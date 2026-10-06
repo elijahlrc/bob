@@ -108,7 +108,7 @@ export const STAT_TEXT: Record<string, StatText> = {
   avatarOfFire: { flag: '50% of non-Fire Damage converted to Fire; deal no non-Fire Damage' },
   closeQuarters: { flag: 'Projectiles deal more Damage at close range, less at long range' },
   instantLeechNoRegen: { flag: 'Life Leech is instant; you have no Life Regeneration' },
-  overload: {
+  feverPitch: {
     flag: '40% more Elemental Damage for 8 seconds after a Critical Strike; Critical Strike Multiplier is 100%',
   },
   painConduit: { flag: '30% more Spell Damage while on Low Life' },

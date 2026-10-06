@@ -175,7 +175,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
   const baseCtx = ctxOf(baseTags, conds, statValue);
   const avatar = db.flag('avatarOfFire', baseCtx);
   const neverCrit = db.flag('neverCrit', baseCtx);
-  const overload = db.flag('overload', baseCtx);
+  const overload = db.flag('feverPitch', baseCtx);
 
   function handProfile(hand: HandStats | null): HandProfile {
     const tags = baseTags | (hand ? tagMask(hand.tags) : 0);

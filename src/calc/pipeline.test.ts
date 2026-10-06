@@ -144,7 +144,7 @@ describe('§6.5 steps 1–2, 4, 7: base, scaling and crit', () => {
     expect(profile(new ModDB([mod('critChance', 'inc', 5000)])).hands[0].critChance).toBe(0.95);
     expect(profile(new ModDB([mod('neverCrit', 'flag', 1)])).hands[0].critChance).toBe(0);
     expect(profile(new ModDB([mod('critMulti', 'base', 50)])).hands[0].critMulti).toBeCloseTo(2);
-    expect(profile(new ModDB([mod('overload', 'flag', 1)])).hands[0].critMulti).toBe(1);
+    expect(profile(new ModDB([mod('feverPitch', 'flag', 1)])).hands[0].critMulti).toBe(1);
   });
 
   it('attack speed and dual wield', () => {

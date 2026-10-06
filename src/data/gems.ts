@@ -92,7 +92,7 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
   },
   {
     kind: 'active',
-    id: 'sweep',
+    id: 'reapingArc',
     name: 'Reaping Arc',
     attr: 'str',
     skillType: 'attack',

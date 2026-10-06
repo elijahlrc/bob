@@ -41,7 +41,7 @@ export const REGIONS: RegionDef[] = [
     angle: -90,
     attrs: ['int'],
     themes: ['spell', 'es', 'mana', 'castSpeed', 'elemental', 'wand', 'reservation', 'esRecharge'],
-    keystones: ['mindBulwark', 'manaBastion', 'overload'],
+    keystones: ['mindBulwark', 'manaBastion', 'feverPitch'],
     notables: [
       'Candlewick Mind',
       'Inkwell of Stars',

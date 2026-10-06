@@ -62,10 +62,10 @@ export const KEYSTONES: KeystoneDef[] = [
     description: 'Leech is instant. You have no life regeneration.',
   },
   {
-    id: 'overload',
+    id: 'feverPitch',
     name: 'Fever Pitch',
     mods: [
-      mod('overload', 'flag', 1),
+      mod('feverPitch', 'flag', 1),
       mod('damage', 'more', 40, { damageTypes: ELE, condition: { id: 'overloadActive' } }),
     ],
     description:

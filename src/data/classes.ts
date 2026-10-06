@@ -37,7 +37,7 @@ export const CLASSES: ClassDef[] = [
     color: 0xd09a3a,
     startWeapons: ['sword_1'],
     startOffHand: 'shield_ar_1',
-    startSkill: 'sweep',
+    startSkill: 'reapingArc',
     startSupport: 'bruteForce',
   },
   {
