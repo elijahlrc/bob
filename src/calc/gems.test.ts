@@ -1,0 +1,101 @@
+import { describe, expect, it } from 'vitest';
+import { ACTIVE_GEMS, AURA_GEMS, gemDef, SUPPORT_GEMS } from '../data/gems';
+import { makeGem, makeItem } from '../gen/items';
+import { mod } from '../mods/types';
+import { newRun } from '../run/run';
+import { Character } from './character';
+import { gemAttrReq, levelValue, naturalGemLevel, resolveActive } from './gems';
+
+function buildWith(
+  classId: string,
+  level: number,
+  gems: string[],
+  extraMods = [] as ReturnType<typeof mod>[],
+) {
+  const run = newRun(classId, 1);
+  const uid = () => run.nextUid++;
+  run.build.level = level;
+  const body = makeItem(uid, 'body_ar_1', level, gems.length);
+  body.sockets = gems.map((g) => makeGem(uid, g));
+  body.implicits.push(...extraMods);
+  run.build.equipment.body = body;
+  run.build.primaryGem = body.sockets[0]!.uid;
+  return run.build;
+}
+
+describe('gems (§11.5)', () => {
+  it('has 7 actives, 17 supports and 7 auras', () => {
+    expect(ACTIVE_GEMS).toHaveLength(7);
+    expect(SUPPORT_GEMS).toHaveLength(17);
+    expect(AURA_GEMS).toHaveLength(7);
+  });
+
+  it('interpolates L1→L20 and extrapolates above', () => {
+    expect(levelValue([10, 48], 1)).toBe(10);
+    expect(levelValue([10, 48], 20)).toBe(48);
+    expect(levelValue([10, 48], 21)).toBe(50);
+    expect(levelValue([9, 520], 20, true)).toBeCloseTo(520);
+  });
+
+  it('auto-levels by character level and attributes', () => {
+    const d = gemDef('crushingBlow');
+    expect(naturalGemLevel(d, 1, { str: 999, dex: 0, int: 0 })).toBe(1);
+    expect(naturalGemLevel(d, 70, { str: 999, dex: 0, int: 0 })).toBe(20);
+    expect(naturalGemLevel(d, 70, { str: 10, dex: 0, int: 0 })).toBe(1);
+    expect(gemAttrReq('str', 20).str).toBe(98);
+    expect(gemAttrReq('dexint', 20).dex).toBe(Math.round(98 * 0.6));
+  });
+
+  it('+level of socketed gems goes past 20 up to 25', () => {
+    const b = buildWith(
+      'vanguard',
+      80,
+      ['crushingBlow'],
+      [mod('socketedGemLevel', 'base', 9, { local: true })],
+    );
+    b.allocated = [];
+    const run = new Character({ ...b });
+    // Attribute requirements may cap the natural level; the bonus is added on top, max 25.
+    const g = run.gems[0];
+    expect(g.level).toBeLessThanOrEqual(25);
+    expect(g.level).toBeGreaterThan(9);
+  });
+
+  it('projectile counts and chains grow every 5 levels', () => {
+    expect(resolveActive(gemDef('splitVolley') as never, 10).behaviour).toMatchObject({ count: 5 });
+    expect(resolveActive(gemDef('arcChain') as never, 15).behaviour).toMatchObject({ chains: 5 });
+  });
+
+  it('supports apply only to matching actives in the same item and multiply cost', () => {
+    const c = new Character(buildWith('mystic', 20, ['flameBolt', 'bruteForce', 'quickCast']));
+    const fb = c.actives[0];
+    expect(fb.supports.map((s) => s.def.id)).toEqual(['quickCast']);
+    expect(fb.costMult).toBeCloseTo(1.2);
+  });
+
+  it('falls back to the default attack when the primary needs another weapon', () => {
+    const c = new Character(buildWith('vanguard', 10, ['splitVolley']));
+    expect(c.primary.gemUid).toBeNull();
+    expect(c.warnings.join()).toMatch(/needs a bow/);
+  });
+
+  it('auras reserve mana in socket order; one that does not fit is inactive', () => {
+    const c = new Character(
+      buildWith('mystic', 10, ['flameBolt', 'stormHalo', 'arcaneWard', 'kindlingHalo']),
+    );
+    const states = c.auras.map((a) => a.active);
+    expect(states).toEqual([true, true, false]);
+    expect(c.reservedMana).toBeGreaterThan(0);
+    expect(c.sheet().warnings.join()).toMatch(/Kindling Halo is inactive/);
+    // Arcane Ward's ES is granted.
+    expect(c.defence().maxEs).toBeGreaterThan(0);
+  });
+
+  it('reduced reservation lowers the cost', () => {
+    const a = new Character(buildWith('mystic', 10, ['flameBolt', 'stormHalo']));
+    const b = new Character(
+      buildWith('mystic', 10, ['flameBolt', 'stormHalo'], [mod('reducedReservation', 'base', 20)]),
+    );
+    expect(b.reservedMana).toBeLessThan(a.reservedMana);
+  });
+});

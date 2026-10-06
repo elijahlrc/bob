@@ -106,6 +106,14 @@ export class Controller {
     this.goTo(run.phase === 'dead' ? 'summary' : run.phase === 'victory' ? 'victory' : 'camp');
   }
 
+  /** Apply a change to the run in camp and notify the UI. */
+  act<T>(fn: (run: RunState) => T): T | undefined {
+    if (!this.run) return undefined;
+    const r = fn(this.run);
+    this.changed();
+    return r;
+  }
+
   setAutoContinue(on: boolean): void {
     if (!this.run) return;
     this.run.autoContinue = on;

@@ -180,3 +180,252 @@ button {
   display: flex;
   gap: 4px;
 }
+.camp {
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: stretch;
+  gap: 0;
+  padding: 0;
+}
+.camp-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.camp-side {
+  width: 260px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-left: 1px solid #333;
+  background: #15141b;
+  overflow: auto;
+}
+.camp-side h2 {
+  margin: 0;
+}
+.camp-side .theme-choice {
+  flex-direction: column;
+}
+.notice {
+  color: #ffd84a;
+}
+.warn {
+  color: #ff8a6a;
+}
+.xp {
+  height: 6px;
+  background: #222;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.xp-fill {
+  height: 100%;
+  background: #b08040;
+}
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding: 8px 8px 0;
+  border-bottom: 1px solid #333;
+}
+.tab {
+  background: #1c1a22;
+  border: 1px solid #333;
+  border-bottom: none;
+  padding: 6px 14px;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+}
+.tab.on {
+  background: #2a2733;
+  color: #ffd84a;
+}
+.tab-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+}
+.tree-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+.tree-bar {
+  display: flex;
+  gap: 16px;
+  padding: 6px 10px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+svg.tree {
+  flex: 1;
+  width: 100%;
+  background: #0c0b10;
+  cursor: grab;
+  touch-action: none;
+}
+.edge {
+  stroke: #3a3644;
+  stroke-width: 6;
+}
+.edge.on {
+  stroke: #d0a040;
+  stroke-width: 9;
+}
+.node {
+  fill: #2a2733;
+  stroke: #5a5466;
+  stroke-width: 3;
+  cursor: pointer;
+}
+.node.travel {
+  fill: #24222b;
+}
+.node.notable {
+  fill: #3a3446;
+  stroke: #9a8a6a;
+  stroke-width: 4;
+}
+.node.keystone {
+  fill: #40304a;
+  stroke: #c090ff;
+  stroke-width: 5;
+}
+.node.can {
+  stroke: #e0d0a0;
+}
+.node.on {
+  fill: #d0a040;
+  stroke: #ffe8a0;
+}
+.node.start {
+  fill: #555;
+  stroke: #888;
+}
+.node.start.mine {
+  stroke: #fff;
+  stroke-width: 5;
+}
+.path-ring {
+  fill: none;
+  stroke: #7af0ff;
+  stroke-width: 4;
+  pointer-events: none;
+}
+.tooltip {
+  position: fixed;
+  z-index: 10;
+  pointer-events: none;
+  background: #111018ee;
+  border: 1px solid #555;
+  border-radius: 6px;
+  padding: 8px 10px;
+  max-width: 320px;
+  font-size: 13px;
+}
+.tt-name {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.tt-name.notable {
+  color: #ffd84a;
+}
+.tt-name.keystone {
+  color: #c090ff;
+}
+.tt-mod {
+  color: #9ab8ff;
+}
+.tt-hint {
+  margin-top: 6px;
+  color: #9a9488;
+}
+.sheet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 16px;
+}
+.sheet table {
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.sheet td {
+  padding: 3px 10px;
+  border-bottom: 1px solid #2a2733;
+}
+.sheet td:first-child {
+  color: #9a9488;
+}
+.auras {
+  width: 100%;
+}
+.skills {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.socket-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.socket-item {
+  width: 160px;
+}
+.socket {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid #4a4555;
+  border-radius: 6px;
+  background: #1c1a22;
+  min-height: 34px;
+}
+.socket.empty {
+  padding: 6px 12px;
+  color: #777;
+  cursor: pointer;
+}
+.socket.active {
+  border-color: #c06040;
+}
+.socket.support {
+  border-color: #4080c0;
+}
+.socket.aura {
+  border-color: #40c080;
+}
+.socket.primary {
+  box-shadow: 0 0 0 2px #ffd84a;
+}
+.gem-name {
+  background: none;
+  border: none;
+  padding: 6px 10px;
+  cursor: pointer;
+  text-align: left;
+}
+.x {
+  background: none;
+  border: none;
+  border-left: 1px solid #333;
+  padding: 0 8px;
+  cursor: pointer;
+  color: #999;
+}
+.gem-pick {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 8px;
+  border: 1px dashed #555;
+  border-radius: 6px;
+}

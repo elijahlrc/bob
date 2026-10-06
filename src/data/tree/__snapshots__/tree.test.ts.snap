@@ -1,0 +1,136 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`passive tree invariants (§9.3) > is deterministic and pinned (snapshot) 1`] = `
+{
+  "edges": 1440,
+  "keystones": [
+    {
+      "id": 46,
+      "name": "Crimson Pact",
+      "x": 370,
+      "y": -641,
+    },
+    {
+      "id": 49,
+      "name": "Pain Conduit",
+      "x": 370,
+      "y": 641,
+    },
+    {
+      "id": 52,
+      "name": "Strongarm",
+      "x": -740,
+      "y": 0,
+    },
+    {
+      "id": 88,
+      "name": "Mind Bulwark",
+      "x": -695,
+      "y": -1715,
+    },
+    {
+      "id": 134,
+      "name": "Mana Bastion",
+      "x": 829,
+      "y": -1984,
+    },
+    {
+      "id": 183,
+      "name": "Overload",
+      "x": -101,
+      "y": -2748,
+    },
+    {
+      "id": 236,
+      "name": "Cruel Agony",
+      "x": 1138,
+      "y": -1459,
+    },
+    {
+      "id": 282,
+      "name": "Shade Leech",
+      "x": 2132,
+      "y": -274,
+    },
+    {
+      "id": 331,
+      "name": "Hollow Vessel",
+      "x": 2330,
+      "y": -1461,
+    },
+    {
+      "id": 384,
+      "name": "Close Quarters",
+      "x": 1832,
+      "y": 256,
+    },
+    {
+      "id": 430,
+      "name": "Arrow Weave",
+      "x": 1303,
+      "y": 1710,
+    },
+    {
+      "id": 479,
+      "name": "Steady Draw",
+      "x": 2430,
+      "y": 1287,
+    },
+    {
+      "id": 532,
+      "name": "Plated Hide",
+      "x": 695,
+      "y": 1715,
+    },
+    {
+      "id": 578,
+      "name": "Wound Dance",
+      "x": -829,
+      "y": 1984,
+    },
+    {
+      "id": 627,
+      "name": "Shieldwall",
+      "x": 101,
+      "y": 2748,
+    },
+    {
+      "id": 680,
+      "name": "Blood Rite",
+      "x": -1138,
+      "y": 1459,
+    },
+    {
+      "id": 726,
+      "name": "Unerring Discipline",
+      "x": -2132,
+      "y": 274,
+    },
+    {
+      "id": 775,
+      "name": "Rooted Stance",
+      "x": -2330,
+      "y": 1461,
+    },
+    {
+      "id": 828,
+      "name": "Searing Avatar",
+      "x": -1832,
+      "y": -256,
+    },
+    {
+      "id": 874,
+      "name": "Prismatic Balance",
+      "x": -1303,
+      "y": -1710,
+    },
+    {
+      "id": 923,
+      "name": "Living Ward",
+      "x": -2430,
+      "y": -1287,
+    },
+  ],
+  "nodes": 1344,
+}
+`;

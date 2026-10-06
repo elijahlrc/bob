@@ -1,6 +1,6 @@
 # Bob — Progress
 
-Current milestone: **M3 — Character building**
+Current milestone: **M4 — Items**
 
 Spec: [DESIGN.md](DESIGN.md). Each milestone ends with green `npm run check` and `npm run build` and one commit.
 
@@ -35,14 +35,16 @@ controller in dev builds for debugging.
       projectile attack, chaining spell, falloff spell, poison — each with and without evasion/resists
 - [x] Flasks with auto-use policy
 
-## M3 — Character building
+## M3 — Character building ✅
 
-- [ ] Six classes
-- [ ] Tree engine (≥ 450 nodes, 21 keystones working and tested)
-- [ ] SVG tree UI
-- [ ] XP, levelling, passive and bonus points
-- [ ] Gems: sockets, supports, auto-level, primary, default attack, 7 actives + 17 supports
-- [ ] 7 auras with reservation and inactive warning
+- [x] Six classes
+- [x] Tree engine — built at **full size** already (1,344 nodes, 139 notables, 21 keystones); every
+      §9.3 invariant passes, including the node-count range; all 21 keystones tested
+- [x] SVG tree UI: pan, zoom, tooltips, path allocation, refund, point counters
+- [x] XP, levelling (mid-map rebuild), passive and bonus points
+- [x] Gems: sockets, all-linked supports, auto-level (+socketed levels to 25), primary selection,
+      default-attack fallback, 7 actives + 17 supports (Skills tab)
+- [x] 7 auras with reservation and the inactive-aura warning (Character tab)
 
 ## M4 — Items
 
