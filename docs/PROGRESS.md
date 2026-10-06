@@ -122,6 +122,8 @@ the title screen, with the class select, camp and auto-continue) shows no consol
 - No canvas tree renderer (the SVG met the cost measurement; see above).
 - Only `primary` skill is used; other actives are inactive in v1, as specified.
 
+See also `docs/BUGS.md` for the list of bugs to revisit after the aesthetic is chosen.
+
 ## Known bugs / limitations
 
 - Saves store passive allocations as tree node ids; editing `src/data/tree/spec.ts` invalidates saves
