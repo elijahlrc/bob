@@ -1,0 +1,25 @@
+# Dependencies and build output
+node_modules
+dist
+dist-ssr
+coverage
+
+# Logs
+*.log
+npm-debug.log*
+
+# Local env / overrides
+*.local
+.env
+.env.*
+
+# Claude Code per-user settings (launch.json is shared and committed)
+.claude/settings.local.json
+
+# Editors and OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+*.sw?
