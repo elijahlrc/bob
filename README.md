@@ -31,8 +31,15 @@ Then open http://localhost:5173.
    - **Passive tree** — click a node to allocate the whole path to it; click an allocated node to
      refund it (costs a refund point; the tree must stay connected). You earn a passive point per
      level, plus 3 bonus points after maps 10, 20 … 80.
-   - **Items** — equip gear from your inventory. Item cards show the change in DPS, life, resistances
-     and effective HP. Gems are socketed from the **Skills** tab; every socket on an item is linked.
+   - **Items** — the inventory is a sortable, filterable list. Every row shows the effect of equipping it
+     (▲/▼ DPS and effective HP). Click an item to see it beside what it would replace; click a highlighted slot
+     to equip there, or double-click / press Enter for the best slot. Sort by slot, rarity, item level, Δ DPS,
+     Δ EHP or "best upgrade"; filter by weapons, armour, jewellery, flasks, gems, upgrades or usable. **Discard
+     junk** removes normal and magic items that are not upgrades. Keys: ↑/↓ browse, Enter equip, Del discard,
+     U unequip. **Ctrl+Z undoes** the last camp change (equip, socket, passive point, reward pick).
+   - **Skills** — click a gem to preview each socket's effect, then click a socket; or drag gems onto sockets
+     (drag back onto the gem list to remove, onto another socket to swap). Double-click a gem to auto-place it.
+     Every socket on an item is linked; ★ sets the primary skill.
    - **Character** — the full stat sheet, aura reservations and warnings.
    - A **reward pick** (1 of 3) appears after every 5th map.
    - Choose the next map (two themes with different bonuses), or leave **Auto-continue** on: when

@@ -36,6 +36,23 @@ export function Camp({ c }: { c: Controller }) {
     }, 100);
     return () => clearInterval(id);
   }, [auto, run?.map]);
+  // Ctrl+Z undoes the last camp change (equip, socket, passive point, reward pick ...).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        e.key.toLowerCase() === 'z' &&
+        tag !== 'INPUT' &&
+        tag !== 'SELECT'
+      ) {
+        e.preventDefault();
+        c.undo();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [c]);
   const ch = useMemo(
     () =>
       run

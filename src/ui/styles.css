@@ -568,3 +568,247 @@ svg.tree {
 .reward-preview {
   margin-top: 4px;
 }
+/* Inventory management */
+.items {
+  outline: none;
+}
+.hint {
+  font-size: 12px;
+}
+.inv-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.inv-toolbar select {
+  background: #1c1a22;
+  color: inherit;
+  border: 1px solid #4a4555;
+  border-radius: 4px;
+  padding: 3px 6px;
+}
+.spacer {
+  flex: 1;
+}
+.chips {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 8px 0;
+}
+.chip {
+  background: #1c1a22;
+  border: 1px solid #3a3644;
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.chip.on {
+  background: #b08040;
+  color: #111;
+  border-color: #b08040;
+}
+.count {
+  margin-left: auto;
+  font-size: 12px;
+}
+.inv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.inv-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 80px 38px auto;
+  gap: 8px;
+  align-items: center;
+  background: #1c1a22;
+  border: 1px solid #2f2b38;
+  border-radius: 5px;
+  padding: 4px 8px;
+  text-align: left;
+  font-size: 13px;
+  cursor: pointer;
+}
+.inv-row:hover {
+  background: #26232e;
+}
+.inv-row.sel {
+  outline: 2px solid #ffd84a;
+}
+.inv-row.unusable {
+  opacity: 0.55;
+}
+.row-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.row-badges {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+.badge {
+  font-size: 11px;
+  border-radius: 8px;
+  padding: 1px 6px;
+  white-space: nowrap;
+  background: #2a2733;
+}
+.badge.up {
+  color: #60e070;
+  background: #17301c;
+}
+.badge.down {
+  color: #ff7070;
+  background: #351818;
+}
+.badge.neutral {
+  color: #999;
+}
+.new-tag {
+  font-size: 10px;
+  font-weight: bold;
+  background: #ffd84a;
+  color: #111;
+  border-radius: 3px;
+  padding: 0 4px;
+  margin-right: 6px;
+}
+.eq-slot.target {
+  outline: 2px dashed #60e070;
+  background: #17301c;
+}
+.eq-slot.blocked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.compare {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.compare > div {
+  flex: 1;
+  min-width: 0;
+}
+.cmp-title {
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+.empty-card {
+  text-align: center;
+  padding: 24px 10px;
+}
+.btn.primary {
+  background: #6a4a20;
+  border-color: #b08040;
+}
+.items {
+  flex-wrap: wrap;
+}
+.equip-col {
+  width: min(560px, 100%);
+}
+/* Skills / sockets */
+.skills-wrap {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding: 16px;
+}
+.skills-wrap .skills {
+  flex: 1 1 420px;
+  padding: 0;
+}
+.skill-summary {
+  font-size: 15px;
+}
+.gem-inv {
+  flex: 0 0 280px;
+  min-height: 160px;
+  border: 1px dashed #3a3644;
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.gem-inv.drop,
+.socket.drop {
+  border-color: #ffd84a;
+  background: #2a2412;
+}
+.gem-group-title {
+  font-size: 11px;
+  margin-top: 6px;
+}
+.gem-chip {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  align-items: center;
+  background: #1c1a22;
+  border: 1px solid #4a4555;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 13px;
+  cursor: grab;
+  text-align: left;
+}
+.gem-chip.active {
+  border-color: #c06040;
+}
+.gem-chip.support {
+  border-color: #4080c0;
+}
+.gem-chip.aura {
+  border-color: #40c080;
+}
+.gem-chip.sel,
+.socket.sel {
+  outline: 2px solid #ffd84a;
+}
+.socket.target {
+  border-style: dashed;
+  border-color: #60e070;
+}
+.socket.empty {
+  min-width: 90px;
+  justify-content: center;
+  align-items: center;
+}
+.star {
+  background: none;
+  border: none;
+  border-left: 1px solid #333;
+  padding: 0 8px;
+  cursor: pointer;
+  color: #666;
+}
+.star.on {
+  color: #ffd84a;
+}
+select option {
+  background: #1c1a22;
+}
+.equip-col {
+  flex: 0 1 440px;
+  width: auto;
+  min-width: 300px;
+}
+.inv-col {
+  flex: 1 1 380px;
+  min-width: 340px;
+}
+.inv-row {
+  grid-template-columns: minmax(110px, 1fr) 72px 34px auto;
+}
+.inv-row {
+  grid-template-columns: minmax(110px, 1fr) 72px 34px 150px;
+}

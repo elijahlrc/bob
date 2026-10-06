@@ -54,6 +54,7 @@ export class Controller {
   continueRun(): void {
     if (this.saved.status !== 'ok') return;
     this.run = this.saved.run;
+    this.undoStack = [];
     this.lastResult = null;
     this.goTo('camp');
   }
@@ -72,6 +73,7 @@ export class Controller {
 
   startRun(classId: string, seed: number): void {
     this.run = newRun(classId, seed);
+    this.undoStack = [];
     this.lastResult = null;
     this.goTo('camp');
   }
@@ -82,6 +84,7 @@ export class Controller {
     if (!run) return;
     const plan = planFor(run, run.nextThemes[themeIdx] ?? run.nextThemes[0]);
     run.newLoot = [];
+    this.undoStack = [];
     this.world = createWorld({ plan, build: run.build, xp: run.xp, opts: worldOptsFor(run, plan) });
     this.acc = 0;
     this.screen = 'map';
@@ -135,12 +138,46 @@ export class Controller {
     this.goTo(run.phase === 'dead' ? 'summary' : run.phase === 'victory' ? 'victory' : 'camp');
   }
 
-  /** Apply a change to the run in camp and notify the UI. */
+  private undoStack: string[] = [];
+
+  /** The parts of a run a camp change can touch (undo snapshots). */
+  private snapshot(run: RunState): string {
+    const { build, inventory, nextUid, bonusPoints, refundPoints, reward, newLoot } = run;
+    return JSON.stringify({
+      build,
+      inventory,
+      nextUid,
+      bonusPoints,
+      refundPoints,
+      reward,
+      newLoot,
+    });
+  }
+
+  /** Apply a change to the run in camp and notify the UI. Changes can be undone. */
   act<T>(fn: (run: RunState) => T): T | undefined {
     if (!this.run) return undefined;
+    const before = this.snapshot(this.run);
     const r = fn(this.run);
+    if (this.snapshot(this.run) !== before) {
+      this.undoStack.push(before);
+      if (this.undoStack.length > 40) this.undoStack.shift();
+    }
     this.changed();
     return r;
+  }
+
+  get canUndo(): boolean {
+    return this.undoStack.length > 0;
+  }
+
+  /** Revert the last camp change (equip, socket, passive point, reward pick ...). */
+  undo(): boolean {
+    const prev = this.undoStack.pop();
+    if (!prev || !this.run) return false;
+    Object.assign(this.run, JSON.parse(prev));
+    this.changed();
+    return true;
   }
 
   setAutoContinue(on: boolean): void {

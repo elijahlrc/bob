@@ -105,6 +105,16 @@ every-5th-map rule (maps 10, 20, … are multiples of 5 already, so it is covere
 M0–M7 are met. `npm run check` and `npm run build` are green, and a browser playthrough of maps 1–2 (from
 the title screen, with the class select, camp and auto-continue) shows no console errors.
 
+## After M7: inventory management
+
+- Items tab rewritten: sortable/filterable list with per-item Δ DPS / Δ EHP badges, NEW tags, side-by-side
+  compare with the item being replaced, target-slot highlighting, double-click and keyboard shortcuts,
+  "discard junk", sort/filter preferences remembered (`localStorage`, `bob.pref.*`).
+- Skills tab: gem list with best-placement badges, per-socket effect previews, drag-and-drop and
+  click-to-place, auto-socket, swap between items.
+- Camp-wide undo (Ctrl+Z, 40 steps) in `Controller.act`; headless logic in `src/run/inventoryOps.ts`
+  (tested in `inventoryOps.test.ts`).
+
 ## Deferred / cut
 
 - Combat log, minimap, sound, seed entry, per-skill DPS breakdown, manual flask hotkeys (the "Stretch"
