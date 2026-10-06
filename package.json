@@ -18,12 +18,17 @@
     "check": "tsc && eslint . && prettier --check . && vitest run --passWithNoTests"
   },
   "dependencies": {
-    "phaser": "^4.2.1"
+    "@preact/signals": "^2.11.3",
+    "phaser": "^4.2.1",
+    "preact": "^11.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@preact/preset-vite": "^2.10.6",
+    "@types/node": "^26.6.4",
     "eslint": "^10.12.0",
     "prettier": "^3.9.9",
+    "tsx": "^4.23.15",
     "typescript": "~6.0",
     "typescript-eslint": "^8.71.1",
     "vite": "^8.3.3",

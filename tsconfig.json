@@ -3,7 +3,7 @@
     "target": "es2023",
     "module": "esnext",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"],
+    "types": ["vite/client", "node"],
     "skipLibCheck": true,
 
     /* Bundler mode: Vite does the transpiling, tsc only type-checks */
@@ -12,6 +12,8 @@
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
 
     /* Type safety */
     "strict": true,
@@ -21,5 +23,5 @@
     "noImplicitOverride": true,
     "erasableSyntaxOnly": true
   },
-  "include": ["src", "vite.config.ts"]
+  "include": ["src", "scripts", "vite.config.ts"]
 }

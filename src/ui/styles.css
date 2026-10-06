@@ -1,0 +1,19 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #e6e1d3;
+}
+.screen {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 16, 0.92);
+}
+.title h1 {
+  font-size: 64px;
+  letter-spacing: 0.2em;
+  margin: 0 0 8px;
+}

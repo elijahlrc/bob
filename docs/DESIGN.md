@@ -116,14 +116,14 @@ Title → Class select → [Camp → Map]×100 → Victory
 There are six classes. Classes differ only in starting attributes, starting gear and gems, and where they start on the
 tree.
 
-| Class (ours) | PoE analogue | Str | Dex | Int | Start weapon      | Start skill   | Start support   |
-| ------------ | ------------ | --- | --- | --- | ----------------- | ------------- | --------------- |
-| Vanguard     | Marauder     | 32  | 14  | 14  | 2H mace           | Crushing Blow | Brute Force     |
-| Strider      | Ranger       | 14  | 32  | 14  | Bow (+ quiver)    | Split Volley  | Swift Assault   |
-| Mystic       | Witch        | 14  | 14  | 32  | Wand              | Flame Bolt    | Spell Echo      |
-| Reaver       | Duelist      | 23  | 23  | 14  | 1H sword + shield | Sweep         | Brute Force     |
-| Zealot       | Templar      | 23  | 14  | 23  | Sceptre + shield  | Arc Chain     | Elemental Focus |
-| Shade        | Shadow       | 14  | 23  | 23  | Dagger + dagger   | Venom Cut     | Swift Assault   |
+| Class (ours) | PoE analogue | Str | Dex | Int | Start weapon      | Start skill   | Start support       |
+| ------------ | ------------ | --- | --- | --- | ----------------- | ------------- | ------------------- |
+| Vanguard     | Marauder     | 32  | 14  | 14  | 2H mace           | Crushing Blow | Brute Force         |
+| Strider      | Ranger       | 14  | 32  | 14  | Bow (+ quiver)    | Split Volley  | Swift Assault       |
+| Mystic       | Witch        | 14  | 14  | 32  | Wand              | Flame Bolt    | Echoing Cast        |
+| Reaver       | Duelist      | 23  | 23  | 14  | 1H sword + shield | Sweep         | Brute Force         |
+| Zealot       | Templar      | 23  | 14  | 23  | Sceptre + shield  | Arc Chain     | Channelled Elements |
+| Shade        | Shadow       | 14  | 23  | 23  | Dagger + dagger   | Venom Cut     | Swift Assault       |
 
 Every class also starts with: a 2-socket body armour (holding the start skill and support), one life flask and one
 mana flask.
@@ -516,7 +516,7 @@ At ~1,300 nodes, the tree is authored at the **cluster** level, never node by no
 | Unerring Discipline | Attacks always hit. Never deal critical strikes.                                                         | Resolute Technique    |
 | Hollow Vessel       | Max life is 1. Immune to chaos damage.                                                                   | Chaos Inoculation     |
 | Blood Rite          | Skills cost life instead of mana. Max mana is 0. Auras reserve life instead of mana.                     | Blood Magic           |
-| Iron Skin           | Evasion rating is converted to armour. Dexterity gives no evasion bonus.                                 | Iron Reflexes         |
+| Plated Hide         | Evasion rating is converted to armour. Dexterity gives no evasion bonus.                                 | Iron Reflexes         |
 | Mind Bulwark        | 30% of damage is taken from mana before life.                                                            | Mind Over Matter      |
 | Searing Avatar      | 50% of physical, lightning and cold damage is converted to fire. Deal no non-fire damage.                | Avatar of Fire        |
 | Close Quarters      | Projectile damage: up to 50% more at short range, falling to 50% less at long range (linear, 1–8 tiles). | Point Blank           |
@@ -750,25 +750,25 @@ tiers keep unlocking throughout the 100-map run. Families:
 
 **Supports (17):**
 
-| Name (ours)       | Effect                                                            | Cost × | Tags       | PoE analogue                |
-| ----------------- | ----------------------------------------------------------------- | ------ | ---------- | --------------------------- |
-| Brute Force       | 40%→59% more melee physical damage                                | 1.4    | melee      | Melee Physical Damage       |
-| Swift Assault     | 25%→44% increased attack speed                                    | 1.15   | attack     | Faster Attacks              |
-| Quick Cast        | 20%→39% increased cast speed                                      | 1.2    | spell      | Faster Casting              |
-| Ember Infusion    | Gain 25%→34% of physical as extra fire                            | 1.2    | attack     | Added Fire Damage           |
-| Elemental Focus   | 30%→49% more elemental damage; cannot inflict elemental ailments  | 1.3    | any        | Elemental Focus             |
-| Focused Ruin      | 30%→49% more spell damage; 100% reduced crit chance               | 1.3    | spell      | Controlled Destruction      |
-| Spell Echo        | Repeats the cast (70% more cast speed); 10% less damage           | 1.4    | spell      | Spell Echo                  |
-| Volley Split      | +2 projectiles; 25% less projectile damage                        | 1.5    | projectile | Lesser Multiple Projectiles |
-| Piercing Shot     | Projectiles pierce 2→5 targets; 10% more projectile damage at L20 | 1.2    | projectile | Pierce                      |
-| Dense Blast       | 35%→54% more area damage; 30% less area of effect                 | 1.4    | area       | Concentrated Effect         |
-| Wide Blast        | 30%→49% increased area of effect                                  | 1.4    | area       | Increased AoE               |
-| Precision Strikes | 30%→49% increased crit chance; +15%→34% crit multiplier           | 1.2    | any        | Increased Critical Strikes  |
-| Lacerate          | 25% chance to bleed; 30%→49% more bleed damage                    | 1.2    | attack     | Chance to Bleed             |
-| Toxin Coat        | 40% chance to poison; 20%→39% more poison damage                  | 1.2    | any        | Chance to Poison            |
-| Kindle            | 30% ignite chance; 40%→59% more ignite damage                     | 1.2    | any        | Immolate/Burning-ish        |
-| Bloodthirst       | 2% of attack damage leeched as life                               | 1.3    | attack     | Life Leech                  |
-| Staggering Force  | 30%→49% increased stun duration; 20% reduced enemy stun threshold | 1.15   | attack     | (ours)                      |
+| Name (ours)         | Effect                                                            | Cost × | Tags       | PoE analogue                |
+| ------------------- | ----------------------------------------------------------------- | ------ | ---------- | --------------------------- |
+| Brute Force         | 40%→59% more melee physical damage                                | 1.4    | melee      | Melee Physical Damage       |
+| Swift Assault       | 25%→44% increased attack speed                                    | 1.15   | attack     | Faster Attacks              |
+| Quick Cast          | 20%→39% increased cast speed                                      | 1.2    | spell      | Faster Casting              |
+| Ember Infusion      | Gain 25%→34% of physical as extra fire                            | 1.2    | attack     | Added Fire Damage           |
+| Channelled Elements | 30%→49% more elemental damage; cannot inflict elemental ailments  | 1.3    | any        | Elemental Focus             |
+| Focused Ruin        | 30%→49% more spell damage; 100% reduced crit chance               | 1.3    | spell      | Controlled Destruction      |
+| Echoing Cast        | Repeats the cast (70% more cast speed); 10% less damage           | 1.4    | spell      | Spell Echo                  |
+| Volley Split        | +2 projectiles; 25% less projectile damage                        | 1.5    | projectile | Lesser Multiple Projectiles |
+| Piercing Shot       | Projectiles pierce 2→5 targets; 10% more projectile damage at L20 | 1.2    | projectile | Pierce                      |
+| Dense Blast         | 35%→54% more area damage; 30% less area of effect                 | 1.4    | area       | Concentrated Effect         |
+| Wide Blast          | 30%→49% increased area of effect                                  | 1.4    | area       | Increased AoE               |
+| Precision Strikes   | 30%→49% increased crit chance; +15%→34% crit multiplier           | 1.2    | any        | Increased Critical Strikes  |
+| Rending Edge        | 25% chance to bleed; 30%→49% more bleed damage                    | 1.2    | attack     | Chance to Bleed             |
+| Toxin Coat          | 40% chance to poison; 20%→39% more poison damage                  | 1.2    | any        | Chance to Poison            |
+| Kindle              | 30% ignite chance; 40%→59% more ignite damage                     | 1.2    | any        | Immolate/Burning-ish        |
+| Bloodthirst         | 2% of attack damage leeched as life                               | 1.3    | attack     | Life Leech                  |
+| Staggering Force    | 30%→49% increased stun duration; 20% reduced enemy stun threshold | 1.15   | attack     | (ours)                      |
 
 That is 17 supports.
 
@@ -1201,6 +1201,14 @@ playthrough of at least maps 1–2 shows no console errors. `docs/PROGRESS.md` l
 ## Appendix A — Implementation decisions
 
 _(Filled in during implementation: date, decision, reason.)_
+
+| Date       | Decision                                                                                                                                                                                                     | Reason                                                                                                                                         |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-06 | Renamed supports "Spell Echo" → **Echoing Cast**, "Elemental Focus" → **Channelled Elements**, "Lacerate" → **Rending Edge**, and keystone "Iron Skin" → **Plated Hide**.                                    | The first three are the reference game's own proper names (§3.3); the last was too close to one.                                               |
+| 2026-10-06 | The IP deny-list matches multi-word entries anywhere as whole words, and single-word entries only when they are an entire string.                                                                            | Lets common words inside our names ("Veil of Grace", "Haste flask") pass while still catching a gem or class named exactly like the reference. |
+| 2026-10-06 | Web lookups may be used to understand how a mechanic works; nothing (code, data, text, art) is copied from Path of Building, game files or the wiki. Blender is not used: §14.5 mandates code-generated art. | Reconciles the goal prompt ("use any tools") with §3.                                                                                          |
+| 2026-10-06 | `run/save.ts` takes an injected key–value storage; `main.ts` passes `window.localStorage`.                                                                                                                   | §5.5 needs localStorage but §14.2 keeps `run/` free of DOM globals.                                                                            |
+| 2026-10-06 | Added dev dependency `@types/node`. `scripts/` may use wall-clock time (the bot measures its own speed); the banned-globals rule applies to the headless `src/` layers.                                      | `scripts/simulate.ts` needs Node typings and timing.                                                                                           |
 
 ## Appendix B — Glossary
 
