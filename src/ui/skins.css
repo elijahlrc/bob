@@ -4,7 +4,8 @@
    ================================================================================================= */
 
 /* ---- Grimdark: iron, leather and embers ---- */
-:root[data-style='grim'] {
+:root[data-style='grim'],
+:root[data-style='gri'] {
   --bg: #070508;
   --screen: rgba(8, 6, 8, 0.93);
   --screen-bg: radial-gradient(ellipse at 50% 40%, #1d1510 0%, #0a0708 60%, #040304 100%);
@@ -26,7 +27,8 @@
   --font: 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
   --title-font: 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
 }
-:root[data-style='grim'] .title h1 {
+:root[data-style='grim'] .title h1,
+:root[data-style='gri'] .title h1 {
   font-family: var(--title-font);
   letter-spacing: 0.35em;
   text-shadow:
@@ -35,8 +37,11 @@
   color: #e8d6b0;
 }
 :root[data-style='grim'] .btn,
+:root[data-style='gri'] .btn,
 :root[data-style='grim'] .tab,
-:root[data-style='grim'] .style-btn {
+:root[data-style='gri'] .tab,
+:root[data-style='grim'] .style-btn,
+:root[data-style='gri'] .style-btn {
   background: linear-gradient(#3a2b1e, #24190f);
   border: 1px solid #6a5238;
   box-shadow:
@@ -45,27 +50,36 @@
     0 2px 5px #000a;
   text-shadow: 0 1px 1px #000;
 }
-:root[data-style='grim'] .btn:hover {
+:root[data-style='grim'] .btn:hover,
+:root[data-style='gri'] .btn:hover {
   background: linear-gradient(#4a3624, #2e2014);
 }
-:root[data-style='grim'] .btn.primary {
+:root[data-style='grim'] .btn.primary,
+:root[data-style='gri'] .btn.primary {
   background: linear-gradient(#a8601f, #5e3010);
   border-color: #d89a50;
 }
-:root[data-style='grim'] .btn.on {
+:root[data-style='grim'] .btn.on,
+:root[data-style='gri'] .btn.on {
   background: linear-gradient(#d88a38, #8a4a18);
   color: #1a0e06;
 }
 :root[data-style='grim'] .camp-side,
+:root[data-style='gri'] .camp-side,
 :root[data-style='grim'] .item-card,
+:root[data-style='gri'] .item-card,
 :root[data-style='grim'] .class-card,
+:root[data-style='gri'] .class-card,
 :root[data-style='grim'] .gem-inv,
-:root[data-style='grim'] .tooltip {
+:root[data-style='gri'] .gem-inv,
+:root[data-style='grim'] .tooltip,
+:root[data-style='gri'] .tooltip {
   box-shadow:
     inset 0 0 0 1px #000,
     inset 0 0 18px #000a;
 }
-:root[data-style='grim'] .orb-glass {
+:root[data-style='grim'] .orb-glass,
+:root[data-style='gri'] .orb-glass {
   border: 6px solid #3a2c1e;
   box-shadow:
     inset 0 0 18px #000,
@@ -73,7 +87,8 @@
     0 0 0 4px #5a4630,
     0 6px 14px #000c;
 }
-:root[data-style='grim'] .hud-bottom::before {
+:root[data-style='grim'] .hud-bottom::before,
+:root[data-style='gri'] .hud-bottom::before {
   content: '';
   position: absolute;
   left: -12px;
@@ -84,7 +99,8 @@
   z-index: -1;
   pointer-events: none;
 }
-:root[data-style='grim'] .flask-body {
+:root[data-style='grim'] .flask-body,
+:root[data-style='gri'] .flask-body {
   border-color: #6a5238;
   background: #0a0806;
 }

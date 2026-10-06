@@ -103,7 +103,7 @@ export function Hud({ c }: { c: Controller }) {
       {sc && (
         <div class="hud-showcase">
           <div class="muted">
-            {CLASSES[sc.classIdx].name} · keys 1 / 2 / 3 switch style · N next class
+            {CLASSES[sc.classIdx].name} · keys 1-4 switch style · N next class
           </div>
           <StyleSwitcher c={c} compact />
           <div class="showcase-row">

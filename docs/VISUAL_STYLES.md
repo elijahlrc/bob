@@ -1,7 +1,7 @@
 # Visual style exploration
 
-Three complete vertical slices of the map renderer, all driven by the same simulation and the same
-procedural figure rig (`src/render/style/figure.ts`). Switch live with keys **1 / 2 / 3** (map or title),
+Four complete vertical slices (three styles plus Grim Isometric, a diagonal-camera variant of Grimdark) of the map renderer, all driven by the same simulation and the same
+procedural figure rig (`src/render/style/figure.ts`). Switch live with keys **1 / 2 / 3 / 4** (map or title),
 the style switcher on the title screen, or the panel in Showcase mode. The choice is remembered
 (`localStorage` key `bob.style`).
 
@@ -45,3 +45,12 @@ Facing changes need sustained motion and a 0.15 s gap between turns, which preve
 - Grimdark's lighting is GPU-bound (max 32 lights); worth profiling on low-end machines.
 - No real fps was measured: the preview pane throttles frames.
 - Recommendation: **Grimdark** matches the stated goal best; **Cel Isometric** has the strongest readability when screens are crowded; **Inkwell** is the cheapest to extend. Cel's isometric camera would need pathing/click-projection work if input ever becomes spatial.
+
+## Grim Isometric (`gri`)
+
+The Grimdark look from a 2:1 diagonal camera. It is the same class as Grimdark (`GrimIsoStyle` sets `iso`),
+so lights, particles, decals, flasks, enemy marks and animation are shared. What differs:
+
+- 32×16 px diamond tiles (vs 24 px squares) and 0.6× figure rasterisation, shown at 2× zoom (1.5× on windows under 1100 px): smaller pixels and roughly twice the map area in view.
+- Pixel-art floor slabs (Voronoi flagstones) baked into 8×8 chunks; wall cubes with brick courses, a lit top, a mid-tone left face and a dark right face. Walls on the near side are cut low so they never hide the action.
+- Everything sorts by screen y; lights are scaled to 80% of the top-down radii; ground effects become ellipses.

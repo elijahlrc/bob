@@ -55,7 +55,7 @@ export class Controller {
     if (store) {
       this.saved = loadRun(store);
       const sid = store.getItem('bob.style');
-      if (sid === 'grim' || sid === 'cel' || sid === 'ink') this.styleId = sid;
+      if (sid === 'grim' || sid === 'gri' || sid === 'cel' || sid === 'ink') this.styleId = sid;
     }
     this.bus.on('frame', ({ dtMs }) => this.onFrame(dtMs));
     this.bus.on('select', ({ id }) => (this.selectedId = id));
@@ -267,9 +267,19 @@ export class Controller {
    * passive points, no pending reward and no new unique or rare item.
    */
   canAutoContinue(): boolean {
+    return this.autoBlocker() === null;
+  }
+
+  /** Why auto-continue is paused (shown in the camp), or null when nothing needs attention. */
+  autoBlocker(): string | null {
     const run = this.run;
-    if (!run || run.phase !== 'camp') return false;
-    return passivePoints(run) <= 0 && !run.reward && run.newLoot.length === 0;
+    if (!run || run.phase !== 'camp') return 'not in camp';
+    const pts = passivePoints(run);
+    if (pts > 0) return `${pts} unspent passive point${pts === 1 ? '' : 's'}`;
+    if (run.reward) return 'a reward is waiting to be picked';
+    if (run.newLoot.length > 0)
+      return `${run.newLoot.length} new rare/unique item${run.newLoot.length === 1 ? '' : 's'} (open Items)`;
+    return null;
   }
 
   /** Abandon the run and return to the title screen. */

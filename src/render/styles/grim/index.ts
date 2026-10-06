@@ -13,10 +13,13 @@ import { StyleBase, AnimTrack, figureOf, heroColor, type ActorView } from '../..
 import type { MarkTheme } from '../../style/marks';
 import { isHero, type AnimName, type FigureKind } from '../../style/figure';
 import type { StyleId } from '../../style/types';
-import { buildProps, FRAMES, GTILE, makeTileset, rasterFigure } from './paint';
+import { buildProps, FIG_PX, FIG_PX_ISO, FRAMES, GTILE, makeTileset, rasterFigure } from './paint';
+import { isoFloors, isoWalls, ISO_H, ISO_W, WALL_LOW, WALL_TALL } from './isoPaint';
 
 /** Integer pixel zoom: 2× on smaller windows (so spells stay in view), 3× on large ones. */
-function pickZoom(width: number): number {
+function pickZoom(width: number, iso: boolean): number {
+  // The isometric view uses smaller pixels (and so shows more of the map).
+  if (iso) return width >= 1100 ? 2 : 1.5;
   return width >= 1500 ? 3 : 2;
 }
 const ELEMENT_TINT: Record<string, number> = {
@@ -67,6 +70,8 @@ type Torch = { light: Phaser.GameObjects.Light; seed: number; base: number; x: n
 
 export class GrimStyle extends StyleBase {
   readonly id: StyleId = 'grim';
+  /** Isometric camera (the 'gri' variant); everything else is shared. */
+  protected iso = false;
   private tileMap: Phaser.Tilemaps.Tilemap | null = null;
   private layer: Phaser.Tilemaps.TilemapLayer | null = null;
   private owned: Phaser.GameObjects.GameObject[] = [];
@@ -91,7 +96,31 @@ export class GrimStyle extends StyleBase {
   private rng = new Rng(7);
 
   project(x: number, y: number): { x: number; y: number } {
+    if (this.iso) return { x: ((x - y) * ISO_W) / 2, y: ((x + y) * ISO_H) / 2 };
     return { x: x * GTILE, y: y * GTILE };
+  }
+
+  /** A world-space radius in tiles -> the horizontal semi-axis in pixels. */
+  private rpx(r: number): number {
+    return this.iso ? r * ISO_W * 0.7071 : r * GTILE;
+  }
+
+  /** Height / width of a ground circle on screen. */
+  private squash(): number {
+    return this.iso ? 0.5 : 1;
+  }
+
+  /** Projected position as a spreadable [x, y] pair. */
+  private xy(x: number, y: number): [number, number] {
+    const p = this.project(x, y);
+    return [p.x, p.y];
+  }
+
+  /** A world direction as a screen angle (radians). */
+  private ang(vx: number, vy: number): number {
+    const a = this.project(vx, vy);
+    const o = this.project(0, 0);
+    return Math.atan2(a.y - o.y, a.x - o.x);
   }
 
   // ---- Textures --------------------------------------------------------------------------------
@@ -103,9 +132,12 @@ export class GrimStyle extends StyleBase {
 
   private figKey(kind: FigureKind, accent: number, anim: AnimName, i: number): string {
     const acc = isHero(kind) ? accent : 0;
-    const key = `gf_${kind}_${acc}_${anim}_${i}`;
+    const key = `gf${this.iso ? 'i' : ''}_${kind}_${acc}_${anim}_${i}`;
     if (!this.scene.textures.exists(key))
-      this.addTex(key, rasterFigure(kind, anim, i / FRAMES[anim], acc));
+      this.addTex(
+        key,
+        rasterFigure(kind, anim, i / FRAMES[anim], acc, this.iso ? FIG_PX_ISO : FIG_PX),
+      );
     return key;
   }
 
@@ -120,10 +152,67 @@ export class GrimStyle extends StyleBase {
     const s = this.scene;
     this.ensureProps();
     const lab = world.plan.lab;
+    const rng = new Rng(world.plan.seed ^ 0x51ed);
+    if (this.iso) this.buildIsoFloor(world, rng);
+    else this.buildFlatFloor(world, rng);
+
+    // Lighting: a dark cold ambient, warm pools around torches and the player.
+    s.lights.enable();
+    s.lights.setAmbientColor(0x625c7a);
+
+    const cam = s.cameras.main;
+    this.zoom = pickZoom(cam.width, this.iso);
+    cam.setZoom(this.zoom);
+    if (this.iso)
+      cam.setBounds(
+        -(lab.h * ISO_W) / 2 - 300,
+        -300,
+        ((lab.w + lab.h) * ISO_W) / 2 + 600,
+        ((lab.w + lab.h) * ISO_H) / 2 + 600,
+      );
+    else cam.setBounds(-200, -200, lab.w * GTILE + 400, lab.h * GTILE + 400);
+    cam.roundPixels = true;
+    cam.setBackgroundColor(0x050408);
+    this.setupFilters(cam);
+
+    this.makeEmitters();
+    this.gfx = s.add.graphics().setDepth(600);
+    this.owned.push(this.gfx);
+    this.placeProps(world, rng);
+
+    const pl0 = this.project(world.player.x, world.player.y);
+    this.playerLight = this.addLight(pl0.x, pl0.y, 320, 0xffb060, 1.5);
+    const ex = this.project(lab.exit.x, lab.exit.y);
+    const pa = s.add
+      .image(ex.x, ex.y, 'g_portal')
+      .setDepth(700)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setTint(0x66ccff);
+    const pb = s.add
+      .image(ex.x, ex.y, 'g_portal')
+      .setDepth(700)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setTint(0xaa88ff)
+      .setScale(0.7);
+    this.owned.push(pa, pb);
+    this.portal = {
+      a: pa,
+      b: pb,
+      light: this.addLight(ex.x, ex.y, 140, 0x66aaff, 0),
+    };
+    if (this.iso) {
+      pa.setScale(1, 0.55);
+      pb.setScale(0.7, 0.4);
+    }
+    this.scene.events.emit('gstyle-built');
+  }
+
+  private buildFlatFloor(world: World, rng: Rng): void {
+    const s = this.scene;
+    const lab = world.plan.lab;
     const theme = world.plan.theme;
     const key = `g_tiles_${theme.id}`;
     if (!s.textures.exists(key)) this.addTex(key, makeTileset(theme.floor, theme.wall));
-    const rng = new Rng(world.plan.seed ^ 0x51ed);
     const isFloor = (x: number, y: number) =>
       x >= 0 && y >= 0 && x < lab.w && y < lab.h && lab.tiles[y * lab.w + x] === 1;
     const data: number[][] = [];
@@ -139,50 +228,73 @@ export class GrimStyle extends StyleBase {
     const ts = this.tileMap.addTilesetImage(key, key, GTILE, GTILE)!;
     this.layer = this.tileMap.createLayer(0, ts, 0, 0) as Phaser.Tilemaps.TilemapLayer;
     this.layer.setDepth(0).setLighting(true);
+  }
 
-    // Lighting: a dark cold ambient, warm pools around torches and the player.
-    s.lights.enable();
-    s.lights.setAmbientColor(0x625c7a);
-
-    const cam = s.cameras.main;
-    this.zoom = pickZoom(cam.width);
-    cam.setZoom(this.zoom);
-    cam.setBounds(-200, -200, lab.w * GTILE + 400, lab.h * GTILE + 400);
-    cam.roundPixels = true;
-    cam.setBackgroundColor(0x050408);
-    this.setupFilters(cam);
-
-    this.makeEmitters();
-    this.gfx = s.add.graphics().setDepth(600);
-    this.owned.push(this.gfx);
-    this.placeProps(world, rng);
-
-    this.playerLight = this.addLight(
-      world.player.x * GTILE,
-      world.player.y * GTILE,
-      320,
-      0xffb060,
-      1.5,
-    );
-    const ex = lab.exit;
-    const pa = s.add
-      .image(ex.x * GTILE, ex.y * GTILE, 'g_portal')
-      .setDepth(700)
-      .setBlendMode(Phaser.BlendModes.ADD)
-      .setTint(0x66ccff);
-    const pb = s.add
-      .image(ex.x * GTILE, ex.y * GTILE, 'g_portal')
-      .setDepth(700)
-      .setBlendMode(Phaser.BlendModes.ADD)
-      .setTint(0xaa88ff)
-      .setScale(0.7);
-    this.owned.push(pa, pb);
-    this.portal = {
-      a: pa,
-      b: pb,
-      light: this.addLight(ex.x * GTILE, ex.y * GTILE, 140, 0x66aaff, 0),
-    };
-    this.scene.events.emit('gstyle-built');
+  /** Diamond floor slabs baked into chunks, plus pixel-art wall cubes sorted with the actors by screen y. */
+  private buildIsoFloor(world: World, rng: Rng): void {
+    const s = this.scene;
+    const lab = world.plan.lab;
+    const tid = world.plan.theme.id;
+    const th = world.plan.theme;
+    const floors = isoFloors(th.floor);
+    isoWalls(th.wall, WALL_TALL).forEach((c, i) => this.addTex(`gwt_${tid}_${i}`, c));
+    isoWalls(th.wall, WALL_LOW).forEach((c, i) => this.addTex(`gwl_${tid}_${i}`, c));
+    const isFloor = (x: number, y: number) =>
+      x >= 0 && y >= 0 && x < lab.w && y < lab.h && lab.tiles[y * lab.w + x] === 1;
+    const CH = 8;
+    for (let cy = 0; cy < Math.ceil(lab.h / CH); cy++)
+      for (let cx = 0; cx < Math.ceil(lab.w / CH); cx++) {
+        const minX = (cx * CH - (cy * CH + CH)) * (ISO_W / 2);
+        const minY = (cx * CH + cy * CH) * (ISO_H / 2);
+        const cnv = document.createElement('canvas');
+        cnv.width = CH * ISO_W + ISO_W;
+        cnv.height = CH * ISO_H + ISO_H;
+        const c = cnv.getContext('2d')!;
+        let any = false;
+        for (let y = cy * CH; y < Math.min(lab.h, cy * CH + CH); y++)
+          for (let x = cx * CH; x < Math.min(lab.w, cx * CH + CH); x++) {
+            if (!isFloor(x, y)) continue;
+            any = true;
+            const p = this.project(x, y);
+            const v = (x * 7 + y * 13 + ((x + y) % 2) * 5) % 4;
+            c.drawImage(floors[v], p.x - ISO_W / 2 - minX, p.y - minY);
+            // Contact shadow in the corner under walls to the north-west.
+            if (!isFloor(x - 1, y) || !isFloor(x, y - 1)) {
+              c.save();
+              c.globalAlpha = 0.35;
+              c.fillStyle = '#000';
+              c.beginPath();
+              c.moveTo(p.x - minX, p.y - minY);
+              c.lineTo(p.x + ISO_W / 4 - minX, p.y + ISO_H / 4 - minY);
+              c.lineTo(p.x - minX, p.y + ISO_H / 2 - minY);
+              c.lineTo(p.x - ISO_W / 4 - minX, p.y + ISO_H / 4 - minY);
+              c.closePath();
+              c.fill();
+              c.restore();
+            }
+          }
+        if (!any) continue;
+        const key = `gc_${world.plan.seed}_${cx}_${cy}`;
+        this.addTex(key, cnv);
+        const img = s.add.image(minX, minY, key).setOrigin(0, 0).setDepth(0).setLighting(true);
+        this.owned.push(img);
+      }
+    for (let y = 0; y < lab.h; y++)
+      for (let x = 0; x < lab.w; x++) {
+        if (isFloor(x, y)) continue;
+        let near = false;
+        for (let dy = -1; dy <= 1 && !near; dy++)
+          for (let dx = -1; dx <= 1; dx++) if (isFloor(x + dx, y + dy)) near = true;
+        if (!near) continue;
+        const front = isFloor(x - 1, y) || isFloor(x, y - 1) || isFloor(x - 1, y - 1);
+        const p = this.project(x + 1, y + 1);
+        const img = s.add
+          .image(p.x, p.y, `${front ? 'gwl' : 'gwt'}_${tid}_${rng.int(0, 2)}`)
+          .setOrigin(0.5, 1)
+          .setDepth(1000 + p.y)
+          .setLighting(true);
+        this.owned.push(img);
+      }
   }
 
   private setupFilters(cam: Phaser.Cameras.Scene2D.Camera): void {
@@ -200,7 +312,7 @@ export class GrimStyle extends StyleBase {
     color: number,
     intensity: number,
   ): Phaser.GameObjects.Light {
-    const l = this.scene.lights.addLight(x, y, r, color, intensity);
+    const l = this.scene.lights.addLight(x, y, this.iso ? r * 0.8 : r, color, intensity);
     this.lightsOwned.push(l);
     return l;
   }
@@ -361,9 +473,11 @@ export class GrimStyle extends StyleBase {
       for (const tx of [r.x + 2, r.x + r.w - 3]) {
         const ty = r.y - 1;
         if (!isFace(tx, ty)) continue;
-        const wx = tx * GTILE + GTILE / 2;
-        const wy = ty * GTILE + 19;
-        const img = s.add.image(wx, wy, 'g_torch').setDepth(2);
+        const tb = this.project(tx + 1, ty + 1);
+        const wx = this.iso ? tb.x + 5 : tx * GTILE + GTILE / 2;
+        const wy = this.iso ? tb.y - 15 : ty * GTILE + 19;
+        const td = this.iso ? 1000 + tb.y + 1 : 2;
+        const img = s.add.image(wx, wy, 'g_torch').setDepth(td);
         this.owned.push(img);
         const light = this.addLight(wx, wy + 8, 190, 0xff8a38, 1.5);
         this.torches.push({ light, seed: rng.next() * 100, base: 1.5, x: wx, y: wy });
@@ -379,11 +493,11 @@ export class GrimStyle extends StyleBase {
           blendMode: Phaser.BlendModes.ADD,
           color: [0xfff0a0, 0xff9a28, 0xc03c10],
         } as never) as Emitter;
-        fl.setDepth(3);
+        fl.setDepth(td + 1);
         this.owned.push(fl);
         const g = s.add
           .image(wx, wy - 3, 'g_glow')
-          .setDepth(3)
+          .setDepth(td + 1)
           .setBlendMode(Phaser.BlendModes.ADD)
           .setTint(0xff8a38)
           .setScale(0.55)
@@ -392,8 +506,9 @@ export class GrimStyle extends StyleBase {
       }
       // A brazier in the corner of bigger rooms.
       if (room.kind === 'end' || (room.kind === 'main' && rng.chance(0.5))) {
-        const bx = (r.x + 1.6) * GTILE;
-        const by = (r.y + 1.7) * GTILE;
+        const bp = this.project(r.x + 1.6, r.y + 1.7);
+        const bx = bp.x;
+        const by = bp.y;
         const b = s.add
           .image(bx, by, 'g_brazier')
           .setDepth(1000 + by)
@@ -430,8 +545,7 @@ export class GrimStyle extends StyleBase {
       if (room.kind !== 'start') {
         for (let i = 0; i < 3; i++)
           this.addDecal(
-            rng.float(r.x + 1, r.x + r.w - 1) * GTILE,
-            rng.float(r.y + 1, r.y + r.h - 1) * GTILE,
+            ...this.xy(rng.float(r.x + 1, r.x + r.w - 1), rng.float(r.y + 1, r.y + r.h - 1)),
             rng.chance(0.4) ? 'g_bonepile' : 'g_blood' + rng.int(0, 2),
             rng.chance(0.5),
             0.9,
@@ -482,7 +596,7 @@ export class GrimStyle extends StyleBase {
         .setTint(rc)
         .setBlendMode(Phaser.BlendModes.ADD)
         .setAlpha(0.85);
-      ring.setScale(a.rarity === 'boss' ? 2.6 : a.r * 2.4);
+      ring.setScale((a.rarity === 'boss' ? 2.6 : a.r * 2.4) * (this.iso ? 0.8 : 1));
     }
     let light: Phaser.GameObjects.Light | null = null;
     if (a.rarity === 'boss') light = this.addLight(0, 0, 260, 0xff4a28, 1.3);
@@ -507,8 +621,7 @@ export class GrimStyle extends StyleBase {
     const d = v.data;
     if (d.gone) return;
     const t = v.track;
-    const px = t.rx * GTILE;
-    const py = t.ry * GTILE;
+    const { x: px, y: py } = this.project(t.rx, t.ry);
     const st = t.state(a);
     const n = FRAMES[st.anim];
     const idx = Math.min(n - 1, Math.floor(st.t * n));
@@ -522,8 +635,9 @@ export class GrimStyle extends StyleBase {
     let oy = 0;
     if (t.hitT < 0.12 && a.alive) {
       const k = (1 - t.hitT / 0.12) * (t.crit ? 5 : 2.5);
-      ox = Math.cos(t.hitDir) * k;
-      oy = Math.sin(t.hitDir) * k;
+      const ha = this.ang(Math.cos(t.hitDir), Math.sin(t.hitDir));
+      ox = Math.cos(ha) * k;
+      oy = Math.sin(ha) * k;
     }
     d.sprite.setPosition(Math.round(px + ox), Math.round(py + oy));
     d.sprite.setFlipX(t.face < 0);
@@ -541,7 +655,7 @@ export class GrimStyle extends StyleBase {
       .setPosition(px, py + 1)
       .setDepth(500)
       .setAlpha(a.alive ? 0.85 : Math.max(0, 0.6 - t.deathT * 0.2))
-      .setScale(Math.max(0.6, a.r * 2.1));
+      .setScale(Math.max(0.6, a.r * 2.1) * (this.iso ? 0.8 : 1));
     if (d.ring)
       d.ring
         .setPosition(px, py + 1)
@@ -600,9 +714,8 @@ export class GrimStyle extends StyleBase {
       light: Phaser.GameObjects.Light | null;
       acc: number;
     };
-    const x = p.x * GTILE;
-    const y = p.y * GTILE;
-    q.img.setPosition(x, y).setRotation(Math.atan2(p.vy, p.vx));
+    const { x, y } = this.project(p.x, p.y);
+    q.img.setPosition(x, y).setRotation(this.ang(p.vx, p.vy));
     q.glow.setPosition(x, y);
     q.light?.setPosition(x, y);
     q.acc += dt;
@@ -689,8 +802,7 @@ export class GrimStyle extends StyleBase {
       tint: number;
       light: Phaser.GameObjects.Light | null;
     };
-    const x = d.x * GTILE;
-    const y = d.y * GTILE;
+    const { x, y } = this.project(d.x, d.y);
     const bob = Math.sin(this.time * 3 + q.ph) * 1.5;
     q.img.setPosition(x, y - 4 + bob);
     q.glow.setPosition(x, y - 4);
@@ -717,11 +829,12 @@ export class GrimStyle extends StyleBase {
   }
 
   protected createChest(c: Chest) {
+    const cp = this.project(c.x, c.y);
     const img = this.scene.add
-      .image(c.x * GTILE, c.y * GTILE + 4, 'g_chest')
+      .image(cp.x, cp.y + 4, 'g_chest')
       .setOrigin(0.5, 0.85)
       .setLighting(true)
-      .setDepth(1000 + c.y * GTILE);
+      .setDepth(1000 + cp.y);
     this.owned.push(img);
     return { img, opened: false };
   }
@@ -730,9 +843,10 @@ export class GrimStyle extends StyleBase {
     if (c.opened && !q.opened) {
       q.opened = true;
       q.img.setTexture('g_chestOpen');
-      this.flash(c.x * GTILE, c.y * GTILE, 0xffd070, 2, 0.5);
-      this.em.spark.emitParticleAt(c.x * GTILE, c.y * GTILE - 4, 18);
-      this.em.mote.emitParticleAt(c.x * GTILE, c.y * GTILE - 4, 14);
+      const cp = this.project(c.x, c.y);
+      this.flash(cp.x, cp.y, 0xffd070, 2, 0.5);
+      this.em.spark.emitParticleAt(cp.x, cp.y - 4, 18);
+      this.em.mote.emitParticleAt(cp.x, cp.y - 4, 14);
     }
   }
 
@@ -741,18 +855,18 @@ export class GrimStyle extends StyleBase {
     g.clear();
     for (const e of effects) {
       const k = 1 - e.t / e.total;
-      const x = e.x * GTILE;
-      const y = e.y * GTILE;
-      const r = e.radius * GTILE;
-      g.fillStyle(0xa01010, 0.16 + 0.22 * k).fillCircle(x, y, r);
-      g.lineStyle(1, 0xff4020, 0.9).strokeCircle(x, y, r);
-      g.lineStyle(1, 0xffa040, 0.9).strokeCircle(x, y, r * k);
+      const { x, y } = this.project(e.x, e.y);
+      const r = this.rpx(e.radius);
+      const sq = this.squash();
+      g.fillStyle(0xa01010, 0.16 + 0.22 * k).fillEllipse(x, y, r * 2, r * 2 * sq);
+      g.lineStyle(1, 0xff4020, 0.9).strokeEllipse(x, y, r * 2, r * 2 * sq);
+      g.lineStyle(1, 0xffa040, 0.9).strokeEllipse(x, y, r * 2 * k, r * 2 * k * sq);
       // Rune ticks rotating around the rim.
       for (let i = 0; i < 12; i++) {
         const a = (i / 12) * Math.PI * 2 + this.time * 1.4;
         g.fillStyle(0xff7030, 0.9).fillRect(
           x + Math.cos(a) * (r - 3),
-          y + Math.sin(a) * (r - 3),
+          y + Math.sin(a) * (r - 3) * sq,
           2,
           2,
         );
@@ -810,7 +924,7 @@ export class GrimStyle extends StyleBase {
 
   private pxOf(id: number): { x: number; y: number } | null {
     const a = this.byId.get(id);
-    return a ? { x: a.x * GTILE, y: a.y * GTILE } : null;
+    return a ? this.project(a.x, a.y) : null;
   }
 
   private floater(x: number, y: number, text: string, color: number, big: boolean): void {
@@ -845,7 +959,7 @@ export class GrimStyle extends StyleBase {
       case 'hit': {
         const dst = this.byId.get(e.dst) ?? world.actors.find((a) => a.id === e.dst);
         if (!dst) break;
-        const p = { x: dst.x * GTILE, y: dst.y * GTILE };
+        const p = this.project(dst.x, dst.y);
         const src = e.src
           ? (this.byId.get(e.src) ?? world.actors.find((a) => a.id === e.src))
           : undefined;
@@ -921,7 +1035,7 @@ export class GrimStyle extends StyleBase {
       case 'death': {
         const a = this.byId.get(e.id) ?? world.actors.find((x) => x.id === e.id);
         if (!a) break;
-        const p = { x: a.x * GTILE, y: a.y * GTILE };
+        const p = this.project(a.x, a.y);
         if (a.isPlayer) break;
         const big = a.rarity === 'boss' || a.rarity === 'miniboss' || a.rarity === 'rare';
         em.bone.explode(big ? 22 : 10, p.x, p.y - 8);
@@ -935,8 +1049,7 @@ export class GrimStyle extends StyleBase {
         break;
       }
       case 'explode': {
-        const x = e.x * GTILE;
-        const y = e.y * GTILE;
+        const { x, y } = this.project(e.x, e.y);
         if (e.dtype === 3) {
           this.flash(x, y, 0xff9a40, 2.2, 0.5);
           em.flame.explode(24, x, y);
@@ -988,8 +1101,9 @@ export class GrimStyle extends StyleBase {
               : tags.includes('lightning')
                 ? 0xc8a0ff
                 : 0xffffff;
-          const x = a.x * GTILE + Math.cos(a.facing) * 8;
-          const y = a.y * GTILE - 10;
+          const ap = this.project(a.x, a.y);
+          const x = ap.x + Math.cos(this.ang(Math.cos(a.facing), Math.sin(a.facing))) * 8;
+          const y = ap.y - 10;
           em.pop.particleTint = col;
           em.pop.explode(1, x, y);
           em.spark.explode(5, x, y);
@@ -1052,15 +1166,17 @@ export class GrimStyle extends StyleBase {
   }
 
   private slash(src: Actor, arc: boolean, skill: string): void {
-    const x = src.x * GTILE + Math.cos(src.facing) * (arc ? 6 : 10);
-    const y = src.y * GTILE - 8 + Math.sin(src.facing) * 4;
+    const sp = this.project(src.x, src.y);
+    const sa = this.ang(Math.cos(src.facing), Math.sin(src.facing));
+    const x = sp.x + Math.cos(sa) * (arc ? 6 : 10);
+    const y = sp.y - 8 + Math.sin(sa) * 4;
     const img = this.scene.add
       .image(x, y, 'g_slash')
       .setOrigin(0.15, 0.5)
       .setBlendMode(Phaser.BlendModes.ADD)
       .setDepth(94000);
-    img.setRotation(Math.cos(src.facing) >= 0 ? 0 : Math.PI).setFlipY(Math.random() < 0.5);
-    if (Math.cos(src.facing) < 0) img.setFlipY(!img.flipY);
+    img.setRotation(Math.cos(sa) >= 0 ? 0 : Math.PI).setFlipY(Math.random() < 0.5);
+    if (Math.cos(sa) < 0) img.setFlipY(!img.flipY);
     const heavy = skill === 'crushingBlow' || src.rarity === 'boss';
     img
       .setScale(arc ? 1.5 : heavy ? 1.2 : 0.9)
@@ -1076,7 +1192,7 @@ export class GrimStyle extends StyleBase {
       onComplete: () => img.destroy(),
     });
     if (heavy) {
-      this.em.dust.explode(6, x + Math.cos(src.facing) * 8, src.y * GTILE + 2);
+      this.em.dust.explode(6, x + Math.cos(sa) * 8, sp.y + 2);
       this.shake = Math.max(this.shake, 2);
     }
   }
@@ -1128,8 +1244,7 @@ export class GrimStyle extends StyleBase {
       v.data.acc += dt;
       if (v.data.acc < 0.07) continue;
       v.data.acc = 0;
-      const x = a.x * GTILE;
-      const y = a.y * GTILE;
+      const { x, y } = this.project(a.x, a.y);
       if (a.ail.ignites.length)
         this.em.flame.emitParticleAt(x + (Math.random() - 0.5) * 8, y - 6 - Math.random() * 10, 1);
       if (a.ail.shock > 0 && Math.random() < 0.6)
@@ -1178,4 +1293,10 @@ export class GrimStyle extends StyleBase {
     }
     void figureOf;
   }
+}
+
+/** Grimdark with a diagonal isometric camera: the same pixel art and lighting, smaller pixels, wider view. */
+export class GrimIsoStyle extends GrimStyle {
+  override readonly id: StyleId = 'gri';
+  protected override iso = true;
 }

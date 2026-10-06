@@ -13,6 +13,8 @@ import {
 export const GTILE = 24;
 /** Figure design units → pixels. */
 export const FIG_PX = 0.75;
+/** Figure scale in the isometric variant (smaller pixels, more of the map in view). */
+export const FIG_PX_ISO = 0.6;
 
 export const FRAMES: Record<AnimName, number> = { idle: 4, walk: 8, attack: 6, stun: 4, death: 7 };
 
@@ -102,8 +104,8 @@ function fillPrim(ctx: CanvasRenderingContext2D, p: Prim, ox: number, oy: number
   }
 }
 
-export function frameSize(kind: FigureKind): number {
-  return Math.ceil(84 * SCALE_OF[kind] * FIG_PX) + 4;
+export function frameSize(kind: FigureKind, px = FIG_PX): number {
+  return Math.ceil(84 * SCALE_OF[kind] * px) + 4;
 }
 
 /**
@@ -115,8 +117,9 @@ export function rasterFigure(
   anim: AnimName,
   t: number,
   accent: number,
+  px = FIG_PX,
 ): HTMLCanvasElement {
-  const S = frameSize(kind);
+  const S = frameSize(kind, px);
   const pal = isHero(kind) ? heroPalette(accent) : UNDEAD;
   const prims = buildFigure(kind, poseFor(kind, anim, t));
   const scratch = document.createElement('canvas');
@@ -128,7 +131,7 @@ export function rasterFigure(
   const oy = S * 0.84;
   prims.forEach((p, i) => {
     sctx.clearRect(0, 0, S, S);
-    fillPrim(sctx, p, ox, oy, FIG_PX);
+    fillPrim(sctx, p, ox, oy, px);
     const d = sctx.getImageData(0, 0, S, S).data;
     for (let k = 0; k < S * S; k++)
       if (d[k * 4 + 3] > 100) {

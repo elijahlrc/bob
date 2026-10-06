@@ -46,6 +46,8 @@ describe('visual style preference', () => {
     c.setStyle('ink');
     expect(seen).toEqual(['ink']);
     expect(new Controller(store).styleId).toBe('ink');
+    c.setStyle('gri');
+    expect(new Controller(store).styleId).toBe('gri');
     store.setItem('bob.style', 'nonsense');
     expect(new Controller(store).styleId).toBe('grim');
   });

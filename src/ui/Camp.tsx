@@ -19,7 +19,8 @@ export function Camp({ c }: { c: Controller }) {
   const run = c.run;
   const [tab, setTab] = useState<Tab>('sheet');
   const [left, setLeft] = useState<number | null>(null);
-  const auto = !!run && run.autoContinue && c.canAutoContinue();
+  const blocker = run ? c.autoBlocker() : null;
+  const auto = !!run && run.autoContinue && blocker === null;
   useEffect(() => {
     if (!auto) {
       setLeft(null);
@@ -133,6 +134,7 @@ export function Camp({ c }: { c: Controller }) {
           />{' '}
           Auto-continue
           {left !== null && ` — ${themeDef(run.nextThemes[0]).name} in ${left.toFixed(1)} s`}
+          {run.autoContinue && blocker && <div class="warn">Paused: {blocker}</div>}
         </label>
         <button class="btn" onClick={() => c.quit()}>
           Save and quit

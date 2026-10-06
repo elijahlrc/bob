@@ -15,7 +15,7 @@ export function App({ c }: { c: Controller }) {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (e.ctrlKey || e.metaKey || e.altKey || tag === 'INPUT' || tag === 'SELECT') return;
-      const i = ['1', '2', '3'].indexOf(e.key);
+      const i = ['1', '2', '3', '4'].indexOf(e.key);
       if (i >= 0 && (c.screen === 'map' || c.screen === 'title')) c.setStyle(STYLE_IDS[i]);
       if (e.key.toLowerCase() === 'n' && c.showcase) c.nextShowcaseClass();
     };
