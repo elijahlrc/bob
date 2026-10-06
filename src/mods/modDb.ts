@@ -57,7 +57,8 @@ function compile(m: Mod): Compiled {
   };
 }
 
-function matches(c: Compiled, ctx: ModCtx): boolean {
+function matches(c: Compiled, ctx: ModCtx, require = 0): boolean {
+  if (require && (c.tagMask & require) === 0) return false;
   if (c.tagMask && (c.tagMask & ctx.tags) !== c.tagMask) return false;
   if (c.dmgMask && ctx.ancestry && (c.dmgMask & ctx.ancestry) === 0) return false;
   if (c.condMask) {
@@ -105,22 +106,25 @@ export class ModDB {
     return this.byStat.has(stat);
   }
 
-  /** Sum of matching mods of one kind. */
-  sum(kind: ModKind, stat: StatId, ctx: ModCtx = EMPTY_CTX): number {
+  /**
+   * Sum of matching mods of one kind. `require` (tag bitmask) additionally demands that the mod
+   * carries at least one of those tags (used for ailment-only scaling).
+   */
+  sum(kind: ModKind, stat: StatId, ctx: ModCtx = EMPTY_CTX, require = 0): number {
     const list = this.byStat.get(stat);
     if (!list) return 0;
     let s = 0;
-    for (const c of list) if (c.mod.kind === kind && matches(c, ctx)) s += valueOf(c, ctx);
+    for (const c of list) if (c.mod.kind === kind && matches(c, ctx, require)) s += valueOf(c, ctx);
     return s;
   }
 
   /** Product of (1 + more/100) over matching `more` mods. */
-  more(stat: StatId, ctx: ModCtx = EMPTY_CTX): number {
+  more(stat: StatId, ctx: ModCtx = EMPTY_CTX, require = 0): number {
     const list = this.byStat.get(stat);
     if (!list) return 1;
     let p = 1;
     for (const c of list)
-      if (c.mod.kind === 'more' && matches(c, ctx)) p *= 1 + valueOf(c, ctx) / 100;
+      if (c.mod.kind === 'more' && matches(c, ctx, require)) p *= 1 + valueOf(c, ctx) / 100;
     return p;
   }
 
@@ -142,8 +146,8 @@ export class ModDB {
   }
 
   /** Σinc as a fraction (20% → 0.2). */
-  inc(stat: StatId, ctx: ModCtx = EMPTY_CTX): number {
-    return this.sum('inc', stat, ctx) / 100;
+  inc(stat: StatId, ctx: ModCtx = EMPTY_CTX, require = 0): number {
+    return this.sum('inc', stat, ctx, require) / 100;
   }
 
   /** `base · (1 + Σinc) · Π more`, honouring overrides. */
@@ -155,8 +159,15 @@ export class ModDB {
   }
 
   /** `(1 + Σinc) · Π more` (for multipliers on an externally supplied base). */
-  mult(stat: StatId, ctx: ModCtx = EMPTY_CTX): number {
-    return Math.max(0, 1 + this.inc(stat, ctx)) * this.more(stat, ctx);
+  mult(stat: StatId, ctx: ModCtx = EMPTY_CTX, require = 0): number {
+    return Math.max(0, 1 + this.inc(stat, ctx, require)) * this.more(stat, ctx, require);
+  }
+
+  /** Bitmask of every condition used by any mod (to keep condition-keyed caches small). */
+  condsUsed(): number {
+    let m = 0;
+    for (const list of this.byStat.values()) for (const c of list) m |= c.condMask;
+    return m;
   }
 
   /** True if any mod for this stat depends on a condition. */

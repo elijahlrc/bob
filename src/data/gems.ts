@@ -1,0 +1,482 @@
+import type { DamageType, Mod, SkillTag } from '../mods/types';
+
+/** A value authored at gem level 1 and level 20 (DESIGN.md §11.5). */
+export type LevelValue = number | readonly [number, number];
+
+export type GemMod = Omit<Mod, 'value'> & { value: LevelValue };
+
+export type GemAttr = 'str' | 'dex' | 'int' | 'dexint' | 'strint' | 'strdex';
+
+export type SkillBehaviour =
+  | { kind: 'melee'; range: number; range2h?: number; arc?: number; radius?: number }
+  | {
+      kind: 'projectile';
+      count: number;
+      countPer5?: number;
+      spread: number;
+      pierce?: number;
+      explodeRadius?: number;
+      range?: number;
+      falloff?: number;
+    }
+  | { kind: 'chain'; range: number; chains: number; chainsPer5?: number; chainRange: number };
+
+export type ActiveGemDef = {
+  kind: 'active';
+  id: string;
+  name: string;
+  attr: GemAttr;
+  skillType: 'attack' | 'spell';
+  tags: SkillTag[];
+  behaviour: SkillBehaviour;
+  /** Attacks: "deals N% of base damage". */
+  baseMult?: LevelValue;
+  /** Spells: base damage per type. */
+  spellDamage?: { type: DamageType; min: LevelValue; max: LevelValue }[];
+  /** Added damage effectiveness for spells, percent. */
+  effectiveness?: number;
+  castTime?: number;
+  /** Spell base crit, percent. */
+  crit?: number;
+  cost: LevelValue;
+  mods: GemMod[];
+  /** Attacks: weapon tags, any of which must be present. */
+  requiresWeapon?: SkillTag[];
+  /** Sweep: dual wielding hits with both weapons. */
+  bothWeapons?: boolean;
+  description: string;
+};
+
+export type SupportGemDef = {
+  kind: 'support';
+  id: string;
+  name: string;
+  attr: GemAttr;
+  /** The supported skill must have at least one of these tags (empty: any). */
+  supports: SkillTag[];
+  costMult: number;
+  mods: GemMod[];
+  description: string;
+};
+
+export type AuraGemDef = {
+  kind: 'aura';
+  id: string;
+  name: string;
+  attr: GemAttr;
+  /** Percent of unreserved mana, or a flat amount by level. */
+  reservePct?: number;
+  reserveFlat?: LevelValue;
+  mods: GemMod[];
+  description: string;
+};
+
+export type GemDef = ActiveGemDef | SupportGemDef | AuraGemDef;
+
+export const ACTIVE_GEMS: ActiveGemDef[] = [
+  {
+    kind: 'active',
+    id: 'crushingBlow',
+    name: 'Crushing Blow',
+    attr: 'str',
+    skillType: 'attack',
+    tags: ['attack', 'melee', 'strike'],
+    behaviour: { kind: 'melee', range: 1.4, range2h: 1.7 },
+    baseMult: [150, 190],
+    cost: [5, 10],
+    mods: [
+      { stat: 'stunDuration', kind: 'inc', value: 25 },
+      { stat: 'stunDamage', kind: 'inc', value: 25 },
+    ],
+    description: 'A single heavy blow that staggers its target.',
+  },
+  {
+    kind: 'active',
+    id: 'sweep',
+    name: 'Sweep',
+    attr: 'str',
+    skillType: 'attack',
+    tags: ['attack', 'melee', 'area'],
+    behaviour: { kind: 'melee', range: 2.2, arc: 120, radius: 2.2 },
+    baseMult: [100, 140],
+    cost: [6, 11],
+    mods: [],
+    bothWeapons: true,
+    description: 'A wide arc that strikes every enemy in front of you.',
+  },
+  {
+    kind: 'active',
+    id: 'splitVolley',
+    name: 'Split Volley',
+    attr: 'dex',
+    skillType: 'attack',
+    tags: ['attack', 'projectile'],
+    behaviour: { kind: 'projectile', count: 3, countPer5: 1, spread: 30, range: 9 },
+    baseMult: [90, 120],
+    cost: [6, 12],
+    mods: [],
+    requiresWeapon: ['bow'],
+    description: 'Looses a fan of arrows.',
+  },
+  {
+    kind: 'active',
+    id: 'venomCut',
+    name: 'Venom Cut',
+    attr: 'dex',
+    skillType: 'attack',
+    tags: ['attack', 'melee', 'strike'],
+    behaviour: { kind: 'melee', range: 1.4 },
+    baseMult: [100, 130],
+    cost: [5, 9],
+    mods: [
+      { stat: 'chance.poison', kind: 'base', value: 40 },
+      { stat: 'damage', kind: 'more', value: 25, tags: ['poison'] },
+    ],
+    requiresWeapon: ['dagger', 'claw', 'sword'],
+    description: 'A quick cut that leaves a lingering venom.',
+  },
+  {
+    kind: 'active',
+    id: 'flameBolt',
+    name: 'Flame Bolt',
+    attr: 'int',
+    skillType: 'spell',
+    tags: ['spell', 'projectile', 'area', 'fire'],
+    behaviour: { kind: 'projectile', count: 1, spread: 0, explodeRadius: 1.2, range: 9 },
+    spellDamage: [{ type: 'fire', min: [9, 520], max: [14, 780] }],
+    effectiveness: 240,
+    castTime: 0.75,
+    crit: 6,
+    cost: [6, 28],
+    mods: [{ stat: 'chance.ignite', kind: 'base', value: 25 }],
+    description: 'Hurls a bolt of flame that bursts on impact.',
+  },
+  {
+    kind: 'active',
+    id: 'arcChain',
+    name: 'Arc Chain',
+    attr: 'int',
+    skillType: 'spell',
+    tags: ['spell', 'chaining', 'lightning'],
+    behaviour: { kind: 'chain', range: 7, chains: 2, chainsPer5: 1, chainRange: 4 },
+    spellDamage: [{ type: 'lightning', min: [2, 70], max: [20, 650] }],
+    effectiveness: 80,
+    castTime: 0.8,
+    crit: 5,
+    cost: [7, 26],
+    mods: [{ stat: 'chance.shock', kind: 'base', value: 10 }],
+    description: 'A crackling bolt that leaps between enemies.',
+  },
+  {
+    kind: 'active',
+    id: 'frostLance',
+    name: 'Frost Lance',
+    attr: 'int',
+    skillType: 'spell',
+    tags: ['spell', 'projectile', 'cold'],
+    behaviour: { kind: 'projectile', count: 1, spread: 0, pierce: 99, range: 9, falloff: 0.5 },
+    spellDamage: [{ type: 'cold', min: [7, 480], max: [11, 720] }],
+    effectiveness: 130,
+    castTime: 0.65,
+    crit: 6,
+    cost: [6, 24],
+    mods: [],
+    description: 'A piercing shard of ice that weakens with distance.',
+  },
+];
+
+export const SUPPORT_GEMS: SupportGemDef[] = [
+  {
+    kind: 'support',
+    id: 'bruteForce',
+    name: 'Brute Force',
+    attr: 'str',
+    supports: ['melee'],
+    costMult: 1.4,
+    mods: [
+      { stat: 'damage', kind: 'more', value: [40, 59], damageTypes: ['physical'], tags: ['melee'] },
+    ],
+    description: 'More melee physical damage.',
+  },
+  {
+    kind: 'support',
+    id: 'swiftAssault',
+    name: 'Swift Assault',
+    attr: 'dex',
+    supports: ['attack'],
+    costMult: 1.15,
+    mods: [{ stat: 'attackSpeed', kind: 'inc', value: [25, 44] }],
+    description: 'Increased attack speed.',
+  },
+  {
+    kind: 'support',
+    id: 'quickCast',
+    name: 'Quick Cast',
+    attr: 'int',
+    supports: ['spell'],
+    costMult: 1.2,
+    mods: [{ stat: 'castSpeed', kind: 'inc', value: [20, 39] }],
+    description: 'Increased cast speed.',
+  },
+  {
+    kind: 'support',
+    id: 'emberInfusion',
+    name: 'Ember Infusion',
+    attr: 'str',
+    supports: ['attack'],
+    costMult: 1.2,
+    mods: [{ stat: 'gain.physical.fire', kind: 'base', value: [25, 34] }],
+    description: 'Gain physical damage as extra fire damage.',
+  },
+  {
+    kind: 'support',
+    id: 'channelledElements',
+    name: 'Channelled Elements',
+    attr: 'int',
+    supports: [],
+    costMult: 1.3,
+    mods: [
+      { stat: 'damage', kind: 'more', value: [30, 49], damageTypes: ['fire', 'cold', 'lightning'] },
+      { stat: 'cannotInflictEle', kind: 'flag', value: 1 },
+    ],
+    description: 'More elemental damage, but no elemental ailments.',
+  },
+  {
+    kind: 'support',
+    id: 'focusedRuin',
+    name: 'Focused Ruin',
+    attr: 'int',
+    supports: ['spell'],
+    costMult: 1.3,
+    mods: [
+      { stat: 'damage', kind: 'more', value: [30, 49], tags: ['spell'] },
+      { stat: 'critChance', kind: 'inc', value: -100 },
+    ],
+    description: 'More spell damage; critical strikes are suppressed.',
+  },
+  {
+    kind: 'support',
+    id: 'echoingCast',
+    name: 'Echoing Cast',
+    attr: 'int',
+    supports: ['spell'],
+    costMult: 1.4,
+    mods: [
+      { stat: 'castSpeed', kind: 'more', value: 70 },
+      { stat: 'damage', kind: 'more', value: -10 },
+    ],
+    description: 'The spell repeats itself.',
+  },
+  {
+    kind: 'support',
+    id: 'volleySplit',
+    name: 'Volley Split',
+    attr: 'dex',
+    supports: ['projectile'],
+    costMult: 1.5,
+    mods: [
+      { stat: 'projectiles', kind: 'base', value: 2 },
+      { stat: 'damage', kind: 'more', value: -25, tags: ['projectile'] },
+    ],
+    description: 'Two additional projectiles at reduced damage.',
+  },
+  {
+    kind: 'support',
+    id: 'piercingShot',
+    name: 'Piercing Shot',
+    attr: 'dex',
+    supports: ['projectile'],
+    costMult: 1.2,
+    mods: [
+      { stat: 'pierce', kind: 'base', value: [2, 5] },
+      { stat: 'damage', kind: 'more', value: [0, 10], tags: ['projectile'] },
+    ],
+    description: 'Projectiles pass through enemies.',
+  },
+  {
+    kind: 'support',
+    id: 'denseBlast',
+    name: 'Dense Blast',
+    attr: 'int',
+    supports: ['area'],
+    costMult: 1.4,
+    mods: [
+      { stat: 'damage', kind: 'more', value: [35, 54], tags: ['area'] },
+      { stat: 'aoe', kind: 'more', value: -30 },
+    ],
+    description: 'Smaller, more damaging areas.',
+  },
+  {
+    kind: 'support',
+    id: 'wideBlast',
+    name: 'Wide Blast',
+    attr: 'int',
+    supports: ['area'],
+    costMult: 1.4,
+    mods: [{ stat: 'aoe', kind: 'inc', value: [30, 49] }],
+    description: 'Larger areas of effect.',
+  },
+  {
+    kind: 'support',
+    id: 'precisionStrikes',
+    name: 'Precision Strikes',
+    attr: 'int',
+    supports: [],
+    costMult: 1.2,
+    mods: [
+      { stat: 'critChance', kind: 'inc', value: [30, 49] },
+      { stat: 'critMulti', kind: 'base', value: [15, 34] },
+    ],
+    description: 'Better critical strikes.',
+  },
+  {
+    kind: 'support',
+    id: 'rendingEdge',
+    name: 'Rending Edge',
+    attr: 'str',
+    supports: ['attack'],
+    costMult: 1.2,
+    mods: [
+      { stat: 'chance.bleed', kind: 'base', value: 25 },
+      { stat: 'damage', kind: 'more', value: [30, 49], tags: ['bleed'] },
+    ],
+    description: 'Hits cause stronger bleeding.',
+  },
+  {
+    kind: 'support',
+    id: 'toxinCoat',
+    name: 'Toxin Coat',
+    attr: 'dex',
+    supports: [],
+    costMult: 1.2,
+    mods: [
+      { stat: 'chance.poison', kind: 'base', value: 40 },
+      { stat: 'damage', kind: 'more', value: [20, 39], tags: ['poison'] },
+    ],
+    description: 'Hits poison their targets.',
+  },
+  {
+    kind: 'support',
+    id: 'kindle',
+    name: 'Kindle',
+    attr: 'str',
+    supports: [],
+    costMult: 1.2,
+    mods: [
+      { stat: 'chance.ignite', kind: 'base', value: 30 },
+      { stat: 'damage', kind: 'more', value: [40, 59], tags: ['ignite'] },
+    ],
+    description: 'Hits set targets ablaze.',
+  },
+  {
+    kind: 'support',
+    id: 'bloodthirst',
+    name: 'Bloodthirst',
+    attr: 'str',
+    supports: ['attack'],
+    costMult: 1.3,
+    mods: [{ stat: 'leech.life', kind: 'base', value: 2, tags: ['attack'] }],
+    description: 'Attack damage is leeched as life.',
+  },
+  {
+    kind: 'support',
+    id: 'staggeringForce',
+    name: 'Staggering Force',
+    attr: 'str',
+    supports: ['attack'],
+    costMult: 1.15,
+    mods: [
+      { stat: 'stunDuration', kind: 'inc', value: [30, 49] },
+      { stat: 'enemyStunThreshold', kind: 'base', value: 20 },
+    ],
+    description: 'Longer stuns, easier to stun.',
+  },
+];
+
+export const AURA_GEMS: AuraGemDef[] = [
+  {
+    kind: 'aura',
+    id: 'kindlingHalo',
+    name: 'Kindling Halo',
+    attr: 'str',
+    reservePct: 50,
+    mods: [
+      { stat: 'damage.min', kind: 'base', value: [4, 120], damageTypes: ['fire'] },
+      { stat: 'damage.max', kind: 'base', value: [7, 180], damageTypes: ['fire'] },
+    ],
+    description: 'Adds fire damage to attacks and spells.',
+  },
+  {
+    kind: 'aura',
+    id: 'stormHalo',
+    name: 'Storm Halo',
+    attr: 'int',
+    reservePct: 50,
+    mods: [
+      { stat: 'damage.min', kind: 'base', value: [1, 20], damageTypes: ['lightning'] },
+      { stat: 'damage.max', kind: 'base', value: [12, 300], damageTypes: ['lightning'] },
+    ],
+    description: 'Adds lightning damage to attacks and spells.',
+  },
+  {
+    kind: 'aura',
+    id: 'frostHalo',
+    name: 'Frost Halo',
+    attr: 'dexint',
+    reservePct: 50,
+    mods: [{ stat: 'gain.physical.cold', kind: 'base', value: [10, 19] }],
+    description: 'Gain physical damage as extra cold damage.',
+  },
+  {
+    kind: 'aura',
+    id: 'veilOfGrace',
+    name: 'Veil of Grace',
+    attr: 'dex',
+    reservePct: 50,
+    mods: [{ stat: 'evasion', kind: 'base', value: [60, 1700] }],
+    description: 'Grants evasion rating.',
+  },
+  {
+    kind: 'aura',
+    id: 'ironBastion',
+    name: 'Iron Bastion',
+    attr: 'str',
+    reservePct: 50,
+    mods: [{ stat: 'armour', kind: 'more', value: [20, 39] }],
+    description: 'More armour.',
+  },
+  {
+    kind: 'aura',
+    id: 'arcaneWard',
+    name: 'Arcane Ward',
+    attr: 'int',
+    reservePct: 35,
+    mods: [{ stat: 'es', kind: 'base', value: [60, 500] }],
+    description: 'Grants energy shield.',
+  },
+  {
+    kind: 'aura',
+    id: 'clearMind',
+    name: 'Clear Mind',
+    attr: 'int',
+    reserveFlat: [35, 100],
+    mods: [{ stat: 'manaRegenFlat', kind: 'base', value: [1.8, 8] }],
+    description: 'Regenerates mana.',
+  },
+];
+
+export const ALL_GEMS: GemDef[] = [...ACTIVE_GEMS, ...SUPPORT_GEMS, ...AURA_GEMS];
+const GEM_BY_ID = new Map<string, GemDef>(ALL_GEMS.map((g) => [g.id, g]));
+
+export function gemDef(id: string): GemDef {
+  const g = GEM_BY_ID.get(id);
+  if (!g) throw new Error(`unknown gem ${id}`);
+  return g;
+}
+
+/** §11.5 level requirement per gem level (index 0 = level 1). */
+export const GEM_LEVEL_REQ = [
+  1, 2, 4, 7, 11, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 67, 70,
+] as const;
+
+export const MAX_GEM_LEVEL = 25;
