@@ -3,12 +3,19 @@ import { DT } from '../data/constants';
 import { worldResult, type MapResult } from '../sim/runMap';
 import type { SimEvent, World } from '../sim/types';
 import { createWorld, stepWorld } from '../sim/world';
+import { CLASSES } from '../data/classes';
+import type { StyleId } from '../data/styles';
+import { botCamp } from './bot';
 import { finishMap, newRun, passivePoints, planFor, worldOptsFor, type RunState } from './run';
 import { clearSave, loadRun, saveRun, type KeyValueStore, type LoadResult } from './save';
 
 export type Screen = 'title' | 'classSelect' | 'camp' | 'map' | 'summary' | 'victory';
 
+export type StyleChoice = StyleId;
+
 export type BusEvents = {
+  /** The visual style changed (renderer rebuilds the current map). */
+  style: { id: StyleChoice };
   /** Run or screen state changed (UI re-renders). */
   state: null;
   /** A map started; the renderer builds its scene from the world. */
@@ -35,18 +42,76 @@ export class Controller {
   private acc = 0;
 
   private store: KeyValueStore | null;
+  styleId: StyleChoice = 'grim';
   /** Result of looking for a saved run at boot. */
   saved: LoadResult = { status: 'none' };
 
   constructor(store: KeyValueStore | null = null) {
     this.store = store;
-    if (store) this.saved = loadRun(store);
+    if (store) {
+      this.saved = loadRun(store);
+      const sid = store.getItem('bob.style');
+      if (sid === 'grim' || sid === 'cel' || sid === 'ink') this.styleId = sid;
+    }
     this.bus.on('frame', ({ dtMs }) => this.onFrame(dtMs));
   }
 
   private changed(): void {
     // The game saves on entering camp and on any camp change (§5.5).
     if (this.store && this.run && this.screen === 'camp') saveRun(this.store, this.run);
+    this.bus.emit('state', null);
+  }
+
+  /** Showcase mode: an endless, invulnerable demo that cycles classes (for comparing visual styles). */
+  showcase: { classIdx: number; boss: boolean; runs: number } | null = null;
+
+  startShowcase(boss = false): void {
+    this.showcase = { classIdx: 0, boss, runs: 0 };
+    this.launchShowcase();
+  }
+
+  /** Next class in the showcase (also used when a showcase map ends). */
+  nextShowcaseClass(): void {
+    if (!this.showcase) return;
+    this.showcase.classIdx = (this.showcase.classIdx + 1) % CLASSES.length;
+    this.launchShowcase();
+  }
+
+  private launchShowcase(): void {
+    const sc = this.showcase!;
+    if (this.world) this.bus.emit('mapEnd', null);
+    const cls = CLASSES[sc.classIdx];
+    const run = newRun(cls.id, 1000 + sc.classIdx * 17 + sc.runs++ * 101);
+    run.build.level = sc.boss ? 100 : 45;
+    run.map = sc.boss ? 100 : 30;
+    botCamp(run);
+    this.run = run;
+    const plan = planFor(run, run.nextThemes[0]);
+    this.world = createWorld({
+      plan,
+      build: run.build,
+      xp: 0,
+      opts: { ...worldOptsFor(run, plan), godMode: true, freeResources: true, maxTime: 900 },
+    });
+    this.acc = 0;
+    this.screen = 'map';
+    this.bus.emit('mapStart', { world: this.world });
+    this.bus.emit('state', null);
+  }
+
+  exitShowcase(): void {
+    if (this.world) this.bus.emit('mapEnd', null);
+    this.world = null;
+    this.showcase = null;
+    this.run = null;
+    this.goTo('title');
+  }
+
+  /** Switch the visual style (map renderer and UI skin). Remembered between sessions. */
+  setStyle(id: StyleChoice): void {
+    this.styleId = id;
+    this.store?.setItem('bob.style', id);
+    this.bus.emit('style', { id });
     this.bus.emit('state', null);
   }
 
@@ -126,6 +191,10 @@ export class Controller {
     const w = this.world;
     const run = this.run;
     if (!w || !run) return;
+    if (this.showcase) {
+      this.nextShowcaseClass();
+      return;
+    }
     const res = worldResult(w);
     this.lastResult = res;
     finishMap(run, res);

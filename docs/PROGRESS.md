@@ -150,3 +150,7 @@ Bot results — 10 run(s) per class, maps up to 100, seed 1
 Pacing (median level after map): map 1: level 1 (n=60) · map 10: level 11 (n=60) · map 25: level 25 (n=48) · map 50: level 51 (n=37) · map 75: level 75 (n=34) · map 90: level 90 (n=30) · map 100: level 99 (n=28)
 Total wall time: 217.9 s
 ```
+
+## Visual styles
+
+Three map render styles (Grimdark, Cel Isometric, Inkwell) live in `src/render/styles/`. Switch with keys 1/2/3 or the Title screen; _Showcase_ mode on the Title screen auto-plays a demo (N = next class). See `docs/VISUAL_STYLES.md`.

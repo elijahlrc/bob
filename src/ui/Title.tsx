@@ -1,5 +1,6 @@
-import type { Controller } from '../run/controller';
 import { classDef } from '../data/classes';
+import type { Controller } from '../run/controller';
+import { StyleSwitcher } from './StyleSwitcher';
 
 export function Title({ c }: { c: Controller }) {
   const saved = c.saved;
@@ -30,6 +31,18 @@ export function Title({ c }: { c: Controller }) {
         </div>
       )}
       {saved.status === 'ok' && <p class="muted">Starting a new run replaces the saved one.</p>}
+      <div class="style-panel">
+        <div class="muted">Visual style</div>
+        <StyleSwitcher c={c} />
+        <div class="showcase-row">
+          <button class="btn" onClick={() => c.startShowcase(false)}>
+            ▶ Showcase: crypt
+          </button>
+          <button class="btn" onClick={() => c.startShowcase(true)}>
+            ▶ Showcase: boss
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

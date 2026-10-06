@@ -1,6 +1,27 @@
 :root {
-  font-family: system-ui, sans-serif;
-  color: #e6e1d3;
+  --bg: #0f1016;
+  --screen: rgba(10, 10, 16, 0.94);
+  --panel: #1c1a22;
+  --panel2: #26232e;
+  --btn: #2a2733;
+  --btn-h: #36323f;
+  --border: #4a4555;
+  --border2: #3a3644;
+  --accent: #b08040;
+  --accent-d: #6a4a20;
+  --text: #e6e1d3;
+  --muted: #9a9488;
+  --side: #15141b;
+  --hi: #ffd84a;
+  --on-accent: #111;
+  --tree-bg: #0c0b10;
+  --radius: 6px;
+  --font: system-ui, sans-serif;
+  --title-font: system-ui, sans-serif;
+}
+:root {
+  font-family: var(--font);
+  color: var(--text);
 }
 button {
   font: inherit;
@@ -15,7 +36,7 @@ button {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  background: rgba(10, 10, 16, 0.94);
+  background: var(--screen-bg, var(--screen));
   overflow: auto;
 }
 .title h1 {
@@ -25,28 +46,28 @@ button {
 }
 .subtitle,
 .muted {
-  color: #9a9488;
+  color: var(--muted);
 }
 .btn {
-  background: #2a2733;
-  border: 1px solid #4a4555;
-  border-radius: 6px;
+  background: var(--btn);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 8px 18px;
   cursor: pointer;
 }
 .btn:hover {
-  background: #36323f;
+  background: var(--btn-h);
 }
 .btn.primary {
-  background: #6a4a20;
-  border-color: #b08040;
+  background: var(--accent-d);
+  border-color: var(--accent);
 }
 .btn.small {
   padding: 4px 10px;
   font-size: 13px;
 }
 .btn.on {
-  background: #b08040;
+  background: var(--accent);
   color: #111;
 }
 .class-grid {
@@ -57,7 +78,7 @@ button {
   max-width: 720px;
 }
 .class-card {
-  background: #1c1a22;
+  background: var(--panel);
   border: 2px solid;
   border-radius: 8px;
   padding: 14px;
@@ -65,7 +86,7 @@ button {
   cursor: pointer;
 }
 .class-card:hover {
-  background: #26232e;
+  background: var(--panel2);
 }
 .class-name {
   font-size: 20px;
@@ -200,7 +221,7 @@ button {
   flex-direction: column;
   gap: 10px;
   border-left: 1px solid #333;
-  background: #15141b;
+  background: var(--side);
   overflow: auto;
 }
 .camp-side h2 {
@@ -210,7 +231,7 @@ button {
   flex-direction: column;
 }
 .notice {
-  color: #ffd84a;
+  color: var(--hi);
 }
 .warn {
   color: #ff8a6a;
@@ -223,7 +244,7 @@ button {
 }
 .xp-fill {
   height: 100%;
-  background: #b08040;
+  background: var(--accent);
 }
 .tabs {
   display: flex;
@@ -232,7 +253,7 @@ button {
   border-bottom: 1px solid #333;
 }
 .tab {
-  background: #1c1a22;
+  background: var(--panel);
   border: 1px solid #333;
   border-bottom: none;
   padding: 6px 14px;
@@ -240,8 +261,8 @@ button {
   cursor: pointer;
 }
 .tab.on {
-  background: #2a2733;
-  color: #ffd84a;
+  background: var(--btn);
+  color: var(--hi);
 }
 .tab-body {
   flex: 1;
@@ -265,12 +286,12 @@ button {
 svg.tree {
   flex: 1;
   width: 100%;
-  background: #0c0b10;
+  background: var(--tree-bg);
   cursor: grab;
   touch-action: none;
 }
 .edge {
-  stroke: #3a3644;
+  stroke: var(--border2);
   stroke-width: 6;
 }
 .edge.on {
@@ -278,7 +299,7 @@ svg.tree {
   stroke-width: 9;
 }
 .node {
-  fill: #2a2733;
+  fill: var(--btn);
   stroke: #5a5466;
   stroke-width: 3;
   cursor: pointer;
@@ -323,7 +344,7 @@ svg.tree {
   pointer-events: none;
   background: #111018ee;
   border: 1px solid #555;
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 8px 10px;
   max-width: 320px;
   font-size: 13px;
@@ -333,7 +354,7 @@ svg.tree {
   margin-bottom: 4px;
 }
 .tt-name.notable {
-  color: #ffd84a;
+  color: var(--hi);
 }
 .tt-name.keystone {
   color: #c090ff;
@@ -343,7 +364,7 @@ svg.tree {
 }
 .tt-hint {
   margin-top: 6px;
-  color: #9a9488;
+  color: var(--muted);
 }
 .sheet {
   display: flex;
@@ -357,10 +378,10 @@ svg.tree {
 }
 .sheet td {
   padding: 3px 10px;
-  border-bottom: 1px solid #2a2733;
+  border-bottom: 1px solid var(--btn);
 }
 .sheet td:first-child {
-  color: #9a9488;
+  color: var(--muted);
 }
 .auras {
   width: 100%;
@@ -383,9 +404,9 @@ svg.tree {
 .socket {
   display: flex;
   align-items: stretch;
-  border: 1px solid #4a4555;
-  border-radius: 6px;
-  background: #1c1a22;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
   min-height: 34px;
 }
 .socket.empty {
@@ -403,7 +424,7 @@ svg.tree {
   border-color: #40c080;
 }
 .socket.primary {
-  box-shadow: 0 0 0 2px #ffd84a;
+  box-shadow: 0 0 0 2px var(--hi);
 }
 .gem-name {
   background: none;
@@ -427,7 +448,7 @@ svg.tree {
   align-items: center;
   padding: 8px;
   border: 1px dashed #555;
-  border-radius: 6px;
+  border-radius: var(--radius);
 }
 .items {
   display: flex;
@@ -453,9 +474,9 @@ svg.tree {
 }
 .eq-slot,
 .inv-item {
-  background: #1c1a22;
-  border: 1px solid #3a3644;
-  border-radius: 6px;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
   padding: 6px 8px;
   text-align: left;
   font-size: 13px;
@@ -464,7 +485,7 @@ svg.tree {
 }
 .eq-slot.sel,
 .inv-item.sel {
-  outline: 2px solid #ffd84a;
+  outline: 2px solid var(--hi);
 }
 .flaskslot {
   font-size: 11px;
@@ -498,7 +519,7 @@ svg.tree {
 .item-card {
   background: #111018;
   border: 1px solid #444;
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 10px;
   font-size: 13px;
   color: #ddd;
@@ -562,8 +583,8 @@ svg.tree {
   flex-direction: column;
   gap: 4px;
   padding: 8px;
-  border: 1px solid #b08040;
-  border-radius: 6px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
 }
 .reward-preview {
   margin-top: 4px;
@@ -582,9 +603,9 @@ svg.tree {
   flex-wrap: wrap;
 }
 .inv-toolbar select {
-  background: #1c1a22;
+  background: var(--panel);
   color: inherit;
-  border: 1px solid #4a4555;
+  border: 1px solid var(--border);
   border-radius: 4px;
   padding: 3px 6px;
 }
@@ -599,17 +620,17 @@ svg.tree {
   margin: 8px 0;
 }
 .chip {
-  background: #1c1a22;
-  border: 1px solid #3a3644;
+  background: var(--panel);
+  border: 1px solid var(--border2);
   border-radius: 12px;
   padding: 2px 10px;
   font-size: 12px;
   cursor: pointer;
 }
 .chip.on {
-  background: #b08040;
+  background: var(--accent);
   color: #111;
-  border-color: #b08040;
+  border-color: var(--accent);
 }
 .count {
   margin-left: auto;
@@ -625,7 +646,7 @@ svg.tree {
   grid-template-columns: minmax(120px, 1fr) 80px 38px auto;
   gap: 8px;
   align-items: center;
-  background: #1c1a22;
+  background: var(--panel);
   border: 1px solid #2f2b38;
   border-radius: 5px;
   padding: 4px 8px;
@@ -634,10 +655,10 @@ svg.tree {
   cursor: pointer;
 }
 .inv-row:hover {
-  background: #26232e;
+  background: var(--panel2);
 }
 .inv-row.sel {
-  outline: 2px solid #ffd84a;
+  outline: 2px solid var(--hi);
 }
 .inv-row.unusable {
   opacity: 0.55;
@@ -657,7 +678,7 @@ svg.tree {
   border-radius: 8px;
   padding: 1px 6px;
   white-space: nowrap;
-  background: #2a2733;
+  background: var(--btn);
 }
 .badge.up {
   color: #60e070;
@@ -673,7 +694,7 @@ svg.tree {
 .new-tag {
   font-size: 10px;
   font-weight: bold;
-  background: #ffd84a;
+  background: var(--hi);
   color: #111;
   border-radius: 3px;
   padding: 0 4px;
@@ -705,8 +726,8 @@ svg.tree {
   padding: 24px 10px;
 }
 .btn.primary {
-  background: #6a4a20;
-  border-color: #b08040;
+  background: var(--accent-d);
+  border-color: var(--accent);
 }
 .items {
   flex-wrap: wrap;
@@ -732,7 +753,7 @@ svg.tree {
 .gem-inv {
   flex: 0 0 280px;
   min-height: 160px;
-  border: 1px dashed #3a3644;
+  border: 1px dashed var(--border2);
   border-radius: 8px;
   padding: 10px;
   display: flex;
@@ -741,7 +762,7 @@ svg.tree {
 }
 .gem-inv.drop,
 .socket.drop {
-  border-color: #ffd84a;
+  border-color: var(--hi);
   background: #2a2412;
 }
 .gem-group-title {
@@ -753,9 +774,9 @@ svg.tree {
   justify-content: space-between;
   gap: 6px;
   align-items: center;
-  background: #1c1a22;
-  border: 1px solid #4a4555;
-  border-radius: 6px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 5px 8px;
   font-size: 13px;
   cursor: grab;
@@ -772,7 +793,7 @@ svg.tree {
 }
 .gem-chip.sel,
 .socket.sel {
-  outline: 2px solid #ffd84a;
+  outline: 2px solid var(--hi);
 }
 .socket.target {
   border-style: dashed;
@@ -792,10 +813,10 @@ svg.tree {
   color: #666;
 }
 .star.on {
-  color: #ffd84a;
+  color: var(--hi);
 }
 select option {
-  background: #1c1a22;
+  background: var(--panel);
 }
 .equip-col {
   flex: 0 1 440px;
@@ -811,4 +832,128 @@ select option {
 }
 .inv-row {
   grid-template-columns: minmax(110px, 1fr) 72px 34px 150px;
+}
+
+/* ---- Orb HUD ---- */
+.hud-bottom {
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.hud-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.orb {
+  position: relative;
+  width: 104px;
+  height: 104px;
+  flex: none;
+}
+.orb-glass {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #0a0508;
+  border: 3px solid #2b2218;
+  box-shadow:
+    inset 0 0 14px #000,
+    0 0 12px #000a;
+}
+.orb-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: height 0.15s;
+}
+.orb.life .orb-fill {
+  background: radial-gradient(circle at 35% 30%, #ff6a5a 0%, #c01820 45%, #5a0810 100%);
+}
+.orb.mana .orb-fill {
+  background: radial-gradient(circle at 35% 30%, #7aa0ff 0%, #2a48c8 45%, #0e1a5a 100%);
+}
+.orb-es {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(140, 200, 255, 0.35);
+  border-top: 1px solid #bfe8ff;
+}
+.orb-gloss {
+  position: absolute;
+  inset: 4px 10px 50% 10px;
+  border-radius: 50%;
+  background: linear-gradient(#ffffff55, #ffffff00);
+}
+.orb-text {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 1px 3px #000;
+  pointer-events: none;
+}
+.hud-showcase {
+  position: absolute;
+  top: 40px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  pointer-events: auto;
+  font-size: 12px;
+}
+.showcase-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.style-panel {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+.style-switch {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.style-btn {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 14px;
+  cursor: pointer;
+  min-width: 150px;
+  text-align: center;
+}
+.style-btn.on {
+  border-color: var(--hi);
+  box-shadow: 0 0 0 1px var(--hi);
+}
+.style-btn .key {
+  opacity: 0.6;
+  font-size: 11px;
+  margin-right: 4px;
+}
+.style-btn .tagline {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+  max-width: 190px;
+}
+.style-switch.compact .style-btn {
+  min-width: 0;
+  padding: 3px 10px;
+  font-size: 12px;
 }

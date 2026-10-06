@@ -82,3 +82,7 @@ Then open http://localhost:5173.
 run under Node and Vitest; ESLint enforces the boundaries.
 
 `dist/` is a plain static site (relative paths), so it can be hosted anywhere.
+
+## Visual styles
+
+Three map render styles (Grimdark, Cel Isometric, Inkwell) live in `src/render/styles/`. Switch with keys 1/2/3 or the Title screen; _Showcase_ mode on the Title screen auto-plays a demo (N = next class). See `docs/VISUAL_STYLES.md`.

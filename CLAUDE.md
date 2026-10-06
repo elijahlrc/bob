@@ -22,3 +22,7 @@
   `npm run sim -- --runs 10 --class all` and, if XP pacing moved, `--write-xp`.
 - **Bash tool quirk:** in Bash, Node is not on PATH; use `export PATH="/c/Program Files/nodejs:$PATH"`.
   Backslash escapes in heredocs can be collapsed; write files with the Write tool instead.
+
+## Visual styles
+
+Three map render styles (Grimdark, Cel Isometric, Inkwell) live in `src/render/styles/`. Switch with keys 1/2/3 or the Title screen; _Showcase_ mode on the Title screen auto-plays a demo (N = next class). See `docs/VISUAL_STYLES.md`.
