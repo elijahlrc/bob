@@ -83,20 +83,58 @@ controller in dev builds for debugging.
 Deferred / changed in M6: the reward pick after a **mini-boss** (§5.3) is not separate from the
 every-5th-map rule (maps 10, 20, … are multiples of 5 already, so it is covered).
 
-## M7 — Full-size tree and balance
+## M7 — Full-size tree and balance ✅
 
-- [ ] Full tree (1,250–1,350 nodes); all §9.3 invariants
-- [ ] Tree view rendering requirement
-- [ ] Balance pass (60 bot runs) — results below
+- [x] Full tree: 1,344 nodes (limit 1,250–1,350), 139 notables, 21 keystones, 160-odd clusters; every §9.3
+      invariant passes (connectivity, spacing ≥ 40, no edge through a foreign node, ≥ 4 keystones within
+      40 points and ≥ 15 notables within 30 points of every class start, unique notable names, ≤ 3 sharing a
+      mod set, deterministic snapshot)
+- [x] Tree view: SVG, a single group transform for pan/zoom (no re-render; 0.16 ms JS + layout per update
+      with all 1,344 nodes and 1,440 edges). The in-app browser throttles animation frames to 1 Hz, so paint
+      frame rate could not be measured here; the canvas fallback was therefore not built (see Appendix A)
+- [x] Balance pass, 60 bot runs (10 per class, `npm run sim -- --runs 10 --class all --seed 1`):
+  - map 1 clear rate: **100%** (600 of 600 runs, 100 per class, seed 7)
+  - every class median map reached ≥ 25 (lowest: Zealot 55.5); all six classes ≥ 50 (need 3)
+  - **22 of 60 runs won** (clearing map 100); runs are not a human benchmark: the bot is greedy
+  - pacing: median level after map 10 / 25 / 50 / 75 / 90 / 100 = 11 / 25 / 51 / 75 / 90 / 99 (±4 ✓)
+  - stuck-guard triggers: 0.00 per 10 maps (need < 1)
+  - speed: 1,600–2,300× real time (need ≥ 500×)
 
-## Deferred
+## Definition of done
 
-_(none yet)_
+M0–M7 are met. `npm run check` and `npm run build` are green, and a browser playthrough of maps 1–2 (from
+the title screen, with the class select, camp and auto-continue) shows no console errors.
 
-## Known bugs
+## Deferred / cut
 
-_(none yet)_
+- Combat log, minimap, sound, seed entry, per-skill DPS breakdown, manual flask hotkeys (the "Stretch"
+  list). Nothing from M0–M7 was cut.
+- No canvas tree renderer (the SVG met the cost measurement; see above).
+- Only `primary` skill is used; other actives are inactive in v1, as specified.
+
+## Known bugs / limitations
+
+- The in-app browser pane throttles animation frames, so the Phaser camera lags in screenshots taken there;
+  it is correct in a normal foreground tab.
+- Strider and Shade are the weakest classes for the bot (median 74 and 73.5); Reaver and Vanguard the
+  strongest. The bot is a greedy heuristic and under-uses auras and flasks; a human should do better.
+- Late-game monster damage is far below the original design's sample table (Appendix A): the bot-assembled
+  builds are modest, and humans can build stronger characters.
 
 ## Latest bot results
 
-_(not yet run)_
+```
+Bot results — 10 run(s) per class, maps up to 100, seed 1
+
+| Class | Wins | Median map reached | Median level @25/50/75 | Deaths (maps) | Stuck/10 maps | Mean map time (1×) | Wall s/run | Speed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| vanguard | 7/10 | 101 | 25/50/75 | —, 23, 17, —, —, —, —, —, —, 100 | 0.00 | 100 s | 4.5 | 1892× |
+| strider | 0/10 | 74 | 25.5/51/75 | 79, 100, 69, 14, 100, 13, 19, 97, 10, 99 | 0.00 | 134 s | 3.5 | 2336× |
+| mystic | 5/10 | 69.5 | 25.5/51/75 | —, 24, 17, —, —, 24, —, —, 19, 38 | 0.00 | 82 s | 2.7 | 1869× |
+| reaver | 5/10 | 100.5 | 25/50/75 | 40, —, —, 31, 100, 100, —, —, —, 40 | 0.00 | 86 s | 4.4 | 1591× |
+| zealot | 4/10 | 55.5 | 25/50/76 | —, 45, 17, 31, 66, —, 30, —, —, 39 | 0.00 | 113 s | 3.5 | 2074× |
+| shade | 1/10 | 73.5 | 25/51/76 | 80, —, 81, 10, 67, 100, 26, 40, 84, 39 | 0.00 | 104 s | 3.2 | 2087× |
+
+Pacing (median level after map): map 1: level 1 (n=60) · map 10: level 11 (n=60) · map 25: level 25 (n=48) · map 50: level 51 (n=37) · map 75: level 75 (n=34) · map 90: level 90 (n=30) · map 100: level 99 (n=28)
+Total wall time: 217.9 s
+```

@@ -92,7 +92,7 @@ export const MONSTER_LIFE_BASE = 20;
 export const MONSTER_LIFE_GROWTH = 1.055;
 export const MONSTER_LIFE_LINEAR = 12;
 export const MONSTER_HIT_BASE = 2;
-export const MONSTER_HIT_COEF = 0.12;
+export const MONSTER_HIT_COEF = 0.085;
 export const MONSTER_HIT_EXP = 1.5;
 /** Early-map easing: monster life and damage ramp from these fractions to full by EASE_LEVEL. */
 export const EASE_LEVEL = 20;

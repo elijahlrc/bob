@@ -17,3 +17,8 @@
   - In PowerShell, refresh PATH first:
     `$env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")`
   - Dev server: `npm run dev` on http://localhost:5173 (strict port).
+- **Status:** M0–M7 of DESIGN.md are complete (see `docs/PROGRESS.md`). Further work is the stretch list
+  or balance changes. Balance constants live in `src/data/constants.ts`; after changing them run
+  `npm run sim -- --runs 10 --class all` and, if XP pacing moved, `--write-xp`.
+- **Bash tool quirk:** in Bash, Node is not on PATH; use `export PATH="/c/Program Files/nodejs:$PATH"`.
+  Backslash escapes in heredocs can be collapsed; write files with the Write tool instead.

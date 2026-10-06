@@ -82,12 +82,13 @@ for (const cls of args.classes) {
   const wall = rs.reduce((s, r) => s + r.wallMs, 0) / rs.length / 1000;
   const sim = rs.reduce((s, r) => s + r.simSeconds, 0);
   const wallTotal = rs.reduce((s, r) => s + r.wallMs, 0) / 1000;
+  const deaths = rs.map((r) => r.deathMap).filter((d): d is number => d !== null);
+  const deathText =
+    rs.length <= 12
+      ? rs.map((r) => r.deathMap ?? '—').join(', ')
+      : `${deaths.length}/${rs.length} died${deaths.length ? `, earliest map ${Math.min(...deaths)}, median ${median(deaths)}` : ''}`;
   lines.push(
-    `| ${cls} | ${rs.filter((r) => r.won).length}/${rs.length} | ${median(reached)} | ${levelAt(25)}/${levelAt(50)}/${levelAt(75)} | ${rs
-      .map((r) => r.deathMap ?? '—')
-      .join(
-        ', ',
-      )} | ${((stuck / Math.max(1, mapsPlayed)) * 10).toFixed(2)} | ${(times.reduce((a, b) => a + b, 0) / Math.max(1, times.length)).toFixed(0)} s | ${wall.toFixed(1)} | ${(sim / wallTotal).toFixed(0)}× |`,
+    `| ${cls} | ${rs.filter((r) => r.won).length}/${rs.length} | ${median(reached)} | ${levelAt(25)}/${levelAt(50)}/${levelAt(75)} | ${deathText} | ${((stuck / Math.max(1, mapsPlayed)) * 10).toFixed(2)} | ${(times.reduce((a, b) => a + b, 0) / Math.max(1, times.length)).toFixed(0)} s | ${wall.toFixed(1)} | ${(sim / wallTotal).toFixed(0)}× |`,
   );
 }
 const allMaps = results.flatMap((r) => r.maps);
