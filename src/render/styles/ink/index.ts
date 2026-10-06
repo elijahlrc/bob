@@ -10,6 +10,7 @@ import type {
   World,
 } from '../../../sim/types';
 import { AnimTrack, StyleBase, heroColor, type ActorView } from '../../style/base';
+import type { MarkTheme } from '../../style/marks';
 import type { AnimName, FigureKind } from '../../style/figure';
 import type { StyleId } from '../../style/types';
 import {
@@ -435,6 +436,10 @@ export class InkStyle extends StyleBase {
         boil: Math.floor(Math.random() * 3),
       },
     };
+  }
+
+  protected markTheme(): MarkTheme {
+    return { unit: 3.2, outline: 0x1c1612, squash: 0.5 };
   }
 
   protected updateView(v: View, a: Actor): void {

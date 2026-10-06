@@ -164,25 +164,75 @@ button {
 }
 .flasks {
   display: flex;
-  gap: 4px;
+  gap: 6px;
+  align-items: flex-end;
 }
 .flask {
   position: relative;
-  width: 16px;
-  height: 36px;
-  border: 1px solid #777;
-  border-radius: 3px 3px 6px 6px;
+  width: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.flask-neck {
+  width: 10px;
+  height: 7px;
+  border: 1px solid #888;
+  border-bottom: none;
   background: #000a;
+}
+.flask-body {
+  position: relative;
+  width: 30px;
+  height: 44px;
+  border: 2px solid #888;
+  border-radius: 4px 4px 12px 12px;
+  background: #000b;
   overflow: hidden;
 }
-.flask.active {
+.flask.ready .flask-body {
+  border-color: #d8d8d8;
+}
+.flask.active .flask-body {
   border-color: #fff;
+  box-shadow:
+    0 0 10px #fff,
+    inset 0 0 8px #fff8;
+  animation: flask-pulse 0.6s ease-in-out infinite alternate;
+}
+@keyframes flask-pulse {
+  from {
+    filter: brightness(1);
+  }
+  to {
+    filter: brightness(1.7);
+  }
+}
+.flask-count {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow:
+    0 0 3px #000,
+    0 1px 0 #000;
+}
+.flask-tag {
+  font-size: 10px;
+  line-height: 12px;
+  color: var(--muted);
+  text-shadow: 0 1px 1px #000;
 }
 .flask-fill {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
+  transition: height 0.2s;
 }
 .flask-fill.life {
   background: #c03030;
@@ -962,4 +1012,97 @@ select option {
    (the list sits below this column when the window is narrow). */
 .item-detail {
   min-height: 340px;
+}
+
+/* ---- Enemy inspect card ---- */
+.inspect {
+  position: absolute;
+  left: 16px;
+  top: 56px;
+  width: 270px;
+  padding: 10px 12px;
+  background: var(--panel);
+  color: var(--text);
+  border: 2px solid var(--rar, #888);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 14px #000a;
+  pointer-events: auto;
+  font-size: 13px;
+}
+.inspect-x {
+  position: absolute;
+  right: 6px;
+  top: 4px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 18px;
+  cursor: pointer;
+}
+.inspect-name {
+  font-weight: bold;
+  font-size: 15px;
+  color: var(--rar, #fff);
+  padding-right: 18px;
+}
+.inspect-sub {
+  margin-bottom: 6px;
+}
+.inspect-life {
+  position: relative;
+  height: 16px;
+  background: #301010;
+  border: 1px solid #000;
+  margin-bottom: 8px;
+}
+.inspect-life > div {
+  height: 100%;
+  background: var(--rar, #c03030);
+}
+.inspect-life > span {
+  position: absolute;
+  inset: 0;
+  text-align: center;
+  font-size: 11px;
+  line-height: 16px;
+  color: #fff;
+  text-shadow:
+    0 0 2px #000,
+    0 1px 0 #000;
+}
+.inspect-mod {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 6px;
+}
+.inspect-mod-name {
+  font-weight: bold;
+}
+.mchip {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+  background: var(--c);
+  outline: 2px solid #000;
+}
+.mchip.circle {
+  border-radius: 50%;
+}
+.mchip.ring {
+  border-radius: 50%;
+  background: radial-gradient(circle, #000 0 30%, var(--c) 32%);
+}
+.mchip.diamond {
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  outline: none;
+}
+.mchip.triUp {
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  outline: none;
+}
+.mchip.triDown {
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  outline: none;
 }

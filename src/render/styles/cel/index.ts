@@ -10,6 +10,7 @@ import type {
   World,
 } from '../../../sim/types';
 import { AnimTrack, StyleBase, heroColor, type ActorView } from '../../style/base';
+import type { MarkTheme } from '../../style/marks';
 import type { AnimName, FigureKind } from '../../style/figure';
 import type { StyleId } from '../../style/types';
 import {
@@ -427,6 +428,10 @@ export class CelStyle extends StyleBase {
         face: 1,
       },
     };
+  }
+
+  protected markTheme(): MarkTheme {
+    return { unit: 3.4, outline: 0x1d0f2e, squash: 0.5 };
   }
 
   protected updateView(v: View, a: Actor, dt: number): void {

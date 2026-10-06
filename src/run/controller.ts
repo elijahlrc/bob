@@ -16,6 +16,8 @@ export type StyleChoice = StyleId;
 export type BusEvents = {
   /** The visual style changed (renderer rebuilds the current map). */
   style: { id: StyleChoice };
+  /** The inspected enemy changed (click on the map; null clears). */
+  select: { id: number | null };
   /** Run or screen state changed (UI re-renders). */
   state: null;
   /** A map started; the renderer builds its scene from the world. */
@@ -39,6 +41,8 @@ export class Controller {
   lastResult: MapResult | null = null;
   speed = 1;
   paused = false;
+  /** Enemy picked for inspection on the map. */
+  selectedId: number | null = null;
   private acc = 0;
 
   private store: KeyValueStore | null;
@@ -54,6 +58,7 @@ export class Controller {
       if (sid === 'grim' || sid === 'cel' || sid === 'ink') this.styleId = sid;
     }
     this.bus.on('frame', ({ dtMs }) => this.onFrame(dtMs));
+    this.bus.on('select', ({ id }) => (this.selectedId = id));
   }
 
   private changed(): void {
@@ -95,6 +100,7 @@ export class Controller {
     });
     this.acc = 0;
     this.screen = 'map';
+    this.bus.emit('select', { id: null });
     this.bus.emit('mapStart', { world: this.world });
     this.bus.emit('state', null);
   }
@@ -153,6 +159,7 @@ export class Controller {
     this.world = createWorld({ plan, build: run.build, xp: run.xp, opts: worldOptsFor(run, plan) });
     this.acc = 0;
     this.screen = 'map';
+    this.bus.emit('select', { id: null });
     this.bus.emit('mapStart', { world: this.world });
     this.changed();
   }

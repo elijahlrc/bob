@@ -10,6 +10,10 @@ export interface MapStyle {
   update(world: World, dt: number): void;
   /** Sim events produced since the last frame (hits, deaths, ...). */
   onEvents(events: SimEvent[], world: World): void;
+  /** Highlight (and show life/affix marks for) the inspected enemy. */
+  setSelected(id: number | null): void;
+  /** The actor under a world-space point (an enemy), or null. Used for click-to-inspect. */
+  pick(wx: number, wy: number): number | null;
   destroy(): void;
 }
 

@@ -11,6 +11,7 @@ export class MapScene extends Phaser.Scene {
   private world: World | null = null;
   private style: MapStyle | null = null;
   private styleId: StyleId = 'grim';
+  private selected: number | null = null;
   private unsub: (() => void)[] = [];
 
   constructor() {
@@ -29,15 +30,25 @@ export class MapScene extends Phaser.Scene {
       this.bus.on('ticked', ({ events, world }) => {
         if (this.world === world) this.style?.onEvents(events, world);
       }),
+      this.bus.on('select', ({ id }) => {
+        this.selected = id;
+        this.style?.setSelected(id);
+      }),
       this.bus.on('style', ({ id }) => {
         this.styleId = id;
         if (this.world) this.build(this.world);
       }),
     );
+    this.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
+      if (!this.style || !this.world || p.button !== 0) return;
+      const id = this.style.pick(p.worldX, p.worldY);
+      this.bus.emit('select', { id });
+    });
     this.events.once('shutdown', () => this.unsub.forEach((u) => u()));
   }
 
   private clear(): void {
+    this.selected = null;
     this.style?.destroy();
     this.style = null;
     this.world = null;
@@ -48,6 +59,7 @@ export class MapScene extends Phaser.Scene {
     this.world = world;
     this.style = makeStyle(this.styleId, this);
     this.style.build(world);
+    this.style.setSelected(this.selected);
   }
 
   override update(_time: number, delta: number): void {

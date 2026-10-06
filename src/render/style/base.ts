@@ -11,6 +11,7 @@ import type {
   World,
 } from '../../sim/types';
 import { AnimTrack } from './anim';
+import { MonsterMarks, type MarkTheme } from './marks';
 import { heroFigure, monsterFigure, type FigureKind } from './figure';
 
 export { AnimTrack };
@@ -52,6 +53,8 @@ export abstract class StyleBase implements MapStyle {
   protected shake = 0;
 
   protected scene: Phaser.Scene;
+  protected marks: MonsterMarks | null = null;
+  protected selectedId: number | null = null;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -67,6 +70,10 @@ export abstract class StyleBase implements MapStyle {
 
   // ---- Lifecycle ----
   abstract buildWorld(world: World): void;
+  /** Look of the enemy readouts (pips, bars, auras) in this style. */
+  protected abstract markTheme(): MarkTheme;
+  /** Fraction of the sprite height (above the feet) at which an enemy's head sits. */
+  protected headFrac = 0.62;
   protected abstract createView(a: Actor, kind: FigureKind): ActorView;
   protected abstract updateView(v: ActorView, a: Actor, dt: number): void;
   protected abstract destroyView(v: ActorView): void;
@@ -87,6 +94,8 @@ export abstract class StyleBase implements MapStyle {
   build(world: World): void {
     this.world = world;
     this.buildWorld(world);
+    this.marks?.destroy();
+    this.marks = new MonsterMarks(this.scene, this.markTheme());
     const cam = this.scene.cameras.main;
     const p = this.project(world.player.x, world.player.y);
     cam.centerOn(p.x, p.y);
@@ -165,6 +174,50 @@ export abstract class StyleBase implements MapStyle {
     this.updateExit(world, dt);
     this.frame(world, dt);
     this.followCamera(world, dt);
+    this.marks?.draw(world, this.selectedId, this.time, (a) => this.markPos(a));
+  }
+
+  /** Screen-space anchor for an actor's readouts: feet position, head height, and body radius in px. */
+  protected markPos(a: Actor): { x: number; y: number; headUp: number; r: number } | null {
+    const v = this.views.get(a.id);
+    if (!v) return null;
+    const p = this.project(v.track.rx, v.track.ry);
+    const sprite = v.data.sprite as Phaser.GameObjects.Image | undefined;
+    const h = sprite?.displayHeight ?? 40;
+    return { x: p.x, y: p.y, headUp: h * this.headFrac, r: this.pickRadius(a) };
+  }
+
+  /** Body radius in px, used for the ground aura and picking. */
+  protected pickRadius(a: Actor): number {
+    const p0 = this.project(0, 0);
+    const p1 = this.project(a.r * 1.4, 0);
+    return Math.max(8, Math.hypot(p1.x - p0.x, p1.y - p0.y));
+  }
+
+  setSelected(id: number | null): void {
+    this.selectedId = id;
+  }
+
+  pick(wx: number, wy: number): number | null {
+    let best: number | null = null;
+    let bestD = Infinity;
+    for (const a of this.world.actors) {
+      if (a.isPlayer || !a.alive) continue;
+      const m = this.markPos(a);
+      if (!m) continue;
+      // Test against the whole body: from the feet up to the head.
+      const cy = m.y - m.headUp * 0.5;
+      const rx = Math.max(m.r, m.headUp * 0.45);
+      const ry = Math.max(m.headUp * 0.6, m.r);
+      const dx = (wx - m.x) / rx;
+      const dy = (wy - cy) / ry;
+      const d = dx * dx + dy * dy;
+      if (d <= 1 && d < bestD) {
+        bestD = d;
+        best = a.id;
+      }
+    }
+    return best;
   }
 
   /** Camera follows the player with a little smoothing and the shake applied. */
@@ -198,6 +251,8 @@ export abstract class StyleBase implements MapStyle {
     for (const o of this.drops.values()) this.destroyDrop(o, false);
     this.drops.clear();
     this.chests.clear();
+    this.marks?.destroy();
+    this.marks = null;
     this.destroyAll();
   }
 }

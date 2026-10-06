@@ -10,6 +10,7 @@ import type {
   World,
 } from '../../../sim/types';
 import { StyleBase, AnimTrack, figureOf, heroColor, type ActorView } from '../../style/base';
+import type { MarkTheme } from '../../style/marks';
 import { isHero, type AnimName, type FigureKind } from '../../style/figure';
 import type { StyleId } from '../../style/types';
 import { buildProps, FRAMES, GTILE, makeTileset, rasterFigure } from './paint';
@@ -496,6 +497,10 @@ export class GrimStyle extends StyleBase {
       kind,
       data: { sprite, shadow, ring, light, gone: false, last: '', acc: 0, accent, variant },
     };
+  }
+
+  protected markTheme(): MarkTheme {
+    return { unit: 2.6, outline: 0x08060a, squash: 0.5 };
   }
 
   protected updateView(v: View, a: Actor, dt: number): void {

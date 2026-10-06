@@ -84,7 +84,7 @@
   z-index: -1;
   pointer-events: none;
 }
-:root[data-style='grim'] .flask {
+:root[data-style='grim'] .flask-body {
   border-color: #6a5238;
   background: #0a0806;
 }
@@ -182,7 +182,7 @@
   paint-order: stroke fill;
   font-size: 18px;
 }
-:root[data-style='cel'] .flask {
+:root[data-style='cel'] .flask-body {
   border: 3px solid #1d0f2e;
 }
 :root[data-style='cel'] .hud-top {
@@ -312,7 +312,7 @@
     0 0 3px #000,
     1px 1px 0 #000;
 }
-:root[data-style='ink'] .flask {
+:root[data-style='ink'] .flask-body {
   border: 2px solid #2a1f16;
   background: #f1e5c4;
 }
