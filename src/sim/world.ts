@@ -70,6 +70,7 @@ function newActor(id: number, isPlayer: boolean, x: number, y: number, r: number
     slamT: 7,
     bossPhase: 0,
     summonedBy: 0,
+    dummy: false,
   };
 }
 
@@ -376,6 +377,10 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     levelUp(w);
   }
   if (w.build.level >= MAX_LEVEL) w.xp = 0;
+  if (w.opts.freeResources && p.alive) {
+    p.life = lifeCap(w, p);
+    p.mana = Math.max(0, p.def.maxMana - w.char.reservedMana);
+  }
   if (!p.alive && w.status === 'running') w.status = 'dead';
   if (w.t >= (w.opts.maxTime ?? 900) && w.status === 'running') w.status = 'timeout';
 }

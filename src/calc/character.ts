@@ -564,3 +564,29 @@ export function useTags(p: SkillProfile): number {
 }
 
 export type { Item };
+
+/** §8.1: pure, synchronous character sheet for a build. */
+export function computeCharacter(build: Build, config: CalcConfig = {}): CharacterSheet {
+  return new Character(build, config).sheet();
+}
+
+export type SheetDiff = {
+  dps: number;
+  life: number;
+  es: number;
+  mana: number;
+  res: number[];
+  ehp: number;
+};
+
+/** Item-compare deltas (§8.1): `b − a`. */
+export function diffSheets(a: CharacterSheet, b: CharacterSheet): SheetDiff {
+  return {
+    dps: b.skill.totalDps - a.skill.totalDps,
+    life: b.life - a.life,
+    es: b.es - a.es,
+    mana: b.mana - a.mana,
+    res: b.res.map((r, i) => r - a.res[i]),
+    ehp: b.ehp - a.ehp,
+  };
+}

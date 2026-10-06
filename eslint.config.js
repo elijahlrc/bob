@@ -52,6 +52,8 @@ export default defineConfig(
   },
   {
     files: DETERMINISTIC,
+    // Tests may time themselves.
+    ignores: ['**/*.test.ts'],
     rules: {
       'no-restricted-properties': [
         'error',

@@ -87,6 +87,8 @@ export type Actor = {
   slamT: number;
   bossPhase: number;
   summonedBy: number;
+  /** Training dummy: never acts (convergence tests). */
+  dummy: boolean;
 };
 
 export type Projectile = {
@@ -182,6 +184,8 @@ export type WorldOpts = {
   chestLoot?: (w: World, c: Chest) => AnyItem[];
   /** Hard cap on simulated seconds. */
   maxTime?: number;
+  /** Refill the player's life and mana every tick (training-dummy tests). */
+  freeResources?: boolean;
 };
 
 export type World = {

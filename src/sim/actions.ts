@@ -134,6 +134,8 @@ function fire(w: World, a: Actor, act: Action): void {
       best = c.max;
       dtype = c.type;
     }
+  // All projectiles of one use share a hit list: a use hits each target at most once.
+  const useHits: number[] = [];
   for (let i = 0; i < n; i++) {
     const ang = base + (i - (n - 1) / 2) * step;
     const id = w.nextId++;
@@ -150,7 +152,7 @@ function fire(w: World, a: Actor, act: Action): void {
       maxRange: (b.range ?? 9) + 2,
       profile: p,
       hand: act.hand,
-      hitIds: [],
+      hitIds: useHits,
       pierceLeft: p.pierce,
       explodeRadius: (b.explodeRadius ?? 0) * p.radiusMult,
       startX: a.x,
@@ -170,11 +172,10 @@ function explode(
 ): void {
   w.events.push({ t: 'explode', x, y, r: pr.explodeRadius, dtype: pr.dtype });
   if (!owner) return;
-  const d = Math.hypot(x - pr.startX, y - pr.startY);
   for (const e of w.actors) {
     if (!e.alive || e.faction === pr.faction) continue;
     if (Math.hypot(e.x - x, e.y - y) <= pr.explodeRadius + e.r)
-      hit(w, owner, e, pr.profile, pr.hand, d);
+      hit(w, owner, e, pr.profile, pr.hand, Math.hypot(e.x - pr.startX, e.y - pr.startY));
   }
 }
 
@@ -213,7 +214,8 @@ export function updateProjectiles(w: World, dt: number): void {
           alive = false;
           break;
         }
-        if (owner) hit(w, owner, e, pr.profile, pr.hand, pr.travelled);
+        if (owner)
+          hit(w, owner, e, pr.profile, pr.hand, Math.hypot(e.x - pr.startX, e.y - pr.startY));
         if (pr.pierceLeft > 0) pr.pierceLeft--;
         else {
           alive = false;

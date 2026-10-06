@@ -286,7 +286,7 @@ export function alertPack(w: World, m: Actor): void {
 
 export function monsterAI(w: World, m: Actor, dt: number): void {
   m.moving = false;
-  if (!canAct(m)) return;
+  if (m.dummy || !canAct(m)) return;
   const p = w.player;
   if (!p.alive) return;
   const d = Math.hypot(p.x - m.x, p.y - m.y);

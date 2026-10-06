@@ -1,6 +1,6 @@
 # Bob — Progress
 
-Current milestone: **M2 — Combat rules**
+Current milestone: **M3 — Character building**
 
 Spec: [DESIGN.md](DESIGN.md). Each milestone ends with green `npm run check` and `npm run build` and one commit.
 
@@ -26,13 +26,14 @@ themes, an estimated XP table) is already written; population already rolls magi
 Balance is untuned (several classes can die on maps 1–2; see M7). `window.__bob` exposes the
 controller in dev builds for debugging.
 
-## M2 — Combat rules
+## M2 — Combat rules ✅
 
-- [ ] Full damage pipeline, unit-tested
-- [ ] Six ailments + stun in sim with indicators
-- [ ] `computeCharacter` full sheet
-- [ ] Convergence test (melee phys, crit spell, conversion, dual wield, poison)
-- [ ] Flasks with auto-use policy
+- [x] Full damage pipeline, unit-tested (`calc/pipeline.test.ts`, `sim/combat.test.ts`)
+- [x] Six ailments + stun in sim with indicators (pips, freeze ring, stun stars)
+- [x] `computeCharacter` full sheet + `diffSheets` (< 5 ms)
+- [x] Convergence test: melee phys, crit spell, conversion, dual wield (alternating and Sweep),
+      projectile attack, chaining spell, falloff spell, poison — each with and without evasion/resists
+- [x] Flasks with auto-use policy
 
 ## M3 — Character building
 
