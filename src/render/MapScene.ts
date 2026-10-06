@@ -130,8 +130,10 @@ export class MapScene extends Phaser.Scene {
       s = this.add.image(0, 0, 'player').setTint(classDef(this.world!.build.classId).color);
     } else {
       const spec = a.mon!.spec;
-      s = this.add.image(0, 0, spec.type).setTint(VARIANT_TINTS[spec.variant] ?? 0xffffff);
-      const scale = spec.rarity === 'boss' ? 2.2 : spec.rarity === 'miniboss' ? 1.35 : 1;
+      s = this.add
+        .image(0, 0, spec.rarity === 'boss' ? 'boss' : spec.type)
+        .setTint(VARIANT_TINTS[spec.variant] ?? 0xffffff);
+      const scale = spec.rarity === 'boss' ? 1.3 : spec.rarity === 'miniboss' ? 1.35 : 1;
       s.setScale(scale);
       const rc = RARITY_COLORS[spec.rarity];
       if (rc !== undefined) {

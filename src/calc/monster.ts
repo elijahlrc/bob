@@ -23,6 +23,9 @@ import {
 import type { SkillDef } from './gems';
 import { buildProfile, type HandStats, type SkillProfile } from './skill';
 
+/** §12.7 crushing swing. */
+export const BOSS_ATTACK_TIME = 1.6;
+
 export type MonsterSpec = {
   type: MonsterTypeId;
   variant: Variant;
@@ -118,7 +121,8 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
       [0, 0],
       [0, 0],
     ],
-    aps: 1 / t.attackTime,
+    // The Ossuary Regent's crushing swing takes 1.6 s (§12.7).
+    aps: 1 / (spec.rarity === 'boss' ? BOSS_ATTACK_TIME : t.attackTime),
     crit: 5,
     range: t.range,
     tags: [],

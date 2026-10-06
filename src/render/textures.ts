@@ -91,6 +91,17 @@ export function makeEntityTextures(scene: Phaser.Scene): void {
     g.fillStyle(dark, 1).fillCircle(11, 15, 2).fillCircle(17, 15, 2);
     g.fillStyle(0xffffff, 1).fillCircle(25, 8, 5);
   });
+  // The Ossuary Regent: a huge crowned skull.
+  bake('boss', 64, 64, () => {
+    g.fillStyle(bone, 1).fillCircle(32, 36, 24);
+    g.fillStyle(dark, 1).fillCircle(23, 34, 6).fillCircle(41, 34, 6);
+    g.fillRect(24, 48, 16, 4);
+    g.fillStyle(0xd8b040, 1)
+      .fillTriangle(12, 16, 20, 2, 26, 16)
+      .fillTriangle(26, 14, 32, 0, 38, 14)
+      .fillTriangle(38, 16, 44, 2, 52, 16);
+    g.fillRect(12, 14, 40, 5);
+  });
   bake('ring', 64, 64, () => {
     g.lineStyle(3, 0xffffff, 1).strokeCircle(32, 32, 29);
   });

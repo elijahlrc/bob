@@ -1,6 +1,6 @@
 # Bob — Progress
 
-Current milestone: **M5 — Enemies**
+Current milestone: **M6 — Run loop**
 
 Spec: [DESIGN.md](DESIGN.md). Each milestone ends with green `npm run check` and `npm run build` and one commit.
 
@@ -58,13 +58,14 @@ controller in dev builds for debugging.
       item cards with compare deltas from the calc engine
 - [x] Chests in side branches (magic-or-better item or a gem)
 
-## M5 — Enemies
+## M5 — Enemies ✅
 
-- [ ] 4 types × elemental variants
-- [ ] Magic/rare/mini-boss with 15 mods; rare names
-- [ ] Level scaling, XP, pack population
-- [ ] Themes and next-map choice
-- [ ] The Ossuary Regent
+- [x] 4 types × elemental variants with distinct silhouettes and tints
+- [x] Magic/rare/mini-boss with all 15 mods (volatile, raiser, rime aura in the sim); rare names
+- [x] Level scaling (§12.1 fixtures), XP, pack population (70/22/8 tested)
+- [x] Themes and the 2-option next-map choice
+- [x] The Ossuary Regent: 1.6 s swing, telegraphed slam every 7 s, raises 4 warriors at 75/50/25%,
+      +30% resists, ×4 stun threshold, crowned sprite (tested headless)
 
 ## M6 — Run loop
 
