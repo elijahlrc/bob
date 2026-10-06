@@ -7,6 +7,7 @@ import { resistPenaltyForMap } from '../gen/mapPlan';
 import type { Controller } from '../run/controller';
 import { passivePoints } from '../run/run';
 import { Items } from './Items';
+import { Reward } from './Reward';
 import { Sheet } from './Sheet';
 import { Skills } from './Skills';
 import { TreeView } from './TreeView';
@@ -90,6 +91,7 @@ export function Camp({ c }: { c: Controller }) {
             Last map: {last.time.toFixed(0)} s · {last.kills} kills
           </div>
         )}
+        {run.reward && <Reward c={c} />}
         {pts > 0 && (
           <div class="notice">
             You have {pts} unspent passive point{pts > 1 ? 's' : ''}.
@@ -116,6 +118,9 @@ export function Camp({ c }: { c: Controller }) {
           {left !== null && ` — ${themeDef(run.nextThemes[0]).name} in ${left.toFixed(1)} s`}
         </label>
         <button class="btn" onClick={() => c.quit()}>
+          Save and quit
+        </button>
+        <button class="btn danger" onClick={() => confirm('Abandon this run?') && c.abandon()}>
           Abandon run
         </button>
       </div>

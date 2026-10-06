@@ -4,7 +4,15 @@ import { Controller } from './run/controller';
 import { App } from './ui/App';
 import './ui/styles.css';
 
-const controller = new Controller();
+function storage(): Storage | null {
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+const controller = new Controller(storage());
 createGame('app', controller.bus);
 render(h(App, { c: controller }), document.getElementById('ui')!);
 

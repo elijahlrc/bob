@@ -1,6 +1,6 @@
 # Bob — Progress
 
-Current milestone: **M6 — Run loop**
+Current milestone: **M7 — Full-size tree and balance**
 
 Spec: [DESIGN.md](DESIGN.md). Each milestone ends with green `npm run check` and `npm run build` and one commit.
 
@@ -67,13 +67,21 @@ controller in dev builds for debugging.
 - [x] The Ossuary Regent: 1.6 s swing, telegraphed slam every 7 s, raises 4 warriors at 75/50/25%,
       +30% resists, ×4 stun threshold, crowned sprite (tested headless)
 
-## M6 — Run loop
+## M6 — Run loop ✅
 
-- [ ] 100-map schedule (penalties, bonus points, refunds, rewards, auto-continue, mini-bosses, victory/summary)
-- [ ] Save/load at camp, continue run
-- [ ] `npm run sim` bot at ≥ 500× real time
-- [ ] XP table from bot measurements
-- [ ] README updated
+- [x] 100-map schedule: rooms, resist penalties (0/−30/−60), +3 bonus points after maps 10–80,
+      refund points, reward picks (after every 5th map), auto-continue, mini-bosses every 10th map,
+      boss on map 100, victory and run-summary screens
+- [x] Save/load at camp (`bob.save`, version 1, injected storage), Continue run on the title screen,
+      "save incompatible" handling
+- [x] `npm run sim` headless bot (greedy Δ(DPS × EHP): passives, equipment, gems, flasks, rewards) at
+      1,700–3,000× real time (requirement: 500×)
+- [x] XP table derived from bot measurements (`src/data/measuredXp.ts`, from 60 runs); median level
+      within ±4 of the map number
+- [x] README updated
+
+Deferred / changed in M6: the reward pick after a **mini-boss** (§5.3) is not separate from the
+every-5th-map rule (maps 10, 20, … are multiples of 5 already, so it is covered).
 
 ## M7 — Full-size tree and balance
 

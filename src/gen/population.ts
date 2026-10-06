@@ -51,7 +51,12 @@ export function rollVariant(rng: Rng, type: MonsterTypeId, theme: ThemeDef): Var
   return rng.weighted(vs, (v) => ELEMENT_WEIGHTS[v] * (theme.elementWeights[v] ?? 1));
 }
 
-export function rollMonsterMods(rng: Rng, rarity: MonsterRarity): MonsterModId[] {
+/** Mods held back on early maps (tunable; bot-balanced, see Appendix A). */
+const LATE_MODS: MonsterModId[] = ['fortified', 'raiser', 'rimeAura', 'frenzied'];
+export const LATE_MOD_LEVEL = 15;
+export const MINIBOSS_LATE_MOD_LEVEL = 50;
+
+export function rollMonsterMods(rng: Rng, rarity: MonsterRarity, level = 100): MonsterModId[] {
   const [lo, hi] =
     rarity === 'magic'
       ? [1, 2]
@@ -61,7 +66,12 @@ export function rollMonsterMods(rng: Rng, rarity: MonsterRarity): MonsterModId[]
           ? [4, 4]
           : [0, 0];
   const n = rng.int(lo, hi);
-  const pool = MONSTER_MODS.filter((m) => rarity !== 'magic' || m.magic).map((m) => m.id);
+  const pool = MONSTER_MODS.filter(
+    (m) =>
+      (rarity !== 'magic' || m.magic) &&
+      (level >= (rarity === 'miniboss' ? MINIBOSS_LATE_MOD_LEVEL : LATE_MOD_LEVEL) ||
+        !LATE_MODS.includes(m.id)),
+  ).map((m) => m.id);
   rng.shuffle(pool);
   return pool.slice(0, n).sort();
 }
@@ -117,7 +127,7 @@ export function populate(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Populati
       variant: rollVariant(rng, type, opts.theme),
       rarity,
       level,
-      mods: rollMonsterMods(rng, rarity),
+      mods: rollMonsterMods(rng, rarity, level),
     };
   };
   const extra = Math.floor(opts.map / 20);

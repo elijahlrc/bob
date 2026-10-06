@@ -55,7 +55,7 @@ describe('monster stats (§12.1–12.5)', () => {
     expect(buildMonster(spec({ rarity: 'magic', mods: ['prismatic'] })).defence.res[1]).toBe(30);
     expect(
       buildMonster(spec({ rarity: 'magic', mods: ['vampiric'] })).profile(0).leechLife[0],
-    ).toBeCloseTo(0.2);
+    ).toBeCloseTo(0.1);
     expect(
       buildMonster(spec({ rarity: 'magic', mods: ['regenerating'] })).defence.lifeRegen,
     ).toBeGreaterThan(0);

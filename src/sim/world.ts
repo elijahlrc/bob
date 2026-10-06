@@ -71,6 +71,8 @@ function newActor(id: number, isPlayer: boolean, x: number, y: number, r: number
     bossPhase: 0,
     summonedBy: 0,
     dummy: false,
+    retreatT: 0,
+    retreatCd: 0,
   };
 }
 

@@ -1,4 +1,6 @@
 import {
+  ATTACK_LEVEL_MAX,
+  ATTACK_LEVEL_MIN,
   BASE_ACCURACY,
   BASE_EVASION,
   BASE_LIFE,
@@ -103,6 +105,10 @@ export type SkillSheet = {
   poisonDps: number;
   ailmentDps: number;
   totalDps: number;
+  /** Fraction of uses the mana (or life) regeneration can pay for. */
+  sustain: number;
+  /** DPS blending in the default attack for the unsustained share. */
+  sustainedDps: number;
   cost: number;
   range: number;
 };
@@ -218,6 +224,14 @@ export class Character {
       mod('evasion', 'base', BASE_EVASION(level)),
       mod('accuracy', 'base', BASE_ACCURACY(level)),
       mod('moveSpeed', 'base', BASE_MOVE_SPEED),
+      mod('damage.min', 'base', ATTACK_LEVEL_MIN * level, {
+        damageTypes: ['physical'],
+        tags: ['attack'],
+      }),
+      mod('damage.max', 'base', ATTACK_LEVEL_MAX * level, {
+        damageTypes: ['physical'],
+        tags: ['attack'],
+      }),
     ];
     const tree = getTree();
     for (const id of build.allocated) {
@@ -473,6 +487,20 @@ export class Character {
     }
     const hitDps = perUse * usesPerSec;
     const ailmentDps = ign + bl + po;
+    const totalDps = hitDps + ailmentDps;
+    // Sustain: the share of uses the resource pool can pay for; the rest fall back to the default attack.
+    let sustain = 1;
+    let sustainedDps = totalDps;
+    if (p.cost > 0 && choice.gemUid !== null) {
+      const d = this.defence();
+      const costLife = this.db.flag('skillsCostLife');
+      const regen = costLife ? d.lifeRegen : d.manaRegen;
+      sustain = Math.min(1, regen / (p.cost * usesPerSec));
+      if (sustain < 1) {
+        const dflt = this.skillSheet(this.defaultAttack, target);
+        sustainedDps = sustain * totalDps + (1 - sustain) * dflt.totalDps;
+      }
+    }
     return {
       name: choice.skill.name,
       id: choice.skill.id,
@@ -489,7 +517,9 @@ export class Character {
       bleedDps: bl,
       poisonDps: po,
       ailmentDps,
-      totalDps: hitDps + ailmentDps,
+      totalDps,
+      sustain,
+      sustainedDps,
       cost: p.cost,
       range: skillRange(p),
     };

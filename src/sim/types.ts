@@ -89,6 +89,9 @@ export type Actor = {
   summonedBy: number;
   /** Training dummy: never acts (convergence tests). */
   dummy: boolean;
+  /** Ranged monsters: remaining retreat time and its cooldown. */
+  retreatT: number;
+  retreatCd: number;
 };
 
 export type Projectile = {
@@ -186,6 +189,8 @@ export type WorldOpts = {
   maxTime?: number;
   /** Refill the player's life and mana every tick (training-dummy tests). */
   freeResources?: boolean;
+  /** Balance probes: the player cannot die (life is restored at 1). */
+  godMode?: boolean;
 };
 
 export type World = {

@@ -6,6 +6,8 @@ import {
   MONSTER_AGGRO,
   PACK_ALERT,
   REPATH_INTERVAL,
+  RETREAT_COOLDOWN,
+  RETREAT_TIME,
   STUCK_TIME,
 } from '../data/constants';
 import { actorById, startAction } from './actions';
@@ -326,9 +328,16 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
   const kind = prof.skill.behaviour.kind;
   const range = m.mon!.range;
   if (kind !== 'melee') {
-    if (d < 2) {
+    // Retreat when crowded: short half-speed bursts with a cooldown, so they don't kite forever.
+    m.retreatCd -= dt;
+    if (d < 2 && m.retreatT <= 0 && m.retreatCd <= 0) {
+      m.retreatT = RETREAT_TIME;
+      m.retreatCd = RETREAT_COOLDOWN;
+    }
+    if (m.retreatT > 0) {
+      m.retreatT -= dt;
       const away = w.grid.collide(m.x - (p.x - m.x), m.y - (p.y - m.y), m.r);
-      step(w, m, away.x - m.x, away.y - m.y, dt);
+      step(w, m, away.x - m.x, away.y - m.y, dt * 0.5);
       return;
     }
     if (d <= range && los) {

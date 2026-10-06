@@ -1,5 +1,15 @@
 import { clamp } from '../core/math';
-import { ARMOUR_CAP, MIN_HIT_CHANCE, RES_FLOOR } from '../data/constants';
+import {
+  ARMOUR_CAP,
+  MIN_HIT_CHANCE,
+  MONSTER_HIT_BASE,
+  MONSTER_HIT_COEF,
+  MONSTER_HIT_EXP,
+  MONSTER_LIFE_BASE,
+  MONSTER_LIFE_GROWTH,
+  MONSTER_LIFE_LINEAR,
+  RES_FLOOR,
+} from '../data/constants';
 
 /** §6.3 Hit chance of an attack. */
 export function hitChance(accuracy: number, evasion: number): number {
@@ -45,10 +55,10 @@ export function levelPenalty(playerLevel: number, monLevel: number): number {
 
 /** §12.1 Monster level scaling. */
 export function monsterLife(m: number): number {
-  return Math.round(20 * Math.pow(1.07, m) + 10 * m);
+  return Math.round(MONSTER_LIFE_BASE * Math.pow(MONSTER_LIFE_GROWTH, m) + MONSTER_LIFE_LINEAR * m);
 }
 export function monsterHit(m: number): number {
-  return 4 + 0.6 * Math.pow(m, 1.6);
+  return MONSTER_HIT_BASE + MONSTER_HIT_COEF * Math.pow(m, MONSTER_HIT_EXP);
 }
 export function monsterAccuracy(m: number): number {
   return 20 + 14 * m;

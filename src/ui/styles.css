@@ -551,3 +551,20 @@ svg.tree {
   opacity: 0.4;
   cursor: default;
 }
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+.reward {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid #b08040;
+  border-radius: 6px;
+}
+.reward-preview {
+  margin-top: 4px;
+}

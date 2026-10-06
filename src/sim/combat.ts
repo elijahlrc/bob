@@ -110,6 +110,7 @@ export function applyDamage(w: World, dst: Actor, dmg: number[]): number {
   }
   dst.life -= lifeDmg;
   dst.sinceDamaged = 0;
+  if (dst.isPlayer && w.opts.godMode && dst.life <= 0) dst.life = 1;
   if (dst.isPlayer) w.stats.damageTaken += total;
   else w.stats.damageDealt += total;
   if (dst.life <= 0) killActor(w, dst);

@@ -1,3 +1,4 @@
+import { easeDamage, easeLife } from '../data/constants';
 import {
   MONSTER_TYPES,
   RARITY_MULTS,
@@ -97,7 +98,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
   const r = RARITY_MULTS[spec.rarity];
   const m = spec.level;
   const mods: Mod[] = [
-    mod('life', 'base', Math.round(monsterLife(m) * t.lifeMult * r.life)),
+    mod('life', 'base', Math.round(monsterLife(m) * easeLife(m) * t.lifeMult * r.life)),
     mod('accuracy', 'base', monsterAccuracy(m)),
     mod('evasion', 'base', monsterEvasion(m)),
     mod('armour', 'base', monsterArmour(m)),
@@ -111,7 +112,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
   const ctx = { tags: 0, ancestry: 0, conds: 0 };
   const stunThreshMult = spec.rarity === 'boss' ? 4 : spec.rarity === 'miniboss' ? 2 : 1;
   const defence = defenceFromDb(db, ctx, { isPlayer: false, resistPenalty: 0, stunThreshMult });
-  const dmg = monsterHit(m) * t.dmgMult * r.dmg;
+  const dmg = monsterHit(m) * easeDamage(m) * t.dmgMult * r.dmg;
   const skill = monsterSkill(spec, dmg);
   const hand: HandStats = {
     flats: [

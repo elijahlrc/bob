@@ -4,6 +4,7 @@ import { worldResult, type MapResult } from '../sim/runMap';
 import type { SimEvent, World } from '../sim/types';
 import { createWorld, stepWorld } from '../sim/world';
 import { finishMap, newRun, passivePoints, planFor, worldOptsFor, type RunState } from './run';
+import { clearSave, loadRun, saveRun, type KeyValueStore, type LoadResult } from './save';
 
 export type Screen = 'title' | 'classSelect' | 'camp' | 'map' | 'summary' | 'victory';
 
@@ -33,12 +34,35 @@ export class Controller {
   paused = false;
   private acc = 0;
 
-  constructor() {
+  private store: KeyValueStore | null;
+  /** Result of looking for a saved run at boot. */
+  saved: LoadResult = { status: 'none' };
+
+  constructor(store: KeyValueStore | null = null) {
+    this.store = store;
+    if (store) this.saved = loadRun(store);
     this.bus.on('frame', ({ dtMs }) => this.onFrame(dtMs));
   }
 
   private changed(): void {
+    // The game saves on entering camp and on any camp change (§5.5).
+    if (this.store && this.run && this.screen === 'camp') saveRun(this.store, this.run);
     this.bus.emit('state', null);
+  }
+
+  /** Resume the saved run at camp. */
+  continueRun(): void {
+    if (this.saved.status !== 'ok') return;
+    this.run = this.saved.run;
+    this.lastResult = null;
+    this.goTo('camp');
+  }
+
+  /** Discard an incompatible or unwanted save. */
+  discardSave(): void {
+    if (this.store) clearSave(this.store);
+    this.saved = { status: 'none' };
+    this.changed();
   }
 
   goTo(screen: Screen): void {
@@ -104,6 +128,10 @@ export class Controller {
     finishMap(run, res);
     this.world = null;
     this.bus.emit('mapEnd', null);
+    if (run.phase !== 'camp' && this.store) {
+      clearSave(this.store);
+      this.saved = { status: 'none' };
+    }
     this.goTo(run.phase === 'dead' ? 'summary' : run.phase === 'victory' ? 'victory' : 'camp');
   }
 
@@ -135,7 +163,15 @@ export class Controller {
   quit(): void {
     if (this.world) this.bus.emit('mapEnd', null);
     this.world = null;
+    if (this.store) this.saved = loadRun(this.store);
     this.run = null;
     this.goTo('title');
+  }
+
+  /** Abandon the current run entirely (deletes the save). */
+  abandon(): void {
+    if (this.store) clearSave(this.store);
+    this.saved = { status: 'none' };
+    this.quit();
   }
 }

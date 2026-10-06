@@ -3,7 +3,7 @@ import { classDef } from '../data/classes';
 import { THEMES } from '../data/themes';
 import type { AnyItem, Build, Item } from '../data/types';
 import { makeFlask, makeGem, makeItem } from '../gen/items';
-import { rollChest, rollMonsterDrops } from '../gen/loot';
+import { rollChest, rollDrop, rollFlask, rollGem, rollMonsterDrops } from '../gen/loot';
 import { makeMapPlan, type MapPlan } from '../gen/mapPlan';
 import type { WorldOpts } from '../sim/types';
 import type { MapResult } from '../sim/runMap';
@@ -165,9 +165,34 @@ export function finishMap(run: RunState, res: MapResult): void {
     run.phase = 'victory';
     return;
   }
+  // Reward pick (1 of 3) after every 5th map and after every mini-boss (§5.3).
+  if (run.map % 5 === 0) run.reward = rollRewards(run);
   run.map += 1;
   run.nextThemes = rollThemes(run.seed, run.map);
   run.phase = 'camp';
+}
+
+/** Three reward offers drawn from the item, gem and flask pools. */
+export function rollRewards(run: RunState): AnyItem[] {
+  const rng = new Rng(run.seed).fork(`reward${run.map}`);
+  const uid = uidSource(run);
+  const ilvl = run.map;
+  const out: AnyItem[] = [];
+  for (let i = 0; i < 3; i++) {
+    const pool = rng.weighted(['item', 'gem', 'flask'] as const, [50, 30, 20]);
+    if (pool === 'gem') out.push(rollGem(rng, uid));
+    else if (pool === 'flask') out.push(rollFlask(rng, uid, ilvl, 1));
+    else out.push(rollDrop(rng, uid, { ilvl, monster: 'rare' }, rng.chance(0.7)));
+  }
+  return out;
+}
+
+/** Take one reward offer (or none) into the inventory. */
+export function takeReward(run: RunState, uid: number | null): void {
+  if (!run.reward) return;
+  const it = run.reward.find((x) => x.uid === uid);
+  if (it) run.inventory.push(it);
+  run.reward = null;
 }
 
 /** Passive points available to spend (§5.3). */

@@ -23,6 +23,8 @@ type WeaponClassDef = {
 export const WEAPON_TIER_LEVELS = [1, 15, 30, 45, 60] as const;
 /** Damage scales roughly ×1.9 per base tier (tunable). */
 export const TIER_DAMAGE = 1.9;
+/** One-handed weapons get a base-damage bonus (they give up a hand; tunable, bot-balanced). */
+export const ONE_HAND_DAMAGE = 1.6;
 
 const t = (tier: number, a: number, b: number) => Math.round(a + ((b - a) * tier) / 4);
 
@@ -239,7 +241,9 @@ function weaponBases(): ItemBase[] {
   for (const d of WEAPON_CLASS_DEFS) {
     d.names.forEach((name, tier) => {
       const level = WEAPON_TIER_LEVELS[tier];
-      const f = Math.pow(TIER_DAMAGE, tier);
+      const f =
+        Math.pow(TIER_DAMAGE, tier) *
+        (d.hands === 1 && d.cls !== 'wand' ? ONE_HAND_DAMAGE : d.cls === 'bow' ? 1.3 : 1);
       out.push({
         id: `${d.cls}_${tier + 1}`,
         name,

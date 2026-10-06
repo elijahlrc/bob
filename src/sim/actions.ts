@@ -79,7 +79,7 @@ function fire(w: World, a: Actor, act: Action): void {
       const half = ((b.arc / 2) * Math.PI) / 180;
       for (const e of enemiesOf(w, a)) {
         const d = Math.hypot(e.x - a.x, e.y - a.y);
-        if (d > radius + e.r) continue;
+        if (d > radius + e.r + a.r + 0.4) continue;
         const ang = Math.atan2(e.y - a.y, e.x - a.x);
         if (d > e.r && Math.abs(angleDiff(a.facing, ang)) > half) continue;
         if (p.bothHands) for (let h = 0; h < p.hands.length; h++) hit(w, a, e, p, h, d);

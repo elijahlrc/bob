@@ -12,6 +12,9 @@ export const BASE_EVASION = (level: number): number => 50 + 3 * level;
 export const BASE_ACCURACY = (level: number): number => 2 * level;
 export const BASE_MANA_REGEN_PCT = 1.75;
 export const BASE_CRIT_MULTI = 150;
+/** Built-in flat physical damage to attacks per character level (tunable; see Appendix A). */
+export const ATTACK_LEVEL_MIN = 0.7;
+export const ATTACK_LEVEL_MAX = 1.4;
 export const DEFAULT_MAX_RES = 75;
 export const HARD_MAX_RES = 90;
 export const BASE_MOVE_SPEED = 4.0;
@@ -81,6 +84,26 @@ export const PACK_ALERT = 6;
 export const LEASH_TIME = 6;
 export const STUCK_TIME = 20;
 export const REPATH_INTERVAL = 0.5;
+export const RETREAT_TIME = 0.8;
+export const RETREAT_COOLDOWN = 3;
+
+// §12.1 Monster scaling (tunable; bot-balanced, see DESIGN.md Appendix A).
+export const MONSTER_LIFE_BASE = 20;
+export const MONSTER_LIFE_GROWTH = 1.055;
+export const MONSTER_LIFE_LINEAR = 12;
+export const MONSTER_HIT_BASE = 2;
+export const MONSTER_HIT_COEF = 0.12;
+export const MONSTER_HIT_EXP = 1.5;
+/** Early-map easing: monster life and damage ramp from these fractions to full by EASE_LEVEL. */
+export const EASE_LEVEL = 20;
+export const EASE_LIFE = 0.5;
+export const EASE_DAMAGE = 0.6;
+export function easeLife(m: number): number {
+  return EASE_LIFE + (1 - EASE_LIFE) * Math.min(1, (m - 1) / (EASE_LEVEL - 1));
+}
+export function easeDamage(m: number): number {
+  return EASE_DAMAGE + (1 - EASE_DAMAGE) * Math.min(1, (m - 1) / (EASE_LEVEL - 1));
+}
 
 // §10 Labyrinth.
 export const CELL = 14;

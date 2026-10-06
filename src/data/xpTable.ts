@@ -1,10 +1,15 @@
+import { MEASURED_XP } from './measuredXp';
+
 /**
  * §5.4 level curve: xpToNext(L) = round(expectedMapXp(L) · k(L)).
  *
  * `MEASURED_MAP_XP[L - 1]` is the mean XP the headless bot earned clearing a map at area level L
  * (30 seeds). Until measured, entries are null and the doc's estimate is used.
  */
-export const MEASURED_MAP_XP: (number | null)[] = new Array(100).fill(null);
+export const MEASURED_MAP_XP: (number | null)[] = Array.from(
+  { length: 100 },
+  (_, i) => MEASURED_XP[i] || null,
+);
 
 export const MAX_LEVEL = 100;
 
