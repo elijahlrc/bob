@@ -226,70 +226,73 @@ export function Items({ c }: { c: Controller }) {
             Click a highlighted slot to equip, or press Enter / double-click for the best slot.
           </div>
         )}
-        {shown && (
-          <div class="item-detail">
-            <div class={shownInfo?.replaces || shownInfo?.slot ? 'compare' : ''}>
-              <div>
-                {fromInv && <div class="muted cmp-title">New</div>}
-                <ItemCard it={shown} diff={diff} />
-              </div>
-              {fromInv && shown.kind === 'item' && shownInfo?.slot && (
+        <div class="item-detail">
+          {!shown && <div class="muted hint">Hover or select an item to see its details.</div>}
+          {shown && (
+            <>
+              <div class={shownInfo?.replaces || shownInfo?.slot ? 'compare' : ''}>
                 <div>
-                  <div class="muted cmp-title">Equipped ({slotLabel(shownInfo.slot)})</div>
-                  {shownInfo.replaces ? (
-                    <ItemCard it={shownInfo.replaces} />
-                  ) : (
-                    <div class="item-card empty-card muted">Empty slot</div>
-                  )}
+                  {fromInv && <div class="muted cmp-title">New</div>}
+                  <ItemCard it={shown} diff={diff} />
                 </div>
-              )}
-            </div>
-            <div class="item-actions">
-              {sel?.from === 'inv' && selected && (
-                <button
-                  class="btn small primary"
-                  disabled={!shownInfo?.equippable && selected.kind !== 'gem'}
-                  title={shownInfo?.reason}
-                  onClick={() => doQuick(selected.uid)}
-                >
-                  {selected.kind === 'gem'
-                    ? 'Socket (best free socket)'
-                    : shownInfo?.slot
-                      ? `Equip → ${slotLabel(shownInfo.slot)}`
-                      : 'Equip'}
-                </button>
-              )}
-              {sel?.from === 'slot' && (
-                <button
-                  class="btn small"
-                  onClick={() => {
-                    c.act((r) => unequip(r, sel.slot));
-                    setSel(null);
-                  }}
-                >
-                  Unequip
-                </button>
-              )}
-              {sel?.from === 'flask' && (
-                <button
-                  class="btn small"
-                  onClick={() => {
-                    c.act((r) => unequipFlask(r, sel.idx));
-                    setSel(null);
-                  }}
-                >
-                  Unequip
-                </button>
-              )}
-              {sel?.from === 'inv' && selected && (
-                <button class="btn small danger" onClick={() => doDiscard(selected.uid)}>
-                  Discard
-                </button>
-              )}
-            </div>
-            {msg && <div class="warn">{msg}</div>}
-          </div>
-        )}
+                {fromInv && shown.kind === 'item' && shownInfo?.slot && (
+                  <div>
+                    <div class="muted cmp-title">Equipped ({slotLabel(shownInfo.slot)})</div>
+                    {shownInfo.replaces ? (
+                      <ItemCard it={shownInfo.replaces} />
+                    ) : (
+                      <div class="item-card empty-card muted">Empty slot</div>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div class="item-actions">
+                {sel?.from === 'inv' && selected && (
+                  <button
+                    class="btn small primary"
+                    disabled={!shownInfo?.equippable && selected.kind !== 'gem'}
+                    title={shownInfo?.reason}
+                    onClick={() => doQuick(selected.uid)}
+                  >
+                    {selected.kind === 'gem'
+                      ? 'Socket (best free socket)'
+                      : shownInfo?.slot
+                        ? `Equip → ${slotLabel(shownInfo.slot)}`
+                        : 'Equip'}
+                  </button>
+                )}
+                {sel?.from === 'slot' && (
+                  <button
+                    class="btn small"
+                    onClick={() => {
+                      c.act((r) => unequip(r, sel.slot));
+                      setSel(null);
+                    }}
+                  >
+                    Unequip
+                  </button>
+                )}
+                {sel?.from === 'flask' && (
+                  <button
+                    class="btn small"
+                    onClick={() => {
+                      c.act((r) => unequipFlask(r, sel.idx));
+                      setSel(null);
+                    }}
+                  >
+                    Unequip
+                  </button>
+                )}
+                {sel?.from === 'inv' && selected && (
+                  <button class="btn small danger" onClick={() => doDiscard(selected.uid)}>
+                    Discard
+                  </button>
+                )}
+              </div>
+              {msg && <div class="warn">{msg}</div>}
+            </>
+          )}
+        </div>
         <div class="muted hint">
           Keys: ↑/↓ browse · Enter equip · Del discard · U unequip · Ctrl+Z undo
         </div>
