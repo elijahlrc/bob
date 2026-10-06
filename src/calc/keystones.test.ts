@@ -106,7 +106,7 @@ describe('keystones (§9.4) — every one has an effect', () => {
     expect(d.lifeRegen).toBe(0);
   });
 
-  it('Overload: 100% crit multi; 40% more elemental damage after a crit', () => {
+  it('Fever Pitch: 100% crit multi; 40% more elemental damage after a crit', () => {
     const c = both('mystic', 'overload').with;
     const base = c.profile(c.primary, 0);
     const after = c.profile(c.primary, condBit('overloadActive'));

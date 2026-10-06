@@ -114,6 +114,8 @@ the title screen, with the class select, camp and auto-continue) shows no consol
 
 ## Known bugs / limitations
 
+- Saves store passive allocations as tree node ids; editing `src/data/tree/spec.ts` invalidates saves
+  (bump `SAVE_VERSION`).
 - The in-app browser pane throttles animation frames, so the Phaser camera lags in screenshots taken there;
   it is correct in a normal foreground tab.
 - Strider and Shade are the weakest classes for the bot (median 74 and 73.5); Reaver and Vanguard the

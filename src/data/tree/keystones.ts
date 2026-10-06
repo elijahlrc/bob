@@ -63,7 +63,7 @@ export const KEYSTONES: KeystoneDef[] = [
   },
   {
     id: 'overload',
-    name: 'Overload',
+    name: 'Fever Pitch',
     mods: [
       mod('overload', 'flag', 1),
       mod('damage', 'more', 40, { damageTypes: ELE, condition: { id: 'overloadActive' } }),

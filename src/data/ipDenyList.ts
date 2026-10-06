@@ -87,6 +87,8 @@ export const IP_DENY_LIST: readonly string[] = [
   'Call to Arms',
   'Celestial Jewel',
   // Skill gems and supports.
+  'Sweep',
+  'Overload',
   'Heavy Strike',
   'Cleave',
   'Split Arrow',

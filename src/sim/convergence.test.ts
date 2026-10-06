@@ -71,7 +71,7 @@ const REF_BUILDS: RefBuild[] = [
     distance: 1.4,
   },
   {
-    name: 'dual wield Sweep (both weapons hit)',
+    name: 'dual wield Reaping Arc (both weapons hit)',
     build: buildFor('reaver', 30, ['sweep'], { main: 'sword_3', off: 'axe_2' }),
     distance: 1.6,
   },
