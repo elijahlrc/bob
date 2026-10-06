@@ -6,12 +6,13 @@ import { xpToNext } from '../data/xpTable';
 import { resistPenaltyForMap } from '../gen/mapPlan';
 import type { Controller } from '../run/controller';
 import { passivePoints } from '../run/run';
+import { Items } from './Items';
 import { Sheet } from './Sheet';
 import { Skills } from './Skills';
 import { TreeView } from './TreeView';
 
 const COUNTDOWN = 2;
-type Tab = 'tree' | 'sheet' | 'skills';
+type Tab = 'tree' | 'sheet' | 'skills' | 'items';
 
 export function Camp({ c }: { c: Controller }) {
   const run = c.run;
@@ -58,6 +59,9 @@ export function Camp({ c }: { c: Controller }) {
           <button class={'tab' + (tab === 'tree' ? ' on' : '')} onClick={() => setTab('tree')}>
             Passive tree{pts > 0 ? ` (${pts})` : ''}
           </button>
+          <button class={'tab' + (tab === 'items' ? ' on' : '')} onClick={() => setTab('items')}>
+            Items{run.newLoot.length ? ` (${run.newLoot.length} new)` : ''}
+          </button>
           <button class={'tab' + (tab === 'skills' ? ' on' : '')} onClick={() => setTab('skills')}>
             Skills
           </button>
@@ -66,6 +70,7 @@ export function Camp({ c }: { c: Controller }) {
           {tab === 'tree' && <TreeView c={c} />}
           {tab === 'sheet' && <Sheet s={sheet} />}
           {tab === 'skills' && <Skills c={c} ch={ch} />}
+          {tab === 'items' && <Items c={c} />}
         </div>
       </div>
       <div class="camp-side">

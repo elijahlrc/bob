@@ -1,6 +1,6 @@
 # Bob — Progress
 
-Current milestone: **M4 — Items**
+Current milestone: **M5 — Enemies**
 
 Spec: [DESIGN.md](DESIGN.md). Each milestone ends with green `npm run check` and `npm run build` and one commit.
 
@@ -46,14 +46,17 @@ controller in dev builds for debugging.
       default-attack fallback, 7 actives + 17 supports (Skills tab)
 - [x] 7 auras with reservation and the inactive-aura warning (Character tab)
 
-## M4 — Items
+## M4 — Items ✅
 
-- [ ] All bases, ~50 affix families / ~350 tiers, ilvl-gated rolling
-- [ ] Rarity, naming, drop tables
-- [ ] ≥ 30 uniques incl. the 12 listed
-- [ ] Flask bases and affixes
-- [ ] Equipment/inventory UI with compare deltas
-- [ ] Chests in side branches
+- [x] All bases (60 weapons, 96 armour, 12 shields, jewellery, belts, quivers); 57 affix families /
+      360 tiers (minIlvl 1–82) generated from compact definitions; ilvl-gated rolling with max-affix
+      rules (tested)
+- [x] Rarity, naming (magic prefix/suffix names, rare two-word names), drop tables (tested)
+- [x] 30 uniques incl. the 12 listed; at least one per starting weapon class; levels 2–80
+- [x] Flask bases and 9 flask affix families (magic flasks)
+- [x] Items tab: equip (gems carry over), unequip, discard, flask slots, requirement checks,
+      item cards with compare deltas from the calc engine
+- [x] Chests in side branches (magic-or-better item or a gem)
 
 ## M5 — Enemies
 

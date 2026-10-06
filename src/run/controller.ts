@@ -3,7 +3,7 @@ import { DT } from '../data/constants';
 import { worldResult, type MapResult } from '../sim/runMap';
 import type { SimEvent, World } from '../sim/types';
 import { createWorld, stepWorld } from '../sim/world';
-import { finishMap, newRun, passivePoints, planFor, type RunState } from './run';
+import { finishMap, newRun, passivePoints, planFor, worldOptsFor, type RunState } from './run';
 
 export type Screen = 'title' | 'classSelect' | 'camp' | 'map' | 'summary' | 'victory';
 
@@ -57,7 +57,8 @@ export class Controller {
     const run = this.run;
     if (!run) return;
     const plan = planFor(run, run.nextThemes[themeIdx] ?? run.nextThemes[0]);
-    this.world = createWorld({ plan, build: run.build, xp: run.xp });
+    run.newLoot = [];
+    this.world = createWorld({ plan, build: run.build, xp: run.xp, opts: worldOptsFor(run, plan) });
     this.acc = 0;
     this.screen = 'map';
     this.bus.emit('mapStart', { world: this.world });

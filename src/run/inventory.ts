@@ -1,7 +1,7 @@
 import { Character } from '../calc/character';
 import { itemBase, isWeaponClass } from '../data/bases';
 import { flaskBase } from '../data/flasks';
-import type { AnyItem, Attrs, EquipSlot, FlaskItem, GemItem, Item } from '../data/types';
+import type { AnyItem, Attrs, Build, EquipSlot, FlaskItem, GemItem, Item } from '../data/types';
 import type { RunState } from './run';
 
 export const INVENTORY_SIZE = 60;
@@ -54,6 +54,34 @@ export function canEquip(run: RunState, item: Item, slot: EquipSlot): EquipCheck
   return { ok: true };
 }
 
+/**
+ * Move gems from the item being replaced into the new item's empty sockets (in order). Returns
+ * the new item and what remains of the old one.
+ */
+export function transferGems(
+  oldItem: Item | undefined,
+  newItem: Item,
+): { next: Item; prev?: Item } {
+  if (!oldItem) return { next: newItem };
+  const nextSockets = [...newItem.sockets];
+  const prevSockets = [...oldItem.sockets];
+  for (let i = 0; i < prevSockets.length; i++) {
+    const g = prevSockets[i];
+    if (!g) continue;
+    const slot = nextSockets.indexOf(null);
+    if (slot < 0) break;
+    nextSockets[slot] = g;
+    prevSockets[i] = null;
+  }
+  return { next: { ...newItem, sockets: nextSockets }, prev: { ...oldItem, sockets: prevSockets } };
+}
+
+/** The build with `item` placed in `slot` (gems carried over), for compare deltas. */
+export function withEquipped(build: Build, item: Item, slot: EquipSlot): Build {
+  const { next } = transferGems(build.equipment[slot], item);
+  return { ...build, equipment: { ...build.equipment, [slot]: next } };
+}
+
 function take(run: RunState, uid: number): AnyItem | undefined {
   const i = run.inventory.findIndex((x) => x.uid === uid);
   if (i < 0) return undefined;
@@ -68,9 +96,9 @@ export function equip(run: RunState, uid: number, slot: EquipSlot): EquipCheck {
   if (!chk.ok) return chk;
   take(run, uid);
   const eq = { ...run.build.equipment };
-  const old = eq[slot];
-  if (old) run.inventory.push(old);
-  eq[slot] = item;
+  const { next, prev } = transferGems(eq[slot], item);
+  if (prev) run.inventory.push(prev);
+  eq[slot] = next;
   // Two-handers clear an incompatible off hand.
   const base = itemBase(item.baseId);
   if (slot === 'mainHand' && base.hands === 2 && eq.offHand) {

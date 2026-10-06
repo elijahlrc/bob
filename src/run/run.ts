@@ -3,7 +3,9 @@ import { classDef } from '../data/classes';
 import { THEMES } from '../data/themes';
 import type { AnyItem, Build, Item } from '../data/types';
 import { makeFlask, makeGem, makeItem } from '../gen/items';
+import { rollChest, rollMonsterDrops } from '../gen/loot';
 import { makeMapPlan, type MapPlan } from '../gen/mapPlan';
+import type { WorldOpts } from '../sim/types';
 import type { MapResult } from '../sim/runMap';
 
 export const SAVE_VERSION = 1;
@@ -121,6 +123,22 @@ export function planFor(run: RunState, themeId: string): MapPlan {
   return makeMapPlan(mapSeed(run, run.map), run.map, themeId);
 }
 
+/** World hooks that generate loot with the run's uid counter. */
+export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
+  const uid = uidSource(run);
+  return {
+    loot: (w, m) =>
+      m.mon
+        ? rollMonsterDrops(w.rngLoot, uid, {
+            ilvl: m.mon.spec.level,
+            monster: m.mon.spec.rarity,
+            theme: plan.theme,
+          })
+        : [],
+    chestLoot: (w) => rollChest(w.rngLoot, uid, plan.areaLevel),
+  };
+}
+
 /** Apply a finished map's result to the run. */
 export function finishMap(run: RunState, res: MapResult): void {
   run.history.push({
@@ -138,6 +156,9 @@ export function finishMap(run: RunState, res: MapResult): void {
     return;
   }
   run.inventory.push(...res.picked);
+  for (const it of res.picked)
+    if (it.kind === 'item' && (it.rarity === 'rare' || it.rarity === 'unique'))
+      run.newLoot.push(it.uid);
   run.refundPoints += 1;
   if (run.map % 10 === 0 && run.map <= 80) run.bonusPoints += 3;
   if (run.map >= TOTAL_MAPS) {

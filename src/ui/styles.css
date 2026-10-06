@@ -429,3 +429,125 @@ svg.tree {
   border: 1px dashed #555;
   border-radius: 6px;
 }
+.items {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  align-items: flex-start;
+}
+.equip-col {
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.equip-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.flask-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+}
+.eq-slot,
+.inv-item {
+  background: #1c1a22;
+  border: 1px solid #3a3644;
+  border-radius: 6px;
+  padding: 6px 8px;
+  text-align: left;
+  font-size: 13px;
+  cursor: pointer;
+  overflow: hidden;
+}
+.eq-slot.sel,
+.inv-item.sel {
+  outline: 2px solid #ffd84a;
+}
+.flaskslot {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.magic {
+  color: #8aa8ff;
+}
+.rare {
+  color: #ffe070;
+}
+.unique {
+  color: #ffa040;
+}
+.gem {
+  color: #40e0c0;
+}
+.flaskitem {
+  color: #ff90b0;
+}
+.inv-col {
+  flex: 1;
+  min-width: 0;
+}
+.inv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 4px;
+  margin-top: 6px;
+}
+.item-card {
+  background: #111018;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 13px;
+  color: #ddd;
+}
+.ic-name {
+  font-weight: bold;
+  font-size: 15px;
+}
+.item-card.magic .ic-name {
+  color: #8aa8ff;
+}
+.item-card.rare .ic-name {
+  color: #ffe070;
+}
+.item-card.unique .ic-name {
+  color: #ffa040;
+}
+.ic-base {
+  color: #bbb;
+}
+.ic-mod {
+  color: #9ab8ff;
+}
+.ic-mod.implicit {
+  color: #c8c0a8;
+  border-bottom: 1px solid #333;
+  padding-bottom: 2px;
+}
+.ic-diff {
+  margin-top: 6px;
+  border-top: 1px solid #333;
+  padding-top: 4px;
+}
+.delta.up {
+  color: #60e070;
+}
+.delta.down {
+  color: #ff6060;
+}
+.item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+.btn.danger {
+  border-color: #803030;
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
