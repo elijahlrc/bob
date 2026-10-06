@@ -1,6 +1,5 @@
 import type Phaser from 'phaser';
 import type { Controller } from './run/controller';
-import type { StyleChoice } from './run/controller';
 
 /**
  * Dev-only helpers on `window.__dev` for driving the game from the browser console or an automation
@@ -34,19 +33,17 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
       }
       return -1;
     },
-    /** Start the crypt showcase on class index `idx` in a style. */
-    async showcase(idx = 0, style: StyleChoice = 'grim', warm = 120): Promise<string> {
+    /** Start the crypt showcase on class index `idx`. */
+    async showcase(idx = 0, warm = 120): Promise<string> {
       controller.startShowcase(false);
       controller.setSpeed(2);
-      controller.setStyle(style);
       for (let i = 0; i < idx; i++) controller.nextShowcaseClass();
       await dev.step(warm);
       return controller.run!.classId;
     },
     /** Start the boss showcase and fast-forward until the boss is close. */
-    async boss(style: StyleChoice = 'grim', idx = 0): Promise<number> {
+    async boss(idx = 0): Promise<number> {
       controller.startShowcase(true);
-      controller.setStyle(style);
       for (let i = 0; i < idx; i++) controller.nextShowcaseClass();
       controller.setSpeed(8);
       let n = 0;

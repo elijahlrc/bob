@@ -1,3 +1,7 @@
+> **Decision (2026-10-06):** Grim Isometric was chosen. Grimdark top-down, Cel Isometric and Inkwell were
+> removed from the code (they remain in git history on the `visual-style` branch's earlier commits). The
+> sections below record the exploration.
+
 # Visual style exploration
 
 Four complete vertical slices (three styles plus Grim Isometric, a diagonal-camera variant of Grimdark) of the map renderer, all driven by the same simulation and the same

@@ -1,11 +1,6 @@
-/* =================================================================================================
-   Style skins. `data-style` is set on <html>; each skin overrides the theme variables from
-   styles.css and adds a few structural touches (frames, shadows, fonts).
-   ================================================================================================= */
+/* Grimdark UI skin: iron, leather and embers. Overrides the base theme variables and adds frames. */
 
-/* ---- Grimdark: iron, leather and embers ---- */
-:root[data-style='grim'],
-:root[data-style='gri'] {
+:root {
   --bg: #070508;
   --screen: rgba(8, 6, 8, 0.93);
   --screen-bg: radial-gradient(ellipse at 50% 40%, #1d1510 0%, #0a0708 60%, #040304 100%);
@@ -27,8 +22,7 @@
   --font: 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
   --title-font: 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
 }
-:root[data-style='grim'] .title h1,
-:root[data-style='gri'] .title h1 {
+:root .title h1 {
   font-family: var(--title-font);
   letter-spacing: 0.35em;
   text-shadow:
@@ -36,12 +30,8 @@
     0 3px 0 #000;
   color: #e8d6b0;
 }
-:root[data-style='grim'] .btn,
-:root[data-style='gri'] .btn,
-:root[data-style='grim'] .tab,
-:root[data-style='gri'] .tab,
-:root[data-style='grim'] .style-btn,
-:root[data-style='gri'] .style-btn {
+:root .btn,
+:root .tab {
   background: linear-gradient(#3a2b1e, #24190f);
   border: 1px solid #6a5238;
   box-shadow:
@@ -50,36 +40,27 @@
     0 2px 5px #000a;
   text-shadow: 0 1px 1px #000;
 }
-:root[data-style='grim'] .btn:hover,
-:root[data-style='gri'] .btn:hover {
+:root .btn:hover {
   background: linear-gradient(#4a3624, #2e2014);
 }
-:root[data-style='grim'] .btn.primary,
-:root[data-style='gri'] .btn.primary {
+:root .btn.primary {
   background: linear-gradient(#a8601f, #5e3010);
   border-color: #d89a50;
 }
-:root[data-style='grim'] .btn.on,
-:root[data-style='gri'] .btn.on {
+:root .btn.on {
   background: linear-gradient(#d88a38, #8a4a18);
   color: #1a0e06;
 }
-:root[data-style='grim'] .camp-side,
-:root[data-style='gri'] .camp-side,
-:root[data-style='grim'] .item-card,
-:root[data-style='gri'] .item-card,
-:root[data-style='grim'] .class-card,
-:root[data-style='gri'] .class-card,
-:root[data-style='grim'] .gem-inv,
-:root[data-style='gri'] .gem-inv,
-:root[data-style='grim'] .tooltip,
-:root[data-style='gri'] .tooltip {
+:root .camp-side,
+:root .item-card,
+:root .class-card,
+:root .gem-inv,
+:root .tooltip {
   box-shadow:
     inset 0 0 0 1px #000,
     inset 0 0 18px #000a;
 }
-:root[data-style='grim'] .orb-glass,
-:root[data-style='gri'] .orb-glass {
+:root .orb-glass {
   border: 6px solid #3a2c1e;
   box-shadow:
     inset 0 0 18px #000,
@@ -87,8 +68,7 @@
     0 0 0 4px #5a4630,
     0 6px 14px #000c;
 }
-:root[data-style='grim'] .hud-bottom::before,
-:root[data-style='gri'] .hud-bottom::before {
+:root .hud-bottom::before {
   content: '';
   position: absolute;
   left: -12px;
@@ -99,236 +79,7 @@
   z-index: -1;
   pointer-events: none;
 }
-:root[data-style='grim'] .flask-body,
-:root[data-style='gri'] .flask-body {
+:root .flask-body {
   border-color: #6a5238;
   background: #0a0806;
-}
-
-/* ---- Cel isometric: candy colours, thick outlines, hard offset shadows ---- */
-:root[data-style='cel'] {
-  --bg: #1b1240;
-  --screen: rgba(27, 18, 64, 0.9);
-  --screen-bg: linear-gradient(160deg, #4a2aa8 0%, #2b1a78 55%, #1b1240 100%);
-  --panel: #3b2a86;
-  --panel2: #4a38a0;
-  --btn: #6a4ad8;
-  --btn-h: #7e62f0;
-  --border: #1d0f2e;
-  --border2: #5a46b8;
-  --accent: #ffd24a;
-  --accent-d: #c8901a;
-  --text: #fff8e8;
-  --muted: #cbbdf2;
-  --side: #2d1e6e;
-  --hi: #7fffe0;
-  --on-accent: #2b1740;
-  --tree-bg: #24165e;
-  --radius: 14px;
-  --font: 'Trebuchet MS', 'Arial Rounded MT Bold', 'Segoe UI', sans-serif;
-  --title-font: 'Trebuchet MS', 'Arial Rounded MT Bold', 'Segoe UI', sans-serif;
-}
-:root[data-style='cel'] .title h1 {
-  font-family: var(--title-font);
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  color: #fff3b0;
-  -webkit-text-stroke: 3px #1d0f2e;
-  paint-order: stroke fill;
-  text-shadow: 0 6px 0 #1d0f2e;
-}
-:root[data-style='cel'] .btn,
-:root[data-style='cel'] .tab,
-:root[data-style='cel'] .style-btn,
-:root[data-style='cel'] .class-card,
-:root[data-style='cel'] .camp-side,
-:root[data-style='cel'] .item-card,
-:root[data-style='cel'] .gem-inv,
-:root[data-style='cel'] .inv-row,
-:root[data-style='cel'] .eq-slot {
-  border: 3px solid #1d0f2e;
-  box-shadow: 0 4px 0 #1d0f2e;
-  font-weight: 600;
-}
-:root[data-style='cel'] .btn:hover,
-:root[data-style='cel'] .style-btn:hover {
-  transform: translateY(-1px);
-}
-:root[data-style='cel'] .btn:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 #1d0f2e;
-}
-:root[data-style='cel'] .btn.primary {
-  background: #ff6a8a;
-}
-:root[data-style='cel'] .btn.on,
-:root[data-style='cel'] .chip.on {
-  background: #ffd24a;
-  color: #2b1740;
-}
-:root[data-style='cel'] .tab {
-  border-radius: 12px 12px 0 0;
-  box-shadow: none;
-}
-:root[data-style='cel'] .tab.on {
-  background: #ffd24a;
-  color: #2b1740;
-}
-:root[data-style='cel'] .orb-glass {
-  border: 5px solid #1d0f2e;
-  box-shadow: 0 6px 0 #1d0f2e;
-  background: #2b1740;
-}
-:root[data-style='cel'] .orb.life .orb-fill {
-  background: #ff5a7a;
-}
-:root[data-style='cel'] .orb.mana .orb-fill {
-  background: #5a9aff;
-}
-:root[data-style='cel'] .orb-gloss {
-  inset: 10px auto auto 14px;
-  width: 22px;
-  height: 14px;
-  border-radius: 50%;
-  background: #ffffffcc;
-  transform: rotate(-30deg);
-}
-:root[data-style='cel'] .orb-text {
-  -webkit-text-stroke: 3px #1d0f2e;
-  paint-order: stroke fill;
-  font-size: 18px;
-}
-:root[data-style='cel'] .flask-body {
-  border: 3px solid #1d0f2e;
-}
-:root[data-style='cel'] .hud-top {
-  font-weight: 700;
-  text-shadow:
-    0 2px 0 #1d0f2e,
-    0 0 6px #1d0f2e;
-}
-
-/* ---- Inkwell: parchment, ink and a little wobble ---- */
-:root[data-style='ink'] {
-  --bg: #2a1c0e;
-  --screen: rgba(236, 220, 180, 0.96);
-  --screen-bg: radial-gradient(ellipse at 50% 40%, #f1e5c2 0%, #e4d3a6 70%, #cdb783 100%);
-  --panel: #f1e5c4;
-  --panel2: #e8d8ae;
-  --btn: #efe0b8;
-  --btn-h: #e2cf9a;
-  --border: #2a1f16;
-  --border2: #9a8460;
-  --accent: #a3201c;
-  --accent-d: #7a1612;
-  --text: #2a1f16;
-  --muted: #6e5c46;
-  --side: #e6d6ac;
-  --hi: #a3201c;
-  --on-accent: #f4ead0;
-  --tree-bg: #dcc99a;
-  --radius: 3px;
-  --font: Georgia, 'Palatino Linotype', serif;
-  --title-font: Georgia, 'Palatino Linotype', serif;
-}
-:root[data-style='ink'] .title h1 {
-  font-family: var(--title-font);
-  font-style: italic;
-  letter-spacing: 0.25em;
-  color: #2a1f16;
-  text-shadow: 2px 2px 0 #c9b383;
-}
-:root[data-style='ink'] .btn,
-:root[data-style='ink'] .tab,
-:root[data-style='ink'] .style-btn,
-:root[data-style='ink'] .class-card,
-:root[data-style='ink'] .camp-side,
-:root[data-style='ink'] .item-card,
-:root[data-style='ink'] .gem-inv {
-  border: 2px solid #2a1f16;
-  box-shadow: 3px 3px 0 #2a1f1655;
-  filter: url(#rough);
-}
-:root[data-style='ink'] .btn.primary {
-  background: #a3201c;
-  color: #f4ead0;
-}
-:root[data-style='ink'] .btn.on,
-:root[data-style='ink'] .chip.on {
-  background: #2a1f16;
-  color: #f4ead0;
-}
-:root[data-style='ink'] .tab.on {
-  background: #a3201c;
-  color: #f4ead0;
-}
-:root[data-style='ink'] .camp-side {
-  background: #e9dab2;
-}
-:root[data-style='ink'] .inv-row,
-:root[data-style='ink'] .eq-slot {
-  border: 1.5px solid #2a1f16aa;
-}
-:root[data-style='ink'] .node {
-  stroke: #2a1f16;
-}
-:root[data-style='ink'] .node.on {
-  fill: #a3201c;
-  stroke: #2a1f16;
-}
-:root[data-style='ink'] .edge {
-  stroke: #9a8460;
-}
-:root[data-style='ink'] .edge.on {
-  stroke: #a3201c;
-}
-:root[data-style='ink'] .tooltip {
-  background: #f1e5c4f2;
-  color: #2a1f16;
-  border: 2px solid #2a1f16;
-}
-:root[data-style='ink'] .tt-mod,
-:root[data-style='ink'] .ic-mod {
-  color: #3a4a78;
-}
-:root[data-style='ink'] .item-card {
-  color: #2a1f16;
-}
-:root[data-style='ink'] .orb-glass {
-  background: #f1e5c4;
-  border: 4px solid #2a1f16;
-  box-shadow:
-    inset 0 0 10px #2a1f1688,
-    3px 4px 0 #2a1f1666;
-}
-:root[data-style='ink'] .orb.life .orb-fill {
-  background: radial-gradient(circle at 35% 30%, #c8403a 0%, #a3201c 50%, #5a0e0c 100%);
-}
-:root[data-style='ink'] .orb.mana .orb-fill {
-  background: radial-gradient(circle at 35% 30%, #4a5a8a 0%, #232c4c 50%, #10142a 100%);
-}
-:root[data-style='ink'] .orb-text {
-  color: #f4ead0;
-  text-shadow:
-    0 0 3px #000,
-    1px 1px 0 #000;
-  font-style: italic;
-}
-:root[data-style='ink'] .hud-top {
-  color: #f4ead0;
-  text-shadow:
-    0 0 3px #000,
-    1px 1px 0 #000;
-  font-style: italic;
-  font-weight: bold;
-}
-:root[data-style='ink'] .hud-showcase .muted {
-  color: #f4ead0;
-  text-shadow:
-    0 0 3px #000,
-    1px 1px 0 #000;
-}
-:root[data-style='ink'] .flask-body {
-  border: 2px solid #2a1f16;
-  background: #f1e5c4;
 }

@@ -4,18 +4,13 @@ import { worldResult, type MapResult } from '../sim/runMap';
 import type { SimEvent, World } from '../sim/types';
 import { createWorld, stepWorld } from '../sim/world';
 import { CLASSES } from '../data/classes';
-import type { StyleId } from '../data/styles';
 import { botCamp } from './bot';
 import { finishMap, newRun, passivePoints, planFor, worldOptsFor, type RunState } from './run';
 import { clearSave, loadRun, saveRun, type KeyValueStore, type LoadResult } from './save';
 
 export type Screen = 'title' | 'classSelect' | 'camp' | 'map' | 'summary' | 'victory';
 
-export type StyleChoice = StyleId;
-
 export type BusEvents = {
-  /** The visual style changed (renderer rebuilds the current map). */
-  style: { id: StyleChoice };
   /** The inspected enemy changed (click on the map; null clears). */
   select: { id: number | null };
   /** Run or screen state changed (UI re-renders). */
@@ -46,7 +41,6 @@ export class Controller {
   private acc = 0;
 
   private store: KeyValueStore | null;
-  styleId: StyleChoice = 'grim';
   /** Result of looking for a saved run at boot. */
   saved: LoadResult = { status: 'none' };
 
@@ -54,8 +48,6 @@ export class Controller {
     this.store = store;
     if (store) {
       this.saved = loadRun(store);
-      const sid = store.getItem('bob.style');
-      if (sid === 'grim' || sid === 'gri' || sid === 'cel' || sid === 'ink') this.styleId = sid;
     }
     this.bus.on('frame', ({ dtMs }) => this.onFrame(dtMs));
     this.bus.on('select', ({ id }) => (this.selectedId = id));
@@ -111,14 +103,6 @@ export class Controller {
     this.showcase = null;
     this.run = null;
     this.goTo('title');
-  }
-
-  /** Switch the visual style (map renderer and UI skin). Remembered between sessions. */
-  setStyle(id: StyleChoice): void {
-    this.styleId = id;
-    this.store?.setItem('bob.style', id);
-    this.bus.emit('style', { id });
-    this.bus.emit('state', null);
   }
 
   /** Resume the saved run at camp. */

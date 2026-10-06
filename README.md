@@ -83,6 +83,10 @@ run under Node and Vitest; ESLint enforces the boundaries.
 
 `dist/` is a plain static site (relative paths), so it can be hosted anywhere.
 
-## Visual styles
+## Visual style
 
-Three map render styles (Grimdark, Cel Isometric, Inkwell) live in `src/render/styles/`. Switch with keys 1/2/3 or the Title screen; _Showcase_ mode on the Title screen auto-plays a demo (N = next class). See `docs/VISUAL_STYLES.md`.
+The map is rendered as isometric Grimdark: crunchy pixel art, a diagonal 2:1 camera, real-time lights and
+particles (`src/render/styles/grim/`, shared figure rig in `src/render/style/`). Three other styles were
+explored and removed; see `docs/VISUAL_STYLES.md`. _Showcase_ mode on the Title screen auto-plays a demo
+(N = next class). Uncaught errors are saved to `localStorage['bob.crashlog']` and shown as a copyable report
+(`src/crashlog.ts`). Known bugs to revisit are in `docs/BUGS.md`.

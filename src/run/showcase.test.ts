@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../data/classes';
 import { Controller } from './controller';
-import { MemoryStore } from './save';
 
 describe('showcase mode', () => {
   it('starts an invulnerable map and cycles through every class', () => {
@@ -33,22 +32,5 @@ describe('showcase mode', () => {
     c.startShowcase(false);
     for (let i = 0; i < 300; i++) c.bus.emit('frame', { dtMs: 100 });
     expect(c.world?.player.alive ?? true).toBe(true);
-  });
-});
-
-describe('visual style preference', () => {
-  it('is remembered and announced', () => {
-    const store = new MemoryStore();
-    const c = new Controller(store);
-    const seen: string[] = [];
-    c.bus.on('style', ({ id }) => seen.push(id));
-    expect(c.styleId).toBe('grim');
-    c.setStyle('ink');
-    expect(seen).toEqual(['ink']);
-    expect(new Controller(store).styleId).toBe('ink');
-    c.setStyle('gri');
-    expect(new Controller(store).styleId).toBe('gri');
-    store.setItem('bob.style', 'nonsense');
-    expect(new Controller(store).styleId).toBe('grim');
   });
 });

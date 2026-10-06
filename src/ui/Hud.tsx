@@ -4,9 +4,8 @@ import { monsterModDef, MONSTER_TYPES, BOSS_NAME } from '../data/monsters';
 import type { Actor } from '../sim/types';
 import { SPEEDS, type Controller } from '../run/controller';
 import { useTicks } from './hooks';
-import { StyleSwitcher } from './StyleSwitcher';
 
-/** A resource orb: the fill height shows the amount; the skin comes from the active style's CSS. */
+/** A resource orb: the fill height shows the amount; the skin comes from CSS. */
 function Orb(props: {
   value: number;
   max: number;
@@ -102,10 +101,7 @@ export function Hud({ c }: { c: Controller }) {
       {sel && sel.alive && !sel.isPlayer && <Inspect a={sel} c={c} />}
       {sc && (
         <div class="hud-showcase">
-          <div class="muted">
-            {CLASSES[sc.classIdx].name} · keys 1-4 switch style · N next class
-          </div>
-          <StyleSwitcher c={c} compact />
+          <div class="muted">{CLASSES[sc.classIdx].name} · N next class</div>
           <div class="showcase-row">
             <button class="btn small" onClick={() => c.nextShowcaseClass()}>
               Next class (N)

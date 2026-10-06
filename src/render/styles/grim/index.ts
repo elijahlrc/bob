@@ -12,15 +12,12 @@ import type {
 import { StyleBase, AnimTrack, figureOf, heroColor, type ActorView } from '../../style/base';
 import type { MarkTheme } from '../../style/marks';
 import { isHero, type AnimName, type FigureKind } from '../../style/figure';
-import type { StyleId } from '../../style/types';
-import { buildProps, FIG_PX, FIG_PX_ISO, FRAMES, GTILE, makeTileset, rasterFigure } from './paint';
+import { buildProps, FIG_PX, FRAMES, rasterFigure } from './paint';
 import { isoFloors, isoWalls, ISO_H, ISO_W, WALL_LOW, WALL_TALL } from './isoPaint';
 
-/** Integer pixel zoom: 2× on smaller windows (so spells stay in view), 3× on large ones. */
-function pickZoom(width: number, iso: boolean): number {
-  // The isometric view uses smaller pixels (and so shows more of the map).
-  if (iso) return width >= 1100 ? 2 : 1.5;
-  return width >= 1500 ? 3 : 2;
+/** Pixel zoom: 2x on normal windows, 1.5x on small ones (smaller pixels, wider view). */
+function pickZoom(width: number): number {
+  return width >= 1100 ? 2 : 1.5;
 }
 const ELEMENT_TINT: Record<string, number> = {
   none: 0xffffff,
@@ -69,11 +66,6 @@ type TempLight = { light: Phaser.GameObjects.Light; t: number; total: number; ba
 type Torch = { light: Phaser.GameObjects.Light; seed: number; base: number; x: number; y: number };
 
 export class GrimStyle extends StyleBase {
-  readonly id: StyleId = 'grim';
-  /** Isometric camera (the 'gri' variant); everything else is shared. */
-  protected iso = false;
-  private tileMap: Phaser.Tilemaps.Tilemap | null = null;
-  private layer: Phaser.Tilemaps.TilemapLayer | null = null;
   private owned: Phaser.GameObjects.GameObject[] = [];
   private lightsOwned: Phaser.GameObjects.Light[] = [];
   private em!: Record<string, Emitter>;
@@ -96,18 +88,17 @@ export class GrimStyle extends StyleBase {
   private rng = new Rng(7);
 
   project(x: number, y: number): { x: number; y: number } {
-    if (this.iso) return { x: ((x - y) * ISO_W) / 2, y: ((x + y) * ISO_H) / 2 };
-    return { x: x * GTILE, y: y * GTILE };
+    return { x: ((x - y) * ISO_W) / 2, y: ((x + y) * ISO_H) / 2 };
   }
 
   /** A world-space radius in tiles -> the horizontal semi-axis in pixels. */
   private rpx(r: number): number {
-    return this.iso ? r * ISO_W * 0.7071 : r * GTILE;
+    return r * ISO_W * 0.7071;
   }
 
   /** Height / width of a ground circle on screen. */
   private squash(): number {
-    return this.iso ? 0.5 : 1;
+    return 0.5;
   }
 
   /** Projected position as a spreadable [x, y] pair. */
@@ -132,12 +123,9 @@ export class GrimStyle extends StyleBase {
 
   private figKey(kind: FigureKind, accent: number, anim: AnimName, i: number): string {
     const acc = isHero(kind) ? accent : 0;
-    const key = `gf${this.iso ? 'i' : ''}_${kind}_${acc}_${anim}_${i}`;
+    const key = `gf_${kind}_${acc}_${anim}_${i}`;
     if (!this.scene.textures.exists(key))
-      this.addTex(
-        key,
-        rasterFigure(kind, anim, i / FRAMES[anim], acc, this.iso ? FIG_PX_ISO : FIG_PX),
-      );
+      this.addTex(key, rasterFigure(kind, anim, i / FRAMES[anim], acc, FIG_PX));
     return key;
   }
 
@@ -153,24 +141,21 @@ export class GrimStyle extends StyleBase {
     this.ensureProps();
     const lab = world.plan.lab;
     const rng = new Rng(world.plan.seed ^ 0x51ed);
-    if (this.iso) this.buildIsoFloor(world, rng);
-    else this.buildFlatFloor(world, rng);
+    this.buildIsoFloor(world, rng);
 
     // Lighting: a dark cold ambient, warm pools around torches and the player.
     s.lights.enable();
     s.lights.setAmbientColor(0x625c7a);
 
     const cam = s.cameras.main;
-    this.zoom = pickZoom(cam.width, this.iso);
+    this.zoom = pickZoom(cam.width);
     cam.setZoom(this.zoom);
-    if (this.iso)
-      cam.setBounds(
-        -(lab.h * ISO_W) / 2 - 300,
-        -300,
-        ((lab.w + lab.h) * ISO_W) / 2 + 600,
-        ((lab.w + lab.h) * ISO_H) / 2 + 600,
-      );
-    else cam.setBounds(-200, -200, lab.w * GTILE + 400, lab.h * GTILE + 400);
+    cam.setBounds(
+      -(lab.h * ISO_W) / 2 - 300,
+      -300,
+      ((lab.w + lab.h) * ISO_W) / 2 + 600,
+      ((lab.w + lab.h) * ISO_H) / 2 + 600,
+    );
     cam.roundPixels = true;
     cam.setBackgroundColor(0x050408);
     this.setupFilters(cam);
@@ -200,34 +185,9 @@ export class GrimStyle extends StyleBase {
       b: pb,
       light: this.addLight(ex.x, ex.y, 140, 0x66aaff, 0),
     };
-    if (this.iso) {
-      pa.setScale(1, 0.55);
-      pb.setScale(0.7, 0.4);
-    }
+    pa.setScale(1, 0.55);
+    pb.setScale(0.7, 0.4);
     this.scene.events.emit('gstyle-built');
-  }
-
-  private buildFlatFloor(world: World, rng: Rng): void {
-    const s = this.scene;
-    const lab = world.plan.lab;
-    const theme = world.plan.theme;
-    const key = `g_tiles_${theme.id}`;
-    if (!s.textures.exists(key)) this.addTex(key, makeTileset(theme.floor, theme.wall));
-    const isFloor = (x: number, y: number) =>
-      x >= 0 && y >= 0 && x < lab.w && y < lab.h && lab.tiles[y * lab.w + x] === 1;
-    const data: number[][] = [];
-    for (let y = 0; y < lab.h; y++) {
-      const row: number[] = [];
-      for (let x = 0; x < lab.w; x++) {
-        if (isFloor(x, y)) row.push(!isFloor(x, y - 1) ? 4 + rng.int(0, 1) : rng.int(0, 3));
-        else row.push(isFloor(x, y + 1) ? 6 + rng.int(0, 2) : 9 + rng.int(0, 1));
-      }
-      data.push(row);
-    }
-    this.tileMap = s.make.tilemap({ data, tileWidth: GTILE, tileHeight: GTILE });
-    const ts = this.tileMap.addTilesetImage(key, key, GTILE, GTILE)!;
-    this.layer = this.tileMap.createLayer(0, ts, 0, 0) as Phaser.Tilemaps.TilemapLayer;
-    this.layer.setDepth(0).setLighting(true);
   }
 
   /** Diamond floor slabs baked into chunks, plus pixel-art wall cubes sorted with the actors by screen y. */
@@ -312,7 +272,7 @@ export class GrimStyle extends StyleBase {
     color: number,
     intensity: number,
   ): Phaser.GameObjects.Light {
-    const l = this.scene.lights.addLight(x, y, this.iso ? r * 0.8 : r, color, intensity);
+    const l = this.scene.lights.addLight(x, y, r * 0.8, color, intensity);
     this.lightsOwned.push(l);
     return l;
   }
@@ -474,9 +434,9 @@ export class GrimStyle extends StyleBase {
         const ty = r.y - 1;
         if (!isFace(tx, ty)) continue;
         const tb = this.project(tx + 1, ty + 1);
-        const wx = this.iso ? tb.x + 5 : tx * GTILE + GTILE / 2;
-        const wy = this.iso ? tb.y - 15 : ty * GTILE + 19;
-        const td = this.iso ? 1000 + tb.y + 1 : 2;
+        const wx = tb.x + 5;
+        const wy = tb.y - 15;
+        const td = 1000 + tb.y + 1;
         const img = s.add.image(wx, wy, 'g_torch').setDepth(td);
         this.owned.push(img);
         const light = this.addLight(wx, wy + 8, 190, 0xff8a38, 1.5);
@@ -596,7 +556,7 @@ export class GrimStyle extends StyleBase {
         .setTint(rc)
         .setBlendMode(Phaser.BlendModes.ADD)
         .setAlpha(0.85);
-      ring.setScale((a.rarity === 'boss' ? 2.6 : a.r * 2.4) * (this.iso ? 0.8 : 1));
+      ring.setScale((a.rarity === 'boss' ? 2.6 : a.r * 2.4) * 0.8);
     }
     let light: Phaser.GameObjects.Light | null = null;
     if (a.rarity === 'boss') light = this.addLight(0, 0, 260, 0xff4a28, 1.3);
@@ -655,7 +615,7 @@ export class GrimStyle extends StyleBase {
       .setPosition(px, py + 1)
       .setDepth(500)
       .setAlpha(a.alive ? 0.85 : Math.max(0, 0.6 - t.deathT * 0.2))
-      .setScale(Math.max(0.6, a.r * 2.1) * (this.iso ? 0.8 : 1));
+      .setScale(Math.max(0.6, a.r * 2.1) * 0.8);
     if (d.ring)
       d.ring
         .setPosition(px, py + 1)
@@ -1277,9 +1237,6 @@ export class GrimStyle extends StyleBase {
     this.torches = [];
     this.temps = [];
     this.bolts = [];
-    this.layer?.destroy();
-    this.tileMap?.destroy();
-    this.layer = this.tileMap = null;
     this.portal = null;
     this.playerLight = null;
     this.scene.lights.disable();
@@ -1293,10 +1250,4 @@ export class GrimStyle extends StyleBase {
     }
     void figureOf;
   }
-}
-
-/** Grimdark with a diagonal isometric camera: the same pixel art and lighting, smaller pixels, wider view. */
-export class GrimIsoStyle extends GrimStyle {
-  override readonly id: StyleId = 'gri';
-  protected override iso = true;
 }

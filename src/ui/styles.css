@@ -965,47 +965,12 @@ select option {
   gap: 8px;
   justify-content: center;
 }
-.style-panel {
+.demo-panel {
   margin-top: 18px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   align-items: center;
-}
-.style-switch {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.style-btn {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 8px 14px;
-  cursor: pointer;
-  min-width: 150px;
-  text-align: center;
-}
-.style-btn.on {
-  border-color: var(--hi);
-  box-shadow: 0 0 0 1px var(--hi);
-}
-.style-btn .key {
-  opacity: 0.6;
-  font-size: 11px;
-  margin-right: 4px;
-}
-.style-btn .tagline {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 3px;
-  max-width: 190px;
-}
-.style-switch.compact .style-btn {
-  min-width: 0;
-  padding: 3px 10px;
-  font-size: 12px;
 }
 
 /* Reserve room for the hover/selection card so hovering never shifts the inventory list under the cursor

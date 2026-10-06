@@ -15,7 +15,7 @@ import { MonsterMarks, type MarkTheme } from './marks';
 import { heroFigure, monsterFigure, type FigureKind } from './figure';
 
 export { AnimTrack };
-import type { MapStyle, StyleId } from './types';
+import type { MapStyle } from './types';
 
 export type ActorView = {
   id: number;
@@ -42,7 +42,6 @@ export function heroColor(w: World): number {
  * orchestration. Subclasses decide how everything looks.
  */
 export abstract class StyleBase implements MapStyle {
-  abstract readonly id: StyleId;
   protected world!: World;
   protected views = new Map<number, ActorView>();
   protected projs = new Map<number, unknown>();

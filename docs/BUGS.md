@@ -24,3 +24,12 @@ Neither side lands a killing blow, so the map never progresses.
 - Check the hit-chance and projectile collision paths for a ranged player attacking a ranged enemy.
 - Consider a stalemate breaker: enemies close in (or the player advances) when no damage has been dealt
   for several seconds, and/or a map time limit that fails the map cleanly.
+
+## 2. Crash after the player tried to shoot an unhittable enemy (open, needs the report)
+
+**Symptom.** A full crash after the character kept shooting an enemy it could not hit. Probably the same
+situation as bug 1.
+
+**Status.** Error text unknown. Crash logging now exists (`src/crashlog.ts`): the next crash is stored in
+`localStorage['bob.crashlog']` and shown as a copyable report with a snapshot of the player, its target and
+the actor counts. Paste that report here.

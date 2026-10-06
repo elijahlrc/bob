@@ -2,10 +2,9 @@ import Phaser from 'phaser';
 import type { Emitter } from '../core/events';
 import type { BusEvents } from '../run/controller';
 import { MapScene } from './MapScene';
-import type { StyleId } from './style/types';
 
 /** Create the Phaser game that renders maps. DOM screens are drawn over it by `ui`. */
-export function createGame(parent: string, bus: Emitter<BusEvents>, style: StyleId): Phaser.Game {
+export function createGame(parent: string, bus: Emitter<BusEvents>): Phaser.Game {
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent,
@@ -18,6 +17,6 @@ export function createGame(parent: string, bus: Emitter<BusEvents>, style: Style
       autoCenter: Phaser.Scale.NO_CENTER,
     },
   });
-  game.scene.add('map', MapScene, true, { bus, style });
+  game.scene.add('map', MapScene, true, { bus });
   return game;
 }

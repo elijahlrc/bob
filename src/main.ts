@@ -1,5 +1,6 @@
 import { h, render } from 'preact';
 import { createGame } from './render/game';
+import { installCrashLog } from './crashlog';
 import { Controller } from './run/controller';
 import { App } from './ui/App';
 import './ui/styles.css';
@@ -14,9 +15,8 @@ function storage(): Storage | null {
 }
 
 const controller = new Controller(storage());
-const game = createGame('app', controller.bus, controller.styleId);
-document.documentElement.dataset.style = controller.styleId;
-controller.bus.on('style', ({ id }) => (document.documentElement.dataset.style = id));
+installCrashLog(controller);
+const game = createGame('app', controller.bus);
 render(h(App, { c: controller }), document.getElementById('ui')!);
 
 // Dev-only handle for debugging from the browser console.

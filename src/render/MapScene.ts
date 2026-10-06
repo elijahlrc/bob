@@ -2,15 +2,14 @@ import Phaser from 'phaser';
 import type { Emitter } from '../core/events';
 import type { BusEvents } from '../run/controller';
 import type { World } from '../sim/types';
-import type { MapStyle, StyleId } from './style/types';
-import { makeStyle } from './styles';
+import type { MapStyle } from './style/types';
+import { GrimStyle } from './styles/grim';
 
 /** Hosts the active visual style. The style reads sim state and never writes it (§8.2). */
 export class MapScene extends Phaser.Scene {
   private bus!: Emitter<BusEvents>;
   private world: World | null = null;
   private style: MapStyle | null = null;
-  private styleId: StyleId = 'grim';
   private selected: number | null = null;
   private unsub: (() => void)[] = [];
 
@@ -18,9 +17,8 @@ export class MapScene extends Phaser.Scene {
     super('map');
   }
 
-  init(data: { bus: Emitter<BusEvents>; style: StyleId }): void {
+  init(data: { bus: Emitter<BusEvents> }): void {
     this.bus = data.bus;
-    this.styleId = data.style;
   }
 
   create(): void {
@@ -33,10 +31,6 @@ export class MapScene extends Phaser.Scene {
       this.bus.on('select', ({ id }) => {
         this.selected = id;
         this.style?.setSelected(id);
-      }),
-      this.bus.on('style', ({ id }) => {
-        this.styleId = id;
-        if (this.world) this.build(this.world);
       }),
     );
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
@@ -57,7 +51,7 @@ export class MapScene extends Phaser.Scene {
   private build(world: World): void {
     this.style?.destroy();
     this.world = world;
-    this.style = makeStyle(this.styleId, this);
+    this.style = new GrimStyle(this);
     this.style.build(world);
     this.style.setSelected(this.selected);
   }
