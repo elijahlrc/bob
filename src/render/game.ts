@@ -1,23 +1,21 @@
 import Phaser from 'phaser';
-
-class BackdropScene extends Phaser.Scene {
-  constructor() {
-    super('backdrop');
-  }
-}
+import type { Emitter } from '../core/events';
+import type { BusEvents } from '../run/controller';
+import { MapScene } from './MapScene';
 
 /** Create the Phaser game that renders maps. DOM screens are drawn over it by `ui`. */
-export function createGame(parent: string): Phaser.Game {
-  return new Phaser.Game({
+export function createGame(parent: string, bus: Emitter<BusEvents>): Phaser.Game {
+  const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent,
-    width: 960,
-    height: 540,
+    width: window.innerWidth,
+    height: window.innerHeight,
     backgroundColor: '#0f1016',
     scale: {
       mode: Phaser.Scale.RESIZE,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
+      autoCenter: Phaser.Scale.NO_CENTER,
     },
-    scene: [BackdropScene],
   });
+  game.scene.add('map', MapScene, true, { bus });
+  return game;
 }

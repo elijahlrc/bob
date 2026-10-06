@@ -2,6 +2,10 @@
   font-family: system-ui, sans-serif;
   color: #e6e1d3;
 }
+button {
+  font: inherit;
+  color: inherit;
+}
 .screen {
   position: absolute;
   inset: 0;
@@ -10,10 +14,169 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(10, 10, 16, 0.92);
+  gap: 12px;
+  background: rgba(10, 10, 16, 0.94);
+  overflow: auto;
 }
 .title h1 {
   font-size: 64px;
   letter-spacing: 0.2em;
-  margin: 0 0 8px;
+  margin: 0;
+}
+.subtitle,
+.muted {
+  color: #9a9488;
+}
+.btn {
+  background: #2a2733;
+  border: 1px solid #4a4555;
+  border-radius: 6px;
+  padding: 8px 18px;
+  cursor: pointer;
+}
+.btn:hover {
+  background: #36323f;
+}
+.btn.primary {
+  background: #6a4a20;
+  border-color: #b08040;
+}
+.btn.small {
+  padding: 4px 10px;
+  font-size: 13px;
+}
+.btn.on {
+  background: #b08040;
+  color: #111;
+}
+.class-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 220px));
+  justify-content: center;
+  gap: 12px;
+  max-width: 720px;
+}
+.class-card {
+  background: #1c1a22;
+  border: 2px solid;
+  border-radius: 8px;
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.class-card:hover {
+  background: #26232e;
+}
+.class-name {
+  font-size: 20px;
+  font-weight: bold;
+}
+.class-attrs,
+.class-skill {
+  font-size: 13px;
+  color: #b8b2a6;
+  margin-top: 4px;
+}
+.theme-choice {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+.theme {
+  min-width: 200px;
+}
+.theme-name {
+  font-weight: bold;
+}
+.hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.hud-top {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  font-size: 14px;
+  text-shadow: 0 1px 2px #000;
+}
+.hud-bottom {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+  pointer-events: auto;
+}
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 260px;
+  max-width: 60vw;
+}
+.bar {
+  position: relative;
+  height: 16px;
+  background: #000a;
+  border: 1px solid #555;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+.bar-text {
+  position: relative;
+  font-size: 11px;
+  line-height: 16px;
+  padding-left: 6px;
+  text-shadow: 0 1px 2px #000;
+}
+.flasks {
+  display: flex;
+  gap: 4px;
+}
+.flask {
+  position: relative;
+  width: 16px;
+  height: 36px;
+  border: 1px solid #777;
+  border-radius: 3px 3px 6px 6px;
+  background: #000a;
+  overflow: hidden;
+}
+.flask.active {
+  border-color: #fff;
+}
+.flask-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.flask-fill.life {
+  background: #c03030;
+}
+.flask-fill.mana {
+  background: #3050c0;
+}
+.flask-fill.hybrid {
+  background: #8040a0;
+}
+.flask-fill.utility {
+  background: #c0a040;
+}
+.speeds {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
 }
