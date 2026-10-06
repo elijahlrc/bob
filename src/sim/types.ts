@@ -109,6 +109,10 @@ export type Projectile = {
   hand: number;
   hitIds: number[];
   pierceLeft: number;
+  /** Who the shooter aimed at, and the closest this projectile came to them (diagnostics). */
+  aimId: number;
+  minDist: number;
+  lastHitId: number;
   explodeRadius: number;
   startX: number;
   startY: number;
@@ -160,6 +164,16 @@ export type SimEvent =
   | { t: 'chain'; from: number; to: number }
   | { t: 'explode'; x: number; y: number; r: number; dtype: number }
   | { t: 'stuck' }
+  | { t: 'stall'; id: number }
+  | {
+      t: 'projectileEnd';
+      id: number;
+      owner: number;
+      aim: number;
+      fate: 0 | 1 | 2 | 3;
+      closest: number;
+      lastHit: number;
+    }
   | { t: 'exitOpen' }
   | { t: 'cleared' }
   | { t: 'playerDied' }
@@ -175,6 +189,18 @@ export type PlayerAI = {
   pathT: number;
   targetId: number;
   scanT: number;
+  /** Stall breaker: the target being watched, its life when last damaged, and when. */
+  /** Player projectiles that hit walls recently (resets after a quiet spell), and when the count began. */
+  blocked: number;
+  blockedT: number;
+  /** Seconds left of closing in for a clearer shot. */
+  repoT: number;
+  watchId: number;
+  watchLife: number;
+  watchT: number;
+  /** A target the player has given up on, and until when. */
+  skipId: number;
+  skipUntil: number;
   stuckT: number;
   stuckX: number;
   stuckY: number;
@@ -223,6 +249,9 @@ export type World = {
     kills: number;
     xpGained: number;
     stuck: number;
+    stalls: number;
+    /** Player projectiles stopped by walls. */
+    wallBlocked: number;
     picked: number;
     damageTaken: number;
     damageDealt: number;

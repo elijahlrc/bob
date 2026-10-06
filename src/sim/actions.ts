@@ -1,5 +1,5 @@
 import { angleDiff } from '../core/math';
-import { HIT_AT, PROJECTILE_SPEED } from '../data/constants';
+import { BLOCK_WINDOW, HIT_AT, PROJECTILE_SPEED, SHOT_ALERT } from '../data/constants';
 import type { SkillProfile } from '../calc/skill';
 import { hit } from './combat';
 import type { Action, Actor, World } from './types';
@@ -29,6 +29,28 @@ export function startAction(
   a.carry = 0;
   a.facing = Math.atan2(target.y - a.y, target.x - a.x);
   w.events.push({ t: 'use', src: a.id, skill: p.skill.id });
+  // Fighting is noisy: idle monsters nearby come running even if they have not seen the player.
+  if (a.isPlayer)
+    for (const m of w.actors)
+      if (
+        !m.isPlayer &&
+        m.alive &&
+        m.state === 'idle' &&
+        Math.hypot(m.x - a.x, m.y - a.y) <= SHOT_ALERT
+      ) {
+        m.state = 'chase';
+        m.lostT = 0;
+      }
+}
+
+/**
+ * Aim angle of arrow `i` of an `n`-arrow fan. With an even count a symmetric fan has no arrow on the aim
+ * line, and every arrow can pass either side of a small target at range, so the fan is shifted by half a
+ * step (alternating sides) to keep one arrow flying true.
+ */
+export function fanAngle(base: number, i: number, n: number, step: number, tick: number): number {
+  const centre = (n - 1) / 2 + (n % 2 === 0 ? (tick % 2 === 0 ? 0.5 : -0.5) : 0);
+  return base + (i - centre) * step;
 }
 
 export function actorById(w: World, id: number): Actor | undefined {
@@ -137,7 +159,7 @@ function fire(w: World, a: Actor, act: Action): void {
   // All projectiles of one use share a hit list: a use hits each target at most once.
   const useHits: number[] = [];
   for (let i = 0; i < n; i++) {
-    const ang = base + (i - (n - 1) / 2) * step;
+    const ang = fanAngle(base, i, n, step, w.tick);
     const id = w.nextId++;
     w.projectiles.push({
       id,
@@ -154,6 +176,9 @@ function fire(w: World, a: Actor, act: Action): void {
       hand: act.hand,
       hitIds: useHits,
       pierceLeft: p.pierce,
+      aimId: act.targetId,
+      minDist: Infinity,
+      lastHitId: 0,
       explodeRadius: (b.explodeRadius ?? 0) * p.radiusMult,
       startX: a.x,
       startY: a.y,
@@ -179,6 +204,19 @@ function explode(
   }
 }
 
+/** Fates reported in `projectileEnd` events: 0 wall, 1 out of range, 2 spent on an enemy, 3 exploded. */
+function endProjectile(w: World, pr: World['projectiles'][number], fate: 0 | 1 | 2 | 3): void {
+  w.events.push({
+    t: 'projectileEnd',
+    id: pr.id,
+    owner: pr.owner,
+    aim: pr.aimId,
+    fate,
+    closest: Number.isFinite(pr.minDist) ? pr.minDist : -1,
+    lastHit: pr.lastHitId,
+  });
+}
+
 /** Move projectiles, resolve wall and enemy collisions. */
 export function updateProjectiles(w: World, dt: number): void {
   const list = w.projectiles;
@@ -192,13 +230,23 @@ export function updateProjectiles(w: World, dt: number): void {
       pr.y += (pr.vy * dt) / steps;
       pr.travelled += (Math.hypot(pr.vx, pr.vy) * dt) / steps;
       const owner = actorById(w, pr.owner);
+      const aim = pr.aimId ? actorById(w, pr.aimId) : undefined;
+      if (aim) pr.minDist = Math.min(pr.minDist, Math.hypot(aim.x - pr.x, aim.y - pr.y));
       if (!w.grid.isFloor(Math.floor(pr.x), Math.floor(pr.y))) {
+        if (owner?.isPlayer) {
+          w.stats.wallBlocked++;
+          if (w.t - w.ai.blockedT > BLOCK_WINDOW) w.ai.blocked = 0;
+          if (w.ai.blocked === 0) w.ai.blockedT = w.t;
+          w.ai.blocked++;
+        }
         if (pr.explodeRadius > 0)
           explode(w, owner, pr, pr.x - (pr.vx * dt) / steps, pr.y - (pr.vy * dt) / steps);
+        endProjectile(w, pr, 0);
         alive = false;
         break;
       }
       if (pr.travelled >= pr.maxRange) {
+        endProjectile(w, pr, 1);
         alive = false;
         break;
       }
@@ -209,8 +257,10 @@ export function updateProjectiles(w: World, dt: number): void {
         const dy = e.y - pr.y;
         if (dx * dx + dy * dy > rr * rr) continue;
         pr.hitIds.push(e.id);
+        pr.lastHitId = e.id;
         if (pr.explodeRadius > 0) {
           explode(w, owner, pr, pr.x, pr.y);
+          endProjectile(w, pr, 3);
           alive = false;
           break;
         }
@@ -218,6 +268,7 @@ export function updateProjectiles(w: World, dt: number): void {
           hit(w, owner, e, pr.profile, pr.hand, Math.hypot(e.x - pr.startX, e.y - pr.startY));
         if (pr.pierceLeft > 0) pr.pierceLeft--;
         else {
+          endProjectile(w, pr, 2);
           alive = false;
           break;
         }

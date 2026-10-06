@@ -30,6 +30,15 @@ export function Title({ c }: { c: Controller }) {
         </div>
       )}
       {saved.status === 'ok' && <p class="muted">Starting a new run replaces the saved one.</p>}
+      {saved.status === 'ok' && (
+        <button
+          class="btn small"
+          title="Copies the saved run to the clipboard so it can be attached to a bug report"
+          onClick={() => void navigator.clipboard?.writeText(c.exportSave() ?? '')}
+        >
+          Copy save (for bug reports)
+        </button>
+      )}
       <div class="demo-panel">
         <div class="muted">Demo</div>
         <div class="showcase-row">

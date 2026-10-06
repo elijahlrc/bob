@@ -79,7 +79,19 @@ export const FLASK_CHARGES_ON_KILL = { normal: 1, magic: 2, rare: 5, unique: 10 
 // §13 AI.
 export const ENGAGE_RANGE = 9;
 export const LOOT_RANGE = 6;
-export const MONSTER_AGGRO = 8;
+/** Monsters notice the player within this range (line of sight); above ENGAGE_RANGE so nothing is shot at unaware. */
+export const MONSTER_AGGRO = 10;
+/** Idle monsters this close to a player who starts an attack come running (they hear it). */
+export const SHOT_ALERT = 10;
+/** The player gives up on a target it has not damaged for this long (seconds), for SKIP_TIME. */
+export const STALL_TIME = 20;
+export const SKIP_TIME = 30;
+/** Arrows that hit walls within BLOCK_WINDOW seconds before the player moves in for a clearer shot. */
+export const BLOCK_LIMIT = 5;
+export const BLOCK_WINDOW = 3;
+/** How long the player closes in, and how close it tries to get (tiles), when repositioning. */
+export const REPOSITION_TIME = 3;
+export const REPOSITION_DIST = 3.5;
 export const PACK_ALERT = 6;
 export const LEASH_TIME = 6;
 export const STUCK_TIME = 20;

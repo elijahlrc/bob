@@ -6,7 +6,7 @@ import { createWorld, stepWorld } from '../sim/world';
 import { CLASSES } from '../data/classes';
 import { botCamp } from './bot';
 import { finishMap, newRun, passivePoints, planFor, worldOptsFor, type RunState } from './run';
-import { clearSave, loadRun, saveRun, type KeyValueStore, type LoadResult } from './save';
+import { clearSave, loadRun, saveRun, SAVE_KEY, type KeyValueStore, type LoadResult } from './save';
 
 export type Screen = 'title' | 'classSelect' | 'camp' | 'map' | 'summary' | 'victory';
 
@@ -264,6 +264,11 @@ export class Controller {
     if (run.newLoot.length > 0)
       return `${run.newLoot.length} new rare/unique item${run.newLoot.length === 1 ? '' : 's'} (open Items)`;
     return null;
+  }
+
+  /** The raw saved run (for bug reports), or null. */
+  exportSave(): string | null {
+    return this.store?.getItem(SAVE_KEY) ?? null;
   }
 
   /** Abandon the run and return to the title screen. */

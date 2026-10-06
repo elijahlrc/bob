@@ -1,13 +1,19 @@
 import { skillRange } from '../calc/character';
 import {
   ENGAGE_RANGE,
+  BLOCK_LIMIT,
+  BLOCK_WINDOW,
   LEASH_TIME,
   LOOT_RANGE,
   MONSTER_AGGRO,
   PACK_ALERT,
   REPATH_INTERVAL,
+  REPOSITION_DIST,
+  REPOSITION_TIME,
   RETREAT_COOLDOWN,
   RETREAT_TIME,
+  SKIP_TIME,
+  STALL_TIME,
   STUCK_TIME,
 } from '../data/constants';
 import { actorById, startAction } from './actions';
@@ -81,6 +87,7 @@ function findTarget(w: World): Actor | null {
   let bd = Infinity;
   for (const m of w.actors) {
     if (m.isPlayer || !m.alive) continue;
+    if (m.id === w.ai.skipId && w.t < w.ai.skipUntil) continue;
     const d = Math.hypot(m.x - p.x, m.y - p.y);
     if (d > ENGAGE_RANGE) continue;
     if (d > bd + 1e-9) continue;
@@ -134,7 +141,23 @@ export function playerAI(w: World, dt: number): void {
     ai.scanT = 0.1;
     target = findTarget(w) ?? undefined;
   }
+  if (target && target.id === ai.skipId && w.t < ai.skipUntil) target = undefined;
   if (target) {
+    // Stall breaker: a target that takes no damage for a long time is dropped for a while, so the
+    // run moves on (and the monster, if it is chasing, comes to the player instead).
+    if (ai.watchId !== target.id || target.life < ai.watchLife - 1e-6) {
+      ai.watchId = target.id;
+      ai.watchLife = target.life;
+      ai.watchT = w.t;
+    } else if (w.t - ai.watchT > STALL_TIME) {
+      ai.skipId = target.id;
+      ai.skipUntil = w.t + SKIP_TIME;
+      ai.watchId = 0;
+      ai.targetId = 0;
+      w.stats.stalls++;
+      w.events.push({ t: 'stall', id: target.id });
+      return;
+    }
     ai.targetId = target.id;
     ai.mode = 'engage';
     const { which, prof } = chooseSkill(w, target);
@@ -142,6 +165,18 @@ export function playerAI(w: World, dt: number): void {
     const reach = skillRange(prof) + target.r + (melee ? p.r : 0);
     const d = Math.hypot(target.x - p.x, target.y - p.y);
     const inRange = d <= reach && (melee || w.grid.los(p.x, p.y, target.x, target.y));
+    // Arrows keep hitting walls (a wide fan in a narrow corridor): close in for a clearer shot.
+    if (!melee && ai.repoT <= 0 && ai.blocked >= BLOCK_LIMIT && w.t - ai.blockedT <= BLOCK_WINDOW) {
+      ai.repoT = REPOSITION_TIME;
+      ai.blocked = 0;
+    }
+    if (ai.repoT > 0) {
+      ai.repoT -= dt;
+      if (d > REPOSITION_DIST) {
+        moveTo(w, p, target.x, target.y, dt);
+        return;
+      }
+    }
     if (inRange) {
       if (which === 'primary') payCost(w, prof.cost);
       startAction(w, p, which, prof, target);
