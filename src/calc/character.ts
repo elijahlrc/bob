@@ -33,7 +33,6 @@ import {
   BUFFS,
   BUFF_IDS,
   DYN_SHIFT,
-  hasBuffSource,
   hasRageSource,
   hasRecoverSource,
   rageMods,
@@ -134,6 +133,19 @@ export type SteadyMode = 'clearing' | 'boss';
 
 /** The incoming damage mix of the reference monster: shares of physical, lightning, cold, fire and chaos. */
 export const DEFAULT_HIT_MIX: readonly number[] = [0.5, 0.14, 0.14, 0.14, 0.08];
+
+const nodeModsCache = new WeakMap<object, Mod[]>();
+
+/** What an allocated passive gives, with its source (the same objects every time: the passive tree never changes). */
+function nodeMods(n: { mods: readonly Mod[] }, id: number): Mod[] {
+  let out = nodeModsCache.get(n);
+  if (!out)
+    nodeModsCache.set(
+      n,
+      (out = n.mods.map((m) => ({ ...m, source: { kind: 'tree' as const, id: String(id) } }))),
+    );
+  return out;
+}
 
 export type SocketedGem = {
   gem: GemItem;
@@ -442,7 +454,7 @@ export class Character {
     const tree = getTree();
     for (const id of build.allocated) {
       const n = tree.nodes[id];
-      if (n) for (const m of n.mods) mods.push({ ...m, source: { kind: 'tree', id: String(id) } });
+      if (n) mods.push(...nodeMods(n, id));
     }
     for (const slot of EQUIP_SLOTS) {
       const it = build.equipment[slot];
@@ -472,7 +484,12 @@ export class Character {
           for (const m of gd.mods)
             if (GAIN_STAT.test(m.stat)) gemSources.push({ ...m, value: levelValue(m.value, 20) });
       }
-    const withGems = () => [...mods, ...gemSources];
+    // What can grant charges, buffs, rage or recovery: worked out once (the charge effects added below grant none).
+    const gemsAndMods = [...mods, ...gemSources];
+    const buffIdsGranted = new Set<string>();
+    for (const m of gemsAndMods)
+      if (m.value > 0 && m.stat.startsWith('buffOn.'))
+        buffIdsGranted.add(m.stat.slice(m.stat.lastIndexOf('.') + 1));
     // Charges (EXPANSION 5.6): the count the sim reports, or the maximum where something can grant one.
     const held = noCharges();
     const cap = noCharges();
@@ -480,16 +497,16 @@ export class Character {
       cap[k] = maxChargesOf(mods, k);
       held[k] = Math.min(
         cap[k],
-        this.config.charges ? this.config.charges[k] : hasChargeSource(withGems(), k) ? cap[k] : 0,
+        this.config.charges ? this.config.charges[k] : hasChargeSource(gemsAndMods, k) ? cap[k] : 0,
       );
       mods.push(...chargeMods(k, held[k]));
     }
     this.charges = held;
     this.chargeMax = cap;
     this.chargeSource = {
-      grit: hasChargeSource(withGems(), 'grit'),
-      fervour: hasChargeSource(withGems(), 'fervour'),
-      insight: hasChargeSource(withGems(), 'insight'),
+      grit: hasChargeSource(gemsAndMods, 'grit'),
+      fervour: hasChargeSource(gemsAndMods, 'fervour'),
+      insight: hasChargeSource(gemsAndMods, 'insight'),
     };
     // Buffs: their effects wait behind a condition, so they are only added when something can grant them.
     this.buffSource = Object.fromEntries(BUFF_IDS.map((id) => [id, false])) as Record<
@@ -504,12 +521,14 @@ export class Character {
         if (gd?.kind === 'active' && gd.utility?.kind === 'buff') utilBuffs.add(gd.utility.buff);
       }
     for (const id of BUFF_IDS) {
-      this.buffSource[id] = hasBuffSource(withGems(), id) || utilBuffs.has(id);
+      this.buffSource[id] = buffIdsGranted.has(id) || utilBuffs.has(id);
       if (this.buffSource[id]) mods.push(...BUFFS[id].mods);
     }
-    this.rageSource = hasRageSource(withGems());
+    this.rageSource = hasRageSource(gemsAndMods);
     this.anyGain =
-      this.rageSource || hasRecoverSource(withGems()) || BUFF_IDS.some((id) => this.buffSource[id]);
+      this.rageSource ||
+      hasRecoverSource(gemsAndMods) ||
+      BUFF_IDS.some((id) => this.buffSource[id]);
     this.rageMax =
       BASE_MAX_RAGE + mods.reduce((n, m) => (m.stat === 'maxRage' ? n + m.value : n), 0);
     this.defaultDyn = this.rageSource ? ASSUMED_RAGE << DYN_SHIFT : 0;

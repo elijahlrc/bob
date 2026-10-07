@@ -54,6 +54,20 @@ export function sheetOf(run: RunState, build: Build = run.build): CharacterSheet
   return new Character(build, cfgFor(run)).sheet();
 }
 
+const skillCache = new Map<string, { dps: number; isDefault: boolean }>();
+
+/** The primary skill's sustained damage of a build, and whether it fell back to the default attack (remembered like scores). */
+function skillOf(run: RunState, build: Build): { dps: number; isDefault: boolean } {
+  const key = buildKey(run, build);
+  let r = skillCache.get(key);
+  if (!r) {
+    const s = sheetOf(run, build).skill;
+    if (skillCache.size > 20000) skillCache.clear();
+    skillCache.set(key, (r = { dps: s.sustainedDps, isDefault: s.isDefault }));
+  }
+  return r;
+}
+
 /** The bot's objective: total DPS × effective HP (geometric-safe for zeros). */
 export function score(s: CharacterSheet): number {
   return Math.max(0.1, sheetDps(s)) * Math.max(1, s.ehp);
@@ -208,10 +222,9 @@ export function botRegem(run: RunState): void {
     const eq = { ...equipment };
     const it = eq[host]!;
     eq[host] = { ...it, sockets: [g, ...it.sockets.slice(1)] };
-    const s = sheetOf(run, buildWith(eq, g.uid));
-    if (s.skill.isDefault) continue;
-    if (!bestActive || s.skill.sustainedDps > bestActive.dps)
-      bestActive = { gem: g, dps: s.skill.sustainedDps };
+    const s = skillOf(run, buildWith(eq, g.uid));
+    if (s.isDefault) continue;
+    if (!bestActive || s.dps > bestActive.dps) bestActive = { gem: g, dps: s.dps };
   }
   let primary: number | undefined;
   if (bestActive) {
@@ -231,7 +244,7 @@ export function botRegem(run: RunState): void {
       (d.supports.length === 0 || d.supports.some((t) => types.has(t))) &&
       (d.needs ?? []).every((t) => types.has(t));
     while (equipment[host]!.sockets.includes(null)) {
-      const cur = sheetOf(run, buildWith(equipment, primary)).skill.sustainedDps;
+      const cur = skillOf(run, buildWith(equipment, primary)).dps;
       let best: { gem: GemItem; dps: number } | null = null;
       const tried = new Set<string>();
       for (const g of pool) {
@@ -244,7 +257,7 @@ export function botRegem(run: RunState): void {
         const sockets = [...it.sockets];
         sockets[sockets.indexOf(null)] = g;
         eq[host] = { ...it, sockets };
-        const dps = sheetOf(run, buildWith(eq, primary)).skill.sustainedDps;
+        const dps = skillOf(run, buildWith(eq, primary)).dps;
         if (dps > cur * 1.01 && (!best || dps > best.dps)) best = { gem: g, dps };
       }
       if (!best) break;

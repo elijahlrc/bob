@@ -60,7 +60,16 @@ export function armourStats(item: Item, base: ItemBase = itemBase(item.baseId)):
 }
 
 /** Mods an equipped item contributes to the character (non-local mods + resolved defences). */
+const globalModsCache = new WeakMap<Item, Mod[]>();
+
+/** Items are never edited in place, so what one gives the character is worked out once. */
 export function itemGlobalMods(item: Item): Mod[] {
+  let out = globalModsCache.get(item);
+  if (!out) globalModsCache.set(item, (out = computeGlobalMods(item)));
+  return out;
+}
+
+function computeGlobalMods(item: Item): Mod[] {
   const base = itemBase(item.baseId);
   const src = { kind: 'item' as const, id: String(item.uid) };
   const out: Mod[] = itemMods(item)
