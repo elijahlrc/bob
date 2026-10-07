@@ -10,6 +10,7 @@ import {
   type SkillBehaviour,
 } from '../data/gems';
 import type { Attrs } from '../data/types';
+import type { SkillType } from '../data/skillTypes';
 import type { DamageType, Mod, SkillTag } from '../mods/types';
 
 /** Interpolate an L1/L20 value; levels above 20 extrapolate the same curve. */
@@ -74,6 +75,8 @@ export type SkillDef = {
   name: string;
   type: 'attack' | 'spell';
   tags: SkillTag[];
+  /** Every skill type: the tags and the extra types. */
+  types: SkillType[];
   behaviour: SkillBehaviour;
   level: number;
   /** Percent of base damage (attacks). */
@@ -106,6 +109,7 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     name: def.name,
     type: def.skillType,
     tags: def.tags,
+    types: [...new Set<SkillType>([...def.tags, ...(def.types ?? [])])],
     behaviour,
     level,
     baseMult: def.baseMult ? levelValue(def.baseMult, level) : 100,
@@ -130,6 +134,7 @@ export const DEFAULT_ATTACK: SkillDef = {
   name: 'Default Attack',
   type: 'attack',
   tags: ['attack', 'melee'],
+  types: ['attack', 'melee'],
   behaviour: { kind: 'melee', range: 1.3 },
   level: 1,
   baseMult: 100,
@@ -146,5 +151,6 @@ export const DEFAULT_BOW_ATTACK: SkillDef = {
   ...DEFAULT_ATTACK,
   id: 'defaultBowAttack',
   tags: ['attack', 'projectile'],
+  types: ['attack', 'projectile'],
   behaviour: { kind: 'projectile', count: 1, spread: 0, range: 9 },
 };

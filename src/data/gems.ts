@@ -1,6 +1,7 @@
 import type { DamageType, Mod, SkillTag } from '../mods/types';
 import type { TriggerDef } from './triggers';
 import type { HexId } from './hexes';
+import type { SkillType } from './skillTypes';
 
 /** A value authored at gem level 1 and level 20 (DESIGN.md §11.5). */
 export type LevelValue = number | readonly [number, number];
@@ -32,6 +33,8 @@ export type ActiveGemDef = {
   attr: GemAttr;
   skillType: 'attack' | 'spell';
   tags: SkillTag[];
+  /** Skill types beyond the tags (what supports can do with it): `totemable`, `trappable`, `triggerable`, ... */
+  types?: SkillType[];
   behaviour: SkillBehaviour;
   /** Attacks: "deals N% of base damage". */
   baseMult?: LevelValue;
@@ -56,8 +59,14 @@ export type SupportGemDef = {
   id: string;
   name: string;
   attr: GemAttr;
-  /** The supported skill must have at least one of these tags (empty: any). */
-  supports: SkillTag[];
+  /** The supported skill must have at least one of these types (empty: any). */
+  supports: SkillType[];
+  /** ... and all of these. */
+  needs?: SkillType[];
+  /** The skill must have none of these. */
+  excludes?: SkillType[];
+  /** Types the support adds to the skill (a totem support makes it a totem). */
+  adds?: SkillType[];
   costMult: number;
   mods: GemMod[];
   /** Trigger supports: the linked spells are cast by this trigger instead of by the player. */

@@ -57,6 +57,7 @@ function monsterSkill(spec: MonsterSpec, dmg: number): SkillDef {
     name: t.name,
     type: 'attack',
     tags: ['attack', 'melee'],
+    types: ['attack', 'melee'],
     behaviour: { kind: 'melee', range: t.range },
     level: spec.level,
     baseMult: 100,
@@ -71,6 +72,7 @@ function monsterSkill(spec: MonsterSpec, dmg: number): SkillDef {
     return {
       ...base,
       tags: ['attack', 'projectile'],
+      types: ['attack', 'projectile'],
       behaviour: { kind: 'projectile', count: 1, spread: 0, range: t.range + 2 },
     };
   if (t.attack === 'spell')

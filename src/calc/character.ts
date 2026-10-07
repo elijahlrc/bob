@@ -30,6 +30,7 @@ import { BASE_HEX_LIMIT, HEX_IDS, hexEffect, type HexId } from '../data/hexes';
 import type { TriggerDef } from '../data/triggers';
 import { itemBase, isWeaponClass } from '../data/bases';
 import { gemDef, type AuraGemDef, type GemDef, type SupportGemDef } from '../data/gems';
+import { resolveSupports, typesAllow } from '../data/skillTypes';
 import { getTree } from '../data/tree';
 import { KEYSTONES } from '../data/tree/keystones';
 import {
@@ -51,6 +52,7 @@ import {
   type StatId,
   maskAnd,
   maskOr,
+  SKILL_TAGS,
 } from '../mods/types';
 import { expectedAilments, expectedHit, NO_SHIFT, type Defence, type TargetState } from './combat';
 import { defenceFromDb } from './defence';
@@ -117,6 +119,8 @@ export type SkillChoice = {
   gemUid: number | null;
   skill: SkillDef;
   supports: SocketedGem[];
+  /** Skill tags the supports add (a totem support adds `totem`). */
+  addedTags: SkillTag[];
   costMult: number;
   usable: boolean;
   reason?: string;
@@ -240,8 +244,9 @@ export const SECONDARY_MIN_COOLDOWN = 3;
 const DUAL_TAGS: SkillTag[] = ['dualWield'];
 const SHIELD_TAGS: SkillTag[] = ['shield'];
 
+/** Whether a support's rules allow it to support the skill (before other supports add their types). */
 function supportApplies(s: SupportGemDef, skill: SkillDef): boolean {
-  return s.supports.length === 0 || s.supports.some((t) => skill.tags.includes(t));
+  return typesAllow(s, new Set(skill.types));
 }
 
 /**
@@ -470,8 +475,16 @@ export class Character {
       const skill = resolveActive(sg.def, sg.level);
       if (skill.behaviour.kind === 'melee' && skill.behaviour.range2h && weaponTags.has('twoHand'))
         skill.behaviour = { ...skill.behaviour, range: skill.behaviour.range2h };
-      const supports = this.gems.filter(
-        (o) => o.slot === sg.slot && o.def.kind === 'support' && supportApplies(o.def, skill),
+      // Supports can add types (a totem support makes the skill a totem), which change what the others may do.
+      const linked = this.gems.filter((o) => o.slot === sg.slot && o.def.kind === 'support');
+      const resolved = resolveSupports(
+        skill.types,
+        linked.map((o) => ({ ...(o.def as SupportGemDef), gem: o })),
+      );
+      const supports = resolved.applied.map((r) => r.gem);
+      const addedTags = [...resolved.types].filter(
+        (t): t is SkillTag =>
+          (SKILL_TAGS as readonly string[]).includes(t) && !skill.tags.includes(t as SkillTag),
       );
       let costMult = 1;
       for (const s of supports) costMult *= (s.def as SupportGemDef).costMult;
@@ -490,6 +503,7 @@ export class Character {
         gemUid: sg.gem.uid,
         skill,
         supports,
+        addedTags,
         costMult,
         usable,
         reason,
@@ -509,6 +523,7 @@ export class Character {
             : dflt.behaviour,
       },
       supports: [],
+      addedTags: [],
       costMult: 1,
       usable: true,
       costsLife: costLifeAll,
@@ -606,6 +621,7 @@ export class Character {
                   gemUid: null,
                   skill: resolveActive(gd, eff.level),
                   supports: [],
+                  addedTags: [],
                   costMult: 1,
                   usable: true,
                   costsLife: false,
@@ -728,7 +744,7 @@ export class Character {
       skill: choice.skill,
       db,
       hands: choice.skill.type === 'attack' ? this.hands : [],
-      extraTags: this.extraTags(),
+      extraTags: [...this.extraTags(), ...choice.addedTags],
       costMult: choice.costMult,
       conds: c,
       statValue: this.statValue,
