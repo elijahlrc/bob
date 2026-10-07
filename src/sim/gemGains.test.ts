@@ -22,13 +22,12 @@ function build(gems: string[], classId: string, main?: string): Build {
 
 describe('gem-granted gains in the sim', () => {
   it('Bulwark Strikes: a melee hit fortifies the character', () => {
-    const {
-      world: w,
-      dummy,
-      player,
-    } = createDummyWorld(build(['crushingBlow', 'bulwarkStrikes'], 'vanguard', 'mace2_3'), {
-      distance: 1.5,
-    });
+    const { world: w, dummy } = createDummyWorld(
+      build(['crushingBlow', 'bulwarkStrikes'], 'vanguard', 'mace2_3'),
+      {
+        distance: 1.5,
+      },
+    );
     const prof = w.char.profile(w.primary, playerConds(w, dummy), flaskMask(w));
     expect(w.buffT.fortify).toBe(0);
     const res = resolveHit(new Rng(1), prof, prof.hands[0], targetState(dummy), 1, false);
@@ -38,13 +37,12 @@ describe('gem-granted gains in the sim', () => {
   });
 
   it('Stagger Resolve: a melee stun grants a Grit charge', () => {
-    const {
-      world: w,
-      dummy,
-      player,
-    } = createDummyWorld(build(['crushingBlow', 'staggerResolve'], 'vanguard', 'mace2_3'), {
-      distance: 1.5,
-    });
+    const { world: w, dummy } = createDummyWorld(
+      build(['crushingBlow', 'staggerResolve'], 'vanguard', 'mace2_3'),
+      {
+        distance: 1.5,
+      },
+    );
     const prof = w.char.profile(w.primary, playerConds(w, dummy), flaskMask(w));
     const res = resolveHit(new Rng(2), prof, prof.hands[0], targetState(dummy), 1, false);
     res.outcome = 'hit';
