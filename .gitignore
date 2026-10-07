@@ -2,7 +2,7 @@
 node_modules
 dist
 dist-ssr
-coverage
+/coverage
 
 # Logs
 *.log
@@ -23,3 +23,6 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 *.sw?
+
+# Draft entries awaiting review (scripts/coverage/draft.ts)
+scripts/coverage/staging/

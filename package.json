@@ -19,7 +19,11 @@
     "sim": "tsx scripts/simulate.ts",
     "random": "tsx scripts/random-play.ts",
     "lethality": "tsx scripts/theme-lethality.ts",
-    "economy": "tsx scripts/currency-economy.ts"
+    "economy": "tsx scripts/currency-economy.ts",
+    "coverage": "tsx scripts/coverage/coverage.ts",
+    "coverage:fetch": "tsx scripts/coverage/fetch-reference.ts",
+    "coverage:pob": "tsx scripts/coverage/pob-extract.ts",
+    "coverage:draft": "tsx scripts/coverage/draft.ts"
   },
   "dependencies": {
     "@preact/signals": "^2.11.3",

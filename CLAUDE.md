@@ -3,9 +3,14 @@
 - The design spec is [docs/DESIGN.md](docs/DESIGN.md), and it is authoritative. Progress is tracked in
   `docs/PROGRESS.md`. Record any decision the spec doesn't cover in DESIGN.md Appendix A.
 - **IP policy (DESIGN.md §3):**
-  - Never copy or translate code or data from Path of Building, GGG exports, the PoE wiki or game files.
-  - Every player-visible name in `src/` is our own.
-  - No PoE art or audio.
+  - Never copy or translate **code** from Path of Building or any other project.
+  - The PoE wiki and Path of Building **data** may be consulted, and scripts may draft entries from them (revised
+    with the user on 2026-10-07). Reference data lives in `docs/coverage/` and `scripts/coverage/`, never in `src/`.
+  - Every player-visible name and text in `src/` is our own; `src/data/ip.test.ts` checks them against the reference
+    list. No PoE art or audio.
+- **Coverage plan:** [docs/COVERAGE.md](docs/COVERAGE.md) (milestones C0–C7) is under way. `npm run coverage` prints
+  where it stands, and `docs/coverage/README.md` describes the data and tools. Every new droppable gem or unique needs
+  a line in `docs/coverage/map.json`.
 - **Architecture boundaries (§14.2):**
   - `core`, `data`, `mods`, `calc`, `gen`, `sim` and `run` are headless: no Phaser, Preact or DOM.
   - No `Math.random`, `Date.now` or `performance.now` outside `render` and `ui`.

@@ -1,6 +1,6 @@
 # Bob — Coverage Plan: the gems and uniques of patch 3.9.0
 
-Status: **draft for review, 2026-10-07** · Owner: the user · Implementer: Claude
+Status: **approved 2026-10-07; C0 done 2026-10-07** · Owner: the user · Implementer: Claude
 
 This plan extends [DESIGN.md](DESIGN.md) and [EXPANSION.md](EXPANSION.md). Its goal is to give Bob an analog of **at
 least 90% of the skill gems and 90% of the unique items** that existed in PoE 1 patch 3.9.0. Milestones are
@@ -18,8 +18,8 @@ Conventions follow DESIGN.md:
 
 - **Where we are.** Bob has 38 droppable gems and 69 uniques. Against 3.9.0 that is roughly **11% of gems** and **5%
   of uniques** (39 uniques are documented analogs; the other 30 predate the analog rule). C0 measures this exactly.
-- **What 90% forces.** It is not reachable by skipping whole systems. The gem target allows about 35 misses, and
-  minions alone account for 37 gems. So every missing skill system is in scope:
+- **What 90% forces.** It is not reachable by skipping whole systems. The gem target allows 34 misses, and minions
+  alone account for 31 gems (C0's bucket count). So every missing skill system is in scope:
   - minions;
   - totems, traps, mines and brands;
   - channelling;
@@ -46,15 +46,15 @@ Conventions follow DESIGN.md:
 
 ### 1.1 Taken with the user (2026-10-07)
 
-| #   | Topic              | Decision                                                                                                                                  |
-| --- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| C-1 | Version            | PoE 1 **3.9.0**. Mechanics are brought in line with it (C1), except for the deliberate divergences in DESIGN 2.1.                         |
-| C-2 | Sources            | The wiki and Path of Building **data** may be consulted, and scripts may draft from them. No code is copied (DESIGN §3, revised).         |
-| C-3 | Names              | Every new gem and unique gets **our own name**. `ip.test` stays and grows (section 7.4).                                                  |
-| C-4 | Data method        | **Script-assisted drafts**, then hand review of every entry.                                                                              |
-| C-5 | Gem denominator    | **349 gems**: 219 active and 130 support. Vaal (34), Awakened (35) and Portal are excluded.                                               |
-| C-6 | Unique denominator | **797 uniques**: equippable uniques and unique flasks in 3.9.0. Jewels (141), maps, fragments, watchstones and fishing rods are excluded. |
-| C-7 | Scope              | Minions, totems, traps, mines and brands come in, reversing DESIGN D6. Jewels, ascendancies and influence stay out.                       |
+| #   | Topic              | Decision                                                                                                                                                                                                                                                                                       |
+| --- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C-1 | Version            | PoE 1 **3.9.0**. Mechanics are brought in line with it (C1), except for the deliberate divergences in DESIGN 2.1.                                                                                                                                                                              |
+| C-2 | Sources            | The wiki and Path of Building **data** may be consulted, and scripts may draft from them. No code is copied (DESIGN §3, revised).                                                                                                                                                              |
+| C-3 | Names              | Every new gem and unique gets **our own name**. `ip.test` stays and grows (section 7.4).                                                                                                                                                                                                       |
+| C-4 | Data method        | **Script-assisted drafts**, then hand review of every entry.                                                                                                                                                                                                                                   |
+| C-5 | Gem denominator    | **349 gems**: 219 active and 130 support. Vaal (34), Awakened (35) and Portal are excluded.                                                                                                                                                                                                    |
+| C-6 | Unique denominator | **782 uniques**: equippable uniques and unique flasks in 3.9.0 (the first draft said 797). Jewels, maps, fragments, watchstones and fishing rods are excluded, and so are 15 wiki entries marked "not in game" (cut or never-obtainable placeholders such as Tear of Entropy). C0 measured it. |
+| C-7 | Scope              | Minions, totems, traps, mines and brands come in, reversing DESIGN D6. Jewels, ascendancies and influence stay out.                                                                                                                                                                            |
 
 ### 1.2 Still open (defaults in effect until answered)
 
@@ -62,8 +62,9 @@ Conventions follow DESIGN.md:
    mechanic doesn't.
 2. **Missing weapon classes** (rune dagger, thrusting sword, warstaff: 35 uniques). _Default:_ add them as new bases
    within the existing dagger, sword and staff classes.
-3. **Who chooses a skill's role** (primary, rotation, buff, utility). _Default:_ the AI assigns roles by gem type.
-   The player keeps the primary pick and can switch any skill off (section 5.1).
+3. **Who chooses a skill's role** (primary, rotation, buff, utility). _Decided with the user 2026-10-07:_ the AI
+   assigns roles by gem type; the player keeps the primary pick and can switch any skill off (section 5.1).
+   Optional per-skill player control (when a skill fires) is wanted eventually, after the coverage plan.
 4. **Abyssal-socket lines on uniques.** _Default:_ drop those lines and keep the rest of the item; it still counts if
    the defining mechanic survives.
 5. **Gem levels beyond 20.** 3.9 gems run to level 20, and Bob's auto-level to the character's level.
@@ -99,10 +100,10 @@ excluded`, note). It can't live in `src/data`, because the IP scan forbids refer
 | -------------------------- | --------------- | ------------------------------------------------ | ------------------ |
 | Active gems                | 219             | 7 actives, 7 auras, 4 hexes, plus 1 item-granted | ~18 → ~8%          |
 | Support gems               | 130             | 20                                               | ~20 → ~15%         |
-| Uniques (excluding flasks) | 771             | 63                                               | ~33 → ~4%          |
+| Uniques (excluding flasks) | 756             | 63                                               | ~32 → ~4%          |
 | Unique flasks              | 26              | 6                                                | ~6 → ~23%          |
 | **All gems**               | **349**         |                                                  | **~11%**           |
-| **All uniques**            | **797**         |                                                  | **~5%**            |
+| **All uniques**            | **782**         |                                                  | **~5%**            |
 
 Today's skill shapes are melee, projectile, chain and burst. Skill tags use 31 of a 32-bit mask.
 
@@ -115,18 +116,22 @@ with per-entry tagging.
 
 | System                          | Active gems | Support gems | Uniques | Milestone |
 | ------------------------------- | ----------- | ------------ | ------- | --------- |
-| No new system ("plain")         | 82          | 79           | 398     | C3        |
-| Damage over time and ailments   | 2           | 9            | 102     | C3        |
-| Charges and flasks              | 1           | 2            | 89      | C3        |
-| Triggers (exist since X4)       | —           | 11           | 53      | C3        |
-| Channelling                     | 17          | 2            | 3       | C3        |
-| Auras, heralds and guards       | 29          | 1            | 22      | C4        |
-| Curses and marks                | 14          | 2            | 40      | C4        |
-| Movement                        | 11          | —            | 5       | C4        |
-| Warcries and banners            | 5           | —            | 9       | C4        |
-| Totems, traps, mines and brands | 30          | 15           | 18      | C5        |
-| Minions                         | 28          | 9            | 58      | C6        |
-| **Total**                       | **219**     | **130**      | **797** |           |
+| No new system ("plain")         | 81          | 85           | 346     | C3        |
+| Damage over time and ailments   | 8           | 15           | 126     | C3        |
+| Charges and flasks              | 0           | 4            | 89      | C3        |
+| Triggers (exist since X4)       | 0           | 6            | 74      | C3        |
+| Channelling                     | 11          | 1            | 1       | C3        |
+| Auras, heralds, guards, buffs   | 33          | 0            | 32      | C4        |
+| Curses and marks                | 14          | 2            | 33      | C4        |
+| Movement                        | 15          | 0            | 5       | C4        |
+| Warcries and banners            | 5           | 0            | 6       | C4        |
+| Totems, traps, mines and brands | 30          | 8            | 18      | C5        |
+| Minions                         | 22          | 9            | 52      | C6        |
+| **Total**                       | **219**     | **130**      | **782** |           |
+
+_C0 replaced the rough keyword pass with `scripts/coverage/buckets.ts` (still keyword rules over wiki tags and mod
+text; per-entry fixes go in `docs/coverage/bucket-overrides.json`). `npm run coverage` prints the live version of
+this table._
 
 **Plain is not free.** Most plain active gems need a skill shape Bob lacks. By wiki tag they split into: area
 76, bow 21, projectile 24, strike 18, melee 14, slam 10, nova 8, orb 4, chaining 4, other 41. C2 adds the missing
@@ -134,9 +139,10 @@ shapes.
 
 **The forcing math:**
 
-- 90% of 349 gems allows **35 misses**, but minions alone are 37 gems.
-- 90% of 797 uniques allows **79 misses**. That one is reachable without minions, totems or traps (C4 ends at about
-  90.5%), but the gems are not.
+- 90% of 349 gems allows **34 misses**, but minions alone are 31 gems. Skipping the whole bucket leaves room for
+  only 3 other misses, and about 10% of the rest is expected to be hard, so in practice minions are in scope.
+- 90% of 782 uniques allows **78 misses**. That one is reachable without minions, totems or traps (C4 ends at about
+  91%), but the gems are not.
 
 ---
 
@@ -163,6 +169,8 @@ later.
 | Offering          | (Bone Offering, Flesh Offering)             | When minions are out and a corpse is near.                                                                  |
 
 - The AI assigns roles from gem types, and the player can switch any skill off.
+- **Later (after C7):** optional player control over when each skill fires (thresholds, "bosses only"). Policies
+  take their thresholds as parameters from the start, so this is a UI addition, not an engine change.
 - The bot's build scorer counts time spent on non-damage skills as a cost to the primary's DPS, the way
   `secondaryLoad` does today.
 
@@ -307,9 +315,9 @@ Actual coverage will run a little lower, since about 10% of entries are expected
 | **C0** Reference and measurement       | Fetch script, `reference-3.9.0.json`, `map.json`, `npm run coverage`, IP deny-list, refs for the existing 38 gems and 69 uniques, per-entry tagging, draft script, the 3.9-era Path of Building data located | ~11%                                   | ~5%                |
 | **C1** Mechanics audit                 | `AUDIT-3.9.md`, fixes with tests, divergences recorded, convergence retuned                                                                                                                                  | ~11%                                   | ~5%                |
 | **C2** Engine foundations              | Tag widening, skill types and support compatibility, new skill shapes, gem level tables, bot pruning, new weapon bases                                                                                       | ~11%                                   | ~5%                |
-| **C3** Core content (about 16 batches) | Plain, damage-over-time, charge, trigger and channelling gems (205), and the uniques in those buckets (645)                                                                                                  | ~59%                                   | ~81%               |
-| **C4** Many skills                     | Roles and use policies (5.1), then the auras, heralds, guards, curses, marks, movement, warcry and banner gems (62) and uniques (76)                                                                         | ~77%                                   | **~90%**           |
-| **C5** Deployables                     | Allied entity model; totems, traps, mines and brands (45 gems, 18 uniques)                                                                                                                                   | ~89%                                   | ~93%               |
+| **C3** Core content (about 16 batches) | Plain, damage-over-time, charge, trigger and channelling gems (211), and the uniques in those buckets (636)                                                                                                  | ~64%                                   | ~82%               |
+| **C4** Many skills                     | Roles and use policies (5.1), then the auras, heralds, guards, curses, marks, movement, warcry and banner gems (62) and uniques (76)                                                                         | ~80%                                   | **~91%**           |
+| **C5** Deployables                     | Allied entity model; totems, traps, mines and brands (45 gems, 18 uniques)                                                                                                                                   | ~91%                                   | ~93%               |
 | **C6** Minions                         | Minion AI, spectres from Bob's factions, golems, corpse skills (37 gems, 58 uniques)                                                                                                                         | **~100%** before skips; 90% target met | ~100% before skips |
 | **C7** Integration                     | Balance back into the 25–50% win band, drop and reward tuning, UI for browsing, a codex                                                                                                                      | —                                      | —                  |
 
@@ -349,11 +357,10 @@ Each milestone bumps `SAVE_VERSION` when `RunState` or the data changes, and log
 
 ---
 
-## 11. Next step
+## 11. Status
 
-Review this plan. Once it is approved, C0 starts. The reference list was already fetched once while writing this plan:
-
-- 349 gems in scope, from 419 at 3.9;
-- 797 uniques in scope, from 991 uniques at 3.9 (938 equippable including jewels).
-
-C0 turns that fetch into a committed, re-runnable script.
+- **C0 done (2026-10-07).** The reference list is a committed, re-runnable fetch (`npm run coverage:fetch`):
+  - 349 gems in scope (219 active, 130 support), from 419 at 3.9;
+  - 782 uniques in scope (the first fetch said 797; the 15 difference is wiki entries marked "not in game").
+- Tooling and data are described in [coverage/README.md](coverage/README.md).
+- **Next:** C1, the mechanics audit (`docs/AUDIT-3.9.md`).

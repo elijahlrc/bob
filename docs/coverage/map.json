@@ -1,0 +1,541 @@
+{
+  "gems": {
+    "crushingBlow": {
+      "ref": "Heavy Strike",
+      "status": "covered",
+      "note": "single heavy strike that stuns"
+    },
+    "reapingArc": {
+      "ref": "Cleave",
+      "status": "covered",
+      "note": "arc melee that hits with both weapons"
+    },
+    "splitVolley": {
+      "ref": "Split Arrow",
+      "status": "covered",
+      "note": "fan of arrows"
+    },
+    "venomCut": {
+      "ref": "Viper Strike",
+      "status": "covered",
+      "note": "poisoning strike"
+    },
+    "flameBolt": {
+      "ref": "Fireball",
+      "status": "covered",
+      "note": "fire projectile that explodes and can ignite"
+    },
+    "arcChain": {
+      "ref": "Arc",
+      "status": "covered",
+      "note": "chaining lightning"
+    },
+    "frostLance": {
+      "ref": "Ice Spear",
+      "status": "covered",
+      "note": "piercing cold projectile"
+    },
+    "bruteForce": {
+      "ref": "Melee Physical Damage Support",
+      "status": "covered",
+      "note": "more melee physical damage"
+    },
+    "swiftAssault": {
+      "ref": "Faster Attacks Support",
+      "status": "covered",
+      "note": "attack speed"
+    },
+    "quickCast": {
+      "ref": "Faster Casting Support",
+      "status": "covered",
+      "note": "cast speed"
+    },
+    "emberInfusion": {
+      "ref": "Cold to Fire Support",
+      "status": "partial",
+      "note": "gain-as-extra fire; the nearest reference converts instead"
+    },
+    "channelledElements": {
+      "ref": "Elemental Focus Support",
+      "status": "covered",
+      "note": "more elemental damage, no ailments"
+    },
+    "focusedRuin": {
+      "ref": "Controlled Destruction Support",
+      "status": "covered",
+      "note": "more spell damage, no spell crits"
+    },
+    "echoingCast": {
+      "ref": "Spell Echo Support",
+      "status": "covered",
+      "note": "repeats the spell"
+    },
+    "volleySplit": {
+      "ref": "Greater Multiple Projectiles Support",
+      "status": "covered",
+      "note": "two extra projectiles, less damage"
+    },
+    "piercingShot": {
+      "ref": "Pierce Support",
+      "status": "covered",
+      "note": "projectiles pierce"
+    },
+    "denseBlast": {
+      "ref": "Concentrated Effect Support",
+      "status": "covered",
+      "note": "smaller area, more damage"
+    },
+    "wideBlast": {
+      "ref": "Increased Area of Effect Support",
+      "status": "covered",
+      "note": "larger area"
+    },
+    "precisionStrikes": {
+      "ref": "Increased Critical Strikes Support",
+      "status": "covered",
+      "note": "critical strike chance"
+    },
+    "rendingEdge": {
+      "ref": "Chance to Bleed Support",
+      "status": "covered",
+      "note": "bleed chance and bleed damage"
+    },
+    "toxinCoat": {
+      "ref": "Chance to Poison Support",
+      "status": "covered",
+      "note": "poison chance"
+    },
+    "kindle": {
+      "ref": "Immolate Support",
+      "status": "partial",
+      "note": "chance to ignite plus ignite damage; no exact 3.9 match"
+    },
+    "bloodthirst": {
+      "ref": "Life Leech Support",
+      "status": "covered",
+      "note": "attack leech"
+    },
+    "staggeringForce": {
+      "ref": "Stun Support",
+      "status": "covered",
+      "note": "stun duration and threshold"
+    },
+    "criticalRelay": {
+      "ref": "Cast On Critical Strike Support",
+      "status": "covered",
+      "note": "trigger on crit"
+    },
+    "woundedRetort": {
+      "ref": "Cast when Damage Taken Support",
+      "status": "covered",
+      "note": "trigger on damage taken"
+    },
+    "hexingStrikes": {
+      "ref": "Hextouch Support",
+      "status": "covered",
+      "note": "hexes on hit"
+    },
+    "kindlingHalo": {
+      "ref": "Anger",
+      "status": "covered",
+      "note": "added fire damage aura"
+    },
+    "stormHalo": {
+      "ref": "Wrath",
+      "status": "covered",
+      "note": "added lightning damage aura"
+    },
+    "frostHalo": {
+      "ref": "Hatred",
+      "status": "covered",
+      "note": "physical as extra cold aura"
+    },
+    "veilOfGrace": {
+      "ref": "Grace",
+      "status": "covered",
+      "note": "evasion aura"
+    },
+    "ironBastion": {
+      "ref": "Determination",
+      "status": "covered",
+      "note": "armour aura"
+    },
+    "arcaneWard": {
+      "ref": "Discipline",
+      "status": "covered",
+      "note": "energy shield aura"
+    },
+    "clearMind": {
+      "ref": "Clarity",
+      "status": "covered",
+      "note": "mana regeneration aura"
+    },
+    "brittleDoom": {
+      "ref": "Elemental Weakness",
+      "status": "covered",
+      "note": "applied by Hexing Strikes, not cast directly (C4 adds casting)"
+    },
+    "leadenLimbs": {
+      "ref": "Temporal Chains",
+      "status": "covered",
+      "note": "applied by Hexing Strikes"
+    },
+    "feebleGrip": {
+      "ref": "Enfeeble",
+      "status": "covered",
+      "note": "applied by Hexing Strikes"
+    },
+    "openWounds": {
+      "ref": "Vulnerability",
+      "status": "covered",
+      "note": "applied by Hexing Strikes"
+    }
+  },
+  "uniques": {
+    "walledHeart": {
+      "ref": "Kaom's Heart",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "gravediggersSmock": {
+      "ref": "Tabula Rasa",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "embalmersWraps": {
+      "ref": "Shavronne's Wrappings",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "thunderwireHauberk": {
+      "ref": "Lightning Coil",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "steadfastCassock": {
+      "ref": "Cloak of Defiance",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "spellswornCirclet": {
+      "ref": "Crown of Eyes",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "bareVisor": {
+      "ref": "Abyssus",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "cantorsHood": {
+      "ref": "Alpha's Howl",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "knuckleboneBindings": {
+      "ref": "Facebreaker",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "rimeclaspGloves": {
+      "ref": "Hrimsorrow",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "bloodquickGauntlets": {
+      "ref": "Atziri's Acuity",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "meteoriteEdge": {
+      "ref": "Starforge",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "unblinkingLongbow": {
+      "ref": "Lioneye's Glare",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "thousandRibs": {
+      "ref": "Reach of the Council",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "ashenHeartstone": {
+      "ref": "Xoph's Blood",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "orreryOfBone": {
+      "ref": "Astramentis",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "rotheartBand": {
+      "ref": "Ming's Heart",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "wideCinch": {
+      "ref": "Ryslatha's Coil",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "hoarfrostDraught": {
+      "ref": "Taste of Hate",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "lastLightFlask": {
+      "ref": "Dying Sun",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "rotwineFlask": {
+      "ref": "Atziri's Promise",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "stonebrewFlask": {
+      "ref": "Rumi's Concoction",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "gamblersTonic": {
+      "ref": "Divination Distillate",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "thunderknell": {
+      "ref": "Mjölner",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "frostwrit": {
+      "ref": "Cospri's Malice",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "gravescribe": {
+      "ref": "The Poet's Pen",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "cinderfallAxe": {
+      "ref": "Ngamahu's Flame",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "stormsplitJerkin": {
+      "ref": "Inpulsa's Broken Heart",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "kindredSparks": {
+      "ref": "Berek's Respite",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "twinPyreBand": {
+      "ref": "Emberwake",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "lanternBulwark": {
+      "ref": "Aegis Aurora",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "bloodglassWard": {
+      "ref": "Prism Guardian",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "martyrsDraught": {
+      "ref": "Coruscating Elixir",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "pickpocketsLament": {
+      "ref": "Thief's Torment",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "lullabySilks": {
+      "ref": "Asenath's Gentle Touch",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "twiceHexedRing": {
+      "ref": "Doedre's Damning",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "bandOfEndlessGrit": {
+      "ref": "Kaom's Way",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "ferventStride": {
+      "ref": "",
+      "status": "excluded",
+      "note": "analog \"the common \"+1 maximum charges\" pattern\" is not in the 3.9 reference list"
+    },
+    "trophyCord": {
+      "ref": "Headhunter",
+      "status": "covered",
+      "note": "documented analog (EXPANSION 6.4)"
+    },
+    "hollowCrown": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "gravemarrow": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "coldheart": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "rattleBow": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "emberWrap": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "ironroot": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "bloodknot": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "stormcall": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "wanderersSash": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "thornshield": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "gravehammer": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "stillstone": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "oakenGrudge": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "firstSplinter": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "cinderReed": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "duellistsDue": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "sunspokeRelic": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "viperTongue": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "lanternOfTheLost": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "marrowLoop": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "quietStep": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "pyreMantle": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "colossusKnuckles": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "sigilOfTheArchive": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "woundWeaver": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "skylineHorn": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "deathlessVigil": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "stormglassCirclet": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "kingsTithe": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "lastBreath": {
+      "ref": "",
+      "status": "excluded",
+      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    }
+  }
+}

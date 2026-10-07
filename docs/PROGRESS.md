@@ -443,3 +443,21 @@ revert if they would rather not.
 - Small check (4 runs x 6 classes, seed 11): nobody dies before map 36, so the default attack carries maps 1–4; wins were 2/24
   (the previous check had 5/24; at this sample size the difference is within noise, but the win rate stays below the 25–50% band,
   see the X9 note).
+
+### C0 done: reference and measurement (2026-10-07)
+
+- **Reference list** (`npm run coverage:fetch`, wiki Cargo API): 349 gems (219 active, 130 support) as planned, and **782
+  uniques** (the plan's 797 counted 15 wiki entries marked "not in game"; C-6 corrected). Provenance and filters are in
+  `docs/coverage/README.md`.
+- **3.9-era numbers:** Path of Building v1.4.155 (commit e3719726d7, the day after 3.9.0 launched) is extracted to
+  `docs/coverage/pob-skills.json` (418 gems, level 1 and 20 values) and `pob-uniques.json` (749 uniques with variants).
+- **Measurement:** `npm run coverage` and `docs/coverage/map.json` (every Bob gem and unique mapped; 2 gems are partial
+  analogs). `scripts/coverage/coverage.test.ts` checks the map.
+- **IP test** now denies every reference gem and unique name, and the 3.9-era names, as an exact `name`
+  (`src/data/ip.test.ts`). No existing Bob name collides.
+- **Draft tool:** `npm run coverage:draft -- gem|unique "Name"` writes a hand-review draft to
+  `scripts/coverage/staging/` (git-ignored).
+- **Fixed on the way:** `.gitignore` had a bare `coverage` that would have ignored `docs/coverage` and `scripts/coverage`;
+  CLAUDE.md's IP bullet still said "never consult wiki or PoB data".
+- **Coverage now: gems 36/349 (10.3%), uniques 38/782 (4.9%).** Potential if every bucket of a milestone is covered:
+  C3 64% / 82%, C4 80% / 91%, C5 91% / 93%.
