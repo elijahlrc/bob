@@ -1,0 +1,67 @@
+[
+  { "ref": "Added Chaos Damage Support", "note": "Adds chaos damage to every hit of the supported skill, scaling with gem level.",
+    "def": { "kind": "support", "id": "venomSeed", "name": "Venom Seed", "attr": "int", "supports": [], "costMult": 1.3, "mods": [
+      { "stat": "damage.min", "kind": "base", "value": [2, 137], "damageTypes": ["chaos"] },
+      { "stat": "damage.max", "kind": "base", "value": [4, 205], "damageTypes": ["chaos"] } ],
+      "description": "Adds chaos damage to the hits of the supported skill." } },
+  { "ref": "Added Cold Damage Support", "note": "Adds cold damage to every hit of the supported skill, scaling with gem level.",
+    "def": { "kind": "support", "id": "rimeSeed", "name": "Rime Seed", "attr": "dex", "supports": [], "costMult": 1.3, "mods": [
+      { "stat": "damage.min", "kind": "base", "value": [2, 150], "damageTypes": ["cold"] },
+      { "stat": "damage.max", "kind": "base", "value": [4, 225], "damageTypes": ["cold"] } ],
+      "description": "Adds cold damage to the hits of the supported skill." } },
+  { "ref": "Added Lightning Damage Support", "note": "Adds a wide spread of lightning damage to every hit of the supported skill.",
+    "def": { "kind": "support", "id": "sparkSeed", "name": "Spark Seed", "attr": "int", "supports": [], "costMult": 1.3, "mods": [
+      { "stat": "damage.min", "kind": "base", "value": [1, 20], "damageTypes": ["lightning"] },
+      { "stat": "damage.max", "kind": "base", "value": [8, 400], "damageTypes": ["lightning"] } ],
+      "description": "Adds a wide spread of lightning damage to the hits of the supported skill." } },
+  { "ref": "Additional Accuracy Support", "note": "Adds flat accuracy rating to the supported attack.",
+    "def": { "kind": "support", "id": "keenEye", "name": "Keen Eye", "attr": "dex", "supports": ["attack"], "costMult": 1.1, "mods": [
+      { "stat": "accuracy", "kind": "base", "value": [20, 300] } ],
+      "description": "Adds accuracy rating to the supported attack." } },
+  { "ref": "Bloodlust Support", "note": "More melee physical damage against bleeding enemies, and the skill can no longer cause bleeding.",
+    "def": { "kind": "support", "id": "rendingThirst", "name": "Rending Thirst", "attr": "str", "supports": ["melee"], "costMult": 1.25, "mods": [
+      { "stat": "damage", "kind": "more", "value": [40, 59], "damageTypes": ["physical"], "tags": ["melee"], "condition": { "id": "targetBleeding" } },
+      { "stat": "chance.bleed", "kind": "base", "value": -1000 } ],
+      "description": "More melee physical damage against bleeding enemies, but the skill cannot cause bleeding." } },
+  { "ref": "Bonechill Support", "note": "Increases the effect of the chill the supported skill inflicts.",
+    "def": { "kind": "support", "id": "deepChill", "name": "Deep Chill", "attr": "int", "supports": ["cold"], "costMult": 1.2, "mods": [
+      { "stat": "effect.chill", "kind": "inc", "value": [25, 44] } ],
+      "description": "Increases the effect of the chill of cold skills." } },
+  { "ref": "Brutality Support", "note": "A large more multiplier to physical damage, at the price of every other damage type.",
+    "def": { "kind": "support", "id": "bluntIntent", "name": "Blunt Intent", "attr": "str", "supports": [], "costMult": 1.3, "mods": [
+      { "stat": "damage", "kind": "more", "value": [40, 59], "damageTypes": ["physical"] },
+      { "stat": "noElementalDamage", "kind": "flag", "value": 1 },
+      { "stat": "noChaosDamage", "kind": "flag", "value": 1 } ],
+      "description": "More physical damage, but the skill deals no elemental or chaos damage." } },
+  { "ref": "Burning Damage Support", "note": "More burning (ignite) damage.",
+    "def": { "kind": "support", "id": "fannedFlame", "name": "Fanned Flame", "attr": "str", "supports": [], "costMult": 1.2, "mods": [
+      { "stat": "damage", "kind": "more", "value": [35, 54], "tags": ["ignite"] } ],
+      "description": "More damage from ignites." } },
+  { "ref": "Chain Support", "note": "The supported projectile chains twice, at reduced damage.",
+    "def": { "kind": "support", "id": "ricochet", "name": "Ricochet", "attr": "dex", "supports": ["projectile", "chaining"], "excludes": ["channelling"], "costMult": 1.5, "mods": [
+      { "stat": "chains", "kind": "base", "value": 2 },
+      { "stat": "damage", "kind": "more", "value": [-30, -11] } ],
+      "description": "Projectiles chain two additional times, at reduced damage." } },
+  { "ref": "Cold Penetration Support", "note": "The supported skill's hits penetrate cold resistance.",
+    "def": { "kind": "support", "id": "frostbreaker", "name": "Frostbreaker", "attr": "dex", "supports": [], "costMult": 1.4, "mods": [
+      { "stat": "penetration", "kind": "base", "value": [18, 37], "damageTypes": ["cold"] } ],
+      "description": "Hits penetrate enemy cold resistance." } },
+  { "ref": "Combustion Support", "note": "A chance to ignite, and more fire damage.",
+    "def": { "kind": "support", "id": "tinderbox", "name": "Tinderbox", "attr": "int", "supports": [], "costMult": 1.2, "mods": [
+      { "stat": "chance.ignite", "kind": "base", "value": [30, 49] },
+      { "stat": "damage", "kind": "more", "value": [10, 29], "damageTypes": ["fire"] } ],
+      "description": "A chance to ignite and more fire damage." } },
+  { "ref": "Culling Strike Support", "note": "Hits kill enemies left at 10% life or less.",
+    "def": { "kind": "support", "id": "mercyStroke", "name": "Mercy Stroke", "attr": "dex", "supports": [], "costMult": 1.1, "mods": [
+      { "stat": "cullingStrike", "kind": "flag", "value": 1 },
+      { "stat": "damage", "kind": "inc", "value": [0, 38] } ],
+      "description": "Hits kill enemies left at 10% life or less, with a little more damage at higher levels." } },
+  { "ref": "Damage on Full Life Support", "note": "More damage while the character is on full life.",
+    "def": { "kind": "support", "id": "freshVigour", "name": "Fresh Vigour", "attr": "str", "supports": ["attack"], "costMult": 1.3, "mods": [
+      { "stat": "damage", "kind": "more", "value": [30, 49], "condition": { "id": "onFullLife" } } ],
+      "description": "More damage while you are on full life." } },
+  { "ref": "Close Combat Support", "note": "More melee damage against nearby enemies (the buff on kill is dropped).",
+    "def": { "kind": "support", "id": "knifeRange", "name": "Knife Range", "attr": "dex", "supports": ["melee"], "costMult": 1.4, "mods": [
+      { "stat": "damage", "kind": "more", "value": [40, 59], "tags": ["melee"], "condition": { "id": "targetNearby" } } ],
+      "description": "More melee damage against nearby enemies." } }
+]

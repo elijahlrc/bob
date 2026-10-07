@@ -2,6 +2,7 @@ import type { DamageType, Mod, SkillTag } from '../mods/types';
 import type { TriggerDef } from './triggers';
 import type { HexId } from './hexes';
 import type { SkillType } from './skillTypes';
+import { GEN_ACTIVE_GEMS, GEN_SUPPORT_GEMS } from './gemsGen';
 
 /** A value authored at gem level 1 and level 20 (DESIGN.md §11.5). */
 export type LevelValue = number | readonly [number, number];
@@ -631,6 +632,10 @@ export const GRANTED_GEMS: ActiveGemDef[] = [
     description: 'A nova of flame around the target.',
   },
 ];
+
+// The coverage plan's gems (docs/coverage/gems, generated).
+ACTIVE_GEMS.push(...GEN_ACTIVE_GEMS);
+SUPPORT_GEMS.push(...GEN_SUPPORT_GEMS);
 
 /** Every gem that can drop. */
 export const ALL_GEMS: GemDef[] = [

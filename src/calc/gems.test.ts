@@ -25,9 +25,9 @@ function buildWith(
 }
 
 describe('gems (§11.5)', () => {
-  it('has 7 actives, 19 supports (17, plus the two trigger supports) and 7 auras', () => {
-    expect(ACTIVE_GEMS).toHaveLength(7);
-    expect(SUPPORT_GEMS).toHaveLength(19);
+  it('has the first 7 actives, 19 supports and 7 auras, and the coverage plan adds more (generated)', () => {
+    expect(ACTIVE_GEMS.length).toBeGreaterThanOrEqual(7);
+    expect(SUPPORT_GEMS.length).toBeGreaterThanOrEqual(19);
     expect(AURA_GEMS).toHaveLength(7);
   });
 

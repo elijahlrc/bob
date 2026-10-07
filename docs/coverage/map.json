@@ -51,9 +51,9 @@
    "note": "cast speed"
   },
   "emberInfusion": {
-   "ref": "Cold to Fire Support",
-   "status": "partial",
-   "note": "gain-as-extra fire; the nearest reference converts instead"
+   "ref": "Added Fire Damage Support",
+   "status": "covered",
+   "note": "gain physical damage as extra fire damage (the reference gem does the same)"
   },
   "channelledElements": {
    "ref": "Elemental Focus Support",
@@ -189,6 +189,76 @@
    "ref": "Vulnerability",
    "status": "covered",
    "note": "applied by Hexing Strikes"
+  },
+  "venomSeed": {
+   "ref": "Added Chaos Damage Support",
+   "status": "covered",
+   "note": "Adds chaos damage to every hit of the supported skill, scaling with gem level."
+  },
+  "rimeSeed": {
+   "ref": "Added Cold Damage Support",
+   "status": "covered",
+   "note": "Adds cold damage to every hit of the supported skill, scaling with gem level."
+  },
+  "sparkSeed": {
+   "ref": "Added Lightning Damage Support",
+   "status": "covered",
+   "note": "Adds a wide spread of lightning damage to every hit of the supported skill."
+  },
+  "keenEye": {
+   "ref": "Additional Accuracy Support",
+   "status": "covered",
+   "note": "Adds flat accuracy rating to the supported attack."
+  },
+  "rendingThirst": {
+   "ref": "Bloodlust Support",
+   "status": "covered",
+   "note": "More melee physical damage against bleeding enemies, and the skill can no longer cause bleeding."
+  },
+  "deepChill": {
+   "ref": "Bonechill Support",
+   "status": "covered",
+   "note": "Increases the effect of the chill the supported skill inflicts."
+  },
+  "bluntIntent": {
+   "ref": "Brutality Support",
+   "status": "covered",
+   "note": "A large more multiplier to physical damage, at the price of every other damage type."
+  },
+  "fannedFlame": {
+   "ref": "Burning Damage Support",
+   "status": "covered",
+   "note": "More burning (ignite) damage."
+  },
+  "ricochet": {
+   "ref": "Chain Support",
+   "status": "covered",
+   "note": "The supported projectile chains twice, at reduced damage."
+  },
+  "frostbreaker": {
+   "ref": "Cold Penetration Support",
+   "status": "covered",
+   "note": "The supported skill's hits penetrate cold resistance."
+  },
+  "tinderbox": {
+   "ref": "Combustion Support",
+   "status": "covered",
+   "note": "A chance to ignite, and more fire damage."
+  },
+  "mercyStroke": {
+   "ref": "Culling Strike Support",
+   "status": "covered",
+   "note": "Hits kill enemies left at 10% life or less."
+  },
+  "freshVigour": {
+   "ref": "Damage on Full Life Support",
+   "status": "covered",
+   "note": "More damage while the character is on full life."
+  },
+  "knifeRange": {
+   "ref": "Close Combat Support",
+   "status": "covered",
+   "note": "More melee damage against nearby enemies (the buff on kill is dropped)."
   }
  },
  "uniques": {

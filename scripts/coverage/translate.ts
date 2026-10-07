@@ -241,6 +241,39 @@ function main(): void {
     }
     return;
   }
+  if (args[0] === '--cheap') {
+    // The open lines of the undecided uniques that have at most N of them: the cheapest mechanics to add.
+    const maxOpen = Number(args[1] ?? 2);
+    const decided = new Set<string>();
+    for (const f of readdirSync(resolve(COVERAGE_DIR, 'uniques')).filter((x) =>
+      x.endsWith('.json'),
+    ))
+      for (const d of JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'uniques', f), 'utf8')) as {
+        ref: string;
+      }[])
+        decided.add(key(d.ref));
+    const map = JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'map.json'), 'utf8')) as {
+      uniques: Record<string, { ref: string; status: string }>;
+    };
+    for (const e of Object.values(map.uniques))
+      if (e.ref && e.status !== 'excluded') decided.add(key(e.ref));
+    const freq = new Map<string, number>();
+    let count = 0;
+    for (const u of unique) {
+      if (decided.has(key(u.name))) continue;
+      const open = currentLines(u).flatMap((l) => {
+        const r = translateLine(l, ctxFor(u.base, u.slot));
+        return r.kind === 'unmapped' ? [r.core] : [];
+      });
+      if (open.length > maxOpen) continue;
+      count++;
+      for (const c of new Set(open)) freq.set(c, (freq.get(c) ?? 0) + 1);
+    }
+    console.log('undecided uniques with at most ' + maxOpen + ' open lines: ' + count);
+    const top = [...freq.entries()].sort((x, y) => y[1] - x[1]).slice(0, Number(args[2] ?? 60));
+    console.log(top.map(([k, v]) => `${v}\t${k}`).join('\n'));
+    return;
+  }
   if (args[0] === '--next') {
     // The next undecided uniques, fewest open lines first: what a batch works through.
     const n = Number(args[1] ?? 25);

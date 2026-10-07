@@ -26,7 +26,10 @@
     "coverage:draft": "tsx scripts/coverage/draft.ts",
     "coverage:wiki": "tsx scripts/coverage/wiki-page.ts",
     "coverage:bases": "tsx scripts/coverage/pob-bases.ts",
-    "coverage:translate": "tsx scripts/coverage/translate.ts"
+    "coverage:translate": "tsx scripts/coverage/translate.ts",
+    "coverage:gems": "tsx scripts/coverage/gem-view.ts",
+    "coverage:emit": "tsx scripts/coverage/emit-uniques.ts",
+    "coverage:emit-gems": "tsx scripts/coverage/emit-gems.ts"
   },
   "dependencies": {
     "@preact/signals": "^2.11.3",

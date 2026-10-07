@@ -428,3 +428,7 @@ Object.assign(STAT_TEXT, {
   flaskLifeRate: { name: 'Flask Life Recovery rate' },
   flaskManaRate: { name: 'Flask Mana Recovery rate' },
 } satisfies Record<string, StatText>);
+
+Object.assign(STAT_TEXT, {
+  noChaosDamage: { flag: 'Deals no Chaos Damage' },
+} satisfies Record<string, StatText>);

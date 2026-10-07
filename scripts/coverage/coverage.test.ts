@@ -77,3 +77,11 @@ describe('generated uniques', () => {
     }
   });
 });
+
+describe('generated gems', () => {
+  it('src/data/gemsGen.ts is exactly what the decisions produce', async () => {
+    const { renderGems, loadGemDecisions, OUT } = await import('./emit-gems');
+    const { readFileSync } = await import('node:fs');
+    expect(readFileSync(OUT, 'utf8')).toBe((await renderGems(loadGemDecisions())).text);
+  });
+});

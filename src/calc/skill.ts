@@ -223,6 +223,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
   const overload = db.flag('feverPitch', baseCtx);
   const noEle = db.flag('noElementalDamage', baseCtx);
   const noPhys = db.flag('noPhysicalDamage', baseCtx);
+  const noChaos = db.flag('noChaosDamage', baseCtx);
   const spellBit = tagBit('spell');
   const spellIncOnAttacks = isAttack && db.flag('spellIncAppliesToAttacks', baseCtx);
 
@@ -262,6 +263,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     if (avatar) chunks = chunks.filter((c) => c.type === FIRE);
     if (noEle) chunks = chunks.filter((c) => c.type === PHYS || c.type === CHAOS);
     if (noPhys) chunks = chunks.filter((c) => c.type !== PHYS);
+    if (noChaos) chunks = chunks.filter((c) => c.type !== CHAOS);
     // Step 4: scaling.
     const hitTag = tagBit('hit');
     let hitMultAcc = 0;
