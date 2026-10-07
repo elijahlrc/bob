@@ -548,3 +548,11 @@ revert if they would rather not.
 - **Bot speed.** About 200 times real time (DESIGN asks 500); see C3 to C6. Candidate pruning and cheaper character builds for
   craft trials remain the way to win it back.
 - **Tests.** 1,754.
+
+### Planned follow-up: minions that can be hurt
+
+Minions are invulnerable today (`src/sim/minions.ts`), which departs from PoE and makes them much stronger against area enemies;
+`minionLife` and the Minion Life support have no effect for the same reason. Planned fix (not started): give minions life from the
+gem level and the minion modifiers, let enemy attacks, projectiles and area hits target and kill them, add resummon timing
+and corpse or cooldown limits, make Minion Life and Meat Shield do what they say, and then rebalance minion damage and
+re-run the small bot sims. Until then, treat minion numbers as provisional.
