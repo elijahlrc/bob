@@ -13,6 +13,8 @@ export type TriggerOn =
   | 'crit'
   /** The player starts an attack. */
   | 'attack'
+  /** The player starts casting a spell. */
+  | 'cast'
   /** The player kills an enemy. */
   | 'kill'
   /** The player blocks a hit. */
@@ -29,6 +31,8 @@ export type TriggerEffect =
   | { kind: 'explode'; pctOfMaxLife: number; dtype: DamageType; radius: number }
   /** Kill triggers: the dead enemy's shock or ignite spreads to enemies nearby. */
   | { kind: 'spread'; ailment: 'shock' | 'ignite'; radius: number }
+  /** Give up a share of maximum life to gain that much in another pool (Demon Stitcher analog). */
+  | { kind: 'sacrifice'; pctOfLife: number; pool: 'es' | 'mana' }
   /** Recover a share of maximum life, or of armour, into a pool. */
   | { kind: 'recover'; pool: 'life' | 'es' | 'mana'; pctOf: 'maxLife' | 'armour'; value: number };
 
@@ -67,6 +71,8 @@ function effectText(e: TriggerEffect): string {
       return `the enemy explodes for ${e.pctOfMaxLife}% of its maximum life as ${e.dtype} damage`;
     case 'spread':
       return `spread its ${e.ailment} to nearby enemies`;
+    case 'sacrifice':
+      return `sacrifice ${e.pctOfLife}% of life to gain that much ${e.pool === 'es' ? 'energy shield' : e.pool}`;
     case 'recover':
       return `recover ${e.value}% of ${e.pctOf === 'armour' ? 'armour' : 'maximum life'} as ${e.pool === 'es' ? 'energy shield' : e.pool}`;
   }
@@ -82,6 +88,8 @@ export function triggerCause(t: TriggerDef): string {
       return tags ? `on ${tags} critical strike` : 'on critical strike';
     case 'attack':
       return 'when you attack';
+    case 'cast':
+      return 'when you cast a spell';
     case 'kill':
       return `when you kill ${t.targetHas ? `a ${t.targetHas === 'shock' ? 'shocked' : t.targetHas === 'hex' ? 'hexed' : 'ignited'} enemy` : 'an enemy'}`;
     case 'block':

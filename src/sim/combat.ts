@@ -1,4 +1,11 @@
-import { resolveHit, shockTaken, takenAs, type HitResult, type TargetState } from '../calc/combat';
+import {
+  AILMENT_NAMES,
+  resolveHit,
+  shockTaken,
+  takenAs,
+  type HitResult,
+  type TargetState,
+} from '../calc/combat';
 import { levelPenalty } from '../calc/formulas';
 import type { SkillProfile } from '../calc/skill';
 import {
@@ -16,6 +23,7 @@ import {
 import { cannotBleed } from '../data/monsters';
 import { BUFFS, BUFF_IDS, DYN_SHIFT } from '../data/buffs';
 import { MONSTER_CONDS } from '../calc/monster';
+import { WIELD_CONDS } from '../calc/staticConds';
 import { maskOr, type CondId } from '../mods/types';
 import { rollGains } from './buffs';
 import { gainTrophy, rollCharges } from './charges';
@@ -56,7 +64,15 @@ const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
   esFull: (_w, p) => p.def.maxEs > 0 && p.es >= p.def.maxEs - 0.5,
   onLowMana: (w, p) => p.mana <= Math.max(1, p.def.maxMana - w.char.reservedMana) * LOW_LIFE,
   cursed: (_w, p) => p.hexes.length > 0,
+  stationary: (_w, p) => !p.moving,
+  ignited: (_w, p) => p.ail.ignites.length > 0,
+  shocked: (_w, p) => p.ail.shock > 0,
+  chilled: (_w, p) => p.ail.chill > 0,
+  frozen: (_w, p) => p.ail.freezeT > 0,
+  bleeding: (_w, p) => p.ail.bleeds.length > 0,
+  poisoned: (_w, p) => p.ail.poisons.length > 0,
 };
+for (const [id, tag] of WIELD_CONDS) PLAYER_TESTS[id] = (w) => w.char.weaponTags.has(tag);
 for (const id of BUFF_IDS) {
   const cond = BUFFS[id].cond;
   PLAYER_TESTS[cond] = (w) => w.buffT[id] > 0;
@@ -258,7 +274,8 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     if (p.overload) src.tOverload = 0;
   }
   // Leech and life on hit. Some monsters cannot be leeched from; some gear makes crit leech instant.
-  const instant = src.def.instantLeech || (res.crit && p.instantLeechOnCrit);
+  const instant =
+    src.def.instantLeech || p.instantLeechAlways || (res.crit && p.instantLeechOnCrit);
   let ll = 0;
   let lm = 0;
   if (!dst.def.cannotBeLeechedFrom)
@@ -279,6 +296,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (wasAlive && dst.alive) {
     payImpales(w, dst);
     recordImpale(w, dst, p, res);
+    reflectBack(w, src, dst, p, res);
     // Culling strike: a hit that leaves the target at 10% life or less finishes it.
     if (p.culling && !dst.isPlayer && dst.life <= dst.def.maxLife * CULLING_SHARE)
       killActor(w, dst);
@@ -335,30 +353,34 @@ export function pushDot(list: Dot[], d: Dot, cap = 30): void {
 function applyAilments(w: World, dst: Actor, res: HitResult, p: SkillProfile): void {
   const a = res.ailments;
   const ail = dst.ail;
+  const d = dst.def;
+  // Chances to avoid an ailment, and how long each lasts on this actor.
+  for (const name of AILMENT_NAMES)
+    if (a[name] > 0 && d.avoid[name] > 0 && w.rngCombat.chance(d.avoid[name])) a[name] = 0;
   if (a.ignite > 0) {
-    pushDot(ail.ignites, { dps: a.ignite, t: p.ignite.dur });
+    pushDot(ail.ignites, { dps: a.ignite, t: p.ignite.dur * d.durOnSelf.ignite });
     ail.igniteMax = p.ignite.max;
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'ignite' });
   }
   if (a.bleed > 0 && !(dst.mon && cannotBleed(dst.mon.spec.type))) {
-    pushDot(ail.bleeds, { dps: a.bleed, t: p.bleed.dur, stack: p.woundDance });
+    pushDot(ail.bleeds, { dps: a.bleed, t: p.bleed.dur * d.durOnSelf.bleed, stack: p.woundDance });
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'bleed' });
   }
   if (a.poison > 0) {
-    pushDot(ail.poisons, { dps: a.poison, t: p.poison.dur }, 400);
+    pushDot(ail.poisons, { dps: a.poison, t: p.poison.dur * d.durOnSelf.poison }, 400);
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'poison' });
   }
   if (a.shock > 0 && a.shock >= ail.shock) {
     ail.shock = a.shock;
-    ail.shockT = p.shock.dur;
+    ail.shockT = p.shock.dur * d.durOnSelf.shock;
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'shock' });
   }
   if (a.chill > 0 && a.chill >= ail.chill) {
     ail.chill = a.chill;
-    ail.chillT = p.chill.dur;
+    ail.chillT = p.chill.dur * d.durOnSelf.chill;
   }
   if (a.freeze > 0 && a.freeze > ail.freezeT) {
-    ail.freezeT = a.freeze;
+    ail.freezeT = a.freeze * d.durOnSelf.freeze;
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'freeze' });
   }
 }
@@ -400,6 +422,15 @@ export function logDamage(
 }
 
 /** Raw damage of one type that ignores evasion and block (explosions, slams). */
+/** A player hit by a monster's melee attack deals damage back to it (reflect). */
+function reflectBack(w: World, src: Actor, dst: Actor, p: SkillProfile, res: HitResult): void {
+  if (!dst.isPlayer || src.isPlayer || !src.alive || p.skill.behaviour.kind !== 'melee') return;
+  const d = dst.def;
+  for (let t = 0; t < 5; t++) if (d.reflect[t] > 0) rawHit(w, src, d.reflect[t], t, 'Reflect');
+  if (d.reflectPhysPct > 0 && res.dmg[0] > 0 && src.alive)
+    rawHit(w, src, res.dmg[0] * d.reflectPhysPct, 0, 'Reflect');
+}
+
 /** Every impale on the target deals what it recorded as reflected physical damage, and uses up one of its hits. */
 function payImpales(w: World, dst: Actor): void {
   if (dst.impales.length === 0) return;
@@ -656,7 +687,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       for (let i = 0; i < Math.min(WOUND_DANCE_STACKS, sorted.length); i++) b += sorted[i];
     } else {
       for (const d of ail.bleeds) if (d.dps > b) b = d.dps;
-      if (a.moving) b *= BLEED_MOVING_MULT;
+      if (a.moving && !def.noMovingBleed) b *= BLEED_MOVING_MULT;
     }
     dotPhys += b;
     decay(ail.bleeds, dt);
@@ -697,6 +728,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       def.maxMana,
       dt,
       a.mana >= manaCap,
+      def.leechRate,
     );
   }
   if (def.leechToEs)
@@ -706,6 +738,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       def.maxLife,
       dt,
       a.es >= def.maxEs,
+      def.leechRate,
     );
   else
     leechTick(
@@ -714,6 +747,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       def.maxLife,
       dt,
       a.life >= cap,
+      def.leechRate,
     );
   // ES recharge.
   if (def.maxEs > 0 && a.es < def.maxEs && a.sinceDamaged >= def.esDelay)
@@ -735,14 +769,18 @@ function leechTick(
   max: number,
   dt: number,
   full: boolean,
+  rate = 1,
 ): void {
   if (!list.length) return;
   if (full) {
     list.length = 0;
     return;
   }
-  const per = LEECH_RATE_PER_INSTANCE * max;
-  const scale = Math.min(1, LEECH_RATE_CAP / (LEECH_RATE_PER_INSTANCE * list.length));
+  const per = LEECH_RATE_PER_INSTANCE * max * rate;
+  const scale = Math.min(
+    1,
+    (LEECH_RATE_CAP * rate) / (LEECH_RATE_PER_INSTANCE * rate * list.length),
+  );
   let total = 0;
   let j = 0;
   for (let i = 0; i < list.length; i++) {

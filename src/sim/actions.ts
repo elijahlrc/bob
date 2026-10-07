@@ -33,6 +33,7 @@ export function startAction(
   a.facing = Math.atan2(target.y - a.y, target.x - a.x);
   w.events.push({ t: 'use', src: a.id, skill: p.skill.id });
   if (a.isPlayer && p.isAttack) fireTriggers(w, { on: 'attack', target, tags: p.tagMask });
+  if (a.isPlayer && !p.isAttack) fireTriggers(w, { on: 'cast', target, tags: p.tagMask });
   // Fighting is noisy: idle monsters nearby come running even if they have not seen the player.
   if (a.isPlayer)
     for (const m of w.actors)
@@ -180,8 +181,9 @@ export function fire(w: World, a: Actor, act: Action): void {
   const b = p.skill.behaviour;
   const target = actorById(w, act.targetId);
   if (b.kind === 'melee') {
+    const reach = b.range + p.rangeBonus;
     if (b.arc) {
-      const radius = (b.radius ?? b.range) * p.radiusMult;
+      const radius = (b.radius ?? reach) * p.radiusMult;
       const half = ((b.arc / 2) * Math.PI) / 180;
       for (const e of enemiesOf(w, a)) {
         const d = Math.hypot(e.x - a.x, e.y - a.y);
@@ -195,7 +197,7 @@ export function fire(w: World, a: Actor, act: Action): void {
     }
     if (!target || !target.alive) return;
     const d = Math.hypot(target.x - a.x, target.y - a.y);
-    if (d > b.range + target.r + a.r + 0.4) return;
+    if (d > reach + target.r + a.r + 0.4) return;
     hit(w, a, target, p, act.hand, d);
     return;
   }

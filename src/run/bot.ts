@@ -313,14 +313,25 @@ function equipAndRegem(run: RunState, uid: number, slot: EquipSlot): void {
  * gem group elsewhere first (EXPANSION 10.1 item 3), which is how a socketless unique gets worn.
  */
 export function botEquip(run: RunState): void {
+  // How each (item, slot) fared the first time through the bag: after something is worn, only the ones that were close
+  // to an improvement are tried again. A bag full of items that were clearly worse stays clearly worse, and trying every
+  // one of them after every swap is what made a large unique pool slow the bot down (COVERAGE 5.2, bot scaling).
+  const first = new Map<string, number>();
   for (let guard = 0; guard < 20; guard++) {
     const base = scoreOf(run, run.build);
     let best: { uid: number; slot: EquipSlot; s: number; viaRegem: boolean } | null = null;
     for (const it of run.inventory) {
       if (it.kind !== 'item') continue;
       for (const slot of slotsFor(it)) {
-        if (!canEquip(run, it, slot).ok) continue;
+        const fk = `${it.uid}:${slot}`;
+        const prior = first.get(fk);
+        if (guard > 0 && prior !== undefined && prior < 0.9) continue;
+        if (!canEquip(run, it, slot).ok) {
+          first.set(fk, 0);
+          continue;
+        }
         let s = scoreOf(run, withEquipped(run.build, it, slot));
+        if (guard === 0) first.set(fk, s / base);
         let viaRegem = false;
         // Only for uniques that a plain swap rejects: the plan costs a trial run, and uniques are the
         // items that break the socket plan on purpose.

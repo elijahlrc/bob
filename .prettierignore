@@ -6,3 +6,4 @@ docs/coverage/pob-*.json
 # Reviewed decisions are written one entry to a line.
 docs/coverage/uniques/*.json
 docs/coverage/gems/*.json
+docs/coverage/map.json

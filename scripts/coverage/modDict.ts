@@ -42,6 +42,14 @@ export const IGNORED: RegExp[] = [
   /^Unidentified$/,
   /^Has # Abyssal Sockets?$/,
   /^Has # Socket$/,
+  /^Cannot be Blinded$/,
+  /^Items and Gems have # reduced Attribute Requirements$/,
+  /^Unaffected by (Shocked|Chilled|Burning|Desecrated) Ground$/,
+  /Footprints$/,
+  /^# chance to Cause Monsters to Flee/i,
+  /^# increased Effect of Socketed Jewels$/,
+  /^Cover Enemies in Ash/,
+  /^Zealot's Oath$/,
 ];
 
 // ---- Clauses -----------------------------------------------------------------------------------------------------
@@ -100,6 +108,26 @@ export const CLAUSES: Clause[] = [
       },
     }),
   },
+  { re: /while stationary$/, apply: withCond('stationary') },
+  { re: /while Ignited$/, apply: withCond('ignited') },
+  { re: /while Shocked$/, apply: withCond('shocked') },
+  { re: /while Chilled$/, apply: withCond('chilled') },
+  { re: /while Frozen$/, apply: withCond('frozen') },
+  { re: /while Bleeding$/, apply: withCond('bleeding') },
+  { re: /while Poisoned$/, apply: withCond('poisoned') },
+  { re: /while wielding a Staff$/, apply: withCond('wieldingStaff') },
+  { re: /while wielding a Bow$/, apply: withCond('wieldingBow') },
+  { re: /while wielding a Sword$/, apply: withCond('wieldingSword') },
+  { re: /while wielding an Axe$/, apply: withCond('wieldingAxe') },
+  { re: /while wielding a Mace$/, apply: withCond('wieldingMace') },
+  { re: /while wielding a Dagger$/, apply: withCond('wieldingDagger') },
+  { re: /while wielding a Claw$/, apply: withCond('wieldingClaw') },
+  { re: /while wielding a Wand$/, apply: withCond('wieldingWand') },
+  { re: /while wielding a Sceptre$/, apply: withCond('wieldingSceptre') },
+  { re: /while not on Low Mana$/, apply: withCond('onLowMana', true) },
+  { re: /(?:when|while) on Low Mana$/, apply: withCond('onLowMana') },
+  { re: /if you've Blocked Recently$/, apply: withCond('blockedRecently') },
+  { re: /per Level$/, apply: (_m, x) => ({ ...x, per: { stat: 'level', div: 1 } }) },
   { re: /with Weapons$/, apply: withTags('attack') },
   { re: /with Attack Skills$/, apply: withTags('attack') },
   { re: /with Spell Skills$/, apply: withTags('spell') },
@@ -430,6 +458,219 @@ for (const [word, kind] of [
 incRule('Movement Speed per Frenzy Charge', 'moveSpeed', () => ({
   per: { stat: 'charges.fervour', div: 1 },
 }));
+
+// Recovery on events.
+const RECOVER_EVENTS: [string, string][] = [
+  ['on Kill', 'kill'],
+  ['when you Block', 'block'],
+  ['on Critical Strike', 'crit'],
+  ['when Hit', 'hitTaken'],
+  ['when you are Hit', 'hitTaken'],
+];
+const POOLS: [string, string][] = [
+  ['Life', 'life'],
+  ['Mana', 'mana'],
+  ['Energy Shield', 'es'],
+];
+for (const [phrase, event] of RECOVER_EVENTS)
+  for (const [label, pool] of POOLS) {
+    rule(new RegExp(`^# ${label} [Gg]ained ${phrase}$`), (_m, n) => [
+      mk(`recover.${event}.${pool}`, 'base', n[0]),
+    ]);
+    rule(new RegExp(`^Recover # ${label} ${phrase}$`), (_m, n) => [
+      mk(`recover.${event}.${pool}`, 'base', n[0]),
+    ]);
+    rule(new RegExp(`^Recover # of Maximum ${label} ${phrase}$`), (_m, n) => [
+      mk(`recoverPct.${event}.${pool}`, 'base', n[0]),
+    ]);
+  }
+rule(/^# Mana gained for each Enemy hit by Attacks$/, (_m, n) => [mk('manaOnHit', 'base', n[0])]);
+
+// Buffs and rage on events.
+const BUFF_WORDS: Record<string, string> = {
+  Onslaught: 'onslaught',
+  Fortify: 'fortify',
+  'Unholy Might': 'unholyMight',
+  'Arcane Surge': 'arcaneSurge',
+};
+const BUFF_EVENTS: [string, string][] = [
+  ['on Kill', 'kill'],
+  ['on Critical Strike', 'crit'],
+  ['on Hit', 'hit'],
+  ['on Melee Hit', 'meleeHit'],
+  ['when you Block', 'block'],
+  ['when Hit', 'hitTaken'],
+];
+for (const [word, id] of Object.entries(BUFF_WORDS))
+  for (const [phrase, event] of BUFF_EVENTS) {
+    rule(new RegExp(`^You gain ${word} for # seconds? ${phrase}$`), () => [
+      mk(`buffOn.${event}.${id}`, 'base', [100, 100]),
+    ]);
+    rule(new RegExp(`^# chance to gain ${word} for # seconds? ${phrase}$`), (_m, n) => [
+      mk(`buffOn.${event}.${id}`, 'base', n[0]),
+    ]);
+    rule(new RegExp(`^# chance to gain ${word} ${phrase}$`), (_m, n) => [
+      mk(`buffOn.${event}.${id}`, 'base', n[0]),
+    ]);
+  }
+rule(/^Gain # Rage on Hit$/, (_m, n) => [mk('rageOn.hit', 'base', n[0])]);
+rule(/^# to maximum Rage$/, (_m, n) => [mk('maxRage', 'base', n[0])]);
+
+// Avoiding and suffering ailments.
+for (const [word, id] of [
+  ['Ignited', 'ignite'],
+  ['Shocked', 'shock'],
+  ['Poisoned', 'poison'],
+  ['Frozen', 'freeze'],
+  ['Chilled', 'chill'],
+] as const) {
+  rule(new RegExp(`^Cannot be ${word}$`), () => [mk(`avoid.${id}`, 'base', [100, 100])]);
+  rule(new RegExp(`^# chance to Avoid being ${word}$`), (_m, n) => [
+    mk(`avoid.${id}`, 'base', n[0]),
+  ]);
+}
+rule(/^# chance to Avoid being Stunned$/, (_m, n) => [mk('stunAvoid', 'base', n[0])]);
+for (const [word, id] of [
+  ['Shock', 'shock'],
+  ['Chill', 'chill'],
+  ['Freeze', 'freeze'],
+  ['Ignite', 'ignite'],
+  ['Poison', 'poison'],
+  ['Bleeding', 'bleed'],
+] as const) {
+  rule(new RegExp(`^# increased ${word} Duration on You$`), (_m, n) => [
+    mk(`durationOnSelf.${id}`, 'inc', n[0]),
+  ]);
+  rule(new RegExp(`^# reduced ${word} Duration on You$`), (_m, n) => [
+    mk(`durationOnSelf.${id}`, 'inc', neg(n[0])),
+  ]);
+}
+rule(/^Moving while Bleeding doesn't cause you to take extra Damage$/, () => [
+  flag('noMovingBleed'),
+]);
+
+// Damage taken, reflect and dodge.
+rule(new RegExp(`^# of Physical Damage (?:from Hits )?taken as ${TYPE} Damage$`), (m, n) =>
+  m[1] === 'Physical' ? [] : [mk(`physTakenAs.${m[1].toLowerCase()}`, 'base', n[0])],
+);
+rule(new RegExp(`^# increased ${TYPE} Damage taken$`), (m, n) =>
+  (typeOf(m[1]) ?? []).map((t) => mk(`damageTaken.${t}`, 'inc', n[0])),
+);
+rule(new RegExp(`^# reduced ${TYPE} Damage taken$`), (m, n) =>
+  (typeOf(m[1]) ?? []).map((t) => mk(`damageTaken.${t}`, 'inc', neg(n[0]))),
+);
+rule(new RegExp(`^# ${TYPE} Damage taken from Attacks$`), (m, n) =>
+  (typeOf(m[1]) ?? []).map((t) => mk(`flatTaken.attack.${t}`, 'base', n[0])),
+);
+rule(new RegExp(`^Take # ${TYPE} Damage when hit by Attacks$`), (m, n) =>
+  (typeOf(m[1]) ?? []).map((t) => mk(`flatTaken.attack.${t}`, 'base', n[0])),
+);
+rule(new RegExp(`^Reflects # ${TYPE} Damage to Melee Attackers$`), (m, n) =>
+  (typeOf(m[1]) ?? []).map((t) => mk(`reflect.${t}`, 'base', n[0])),
+);
+rule(new RegExp(`^Reflects # to # ${TYPE} Damage to Melee Attackers$`), (m, n) =>
+  (typeOf(m[1]) ?? []).map((t) =>
+    mk(`reflect.${t}`, 'base', [
+      Math.round((n[0][0] + n[1][0]) / 2),
+      Math.round((n[0][1] + n[1][1]) / 2),
+    ]),
+  ),
+);
+rule(/^# of Melee Physical Damage taken reflected to Attacker$/, (_m, n) => [
+  mk('reflectPhysPct', 'base', n[0]),
+]);
+rule(/^# chance to Dodge Attacks$/, (_m, n) => [mk('dodgeAttack', 'base', n[0])]);
+rule(/^# [Cc]hance to Dodge Spell Damage$/, (_m, n) => [mk('dodgeSpell', 'base', n[0])]);
+rule(/^# chance to Dodge Attack and Spell Hits$/, (_m, n) => [
+  mk('dodgeAttack', 'base', n[0]),
+  mk('dodgeSpell', 'base', n[0]),
+]);
+
+// Durations on enemies, leech rate, flasks, cost, range, arrows, curses on hit, keystones.
+for (const [word, id] of [
+  ['Shock', 'shock'],
+  ['Chill', 'chill'],
+  ['Freeze', 'freeze'],
+  ['Ignite', 'ignite'],
+  ['Poison', 'poison'],
+  ['Bleeding', 'bleed'],
+] as const) {
+  incRule(`${word} Duration on Enemies`, `duration.${id}`);
+}
+rule(/^# increased Life Leeched per second$/, (_m, n) => [mk('leechRate', 'inc', n[0])]);
+rule(/^# increased Mana Leeched per second$/, (_m, n) => [mk('leechRate', 'inc', n[0])]);
+rule(/^Gain Life from Leech instantly from Hits with this Weapon$/, () => [
+  flag('instantLeechAlways'),
+]);
+rule(/^# increased Life Recovery from Flasks$/, (_m, n) => [mk('flaskLifeRecovery', 'inc', n[0])]);
+rule(/^# increased Mana Recovery from Flasks$/, (_m, n) => [mk('flaskManaRecovery', 'inc', n[0])]);
+rule(/^# increased Flask Life Recovery rate$/, (_m, n) => [mk('flaskLifeRate', 'inc', n[0])]);
+rule(/^# increased Flask Mana Recovery rate$/, (_m, n) => [mk('flaskManaRate', 'inc', n[0])]);
+rule(/^# to Total Mana Cost of Skills$/, (_m, n) => [mk('costFlat', 'base', n[0])]);
+rule(/^# to Melee Weapon and Unarmed range$/, (_m, n) => [
+  mk('meleeRange', 'base', [n[0][0] / 10, n[0][1] / 10]),
+]);
+rule(/^# to Weapon range$/, (_m, n) => [mk('meleeRange', 'base', [n[0][0] / 10, n[0][1] / 10])]);
+rule(/^Adds an additional Arrow$/, () => [mk('projectiles', 'base', [1, 1], { tags: ['bow'] })]);
+rule(/^# additional Arrows$/, (_m, n) => [mk('projectiles', 'base', n[0], { tags: ['bow'] })]);
+rule(/^Arrows Pierce an additional Target$/, () => [
+  mk('pierce', 'base', [1, 1], { tags: ['bow'] }),
+]);
+rule(/^# to Critical Strike Multiplier for Spells$/, (_m, n) => [
+  mk('critMulti', 'base', n[0], { tags: ['spell'] }),
+]);
+rule(/^# to Critical Strike Multiplier$/, (_m, n) => [mk('critMulti', 'base', n[0])]);
+rule(/^# to Maximum (Fire|Cold|Lightning|Chaos) Resistance$/, (m, n) => [
+  mk(`maxResist.${m[1].toLowerCase()}`, 'base', n[0]),
+]);
+rule(/^You gain # (Evasion Rating|Armour)$/, (m, n) => {
+  const stat = m[1] === 'Armour' ? 'armour' : 'evasion';
+  return [mk(stat, 'base', scaled(stat, n[0]))];
+});
+rule(new RegExp(`^Adds # to # ${TYPE} Damage to Attacks with this Weapon$`), (m, n) => {
+  const t = typeOf(m[1]);
+  return [
+    mk('damage.min', 'base', n[0], { damageTypes: t, tags: ['attack'] }),
+    mk('damage.max', 'base', n[1], { damageTypes: t, tags: ['attack'] }),
+  ];
+});
+rule(/^Your spells have # chance to Shock against Frozen enemies$/, (_m, n) => [
+  mk('chance.shock', 'base', n[0], { tags: ['spell'], condition: { id: 'targetFrozen' } }),
+]);
+const CURSE_HEX: Record<string, string> = {
+  'Temporal Chains': 'leadenLimbs',
+  Enfeeble: 'feebleGrip',
+  Vulnerability: 'openWounds',
+  'Elemental Weakness': 'brittleDoom',
+};
+for (const [word, id] of Object.entries(CURSE_HEX)) {
+  rule(new RegExp(`^# chance to Curse (?:un-cursed )?Enemies with ${word} on Hit$`), () => [
+    mk(`hexOnHit.${id}`, 'base', [10, 10]),
+  ]);
+  rule(new RegExp(`^Curse Enemies with level # ${word} on Hit$`), (_m, n) => [
+    mk(`hexOnHit.${id}`, 'base', n[0]),
+  ]);
+  rule(new RegExp(`^# chance to Curse Enemies with level # ${word} on Hit$`), (_m, n) => [
+    mk(`hexOnHit.${id}`, 'base', n[1] ?? n[0]),
+  ]);
+}
+for (const [phrase, id] of [
+  ['Pain Attunement', 'painConduit'],
+  ['Chaos Inoculation', 'hollowVessel'],
+  ['Iron Reflexes', 'platedHide'],
+  ['Mind Over Matter', 'mindBulwark'],
+  ['Avatar of Fire', 'searingAvatar'],
+  ['Point Blank', 'closeQuarters'],
+  ['Ghost Reaver', 'shadeLeech'],
+  ['Elemental Overload', 'feverPitch'],
+  ['Crimson Dance', 'woundDance'],
+  ['Perfect Agony', 'cruelAgony'],
+  ['Eldritch Battery', 'manaBastion'],
+  ['Resolute Technique', 'unerringDiscipline'],
+  ['Unwavering Stance', 'rootedStance'],
+  ['Arrow Dancing', 'arrowWeave'],
+] as const)
+  rule(new RegExp(`^${phrase}$`), () => [flag(`grantsKeystone.${id}`)]);
 
 // All gems of a kind (not only the socketed ones).
 rule(/^# to Level of all (Fire|Cold|Lightning|Chaos|Physical) Spell Skill Gems$/, (m, n) => [

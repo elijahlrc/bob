@@ -164,6 +164,22 @@ export const CONDITION_TEXT: Record<string, string> = {
   onLowMana: 'while on Low Mana',
   targetCursed: 'against Hexed Enemies',
   cursed: 'while Hexed',
+  stationary: 'while stationary',
+  ignited: 'while Ignited',
+  shocked: 'while Shocked',
+  chilled: 'while Chilled',
+  frozen: 'while Frozen',
+  bleeding: 'while Bleeding',
+  poisoned: 'while Poisoned',
+  wieldingStaff: 'while wielding a Staff',
+  wieldingBow: 'while wielding a Bow',
+  wieldingSword: 'while wielding a Sword',
+  wieldingAxe: 'while wielding an Axe',
+  wieldingMace: 'while wielding a Mace',
+  wieldingDagger: 'while wielding a Dagger',
+  wieldingClaw: 'while wielding a Claw',
+  wieldingWand: 'while wielding a Wand',
+  wieldingSceptre: 'while wielding a Sceptre',
 };
 
 export const TAG_TEXT: Record<string, string> = {
@@ -320,6 +336,26 @@ for (const id of BUFF_IDS) {
   for (const [event, phrase] of Object.entries(on))
     STAT_TEXT[`buffOn.${event}.${id}`] = { base: `{v}% chance to gain ${name} ${phrase}` };
 }
+const RECOVER_POOL_TEXT: Record<string, string> = {
+  life: 'Life',
+  mana: 'Mana',
+  es: 'Energy Shield',
+};
+for (const [event, phrase] of Object.entries({
+  kill: 'on Kill',
+  hit: 'on Hit',
+  meleeHit: 'on Melee Hit',
+  crit: 'on Critical Strike',
+  block: 'when you Block',
+  hitTaken: 'when you are Hit',
+  flask: 'when you use a Flask',
+}))
+  for (const [pool, label] of Object.entries(RECOVER_POOL_TEXT)) {
+    STAT_TEXT[`recover.${event}.${pool}`] = { base: `Gain {v} ${label} ${phrase}` };
+    STAT_TEXT[`recoverPct.${event}.${pool}`] = {
+      base: `Recover {v}% of maximum ${label} ${phrase}`,
+    };
+  }
 for (const [event, phrase] of Object.entries({
   kill: 'on Kill',
   hit: 'on Hit',
@@ -355,3 +391,40 @@ Object.assign(CONDITION_TEXT, {
   unholyMight: 'while you have Dread Might',
   arcaneSurge: 'while you have Arcane Tide',
 });
+
+// ---- Added by C3: avoiding ailments, reflect, flat damage taken, dodge ------------------------------
+
+for (const [id, label] of [
+  ['ignite', 'Ignited'],
+  ['shock', 'Shocked'],
+  ['chill', 'Chilled'],
+  ['freeze', 'Frozen'],
+  ['bleed', 'Bled'],
+  ['poison', 'Poisoned'],
+] as const) {
+  STAT_TEXT[`avoid.${id}`] = { base: `{v}% chance to Avoid being ${label}` };
+  STAT_TEXT[`durationOnSelf.${id}`] = { name: `${label.replace(/ed$/, '')} Duration on you` };
+}
+for (const t of ['physical', 'lightning', 'cold', 'fire', 'chaos']) {
+  STAT_TEXT[`flatTaken.attack.${t}`] = {
+    base: `{v} ${TYPE_LABEL[t]} Damage taken from Attack Hits`,
+  };
+  STAT_TEXT[`reflect.${t}`] = { base: `Reflects {v} ${TYPE_LABEL[t]} Damage to Melee Attackers` };
+}
+Object.assign(STAT_TEXT, {
+  reflectPhysPct: { base: '{v}% of Melee Physical Damage taken is reflected to the Attacker' },
+  noMovingBleed: { flag: "Moving while Bleeding doesn't cause you to take extra Damage" },
+  dodgeAttack: { base: '{v}% chance to Dodge Attack Hits' },
+  dodgeSpell: { base: '{v}% chance to Dodge Spell Hits' },
+} satisfies Record<string, StatText>);
+
+Object.assign(STAT_TEXT, {
+  leechRate: { name: 'Life and Mana Leeched per second' },
+  instantLeechAlways: { flag: 'Leech from Hits is instant' },
+  meleeRange: { base: '{v} to Melee Weapon and Unarmed range' },
+  costFlat: { base: '{v} to Total Mana Cost of Skills' },
+  flaskLifeRecovery: { name: 'Life Recovery from Flasks' },
+  flaskManaRecovery: { name: 'Mana Recovery from Flasks' },
+  flaskLifeRate: { name: 'Flask Life Recovery rate' },
+  flaskManaRate: { name: 'Flask Mana Recovery rate' },
+} satisfies Record<string, StatText>);

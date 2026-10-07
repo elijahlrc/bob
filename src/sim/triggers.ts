@@ -17,6 +17,7 @@ import type { Actor, Action, World } from './types';
 export type TriggerEvent =
   | { on: 'hit'; target: Actor; tags: number; crit: boolean }
   | { on: 'attack'; target: Actor; tags: number }
+  | { on: 'cast'; target: Actor; tags: number }
   | { on: 'kill'; target: Actor }
   | { on: 'block' }
   | { on: 'hitTaken'; damage: number };
@@ -82,6 +83,8 @@ function perform(
       return ev.on === 'kill' && spread(w, e, ev.target);
     case 'recover':
       return recover(w, e);
+    case 'sacrifice':
+      return sacrifice(w, e);
   }
 }
 
@@ -186,6 +189,16 @@ function spread(w: World, e: Extract<TriggerEffect, { kind: 'spread' }>, dead: A
     }
   }
   return any;
+}
+
+function sacrifice(w: World, e: Extract<TriggerEffect, { kind: 'sacrifice' }>): boolean {
+  const p = w.player;
+  const amount = Math.min(Math.max(0, p.life - 1), (e.pctOfLife / 100) * p.def.maxLife);
+  if (amount <= 0) return false;
+  p.life -= amount;
+  if (e.pool === 'es') p.es = Math.min(p.def.maxEs, p.es + amount);
+  else p.mana = Math.min(p.def.maxMana - w.char.reservedMana, p.mana + amount);
+  return true;
 }
 
 function recover(w: World, e: Extract<TriggerEffect, { kind: 'recover' }>): boolean {

@@ -29,6 +29,11 @@ function physTakenAs(db: ModDB, ctx: ModCtx): number[] {
   return total > 1 ? shares.map((s) => s / total) : shares;
 }
 
+/** The chance to avoid an ailment: "cannot be X" is 100%. */
+function avoidOf(db: ModDB, ctx: ModCtx, name: string): number {
+  return clamp(db.sum('base', `avoid.${name}`, ctx) / 100, 0, 1);
+}
+
 /** Resolve defensive stats from a mod database (§6.1–6.4). Shared by players and monsters. */
 export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defence {
   const flag = (s: string) => db.flag(s, ctx);
@@ -129,5 +134,28 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
     cannotBeLeechedFrom: flag('cannotBeLeechedFrom'),
     immuneAilments: flag('immuneAilments'),
     immune: DAMAGE_TYPES.map((t) => t !== 'physical' && t !== 'chaos' && flag(`immune.${t}`)),
+    avoid: {
+      ignite: avoidOf(db, ctx, 'ignite'),
+      shock: avoidOf(db, ctx, 'shock'),
+      chill: avoidOf(db, ctx, 'chill'),
+      freeze: avoidOf(db, ctx, 'freeze'),
+      bleed: avoidOf(db, ctx, 'bleed'),
+      poison: avoidOf(db, ctx, 'poison'),
+    },
+    durOnSelf: {
+      ignite: db.mult('durationOnSelf.ignite', ctx),
+      shock: db.mult('durationOnSelf.shock', ctx),
+      chill: db.mult('durationOnSelf.chill', ctx),
+      freeze: db.mult('durationOnSelf.freeze', ctx),
+      bleed: db.mult('durationOnSelf.bleed', ctx),
+      poison: db.mult('durationOnSelf.poison', ctx),
+    },
+    flatTakenAttack: DAMAGE_TYPES.map((t) => db.sum('base', `flatTaken.attack.${t}`, ctx)),
+    reflect: DAMAGE_TYPES.map((t) => db.sum('base', `reflect.${t}`, ctx)),
+    reflectPhysPct: clamp(db.sum('base', 'reflectPhysPct', ctx) / 100, 0, 1),
+    leechRate: db.mult('leechRate', ctx),
+    noMovingBleed: flag('noMovingBleed'),
+    dodgeAttack: clamp(db.sum('base', 'dodgeAttack', ctx) / 100, 0, 0.75),
+    dodgeSpell: clamp(db.sum('base', 'dodgeSpell', ctx) / 100, 0, 0.75),
   };
 }

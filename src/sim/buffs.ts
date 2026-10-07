@@ -4,10 +4,14 @@ import {
   RAGE_DECAY_EVERY,
   RAGE_HOLD,
   buffStat,
+  RECOVER_POOLS,
   rageStat,
+  recoverPctStat,
+  recoverStat,
   type BuffEvent,
   type BuffId,
 } from '../data/buffs';
+import { lifeCap } from './combat';
 import type { World } from './types';
 
 /**
@@ -40,6 +44,18 @@ export function rollGains(w: World, event: BuffEvent): void {
     if (chance > 0 && w.rngTrig.chance(Math.min(1, chance / 100))) gainBuff(w, id);
   }
   if (ch.rageSource) gainRage(w, ch.db.sum('base', rageStat(event)));
+  for (const pool of RECOVER_POOLS) {
+    const flat = ch.db.sum('base', recoverStat(event, pool));
+    const pct = ch.db.sum('base', recoverPctStat(event, pool));
+    if (flat === 0 && pct === 0) continue;
+    const p = w.player;
+    const max = pool === 'life' ? p.def.maxLife : pool === 'mana' ? p.def.maxMana : p.def.maxEs;
+    const amount = flat + (pct / 100) * max;
+    if (pool === 'life') p.life = Math.min(lifeCap(w, p), p.life + amount);
+    else if (pool === 'mana')
+      p.mana = Math.min(Math.max(0, p.def.maxMana - ch.reservedMana), p.mana + amount);
+    else p.es = Math.min(p.def.maxEs, p.es + amount);
+  }
   // Being hit holds the rage you have, as gaining it does.
   if (event === 'hitTaken') w.rageT = 0;
 }

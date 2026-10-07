@@ -84,6 +84,23 @@ export function hasBuffSource(mods: readonly Mod[], id: BuffId): boolean {
   return mods.some((m) => m.stat.startsWith('buffOn.') && m.stat.endsWith(`.${id}`) && m.value > 0);
 }
 
+/**
+ * Recovery on an event (a kill, a hit landed or taken, a block, a critical strike, a flask): a flat amount or a share of
+ * the maximum of a pool, `recover.<event>.<pool>` and `recoverPct.<event>.<pool>`.
+ */
+export const RECOVER_POOLS = ['life', 'mana', 'es'] as const;
+export type RecoverPool = (typeof RECOVER_POOLS)[number];
+export const recoverStat = (event: BuffEvent, pool: RecoverPool): string =>
+  `recover.${event}.${pool}`;
+export const recoverPctStat = (event: BuffEvent, pool: RecoverPool): string =>
+  `recoverPct.${event}.${pool}`;
+
+export function hasRecoverSource(mods: readonly Mod[]): boolean {
+  return mods.some(
+    (m) => (m.stat.startsWith('recover.') || m.stat.startsWith('recoverPct.')) && m.value > 0,
+  );
+}
+
 // Rage: a count from 0 to the maximum, worth 1% increased attack damage, 0.5% increased attack speed and 0.2%
 // increased movement speed a point. One is lost every half second unless rage was gained or the player was hit lately.
 export const BASE_MAX_RAGE = 50;

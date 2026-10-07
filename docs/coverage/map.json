@@ -1,881 +1,1146 @@
 {
-  "gems": {
-    "crushingBlow": {
-      "ref": "Heavy Strike",
-      "status": "covered",
-      "note": "single heavy strike that stuns"
-    },
-    "reapingArc": {
-      "ref": "Cleave",
-      "status": "covered",
-      "note": "arc melee that hits with both weapons"
-    },
-    "splitVolley": {
-      "ref": "Split Arrow",
-      "status": "covered",
-      "note": "fan of arrows"
-    },
-    "venomCut": {
-      "ref": "Viper Strike",
-      "status": "covered",
-      "note": "poisoning strike"
-    },
-    "flameBolt": {
-      "ref": "Fireball",
-      "status": "covered",
-      "note": "fire projectile that explodes and can ignite"
-    },
-    "arcChain": {
-      "ref": "Arc",
-      "status": "covered",
-      "note": "chaining lightning"
-    },
-    "frostLance": {
-      "ref": "Ice Spear",
-      "status": "covered",
-      "note": "piercing cold projectile"
-    },
-    "bruteForce": {
-      "ref": "Melee Physical Damage Support",
-      "status": "covered",
-      "note": "more melee physical damage"
-    },
-    "swiftAssault": {
-      "ref": "Faster Attacks Support",
-      "status": "covered",
-      "note": "attack speed"
-    },
-    "quickCast": {
-      "ref": "Faster Casting Support",
-      "status": "covered",
-      "note": "cast speed"
-    },
-    "emberInfusion": {
-      "ref": "Cold to Fire Support",
-      "status": "partial",
-      "note": "gain-as-extra fire; the nearest reference converts instead"
-    },
-    "channelledElements": {
-      "ref": "Elemental Focus Support",
-      "status": "covered",
-      "note": "more elemental damage, no ailments"
-    },
-    "focusedRuin": {
-      "ref": "Controlled Destruction Support",
-      "status": "covered",
-      "note": "more spell damage, no spell crits"
-    },
-    "echoingCast": {
-      "ref": "Spell Echo Support",
-      "status": "covered",
-      "note": "repeats the spell"
-    },
-    "volleySplit": {
-      "ref": "Greater Multiple Projectiles Support",
-      "status": "covered",
-      "note": "two extra projectiles, less damage"
-    },
-    "piercingShot": {
-      "ref": "Pierce Support",
-      "status": "covered",
-      "note": "projectiles pierce"
-    },
-    "denseBlast": {
-      "ref": "Concentrated Effect Support",
-      "status": "covered",
-      "note": "smaller area, more damage"
-    },
-    "wideBlast": {
-      "ref": "Increased Area of Effect Support",
-      "status": "covered",
-      "note": "larger area"
-    },
-    "precisionStrikes": {
-      "ref": "Increased Critical Strikes Support",
-      "status": "covered",
-      "note": "critical strike chance"
-    },
-    "rendingEdge": {
-      "ref": "Chance to Bleed Support",
-      "status": "covered",
-      "note": "bleed chance and bleed damage"
-    },
-    "toxinCoat": {
-      "ref": "Chance to Poison Support",
-      "status": "covered",
-      "note": "poison chance"
-    },
-    "kindle": {
-      "ref": "Immolate Support",
-      "status": "partial",
-      "note": "chance to ignite plus ignite damage; no exact 3.9 match"
-    },
-    "bloodthirst": {
-      "ref": "Life Leech Support",
-      "status": "covered",
-      "note": "attack leech"
-    },
-    "staggeringForce": {
-      "ref": "Stun Support",
-      "status": "covered",
-      "note": "stun duration and threshold"
-    },
-    "criticalRelay": {
-      "ref": "Cast On Critical Strike Support",
-      "status": "covered",
-      "note": "trigger on crit"
-    },
-    "woundedRetort": {
-      "ref": "Cast when Damage Taken Support",
-      "status": "covered",
-      "note": "trigger on damage taken"
-    },
-    "hexingStrikes": {
-      "ref": "Hextouch Support",
-      "status": "covered",
-      "note": "hexes on hit"
-    },
-    "kindlingHalo": {
-      "ref": "Anger",
-      "status": "covered",
-      "note": "added fire damage aura"
-    },
-    "stormHalo": {
-      "ref": "Wrath",
-      "status": "covered",
-      "note": "added lightning damage aura"
-    },
-    "frostHalo": {
-      "ref": "Hatred",
-      "status": "covered",
-      "note": "physical as extra cold aura"
-    },
-    "veilOfGrace": {
-      "ref": "Grace",
-      "status": "covered",
-      "note": "evasion aura"
-    },
-    "ironBastion": {
-      "ref": "Determination",
-      "status": "covered",
-      "note": "armour aura"
-    },
-    "arcaneWard": {
-      "ref": "Discipline",
-      "status": "covered",
-      "note": "energy shield aura"
-    },
-    "clearMind": {
-      "ref": "Clarity",
-      "status": "covered",
-      "note": "mana regeneration aura"
-    },
-    "brittleDoom": {
-      "ref": "Elemental Weakness",
-      "status": "covered",
-      "note": "applied by Hexing Strikes, not cast directly (C4 adds casting)"
-    },
-    "leadenLimbs": {
-      "ref": "Temporal Chains",
-      "status": "covered",
-      "note": "applied by Hexing Strikes"
-    },
-    "feebleGrip": {
-      "ref": "Enfeeble",
-      "status": "covered",
-      "note": "applied by Hexing Strikes"
-    },
-    "openWounds": {
-      "ref": "Vulnerability",
-      "status": "covered",
-      "note": "applied by Hexing Strikes"
-    }
+ "gems": {
+  "crushingBlow": {
+   "ref": "Heavy Strike",
+   "status": "covered",
+   "note": "single heavy strike that stuns"
   },
-  "uniques": {
-    "walledHeart": {
-      "ref": "Kaom's Heart",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "gravediggersSmock": {
-      "ref": "Tabula Rasa",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "embalmersWraps": {
-      "ref": "Shavronne's Wrappings",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "thunderwireHauberk": {
-      "ref": "Lightning Coil",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "steadfastCassock": {
-      "ref": "Cloak of Defiance",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "spellswornCirclet": {
-      "ref": "Crown of Eyes",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "bareVisor": {
-      "ref": "Abyssus",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "cantorsHood": {
-      "ref": "Alpha's Howl",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "knuckleboneBindings": {
-      "ref": "Facebreaker",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "rimeclaspGloves": {
-      "ref": "Hrimsorrow",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "bloodquickGauntlets": {
-      "ref": "Atziri's Acuity",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "meteoriteEdge": {
-      "ref": "Starforge",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "unblinkingLongbow": {
-      "ref": "Lioneye's Glare",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "thousandRibs": {
-      "ref": "Reach of the Council",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "ashenHeartstone": {
-      "ref": "Xoph's Blood",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "orreryOfBone": {
-      "ref": "Astramentis",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "rotheartBand": {
-      "ref": "Ming's Heart",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "wideCinch": {
-      "ref": "Ryslatha's Coil",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "hoarfrostDraught": {
-      "ref": "Taste of Hate",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "lastLightFlask": {
-      "ref": "Dying Sun",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "rotwineFlask": {
-      "ref": "Atziri's Promise",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "stonebrewFlask": {
-      "ref": "Rumi's Concoction",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "gamblersTonic": {
-      "ref": "Divination Distillate",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "thunderknell": {
-      "ref": "Mjölner",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "frostwrit": {
-      "ref": "Cospri's Malice",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "gravescribe": {
-      "ref": "The Poet's Pen",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "cinderfallAxe": {
-      "ref": "Ngamahu's Flame",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "stormsplitJerkin": {
-      "ref": "Inpulsa's Broken Heart",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "kindredSparks": {
-      "ref": "Berek's Respite",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "twinPyreBand": {
-      "ref": "Emberwake",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "lanternBulwark": {
-      "ref": "Aegis Aurora",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "bloodglassWard": {
-      "ref": "Prism Guardian",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "martyrsDraught": {
-      "ref": "Coruscating Elixir",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "pickpocketsLament": {
-      "ref": "Thief's Torment",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "lullabySilks": {
-      "ref": "Asenath's Gentle Touch",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "twiceHexedRing": {
-      "ref": "Doedre's Damning",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "bandOfEndlessGrit": {
-      "ref": "Kaom's Way",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "ferventStride": {
-      "ref": "",
-      "status": "excluded",
-      "note": "analog \"the common \"+1 maximum charges\" pattern\" is not in the 3.9 reference list"
-    },
-    "trophyCord": {
-      "ref": "Headhunter",
-      "status": "covered",
-      "note": "documented analog (EXPANSION 6.4)"
-    },
-    "hollowCrown": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "gravemarrow": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "coldheart": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "rattleBow": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "emberWrap": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "ironroot": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "bloodknot": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "stormcall": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "wanderersSash": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "thornshield": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "gravehammer": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "stillstone": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "oakenGrudge": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "firstSplinter": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "cinderReed": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "duellistsDue": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "sunspokeRelic": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "viperTongue": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "lanternOfTheLost": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "marrowLoop": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "quietStep": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "pyreMantle": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "colossusKnuckles": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "sigilOfTheArchive": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "woundWeaver": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "skylineHorn": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "deathlessVigil": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "stormglassCirclet": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "kingsTithe": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "lastBreath": {
-      "ref": "",
-      "status": "excluded",
-      "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
-    },
-    "kilnband": {
-      "ref": "Ahkeli's Meadow",
-      "status": "covered",
-      "note": "Fire resistance, strength and a little life and energy shield."
-    },
-    "furnaceLoop": {
-      "ref": "Ahkeli's Mountain",
-      "status": "covered",
-      "note": "Same stat line as its sibling: fire resistance and strength with small life and energy shield."
-    },
-    "smeltersRing": {
-      "ref": "Ahkeli's Valley",
-      "status": "covered",
-      "note": "Same stat line as its siblings."
-    },
-    "gildedTithe": {
-      "ref": "Andvarius",
-      "status": "covered",
-      "note": "Huge item rarity for the cost of elemental resistance."
-    },
-    "whisperersCap": {
-      "ref": "Asenath's Mark",
-      "status": "covered",
-      "note": "Attack and cast speed, mana regeneration, energy shield and movement speed on a circlet."
-    },
-    "magpieGauntlets": {
-      "ref": "Aurseize",
-      "status": "covered",
-      "note": "Armour and evasion with item rarity and all elemental resistances, at a movement speed cost."
-    },
-    "paupersRapier": {
-      "ref": "Aurumvorax",
-      "status": "covered",
-      "note": "Physical damage and crit multiplier with life on hit, paid for with item rarity and a thrusting base."
-    },
-    "triuneRod": {
-      "ref": "Axiom Perpetuum",
-      "status": "covered",
-      "note": "Added fire, cold and lightning damage to spells with strong spell crit."
-    },
-    "stillbreathSash": {
-      "ref": "Bated Breath",
-      "status": "covered",
-      "note": "Energy shield, recharge rate and intelligence on a belt."
-    },
-    "eclipseHelm": {
-      "ref": "Black Sun Crest",
-      "status": "covered",
-      "note": "+1 to socketed gems with armour and percentage attributes."
-    },
-    "cinderfeatherQuiver": {
-      "ref": "Blackgleam",
-      "status": "covered",
-      "note": "Added fire to bow attacks with attack speed and physical converted to fire."
-    },
-    "gutterStiletto": {
-      "ref": "Bloodplay",
-      "status": "covered",
-      "note": "Crit, attack speed, bleed chance and added physical on a dagger."
-    },
-    "tallowHammer": {
-      "ref": "Brightbeak",
-      "status": "covered",
-      "note": "Fast heavy mace: attack speed, crit and stun threshold with fire and lightning resistance."
-    },
-    "butchersFrock": {
-      "ref": "Carcass Jack",
-      "status": "covered",
-      "note": "Area of effect and area damage with evasion and energy shield."
-    },
-    "gravecapCirclet": {
-      "ref": "Chitus' Apex",
-      "status": "covered",
-      "note": "Strength, mana, resistances, experience and elemental damage."
-    },
-    "rockfallQuiver": {
-      "ref": "Craghead",
-      "status": "covered",
-      "note": "Added physical to bow attacks, stun duration and a lower enemy stun threshold, slower projectiles."
-    },
-    "coinbearerBuckler": {
-      "ref": "Crest of Perandus",
-      "status": "covered",
-      "note": "Life, regeneration, life leech, lightning resistance, block and movement speed on a buckler."
-    },
-    "wizenedGloves": {
-      "ref": "Doedre's Tenure",
-      "status": "covered",
-      "note": "Spell damage and energy shield at a cast speed cost."
-    },
-    "shardOfSlumber": {
-      "ref": "Dream Fragments",
-      "status": "covered",
-      "note": "Cold resistance, mana, regeneration and immunity to freeze and chill."
-    },
-    "lidlessEye": {
-      "ref": "Eye of Chayula",
-      "status": "covered",
-      "note": "All attributes and item rarity for 20% less life, with immunity to stun."
-    },
-    "emberstrideBoots": {
-      "ref": "Gang's Momentum",
-      "status": "covered",
-      "note": "Movement speed, fire resistance, chance to ignite and damage against ignited enemies."
-    },
-    "prismCrown": {
-      "ref": "Geofri's Crest",
-      "status": "covered",
-      "note": "+1 to socketed gems, armour and energy shield and all four resistances."
-    },
-    "maulwrightsClub": {
-      "ref": "Gorebreaker",
-      "status": "covered",
-      "note": "Huge physical damage, stun duration and threshold, melee damage against bleeding enemies."
-    },
-    "snareOfPlenty": {
-      "ref": "Greedtrap",
-      "status": "covered",
-      "note": "Attributes, energy shield, movement speed and item quantity on low life."
-    },
-    "frostbreakSledge": {
-      "ref": "Hrimnor's Dirge",
-      "status": "covered",
-      "note": "Slow heavy mace converting a half of physical to extra cold, big stun duration and leech."
-    },
-    "hailbreakHammer": {
-      "ref": "Hrimnor's Hymn",
-      "status": "covered",
-      "note": "Physical damage and stun threshold on a sledgehammer, a lower-level sibling."
-    },
-    "coldfangQuiver": {
-      "ref": "Hyrri's Bite",
-      "status": "covered",
-      "note": "Added cold to attacks, life on hit, attributes and area of effect."
-    },
-    "eelskinQuiver": {
-      "ref": "Hyrri's Demise",
-      "status": "covered",
-      "note": "Life on hit, attack speed, area of effect and added damage to attacks per ten points of each attribute."
-    },
-    "glacierCoffin": {
-      "ref": "Icetomb",
-      "status": "covered",
-      "note": "Strength, intelligence, cold resistance, armour and energy shield, immune to chill, long chill duration on enemies."
-    },
-    "chargingIdol": {
-      "ref": "Karui Charge",
-      "status": "covered",
-      "note": "Projectile damage and speed, attack speed, accuracy and movement speed."
-    },
-    "totemWard": {
-      "ref": "Karui Ward",
-      "status": "covered",
-      "note": "A cheaper sibling: projectile damage and speed, accuracy, strength and movement speed."
-    },
-    "sagesHammer": {
-      "ref": "Lavianga's Wisdom",
-      "status": "covered",
-      "note": "Physical damage, life, mana and area damage and effect on a mace at a movement cost."
-    },
-    "pileOfOdds": {
-      "ref": "Le Heup of All",
-      "status": "covered",
-      "note": "Damage, all attributes, item rarity and all resistances at random strength."
-    },
-    "skinnersKnife": {
-      "ref": "Mightflay",
-      "status": "covered",
-      "note": "Physical damage, added physical, strength and life on hit."
-    },
-    "graveBite": {
-      "ref": "Mortem Morsu",
-      "status": "covered",
-      "note": "Claw: life on hit, crit, 60% poison and physical converted to chaos."
-    },
-    "totemOfThePack": {
-      "ref": "Natural Hierarchy",
-      "status": "covered",
-      "note": "Increased damage of every type on an amulet."
-    },
-    "openFistMitts": {
-      "ref": "Ondar's Clasp",
-      "status": "covered",
-      "note": "Attack speed on full life, movement speed on low life, added lightning and accuracy."
-    },
-    "tidepoolRing": {
-      "ref": "Putembo's Meadow",
-      "status": "covered",
-      "note": "Intelligence with percentage life and energy shield."
-    },
-    "wellspringRing": {
-      "ref": "Putembo's Mountain",
-      "status": "covered",
-      "note": "Sibling of the Tidepool ring."
-    },
-    "reedwaterRing": {
-      "ref": "Putembo's Valley",
-      "status": "covered",
-      "note": "Sibling of the Tidepool ring."
-    },
-    "prismTreads": {
-      "ref": "Rainbowstride",
-      "status": "covered",
-      "note": "Spell block, mana, energy shield, all resistances and movement speed on boots."
-    },
-    "penitentBlade": {
-      "ref": "Rebuke of the Vaal",
-      "status": "covered",
-      "note": "Added damage of all five types and attack speed on a sword."
-    },
-    "wolfhowlBlade": {
-      "ref": "Rigwald's Charge",
-      "status": "covered",
-      "note": "Accuracy, physical damage, attack speed and movement speed."
-    },
-    "singedWoolGloves": {
-      "ref": "Sadima's Touch",
-      "status": "covered",
-      "note": "Added fire and lightning to attacks, energy shield and item quantity."
-    },
-    "longstrideBoots": {
-      "ref": "Seven-League Step",
-      "status": "covered",
-      "note": "Fifty percent movement speed and nothing else."
-    },
-    "scholarsQuickstep": {
-      "ref": "Shavronne's Pace",
-      "status": "covered",
-      "note": "Energy shield and intelligence with movement speed, more on full life."
-    },
-    "frostneedleSword": {
-      "ref": "Shiversting",
-      "status": "covered",
-      "note": "Added cold, accuracy and mana leech, and immunity to freeze."
-    },
-    "moonwoodBow": {
-      "ref": "Silverbough",
-      "status": "covered",
-      "note": "Gem levels (all and bow), physical damage, attack speed and mana on kill."
-    },
-    "moonwoodSwitch": {
-      "ref": "Silverbranch",
-      "status": "covered",
-      "note": "A lower sibling: bow gem level, physical damage, attack speed and mana on kill."
-    },
-    "snakeskinGrips": {
-      "ref": "Slitherpinch",
-      "status": "covered",
-      "note": "Dexterity, evasion, attack speed and attack leech."
-    },
-    "wardstoneOfCalm": {
-      "ref": "Stone of Lazhwar",
-      "status": "covered",
-      "note": "Spell block, cast speed and mana."
-    },
-    "solsticeTreads": {
-      "ref": "Sundance",
-      "status": "covered",
-      "note": "Evasion, attack speed, item rarity, fire resistance and movement speed."
-    },
-    "burnishedFob": {
-      "ref": "The Ignomon",
-      "status": "covered",
-      "note": "Added fire to attacks, accuracy, evasion and fire resistance."
-    },
-    "cinderStaff": {
-      "ref": "The Searing Touch",
-      "status": "covered",
-      "note": "Fire gem level, spell and fire damage, burning damage, cast speed and staff block."
-    },
-    "beaconQuiver": {
-      "ref": "The Signal Fire",
-      "status": "covered",
-      "note": "Physical converted and gained as fire, added fire to bow attacks and attack speed."
-    },
-    "gospelSceptre": {
-      "ref": "The Supreme Truth",
-      "status": "covered",
-      "note": "Elemental and physical damage, attack speed, gem level and experience."
-    },
-    "lopsidedPendant": {
-      "ref": "Ungil's Harmony",
-      "status": "covered",
-      "note": "Doubled crit chance for less crit multiplier, life, mana and stun recovery."
-    },
-    "brightwaterRing": {
-      "ref": "Uzaza's Meadow",
-      "status": "covered",
-      "note": "Dexterity with percentage life and energy shield."
-    },
-    "highwaterRing": {
-      "ref": "Uzaza's Mountain",
-      "status": "covered",
-      "note": "Sibling of the Brightwater ring."
-    },
-    "lowwaterRing": {
-      "ref": "Uzaza's Valley",
-      "status": "covered",
-      "note": "Sibling of the Brightwater ring."
-    },
-    "twinchargePendant": {
-      "ref": "Victario's Acuity",
-      "status": "covered",
-      "note": "Frenzy and Power charges on kill, with projectile speed and damage per charge."
-    },
-    "hollowCapacitor": {
-      "ref": "Void Battery",
-      "status": "covered",
-      "note": "Power charges raise spell damage, with a penalty to base spell damage and big spell crit."
-    },
-    "plainSetting": {
-      "ref": "Voideye",
-      "status": "covered",
-      "note": "Five levels of socketed gems on a ring."
-    },
-    "paupersMaul": {
-      "ref": "Voidhome",
-      "status": "covered",
-      "note": "Heavy mace with fast attacks and big damage, paid for with rarity and experience."
-    },
-    "footlooseShoes": {
-      "ref": "Wanderlust",
-      "status": "covered",
-      "note": "Movement speed, mana regeneration, energy shield and immunity to freeze."
-    },
-    "luckySnare": {
-      "ref": "Wondertrap",
-      "status": "covered",
-      "note": "All attributes, energy shield, movement speed and huge item rarity on low life."
-    },
-    "stormcallersPole": {
-      "ref": "Agnerod North",
-      "status": "covered",
-      "note": "Lightning gem level, lightning damage, shock chance and penetration on a staff."
-    },
-    "stormcallersRod": {
-      "ref": "Agnerod West",
-      "status": "covered",
-      "note": "Lightning gem level, lightning damage, added spell lightning and penetration on a staff."
-    }
+  "reapingArc": {
+   "ref": "Cleave",
+   "status": "covered",
+   "note": "arc melee that hits with both weapons"
+  },
+  "splitVolley": {
+   "ref": "Split Arrow",
+   "status": "covered",
+   "note": "fan of arrows"
+  },
+  "venomCut": {
+   "ref": "Viper Strike",
+   "status": "covered",
+   "note": "poisoning strike"
+  },
+  "flameBolt": {
+   "ref": "Fireball",
+   "status": "covered",
+   "note": "fire projectile that explodes and can ignite"
+  },
+  "arcChain": {
+   "ref": "Arc",
+   "status": "covered",
+   "note": "chaining lightning"
+  },
+  "frostLance": {
+   "ref": "Ice Spear",
+   "status": "covered",
+   "note": "piercing cold projectile"
+  },
+  "bruteForce": {
+   "ref": "Melee Physical Damage Support",
+   "status": "covered",
+   "note": "more melee physical damage"
+  },
+  "swiftAssault": {
+   "ref": "Faster Attacks Support",
+   "status": "covered",
+   "note": "attack speed"
+  },
+  "quickCast": {
+   "ref": "Faster Casting Support",
+   "status": "covered",
+   "note": "cast speed"
+  },
+  "emberInfusion": {
+   "ref": "Cold to Fire Support",
+   "status": "partial",
+   "note": "gain-as-extra fire; the nearest reference converts instead"
+  },
+  "channelledElements": {
+   "ref": "Elemental Focus Support",
+   "status": "covered",
+   "note": "more elemental damage, no ailments"
+  },
+  "focusedRuin": {
+   "ref": "Controlled Destruction Support",
+   "status": "covered",
+   "note": "more spell damage, no spell crits"
+  },
+  "echoingCast": {
+   "ref": "Spell Echo Support",
+   "status": "covered",
+   "note": "repeats the spell"
+  },
+  "volleySplit": {
+   "ref": "Greater Multiple Projectiles Support",
+   "status": "covered",
+   "note": "two extra projectiles, less damage"
+  },
+  "piercingShot": {
+   "ref": "Pierce Support",
+   "status": "covered",
+   "note": "projectiles pierce"
+  },
+  "denseBlast": {
+   "ref": "Concentrated Effect Support",
+   "status": "covered",
+   "note": "smaller area, more damage"
+  },
+  "wideBlast": {
+   "ref": "Increased Area of Effect Support",
+   "status": "covered",
+   "note": "larger area"
+  },
+  "precisionStrikes": {
+   "ref": "Increased Critical Strikes Support",
+   "status": "covered",
+   "note": "critical strike chance"
+  },
+  "rendingEdge": {
+   "ref": "Chance to Bleed Support",
+   "status": "covered",
+   "note": "bleed chance and bleed damage"
+  },
+  "toxinCoat": {
+   "ref": "Chance to Poison Support",
+   "status": "covered",
+   "note": "poison chance"
+  },
+  "kindle": {
+   "ref": "Immolate Support",
+   "status": "partial",
+   "note": "chance to ignite plus ignite damage; no exact 3.9 match"
+  },
+  "bloodthirst": {
+   "ref": "Life Leech Support",
+   "status": "covered",
+   "note": "attack leech"
+  },
+  "staggeringForce": {
+   "ref": "Stun Support",
+   "status": "covered",
+   "note": "stun duration and threshold"
+  },
+  "criticalRelay": {
+   "ref": "Cast On Critical Strike Support",
+   "status": "covered",
+   "note": "trigger on crit"
+  },
+  "woundedRetort": {
+   "ref": "Cast when Damage Taken Support",
+   "status": "covered",
+   "note": "trigger on damage taken"
+  },
+  "hexingStrikes": {
+   "ref": "Hextouch Support",
+   "status": "covered",
+   "note": "hexes on hit"
+  },
+  "kindlingHalo": {
+   "ref": "Anger",
+   "status": "covered",
+   "note": "added fire damage aura"
+  },
+  "stormHalo": {
+   "ref": "Wrath",
+   "status": "covered",
+   "note": "added lightning damage aura"
+  },
+  "frostHalo": {
+   "ref": "Hatred",
+   "status": "covered",
+   "note": "physical as extra cold aura"
+  },
+  "veilOfGrace": {
+   "ref": "Grace",
+   "status": "covered",
+   "note": "evasion aura"
+  },
+  "ironBastion": {
+   "ref": "Determination",
+   "status": "covered",
+   "note": "armour aura"
+  },
+  "arcaneWard": {
+   "ref": "Discipline",
+   "status": "covered",
+   "note": "energy shield aura"
+  },
+  "clearMind": {
+   "ref": "Clarity",
+   "status": "covered",
+   "note": "mana regeneration aura"
+  },
+  "brittleDoom": {
+   "ref": "Elemental Weakness",
+   "status": "covered",
+   "note": "applied by Hexing Strikes, not cast directly (C4 adds casting)"
+  },
+  "leadenLimbs": {
+   "ref": "Temporal Chains",
+   "status": "covered",
+   "note": "applied by Hexing Strikes"
+  },
+  "feebleGrip": {
+   "ref": "Enfeeble",
+   "status": "covered",
+   "note": "applied by Hexing Strikes"
+  },
+  "openWounds": {
+   "ref": "Vulnerability",
+   "status": "covered",
+   "note": "applied by Hexing Strikes"
   }
+ },
+ "uniques": {
+  "walledHeart": {
+   "ref": "Kaom's Heart",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "gravediggersSmock": {
+   "ref": "Tabula Rasa",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "embalmersWraps": {
+   "ref": "Shavronne's Wrappings",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "thunderwireHauberk": {
+   "ref": "Lightning Coil",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "steadfastCassock": {
+   "ref": "Cloak of Defiance",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "spellswornCirclet": {
+   "ref": "Crown of Eyes",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "bareVisor": {
+   "ref": "Abyssus",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "cantorsHood": {
+   "ref": "Alpha's Howl",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "knuckleboneBindings": {
+   "ref": "Facebreaker",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "rimeclaspGloves": {
+   "ref": "Hrimsorrow",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "bloodquickGauntlets": {
+   "ref": "Atziri's Acuity",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "meteoriteEdge": {
+   "ref": "Starforge",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "unblinkingLongbow": {
+   "ref": "Lioneye's Glare",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "thousandRibs": {
+   "ref": "Reach of the Council",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "ashenHeartstone": {
+   "ref": "Xoph's Blood",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "orreryOfBone": {
+   "ref": "Astramentis",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "rotheartBand": {
+   "ref": "Ming's Heart",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "wideCinch": {
+   "ref": "Ryslatha's Coil",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "hoarfrostDraught": {
+   "ref": "Taste of Hate",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "lastLightFlask": {
+   "ref": "Dying Sun",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "rotwineFlask": {
+   "ref": "Atziri's Promise",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "stonebrewFlask": {
+   "ref": "Rumi's Concoction",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "gamblersTonic": {
+   "ref": "Divination Distillate",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "thunderknell": {
+   "ref": "Mjölner",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "frostwrit": {
+   "ref": "Cospri's Malice",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "gravescribe": {
+   "ref": "The Poet's Pen",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "cinderfallAxe": {
+   "ref": "Ngamahu's Flame",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "stormsplitJerkin": {
+   "ref": "Inpulsa's Broken Heart",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "kindredSparks": {
+   "ref": "Berek's Respite",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "twinPyreBand": {
+   "ref": "Emberwake",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "lanternBulwark": {
+   "ref": "Aegis Aurora",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "bloodglassWard": {
+   "ref": "Prism Guardian",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "martyrsDraught": {
+   "ref": "Coruscating Elixir",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "pickpocketsLament": {
+   "ref": "Thief's Torment",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "lullabySilks": {
+   "ref": "Asenath's Gentle Touch",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "twiceHexedRing": {
+   "ref": "Doedre's Damning",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "bandOfEndlessGrit": {
+   "ref": "Kaom's Way",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "ferventStride": {
+   "ref": "",
+   "status": "excluded",
+   "note": "analog \"the common \"+1 maximum charges\" pattern\" is not in the 3.9 reference list"
+  },
+  "trophyCord": {
+   "ref": "Headhunter",
+   "status": "covered",
+   "note": "documented analog (EXPANSION 6.4)"
+  },
+  "hollowCrown": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "gravemarrow": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "coldheart": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "rattleBow": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "emberWrap": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "ironroot": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "bloodknot": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "stormcall": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "wanderersSash": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "thornshield": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "gravehammer": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "stillstone": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "oakenGrudge": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "firstSplinter": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "cinderReed": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "duellistsDue": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "sunspokeRelic": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "viperTongue": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "lanternOfTheLost": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "marrowLoop": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "quietStep": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "pyreMantle": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "colossusKnuckles": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "sigilOfTheArchive": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "woundWeaver": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "skylineHorn": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "deathlessVigil": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "stormglassCirclet": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "kingsTithe": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "lastBreath": {
+   "ref": "",
+   "status": "excluded",
+   "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+  },
+  "kilnband": {
+   "ref": "Ahkeli's Meadow",
+   "status": "covered",
+   "note": "Fire resistance, strength and a little life and energy shield."
+  },
+  "furnaceLoop": {
+   "ref": "Ahkeli's Mountain",
+   "status": "covered",
+   "note": "Same stat line as its sibling: fire resistance and strength with small life and energy shield."
+  },
+  "smeltersRing": {
+   "ref": "Ahkeli's Valley",
+   "status": "covered",
+   "note": "Same stat line as its siblings."
+  },
+  "gildedTithe": {
+   "ref": "Andvarius",
+   "status": "covered",
+   "note": "Huge item rarity for the cost of elemental resistance."
+  },
+  "whisperersCap": {
+   "ref": "Asenath's Mark",
+   "status": "covered",
+   "note": "Attack and cast speed, mana regeneration, energy shield and movement speed on a circlet."
+  },
+  "magpieGauntlets": {
+   "ref": "Aurseize",
+   "status": "covered",
+   "note": "Armour and evasion with item rarity and all elemental resistances, at a movement speed cost."
+  },
+  "paupersRapier": {
+   "ref": "Aurumvorax",
+   "status": "covered",
+   "note": "Physical damage and crit multiplier with life on hit, paid for with item rarity and a thrusting base."
+  },
+  "triuneRod": {
+   "ref": "Axiom Perpetuum",
+   "status": "covered",
+   "note": "Added fire, cold and lightning damage to spells with strong spell crit."
+  },
+  "stillbreathSash": {
+   "ref": "Bated Breath",
+   "status": "covered",
+   "note": "Energy shield, recharge rate and intelligence on a belt."
+  },
+  "eclipseHelm": {
+   "ref": "Black Sun Crest",
+   "status": "covered",
+   "note": "+1 to socketed gems with armour and percentage attributes."
+  },
+  "cinderfeatherQuiver": {
+   "ref": "Blackgleam",
+   "status": "covered",
+   "note": "Added fire to bow attacks with attack speed and physical converted to fire."
+  },
+  "gutterStiletto": {
+   "ref": "Bloodplay",
+   "status": "covered",
+   "note": "Crit, attack speed, bleed chance and added physical on a dagger."
+  },
+  "tallowHammer": {
+   "ref": "Brightbeak",
+   "status": "covered",
+   "note": "Fast heavy mace: attack speed, crit and stun threshold with fire and lightning resistance."
+  },
+  "butchersFrock": {
+   "ref": "Carcass Jack",
+   "status": "covered",
+   "note": "Area of effect and area damage with evasion and energy shield."
+  },
+  "gravecapCirclet": {
+   "ref": "Chitus' Apex",
+   "status": "covered",
+   "note": "Strength, mana, resistances, experience and elemental damage."
+  },
+  "rockfallQuiver": {
+   "ref": "Craghead",
+   "status": "covered",
+   "note": "Added physical to bow attacks, stun duration and a lower enemy stun threshold, slower projectiles."
+  },
+  "coinbearerBuckler": {
+   "ref": "Crest of Perandus",
+   "status": "covered",
+   "note": "Life, regeneration, life leech, lightning resistance, block and movement speed on a buckler."
+  },
+  "wizenedGloves": {
+   "ref": "Doedre's Tenure",
+   "status": "covered",
+   "note": "Spell damage and energy shield at a cast speed cost."
+  },
+  "shardOfSlumber": {
+   "ref": "Dream Fragments",
+   "status": "covered",
+   "note": "Cold resistance, mana, regeneration and immunity to freeze and chill."
+  },
+  "lidlessEye": {
+   "ref": "Eye of Chayula",
+   "status": "covered",
+   "note": "All attributes and item rarity for 20% less life, with immunity to stun."
+  },
+  "emberstrideBoots": {
+   "ref": "Gang's Momentum",
+   "status": "covered",
+   "note": "Movement speed, fire resistance, chance to ignite and damage against ignited enemies."
+  },
+  "prismCrown": {
+   "ref": "Geofri's Crest",
+   "status": "covered",
+   "note": "+1 to socketed gems, armour and energy shield and all four resistances."
+  },
+  "maulwrightsClub": {
+   "ref": "Gorebreaker",
+   "status": "covered",
+   "note": "Huge physical damage, stun duration and threshold, melee damage against bleeding enemies."
+  },
+  "snareOfPlenty": {
+   "ref": "Greedtrap",
+   "status": "covered",
+   "note": "Attributes, energy shield, movement speed and item quantity on low life."
+  },
+  "frostbreakSledge": {
+   "ref": "Hrimnor's Dirge",
+   "status": "covered",
+   "note": "Slow heavy mace converting a half of physical to extra cold, big stun duration and leech."
+  },
+  "hailbreakHammer": {
+   "ref": "Hrimnor's Hymn",
+   "status": "covered",
+   "note": "Physical damage and stun threshold on a sledgehammer, a lower-level sibling."
+  },
+  "coldfangQuiver": {
+   "ref": "Hyrri's Bite",
+   "status": "covered",
+   "note": "Added cold to attacks, life on hit, attributes and area of effect."
+  },
+  "eelskinQuiver": {
+   "ref": "Hyrri's Demise",
+   "status": "covered",
+   "note": "Life on hit, attack speed, area of effect and added damage to attacks per ten points of each attribute."
+  },
+  "glacierCoffin": {
+   "ref": "Icetomb",
+   "status": "covered",
+   "note": "Strength, intelligence, cold resistance, armour and energy shield, immune to chill, long chill duration on enemies."
+  },
+  "chargingIdol": {
+   "ref": "Karui Charge",
+   "status": "covered",
+   "note": "Projectile damage and speed, attack speed, accuracy and movement speed."
+  },
+  "totemWard": {
+   "ref": "Karui Ward",
+   "status": "covered",
+   "note": "A cheaper sibling: projectile damage and speed, accuracy, strength and movement speed."
+  },
+  "sagesHammer": {
+   "ref": "Lavianga's Wisdom",
+   "status": "covered",
+   "note": "Physical damage, life, mana and area damage and effect on a mace at a movement cost."
+  },
+  "pileOfOdds": {
+   "ref": "Le Heup of All",
+   "status": "covered",
+   "note": "Damage, all attributes, item rarity and all resistances at random strength."
+  },
+  "skinnersKnife": {
+   "ref": "Mightflay",
+   "status": "covered",
+   "note": "Physical damage, added physical, strength and life on hit."
+  },
+  "graveBite": {
+   "ref": "Mortem Morsu",
+   "status": "covered",
+   "note": "Claw: life on hit, crit, 60% poison and physical converted to chaos."
+  },
+  "totemOfThePack": {
+   "ref": "Natural Hierarchy",
+   "status": "covered",
+   "note": "Increased damage of every type on an amulet."
+  },
+  "openFistMitts": {
+   "ref": "Ondar's Clasp",
+   "status": "covered",
+   "note": "Attack speed on full life, movement speed on low life, added lightning and accuracy."
+  },
+  "tidepoolRing": {
+   "ref": "Putembo's Meadow",
+   "status": "covered",
+   "note": "Intelligence with percentage life and energy shield."
+  },
+  "wellspringRing": {
+   "ref": "Putembo's Mountain",
+   "status": "covered",
+   "note": "Sibling of the Tidepool ring."
+  },
+  "reedwaterRing": {
+   "ref": "Putembo's Valley",
+   "status": "covered",
+   "note": "Sibling of the Tidepool ring."
+  },
+  "prismTreads": {
+   "ref": "Rainbowstride",
+   "status": "covered",
+   "note": "Spell block, mana, energy shield, all resistances and movement speed on boots."
+  },
+  "penitentBlade": {
+   "ref": "Rebuke of the Vaal",
+   "status": "covered",
+   "note": "Added damage of all five types and attack speed on a sword."
+  },
+  "wolfhowlBlade": {
+   "ref": "Rigwald's Charge",
+   "status": "covered",
+   "note": "Accuracy, physical damage, attack speed and movement speed."
+  },
+  "singedWoolGloves": {
+   "ref": "Sadima's Touch",
+   "status": "covered",
+   "note": "Added fire and lightning to attacks, energy shield and item quantity."
+  },
+  "longstrideBoots": {
+   "ref": "Seven-League Step",
+   "status": "covered",
+   "note": "Fifty percent movement speed and nothing else."
+  },
+  "scholarsQuickstep": {
+   "ref": "Shavronne's Pace",
+   "status": "covered",
+   "note": "Energy shield and intelligence with movement speed, more on full life."
+  },
+  "frostneedleSword": {
+   "ref": "Shiversting",
+   "status": "covered",
+   "note": "Added cold, accuracy and mana leech, and immunity to freeze."
+  },
+  "moonwoodBow": {
+   "ref": "Silverbough",
+   "status": "covered",
+   "note": "Gem levels (all and bow), physical damage, attack speed and mana on kill."
+  },
+  "moonwoodSwitch": {
+   "ref": "Silverbranch",
+   "status": "covered",
+   "note": "A lower sibling: bow gem level, physical damage, attack speed and mana on kill."
+  },
+  "snakeskinGrips": {
+   "ref": "Slitherpinch",
+   "status": "covered",
+   "note": "Dexterity, evasion, attack speed and attack leech."
+  },
+  "wardstoneOfCalm": {
+   "ref": "Stone of Lazhwar",
+   "status": "covered",
+   "note": "Spell block, cast speed and mana."
+  },
+  "solsticeTreads": {
+   "ref": "Sundance",
+   "status": "covered",
+   "note": "Evasion, attack speed, item rarity, fire resistance and movement speed."
+  },
+  "burnishedFob": {
+   "ref": "The Ignomon",
+   "status": "covered",
+   "note": "Added fire to attacks, accuracy, evasion and fire resistance."
+  },
+  "cinderStaff": {
+   "ref": "The Searing Touch",
+   "status": "covered",
+   "note": "Fire gem level, spell and fire damage, burning damage, cast speed and staff block."
+  },
+  "beaconQuiver": {
+   "ref": "The Signal Fire",
+   "status": "covered",
+   "note": "Physical converted and gained as fire, added fire to bow attacks and attack speed."
+  },
+  "gospelSceptre": {
+   "ref": "The Supreme Truth",
+   "status": "covered",
+   "note": "Elemental and physical damage, attack speed, gem level and experience."
+  },
+  "lopsidedPendant": {
+   "ref": "Ungil's Harmony",
+   "status": "covered",
+   "note": "Doubled crit chance for less crit multiplier, life, mana and stun recovery."
+  },
+  "brightwaterRing": {
+   "ref": "Uzaza's Meadow",
+   "status": "covered",
+   "note": "Dexterity with percentage life and energy shield."
+  },
+  "highwaterRing": {
+   "ref": "Uzaza's Mountain",
+   "status": "covered",
+   "note": "Sibling of the Brightwater ring."
+  },
+  "lowwaterRing": {
+   "ref": "Uzaza's Valley",
+   "status": "covered",
+   "note": "Sibling of the Brightwater ring."
+  },
+  "twinchargePendant": {
+   "ref": "Victario's Acuity",
+   "status": "covered",
+   "note": "Frenzy and Power charges on kill, with projectile speed and damage per charge."
+  },
+  "hollowCapacitor": {
+   "ref": "Void Battery",
+   "status": "covered",
+   "note": "Power charges raise spell damage, with a penalty to base spell damage and big spell crit."
+  },
+  "plainSetting": {
+   "ref": "Voideye",
+   "status": "covered",
+   "note": "Five levels of socketed gems on a ring."
+  },
+  "paupersMaul": {
+   "ref": "Voidhome",
+   "status": "covered",
+   "note": "Heavy mace with fast attacks and big damage, paid for with rarity and experience."
+  },
+  "footlooseShoes": {
+   "ref": "Wanderlust",
+   "status": "covered",
+   "note": "Movement speed, mana regeneration, energy shield and immunity to freeze."
+  },
+  "luckySnare": {
+   "ref": "Wondertrap",
+   "status": "covered",
+   "note": "All attributes, energy shield, movement speed and huge item rarity on low life."
+  },
+  "stormcallersPole": {
+   "ref": "Agnerod North",
+   "status": "covered",
+   "note": "Lightning gem level, lightning damage, shock chance and penetration on a staff."
+  },
+  "stormcallersRod": {
+   "ref": "Agnerod West",
+   "status": "covered",
+   "note": "Lightning gem level, lightning damage, added spell lightning and penetration on a staff."
+  },
+  "stormcallersCrook": {
+   "ref": "Agnerod East",
+   "status": "covered",
+   "note": "Lightning gem level, lightning damage and a long shock on a staff."
+  },
+  "stormcallersSpire": {
+   "ref": "Agnerod South",
+   "status": "covered",
+   "note": "Lightning gem level, lightning damage, maximum lightning resistance and penetration."
+  },
+  "embertoothTotem": {
+   "ref": "Araku Tiki",
+   "status": "covered",
+   "note": "Life, regeneration and evasion on low life."
+  },
+  "pearlOfPlenty": {
+   "ref": "Atziri's Foible",
+   "status": "covered",
+   "note": "A deep mana pool with extra regeneration."
+  },
+  "gildedPall": {
+   "ref": "Atziri's Splendour",
+   "status": "covered",
+   "note": "Huge armour, evasion and energy shield with all resistances and life and mana on kill."
+  },
+  "silksoftSteps": {
+   "ref": "Atziri's Step",
+   "status": "covered",
+   "note": "Evasion, life, movement speed and dodging spells."
+  },
+  "wyrmsGut": {
+   "ref": "Belly of the Beast",
+   "status": "covered",
+   "note": "Armour and life percentage with flask life recovery rate."
+  },
+  "passOfTwoWinters": {
+   "ref": "Berek's Pass",
+   "status": "covered",
+   "note": "Fire damage, added cold to attacks and spells, and damage while ignited."
+  },
+  "charcoalRing": {
+   "ref": "Blackheart",
+   "status": "covered",
+   "note": "Physical damage, added chaos to attacks, life and regeneration."
+  },
+  "clottedGrip": {
+   "ref": "Bloodgrip",
+   "status": "covered",
+   "note": "Added physical, life, flat regeneration, flask life recovery and no extra bleed damage from moving."
+  },
+  "thirstingPaw": {
+   "ref": "Bloodseeker",
+   "status": "covered",
+   "note": "Physical damage, attack speed, leech and instant leech on a claw."
+  },
+  "thornjerkin": {
+   "ref": "Bramblejack",
+   "status": "covered",
+   "note": "Reflect most of a melee hit and take less from attacks, with added physical."
+  },
+  "brinewalkerBoots": {
+   "ref": "Brinerot Whalers",
+   "status": "covered",
+   "note": "Energy shield, physical and projectile damage, lightning resistance and movement speed."
+  },
+  "quickhideWrap": {
+   "ref": "Briskwrap",
+   "status": "covered",
+   "note": "Attack speed, evasion, cold resistance, movement speed and flask mana recovery."
+  },
+  "pelletSceptre": {
+   "ref": "Brutus' Lead Sprinkler",
+   "status": "covered",
+   "note": "Physical and elemental damage, added damage per ten strength and attack speed on a sceptre."
+  },
+  "pactRing": {
+   "ref": "Call of the Brotherhood",
+   "status": "covered",
+   "note": "Cold and lightning resistance, lightning damage, spells always shock frozen enemies."
+  },
+  "slaughterPendant": {
+   "ref": "Carnage Heart",
+   "status": "covered",
+   "note": "All attributes and resistances, attack leech, damage while leeching and faster leech."
+  },
+  "smoulderingBulwark": {
+   "ref": "Chernobog's Pillar",
+   "status": "covered",
+   "note": "Armour, life, fire resistance, added fire to attacks and spells, curses enemies with Feeble Grip."
+  },
+  "gildedMalice": {
+   "ref": "Cherrubim's Maleficence",
+   "status": "covered",
+   "note": "Chaos damage, armour and evasion, life and faster life leech."
+  },
+  "pyreRobe": {
+   "ref": "Cloak of Flame",
+   "status": "covered",
+   "note": "Fire resistance, ignite chance and duration, reflect fire and take physical as fire."
+  },
+  "briarCirclet": {
+   "ref": "Crown of Thorns",
+   "status": "covered",
+   "note": "Energy shield, reflect physical, extra physical taken from attacks and Pain Conduit."
+  },
+  "saluteOfThePit": {
+   "ref": "Daresso's Salute",
+   "status": "covered",
+   "note": "Fire and cold resistance, movement speed on full life, melee damage, reach, at half the energy shield."
+  },
+  "lastSprint": {
+   "ref": "Death Rush",
+   "status": "covered",
+   "note": "Accuracy, armour, life, chaos resistance and attack leech."
+  },
+  "paleHarp": {
+   "ref": "Death's Harp",
+   "status": "covered",
+   "note": "An additional arrow, crit multiplier and attack speed on a bow."
+  },
+  "paleDirge": {
+   "ref": "Death's Opus",
+   "status": "covered",
+   "note": "Two additional arrows, added physical, crit multiplier and attack speed on a bow."
+  },
+  "faithkeeperVisor": {
+   "ref": "Devoto's Devotion",
+   "status": "covered",
+   "note": "Attack speed, armour and evasion, chaos resistance and movement speed at less physical damage."
+  },
+  "starlitSkean": {
+   "ref": "Divinarius",
+   "status": "covered",
+   "note": "Spell damage, spell crit, life and mana on kill and spell crit multiplier when nothing has died recently."
+  },
+  "venomtongueGloves": {
+   "ref": "Doedre's Malevolence",
+   "status": "covered",
+   "note": "Spell damage and added chaos to spells with energy shield, at a cast speed and mana cost price."
+  },
+  "corsairsTricorne": {
+   "ref": "Fairgraves' Tricorne",
+   "status": "covered",
+   "note": "Added cold to attacks, evasion, mana, lightning resistance and immune to shock."
+  },
+  "vixenHide": {
+   "ref": "Foxshade",
+   "status": "covered",
+   "note": "Added physical, dexterity, evasion and a flat evasion rating on full life."
+  },
+  "pennyCap": {
+   "ref": "Goldrim",
+   "status": "covered",
+   "note": "Evasion, item rarity, all resistances and reflected physical damage."
+  },
+  "mindfulClaw": {
+   "ref": "Hand of Thought and Motion",
+   "status": "covered",
+   "note": "Life on hit, elemental damage with attacks, added lightning and attack speed."
+  },
+  "wiseClaw": {
+   "ref": "Hand of Wisdom and Action",
+   "status": "covered",
+   "note": "Life on hit, elemental attack damage, dexterity and intelligence and added lightning."
+  },
+  "seersCharm": {
+   "ref": "Hinekora's Sight",
+   "status": "covered",
+   "note": "Accuracy and dodging attacks and spells."
+  },
+  "gaolersClaw": {
+   "ref": "Izaro's Dilemma",
+   "status": "covered",
+   "note": "Life on hit, physical damage, added physical, attack speed and accuracy."
+  },
+  "rimeguardBuckler": {
+   "ref": "Kaltenhalt",
+   "status": "covered",
+   "note": "Movement speed, evasion, cold resistance and maximum, physical gained as cold."
+  },
+  "penitentsCirclet": {
+   "ref": "Martyr's Crown",
+   "status": "covered",
+   "note": "A big energy shield, reflect, extra physical taken from attacks and Pain Conduit."
+  },
+  "brawnGirdle": {
+   "ref": "Meginord's Girdle",
+   "status": "covered",
+   "note": "Added physical, strength, life, cold resistance and flask life recovery rate."
+  },
+  "hushwalkBoots": {
+   "ref": "Mutewind Whispersteps",
+   "status": "covered",
+   "note": "Added cold to spells, spell crit, evasion, cold resistance and movement speed."
+  },
+  "cinderTotem": {
+   "ref": "Ngamahu Tiki",
+   "status": "covered",
+   "note": "Fire damage, life, regeneration and evasion on low life."
+  },
+  "hailBow": {
+   "ref": "Quill Rain",
+   "status": "covered",
+   "note": "A short bow with double attack speed and damage for 30% less damage, and fast projectiles."
+  },
+  "harvestersChase": {
+   "ref": "Reaper's Pursuit",
+   "status": "covered",
+   "note": "Physical damage, life on kill, item rarity, culling strike and movement speed on full life."
+  },
+  "crimsonGreaves": {
+   "ref": "Redblade Tramplers",
+   "status": "covered",
+   "note": "Life, added physical, armour, fire resistance and a lower enemy stun threshold."
+  },
+  "sparkQuiver": {
+   "ref": "Saemus' Gift",
+   "status": "covered",
+   "note": "Dexterity, cast speed, life, lightning resistance, avoid stun and lightning damage."
+  },
+  "saplingKite": {
+   "ref": "Springleaf",
+   "status": "covered",
+   "note": "Elemental resistance, armour and energy shield, regeneration and freeze duration reduction."
+  },
+  "thunderstrideGreaves": {
+   "ref": "Stormcharger",
+   "status": "covered",
+   "note": "Lightning resistance, movement speed, long shocks and physical converted to lightning."
+  },
+  "tidemarkRing": {
+   "ref": "Tasalio's Sign",
+   "status": "covered",
+   "note": "Added cold against chilled enemies, added cold to attacks and spells, evasion and chill avoidance."
+  },
+  "heartwoodKite": {
+   "ref": "The Oak",
+   "status": "covered",
+   "note": "Armour and energy shield, big life, regeneration and freeze duration reduction."
+  },
+  "ruinwakeBoots": {
+   "ref": "Wake of Destruction",
+   "status": "covered",
+   "note": "Movement speed, added lightning to attacks, life on kill and armour and energy shield."
+  },
+  "thornwall": {
+   "ref": "Wall of Brambles",
+   "status": "covered",
+   "note": "A big flat armour with reflect, added physical and less physical taken from attacks."
+  },
+  "windhideWrap": {
+   "ref": "Wildwrap",
+   "status": "covered",
+   "note": "A higher-level Quickhide Wrap: attack speed, evasion, cold resistance, movement speed and flask mana recovery."
+  },
+  "rimeheart": {
+   "ref": "Winterheart",
+   "status": "covered",
+   "note": "Dexterity, life, cold resistance, immune to chill and regeneration while frozen."
+  },
+  "cinderHeart": {
+   "ref": "Xoph's Heart",
+   "status": "covered",
+   "note": "Strength, fire damage, life and fire resistance."
+  }
+ }
 }

@@ -33,6 +33,16 @@ import {
 const NT = DAMAGE_TYPES.length;
 
 /** Resolved defensive stats of any combatant (player, monster, training dummy). */
+export type AilmentName = 'ignite' | 'shock' | 'chill' | 'freeze' | 'bleed' | 'poison';
+export const AILMENT_NAMES: AilmentName[] = [
+  'ignite',
+  'shock',
+  'chill',
+  'freeze',
+  'bleed',
+  'poison',
+];
+
 export type Defence = {
   /** The player (ailments from monsters differ: a monster's bleed deals less). */
   isPlayer: boolean;
@@ -93,6 +103,22 @@ export type Defence = {
   immuneAilments: boolean;
   /** Immune to this element (index = damage type): no damage and no matching ailment. */
   immune: boolean[];
+  /** Chance (fraction) to avoid each ailment when it would be inflicted. */
+  avoid: Record<AilmentName, number>;
+  /** Multiplier on how long each ailment lasts on this actor. */
+  durOnSelf: Record<AilmentName, number>;
+  /** Flat damage taken from each attack hit, by type (negative: less). */
+  flatTakenAttack: number[];
+  /** Damage dealt back to a melee attacker per hit, by type, and the share of the physical damage taken that is reflected. */
+  reflect: number[];
+  reflectPhysPct: number;
+  /** Multiplier on how fast leech is recovered (increased Life Leeched per second). */
+  leechRate: number;
+  /** Moving while bleeding does not make the bleed hurt more. */
+  noMovingBleed: boolean;
+  /** Chance (fraction) to dodge an attack hit, and a spell hit: the hit does nothing, apart from evasion. */
+  dodgeAttack: number;
+  dodgeSpell: number;
 };
 
 /** Dynamic state of the target at hit time. */
@@ -155,7 +181,7 @@ export function attackHitChance(p: SkillProfile, hand: HandProfile, def: Defence
   const isProj = p.skill.behaviour.kind === 'projectile';
   const bonus = isProj ? def.evadeProj : def.evadeMelee;
   if (bonus) c = Math.min(1, Math.max(0.05, c * (1 - bonus)));
-  return c;
+  return c * (1 - def.dodgeAttack);
 }
 
 export function blockChance(p: SkillProfile, def: Defence): number {
@@ -187,6 +213,10 @@ export function shockTaken(def: Defence, shock: number): number {
 export function mitigate(p: SkillProfile, t: TargetState, dmg: number[]): number[] {
   const def = t.def;
   takenAs(def, dmg);
+  if (p.isAttack)
+    for (let i = 0; i < NT; i++)
+      if (dmg[i] > 0 && def.flatTakenAttack[i] !== 0)
+        dmg[i] = Math.max(0, dmg[i] + def.flatTakenAttack[i]);
   const taken = def.damageTakenMult * def.hitTakenMult * shockTaken(def, t.shock);
   for (let i = 0; i < NT; i++) {
     if (dmg[i] <= 0) continue;
@@ -328,6 +358,10 @@ export function resolveHit(
     res.outcome = 'miss';
     return res;
   }
+  if (isSpellHit && t.def.dodgeSpell > 0 && rng.chance(t.def.dodgeSpell)) {
+    res.outcome = 'miss';
+    return res;
+  }
   const blk = blockChance(p, t.def);
   if (blk > 0 && rng.chance(blk)) {
     res.outcome = 'block';
@@ -416,9 +450,9 @@ export function expectedHit(
     t,
     avgH.map((h) => h * hand.hitMult * critM),
   );
-  const hc = p.isAttack ? attackHitChance(p, hand, t.def) : 1;
+  const hc = p.isAttack ? attackHitChance(p, hand, t.def) : 1 - t.def.dodgeSpell;
   // An attack confirms a critical strike with a second accuracy check (3.9).
-  const cc = hand.critChance * hc;
+  const cc = hand.critChance * (p.isAttack ? hc : 1);
   const perType = nonCrit.map((n, i) => n * (1 - cc) + crit[i] * cc);
   // Impale: each landed hit also deals the damage the impales on the target recorded, as reflected physical damage.
   if (p.impale.chance > 0 && avgH[PHYS] > 0) {

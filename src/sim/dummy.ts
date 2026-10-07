@@ -52,6 +52,15 @@ export function dummyDefence(over: Partial<Defence> = {}): Defence {
     cannotBeLeechedFrom: false,
     immuneAilments: false,
     immune: [false, false, false, false, false],
+    avoid: { ignite: 0, shock: 0, chill: 0, freeze: 0, bleed: 0, poison: 0 },
+    durOnSelf: { ignite: 1, shock: 1, chill: 1, freeze: 1, bleed: 1, poison: 1 },
+    flatTakenAttack: [0, 0, 0, 0, 0],
+    reflect: [0, 0, 0, 0, 0],
+    reflectPhysPct: 0,
+    leechRate: 1,
+    noMovingBleed: false,
+    dodgeAttack: 0,
+    dodgeSpell: 0,
     ...over,
   };
 }

@@ -33,6 +33,7 @@ import {
   DYN_SHIFT,
   hasBuffSource,
   hasRageSource,
+  hasRecoverSource,
   rageMods,
   type BuffId,
 } from '../data/buffs';
@@ -53,6 +54,7 @@ import {
   type Item,
 } from '../data/types';
 import { CondIndex, ModDB, type ModCtx } from '../mods/modDb';
+import { WIELD_CONDS } from './staticConds';
 import {
   mod,
   tagMask,
@@ -300,6 +302,8 @@ export class Character {
   readonly defaultAttack: SkillChoice;
   readonly hands: HandStats[];
   readonly dualWielding: boolean;
+  /** Tags of the weapons held (staff, bow, twoHand, ...). */
+  readonly weaponTags: Set<SkillTag>;
   readonly holdingShield: boolean;
   readonly flasks: FlaskSpec[];
   /** The bit of each condition this character's mods use; every ModDB of the character shares it. */
@@ -354,6 +358,7 @@ export class Character {
         },
       ];
     }
+    this.weaponTags = new Set<SkillTag>(this.hands.flatMap((h) => h.tags));
 
     // 1. Static mods: class, level, tree, items.
     const mods: Mod[] = [
@@ -432,7 +437,8 @@ export class Character {
       if (this.buffSource[id]) mods.push(...BUFFS[id].mods);
     }
     this.rageSource = hasRageSource(mods);
-    this.anyGain = this.rageSource || BUFF_IDS.some((id) => this.buffSource[id]);
+    this.anyGain =
+      this.rageSource || hasRecoverSource(mods) || BUFF_IDS.some((id) => this.buffSource[id]);
     this.rageMax =
       BASE_MAX_RAGE + mods.reduce((n, m) => (m.stat === 'maxRage' ? n + m.value : n), 0);
     this.defaultDyn = this.rageSource ? ASSUMED_RAGE << DYN_SHIFT : 0;
@@ -500,7 +506,7 @@ export class Character {
         this.gems.push({ gem: g, def, slot, socket, level: gemLevel(def, level, attrs, bonus) });
       });
     }
-    const weaponTags = new Set<SkillTag>(this.hands.flatMap((h) => h.tags));
+    const weaponTags = this.weaponTags;
     const costLifeAll = db0.flag('skillsCostLife', ctx0);
     // Gems in an item with the "socketed gems use life" rule pay and reserve life instead of mana.
     const usesLife = (slot: EquipSlot) =>
@@ -626,6 +632,9 @@ export class Character {
     for (const f of this.flasks) registerAll(f.buff);
     registerAll(rageMods(1));
     for (const id of ['onLowLife', 'overloadActive'] as const) this.cond.bit(id);
+    // Conditions that never change in a fight: the sheet takes them as true from the start.
+    for (const [id, tag] of WIELD_CONDS)
+      if (this.weaponTags.has(tag)) this.configConds = maskOr(this.configConds, this.cond.peek(id));
     if (this.config.steady)
       this.configConds = maskOr(this.configConds, this.steadyMask(this.config.steady));
   }
@@ -1127,7 +1136,7 @@ export class Character {
 
 export function skillRange(p: SkillProfile): number {
   const b = p.skill.behaviour;
-  if (b.kind === 'melee') return b.range;
+  if (b.kind === 'melee') return b.range + p.rangeBonus;
   if (b.kind === 'chain') return b.range;
   if (b.kind === 'burst') return b.origin === 'self' ? b.radius * 0.9 : (b.reach ?? b.radius);
   if (b.kind === 'beam') return b.length * 0.9;

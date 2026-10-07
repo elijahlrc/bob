@@ -108,6 +108,10 @@ export type SkillProfile = {
   alwaysFreezeOnCrit: boolean;
   /** Leech from critical strikes is instant. */
   instantLeechOnCrit: boolean;
+  /** All leech from this skill's hits is instant. */
+  instantLeechAlways: boolean;
+  /** Extra reach of melee skills, in tiles. */
+  rangeBonus: number;
   leechLife: number[];
   leechMana: number[];
   lifeOnHit: number;
@@ -365,7 +369,12 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     useTime,
     repeats: Math.max(0, Math.round(db.sum('base', 'repeats', baseCtx))),
     pulses: beh.kind === 'ground' ? Math.max(1, Math.floor(beh.duration / beh.interval)) : 1,
-    cost: Math.round(skill.cost * inp.costMult * db.mult('cost', baseCtx)),
+    cost: Math.max(
+      0,
+      Math.round(
+        skill.cost * inp.costMult * db.mult('cost', baseCtx) + db.sum('base', 'costFlat', baseCtx),
+      ),
+    ),
     ignite: igniteSpec(),
     bleed: isAttack
       ? ailment('chance.bleed', 'duration.bleed', BLEED_DURATION)
@@ -400,6 +409,8 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     },
     alwaysFreezeOnCrit: db.flag('alwaysFreezeOnCrit', baseCtx),
     instantLeechOnCrit: db.flag('instantLeechOnCrit', baseCtx),
+    instantLeechAlways: db.flag('instantLeechAlways', baseCtx),
+    rangeBonus: beh.kind === 'melee' ? db.sum('base', 'meleeRange', baseCtx) : 0,
     leechLife: perType('leech.life').map((v) => v * db.mult('leechRecovery', baseCtx)),
     leechMana: perType('leech.mana').map((v) => v * db.mult('leechRecovery', baseCtx)),
     lifeOnHit: db.sum('base', 'lifeOnHit', baseCtx),

@@ -49,9 +49,18 @@ export function flaskSpec(f: FlaskItem, charDb: ModDB): FlaskSpec {
     uid: f.uid,
     kind: base.kind,
     name: f.name,
-    life: Math.round(base.life * recovery),
-    mana: Math.round(base.mana * recovery),
-    duration: Math.max(0.5, duration),
+    life: Math.round(base.life * recovery * charDb.mult('flaskLifeRecovery')),
+    mana: Math.round(base.mana * recovery * charDb.mult('flaskManaRecovery')),
+    // A faster recovery rate is the same amount over less time.
+    duration: Math.max(
+      0.5,
+      duration /
+        (base.life > 0
+          ? charDb.mult('flaskLifeRate')
+          : base.mana > 0
+            ? charDb.mult('flaskManaRate')
+            : 1),
+    ),
     maxCharges: Math.round(base.maxCharges * local.mult('flask.maxCharges')),
     perUse: base.perUse,
     instant: local.flag('flask.instant'),

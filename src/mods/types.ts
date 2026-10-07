@@ -142,6 +142,23 @@ export const CONDITIONS = [
   'onslaught',
   'unholyMight',
   'arcaneSurge',
+  // State of the player (C3): moving, ailments on the player, the weapon held.
+  'stationary',
+  'ignited',
+  'shocked',
+  'chilled',
+  'frozen',
+  'bleeding',
+  'poisoned',
+  'wieldingStaff',
+  'wieldingBow',
+  'wieldingSword',
+  'wieldingAxe',
+  'wieldingMace',
+  'wieldingDagger',
+  'wieldingClaw',
+  'wieldingWand',
+  'wieldingSceptre',
 ] as const;
 export type CondId = (typeof CONDITIONS)[number];
 
