@@ -644,6 +644,131 @@
    "ref": "Sunder",
    "status": "covered",
    "note": "A slam that sends a shockwave forward with a weaker second wave (the waves are averaged)."
+  },
+  "rimeDrift": {
+   "ref": "Creeping Frost",
+   "status": "covered",
+   "note": "A slow cold projectile that leaves a field of frost where it ends (modelled as a short zone at its end)."
+  },
+  "anvilDrop": {
+   "ref": "Crushing Fist",
+   "status": "covered",
+   "note": "A heavy slam with a shield-less weapon that stuns more easily (the retaliation condition is dropped)."
+  },
+  "snareShot": {
+   "ref": "Ensnaring Arrow",
+   "status": "covered",
+   "note": "An arrow that tethers its target, slowing it (modelled as a hit that also slows by chilling)."
+  },
+  "glacierWall": {
+   "ref": "Frost Wall",
+   "status": "covered",
+   "note": "A wall of ice that hits what stands under it (modelled as a line of ground that lasts three seconds)."
+  },
+  "rimeRebuke": {
+   "ref": "Glacial Shield Swipe",
+   "status": "covered",
+   "note": "A shield swipe that is half cold, in a wide arc (the retaliation condition is dropped)."
+  },
+  "haloSweep": {
+   "ref": "Holy Sweep",
+   "status": "covered",
+   "note": "A sweeping attack of lightning in a wide arc."
+  },
+  "clusterBolt": {
+   "ref": "Kinetic Blast of Clustering",
+   "status": "covered",
+   "note": "A wand shot that bursts into a large cluster of physical bursts."
+  },
+  "cleansingBlaze": {
+   "ref": "Purifying Flame",
+   "status": "covered",
+   "note": "A burst of holy fire that burns the ground in an area (modelled as a short zone, with the consecrated ground dropped)."
+  },
+  "slagLob": {
+   "ref": "Rolling Magma",
+   "status": "covered",
+   "note": "A fire projectile that chains between enemies, bursting at each."
+  },
+  "blightHail": {
+   "ref": "Scourge Arrow",
+   "status": "covered",
+   "note": "A channelled bow skill that builds up a growing hail of chaos arrows (the stacks are averaged into a steady volley)."
+  },
+  "spiritSaw": {
+   "ref": "Soulrend",
+   "status": "covered",
+   "note": "A slow, spinning chaos projectile that eats at what it hits and returns the caster's energy shield."
+  },
+  "ghostCoil": {
+   "ref": "Spectral Helix",
+   "status": "covered",
+   "note": "A spectral weapon that flies out in a spiral and comes back (modelled as a returning projectile)."
+  },
+  "ghostShard": {
+   "ref": "Spectral Shield Throw",
+   "status": "covered",
+   "note": "Throws spectral shards of the shield, hitting harder the more armour and evasion the shield has (the scaling is averaged)."
+  },
+  "brimstoneStorm": {
+   "ref": "Storm Burst",
+   "status": "covered",
+   "note": "A channelled storm that fires jumping lightning orbs around the caster (averaged into repeated bursts)."
+  },
+  "bladeWind": {
+   "ref": "Swordstorm",
+   "status": "covered",
+   "note": "A flurry of blade-wind strikes in all directions (the retaliation condition is dropped)."
+  },
+  "magmaCrack": {
+   "ref": "Tectonic Slam",
+   "status": "covered",
+   "note": "A slam that is half fire and sends fissures out in front of the character."
+  },
+  "whirlShot": {
+   "ref": "Tornado Shot",
+   "status": "covered",
+   "note": "A bow shot with a main arrow and a ring of secondary arrows that burst from it as it flies (folded into a fan)."
+  },
+  "venomShower": {
+   "ref": "Toxic Rain",
+   "status": "covered",
+   "note": "Arrows rain on an area as a poisonous cloud (modelled as a zone with poison on every pulse)."
+  },
+  "toxinCircle": {
+   "ref": "Venom Gyre",
+   "status": "covered",
+   "note": "A spinning projectile that poisons and returns, hitting on both legs."
+  },
+  "guardedStrike": {
+   "ref": "Vigilant Strike",
+   "status": "covered",
+   "note": "A strike that also fortifies the character for a while."
+  },
+  "blizzardRing": {
+   "ref": "Vortex",
+   "status": "covered",
+   "note": "A slow expanding vortex of frost around the caster that chills for several seconds."
+  },
+  "tideOfJudgement": {
+   "ref": "Wave of Conviction",
+   "status": "covered",
+   "note": "A wave of fire, lightning and physical force that shifts which element is weakest to it (averaged into a mix)."
+  },
+  "primeSplash": {
+   "ref": "Wild Strike",
+   "status": "covered",
+   "note": "A strike that carries a random element and fires that element's projectiles from the target (averaged over the elements)."
+  },
+  "hoarfrostMote": {
+   "ref": "Winter Orb",
+   "status": "covered",
+   "note": "A channelled orb of cold that grows stronger the longer it is held (averaged), pulsing around the caster."
+  },
+  "rotTouch": {
+   "ref": "Wither",
+   "status": "covered",
+   "note": "A channelled chaos cloud that stacks a debuff making enemies take more chaos damage (averaged into a lower chaos resistance)."
   }
  },
  "uniques": {

@@ -52,12 +52,18 @@ function weaponFor(def: ActiveGemDef): string {
   return 'wand_3';
 }
 
-function buildFor(gems: string[], main: string, classId: string, dual = false): Build {
+function buildFor(
+  gems: string[],
+  main: string,
+  classId: string,
+  off: 'none' | 'dual' | 'shield' = 'none',
+): Build {
   const run = newRun(classId, 1);
   const b = run.build;
   b.level = 50;
   b.equipment.mainHand = makeItem(uid, main, 50, 1);
-  if (dual) b.equipment.offHand = makeItem(uid, main, 50, 1);
+  if (off === 'dual') b.equipment.offHand = makeItem(uid, main, 50, 1);
+  else if (off === 'shield') b.equipment.offHand = makeItem(uid, 'shield_ar_3', 50, 1);
   else delete b.equipment.offHand;
   const body = makeItem(uid, 'body_ar_1', 50, Math.max(1, gems.length));
   body.sockets = gems.map((g) => makeGem(uid, g));
@@ -79,7 +85,7 @@ describe('every active gem', () => {
         granted ? [] : [def.id],
         main,
         classId,
-        !!def.needsDualWield || !!def.bothWeapons,
+        def.needsShield ? 'shield' : def.needsDualWield || def.bothWeapons ? 'dual' : 'none',
       );
       const c = new Character(b, { areaLevel: 50 });
       const sheet = c.sheet();

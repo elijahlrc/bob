@@ -565,6 +565,10 @@ export class Character {
         usable = false;
         reason = `${skill.name} needs two weapons`;
       }
+      if (sg.def.needsShield && !this.holdingShield) {
+        usable = false;
+        reason = `${skill.name} needs a shield`;
+      }
       if (skill.id === 'venomCut' && weaponTags.has('twoHand')) {
         usable = false;
         reason = `${skill.name} needs a one-handed weapon`;

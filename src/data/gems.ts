@@ -83,6 +83,8 @@ export type ActiveGemDef = {
   bothWeapons?: boolean;
   /** Only usable while dual wielding. */
   needsDualWield?: boolean;
+  /** Only usable while holding a shield. */
+  needsShield?: boolean;
   description: string;
 };
 
