@@ -1,0 +1,18 @@
+[
+  { "ref": "Discharge", "note": "A nova around the character whose damage grows with the charges held: fire per Grit, cold per Fervour, lightning per Insight (the charges are not consumed here).",
+    "def": { "kind": "active", "id": "chargeRelease", "name": "Charge Release", "attr": "int", "skillType": "spell", "tags": ["spell", "area", "fire", "cold", "lightning", "nova"], "types": ["triggerable", "repeatable"],
+      "behaviour": { "kind": "burst", "radius": 3.2, "origin": "self" }, "castTime": 0.75, "crit": 7, "cost": [13, 25],
+      "mods": [
+        { "stat": "damage.min", "kind": "base", "value": [3, 120], "damageTypes": ["fire"], "per": { "stat": "charges.grit", "div": 1 } },
+        { "stat": "damage.max", "kind": "base", "value": [5, 180], "damageTypes": ["fire"], "per": { "stat": "charges.grit", "div": 1 } },
+        { "stat": "damage.min", "kind": "base", "value": [2, 100], "damageTypes": ["cold"], "per": { "stat": "charges.fervour", "div": 1 } },
+        { "stat": "damage.max", "kind": "base", "value": [4, 150], "damageTypes": ["cold"], "per": { "stat": "charges.fervour", "div": 1 } },
+        { "stat": "damage.min", "kind": "base", "value": [1, 20], "damageTypes": ["lightning"], "per": { "stat": "charges.insight", "div": 1 } },
+        { "stat": "damage.max", "kind": "base", "value": [8, 330], "damageTypes": ["lightning"], "per": { "stat": "charges.insight", "div": 1 } } ],
+      "description": "Lets out the charges you hold as a nova of fire, cold and lightning." } },
+  { "ref": "Siphoning Trap of Pain", "note": "A variant of the drain trap that deals chaos damage over time to the enemies near it and feeds the character.",
+    "def": { "kind": "active", "id": "rotDrainTrap", "name": "Rot Drain Trap", "attr": "dex", "skillType": "spell", "tags": ["spell", "trap", "area", "chaos", "duration"], "types": ["trap"],
+      "behaviour": { "kind": "ground", "radius": 2.2, "duration": 3, "interval": 0.5, "reach": 8 },
+      "spellDamage": [{ "type": "chaos", "spread": [0.8, 1.2] }], "effectiveness": 35, "castTime": 1, "crit": 0, "cost": [7, 24], "mods": [{ "stat": "leech.life", "kind": "base", "value": 1 }, { "stat": "chance.poison", "kind": "base", "value": 50 }],
+      "description": "A trap that rots the enemies near it and feeds you." } }
+]

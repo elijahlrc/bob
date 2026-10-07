@@ -143,7 +143,14 @@ describe('every support gem', () => {
       const b = buildFor([a.id, s.id], weaponFor(a), ATTR_CLASS(a.attr));
       const c = new Character(b, { areaLevel: 50 });
       expect(finite(c.sheet().skill.totalDps)).toBe(true);
-      if (!s.trigger && !s.hexOnHit)
+      if (s.blasphemy) {
+        // The curse stands on enemies hit and reserves mana instead of being cast.
+        const choice = c.actives.find((x) => x.skill.id === a.id)!;
+        expect(choice.supports.map((x) => x.def.id)).toContain(s.id);
+        expect(c.hexes.length).toBeGreaterThan(0);
+        expect(c.reservedMana).toBeGreaterThan(0);
+        expect(c.utilities).toHaveLength(0);
+      } else if (!s.trigger && !s.hexOnHit)
         expect(c.primary.supports.map((x) => x.def.id)).toContain(s.id);
       for (const other of actives.filter((x) => !ok.includes(x))) {
         const bad = buildFor([other.id, s.id], weaponFor(other), ATTR_CLASS(other.attr));

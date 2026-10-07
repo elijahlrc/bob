@@ -133,6 +133,12 @@ export type SupportGemDef = {
   trigger?: TriggerDef;
   /** Hexing Strikes: the hex gems in the same item are applied to enemies the supported skill hits. */
   hexOnHit?: boolean;
+  /** Mods that act on the whole character while a skill the support applies to is socketed (not only on that skill). */
+  global?: GemMod[];
+  /** Triggers the support gives the character while it applies to a socketed skill (a kill spreads ignites). */
+  extraTriggers?: TriggerDef[];
+  /** Blasphemy: the supported curse is always on every enemy the character hits, and reserves mana instead of being cast. */
+  blasphemy?: { reservePct: number };
   description: string;
 };
 

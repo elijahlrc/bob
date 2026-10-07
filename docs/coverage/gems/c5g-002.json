@@ -1,0 +1,105 @@
+[
+  { "ref": "Ancestral Call Support", "note": "The supported melee strike also strikes twice more at other targets near it (modelled as two repeats at slightly less damage).",
+    "def": { "kind": "support", "id": "echoingBlow", "name": "Echoing Blow", "attr": "str", "supports": ["melee"], "needs": ["attack"], "excludes": ["triggered", "channelling"], "costMult": 1.4, "mods": [
+      { "stat": "repeats", "kind": "base", "value": 2 }, { "stat": "damage", "kind": "more", "value": [-19, 0] } ],
+      "description": "The strike lands twice more on other targets near it." } },
+  { "ref": "Barrage Support", "note": "The supported bow or wand attack fires four more projectiles in a tight fan at less damage each.",
+    "def": { "kind": "support", "id": "rollingVolleys", "name": "Rolling Volleys", "attr": "dex", "supports": ["projectile"], "needs": ["attack"], "excludes": ["channelling"], "costMult": 1.4, "mods": [
+      { "stat": "projectiles", "kind": "base", "value": 4 }, { "stat": "damage", "kind": "more", "value": [-30, -20] } ],
+      "description": "Four more projectiles, each hitting less." } },
+  { "ref": "Blind Support", "note": "Hits blind enemies (modelled as the hexed enemies dealing less damage).",
+    "def": { "kind": "support", "id": "dazzle", "name": "Dazzle", "attr": "dex", "supports": [], "costMult": 1.1, "mods": [],
+      "global": [{ "stat": "hexOnHit.feebleGrip", "kind": "base", "value": [3, 10] }],
+      "description": "Enemies you hit deal less damage, as if blinded." } },
+  { "ref": "Block Chance Reduction Support", "note": "Enemies block and dodge less (modelled as more accuracy for the supported skill).",
+    "def": { "kind": "support", "id": "guardBreaker", "name": "Guard Breaker", "attr": "dex", "supports": [], "costMult": 1.1, "mods": [
+      { "stat": "accuracy", "kind": "inc", "value": [20, 40] } ],
+      "description": "Your hits land past guards." } },
+  { "ref": "Chance to Flee Support", "note": "Hit enemies lose their nerve and slow down (modelled as a slowing hex on enemies hit).",
+    "def": { "kind": "support", "id": "rout", "name": "Rout", "attr": "dex", "supports": [], "costMult": 1.1, "mods": [],
+      "global": [{ "stat": "hexOnHit.leadenLimbs", "kind": "base", "value": [3, 10] }],
+      "description": "Enemies you hit falter and slow down." } },
+  { "ref": "Energy Leech Support", "note": "Hits restore energy shield, and the skill deals more damage while the character is on full energy shield.",
+    "def": { "kind": "support", "id": "wardSiphon", "name": "Ward Siphon", "attr": "int", "supports": [], "costMult": 1.3, "mods": [
+      { "stat": "esOnHit", "kind": "base", "value": [6, 60] }, { "stat": "damage", "kind": "more", "value": [12, 24], "condition": { "id": "esFull" } } ],
+      "description": "Hits restore energy shield." } },
+  { "ref": "Enhance Support", "note": "Raises the quality of the supported gem (modelled as a small increase in damage).",
+    "def": { "kind": "support", "id": "refineGem", "name": "Refine Gem", "attr": "dex", "supports": [], "costMult": 1.15, "mods": [
+      { "stat": "damage", "kind": "inc", "value": [0, 20] } ],
+      "description": "Raises the quality of the supported gem." } },
+  { "ref": "Enlighten Support", "note": "Lowers the mana cost multiplier of the supported gem group (modelled as a cost multiplier below one).",
+    "def": { "kind": "support", "id": "deepInsight", "name": "Deep Insight", "attr": "int", "supports": [], "costMult": 0.75, "mods": [],
+      "description": "Makes the supported skill cheaper to cast." } },
+  { "ref": "Immolate Support", "note": "The supported attack deals more burning damage and ignites more often, adding fire damage.",
+    "def": { "kind": "support", "id": "cindering", "name": "Cindering", "attr": "str", "supports": ["attack"], "costMult": 1.3, "mods": [
+      { "stat": "damage.min", "kind": "base", "value": [3, 60], "damageTypes": ["fire"] }, { "stat": "damage.max", "kind": "base", "value": [5, 90], "damageTypes": ["fire"] },
+      { "stat": "chance.ignite", "kind": "base", "value": 20 } ],
+      "description": "Adds fire damage to the attack and ignites more often." } },
+  { "ref": "Ignite Proliferation Support", "note": "Ignites spread to the enemies nearby when an ignited enemy is killed, and ignite damage rises.",
+    "def": { "kind": "support", "id": "wildfireSeed", "name": "Wildfire Seed", "attr": "int", "supports": [], "costMult": 1.3, "mods": [
+      { "stat": "damage", "kind": "more", "value": [20, 39], "tags": ["ignite"] } ],
+      "extraTriggers": [{ "on": "kill", "targetHas": "ignite", "chance": 100, "cooldown": 0, "effect": { "kind": "spread", "ailment": "ignite", "radius": 3 } }],
+      "description": "Ignites spread from the enemies you kill." } },
+  { "ref": "Inspiration Support", "note": "The supported skill costs less mana and hits harder in critical strikes with each Insight charge held (the righteous charges are folded into Insight).",
+    "def": { "kind": "support", "id": "lightheart", "name": "Lightheart", "attr": "str", "supports": [], "costMult": 0.7, "mods": [
+      { "stat": "critChance", "kind": "inc", "value": [6, 8], "per": { "stat": "charges.insight", "div": 1 } },
+      { "stat": "damage", "kind": "more", "value": [5, 7], "damageTypes": ["fire", "cold", "lightning"], "per": { "stat": "charges.insight", "div": 1 } } ],
+      "description": "A cheaper skill that grows stronger with Insight." } },
+  { "ref": "Intensify Support", "note": "The supported area spell hits harder and wider, the charge-up between uses averaged into a flat bonus.",
+    "def": { "kind": "support", "id": "swellingBlast", "name": "Swelling Blast", "attr": "int", "supports": ["area"], "needs": ["spell"], "excludes": ["totem", "trap", "mine", "channelling", "triggered"], "costMult": 1.4, "mods": [
+      { "stat": "aoe", "kind": "inc", "value": [35, 54] }, { "stat": "damage", "kind": "more", "value": [10, 16], "tags": ["area"] } ],
+      "description": "Area spells grow in size and strength." } },
+  { "ref": "Item Rarity Support", "note": "More rarity of the items dropped by enemies killed while the supported skill is socketed.",
+    "def": { "kind": "support", "id": "scavenger", "name": "Scavenger", "attr": "int", "supports": [], "costMult": 1.1, "mods": [],
+      "global": [{ "stat": "itemRarity", "kind": "inc", "value": [40, 59] }],
+      "description": "Enemies drop rarer items." } },
+  { "ref": "Less Duration Support", "note": "Shorter zones and ailments for more damage.",
+    "def": { "kind": "support", "id": "briefBurst", "name": "Brief Burst", "attr": "str", "supports": ["duration"], "costMult": 1.2, "mods": [
+      { "stat": "skillDuration", "kind": "more", "value": [-49, -40] }, { "stat": "damage", "kind": "more", "value": [10, 19] } ],
+      "description": "The skill's effects end sooner and hit harder." } },
+  { "ref": "More Duration Support", "note": "Longer zones and ailments for less damage.",
+    "def": { "kind": "support", "id": "lingeringEffect", "name": "Lingering Effect", "attr": "str", "supports": ["duration"], "costMult": 1.2, "mods": [
+      { "stat": "skillDuration", "kind": "more", "value": [25, 44] }, { "stat": "damage", "kind": "more", "value": -15 } ],
+      "description": "The skill's effects last longer at less strength." } },
+  { "ref": "Maim Support", "note": "Hits maim: enemies slow and take more physical damage (modelled as hexes on the enemies hit), and the skill deals more physical damage.",
+    "def": { "kind": "support", "id": "hamstring", "name": "Hamstring", "attr": "str", "supports": ["attack"], "costMult": 1.15, "mods": [
+      { "stat": "damage", "kind": "more", "value": [15, 30], "damageTypes": ["physical"] } ],
+      "global": [{ "stat": "hexOnHit.openWounds", "kind": "base", "value": [1, 6] }],
+      "description": "Hits cripple: enemies slow and take more physical damage." } },
+  { "ref": "Mirage Archer Support", "note": "A mirage of the archer fires with each attack, a little weaker and slower (modelled as one repeat of the attack).",
+    "def": { "kind": "support", "id": "twinShadow", "name": "Twin Shadow", "attr": "dex", "supports": ["projectile"], "needs": ["attack"], "excludes": ["totem", "trap", "mine", "triggered"], "costMult": 1.4, "mods": [
+      { "stat": "repeats", "kind": "base", "value": 1 }, { "stat": "damage", "kind": "more", "value": [-40, -31] } ],
+      "description": "A shadow of you fires with every shot." } },
+  { "ref": "Nightblade Support", "note": "Critical strikes grant Elusive (modelled as a bonus to critical chance and multiplier for the supported skill).",
+    "def": { "kind": "support", "id": "veilCut", "name": "Veil Cut", "attr": "dex", "supports": ["attack"], "costMult": 1.4, "mods": [
+      { "stat": "critChance", "kind": "inc", "value": [70, 100] }, { "stat": "critMulti", "kind": "base", "value": [40, 60] } ],
+      "description": "Sharper critical strikes." } },
+  { "ref": "Rage Support", "note": "Melee hits grant Rage, which boosts attacks.",
+    "def": { "kind": "support", "id": "fury", "name": "Fury Well", "attr": "str", "supports": ["melee"], "costMult": 1.3, "mods": [
+      { "stat": "rageOn.meleeHit", "kind": "base", "value": 1 } ],
+      "description": "Melee hits build Rage." } },
+  { "ref": "Shockwave Support", "note": "Blunt hits send a shockwave that hits the area (modelled as more melee damage in an area and a wider reach).",
+    "def": { "kind": "support", "id": "shatteringBlows", "name": "Shattering Blows", "attr": "str", "supports": ["melee"], "costMult": 1.4, "mods": [
+      { "stat": "aoe", "kind": "inc", "value": 25 }, { "stat": "damage", "kind": "more", "value": 25, "tags": ["melee"] } ],
+      "description": "Blunt hits send a shockwave through the enemies around." } },
+  { "ref": "Spell Cascade Support", "note": "The supported area spell is cast again on both sides of the target (modelled as two repeats at less damage).",
+    "def": { "kind": "support", "id": "flankingCast", "name": "Flanking Cast", "attr": "int", "supports": ["cascadable"], "excludes": ["totem", "trap", "mine", "triggered"], "costMult": 1.4, "mods": [
+      { "stat": "repeats", "kind": "base", "value": 2 }, { "stat": "damage", "kind": "more", "value": [-40, -21] }, { "stat": "aoe", "kind": "inc", "value": -20 } ],
+      "description": "The spell lands again on either side." } },
+  { "ref": "Unleash Support", "note": "The supported spell is cast again, at less damage per cast (the stored seals are averaged).",
+    "def": { "kind": "support", "id": "doubleRelease", "name": "Double Release", "attr": "int", "supports": ["repeatable"], "needs": ["spell"], "excludes": ["totem", "trap", "mine", "triggered", "channelling"], "costMult": 1.4, "mods": [
+      { "stat": "repeats", "kind": "base", "value": 1 }, { "stat": "damage", "kind": "more", "value": [-35, -26] } ],
+      "description": "The spell is released again at once." } },
+  { "ref": "Blasphemy Support", "note": "A curse under this support is no longer cast: it stands on every enemy the character hits, and reserves mana.",
+    "def": { "kind": "support", "id": "standingCurse", "name": "Standing Curse", "attr": "int", "supports": ["curse"], "costMult": 1, "mods": [],
+      "blasphemy": { "reservePct": 35 },
+      "description": "The supported curse stays on every enemy you hit, at the cost of reserved mana." } },
+  { "ref": "Cast on Melee Kill Support", "note": "Spells linked to the supported melee skill are cast when it kills.",
+    "def": { "kind": "support", "id": "slayersEcho", "name": "Slayer's Echo", "attr": "str", "supports": ["melee"], "excludes": ["totem", "trap", "mine"], "costMult": 1.4, "mods": [],
+      "trigger": { "on": "kill", "tags": ["melee"], "chance": 100, "cooldown": 0.25, "effect": { "kind": "castSocketed" } },
+      "description": "Linked spells are cast when your melee blows kill." } },
+  { "ref": "Cast when Stunned Support", "note": "Spells linked to the supported spell are cast when the character has taken a heavy blow (a stun is approximated by a large hit).",
+    "def": { "kind": "support", "id": "reelingCast", "name": "Reeling Cast", "attr": "int", "supports": ["triggerable"], "needs": ["spell"], "excludes": ["totem", "trap", "mine"], "costMult": 1.3, "mods": [],
+      "trigger": { "on": "hitTaken", "chance": 100, "cooldown": 0.5, "threshold": 20, "effect": { "kind": "castSocketed" } },
+      "description": "Linked spells are cast when a heavy blow lands on you." } }
+]

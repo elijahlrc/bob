@@ -298,6 +298,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   else addLeech(src, 'leechLife', ll, instant);
   addLeech(src, 'leechMana', lm, instant);
   if (p.lifeOnHit > 0) src.life = Math.min(lifeCap(w, src), src.life + p.lifeOnHit);
+  if (p.esOnHit > 0 && src.isPlayer) src.es = Math.min(src.def.maxEs, src.es + p.esOnHit);
   if (p.manaOnHit > 0 && src.isPlayer)
     src.mana = Math.min(Math.max(0, src.def.maxMana - w.char.reservedMana), src.mana + p.manaOnHit);
 

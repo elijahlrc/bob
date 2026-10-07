@@ -1364,6 +1364,141 @@
    "ref": "Storm Brand",
    "status": "covered",
    "note": "A brand that attaches to an enemy and chains lightning from it to others near, every 0.6 seconds."
+  },
+  "echoingBlow": {
+   "ref": "Ancestral Call Support",
+   "status": "covered",
+   "note": "The supported melee strike also strikes twice more at other targets near it (modelled as two repeats at slightly less damage)."
+  },
+  "rollingVolleys": {
+   "ref": "Barrage Support",
+   "status": "covered",
+   "note": "The supported bow or wand attack fires four more projectiles in a tight fan at less damage each."
+  },
+  "dazzle": {
+   "ref": "Blind Support",
+   "status": "covered",
+   "note": "Hits blind enemies (modelled as the hexed enemies dealing less damage)."
+  },
+  "guardBreaker": {
+   "ref": "Block Chance Reduction Support",
+   "status": "covered",
+   "note": "Enemies block and dodge less (modelled as more accuracy for the supported skill)."
+  },
+  "rout": {
+   "ref": "Chance to Flee Support",
+   "status": "covered",
+   "note": "Hit enemies lose their nerve and slow down (modelled as a slowing hex on enemies hit)."
+  },
+  "wardSiphon": {
+   "ref": "Energy Leech Support",
+   "status": "covered",
+   "note": "Hits restore energy shield, and the skill deals more damage while the character is on full energy shield."
+  },
+  "refineGem": {
+   "ref": "Enhance Support",
+   "status": "covered",
+   "note": "Raises the quality of the supported gem (modelled as a small increase in damage)."
+  },
+  "deepInsight": {
+   "ref": "Enlighten Support",
+   "status": "covered",
+   "note": "Lowers the mana cost multiplier of the supported gem group (modelled as a cost multiplier below one)."
+  },
+  "cindering": {
+   "ref": "Immolate Support",
+   "status": "covered",
+   "note": "The supported attack deals more burning damage and ignites more often, adding fire damage."
+  },
+  "wildfireSeed": {
+   "ref": "Ignite Proliferation Support",
+   "status": "covered",
+   "note": "Ignites spread to the enemies nearby when an ignited enemy is killed, and ignite damage rises."
+  },
+  "lightheart": {
+   "ref": "Inspiration Support",
+   "status": "covered",
+   "note": "The supported skill costs less mana and hits harder in critical strikes with each Insight charge held (the righteous charges are folded into Insight)."
+  },
+  "swellingBlast": {
+   "ref": "Intensify Support",
+   "status": "covered",
+   "note": "The supported area spell hits harder and wider, the charge-up between uses averaged into a flat bonus."
+  },
+  "scavenger": {
+   "ref": "Item Rarity Support",
+   "status": "covered",
+   "note": "More rarity of the items dropped by enemies killed while the supported skill is socketed."
+  },
+  "briefBurst": {
+   "ref": "Less Duration Support",
+   "status": "covered",
+   "note": "Shorter zones and ailments for more damage."
+  },
+  "lingeringEffect": {
+   "ref": "More Duration Support",
+   "status": "covered",
+   "note": "Longer zones and ailments for less damage."
+  },
+  "hamstring": {
+   "ref": "Maim Support",
+   "status": "covered",
+   "note": "Hits maim: enemies slow and take more physical damage (modelled as hexes on the enemies hit), and the skill deals more physical damage."
+  },
+  "twinShadow": {
+   "ref": "Mirage Archer Support",
+   "status": "covered",
+   "note": "A mirage of the archer fires with each attack, a little weaker and slower (modelled as one repeat of the attack)."
+  },
+  "veilCut": {
+   "ref": "Nightblade Support",
+   "status": "covered",
+   "note": "Critical strikes grant Elusive (modelled as a bonus to critical chance and multiplier for the supported skill)."
+  },
+  "fury": {
+   "ref": "Rage Support",
+   "status": "covered",
+   "note": "Melee hits grant Rage, which boosts attacks."
+  },
+  "shatteringBlows": {
+   "ref": "Shockwave Support",
+   "status": "covered",
+   "note": "Blunt hits send a shockwave that hits the area (modelled as more melee damage in an area and a wider reach)."
+  },
+  "flankingCast": {
+   "ref": "Spell Cascade Support",
+   "status": "covered",
+   "note": "The supported area spell is cast again on both sides of the target (modelled as two repeats at less damage)."
+  },
+  "doubleRelease": {
+   "ref": "Unleash Support",
+   "status": "covered",
+   "note": "The supported spell is cast again, at less damage per cast (the stored seals are averaged)."
+  },
+  "standingCurse": {
+   "ref": "Blasphemy Support",
+   "status": "covered",
+   "note": "A curse under this support is no longer cast: it stands on every enemy the character hits, and reserves mana."
+  },
+  "slayersEcho": {
+   "ref": "Cast on Melee Kill Support",
+   "status": "covered",
+   "note": "Spells linked to the supported melee skill are cast when it kills."
+  },
+  "reelingCast": {
+   "ref": "Cast when Stunned Support",
+   "status": "covered",
+   "note": "Spells linked to the supported spell are cast when the character has taken a heavy blow (a stun is approximated by a large hit)."
+  },
+  "chargeRelease": {
+   "ref": "Discharge",
+   "status": "covered",
+   "note": "A nova around the character whose damage grows with the charges held: fire per Grit, cold per Fervour, lightning per Insight (the charges are not consumed here)."
+  },
+  "rotDrainTrap": {
+   "ref": "Siphoning Trap of Pain",
+   "status": "covered",
+   "note": "A variant of the drain trap that deals chaos damage over time to the enemies near it and feeds the character."
   }
  },
  "uniques": {

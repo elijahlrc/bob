@@ -150,6 +150,16 @@ function deployKind(own: readonly string[], all: ReadonlySet<string>): DeployKin
   return undefined;
 }
 
+/** The Blasphemy support on a curse skill, if there is one: the curse is a standing aura, not a cast. */
+export function blasphemyOf(c: SkillChoice): { reservePct: number } | undefined {
+  if (c.skill.utility?.kind !== 'curse') return undefined;
+  for (const s of c.supports) {
+    const b = (s.def as SupportGemDef).blasphemy;
+    if (b) return b;
+  }
+  return undefined;
+}
+
 export type SkillChoice = {
   key: string;
   gemUid: number | null;
@@ -670,6 +680,29 @@ export class Character {
       costsLife: costLifeAll,
     };
     this.buildTriggers(build);
+    // What supports give beyond their own skill: mods for the whole character, and triggers.
+    for (const a of this.actives) {
+      if (!a.usable || a.gemUid === null) continue;
+      for (const s of a.supports) {
+        const sd = s.def as SupportGemDef;
+        if (sd.global)
+          db0.addAll(
+            gemMods(sd.global, s.level, sd.id).map((m) => ({
+              ...m,
+              source: { kind: 'gem' as const, id: sd.id },
+            })),
+          );
+        (sd.extraTriggers ?? []).forEach((t, i) =>
+          this.triggers.push({
+            key: `sup${s.gem.uid}:${i}`,
+            def: t,
+            slot: s.slot,
+            skills: [],
+            tagMask: tagMask(t.tags),
+          }),
+        );
+      }
+    }
     const chosen =
       this.actives.find((a) => a.gemUid === build.primaryGem && !a.triggered && !a.skill.utility) ??
       this.actives.find((a) => a.usable && !a.triggered && !a.skill.utility);
@@ -690,6 +723,7 @@ export class Character {
     for (const a of this.actives) {
       if (!a.usable || a.triggered || a.gemUid === null || casting.has(a.skill.id)) continue;
       casting.add(a.skill.id);
+      if (blasphemyOf(a)) continue;
       if (a.skill.utility) this.utilities.push(a);
       else this.secondaryCandidates.push(a);
     }
@@ -700,6 +734,12 @@ export class Character {
     let reservedMana = 0;
     let reservedLife = 0;
     const auraEffect = db0.mult('auraEffect', ctx0);
+    // A curse under Blasphemy stands as an aura that reserves mana.
+    for (const a of this.actives) {
+      const b = blasphemyOf(a);
+      if (a.usable && b)
+        reservedMana += Math.ceil((b.reservePct / 100) * pre.maxMana * (1 - Math.min(0.95, red)));
+    }
     for (const sg of this.gems) {
       if (sg.def.kind !== 'aura') continue;
       const def = sg.def;
@@ -894,6 +934,11 @@ export class Character {
       for (const g of this.gems)
         if (g.slot === prim.slot && g.def.kind === 'hex')
           out.push({ id: g.def.hex, level: g.level, effect: 0 });
+    for (const a of this.actives) {
+      const u = a.skill.utility;
+      if (a.usable && u?.kind === 'curse' && blasphemyOf(a))
+        out.push({ id: u.hex, level: a.skill.level, effect: 0 });
+    }
     for (const id of ALL_HEX_IDS) {
       const lv = db.sum('base', `hexOnHit.${id}`, ctx);
       if (lv > 0 && !out.some((h) => h.id === id)) out.push({ id, level: lv, effect: 0 });

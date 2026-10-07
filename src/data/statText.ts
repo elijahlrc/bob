@@ -433,6 +433,8 @@ Object.assign(STAT_TEXT, {
 Object.assign(STAT_TEXT, {
   globalDefences: { name: 'Global Defences', pct: true },
   noChaosDamage: { flag: 'Deals no Chaos Damage' },
+  esOnHit: { base: 'Gain {v} Energy Shield per Enemy Hit' },
+  skillDuration: { name: 'Skill Effect Duration', pct: true },
   deployCount: { base: '{v} additional totems, traps, mines or brands at a time' },
   auraBurn: { base: 'Burn nearby Enemies for {v}% of your Maximum Life as Fire Damage per second' },
   selfBurn: { base: 'Burn for {v}% of your Maximum Life per second (cannot kill you)' },

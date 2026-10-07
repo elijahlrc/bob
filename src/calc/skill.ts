@@ -121,6 +121,8 @@ export type SkillProfile = {
   leechMana: number[];
   lifeOnHit: number;
   manaOnHit: number;
+  /** Energy shield gained for each hit. */
+  esOnHit: number;
   /** Fraction of the target's armour this skill ignores (Sundering monsters). */
   armourIgnore: number;
   /** Percent of the target's maximum mana each hit drains (Siphoning monsters). */
@@ -375,7 +377,10 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     hands,
     useTime,
     repeats: Math.max(0, Math.round(db.sum('base', 'repeats', baseCtx))),
-    pulses: beh.kind === 'ground' ? Math.max(1, Math.floor(beh.duration / beh.interval)) : 1,
+    pulses:
+      beh.kind === 'ground'
+        ? Math.max(1, Math.floor((beh.duration * db.mult('skillDuration', baseCtx)) / beh.interval))
+        : 1,
     deployCount: Math.max(1, Math.round(1 + db.sum('base', 'deployCount', baseCtx))),
     cost: Math.max(
       0,
@@ -424,6 +429,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     leechMana: perType('leech.mana').map((v) => v * db.mult('leechRecovery', baseCtx)),
     lifeOnHit: db.sum('base', 'lifeOnHit', baseCtx),
     manaOnHit: db.sum('base', 'manaOnHit', baseCtx),
+    esOnHit: db.sum('base', 'esOnHit', baseCtx),
     armourIgnore: clamp(db.sum('base', 'armourIgnore', baseCtx) / 100, 0, 1),
     manaDrain: db.sum('base', 'manaDrain', baseCtx),
     stunDamageMult: isAttack ? db.mult('stunDamage', baseCtx) : 1,
