@@ -1,4 +1,6 @@
 import { skillRange } from '../calc/character';
+import type { Defence } from '../calc/combat';
+import type { SkillProfile } from '../calc/skill';
 import {
   ENGAGE_RANGE,
   BLOCK_LIMIT,
@@ -16,9 +18,12 @@ import {
   STALL_TIME,
   STUCK_TIME,
 } from '../data/constants';
+import { MONSTER_TYPES } from '../data/monsters';
 import { actorById, startAction } from './actions';
-import { monsterConds, playerConds } from './combat';
-import type { Actor, World } from './types';
+import { bloaterBurst, isZone, speedMult } from './factions';
+import { flaskMask, monsterConds, playerConds } from './combat';
+import { canPay, payCost } from './cost';
+import type { Actor, GroundEffect, World } from './types';
 
 function canAct(a: Actor): boolean {
   return a.alive && !a.action && a.stunT <= 0 && a.ail.freezeT <= 0;
@@ -28,11 +33,17 @@ function canAct(a: Actor): boolean {
 export function step(w: World, a: Actor, dx: number, dy: number, dt: number): void {
   const len = Math.hypot(dx, dy);
   if (len < 1e-6) return;
-  const speed = a.def.moveSpeed * (1 - a.ail.chill);
+  const speed = a.def.moveSpeed * (1 - a.ail.chill) * speedMult(a);
   const d = Math.min(len, speed * dt);
   const nx = a.x + (dx / len) * d;
   const ny = a.y + (dy / len) * d;
-  const c = w.grid.collide(nx, ny, a.r);
+  // Fliers cross walls; they only stay inside the map.
+  const c = a.flies
+    ? {
+        x: Math.max(0.5, Math.min(w.grid.w - 0.5, nx)),
+        y: Math.max(0.5, Math.min(w.grid.h - 0.5, ny)),
+      }
+    : w.grid.collide(nx, ny, a.r);
   a.x = c.x;
   a.y = c.y;
   a.moving = true;
@@ -81,49 +92,125 @@ function clearPath(w: World, x0: number, y0: number, x1: number, y1: number, r: 
   );
 }
 
+/** Seconds the player will chase one drop or chest before it gives up on it. */
+const LOOT_GIVE_UP = 20;
+
+/** Types the player shoots first when they are within reach (EXPANSION 5.9). */
+const SUPPORT_TYPES = new Set(['nest', 'pylon']);
+const SUPPORT_PRIORITY = 4;
+
 function findTarget(w: World): Actor | null {
   const p = w.player;
   let best: Actor | null = null;
   let bd = Infinity;
   for (const m of w.actors) {
-    if (m.isPlayer || !m.alive) continue;
+    if (m.isPlayer || !m.alive || m.phaseT > 0) continue;
     if (m.id === w.ai.skipId && w.t < w.ai.skipUntil) continue;
-    const d = Math.hypot(m.x - p.x, m.y - p.y);
-    if (d > ENGAGE_RANGE) continue;
+    const real = Math.hypot(m.x - p.x, m.y - p.y);
+    if (real > ENGAGE_RANGE) continue;
+    // Spawners and shield-givers come first: a nest feeds the pack and a pylon makes it untouchable.
+    const support = !!m.mon && SUPPORT_TYPES.has(m.mon.spec.type);
+    const d = real - (support ? SUPPORT_PRIORITY : 0);
     if (d > bd + 1e-9) continue;
     if (Math.abs(d - bd) <= 1e-9 && best && m.life >= best.life) continue;
-    if (!w.grid.los(p.x, p.y, m.x, m.y)) continue;
+    // Out of sight is no reason to ignore a pylon: everything around it is untouchable until it falls.
+    if (!support && !w.grid.los(p.x, p.y, m.x, m.y)) continue;
+    if (support && m.mon!.spec.type === 'nest' && !w.grid.los(p.x, p.y, m.x, m.y)) continue;
     best = m;
     bd = d;
   }
   return best;
 }
 
-function chooseSkill(w: World, target: Actor) {
-  const p = w.player;
-  const conds = playerConds(w, target);
-  if (w.primary.usable && w.primary.gemUid !== null) {
-    const prof = w.char.profile(w.primary, conds);
-    const costLife = w.char.db.flag('skillsCostLife');
-    const pool = costLife ? p.life - 1 : p.def.esProtectsMana ? p.mana + p.es : p.mana;
-    if (pool >= prof.cost) return { which: 'primary' as const, prof };
-  }
-  return { which: 'default' as const, prof: w.char.profile(w.char.defaultAttack, conds) };
+/** Whether a skill can hurt a target at all: some of its damage is of a type the target is not immune to. */
+export function canHurt(p: SkillProfile, def: Defence): boolean {
+  return p.hands.some((h) =>
+    h.chunks.some((c) => c.max > 0 && !def.immune[c.type] && !(c.type === 4 && def.immuneChaos)),
+  );
 }
 
-function payCost(w: World, cost: number): void {
+/** Whether the player, from where it stands, can use a skill on the target. */
+function inReach(w: World, prof: SkillProfile, target: Actor): boolean {
   const p = w.player;
-  if (cost <= 0) return;
-  if (w.char.db.flag('skillsCostLife')) {
-    p.life -= cost;
-    return;
+  const melee = prof.skill.behaviour.kind === 'melee';
+  const reach = skillRange(prof) + target.r + (melee ? p.r : 0);
+  const d = Math.hypot(target.x - p.x, target.y - p.y);
+  return d <= reach && (melee || w.grid.los(p.x, p.y, target.x, target.y));
+}
+
+function chooseSkill(w: World, target: Actor) {
+  const conds = playerConds(w, target);
+  // Secondary casts first (EXPANSION 5.5a): the ready one with the longest cooldown.
+  let second: {
+    prof: SkillProfile;
+    costsLife: boolean;
+    key: string;
+    cd: number;
+  } | null = null;
+  for (const c of w.char.secondaries) {
+    if ((w.secondaryReady[c.key] ?? 0) > w.t) continue;
+    const prof = w.char.profile(c, conds, flaskMask(w));
+    if (!canHurt(prof, target.def) || !canPay(w, c.costsLife, prof.cost)) continue;
+    if (!inReach(w, prof, target)) continue;
+    const cd = w.char.cooldownOf(c, conds);
+    if (!second || cd > second.cd) second = { prof, costsLife: c.costsLife, key: c.key, cd };
   }
-  if (p.def.esProtectsMana && p.es > 0) {
-    const a = Math.min(p.es, cost);
-    p.es -= a;
-    cost -= a;
+  if (second) return { which: 'secondary' as const, ...second };
+  if (w.primary.usable && w.primary.gemUid !== null) {
+    const prof = w.char.profile(w.primary, conds, flaskMask(w));
+    // Against a target immune to everything the skill deals, fall back to the weapon.
+    if (canHurt(prof, target.def) && canPay(w, w.primary.costsLife, prof.cost))
+      return { which: 'primary' as const, prof, costsLife: w.primary.costsLife, key: '', cd: 0 };
   }
-  p.mana -= cost;
+  return {
+    which: 'default' as const,
+    prof: w.char.profile(w.char.defaultAttack, conds, flaskMask(w)),
+    costsLife: false,
+    key: '',
+    cd: 0,
+  };
+}
+
+/** A lasting zone or a blast about to land that covers a point, if any (with a margin in tiles). */
+export function hazardAt(w: World, x: number, y: number, margin = 0): GroundEffect | null {
+  for (const e of w.effects) {
+    const lands = !isZone(e) && e.faction === 1 && e.t > 0;
+    if ((isZone(e) || lands) && Math.hypot(x - e.x, y - e.y) <= e.radius + margin) return e;
+  }
+  return null;
+}
+
+/**
+ * Step out of a hazard (EXPANSION 5.8): the nearest clear spot, but only one from which the target is still in
+ * reach, so the player never walks out of the fight. Returns whether it moved.
+ */
+function avoidHazard(w: World, dt: number): boolean {
+  const p = w.player;
+  if (!hazardAt(w, p.x, p.y, p.r)) return false;
+  const target = w.ai.targetId ? actorById(w, w.ai.targetId) : undefined;
+  const prof = w.primary.usable
+    ? w.char.profile(w.primary, 0)
+    : w.char.profile(w.char.defaultAttack, 0);
+  const melee = prof.skill.behaviour.kind === 'melee';
+  const reach = skillRange(prof) + (target ? target.r : 0) + (melee ? p.r : 0);
+  let best: { x: number; y: number; d: number } | null = null;
+  for (let k = 0; k < 16; k++) {
+    const ang = (k / 16) * Math.PI * 2;
+    for (const len of [1.5, 2.5, 3.5]) {
+      const c = w.grid.collide(p.x + Math.cos(ang) * len, p.y + Math.sin(ang) * len, p.r);
+      if (Math.hypot(c.x - p.x, c.y - p.y) < len - 0.2) continue;
+      if (hazardAt(w, c.x, c.y, p.r + 0.3) || !w.grid.los(p.x, p.y, c.x, c.y)) continue;
+      if (target && target.alive) {
+        const d = Math.hypot(target.x - c.x, target.y - c.y);
+        if (d > reach || (!melee && !w.grid.los(c.x, c.y, target.x, target.y))) continue;
+      }
+      if (!best || len < best.d) best = { x: c.x, y: c.y, d: len };
+      break;
+    }
+  }
+  if (!best) return false;
+  moveTo(w, p, best.x, best.y, dt);
+  return true;
 }
 
 export function playerAI(w: World, dt: number): void {
@@ -131,6 +218,7 @@ export function playerAI(w: World, dt: number): void {
   const ai = w.ai;
   p.moving = false;
   if (!canAct(p)) return;
+  if (avoidHazard(w, dt)) return;
 
   // Engage.
   let target = ai.targetId ? actorById(w, ai.targetId) : undefined;
@@ -160,7 +248,7 @@ export function playerAI(w: World, dt: number): void {
     }
     ai.targetId = target.id;
     ai.mode = 'engage';
-    const { which, prof } = chooseSkill(w, target);
+    const { which, prof, costsLife, key, cd } = chooseSkill(w, target);
     const melee = prof.skill.behaviour.kind === 'melee';
     const reach = skillRange(prof) + target.r + (melee ? p.r : 0);
     const d = Math.hypot(target.x - p.x, target.y - p.y);
@@ -178,7 +266,8 @@ export function playerAI(w: World, dt: number): void {
       }
     }
     if (inRange) {
-      if (which === 'primary') payCost(w, prof.cost);
+      if (which === 'primary' || which === 'secondary') payCost(w, costsLife, prof.cost);
+      if (which === 'secondary') w.secondaryReady[key] = w.t + cd;
       startAction(w, p, which, prof, target);
       return;
     }
@@ -214,6 +303,19 @@ export function playerAI(w: World, dt: number): void {
       lootIdx = i;
     }
   });
+  // A hunt for something that cannot be reached is given up after a while, rather than for ever.
+  if (lootKind) {
+    const id = lootKind === 'drop' ? w.drops[lootIdx].id : w.chests[lootIdx].id;
+    if (ai.lootId !== id) {
+      ai.lootId = id;
+      ai.lootSince = w.t;
+    } else if (w.t - ai.lootSince > LOOT_GIVE_UP) {
+      if (lootKind === 'drop') w.drops.splice(lootIdx, 1);
+      else w.chests[lootIdx].opened = true;
+      ai.lootId = 0;
+      lootKind = null;
+    }
+  }
   if (lootKind) {
     ai.mode = 'loot';
     if (lootD < 0.7) {
@@ -301,7 +403,16 @@ export function playerAI(w: World, dt: number): void {
 }
 
 function monsterMove(w: World, m: Actor, tx: number, ty: number, dt: number): void {
+  if (m.stationary) return;
   const d = Math.hypot(tx - m.x, ty - m.y);
+  if (m.flies) {
+    // Straight at the target, weaving from side to side.
+    const wob = Math.sin(w.t * 5 + m.id) * 0.7;
+    const dx = tx - m.x;
+    const dy = ty - m.y;
+    step(w, m, dx - dy * wob * 0.5, dy + dx * wob * 0.5, dt);
+    return;
+  }
   if (d < 8 && w.grid.los(m.x, m.y, tx, ty)) {
     step(w, m, tx - m.x, ty - m.y, dt);
     return;
@@ -324,6 +435,8 @@ export function alertPack(w: World, m: Actor): void {
 export function monsterAI(w: World, m: Actor, dt: number): void {
   m.moving = false;
   if (m.dummy || !canAct(m)) return;
+  // A Gloomstalker stands still while its blink gathers.
+  if (m.blinkT > 0 || m.phaseT > 0 || m.channelT > 0) return;
   const p = w.player;
   if (!p.alive) return;
   const d = Math.hypot(p.x - m.x, p.y - m.y);
@@ -359,10 +472,16 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
       return;
     }
   }
+  // Nests and pylons do nothing but what the faction code gives them.
+  if (MONSTER_TYPES[m.mon!.spec.type].noAttack) return;
   const prof = m.mon!.profile(monsterConds(m));
   const kind = prof.skill.behaviour.kind;
   const range = m.mon!.range;
   if (kind !== 'melee') {
+    if (m.stationary) {
+      if (d <= range && los) startAction(w, m, 'monster', prof, p);
+      return;
+    }
     // Retreat when crowded: short half-speed bursts with a cooldown, so they don't kite forever.
     m.retreatCd -= dt;
     if (d < 2 && m.retreatT <= 0 && m.retreatCd <= 0) {
@@ -383,37 +502,65 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     return;
   }
   if (d <= range + p.r + m.r) {
-    startAction(w, m, 'monster', prof, p);
+    // A Bloater does not strike: it bursts on contact.
+    if (m.mon!.spec.type === 'bloater') bloaterBurst(w, m);
+    else startAction(w, m, 'monster', prof, p);
     return;
   }
   monsterMove(w, m, p.x, p.y, dt);
 }
 
+/** No two actors can touch from further apart than this (the largest radius, a boss, twice over). */
+const MAX_ACTOR_REACH = 2;
+
 /** Soft separation between nearby actors. */
 export function separate(w: World): void {
-  const list = w.actors;
   const p = w.player;
+  // Dead actors stay in the world's list, so look only at the living (a big map has hundreds of the dead).
+  const list: Actor[] = [];
+  for (const m of w.actors) if (m.alive && !m.isPlayer) list.push(m);
+  // Sorted by x, the inner loop can stop as soon as the next actor is too far to the right to touch.
+  list.sort((a, b) => a.x - b.x);
   for (let i = 0; i < list.length; i++) {
     const a = list[i];
-    if (!a.alive || a.isPlayer || a.state === 'idle') continue;
+    if (a.state === 'idle' || a.stationary) continue;
     for (let j = i + 1; j < list.length; j++) {
       const b = list[j];
-      if (!b.alive || b.isPlayer) continue;
       const dx = b.x - a.x;
-      const dy = b.y - a.y;
       const rr = a.r + b.r;
+      if (dx > MAX_ACTOR_REACH) break;
+      const dy = b.y - a.y;
+      if (dy > rr || dy < -rr || dx > rr) continue;
       const d2 = dx * dx + dy * dy;
       if (d2 >= rr * rr || d2 < 1e-9) continue;
       const d = Math.sqrt(d2);
-      const push = (rr - d) / 2;
+      // A stationary monster does not budge: the other one gives way entirely.
+      const push = b.stationary ? rr - d : (rr - d) / 2;
       const nx = dx / d;
       const ny = dy / d;
-      const ca = w.grid.collide(a.x - nx * push, a.y - ny * push, a.r);
-      a.x = ca.x;
-      a.y = ca.y;
-      const cb = w.grid.collide(b.x + nx * push, b.y + ny * push, b.r);
-      b.x = cb.x;
-      b.y = cb.y;
+      // Away from the walls (nearly everywhere) a push needs no wall check.
+      const ax = a.x - nx * push;
+      const ay = a.y - ny * push;
+      if (w.grid.clear(ax, ay)) {
+        a.x = ax;
+        a.y = ay;
+      } else {
+        const ca = w.grid.collide(ax, ay, a.r);
+        a.x = ca.x;
+        a.y = ca.y;
+      }
+      if (!b.stationary) {
+        const bx = b.x + nx * push;
+        const by = b.y + ny * push;
+        if (w.grid.clear(bx, by)) {
+          b.x = bx;
+          b.y = by;
+        } else {
+          const cb = w.grid.collide(bx, by, b.r);
+          b.x = cb.x;
+          b.y = cb.y;
+        }
+      }
     }
     // Player vs monster: the monster yields most of the overlap.
     const dx = a.x - p.x;

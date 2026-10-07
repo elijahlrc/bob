@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'preact/hooks';
 import type { Character } from '../calc/character';
+import { naturalGemLevel } from '../calc/gems';
 import { gemDef } from '../data/gems';
 import { EQUIP_SLOTS, type GemItem } from '../data/types';
 import type { Controller } from '../run/controller';
@@ -12,6 +13,8 @@ import {
   type Placement,
   type SocketRef,
 } from '../run/inventoryOps';
+
+import { GemTip } from './GemCard';
 
 type Sel = { from: 'inv'; uid: number } | ({ from: 'socket' } & SocketRef);
 type Drag = { from: 'inv'; uid: number } | ({ from: 'socket' } & SocketRef);
@@ -35,6 +38,65 @@ function Badge({ p }: { p: Pick<Placement, 'dpsPct' | 'ehpPct' | 'scorePct'> }) 
   );
 }
 
+/**
+ * Whether a socketed gem is doing anything, in a line: which skills a support is on, what supports a skill, whether an aura
+ * is active, and why not when it is not (a support needs a matching skill in the same item).
+ */
+export function gemStatus(
+  ch: Character,
+  uid: number,
+  def: ReturnType<typeof gemDef>,
+): { ok: boolean; text: string } | null {
+  if (def.kind === 'support') {
+    const on = ch.actives.filter((a) => a.supports.some((x) => x.gem.uid === uid));
+    if (on.length)
+      return { ok: true, text: `Supporting: ${on.map((a) => a.skill.name).join(', ')}` };
+    const needs = def.supports.length ? def.supports.join(' or ') : 'an active skill';
+    return {
+      ok: false,
+      text: `Not supporting anything: needs a ${needs} skill in the same item`,
+    };
+  }
+  if (def.kind === 'active') {
+    const a = ch.actives.find((x) => x.gemUid === uid);
+    if (!a || !a.usable) return null;
+    const names = a.supports.map((x) => x.def.name);
+    const linked = names.length ? `Supported by: ${names.join(', ')}` : 'No supports linked';
+    // A skill the mana cannot pay for is mostly replaced by the weapon attack: say so.
+    if (ch.primary.gemUid === uid) {
+      const sustain = ch.skillSheet(
+        a,
+        undefined,
+        ch.configConds,
+        undefined,
+        0,
+        ch.primaryShare(),
+      ).sustain;
+      if (sustain < 0.9)
+        return {
+          ok: false,
+          text: `${linked}. Mana-starved: you can pay for about ${Math.round(sustain * 100)}% of casts, the rest are weapon attacks`,
+        };
+    }
+    return { ok: true, text: linked };
+  }
+  if (def.kind === 'aura') {
+    const au = ch.auras.find((x) => x.def.id === def.id);
+    if (au && !au.active) return { ok: false, text: 'Inactive: not enough mana to reserve it' };
+    return au ? { ok: true, text: `Active, reserving ${Math.round(au.reserved)} mana` } : null;
+  }
+  if (def.kind === 'hex') {
+    const on = ch.hexes.some((h) => h.id === def.hex);
+    return on
+      ? { ok: true, text: 'Hexes the enemies you hit' }
+      : {
+          ok: false,
+          text: 'Not applied: needs Hexing Strikes in the same item as your main skill',
+        };
+  }
+  return null;
+}
+
 const sameSocket = (a: SocketRef, b: SocketRef) => a.slot === b.slot && a.socket === b.socket;
 
 export function Skills({ c, ch }: { c: Controller; ch: Character }) {
@@ -43,12 +105,20 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
   const [drag, setDrag] = useState<Drag | null>(null);
   const [over, setOver] = useState<string | null>(null);
   const [msg, setMsg] = useState('');
+  const [tip, setTip] = useState<{ gemId: string; level: number; x: number; y: number } | null>(
+    null,
+  );
+  const hoverGem = (gemId: string, level: number) => ({
+    onMouseEnter: (e: MouseEvent) => setTip({ gemId, level, x: e.clientX, y: e.clientY }),
+    onMouseMove: (e: MouseEvent) => setTip({ gemId, level, x: e.clientX, y: e.clientY }),
+    onMouseLeave: () => setTip(null),
+  });
   const gems = useMemo(
     () =>
       run.inventory
         .filter((x): x is GemItem => x.kind === 'gem')
         .sort((a, b) => {
-          const order = { active: 0, support: 1, aura: 2 };
+          const order = { active: 0, support: 1, hex: 2, aura: 3 };
           const da = gemDef(a.gemId);
           const db = gemDef(b.gemId);
           return order[da.kind] - order[db.kind] || da.name.localeCompare(db.name);
@@ -104,7 +174,15 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
     }
   };
 
-  const summary = ch.skillSheet();
+  const summary = ch.skillSheet(
+    ch.primary,
+    undefined,
+    ch.configConds,
+    undefined,
+    0,
+    ch.primaryShare(),
+  );
+  const secondary = ch.secondarySheets();
   return (
     <div class="skills-wrap">
       <div class="skills">
@@ -119,10 +197,22 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
               : ''} · {Math.round(ch.ehp())} effective HP
           </span>
         </div>
+        {secondary.length > 0 && (
+          <div class="skill-summary muted">
+            Also cast whenever ready:{' '}
+            {secondary
+              .map(
+                (x) =>
+                  `${x.skill.name} (every ${Math.round(x.cooldown * 10) / 10} s, ${Math.round(x.dps * 10) / 10} DPS)`,
+              )
+              .join(' · ')}
+          </div>
+        )}
         <p class="muted hint">
-          Every socket on an item is linked. Click a gem, then a socket — or drag gems onto sockets
-          (drop on the gem list to remove). Double-click a gem to auto-place or remove it. ★ sets
-          the primary skill.
+          Every skill you have equipped is used: the ★ primary is cast over and over, and every
+          other active skill is cast whenever it is off cooldown. Every socket on an item is linked.
+          Click a gem, then a socket — or drag gems onto sockets (drop on the gem list to remove).
+          Double-click a gem to auto-place or remove it. ★ sets the primary skill.
         </p>
         {EQUIP_SLOTS.map((slot) => {
           const it = run.build.equipment[slot];
@@ -166,6 +256,7 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
                 const d = gemDef(g.gemId);
                 const primary = ch.primary.gemUid === g.uid;
                 const active = ch.actives.find((a) => a.gemUid === g.uid);
+                const status = gemStatus(ch, g.uid, d);
                 return (
                   <div
                     key={i}
@@ -179,10 +270,10 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
                       setOver(null);
                     }}
                     {...common}
+                    {...hoverGem(g.gemId, levelOf(g.uid))}
                   >
                     <button
                       class="gem-name"
-                      title={d.description}
                       onClick={() => onSocketClick(ref)}
                       onDblClick={() => c.act((r) => unsocketGem(r, slot, i))}
                     >
@@ -193,6 +284,11 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
                         </div>
                       )}
                       {active && !active.usable && <div class="warn">{active.reason}</div>}
+                      {status && (
+                        <div class={status.ok ? 'muted gem-status' : 'warn gem-status'}>
+                          {status.text}
+                        </div>
+                      )}
                     </button>
                     {d.kind === 'active' && (
                       <button
@@ -239,13 +335,19 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
         {gems.length === 0 && (
           <div class="muted">No spare gems. Drag socketed gems here to remove them.</div>
         )}
-        {(['active', 'support', 'aura'] as const).map((kind) => {
+        {(['active', 'support', 'hex', 'aura'] as const).map((kind) => {
           const list = gems.filter((g) => gemDef(g.gemId).kind === kind);
           if (!list.length) return null;
           return (
             <div key={kind} class="gem-group">
               <div class="muted gem-group-title">
-                {kind === 'active' ? 'Skills' : kind === 'support' ? 'Supports' : 'Auras'}
+                {kind === 'active'
+                  ? 'Skills'
+                  : kind === 'support'
+                    ? 'Supports'
+                    : kind === 'hex'
+                      ? 'Hexes'
+                      : 'Auras'}
               </div>
               {list.map((g) => {
                 const d = gemDef(g.gemId);
@@ -255,7 +357,7 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
                     key={g.uid}
                     class={`gem-chip ${d.kind}${sel?.from === 'inv' && sel.uid === g.uid ? ' sel' : ''}`}
                     draggable
-                    title={d.description}
+                    {...hoverGem(g.gemId, naturalGemLevel(d, run.build.level, ch.attrs))}
                     onDragStart={() => setDrag({ from: 'inv', uid: g.uid })}
                     onDragEnd={() => {
                       setDrag(null);
@@ -283,6 +385,7 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
           );
         })}
       </div>
+      {tip && <GemTip {...tip} />}
     </div>
   );
 }

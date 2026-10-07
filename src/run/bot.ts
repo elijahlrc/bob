@@ -1,11 +1,12 @@
-import { Character, type CharacterSheet } from '../calc/character';
+import { Character, sheetDps, type CharacterSheet } from '../calc/character';
 import { itemBase } from '../data/bases';
 import { flaskBase } from '../data/flasks';
 import { gemDef } from '../data/gems';
+import { themeDef } from '../data/themes';
 import { getTree } from '../data/tree';
 import {
   EQUIP_SLOTS,
-  type AnyItem,
+  type InventoryItem,
   type Build,
   type EquipSlot,
   type GemItem,
@@ -13,8 +14,9 @@ import {
 } from '../data/types';
 import { resistPenaltyForMap } from '../gen/mapPlan';
 import { runMap, type MapResult } from '../sim/runMap';
-import { canEquip, discard, equip, equipFlask, slotsFor, withEquipped } from './inventory';
+import { canEquip, equip, equipFlask, slotsFor, unsocketGem, withEquipped } from './inventory';
 import {
+  affixesFor,
   finishMap,
   newRun,
   passivePoints,
@@ -23,26 +25,90 @@ import {
   worldOptsFor,
   type RunState,
 } from './run';
+import { Rng } from '../core/rng';
+import { botChalk, botCraft } from './botCraft';
+import { salvage } from './craft';
+import { buildSignature, killerTracker, RunTally } from './metrics';
+import { randomCraft } from './randomBot';
+import type { RunSummary } from './report';
+import { scoreTheme } from './threat';
 import { allocate, pathTo } from './tree';
 
 /**
  * The headless decision bot (DESIGN.md §15.5): greedy choices by Δ(DPS × EHP).
  */
 
+/** The bot plans with the steady-state conditions of a fight (EXPANSION 5.10), not with all of them off. */
 export function cfgFor(run: RunState) {
-  return { areaLevel: run.map, resistPenalty: resistPenaltyForMap(run.map) };
+  return {
+    areaLevel: run.map,
+    resistPenalty: resistPenaltyForMap(run.map),
+    steady: 'clearing' as const,
+  };
 }
 
+/** The character sheet under the clearing conditions. */
 export function sheetOf(run: RunState, build: Build = run.build): CharacterSheet {
   return new Character(build, cfgFor(run)).sheet();
 }
 
 /** The bot's objective: total DPS × effective HP (geometric-safe for zeros). */
 export function score(s: CharacterSheet): number {
-  return Math.max(0.1, s.skill.sustainedDps) * Math.max(1, s.ehp);
+  return Math.max(0.1, sheetDps(s)) * Math.max(1, s.ehp);
 }
 
-const scoreOf = (run: RunState, b: Build) => score(sheetOf(run, b));
+/** How much a build's clearing score counts against its boss score. */
+const CLEARING_WEIGHT = 0.7;
+
+/** The score of a build: its clearing and boss scores, as a weighted geometric mean. */
+export function scoreBuild(run: RunState, build: Build): number {
+  // The bot asks about the same builds again and again (every pass over a bag re-tries the items it has already
+  // tried), so remember the scores by everything they depend on.
+  const key = buildKey(run, build);
+  const hit = scoreCache.get(key);
+  if (hit !== undefined) return hit;
+  const ch = new Character(build, cfgFor(run));
+  const clearing = score(ch.sheet());
+  const boss = score(ch.sheet(ch.steadyMask('boss')));
+  const v = clearing ** CLEARING_WEIGHT * boss ** (1 - CLEARING_WEIGHT);
+  if (scoreCache.size > 20000) scoreCache.clear();
+  scoreCache.set(key, v);
+  return v;
+}
+
+const scoreCache = new Map<string, number>();
+/** What an item or flask is, as text (items are never edited in place, so this is worked out once per object). */
+const objectKeys = new WeakMap<object, string>();
+const keyOf = (x: object | null | undefined): string => {
+  if (!x) return '';
+  let k = objectKeys.get(x);
+  if (k === undefined) objectKeys.set(x, (k = JSON.stringify(x)));
+  return k;
+};
+
+/** Everything a build's score depends on: the character, its gear, its tree, and the map (for the area level). */
+function buildKey(run: RunState, b: Build): string {
+  const parts = [run.map, b.classId, b.level, b.primaryGem ?? '', b.allocated.join(',')];
+  for (const slot of EQUIP_SLOTS) parts.push(keyOf(b.equipment[slot]));
+  for (const f of b.flasks) parts.push(keyOf(f));
+  return parts.join('|');
+}
+
+const scoreOf = scoreBuild;
+
+/** Which of the two offered themes the bot takes. */
+export type ThemeRule = 'first' | 'best';
+
+/** The offered theme the build is best placed to beat (the first one when the rule is 'first'). */
+export function chooseTheme(run: RunState, rule: ThemeRule = 'best'): string {
+  const [a, b] = run.nextThemes;
+  if (rule === 'first') return a;
+  const ch = new Character(run.build, cfgFor(run));
+  const boss = run.map % 10 === 0 ? 'boss' : 'clearing';
+  const va = scoreTheme(ch, themeDef(a), boss, affixesFor(run, a)).value;
+  const vb = scoreTheme(ch, themeDef(b), boss, affixesFor(run, b)).value;
+  return vb > va * 1.001 ? b : a;
+}
 
 // ---- Passives -----------------------------------------------------------------------------
 
@@ -173,6 +239,26 @@ export function botRegem(run: RunState): void {
       place(host, best.gem);
     }
   }
+  // 2b. Secondary casts (EXPANSION 5.5a): another active in a free socket, kept if the combined score rises.
+  if (bestActive) {
+    const second = new Set<string>([gemDef(bestActive.gem.gemId).id]);
+    for (const g of [...pool]) {
+      if (gemDef(g.gemId).kind !== 'active' || second.has(g.gemId)) continue;
+      const slot = EQUIP_SLOTS.find((x) => equipment[x]?.sockets.includes(null));
+      if (!slot) break;
+      const before = scoreOf(run, buildWith(equipment, primary));
+      const eq = { ...equipment };
+      const it = eq[slot]!;
+      const sockets = [...it.sockets];
+      sockets[sockets.indexOf(null)] = g;
+      eq[slot] = { ...it, sockets };
+      if (scoreOf(run, buildWith(eq, primary)) > before * 1.01) {
+        take(g.uid);
+        place(slot, g);
+        second.add(g.gemId);
+      }
+    }
+  }
   // 3. Auras in any remaining socket, kept only if they improve the score.
   const auras = pool.filter((g) => gemDef(g.gemId).kind === 'aura');
   const usedAura = new Set<string>();
@@ -201,25 +287,66 @@ export function botRegem(run: RunState): void {
 
 // ---- Items --------------------------------------------------------------------------------
 
-/** Equip any inventory item that improves the score (gems carried over). */
+/** Whether the item in `slot` holds more gems than a replacement with `sockets` sockets could take. */
+function wouldStrand(run: RunState, slot: EquipSlot, sockets: number): boolean {
+  const old = run.build.equipment[slot];
+  return !!old && old.sockets.filter(Boolean).length > sockets;
+}
+
+/** Take every gem out of the item in `slot`, into the inventory, so a new layout can place them. */
+function stripGems(run: RunState, slot: EquipSlot): void {
+  const it = run.build.equipment[slot];
+  if (!it) return;
+  for (let i = 0; i < it.sockets.length; i++) unsocketGem(run, slot, i);
+}
+
+/** A two-step plan: move the gem group to the best other host, then wear the item. */
+function equipAndRegem(run: RunState, uid: number, slot: EquipSlot): void {
+  stripGems(run, slot);
+  equip(run, uid, slot);
+  botRegem(run);
+}
+
+/**
+ * Equip any inventory item that improves the score (gems carried over). An item that would strand
+ * gems (fewer sockets than the one it replaces) is also tried as the two-step plan of moving the
+ * gem group elsewhere first (EXPANSION 10.1 item 3), which is how a socketless unique gets worn.
+ */
 export function botEquip(run: RunState): void {
   for (let guard = 0; guard < 20; guard++) {
     const base = scoreOf(run, run.build);
-    let best: { uid: number; slot: EquipSlot; s: number } | null = null;
+    let best: { uid: number; slot: EquipSlot; s: number; viaRegem: boolean } | null = null;
     for (const it of run.inventory) {
       if (it.kind !== 'item') continue;
       for (const slot of slotsFor(it)) {
         if (!canEquip(run, it, slot).ok) continue;
-        const s = scoreOf(run, withEquipped(run.build, it, slot));
-        if (s > base * 1.005 && (!best || s > best.s)) best = { uid: it.uid, slot, s };
+        let s = scoreOf(run, withEquipped(run.build, it, slot));
+        let viaRegem = false;
+        // Only for uniques that a plain swap rejects: the plan costs a trial run, and uniques are the
+        // items that break the socket plan on purpose.
+        if (
+          it.rarity === 'unique' &&
+          s <= base * 1.005 &&
+          wouldStrand(run, slot, it.sockets.length)
+        ) {
+          const trial: RunState = JSON.parse(JSON.stringify(run));
+          equipAndRegem(trial, it.uid, slot);
+          const s2 = scoreOf(trial, trial.build);
+          if (s2 > s) {
+            s = s2;
+            viaRegem = true;
+          }
+        }
+        if (s > base * 1.005 && (!best || s > best.s)) best = { uid: it.uid, slot, s, viaRegem };
       }
     }
     if (!best) break;
-    equip(run, best.uid, best.slot);
+    if (best.viaRegem) equipAndRegem(run, best.uid, best.slot);
+    else equip(run, best.uid, best.slot);
   }
 }
 
-function flaskRank(f: AnyItem): number {
+function flaskRank(f: InventoryItem): number {
   if (f.kind !== 'flask') return -1;
   const b = flaskBase(f.baseId);
   return b.life * 1.0 + b.mana * 0.5 + (b.kind === 'utility' ? 300 : 0) + f.affixes.length * 20;
@@ -230,7 +357,7 @@ export function botFlasks(run: RunState): void {
   const all = [
     ...run.build.flasks.filter(Boolean),
     ...run.inventory.filter((x) => x.kind === 'flask'),
-  ] as AnyItem[];
+  ] as InventoryItem[];
   const usable = all.filter(
     (f) => f.kind === 'flask' && flaskBase(f.baseId).level <= run.build.level,
   );
@@ -242,32 +369,49 @@ export function botFlasks(run: RunState): void {
   const mana = byKind('mana');
   const util = byKind('utility');
   const usesMana = sheetOf(run).skill.cost > 0;
-  const want: AnyItem[] = [life[0], life[1], usesMana ? mana[0] : util[2], util[0], util[1]].filter(
-    (x, i, arr) => x && arr.indexOf(x) === i,
-  ) as AnyItem[];
+  const want: InventoryItem[] = [
+    life[0],
+    life[1],
+    usesMana ? mana[0] : util[2],
+    util[0],
+    util[1],
+  ].filter((x, i, arr) => x && arr.indexOf(x) === i) as InventoryItem[];
   // Put everything back in the inventory, then equip the chosen ones.
   for (const f of run.build.flasks) if (f) run.inventory.push(f);
   run.build = { ...run.build, flasks: [null, null, null, null, null] };
   want.slice(0, 5).forEach((f, i) => equipFlask(run, f.uid, i));
 }
 
-/** Keep the inventory small: drop items that are not upgrades. */
-export function botTidy(run: RunState, keep = 24): void {
+/** Keep the inventory small: salvage items that are not upgrades (into Bone Dust). */
+/** How many copies of one gem the bot keeps in the bag (one is placed, one may be spare). */
+const SPARE_GEMS = 2;
+
+export function botTidy(run: RunState, keep = 12): void {
   const items = run.inventory.filter((x) => x.kind === 'item') as Item[];
-  if (items.length <= keep) return;
   const value = (it: Item) =>
     ({ normal: 0, magic: 1, rare: 2, unique: 3 })[it.rarity] * 100 +
     itemBase(it.baseId).level +
     it.ilvl * 0.1;
   items.sort((a, b) => value(a) - value(b));
-  for (const it of items.slice(0, items.length - keep)) discard(run, it.uid);
+  for (const it of items.slice(0, Math.max(0, items.length - keep))) salvage(run, it.uid);
   const flasks = run.inventory.filter((x) => x.kind === 'flask');
   flasks.sort((a, b) => flaskRank(a) - flaskRank(b));
-  for (const f of flasks.slice(0, Math.max(0, flasks.length - 6))) discard(run, f.uid);
+  for (const f of flasks.slice(0, Math.max(0, flasks.length - 6))) salvage(run, f.uid);
+  // Gems drop often now: a skill or support is only ever used once or twice, so extra copies are salvaged.
+  const seen = new Map<string, number>();
+  for (const g of run.inventory)
+    if (g.kind === 'gem') {
+      const n = (seen.get(g.gemId) ?? 0) + 1;
+      seen.set(g.gemId, n);
+      if (n > SPARE_GEMS) salvage(run, g.uid);
+    }
 }
 
 /** Take the reward offer that scores best (items equipped, gems socketed). */
-export function botReward(run: RunState): void {
+/** How the bot spends currency: by the sheet ('greedy'), at random, or not at all. */
+export type CraftPolicy = 'greedy' | 'random' | 'none';
+
+export function botReward(run: RunState, crafting = true): void {
   if (!run.reward) return;
   const offers = run.reward;
   let best: { uid: number; s: number } | null = null;
@@ -276,18 +420,36 @@ export function botReward(run: RunState): void {
     takeReward(trial, o.uid);
     if (o.kind === 'gem') botRegem(trial);
     else if (o.kind === 'item') botEquip(trial);
-    else botFlasks(trial);
-    const s = scoreOf(trial, trial.build) + (o.kind === 'flask' ? 1 : 0);
+    else if (o.kind === 'flask') botFlasks(trial);
+    // A bundle of currency is worth a little to a bot that crafts, and nothing to one that does not.
+    const s =
+      o.kind === 'currency'
+        ? crafting
+          ? scoreOf(trial, trial.build) * 1.004
+          : 0
+        : scoreOf(trial, trial.build) + (o.kind === 'flask' ? 1 : 0);
     if (!best || s > best.s) best = { uid: o.uid, s };
   }
   takeReward(run, best?.uid ?? null);
 }
 
 /** All camp decisions between maps. */
-export function botCamp(run: RunState): void {
-  botReward(run);
+export function botCamp(run: RunState, policy: CraftPolicy = 'greedy'): void {
+  botReward(run, policy !== 'none');
   botEquip(run);
   botRegem(run);
+  if (policy === 'greedy') {
+    // Re-equip and re-socket only if crafting changed something.
+    if (botCraft(run) > 0) {
+      botEquip(run);
+      botRegem(run);
+    }
+  } else if (policy === 'random') {
+    const rng = new Rng(run.seed).fork(`botCraft${run.map}`);
+    for (let i = 0; i < 8; i++) randomCraft(run, rng);
+    botEquip(run);
+    botRegem(run);
+  }
   botFlasks(run);
   botAllocate(run);
   botTidy(run);
@@ -303,24 +465,37 @@ export type BotMapRecord = {
   stuck: number;
 };
 
-export type BotRunResult = {
-  classId: string;
+export type BotRunResult = RunSummary & {
   seed: number;
-  won: boolean;
   /** The last map attempted. */
   reached: number;
   maps: BotMapRecord[];
-  deathMap: number | null;
+};
+
+export type BotRunOpts = {
+  /** 'best' (default) takes the theme the build is better placed to beat; 'first' always takes the first. */
+  themes?: ThemeRule;
+  /** How the bot spends currency (default 'greedy'). */
+  crafting?: CraftPolicy;
 };
 
 /** Play a full run headlessly (§15.5). `maxMap` stops after that map. */
-export function botRun(classId: string, seed: number, maxMap = 100): BotRunResult {
+export function botRun(
+  classId: string,
+  seed: number,
+  maxMap = 100,
+  opts: BotRunOpts = {},
+): BotRunResult {
   const run = newRun(classId, seed);
   const maps: BotMapRecord[] = [];
+  const tally = new RunTally();
+  const killer = killerTracker();
   while (run.phase === 'camp' && run.map <= maxMap) {
-    botCamp(run);
-    const plan = planFor(run, run.nextThemes[0]);
-    const res = runMap(plan, run.build, run.xp, worldOptsFor(run, plan));
+    const crafting = opts.crafting ?? 'greedy';
+    botCamp(run, crafting);
+    if (crafting === 'greedy') botChalk(run);
+    const plan = planFor(run, chooseTheme(run, opts.themes));
+    const res = runMap(plan, run.build, run.xp, worldOptsFor(run, plan), undefined, killer.tick);
     maps.push({
       map: run.map,
       status: res.status,
@@ -329,16 +504,24 @@ export function botRun(classId: string, seed: number, maxMap = 100): BotRunResul
       xp: res.xpGained,
       stuck: res.stuck,
     });
+    if (res.status === 'cleared') tally.afterMap(run, res.picked);
     finishMap(run, res);
   }
   const last = maps[maps.length - 1];
+  const died = run.phase === 'dead';
   return {
     classId,
     seed,
     won: run.phase === 'victory',
     reached: last?.map ?? 0,
     maps,
-    deathMap: run.phase === 'dead' ? (last?.map ?? null) : null,
+    deathMap: died ? (last?.map ?? null) : null,
+    killer: died ? killer.get() : null,
+    mapsPlayed: maps.length,
+    found: tally.found,
+    gemsFound: tally.gems,
+    snapshots: tally.snapshots,
+    signature: buildSignature(run.build),
   };
 }
 

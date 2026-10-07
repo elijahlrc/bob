@@ -37,6 +37,10 @@ function statName(m: Mod): string {
     const tp = typesPhrase(m.damageTypes);
     return tp ? `${tp} Damage` : 'Damage';
   }
+  if (m.stat === 'minDamage' || m.stat === 'maxDamage') {
+    const tp = typesPhrase(m.damageTypes);
+    return `${m.stat === 'minDamage' ? 'minimum' : 'maximum'} ${tp ? tp + ' ' : ''}Damage`;
+  }
   const conv = /^(convert|gain|convertSkill)\.(\w+)\.(\w+)$/.exec(m.stat);
   if (conv) return `${TYPE_NAME[conv[2] as DamageType]} as ${TYPE_NAME[conv[3] as DamageType]}`;
   return STAT_TEXT[m.stat]?.name ?? m.stat;
@@ -45,6 +49,11 @@ function statName(m: Mod): string {
 /** Render one mod to a player-visible line. */
 export function modText(m: Mod): string {
   const t = STAT_TEXT[m.stat];
+  // "+2 to Level of Socketed Aura Gems": the tags say which gems.
+  if (m.stat === 'socketedGemLevel' && m.tags?.length) {
+    const tags = m.tags.map((x) => x.charAt(0).toUpperCase() + x.slice(1)).join(' ');
+    return `+${fmt(m.value)} to Level of Socketed ${tags} Gems`;
+  }
   const sfx = suffix(m);
   const v = fmt(m.value);
   const conv = /^(convert|convertSkill|gain)\.(\w+)\.(\w+)$/.exec(m.stat);

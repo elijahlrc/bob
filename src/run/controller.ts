@@ -5,6 +5,7 @@ import type { SimEvent, World } from '../sim/types';
 import { createWorld, stepWorld } from '../sim/world';
 import { CLASSES } from '../data/classes';
 import { botCamp } from './bot';
+import { completeTabletSets } from './craft';
 import { finishMap, newRun, passivePoints, planFor, worldOptsFor, type RunState } from './run';
 import { clearSave, loadRun, saveRun, SAVE_KEY, type KeyValueStore, type LoadResult } from './save';
 
@@ -203,6 +204,7 @@ export class Controller {
   /** The parts of a run a camp change can touch (undo snapshots). */
   private snapshot(run: RunState): string {
     const { build, inventory, nextUid, bonusPoints, refundPoints, reward, newLoot } = run;
+    const { currency, dust, tablets } = run;
     return JSON.stringify({
       build,
       inventory,
@@ -211,6 +213,9 @@ export class Controller {
       refundPoints,
       reward,
       newLoot,
+      currency,
+      dust,
+      tablets,
     });
   }
 
@@ -223,6 +228,18 @@ export class Controller {
       this.undoStack.push(before);
       if (this.undoStack.length > 40) this.undoStack.shift();
     }
+    this.changed();
+    return r;
+  }
+
+  /**
+   * A craft or a salvage. It clears the undo history (EXPANSION 8.4): crafting is final, and an undo
+   * could otherwise turn a draw into a free retry.
+   */
+  craft<T>(fn: (run: RunState) => T): T | undefined {
+    if (!this.run) return undefined;
+    const r = fn(this.run);
+    this.undoStack = [];
     this.changed();
     return r;
   }
@@ -261,6 +278,10 @@ export class Controller {
     const pts = passivePoints(run);
     if (pts > 0) return `${pts} unspent passive point${pts === 1 ? '' : 's'}`;
     if (run.reward) return 'a reward is waiting to be picked';
+    if (run.pendingCraft) return 'a craft is waiting for you to pick a result';
+    const set = completeTabletSets(run);
+    if (set.length)
+      return `${set.length} tablet set${set.length === 1 ? '' : 's'} to redeem (open the Workbench)`;
     if (run.newLoot.length > 0)
       return `${run.newLoot.length} new rare/unique item${run.newLoot.length === 1 ? '' : 's'} (open Items)`;
     return null;

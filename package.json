@@ -16,7 +16,10 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "check": "tsc && eslint . && prettier --check . && vitest run --passWithNoTests",
-    "sim": "tsx scripts/simulate.ts"
+    "sim": "tsx scripts/simulate.ts",
+    "random": "tsx scripts/random-play.ts",
+    "lethality": "tsx scripts/theme-lethality.ts",
+    "economy": "tsx scripts/currency-economy.ts"
   },
   "dependencies": {
     "@preact/signals": "^2.11.3",

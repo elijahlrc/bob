@@ -13,7 +13,7 @@ export function dmgMask(ts: readonly DamageType[] | undefined): number {
   return m;
 }
 
-/** Skill tags. Kept to ≤ 31 so they fit a bitmask. */
+/** Skill tags. Kept to at most 32 (31 in use) so they fit a 32-bit mask; widen it if a 33rd is needed. */
 export const SKILL_TAGS = [
   'attack',
   'spell',
@@ -45,6 +45,7 @@ export const SKILL_TAGS = [
   'shield',
   'unarmed',
   'hit',
+  'triggered',
 ] as const;
 export type SkillTag = (typeof SKILL_TAGS)[number];
 
@@ -81,6 +82,13 @@ export const CONDITIONS = [
   'stunnedRecently',
   'overloadActive',
   'blockedRecently',
+  'beenHitRecently',
+  'leeching',
+  'esFull',
+  'targetLowLife',
+  'onLowMana',
+  'targetCursed',
+  'cursed',
 ] as const;
 export type CondId = (typeof CONDITIONS)[number];
 

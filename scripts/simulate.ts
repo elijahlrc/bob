@@ -1,12 +1,13 @@
 /**
  * Headless bot runs (DESIGN.md §15.5).
  *
- *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp]
+ *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--craft greedy|random|none] [--report]
  */
 import { writeFileSync } from 'node:fs';
 import { median } from '../src/core/math';
 import { CLASSES } from '../src/data/classes';
-import { botRun, type BotRunResult } from '../src/run/bot';
+import { botRun, type BotRunResult, type CraftPolicy, type ThemeRule } from '../src/run/bot';
+import { depthReport } from '../src/run/report';
 
 type Args = {
   runs: number;
@@ -16,6 +17,11 @@ type Args = {
   measureXp: boolean;
   writeXp: boolean;
   json: boolean;
+  /** 'first' takes the first offered theme (the old behaviour); 'best' picks by the theme score. */
+  themes: ThemeRule;
+  /** How the bot spends currency: by the sheet, at random, or not at all. */
+  crafting: CraftPolicy;
+  report: boolean;
 };
 
 function parseArgs(argv: string[]): Args {
@@ -27,6 +33,9 @@ function parseArgs(argv: string[]): Args {
     measureXp: false,
     writeXp: false,
     json: false,
+    themes: 'best',
+    crafting: 'greedy',
+    report: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
@@ -38,6 +47,10 @@ function parseArgs(argv: string[]): Args {
     else if (k === '--measure-xp') a.measureXp = true;
     else if (k === '--write-xp') a.writeXp = a.measureXp = true;
     else if (k === '--json') a.json = true;
+    else if (k === '--themes') a.themes = v === 'first' ? 'first' : 'best';
+    else if (k === '--report') a.report = true;
+    else if (k === '--craft')
+      a.crafting = v === 'none' ? 'none' : v === 'random' ? 'random' : 'greedy';
   }
   return a;
 }
@@ -48,7 +61,10 @@ const t0 = performance.now();
 for (const cls of args.classes) {
   for (let r = 0; r < args.runs; r++) {
     const start = performance.now();
-    const res = botRun(cls, args.seed * 1000 + r, args.maxMap);
+    const res = botRun(cls, args.seed * 1000 + r, args.maxMap, {
+      themes: args.themes,
+      crafting: args.crafting,
+    });
     const wallMs = performance.now() - start;
     const simSeconds = res.maps.reduce((s, m) => s + m.time, 0);
     results.push({ ...res, wallMs, simSeconds });
@@ -101,6 +117,7 @@ lines.push('');
 lines.push(`Pacing (median level after map): ${pacing.join(' · ')}`);
 lines.push(`Total wall time: ${((performance.now() - t0) / 1000).toFixed(1)} s`);
 console.log(lines.join('\n'));
+if (args.report) console.log('\n' + depthReport(results));
 
 if (args.measureXp) {
   // Mean XP per cleared map by area level.

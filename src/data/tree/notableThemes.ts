@@ -457,3 +457,122 @@ export const THEMES: Record<string, Theme> = {
     notable: (s) => [mod('manaRegen', 'inc', r(20 * s)), mod('lifeRegenPct', 'base', r1(0.4 * s))],
   },
 };
+
+/**
+ * Themes of the depth expansion (EXPANSION 6.5): charge sources, hex strength, and payoffs that need a condition.
+ * They replace the themes of a dozen clusters (see NEW_NOTABLES in spec.ts).
+ */
+Object.assign(THEMES, {
+  gritBlock: {
+    id: 'gritBlock',
+    smallName: 'Block',
+    small: [mod('blockAttack', 'base', 1.5)],
+    notable: (s) => [
+      mod('chargeOn.block.grit', 'base', r(25 * s)),
+      mod('blockAttack', 'base', r(3 * s)),
+    ],
+  },
+  gritRegen: {
+    id: 'gritRegen',
+    smallName: 'Life Regeneration',
+    small: [mod('lifeRegenPct', 'base', 0.1)],
+    notable: (s) => [
+      mod('lifeRegenPct', 'base', r1(0.3 * s), { per: { stat: 'charges.grit', div: 1 } }),
+      mod('chargeOn.kill.grit', 'base', r(8 * s)),
+    ],
+  },
+  maxGrit: {
+    id: 'maxGrit',
+    smallName: 'Physical Damage Reduction',
+    small: [mod('physReduction', 'base', 1)],
+    notable: (s) => [mod('maxCharges.grit', 'base', 1), mod('physReduction', 'base', r(2 * s))],
+  },
+  fervourKill: {
+    id: 'fervourKill',
+    smallName: 'Attack Speed',
+    small: [mod('attackSpeed', 'inc', 1.5)],
+    notable: (s) => [
+      mod('chargeOn.kill.fervour', 'base', r(18 * s)),
+      mod('moveSpeed', 'inc', r(3 * s)),
+    ],
+  },
+  maxFervour: {
+    id: 'maxFervour',
+    smallName: 'Cast Speed',
+    small: [mod('castSpeed', 'inc', 1.5)],
+    notable: (s) => [mod('maxCharges.fervour', 'base', 1), mod('castSpeed', 'inc', r(3 * s))],
+  },
+  insightCrit: {
+    id: 'insightCrit',
+    smallName: 'Critical Strike Chance',
+    small: [mod('critChance', 'inc', 5)],
+    notable: (s) => [
+      mod('chargeOn.crit.insight', 'base', r(35 * s)),
+      mod('critMulti', 'base', r(8 * s)),
+    ],
+  },
+  hexEffect: {
+    id: 'hexEffect',
+    smallName: 'Hex Effect',
+    small: [mod('curseEffect', 'inc', 2)],
+    notable: (s) => [mod('curseEffect', 'inc', r(12 * s)), mod('mana', 'inc', r(4 * s))],
+  },
+  curseWard: {
+    id: 'curseWard',
+    smallName: 'Hex Resistance',
+    small: [mod('curseEffectOnSelf', 'inc', -6)],
+    notable: (s) => [
+      mod('curseEffectOnSelf', 'inc', -r(25 * s)),
+      mod('stunAvoid', 'base', r(8 * s)),
+    ],
+  },
+  chaosEs: {
+    id: 'chaosEs',
+    smallName: 'Chaos Resistance',
+    small: [mod('resist.chaos', 'base', 4)],
+    notable: (s) => [mod('resist.chaos', 'base', r(12 * s)), mod('es', 'inc', r(8 * s))],
+  },
+  vsHexed: {
+    id: 'vsHexed',
+    smallName: 'Damage',
+    small: [mod('damage', 'inc', 4)],
+    notable: (s) => [
+      mod('damage', 'more', r(10 * s), { condition: { id: 'targetCursed' } }),
+      mod('damage', 'inc', r(6 * s)),
+    ],
+  },
+  whileLeeching: {
+    id: 'whileLeeching',
+    smallName: 'Damage',
+    small: [mod('damage', 'inc', 4)],
+    notable: (s) => [
+      mod('damage', 'more', r(10 * s), { condition: { id: 'leeching' } }),
+      mod('leech.life', 'base', r1(0.3 * s), { tags: ['attack'] }),
+    ],
+  },
+  beenHit: {
+    id: 'beenHit',
+    smallName: 'Armour',
+    small: [mod('armour', 'inc', 8)],
+    notable: (s) => [
+      mod('damage', 'more', r(10 * s), { condition: { id: 'beenHitRecently' } }),
+      mod('armour', 'inc', r(12 * s)),
+    ],
+  },
+} satisfies Record<string, Theme>);
+
+/** The names of the dozen new notables, by the cluster that holds them. */
+export const NEW_NOTABLE_THEMES = [
+  'gritBlock',
+  'gritRegen',
+  'maxGrit',
+  'fervourKill',
+  'maxFervour',
+  'insightCrit',
+  'hexEffect',
+  'curseWard',
+  'chaosEs',
+  'vsHexed',
+  'whileLeeching',
+  'beenHit',
+];

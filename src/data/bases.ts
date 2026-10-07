@@ -426,11 +426,28 @@ function jewelleryBases(): ItemBase[] {
   ];
 }
 
+/** Bases only uniques use. */
+function uniqueBases(): ItemBase[] {
+  return [
+    {
+      id: 'body_rags',
+      name: 'Grave Rags',
+      itemClass: 'body',
+      level: 1,
+      req: { str: 0, dex: 0, int: 0 },
+      implicits: [],
+      tags: [],
+      uniqueOnly: true,
+    },
+  ];
+}
+
 export const ITEM_BASES: ItemBase[] = [
   ...weaponBases(),
   ...armourBases(),
   ...shieldBases(),
   ...jewelleryBases(),
+  ...uniqueBases(),
 ];
 
 const BASE_BY_ID = new Map(ITEM_BASES.map((b) => [b.id, b]));

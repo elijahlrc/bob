@@ -59,6 +59,11 @@ export function naturalGemLevel(def: GemDef, charLevel: number, attrs: Attrs): n
   return best;
 }
 
+/** The tags a gem counts as for tag-filtered bonuses: an active's skill tags, or "aura". */
+export function gemTagsOf(def: GemDef): readonly SkillTag[] {
+  return def.kind === 'active' ? def.tags : def.kind === 'aura' ? ['aura'] : [];
+}
+
 export function gemLevel(def: GemDef, charLevel: number, attrs: Attrs, bonus: number): number {
   return Math.min(MAX_GEM_LEVEL, naturalGemLevel(def, charLevel, attrs) + bonus);
 }
@@ -77,6 +82,8 @@ export type SkillDef = {
   /** Added damage effectiveness, percent. */
   effectiveness: number;
   castTime: number;
+  /** Seconds between uses when cast as a secondary skill; the default is 6 uses long, at least 3 s. */
+  cooldown?: number;
   /** Spell base crit, percent. */
   crit: number;
   cost: number;

@@ -1,9 +1,20 @@
+import { gemDef } from '../data/gems';
 import { describe, expect, it } from 'vitest';
 import { endKindForMap, resistPenaltyForMap, roomsForMap } from '../gen/mapPlan';
 import type { MapResult } from '../sim/runMap';
 import { botRun } from './bot';
 import { Controller } from './controller';
-import { finishMap, newRun, passivePoints, rollRewards, takeReward, TOTAL_MAPS } from './run';
+import {
+  finishMap,
+  newRun,
+  passivePoints,
+  rollRewards,
+  rollSkillRewards,
+  SKILL_REWARD_MAPS,
+  SAVE_VERSION,
+  takeReward,
+  TOTAL_MAPS,
+} from './run';
 import { clearSave, loadRun, MemoryStore, SAVE_KEY, saveRun } from './save';
 
 const cleared = (level: number): MapResult => ({
@@ -37,7 +48,7 @@ describe('map schedule (§5.3)', () => {
 });
 
 describe('run progression (§5.3)', () => {
-  it('+3 bonus passive points after maps 10–80, a refund point per map, rewards every 5th map', () => {
+  it('+3 bonus passive points after maps 10–80, a refund point per map, rewards every 5th map and skill gems on the first four', () => {
     const run = newRun('vanguard', 7);
     let lvl = 1;
     for (let m = 1; m <= 90; m++) {
@@ -45,6 +56,13 @@ describe('run progression (§5.3)', () => {
       lvl = Math.min(100, lvl + 1);
       if (m % 5 === 0) {
         expect(run.reward, `reward after map ${m}`).toHaveLength(3);
+        takeReward(run, null);
+      } else if (m <= SKILL_REWARD_MAPS) {
+        expect(run.reward, `skill gems after map ${m}`).toHaveLength(3);
+        expect(
+          run.reward!.every((o) => o.kind === 'gem' && gemDef(o.gemId).kind === 'active'),
+        ).toBe(true);
+        expect(new Set(run.reward!.map((o) => (o as { gemId: string }).gemId)).size).toBe(3);
         takeReward(run, null);
       } else expect(run.reward).toBeNull();
     }
@@ -56,6 +74,19 @@ describe('run progression (§5.3)', () => {
     expect(passivePoints(run)).toBe(99 + 24);
   });
 
+  it("remembers what the last cleared map dropped, replacing the previous map's list", () => {
+    const run = newRun('mystic', 1);
+    const gem = { kind: 'gem' as const, uid: 501, gemId: 'crushingBlow' };
+    const pot = { kind: 'currency' as const, uid: 502, id: 'ember', count: 2 };
+    const bag = { kind: 'gem' as const, uid: 503, gemId: 'crushingBlow' };
+    finishMap(run, { ...cleared(1), picked: [gem, pot] });
+    expect(run.lastDrops).toEqual([501]);
+    finishMap(run, { ...cleared(2), picked: [bag] });
+    expect(run.lastDrops).toEqual([503]);
+    finishMap(run, cleared(3));
+    expect(run.lastDrops).toEqual([]);
+  });
+
   it('death ends the run; clearing map 100 is victory', () => {
     const run = newRun('mystic', 1);
     finishMap(run, { ...cleared(1), status: 'dead' });
@@ -64,6 +95,24 @@ describe('run progression (§5.3)', () => {
     run2.map = TOTAL_MAPS;
     finishMap(run2, cleared(100));
     expect(run2.phase).toBe('victory');
+  });
+
+  it('skill gem offers skip gems already held, and picking one adds it to the bag', () => {
+    const run = newRun('mystic', 3);
+    const first = rollSkillRewards(run);
+    const held = new Set(
+      run.inventory.filter((x) => x.kind === 'gem').map((g) => (g as { gemId: string }).gemId),
+    );
+    for (const o of first) expect(held.has((o as { gemId: string }).gemId)).toBe(false);
+    const wornIds = run.build.equipment.body!.sockets.map((g) => g?.gemId);
+    for (const o of first) expect(wornIds).not.toContain((o as { gemId: string }).gemId);
+    run.reward = first;
+    takeReward(run, first[2].uid);
+    expect(run.inventory.some((x) => x.uid === first[2].uid)).toBe(true);
+    const again = rollSkillRewards(run);
+    expect(
+      again.some((o) => (o as { gemId: string }).gemId === (first[2] as { gemId: string }).gemId),
+    ).toBe(false);
   });
 
   it('reward picks add the chosen offer to the inventory', () => {
@@ -83,7 +132,7 @@ describe('saving (§5.5)', () => {
     const run = newRun('zealot', 11);
     finishMap(run, cleared(2));
     saveRun(store, run);
-    expect(JSON.parse(store.getItem(SAVE_KEY)!).version).toBe(1);
+    expect(JSON.parse(store.getItem(SAVE_KEY)!).version).toBe(SAVE_VERSION);
     const r = loadRun(store);
     expect(r.status).toBe('ok');
     if (r.status === 'ok') expect(r.run).toEqual(JSON.parse(JSON.stringify(run)));

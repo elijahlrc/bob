@@ -129,6 +129,16 @@ export const IP_DENY_LIST: readonly string[] = [
   // Uniques (a sample of famous ones).
   "Kaom's Heart",
   'Headhunter',
+  // Wave 3 and the hexes and charges of the depth expansion (EXPANSION 5.6, 5.7, 6.4).
+  "Asenath's Gentle Touch",
+  "Doedre's Damning",
+  "Kaom's Way",
+  'Elemental Weakness',
+  'Temporal Chains',
+  'Enfeeble',
+  'Endurance Charge',
+  'Frenzy Charge',
+  'Power Charge',
   'Mjolner',
   'Shavronne',
   'Tabula Rasa',

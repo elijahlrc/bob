@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
-import { EQUIP_SLOTS, type AnyItem, type EquipSlot } from '../data/types';
+import { EQUIP_SLOTS, type InventoryItem, type EquipSlot } from '../data/types';
 import { resistPenaltyForMap } from '../gen/mapPlan';
 import type { Controller } from '../run/controller';
+import { salvage, salvageValue } from '../run/craft';
 import {
   canEquip,
   discard,
@@ -31,8 +32,11 @@ import { loadPref, savePref } from './prefs';
 type Sel =
   { from: 'inv'; uid: number } | { from: 'slot'; slot: EquipSlot } | { from: 'flask'; idx: number };
 
-const FILTERS: [FilterKey, string][] = [
+type ListFilter = FilterKey | 'last';
+
+const FILTERS: [ListFilter, string][] = [
   ['all', 'All'],
+  ['last', 'Last map'],
   ['upgrades', 'Upgrades'],
   ['weapon', 'Weapons'],
   ['armour', 'Armour'],
@@ -62,7 +66,7 @@ export function Items({ c }: { c: Controller }) {
   const [msg, setMsg] = useState('');
   const [sort, setSort] = useState<SortKey>(() => loadPref<SortKey>('inv.sort', 'newest'));
   const [desc, setDesc] = useState<boolean>(() => loadPref<boolean>('inv.desc', false));
-  const [filter, setFilter] = useState<FilterKey>(() => loadPref<FilterKey>('inv.filter', 'all'));
+  const [filter, setFilter] = useState<ListFilter>(() => loadPref<ListFilter>('inv.filter', 'all'));
   // Items picked up since the last camp visit are tagged NEW (captured before they are acknowledged).
   const fresh = useRef(new Set(run.newLoot));
   useEffect(() => {
@@ -74,24 +78,32 @@ export function Items({ c }: { c: Controller }) {
 
   const cfg = { areaLevel: run.map, resistPenalty: resistPenaltyForMap(run.map) };
   const infos = useMemo(() => itemInfos(run), [run.build, run.inventory]);
-  const visible = useMemo(
-    () => sortItems(filterItems(run.inventory, infos, filter), infos, sort, desc),
-    [run.inventory, infos, sort, desc, filter],
+  const lastDrops = useMemo(() => new Set(run.lastDrops ?? []), [run.lastDrops]);
+  const lastCount = useMemo(
+    () => run.inventory.filter((x) => lastDrops.has(x.uid)).length,
+    [run.inventory, lastDrops],
   );
+  const visible = useMemo(() => {
+    const pool =
+      filter === 'last'
+        ? run.inventory.filter((x) => lastDrops.has(x.uid))
+        : filterItems(run.inventory, infos, filter);
+    return sortItems(pool, infos, sort, desc);
+  }, [run.inventory, infos, sort, desc, filter, lastDrops]);
   const junk = useMemo(() => junkItems(run), [run.build, run.inventory]);
   const upgrades = useMemo(
     () => run.inventory.filter((x) => isUpgrade(infos.get(x.uid)!)).length,
     [run.inventory, infos],
   );
 
-  const lookup = (s: Sel | null): AnyItem | null => {
+  const lookup = (s: Sel | null): InventoryItem | null => {
     if (!s) return null;
     if (s.from === 'inv') return run.inventory.find((x) => x.uid === s.uid) ?? null;
     if (s.from === 'slot') return run.build.equipment[s.slot] ?? null;
     return run.build.flasks[s.idx] ?? null;
   };
   const selected = lookup(sel);
-  const shown: AnyItem | null =
+  const shown: InventoryItem | null =
     (hover !== null ? run.inventory.find((x) => x.uid === hover) : null) ?? selected;
   const shownInfo: ItemInfo | undefined = shown ? infos.get(shown.uid) : undefined;
   const fromInv = shown !== null && run.inventory.some((x) => x.uid === shown.uid);
@@ -125,15 +137,16 @@ export function Items({ c }: { c: Controller }) {
     const next = visible[i + 1] ?? visible[i - 1];
     setSel(next ? { from: 'inv', uid: next.uid } : null);
   };
-  const discardJunk = () => {
+  const salvageJunk = () => {
     if (!junk.length) return;
+    const dust = junk.reduce((n, x) => n + salvageValue(x), 0);
     if (
       !confirm(
-        `Discard ${junk.length} normal/magic item${junk.length > 1 ? 's' : ''} that are not upgrades?`,
+        `Salvage ${junk.length} normal/magic item${junk.length > 1 ? 's' : ''} that are not upgrades for ${dust} Bone Dust?`,
       )
     )
       return;
-    c.act((r) => junk.forEach((x) => discard(r, x.uid)));
+    c.craft((r) => junk.forEach((x) => salvage(r, x.uid)));
     setSel(null);
   };
 
@@ -233,7 +246,7 @@ export function Items({ c }: { c: Controller }) {
               <div class={shownInfo?.replaces || shownInfo?.slot ? 'compare' : ''}>
                 <div>
                   {fromInv && <div class="muted cmp-title">New</div>}
-                  <ItemCard it={shown} diff={diff} />
+                  <ItemCard it={shown} diff={diff} build={run.build} />
                 </div>
                 {fromInv && shown.kind === 'item' && shownInfo?.slot && (
                   <div>
@@ -319,8 +332,8 @@ export function Items({ c }: { c: Controller }) {
           <button class="btn small" disabled={!c.canUndo} onClick={() => c.undo()} title="Ctrl+Z">
             ↶ Undo
           </button>
-          <button class="btn small danger" disabled={!junk.length} onClick={discardJunk}>
-            Discard junk ({junk.length})
+          <button class="btn small danger" disabled={!junk.length} onClick={salvageJunk}>
+            Salvage junk ({junk.length})
           </button>
         </div>
         <div class="chips">
@@ -332,6 +345,7 @@ export function Items({ c }: { c: Controller }) {
             >
               {label}
               {k === 'upgrades' && upgrades > 0 ? ` (${upgrades})` : ''}
+              {k === 'last' ? ` (${lastCount})` : ''}
             </button>
           ))}
           <span class="muted count">

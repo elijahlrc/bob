@@ -84,7 +84,7 @@ export abstract class StyleBase implements MapStyle {
   protected abstract destroyDrop(obj: unknown, picked: boolean): void;
   protected abstract createChest(c: Chest): unknown;
   protected abstract updateChest(obj: unknown, c: Chest, dt: number): void;
-  protected abstract updateGround(effects: GroundEffect[], dt: number): void;
+  protected abstract updateGround(effects: GroundEffect[], dt: number, world: World): void;
   protected abstract updateExit(world: World, dt: number): void;
   protected abstract handleEvent(e: SimEvent, world: World): void;
   protected abstract frame(world: World, dt: number): void;
@@ -169,7 +169,7 @@ export abstract class StyleBase implements MapStyle {
       }
       this.updateChest(o, c, dt);
     }
-    this.updateGround(world.effects, dt);
+    this.updateGround(world.effects, dt, world);
     this.updateExit(world, dt);
     this.frame(world, dt);
     this.followCamera(world, dt);

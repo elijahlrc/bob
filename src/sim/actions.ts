@@ -1,7 +1,9 @@
 import { angleDiff } from '../core/math';
-import { BLOCK_WINDOW, HIT_AT, PROJECTILE_SPEED, SHOT_ALERT } from '../data/constants';
+import { BLOCK_WINDOW, ECHO_GAP, HIT_AT, PROJECTILE_SPEED, SHOT_ALERT } from '../data/constants';
 import type { SkillProfile } from '../calc/skill';
 import { hit } from './combat';
+import { registerBlast, shieldBlocks, speedMult } from './factions';
+import { fireTriggers } from './triggers';
 import type { Action, Actor, World } from './types';
 
 /** Begin an action (attack or cast). The previous action's overflow time carries over. */
@@ -22,6 +24,7 @@ export function startAction(
     duration,
     elapsed: a.carry,
     fired: false,
+    echoes: 0,
     targetId: target.id,
     aimX: target.x,
     aimY: target.y,
@@ -29,6 +32,7 @@ export function startAction(
   a.carry = 0;
   a.facing = Math.atan2(target.y - a.y, target.x - a.x);
   w.events.push({ t: 'use', src: a.id, skill: p.skill.id });
+  if (a.isPlayer && p.isAttack) fireTriggers(w, { on: 'attack', target, tags: p.tagMask });
   // Fighting is noisy: idle monsters nearby come running even if they have not seen the player.
   if (a.isPlayer)
     for (const m of w.actors)
@@ -59,6 +63,9 @@ export function actorById(w: World, id: number): Actor | undefined {
   return undefined;
 }
 
+/** When the next echo lands: a share of the use time after the first (and each earlier echo). */
+const echoeAt = (act: Action) => (HIT_AT + ECHO_GAP * (act.echoes + 1)) * act.duration;
+
 /** Advance the current action; fire it at 60% of its use time. */
 export function updateAction(w: World, a: Actor, dt: number): void {
   const act = a.action;
@@ -74,10 +81,21 @@ export function updateAction(w: World, a: Actor, dt: number): void {
     act.aimY = t.y;
     a.facing = Math.atan2(t.y - a.y, t.x - a.x);
   }
-  act.elapsed += dt * (1 - a.ail.chill);
+  act.elapsed += dt * (1 - a.ail.chill) * speedMult(a);
   if (!act.fired && act.elapsed >= HIT_AT * act.duration) {
     act.fired = true;
     fire(w, a, act);
+  }
+  // Echoes: the same use lands again a moment after the first, without a new wind-up or a new cost.
+  if (act.fired && act.echoes < act.profile.repeats && act.elapsed >= echoeAt(act)) {
+    act.echoes++;
+    const t2 = actorById(w, act.targetId);
+    if (t2 && t2.alive) {
+      act.aimX = t2.x;
+      act.aimY = t2.y;
+    }
+    fire(w, a, act);
+    w.events.push({ t: 'echo', src: a.id, skill: act.profile.skill.id });
   }
   if (act.elapsed >= act.duration) {
     a.carry = act.elapsed - act.duration;
@@ -91,7 +109,8 @@ function enemiesOf(w: World, a: Actor): Actor[] {
   return w.player.alive ? [w.player] : [];
 }
 
-function fire(w: World, a: Actor, act: Action): void {
+/** Resolve an action's effect: strikes, chains or projectiles. Triggers call it with no wind-up. */
+export function fire(w: World, a: Actor, act: Action): void {
   const p = act.profile;
   const b = p.skill.behaviour;
   const target = actorById(w, act.targetId);
@@ -139,6 +158,23 @@ function fire(w: World, a: Actor, act: Action): void {
       if (!best) break;
       from = cur;
       cur = best;
+    }
+    return;
+  }
+  if (b.kind === 'burst') {
+    // A nova around the target, not the caster.
+    const radius = b.radius * p.radiusMult;
+    let dominant = 0;
+    let best = -1;
+    for (const c of p.hands[0].chunks)
+      if (c.max > best) {
+        best = c.max;
+        dominant = c.type;
+      }
+    w.events.push({ t: 'explode', x: act.aimX, y: act.aimY, r: radius, dtype: dominant });
+    for (const e of enemiesOf(w, a)) {
+      if (Math.hypot(e.x - act.aimX, e.y - act.aimY) > radius + e.r) continue;
+      hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
     }
     return;
   }
@@ -196,6 +232,7 @@ function explode(
   y: number,
 ): void {
   w.events.push({ t: 'explode', x, y, r: pr.explodeRadius, dtype: pr.dtype });
+  registerBlast(w, x, y, pr.explodeRadius);
   if (!owner) return;
   for (const e of w.actors) {
     if (!e.alive || e.faction === pr.faction) continue;
@@ -261,6 +298,13 @@ export function updateProjectiles(w: World, dt: number): void {
         if (pr.explodeRadius > 0) {
           explode(w, owner, pr, pr.x, pr.y);
           endProjectile(w, pr, 3);
+          alive = false;
+          break;
+        }
+        // A Shieldbearer turns away what arrives at its front.
+        if (shieldBlocks(w, e, pr.x, pr.y)) {
+          w.events.push({ t: 'block', src: pr.owner, dst: e.id });
+          endProjectile(w, pr, 2);
           alive = false;
           break;
         }

@@ -1,5 +1,25 @@
-import type { Actor } from '../../sim/types';
+import { ECHO_GAP, HIT_AT } from '../../data/constants';
+import type { Action, Actor } from '../../sim/types';
 import type { AnimName } from './figure';
+
+/**
+ * The attack animation's time for an action. A repeating skill (Echoing Cast) plays a second, shorter wind-up and strike
+ * for every echo, each landing at the moment the sim fires it, so two casts are two visible casts.
+ */
+function attackTime(act: Action): number {
+  const u = Math.min(1, act.elapsed / act.duration);
+  const n = act.profile.repeats;
+  if (n <= 0 || act.which === 'triggered') return u;
+  const first = HIT_AT;
+  const end = first + ECHO_GAP * n;
+  if (u < first) return u;
+  if (u < end) {
+    // Inside echo k: wind back up and strike again (animation time 0.25 to 0.55, where the blow lands).
+    const frac = ((u - first) % ECHO_GAP) / ECHO_GAP;
+    return 0.25 + 0.3 * frac;
+  }
+  return 0.6 + 0.4 * ((u - end) / Math.max(1e-6, 1 - end));
+}
 
 /** Per-actor animation state tracked on the renderer side (never written back to the sim). */
 export class AnimTrack {
@@ -83,7 +103,7 @@ export class AnimTrack {
   state(a: Actor): { anim: AnimName; t: number } {
     if (!a.alive) return { anim: 'death', t: Math.min(1, this.deathT / 0.7) };
     if (a.stunT > 0 || a.ail.freezeT > 0) return { anim: 'stun', t: (this.idlePhase * 2) % 1 };
-    if (a.action) return { anim: 'attack', t: Math.min(1, a.action.elapsed / a.action.duration) };
+    if (a.action) return { anim: 'attack', t: attackTime(a.action) };
     if (this.speed > 0.6) return { anim: 'walk', t: this.walkPhase % 1 };
     return { anim: 'idle', t: this.idlePhase };
   }

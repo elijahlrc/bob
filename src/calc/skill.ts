@@ -63,18 +63,30 @@ export type SkillProfile = {
   hands: HandProfile[];
   /** Average seconds per use. */
   useTime: number;
+  /** Extra times the skill fires after each use (Echoing Cast): a use lands 1 + repeats times. */
+  repeats: number;
   cost: number;
-  ignite: AilmentSpec;
+  /** Ignite: `max` ignites can burn at once (the strongest count); `speed` makes them deal their damage faster. */
+  ignite: AilmentSpec & { max: number; speed: number };
   bleed: AilmentSpec;
   poison: AilmentSpec;
   shock: { chance: number; effect: number; dur: number };
   chill: { effect: number; dur: number };
   freeze: { chance: number; dur: number };
   cannotInflictEle: boolean;
+  /** Damage types (indices) that can inflict each ailment: its own, plus any a rule allows. */
+  ailmentFrom: { ignite: number[]; shock: number[]; chill: number[]; freeze: number[] };
   alwaysFreezeOnCrit: boolean;
+  /** Leech from critical strikes is instant. */
+  instantLeechOnCrit: boolean;
   leechLife: number[];
   leechMana: number[];
   lifeOnHit: number;
+  manaOnHit: number;
+  /** Fraction of the target's armour this skill ignores (Sundering monsters). */
+  armourIgnore: number;
+  /** Percent of the target's maximum mana each hit drains (Siphoning monsters). */
+  manaDrain: number;
   stunDamageMult: number;
   enemyStunThreshRed: number;
   stunDurMult: number;
@@ -176,6 +188,10 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
   const avatar = db.flag('avatarOfFire', baseCtx);
   const neverCrit = db.flag('neverCrit', baseCtx);
   const overload = db.flag('feverPitch', baseCtx);
+  const noEle = db.flag('noElementalDamage', baseCtx);
+  const noPhys = db.flag('noPhysicalDamage', baseCtx);
+  const spellBit = tagBit('spell');
+  const spellIncOnAttacks = isAttack && db.flag('spellIncAppliesToAttacks', baseCtx);
 
   function handProfile(hand: HandStats | null): HandProfile {
     const tags = baseTags | (hand ? tagMask(hand.tags) : 0);
@@ -211,15 +227,22 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     // Step 3: conversion and gain.
     let chunks = convertChunks(base, db, ctx);
     if (avatar) chunks = chunks.filter((c) => c.type === FIRE);
+    if (noEle) chunks = chunks.filter((c) => c.type === PHYS || c.type === CHAOS);
+    if (noPhys) chunks = chunks.filter((c) => c.type !== PHYS);
     // Step 4: scaling.
     const hitTag = tagBit('hit');
     let hitMultAcc = 0;
     let hitW = 0;
     for (const c of chunks) {
       const cctx = { ...ctx, ancestry: c.anc };
-      const m = db.mult('damage', cctx);
-      c.min *= m;
-      c.max *= m;
+      let m = db.mult('damage', cctx);
+      if (spellIncOnAttacks) {
+        // Increases and reductions to spell damage also apply (not "more" mods).
+        const inc = db.inc('damage', { ...cctx, tags: tags | spellBit });
+        m = Math.max(0, 1 + inc) * db.more('damage', cctx);
+      }
+      c.min *= m * db.mult('minDamage', cctx);
+      c.max *= m * db.mult('maxDamage', cctx);
       const hm = db.mult('damage', { ...cctx, tags: tags | hitTag }, hitTag);
       hitMultAcc += hm * (c.min + c.max);
       hitW += c.min + c.max;
@@ -274,6 +297,18 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     };
   };
 
+  /** Ignites can burn faster (more damage a second, for less time) and, rarely, more than one at once. */
+  const igniteSpec = () => {
+    const raw = ailment('ignite', 'chance.ignite', 'duration.ignite', IGNITE_DURATION, 1 << FIRE);
+    const speed = Math.max(0.1, 1 + db.inc('ignite.speed', baseCtx));
+    return {
+      ...raw,
+      dur: raw.dur / speed,
+      speed,
+      max: 1 + Math.max(0, Math.floor(db.sum('base', 'ignite.extra', baseCtx))),
+    };
+  };
+
   const perType = (stat: string, div = 100) =>
     DAMAGE_TYPES.map((_, t) => db.sum('base', stat, { ...baseCtx, ancestry: 1 << t }) / div);
 
@@ -281,6 +316,13 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
   const aoeMult = db.mult('aoe', baseCtx);
   const ailEffect = db.inc('ailmentEffect', baseCtx);
   const cannotInflictEle = db.flag('cannotInflictEle', baseCtx);
+  /** "Your physical damage can shock": the types, beyond its own, that can inflict an ailment. */
+  const ailmentSources = (ail: string, own: number): number[] => {
+    const out = [own];
+    for (let t = 0; t < NT; t++)
+      if (t !== own && db.flag(`can${ail}.${DAMAGE_TYPES[t]}`, baseCtx)) out.push(t);
+    return out;
+  };
 
   return {
     skill,
@@ -288,8 +330,9 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     tagMask: baseTags,
     hands,
     useTime,
+    repeats: Math.max(0, Math.round(db.sum('base', 'repeats', baseCtx))),
     cost: Math.round(skill.cost * inp.costMult * db.mult('cost', baseCtx)),
-    ignite: ailment('ignite', 'chance.ignite', 'duration.ignite', IGNITE_DURATION, 1 << FIRE),
+    ignite: igniteSpec(),
     bleed: isAttack
       ? ailment('bleed', 'chance.bleed', 'duration.bleed', BLEED_DURATION, 1 << PHYS)
       : { chance: 0, mult: 1, dur: BLEED_DURATION },
@@ -308,10 +351,20 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
       dur: db.mult('duration.freeze', baseCtx),
     },
     cannotInflictEle,
+    ailmentFrom: {
+      ignite: ailmentSources('Ignite', FIRE),
+      shock: ailmentSources('Shock', LIGHT),
+      chill: ailmentSources('Chill', COLD),
+      freeze: ailmentSources('Freeze', COLD),
+    },
     alwaysFreezeOnCrit: db.flag('alwaysFreezeOnCrit', baseCtx),
-    leechLife: perType('leech.life'),
-    leechMana: perType('leech.mana'),
+    instantLeechOnCrit: db.flag('instantLeechOnCrit', baseCtx),
+    leechLife: perType('leech.life').map((v) => v * db.mult('leechRecovery', baseCtx)),
+    leechMana: perType('leech.mana').map((v) => v * db.mult('leechRecovery', baseCtx)),
     lifeOnHit: db.sum('base', 'lifeOnHit', baseCtx),
+    manaOnHit: db.sum('base', 'manaOnHit', baseCtx),
+    armourIgnore: clamp(db.sum('base', 'armourIgnore', baseCtx) / 100, 0, 1),
+    manaDrain: db.sum('base', 'manaDrain', baseCtx),
     stunDamageMult: isAttack ? db.mult('stunDamage', baseCtx) : 1,
     enemyStunThreshRed: clamp(db.sum('base', 'enemyStunThreshold', baseCtx) / 100, 0, 0.9),
     stunDurMult: db.mult('stunDuration', baseCtx),

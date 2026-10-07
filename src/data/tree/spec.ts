@@ -326,6 +326,25 @@ function slotAngle(region: RegionDef, ring: number, slot: number): number {
   return region.angle + (slot - (n - 1) / 2) * step + stagger;
 }
 
+/**
+ * The notables of the depth expansion (EXPANSION 6.5): the cluster that holds each, its theme and its name. They
+ * replace the notable that would otherwise sit there, so the tree keeps its size.
+ */
+export const NEW_NOTABLES: Record<string, { name: string; theme: string }> = {
+  str_2_2: { name: 'Bulwark of Habit', theme: 'gritBlock' },
+  str_4_1: { name: 'Stored Fortitude', theme: 'gritRegen' },
+  strint_4_1: { name: 'Deepened Stance', theme: 'maxGrit' },
+  strdex_2_1: { name: 'Feast of Frenzy', theme: 'fervourKill' },
+  dex_4_2: { name: 'Quickened Heartbeat', theme: 'maxFervour' },
+  dex_2_2: { name: 'Cold Clarity', theme: 'insightCrit' },
+  dexint_2_1: { name: "Hexbinder's Tithe", theme: 'hexEffect' },
+  int_4_2: { name: 'Spite-Proof Skin', theme: 'curseWard' },
+  int_2_1: { name: 'Marrow Veil', theme: 'chaosEs' },
+  dexint_4_3: { name: 'Hunter of the Marked', theme: 'vsHexed' },
+  strdex_4_3: { name: 'Red Gait', theme: 'whileLeeching' },
+  strint_2_2: { name: 'Grudge Engine', theme: 'beenHit' },
+};
+
 /** Generate the cluster list (deterministic). */
 export function buildClusterSpecs(): ClusterSpec[] {
   const out: ClusterSpec[] = [];
@@ -440,6 +459,12 @@ export function buildClusterSpecs(): ClusterSpec[] {
         });
       }
     }
+  }
+  for (const [id, n] of Object.entries(NEW_NOTABLES)) {
+    const c = out.find((x) => x.id === id);
+    if (!c || !c.notable) throw new Error(`no notable cluster ${id}`);
+    c.theme = n.theme;
+    c.notable.name = n.name;
   }
   // Cross-region links at sector boundaries on odd rings: last slot of a region ↔ first of the next.
   REGIONS.forEach((reg, i) => {

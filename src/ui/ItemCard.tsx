@@ -1,16 +1,27 @@
 import { Character, diffSheets, type SheetDiff } from '../calc/character';
+import { itemReq } from '../calc/items';
 import { itemBase } from '../data/bases';
+import { triggerText } from '../data/triggers';
 import { flaskBase } from '../data/flasks';
+import { naturalGemLevel } from '../calc/gems';
 import { gemDef } from '../data/gems';
-import type { AnyItem, Build, EquipSlot } from '../data/types';
+import type { InventoryItem, Build, EquipSlot } from '../data/types';
+import type { Mod } from '../mods/types';
 import { modsText } from '../mods/text';
 import { slotsFor, withEquipped } from '../run/inventory';
+import { GemCard } from './GemCard';
 
-export function rarityClass(it: AnyItem): string {
-  return it.kind === 'item' ? it.rarity : it.kind === 'flask' ? 'flaskitem' : 'gem';
+export function rarityClass(it: InventoryItem): string {
+  return it.kind === 'item'
+    ? it.rarity
+    : it.kind === 'flask'
+      ? it.uniqueId
+        ? 'unique'
+        : 'flaskitem'
+      : 'gem';
 }
 
-export function itemTitle(it: AnyItem): string {
+export function itemTitle(it: InventoryItem): string {
   if (it.kind === 'gem') return gemDef(it.gemId).name;
   return it.name;
 }
@@ -18,7 +29,7 @@ export function itemTitle(it: AnyItem): string {
 /** Δ of equipping `it` into its first valid slot (or the given slot). */
 export function compareDelta(
   build: Build,
-  it: AnyItem,
+  it: InventoryItem,
   cfg: { areaLevel: number; resistPenalty: number },
   slot?: EquipSlot,
 ): SheetDiff | null {
@@ -39,27 +50,27 @@ function DeltaLine({ label, v, pct }: { label: string; v: number; pct?: boolean 
   );
 }
 
-export function ItemCard({ it, diff }: { it: AnyItem; diff?: SheetDiff | null }) {
-  if (it.kind === 'gem') {
-    const d = gemDef(it.gemId);
-    return (
-      <div class="item-card gem">
-        <div class="ic-name">{d.name}</div>
-        <div class="muted">
-          {d.kind === 'active'
-            ? 'Active skill gem'
-            : d.kind === 'support'
-              ? 'Support gem'
-              : 'Aura gem'}
-        </div>
-        <div class="ic-mod">{d.description}</div>
-      </div>
-    );
-  }
+/** The level a gem would have in this build (before any socketed-item bonus). */
+export function gemLevelIn(build: Build, gemId: string): number {
+  return naturalGemLevel(gemDef(gemId), build.level, new Character(build).attrs);
+}
+
+export function ItemCard({
+  it,
+  diff,
+  build,
+}: {
+  it: InventoryItem;
+  diff?: SheetDiff | null;
+  /** Used to work out what level a gem would have. */
+  build?: Build;
+}) {
+  if (it.kind === 'gem')
+    return <GemCard gemId={it.gemId} level={build ? gemLevelIn(build, it.gemId) : 1} />;
   if (it.kind === 'flask') {
     const b = flaskBase(it.baseId);
     return (
-      <div class="item-card flaskitem">
+      <div class={`item-card ${it.uniqueId ? 'unique' : 'flaskitem'}`}>
         <div class="ic-name">{it.name}</div>
         <div class="muted">
           Requires level {b.level} · {b.perUse}/{b.maxCharges} charges · {b.duration} s
@@ -83,10 +94,15 @@ export function ItemCard({ it, diff }: { it: AnyItem; diff?: SheetDiff | null })
   }
   const b = itemBase(it.baseId);
   const req = [`level ${b.level}`];
-  if (b.req.str) req.push(`${b.req.str} Str`);
-  if (b.req.dex) req.push(`${b.req.dex} Dex`);
-  if (b.req.int) req.push(`${b.req.int} Int`);
-  const explicit = [...it.affixes.flatMap((a) => a.mods), ...(it.uniqueMods ?? [])];
+  const need = itemReq(it);
+  if (need.str) req.push(`${need.str} Str`);
+  if (need.dex) req.push(`${need.dex} Dex`);
+  if (need.int) req.push(`${need.int} Int`);
+  const all = [...it.affixes.flatMap((a) => a.mods), ...(it.uniqueMods ?? [])];
+  // Rules (flags, granted keystones, triggers) are set apart from the stat lines.
+  const isRule = (m: Mod) => m.kind === 'flag';
+  const explicit = all.filter((m) => !isRule(m));
+  const rules = all.filter(isRule);
   return (
     <div class={`item-card ${it.rarity}`}>
       <div class="ic-name">{it.name}</div>
@@ -120,6 +136,16 @@ export function ItemCard({ it, diff }: { it: AnyItem; diff?: SheetDiff | null })
       {modsText(explicit).map((l, i) => (
         <div key={`e${i}`} class="ic-mod explicit">
           {l}
+        </div>
+      ))}
+      {modsText(rules).map((l, i) => (
+        <div key={`r${i}`} class="ic-mod rule">
+          {l}
+        </div>
+      ))}
+      {(it.uniqueTriggers ?? []).map((t, i) => (
+        <div key={`t${i}`} class="ic-mod rule">
+          {triggerText(t)}
         </div>
       ))}
       {diff && (

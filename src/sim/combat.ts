@@ -1,4 +1,4 @@
-import { resolveHit, type HitResult, type TargetState } from '../calc/combat';
+import { resolveHit, shockTaken, takenAs, type HitResult, type TargetState } from '../calc/combat';
 import { levelPenalty } from '../calc/formulas';
 import type { SkillProfile } from '../calc/skill';
 import {
@@ -11,10 +11,20 @@ import {
   STUN_GRACE,
   WOUND_DANCE_STACKS,
 } from '../data/constants';
+import { cannotBleed } from '../data/monsters';
 import { condBit } from '../mods/types';
+import { gainTrophy, rollCharges } from './charges';
+import { applyPlayerHexes, tickHexes } from './hexes';
+import { damageMult, hexPlayerAtRandom, onMonsterDeath, shieldedByPylon } from './factions';
+import { fireTriggers } from './triggers';
+import { spawnMonster } from './world';
 import type { Actor, Dot, World } from './types';
 
 const CHAOS = 4;
+/** Seconds of damage kept for the death recap. */
+const DAMAGE_LOG_TIME = 6;
+/** Share of a melee hit that a Thorned monster reflects as physical damage. */
+const THORNS_SHARE = 0.1;
 const OVERLOAD_TIME = 8;
 
 export function lifeCap(w: World, a: Actor): number {
@@ -27,7 +37,7 @@ export function playerConds(w: World, target: Actor | null): number {
   let c = 0;
   const cap = lifeCap(w, p);
   if (p.life >= cap - 0.5) c |= condBit('onFullLife');
-  if (p.life <= cap * LOW_LIFE) c |= condBit('onLowLife');
+  if (p.life <= p.def.maxLife * LOW_LIFE) c |= condBit('onLowLife');
   if (p.tKill < RECENT) c |= condBit('killedRecently');
   if (p.tCrit < RECENT) c |= condBit('critRecently');
   if (p.tHit < RECENT) c |= condBit('hitRecently');
@@ -38,12 +48,19 @@ export function playerConds(w: World, target: Actor | null): number {
   if (p.tStunEnemy < RECENT) c |= condBit('stunnedRecently');
   if (p.tOverload < OVERLOAD_TIME) c |= condBit('overloadActive');
   if (p.tBlock < RECENT) c |= condBit('blockedRecently');
+  if (p.tBeenHit < RECENT) c |= condBit('beenHitRecently');
+  if (p.leechLife.length > 0) c |= condBit('leeching');
+  if (p.def.maxEs > 0 && p.es >= p.def.maxEs - 0.5) c |= condBit('esFull');
+  const manaCap = Math.max(1, p.def.maxMana - w.char.reservedMana);
+  if (p.mana <= manaCap * LOW_LIFE) c |= condBit('onLowMana');
+  if (p.hexes.length) c |= condBit('cursed');
   if (target) c |= targetConds(target, p);
   return c;
 }
 
 export function targetConds(t: Actor, from: Actor): number {
   let c = 0;
+  if (t.hexes.length) c |= condBit('targetCursed');
   if (t.ail.ignites.length) c |= condBit('targetIgnited');
   if (t.ail.shock > 0) c |= condBit('targetShocked');
   if (t.ail.chill > 0) c |= condBit('targetChilled');
@@ -51,6 +68,7 @@ export function targetConds(t: Actor, from: Actor): number {
   if (t.ail.bleeds.length) c |= condBit('targetBleeding');
   if (t.ail.poisons.length) c |= condBit('targetPoisoned');
   if (t.stunT > 0) c |= condBit('targetStunned');
+  if (t.life <= t.def.maxLife * LOW_LIFE) c |= condBit('targetLowLife');
   if (t.rarity === 'rare' || t.rarity === 'miniboss' || t.rarity === 'boss')
     c |= condBit('targetRareOrUnique');
   if (Math.hypot(t.x - from.x, t.y - from.y) <= 2 + t.r) c |= condBit('targetNearby');
@@ -81,14 +99,23 @@ export function refreshPlayerDefence(w: World): void {
 }
 
 export function targetState(a: Actor): TargetState {
-  return { def: a.def, shock: a.ail.shock, resShift: a.resShift };
+  // Brittle Doom lowers the three elemental resistances; Open Wounds adds physical vulnerability.
+  const resShift = a.hexRes
+    ? a.resShift.map((r, i) => (i >= 1 && i <= 3 ? r - a.hexRes : r))
+    : a.resShift;
+  return { def: a.def, shock: a.ail.shock, resShift, vuln: a.hexVuln };
 }
 
 /**
  * Route damage per type into ES / mana / life (§6.3). Chaos bypasses ES. Returns total dealt.
  */
 export function applyDamage(w: World, dst: Actor, dmg: number[]): number {
-  if (!dst.alive) return 0;
+  if (!dst.alive || dst.phaseT > 0) return 0;
+  if (!dst.isPlayer && dst.mon) {
+    // A Bone Beetle curled up takes 80% less physical damage; a Warden Pylon makes its allies untouchable.
+    if (dst.curlT > 0) dmg[0] *= 0.2;
+    if (w.hasPylons && shieldedByPylon(w, dst)) return 0;
+  }
   let total = 0;
   for (let i = 0; i < 5; i++) total += dmg[i];
   if (total <= 0) return 0;
@@ -96,6 +123,11 @@ export function applyDamage(w: World, dst: Actor, dmg: number[]): number {
   let rest = total - dmg[CHAOS];
   let chaos = dmg[CHAOS];
   if (def.immuneChaos) chaos = 0;
+  // Embalmer-style rule: chaos damage hits energy shield like any other damage.
+  if (def.chaosHitsEs) {
+    rest += chaos;
+    chaos = 0;
+  }
   // ES absorbs non-chaos damage first (unless it protects mana instead).
   if (!def.esProtectsMana && dst.es > 0) {
     const a = Math.min(dst.es, rest);
@@ -140,44 +172,86 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     wake(w, dst);
     return;
   }
+  // Feeble Grip makes a hexed attacker deal less; the auras and Fervour of the Choir make its monsters deal more.
+  const dealt = damageMult(src);
+  if (dealt !== 1 && res.outcome !== 'block') {
+    for (let i = 0; i < res.dmg.length; i++) res.dmg[i] *= dealt;
+    res.total *= dealt;
+  }
+  if (src.modIds.includes('hexcaller') && dst.isPlayer && res.outcome === 'hit' && src.hexCd <= 0) {
+    src.hexCd = 4;
+    hexPlayerAtRandom(w);
+  }
   if (res.outcome === 'block') {
     w.events.push({ t: 'block', src: src.id, dst: dst.id });
     dst.tBlock = 0;
+    if (dst.isPlayer) rollCharges(w, 'block');
     if (dst.def.lifeOnBlockPct > 0)
       dst.life = Math.min(lifeCap(w, dst), dst.life + dst.def.maxLife * dst.def.lifeOnBlockPct);
     wake(w, dst);
+    if (dst.isPlayer) fireTriggers(w, { on: 'block' });
     return;
   }
   let dtype = 0;
   for (let i = 1; i < 5; i++) if (res.dmg[i] > res.dmg[dtype]) dtype = i;
   w.events.push({ t: 'hit', src: src.id, dst: dst.id, amount: res.total, crit: res.crit, dtype });
+  if (dst.isPlayer) logDamage(w, src, src.name, dtype, res.total);
   src.tHit = 0;
+  dst.tBeenHit = 0;
   if (res.crit) {
     src.tCrit = 0;
+    if (src.isPlayer) rollCharges(w, 'crit');
     if (p.overload) src.tOverload = 0;
   }
-  // Leech and life on hit.
-  const instant = src.def.instantLeech;
+  // Leech and life on hit. Some monsters cannot be leeched from; some gear makes crit leech instant.
+  const instant = src.def.instantLeech || (res.crit && p.instantLeechOnCrit);
   let ll = 0;
   let lm = 0;
-  for (let i = 0; i < 5; i++) {
-    ll += res.dmg[i] * p.leechLife[i];
-    lm += res.dmg[i] * p.leechMana[i];
-  }
+  if (!dst.def.cannotBeLeechedFrom)
+    for (let i = 0; i < 5; i++) {
+      ll += res.dmg[i] * p.leechLife[i];
+      lm += res.dmg[i] * p.leechMana[i];
+    }
   if (src.def.leechToEs && instant) src.es = Math.min(src.def.maxEs, src.es + ll);
   else addLeech(src, 'leechLife', ll, instant);
   addLeech(src, 'leechMana', lm, instant);
   if (p.lifeOnHit > 0) src.life = Math.min(lifeCap(w, src), src.life + p.lifeOnHit);
+  if (p.manaOnHit > 0 && src.isPlayer)
+    src.mana = Math.min(Math.max(0, src.def.maxMana - w.char.reservedMana), src.mana + p.manaOnHit);
 
   const wasAlive = dst.alive;
+  if (src.isPlayer) applyPlayerHexes(w, dst);
   applyDamage(w, dst, res.dmg);
+  // A beetle that is hit curls up for a moment (then cannot again for three seconds).
+  if (wasAlive && dst.alive && dst.mon?.spec.type === 'beetle' && dst.skillT <= 0) {
+    dst.curlT = 1.5;
+    dst.skillT = 3;
+  }
   wake(w, dst);
+  // Siphoning monsters drain the player's mana; Thorned monsters reflect part of a melee hit.
+  if (p.manaDrain > 0 && dst.isPlayer)
+    dst.mana = Math.max(0, dst.mana - (dst.def.maxMana * p.manaDrain) / 100);
+  if (
+    src.isPlayer &&
+    wasAlive &&
+    dst.modIds.includes('thorned') &&
+    p.skill.behaviour.kind === 'melee' &&
+    res.total > 0
+  )
+    rawHit(w, src, res.total * THORNS_SHARE, 0);
+  const afterHit = () => {
+    if (src.isPlayer) fireTriggers(w, { on: 'hit', target: dst, tags: p.tagMask, crit: res.crit });
+    if (dst.isPlayer) fireTriggers(w, { on: 'hitTaken', damage: res.total });
+  };
   // Prismatic Balance: shift the target's elemental resistances.
   if (p.prismaticBalance) {
     for (let i = 1; i <= 3; i++) dst.resShift[i] = res.dmg[i] > 0 ? 25 : -50;
     dst.resShiftT = 5;
   }
-  if (!wasAlive || !dst.alive) return;
+  if (!wasAlive || !dst.alive) {
+    afterHit();
+    return;
+  }
   applyAilments(w, dst, res, p);
   if (res.stun > 0) {
     dst.stunT = res.stun;
@@ -185,9 +259,10 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     src.tStunEnemy = 0;
     w.events.push({ t: 'stun', dst: dst.id, dur: res.stun });
   }
+  afterHit();
 }
 
-function pushDot(list: Dot[], d: Dot, cap = 30): void {
+export function pushDot(list: Dot[], d: Dot, cap = 30): void {
   list.push(d);
   if (list.length > cap) {
     let wi = 0;
@@ -201,9 +276,10 @@ function applyAilments(w: World, dst: Actor, res: HitResult, p: SkillProfile): v
   const ail = dst.ail;
   if (a.ignite > 0) {
     pushDot(ail.ignites, { dps: a.ignite, t: p.ignite.dur });
+    ail.igniteMax = p.ignite.max;
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'ignite' });
   }
-  if (a.bleed > 0) {
+  if (a.bleed > 0 && !(dst.mon && cannotBleed(dst.mon.spec.type))) {
     pushDot(ail.bleeds, { dps: a.bleed, t: p.bleed.dur, stack: p.woundDance });
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'bleed' });
   }
@@ -241,20 +317,60 @@ export function hit(
   applyHit(w, src, dst, p, res);
 }
 
+/** Remember damage the player took, for the death recap. */
+export function logDamage(
+  w: World,
+  src: Pick<Actor, 'name' | 'rarity' | 'modIds'> | null,
+  label: string,
+  dtype: number,
+  amount: number,
+): void {
+  if (amount <= 0) return;
+  const log = w.dmgLog;
+  log.push({
+    t: w.t,
+    name: src ? src.name : label,
+    rarity: src ? src.rarity : 'effect',
+    mods: src ? [...src.modIds] : [],
+    dtype,
+    amount,
+  });
+  while (log.length > 0 && w.t - log[0].t > DAMAGE_LOG_TIME) log.shift();
+}
+
 /** Raw damage of one type that ignores evasion and block (explosions, slams). */
-export function rawHit(w: World, dst: Actor, amount: number, type: number): void {
+export function rawHit(
+  w: World,
+  dst: Actor,
+  amount: number,
+  type: number,
+  label = 'Explosion',
+): void {
   const dmg = [0, 0, 0, 0, 0];
   dmg[type] = amount;
   const def = dst.def;
-  if (type === 0) {
-    const red = Math.min(0.9, def.armour / (def.armour + 10 * amount) + def.physReduction);
-    dmg[0] *= 1 - red;
-  } else {
-    const r = Math.max(-200, Math.min(def.res[type] + dst.resShift[type], def.maxRes[type]));
-    dmg[type] *= 1 - r / 100;
+  takenAs(def, dmg);
+  const taken = def.damageTakenMult * shockTaken(def, dst.ail.shock);
+  for (let i = 0; i < 5; i++) {
+    if (dmg[i] <= 0) continue;
+    if (def.immune[i] || (i === CHAOS && def.immuneChaos)) {
+      dmg[i] = 0;
+      continue;
+    }
+    if (i === 0) {
+      const red = Math.min(0.9, def.armour / (def.armour + 10 * dmg[0]) + def.physReduction);
+      dmg[0] *= 1 - red;
+    } else {
+      const shift = dst.resShift[i] - (i <= 3 ? dst.hexRes : 0);
+      const r = Math.max(-200, Math.min(def.res[i] + shift, def.maxRes[i]));
+      dmg[i] *= 1 - r / 100;
+    }
+    dmg[i] *= taken * def.damageTakenType[i];
+    if (i === 0) dmg[i] *= 1 + dst.hexVuln;
   }
-  dmg[type] *= def.damageTakenMult * (1 + dst.ail.shock);
-  w.events.push({ t: 'hit', src: 0, dst: dst.id, amount: dmg[type], crit: false, dtype: type });
+  const total = dmg[0] + dmg[1] + dmg[2] + dmg[3] + dmg[4];
+  w.events.push({ t: 'hit', src: 0, dst: dst.id, amount: total, crit: false, dtype: type });
+  if (dst.isPlayer) logDamage(w, null, label, type, total);
   applyDamage(w, dst, dmg);
 }
 
@@ -268,12 +384,34 @@ export function wake(w: World, a: Actor): void {
       o.state = 'chase';
 }
 
+/** A drop must land on floor: a flier that dies over a wall drops its loot where it can be reached. */
+function dropSpot(w: World, a: Actor, pos: { x: number; y: number }): { x: number; y: number } {
+  if (!a.flies || w.grid.isFloor(Math.floor(pos.x), Math.floor(pos.y))) return pos;
+  const p = w.player;
+  let best = { x: p.x, y: p.y };
+  let bd = Infinity;
+  for (let dy = -4; dy <= 4; dy++)
+    for (let dx = -4; dx <= 4; dx++) {
+      const tx = Math.floor(a.x) + dx;
+      const ty = Math.floor(a.y) + dy;
+      if (!w.grid.isFloor(tx, ty)) continue;
+      const d = dx * dx + dy * dy;
+      if (d < bd) {
+        bd = d;
+        best = { x: tx + 0.5, y: ty + 0.5 };
+      }
+    }
+  return best;
+}
+
 export function killActor(w: World, a: Actor): void {
   if (!a.alive) return;
   a.alive = false;
   a.life = 0;
   a.action = null;
   w.events.push({ t: 'death', id: a.id });
+  if (!a.isPlayer && !a.noReward) rollCharges(w, 'kill');
+  if (!a.isPlayer && a.rarity === 'rare') gainTrophy(w, a.modIds);
   if (a.isPlayer) {
     w.status = 'dead';
     w.events.push({ t: 'playerDied' });
@@ -307,7 +445,11 @@ export function killActor(w: World, a: Actor): void {
       for (const item of w.opts.loot(w, a)) {
         const id = w.nextId++;
         const ang = w.rngLoot.float(0, Math.PI * 2);
-        const pos = w.grid.collide(a.x + Math.cos(ang) * 0.6, a.y + Math.sin(ang) * 0.6, 0.2);
+        const pos = dropSpot(
+          w,
+          a,
+          w.grid.collide(a.x + Math.cos(ang) * 0.6, a.y + Math.sin(ang) * 0.6, 0.2),
+        );
         w.drops.push({ id, x: pos.x, y: pos.y, item });
         w.events.push({ t: 'drop', id });
       }
@@ -326,6 +468,29 @@ export function killActor(w: World, a: Actor): void {
       dtype: 3,
       faction: 1,
     });
+  }
+  if (a.modIds.includes('splitting') && a.mon) splitInTwo(w, a);
+  onMonsterDeath(w, a);
+  fireTriggers(w, { on: 'kill', target: a });
+}
+
+/** A Splitting monster leaves two weaker copies behind (no XP or loot, and they do not split). */
+function splitInTwo(w: World, a: Actor): void {
+  const spec = a.mon!.spec;
+  for (const dx of [-0.6, 0.6]) {
+    const pos = w.grid.collide(a.x + dx, a.y, 0.4);
+    const c = spawnMonster(
+      w,
+      { type: spec.type, variant: spec.variant, rarity: 'normal', level: spec.level, mods: [] },
+      pos.x,
+      pos.y,
+      a.room,
+      a.pack,
+      a.name,
+    );
+    c.noReward = true;
+    c.state = 'chase';
+    w.events.push({ t: 'summon', id: c.id });
   }
 }
 
@@ -349,8 +514,20 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   a.tFlask += dt;
   a.tStunEnemy += dt;
   a.tBlock += dt;
+  a.tBeenHit += dt;
   a.tOverload += dt;
   a.sinceDamaged += dt;
+  tickHexes(a, dt);
+  if (a.curlT > 0) a.curlT -= dt;
+  if (a.buffT > 0) a.buffT -= dt;
+  if (a.zealT > 0) a.zealT -= dt;
+  if (a.hexCd > 0) a.hexCd -= dt;
+  // A beetle counts down the wait before it can curl up again (nothing else uses its faction timer).
+  if (a.skillT > 0 && a.mon?.spec.type === 'beetle') a.skillT -= dt;
+  if (a.fervourT > 0) {
+    a.fervourT -= dt;
+    if (a.fervourT <= 0) a.fervour = 0;
+  }
   if (a.resShiftT > 0) {
     a.resShiftT -= dt;
     if (a.resShiftT <= 0) a.resShift.fill(0);
@@ -369,14 +546,20 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     if (ail.chillT <= 0) ail.chill = 0;
   }
   // Damage over time.
-  const taken = def.damageTakenMult * (1 + ail.shock);
+  const taken = def.damageTakenMult * shockTaken(def, ail.shock);
   let dotPhys = 0;
   let dotFire = 0;
   let dotChaos = 0;
   if (ail.ignites.length) {
-    let best = 0;
-    for (const d of ail.ignites) if (d.dps > best) best = d.dps;
-    dotFire += best;
+    // The strongest `igniteMax` ignites burn.
+    if (ail.igniteMax <= 1) {
+      let best = 0;
+      for (const d of ail.ignites) if (d.dps > best) best = d.dps;
+      dotFire += best;
+    } else {
+      const top = ail.ignites.map((d) => d.dps).sort((x, y) => y - x);
+      for (let i = 0; i < Math.min(ail.igniteMax, top.length); i++) dotFire += top[i];
+    }
     decay(ail.ignites, dt);
   }
   if (ail.bleeds.length) {
@@ -397,7 +580,19 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     decay(ail.poisons, dt);
   }
   if (dotPhys + dotFire + dotChaos > 0) {
-    const dmg = [dotPhys * taken * dt, 0, 0, dotFire * taken * dt, dotChaos * taken * dt];
+    const tt = def.damageTakenType;
+    const dmg = [
+      dotPhys * taken * tt[0] * dt,
+      0,
+      0,
+      dotFire * taken * tt[3] * dt,
+      dotChaos * taken * tt[4] * dt,
+    ];
+    if (a.isPlayer) {
+      logDamage(w, null, 'Burning', 3, dmg[3]);
+      logDamage(w, null, 'Bleeding', 0, dmg[0]);
+      logDamage(w, null, 'Poison', 4, dmg[4]);
+    }
     applyDamage(w, a, dmg);
     if (!a.alive) return;
   }

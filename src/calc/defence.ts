@@ -20,6 +20,15 @@ export type DefenceOpts = {
   reservedLife?: number;
 };
 
+/** Shares of physical hit damage taken as other types (fractions; they never add up to more than 1). */
+function physTakenAs(db: ModDB, ctx: ModCtx): number[] {
+  const shares = DAMAGE_TYPES.map((t) =>
+    t === 'physical' ? 0 : clamp(db.sum('base', `physTakenAs.${t}`, ctx) / 100, 0, 1),
+  );
+  const total = shares.reduce((a, b) => a + b, 0);
+  return total > 1 ? shares.map((s) => s / total) : shares;
+}
+
 /** Resolve defensive stats from a mod database (§6.1–6.4). Shared by players and monsters. */
 export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defence {
   const flag = (s: string) => db.flag(s, ctx);
@@ -107,5 +116,12 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
     instantLeech: noRegen,
     leechToEs: flag('leechToES'),
     regenToEs: flag('regenToES'),
+    chaosHitsEs: flag('chaosNotBypassEs'),
+    physTakenAs: physTakenAs(db, ctx),
+    damageTakenType: DAMAGE_TYPES.map((t) => db.mult(`damageTaken.${t}`, ctx)),
+    unaffectedByShock: flag('unaffectedByShock'),
+    cannotBeLeechedFrom: flag('cannotBeLeechedFrom'),
+    immuneAilments: flag('immuneAilments'),
+    immune: DAMAGE_TYPES.map((t) => t !== 'physical' && t !== 'chaos' && flag(`immune.${t}`)),
   };
 }

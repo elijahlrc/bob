@@ -1,5 +1,6 @@
 import { easeDamage, easeLife } from '../data/constants';
 import {
+  FACTION_MODS,
   MONSTER_TYPES,
   RARITY_MULTS,
   monsterModDef,
@@ -9,6 +10,7 @@ import {
   type MonsterTypeId,
   type Variant,
 } from '../data/monsters';
+import { mapAffixDef } from '../data/mapAffixes';
 import { ModDB } from '../mods/modDb';
 import { mod, type Mod } from '../mods/types';
 import type { Defence } from './combat';
@@ -33,6 +35,8 @@ export type MonsterSpec = {
   rarity: MonsterRarity;
   level: number;
   mods: MonsterModId[];
+  /** Ids of the map affixes that apply to every monster on the map. */
+  affix?: string[];
 };
 
 export type MonsterStats = {
@@ -86,7 +90,7 @@ function monsterSkill(spec: MonsterSpec, dmg: number): SkillDef {
 const cache = new Map<string, MonsterStats>();
 
 export function monsterKey(spec: MonsterSpec): string {
-  return `${spec.type}|${spec.variant}|${spec.rarity}|${spec.level}|${spec.mods.join(',')}`;
+  return `${spec.type}|${spec.variant}|${spec.rarity}|${spec.level}|${spec.mods.join(',')}|${(spec.affix ?? []).join(',')}`;
 }
 
 /** Build (and memoise) a monster's stats from its spec. */
@@ -97,16 +101,23 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
   const t = MONSTER_TYPES[spec.type];
   const r = RARITY_MULTS[spec.rarity];
   const m = spec.level;
+  const life = Math.round(monsterLife(m) * easeLife(m) * t.lifeMult * r.life);
   const mods: Mod[] = [
-    mod('life', 'base', Math.round(monsterLife(m) * easeLife(m) * t.lifeMult * r.life)),
+    mod('life', 'base', life),
     mod('accuracy', 'base', monsterAccuracy(m)),
     mod('evasion', 'base', monsterEvasion(m)),
     mod('armour', 'base', monsterArmour(m)),
     mod('moveSpeed', 'base', t.speed),
     ...t.mods,
+    ...(FACTION_MODS[t.faction] ?? []),
     ...variantMods(spec.variant, spec.type === 'mage'),
   ];
+  // A Core Golem is immune to its element and to that element's ailments.
+  if (t.elemental && spec.variant !== 'none') mods.push(mod(`immune.${spec.variant}`, 'flag', 1));
   for (const id of spec.mods) mods.push(...monsterModDef(id).mods);
+  for (const id of spec.affix ?? []) mods.push(...(mapAffixDef(id).monsterMods ?? []));
+  // Shrouded: an energy shield shell worth a quarter of its life, which recharges when it is left alone.
+  if (spec.mods.includes('shrouded')) mods.push(mod('es', 'base', Math.round(life * 0.25)));
   if (spec.rarity === 'boss') mods.push(mod('resist.allEle', 'base', 30));
   const db = new ModDB(mods.map((x) => ({ ...x, source: { kind: 'monster', id: k } })));
   const ctx = { tags: 0, ancestry: 0, conds: 0 };

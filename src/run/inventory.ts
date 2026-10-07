@@ -1,7 +1,16 @@
 import { Character } from '../calc/character';
+import { itemHasRule, itemReq } from '../calc/items';
 import { itemBase, isWeaponClass } from '../data/bases';
 import { flaskBase } from '../data/flasks';
-import type { AnyItem, Attrs, Build, EquipSlot, FlaskItem, GemItem, Item } from '../data/types';
+import type {
+  InventoryItem,
+  Attrs,
+  Build,
+  EquipSlot,
+  FlaskItem,
+  GemItem,
+  Item,
+} from '../data/types';
 import type { RunState } from './run';
 
 export const INVENTORY_SIZE = 60;
@@ -23,11 +32,26 @@ export function slotsFor(item: Item): EquipSlot[] {
   }
 }
 
+/** The attributes worked out by `attrsWithout`, by the build they were worked out for (a build is replaced, not edited). */
+const attrCache = new WeakMap<object, Map<string, Attrs>>();
+
 /** Attributes the character would have without the item currently in `slot`. */
 function attrsWithout(run: RunState, slot: EquipSlot | null): Attrs {
-  const equipment = { ...run.build.equipment };
+  // Judging a pile of items asks this for the same few builds over and over, so remember the answers.
+  const b = run.build;
+  const worn = Object.entries(b.equipment)
+    .map(([k, it]) => `${k}${it?.uid}`)
+    .join(',');
+  const key = `${slot}|${b.level}|${b.allocated.join(',')}|${worn}`;
+  let per = attrCache.get(b.equipment);
+  if (!per) attrCache.set(b.equipment, (per = new Map()));
+  const hit = per.get(key);
+  if (hit) return hit;
+  const equipment = { ...b.equipment };
   if (slot) delete equipment[slot];
-  return new Character({ ...run.build, equipment }).attrs;
+  const attrs = new Character({ ...b, equipment }).attrs;
+  per.set(key, attrs);
+  return attrs;
 }
 
 export type EquipCheck = { ok: boolean; reason?: string };
@@ -38,7 +62,15 @@ export function canEquip(run: RunState, item: Item, slot: EquipSlot): EquipCheck
   if (base.level > run.build.level) return { ok: false, reason: `Requires level ${base.level}` };
   const a = attrsWithout(run, slot);
   for (const k of ['str', 'dex', 'int'] as const)
-    if (a[k] < base.req[k]) return { ok: false, reason: `Requires ${base.req[k]} ${k}` };
+    if (a[k] < itemReq(item)[k]) return { ok: false, reason: `Requires ${itemReq(item)[k]} ${k}` };
+  // A ring with the "no other ring" rule needs the other ring slot empty, and blocks a second ring.
+  if (slot === 'ring1' || slot === 'ring2') {
+    const other = run.build.equipment[slot === 'ring1' ? 'ring2' : 'ring1'];
+    if (other && itemHasRule(item, 'noOtherRing'))
+      return { ok: false, reason: 'Cannot be worn with another ring' };
+    if (other && itemHasRule(other, 'noOtherRing'))
+      return { ok: false, reason: `${other.name} cannot be worn with another ring` };
+  }
   const main = slot === 'mainHand' ? item : run.build.equipment.mainHand;
   const off = slot === 'offHand' ? item : run.build.equipment.offHand;
   if (main && off) {
@@ -82,7 +114,7 @@ export function withEquipped(build: Build, item: Item, slot: EquipSlot): Build {
   return { ...build, equipment: { ...build.equipment, [slot]: next } };
 }
 
-function take(run: RunState, uid: number): AnyItem | undefined {
+function take(run: RunState, uid: number): InventoryItem | undefined {
   const i = run.inventory.findIndex((x) => x.uid === uid);
   if (i < 0) return undefined;
   return run.inventory.splice(i, 1)[0];

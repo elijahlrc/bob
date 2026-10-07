@@ -1,7 +1,16 @@
 import type { CharacterSheet } from '../calc/character';
+import { HEXES, hexText } from '../data/hexes';
 
 const f0 = (v: number) => Math.round(v).toLocaleString();
 const f1 = (v: number) => (Math.round(v * 10) / 10).toLocaleString();
+const f2 = (v: number) => (Math.round(v * 100) / 100).toLocaleString();
+const slotLabel = (slot: string) => {
+  const words = slot
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/(\d)/, ' $1')
+    .toLowerCase();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+};
 const pct = (v: number) => `${f1(v * 100)}%`;
 
 export function Sheet({ s }: { s: CharacterSheet }) {
@@ -58,6 +67,71 @@ export function Sheet({ s }: { s: CharacterSheet }) {
           ))}
         </tbody>
       </table>
+      {s.secondary.length > 0 && (
+        <table class="triggered">
+          <tbody>
+            <tr>
+              <td colSpan={2}>
+                <b>Secondary casts</b> <span class="muted">(used whenever ready)</span>
+              </td>
+            </tr>
+            {s.secondary.map((t) => (
+              <tr key={t.key}>
+                <td>{t.skill.name}</td>
+                <td>
+                  every {f1(1 / t.usesPerSec)} s · {f1(t.dps)} DPS · {f1(t.manaPerSec)} mana/s
+                </td>
+              </tr>
+            ))}
+            <tr>
+              <td>Total DPS with secondary casts</td>
+              <td>{f1(k.totalDps + s.secondaryDps + s.triggeredDps)}</td>
+            </tr>
+          </tbody>
+        </table>
+      )}
+      {s.hexes.length > 0 && (
+        <table class="triggered">
+          <tbody>
+            <tr>
+              <td colSpan={2}>
+                <b>Hexes on enemies you hit</b>
+              </td>
+            </tr>
+            {s.hexes.map((h) => (
+              <tr key={h.id}>
+                <td>{HEXES[h.id].name}</td>
+                <td>{hexText(h.id, h.effect)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {s.triggered.length > 0 && (
+        <table class="triggered">
+          <tbody>
+            <tr>
+              <td colSpan={2}>
+                <b>Triggered skills</b>
+              </td>
+            </tr>
+            {s.triggered.map((t) => (
+              <tr key={t.key + t.skill.id}>
+                <td>
+                  {t.skill.name} <span class="muted">({slotLabel(t.source)})</span>
+                </td>
+                <td>
+                  {f2(t.usesPerSec)}/s · {f1(t.dps)} DPS · {f1(t.manaPerSec)} mana/s
+                </td>
+              </tr>
+            ))}
+            <tr>
+              <td>Total DPS with triggered skills</td>
+              <td>{f1(k.totalDps + s.triggeredDps + s.secondaryDps)}</td>
+            </tr>
+          </tbody>
+        </table>
+      )}
       {s.auras.length > 0 && (
         <div class="auras">
           {s.auras.map((a) => (

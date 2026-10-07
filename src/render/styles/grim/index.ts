@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { Rng } from '../../../core/rng';
+import { factionOfSpec } from '../../../data/monsters';
 import type {
   Actor,
   Chest,
@@ -13,6 +14,7 @@ import { StyleBase, AnimTrack, figureOf, heroColor, type ActorView } from '../..
 import type { MarkTheme } from '../../style/marks';
 import { isHero, type AnimName, type FigureKind } from '../../style/figure';
 import { buildProps, FIG_PX, FRAMES, rasterFigure } from './paint';
+import { DROP_COLOR, dropLabel, dropRarity } from '../../dropLabel';
 import { isoFloors, isoWalls, ISO_H, ISO_W, WALL_LOW, WALL_TALL } from './isoPaint';
 
 /** Pixel zoom: 2x on normal windows, 1.5x on small ones (smaller pixels, wider view). */
@@ -30,20 +32,27 @@ const ELEMENT_LIGHT: Record<string, number> = {
   cold: 0x5aa8ff,
   lightning: 0xb070ff,
 };
+/** Palettes of the factions that reuse the humanoid rig (EXPANSION 7.3): the Ossuary stays bone-white. */
+const FACTION_TINT: Record<string, number> = {
+  rot: 0x9fd07a,
+  hollow: 0x8fb8e8,
+  choir: 0xe0a070,
+  swarm: 0xd8b880,
+  reliquary: 0xa8b0c0,
+};
+/** How lasting ground zones are drawn, by kind. */
+const ZONE_LOOK: Record<string, { fill: number; edge: number }> = {
+  caustic: { fill: 0x4a8a1a, edge: 0xa0e04a },
+  burning: { fill: 0xa04010, edge: 0xff9a40 },
+  chilling: { fill: 0x2a5a8a, edge: 0x9ad8ff },
+  shocking: { fill: 0x4a2a8a, edge: 0xc8a0ff },
+};
 const DTYPE_COLOR = [0xeadfc8, 0xc89cff, 0x9ad8ff, 0xff9a40, 0x9ae05a];
 const RARITY_RING: Record<string, number> = {
   magic: 0x5a7cff,
   rare: 0xffd040,
   miniboss: 0xff8a20,
   boss: 0xff3a20,
-};
-const DROP_TINT: Record<string, number> = {
-  normal: 0xdddddd,
-  magic: 0x6a8cff,
-  rare: 0xffd84a,
-  unique: 0xff9a2a,
-  gem: 0x40e0c0,
-  flask: 0xff6090,
 };
 
 type Emitter = Phaser.GameObjects.Particles.ParticleEmitter;
@@ -83,6 +92,8 @@ export class GrimStyle extends StyleBase {
   } | null = null;
   private slashed = new WeakSet<object>();
   private floaters: Phaser.GameObjects.Text[] = [];
+  private labelFrame = -1;
+  private placed: { x: number; y: number; w: number; h: number }[] = [];
   private punch = 0;
   private zoom = 3;
   private rng = new Rng(7);
@@ -548,6 +559,10 @@ export class GrimStyle extends StyleBase {
     const shadow = s.add.image(0, 0, 'g_shadow').setOrigin(0.5, 0.5);
     const variant = a.mon?.spec.variant ?? 'none';
     if (variant !== 'none') sprite.setTint(ELEMENT_TINT[variant]);
+    else if (a.mon) {
+      const fac = factionOfSpec(a.mon.spec);
+      if (FACTION_TINT[fac]) sprite.setTint(FACTION_TINT[fac]);
+    }
     let ring: Phaser.GameObjects.Image | null = null;
     const rc = a.isPlayer ? undefined : RARITY_RING[a.rarity];
     if (rc !== undefined) {
@@ -606,11 +621,14 @@ export class GrimStyle extends StyleBase {
     if (t.hitT < 0.07 && a.alive) d.sprite.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
     else {
       let tint = ELEMENT_TINT[d.variant] ?? 0xffffff;
+      if (tint === 0xffffff && a.mon) tint = FACTION_TINT[factionOfSpec(a.mon.spec)] ?? tint;
       if (a.ail.freezeT > 0) tint = 0x7ec8ff;
       else if (a.ail.chill > 0) tint = 0xb8dcff;
       else if (a.ail.poisons.length) tint = 0xc4f0a0;
       d.sprite.setTint(tint).setTintMode(Phaser.TintModes.MULTIPLY);
     }
+    // The Unremembered fades out of sight while it phases.
+    if (a.alive) d.sprite.setAlpha(a.phaseT > 0 ? 0.12 : 1);
     d.shadow
       .setPosition(px, py + 1)
       .setDepth(500)
@@ -711,8 +729,8 @@ export class GrimStyle extends StyleBase {
   // ---- Drops, chests, exit ---------------------------------------------------------------------
   protected createDrop(d: Drop) {
     const s = this.scene;
-    const rarity = d.item.kind === 'item' ? d.item.rarity : d.item.kind;
-    const tint = DROP_TINT[rarity] ?? 0xffffff;
+    const rarity = dropRarity(d.item);
+    const tint = DROP_COLOR[rarity] ?? 0xffffff;
     const img = s.add
       .image(0, 0, d.item.kind === 'gem' ? 'g_gem' : 'g_bag')
       .setTint(tint)
@@ -737,12 +755,25 @@ export class GrimStyle extends StyleBase {
             .setDepth(2001)
             .setAlpha(big ? 0.85 : 0.5)
             .setScale(1, big ? 0.9 : 0.5);
-    this.owned.push(img, glow);
+    const label = s.add
+      .text(0, 0, dropLabel(d.item), {
+        fontFamily: '"Palatino Linotype", Georgia, serif',
+        fontSize: big ? '8px' : '7px',
+        fontStyle: big ? 'bold' : 'normal',
+        color: '#' + tint.toString(16).padStart(6, '0'),
+        backgroundColor: 'rgba(10,6,8,0.72)',
+        padding: { x: 2, y: 1 },
+      })
+      .setOrigin(0.5, 1)
+      .setDepth(2002)
+      .setResolution(this.zoom * 2);
+    this.owned.push(img, glow, label);
     if (beam) this.owned.push(beam);
     const o = {
       img,
       glow,
       beam,
+      label,
       tint,
       rarity,
       ph: Math.random() * 6,
@@ -758,6 +789,7 @@ export class GrimStyle extends StyleBase {
       img: Phaser.GameObjects.Image;
       glow: Phaser.GameObjects.Image;
       beam: Phaser.GameObjects.Image | null;
+      label: Phaser.GameObjects.Text;
       ph: number;
       tint: number;
       light: Phaser.GameObjects.Light | null;
@@ -768,6 +800,7 @@ export class GrimStyle extends StyleBase {
     q.glow.setPosition(x, y - 4);
     q.beam?.setPosition(x, y - 2).setAlpha(0.55 + Math.sin(this.time * 4 + q.ph) * 0.15);
     q.light?.setPosition(x, y - 6);
+    this.placeLabel(q.label, x, y - 12);
     if (Math.random() < 0.04) this.em.mote.emitParticleAt(x + (Math.random() - 0.5) * 8, y - 4, 1);
   }
   protected destroyDrop(o: unknown, picked: boolean): void {
@@ -775,6 +808,7 @@ export class GrimStyle extends StyleBase {
       img: Phaser.GameObjects.Image;
       glow: Phaser.GameObjects.Image;
       beam: Phaser.GameObjects.Image | null;
+      label: Phaser.GameObjects.Text;
       light: Phaser.GameObjects.Light | null;
       tint: number;
     };
@@ -785,7 +819,28 @@ export class GrimStyle extends StyleBase {
     q.img.destroy();
     q.glow.destroy();
     q.beam?.destroy();
+    q.label.destroy();
     this.dropLight(q.light);
+  }
+
+  /** Put a ground label at (x, y), nudged upward until it clears the labels already placed this frame. */
+  private placeLabel(label: Phaser.GameObjects.Text, x: number, y: number): void {
+    if (this.labelFrame !== this.time) {
+      this.labelFrame = this.time;
+      this.placed = [];
+    }
+    const w = label.width;
+    const h = label.height;
+    let ly = y;
+    for (let tries = 0; tries < 12; tries++) {
+      const hit = this.placed.find(
+        (p) => Math.abs(p.x - x) < (p.w + w) / 2 + 1 && Math.abs(p.y - ly) < (p.h + h) / 2,
+      );
+      if (!hit) break;
+      ly = hit.y - (hit.h + h) / 2 - 1;
+    }
+    this.placed.push({ x, y: ly, w, h });
+    label.setPosition(x, ly);
   }
 
   protected createChest(c: Chest) {
@@ -810,14 +865,39 @@ export class GrimStyle extends StyleBase {
     }
   }
 
-  protected updateGround(effects: GroundEffect[]): void {
+  protected updateGround(effects: GroundEffect[], _dt: number, world: World): void {
     const g = this.gfx;
     g.clear();
+    // Corpses: a dark smear that fades as it crumbles, with a green glint while a Shambler waits to rise.
+    for (const c of world.corpses) {
+      const { x, y } = this.project(c.x, c.y);
+      const fade = Math.max(0, 1 - c.age / 10);
+      g.fillStyle(0x1a1410, 0.5 * fade).fillEllipse(x, y + 1, 11, 5);
+      if (c.spec.type === 'shambler' && c.age > 1)
+        g.fillStyle(0x9fd07a, 0.35 * Math.sin(this.time * 6 + c.id) ** 2).fillEllipse(x, y, 7, 3);
+    }
     for (const e of effects) {
-      const k = 1 - e.t / e.total;
       const { x, y } = this.project(e.x, e.y);
       const r = this.rpx(e.radius);
       const sq = this.squash();
+      // Lasting zones: a coloured pool with a slow swirl, fading in the last second.
+      const zone = ZONE_LOOK[e.kind];
+      if (zone) {
+        const fade = Math.min(1, e.t);
+        g.fillStyle(zone.fill, 0.2 * fade).fillEllipse(x, y, r * 2, r * 2 * sq);
+        g.lineStyle(1, zone.edge, 0.7 * fade).strokeEllipse(x, y, r * 2, r * 2 * sq);
+        for (let i = 0; i < 7; i++) {
+          const a = (i / 7) * Math.PI * 2 + this.time * 0.8;
+          const rr = r * (0.35 + 0.45 * ((i * 0.37 + this.time * 0.15) % 1));
+          g.fillStyle(zone.edge, 0.5 * fade).fillCircle(
+            x + Math.cos(a) * rr,
+            y + Math.sin(a) * rr * sq,
+            1.5,
+          );
+        }
+        continue;
+      }
+      const k = 1 - e.t / e.total;
       g.fillStyle(0xa01010, 0.16 + 0.22 * k).fillEllipse(x, y, r * 2, r * 2 * sq);
       g.lineStyle(1, 0xff4020, 0.9).strokeEllipse(x, y, r * 2, r * 2 * sq);
       g.lineStyle(1, 0xffa040, 0.9).strokeEllipse(x, y, r * 2 * k, r * 2 * k * sq);
@@ -1104,6 +1184,12 @@ export class GrimStyle extends StyleBase {
           f?.spec.kind === 'mana' ? 0x4a78ff : f?.spec.kind === 'utility' ? 0xffd070 : 0xd03030;
         this.flash(p.x, p.y - 8, col, 1.4, 0.3);
         em.mote.explode(10, p.x, p.y - 10);
+        break;
+      }
+      case 'blink': {
+        const p = this.project(e.x, e.y);
+        this.flash(p.x, p.y - 6, e.end ? 0xb0e0ff : 0x6a8cff, 1.4, 0.3);
+        em.smoke.explode(e.end ? 6 : 4, p.x, p.y);
         break;
       }
       case 'summon': {

@@ -43,6 +43,13 @@ export function dummyDefence(over: Partial<Defence> = {}): Defence {
     instantLeech: false,
     leechToEs: false,
     regenToEs: false,
+    chaosHitsEs: false,
+    physTakenAs: [0, 0, 0, 0, 0],
+    damageTakenType: [1, 1, 1, 1, 1],
+    unaffectedByShock: false,
+    cannotBeLeechedFrom: false,
+    immuneAilments: false,
+    immune: [false, false, false, false, false],
     ...over,
   };
 }
@@ -70,6 +77,7 @@ export function createDummyWorld(
     areaLevel: build.level,
     resistPenalty: 0,
     theme: themeDef('ashenCrypt'),
+    affixes: [],
     endKind: 'rare',
     lab: {
       w: size,

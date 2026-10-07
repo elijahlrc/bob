@@ -1,14 +1,28 @@
+import { ACTIVE_GEMS } from '../data/gems';
 import { Rng } from '../core/rng';
 import { classDef } from '../data/classes';
-import { THEMES } from '../data/themes';
-import type { AnyItem, Build, Item } from '../data/types';
+import { factionOfSpec } from '../data/monsters';
+import { themesFor } from '../data/themes';
+import { TABLET_PREFIX } from '../data/currency';
+import type { AnyItem, Build, CurrencyItem, InventoryItem, Item } from '../data/types';
+import { rollCurrencyBundle, rollCurrencyDrops } from '../gen/currencyDrops';
 import { makeFlask, makeGem, makeItem } from '../gen/items';
-import { rollChest, rollDrop, rollFlask, rollGem, rollMonsterDrops } from '../gen/loot';
-import { makeMapPlan, type MapPlan } from '../gen/mapPlan';
-import type { WorldOpts } from '../sim/types';
+import {
+  rollChest,
+  rollDrop,
+  rollFlask,
+  rollGem,
+  rollMonsterDrops,
+  rollUniqueOf,
+  uniqueIdOf,
+} from '../gen/loot';
+import { mapAffixDef } from '../data/mapAffixes';
+import { makeMapPlan, rollMapAffixes, type MapPlan } from '../gen/mapPlan';
+import { flaskMask } from '../sim/combat';
+import type { DeathRecap, WorldOpts } from '../sim/types';
 import type { MapResult } from '../sim/runMap';
 
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 3;
 export const TOTAL_MAPS = 100;
 
 export type MapRecord = {
@@ -20,6 +34,17 @@ export type MapRecord = {
   stuck: number;
 };
 
+/** A reforge whose three alternatives have been drawn and shown, and not yet picked (EXPANSION 8.1). */
+export type PendingCraft = { itemUid: number; pinned: string[]; options: Item[] };
+
+/** Wayfinder's Chalk edits to one of the two offered maps. */
+export type MapEdit = { add: string[]; remove: string[] };
+
+export const noMapEdits = (): MapEdit[] => [
+  { add: [], remove: [] },
+  { add: [], remove: [] },
+];
+
 export type RunState = {
   version: number;
   seed: number;
@@ -28,7 +53,7 @@ export type RunState = {
   map: number;
   build: Build;
   xp: number;
-  inventory: AnyItem[];
+  inventory: InventoryItem[];
   nextUid: number;
   bonusPoints: number;
   refundPoints: number;
@@ -41,6 +66,21 @@ export type RunState = {
   reward: AnyItem[] | null;
   /** Items picked up since the last camp visit that are new uniques or rares. */
   newLoot: number[];
+  /** Uids of the items, gems and flasks the last cleared map dropped (the Items "Last map" filter). */
+  lastDrops: number[];
+  /** Why the run ended, if the player died. */
+  lastRecap?: DeathRecap;
+  /** Crafting currency by id (EXPANSION section 8). Nothing carries over between runs. */
+  currency: Record<string, number>;
+  /** Bone Dust from salvage. */
+  dust: number;
+  /** Tablets collected, by unique id. */
+  tablets: Record<string, number>;
+  /** Rises with every craft that draws; craft rolls come from the run seed and this number. */
+  craftSeq: number;
+  pendingCraft: PendingCraft | null;
+  /** Chalk edits of the two offered maps; cleared when the next maps are offered. */
+  mapEdits: MapEdit[];
 };
 
 const BODY_FOR_CLASS: Record<string, string> = {
@@ -58,7 +98,7 @@ export function uidSource(run: RunState): () => number {
 
 export function rollThemes(seed: number, map: number): [string, string] {
   const r = new Rng(seed).fork(`themes${map}`);
-  const ids = r.shuffle(THEMES.map((t) => t.id));
+  const ids = r.shuffle(themesFor(map).map((t) => t.id));
   return [ids[0], ids[1]];
 }
 
@@ -88,6 +128,13 @@ export function newRun(classId: string, seed: number): RunState {
     history: [],
     reward: null,
     newLoot: [],
+    lastDrops: [],
+    currency: {},
+    dust: 0,
+    tablets: {},
+    craftSeq: 0,
+    pendingCraft: null,
+    mapEdits: noMapEdits(),
   };
   const uid = uidSource(run);
   const main = makeItem(uid, cls.startWeapons[0], 1, 1);
@@ -119,22 +166,59 @@ export function mapSeed(run: RunState, map: number): number {
   return new Rng(run.seed).fork(`map${map}`).nextU32();
 }
 
+/** The affixes of the offered map with this theme. */
+export function affixesFor(run: RunState, themeId: string): string[] {
+  const offer = Math.max(0, run.nextThemes.indexOf(themeId as never));
+  const edit = run.mapEdits[offer];
+  const rolled = rollMapAffixes(run.seed, run.map, offer);
+  if (!edit) return rolled;
+  const kept = rolled.filter((id) => !edit.remove.includes(id));
+  return [...new Set([...kept, ...edit.add])].sort();
+}
+
 export function planFor(run: RunState, themeId: string): MapPlan {
-  return makeMapPlan(mapSeed(run, run.map), run.map, themeId);
+  return makeMapPlan(mapSeed(run, run.map), run.map, themeId, affixesFor(run, themeId));
+}
+
+/** What a map's affixes add to its loot, as fractions. */
+export function affixRewards(affixes: string[]): { quantity: number; rarity: number } {
+  const defs = affixes.map(mapAffixDef);
+  return {
+    quantity: defs.reduce((n, a) => n + (a.reward.quantity ?? 0), 0),
+    rarity: defs.reduce((n, a) => n + (a.reward.rarity ?? 0), 0),
+  };
 }
 
 /** World hooks that generate loot with the run's uid counter. */
 export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
   const uid = uidSource(run);
   return {
-    loot: (w, m) =>
-      m.mon
-        ? rollMonsterDrops(w.rngLoot, uid, {
-            ilvl: m.mon.spec.level,
-            monster: m.mon.spec.rarity,
-            theme: plan.theme,
-          })
-        : [],
+    loot: (w, m): AnyItem[] => {
+      if (!m.mon) return [];
+      // Item quantity and rarity from gear, and from any flask active right now.
+      const db = w.char.dbWith(flaskMask(w));
+      const { quantity, rarity } = affixRewards(plan.affixes);
+      const faction = factionOfSpec(m.mon.spec);
+      const items: AnyItem[] = rollMonsterDrops(w.rngLoot, uid, {
+        ilvl: m.mon.spec.level,
+        monster: m.mon.spec.rarity,
+        theme: plan.theme,
+        faction,
+        playerQuantity: db.mult('itemQuantity') * (1 + quantity),
+        playerRarity: db.mult('itemRarity') * (1 + rarity),
+      });
+      return items.concat(
+        rollCurrencyDrops(w.rngLoot, uid, {
+          map: plan.map,
+          monster: m.mon.spec.rarity,
+          faction,
+          quantity: db.mult('itemQuantity') * (1 + quantity) * (1 + plan.theme.itemQuantity),
+          essenceBonus: plan.theme.extraEssence,
+          currencyBonus: plan.theme.extraCurrency,
+          bonusCurrency: plan.theme.bonusCurrency,
+        }),
+      );
+    },
     chestLoot: (w) => rollChest(w.rngLoot, uid, plan.areaLevel),
   };
 }
@@ -153,12 +237,20 @@ export function finishMap(run: RunState, res: MapResult): void {
   run.xp = res.xp;
   if (res.status !== 'cleared') {
     run.phase = 'dead';
+    if (res.recap) run.lastRecap = res.recap;
     return;
   }
-  run.inventory.push(...res.picked);
-  for (const it of res.picked)
+  run.lastDrops = [];
+  for (const it of res.picked) {
+    if (it.kind !== 'currency') run.lastDrops.push(it.uid);
+    if (it.kind === 'currency') {
+      stash(run, it);
+      continue;
+    }
+    run.inventory.push(it);
     if (it.kind === 'item' && (it.rarity === 'rare' || it.rarity === 'unique'))
       run.newLoot.push(it.uid);
+  }
   run.refundPoints += 1;
   if (run.map % 10 === 0 && run.map <= 80) run.bonusPoints += 3;
   if (run.map >= TOTAL_MAPS) {
@@ -167,9 +259,35 @@ export function finishMap(run: RunState, res: MapResult): void {
   }
   // Reward pick (1 of 3) after every 5th map and after every mini-boss (§5.3).
   if (run.map % 5 === 0) run.reward = rollRewards(run);
+  else if (run.map <= SKILL_REWARD_MAPS) run.reward = rollSkillRewards(run);
   run.map += 1;
   run.nextThemes = rollThemes(run.seed, run.map);
+  run.mapEdits = noMapEdits();
   run.phase = 'camp';
+}
+
+/** Put picked-up currency or tablets in the pouch. */
+export function stash(run: RunState, it: CurrencyItem): void {
+  if (it.id.startsWith(TABLET_PREFIX)) {
+    const id = it.id.slice(TABLET_PREFIX.length);
+    run.tablets[id] = (run.tablets[id] ?? 0) + it.count;
+  } else run.currency[it.id] = (run.currency[it.id] ?? 0) + it.count;
+}
+
+/** The early maps that end with a pick of three skill gems (the others follow the every-fifth-map pick). */
+export const SKILL_REWARD_MAPS = 4;
+
+/** Three different skill gems the run does not hold yet (as many as are left, if fewer). */
+export function rollSkillRewards(run: RunState): AnyItem[] {
+  const rng = new Rng(run.seed).fork(`skillreward${run.map}`);
+  const held = new Set<string>();
+  for (const it of run.inventory) if (it.kind === 'gem') held.add(it.gemId);
+  for (const it of Object.values(run.build.equipment))
+    for (const g of it?.sockets ?? []) if (g) held.add(g.gemId);
+  const pool = ACTIVE_GEMS.filter((g) => !held.has(g.id));
+  rng.shuffle(pool);
+  const uid = uidSource(run);
+  return pool.slice(0, 3).map((g): AnyItem => ({ kind: 'gem', uid: uid(), gemId: g.id }));
 }
 
 /** Three reward offers drawn from the item, gem and flask pools. */
@@ -178,9 +296,22 @@ export function rollRewards(run: RunState): AnyItem[] {
   const uid = uidSource(run);
   const ilvl = run.map;
   const out: AnyItem[] = [];
+  // After maps 25, 50 and 75 the three offers are uniques the character can wear at its level.
+  if (run.map % 25 === 0 && run.map < TOTAL_MAPS) {
+    const seen = new Set<string>();
+    for (let i = 0; i < 3; i++) {
+      const u = rollUniqueOf(rng, uid, Math.min(ilvl, run.build.level), undefined, seen);
+      if (!u) break;
+      out.push(u);
+      seen.add(uniqueIdOf(u) ?? '');
+    }
+    while (out.length < 3) out.push(rollDrop(rng, uid, { ilvl, monster: 'rare' }, true));
+    return out;
+  }
   for (let i = 0; i < 3; i++) {
-    const pool = rng.weighted(['item', 'gem', 'flask'] as const, [50, 30, 20]);
-    if (pool === 'gem') out.push(rollGem(rng, uid));
+    const pool = rng.weighted(['item', 'gem', 'flask', 'currency'] as const, [45, 25, 15, 15]);
+    if (pool === 'currency') out.push(rollCurrencyBundle(rng, uid, run.map));
+    else if (pool === 'gem') out.push(rollGem(rng, uid));
     else if (pool === 'flask') out.push(rollFlask(rng, uid, ilvl, 1));
     else out.push(rollDrop(rng, uid, { ilvl, monster: 'rare' }, rng.chance(0.7)));
   }
@@ -191,7 +322,10 @@ export function rollRewards(run: RunState): AnyItem[] {
 export function takeReward(run: RunState, uid: number | null): void {
   if (!run.reward) return;
   const it = run.reward.find((x) => x.uid === uid);
-  if (it) run.inventory.push(it);
+  if (it) {
+    if (it.kind === 'currency') stash(run, it);
+    else run.inventory.push(it);
+  }
   run.reward = null;
 }
 

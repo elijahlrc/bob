@@ -1,4 +1,6 @@
 import type { DamageType, Mod, SkillTag } from '../mods/types';
+import type { TriggerDef } from './triggers';
+import type { HexId } from './hexes';
 
 /** A value authored at gem level 1 and level 20 (DESIGN.md §11.5). */
 export type LevelValue = number | readonly [number, number];
@@ -19,7 +21,9 @@ export type SkillBehaviour =
       range?: number;
       falloff?: number;
     }
-  | { kind: 'chain'; range: number; chains: number; chainsPer5?: number; chainRange: number };
+  | { kind: 'chain'; range: number; chains: number; chainsPer5?: number; chainRange: number }
+  /** A nova centred on the target, not on the caster (item-granted skills). */
+  | { kind: 'burst'; radius: number };
 
 export type ActiveGemDef = {
   kind: 'active';
@@ -56,6 +60,10 @@ export type SupportGemDef = {
   supports: SkillTag[];
   costMult: number;
   mods: GemMod[];
+  /** Trigger supports: the linked spells are cast by this trigger instead of by the player. */
+  trigger?: TriggerDef;
+  /** Hexing Strikes: the hex gems in the same item are applied to enemies the supported skill hits. */
+  hexOnHit?: boolean;
   description: string;
 };
 
@@ -71,7 +79,17 @@ export type AuraGemDef = {
   description: string;
 };
 
-export type GemDef = ActiveGemDef | SupportGemDef | AuraGemDef;
+/** A hex gem (EXPANSION 5.7): applied to enemies you hit when linked with Hexing Strikes in the same item. */
+export type HexGemDef = {
+  kind: 'hex';
+  id: string;
+  name: string;
+  attr: GemAttr;
+  hex: HexId;
+  description: string;
+};
+
+export type GemDef = ActiveGemDef | SupportGemDef | AuraGemDef | HexGemDef;
 
 export const ACTIVE_GEMS: ActiveGemDef[] = [
   {
@@ -262,10 +280,11 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
     supports: ['spell'],
     costMult: 1.4,
     mods: [
-      { stat: 'castSpeed', kind: 'more', value: 70 },
+      { stat: 'repeats', kind: 'base', value: 1 },
+      { stat: 'castSpeed', kind: 'more', value: -20 },
       { stat: 'damage', kind: 'more', value: -10 },
     ],
-    description: 'The spell repeats itself.',
+    description: 'The spell is cast a second time, a moment after the first.',
   },
   {
     kind: 'support',
@@ -393,6 +412,45 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
   },
 ];
 
+/** Trigger supports (EXPANSION 5.5): the supported spells fire from a trigger. */
+SUPPORT_GEMS.push(
+  {
+    kind: 'support',
+    id: 'criticalRelay',
+    name: 'Critical Relay',
+    attr: 'int',
+    supports: ['spell'],
+    costMult: 1.3,
+    mods: [{ stat: 'damage', kind: 'more', value: [-25, -15] }],
+    trigger: {
+      on: 'crit',
+      tags: ['attack'],
+      chance: 100,
+      cooldown: 0.25,
+      effect: { kind: 'castSocketed' },
+    },
+    description:
+      'Linked spells are cast when you critically strike with an attack, but deal less damage.',
+  },
+  {
+    kind: 'support',
+    id: 'woundedRetort',
+    name: 'Wounded Retort',
+    attr: 'int',
+    supports: ['spell'],
+    costMult: 1.3,
+    mods: [],
+    trigger: {
+      on: 'hitTaken',
+      threshold: 30,
+      chance: 100,
+      cooldown: 0.5,
+      effect: { kind: 'castSocketed' },
+    },
+    description: 'Linked spells are cast whenever you have taken a large amount of damage.',
+  },
+);
+
 export const AURA_GEMS: AuraGemDef[] = [
   {
     kind: 'aura',
@@ -465,8 +523,86 @@ export const AURA_GEMS: AuraGemDef[] = [
   },
 ];
 
-export const ALL_GEMS: GemDef[] = [...ACTIVE_GEMS, ...SUPPORT_GEMS, ...AURA_GEMS];
-const GEM_BY_ID = new Map<string, GemDef>(ALL_GEMS.map((g) => [g.id, g]));
+/** Hex gems and the support that applies them (EXPANSION 5.7). */
+export const HEX_GEMS: HexGemDef[] = [
+  {
+    kind: 'hex',
+    id: 'brittleDoom',
+    name: 'Brittle Doom',
+    attr: 'int',
+    hex: 'brittleDoom',
+    description: 'Strips the elemental resistances of the hexed.',
+  },
+  {
+    kind: 'hex',
+    id: 'leadenLimbs',
+    name: 'Leaden Limbs',
+    attr: 'dex',
+    hex: 'leadenLimbs',
+    description: 'Slows the hexed in everything they do.',
+  },
+  {
+    kind: 'hex',
+    id: 'feebleGrip',
+    name: 'Feeble Grip',
+    attr: 'str',
+    hex: 'feebleGrip',
+    description: 'The hexed deal less damage.',
+  },
+  {
+    kind: 'hex',
+    id: 'openWounds',
+    name: 'Open Wounds',
+    attr: 'str',
+    hex: 'openWounds',
+    description: 'The hexed take more physical damage.',
+  },
+];
+
+export const HEXING_STRIKES: SupportGemDef = {
+  kind: 'support',
+  id: 'hexingStrikes',
+  name: 'Hexing Strikes',
+  attr: 'int',
+  supports: [],
+  costMult: 1.3,
+  mods: [],
+  hexOnHit: true,
+  description: 'Hexes in the same item are applied to enemies the skill hits.',
+};
+
+/**
+ * Skills that exist only through items (EXPANSION 5.4). They never drop as gems; a unique's trigger
+ * casts them.
+ */
+export const GRANTED_GEMS: ActiveGemDef[] = [
+  {
+    kind: 'active',
+    id: 'emberBurst',
+    name: 'Ember Burst',
+    attr: 'int',
+    skillType: 'spell',
+    tags: ['spell', 'area', 'fire'],
+    behaviour: { kind: 'burst', radius: 2 },
+    spellDamage: [{ type: 'fire', min: [7, 420], max: [11, 630] }],
+    effectiveness: 200,
+    castTime: 0.7,
+    crit: 6,
+    cost: [2, 16],
+    mods: [{ stat: 'chance.ignite', kind: 'base', value: 20 }],
+    description: 'A nova of flame around the target.',
+  },
+];
+
+/** Every gem that can drop. */
+export const ALL_GEMS: GemDef[] = [
+  ...ACTIVE_GEMS,
+  ...SUPPORT_GEMS,
+  HEXING_STRIKES,
+  ...AURA_GEMS,
+  ...HEX_GEMS,
+];
+const GEM_BY_ID = new Map<string, GemDef>([...ALL_GEMS, ...GRANTED_GEMS].map((g) => [g.id, g]));
 
 export function gemDef(id: string): GemDef {
   const g = GEM_BY_ID.get(id);

@@ -24,9 +24,9 @@ function buildWith(
 }
 
 describe('gems (§11.5)', () => {
-  it('has 7 actives, 17 supports and 7 auras', () => {
+  it('has 7 actives, 19 supports (17, plus the two trigger supports) and 7 auras', () => {
     expect(ACTIVE_GEMS).toHaveLength(7);
-    expect(SUPPORT_GEMS).toHaveLength(17);
+    expect(SUPPORT_GEMS).toHaveLength(19);
     expect(AURA_GEMS).toHaveLength(7);
   });
 

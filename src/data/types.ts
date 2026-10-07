@@ -1,4 +1,5 @@
 import type { DamageType, Mod, SkillTag } from '../mods/types';
+import type { TriggerDef } from './triggers';
 
 export type Attrs = { str: number; dex: number; int: number };
 
@@ -59,6 +60,8 @@ export type ItemBase = {
   weapon?: WeaponBaseStats;
   defence?: { armour?: number; evasion?: number; es?: number; block?: number };
   defenceType?: DefenceType;
+  /** Never drops on its own; only a unique uses it. */
+  uniqueOnly?: boolean;
   /** Weapon tags contributed to skill uses ('mace', 'twoHand', ...). */
   tags: SkillTag[];
   hands?: 1 | 2;
@@ -66,7 +69,13 @@ export type ItemBase = {
 
 export type Rarity = 'normal' | 'magic' | 'rare' | 'unique';
 
-export type AffixRoll = { family: string; tier: number; mods: Mod[] };
+export type AffixRoll = {
+  family: string;
+  tier: number;
+  mods: Mod[];
+  /** Added at the Workbench for Bone Dust (one per item, removable for free). */
+  bench?: boolean;
+};
 
 export type GemItem = { kind: 'gem'; uid: number; gemId: string };
 
@@ -84,6 +93,16 @@ export type Item = {
   /** Unique id and its rolled mods. */
   uniqueId?: string;
   uniqueMods?: Mod[];
+  /** Triggers the item carries (EXPANSION 5.5). */
+  uniqueTriggers?: TriggerDef[];
+  /** Attributes a unique needs beyond its base's. */
+  uniqueReq?: Partial<Attrs>;
+  /** The socket count is part of the unique's identity and cannot be changed. */
+  fixedSockets?: boolean;
+  /** Sealed: it can never be changed again (EXPANSION 8.2). */
+  sealed?: boolean;
+  /** Families of the affixes raised to their tier maximum (at most two). */
+  polished?: string[];
   /** Socket contents; length = socket count. */
   sockets: (GemItem | null)[];
 };
@@ -95,9 +114,21 @@ export type FlaskItem = {
   ilvl: number;
   name: string;
   affixes: AffixRoll[];
+  /** Set on unique flasks. Their fixed mods are in `affixes`. */
+  uniqueId?: string;
 };
 
-export type AnyItem = Item | GemItem | FlaskItem;
+/**
+ * A currency drop: a stack of crafting currency, or tablets for a unique (id `tablet:<unique id>`).
+ * It is picked up like an item but goes into the pouch, never the inventory (EXPANSION 8.4).
+ */
+export type CurrencyItem = { kind: 'currency'; uid: number; id: string; count: number };
+
+/** What the inventory can hold. */
+export type InventoryItem = Item | GemItem | FlaskItem;
+
+/** Anything that can drop or be offered: an inventory item or currency. */
+export type AnyItem = InventoryItem | CurrencyItem;
 
 /** A character build: everything the calc engine needs. */
 export type Build = {

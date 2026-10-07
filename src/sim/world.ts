@@ -1,7 +1,10 @@
+import { MONSTER_TYPES } from '../data/monsters';
 import { Character } from '../calc/character';
+import { noCharges, type ChargeCounts } from '../calc/charges';
 import { buildMonster, type MonsterSpec } from '../calc/monster';
 import { Rng } from '../core/rng';
 import { DT } from '../data/constants';
+import { mapAffixDef } from '../data/mapAffixes';
 import { MAX_LEVEL, xpToNext } from '../data/xpTable';
 import type { Build } from '../data/types';
 import type { MapPlan } from '../gen/mapPlan';
@@ -10,6 +13,9 @@ import { updateAction, updateProjectiles } from './actions';
 import { monsterAI, playerAI, separate } from './ai';
 import { lifeCap, rawHit, refreshPlayerDefence, tickActor } from './combat';
 import { autoFlaskPolicy, type FlaskPolicy } from './flaskPolicy';
+import { isZone, tickCorpses, tickFactionBehaviour, tickZones } from './factions';
+import { rebuildCharacter, seedCharacters, tickCharges } from './charges';
+import { tickTriggers } from './triggers';
 import { Grid } from './grid';
 import type { Actor, World, WorldOpts } from './types';
 
@@ -32,6 +38,7 @@ function newActor(id: number, isPlayer: boolean, x: number, y: number, r: number
     handIdx: 0,
     ail: {
       ignites: [],
+      igniteMax: 1,
       bleeds: [],
       poisons: [],
       shock: 0,
@@ -51,6 +58,7 @@ function newActor(id: number, isPlayer: boolean, x: number, y: number, r: number
     tFlask: 99,
     tStunEnemy: 99,
     tBlock: 99,
+    tBeenHit: 99,
     tOverload: 99,
     resShift: [0, 0, 0, 0, 0],
     resShiftT: 0,
@@ -73,6 +81,27 @@ function newActor(id: number, isPlayer: boolean, x: number, y: number, r: number
     dummy: false,
     retreatT: 0,
     retreatCd: 0,
+    risen: false,
+    skillT: 5,
+    blinkT: 0,
+    shellBy: 0,
+    phaseT: 0,
+    hexes: [],
+    hexRes: 0,
+    hexVuln: 0,
+    hexDmg: 1,
+    hexSpeed: 1,
+    buffT: 0,
+    zealT: 0,
+    fervour: 0,
+    fervourT: 0,
+    hexCd: 0,
+    channelT: 0,
+    flies: false,
+    stationary: false,
+    curlT: 0,
+    markX: 0,
+    markY: 0,
   };
 }
 
@@ -94,6 +123,9 @@ export function spawnMonster(
   a.name = name;
   a.rarity = spec.rarity;
   a.modIds = spec.mods;
+  a.flies = !!MONSTER_TYPES[spec.type].flies;
+  a.stationary = !!MONSTER_TYPES[spec.type].stationary;
+  if (spec.type === 'pylon') w.hasPylons = true;
   a.room = room;
   a.pack = pack;
   w.actors.push(a);
@@ -108,8 +140,17 @@ export type CreateWorldInput = {
   opts?: WorldOpts;
 };
 
-export function makeCharacter(build: Build, plan: MapPlan): Character {
-  return new Character(build, { areaLevel: plan.areaLevel, resistPenalty: plan.resistPenalty });
+export function makeCharacter(
+  build: Build,
+  plan: MapPlan,
+  charges: ChargeCounts = noCharges(),
+): Character {
+  return new Character(build, {
+    areaLevel: plan.areaLevel,
+    resistPenalty: plan.resistPenalty,
+    extraMods: plan.affixes.flatMap((id) => mapAffixDef(id).playerMods ?? []),
+    charges,
+  });
 }
 
 export function createWorld(inp: CreateWorldInput): World {
@@ -127,11 +168,20 @@ export function createWorld(inp: CreateWorldInput): World {
     rngCombat: root.fork('combat'),
     rngAi: root.fork('ai'),
     rngLoot: root.fork('loot'),
+    rngTrig: root.fork('trigger'),
+    chargeT: { grit: 0, fervour: 0, insight: 0 },
+    chars: new Map(),
+    trophy: {},
+    secondaryReady: {},
+    trig: { cooldown: {}, taken: {}, busy: false, explosions: 0, queue: [], draining: false },
     actors: [player],
     player,
     nextId: 2,
     projectiles: [],
     effects: [],
+    corpses: [],
+    hasPylons: false,
+    blasts: [],
     drops: [],
     chests: plan.pop.chests.map((c, i) => ({
       id: 100000 + i,
@@ -151,6 +201,8 @@ export function createWorld(inp: CreateWorldInput): World {
       queued: false,
       lifeRate: 0,
       manaRate: 0,
+      esRate: 0,
+      esT: 0,
     })),
     xp: inp.xp,
     status: 'running',
@@ -175,6 +227,8 @@ export function createWorld(inp: CreateWorldInput): World {
       stuckT: 0,
       stuckX: plan.lab.start.x,
       stuckY: plan.lab.start.y,
+      lootId: 0,
+      lootSince: 0,
     },
     opts: inp.opts ?? {},
     stats: {
@@ -188,6 +242,7 @@ export function createWorld(inp: CreateWorldInput): World {
       damageDealt: 0,
     },
     picked: [],
+    dmgLog: [],
   };
   player.def = char.defence();
   player.life = lifeCap(w, player);
@@ -195,6 +250,7 @@ export function createWorld(inp: CreateWorldInput): World {
   player.mana = Math.max(0, player.def.maxMana - char.reservedMana);
   player.name = 'You';
   for (const s of plan.pop.monsters) spawnMonster(w, s.spec, s.x, s.y, s.room, s.pack, s.name);
+  seedCharacters(w);
   return w;
 }
 
@@ -205,8 +261,7 @@ function levelUp(w: World): void {
   const mf = p.def.maxMana > 0 ? p.mana / p.def.maxMana : 1;
   const ef = p.def.maxEs > 0 ? p.es / p.def.maxEs : 1;
   w.build = { ...w.build, level: w.build.level + 1 };
-  w.char = makeCharacter(w.build, w.plan);
-  w.primary = w.char.primary;
+  rebuildCharacter(w);
   w.flasks.forEach((f, i) => {
     if (w.char.flasks[i]) f.spec = w.char.flasks[i];
   });
@@ -216,6 +271,9 @@ function levelUp(w: World): void {
   p.es = ef * p.def.maxEs;
   w.events.push({ t: 'levelUp', level: w.build.level });
 }
+
+/** Seconds over which a life-to-ES flask returns the life it took. */
+const LIFE_TO_ES_TIME = 2;
 
 function useFlask(w: World, i: number): void {
   const f = w.flasks[i];
@@ -237,6 +295,13 @@ function useFlask(w: World, i: number): void {
     if (f.activeT > 0) return;
     f.activeT = s.duration;
   }
+  if (s.lifeToEs) {
+    // All but 1 life is turned into energy shield, which comes back over two seconds.
+    const removed = Math.max(0, p.life - 1);
+    p.life = Math.min(p.life, 1);
+    f.esRate = Math.min(removed, Math.max(0, p.def.maxEs - p.es)) / LIFE_TO_ES_TIME;
+    f.esT = LIFE_TO_ES_TIME;
+  }
   f.charges -= s.perUse;
   p.tFlask = 0;
   if (s.removeIgnite) p.ail.ignites.length = 0;
@@ -252,6 +317,14 @@ function tickFlasks(w: World, dt: number, policy: FlaskPolicy): void {
   const p = w.player;
   for (const i of policy(w)) useFlask(w, i);
   for (const f of w.flasks) {
+    if (f.esT > 0) {
+      p.es = Math.min(p.def.maxEs, p.es + f.esRate * Math.min(dt, f.esT));
+      f.esT -= dt;
+      if (f.esT <= 0) {
+        f.esT = 0;
+        f.esRate = 0;
+      }
+    }
     if (f.activeT <= 0) continue;
     const step = Math.min(dt, f.activeT);
     f.activeT -= dt;
@@ -280,9 +353,11 @@ function tickEffects(w: World, dt: number): void {
       w.effects[j++] = e;
       continue;
     }
+    // A lasting zone just fades.
+    if (isZone(e)) continue;
     w.events.push({ t: 'explode', x: e.x, y: e.y, r: e.radius, dtype: e.dtype });
     if (p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r)
-      rawHit(w, p, e.damage, e.dtype);
+      rawHit(w, p, e.damage, e.dtype, e.kind === 'slam' ? 'Crushing slam' : 'Volatile explosion');
   }
   w.effects.length = j;
 }
@@ -372,6 +447,8 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   w.tick++;
   const p = w.player;
   refreshPlayerDefence(w);
+  tickTriggers(w, dt);
+  tickCharges(w, dt);
   tickFlasks(w, dt, policy);
   // Flow field for monsters follows the player tile.
   w.grid.buildFlow(p.x, p.y);
@@ -384,11 +461,14 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     else {
       monsterAI(w, a, dt);
       tickMonsterMods(w, a, dt);
+      if (a.state === 'chase') tickFactionBehaviour(w, a, dt);
     }
     if (!a.action) a.carry = 0;
   }
   updateProjectiles(w, dt);
   tickEffects(w, dt);
+  tickZones(w, dt);
+  tickCorpses(w, dt);
   separate(w);
   checkExit(w);
   while (w.build.level < MAX_LEVEL && w.xp >= xpToNext(w.build.level)) {

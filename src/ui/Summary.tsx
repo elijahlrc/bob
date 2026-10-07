@@ -1,5 +1,50 @@
 import { classDef } from '../data/classes';
+import { DAMAGE_TYPES } from '../mods/types';
 import type { Controller } from '../run/controller';
+import type { DeathRecap } from '../sim/types';
+
+const f0 = (v: number) => Math.round(v).toLocaleString();
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** Why you died: the killer, the last seconds of damage, and the defences you had (EXPANSION section 9). */
+function Recap({ r }: { r: DeathRecap }) {
+  const total = r.lines.reduce((s, l) => s + l.amount, 0);
+  const mods = r.killerMods.length ? `: ${r.killerMods.join(', ')}` : '';
+  const resLine = (['fire', 'cold', 'lightning', 'chaos'] as const).map((k) => {
+    const below = r.res[k] < r.maxRes[k];
+    return (
+      <span key={k} class={below ? 'warn' : ''}>
+        {cap(k)} {r.res[k]}% / {r.maxRes[k]}%{k === 'chaos' ? '' : ' · '}
+      </span>
+    );
+  });
+  return (
+    <div class="recap">
+      <h3>What happened</h3>
+      <p>
+        Killed by <b>{r.killer}</b> ({r.killerRarity}
+        {mods}), {r.time.toFixed(0)} s into the map.
+      </p>
+      <div class="muted">Damage taken in the last 5 seconds: {f0(total)}</div>
+      <table>
+        <tbody>
+          {r.lines.slice(0, 6).map((l) => (
+            <tr key={`${l.name}${l.dtype}`}>
+              <td>{f0(l.amount)}</td>
+              <td>{DAMAGE_TYPES[l.dtype]}</td>
+              <td>{l.name}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div class="muted">Your resistances (current / maximum): {resLine}</div>
+      <div class="muted">
+        Life {f0(r.maxLife)} · Energy shield {f0(r.maxEs)}
+        {r.ailments.length > 0 && ` · You were ${r.ailments.join(', ')}`}
+      </div>
+    </div>
+  );
+}
 
 export function Summary({ c }: { c: Controller }) {
   const run = c.run;
@@ -20,6 +65,7 @@ export function Summary({ c }: { c: Controller }) {
       <p class="muted">
         Maps cleared: {run.history.filter((h) => h.status === 'cleared').length} · Kills: {kills}
       </p>
+      {!won && run.lastRecap && <Recap r={run.lastRecap} />}
       <button class="btn primary" onClick={() => c.quit()}>
         Back to title
       </button>

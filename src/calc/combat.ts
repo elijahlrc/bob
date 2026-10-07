@@ -71,6 +71,20 @@ export type Defence = {
   instantLeech: boolean;
   leechToEs: boolean;
   regenToEs: boolean;
+  /** Chaos damage hits energy shield before life. */
+  chaosHitsEs: boolean;
+  /** Share (fraction) of physical hit damage taken as each type; index = damage type. */
+  physTakenAs: number[];
+  /** More or less damage taken of each type; index = damage type. */
+  damageTakenType: number[];
+  /** Shock does nothing to this actor. */
+  unaffectedByShock: boolean;
+  /** Hits against it leech nothing. */
+  cannotBeLeechedFrom: boolean;
+  /** No ailments at all. */
+  immuneAilments: boolean;
+  /** Immune to this element (index = damage type): no damage and no matching ailment. */
+  immune: boolean[];
 };
 
 /** Dynamic state of the target at hit time. */
@@ -80,6 +94,8 @@ export type TargetState = {
   shock: number;
   /** Prismatic Balance resistance shifts per type, percent. */
   resShift: number[];
+  /** Open Wounds: increased physical damage taken, as a fraction. */
+  vuln?: number;
 };
 
 export const NO_SHIFT: readonly number[] = [0, 0, 0, 0, 0];
@@ -125,14 +141,41 @@ export function blockChance(p: SkillProfile, def: Defence): number {
   return p.isAttack ? def.blockAttack : def.blockSpell;
 }
 
+/** Move the "taken as" share of a physical hit into other types, before mitigation. Mutates `dmg`. */
+export function takenAs(def: Defence, dmg: number[]): number[] {
+  const phys = dmg[PHYS];
+  if (phys <= 0) return dmg;
+  let moved = 0;
+  for (let i = 1; i < NT; i++) {
+    const s = def.physTakenAs[i];
+    if (s > 0) {
+      dmg[i] += phys * s;
+      moved += s;
+    }
+  }
+  if (moved > 0) dmg[PHYS] = phys * (1 - moved);
+  return dmg;
+}
+
+/** The damage multiplier from shock on a target (shock does nothing to those unaffected by it). */
+export function shockTaken(def: Defence, shock: number): number {
+  return def.unaffectedByShock ? 1 : 1 + shock;
+}
+
 /** Mitigate one hit's per-type damage (crit already applied). Mutates and returns `dmg`. */
 export function mitigate(p: SkillProfile, t: TargetState, dmg: number[]): number[] {
   const def = t.def;
-  const taken = def.damageTakenMult * (1 + t.shock);
+  takenAs(def, dmg);
+  const taken = def.damageTakenMult * shockTaken(def, t.shock);
   for (let i = 0; i < NT; i++) {
     if (dmg[i] <= 0) continue;
+    if (def.immune[i]) {
+      dmg[i] = 0;
+      continue;
+    }
     if (i === PHYS) {
-      const red = Math.min(0.9, armourReduction(def.armour, dmg[i]) + def.physReduction);
+      const armour = def.armour * (1 - p.armourIgnore);
+      const red = Math.min(0.9, armourReduction(armour, dmg[i]) + def.physReduction);
       dmg[i] *= 1 - red;
     } else if (i === CHAOS && def.immuneChaos) {
       dmg[i] = 0;
@@ -140,7 +183,8 @@ export function mitigate(p: SkillProfile, t: TargetState, dmg: number[]): number
       const r = effectiveRes(def.res[i] + t.resShift[i], def.maxRes[i], p.pen[i]);
       dmg[i] *= 1 - r / 100;
     }
-    dmg[i] *= taken;
+    dmg[i] *= taken * def.damageTakenType[i];
+    if (i === PHYS && t.vuln) dmg[i] *= 1 + t.vuln;
   }
   return dmg;
 }
@@ -156,16 +200,21 @@ export function ailmentsFromHit(
 ): AilmentResult {
   const def = t.def;
   const a = emptyAilments();
+  if (def.immuneAilments) return a;
   const agony = p.cruelAgony && crit ? hand.critMulti : 1;
   const resMult = (i: number) => {
-    if (i === CHAOS && def.immuneChaos) return 0;
+    if (def.immune[i] || (i === CHAOS && def.immuneChaos)) return 0;
     const r = effectiveRes(def.res[i] + t.resShift[i], def.maxRes[i], p.pen[i]);
     return 1 - r / 100;
   };
+  // The damage that can inflict an ailment: its own type, plus any type a rule allows.
+  const from = (types: number[]) => types.reduce((s, i) => s + H[i], 0);
   const thresh = Math.max(1, def.ailmentThreshold);
   const ele = !p.cannotInflictEle;
-  if (ele && H[FIRE] > 0 && (crit || roll(p.ignite.chance))) {
-    a.ignite = IGNITE_DPS_FRAC * H[FIRE] * p.ignite.mult * agony * resMult(FIRE);
+  const ignH = from(p.ailmentFrom.ignite);
+  if (ele && ignH > 0 && !def.immune[FIRE] && (crit || roll(p.ignite.chance))) {
+    const hm = p.ailmentFrom.ignite.reduce((s, i) => s + H[i] * resMult(i), 0);
+    a.ignite = IGNITE_DPS_FRAC * hm * p.ignite.mult * agony * p.ignite.speed;
   }
   if (p.isAttack && H[PHYS] > 0 && roll(p.bleed.chance)) {
     a.bleed = BLEED_DPS_FRAC * H[PHYS] * p.bleed.mult * agony;
@@ -173,18 +222,27 @@ export function ailmentsFromHit(
   if (H[PHYS] + H[CHAOS] > 0 && roll(p.poison.chance)) {
     a.poison = POISON_DPS_FRAC * (H[PHYS] + H[CHAOS]) * p.poison.mult * agony * resMult(CHAOS);
   }
-  if (ele && H[LIGHT] > 0 && (crit || roll(p.shock.chance))) {
-    const e = mag(H[LIGHT] / thresh, SHOCK_CAP) * p.shock.effect;
+  const shockH = from(p.ailmentFrom.shock);
+  if (
+    ele &&
+    shockH > 0 &&
+    !def.immune[LIGHT] &&
+    !def.unaffectedByShock &&
+    (crit || roll(p.shock.chance))
+  ) {
+    const e = mag(shockH / thresh, SHOCK_CAP) * p.shock.effect;
     if (e >= MIN_SHOCK_CHILL) a.shock = e / 100;
   }
-  if (ele && H[COLD] > 0) {
-    if (!def.cannotBeChilled) {
-      const e = mag(H[COLD] / thresh, CHILL_CAP) * p.chill.effect;
+  if (ele && !def.immune[COLD]) {
+    const chillH = from(p.ailmentFrom.chill);
+    if (chillH > 0 && !def.cannotBeChilled) {
+      const e = mag(chillH / thresh, CHILL_CAP) * p.chill.effect;
       if (e >= MIN_SHOCK_CHILL) a.chill = e / 100;
     }
+    const freezeH = from(p.ailmentFrom.freeze);
     const freezeCrit = crit || (p.alwaysFreezeOnCrit && crit);
-    if (!def.cannotBeFrozen && (freezeCrit || roll(p.freeze.chance))) {
-      const d = Math.min(FREEZE_MAX, FREEZE_PER_R * (H[COLD] / thresh)) * p.freeze.dur;
+    if (freezeH > 0 && !def.cannotBeFrozen && (freezeCrit || roll(p.freeze.chance))) {
+      const d = Math.min(FREEZE_MAX, FREEZE_PER_R * (freezeH / thresh)) * p.freeze.dur;
       if (d >= MIN_FREEZE) a.freeze = d;
     }
   }
@@ -305,6 +363,27 @@ export function expectedHit(
   };
 }
 
+/**
+ * Ignites burning at once, on average, when each of `n` hits in an ignite's lifetime ignites with
+ * chance `ign` and at most `max` count. For one ignite this is the chance that at least one burns;
+ * for more, the same hits are counted as a Poisson stream.
+ */
+export function expectedIgnites(ign: number, n: number, max: number): number {
+  if (ign <= 0 || n <= 0) return 0;
+  if (max <= 1) return 1 - Math.pow(1 - ign, n);
+  if (ign >= 1) return Math.min(max, n);
+  const mean = -n * Math.log(1 - ign);
+  let term = Math.exp(-mean);
+  let cdf = term; // P(K <= 0)
+  let sum = 0;
+  for (let k = 1; k <= max; k++) {
+    sum += 1 - cdf; // P(K >= k)
+    term *= mean / k;
+    cdf += term;
+  }
+  return sum;
+}
+
 export type ExpectedAilments = {
   igniteDps: number;
   bleedDps: number;
@@ -336,7 +415,7 @@ export function expectedAilments(
   const ign = p.cannotInflictEle ? 0 : cc + (1 - cc) * p.ignite.chance;
   const ignAvg = cc * cr.ignite + (1 - cc) * p.ignite.chance * non.ignite;
   const ignPer = ign > 0 ? ignAvg / ign : 0;
-  const ignUptime = 1 - Math.pow(1 - ign, lands * p.ignite.dur);
+  const ignUptime = expectedIgnites(ign, lands * p.ignite.dur, p.ignite.max);
   const bl = p.bleed.chance;
   const blPer = cc * cr.bleed + (1 - cc) * non.bleed;
   const stacks = p.woundDance ? Math.min(8, lands * bl * p.bleed.dur) : 0;

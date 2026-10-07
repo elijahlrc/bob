@@ -118,7 +118,7 @@ describe('animation tracking', () => {
       t.update(a, 1 / 60);
     }
     expect(t.face).toBe(-1);
-    a.action = { elapsed: 0.3, duration: 0.6 } as never;
+    a.action = { elapsed: 0.3, duration: 0.6, profile: { repeats: 0 } } as never;
     expect(t.state(a)).toEqual({ anim: 'attack', t: 0.5 });
     a.action = null;
     a.stunT = 0.3;
@@ -126,5 +126,35 @@ describe('animation tracking', () => {
     a.alive = false;
     t.update(a, 0.35);
     expect(t.state(a)).toEqual({ anim: 'death', t: 0.5 });
+  });
+});
+
+describe('the attack animation of a repeating skill (Echoing Cast)', () => {
+  it('winds up and strikes again for each echo, landing when the sim fires it', () => {
+    const t = new AnimTrack();
+    const a = {
+      x: 5,
+      y: 5,
+      alive: true,
+      action: null,
+      stunT: 0,
+      facing: 0,
+      ail: { freezeT: 0 },
+    } as unknown as Actor;
+    t.update(a, 1 / 60);
+    const at = (u: number) => {
+      a.action = { elapsed: u, duration: 1, profile: { repeats: 1 }, which: 'primary' } as never;
+      return t.state(a).t;
+    };
+    expect(at(0.3)).toBeCloseTo(0.3, 6);
+    // Just after the first strike the figure is back at the wind-up...
+    expect(at(0.61)).toBeLessThan(0.3);
+    // ...and strikes again where the sim fires the echo (0.6 + 0.25 of the use time).
+    expect(at(0.849)).toBeGreaterThan(0.5);
+    expect(at(0.849)).toBeLessThan(0.6);
+    // Then it recovers.
+    expect(at(0.95)).toBeGreaterThan(0.6);
+    a.action = { elapsed: 0.3, duration: 1, profile: { repeats: 0 }, which: 'primary' } as never;
+    expect(t.state(a).t).toBeCloseTo(0.3, 6);
   });
 });

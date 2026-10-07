@@ -2,7 +2,8 @@ import { Hasher } from '../core/hash';
 import type { AnyItem, Build } from '../data/types';
 import type { MapPlan } from '../gen/mapPlan';
 import type { FlaskPolicy } from './flaskPolicy';
-import type { MapStatus, World, WorldOpts } from './types';
+import { buildRecap } from './recap';
+import type { DeathRecap, MapStatus, World, WorldOpts } from './types';
 import { createWorld, stepWorld } from './world';
 
 export type MapResult = {
@@ -19,6 +20,8 @@ export type MapResult = {
   /** Hash of the full event log (determinism checks). */
   eventHash: number;
   lifeFrac: number;
+  /** Why the player died, when they did (EXPANSION section 9). */
+  recap?: DeathRecap;
 };
 
 export function hashEvents(h: Hasher, w: World): void {
@@ -62,5 +65,6 @@ export function worldResult(w: World, eventHash = 0): MapResult {
     picked: w.picked,
     eventHash,
     lifeFrac: w.player.life / Math.max(1, w.player.def.maxLife),
+    ...(w.status === 'dead' ? { recap: buildRecap(w) } : {}),
   };
 }

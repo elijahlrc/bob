@@ -1,7 +1,9 @@
 import { CLASSES } from '../data/classes';
 import { hex, MOD_MARKS, RARITY_COLOR } from '../data/monsterMarks';
 import { monsterModDef, MONSTER_TYPES, BOSS_NAME } from '../data/monsters';
-import type { Actor } from '../sim/types';
+import { HEXES, hexText } from '../data/hexes';
+import { CHARGE_KINDS, CHARGE_NAMES, CHARGE_SECONDS, CHARGE_TEXT } from '../calc/charges';
+import type { Actor, World } from '../sim/types';
 import { SPEEDS, type Controller } from '../run/controller';
 import { useTicks } from './hooks';
 
@@ -13,13 +15,23 @@ function Orb(props: {
   label: string;
   es?: number;
   esMax?: number;
+  /** The part of `max` held by auras: drawn as a locked band at the top, so the orb keeps its full scale. */
+  reserved?: number;
 }) {
   const { value, max, kind, label } = props;
+  const reserved = Math.max(0, Math.min(max, props.reserved ?? 0));
   const pct = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0;
+  const resPct = max > 0 ? (reserved / max) * 100 : 0;
   const esPct = props.esMax ? Math.max(0, Math.min(100, ((props.es ?? 0) / props.esMax) * 100)) : 0;
   return (
-    <div class={`orb ${kind}`} title={`${label} ${Math.round(value)} / ${Math.round(max)}`}>
+    <div
+      class={`orb ${kind}`}
+      title={`${label} ${Math.round(value)} / ${Math.round(max - reserved)}${
+        reserved > 0 ? ` (${Math.round(reserved)} of ${Math.round(max)} reserved by auras)` : ''
+      }`}
+    >
       <div class="orb-glass">
+        {resPct > 0 && <div class="orb-reserved" style={{ height: `${resPct}%` }} />}
         <div class="orb-fill" style={{ height: `${pct}%` }} />
         {esPct > 0 && <div class="orb-es" style={{ height: `${esPct}%` }} />}
         <div class="orb-gloss" />
@@ -59,6 +71,15 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
           {Math.round(a.life).toLocaleString()} / {Math.round(maxLife).toLocaleString()}
         </span>
       </div>
+      {a.hexes.map((h) => (
+        <div key={h.id} class="inspect-mod">
+          <span class="mchip ring" style={{ '--c': '#c070e0' }} />
+          <div>
+            <div class="inspect-mod-name">Hexed: {HEXES[h.id].name}</div>
+            <div class="muted">{hexText(h.id, h.effect)}</div>
+          </div>
+        </div>
+      ))}
       {a.modIds.length === 0 ? (
         <div class="muted">No affixes.</div>
       ) : (
@@ -79,13 +100,45 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
   );
 }
 
+/** Pips for each kind of charge the character can gain (EXPANSION 5.6). */
+function Charges({ w }: { w: World }) {
+  const ch = w.char;
+  const kinds = CHARGE_KINDS.filter((k) => ch.chargeSource[k] || ch.charges[k] > 0);
+  const hexes = w.player.hexes;
+  if (!kinds.length && !hexes.length) return null;
+  return (
+    <div class="charges">
+      {hexes.map((h) => (
+        <div
+          key={h.id}
+          class="hexchip"
+          title={`Hexed: ${HEXES[h.id].name}, ${hexText(h.id, h.effect)}. ${Math.ceil(h.t)} s left.`}
+        >
+          ☠ {HEXES[h.id].name}
+        </div>
+      ))}
+      {kinds.map((k) => (
+        <div
+          key={k}
+          class={`charge ${k}`}
+          title={`${CHARGE_NAMES[k]}: ${ch.charges[k]} of ${ch.chargeMax[k]}. Each charge: ${CHARGE_TEXT[k]}. Lasts ${CHARGE_SECONDS} seconds.`}
+        >
+          {Array.from({ length: ch.chargeMax[k] }, (_, i) => (
+            <span key={i} class={'pip' + (i < ch.charges[k] ? ' on' : '')} />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function Hud({ c }: { c: Controller }) {
   useTicks(c);
   const w = c.world;
   if (!w) return null;
   const p = w.player;
-  const lifeMax = Math.max(1, p.def.maxLife - w.char.reservedLife);
-  const manaMax = Math.max(0, p.def.maxMana - w.char.reservedMana);
+  const lifeMax = Math.max(1, p.def.maxLife);
+  const manaMax = Math.max(1, p.def.maxMana);
   const sc = c.showcase;
   const sel = c.selectedId !== null ? w.actors.find((x) => x.id === c.selectedId) : undefined;
   return (
@@ -113,8 +166,17 @@ export function Hud({ c }: { c: Controller }) {
         </div>
       )}
       <div class="hud-bottom">
-        <Orb value={p.life} max={lifeMax} kind="life" label="Life" es={p.es} esMax={p.def.maxEs} />
+        <Orb
+          value={p.life}
+          max={lifeMax}
+          reserved={w.char.reservedLife}
+          kind="life"
+          label="Life"
+          es={p.es}
+          esMax={p.def.maxEs}
+        />
         <div class="hud-center">
+          <Charges w={w} />
           <div class="flasks">
             {w.flasks.map((f, i) => {
               const pct = f.spec.maxCharges > 0 ? (f.charges / f.spec.maxCharges) * 100 : 0;
@@ -158,7 +220,7 @@ export function Hud({ c }: { c: Controller }) {
             ))}
           </div>
         </div>
-        <Orb value={p.mana} max={Math.max(1, manaMax)} kind="mana" label="Mana" />
+        <Orb value={p.mana} max={manaMax} reserved={w.char.reservedMana} kind="mana" label="Mana" />
       </div>
     </div>
   );

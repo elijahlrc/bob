@@ -1,3 +1,4 @@
+import { MONSTER_TYPES, type MonsterTypeId } from '../../data/monsters';
 /**
  * Style-independent character rig. A figure is a list of primitives in a local design space
  * (origin at the feet, +x right, -y up, ~48 units tall for a person). Each visual style rasterises the
@@ -31,6 +32,15 @@ export type FigureKind =
   | 'archer'
   | 'mage'
   | 'boss'
+  // Creature rigs of the Swarm and the Reliquary (EXPANSION 7.3): not built on the skeleton.
+  | 'gnawer'
+  | 'bat'
+  | 'beetle'
+  | 'nest'
+  | 'sentinel'
+  | 'arbalest'
+  | 'golem'
+  | 'pylon'
   | 'hero_mace'
   | 'hero_sword'
   | 'hero_bow'
@@ -223,6 +233,14 @@ const BUILDS: Record<FigureKind, Build> = {
   archer: { scale: 0.95, legLen: 9, torsoH: 13, shoulder: 6, skull: 6.2, ribW: 5 },
   mage: { scale: 0.95, legLen: 8, torsoH: 14, shoulder: 6, skull: 6.5, ribW: 5.5 },
   boss: { scale: 2, legLen: 9, torsoH: 15, shoulder: 8, skull: 7, ribW: 7 },
+  gnawer: { scale: 0.7, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  bat: { scale: 0.7, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  beetle: { scale: 0.9, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  nest: { scale: 1.3, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  sentinel: { scale: 1.5, legLen: 9, torsoH: 14, shoulder: 9, skull: 6, ribW: 8 },
+  arbalest: { scale: 1.1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  golem: { scale: 1.4, legLen: 8, torsoH: 14, shoulder: 10, skull: 6, ribW: 8 },
+  pylon: { scale: 1.2, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   hero_mace: { scale: 1.05, legLen: 9, torsoH: 14, shoulder: 8, skull: 5.5, ribW: 7 },
   hero_sword: { scale: 1, legLen: 9, torsoH: 14, shoulder: 7, skull: 5.5, ribW: 6.5 },
   hero_bow: { scale: 1, legLen: 9.5, torsoH: 13, shoulder: 6, skull: 5.5, ribW: 5.5 },
@@ -315,8 +333,171 @@ function weapon(
   }
 }
 
+/** The kinds drawn by `buildCreature` rather than on the skeleton. */
+const CREATURES = new Set<FigureKind>([
+  'gnawer',
+  'bat',
+  'beetle',
+  'nest',
+  'sentinel',
+  'arbalest',
+  'golem',
+  'pylon',
+]);
+
+/**
+ * The Swarm and the Reliquary: bodies built from circles, capsules and boxes in the same design space as the
+ * skeleton (feet at the origin, up is -y). The pose supplies the same numbers: `legA` and `legB` are the two gait
+ * phases (wing beats for the bat), `bob` lifts the body, `armA` raises limbs, `charge` loads the crossbow.
+ */
+function buildCreature(kind: FigureKind, pose: Pose): Prim[] {
+  const b: B = { prims: [] };
+  const lift = pose.bob;
+  switch (kind) {
+    case 'gnawer': {
+      // A low, long rodent: four scrabbling legs, a tail, a pointed head.
+      for (const [x, ph] of [
+        [-4, pose.legB],
+        [4, pose.legA],
+      ] as const) {
+        cap(b, x - 1, -4 + lift, x + ph * 3 - 1, 0, 1, 'boneShade');
+        cap(b, x + 1.5, -4 + lift, x + 1.5 - ph * 3, 0, 1, 'boneShade');
+      }
+      cap(b, -9, -6 + lift, -4, -4 + lift, 0.7, 'dark');
+      circ(b, -1, -6 + lift, 4.6, 'boneShade');
+      circ(b, 0, -7 + lift, 3.6, 'bone');
+      circ(b, 6, -7 + lift + pose.head * 2, 3, 'bone');
+      b.prims.push({
+        k: 'tri',
+        pts: [8, -9 + lift, 12, -7 + lift, 8, -5.5 + lift],
+        role: 'boneShade',
+      });
+      circ(b, 7, -8.3 + lift, 0.8, 'eye');
+      circ(b, 4.6, -10.3 + lift, 1.4, 'bone');
+      break;
+    }
+    case 'bat': {
+      // Hovers above the ground; wings beat with the gait phase.
+      const y = -18 + lift;
+      const flap = pose.legA * 9;
+      circ(b, 0, y, 3.6, 'boneShade');
+      circ(b, 3.2, y - 1, 2.6, 'bone');
+      b.prims.push({ k: 'tri', pts: [3, y - 3, 4.4, y - 6.5, 5.6, y - 3], role: 'bone' });
+      circ(b, 4.2, y - 1.2, 0.8, 'eye');
+      for (const side of [-1, 1]) {
+        const tipX = side * 12;
+        const tipY = y - 3 - flap * side * 0 - Math.abs(flap) * (side > 0 ? 1 : 0.8) + 2;
+        b.prims.push({
+          k: 'tri',
+          pts: [side * 1.5, y - 1, tipX, tipY, side * 8, y + 3],
+          role: 'cloth',
+        });
+        cap(b, side * 1.5, y - 1, tipX, tipY, 0.8, 'dark');
+      }
+      cap(b, -2, y + 3, -3, y + 7, 0.6, 'dark');
+      cap(b, 1, y + 3, 2, y + 7, 0.6, 'dark');
+      break;
+    }
+    case 'beetle': {
+      // A domed shell over six small legs, with a blunt head.
+      for (const i of [-1, 0, 1]) {
+        const ph = i % 2 ? pose.legA : pose.legB;
+        cap(b, i * 4, -4 + lift, i * 5 + ph * 2.5, 0, 0.9, 'dark');
+      }
+      circ(b, 0, -7 + lift, 8.5, 'metalShade');
+      circ(b, -1, -8 + lift, 7, 'metal');
+      cap(b, 0, -14 + lift, 0, -2 + lift, 0.5, 'dark');
+      circ(b, 8, -5 + lift, 3.2, 'boneShade');
+      circ(b, 9.2, -5.6 + lift, 0.8, 'eye');
+      cap(b, 10, -8 + lift, 13, -11 + lift, 0.7, 'dark');
+      break;
+    }
+    case 'nest': {
+      // A mound of packed bone with dark mouths and pale eggs.
+      circ(b, 0, -6 + lift, 11, 'boneShade');
+      circ(b, -4, -9 + lift, 7, 'cloth');
+      circ(b, 5, -8 + lift, 6, 'clothShade');
+      for (const [x, y, r] of [
+        [-5, -4, 2.4],
+        [4, -3, 2],
+        [0, -9, 2.2],
+      ] as const)
+        circ(b, x, y + lift, r, 'dark');
+      for (const [x, y] of [
+        [-8, -2],
+        [8, -1],
+        [-2, -13],
+      ] as const)
+        circ(b, x, y + lift, 1.6, 'bone');
+      circ(b, 0, -9 + lift, 0.9, 'eye');
+      break;
+    }
+    case 'sentinel': {
+      // A bone-and-iron guardian: slab torso, helm with a slit, heavy raised fists.
+      const hip = -16;
+      box(b, -3, hip + 8 + pose.legB * 4, 5, 18, 0, 'metalShade');
+      box(b, 4, hip + 8 + pose.legA * 4, 5, 18, 0, 'metal');
+      box(b, 0, hip - 8 + lift, 18, 18, 0, 'metalShade');
+      box(b, 0, hip - 9 + lift, 15, 15, 0, 'metal');
+      box(b, 0, hip - 10 + lift, 5, 5, 0, 'accent');
+      box(b, 1, hip - 22 + lift, 10, 9, 0, 'metalShade');
+      box(b, 3, hip - 22 + lift, 6, 2, 0, 'eye');
+      const raise = pose.armA * 8;
+      cap(b, 9, hip - 14 + lift, 15, hip - 6 - raise + lift, 3, 'metal');
+      circ(b, 15, hip - 5 - raise + lift, 4.5, 'metalShade');
+      cap(b, -9, hip - 14 + lift, -14, hip - 5 + lift, 3, 'metalShade');
+      circ(b, -14, hip - 4 + lift, 4, 'metalShade');
+      break;
+    }
+    case 'arbalest': {
+      // A crossbow on a stand: it never moves, so the pose only loads the string.
+      box(b, 0, -5, 12, 10, 0, 'metalShade');
+      box(b, 0, -14 + lift, 4, 8, 0, 'metal');
+      box(b, 5, -20, 16, 2.4, 0, 'wood');
+      const pull = -pose.charge * 6;
+      cap(b, 11, -20, 7 + pull, -26, 1, 'wood');
+      cap(b, 11, -20, 7 + pull, -14, 1, 'wood');
+      cap(b, 7 + pull, -26, 7 + pull, -14, 0.4, 'dark');
+      if (pose.charge > 0.1) cap(b, 7 + pull, -20, 17, -20, 0.8, 'metal');
+      circ(b, -3, -9, 1.5, 'eye');
+      break;
+    }
+    case 'golem': {
+      // A hunched figure of stacked stone with a burning core.
+      box(b, -4, -5 + pose.legB * 3, 7, 10, 0, 'boneShade');
+      box(b, 5, -5 + pose.legA * 3, 7, 10, 0, 'bone');
+      circ(b, 0, -17 + lift, 10, 'metalShade');
+      circ(b, -1, -18 + lift, 8, 'boneShade');
+      circ(b, 0, -17 + lift, 3.4 + pose.charge, 'glow');
+      circ(b, 3, -29 + lift, 4.6, 'bone');
+      circ(b, 5, -29.5 + lift, 1, 'eye');
+      const swing = pose.armA * 6;
+      circ(b, 11, -14 + lift, 4.4, 'boneShade');
+      cap(b, 8, -22 + lift, 13, -8 - swing + lift, 3.4, 'bone');
+      circ(b, 14, -7 - swing + lift, 5, 'boneShade');
+      cap(b, -8, -22 + lift, -13, -9 + lift, 3, 'boneShade');
+      circ(b, -13, -8 + lift, 4.4, 'boneShade');
+      break;
+    }
+    case 'pylon': {
+      // A pillar capped by a hovering crystal.
+      box(b, 0, -3, 12, 6, 0, 'metalShade');
+      box(b, 0, -14, 7, 18, 0, 'metal');
+      box(b, 0, -14, 3, 18, 0, 'metalShade');
+      const bob = Math.sin(pose.bob * 2) * 1.2;
+      b.prims.push({ k: 'tri', pts: [-4, -27 + bob, 0, -36 + bob, 4, -27 + bob], role: 'glow' });
+      b.prims.push({ k: 'tri', pts: [-4, -27 + bob, 0, -20 + bob, 4, -27 + bob], role: 'accent' });
+      break;
+    }
+    default:
+      break;
+  }
+  return b.prims;
+}
+
 /** Build the primitives of a figure in a pose (back to front). */
 export function buildFigure(kind: FigureKind, pose: Pose): Prim[] {
+  if (CREATURES.has(kind)) return finish(buildCreature(kind, pose), BUILDS[kind].scale, pose);
   const B_ = BUILDS[kind];
   const b: B = { prims: [] };
   const hero = isHero(kind);
@@ -447,9 +628,12 @@ export function buildFigure(kind: FigureKind, pose: Pose): Prim[] {
     circ(b, shX - 4, shY + 8, 4.2, 'metal');
     circ(b, shX - 4, shY + 8, 1.4, 'accent');
   }
-  // Scale, rotation and scatter.
+  return finish(b.prims, B_.scale, pose);
+}
+
+/** Apply scale, rotation and scatter to a built figure. */
+function finish(prims: Prim[], s: number, pose: Pose): Prim[] {
   const out: Prim[] = [];
-  const s = B_.scale;
   const rc = Math.cos(pose.rot);
   const rs = Math.sin(pose.rot);
   const tx = (x: number, y: number, i: number): [number, number] => {
@@ -460,7 +644,7 @@ export function buildFigure(kind: FigureKind, pose: Pose): Prim[] {
     const Y = (y + sy * 0.3) * s;
     return [X * rc - Y * rs, X * rs + Y * rc];
   };
-  b.prims.forEach((p, i) => {
+  prims.forEach((p, i) => {
     switch (p.k) {
       case 'circ': {
         const [x, y] = tx(p.x, p.y, i);
@@ -495,11 +679,8 @@ export function buildFigure(kind: FigureKind, pose: Pose): Prim[] {
 export type FrameCounts = Record<AnimName, number>;
 
 /** Figure kind used for a monster type; heroes by weapon class. */
-export function monsterFigure(
-  type: 'warrior' | 'brute' | 'archer' | 'mage',
-  rarity: string,
-): FigureKind {
-  return rarity === 'boss' ? 'boss' : type;
+export function monsterFigure(type: MonsterTypeId, rarity: string): FigureKind {
+  return rarity === 'boss' ? 'boss' : MONSTER_TYPES[type].body;
 }
 
 export function heroFigure(mainHandClass: string | undefined): FigureKind {

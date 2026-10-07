@@ -16,6 +16,8 @@ export type FlaskBase = {
   /** Utility buff mods; `scale` mods are multiplied by (1 + 0.04 · ilvl). */
   buff: Mod[];
   scaleWithIlvl?: boolean;
+  /** Never drops on its own; only a unique flask uses it. */
+  uniqueOnly?: boolean;
 };
 
 const LIFE_AMOUNTS = [70, 150, 270, 450, 700, 1000, 1400, 1900];
@@ -97,6 +99,13 @@ const util = (id: string, name: string, level: number, buff: Mod[], scale = fals
   scaleWithIlvl: scale,
 });
 
+/** The bases of the unique flasks (their effect comes from the unique, not the base). */
+const uniqueUtil = (id: string, name: string, level: number): FlaskBase => ({
+  ...util(id, name, level, []),
+  duration: 6,
+  uniqueOnly: true,
+});
+
 export const FLASK_BASES: FlaskBase[] = [
   ...lifeFlasks(),
   ...manaFlasks(),
@@ -116,6 +125,12 @@ export const FLASK_BASES: FlaskBase[] = [
     mod('resist.lightning', 'base', 50),
     mod('maxResist.lightning', 'base', 5),
   ]),
+  uniqueUtil('flask_hoarfrost', 'Hoarfrost Draught', 26),
+  uniqueUtil('flask_lastlight', 'Last Light Flask', 40),
+  uniqueUtil('flask_rotwine', 'Rotwine Flask', 35),
+  uniqueUtil('flask_stonebrew', 'Stonebrew Flask', 20),
+  uniqueUtil('flask_tonic', "Gambler's Tonic", 22),
+  uniqueUtil('flask_martyr', "Martyr's Draught", 30),
 ];
 
 const BY_ID = new Map(FLASK_BASES.map((f) => [f.id, f]));

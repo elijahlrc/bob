@@ -1,7 +1,14 @@
+import { sheetDps } from '../calc/character';
 import { itemBase, isWeaponClass } from '../data/bases';
 import { flaskBase } from '../data/flasks';
 import { gemDef } from '../data/gems';
-import { EQUIP_SLOTS, type AnyItem, type EquipSlot, type Item, type Rarity } from '../data/types';
+import {
+  EQUIP_SLOTS,
+  type InventoryItem,
+  type EquipSlot,
+  type Item,
+  type Rarity,
+} from '../data/types';
 import { canEquip, equip, equipFlask, slotsFor, socketGem, withEquipped } from './inventory';
 import { score, sheetOf } from './bot';
 import type { RunState } from './run';
@@ -43,7 +50,7 @@ export function slotLabel(s: EquipSlot): string {
   return SLOT_LABEL[s];
 }
 
-export function groupOf(it: AnyItem): ItemGroup {
+export function groupOf(it: InventoryItem): ItemGroup {
   if (it.kind === 'gem') return 'gem';
   if (it.kind === 'flask') return 'flask';
   const c = itemBase(it.baseId).itemClass;
@@ -60,12 +67,12 @@ const GROUP_ORDER: Record<ItemGroup, number> = {
   gem: 4,
 };
 
-function slotOrder(it: AnyItem): number {
+function slotOrder(it: InventoryItem): number {
   if (it.kind === 'item') return EQUIP_SLOTS.indexOf(slotsFor(it)[0]);
   return 20 + GROUP_ORDER[groupOf(it)];
 }
 
-function naturalLabel(it: AnyItem): string {
+function naturalLabel(it: InventoryItem): string {
   if (it.kind === 'gem') return 'Gem';
   if (it.kind === 'flask') return 'Flask';
   const c = itemBase(it.baseId).itemClass;
@@ -111,7 +118,7 @@ export function itemInfos(run: RunState): Map<number, ItemInfo> {
           info.slot = slot;
           info.equippable = true;
           info.reason = undefined;
-          info.dpsPct = pct(base.skill.sustainedDps, s.skill.sustainedDps);
+          info.dpsPct = pct(sheetDps(base), sheetDps(s));
           info.ehpPct = pct(base.ehp, s.ehp);
           info.scorePct = pct(baseScore, sc);
           info.replaces = run.build.equipment[slot];
@@ -139,7 +146,7 @@ export const SORT_LABELS: Record<SortKey, string> = {
 
 const RARITY_RANK: Record<Rarity, number> = { normal: 0, magic: 1, rare: 2, unique: 3 };
 
-function rarityRank(it: AnyItem): number {
+function rarityRank(it: InventoryItem): number {
   return it.kind === 'item'
     ? RARITY_RANK[it.rarity]
     : it.kind === 'flask'
@@ -149,7 +156,7 @@ function rarityRank(it: AnyItem): number {
       : 0;
 }
 
-function name(it: AnyItem): string {
+function name(it: InventoryItem): string {
   return it.kind === 'gem' ? gemDef(it.gemId).name : it.name;
 }
 
@@ -159,10 +166,10 @@ export function isUpgrade(info: ItemInfo): boolean {
 }
 
 export function filterItems(
-  items: AnyItem[],
+  items: InventoryItem[],
   infos: Map<number, ItemInfo>,
   f: FilterKey,
-): AnyItem[] {
+): InventoryItem[] {
   switch (f) {
     case 'all':
       return items;
@@ -177,13 +184,13 @@ export function filterItems(
 
 /** Sort a copy of `items`. `desc` flips the natural direction of the key. */
 export function sortItems(
-  items: AnyItem[],
+  items: InventoryItem[],
   infos: Map<number, ItemInfo>,
   key: SortKey,
   desc: boolean,
-): AnyItem[] {
-  const info = (x: AnyItem) => infos.get(x.uid)!;
-  const val = (x: AnyItem): number | string => {
+): InventoryItem[] {
+  const info = (x: InventoryItem) => infos.get(x.uid)!;
+  const val = (x: InventoryItem): number | string => {
     switch (key) {
       case 'newest':
         return x.uid;
@@ -288,7 +295,7 @@ export function placementsFor(run: RunState, gemUid: number): Placement[] {
       out.push({
         slot,
         socket,
-        dpsPct: pct(base.skill.sustainedDps, s.skill.sustainedDps),
+        dpsPct: pct(sheetDps(base), sheetDps(s)),
         ehpPct: pct(base.ehp, s.ehp),
         scorePct: pct(score(base), score(s)),
         replaces: cur ? gemDef(cur.gemId).name : undefined,
@@ -337,7 +344,7 @@ export function moveGem(run: RunState, from: SocketRef, to: SocketRef): boolean 
 }
 
 /** Inventory items the "discard junk" button removes: non-upgrade normal/magic items. */
-export function junkItems(run: RunState): AnyItem[] {
+export function junkItems(run: RunState): InventoryItem[] {
   const infos = itemInfos(run);
   return run.inventory.filter((x) => {
     if (x.kind !== 'item' || (x.rarity !== 'normal' && x.rarity !== 'magic')) return false;

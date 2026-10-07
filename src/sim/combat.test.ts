@@ -152,6 +152,8 @@ describe('§6.9 flask policy', () => {
         queued: false,
         lifeRate: 0,
         manaRate: 0,
+        esRate: 0,
+        esT: 0,
       },
     ];
     const p = w.player;

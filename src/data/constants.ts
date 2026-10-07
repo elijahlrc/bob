@@ -68,6 +68,8 @@ export const STUN_NON_PHYS = 0.5;
 export const DUAL_WIELD_MORE_APS = 10;
 export const FISTS = { min: 2, max: 6, aps: 1.2, crit: 0 };
 export const HIT_AT = 0.6;
+/** Echoing Cast: each echo lands this share of the use time after the one before. */
+export const ECHO_GAP = 0.25;
 
 // §8.2 Simulation.
 export const PROJECTILE_SPEED = 12;

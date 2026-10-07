@@ -7,12 +7,16 @@ import type { Rng } from '../core/rng';
 import type { MonsterModId, MonsterRarity } from '../data/monsters';
 import type { AnyItem, Build } from '../data/types';
 import type { MapPlan } from '../gen/mapPlan';
+import type { Corpse } from './factions';
+import type { HexState } from './hexes';
 import type { Grid } from './grid';
 
 export type Dot = { dps: number; t: number; stack?: boolean };
 
 export type Ailments = {
   ignites: Dot[];
+  /** How many ignites burn at once (the strongest count), set by whoever ignited it. */
+  igniteMax: number;
   bleeds: Dot[];
   poisons: Dot[];
   shock: number;
@@ -24,12 +28,14 @@ export type Ailments = {
 
 export type Action = {
   profile: SkillProfile;
-  /** Which skill: 'primary', 'default' or 'monster'. */
-  which: 'primary' | 'default' | 'monster';
+  /** Which skill: 'primary', 'secondary', 'default', 'monster' or 'triggered'. */
+  which: 'primary' | 'secondary' | 'default' | 'monster' | 'triggered';
   hand: number;
   duration: number;
   elapsed: number;
   fired: boolean;
+  /** Repeats (Echoing Cast) already fired after the first. */
+  echoes: number;
   targetId: number;
   aimX: number;
   aimY: number;
@@ -66,6 +72,8 @@ export type Actor = {
   tFlask: number;
   tStunEnemy: number;
   tBlock: number;
+  /** Seconds since this actor was last hit (for "been hit recently"). */
+  tBeenHit: number;
   tOverload: number;
   resShift: number[];
   resShiftT: number;
@@ -92,6 +100,36 @@ export type Actor = {
   /** Ranged monsters: remaining retreat time and its cooldown. */
   retreatT: number;
   retreatCd: number;
+  /** A monster raised from a corpse: no rewards, leaves no corpse, and a Shambler does not rise twice. */
+  risen: boolean;
+  /** A faction ability timer (raise, blink), and the time left of a blink telegraph. */
+  skillT: number;
+  blinkT: number;
+  /** The Lantern Wight whose energy shield shell this monster carries. */
+  shellBy: number;
+  /** Seconds left of a phase-out (the Unremembered): immune, unseen and idle. */
+  phaseT: number;
+  /** Hexes on this actor (EXPANSION 5.7) and what they add up to. */
+  hexes: HexState[];
+  hexRes: number;
+  hexVuln: number;
+  hexDmg: number;
+  hexSpeed: number;
+  /** The Choir (EXPANSION 7.3): the censer aura time left, a Zealous boost, and Fervour stacks with their time left. */
+  buffT: number;
+  zealT: number;
+  fervour: number;
+  fervourT: number;
+  /** Moves over walls (bats), never moves (nests, pylons, arbalests), and the time left of a beetle curled up. */
+  flies: boolean;
+  stationary: boolean;
+  curlT: number;
+  /** Where a burrowed Gnawing Queen will come up. */
+  markX: number;
+  markY: number;
+  /** Seconds before a Hexcaller can hex again, and the time left of a Choirmaster channel. */
+  hexCd: number;
+  channelT: number;
 };
 
 export type Projectile = {
@@ -126,8 +164,11 @@ export type GroundEffect = {
   radius: number;
   t: number;
   total: number;
-  kind: 'volatile' | 'slam' | 'explosion';
+  kind: 'volatile' | 'slam' | 'explosion' | 'caustic' | 'burning' | 'chilling' | 'shocking';
+  /** A blast: damage when it lands. A lasting zone (caustic, burning, chilling, shocking): damage per second. */
   damage: number;
+  /** Zones: time since the last damage pulse. */
+  acc?: number;
   dtype: number;
   faction: 0 | 1;
 };
@@ -144,6 +185,9 @@ export type FlaskState = {
   /** Recovery per second while active (life/mana flasks). */
   lifeRate: number;
   manaRate: number;
+  /** Energy shield returned over time by a life-to-ES flask, and the time left. */
+  esRate: number;
+  esT: number;
 };
 
 export type SimEvent =
@@ -161,8 +205,13 @@ export type SimEvent =
   | { t: 'flaskUsed'; idx: number }
   | { t: 'projectileSpawned'; id: number }
   | { t: 'use'; src: number; skill: string }
+  | { t: 'echo'; src: number; skill: string }
+  | { t: 'trigger'; skill: string; kind: string }
   | { t: 'chain'; from: number; to: number }
   | { t: 'explode'; x: number; y: number; r: number; dtype: number }
+  | { t: 'blink'; id: number; x: number; y: number; end: boolean }
+  | { t: 'charge'; kind: string; count: number }
+  | { t: 'hex'; id: number; hex: string }
   | { t: 'stuck' }
   | { t: 'stall'; id: number }
   | {
@@ -180,6 +229,34 @@ export type SimEvent =
   | { t: 'summon'; id: number };
 
 export type MapStatus = 'running' | 'cleared' | 'dead' | 'timeout';
+
+/** One piece of damage the player took (kept for the last few seconds, for the death recap). */
+export type DamageRecord = {
+  t: number;
+  /** What dealt it: a monster's name, or an effect such as "Burning". */
+  name: string;
+  rarity: string;
+  mods: string[];
+  dtype: number;
+  amount: number;
+};
+
+/** Why the player died (EXPANSION section 9): the last seconds of damage, the killer, and your defences. */
+export type DeathRecap = {
+  time: number;
+  killer: string;
+  killerRarity: string;
+  killerMods: string[];
+  /** Damage taken in the last 5 seconds, by source and type, largest first. */
+  lines: { name: string; dtype: number; amount: number }[];
+  /** Resistances (fire, cold, lightning, chaos) and their caps, at the moment of death. */
+  res: { fire: number; cold: number; lightning: number; chaos: number };
+  maxRes: { fire: number; cold: number; lightning: number; chaos: number };
+  /** Ailments the player carried. */
+  ailments: string[];
+  maxLife: number;
+  maxEs: number;
+};
 
 export type PlayerAI = {
   mode: 'advance' | 'engage' | 'loot' | 'exit';
@@ -204,6 +281,9 @@ export type PlayerAI = {
   stuckT: number;
   stuckX: number;
   stuckY: number;
+  /** The drop or chest the player is heading for, and since when (a loot hunt that goes nowhere is dropped). */
+  lootId: number;
+  lootSince: number;
 };
 
 export type WorldOpts = {
@@ -219,6 +299,21 @@ export type WorldOpts = {
   godMode?: boolean;
 };
 
+/** Runtime state of the triggers (EXPANSION 5.5), keyed by trigger source. */
+export type TriggerRuntime = {
+  /** Seconds left on each source's cooldown. */
+  cooldown: Record<string, number>;
+  /** Damage taken since a hit-taken trigger last fired. */
+  taken: Record<string, number>;
+  /** True while a triggered skill is being cast: nothing triggers from it. */
+  busy: boolean;
+  /** Kill explosions so far this tick (capped, for speed). */
+  explosions: number;
+  /** Explosions waiting their turn: a chain of kills continues over the next ticks. */
+  queue: { x: number; y: number; r: number; type: number; amount: number; from: number }[];
+  draining: boolean;
+};
+
 export type World = {
   plan: MapPlan;
   grid: Grid;
@@ -227,11 +322,26 @@ export type World = {
   rngCombat: Rng;
   rngAi: Rng;
   rngLoot: Rng;
+  /** Chance rolls and spell choices of triggers (separate, so triggers never disturb other streams). */
+  rngTrig: Rng;
+  /** Seconds left on the charges of each kind (EXPANSION 5.6), and the characters built for each count held. */
+  chargeT: Record<'grit' | 'fervour' | 'insight', number>;
+  chars: Map<string, Character>;
+  /** The Trophy Cord: monster mods held, by mod id, and the seconds left of each. */
+  trophy: Record<string, number>;
+  trig: TriggerRuntime;
+  /** When each secondary skill (by choice key) can next be cast (EXPANSION 5.5a). */
+  secondaryReady: Record<string, number>;
   actors: Actor[];
   player: Actor;
   nextId: number;
   projectiles: Projectile[];
   effects: GroundEffect[];
+  /** Bodies of dead monsters (EXPANSION 5.8), and recent explosions that destroy fresh ones. */
+  corpses: Corpse[];
+  /** Whether any Warden Pylon has been spawned (so damage need not look for one on most maps). */
+  hasPylons: boolean;
+  blasts: { x: number; y: number; r: number; t: number }[];
   drops: Drop[];
   chests: Chest[];
   events: SimEvent[];
@@ -257,4 +367,6 @@ export type World = {
     damageDealt: number;
   };
   picked: AnyItem[];
+  /** Damage the player took in the last few seconds. */
+  dmgLog: DamageRecord[];
 };

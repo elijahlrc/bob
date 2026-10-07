@@ -19,6 +19,8 @@ export type FlaskSpec = {
   removeIgnite: boolean;
   removeFreeze: boolean;
   removeBleed: boolean;
+  /** On use, all but 1 life returns as energy shield over a short time (the Martyr's Draught). */
+  lifeToEs: boolean;
 };
 
 export function flaskSpec(f: FlaskItem, charDb: ModDB): FlaskSpec {
@@ -54,5 +56,6 @@ export function flaskSpec(f: FlaskItem, charDb: ModDB): FlaskSpec {
     removeIgnite: local.flag('removeIgnite'),
     removeFreeze: local.flag('removeFreeze'),
     removeBleed: local.flag('removeBleed'),
+    lifeToEs: local.flag('flask.lifeToEs'),
   };
 }

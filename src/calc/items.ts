@@ -1,6 +1,6 @@
 import { itemBase } from '../data/bases';
-import type { Item, ItemBase } from '../data/types';
-import { DAMAGE_TYPES, mod, type Mod } from '../mods/types';
+import type { Attrs, Item, ItemBase } from '../data/types';
+import { DAMAGE_TYPES, mod, type Mod, type SkillTag } from '../mods/types';
 import type { HandStats } from './skill';
 
 export function itemMods(item: Item): Mod[] {
@@ -76,9 +76,51 @@ export function itemGlobalMods(item: Item): Mod[] {
   return out;
 }
 
-/** Socketed-gem level bonus of an item ("+N to level of socketed gems"). */
-export function socketedGemBonus(item: Item): number {
+/**
+ * Socketed-gem level bonus of an item ("+N to level of socketed gems"). A mod with tags only
+ * counts for gems that carry all of them ("+2 to level of socketed aura gems").
+ */
+export function socketedGemBonus(
+  item: Item,
+  gemTags: readonly SkillTag[] = [],
+  statValue: (stat: string) => number = () => 0,
+): number {
   let s = 0;
-  for (const m of itemMods(item)) if (m.stat === 'socketedGemLevel') s += m.value;
+  for (const m of itemMods(item))
+    if (m.stat === 'socketedGemLevel' && (m.tags ?? []).every((t) => gemTags.includes(t)))
+      s += m.per ? m.value * Math.floor(statValue(m.per.stat) / m.per.div) : m.value;
   return s;
+}
+
+/** The attributes an item needs: its base's, or a unique's own if higher. */
+export function itemReq(item: Item): Attrs {
+  const b = itemBase(item.baseId).req;
+  const u = item.uniqueReq;
+  return {
+    str: Math.max(b.str, u?.str ?? 0),
+    dex: Math.max(b.dex, u?.dex ?? 0),
+    int: Math.max(b.int, u?.int ?? 0),
+  };
+}
+
+/** Percent less mana (or life) reserved by the aura gems socketed in this item. */
+export function socketedReservationReduction(item: Item): number {
+  let s = 0;
+  for (const m of itemMods(item)) if (m.stat === 'socketedReducedReservation') s += m.value;
+  return s;
+}
+
+/** Item rules are flag mods on the item itself (a stat with the prefix `rule.`). */
+export function itemHasRule(item: Item, rule: string): boolean {
+  return itemMods(item).some((m) => m.stat === `rule.${rule}` && m.kind === 'flag');
+}
+
+/** Ids of the keystones an item grants (flags named `grantsKeystone.<id>`). */
+export function grantedKeystones(item: Item): string[] {
+  const out: string[] = [];
+  for (const m of itemMods(item)) {
+    const hit = /^grantsKeystone\.(\w+)$/.exec(m.stat);
+    if (hit && m.kind === 'flag') out.push(hit[1]);
+  }
+  return out;
 }

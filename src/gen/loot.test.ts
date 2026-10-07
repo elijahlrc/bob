@@ -6,6 +6,7 @@ import { FLASK_BASES } from '../data/flasks';
 import type { Item } from '../data/types';
 import { UNIQUES, uniqueDef } from '../data/uniques';
 import {
+  GEM_RATE,
   itemTags,
   rollChest,
   rollDrop,
@@ -14,6 +15,7 @@ import {
   rollMonsterDrops,
   rollSockets,
   rollUnique,
+  uniqueIdOf,
   socketCap,
 } from './loot';
 
@@ -22,8 +24,9 @@ const uid = () => n++;
 const famType = (id: string) => FAMILIES.find((f) => f.id === id)!.type;
 
 describe('item data (§11.2–11.3)', () => {
-  it('has every base', () => {
-    const count = (p: (b: (typeof ITEM_BASES)[number]) => boolean) => ITEM_BASES.filter(p).length;
+  it('has every base that can drop (unique-only bases are extra)', () => {
+    const count = (p: (b: (typeof ITEM_BASES)[number]) => boolean) =>
+      ITEM_BASES.filter((b) => !b.uniqueOnly && p(b)).length;
     expect(count((b) => !!b.weapon)).toBe(60);
     expect(count((b) => ['helmet', 'gloves', 'boots', 'body'].includes(b.itemClass))).toBe(96);
     expect(count((b) => b.itemClass === 'shield')).toBe(12);
@@ -162,17 +165,24 @@ describe('drop tables (§11.4)', () => {
     const rng = new Rng(12);
     let normal = 0;
     let magic = 0;
+    let gems = 0;
     const N = 20000;
+    const gear = (d: { kind: string }[]) => d.filter((x) => x.kind !== 'gem').length;
     for (let i = 0; i < N; i++) {
-      normal += rollMonsterDrops(rng, uid, { ilvl: 30, monster: 'normal' }).length;
-      magic += rollMonsterDrops(rng, uid, { ilvl: 30, monster: 'magic' }).length;
+      const n = rollMonsterDrops(rng, uid, { ilvl: 30, monster: 'normal' });
+      normal += gear(n);
+      gems += n.length - gear(n);
+      magic += gear(rollMonsterDrops(rng, uid, { ilvl: 30, monster: 'magic' }));
     }
     expect(normal / N).toBeCloseTo(0.08, 1);
     expect(magic / N).toBeCloseTo(0.25, 1);
+    // Gems drop on their own, at the rate in GEM_RATE (normal monsters: 0.6%).
+    expect(gems / N).toBeCloseTo(GEM_RATE.normal, 2);
     for (let i = 0; i < 50; i++) {
       const d = rollMonsterDrops(rng, uid, { ilvl: 30, monster: 'miniboss' });
       expect(d.length).toBeGreaterThanOrEqual(3);
-      expect(d.some((x) => x.kind === 'item' && x.rarity === 'rare')).toBe(true);
+      // A mini-boss drops a unique from its faction's pool (EXPANSION 6.2).
+      expect(d.some((x) => uniqueIdOf(x) !== undefined)).toBe(true);
     }
   });
 
@@ -189,11 +199,12 @@ describe('drop tables (§11.4)', () => {
     expect(flasks / N).toBeCloseTo(0.15, 1);
   });
 
-  it('chests give magic-or-better items or gems', () => {
+  it('chests give magic-or-better items, unique flasks or gems', () => {
     const rng = new Rng(14);
     for (let i = 0; i < 200; i++) {
       const [x] = rollChest(rng, uid, 20);
       if (x.kind === 'item') expect((x as Item).rarity).not.toBe('normal');
+      else if (x.kind === 'flask') expect(x.uniqueId).toBeDefined();
       else expect(x.kind).toBe('gem');
     }
   });

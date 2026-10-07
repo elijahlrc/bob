@@ -1,0 +1,244 @@
+import { Character, type SteadyMode } from '../calc/character';
+import { NO_SHIFT } from '../calc/combat';
+import { buildMonster } from '../calc/monster';
+import { mapAffixDef } from '../data/mapAffixes';
+import { MONSTER_TYPES, type FactionId, type MonsterTypeId, type Variant } from '../data/monsters';
+import type { ThemeDef } from '../data/themes';
+import { ELEMENT_WEIGHTS, neverPlain, typeShares } from '../gen/population';
+
+/**
+ * What a map theme asks of a build (EXPANSION 5.10 and section 9). The first version works from the
+ * theme's monster mix alone; faction profiles and map affixes extend it in X5.
+ */
+export type ThemeThreat = {
+  /** Shares of the incoming damage that are physical, lightning, cold, fire and chaos (sum 1). */
+  mix: number[];
+  /** Share of the monsters that are each variant (sum 1). */
+  variants: Record<Variant, number>;
+  /** Damage rate × time to kill, relative to the plain mix of monsters (1 = average). */
+  pressure: number;
+};
+
+const ELEMENT_INDEX: Record<Variant, number> = { none: 0, lightning: 1, cold: 2, fire: 3 };
+const CONVERT_TARGET: Record<string, number> = { lightning: 1, cold: 2, fire: 3, chaos: 4 };
+
+/** The share of a type's physical damage that it converts by nature (the Rot to chaos, the Hollow to cold). */
+function innateConversion(id: MonsterTypeId): { to: number; share: number } | null {
+  for (const m of MONSTER_TYPES[id].mods) {
+    const [kind, from, to] = m.stat.split('.');
+    if (kind === 'convert' && from === 'physical' && CONVERT_TARGET[to])
+      return { to: CONVERT_TARGET[to], share: m.value / 100 };
+  }
+  return null;
+}
+/** What a faction's behaviours add to its raw numbers (zones, raising, blinking), as a multiplier. */
+const FACTION_PRESSURE: Record<FactionId, number> = {
+  ossuary: 1,
+  rot: 1.25,
+  hollow: 1.2,
+  choir: 1.3,
+  swarm: 1.3,
+  reliquary: 1.3,
+};
+const ALL_VARIANTS = Object.keys(ELEMENT_WEIGHTS) as Variant[];
+
+function rawThreat(
+  theme: Pick<ThemeDef, 'typeWeights' | 'elementWeights' | 'factions'>,
+): ThemeThreat {
+  const mix = [0, 0, 0, 0, 0];
+  const variants: Record<Variant, number> = { none: 0, fire: 0, cold: 0, lightning: 0 };
+  let pressure = 0;
+  let total = 0;
+  for (const [id, typeShare] of typeShares(theme)) {
+    const t = MONSTER_TYPES[id];
+    const innate = t.innate ? innateConversion(id) : null;
+    const vs = t.innate
+      ? (['none'] as Variant[])
+      : ALL_VARIANTS.filter((v) => !neverPlain(id) || v !== 'none');
+    const weight = (v: Variant) => ELEMENT_WEIGHTS[v] * (theme.elementWeights[v] ?? 1);
+    const vTotal = vs.reduce((s, v) => s + weight(v), 0);
+    for (const v of vs) {
+      const share = (typeShare * weight(v)) / vTotal;
+      // Variants turn part of the physical damage into their element (mages all of it).
+      const conv = v === 'none' ? 0 : id === 'mage' ? 1 : 0.6;
+      const dmg = share * t.dmgMult;
+      if (innate) {
+        mix[0] += dmg * (1 - innate.share);
+        mix[innate.to] += dmg * innate.share;
+      } else {
+        mix[0] += dmg * (1 - conv);
+        mix[ELEMENT_INDEX[v]] += dmg * conv;
+      }
+      variants[v] += share;
+      pressure += (share * t.dmgMult * t.lifeMult) / t.attackTime;
+      total += share;
+    }
+  }
+  const dmgTotal = mix.reduce((a, b) => a + b, 0);
+  for (let i = 0; i < 5; i++) mix[i] /= dmgTotal;
+  for (const v of ALL_VARIANTS) variants[v] /= total;
+  return { mix, variants, pressure: pressure / total };
+}
+
+const BASE_PRESSURE = rawThreat({ typeWeights: {}, elementWeights: {} }).pressure;
+
+export function themeThreat(theme: ThemeDef): ThemeThreat {
+  const t = rawThreat(theme);
+  return { ...t, pressure: t.pressure / BASE_PRESSURE };
+}
+
+/** What a map's affixes do to the monsters, in a form the threat model can use. */
+export function affixThreat(affixes: string[]): {
+  life: number;
+  damage: number;
+  chaosGain: number;
+  cannotEvade: boolean;
+} {
+  let life = 1;
+  let damage = 1;
+  let chaosGain = 0;
+  let cannotEvade = false;
+  for (const id of affixes)
+    for (const m of mapAffixDef(id).monsterMods ?? []) {
+      if (m.stat === 'life' && m.kind === 'more') life *= 1 + m.value / 100;
+      if (m.stat === 'damage' && m.kind === 'more') damage *= 1 + m.value / 100;
+      if (m.stat === 'gain.physical.chaos') chaosGain += m.value / 100;
+      if (m.stat === 'alwaysHit') cannotEvade = true;
+    }
+  return { life, damage, chaosGain, cannotEvade };
+}
+
+/** A small value for what a theme and its affixes pay out, as a fraction of a normal map's rewards. */
+export function themeReward(theme: ThemeDef, affixes: string[] = []): number {
+  let r =
+    0.5 * theme.itemQuantity +
+    0.3 * (theme.rareWeightMult - 1) +
+    0.6 * (theme.xpMult - 1) +
+    0.05 * theme.extraRarePacks +
+    0.03 * theme.extraChests +
+    // Extra essences and currency are worth about a fifth and a tenth of the same share of item quantity.
+    0.2 * (theme.extraEssence ?? 0) +
+    0.1 * (theme.extraCurrency ?? 0) +
+    (theme.bonusCurrency ? 0.03 : 0);
+  for (const id of affixes) {
+    const a = mapAffixDef(id);
+    r += 0.5 * (a.reward.quantity ?? 0) + 0.3 * (a.reward.rarity ?? 0);
+    r += 0.05 * (a.extraRarePacks ?? 0);
+  }
+  return r;
+}
+
+export type ThemeScore = {
+  /** DPS against this theme's monsters, and effective HP against its damage mix. */
+  dps: number;
+  ehp: number;
+  pressure: number;
+  /** The number the bot ranks themes by: survival first, rewards as a tiebreaker. */
+  value: number;
+};
+
+/**
+ * How a character fares against a theme and its map affixes: DPS against the monsters it will meet,
+ * effective HP against the damage they deal, and how hard the monsters are to kill and to survive.
+ */
+export function scoreTheme(
+  ch: Character,
+  theme: ThemeDef,
+  mode: SteadyMode,
+  affixes: string[] = [],
+): ThemeScore {
+  const threat = themeThreat(theme);
+  const a = affixThreat(affixes);
+  // Affixes that change the player change the character itself.
+  const playerMods = affixes.flatMap((id) => mapAffixDef(id).playerMods ?? []);
+  const me = playerMods.length
+    ? new Character(ch.build, { ...ch.config, extraMods: [...ch.config.extraMods, ...playerMods] })
+    : ch;
+  const conds = me.steadyMask(mode);
+  const level = me.config.areaLevel;
+  let dps = 0;
+  for (const v of ALL_VARIANTS) {
+    if (threat.variants[v] <= 0) continue;
+    const def = buildMonster({
+      type: 'warrior',
+      variant: v,
+      rarity: 'normal',
+      level,
+      mods: [],
+      affix: affixes,
+    }).defence;
+    const s = me.skillSheet(me.primary, { def, shock: 0, resShift: [...NO_SHIFT] }, conds);
+    dps += threat.variants[v] * s.sustainedDps;
+  }
+  // The Hollow are ethereal (half physical damage taken) and evasive: a build is slower to kill them.
+  const hollow = typeShares(theme)
+    .filter(([id]) => MONSTER_TYPES[id].faction === 'hollow')
+    .reduce((n, [, share]) => n + share, 0);
+  if (hollow > 0) {
+    const against = (type: MonsterTypeId) =>
+      me.skillSheet(
+        me.primary,
+        {
+          def: buildMonster({
+            type,
+            variant: 'none',
+            rarity: 'normal',
+            level,
+            mods: [],
+            affix: affixes,
+          }).defence,
+          shock: 0,
+          resShift: [...NO_SHIFT],
+        },
+        conds,
+      ).sustainedDps;
+    const ratio = against('gloomstalker') / Math.max(1e-9, against('warrior'));
+    dps *= 1 - hollow + hollow * ratio;
+  }
+  const g = a.chaosGain;
+  const mix = g > 0 ? threat.mix.map((x, i) => (x + (i === 4 ? g : 0)) / (1 + g)) : threat.mix;
+  const defence = me.defence(conds);
+  const ehp = me.ehp(a.cannotEvade ? { ...defence, cannotEvade: true } : defence, mix);
+  // Corpse raising, ground clouds and blinking add to what the plain numbers say.
+  const mechanics = typeShares(theme).reduce(
+    (n, [id, share]) => n + share * (FACTION_PRESSURE[MONSTER_TYPES[id].faction] - 1),
+    1,
+  );
+  const pressure = threat.pressure * mechanics * a.life * a.damage * (1 + g);
+  const value = ((Math.max(0.1, dps) * ehp) / pressure) * (1 + themeReward(theme, affixes));
+  return { dps, ehp, pressure, value };
+}
+
+/** A map with nothing special, to compare others against. */
+const NEUTRAL: ThemeDef = {
+  id: 'neutral',
+  name: 'Neutral',
+  elementWeights: {},
+  typeWeights: {},
+  itemQuantity: 0,
+  rareWeightMult: 1,
+  xpMult: 1,
+  extraRarePacks: 0,
+  extraChests: 0,
+  bonusText: '',
+  floor: 0,
+  wall: 0,
+};
+
+/** The threat preview of EXPANSION section 9: your DPS and effective HP on a map, against a plain one. */
+export function threatPreview(
+  ch: Character,
+  theme: ThemeDef,
+  mode: SteadyMode,
+  affixes: string[] = [],
+): { dps: number; ehp: number } {
+  const base = scoreTheme(ch, NEUTRAL, mode, []);
+  const here = scoreTheme(ch, theme, mode, affixes);
+  const a = affixThreat(affixes);
+  // Tougher monsters take longer to kill, and harder-hitting ones take more of your life per hit.
+  return {
+    dps: here.dps / Math.max(1e-9, base.dps) / a.life,
+    // Gained chaos damage is extra damage on top of what the monsters already deal.
+    ehp: here.ehp / Math.max(1e-9, base.ehp) / (a.damage * (1 + a.chaosGain)),
+  };
+}

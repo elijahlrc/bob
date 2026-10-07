@@ -1,19 +1,56 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { Character } from '../calc/character';
 import { classDef } from '../data/classes';
+import { mapAffixDef, rewardText } from '../data/mapAffixes';
 import { themeDef } from '../data/themes';
+import { offersFor } from '../run/preview';
 import { xpToNext } from '../data/xpTable';
 import { resistPenaltyForMap } from '../gen/mapPlan';
 import type { Controller } from '../run/controller';
-import { passivePoints } from '../run/run';
+import { chalkAdd, chalkOptions, chalkRemove } from '../run/craft';
+import { affixesFor, passivePoints } from '../run/run';
 import { Items } from './Items';
 import { Reward } from './Reward';
 import { Sheet } from './Sheet';
+import { Workbench } from './Workbench';
 import { Skills } from './Skills';
 import { TreeView } from './TreeView';
 
 const COUNTDOWN = 2;
-type Tab = 'tree' | 'sheet' | 'skills' | 'items';
+type Tab = 'tree' | 'sheet' | 'skills' | 'items' | 'workbench';
+
+/** Wayfinder's Chalk on an offered map: add one of three affixes, or remove one (EXPANSION 8.2). */
+function Chalk({ c, offer }: { c: Controller; offer: number }) {
+  const run = c.run!;
+  const have = affixesFor(run, run.nextThemes[offer]);
+  const chalk = run.currency.chalk ?? 0;
+  return (
+    <div class="chalk">
+      <div class="muted">Wayfinder's Chalk × {chalk}</div>
+      {chalkOptions(run, offer).map((id) => (
+        <button
+          key={id}
+          class="btn small"
+          title={`Add: ${mapAffixDef(id).text} (${rewardText(mapAffixDef(id))})`}
+          onClick={() => c.craft((r) => chalkAdd(r, offer, id))}
+        >
+          + {mapAffixDef(id).name}
+        </button>
+      ))}
+      {chalk >= 2 &&
+        have.map((id) => (
+          <button
+            key={id}
+            class="btn small danger"
+            title={`Remove: ${mapAffixDef(id).text} (costs 2)`}
+            onClick={() => c.craft((r) => chalkRemove(r, offer, id))}
+          >
+            − {mapAffixDef(id).name}
+          </button>
+        ))}
+    </div>
+  );
+}
 
 export function Camp({ c }: { c: Controller }) {
   const run = c.run;
@@ -84,12 +121,19 @@ export function Camp({ c }: { c: Controller }) {
           <button class={'tab' + (tab === 'skills' ? ' on' : '')} onClick={() => setTab('skills')}>
             Skills
           </button>
+          <button
+            class={'tab' + (tab === 'workbench' ? ' on' : '')}
+            onClick={() => setTab('workbench')}
+          >
+            Workbench{run.pendingCraft ? ' (pick a result)' : ''}
+          </button>
         </div>
         <div class="tab-body">
           {tab === 'tree' && <TreeView c={c} />}
           {tab === 'sheet' && <Sheet s={sheet} />}
           {tab === 'skills' && <Skills c={c} ch={ch} />}
           {tab === 'items' && <Items c={c} />}
+          {tab === 'workbench' && <Workbench c={c} />}
         </div>
       </div>
       <div class="camp-side">
@@ -116,13 +160,27 @@ export function Camp({ c }: { c: Controller }) {
           </div>
         )}
         <div class="theme-choice">
-          {run.nextThemes.map((id, i) => {
-            const t = themeDef(id);
+          {offersFor(run).map((o, i) => {
+            const t = themeDef(o.themeId);
             return (
-              <button key={id} class="btn theme" onClick={() => c.startMap(i)}>
-                <div class="theme-name">{t.name}</div>
-                <div class="muted">{t.bonusText}</div>
-              </button>
+              <div key={o.themeId} class="theme-wrap">
+                <button class="btn theme" onClick={() => c.startMap(i)}>
+                  <div class="theme-name">{t.name}</div>
+                  <div class="muted">{t.bonusText}</div>
+                  {o.affixes.map((id) => {
+                    const a = mapAffixDef(id);
+                    return (
+                      <div key={id} class="affix">
+                        {a.text} <span class="muted">({rewardText(a)})</span>
+                      </div>
+                    );
+                  })}
+                  <div class="threat">
+                    For you: DPS ×{o.dps.toFixed(2)} · effective HP ×{o.ehp.toFixed(2)}
+                  </div>
+                </button>
+                {(run.currency.chalk ?? 0) > 0 && <Chalk c={c} offer={i} />}
+              </div>
             );
           })}
         </div>

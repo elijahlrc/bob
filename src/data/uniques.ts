@@ -1,4 +1,9 @@
-import type { DamageType, ModKind, SkillTag } from '../mods/types';
+import type { CondId, DamageType, ModKind, SkillTag } from '../mods/types';
+import type { Attrs } from './types';
+import type { TriggerDef } from './triggers';
+import { WAVE1_UNIQUES } from './uniquesWave1';
+import { WAVE2_UNIQUES } from './uniquesWave2';
+import { WAVE3_UNIQUES } from './uniquesWave3';
 
 /**
  * Unique items (DESIGN.md §11.7). Every name, flavour line and number is ours. `level` is the
@@ -12,7 +17,9 @@ export type UniqueMod = {
   damageTypes?: DamageType[];
   tags?: SkillTag[];
   local?: boolean;
-  condition?: { id: 'targetStunned' | 'onLowLife' | 'onFullLife' | 'killedRecently' };
+  condition?: { id: CondId; not?: boolean };
+  /** value × floor(stat / div), like a mod's `per`. */
+  per?: { stat: string; div: number };
 };
 
 export type UniqueDef = {
@@ -20,9 +27,17 @@ export type UniqueDef = {
   name: string;
   baseId: string;
   level: number;
+  /** Attributes needed beyond the base's (a unique may ask for more). */
+  req?: Partial<Attrs>;
   /** Fixed socket count override (default: rolled). */
   sockets?: number;
   mods: UniqueMod[];
+  /** Triggers the item carries (EXPANSION 5.5). */
+  triggers?: TriggerDef[];
+  /** Factions whose maps drop this unique more often (four times the weight). */
+  factions?: string[];
+  /** Authoring notes, never shown to players (EXPANSION 6.1 rule 3). */
+  notes?: { pairsWith: string[]; weakAgainst: string[] };
   flavour: string;
 };
 
@@ -402,6 +417,9 @@ export const UNIQUES: UniqueDef[] = [
     ],
     flavour: 'Spend it well.',
   },
+  ...WAVE1_UNIQUES,
+  ...WAVE2_UNIQUES,
+  ...WAVE3_UNIQUES,
 ];
 
 export function uniqueDef(id: string): UniqueDef {

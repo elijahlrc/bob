@@ -1,3 +1,6 @@
+import { CHARGE_KINDS, CHARGE_NAMES } from '../calc/charges';
+import { HEX_IDS, HEXES } from './hexes';
+import { KEYSTONES } from './tree/keystones';
 /**
  * Per-stat text templates (DESIGN.md §7.1). Text is always generated from structured mods; it is
  * never parsed back. `name` is used with increased/more/base phrasing; `pct` marks stats whose
@@ -153,6 +156,13 @@ export const CONDITION_TEXT: Record<string, string> = {
   stunnedRecently: 'if you have Stunned an Enemy Recently',
   overloadActive: 'after a recent Critical Strike',
   blockedRecently: 'if you have Blocked Recently',
+  beenHitRecently: 'if you have been Hit Recently',
+  leeching: 'while Leeching',
+  esFull: 'while Energy Shield is full',
+  targetLowLife: 'against Enemies on Low Life',
+  onLowMana: 'while on Low Mana',
+  targetCursed: 'against Hexed Enemies',
+  cursed: 'while Hexed',
 };
 
 export const TAG_TEXT: Record<string, string> = {
@@ -194,3 +204,89 @@ export const PER_TEXT: Record<string, string> = {
   int: 'Intelligence',
   level: 'Level',
 };
+
+// ---- Stats added by the depth expansion (EXPANSION 5.3) ---------------------------------------
+
+const TYPE_LABEL: Record<string, string> = {
+  physical: 'Physical',
+  lightning: 'Lightning',
+  cold: 'Cold',
+  fire: 'Fire',
+  chaos: 'Chaos',
+};
+
+Object.assign(STAT_TEXT, {
+  chaosNotBypassEs: { flag: 'Chaos Damage does not bypass Energy Shield' },
+  minDamage: { name: 'minimum Damage' },
+  maxDamage: { name: 'maximum Damage' },
+  instantLeechOnCrit: { flag: 'Leech from Critical Strikes is instant' },
+  cannotBeLeechedFrom: { flag: 'Cannot be Leeched from' },
+  immuneAilments: { flag: 'Immune to Ailments' },
+  unaffectedByShock: { flag: 'Unaffected by Shock' },
+  noElementalDamage: { flag: 'Deal no Elemental Damage' },
+  noPhysicalDamage: { flag: 'Deal no Physical Damage' },
+  spellIncAppliesToAttacks: {
+    flag: 'Increases and reductions to Spell Damage also apply to Attacks',
+  },
+  'rule.noOtherRing': { flag: 'You cannot equip another Ring' },
+  'rule.socketedGemsUseLife': {
+    flag: 'Socketed Gems cost and reserve Life instead of Mana',
+  },
+  socketedReducedReservation: { base: '{v}% reduced Reservation of Socketed Gems' },
+  manaOnHit: { base: 'Gain {v} Mana per Enemy Hit' },
+  curseEffectOnSelf: { name: 'effect of Curses on you' },
+  'ignite.extra': { base: 'You can inflict {v} additional Ignite on an enemy' },
+  'ignite.speed': { name: 'speed at which Ignites deal their damage' },
+  'flask.lifeToEs': {
+    flag: 'On use, removes all but 1 Life; the removed Life returns as Energy Shield over 2 seconds',
+  },
+} satisfies Record<string, StatText>);
+
+for (const t of ['lightning', 'cold', 'fire', 'chaos']) {
+  const label = TYPE_LABEL[t];
+  STAT_TEXT[`physTakenAs.${t}`] = {
+    base: `{v}% of Physical Damage from Hits taken as ${label} Damage`,
+  };
+  STAT_TEXT[`immune.${t}`] = { flag: `Immune to ${label} Damage and its Ailments` };
+  for (const [stat, ailment] of [
+    ['canIgnite', 'Ignite'],
+    ['canShock', 'Shock'],
+    ['canChill', 'Chill'],
+    ['canFreeze', 'Freeze'],
+  ])
+    STAT_TEXT[`${stat}.${t}`] = { flag: `Your ${label} Damage can ${ailment}` };
+}
+for (const t of ['physical', 'lightning', 'cold', 'fire', 'chaos'])
+  STAT_TEXT[`damageTaken.${t}`] = { name: `${TYPE_LABEL[t]} Damage taken` };
+Object.assign(STAT_TEXT, {
+  curseEffect: { name: 'effect of your Hexes' },
+  repeats: { base: 'Skill repeats {v} additional time' },
+  trophyMods: {
+    flag: 'When you kill a Rare monster, you gain its monster mods for 20 seconds',
+  },
+  hexLimit: { base: 'You can apply {v} additional Hex' },
+} satisfies Record<string, StatText>);
+for (const k of CHARGE_KINDS) {
+  const name = CHARGE_NAMES[k];
+  STAT_TEXT[`maxCharges.${k}`] = { base: `{v} to Maximum ${name} Charges` };
+  STAT_TEXT[`chargeOn.kill.${k}`] = { base: `{v}% chance to gain a ${name} Charge on Kill` };
+  STAT_TEXT[`chargeOn.block.${k}`] = {
+    base: `{v}% chance to gain a ${name} Charge when you Block`,
+  };
+  STAT_TEXT[`chargeOn.crit.${k}`] = {
+    base: `{v}% chance to gain a ${name} Charge on Critical Strike`,
+  };
+  STAT_TEXT[`chargeOn.hit.${k}`] = { base: `{v}% chance to gain a ${name} Charge on Hit` };
+}
+for (const id of HEX_IDS)
+  STAT_TEXT[`hexOnHit.${id}`] = { base: `Hexes Enemies you Hit with level {v} ${HEXES[id].name}` };
+for (const k of KEYSTONES) STAT_TEXT[`grantsKeystone.${k.id}`] = { flag: `Grants ${k.name}` };
+for (const t of ['physical', 'lightning', 'cold', 'fire'])
+  for (const a of ['canIgnite', 'canShock', 'canChill', 'canFreeze'])
+    STAT_TEXT[`${a}.${t}`] ??= {
+      flag: `Your ${TYPE_LABEL[t]} Damage can ${a.slice(3)}`,
+    };
+
+TAG_TEXT.unarmed = 'while Unarmed';
+TAG_TEXT.triggered = 'with Triggered Skills';
+TAG_TEXT.aura = 'with Auras';

@@ -25,6 +25,41 @@ export class Grid {
     this.parent = new Int32Array(n);
     this.flowDist = new Int16Array(n);
     this.flowStamp = new Uint32Array(n);
+    this.openTiles = new Uint8Array(n);
+    this.refreshOpen();
+  }
+
+  /** Tiles with floor on all eight sides: a circle up to one tile wide centred on one cannot touch a wall. */
+  private openTiles: Uint8Array;
+
+  /** Recompute which tiles are open (call after changing `tiles`). */
+  refreshOpen(): void {
+    const { w, h, tiles } = this;
+    this.openTiles.fill(0);
+    for (let y = 1; y < h - 1; y++)
+      for (let x = 1; x < w - 1; x++) {
+        const i = y * w + x;
+        if (
+          tiles[i - w - 1] === FLOOR &&
+          tiles[i - w] === FLOOR &&
+          tiles[i - w + 1] === FLOOR &&
+          tiles[i - 1] === FLOOR &&
+          tiles[i] === FLOOR &&
+          tiles[i + 1] === FLOOR &&
+          tiles[i + w - 1] === FLOOR &&
+          tiles[i + w] === FLOOR &&
+          tiles[i + w + 1] === FLOOR
+        )
+          this.openTiles[i] = 1;
+      }
+  }
+
+  /** Whether a circle of radius one tile or less centred here is clear of every wall (a fast check). */
+  clear(x: number, y: number): boolean {
+    const tx = Math.floor(x);
+    const ty = Math.floor(y);
+    if (tx < 1 || ty < 1 || tx >= this.w - 1 || ty >= this.h - 1) return false;
+    return this.openTiles[ty * this.w + tx] === 1;
   }
 
   isFloor(x: number, y: number): boolean {
@@ -217,6 +252,7 @@ export class Grid {
   /** Push a circle out of wall tiles. Returns the corrected position. */
   collide(x: number, y: number, r: number): { x: number; y: number } {
     for (let pass = 0; pass < 2; pass++) {
+      let pushed = false;
       const x0 = Math.floor(x - r);
       const x1 = Math.floor(x + r);
       const y0 = Math.floor(y - r);
@@ -230,6 +266,7 @@ export class Grid {
           const dy = y - cy;
           const d2 = dx * dx + dy * dy;
           if (d2 >= r * r) continue;
+          pushed = true;
           if (d2 > 1e-9) {
             const d = Math.sqrt(d2);
             x = cx + (dx / d) * r;
@@ -242,6 +279,8 @@ export class Grid {
             else y = oy > 0 ? ty + 1 + r : ty - r;
           }
         }
+      // Nothing was pushed: a second pass would find the same.
+      if (!pushed) break;
     }
     return { x, y };
   }
