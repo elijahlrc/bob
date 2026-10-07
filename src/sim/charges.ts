@@ -10,7 +10,15 @@ import {
 import { mapAffixDef } from '../data/mapAffixes';
 import { TROPHY_MODS, TROPHY_SECONDS, trophyMods } from '../data/trophy';
 import { refreshPlayerDefence } from './combat';
+import type { Mod } from '../mods/types';
 import type { World } from './types';
+
+/** The sum of the base mods of one stat in a short list (what a skill and its supports give). */
+export function sumOf(mods: readonly Mod[], stat: string): number {
+  let s = 0;
+  for (const m of mods) if (m.stat === stat && m.kind === 'base') s += m.value;
+  return s;
+}
 
 /**
  * Charges in the sim (EXPANSION 5.6). The player holds up to the character's maximum of each kind. Gaining
@@ -75,9 +83,10 @@ export function gainCharge(w: World, kind: ChargeKind): void {
 }
 
 /** Roll the chance of gaining each kind of charge on an event (a kill, a block, a critical strike). */
-export function rollCharges(w: World, event: ChargeEvent): void {
+export function rollCharges(w: World, event: ChargeEvent, extra: readonly Mod[] = []): void {
   for (const kind of CHARGE_KINDS) {
-    const chance = w.char.db.sum('base', chargeStat(event, kind));
+    const chance =
+      w.char.db.sum('base', chargeStat(event, kind)) + sumOf(extra, chargeStat(event, kind));
     if (chance > 0 && w.rngTrig.chance(Math.min(1, chance / 100))) gainCharge(w, kind);
   }
 }

@@ -1,0 +1,47 @@
+[
+  { "ref": "Deadly Ailments Support", "note": "More damage from ailments, less from the hit itself.",
+    "def": { "kind": "support", "id": "lingeringCruelty", "name": "Lingering Cruelty", "attr": "dex", "supports": [], "costMult": 1.3, "mods": [
+      { "stat": "damage", "kind": "more", "value": [45, 64], "tags": ["dot"] },
+      { "stat": "damage", "kind": "more", "value": -10, "tags": ["hit"] } ],
+      "description": "More damage over time from ailments, but less damage from hits." } },
+  { "ref": "Decay Support", "note": "Hits inflict a long poison-like damage over time (modelled as a certain, long poison).",
+    "def": { "kind": "support", "id": "slowRot", "name": "Slow Rot", "attr": "int", "supports": [], "costMult": 1.3, "mods": [
+      { "stat": "chance.poison", "kind": "base", "value": 100 },
+      { "stat": "duration.poison", "kind": "inc", "value": 400 } ],
+      "description": "Hits always poison, and the poison lasts much longer." } },
+  { "ref": "Efficacy Support", "note": "More spell damage and more damage over time.",
+    "def": { "kind": "support", "id": "patientPower", "name": "Patient Power", "attr": "int", "supports": [], "costMult": 1.3, "mods": [
+      { "stat": "damage", "kind": "more", "value": [10, 20], "tags": ["spell"] },
+      { "stat": "damage", "kind": "more", "value": [15, 24], "tags": ["dot"] } ],
+      "description": "More damage from spells and from damage over time." } },
+  { "ref": "Elemental Damage with Attacks Support", "note": "More elemental damage with attacks.",
+    "def": { "kind": "support", "id": "elementalEdge", "name": "Elemental Edge", "attr": "str", "supports": ["attack"], "costMult": 1.4, "mods": [
+      { "stat": "damage", "kind": "more", "value": [35, 54], "damageTypes": ["fire", "cold", "lightning"] } ],
+      "description": "More elemental damage with attacks." } },
+  { "ref": "Faster Projectiles Support", "note": "Faster projectiles that also deal more projectile damage.",
+    "def": { "kind": "support", "id": "swiftFlight", "name": "Swift Flight", "attr": "dex", "supports": ["projectile"], "costMult": 1.1, "mods": [
+      { "stat": "projectileSpeed", "kind": "inc", "value": [50, 69] },
+      { "stat": "damage", "kind": "inc", "value": [20, 29], "tags": ["projectile"] } ],
+      "description": "Increased projectile speed and projectile damage." } },
+  { "ref": "Fire Penetration Support", "note": "The supported skill's hits penetrate fire resistance.",
+    "def": { "kind": "support", "id": "ashbreaker", "name": "Ashbreaker", "attr": "str", "supports": [], "costMult": 1.4, "mods": [
+      { "stat": "penetration", "kind": "base", "value": [18, 37], "damageTypes": ["fire"] } ],
+      "description": "Hits penetrate enemy fire resistance." } },
+  { "ref": "Fortify Support", "note": "Melee hits fortify the character, and the supported skill deals more melee damage.",
+    "def": { "kind": "support", "id": "bulwarkStrikes", "name": "Bulwark Strikes", "attr": "str", "supports": ["melee"], "costMult": 1.3, "mods": [
+      { "stat": "damage", "kind": "more", "value": [20, 34], "tags": ["melee"] },
+      { "stat": "buffOn.meleeHit.fortify", "kind": "base", "value": 100 } ],
+      "description": "More melee damage, and melee hits make you Fortified." } },
+  { "ref": "Arcane Surge Support", "note": "Casting the supported spell grants Arcane Tide, a short buff of spell damage, cast speed and mana regeneration (the mana-spent threshold is dropped).",
+    "def": { "kind": "support", "id": "tideGathering", "name": "Tide Gathering", "attr": "int", "supports": ["spell"], "excludes": ["totem", "trap", "mine", "triggered"], "costMult": 1.3, "mods": [
+      { "stat": "buffOn.cast.arcaneSurge", "kind": "base", "value": 100 } ],
+      "description": "Casting the supported spell grants Arcane Tide." } },
+  { "ref": "Endurance Charge on Melee Stun Support", "note": "Stunning with the supported melee skill grants a Grit charge.",
+    "def": { "kind": "support", "id": "staggerResolve", "name": "Stagger Resolve", "attr": "str", "supports": ["melee"], "costMult": 1.1, "mods": [
+      { "stat": "enemyStunThreshold", "kind": "base", "value": [0, 19] },
+      { "stat": "chargeOn.stun.grit", "kind": "base", "value": 100 } ],
+      "description": "Melee stuns are easier and grant a Grit charge." } },
+  { "ref": "Empower Support", "note": "Raises the level of the supported skill.",
+    "def": { "kind": "support", "id": "exaltedFocus", "name": "Exalted Focus", "attr": "str", "supports": [], "costMult": 1.25, "levelBonus": [0, 9], "mods": [],
+      "description": "Raises the level of the supported skill." } }
+]

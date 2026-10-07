@@ -432,3 +432,27 @@ Object.assign(STAT_TEXT, {
 Object.assign(STAT_TEXT, {
   noChaosDamage: { flag: 'Deals no Chaos Damage' },
 } satisfies Record<string, StatText>);
+
+// Events added with the skill-scoped gains: a stun, the start of a spell.
+const MORE_EVENTS: Record<string, string> = {
+  stun: 'when you Stun an Enemy',
+  cast: 'when you Cast a Spell',
+  meleeHit: 'on Melee Hit',
+};
+for (const [event, phrase] of Object.entries(MORE_EVENTS)) {
+  for (const id of BUFF_IDS)
+    STAT_TEXT[`buffOn.${event}.${id}`] ??= {
+      base: `{v}% chance to gain ${BUFFS[id].name} ${phrase}`,
+    };
+  STAT_TEXT[`rageOn.${event}`] ??= { base: `Gain {v} Rage ${phrase}` };
+  for (const k of CHARGE_KINDS)
+    STAT_TEXT[`chargeOn.${event}.${k}`] ??= {
+      base: `{v}% chance to gain a ${CHARGE_NAMES[k]} Charge ${phrase}`,
+    };
+  for (const [pool, label] of Object.entries({ life: 'Life', mana: 'Mana', es: 'Energy Shield' })) {
+    STAT_TEXT[`recover.${event}.${pool}`] ??= { base: `Gain {v} ${label} ${phrase}` };
+    STAT_TEXT[`recoverPct.${event}.${pool}`] ??= {
+      base: `Recover {v}% of maximum ${label} ${phrase}`,
+    };
+  }
+}

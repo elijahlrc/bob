@@ -41,7 +41,13 @@ import { classDef } from '../data/classes';
 import { BASE_HEX_LIMIT, HEX_IDS, hexEffect, type HexId } from '../data/hexes';
 import type { TriggerDef } from '../data/triggers';
 import { itemBase, isWeaponClass } from '../data/bases';
-import { gemDef, type AuraGemDef, type GemDef, type SupportGemDef } from '../data/gems';
+import {
+  MAX_GEM_LEVEL,
+  gemDef,
+  type AuraGemDef,
+  type GemDef,
+  type SupportGemDef,
+} from '../data/gems';
 import { resolveSupports, typesAllow } from '../data/skillTypes';
 import { getTree } from '../data/tree';
 import { KEYSTONES } from '../data/tree/keystones';
@@ -253,6 +259,7 @@ export type CharacterSheet = {
 export const SECONDARY_COOLDOWN_USES = 6;
 export const SECONDARY_MIN_COOLDOWN = 3;
 
+const GAIN_STAT = /^(buffOn|chargeOn|rageOn|recover|recoverPct)\./;
 const DUAL_TAGS: SkillTag[] = ['dualWield'];
 const SHIELD_TAGS: SkillTag[] = ['shield'];
 
@@ -412,6 +419,17 @@ export class Character {
       if (k && !have.has(k.name))
         for (const m of k.mods) mods.push({ ...m, source: { kind: 'item', id: `keystone.${id}` } });
     }
+    // A socketed gem can be a source of charges, buffs, rage or recovery too (a support that grants them to its skill).
+    const gemSources: Mod[] = [];
+    for (const slot of EQUIP_SLOTS)
+      for (const g of build.equipment[slot]?.sockets ?? []) {
+        if (!g) continue;
+        const gd = gemDef(g.gemId);
+        if ('mods' in gd)
+          for (const m of gd.mods)
+            if (GAIN_STAT.test(m.stat)) gemSources.push({ ...m, value: levelValue(m.value, 20) });
+      }
+    const withGems = () => [...mods, ...gemSources];
     // Charges (EXPANSION 5.6): the count the sim reports, or the maximum where something can grant one.
     const held = noCharges();
     const cap = noCharges();
@@ -419,26 +437,26 @@ export class Character {
       cap[k] = maxChargesOf(mods, k);
       held[k] = Math.min(
         cap[k],
-        this.config.charges ? this.config.charges[k] : hasChargeSource(mods, k) ? cap[k] : 0,
+        this.config.charges ? this.config.charges[k] : hasChargeSource(withGems(), k) ? cap[k] : 0,
       );
       mods.push(...chargeMods(k, held[k]));
     }
     this.charges = held;
     this.chargeMax = cap;
     this.chargeSource = {
-      grit: hasChargeSource(mods, 'grit'),
-      fervour: hasChargeSource(mods, 'fervour'),
-      insight: hasChargeSource(mods, 'insight'),
+      grit: hasChargeSource(withGems(), 'grit'),
+      fervour: hasChargeSource(withGems(), 'fervour'),
+      insight: hasChargeSource(withGems(), 'insight'),
     };
     // Buffs: their effects wait behind a condition, so they are only added when something can grant them.
     this.buffSource = { fortify: false, onslaught: false, unholyMight: false, arcaneSurge: false };
     for (const id of BUFF_IDS) {
-      this.buffSource[id] = hasBuffSource(mods, id);
+      this.buffSource[id] = hasBuffSource(withGems(), id);
       if (this.buffSource[id]) mods.push(...BUFFS[id].mods);
     }
-    this.rageSource = hasRageSource(mods);
+    this.rageSource = hasRageSource(withGems());
     this.anyGain =
-      this.rageSource || hasRecoverSource(mods) || BUFF_IDS.some((id) => this.buffSource[id]);
+      this.rageSource || hasRecoverSource(withGems()) || BUFF_IDS.some((id) => this.buffSource[id]);
     this.rageMax =
       BASE_MAX_RAGE + mods.reduce((n, m) => (m.stat === 'maxRage' ? n + m.value : n), 0);
     this.defaultDyn = this.rageSource ? ASSUMED_RAGE << DYN_SHIFT : 0;
@@ -513,9 +531,7 @@ export class Character {
       costLifeAll || itemHasRule(build.equipment[slot]!, 'socketedGemsUseLife');
     for (const sg of this.gems) {
       if (sg.def.kind !== 'active') continue;
-      const skill = resolveActive(sg.def, sg.level);
-      if (skill.behaviour.kind === 'melee' && skill.behaviour.range2h && weaponTags.has('twoHand'))
-        skill.behaviour = { ...skill.behaviour, range: skill.behaviour.range2h };
+      let skill = resolveActive(sg.def, sg.level);
       // Supports can add types (a totem support makes the skill a totem), which change what the others may do.
       const linked = this.gems.filter((o) => o.slot === sg.slot && o.def.kind === 'support');
       const resolved = resolveSupports(
@@ -523,6 +539,15 @@ export class Character {
         linked.map((o) => ({ ...(o.def as SupportGemDef), gem: o })),
       );
       const supports = resolved.applied.map((r) => r.gem);
+      // A support can raise the level of the skill it supports.
+      const levelBonus = supports.reduce((n, s) => {
+        const lb = (s.def as SupportGemDef).levelBonus;
+        return lb === undefined ? n : n + Math.round(levelValue(lb, s.level));
+      }, 0);
+      if (levelBonus > 0)
+        skill = resolveActive(sg.def, Math.min(MAX_GEM_LEVEL, sg.level + levelBonus));
+      if (skill.behaviour.kind === 'melee' && skill.behaviour.range2h && weaponTags.has('twoHand'))
+        skill.behaviour = { ...skill.behaviour, range: skill.behaviour.range2h };
       const addedTags = [...resolved.types].filter(
         (t): t is SkillTag =>
           (SKILL_TAGS as readonly string[]).includes(t) && !skill.tags.includes(t as SkillTag),
@@ -804,6 +829,8 @@ export class Character {
       conds: c,
       statValue: this.statValue,
     });
+    // What the skill and its supports give on events (charges, buffs, rage, recovery): rolled when the skill hits.
+    p.gains = [...choice.skill.mods, ...supportMods].filter((m) => GAIN_STAT.test(m.stat));
     this.profiles.set(k, p);
     return p;
   }

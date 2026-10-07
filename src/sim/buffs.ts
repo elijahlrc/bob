@@ -11,6 +11,8 @@ import {
   type BuffEvent,
   type BuffId,
 } from '../data/buffs';
+import type { Mod } from '../mods/types';
+import { sumOf } from './charges';
 import { lifeCap } from './combat';
 import type { World } from './types';
 
@@ -35,18 +37,21 @@ export function gainRage(w: World, points: number): void {
 }
 
 /** Roll the buffs and rage that an event can give (a kill, a hit landed or taken, a critical strike, a flask). */
-export function rollGains(w: World, event: BuffEvent): void {
+export function rollGains(w: World, event: BuffEvent, extra: readonly Mod[] = []): void {
   const ch = w.char;
   if (!ch.anyGain) return;
   for (const id of BUFF_IDS) {
     if (!ch.buffSource[id]) continue;
-    const chance = ch.db.sum('base', buffStat(event, id));
+    const chance = ch.db.sum('base', buffStat(event, id)) + sumOf(extra, buffStat(event, id));
     if (chance > 0 && w.rngTrig.chance(Math.min(1, chance / 100))) gainBuff(w, id);
   }
-  if (ch.rageSource) gainRage(w, ch.db.sum('base', rageStat(event)));
+  if (ch.rageSource)
+    gainRage(w, ch.db.sum('base', rageStat(event)) + sumOf(extra, rageStat(event)));
   for (const pool of RECOVER_POOLS) {
-    const flat = ch.db.sum('base', recoverStat(event, pool));
-    const pct = ch.db.sum('base', recoverPctStat(event, pool));
+    const flat =
+      ch.db.sum('base', recoverStat(event, pool)) + sumOf(extra, recoverStat(event, pool));
+    const pct =
+      ch.db.sum('base', recoverPctStat(event, pool)) + sumOf(extra, recoverPctStat(event, pool));
     if (flat === 0 && pct === 0) continue;
     const p = w.player;
     const max = pool === 'life' ? p.def.maxLife : pool === 'mana' ? p.def.maxMana : p.def.maxEs;

@@ -68,6 +68,8 @@ export const BUFFS: Record<BuffId, BuffDef> = {
 
 /** The events a buff can be gained on, and the stat id of the chance, in percent: `buffOn.<event>.<buff>`. */
 export const BUFF_EVENTS = [
+  'stun',
+  'cast',
   'kill',
   'hit',
   'meleeHit',

@@ -39,3 +39,29 @@ describe('gem levels from anywhere', () => {
     expect(levelOf(c, 'frostLance')).toBe(levelOf(plain, 'frostLance'));
   });
 });
+
+describe('supports that raise a level or grant things on events', () => {
+  it('Exalted Focus raises the level of the skill it supports', () => {
+    const plain = new Character(build(['crushingBlow'], [], 'vanguard'), { areaLevel: 40 });
+    const c = new Character(build(['crushingBlow', 'exaltedFocus'], [], 'vanguard'), {
+      areaLevel: 40,
+    });
+    expect(c.primary.skill.level).toBeGreaterThan(plain.primary.skill.level);
+    expect(c.primary.skill.level).toBeLessThanOrEqual(25);
+  });
+
+  it('a support that grants a buff or charge on an event makes the character a source of it', () => {
+    const c = new Character(build(['crushingBlow', 'bulwarkStrikes'], [], 'vanguard'), {
+      areaLevel: 40,
+    });
+    expect(c.buffSource.fortify).toBe(true);
+    expect(c.primary.supports.map((s) => s.def.id)).toContain('bulwarkStrikes');
+    expect(c.profile(c.primary).gains.map((m) => m.stat)).toContain('buffOn.meleeHit.fortify');
+    const plain = new Character(build(['crushingBlow'], [], 'vanguard'), { areaLevel: 40 });
+    expect(plain.buffSource.fortify).toBe(false);
+    const stagger = new Character(build(['crushingBlow', 'staggerResolve'], [], 'vanguard'), {
+      areaLevel: 40,
+    });
+    expect(stagger.chargeSource.grit).toBe(true);
+  });
+});

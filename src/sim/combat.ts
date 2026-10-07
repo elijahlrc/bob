@@ -261,15 +261,19 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   src.tHit = 0;
   dst.tBeenHit = 0;
   if (src.isPlayer) {
-    rollGains(w, 'hit');
-    if (p.skill.behaviour.kind === 'melee') rollGains(w, 'meleeHit');
+    rollGains(w, 'hit', p.gains);
+    rollCharges(w, 'hit', p.gains);
+    if (p.skill.behaviour.kind === 'melee') {
+      rollGains(w, 'meleeHit', p.gains);
+      rollCharges(w, 'meleeHit', p.gains);
+    }
   }
   if (dst.isPlayer) rollGains(w, 'hitTaken');
   if (res.crit) {
     src.tCrit = 0;
     if (src.isPlayer) {
-      rollCharges(w, 'crit');
-      rollGains(w, 'crit');
+      rollCharges(w, 'crit', p.gains);
+      rollGains(w, 'crit', p.gains);
     }
     if (p.overload) src.tOverload = 0;
   }
@@ -337,6 +341,10 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     dst.action = null;
     src.tStunEnemy = 0;
     w.events.push({ t: 'stun', dst: dst.id, dur: res.stun });
+    if (src.isPlayer) {
+      rollGains(w, 'stun', p.gains);
+      rollCharges(w, 'stun', p.gains);
+    }
   }
   afterHit();
 }

@@ -17,6 +17,7 @@ import {
   tagBit,
   tagMask,
   type DamageType,
+  type Mod,
   type SkillTag,
   type StatId,
   maskAnd,
@@ -112,6 +113,8 @@ export type SkillProfile = {
   instantLeechAlways: boolean;
   /** Extra reach of melee skills, in tiles. */
   rangeBonus: number;
+  /** Mods of the skill and its supports that give charges, buffs, rage or recovery on events (set by the Character). */
+  gains: Mod[];
   leechLife: number[];
   leechMana: number[];
   lifeOnHit: number;
@@ -412,6 +415,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     alwaysFreezeOnCrit: db.flag('alwaysFreezeOnCrit', baseCtx),
     instantLeechOnCrit: db.flag('instantLeechOnCrit', baseCtx),
     instantLeechAlways: db.flag('instantLeechAlways', baseCtx),
+    gains: [],
     rangeBonus: beh.kind === 'melee' ? db.sum('base', 'meleeRange', baseCtx) : 0,
     leechLife: perType('leech.life').map((v) => v * db.mult('leechRecovery', baseCtx)),
     leechMana: perType('leech.mana').map((v) => v * db.mult('leechRecovery', baseCtx)),

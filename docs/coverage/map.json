@@ -259,6 +259,56 @@
    "ref": "Close Combat Support",
    "status": "covered",
    "note": "More melee damage against nearby enemies (the buff on kill is dropped)."
+  },
+  "lingeringCruelty": {
+   "ref": "Deadly Ailments Support",
+   "status": "covered",
+   "note": "More damage from ailments, less from the hit itself."
+  },
+  "slowRot": {
+   "ref": "Decay Support",
+   "status": "covered",
+   "note": "Hits inflict a long poison-like damage over time (modelled as a certain, long poison)."
+  },
+  "patientPower": {
+   "ref": "Efficacy Support",
+   "status": "covered",
+   "note": "More spell damage and more damage over time."
+  },
+  "elementalEdge": {
+   "ref": "Elemental Damage with Attacks Support",
+   "status": "covered",
+   "note": "More elemental damage with attacks."
+  },
+  "swiftFlight": {
+   "ref": "Faster Projectiles Support",
+   "status": "covered",
+   "note": "Faster projectiles that also deal more projectile damage."
+  },
+  "ashbreaker": {
+   "ref": "Fire Penetration Support",
+   "status": "covered",
+   "note": "The supported skill's hits penetrate fire resistance."
+  },
+  "bulwarkStrikes": {
+   "ref": "Fortify Support",
+   "status": "covered",
+   "note": "Melee hits fortify the character, and the supported skill deals more melee damage."
+  },
+  "tideGathering": {
+   "ref": "Arcane Surge Support",
+   "status": "covered",
+   "note": "Casting the supported spell grants Arcane Tide, a short buff of spell damage, cast speed and mana regeneration (the mana-spent threshold is dropped)."
+  },
+  "staggerResolve": {
+   "ref": "Endurance Charge on Melee Stun Support",
+   "status": "covered",
+   "note": "Stunning with the supported melee skill grants a Grit charge."
+  },
+  "exaltedFocus": {
+   "ref": "Empower Support",
+   "status": "covered",
+   "note": "Raises the level of the supported skill."
   }
  },
  "uniques": {

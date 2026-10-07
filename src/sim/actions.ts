@@ -1,6 +1,8 @@
 import { angleDiff } from '../core/math';
 import { BLOCK_WINDOW, ECHO_GAP, HIT_AT, PROJECTILE_SPEED, SHOT_ALERT } from '../data/constants';
 import type { SkillProfile } from '../calc/skill';
+import { rollGains } from './buffs';
+import { rollCharges } from './charges';
 import { hit } from './combat';
 import { registerBlast, shieldBlocks, speedMult } from './factions';
 import { fireTriggers } from './triggers';
@@ -33,7 +35,11 @@ export function startAction(
   a.facing = Math.atan2(target.y - a.y, target.x - a.x);
   w.events.push({ t: 'use', src: a.id, skill: p.skill.id });
   if (a.isPlayer && p.isAttack) fireTriggers(w, { on: 'attack', target, tags: p.tagMask });
-  if (a.isPlayer && !p.isAttack) fireTriggers(w, { on: 'cast', target, tags: p.tagMask });
+  if (a.isPlayer && !p.isAttack) {
+    fireTriggers(w, { on: 'cast', target, tags: p.tagMask });
+    rollGains(w, 'cast', p.gains);
+    rollCharges(w, 'cast', p.gains);
+  }
   // Fighting is noisy: idle monsters nearby come running even if they have not seen the player.
   if (a.isPlayer)
     for (const m of w.actors)

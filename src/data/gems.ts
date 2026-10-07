@@ -99,6 +99,8 @@ export type SupportGemDef = {
   adds?: SkillType[];
   costMult: number;
   mods: GemMod[];
+  /** Raises the level of the skill it supports (Empower analog), by gem level. */
+  levelBonus?: LevelValue;
   /** Trigger supports: the linked spells are cast by this trigger instead of by the player. */
   trigger?: TriggerDef;
   /** Hexing Strikes: the hex gems in the same item are applied to enemies the supported skill hits. */
