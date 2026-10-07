@@ -7,6 +7,8 @@ import type { ArmourSlot, Attrs, DefenceType, ItemBase, ItemClass, WeaponClass }
 
 type WeaponClassDef = {
   cls: WeaponClass;
+  /** Base id prefix when the family shares a class with another (a rune dagger is a dagger); default the class. */
+  idPrefix?: string;
   hands: 1 | 2;
   crit: number;
   aps: number;
@@ -213,6 +215,64 @@ export const WEAPON_CLASS_DEFS: WeaponClassDef[] = [
       'Starcaller Staff',
     ],
   },
+  // Families inside an existing class (COVERAGE C2): they use the class's skills and slots.
+  {
+    cls: 'dagger',
+    idPrefix: 'runedagger',
+    hands: 1,
+    crit: 6,
+    aps: 1.3,
+    min: 3,
+    max: 7,
+    range: 1.2,
+    attrs: ['dex', 'int'],
+    tags: ['dagger', 'oneHand'],
+    implicit: (k) => [mod('damage', 'inc', t(k, 18, 38), { tags: ['spell'] })],
+    names: [
+      'Etched Bone Knife',
+      'Rune-cut Dirk',
+      'Glyph Kris',
+      'Sigil Stiletto',
+      'Cairn-script Blade',
+    ],
+  },
+  {
+    cls: 'sword',
+    idPrefix: 'thrust',
+    hands: 1,
+    crit: 5.5,
+    aps: 1.55,
+    min: 3,
+    max: 8,
+    range: 1.6,
+    attrs: ['dex'],
+    tags: ['sword', 'oneHand'],
+    implicit: (k) => [mod('accuracy', 'base', t(k, 30, 400), { local: true })],
+    names: ['Splinter Foil', 'Needle Rapier', 'Bone Estoc', 'Wardsteel Rapier', 'Starmetal Foil'],
+  },
+  {
+    cls: 'staff',
+    idPrefix: 'warstaff',
+    hands: 2,
+    crit: 6,
+    aps: 1.3,
+    min: 9,
+    max: 17,
+    range: 1.6,
+    attrs: ['str', 'dex'],
+    tags: ['staff', 'twoHand'],
+    implicit: (k) => [
+      mod('blockAttack', 'base', t(k, 12, 18)),
+      mod('damage', 'inc', t(k, 12, 30), { tags: ['melee'] }),
+    ],
+    names: [
+      "Brawler's Pole",
+      'Iron-shod Staff',
+      "Pilgrim's Warstaff",
+      'Grave-keeper Pike',
+      'Colossus Warstaff',
+    ],
+  },
   {
     cls: 'bow',
     hands: 2,
@@ -245,7 +305,7 @@ function weaponBases(): ItemBase[] {
         Math.pow(TIER_DAMAGE, tier) *
         (d.hands === 1 && d.cls !== 'wand' ? ONE_HAND_DAMAGE : d.cls === 'bow' ? 1.3 : 1);
       out.push({
-        id: `${d.cls}_${tier + 1}`,
+        id: `${d.idPrefix ?? d.cls}_${tier + 1}`,
         name,
         itemClass: d.cls,
         level,

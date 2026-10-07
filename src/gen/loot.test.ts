@@ -27,7 +27,7 @@ describe('item data (§11.2–11.3)', () => {
   it('has every base that can drop (unique-only bases are extra)', () => {
     const count = (p: (b: (typeof ITEM_BASES)[number]) => boolean) =>
       ITEM_BASES.filter((b) => !b.uniqueOnly && p(b)).length;
-    expect(count((b) => !!b.weapon)).toBe(60);
+    expect(count((b) => !!b.weapon)).toBe(75); // 12 classes of 5 tiers, plus rune daggers, thrusting swords and warstaffs
     expect(count((b) => ['helmet', 'gloves', 'boots', 'body'].includes(b.itemClass))).toBe(96);
     expect(count((b) => b.itemClass === 'shield')).toBe(12);
     expect(count((b) => b.itemClass === 'ring')).toBe(5);
