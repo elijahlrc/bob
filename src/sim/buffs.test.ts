@@ -4,7 +4,7 @@ import { Rng } from '../core/rng';
 import { RAGE_HOLD } from '../data/buffs';
 import type { Build } from '../data/types';
 import { makeGem, makeItem } from '../gen/items';
-import { condBit, mod, type Mod } from '../mods/types';
+import { mod, type Mod } from '../mods/types';
 import { newRun } from '../run/run';
 import { gainBuff, gainRage, rollGains, tickBuffs } from './buffs';
 import { applyHit, flaskMask, playerConds, refreshPlayerDefence, targetState } from './combat';
@@ -51,7 +51,7 @@ describe('buffs: conditions with timers (C2)', () => {
     expect(plain).toBe(1);
     rollGains(w, 'hit');
     expect(w.buffT.fortify).toBeCloseTo(4);
-    expect(playerConds(w, null) & condBit('fortified')).toBeGreaterThan(0);
+    expect(playerConds(w, null) & w.char.cond.peek('fortified')).toBeGreaterThan(0);
     refreshPlayerDefence(w);
     expect(p.def.hitTakenMult).toBeCloseTo(0.8);
     expect(p.def.damageTakenMult).toBe(1); // damage over time uses this one

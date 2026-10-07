@@ -10,7 +10,7 @@ import { WAVE1_UNIQUES } from '../data/uniquesWave1';
 import type { Build, EquipSlot, Item } from '../data/types';
 import { modsText } from '../mods/text';
 import { makeGem, makeItem } from './items';
-import { condBit } from '../mods/types';
+import { CONDITIONS } from '../mods/types';
 import { flaskSpec } from '../calc/flasks';
 import { newRun, rollRewards, type RunState } from '../run/run';
 import { slotsFor } from '../run/inventory';
@@ -412,7 +412,7 @@ describe('acquisition (EXPANSION 6.2 items 1–4)', () => {
   });
 
   it('flask conditions exist for the flask rules', () => {
-    expect(condBit('flaskActive')).toBeGreaterThan(0);
+    expect(CONDITIONS).toContain('flaskActive');
   });
 });
 

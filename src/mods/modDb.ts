@@ -1,5 +1,4 @@
 import {
-  condBit,
   dmgMask,
   tagMask,
   type CondId,
@@ -12,7 +11,48 @@ import {
   maskSubset,
 } from './types';
 
-/** Query context. Masks are precomputed bitsets (see `types.ts`). */
+/**
+ * The bit of each condition, local to one character (or one monster kind): only conditions some mod uses get a bit, so
+ * there can be any number of condition ids as long as one character uses at most 52. Every ModDB of a character shares its
+ * index, so a mask means the same thing in all of them. `peek` is 0 for a condition no mod uses: then nothing depends on
+ * it and the sim need not evaluate it.
+ */
+export class CondIndex {
+  readonly ids: CondId[] = [];
+  private index = new Map<CondId, number>();
+
+  /** The bit of a condition, registering it if it is new. */
+  bit(id: CondId): number {
+    let i = this.index.get(id);
+    if (i === undefined) {
+      i = this.ids.length;
+      if (i >= 52) throw new Error('more than 52 conditions in one character');
+      this.ids.push(id);
+      this.index.set(id, i);
+    }
+    return 2 ** i;
+  }
+
+  /** The bit of a condition some mod uses, or 0. */
+  peek(id: CondId): number {
+    const i = this.index.get(id);
+    return i === undefined ? 0 : 2 ** i;
+  }
+
+  /** Every registered bit. */
+  get all(): number {
+    return 2 ** this.ids.length - 1;
+  }
+
+  /** The bits of the conditions about the target, which damage over time ignores. */
+  targetMask(): number {
+    let m = 0;
+    for (const id of this.ids) if (id.startsWith('target')) m = maskOr(m, this.peek(id));
+    return m;
+  }
+}
+
+/** Query context. Masks are precomputed bitsets (see `types.ts`); condition masks use the ModDB's CondIndex. */
 export type ModCtx = {
   /** Skill tags of the current use (bitmask). */
   tags: number;
@@ -27,13 +67,15 @@ export type ModCtx = {
 export const EMPTY_CTX: ModCtx = { tags: 0, ancestry: 0, conds: 0 };
 
 export function makeCtx(opts: {
+  /** The condition index of the ModDB queried (`db.cond`); needed when `conds` is given. */
+  cond?: CondIndex;
   tags?: readonly SkillTag[];
   ancestry?: Parameters<typeof dmgMask>[0];
   conds?: readonly CondId[];
   statValue?: (stat: StatId) => number;
 }): ModCtx {
   let conds = 0;
-  for (const c of opts.conds ?? []) conds = maskOr(conds, condBit(c));
+  for (const c of opts.conds ?? []) conds = maskOr(conds, opts.cond?.peek(c) ?? 0);
   return {
     tags: tagMask(opts.tags),
     ancestry: dmgMask(opts.ancestry),
@@ -50,12 +92,12 @@ type Compiled = {
   condNot: boolean;
 };
 
-function compile(m: Mod): Compiled {
+function compile(m: Mod, cond: CondIndex): Compiled {
   return {
     mod: m,
     tagMask: tagMask(m.tags),
     dmgMask: dmgMask(m.damageTypes),
-    condMask: m.condition ? condBit(m.condition.id) : 0,
+    condMask: m.condition ? cond.bit(m.condition.id) : 0,
     condNot: m.condition?.not ?? false,
   };
 }
@@ -86,7 +128,10 @@ export class ModDB {
   private byStat = new Map<StatId, Compiled[]>();
   private all: Mod[] = [];
 
-  constructor(mods: readonly Mod[] = []) {
+  readonly cond: CondIndex;
+
+  constructor(mods: readonly Mod[] = [], cond: CondIndex = new CondIndex()) {
+    this.cond = cond;
     this.addAll(mods);
   }
 
@@ -94,7 +139,7 @@ export class ModDB {
     this.all.push(m);
     let list = this.byStat.get(m.stat);
     if (!list) this.byStat.set(m.stat, (list = []));
-    list.push(compile(m));
+    list.push(compile(m, this.cond));
   }
 
   addAll(mods: readonly Mod[]): void {

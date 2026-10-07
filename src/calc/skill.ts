@@ -21,8 +21,6 @@ import {
   type StatId,
   maskAnd,
   maskOr,
-  CONDITIONS,
-  condBit,
 } from '../mods/types';
 import type { SkillDef } from './gems';
 
@@ -151,11 +149,6 @@ export type ProfileInput = {
 };
 
 const DOT_TAGS = tagBit('dot');
-/** Conditions about the player, not the target: the only ones that reach damage over time. */
-const NOT_TARGET_CONDS = CONDITIONS.reduce(
-  (m, c) => (c.startsWith('target') ? m : maskOr(m, condBit(c))),
-  0,
-);
 
 function ctxOf(tags: number, conds: number, statValue: (s: StatId) => number, anc = 0): ModCtx {
   return { tags, ancestry: anc, conds, statValue };
@@ -270,7 +263,8 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     let hitMultAcc = 0;
     let hitW = 0;
     const ailChunks: AilChunk[] = [];
-    const ownConds = maskAnd(conds, NOT_TARGET_CONDS);
+    // Only conditions about the player reach damage over time.
+    const ownConds = maskAnd(conds, db.cond.all - db.cond.targetMask());
     const ak = (tag: SkillTag, anc: number) =>
       db.mult('damage', ctxOf(maskOr(DOT_TAGS, tagBit(tag)), ownConds, statValue, anc));
     for (const c of chunks) {

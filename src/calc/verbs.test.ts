@@ -3,7 +3,7 @@ import { getTree } from '../data/tree';
 import type { Build, Item } from '../data/types';
 import { makeFlask, makeGem, makeItem } from '../gen/items';
 import { ModDB } from '../mods/modDb';
-import { CONDITIONS, condBit, mod, type Mod } from '../mods/types';
+import { CONDITIONS, mod, type Mod } from '../mods/types';
 import { newRun } from '../run/run';
 import { dummyDefence } from '../sim/dummy';
 import { Character } from './character';
@@ -49,8 +49,7 @@ describe('new conditions (EXPANSION 5.2)', () => {
       'onLowMana',
     ] as const)
       expect(CONDITIONS).toContain(c);
-    expect(new Set(CONDITIONS.map(condBit)).size).toBe(CONDITIONS.length);
-    expect(CONDITIONS.length).toBeLessThanOrEqual(32);
+    expect(new Set(CONDITIONS).size).toBe(CONDITIONS.length);
   });
 
   it('a calc config can switch one on', () => {

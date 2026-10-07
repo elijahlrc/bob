@@ -52,9 +52,8 @@ import {
   type GemItem,
   type Item,
 } from '../data/types';
-import { ModDB, type ModCtx } from '../mods/modDb';
+import { CondIndex, ModDB, type ModCtx } from '../mods/modDb';
 import {
-  condBit,
   mod,
   tagMask,
   type CondId,
@@ -303,7 +302,8 @@ export class Character {
   readonly dualWielding: boolean;
   readonly holdingShield: boolean;
   readonly flasks: FlaskSpec[];
-  readonly relevantConds: number;
+  /** The bit of each condition this character's mods use; every ModDB of the character shares it. */
+  readonly cond = new CondIndex();
   configConds: number;
   readonly warnings: string[] = [];
   private profiles = new Map<string, SkillProfile>();
@@ -323,7 +323,7 @@ export class Character {
       charges: config.charges,
     };
     let cc = 0;
-    for (const c of this.config.conds) cc = maskOr(cc, condBit(c));
+    for (const c of this.config.conds) cc = maskOr(cc, this.cond.bit(c));
     this.configConds = cc;
     const cls = classDef(build.classId);
     const level = build.level;
@@ -436,7 +436,7 @@ export class Character {
     this.rageMax =
       BASE_MAX_RAGE + mods.reduce((n, m) => (m.stat === 'maxRage' ? n + m.value : n), 0);
     this.defaultDyn = this.rageSource ? ASSUMED_RAGE << DYN_SHIFT : 0;
-    const db0 = new ModDB(mods);
+    const db0 = new ModDB(mods, this.cond);
     const ctx0: ModCtx = { tags: 0, ancestry: 0, conds: cc, statValue: () => 0 };
 
     // 2. Attributes.
@@ -567,7 +567,8 @@ export class Character {
     this.primary = chosen && chosen.usable ? chosen : this.defaultAttack;
     this.hexes = this.deriveHexes(db0, ctx0);
     // The enemies the character hits are hexed (for the sheet; the sim tracks it per enemy).
-    if (this.hexes.length) this.configConds = maskOr(this.configConds, condBit('targetCursed'));
+    if (this.hexes.length)
+      this.configConds = maskOr(this.configConds, this.cond.peek('targetCursed'));
     const casting = new Set([this.primary.skill.id]);
     for (const a of this.actives) {
       if (!a.usable || a.triggered || a.gemUid === null || casting.has(a.skill.id)) continue;
@@ -611,13 +612,16 @@ export class Character {
     this.reservedLife = reservedLife;
     this.reservedMana = reservedMana;
     this.db = db0;
-    this.relevantConds = maskOr(
-      maskOr(db0.condsUsed(), condBit('onLowLife')),
-      condBit('overloadActive'),
-    );
     this.flasks = build.flasks.filter((f) => f !== null).map((f) => flaskSpec(f!, db0));
-    for (const f of this.flasks)
-      this.relevantConds = maskOr(this.relevantConds, new ModDB(f.buff).condsUsed());
+    // Register every condition any mod of this character can use up front (gems, flasks, rage), so a mask built before
+    // a skill's database exists still means the same thing in it.
+    const registerAll = (list: readonly { condition?: { id: CondId } }[]) => {
+      for (const m of list) if (m.condition) this.cond.bit(m.condition.id);
+    };
+    for (const sg of this.gems) if ('mods' in sg.def) registerAll(sg.def.mods);
+    for (const f of this.flasks) registerAll(f.buff);
+    registerAll(rageMods(1));
+    for (const id of ['onLowLife', 'overloadActive'] as const) this.cond.bit(id);
     if (this.config.steady)
       this.configConds = maskOr(this.configConds, this.steadyMask(this.config.steady));
   }
@@ -743,15 +747,16 @@ export class Character {
   }
 
   steadyMask(mode: SteadyMode): number {
-    let m = maskOr(condBit('hitRecently'), condBit('usedFlaskRecently'));
+    let m = maskOr(this.cond.peek('hitRecently'), this.cond.peek('usedFlaskRecently'));
     // A buff that something can grant is assumed up, as a charge is assumed held.
-    for (const id of BUFF_IDS) if (this.buffSource[id]) m = maskOr(m, condBit(BUFFS[id].cond));
-    if (this.hexes.length) m = maskOr(m, condBit('targetCursed'));
-    if (mode === 'clearing') m = maskOr(m, condBit('killedRecently'));
+    for (const id of BUFF_IDS)
+      if (this.buffSource[id]) m = maskOr(m, this.cond.peek(BUFFS[id].cond));
+    if (this.hexes.length) m = maskOr(m, this.cond.peek('targetCursed'));
+    if (mode === 'clearing') m = maskOr(m, this.cond.peek('killedRecently'));
     const d = this.defence(m);
-    if (this.reservedLife >= 0.65 * d.maxLife) m = maskOr(m, condBit('onLowLife'));
+    if (this.reservedLife >= 0.65 * d.maxLife) m = maskOr(m, this.cond.peek('onLowLife'));
     const hand = this.profile(this.primary, m).hands[0];
-    if (hand && hand.critChance >= 0.2) m = maskOr(m, condBit('critRecently'));
+    if (hand && hand.critChance >= 0.2) m = maskOr(m, this.cond.peek('critRecently'));
     return m;
   }
 
@@ -765,7 +770,7 @@ export class Character {
     conds: number = this.configConds,
     flaskMask: number = this.defaultDyn,
   ): SkillProfile {
-    const c = maskAnd(conds, this.relevantConds);
+    const c = maskAnd(conds, this.cond.all);
     const k = `${choice.key}|${c}|${flaskMask}`;
     let p = this.profiles.get(k);
     if (p) return p;
@@ -775,7 +780,7 @@ export class Character {
     const base = this.dbWith(flaskMask);
     const db =
       choice.skill.mods.length || supportMods.length
-        ? new ModDB([...base.mods(), ...choice.skill.mods, ...supportMods])
+        ? new ModDB([...base.mods(), ...choice.skill.mods, ...supportMods], this.cond)
         : base;
     p = buildProfile({
       skill: choice.skill,
@@ -800,7 +805,7 @@ export class Character {
       this.flasks.forEach((f, i) => {
         if (flasks & (1 << i)) extra.push(...f.buff);
       });
-      db = new ModDB([...this.db.mods(), ...extra]);
+      db = new ModDB([...this.db.mods(), ...extra], this.cond);
       this.flaskDbs.set(dyn, db);
     }
     return db;
@@ -808,7 +813,7 @@ export class Character {
 
   /** Defences for a condition mask and a bitmask of active flasks (cached). */
   defence(conds: number = this.configConds, flaskMask: number = this.defaultDyn): Defence {
-    const c = maskAnd(conds, this.relevantConds);
+    const c = maskAnd(conds, this.cond.all);
     const k = `${c}|${flaskMask}`;
     let d = this.defences.get(k);
     if (!d) {

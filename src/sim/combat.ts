@@ -15,7 +15,8 @@ import {
 } from '../data/constants';
 import { cannotBleed } from '../data/monsters';
 import { BUFFS, BUFF_IDS, DYN_SHIFT } from '../data/buffs';
-import { condBit, maskOr } from '../mods/types';
+import { MONSTER_CONDS } from '../calc/monster';
+import { maskOr, type CondId } from '../mods/types';
 import { rollGains } from './buffs';
 import { gainTrophy, rollCharges } from './charges';
 import { applyPlayerHexes, tickHexes } from './hexes';
@@ -35,53 +36,86 @@ export function lifeCap(w: World, a: Actor): number {
   return a.isPlayer ? Math.max(1, a.def.maxLife - w.char.reservedLife) : a.def.maxLife;
 }
 
-/** Bitmask of the player's active conditions (§7.3), optionally against a target. */
-export function playerConds(w: World, target: Actor | null): number {
-  const p = w.player;
-  let c = 0;
-  const cap = lifeCap(w, p);
-  if (p.life >= cap - 0.5) c = maskOr(c, condBit('onFullLife'));
-  if (p.life <= p.def.maxLife * LOW_LIFE) c = maskOr(c, condBit('onLowLife'));
-  if (p.tKill < RECENT) c = maskOr(c, condBit('killedRecently'));
-  if (p.tCrit < RECENT) c = maskOr(c, condBit('critRecently'));
-  if (p.tHit < RECENT) c = maskOr(c, condBit('hitRecently'));
-  if (p.tFlask < RECENT) c = maskOr(c, condBit('usedFlaskRecently'));
-  if (w.flasks.some((f) => f.activeT > 0)) c = maskOr(c, condBit('flaskActive'));
-  if (w.char.dualWielding) c = maskOr(c, condBit('dualWielding'));
-  if (w.char.holdingShield) c = maskOr(c, condBit('holdingShield'));
-  if (p.tStunEnemy < RECENT) c = maskOr(c, condBit('stunnedRecently'));
-  if (p.tOverload < OVERLOAD_TIME) c = maskOr(c, condBit('overloadActive'));
-  if (p.tBlock < RECENT) c = maskOr(c, condBit('blockedRecently'));
-  if (p.tBeenHit < RECENT) c = maskOr(c, condBit('beenHitRecently'));
-  if (p.leechLife.length > 0) c = maskOr(c, condBit('leeching'));
-  if (p.def.maxEs > 0 && p.es >= p.def.maxEs - 0.5) c = maskOr(c, condBit('esFull'));
-  const manaCap = Math.max(1, p.def.maxMana - w.char.reservedMana);
-  if (p.mana <= manaCap * LOW_LIFE) c = maskOr(c, condBit('onLowMana'));
-  if (p.hexes.length) c = maskOr(c, condBit('cursed'));
-  for (const id of BUFF_IDS) if (w.buffT[id] > 0) c = maskOr(c, condBit(BUFFS[id].cond));
-  if (target) c = maskOr(c, targetConds(target, p));
+/** What makes each condition true for the player; a condition is only evaluated when this character's mods use it. */
+type PlayerTest = (w: World, p: Actor) => boolean;
+const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
+  onFullLife: (w, p) => p.life >= lifeCap(w, p) - 0.5,
+  onLowLife: (_w, p) => p.life <= p.def.maxLife * LOW_LIFE,
+  killedRecently: (_w, p) => p.tKill < RECENT,
+  critRecently: (_w, p) => p.tCrit < RECENT,
+  hitRecently: (_w, p) => p.tHit < RECENT,
+  usedFlaskRecently: (_w, p) => p.tFlask < RECENT,
+  flaskActive: (w) => w.flasks.some((f) => f.activeT > 0),
+  dualWielding: (w) => w.char.dualWielding,
+  holdingShield: (w) => w.char.holdingShield,
+  stunnedRecently: (_w, p) => p.tStunEnemy < RECENT,
+  overloadActive: (_w, p) => p.tOverload < OVERLOAD_TIME,
+  blockedRecently: (_w, p) => p.tBlock < RECENT,
+  beenHitRecently: (_w, p) => p.tBeenHit < RECENT,
+  leeching: (_w, p) => p.leechLife.length > 0,
+  esFull: (_w, p) => p.def.maxEs > 0 && p.es >= p.def.maxEs - 0.5,
+  onLowMana: (w, p) => p.mana <= Math.max(1, p.def.maxMana - w.char.reservedMana) * LOW_LIFE,
+  cursed: (_w, p) => p.hexes.length > 0,
+};
+for (const id of BUFF_IDS) {
+  const cond = BUFFS[id].cond;
+  PLAYER_TESTS[cond] = (w) => w.buffT[id] > 0;
+}
+
+type TargetTest = (t: Actor, from: Actor) => boolean;
+const TARGET_TESTS: Partial<Record<CondId, TargetTest>> = {
+  targetCursed: (t) => t.hexes.length > 0,
+  targetIgnited: (t) => t.ail.ignites.length > 0,
+  targetShocked: (t) => t.ail.shock > 0,
+  targetChilled: (t) => t.ail.chill > 0,
+  targetFrozen: (t) => t.ail.freezeT > 0,
+  targetBleeding: (t) => t.ail.bleeds.length > 0,
+  targetPoisoned: (t) => t.ail.poisons.length > 0,
+  targetStunned: (t) => t.stunT > 0,
+  targetLowLife: (t) => t.life <= t.def.maxLife * LOW_LIFE,
+  targetRareOrUnique: (t) => t.rarity === 'rare' || t.rarity === 'miniboss' || t.rarity === 'boss',
+  targetNearby: (t, from) => Math.hypot(t.x - from.x, t.y - from.y) <= 2 + t.r,
+};
+
+type Compiled = { n: number; player: [number, PlayerTest][]; target: [number, TargetTest][] };
+const compiled = new WeakMap<object, Compiled>();
+
+/** The tests of the conditions a character's mods use, with their bits (rebuilt if it registers more). */
+function condTests(w: World): Compiled {
+  const idx = w.char.cond;
+  let c = compiled.get(idx);
+  if (!c || c.n !== idx.ids.length) {
+    c = { n: idx.ids.length, player: [], target: [] };
+    idx.ids.forEach((id, i) => {
+      const pt = PLAYER_TESTS[id];
+      const tt = TARGET_TESTS[id];
+      if (pt) c!.player.push([2 ** i, pt]);
+      else if (tt) c!.target.push([2 ** i, tt]);
+    });
+    compiled.set(idx, c);
+  }
   return c;
 }
 
-export function targetConds(t: Actor, from: Actor): number {
+/** Bitmask of the player's active conditions (§7.3), optionally against a target. Bits are the character's own. */
+export function playerConds(w: World, target: Actor | null): number {
+  const p = w.player;
+  const t = condTests(w);
   let c = 0;
-  if (t.hexes.length) c = maskOr(c, condBit('targetCursed'));
-  if (t.ail.ignites.length) c = maskOr(c, condBit('targetIgnited'));
-  if (t.ail.shock > 0) c = maskOr(c, condBit('targetShocked'));
-  if (t.ail.chill > 0) c = maskOr(c, condBit('targetChilled'));
-  if (t.ail.freezeT > 0) c = maskOr(c, condBit('targetFrozen'));
-  if (t.ail.bleeds.length) c = maskOr(c, condBit('targetBleeding'));
-  if (t.ail.poisons.length) c = maskOr(c, condBit('targetPoisoned'));
-  if (t.stunT > 0) c = maskOr(c, condBit('targetStunned'));
-  if (t.life <= t.def.maxLife * LOW_LIFE) c = maskOr(c, condBit('targetLowLife'));
-  if (t.rarity === 'rare' || t.rarity === 'miniboss' || t.rarity === 'boss')
-    c = maskOr(c, condBit('targetRareOrUnique'));
-  if (Math.hypot(t.x - from.x, t.y - from.y) <= 2 + t.r) c = maskOr(c, condBit('targetNearby'));
+  for (const [bit, test] of t.player) if (test(w, p)) c = maskOr(c, bit);
+  if (target) for (const [bit, test] of t.target) if (test(target, p)) c = maskOr(c, bit);
+  return c;
+}
+
+/** The conditions about a target, as a mask in the character's own bits. */
+export function targetConds(w: World, t: Actor, from: Actor): number {
+  let c = 0;
+  for (const [bit, test] of condTests(w).target) if (test(t, from)) c = maskOr(c, bit);
   return c;
 }
 
 export function monsterConds(a: Actor): number {
-  return a.life <= a.def.maxLife * LOW_LIFE ? condBit('onLowLife') : 0;
+  return a.life <= a.def.maxLife * LOW_LIFE ? MONSTER_CONDS.peek('onLowLife') : 0;
 }
 
 export function flaskMask(w: World): number {

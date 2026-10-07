@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Character } from '../calc/character';
 import { THEMES, themeDef } from '../data/themes';
-import { condBit, mod } from '../mods/types';
+import { mod } from '../mods/types';
 import { cfgFor, chooseTheme, scoreBuild } from './bot';
 import { newRun, type RunState } from './run';
 import { scoreTheme, themeThreat } from './threat';
@@ -34,13 +34,17 @@ describe('the bot plans with steady-state conditions (EXPANSION 5.10)', () => {
 
   it('clearing assumes recent kills and hits; a boss fight assumes no kills', () => {
     const ch = new Character(run.build, cfgFor(run));
+    // Condition bits exist for the conditions a character's mods use: register the three under test.
+    for (const id of ['killedRecently', 'hitRecently', 'usedFlaskRecently'] as const)
+      ch.cond.bit(id);
+    const bit = (id: 'killedRecently' | 'hitRecently' | 'usedFlaskRecently') => ch.cond.peek(id);
     const clearing = ch.steadyMask('clearing');
     const boss = ch.steadyMask('boss');
-    expect(clearing & condBit('killedRecently')).not.toBe(0);
-    expect(boss & condBit('killedRecently')).toBe(0);
+    expect(clearing & bit('killedRecently')).not.toBe(0);
+    expect(boss & bit('killedRecently')).toBe(0);
     for (const m of [clearing, boss]) {
-      expect(m & condBit('hitRecently')).not.toBe(0);
-      expect(m & condBit('usedFlaskRecently')).not.toBe(0);
+      expect(m & bit('hitRecently')).not.toBe(0);
+      expect(m & bit('usedFlaskRecently')).not.toBe(0);
     }
   });
 

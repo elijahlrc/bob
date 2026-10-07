@@ -145,11 +145,6 @@ export const CONDITIONS = [
 ] as const;
 export type CondId = (typeof CONDITIONS)[number];
 
-const COND_INDEX = new Map<string, number>(CONDITIONS.map((c, i) => [c, i]));
-export function condBit(c: CondId): number {
-  return 2 ** (COND_INDEX.get(c) as number);
-}
-
 export type ModKind = 'base' | 'inc' | 'more' | 'flag' | 'override';
 
 export type Condition = { id: CondId; not?: boolean };

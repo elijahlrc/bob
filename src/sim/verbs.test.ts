@@ -5,11 +5,11 @@ import { makeGem, makeItem } from '../gen/items';
 import { rarityWeights, rollMonsterDrops } from '../gen/loot';
 import { Rng } from '../core/rng';
 import { LOW_LIFE } from '../data/constants';
-import { condBit, mod, type Mod } from '../mods/types';
+import { mod, type CondId, type Mod } from '../mods/types';
 import { newRun } from '../run/run';
 import { applyDamage, applyHit, playerConds, rawHit, targetConds } from './combat';
 import { createDummyWorld, dummyDefence } from './dummy';
-import type { World } from './types';
+import type { Actor, World } from './types';
 
 function buildWith(extra: Mod[], gems = ['crushingBlow', 'kindlingHalo']): Build {
   const run = newRun('vanguard', 1);
@@ -122,7 +122,15 @@ describe('sim rules for the new verbs', () => {
 });
 
 describe('player and target conditions in the sim', () => {
-  const has = (mask: number, c: Parameters<typeof condBit>[0]) => (mask & condBit(c)) !== 0;
+  // Condition bits belong to the character and only exist for conditions its mods use: register, then ask.
+  const has = (world: World, id: CondId, target: Actor | null = null) => {
+    const bit = world.char.cond.bit(id);
+    return (playerConds(world, target) & bit) !== 0;
+  };
+  const targetHas = (world: World, t: Actor, from: Actor, id: CondId) => {
+    const bit = world.char.cond.bit(id);
+    return (targetConds(world, t, from) & bit) !== 0;
+  };
 
   it('been hit recently, leeching, ES full, low mana', () => {
     const { world, player } = arena([], ['crushingBlow']);
@@ -130,20 +138,18 @@ describe('player and target conditions in the sim', () => {
     player.es = 100;
     player.mana = 100;
     player.tBeenHit = 99;
-    let c = playerConds(world, null);
-    expect(has(c, 'beenHitRecently')).toBe(false);
-    expect(has(c, 'leeching')).toBe(false);
-    expect(has(c, 'esFull')).toBe(true);
-    expect(has(c, 'onLowMana')).toBe(false);
+    expect(has(world, 'beenHitRecently')).toBe(false);
+    expect(has(world, 'leeching')).toBe(false);
+    expect(has(world, 'esFull')).toBe(true);
+    expect(has(world, 'onLowMana')).toBe(false);
     player.tBeenHit = 1;
     player.leechLife.push(10);
     player.es = 50;
     player.mana = 20;
-    c = playerConds(world, null);
-    expect(has(c, 'beenHitRecently')).toBe(true);
-    expect(has(c, 'leeching')).toBe(true);
-    expect(has(c, 'esFull')).toBe(false);
-    expect(has(c, 'onLowMana')).toBe(true);
+    expect(has(world, 'beenHitRecently')).toBe(true);
+    expect(has(world, 'leeching')).toBe(true);
+    expect(has(world, 'esFull')).toBe(false);
+    expect(has(world, 'onLowMana')).toBe(true);
   });
 
   it('a hit marks its victim as recently hit', () => {
@@ -164,12 +170,12 @@ describe('player and target conditions in the sim', () => {
   });
 
   it('the target is on low life at 35% of its maximum', () => {
-    const { player, dummy } = arena();
+    const { world, player, dummy } = arena();
     dummy.def = dummyDefence({ maxLife: 1000 });
     dummy.life = 1000 * LOW_LIFE + 1;
-    expect(has(targetConds(dummy, player), 'targetLowLife')).toBe(false);
+    expect(targetHas(world, dummy, player, 'targetLowLife')).toBe(false);
     dummy.life = 1000 * LOW_LIFE - 1;
-    expect(has(targetConds(dummy, player), 'targetLowLife')).toBe(true);
+    expect(targetHas(world, dummy, player, 'targetLowLife')).toBe(true);
   });
 
   it('low life is measured against maximum life, not against life left after reservation (DESIGN 6.3)', () => {
@@ -185,9 +191,9 @@ describe('player and target conditions in the sim', () => {
     // 30% of maximum life: low life by the rule, though above 35% of what the cap allows.
     player.life = 0.3 * max;
     expect(player.life / cap).toBeGreaterThan(LOW_LIFE);
-    expect(has(playerConds(world, null), 'onLowLife')).toBe(true);
+    expect(has(world, 'onLowLife')).toBe(true);
     player.life = 0.4 * max;
-    expect(has(playerConds(world, null), 'onLowLife')).toBe(false);
+    expect(has(world, 'onLowLife')).toBe(false);
   });
 });
 

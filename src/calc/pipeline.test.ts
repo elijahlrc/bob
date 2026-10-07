@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Rng } from '../core/rng';
 import { ModDB } from '../mods/modDb';
-import { condBit, mod } from '../mods/types';
+import { mod } from '../mods/types';
 import { dummyDefence } from '../sim/dummy';
 import {
   ailBaseOf,
@@ -289,16 +289,17 @@ describe('§6.6 ailments', () => {
       new ModDB([...chances, mod('damage', 'inc', 100, { condition: { id: 'targetIgnited' } })]),
     );
     const plain = profile(new ModDB(chances));
+    const targetDb = new ModDB([
+      ...chances,
+      mod('damage', 'inc', 100, { condition: { id: 'targetIgnited' } }),
+    ]);
     const withTarget = buildProfile({
       skill: DEFAULT_ATTACK,
-      db: new ModDB([
-        ...chances,
-        mod('damage', 'inc', 100, { condition: { id: 'targetIgnited' } }),
-      ]),
+      db: targetDb,
       hands: [hand(10, 20)],
       extraTags: [],
       costMult: 1,
-      conds: condBit('targetIgnited'),
+      conds: targetDb.cond.bit('targetIgnited'),
       statValue: () => 0,
     });
     // The hit is doubled by the condition; the poison and bleed bases are not.

@@ -3,7 +3,7 @@ import { getTree } from '../data/tree';
 import { KEYSTONES } from '../data/tree/keystones';
 import type { Build } from '../data/types';
 import { makeGem, makeItem } from '../gen/items';
-import { condBit, mod } from '../mods/types';
+import { mod } from '../mods/types';
 import { newRun } from '../run/run';
 import { withStarterGems } from '../run/starterGems';
 import { applyDamage } from '../sim/combat';
@@ -111,7 +111,7 @@ describe('keystones (§9.4) — every one has an effect', () => {
   it('Fever Pitch: 100% crit multi; 40% more elemental damage after a crit', () => {
     const c = both('mystic', 'feverPitch').with;
     const base = c.profile(c.primary, 0);
-    const after = c.profile(c.primary, condBit('overloadActive'));
+    const after = c.profile(c.primary, c.cond.bit('overloadActive'));
     expect(base.hands[0].critMulti).toBe(1);
     expect(after.hands[0].chunks[0].min / base.hands[0].chunks[0].min).toBeCloseTo(1.4);
   });
@@ -119,7 +119,7 @@ describe('keystones (§9.4) — every one has an effect', () => {
   it('Pain Conduit: 30% more spell damage on low life', () => {
     const c = both('mystic', 'painConduit').with;
     const hi = c.profile(c.primary, 0).hands[0].chunks[0].min;
-    const lo = c.profile(c.primary, condBit('onLowLife')).hands[0].chunks[0].min;
+    const lo = c.profile(c.primary, c.cond.bit('onLowLife')).hands[0].chunks[0].min;
     expect(lo / hi).toBeCloseTo(1.3);
   });
 

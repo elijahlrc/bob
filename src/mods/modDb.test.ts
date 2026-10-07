@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { makeCtx, ModDB } from './modDb';
+import { CondIndex, makeCtx, ModDB } from './modDb';
 import { modsText, modText } from './text';
 import {
-  condBit,
   CONDITIONS,
   maskAnd,
   maskIntersects,
@@ -69,9 +68,9 @@ describe('ModDB', () => {
       mod('damage', 'inc', 20, { condition: { id: 'onFullLife', not: true } }),
     ]);
     expect(db.more('damage', makeCtx({}))).toBe(1);
-    expect(db.more('damage', makeCtx({ conds: ['onLowLife'] }))).toBeCloseTo(1.3);
+    expect(db.more('damage', makeCtx({ cond: db.cond, conds: ['onLowLife'] }))).toBeCloseTo(1.3);
     expect(db.sum('inc', 'damage', makeCtx({}))).toBe(20);
-    expect(db.sum('inc', 'damage', makeCtx({ conds: ['onFullLife'] }))).toBe(0);
+    expect(db.sum('inc', 'damage', makeCtx({ cond: db.cond, conds: ['onFullLife'] }))).toBe(0);
     expect(db.isConditional('damage')).toBe(true);
   });
 
@@ -138,10 +137,18 @@ describe('wide masks (tags and conditions beyond bit 31)', () => {
     expect(db.sum('inc', 'damage', makeCtx({ tags: ['projectile'] }))).toBe(0);
   });
 
-  it('every tag and condition has its own bit', () => {
+  it('every tag has its own bit, and conditions get theirs from the index in use', () => {
+    const idx = new CondIndex();
+    const bits = CONDITIONS.slice(0, 30).map((c) => idx.bit(c));
+    expect(new Set(bits).size).toBe(30);
+    expect(idx.peek(CONDITIONS[31])).toBe(0);
+    expect(idx.all).toBe(2 ** 30 - 1);
+    expect(() => {
+      const big = new CondIndex();
+      for (let i = 0; i < 53; i++) big.bit(`c${i}` as never);
+    }).toThrow();
     expect(new Set(SKILL_TAGS.map((t) => tagBit(t))).size).toBe(SKILL_TAGS.length);
-    expect(new Set(CONDITIONS.map((c) => condBit(c))).size).toBe(CONDITIONS.length);
+    expect(new Set(CONDITIONS).size).toBe(CONDITIONS.length);
     expect(SKILL_TAGS.length).toBeLessThanOrEqual(52);
-    expect(CONDITIONS.length).toBeLessThanOrEqual(52);
   });
 });

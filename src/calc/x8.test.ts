@@ -173,9 +173,12 @@ describe('hexes in the calc (EXPANSION 5.7)', () => {
     const c = new Character(build(['crushingBlow', 'hexingStrikes', 'openWounds']), {
       areaLevel: 40,
     });
-    expect(c.steadyMask('clearing') & (1 << 26)).not.toBe(0);
+    // Bits exist for the conditions a character's mods use: register the one under test.
+    const bit = c.cond.bit('targetCursed');
+    expect(c.steadyMask('clearing') & bit).not.toBe(0);
     const plain = new Character(build(['crushingBlow']), { areaLevel: 40 });
-    expect(plain.steadyMask('clearing') & (1 << 26)).toBe(0);
+    const pbit = plain.cond.bit('targetCursed');
+    expect(plain.steadyMask('clearing') & pbit).toBe(0);
   });
 
   it('a hexed-target condition pays off only against hexed enemies', () => {

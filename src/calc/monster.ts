@@ -11,7 +11,7 @@ import {
   type Variant,
 } from '../data/monsters';
 import { mapAffixDef } from '../data/mapAffixes';
-import { ModDB } from '../mods/modDb';
+import { CondIndex, ModDB } from '../mods/modDb';
 import { maskAnd, mod, type Mod } from '../mods/types';
 import type { Defence } from './combat';
 import { defenceFromDb } from './defence';
@@ -49,6 +49,10 @@ export type MonsterStats = {
   radius: number;
   xp: number;
 };
+
+/** The condition bits of every monster kind (they share one index, so `monsterConds` means the same for all). */
+export const MONSTER_CONDS = new CondIndex();
+MONSTER_CONDS.bit('onLowLife');
 
 function monsterSkill(spec: MonsterSpec, dmg: number): SkillDef {
   const t = MONSTER_TYPES[spec.type];
@@ -122,7 +126,10 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
   // Shrouded: an energy shield shell worth a quarter of its life, which recharges when it is left alone.
   if (spec.mods.includes('shrouded')) mods.push(mod('es', 'base', Math.round(life * 0.25)));
   if (spec.rarity === 'boss') mods.push(mod('resist.allEle', 'base', 30));
-  const db = new ModDB(mods.map((x) => ({ ...x, source: { kind: 'monster', id: k } })));
+  const db = new ModDB(
+    mods.map((x) => ({ ...x, source: { kind: 'monster', id: k } })),
+    MONSTER_CONDS,
+  );
   const ctx = { tags: 0, ancestry: 0, conds: 0 };
   const stunThreshMult = spec.rarity === 'boss' ? 4 : spec.rarity === 'miniboss' ? 2 : 1;
   const defence = defenceFromDb(db, ctx, { isPlayer: false, resistPenalty: 0, stunThreshMult });
