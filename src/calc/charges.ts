@@ -27,7 +27,16 @@ export const CHARGE_TEXT: Record<ChargeKind, string> = {
 export const noCharges = (): ChargeCounts => ({ grit: 0, fervour: 0, insight: 0 });
 
 /** The stat ids of the ways to gain a charge: a chance, in percent, on the event. */
-export const CHARGE_EVENTS = ['kill', 'block', 'crit', 'hit', 'meleeHit', 'stun', 'cast'] as const;
+export const CHARGE_EVENTS = [
+  'kill',
+  'block',
+  'crit',
+  'hit',
+  'meleeHit',
+  'stun',
+  'cast',
+  'hitTaken',
+] as const;
 export type ChargeEvent = (typeof CHARGE_EVENTS)[number];
 export const chargeStat = (event: ChargeEvent, kind: ChargeKind): string =>
   `chargeOn.${event}.${kind}`;

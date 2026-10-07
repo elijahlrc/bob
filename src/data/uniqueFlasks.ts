@@ -246,6 +246,45 @@ export const UNIQUE_FLASKS: UniqueFlaskDef[] = [
     },
     flavour: 'A bitter cup, and the curse comes with it.',
   },
+  {
+    id: 'penitentDraught',
+    name: 'Penitent Draught',
+    baseId: 'flask_penitent',
+    level: 35,
+    mods: [m('regenToES', 'flag', 1), m('lifeRegen', 'inc', 25, 50)],
+    notes: {
+      pairsWith: ['energy shield builds', 'high life regeneration'],
+      weakAgainst: ['life builds with no use for energy shield'],
+    },
+    flavour: 'It takes the wound and gives back a ward.',
+  },
+  {
+    id: 'hollowOakDraught',
+    name: 'Hollow Oak Draught',
+    baseId: 'flask_hollowoak',
+    level: 8,
+    mods: [
+      m('hitTaken', 'more', -10),
+      m('penetration', 'base', 10, 15, { damageTypes: ['fire', 'cold', 'lightning'] }),
+    ],
+    notes: {
+      pairsWith: ['early maps', 'elemental damage'],
+      weakAgainst: ['maps with mostly physical damage'],
+    },
+    flavour: 'The old oak sheds its bark and keeps the rest.',
+  },
+  {
+    id: 'brimmingCup',
+    name: 'Brimming Cup',
+    baseId: 'flask_brimming',
+    level: 35,
+    mods: [m('flaskCharges', 'inc', 100), m('flaskEffect', 'inc', 10, 20)],
+    notes: {
+      pairsWith: ['builds with several flasks', 'life and mana flask users'],
+      weakAgainst: ['builds with no other flask'],
+    },
+    flavour: 'It fills the other cups while it empties.',
+  },
 ];
 
 export function uniqueFlaskDef(id: string): UniqueFlaskDef {

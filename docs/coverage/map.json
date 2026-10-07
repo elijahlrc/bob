@@ -5481,6 +5481,21 @@
    "ref": "Tremor Rod",
    "status": "covered",
    "note": "Staff linked to the blastchain mine support, with spell damage, block, a lower enemy stun threshold and mines that repeat once more."
+  },
+  "penitentDraught": {
+   "ref": "The Sorrow of the Divine",
+   "status": "covered",
+   "note": "More life regeneration, and it is applied to energy shield during it (the consecrated ground and the oath are dropped)."
+  },
+  "hollowOakDraught": {
+   "ref": "The Wise Oak",
+   "status": "covered",
+   "note": "Less damage taken from hits and elemental penetration during the effect (the lowest and highest resistance rules are averaged into flat values)."
+  },
+  "brimmingCup": {
+   "ref": "The Overflowing Chalice",
+   "status": "covered",
+   "note": "Other flasks gain charges much faster and work better during the effect (the consecrated ground and the lock on its own charges are dropped)."
   }
  }
 }

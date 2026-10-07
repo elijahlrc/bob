@@ -275,7 +275,10 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       rollCharges(w, 'meleeHit', p.gains);
     }
   }
-  if (dst.isPlayer) rollGains(w, 'hitTaken');
+  if (dst.isPlayer) {
+    rollGains(w, 'hitTaken');
+    rollCharges(w, 'hitTaken');
+  }
   if (res.crit) {
     src.tCrit = 0;
     if (src.isPlayer) {
