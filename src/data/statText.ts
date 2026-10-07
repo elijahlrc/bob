@@ -1,4 +1,5 @@
 import { CHARGE_KINDS, CHARGE_NAMES } from '../calc/charges';
+import { BUFF_IDS, BUFFS } from './buffs';
 import { HEX_IDS, HEXES } from './hexes';
 import { KEYSTONES } from './tree/keystones';
 /**
@@ -290,3 +291,66 @@ for (const t of ['physical', 'lightning', 'cold', 'fire'])
 TAG_TEXT.unarmed = 'while Unarmed';
 TAG_TEXT.triggered = 'with Triggered Skills';
 TAG_TEXT.aura = 'with Auras';
+
+// ---- Added by the coverage plan (C2): the buff layer, impale, culling and the new tags -------------
+
+Object.assign(STAT_TEXT, {
+  hitTaken: { name: 'damage taken from Hits' },
+  manaRegenPct: { base: 'Regenerate {v}% of Mana per second' },
+  'chance.impale': { name: 'chance to Impale Enemies on Hit', pct: true },
+  impaleEffect: { name: 'Impale Effect' },
+  impaleHits: { base: 'Impales last {v} additional Hits' },
+  maxImpale: { base: '{v} to maximum Impales on an Enemy' },
+  cullingStrike: { flag: 'Your Hits kill Enemies left at 10% Life or less' },
+  maxRage: { base: '{v} to maximum Rage' },
+  buffDuration: { name: 'Buff Duration' },
+} satisfies Record<string, StatText>);
+for (const id of BUFF_IDS) {
+  const name = BUFFS[id].name;
+  const on: Record<string, string> = {
+    kill: 'on Kill',
+    hit: 'on Hit',
+    meleeHit: 'on Melee Hit',
+    crit: 'on Critical Strike',
+    block: 'when you Block',
+    hitTaken: 'when you are Hit',
+    flask: 'when you use a Flask',
+  };
+  for (const [event, phrase] of Object.entries(on))
+    STAT_TEXT[`buffOn.${event}.${id}`] = { base: `{v}% chance to gain ${name} ${phrase}` };
+}
+for (const [event, phrase] of Object.entries({
+  kill: 'on Kill',
+  hit: 'on Hit',
+  meleeHit: 'on Melee Hit',
+  crit: 'on Critical Strike',
+  block: 'when you Block',
+  hitTaken: 'when you are Hit',
+  flask: 'when you use a Flask',
+}))
+  STAT_TEXT[`rageOn.${event}`] = { base: `Gain {v} Rage ${phrase}` };
+
+Object.assign(TAG_TEXT, {
+  totem: 'with Totem Skills',
+  trap: 'with Trap Skills',
+  mine: 'with Mine Skills',
+  brand: 'with Brand Skills',
+  minion: 'of Minions',
+  channelling: 'with Channelling Skills',
+  duration: 'with Duration Skills',
+  curse: 'with Curses',
+  warcry: 'with Warcries',
+  herald: 'with Heralds',
+  guard: 'with Guard Skills',
+  movement: 'with Movement Skills',
+  nova: 'with Nova Skills',
+  slam: 'with Slam Skills',
+  physical: 'with Physical Skills',
+  chaos: 'with Chaos Skills',
+});
+Object.assign(CONDITION_TEXT, {
+  fortified: 'while Fortified',
+  onslaught: 'while Quickened',
+  unholyMight: 'while you have Dread Might',
+  arcaneSurge: 'while you have Arcane Tide',
+});

@@ -1,6 +1,6 @@
 # Bob — Coverage Plan: the gems and uniques of patch 3.9.0
 
-Status: **approved 2026-10-07; C0 and C1 done 2026-10-07** · Owner: the user · Implementer: Claude
+Status: **approved 2026-10-07; C0, C1 and C2 done 2026-10-07** · Owner: the user · Implementer: Claude
 
 This plan extends [DESIGN.md](DESIGN.md) and [EXPANSION.md](EXPANSION.md). Its goal is to give Bob an analog of **at
 least 90% of the skill gems and 90% of the unique items** that existed in PoE 1 patch 3.9.0. Milestones are
@@ -364,4 +364,5 @@ Each milestone bumps `SAVE_VERSION` when `RunState` or the data changes, and log
   - 782 uniques in scope (the first fetch said 797; the 15 difference is wiki entries marked "not in game").
 - Tooling and data are described in [coverage/README.md](coverage/README.md).
 - **C1 done (2026-10-07):** see [AUDIT-3.9.md](AUDIT-3.9.md).
-- **Next:** C2, the engine foundations.
+- **C2 done (2026-10-07):** engine foundations (PROGRESS.md).
+- **Next:** C3, core content.

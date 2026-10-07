@@ -472,3 +472,23 @@ revert if they would rather not.
 - New tool: `npm run coverage:wiki -- "Page" [date]` prints a wiki page as it stood in the 3.9 era.
 - Convergence tests needed no retuning. Small bot check (4 × 6, seed 11): 3/24 wins (was 2/24), within noise.
 - **Tests.** 521.
+
+### C2 done: engine foundations (2026-10-07)
+
+- **Masks.** Tags and conditions are numbers of up to 52 bits (`maskOr`, `maskAnd`, `maskSubset`); 16 new tags (totem, trap,
+  mine, brand, minion, channelling, duration, curse, warcry, herald, guard, movement, nova, slam, physical, chaos).
+- **Skill types and support rules** (`src/data/skillTypes.ts`): every tag plus capability types; supports have `supports`
+  (any of), `needs` (all of), `excludes` and `adds`, resolved to a fixpoint so a totem support changes what the others can do.
+- **One spell damage curve** (`spellBaseDamage(level)` in constants): a spell is a `spread` plus an `effectiveness`; the draft
+  tool emits it. The four hand-tuned spells keep their numbers.
+- **Ailments scale from base damage** (the C1 fix, completed): per-chunk multipliers per ailment (`AilChunk`).
+- **Buff layer** (`src/data/buffs.ts`, `src/sim/buffs.ts`): Fortified (hit-only damage taken), Quickened, Dread Might, Arcane
+  Tide as conditions with timers; rage as a count carried in the dynamic mask; impale; culling strike.
+- **Shapes:** nova and slam (burst with an origin), beam, ground zones (rain, clouds, walls, delayed blasts), returning
+  projectiles. A channelled skill is repeated short casts, so there is no new action model; ramping stages are averaged.
+- **Weapon families:** rune dagger, thrusting sword, warstaff (inside the dagger, sword and staff classes).
+- **Tests generated for every gem** (`src/sim/gemSmoke.test.ts`), and a check that every stat in the data has text.
+- **Not done in C2 (waiting for content to need it):** bot candidate pruning (the build scorer is unchanged; measure when C3
+  batches land) and per-shape convergence cases (the generated gem test covers the sim; the 3% convergence test gets a case
+  for each archetype as C3 adds gems).
+- **Tests.** 592.
