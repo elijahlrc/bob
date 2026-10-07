@@ -5,6 +5,7 @@ import type { Build } from '../data/types';
 import { makeGem, makeItem } from '../gen/items';
 import { condBit, mod } from '../mods/types';
 import { newRun } from '../run/run';
+import { withStarterGems } from '../run/starterGems';
 import { applyDamage } from '../sim/combat';
 import { createDummyWorld, dummyDefence } from '../sim/dummy';
 import { stepWorld } from '../sim/world';
@@ -20,6 +21,7 @@ function ksNode(id: string): number {
 
 function build(classId: string, keystones: string[], gems?: string[], main?: string): Build {
   const run = newRun(classId, 1);
+  if (!gems) withStarterGems(run);
   const uid = () => run.nextUid++;
   const b = run.build;
   b.level = 40;

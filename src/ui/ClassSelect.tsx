@@ -1,5 +1,5 @@
 import { CLASSES } from '../data/classes';
-import { gemDef } from '../data/gems';
+import { itemBase } from '../data/bases';
 import type { Controller } from '../run/controller';
 
 export function hex(c: number): string {
@@ -24,9 +24,7 @@ export function ClassSelect({ c }: { c: Controller }) {
             <div class="class-attrs">
               Str {cls.attrs.str} · Dex {cls.attrs.dex} · Int {cls.attrs.int}
             </div>
-            <div class="class-skill">
-              {gemDef(cls.startSkill).name} + {gemDef(cls.startSupport).name}
-            </div>
+            <div class="class-skill">{itemBase(cls.startWeapons[0]).name}</div>
           </button>
         ))}
       </div>

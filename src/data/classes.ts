@@ -1,6 +1,9 @@
 import type { ClassDef } from './types';
 
-/** DESIGN.md §5.2. Classes differ only in attributes, starting kit and tree start. */
+/**
+ * DESIGN.md §5.2. Classes differ only in attributes, starting weapons and tree start. A character starts with no
+ * gems: the first skill gems come as rewards after the first maps (`SKILL_REWARD_MAPS`).
+ */
 export const CLASSES: ClassDef[] = [
   {
     id: 'vanguard',
@@ -8,8 +11,6 @@ export const CLASSES: ClassDef[] = [
     attrs: { str: 32, dex: 14, int: 14 },
     color: 0xc0503a,
     startWeapons: ['mace2_1'],
-    startSkill: 'crushingBlow',
-    startSupport: 'bruteForce',
   },
   {
     id: 'strider',
@@ -18,8 +19,6 @@ export const CLASSES: ClassDef[] = [
     color: 0x5aa04a,
     startWeapons: ['bow_1'],
     startOffHand: 'quiver_acc',
-    startSkill: 'splitVolley',
-    startSupport: 'swiftAssault',
   },
   {
     id: 'mystic',
@@ -27,8 +26,6 @@ export const CLASSES: ClassDef[] = [
     attrs: { str: 14, dex: 14, int: 32 },
     color: 0x5a78d0,
     startWeapons: ['wand_1'],
-    startSkill: 'flameBolt',
-    startSupport: 'echoingCast',
   },
   {
     id: 'reaver',
@@ -37,8 +34,6 @@ export const CLASSES: ClassDef[] = [
     color: 0xd09a3a,
     startWeapons: ['sword_1'],
     startOffHand: 'shield_ar_1',
-    startSkill: 'reapingArc',
-    startSupport: 'bruteForce',
   },
   {
     id: 'zealot',
@@ -47,8 +42,6 @@ export const CLASSES: ClassDef[] = [
     color: 0xd0c070,
     startWeapons: ['sceptre_1'],
     startOffHand: 'shield_es_1',
-    startSkill: 'arcChain',
-    startSupport: 'channelledElements',
   },
   {
     id: 'shade',
@@ -56,8 +49,6 @@ export const CLASSES: ClassDef[] = [
     attrs: { str: 14, dex: 23, int: 23 },
     color: 0x9a5ac0,
     startWeapons: ['dagger_1', 'dagger_1'],
-    startSkill: 'venomCut',
-    startSupport: 'swiftAssault',
   },
 ];
 

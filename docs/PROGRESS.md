@@ -434,3 +434,12 @@ revert if they would rather not.
   order to try them: Reliquary and Swarm monster stats (`data/monsters.ts`), the share of faction themes among the offers
   (`fromMap` in `data/themes.ts`), and the mixed themes (from map 40). `npm run lethality -- --class <c> --map <n> --mixed`
   shows a theme at a glance.
+
+### No starting gems (2026-10-07)
+
+- Characters start with weapons, two flasks and an empty two-socket body armour, and no gems. The first skill gems are the picks
+  after maps 1–4. `startSkill`/`startSupport` are gone from the class data; the class card shows the starting weapon.
+  Tests that need a working skill use `withStarterGems` (`src/run/starterGems.ts`).
+- Small check (4 runs x 6 classes, seed 11): nobody dies before map 36, so the default attack carries maps 1–4; wins were 2/24
+  (the previous check had 5/24; at this sample size the difference is within noise, but the win rate stays below the 25–50% band,
+  see the X9 note).

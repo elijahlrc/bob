@@ -13,9 +13,10 @@ import {
   sortItems,
 } from './inventoryOps';
 import { newRun, type RunState } from './run';
+import { withStarterGems } from './starterGems';
 
 function setup(classId = 'reaver'): { run: RunState; uid: () => number } {
-  const run = newRun(classId, 1);
+  const run = withStarterGems(newRun(classId, 1));
   run.build.level = 20;
   return { run, uid: () => run.nextUid++ };
 }

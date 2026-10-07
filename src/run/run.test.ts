@@ -1,3 +1,4 @@
+import { CLASSES } from '../data/classes';
 import { gemDef } from '../data/gems';
 import { describe, expect, it } from 'vitest';
 import { endKindForMap, resistPenaltyForMap, roomsForMap } from '../gen/mapPlan';
@@ -179,5 +180,30 @@ describe('the headless bot (§15.5)', () => {
     const wall = (performance.now() - t0) / 1000;
     const sim = r.maps.reduce((s, m) => s + m.time, 0);
     expect(sim / wall).toBeGreaterThan(500);
+  });
+});
+
+describe('starting kit', () => {
+  it('no class starts with a gem; the weapons, flasks and an empty two-socket body remain', () => {
+    for (const cls of CLASSES) {
+      const run = newRun(cls.id, 1);
+      const gems = [
+        ...Object.values(run.build.equipment).flatMap((it) => it?.sockets ?? []),
+        ...run.inventory.filter((x) => x.kind === 'gem'),
+      ].filter(Boolean);
+      expect(gems, cls.id).toHaveLength(0);
+      expect(run.build.primaryGem).toBeUndefined();
+      expect(run.build.equipment.mainHand).toBeDefined();
+      expect(run.build.equipment.body!.sockets).toEqual([null, null]);
+      expect(run.build.flasks[0]).not.toBeNull();
+    }
+  });
+
+  it('a first map is clearable on the default attack, then the first gem pick follows', () => {
+    const r = botRun('vanguard', 3, 1);
+    expect(r.maps[0].status).toBe('cleared');
+    const run = newRun('vanguard', 3);
+    finishMap(run, cleared(1));
+    expect(run.reward).toHaveLength(3);
   });
 });

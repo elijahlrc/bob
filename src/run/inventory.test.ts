@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { makeFlask, makeGem, makeItem } from '../gen/items';
 import { newRun } from './run';
+import { withStarterGems } from './starterGems';
 import {
   canEquip,
   discard,
@@ -13,7 +14,7 @@ import {
 } from './inventory';
 
 function setup(classId = 'reaver') {
-  const run = newRun(classId, 1);
+  const run = withStarterGems(newRun(classId, 1));
   const uid = () => run.nextUid++;
   return { run, uid };
 }
@@ -79,7 +80,7 @@ describe('equipment rules (§11.1)', () => {
 
 describe('gem transfer on equip', () => {
   it('moves gems into the new item when it has room', () => {
-    const run = newRun('vanguard', 1);
+    const run = withStarterGems(newRun('vanguard', 1));
     const uid = () => run.nextUid++;
     const body = makeItem(uid, 'body_ar_1', 1, 3);
     run.inventory.push(body);

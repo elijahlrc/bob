@@ -6,7 +6,7 @@ import { themesFor } from '../data/themes';
 import { TABLET_PREFIX } from '../data/currency';
 import type { AnyItem, Build, CurrencyItem, InventoryItem, Item } from '../data/types';
 import { rollCurrencyBundle, rollCurrencyDrops } from '../gen/currencyDrops';
-import { makeFlask, makeGem, makeItem } from '../gen/items';
+import { makeFlask, makeItem } from '../gen/items';
 import {
   rollChest,
   rollDrop,
@@ -148,9 +148,7 @@ export function newRun(classId: string, seed: number): RunState {
       cls.startOffHand.startsWith('quiver') ? 0 : 1,
     );
   const body: Item = makeItem(uid, BODY_FOR_CLASS[classId], 1, 2);
-  body.sockets = [makeGem(uid, cls.startSkill), makeGem(uid, cls.startSupport)];
   run.build.equipment.body = body;
-  run.build.primaryGem = body.sockets[0]!.uid;
   run.build.flasks = [
     makeFlask(uid, 'flask_life_1', 1),
     makeFlask(uid, 'flask_mana_1', 1),

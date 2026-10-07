@@ -113,8 +113,9 @@ Title → Class select → [Camp → Map]×100 → Victory
 
 ### 5.2 Classes
 
-There are six classes. Classes differ only in starting attributes, starting gear and gems, and where they start on the
-tree.
+There are six classes. Classes differ only in starting attributes, starting gear, and where they start on the tree. A character starts with
+no gems (changed 2026-10-07): it fights with its weapon, and the first skill gems come as a pick of three after each
+of maps 1 to 4 (EXPANSION section 8 and `SKILL_REWARD_MAPS`).
 
 | Class (ours) | PoE analogue | Str | Dex | Int | Start weapon      | Start skill   | Start support       |
 | ------------ | ------------ | --- | --- | --- | ----------------- | ------------- | ------------------- |
@@ -734,7 +735,7 @@ tiers keep unlocking throughout the 100-map run. Families:
     60% of that in each attribute.
 - Gem stats are authored at L1 and L20. Values in between interpolate geometrically for damage and linearly for
   everything else. A gem may override a single level.
-- **Acquisition:** the starting gems; the camp reward pick (1 of 3 offers drawn from item, gem and flask pools); and
+- **Acquisition:** the skill gem picks after maps 1–4; gem drops; the camp reward pick (1 of 3 offers drawn from item, gem and flask pools); and
   side-branch chests (20% chance of a gem instead of an item).
 
 **Active skills (7):**

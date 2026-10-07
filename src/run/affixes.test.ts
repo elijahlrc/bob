@@ -10,6 +10,7 @@ import { runMap } from '../sim/runMap';
 import { makeCharacter } from '../sim/world';
 import { cfgFor } from './bot';
 import { offersFor } from './preview';
+import { withStarterGems } from './starterGems';
 import { affixRewards, affixesFor, finishMap, newRun, planFor, worldOptsFor } from './run';
 import { threatPreview } from './threat';
 
@@ -109,7 +110,7 @@ describe('map affixes (EXPANSION 7.5)', () => {
 });
 
 describe('threat preview (EXPANSION section 9)', () => {
-  const run = newRun('vanguard', 1);
+  const run = withStarterGems(newRun('vanguard', 1));
   run.build.level = 50;
   run.map = 50;
   const ch = new Character(run.build, cfgFor(run));
@@ -145,7 +146,7 @@ describe('threat preview (EXPANSION section 9)', () => {
   });
 
   it('a resistant monster cuts the DPS of an element it resists, not of physical', () => {
-    const fireRun = newRun('mystic', 1);
+    const fireRun = withStarterGems(newRun('mystic', 1));
     fireRun.build.level = 50;
     fireRun.map = 50;
     const c = new Character(fireRun.build, cfgFor(fireRun));

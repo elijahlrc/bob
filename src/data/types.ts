@@ -148,8 +148,6 @@ export type ClassDef = {
   color: number;
   startWeapons: string[];
   startOffHand?: string;
-  startSkill: string;
-  startSupport: string;
 };
 
 export type DamageRange = { type: DamageType; min: number; max: number };

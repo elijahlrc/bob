@@ -3,12 +3,13 @@ import { CLASSES } from '../data/classes';
 import { makeItem } from '../gen/items';
 import { mod } from '../mods/types';
 import { newRun } from '../run/run';
+import { withStarterGems } from '../run/starterGems';
 import { computeCharacter, diffSheets } from './character';
 
 describe('computeCharacter (§8.1)', () => {
   for (const cls of CLASSES) {
     it(`${cls.name} starting build produces a full sheet`, () => {
-      const run = newRun(cls.id, 1);
+      const run = withStarterGems(newRun(cls.id, 1));
       const s = computeCharacter(run.build);
       expect(s.attrs).toEqual(cls.attrs);
       expect(s.life).toBe(Math.round(38 + 12 + cls.attrs.str * 0.5));
