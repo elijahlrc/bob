@@ -283,7 +283,9 @@ export class GrimStyle extends StyleBase {
         const img = s.add
           .image(p.x, p.y, `${front ? 'gwl' : 'gwt'}_${tid}_${rng.int(0, 2)}`)
           .setOrigin(0.5, 1)
-          .setDepth(1000 + p.y)
+          // Sorted by the middle of the footprint, like actors by their feet: a wall behind an actor must never draw over it
+          // (the bottom corner, half a tile lower, did that to anyone in the half of a tile nearest a wall).
+          .setDepth(1000 + p.y - ISO_H / 2)
           .setLighting(true);
         this.owned.push(img);
       }
