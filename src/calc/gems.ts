@@ -117,6 +117,15 @@ export function spellDamageAt(
   };
 }
 
+/** What supports may do with a skill whose gem lists no types of its own: spells can be totemised, trapped and mined. */
+function defaultTypes(def: ActiveGemDef): SkillType[] {
+  if (def.utility || def.tags.some((t) => ['totem', 'trap', 'mine', 'brand'].includes(t)))
+    return [];
+  return def.skillType === 'spell'
+    ? ['totemable', 'trappable', 'mineable', 'triggerable', 'repeatable']
+    : ['repeatable'];
+}
+
 export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
   const b = def.behaviour;
   const per5 = Math.floor(level / 5);
@@ -131,7 +140,7 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     name: def.name,
     type: def.skillType,
     tags: def.tags,
-    types: [...new Set<SkillType>([...def.tags, ...(def.types ?? [])])],
+    types: [...new Set<SkillType>([...def.tags, ...(def.types ?? defaultTypes(def))])],
     behaviour,
     level,
     baseMult: def.baseMult ? levelValue(def.baseMult, level) : 100,

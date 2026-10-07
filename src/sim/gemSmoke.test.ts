@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Character } from '../calc/character';
+import { resolveActive } from '../calc/gems';
 import {
   ACTIVE_GEMS,
   ALL_GEMS,
@@ -135,7 +136,7 @@ describe('every support gem', () => {
   const actives = ACTIVE_GEMS;
   for (const s of supports) {
     it(`${s.id}: applies to the skills its rules allow, and its sheet computes`, () => {
-      const ok = actives.filter((a) => typesAllow(s, new Set([...a.tags, ...(a.types ?? [])])));
+      const ok = actives.filter((a) => typesAllow(s, new Set(resolveActive(a, 1).types)));
       // A support nothing can use is a data mistake (unless it is a trigger or hex support that needs others).
       expect(ok.length).toBeGreaterThan(0);
       const a = ok[0];
