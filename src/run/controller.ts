@@ -6,7 +6,7 @@ import { createWorld, stepWorld } from '../sim/world';
 import { CLASSES } from '../data/classes';
 import { botCamp } from './bot';
 import { completeTabletSets } from './craft';
-import { recordFound } from './codex';
+import { loadFound, recordFound } from './codex';
 import { finishMap, newRun, passivePoints, planFor, worldOptsFor, type RunState } from './run';
 import { clearSave, loadRun, saveRun, SAVE_KEY, type KeyValueStore, type LoadResult } from './save';
 
@@ -43,6 +43,11 @@ export class Controller {
   private acc = 0;
 
   private store: KeyValueStore | null;
+  /** The gems and uniques this browser has found (the Codex). */
+  found(): Set<string> {
+    return loadFound(this.store);
+  }
+
   /** Result of looking for a saved run at boot. */
   saved: LoadResult = { status: 'none' };
 
@@ -59,7 +64,7 @@ export class Controller {
     // The game saves on entering camp and on any camp change (§5.5).
     if (this.store && this.run && this.screen === 'camp') {
       saveRun(this.store, this.run);
-      recordFound(this.run);
+      recordFound(this.store, this.run);
     }
     this.bus.emit('state', null);
   }

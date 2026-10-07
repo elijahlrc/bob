@@ -6,7 +6,6 @@ import { UNIQUES } from '../data/uniques';
 import { UNIQUE_FLASKS } from '../data/uniqueFlasks';
 import { modsText } from '../mods/text';
 import type { Controller } from '../run/controller';
-import { loadFound } from '../run/codex';
 import { GemCard } from './GemCard';
 import { gemCardData } from './gemText';
 
@@ -18,7 +17,7 @@ export function Codex({ c }: { c: Controller }) {
   const [q, setQ] = useState('');
   const [foundOnly, setFoundOnly] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
-  const found = loadFound();
+  const found = c.found();
   const needle = q.trim().toLowerCase();
 
   const gems = ALL_GEMS.filter((g) => {

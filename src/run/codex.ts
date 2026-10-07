@@ -1,5 +1,6 @@
 import { EQUIP_SLOTS } from '../data/types';
 import type { RunState } from './run';
+import type { KeyValueStore } from './save';
 
 /**
  * The Codex remembers which gems and uniques the player has ever held (per browser, across runs). Storage may be
@@ -7,9 +8,9 @@ import type { RunState } from './run';
  */
 const KEY = 'bob.codex.v1';
 
-export function loadFound(): Set<string> {
+export function loadFound(store: KeyValueStore | null): Set<string> {
   try {
-    const raw = window.localStorage.getItem(KEY);
+    const raw = store?.getItem(KEY) ?? null;
     return new Set(raw ? (JSON.parse(raw) as string[]) : []);
   } catch {
     return new Set();
@@ -37,12 +38,13 @@ export function heldIds(run: RunState): string[] {
 }
 
 /** Add what the run holds to the Codex. */
-export function recordFound(run: RunState): void {
+export function recordFound(store: KeyValueStore | null, run: RunState): void {
+  if (!store) return;
   try {
-    const found = loadFound();
+    const found = loadFound(store);
     const before = found.size;
     for (const id of heldIds(run)) found.add(id);
-    if (found.size !== before) window.localStorage.setItem(KEY, JSON.stringify([...found]));
+    if (found.size !== before) store.setItem(KEY, JSON.stringify([...found]));
   } catch {
     // The Codex is a convenience only.
   }
