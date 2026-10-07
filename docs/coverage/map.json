@@ -4931,6 +4931,556 @@
    "ref": "Willowgift",
    "status": "covered",
    "note": "Speed while fortified and spell suppression while fortified (modelled as spell dodge), with dexterity and cold resistance for fire resistance. The loss of the fortification damage reduction is dropped."
+  },
+  "rotbloomPendant": {
+   "ref": "Aul's Uprising",
+   "status": "covered",
+   "note": "All attributes, life and global defences, plus the Envy aura approximated as a flat increase to chaos damage (no skill, no reservation). The granted Envy skill and its no-reservation line are dropped."
+  },
+  "brawlersFetish": {
+   "ref": "Rigwald's Curse",
+   "status": "covered",
+   "note": "Unarmed critical strike chance and critical multiplier. The rule that claw modifiers also apply to unarmed attacks is dropped (no counterpart)."
+  },
+  "ebbtideCharm": {
+   "ref": "Sidhebreath",
+   "status": "covered",
+   "note": "Minion life and speed with cold resistance; the added cold damage of minions is approximated as increased minion damage, and the minion mana cost is reduced."
+  },
+  "wrathwingPendant": {
+   "ref": "Tavukai",
+   "status": "covered",
+   "note": "Intelligence and life regeneration with strongly increased minion damage. The reference limits the damage to raging spirits and adds a life drain to them; here it applies to all minions and the drain, duration and spirit life lines are dropped."
+  },
+  "golemcallerChain": {
+   "ref": "The Primordial Chain",
+   "status": "covered",
+   "note": "Three additional minions at a time, paid for with less minion damage, and much faster minions. The golem-only restriction, size and life lines are dropped: the extra count applies to every summon."
+  },
+  "rimegirtBelt": {
+   "ref": "Hyperboreus",
+   "status": "covered",
+   "note": "Strongly increased damage against chilled enemies with cold resistance. The Focus skill lines are dropped."
+  },
+  "hollowgutSash": {
+   "ref": "Faminebind",
+   "status": "covered",
+   "note": "A burning aura that scorches nearby enemies each second, with longer flask effects, physical and projectile damage and cold resistance. The aura burns for fire damage as a share of maximum life instead of a flat chaos amount; the flask charge penalty is dropped."
+  },
+  "snaresmithCord": {
+   "ref": "Sunblast",
+   "status": "covered",
+   "note": "Trap damage with stun recovery, mana regeneration and fire resistance. The short trap duration and triggering traps at the end of their duration are dropped (no counterpart)."
+  },
+  "pallbearerRobe": {
+   "ref": "Cloak of Tawm'r Isley",
+   "status": "covered",
+   "note": "A high energy shield robe whose socketed gems are supported by life leech (the reference limits it to minion gems). Minion blinding and the identified-drops line are dropped."
+  },
+  "tidewallPlate": {
+   "ref": "Craiceann's Carapace",
+   "status": "covered",
+   "note": "Huge armour, life and fire and cold resistance. The crab aspect and its barriers are approximated as a steelskin-style guard triggered when hit; the bleed immunity is dropped."
+  },
+  "marshalsHauberk": {
+   "ref": "Chains of Command",
+   "status": "covered",
+   "note": "Armour, energy shield and life, and each kill has a chance to animate a weapon. The animated-guardian damage and splash lines are dropped, as is the restriction on other minions."
+  },
+  "hexwovenRobe": {
+   "ref": "Doedre's Skin",
+   "status": "covered",
+   "note": "Socketed curses are supported by the blasphemy support, and curses can stack beyond the usual limit, on a high energy shield robe. The summoned effigy and its triggered curses are dropped."
+  },
+  "prowlersPelt": {
+   "ref": "Farrul's Fur",
+   "status": "covered",
+   "note": "Casts the cat aspect (stealth) on hit, with a short cooldown, on a heavy armour and evasion body with big life. The extra stealth duration, the charge gain and the phasing are dropped."
+  },
+  "silkweaverShroud": {
+   "ref": "Fenumus' Shroud",
+   "status": "covered",
+   "note": "Casts the spider aspect (webs) on hit, with a short cooldown, on a high energy shield robe with intelligence. The web weakening lines, the aspect area bonus and the energy shield regeneration are dropped."
+  },
+  "moulderingHost": {
+   "ref": "Rotting Legion",
+   "status": "covered",
+   "note": "Armour, energy shield and life with the minion meat-shield support. The per-zombie bonuses are flat here, scaled for about four zombies: increased damage and less elemental damage taken."
+  },
+  "duskveilCarapace": {
+   "ref": "Shroud of the Lightless",
+   "status": "covered",
+   "note": "Evasion, energy shield, life and mana. The socketed penetration support is approximated as flat elemental penetration; the shade form trigger and the abyss jewel scaling are dropped."
+  },
+  "totemwrightRobe": {
+   "ref": "Soul Mantle",
+   "status": "covered",
+   "note": "Socketed spells are supported by the spell totem support, with one additional totem, spell damage and energy shield. Totem life and the curse on totem death are dropped."
+  },
+  "feastdayRegalia": {
+   "ref": "The Queen's Hunger",
+   "status": "covered",
+   "note": "Triggers the bone, flesh and spirit offerings in turn: each fires on hit with its own cooldown, so they come about as often as in the reference but not in sequence. Offerings affecting you are dropped, as is the veiled prefix."
+  },
+  "gravecallerSilks": {
+   "ref": "Vis Mortis",
+   "status": "covered",
+   "note": "High energy shield and mana with increased minion damage. The minion life penalty (minions cannot be hurt) and the chaos gain are dropped."
+  },
+  "huntersHide": {
+   "ref": "Yriel's Fostering",
+   "status": "covered",
+   "note": "Greatly increased critical strike chance for projectile attacks with accuracy, evasion and life. The summoned bestial minion and the bonuses that depend on it are dropped."
+  },
+  "ironstrideBoots": {
+   "ref": "Alberon's Warpath",
+   "status": "covered",
+   "note": "Added chaos damage to attacks, armour, chaos resistance and big movement speed, with strength and a bonus skeleton."
+  },
+  "gravetreadSlippers": {
+   "ref": "Bones of Ullr",
+   "status": "covered",
+   "note": "Life, mana, energy shield and movement speed with +1 to the level of minion skills (raise zombie and spectre gems in the reference)."
+  },
+  "deathpledgePlate": {
+   "ref": "Death's Oath",
+   "status": "covered",
+   "note": "A burning aura that scorches nearby enemies (fire damage as a share of maximum life instead of the chaos aura skill), with attributes, life, attack speed, armour and attack leech. The chaos damage taken on kill is dropped."
+  },
+  "featherstormRaiment": {
+   "ref": "Saqawal's Nest",
+   "status": "covered",
+   "note": "Casts the avian aspect (flight and might) on hit, with a short cooldown, on a robe with attributes, lightning resistance, reduced reservation and flat evasion and energy shield. The doubled aspect effect and the party share are dropped."
+  },
+  "moonstepLeathers": {
+   "ref": "The Perfect Form",
+   "status": "covered",
+   "note": "Grants the cold evasion armour skill and dodges spells, with evasion, life, dexterity and a cold resistance penalty. The cold-resistance scaling of evasion is dropped, and phase acrobatics is approximated as spell dodge."
+  },
+  "whiteoutLeathers": {
+   "ref": "The Snowblind Grace",
+   "status": "covered",
+   "note": "Grants the cold evasion armour skill with spell dodge, evasion, dexterity and life. The stronger buff effect and the cold-resistance scaling of evasion are dropped."
+  },
+  "springwireBoots": {
+   "ref": "Deerstalker",
+   "status": "covered",
+   "note": "Socketed gems are supported by the trap support, with evasion, life, movement speed and faster trap throwing (applied to both attack and spell traps). The speed burst after throwing a trap is dropped."
+  },
+  "hushpadBoots": {
+   "ref": "Farrul's Chase",
+   "status": "covered",
+   "note": "Movement speed that doubles up while hidden by the cat aspect (the aspect itself comes from another item, as in the reference). The triggered cry on losing the stealth and the bleed avoidance are dropped."
+  },
+  "webspunTreads": {
+   "ref": "Fenumus' Spinnerets",
+   "status": "covered",
+   "note": "Evasion and energy shield, resistances and speed, with a little energy shield on every hit (standing in for the gain per hit on a webbed enemy, scaled by the energy shield ratio, so it applies even without webs). The extra web application and the debuff duration are dropped."
+  },
+  "spendthriftBoots": {
+   "ref": "Omeyocan",
+   "status": "covered",
+   "note": "A mana-hungry boot: flat dodge for attacks and spells (the reference scales it with maximum mana up to 20%, here a flat 16%), 7% of mana regenerated negatively every second, and Onslaught approximated as 20% attack, cast and movement speed while not on low mana."
+  },
+  "stormcrowBoots": {
+   "ref": "Saqawal's Talons",
+   "status": "covered",
+   "note": "Grants the winged aspect, with armour and evasion, movement speed and big life and mana regeneration while its boon is active. The boon duration change is dropped."
+  },
+  "hearthstepGreaves": {
+   "ref": "Torchoak Step",
+   "status": "covered",
+   "note": "Armour and movement speed with faster totem placement (as totem skill speed, for both attacks and spells). Totem life and the fire reflection are dropped."
+  },
+  "garrisonBow": {
+   "ref": "Iron Commander",
+   "status": "covered",
+   "note": "A fast physical bow that raises the number of totems, traps, mines or brands at a time for each 200 dexterity, with faster totem placement and added physical per dexterity. Totem life is dropped; the extra deployables count for every deployable, not just ballistae."
+  },
+  "ghoulstring": {
+   "ref": "Null's Inclination",
+   "status": "covered",
+   "note": "Huge added chaos damage and attack speed, minion damage per dexterity, and socketed minion spells cast on kill with the bow (an attack kill, with a short cooldown). The intelligence requirement is dropped."
+  },
+  "splitfangBow": {
+   "ref": "Slivertongue",
+   "status": "covered",
+   "note": "Heavy added physical damage with big crit chance and crit multiplier on projectiles and an extra pierce. Bob has no forking arrows, so the fork conditions are approximated as applying to all projectiles."
+  },
+  "kennelTalon": {
+   "ref": "The Scourge",
+   "status": "covered",
+   "note": "A fast physical claw for minion builds: faster minions, big minion damage after you hit, and a chance on kill to call a pack of minions (the furies stand in for the spectral wolf). The shared minion damage on the wearer is dropped."
+  },
+  "snarewrightMitts": {
+   "ref": "Architect's Hand",
+   "status": "covered",
+   "note": "Dexterity and evasion with energy shield, wider trap areas, and slower trap throwing. The cast-speed-to-trap-speed rule is dropped."
+  },
+  "gravetenderGloves": {
+   "ref": "Aukuna's Will",
+   "status": "covered",
+   "note": "Grants the husk summon (the corpse-free zombie analog) with dexterity, cast speed and evasion with energy shield. The zombie life line maps to minion life, which has no effect because minions cannot be hurt; the corpse lines are dropped."
+  },
+  "spindleGloves": {
+   "ref": "Fenumus' Weave",
+   "status": "covered",
+   "note": "Grants the spider aspect with evasion and energy shield, life, and attack and cast speed. The damage and added chaos that scale with webs on the enemy are dropped."
+  },
+  "bloodrushGauntlets": {
+   "ref": "Flesh and Spirit",
+   "status": "covered",
+   "note": "Attack speed, armour and evasion and life regeneration with a life recovery on kill (the reference recovers 20% of life when a kill streak triggers rampage, here an even 1% on every kill). The vaal soul line is dropped."
+  },
+  "frostbinderGloves": {
+   "ref": "Grip of the Council",
+   "status": "covered",
+   "note": "Strength, life and cold resistance with extra minion damage standing in for the cold gained as extra damage. The slower minions and the minion resistance are dropped."
+  },
+  "cyclegripMitts": {
+   "ref": "Malachai's Mark",
+   "status": "covered",
+   "note": "Evasion and energy shield, life, and life and energy shield on kill. The timed sequence of endurance, frenzy and power charges is approximated as a chance to gain each charge on kill."
+  },
+  "zephyrGauntlets": {
+   "ref": "Saqawal's Winds",
+   "status": "covered",
+   "note": "Armour and energy shield, life and cold and lightning resistance, with added cold and lightning damage while the winged aspect boon is active. The aspect itself comes from another item, as in the reference, and the boon duration change is dropped."
+  },
+  "smokeveilGloves": {
+   "ref": "Shadows and Dust",
+   "status": "covered",
+   "note": "Crit chance and multiplier, evasion and energy shield and mana leech, with Unholy Might on kill (the kill-streak rampage approximated as a 5% chance). The smoke cloud is dropped."
+  },
+  "pitfallMitts": {
+   "ref": "Slavedriver's Hand",
+   "status": "covered",
+   "note": "Dexterity and a lot of evasion and energy shield, with trap skills costing life instead of mana, wider trap areas and slower trap throwing. The charge on trap trigger and the cast-speed-to-trap-speed rule are dropped."
+  },
+  "voidlitCrown": {
+   "ref": "Ahn's Contempt",
+   "status": "covered",
+   "note": "All attributes, armour and energy shield, life, one fewer power charge, and physical damage gained as extra chaos. The reference only grants the chaos at maximum power charges and softens crits with none; here the chaos gain is unconditional and the crit line is dropped."
+  },
+  "threefoldCrown": {
+   "ref": "Crown of the Inward Eye",
+   "status": "covered",
+   "note": "Huge armour and energy shield with more maximum life, mana and energy shield. The three transfiguration effects are dropped."
+  },
+  "powderMask": {
+   "ref": "Curtain Call",
+   "status": "covered",
+   "note": "A little life, and extra deployables (totems, traps, mines or brands at a time) at 500 dexterity and again at 500 intelligence. The mine laying and arming speed lines are dropped."
+  },
+  "prowlMask": {
+   "ref": "Farrul's Bite",
+   "status": "covered",
+   "note": "Grants the cat aspect with evasion and energy shield, cold resistance and extra crit chance while its stealth is active (the +1% base crit chance is approximated as 20% increased). The blind chance and the damage against blinded enemies are dropped."
+  },
+  "wraithveilMask": {
+   "ref": "Heretic's Veil",
+   "status": "covered",
+   "note": "Energy shield and evasion, plus one level to socketed curse gems and an extra hex at a time (standing in for the blasphemy support). The curse reservation reduction is dropped."
+  },
+  "stonewardGauntlets": {
+   "ref": "Null and Void",
+   "status": "covered",
+   "note": "Strength, armour and energy shield, life and mana regeneration, with a chance on kill to gain the Steel Hide guard (the rampage streak approximated as a 5% chance, and the physical immunity as the guard buff). The ailment dispel is dropped."
+  },
+  "grinningMask": {
+   "ref": "Leer Cast",
+   "status": "covered",
+   "note": "A joke item that works for a lone fighter: less damage, then the group damage bonus applies to you since Bob has no allies, for a net penalty, with dexterity, life and mana."
+  },
+  "bloodglassVisor": {
+   "ref": "Malachai's Awakening",
+   "status": "covered",
+   "note": "Blood magic with big added cold, fire and lightning damage to spells, spell damage, strength and all resistances. The 'while no life is reserved' condition is dropped (the added damage always applies) and the variant Mortal Conviction line is dropped."
+  },
+  "emberwritCirclet": {
+   "ref": "Mark of the Red Covenant",
+   "status": "covered",
+   "note": "Energy shield, faster minions and a huge minion damage bonus. The reference line is about burning spirits only; here the damage bonus covers all minions (Call Furies is the spirit analog). The spirit count penalty, the always-ignite and the duration refresh lines are dropped."
+  },
+  "assizeCrown": {
+   "ref": "Mask of the Tribunal",
+   "status": "covered",
+   "note": "Huge armour and energy shield with all attributes. The reference grants its bonuses to nearby allies; Bob has no allies, so the character gets them: global defences per 100 strength, critical strike multiplier per 100 dexterity and cast speed per 100 intelligence. The reduced reservation line is dropped."
+  },
+  "whorlHelm": {
+   "ref": "Mindspiral",
+   "status": "covered",
+   "note": "Cold and lightning damage with a deep mana pool. Damage taken gained as mana over time is approximated by a small flat mana gain when you are hit. The extra energy shield from maximum mana, the leech restrictions and the enemy leech line are dropped."
+  },
+  "featherstormHood": {
+   "ref": "Saqawal's Flock",
+   "status": "covered",
+   "note": "Evasion, life, lightning resistance and movement speed, and it casts the avian boon (Feathered Boon) when you hit an enemy, every 12 seconds. The tornado trigger on gaining the boon is dropped."
+  },
+  "oratorsGarland": {
+   "ref": "Speaker's Wreath",
+   "status": "covered",
+   "note": "Dexterity and skill effect duration, with minion attack and movement speed that grows with dexterity (2% per 50). The ignited-only minion kill rule is dropped."
+  },
+  "sinewlordHelm": {
+   "ref": "The Baron",
+   "status": "covered",
+   "note": "Plus two to socketed minion gems, strength and minion life. Half of your strength going to minions is approximated as 1% increased minion damage per 10 strength; one more minion per 300 strength (it applies to all minions, not only zombies). The leech at 1000 strength is dropped."
+  },
+  "smoulderplateHelm": {
+   "ref": "The Formless Flame",
+   "status": "covered",
+   "note": "Armour and life with less fire damage taken from hits. Armour scaling with fire resistance is approximated by a flat 75% increased armour (the usual capped fire resistance); the fire reduction applies to attack hits."
+  },
+  "pyreplateHelm": {
+   "ref": "The Formless Inferno",
+   "status": "covered",
+   "note": "Big armour, some physical damage taken as fire and a fire resistance penalty. Armour scaling with uncapped fire resistance is approximated by a flat 45% increased armour (a capped resistance minus the penalty)."
+  },
+  "gravecallCirclet": {
+   "ref": "Wraithlord",
+   "status": "covered",
+   "note": "Plus two to socketed minion gems with a lot of energy shield. Minion life regeneration and spectre life are dropped (minions cannot be hurt, no spectres)."
+  },
+  "twinflameHatchet": {
+   "ref": "Dyadus",
+   "status": "covered",
+   "note": "Written as the main-hand half: big added fire damage, ignite chance, attack speed and more ignite damage against chilled enemies. The off-hand cold damage and chill on hit lines are dropped (hand-specific)."
+  },
+  "pottersMaul": {
+   "ref": "Clayshaper",
+   "status": "covered",
+   "note": "Grants the stone golem skill (Stone Colossus) with one more minion, minion life, attack speed, added physical damage and a lower enemy stun threshold. The minion added-physical line is dropped (folded into the weapon's own damage)."
+  },
+  "fleetsongBlade": {
+   "ref": "Beltimber Blade",
+   "status": "covered",
+   "note": "Huge physical damage and attack speed with evasion while moving and two additional projectiles. The 'used a movement skill recently' condition is dropped (the projectiles always apply). Far Shot is dropped."
+  },
+  "dicebrand": {
+   "ref": "Fate of the Vaal",
+   "status": "covered",
+   "note": "Physical damage is converted to elements (a random element in the reference, here an even three-way split of 99%), every hit can inflict elemental ailments, and more damage against ignited, frozen and shocked enemies."
+  },
+  "slumberCutlass": {
+   "ref": "Severed in Sleep",
+   "status": "covered",
+   "note": "Minion damage with all attributes and accuracy. The minion poison chance and the life recovery on killing a poisoned enemy are dropped."
+  },
+  "wagerBlade": {
+   "ref": "Story of the Vaal",
+   "status": "covered",
+   "note": "Half the physical damage is converted to elements (a random element in the reference, here split evenly) and every hit can inflict elemental ailments, with life on kill."
+  },
+  "winterbrideSabre": {
+   "ref": "The Princess",
+   "status": "covered",
+   "note": "Physical damage, attack speed and a quarter of physical damage as extra cold. The increased damage taken from skeletons and ghosts is dropped."
+  },
+  "forkfeatherQuiver": {
+   "ref": "Rigwald's Quills",
+   "status": "covered",
+   "note": "Projectile damage, accuracy and life on hit at a projectile speed cost. Projectiles fork in the reference; here they chain once (an extra target per projectile)."
+  },
+  "standmakerQuiver": {
+   "ref": "Skirmish",
+   "status": "covered",
+   "note": "Mana, mana regeneration, accuracy and mana leech with one additional totem at a time (applies to every totem skill, not only attack ones)."
+  },
+  "saltmireBand": {
+   "ref": "Brinerot Mark",
+   "status": "covered",
+   "note": "Plus three to socketed minion (golem) gems with spell damage, energy shield and lightning resistance. The golem buff effect and golem energy shield lines are dropped."
+  },
+  "lifelineLoop": {
+   "ref": "Heartbound Loop",
+   "status": "covered",
+   "note": "Life and mana regeneration with more minion life. The minion area of effect and the physical damage taken on minion death are dropped."
+  },
+  "yokemarkRing": {
+   "ref": "Mark of Submission",
+   "status": "covered",
+   "note": "Enemies you hit are cursed. The reference uses a socketed curse gem; here the curse is fixed to the elemental weakness hex at level 10."
+  },
+  "hushgaleSeal": {
+   "ref": "Mutewind Seal",
+   "status": "covered",
+   "note": "Plus three to socketed minion (golem) gems, added physical damage to attacks, attack speed and dodge. The golem cast speed and onslaught lines are dropped."
+  },
+  "rustforgeBand": {
+   "ref": "Redblade Band",
+   "status": "covered",
+   "note": "Plus three to socketed minion (golem) gems with strength, life and fire damage. The golem taunt and life regeneration lines are dropped."
+  },
+  "reefflareRing": {
+   "ref": "Sibyl's Lament",
+   "status": "covered",
+   "note": "Added fire damage to attacks and elemental attack damage at a rarity cost. The ring-slot reflect reduction lines are dropped (no reflected damage taken)."
+  },
+  "coilwindRing": {
+   "ref": "Snakepit",
+   "status": "covered",
+   "note": "Cold damage and cast speed with spell projectiles that chain once more (the right-ring-slot half applied wherever it is worn). The fork, no-pierce and left-slot lines are dropped."
+  },
+  "anchorfallBlade": {
+   "ref": "Varunastra",
+   "status": "covered",
+   "note": "Accuracy, physical damage and added physical damage with mana gained on hit. The 'counts as all one handed melee weapon types' line is dropped."
+  },
+  "venomstingDirk": {
+   "ref": "Arakaali's Fang",
+   "status": "covered",
+   "note": "Huge physical, added physical and chaos and poison chance on a dagger. Kills summon a few minions (Call Bonewalkers stands in for the reference spiders, which were a variant line; the trigger is capped by a cooldown)."
+  },
+  "cinderfangKnife": {
+   "ref": "Vulconus",
+   "status": "covered",
+   "note": "Enormous added physical and fire on a dagger, bleed chance, more fire against bleeding enemies and more physical against ignited ones. The timed fire-avatar cycle is replaced by its average: half the conversion and crit bonus all the time. The armour while not in avatar form is dropped."
+  },
+  "charnelWand": {
+   "ref": "Mon'tregul's Grasp",
+   "status": "covered",
+   "note": "Elemental damage with fewer but much stronger minions: one minion fewer, and minions deal a large amount more damage. Zombie life, resistance, size and the death explosion are dropped."
+  },
+  "bulwarkOfGrit": {
+   "ref": "Ahn's Heritage",
+   "status": "covered",
+   "note": "Life and armour on a tower shield, paid for with a lower block cap and one fewer grit charge, in exchange for higher maximum resistances (always on here; the reference needed no endurance charges). The onslaught at maximum charges is dropped."
+  },
+  "venomboundAegis": {
+   "ref": "Apep's Slumber",
+   "status": "covered",
+   "note": "Added chaos damage and energy shield, with higher maximum resistances and a much faster energy shield recharge while poisoned, and poison that lingers on you. The poison-per-stack regeneration is approximated by the recharge rate; the extra chance to be poisoned is dropped."
+  },
+  "surgemarkAegis": {
+   "ref": "Bitterbind Point",
+   "status": "covered",
+   "note": "Spell damage and big energy shield, with Arcane Surge gained on every critical strike and a boost to spell crit (the reference scaled it per spectre; one spectre is assumed). The spectre life and the spectres' share of the surge are dropped, and so is the crafted support gem level."
+  },
+  "snapjawBulwark": {
+   "ref": "Jaws of Agony",
+   "status": "covered",
+   "note": "Grants the jaws trap skill with trap damage, physical damage, life, flat physical damage taken reduction and spell dodge. The power charge on throwing a trap is dropped."
+  },
+  "broodWarden": {
+   "ref": "Matua Tupuna",
+   "status": "covered",
+   "note": "Plus levels to socketed minion gems with mana, energy shield, spell damage and stronger auras on you. The aura effect on minions and the tar are dropped."
+  },
+  "howlcallBuckler": {
+   "ref": "Mutewind Pennant",
+   "status": "covered",
+   "note": "Evasion, movement speed, cold resistance and area of effect, with a chance for onslaught when you cast (warcries are spells here; the reference gave it on every warcry) and longer warcry buffs in place of the warcry effect."
+  },
+  "rootspireBulwark": {
+   "ref": "Trolltimber Spire",
+   "status": "covered",
+   "note": "Life, life regeneration and heavy armour with wider totem skills and a little life leech from totem damage."
+  },
+  "totemboundRampart": {
+   "ref": "Tukohama's Fortress",
+   "status": "covered",
+   "note": "Huge life with Blood Magic, more totem damage, and one additional totem. The armour per active totem is a flat amount (one totem assumed); the other keystone variant is dropped."
+  },
+  "almsgiverKite": {
+   "ref": "Victario's Charity",
+   "status": "covered",
+   "note": "Life, lightning and chaos resistance, wider auras, and charges on kill and hit. The reference granted them to nearby allies; here they go to you."
+  },
+  "hatcheryWarden": {
+   "ref": "Whakatutuki o Matua",
+   "status": "covered",
+   "note": "Plus three levels to socketed minion gems, energy shield, mana, and stronger auras on you, with life regeneration after blocking. The aura effect on minions and the tar are dropped."
+  },
+  "hexholdRoundel": {
+   "ref": "Wheel of the Stormsail",
+   "status": "covered",
+   "note": "Item rarity and block with longer curses. The longer duration of curses on you is dropped."
+  },
+  "ossuaryStaff": {
+   "ref": "Femurs of the Saints",
+   "status": "covered",
+   "note": "Block while wielding a staff, plus two to minion gems and a large minion damage bonus. The per-skeleton, zombie, spectre and raging spirit scaling lines are dropped."
+  },
+  "briarsnareRod": {
+   "ref": "Fencoil",
+   "status": "covered",
+   "note": "Staff linked to the trap support, with damage, life and mana and block."
+  },
+  "marshsnareRod": {
+   "ref": "Mirebough",
+   "status": "covered",
+   "note": "Staff linked to the trap, cluster trap and trap-and-mine damage supports, with damage, life and mana and block."
+  },
+  "roarboundCleaver": {
+   "ref": "Debeon's Dirge",
+   "status": "covered",
+   "note": "Enormous added cold on a two-handed axe, with movement speed and elemental damage while a Kindled Fury warcry is active (the reference counted any warcry used recently). The warcry knockback is dropped."
+  },
+  "streakbreakerAxe": {
+   "ref": "Sinvicta's Mettle",
+   "status": "covered",
+   "note": "Physical damage and attack speed on a fast axe. The rampage streak is approximated by a flat area bonus and a small frenzy-charge chance on kill (fervour here)."
+  },
+  "twinfireCleaver": {
+   "ref": "Wings of Entropy",
+   "status": "covered",
+   "note": "Both fire and chaos added damage on a two-handed axe, plus flat attack block and physical damage. The reference counted as dual wielding and split the flat damage by hand; here the axe carries both and the block is unconditional."
+  },
+  "barrowmaul": {
+   "ref": "Chaber Cairn",
+   "status": "covered",
+   "note": "Huge physical damage with socketed melee and minion gem levels, mana and minion life and longer skill effects."
+  },
+  "gravemaul": {
+   "ref": "Chober Chaber",
+   "status": "covered",
+   "note": "Stun duration, socketed melee and minion gem levels, mana, minion life and a smaller skill effect duration bonus. The strength requirement reduction is dropped."
+  },
+  "bladewakeHammer": {
+   "ref": "Jorrhast's Blacksteel",
+   "status": "covered",
+   "note": "Physical damage, attack and cast speed, and a chance on kill to wake animated blades (Wake Blades stands in for the reference trigger). The duration and extra-copy lines are dropped."
+  },
+  "regentsWrit": {
+   "ref": "Queen's Decree",
+   "status": "covered",
+   "note": "Three additional minions, minion life, damage and long minion durations, with accuracy on a sword."
+  },
+  "regentsFlight": {
+   "ref": "Queen's Escape",
+   "status": "covered",
+   "note": "Three additional minions, minion life, damage, movement speed and long minion durations, with accuracy on a sword."
+  },
+  "whirlwindFalchion": {
+   "ref": "The Dancing Dervish",
+   "status": "covered",
+   "note": "Physical damage, attack speed, accuracy and movement speed, with a chance on kill to wake animated blades (Wake Blades stands in for the manifested dancer; the rampage requirement and the weapon-slot lock are dropped)."
+  },
+  "twinwhirlFalchion": {
+   "ref": "The Dancing Duo",
+   "status": "covered",
+   "note": "Physical damage, attack speed and movement speed, with a chance on kill to wake animated blades (Wake Blades stands in for the manifested dancers; the rampage requirement, weapon-slot lock and the second copy are dropped)."
+  },
+  "bonepactWand": {
+   "ref": "Midnight Bargain",
+   "status": "covered",
+   "note": "Spell damage, intelligence and three additional minions with minion speed and damage. The reserved life is modelled as a flat reduction of maximum life; the chaos inoculation restriction is dropped."
+  },
+  "wraithcallStaff": {
+   "ref": "Soulwrest",
+   "status": "covered",
+   "note": "Huge spell damage, cast speed and mana regeneration, with a chance on kill to call spectral motes (Whirring Motes stands in for the phantasm; the reference triggered it by consuming corpses). The minion flat physical damage and the corpse regeneration are dropped."
+  },
+  "hoarwhisperStaff": {
+   "ref": "The Whispering Ice",
+   "status": "covered",
+   "note": "Grants a cold area spell (Rime Spires stands in for the reference ice storm), with block, cast speed, intelligence and spell damage per ten intelligence. The support gem level is dropped."
+  },
+  "quakefuseStaff": {
+   "ref": "Tremor Rod",
+   "status": "covered",
+   "note": "Staff linked to the blastchain mine support, with spell damage, block, a lower enemy stun threshold and mines that repeat once more."
   }
  }
 }

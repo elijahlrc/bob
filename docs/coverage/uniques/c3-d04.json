@@ -1,0 +1,94 @@
+[
+  { "ref": "Arakaali's Fang", "name": "Venomsting Dirk", "flavour": "It leaves small things crawling where the big thing fell.", "note": "Huge physical, added physical and chaos and poison chance on a dagger. Kills summon a few minions (Call Bonewalkers stands in for the reference spiders, which were a variant line; the trigger is capped by a cooldown).", "drop": ["Raise Spiders on Kill"], "triggers": [{ "on": "kill", "chance": 100, "cooldown": 2, "effect": { "kind": "castGranted", "skillId": "callBonewalkers", "level": 5 } }] },
+  { "ref": "Vulconus", "name": "Cinderfang Knife", "flavour": "Warm to the hand, hotter to the wound.", "note": "Enormous added physical and fire on a dagger, bleed chance, more fire against bleeding enemies and more physical against ignited ones. The timed fire-avatar cycle is replaced by its average: half the conversion and crit bonus all the time. The armour while not in avatar form is dropped.", "drop": ["increased Fire Damage with Hits and Ailments against Bleeding Enemies", "increased Physical Damage with Hits and Ailments against Ignited Enemies", "Every 8 seconds, gain Avatar of Fire", "Critical Strike Chance while you have Avatar of Fire", "Physical Damage Converted to Fire while you have Avatar of Fire", "Armour while you do not have Avatar of Fire"], "mods": [
+    { "stat": "damage", "kind": "inc", "min": 75, "max": 100, "damageTypes": ["fire"], "condition": { "id": "targetBleeding" } },
+    { "stat": "damage", "kind": "inc", "min": 75, "max": 100, "damageTypes": ["physical"], "condition": { "id": "targetIgnited" } },
+    { "stat": "critChance", "kind": "inc", "min": 80, "max": 100 },
+    { "stat": "convert.physical.fire", "kind": "base", "min": 25, "max": 25 }
+  ] },
+  { "ref": "Mon'tregul's Grasp", "name": "Charnel Wand", "flavour": "Fewer of them, and none of them kind.", "note": "Elemental damage with fewer but much stronger minions: one minion fewer, and minions deal a large amount more damage. Zombie life, resistance, size and the death explosion are dropped.", "drop": ["reduced maximum number of Raised Zombies", "Raised Zombies have +5000 to maximum Life", "increased Zombie Resistances", "increased Zombie Size", "Enemies killed by Zombies explode", "Raised Zombies deal"], "mods": [
+    { "stat": "minionCount", "kind": "base", "min": -1, "max": -1 },
+    { "stat": "minionDamage", "kind": "more", "min": 80, "max": 100 }
+  ] },
+  { "ref": "Ahn's Heritage", "name": "Bulwark of Grit", "flavour": "It asks for a smaller wall, and gives a thicker one.", "note": "Life and armour on a tower shield, paid for with a lower block cap and one fewer grit charge, in exchange for higher maximum resistances (always on here; the reference needed no endurance charges). The onslaught at maximum charges is dropped.", "drop": ["to maximum Endurance Charges", "to maximum Block Chance", "to all maximum Resistances while you have no Endurance Charges", "Onslaught while at maximum Endurance Charges"], "mods": [
+    { "stat": "maxCharges.grit", "kind": "base", "min": -1, "max": -1 },
+    { "stat": "blockCap", "kind": "base", "min": -10, "max": -10 },
+    { "stat": "maxResist.allEle", "kind": "base", "min": 3, "max": 3 },
+    { "stat": "maxResist.chaos", "kind": "base", "min": 3, "max": 3 }
+  ] },
+  { "ref": "Apep's Slumber", "name": "Venombound Aegis", "flavour": "Poison is only a slow way to be well.", "note": "Added chaos damage and energy shield, with higher maximum resistances and a much faster energy shield recharge while poisoned, and poison that lingers on you. The poison-per-stack regeneration is approximated by the recharge rate; the extra chance to be poisoned is dropped.", "drop": ["chance to be Poisoned", "to all maximum Resistances while Poisoned", "Energy Shield Regenerated per Second per Poison", "Poisons on you expire"], "mods": [
+    { "stat": "maxResist.allEle", "kind": "base", "min": 3, "max": 3, "condition": { "id": "poisoned" } },
+    { "stat": "maxResist.chaos", "kind": "base", "min": 3, "max": 3, "condition": { "id": "poisoned" } },
+    { "stat": "esRechargeRate", "kind": "inc", "min": 100, "max": 100, "condition": { "id": "poisoned" } },
+    { "stat": "durationOnSelf.poison", "kind": "inc", "min": 100, "max": 100 }
+  ] },
+  { "ref": "Bitterbind Point", "name": "Surgemark Aegis", "flavour": "Each bright hit tightens the spring.", "note": "Spell damage and big energy shield, with Arcane Surge gained on every critical strike and a boost to spell crit (the reference scaled it per spectre; one spectre is assumed). The spectre life and the spectres' share of the surge are dropped, and so is the crafted support gem level.", "drop": ["Spectres have", "Gain Arcane Surge when you deal a Critical Strike", "Your Raised Spectres also gain Arcane Surge", "Critical Strike Chance for Spells per Raised Spectre", "Level of Socketed Support Gems"], "mods": [
+    { "stat": "buffOn.crit.arcaneSurge", "kind": "base", "min": 100, "max": 100 },
+    { "stat": "critChance", "kind": "inc", "min": 40, "max": 50, "tags": ["spell"] }
+  ] },
+  { "ref": "Jaws of Agony", "name": "Snapjaw Bulwark", "flavour": "The door shuts on whatever follows you in.", "note": "Grants the jaws trap skill with trap damage, physical damage, life, flat physical damage taken reduction and spell dodge. The power charge on throwing a trap is dropped.", "drop": ["Trap Damage", "Power Charge on Throwing a Trap"], "mods": [{ "stat": "damage", "kind": "inc", "min": 18, "max": 28, "tags": ["trap"] }] },
+  { "ref": "Matua Tupuna", "name": "Brood Warden", "flavour": "Everything under its shade grows a little stronger.", "note": "Plus levels to socketed minion gems with mana, energy shield, spell damage and stronger auras on you. The aura effect on minions and the tar are dropped.", "drop": ["Effect of Auras on You", "Effect of Auras on your Minions", "Spreads Tar"], "mods": [{ "stat": "auraEffect", "kind": "inc", "min": 10, "max": 10 }] },
+  { "ref": "Mutewind Pennant", "name": "Howlcall Buckler", "flavour": "Shout, and the legs remember how to run.", "note": "Evasion, movement speed, cold resistance and area of effect, with a chance for onslaught when you cast (warcries are spells here; the reference gave it on every warcry) and longer warcry buffs in place of the warcry effect.", "drop": ["Increased Evasion Rating", "Onslaught for 4 seconds on using a Warcry", "Increased Warcry Effect"], "mods": [
+    { "stat": "evasion", "kind": "inc", "min": 80, "max": 100, "local": true },
+    { "stat": "buffOn.cast.onslaught", "kind": "base", "min": 20, "max": 20 },
+    { "stat": "skillDuration", "kind": "inc", "min": 25, "max": 25, "tags": ["warcry"] }
+  ] },
+  { "ref": "Trolltimber Spire", "name": "Rootspire Bulwark", "flavour": "Planted, and it keeps what it plants.", "note": "Life, life regeneration and heavy armour with wider totem skills and a little life leech from totem damage.", "drop": ["Area of Effect for Skills used by Totems", "Damage dealt by your Totems is Leeched"], "mods": [
+    { "stat": "aoe", "kind": "inc", "min": 15, "max": 15, "tags": ["totem"] },
+    { "stat": "leech.life", "kind": "base", "min": 0.5, "max": 0.5, "tags": ["totem"] }
+  ] },
+  { "ref": "Tukohama's Fortress", "name": "Totembound Rampart", "flavour": "Wherever the post stands, so do you.", "note": "Huge life with Blood Magic, more totem damage, and one additional totem. The armour per active totem is a flat amount (one totem assumed); the other keystone variant is dropped.", "drop": ["Totem Damage", "additional Totem summoned at a time", "Armour per active Totem", "Mortal Conviction"], "mods": [
+    { "stat": "damage", "kind": "inc", "min": 40, "max": 40, "tags": ["totem"] },
+    { "stat": "deployCount", "kind": "base", "min": 1, "max": 1 },
+    { "stat": "armour", "kind": "base", "min": 180, "max": 180 }
+  ] },
+  { "ref": "Victario's Charity", "name": "Almsgiver Kite", "flavour": "Spend it on others and it comes back doubled.", "note": "Life, lightning and chaos resistance, wider auras, and charges on kill and hit. The reference granted them to nearby allies; here they go to you.", "drop": ["Area of Effect of Aura Skills", "to grant a Power Charge to nearby Allies on Kill", "to grant a Frenzy Charge to nearby Allies on Hit"], "mods": [
+    { "stat": "aoe", "kind": "inc", "min": 20, "max": 20, "tags": ["aura"] },
+    { "stat": "chargeOn.kill.insight", "kind": "base", "min": 10, "max": 10 },
+    { "stat": "chargeOn.hit.fervour", "kind": "base", "min": 5, "max": 5 }
+  ] },
+  { "ref": "Whakatutuki o Matua", "name": "Hatchery Warden", "flavour": "A fresh brood for every blow it turns.", "note": "Plus three levels to socketed minion gems, energy shield, mana, and stronger auras on you, with life regeneration after blocking. The aura effect on minions and the tar are dropped.", "drop": ["Effect of Auras on you", "Effect of Auras on your Minions", "Spreads Tar", "Regenerate 5% of Life per second"], "mods": [
+    { "stat": "auraEffect", "kind": "inc", "min": 20, "max": 20 },
+    { "stat": "lifeRegenPct", "kind": "base", "min": 5, "max": 5, "condition": { "id": "blockedRecently" } }
+  ] },
+  { "ref": "Wheel of the Stormsail", "name": "Hexhold Roundel", "flavour": "A curse lingers longer on a patient hand.", "note": "Item rarity and block with longer curses. The longer duration of curses on you is dropped.", "drop": ["Curse Duration", "Duration of Curses on you"], "mods": [{ "stat": "skillDuration", "kind": "inc", "min": 25, "max": 25, "tags": ["curse"] }] },
+  { "ref": "Femurs of the Saints", "name": "Ossuary Staff", "flavour": "Count the bones and call the roll.", "note": "Block while wielding a staff, plus two to minion gems and a large minion damage bonus. The per-skeleton, zombie, spectre and raging spirit scaling lines are dropped.", "drop": ["Chance to Block Attack Damage per Summoned Skeleton", "per Summoned Raging Spirit", "for each Raised Zombie", "per Raised Spectre"] },
+  { "ref": "Fencoil", "name": "Briarsnare Rod", "flavour": "Every step it takes is a trap for someone.", "note": "Staff linked to the trap support, with damage, life and mana and block." },
+  { "ref": "Mirebough", "name": "Marshsnare Rod", "flavour": "Sunk in the bog, set for the next foot.", "note": "Staff linked to the trap, cluster trap and trap-and-mine damage supports, with damage, life and mana and block.", "drop": ["Level 16 Cluster Trap"], "mods": [{ "stat": "socketSupport.snareCluster", "kind": "base", "min": 16, "max": 16 }] },
+  { "ref": "Debeon's Dirge", "name": "Roarbound Cleaver", "flavour": "Silence it, and it only waits.", "note": "Enormous added cold on a two-handed axe, with movement speed and elemental damage while a Kindled Fury warcry is active (the reference counted any warcry used recently). The warcry knockback is dropped.", "drop": ["Movement Speed if you've used a Warcry Recently", "Elemental Damage if you've used a Warcry Recently", "Warcries Knock Enemies Back"], "mods": [
+    { "stat": "moveSpeed", "kind": "inc", "min": 15, "max": 15, "condition": { "id": "infernalCry" } },
+    { "stat": "damage", "kind": "inc", "min": 150, "max": 150, "damageTypes": ["fire", "cold", "lightning"], "condition": { "id": "infernalCry" } }
+  ] },
+  { "ref": "Sinvicta's Mettle", "name": "Streakbreaker Axe", "flavour": "The longer the run, the wider the swing.", "note": "Physical damage and attack speed on a fast axe. The rampage streak is approximated by a flat area bonus and a small frenzy-charge chance on kill (fervour here).", "drop": ["Rampage"], "mods": [
+    { "stat": "aoe", "kind": "inc", "min": 6, "max": 6 },
+    { "stat": "chargeOn.kill.fervour", "kind": "base", "min": 2, "max": 2 }
+  ] },
+  { "ref": "Wings of Entropy", "name": "Twinfire Cleaver", "flavour": "One side burns, the other rots.", "note": "Both fire and chaos added damage on a two-handed axe, plus flat attack block and physical damage. The reference counted as dual wielding and split the flat damage by hand; here the axe carries both and the block is unconditional.", "drop": ["additional Chance to Block while Dual Wielding", "Fire Damage in Main Hand", "Chaos Damage in Off Hand", "Counts as Dual Wielding"], "mods": [
+    { "stat": "blockAttack", "kind": "base", "min": 8, "max": 8 },
+    { "stat": "damage.min", "kind": "base", "min": 55, "max": 65, "damageTypes": ["fire"], "local": true },
+    { "stat": "damage.max", "kind": "base", "min": 100, "max": 120, "damageTypes": ["fire"], "local": true },
+    { "stat": "damage.min", "kind": "base", "min": 55, "max": 65, "damageTypes": ["chaos"], "local": true },
+    { "stat": "damage.max", "kind": "base", "min": 100, "max": 120, "damageTypes": ["chaos"], "local": true }
+  ] },
+  { "ref": "Chaber Cairn", "name": "Barrowmaul", "flavour": "Heavy enough to wake what lies under it.", "note": "Huge physical damage with socketed melee and minion gem levels, mana and minion life and longer skill effects.", "drop": ["Skill Effect Duration"], "mods": [{ "stat": "skillDuration", "kind": "inc", "min": 30, "max": 30 }] },
+  { "ref": "Chober Chaber", "name": "Gravemaul", "flavour": "A lighter swing for a shorter grave.", "note": "Stun duration, socketed melee and minion gem levels, mana, minion life and a smaller skill effect duration bonus. The strength requirement reduction is dropped.", "drop": ["Skill Effect Duration", "Strength Requirement"], "mods": [{ "stat": "skillDuration", "kind": "inc", "min": 15, "max": 15 }] },
+  { "ref": "Jorrhast's Blacksteel", "name": "Bladewake Hammer", "flavour": "Every kill leaves something blunt and sharp behind.", "note": "Physical damage, attack and cast speed, and a chance on kill to wake animated blades (Wake Blades stands in for the reference trigger). The duration and extra-copy lines are dropped.", "drop": ["Animate Weapon", "you Animate create an additional copy"], "triggers": [{ "on": "kill", "chance": 25, "cooldown": 1, "effect": { "kind": "castGranted", "skillId": "wakeBlades", "level": 20 } }] },
+  { "ref": "Queen's Decree", "name": "Regent's Writ", "flavour": "Each word is a small army.", "note": "Three additional minions, minion life, damage and long minion durations, with accuracy on a sword.", "drop": ["Skeleton Duration", "maximum number of Zombies", "maximum number of Spectres", "maximum number of Skeletons"], "mods": [
+    { "stat": "skillDuration", "kind": "inc", "min": 150, "max": 200, "tags": ["minion"] },
+    { "stat": "minionCount", "kind": "base", "min": 1, "max": 1 },
+    { "stat": "minionCount", "kind": "base", "min": 1, "max": 1 },
+    { "stat": "minionCount", "kind": "base", "min": 1, "max": 1 }
+  ] },
+  { "ref": "Queen's Escape", "name": "Regent's Flight", "flavour": "Ride out before the crown can fall.", "note": "Three additional minions, minion life, damage, movement speed and long minion durations, with accuracy on a sword.", "drop": ["Skeleton Duration", "maximum number of Zombies", "maximum number of Spectres", "maximum number of Skeletons"], "mods": [
+    { "stat": "skillDuration", "kind": "inc", "min": 150, "max": 200, "tags": ["minion"] },
+    { "stat": "minionCount", "kind": "base", "min": 1, "max": 1 },
+    { "stat": "minionCount", "kind": "base", "min": 1, "max": 1 },
+    { "stat": "minionCount", "kind": "base", "min": 1, "max": 1 }
+  ] },
+  { "ref": "The Dancing Dervish", "name": "Whirlwind Falchion", "flavour": "It spins on its own once the room is red.", "note": "Physical damage, attack speed, accuracy and movement speed, with a chance on kill to wake animated blades (Wake Blades stands in for the manifested dancer; the rampage requirement and the weapon-slot lock are dropped).", "drop": ["Rampage", "Manifested Dancing Dervish"], "triggers": [{ "on": "kill", "chance": 10, "cooldown": 8, "effect": { "kind": "castGranted", "skillId": "wakeBlades", "level": 15 } }] },
+  { "ref": "The Dancing Duo", "name": "Twinwhirl Falchion", "flavour": "Two of everything, and both of them hungry.", "note": "Physical damage, attack speed and movement speed, with a chance on kill to wake animated blades (Wake Blades stands in for the manifested dancers; the rampage requirement, weapon-slot lock and the second copy are dropped).", "drop": ["Rampage", "Manifested Dancing Dervish"], "triggers": [{ "on": "kill", "chance": 12, "cooldown": 8, "effect": { "kind": "castGranted", "skillId": "wakeBlades", "level": 15 } }] },
+  { "ref": "Midnight Bargain", "name": "Bonepact Wand", "flavour": "Paid in advance, collected in the dark.", "note": "Spell damage, intelligence and three additional minions with minion speed and damage. The reserved life is modelled as a flat reduction of maximum life; the chaos inoculation restriction is dropped.", "drop": ["Reserves 30% of Life", "Cannot be used with Chaos Inoculation"], "mods": [{ "stat": "life", "kind": "more", "min": -30, "max": -30 }] },
+  { "ref": "Soulwrest", "name": "Wraithcall Staff", "flavour": "Something always answers the dying.", "note": "Huge spell damage, cast speed and mana regeneration, with a chance on kill to call spectral motes (Whirring Motes stands in for the phantasm; the reference triggered it by consuming corpses). The minion flat physical damage and the corpse regeneration are dropped.", "drop": ["Summon Phantasm", "Minions deal", "Consumed a Corpse Recently"], "triggers": [{ "on": "kill", "chance": 25, "cooldown": 2, "effect": { "kind": "castGranted", "skillId": "whirringMotes", "level": 20 } }] },
+  { "ref": "The Whispering Ice", "name": "Hoarwhisper Staff", "flavour": "A quiet that arrives as frost.", "note": "Grants a cold area spell (Rime Spires stands in for the reference ice storm), with block, cast speed, intelligence and spell damage per ten intelligence. The support gem level is dropped.", "drop": ["Level of Socketed Support Gems", "Icestorm Skill"], "mods": [{ "stat": "grantSkill.rimeSpires", "kind": "base", "min": 1, "max": 1 }] },
+  { "ref": "Tremor Rod", "name": "Quakefuse Staff", "flavour": "Count to three and keep your feet apart.", "note": "Staff linked to the blastchain mine support, with spell damage, block, a lower enemy stun threshold and mines that repeat once more.", "drop": ["Mines can be Detonated an additional time"], "mods": [{ "stat": "repeats", "kind": "base", "min": 1, "max": 1, "tags": ["mine"] }] }
+]

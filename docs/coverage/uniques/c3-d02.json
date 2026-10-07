@@ -1,0 +1,289 @@
+[
+  {
+    "ref": "Deerstalker",
+    "name": "Springwire Boots",
+    "flavour": "Set it, forget it, and walk away quickly.",
+    "note": "Socketed gems are supported by the trap support, with evasion, life, movement speed and faster trap throwing (applied to both attack and spell traps). The speed burst after throwing a trap is dropped.",
+    "drop": ["Trap Throwing Speed", "for 9 seconds on Throwing a Trap"],
+    "mods": [
+      { "stat": "attackSpeed", "kind": "inc", "min": 14, "max": 18, "tags": ["trap"] },
+      { "stat": "castSpeed", "kind": "inc", "min": 14, "max": 18, "tags": ["trap"] }
+    ]
+  },
+  {
+    "ref": "Farrul's Chase",
+    "name": "Hushpad Boots",
+    "flavour": "Nothing hears them, and nothing sees what follows.",
+    "note": "Movement speed that doubles up while hidden by the cat aspect (the aspect itself comes from another item, as in the reference). The triggered cry on losing the stealth and the bleed avoidance are dropped.",
+    "drop": ["Intimidating Cry when you lose Cat's Stealth", "chance to avoid Bleeding", "while you have Cat's Stealth"],
+    "mods": [
+      { "stat": "moveSpeed", "kind": "inc", "min": 20, "max": 20, "condition": { "id": "catStealth" } }
+    ]
+  },
+  {
+    "ref": "Fenumus' Spinnerets",
+    "name": "Webspun Treads",
+    "flavour": "Silk underfoot, and something patient overhead.",
+    "note": "Evasion and energy shield, resistances and speed, with a little energy shield on every hit (standing in for the gain per hit on a webbed enemy, scaled by the energy shield ratio, so it applies even without webs). The extra web application and the debuff duration are dropped.",
+    "drop": ["Aspect of the Spider can inflict", "Energy Shield for each Enemy you Hit which is affected by a Spider's Web", "Aspect of the Spider Debuff Duration"],
+    "mods": [
+      { "stat": "esOnHit", "kind": "base", "min": 7, "max": 9 }
+    ]
+  },
+  {
+    "ref": "Omeyocan",
+    "name": "Spendthrift Boots",
+    "flavour": "Every step burns a little of what you meant to save.",
+    "note": "A mana-hungry boot: flat dodge for attacks and spells (the reference scales it with maximum mana up to 20%, here a flat 16%), 7% of mana regenerated negatively every second, and Onslaught approximated as 20% attack, cast and movement speed while not on low mana.",
+    "drop": ["Dodge Attack and Spell Hits per 500 Maximum Mana", "You have Onslaught while not on Low Mana", "Lose 7% of maximum Mana per Second"],
+    "mods": [
+      { "stat": "dodgeAttack", "kind": "base", "min": 16, "max": 16 },
+      { "stat": "dodgeSpell", "kind": "base", "min": 16, "max": 16 },
+      { "stat": "manaRegenPct", "kind": "base", "min": -7, "max": -7 },
+      { "stat": "moveSpeed", "kind": "inc", "min": 20, "max": 20, "condition": { "id": "onLowMana", "not": true } },
+      { "stat": "attackSpeed", "kind": "inc", "min": 20, "max": 20, "condition": { "id": "onLowMana", "not": true } },
+      { "stat": "castSpeed", "kind": "inc", "min": 20, "max": 20, "condition": { "id": "onLowMana", "not": true } }
+    ]
+  },
+  {
+    "ref": "Saqawal's Talons",
+    "name": "Stormcrow Boots",
+    "flavour": "The ground is only a suggestion.",
+    "note": "Grants the winged aspect, with armour and evasion, movement speed and big life and mana regeneration while its boon is active. The boon duration change is dropped.",
+    "drop": ["Avian's Flight Duration", "Life Regenerated per Second while you have Avian's Flight", "Mana Regenerated per Second while you have Avian's Flight"],
+    "mods": [
+      { "stat": "lifeRegen", "kind": "base", "min": 100, "max": 100, "condition": { "id": "avianBoon" } },
+      { "stat": "manaRegenFlat", "kind": "base", "min": 12, "max": 12, "condition": { "id": "avianBoon" } }
+    ]
+  },
+  {
+    "ref": "Torchoak Step",
+    "name": "Hearthstep Greaves",
+    "flavour": "Wherever it stands, someone is already building a fire.",
+    "note": "Armour and movement speed with faster totem placement (as totem skill speed, for both attacks and spells). Totem life and the fire reflection are dropped.",
+    "drop": ["Totem Life", "Totem Placement speed", "Totems Reflect"],
+    "mods": [
+      { "stat": "attackSpeed", "kind": "inc", "min": 30, "max": 50, "tags": ["totem"] },
+      { "stat": "castSpeed", "kind": "inc", "min": 30, "max": 50, "tags": ["totem"] }
+    ]
+  },
+  {
+    "ref": "Iron Commander",
+    "name": "Garrison Bow",
+    "flavour": "It never fires alone.",
+    "note": "A fast physical bow that raises the number of totems, traps, mines or brands at a time for each 200 dexterity, with faster totem placement and added physical per dexterity. Totem life is dropped; the extra deployables count for every deployable, not just ballistae.",
+    "drop": ["Totem Life", "Totem Placement speed", "Siege Ballista Totem per 200 Dexterity"],
+    "mods": [
+      { "stat": "deployCount", "kind": "base", "min": 1, "max": 1, "per": { "stat": "dex", "div": 200 } },
+      { "stat": "attackSpeed", "kind": "inc", "min": 14, "max": 20, "tags": ["totem"] },
+      { "stat": "castSpeed", "kind": "inc", "min": 14, "max": 20, "tags": ["totem"] }
+    ]
+  },
+  {
+    "ref": "Null's Inclination",
+    "name": "Ghoulstring",
+    "flavour": "What it kills gets back up to help.",
+    "note": "Huge added chaos damage and attack speed, minion damage per dexterity, and socketed minion spells cast on kill with the bow (an attack kill, with a short cooldown). The intelligence requirement is dropped.",
+    "drop": ["Intelligence Requirement", "Cast Socketed Minion Spells on Kill with this Weapon"],
+    "triggers": [
+      { "on": "kill", "tags": ["attack"], "chance": 100, "cooldown": 0.5, "effect": { "kind": "castSocketed", "spellTags": ["minion"] } }
+    ]
+  },
+  {
+    "ref": "Slivertongue",
+    "name": "Splitfang Bow",
+    "flavour": "Two arrows leave, and neither one is the real one.",
+    "note": "Heavy added physical damage with big crit chance and crit multiplier on projectiles and an extra pierce. Bob has no forking arrows, so the fork conditions are approximated as applying to all projectiles.",
+    "drop": ["Critical Strike Chance with arrows that Fork", "Arrows that Pierce have +50%", "Arrows Pierce all Targets after Forking"],
+    "mods": [
+      { "stat": "critChance", "kind": "inc", "min": 150, "max": 200, "tags": ["projectile"] },
+      { "stat": "critMulti", "kind": "base", "min": 50, "max": 50, "tags": ["projectile"] },
+      { "stat": "pierce", "kind": "base", "min": 2, "max": 2 }
+    ]
+  },
+  {
+    "ref": "The Scourge",
+    "name": "Kennel Talon",
+    "flavour": "It was bred to run ahead.",
+    "note": "A fast physical claw for minion builds: faster minions, big minion damage after you hit, and a chance on kill to call a pack of minions (the furies stand in for the spectral wolf). The shared minion damage on the wearer is dropped.",
+    "drop": ["Summon Spectral Wolf on Kill", "Increases and Reductions to Minion Damage also affect you", "70% increased Minion Damage if you have Hit Recently"],
+    "mods": [
+      { "stat": "minionDamage", "kind": "inc", "min": 70, "max": 70, "condition": { "id": "hitRecently" } }
+    ],
+    "triggers": [
+      { "on": "kill", "chance": 10, "cooldown": 1, "effect": { "kind": "castGranted", "skillId": "callFuries", "level": 10 } }
+    ]
+  },
+  {
+    "ref": "Architect's Hand",
+    "name": "Snarewright Mitts",
+    "flavour": "Slow hands, wide traps.",
+    "note": "Dexterity and evasion with energy shield, wider trap areas, and slower trap throwing. The cast-speed-to-trap-speed rule is dropped.",
+    "drop": ["Trap Throwing Speed", "Skills used by Traps have"],
+    "mods": [
+      { "stat": "attackSpeed", "kind": "inc", "min": -30, "max": -20, "tags": ["trap"] },
+      { "stat": "castSpeed", "kind": "inc", "min": -30, "max": -20, "tags": ["trap"] },
+      { "stat": "aoe", "kind": "inc", "min": 10, "max": 20, "tags": ["trap"] }
+    ]
+  },
+  {
+    "ref": "Aukuna's Will",
+    "name": "Gravetender Gloves",
+    "flavour": "The dead need no invitation, only a hand to hold.",
+    "note": "Grants the husk summon (the corpse-free zombie analog) with dexterity, cast speed and evasion with energy shield. The zombie life line maps to minion life, which has no effect because minions cannot be hurt; the corpse lines are dropped.",
+    "drop": ["Raised Zombies have", "Raise Zombie does not require", "Your Raised Zombies count as Corpses"],
+    "mods": [
+      { "stat": "grantSkill.raiseHusk", "kind": "base", "min": 10, "max": 10 },
+      { "stat": "minionLife", "kind": "inc", "min": 80, "max": 100 }
+    ]
+  },
+  {
+    "ref": "Fenumus' Weave",
+    "name": "Spindle Gloves",
+    "flavour": "Wound tight, then let go.",
+    "note": "Grants the spider aspect with evasion and energy shield, life, and attack and cast speed. The damage and added chaos that scale with webs on the enemy are dropped.",
+    "drop": ["Damage with Hits and Ailments against Enemies affected by 3 Spider's Webs", "for each Spider's Web on the Enemy"]
+  },
+  {
+    "ref": "Flesh and Spirit",
+    "name": "Bloodrush Gauntlets",
+    "flavour": "The pace of the slaughter feeds the one who sets it.",
+    "note": "Attack speed, armour and evasion and life regeneration with a life recovery on kill (the reference recovers 20% of life when a kill streak triggers rampage, here an even 1% on every kill). The vaal soul line is dropped.",
+    "drop": ["Rampage"],
+    "mods": [
+      { "stat": "recoverPct.kill.life", "kind": "base", "min": 1, "max": 1 }
+    ]
+  },
+  {
+    "ref": "Grip of the Council",
+    "name": "Frostbinder Gloves",
+    "flavour": "The pack grows cold, and the cold grows teeth.",
+    "note": "Strength, life and cold resistance with extra minion damage standing in for the cold gained as extra damage. The slower minions and the minion resistance are dropped.",
+    "drop": ["Minions have 10% reduced Movement Speed", "Minions gain 20% of Physical Damage as Extra Cold Damage"],
+    "mods": [
+      { "stat": "minionDamage", "kind": "inc", "min": 20, "max": 20 }
+    ]
+  },
+  {
+    "ref": "Malachai's Mark",
+    "name": "Cyclegrip Mitts",
+    "flavour": "Three tempers, taken in turn.",
+    "note": "Evasion and energy shield, life, and life and energy shield on kill. The timed sequence of endurance, frenzy and power charges is approximated as a chance to gain each charge on kill.",
+    "drop": ["Grants Malachai's Endurance"],
+    "mods": [
+      { "stat": "chargeOn.kill.grit", "kind": "base", "min": 20, "max": 20 },
+      { "stat": "chargeOn.kill.fervour", "kind": "base", "min": 20, "max": 20 },
+      { "stat": "chargeOn.kill.insight", "kind": "base", "min": 20, "max": 20 }
+    ]
+  },
+  {
+    "ref": "Saqawal's Winds",
+    "name": "Zephyr Gauntlets",
+    "flavour": "The wind arrives first, and then the weather.",
+    "note": "Armour and energy shield, life and cold and lightning resistance, with added cold and lightning damage while the winged aspect boon is active. The aspect itself comes from another item, as in the reference, and the boon duration change is dropped.",
+    "drop": ["Avian's Might Duration", "Cold Damage while you have Avian's Might", "Lightning Damage while you have Avian's Might"],
+    "mods": [
+      { "stat": "damage.min", "kind": "base", "min": 20, "max": 25, "damageTypes": ["cold"], "condition": { "id": "avianBoon" } },
+      { "stat": "damage.max", "kind": "base", "min": 37, "max": 40, "damageTypes": ["cold"], "condition": { "id": "avianBoon" } },
+      { "stat": "damage.min", "kind": "base", "min": 1, "max": 3, "damageTypes": ["lightning"], "condition": { "id": "avianBoon" } },
+      { "stat": "damage.max", "kind": "base", "min": 55, "max": 62, "damageTypes": ["lightning"], "condition": { "id": "avianBoon" } }
+    ]
+  },
+  {
+    "ref": "Shadows and Dust",
+    "name": "Smokeveil Gloves",
+    "flavour": "Gone before the cloth settles.",
+    "note": "Crit chance and multiplier, evasion and energy shield and mana leech, with Unholy Might on kill (the kill-streak rampage approximated as a 5% chance). The smoke cloud is dropped.",
+    "drop": ["Rampage"],
+    "mods": [
+      { "stat": "buffOn.kill.unholyMight", "kind": "base", "min": 5, "max": 5 }
+    ]
+  },
+  {
+    "ref": "Slavedriver's Hand",
+    "name": "Pitfall Mitts",
+    "flavour": "Pay in blood, set it slowly, and keep it wide.",
+    "note": "Dexterity and a lot of evasion and energy shield, with trap skills costing life instead of mana, wider trap areas and slower trap throwing. The charge on trap trigger and the cast-speed-to-trap-speed rule are dropped.",
+    "drop": ["Trap Throwing Speed", "Skills which throw Traps have Blood Magic", "Skills used by Traps have", "chance to gain an Endurance, Frenzy or Power Charge when any of your Traps"],
+    "mods": [
+      { "stat": "attackSpeed", "kind": "inc", "min": -30, "max": -20, "tags": ["trap"] },
+      { "stat": "castSpeed", "kind": "inc", "min": -30, "max": -20, "tags": ["trap"] },
+      { "stat": "skillsCostLife", "kind": "flag", "min": 1, "max": 1, "tags": ["trap"] },
+      { "stat": "aoe", "kind": "inc", "min": 10, "max": 20, "tags": ["trap"] }
+    ]
+  },
+  {
+    "ref": "Ahn's Contempt",
+    "name": "Voidlit Crown",
+    "flavour": "It trades a charge for a sharper kind of dark.",
+    "note": "All attributes, armour and energy shield, life, one fewer power charge, and physical damage gained as extra chaos. The reference only grants the chaos at maximum power charges and softens crits with none; here the chaos gain is unconditional and the crit line is dropped.",
+    "drop": ["Extra Chaos Damage while at maximum Power Charges", "Extra Damage from Critical Strikes while you have no Power Charges"],
+    "mods": [
+      { "stat": "gain.physical.chaos", "kind": "base", "min": 8, "max": 12 }
+    ]
+  },
+  {
+    "ref": "Crown of the Inward Eye",
+    "name": "Threefold Crown",
+    "flavour": "Three reflections, none of them flattering.",
+    "note": "Huge armour and energy shield with more maximum life, mana and energy shield. The three transfiguration effects are dropped.",
+    "drop": ["maximum Life, Mana and Global Energy Shield", "Transfiguration of Soul", "Transfiguration of Body", "Transfiguration of Mind"],
+    "mods": [
+      { "stat": "life", "kind": "inc", "min": 9, "max": 21 },
+      { "stat": "mana", "kind": "inc", "min": 9, "max": 21 },
+      { "stat": "es", "kind": "inc", "min": 9, "max": 21 }
+    ]
+  },
+  {
+    "ref": "Curtain Call",
+    "name": "Powder Mask",
+    "flavour": "The finale is laid in advance.",
+    "note": "A little life, and extra deployables (totems, traps, mines or brands at a time) at 500 dexterity and again at 500 intelligence. The mine laying and arming speed lines are dropped.",
+    "drop": ["Mine Laying Speed", "Mine Arming Speed", "at least 500 Dexterity", "at least 500 Intelligence"],
+    "mods": [
+      { "stat": "deployCount", "kind": "base", "min": 1, "max": 1, "per": { "stat": "dex", "div": 500 } },
+      { "stat": "deployCount", "kind": "base", "min": 1, "max": 1, "per": { "stat": "int", "div": 500 } }
+    ]
+  },
+  {
+    "ref": "Farrul's Bite",
+    "name": "Prowl Mask",
+    "flavour": "Eyes first, then the rest of the animal.",
+    "note": "Grants the cat aspect with evasion and energy shield, cold resistance and extra crit chance while its stealth is active (the +1% base crit chance is approximated as 20% increased). The blind chance and the damage against blinded enemies are dropped.",
+    "drop": ["Critical Strike Chance while affected by Aspect of the Cat", "Blind Enemies while you have Cat's Stealth", "against Blinded Enemies"],
+    "mods": [
+      { "stat": "critChance", "kind": "inc", "min": 20, "max": 20, "condition": { "id": "catStealth" } }
+    ]
+  },
+  {
+    "ref": "Heretic's Veil",
+    "name": "Wraithveil Mask",
+    "flavour": "A faith with more verdicts than believers.",
+    "note": "Energy shield and evasion, plus one level to socketed curse gems and an extra hex at a time (standing in for the blasphemy support). The curse reservation reduction is dropped.",
+    "drop": ["Supported by Level 22 Blasphemy", "Socketed Curse Gems have 12% reduced Mana Reservation"],
+    "mods": [
+      { "stat": "hexLimit", "kind": "base", "min": 1, "max": 1 }
+    ]
+  },
+  {
+    "ref": "Null and Void",
+    "name": "Stoneward Gauntlets",
+    "flavour": "Nothing gets through, for a little while.",
+    "note": "Strength, armour and energy shield, life and mana regeneration, with a chance on kill to gain the Steel Hide guard (the rampage streak approximated as a 5% chance, and the physical immunity as the guard buff). The ailment dispel is dropped.",
+    "drop": ["Rampage"],
+    "mods": [
+      { "stat": "buffOn.kill.steelHide", "kind": "base", "min": 5, "max": 5 }
+    ]
+  },
+  {
+    "ref": "Leer Cast",
+    "name": "Grinning Mask",
+    "flavour": "Everyone else is meant to laugh along.",
+    "note": "A joke item that works for a lone fighter: less damage, then the group damage bonus applies to you since Bob has no allies, for a net penalty, with dexterity, life and mana.",
+    "drop": ["30% reduced Damage", "You and nearby allies gain 15% increased Damage"],
+    "mods": [
+      { "stat": "damage", "kind": "inc", "min": -30, "max": -30 },
+      { "stat": "damage", "kind": "inc", "min": 15, "max": 15 }
+    ]
+  }
+]

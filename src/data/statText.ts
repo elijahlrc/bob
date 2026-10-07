@@ -1,6 +1,6 @@
 import { CHARGE_KINDS, CHARGE_NAMES } from '../calc/charges';
 import { BUFF_IDS, BUFFS } from './buffs';
-import { ALL_GEMS } from './gems';
+import { ALL_GEMS, GRANTED_GEMS } from './gems';
 import { ALL_HEX_IDS, HEXES } from './hexes';
 import { KEYSTONES } from './tree/keystones';
 /**
@@ -469,7 +469,7 @@ for (const [event, phrase] of Object.entries(MORE_EVENTS)) {
 }
 
 // Item-granted skills and supports linked to every socketed gem (one stat per gem).
-for (const g of ALL_GEMS) {
+for (const g of [...ALL_GEMS, ...GRANTED_GEMS]) {
   if (g.kind === 'support')
     STAT_TEXT[`socketSupport.${g.id}`] = {
       base: `Socketed Gems are Supported by level {v} ${g.name}`,
