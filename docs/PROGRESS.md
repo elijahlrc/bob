@@ -575,3 +575,19 @@ Minions used to be untouchable (a departure from PoE that made them far stronger
   letting monsters pick the nearest of player and minion instead of the player first.
 - **Not done.** Minions do not draw aggro on their own (no taunt, no "nearest target" rule), and Meat Shield does not
   redirect hits. Flame and ice golem buffs to the owner are unchanged.
+
+### Skill bar, visual language and skill gallery (2026-10-07)
+
+- **Skill bar.** The map HUD shows every equipped skill (primary, secondaries, utility skills, auras, item triggers, the
+  basic attack when there is no primary) with a cooldown sweep, a cast or active ring, a badge (minions standing, totems
+  down, trigger chance) and a tooltip. `src/ui/skillStatus.ts` computes it from the world (pure, tested); `SkillBar.tsx` draws it.
+- **Visual language.** Colour is the damage type, shape is the delivery (`src/calc/skillLook.ts`, `docs/VISUAL_LANGUAGE.md`).
+  New sim events `swing` and `thrust` carry melee geometry; `src/render/styles/grim/skillFx.ts` draws casts (rune circles),
+  swings, thrusts, area rings, zones, deployables, minions, auras, buffs, curse marks and blinks from events and world
+  state, replacing the old per-hit slash. Projectiles are arrows for attacks and orbs for spells, tinted by element.
+- **Skill gallery.** Title screen, "Skill gallery": one skill at a time against three dummies, with a list, N/P and a 0.25×
+  speed (effects follow the sim's pace, so they freeze when paused). The Codex has a "Skill looks" tab with the legend.
+- **Tests.** Every gem has a delivery and colour, every delivery and element is used, every gem queues an effect, every
+  gem is usable in the gallery. 1,782 tests.
+- **Known.** Mystic seed 1000 (bot) dies on map 1; it did so before this work. The in-app browser pane runs the game at
+  about 1.5 frames a second, so effects were checked frame by frame with `window.__dev`.

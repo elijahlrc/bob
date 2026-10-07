@@ -1264,6 +1264,102 @@ select option {
   color: #e0b0f0;
   background: rgba(80, 30, 100, 0.45);
 }
+/* ---- Skill bar (in-map HUD): one tile per equipped skill, tinted with its look colour in --c ---- */
+.skillbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+  max-width: 420px;
+  /* The HUD ignores the mouse; the tiles take it for their tooltips. */
+  pointer-events: auto;
+}
+.skill {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  box-sizing: border-box;
+  border: 1px solid var(--c);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--c) 22%, #000b);
+  overflow: hidden;
+}
+.skill-init {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--c);
+  text-shadow:
+    0 0 3px #000,
+    0 1px 0 #000;
+}
+/* The sweep: a dark wedge for the share still to come, clockwise from the top. */
+.skill-sweep {
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(from 0deg, #000c calc(var(--cd) * 1%), transparent 0);
+}
+.skill.active .skill-sweep,
+.skill.casting .skill-sweep {
+  background: conic-gradient(from 0deg, #fff4 calc(var(--cd) * 1%), transparent 0);
+}
+.skill-time {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1px;
+  text-align: center;
+  font-size: 10px;
+  line-height: 11px;
+  color: #fff;
+  text-shadow:
+    0 0 3px #000,
+    0 1px 0 #000;
+}
+.skill-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0 3px;
+  font-size: 9px;
+  line-height: 11px;
+  color: #fff;
+  background: #000c;
+  border-bottom-left-radius: 4px;
+}
+.skill.cooling .skill-init {
+  opacity: 0.45;
+}
+.skill.active,
+.skill.casting {
+  border-color: #fff;
+  box-shadow:
+    0 0 8px var(--c),
+    inset 0 0 6px #fff8;
+}
+.skill.casting {
+  animation: flask-pulse 0.5s ease-in-out infinite alternate;
+}
+.skill.nopay {
+  border-color: #c04040;
+  background: #4a1414cc;
+}
+.skill.nopay .skill-init {
+  color: #e07070;
+}
+.skill.off {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+/* Auras and trigger tiles are always on (or waiting): a little quieter than the skills the character uses. */
+.skill.passive {
+  opacity: 0.8;
+}
+
 .gem-status {
   font-size: 11px;
   font-weight: normal;
@@ -1307,4 +1403,26 @@ select option {
   width: 100%;
   margin: 4px 0 6px;
   box-sizing: border-box;
+}
+
+/* Skill looks: colour chips in the Codex (see src/calc/skillLook.ts). */
+.look-chip {
+  display: inline-block;
+  width: 0.7em;
+  height: 0.7em;
+  margin-right: 0.35em;
+  border-radius: 2px;
+  vertical-align: baseline;
+  box-shadow: 0 0 4px currentColor;
+}
+.look-legend h3 {
+  margin: 0.8em 0 0.3em;
+}
+.look-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1.2em;
+}
+.look-shape {
+  padding: 0.25em 0.5em;
 }

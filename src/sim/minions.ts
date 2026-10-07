@@ -81,6 +81,7 @@ export function summonMinions(w: World, c: SkillChoice, prof: SkillProfile): voi
     m.dmg = prof.minionDamage;
     m.speed = prof.minionSpeed;
     w.minions.push(m);
+    w.events.push({ t: 'summon', id: m.id });
   }
 }
 

@@ -242,7 +242,29 @@ export type SimEvent =
   | { t: 'use'; src: number; skill: string }
   | { t: 'echo'; src: number; skill: string }
   | { t: 'trigger'; skill: string; kind: string }
-  | { t: 'chain'; from: number; to: number }
+  | { t: 'chain'; from: number; to: number; dtype?: number }
+  /** A melee sweep (the arc, in degrees, centred on `facing`) and a melee thrust at one target; `heavy` is a slam or a boss blow. */
+  | {
+      t: 'swing';
+      src: number;
+      x: number;
+      y: number;
+      facing: number;
+      radius: number;
+      arc: number;
+      dtype: number;
+      heavy: boolean;
+    }
+  | {
+      t: 'thrust';
+      src: number;
+      x: number;
+      y: number;
+      x2: number;
+      y2: number;
+      dtype: number;
+      heavy: boolean;
+    }
   | { t: 'explode'; x: number; y: number; r: number; dtype: number }
   | { t: 'beam'; x: number; y: number; x2: number; y2: number; dtype: number }
   | { t: 'blink'; id: number; x: number; y: number; end: boolean }

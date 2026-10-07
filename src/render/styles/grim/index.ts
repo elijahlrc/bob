@@ -1,4 +1,3 @@
-import { MINIONS } from '../../../data/minions';
 import Phaser from 'phaser';
 import { Rng } from '../../../core/rng';
 import { factionOfSpec } from '../../../data/monsters';
@@ -16,6 +15,7 @@ import type { MarkTheme } from '../../style/marks';
 import { isHero, type AnimName, type FigureKind } from '../../style/figure';
 import { buildProps, FIG_PX, FRAMES, rasterFigure } from './paint';
 import { DROP_COLOR, dropLabel, dropRarity } from '../../dropLabel';
+import { SkillFx } from './skillFx';
 import { isoFloors, isoWalls, ISO_H, ISO_W, WALL_LOW, WALL_TALL } from './isoPaint';
 
 /** Pixel zoom: 2x on normal windows, 1.5x on small ones (smaller pixels, wider view). */
@@ -81,6 +81,8 @@ export class GrimStyle extends StyleBase {
   private em!: Record<string, Emitter>;
   private gfx!: Phaser.GameObjects.Graphics;
   private bolts: Bolt[] = [];
+  private fx!: SkillFx;
+  private lastSimT = 0;
   private temps: TempLight[] = [];
   private torches: Torch[] = [];
   private decals: Phaser.GameObjects.Image[] = [];
@@ -91,7 +93,6 @@ export class GrimStyle extends StyleBase {
     b: Phaser.GameObjects.Image;
     light: Phaser.GameObjects.Light;
   } | null = null;
-  private slashed = new WeakSet<object>();
   private floaters: Phaser.GameObjects.Text[] = [];
   private labelFrame = -1;
   private placed: { x: number; y: number; w: number; h: number }[] = [];
@@ -175,6 +176,25 @@ export class GrimStyle extends StyleBase {
     this.makeEmitters();
     this.gfx = s.add.graphics().setDepth(600);
     this.owned.push(this.gfx);
+    this.fx?.destroy();
+    this.fx = new SkillFx(
+      {
+        project: (x, y) => this.project(x, y),
+        rpx: (r) => this.rpx(r),
+        squash: () => this.squash(),
+        em: this.em,
+        flash: (x, y, c, sc, i) => this.flash(x, y, c, sc, i),
+        shake: (a) => {
+          this.shake = Math.max(this.shake, a);
+        },
+        actorById: (id) =>
+          this.byId.get(id) ??
+          this.world.minions.find((m) => m.id === id) ??
+          this.world.actors.find((a) => a.id === id) ??
+          null,
+      },
+      s,
+    );
     this.placeProps(world, rng);
 
     const pl0 = this.project(world.player.x, world.player.y);
@@ -670,19 +690,22 @@ export class GrimStyle extends StyleBase {
   // ---- Projectiles -----------------------------------------------------------------------------
   protected createProjectile(p: Projectile) {
     const s = this.scene;
+    // Attacks fly as arrows, spells as orbs; the element tints either (a bigger orb bursts where it lands).
+    const arrow = p.profile.skill.type === 'attack';
     const phys = p.dtype === 0;
-    const img = s.add.image(0, 0, phys ? 'g_arrow' : 'g_orb').setDepth(80000);
+    const col = DTYPE_COLOR[p.dtype];
+    const img = s.add.image(0, 0, arrow ? 'g_arrow' : 'g_orb').setDepth(80000);
     const glow = s.add
       .image(0, 0, 'g_glow')
       .setDepth(79999)
       .setBlendMode(Phaser.BlendModes.ADD)
-      .setScale(phys ? 0.25 : 0.6)
-      .setAlpha(phys ? 0.25 : 0.8);
-    if (!phys) {
-      img.setTint(DTYPE_COLOR[p.dtype]).setBlendMode(Phaser.BlendModes.ADD);
-      glow.setTint(DTYPE_COLOR[p.dtype]);
-    }
-    const light = phys ? null : this.addLight(0, 0, 110, DTYPE_COLOR[p.dtype], 1.2);
+      .setScale(arrow ? (phys ? 0.25 : 0.35) : p.explodeRadius > 0 ? 0.9 : 0.6)
+      .setAlpha(arrow ? (phys ? 0.25 : 0.55) : 0.8);
+    if (arrow) {
+      if (!phys) img.setTint(col);
+    } else img.setTint(col).setBlendMode(Phaser.BlendModes.ADD);
+    if (!phys || !arrow) glow.setTint(col);
+    const light = phys && arrow ? null : this.addLight(0, 0, 110, col, 1.2);
     this.owned.push(img, glow);
     return { img, glow, light, acc: 0 };
   }
@@ -866,7 +889,7 @@ export class GrimStyle extends StyleBase {
     }
   }
 
-  protected updateGround(effects: GroundEffect[], _dt: number, world: World): void {
+  protected updateGround(effects: GroundEffect[], dt: number, world: World): void {
     const g = this.gfx;
     g.clear();
     // Corpses: a dark smear that fades as it crumbles, with a green glint while a Shambler waits to rise.
@@ -877,44 +900,11 @@ export class GrimStyle extends StyleBase {
       if (c.spec.type === 'shambler' && c.age > 1)
         g.fillStyle(0x9fd07a, 0.35 * Math.sin(this.time * 6 + c.id) ** 2).fillEllipse(x, y, 7, 3);
     }
-    // Totems, brands, traps and mines the character has put down.
-    for (const d of world.deployables) {
-      const { x, y } = this.project(d.x, d.y);
-      const col =
-        d.kind === 'totem'
-          ? 0xc8a060
-          : d.kind === 'brand'
-            ? 0xb070ff
-            : d.kind === 'trap'
-              ? 0xe0c040
-              : 0xff7040;
-      const fade = Math.min(1, d.t);
-      if (d.kind === 'totem') {
-        g.fillStyle(col, 0.9 * fade).fillRect(x - 3, y - 12, 6, 12);
-        g.fillStyle(0xfff0c0, 0.9 * fade).fillRect(x - 4, y - 14, 8, 3);
-      } else if (d.kind === 'brand') {
-        g.lineStyle(1, col, 0.9 * fade).strokeCircle(x, y - 4, 5);
-        g.fillStyle(col, 0.5 * fade).fillCircle(x, y - 4, 2.5);
-      } else {
-        g.fillStyle(col, 0.85 * fade).fillCircle(x, y, 2.5);
-        g.lineStyle(1, col, 0.6 * fade).strokeCircle(x, y, 4);
-      }
-    }
-    // Minions.
-    for (const m of world.minions) {
-      if (!m.alive) continue;
-      const { x, y } = this.project(m.x, m.y);
-      const col = MINIONS[m.kind].color;
-      g.fillStyle(0x000000, 0.35).fillEllipse(x, y + 1, 9, 4);
-      g.fillStyle(col, 0.95).fillCircle(x, y - 5, 4);
-      g.lineStyle(1, 0xffffff, 0.6).strokeCircle(x, y - 5, 4);
-      // A hurt minion shows what is left of its life.
-      if (m.life < m.def.maxLife) {
-        const frac = Math.max(0, m.life / m.def.maxLife);
-        g.fillStyle(0x000000, 0.6).fillRect(x - 6, y - 13, 12, 2);
-        g.fillStyle(0x6ad07a, 0.95).fillRect(x - 6, y - 13, 12 * frac, 2);
-      }
-    }
+    // Zones, deployables, minions, auras and every skill effect (src/render/styles/grim/skillFx.ts).
+    // Effects keep the sim's pace: frozen while paused, slow when the game is slowed.
+    const adv = world.t - this.lastSimT;
+    this.lastSimT = world.t;
+    this.fx.frame(world, dt > 0 ? dt * Math.min(1, adv / dt) : 0, this.time, g);
     for (const e of effects) {
       const { x, y } = this.project(e.x, e.y);
       const r = this.rpx(e.radius);
@@ -960,10 +950,11 @@ export class GrimStyle extends StyleBase {
         continue;
       }
       const a = Math.min(1, b.t * 7);
+      const soft = Phaser.Display.Color.IntegerToColor(b.color).lighten(35).color;
       for (const [w, col, al] of [
-        [5, 0x6a40ff, 0.18],
-        [3, 0xb890ff, 0.4],
-        [1, 0xffffff, 1],
+        [5, b.color, 0.2],
+        [3, soft, 0.5],
+        [1.2, 0xffffff, 1],
       ] as const) {
         g.lineStyle(w, col, al * a)
           .beginPath()
@@ -1034,6 +1025,7 @@ export class GrimStyle extends StyleBase {
 
   protected handleEvent(e: SimEvent, world: World): void {
     const em = this.em;
+    this.fx.onEvent(e, world);
     switch (e.t) {
       case 'hit': {
         const dst = this.byId.get(e.dst) ?? world.actors.find((a) => a.id === e.dst);
@@ -1059,6 +1051,7 @@ export class GrimStyle extends StyleBase {
           if (e.dtype === 3) em.flame.explode(6, p.x, p.y - 6);
           else if (e.dtype === 2) em.ice.explode(8, p.x, p.y - 6);
           else if (e.dtype === 1) em.bolt.explode(8, p.x, p.y - 6);
+          else if (e.dtype === 4) em.poison.explode(8, p.x, p.y - 6);
           else em.spark.explode(e.crit ? 7 : 3, p.x, p.y - 6);
           if (Math.random() < 0.18)
             this.addDecal(
@@ -1074,19 +1067,6 @@ export class GrimStyle extends StyleBase {
           this.punch = 0.05;
           em.pop.particleTint = 0xffffff;
           em.pop.explode(1, p.x, p.y - 8);
-        }
-        // Melee swoosh once per attack.
-        if (
-          src?.action &&
-          !this.slashed.has(src.action) &&
-          src.action.profile.skill.behaviour.kind === 'melee'
-        ) {
-          this.slashed.add(src.action);
-          this.slash(
-            src,
-            src.action.profile.skill.behaviour.arc !== undefined,
-            src.action.profile.skill.id,
-          );
         }
         if (amt > 0 && (src?.isPlayer || dst.isPlayer))
           this.floater(
@@ -1190,31 +1170,12 @@ export class GrimStyle extends StyleBase {
               y: a.y - 8 + ((b.y - a.y) * i) / n + (Math.random() - 0.5) * 9,
             });
           pts.push({ x: b.x, y: b.y - 8 });
-          this.bolts.push({ pts, t: 0.28, color: 0xb890ff });
-          em.bolt.explode(8, b.x, b.y - 8);
-          this.flash(b.x, b.y - 8, 0xb890ff, 1, 0.15);
-        }
-        break;
-      }
-      case 'use': {
-        const a = this.byId.get(e.src);
-        if (!a) break;
-        const prof = a.action?.profile;
-        if (prof && prof.skill.type === 'spell') {
-          const tags = prof.skill.tags;
-          const col = tags.includes('fire')
-            ? 0xff9a40
-            : tags.includes('cold')
-              ? 0x9ad8ff
-              : tags.includes('lightning')
-                ? 0xc8a0ff
-                : 0xffffff;
-          const ap = this.project(a.x, a.y);
-          const x = ap.x + Math.cos(this.ang(Math.cos(a.facing), Math.sin(a.facing))) * 8;
-          const y = ap.y - 10;
-          em.pop.particleTint = col;
-          em.pop.explode(1, x, y);
-          em.spark.explode(5, x, y);
+          const col = DTYPE_COLOR[e.dtype ?? 1] ?? 0xb890ff;
+          this.bolts.push({ pts, t: 0.28, color: col });
+          const spray =
+            e.dtype === 3 ? em.flame : e.dtype === 2 ? em.ice : e.dtype === 4 ? em.poison : em.bolt;
+          spray.explode(8, b.x, b.y - 8);
+          this.flash(b.x, b.y - 8, col, 1, 0.15);
         }
         break;
       }
@@ -1276,38 +1237,6 @@ export class GrimStyle extends StyleBase {
         if (p && e.kind === 'freeze') em.ice.explode(14, p.x, p.y - 8);
         break;
       }
-    }
-  }
-
-  private slash(src: Actor, arc: boolean, skill: string): void {
-    const sp = this.project(src.x, src.y);
-    const sa = this.ang(Math.cos(src.facing), Math.sin(src.facing));
-    const x = sp.x + Math.cos(sa) * (arc ? 6 : 10);
-    const y = sp.y - 8 + Math.sin(sa) * 4;
-    const img = this.scene.add
-      .image(x, y, 'g_slash')
-      .setOrigin(0.15, 0.5)
-      .setBlendMode(Phaser.BlendModes.ADD)
-      .setDepth(94000);
-    img.setRotation(Math.cos(sa) >= 0 ? 0 : Math.PI).setFlipY(Math.random() < 0.5);
-    if (Math.cos(sa) < 0) img.setFlipY(!img.flipY);
-    const heavy = skill === 'crushingBlow' || src.rarity === 'boss';
-    img
-      .setScale(arc ? 1.5 : heavy ? 1.2 : 0.9)
-      .setTint(src.isPlayer ? 0xfff0d0 : 0xd8e8ff)
-      .setAlpha(0.95);
-    this.owned.push(img);
-    this.scene.tweens.add({
-      targets: img,
-      alpha: 0,
-      scaleX: img.scaleX * 1.25,
-      duration: 170,
-      ease: 'Cubic.easeOut',
-      onComplete: () => img.destroy(),
-    });
-    if (heavy) {
-      this.em.dust.explode(6, x + Math.cos(sa) * 8, sp.y + 2);
-      this.shake = Math.max(this.shake, 2);
     }
   }
 
@@ -1388,6 +1317,7 @@ export class GrimStyle extends StyleBase {
     for (const f of this.floaters) f.destroy();
     this.floaters = [];
     for (const l of [...this.lightsOwned]) this.dropLight(l);
+    this.fx?.destroy();
     this.torches = [];
     this.temps = [];
     this.bolts = [];

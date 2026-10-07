@@ -138,6 +138,11 @@ function dominantType(p: SkillProfile, hand: number): number {
   return dtype;
 }
 
+/** A slam, or any blow of a boss: it shakes the ground. */
+function isHeavy(a: Actor, p: SkillProfile): boolean {
+  return a.rarity === 'boss' || p.skill.tags.includes('slam');
+}
+
 /** Distance from a point to a line segment. */
 export function segmentDist(
   px: number,
@@ -228,6 +233,17 @@ export function fire(w: World, a: Actor, act: Action): void {
     if (b.arc) {
       const radius = (b.radius ?? reach) * p.radiusMult;
       const half = ((b.arc / 2) * Math.PI) / 180;
+      w.events.push({
+        t: 'swing',
+        src: a.id,
+        x: a.x,
+        y: a.y,
+        facing: a.facing,
+        radius: radius + a.r,
+        arc: b.arc,
+        dtype: dominantType(p, act.hand),
+        heavy: isHeavy(a, p),
+      });
       for (const e of enemiesOf(w, a)) {
         const d = Math.hypot(e.x - a.x, e.y - a.y);
         if (d > radius + e.r + a.r + 0.4) continue;
@@ -241,6 +257,16 @@ export function fire(w: World, a: Actor, act: Action): void {
     if (!target || !target.alive) return;
     const d = Math.hypot(target.x - a.x, target.y - a.y);
     if (d > reach + target.r + a.r + 0.4) return;
+    w.events.push({
+      t: 'thrust',
+      src: a.id,
+      x: a.x,
+      y: a.y,
+      x2: target.x,
+      y2: target.y,
+      dtype: dominantType(p, act.hand),
+      heavy: isHeavy(a, p),
+    });
     hit(w, a, target, p, act.hand, d);
     return;
   }
@@ -252,7 +278,7 @@ export function fire(w: World, a: Actor, act: Action): void {
     for (let i = 0; i <= p.chains; i++) {
       const d = Math.hypot(cur.x - a.x, cur.y - a.y);
       hit(w, a, cur, p, act.hand, d);
-      w.events.push({ t: 'chain', from: from.id, to: cur.id });
+      w.events.push({ t: 'chain', from: from.id, to: cur.id, dtype: dominantType(p, act.hand) });
       hitIds.push(cur.id);
       if (i === p.chains) break;
       let best: Actor | null = null;

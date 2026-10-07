@@ -5,6 +5,7 @@ import type { SimEvent, World } from '../sim/types';
 import { createWorld, stepWorld } from '../sim/world';
 import { CLASSES } from '../data/classes';
 import { botCamp } from './bot';
+import { galleryEntries, galleryRun, galleryWorld, type GalleryEntry } from './gallery';
 import { completeTabletSets } from './craft';
 import { loadFound, recordFound } from './codex';
 import { finishMap, newRun, passivePoints, planFor, worldOptsFor, type RunState } from './run';
@@ -28,6 +29,9 @@ export type BusEvents = {
 };
 
 export const SPEEDS = [1, 2, 4, 8] as const;
+
+/** Seconds of game time each skill gets in the gallery before the next one comes up. */
+const GALLERY_SECONDS = 14;
 
 /** Drives screens and the in-map sim. Headless: talks to render and UI only through the bus. */
 export class Controller {
@@ -107,9 +111,40 @@ export class Controller {
     this.bus.emit('state', null);
   }
 
+  /** The skill gallery: one skill at a time against training dummies, on a timer or by choice (see gallery.ts). */
+  gallery: { idx: number; entries: GalleryEntry[]; runs: number } | null = null;
+
+  startGallery(): void {
+    this.gallery = { idx: 0, entries: galleryEntries(), runs: 0 };
+    this.launchGallery();
+  }
+
+  /** Show another skill: the next (1), the previous (-1) or a given place in the list. */
+  galleryGo(to: number | 'next' | 'prev'): void {
+    const g = this.gallery;
+    if (!g) return;
+    const n = g.entries.length;
+    g.idx = to === 'next' ? (g.idx + 1) % n : to === 'prev' ? (g.idx + n - 1) % n : to;
+    this.launchGallery();
+  }
+
+  private launchGallery(): void {
+    const g = this.gallery!;
+    if (this.world) this.bus.emit('mapEnd', null);
+    const run = galleryRun(g.entries[g.idx], 4000 + g.runs++);
+    this.run = run;
+    this.world = galleryWorld(run, g.entries[g.idx]);
+    this.acc = 0;
+    this.screen = 'map';
+    this.bus.emit('select', { id: null });
+    this.bus.emit('mapStart', { world: this.world });
+    this.bus.emit('state', null);
+  }
+
   exitShowcase(): void {
     if (this.world) this.bus.emit('mapEnd', null);
     this.world = null;
+    this.gallery = null;
     this.showcase = null;
     this.run = null;
     this.goTo('title');
@@ -185,13 +220,18 @@ export class Controller {
       }
     }
     this.bus.emit('ticked', { world: w, events });
-    if (w.status !== 'running') this.endMap();
+    if (this.gallery && w.t > GALLERY_SECONDS) this.galleryGo('next');
+    else if (w.status !== 'running') this.endMap();
   }
 
   private endMap(): void {
     const w = this.world;
     const run = this.run;
     if (!w || !run) return;
+    if (this.gallery) {
+      this.galleryGo('next');
+      return;
+    }
     if (this.showcase) {
       this.nextShowcaseClass();
       return;

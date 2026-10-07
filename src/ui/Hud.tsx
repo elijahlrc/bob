@@ -5,7 +5,9 @@ import { HEXES, hexText } from '../data/hexes';
 import { CHARGE_KINDS, CHARGE_NAMES, CHARGE_SECONDS, CHARGE_TEXT } from '../calc/charges';
 import type { Actor, World } from '../sim/types';
 import { SPEEDS, type Controller } from '../run/controller';
+import { DELIVERY_NAME, ELEMENT_NAME } from '../calc/skillLook';
 import { useTicks } from './hooks';
+import { SkillBar } from './SkillBar';
 
 /** A resource orb: the fill height shows the amount; the skin comes from CSS. */
 function Orb(props: {
@@ -152,6 +154,41 @@ export function Hud({ c }: { c: Controller }) {
         <span>{w.exitOpen ? 'Exit open' : ''}</span>
       </div>
       {sel && sel.alive && !sel.isPlayer && <Inspect a={sel} c={c} />}
+      {c.gallery && (
+        <div class="hud-showcase hud-gallery">
+          <div>
+            {c.gallery.entries[c.gallery.idx].name}
+            <span class="muted">
+              {' '}
+              · {DELIVERY_NAME[c.gallery.entries[c.gallery.idx].look.delivery]} ·{' '}
+              {c.gallery.entries[c.gallery.idx].look.element >= 0
+                ? ELEMENT_NAME[c.gallery.entries[c.gallery.idx].look.element]
+                : 'no damage'}
+            </span>
+          </div>
+          <select
+            value={c.gallery.idx}
+            onChange={(e) => c.galleryGo(Number((e.target as HTMLSelectElement).value))}
+          >
+            {c.gallery.entries.map((en, i) => (
+              <option key={en.id} value={i}>
+                {DELIVERY_NAME[en.look.delivery]}: {en.name}
+              </option>
+            ))}
+          </select>
+          <div class="showcase-row">
+            <button class="btn small" onClick={() => c.galleryGo('prev')}>
+              Prev (P)
+            </button>
+            <button class="btn small" onClick={() => c.galleryGo('next')}>
+              Next (N)
+            </button>
+            <button class="btn small" onClick={() => c.exitShowcase()}>
+              Exit
+            </button>
+          </div>
+        </div>
+      )}
       {sc && (
         <div class="hud-showcase">
           <div class="muted">{CLASSES[sc.classIdx].name} · N next class</div>
@@ -177,6 +214,7 @@ export function Hud({ c }: { c: Controller }) {
         />
         <div class="hud-center">
           <Charges w={w} />
+          <SkillBar w={w} />
           <div class="flasks">
             {w.flasks.map((f, i) => {
               const pct = f.spec.maxCharges > 0 ? (f.charges / f.spec.maxCharges) * 100 : 0;
@@ -209,7 +247,7 @@ export function Hud({ c }: { c: Controller }) {
             <button class={'btn small' + (c.paused ? ' on' : '')} onClick={() => c.togglePause()}>
               ❚❚
             </button>
-            {SPEEDS.map((s) => (
+            {[...(c.gallery ? [0.25] : []), ...SPEEDS].map((s) => (
               <button
                 key={s}
                 class={'btn small' + (!c.paused && c.speed === s ? ' on' : '')}

@@ -22,7 +22,13 @@ export type Deployable = {
   fireT: number;
 };
 
-const SECONDS: Record<DeployKind, number> = { totem: 10, brand: 12, trap: 8, mine: 14 };
+/** How long each kind of deployable stands, in seconds (the skill bar counts down over this). */
+export const DEPLOY_SECONDS: Record<DeployKind, number> = {
+  totem: 10,
+  brand: 12,
+  trap: 8,
+  mine: 14,
+};
 /** Distance at which an enemy sets off a trap, and at which a mine goes off. */
 const TRAP_RADIUS = 1.6;
 const MINE_RADIUS = 3.5;
@@ -42,13 +48,15 @@ export function deployedCount(w: World, key: string): number {
   return n;
 }
 
+/** How many of a deploying skill's totems, brands, traps or mines may stand at once. */
+export function deployCap(c: SkillChoice, prof: SkillProfile): number {
+  return c.deploy === 'totem' || c.deploy === 'brand' ? prof.deployCount : prof.deployCount * SETS;
+}
+
 /** Whether the skill has all it can have down already: the AI uses another skill meanwhile. */
 export function deployFull(w: World, c: SkillChoice, prof: SkillProfile): boolean {
   if (!c.deploy) return false;
-  const have = deployedCount(w, c.key);
-  const cap =
-    c.deploy === 'totem' || c.deploy === 'brand' ? prof.deployCount : prof.deployCount * SETS;
-  return have >= cap;
+  return deployedCount(w, c.key) >= deployCap(c, prof);
 }
 
 const enemies = (w: World): Actor[] =>
@@ -60,7 +68,7 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
   if (!c?.deploy) return;
   const target = actorById(w, act.targetId);
   const n = act.profile.deployCount;
-  const seconds = SECONDS[c.deploy];
+  const seconds = DEPLOY_SECONDS[c.deploy];
   const put = (x: number, y: number) => {
     const spot = w.grid.collide(x, y, 0.3);
     w.deployables.push({

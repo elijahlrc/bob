@@ -51,6 +51,9 @@ export function Title({ c }: { c: Controller }) {
           <button class="btn" onClick={() => c.startShowcase(true)}>
             ▶ Showcase: boss
           </button>
+          <button class="btn" onClick={() => c.startGallery()}>
+            ▶ Skill gallery
+          </button>
         </div>
       </div>
     </div>
