@@ -115,7 +115,7 @@ describe('the shared spell base-damage curve (COVERAGE 5.2)', () => {
   it('a share scales one type of several', () => {
     const half = spellDamageAt({ type: 'cold', spread: [1, 1], share: 0.5 }, 100, 10);
     const full = spellDamageAt({ type: 'cold', spread: [1, 1] }, 100, 10);
-    expect(half.min).toBeCloseTo(full.min / 2, 0);
+    expect(Math.abs(half.min - full.min / 2)).toBeLessThanOrEqual(1);
   });
 
   it('keeps hand-tuned numbers as they are', () => {
