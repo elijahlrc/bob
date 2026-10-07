@@ -706,6 +706,176 @@
       "ref": "Mightflay",
       "status": "covered",
       "note": "Physical damage, added physical, strength and life on hit."
+    },
+    "graveBite": {
+      "ref": "Mortem Morsu",
+      "status": "covered",
+      "note": "Claw: life on hit, crit, 60% poison and physical converted to chaos."
+    },
+    "totemOfThePack": {
+      "ref": "Natural Hierarchy",
+      "status": "covered",
+      "note": "Increased damage of every type on an amulet."
+    },
+    "openFistMitts": {
+      "ref": "Ondar's Clasp",
+      "status": "covered",
+      "note": "Attack speed on full life, movement speed on low life, added lightning and accuracy."
+    },
+    "tidepoolRing": {
+      "ref": "Putembo's Meadow",
+      "status": "covered",
+      "note": "Intelligence with percentage life and energy shield."
+    },
+    "wellspringRing": {
+      "ref": "Putembo's Mountain",
+      "status": "covered",
+      "note": "Sibling of the Tidepool ring."
+    },
+    "reedwaterRing": {
+      "ref": "Putembo's Valley",
+      "status": "covered",
+      "note": "Sibling of the Tidepool ring."
+    },
+    "prismTreads": {
+      "ref": "Rainbowstride",
+      "status": "covered",
+      "note": "Spell block, mana, energy shield, all resistances and movement speed on boots."
+    },
+    "penitentBlade": {
+      "ref": "Rebuke of the Vaal",
+      "status": "covered",
+      "note": "Added damage of all five types and attack speed on a sword."
+    },
+    "wolfhowlBlade": {
+      "ref": "Rigwald's Charge",
+      "status": "covered",
+      "note": "Accuracy, physical damage, attack speed and movement speed."
+    },
+    "singedWoolGloves": {
+      "ref": "Sadima's Touch",
+      "status": "covered",
+      "note": "Added fire and lightning to attacks, energy shield and item quantity."
+    },
+    "longstrideBoots": {
+      "ref": "Seven-League Step",
+      "status": "covered",
+      "note": "Fifty percent movement speed and nothing else."
+    },
+    "scholarsQuickstep": {
+      "ref": "Shavronne's Pace",
+      "status": "covered",
+      "note": "Energy shield and intelligence with movement speed, more on full life."
+    },
+    "frostneedleSword": {
+      "ref": "Shiversting",
+      "status": "covered",
+      "note": "Added cold, accuracy and mana leech, and immunity to freeze."
+    },
+    "moonwoodBow": {
+      "ref": "Silverbough",
+      "status": "covered",
+      "note": "Gem levels (all and bow), physical damage, attack speed and mana on kill."
+    },
+    "moonwoodSwitch": {
+      "ref": "Silverbranch",
+      "status": "covered",
+      "note": "A lower sibling: bow gem level, physical damage, attack speed and mana on kill."
+    },
+    "snakeskinGrips": {
+      "ref": "Slitherpinch",
+      "status": "covered",
+      "note": "Dexterity, evasion, attack speed and attack leech."
+    },
+    "wardstoneOfCalm": {
+      "ref": "Stone of Lazhwar",
+      "status": "covered",
+      "note": "Spell block, cast speed and mana."
+    },
+    "solsticeTreads": {
+      "ref": "Sundance",
+      "status": "covered",
+      "note": "Evasion, attack speed, item rarity, fire resistance and movement speed."
+    },
+    "burnishedFob": {
+      "ref": "The Ignomon",
+      "status": "covered",
+      "note": "Added fire to attacks, accuracy, evasion and fire resistance."
+    },
+    "cinderStaff": {
+      "ref": "The Searing Touch",
+      "status": "covered",
+      "note": "Fire gem level, spell and fire damage, burning damage, cast speed and staff block."
+    },
+    "beaconQuiver": {
+      "ref": "The Signal Fire",
+      "status": "covered",
+      "note": "Physical converted and gained as fire, added fire to bow attacks and attack speed."
+    },
+    "gospelSceptre": {
+      "ref": "The Supreme Truth",
+      "status": "covered",
+      "note": "Elemental and physical damage, attack speed, gem level and experience."
+    },
+    "lopsidedPendant": {
+      "ref": "Ungil's Harmony",
+      "status": "covered",
+      "note": "Doubled crit chance for less crit multiplier, life, mana and stun recovery."
+    },
+    "brightwaterRing": {
+      "ref": "Uzaza's Meadow",
+      "status": "covered",
+      "note": "Dexterity with percentage life and energy shield."
+    },
+    "highwaterRing": {
+      "ref": "Uzaza's Mountain",
+      "status": "covered",
+      "note": "Sibling of the Brightwater ring."
+    },
+    "lowwaterRing": {
+      "ref": "Uzaza's Valley",
+      "status": "covered",
+      "note": "Sibling of the Brightwater ring."
+    },
+    "twinchargePendant": {
+      "ref": "Victario's Acuity",
+      "status": "covered",
+      "note": "Frenzy and Power charges on kill, with projectile speed and damage per charge."
+    },
+    "hollowCapacitor": {
+      "ref": "Void Battery",
+      "status": "covered",
+      "note": "Power charges raise spell damage, with a penalty to base spell damage and big spell crit."
+    },
+    "plainSetting": {
+      "ref": "Voideye",
+      "status": "covered",
+      "note": "Five levels of socketed gems on a ring."
+    },
+    "paupersMaul": {
+      "ref": "Voidhome",
+      "status": "covered",
+      "note": "Heavy mace with fast attacks and big damage, paid for with rarity and experience."
+    },
+    "footlooseShoes": {
+      "ref": "Wanderlust",
+      "status": "covered",
+      "note": "Movement speed, mana regeneration, energy shield and immunity to freeze."
+    },
+    "luckySnare": {
+      "ref": "Wondertrap",
+      "status": "covered",
+      "note": "All attributes, energy shield, movement speed and huge item rarity on low life."
+    },
+    "stormcallersPole": {
+      "ref": "Agnerod North",
+      "status": "covered",
+      "note": "Lightning gem level, lightning damage, shock chance and penetration on a staff."
+    },
+    "stormcallersRod": {
+      "ref": "Agnerod West",
+      "status": "covered",
+      "note": "Lightning gem level, lightning damage, added spell lightning and penetration on a staff."
     }
   }
 }

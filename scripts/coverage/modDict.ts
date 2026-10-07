@@ -431,4 +431,13 @@ incRule('Movement Speed per Frenzy Charge', 'moveSpeed', () => ({
   per: { stat: 'charges.fervour', div: 1 },
 }));
 
+// All gems of a kind (not only the socketed ones).
+rule(/^# to Level of all (Fire|Cold|Lightning|Chaos|Physical) Spell Skill Gems$/, (m, n) => [
+  mk('gemLevel', 'base', n[0], { tags: [m[1].toLowerCase() as SkillTag, 'spell'] }),
+]);
+rule(/^# to Level of all Spell Skill Gems$/, (_m, n) => [
+  mk('gemLevel', 'base', n[0], { tags: ['spell'] }),
+]);
+rule(/^# to Level of all Skill Gems$/, (_m, n) => [mk('gemLevel', 'base', n[0])]);
+
 export const RULES = rules;

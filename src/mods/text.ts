@@ -50,6 +50,10 @@ function statName(m: Mod): string {
 export function modText(m: Mod): string {
   const t = STAT_TEXT[m.stat];
   // "+2 to Level of Socketed Aura Gems": the tags say which gems.
+  if (m.stat === 'gemLevel') {
+    const tags = (m.tags ?? []).map((x) => x.charAt(0).toUpperCase() + x.slice(1)).join(' ');
+    return `+${fmt(m.value)} to Level of all ${tags ? tags + ' ' : ''}Skill Gems`;
+  }
   if (m.stat === 'socketedGemLevel' && m.tags?.length) {
     const tags = m.tags.map((x) => x.charAt(0).toUpperCase() + x.slice(1)).join(' ');
     return `+${fmt(m.value)} to Level of Socketed ${tags} Gems`;

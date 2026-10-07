@@ -303,6 +303,7 @@ Object.assign(STAT_TEXT, {
   maxImpale: { base: '{v} to maximum Impales on an Enemy' },
   cullingStrike: { flag: 'Your Hits kill Enemies left at 10% Life or less' },
   maxRage: { base: '{v} to maximum Rage' },
+  gemLevel: { base: '{v} to Level of all Skill Gems' },
   buffDuration: { name: 'Buff Duration' },
 } satisfies Record<string, StatText>);
 for (const id of BUFF_IDS) {

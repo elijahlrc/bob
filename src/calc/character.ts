@@ -492,7 +492,11 @@ export class Character {
       it.sockets.forEach((g, socket) => {
         if (!g) return;
         const def = gemDef(g.gemId);
-        const bonus = socketedGemBonus(it, gemTagsOf(def), (st) => (st === 'level' ? level : 0));
+        // Gem levels from the item the gem sits in, and from anything that raises every gem of its kind.
+        const tags = gemTagsOf(def);
+        const bonus =
+          socketedGemBonus(it, tags, (st) => (st === 'level' ? level : 0)) +
+          db0.sum('base', 'gemLevel', { tags: tagMask(tags), ancestry: 0, conds: 0 });
         this.gems.push({ gem: g, def, slot, socket, level: gemLevel(def, level, attrs, bonus) });
       });
     }
