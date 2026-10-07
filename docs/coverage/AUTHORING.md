@@ -85,3 +85,19 @@ together.
 - **`per` reads only `str`, `dex`, `int`, `level` and the charge counts.**
 - **`drop` matches substrings of the reference line, case-sensitively;** one entry can drop several lines, so make
   entries specific. A line you write by hand must also be dropped.
+
+## Third round: minions, deployables, aspects
+
+- **Minions exist** (`summon` utility gems: `raiseHusk`, `callBonewalkers`, `callFuries`, the six `*Colossus` golems,
+  `hallowedRelic`, `whirringMotes`, `bindShade`, `wakeBlades`, `wakeSentinel`, the offerings, ...). The translator maps
+  "Grants Level N X Skill" for these, and the lines "Minions deal N% increased Damage" (`minionDamage`), "Minions have N%
+  increased Movement/Attack Speed" (`minionSpeed`), "increased maximum Life" (`minionLife`, no effect: minions cannot be
+  hurt) and "+N to Maximum number of Skeletons/Zombies/Spectres" (`minionCount`) are mapped. Hand-written: `minionDamage`
+  `more`, `minionSpeed`, `minionCount`. A unique whose defining line is minions can be covered now; say what was
+  simplified.
+- **Totems, traps, mines and brands exist** (the gems in `src/data/gemsGen.ts` with tags `totem`, `trap`, `mine`, `brand`,
+  and the supports). `deployCount` (additional totems, traps, mines or brands at a time) is a stat.
+- **Aspects:** `aspectOfPrey` (Cat's Stealth: condition `catStealth`), `aspectOfWing` (Avian's Might and Flight: condition
+  `avianBoon`), `aspectOfWeb` (Spider's Webs) are granted skills: the translator maps "Grants Level N Aspect of the X Skill".
+  There is no crab aspect yet.
+- Everything left over after this round is a real gap: skip it with the reason.
