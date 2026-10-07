@@ -8,9 +8,12 @@
     with the user on 2026-10-07). Reference data lives in `docs/coverage/` and `scripts/coverage/`, never in `src/`.
   - Every player-visible name and text in `src/` is our own; `src/data/ip.test.ts` checks them against the reference
     list. No PoE art or audio.
-- **Coverage plan:** [docs/COVERAGE.md](docs/COVERAGE.md) (milestones C0–C7) is under way. `npm run coverage` prints
-  where it stands, and `docs/coverage/README.md` describes the data and tools. Every new droppable gem or unique needs
-  a line in `docs/coverage/map.json`.
+- **Coverage plan:** [docs/COVERAGE.md](docs/COVERAGE.md) (milestones C0–C7): C0 to C6 are done (gems 93%, uniques 98% of
+  the 3.9.0 list); C7 is the integration pass. `npm run coverage` prints where it stands, and `docs/coverage/README.md`
+  describes the data and tools. Every new droppable gem or unique needs a line in `docs/coverage/map.json`. New content
+  goes through decision files (`docs/coverage/gems/`, `docs/coverage/uniques/`; see `docs/coverage/AUTHORING.md`) and
+  `npm run coverage:emit` / `coverage:emit-gems`, never by editing the generated `src/data/*Gen.ts`. Items are never
+  edited in place (what an item gives is remembered by object).
 - **Architecture boundaries (§14.2):**
   - `core`, `data`, `mods`, `calc`, `gen`, `sim` and `run` are headless: no Phaser, Preact or DOM.
   - No `Math.random`, `Date.now` or `performance.now` outside `render` and `ui`.
