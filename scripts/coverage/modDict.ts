@@ -3,7 +3,10 @@
  * `#`), to mods in Bob's own stat vocabulary. A stat that does not exist in Bob yet is listed by `needs-verb` (npm run
  * coverage:translate -- --needs) and is implemented when three or more uniques want it.
  */
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import type { SkillTag } from '../../src/mods/types';
+import { COVERAGE_DIR, key } from './reference';
 import { DMG_TYPES, type Clause, type LineCtx, type ModT, type Num, type Rule } from './translate';
 
 const mk = (stat: string, kind: ModT['kind'], n: Num, extra: Partial<ModT> = {}): ModT => ({
@@ -413,6 +416,25 @@ rule(/^# increased Mana Reserved$/, (_m, n) => [mk('reducedReservation', 'base',
 rule(/^Socketed Gems have # reduced Mana Reservation$/, (_m, n) => [
   mk('socketedReducedReservation', 'base', n[0]),
 ]);
+// "Socketed Gems are Supported by level N X": the support is linked to every gem in the item. Only supports Bob has.
+{
+  const gems = (
+    JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'map.json'), 'utf8')) as {
+      gems: Record<string, { ref: string }>;
+    }
+  ).gems;
+  const byName = new Map<string, string>();
+  for (const [id, e] of Object.entries(gems)) byName.set(key(e.ref.replace(/ Support$/, '')), id);
+  const alt = Object.values(gems)
+    .filter((e) => / Support$/.test(e.ref))
+    .map((e) => e.ref.replace(/ Support$/, ''))
+    .map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('|');
+  rule(new RegExp(`^Socketed Gems are supported by level # (${alt})$`, 'i'), (m, n) => {
+    const id = byName.get(key(m[1]));
+    return id ? [mk(`socketSupport.${id}`, 'base', n[0])] : [];
+  });
+}
 rule(/^# to Level of Socketed Gems$/, (_m, n) => [mk('socketedGemLevel', 'base', n[0])]);
 for (const [word, tag] of [
   ['Fire', 'fire'],

@@ -6,8 +6,39 @@ import { mod, type CondId, type Mod } from '../mods/types';
  * the seconds left of each. Rage is different: it is a count, and each point is worth a little.
  * The names are descriptive; the effects follow the reference game's numbers.
  */
-export type BuffId = 'fortify' | 'onslaught' | 'unholyMight' | 'arcaneSurge';
-export const BUFF_IDS: BuffId[] = ['fortify', 'onslaught', 'unholyMight', 'arcaneSurge'];
+export type BuffId =
+  | 'fortify'
+  | 'onslaught'
+  | 'unholyMight'
+  | 'arcaneSurge'
+  | 'bloodSurge'
+  | 'steelHide'
+  | 'moltenGuard'
+  | 'deathless'
+  | 'phaseRun'
+  | 'enduringCry'
+  | 'rallyingCry'
+  | 'infernalCry'
+  | 'warBanner'
+  | 'dreadBanner'
+  | 'witherStep';
+export const BUFF_IDS: BuffId[] = [
+  'fortify',
+  'onslaught',
+  'unholyMight',
+  'arcaneSurge',
+  'bloodSurge',
+  'steelHide',
+  'moltenGuard',
+  'deathless',
+  'phaseRun',
+  'enduringCry',
+  'rallyingCry',
+  'infernalCry',
+  'warBanner',
+  'dreadBanner',
+  'witherStep',
+];
 
 export type BuffDef = {
   id: BuffId;
@@ -19,11 +50,112 @@ export type BuffDef = {
   text: string;
   /** What the buff does, as mods that hold while the condition is true. */
   mods: Mod[];
+  /** Utility-skill buffs: what the gem gives is in the gem (its mods), and the sheet assumes it up only when it mostly is. */
+  gem?: boolean;
 };
 
 const when = (cond: CondId): { condition: { id: CondId } } => ({ condition: { id: cond } });
 
 export const BUFFS: Record<BuffId, BuffDef> = {
+  bloodSurge: {
+    id: 'bloodSurge',
+    name: 'Blood Surge',
+    seconds: 10,
+    cond: 'bloodSurge',
+    text: 'Blood Surge',
+    mods: [],
+    gem: true,
+  },
+  steelHide: {
+    id: 'steelHide',
+    name: 'Steel Hide',
+    seconds: 3,
+    cond: 'steelHide',
+    text: 'Steel Hide',
+    mods: [],
+    gem: true,
+  },
+  moltenGuard: {
+    id: 'moltenGuard',
+    name: 'Molten Guard',
+    seconds: 4,
+    cond: 'moltenGuard',
+    text: 'Molten Guard',
+    mods: [],
+    gem: true,
+  },
+  deathless: {
+    id: 'deathless',
+    name: 'Deathless',
+    seconds: 4,
+    cond: 'deathless',
+    text: 'Deathless',
+    mods: [],
+    gem: true,
+  },
+  phaseRun: {
+    id: 'phaseRun',
+    name: 'Slipstream',
+    seconds: 4,
+    cond: 'phaseRun',
+    text: 'Slipstream',
+    mods: [],
+    gem: true,
+  },
+  enduringCry: {
+    id: 'enduringCry',
+    name: 'Steadfast',
+    seconds: 8,
+    cond: 'enduringCry',
+    text: 'Steadfast',
+    mods: [],
+    gem: true,
+  },
+  rallyingCry: {
+    id: 'rallyingCry',
+    name: 'Rallied',
+    seconds: 8,
+    cond: 'rallyingCry',
+    text: 'Rallied',
+    mods: [],
+    gem: true,
+  },
+  infernalCry: {
+    id: 'infernalCry',
+    name: 'Kindled Fury',
+    seconds: 8,
+    cond: 'infernalCry',
+    text: 'Kindled Fury',
+    mods: [],
+    gem: true,
+  },
+  warBanner: {
+    id: 'warBanner',
+    name: 'Standard of Valour',
+    seconds: 8,
+    cond: 'warBanner',
+    text: 'Standard of Valour',
+    mods: [],
+    gem: true,
+  },
+  dreadBanner: {
+    id: 'dreadBanner',
+    name: 'Standard of Dread',
+    seconds: 8,
+    cond: 'dreadBanner',
+    text: 'Standard of Dread',
+    mods: [],
+    gem: true,
+  },
+  witherStep: {
+    id: 'witherStep',
+    name: 'Rot Stride',
+    seconds: 4,
+    cond: 'witherStep',
+    text: 'Rot Stride',
+    mods: [],
+    gem: true,
+  },
   fortify: {
     id: 'fortify',
     name: 'Fortified',

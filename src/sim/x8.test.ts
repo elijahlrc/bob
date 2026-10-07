@@ -170,7 +170,7 @@ describe('hexes in the sim (EXPANSION 5.7)', () => {
     expect(raw(b)).toBeCloseTo(0.5, 6);
     const c = put(w, 'warrior', 10);
     applyHex(w, c, 'brittleDoom', 30, 1);
-    expect(c.hexRes).toBe(30);
+    expect(c.hexRes.slice(1, 4)).toEqual([30, 30, 30]);
   });
 
   it('Leaden Limbs slows movement and actions; Feeble Grip lowers damage dealt', () => {

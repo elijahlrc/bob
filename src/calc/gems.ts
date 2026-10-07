@@ -10,6 +10,7 @@ import {
   type LevelValue,
   type SkillBehaviour,
   type SpellDamageDef,
+  type UtilityDef,
 } from '../data/gems';
 import type { Attrs } from '../data/types';
 import type { SkillType } from '../data/skillTypes';
@@ -95,6 +96,8 @@ export type SkillDef = {
   mods: Mod[];
   requiresWeapon?: SkillTag[];
   bothWeapons?: boolean;
+  utility?: UtilityDef;
+  travel?: number;
 };
 
 /** A spell's base damage in one type at a level, from explicit numbers or from the shared curve. */
@@ -142,6 +145,8 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     mods: gemMods(def.mods, level, def.id),
     requiresWeapon: def.requiresWeapon,
     bothWeapons: def.bothWeapons,
+    utility: def.utility,
+    travel: def.travel,
   };
 }
 

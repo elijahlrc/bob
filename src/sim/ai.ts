@@ -23,6 +23,7 @@ import { actorById, startAction } from './actions';
 import { bloaterBurst, isZone, speedMult } from './factions';
 import { flaskMask, monsterConds, playerConds } from './combat';
 import { canPay, payCost } from './cost';
+import { chooseUtility } from './utility';
 import type { Actor, GroundEffect, World } from './types';
 
 function canAct(a: Actor): boolean {
@@ -248,6 +249,13 @@ export function playerAI(w: World, dt: number): void {
     }
     ai.targetId = target.id;
     ai.mode = 'engage';
+    const util = chooseUtility(w, target);
+    if (util) {
+      payCost(w, util.choice.costsLife, util.prof.cost);
+      w.utilityReady[util.choice.key] = w.t + util.cd;
+      startAction(w, p, 'utility', util.prof, target);
+      return;
+    }
     const { which, prof, costsLife, key, cd } = chooseSkill(w, target);
     const melee = prof.skill.behaviour.kind === 'melee';
     const reach = skillRange(prof) + target.r + (melee ? p.r : 0);

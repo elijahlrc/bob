@@ -132,6 +132,8 @@ export type TargetState = {
   resShift: number[];
   /** Open Wounds: increased physical damage taken, as a fraction. */
   vuln?: number;
+  /** Increased damage taken of every type, as a fraction (curses and marks). */
+  vulnAll?: number;
 };
 
 export const NO_SHIFT: readonly number[] = [0, 0, 0, 0, 0];
@@ -236,6 +238,7 @@ export function mitigate(p: SkillProfile, t: TargetState, dmg: number[]): number
     }
     dmg[i] *= taken * def.damageTakenType[i];
     if (i === PHYS && t.vuln) dmg[i] *= 1 + t.vuln;
+    if (t.vulnAll) dmg[i] *= 1 + t.vulnAll;
   }
   return dmg;
 }

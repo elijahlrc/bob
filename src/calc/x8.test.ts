@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Rng } from '../core/rng';
 import { gemDef } from '../data/gems';
-import { hexEffect, HEXES } from '../data/hexes';
+import { hexEffect, HEX_IDS } from '../data/hexes';
 import { uniqueDef } from '../data/uniques';
 import { WAVE3_UNIQUES } from '../data/uniquesWave3';
 import { getTree } from '../data/tree';
@@ -111,8 +111,8 @@ describe('hexes in the calc (EXPANSION 5.7)', () => {
     expect(hexEffect('leadenLimbs', 20)).toBe(25);
     expect(hexEffect('feebleGrip', 20)).toBe(25);
     expect(hexEffect('openWounds', 10)).toBeGreaterThan(20);
-    expect(Object.keys(HEXES)).toHaveLength(4);
-    for (const id of Object.keys(HEXES)) expect(gemDef(id).kind).toBe('hex');
+    expect(HEX_IDS).toHaveLength(4);
+    for (const id of HEX_IDS) expect(gemDef(id).kind).toBe('hex');
     expect(gemDef('hexingStrikes').kind).toBe('support');
   });
 

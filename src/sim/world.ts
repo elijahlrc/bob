@@ -14,6 +14,7 @@ import { monsterAI, playerAI, separate } from './ai';
 import { lifeCap, rawHit, refreshPlayerDefence, tickActor } from './combat';
 import { autoFlaskPolicy, type FlaskPolicy } from './flaskPolicy';
 import { isZone, tickCorpses, tickFactionBehaviour, tickZones } from './factions';
+import { BUFF_IDS, type BuffId } from '../data/buffs';
 import { rollGains, tickBuffs } from './buffs';
 import { rebuildCharacter, seedCharacters, tickCharges } from './charges';
 import { tickTriggers } from './triggers';
@@ -89,7 +90,8 @@ function newActor(id: number, isPlayer: boolean, x: number, y: number, r: number
     phaseT: 0,
     hexes: [],
     impales: [],
-    hexRes: 0,
+    hexRes: [0, 0, 0, 0, 0],
+    hexVulnAll: 0,
     hexVuln: 0,
     hexDmg: 1,
     hexSpeed: 1,
@@ -172,13 +174,14 @@ export function createWorld(inp: CreateWorldInput): World {
     rngLoot: root.fork('loot'),
     rngTrig: root.fork('trigger'),
     chargeT: { grit: 0, fervour: 0, insight: 0 },
-    buffT: { fortify: 0, onslaught: 0, unholyMight: 0, arcaneSurge: 0 },
+    buffT: Object.fromEntries(BUFF_IDS.map((id) => [id, 0])) as Record<BuffId, number>,
     rage: 0,
     rageT: 0,
     rageDrain: 0,
     chars: new Map(),
     trophy: {},
     secondaryReady: {},
+    utilityReady: {},
     trig: {
       cooldown: {},
       taken: {},

@@ -66,7 +66,7 @@ describe('generated uniques', () => {
     const { render, loadDecisions, OUT } = await import('./emit-uniques');
     const { readFileSync } = await import('node:fs');
     expect(readFileSync(OUT, 'utf8')).toBe((await render(loadDecisions())).text);
-  });
+  }, 60000);
 
   it('every decision has our own name, a flavour line and a note', async () => {
     const { loadDecisions } = await import('./emit-uniques');

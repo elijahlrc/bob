@@ -155,10 +155,15 @@ export function refreshPlayerDefence(w: World): void {
 
 export function targetState(a: Actor): TargetState {
   // Brittle Doom lowers the three elemental resistances; Open Wounds adds physical vulnerability.
-  const resShift = a.hexRes
-    ? a.resShift.map((r, i) => (i >= 1 && i <= 3 ? r - a.hexRes : r))
-    : a.resShift;
-  return { def: a.def, shock: a.ail.shock, resShift, vuln: a.hexVuln, es: a.es };
+  const resShift = a.resShift.map((r, i) => r - a.hexRes[i]);
+  return {
+    def: a.def,
+    shock: a.ail.shock,
+    resShift,
+    vuln: a.hexVuln,
+    vulnAll: a.hexVulnAll,
+    es: a.es,
+  };
 }
 
 /**
@@ -483,12 +488,13 @@ export function rawHit(
       const red = Math.min(0.9, def.armour / (def.armour + 10 * dmg[0]) + def.physReduction);
       dmg[0] *= 1 - red;
     } else {
-      const shift = dst.resShift[i] - (i <= 3 ? dst.hexRes : 0);
+      const shift = dst.resShift[i] - dst.hexRes[i];
       const r = Math.max(-200, Math.min(def.res[i] + shift, def.maxRes[i]));
       dmg[i] *= 1 - r / 100;
     }
     dmg[i] *= taken * def.damageTakenType[i];
     if (i === 0) dmg[i] *= 1 + dst.hexVuln;
+    dmg[i] *= 1 + dst.hexVulnAll;
   }
   const total = dmg[0] + dmg[1] + dmg[2] + dmg[3] + dmg[4];
   w.events.push({ t: 'hit', src: 0, dst: dst.id, amount: total, crit: false, dtype: type });

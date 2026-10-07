@@ -1,4 +1,10 @@
-import { BASE_HEX_LIMIT, BOSS_CURSE_EFFECT, HEX_SECONDS, type HexId } from '../data/hexes';
+import {
+  BASE_HEX_LIMIT,
+  BOSS_CURSE_EFFECT,
+  HEX_SECONDS,
+  hexTotals,
+  type HexId,
+} from '../data/hexes';
 import type { Actor, World } from './types';
 
 /**
@@ -61,18 +67,10 @@ export function tickHexes(a: Actor, dt: number): void {
 
 /** Refresh the numbers the damage and movement code read. */
 export function recompute(a: Actor): void {
-  let res = 0;
-  let vuln = 0;
-  let dmg = 1;
-  let speed = 1;
-  for (const h of a.hexes) {
-    if (h.id === 'brittleDoom') res += h.effect;
-    else if (h.id === 'openWounds') vuln += h.effect / 100;
-    else if (h.id === 'feebleGrip') dmg *= 1 - h.effect / 100;
-    else speed *= 1 - h.effect / 100;
-  }
-  a.hexRes = res;
-  a.hexVuln = vuln;
-  a.hexDmg = dmg;
-  a.hexSpeed = speed;
+  const t = hexTotals(a.hexes);
+  a.hexRes = t.res;
+  a.hexVuln = t.vulnPhys;
+  a.hexVulnAll = t.vulnAll;
+  a.hexDmg = t.damageMult;
+  a.hexSpeed = t.speedMult;
 }

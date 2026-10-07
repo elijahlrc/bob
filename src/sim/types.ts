@@ -30,7 +30,7 @@ export type Ailments = {
 export type Action = {
   profile: SkillProfile;
   /** Which skill: 'primary', 'secondary', 'default', 'monster' or 'triggered'. */
-  which: 'primary' | 'secondary' | 'default' | 'monster' | 'triggered';
+  which: 'primary' | 'secondary' | 'default' | 'monster' | 'triggered' | 'utility';
   hand: number;
   duration: number;
   elapsed: number;
@@ -114,8 +114,10 @@ export type Actor = {
   hexes: HexState[];
   /** Impales on this actor: the physical damage each recorded, and the hits it has left. */
   impales: { dmg: number; hits: number }[];
-  hexRes: number;
+  /** Resistance lowered by hexes, per damage type (index 0 unused). */
+  hexRes: number[];
   hexVuln: number;
+  hexVulnAll: number;
   hexDmg: number;
   hexSpeed: number;
   /** The Choir (EXPANSION 7.3): the censer aura time left, a Zealous boost, and Fervour stacks with their time left. */
@@ -367,6 +369,8 @@ export type World = {
   trig: TriggerRuntime;
   /** When each secondary skill (by choice key) can next be cast (EXPANSION 5.5a). */
   secondaryReady: Record<string, number>;
+  /** When each utility skill (by choice key) can next be cast. */
+  utilityReady: Record<string, number>;
   actors: Actor[];
   player: Actor;
   nextId: number;

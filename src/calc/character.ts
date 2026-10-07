@@ -38,7 +38,15 @@ import {
   type BuffId,
 } from '../data/buffs';
 import { classDef } from '../data/classes';
-import { BASE_HEX_LIMIT, HEX_IDS, hexEffect, type HexId } from '../data/hexes';
+import {
+  ALL_HEX_IDS,
+  BASE_HEX_LIMIT,
+  HEXES,
+  HEX_SECONDS,
+  hexEffect,
+  hexTotals,
+  type HexId,
+} from '../data/hexes';
 import type { TriggerDef } from '../data/triggers';
 import { itemBase, isWeaponClass } from '../data/bases';
 import {
@@ -90,6 +98,7 @@ import {
   grantedKeystones,
   itemGlobalMods,
   itemHasRule,
+  itemMods,
   socketedGemBonus,
   socketedReservationReduction,
   weaponStats,
@@ -292,6 +301,12 @@ export class Character {
   readonly hexes: PlayerHex[] = [];
   /** How many of the hexes of the character a target holds at once. */
   hexLimit = BASE_HEX_LIMIT;
+  /** The utility skills (curses, buffs, warcries, blinks) the character casts by policy, not as damage. */
+  readonly utilities: SkillChoice[] = [];
+  /** The curses the character casts as skills (utility gems), strongest first. */
+  readonly castCurses: PlayerHex[] = [];
+  /** What the sheet assumes an enemy carries: the hit-applied hexes and the cast curses, within the hex limit. */
+  readonly sheetHexes: PlayerHex[] = [];
   /** Which kinds of charge something can grant. */
   readonly chargeSource: Record<ChargeKind, boolean>;
   /** Which buffs something can grant (their effects are in the database, behind their conditions), and whether rage. */
@@ -450,9 +465,19 @@ export class Character {
       insight: hasChargeSource(withGems(), 'insight'),
     };
     // Buffs: their effects wait behind a condition, so they are only added when something can grant them.
-    this.buffSource = { fortify: false, onslaught: false, unholyMight: false, arcaneSurge: false };
+    this.buffSource = Object.fromEntries(BUFF_IDS.map((id) => [id, false])) as Record<
+      BuffId,
+      boolean
+    >;
+    // A utility skill in a socket is a source of its buff (it casts it).
+    const utilBuffs = new Set<BuffId>();
+    for (const slot of EQUIP_SLOTS)
+      for (const g of build.equipment[slot]?.sockets ?? []) {
+        const gd = g ? gemDef(g.gemId) : null;
+        if (gd?.kind === 'active' && gd.utility?.kind === 'buff') utilBuffs.add(gd.utility.buff);
+      }
     for (const id of BUFF_IDS) {
-      this.buffSource[id] = hasBuffSource(withGems(), id);
+      this.buffSource[id] = hasBuffSource(withGems(), id) || utilBuffs.has(id);
       if (this.buffSource[id]) mods.push(...BUFFS[id].mods);
     }
     this.rageSource = hasRageSource(withGems());
@@ -532,6 +557,23 @@ export class Character {
           db0.sum('base', 'gemLevel', { tags: tagMask(tags), ancestry: 0, conds: 0 });
         this.gems.push({ gem: g, def, slot, socket, level: gemLevel(def, level, attrs, bonus) });
       });
+    }
+    // "Socketed gems are supported by ...": the item links that support to every gem in it.
+    for (const slot of EQUIP_SLOTS) {
+      const it = build.equipment[slot];
+      if (!it) continue;
+      for (const m of itemMods(it)) {
+        if (!m.stat.startsWith('socketSupport.')) continue;
+        const def = gemDef(m.stat.slice('socketSupport.'.length));
+        if (def.kind !== 'support') continue;
+        this.gems.push({
+          gem: { kind: 'gem', uid: -1 - this.gems.length, gemId: def.id },
+          def,
+          slot,
+          socket: -1,
+          level: Math.max(1, Math.min(MAX_GEM_LEVEL, Math.round(m.value))),
+        });
+      }
     }
     const weaponTags = this.weaponTags;
     const costLifeAll = db0.flag('skillsCostLife', ctx0);
@@ -613,19 +655,27 @@ export class Character {
     };
     this.buildTriggers(build);
     const chosen =
-      this.actives.find((a) => a.gemUid === build.primaryGem && !a.triggered) ??
-      this.actives.find((a) => a.usable && !a.triggered);
+      this.actives.find((a) => a.gemUid === build.primaryGem && !a.triggered && !a.skill.utility) ??
+      this.actives.find((a) => a.usable && !a.triggered && !a.skill.utility);
     if (chosen && !chosen.usable) this.warnings.push(chosen.reason ?? 'Primary skill unusable');
     this.primary = chosen && chosen.usable ? chosen : this.defaultAttack;
     this.hexes = this.deriveHexes(db0, ctx0);
+    this.castCurses = this.deriveCurses(db0, ctx0);
+    this.sheetHexes = [
+      ...this.hexes,
+      ...this.castCurses.filter((c) => !this.hexes.some((h) => h.id === c.id)),
+    ]
+      .sort((a, b) => b.effect - a.effect)
+      .slice(0, this.hexLimit);
     // The enemies the character hits are hexed (for the sheet; the sim tracks it per enemy).
-    if (this.hexes.length)
+    if (this.sheetHexes.length)
       this.configConds = maskOr(this.configConds, this.cond.peek('targetCursed'));
     const casting = new Set([this.primary.skill.id]);
     for (const a of this.actives) {
       if (!a.usable || a.triggered || a.gemUid === null || casting.has(a.skill.id)) continue;
       casting.add(a.skill.id);
-      this.secondaryCandidates.push(a);
+      if (a.skill.utility) this.utilities.push(a);
+      else this.secondaryCandidates.push(a);
     }
 
     // 4. Auras and reservation.
@@ -660,6 +710,42 @@ export class Character {
         this.warnings.push(`${def.name} is inactive: not enough ${life ? 'life' : 'mana'}`);
       }
       this.auras.push({ gem: sg, def, reserved: r, active });
+    }
+    // Utility buffs act while their timer runs (the sim) or, for the sheet, as if up; marks give their bonuses.
+    for (const a of this.utilities) {
+      const u = a.skill.utility!;
+      if (u.kind === 'buff') {
+        const bd = BUFFS[u.buff];
+        const uptime = Math.min(
+          1,
+          (u.seconds * db0.mult('buffDuration', ctx0)) / (u.cooldown ?? u.seconds * 0.9),
+        );
+        const src = { kind: 'gem' as const, id: a.skill.id };
+        const mods = gemMods(u.mods, a.skill.level, a.skill.id);
+        // The sheet of a bot's build counts a buff that is only up part of the time by its uptime.
+        if (this.config.steady && uptime < 0.5)
+          db0.addAll(mods.map((m) => ({ ...m, value: m.value * uptime, source: src })));
+        else db0.addAll(mods.map((m) => ({ ...m, condition: { id: bd.cond }, source: src })));
+        this.cond.bit(bd.cond);
+      } else if (u.kind === 'curse') {
+        const hd = HEXES[u.hex];
+        const t = Math.max(0, Math.min(1, (a.skill.level - 1) / 19));
+        const mult = db0.mult('curseEffect', ctx0);
+        for (const sm of hd.selfMods ?? []) {
+          db0.add({
+            stat: sm.stat,
+            kind: sm.kind,
+            value:
+              (sm.low + (sm.high - sm.low) * t) *
+              (sm.kind === 'base' && sm.stat === 'critMulti' ? 1 : mult),
+            tags: sm.tags,
+            damageTypes: sm.damageTypes,
+            condition: { id: 'targetCursed' },
+            source: { kind: 'gem', id: a.skill.id },
+          });
+        }
+        this.cond.bit('targetCursed');
+      }
     }
     this.reservedLife = reservedLife;
     this.reservedMana = reservedMana;
@@ -775,7 +861,7 @@ export class Character {
       for (const g of this.gems)
         if (g.slot === prim.slot && g.def.kind === 'hex')
           out.push({ id: g.def.hex, level: g.level, effect: 0 });
-    for (const id of HEX_IDS) {
+    for (const id of ALL_HEX_IDS) {
       const lv = db.sum('base', `hexOnHit.${id}`, ctx);
       if (lv > 0 && !out.some((h) => h.id === id)) out.push({ id, level: lv, effect: 0 });
     }
@@ -786,19 +872,39 @@ export class Character {
     return out.slice(0, this.hexLimit);
   }
 
-  /** What the character's hexes do to a hit enemy: resistance shifts and physical vulnerability. */
-  hexTarget(): { resShift: number[]; vuln: number; damageMult: number; speedMult: number } {
-    const resShift = [...NO_SHIFT];
-    let vuln = 0;
-    let damageMult = 1;
-    let speedMult = 1;
-    for (const h of this.hexes) {
-      if (h.id === 'brittleDoom') for (let i = 1; i <= 3; i++) resShift[i] -= h.effect;
-      else if (h.id === 'openWounds') vuln += h.effect / 100;
-      else if (h.id === 'feebleGrip') damageMult *= 1 - h.effect / 100;
-      else speedMult *= 1 - h.effect / 100;
+  /** The curses cast by utility gems: level sets the effect, curse effect scales it. */
+  private deriveCurses(db: ModDB, ctx: ModCtx): PlayerHex[] {
+    const out: PlayerHex[] = [];
+    const mult = db.mult('curseEffect', ctx);
+    for (const a of this.actives) {
+      const u = a.skill.utility;
+      if (!a.usable || a.triggered || u?.kind !== 'curse') continue;
+      out.push({
+        id: u.hex,
+        level: a.skill.level,
+        effect: Math.round(hexEffect(u.hex, a.skill.level) * mult * 10) / 10,
+      });
     }
-    return { resShift, vuln, damageMult, speedMult };
+    out.sort((a, b) => b.effect - a.effect);
+    return out;
+  }
+
+  /** What the character's hexes do to a hit enemy: resistance shifts and physical vulnerability. */
+  hexTarget(): {
+    resShift: number[];
+    vuln: number;
+    vulnAll: number;
+    damageMult: number;
+    speedMult: number;
+  } {
+    const t = hexTotals(this.sheetHexes);
+    return {
+      resShift: NO_SHIFT.map((_, i) => -t.res[i]),
+      vuln: t.vulnPhys,
+      vulnAll: t.vulnAll,
+      damageMult: t.damageMult,
+      speedMult: t.speedMult,
+    };
   }
 
   steadyMask(mode: SteadyMode): number {
@@ -806,7 +912,7 @@ export class Character {
     // A buff that something can grant is assumed up, as a charge is assumed held.
     for (const id of BUFF_IDS)
       if (this.buffSource[id]) m = maskOr(m, this.cond.peek(BUFFS[id].cond));
-    if (this.hexes.length) m = maskOr(m, this.cond.peek('targetCursed'));
+    if (this.sheetHexes.length) m = maskOr(m, this.cond.peek('targetCursed'));
     if (mode === 'clearing') m = maskOr(m, this.cond.peek('killedRecently'));
     const d = this.defence(m);
     if (this.reservedLife >= 0.65 * d.maxLife) m = maskOr(m, this.cond.peek('onLowLife'));
@@ -916,6 +1022,7 @@ export class Character {
       shock: 0,
       resShift: hexed.resShift,
       vuln: hexed.vuln,
+      vulnAll: hexed.vulnAll,
     };
     const d = this.config.targetDistance;
     const usesPerSec = usesOverride ?? timeShare / p.useTime;
@@ -1073,9 +1180,28 @@ export class Character {
     return rows.map((r) => ({ ...r, rate: (r.rate * 0.9) / total, busy: (r.busy * 0.9) / total }));
   }
 
-  /** The share of time the primary skill has left after the secondary casts. */
+  /** How the utility skills take the character's time: each is cast once per cooldown (or per buff or curse duration). */
+  utilityLoad(
+    conds: number = this.configConds,
+  ): { choice: SkillChoice; rate: number; busy: number }[] {
+    return this.utilities.map((choice) => {
+      const u = choice.skill.utility!;
+      const p = this.profile(choice, conds);
+      const every =
+        u.kind === 'buff'
+          ? (u.cooldown ?? u.seconds * 0.9)
+          : u.kind === 'curse'
+            ? HEX_SECONDS * 0.9
+            : u.cooldown;
+      const rate = 1 / Math.max(every, p.useTime);
+      return { choice, rate, busy: rate * p.useTime };
+    });
+  }
+
+  /** The share of time the primary skill has left after the secondary casts and the utility skills. */
   primaryShare(conds: number = this.configConds): number {
-    return 1 - this.secondaryLoad(conds).reduce((a, r) => a + r.busy, 0);
+    const u = this.utilityLoad(conds).reduce((a, r) => a + r.busy, 0);
+    return Math.max(0.1, 1 - this.secondaryLoad(conds).reduce((a, r) => a + r.busy, 0) - u);
   }
 
   secondarySheets(conds: number = this.configConds, target?: TargetState): SecondarySheet[] {
@@ -1146,7 +1272,8 @@ export class Character {
     const secondary = this.secondarySheets(conds);
     const triggeredMana =
       triggered.reduce((a, t) => a + t.manaPerSec, 0) +
-      secondary.reduce((a, t) => a + t.manaPerSec, 0);
+      secondary.reduce((a, t) => a + t.manaPerSec, 0) +
+      this.utilityLoad(conds).reduce((a, r) => a + this.profile(r.choice, conds).cost * r.rate, 0);
     return {
       level: this.build.level,
       attrs: this.attrs,
@@ -1176,7 +1303,7 @@ export class Character {
       ),
       triggered,
       triggeredDps: triggered.reduce((a, t) => a + t.dps, 0),
-      hexes: this.hexes,
+      hexes: this.sheetHexes,
       secondary,
       secondaryDps: secondary.reduce((a, t) => a + t.dps, 0),
       ehp: this.ehp(d),
@@ -1187,6 +1314,10 @@ export class Character {
 }
 
 export function skillRange(p: SkillProfile): number {
+  return skillReach(p) + (p.skill.travel ?? 0);
+}
+
+function skillReach(p: SkillProfile): number {
   const b = p.skill.behaviour;
   if (b.kind === 'melee') return b.range + p.rangeBonus;
   if (b.kind === 'chain') return b.range;

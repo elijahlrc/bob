@@ -6,6 +6,7 @@ import { rollCharges } from './charges';
 import { hit } from './combat';
 import { registerBlast, shieldBlocks, speedMult } from './factions';
 import { fireTriggers } from './triggers';
+import { applyUtility } from './utility';
 import type { Action, Actor, World } from './types';
 
 /** Begin an action (attack or cast). The previous action's overflow time carries over. */
@@ -94,7 +95,12 @@ export function updateAction(w: World, a: Actor, dt: number): void {
     fire(w, a, act);
   }
   // Echoes: the same use lands again a moment after the first, without a new wind-up or a new cost.
-  if (act.fired && act.echoes < act.profile.repeats && act.elapsed >= echoeAt(act)) {
+  if (
+    act.which !== 'utility' &&
+    act.fired &&
+    act.echoes < act.profile.repeats &&
+    act.elapsed >= echoeAt(act)
+  ) {
     act.echoes++;
     const t2 = actorById(w, act.targetId);
     if (t2 && t2.alive) {
@@ -183,9 +189,29 @@ export function tickSkillZones(w: World, dt: number): void {
 
 /** Resolve an action's effect: strikes, chains or projectiles. Triggers call it with no wind-up. */
 export function fire(w: World, a: Actor, act: Action): void {
+  if (act.which === 'utility') {
+    applyUtility(w, a, act);
+    return;
+  }
   const p = act.profile;
   const b = p.skill.behaviour;
   const target = actorById(w, act.targetId);
+  // A travelling skill (a leap, a charge) carries the caster toward the target before it lands.
+  if (p.skill.travel && target && target.alive) {
+    const d = Math.hypot(target.x - a.x, target.y - a.y);
+    const step = Math.max(0, Math.min(p.skill.travel, d - (target.r + a.r + 0.8)));
+    if (step > 0.05) {
+      const spot = w.grid.collide(
+        a.x + ((target.x - a.x) / d) * step,
+        a.y + ((target.y - a.y) / d) * step,
+        a.r,
+      );
+      w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: false });
+      a.x = spot.x;
+      a.y = spot.y;
+      w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true });
+    }
+  }
   if (b.kind === 'melee') {
     const reach = b.range + p.rangeBonus;
     if (b.arc) {

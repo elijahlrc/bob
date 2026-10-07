@@ -1,5 +1,6 @@
 import type { DamageType, Mod, SkillTag } from '../mods/types';
 import type { TriggerDef } from './triggers';
+import type { BuffId } from './buffs';
 import type { HexId } from './hexes';
 import type { SkillType } from './skillTypes';
 import { GEN_ACTIVE_GEMS, GEN_SUPPORT_GEMS } from './gemsGen';
@@ -56,6 +57,25 @@ export type SpellDamageDef =
   | { type: DamageType; min: LevelValue; max: LevelValue }
   | { type: DamageType; spread: readonly [number, number]; share?: number };
 
+/**
+ * What a utility skill does instead of damage (COVERAGE 5.1): the character casts it by a policy, not on the player's say.
+ * 'upkeep' recasts a buff when it ends and enemies are near; 'guard' casts when life is low or a big hit lands;
+ * 'rally' casts when a pack or a rare enemy is near. A curse is cast on a target and the enemies around it; a blink
+ * closes a gap to a target that is out of reach.
+ */
+export type UtilityDef =
+  | {
+      kind: 'buff';
+      buff: BuffId;
+      seconds: number;
+      policy: 'upkeep' | 'guard' | 'rally';
+      cooldown?: number;
+      /** What the buff does while it lasts (the buff's condition is added to each). */
+      mods: GemMod[];
+    }
+  | { kind: 'curse'; hex: HexId; radius: number }
+  | { kind: 'blink'; distance: number; cooldown: number };
+
 export type ActiveGemDef = {
   kind: 'active';
   id: string;
@@ -85,6 +105,10 @@ export type ActiveGemDef = {
   needsDualWield?: boolean;
   /** Only usable while holding a shield. */
   needsShield?: boolean;
+  /** A utility skill (a curse, a buff, a warcry, a blink): it does not deal damage and is never the primary skill. */
+  utility?: UtilityDef;
+  /** A damaging skill that also moves the caster this far toward the target (a leap, a charge). */
+  travel?: number;
   description: string;
 };
 
