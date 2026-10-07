@@ -131,6 +131,15 @@ export const FLASK_BASES: FlaskBase[] = [
   uniqueUtil('flask_stonebrew', 'Stonebrew Flask', 20),
   uniqueUtil('flask_tonic', "Gambler's Tonic", 22),
   uniqueUtil('flask_martyr', "Martyr's Draught", 30),
+  uniqueUtil('flask_emberwell', 'Emberwell Urn', 22),
+  uniqueUtil('flask_venomvein', 'Venomvein Phial', 27),
+  uniqueUtil('flask_steadfast', 'Steadfast Tonic', 22),
+  uniqueUtil('flask_unbound', 'Unbound Draught', 50),
+  uniqueUtil('flask_bellowing', 'Bellowing Draught', 27),
+  uniqueUtil('flask_swiftgut', 'Swiftgut Flask', 40),
+  uniqueUtil('flask_ashen', 'Ashen Tonic', 14),
+  uniqueUtil('flask_thunderblood', 'Thunderblood Vial', 68),
+  uniqueUtil('flask_hexfire', 'Hexfire Brew', 48),
 ];
 
 const BY_ID = new Map(FLASK_BASES.map((f) => [f.id, f]));

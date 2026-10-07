@@ -114,6 +114,138 @@ export const UNIQUE_FLASKS: UniqueFlaskDef[] = [
     },
     flavour: 'Drink deep. Someone has to go first.',
   },
+  {
+    id: 'emberwellUrn',
+    name: 'Emberwell Urn',
+    baseId: 'flask_emberwell',
+    level: 22,
+    mods: [
+      m('recoverPct.kill.life', 'base', 1, 3),
+      m('recoverPct.kill.mana', 'base', 1, 3),
+      m('recoverPct.kill.es', 'base', 1, 3),
+      m('damage', 'more', 10, 10, { condition: { id: 'targetIgnited' } }),
+    ],
+    notes: {
+      pairsWith: ['ignite builds', 'fast clears with many kills'],
+      weakAgainst: ['single targets, where no kill refills it'],
+    },
+    flavour: 'It never quite cools, and it never quite empties.',
+  },
+  {
+    id: 'venomveinPhial',
+    name: 'Venomvein Phial',
+    baseId: 'flask_venomvein',
+    level: 27,
+    mods: [
+      m('chance.poison', 'base', 25),
+      m('critMulti', 'base', -50),
+      m('duration.poison', 'inc', 50, 75),
+    ],
+    notes: {
+      pairsWith: ['poison and chaos damage', 'builds that rarely crit'],
+      weakAgainst: ['crit builds, where it removes the bonus'],
+    },
+    flavour: 'Take the sting out of the crit and put it in the blood.',
+  },
+  {
+    id: 'steadfastTonic',
+    name: 'Steadfast Tonic',
+    baseId: 'flask_steadfast',
+    level: 22,
+    mods: [
+      m('cannotBeFrozen', 'flag', 1),
+      m('cannotBeChilled', 'flag', 1),
+      m('cannotBeStunned', 'flag', 1),
+      m('curseEffectOnSelf', 'inc', -100),
+    ],
+    notes: {
+      pairsWith: ['cold and shock maps', 'curse-heavy enemies'],
+      weakAgainst: ['maps with nothing to be immune to'],
+    },
+    flavour: 'For a minute, nothing can be done to you.',
+  },
+  {
+    id: 'unboundDraught',
+    name: 'Unbound Draught',
+    baseId: 'flask_unbound',
+    level: 50,
+    mods: [m('cost', 'inc', -100), m('manaRegenPct', 'base', 1.5)],
+    notes: {
+      pairsWith: ['big spell skills and utility casts', 'mana-hungry builds'],
+      weakAgainst: ['attack builds with cheap skills'],
+    },
+    flavour: 'Spend as you like. It will not be missed.',
+  },
+  {
+    id: 'bellowingDraught',
+    name: 'Bellowing Draught',
+    baseId: 'flask_bellowing',
+    level: 27,
+    mods: [
+      m('damage', 'more', 20, 25, { damageTypes: ['physical'], tags: ['melee'] }),
+      m('stunDuration', 'inc', 30),
+    ],
+    notes: {
+      pairsWith: ['melee physical builds', 'stun-based builds'],
+      weakAgainst: ['ranged and spell builds'],
+    },
+    flavour: 'Roar first. Hit second.',
+  },
+  {
+    id: 'swiftgutFlask',
+    name: 'Swiftgut Flask',
+    baseId: 'flask_swiftgut',
+    level: 40,
+    mods: [
+      m('moveSpeed', 'inc', 10, 30),
+      m('buffOn.flask.onslaught', 'base', 100),
+      m('chargeOn.crit.fervour', 'base', 15),
+    ],
+    notes: {
+      pairsWith: ['frenzy and speed builds', 'clearing runs'],
+      weakAgainst: ['slow boss fights, where the speed is wasted'],
+    },
+    flavour: 'Better not to ask what is in it.',
+  },
+  {
+    id: 'ashenTonic',
+    name: 'Ashen Tonic',
+    baseId: 'flask_ashen',
+    level: 14,
+    mods: [m('buffOn.flask.unholyMight', 'base', 100), m('removeIgnite', 'flag', 1)],
+    notes: {
+      pairsWith: ['physical builds that want chaos damage', 'fire maps'],
+      weakAgainst: ['builds with no physical damage'],
+    },
+    flavour: 'It puts out the fire and lights something worse.',
+  },
+  {
+    id: 'thunderbloodVial',
+    name: 'Thunderblood Vial',
+    baseId: 'flask_thunderblood',
+    level: 68,
+    mods: [
+      m('leech.life', 'base', 2, 2, { damageTypes: ['lightning'] }),
+      m('convert.physical.lightning', 'base', 20),
+    ],
+    notes: {
+      pairsWith: ['lightning builds', 'physical hitters who want a lightning share'],
+      weakAgainst: ['builds that need their physical damage'],
+    },
+    flavour: 'It hums when it is full, and it is always full.',
+  },
+  {
+    id: 'hexfireBrew',
+    name: 'Hexfire Brew',
+    baseId: 'flask_hexfire',
+    level: 48,
+    mods: [m('damage', 'inc', 25, 40, { tags: ['dot'] }), m('hexOnHit.chaosSap', 'base', 21)],
+    notes: {
+      pairsWith: ['damage over time builds', 'chaos damage'],
+      weakAgainst: ['hit-based builds'],
+    },
+    flavour: 'A bitter cup, and the curse comes with it.',
+  },
 ];
 
 export function uniqueFlaskDef(id: string): UniqueFlaskDef {

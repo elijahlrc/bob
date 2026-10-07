@@ -3676,6 +3676,51 @@
    "ref": "Xirgil's Crank",
    "status": "covered",
    "note": "Spell staff: +1 all spell gems, spell damage, block, energy shield (reference flat value scaled by 0.45) and melee lightning reflect. Dropped the chance for energy shield recharge to start on block."
+  },
+  "emberwellUrn": {
+   "ref": "Cinderswallow Urn",
+   "status": "covered",
+   "note": "Recovers life, mana and energy shield on kills during the effect, and ignited enemies take more damage (the charge from ignited corpses is dropped)."
+  },
+  "venomveinPhial": {
+   "ref": "Coralito's Signature",
+   "status": "covered",
+   "note": "A chance to poison and longer poisons during the effect, at the price of critical strikes dealing no extra damage (the chaos damage taken each second is dropped)."
+  },
+  "steadfastTonic": {
+   "ref": "Kiara's Determination",
+   "status": "covered",
+   "note": "Immunity to freeze, chill, stun and curses during the effect (the shortened duration is dropped)."
+  },
+  "unboundDraught": {
+   "ref": "Lavianga's Spirit",
+   "status": "covered",
+   "note": "Skills cost no mana during the effect, and mana regenerates faster (the mana recovery of the reference flask is folded into the regeneration)."
+  },
+  "bellowingDraught": {
+   "ref": "Lion's Roar",
+   "status": "covered",
+   "note": "More melee physical damage during the effect (the knockback and the fleeing enemies are dropped)."
+  },
+  "swiftgutFlask": {
+   "ref": "Rotgut",
+   "status": "covered",
+   "note": "Movement speed and Quickened (the onslaught of the reference) on use, and a chance of Fervour on crits (the charges consumed on use are dropped)."
+  },
+  "ashenTonic": {
+   "ref": "Sin's Rebirth",
+   "status": "covered",
+   "note": "Gain Dread Might on use and shed burning (the smoke cloud is dropped)."
+  },
+  "thunderbloodVial": {
+   "ref": "Vessel of Vinktar",
+   "status": "covered",
+   "note": "Leeches lightning damage as life and converts a share of physical damage to lightning during the effect (the shocking of enemies and of the wearer is dropped)."
+  },
+  "hexfireBrew": {
+   "ref": "Witchfire Brew",
+   "status": "covered",
+   "note": "More damage over time during the effect, and the enemies hit are cursed to lose chaos resistance (the smoke cloud is dropped)."
   }
  }
 }

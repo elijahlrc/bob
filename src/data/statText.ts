@@ -1,6 +1,6 @@
 import { CHARGE_KINDS, CHARGE_NAMES } from '../calc/charges';
 import { BUFF_IDS, BUFFS } from './buffs';
-import { HEX_IDS, HEXES } from './hexes';
+import { ALL_HEX_IDS, HEXES } from './hexes';
 import { KEYSTONES } from './tree/keystones';
 /**
  * Per-stat text templates (DESIGN.md §7.1). Text is always generated from structured mods; it is
@@ -295,7 +295,7 @@ for (const k of CHARGE_KINDS) {
   };
   STAT_TEXT[`chargeOn.hit.${k}`] = { base: `{v}% chance to gain a ${name} Charge on Hit` };
 }
-for (const id of HEX_IDS)
+for (const id of ALL_HEX_IDS)
   STAT_TEXT[`hexOnHit.${id}`] = { base: `Hexes Enemies you Hit with level {v} ${HEXES[id].name}` };
 for (const k of KEYSTONES) STAT_TEXT[`grantsKeystone.${k.id}`] = { flag: `Grants ${k.name}` };
 for (const t of ['physical', 'lightning', 'cold', 'fire'])

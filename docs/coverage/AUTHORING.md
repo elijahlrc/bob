@@ -68,3 +68,20 @@ together.
   `charges.insight`).
 - Borderline calls: cover the item when the line that makes it worth wearing survives (a damage conversion, a keystone-like
   rule, a big stat), and note what was simplified. Skip it when only the filler lines survive.
+
+## Second round: what exists now
+
+- **Granted skills and socketed supports map by themselves.** "Grants Level N X Skill" and "Socketed Gems are Supported by
+  level N X" are translated when Bob has an analog of X (the translator reads `docs/coverage/map.json`). A line that
+  stays open means Bob has no analog yet: skip the unique unless the line is secondary.
+- **Gems of C3 and C4 now exist** for curses (`tinderCurse` ... `warlordSigil`), marks, warcries and banners, guards,
+  buffs, movement skills, auras, stances and heralds. A trigger may `castGranted` any active gem id (`src/data/gems.ts`,
+  `src/data/gemsGen.ts`); give it a level.
+- **New conditions:** `heraldAsh`, `heraldIce`, `heraldThunder`, `heraldAgony` (while that herald is active; the
+  translator maps "while affected by Herald of X"), `targetCursed` ("when Hitting Cursed Enemies" maps too).
+- **Still not available:** minions, totems, traps, mines, brands (C5, C6): skip uniques whose defining line needs them.
+  Unique flasks go through a separate pipeline: skip them.
+- **`chargeOn.*` and `buffOn.*` ignore `condition`.** Do not write them with one; use a plain chance and say so.
+- **`per` reads only `str`, `dex`, `int`, `level` and the charge counts.**
+- **`drop` matches substrings of the reference line, case-sensitively;** one entry can drop several lines, so make
+  entries specific. A line you write by hand must also be dropped.
