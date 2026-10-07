@@ -394,6 +394,61 @@
    "ref": "Dual Strike",
    "status": "covered",
    "note": "Strikes with both weapons at once, with more critical chance; dual wielding only."
+  },
+  "quickeningShot": {
+   "ref": "Frenzy",
+   "status": "covered",
+   "note": "A fast bow or wand attack that grants a Fervour charge on hit and is stronger and faster for each charge held."
+  },
+  "rimeSplinter": {
+   "ref": "Frost Blades",
+   "status": "covered",
+   "note": "A melee strike that releases cold blades from the first enemy hit (modelled as a fan of cold projectiles)."
+  },
+  "primalStrike": {
+   "ref": "Elemental Hit",
+   "status": "covered",
+   "note": "An attack that deals only elemental damage, added from all three elements, with a chance to freeze, shock or ignite (the random element is averaged)."
+  },
+  "ghostBlades": {
+   "ref": "Ethereal Knives",
+   "status": "covered",
+   "note": "A wide fan of ten knives in front of the caster."
+  },
+  "fuseArrow": {
+   "ref": "Explosive Arrow",
+   "status": "covered",
+   "note": "A fire arrow that sticks and then explodes (the fuse is folded into an immediate burst)."
+  },
+  "emberHail": {
+   "ref": "Firestorm",
+   "status": "covered",
+   "note": "Flaming bolts rain over an area for two seconds."
+  },
+  "scorchWave": {
+   "ref": "Flame Surge",
+   "status": "covered",
+   "note": "A surge of flame in front of the caster that hits burning enemies harder."
+  },
+  "furnaceRoar": {
+   "ref": "Flameblast",
+   "status": "covered",
+   "note": "A channelled blast of fire around the caster (the stages are averaged into repeated bursts)."
+  },
+  "chillingShard": {
+   "ref": "Freezing Pulse",
+   "status": "covered",
+   "note": "A short-lived cold projectile that pierces and freezes (the fading is folded into the damage)."
+  },
+  "faultline": {
+   "ref": "Earthquake",
+   "status": "covered",
+   "note": "A heavy slam that cracks the ground and erupts after a moment (the aftershock is averaged into one stronger hit)."
+  },
+  "sapBolt": {
+   "ref": "Essence Drain",
+   "status": "covered",
+   "note": "A chaos projectile that leaves a draining damage over time and heals the caster from it."
   }
  },
  "uniques": {
