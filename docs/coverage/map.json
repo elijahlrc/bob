@@ -899,6 +899,81 @@
    "ref": "Infused Channelling Support",
    "status": "covered",
    "note": "More damage for channelled skills (the barrier that cuts damage taken is dropped)."
+  },
+  "tinderCurse": {
+   "ref": "Flammability",
+   "status": "covered",
+   "note": "A curse cast on a target and the enemies around it: their fire resistance falls (25% to 44%). Used by the AI on packs and rare enemies, one curse at a time."
+  },
+  "rimeCurse": {
+   "ref": "Frostbite",
+   "status": "covered",
+   "note": "A curse that lowers the cold resistance of the enemies it falls on (25% to 44%)."
+  },
+  "staticCurse": {
+   "ref": "Conductivity",
+   "status": "covered",
+   "note": "A curse that lowers the lightning resistance of the enemies it falls on (25% to 44%)."
+  },
+  "voidCurse": {
+   "ref": "Despair",
+   "status": "covered",
+   "note": "A curse that lowers chaos resistance (20% to 29%); the extra damage over time taken is folded into the weaker chaos resistance."
+  },
+  "penance": {
+   "ref": "Punishment",
+   "status": "covered",
+   "note": "A curse that makes the cursed take more damage from melee hits (modelled as more damage taken of every type)."
+  },
+  "ruinRitual": {
+   "ref": "Bane",
+   "status": "covered",
+   "note": "A curse that lowers chaos resistance and makes enemies take more damage (the curses it spreads on death are dropped)."
+  },
+  "ruinSigil": {
+   "ref": "Assassin's Mark",
+   "status": "covered",
+   "note": "A mark: enemies under it take more damage, and the character has more critical strike chance and multiplier against them (the life and mana on kill are dropped)."
+  },
+  "plentySigil": {
+   "ref": "Poacher's Mark",
+   "status": "covered",
+   "note": "A mark: marked enemies take more damage, and the character gains Fervour charges when they die (the flask charges and life on being hit are dropped)."
+  },
+  "huntSigil": {
+   "ref": "Sniper's Mark",
+   "status": "covered",
+   "note": "A mark: the character deals more projectile damage with more accuracy to the marked, which also take more damage."
+  },
+  "warlordSigil": {
+   "ref": "Warlord's Mark",
+   "status": "covered",
+   "note": "A mark: the character stuns the marked for longer and leeches life from melee hits on them (the stun recovery malus is folded into the stun duration)."
+  },
+  "steadfastBellow": {
+   "ref": "Enduring Cry",
+   "status": "covered",
+   "note": "A warcry cast when a pack or a rare enemy is near: it regenerates life and grants Grit charges (the scaling with nearby enemies is averaged)."
+  },
+  "rallyingRoar": {
+   "ref": "Rallying Cry",
+   "status": "covered",
+   "note": "A warcry cast when a pack or a rare enemy is near: more damage and mana regeneration for a few seconds (the allies' share is folded into the character's)."
+  },
+  "kindledBellow": {
+   "ref": "Infernal Cry",
+   "status": "covered",
+   "note": "A warcry that exerts the next attacks for more damage (modelled as more attack damage while it lasts); the death nova is dropped."
+  },
+  "standardOfValour": {
+   "ref": "War Banner",
+   "status": "covered",
+   "note": "A banner that gives more accuracy and the character's speed and damage a lift for as long as it stands (modelled as a timed buff, recast when it ends; the stages are averaged)."
+  },
+  "standardOfDread": {
+   "ref": "Dread Banner",
+   "status": "covered",
+   "note": "A banner that makes the character's hits impale and gives a fortifying effect (modelled as a timed buff of impale chance and less damage taken from hits)."
   }
  },
  "uniques": {

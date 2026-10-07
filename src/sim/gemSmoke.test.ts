@@ -82,13 +82,32 @@ describe('every active gem', () => {
       const classId = ATTR_CLASS(def.attr);
       const main = weaponFor(def);
       const b = buildFor(
-        granted ? [] : [def.id],
+        granted ? [] : def.utility ? ['crushingBlow', def.id] : [def.id],
         main,
         classId,
         def.needsShield ? 'shield' : def.needsDualWield || def.bothWeapons ? 'dual' : 'none',
       );
       const c = new Character(b, { areaLevel: 50 });
       const sheet = c.sheet();
+      if (def.utility) {
+        // A utility skill is cast by policy next to a damage skill: it never becomes the primary, and its effect shows up.
+        expect(c.utilities.map((u) => u.skill.id)).toContain(def.id);
+        expect(c.primary.skill.id).toBe('crushingBlow');
+        const { world, dummy } = createDummyWorld(b, { distance: 2 });
+        world.opts.freeResources = true;
+        world.opts.godMode = true;
+        dummy.rarity = 'boss'; // rallying skills wait for a pack or a big enemy
+        let seen = false;
+        const u = def.utility;
+        for (let i = 0; i < 20 * 60 && !seen; i++) {
+          stepWorld(world);
+          if (u.kind === 'buff') seen = world.buffT[u.buff] > 0;
+          else if (u.kind === 'curse') seen = dummy.hexes.some((h) => h.id === u.hex);
+          else seen = true;
+        }
+        expect(seen).toBe(true);
+        return;
+      }
       for (const v of [sheet.life, sheet.mana, sheet.skill.totalDps, sheet.skill.avgHit, sheet.ehp])
         expect(finite(v)).toBe(true);
       if (granted) return;
