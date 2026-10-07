@@ -84,10 +84,10 @@ describe('trigger supports and Ember Burst', () => {
       b.primaryGem = b.equipment.mainHand!.sockets[0]!.uid;
     });
 
-  it('Critical Relay casts the linked spell when an attack crits, and the spell loses damage', () => {
+  it('Critical Relay casts the linked spell when an attack crits, and the spell deals more damage', () => {
     const c = ch(withSupport('criticalRelay'));
     expect(c.triggers).toHaveLength(1);
-    expect(c.triggers[0].def).toMatchObject({ on: 'crit', cooldown: 0.25 });
+    expect(c.triggers[0].def).toMatchObject({ on: 'crit', cooldown: 0.15 });
     expect(c.triggers[0].skills.map((s) => s.skill.id)).toEqual(['frostLance']);
     expect(c.primary.skill.id).toBe('flameBolt');
     const plain = ch(
@@ -97,7 +97,7 @@ describe('trigger supports and Ember Burst', () => {
     );
     const damage = (x: Character, choice = x.actives.find((a) => a.skill.id === 'frostLance')!) =>
       x.profile(choice).hands[0].chunks.reduce((s, k) => s + k.max, 0);
-    expect(damage(c)).toBeLessThan(damage(plain));
+    expect(damage(c)).toBeGreaterThan(damage(plain));
   });
 
   it('Wounded Retort casts the linked spell after enough damage is taken', () => {

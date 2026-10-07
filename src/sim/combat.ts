@@ -4,6 +4,7 @@ import type { SkillProfile } from '../calc/skill';
 import {
   BLEED_MOVING_MULT,
   FLASK_CHARGES_ON_KILL,
+  LEECH_INSTANCE_MAX,
   LEECH_RATE_CAP,
   LEECH_RATE_PER_INSTANCE,
   LOW_LIFE,
@@ -103,7 +104,7 @@ export function targetState(a: Actor): TargetState {
   const resShift = a.hexRes
     ? a.resShift.map((r, i) => (i >= 1 && i <= 3 ? r - a.hexRes : r))
     : a.resShift;
-  return { def: a.def, shock: a.ail.shock, resShift, vuln: a.hexVuln };
+  return { def: a.def, shock: a.ail.shock, resShift, vuln: a.hexVuln, es: a.es };
 }
 
 /**
@@ -156,6 +157,10 @@ function addLeech(
   instant: boolean,
 ): void {
   if (amount <= 0) return;
+  amount = Math.min(
+    amount,
+    LEECH_INSTANCE_MAX * (list === 'leechLife' ? src.def.maxLife : src.def.maxMana),
+  );
   if (instant) {
     if (list === 'leechLife') src.life += amount;
     else src.mana += amount;

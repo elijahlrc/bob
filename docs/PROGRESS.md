@@ -461,3 +461,14 @@ revert if they would rather not.
   CLAUDE.md's IP bullet still said "never consult wiki or PoB data".
 - **Coverage now: gems 36/349 (10.3%), uniques 38/782 (4.9%).** Potential if every bucket of a milestone is covered:
   C3 64% / 82%, C4 80% / 91%, C5 91% / 93%.
+
+### C1 done: mechanics audit against 3.9.0 (2026-10-07)
+
+- `docs/AUDIT-3.9.md`: 23 rules brought in line with 3.9.0 (each with a wiki revision), 12 divergences recorded in DESIGN 2.1,
+  and the missing buff layer (Fortify, Onslaught, Impale, Rage, Arcane Surge, Culling Strike, Unholy Might) scheduled for C2.
+- Biggest changes: hit chance ×1.15; crit confirmation and crit ailments ×1.5; bleed 70% a second (×3 moving); shock and
+  chill `50 · r^0.4`; stun rules (ES ignore, 20% floor, melee weights); ES recharge 20% a second; dual wielding +20% more
+  physical damage and +15% block; triggered skills cost no mana and have per-spell cooldowns; flask charges per kill.
+- New tool: `npm run coverage:wiki -- "Page" [date]` prints a wiki page as it stood in the 3.9 era.
+- Convergence tests needed no retuning. Small bot check (4 × 6, seed 11): 3/24 wins (was 2/24), within noise.
+- **Tests.** 521.

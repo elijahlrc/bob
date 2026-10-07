@@ -1,4 +1,4 @@
-import { BASE_HEX_LIMIT, HEX_SECONDS, type HexId } from '../data/hexes';
+import { BASE_HEX_LIMIT, BOSS_CURSE_EFFECT, HEX_SECONDS, type HexId } from '../data/hexes';
 import type { Actor, World } from './types';
 
 /**
@@ -13,6 +13,7 @@ export type HexState = { id: HexId; effect: number; t: number };
 /** Put a hex on an actor, or renew it. When the actor is at its limit, the one with the least time left goes. */
 export function applyHex(w: World, a: Actor, id: HexId, effect: number, limit: number): void {
   if (!a.alive || a.modIds.includes('hexWarded')) return;
+  if (a.rarity === 'boss') effect *= BOSS_CURSE_EFFECT;
   const have = a.hexes.find((h) => h.id === id);
   if (have) {
     have.t = HEX_SECONDS;

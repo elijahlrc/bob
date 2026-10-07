@@ -109,13 +109,13 @@ describe('§6.6 damage over time in the sim', () => {
     expect(l1 - dummy.life).toBeCloseTo(15);
   });
 
-  it('bleed deals double damage to moving targets', () => {
+  it('bleed deals triple damage to moving targets (3.9)', () => {
     const { w, dummy } = world();
     dummy.ail.bleeds = [{ dps: 10, t: 5 }];
     dummy.moving = true;
     const l0 = dummy.life;
     tickActor(w, dummy, 1);
-    expect(l0 - dummy.life).toBeCloseTo(20);
+    expect(l0 - dummy.life).toBeCloseTo(30);
   });
 });
 

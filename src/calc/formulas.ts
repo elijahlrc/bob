@@ -1,5 +1,6 @@
 import { clamp } from '../core/math';
 import {
+  ACCURACY_FACTOR,
   ARMOUR_CAP,
   MIN_HIT_CHANCE,
   MONSTER_HIT_BASE,
@@ -11,11 +12,11 @@ import {
   RES_FLOOR,
 } from '../data/constants';
 
-/** §6.3 Hit chance of an attack. */
+/** §6.3 Hit chance of an attack: 1.15 · acc / (acc + (evasion / 4)^0.8), between 5% and 100% (3.9). */
 export function hitChance(accuracy: number, evasion: number): number {
   if (evasion <= 0) return 1;
   const acc = Math.max(0, accuracy);
-  return clamp(acc / (acc + Math.pow(evasion / 4, 0.8)), MIN_HIT_CHANCE, 1);
+  return clamp((ACCURACY_FACTOR * acc) / (acc + Math.pow(evasion / 4, 0.8)), MIN_HIT_CHANCE, 1);
 }
 
 /** §6.3 Physical damage reduction from armour against a hit of `damage` physical. */
@@ -29,17 +30,20 @@ export function effectiveRes(res: number, maxRes: number, pen = 0): number {
   return Math.max(RES_FLOOR, Math.min(res, maxRes) - pen);
 }
 
-/** §6.6 Ailment magnitude: `cap · min(1, sqrt(2r))`. */
-export function mag(r: number, cap: number): number {
+/**
+ * §6.6 Shock and chill magnitude, in percent: `50 · r^0.4 · (1 + effect)`, at most `cap` (50 for shock, 30 for chill).
+ * `r` is the damage dealt over the target's ailment threshold; the effect bonus counts before the cap (3.9).
+ */
+export function mag(r: number, cap: number, effect = 1): number {
   if (r <= 0) return 0;
-  return cap * Math.min(1, Math.sqrt(2 * r));
+  return Math.min(cap, 50 * Math.pow(r, 0.4) * effect);
 }
 
 /** §6.6a Stun chance from stun damage and the effective threshold. */
 export function stunChance(stunDamage: number, threshold: number, minChance: number): number {
   if (threshold <= 0) return 1;
   const c = clamp((2 * stunDamage) / threshold, 0, 1);
-  return c < minChance ? 0 : c;
+  return c <= minChance ? 0 : c;
 }
 
 /** §5.4 Experience. */

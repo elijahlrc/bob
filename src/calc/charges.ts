@@ -56,11 +56,8 @@ export function chargeMods(kind: ChargeKind, n: number): Mod[] {
       out.push(mod('physReduction', 'base', 4 * n), mod('resist.allEle', 'base', 4 * n));
       break;
     case 'fervour':
-      out.push(
-        mod('attackSpeed', 'inc', 4 * n),
-        mod('castSpeed', 'inc', 4 * n),
-        mod('moveSpeed', 'inc', 4 * n),
-      );
+      // 3.9: attack and cast speed, and more damage; no movement speed.
+      out.push(mod('attackSpeed', 'inc', 4 * n), mod('castSpeed', 'inc', 4 * n));
       // 4% more damage per charge: each charge is its own multiplier.
       for (let i = 0; i < n; i++) out.push(mod('damage', 'more', 4));
       break;

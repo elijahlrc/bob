@@ -4,14 +4,12 @@ import { DAMAGE_TYPES, tagBit } from '../mods/types';
 import { fire } from './actions';
 import { registerBlast } from './factions';
 import { flaskMask, lifeCap, playerConds, pushDot, rawHit, wake } from './combat';
-import { canPay, payCost } from './cost';
 import type { Actor, Action, World } from './types';
 
 /**
- * Triggers (EXPANSION 5.5). Rules, as in the reference game:
- * - each trigger source has its own cooldown;
- * - a triggered skill pays its mana cost, and does not fire when mana is short;
- * - a triggered skill takes no action time;
+ * Triggers (EXPANSION 5.5). Rules, as in the reference game (AUDIT-3.9):
+ * - each triggered skill has its own cooldown, and a source with several spells casts them in turn;
+ * - a triggered skill costs no mana (and needs none) and takes no action time;
  * - nothing triggers from a triggered skill (its hits carry the 'triggered' tag).
  * Kill explosions are capped per tick, so a dense pack cannot stall the sim.
  */
@@ -54,11 +52,15 @@ export function fireTriggers(w: World, ev: TriggerEvent): void {
       w.trig.taken[src.key] = (w.trig.taken[src.key] ?? 0) + ev.damage;
       if (w.trig.taken[src.key] < ((d.threshold ?? 0) / 100) * w.player.def.maxLife) continue;
     }
-    if ((w.trig.cooldown[src.key] ?? 0) > 0) continue;
+    // The next spell in socket order; its own cooldown, not the source's (3.9).
+    const turn = w.trig.next[src.key] ?? 0;
+    const skill = src.skills.length ? src.skills[turn % src.skills.length] : undefined;
+    const cdKey = skill ? `${src.key}:${skill.key}` : src.key;
+    if ((w.trig.cooldown[cdKey] ?? 0) > 0) continue;
     if (d.chance < 100 && !w.rngTrig.chance(d.chance / 100)) continue;
-    const skill = src.skills.length > 1 ? w.rngTrig.pick(src.skills) : src.skills[0];
     if (!perform(w, d.effect, ev, skill)) continue;
-    w.trig.cooldown[src.key] = d.cooldown;
+    w.trig.cooldown[cdKey] = d.cooldown;
+    w.trig.next[src.key] = turn + 1;
     if (d.on === 'hitTaken') w.trig.taken[src.key] = 0;
   }
 }
@@ -102,8 +104,6 @@ function castTriggered(w: World, choice: SkillChoice, ev: TriggerEvent): boolean
   const target = 'target' in ev && ev.target.alive ? ev.target : nearestEnemy(w);
   if (!target) return false;
   const prof = w.char.profile(choice, playerConds(w, target), flaskMask(w));
-  if (!canPay(w, choice.costsLife, prof.cost)) return false;
-  payCost(w, choice.costsLife, prof.cost);
   const act: Action = {
     profile: prof,
     which: 'triggered',

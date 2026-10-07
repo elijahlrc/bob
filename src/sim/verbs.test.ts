@@ -87,7 +87,8 @@ describe('sim rules for the new verbs', () => {
       stun: 0,
     });
     player.life = 100;
-    player.def = { ...player.def, instantLeech: false };
+    // One leech instance recovers at most 10% of the maximum, so keep the maximum large.
+    player.def = { ...player.def, instantLeech: false, maxLife: 5000 };
     applyHit(world, player, dummy, prof, res(false));
     expect(player.life).toBe(100); // normal leech is gradual
     expect(player.leechLife.length).toBe(1);

@@ -1,4 +1,4 @@
-import { easeDamage, easeLife } from '../data/constants';
+import { BASE_CRIT_MULTI, MONSTER_CRIT_MULTI, easeDamage, easeLife } from '../data/constants';
 import {
   FACTION_MODS,
   MONSTER_TYPES,
@@ -108,6 +108,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
     mod('evasion', 'base', monsterEvasion(m)),
     mod('armour', 'base', monsterArmour(m)),
     mod('moveSpeed', 'base', t.speed),
+    mod('critMulti', 'base', MONSTER_CRIT_MULTI - BASE_CRIT_MULTI),
     ...t.mods,
     ...(FACTION_MODS[t.faction] ?? []),
     ...variantMods(spec.variant, spec.type === 'mage'),

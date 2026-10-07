@@ -13,6 +13,7 @@ import {
   type TargetState,
 } from './combat';
 import { DEFAULT_ATTACK, type SkillDef } from './gems';
+import { mag } from './formulas';
 import { buildProfile, convertChunks, FIRE, PHYS, COLD, type HandStats } from './skill';
 
 const hand = (min: number, max: number, crit = 5, aps = 1): HandStats => ({
@@ -137,11 +138,11 @@ describe('§6.5 steps 1–2, 4, 7: base, scaling and crit', () => {
     expect(p.useTime).toBeCloseTo(0.5);
   });
 
-  it('crit chance: base × (1 + inc) × more, capped at 95%', () => {
+  it('crit chance: base × (1 + inc) × more, capped at 100%', () => {
     expect(profile(new ModDB([mod('critChance', 'inc', 100)])).hands[0].critChance).toBeCloseTo(
       0.1,
     );
-    expect(profile(new ModDB([mod('critChance', 'inc', 5000)])).hands[0].critChance).toBe(0.95);
+    expect(profile(new ModDB([mod('critChance', 'inc', 5000)])).hands[0].critChance).toBe(1);
     expect(profile(new ModDB([mod('neverCrit', 'flag', 1)])).hands[0].critChance).toBe(0);
     expect(profile(new ModDB([mod('critMulti', 'base', 50)])).hands[0].critMulti).toBeCloseTo(2);
     expect(profile(new ModDB([mod('feverPitch', 'flag', 1)])).hands[0].critMulti).toBe(1);
@@ -160,7 +161,9 @@ describe('§6.3 defences in hits', () => {
   it('accuracy vs evasion, always-hit and evade bonuses', () => {
     const p = profile(new ModDB([mod('accuracy', 'base', 500)]));
     const t = target({ evasion: 1000 });
-    expect(attackHitChance(p, p.hands[0], t.def)).toBeCloseTo(500 / (500 + Math.pow(250, 0.8)));
+    expect(attackHitChance(p, p.hands[0], t.def)).toBeCloseTo(
+      (1.15 * 500) / (500 + Math.pow(250, 0.8)),
+    );
     const rt = profile(new ModDB([mod('alwaysHit', 'flag', 1)]));
     expect(attackHitChance(rt, rt.hands[0], t.def)).toBe(1);
     const sp = profile(new ModDB(), spell);
@@ -238,16 +241,20 @@ describe('§6.6 ailments', () => {
       ]),
     );
     const a = ailmentsFromHit(p, p.hands[0], [50, 0, 0, 0, 0], false, t, always);
-    expect(a.bleed).toBeCloseTo(10);
+    expect(a.bleed).toBeCloseTo(35); // 70% of the physical hit a second (3.9)
     expect(a.poison).toBeCloseTo(20);
   });
   it('shock and chill use mag(r, cap) and the 5% floor', () => {
     const p = profile(new ModDB([mod('chance.shock', 'base', 100)]));
     expect(ailmentsFromHit(p, p.hands[0], [0, 50, 0, 0, 0], false, t, always).shock).toBeCloseTo(
-      0.5,
+      mag(0.5, 50) / 100,
+    );
+    // Chill is capped at 30%.
+    expect(ailmentsFromHit(p, p.hands[0], [0, 0, 50, 0, 0], false, t, always).chill).toBeCloseTo(
+      0.3,
     );
     expect(ailmentsFromHit(p, p.hands[0], [0, 0, 12.5, 0, 0], false, t, always).chill).toBeCloseTo(
-      0.15,
+      mag(0.125, 30) / 100,
     );
     expect(ailmentsFromHit(p, p.hands[0], [0, 0.1, 0, 0, 0], false, t, always).shock).toBe(0);
   });
@@ -273,11 +280,11 @@ describe('§6.6a stun', () => {
     );
     const def = dummyDefence({ stunThreshold: 1000, cannotBeStunned: false });
     const r = stunFromHit(p, [100, 0, 0, 100, 0], def, true, null);
-    // S = (100 + 50) × 1.5 = 225; threshold 750 → 0.6.
-    expect(r.chance).toBeCloseTo(0.6);
+    // A melee hit: physical counts 1.25, other types 1. S = (125 + 100) × 1.5 = 337.5; threshold 750 → 0.9.
+    expect(r.chance).toBeCloseTo(0.9);
     expect(r.duration).toBeCloseTo(0.35);
   });
-  it('no stun below 10%, during grace, or when immune', () => {
+  it('no stun at or below 20%, during grace, or when immune', () => {
     const p = profile(new ModDB());
     const def = dummyDefence({ stunThreshold: 1000, cannotBeStunned: false });
     expect(stunFromHit(p, [40, 0, 0, 0, 0], def, true, null).chance).toBe(0);

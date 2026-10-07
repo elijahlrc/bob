@@ -1,6 +1,8 @@
 import {
   ATTACK_LEVEL_MAX,
   ATTACK_LEVEL_MIN,
+  DUAL_WIELD_BLOCK,
+  DUAL_WIELD_MORE_PHYS,
   BASE_ACCURACY,
   BASE_EVASION,
   BASE_LIFE,
@@ -345,6 +347,16 @@ export class Character {
         tags: ['attack'],
       }),
     ];
+    if (this.dualWielding) {
+      // Dual wielding (3.9): 20% more physical attack damage and 15% additional chance to block attacks.
+      mods.push(
+        mod('damage', 'more', DUAL_WIELD_MORE_PHYS, {
+          damageTypes: ['physical'],
+          tags: ['attack', 'dualWield'],
+        }),
+        mod('blockAttack', 'base', DUAL_WIELD_BLOCK),
+      );
+    }
     const tree = getTree();
     for (const id of build.allocated) {
       const n = tree.nodes[id];
@@ -987,7 +999,8 @@ export class Character {
           skill: sheet,
           usesPerSec: each,
           dps: sheet.totalDps,
-          manaPerSec: this.profile(c, conds).cost * each,
+          // A triggered skill costs no mana (3.9).
+          manaPerSec: 0,
         });
       }
     }

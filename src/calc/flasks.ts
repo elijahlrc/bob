@@ -27,8 +27,11 @@ export function flaskSpec(f: FlaskItem, charDb: ModDB): FlaskSpec {
   const base = flaskBase(f.baseId);
   const local = new ModDB(f.affixes.flatMap((a) => a.mods));
   const effect = charDb.mult('flaskEffect');
-  const recovery = local.mult('flask.amount') * charDb.mult('flaskRecovery');
-  const duration = base.duration * local.mult('flask.duration') * charDb.mult('flaskDuration');
+  // Flask effect scales what a flask recovers as well as its buffs; a longer duration is the same rate for longer,
+  // so it recovers proportionally more (3.9).
+  const longer = local.mult('flask.duration') * charDb.mult('flaskDuration');
+  const recovery = local.mult('flask.amount') * charDb.mult('flaskRecovery') * effect * longer;
+  const duration = base.duration * longer;
   const scale = base.scaleWithIlvl ? 1 + 0.04 * f.ilvl : 1;
   const src = { kind: 'flask' as const, id: String(f.uid) };
   const buff: Mod[] = [

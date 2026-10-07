@@ -305,6 +305,8 @@ export type TriggerRuntime = {
   cooldown: Record<string, number>;
   /** Damage taken since a hit-taken trigger last fired. */
   taken: Record<string, number>;
+  /** The spell of each source that is next in line (they are cast in turn). */
+  next: Record<string, number>;
   /** True while a triggered skill is being cast: nothing triggers from it. */
   busy: boolean;
   /** Kill explosions so far this tick (capped, for speed). */

@@ -2,18 +2,22 @@ import type { Rng } from '../core/rng';
 import {
   BLEED_DPS_FRAC,
   CHILL_CAP,
+  CRIT_AILMENT_MULT,
   FREEZE_MAX,
   FREEZE_PER_R,
   IGNITE_DPS_FRAC,
   MIN_FREEZE,
   MIN_SHOCK_CHILL,
+  MONSTER_BLEED_DPS_FRAC,
   POISON_DPS_FRAC,
   SHOCK_CAP,
   STUN_BASE_DURATION,
+  STUN_ES_IGNORE,
+  STUN_MELEE_PHYS,
   STUN_MIN_CHANCE,
-  STUN_NON_PHYS,
+  STUN_NON_MELEE_NON_PHYS,
 } from '../data/constants';
-import { DAMAGE_TYPES } from '../mods/types';
+import { DAMAGE_TYPES, tagBit } from '../mods/types';
 import { armourReduction, effectiveRes, hitChance, mag, stunChance } from './formulas';
 import {
   CHAOS,
@@ -30,6 +34,8 @@ const NT = DAMAGE_TYPES.length;
 
 /** Resolved defensive stats of any combatant (player, monster, training dummy). */
 export type Defence = {
+  /** The player (ailments from monsters differ: a monster's bleed deals less). */
+  isPlayer: boolean;
   maxLife: number;
   maxEs: number;
   maxMana: number;
@@ -92,6 +98,8 @@ export type TargetState = {
   def: Defence;
   /** Current shock (increased damage taken, fraction). */
   shock: number;
+  /** Energy shield the target has right now (a stun is sometimes ignored while it is up). */
+  es?: number;
   /** Prismatic Balance resistance shifts per type, percent. */
   resShift: number[];
   /** Open Wounds: increased physical damage taken, as a fraction. */
@@ -201,10 +209,12 @@ export function ailmentsFromHit(
   const def = t.def;
   const a = emptyAilments();
   if (def.immuneAilments) return a;
-  const agony = p.cruelAgony && crit ? hand.critMulti : 1;
+  // 3.9: ailments from a critical strike carry a fixed 150%, whatever the critical strike multiplier.
+  const agony = crit ? (p.cruelAgony ? hand.critMulti : CRIT_AILMENT_MULT) : 1;
   const resMult = (i: number) => {
     if (def.immune[i] || (i === CHAOS && def.immuneChaos)) return 0;
-    const r = effectiveRes(def.res[i] + t.resShift[i], def.maxRes[i], p.pen[i]);
+    // Penetration does not apply to damage over time (3.9).
+    const r = effectiveRes(def.res[i] + t.resShift[i], def.maxRes[i]);
     return 1 - r / 100;
   };
   // The damage that can inflict an ailment: its own type, plus any type a rule allows.
@@ -217,7 +227,8 @@ export function ailmentsFromHit(
     a.ignite = IGNITE_DPS_FRAC * hm * p.ignite.mult * agony * p.ignite.speed;
   }
   if (p.isAttack && H[PHYS] > 0 && roll(p.bleed.chance)) {
-    a.bleed = BLEED_DPS_FRAC * H[PHYS] * p.bleed.mult * agony;
+    a.bleed =
+      (def.isPlayer ? MONSTER_BLEED_DPS_FRAC : BLEED_DPS_FRAC) * H[PHYS] * p.bleed.mult * agony;
   }
   if (H[PHYS] + H[CHAOS] > 0 && roll(p.poison.chance)) {
     a.poison = POISON_DPS_FRAC * (H[PHYS] + H[CHAOS]) * p.poison.mult * agony * resMult(CHAOS);
@@ -230,13 +241,13 @@ export function ailmentsFromHit(
     !def.unaffectedByShock &&
     (crit || roll(p.shock.chance))
   ) {
-    const e = mag(shockH / thresh, SHOCK_CAP) * p.shock.effect;
+    const e = mag(shockH / thresh, SHOCK_CAP, p.shock.effect);
     if (e >= MIN_SHOCK_CHILL) a.shock = e / 100;
   }
   if (ele && !def.immune[COLD]) {
     const chillH = from(p.ailmentFrom.chill);
     if (chillH > 0 && !def.cannotBeChilled) {
-      const e = mag(chillH / thresh, CHILL_CAP) * p.chill.effect;
+      const e = mag(chillH / thresh, CHILL_CAP, p.chill.effect);
       if (e >= MIN_SHOCK_CHILL) a.chill = e / 100;
     }
     const freezeH = from(p.ailmentFrom.freeze);
@@ -256,17 +267,26 @@ export function stunFromHit(
   def: Defence,
   canStun: boolean,
   rng: Rng | null,
+  esUp = false,
 ): { chance: number; duration: number } {
   if (!canStun || def.cannotBeStunned) return { chance: 0, duration: 0 };
+  // 3.9: melee physical damage stuns best (x1.25), non-melee non-physical worst (x0.75).
+  const melee = (p.tagMask & tagBit('melee')) !== 0;
   let s = 0;
-  for (let i = 0; i < NT; i++) s += i === PHYS ? dmg[i] : dmg[i] * STUN_NON_PHYS;
+  for (let i = 0; i < NT; i++) {
+    const w = i === PHYS ? (melee ? STUN_MELEE_PHYS : 1) : melee ? 1 : STUN_NON_MELEE_NON_PHYS;
+    s += dmg[i] * w;
+  }
   s *= p.stunDamageMult;
   const eff = def.stunThreshold * (1 - p.enemyStunThreshRed);
   const chance = stunChance(s, eff, STUN_MIN_CHANCE);
   const duration = STUN_BASE_DURATION * p.stunDurMult * def.stunDurOnSelf;
-  if (!rng) return { chance: chance * (1 - def.stunAvoid), duration };
+  // While energy shield is up, half of all stuns are ignored (not with Eldritch Battery-style rules).
+  const ignore = esUp && !def.esProtectsMana ? STUN_ES_IGNORE : 0;
+  if (!rng) return { chance: chance * (1 - def.stunAvoid) * (1 - ignore), duration };
   if (chance <= 0 || !rng.chance(chance)) return { chance, duration: 0 };
   if (def.stunAvoid > 0 && rng.chance(def.stunAvoid)) return { chance, duration: 0 };
+  if (ignore > 0 && rng.chance(ignore)) return { chance, duration: 0 };
   return { chance, duration };
 }
 
@@ -300,13 +320,17 @@ export function resolveHit(
   }
   const dm = distanceMult(p, dist);
   for (const c of hand.chunks) res.H[c.type] += (c.min + rng.next() * (c.max - c.min)) * dm;
-  res.crit = hand.critChance > 0 && rng.chance(hand.critChance);
+  // 3.9: an attack must also pass an accuracy check to confirm a critical strike.
+  res.crit =
+    hand.critChance > 0 &&
+    rng.chance(hand.critChance) &&
+    (isSpellHit || rng.chance(attackHitChance(p, hand, t.def)));
   const cm = (res.crit ? hand.critMulti * (p.cruelAgony ? 0.7 : 1) : 1) * hand.hitMult;
   for (let i = 0; i < NT; i++) res.dmg[i] = res.H[i] * cm;
   mitigate(p, t, res.dmg);
   for (let i = 0; i < NT; i++) res.total += res.dmg[i];
   res.ailments = ailmentsFromHit(p, hand, res.H, res.crit, t, (c) => c > 0 && rng.chance(c));
-  res.stun = stunFromHit(p, res.dmg, t.def, canStun, rng).duration;
+  res.stun = stunFromHit(p, res.dmg, t.def, canStun, rng, (t.es ?? 0) > 0).duration;
   return res;
 }
 
@@ -345,13 +369,15 @@ export function expectedHit(
     t,
     avgH.map((h) => h * hand.hitMult * critM),
   );
-  const cc = hand.critChance;
-  const perType = nonCrit.map((n, i) => n * (1 - cc) + crit[i] * cc);
   const hc = p.isAttack ? attackHitChance(p, hand, t.def) : 1;
+  // An attack confirms a critical strike with a second accuracy check (3.9).
+  const cc = hand.critChance * hc;
+  const perType = nonCrit.map((n, i) => n * (1 - cc) + crit[i] * cc);
   const bc = blockChance(p, t.def);
   const total = perType.reduce((a, b) => a + b, 0);
-  const sNon = stunFromHit(p, nonCrit, t.def, true, null).chance;
-  const sCrit = stunFromHit(p, crit, t.def, true, null).chance;
+  const esUp = (t.es ?? 0) > 0;
+  const sNon = stunFromHit(p, nonCrit, t.def, true, null, esUp).chance;
+  const sCrit = stunFromHit(p, crit, t.def, true, null, esUp).chance;
   return {
     hitChance: hc,
     blockChance: bc,

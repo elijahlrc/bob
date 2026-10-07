@@ -421,16 +421,16 @@ SUPPORT_GEMS.push(
     attr: 'int',
     supports: ['spell'],
     costMult: 1.3,
-    mods: [{ stat: 'damage', kind: 'more', value: [-25, -15] }],
+    mods: [{ stat: 'damage', kind: 'more', value: [20, 39] }],
     trigger: {
       on: 'crit',
       tags: ['attack'],
       chance: 100,
-      cooldown: 0.25,
+      cooldown: 0.15,
       effect: { kind: 'castSocketed' },
     },
     description:
-      'Linked spells are cast when you critically strike with an attack, but deal less damage.',
+      'Linked spells are cast when you critically strike with an attack, and deal more damage.',
   },
   {
     kind: 'support',
@@ -444,7 +444,7 @@ SUPPORT_GEMS.push(
       on: 'hitTaken',
       threshold: 30,
       chance: 100,
-      cooldown: 0.5,
+      cooldown: 0.25,
       effect: { kind: 'castSocketed' },
     },
     description: 'Linked spells are cast whenever you have taken a large amount of damage.',

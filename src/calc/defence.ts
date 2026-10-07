@@ -33,7 +33,8 @@ function physTakenAs(db: ModDB, ctx: ModCtx): number[] {
 export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defence {
   const flag = (s: string) => db.flag(s, ctx);
   const lifeIsOne = flag('lifeIsOne');
-  const maxLife = lifeIsOne ? 1 : Math.max(1, Math.round(db.calc('life', ctx)));
+  const fullLife = Math.max(1, Math.round(db.calc('life', ctx)));
+  const maxLife = lifeIsOne ? 1 : fullLife;
   const maxMana = flag('skillsCostLife') ? 0 : Math.max(0, Math.round(db.calc('mana', ctx)));
   const maxEs = Math.max(0, Math.round(db.calc('es', ctx)));
 
@@ -75,13 +76,15 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
   const noRegen = flag('instantLeechNoRegen');
   const lifeRegen = noRegen
     ? 0
-    : db.sum('base', 'lifeRegen', ctx) * db.mult('lifeRegen', ctx) +
-      (db.sum('base', 'lifeRegenPct', ctx) / 100) * maxLife;
+    : (db.sum('base', 'lifeRegen', ctx) + (db.sum('base', 'lifeRegenPct', ctx) / 100) * maxLife) *
+      db.mult('lifeRegen', ctx);
+  // Increased mana regeneration scales flat regeneration too (3.9).
   const manaRegen =
-    maxMana * (BASE_MANA_REGEN_PCT / 100) * db.mult('manaRegen', ctx) +
-    db.sum('base', 'manaRegenFlat', ctx);
+    (maxMana * (BASE_MANA_REGEN_PCT / 100) + db.sum('base', 'manaRegenFlat', ctx)) *
+    db.mult('manaRegen', ctx);
 
   return {
+    isPlayer: opts.isPlayer,
     maxLife,
     maxEs,
     maxMana,
@@ -94,7 +97,8 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
     physReduction: clamp(db.sum('base', 'physReduction', ctx) / 100, 0, 0.9),
     damageTakenMult: db.mult('damageTaken', ctx),
     ailmentThreshold: opts.isPlayer ? maxLife + maxEs : maxLife,
-    stunThreshold: maxLife * db.mult('stunThreshold', ctx) * (opts.stunThreshMult ?? 1),
+    // Chaos Inoculation: the stun threshold uses the life the character would have without it (3.9).
+    stunThreshold: fullLife * db.mult('stunThreshold', ctx) * (opts.stunThreshMult ?? 1),
     stunAvoid: clamp(db.sum('base', 'stunAvoid', ctx) / 100, 0, 1),
     stunDurOnSelf: Math.max(0, 1 - db.sum('base', 'stunDurationOnSelf', ctx) / 100),
     cannotBeStunned: flag('cannotBeStunned'),

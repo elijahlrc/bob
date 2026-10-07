@@ -38,7 +38,9 @@ describe('§12.1 monster scaling fixtures', () => {
 describe('§6.3 defences', () => {
   it('hit chance', () => {
     expect(hitChance(100, 0)).toBe(1);
-    expect(hitChance(1000, 400)).toBeCloseTo(1000 / (1000 + Math.pow(100, 0.8)));
+    // 3.9: the attacker's accuracy counts 15% extra, and the chance tops out at 100%.
+    expect(hitChance(100, 400)).toBeCloseTo((1.15 * 100) / (100 + Math.pow(100, 0.8)));
+    expect(hitChance(1000, 400)).toBe(1);
     expect(hitChance(0, 1000)).toBe(0.05);
   });
   it('armour', () => {
@@ -55,17 +57,22 @@ describe('§6.3 defences', () => {
 
 describe('§6.6 ailments', () => {
   it('mag', () => {
-    expect(mag(0.5, 50)).toBe(50);
-    expect(mag(0.125, 50)).toBeCloseTo(25);
+    // 50 · r^0.4 · (1 + effect), capped (3.9).
+    expect(mag(0.5, 50)).toBeCloseTo(50 * Math.pow(0.5, 0.4));
+    expect(mag(0.125, 50)).toBeCloseTo(50 * Math.pow(0.125, 0.4));
+    expect(mag(1, 50)).toBe(50);
+    expect(mag(0.5, 50, 2)).toBe(50); // the effect bonus counts before the cap
+    expect(mag(0.5, 30)).toBe(30);
+    expect(mag(0.125, 30)).toBeCloseTo(50 * Math.pow(0.125, 0.4));
     expect(mag(0, 30)).toBe(0);
   });
 });
 
 describe('§6.6a stun', () => {
   it('chance with minimum', () => {
-    expect(stunChance(50, 100, 0.1)).toBe(1);
-    expect(stunChance(10, 100, 0.1)).toBeCloseTo(0.2);
-    expect(stunChance(4, 100, 0.1)).toBe(0);
+    expect(stunChance(50, 100, 0.2)).toBe(1);
+    expect(stunChance(15, 100, 0.2)).toBeCloseTo(0.3);
+    expect(stunChance(10, 100, 0.2)).toBe(0); // a chance at or under 20% is ignored (3.9)
   });
 });
 

@@ -69,7 +69,8 @@ describe('charges in the calc (EXPANSION 5.6)', () => {
     const fer = new Character(b, { areaLevel: 40, charges: { ...noCharges(), fervour: 3 } });
     const ratio = fer.skillSheet().usesPerSec / none.skillSheet().usesPerSec;
     expect(ratio).toBeCloseTo(1.12, 2);
-    expect(fer.defence().moveSpeed / none.defence().moveSpeed).toBeCloseTo(1.12, 2);
+    // 3.9: Fervour gives no movement speed.
+    expect(fer.defence().moveSpeed / none.defence().moveSpeed).toBeCloseTo(1, 6);
     // 4% more damage per charge, as three separate multipliers.
     const more = chargeMods('fervour', 3).filter((m) => m.stat === 'damage' && m.kind === 'more');
     expect(more).toHaveLength(3);

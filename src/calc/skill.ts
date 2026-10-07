@@ -253,7 +253,8 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     let critChance = 0;
     if (!neverCrit) {
       const c = (baseCrit + db.sum('base', 'critChance', ctx)) * db.mult('critChance', ctx);
-      critChance = clamp(c / 100, 0, 0.95);
+      // 3.6 removed the 5% minimum and 95% maximum.
+      critChance = clamp(c / 100, 0, 1);
     }
     const critMulti = overload ? 1 : (BASE_CRIT_MULTI + db.sum('base', 'critMulti', ctx)) / 100;
     // Accuracy.

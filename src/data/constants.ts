@@ -8,7 +8,7 @@ export const DT = 1 / TICK_RATE;
 // §6.1 Base character stats.
 export const BASE_LIFE = (level: number): number => 38 + 12 * level;
 export const BASE_MANA = (level: number): number => 34 + 6 * level;
-export const BASE_EVASION = (level: number): number => 50 + 3 * level;
+export const BASE_EVASION = (level: number): number => 53 + 3 * level;
 export const BASE_ACCURACY = (level: number): number => 2 * level;
 export const BASE_MANA_REGEN_PCT = 1.75;
 export const BASE_CRIT_MULTI = 150;
@@ -33,18 +33,27 @@ export const ARMOUR_CAP = 0.9;
 export const BLOCK_CAP = 75;
 export const RES_FLOOR = -200;
 export const ES_RECHARGE_DELAY = 2.0;
-export const ES_RECHARGE_RATE = 0.333;
+/** Share of maximum energy shield recharged per second (3.9: 20%; AUDIT-3.9). */
+export const ES_RECHARGE_RATE = 0.2;
 export const MIN_HIT_CHANCE = 0.05;
+/** Attacker accuracy counts 15% extra in the hit chance formula (3.9). */
+export const ACCURACY_FACTOR = 1.15;
 
 // §6.4 Recovery.
 export const LEECH_RATE_PER_INSTANCE = 0.02;
 export const LEECH_RATE_CAP = 0.2;
+/** One leech instance can recover at most this share of the maximum (3.9). */
+export const LEECH_INSTANCE_MAX = 0.1;
 
 // §6.6 Ailments.
 export const IGNITE_DPS_FRAC = 0.5;
 export const IGNITE_DURATION = 4;
-export const BLEED_DPS_FRAC = 0.2;
-export const BLEED_MOVING_MULT = 2;
+/** Bleed deals 70% of the hit's physical damage a second (3.9), tripled while the target moves; a monster's bleed on the player deals 10%. */
+export const BLEED_DPS_FRAC = 0.7;
+export const MONSTER_BLEED_DPS_FRAC = 0.1;
+export const BLEED_MOVING_MULT = 3;
+/** Ailments inflicted by a critical strike carry this fixed multiplier, whatever the critical strike multiplier (3.9). */
+export const CRIT_AILMENT_MULT = 1.5;
 export const BLEED_DURATION = 5;
 export const POISON_DPS_FRAC = 0.2;
 export const POISON_DURATION = 2;
@@ -60,12 +69,22 @@ export const WOUND_DANCE_STACKS = 8;
 
 // §6.6a Stun.
 export const STUN_BASE_DURATION = 0.35;
-export const STUN_MIN_CHANCE = 0.1;
+/** A stun chance at or under this is ignored (3.9: 20%). */
+export const STUN_MIN_CHANCE = 0.2;
+/** Stun damage weights (3.9): melee physical, and non-melee non-physical. */
+export const STUN_MELEE_PHYS = 1.25;
+export const STUN_NON_MELEE_NON_PHYS = 0.75;
+/** While energy shield is up, a stun is ignored with this chance (3.9). */
+export const STUN_ES_IGNORE = 0.5;
 export const STUN_GRACE = 0.5;
-export const STUN_NON_PHYS = 0.5;
 
 // §6.7 Speeds and costs.
 export const DUAL_WIELD_MORE_APS = 10;
+/** Dual wielding (3.9): 20% more physical attack damage and 15% additional chance to block attacks. */
+export const DUAL_WIELD_MORE_PHYS = 20;
+export const DUAL_WIELD_BLOCK = 15;
+/** Monsters crit for 130% (3.9), not the 150% of players. */
+export const MONSTER_CRIT_MULTI = 130;
 export const FISTS = { min: 2, max: 6, aps: 1.2, crit: 0 };
 export const HIT_AT = 0.6;
 /** Echoing Cast: each echo lands this share of the use time after the one before. */
@@ -76,7 +95,8 @@ export const PROJECTILE_SPEED = 12;
 export const RECENT = 4;
 
 // §6.9 Flasks.
-export const FLASK_CHARGES_ON_KILL = { normal: 1, magic: 2, rare: 5, unique: 10 } as const;
+/** Charges a kill grants each flask, by the monster's rarity (3.9; fractions are kept). */
+export const FLASK_CHARGES_ON_KILL = { normal: 1, magic: 3.5, rare: 6, unique: 11 } as const;
 
 // §13 AI.
 export const ENGAGE_RANGE = 9;

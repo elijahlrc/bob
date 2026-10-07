@@ -6,6 +6,8 @@ export type HexId = 'brittleDoom' | 'leadenLimbs' | 'feebleGrip' | 'openWounds';
 export const HEX_IDS: HexId[] = ['brittleDoom', 'leadenLimbs', 'feebleGrip', 'openWounds'];
 
 export const HEX_SECONDS = 6;
+/** Bosses take a third less effect from curses (3.9). */
+export const BOSS_CURSE_EFFECT = 0.67;
 /** How many of the player's hexes a target holds at once, before items and the tree. */
 export const BASE_HEX_LIMIT = 1;
 

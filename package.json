@@ -23,7 +23,8 @@
     "coverage": "tsx scripts/coverage/coverage.ts",
     "coverage:fetch": "tsx scripts/coverage/fetch-reference.ts",
     "coverage:pob": "tsx scripts/coverage/pob-extract.ts",
-    "coverage:draft": "tsx scripts/coverage/draft.ts"
+    "coverage:draft": "tsx scripts/coverage/draft.ts",
+    "coverage:wiki": "tsx scripts/coverage/wiki-page.ts"
   },
   "dependencies": {
     "@preact/signals": "^2.11.3",

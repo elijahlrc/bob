@@ -9,6 +9,7 @@ import { createWorld, spawnMonster } from './world';
 /** A defence with no mitigation; override fields as needed. */
 export function dummyDefence(over: Partial<Defence> = {}): Defence {
   return {
+    isPlayer: false,
     maxLife: 1e12,
     maxEs: 0,
     maxMana: 0,

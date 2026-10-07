@@ -138,12 +138,10 @@ describe('triggers: casting a socketed spell (EXPANSION 5.5)', () => {
     expect(t.triggers).toBe(t.uses);
   });
 
-  it('pay mana, and do not fire when it is short', () => {
+  it('cost no mana, and fire with none left (3.9)', () => {
     const none = run(buildFor([onHit({ cooldown: 0 })]), 20, 1, 1.6, 0).t;
-    expect(none.triggers).toBe(0);
-    expect(none.hits).toBeGreaterThan(5); // the primary still attacks (free default attack or paid skill)
-    const { world } = run(buildFor([onHit({ cooldown: 0 })]), 5, 1, 1.6);
-    expect(world.char.profile(world.char.triggers[0].skills[0]).cost).toBeGreaterThan(0);
+    expect(none.triggers).toBeGreaterThan(5);
+    expect(none.hits).toBeGreaterThan(5);
   });
 
   it('never trigger from a triggered skill', () => {
