@@ -18,6 +18,7 @@ import {
   spellBaseDamage,
 } from '../data/constants';
 import { MINIONS, MINION_ENEMY_RES } from '../data/minions';
+import { minionUptime } from './minion';
 import {
   CHARGE_KINDS,
   chargeMods,
@@ -1299,7 +1300,7 @@ export class Character {
     return rows.map((r) => ({ ...r, rate: (r.rate * 0.9) / total, busy: (r.busy * 0.9) / total }));
   }
 
-  /** Damage a second of the minions the character's summon skills keep standing (they are never hurt, and always in reach). */
+  /** Damage a second of the minions the character's summon skills keep standing, less the time they spend fallen (they are assumed in reach). */
   minionDps(conds: number = this.configConds): number {
     let dps = 0;
     for (const c of this.utilities) {
@@ -1309,7 +1310,9 @@ export class Character {
       const p = this.profile(c, conds);
       const count = Math.max(1, Math.round(levelValue(u.count, c.skill.level)) + p.minionCount);
       const hit = spellBaseDamage(c.skill.level) * def.dmg * p.minionDamage;
-      dps += count * hit * def.rate * p.minionSpeed * MINION_ENEMY_RES * (1 + def.splash * 0.5);
+      const up = minionUptime(u.minion, this.config.areaLevel, p.minionLife, p.minionTaken);
+      dps +=
+        count * hit * def.rate * p.minionSpeed * MINION_ENEMY_RES * (1 + def.splash * 0.5) * up;
     }
     return dps;
   }

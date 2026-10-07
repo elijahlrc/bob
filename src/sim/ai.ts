@@ -445,6 +445,56 @@ export function alertPack(w: World, m: Actor): void {
   }
 }
 
+/** Seconds a chasing monster must be held up before it turns on a minion in its way. */
+const BLOCKED_TIME = 0.35;
+
+/** The nearest standing minion a melee monster can strike from where it stands. */
+function minionInReach(w: World, m: Actor, range: number): Actor | null {
+  let best: Actor | null = null;
+  let bd = Infinity;
+  for (const v of w.minions) {
+    if (!v.alive) continue;
+    const d = Math.hypot(v.x - m.x, v.y - m.y);
+    if (d <= range + v.r + m.r && d < bd) {
+      best = v;
+      bd = d;
+    }
+  }
+  return best;
+}
+
+/** The nearest standing minion a ranged monster can shoot at: in range and in sight. */
+function minionInSight(w: World, m: Actor, range: number): Actor | null {
+  let best: Actor | null = null;
+  let bd = Infinity;
+  for (const v of w.minions) {
+    if (!v.alive) continue;
+    const d = Math.hypot(v.x - m.x, v.y - m.y);
+    if (d <= range && d < bd && w.grid.los(m.x, m.y, v.x, v.y)) {
+      best = v;
+      bd = d;
+    }
+  }
+  return best;
+}
+
+/**
+ * Walk toward the player, noting whether it gets anywhere. A monster that keeps trying to walk and barely moves is held
+ * up (by the minions, or by the crowd around it); `blockT` counts the seconds.
+ */
+function chaseStep(w: World, m: Actor, tx: number, ty: number, dt: number): void {
+  if (m.tryTick === w.tick - 1) {
+    const moved = Math.hypot(m.x - m.prevX, m.y - m.prevY);
+    const want = m.def.moveSpeed * (1 - m.ail.chill) * speedMult(m) * dt;
+    if (moved < want * 0.4) m.blockT += dt;
+    else m.blockT = Math.max(0, m.blockT - 2 * dt);
+  }
+  m.tryTick = w.tick;
+  m.prevX = m.x;
+  m.prevY = m.y;
+  monsterMove(w, m, tx, ty, dt);
+}
+
 export function monsterAI(w: World, m: Actor, dt: number): void {
   m.moving = false;
   if (m.dummy || !canAct(m)) return;
@@ -493,6 +543,11 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
   if (kind !== 'melee') {
     if (m.stationary) {
       if (d <= range && los) startAction(w, m, 'monster', prof, p);
+      else {
+        // It cannot reach the player: a minion in sight will do.
+        const v = w.minions.length > 0 ? minionInSight(w, m, range) : null;
+        if (v) startAction(w, m, 'monster', prof, v);
+      }
       return;
     }
     // Retreat when crowded: short half-speed bursts with a cooldown, so they don't kite forever.
@@ -511,16 +566,31 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
       startAction(w, m, 'monster', prof, p);
       return;
     }
-    monsterMove(w, m, p.x, p.y, dt);
+    // It cannot hit the player from here: a minion in range and in sight is shot instead.
+    const v = w.minions.length > 0 ? minionInSight(w, m, range) : null;
+    if (v) {
+      startAction(w, m, 'monster', prof, v);
+      return;
+    }
+    chaseStep(w, m, p.x, p.y, dt);
     return;
   }
   if (d <= range + p.r + m.r) {
+    m.blockT = 0;
     // A Bloater does not strike: it bursts on contact.
     if (m.mon!.spec.type === 'bloater') bloaterBurst(w, m);
     else startAction(w, m, 'monster', prof, p);
     return;
   }
-  monsterMove(w, m, p.x, p.y, dt);
+  // Held up on the way to the player (by minions, say): whatever minion is in reach gets hit instead.
+  if (m.blockT >= BLOCKED_TIME && w.minions.length > 0) {
+    const v = minionInReach(w, m, range);
+    if (v) {
+      startAction(w, m, 'monster', prof, v);
+      return;
+    }
+  }
+  chaseStep(w, m, p.x, p.y, dt);
 }
 
 /** No two actors can touch from further apart than this (the largest radius, a boss, twice over). */
@@ -589,6 +659,70 @@ export function separate(w: World): void {
       const cp = w.grid.collide(p.x - (dx / d) * push * 0.2, p.y - (dy / d) * push * 0.2, p.r);
       p.x = cp.x;
       p.y = cp.y;
+    }
+  }
+  if (w.minions.length > 0) separateMinions(w, list);
+}
+
+/**
+ * Minions are bodies like any other: monsters cannot walk through them, so they hold a corridor and draw blows. A
+ * monster that is awake and free to move gives way half; one that sleeps or never moves gives none, and the minion
+ * yields instead. The player pushes minions aside.
+ */
+function separateMinions(w: World, list: Actor[]): void {
+  const p = w.player;
+  const ms = w.minions;
+  const nudge = (a: Actor, dx: number, dy: number): void => {
+    const x = a.x + dx;
+    const y = a.y + dy;
+    if (w.grid.clear(x, y)) {
+      a.x = x;
+      a.y = y;
+    } else {
+      const c = w.grid.collide(x, y, a.r);
+      a.x = c.x;
+      a.y = c.y;
+    }
+  };
+  for (let i = 0; i < ms.length; i++) {
+    const m = ms[i];
+    if (!m.alive) continue;
+    for (const a of list) {
+      const dx = a.x - m.x;
+      const rr = a.r + m.r;
+      if (dx > rr || dx < -rr) continue;
+      const dy = a.y - m.y;
+      if (dy > rr || dy < -rr) continue;
+      const d2 = dx * dx + dy * dy;
+      if (d2 >= rr * rr || d2 < 1e-9) continue;
+      const d = Math.sqrt(d2);
+      const gap = rr - d;
+      const holds = a.state === 'idle' || a.stationary;
+      const nx = dx / d;
+      const ny = dy / d;
+      nudge(m, -nx * (holds ? gap : gap / 2), -ny * (holds ? gap : gap / 2));
+      if (!holds) nudge(a, nx * (gap / 2), ny * (gap / 2));
+    }
+    for (let j = i + 1; j < ms.length; j++) {
+      const o = ms[j];
+      if (!o.alive) continue;
+      const dx = o.x - m.x;
+      const dy = o.y - m.y;
+      const rr = o.r + m.r;
+      const d2 = dx * dx + dy * dy;
+      if (d2 >= rr * rr || d2 < 1e-9) continue;
+      const d = Math.sqrt(d2);
+      const half = (rr - d) / 2;
+      nudge(m, (-dx / d) * half, (-dy / d) * half);
+      nudge(o, (dx / d) * half, (dy / d) * half);
+    }
+    const dx = m.x - p.x;
+    const dy = m.y - p.y;
+    const rr = m.r + p.r;
+    const d2 = dx * dx + dy * dy;
+    if (d2 < rr * rr && d2 > 1e-9) {
+      const d = Math.sqrt(d2);
+      nudge(m, (dx / d) * (rr - d), (dy / d) * (rr - d));
     }
   }
 }

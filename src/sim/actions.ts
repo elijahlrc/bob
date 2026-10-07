@@ -69,6 +69,7 @@ export function fanAngle(base: number, i: number, n: number, step: number, tick:
 export function actorById(w: World, id: number): Actor | undefined {
   // Actors are stored in id order for monsters spawned at map start; summons append.
   for (const a of w.actors) if (a.id === id) return a;
+  for (const m of w.minions) if (m.id === id) return m;
   return undefined;
 }
 
@@ -120,7 +121,9 @@ export function updateAction(w: World, a: Actor, dt: number): void {
 
 function enemiesOf(w: World, a: Actor): Actor[] {
   if (a.isPlayer) return w.actors.filter((o) => !o.isPlayer && o.alive);
-  return w.player.alive ? [w.player] : [];
+  if (!w.player.alive) return [];
+  // A monster's area attack catches the player's minions too.
+  return w.minions.length === 0 ? [w.player] : [w.player, ...w.minions.filter((m) => m.alive)];
 }
 
 /** The damage type of a skill's biggest chunk (what an effect looks like). */
@@ -382,6 +385,10 @@ function explode(
     if (Math.hypot(e.x - x, e.y - y) <= pr.explodeRadius + e.r)
       hit(w, owner, e, pr.profile, pr.hand, Math.hypot(e.x - pr.startX, e.y - pr.startY));
   }
+  if (pr.faction === 1)
+    for (const e of w.minions)
+      if (e.alive && Math.hypot(e.x - x, e.y - y) <= pr.explodeRadius + e.r)
+        hit(w, owner, e, pr.profile, pr.hand, Math.hypot(e.x - pr.startX, e.y - pr.startY));
 }
 
 /** Fates reported in `projectileEnd` events: 0 wall, 1 out of range, 2 spent on an enemy, 3 exploded. */
@@ -451,7 +458,11 @@ export function updateProjectiles(w: World, dt: number): void {
         alive = false;
         break;
       }
-      for (const e of w.actors) {
+      // Monster projectiles stop at the player's minions as well.
+      const na = w.actors.length;
+      const nm = pr.faction === 1 ? w.minions.length : 0;
+      for (let k = 0; k < na + nm; k++) {
+        const e = k < na ? w.actors[k] : w.minions[k - na];
         if (!e.alive || e.faction === pr.faction || pr.hitIds.includes(e.id)) continue;
         const rr = e.r + pr.r;
         const dx = e.x - pr.x;

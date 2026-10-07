@@ -29,8 +29,8 @@ Conventions follow DESIGN.md:
   charges, rampage, ground-effect conditions, corpse skills (Desecrate, Detonate Dead, Unearth, Volatile Dead), Manabond,
   Plague Bearer, Herald of Purity, Tempest Shield, trap and mine remote controls, and a few unique flasks. Each is listed in
   `npm run coverage -- --list`.
-- **Known divergences to keep in mind:** channelling and ramping skills are averaged into repeated hits; minions cannot be
-  hurt; deployables and utility skills follow simple use policies; many "support gem on item" lines are folded into stats.
+- **Known divergences to keep in mind:** channelling and ramping skills are averaged into repeated hits; minions are
+  hurt only by area attacks and by monsters held up behind them; deployables and utility skills follow simple use policies; many "support gem on item" lines are folded into stats.
 
 ## 0. Summary
 

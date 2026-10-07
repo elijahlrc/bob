@@ -130,7 +130,7 @@
     "ref": "Aukuna's Will",
     "name": "Gravetender Gloves",
     "flavour": "The dead need no invitation, only a hand to hold.",
-    "note": "Grants the husk summon (the corpse-free zombie analog) with dexterity, cast speed and evasion with energy shield. The zombie life line maps to minion life, which has no effect because minions cannot be hurt; the corpse lines are dropped.",
+    "note": "Grants the husk summon (the corpse-free zombie analog) with dexterity, cast speed and evasion with energy shield. The zombie life line maps to minion life; the corpse lines are dropped.",
     "drop": ["Raised Zombies have", "Raise Zombie does not require", "Your Raised Zombies count as Corpses"],
     "mods": [
       { "stat": "grantSkill.raiseHusk", "kind": "base", "min": 10, "max": 10 },

@@ -91,6 +91,9 @@ export type SkillProfile = {
   /** What the character's minion modifiers do to minions this skill summons: damage and speed multipliers, extra minions. */
   minionDamage: number;
   minionSpeed: number;
+  /** Multipliers on their life and on the damage they take. */
+  minionLife: number;
+  minionTaken: number;
   minionCount: number;
   /** How many totems or brands can stand, or traps or mines go off, at once (1 and the support mods). */
   deployCount: number;
@@ -388,6 +391,8 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     deployCount: Math.max(1, Math.round(1 + db.sum('base', 'deployCount', baseCtx))),
     minionDamage: db.mult('minionDamage', baseCtx),
     minionSpeed: db.mult('minionSpeed', baseCtx),
+    minionLife: db.mult('minionLife', baseCtx),
+    minionTaken: db.mult('minionTaken', baseCtx),
     minionCount: Math.round(db.sum('base', 'minionCount', baseCtx)),
     cost: Math.max(
       0,

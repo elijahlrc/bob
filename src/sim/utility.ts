@@ -6,7 +6,7 @@ import { gainBuff } from './buffs';
 import { flaskMask, playerConds, rawHit } from './combat';
 import { canPay } from './cost';
 import { applyHex } from './hexes';
-import { minionCount, summonCount, summonMinions } from './minions';
+import { minionCount, summonCount, summonMinions, summonRespawn } from './minions';
 import type { Action, Actor, World } from './types';
 
 /**
@@ -72,7 +72,7 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
     if (u.kind === 'summon') {
       // Minions are summoned in the first fight and again when they are gone or have run out.
       if (d > CAST_RANGE + 6 || minionCount(w, c.key) >= summonCount(c, prof)) continue;
-      return { choice: c, prof, cd: 1 };
+      return { choice: c, prof, cd: summonRespawn(c) };
     }
     // A blink closes the gap to a target the primary skill cannot reach yet.
     const reach = skillRange(ch.profile(w.primary, conds, flaskMask(w))) + target.r;

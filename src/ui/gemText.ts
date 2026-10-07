@@ -82,7 +82,7 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
     return {
       stats: [
         `Summons ${n} ${m.name}${n === 1 ? '' : 's'}${u.seconds ? ` for ${num(u.seconds)} s` : ''}`,
-        'They follow you and strike the nearest enemy',
+        'They follow you and strike the nearest enemy; they can fall, and casting again fills their places',
       ],
       effects: modsText(gemMods(u.ownerMods ?? [], level, def.id)),
     };

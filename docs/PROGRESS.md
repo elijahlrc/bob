@@ -549,10 +549,29 @@ revert if they would rather not.
   craft trials remain the way to win it back.
 - **Tests.** 1,754.
 
-### Planned follow-up: minions that can be hurt
+### Minions that can be hurt (2026-10-07)
 
-Minions are invulnerable today (`src/sim/minions.ts`), which departs from PoE and makes them much stronger against area enemies;
-`minionLife` and the Minion Life support have no effect for the same reason. Planned fix (not started): give minions life from the
-gem level and the minion modifiers, let enemy attacks, projectiles and area hits target and kill them, add resummon timing
-and corpse or cooldown limits, make Minion Life and Meat Shield do what they say, and then rebalance minion damage and
-re-run the small bot sims. Until then, treat minion numbers as provisional.
+Minions used to be untouchable (a departure from PoE that made them far stronger against area enemies). Now:
+
+- **Life and defence.** A minion is an `Actor` of the player's side kept in `w.minions` (not `w.actors`, so no monster-only code
+  sees it). Its life is a normal monster's life at the map level, scaled by the kind's share (`MinionDef.life`: skeletons 0.5,
+  zombies 1.4, golems 2.4 to 3) and by the summoning skill's `minionLife`; it has the monster armour curve, the kind's elemental
+  resistance, and regenerates 1% of its life a second (`src/calc/minion.ts`, memoised). `minionTaken` (less damage taken) scales
+  what it suffers. Ailments, stun and freeze work on it like on any actor.
+- **Who hits them.** Enemies go for the player first. A melee monster that has been held up (it keeps walking and barely moves,
+  0.35 s) hits a minion within reach; a ranged monster that cannot hit the player from where it stands shoots a minion it can see
+  in range. Monster area attacks (arcs, bursts, beams, chains), projectiles and their explosions, slams, volatile blasts and
+  lasting zones (caustic, burning, chilling, shocking) all catch minions. Minions have bodies: monsters and minions push each
+  other apart, so minions hold corridors (`separateMinions`); the player pushes them aside.
+- **Resummon.** Casting a summon again tops up the missing minions and renews the timers of those standing (it no longer
+  replaces and heals them); each kind has a respawn time (`MinionDef.respawn`, 2 to 6 s) before it can be cast again, and
+  the mana cost limits it further. No corpse requirement: the summons here have none.
+- **Supports.** Hardy Pack gives more minion life; Warding Pack gives some life, less damage taken and speed. `minionLife`
+  and `minionTaken` are real stats now (uniques with minion life work).
+- **Calc.** `minionDps` is multiplied by an uptime from life against the hits of the map (`minionUptime`, fragility 4), tuned to
+  probe runs on real maps with a summoner: skeletons 0.75 to 0.95 standing, zombies and golems nearly always.
+- **Seen in probe runs.** Because enemies prefer the player, minions take a few hundred to a couple of thousand damage over a
+  map and seldom die. Tuning knobs if that proves too safe: the respawn times, the regen, the 0.35 s hold-up time, or
+  letting monsters pick the nearest of player and minion instead of the player first.
+- **Not done.** Minions do not draw aggro on their own (no taunt, no "nearest target" rule), and Meat Shield does not
+  redirect hits. Flame and ice golem buffs to the owner are unchanged.

@@ -1,5 +1,5 @@
 [
-  { "ref": "Raise Zombie", "note": "Raises zombies (3 to 7) that follow the character and slam enemies; they cannot be hurt in Bob, so they stay until the map ends.",
+  { "ref": "Raise Zombie", "note": "Raises zombies (3 to 7) that follow the character and slam enemies; they have life, are hurt by enemy blows and area attacks, and are raised again when the skill is cast after they fall.",
     "def": { "kind": "active", "id": "raiseHusk", "name": "Raise Husk", "attr": "int", "skillType": "spell", "tags": ["spell", "minion", "duration"], "types": ["triggerable"],
       "behaviour": { "kind": "burst", "radius": 1, "origin": "self" }, "castTime": 0.85, "cost": [10, 38], "mods": [],
       "utility": { "kind": "summon", "minion": "zombie", "count": [3, 7] },
@@ -102,18 +102,18 @@
     "def": { "kind": "support", "id": "packFury", "name": "Pack Fury", "attr": "int", "supports": ["minion"], "costMult": 1.3, "mods": [
       { "stat": "minionDamage", "kind": "more", "value": [25, 49] } ],
       "description": "Minions deal more damage." } },
-  { "ref": "Minion Life Support", "note": "The supported minions are sturdier; Bob's minions cannot be hurt, so the extra life is folded into more minion damage.",
+  { "ref": "Minion Life Support", "note": "The supported minions have more life.",
     "def": { "kind": "support", "id": "hardyPack", "name": "Hardy Pack", "attr": "str", "supports": ["minion"], "costMult": 1.3, "mods": [
-      { "stat": "minionDamage", "kind": "more", "value": [10, 20] } ],
-      "description": "Sturdier minions that stay in the fight." } },
+      { "stat": "minionLife", "kind": "more", "value": [30, 49] } ],
+      "description": "Minions have more life and last longer in a fight." } },
   { "ref": "Minion Speed Support", "note": "The supported minions strike and move faster.",
     "def": { "kind": "support", "id": "packHaste", "name": "Pack Haste", "attr": "dex", "supports": ["minion"], "costMult": 1.2, "mods": [
       { "stat": "minionSpeed", "kind": "inc", "value": [25, 44] } ],
       "description": "Minions strike and move faster." } },
-  { "ref": "Meat Shield Support", "note": "The supported minions stay close to the character and take less damage; here they hit harder against enemies near the character.",
+  { "ref": "Meat Shield Support", "note": "The supported minions have more life and take less damage; they also move faster to keep up with the character.",
     "def": { "kind": "support", "id": "wardingPack", "name": "Warding Pack", "attr": "str", "supports": ["minion"], "costMult": 1.2, "mods": [
-      { "stat": "minionDamage", "kind": "more", "value": [20, 30] }, { "stat": "minionSpeed", "kind": "inc", "value": [10, 29] } ],
-      "description": "Minions guard you and fight harder near you." } },
+      { "stat": "minionLife", "kind": "more", "value": [10, 19] }, { "stat": "minionTaken", "kind": "more", "value": [-20, -29] }, { "stat": "minionSpeed", "kind": "inc", "value": [10, 29] } ],
+      "description": "Minions guard you: more life, less damage taken, and quicker to follow." } },
   { "ref": "Elemental Army Support", "note": "The supported minions deal more elemental damage and shrug off elements (the exposure is dropped).",
     "def": { "kind": "support", "id": "elementalPack", "name": "Elemental Pack", "attr": "int", "supports": ["minion"], "costMult": 1.3, "mods": [
       { "stat": "minionDamage", "kind": "more", "value": [20, 29] } ],

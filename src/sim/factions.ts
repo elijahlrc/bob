@@ -272,30 +272,38 @@ export function tickCorpses(w: World, dt: number): void {
   w.corpses.length = j;
 }
 
-/** Lasting zones hurt the player standing in them, in pulses. */
+/** Lasting zones hurt the player and the player's minions standing in them, in pulses. */
 export function tickZones(w: World, dt: number): void {
   const p = w.player;
   for (const e of w.effects) {
-    if (!isZone(e) || !p.alive) continue;
-    if (Math.hypot(p.x - e.x, p.y - e.y) > e.radius + p.r) continue;
-    if (e.kind === 'chilling' && !p.def.cannotBeChilled) {
-      p.ail.chill = Math.max(p.ail.chill, 0.3);
-      p.ail.chillT = Math.max(p.ail.chillT, 0.5);
-    } else if (e.kind === 'shocking') {
-      p.ail.shock = Math.max(p.ail.shock, 0.2);
-      p.ail.shockT = Math.max(p.ail.shockT, 0.5);
+    if (!isZone(e)) continue;
+    const inside = (a: Actor) => a.alive && Math.hypot(a.x - e.x, a.y - e.y) <= e.radius + a.r;
+    // The player and the player's minions are caught by a monster's zone alike.
+    const caught: Actor[] = [];
+    if (inside(p)) caught.push(p);
+    for (const m of w.minions) if (inside(m)) caught.push(m);
+    if (caught.length === 0) continue;
+    for (const a of caught) {
+      if (e.kind === 'chilling' && !a.def.cannotBeChilled) {
+        a.ail.chill = Math.max(a.ail.chill, 0.3);
+        a.ail.chillT = Math.max(a.ail.chillT, 0.5);
+      } else if (e.kind === 'shocking') {
+        a.ail.shock = Math.max(a.ail.shock, 0.2);
+        a.ail.shockT = Math.max(a.ail.shockT, 0.5);
+      }
     }
     e.acc = (e.acc ?? 0) + dt;
     while (e.acc >= ZONE_PULSE) {
       e.acc -= ZONE_PULSE;
       if (e.kind === 'caustic' || e.kind === 'burning')
-        rawHit(
-          w,
-          p,
-          e.damage * ZONE_PULSE,
-          e.dtype,
-          e.kind === 'caustic' ? 'Caustic cloud' : 'Burning ground',
-        );
+        for (const a of caught)
+          rawHit(
+            w,
+            a,
+            e.damage * ZONE_PULSE,
+            e.dtype,
+            e.kind === 'caustic' ? 'Caustic cloud' : 'Burning ground',
+          );
     }
   }
 }

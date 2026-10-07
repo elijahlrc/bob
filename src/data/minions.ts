@@ -2,8 +2,9 @@ import type { DamageType } from '../mods/types';
 
 /**
  * Minions (COVERAGE C6): allies a summon skill puts on the map. They follow the character, run at the nearest enemy and
- * strike it, using numbers from the summoning gem's level and the character's minion modifiers. They cannot be hurt
- * (enemies go for the character), so a minion that is not time-limited stays until the map ends.
+ * strike it, using numbers from the summoning gem's level and the character's minion modifiers. Enemies go for the
+ * character first, but hit minions that block their way and catch them in area attacks; a minion that falls is summoned
+ * again after its respawn time. One that is not time-limited otherwise stays until the map ends.
  */
 export type MinionId =
   | 'skeleton'
@@ -38,6 +39,13 @@ export type MinionDef = {
   dtype: DamageType;
   /** A strike hits everything this close to the target too (tiles); 0 for a single target. */
   splash: number;
+  /** Life as a share of a normal monster's life at the minion's level, and the radius of its body (tiles). */
+  life: number;
+  r: number;
+  /** Elemental resistance, percent (chaos is not resisted). */
+  res: number;
+  /** Seconds before a summon of this kind can be cast again after the last cast. */
+  respawn: number;
   /** Colour on the map. */
   color: number;
 };
@@ -53,6 +61,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: false,
     dtype: 'physical',
     splash: 0,
+    life: 0.5,
+    r: 0.3,
+    res: 30,
+    respawn: 2,
     color: 0xd8d0b8,
   },
   zombie: {
@@ -65,6 +77,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: false,
     dtype: 'physical',
     splash: 0.8,
+    life: 1.4,
+    r: 0.4,
+    res: 30,
+    respawn: 3,
     color: 0x7a8a5a,
   },
   spirit: {
@@ -77,6 +93,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: false,
     dtype: 'fire',
     splash: 0,
+    life: 0.4,
+    r: 0.3,
+    res: 20,
+    respawn: 2,
     color: 0xff6a30,
   },
   stoneGolem: {
@@ -89,6 +109,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: false,
     dtype: 'physical',
     splash: 1,
+    life: 3,
+    r: 0.55,
+    res: 45,
+    respawn: 6,
     color: 0x9a9080,
   },
   chaosGolem: {
@@ -101,6 +125,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: false,
     dtype: 'chaos',
     splash: 0.8,
+    life: 2.4,
+    r: 0.55,
+    res: 40,
+    respawn: 6,
     color: 0x8030b0,
   },
   flameGolem: {
@@ -113,6 +141,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: true,
     dtype: 'fire',
     splash: 0.8,
+    life: 2.4,
+    r: 0.55,
+    res: 40,
+    respawn: 6,
     color: 0xff5020,
   },
   iceGolem: {
@@ -125,6 +157,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: false,
     dtype: 'cold',
     splash: 0.8,
+    life: 2.4,
+    r: 0.55,
+    res: 40,
+    respawn: 6,
     color: 0x80c8ff,
   },
   lightningGolem: {
@@ -137,6 +173,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: true,
     dtype: 'lightning',
     splash: 0.6,
+    life: 2.4,
+    r: 0.55,
+    res: 40,
+    respawn: 6,
     color: 0xc0a0ff,
   },
   carrionGolem: {
@@ -149,6 +189,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: false,
     dtype: 'physical',
     splash: 0.8,
+    life: 2.4,
+    r: 0.55,
+    res: 40,
+    respawn: 6,
     color: 0x6a4a3a,
   },
   relic: {
@@ -161,6 +205,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: true,
     dtype: 'fire',
     splash: 0,
+    life: 1.2,
+    r: 0.35,
+    res: 30,
+    respawn: 4,
     color: 0xffe080,
   },
   bot: {
@@ -173,6 +221,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: false,
     dtype: 'physical',
     splash: 0,
+    life: 0.5,
+    r: 0.25,
+    res: 20,
+    respawn: 3,
     color: 0xa0e0ff,
   },
   clone: {
@@ -185,6 +237,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: true,
     dtype: 'physical',
     splash: 0,
+    life: 0.9,
+    r: 0.35,
+    res: 30,
+    respawn: 4,
     color: 0x6a6a90,
   },
   blade: {
@@ -197,6 +253,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: false,
     dtype: 'physical',
     splash: 0,
+    life: 0.4,
+    r: 0.3,
+    res: 20,
+    respawn: 2,
     color: 0xc0c0d0,
   },
   sentinel: {
@@ -209,6 +269,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: false,
     dtype: 'physical',
     splash: 0.8,
+    life: 2.4,
+    r: 0.5,
+    res: 40,
+    respawn: 5,
     color: 0xb0a070,
   },
   spectre: {
@@ -221,6 +285,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: true,
     dtype: 'chaos',
     splash: 0,
+    life: 1,
+    r: 0.35,
+    res: 30,
+    respawn: 3,
     color: 0x70c0a0,
   },
   radiant: {
@@ -233,6 +301,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: false,
     dtype: 'physical',
     splash: 0,
+    life: 1.4,
+    r: 0.4,
+    res: 30,
+    respawn: 3,
     color: 0xfff0b0,
   },
   phantasm: {
@@ -245,6 +317,10 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     ranged: true,
     dtype: 'chaos',
     splash: 0,
+    life: 0.5,
+    r: 0.3,
+    res: 20,
+    respawn: 2,
     color: 0x90ffc0,
   },
 };

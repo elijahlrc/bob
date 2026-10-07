@@ -7427,12 +7427,12 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.3,
     mods: [
       {
-        stat: 'minionDamage',
+        stat: 'minionLife',
         kind: 'more',
-        value: [10, 20],
+        value: [30, 49],
       },
     ],
-    description: 'Sturdier minions that stay in the fight.',
+    description: 'Minions have more life and last longer in a fight.',
   },
   {
     kind: 'support',
@@ -7459,9 +7459,14 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.2,
     mods: [
       {
-        stat: 'minionDamage',
+        stat: 'minionLife',
         kind: 'more',
-        value: [20, 30],
+        value: [10, 19],
+      },
+      {
+        stat: 'minionTaken',
+        kind: 'more',
+        value: [-20, -29],
       },
       {
         stat: 'minionSpeed',
@@ -7469,7 +7474,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         value: [10, 29],
       },
     ],
-    description: 'Minions guard you and fight harder near you.',
+    description: 'Minions guard you: more life, less damage taken, and quicker to follow.',
   },
   {
     kind: 'support',

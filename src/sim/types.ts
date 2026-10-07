@@ -137,6 +137,11 @@ export type Actor = {
   /** Seconds before a Hexcaller can hex again, and the time left of a Choirmaster channel. */
   hexCd: number;
   channelT: number;
+  /** A chasing monster: seconds it has spent held up (it walks but gets nowhere), and where it was and when it last tried to walk. */
+  blockT: number;
+  prevX: number;
+  prevY: number;
+  tryTick: number;
 };
 
 export type Projectile = {
@@ -381,7 +386,6 @@ export type World = {
   deploySeq: number;
   /** The minions standing. */
   minions: Minion[];
-  minionSeq: number;
   actors: Actor[];
   player: Actor;
   nextId: number;

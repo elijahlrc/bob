@@ -22,95 +22,8 @@ import { tickAuraBurn } from './utility';
 import { rebuildCharacter, seedCharacters, tickCharges } from './charges';
 import { tickTriggers } from './triggers';
 import { Grid } from './grid';
+import { newActor } from './actor';
 import type { Actor, World, WorldOpts } from './types';
-
-function newActor(id: number, isPlayer: boolean, x: number, y: number, r: number): Actor {
-  return {
-    id,
-    isPlayer,
-    faction: isPlayer ? 0 : 1,
-    x,
-    y,
-    r,
-    facing: 0,
-    alive: true,
-    life: 1,
-    es: 0,
-    mana: 0,
-    def: undefined as never,
-    action: null,
-    carry: 0,
-    handIdx: 0,
-    ail: {
-      ignites: [],
-      igniteMax: 1,
-      bleeds: [],
-      poisons: [],
-      shock: 0,
-      shockT: 0,
-      chill: 0,
-      chillT: 0,
-      freezeT: 0,
-    },
-    stunT: 0,
-    graceT: 0,
-    leechLife: [],
-    leechMana: [],
-    sinceDamaged: 99,
-    tKill: 99,
-    tCrit: 99,
-    tHit: 99,
-    tFlask: 99,
-    tStunEnemy: 99,
-    tBlock: 99,
-    tBeenHit: 99,
-    tOverload: 99,
-    resShift: [0, 0, 0, 0, 0],
-    resShiftT: 0,
-    moving: false,
-    name: '',
-    rarity: 'player',
-    modIds: [],
-    room: -1,
-    pack: -1,
-    homeX: x,
-    homeY: y,
-    state: 'idle',
-    lostT: 0,
-    noticeT: 0,
-    noReward: false,
-    raiserT: 8,
-    slamT: 7,
-    bossPhase: 0,
-    summonedBy: 0,
-    dummy: false,
-    retreatT: 0,
-    retreatCd: 0,
-    risen: false,
-    skillT: 5,
-    blinkT: 0,
-    shellBy: 0,
-    phaseT: 0,
-    hexes: [],
-    impales: [],
-    hexRes: [0, 0, 0, 0, 0],
-    hexVulnAll: 0,
-    hexVuln: 0,
-    hexDmg: 1,
-    hexSpeed: 1,
-    buffT: 0,
-    zealT: 0,
-    fervour: 0,
-    fervourT: 0,
-    hexCd: 0,
-    channelT: 0,
-    flies: false,
-    stationary: false,
-    curlT: 0,
-    markX: 0,
-    markY: 0,
-  };
-}
 
 export function spawnMonster(
   w: World,
@@ -189,7 +102,6 @@ export function createWorld(inp: CreateWorldInput): World {
     deployables: [],
     deploySeq: 0,
     minions: [],
-    minionSeq: 0,
     trig: {
       cooldown: {},
       taken: {},
@@ -383,8 +295,14 @@ function tickEffects(w: World, dt: number): void {
     // A lasting zone just fades.
     if (isZone(e)) continue;
     w.events.push({ t: 'explode', x: e.x, y: e.y, r: e.radius, dtype: e.dtype });
+    const label = e.kind === 'slam' ? 'Crushing slam' : 'Volatile explosion';
     if (p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r)
-      rawHit(w, p, e.damage, e.dtype, e.kind === 'slam' ? 'Crushing slam' : 'Volatile explosion');
+      rawHit(w, p, e.damage, e.dtype, label);
+    // The player's minions standing in a monster's blast are hurt too.
+    if (e.faction === 1)
+      for (const m of w.minions)
+        if (m.alive && Math.hypot(m.x - e.x, m.y - e.y) <= e.radius + m.r)
+          rawHit(w, m, e.damage, e.dtype, label);
   }
   w.effects.length = j;
 }

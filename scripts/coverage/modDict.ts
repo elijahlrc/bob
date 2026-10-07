@@ -482,7 +482,8 @@ for (const [word, id] of [
 rule(/^Minions deal # increased Damage$/, (_m, n) => [mk('minionDamage', 'inc', n[0])]);
 rule(/^Minions have # increased Movement Speed$/, (_m, n) => [mk('minionSpeed', 'inc', n[0])]);
 rule(/^Minions have # increased Attack Speed$/, (_m, n) => [mk('minionSpeed', 'inc', n[0])]);
-rule(/^Minions have # increased maximum Life$/, (_m, n) => [mk('minionLife', 'inc', n[0])]);
+rule(/^Minions have # increased maximum Life$/i, (_m, n) => [mk('minionLife', 'inc', n[0])]);
+rule(/^Minions have # reduced maximum Life$/i, (_m, n) => [mk('minionLife', 'inc', neg(n[0]))]);
 rule(/^# to Maximum number of (?:Skeletons|Zombies|Spectres|Raging Spirits|Golems)$/, (_m, n) => [
   mk('minionCount', 'base', n[0]),
 ]);

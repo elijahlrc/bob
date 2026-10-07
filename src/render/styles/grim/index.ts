@@ -902,11 +902,18 @@ export class GrimStyle extends StyleBase {
     }
     // Minions.
     for (const m of world.minions) {
+      if (!m.alive) continue;
       const { x, y } = this.project(m.x, m.y);
       const col = MINIONS[m.kind].color;
       g.fillStyle(0x000000, 0.35).fillEllipse(x, y + 1, 9, 4);
       g.fillStyle(col, 0.95).fillCircle(x, y - 5, 4);
       g.lineStyle(1, 0xffffff, 0.6).strokeCircle(x, y - 5, 4);
+      // A hurt minion shows what is left of its life.
+      if (m.life < m.def.maxLife) {
+        const frac = Math.max(0, m.life / m.def.maxLife);
+        g.fillStyle(0x000000, 0.6).fillRect(x - 6, y - 13, 12, 2);
+        g.fillStyle(0x6ad07a, 0.95).fillRect(x - 6, y - 13, 12 * frac, 2);
+      }
     }
     for (const e of effects) {
       const { x, y } = this.project(e.x, e.y);
@@ -1106,7 +1113,15 @@ export class GrimStyle extends StyleBase {
       }
       case 'death': {
         const a = this.byId.get(e.id) ?? world.actors.find((x) => x.id === e.id);
-        if (!a) break;
+        if (!a) {
+          // A minion falls: a puff of dust where it stood.
+          const f = world.minions.find((x) => x.id === e.id);
+          if (f) {
+            const q = this.project(f.x, f.y);
+            em.dust.explode(3, q.x, q.y - 2);
+          }
+          break;
+        }
         const p = this.project(a.x, a.y);
         if (a.isPlayer) break;
         const big = a.rarity === 'boss' || a.rarity === 'miniboss' || a.rarity === 'rare';

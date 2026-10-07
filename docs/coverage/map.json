@@ -1503,7 +1503,7 @@
   "raiseHusk": {
    "ref": "Raise Zombie",
    "status": "covered",
-   "note": "Raises zombies (3 to 7) that follow the character and slam enemies; they cannot be hurt in Bob, so they stay until the map ends."
+   "note": "Raises zombies (3 to 7) that follow the character and slam enemies; they have life, are hurt by enemy blows and area attacks, and are raised again when the skill is cast after they fall."
   },
   "callBonewalkers": {
    "ref": "Summon Skeletons",
@@ -1603,7 +1603,7 @@
   "hardyPack": {
    "ref": "Minion Life Support",
    "status": "covered",
-   "note": "The supported minions are sturdier; Bob's minions cannot be hurt, so the extra life is folded into more minion damage."
+   "note": "The supported minions have more life."
   },
   "packHaste": {
    "ref": "Minion Speed Support",
@@ -1613,7 +1613,7 @@
   "wardingPack": {
    "ref": "Meat Shield Support",
    "status": "covered",
-   "note": "The supported minions stay close to the character and take less damage; here they hit harder against enemies near the character."
+   "note": "The supported minions have more life and take less damage; they also move faster to keep up with the character."
   },
   "elementalPack": {
    "ref": "Elemental Army Support",
@@ -5025,7 +5025,7 @@
   "gravecallerSilks": {
    "ref": "Vis Mortis",
    "status": "covered",
-   "note": "High energy shield and mana with increased minion damage. The minion life penalty (minions cannot be hurt) and the chaos gain are dropped."
+   "note": "High energy shield and mana with increased minion damage and a minion life penalty. The chaos gain is dropped."
   },
   "huntersHide": {
    "ref": "Yriel's Fostering",
@@ -5120,7 +5120,7 @@
   "gravetenderGloves": {
    "ref": "Aukuna's Will",
    "status": "covered",
-   "note": "Grants the husk summon (the corpse-free zombie analog) with dexterity, cast speed and evasion with energy shield. The zombie life line maps to minion life, which has no effect because minions cannot be hurt; the corpse lines are dropped."
+   "note": "Grants the husk summon (the corpse-free zombie analog) with dexterity, cast speed and evasion with energy shield. The zombie life line maps to minion life; the corpse lines are dropped."
   },
   "spindleGloves": {
    "ref": "Fenumus' Weave",
@@ -5240,7 +5240,7 @@
   "gravecallCirclet": {
    "ref": "Wraithlord",
    "status": "covered",
-   "note": "Plus two to socketed minion gems with a lot of energy shield. Minion life regeneration and spectre life are dropped (minions cannot be hurt, no spectres)."
+   "note": "Plus two to socketed minion gems with a lot of energy shield. Minion life regeneration (every minion regenerates a little already) and spectre life (no spectres) are dropped."
   },
   "twinflameHatchet": {
    "ref": "Dyadus",

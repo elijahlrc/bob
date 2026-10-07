@@ -9127,6 +9127,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     mods: [
       m('es', 'inc', 200, 220, { local: true }),
       m('mana', 'base', 20, 30),
+      m('minionLife', 'inc', -20),
       m('minionDamage', 'inc', 15),
     ],
     flavour: 'The silk is thin; the army it commands is not.',

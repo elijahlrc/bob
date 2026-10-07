@@ -206,7 +206,7 @@ export function applyDamage(w: World, dst: Actor, dmg: number[]): number {
   dst.sinceDamaged = 0;
   if (dst.isPlayer && w.opts.godMode && dst.life <= 0) dst.life = 1;
   if (dst.isPlayer) w.stats.damageTaken += total;
-  else w.stats.damageDealt += total;
+  else if (dst.faction === 1) w.stats.damageDealt += total;
   if (dst.life <= 0) killActor(w, dst);
   return total;
 }
@@ -544,6 +544,8 @@ export function killActor(w: World, a: Actor): void {
   a.life = 0;
   a.action = null;
   w.events.push({ t: 'death', id: a.id });
+  // A minion that falls is just gone (tickMinions clears it): nothing is earned, dropped or raised.
+  if (!a.isPlayer && a.faction === 0) return;
   if (!a.isPlayer && !a.noReward) {
     rollCharges(w, 'kill');
     rollGains(w, 'kill');
