@@ -769,6 +769,111 @@
    "ref": "Wither",
    "status": "covered",
    "note": "A channelled chaos cloud that stacks a debuff making enemies take more chaos damage (averaged into a lower chaos resistance)."
+  },
+  "frostFang": {
+   "ref": "Ice Bite Support",
+   "status": "covered",
+   "note": "A chance to freeze, added cold damage that grows with Fervour charges (the charge on killing a frozen enemy is a plain chance on kill)."
+  },
+  "skewer": {
+   "ref": "Impale Support",
+   "status": "covered",
+   "note": "The supported attack impales, with a stronger impale and more physical damage."
+  },
+  "crueltyEdge": {
+   "ref": "Increased Critical Damage Support",
+   "status": "covered",
+   "note": "A flat increase in critical strike multiplier."
+  },
+  "livewire": {
+   "ref": "Innervate Support",
+   "status": "covered",
+   "note": "Adds lightning damage, with a chance to shock (the buff after killing a shocked enemy is dropped)."
+  },
+  "firmHold": {
+   "ref": "Iron Grip Support",
+   "status": "covered",
+   "note": "More projectile damage for projectile attacks (the keystone effect is dropped)."
+  },
+  "steelResolve": {
+   "ref": "Iron Will Support",
+   "status": "covered",
+   "note": "More spell damage (the keystone effect is dropped)."
+  },
+  "stormbreaker": {
+   "ref": "Lightning Penetration Support",
+   "status": "covered",
+   "note": "The supported skill's hits penetrate lightning resistance."
+  },
+  "siphonDraught": {
+   "ref": "Mana Leech Support",
+   "status": "covered",
+   "note": "Attacks leech mana from the damage they deal."
+  },
+  "tripleCadence": {
+   "ref": "Multistrike Support",
+   "status": "covered",
+   "note": "The supported melee attack strikes three times, faster, with the later strikes stronger and the whole at somewhat less damage."
+  },
+  "galvanise": {
+   "ref": "Physical to Lightning Support",
+   "status": "covered",
+   "note": "Half of the physical damage is converted to lightning, and some more physical is gained as lightning."
+  },
+  "closeQuarters": {
+   "ref": "Point Blank Support",
+   "status": "covered",
+   "note": "More projectile damage (the keystone range effect is dropped)."
+  },
+  "glimpseOfCrit": {
+   "ref": "Power Charge On Critical Support",
+   "status": "covered",
+   "note": "Critical strikes may grant an Insight charge, and the skill deals more damage for each charge held."
+  },
+  "wideCrush": {
+   "ref": "Pulverise Support",
+   "status": "covered",
+   "note": "Melee skills hit a larger area and harder, but a little slower."
+  },
+  "lingeringShots": {
+   "ref": "Slower Projectiles Support",
+   "status": "covered",
+   "note": "Slower projectiles that deal more damage."
+  },
+  "hastenedRot": {
+   "ref": "Swift Affliction Support",
+   "status": "covered",
+   "note": "More damage over time, but ailments last a little less."
+  },
+  "freedRot": {
+   "ref": "Unbound Ailments Support",
+   "status": "covered",
+   "note": "Ailments last longer and deal more damage."
+  },
+  "cruelFlight": {
+   "ref": "Vicious Projectiles Support",
+   "status": "covered",
+   "note": "More physical damage and damage over time for projectile attacks, a little slower."
+  },
+  "foulBrew": {
+   "ref": "Vile Toxins Support",
+   "status": "covered",
+   "note": "Poison deals more damage, and hits deal more for each poison on the target."
+  },
+  "voidTwist": {
+   "ref": "Void Manipulation Support",
+   "status": "covered",
+   "note": "More chaos damage, less elemental damage."
+  },
+  "twinSalvo": {
+   "ref": "Volley Support",
+   "status": "covered",
+   "note": "Two more projectiles fired in parallel, for slightly less damage."
+  },
+  "witherMark": {
+   "ref": "Withering Touch Support",
+   "status": "covered",
+   "note": "Gains physical damage as chaos, and the target is withered (takes more chaos damage)."
   }
  },
  "uniques": {
