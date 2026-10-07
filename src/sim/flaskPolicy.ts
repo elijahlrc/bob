@@ -50,7 +50,8 @@ export const autoFlaskPolicy: FlaskPolicy = (w) => {
       usedLife = true;
       return;
     }
-    if (k === 'mana' && !f.queued && p.mana < 2 * cost) {
+    // A hybrid flask also refills mana: it is drunk for low mana as a mana flask is.
+    if ((k === 'mana' || k === 'hybrid') && !f.queued && p.mana < 2 * cost) {
       if (f.activeT <= 0) out.push(i);
       return;
     }

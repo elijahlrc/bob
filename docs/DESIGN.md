@@ -31,12 +31,12 @@ These were decided with the user before this doc was written. Do not re-open the
 | #   | Topic                | Decision                                                                                                                                                                                                                                                                               |
 | --- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | D1  | Game shape           | One character walks through maps. After each map, update the build with items and XP gained.                                                                                                                                                                                           |
-| D2  | Skills               | A limited set of skill gems (section 11.5).                                                                                                                                                                                                                                            |
+| D2  | Skills               | A limited set of skill gems (section 11.5). _(Superseded 2026-10-07: the coverage plan, `docs/COVERAGE.md`, targets 90% of 3.9.0's gems and uniques.)_                                                                                                                                 |
 | D3  | Fidelity             | Aspire to real PoE mechanics; diverge freely when something is hard or a trade-off favours simplicity. Divergences are listed in 2.1.                                                                                                                                                  |
-| D4  | IP                   | Our own names and our own art. Mechanics are not copyrightable; never copy code, data files, text or art (section 3).                                                                                                                                                                  |
+| D4  | IP                   | Our own names and our own art. The PoE wiki and Path of Building data may be consulted for mechanics and numbers; never copy code, names, flavour text or art (section 3; revised with the user 2026-10-07).                                                                           |
 | D5  | v1 mechanics         | Passive tree (small/notable/keystone), attributes, life/mana/ES, armour/evasion/block/resists, crit, conversion, increased vs more, ignite/shock/chill/freeze/bleed/poison, **stun**, item bases + affixes, monster level scaling, **flasks, auras + mana reservation, unique items**. |
-| D6  | Out of scope         | Ascendancies, jewels of any kind, influence, minions, totems, traps. _(Charges, curses and crafting/currency were brought in by the depth expansion, `docs/EXPANSION.md`.)_                                                                                                            |
-| D7  | Reference era        | A frozen, older PoE 1 ruleset (section 4).                                                                                                                                                                                                                                             |
+| D6  | Out of scope         | Ascendancies, jewels of any kind, influence. _(Charges, curses and crafting/currency were brought in by the depth expansion, `docs/EXPANSION.md`; minions, totems, traps, mines and brands by the coverage plan, `docs/COVERAGE.md`, 2026-10-07.)_                                     |
+| D7  | Reference version    | PoE 1 **patch 3.9.0** (December 2019), frozen (section 4). Pinned with the user 2026-10-07.                                                                                                                                                                                            |
 | D8  | Meta structure       | Run-based roguelike.                                                                                                                                                                                                                                                                   |
 | D9  | Player input in maps | None: pure auto-battler. Speed controls only. Manual flask use is a future option, so keep flask triggering behind a policy interface.                                                                                                                                                 |
 | D10 | Enemies              | Skeletons are the core family, with elemental variants and normal/magic/rare/unique tiers carrying monster mods. _(Undead and crypt-dwelling factions were added by the depth expansion, `docs/EXPANSION.md`.)_                                                                        |
@@ -68,10 +68,15 @@ These were decided with the user before this doc was written. Do not re-open the
 
 ## 3. IP policy (hard rules)
 
+_Revised with the user on 2026-10-07. The earlier version of rules 1–2 was written without the user's input and was
+stricter than they intended._
+
 1. **No code** from Path of Building, PoE tools, or any other project is copied or translated. Formulas are
-   implemented from our own understanding of the mechanics and from the tables in this doc.
-2. **No data files** from Path of Building, GGG's skill tree export, the PoE wiki, or game files are downloaded, read
-   into the build, or transcribed.
+   implemented by us in our own code.
+2. **Data may be consulted.** The PoE wiki (including its Cargo API) and Path of Building's data files may be read for
+   mechanics and numbers, and scripts may use them to draft entries in our own data format, which are then reviewed
+   by hand. Reference data lives under `docs/coverage/` or `scripts/`, never in `src/`, and the game never loads it
+   at runtime. Record where a number came from when it follows the reference (section 4).
 3. **No names or text.** Every player-visible string in `src/` — classes, gems, notables, keystones, uniques, item
    bases, affix names, flavour text — is our own invention. A name merely _describing_ a mechanic ("Fire Resistance",
    "Critical Strike Chance", "Ignite") is fine. A PoE proper name ("Resolute Technique", "Kaom's Heart", "Marauder",
@@ -85,13 +90,15 @@ These were decided with the user before this doc was written. Do not re-open the
 
 ## 4. Reference ruleset
 
-We model **PoE 1 as of roughly the 3.0–3.9 era (2017–2019)**: it has every mechanic in D5 (poison and bleed,
-flasks, auras with percentage reservation, uniques, energy shield, block) and predates cluster jewels and the later
-ailment and defence reworks.
+We model **PoE 1 patch 3.9.0** (December 2019, pinned 2026-10-07; earlier drafts said "roughly the 3.0–3.9 era"). It
+has every mechanic in D5 (poison and bleed, flasks, auras with percentage reservation, uniques, energy shield, block)
+and predates cluster jewels and the later ailment and defence reworks. The coverage plan's denominator is everything
+that existed in 3.9.0 (`docs/COVERAGE.md`).
 
-All numbers here are authored by us. The era is only a mental model of how systems fit together. Where a historical
-value is uncertain, this doc picks a v1 value and marks it _tunable_. **Never** "fix" a constant to match a remembered
-PoE number without updating this doc.
+Mechanics should match 3.9.0 unless a divergence is listed in 2.1. Bob's own scale (100 maps, levels 1–100) means
+many numbers are retuned rather than copied. When a constant is changed to follow 3.9.0, update this doc and record
+the source (a wiki page revision from the 3.9 period, or the Path of Building data of that era). **Never** change a
+constant to match a _remembered_ PoE number.
 
 ---
 

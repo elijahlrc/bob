@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DT } from '../data/constants';
 import { makeFlask } from '../gen/items';
+import { withStarterGems } from '../run/starterGems';
 import { newRun } from '../run/run';
 import { applyDamage, lifeCap, tickActor } from './combat';
 import { createDummyWorld } from './dummy';
@@ -167,5 +168,49 @@ describe('§6.9 flask policy', () => {
     expect(p.life - l0).toBeGreaterThan(10);
     // While recovering, the policy does not use another life flask.
     expect(autoFlaskPolicy(w)).toEqual([]);
+  });
+});
+
+describe('hybrid flasks refill mana as well as life (flask policy)', () => {
+  function hybridWorld() {
+    const run = withStarterGems(newRun('mystic', 3));
+    run.build.level = 20;
+    const uid = () => run.nextUid++;
+    run.build.flasks = [makeFlask(uid, 'flask_hybrid_1', 1), null, null, null, null];
+    const { world: w } = createDummyWorld(run.build, { distance: 20 });
+    w.opts.freeResources = false;
+    const spec = w.char.flasks[0];
+    expect(spec.kind).toBe('hybrid');
+    w.flasks[0].charges = spec.maxCharges;
+    return w;
+  }
+
+  it('is drunk when mana runs low, even at full life', () => {
+    const w = hybridWorld();
+    const p = w.player;
+    const cost = w.char.profile(w.primary).cost;
+    expect(cost).toBeGreaterThan(0);
+    p.life = lifeCap(w, p);
+    p.mana = cost; // below twice the cost of the main skill
+    expect(autoFlaskPolicy(w)).toEqual([0]);
+  });
+
+  it('is left alone with healthy life and mana, and while it is already active', () => {
+    const w = hybridWorld();
+    const p = w.player;
+    p.life = lifeCap(w, p);
+    p.mana = p.def.maxMana;
+    expect(autoFlaskPolicy(w)).toEqual([]);
+    p.mana = 0;
+    w.flasks[0].activeT = 3;
+    expect(autoFlaskPolicy(w)).toEqual([]);
+  });
+
+  it('still answers low life', () => {
+    const w = hybridWorld();
+    const p = w.player;
+    p.mana = p.def.maxMana;
+    p.life = lifeCap(w, p) * 0.2;
+    expect(autoFlaskPolicy(w)).toEqual([0]);
   });
 });
