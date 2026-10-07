@@ -2,6 +2,7 @@ import { useEffect } from 'preact/hooks';
 import type { Controller } from '../run/controller';
 import { Camp } from './Camp';
 import { ClassSelect } from './ClassSelect';
+import { Codex } from './Codex';
 import { Hud } from './Hud';
 import { useControllerState } from './hooks';
 import { Summary } from './Summary';
@@ -22,6 +23,8 @@ export function App({ c }: { c: Controller }) {
   switch (c.screen) {
     case 'title':
       return <Title c={c} />;
+    case 'codex':
+      return <Codex c={c} />;
     case 'classSelect':
       return <ClassSelect c={c} />;
     case 'camp':

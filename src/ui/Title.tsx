@@ -20,6 +20,9 @@ export function Title({ c }: { c: Controller }) {
         >
           New Run
         </button>
+        <button class="btn" onClick={() => c.goTo('codex')}>
+          Codex
+        </button>
       </div>
       {saved.status === 'incompatible' && (
         <div class="warn">

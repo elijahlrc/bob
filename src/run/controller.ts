@@ -6,10 +6,11 @@ import { createWorld, stepWorld } from '../sim/world';
 import { CLASSES } from '../data/classes';
 import { botCamp } from './bot';
 import { completeTabletSets } from './craft';
+import { recordFound } from './codex';
 import { finishMap, newRun, passivePoints, planFor, worldOptsFor, type RunState } from './run';
 import { clearSave, loadRun, saveRun, SAVE_KEY, type KeyValueStore, type LoadResult } from './save';
 
-export type Screen = 'title' | 'classSelect' | 'camp' | 'map' | 'summary' | 'victory';
+export type Screen = 'title' | 'classSelect' | 'camp' | 'map' | 'summary' | 'victory' | 'codex';
 
 export type BusEvents = {
   /** The inspected enemy changed (click on the map; null clears). */
@@ -56,7 +57,10 @@ export class Controller {
 
   private changed(): void {
     // The game saves on entering camp and on any camp change (§5.5).
-    if (this.store && this.run && this.screen === 'camp') saveRun(this.store, this.run);
+    if (this.store && this.run && this.screen === 'camp') {
+      saveRun(this.store, this.run);
+      recordFound(this.run);
+    }
     this.bus.emit('state', null);
   }
 
