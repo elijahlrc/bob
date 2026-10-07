@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'preact/hooks';
 import type { Character } from '../calc/character';
 import { naturalGemLevel } from '../calc/gems';
-import { gemDef } from '../data/gems';
+import { gemDef, type GemDef } from '../data/gems';
 import { EQUIP_SLOTS, type GemItem } from '../data/types';
 import type { Controller } from '../run/controller';
 import { setPrimary, socketGem, unsocketGem } from '../run/inventory';
@@ -15,6 +15,17 @@ import {
 } from '../run/inventoryOps';
 
 import { GemTip } from './GemCard';
+import { gemCardData } from './gemText';
+import { loadPref, savePref } from './prefs';
+
+const GEM_GROUPS = ['Skills', 'Utility skills', 'Supports', 'Hexes', 'Auras'] as const;
+
+/** The inventory heading a gem sits under: damage skills, the utility skills a policy casts, supports, hexes, auras. */
+function groupOfGem(d: GemDef): (typeof GEM_GROUPS)[number] {
+  if (d.kind === 'active') return d.utility ? 'Utility skills' : 'Skills';
+  if (d.kind === 'support') return 'Supports';
+  return d.kind === 'hex' ? 'Hexes' : 'Auras';
+}
 
 type Sel = { from: 'inv'; uid: number } | ({ from: 'socket' } & SocketRef);
 type Drag = { from: 'inv'; uid: number } | ({ from: 'socket' } & SocketRef);
@@ -106,6 +117,7 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
   const [drag, setDrag] = useState<Drag | null>(null);
   const [over, setOver] = useState<string | null>(null);
   const [msg, setMsg] = useState('');
+  const [q, setQ] = useState(() => loadPref('gemSearch', ''));
   const [tip, setTip] = useState<{ gemId: string; level: number; x: number; y: number } | null>(
     null,
   );
@@ -126,6 +138,15 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
         }),
     [run.inventory],
   );
+  const needle = q.trim().toLowerCase();
+  const shownGems = needle
+    ? gems.filter((g) => {
+        const d = gemCardData(gemDef(g.gemId), 20);
+        return `${d.name} ${d.type} ${d.tags.join(' ')} ${d.description}`
+          .toLowerCase()
+          .includes(needle);
+      })
+    : gems;
   const levelOf = (uid: number) => ch.gems.find((g) => g.gem.uid === uid)?.level ?? 1;
 
   // The inventory gem being placed (selected or being dragged), and what each socket would gain.
@@ -336,23 +357,28 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
         }}
       >
         <div class="muted">Gems ({gems.length})</div>
+        {gems.length > 8 && (
+          <input
+            class="search"
+            type="text"
+            placeholder="Search gems by name, tag or type"
+            value={q}
+            onInput={(e) => {
+              const v = (e.target as HTMLInputElement).value;
+              setQ(v);
+              savePref('gemSearch', v);
+            }}
+          />
+        )}
         {gems.length === 0 && (
           <div class="muted">No spare gems. Drag socketed gems here to remove them.</div>
         )}
-        {(['active', 'support', 'hex', 'aura'] as const).map((kind) => {
-          const list = gems.filter((g) => gemDef(g.gemId).kind === kind);
+        {GEM_GROUPS.map((group) => {
+          const list = shownGems.filter((g) => groupOfGem(gemDef(g.gemId)) === group);
           if (!list.length) return null;
           return (
-            <div key={kind} class="gem-group">
-              <div class="muted gem-group-title">
-                {kind === 'active'
-                  ? 'Skills'
-                  : kind === 'support'
-                    ? 'Supports'
-                    : kind === 'hex'
-                      ? 'Hexes'
-                      : 'Auras'}
-              </div>
+            <div key={group} class="gem-group">
+              <div class="muted gem-group-title">{group}</div>
               {list.map((g) => {
                 const d = gemDef(g.gemId);
                 const b = best.get(g.uid);

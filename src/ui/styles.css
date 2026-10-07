@@ -1302,3 +1302,9 @@ select option {
 .codex-head .found {
   color: #8fd18f;
 }
+
+.gem-inv .search {
+  width: 100%;
+  margin: 4px 0 6px;
+  box-sizing: border-box;
+}
