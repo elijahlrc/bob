@@ -1171,7 +1171,10 @@ export class Character {
     }
     // A repeating skill (Echoing Cast) lands several times per use; a triggered one does not repeat.
     const lands = (choice.triggered ? 1 : 1 + p.repeats) * p.pulses;
-    const hitDps = perUse * usesPerSec * lands;
+    let hitDps = perUse * usesPerSec * lands;
+    // While its totems and brands stand and shoot, the character itself fights with its weapon.
+    if (standing && usesOverride === undefined && choice.gemUid !== null)
+      hitDps += this.skillSheet(this.defaultAttack, target, conds).hitDps * 0.9;
     const ailmentDps = ign + bl + po;
     const totalDps = hitDps + ailmentDps;
     // Sustain: the share of uses the resource pool can pay for; the rest fall back to the default attack.

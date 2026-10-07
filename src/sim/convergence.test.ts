@@ -92,6 +92,70 @@ const REF_BUILDS: RefBuild[] = [
   },
 ];
 
+/** The shapes the coverage plan added: each must hold the same anchor as the first ones (deployables within 10%). */
+const SHAPE_BUILDS: (RefBuild & { tolerance: number })[] = [
+  {
+    name: 'ground line (Rime Spires)',
+    build: buildFor('mystic', 40, ['rimeSpires'], { main: 'wand_3' }),
+    distance: 4,
+    tolerance: 0.03,
+  },
+  {
+    name: 'ground zone (Ember Hail)',
+    build: buildFor('mystic', 40, ['emberHail'], { main: 'wand_3' }),
+    distance: 4,
+    tolerance: 0.03,
+  },
+  {
+    name: 'nova (Frost Ring)',
+    build: buildFor('mystic', 40, ['frostRing'], { main: 'wand_3' }),
+    distance: 4,
+    tolerance: 0.03,
+  },
+  {
+    name: 'beam (Blaze Stream)',
+    build: buildFor('mystic', 40, ['blazeStream'], { main: 'wand_3' }),
+    distance: 3,
+    tolerance: 0.03,
+  },
+  {
+    name: 'returning projectile (Phantom Toss)',
+    build: buildFor('strider', 40, ['phantomToss'], { main: 'sword_3' }),
+    distance: 4,
+    tolerance: 0.03,
+  },
+  {
+    name: 'chain attack (Storm Arrow)',
+    build: buildFor('strider', 40, ['stormArrow'], { main: 'bow_3' }),
+    distance: 5,
+    tolerance: 0.03,
+  },
+  {
+    name: 'trap (Frost Trap)',
+    build: buildFor('strider', 40, ['frostTrap'], { main: 'wand_3' }),
+    distance: 4,
+    tolerance: 0.05,
+  },
+  {
+    name: 'mine (Storm Charge)',
+    build: buildFor('mystic', 40, ['stormCharge'], { main: 'wand_3' }),
+    distance: 4,
+    tolerance: 0.05,
+  },
+  {
+    name: 'totem (Flame Bolt under Standing Cast)',
+    build: buildFor('mystic', 40, ['flameBolt', 'standingCast'], { main: 'wand_3' }),
+    distance: 4,
+    tolerance: 0.1,
+  },
+  {
+    name: 'brand (Doom Sigil)',
+    build: buildFor('mystic', 40, ['doomSigil'], { main: 'wand_3' }),
+    distance: 4,
+    tolerance: 0.1,
+  },
+];
+
 const POISON_BUILD: RefBuild = {
   name: 'poison (Venom Cut + Toxin Coat)',
   build: buildFor('shade', 30, ['venomCut', 'toxinCoat'], { main: 'dagger_3', off: 'claw_2' }),
@@ -158,6 +222,18 @@ describe('calc ↔ sim convergence (§8.3)', () => {
         ).toBeLessThan(1.03);
       });
     }
+  }
+
+  for (const rb of SHAPE_BUILDS) {
+    it(`${rb.name} — no mitigation`, () => {
+      const calc = calcFor(rb, {});
+      expect(calc.isDefault).toBe(false);
+      const sim = simulate(rb, {});
+      const ratio = sim.hitDps / calc.hitDps;
+      const msg = `sim ${sim.hitDps.toFixed(2)} vs calc ${calc.hitDps.toFixed(2)}`;
+      expect(ratio, msg).toBeGreaterThan(1 - rb.tolerance);
+      expect(ratio, msg).toBeLessThan(1 + rb.tolerance);
+    });
   }
 
   for (const [dname, def] of DEFENCES) {
