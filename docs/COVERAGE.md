@@ -1,6 +1,6 @@
 # Bob — Coverage Plan: the gems and uniques of patch 3.9.0
 
-Status: **approved 2026-10-07; C0, C1 and C2 done 2026-10-07** · Owner: the user · Implementer: Claude
+Status: **approved 2026-10-07; C0 to C6 done 2026-10-07 (gems 93.1%, uniques 90.4%); C7 in progress** · Owner: the user · Implementer: Claude
 
 This plan extends [DESIGN.md](DESIGN.md) and [EXPANSION.md](EXPANSION.md). Its goal is to give Bob an analog of **at
 least 90% of the skill gems and 90% of the unique items** that existed in PoE 1 patch 3.9.0. Milestones are
@@ -13,6 +13,24 @@ Conventions follow DESIGN.md:
 - every count marked _rough_ comes from a keyword pass over the reference list and is refined in C0.
 
 ---
+
+## Outcome (2026-10-07)
+
+- **Gems 325 of 349 (93.1%), uniques 707 of 782 (90.4%)**, measured by `npm run coverage`. Every entry has its own name, a
+  note on what it does and what was simplified (`docs/coverage/map.json`), and every gem has a generated smoke test.
+- **Engine added on the way:** per-character condition bits (no cap on condition ids), 52-bit masks, skill types and the
+  support fixpoint, the buff layer, utility skills with use policies (curses, marks, warcries, banners, guards, buffs,
+  blinks, summons), curses and marks as hexes, auras with triggers and a burning aura, deployables (totems, brands, traps,
+  mines) in calc and sim, minions in calc and sim, granted skills and item-linked supports, supports that give the
+  character mods and triggers (Blasphemy), travelling attacks, energy shield on hit, skill duration.
+- **Content pipeline:** `docs/coverage/AUTHORING.md`, the translator (`modDict.ts`), decision files
+  (`docs/coverage/uniques/*.json`, `docs/coverage/gems/*.json`) and emitters; `emit-uniques.ts --check` is a dry run.
+- **What is deliberately not covered:** jewels, abyss sockets and socket colours, vaal skills, crab barriers, spirit
+  charges, rampage, ground-effect conditions, corpse skills (Desecrate, Detonate Dead, Unearth, Volatile Dead), Manabond,
+  Plague Bearer, Herald of Purity, Tempest Shield, trap and mine remote controls, and a few unique flasks. Each is listed in
+  `npm run coverage -- --list`.
+- **Known divergences to keep in mind:** channelling and ramping skills are averaged into repeated hits; minions cannot be
+  hurt; deployables and utility skills follow simple use policies; many "support gem on item" lines are folded into stats.
 
 ## 0. Summary
 

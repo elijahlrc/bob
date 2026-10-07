@@ -507,3 +507,24 @@ revert if they would rather not.
   asked not to optimise per gem until the whole plan is done; revisit candidate pruning and cheaper `Character` builds in C7.
 - **Deferred gems** (need systems from later milestones): corpse skills (Desecrate, Detonate Dead, Unearth, Volatile Dead),
   Discharge (consumes charges), Manabond, Plague Bearer, trap/mine/totem supports, trigger supports, minions.
+
+### C3 to C6 done: gems and uniques, deployables, minions (2026-10-07)
+
+- **Coverage.** Gems 325 of 349 (93.1%), uniques 707 of 782 (90.4%): both targets met. Gem batches c3g-001..010, c4g-001..003,
+  c5g-001..003, c6g-001; unique decisions c3-001..003 and c3-a, c3-b, c3-c, c3-d files drafted by parallel agents from
+  `docs/coverage/AUTHORING.md` and emitted together.
+- **C4 engine.** Utility skills (`ActiveGemDef.utility`: curse, buff, blink, summon) cast by policy (`src/sim/utility.ts`: upkeep,
+  guard, rally); curses and marks are hexes with effect tables and self-mods; auras carry triggers (heralds) and a burning aura
+  (Searing Mantle); granted skills (`grantSkill.<id>`) and socketed supports (`socketSupport.<id>`); supports with global mods,
+  triggers and Blasphemy; `needsShield`, `needsDualWield`, `travel`.
+- **C5 engine.** Totems, brands, traps and mines (`src/sim/deploy.ts`): a skill with the tag, or under the support, is put down
+  and fires from where it stands; `deployCount` raises the number at once; the sheet counts totems as extra uses.
+- **C6 engine.** Minions (`src/data/minions.ts`, `src/sim/minions.ts`): summon skills keep minions standing that follow the
+  character and strike the nearest enemy; `minionDamage`, `minionSpeed`, `minionCount`; the sheet adds `minionDps`.
+- **Balance check (4 x 6, seed 11, with 582 uniques):** 7 of 24 wins (29%), inside the 25% to 50% band. A second check follows
+  the last unique round.
+- **Bot speed.** 190 to 200 times real time on one core (was 1,600 to 2,300 before the plan; DESIGN asks 500). Each camp builds
+  about 500 characters; the cost is spread over the constructor and the craft and equip trials. Done: buff and charge source
+  scans once per build, item and passive mods remembered by object, layout scores remembered. Not done: candidate pruning,
+  cheaper character builds for craft trials. The local speed tests keep floors of 200 and 400.
+- **Tests.** 1,681.
