@@ -449,6 +449,7 @@ const MORE_EVENTS: Record<string, string> = {
   stun: 'when you Stun an Enemy',
   cast: 'when you Cast a Spell',
   meleeHit: 'on Melee Hit',
+  hitTaken: 'when you are Hit',
 };
 for (const [event, phrase] of Object.entries(MORE_EVENTS)) {
   for (const id of BUFF_IDS)

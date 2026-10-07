@@ -5496,6 +5496,301 @@
    "ref": "The Overflowing Chalice",
    "status": "covered",
    "note": "Other flasks gain charges much faster and work better during the effect (the consecrated ground and the lock on its own charges are dropped)."
+  },
+  "pairingLocket": {
+   "ref": "Badge of the Brotherhood",
+   "status": "covered",
+   "note": "Dexterity and intelligence with a flat extra frenzy charge and power charge. The reference ties maximum frenzy to maximum power charges and adds travel-skill cooldown and elusive scaling per charge; those lines are dropped and the charge synergy is approximated as one more of each."
+  },
+  "dreadTether": {
+   "ref": "Coward's Chains",
+   "status": "covered",
+   "note": "Damage, attributes and movement speed paid for by a standing damage-taken penalty. The reference curses the wearer with Vulnerability (and makes enemy hits unlucky while cursed); the curse is approximated as 10% increased damage taken and the unlucky-hit line is dropped."
+  },
+  "heirloomShackle": {
+   "ref": "Coward's Legacy",
+   "status": "covered",
+   "note": "Attributes and movement speed paid for by a self-inflicted weakness: the reference curses the wearer with a level 20 Vulnerability and amplifies curses on them by half. Approximated as 15% increased damage taken and the 50% increased curse effect on you; the low-life-while-cursed line is dropped."
+  },
+  "votiveStrap": {
+   "ref": "Leash of Oblation",
+   "status": "covered",
+   "note": "Life and attributes with all three offering analogs granted (bone, flesh and spirit rites at level 10), standing in for being able to keep an offering of each type. The reduced offering duration is dropped."
+  },
+  "broodGirdle": {
+   "ref": "Mother's Embrace",
+   "status": "covered",
+   "note": "Strength, life and cold resistance with strongly longer flask effects. The reference has minions drink the wearer's flasks with their own duration bonus and cheaper charges; the bonus is given to the wearer (longer flask duration, more flask charges gained) and the minion-use line is dropped."
+  },
+  "sappersGirdle": {
+   "ref": "Siegebreaker",
+   "status": "covered",
+   "note": "Strength, life, energy shield and chaos resistance with a minion damage bonus. The reference makes minions taunt and spread caustic ground when they die; both lines are dropped and approximated as 25 to 30% increased minion damage."
+  },
+  "ebbingCincture": {
+   "ref": "Soul Tether",
+   "status": "covered",
+   "note": "Intelligence and a bonus to energy shield with life leech that fills energy shield while on full life. The reference starts energy shield at zero, stops regeneration and drains 5% per second; approximated as no energy shield recharge (-100% recharge rate). The extra maximum energy shield from life is a flat bonus; the zero start and the drain are dropped."
+  },
+  "unboundSash": {
+   "ref": "The Flow Untethered",
+   "status": "covered",
+   "note": "Attack and cast speed with faster recovery. The recovery lines are approximated as 1% life regeneration and increased energy shield recharge rate; the granted time-stopping summon, cooldown recovery and faster debuff expiry are dropped."
+  },
+  "unfedGirdle": {
+   "ref": "Umbilicus Immortalis",
+   "status": "covered",
+   "note": "Higher maximum life and 2% life regeneration, traded against flasks: flask effect is reduced by 100% so flasks do nothing for the wearer. The reference lets flasks work on zombies and spectres instead; that is dropped."
+  },
+  "vanguardMail": {
+   "ref": "Ambu's Charge",
+   "status": "covered",
+   "note": "Heavy armour and energy shield with life, elemental resistances and regeneration after being hit. Gaining an endurance charge when taking a critical strike is approximated as a chance to gain an endurance charge whenever you are hit; sharing charges with allies is dropped."
+  },
+  "gorewritHauberk": {
+   "ref": "Bloodbond",
+   "status": "covered",
+   "note": "Evasion and energy shield, life, regeneration and minion life with a granted offering skill. The blood offering has no analog; the flesh offering analog (Flesh Surge Rite, level 15) stands in. The minion dodge line is dropped."
+  },
+  "gemweaverHabit": {
+   "ref": "Dialla's Malefaction",
+   "status": "covered",
+   "note": "A robe built around its gems. The colour-dependent rules (red gems one level higher, green quality, blue experience, ignoring socket colour, no attribute requirements) are replaced by a flat +2 to the level of socketed gems."
+  },
+  "thornwoodHide": {
+   "ref": "Queen of the Forest",
+   "status": "covered",
+   "note": "A high evasion hide with life and elemental resistances and a movement speed penalty. The reference gains 1% movement speed per 600 evasion; approximated as a flat +35% movement speed offsetting most of the penalty. The reduced physical damage from animals is dropped."
+  },
+  "evermoreRaiment": {
+   "ref": "The Eternity Shroud",
+   "status": "covered",
+   "note": "Evasion and energy shield, life and chaos resistance, with a trigger that restores life when you are hit (a life recovery stands in for the triggered healing skill) and extra chaos damage from elemental damage (assuming two matching items). The chaos-resistance ignore line is dropped."
+  },
+  "paleBastion": {
+   "ref": "The Ivory Tower",
+   "status": "covered",
+   "note": "Intelligence and mana with part of the damage taken from mana before life (the reference does this only for chaos damage; here a 30% share of all damage), and faster energy shield recharge standing in for regenerating 2% of energy shield per second. The energy shield per reserved life is dropped."
+  },
+  "snarebinderVest": {
+   "ref": "Tinkerskin",
+   "status": "covered",
+   "note": "Evasion and energy shield with life. Recovering life and energy shield and gaining frenzy charges when your trap is triggered are approximated as recovery and a frenzy charge chance when your trap hits an enemy. The trap throwing cooldown line and the phasing chance are dropped."
+  },
+  "charnelTreads": {
+   "ref": "Bubonic Trail",
+   "status": "covered",
+   "note": "Life and big movement speed with a flat 10% increased damage standing in for the abyssal jewel bonus. The triggered corpse skill is dropped."
+  },
+  "patientTreads": {
+   "ref": "Ralakesh's Impatience",
+   "status": "covered",
+   "note": "Cold and chaos resistance and movement speed. Gaining a random charge each second while stationary is approximated as a chance to gain each of frenzy, endurance and power charges on hit; losing the charges on moving is dropped."
+  },
+  "hazardSlippers": {
+   "ref": "Steppan Eard",
+   "status": "covered",
+   "note": "Energy shield and 30% movement speed. The ground-effect lines are approximated by the matching state on the wearer: damage while ignited (burning ground), movement speed while shocked (shocked ground) and life regeneration while chilled (chilled ground)."
+  },
+  "stainedMitts": {
+   "ref": "Blasphemer's Grasp",
+   "status": "covered",
+   "note": "Dexterity, evasion and energy shield, life. The per-influenced-item bonuses are approximated with a flat life and ailment effect bonus (assuming two matching items); the damage over time multiplier and the flask ailment removal are dropped."
+  },
+  "gloamcasterGrips": {
+   "ref": "Command of the Pit",
+   "status": "covered",
+   "note": "Cast speed and life. The abyssal jewel conditions are dropped: gaining arcane surge on spell hits is given as a plain chance, and the minion accuracy line is dropped."
+  },
+  "barnacleGauntlets": {
+   "ref": "Craiceann's Pincers",
+   "status": "covered",
+   "note": "Armour, large life regeneration and fire resistance. The damage per crab barrier is approximated as a flat 12% increased damage; the barrier-refill chance is dropped."
+  },
+  "sapperMitts": {
+   "ref": "Machina Mitts",
+   "status": "covered",
+   "note": "A big evasion and energy shield gauntlet; leech of mine damage as life is kept (a 1% life leech from mine skills). The power-charge recovery trade and the charge decay are dropped."
+  },
+  "fetterbreakGauntlets": {
+   "ref": "Shackles of the Wretched",
+   "status": "covered",
+   "note": "Stun recovery and ailment protection. Not being re-chilled, frozen, ignited or shocked for a few seconds is approximated as a 40% chance to avoid each. Reflected curses and frenzy charges to allies on death are dropped."
+  },
+  "gravehandGauntlets": {
+   "ref": "Tombfist",
+   "status": "covered",
+   "note": "Attack speed and life. The jewel-gated intimidate and maim on hit are approximated as a flat 15% increased attack damage."
+  },
+  "packmasterMesh": {
+   "ref": "Triad Grip",
+   "status": "covered",
+   "note": "Armour and energy shield with strongly increased minion damage. The socket-colour conversions of minion damage and the chance for minions to freeze, shock and ignite are dropped and replaced by a flat 30% increased minion damage."
+  },
+  "bronzecladGrips": {
+   "ref": "Vaal Caress",
+   "status": "covered",
+   "note": "Armour and evasion, life and cold resistance with a bonus to socketed gem level (+1 to all socketed gems, as vaal gems do not exist) and a chance to gain onslaught when casting standing in for onslaught on vaal skill use."
+  },
+  "earthwrightGrips": {
+   "ref": "Worldcarver",
+   "status": "covered",
+   "note": "Accuracy, armour and evasion, life. The map-modifier scaling is approximated as flat attack damage and attack speed (assuming two modifiers); the triggered mana-spent skill is dropped."
+  },
+  "barnacleCrown": {
+   "ref": "Craiceann's Chitin",
+   "status": "covered",
+   "note": "Armour and energy shield with life and spell block. The block bonuses at crab barrier counts are approximated as a flat +5% attack block; barrier retention is dropped."
+  },
+  "gildedDiadem": {
+   "ref": "Crown of the Tyrant",
+   "status": "covered",
+   "note": "Life, added fire, cold and lightning damage and enemy resistance penetration. The per-socket added damage is given once for each colour (as if one of each socket colour, to the wearer only), the white-socket chaos damage is dropped, and the nearby enemy resistance reduction becomes 10% elemental penetration."
+  },
+  "basaltVisage": {
+   "ref": "Gorgon's Gaze",
+   "status": "covered",
+   "note": "Big energy shield mask with life, attack and cast speed, less elemental damage taken while still, and extra physical damage reduction while moving. The granted statue skill is dropped (no counterpart)."
+  },
+  "mendingCage": {
+   "ref": "Hale Negator",
+   "status": "covered",
+   "note": "Maximum life with life and energy shield recovered when a big hit lands. The spirit charge system (gain one a second, lose all on a savage hit, recover on loss) is approximated as two triggers that recover life and energy shield after taking a heavy hit; the abyss socket and charge-per-jewel lines are dropped."
+  },
+  "fluxCirclet": {
+   "ref": "Indigon",
+   "status": "covered",
+   "note": "Energy shield and maximum mana with a big spell damage bonus paid for by higher skill costs. The reference scales both with mana spent recently; here they are flat (spell damage and spell cost increases). The mana flask life recovery lines are dropped."
+  },
+  "wispCrown": {
+   "ref": "Lightpoacher",
+   "status": "covered",
+   "note": "All elemental resistances and a chance on kill to recover life, standing in for the spirit charge cycle (gain on kill, recover when it expires). The triggered burst skill and charge-per-jewel lines are dropped."
+  },
+  "wellspringHelm": {
+   "ref": "Mask of the Spirit Drinker",
+   "status": "covered",
+   "note": "Armour and energy shield mask with life. The life regeneration tiers (50, 100 or 150 a second at 500, 1000 or 1500 maximum energy shield) become a flat 100 a second; the energy shield drawbacks (starts at zero, cannot gain) are approximated as no energy shield recharge."
+  },
+  "seamedCrown": {
+   "ref": "Mask of the Stitched Demon",
+   "status": "covered",
+   "note": "Big intelligence and energy shield, with life gained per two intelligence and a percentage life regeneration standing in for the regeneration per 500 energy shield. The attribute bonus removal lines are dropped, and the energy shield drawbacks are approximated as no energy shield recharge."
+  },
+  "reservoirCrown": {
+   "ref": "Memory Vault",
+   "status": "covered",
+   "note": "Energy shield, mana, regeneration and fire resistance with a mana reservation penalty. The armour equal to reserved mana becomes a flat armour bonus."
+  },
+  "hushedMuzzle": {
+   "ref": "Scold's Bridle",
+   "status": "covered",
+   "note": "Strong spell damage and mana at a cast speed cost. The self damage taken as a share of skill mana costs is dropped."
+  },
+  "bonecrestHelm": {
+   "ref": "Skullhead",
+   "status": "covered",
+   "note": "Armour, evasion, life, mana and elemental resistance. The minion defence lines (block, armour, regeneration) are given to the wearer instead: block chance, flat armour and a small percentage life regeneration."
+  },
+  "shrinekeeperMask": {
+   "ref": "The Gull",
+   "status": "covered",
+   "note": "Evasion and energy shield with life and cold resistance. The shrine created on kill is approximated as a chance to gain the onslaught buff on kill (one of the shrine effects); the shrine effect and duration bonuses are dropped."
+  },
+  "duskwardHelm": {
+   "ref": "Veil of the Night",
+   "status": "covered",
+   "note": "Global defences and stun recovery in exchange for the elemental resistance penalty, written as maximum elemental resistances lowered to zero (resistances cannot go above zero). The lightning reflection on block is dropped."
+  },
+  "lanternCirclet": {
+   "ref": "Wreath of Phrecia",
+   "status": "covered",
+   "note": "Deals no chaos damage. The light radius rules (increases also apply to damage and, at half value, to area of effect) are written as their payoff: flat increased damage and area of effect, using the light radius range. The attribute requirement removal is dropped."
+  },
+  "spectrumBlade": {
+   "ref": "Prismatic Eclipse",
+   "status": "covered",
+   "note": "Accuracy and added physical with block while dual wielding. The socket colour rules are written for one red, one green and one blue socket: physical damage, attack speed and mana leech. The white socket melee range line is dropped."
+  },
+  "centurionEdge": {
+   "ref": "Scaeva",
+   "status": "covered",
+   "note": "Heavy added physical and crit chance, with the main hand crit bonus applied flat. The socket colour rules are written for one red, one green and one blue socket: life leech, critical multiplier and mana leech. The white socket defences and the off hand block lines are dropped."
+  },
+  "dreamtideCutlass": {
+   "ref": "United in Dream",
+   "status": "covered",
+   "note": "Strongly increased minion damage and accuracy, plus the granted Envy aura approximated as a flat increase to chaos damage (no skill, no reservation). The minion poison and leech lines are dropped."
+  },
+  "hallowedDiamond": {
+   "ref": "Gifts from Above",
+   "status": "covered",
+   "note": "Strong critical strike chance. The consecrated ground (triggered on critical strike) is written as its payoff while you have crit recently: more damage and extra block chance. The item rarity on critical kills line is dropped."
+  },
+  "blankBand": {
+   "ref": "Malachai's Artifice",
+   "status": "covered",
+   "note": "Lowered elemental resistances offset by a huge fire resistance bonus: the reference gives the bonus to the resistance matching the colour of the socketed gem, here fire is chosen (a single socket supports one colour). White sockets and the elemental equilibrium socket effect are dropped."
+  },
+  "twinMoonRing": {
+   "ref": "Shavronne's Revelation",
+   "status": "covered",
+   "note": "Energy shield and intelligence, with the left ring slot effects given to the wearer: extra energy shield and mana regeneration per second, and no energy shield recharge. The right ring slot lines are dropped."
+  },
+  "outcastBand": {
+   "ref": "The Pariah",
+   "status": "covered",
+   "note": "Higher socketed gem levels with attack and cast speed. The per socket colour bonuses are written for a single red socket: a large flat life bonus. The other colours (energy shield, mana, item quantity) are dropped."
+  },
+  "brittleMoonring": {
+   "ref": "Valyrium",
+   "status": "covered",
+   "note": "Energy shield and fire resistance paid for by cold resistance. Basing stun threshold on energy shield is approximated as a lowered stun threshold."
+  },
+  "tidalSceptre": {
+   "ref": "Augyre",
+   "status": "covered",
+   "note": "Huge physical damage, speed and crit with half converted to lightning. The sixteen second overload and resolute technique cycle is written with the existing overload state (after a recent critical strike): more elemental damage while it is active, and increased physical damage while it is not."
+  },
+  "ashenFetish": {
+   "ref": "Earendel's Embrace",
+   "status": "covered",
+   "note": "All attributes and strongly increased minion damage. The skeleton fire lines (ash on hit, fire damage taken, avatar of fire) are dropped."
+  },
+  "polarSceptre": {
+   "ref": "Nebulis",
+   "status": "covered",
+   "note": "Elemental damage and cast speed. The cold and lightning damage gained per resistance above 75% is written as a flat increase to each."
+  },
+  "veilcasterWard": {
+   "ref": "Kongming's Stratagem",
+   "status": "covered",
+   "note": "Spell damage, intelligence and energy shield with no block chance. The blinded enemy bonuses are written flat (more fire damage); the reduced spell damage taken from blinded enemies and the trap smoke triggers are dropped."
+  },
+  "wellburstWard": {
+   "ref": "Manastorm",
+   "status": "covered",
+   "note": "Mana, mana regeneration, mana on kill and flask mana recovery with spell damage. Sacrificing all mana on cast for added lightning damage is approximated as flat added maximum lightning damage to spells."
+  },
+  "crimsonStandard": {
+   "ref": "Redblade Banner",
+   "status": "covered",
+   "note": "Life, armour and block on a tower shield. Leech against taunted enemies is written as flat attack life leech; the warcry cooldown speed and life on taunt lines are dropped (no taunt or warcry cooldown)."
+  },
+  "everfruitWard": {
+   "ref": "The Eternal Apple",
+   "status": "covered",
+   "note": "Life and chaos resistance, with no block. The warcry triggered when losing endurance charges is written as a warcry cast after taking a heavy hit; the endurance charge and cooldown lines are dropped."
+  },
+  "glarewand": {
+   "ref": "Corona Solaris",
+   "status": "covered",
+   "note": "Added physical and critical multiplier. The blinded enemy bonuses are written against nearby enemies (the reference aura blinds everything near you): huge crit chance and added fire damage to attacks. The granted blinding aura is dropped."
+  },
+  "sunderStaff": {
+   "ref": "Disintegrator",
+   "status": "covered",
+   "note": "Huge added physical damage, block and added physical to spells. The siphoning charges are written for a single always-on charge: added physical to attacks and spells, extra chaos damage, extra physical reduction and life leech. The physical damage taken per second is dropped."
   }
  }
 }

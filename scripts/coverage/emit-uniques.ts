@@ -206,9 +206,7 @@ function check(file: string): void {
       if (
         !STAT_TEXT[m.stat] &&
         !['damage', 'damage.min', 'damage.max'].includes(m.stat) &&
-        !/^(convertSkill|gain|convert|chargeOn|buffOn|rageOn|recover|recoverPct|resist|max|duration|effect|chance)./.test(
-          m.stat,
-        )
+        !/^(convertSkill|gain|convert)[.]/.test(m.stat)
       )
         bad(`unknown stat ${m.stat}`);
       if (m.min > m.max && m.min >= 0) bad(`mod ${m.stat}: min ${m.min} is above max ${m.max}`);
