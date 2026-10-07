@@ -544,6 +544,106 @@
    "ref": "Frost Bomb",
    "status": "covered",
    "note": "A cold crystal that pulses for two seconds (the lowered cold resistance and regeneration debuff are dropped)."
+  },
+  "scatterBolt": {
+   "ref": "Kinetic Blast",
+   "status": "covered",
+   "note": "A wand shot that bursts into four smaller bursts at the target (the clusters are folded into one burst)."
+  },
+  "stormArrow": {
+   "ref": "Lightning Arrow",
+   "status": "covered",
+   "note": "An arrow that is half lightning and arcs to up to three other enemies near the target, with a stronger shock."
+  },
+  "boltCleave": {
+   "ref": "Lightning Strike",
+   "status": "covered",
+   "note": "A strike that sends lightning projectiles from the target (modelled as a fan of lightning projectiles)."
+  },
+  "crackleRing": {
+   "ref": "Lightning Tendrils",
+   "status": "covered",
+   "note": "A channelled pulse of lightning around the caster that grows every fourth pulse (the larger pulse is averaged)."
+  },
+  "slagBlow": {
+   "ref": "Molten Strike",
+   "status": "covered",
+   "note": "A strike that is mostly fire and throws molten balls from the target."
+  },
+  "tempestMote": {
+   "ref": "Orb of Storms",
+   "status": "covered",
+   "note": "A slow orb that calls down lightning bolts around it for six seconds."
+  },
+  "spearBurst": {
+   "ref": "Perforate",
+   "status": "covered",
+   "note": "Spears of force burst from the ground in front of the character (the stance is dropped)."
+  },
+  "venomStrike": {
+   "ref": "Pestilent Strike",
+   "status": "covered",
+   "note": "A strike that is half chaos with a good chance to poison, and bursts the poison on nearby enemies (the burst is dropped)."
+  },
+  "mindDrain": {
+   "ref": "Power Siphon",
+   "status": "covered",
+   "note": "A wand volley that culls weak enemies and gains Insight charges from strong ones."
+  },
+  "gougeShot": {
+   "ref": "Puncture",
+   "status": "covered",
+   "note": "A stab or shot that always bleeds, with the bleed lasting eight seconds."
+  },
+  "arrowShower": {
+   "ref": "Rain of Arrows",
+   "status": "covered",
+   "note": "A wide volley that falls on an area (modelled as a ground zone that pulses once)."
+  },
+  "sweepingCut": {
+   "ref": "Reave",
+   "status": "covered",
+   "note": "A sweep of the weapon that builds in area with each use (the stacks are averaged into a larger sweep)."
+  },
+  "searingLance": {
+   "ref": "Scorching Ray",
+   "status": "covered",
+   "note": "A channelled ray of fire that burns longer on the same target and lowers fire resistance (the stacks are averaged)."
+  },
+  "splinterVolley": {
+   "ref": "Shattering Steel",
+   "status": "covered",
+   "note": "Throws a spread of steel shards that hit hardest up close, with a chance to impale."
+  },
+  "staticRing": {
+   "ref": "Shock Nova",
+   "status": "covered",
+   "note": "Two rings of lightning that expand from the caster, with a stronger shock."
+  },
+  "skitterFlash": {
+   "ref": "Spark",
+   "status": "covered",
+   "note": "A cloud of erratic sparks that fly in all directions for two seconds."
+  },
+  "phantomToss": {
+   "ref": "Spectral Throw",
+   "status": "covered",
+   "note": "Throws a spectral weapon that flies out and back, hitting on both legs."
+  },
+  "chargedBlow": {
+   "ref": "Static Strike",
+   "status": "covered",
+   "note": "A heavy strike that is mostly lightning and zaps nearby enemies for four seconds (the zaps are averaged)."
+  },
+  "skyfall": {
+   "ref": "Storm Call",
+   "status": "covered",
+   "note": "Calls bolts of lightning down on the area around the caster for 1.5 seconds (the delayed second strike is dropped)."
+  },
+  "ruptureLine": {
+   "ref": "Sunder",
+   "status": "covered",
+   "note": "A slam that sends a shockwave forward with a weaker second wave (the waves are averaged)."
   }
  },
  "uniques": {
