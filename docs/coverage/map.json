@@ -5240,7 +5240,7 @@
   "gravecallCirclet": {
    "ref": "Wraithlord",
    "status": "covered",
-   "note": "Plus two to socketed minion gems with a lot of energy shield. Minion life regeneration (every minion regenerates a little already) and spectre life (no spectres) are dropped."
+   "note": "Plus two to socketed minion gems with a lot of energy shield. Minions mend a share of their life each second; spectre life is dropped (no spectres)."
   },
   "twinflameHatchet": {
    "ref": "Dyadus",

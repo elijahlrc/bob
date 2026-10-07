@@ -483,6 +483,7 @@ rule(/^Minions deal # increased Damage$/, (_m, n) => [mk('minionDamage', 'inc', 
 rule(/^Minions have # increased Movement Speed$/, (_m, n) => [mk('minionSpeed', 'inc', n[0])]);
 rule(/^Minions have # increased Attack Speed$/, (_m, n) => [mk('minionSpeed', 'inc', n[0])]);
 rule(/^Minions have # increased maximum Life$/i, (_m, n) => [mk('minionLife', 'inc', n[0])]);
+rule(/^Minions Regenerate # Life per second$/i, (_m, n) => [mk('minionRegen', 'base', n[0])]);
 rule(/^Minions have # reduced maximum Life$/i, (_m, n) => [mk('minionLife', 'inc', neg(n[0]))]);
 rule(/^# to Maximum number of (?:Skeletons|Zombies|Spectres|Raging Spirits|Golems)$/, (_m, n) => [
   mk('minionCount', 'base', n[0]),

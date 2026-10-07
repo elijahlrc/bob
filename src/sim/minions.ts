@@ -60,7 +60,13 @@ export function summonMinions(w: World, c: SkillChoice, prof: SkillProfile): voi
   for (const m of w.minions) if (m.key === c.key && m.alive) m.t = u.seconds ?? Infinity;
   const p = w.player;
   const def = MINIONS[u.minion];
-  const body = minionBody(u.minion, w.plan.areaLevel, prof.minionLife, prof.minionTaken);
+  const body = minionBody(
+    u.minion,
+    w.plan.areaLevel,
+    prof.minionLife,
+    prof.minionTaken,
+    prof.minionRegen,
+  );
   for (let i = have; i < n; i++) {
     const ang = (i / n) * Math.PI * 2;
     const spot = w.grid.collide(p.x + Math.cos(ang) * 1.2, p.y + Math.sin(ang) * 1.2, def.r);

@@ -256,4 +256,15 @@ describe('mortal minions', () => {
     const sturdy = new Character(b, { areaLevel: 30 }).sheet().minionDps;
     expect(sturdy).toBeGreaterThan(plain);
   });
+
+  it('minions mend only when something gives them regeneration', () => {
+    expect(minionBody('zombie', 30, 1, 1).def.lifeRegen).toBe(0);
+    const mends = minionBody('zombie', 30, 1, 1, 1);
+    expect(mends.def.lifeRegen).toBeCloseTo(mends.life * 0.01, 3);
+    const w = arena();
+    const [a] = summon(w);
+    a.life = a.def.maxLife / 2;
+    run(w, 5);
+    expect(a.life).toBe(a.def.maxLife / 2);
+  });
 });

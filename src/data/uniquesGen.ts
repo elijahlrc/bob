@@ -9794,6 +9794,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     mods: [
       m('socketedGemLevel', 'base', 2, 2, { tags: ['minion'] }),
       m('es', 'inc', 120, 150, { local: true }),
+      m('minionRegen', 'base', 1),
     ],
     flavour: 'Names the dead, and they come.',
   },

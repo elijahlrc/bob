@@ -7,8 +7,6 @@ import { defenceFromDb } from './defence';
 import { monsterArmour, monsterHit, monsterLife } from './formulas';
 import { MONSTER_CONDS } from './monster';
 
-/** Life regenerated each second, as a share of a minion's life. */
-export const MINION_REGEN_PCT = 1;
 /** Movement the defence block reports; the sim moves minions by their own speed. */
 const MINION_MOVE = 1;
 
@@ -21,7 +19,7 @@ const cache = new Map<string, MinionBody>();
 
 /**
  * What a minion of a kind is made of at a level: monsters' life and armour at that level, scaled by the kind's
- * share, the life multiplier of the summoning skill and the damage-taken multiplier. Memoised: a summon asks again
+ * share, the life multiplier of the summoning skill, the damage-taken multiplier and any regeneration it grants. Memoised: a summon asks again
  * every time one falls.
  */
 export function minionBody(
@@ -29,8 +27,9 @@ export function minionBody(
   level: number,
   lifeMult: number,
   takenMult: number,
+  regenPct = 0,
 ): MinionBody {
-  const key = `${kind}|${level}|${lifeMult.toFixed(3)}|${takenMult.toFixed(3)}`;
+  const key = `${kind}|${level}|${lifeMult.toFixed(3)}|${takenMult.toFixed(3)}|${regenPct}`;
   const hit = cache.get(key);
   if (hit) return hit;
   const m = MINIONS[kind];
@@ -43,7 +42,8 @@ export function minionBody(
     mod('armour', 'base', monsterArmour(level)),
     mod('moveSpeed', 'base', MINION_MOVE),
     mod('resist.allEle', 'base', m.res),
-    mod('lifeRegenPct', 'base', MINION_REGEN_PCT),
+    // Minions have no regeneration of their own: it comes from gear that says so (the minionRegen stat).
+    mod('lifeRegenPct', 'base', regenPct),
   ];
   const db = new ModDB(
     mods.map((x) => ({ ...x, source: { kind: 'monster', id: `minion_${kind}` } })),

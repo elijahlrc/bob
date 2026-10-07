@@ -94,6 +94,8 @@ export type SkillProfile = {
   /** Multipliers on their life and on the damage they take. */
   minionLife: number;
   minionTaken: number;
+  /** Percent of its life a minion mends each second (minions have none of their own). */
+  minionRegen: number;
   minionCount: number;
   /** How many totems or brands can stand, or traps or mines go off, at once (1 and the support mods). */
   deployCount: number;
@@ -393,6 +395,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     minionSpeed: db.mult('minionSpeed', baseCtx),
     minionLife: db.mult('minionLife', baseCtx),
     minionTaken: db.mult('minionTaken', baseCtx),
+    minionRegen: db.sum('base', 'minionRegen', baseCtx),
     minionCount: Math.round(db.sum('base', 'minionCount', baseCtx)),
     cost: Math.max(
       0,

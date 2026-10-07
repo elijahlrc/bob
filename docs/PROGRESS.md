@@ -556,7 +556,7 @@ Minions used to be untouchable (a departure from PoE that made them far stronger
 - **Life and defence.** A minion is an `Actor` of the player's side kept in `w.minions` (not `w.actors`, so no monster-only code
   sees it). Its life is a normal monster's life at the map level, scaled by the kind's share (`MinionDef.life`: skeletons 0.5,
   zombies 1.4, golems 2.4 to 3) and by the summoning skill's `minionLife`; it has the monster armour curve, the kind's elemental
-  resistance, and regenerates 1% of its life a second (`src/calc/minion.ts`, memoised). `minionTaken` (less damage taken) scales
+  resistance, and has no regeneration of its own (as in PoE; the `minionRegen` stat, from gear, gives some) (`src/calc/minion.ts`, memoised). `minionTaken` (less damage taken) scales
   what it suffers. Ailments, stun and freeze work on it like on any actor.
 - **Who hits them.** Enemies go for the player first. A melee monster that has been held up (it keeps walking and barely moves,
   0.35 s) hits a minion within reach; a ranged monster that cannot hit the player from where it stands shoots a minion it can see
@@ -571,8 +571,9 @@ Minions used to be untouchable (a departure from PoE that made them far stronger
 - **Calc.** `minionDps` is multiplied by an uptime from life against the hits of the map (`minionUptime`, fragility 4), tuned to
   probe runs on real maps with a summoner: skeletons 0.75 to 0.95 standing, zombies and golems nearly always.
 - **Seen in probe runs.** Because enemies prefer the player, minions take a few hundred to a couple of thousand damage over a
-  map and seldom die. Tuning knobs if that proves too safe: the respawn times, the regen, the 0.35 s hold-up time, or
-  letting monsters pick the nearest of player and minion instead of the player first.
+  map. With no regeneration (probe runs on maps 10 to 50) zombies fall 0 to 5 times a map and skeletons 0 to 13, standing
+  about 0.93 to 0.97 of the time; golems rarely fall. Tuning knobs if that proves too safe: the respawn times, the 0.35 s
+  hold-up time, or letting monsters pick the nearest of player and minion instead of the player first.
 - **Not done.** Minions do not draw aggro on their own (no taunt, no "nearest target" rule), and Meat Shield does not
   redirect hits. Flame and ice golem buffs to the owner are unchanged.
 
