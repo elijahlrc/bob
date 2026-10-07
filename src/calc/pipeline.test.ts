@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Rng } from '../core/rng';
 import { ModDB } from '../mods/modDb';
-import { mod } from '../mods/types';
+import { condBit, mod } from '../mods/types';
 import { dummyDefence } from '../sim/dummy';
 import {
   ailBaseOf,
@@ -269,6 +269,43 @@ describe('§6.6 ailments', () => {
       new ModDB([...chances, mod('damage', 'inc', 100, { damageTypes: ['fire'] })]),
     );
     expect(fire.bleed).toBeCloseTo(plain.bleed);
+  });
+  it('an ailment takes the modifiers of the type it deals, whatever the hit was (3.9)', () => {
+    const plain = ailmentsOf(new ModDB(chances));
+    // The hit is physical: bleed (physical) takes physical mods, poison (chaos) takes chaos mods.
+    const phys = ailmentsOf(
+      new ModDB([...chances, mod('damage', 'inc', 100, { damageTypes: ['physical'] })]),
+    );
+    expect(phys.bleed).toBeCloseTo(plain.bleed * 2);
+    expect(phys.poison).toBeCloseTo(plain.poison);
+    const chaos = ailmentsOf(
+      new ModDB([...chances, mod('damage', 'inc', 100, { damageTypes: ['chaos'] })]),
+    );
+    expect(chaos.poison).toBeCloseTo(plain.poison * 2);
+    expect(chaos.bleed).toBeCloseTo(plain.bleed);
+  });
+  it('a condition on the target does not reach damage over time', () => {
+    const p = profile(
+      new ModDB([...chances, mod('damage', 'inc', 100, { condition: { id: 'targetIgnited' } })]),
+    );
+    const plain = profile(new ModDB(chances));
+    const withTarget = buildProfile({
+      skill: DEFAULT_ATTACK,
+      db: new ModDB([
+        ...chances,
+        mod('damage', 'inc', 100, { condition: { id: 'targetIgnited' } }),
+      ]),
+      hands: [hand(10, 20)],
+      extraTags: [],
+      costMult: 1,
+      conds: condBit('targetIgnited'),
+      statValue: () => 0,
+    });
+    // The hit is doubled by the condition; the poison and bleed bases are not.
+    expect(withTarget.hands[0].chunks[0].max / plain.hands[0].chunks[0].max).toBeCloseTo(2);
+    expect(withTarget.hands[0].ailChunks[0].k[1]).toBeCloseTo(1);
+    expect(withTarget.hands[0].ailChunks[0].k[2]).toBeCloseTo(1);
+    expect(p.hands[0].ailChunks[0].k[1]).toBeCloseTo(1);
   });
   it('shock and chill use mag(r, cap) and the 5% floor', () => {
     const p = profile(new ModDB([mod('chance.shock', 'base', 100)]));

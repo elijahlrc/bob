@@ -19,7 +19,10 @@ import {
   type DamageType,
   type SkillTag,
   type StatId,
+  maskAnd,
   maskOr,
+  CONDITIONS,
+  condBit,
 } from '../mods/types';
 import type { SkillDef } from './gems';
 
@@ -148,6 +151,11 @@ export type ProfileInput = {
 };
 
 const DOT_TAGS = tagBit('dot');
+/** Conditions about the player, not the target: the only ones that reach damage over time. */
+const NOT_TARGET_CONDS = CONDITIONS.reduce(
+  (m, c) => (c.startsWith('target') ? m : maskOr(m, condBit(c))),
+  0,
+);
 
 function ctxOf(tags: number, conds: number, statValue: (s: StatId) => number, anc = 0): ModCtx {
   return { tags, ancestry: anc, conds, statValue };
@@ -262,15 +270,18 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     let hitMultAcc = 0;
     let hitW = 0;
     const ailChunks: AilChunk[] = [];
+    const ownConds = maskAnd(conds, NOT_TARGET_CONDS);
+    const ak = (tag: SkillTag, anc: number) =>
+      db.mult('damage', ctxOf(maskOr(DOT_TAGS, tagBit(tag)), ownConds, statValue, anc));
     for (const c of chunks) {
       const cctx = { ...ctx, ancestry: c.anc };
-      const ak = (tag: SkillTag) =>
-        db.mult('damage', ctxOf(maskOr(DOT_TAGS, tagBit(tag)), conds, statValue, c.anc));
+      // An ailment takes the modifiers of the type it deals (ignite fire, bleed physical, poison chaos), whatever type
+      // the hit was, and no condition on the target (3.9).
       ailChunks.push({
         type: c.type,
         min: c.min,
         max: c.max,
-        k: [ak('ignite'), ak('bleed'), ak('poison')],
+        k: [ak('ignite', 1 << FIRE), ak('bleed', 1 << PHYS), ak('poison', 1 << CHAOS)],
       });
       let m = db.mult('damage', cctx);
       if (spellIncOnAttacks) {
