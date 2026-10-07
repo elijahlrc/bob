@@ -1,0 +1,27 @@
+[
+  { "ref": "Multiple Projectiles Support", "note": "Two more projectiles, quicker, at the cost of less damage.",
+    "def": { "kind": "support", "id": "tripleShot", "name": "Triple Shot", "attr": "dex", "supports": ["projectile"], "excludes": ["channelling"], "costMult": 1.5, "mods": [
+      { "stat": "projectiles", "kind": "base", "value": 2 },
+      { "stat": "attackSpeed", "kind": "more", "value": 10 },
+      { "stat": "castSpeed", "kind": "more", "value": 10 },
+      { "stat": "damage", "kind": "more", "value": -18 } ],
+      "description": "Two more projectiles, a little faster, each hitting less hard." } },
+  { "ref": "Life Gain on Hit Support", "note": "Attacks gain life for each enemy hit.",
+    "def": { "kind": "support", "id": "bloodRefund", "name": "Blood Refund", "attr": "str", "supports": ["attack"], "costMult": 1.5, "mods": [
+      { "stat": "lifeOnHit", "kind": "base", "value": [3, 22] } ],
+      "description": "Attacks restore life for each enemy they hit." } },
+  { "ref": "Critical Strike Affliction Support", "note": "More critical strike chance, and ailments from critical strikes deal more damage over time.",
+    "def": { "kind": "support", "id": "festeringCrit", "name": "Festering Crit", "attr": "dex", "supports": [], "costMult": 1.2, "mods": [
+      { "stat": "critChance", "kind": "inc", "value": [30, 49] },
+      { "stat": "damage", "kind": "more", "value": [25, 44], "tags": ["dot"], "condition": { "id": "critRecently" } } ],
+      "description": "More critical strike chance, and damaging ailments caused by crits hurt more." } },
+  { "ref": "Ruthless Support", "note": "Every third melee hit deals far more damage (averaged over the three hits).",
+    "def": { "kind": "support", "id": "mercilessCadence", "name": "Merciless Cadence", "attr": "str", "supports": ["melee"], "excludes": ["channelling"], "costMult": 1.1, "mods": [
+      { "stat": "damage", "kind": "more", "value": [25, 44], "tags": ["melee"] },
+      { "stat": "damage", "kind": "more", "value": [25, 44], "tags": ["bleed"] } ],
+      "description": "Every third melee hit lands with great force; averaged here as more melee and bleed damage." } },
+  { "ref": "Infused Channelling Support", "note": "More damage for channelled skills (the barrier that cuts damage taken is dropped).",
+    "def": { "kind": "support", "id": "chargedBreath", "name": "Charged Breath", "attr": "int", "supports": ["channelling"], "costMult": 1.4, "mods": [
+      { "stat": "damage", "kind": "more", "value": [20, 39] } ],
+      "description": "Channelled skills deal more damage." } }
+]

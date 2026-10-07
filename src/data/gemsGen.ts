@@ -3868,4 +3868,118 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     ],
     description: 'Gains physical damage as chaos, and leaves the target open to chaos.',
   },
+  {
+    kind: 'support',
+    id: 'tripleShot',
+    name: 'Triple Shot',
+    attr: 'dex',
+    supports: ['projectile'],
+    excludes: ['channelling'],
+    costMult: 1.5,
+    mods: [
+      {
+        stat: 'projectiles',
+        kind: 'base',
+        value: 2,
+      },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: 10,
+      },
+      {
+        stat: 'castSpeed',
+        kind: 'more',
+        value: 10,
+      },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: -18,
+      },
+    ],
+    description: 'Two more projectiles, a little faster, each hitting less hard.',
+  },
+  {
+    kind: 'support',
+    id: 'bloodRefund',
+    name: 'Blood Refund',
+    attr: 'str',
+    supports: ['attack'],
+    costMult: 1.5,
+    mods: [
+      {
+        stat: 'lifeOnHit',
+        kind: 'base',
+        value: [3, 22],
+      },
+    ],
+    description: 'Attacks restore life for each enemy they hit.',
+  },
+  {
+    kind: 'support',
+    id: 'festeringCrit',
+    name: 'Festering Crit',
+    attr: 'dex',
+    supports: [],
+    costMult: 1.2,
+    mods: [
+      {
+        stat: 'critChance',
+        kind: 'inc',
+        value: [30, 49],
+      },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [25, 44],
+        tags: ['dot'],
+        condition: {
+          id: 'critRecently',
+        },
+      },
+    ],
+    description: 'More critical strike chance, and damaging ailments caused by crits hurt more.',
+  },
+  {
+    kind: 'support',
+    id: 'mercilessCadence',
+    name: 'Merciless Cadence',
+    attr: 'str',
+    supports: ['melee'],
+    excludes: ['channelling'],
+    costMult: 1.1,
+    mods: [
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [25, 44],
+        tags: ['melee'],
+      },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [25, 44],
+        tags: ['bleed'],
+      },
+    ],
+    description:
+      'Every third melee hit lands with great force; averaged here as more melee and bleed damage.',
+  },
+  {
+    kind: 'support',
+    id: 'chargedBreath',
+    name: 'Charged Breath',
+    attr: 'int',
+    supports: ['channelling'],
+    costMult: 1.4,
+    mods: [
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [20, 39],
+      },
+    ],
+    description: 'Channelled skills deal more damage.',
+  },
 ];

@@ -874,6 +874,31 @@
    "ref": "Withering Touch Support",
    "status": "covered",
    "note": "Gains physical damage as chaos, and the target is withered (takes more chaos damage)."
+  },
+  "tripleShot": {
+   "ref": "Multiple Projectiles Support",
+   "status": "covered",
+   "note": "Two more projectiles, quicker, at the cost of less damage."
+  },
+  "bloodRefund": {
+   "ref": "Life Gain on Hit Support",
+   "status": "covered",
+   "note": "Attacks gain life for each enemy hit."
+  },
+  "festeringCrit": {
+   "ref": "Critical Strike Affliction Support",
+   "status": "covered",
+   "note": "More critical strike chance, and ailments from critical strikes deal more damage over time."
+  },
+  "mercilessCadence": {
+   "ref": "Ruthless Support",
+   "status": "covered",
+   "note": "Every third melee hit deals far more damage (averaged over the three hits)."
+  },
+  "chargedBreath": {
+   "ref": "Infused Channelling Support",
+   "status": "covered",
+   "note": "More damage for channelled skills (the barrier that cuts damage taken is dropped)."
   }
  },
  "uniques": {
