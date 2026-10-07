@@ -13,7 +13,11 @@ import { pathToFileURL } from 'node:url';
 import { format, resolveConfig } from 'prettier';
 import { ITEM_BASES } from '../../src/data/bases';
 import { bobBaseFor } from './bobBase';
-import { COVERAGE_DIR, key, loadReference } from './reference';
+import { CONDITIONS } from '../../src/mods/types';
+import { STAT_TEXT } from '../../src/data/statText';
+import { UNIQUES } from '../../src/data/uniques';
+import { GENERATED_UNIQUES } from '../../src/data/uniquesGen';
+import { COVERAGE_DIR, key, loadPobNames, loadReference } from './reference';
 import { ctxFor, currentLines, loadPobUniques, translateLine, type ModT } from './translate';
 
 export type Decision = {
@@ -159,7 +163,69 @@ const m = (
 export const GENERATED_UNIQUES: UniqueDef[] = [
 `;
 
+/**
+ * Dry run of one decisions file (what an author runs before handing it over): every decision builds, every stat and
+ * condition it uses exists, and its name and id are free and not a reference name. Prints the problems; exit code 1
+ * if there are any. Nothing is written.
+ */
+function check(file: string): void {
+  const path = resolve(file);
+  const mine = JSON.parse(readFileSync(path, 'utf8')) as Decision[];
+  const here = path.split(String.fromCharCode(92)).join('/');
+  const others: Decision[] = [];
+  for (const f of readdirSync(DECISIONS_DIR).filter((x) => x.endsWith('.json'))) {
+    const p = resolve(DECISIONS_DIR, f).split(String.fromCharCode(92)).join('/');
+    if (p !== here) others.push(...(JSON.parse(readFileSync(p, 'utf8')) as Decision[]));
+  }
+  const generated = new Set(GENERATED_UNIQUES.map((u) => u.id));
+  const taken = new Set<string>();
+  for (const u of UNIQUES) if (!generated.has(u.id)) taken.add(key(u.name));
+  for (const d of others) taken.add(key(d.name));
+  const refNames = new Set<string>();
+  for (const n of loadPobNames().uniques) refNames.add(key(n));
+  for (const n of loadPobNames().gems) refNames.add(key(n));
+  for (const r of loadReference().uniques) refNames.add(key(r.name));
+  for (const r of loadReference().gems) refNames.add(key(r.name));
+  const ids = new Set<string>(UNIQUES.filter((u) => !generated.has(u.id)).map((u) => u.id));
+  for (const d of others) ids.add(d.id ?? camel(d.name));
+  const seenRefs = new Set(others.map((d) => key(d.ref)));
+  const problems: string[] = [];
+  const mineNames = new Set<string>();
+  for (const d of mine) {
+    const bad = (msg: string) => problems.push(`${d.ref} / ${d.name}: ${msg}`);
+    if (!d.name || !d.flavour || !d.note) bad('name, flavour and note are all required');
+    if (refNames.has(key(d.name))) bad('the name is a reference name');
+    if (taken.has(key(d.name)) || mineNames.has(key(d.name))) bad('the name is already used');
+    mineNames.add(key(d.name));
+    const id = d.id ?? camel(d.name);
+    if (ids.has(id)) bad(`the id ${id} is already used`);
+    ids.add(id);
+    if (seenRefs.has(key(d.ref))) bad('the reference unique already has a decision');
+    seenRefs.add(key(d.ref));
+    for (const m of d.mods ?? []) {
+      if (
+        !STAT_TEXT[m.stat] &&
+        !/^(convertSkill|gain|convert|chargeOn|buffOn|rageOn|recover|recoverPct|resist|max|duration|effect|chance)./.test(
+          m.stat,
+        )
+      )
+        bad(`unknown stat ${m.stat}`);
+      if (m.condition && !(CONDITIONS as readonly string[]).includes(m.condition.id))
+        bad(`unknown condition ${m.condition.id}`);
+    }
+    try {
+      build(d);
+    } catch (e) {
+      bad((e as Error).message);
+    }
+  }
+  console.log(`checked ${mine.length} decisions: ${problems.length} problems`);
+  for (const p of problems) console.log('  ' + p);
+  if (problems.length) process.exitCode = 1;
+}
+
 async function main(): Promise<void> {
+  if (process.argv[2] === '--check') return check(process.argv[3]);
   const { text, built } = await render(loadDecisions());
   writeFileSync(OUT, text);
   const mapPath = resolve(COVERAGE_DIR, 'map.json');
