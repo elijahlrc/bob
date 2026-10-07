@@ -12,7 +12,7 @@ import {
 } from '../data/monsters';
 import { mapAffixDef } from '../data/mapAffixes';
 import { ModDB } from '../mods/modDb';
-import { mod, type Mod } from '../mods/types';
+import { maskAnd, mod, type Mod } from '../mods/types';
 import type { Defence } from './combat';
 import { defenceFromDb } from './defence';
 import {
@@ -143,7 +143,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
   const profiles = new Map<number, SkillProfile>();
   const relevant = db.condsUsed();
   const profile = (conds: number) => {
-    const c = conds & relevant;
+    const c = maskAnd(conds, relevant);
     let p = profiles.get(c);
     if (!p) {
       p = buildProfile({

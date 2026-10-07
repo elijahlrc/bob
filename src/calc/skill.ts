@@ -16,6 +16,7 @@ import {
   type DamageType,
   type SkillTag,
   type StatId,
+  maskOr,
 } from '../mods/types';
 import type { SkillDef } from './gems';
 
@@ -198,7 +199,7 @@ function addedFlats(db: ModDB, ctx: ModCtx, eff: number): [number, number][] {
 export function buildProfile(inp: ProfileInput): SkillProfile {
   const { skill, db, conds, statValue } = inp;
   const isAttack = skill.type === 'attack';
-  const baseTags = tagMask(skill.tags) | tagMask(inp.extraTags);
+  const baseTags = maskOr(tagMask(skill.tags), tagMask(inp.extraTags));
   const baseCtx = ctxOf(baseTags, conds, statValue);
   const avatar = db.flag('avatarOfFire', baseCtx);
   const neverCrit = db.flag('neverCrit', baseCtx);
@@ -209,7 +210,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
   const spellIncOnAttacks = isAttack && db.flag('spellIncAppliesToAttacks', baseCtx);
 
   function handProfile(hand: HandStats | null): HandProfile {
-    const tags = baseTags | (hand ? tagMask(hand.tags) : 0);
+    const tags = maskOr(baseTags, hand ? tagMask(hand.tags) : 0);
     const ctx = ctxOf(tags, conds, statValue);
     // Step 1: base damage.
     const base: Chunk[] = [];
@@ -252,7 +253,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     for (const c of chunks) {
       const cctx = { ...ctx, ancestry: c.anc };
       const ak = (tag: SkillTag) =>
-        db.mult('damage', ctxOf(DOT_TAGS | tagBit(tag), conds, statValue, c.anc));
+        db.mult('damage', ctxOf(maskOr(DOT_TAGS, tagBit(tag)), conds, statValue, c.anc));
       ailChunks.push({
         type: c.type,
         min: c.min,
@@ -262,12 +263,12 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
       let m = db.mult('damage', cctx);
       if (spellIncOnAttacks) {
         // Increases and reductions to spell damage also apply (not "more" mods).
-        const inc = db.inc('damage', { ...cctx, tags: tags | spellBit });
+        const inc = db.inc('damage', { ...cctx, tags: maskOr(tags, spellBit) });
         m = Math.max(0, 1 + inc) * db.more('damage', cctx);
       }
       c.min *= m * db.mult('minDamage', cctx);
       c.max *= m * db.mult('maxDamage', cctx);
-      const hm = db.mult('damage', { ...cctx, tags: tags | hitTag }, hitTag);
+      const hm = db.mult('damage', { ...cctx, tags: maskOr(tags, hitTag) }, hitTag);
       hitMultAcc += hm * (c.min + c.max);
       hitW += c.min + c.max;
     }

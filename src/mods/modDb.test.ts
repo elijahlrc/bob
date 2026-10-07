@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { makeCtx, ModDB } from './modDb';
 import { modsText, modText } from './text';
-import { mod } from './types';
+import {
+  condBit,
+  CONDITIONS,
+  maskAnd,
+  maskIntersects,
+  maskOr,
+  maskSubset,
+  mod,
+  SKILL_TAGS,
+  tagBit,
+} from './types';
 
 describe('ModDB', () => {
   it('sums increased additively and multiplies more', () => {
@@ -103,5 +113,35 @@ describe('mod text', () => {
         mod('damage.max', 'base', 7, { damageTypes: ['fire'], tags: ['attack'] }),
       ]),
     ).toEqual(['Adds 3 to 7 Fire Damage to Attacks']);
+  });
+});
+
+describe('wide masks (tags and conditions beyond bit 31)', () => {
+  it('combine, intersect and compare past 32 bits', () => {
+    const hi = tagBit('warcry');
+    const lo = tagBit('melee');
+    expect(hi).toBeGreaterThan(2 ** 32);
+    const both = maskOr(hi, lo);
+    expect(maskSubset(hi, both)).toBe(true);
+    expect(maskSubset(lo, both)).toBe(true);
+    expect(maskSubset(both, lo)).toBe(false);
+    expect(maskAnd(both, hi)).toBe(hi);
+    expect(maskAnd(lo, hi)).toBe(0);
+    expect(maskIntersects(both, tagBit('totem'))).toBe(false);
+    expect(maskOr(2 ** 31, 1)).toBe(2 ** 31 + 1);
+  });
+
+  it('a mod tagged with a high tag matches only skills that have it', () => {
+    const db = new ModDB([mod('damage', 'inc', 30, { tags: ['totem', 'projectile'] })]);
+    expect(db.sum('inc', 'damage', makeCtx({ tags: ['totem', 'projectile', 'attack'] }))).toBe(30);
+    expect(db.sum('inc', 'damage', makeCtx({ tags: ['totem', 'attack'] }))).toBe(0);
+    expect(db.sum('inc', 'damage', makeCtx({ tags: ['projectile'] }))).toBe(0);
+  });
+
+  it('every tag and condition has its own bit', () => {
+    expect(new Set(SKILL_TAGS.map((t) => tagBit(t))).size).toBe(SKILL_TAGS.length);
+    expect(new Set(CONDITIONS.map((c) => condBit(c))).size).toBe(CONDITIONS.length);
+    expect(SKILL_TAGS.length).toBeLessThanOrEqual(52);
+    expect(CONDITIONS.length).toBeLessThanOrEqual(52);
   });
 });

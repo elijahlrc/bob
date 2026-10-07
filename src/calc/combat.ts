@@ -17,7 +17,7 @@ import {
   STUN_MIN_CHANCE,
   STUN_NON_MELEE_NON_PHYS,
 } from '../data/constants';
-import { DAMAGE_TYPES, tagBit } from '../mods/types';
+import { DAMAGE_TYPES, maskIntersects, tagBit } from '../mods/types';
 import { armourReduction, effectiveRes, hitChance, mag, stunChance } from './formulas';
 import {
   CHAOS,
@@ -281,7 +281,7 @@ export function stunFromHit(
 ): { chance: number; duration: number } {
   if (!canStun || def.cannotBeStunned) return { chance: 0, duration: 0 };
   // 3.9: melee physical damage stuns best (x1.25), non-melee non-physical worst (x0.75).
-  const melee = (p.tagMask & tagBit('melee')) !== 0;
+  const melee = maskIntersects(p.tagMask, tagBit('melee'));
   let s = 0;
   for (let i = 0; i < NT; i++) {
     const w = i === PHYS ? (melee ? STUN_MELEE_PHYS : 1) : melee ? 1 : STUN_NON_MELEE_NON_PHYS;

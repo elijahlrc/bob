@@ -1,6 +1,6 @@
 import type { SkillChoice } from '../calc/character';
 import type { TriggerDef, TriggerEffect } from '../data/triggers';
-import { DAMAGE_TYPES, tagBit } from '../mods/types';
+import { DAMAGE_TYPES, maskSubset, tagBit } from '../mods/types';
 import { fire } from './actions';
 import { registerBlast } from './factions';
 import { flaskMask, lifeCap, playerConds, pushDot, rawHit, wake } from './combat';
@@ -26,7 +26,7 @@ const TRIGGERED = tagBit('triggered');
 
 function matches(d: TriggerDef, ev: TriggerEvent, tagMask: number): boolean {
   if (d.on !== ev.on && !(ev.on === 'hit' && ev.crit && d.on === 'crit')) return false;
-  if ('tags' in ev && (tagMask & ~ev.tags) !== 0) return false;
+  if ('tags' in ev && !maskSubset(tagMask, ev.tags)) return false;
   if (ev.on === 'kill' && d.targetHas) {
     const t = ev.target;
     const has =

@@ -49,6 +49,8 @@ import {
   type Mod,
   type SkillTag,
   type StatId,
+  maskAnd,
+  maskOr,
 } from '../mods/types';
 import { expectedAilments, expectedHit, NO_SHIFT, type Defence, type TargetState } from './combat';
 import { defenceFromDb } from './defence';
@@ -296,7 +298,7 @@ export class Character {
       charges: config.charges,
     };
     let cc = 0;
-    for (const c of this.config.conds) cc |= condBit(c);
+    for (const c of this.config.conds) cc = maskOr(cc, condBit(c));
     this.configConds = cc;
     const cls = classDef(build.classId);
     const level = build.level;
@@ -519,7 +521,7 @@ export class Character {
     this.primary = chosen && chosen.usable ? chosen : this.defaultAttack;
     this.hexes = this.deriveHexes(db0, ctx0);
     // The enemies the character hits are hexed (for the sheet; the sim tracks it per enemy).
-    if (this.hexes.length) this.configConds |= condBit('targetCursed');
+    if (this.hexes.length) this.configConds = maskOr(this.configConds, condBit('targetCursed'));
     const casting = new Set([this.primary.skill.id]);
     for (const a of this.actives) {
       if (!a.usable || a.triggered || a.gemUid === null || casting.has(a.skill.id)) continue;
@@ -563,10 +565,15 @@ export class Character {
     this.reservedLife = reservedLife;
     this.reservedMana = reservedMana;
     this.db = db0;
-    this.relevantConds = db0.condsUsed() | condBit('onLowLife') | condBit('overloadActive');
+    this.relevantConds = maskOr(
+      maskOr(db0.condsUsed(), condBit('onLowLife')),
+      condBit('overloadActive'),
+    );
     this.flasks = build.flasks.filter((f) => f !== null).map((f) => flaskSpec(f!, db0));
-    for (const f of this.flasks) this.relevantConds |= new ModDB(f.buff).condsUsed();
-    if (this.config.steady) this.configConds |= this.steadyMask(this.config.steady);
+    for (const f of this.flasks)
+      this.relevantConds = maskOr(this.relevantConds, new ModDB(f.buff).condsUsed());
+    if (this.config.steady)
+      this.configConds = maskOr(this.configConds, this.steadyMask(this.config.steady));
   }
 
   /** Collect the triggers of the equipped items and the skills they cast (EXPANSION 5.5). */
@@ -689,13 +696,13 @@ export class Character {
   }
 
   steadyMask(mode: SteadyMode): number {
-    let m = condBit('hitRecently') | condBit('usedFlaskRecently');
-    if (this.hexes.length) m |= condBit('targetCursed');
-    if (mode === 'clearing') m |= condBit('killedRecently');
+    let m = maskOr(condBit('hitRecently'), condBit('usedFlaskRecently'));
+    if (this.hexes.length) m = maskOr(m, condBit('targetCursed'));
+    if (mode === 'clearing') m = maskOr(m, condBit('killedRecently'));
     const d = this.defence(m);
-    if (this.reservedLife >= 0.65 * d.maxLife) m |= condBit('onLowLife');
+    if (this.reservedLife >= 0.65 * d.maxLife) m = maskOr(m, condBit('onLowLife'));
     const hand = this.profile(this.primary, m).hands[0];
-    if (hand && hand.critChance >= 0.2) m |= condBit('critRecently');
+    if (hand && hand.critChance >= 0.2) m = maskOr(m, condBit('critRecently'));
     return m;
   }
 
@@ -705,7 +712,7 @@ export class Character {
 
   /** The profile of a skill for a condition mask and a bitmask of active flasks (cached). */
   profile(choice: SkillChoice, conds: number = this.configConds, flaskMask = 0): SkillProfile {
-    const c = conds & this.relevantConds;
+    const c = maskAnd(conds, this.relevantConds);
     const k = `${choice.key}|${c}|${flaskMask}`;
     let p = this.profiles.get(k);
     if (p) return p;
@@ -747,7 +754,7 @@ export class Character {
 
   /** Defences for a condition mask and a bitmask of active flasks (cached). */
   defence(conds: number = this.configConds, flaskMask = 0): Defence {
-    const c = conds & this.relevantConds;
+    const c = maskAnd(conds, this.relevantConds);
     const k = c * 64 + flaskMask;
     let d = this.defences.get(k);
     if (!d) {
@@ -1063,7 +1070,7 @@ export function skillRange(p: SkillProfile): number {
 
 /** Tags of a skill use (for UI and tests). */
 export function useTags(p: SkillProfile): number {
-  return p.tagMask | tagMask([]);
+  return p.tagMask;
 }
 
 export type { Item };

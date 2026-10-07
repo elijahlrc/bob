@@ -13,7 +13,7 @@ import {
   WOUND_DANCE_STACKS,
 } from '../data/constants';
 import { cannotBleed } from '../data/monsters';
-import { condBit } from '../mods/types';
+import { condBit, maskOr } from '../mods/types';
 import { gainTrophy, rollCharges } from './charges';
 import { applyPlayerHexes, tickHexes } from './hexes';
 import { damageMult, hexPlayerAtRandom, onMonsterDeath, shieldedByPylon } from './factions';
@@ -37,42 +37,42 @@ export function playerConds(w: World, target: Actor | null): number {
   const p = w.player;
   let c = 0;
   const cap = lifeCap(w, p);
-  if (p.life >= cap - 0.5) c |= condBit('onFullLife');
-  if (p.life <= p.def.maxLife * LOW_LIFE) c |= condBit('onLowLife');
-  if (p.tKill < RECENT) c |= condBit('killedRecently');
-  if (p.tCrit < RECENT) c |= condBit('critRecently');
-  if (p.tHit < RECENT) c |= condBit('hitRecently');
-  if (p.tFlask < RECENT) c |= condBit('usedFlaskRecently');
-  if (w.flasks.some((f) => f.activeT > 0)) c |= condBit('flaskActive');
-  if (w.char.dualWielding) c |= condBit('dualWielding');
-  if (w.char.holdingShield) c |= condBit('holdingShield');
-  if (p.tStunEnemy < RECENT) c |= condBit('stunnedRecently');
-  if (p.tOverload < OVERLOAD_TIME) c |= condBit('overloadActive');
-  if (p.tBlock < RECENT) c |= condBit('blockedRecently');
-  if (p.tBeenHit < RECENT) c |= condBit('beenHitRecently');
-  if (p.leechLife.length > 0) c |= condBit('leeching');
-  if (p.def.maxEs > 0 && p.es >= p.def.maxEs - 0.5) c |= condBit('esFull');
+  if (p.life >= cap - 0.5) c = maskOr(c, condBit('onFullLife'));
+  if (p.life <= p.def.maxLife * LOW_LIFE) c = maskOr(c, condBit('onLowLife'));
+  if (p.tKill < RECENT) c = maskOr(c, condBit('killedRecently'));
+  if (p.tCrit < RECENT) c = maskOr(c, condBit('critRecently'));
+  if (p.tHit < RECENT) c = maskOr(c, condBit('hitRecently'));
+  if (p.tFlask < RECENT) c = maskOr(c, condBit('usedFlaskRecently'));
+  if (w.flasks.some((f) => f.activeT > 0)) c = maskOr(c, condBit('flaskActive'));
+  if (w.char.dualWielding) c = maskOr(c, condBit('dualWielding'));
+  if (w.char.holdingShield) c = maskOr(c, condBit('holdingShield'));
+  if (p.tStunEnemy < RECENT) c = maskOr(c, condBit('stunnedRecently'));
+  if (p.tOverload < OVERLOAD_TIME) c = maskOr(c, condBit('overloadActive'));
+  if (p.tBlock < RECENT) c = maskOr(c, condBit('blockedRecently'));
+  if (p.tBeenHit < RECENT) c = maskOr(c, condBit('beenHitRecently'));
+  if (p.leechLife.length > 0) c = maskOr(c, condBit('leeching'));
+  if (p.def.maxEs > 0 && p.es >= p.def.maxEs - 0.5) c = maskOr(c, condBit('esFull'));
   const manaCap = Math.max(1, p.def.maxMana - w.char.reservedMana);
-  if (p.mana <= manaCap * LOW_LIFE) c |= condBit('onLowMana');
-  if (p.hexes.length) c |= condBit('cursed');
-  if (target) c |= targetConds(target, p);
+  if (p.mana <= manaCap * LOW_LIFE) c = maskOr(c, condBit('onLowMana'));
+  if (p.hexes.length) c = maskOr(c, condBit('cursed'));
+  if (target) c = maskOr(c, targetConds(target, p));
   return c;
 }
 
 export function targetConds(t: Actor, from: Actor): number {
   let c = 0;
-  if (t.hexes.length) c |= condBit('targetCursed');
-  if (t.ail.ignites.length) c |= condBit('targetIgnited');
-  if (t.ail.shock > 0) c |= condBit('targetShocked');
-  if (t.ail.chill > 0) c |= condBit('targetChilled');
-  if (t.ail.freezeT > 0) c |= condBit('targetFrozen');
-  if (t.ail.bleeds.length) c |= condBit('targetBleeding');
-  if (t.ail.poisons.length) c |= condBit('targetPoisoned');
-  if (t.stunT > 0) c |= condBit('targetStunned');
-  if (t.life <= t.def.maxLife * LOW_LIFE) c |= condBit('targetLowLife');
+  if (t.hexes.length) c = maskOr(c, condBit('targetCursed'));
+  if (t.ail.ignites.length) c = maskOr(c, condBit('targetIgnited'));
+  if (t.ail.shock > 0) c = maskOr(c, condBit('targetShocked'));
+  if (t.ail.chill > 0) c = maskOr(c, condBit('targetChilled'));
+  if (t.ail.freezeT > 0) c = maskOr(c, condBit('targetFrozen'));
+  if (t.ail.bleeds.length) c = maskOr(c, condBit('targetBleeding'));
+  if (t.ail.poisons.length) c = maskOr(c, condBit('targetPoisoned'));
+  if (t.stunT > 0) c = maskOr(c, condBit('targetStunned'));
+  if (t.life <= t.def.maxLife * LOW_LIFE) c = maskOr(c, condBit('targetLowLife'));
   if (t.rarity === 'rare' || t.rarity === 'miniboss' || t.rarity === 'boss')
-    c |= condBit('targetRareOrUnique');
-  if (Math.hypot(t.x - from.x, t.y - from.y) <= 2 + t.r) c |= condBit('targetNearby');
+    c = maskOr(c, condBit('targetRareOrUnique'));
+  if (Math.hypot(t.x - from.x, t.y - from.y) <= 2 + t.r) c = maskOr(c, condBit('targetNearby'));
   return c;
 }
 

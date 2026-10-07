@@ -7,6 +7,9 @@ import {
   type ModKind,
   type SkillTag,
   type StatId,
+  maskIntersects,
+  maskOr,
+  maskSubset,
 } from './types';
 
 /** Query context. Masks are precomputed bitsets (see `types.ts`). */
@@ -30,7 +33,7 @@ export function makeCtx(opts: {
   statValue?: (stat: StatId) => number;
 }): ModCtx {
   let conds = 0;
-  for (const c of opts.conds ?? []) conds |= condBit(c);
+  for (const c of opts.conds ?? []) conds = maskOr(conds, condBit(c));
   return {
     tags: tagMask(opts.tags),
     ancestry: dmgMask(opts.ancestry),
@@ -58,11 +61,11 @@ function compile(m: Mod): Compiled {
 }
 
 function matches(c: Compiled, ctx: ModCtx, require = 0): boolean {
-  if (require && (c.tagMask & require) === 0) return false;
-  if (c.tagMask && (c.tagMask & ctx.tags) !== c.tagMask) return false;
+  if (require && !maskIntersects(c.tagMask, require)) return false;
+  if (c.tagMask && !maskSubset(c.tagMask, ctx.tags)) return false;
   if (c.dmgMask && ctx.ancestry && (c.dmgMask & ctx.ancestry) === 0) return false;
   if (c.condMask) {
-    const on = (ctx.conds & c.condMask) !== 0;
+    const on = maskIntersects(ctx.conds, c.condMask);
     if (on === c.condNot) return false;
   }
   return true;
@@ -166,7 +169,7 @@ export class ModDB {
   /** Bitmask of every condition used by any mod (to keep condition-keyed caches small). */
   condsUsed(): number {
     let m = 0;
-    for (const list of this.byStat.values()) for (const c of list) m |= c.condMask;
+    for (const list of this.byStat.values()) for (const c of list) m = maskOr(m, c.condMask);
     return m;
   }
 

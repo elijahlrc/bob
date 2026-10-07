@@ -13,7 +13,37 @@ export function dmgMask(ts: readonly DamageType[] | undefined): number {
   return m;
 }
 
-/** Skill tags. Kept to at most 32 (31 in use) so they fit a 32-bit mask; widen it if a 33rd is needed. */
+/**
+ * Masks (tags and conditions) are plain numbers holding up to 52 bits. Native bit operators only see 32 bits, so combine,
+ * intersect and compare them with `maskOr`, `maskAnd` and `maskSubset`.
+ */
+const W32 = 4294967296;
+export function maskOr(a: number, b: number): number {
+  if (a < W32 && b < W32) return (a | b) >>> 0;
+  const al = a % W32;
+  const bl = b % W32;
+  const ah = (a - al) / W32;
+  const bh = (b - bl) / W32;
+  return ((al | bl) >>> 0) + ((ah | bh) >>> 0) * W32;
+}
+export function maskAnd(a: number, b: number): number {
+  if (a < W32 && b < W32) return (a & b) >>> 0;
+  const al = a % W32;
+  const bl = b % W32;
+  const ah = (a - al) / W32;
+  const bh = (b - bl) / W32;
+  return ((al & bl) >>> 0) + ((ah & bh) >>> 0) * W32;
+}
+/** Whether every bit of `need` is set in `have`. */
+export function maskSubset(need: number, have: number): boolean {
+  return maskAnd(need, have) === need;
+}
+/** Whether any bit of `a` is set in `b`. */
+export function maskIntersects(a: number, b: number): boolean {
+  return maskAnd(a, b) !== 0;
+}
+
+/** Skill tags. A tag's bit is 2^index; add new tags at the end. */
 export const SKILL_TAGS = [
   'attack',
   'spell',
@@ -46,16 +76,34 @@ export const SKILL_TAGS = [
   'unarmed',
   'hit',
   'triggered',
+  // Added by the coverage plan (C2). Bits 31 and up: masks are numbers of up to 52 bits (see `maskOr`).
+  'totem',
+  'trap',
+  'mine',
+  'brand',
+  'minion',
+  'channelling',
+  'duration',
+  'curse',
+  'warcry',
+  'herald',
+  'guard',
+  'movement',
+  'nova',
+  'slam',
+  'physical',
+  'chaos',
 ] as const;
 export type SkillTag = (typeof SKILL_TAGS)[number];
 
+const TAG_INDEX = new Map<string, number>(SKILL_TAGS.map((t, i) => [t, i]));
 export function tagBit(t: SkillTag): number {
-  return 1 << SKILL_TAGS.indexOf(t);
+  return 2 ** (TAG_INDEX.get(t) as number);
 }
 export function tagMask(ts: readonly SkillTag[] | undefined): number {
   if (!ts) return 0;
   let m = 0;
-  for (const t of ts) m |= tagBit(t);
+  for (const t of ts) m = maskOr(m, tagBit(t));
   return m;
 }
 
@@ -92,8 +140,9 @@ export const CONDITIONS = [
 ] as const;
 export type CondId = (typeof CONDITIONS)[number];
 
+const COND_INDEX = new Map<string, number>(CONDITIONS.map((c, i) => [c, i]));
 export function condBit(c: CondId): number {
-  return 1 << CONDITIONS.indexOf(c);
+  return 2 ** (COND_INDEX.get(c) as number);
 }
 
 export type ModKind = 'base' | 'inc' | 'more' | 'flag' | 'override';
