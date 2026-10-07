@@ -133,6 +133,8 @@ export type HitResult = {
   crit: boolean;
   /** Post-mitigation damage per type (before routing to ES/life). */
   dmg: number[];
+  /** Physical damage after crit, before mitigation: what an impale records. */
+  rawPhys?: number;
   total: number;
   /** Rolled pre-crit, pre-mitigation damage per type ("H"). */
   H: number[];
@@ -351,6 +353,7 @@ export function resolveHit(
     (isSpellHit || rng.chance(attackHitChance(p, hand, t.def)));
   const cm = (res.crit ? hand.critMulti * (p.cruelAgony ? 0.7 : 1) : 1) * hand.hitMult;
   for (let i = 0; i < NT; i++) res.dmg[i] = res.H[i] * cm;
+  res.rawPhys = res.dmg[PHYS];
   mitigate(p, t, res.dmg);
   for (let i = 0; i < NT; i++) res.total += res.dmg[i];
   res.ailments = ailmentsFromHit(
@@ -417,6 +420,13 @@ export function expectedHit(
   // An attack confirms a critical strike with a second accuracy check (3.9).
   const cc = hand.critChance * hc;
   const perType = nonCrit.map((n, i) => n * (1 - cc) + crit[i] * cc);
+  // Impale: each landed hit also deals the damage the impales on the target recorded, as reflected physical damage.
+  if (p.impale.chance > 0 && avgH[PHYS] > 0) {
+    const stacks = Math.min(p.impale.max, p.impale.hits * p.impale.chance);
+    const rawPhys = avgH[PHYS] * hand.hitMult * (1 + cc * (critM - 1));
+    const extra = mitigate(p, t, [stacks * p.impale.share * rawPhys, 0, 0, 0, 0]);
+    perType[PHYS] += extra[PHYS];
+  }
   const bc = blockChance(p, t.def);
   const total = perType.reduce((a, b) => a + b, 0);
   const esUp = (t.es ?? 0) > 0;

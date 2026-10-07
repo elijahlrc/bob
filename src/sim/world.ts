@@ -88,6 +88,7 @@ function newActor(id: number, isPlayer: boolean, x: number, y: number, r: number
     shellBy: 0,
     phaseT: 0,
     hexes: [],
+    impales: [],
     hexRes: 0,
     hexVuln: 0,
     hexDmg: 1,

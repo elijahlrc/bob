@@ -87,6 +87,14 @@ export const STUN_NON_MELEE_NON_PHYS = 0.75;
 export const STUN_ES_IGNORE = 0.5;
 export const STUN_GRACE = 0.5;
 
+// Impale (3.9): a hit that impales records 10% of its physical damage; the next 5 hits each deal it again as reflected
+// physical damage. A target holds at most 5 impales.
+export const IMPALE_SHARE = 0.1;
+export const IMPALE_HITS = 5;
+export const IMPALE_MAX = 5;
+/** A culling strike kills a target left at this share of its life or less. */
+export const CULLING_SHARE = 0.1;
+
 // §6.7 Speeds and costs.
 export const DUAL_WIELD_MORE_APS = 10;
 /** Dual wielding (3.9): 20% more physical attack damage and 15% additional chance to block attacks. */

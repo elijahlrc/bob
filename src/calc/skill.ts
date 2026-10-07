@@ -4,6 +4,9 @@ import {
   BLEED_DURATION,
   CHILL_DURATION,
   DUAL_WIELD_MORE_APS,
+  IMPALE_HITS,
+  IMPALE_MAX,
+  IMPALE_SHARE,
   IGNITE_DURATION,
   POISON_DURATION,
   SHOCK_DURATION,
@@ -90,6 +93,13 @@ export type SkillProfile = {
   chill: { effect: number; dur: number };
   freeze: { chance: number; dur: number };
   cannotInflictEle: boolean;
+  /**
+   * Impale: the chance a hit impales, the share of its physical damage each impale records, how many hits each lasts, and
+   * how many can be on one target (3.9).
+   */
+  impale: { chance: number; share: number; hits: number; max: number };
+  /** A hit that leaves the target at 10% life or less kills it. */
+  culling: boolean;
   /** Damage types (indices) that can inflict each ailment: its own, plus any a rule allows. */
   ailmentFrom: { ignite: number[]; shock: number[]; chill: number[]; freeze: number[] };
   alwaysFreezeOnCrit: boolean;
@@ -367,6 +377,13 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
       dur: db.mult('duration.freeze', baseCtx),
     },
     cannotInflictEle,
+    impale: {
+      chance: clamp(db.sum('base', 'chance.impale', baseCtx) / 100, 0, 1),
+      share: IMPALE_SHARE * Math.max(0, 1 + db.inc('impaleEffect', baseCtx)),
+      hits: IMPALE_HITS + Math.round(db.sum('base', 'impaleHits', baseCtx)),
+      max: IMPALE_MAX + Math.round(db.sum('base', 'maxImpale', baseCtx)),
+    },
+    culling: db.flag('cullingStrike', baseCtx),
     ailmentFrom: {
       ignite: ailmentSources('Ignite', FIRE),
       shock: ailmentSources('Shock', LIGHT),

@@ -3,6 +3,7 @@ import { levelPenalty } from '../calc/formulas';
 import type { SkillProfile } from '../calc/skill';
 import {
   BLEED_MOVING_MULT,
+  CULLING_SHARE,
   FLASK_CHARGES_ON_KILL,
   LEECH_INSTANCE_MAX,
   LEECH_RATE_CAP,
@@ -241,6 +242,13 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   const wasAlive = dst.alive;
   if (src.isPlayer) applyPlayerHexes(w, dst);
   applyDamage(w, dst, res.dmg);
+  if (wasAlive && dst.alive) {
+    payImpales(w, dst);
+    recordImpale(w, dst, p, res);
+    // Culling strike: a hit that leaves the target at 10% life or less finishes it.
+    if (p.culling && !dst.isPlayer && dst.life <= dst.def.maxLife * CULLING_SHARE)
+      killActor(w, dst);
+  }
   // A beetle that is hit curls up for a moment (then cannot again for three seconds).
   if (wasAlive && dst.alive && dst.mon?.spec.type === 'beetle' && dst.skillT <= 0) {
     dst.curlT = 1.5;
@@ -358,6 +366,28 @@ export function logDamage(
 }
 
 /** Raw damage of one type that ignores evasion and block (explosions, slams). */
+/** Every impale on the target deals what it recorded as reflected physical damage, and uses up one of its hits. */
+function payImpales(w: World, dst: Actor): void {
+  if (dst.impales.length === 0) return;
+  let stored = 0;
+  let j = 0;
+  for (const imp of dst.impales) {
+    stored += imp.dmg;
+    if (--imp.hits > 0) dst.impales[j++] = imp;
+  }
+  dst.impales.length = j;
+  rawHit(w, dst, stored, 0, 'Impale');
+}
+
+/** A hit that impales records a share of its physical damage on the target. */
+function recordImpale(w: World, dst: Actor, p: SkillProfile, res: HitResult): void {
+  const imp = p.impale;
+  if (imp.chance <= 0 || !dst.alive || (res.rawPhys ?? 0) <= 0) return;
+  if (!w.rngCombat.chance(imp.chance)) return;
+  dst.impales.push({ dmg: (res.rawPhys ?? 0) * imp.share, hits: imp.hits });
+  while (dst.impales.length > imp.max) dst.impales.shift();
+}
+
 export function rawHit(
   w: World,
   dst: Actor,
@@ -369,7 +399,7 @@ export function rawHit(
   dmg[type] = amount;
   const def = dst.def;
   takenAs(def, dmg);
-  const taken = def.damageTakenMult * shockTaken(def, dst.ail.shock);
+  const taken = def.damageTakenMult * def.hitTakenMult * shockTaken(def, dst.ail.shock);
   for (let i = 0; i < 5; i++) {
     if (dmg[i] <= 0) continue;
     if (def.immune[i] || (i === CHAOS && def.immuneChaos)) {

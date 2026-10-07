@@ -112,6 +112,8 @@ export type Actor = {
   phaseT: number;
   /** Hexes on this actor (EXPANSION 5.7) and what they add up to. */
   hexes: HexState[];
+  /** Impales on this actor: the physical damage each recorded, and the hits it has left. */
+  impales: { dmg: number; hits: number }[];
   hexRes: number;
   hexVuln: number;
   hexDmg: number;
