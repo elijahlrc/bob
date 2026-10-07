@@ -9,7 +9,8 @@ import {
 } from '../data/affixes';
 import { isWeaponClass, ITEM_BASES } from '../data/bases';
 import { FLASK_AFFIXES, FLASK_BASES } from '../data/flasks';
-import { ALL_GEMS } from '../data/gems';
+import { classDef } from '../data/classes';
+import { ALL_GEMS, type GemDef } from '../data/gems';
 import type { MonsterRarity } from '../data/monsters';
 import type { ThemeDef } from '../data/themes';
 import type {
@@ -342,8 +343,61 @@ export function uniqueIdOf(it: AnyItem): string | undefined {
   return it.kind === 'gem' || it.kind === 'currency' ? undefined : it.uniqueId;
 }
 
-export function rollGem(rng: Rng, uid: UidSource): GemItem {
-  return { kind: 'gem', uid: uid(), gemId: rng.pick(ALL_GEMS).id };
+/** Skills that need a system the first maps do not teach (a deployable, a minion, a curse, a warcry, a channel). */
+const SPECIAL_TAGS = new Set<string>([
+  'totem',
+  'trap',
+  'mine',
+  'brand',
+  'minion',
+  'curse',
+  'warcry',
+  'guard',
+  'movement',
+  'herald',
+  'channelling',
+]);
+
+function isSpecial(g: GemDef): boolean {
+  if (g.kind === 'hex') return true;
+  if (g.kind === 'aura') return g.reservePct === 0 || !!g.triggers;
+  if (g.kind === 'support')
+    return !!(
+      g.adds?.length ||
+      g.trigger ||
+      g.hexOnHit ||
+      g.blasphemy ||
+      g.global ||
+      g.extraTriggers
+    );
+  return !!g.utility || g.tags.some((t) => SPECIAL_TAGS.has(t));
+}
+
+/**
+ * How likely a gem is to drop: plain damage skills most, supports and auras a little less, the special kinds least, and the
+ * character's own attribute twice as much. The first four maps hold nothing special at all.
+ */
+export function gemWeight(g: GemDef, classId?: string, ilvl = 99): number {
+  const special = isSpecial(g);
+  if (special && ilvl <= EARLY_MAPS) return 0;
+  let w = special ? 1 : g.kind === 'active' ? 3 : 2;
+  if (classId) {
+    const a = classDef(classId).attrs;
+    const main = a.str >= a.dex && a.str >= a.int ? 'str' : a.dex >= a.int ? 'dex' : 'int';
+    if (g.attr.includes(main)) w *= 2;
+  }
+  return w;
+}
+
+export const EARLY_MAPS = 4;
+
+export function rollGem(
+  rng: Rng,
+  uid: UidSource,
+  ctx: { classId?: string; ilvl?: number } = {},
+): GemItem {
+  const gem = rng.weighted(ALL_GEMS, (g) => gemWeight(g, ctx.classId, ctx.ilvl));
+  return { kind: 'gem', uid: uid(), gemId: gem.id };
 }
 
 /** A flask base the item level allows (biased to recent tiers), 35% magic with 1–2 affixes. */
@@ -404,6 +458,8 @@ export type DropContext = {
   theme?: ThemeDef;
   /** The faction of the monster that dropped it (its own uniques drop more often). */
   faction?: string;
+  /** The character's class (its own attribute's gems drop more often). */
+  classId?: string;
   /** The player's item quantity and rarity multipliers (1 = none), from gear and flasks. */
   playerQuantity?: number;
   playerRarity?: number;
@@ -461,7 +517,7 @@ export function rollGemDrops(rng: Rng, uid: UidSource, ctx: DropContext): GemIte
   const q = (1 + (ctx.theme?.itemQuantity ?? 0)) * (ctx.playerQuantity ?? 1);
   const expected = GEM_RATE[ctx.monster] * q;
   const n = Math.floor(expected) + (rng.chance(expected - Math.floor(expected)) ? 1 : 0);
-  return Array.from({ length: n }, () => rollGem(rng, uid));
+  return Array.from({ length: n }, () => rollGem(rng, uid, ctx));
 }
 
 /** §11.4 drops for a killed monster. */
@@ -502,7 +558,7 @@ export function rollMonsterDrops(rng: Rng, uid: UidSource, ctx: DropContext): In
 
 /** §10.1 chests: one magic-or-better item, or (40%) a gem. */
 export function rollChest(rng: Rng, uid: UidSource, ilvl: number): InventoryItem[] {
-  if (rng.chance(CHEST_GEM_CHANCE)) return [rollGem(rng, uid)];
+  if (rng.chance(CHEST_GEM_CHANCE)) return [rollGem(rng, uid, { ilvl })];
   const w = rarityWeights('magic');
   let rarity = rng.weighted(['magic', 'rare', 'unique'] as Rarity[], (r) => w[r]);
   if (rarity === 'unique') {

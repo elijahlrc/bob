@@ -202,6 +202,7 @@ export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
         monster: m.mon.spec.rarity,
         theme: plan.theme,
         faction,
+        classId: run.build.classId,
         playerQuantity: db.mult('itemQuantity') * (1 + quantity),
         playerRarity: db.mult('itemRarity') * (1 + rarity),
       });
@@ -309,7 +310,7 @@ export function rollRewards(run: RunState): AnyItem[] {
   for (let i = 0; i < 3; i++) {
     const pool = rng.weighted(['item', 'gem', 'flask', 'currency'] as const, [45, 25, 15, 15]);
     if (pool === 'currency') out.push(rollCurrencyBundle(rng, uid, run.map));
-    else if (pool === 'gem') out.push(rollGem(rng, uid));
+    else if (pool === 'gem') out.push(rollGem(rng, uid, { classId: run.build.classId, ilvl }));
     else if (pool === 'flask') out.push(rollFlask(rng, uid, ilvl, 1));
     else out.push(rollDrop(rng, uid, { ilvl, monster: 'rare' }, rng.chance(0.7)));
   }
