@@ -88,6 +88,10 @@ export type SkillProfile = {
   repeats: number;
   /** Times one use hits a target that stays put: more than one for a zone that pulses (rain, a cloud). */
   pulses: number;
+  /** What the character's minion modifiers do to minions this skill summons: damage and speed multipliers, extra minions. */
+  minionDamage: number;
+  minionSpeed: number;
+  minionCount: number;
   /** How many totems or brands can stand, or traps or mines go off, at once (1 and the support mods). */
   deployCount: number;
   cost: number;
@@ -382,6 +386,9 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
         ? Math.max(1, Math.floor((beh.duration * db.mult('skillDuration', baseCtx)) / beh.interval))
         : 1,
     deployCount: Math.max(1, Math.round(1 + db.sum('base', 'deployCount', baseCtx))),
+    minionDamage: db.mult('minionDamage', baseCtx),
+    minionSpeed: db.mult('minionSpeed', baseCtx),
+    minionCount: Math.round(db.sum('base', 'minionCount', baseCtx)),
     cost: Math.max(
       0,
       Math.round(

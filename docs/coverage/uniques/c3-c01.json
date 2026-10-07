@@ -1,0 +1,39 @@
+[
+  { "ref": "Astral Projector", "name": "Skyward Signet", "flavour": "The storm is aimed now, and so is the blame.", "note": "Lightning resistance, intelligence and spell damage with a flat chance to avoid each elemental ailment, and nova spells with less area of effect. Dropped: casting novas at the target location instead of around you.", "drop": ["30% chance to Avoid Elemental Ailments", "Nova Spells have 20% less Area of Effect", "Nova Spells Cast at the targeted location instead of around you"], "mods": [
+    { "stat": "avoid.ignite", "kind": "base", "min": 30, "max": 30 },
+    { "stat": "avoid.shock", "kind": "base", "min": 30, "max": 30 },
+    { "stat": "avoid.chill", "kind": "base", "min": 30, "max": 30 },
+    { "stat": "avoid.freeze", "kind": "base", "min": 30, "max": 30 },
+    { "stat": "aoe", "kind": "more", "min": -20, "max": -20, "tags": ["nova"] }
+  ] },
+  { "ref": "Breathstealer", "name": "Mistvein Gauntlets", "flavour": "They take the last breath and keep the warmth.", "note": "Armour and evasion with mana, all elemental resistances and attack and cast speed. Dropped: the blighted spore created when a skill kills a rare monster.", "drop": ["Create a Blighted Spore when your Skills or Minions Kill a Rare Monster"] },
+  { "ref": "Cold Iron Point", "name": "Blackiron Awl", "flavour": "No fire, no frost, no spark; only the point.", "note": "Critical chance and plus three to physical spell gems on a dagger, paid for by dealing no elemental damage.", "drop": ["Deal no Elemental Damage"], "mods": [{ "stat": "noElementalDamage", "kind": "flag", "min": 1, "max": 1 }] },
+  { "ref": "Cowl of the Ceraunophile", "name": "Stormward Cowl", "flavour": "Hood up, and the sky agrees with you.", "note": "All attributes and energy shield, with lightning resistance pinned at the cap and fire and cold resistance heavily reduced. The 'set to 75%' rule is written as a large flat lightning resistance bonus (enough to hold the cap through the map resistance penalty).", "drop": ["(55-50)% reduced Fire Resistance", "(55-50)% reduced Cold Resistance", "Lightning Resistance is 75%"], "mods": [
+    { "stat": "resist.fire", "kind": "base", "min": -55, "max": -50 },
+    { "stat": "resist.cold", "kind": "base", "min": -55, "max": -50 },
+    { "stat": "resist.lightning", "kind": "base", "min": 135, "max": 135 }
+  ] },
+  { "ref": "Cowl of the Cryophile", "name": "Rimeward Cowl", "flavour": "Hood up, and the breath turns to glass.", "note": "All attributes and evasion, with cold resistance pinned at the cap and fire and lightning resistance heavily reduced. The 'set to 75%' rule is written as a large flat cold resistance bonus (enough to hold the cap through the map resistance penalty).", "drop": ["(55-50)% reduced Fire Resistance", "Cold Resistance is 75%", "(55-50)% reduced Lightning Resistance"], "mods": [
+    { "stat": "resist.fire", "kind": "base", "min": -55, "max": -50 },
+    { "stat": "resist.cold", "kind": "base", "min": 135, "max": 135 },
+    { "stat": "resist.lightning", "kind": "base", "min": -55, "max": -50 }
+  ] },
+  { "ref": "Cowl of the Thermophile", "name": "Cinderward Cowl", "flavour": "Hood up, and the cold stays outside.", "note": "All attributes and armour, with fire resistance pinned at the cap and cold and lightning resistance heavily reduced. The 'set to 75%' rule is written as a large flat fire resistance bonus (enough to hold the cap through the map resistance penalty).", "drop": ["Fire Resistance is 75%", "(55-50)% reduced Cold Resistance", "(55-50)% reduced Lightning Resistance"], "mods": [
+    { "stat": "resist.fire", "kind": "base", "min": 135, "max": 135 },
+    { "stat": "resist.cold", "kind": "base", "min": -55, "max": -50 },
+    { "stat": "resist.lightning", "kind": "base", "min": -55, "max": -50 }
+  ] },
+  { "ref": "Demigod's Beacon", "name": "Gilt Lantern", "flavour": "It lights the way for whoever carries it.", "note": "Chaos resistance, added fire to attacks and item rarity on a shield. Light radius is ignored." },
+  { "ref": "Demigod's Bounty", "name": "Gilded Cincture", "flavour": "Wide enough to hold a fortune.", "note": "Item rarity and all elemental resistances on a belt. Character size is ignored." },
+  { "ref": "Demigod's Dominance", "name": "Aureate Vestment", "flavour": "Heavy with gold and heavier with expectation.", "note": "All elemental resistances, all attributes and plus one to socketed gems on a body armour." },
+  { "ref": "Demigod's Eye", "name": "Sunstruck Band", "flavour": "Look at it too long and your pockets feel lighter.", "note": "All attributes, item rarity and mana regeneration on a ring. Character size is ignored." },
+  { "ref": "Demigod's Immortality", "name": "Everbright Visor", "base": "helmet_ar_1", "flavour": "Polished until nothing sticks.", "note": "All elemental resistances and all attributes on a helmet. Character size is ignored." },
+  { "ref": "Demigod's Presence", "name": "Halo Locket", "flavour": "A small sun to wear on the chest.", "note": "Item rarity and fixed all elemental resistances on an amulet. Character size is ignored." },
+  { "ref": "Demigod's Stride", "name": "Coinstep Treads", "flavour": "Each footfall rings like a purse.", "note": "All elemental resistances, item rarity and movement speed on boots." },
+  { "ref": "Demigod's Touch", "name": "Gilt Palms", "flavour": "Everything it handles comes back brighter.", "note": "Life, attack speed and cast speed on gloves." },
+  { "ref": "Demigod's Triumph", "name": "Laurel Crest", "flavour": "Worn once for the crowd, then for good.", "note": "All attributes, life regeneration and item rarity on a helmet.", "drop": ["Regenerate 2 Life per second"], "mods": [{ "stat": "lifeRegen", "kind": "base", "min": 2, "max": 2 }] },
+  { "ref": "Eye of Malice", "name": "Baleful Mask", "flavour": "It wishes you well, and means the opposite.", "note": "Huge evasion and energy shield with fire and cold resistance. Dropped: the fire and cold exposure on hit and the enemy resistance drawback (they roughly offset).", "drop": ["25% chance to inflict Cold Exposure on Hit", "25% chance to inflict Fire Exposure on Hit", "Nearby Enemies have 50% increased Fire and Cold Resistances"] },
+  { "ref": "Fury Valve", "name": "Scattergun Pendant", "flavour": "Pressure builds until the arrows leave in a crowd.", "note": "Skills fire two additional projectiles, with projectile speed, evasion, dexterity and intelligence and all elemental resistances. Dropped: the rule that projectile count modifiers split projectiles instead.", "drop": ["Skills fire 2 additional Projectiles", "Modifiers to number of Projectiles instead apply", "to the number of targets Projectiles Split towards"], "mods": [{ "stat": "projectiles", "kind": "base", "min": 2, "max": 2 }] },
+  { "ref": "Hands of the High Templar", "name": "Vowkeeper Gauntlets", "flavour": "Sworn hands do not shake.", "note": "Armour and energy shield, life and fire and lightning resistance on gloves." },
+  { "ref": "Icefang Orbit", "name": "Frostvenom Band", "flavour": "Cold teeth, slow poison.", "note": "Poison on hit and increased poison damage, added physical to attacks and dexterity. Dropped: the chill links with poison and shattering poisoned kills.", "drop": ["(40-60)% increased Damage with Poison", "You are Chilled when you are Poisoned", "Non-Chilled Enemies you Poison are Chilled", "Poisoned Enemies you Kill with Hits Shatter"], "mods": [{ "stat": "damage", "kind": "inc", "min": 40, "max": 60, "tags": ["poison"] }] }
+]

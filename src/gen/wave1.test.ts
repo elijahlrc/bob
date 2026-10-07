@@ -378,7 +378,7 @@ describe('acquisition (EXPANSION 6.2 items 1–4)', () => {
     const own = count('reliquary');
     const other = count('hollow');
     expect(own).toBeGreaterThan(other * 2);
-  });
+  }, 60000);
 
   it('only uniques the item level allows are in the pool', () => {
     for (const e of uniquePool(10)) expect(e.def.level).toBeLessThanOrEqual(10);

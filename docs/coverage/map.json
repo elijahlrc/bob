@@ -1499,6 +1499,136 @@
    "ref": "Siphoning Trap of Pain",
    "status": "covered",
    "note": "A variant of the drain trap that deals chaos damage over time to the enemies near it and feeds the character."
+  },
+  "raiseHusk": {
+   "ref": "Raise Zombie",
+   "status": "covered",
+   "note": "Raises zombies (3 to 7) that follow the character and slam enemies; they cannot be hurt in Bob, so they stay until the map ends."
+  },
+  "callBonewalkers": {
+   "ref": "Summon Skeletons",
+   "status": "covered",
+   "note": "Summons a group of skeletons (3 to 8) that run at enemies and last twenty seconds."
+  },
+  "callFuries": {
+   "ref": "Summon Raging Spirit",
+   "status": "covered",
+   "note": "Summons burning spirits (3 to 8) that rush at enemies for five seconds."
+  },
+  "stoneColossus": {
+   "ref": "Summon Stone Golem",
+   "status": "covered",
+   "note": "A stone golem that fights beside the character and regenerates its life."
+  },
+  "blightColossus": {
+   "ref": "Summon Chaos Golem",
+   "status": "covered",
+   "note": "A chaos golem that fights beside the character and lowers the physical damage taken."
+  },
+  "emberColossus": {
+   "ref": "Summon Flame Golem",
+   "status": "covered",
+   "note": "A flame golem that throws fire at enemies and makes the character deal more damage."
+  },
+  "rimeColossus": {
+   "ref": "Summon Ice Golem",
+   "status": "covered",
+   "note": "An ice golem that fights beside the character and gives it critical strike chance and accuracy."
+  },
+  "stormColossus": {
+   "ref": "Summon Lightning Golem",
+   "status": "covered",
+   "note": "A lightning golem that shoots enemies and quickens the character's attacks and casting."
+  },
+  "carrionColossus": {
+   "ref": "Summon Carrion Golem",
+   "status": "covered",
+   "note": "A carrion golem that fights beside the character and adds physical damage to its minions (folded into the character's added damage)."
+  },
+  "hallowedRelic": {
+   "ref": "Summon Holy Relic",
+   "status": "covered",
+   "note": "A relic that follows the character, shoots at enemies and regenerates the character's life."
+  },
+  "whirringMotes": {
+   "ref": "Summon Skitterbots",
+   "status": "covered",
+   "note": "Two motes that follow the character and make shocks and chills stronger (the auras on enemies are folded into the character's ailment effect)."
+  },
+  "bindShade": {
+   "ref": "Raise Spectre",
+   "status": "covered",
+   "note": "Raises one or two bound shades that follow the character and fire chaos bolts at enemies (Bob's shades stand in for the reference's raised monsters)."
+  },
+  "wakeBlades": {
+   "ref": "Animate Weapon",
+   "status": "covered",
+   "note": "Animates a few blades that fight for the character for a long while."
+  },
+  "wakeSentinel": {
+   "ref": "Animate Guardian",
+   "status": "covered",
+   "note": "Animates a guardian that fights beside the character."
+  },
+  "shadowQuiver": {
+   "ref": "Blink Arrow",
+   "status": "covered",
+   "note": "Fires an arrow that leaves a shadow archer for three seconds."
+  },
+  "mirrorQuiver": {
+   "ref": "Mirror Arrow",
+   "status": "covered",
+   "note": "Fires an arrow that leaves a mirrored archer for three seconds."
+  },
+  "boneWardRite": {
+   "ref": "Bone Offering",
+   "status": "covered",
+   "note": "An offering cast when enemies are near that gives block chance for a few seconds (the corpse is not used here)."
+  },
+  "fleshSurgeRite": {
+   "ref": "Flesh Offering",
+   "status": "covered",
+   "note": "An offering cast when enemies are near that quickens attacks, casting and movement for a few seconds."
+  },
+  "spiritWardRite": {
+   "ref": "Spirit Offering",
+   "status": "covered",
+   "note": "An offering cast when enemies are near that gives resistances and chaos damage from physical for a few seconds."
+  },
+  "packFury": {
+   "ref": "Minion Damage Support",
+   "status": "covered",
+   "note": "The supported minions deal more damage."
+  },
+  "hardyPack": {
+   "ref": "Minion Life Support",
+   "status": "covered",
+   "note": "The supported minions are sturdier; Bob's minions cannot be hurt, so the extra life is folded into more minion damage."
+  },
+  "packHaste": {
+   "ref": "Minion Speed Support",
+   "status": "covered",
+   "note": "The supported minions strike and move faster."
+  },
+  "wardingPack": {
+   "ref": "Meat Shield Support",
+   "status": "covered",
+   "note": "The supported minions stay close to the character and take less damage; here they hit harder against enemies near the character."
+  },
+  "elementalPack": {
+   "ref": "Elemental Army Support",
+   "status": "covered",
+   "note": "The supported minions deal more elemental damage and shrug off elements (the exposure is dropped)."
+  },
+  "frenziedPack": {
+   "ref": "Feeding Frenzy Support",
+   "status": "covered",
+   "note": "The supported minions make the character stronger as they hit (folded into more minion damage and speed)."
+  },
+  "burningPack": {
+   "ref": "Infernal Legion Support",
+   "status": "covered",
+   "note": "The supported minions burn the ground around them; here they simply deal more damage."
   }
  },
  "uniques": {
@@ -4646,6 +4776,161 @@
    "ref": "Dying Breath",
    "status": "covered",
    "note": "Wider auras and curses, stronger auras and curses, cast speed, mana and block. The ally damage line was dropped."
+  },
+  "skywardSignet": {
+   "ref": "Astral Projector",
+   "status": "covered",
+   "note": "Lightning resistance, intelligence and spell damage with a flat chance to avoid each elemental ailment, and nova spells with less area of effect. Dropped: casting novas at the target location instead of around you."
+  },
+  "mistveinGauntlets": {
+   "ref": "Breathstealer",
+   "status": "covered",
+   "note": "Armour and evasion with mana, all elemental resistances and attack and cast speed. Dropped: the blighted spore created when a skill kills a rare monster."
+  },
+  "blackironAwl": {
+   "ref": "Cold Iron Point",
+   "status": "covered",
+   "note": "Critical chance and plus three to physical spell gems on a dagger, paid for by dealing no elemental damage."
+  },
+  "stormwardCowl": {
+   "ref": "Cowl of the Ceraunophile",
+   "status": "covered",
+   "note": "All attributes and energy shield, with lightning resistance pinned at the cap and fire and cold resistance heavily reduced. The 'set to 75%' rule is written as a large flat lightning resistance bonus (enough to hold the cap through the map resistance penalty)."
+  },
+  "rimewardCowl": {
+   "ref": "Cowl of the Cryophile",
+   "status": "covered",
+   "note": "All attributes and evasion, with cold resistance pinned at the cap and fire and lightning resistance heavily reduced. The 'set to 75%' rule is written as a large flat cold resistance bonus (enough to hold the cap through the map resistance penalty)."
+  },
+  "cinderwardCowl": {
+   "ref": "Cowl of the Thermophile",
+   "status": "covered",
+   "note": "All attributes and armour, with fire resistance pinned at the cap and cold and lightning resistance heavily reduced. The 'set to 75%' rule is written as a large flat fire resistance bonus (enough to hold the cap through the map resistance penalty)."
+  },
+  "giltLantern": {
+   "ref": "Demigod's Beacon",
+   "status": "covered",
+   "note": "Chaos resistance, added fire to attacks and item rarity on a shield. Light radius is ignored."
+  },
+  "gildedCincture": {
+   "ref": "Demigod's Bounty",
+   "status": "covered",
+   "note": "Item rarity and all elemental resistances on a belt. Character size is ignored."
+  },
+  "aureateVestment": {
+   "ref": "Demigod's Dominance",
+   "status": "covered",
+   "note": "All elemental resistances, all attributes and plus one to socketed gems on a body armour."
+  },
+  "sunstruckBand": {
+   "ref": "Demigod's Eye",
+   "status": "covered",
+   "note": "All attributes, item rarity and mana regeneration on a ring. Character size is ignored."
+  },
+  "everbrightVisor": {
+   "ref": "Demigod's Immortality",
+   "status": "covered",
+   "note": "All elemental resistances and all attributes on a helmet. Character size is ignored."
+  },
+  "haloLocket": {
+   "ref": "Demigod's Presence",
+   "status": "covered",
+   "note": "Item rarity and fixed all elemental resistances on an amulet. Character size is ignored."
+  },
+  "coinstepTreads": {
+   "ref": "Demigod's Stride",
+   "status": "covered",
+   "note": "All elemental resistances, item rarity and movement speed on boots."
+  },
+  "giltPalms": {
+   "ref": "Demigod's Touch",
+   "status": "covered",
+   "note": "Life, attack speed and cast speed on gloves."
+  },
+  "laurelCrest": {
+   "ref": "Demigod's Triumph",
+   "status": "covered",
+   "note": "All attributes, life regeneration and item rarity on a helmet."
+  },
+  "balefulMask": {
+   "ref": "Eye of Malice",
+   "status": "covered",
+   "note": "Huge evasion and energy shield with fire and cold resistance. Dropped: the fire and cold exposure on hit and the enemy resistance drawback (they roughly offset)."
+  },
+  "scattergunPendant": {
+   "ref": "Fury Valve",
+   "status": "covered",
+   "note": "Skills fire two additional projectiles, with projectile speed, evasion, dexterity and intelligence and all elemental resistances. Dropped: the rule that projectile count modifiers split projectiles instead."
+  },
+  "vowkeeperGauntlets": {
+   "ref": "Hands of the High Templar",
+   "status": "covered",
+   "note": "Armour and energy shield, life and fire and lightning resistance on gloves."
+  },
+  "frostvenomBand": {
+   "ref": "Icefang Orbit",
+   "status": "covered",
+   "note": "Poison on hit and increased poison damage, added physical to attacks and dexterity. Dropped: the chill links with poison and shattering poisoned kills."
+  },
+  "hazeBuckler": {
+   "ref": "Mistwall",
+   "status": "covered",
+   "note": "Movement speed, evasion and fire and cold resistance on a buckler; maximum attack block while you have not blocked recently, and a block grants the movement buff (Slipstream stands in for phasing). The elemental avoidance while phasing is dropped."
+  },
+  "emberandRimeMitts": {
+   "ref": "Painseeker",
+   "status": "covered",
+   "note": "Added fire, cold and lightning damage with evasion; non-damaging ailments are stronger (modelled as increased ailment effect). The line about critical strikes not inherently inflicting ailments is dropped."
+  },
+  "twinstrikeRapier": {
+   "ref": "Paradoxica",
+   "status": "covered",
+   "note": "Attacks deal double damage, modelled as 100% more damage with attacks (it also applies to an off-hand weapon); plus critical strike multiplier on a thrusting base."
+  },
+  "surgeSignet": {
+   "ref": "Precursor's Emblem",
+   "status": "covered",
+   "note": "Fire and cold resistance, strength and dexterity, life and energy shield. The reference gives one random charge-themed implicit from a long list; here it is fixed to damage per endurance-analog and frenzy-analog charge."
+  },
+  "mildewHauberk": {
+   "ref": "Sporeguard",
+   "status": "covered",
+   "note": "Enemies you kill burst for a share of their life as chaos damage, on a huge armour and energy shield body with life and chaos resistance. The triggered ground curse skill and the fungal ground are dropped."
+  },
+  "laurelCharm": {
+   "ref": "Talisman of the Victor",
+   "status": "covered",
+   "note": "All elemental resistances, movement speed and global defences on an amulet."
+  },
+  "duskSceptre": {
+   "ref": "The Black Cane",
+   "status": "covered",
+   "note": "Elemental damage, intelligence, cast speed and mana regeneration on a sceptre. The minion damage and phantasm lines are dropped."
+  },
+  "hexweaveTalisman": {
+   "ref": "The Jinxed Juju",
+   "status": "covered",
+   "note": "Aura effect, attributes and chaos resistance. The spectre life shield is dropped; the aura effect applies to all auras."
+  },
+  "thunderhoofBoots": {
+   "ref": "The Stampede",
+   "status": "covered",
+   "note": "Movement speed is raised by half, modelled as 50% increased movement speed; mana regeneration while moving, stun recovery, evasion and energy shield. The travel skill cooldown line is dropped."
+  },
+  "lancetBand": {
+   "ref": "Venopuncture",
+   "status": "covered",
+   "note": "Attacks cause bleeding more often, bleeding damage is boosted, with added physical and strength. The chilling and shattering of bleeding enemies and the self-chill are dropped."
+  },
+  "veteransSignet": {
+   "ref": "Warrior's Legacy",
+   "status": "covered",
+   "note": "Strike skills repeat once; melee damage, strength and fire resistance, stun avoidance, at a heavy attack speed cost."
+  },
+  "boughPendant": {
+   "ref": "Willowgift",
+   "status": "covered",
+   "note": "Speed while fortified and spell suppression while fortified (modelled as spell dodge), with dexterity and cold resistance for fire resistance. The loss of the fortification damage reduction is dropped."
   }
  }
 }

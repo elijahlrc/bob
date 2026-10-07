@@ -1,6 +1,7 @@
 import type { DamageType, Mod, SkillTag } from '../mods/types';
 import type { TriggerDef } from './triggers';
 import type { BuffId } from './buffs';
+import type { MinionId } from './minions';
 import type { HexId } from './hexes';
 import type { SkillType } from './skillTypes';
 import { GEN_ACTIVE_GEMS, GEN_AURA_GEMS, GEN_SUPPORT_GEMS } from './gemsGen';
@@ -74,7 +75,15 @@ export type UtilityDef =
       mods: GemMod[];
     }
   | { kind: 'curse'; hex: HexId; radius: number }
-  | { kind: 'blink'; distance: number; cooldown: number };
+  | { kind: 'blink'; distance: number; cooldown: number }
+  /** Summons minions (COVERAGE C6): `count` of them at once, for `seconds` if they are time-limited. `ownerMods` is what the character gains while they stand. */
+  | {
+      kind: 'summon';
+      minion: MinionId;
+      count: LevelValue;
+      seconds?: number;
+      ownerMods?: GemMod[];
+    };
 
 export type ActiveGemDef = {
   kind: 'active';

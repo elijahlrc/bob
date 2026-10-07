@@ -107,6 +107,7 @@ describe('every active gem', () => {
           stepWorld(world);
           if (u.kind === 'buff') seen = world.buffT[u.buff] > 0;
           else if (u.kind === 'curse') seen = dummy.hexes.some((h) => h.id === u.hex);
+          else if (u.kind === 'summon') seen = world.minions.length > 0;
           else seen = true;
         }
         expect(seen).toBe(true);
@@ -150,8 +151,10 @@ describe('every support gem', () => {
         expect(c.hexes.length).toBeGreaterThan(0);
         expect(c.reservedMana).toBeGreaterThan(0);
         expect(c.utilities).toHaveLength(0);
-      } else if (!s.trigger && !s.hexOnHit)
-        expect(c.primary.supports.map((x) => x.def.id)).toContain(s.id);
+      } else if (!s.trigger && !s.hexOnHit) {
+        const choice = c.actives.find((x) => x.skill.id === a.id)!;
+        expect(choice.supports.map((x) => x.def.id)).toContain(s.id);
+      }
       for (const other of actives.filter((x) => !ok.includes(x))) {
         const bad = buildFor([other.id, s.id], weaponFor(other), ATTR_CLASS(other.attr));
         const ch = new Character(bad, { areaLevel: 50 });

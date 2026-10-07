@@ -25,7 +25,10 @@ export type BuffId =
   | 'berserk'
   | 'regenTotem'
   | 'decoyTotem'
-  | 'smokeScreen';
+  | 'smokeScreen'
+  | 'offeringBone'
+  | 'offeringFlesh'
+  | 'offeringSpirit';
 export const BUFF_IDS: BuffId[] = [
   'fortify',
   'onslaught',
@@ -46,6 +49,9 @@ export const BUFF_IDS: BuffId[] = [
   'regenTotem',
   'decoyTotem',
   'smokeScreen',
+  'offeringBone',
+  'offeringFlesh',
+  'offeringSpirit',
 ];
 
 export type BuffDef = {
@@ -65,6 +71,33 @@ export type BuffDef = {
 const when = (cond: CondId): { condition: { id: CondId } } => ({ condition: { id: cond } });
 
 export const BUFFS: Record<BuffId, BuffDef> = {
+  offeringBone: {
+    id: 'offeringBone',
+    name: 'Bone Ward',
+    seconds: 8,
+    cond: 'offeringBone',
+    text: 'Bone Ward',
+    mods: [],
+    gem: true,
+  },
+  offeringFlesh: {
+    id: 'offeringFlesh',
+    name: 'Flesh Surge',
+    seconds: 8,
+    cond: 'offeringFlesh',
+    text: 'Flesh Surge',
+    mods: [],
+    gem: true,
+  },
+  offeringSpirit: {
+    id: 'offeringSpirit',
+    name: 'Spirit Ward',
+    seconds: 8,
+    cond: 'offeringSpirit',
+    text: 'Spirit Ward',
+    mods: [],
+    gem: true,
+  },
   regenTotem: {
     id: 'regenTotem',
     name: 'Mending Aura',

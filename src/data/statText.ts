@@ -433,6 +433,9 @@ Object.assign(STAT_TEXT, {
 Object.assign(STAT_TEXT, {
   globalDefences: { name: 'Global Defences', pct: true },
   noChaosDamage: { flag: 'Deals no Chaos Damage' },
+  minionDamage: { name: 'Damage of your Minions', pct: true },
+  minionSpeed: { name: 'Minion Attack and Movement Speed', pct: true },
+  minionCount: { base: '{v} additional Minions' },
   esOnHit: { base: 'Gain {v} Energy Shield per Enemy Hit' },
   skillDuration: { name: 'Skill Effect Duration', pct: true },
   deployCount: { base: '{v} additional totems, traps, mines or brands at a time' },

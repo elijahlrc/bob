@@ -1,0 +1,38 @@
+[
+  { "ref": "Mistwall", "name": "Haze Buckler", "flavour": "Hard to hit, harder to find.", "note": "Movement speed, evasion and fire and cold resistance on a buckler; maximum attack block while you have not blocked recently, and a block grants the movement buff (Slipstream stands in for phasing). The elemental avoidance while phasing is dropped.", "drop": ["chance to Avoid Damage of each Element from Hits while Phasing", "You are at Maximum Chance to Block Attack Damage if you have not Blocked Recently", "You have Phasing if you have Blocked Recently"], "mods": [
+    { "stat": "blockAttack", "kind": "base", "min": 75, "max": 75, "condition": { "id": "blockedRecently", "not": true } },
+    { "stat": "buffOn.block.phaseRun", "kind": "base", "min": 100, "max": 100 }
+  ] },
+  { "ref": "Painseeker", "name": "Ember-and-Rime Mitts", "flavour": "Three kinds of hurt, one kind of grip.", "note": "Added fire, cold and lightning damage with evasion; non-damaging ailments are stronger (modelled as increased ailment effect). The line about critical strikes not inherently inflicting ailments is dropped.", "drop": ["Critical Strikes do not inherently inflict non-Damaging Ailments", "Inflict non-Damaging Ailments as though dealing"], "mods": [
+    { "stat": "ailmentEffect", "kind": "inc", "min": 100, "max": 200 }
+  ] },
+  { "ref": "Paradoxica", "name": "Twinstrike Rapier", "flavour": "It strikes once to be sure, then once more.", "note": "Attacks deal double damage, modelled as 100% more damage with attacks (it also applies to an off-hand weapon); plus critical strike multiplier on a thrusting base.", "drop": ["Attacks with this Weapon deal Double Damage"], "mods": [
+    { "stat": "damage", "kind": "more", "min": 100, "max": 100, "tags": ["attack"] }
+  ] },
+  { "ref": "Precursor's Emblem", "name": "Surge Signet", "flavour": "Wear it for the momentum, keep it for the charge.", "note": "Fire and cold resistance, strength and dexterity, life and energy shield. The reference gives one random charge-themed implicit from a long list; here it is fixed to damage per endurance-analog and frenzy-analog charge.", "drop": ["Endurance Charge Duration", "or"], "mods": [
+    { "stat": "damage", "kind": "inc", "min": 5, "max": 5, "per": { "stat": "charges.grit", "div": 1 } },
+    { "stat": "damage", "kind": "inc", "min": 5, "max": 5, "per": { "stat": "charges.fervour", "div": 1 } }
+  ] },
+  { "ref": "Sporeguard", "name": "Mildew Hauberk", "flavour": "What dies near it blooms.", "note": "Enemies you kill burst for a share of their life as chaos damage, on a huge armour and energy shield body with life and chaos resistance. The triggered ground curse skill and the fungal ground are dropped.", "drop": ["Trigger Level 10 Contaminate when you Kill an Enemy", "Enemies on Fungal Ground you Kill Explode", "You have Fungal Ground around you while stationary"], "triggers": [{ "on": "kill", "chance": 100, "cooldown": 0, "effect": { "kind": "explode", "pctOfMaxLife": 10, "dtype": "chaos", "radius": 2.5 } }] },
+  { "ref": "Talisman of the Victor", "name": "Laurel Charm", "flavour": "Worn lightly by those who have already won.", "note": "All elemental resistances, movement speed and global defences on an amulet." },
+  { "ref": "The Black Cane", "name": "Dusk Sceptre", "flavour": "Walk with it long enough and it walks for you.", "note": "Elemental damage, intelligence, cast speed and mana regeneration on a sceptre. The minion damage and phantasm lines are dropped.", "drop": ["Minions deal", "Each Summoned Phantasm grants you Phantasmal Might"] },
+  { "ref": "The Jinxed Juju", "name": "Hexweave Talisman", "flavour": "Bad luck for everyone but the bearer.", "note": "Aura effect, attributes and chaos resistance. The spectre life shield is dropped; the aura effect applies to all auras.", "drop": ["increased effect of Non-Curse Auras from your Skills", "of Damage from Hits is taken from your Raised Spectres"], "mods": [
+    { "stat": "auraEffect", "kind": "inc", "min": 10, "max": 15 }
+  ] },
+  { "ref": "The Stampede", "name": "Thunderhoof Boots", "flavour": "The herd has always been faster than the road.", "note": "Movement speed is raised by half, modelled as 50% increased movement speed; mana regeneration while moving, stun recovery, evasion and energy shield. The travel skill cooldown line is dropped.", "drop": ["Cooldown Recovery Rate of Travel Skills", "Mana Regeneration Rate while moving", "Your Movement Speed is 150% of its base value"], "mods": [
+    { "stat": "manaRegen", "kind": "inc", "min": 30, "max": 40, "condition": { "id": "stationary", "not": true } },
+    { "stat": "moveSpeed", "kind": "inc", "min": 50, "max": 50 }
+  ] },
+  { "ref": "Venopuncture", "name": "Lancet Band", "flavour": "A small cut, and a long cold afterwards.", "note": "Attacks cause bleeding more often, bleeding damage is boosted, with added physical and strength. The chilling and shattering of bleeding enemies and the self-chill are dropped.", "drop": ["Attacks have 25% chance to cause Bleeding", "Damage with Bleeding", "You are Chilled while you are Bleeding", "Non-Chilled Enemies you inflict Bleeding on are Chilled", "Bleeding Enemies you Kill with Hits Shatter"], "mods": [
+    { "stat": "chance.bleed", "kind": "base", "min": 25, "max": 25, "tags": ["attack"] },
+    { "stat": "damage", "kind": "inc", "min": 40, "max": 60, "tags": ["bleed"] }
+  ] },
+  { "ref": "Warrior's Legacy", "name": "Veteran's Signet", "flavour": "Every old soldier swings twice at the same ghost.", "note": "Strike skills repeat once; melee damage, strength and fire resistance, stun avoidance, at a heavy attack speed cost.", "drop": ["Strike Skills also target the previous location they were used"], "mods": [
+    { "stat": "repeats", "kind": "base", "min": 1, "max": 1, "tags": ["strike"] }
+  ] },
+  { "ref": "Willowgift", "name": "Bough Pendant", "flavour": "Bend with the wind and the wind forgets you.", "note": "Speed while fortified and spell suppression while fortified (modelled as spell dodge), with dexterity and cold resistance for fire resistance. The loss of the fortification damage reduction is dropped.", "drop": ["You do not inherently take less Damage for having Fortification", "chance to Suppress Spell Damage per Fortification", "increased Attack and Cast Speed while at maximum Fortification"], "mods": [
+    { "stat": "dodgeSpell", "kind": "base", "min": 20, "max": 20, "condition": { "id": "fortified" } },
+    { "stat": "attackSpeed", "kind": "inc", "min": 15, "max": 25, "condition": { "id": "fortified" } },
+    { "stat": "castSpeed", "kind": "inc", "min": 15, "max": 25, "condition": { "id": "fortified" } }
+  ] }
+]

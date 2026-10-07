@@ -47,7 +47,7 @@ export const BASE_HEX_LIMIT = 1;
 
 /** What a hex does to the one it is on, with its effect value in percent. */
 export type HexFx = {
-  /** Lowers these resistances (indices of the damage types: fire 1, cold 2, lightning 3, chaos 4). */
+  /** Lowers these resistances (indices of the damage types: lightning 1, cold 2, fire 3, chaos 4). */
   res?: number[];
   /** Increased physical damage taken. */
   vulnPhys?: boolean;
@@ -120,7 +120,7 @@ export const HEXES: Record<HexId, HexDef> = {
     low: 25,
     high: 44,
     text: 'to fire resistance',
-    fx: { res: [1] },
+    fx: { res: [3] },
   },
   coldSap: {
     id: 'coldSap',
@@ -136,7 +136,7 @@ export const HEXES: Record<HexId, HexDef> = {
     low: 25,
     high: 44,
     text: 'to lightning resistance',
-    fx: { res: [3] },
+    fx: { res: [1] },
   },
   chaosSap: {
     id: 'chaosSap',

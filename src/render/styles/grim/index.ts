@@ -1,3 +1,4 @@
+import { MINIONS } from '../../../data/minions';
 import Phaser from 'phaser';
 import { Rng } from '../../../core/rng';
 import { factionOfSpec } from '../../../data/monsters';
@@ -875,6 +876,37 @@ export class GrimStyle extends StyleBase {
       g.fillStyle(0x1a1410, 0.5 * fade).fillEllipse(x, y + 1, 11, 5);
       if (c.spec.type === 'shambler' && c.age > 1)
         g.fillStyle(0x9fd07a, 0.35 * Math.sin(this.time * 6 + c.id) ** 2).fillEllipse(x, y, 7, 3);
+    }
+    // Totems, brands, traps and mines the character has put down.
+    for (const d of world.deployables) {
+      const { x, y } = this.project(d.x, d.y);
+      const col =
+        d.kind === 'totem'
+          ? 0xc8a060
+          : d.kind === 'brand'
+            ? 0xb070ff
+            : d.kind === 'trap'
+              ? 0xe0c040
+              : 0xff7040;
+      const fade = Math.min(1, d.t);
+      if (d.kind === 'totem') {
+        g.fillStyle(col, 0.9 * fade).fillRect(x - 3, y - 12, 6, 12);
+        g.fillStyle(0xfff0c0, 0.9 * fade).fillRect(x - 4, y - 14, 8, 3);
+      } else if (d.kind === 'brand') {
+        g.lineStyle(1, col, 0.9 * fade).strokeCircle(x, y - 4, 5);
+        g.fillStyle(col, 0.5 * fade).fillCircle(x, y - 4, 2.5);
+      } else {
+        g.fillStyle(col, 0.85 * fade).fillCircle(x, y, 2.5);
+        g.lineStyle(1, col, 0.6 * fade).strokeCircle(x, y, 4);
+      }
+    }
+    // Minions.
+    for (const m of world.minions) {
+      const { x, y } = this.project(m.x, m.y);
+      const col = MINIONS[m.kind].color;
+      g.fillStyle(0x000000, 0.35).fillEllipse(x, y + 1, 9, 4);
+      g.fillStyle(col, 0.95).fillCircle(x, y - 5, 4);
+      g.lineStyle(1, 0xffffff, 0.6).strokeCircle(x, y - 5, 4);
     }
     for (const e of effects) {
       const { x, y } = this.project(e.x, e.y);

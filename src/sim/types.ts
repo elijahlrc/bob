@@ -11,6 +11,7 @@ import type { BuffId } from '../data/buffs';
 import type { Corpse } from './factions';
 import type { HexState } from './hexes';
 import type { Deployable } from './deploy';
+import type { Minion } from './minions';
 import type { Grid } from './grid';
 
 export type Dot = { dps: number; t: number; stack?: boolean };
@@ -378,6 +379,9 @@ export type World = {
   /** The totems, brands, traps and mines on the ground. */
   deployables: Deployable[];
   deploySeq: number;
+  /** The minions standing. */
+  minions: Minion[];
+  minionSeq: number;
   actors: Actor[];
   player: Actor;
   nextId: number;

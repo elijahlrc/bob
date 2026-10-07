@@ -6,6 +6,7 @@ import { gainBuff } from './buffs';
 import { flaskMask, playerConds, rawHit } from './combat';
 import { canPay } from './cost';
 import { applyHex } from './hexes';
+import { minionCount, summonCount, summonMinions } from './minions';
 import type { Action, Actor, World } from './types';
 
 /**
@@ -68,6 +69,11 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
       if (!pack && !big && target.life < 0.5 * target.def.maxLife) continue;
       return { choice: c, prof, cd: 0.5 };
     }
+    if (u.kind === 'summon') {
+      // Minions are summoned in the first fight and again when they are gone or have run out.
+      if (d > CAST_RANGE + 6 || minionCount(w, c.key) >= summonCount(c, prof)) continue;
+      return { choice: c, prof, cd: 1 };
+    }
     // A blink closes the gap to a target the primary skill cannot reach yet.
     const reach = skillRange(ch.profile(w.primary, conds, flaskMask(w))) + target.r;
     if (d > reach + 2 && d <= u.distance + reach && w.grid.los(p.x, p.y, target.x, target.y))
@@ -91,7 +97,7 @@ export function tickAuraBurn(w: World, dt: number): void {
   if (!p.alive) return;
   const amount = (b.pct / 100) * p.def.maxLife * BURN_EVERY;
   if (amount > 0)
-    for (const e of enemiesNear(w, p.x, p.y, BURN_RADIUS)) rawHit(w, e, amount, 1, 'Burning aura');
+    for (const e of enemiesNear(w, p.x, p.y, BURN_RADIUS)) rawHit(w, e, amount, 3, 'Burning aura');
   if (b.self > 0) p.life = Math.max(1, p.life - (b.self / 100) * p.def.maxLife * BURN_EVERY);
 }
 
@@ -104,6 +110,10 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     gainBuff(w, u.buff);
     // The buff's own length is the gem's: a utility buff lasts as long as its gem says.
     w.buffT[u.buff] = Math.max(w.buffT[u.buff], u.seconds * w.char.db.mult('buffDuration'));
+    return;
+  }
+  if (u.kind === 'summon') {
+    summonMinions(w, c, act.profile);
     return;
   }
   const target = actorById(w, act.targetId);

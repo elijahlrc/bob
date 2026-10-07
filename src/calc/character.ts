@@ -15,7 +15,9 @@ import {
   INT_MANA,
   STR_LIFE,
   STR_MELEE_PHYS_INC,
+  spellBaseDamage,
 } from '../data/constants';
+import { MINIONS, MINION_ENEMY_RES } from '../data/minions';
 import {
   CHARGE_KINDS,
   chargeMods,
@@ -217,7 +219,7 @@ export type SecondarySheet = {
 
 /** The DPS a character sheet reports: the primary skill, its triggered skills and its secondary casts. */
 export function sheetDps(s: CharacterSheet): number {
-  return s.skill.sustainedDps + s.triggeredDps + s.secondaryDps;
+  return s.skill.sustainedDps + s.triggeredDps + s.secondaryDps + s.minionDps;
 }
 
 export type AuraState = {
@@ -280,6 +282,8 @@ export type CharacterSheet = {
   /** Secondary casts (EXPANSION 5.5a): every other equipped active skill, cast when ready. */
   secondary: SecondarySheet[];
   secondaryDps: number;
+  /** What the summoned minions add, in damage a second (they are assumed standing). */
+  minionDps: number;
   ehp: number;
   auras: { name: string; reserved: number; active: boolean }[];
   warnings: string[];
@@ -793,6 +797,14 @@ export class Character {
           db0.addAll(mods.map((m) => ({ ...m, value: m.value * uptime, source: src })));
         else db0.addAll(mods.map((m) => ({ ...m, condition: { id: bd.cond }, source: src })));
         this.cond.bit(bd.cond);
+      } else if (u.kind === 'summon') {
+        // The minions are assumed standing: what they give their owner is always on.
+        db0.addAll(
+          gemMods(u.ownerMods ?? [], a.skill.level, a.skill.id).map((m) => ({
+            ...m,
+            source: { kind: 'gem' as const, id: a.skill.id },
+          })),
+        );
       } else if (u.kind === 'curse') {
         const hd = HEXES[u.hex];
         const t = Math.max(0, Math.min(1, (a.skill.level - 1) / 19));
@@ -1265,6 +1277,21 @@ export class Character {
     return rows.map((r) => ({ ...r, rate: (r.rate * 0.9) / total, busy: (r.busy * 0.9) / total }));
   }
 
+  /** Damage a second of the minions the character's summon skills keep standing (they are never hurt, and always in reach). */
+  minionDps(conds: number = this.configConds): number {
+    let dps = 0;
+    for (const c of this.utilities) {
+      const u = c.skill.utility;
+      if (u?.kind !== 'summon') continue;
+      const def = MINIONS[u.minion];
+      const p = this.profile(c, conds);
+      const count = Math.max(1, Math.round(levelValue(u.count, c.skill.level)) + p.minionCount);
+      const hit = spellBaseDamage(c.skill.level) * def.dmg * p.minionDamage;
+      dps += count * hit * def.rate * p.minionSpeed * MINION_ENEMY_RES * (1 + def.splash * 0.5);
+    }
+    return dps;
+  }
+
   /** How the utility skills take the character's time: each is cast once per cooldown (or per buff or curse duration). */
   utilityLoad(
     conds: number = this.configConds,
@@ -1277,7 +1304,9 @@ export class Character {
           ? (u.cooldown ?? u.seconds * 0.9)
           : u.kind === 'curse'
             ? HEX_SECONDS * 0.9
-            : u.cooldown;
+            : u.kind === 'summon'
+              ? (u.seconds ?? 90)
+              : u.cooldown;
       const rate = 1 / Math.max(every, p.useTime);
       return { choice, rate, busy: rate * p.useTime };
     });
@@ -1391,6 +1420,7 @@ export class Character {
       hexes: this.sheetHexes,
       secondary,
       secondaryDps: secondary.reduce((a, t) => a + t.dps, 0),
+      minionDps: this.minionDps(conds),
       ehp: this.ehp(d),
       auras: this.auras.map((a) => ({ name: a.def.name, reserved: a.reserved, active: a.active })),
       warnings: this.warnings,
@@ -1439,8 +1469,9 @@ export function diffSheets(a: CharacterSheet, b: CharacterSheet): SheetDiff {
     dps:
       b.skill.totalDps +
       b.triggeredDps +
-      b.secondaryDps -
-      (a.skill.totalDps + a.triggeredDps + a.secondaryDps),
+      b.secondaryDps +
+      b.minionDps -
+      (a.skill.totalDps + a.triggeredDps + a.secondaryDps + a.minionDps),
     life: b.life - a.life,
     es: b.es - a.es,
     mana: b.mana - a.mana,
