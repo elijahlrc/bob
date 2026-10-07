@@ -154,6 +154,10 @@ export const CONDITIONS = [
   'dreadBanner',
   'witherStep',
   'berserk',
+  'heraldAsh',
+  'heraldIce',
+  'heraldThunder',
+  'heraldAgony',
   // State of the player (C3): moving, ailments on the player, the weapon held.
   'stationary',
   'ignited',

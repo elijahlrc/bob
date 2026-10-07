@@ -68,7 +68,7 @@ import {
   type Item,
 } from '../data/types';
 import { CondIndex, ModDB, type ModCtx } from '../mods/modDb';
-import { WIELD_CONDS } from './staticConds';
+import { AURA_CONDS, WIELD_CONDS } from './staticConds';
 import {
   mod,
   tagMask,
@@ -565,9 +565,11 @@ export class Character {
       const it = build.equipment[slot];
       if (!it) continue;
       for (const m of itemMods(it)) {
-        if (!m.stat.startsWith('socketSupport.')) continue;
-        const def = gemDef(m.stat.slice('socketSupport.'.length));
-        if (def.kind !== 'support') continue;
+        const granted = m.stat.startsWith('grantSkill.');
+        if (!granted && !m.stat.startsWith('socketSupport.')) continue;
+        const def = gemDef(m.stat.slice(m.stat.indexOf('.') + 1));
+        if (granted ? def.kind === 'support' || def.kind === 'hex' : def.kind !== 'support')
+          continue;
         this.gems.push({
           gem: { kind: 'gem', uid: -1 - this.gems.length, gemId: def.id },
           def,
@@ -777,6 +779,9 @@ export class Character {
     registerAll(rageMods(1));
     for (const id of ['onLowLife', 'overloadActive'] as const) this.cond.bit(id);
     // Conditions that never change in a fight: the sheet takes them as true from the start.
+    for (const [id, gem] of AURA_CONDS)
+      if (this.auras.some((a) => a.active && a.def.id === gem))
+        this.configConds = maskOr(this.configConds, this.cond.peek(id));
     for (const [id, tag] of WIELD_CONDS)
       if (this.weaponTags.has(tag)) this.configConds = maskOr(this.configConds, this.cond.peek(id));
     if (this.config.steady)

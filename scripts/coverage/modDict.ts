@@ -86,7 +86,11 @@ export const CLAUSES: Clause[] = [
   { re: /(?:against|on) Ignited Enemies$/, apply: withCond('targetIgnited') },
   { re: /(?:against|on) Bleeding Enemies$/, apply: withCond('targetBleeding') },
   { re: /(?:against|on) Poisoned Enemies$/, apply: withCond('targetPoisoned') },
-  { re: /against Cursed Enemies$/, apply: withCond('targetCursed') },
+  { re: /(?:against|when Hitting) Cursed Enemies$/, apply: withCond('targetCursed') },
+  { re: /while affected by Herald of Ash$/, apply: withCond('heraldAsh') },
+  { re: /while affected by Herald of Ice$/, apply: withCond('heraldIce') },
+  { re: /while affected by Herald of Thunder$/, apply: withCond('heraldThunder') },
+  { re: /while affected by Herald of Agony$/, apply: withCond('heraldAgony') },
   { re: /against Rare or Unique Enemies$/, apply: withCond('targetRareOrUnique') },
   { re: /(?:when|while) at least # Enemies are Nearby$/, apply: withCond('targetNearby') },
   {
@@ -435,6 +439,27 @@ rule(/^Socketed Gems have # reduced Mana Reservation$/, (_m, n) => [
     return id ? [mk(`socketSupport.${id}`, 'base', n[0])] : [];
   });
 }
+// "Grants Level N X Skill": the character has the skill as if it were socketed (an item-granted gem). Only skills Bob has.
+{
+  const gems = (
+    JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'map.json'), 'utf8')) as {
+      gems: Record<string, { ref: string }>;
+    }
+  ).gems;
+  const skills = Object.entries(gems).filter(([, e]) => !/ Support$/.test(e.ref));
+  const byName = new Map<string, string>();
+  for (const [id, e] of skills) byName.set(key(e.ref), id);
+  const alt = skills.map(([, e]) => e.ref.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  rule(new RegExp(`^Grants Level # (${alt}) Skill$`, 'i'), (m, n) => {
+    const id = byName.get(key(m[1]));
+    return id ? [mk(`grantSkill.${id}`, 'base', n[0])] : [];
+  });
+  rule(new RegExp(`^Grants (${alt}) Skill$`, 'i'), (m) => {
+    const id = byName.get(key(m[1]));
+    return id ? [mk(`grantSkill.${id}`, 'base', [20, 20])] : [];
+  });
+}
+rule(/^# reduced Effect of Curses on You$/, (_m, n) => [mk('curseEffectOnSelf', 'inc', neg(n[0]))]);
 rule(/^# to Level of Socketed Gems$/, (_m, n) => [mk('socketedGemLevel', 'base', n[0])]);
 for (const [word, tag] of [
   ['Fire', 'fire'],

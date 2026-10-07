@@ -23,7 +23,7 @@ import {
 import { cannotBleed } from '../data/monsters';
 import { BUFFS, BUFF_IDS, DYN_SHIFT } from '../data/buffs';
 import { MONSTER_CONDS } from '../calc/monster';
-import { WIELD_CONDS } from '../calc/staticConds';
+import { AURA_CONDS, WIELD_CONDS } from '../calc/staticConds';
 import { maskOr, type CondId } from '../mods/types';
 import { rollGains } from './buffs';
 import { gainTrophy, rollCharges } from './charges';
@@ -73,6 +73,8 @@ const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
   poisoned: (_w, p) => p.ail.poisons.length > 0,
 };
 for (const [id, tag] of WIELD_CONDS) PLAYER_TESTS[id] = (w) => w.char.weaponTags.has(tag);
+for (const [id, gem] of AURA_CONDS)
+  PLAYER_TESTS[id] = (w) => w.char.auras.some((a) => a.active && a.def.id === gem);
 for (const id of BUFF_IDS) {
   const cond = BUFFS[id].cond;
   PLAYER_TESTS[cond] = (w) => w.buffT[id] > 0;
