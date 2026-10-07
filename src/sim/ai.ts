@@ -23,6 +23,7 @@ import { actorById, startAction } from './actions';
 import { bloaterBurst, isZone, speedMult } from './factions';
 import { flaskMask, monsterConds, playerConds } from './combat';
 import { canPay, payCost } from './cost';
+import { deployFull } from './deploy';
 import { chooseUtility } from './utility';
 import type { Actor, GroundEffect, World } from './types';
 
@@ -152,7 +153,7 @@ function chooseSkill(w: World, target: Actor) {
     if ((w.secondaryReady[c.key] ?? 0) > w.t) continue;
     const prof = w.char.profile(c, conds, flaskMask(w));
     if (!canHurt(prof, target.def) || !canPay(w, c.costsLife, prof.cost)) continue;
-    if (!inReach(w, prof, target)) continue;
+    if (deployFull(w, c, prof) || !inReach(w, prof, target)) continue;
     const cd = w.char.cooldownOf(c, conds);
     if (!second || cd > second.cd) second = { prof, costsLife: c.costsLife, key: c.key, cd };
   }
@@ -160,7 +161,11 @@ function chooseSkill(w: World, target: Actor) {
   if (w.primary.usable && w.primary.gemUid !== null) {
     const prof = w.char.profile(w.primary, conds, flaskMask(w));
     // Against a target immune to everything the skill deals, fall back to the weapon.
-    if (canHurt(prof, target.def) && canPay(w, w.primary.costsLife, prof.cost))
+    if (
+      canHurt(prof, target.def) &&
+      canPay(w, w.primary.costsLife, prof.cost) &&
+      !deployFull(w, w.primary, prof)
+    )
       return { which: 'primary' as const, prof, costsLife: w.primary.costsLife, key: '', cd: 0 };
   }
   return {

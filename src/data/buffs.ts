@@ -22,7 +22,10 @@ export type BuffId =
   | 'warBanner'
   | 'dreadBanner'
   | 'witherStep'
-  | 'berserk';
+  | 'berserk'
+  | 'regenTotem'
+  | 'decoyTotem'
+  | 'smokeScreen';
 export const BUFF_IDS: BuffId[] = [
   'fortify',
   'onslaught',
@@ -40,6 +43,9 @@ export const BUFF_IDS: BuffId[] = [
   'dreadBanner',
   'witherStep',
   'berserk',
+  'regenTotem',
+  'decoyTotem',
+  'smokeScreen',
 ];
 
 export type BuffDef = {
@@ -59,6 +65,33 @@ export type BuffDef = {
 const when = (cond: CondId): { condition: { id: CondId } } => ({ condition: { id: cond } });
 
 export const BUFFS: Record<BuffId, BuffDef> = {
+  regenTotem: {
+    id: 'regenTotem',
+    name: 'Mending Aura',
+    seconds: 8,
+    cond: 'regenTotem',
+    text: 'Mending Aura',
+    mods: [],
+    gem: true,
+  },
+  decoyTotem: {
+    id: 'decoyTotem',
+    name: 'Decoy Aura',
+    seconds: 8,
+    cond: 'decoyTotem',
+    text: 'Decoy Aura',
+    mods: [],
+    gem: true,
+  },
+  smokeScreen: {
+    id: 'smokeScreen',
+    name: 'Smoke Screen',
+    seconds: 5,
+    cond: 'smokeScreen',
+    text: 'Smoke Screen',
+    mods: [],
+    gem: true,
+  },
   berserk: {
     id: 'berserk',
     name: 'Rampant',

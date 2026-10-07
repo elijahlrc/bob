@@ -141,6 +141,15 @@ export type SocketedGem = {
   level: number;
 };
 
+/** What a skill puts on the ground instead of casting: a totem or a brand (shoots on its own), a trap or a mine (goes off when enemies come). */
+export type DeployKind = 'totem' | 'brand' | 'trap' | 'mine';
+
+function deployKind(own: readonly string[], all: ReadonlySet<string>): DeployKind | undefined {
+  for (const k of ['totem', 'brand', 'trap', 'mine'] as const)
+    if (all.has(k) || own.includes(k)) return k;
+  return undefined;
+}
+
 export type SkillChoice = {
   key: string;
   gemUid: number | null;
@@ -155,6 +164,8 @@ export type SkillChoice = {
   costsLife: boolean;
   /** Cast only by a trigger: never the primary skill. */
   triggered?: boolean;
+  /** The skill is put on the ground as a totem, brand, trap or mine (a support or the gem itself makes it so). */
+  deploy?: DeployKind;
 };
 
 /** A trigger an equipped item carries, with the skills it can cast. */
@@ -636,6 +647,7 @@ export class Character {
         costMult,
         usable,
         reason,
+        deploy: deployKind(skill.types, resolved.types),
         costsLife: usesLife(sg.slot),
       });
     }
@@ -1046,7 +1058,12 @@ export class Character {
       vulnAll: hexed.vulnAll,
     };
     const d = this.config.targetDistance;
-    const usesPerSec = usesOverride ?? timeShare / p.useTime;
+    // A totem or brand shoots on its own, whatever the character does; traps and mines go off several at a time.
+    const deployN = choice.deploy ? p.deployCount : 1;
+    const standing = choice.deploy === 'totem' || choice.deploy === 'brand';
+    const usesPerSec =
+      usesOverride ??
+      (standing ? deployN / p.useTime : (timeShare / p.useTime) * (choice.deploy ? deployN : 1));
     const perType = [0, 0, 0, 0, 0];
     let perUse = 0;
     let hc = 0;
@@ -1087,7 +1104,9 @@ export class Character {
     if (p.cost > 0 && choice.gemUid !== null && usesOverride === undefined) {
       const d = this.defence(conds);
       const regen = Math.max(0, (choice.costsLife ? d.lifeRegen : d.manaRegen) - resourceTaken);
-      sustain = Math.min(1, regen / (p.cost * usesPerSec));
+      // A deployed skill is paid for when it is put down, not at each of its shots.
+      const paid = choice.deploy ? timeShare / p.useTime : usesPerSec;
+      sustain = Math.min(1, regen / (p.cost * paid));
       if (sustain < 1) {
         const dflt = this.skillSheet(this.defaultAttack, target, conds);
         sustainedDps = sustain * totalDps + (1 - sustain) * dflt.totalDps;

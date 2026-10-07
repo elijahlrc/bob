@@ -6,6 +6,7 @@ import { rollCharges } from './charges';
 import { hit } from './combat';
 import { registerBlast, shieldBlocks, speedMult } from './factions';
 import { fireTriggers } from './triggers';
+import { placeDeployable } from './deploy';
 import { applyUtility } from './utility';
 import type { Action, Actor, World } from './types';
 
@@ -192,6 +193,13 @@ export function fire(w: World, a: Actor, act: Action): void {
   if (act.which === 'utility') {
     applyUtility(w, a, act);
     return;
+  }
+  if (a.isPlayer && act.which !== 'deployed' && act.which !== 'default') {
+    const c = w.char.actives.find((x) => x.skill.id === act.profile.skill.id);
+    if (c?.deploy) {
+      placeDeployable(w, a, act);
+      return;
+    }
   }
   const p = act.profile;
   const b = p.skill.behaviour;

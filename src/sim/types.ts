@@ -10,6 +10,7 @@ import type { MapPlan } from '../gen/mapPlan';
 import type { BuffId } from '../data/buffs';
 import type { Corpse } from './factions';
 import type { HexState } from './hexes';
+import type { Deployable } from './deploy';
 import type { Grid } from './grid';
 
 export type Dot = { dps: number; t: number; stack?: boolean };
@@ -30,7 +31,7 @@ export type Ailments = {
 export type Action = {
   profile: SkillProfile;
   /** Which skill: 'primary', 'secondary', 'default', 'monster' or 'triggered'. */
-  which: 'primary' | 'secondary' | 'default' | 'monster' | 'triggered' | 'utility';
+  which: 'primary' | 'secondary' | 'default' | 'monster' | 'triggered' | 'utility' | 'deployed';
   hand: number;
   duration: number;
   elapsed: number;
@@ -242,6 +243,7 @@ export type SimEvent =
   | { t: 'charge'; kind: string; count: number }
   | { t: 'buff'; id: string }
   | { t: 'hex'; id: number; hex: string }
+  | { t: 'deploy'; kind: string; x: number; y: number; end: boolean }
   | { t: 'stuck' }
   | { t: 'stall'; id: number }
   | {
@@ -373,6 +375,9 @@ export type World = {
   utilityReady: Record<string, number>;
   /** Time since the burning aura last struck. */
   auraBurnT: number;
+  /** The totems, brands, traps and mines on the ground. */
+  deployables: Deployable[];
+  deploySeq: number;
   actors: Actor[];
   player: Actor;
   nextId: number;

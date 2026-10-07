@@ -1,5 +1,6 @@
 import { CHARGE_KINDS, CHARGE_NAMES } from '../calc/charges';
 import { BUFF_IDS, BUFFS } from './buffs';
+import { ALL_GEMS } from './gems';
 import { ALL_HEX_IDS, HEXES } from './hexes';
 import { KEYSTONES } from './tree/keystones';
 /**
@@ -432,6 +433,7 @@ Object.assign(STAT_TEXT, {
 Object.assign(STAT_TEXT, {
   globalDefences: { name: 'Global Defences', pct: true },
   noChaosDamage: { flag: 'Deals no Chaos Damage' },
+  deployCount: { base: '{v} additional totems, traps, mines or brands at a time' },
   auraBurn: { base: 'Burn nearby Enemies for {v}% of your Maximum Life as Fire Damage per second' },
   selfBurn: { base: 'Burn for {v}% of your Maximum Life per second (cannot kill you)' },
 } satisfies Record<string, StatText>);
@@ -458,4 +460,13 @@ for (const [event, phrase] of Object.entries(MORE_EVENTS)) {
       base: `Recover {v}% of maximum ${label} ${phrase}`,
     };
   }
+}
+
+// Item-granted skills and supports linked to every socketed gem (one stat per gem).
+for (const g of ALL_GEMS) {
+  if (g.kind === 'support')
+    STAT_TEXT[`socketSupport.${g.id}`] = {
+      base: `Socketed Gems are Supported by level {v} ${g.name}`,
+    };
+  else STAT_TEXT[`grantSkill.${g.id}`] = { base: `Grants Level {v} ${g.name} Skill` };
 }
