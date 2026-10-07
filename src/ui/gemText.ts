@@ -1,4 +1,4 @@
-import { gemAttrReq, gemMods, levelValue } from '../calc/gems';
+import { gemAttrReq, gemMods, levelValue, spellDamageAt } from '../calc/gems';
 import { GEM_LEVEL_REQ, type GemDef, type SkillBehaviour } from '../data/gems';
 import { HEX_SECONDS, hexEffect, hexText } from '../data/hexes';
 import { triggerCause } from '../data/triggers';
@@ -75,10 +75,10 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
     tags.push(...def.tags.map(tagLabel));
     stats.push(`Costs ${Math.round(levelValue(def.cost, level))} mana`);
     if (def.baseMult) stats.push(`Deals ${num(levelValue(def.baseMult, level))}% of base damage`);
-    for (const d of def.spellDamage ?? [])
-      stats.push(
-        `Deals ${Math.round(levelValue(d.min, level, true))} to ${Math.round(levelValue(d.max, level, true))} ${cap(d.type)} damage`,
-      );
+    for (const d of def.spellDamage ?? []) {
+      const r = spellDamageAt(d, def.effectiveness ?? 100, level);
+      stats.push(`Deals ${r.min} to ${r.max} ${cap(r.type)} damage`);
+    }
     if (def.castTime) stats.push(`Cast time ${num(def.castTime)} s`);
     if (def.crit) stats.push(`Base critical chance ${num(def.crit)}%`);
     stats.push(...behaviourLines(def.behaviour, level));

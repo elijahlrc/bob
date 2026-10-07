@@ -24,9 +24,10 @@ const round = (n: number) => Math.round(n * 100) / 100;
 const pair = (a: number, b: number) => (a === b ? `${a}` : `[${a}, ${b}]`);
 
 /**
- * Pairs "..._minimum_..." with "..._maximum_..." stats. In 3.9 data these are the min and max *ratios* of a base damage
- * that comes from a per-level table scaled by the skill's damage effectiveness, so they are not Bob numbers: rescale
- * by hand against Bob's own spell damage tables (see the Bob gems' `effectiveness`).
+ * Pairs "..._minimum_..." with "..._maximum_..." stats. In 3.9 data these are ratios of a base damage that comes from a
+ * per-level table scaled by the skill's damage effectiveness. Bob keeps one such table (`spellBaseDamage`), so a spell
+ * is drafted as a `spread` (the lowest and highest roll as a share of their average) plus the effectiveness, and the
+ * shared curve does the rest. A `share` other than 1 means the type carries more or less than the skill's average.
  */
 function damageRanges(s: PobSkill): string[] {
   const out: string[] = [];
@@ -38,11 +39,12 @@ function damageRanges(s: PobSkill): string[] {
     const type = m[1] ?? m[2];
     const j = s.stats.indexOf(stat.replace('minimum', 'maximum'));
     if (j < 0) return;
-    const f = s.levels.first.values;
-    const l = s.levels.l20.values;
-    out.push(
-      `${type} spread ${round(f[i])}-${round(f[j])} of base at level 1, ${round(l[i])}-${round(l[j])} at level 20`,
-    );
+    const lo = s.levels.l20.values[i];
+    const hi = s.levels.l20.values[j];
+    const avg = (lo + hi) / 2;
+    if (avg <= 0) return;
+    const share = round(avg) === 1 ? '' : `, share: ${round(avg)}`;
+    out.push(`{ type: '${type}', spread: [${round(lo / avg)}, ${round(hi / avg)}]${share} }`);
   });
   return out;
 }
@@ -107,8 +109,7 @@ export function draftGem(name: string): string {
       lines.push(
         `    baseMult: ${pair(round(f.baseMultiplier * 100), round(l.baseMultiplier * 100))},`,
       );
-    if (!attack && ranges.length)
-      lines.push(`    // damage (rescale by hand): ${ranges.join('; ')}`, '    spellDamage: [],');
+    if (!attack && ranges.length) lines.push(`    spellDamage: [${ranges.join(', ')}],`);
     if (!attack && l.damageEffectiveness !== undefined)
       lines.push(`    effectiveness: ${round(l.damageEffectiveness * 100)},`);
     if (s.castTime) lines.push(`    castTime: ${s.castTime},`);

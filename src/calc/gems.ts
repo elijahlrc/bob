@@ -1,4 +1,5 @@
 import { gerp, lerp } from '../core/math';
+import { spellBaseDamage } from '../data/constants';
 import {
   GEM_LEVEL_REQ,
   MAX_GEM_LEVEL,
@@ -8,6 +9,7 @@ import {
   type GemMod,
   type LevelValue,
   type SkillBehaviour,
+  type SpellDamageDef,
 } from '../data/gems';
 import type { Attrs } from '../data/types';
 import type { SkillType } from '../data/skillTypes';
@@ -95,6 +97,23 @@ export type SkillDef = {
   bothWeapons?: boolean;
 };
 
+/** A spell's base damage in one type at a level, from explicit numbers or from the shared curve. */
+export function spellDamageAt(
+  d: SpellDamageDef,
+  effectiveness: number,
+  level: number,
+): { type: DamageType; min: number; max: number } {
+  if ('spread' in d) {
+    const avg = spellBaseDamage(level) * (effectiveness / 100) * (d.share ?? 1);
+    return { type: d.type, min: Math.round(avg * d.spread[0]), max: Math.round(avg * d.spread[1]) };
+  }
+  return {
+    type: d.type,
+    min: Math.round(levelValue(d.min, level, true)),
+    max: Math.round(levelValue(d.max, level, true)),
+  };
+}
+
 export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
   const b = def.behaviour;
   const per5 = Math.floor(level / 5);
@@ -113,11 +132,9 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     behaviour,
     level,
     baseMult: def.baseMult ? levelValue(def.baseMult, level) : 100,
-    spellDamage: (def.spellDamage ?? []).map((d) => ({
-      type: d.type,
-      min: Math.round(levelValue(d.min, level, true)),
-      max: Math.round(levelValue(d.max, level, true)),
-    })),
+    spellDamage: (def.spellDamage ?? []).map((d) =>
+      spellDamageAt(d, def.effectiveness ?? 100, level),
+    ),
     effectiveness: def.effectiveness ?? 100,
     castTime: def.castTime ?? 1,
     crit: def.crit ?? 0,

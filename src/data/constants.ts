@@ -5,6 +5,15 @@
 export const TICK_RATE = 60;
 export const DT = 1 / TICK_RATE;
 
+/**
+ * The shared curve of spell base damage at damage effectiveness 100%: the average roll, from gem level 1 to 20 (geometric,
+ * and the same curve past 20). A spell's own damage is this times its effectiveness (COVERAGE 5.2).
+ */
+export const SPELL_BASE_L1 = 6.5;
+export const SPELL_BASE_L20 = 380;
+export const spellBaseDamage = (level: number): number =>
+  SPELL_BASE_L1 * Math.pow(SPELL_BASE_L20 / SPELL_BASE_L1, (level - 1) / 19);
+
 // §6.1 Base character stats.
 export const BASE_LIFE = (level: number): number => 38 + 12 * level;
 export const BASE_MANA = (level: number): number => 34 + 6 * level;

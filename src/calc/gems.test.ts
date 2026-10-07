@@ -4,7 +4,8 @@ import { makeGem, makeItem } from '../gen/items';
 import { mod } from '../mods/types';
 import { newRun } from '../run/run';
 import { Character } from './character';
-import { gemAttrReq, levelValue, naturalGemLevel, resolveActive } from './gems';
+import { spellBaseDamage } from '../data/constants';
+import { gemAttrReq, levelValue, naturalGemLevel, resolveActive, spellDamageAt } from './gems';
 
 function buildWith(
   classId: string,
@@ -97,5 +98,28 @@ describe('gems (§11.5)', () => {
       buildWith('mystic', 10, ['flameBolt', 'stormHalo'], [mod('reducedReservation', 'base', 20)]),
     );
     expect(b.reservedMana).toBeLessThan(a.reservedMana);
+  });
+});
+
+describe('the shared spell base-damage curve (COVERAGE 5.2)', () => {
+  it('turns a spread and an effectiveness into a damage range at any level', () => {
+    const d = { type: 'fire', spread: [0.8, 1.2] } as const;
+    const l1 = spellDamageAt(d, 100, 1);
+    expect(l1.min).toBe(Math.round(spellBaseDamage(1) * 0.8));
+    expect(l1.max).toBe(Math.round(spellBaseDamage(1) * 1.2));
+    const l20 = spellDamageAt(d, 180, 20);
+    expect((l20.min + l20.max) / 2).toBeCloseTo(spellBaseDamage(20) * 1.8, 0);
+    expect(spellDamageAt(d, 100, 25).max).toBeGreaterThan(l20.max / 1.8);
+  });
+
+  it('a share scales one type of several', () => {
+    const half = spellDamageAt({ type: 'cold', spread: [1, 1], share: 0.5 }, 100, 10);
+    const full = spellDamageAt({ type: 'cold', spread: [1, 1] }, 100, 10);
+    expect(half.min).toBeCloseTo(full.min / 2, 0);
+  });
+
+  it('keeps hand-tuned numbers as they are', () => {
+    const r = spellDamageAt({ type: 'fire', min: [9, 520], max: [14, 780] }, 240, 1);
+    expect(r).toEqual({ type: 'fire', min: 9, max: 14 });
   });
 });

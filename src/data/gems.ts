@@ -26,6 +26,14 @@ export type SkillBehaviour =
   /** A nova centred on the target, not on the caster (item-granted skills). */
   | { kind: 'burst'; radius: number };
 
+/**
+ * A spell's base damage in one type: explicit numbers (hand-tuned gems), or a `spread` (the lowest and highest roll as a
+ * share of the average) taken from the shared curve `spellBaseDamage(level)` times the gem's `effectiveness`.
+ */
+export type SpellDamageDef =
+  | { type: DamageType; min: LevelValue; max: LevelValue }
+  | { type: DamageType; spread: readonly [number, number]; share?: number };
+
 export type ActiveGemDef = {
   kind: 'active';
   id: string;
@@ -39,7 +47,7 @@ export type ActiveGemDef = {
   /** Attacks: "deals N% of base damage". */
   baseMult?: LevelValue;
   /** Spells: base damage per type. */
-  spellDamage?: { type: DamageType; min: LevelValue; max: LevelValue }[];
+  spellDamage?: SpellDamageDef[];
   /** Added damage effectiveness for spells, percent. */
   effectiveness?: number;
   castTime?: number;
