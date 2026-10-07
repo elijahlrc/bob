@@ -10,6 +10,7 @@ import { createWorld, spawnMonster } from './world';
 export function dummyDefence(over: Partial<Defence> = {}): Defence {
   return {
     isPlayer: false,
+    hitTakenMult: 1,
     maxLife: 1e12,
     maxEs: 0,
     maxMana: 0,

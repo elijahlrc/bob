@@ -51,6 +51,8 @@ export type Defence = {
   physReduction: number;
   /** Multiplier on damage taken (before shock). */
   damageTakenMult: number;
+  /** Multiplier on damage taken from hits only, not from damage over time (Fortify). */
+  hitTakenMult: number;
   ailmentThreshold: number;
   stunThreshold: number;
   /** Fraction 0..1. */
@@ -183,7 +185,7 @@ export function shockTaken(def: Defence, shock: number): number {
 export function mitigate(p: SkillProfile, t: TargetState, dmg: number[]): number[] {
   const def = t.def;
   takenAs(def, dmg);
-  const taken = def.damageTakenMult * shockTaken(def, t.shock);
+  const taken = def.damageTakenMult * def.hitTakenMult * shockTaken(def, t.shock);
   for (let i = 0; i < NT; i++) {
     if (dmg[i] <= 0) continue;
     if (def.immune[i]) {

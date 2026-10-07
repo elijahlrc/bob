@@ -13,7 +13,9 @@ import {
   WOUND_DANCE_STACKS,
 } from '../data/constants';
 import { cannotBleed } from '../data/monsters';
+import { BUFFS, BUFF_IDS, DYN_SHIFT } from '../data/buffs';
 import { condBit, maskOr } from '../mods/types';
+import { rollGains } from './buffs';
 import { gainTrophy, rollCharges } from './charges';
 import { applyPlayerHexes, tickHexes } from './hexes';
 import { damageMult, hexPlayerAtRandom, onMonsterDeath, shieldedByPylon } from './factions';
@@ -55,6 +57,7 @@ export function playerConds(w: World, target: Actor | null): number {
   const manaCap = Math.max(1, p.def.maxMana - w.char.reservedMana);
   if (p.mana <= manaCap * LOW_LIFE) c = maskOr(c, condBit('onLowMana'));
   if (p.hexes.length) c = maskOr(c, condBit('cursed'));
+  for (const id of BUFF_IDS) if (w.buffT[id] > 0) c = maskOr(c, condBit(BUFFS[id].cond));
   if (target) c = maskOr(c, targetConds(target, p));
   return c;
 }
@@ -81,7 +84,7 @@ export function monsterConds(a: Actor): number {
 }
 
 export function flaskMask(w: World): number {
-  let m = 0;
+  let m = w.rage << DYN_SHIFT;
   w.flasks.forEach((f, i) => {
     if (f.activeT > 0 && f.spec.buff.length) m |= 1 << i;
   });
@@ -190,7 +193,10 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (res.outcome === 'block') {
     w.events.push({ t: 'block', src: src.id, dst: dst.id });
     dst.tBlock = 0;
-    if (dst.isPlayer) rollCharges(w, 'block');
+    if (dst.isPlayer) {
+      rollCharges(w, 'block');
+      rollGains(w, 'block');
+    }
     if (dst.def.lifeOnBlockPct > 0)
       dst.life = Math.min(lifeCap(w, dst), dst.life + dst.def.maxLife * dst.def.lifeOnBlockPct);
     wake(w, dst);
@@ -203,9 +209,17 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (dst.isPlayer) logDamage(w, src, src.name, dtype, res.total);
   src.tHit = 0;
   dst.tBeenHit = 0;
+  if (src.isPlayer) {
+    rollGains(w, 'hit');
+    if (p.skill.behaviour.kind === 'melee') rollGains(w, 'meleeHit');
+  }
+  if (dst.isPlayer) rollGains(w, 'hitTaken');
   if (res.crit) {
     src.tCrit = 0;
-    if (src.isPlayer) rollCharges(w, 'crit');
+    if (src.isPlayer) {
+      rollCharges(w, 'crit');
+      rollGains(w, 'crit');
+    }
     if (p.overload) src.tOverload = 0;
   }
   // Leech and life on hit. Some monsters cannot be leeched from; some gear makes crit leech instant.
@@ -415,7 +429,10 @@ export function killActor(w: World, a: Actor): void {
   a.life = 0;
   a.action = null;
   w.events.push({ t: 'death', id: a.id });
-  if (!a.isPlayer && !a.noReward) rollCharges(w, 'kill');
+  if (!a.isPlayer && !a.noReward) {
+    rollCharges(w, 'kill');
+    rollGains(w, 'kill');
+  }
   if (!a.isPlayer && a.rarity === 'rare') gainTrophy(w, a.modIds);
   if (a.isPlayer) {
     w.status = 'dead';

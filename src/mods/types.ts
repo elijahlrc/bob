@@ -137,6 +137,11 @@ export const CONDITIONS = [
   'onLowMana',
   'targetCursed',
   'cursed',
+  // The buff layer (src/data/buffs.ts).
+  'fortified',
+  'onslaught',
+  'unholyMight',
+  'arcaneSurge',
 ] as const;
 export type CondId = (typeof CONDITIONS)[number];
 

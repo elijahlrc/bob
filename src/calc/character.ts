@@ -25,6 +25,17 @@ import {
   type ChargeCounts,
   type ChargeKind,
 } from './charges';
+import {
+  ASSUMED_RAGE,
+  BASE_MAX_RAGE,
+  BUFFS,
+  BUFF_IDS,
+  DYN_SHIFT,
+  hasBuffSource,
+  hasRageSource,
+  rageMods,
+  type BuffId,
+} from '../data/buffs';
 import { classDef } from '../data/classes';
 import { BASE_HEX_LIMIT, HEX_IDS, hexEffect, type HexId } from '../data/hexes';
 import type { TriggerDef } from '../data/triggers';
@@ -275,6 +286,15 @@ export class Character {
   hexLimit = BASE_HEX_LIMIT;
   /** Which kinds of charge something can grant. */
   readonly chargeSource: Record<ChargeKind, boolean>;
+  /** Which buffs something can grant (their effects are in the database, behind their conditions), and whether rage. */
+  readonly buffSource: Record<BuffId, boolean>;
+  readonly rageSource: boolean;
+  /** Whether anything can grant a buff or rage (so the sim can skip rolling when nothing can). */
+  readonly anyGain: boolean;
+  /** The most rage the character can hold. */
+  readonly rageMax: number;
+  /** The dynamic state (rage) the sheet assumes when none is given: part of the cache key like active flasks. */
+  private readonly defaultDyn: number;
   /** Every other usable active skill that the primary's position can reach (see `secondaries`). */
   private secondaryCandidates: SkillChoice[] = [];
   private secondaryCache: SkillChoice[] | null = null;
@@ -287,7 +307,7 @@ export class Character {
   configConds: number;
   readonly warnings: string[] = [];
   private profiles = new Map<string, SkillProfile>();
-  private defences = new Map<number, Defence>();
+  private defences = new Map<string, Defence>();
   private flaskDbs = new Map<number, ModDB>();
   readonly statValue: (s: StatId) => number;
 
@@ -405,6 +425,17 @@ export class Character {
       fervour: hasChargeSource(mods, 'fervour'),
       insight: hasChargeSource(mods, 'insight'),
     };
+    // Buffs: their effects wait behind a condition, so they are only added when something can grant them.
+    this.buffSource = { fortify: false, onslaught: false, unholyMight: false, arcaneSurge: false };
+    for (const id of BUFF_IDS) {
+      this.buffSource[id] = hasBuffSource(mods, id);
+      if (this.buffSource[id]) mods.push(...BUFFS[id].mods);
+    }
+    this.rageSource = hasRageSource(mods);
+    this.anyGain = this.rageSource || BUFF_IDS.some((id) => this.buffSource[id]);
+    this.rageMax =
+      BASE_MAX_RAGE + mods.reduce((n, m) => (m.stat === 'maxRage' ? n + m.value : n), 0);
+    this.defaultDyn = this.rageSource ? ASSUMED_RAGE << DYN_SHIFT : 0;
     const db0 = new ModDB(mods);
     const ctx0: ModCtx = { tags: 0, ancestry: 0, conds: cc, statValue: () => 0 };
 
@@ -713,6 +744,8 @@ export class Character {
 
   steadyMask(mode: SteadyMode): number {
     let m = maskOr(condBit('hitRecently'), condBit('usedFlaskRecently'));
+    // A buff that something can grant is assumed up, as a charge is assumed held.
+    for (const id of BUFF_IDS) if (this.buffSource[id]) m = maskOr(m, condBit(BUFFS[id].cond));
     if (this.hexes.length) m = maskOr(m, condBit('targetCursed'));
     if (mode === 'clearing') m = maskOr(m, condBit('killedRecently'));
     const d = this.defence(m);
@@ -727,7 +760,11 @@ export class Character {
   }
 
   /** The profile of a skill for a condition mask and a bitmask of active flasks (cached). */
-  profile(choice: SkillChoice, conds: number = this.configConds, flaskMask = 0): SkillProfile {
+  profile(
+    choice: SkillChoice,
+    conds: number = this.configConds,
+    flaskMask: number = this.defaultDyn,
+  ): SkillProfile {
     const c = maskAnd(conds, this.relevantConds);
     const k = `${choice.key}|${c}|${flaskMask}`;
     let p = this.profiles.get(k);
@@ -753,25 +790,26 @@ export class Character {
     return p;
   }
 
-  /** The mod database with the buffs of the flasks in `flaskMask` added (cached). */
-  dbWith(flaskMask: number): ModDB {
-    if (!flaskMask) return this.db;
-    let db = this.flaskDbs.get(flaskMask);
+  /** The mod database with the flasks and the rage in the dynamic mask added (cached): flask bits, then rage << DYN_SHIFT. */
+  dbWith(dyn: number): ModDB {
+    if (!dyn) return this.db;
+    let db = this.flaskDbs.get(dyn);
     if (!db) {
-      const extra: Mod[] = [];
+      const flasks = dyn & ((1 << DYN_SHIFT) - 1);
+      const extra: Mod[] = rageMods(Math.min(this.rageMax, dyn >> DYN_SHIFT));
       this.flasks.forEach((f, i) => {
-        if (flaskMask & (1 << i)) extra.push(...f.buff);
+        if (flasks & (1 << i)) extra.push(...f.buff);
       });
       db = new ModDB([...this.db.mods(), ...extra]);
-      this.flaskDbs.set(flaskMask, db);
+      this.flaskDbs.set(dyn, db);
     }
     return db;
   }
 
   /** Defences for a condition mask and a bitmask of active flasks (cached). */
-  defence(conds: number = this.configConds, flaskMask = 0): Defence {
+  defence(conds: number = this.configConds, flaskMask: number = this.defaultDyn): Defence {
     const c = maskAnd(conds, this.relevantConds);
-    const k = c * 64 + flaskMask;
+    const k = `${c}|${flaskMask}`;
     let d = this.defences.get(k);
     if (!d) {
       const db = this.dbWith(flaskMask);

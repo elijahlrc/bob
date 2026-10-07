@@ -80,7 +80,8 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
       db.mult('lifeRegen', ctx);
   // Increased mana regeneration scales flat regeneration too (3.9).
   const manaRegen =
-    (maxMana * (BASE_MANA_REGEN_PCT / 100) + db.sum('base', 'manaRegenFlat', ctx)) *
+    (maxMana * ((BASE_MANA_REGEN_PCT + db.sum('base', 'manaRegenPct', ctx)) / 100) +
+      db.sum('base', 'manaRegenFlat', ctx)) *
     db.mult('manaRegen', ctx);
 
   return {
@@ -96,6 +97,7 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
     maxRes,
     physReduction: clamp(db.sum('base', 'physReduction', ctx) / 100, 0, 0.9),
     damageTakenMult: db.mult('damageTaken', ctx),
+    hitTakenMult: db.mult('hitTaken', ctx),
     ailmentThreshold: opts.isPlayer ? maxLife + maxEs : maxLife,
     // Chaos Inoculation: the stun threshold uses the life the character would have without it (3.9).
     stunThreshold: fullLife * db.mult('stunThreshold', ctx) * (opts.stunThreshMult ?? 1),

@@ -7,6 +7,7 @@ import type { Rng } from '../core/rng';
 import type { MonsterModId, MonsterRarity } from '../data/monsters';
 import type { AnyItem, Build } from '../data/types';
 import type { MapPlan } from '../gen/mapPlan';
+import type { BuffId } from '../data/buffs';
 import type { Corpse } from './factions';
 import type { HexState } from './hexes';
 import type { Grid } from './grid';
@@ -211,6 +212,7 @@ export type SimEvent =
   | { t: 'explode'; x: number; y: number; r: number; dtype: number }
   | { t: 'blink'; id: number; x: number; y: number; end: boolean }
   | { t: 'charge'; kind: string; count: number }
+  | { t: 'buff'; id: string }
   | { t: 'hex'; id: number; hex: string }
   | { t: 'stuck' }
   | { t: 'stall'; id: number }
@@ -328,6 +330,11 @@ export type World = {
   rngTrig: Rng;
   /** Seconds left on the charges of each kind (EXPANSION 5.6), and the characters built for each count held. */
   chargeT: Record<'grit' | 'fervour' | 'insight', number>;
+  /** Seconds left of each buff (src/data/buffs.ts), the rage held, seconds since rage was fed, and the drain timer. */
+  buffT: Record<BuffId, number>;
+  rage: number;
+  rageT: number;
+  rageDrain: number;
   chars: Map<string, Character>;
   /** The Trophy Cord: monster mods held, by mod id, and the seconds left of each. */
   trophy: Record<string, number>;

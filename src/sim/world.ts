@@ -14,6 +14,7 @@ import { monsterAI, playerAI, separate } from './ai';
 import { lifeCap, rawHit, refreshPlayerDefence, tickActor } from './combat';
 import { autoFlaskPolicy, type FlaskPolicy } from './flaskPolicy';
 import { isZone, tickCorpses, tickFactionBehaviour, tickZones } from './factions';
+import { rollGains, tickBuffs } from './buffs';
 import { rebuildCharacter, seedCharacters, tickCharges } from './charges';
 import { tickTriggers } from './triggers';
 import { Grid } from './grid';
@@ -170,6 +171,10 @@ export function createWorld(inp: CreateWorldInput): World {
     rngLoot: root.fork('loot'),
     rngTrig: root.fork('trigger'),
     chargeT: { grit: 0, fervour: 0, insight: 0 },
+    buffT: { fortify: 0, onslaught: 0, unholyMight: 0, arcaneSurge: 0 },
+    rage: 0,
+    rageT: 0,
+    rageDrain: 0,
     chars: new Map(),
     trophy: {},
     secondaryReady: {},
@@ -319,6 +324,7 @@ function useFlask(w: World, i: number): void {
     p.ail.chill = 0;
   }
   w.events.push({ t: 'flaskUsed', idx: i });
+  rollGains(w, 'flask');
 }
 
 function tickFlasks(w: World, dt: number, policy: FlaskPolicy): void {
@@ -457,6 +463,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   refreshPlayerDefence(w);
   tickTriggers(w, dt);
   tickCharges(w, dt);
+  tickBuffs(w, dt);
   tickFlasks(w, dt, policy);
   // Flow field for monsters follows the player tile.
   w.grid.buildFlow(p.x, p.y);
