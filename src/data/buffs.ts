@@ -21,7 +21,8 @@ export type BuffId =
   | 'infernalCry'
   | 'warBanner'
   | 'dreadBanner'
-  | 'witherStep';
+  | 'witherStep'
+  | 'berserk';
 export const BUFF_IDS: BuffId[] = [
   'fortify',
   'onslaught',
@@ -38,6 +39,7 @@ export const BUFF_IDS: BuffId[] = [
   'warBanner',
   'dreadBanner',
   'witherStep',
+  'berserk',
 ];
 
 export type BuffDef = {
@@ -57,6 +59,15 @@ export type BuffDef = {
 const when = (cond: CondId): { condition: { id: CondId } } => ({ condition: { id: cond } });
 
 export const BUFFS: Record<BuffId, BuffDef> = {
+  berserk: {
+    id: 'berserk',
+    name: 'Rampant',
+    seconds: 8,
+    cond: 'berserk',
+    text: 'Rampant',
+    mods: [],
+    gem: true,
+  },
   bloodSurge: {
     id: 'bloodSurge',
     name: 'Blood Surge',

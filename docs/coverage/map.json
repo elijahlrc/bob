@@ -974,6 +974,201 @@
    "ref": "Dread Banner",
    "status": "covered",
    "note": "A banner that makes the character's hits impale and gives a fortifying effect (modelled as a timed buff of impale chance and less damage taken from hits)."
+  },
+  "ironHide": {
+   "ref": "Steelskin",
+   "status": "covered",
+   "note": "A guard: when life is low, the character takes much less damage from hits for a few seconds (the absorb limit is folded into a flat reduction), then waits for the cooldown."
+  },
+  "slagCarapace": {
+   "ref": "Molten Shell",
+   "status": "covered",
+   "note": "A guard: for a few seconds the character takes less damage from hits (the share absorbed and reflected as fire is folded into the reduction)."
+  },
+  "deathlessCall": {
+   "ref": "Immortal Call",
+   "status": "covered",
+   "note": "A guard: for a few seconds the character takes much less damage (the endurance charges it would consume are dropped)."
+  },
+  "bloodSurgeCall": {
+   "ref": "Blood Rage",
+   "status": "covered",
+   "note": "A buff kept up while enemies are near: faster attacks and life leech (the life drain and frenzy charge on kill are dropped)."
+  },
+  "rampage": {
+   "ref": "Berserk",
+   "status": "covered",
+   "note": "A buff cast when a pack or a rare enemy is near: more attack damage, speed and movement, and less damage taken (the rage threshold and loss are dropped)."
+  },
+  "quickStep": {
+   "ref": "Dash",
+   "status": "covered",
+   "note": "A blink: the character jumps toward a target that is out of reach (cooldown 2 seconds)."
+  },
+  "cinderStep": {
+   "ref": "Flame Dash",
+   "status": "covered",
+   "note": "A blink toward the target (the burning ground left behind is dropped)."
+  },
+  "rimeStep": {
+   "ref": "Frostblink",
+   "status": "covered",
+   "note": "A blink toward the target (the chilling ground and the cooldown recovery from nearby enemies are dropped)."
+  },
+  "boltStep": {
+   "ref": "Lightning Warp",
+   "status": "covered",
+   "note": "A warp toward the target (the shocking markers it leaves are dropped)."
+  },
+  "shadowSwap": {
+   "ref": "Bodyswap",
+   "status": "covered",
+   "note": "A blink toward the target (the corpse and the explosion it triggers are dropped)."
+  },
+  "slipstream": {
+   "ref": "Phase Run",
+   "status": "covered",
+   "note": "A buff of movement speed and more melee physical damage, kept up in fights."
+  },
+  "rotStride": {
+   "ref": "Withering Step",
+   "status": "covered",
+   "note": "A buff of movement speed that leaves the enemies near open to chaos (the withered stacks are folded into chaos penetration; the dash is dropped)."
+  },
+  "skyfallLeap": {
+   "ref": "Leap Slam",
+   "status": "covered",
+   "note": "A leap to the target that lands in a slam; stuns enemies on full life."
+  },
+  "bulwarkRush": {
+   "ref": "Shield Charge",
+   "status": "covered",
+   "note": "A charge with a shield to the target that hits harder the farther it ran."
+  },
+  "spinningDash": {
+   "ref": "Whirling Blades",
+   "status": "covered",
+   "note": "A whirling dash through the target, hitting once along the way."
+  },
+  "twisterBlade": {
+   "ref": "Cyclone",
+   "status": "covered",
+   "note": "A spinning attack around the character that builds up speed (the stages and the slower movement are averaged)."
+  },
+  "blinkingCut": {
+   "ref": "Flicker Strike",
+   "status": "covered",
+   "note": "A strike that carries the character to the target and gains Fervour charges, attacking faster for each."
+  },
+  "stormRush": {
+   "ref": "Charged Dash",
+   "status": "covered",
+   "note": "A dash through the target that ends in a lightning burst (the stages while channelling are averaged)."
+  },
+  "blessedTrail": {
+   "ref": "Consecrated Path",
+   "status": "covered",
+   "note": "A travelling attack that is half fire and leaves holy ground behind (the ground is dropped)."
+  },
+  "snagLash": {
+   "ref": "Chain Hook",
+   "status": "covered",
+   "note": "A hooked strike that reaches far and gains rage when it hits."
+  },
+  "quickeningHalo": {
+   "ref": "Haste",
+   "status": "covered",
+   "note": "An aura that reserves mana and quickens attacks, casting and movement (the allies' share is dropped)."
+  },
+  "keenHalo": {
+   "ref": "Precision",
+   "status": "covered",
+   "note": "An aura that reserves mana and gives accuracy and critical strike chance."
+  },
+  "crushingHalo": {
+   "ref": "Pride",
+   "status": "covered",
+   "note": "An aura that reserves mana: the character's physical damage rises (the enemies' vulnerability near the character is folded into more damage)."
+  },
+  "warden": {
+   "ref": "Purity of Elements",
+   "status": "covered",
+   "note": "An aura that reserves mana and gives resistance to all elements."
+  },
+  "emberWard": {
+   "ref": "Purity of Fire",
+   "status": "covered",
+   "note": "An aura that reserves mana and gives fire resistance and maximum fire resistance."
+  },
+  "frostWard": {
+   "ref": "Purity of Ice",
+   "status": "covered",
+   "note": "An aura that reserves mana and gives cold resistance and maximum cold resistance."
+  },
+  "stormWard": {
+   "ref": "Purity of Lightning",
+   "status": "covered",
+   "note": "An aura that reserves mana and gives lightning resistance and maximum lightning resistance."
+  },
+  "vitalHalo": {
+   "ref": "Vitality",
+   "status": "covered",
+   "note": "An aura that reserves mana and regenerates life."
+  },
+  "fervorHalo": {
+   "ref": "Zealotry",
+   "status": "covered",
+   "note": "An aura that reserves mana: more spell damage and critical strike chance (the consecrated ground is dropped)."
+  },
+  "maliceHalo": {
+   "ref": "Malevolence",
+   "status": "covered",
+   "note": "An aura that reserves mana: more damage over time and longer ailments."
+  },
+  "duneStance": {
+   "ref": "Blood and Sand",
+   "status": "covered",
+   "note": "A stance with no reservation: the two stances are averaged into more melee area damage."
+  },
+  "stoneStance": {
+   "ref": "Flesh and Stone",
+   "status": "covered",
+   "note": "A stance with no reservation: the two stances are averaged into less damage taken from hits."
+  },
+  "rimePlate": {
+   "ref": "Arctic Armour",
+   "status": "covered",
+   "note": "An aura that reserves mana and cuts the damage taken from hits (the chill on attackers is dropped)."
+  },
+  "searingMantle": {
+   "ref": "Righteous Fire",
+   "status": "covered",
+   "note": "A burning aura with no reservation: the character burns itself without dying and burns the enemies near, with more spell damage."
+  },
+  "cinderHerald": {
+   "ref": "Herald of Ash",
+   "status": "covered",
+   "note": "An aura that reserves mana: physical damage gained as fire, and ignites spread from enemies killed while burning (the overkill burn is dropped)."
+  },
+  "rimeHerald": {
+   "ref": "Herald of Ice",
+   "status": "covered",
+   "note": "An aura that reserves mana: added cold damage, and frozen enemies shatter in an icy burst when killed."
+  },
+  "stormHerald": {
+   "ref": "Herald of Thunder",
+   "status": "covered",
+   "note": "An aura that reserves mana: added lightning damage, and shocked enemies burst in lightning when killed."
+  },
+  "sourHerald": {
+   "ref": "Herald of Agony",
+   "status": "covered",
+   "note": "An aura that reserves mana: a chance to poison and more poison damage (the scorpion minion is dropped)."
+  },
+  "thunderRebuke": {
+   "ref": "Smite",
+   "status": "covered",
+   "note": "A strike with a mace, sceptre or staff that is half lightning, with a chance to shock (the aura for allies is dropped)."
   }
  },
  "uniques": {

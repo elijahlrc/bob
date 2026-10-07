@@ -41,7 +41,7 @@ export type TriggerDef = {
   /** Only skill uses with all these tags count (for example 'melee'). */
   tags?: SkillTag[];
   /** Kill triggers: only enemies carrying this count. */
-  targetHas?: 'shock' | 'ignite' | 'hex';
+  targetHas?: 'shock' | 'ignite' | 'hex' | 'freeze' | 'poison' | 'bleed';
   /** Chance each time the trigger is met, percent. */
   chance: number;
   /** Seconds between two firings of this trigger. */
@@ -49,6 +49,15 @@ export type TriggerDef = {
   /** Hit-taken triggers: fire after damage equal to this percent of maximum life has been taken. */
   threshold?: number;
   effect: TriggerEffect;
+};
+
+const TARGET_WORD: Record<NonNullable<TriggerDef['targetHas']>, string> = {
+  shock: 'shocked',
+  ignite: 'ignited',
+  hex: 'hexed',
+  freeze: 'frozen',
+  poison: 'poisoned',
+  bleed: 'bleeding',
 };
 
 const TAG_WORD: Record<string, string> = {
@@ -91,7 +100,7 @@ export function triggerCause(t: TriggerDef): string {
     case 'cast':
       return 'when you cast a spell';
     case 'kill':
-      return `when you kill ${t.targetHas ? `a ${t.targetHas === 'shock' ? 'shocked' : t.targetHas === 'hex' ? 'hexed' : 'ignited'} enemy` : 'an enemy'}`;
+      return `when you kill ${t.targetHas ? `a ${TARGET_WORD[t.targetHas]} enemy` : 'an enemy'}`;
     case 'block':
       return 'when you block';
     case 'hitTaken':

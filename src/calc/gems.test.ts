@@ -28,7 +28,7 @@ describe('gems (§11.5)', () => {
   it('has the first 7 actives, 19 supports and 7 auras, and the coverage plan adds more (generated)', () => {
     expect(ACTIVE_GEMS.length).toBeGreaterThanOrEqual(7);
     expect(SUPPORT_GEMS.length).toBeGreaterThanOrEqual(19);
-    expect(AURA_GEMS).toHaveLength(7);
+    expect(AURA_GEMS.length).toBeGreaterThanOrEqual(7);
   });
 
   it('interpolates L1→L20 and extrapolates above', () => {

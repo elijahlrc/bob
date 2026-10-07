@@ -301,6 +301,8 @@ export class Character {
   readonly hexes: PlayerHex[] = [];
   /** How many of the hexes of the character a target holds at once. */
   hexLimit = BASE_HEX_LIMIT;
+  /** A burning aura (Righteous Fire's analog): fire damage to enemies near, and to the character, as a percent of maximum life a second. */
+  readonly burn: { pct: number; self: number } = { pct: 0, self: 0 };
   /** The utility skills (curses, buffs, warcries, blinks) the character casts by policy, not as damage. */
   readonly utilities: SkillChoice[] = [];
   /** The curses the character casts as skills (utility gems), strongest first. */
@@ -710,6 +712,16 @@ export class Character {
         this.warnings.push(`${def.name} is inactive: not enough ${life ? 'life' : 'mana'}`);
       }
       this.auras.push({ gem: sg, def, reserved: r, active });
+      if (active)
+        (def.triggers ?? []).forEach((t, i) =>
+          this.triggers.push({
+            key: `aura${sg.gem.uid}:${i}`,
+            def: t,
+            slot: sg.slot,
+            skills: [],
+            tagMask: tagMask(t.tags),
+          }),
+        );
     }
     // Utility buffs act while their timer runs (the sim) or, for the sheet, as if up; marks give their bonuses.
     for (const a of this.utilities) {
@@ -749,6 +761,10 @@ export class Character {
     }
     this.reservedLife = reservedLife;
     this.reservedMana = reservedMana;
+    this.burn = {
+      pct: Math.max(0, db0.sum('base', 'auraBurn', ctx0)),
+      self: Math.max(0, db0.sum('base', 'selfBurn', ctx0)),
+    };
     this.db = db0;
     this.flasks = build.flasks.filter((f) => f !== null).map((f) => flaskSpec(f!, db0));
     // Register every condition any mod of this character can use up front (gems, flasks, rage), so a mask built before

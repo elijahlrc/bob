@@ -3,7 +3,7 @@ import type { TriggerDef } from './triggers';
 import type { BuffId } from './buffs';
 import type { HexId } from './hexes';
 import type { SkillType } from './skillTypes';
-import { GEN_ACTIVE_GEMS, GEN_SUPPORT_GEMS } from './gemsGen';
+import { GEN_ACTIVE_GEMS, GEN_AURA_GEMS, GEN_SUPPORT_GEMS } from './gemsGen';
 
 /** A value authored at gem level 1 and level 20 (DESIGN.md §11.5). */
 export type LevelValue = number | readonly [number, number];
@@ -145,6 +145,8 @@ export type AuraGemDef = {
   reservePct?: number;
   reserveFlat?: LevelValue;
   mods: GemMod[];
+  /** What the aura does on events while it is active (a herald's explosions). */
+  triggers?: TriggerDef[];
   description: string;
 };
 
@@ -666,6 +668,7 @@ export const GRANTED_GEMS: ActiveGemDef[] = [
 // The coverage plan's gems (docs/coverage/gems, generated).
 ACTIVE_GEMS.push(...GEN_ACTIVE_GEMS);
 SUPPORT_GEMS.push(...GEN_SUPPORT_GEMS);
+AURA_GEMS.push(...GEN_AURA_GEMS);
 
 /** Every gem that can drop. */
 export const ALL_GEMS: GemDef[] = [

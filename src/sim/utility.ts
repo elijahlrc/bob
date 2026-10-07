@@ -3,7 +3,7 @@ import type { SkillProfile } from '../calc/skill';
 import { hexEffect } from '../data/hexes';
 import { actorById } from './actions';
 import { gainBuff } from './buffs';
-import { flaskMask, playerConds } from './combat';
+import { flaskMask, playerConds, rawHit } from './combat';
 import { canPay } from './cost';
 import { applyHex } from './hexes';
 import type { Action, Actor, World } from './types';
@@ -74,6 +74,25 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
       return { choice: c, prof, cd: u.cooldown };
   }
   return null;
+}
+
+/** Radius of a burning aura, in tiles. */
+const BURN_RADIUS = 2.8;
+const BURN_EVERY = 0.5;
+
+/** A burning aura damages the enemies near the player (and the player, without killing it) twice a second. */
+export function tickAuraBurn(w: World, dt: number): void {
+  const b = w.char.burn;
+  if (b.pct <= 0 && b.self <= 0) return;
+  w.auraBurnT += dt;
+  if (w.auraBurnT < BURN_EVERY) return;
+  w.auraBurnT -= BURN_EVERY;
+  const p = w.player;
+  if (!p.alive) return;
+  const amount = (b.pct / 100) * p.def.maxLife * BURN_EVERY;
+  if (amount > 0)
+    for (const e of enemiesNear(w, p.x, p.y, BURN_RADIUS)) rawHit(w, e, amount, 1, 'Burning aura');
+  if (b.self > 0) p.life = Math.max(1, p.life - (b.self / 100) * p.def.maxLife * BURN_EVERY);
 }
 
 /** What a utility cast does when it lands: the buff starts, the curse falls on the target and the pack around it, the player blinks. */

@@ -432,6 +432,8 @@ Object.assign(STAT_TEXT, {
 Object.assign(STAT_TEXT, {
   globalDefences: { name: 'Global Defences', pct: true },
   noChaosDamage: { flag: 'Deals no Chaos Damage' },
+  auraBurn: { base: 'Burn nearby Enemies for {v}% of your Maximum Life as Fire Damage per second' },
+  selfBurn: { base: 'Burn for {v}% of your Maximum Life per second (cannot kill you)' },
 } satisfies Record<string, StatText>);
 
 // Events added with the skill-scoped gains: a stun, the start of a spell.

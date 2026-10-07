@@ -16,6 +16,7 @@ import { autoFlaskPolicy, type FlaskPolicy } from './flaskPolicy';
 import { isZone, tickCorpses, tickFactionBehaviour, tickZones } from './factions';
 import { BUFF_IDS, type BuffId } from '../data/buffs';
 import { rollGains, tickBuffs } from './buffs';
+import { tickAuraBurn } from './utility';
 import { rebuildCharacter, seedCharacters, tickCharges } from './charges';
 import { tickTriggers } from './triggers';
 import { Grid } from './grid';
@@ -182,6 +183,7 @@ export function createWorld(inp: CreateWorldInput): World {
     trophy: {},
     secondaryReady: {},
     utilityReady: {},
+    auraBurnT: 0,
     trig: {
       cooldown: {},
       taken: {},
@@ -469,6 +471,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickTriggers(w, dt);
   tickCharges(w, dt);
   tickBuffs(w, dt);
+  tickAuraBurn(w, dt);
   tickSkillZones(w, dt);
   tickFlasks(w, dt, policy);
   // Flow field for monsters follows the player tile.

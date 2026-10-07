@@ -99,6 +99,9 @@ describe('every active gem', () => {
         dummy.rarity = 'boss'; // rallying skills wait for a pack or a big enemy
         let seen = false;
         const u = def.utility;
+        // A guard waits for low life.
+        if (u.kind === 'buff' && u.policy === 'guard')
+          world.player.life = world.player.def.maxLife * 0.4;
         for (let i = 0; i < 20 * 60 && !seen; i++) {
           stepWorld(world);
           if (u.kind === 'buff') seen = world.buffT[u.buff] > 0;
@@ -158,6 +161,24 @@ describe('every aura and other gem', () => {
       const sheet = new Character(b, { areaLevel: 50 }).sheet();
       expect(finite(sheet.skill.totalDps)).toBe(true);
       expect(finite(sheet.life)).toBe(true);
+    });
+  }
+});
+
+describe('every aura gem', () => {
+  for (const def of AURA_GEMS) {
+    it(`${def.id}: is active when socketed, reserves what it says, and its sheet computes`, () => {
+      const b = buildFor([def.id], 'sword_3', ATTR_CLASS(def.attr));
+      const c = new Character(b, { areaLevel: 50 });
+      const sheet = c.sheet();
+      expect(c.auras.map((a) => a.def.id)).toContain(def.id);
+      const a = c.auras.find((x) => x.def.id === def.id)!;
+      expect(a.active).toBe(true);
+      if (def.reservePct) expect(a.reserved).toBeGreaterThan(0);
+      for (const t of def.triggers ?? [])
+        expect(c.triggers.some((s) => s.def.effect.kind === t.effect.kind)).toBe(true);
+      expect(finite(sheet.life)).toBe(true);
+      expect(finite(sheet.ehp)).toBe(true);
     });
   }
 });

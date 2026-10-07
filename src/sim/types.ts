@@ -371,6 +371,8 @@ export type World = {
   secondaryReady: Record<string, number>;
   /** When each utility skill (by choice key) can next be cast. */
   utilityReady: Record<string, number>;
+  /** Time since the burning aura last struck. */
+  auraBurnT: number;
   actors: Actor[];
   player: Actor;
   nextId: number;

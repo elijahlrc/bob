@@ -35,7 +35,13 @@ function matches(d: TriggerDef, ev: TriggerEvent, tagMask: number): boolean {
         ? t.ail.shock > 0
         : d.targetHas === 'hex'
           ? t.hexes.length > 0
-          : t.ail.ignites.length > 0;
+          : d.targetHas === 'freeze'
+            ? t.ail.freezeT > 0
+            : d.targetHas === 'poison'
+              ? t.ail.poisons.length > 0
+              : d.targetHas === 'bleed'
+                ? t.ail.bleeds.length > 0
+                : t.ail.ignites.length > 0;
     if (!has) return false;
   }
   return true;
