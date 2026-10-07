@@ -81,6 +81,8 @@ export type ActiveGemDef = {
   requiresWeapon?: SkillTag[];
   /** Sweep: dual wielding hits with both weapons. */
   bothWeapons?: boolean;
+  /** Only usable while dual wielding. */
+  needsDualWield?: boolean;
   description: string;
 };
 

@@ -309,6 +309,91 @@
    "ref": "Empower Support",
    "status": "covered",
    "note": "Raises the level of the supported skill."
+  },
+  "driftingStorm": {
+   "ref": "Ball Lightning",
+   "status": "covered",
+   "note": "A slow orb of lightning that keeps striking the area around it (modelled as a zone that pulses for two seconds)."
+  },
+  "quiverRush": {
+   "ref": "Barrage",
+   "status": "covered",
+   "note": "A wide volley from a bow or a wand (the repeated volleys are folded into the damage of one)."
+  },
+  "flurryOfEdges": {
+   "ref": "Blade Flurry",
+   "status": "covered",
+   "note": "A channelled flurry of strikes in front of the character; the stacking damage is averaged into the base."
+  },
+  "orbitingBlades": {
+   "ref": "Blade Vortex",
+   "status": "covered",
+   "note": "Blades orbit the caster and cut everything near (modelled as a nova that repeats every cast)."
+  },
+  "rainOfSteel": {
+   "ref": "Bladefall",
+   "status": "covered",
+   "note": "Volleys of blades rain on an area (modelled as a zone that pulses five times)."
+  },
+  "whirlwindCleave": {
+   "ref": "Bladestorm",
+   "status": "covered",
+   "note": "A spinning attack around the character (the storm and stance are dropped)."
+  },
+  "emberDownpour": {
+   "ref": "Blast Rain",
+   "status": "covered",
+   "note": "Arrows rain on an area as fire (all physical converted to fire, with fire penetration)."
+  },
+  "witheringBreath": {
+   "ref": "Blight",
+   "status": "covered",
+   "note": "A channelled breath of chaos in front of the character (the stacking debuff is averaged into short ticks)."
+  },
+  "torchArrow": {
+   "ref": "Burning Arrow",
+   "status": "covered",
+   "note": "A fire arrow that ignites harder than most."
+  },
+  "acidArrow": {
+   "ref": "Caustic Arrow",
+   "status": "covered",
+   "note": "A chaos arrow that bursts and poisons (the lasting cloud is folded into the poison)."
+  },
+  "viperLash": {
+   "ref": "Cobra Lash",
+   "status": "covered",
+   "note": "A poisonous projectile that chains between enemies, from a dagger or a claw."
+  },
+  "suddenFrost": {
+   "ref": "Cold Snap",
+   "status": "covered",
+   "note": "A burst of cold at the target that chills more than usual (the chilled ground is folded into the chill)."
+  },
+  "creepingPlague": {
+   "ref": "Contagion",
+   "status": "covered",
+   "note": "A chaos cloud that eats at everything in it (the spread on death is dropped)."
+  },
+  "pyreBurst": {
+   "ref": "Cremation",
+   "status": "covered",
+   "note": "Fire erupts in an area for several seconds (the corpse is not needed here)."
+  },
+  "judgementTempest": {
+   "ref": "Divine Ire",
+   "status": "covered",
+   "note": "A channelled storm around the character that zaps nearby enemies (the stages are averaged)."
+  },
+  "twinCut": {
+   "ref": "Double Strike",
+   "status": "covered",
+   "note": "Two fast strikes with a melee weapon, with a chance to bleed."
+  },
+  "twinBlades": {
+   "ref": "Dual Strike",
+   "status": "covered",
+   "note": "Strikes with both weapons at once, with more critical chance; dual wielding only."
   }
  },
  "uniques": {

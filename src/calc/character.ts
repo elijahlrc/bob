@@ -560,6 +560,10 @@ export class Character {
         usable = false;
         reason = `${skill.name} needs a ${skill.requiresWeapon.join(' or ')}`;
       }
+      if (sg.def.needsDualWield && !this.dualWielding) {
+        usable = false;
+        reason = `${skill.name} needs two weapons`;
+      }
       if (skill.id === 'venomCut' && weaponTags.has('twoHand')) {
         usable = false;
         reason = `${skill.name} needs a one-handed weapon`;
