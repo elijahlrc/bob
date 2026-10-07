@@ -53,6 +53,15 @@ export const IGNORED: RegExp[] = [
   /^# increased Effect of Socketed Jewels$/,
   /^Cover Enemies in Ash/,
   /^Zealot's Oath$/,
+  /^# increased Character Size$/,
+  /^Can have a second Enchantment Modifier$/,
+  /^Can be modified while Corrupted$/,
+  /^Can have up to # Implicit Modifiers while Item has this Modifier$/,
+  /Fishing Line Strength$/,
+  /(Quantity|Rarity) of Fish Caught$/,
+  /^You can catch Corrupted Fish$/,
+  /^Veiled (prefix|suffix)/,
+  /^(of the Veil|Veiled)/,
 ];
 
 // ---- Clauses -----------------------------------------------------------------------------------------------------

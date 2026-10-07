@@ -140,12 +140,41 @@ export type PobUnique = {
   implicits: number;
 };
 
+let pobCache: PobUnique[] | null = null;
+
+/**
+ * The 3.9-era unique data: Path of Building's, plus (for the reference uniques it does not have) the wiki's current text,
+ * its implicit lines first. Those carry no variants and are marked by an empty `req`.
+ */
 export function loadPobUniques(): PobUnique[] {
-  return (
+  if (pobCache) return pobCache;
+  const pob = (
     JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'pob-uniques.json'), 'utf8')) as {
       uniques: PobUnique[];
     }
   ).uniques;
+  const have = new Set(pob.map((u) => key(u.name)));
+  const extra: PobUnique[] = [];
+  for (const r of loadReference().uniques) {
+    if (have.has(key(r.name)) || /flask$/i.test(r.class)) continue;
+    const split = (t: string) =>
+      t
+        .split(String.fromCharCode(10))
+        .map((x) => x.trim())
+        .filter(Boolean);
+    const imp = split(r.implicit ?? '');
+    extra.push({
+      name: r.name,
+      base: r.base,
+      slot: r.class,
+      variants: [],
+      levelReq: r.level,
+      req: '',
+      lines: [...imp, ...split(r.explicit ?? '')],
+      implicits: imp.length,
+    });
+  }
+  return (pobCache = [...pob, ...extra]);
 }
 
 /**
