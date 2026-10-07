@@ -120,12 +120,15 @@ function valueOf(c: Compiled, ctx: ModCtx): number {
   return m.value * Math.floor(v / m.per.div);
 }
 
+type Bucket = { all: Compiled[] } & Record<ModKind, Compiled[]>;
+
 /**
  * A bag of mods indexed by stat. Query semantics (DESIGN.md §7.2):
  * damageTypes must overlap the ancestry, tags must be a subset of the use's tags, conditions true.
  */
 export class ModDB {
-  private byStat = new Map<StatId, Compiled[]>();
+  /** The mods of each stat, in order, and again split by kind (a query only looks at the kind it asks for). */
+  private byStat = new Map<StatId, Bucket>();
   private all: Mod[] = [];
 
   readonly cond: CondIndex;
@@ -137,9 +140,15 @@ export class ModDB {
 
   add(m: Mod): void {
     this.all.push(m);
-    let list = this.byStat.get(m.stat);
-    if (!list) this.byStat.set(m.stat, (list = []));
-    list.push(compile(m, this.cond));
+    let b = this.byStat.get(m.stat);
+    if (!b)
+      this.byStat.set(
+        m.stat,
+        (b = { all: [], base: [], inc: [], more: [], flag: [], override: [] }),
+      );
+    const c = compile(m, this.cond);
+    b.all.push(c);
+    b[m.kind].push(c);
   }
 
   addAll(mods: readonly Mod[]): void {
@@ -159,37 +168,36 @@ export class ModDB {
    * carries at least one of those tags (used for ailment-only scaling).
    */
   sum(kind: ModKind, stat: StatId, ctx: ModCtx = EMPTY_CTX, require = 0): number {
-    const list = this.byStat.get(stat);
-    if (!list) return 0;
+    const b = this.byStat.get(stat);
+    if (!b) return 0;
     let s = 0;
-    for (const c of list) if (c.mod.kind === kind && matches(c, ctx, require)) s += valueOf(c, ctx);
+    for (const c of b[kind]) if (matches(c, ctx, require)) s += valueOf(c, ctx);
     return s;
   }
 
   /** Product of (1 + more/100) over matching `more` mods. */
   more(stat: StatId, ctx: ModCtx = EMPTY_CTX, require = 0): number {
-    const list = this.byStat.get(stat);
-    if (!list) return 1;
+    const b = this.byStat.get(stat);
+    if (!b) return 1;
     let p = 1;
-    for (const c of list)
-      if (c.mod.kind === 'more' && matches(c, ctx, require)) p *= 1 + valueOf(c, ctx) / 100;
+    for (const c of b.more) if (matches(c, ctx, require)) p *= 1 + valueOf(c, ctx) / 100;
     return p;
   }
 
   /** True if any matching flag mod is present. */
   flag(stat: StatId, ctx: ModCtx = EMPTY_CTX): boolean {
-    const list = this.byStat.get(stat);
-    if (!list) return false;
-    for (const c of list) if (c.mod.kind === 'flag' && matches(c, ctx)) return true;
+    const b = this.byStat.get(stat);
+    if (!b) return false;
+    for (const c of b.flag) if (matches(c, ctx)) return true;
     return false;
   }
 
   /** The last matching override, if any. */
   override(stat: StatId, ctx: ModCtx = EMPTY_CTX): number | undefined {
-    const list = this.byStat.get(stat);
-    if (!list) return undefined;
+    const b = this.byStat.get(stat);
+    if (!b) return undefined;
     let v: number | undefined;
-    for (const c of list) if (c.mod.kind === 'override' && matches(c, ctx)) v = valueOf(c, ctx);
+    for (const c of b.override) if (matches(c, ctx)) v = valueOf(c, ctx);
     return v;
   }
 
@@ -214,13 +222,13 @@ export class ModDB {
   /** Bitmask of every condition used by any mod (to keep condition-keyed caches small). */
   condsUsed(): number {
     let m = 0;
-    for (const list of this.byStat.values()) for (const c of list) m = maskOr(m, c.condMask);
+    for (const b of this.byStat.values()) for (const c of b.all) m = maskOr(m, c.condMask);
     return m;
   }
 
   /** True if any mod for this stat depends on a condition. */
   isConditional(stat: StatId): boolean {
-    const list = this.byStat.get(stat);
-    return !!list && list.some((c) => c.condMask !== 0);
+    const b = this.byStat.get(stat);
+    return !!b && b.all.some((c) => c.condMask !== 0);
   }
 }

@@ -318,6 +318,7 @@ export class Character {
   configConds: number;
   readonly warnings: string[] = [];
   private profiles = new Map<string, SkillProfile>();
+  private skillDbs = new Map<string, ModDB>();
   private defences = new Map<string, Defence>();
   private flaskDbs = new Map<number, ModDB>();
   readonly statValue: (s: StatId) => number;
@@ -820,10 +821,18 @@ export class Character {
     for (const s of choice.supports)
       supportMods.push(...gemMods((s.def as SupportGemDef).mods, s.level, s.def.id));
     const base = this.dbWith(flaskMask);
-    const db =
-      choice.skill.mods.length || supportMods.length
-        ? new ModDB([...base.mods(), ...choice.skill.mods, ...supportMods], this.cond)
-        : base;
+    let db = base;
+    if (choice.skill.mods.length || supportMods.length) {
+      // One database per skill and flask state, shared by every condition mask.
+      const dk = `${choice.key}|${flaskMask}`;
+      let sdb = this.skillDbs.get(dk);
+      if (!sdb)
+        this.skillDbs.set(
+          dk,
+          (sdb = new ModDB([...base.mods(), ...choice.skill.mods, ...supportMods], this.cond)),
+        );
+      db = sdb;
+    }
     p = buildProfile({
       skill: choice.skill,
       db,

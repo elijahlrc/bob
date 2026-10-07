@@ -1,7 +1,9 @@
 import { Character, sheetDps, type CharacterSheet } from '../calc/character';
 import { itemBase } from '../data/bases';
 import { flaskBase } from '../data/flasks';
-import { gemDef } from '../data/gems';
+import { gemDef, type ActiveGemDef, type SupportGemDef } from '../data/gems';
+import { resolveActive } from '../calc/gems';
+import type { SkillType } from '../data/skillTypes';
 import { themeDef } from '../data/themes';
 import { getTree } from '../data/tree';
 import {
@@ -216,14 +218,25 @@ export function botRegem(run: RunState): void {
     take(bestActive.gem.uid);
     place(host, bestActive.gem);
     primary = bestActive.gem.uid;
-    // 2. Supports, greedily by DPS.
+    // 2. Supports, greedily by DPS. A support whose rules can never hold for the skill (even with the types the
+    // other supports add) is not worth building a character for.
+    const types = new Set<SkillType>(
+      resolveActive(gemDef(bestActive.gem.gemId) as ActiveGemDef, 1).types,
+    );
+    for (const g of pool) {
+      const d = gemDef(g.gemId);
+      if (d.kind === 'support') for (const t of d.adds ?? []) types.add(t);
+    }
+    const possible = (d: SupportGemDef) =>
+      (d.supports.length === 0 || d.supports.some((t) => types.has(t))) &&
+      (d.needs ?? []).every((t) => types.has(t));
     while (equipment[host]!.sockets.includes(null)) {
       const cur = sheetOf(run, buildWith(equipment, primary)).skill.sustainedDps;
       let best: { gem: GemItem; dps: number } | null = null;
       const tried = new Set<string>();
       for (const g of pool) {
         const d = gemDef(g.gemId);
-        if (d.kind !== 'support' || tried.has(g.gemId)) continue;
+        if (d.kind !== 'support' || tried.has(g.gemId) || !possible(d)) continue;
         if (equipment[host]!.sockets.some((x) => x?.gemId === g.gemId)) continue;
         tried.add(g.gemId);
         const eq = { ...equipment };
