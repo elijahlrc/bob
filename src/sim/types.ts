@@ -158,6 +158,8 @@ export type Projectile = {
   startX: number;
   startY: number;
   dtype: number;
+  /** A returning projectile: flying back toward its owner. */
+  back?: boolean;
 };
 
 export type GroundEffect = {
@@ -174,6 +176,27 @@ export type GroundEffect = {
   acc?: number;
   dtype: number;
   faction: 0 | 1;
+};
+
+/** A zone a player skill left on the ground: it hits what stands in it every `interval` s, `pulsesLeft` times. */
+export type SkillZone = {
+  id: number;
+  owner: number;
+  profile: SkillProfile;
+  hand: number;
+  x: number;
+  y: number;
+  /** The far end of a strip (a wall or a stream); a circle has none. */
+  x2?: number;
+  y2?: number;
+  radius: number;
+  /** Seconds before the first pulse, between pulses, and to the next pulse. */
+  delayT: number;
+  interval: number;
+  pulseT: number;
+  /** Pulses still to come: duration over interval, rounded down (the calc counts the same). */
+  pulsesLeft: number;
+  dtype: number;
 };
 
 export type Drop = { id: number; x: number; y: number; item: AnyItem };
@@ -212,6 +235,7 @@ export type SimEvent =
   | { t: 'trigger'; skill: string; kind: string }
   | { t: 'chain'; from: number; to: number }
   | { t: 'explode'; x: number; y: number; r: number; dtype: number }
+  | { t: 'beam'; x: number; y: number; x2: number; y2: number; dtype: number }
   | { t: 'blink'; id: number; x: number; y: number; end: boolean }
   | { t: 'charge'; kind: string; count: number }
   | { t: 'buff'; id: string }
@@ -348,6 +372,8 @@ export type World = {
   nextId: number;
   projectiles: Projectile[];
   effects: GroundEffect[];
+  /** Zones the player's skills left on the ground. */
+  zones: SkillZone[];
   /** Bodies of dead monsters (EXPANSION 5.8), and recent explosions that destroy fresh ones. */
   corpses: Corpse[];
   /** Whether any Warden Pylon has been spawned (so damage need not look for one on most maps). */

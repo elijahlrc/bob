@@ -60,7 +60,20 @@ function behaviourLines(b: SkillBehaviour, level: number): string[] {
       return [`Chains ${n} time${n === 1 ? '' : 's'}`];
     }
     case 'burst':
-      return [`Bursts around the target in a radius of ${num(b.radius)}`];
+      return [
+        b.origin === 'self'
+          ? `Bursts around you in a radius of ${num(b.radius)}`
+          : `Bursts around the target in a radius of ${num(b.radius)}`,
+      ];
+    case 'beam':
+      return [`Hits everything in a line ${num(b.length)} long`];
+    case 'ground':
+      return [
+        b.line
+          ? `Leaves a strip ${num(b.line)} long for ${num(b.duration)} s`
+          : `Leaves a zone of radius ${num(b.radius)} for ${num(b.duration)} s`,
+        `Hits every ${num(b.interval)} s${b.delay ? ` after ${num(b.delay)} s` : ''}`,
+      ];
   }
 }
 

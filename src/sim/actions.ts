@@ -109,6 +109,71 @@ function enemiesOf(w: World, a: Actor): Actor[] {
   return w.player.alive ? [w.player] : [];
 }
 
+/** The damage type of a skill's biggest chunk (what an effect looks like). */
+function dominantType(p: SkillProfile, hand: number): number {
+  let dtype = 0;
+  let best = -1;
+  for (const c of p.hands[Math.min(hand, p.hands.length - 1)].chunks)
+    if (c.max > best) {
+      best = c.max;
+      dtype = c.type;
+    }
+  return dtype;
+}
+
+/** Distance from a point to a line segment. */
+export function segmentDist(
+  px: number,
+  py: number,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+): number {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const len2 = dx * dx + dy * dy;
+  const t = len2 > 0 ? Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / len2)) : 0;
+  return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+}
+
+/** Zones a skill left on the ground pulse, and end (rain, a cloud, a wall). */
+export function tickSkillZones(w: World, dt: number): void {
+  if (w.zones.length === 0) return;
+  let j = 0;
+  for (const z of w.zones) {
+    const owner = actorById(w, z.owner);
+    if (!owner || !owner.alive) continue;
+    if (z.delayT > 0) {
+      z.delayT -= dt;
+      w.zones[j++] = z;
+      continue;
+    }
+    z.pulseT -= dt;
+    if (z.pulseT <= 0) {
+      z.pulseT += z.interval;
+      z.pulsesLeft--;
+      w.events.push({
+        t: 'explode',
+        x: z.x2 === undefined ? z.x : (z.x + z.x2) / 2,
+        y: z.y2 === undefined || z.y === undefined ? z.y : (z.y + z.y2) / 2,
+        r: z.radius,
+        dtype: z.dtype,
+      });
+      for (const e of enemiesOf(w, owner)) {
+        const d =
+          z.x2 === undefined || z.y2 === undefined
+            ? Math.hypot(e.x - z.x, e.y - z.y)
+            : segmentDist(e.x, e.y, z.x, z.y, z.x2, z.y2);
+        if (d > z.radius + e.r) continue;
+        hit(w, owner, e, z.profile, z.hand, Math.hypot(e.x - owner.x, e.y - owner.y));
+      }
+    }
+    if (z.pulsesLeft > 0) w.zones[j++] = z;
+  }
+  w.zones.length = j;
+}
+
 /** Resolve an action's effect: strikes, chains or projectiles. Triggers call it with no wind-up. */
 export function fire(w: World, a: Actor, act: Action): void {
   const p = act.profile;
@@ -162,7 +227,9 @@ export function fire(w: World, a: Actor, act: Action): void {
     return;
   }
   if (b.kind === 'burst') {
-    // A nova around the target, not the caster.
+    // Around the target (a slam, an item skill) or, as a nova, around the caster.
+    const cx = b.origin === 'self' ? a.x : act.aimX;
+    const cy = b.origin === 'self' ? a.y : act.aimY;
     const radius = b.radius * p.radiusMult;
     let dominant = 0;
     let best = -1;
@@ -171,11 +238,45 @@ export function fire(w: World, a: Actor, act: Action): void {
         best = c.max;
         dominant = c.type;
       }
-    w.events.push({ t: 'explode', x: act.aimX, y: act.aimY, r: radius, dtype: dominant });
+    w.events.push({ t: 'explode', x: cx, y: cy, r: radius, dtype: dominant });
     for (const e of enemiesOf(w, a)) {
-      if (Math.hypot(e.x - act.aimX, e.y - act.aimY) > radius + e.r) continue;
+      if (Math.hypot(e.x - cx, e.y - cy) > radius + e.r) continue;
       hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
     }
+    return;
+  }
+  if (b.kind === 'beam') {
+    // Everything on the line from the caster toward the target.
+    const len = b.length * p.radiusMult;
+    const ang = Math.atan2(act.aimY - a.y, act.aimX - a.x);
+    const x2 = a.x + Math.cos(ang) * len;
+    const y2 = a.y + Math.sin(ang) * len;
+    w.events.push({ t: 'beam', x: a.x, y: a.y, x2, y2, dtype: dominantType(p, act.hand) });
+    for (const e of enemiesOf(w, a)) {
+      if (segmentDist(e.x, e.y, a.x, a.y, x2, y2) > (b.width * p.radiusMult) / 2 + e.r) continue;
+      hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
+    }
+    return;
+  }
+  if (b.kind === 'ground') {
+    const line = b.line !== undefined;
+    const ang = Math.atan2(act.aimY - a.y, act.aimX - a.x);
+    w.zones.push({
+      id: w.nextId++,
+      owner: a.id,
+      profile: p,
+      hand: act.hand,
+      x: line ? a.x : act.aimX,
+      y: line ? a.y : act.aimY,
+      x2: line ? a.x + Math.cos(ang) * (b.line as number) * p.radiusMult : undefined,
+      y2: line ? a.y + Math.sin(ang) * (b.line as number) * p.radiusMult : undefined,
+      radius: b.radius * p.radiusMult,
+      delayT: b.delay ?? 0,
+      interval: b.interval,
+      pulseT: 0,
+      pulsesLeft: Math.max(1, Math.floor(b.duration / b.interval)),
+      dtype: dominantType(p, act.hand),
+    });
     return;
   }
   // Projectiles.
@@ -283,6 +384,27 @@ export function updateProjectiles(w: World, dt: number): void {
         break;
       }
       if (pr.travelled >= pr.maxRange) {
+        const b = pr.profile.skill.behaviour;
+        if (b.kind === 'projectile' && b.returns && !pr.back && owner?.alive) {
+          // Turn around and fly back to the owner, hitting everything again on the way.
+          const dx = owner.x - pr.x;
+          const dy = owner.y - pr.y;
+          const d = Math.hypot(dx, dy) || 1;
+          const speed = Math.hypot(pr.vx, pr.vy);
+          pr.vx = (dx / d) * speed;
+          pr.vy = (dy / d) * speed;
+          pr.back = true;
+          pr.travelled = 0;
+          pr.maxRange = d + 1;
+          pr.hitIds = [];
+          pr.pierceLeft = pr.profile.pierce;
+        } else {
+          endProjectile(w, pr, 1);
+          alive = false;
+          break;
+        }
+      }
+      if (pr.back && owner && Math.hypot(owner.x - pr.x, owner.y - pr.y) < 0.8) {
         endProjectile(w, pr, 1);
         alive = false;
         break;

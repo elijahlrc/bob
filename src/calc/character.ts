@@ -870,14 +870,16 @@ export class Character {
       cm += h.critMulti / n;
       const land = ex.hitChance * (1 - ex.blockChance);
       const handUses =
-        (p.bothHands ? usesPerSec : usesPerSec / n) * (choice.triggered ? 1 : 1 + p.repeats);
+        (p.bothHands ? usesPerSec : usesPerSec / n) *
+        (choice.triggered ? 1 : 1 + p.repeats) *
+        p.pulses;
       const ail = expectedAilments(p, h, t, d, handUses, land);
       ign = Math.max(ign, ail.igniteDps);
       bl = Math.max(bl, ail.bleedDps);
       po += ail.poisonDps;
     }
     // A repeating skill (Echoing Cast) lands several times per use; a triggered one does not repeat.
-    const lands = choice.triggered ? 1 : 1 + p.repeats;
+    const lands = (choice.triggered ? 1 : 1 + p.repeats) * p.pulses;
     const hitDps = perUse * usesPerSec * lands;
     const ailmentDps = ign + bl + po;
     const totalDps = hitDps + ailmentDps;
@@ -1118,7 +1120,9 @@ export function skillRange(p: SkillProfile): number {
   const b = p.skill.behaviour;
   if (b.kind === 'melee') return b.range;
   if (b.kind === 'chain') return b.range;
-  if (b.kind === 'burst') return b.radius;
+  if (b.kind === 'burst') return b.origin === 'self' ? b.radius * 0.9 : (b.reach ?? b.radius);
+  if (b.kind === 'beam') return b.length * 0.9;
+  if (b.kind === 'ground') return b.line ? b.line * 0.9 : (b.reach ?? 8);
   return b.range ?? 8;
 }
 

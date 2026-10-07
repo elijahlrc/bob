@@ -9,7 +9,7 @@ import { MAX_LEVEL, xpToNext } from '../data/xpTable';
 import type { Build } from '../data/types';
 import type { MapPlan } from '../gen/mapPlan';
 import { monsterName } from '../gen/population';
-import { updateAction, updateProjectiles } from './actions';
+import { tickSkillZones, updateAction, updateProjectiles } from './actions';
 import { monsterAI, playerAI, separate } from './ai';
 import { lifeCap, rawHit, refreshPlayerDefence, tickActor } from './combat';
 import { autoFlaskPolicy, type FlaskPolicy } from './flaskPolicy';
@@ -193,6 +193,7 @@ export function createWorld(inp: CreateWorldInput): World {
     nextId: 2,
     projectiles: [],
     effects: [],
+    zones: [],
     corpses: [],
     hasPylons: false,
     blasts: [],
@@ -465,6 +466,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickTriggers(w, dt);
   tickCharges(w, dt);
   tickBuffs(w, dt);
+  tickSkillZones(w, dt);
   tickFlasks(w, dt, policy);
   // Flow field for monsters follows the player tile.
   w.grid.buildFlow(p.x, p.y);

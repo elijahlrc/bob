@@ -84,6 +84,8 @@ export type SkillProfile = {
   useTime: number;
   /** Extra times the skill fires after each use (Echoing Cast): a use lands 1 + repeats times. */
   repeats: number;
+  /** Times one use hits a target that stays put: more than one for a zone that pulses (rain, a cloud). */
+  pulses: number;
   cost: number;
   /** Ignite: `max` ignites can burn at once (the strongest count); `speed` makes them deal their damage faster. */
   ignite: AilmentSpec & { max: number; speed: number };
@@ -357,6 +359,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     hands,
     useTime,
     repeats: Math.max(0, Math.round(db.sum('base', 'repeats', baseCtx))),
+    pulses: beh.kind === 'ground' ? Math.max(1, Math.floor(beh.duration / beh.interval)) : 1,
     cost: Math.round(skill.cost * inp.costMult * db.mult('cost', baseCtx)),
     ignite: igniteSpec(),
     bleed: isAttack

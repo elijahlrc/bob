@@ -1110,6 +1110,27 @@ export class GrimStyle extends StyleBase {
         }
         break;
       }
+      case 'beam': {
+        // A straight line of light from the caster, coloured by the damage it deals.
+        const from = this.project(e.x, e.y);
+        const to = this.project(e.x2, e.y2);
+        const color = [0xd8d0c0, 0xc8a0ff, 0x9ad8ff, 0xff9a40, 0x9be07a][e.dtype] ?? 0xffffff;
+        const pts: { x: number; y: number }[] = [];
+        const n = 8;
+        for (let i = 0; i <= n; i++)
+          pts.push({
+            x:
+              from.x + ((to.x - from.x) * i) / n + (i > 0 && i < n ? (Math.random() - 0.5) * 4 : 0),
+            y:
+              from.y -
+              8 +
+              ((to.y - from.y) * i) / n +
+              (i > 0 && i < n ? (Math.random() - 0.5) * 4 : 0),
+          });
+        this.bolts.push({ pts, t: 0.2, color });
+        this.flash(to.x, to.y - 8, color, 1, 0.12);
+        break;
+      }
       case 'chain': {
         const a = this.pxOf(e.from);
         const b = this.pxOf(e.to);

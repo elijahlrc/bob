@@ -21,10 +21,31 @@ export type SkillBehaviour =
       explodeRadius?: number;
       range?: number;
       falloff?: number;
+      /** The projectile turns around at the end of its range and flies back, hitting again on the way. */
+      returns?: boolean;
     }
   | { kind: 'chain'; range: number; chains: number; chainsPer5?: number; chainRange: number }
-  /** A nova centred on the target, not on the caster (item-granted skills). */
-  | { kind: 'burst'; radius: number };
+  /**
+   * An instant area. `origin` 'target' (the default) centres it on the target (slams, item-granted skills; `reach` is how
+   * close the caster must be, default the radius); 'self' is a nova around the caster.
+   */
+  | { kind: 'burst'; radius: number; origin?: 'target' | 'self'; reach?: number }
+  /** An instant line from the caster toward the target that hits everything on it (a beam, a channelled ray's tick). */
+  | { kind: 'beam'; length: number; width: number }
+  /**
+   * A zone on the ground that hits what stands in it every `interval` seconds for `duration` seconds, after an optional
+   * `delay` (rain, storm, cascade, a cloud). It lands on the target within `reach` of the caster; with `line` it is a
+   * strip of that length from the caster toward the target instead (a wall, a stream).
+   */
+  | {
+      kind: 'ground';
+      radius: number;
+      duration: number;
+      interval: number;
+      delay?: number;
+      reach?: number;
+      line?: number;
+    };
 
 /**
  * A spell's base damage in one type: explicit numbers (hand-tuned gems), or a `spread` (the lowest and highest roll as a
