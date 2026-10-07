@@ -284,9 +284,11 @@ Damage types are `physical`, `lightning`, `cold`, `fire`, `chaos`.
 
 ### 6.6 Ailments
 
-Ailment damage is based on the hit's **post-step-5 damage before crit and before mitigation**. In the table, "H" is
-that damage of the relevant types. It is then scaled by DoT and ailment mods (increased/more with tags `dot` and the
-ailment's tag) and mitigated by the target's resistance to the ailment's damage type. Crits always apply ignite,
+Ailment damage is based on the hit's **base damage** (step 3, before scaling), calculated separately from the hit: only
+generic mods, damage-type mods (through ancestry), `dot` mods and the ailment's own tag apply. Attack, spell, melee,
+projectile, area and weapon mods never reach it, and neither does the critical strike multiplier. In the table, "H" is
+that damage of the relevant types. It is then mitigated by the target's resistance to the ailment's damage type. Shock,
+chill and freeze use the hit's damage with all its mods (the damage dealt). Crits always apply ignite,
 shock and freeze if the hit dealt the relevant element. Crits apply bleed and poison only through their normal
 chance.
 

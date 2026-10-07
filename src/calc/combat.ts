@@ -119,6 +119,13 @@ export type AilmentResult = {
   freeze: number;
 };
 
+/** Base damage per damage type as each damaging ailment sees it (see `AilChunk`). */
+export type AilBase = { ignite: number[]; bleed: number[]; poison: number[] };
+
+export function emptyAilBase(): AilBase {
+  return { ignite: [0, 0, 0, 0, 0], bleed: [0, 0, 0, 0, 0], poison: [0, 0, 0, 0, 0] };
+}
+
 export type HitResult = {
   outcome: HitOutcome;
   crit: boolean;
@@ -127,6 +134,8 @@ export type HitResult = {
   total: number;
   /** Rolled pre-crit, pre-mitigation damage per type ("H"). */
   H: number[];
+  /** The same roll as the damaging ailments see it. */
+  HA?: AilBase;
   ailments: AilmentResult;
   stun: number;
 };
@@ -202,6 +211,7 @@ export function ailmentsFromHit(
   p: SkillProfile,
   hand: HandProfile,
   H: number[],
+  HA: AilBase,
   crit: boolean,
   t: TargetState,
   roll: (chance: number) => boolean,
@@ -221,17 +231,17 @@ export function ailmentsFromHit(
   const from = (types: number[]) => types.reduce((s, i) => s + H[i], 0);
   const thresh = Math.max(1, def.ailmentThreshold);
   const ele = !p.cannotInflictEle;
-  const ignH = from(p.ailmentFrom.ignite);
+  const ignH = p.ailmentFrom.ignite.reduce((s, i) => s + HA.ignite[i], 0);
   if (ele && ignH > 0 && !def.immune[FIRE] && (crit || roll(p.ignite.chance))) {
-    const hm = p.ailmentFrom.ignite.reduce((s, i) => s + H[i] * resMult(i), 0);
-    a.ignite = IGNITE_DPS_FRAC * hm * p.ignite.mult * agony * p.ignite.speed;
+    const hm = p.ailmentFrom.ignite.reduce((s, i) => s + HA.ignite[i] * resMult(i), 0);
+    a.ignite = IGNITE_DPS_FRAC * hm * agony * p.ignite.speed;
   }
-  if (p.isAttack && H[PHYS] > 0 && roll(p.bleed.chance)) {
-    a.bleed =
-      (def.isPlayer ? MONSTER_BLEED_DPS_FRAC : BLEED_DPS_FRAC) * H[PHYS] * p.bleed.mult * agony;
+  if (p.isAttack && HA.bleed[PHYS] > 0 && roll(p.bleed.chance)) {
+    a.bleed = (def.isPlayer ? MONSTER_BLEED_DPS_FRAC : BLEED_DPS_FRAC) * HA.bleed[PHYS] * agony;
   }
-  if (H[PHYS] + H[CHAOS] > 0 && roll(p.poison.chance)) {
-    a.poison = POISON_DPS_FRAC * (H[PHYS] + H[CHAOS]) * p.poison.mult * agony * resMult(CHAOS);
+  const poisonH = HA.poison[PHYS] + HA.poison[CHAOS];
+  if (poisonH > 0 && roll(p.poison.chance)) {
+    a.poison = POISON_DPS_FRAC * poisonH * agony * resMult(CHAOS);
   }
   const shockH = from(p.ailmentFrom.shock);
   if (
@@ -306,6 +316,7 @@ export function resolveHit(
     dmg: [0, 0, 0, 0, 0],
     total: 0,
     H: [0, 0, 0, 0, 0],
+    HA: undefined,
     ailments: emptyAilments(),
     stun: 0,
   };
@@ -319,7 +330,18 @@ export function resolveHit(
     return res;
   }
   const dm = distanceMult(p, dist);
-  for (const c of hand.chunks) res.H[c.type] += (c.min + rng.next() * (c.max - c.min)) * dm;
+  const ha = emptyAilBase();
+  res.HA = ha;
+  for (let i = 0; i < hand.chunks.length; i++) {
+    const c = hand.chunks[i];
+    const u = rng.next();
+    res.H[c.type] += (c.min + u * (c.max - c.min)) * dm;
+    const ac = hand.ailChunks[i];
+    const base = (ac.min + u * (ac.max - ac.min)) * dm;
+    ha.ignite[c.type] += base * ac.k[0];
+    ha.bleed[c.type] += base * ac.k[1];
+    ha.poison[c.type] += base * ac.k[2];
+  }
   // 3.9: an attack must also pass an accuracy check to confirm a critical strike.
   res.crit =
     hand.critChance > 0 &&
@@ -329,7 +351,15 @@ export function resolveHit(
   for (let i = 0; i < NT; i++) res.dmg[i] = res.H[i] * cm;
   mitigate(p, t, res.dmg);
   for (let i = 0; i < NT; i++) res.total += res.dmg[i];
-  res.ailments = ailmentsFromHit(p, hand, res.H, res.crit, t, (c) => c > 0 && rng.chance(c));
+  res.ailments = ailmentsFromHit(
+    p,
+    hand,
+    res.H,
+    res.HA,
+    res.crit,
+    t,
+    (c) => c > 0 && rng.chance(c),
+  );
   res.stun = stunFromHit(p, res.dmg, t.def, canStun, rng, (t.es ?? 0) > 0).duration;
   return res;
 }
@@ -346,6 +376,10 @@ export type ExpectedHit = {
   perUse: number;
   avgHitNonCrit: number;
   avgH: number[];
+  /** The average hit as the damaging ailments see it. */
+  avgHA: AilBase;
+  /** Chance that a landed hit is a critical strike (an attack must also confirm it with a second hit roll). */
+  critGivenHit: number;
   stunChance: number;
 };
 
@@ -357,7 +391,15 @@ export function expectedHit(
 ): ExpectedHit {
   const dm = distanceMult(p, dist);
   const avgH = [0, 0, 0, 0, 0];
-  for (const c of hand.chunks) avgH[c.type] += ((c.min + c.max) / 2) * dm;
+  const avgHA = emptyAilBase();
+  hand.chunks.forEach((c, i) => {
+    avgH[c.type] += ((c.min + c.max) / 2) * dm;
+    const ac = hand.ailChunks[i];
+    const base = ((ac.min + ac.max) / 2) * dm;
+    avgHA.ignite[c.type] += base * ac.k[0];
+    avgHA.bleed[c.type] += base * ac.k[1];
+    avgHA.poison[c.type] += base * ac.k[2];
+  });
   const nonCrit = mitigate(
     p,
     t,
@@ -385,6 +427,8 @@ export function expectedHit(
     perUse: total * hc * (1 - bc),
     avgHitNonCrit: nonCrit.reduce((a, b) => a + b, 0),
     avgH,
+    avgHA,
+    critGivenHit: cc,
     stunChance: sNon * (1 - cc) + sCrit * cc,
   };
 }
@@ -432,10 +476,10 @@ export function expectedAilments(
 ): ExpectedAilments {
   const ex = expectedHit(p, hand, t, dist);
   const H = ex.avgH;
-  const cc = hand.critChance;
+  const cc = ex.critGivenHit;
   const always = () => true;
-  const non = ailmentsFromHit(p, hand, H, false, t, always);
-  const cr = ailmentsFromHit(p, hand, H, true, t, always);
+  const non = ailmentsFromHit(p, hand, H, ex.avgHA, false, t, always);
+  const cr = ailmentsFromHit(p, hand, H, ex.avgHA, true, t, always);
   const lands = usesPerSec * landChance;
   // Ignite: crits always ignite.
   const ign = p.cannotInflictEle ? 0 : cc + (1 - cc) * p.ignite.chance;
@@ -456,4 +500,9 @@ export function expectedAilments(
     poisonDps: poPer * poisonStacks,
     poisonStacks,
   };
+}
+
+/** An ailment base where every ailment sees the same damage (tests and simple callers). */
+export function ailBaseOf(H: number[]): AilBase {
+  return { ignite: [...H], bleed: [...H], poison: [...H] };
 }

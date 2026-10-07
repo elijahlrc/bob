@@ -7,7 +7,7 @@ import { CONDITIONS, condBit, mod, type Mod } from '../mods/types';
 import { newRun } from '../run/run';
 import { dummyDefence } from '../sim/dummy';
 import { Character } from './character';
-import { ailmentsFromHit, mitigate, shockTaken, NO_SHIFT } from './combat';
+import { ailBaseOf, ailmentsFromHit, mitigate, shockTaken, NO_SHIFT } from './combat';
 import { defenceFromDb } from './defence';
 import type { HandProfile, SkillProfile } from './skill';
 
@@ -157,9 +157,11 @@ describe('ailment rules', () => {
   const always = () => true;
 
   it('physical damage cannot shock unless a rule says so', () => {
-    expect(ailmentsFromHit(prof(), hand, phys, true, t(), always).shock).toBe(0);
+    expect(ailmentsFromHit(prof(), hand, phys, ailBaseOf(phys), true, t(), always).shock).toBe(0);
     const can = prof({ ailmentFrom: { ignite: [3], shock: [1, 0], chill: [2], freeze: [2] } });
-    expect(ailmentsFromHit(can, hand, phys, true, t(), always).shock).toBeGreaterThan(0);
+    expect(
+      ailmentsFromHit(can, hand, phys, ailBaseOf(phys), true, t(), always).shock,
+    ).toBeGreaterThan(0);
   });
 
   it('the rule is read from `canShock.physical`', () => {
@@ -173,18 +175,38 @@ describe('ailment rules', () => {
 
   it('immune targets suffer no ailments; shock-immune ones no shock', () => {
     const light = [0, 1000, 0, 0, 0];
-    expect(ailmentsFromHit(prof(), hand, light, true, t(), always).shock).toBeGreaterThan(0);
+    expect(
+      ailmentsFromHit(prof(), hand, light, ailBaseOf(light), true, t(), always).shock,
+    ).toBeGreaterThan(0);
     const unaffected = t(dummyDefence({ ailmentThreshold: 1000, unaffectedByShock: true }));
-    expect(ailmentsFromHit(prof(), hand, light, true, unaffected, always).shock).toBe(0);
+    expect(
+      ailmentsFromHit(prof(), hand, light, ailBaseOf(light), true, unaffected, always).shock,
+    ).toBe(0);
     const immune = t(dummyDefence({ ailmentThreshold: 1000, immuneAilments: true }));
-    const all = ailmentsFromHit(prof(), hand, [1000, 1000, 1000, 1000, 0], true, immune, always);
+    const all = ailmentsFromHit(
+      prof(),
+      hand,
+      [1000, 1000, 1000, 1000, 0],
+      ailBaseOf([1000, 1000, 1000, 1000, 0]),
+      true,
+      immune,
+      always,
+    );
     expect(Object.values(all).every((v) => v === 0)).toBe(true);
     const fireproof = t(
       dummyDefence({ ailmentThreshold: 1000, immune: [false, false, false, true, false] }),
     );
-    expect(ailmentsFromHit(prof(), hand, [0, 0, 0, 1000, 0], true, fireproof, always).ignite).toBe(
-      0,
-    );
+    expect(
+      ailmentsFromHit(
+        prof(),
+        hand,
+        [0, 0, 0, 1000, 0],
+        ailBaseOf([0, 0, 0, 1000, 0]),
+        true,
+        fireproof,
+        always,
+      ).ignite,
+    ).toBe(0);
   });
 });
 

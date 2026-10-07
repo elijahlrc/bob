@@ -8,6 +8,7 @@ import { newRun } from '../run/run';
 import { dummyDefence } from '../sim/dummy';
 import { Character } from './character';
 import {
+  ailBaseOf,
   ailmentsFromHit,
   expectedHit,
   resolveHit,
@@ -95,18 +96,43 @@ describe('audit 3.9: hits and criticals', () => {
   it('ailments from a critical strike carry a fixed 150%', () => {
     const p = profile(new ModDB([mod('chance.bleed', 'base', 100), mod('critMulti', 'base', 100)]));
     const t = target();
-    const non = ailmentsFromHit(p, p.hands[0], [50, 0, 0, 0, 0], false, t, always).bleed;
-    const crit = ailmentsFromHit(p, p.hands[0], [50, 0, 0, 0, 0], true, t, always).bleed;
+    const non = ailmentsFromHit(
+      p,
+      p.hands[0],
+      [50, 0, 0, 0, 0],
+      ailBaseOf([50, 0, 0, 0, 0]),
+      false,
+      t,
+      always,
+    ).bleed;
+    const crit = ailmentsFromHit(
+      p,
+      p.hands[0],
+      [50, 0, 0, 0, 0],
+      ailBaseOf([50, 0, 0, 0, 0]),
+      true,
+      t,
+      always,
+    ).bleed;
     expect(crit / non).toBeCloseTo(1.5); // not the 250% critical strike multiplier
   });
 
   it('a monster bleeds you for a seventh of what you bleed it for', () => {
     const p = profile(new ModDB([mod('chance.bleed', 'base', 100)]));
-    const onMonster = ailmentsFromHit(p, p.hands[0], [50, 0, 0, 0, 0], false, target(), always);
+    const onMonster = ailmentsFromHit(
+      p,
+      p.hands[0],
+      [50, 0, 0, 0, 0],
+      ailBaseOf([50, 0, 0, 0, 0]),
+      false,
+      target(),
+      always,
+    );
     const onPlayer = ailmentsFromHit(
       p,
       p.hands[0],
       [50, 0, 0, 0, 0],
+      ailBaseOf([50, 0, 0, 0, 0]),
       false,
       target({ isPlayer: true }),
       always,
@@ -122,9 +148,9 @@ describe('audit 3.9: hits and criticals', () => {
     );
     const t = target({ res: [0, 0, 0, 40, 0] });
     const h = [0, 0, 0, 50, 0];
-    expect(ailmentsFromHit(pen, pen.hands[0], h, false, t, always).ignite).toBeCloseTo(
-      ailmentsFromHit(plain, plain.hands[0], h, false, t, always).ignite,
-    );
+    expect(
+      ailmentsFromHit(pen, pen.hands[0], h, ailBaseOf(h), false, t, always).ignite,
+    ).toBeCloseTo(ailmentsFromHit(plain, plain.hands[0], h, ailBaseOf(h), false, t, always).ignite);
   });
 
   it('monsters crit for 130%', () => {

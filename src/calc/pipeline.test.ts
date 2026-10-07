@@ -4,6 +4,7 @@ import { ModDB } from '../mods/modDb';
 import { mod } from '../mods/types';
 import { dummyDefence } from '../sim/dummy';
 import {
+  ailBaseOf,
   ailmentsFromHit,
   attackHitChance,
   expectedHit,
@@ -218,6 +219,7 @@ describe('§6.6 ailments', () => {
       p,
       p.hands[0],
       [0, 0, 0, 40, 0],
+      ailBaseOf([0, 0, 0, 40, 0]),
       false,
       target({ res: [0, 0, 0, 50, 0] }),
       always,
@@ -227,48 +229,135 @@ describe('§6.6 ailments', () => {
   it('crits always ignite', () => {
     const p = profile(new ModDB());
     const never = () => false;
-    expect(ailmentsFromHit(p, p.hands[0], [0, 0, 0, 40, 0], true, t, never).ignite).toBeGreaterThan(
-      0,
-    );
-    expect(ailmentsFromHit(p, p.hands[0], [0, 0, 0, 40, 0], false, t, never).ignite).toBe(0);
+    expect(
+      ailmentsFromHit(p, p.hands[0], [0, 0, 0, 40, 0], ailBaseOf([0, 0, 0, 40, 0]), true, t, never)
+        .ignite,
+    ).toBeGreaterThan(0);
+    expect(
+      ailmentsFromHit(p, p.hands[0], [0, 0, 0, 40, 0], ailBaseOf([0, 0, 0, 40, 0]), false, t, never)
+        .ignite,
+    ).toBe(0);
   });
+  /** Bleed and poison from the average hit of a profile (average physical damage 15). */
+  const ailmentsOf = (db: ModDB) => {
+    const p = profile(db);
+    const ex = expectedHit(p, p.hands[0], t, 0);
+    return ailmentsFromHit(p, p.hands[0], ex.avgH, ex.avgHA, false, t, always);
+  };
+  const chances = [mod('chance.bleed', 'base', 100), mod('chance.poison', 'base', 100)];
   it('bleed and poison scale with their own mods only', () => {
-    const p = profile(
-      new ModDB([
-        mod('chance.bleed', 'base', 100),
-        mod('chance.poison', 'base', 100),
-        mod('damage', 'more', 100, { tags: ['poison'] }),
-      ]),
+    const a = ailmentsOf(new ModDB([...chances, mod('damage', 'more', 100, { tags: ['poison'] })]));
+    expect(a.bleed).toBeCloseTo(0.7 * 15); // 70% of the physical hit a second (3.9)
+    expect(a.poison).toBeCloseTo(0.2 * 15 * 2);
+  });
+  it('attack, melee and weapon modifiers do not reach ailments; generic, dot and damage-type ones do (3.9)', () => {
+    const plain = ailmentsOf(new ModDB(chances));
+    for (const tag of ['attack', 'melee', 'mace', 'oneHand'] as const) {
+      const a = ailmentsOf(new ModDB([...chances, mod('damage', 'inc', 100, { tags: [tag] })]));
+      expect(a.bleed).toBeCloseTo(plain.bleed);
+      expect(a.poison).toBeCloseTo(plain.poison);
+    }
+    const generic = ailmentsOf(new ModDB([...chances, mod('damage', 'inc', 100)]));
+    expect(generic.bleed).toBeCloseTo(plain.bleed * 2);
+    const dot = ailmentsOf(new ModDB([...chances, mod('damage', 'inc', 100, { tags: ['dot'] })]));
+    expect(dot.bleed).toBeCloseTo(plain.bleed * 2);
+    const phys = ailmentsOf(
+      new ModDB([...chances, mod('damage', 'inc', 100, { damageTypes: ['physical'] })]),
     );
-    const a = ailmentsFromHit(p, p.hands[0], [50, 0, 0, 0, 0], false, t, always);
-    expect(a.bleed).toBeCloseTo(35); // 70% of the physical hit a second (3.9)
-    expect(a.poison).toBeCloseTo(20);
+    expect(phys.bleed).toBeCloseTo(plain.bleed * 2);
+    const fire = ailmentsOf(
+      new ModDB([...chances, mod('damage', 'inc', 100, { damageTypes: ['fire'] })]),
+    );
+    expect(fire.bleed).toBeCloseTo(plain.bleed);
   });
   it('shock and chill use mag(r, cap) and the 5% floor', () => {
     const p = profile(new ModDB([mod('chance.shock', 'base', 100)]));
-    expect(ailmentsFromHit(p, p.hands[0], [0, 50, 0, 0, 0], false, t, always).shock).toBeCloseTo(
-      mag(0.5, 50) / 100,
-    );
+    expect(
+      ailmentsFromHit(
+        p,
+        p.hands[0],
+        [0, 50, 0, 0, 0],
+        ailBaseOf([0, 50, 0, 0, 0]),
+        false,
+        t,
+        always,
+      ).shock,
+    ).toBeCloseTo(mag(0.5, 50) / 100);
     // Chill is capped at 30%.
-    expect(ailmentsFromHit(p, p.hands[0], [0, 0, 50, 0, 0], false, t, always).chill).toBeCloseTo(
-      0.3,
-    );
-    expect(ailmentsFromHit(p, p.hands[0], [0, 0, 12.5, 0, 0], false, t, always).chill).toBeCloseTo(
-      mag(0.125, 30) / 100,
-    );
-    expect(ailmentsFromHit(p, p.hands[0], [0, 0.1, 0, 0, 0], false, t, always).shock).toBe(0);
+    expect(
+      ailmentsFromHit(
+        p,
+        p.hands[0],
+        [0, 0, 50, 0, 0],
+        ailBaseOf([0, 0, 50, 0, 0]),
+        false,
+        t,
+        always,
+      ).chill,
+    ).toBeCloseTo(0.3);
+    expect(
+      ailmentsFromHit(
+        p,
+        p.hands[0],
+        [0, 0, 12.5, 0, 0],
+        ailBaseOf([0, 0, 12.5, 0, 0]),
+        false,
+        t,
+        always,
+      ).chill,
+    ).toBeCloseTo(mag(0.125, 30) / 100);
+    expect(
+      ailmentsFromHit(
+        p,
+        p.hands[0],
+        [0, 0.1, 0, 0, 0],
+        ailBaseOf([0, 0.1, 0, 0, 0]),
+        false,
+        t,
+        always,
+      ).shock,
+    ).toBe(0);
   });
   it('freeze lasts min(3, 6r) s and needs at least 0.3 s', () => {
     const p = profile(new ModDB([mod('chance.freeze', 'base', 100)]));
-    expect(ailmentsFromHit(p, p.hands[0], [0, 0, 20, 0, 0], false, t, always).freeze).toBeCloseTo(
-      1.2,
-    );
-    expect(ailmentsFromHit(p, p.hands[0], [0, 0, 1, 0, 0], false, t, always).freeze).toBe(0);
-    expect(ailmentsFromHit(p, p.hands[0], [0, 0, 500, 0, 0], false, t, always).freeze).toBe(3);
+    expect(
+      ailmentsFromHit(
+        p,
+        p.hands[0],
+        [0, 0, 20, 0, 0],
+        ailBaseOf([0, 0, 20, 0, 0]),
+        false,
+        t,
+        always,
+      ).freeze,
+    ).toBeCloseTo(1.2);
+    expect(
+      ailmentsFromHit(p, p.hands[0], [0, 0, 1, 0, 0], ailBaseOf([0, 0, 1, 0, 0]), false, t, always)
+        .freeze,
+    ).toBe(0);
+    expect(
+      ailmentsFromHit(
+        p,
+        p.hands[0],
+        [0, 0, 500, 0, 0],
+        ailBaseOf([0, 0, 500, 0, 0]),
+        false,
+        t,
+        always,
+      ).freeze,
+    ).toBe(3);
   });
   it('cannot inflict elemental ailments', () => {
     const p = profile(new ModDB([mod('cannotInflictEle', 'flag', 1)]));
-    const a = ailmentsFromHit(p, p.hands[0], [0, 50, 50, 50, 0], true, t, always);
+    const a = ailmentsFromHit(
+      p,
+      p.hands[0],
+      [0, 50, 50, 50, 0],
+      ailBaseOf([0, 50, 50, 50, 0]),
+      true,
+      t,
+      always,
+    );
     expect(a.ignite + a.shock + a.chill + a.freeze).toBe(0);
   });
 });

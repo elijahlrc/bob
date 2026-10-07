@@ -273,7 +273,9 @@ describe('wave 2 uniques', () => {
     expect(b.max).toBe(2);
     expect(b.speed).toBeCloseTo(1.4);
     expect(b.dur).toBeCloseTo(a.dur / 1.4);
-    expect(b.mult).toBeCloseTo(a.mult * 0.6);
+    // 40% less burning damage, as the ignite sees the hit's damage.
+    const k = (c: Character) => c.profile(c.primary).hands[0].ailChunks[0].k[0];
+    expect(k(ring)).toBeCloseTo(k(plain) * 0.6);
   });
 
   it('expected ignites: one counts like before, two add up to less than double', () => {

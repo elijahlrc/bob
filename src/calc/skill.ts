@@ -41,9 +41,24 @@ export type HandStats = {
 /** A damage chunk: type index, ancestry bitmask, and a range. */
 export type Chunk = { type: number; anc: number; min: number; max: number };
 
+/**
+ * A chunk's base damage before scaling, with the multiplier each damaging ailment applies to it. Ailments are
+ * calculated from base damage separately from hits: attack, spell, melee, projectile, area and weapon modifiers never
+ * reach them, only damage-over-time, ailment-tagged, damage-type and generic ones (3.9, AUDIT-3.9).
+ */
+export type AilChunk = {
+  type: number;
+  min: number;
+  max: number;
+  /** Multipliers for ignite, bleed and poison. */
+  k: [number, number, number];
+};
+
 export type HandProfile = {
-  /** Post-scaling ranges (step 4). These are "H" for ailments before crit and mitigation. */
+  /** Post-scaling ranges (step 4): the hit's damage "H" before crit and mitigation. */
   chunks: Chunk[];
+  /** The same chunks as damaging ailments see them (parallel to `chunks`). */
+  ailChunks: AilChunk[];
   /** Extra multiplier on hit damage only (mods tagged 'hit'). */
   hitMult: number;
   critChance: number;
@@ -54,7 +69,7 @@ export type HandProfile = {
   range: number;
 };
 
-export type AilmentSpec = { chance: number; mult: number; dur: number };
+export type AilmentSpec = { chance: number; dur: number };
 
 export type SkillProfile = {
   skill: SkillDef;
@@ -233,8 +248,17 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     const hitTag = tagBit('hit');
     let hitMultAcc = 0;
     let hitW = 0;
+    const ailChunks: AilChunk[] = [];
     for (const c of chunks) {
       const cctx = { ...ctx, ancestry: c.anc };
+      const ak = (tag: SkillTag) =>
+        db.mult('damage', ctxOf(DOT_TAGS | tagBit(tag), conds, statValue, c.anc));
+      ailChunks.push({
+        type: c.type,
+        min: c.min,
+        max: c.max,
+        k: [ak('ignite'), ak('bleed'), ak('poison')],
+      });
       let m = db.mult('damage', cctx);
       if (spellIncOnAttacks) {
         // Increases and reductions to spell damage also apply (not "more" mods).
@@ -270,6 +294,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     }
     return {
       chunks,
+      ailChunks,
       hitMult,
       critChance,
       critMulti,
@@ -282,25 +307,14 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
   const hands = isAttack ? inp.hands.map((h) => handProfile(h)) : [handProfile(null)];
   const useTime = hands.reduce((s, h) => s + h.time, 0) / hands.length;
 
-  const ailment = (
-    tag: SkillTag,
-    chanceStat: string,
-    durStat: string,
-    baseDur: number,
-    anc: number,
-  ) => {
-    const t = baseTags | DOT_TAGS | tagBit(tag);
-    const ctx = ctxOf(t, conds, statValue, anc);
-    return {
-      chance: clamp(db.sum('base', chanceStat, baseCtx) / 100, 0, 1),
-      mult: db.mult('damage', ctx, DOT_TAGS | tagBit(tag)),
-      dur: baseDur * db.mult(durStat, baseCtx),
-    };
-  };
+  const ailment = (chanceStat: string, durStat: string, baseDur: number) => ({
+    chance: clamp(db.sum('base', chanceStat, baseCtx) / 100, 0, 1),
+    dur: baseDur * db.mult(durStat, baseCtx),
+  });
 
   /** Ignites can burn faster (more damage a second, for less time) and, rarely, more than one at once. */
   const igniteSpec = () => {
-    const raw = ailment('ignite', 'chance.ignite', 'duration.ignite', IGNITE_DURATION, 1 << FIRE);
+    const raw = ailment('chance.ignite', 'duration.ignite', IGNITE_DURATION);
     const speed = Math.max(0.1, 1 + db.inc('ignite.speed', baseCtx));
     return {
       ...raw,
@@ -335,9 +349,9 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     cost: Math.round(skill.cost * inp.costMult * db.mult('cost', baseCtx)),
     ignite: igniteSpec(),
     bleed: isAttack
-      ? ailment('bleed', 'chance.bleed', 'duration.bleed', BLEED_DURATION, 1 << PHYS)
-      : { chance: 0, mult: 1, dur: BLEED_DURATION },
-    poison: ailment('poison', 'chance.poison', 'duration.poison', POISON_DURATION, 1 << CHAOS),
+      ? ailment('chance.bleed', 'duration.bleed', BLEED_DURATION)
+      : { chance: 0, dur: BLEED_DURATION },
+    poison: ailment('chance.poison', 'duration.poison', POISON_DURATION),
     shock: {
       chance: clamp(db.sum('base', 'chance.shock', baseCtx) / 100, 0, 1),
       effect: Math.max(0, 1 + db.inc('effect.shock', baseCtx) + ailEffect),

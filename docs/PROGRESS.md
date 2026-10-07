@@ -464,7 +464,7 @@ revert if they would rather not.
 
 ### C1 done: mechanics audit against 3.9.0 (2026-10-07)
 
-- `docs/AUDIT-3.9.md`: 23 rules brought in line with 3.9.0 (each with a wiki revision), 12 divergences recorded in DESIGN 2.1,
+- `docs/AUDIT-3.9.md`: 24 rules brought in line with 3.9.0 (each with a wiki revision), 12 divergences recorded in DESIGN 2.1,
   and the missing buff layer (Fortify, Onslaught, Impale, Rage, Arcane Surge, Culling Strike, Unholy Might) scheduled for C2.
 - Biggest changes: hit chance ×1.15; crit confirmation and crit ailments ×1.5; bleed 70% a second (×3 moving); shock and
   chill `50 · r^0.4`; stun rules (ES ignore, 20% floor, melee weights); ES recharge 20% a second; dual wielding +20% more
