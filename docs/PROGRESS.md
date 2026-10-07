@@ -492,3 +492,18 @@ revert if they would rather not.
   batches land) and per-shape convergence cases (the generated gem test covers the sim; the 3% convergence test gets a case
   for each archetype as C3 adds gems).
 - **Tests.** 592.
+
+### C3 in progress: gem content (2026-10-07)
+
+- **Gems.** 174 of 349 (104 of 219 actives, 70 of 130 supports) in nine hand-written batches (`docs/coverage/gems/c3g-*.json`,
+  emitted to `src/data/gemsGen.ts`); every gem has its own name; numbers are the 3.9 level 1 and 20 anchors. Channelling,
+  ramping stages, fuses and spreads are averaged into one repeated hit or a short ground zone (note on each map entry).
+- **Engine additions for gems.** `needsDualWield` and `needsShield` on actives; per-charge `per` mods for charge skills; the bot
+  skips supports whose rules cannot hold for the chosen skill; `ModDB` keeps its mods per kind.
+- **Unique pipeline.** `docs/coverage/AUTHORING.md` and `emit-uniques.ts --check <file>` (dry run: open lines, stats,
+  conditions, names, ids) so decision files can be drafted in parallel and emitted together.
+- **Bot speed.** The headless bot measured 500–560× alone and 450–500× under a loaded full test run once the gem pool grew
+  (the cost is spread over every `Character` build, not one hot spot), so the local speed test floor is now 440×. The user
+  asked not to optimise per gem until the whole plan is done; revisit candidate pruning and cheaper `Character` builds in C7.
+- **Deferred gems** (need systems from later milestones): corpse skills (Desecrate, Detonate Dead, Unearth, Volatile Dead),
+  Discharge (consumes charges), Manabond, Plague Bearer, trap/mine/totem supports, trigger supports, minions.
