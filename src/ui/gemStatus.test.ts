@@ -39,9 +39,8 @@ describe('gem status lines (is this gem doing anything?)', () => {
     const { ch, body } = chOf(['flameBolt', 'echoingCast'], 'mystic');
     const s = status(ch, body, 0)!;
     expect(s.ok).toBe(false);
-    expect(s.text).toMatch(
-      /Supported by: Echoing Cast\. Mana-starved: you can pay for about \d+% of casts/,
-    );
+    expect(s.text).toMatch(/^Supported by: Echoing Cast · Mana-starved \(\d+%\)$/);
+    expect(s.hint).toMatch(/can pay for about \d+% of this skill's casts/);
   });
 
   it('a spell support on an attack is flagged: it does nothing', () => {

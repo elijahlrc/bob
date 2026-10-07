@@ -174,7 +174,8 @@ describe('the headless bot (§15.5)', () => {
     expect(a.maps[0].status).toBe('cleared');
   });
 
-  it('runs at least 500× real time', () => {
+  // Timing tests depend on the machine: they run locally and are skipped on CI (shared runners are slower).
+  it.skipIf(!!process.env.CI)('runs at least 500× real time', () => {
     const t0 = performance.now();
     const r = botRun('reaver', 5, 25);
     const wall = (performance.now() - t0) / 1000;

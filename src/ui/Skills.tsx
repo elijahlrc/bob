@@ -46,7 +46,7 @@ export function gemStatus(
   ch: Character,
   uid: number,
   def: ReturnType<typeof gemDef>,
-): { ok: boolean; text: string } | null {
+): { ok: boolean; text: string; hint?: string } | null {
   if (def.kind === 'support') {
     const on = ch.actives.filter((a) => a.supports.some((x) => x.gem.uid === uid));
     if (on.length)
@@ -75,7 +75,8 @@ export function gemStatus(
       if (sustain < 0.9)
         return {
           ok: false,
-          text: `${linked}. Mana-starved: you can pay for about ${Math.round(sustain * 100)}% of casts, the rest are weapon attacks`,
+          text: `${linked} · Mana-starved (${Math.round(sustain * 100)}%)`,
+          hint: `Your mana regeneration can pay for about ${Math.round(sustain * 100)}% of this skill's casts. The rest are weapon attacks. Add mana regeneration, reduce the cost, or use fewer supports.`,
         };
     }
     return { ok: true, text: linked };
@@ -285,7 +286,10 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
                       )}
                       {active && !active.usable && <div class="warn">{active.reason}</div>}
                       {status && (
-                        <div class={status.ok ? 'muted gem-status' : 'warn gem-status'}>
+                        <div
+                          class={status.ok ? 'muted gem-status' : 'warn gem-status'}
+                          title={status.hint}
+                        >
                           {status.text}
                         </div>
                       )}
