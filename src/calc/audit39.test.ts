@@ -213,7 +213,11 @@ describe('audit 3.9: dual wielding and characters', () => {
   it('chaos inoculation keeps the stun threshold of the life it replaces', () => {
     const b = build(false);
     const normal = new Character(b, { areaLevel: 30 }).defence();
-    b.equipment.body!.implicits.push(mod('lifeIsOne', 'flag', 1));
+    // Items are never edited in place (what an item gives is remembered by object): equip an edited copy.
+    b.equipment.body = {
+      ...b.equipment.body!,
+      implicits: [...b.equipment.body!.implicits, mod('lifeIsOne', 'flag', 1)],
+    };
     const ci = new Character(b, { areaLevel: 30 }).defence();
     expect(ci.maxLife).toBe(1);
     expect(ci.stunThreshold).toBeCloseTo(normal.stunThreshold);
@@ -221,9 +225,15 @@ describe('audit 3.9: dual wielding and characters', () => {
 
   it('increased life regeneration also scales percentage regeneration', () => {
     const b = build(false);
-    b.equipment.body!.implicits.push(mod('lifeRegenPct', 'base', 2));
+    b.equipment.body = {
+      ...b.equipment.body!,
+      implicits: [...b.equipment.body!.implicits, mod('lifeRegenPct', 'base', 2)],
+    };
     const base = new Character(b, { areaLevel: 30 }).defence().lifeRegen;
-    b.equipment.body!.implicits.push(mod('lifeRegen', 'inc', 100));
+    b.equipment.body = {
+      ...b.equipment.body!,
+      implicits: [...b.equipment.body!.implicits, mod('lifeRegen', 'inc', 100)],
+    };
     expect(new Character(b, { areaLevel: 30 }).defence().lifeRegen).toBeCloseTo(base * 2);
   });
 
