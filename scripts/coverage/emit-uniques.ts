@@ -205,11 +205,13 @@ function check(file: string): void {
     for (const m of d.mods ?? []) {
       if (
         !STAT_TEXT[m.stat] &&
+        !['damage', 'damage.min', 'damage.max'].includes(m.stat) &&
         !/^(convertSkill|gain|convert|chargeOn|buffOn|rageOn|recover|recoverPct|resist|max|duration|effect|chance)./.test(
           m.stat,
         )
       )
         bad(`unknown stat ${m.stat}`);
+      if (m.min > m.max && m.min >= 0) bad(`mod ${m.stat}: min ${m.min} is above max ${m.max}`);
       if (m.condition && !(CONDITIONS as readonly string[]).includes(m.condition.id))
         bad(`unknown condition ${m.condition.id}`);
     }

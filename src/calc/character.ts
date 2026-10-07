@@ -509,6 +509,14 @@ export class Character {
     if (!db0.flag('evasionToArmour', ctx0))
       aMods.push(mod('evasion', 'inc', attrs.dex * DEX_EVASION_INC, { source: src }));
     db0.addAll(aMods);
+    // "Increased global defences" raises armour, evasion and energy shield alike.
+    const globalDef = db0.sum('inc', 'globalDefences', ctx0);
+    if (globalDef)
+      db0.addAll(
+        (['armour', 'evasion', 'es'] as const).map((st) =>
+          mod(st, 'inc', globalDef, { source: src }),
+        ),
+      );
 
     // 3. Gems.
     for (const slot of EQUIP_SLOTS) {

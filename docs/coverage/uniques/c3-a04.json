@@ -1,0 +1,214 @@
+[
+  {
+    "ref": "Atziri's Acuity", "name": "Sharpwit Gauntlets", "flavour": "Every lucky strike is paid for in blood.",
+    "note": "Intelligence, life, armour and global crit chance; after a recent crit, leech is instant and life regeneration stops.",
+    "mods": [{ "stat": "instantLeechNoRegen", "kind": "flag", "min": 1, "max": 1, "condition": { "id": "critRecently" } }],
+    "drop": ["Vaal Pact"]
+  },
+  {
+    "ref": "Demon Stitcher", "name": "Seamripper Gloves", "flavour": "It sews you shut with your own thread.",
+    "note": "Cast speed, energy shield and life; each spell cast trades a slice of life for that much energy shield (a short cooldown stands in for the per-cast rule).",
+    "triggers": [{ "on": "cast", "chance": 100, "cooldown": 0.5, "effect": { "kind": "sacrifice", "pctOfLife": 5, "pool": "es" } }],
+    "drop": ["Sacrifice 5% of Life"]
+  },
+  {
+    "ref": "Doryani's Fist", "name": "Bareknuckle Storm", "flavour": "The sparks come from the knuckles, not the weapon.",
+    "note": "Energy shield, shock chance and a large lightning added to unarmed attacks. The granted skill, the unarmed-spell line and energy shield on killing a shocked enemy were dropped.",
+    "mods": [
+      { "stat": "damage.min", "kind": "base", "min": 150, "max": 225, "damageTypes": ["lightning"], "tags": ["attack", "unarmed"] },
+      { "stat": "damage.max", "kind": "base", "min": 525, "max": 600, "damageTypes": ["lightning"], "tags": ["attack", "unarmed"] }
+    ],
+    "drop": ["Doryani's Touch", "to Spells while Unarmed", "Energy Shield gained on Killing a Shocked Enemy", "to Unarmed Attacks"]
+  },
+  {
+    "ref": "Empire's Grasp", "name": "Bulwark Fists", "flavour": "Immovable, and it does not care who knows.",
+    "note": "A large flat armour gauntlet; the knockback lines were dropped.",
+    "drop": ["Knockback direction is reversed", "Supported by level 10 Knockback"]
+  },
+  {
+    "ref": "Facebreaker", "name": "Skullsplitter Mitts", "flavour": "Nothing is held in them but the swing.",
+    "note": "Massively more physical damage while unarmed, with crit multiplier and a lower enemy stun threshold.",
+    "mods": [{ "stat": "damage", "kind": "more", "min": 600, "max": 800, "damageTypes": ["physical"], "tags": ["attack", "unarmed"] }],
+    "drop": ["Unarmed Physical Damage"]
+  },
+  {
+    "ref": "Farrul's Pounce", "name": "Stalker's Claws", "flavour": "They wait until something is already bleeding.",
+    "note": "Armour, evasion, life and extra accuracy and damage against bleeding enemies. The stealth-conditional lines (always bleed, extra buff) were dropped.",
+    "mods": [
+      { "stat": "accuracy", "kind": "base", "min": 400, "max": 500, "condition": { "id": "targetBleeding" } },
+      { "stat": "damage", "kind": "inc", "min": 40, "max": 50, "condition": { "id": "targetBleeding" } }
+    ],
+    "drop": ["Accuracy against Bleeding", "Attacks always inflict Bleeding while you have Cat's Stealth", "Damage with Hits and Ailments against Bleeding", "Crimson Dance while you have Cat's Stealth"]
+  },
+  {
+    "ref": "Haemophilia", "name": "Reddened Gauntlets", "flavour": "The wound keeps its own accounts.",
+    "note": "Strength, damage over time, bleed chance and attack damage against bleeding enemies, with shorter bleeds. The explosion on killing a bleeding enemy was dropped.",
+    "mods": [
+      { "stat": "chance.bleed", "kind": "base", "min": 25, "max": 25 },
+      { "stat": "damage", "kind": "inc", "min": 25, "max": 40, "tags": ["attack"], "condition": { "id": "targetBleeding" } },
+      { "stat": "duration.bleed", "kind": "inc", "min": -25, "max": -25 }
+    ],
+    "drop": ["Attacks have 25% chance to cause Bleeding", "Attack Damage against Bleeding Enemies", "Bleeding Enemies you Kill Explode", "their Maximum Life as Physical Damage", "reduced Bleed duration"]
+  },
+  {
+    "ref": "Hrimburn", "name": "Hoarfire Mitts", "flavour": "Frost that burns on the way out.",
+    "note": "Cold added to spells and attacks, half of physical converted to cold, cold resistance and reflect. The line letting cold damage ignite was dropped.",
+    "drop": ["Your Cold Damage can Ignite"]
+  },
+  {
+    "ref": "Hrimsorrow", "name": "Frostgrief Mitts", "flavour": "Cold hands, and nothing left to say.",
+    "note": "Same stat line as its sibling: added cold, half physical converted to cold, cold resistance and reflect."
+  },
+  {
+    "ref": "Maligaro's Virtuosity", "name": "Sureblade Gloves", "flavour": "A cut made once is a cut made right.",
+    "note": "Attack speed, doubled-up crit chance, evasion and a fixed crit multiplier of 300%.",
+    "mods": [{ "stat": "critMulti", "kind": "override", "min": 300, "max": 300 }],
+    "drop": ["Critical Strike Multiplier is 300%"]
+  },
+  {
+    "ref": "Meginord's Vise", "name": "Ironvice Gauntlets", "flavour": "A grip that keeps what it takes.",
+    "note": "Physical damage, a flat +100 strength and armour; life regeneration of 2% per full 400 strength.",
+    "mods": [{ "stat": "lifeRegenPct", "kind": "base", "min": 2, "max": 2, "per": { "stat": "str", "div": 400 } }],
+    "drop": ["Life Regenerated per second with at least 400 Strength"]
+  },
+  {
+    "ref": "Offering to the Serpent", "name": "Fangbound Gauntlets", "flavour": "Feed it and it will feed you.",
+    "note": "All attributes, armour and energy shield, attack and cast speed and damage while leeching. The leech recovery and full-life leech lines were dropped.",
+    "drop": ["Maximum Recovery per Life Leech", "not removed at Full Life"]
+  },
+  {
+    "ref": "Shaper's Touch", "name": "Measured Grasp", "flavour": "Every stat is a lever, if you know where to push.",
+    "note": "Armour and energy shield with bonuses scaling off each attribute: accuracy, life, mana, energy shield, evasion and melee physical damage.",
+    "mods": [
+      { "stat": "accuracy", "kind": "base", "min": 4, "max": 4, "per": { "stat": "int", "div": 2 } },
+      { "stat": "life", "kind": "base", "min": 1, "max": 1, "per": { "stat": "dex", "div": 4 } },
+      { "stat": "mana", "kind": "base", "min": 2, "max": 2, "per": { "stat": "str", "div": 4 } },
+      { "stat": "damage", "kind": "inc", "min": 2, "max": 2, "damageTypes": ["physical"], "tags": ["melee"], "per": { "stat": "dex", "div": 10 } }
+    ],
+    "drop": ["Accuracy Rating per 2 Intelligence", "Life per 4 Dexterity", "Mana per 4 Strength", "Melee Physical Damage per 10 Dexterity"]
+  },
+  {
+    "ref": "Snakebite", "name": "Venomgrip Mitts", "flavour": "Quicker with every strike that lands.",
+    "note": "Evasion, life, attack speed and accuracy that scale with frenzy charges. The poison-at-max-charges and charge-duration lines were dropped.",
+    "drop": ["Frenzy Charge Duration per Frenzy Charge", "chance to Poison while at maximum Frenzy Charges", "Damage over Time Multiplier for Poison per Frenzy Charge"]
+  },
+  {
+    "ref": "Southbound", "name": "Hailstride Gloves", "flavour": "Walk through winter and it follows.",
+    "note": "Cold added to attacks, maximum life, cold resistance and longer freezes. The line limiting hits to killing frozen enemies and the herald line were dropped.",
+    "drop": ["Herald of Ice Damage", "Your Hits can only Kill Frozen enemies"]
+  },
+  {
+    "ref": "Storm's Gift", "name": "Forkstorm Mitts", "flavour": "One jolt is a rumour; a second is a crowd.",
+    "note": "Damage over time, evasion and energy shield, lightning resistance; killing a shocked enemy spreads its shock to the pack. The always-shock-on-kill line was dropped.",
+    "triggers": [{ "on": "kill", "targetHas": "shock", "chance": 100, "cooldown": 0, "effect": { "kind": "spread", "ailment": "shock", "radius": 3 } }],
+    "drop": ["Enemies you kill are Shocked", "Shocks you inflict spread"]
+  },
+  {
+    "ref": "Surgebinders", "name": "Tideturn Gauntlets", "flavour": "The charge goes where the gauntlets go.",
+    "note": "Armour and evasion with damage scaling per frenzy, endurance and power charge; stealing charges on hit became a gain chance on hit.",
+    "mods": [
+      { "stat": "chargeOn.hit.fervour", "kind": "base", "min": 10, "max": 10 },
+      { "stat": "chargeOn.hit.grit", "kind": "base", "min": 10, "max": 10 },
+      { "stat": "chargeOn.hit.insight", "kind": "base", "min": 10, "max": 10 }
+    ],
+    "drop": ["Steal Power, Frenzy, and Endurance Charges"]
+  },
+  {
+    "ref": "The Embalmer", "name": "Gravetallow Mitts", "flavour": "Preserved in everything that rots.",
+    "note": "Added chaos damage, life, chaos resistance and longer poison. The supporting-gem line was dropped.",
+    "mods": [{ "stat": "duration.poison", "kind": "inc", "min": 20, "max": 25 }],
+    "drop": ["Vile Toxins", "Increased Poison Duration", "increased Poison Duration"]
+  },
+  {
+    "ref": "Thunderfist", "name": "Stormclap Mitts", "flavour": "The sky, in two hands.",
+    "note": "Wide-ranging lightning added to attacks, attack speed, energy shield and longer shocks. The supporting-gem line was dropped.",
+    "drop": ["Added Lightning Damage"]
+  },
+  {
+    "ref": "Veruso's Battering Rams", "name": "Ramhead Gauntlets", "flavour": "Slow to start, hard to stop.",
+    "note": "Attack speed, armour, movement and melee damage per endurance charge, at the cost of longer stuns on you. The shock immunity at max charges was dropped.",
+    "mods": [{ "stat": "stunDurationOnSelf", "kind": "base", "min": -50, "max": -50 }],
+    "drop": ["Stun Duration on you", "cannot be Shocked while at maximum Endurance Charges"]
+  },
+  {
+    "ref": "Voidbringer", "name": "Hollowmind Gloves", "flavour": "Empty enough to hold a storm.",
+    "note": "Spell crit chance, energy shield and energy shield on kill, with +1 to socketed fire, cold and lightning gems and a higher mana cost.",
+    "mods": [
+      { "stat": "cost", "kind": "inc", "min": 40, "max": 80 },
+      { "stat": "socketedGemLevel", "kind": "base", "min": 1, "max": 1, "tags": ["fire"] },
+      { "stat": "socketedGemLevel", "kind": "base", "min": 1, "max": 1, "tags": ["cold"] },
+      { "stat": "socketedGemLevel", "kind": "base", "min": 1, "max": 1, "tags": ["lightning"] }
+    ],
+    "drop": ["Mana Cost of Skills", "Level of Socketed Elemental Gems"]
+  },
+  {
+    "ref": "Volkuur's Guidance", "name": "Viperwire Gloves", "flavour": "A current that bites back.",
+    "note": "Lightning added to spells and attacks, life and lightning resistance; lightning skills can poison, with poison lasting half as long.",
+    "mods": [
+      { "stat": "chance.poison", "kind": "base", "min": 20, "max": 20, "tags": ["lightning"] },
+      { "stat": "duration.poison", "kind": "more", "min": -50, "max": -50 }
+    ],
+    "drop": ["Poison Duration", "Your Lightning Damage can Poison", "Lightning Skills have 20% chance to Poison"]
+  },
+  {
+    "ref": "Winds of Change", "name": "Gustwork Gauntlets", "flavour": "The fastest thing in the room is the thing you threw.",
+    "note": "Life, projectile speed and damage with a movement penalty; the knockback line was dropped.",
+    "drop": ["Knock Enemies Back"]
+  },
+  {
+    "ref": "Abyssus", "name": "Gapejaw Helm", "flavour": "It looks into you, and it is hungry.",
+    "note": "Added physical to attacks, all attributes, armour and melee crit multiplier, at the cost of more physical damage taken.",
+    "mods": [{ "stat": "critMulti", "kind": "base", "min": 100, "max": 125, "tags": ["melee"] }],
+    "drop": ["Melee Critical Strike Multiplier"]
+  },
+  {
+    "ref": "Asenath's Chant", "name": "Hushsong Circlet", "flavour": "A quiet tune, and every string answers.",
+    "note": "Attack and cast speed, energy shield, recovery, mana regeneration and movement; bow attacks trigger a socketed spell (a short cooldown stands in).",
+    "triggers": [{ "on": "attack", "tags": ["bow"], "chance": 100, "cooldown": 0.5, "effect": { "kind": "castSocketed" } }],
+    "drop": ["Trigger a Socketed Spell"]
+  },
+  {
+    "ref": "Crown of Eyes", "name": "Many-Eyed Circlet", "flavour": "Wherever you look, something looks back.",
+    "note": "Spell damage modifiers apply to attacks, with accuracy, energy shield, life and mana leech from attacks, at a fire resistance cost.",
+    "mods": [
+      { "stat": "spellIncAppliesToAttacks", "kind": "flag", "min": 1, "max": 1 },
+      { "stat": "leech.mana", "kind": "base", "min": 0.2, "max": 0.4, "tags": ["attack"] }
+    ],
+    "drop": ["Spell Damage also apply to Attacks", "Attack Damage Leeched as Mana"]
+  },
+  {
+    "ref": "Crown of the Pale King", "name": "Hollow Regent Mask", "flavour": "A king's face, worn by no one.",
+    "note": "Life, evasion and energy shield, physical leech and physical reflect; the life gained from reflected damage was dropped.",
+    "drop": ["Damage you Reflect to enemies is gained as Life"]
+  },
+  {
+    "ref": "Deidbell", "name": "Tollhelm", "flavour": "Each blow rings it a little louder.",
+    "note": "Strength, dexterity, armour and melee damage with added physical to attacks; the no-leech-on-low-life line was dropped.",
+    "mods": [
+      { "stat": "damage.min", "kind": "base", "min": 10, "max": 10, "damageTypes": ["physical"], "tags": ["attack"] },
+      { "stat": "damage.max", "kind": "base", "min": 20, "max": 20, "damageTypes": ["physical"], "tags": ["attack"] }
+    ],
+    "drop": ["Adds 10-20 Physical Damage to Attacks", "Cannot Leech when on Low Life"]
+  },
+  {
+    "ref": "Deidbellow", "name": "Alarum Sallet", "flavour": "It was made to be heard from the next hill.",
+    "note": "Same stat line as the lower helm; the warcry speed lines and the no-leech-on-low-life line were dropped.",
+    "mods": [
+      { "stat": "damage.min", "kind": "base", "min": 10, "max": 10, "damageTypes": ["physical"], "tags": ["attack"] },
+      { "stat": "damage.max", "kind": "base", "min": 20, "max": 20, "damageTypes": ["physical"], "tags": ["attack"] }
+    ],
+    "drop": ["Adds 10-20 Physical Damage to Attacks", "Cannot Leech when on Low Life", "You and nearby allies have 20% increased", "Speed if you've used a Warcry Recently"]
+  },
+  {
+    "ref": "Ezomyte Hold", "name": "Stonewall Hat", "flavour": "Nothing gets in, and neither does the weather.",
+    "note": "Physical damage, armour and life; cannot be stunned, cannot evade.",
+    "mods": [{ "stat": "cannotEvade", "kind": "flag", "min": 1, "max": 1 }],
+    "drop": ["Cannot Evade Enemy Attacks"]
+  },
+  {
+    "ref": "Ezomyte Peak", "name": "Cairn Hat", "flavour": "Stacked stone by stone, and just as steady.",
+    "note": "Physical damage, armour and life; cannot evade.",
+    "mods": [{ "stat": "cannotEvade", "kind": "flag", "min": 1, "max": 1 }],
+    "drop": ["Cannot Evade Enemy Attacks"]
+  }
+]

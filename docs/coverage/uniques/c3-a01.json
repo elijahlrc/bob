@@ -1,0 +1,69 @@
+[
+  { "ref": "Astramentis", "name": "Stoic Pendant", "flavour": "Hits land softer on the one who expects them.", "note": "All attributes with a small flat cut to physical attack damage taken.", "drop": ["Physical Damage taken from Attacks"], "mods": [{ "stat": "flatTaken.attack.physical", "kind": "base", "min": -4, "max": -4 }] },
+  { "ref": "Blightwell", "name": "Draught Locket", "flavour": "It only wakes when you drink.", "note": "Defences, energy shield and resistances; energy shield recharges much faster during flask effect, at a slower start. Defences is written as armour, evasion and energy shield each.", "drop": ["increased Defences", "slower start of Energy Shield Recharge", "Energy Shield Recharge Rate during Flask Effect"], "mods": [
+    { "stat": "armour", "kind": "inc", "min": 15, "max": 25 },
+    { "stat": "evasion", "kind": "inc", "min": 15, "max": 25 },
+    { "stat": "es", "kind": "inc", "min": 15, "max": 25 },
+    { "stat": "esRechargeRate", "kind": "inc", "min": 400, "max": 400, "condition": { "id": "flaskActive" } },
+    { "stat": "esRechargeDelay", "kind": "inc", "min": -30, "max": -30, "condition": { "id": "flaskActive" } }
+  ] },
+  { "ref": "Choir of the Storm", "name": "Skyrend Pendant", "flavour": "Every sharp moment answers with thunder.", "note": "Mana, lightning damage and a lightning chain spell cast on critical strike (Bob's Arc Chain stands in for the bolt). Crit chance scaling from lightning resistance dropped.", "drop": ["Critical Strike Chance is increased by Lightning Resistance", "Trigger Level 20 Lightning Bolt"], "triggers": [{ "on": "crit", "chance": 100, "cooldown": 0.25, "effect": { "kind": "castGranted", "skillId": "arcChain", "level": 20 } }] },
+  { "ref": "Voice of the Storm", "name": "Thunderpeal Pendant", "flavour": "The sky clears its throat.", "note": "Attributes, mana and a lightning chain spell cast on critical strike (lower level; Arc Chain stands in for the bolt). Crit chance scaling from lightning resistance dropped.", "drop": ["Critical Strike Chance is increased by Lightning Resistance", "Trigger Level 12 Lightning Bolt"], "triggers": [{ "on": "crit", "chance": 100, "cooldown": 0.25, "effect": { "kind": "castGranted", "skillId": "arcChain", "level": 12 } }] },
+  { "ref": "Extractor Mentis", "name": "Reaping Charm", "flavour": "What falls is only borrowed from the wearer.", "note": "Strength, chances for Dread Might and Quickening on kill and life on kill. The versions that buff nearby enemies were dropped.", "drop": ["to nearby Enemies on Kill"] },
+  { "ref": "Eye of Innocence", "name": "Singed Cameo", "flavour": "Clean hands, warm gloves.", "note": "Ignite chance with damage and fire leech while ignited. The fire damage taken when igniting was dropped.", "drop": ["Take 100 Fire Damage"] },
+  { "ref": "Marylene's Fallacy", "name": "Glass Gambit", "flavour": "A bet that pays rarely and pays enough.", "note": "Huge critical multiplier for much less critical chance, with accuracy and evasion. Culling on crit dropped.", "drop": ["Culling Strike"] },
+  { "ref": "Perquil's Toe", "name": "Rabbit Charm", "flavour": "Lucky for someone.", "note": "Dexterity and movement speed. The lucky-damage lines were dropped.", "drop": ["is Lucky"] },
+  { "ref": "Rashkaldor's Patience", "name": "Kindling Pendant", "flavour": "Slow to catch, slow to leave.", "note": "Life, mana, a chance to freeze, shock and ignite, and longer elemental ailments on enemies. Cannot gain power charges was dropped.", "drop": ["Duration of Elemental Ailments", "Cannot gain Power Charges"], "mods": [
+    { "stat": "duration.ignite", "kind": "inc", "min": 20, "max": 20 },
+    { "stat": "duration.shock", "kind": "inc", "min": 20, "max": 20 },
+    { "stat": "duration.chill", "kind": "inc", "min": 20, "max": 20 },
+    { "stat": "duration.freeze", "kind": "inc", "min": 20, "max": 20 }
+  ] },
+  { "ref": "Sacrificial Heart", "name": "Altar Heart", "flavour": "Still warm, still giving.", "note": "Large added fire, cold and lightning damage. The recent-vaal-skill lines were dropped.", "drop": ["Vaal Skill"] },
+  { "ref": "Shaper's Seed", "name": "Sprouting Seed", "flavour": "Nothing planted here stays small.", "note": "Mana regeneration and a percentage of life regenerated each second. The nearby-ally versions were dropped.", "drop": ["Nearby Allies"] },
+  { "ref": "The Anvil", "name": "Forgebound Amulet", "flavour": "It takes the blow and pays you for it.", "note": "Armour, block, life and mana when you block and a higher block cap, at attack and cast speed cost. Reflect on block dropped.", "drop": ["Reflects 240 to 300", "maximum Block Chance"], "mods": [{ "stat": "blockCap", "kind": "base", "min": 3, "max": 3 }] },
+  { "ref": "The Aylardex", "name": "Capacitor Locket", "flavour": "Charged, it hums. Overcharged, it hesitates.", "note": "Life, mana, an extra power charge, mana regeneration per power charge and reduced crit chance per power charge. Charge duration and mana-before-life per charge dropped.", "drop": ["Power Charge Duration", "Damage is taken from Mana", "reduced Critical Strike Chance per Power Charge", "Mana Regeneration Rate Per Power Charge"], "mods": [
+    { "stat": "manaRegen", "kind": "inc", "min": 10, "max": 10, "per": { "stat": "charges.insight", "div": 1 } },
+    { "stat": "critChance", "kind": "inc", "min": -40, "max": -40, "per": { "stat": "charges.insight", "div": 1 } }
+  ] },
+  { "ref": "The Halcyon", "name": "Stillfrost Amulet", "flavour": "A calm lake, and a skin of ice on it.", "note": "Cold damage and resistance, freeze chance and freeze duration. The damage after freezing recently was dropped.", "drop": ["Frozen an Enemy Recently"] },
+  { "ref": "The Pandemonius", "name": "Rimebite Pendant", "flavour": "Frost looks for the places you are already weak.", "note": "Cold damage and resistance with cold penetration against chilled enemies. Chill-when-hit and blind-chilled dropped.", "drop": ["Chill Enemy for 1 second when Hit", "Blind Chilled Enemies on Hit"] },
+  { "ref": "Warped Timepiece", "name": "Bent Hourglass", "flavour": "The sand runs fast and some of it runs backwards.", "note": "Attack, cast and movement speed with faster leech. Reduced skill effect duration dropped.", "drop": ["Skill Effect Duration"] },
+  { "ref": "Xoph's Blood", "name": "Ember Vein", "flavour": "Blood, but only the hot kind.", "note": "Life, strength, fire resistance and penetration, and a fire-only conversion (Avatar of Fire). The ash curse on enemies was ignored by the translator.", "drop": [] },
+  { "ref": "Zerphi's Heart", "name": "Blighted Core", "flavour": "Rot burns just as well as anything.", "note": "Large added chaos damage that can ignite, chill and shock. Attribute requirement increase and vaal-skill soul eater dropped.", "drop": ["Attribute Requirements", "Soul Eater", "can Ignite, Chill and Shock"], "mods": [
+    { "stat": "canIgnite.chaos", "kind": "flag", "min": 1, "max": 1 },
+    { "stat": "canChill.chaos", "kind": "flag", "min": 1, "max": 1 },
+    { "stat": "canShock.chaos", "kind": "flag", "min": 1, "max": 1 }
+  ] },
+  { "ref": "Maligaro's Cruelty", "name": "Venomed Hook", "flavour": "Patience, then a second dose.", "note": "Life and charges on kill: frenzy and power; poison duration per power charge. The number-of-poisons conditions on the kills and the poison damage per frenzy charge were dropped.", "drop": ["Frenzy Charge on Killing", "Power Charge on Killing", "Damage with Poison per Frenzy Charge", "Poison Duration per Power Charge"], "mods": [
+    { "stat": "chargeOn.kill.fervour", "kind": "base", "min": 25, "max": 30 },
+    { "stat": "chargeOn.kill.insight", "kind": "base", "min": 12, "max": 15 },
+    { "stat": "duration.poison", "kind": "inc", "min": 3, "max": 3, "per": { "stat": "charges.insight", "div": 1 } }
+  ] },
+  { "ref": "Auxium", "name": "Aether Girdle", "flavour": "Wound tight, it hums with kept charge.", "note": "Elemental weapon damage, mana, energy shield and physical attack mana leech per power charge. Chill and freeze duration from energy shield dropped.", "drop": ["Chill and Freeze duration on you"] },
+  { "ref": "Belt of the Deceiver", "name": "Trickster Cinch", "flavour": "Looks plain. That is the point.", "note": "Physical damage, life and all resistances. Reduced crit damage taken and intimidation dropped.", "drop": ["Extra Damage from Critical Strikes", "Intimidated"] },
+  { "ref": "Doryani's Invitation", "name": "Thunderhold Belt", "flavour": "Come in out of the weather.", "note": "Armour, fire and cold resistance, lightning damage and lightning leech. The flask shock chance dropped.", "drop": ["Your Flasks grant"] },
+  { "ref": "Dyadian Dawn", "name": "Pacifist Girdle", "flavour": "The fists stay closed. Everything else burns.", "note": "Deal no physical damage, with life, fire and cold resistance, leech against chilled enemies and faster ignite burning.", "drop": ["Leeched as Life against Chilled", "Burn 35% faster", "Deal no Physical Damage"], "mods": [
+    { "stat": "noPhysicalDamage", "kind": "flag", "min": 1, "max": 1 },
+    { "stat": "leech.life", "kind": "base", "min": 1, "max": 1, "tags": ["attack"], "condition": { "id": "targetChilled" } },
+    { "stat": "ignite.speed", "kind": "inc", "min": 35, "max": 35 }
+  ] },
+  { "ref": "Feastbind", "name": "Quaffer's Sash", "flavour": "Feed the flask and it feeds you.", "note": "Physical damage, added physical, life and leech with flask charges and mana regeneration while a flask is active.", "drop": ["Flask Charges gained while using a Flask", "Mana Regeneration while using a Flask"], "mods": [
+    { "stat": "flaskCharges", "kind": "inc", "min": 50, "max": 50, "condition": { "id": "flaskActive" } },
+    { "stat": "manaRegen", "kind": "inc", "min": 50, "max": 50, "condition": { "id": "flaskActive" } }
+  ] },
+  { "ref": "Headhunter", "name": "Trophy Strap", "flavour": "A rare thing, taken and worn.", "note": "Strength, dexterity and life; gaining the mods of rare monsters you kill (trophy). The extra damage against rare monsters was dropped.", "drop": ["Rare monster"], "mods": [
+    { "stat": "trophyMods", "kind": "flag", "min": 1, "max": 1 }
+  ] },
+  { "ref": "Immortal Flesh", "name": "Unending Hide", "flavour": "Mends faster than you can bleed.", "note": "Life, huge life and mana regeneration, flat physical damage cut and an elemental resistance penalty. The armour bonus while free of ailments dropped.", "drop": ["while not Ignited"] },
+  { "ref": "Maligaro's Restraint", "name": "Sparkbound Cord", "flavour": "A shock, once felt, makes you quicker.", "note": "Added lightning, damage and movement speed while shocked, with longer shock on you. Shock reflection dropped.", "drop": ["reflected back to you"] },
+  { "ref": "Perandus Blazon", "name": "Hoarder's Sash", "flavour": "Everything in it was bought.", "note": "Stun recovery, attributes, item quantity, fire resistance, flask duration and a flat physical damage cut.", "drop": ["Flask effect duration"], "mods": [{ "stat": "flaskDuration", "kind": "inc", "min": 20, "max": 20 }] },
+  { "ref": "Perseverance", "name": "Stalwart Girdle", "flavour": "Stand long enough and they stop trying.", "note": "Life and cold resistance with fortify when stunning enemies. Damage per armour and evasion, and onslaught while fortified, dropped.", "drop": ["per 300 of the lowest", "Fortify on Melee Stun", "You have Onslaught while"], "mods": [{ "stat": "buffOn.stun.fortify", "kind": "base", "min": 14, "max": 20 }] },
+  { "ref": "Prismweave", "name": "Rainband Sash", "flavour": "Splits the light and keeps the pieces.", "note": "Physical and elemental damage, added fire, cold and lightning to attacks, and resistances. The extra elemental damage while a flask is active was dropped.", "drop": ["while using a Flask"] },
+  { "ref": "Ryslatha's Coil", "name": "Brawl Strap", "flavour": "The wide swing hits harder and the narrow one never lands.", "note": "Life, strength, added physical to attacks, life when stunning and a wider physical attack damage range.", "drop": ["Gain 50 Life when you Stun", "Minimum Physical Attack Damage", "Maximum Physical Attack Damage"], "mods": [
+    { "stat": "recover.stun.life", "kind": "base", "min": 50, "max": 50 },
+    { "stat": "minDamage", "kind": "more", "min": -40, "max": -30, "damageTypes": ["physical"], "tags": ["attack"] },
+    { "stat": "maxDamage", "kind": "more", "min": 30, "max": 40, "damageTypes": ["physical"], "tags": ["attack"] }
+  ] },
+  { "ref": "The Magnate", "name": "Foundry Belt", "flavour": "Wealth is mostly filling things up.", "note": "Physical damage, strength and faster flask charge gain. The resistances at high strength dropped.", "drop": ["Flask Charges gained", "at least 200 Strength"], "mods": [{ "stat": "flaskCharges", "kind": "inc", "min": 50, "max": 50 }] }
+]

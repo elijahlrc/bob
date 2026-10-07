@@ -1851,6 +1851,1561 @@
    "ref": "Xoph's Heart",
    "status": "covered",
    "note": "Strength, fire damage, life and fire resistance."
+  },
+  "stoicPendant": {
+   "ref": "Astramentis",
+   "status": "covered",
+   "note": "All attributes with a small flat cut to physical attack damage taken."
+  },
+  "draughtLocket": {
+   "ref": "Blightwell",
+   "status": "covered",
+   "note": "Defences, energy shield and resistances; energy shield recharges much faster during flask effect, at a slower start. Defences is written as armour, evasion and energy shield each."
+  },
+  "skyrendPendant": {
+   "ref": "Choir of the Storm",
+   "status": "covered",
+   "note": "Mana, lightning damage and a lightning chain spell cast on critical strike (Bob's Arc Chain stands in for the bolt). Crit chance scaling from lightning resistance dropped."
+  },
+  "thunderpealPendant": {
+   "ref": "Voice of the Storm",
+   "status": "covered",
+   "note": "Attributes, mana and a lightning chain spell cast on critical strike (lower level; Arc Chain stands in for the bolt). Crit chance scaling from lightning resistance dropped."
+  },
+  "reapingCharm": {
+   "ref": "Extractor Mentis",
+   "status": "covered",
+   "note": "Strength, chances for Dread Might and Quickening on kill and life on kill. The versions that buff nearby enemies were dropped."
+  },
+  "singedCameo": {
+   "ref": "Eye of Innocence",
+   "status": "covered",
+   "note": "Ignite chance with damage and fire leech while ignited. The fire damage taken when igniting was dropped."
+  },
+  "glassGambit": {
+   "ref": "Marylene's Fallacy",
+   "status": "covered",
+   "note": "Huge critical multiplier for much less critical chance, with accuracy and evasion. Culling on crit dropped."
+  },
+  "rabbitCharm": {
+   "ref": "Perquil's Toe",
+   "status": "covered",
+   "note": "Dexterity and movement speed. The lucky-damage lines were dropped."
+  },
+  "kindlingPendant": {
+   "ref": "Rashkaldor's Patience",
+   "status": "covered",
+   "note": "Life, mana, a chance to freeze, shock and ignite, and longer elemental ailments on enemies. Cannot gain power charges was dropped."
+  },
+  "altarHeart": {
+   "ref": "Sacrificial Heart",
+   "status": "covered",
+   "note": "Large added fire, cold and lightning damage. The recent-vaal-skill lines were dropped."
+  },
+  "sproutingSeed": {
+   "ref": "Shaper's Seed",
+   "status": "covered",
+   "note": "Mana regeneration and a percentage of life regenerated each second. The nearby-ally versions were dropped."
+  },
+  "forgeboundAmulet": {
+   "ref": "The Anvil",
+   "status": "covered",
+   "note": "Armour, block, life and mana when you block and a higher block cap, at attack and cast speed cost. Reflect on block dropped."
+  },
+  "capacitorLocket": {
+   "ref": "The Aylardex",
+   "status": "covered",
+   "note": "Life, mana, an extra power charge, mana regeneration per power charge and reduced crit chance per power charge. Charge duration and mana-before-life per charge dropped."
+  },
+  "stillfrostAmulet": {
+   "ref": "The Halcyon",
+   "status": "covered",
+   "note": "Cold damage and resistance, freeze chance and freeze duration. The damage after freezing recently was dropped."
+  },
+  "rimebitePendant": {
+   "ref": "The Pandemonius",
+   "status": "covered",
+   "note": "Cold damage and resistance with cold penetration against chilled enemies. Chill-when-hit and blind-chilled dropped."
+  },
+  "bentHourglass": {
+   "ref": "Warped Timepiece",
+   "status": "covered",
+   "note": "Attack, cast and movement speed with faster leech. Reduced skill effect duration dropped."
+  },
+  "emberVein": {
+   "ref": "Xoph's Blood",
+   "status": "covered",
+   "note": "Life, strength, fire resistance and penetration, and a fire-only conversion (Avatar of Fire). The ash curse on enemies was ignored by the translator."
+  },
+  "blightedCore": {
+   "ref": "Zerphi's Heart",
+   "status": "covered",
+   "note": "Large added chaos damage that can ignite, chill and shock. Attribute requirement increase and vaal-skill soul eater dropped."
+  },
+  "venomedHook": {
+   "ref": "Maligaro's Cruelty",
+   "status": "covered",
+   "note": "Life and charges on kill: frenzy and power; poison duration per power charge. The number-of-poisons conditions on the kills and the poison damage per frenzy charge were dropped."
+  },
+  "aetherGirdle": {
+   "ref": "Auxium",
+   "status": "covered",
+   "note": "Elemental weapon damage, mana, energy shield and physical attack mana leech per power charge. Chill and freeze duration from energy shield dropped."
+  },
+  "tricksterCinch": {
+   "ref": "Belt of the Deceiver",
+   "status": "covered",
+   "note": "Physical damage, life and all resistances. Reduced crit damage taken and intimidation dropped."
+  },
+  "thunderholdBelt": {
+   "ref": "Doryani's Invitation",
+   "status": "covered",
+   "note": "Armour, fire and cold resistance, lightning damage and lightning leech. The flask shock chance dropped."
+  },
+  "pacifistGirdle": {
+   "ref": "Dyadian Dawn",
+   "status": "covered",
+   "note": "Deal no physical damage, with life, fire and cold resistance, leech against chilled enemies and faster ignite burning."
+  },
+  "quaffersSash": {
+   "ref": "Feastbind",
+   "status": "covered",
+   "note": "Physical damage, added physical, life and leech with flask charges and mana regeneration while a flask is active."
+  },
+  "trophyStrap": {
+   "ref": "Headhunter",
+   "status": "covered",
+   "note": "Strength, dexterity and life; gaining the mods of rare monsters you kill (trophy). The extra damage against rare monsters was dropped."
+  },
+  "unendingHide": {
+   "ref": "Immortal Flesh",
+   "status": "covered",
+   "note": "Life, huge life and mana regeneration, flat physical damage cut and an elemental resistance penalty. The armour bonus while free of ailments dropped."
+  },
+  "sparkboundCord": {
+   "ref": "Maligaro's Restraint",
+   "status": "covered",
+   "note": "Added lightning, damage and movement speed while shocked, with longer shock on you. Shock reflection dropped."
+  },
+  "hoardersSash": {
+   "ref": "Perandus Blazon",
+   "status": "covered",
+   "note": "Stun recovery, attributes, item quantity, fire resistance, flask duration and a flat physical damage cut."
+  },
+  "stalwartGirdle": {
+   "ref": "Perseverance",
+   "status": "covered",
+   "note": "Life and cold resistance with fortify when stunning enemies. Damage per armour and evasion, and onslaught while fortified, dropped."
+  },
+  "rainbandSash": {
+   "ref": "Prismweave",
+   "status": "covered",
+   "note": "Physical and elemental damage, added fire, cold and lightning to attacks, and resistances. The extra elemental damage while a flask is active was dropped."
+  },
+  "brawlStrap": {
+   "ref": "Ryslatha's Coil",
+   "status": "covered",
+   "note": "Life, strength, added physical to attacks, life when stunning and a wider physical attack damage range."
+  },
+  "foundryBelt": {
+   "ref": "The Magnate",
+   "status": "covered",
+   "note": "Physical damage, strength and faster flask charge gain. The resistances at high strength dropped."
+  },
+  "bilgeSash": {
+   "ref": "The Retch",
+   "status": "covered",
+   "note": "Belt that lengthens flask duration, trades some charge gain for it, and speeds you while a flask is active, with physical damage, life, cold resistance and attack leech. Dropped: life leech applying to enemies as chaos damage."
+  },
+  "stockroomGirdle": {
+   "ref": "The Tactician",
+   "status": "covered",
+   "note": "Belt that fills flasks faster (50% increased charges gained) with physical damage, strength and intelligence. Dropped: the two attribute-threshold lines (elemental resistances at 200 strength, crit chance at 200 intelligence)."
+  },
+  "moultCord": {
+   "ref": "Wurm's Molt",
+   "status": "covered",
+   "note": "Life, strength, intelligence, cold resistance and physical attack leech as life and mana. The life line is hand-written (capitalisation the translator misses)."
+  },
+  "ashwardJerkin": {
+   "ref": "Ashrend",
+   "status": "covered",
+   "note": "Evasion, life, fire resistance, cannot be ignited and flat physical damage reduction from attacks. Dropped: the socketed Added Fire Damage support and physical damage with ranged weapons."
+  },
+  "mindwallRobe": {
+   "ref": "Cloak of Defiance",
+   "status": "covered",
+   "note": "Evasion and energy shield, big mana pool, 1% of mana regenerated per second, and the keystone that takes damage from mana before life. Dropped: the extra 10% of damage taken from mana (the keystone already does it)."
+  },
+  "rimeLattice": {
+   "ref": "Crystal Vault",
+   "status": "covered",
+   "note": "Cold resistance, cannot be chilled, 20% of physical taken as cold, armour and energy shield, plus increased effect of chill. Dropped: 30% of fire damage taken as cold (only physical conversion exists)."
+  },
+  "drakeHidePlate": {
+   "ref": "Daresso's Defiance",
+   "status": "covered",
+   "note": "Armour and evasion, leech and a 6% chance to dodge attacks, with endurance charges gained on kill and onslaught when hit. Dropped: losing all endurance charges when hit, and the per-charge onslaught duration and effect (flat onslaught chance used instead)."
+  },
+  "russetWraps": {
+   "ref": "Fox's Fortune",
+   "status": "covered",
+   "note": "Huge evasion while on full life, flat and percentage evasion, added physical damage to attacks, dexterity and movement speed. Dropped: enemies unlucky when damaging you on full life, and the level requirement line."
+  },
+  "hallowedRingmail": {
+   "ref": "Geofri's Sanctuary",
+   "status": "covered",
+   "note": "Armour and energy shield, life, all elemental resistances, and flat energy shield that grows with strength (0.9 per 5, the 0.45 scale applied)."
+  },
+  "hoardPlate": {
+   "ref": "Greed's Embrace",
+   "status": "covered",
+   "note": "Item quantity and rarity paid for with fire and lightning resistance and movement speed. Dropped: reduced strength requirement."
+  },
+  "rimeshotLeathers": {
+   "ref": "Hyrri's Ire",
+   "status": "covered",
+   "note": "Dexterity, evasion, chill duration and dodge chances for attacks and spells. Dropped: added cold damage to bow attacks."
+  },
+  "emberHaloMail": {
+   "ref": "Incandescent Heart",
+   "status": "covered",
+   "note": "Armour and energy shield, life, elemental damage gained as extra chaos and attack life leech. Dropped: 25% of elemental damage taken as chaos (no such conversion stat)."
+  },
+  "cinderVestment": {
+   "ref": "Infernal Mantle",
+   "status": "covered",
+   "note": "Plus one to fire gems, fire damage, doubled crit chance, energy shield and fire converted to chaos. Dropped: increased spell damage taken on low mana."
+  },
+  "voltaicRags": {
+   "ref": "Inpulsa's Broken Heart",
+   "status": "covered",
+   "note": "Shocked enemies you kill explode for 5% of their maximum life as lightning damage (a kill trigger), unaffected by shock, life and effect of shock. Dropped: increased damage after shocking an enemy recently."
+  },
+  "emberholdPlate": {
+   "ref": "Kaom's Heart",
+   "status": "covered",
+   "note": "No sockets, 500 life and fire damage on a heavy plate."
+  },
+  "seamedLeather": {
+   "ref": "Kintsugi",
+   "status": "covered",
+   "note": "Evasion, life, fire resistance, 20% less damage taken while not hit recently and 50% increased evasion once hit recently."
+  },
+  "blightwardMail": {
+   "ref": "Lightbane Raiment",
+   "status": "covered",
+   "note": "Armour and energy shield, 30% physical converted to chaos and chaos damage reflected to melee attackers. Dropped: desecrated ground on block (ground effect)."
+  },
+  "arcCage": {
+   "ref": "Lightning Coil",
+   "status": "covered",
+   "note": "Added lightning damage to attacks, armour and evasion, life, a lightning resistance penalty and 30% of physical taken as lightning."
+  },
+  "prismwovenMail": {
+   "ref": "Loreweave",
+   "status": "covered",
+   "note": "Six sockets, added physical, all attributes, crit chance, energy shield, life, mana, item rarity, elemental damage and a higher maximum for every resistance (+1 to +5, elemental and chaos)."
+  },
+  "cracklingVestment": {
+   "ref": "Shavronne's Wrappings",
+   "status": "covered",
+   "note": "Energy shield, faster start of recharge, lightning resistance, lightning reflect and chaos damage that does not bypass energy shield."
+  },
+  "paleVestment": {
+   "ref": "Skin of the Lords",
+   "status": "covered",
+   "note": "Plus one to level of socketed gems and doubled global defences. Dropped: sockets cannot be modified, corrupted gems only."
+  },
+  "plainShift": {
+   "ref": "Skin of the Loyal",
+   "status": "covered",
+   "note": "Plus one to level of socketed gems and doubled global defences. Dropped: sockets cannot be modified."
+  },
+  "brightsteelCuirass": {
+   "ref": "Solaris Lorica",
+   "status": "covered",
+   "note": "Strength, armour and chaos damage that does not bypass energy shield. Dropped: flat and over-time chaos damage reduction."
+  },
+  "bareCloth": {
+   "ref": "Tabula Rasa",
+   "status": "covered",
+   "note": "Six sockets and nothing else. Links are not modelled, so only the socket count carries over."
+  },
+  "furlinedRegalia": {
+   "ref": "The Beast Fur Shawl",
+   "status": "covered",
+   "note": "Spell damage, energy shield, area of effect and increased energy shield recharge rate (standing in for recovery rate), at 5% increased damage taken."
+  },
+  "pactSilkRobe": {
+   "ref": "The Covenant",
+   "status": "covered",
+   "note": "Socketed gems cost and reserve life instead of mana, with intelligence, life and energy shield. Dropped: the socketed Added Chaos Damage support."
+  },
+  "rampartPlate": {
+   "ref": "The Iron Fortress",
+   "status": "covered",
+   "note": "Attack block per 50 strength, strength, armour and a movement penalty. Dropped: unlucky spell block and the strength damage bonus rewrite."
+  },
+  "hutchJerkin": {
+   "ref": "The Rat Cage",
+   "status": "covered",
+   "note": "Evasion, huge life, movement speed, with a fire resistance penalty and increased fire damage taken. Dropped: 10% of fire damage taken as physical."
+  },
+  "driftingVeil": {
+   "ref": "The Restless Ward",
+   "status": "covered",
+   "note": "Life, evasion and energy shield, life regeneration per endurance charge and movement speed per frenzy charge. Dropped: increased charge duration."
+  },
+  "festivalSilks": {
+   "ref": "Thousand Ribbons",
+   "status": "covered",
+   "note": "Added fire, cold and lightning damage to spells and attacks with small flat life, mana, energy shield, evasion and resistances. Dropped: the socketed Elemental Proliferation support."
+  },
+  "coilscaleArmour": {
+   "ref": "Viper's Scales",
+   "status": "covered",
+   "note": "Armour and evasion, life, cold resistance, movement speed, 20% chance to poison on hit with attacks and cannot be poisoned."
+  },
+  "tinderstepBoots": {
+   "ref": "Abberath's Hooves",
+   "status": "covered",
+   "note": "Strength, movement speed, ignite chance, fire damage per 20 strength, and igniting enemies nearby when an ignited one dies (a kill trigger). Dropped: the triggered fury skill and burning hoofprints."
+  },
+  "shellstrideGreaves": {
+   "ref": "Craiceann's Tracks",
+   "status": "covered",
+   "note": "Armour, life, cold resistance and movement speed on boots. Dropped: the crab barrier lines."
+  },
+  "titheSlippers": {
+   "ref": "Dance of the Offered",
+   "status": "covered",
+   "note": "Mana, lightning resistance, movement speed, quickened (20% attack, cast and movement speed) while not on low mana, and a steady mana drain."
+  },
+  "streakBoots": {
+   "ref": "Darkray Vectors",
+   "status": "covered",
+   "note": "Armour and evasion, lightning resistance, movement speed and dodge per frenzy charge, and one more frenzy charge. Dropped: reduced frenzy charge duration."
+  },
+  "deathbedGreaves": {
+   "ref": "Death's Door",
+   "status": "covered",
+   "note": "Strength, armour and energy shield, all elemental resistances, movement speed, one more endurance charge, immunity to bleeding and longer elemental ailments on you."
+  },
+  "vesperCassock": {
+   "ref": "Zahndethus' Cassock",
+   "status": "covered",
+   "note": "Added lightning damage to attacks, energy shield and strong chaos resistance. Dropped: consecrated ground on block (ground effect)."
+  },
+  "stormfootGreaves": {
+   "ref": "Doryani's Delusion",
+   "status": "covered",
+   "note": "Added lightning damage to spells and attacks on heavy armour boots with life and big movement speed. Dropped the purity aura grant (variant line)."
+  },
+  "murkscaleTreads": {
+   "ref": "Duskblight",
+   "status": "covered",
+   "note": "Chaos resistance while a flask is active, on armour and evasion boots with life and speed. The socketed added-chaos support is dropped."
+  },
+  "gloamstep": {
+   "ref": "Dusktoe",
+   "status": "covered",
+   "note": "Flask-gated added chaos damage and chaos resistance on light armour boots with life and movement speed."
+  },
+  "longstrideWraps": {
+   "ref": "Garukhan's Flight",
+   "status": "covered",
+   "note": "Life regeneration only while moving, life per dexterity, big evasion and movement speed. Ground immunity dropped."
+  },
+  "hoardkeeperShoes": {
+   "ref": "Goldwyrm",
+   "status": "covered",
+   "note": "Item quantity, mana regeneration and fire resistance with a small speed bonus."
+  },
+  "lucidSlippers": {
+   "ref": "Inya's Epiphany",
+   "status": "covered",
+   "note": "Damage per power-type charge, life, intelligence and movement speed. The chance to jump to maximum charges is dropped."
+  },
+  "stonerootGreaves": {
+   "ref": "Kaom's Roots",
+   "status": "covered",
+   "note": "No sockets, huge life, and the rooted stance keystone. Knockback and slow immunities dropped."
+  },
+  "quickdrawPads": {
+   "ref": "Lioneye's Paws",
+   "status": "covered",
+   "note": "Bow attacks trigger a granted arrow volley (Split Volley stands in for the reference triggered area arrow skill) with strength, dexterity, added fire and a low-life speed penalty."
+  },
+  "wardrunnerBoots": {
+   "ref": "Nomic's Storm",
+   "status": "covered",
+   "note": "Movement speed at full energy shield, paid for with more damage taken at full energy shield, plus dexterity and cold resistance."
+  },
+  "vigilSlippers": {
+   "ref": "Shavronne's Gambit",
+   "status": "covered",
+   "note": "Intelligence, energy shield and movement speed when on full life. The energy shield regeneration line is dropped."
+  },
+  "hushedTreads": {
+   "ref": "Sin Trek",
+   "status": "covered",
+   "note": "Dexterity, intelligence, evasion, energy shield and speed. The leech immunity line is dropped."
+  },
+  "pyrewalkers": {
+   "ref": "Sunspite",
+   "status": "covered",
+   "note": "Movement speed and life regeneration while ignited, evasion and energy shield, item rarity and fire resistance. The increased chance to be ignited is dropped."
+  },
+  "crimsonReel": {
+   "ref": "The Blood Dance",
+   "status": "covered",
+   "note": "Frenzy-type charges: speed per charge, slower attack and cast per charge, life regeneration, charge on kill, and damage per charge against enemies on low life."
+  },
+  "relentlessGreaves": {
+   "ref": "The Infinite Pursuit",
+   "status": "covered",
+   "note": "Moving while bleeding costs nothing, with movement speed while bleeding and life. The self-bleed on being hit is dropped."
+  },
+  "woundedRoad": {
+   "ref": "The Red Trail",
+   "status": "covered",
+   "note": "Armour, life, movement speed while bleeding and damage reduction while stationary. The charge-on-hit while bleeding and self-bleed lines are dropped."
+  },
+  "quickstepWraps": {
+   "ref": "Three-step Assault",
+   "status": "covered",
+   "note": "Doubled evasion while quickened, on light evasion boots with life and movement speed. The phasing dodge and the displayed base evasion lines are dropped."
+  },
+  "hillhopperBoots": {
+   "ref": "Victario's Flight",
+   "status": "covered",
+   "note": "Dexterity, intelligence, evasion and movement speed. The ally aura and damage-as-mana lines are dropped."
+  },
+  "hollowSteps": {
+   "ref": "Voidwalker",
+   "status": "covered",
+   "note": "After a recent kill the wearer evades projectiles and pierces more targets (the phasing state is replaced by the killed-recently condition), on evasion and energy shield boots with high speed."
+  },
+  "pointblankBow": {
+   "ref": "Chin Sol",
+   "status": "covered",
+   "note": "Fifty percent more bow damage against nearby enemies, on a fast physical bow with added fire. Knockback dropped."
+  },
+  "gloomRecurve": {
+   "ref": "Darkscorn",
+   "status": "covered",
+   "note": "Physical damage converted and taken as chaos, with added physical, attack speed and accuracy. The poison damage chance is dropped."
+  },
+  "dyedFletching": {
+   "ref": "Doomfletch",
+   "status": "covered",
+   "note": "A full copy of bow physical damage as extra lightning (a fixed element stands in for the random one), with elemental attack damage, added physical and mana regeneration."
+  },
+  "spectrumBow": {
+   "ref": "Doomfletch's Prism",
+   "status": "covered",
+   "note": "Bow physical damage gained as extra fire, cold and lightning, with elemental attack damage, added physical and mana regeneration."
+  },
+  "rimeHunter": {
+   "ref": "Hopeshredder",
+   "status": "covered",
+   "note": "Huge added cold, cold damage per frenzy-type charge, speed and life leech per charge. The elemental avoidance per charge and the self-damage while moving are dropped."
+  },
+  "skewerBow": {
+   "ref": "Infractem",
+   "status": "covered",
+   "note": "Arrows pierce through the whole line (a large pierce count stands in for all targets) with physical damage and added physical. The leech restriction is dropped."
+  },
+  "truesightBow": {
+   "ref": "Lioneye's Glare",
+   "status": "covered",
+   "note": "Hits cannot be evaded, with physical damage, added physical, attack speed and mana. The extra range line is dropped."
+  },
+  "winterLyre": {
+   "ref": "Nuro's Harp",
+   "status": "covered",
+   "note": "Deals no physical damage, huge added cold damage and attack speed. The chilled and consecrated ground lines are dropped."
+  },
+  "twinArcBow": {
+   "ref": "Reach of the Council",
+   "status": "covered",
+   "note": "Two additional projectiles (replacing the socketed volley support) on a heavy added-physical bow, with a slower projectile speed."
+  },
+  "ricochetBow": {
+   "ref": "Roth's Reach",
+   "status": "covered",
+   "note": "Skills chain once more, with projectile speed, physical and elemental damage and attack speed."
+  },
+  "thunderheadBow": {
+   "ref": "Storm Cloud",
+   "status": "covered",
+   "note": "Deals no physical damage; wide-ranging added lightning and very high attack speed."
+  },
+  "squallLongbow": {
+   "ref": "The Tempest",
+   "status": "covered",
+   "note": "Deals no physical damage; increased lightning damage, wide-ranging added lightning and very high attack speed."
+  },
+  "redrainBow": {
+   "ref": "The Crimson Storm",
+   "status": "covered",
+   "note": "Physical bow with crit chance and bleeding after critical strikes (a chance gated on having crit recently), added physical against bleeding enemies. Maim, flask charges and the crafted trigger are dropped."
+  },
+  "livewireBow": {
+   "ref": "Voltaxic Rift",
+   "status": "covered",
+   "note": "Large added lightning with most of it converted to chaos, and chaos damage that can shock with a small shock chance. The shock effect lines are dropped."
+  },
+  "galeSplitter": {
+   "ref": "Windripper",
+   "status": "covered",
+   "note": "Elemental attack damage, added cold and lightning, attack speed and crit chance. The item quantity and rarity from slain enemies are dropped."
+  },
+  "kindlingBow": {
+   "ref": "Xoph's Inception",
+   "status": "covered",
+   "note": "Physical damage, a share gained as extra fire and a chance to ignite. Life on killing ignited enemies is dropped."
+  },
+  "seedfireBow": {
+   "ref": "Xoph's Nurture",
+   "status": "covered",
+   "note": "Half of physical converted to fire, a chance to ignite, and ignites that spread to nearby enemies when an ignited enemy dies (replacing the proliferation support). Life on ignite is dropped."
+  },
+  "bastionTalon": {
+   "ref": "Advancing Fortress",
+   "status": "covered",
+   "note": "Fortified on melee hit (replacing the socketed fortify support), life per hit, block, reflect, evasion and energy shield."
+  },
+  "sirenTalons": {
+   "ref": "Allure",
+   "status": "covered",
+   "note": "Physical damage, added physical and attack speed on a claw. The phasing lines are dropped."
+  },
+  "spellrake": {
+   "ref": "Cybil's Paw",
+   "status": "covered",
+   "note": "Life gained per spell hit and per attack hit, cast speed and mana. Spell damage per block chance is dropped."
+  },
+  "leechrake": {
+   "ref": "Essentia Sanguis",
+   "status": "covered",
+   "note": "Life per hit with leech-style recovery, block while dual wielding, physical and added lightning, attack speed and energy shield."
+  },
+  "corneredFist": {
+   "ref": "Last Resort",
+   "status": "covered",
+   "note": "Doubled claw physical damage, attack speed and accuracy on low life, with life per hit."
+  },
+  "giltRake": {
+   "ref": "Ornament of the East",
+   "status": "covered",
+   "note": "Life per hit, hits cannot be evaded, attack speed and stun recovery, with +1 to socketed gems (all gems rather than dexterity only). Faster attacks support dropped."
+  },
+  "sunderClaw": {
+   "ref": "Rive",
+   "status": "covered",
+   "note": "Physical damage and bleed chance, with physical damage over time per dexterity and bleed duration per intelligence. The flee chance is dropped."
+  },
+  "stingerClaw": {
+   "ref": "The Wasp Nest",
+   "status": "covered",
+   "note": "Poison on hit with heavy physical, attack speed, crit and added chaos damage against poisoned enemies (any poison, not five stacks)."
+  },
+  "winterclutch": {
+   "ref": "Touch of Anguish",
+   "status": "covered",
+   "note": "Life per hit, huge added physical, increased cold damage, crit chance and chance to freeze. Charge on kill, chain and the freeze-on-crit exception are dropped."
+  },
+  "drainspike": {
+   "ref": "Goredrill",
+   "status": "covered",
+   "note": "Bleeding when critical strikes have landed, and more attack damage against bleeding enemies, on a high-crit dagger."
+  },
+  "redlaceDirk": {
+   "ref": "Sanguine Gambol",
+   "status": "covered",
+   "note": "Huge added physical, bleeding after critical strikes, more attack damage against bleeding enemies, and stacking bleeds after a recent crit."
+  },
+  "viperfang": {
+   "ref": "Taproot",
+   "status": "covered",
+   "note": "Poison on hit with longer poisons, mana leech against poisoned enemies, large physical damage and attack speed. Maim and the life leech against maimed enemies are dropped."
+  },
+  "sharpwitGauntlets": {
+   "ref": "Atziri's Acuity",
+   "status": "covered",
+   "note": "Intelligence, life, armour and global crit chance; after a recent crit, leech is instant and life regeneration stops."
+  },
+  "seamripperGloves": {
+   "ref": "Demon Stitcher",
+   "status": "covered",
+   "note": "Cast speed, energy shield and life; each spell cast trades a slice of life for that much energy shield (a short cooldown stands in for the per-cast rule)."
+  },
+  "bareknuckleStorm": {
+   "ref": "Doryani's Fist",
+   "status": "covered",
+   "note": "Energy shield, shock chance and a large lightning added to unarmed attacks. The granted skill, the unarmed-spell line and energy shield on killing a shocked enemy were dropped."
+  },
+  "bulwarkFists": {
+   "ref": "Empire's Grasp",
+   "status": "covered",
+   "note": "A large flat armour gauntlet; the knockback lines were dropped."
+  },
+  "skullsplitterMitts": {
+   "ref": "Facebreaker",
+   "status": "covered",
+   "note": "Massively more physical damage while unarmed, with crit multiplier and a lower enemy stun threshold."
+  },
+  "stalkersClaws": {
+   "ref": "Farrul's Pounce",
+   "status": "covered",
+   "note": "Armour, evasion, life and extra accuracy and damage against bleeding enemies. The stealth-conditional lines (always bleed, extra buff) were dropped."
+  },
+  "reddenedGauntlets": {
+   "ref": "Haemophilia",
+   "status": "covered",
+   "note": "Strength, damage over time, bleed chance and attack damage against bleeding enemies, with shorter bleeds. The explosion on killing a bleeding enemy was dropped."
+  },
+  "hoarfireMitts": {
+   "ref": "Hrimburn",
+   "status": "covered",
+   "note": "Cold added to spells and attacks, half of physical converted to cold, cold resistance and reflect. The line letting cold damage ignite was dropped."
+  },
+  "frostgriefMitts": {
+   "ref": "Hrimsorrow",
+   "status": "covered",
+   "note": "Same stat line as its sibling: added cold, half physical converted to cold, cold resistance and reflect."
+  },
+  "surebladeGloves": {
+   "ref": "Maligaro's Virtuosity",
+   "status": "covered",
+   "note": "Attack speed, doubled-up crit chance, evasion and a fixed crit multiplier of 300%."
+  },
+  "ironviceGauntlets": {
+   "ref": "Meginord's Vise",
+   "status": "covered",
+   "note": "Physical damage, a flat +100 strength and armour; life regeneration of 2% per full 400 strength."
+  },
+  "fangboundGauntlets": {
+   "ref": "Offering to the Serpent",
+   "status": "covered",
+   "note": "All attributes, armour and energy shield, attack and cast speed and damage while leeching. The leech recovery and full-life leech lines were dropped."
+  },
+  "measuredGrasp": {
+   "ref": "Shaper's Touch",
+   "status": "covered",
+   "note": "Armour and energy shield with bonuses scaling off each attribute: accuracy, life, mana, energy shield, evasion and melee physical damage."
+  },
+  "venomgripMitts": {
+   "ref": "Snakebite",
+   "status": "covered",
+   "note": "Evasion, life, attack speed and accuracy that scale with frenzy charges. The poison-at-max-charges and charge-duration lines were dropped."
+  },
+  "hailstrideGloves": {
+   "ref": "Southbound",
+   "status": "covered",
+   "note": "Cold added to attacks, maximum life, cold resistance and longer freezes. The line limiting hits to killing frozen enemies and the herald line were dropped."
+  },
+  "forkstormMitts": {
+   "ref": "Storm's Gift",
+   "status": "covered",
+   "note": "Damage over time, evasion and energy shield, lightning resistance; killing a shocked enemy spreads its shock to the pack. The always-shock-on-kill line was dropped."
+  },
+  "tideturnGauntlets": {
+   "ref": "Surgebinders",
+   "status": "covered",
+   "note": "Armour and evasion with damage scaling per frenzy, endurance and power charge; stealing charges on hit became a gain chance on hit."
+  },
+  "gravetallowMitts": {
+   "ref": "The Embalmer",
+   "status": "covered",
+   "note": "Added chaos damage, life, chaos resistance and longer poison. The supporting-gem line was dropped."
+  },
+  "stormclapMitts": {
+   "ref": "Thunderfist",
+   "status": "covered",
+   "note": "Wide-ranging lightning added to attacks, attack speed, energy shield and longer shocks. The supporting-gem line was dropped."
+  },
+  "ramheadGauntlets": {
+   "ref": "Veruso's Battering Rams",
+   "status": "covered",
+   "note": "Attack speed, armour, movement and melee damage per endurance charge, at the cost of longer stuns on you. The shock immunity at max charges was dropped."
+  },
+  "hollowmindGloves": {
+   "ref": "Voidbringer",
+   "status": "covered",
+   "note": "Spell crit chance, energy shield and energy shield on kill, with +1 to socketed fire, cold and lightning gems and a higher mana cost."
+  },
+  "viperwireGloves": {
+   "ref": "Volkuur's Guidance",
+   "status": "covered",
+   "note": "Lightning added to spells and attacks, life and lightning resistance; lightning skills can poison, with poison lasting half as long."
+  },
+  "gustworkGauntlets": {
+   "ref": "Winds of Change",
+   "status": "covered",
+   "note": "Life, projectile speed and damage with a movement penalty; the knockback line was dropped."
+  },
+  "gapejawHelm": {
+   "ref": "Abyssus",
+   "status": "covered",
+   "note": "Added physical to attacks, all attributes, armour and melee crit multiplier, at the cost of more physical damage taken."
+  },
+  "hushsongCirclet": {
+   "ref": "Asenath's Chant",
+   "status": "covered",
+   "note": "Attack and cast speed, energy shield, recovery, mana regeneration and movement; bow attacks trigger a socketed spell (a short cooldown stands in)."
+  },
+  "manyEyedCirclet": {
+   "ref": "Crown of Eyes",
+   "status": "covered",
+   "note": "Spell damage modifiers apply to attacks, with accuracy, energy shield, life and mana leech from attacks, at a fire resistance cost."
+  },
+  "hollowRegentMask": {
+   "ref": "Crown of the Pale King",
+   "status": "covered",
+   "note": "Life, evasion and energy shield, physical leech and physical reflect; the life gained from reflected damage was dropped."
+  },
+  "tollhelm": {
+   "ref": "Deidbell",
+   "status": "covered",
+   "note": "Strength, dexterity, armour and melee damage with added physical to attacks; the no-leech-on-low-life line was dropped."
+  },
+  "alarumSallet": {
+   "ref": "Deidbellow",
+   "status": "covered",
+   "note": "Same stat line as the lower helm; the warcry speed lines and the no-leech-on-low-life line were dropped."
+  },
+  "stonewallHat": {
+   "ref": "Ezomyte Hold",
+   "status": "covered",
+   "note": "Physical damage, armour and life; cannot be stunned, cannot evade."
+  },
+  "cairnHat": {
+   "ref": "Ezomyte Peak",
+   "status": "covered",
+   "note": "Physical damage, armour and life; cannot evade."
+  },
+  "wormwoodCirclet": {
+   "ref": "Fenumus' Toxins",
+   "status": "covered",
+   "note": "Energy shield and added chaos to spells, with poison chance and poison damage that grow per power charge. Power charges now come from any hit at 10% (the spider web condition and the aspect rider were dropped)."
+  },
+  "hearthfireHalo": {
+   "ref": "Flamesight",
+   "status": "covered",
+   "note": "Energy shield, fire resistance and elemental damage on a circlet. Dropped: scorch chance, the ignite drawback and the sextant line."
+  },
+  "rimeglassHalo": {
+   "ref": "Galesight",
+   "status": "covered",
+   "note": "Energy shield, cold resistance and elemental damage on a circlet. Dropped: brittle chance, the freeze and chill drawback and the sextant line."
+  },
+  "stormwireHalo": {
+   "ref": "Thundersight",
+   "status": "covered",
+   "note": "Energy shield, lightning resistance and elemental damage on a circlet. Dropped: sap chance, the shock drawback and the sextant line."
+  },
+  "latticeMask": {
+   "ref": "Fractal Thoughts",
+   "status": "covered",
+   "note": "Evasion and energy shield, elemental damage per ten dexterity and life per ten intelligence. Dropped the two lines that compare attributes against each other."
+  },
+  "emberfrostHood": {
+   "ref": "Frostferno",
+   "status": "covered",
+   "note": "Plus two to fire and cold gems, big evasion, mana regeneration and fire and cold resistance. The socketed cold-to-fire support became a global 50% cold to fire conversion (value ours)."
+  },
+  "vigilCrown": {
+   "ref": "Geofri's Legacy",
+   "status": "covered",
+   "note": "Plus one socketed gems, armour and energy shield and all four resistances including chaos. Dropped the holy relic lines."
+  },
+  "sergeantsHelm": {
+   "ref": "Honourhome",
+   "status": "covered",
+   "note": "Plus socketed gem levels, added lightning, armour and energy shield, item rarity and reduced mana cost of skills."
+  },
+  "embergrateHelm": {
+   "ref": "Hrimnor's Resolve",
+   "status": "covered",
+   "note": "Fire damage, armour, life and cold resistance. Dropped the recent-fire-skill chill and freeze immunity."
+  },
+  "titheHelm": {
+   "ref": "Kitava's Thirst",
+   "status": "covered",
+   "note": "Armour and energy shield, mana and a cast speed penalty, with a 30% chance to cast a socketed spell whenever you cast a spell (the 100 mana spent threshold was dropped; 0.25 s cooldown)."
+  },
+  "veinletterMask": {
+   "ref": "Malachai's Simula",
+   "status": "covered",
+   "note": "Blood magic with spell, lightning and strength bonuses. Dropped the unmapped extra rider line."
+  },
+  "gravegiltCrown": {
+   "ref": "Malachai's Vision",
+   "status": "covered",
+   "note": "Added chaos damage, energy shield and cold and lightning resistance. Bob has no corrupted items, so the two regeneration lines that need all items corrupted were dropped."
+  },
+  "gulletCirclet": {
+   "ref": "Maw of Conquest",
+   "status": "covered",
+   "note": "Spell crit chance, energy shield and life with poison immunity. Dropped the damage-taken-as-life-over-time line."
+  },
+  "burrowersPelt": {
+   "ref": "Rat's Nest",
+   "status": "covered",
+   "note": "Attack speed, global crit chance, evasion, item rarity and movement speed. Dropped the smaller character size."
+  },
+  "cutpurseHood": {
+   "ref": "Starkonja's Head",
+   "status": "covered",
+   "note": "Evasion, dexterity, attack speed, crit chance and life, with a big evasion bonus and a damage penalty while on low life."
+  },
+  "saltmarshCrown": {
+   "ref": "The Brine Crown",
+   "status": "covered",
+   "note": "Armour and energy shield, life, cold resistance, freeze immunity and a big flat armour and mana regeneration bonus while stationary (1500 armour scaled to 900). Dropped the chilled ground."
+  },
+  "kestrelSallet": {
+   "ref": "The Peregrine",
+   "status": "covered",
+   "note": "Accuracy, armour and evasion, item rarity, lightning resistance, movement speed and a little mana leech from attacks."
+  },
+  "triadMask": {
+   "ref": "The Three Dragons",
+   "status": "covered",
+   "note": "Elemental resistances and the ailment shuffle: fire damage can shock, cold damage can ignite, lightning damage can freeze. The 'but not' halves were dropped."
+  },
+  "apertureMask": {
+   "ref": "The Vertex",
+   "status": "covered",
+   "note": "Plus socketed gem level, evasion and energy shield, flat energy shield and chaos resistance. Dropped the socketed mana cost reduction and the enemy mana leech line."
+  },
+  "seneschalCrown": {
+   "ref": "Voll's Vision",
+   "status": "covered",
+   "note": "Armour, fire and chaos resistance, plus maximum life and large life regeneration. Bob has no corrupted items, so the no-corrupted condition always holds and is applied unconditionally."
+  },
+  "cindercleave": {
+   "ref": "Dreadsurge",
+   "status": "covered",
+   "note": "Huge added fire damage, attack and movement speed, fire resistance, and fire penetration while you are ignited (full ignore stood in for as 100% penetration)."
+  },
+  "flensingHatchet": {
+   "ref": "Jack, the Axe",
+   "status": "covered",
+   "note": "Physical damage, attack speed, bleeding and life leech, with a leech rate penalty (applies to life and mana leech)."
+  },
+  "tallyAxe": {
+   "ref": "Relentless Fury",
+   "status": "covered",
+   "note": "Physical damage, life leech and culling strike, with onslaught on kill (stood in for onslaught on culling strike) and chill immunity while onslaught is active."
+  },
+  "twinbladeAxe": {
+   "ref": "Rigwald's Savagery",
+   "status": "covered",
+   "note": "Big added physical, attack speed and bleed chance, with extra physical weapon damage while dual wielding."
+  },
+  "rimeheartCleaver": {
+   "ref": "Soul Taker",
+   "status": "covered",
+   "note": "Big physical axe whose physical damage can chill. Dropped: attacks ignoring insufficient mana (no such rule)."
+  },
+  "skyrendHatchet": {
+   "ref": "The Gryphon",
+   "status": "covered",
+   "note": "Physical hatchet with life, life on kill and movement speed. Dropped: the socketed support gem."
+  },
+  "shrillwingHatchet": {
+   "ref": "The Screaming Eagle",
+   "status": "covered",
+   "note": "Lower-level sibling: added physical, life, life on kill and movement speed. Dropped: the socketed support gem."
+  },
+  "tollbellMace": {
+   "ref": "Callinellus Malleus",
+   "status": "covered",
+   "note": "Heavy physical mace with a much lower enemy stun threshold. The chill-on-stun line is simplified to physical damage being able to chill; knockback immunity dropped."
+  },
+  "hoarfrostGavel": {
+   "ref": "Cameria's Maul",
+   "status": "covered",
+   "note": "Physical and added cold gavel with crit and cold attack damage. Dropped: rarity from frozen enemies."
+  },
+  "gorgeMallet": {
+   "ref": "Flesh-Eater",
+   "status": "covered",
+   "note": "Fast mace that leeches life, causes bleeding and leeches more against bleeding enemies. All three lines hand-written."
+  },
+  "rimeblowMace": {
+   "ref": "Frostbreath",
+   "status": "covered",
+   "note": "Physical plus cold mace with chill duration; attacks deal double damage to chilled enemies (written as 100% more attack damage against chilled enemies, not weapon-local)."
+  },
+  "skyboltGavel": {
+   "ref": "Mjölner",
+   "status": "covered",
+   "note": "Lightning spells socketed in it fire on hit, with spells chaining one extra time and lightning attack damage. Dropped: attribute requirement lines and the extra damage on triggered spells."
+  },
+  "gritstoneMaul": {
+   "ref": "Nebuloch",
+   "status": "covered",
+   "note": "Huge physical maul gaining physical as fire, with flat physical, armour, chaos resistance and elemental damage reduction per grit charge. Dropped: fire damage taken over time while hit recently, and the 'when hit' qualifier."
+  },
+  "stillhungerBlade": {
+   "ref": "Ahn's Might",
+   "status": "covered",
+   "note": "Huge added physical and crit chance sword at the cost of a maximum fervour charge, with area of effect. Dropped: strength requirement, the crit multiplier with no charges and the accuracy at maximum charges."
+  },
+  "carrionBrand": {
+   "ref": "Dreadbeak",
+   "status": "covered",
+   "note": "Rusted sword that doubles damage on low life, gives life on hit and quickened speeds on low life (the three speed lines of the quickened buff, written by hand)."
+  },
+  "veilwingBlade": {
+   "ref": "Dreamfeather",
+   "status": "covered",
+   "note": "Accuracy, added physical, attack speed, evasion and a little movement speed on an eternal sword. Dropped: attack damage per evasion rating."
+  },
+  "wraithRazor": {
+   "ref": "Ephemeral Edge",
+   "status": "covered",
+   "note": "Huge physical, global crit and accuracy with mana leech; costs maximum life for more energy shield. Both life lines hand-written."
+  },
+  "rootboundSword": {
+   "ref": "Grelwood Shank",
+   "status": "covered",
+   "note": "Physical sword with armour while stationary, Close Quarters and Plated Hide while stationary; two extra projectiles after being hit."
+  },
+  "stormfrenzyBlade": {
+   "ref": "Hyaon's Fury",
+   "status": "covered",
+   "note": "Wide lightning added damage sword with lightning damage and life on kill per fervour charge; takes more damage per charge (written by hand)."
+  },
+  "blightcutSword": {
+   "ref": "Innsbury Edge",
+   "status": "covered",
+   "note": "Physical sword converting a quarter of it to chaos with chaos leech. Dropped: Maim on hit."
+  },
+  "scarletRite": {
+   "ref": "Oni-Goroshi",
+   "status": "covered",
+   "note": "Crit chance and flat physical damage to attacks per character level. Dropped: its fire self-damage drawback while ignited, the two-hand rule and the socket line."
+  },
+  "noonfireRazor": {
+   "ref": "Razor of the Seventh Sun",
+   "status": "covered",
+   "note": "Physical sword converting a quarter to fire with ignite chance, and much more melee physical damage against ignited enemies. Dropped: the burning damage and life recovery on igniting."
+  },
+  "crowpeckSword": {
+   "ref": "Redbeak",
+   "status": "covered",
+   "note": "Same low-life damage and life on hit; written by hand where the reference capitalises the line."
+  },
+  "pairboundBlade": {
+   "ref": "Rigwald's Command",
+   "status": "covered",
+   "note": "Big added physical, axe physical damage, accuracy and frenzy on kill; extra attack block while dual wielding (written by hand)."
+  },
+  "cinderwrathSabre": {
+   "ref": "The Goddess Scorned",
+   "status": "covered",
+   "note": "Huge physical damage fully converted to fire, big crit, fire resistance, ignite immunity and faster ignites. Dropped: the two-hand rule and the damage-source restriction."
+  },
+  "squallforgedSword": {
+   "ref": "The Tempestuous Steel",
+   "status": "covered",
+   "note": "Hits cannot be evaded, physical as extra fire and lightning, and elemental penetration. All three lines hand-written; penetration is not weapon-local."
+  },
+  "landslideQuiver": {
+   "ref": "Cragfall",
+   "status": "covered",
+   "note": "Added physical to bow attacks, lower enemy stun threshold, longer stuns and slow arrows. Dropped: the chance to double stun duration."
+  },
+  "boreheadQuiver": {
+   "ref": "Drillneck",
+   "status": "covered",
+   "note": "Arrows pierce an additional target with attack speed, evasion, life and added physical. Dropped: extra damage to pierced targets."
+  },
+  "duskveilQuiver": {
+   "ref": "Maloney's Nightfall",
+   "status": "covered",
+   "note": "Attack speed, life, chaos resistance and added physical to bow attacks. Dropped: the smoke cloud and the blinded-enemy damage."
+  },
+  "bulwarkQuiver": {
+   "ref": "Rearguard",
+   "status": "covered",
+   "note": "Armour, block, spell block and stun recovery with projectile damage and speed."
+  },
+  "wraithpointQuiver": {
+   "ref": "Soul Strike",
+   "status": "covered",
+   "note": "Added chaos to attacks, dexterity and energy shield with slower recharge but a faster start."
+  },
+  "stormfrostBand": {
+   "ref": "Berek's Grip",
+   "status": "covered",
+   "note": "Cold and lightning resistance, cold damage, lightning added to spells and attacks and life; leeches life against shocked enemies. Dropped: the energy shield leech against frozen enemies."
+  },
+  "cinderstormBand": {
+   "ref": "Berek's Respite",
+   "status": "covered",
+   "note": "Fire and lightning resistance, added fire to spells and attacks, lightning damage and mana. Killing a shocked enemy shocks those near it and killing an ignited one ignites them."
+  },
+  "smolderingCoil": {
+   "ref": "Emberwake",
+   "status": "covered",
+   "note": "Fire damage, cast speed and ignite chance; one extra ignite on an enemy, and ignites burn slower (a trade the reference makes)."
+  },
+  "bastionLoop": {
+   "ref": "Kaom's Sign",
+   "status": "covered",
+   "note": "Strength, life on hit and one more maximum grit charge."
+  },
+  "wellspringLoop": {
+   "ref": "Kaom's Way",
+   "status": "covered",
+   "note": "Strength, life on hit, one more maximum grit charge and life regeneration per grit charge."
+  },
+  "dimlampRing": {
+   "ref": "Lori's Lantern",
+   "status": "covered",
+   "note": "All elemental resistances and movement speed on low life, with chaos resistance on low life. Dropped: enemies being unlucky against you."
+  },
+  "hollowAmethyst": {
+   "ref": "Ming's Heart",
+   "status": "covered",
+   "note": "Chaos resistance and physical as extra chaos at a cost of life and energy shield."
+  },
+  "pyreClasp": {
+   "ref": "Mokou's Embrace",
+   "status": "covered",
+   "note": "Fire damage, cold resistance, ignite chance and attack and cast speed while ignited; ignited more easily (a negative chance to avoid ignite)."
+  },
+  "kindlingLoop": {
+   "ref": "Ngamahu's Sign",
+   "status": "covered",
+   "note": "Strength, added fire, ignite chance and longer ignites. Dropped: life gained on igniting."
+  },
+  "hoardersSeal": {
+   "ref": "Perandus Signet",
+   "status": "covered",
+   "note": "Mana, mana regeneration and experience. Dropped: intelligence per unique item and scroll drops."
+  },
+  "frugalBand": {
+   "ref": "Praxis",
+   "status": "covered",
+   "note": "Mana, mana regeneration and a flat cut to skill mana cost. Dropped: mana gained from damage taken."
+  },
+  "ashenSignet": {
+   "ref": "Pyre",
+   "status": "covered",
+   "note": "Burning damage, half of cold converted to fire and fire resistance. Dropped: destroying ignited enemies on kill."
+  },
+  "twinstoneLoop": {
+   "ref": "Rigwald's Crest",
+   "status": "covered",
+   "note": "Fire and cold damage with mana regeneration. Dropped: the chance to summon a spectral wolf on kill (minion)."
+  },
+  "tempestCinder": {
+   "ref": "Stormfire",
+   "status": "covered",
+   "note": "Lightning damage can ignite, plus added lightning damage against ignited enemies, mana regeneration and fire and lightning resistance. Dropped: burning damage per recently shocked enemy."
+  },
+  "prismBridle": {
+   "ref": "The Taming",
+   "status": "covered",
+   "note": "Chance to freeze, shock and ignite with elemental damage and all elemental resistances. Dropped: the damage bonus per ailment on the enemy."
+  },
+  "ironShackle": {
+   "ref": "The Warden's Brand",
+   "status": "covered",
+   "note": "Added physical damage to attacks at a large attack speed cost. Dropped: the frenzy charge chance when stunning."
+  },
+  "sandturnRing": {
+   "ref": "Timeclasp",
+   "status": "covered",
+   "note": "Attack and cast speed, mana regeneration and energy shield. Dropped: the reduced effect of a slowing curse on you."
+  },
+  "skeinOfHours": {
+   "ref": "Timetwist",
+   "status": "covered",
+   "note": "Attack and cast speed, energy shield and mana regeneration. Dropped: skill effect duration and the slowing-curse immunity."
+  },
+  "stormglassSeal": {
+   "ref": "Valako's Sign",
+   "status": "covered",
+   "note": "Lightning damage, damage and life leech against shocked enemies, and a chance to shock."
+  },
+  "hollowKnuckle": {
+   "ref": "Voidheart",
+   "status": "covered",
+   "note": "Added chaos damage, life and regeneration with a chance to bleed and poison on melee hits."
+  },
+  "frostfireBraid": {
+   "ref": "Winterweave",
+   "status": "covered",
+   "note": "Added fire and cold damage to attacks, life, cold resistance and movement speed while ignited. Dropped: reversed chill on you."
+  },
+  "quietDirk": {
+   "ref": "Heartbreaker",
+   "status": "covered",
+   "note": "Spell damage, mana, energy shield and faster energy shield recharge, with culling strike on spells."
+  },
+  "twinbladeToken": {
+   "ref": "Mark of the Doubting Knight",
+   "status": "covered",
+   "note": "Huge physical damage at reduced attack speed with extra block while dual wielding and elemental resistance. Dropped: bleed and poison on critical strike."
+  },
+  "blightflameDagger": {
+   "ref": "The Consuming Dark",
+   "status": "covered",
+   "note": "Fire spell gem level, fire damage, intelligence and fire converted to chaos, with a strong chance to poison."
+  },
+  "parryingNeedle": {
+   "ref": "Ungil's Gauche",
+   "status": "covered",
+   "note": "Physical and lightning damage, attack speed and crit chance with extra block while dual wielding."
+  },
+  "cutpurseEdge": {
+   "ref": "Widowmaker",
+   "status": "covered",
+   "note": "Added physical damage with high crit chance and crit multiplier. Dropped: crit chance against full-life enemies and life leech on critical strike."
+  },
+  "conclaveRasp": {
+   "ref": "Breath of the Council",
+   "status": "covered",
+   "note": "Huge physical damage with chaos damage and area of effect on a sceptre. Dropped: chaos skill duration."
+  },
+  "houndboneSceptre": {
+   "ref": "Cerberus Limb",
+   "status": "covered",
+   "note": "Spell damage and cast speed, with spell life leech while holding a shield (the shield-chance condition simplified to holding one). Dropped: the three conversions of shield stats."
+  },
+  "gravetouchSceptre": {
+   "ref": "Death's Hand",
+   "status": "covered",
+   "note": "Unholy Might on critical strike with elemental and physical damage and crit chance. Dropped: the power charge on stun."
+  },
+  "brawnboundRod": {
+   "ref": "Doon Cuebiyari",
+   "status": "covered",
+   "note": "Damage scaling with strength, plus strength, cast speed, mana and elemental damage. Dropped: the Iron Will support and the off-hand armour line."
+  },
+  "cinderLamp": {
+   "ref": "Nycta's Lantern",
+   "status": "covered",
+   "note": "Fire gem levels, elemental, spell and physical damage and life on hit. Dropped: the fire penetration support and the added fire damage for socketed gems."
+  },
+  "collapsedStar": {
+   "ref": "Singularity",
+   "status": "covered",
+   "note": "Added lightning damage to spells, elemental damage, cast speed and reduced mana cost. Dropped: hindering nearby enemies and the damage bonus against hindered enemies."
+  },
+  "rimeboneSceptre": {
+   "ref": "Spine of the First Claimant",
+   "status": "covered",
+   "note": "Physical, cold and elemental damage with extra damage against frozen enemies, a chance to freeze and attack and cast speed. Dropped: cold damage over time multiplier."
+  },
+  "nightOracle": {
+   "ref": "The Dark Seer",
+   "status": "covered",
+   "note": "Elemental and general damage with mana and energy shield per level. Dropped: global blind chance."
+  },
+  "dawnbreakWard": {
+   "ref": "Aegis Aurora",
+   "status": "covered",
+   "note": "Energy shield replenished by a share of armour when you block, with huge armour and energy shield, resistances, block and elemental damage."
+  },
+  "venomveilBarrier": {
+   "ref": "Apep's Supremacy",
+   "status": "covered",
+   "note": "Added chaos damage, energy shield, faster recharge, more poison on you with higher maximum resistances while poisoned and slower poison expiry. Dropped: bleeding dealing chaos damage."
+  },
+  "shatteredCreed": {
+   "ref": "Broken Faith",
+   "status": "covered",
+   "note": "Unholy Might on block with chaos leech and physical gained as chaos. Dropped: armour doubling with no energy shield."
+  },
+  "parryDisc": {
+   "ref": "Daresso's Courage",
+   "status": "covered",
+   "note": "Block of spells and attacks after blocking (simplified to any recent block), armour and evasion, resistances."
+  },
+  "veilstormWard": {
+   "ref": "Esh's Visage",
+   "status": "covered",
+   "note": "Chaos damage does not bypass energy shield unless on low life (low mana half dropped), with huge energy shield, life and resistances. Dropped: reflecting shocks."
+  },
+  "sparkgiltShield": {
+   "ref": "Glitterdisc",
+   "status": "covered",
+   "note": "Evasion and energy shield with dodge, item rarity and always igniting while burning. Dropped: avoiding fire damage."
+  },
+  "deepseaBuckler": {
+   "ref": "Great Old One's Ward",
+   "status": "covered",
+   "note": "Added physical damage to attacks, attack speed, life, movement and spell block."
+  },
+  "rimeheartBuckler": {
+   "ref": "Kaltensoul",
+   "status": "covered",
+   "note": "Cold resistance, maximum cold resistance, physical gained as cold, cold reflect and evasion. Dropped: fire damage taken as cold."
+  },
+  "moonwickWard": {
+   "ref": "Light of Lunaris",
+   "status": "covered",
+   "note": "Spell crit chance, spell damage, added cold damage to spells, energy shield and block. Dropped: crit multiplier per block chance and after a non-critical strike."
+  },
+  "rampartOfPenance": {
+   "ref": "Lioneye's Remorse",
+   "status": "covered",
+   "note": "Huge life and armour with flat physical damage taken reduction (applies to all attacks here), block and stun recovery at a movement speed cost."
+  },
+  "spidersilkWall": {
+   "ref": "Lycosidae",
+   "status": "covered",
+   "note": "Your hits cannot be evaded, with armour, life and block. Dropped: added cold damage to counterattacks."
+  },
+  "surgeRoundel": {
+   "ref": "Malachai's Loop",
+   "status": "covered",
+   "note": "Power charges with spell damage per charge, spell damage and a large energy shield. Dropped: losing the charges and being shocked at maximum."
+  },
+  "brazenFacet": {
+   "ref": "Maligaro's Lens",
+   "status": "covered",
+   "note": "Attack speed, life, area and spell dodge for a heavy cost in all elemental resistances. Dropped: nearby allies recovering life on death."
+  },
+  "emberwakeKite": {
+   "ref": "Rise of the Phoenix",
+   "status": "covered",
+   "note": "Fire resistance that grows on low life, with low-life movement speed and ignite immunity, flat life, regeneration and maximum fire resistance. The flat life line is hand-written."
+  },
+  "prismwardHeater": {
+   "ref": "Saffell's Frame",
+   "status": "covered",
+   "note": "Raised maximum resistances and elemental resistances with spell damage; cannot block attacks, written as minus 100 attack block."
+  },
+  "bracingSlab": {
+   "ref": "The Anticipation",
+   "status": "covered",
+   "note": "Tower shield with large life and armour, and flat armour after blocking (1000 scaled to 600). Dropped: permanent intimidate on block."
+  },
+  "stoicTower": {
+   "ref": "The Surrender",
+   "status": "covered",
+   "note": "Recover 250 life on block and big flat armour after blocking (1500 scaled to 900), with life and armour. Dropped: the granted Reckoning skill."
+  },
+  "gnashingBuckler": {
+   "ref": "Thousand Teeth Temu",
+   "status": "covered",
+   "note": "Physical damage reflected to melee attackers (the 1 to 1000 range as its 500 average, always rather than on block), with evasion, life, leech and block. Dropped: life from reflected damage."
+  },
+  "quarrelScreen": {
+   "ref": "Titucius' Span",
+   "status": "covered",
+   "note": "A flat cut to physical attack hits taken, written for all attack hits, with life and armour. Dropped: the projectile-only armour and block bonuses."
+  },
+  "pyrewatchBulwark": {
+   "ref": "Unyielding Flame",
+   "status": "covered",
+   "note": "Triggers a fire burst (Ember Burst, level 20) on a critical strike, with critical chance, life, fire resistance and speed after a recent crit. The granted skill is Bob's own fire burst in place of the reference's."
+  },
+  "echoingSpikeguard": {
+   "ref": "Zeel's Amplifier",
+   "status": "covered",
+   "note": "Spell damage with life regeneration applied to energy shield while not recently hit. The area bonus that grows per recent kill is written at its 50% cap while you have killed recently."
+  },
+  "pyrePenitent": {
+   "ref": "Martyr of Innocence",
+   "status": "covered",
+   "note": "Block and huge added fire on a staff with spell fire damage, and fire penetration after blocking, plus freeze and chill immunity while ignited. Dropped: the granted Vengeance skill."
+  },
+  "galeReliquary": {
+   "ref": "The Stormheart",
+   "status": "covered",
+   "note": "Staff adding cold and lightning damage with shock chance against chilled enemies and shock immunity while chilled."
+  },
+  "thunderfrostPole": {
+   "ref": "The Stormwall",
+   "status": "covered",
+   "note": "Physical split into cold and lightning in equal parts on a high-block staff with shock immunity while chilled. Dropped: chilling and shocking attackers on block."
+  },
+  "quillFoil": {
+   "ref": "Chitus' Needle",
+   "status": "covered",
+   "note": "Physical, critical multiplier, elemental damage, strength, mana and a little range on a foil."
+  },
+  "rimeglassFoil": {
+   "ref": "Cospri's Malice",
+   "status": "covered",
+   "note": "No physical damage, heavy added cold, and a socketed cold spell cast on a melee critical strike (crit-chance bonus against chilled enemies). Dropped: the attribute requirement."
+  },
+  "frostpointEstoc": {
+   "ref": "Daresso's Passion",
+   "status": "covered",
+   "note": "Added physical and cold with frenzy charges gained on kill. Dropped: shorter frenzy duration and the bonus damage with no frenzy charges."
+  },
+  "loopingRapier": {
+   "ref": "Ewar's Mirage",
+   "status": "covered",
+   "note": "Attack speed, added lightning and elemental attack damage, with attacks chaining an additional time (the main-hand clause). Dropped: the off-hand extra projectile."
+  },
+  "spindleRapier": {
+   "ref": "The Goddess Bound",
+   "status": "covered",
+   "note": "Huge physical damage, quick, crit-heavy and evasive but poor at finding items. Uses both hands, so it sits on a two-handed sword base instead of the one-handed rapier."
+  },
+  "gildedCleaver": {
+   "ref": "Atziri's Disfavour",
+   "status": "covered",
+   "note": "Massive added physical, attack speed, bleed chance and range. Dropped: the socketed support gem level bonus."
+  },
+  "crimsonTally": {
+   "ref": "Hezmana's Bloodlust",
+   "status": "covered",
+   "note": "Big physical damage with life leech and skills costing life instead of mana (broader than the reference's attacks-only clause)."
+  },
+  "marrowChopper": {
+   "ref": "Kaom's Primacy",
+   "status": "covered",
+   "note": "Culling strike with big physical damage, life on kill, accuracy and rage gained on a critical strike. Dropped: the extra fire per rage."
+  },
+  "hollowGorger": {
+   "ref": "Kitava's Feast",
+   "status": "covered",
+   "note": "Leeches both life and mana with a large recovery of maximum life on kill and huge physical damage. Dropped: the splash support and the destroy-on-kill clause (no corpses)."
+  },
+  "timberfall": {
+   "ref": "Limbsplit",
+   "status": "covered",
+   "note": "Culling strike on an axe with physical damage and strength. Dropped: the strength-gem level bonus."
+  },
+  "kilnSplitter": {
+   "ref": "Ngamahu's Flame",
+   "status": "covered",
+   "note": "Half of physical converted to fire, fire penetration and a 20% chance on melee hit to cast a fire burst (Ember Burst, level 16), which stands in for the reference's molten burst."
+  },
+  "titheReaper": {
+   "ref": "The Blood Reaper",
+   "status": "covered",
+   "note": "Bleeding, life leech, flat life and regeneration at a mana cost increase."
+  },
+  "brandSplitter": {
+   "ref": "The Cauteriser",
+   "status": "covered",
+   "note": "Culling strike with 70% of physical gained as fire, added physical and strength. Dropped: the strength-gem level bonus."
+  },
+  "gleaningChopper": {
+   "ref": "The Harvest",
+   "status": "covered",
+   "note": "Critical chance per character level with life leech from damage while you have crit recently (the on-crit clause). Dropped: flask charges on critical strike."
+  },
+  "broadPoleaxe": {
+   "ref": "Wideswing",
+   "status": "covered",
+   "note": "Physical damage, strength, accuracy, range and mana on kill on a poleaxe. Dropped: the area-of-effect support gem."
+  },
+  "skullshaker": {
+   "ref": "Brain Rattler",
+   "status": "covered",
+   "note": "Half of physical converted to lightning, shock chance and lightning penetration, with stun duration and big added physical. Dropped: the slow effects on shocked enemies."
+  },
+  "placidMaul": {
+   "ref": "Geofri's Baptism",
+   "status": "covered",
+   "note": "Never deals critical strikes, with a large physical increase, added cold and long stuns."
+  },
+  "rageboundMaul": {
+   "ref": "Kongor's Undying Rage",
+   "status": "covered",
+   "note": "Hits cannot be evaded, critical strikes grant onslaught, critical strikes add no extra damage (written as minus 50 critical multiplier against the 150 base), with added physical, crit chance and elemental resistances."
+  },
+  "leadenMaul": {
+   "ref": "Marohi Erqi",
+   "status": "covered",
+   "note": "Huge physical damage and long stuns at a cost in attack speed, movement speed and accuracy. Dropped: the pulverise support gem."
+  },
+  "blastboneMaul": {
+   "ref": "Panquetzaliztli",
+   "status": "covered",
+   "note": "Slain enemies explode for 10% of their life as fire, with physical, all attributes and life on kill."
+  },
+  "kindlingMaul": {
+   "ref": "Quecholli",
+   "status": "covered",
+   "note": "Slain enemies explode for 10% of their life as fire, with physical, all attributes, stuns and life on kill."
+  },
+  "surfhammer": {
+   "ref": "Tidebreaker",
+   "status": "covered",
+   "note": "Physical damage per endurance charge with endurance charges gained when you stun, a lower enemy stun threshold and big added physical. The charge gain stands in for the support gem."
+  },
+  "deadweightMallet": {
+   "ref": "Trypanon",
+   "status": "covered",
+   "note": "Every attack is a critical strike (written as plus 100 critical chance for attacks) at half attack speed, with long stuns."
+  },
+  "warcrestSword": {
+   "ref": "Doomsower",
+   "status": "covered",
+   "note": "Huge accuracy and physical damage with area and extra fire for melee, written on the wielder rather than socketed gems."
+  },
+  "frenzyGreatsword": {
+   "ref": "Edge of Madness",
+   "status": "covered",
+   "note": "Chaos damage that grows with level, added physical to attacks per level and a level bonus to socketed gems (all gems rather than active ones)."
+  },
+  "bareReaver": {
+   "ref": "Hiltless",
+   "status": "covered",
+   "note": "Big added physical, critical chance, range, accuracy, and skills costing life instead of mana (blood magic written as a flag). Dropped: damage reflected back to you."
+  },
+  "goredBlade": {
+   "ref": "Kondo's Pride",
+   "status": "covered",
+   "note": "Melee damage against bleeding enemies, life leech, big physical and bleeding on critical strikes (written as bleed chance while you have crit recently). Dropped: blinding on crit and the crit-leech ban."
+  },
+  "emberOffering": {
+   "ref": "Oro's Sacrifice",
+   "status": "covered",
+   "note": "No physical damage, massive added fire, ignite chance, culling strike against burning enemies, and extra physical and fire damage taken. Dropped: the frenzy charge on ignite."
+  },
+  "anvilBrand": {
+   "ref": "Starforge",
+   "status": "covered",
+   "note": "Enormous physical increase, life, area for attacks, no elemental damage, and physical damage able to shock."
+  },
+  "finalFang": {
+   "ref": "Terminus Est",
+   "status": "covered",
+   "note": "Critical strikes grant frenzy charges, with huge critical chance, attack speed, accuracy, movement speed and mana on kill."
+  },
+  "tempestClaymore": {
+   "ref": "Voidforge",
+   "status": "covered",
+   "note": "Elemental-only two-hander: all weapon physical is gained as extra fire, cold and lightning (the random element of the reference is split into equal thirds, same average), no physical or chaos damage, fire and cold can shock, bonus attack area and life. Dropped nothing but the one random pick."
+  },
+  "cinderSwitch": {
+   "ref": "Abberath's Horn",
+   "status": "covered",
+   "note": "Fire spell wand: spell and fire damage, added fire to spells, crit chance, shortened ignite duration. Dropped the life gained on killing ignited enemies."
+  },
+  "doublingRod": {
+   "ref": "Amplification Rod",
+   "status": "covered",
+   "note": "The baked-in supports: spells repeat once (Echoing Cast numbers: 20% less cast speed, 10% less damage), plus the Focused Ruin numbers (30% more spell damage, crit chance suppressed). Dropped the Increased Area of Effect support; gem level and intelligence kept."
+  },
+  "gallWand": {
+   "ref": "Apep's Rage",
+   "status": "covered",
+   "note": "Chaos spell wand: spell damage, added chaos to spells, cast speed and chaos resistance, with a 40% mana cost penalty. Dropped the faster poison line."
+  },
+  "veilcutWand": {
+   "ref": "Eclipse Solaris",
+   "status": "covered",
+   "note": "Physical-flat spell wand with crit multiplier. Blinding nearby enemies is expressed through its payoff: massive crit chance against nearby enemies (every nearby enemy is blinded in the reference). The blind itself is dropped."
+  },
+  "saplingSwitch": {
+   "ref": "Lifesprig",
+   "status": "covered",
+   "note": "Spell gem level, spell damage, cast speed, life and mana, and life recovered on each spell cast (the over-one-second regeneration becomes an instant recovery)."
+  },
+  "tidewashWand": {
+   "ref": "Moonsorrow",
+   "status": "covered",
+   "note": "Lightning spell wand: lots of spell damage, lightning damage, cast speed, intelligence. Dropped the Blind support and the chance to blind (no blind in the engine)."
+  },
+  "blightburstWand": {
+   "ref": "Obliteration",
+   "status": "covered",
+   "note": "Added physical, spell damage, crit and physical gained as chaos. Kills have a 20% chance to explode for a quarter of the enemy's maximum life as chaos damage (a kill trigger, radius chosen by us)."
+  },
+  "stillwaterWand": {
+   "ref": "Piscator's Vigil",
+   "status": "covered",
+   "note": "Attack wand: no physical damage, big increased elemental damage for attacks, penetration for attacks, attack speed, accuracy, crit chance and spell damage. 'This weapon' becomes all attacks (a wand is the only weapon it can be)."
+  },
+  "hollowRod": {
+   "ref": "Reverberation Rod",
+   "status": "covered",
+   "note": "The baked-in Spell Echo: spells repeat once (Echoing Cast numbers: 20% less cast speed, 10% less damage), with gem level, spell damage and intelligence."
+  },
+  "umbralSwitch": {
+   "ref": "Shade of Solaris",
+   "status": "covered",
+   "note": "Elemental damage gained as chaos; critical strikes deal no damage (crit multiplier cancelled), and a crit makes spells hit for 200% increased damage for a while. Both gimmick lines kept."
+  },
+  "stormwellWand": {
+   "ref": "Shimmeron",
+   "status": "covered",
+   "note": "Power charge scaling: spell damage, added lightning to spells (flat and per charge), crit multiplier, crit chance and spell block per charge. Dropped the lightning damage taken per second after a crit."
+  },
+  "cageboltWand": {
+   "ref": "Storm Prison",
+   "status": "covered",
+   "note": "Power charge generator: lightning and physical flats, mana regeneration, charge on kill and one more maximum power charge."
+  },
+  "rimecallWand": {
+   "ref": "Tulborn",
+   "status": "covered",
+   "note": "Cold spell wand fed by power charges (added cold to spells per charge). The charge-on-kill chance is kept at 50% but the 'frozen enemy' requirement is dropped (charge rolls ignore conditions), so it is looser than the reference. Dropped the mana on killing a frozen enemy."
+  },
+  "splinterWand": {
+   "ref": "Twyzel",
+   "status": "covered",
+   "note": "Physical attack wand: physical damage and flats, attack speed, crit chance, spell damage and one additional projectile (socketed gems are all skills the player uses)."
+  },
+  "halfLightStaff": {
+   "ref": "Duskdawn",
+   "status": "covered",
+   "note": "Spell crit staff: staff block, spell crit chance, elemental gained as chaos and spell damage after a recent crit. Dropped the crit multiplier per block chance and the crit multiplier after a non-critical strike (no stat to count block chance)."
+  },
+  "crownbreakerStaff": {
+   "ref": "Hegemony's Era",
+   "status": "covered",
+   "note": "Heavy physical staff: block, flat physical, attack speed, crit chance and one more maximum power charge. Dropped the power charge gained on knockback."
+  },
+  "masonsStaff": {
+   "ref": "Pillar of the Caged God",
+   "status": "covered",
+   "note": "Attribute scaling: area per intelligence, attack speed per dexterity and physical attack damage per strength (weapon damage is expressed as physical damage with attacks)."
+  },
+  "oathboundStaff": {
+   "ref": "Pledge of Hands",
+   "status": "covered",
+   "note": "Huge spell damage and doubled maximum mana, with the baked-in Spell Echo expressed as a spell repeat (Echoing Cast numbers: 20% less cast speed, 10% less damage); staff block kept."
+  },
+  "fissureStaff": {
+   "ref": "Realm Ender",
+   "status": "covered",
+   "note": "Fire and cold staff: +1 fire and cold gem levels and +2 to all elemental gem levels (+2 fire, cold and lightning added in), added fire and cold, elemental damage, block. Dropped the Cold to Fire support."
+  },
+  "rimeflameStaff": {
+   "ref": "Realmshaper",
+   "status": "covered",
+   "note": "A lower-level sibling of the fire and cold staff: +1 fire and cold gem levels, added fire and cold, elemental damage, block. Dropped the Cold to Fire support."
+  },
+  "thornfallStaff": {
+   "ref": "Sire of Shards",
+   "status": "covered",
+   "note": "Projectile staff: four additional projectiles, projectile damage, all attributes, all elemental resistances and block. Dropped the projectiles-in-a-nova rule."
+  },
+  "frostcoilStaff": {
+   "ref": "Taryn's Shiver",
+   "status": "covered",
+   "note": "Cold spell staff: cold spell gem levels, spell and cold damage, cast speed, freeze chance, block. Enemies frozen by you take 20% more damage (a more multiplier against frozen enemies)."
+  },
+  "ashenPylon": {
+   "ref": "The Grey Spire",
+   "status": "covered",
+   "note": "Socketless staff with huge increased damage, attack speed and higher maximum resistances (all four, chaos included)."
+  },
+  "windlassStaff": {
+   "ref": "Xirgil's Crank",
+   "status": "covered",
+   "note": "Spell staff: +1 all spell gems, spell damage, block, energy shield (reference flat value scaled by 0.45) and melee lightning reflect. Dropped the chance for energy shield recharge to start on block."
   }
  }
 }

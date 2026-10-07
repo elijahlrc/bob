@@ -1,0 +1,276 @@
+[
+  {
+    "ref": "Malachai's Loop", "name": "Surge Roundel", "flavour": "Hold the charge too long and it holds you.",
+    "note": "Power charges with spell damage per charge, spell damage and a large energy shield. Dropped: losing the charges and being shocked at maximum.",
+    "drop": ["Lose all Power Charges on reaching", "You are Shocked for 4 seconds"]
+  },
+  {
+    "ref": "Maligaro's Lens", "name": "Brazen Facet", "flavour": "It shows you everything, and everything shows you back.",
+    "note": "Attack speed, life, area and spell dodge for a heavy cost in all elemental resistances. Dropped: nearby allies recovering life on death.",
+    "drop": ["Nearby allies Recover 2%"]
+  },
+  {
+    "ref": "Rise of the Phoenix", "name": "Emberwake Kite", "flavour": "What burns down is welcome to stand up again.",
+    "note": "Fire resistance that grows on low life, with low-life movement speed and ignite immunity, flat life, regeneration and maximum fire resistance. The flat life line is hand-written.",
+    "drop": ["+(40-60) Maximum Life"],
+    "mods": [{ "stat": "life", "kind": "base", "min": 40, "max": 60 }]
+  },
+  {
+    "ref": "Saffell's Frame", "name": "Prismward Heater", "flavour": "All the colours, none of the corners.",
+    "note": "Raised maximum resistances and elemental resistances with spell damage; cannot block attacks, written as minus 100 attack block.",
+    "drop": ["+4% to all maximum Resistances", "Cannot Block Attacks"],
+    "mods": [
+      { "stat": "maxResist.allEle", "kind": "base", "min": 4, "max": 4 },
+      { "stat": "blockAttack", "kind": "base", "min": -100, "max": -100 }
+    ]
+  },
+  {
+    "ref": "The Anticipation", "name": "Bracing Slab", "flavour": "Brace once and the weight stays with you.",
+    "note": "Tower shield with large life and armour, and flat armour after blocking (1000 scaled to 600). Dropped: permanent intimidate on block.",
+    "drop": ["+1000 Armour if you've Blocked Recently", "Permanently Intimidate Enemies on Block"],
+    "mods": [{ "stat": "armour", "kind": "base", "min": 600, "max": 600, "condition": { "id": "blockedRecently" } }]
+  },
+  {
+    "ref": "The Surrender", "name": "Stoic Tower", "flavour": "Every blow it takes is paid back in kind.",
+    "note": "Recover 250 life on block and big flat armour after blocking (1500 scaled to 900), with life and armour. Dropped: the granted Reckoning skill.",
+    "drop": ["Grants level 30 Reckoning Skill", "+1500 Armour if you've Blocked Recently"],
+    "mods": [{ "stat": "armour", "kind": "base", "min": 900, "max": 900, "condition": { "id": "blockedRecently" } }]
+  },
+  {
+    "ref": "Thousand Teeth Temu", "name": "Gnashing Buckler", "flavour": "Hit it and count what comes back.",
+    "note": "Physical damage reflected to melee attackers (the 1 to 1000 range as its 500 average, always rather than on block), with evasion, life, leech and block. Dropped: life from reflected damage.",
+    "drop": ["Reflects 1 to 1000 Physical Damage", "of Damage Reflected Gained as Life"],
+    "mods": [{ "stat": "reflect.physical", "kind": "base", "min": 500, "max": 500 }]
+  },
+  {
+    "ref": "Titucius' Span", "name": "Quarrel Screen", "flavour": "Built to be shot at.",
+    "note": "A flat cut to physical attack hits taken, written for all attack hits, with life and armour. Dropped: the projectile-only armour and block bonuses.",
+    "drop": ["Physical Damage taken from Projectile Attacks", "200% increased Armour against Projectiles", "+25% additional Block Chance against Projectiles"],
+    "mods": [{ "stat": "flatTaken.attack.physical", "kind": "base", "min": -80, "max": -50 }]
+  },
+  {
+    "ref": "Unyielding Flame", "name": "Pyrewatch Bulwark", "flavour": "Every sharp blow sets the air alight.",
+    "note": "Triggers a fire burst (Ember Burst, level 20) on a critical strike, with critical chance, life, fire resistance and speed after a recent crit. The granted skill is Bob's own fire burst in place of the reference's.",
+    "drop": ["Trigger Commandment of Inferno on Critical Strike"],
+    "triggers": [{ "on": "crit", "chance": 100, "cooldown": 0.5, "effect": { "kind": "castGranted", "skillId": "emberBurst", "level": 20 } }]
+  },
+  {
+    "ref": "Zeel's Amplifier", "name": "Echoing Spikeguard", "flavour": "Stay unhurt and the whole body hums.",
+    "note": "Spell damage with life regeneration applied to energy shield while not recently hit. The area bonus that grows per recent kill is written at its 50% cap while you have killed recently.",
+    "drop": ["1% increased Area of Effect per Enemy killed recently", "You have Zealot's Oath if you haven't been hit recently"],
+    "mods": [
+      { "stat": "aoe", "kind": "inc", "min": 50, "max": 50, "condition": { "id": "killedRecently" } },
+      { "stat": "regenToES", "kind": "flag", "min": 1, "max": 1, "condition": { "id": "beenHitRecently", "not": true } }
+    ]
+  },
+  {
+    "ref": "Martyr of Innocence", "name": "Pyre Penitent", "flavour": "A long walk to a short fire.",
+    "note": "Block and huge added fire on a staff with spell fire damage, and fire penetration after blocking, plus freeze and chill immunity while ignited. Dropped: the granted Vengeance skill.",
+    "drop": ["Grants level 15 Vengeance Skill", "Immune to Freeze and Chill while Ignited", "Damage Penetrates 15% of Fire Resistance if you have Blocked Recently"],
+    "mods": [
+      { "stat": "avoid.freeze", "kind": "base", "min": 100, "max": 100, "condition": { "id": "ignited" } },
+      { "stat": "avoid.chill", "kind": "base", "min": 100, "max": 100, "condition": { "id": "ignited" } },
+      { "stat": "penetration", "kind": "base", "min": 15, "max": 15, "damageTypes": ["fire"], "condition": { "id": "blockedRecently" } }
+    ]
+  },
+  {
+    "ref": "The Stormheart", "name": "Gale Reliquary", "flavour": "Cold air in, lightning out.",
+    "note": "Staff adding cold and lightning damage with shock chance against chilled enemies and shock immunity while chilled.",
+    "drop": ["You Cannot Be Shocked While Chilled", "50% chance to Shock Chilled Enemies"],
+    "mods": [
+      { "stat": "avoid.shock", "kind": "base", "min": 100, "max": 100, "condition": { "id": "chilled" } },
+      { "stat": "chance.shock", "kind": "base", "min": 50, "max": 50, "condition": { "id": "targetChilled" } }
+    ]
+  },
+  {
+    "ref": "The Stormwall", "name": "Thunderfrost Pole", "flavour": "Half of every blow turns to ice, half to storm.",
+    "note": "Physical split into cold and lightning in equal parts on a high-block staff with shock immunity while chilled. Dropped: chilling and shocking attackers on block.",
+    "drop": ["Chill Attackers for 4 seconds on Block", "Shock Attackers for 4 seconds on Block"]
+  },
+  {
+    "ref": "Chitus' Needle", "name": "Quill Foil", "flavour": "Thin as a promise and as hard to keep.",
+    "note": "Physical, critical multiplier, elemental damage, strength, mana and a little range on a foil.",
+    "drop": ["+30 to Maximum Mana", "+2 to Weapon Range"],
+    "mods": [
+      { "stat": "mana", "kind": "base", "min": 30, "max": 30 },
+      { "stat": "meleeRange", "kind": "base", "min": 0.2, "max": 0.2 }
+    ]
+  },
+  {
+    "ref": "Cospri's Malice", "name": "Rimeglass Foil", "flavour": "It only ever wounds with cold.",
+    "note": "No physical damage, heavy added cold, and a socketed cold spell cast on a melee critical strike (crit-chance bonus against chilled enemies). Dropped: the attribute requirement.",
+    "drop": ["No Physical Damage", "+257 Intelligence Requirement", "Cast a Socketed Cold Spell on Melee Critical Strike"],
+    "mods": [{ "stat": "noPhysicalDamage", "kind": "flag", "min": 1, "max": 1 }],
+    "triggers": [{ "on": "crit", "tags": ["melee"], "chance": 100, "cooldown": 0.25, "effect": { "kind": "castSocketed", "spellTags": ["cold"] } }]
+  },
+  {
+    "ref": "Daresso's Passion", "name": "Frostpoint Estoc", "flavour": "Each kill leaves it faster.",
+    "note": "Added physical and cold with frenzy charges gained on kill. Dropped: shorter frenzy duration and the bonus damage with no frenzy charges.",
+    "drop": ["20% reduced Frenzy Charge Duration", "increased Damage while you have no Frenzy Charges"]
+  },
+  {
+    "ref": "Ewar's Mirage", "name": "Looping Rapier", "flavour": "The second strike arrives before the first leaves.",
+    "note": "Attack speed, added lightning and elemental attack damage, with attacks chaining an additional time (the main-hand clause). Dropped: the off-hand extra projectile.",
+    "drop": ["Attacks Chain an additional time when in Main Hand", "Attacks have an additional Projectile when in Off Hand"],
+    "mods": [{ "stat": "chains", "kind": "base", "min": 1, "max": 1, "tags": ["attack"] }]
+  },
+  {
+    "ref": "The Goddess Bound", "name": "Spindle Rapier", "flavour": "Wound tight and swung with both arms.",
+    "note": "Huge physical damage, quick, crit-heavy and evasive but poor at finding items. Uses both hands, so it sits on a two-handed sword base instead of the one-handed rapier.",
+    "base": "sword2_5",
+    "drop": ["Uses both hand slots"]
+  },
+  {
+    "ref": "Atziri's Disfavour", "name": "Gilded Cleaver", "flavour": "Heavy with someone else's gold.",
+    "note": "Massive added physical, attack speed, bleed chance and range. Dropped: the socketed support gem level bonus.",
+    "drop": ["+2 to Level of Socketed Support Gems"]
+  },
+  {
+    "ref": "Hezmana's Bloodlust", "name": "Crimson Tally", "flavour": "Every swing is paid for in blood.",
+    "note": "Big physical damage with life leech and skills costing life instead of mana (broader than the reference's attacks-only clause).",
+    "drop": ["Attacks have Blood Magic"],
+    "mods": [{ "stat": "skillsCostLife", "kind": "flag", "min": 1, "max": 1 }]
+  },
+  {
+    "ref": "Kaom's Primacy", "name": "Marrow Chopper", "flavour": "Taken from a heap and kept for a reason.",
+    "note": "Culling strike with big physical damage, life on kill, accuracy and rage gained on a critical strike. Dropped: the extra fire per rage.",
+    "drop": ["Gain 1 Rage on Critical Hit", "Gain 1% of Physical Damage as Extra Fire Damage per 1 Rage"],
+    "mods": [{ "stat": "rageOn.crit", "kind": "base", "min": 1, "max": 1 }]
+  },
+  {
+    "ref": "Kitava's Feast", "name": "Hollow Gorger", "flavour": "Hungry in two ways at once.",
+    "note": "Leeches both life and mana with a large recovery of maximum life on kill and huge physical damage. Dropped: the splash support and the destroy-on-kill clause (no corpses).",
+    "drop": ["Socketed Gems are supported by level 25 Melee Splash", "Enemies you hit are destroyed on Kill"]
+  },
+  {
+    "ref": "Limbsplit", "name": "Timberfall", "flavour": "The tree finds out last.",
+    "note": "Culling strike on an axe with physical damage and strength. Dropped: the strength-gem level bonus.",
+    "drop": ["+1 to Level of Socketed Strength Gems"]
+  },
+  {
+    "ref": "Ngamahu's Flame", "name": "Kiln Splitter", "flavour": "A swing that lets the heat out.",
+    "note": "Half of physical converted to fire, fire penetration and a 20% chance on melee hit to cast a fire burst (Ember Burst, level 16), which stands in for the reference's molten burst.",
+    "drop": ["Level 16 Molten Burst on Melee Hit"],
+    "triggers": [{ "on": "hit", "tags": ["melee"], "chance": 20, "cooldown": 0.25, "effect": { "kind": "castGranted", "skillId": "emberBurst", "level": 16 } }]
+  },
+  {
+    "ref": "The Blood Reaper", "name": "Tithe Reaper", "flavour": "A fair harvest, a fair price.",
+    "note": "Bleeding, life leech, flat life and regeneration at a mana cost increase.",
+    "drop": ["50% increased Mana Cost of Skills"],
+    "mods": [{ "stat": "cost", "kind": "inc", "min": 50, "max": 50 }]
+  },
+  {
+    "ref": "The Cauteriser", "name": "Brand Splitter", "flavour": "It seals what it opens.",
+    "note": "Culling strike with 70% of physical gained as fire, added physical and strength. Dropped: the strength-gem level bonus.",
+    "drop": ["+1 to Level of Socketed Strength Gems"]
+  },
+  {
+    "ref": "The Harvest", "name": "Gleaning Chopper", "flavour": "It grows sharper the longer you have lived.",
+    "note": "Critical chance per character level with life leech from damage while you have crit recently (the on-crit clause). Dropped: flask charges on critical strike.",
+    "drop": ["1.2% of Damage Leeched as Life on Critical Strike", "Gain Flask Charges when you deal a Critical Strike"],
+    "mods": [{ "stat": "leech.life", "kind": "base", "min": 1.2, "max": 1.2, "condition": { "id": "critRecently" } }]
+  },
+  {
+    "ref": "Wideswing", "name": "Broad Poleaxe", "flavour": "Stand back and let it have the room.",
+    "note": "Physical damage, strength, accuracy, range and mana on kill on a poleaxe. Dropped: the area-of-effect support gem.",
+    "drop": ["Socketed Gems are Supported by level 20 Increased Area of Effect"]
+  },
+  {
+    "ref": "Brain Rattler", "name": "Skullshaker", "flavour": "The quiet before is the loudest part.",
+    "note": "Half of physical converted to lightning, shock chance and lightning penetration, with stun duration and big added physical. Dropped: the slow effects on shocked enemies.",
+    "drop": ["Enemies you Shock have 30% reduced Cast Speed", "Enemies you Shock have 20% reduced Movement Speed"]
+  },
+  {
+    "ref": "Geofri's Baptism", "name": "Placid Maul", "flavour": "It has never once needed to be clever.",
+    "note": "Never deals critical strikes, with a large physical increase, added cold and long stuns.",
+    "drop": ["Never deal Critical Strikes"],
+    "mods": [{ "stat": "neverCrit", "kind": "flag", "min": 1, "max": 1 }]
+  },
+  {
+    "ref": "Kongor's Undying Rage", "name": "Ragebound Maul", "flavour": "Anger never ran short of room.",
+    "note": "Hits cannot be evaded, critical strikes grant onslaught, critical strikes add no extra damage (written as minus 50 critical multiplier against the 150 base), with added physical, crit chance and elemental resistances.",
+    "drop": ["Your Critical Strikes do not deal extra Damage"],
+    "mods": [{ "stat": "critMulti", "kind": "base", "min": -50, "max": -50 }]
+  },
+  {
+    "ref": "Marohi Erqi", "name": "Leaden Maul", "flavour": "Slow to lift, slower to forgive.",
+    "note": "Huge physical damage and long stuns at a cost in attack speed, movement speed and accuracy. Dropped: the pulverise support gem.",
+    "drop": ["Socketed Gems are Supported by level 15 Pulverise"]
+  },
+  {
+    "ref": "Panquetzaliztli", "name": "Blastbone Maul", "flavour": "What falls to it does not stay down quietly.",
+    "note": "Slain enemies explode for 10% of their life as fire, with physical, all attributes and life on kill.",
+    "drop": ["Enemies killed explode dealing 10% of their Life as Fire Damage"],
+    "triggers": [{ "on": "kill", "chance": 100, "cooldown": 0, "effect": { "kind": "explode", "pctOfMaxLife": 10, "dtype": "fire", "radius": 2.5 } }]
+  },
+  {
+    "ref": "Quecholli", "name": "Kindling Maul", "flavour": "A small fire at the end of every fight.",
+    "note": "Slain enemies explode for 10% of their life as fire, with physical, all attributes, stuns and life on kill.",
+    "drop": ["Enemies killed explode dealing 10% of their Life as Fire Damage"],
+    "triggers": [{ "on": "kill", "chance": 100, "cooldown": 0, "effect": { "kind": "explode", "pctOfMaxLife": 10, "dtype": "fire", "radius": 2.5 } }]
+  },
+  {
+    "ref": "Tidebreaker", "name": "Surfhammer", "flavour": "The stronger the tide, the harder it lands.",
+    "note": "Physical damage per endurance charge with endurance charges gained when you stun, a lower enemy stun threshold and big added physical. The charge gain stands in for the support gem.",
+    "drop": ["Socketed Gems are Supported by Level 20 Endurance Charge on Melee Stun"],
+    "mods": [{ "stat": "chargeOn.stun.grit", "kind": "base", "min": 100, "max": 100 }]
+  },
+  {
+    "ref": "Trypanon", "name": "Deadweight Mallet", "flavour": "One blow, always meant.",
+    "note": "Every attack is a critical strike (written as plus 100 critical chance for attacks) at half attack speed, with long stuns.",
+    "drop": ["All Attacks with this Weapon are Critical Strikes"],
+    "mods": [{ "stat": "critChance", "kind": "base", "min": 100, "max": 100, "tags": ["attack"] }]
+  },
+  {
+    "ref": "Doomsower", "name": "Warcrest Sword", "flavour": "Forged for a crowd that never left.",
+    "note": "Huge accuracy and physical damage with area and extra fire for melee, written on the wielder rather than socketed gems.",
+    "drop": ["Socketed Melee Gems have 15% increased Area of Effect", "Socketed Red Gems get 10% Physical Damage as Extra Fire Damage"],
+    "mods": [
+      { "stat": "aoe", "kind": "inc", "min": 15, "max": 15, "tags": ["melee"] },
+      { "stat": "gain.physical.fire", "kind": "base", "min": 10, "max": 10, "tags": ["melee"] }
+    ]
+  },
+  {
+    "ref": "Edge of Madness", "name": "Frenzy Greatsword", "flavour": "Sharper every year of the habit.",
+    "note": "Chaos damage that grows with level, added physical to attacks per level and a level bonus to socketed gems (all gems rather than active ones).",
+    "drop": ["+1 to Level of Active Socketed Skill Gems"],
+    "mods": [{ "stat": "socketedGemLevel", "kind": "base", "min": 1, "max": 1 }]
+  },
+  {
+    "ref": "Hiltless", "name": "Bare Reaver", "flavour": "Nothing to hold but the work.",
+    "note": "Big added physical, critical chance, range, accuracy, and skills costing life instead of mana (blood magic written as a flag). Dropped: damage reflected back to you.",
+    "drop": ["Socketed Gems are Supported by level 1 Blood Magic", "Enemies you Attack Reflect 100 Physical Damage to you"],
+    "mods": [{ "stat": "skillsCostLife", "kind": "flag", "min": 1, "max": 1 }]
+  },
+  {
+    "ref": "Kondo's Pride", "name": "Gored Blade", "flavour": "It keeps a count of everything it opened.",
+    "note": "Melee damage against bleeding enemies, life leech, big physical and bleeding on critical strikes (written as bleed chance while you have crit recently). Dropped: blinding on crit and the crit-leech ban.",
+    "drop": ["Cannot Leech Life from Critical Strikes", "30% chance to Blind Enemies on Critical Strike", "50% chance to cause Bleeding on Critical Strike"],
+    "mods": [{ "stat": "chance.bleed", "kind": "base", "min": 50, "max": 50, "condition": { "id": "critRecently" } }]
+  },
+  {
+    "ref": "Oro's Sacrifice", "name": "Ember Offering", "flavour": "Give it everything and it burns the rest.",
+    "note": "No physical damage, massive added fire, ignite chance, culling strike against burning enemies, and extra physical and fire damage taken. Dropped: the frenzy charge on ignite.",
+    "drop": ["No Physical Damage", "Culling Strike against Burning Enemies", "Gain a Frenzy Charge if an Attack Ignites an Enemy"],
+    "mods": [
+      { "stat": "noPhysicalDamage", "kind": "flag", "min": 1, "max": 1 },
+      { "stat": "cullingStrike", "kind": "flag", "min": 1, "max": 1, "condition": { "id": "targetIgnited" } }
+    ]
+  },
+  {
+    "ref": "Starforge", "name": "Anvil Brand", "flavour": "Struck once at the bottom of the world.",
+    "note": "Enormous physical increase, life, area for attacks, no elemental damage, and physical damage able to shock.",
+    "drop": ["20% increased Area of Effect for Attacks", "Deal no Elemental Damage", "Your Physical Damage can Shock"],
+    "mods": [
+      { "stat": "aoe", "kind": "inc", "min": 20, "max": 20, "tags": ["attack"] },
+      { "stat": "noElementalDamage", "kind": "flag", "min": 1, "max": 1 },
+      { "stat": "canShock.physical", "kind": "flag", "min": 1, "max": 1 }
+    ]
+  },
+  {
+    "ref": "Terminus Est", "name": "Final Fang", "flavour": "The last stop of a long line.",
+    "note": "Critical strikes grant frenzy charges, with huge critical chance, attack speed, accuracy, movement speed and mana on kill.",
+    "drop": ["Gain a Frenzy Charge on Critical Strike"],
+    "mods": [{ "stat": "chargeOn.crit.fervour", "kind": "base", "min": 100, "max": 100 }]
+  }
+]

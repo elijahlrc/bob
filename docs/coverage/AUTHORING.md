@@ -57,3 +57,14 @@ npx tsx scripts/coverage/emit-uniques.ts --check docs/coverage/uniques/<your fil
 It builds every decision (reporting open lines), checks the stats, conditions, names and ids, and writes nothing. Fix
 every problem. **Do not run `coverage:emit`, and do not edit `src/` or any other file**: the maintainer emits all files
 together.
+
+## Notes from the first round
+
+- `--check` accepts a stat if it is a key of `STAT_TEXT`, one of `damage`, `damage.min`, `damage.max`, or in the families above.
+- A line you write by hand in `mods` or `triggers` must also be listed in `drop` (a substring of the reference line), or the
+  emit stops with "lines neither mapped nor dropped".
+- `drop` matches a **substring** of the reference line as the translator prints it; one entry can drop one line.
+- `per` reads only `str`, `dex`, `int`, `level` and the charge counts (`charges.grit`, `charges.fervour`,
+  `charges.insight`).
+- Borderline calls: cover the item when the line that makes it worth wearing survives (a damage conversion, a keystone-like
+  rule, a big stat), and note what was simplified. Skip it when only the filler lines survive.

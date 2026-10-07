@@ -430,6 +430,7 @@ Object.assign(STAT_TEXT, {
 } satisfies Record<string, StatText>);
 
 Object.assign(STAT_TEXT, {
+  globalDefences: { name: 'Global Defences', pct: true },
   noChaosDamage: { flag: 'Deals no Chaos Damage' },
 } satisfies Record<string, StatText>);
 

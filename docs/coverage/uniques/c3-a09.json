@@ -1,0 +1,336 @@
+[
+  {
+    "ref": "Voidforge",
+    "name": "Tempest Claymore",
+    "flavour": "Struck once, it answers in three colours.",
+    "note": "Elemental-only two-hander: all weapon physical is gained as extra fire, cold and lightning (the random element of the reference is split into equal thirds, same average), no physical or chaos damage, fire and cold can shock, bonus attack area and life. Dropped nothing but the one random pick.",
+    "drop": [
+      "Your Elemental Damage can Shock",
+      "Gain 300% of Weapon Physical Damage",
+      "20% increased Area of Effect for Attacks",
+      "Deal no Non-Elemental Damage"
+    ],
+    "mods": [
+      { "stat": "gain.physical.fire", "kind": "base", "min": 100, "max": 100 },
+      { "stat": "gain.physical.cold", "kind": "base", "min": 100, "max": 100 },
+      { "stat": "gain.physical.lightning", "kind": "base", "min": 100, "max": 100 },
+      { "stat": "noPhysicalDamage", "kind": "flag", "min": 1, "max": 1 },
+      { "stat": "noChaosDamage", "kind": "flag", "min": 1, "max": 1 },
+      { "stat": "canShock.fire", "kind": "flag", "min": 1, "max": 1 },
+      { "stat": "canShock.cold", "kind": "flag", "min": 1, "max": 1 },
+      { "stat": "aoe", "kind": "inc", "min": 20, "max": 20, "tags": ["attack"] }
+    ]
+  },
+  {
+    "ref": "Abberath's Horn",
+    "name": "Cinder Switch",
+    "flavour": "Spits sparks at anything that stands still.",
+    "note": "Fire spell wand: spell and fire damage, added fire to spells, crit chance, shortened ignite duration. Dropped the life gained on killing ignited enemies.",
+    "drop": ["Life Gained on Killing Ignited Enemies"]
+  },
+  {
+    "ref": "Amplification Rod",
+    "name": "Doubling Rod",
+    "flavour": "Say it once and it says it twice.",
+    "note": "The baked-in supports: spells repeat once (Echoing Cast numbers: 20% less cast speed, 10% less damage), plus the Focused Ruin numbers (30% more spell damage, crit chance suppressed). Dropped the Increased Area of Effect support; gem level and intelligence kept.",
+    "drop": [
+      "Supported by level 1 Spell Echo",
+      "Supported by level 1 Increased Area of Effect",
+      "Supported by level 1 Controlled Destruction"
+    ],
+    "mods": [
+      { "stat": "repeats", "kind": "base", "min": 1, "max": 1, "tags": ["spell"] },
+      { "stat": "castSpeed", "kind": "more", "min": -20, "max": -20, "tags": ["spell"] },
+      { "stat": "damage", "kind": "more", "min": -10, "max": -10, "tags": ["spell"] },
+      { "stat": "damage", "kind": "more", "min": 30, "max": 30, "tags": ["spell"] },
+      { "stat": "critChance", "kind": "inc", "min": -100, "max": -100, "tags": ["spell"] }
+    ]
+  },
+  {
+    "ref": "Apep's Rage",
+    "name": "Gall Wand",
+    "flavour": "Bitter to hold, bitterer to be hit by.",
+    "note": "Chaos spell wand: spell damage, added chaos to spells, cast speed and chaos resistance, with a 40% mana cost penalty. Dropped the faster poison line.",
+    "drop": ["40% increased Mana Cost of Skills", "Poisons you inflict deal Damage 20% faster"],
+    "mods": [{ "stat": "cost", "kind": "inc", "min": 40, "max": 40 }]
+  },
+  {
+    "ref": "Eclipse Solaris",
+    "name": "Veilcut Wand",
+    "flavour": "Nothing close to it can see the next blow.",
+    "note": "Physical-flat spell wand with crit multiplier. Blinding nearby enemies is expressed through its payoff: massive crit chance against nearby enemies (every nearby enemy is blinded in the reference). The blind itself is dropped.",
+    "drop": ["Nearby Enemies are Blinded", "against Blinded Enemies"],
+    "mods": [
+      {
+        "stat": "critChance",
+        "kind": "inc",
+        "min": 120,
+        "max": 140,
+        "condition": { "id": "targetNearby" }
+      }
+    ]
+  },
+  {
+    "ref": "Lifesprig",
+    "name": "Sapling Switch",
+    "flavour": "It grows a little more with every word.",
+    "note": "Spell gem level, spell damage, cast speed, life and mana, and life recovered on each spell cast (the over-one-second regeneration becomes an instant recovery).",
+    "drop": ["Regenerate (6-8) Life over 1 second"],
+    "mods": [{ "stat": "recover.cast.life", "kind": "base", "min": 6, "max": 8 }]
+  },
+  {
+    "ref": "Moonsorrow",
+    "name": "Tidewash Wand",
+    "flavour": "Pale light, running out with the water.",
+    "note": "Lightning spell wand: lots of spell damage, lightning damage, cast speed, intelligence. Dropped the Blind support and the chance to blind (no blind in the engine).",
+    "drop": ["supported by level 20 Blind", "chance to Blind Enemies on hit"]
+  },
+  {
+    "ref": "Obliteration",
+    "name": "Blightburst Wand",
+    "flavour": "What it kills does not stay dead quietly.",
+    "note": "Added physical, spell damage, crit and physical gained as chaos. Kills have a 20% chance to explode for a quarter of the enemy's maximum life as chaos damage (a kill trigger, radius chosen by us).",
+    "drop": ["Enemies you Kill have a 20% chance to Explode", "of their maximum Life as Chaos Damage"],
+    "triggers": [
+      {
+        "on": "kill",
+        "chance": 20,
+        "cooldown": 0,
+        "effect": { "kind": "explode", "pctOfMaxLife": 25, "dtype": "chaos", "radius": 2.5 }
+      }
+    ]
+  },
+  {
+    "ref": "Piscator's Vigil",
+    "name": "Stillwater Wand",
+    "flavour": "Patience, and then everything at once.",
+    "note": "Attack wand: no physical damage, big increased elemental damage for attacks, penetration for attacks, attack speed, accuracy, crit chance and spell damage. 'This weapon' becomes all attacks (a wand is the only weapon it can be).",
+    "drop": [
+      "No Physical Damage",
+      "Attacks with this Weapon have (100-115)% increased Elemental Damage",
+      "Attacks with this Weapon Penetrate 5% Elemental Resistances"
+    ],
+    "mods": [
+      { "stat": "noPhysicalDamage", "kind": "flag", "min": 1, "max": 1 },
+      {
+        "stat": "damage",
+        "kind": "inc",
+        "min": 100,
+        "max": 115,
+        "damageTypes": ["fire", "cold", "lightning"],
+        "tags": ["attack"]
+      },
+      {
+        "stat": "penetration",
+        "kind": "base",
+        "min": 5,
+        "max": 5,
+        "damageTypes": ["fire", "cold", "lightning"],
+        "tags": ["attack"]
+      }
+    ]
+  },
+  {
+    "ref": "Reverberation Rod",
+    "name": "Hollow Rod",
+    "flavour": "The second voice is always louder.",
+    "note": "The baked-in Spell Echo: spells repeat once (Echoing Cast numbers: 20% less cast speed, 10% less damage), with gem level, spell damage and intelligence.",
+    "drop": ["Supported by level 1 Spell Echo"],
+    "mods": [
+      { "stat": "repeats", "kind": "base", "min": 1, "max": 1, "tags": ["spell"] },
+      { "stat": "castSpeed", "kind": "more", "min": -20, "max": -20, "tags": ["spell"] },
+      { "stat": "damage", "kind": "more", "min": -10, "max": -10, "tags": ["spell"] }
+    ]
+  },
+  {
+    "ref": "Shade of Solaris",
+    "name": "Umbral Switch",
+    "flavour": "It is brightest when it hurts you least.",
+    "note": "Elemental damage gained as chaos; critical strikes deal no damage (crit multiplier cancelled), and a crit makes spells hit for 200% increased damage for a while. Both gimmick lines kept.",
+    "drop": ["Critical Strikes deal no Damage", "200% increased Spell Damage if you've dealt a Critical Strike"],
+    "mods": [
+      { "stat": "critMulti", "kind": "base", "min": -150, "max": -150 },
+      {
+        "stat": "damage",
+        "kind": "inc",
+        "min": 200,
+        "max": 200,
+        "tags": ["spell"],
+        "condition": { "id": "critRecently" }
+      }
+    ]
+  },
+  {
+    "ref": "Shimmeron",
+    "name": "Stormwell Wand",
+    "flavour": "Every charge it holds is a held breath.",
+    "note": "Power charge scaling: spell damage, added lightning to spells (flat and per charge), crit multiplier, crit chance and spell block per charge. Dropped the lightning damage taken per second after a crit.",
+    "drop": [
+      "+0.3% Critical Strike Chance per Power Charge",
+      "additional Chance to Block Spells per Power Charge",
+      "Lightning Damage taken per second per Power Charge"
+    ],
+    "mods": [
+      {
+        "stat": "critChance",
+        "kind": "base",
+        "min": 0.3,
+        "max": 0.3,
+        "per": { "stat": "charges.insight", "div": 1 }
+      },
+      {
+        "stat": "blockSpell",
+        "kind": "base",
+        "min": 2,
+        "max": 2,
+        "per": { "stat": "charges.insight", "div": 1 }
+      }
+    ]
+  },
+  {
+    "ref": "Storm Prison",
+    "name": "Cagebolt Wand",
+    "flavour": "The lightning keeps coming back for more.",
+    "note": "Power charge generator: lightning and physical flats, mana regeneration, charge on kill and one more maximum power charge.",
+    "drop": ["+1 Maximum Power Charge"],
+    "mods": [{ "stat": "maxCharges.insight", "kind": "base", "min": 1, "max": 1 }]
+  },
+  {
+    "ref": "Tulborn",
+    "name": "Rimecall Wand",
+    "flavour": "Each kill leaves the air a little colder.",
+    "note": "Cold spell wand fed by power charges (added cold to spells per charge). The charge-on-kill chance is kept at 50% but the 'frozen enemy' requirement is dropped (charge rolls ignore conditions), so it is looser than the reference. Dropped the mana on killing a frozen enemy.",
+    "drop": [
+      "50% chance to gain a Power Charge on Killing a Frozen Enemy",
+      "Mana gained on Killing a Frozen Enemy"
+    ],
+    "mods": [{ "stat": "chargeOn.kill.insight", "kind": "base", "min": 50, "max": 50 }]
+  },
+  {
+    "ref": "Twyzel",
+    "name": "Splinter Wand",
+    "flavour": "Light enough to throw twice.",
+    "note": "Physical attack wand: physical damage and flats, attack speed, crit chance, spell damage and one additional projectile (socketed gems are all skills the player uses).",
+    "drop": ["Socketed Gems fire an additional Projectile"],
+    "mods": [{ "stat": "projectiles", "kind": "base", "min": 1, "max": 1 }]
+  },
+  {
+    "ref": "Duskdawn",
+    "name": "Half-Light Staff",
+    "flavour": "Neither the day nor the night will claim it.",
+    "note": "Spell crit staff: staff block, spell crit chance, elemental gained as chaos and spell damage after a recent crit. Dropped the crit multiplier per block chance and the crit multiplier after a non-critical strike (no stat to count block chance).",
+    "drop": [
+      "+1% to Critical Strike Multiplier per 1% Block Chance",
+      "Critical Strike Multiplier if you've dealt a Non-Critical Strike Recently"
+    ]
+  },
+  {
+    "ref": "Hegemony's Era",
+    "name": "Crownbreaker Staff",
+    "flavour": "A long reign, ended in one swing.",
+    "note": "Heavy physical staff: block, flat physical, attack speed, crit chance and one more maximum power charge. Dropped the power charge gained on knockback.",
+    "drop": ["Power Charge if you Knock an Enemy Back"]
+  },
+  {
+    "ref": "Pillar of the Caged God",
+    "name": "Mason's Staff",
+    "flavour": "Built up, stone by stone, from the legs.",
+    "note": "Attribute scaling: area per intelligence, attack speed per dexterity and physical attack damage per strength (weapon damage is expressed as physical damage with attacks).",
+    "drop": ["Physical Weapon Damage per 10 Strength"],
+    "mods": [
+      {
+        "stat": "damage",
+        "kind": "inc",
+        "min": 16,
+        "max": 16,
+        "damageTypes": ["physical"],
+        "tags": ["attack"],
+        "per": { "stat": "str", "div": 10 }
+      }
+    ]
+  },
+  {
+    "ref": "Pledge of Hands",
+    "name": "Oathbound Staff",
+    "flavour": "Sworn on both palms, and it does not forget.",
+    "note": "Huge spell damage and doubled maximum mana, with the baked-in Spell Echo expressed as a spell repeat (Echoing Cast numbers: 20% less cast speed, 10% less damage); staff block kept.",
+    "drop": ["Supported by level 30 Greater Spell Echo"],
+    "mods": [
+      { "stat": "repeats", "kind": "base", "min": 1, "max": 1, "tags": ["spell"] },
+      { "stat": "castSpeed", "kind": "more", "min": -20, "max": -20, "tags": ["spell"] },
+      { "stat": "damage", "kind": "more", "min": -10, "max": -10, "tags": ["spell"] }
+    ]
+  },
+  {
+    "ref": "Realm Ender",
+    "name": "Fissure Staff",
+    "flavour": "It opens a seam in whatever it touches.",
+    "note": "Fire and cold staff: +1 fire and cold gem levels and +2 to all elemental gem levels (+2 fire, cold and lightning added in), added fire and cold, elemental damage, block. Dropped the Cold to Fire support.",
+    "drop": ["Level of Socketed Elemental Gems", "Supported by level 5 Cold to Fire"],
+    "mods": [
+      { "stat": "socketedGemLevel", "kind": "base", "min": 2, "max": 2, "tags": ["fire"] },
+      { "stat": "socketedGemLevel", "kind": "base", "min": 2, "max": 2, "tags": ["cold"] },
+      { "stat": "socketedGemLevel", "kind": "base", "min": 2, "max": 2, "tags": ["lightning"] }
+    ]
+  },
+  {
+    "ref": "Realmshaper",
+    "name": "Rimeflame Staff",
+    "flavour": "A boundary that burns on one side and freezes on the other.",
+    "note": "A lower-level sibling of the fire and cold staff: +1 fire and cold gem levels, added fire and cold, elemental damage, block. Dropped the Cold to Fire support.",
+    "drop": ["Supported by level 5 Cold to Fire"]
+  },
+  {
+    "ref": "Sire of Shards",
+    "name": "Thornfall Staff",
+    "flavour": "Splinters ahead of the swing.",
+    "note": "Projectile staff: four additional projectiles, projectile damage, all attributes, all elemental resistances and block. Dropped the projectiles-in-a-nova rule.",
+    "drop": [
+      "to All Attributes",
+      "to All Elemental Resistances",
+      "Socketed Gems fire 4 additional Projectiles",
+      "Socketed Gems fire Projectiles in a Nova"
+    ],
+    "mods": [
+      { "stat": "allAttr", "kind": "base", "min": 15, "max": 20 },
+      { "stat": "resist.allEle", "kind": "base", "min": 5, "max": 7 },
+      { "stat": "projectiles", "kind": "base", "min": 4, "max": 4 }
+    ]
+  },
+  {
+    "ref": "Taryn's Shiver",
+    "name": "Frostcoil Staff",
+    "flavour": "It tightens like a trap around the cold.",
+    "note": "Cold spell staff: cold spell gem levels, spell and cold damage, cast speed, freeze chance, block. Enemies frozen by you take 20% more damage (a more multiplier against frozen enemies).",
+    "drop": ["Enemies Frozen by you take 20% increased Damage"],
+    "mods": [
+      {
+        "stat": "damage",
+        "kind": "more",
+        "min": 20,
+        "max": 20,
+        "condition": { "id": "targetFrozen" }
+      }
+    ]
+  },
+  {
+    "ref": "The Grey Spire",
+    "name": "Ashen Pylon",
+    "flavour": "A tall thing, with nothing to put in it.",
+    "note": "Socketless staff with huge increased damage, attack speed and higher maximum resistances (all four, chaos included).",
+    "drop": ["Global Damage", "to all maximum Resistances"],
+    "mods": [
+      { "stat": "damage", "kind": "inc", "min": 250, "max": 300 },
+      { "stat": "maxResist.allEle", "kind": "base", "min": 1, "max": 4 },
+      { "stat": "maxResist.chaos", "kind": "base", "min": 1, "max": 4 }
+    ]
+  },
+  {
+    "ref": "Xirgil's Crank",
+    "name": "Windlass Staff",
+    "flavour": "Wind it up and let go.",
+    "note": "Spell staff: +1 all spell gems, spell damage, block, energy shield (reference flat value scaled by 0.45) and melee lightning reflect. Dropped the chance for energy shield recharge to start on block.",
+    "drop": ["Maximum Energy Shield", "Energy Shield Recharge to Start"],
+    "mods": [{ "stat": "es", "kind": "base", "min": 32, "max": 45 }]
+  }
+]

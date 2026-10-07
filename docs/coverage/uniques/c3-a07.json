@@ -1,0 +1,349 @@
+[
+  {
+    "ref": "Pyre",
+    "name": "Ashen Signet",
+    "flavour": "The fire went out; the heat did not.",
+    "note": "Burning damage, half of cold converted to fire and fire resistance. Dropped: destroying ignited enemies on kill.",
+    "drop": ["Ignited Enemies you hit are destroyed on Kill"]
+  },
+  {
+    "ref": "Rigwald's Crest",
+    "name": "Twinstone Loop",
+    "flavour": "Two stones, one on each side of the ledger.",
+    "note": "Fire and cold damage with mana regeneration. Dropped: the chance to summon a spectral wolf on kill (minion).",
+    "drop": ["summon a Spectral Wolf"]
+  },
+  {
+    "ref": "Stormfire",
+    "name": "Tempest Cinder",
+    "flavour": "Lightning that learned to smoulder.",
+    "note": "Lightning damage can ignite, plus added lightning damage against ignited enemies, mana regeneration and fire and lightning resistance. Dropped: burning damage per recently shocked enemy.",
+    "drop": [
+      "increased Burning Damage for each Enemy you have Shocked Recently",
+      "Lightning Damage to Hits against Ignited Enemies",
+      "Your Lightning Damage can Ignite"
+    ],
+    "mods": [
+      { "stat": "damage.min", "kind": "base", "min": 1, "max": 3, "damageTypes": ["lightning"], "condition": { "id": "targetIgnited" } },
+      { "stat": "damage.max", "kind": "base", "min": 62, "max": 70, "damageTypes": ["lightning"], "condition": { "id": "targetIgnited" } },
+      { "stat": "canIgnite.lightning", "kind": "flag", "min": 1, "max": 1 }
+    ]
+  },
+  {
+    "ref": "The Taming",
+    "name": "Prism Bridle",
+    "flavour": "Three tempers, one rein.",
+    "note": "Chance to freeze, shock and ignite with elemental damage and all elemental resistances. Dropped: the damage bonus per ailment on the enemy.",
+    "drop": ["per Freeze, Shock and Ignite on Enemy"]
+  },
+  {
+    "ref": "The Warden's Brand",
+    "name": "Iron Shackle",
+    "flavour": "Heavy on the wrist, heavier on the guilty.",
+    "note": "Added physical damage to attacks at a large attack speed cost. Dropped: the frenzy charge chance when stunning.",
+    "drop": ["Frenzy Charge when you Stun"]
+  },
+  {
+    "ref": "Timeclasp",
+    "name": "Sandturn Ring",
+    "flavour": "Every grain falls a little faster.",
+    "note": "Attack and cast speed, mana regeneration and energy shield. Dropped: the reduced effect of a slowing curse on you.",
+    "drop": ["Temporal Chains has 50% reduced Effect"]
+  },
+  {
+    "ref": "Timetwist",
+    "name": "Skein of Hours",
+    "flavour": "Wound tight, it never runs down.",
+    "note": "Attack and cast speed, energy shield and mana regeneration. Dropped: skill effect duration and the slowing-curse immunity.",
+    "drop": ["Skill Effect Duration", "Unaffected by Temporal Chains"]
+  },
+  {
+    "ref": "Valako's Sign",
+    "name": "Stormglass Seal",
+    "flavour": "It brightens whenever something twitches.",
+    "note": "Lightning damage, damage and life leech against shocked enemies, and a chance to shock.",
+    "drop": [
+      "40% increased Damage with Hits against Shocked Enemies",
+      "Leeched as Life against Shocked Enemies"
+    ],
+    "mods": [
+      { "stat": "damage", "kind": "inc", "min": 40, "max": 40, "condition": { "id": "targetShocked" } },
+      { "stat": "leech.life", "kind": "base", "min": 0.2, "max": 0.2, "condition": { "id": "targetShocked" } }
+    ]
+  },
+  {
+    "ref": "Voidheart",
+    "name": "Hollow Knuckle",
+    "flavour": "Plain iron, with something wrong inside.",
+    "note": "Added chaos damage, life and regeneration with a chance to bleed and poison on melee hits.",
+    "drop": ["chance to cause Bleeding on Melee Hit", "chance to Poison on Melee Hit"],
+    "mods": [
+      { "stat": "chance.bleed", "kind": "base", "min": 30, "max": 50, "tags": ["melee"] },
+      { "stat": "chance.poison", "kind": "base", "min": 20, "max": 40, "tags": ["melee"] }
+    ]
+  },
+  {
+    "ref": "Winterweave",
+    "name": "Frostfire Braid",
+    "flavour": "Two cords, one hot, one cold, never unwound.",
+    "note": "Added fire and cold damage to attacks, life, cold resistance and movement speed while ignited. Dropped: reversed chill on you.",
+    "drop": ["The Effect of Chill on you is reversed"]
+  },
+  {
+    "ref": "Heartbreaker",
+    "name": "Quiet Dirk",
+    "flavour": "A blade for the last few percent.",
+    "note": "Spell damage, mana, energy shield and faster energy shield recharge, with culling strike on spells.",
+    "drop": ["10% faster start of Energy Shield Recharge", "Your Spells have Culling Strike"],
+    "mods": [
+      { "stat": "esRechargeDelay", "kind": "inc", "min": 10, "max": 10 },
+      { "stat": "cullingStrike", "kind": "flag", "min": 1, "max": 1, "tags": ["spell"] }
+    ]
+  },
+  {
+    "ref": "Mark of the Doubting Knight",
+    "name": "Twinblade Token",
+    "flavour": "Carry two answers and doubt neither.",
+    "note": "Huge physical damage at reduced attack speed with extra block while dual wielding and elemental resistance. Dropped: bleed and poison on critical strike.",
+    "drop": [
+      "5% Additional Chance to Block while Dual Wielding",
+      "Cause Bleeding on Critical Strike",
+      "Cause Poison on Critical Strike"
+    ],
+    "mods": [
+      { "stat": "blockAttack", "kind": "base", "min": 5, "max": 5, "condition": { "id": "dualWielding" } }
+    ]
+  },
+  {
+    "ref": "The Consuming Dark",
+    "name": "Blightflame Dagger",
+    "flavour": "It burns, and what it burns turns sour.",
+    "note": "Fire spell gem level, fire damage, intelligence and fire converted to chaos, with a strong chance to poison.",
+    "drop": ["Your Chaos Damage has 60% chance to Poison Enemies"],
+    "mods": [{ "stat": "chance.poison", "kind": "base", "min": 60, "max": 60 }]
+  },
+  {
+    "ref": "Ungil's Gauche",
+    "name": "Parrying Needle",
+    "flavour": "The left hand does the thinking.",
+    "note": "Physical and lightning damage, attack speed and crit chance with extra block while dual wielding.",
+    "drop": ["12% additional Chance to Block while Dual Wielding"],
+    "mods": [
+      { "stat": "blockAttack", "kind": "base", "min": 12, "max": 12, "condition": { "id": "dualWielding" } }
+    ]
+  },
+  {
+    "ref": "Widowmaker",
+    "name": "Cutpurse Edge",
+    "flavour": "Light in the hand, final in the throat.",
+    "note": "Added physical damage with high crit chance and crit multiplier. Dropped: crit chance against full-life enemies and life leech on critical strike.",
+    "drop": [
+      "Critical Strike Chance against Enemies on Full Life",
+      "Leeched as Life on Critical Strike"
+    ]
+  },
+  {
+    "ref": "Breath of the Council",
+    "name": "Conclave Rasp",
+    "flavour": "A voice from the back of the room.",
+    "note": "Huge physical damage with chaos damage and area of effect on a sceptre. Dropped: chaos skill duration.",
+    "drop": ["Chaos Skill Effect Duration"]
+  },
+  {
+    "ref": "Cerberus Limb",
+    "name": "Houndbone Sceptre",
+    "flavour": "Three mouths, one appetite.",
+    "note": "Spell damage and cast speed, with spell life leech while holding a shield (the shield-chance condition simplified to holding one). Dropped: the three conversions of shield stats.",
+    "drop": ["Leeched as Life if Equipped Shield", "on Equipped Shield"],
+    "mods": [
+      { "stat": "leech.life", "kind": "base", "min": 0.5, "max": 0.5, "tags": ["spell"], "condition": { "id": "holdingShield" } }
+    ]
+  },
+  {
+    "ref": "Death's Hand",
+    "name": "Gravetouch Sceptre",
+    "flavour": "A cold grip that knows the way out.",
+    "note": "Unholy Might on critical strike with elemental and physical damage and crit chance. Dropped: the power charge on stun.",
+    "drop": ["gain a Power Charge when you Stun", "Gain Unholy Might for 4 seconds on Critical Strike"],
+    "mods": [{ "stat": "buffOn.crit.unholyMight", "kind": "base", "min": 100, "max": 100 }]
+  },
+  {
+    "ref": "Doon Cuebiyari",
+    "name": "Brawnbound Rod",
+    "flavour": "It asks only that you keep lifting.",
+    "note": "Damage scaling with strength, plus strength, cast speed, mana and elemental damage. Dropped: the Iron Will support and the off-hand armour line.",
+    "drop": [
+      "Supported by level 30 Iron Will",
+      "increased Damage per 8 Strength when in Main Hand",
+      "increased Armour per 16 Strength when in Off Hand"
+    ],
+    "mods": [
+      { "stat": "damage", "kind": "inc", "min": 1, "max": 1, "per": { "stat": "str", "div": 8 } }
+    ]
+  },
+  {
+    "ref": "Nycta's Lantern",
+    "name": "Cinder Lamp",
+    "flavour": "A small flame in a great deal of glass.",
+    "note": "Fire gem levels, elemental, spell and physical damage and life on hit. Dropped: the fire penetration support and the added fire damage for socketed gems.",
+    "drop": [
+      "Supported by level 10 Fire Penetration",
+      "Socketed Gems deal 63 to 94 additional Fire Damage"
+    ]
+  },
+  {
+    "ref": "Singularity",
+    "name": "Collapsed Star",
+    "flavour": "Everything leans toward it eventually.",
+    "note": "Added lightning damage to spells, elemental damage, cast speed and reduced mana cost. Dropped: hindering nearby enemies and the damage bonus against hindered enemies.",
+    "drop": [
+      "reduced Mana Cost of Skills",
+      "Nearby Enemies are Hindered",
+      "against Hindered Enemies"
+    ],
+    "mods": [{ "stat": "cost", "kind": "inc", "min": -6, "max": -8 }]
+  },
+  {
+    "ref": "Spine of the First Claimant",
+    "name": "Rimebone Sceptre",
+    "flavour": "Frost sets in from the inside.",
+    "note": "Physical, cold and elemental damage with extra damage against frozen enemies, a chance to freeze and attack and cast speed. Dropped: cold damage over time multiplier.",
+    "drop": [
+      "40% increased Damage with Hits against Frozen Enemies",
+      "Cold Damage over Time Multiplier"
+    ],
+    "mods": [
+      { "stat": "damage", "kind": "inc", "min": 40, "max": 40, "condition": { "id": "targetFrozen" } }
+    ]
+  },
+  {
+    "ref": "The Dark Seer",
+    "name": "Night Oracle",
+    "flavour": "It sees best with the lights off.",
+    "note": "Elemental and general damage with mana and energy shield per level. Dropped: global blind chance.",
+    "drop": ["chance to Blind Enemies on hit"]
+  },
+  {
+    "ref": "Aegis Aurora",
+    "name": "Dawnbreak Ward",
+    "flavour": "Each blow it turns aside is paid back as light.",
+    "note": "Energy shield replenished by a share of armour when you block, with huge armour and energy shield, resistances, block and elemental damage.",
+    "drop": ["Replenishes Energy Shield by 2% of Armour when you Block"],
+    "triggers": [
+      {
+        "on": "block",
+        "chance": 100,
+        "cooldown": 0.5,
+        "effect": { "kind": "recover", "pool": "es", "pctOf": "armour", "value": 2 }
+      }
+    ]
+  },
+  {
+    "ref": "Apep's Supremacy",
+    "name": "Venomveil Barrier",
+    "flavour": "Poison is only a matter of attitude.",
+    "note": "Added chaos damage, energy shield, faster recharge, more poison on you with higher maximum resistances while poisoned and slower poison expiry. Dropped: bleeding dealing chaos damage.",
+    "drop": [
+      "You take Chaos Damage instead of Physical Damage from Bleeding",
+      "+25% chance to be Poisoned",
+      "+3% to all maximum Resistances while Poisoned",
+      "Poisons on you expire 50% slower",
+      "faster start of Energy Shield Recharge"
+    ],
+    "mods": [
+      { "stat": "esRechargeDelay", "kind": "inc", "min": 30, "max": 50 },
+      { "stat": "avoid.poison", "kind": "base", "min": -25, "max": -25 },
+      { "stat": "maxResist.allEle", "kind": "base", "min": 3, "max": 3, "condition": { "id": "poisoned" } },
+      { "stat": "durationOnSelf.poison", "kind": "inc", "min": 50, "max": 50 }
+    ]
+  },
+  {
+    "ref": "Broken Faith",
+    "name": "Shattered Creed",
+    "flavour": "What is left still blocks.",
+    "note": "Unholy Might on block with chaos leech and physical gained as chaos. Dropped: armour doubling with no energy shield.",
+    "drop": [
+      "100% increased Global Armour when you have no Energy Shield",
+      "You gain Unholy Might for 10 seconds on Block"
+    ],
+    "mods": [{ "stat": "buffOn.block.unholyMight", "kind": "base", "min": 100, "max": 100 }]
+  },
+  {
+    "ref": "Daresso's Courage",
+    "name": "Parry Disc",
+    "flavour": "A block begets a block.",
+    "note": "Block of spells and attacks after blocking (simplified to any recent block), armour and evasion, resistances.",
+    "drop": [
+      "20% chance to Block Spells if you've Blocked an Attack Recently",
+      "20% chance to Block Attacks if you've Blocked a Spell Recently"
+    ],
+    "mods": [
+      { "stat": "blockSpell", "kind": "base", "min": 20, "max": 20, "condition": { "id": "blockedRecently" } },
+      { "stat": "blockAttack", "kind": "base", "min": 20, "max": 20, "condition": { "id": "blockedRecently" } }
+    ]
+  },
+  {
+    "ref": "Esh's Visage",
+    "name": "Veilstorm Ward",
+    "flavour": "The static holds the shadows at bay.",
+    "note": "Chaos damage does not bypass energy shield unless on low life (low mana half dropped), with huge energy shield, life and resistances. Dropped: reflecting shocks.",
+    "drop": [
+      "Chaos Damage does not bypass Energy Shield while not on Low Life or Low Mana",
+      "Reflect Shocks applied to you"
+    ],
+    "mods": [
+      { "stat": "chaosNotBypassEs", "kind": "flag", "min": 1, "max": 1, "condition": { "id": "onLowLife", "not": true } }
+    ]
+  },
+  {
+    "ref": "Glitterdisc",
+    "name": "Sparkgilt Shield",
+    "flavour": "Showy, flammable and rather fond of both.",
+    "note": "Evasion and energy shield with dodge, item rarity and always igniting while burning. Dropped: avoiding fire damage.",
+    "drop": ["25% chance to avoid Fire Damage when Hit", "You always Ignite while Burning"],
+    "mods": [
+      { "stat": "chance.ignite", "kind": "base", "min": 100, "max": 100, "condition": { "id": "ignited" } }
+    ]
+  },
+  {
+    "ref": "Great Old One's Ward",
+    "name": "Deepsea Buckler",
+    "flavour": "Barnacled, patient and not entirely empty.",
+    "note": "Added physical damage to attacks, attack speed, life, movement and spell block.",
+    "drop": ["Chance to Block Spells"],
+    "mods": [{ "stat": "blockSpell", "kind": "base", "min": 8, "max": 12 }]
+  },
+  {
+    "ref": "Kaltensoul",
+    "name": "Rimeheart Buckler",
+    "flavour": "Cold at the rim and colder at the centre.",
+    "note": "Cold resistance, maximum cold resistance, physical gained as cold, cold reflect and evasion. Dropped: fire damage taken as cold.",
+    "drop": ["20% of Fire Damage taken as Cold Damage"]
+  },
+  {
+    "ref": "Light of Lunaris",
+    "name": "Moonwick Ward",
+    "flavour": "A candle that has never needed the sun.",
+    "note": "Spell crit chance, spell damage, added cold damage to spells, energy shield and block. Dropped: crit multiplier per block chance and after a non-critical strike.",
+    "drop": [
+      "Critical Strike Multiplier per 1% Block Chance",
+      "Critical Strike Multiplier if you've dealt a Non-Critical Strike Recently"
+    ]
+  },
+  {
+    "ref": "Lioneye's Remorse",
+    "name": "Rampart of Penance",
+    "flavour": "It remembers every blow it did not stop.",
+    "note": "Huge life and armour with flat physical damage taken reduction (applies to all attacks here), block and stun recovery at a movement speed cost.",
+    "drop": ["Physical Damage taken from Projectile Attacks"],
+    "mods": [{ "stat": "flatTaken.attack.physical", "kind": "base", "min": -25, "max": -25 }]
+  },
+  {
+    "ref": "Lycosidae",
+    "name": "Spidersilk Wall",
+    "flavour": "Nothing slips past a patient web.",
+    "note": "Your hits cannot be evaded, with armour, life and block. Dropped: added cold damage to counterattacks.",
+    "drop": ["Your hits can't be Evaded", "Counterattacks"],
+    "mods": [{ "stat": "alwaysHit", "kind": "flag", "min": 1, "max": 1 }]
+  }
+]

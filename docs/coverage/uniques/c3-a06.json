@@ -1,0 +1,247 @@
+[
+  {
+    "ref": "Soul Taker", "name": "Rimeheart Cleaver", "flavour": "It leaves a cold seam in whatever it opens.",
+    "note": "Big physical axe whose physical damage can chill. Dropped: attacks ignoring insufficient mana (no such rule).",
+    "drop": ["Insufficient Mana", "Your Physical Damage can Chill"],
+    "mods": [{ "stat": "canChill.physical", "kind": "flag", "min": 1, "max": 1 }]
+  },
+  {
+    "ref": "The Gryphon", "name": "Skyrend Hatchet", "flavour": "Nobody has seen it land, only arrive.",
+    "note": "Physical hatchet with life, life on kill and movement speed. Dropped: the socketed support gem.",
+    "drop": ["Chance to Flee"]
+  },
+  {
+    "ref": "The Screaming Eagle", "name": "Shrillwing Hatchet", "flavour": "Light enough to throw, loud enough to regret.",
+    "note": "Lower-level sibling: added physical, life, life on kill and movement speed. Dropped: the socketed support gem.",
+    "drop": ["Chance to Flee"]
+  },
+  {
+    "ref": "Callinellus Malleus", "name": "Tollbell Mace", "flavour": "It rings once, and the bell does not stop.",
+    "note": "Heavy physical mace with a much lower enemy stun threshold. The chill-on-stun line is simplified to physical damage being able to chill; knockback immunity dropped.",
+    "drop": ["Cannot Knock Enemies Back", "All Attack Damage Chills when you Stun"],
+    "mods": [{ "stat": "canChill.physical", "kind": "flag", "min": 1, "max": 1 }]
+  },
+  {
+    "ref": "Cameria's Maul", "name": "Hoarfrost Gavel", "flavour": "Cold weight, swung warm.",
+    "note": "Physical and added cold gavel with crit and cold attack damage. Dropped: rarity from frozen enemies.",
+    "drop": ["Rarity of Items Dropped by Frozen"]
+  },
+  {
+    "ref": "Flesh-Eater", "name": "Gorge Mallet", "flavour": "It is never full, and neither is the man holding it.",
+    "note": "Fast mace that leeches life, causes bleeding and leeches more against bleeding enemies. All three lines hand-written.",
+    "drop": ["1% of Physical Attack Damage leeched as Life", "30% Chance to cause Bleeding on Hit", "of Attack Damage leeched as Life against Bleeding Enemies"],
+    "mods": [
+      { "stat": "leech.life", "kind": "base", "min": 1, "max": 1, "damageTypes": ["physical"], "tags": ["attack"] },
+      { "stat": "chance.bleed", "kind": "base", "min": 30, "max": 30 },
+      { "stat": "leech.life", "kind": "base", "min": 3, "max": 3, "tags": ["attack"], "condition": { "id": "targetBleeding" } }
+    ]
+  },
+  {
+    "ref": "Frostbreath", "name": "Rimeblow Mace", "flavour": "Breathe in and the lungs freeze first.",
+    "note": "Physical plus cold mace with chill duration; attacks deal double damage to chilled enemies (written as 100% more attack damage against chilled enemies, not weapon-local).",
+    "drop": ["double Damage to Chilled Enemies"],
+    "mods": [{ "stat": "damage", "kind": "more", "min": 100, "max": 100, "tags": ["attack"], "condition": { "id": "targetChilled" } }]
+  },
+  {
+    "ref": "Mjölner", "name": "Skybolt Gavel", "flavour": "Struck once, answered from above.",
+    "note": "Lightning spells socketed in it fire on hit, with spells chaining one extra time and lightning attack damage. Dropped: attribute requirement lines and the extra damage on triggered spells.",
+    "drop": ["Strength Requirement", "Intelligence Requirement", "Socketed Lightning Spells deal 100%", "Trigger a Socketed Lightning Spell on Hit", "Skills Chain +1 times"],
+    "sockets": 3,
+    "mods": [{ "stat": "chains", "kind": "base", "min": 1, "max": 1 }],
+    "triggers": [{ "on": "hit", "chance": 100, "cooldown": 0.5, "effect": { "kind": "castSocketed", "spellTags": ["lightning"] } }]
+  },
+  {
+    "ref": "Nebuloch", "name": "Gritstone Maul", "flavour": "Each fall of the head makes it harder to knock down.",
+    "note": "Huge physical maul gaining physical as fire, with flat physical, armour, chaos resistance and elemental damage reduction per grit charge. Dropped: fire damage taken over time while hit recently, and the 'when hit' qualifier.",
+    "drop": ["of Physical Attack Damage as Extra Fire Damage", "Elemental Damage taken when Hit per Endurance Charge", "Fire Damage taken per second per Endurance Charge"],
+    "mods": [
+      { "stat": "gain.physical.fire", "kind": "base", "min": 30, "max": 40, "tags": ["attack"] },
+      { "stat": "damageTaken.fire", "kind": "inc", "min": -1, "max": -1, "per": { "stat": "charges.grit", "div": 1 } },
+      { "stat": "damageTaken.cold", "kind": "inc", "min": -1, "max": -1, "per": { "stat": "charges.grit", "div": 1 } },
+      { "stat": "damageTaken.lightning", "kind": "inc", "min": -1, "max": -1, "per": { "stat": "charges.grit", "div": 1 } }
+    ]
+  },
+  {
+    "ref": "Ahn's Might", "name": "Stillhunger Blade", "flavour": "It wants the swing and nothing else.",
+    "note": "Huge added physical and crit chance sword at the cost of a maximum fervour charge, with area of effect. Dropped: strength requirement, the crit multiplier with no charges and the accuracy at maximum charges.",
+    "drop": ["Strength Requirement", "Global Critical Strike Multiplier while you have no Frenzy Charges", "Accuracy Rating while at Maximum Frenzy Charges"]
+  },
+  {
+    "ref": "Dreadbeak", "name": "Carrion Brand", "flavour": "Corvids know the weak before the weak do.",
+    "note": "Rusted sword that doubles damage on low life, gives life on hit and quickened speeds on low life (the three speed lines of the quickened buff, written by hand).",
+    "drop": ["You have Onslaught while on Low Life"],
+    "mods": [
+      { "stat": "attackSpeed", "kind": "inc", "min": 20, "max": 20, "condition": { "id": "onLowLife" } },
+      { "stat": "castSpeed", "kind": "inc", "min": 20, "max": 20, "condition": { "id": "onLowLife" } },
+      { "stat": "moveSpeed", "kind": "inc", "min": 20, "max": 20, "condition": { "id": "onLowLife" } }
+    ]
+  },
+  {
+    "ref": "Dreamfeather", "name": "Veilwing Blade", "flavour": "Light as a thought and nearly as hard to catch.",
+    "note": "Accuracy, added physical, attack speed, evasion and a little movement speed on an eternal sword. Dropped: attack damage per evasion rating.",
+    "drop": ["per 450 Evasion Rating"]
+  },
+  {
+    "ref": "Ephemeral Edge", "name": "Wraith Razor", "flavour": "It cuts, and then it was never there.",
+    "note": "Huge physical, global crit and accuracy with mana leech; costs maximum life for more energy shield. Both life lines hand-written.",
+    "drop": ["10% reduced Maximum Life", "increased Maximum Energy Shield"],
+    "mods": [
+      { "stat": "life", "kind": "inc", "min": -10, "max": -10 },
+      { "stat": "es", "kind": "inc", "min": 40, "max": 50 }
+    ]
+  },
+  {
+    "ref": "Grelwood Shank", "name": "Rootbound Sword", "flavour": "Stand still long enough and it puts out shoots.",
+    "note": "Physical sword with armour while stationary, Close Quarters and Plated Hide while stationary; two extra projectiles after being hit.",
+    "drop": ["2 additional Projectiles if you've been Hit Recently"],
+    "mods": [{ "stat": "projectiles", "kind": "base", "min": 2, "max": 2, "condition": { "id": "beenHitRecently" } }]
+  },
+  {
+    "ref": "Hyaon's Fury", "name": "Stormfrenzy Blade", "flavour": "The more it spins up, the less it spares.",
+    "note": "Wide lightning added damage sword with lightning damage and life on kill per fervour charge; takes more damage per charge (written by hand).",
+    "drop": ["increased Damage taken per Frenzy Charge"],
+    "mods": [{ "stat": "damageTaken", "kind": "inc", "min": 1, "max": 1, "per": { "stat": "charges.fervour", "div": 1 } }]
+  },
+  {
+    "ref": "Innsbury Edge", "name": "Blightcut Sword", "flavour": "A rot that learned to hold a grip.",
+    "note": "Physical sword converting a quarter of it to chaos with chaos leech. Dropped: Maim on hit.",
+    "drop": ["Maim on hit"]
+  },
+  {
+    "ref": "Oni-Goroshi", "name": "Scarlet Rite", "flavour": "A debt written in six red sockets.",
+    "note": "Crit chance and flat physical damage to attacks per character level. Dropped: its fire self-damage drawback while ignited, the two-hand rule and the socket line.",
+    "drop": ["Sockets: R-R-R-R-R-R", "Uses both hand slots", "Her Embrace"]
+  },
+  {
+    "ref": "Razor of the Seventh Sun", "name": "Noonfire Razor", "flavour": "Sharpened at the hour with no shadow.",
+    "note": "Physical sword converting a quarter to fire with ignite chance, and much more melee physical damage against ignited enemies. Dropped: the burning damage and life recovery on igniting.",
+    "drop": ["Burning Damage if you've Ignited", "Recover 1% of Maximum Life when you Ignite", "Melee Physical Damage against Ignited Enemies"],
+    "mods": [{ "stat": "damage", "kind": "inc", "min": 100, "max": 100, "damageTypes": ["physical"], "tags": ["melee"], "condition": { "id": "targetIgnited" } }]
+  },
+  {
+    "ref": "Redbeak", "name": "Crowpeck Sword", "flavour": "A cheaper sibling with the same appetite.",
+    "note": "Same low-life damage and life on hit; written by hand where the reference capitalises the line.",
+    "drop": ["Life Gained for each Enemy hit by Attacks"],
+    "mods": [{ "stat": "lifeOnHit", "kind": "base", "min": 2, "max": 2, "tags": ["attack"] }]
+  },
+  {
+    "ref": "Rigwald's Command", "name": "Pairbound Blade", "flavour": "It only keeps good company.",
+    "note": "Big added physical, axe physical damage, accuracy and frenzy on kill; extra attack block while dual wielding (written by hand).",
+    "drop": ["Block Chance while Dual Wielding"],
+    "mods": [{ "stat": "blockAttack", "kind": "base", "min": 10, "max": 10, "condition": { "id": "dualWielding" } }]
+  },
+  {
+    "ref": "The Goddess Scorned", "name": "Cinderwrath Sabre", "flavour": "A slight, kept burning.",
+    "note": "Huge physical damage fully converted to fire, big crit, fire resistance, ignite immunity and faster ignites. Dropped: the two-hand rule and the damage-source restriction.",
+    "drop": ["Uses both hand slots", "Ignited Enemies Burn 50% faster", "You can only deal Damage with this Weapon and Ignite"],
+    "mods": [{ "stat": "ignite.speed", "kind": "inc", "min": 50, "max": 50 }]
+  },
+  {
+    "ref": "The Tempestuous Steel", "name": "Squallforged Sword", "flavour": "Hammered between two storms.",
+    "note": "Hits cannot be evaded, physical as extra fire and lightning, and elemental penetration. All three lines hand-written; penetration is not weapon-local.",
+    "drop": ["Penetrate 30% Elemental Resistances", "Physical Attack Damage Added as Lightning Damage", "Physical Attack Damage Added as Fire Damage"],
+    "mods": [
+      { "stat": "penetration", "kind": "base", "min": 30, "max": 30, "damageTypes": ["fire", "cold", "lightning"] },
+      { "stat": "gain.physical.lightning", "kind": "base", "min": 15, "max": 15, "tags": ["attack"] },
+      { "stat": "gain.physical.fire", "kind": "base", "min": 15, "max": 15, "tags": ["attack"] }
+    ]
+  },
+  {
+    "ref": "Cragfall", "name": "Landslide Quiver", "flavour": "The mountain gave up one more stone.",
+    "note": "Added physical to bow attacks, lower enemy stun threshold, longer stuns and slow arrows. Dropped: the chance to double stun duration.",
+    "drop": ["chance to double Stun Duration"]
+  },
+  {
+    "ref": "Drillneck", "name": "Borehead Quiver", "flavour": "Straight through, and keep going.",
+    "note": "Arrows pierce an additional target with attack speed, evasion, life and added physical. Dropped: extra damage to pierced targets.",
+    "drop": ["Targets they Pierce"]
+  },
+  {
+    "ref": "Maloney's Nightfall", "name": "Duskveil Quiver", "flavour": "The last light goes out one arrow at a time.",
+    "note": "Attack speed, life, chaos resistance and added physical to bow attacks. Dropped: the smoke cloud and the blinded-enemy damage.",
+    "drop": ["Smoke Cloud", "against Blinded Enemies"]
+  },
+  {
+    "ref": "Rearguard", "name": "Bulwark Quiver", "flavour": "It faces the way you came from.",
+    "note": "Armour, block, spell block and stun recovery with projectile damage and speed.",
+    "drop": ["Chance to Block Spells"],
+    "mods": [{ "stat": "blockSpell", "kind": "base", "min": 12, "max": 15 }]
+  },
+  {
+    "ref": "Soul Strike", "name": "Wraithpoint Quiver", "flavour": "A point sharpened on someone else's regret.",
+    "note": "Added chaos to attacks, dexterity and energy shield with slower recharge but a faster start.",
+    "drop": ["faster start of Energy Shield Recharge"],
+    "mods": [{ "stat": "esRechargeDelay", "kind": "inc", "min": 80, "max": 80 }]
+  },
+  {
+    "ref": "Berek's Grip", "name": "Stormfrost Band", "flavour": "Two weathers on one finger.",
+    "note": "Cold and lightning resistance, cold damage, lightning added to spells and attacks and life; leeches life against shocked enemies. Dropped: the energy shield leech against frozen enemies.",
+    "drop": ["Leeched as Life against Shocked Enemies", "Leeched as Energy Shield against Frozen Enemies"],
+    "mods": [{ "stat": "leech.life", "kind": "base", "min": 1, "max": 1, "condition": { "id": "targetShocked" } }]
+  },
+  {
+    "ref": "Berek's Respite", "name": "Cinderstorm Band", "flavour": "What burns spreads; what sparks answers.",
+    "note": "Fire and lightning resistance, added fire to spells and attacks, lightning damage and mana. Killing a shocked enemy shocks those near it and killing an ignited one ignites them.",
+    "drop": ["Shocks all nearby Enemies on Killing", "Ignites all nearby Enemies on Killing"],
+    "triggers": [
+      { "on": "kill", "targetHas": "shock", "chance": 100, "cooldown": 0, "effect": { "kind": "spread", "ailment": "shock", "radius": 3 } },
+      { "on": "kill", "targetHas": "ignite", "chance": 100, "cooldown": 0, "effect": { "kind": "spread", "ailment": "ignite", "radius": 3 } }
+    ]
+  },
+  {
+    "ref": "Emberwake", "name": "Smoldering Coil", "flavour": "A slow fire that keeps count.",
+    "note": "Fire damage, cast speed and ignite chance; one extra ignite on an enemy, and ignites burn slower (a trade the reference makes).",
+    "drop": ["additional Ignite on an Enemy", "Burn 50% slower"],
+    "mods": [
+      { "stat": "ignite.extra", "kind": "base", "min": 1, "max": 1 },
+      { "stat": "ignite.speed", "kind": "inc", "min": -50, "max": -50 }
+    ]
+  },
+  {
+    "ref": "Kaom's Sign", "name": "Bastion Loop", "flavour": "A little more to lean on.",
+    "note": "Strength, life on hit and one more maximum grit charge.",
+    "drop": ["Maximum Endurance Charge"],
+    "mods": [{ "stat": "maxCharges.grit", "kind": "base", "min": 1, "max": 1 }]
+  },
+  {
+    "ref": "Kaom's Way", "name": "Wellspring Loop", "flavour": "The longer you hold the line, the better you feel.",
+    "note": "Strength, life on hit, one more maximum grit charge and life regeneration per grit charge.",
+    "drop": ["Maximum Endurance Charge", "of maximum Life Regenerated per second per Endurance Charge"],
+    "mods": [
+      { "stat": "maxCharges.grit", "kind": "base", "min": 1, "max": 1 },
+      { "stat": "lifeRegenPct", "kind": "base", "min": 0.4, "max": 0.4, "per": { "stat": "charges.grit", "div": 1 } }
+    ]
+  },
+  {
+    "ref": "Lori's Lantern", "name": "Dimlamp Ring", "flavour": "It shines best when the room is lost.",
+    "note": "All elemental resistances and movement speed on low life, with chaos resistance on low life. Dropped: enemies being unlucky against you.",
+    "drop": ["Chaos Resistance when on Low Life", "Enemies are Unlucky"],
+    "mods": [{ "stat": "resist.chaos", "kind": "base", "min": 20, "max": 25, "condition": { "id": "onLowLife" } }]
+  },
+  {
+    "ref": "Ming's Heart", "name": "Hollow Amethyst", "flavour": "Emptier, and so more room for the poison.",
+    "note": "Chaos resistance and physical as extra chaos at a cost of life and energy shield."
+  },
+  {
+    "ref": "Mokou's Embrace", "name": "Pyre Clasp", "flavour": "The warmth is the price.",
+    "note": "Fire damage, cold resistance, ignite chance and attack and cast speed while ignited; ignited more easily (a negative chance to avoid ignite).",
+    "drop": ["chance to be Ignited"],
+    "mods": [{ "stat": "avoid.ignite", "kind": "base", "min": -25, "max": -25 }]
+  },
+  {
+    "ref": "Ngamahu's Sign", "name": "Kindling Loop", "flavour": "A spark with a ring around it.",
+    "note": "Strength, added fire, ignite chance and longer ignites. Dropped: life gained on igniting.",
+    "drop": ["Life Gained on Igniting an Enemy"]
+  },
+  {
+    "ref": "Perandus Signet", "name": "Hoarder's Seal", "flavour": "A small, patient fortune.",
+    "note": "Mana, mana regeneration and experience. Dropped: intelligence per unique item and scroll drops.",
+    "drop": ["Intelligence for each Unique Item", "Scrolls of Wisdom"]
+  },
+  {
+    "ref": "Praxis", "name": "Frugal Band", "flavour": "Every cast costs a little less than it should.",
+    "note": "Mana, mana regeneration and a flat cut to skill mana cost. Dropped: mana gained from damage taken.",
+    "drop": ["to Mana Cost of Skills", "Damage taken gained as Mana"],
+    "mods": [{ "stat": "costFlat", "kind": "base", "min": -4, "max": -8 }]
+  }
+]

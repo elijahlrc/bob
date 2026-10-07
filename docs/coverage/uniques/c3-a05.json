@@ -1,0 +1,202 @@
+[
+  {
+    "ref": "Fenumus' Toxins",
+    "name": "Wormwood Circlet",
+    "flavour": "Sweet on the tongue, bitter by the third breath.",
+    "note": "Energy shield and added chaos to spells, with poison chance and poison damage that grow per power charge. Power charges now come from any hit at 10% (the spider web condition and the aspect rider were dropped).",
+    "drop": ["Power Charge on hitting", "chance to Poison per Power Charge", "Damage with Poison per Power Charge", "Aspect of the Spider"],
+    "mods": [
+      { "stat": "chargeOn.hit.insight", "kind": "base", "min": 10, "max": 10 },
+      { "stat": "chance.poison", "kind": "base", "min": 6, "max": 10, "per": { "stat": "charges.insight", "div": 1 } },
+      { "stat": "damage", "kind": "inc", "min": 15, "max": 20, "tags": ["poison"], "per": { "stat": "charges.insight", "div": 1 } }
+    ]
+  },
+  {
+    "ref": "Flamesight",
+    "name": "Hearthfire Halo",
+    "flavour": "Warm behind the eyes, and warmer in front of them.",
+    "note": "Energy shield, fire resistance and elemental damage on a circlet. Dropped: scorch chance, the ignite drawback and the sextant line.",
+    "drop": ["Scorch Enemies", "Cannot inflict Ignite", "per Sextant"]
+  },
+  {
+    "ref": "Galesight",
+    "name": "Rimeglass Halo",
+    "flavour": "Breath hangs in the air around whoever wears it.",
+    "note": "Energy shield, cold resistance and elemental damage on a circlet. Dropped: brittle chance, the freeze and chill drawback and the sextant line.",
+    "drop": ["inflict Brittle", "Cannot inflict Freeze or Chill", "per Sextant"]
+  },
+  {
+    "ref": "Thundersight",
+    "name": "Stormwire Halo",
+    "flavour": "Hair stands up before the thought does.",
+    "note": "Energy shield, lightning resistance and elemental damage on a circlet. Dropped: sap chance, the shock drawback and the sextant line.",
+    "drop": ["Sap Enemies", "Cannot inflict Shock", "per Sextant"]
+  },
+  {
+    "ref": "Fractal Thoughts",
+    "name": "Lattice Mask",
+    "flavour": "Every idea contains a smaller one, and so on.",
+    "note": "Evasion and energy shield, elemental damage per ten dexterity and life per ten intelligence. Dropped the two lines that compare attributes against each other.",
+    "drop": ["Multiplier if Dexterity is higher", "Dexterity if Strength is higher", "Maximum Life per 10 Intelligence"],
+    "mods": [{ "stat": "life", "kind": "base", "min": 2, "max": 2, "per": { "stat": "int", "div": 10 } }]
+  },
+  {
+    "ref": "Frostferno",
+    "name": "Emberfrost Hood",
+    "flavour": "Frost on one cheek, flame on the other.",
+    "note": "Plus two to fire and cold gems, big evasion, mana regeneration and fire and cold resistance. The socketed cold-to-fire support became a global 50% cold to fire conversion (value ours).",
+    "drop": ["Supported by Level 30 Cold to Fire"],
+    "mods": [{ "stat": "convert.cold.fire", "kind": "base", "min": 50, "max": 50 }]
+  },
+  {
+    "ref": "Geofri's Legacy",
+    "name": "Vigil Crown",
+    "flavour": "Kept on a long watch and never taken off.",
+    "note": "Plus one socketed gems, armour and energy shield and all four resistances including chaos. Dropped the holy relic lines.",
+    "drop": ["Holy Relics"]
+  },
+  {
+    "ref": "Honourhome",
+    "name": "Sergeant's Helm",
+    "flavour": "Home is wherever the line holds.",
+    "note": "Plus socketed gem levels, added lightning, armour and energy shield, item rarity and reduced mana cost of skills.",
+    "drop": ["Mana Cost of Skills"],
+    "mods": [{ "stat": "cost", "kind": "inc", "min": -10, "max": -20 }]
+  },
+  {
+    "ref": "Hrimnor's Resolve",
+    "name": "Embergrate Helm",
+    "flavour": "Hot iron over a cold head.",
+    "note": "Fire damage, armour, life and cold resistance. Dropped the recent-fire-skill chill and freeze immunity.",
+    "drop": ["Cannot be Frozen or Chilled if"]
+  },
+  {
+    "ref": "Kitava's Thirst",
+    "name": "Tithe Helm",
+    "flavour": "It always wants a little more than it is given.",
+    "note": "Armour and energy shield, mana and a cast speed penalty, with a 30% chance to cast a socketed spell whenever you cast a spell (the 100 mana spent threshold was dropped; 0.25 s cooldown).",
+    "drop": ["Cast Socketed Spells when", "you Spend at least 100 Mana"],
+    "triggers": [{ "on": "cast", "chance": 30, "cooldown": 0.25, "effect": { "kind": "castSocketed" } }]
+  },
+  {
+    "ref": "Malachai's Simula",
+    "name": "Veinletter Mask",
+    "flavour": "Written in the margin of the wearer's own pulse.",
+    "note": "Blood magic with spell, lightning and strength bonuses. Dropped the unmapped extra rider line.",
+    "drop": ["Mortal Conviction"]
+  },
+  {
+    "ref": "Malachai's Vision",
+    "name": "Gravegilt Crown",
+    "flavour": "Costly to wear and costlier to take off.",
+    "note": "Added chaos damage, energy shield and cold and lightning resistance. Bob has no corrupted items, so the two regeneration lines that need all items corrupted were dropped.",
+    "drop": ["if all Equipped Items are Corrupted"]
+  },
+  {
+    "ref": "Maw of Conquest",
+    "name": "Gullet Circlet",
+    "flavour": "It swallows what the world serves it.",
+    "note": "Spell crit chance, energy shield and life with poison immunity. Dropped the damage-taken-as-life-over-time line.",
+    "drop": ["Unaffected by Poison", "of Damage taken gained a Life"],
+    "mods": [{ "stat": "avoid.poison", "kind": "base", "min": 100, "max": 100 }]
+  },
+  {
+    "ref": "Rat's Nest",
+    "name": "Burrower's Pelt",
+    "flavour": "Warm, crowded and always moving.",
+    "note": "Attack speed, global crit chance, evasion, item rarity and movement speed. Dropped the smaller character size.",
+    "drop": ["Character Size"]
+  },
+  {
+    "ref": "Starkonja's Head",
+    "name": "Cutpurse Hood",
+    "flavour": "Quick when cornered, useless when not.",
+    "note": "Evasion, dexterity, attack speed, crit chance and life, with a big evasion bonus and a damage penalty while on low life.",
+    "drop": ["reduced Damage when on Low Life", "Global Evasion Rating when on Low Life"],
+    "mods": [
+      { "stat": "damage", "kind": "inc", "min": -50, "max": -50, "condition": { "id": "onLowLife" } },
+      { "stat": "evasion", "kind": "inc", "min": 150, "max": 150, "condition": { "id": "onLowLife" } }
+    ]
+  },
+  {
+    "ref": "The Brine Crown",
+    "name": "Saltmarsh Crown",
+    "flavour": "Plant your feet and the tide comes to you.",
+    "note": "Armour and energy shield, life, cold resistance, freeze immunity and a big flat armour and mana regeneration bonus while stationary (1500 armour scaled to 900). Dropped the chilled ground.",
+    "drop": ["Armour while stationary", "Chilled Ground"],
+    "mods": [{ "stat": "armour", "kind": "base", "min": 900, "max": 900, "condition": { "id": "stationary" } }]
+  },
+  {
+    "ref": "The Peregrine",
+    "name": "Kestrel Sallet",
+    "flavour": "Sees the mouse from a mile up.",
+    "note": "Accuracy, armour and evasion, item rarity, lightning resistance, movement speed and a little mana leech from attacks.",
+    "drop": ["Leeched as Mana"],
+    "mods": [{ "stat": "leech.mana", "kind": "base", "min": 0.4, "max": 0.4, "tags": ["attack"] }]
+  },
+  {
+    "ref": "The Three Dragons",
+    "name": "Triad Mask",
+    "flavour": "Three faces, none of them on the right element.",
+    "note": "Elemental resistances and the ailment shuffle: fire damage can shock, cold damage can ignite, lightning damage can freeze. The 'but not' halves were dropped.",
+    "drop": ["can Shock but not Ignite", "can Ignite but not Freeze or Chill", "can Freeze but not Shock"],
+    "mods": [
+      { "stat": "canShock.fire", "kind": "flag", "min": 1, "max": 1 },
+      { "stat": "canIgnite.cold", "kind": "flag", "min": 1, "max": 1 },
+      { "stat": "canFreeze.lightning", "kind": "flag", "min": 1, "max": 1 }
+    ]
+  },
+  {
+    "ref": "The Vertex",
+    "name": "Aperture Mask",
+    "flavour": "Opens wide on the thing behind the thing.",
+    "note": "Plus socketed gem level, evasion and energy shield, flat energy shield and chaos resistance. Dropped the socketed mana cost reduction and the enemy mana leech line.",
+    "drop": ["reduced Mana Cost", "Leech Mana from You"]
+  },
+  {
+    "ref": "Voll's Vision",
+    "name": "Seneschal Crown",
+    "flavour": "The household runs on whatever you will not look at.",
+    "note": "Armour, fire and chaos resistance, plus maximum life and large life regeneration. Bob has no corrupted items, so the no-corrupted condition always holds and is applied unconditionally.",
+    "drop": ["if no Equipped Items are Corrupted"],
+    "mods": [
+      { "stat": "life", "kind": "inc", "min": 8, "max": 12 },
+      { "stat": "lifeRegen", "kind": "base", "min": 100, "max": 100 }
+    ]
+  },
+  {
+    "ref": "Dreadsurge",
+    "name": "Cindercleave",
+    "flavour": "Hits like a forge door slamming.",
+    "note": "Huge added fire damage, attack and movement speed, fire resistance, and fire penetration while you are ignited (full ignore stood in for as 100% penetration).",
+    "drop": ["ignore Enemy Monster Fire Resistance"],
+    "mods": [{ "stat": "penetration", "kind": "base", "min": 100, "max": 100, "damageTypes": ["fire"], "condition": { "id": "ignited" } }]
+  },
+  {
+    "ref": "Jack, the Axe",
+    "name": "Flensing Hatchet",
+    "flavour": "It is only ever in a hurry to be finished.",
+    "note": "Physical damage, attack speed, bleeding and life leech, with a leech rate penalty (applies to life and mana leech).",
+    "drop": ["Life Leeched per second"],
+    "mods": [{ "stat": "leechRate", "kind": "inc", "min": -50, "max": -50 }]
+  },
+  {
+    "ref": "Relentless Fury",
+    "name": "Tally Axe",
+    "flavour": "One notch for each, and no room left on the haft.",
+    "note": "Physical damage, life leech and culling strike, with onslaught on kill (stood in for onslaught on culling strike) and chill immunity while onslaught is active.",
+    "drop": ["Onslaught for 3 seconds on Culling Strike", "Cannot be Chilled while you have Onslaught"],
+    "mods": [
+      { "stat": "buffOn.kill.onslaught", "kind": "base", "min": 100, "max": 100 },
+      { "stat": "cannotBeChilled", "kind": "flag", "min": 1, "max": 1, "condition": { "id": "onslaught" } }
+    ]
+  },
+  {
+    "ref": "Rigwald's Savagery",
+    "name": "Twinblade Axe",
+    "flavour": "Meant for one hand, and wanting another.",
+    "note": "Big added physical, attack speed and bleed chance, with extra physical weapon damage while dual wielding.",
+    "drop": ["Physical Weapon Damage while Dual Wielding"],
+    "mods": [{ "stat": "damage", "kind": "inc", "min": 40, "max": 40, "damageTypes": ["physical"], "tags": ["attack"], "condition": { "id": "dualWielding" } }]
+  }
+]

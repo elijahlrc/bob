@@ -1,0 +1,652 @@
+[
+  {
+    "ref": "The Retch",
+    "name": "Bilge Sash",
+    "flavour": "It smells of the road, and the road smells of it.",
+    "note": "Belt that lengthens flask duration, trades some charge gain for it, and speeds you while a flask is active, with physical damage, life, cold resistance and attack leech. Dropped: life leech applying to enemies as chaos damage.",
+    "drop": [
+      "Flask Effect Duration",
+      "Flask Charges gained while using",
+      "Movement Speed while using a Flask",
+      "Life Leech applies to enemies"
+    ],
+    "mods": [
+      {
+        "stat": "flaskDuration",
+        "kind": "inc",
+        "min": 60,
+        "max": 60
+      },
+      {
+        "stat": "flaskCharges",
+        "kind": "inc",
+        "min": -30,
+        "max": -30,
+        "condition": {
+          "id": "flaskActive"
+        }
+      },
+      {
+        "stat": "moveSpeed",
+        "kind": "inc",
+        "min": 15,
+        "max": 15,
+        "condition": {
+          "id": "flaskActive"
+        }
+      }
+    ]
+  },
+  {
+    "ref": "The Tactician",
+    "name": "Stockroom Girdle",
+    "flavour": "Count the supplies twice, then count the exits.",
+    "note": "Belt that fills flasks faster (50% increased charges gained) with physical damage, strength and intelligence. Dropped: the two attribute-threshold lines (elemental resistances at 200 strength, crit chance at 200 intelligence).",
+    "drop": [
+      "Flask Charges gained",
+      "at least 200 Strength",
+      "at least 200 Intelligence"
+    ],
+    "mods": [
+      {
+        "stat": "flaskCharges",
+        "kind": "inc",
+        "min": 50,
+        "max": 50
+      }
+    ]
+  },
+  {
+    "ref": "Wurm's Molt",
+    "name": "Moult Cord",
+    "flavour": "Shed in one piece, and still warm.",
+    "note": "Life, strength, intelligence, cold resistance and physical attack leech as life and mana. The life line is hand-written (capitalisation the translator misses).",
+    "drop": [
+      "to Maximum Life"
+    ],
+    "mods": [
+      {
+        "stat": "life",
+        "kind": "base",
+        "min": 25,
+        "max": 40
+      }
+    ]
+  },
+  {
+    "ref": "Ashrend",
+    "name": "Ashward Jerkin",
+    "flavour": "The fire never gets past the stitching.",
+    "note": "Evasion, life, fire resistance, cannot be ignited and flat physical damage reduction from attacks. Dropped: the socketed Added Fire Damage support and physical damage with ranged weapons.",
+    "drop": [
+      "Supported by level 10 Added Fire Damage",
+      "with Ranged Weapons"
+    ]
+  },
+  {
+    "ref": "Cloak of Defiance",
+    "name": "Mindwall Robe",
+    "flavour": "Hurt the thought before you hurt the thinker.",
+    "note": "Evasion and energy shield, big mana pool, 1% of mana regenerated per second, and the keystone that takes damage from mana before life. Dropped: the extra 10% of damage taken from mana (the keystone already does it).",
+    "drop": [
+      "of Damage is taken from Mana before Life",
+      "1% of Mana Regenerated per second"
+    ],
+    "mods": [
+      {
+        "stat": "manaRegenPct",
+        "kind": "base",
+        "min": 1,
+        "max": 1
+      }
+    ]
+  },
+  {
+    "ref": "Crystal Vault",
+    "name": "Rime Lattice",
+    "flavour": "Frost is a kind of armour if you let it set.",
+    "note": "Cold resistance, cannot be chilled, 20% of physical taken as cold, armour and energy shield, plus increased effect of chill. Dropped: 30% of fire damage taken as cold (only physical conversion exists).",
+    "drop": [
+      "Fire Damage from Hits taken as Cold Damage",
+      "Effect of Chill"
+    ],
+    "mods": [
+      {
+        "stat": "effect.chill",
+        "kind": "inc",
+        "min": 15,
+        "max": 20
+      }
+    ]
+  },
+  {
+    "ref": "Daresso's Defiance",
+    "name": "Drake Hide Plate",
+    "flavour": "Scales turn a blade more often than a hand does.",
+    "note": "Armour and evasion, leech and a 6% chance to dodge attacks, with endurance charges gained on kill and onslaught when hit. Dropped: losing all endurance charges when hit, and the per-charge onslaught duration and effect (flat onslaught chance used instead).",
+    "drop": [
+      "Chance to Dodge Attacks",
+      "lose all Endurance Charges",
+      "Endurance Charge on Kill",
+      "Onslaught for 5 second",
+      "Onslaught Effect"
+    ],
+    "mods": [
+      {
+        "stat": "dodgeAttack",
+        "kind": "base",
+        "min": 6,
+        "max": 6
+      },
+      {
+        "stat": "chargeOn.kill.grit",
+        "kind": "base",
+        "min": 100,
+        "max": 100
+      },
+      {
+        "stat": "buffOn.hitTaken.onslaught",
+        "kind": "base",
+        "min": 100,
+        "max": 100
+      }
+    ]
+  },
+  {
+    "ref": "Fox's Fortune",
+    "name": "Russet Wraps",
+    "flavour": "Light enough to run in, and always lucky about it.",
+    "note": "Huge evasion while on full life, flat and percentage evasion, added physical damage to attacks, dexterity and movement speed. Dropped: enemies unlucky when damaging you on full life, and the level requirement line.",
+    "drop": [
+      "Requires level 54",
+      "Enemies are Unlucky"
+    ]
+  },
+  {
+    "ref": "Geofri's Sanctuary",
+    "name": "Hallowed Ringmail",
+    "flavour": "Hold the faith and the faith holds you.",
+    "note": "Armour and energy shield, life, all elemental resistances, and flat energy shield that grows with strength (0.9 per 5, the 0.45 scale applied).",
+    "drop": [
+      "maximum Energy Shield per 5 Strength"
+    ],
+    "mods": [
+      {
+        "stat": "es",
+        "kind": "base",
+        "min": 0.9,
+        "max": 0.9,
+        "per": {
+          "stat": "str",
+          "div": 5
+        }
+      }
+    ]
+  },
+  {
+    "ref": "Greed's Embrace",
+    "name": "Hoard Plate",
+    "flavour": "Gold is heavy, and so is wanting it.",
+    "note": "Item quantity and rarity paid for with fire and lightning resistance and movement speed. Dropped: reduced strength requirement.",
+    "drop": [
+      "Strength Requirement"
+    ]
+  },
+  {
+    "ref": "Hyrri's Ire",
+    "name": "Rimeshot Leathers",
+    "flavour": "Every arrow arrives already frozen.",
+    "note": "Dexterity, evasion, chill duration and dodge chances for attacks and spells. Dropped: added cold damage to bow attacks.",
+    "drop": [
+      "Cold Damage to Bow Attacks"
+    ]
+  },
+  {
+    "ref": "Incandescent Heart",
+    "name": "Ember Halo Mail",
+    "flavour": "Something inside is burning and has chosen not to hurry.",
+    "note": "Armour and energy shield, life, elemental damage gained as extra chaos and attack life leech. Dropped: 25% of elemental damage taken as chaos (no such conversion stat).",
+    "drop": [
+      "Elemental Damage taken as Chaos Damage"
+    ]
+  },
+  {
+    "ref": "Infernal Mantle",
+    "name": "Cinder Vestment",
+    "flavour": "Cut from the part of the fire nobody sees.",
+    "note": "Plus one to fire gems, fire damage, doubled crit chance, energy shield and fire converted to chaos. Dropped: increased spell damage taken on low mana.",
+    "drop": [
+      "Spell Damage taken when on Low Mana"
+    ]
+  },
+  {
+    "ref": "Inpulsa's Broken Heart",
+    "name": "Voltaic Rags",
+    "flavour": "The charge goes out of the dead and into the crowd.",
+    "note": "Shocked enemies you kill explode for 5% of their maximum life as lightning damage (a kill trigger), unaffected by shock, life and effect of shock. Dropped: increased damage after shocking an enemy recently.",
+    "drop": [
+      "Unaffected by Shock",
+      "Shocked Enemies you Kill Explode",
+      "their Maximum Life as Lightning",
+      "Shocked an Enemy Recently"
+    ],
+    "mods": [
+      {
+        "stat": "unaffectedByShock",
+        "kind": "flag",
+        "min": 1,
+        "max": 1
+      }
+    ],
+    "triggers": [
+      {
+        "on": "kill",
+        "targetHas": "shock",
+        "chance": 100,
+        "cooldown": 0,
+        "effect": {
+          "kind": "explode",
+          "pctOfMaxLife": 5,
+          "dtype": "lightning",
+          "radius": 2.5
+        }
+      }
+    ]
+  },
+  {
+    "ref": "Kaom's Heart",
+    "name": "Emberhold Plate",
+    "flavour": "No room for anything but a pulse.",
+    "note": "No sockets, 500 life and fire damage on a heavy plate."
+  },
+  {
+    "ref": "Kintsugi",
+    "name": "Seamed Leather",
+    "flavour": "The cracks are the strongest part.",
+    "note": "Evasion, life, fire resistance, 20% less damage taken while not hit recently and 50% increased evasion once hit recently.",
+    "drop": [
+      "20% less Damage taken if you have not been Hit Recently",
+      "50% increased Evasion if you have been Hit Recently"
+    ],
+    "mods": [
+      {
+        "stat": "damageTaken",
+        "kind": "more",
+        "min": -20,
+        "max": -20,
+        "condition": {
+          "id": "beenHitRecently",
+          "not": true
+        }
+      },
+      {
+        "stat": "evasion",
+        "kind": "inc",
+        "min": 50,
+        "max": 50,
+        "condition": {
+          "id": "beenHitRecently"
+        }
+      }
+    ]
+  },
+  {
+    "ref": "Lightbane Raiment",
+    "name": "Blightward Mail",
+    "flavour": "What strikes it comes away rotten.",
+    "note": "Armour and energy shield, 30% physical converted to chaos and chaos damage reflected to melee attackers. Dropped: desecrated ground on block (ground effect).",
+    "drop": [
+      "Desecrated Ground"
+    ]
+  },
+  {
+    "ref": "Lightning Coil",
+    "name": "Arc Cage",
+    "flavour": "Every step crackles, and not kindly.",
+    "note": "Added lightning damage to attacks, armour and evasion, life, a lightning resistance penalty and 30% of physical taken as lightning."
+  },
+  {
+    "ref": "Loreweave",
+    "name": "Prismwoven Mail",
+    "flavour": "Every thread was picked for a different reason.",
+    "note": "Six sockets, added physical, all attributes, crit chance, energy shield, life, mana, item rarity, elemental damage and a higher maximum for every resistance (+1 to +5, elemental and chaos).",
+    "drop": [
+      "Maximum Resistances are"
+    ],
+    "mods": [
+      {
+        "stat": "maxResist.allEle",
+        "kind": "base",
+        "min": 1,
+        "max": 5
+      },
+      {
+        "stat": "maxResist.chaos",
+        "kind": "base",
+        "min": 1,
+        "max": 5
+      }
+    ]
+  },
+  {
+    "ref": "Shavronne's Wrappings",
+    "name": "Crackling Vestment",
+    "flavour": "The static keeps the rot out.",
+    "note": "Energy shield, faster start of recharge, lightning resistance, lightning reflect and chaos damage that does not bypass energy shield.",
+    "drop": [
+      "faster start of Energy Shield Recharge",
+      "Chaos Damage does not bypass Energy Shield"
+    ],
+    "mods": [
+      {
+        "stat": "esRechargeDelay",
+        "kind": "inc",
+        "min": 10,
+        "max": 10
+      },
+      {
+        "stat": "chaosNotBypassEs",
+        "kind": "flag",
+        "min": 1,
+        "max": 1
+      }
+    ]
+  },
+  {
+    "ref": "Skin of the Lords",
+    "name": "Pale Vestment",
+    "flavour": "Wear it once and it is yours for good.",
+    "note": "Plus one to level of socketed gems and doubled global defences. Dropped: sockets cannot be modified, corrupted gems only.",
+    "drop": [
+      "Sockets cannot be modified",
+      "You can only Socket Corrupted Gems"
+    ]
+  },
+  {
+    "ref": "Skin of the Loyal",
+    "name": "Plain Shift",
+    "flavour": "Plain cloth, remarkably well kept.",
+    "note": "Plus one to level of socketed gems and doubled global defences. Dropped: sockets cannot be modified.",
+    "drop": [
+      "Sockets cannot be modified"
+    ]
+  },
+  {
+    "ref": "Solaris Lorica",
+    "name": "Brightsteel Cuirass",
+    "flavour": "A shield for the part of you that is not steel.",
+    "note": "Strength, armour and chaos damage that does not bypass energy shield. Dropped: flat and over-time chaos damage reduction.",
+    "drop": [
+      "Chaos Damage does not bypass Energy Shield",
+      "Chaos Damage taken",
+      "Taken Over Time"
+    ],
+    "mods": [
+      {
+        "stat": "chaosNotBypassEs",
+        "kind": "flag",
+        "min": 1,
+        "max": 1
+      }
+    ]
+  },
+  {
+    "ref": "Tabula Rasa",
+    "name": "Bare Cloth",
+    "flavour": "Nothing on it, and nothing in the way.",
+    "note": "Six sockets and nothing else. Links are not modelled, so only the socket count carries over.",
+    "drop": [
+      "Sockets: W-W-W-W-W-W"
+    ],
+    "sockets": 6
+  },
+  {
+    "ref": "The Beast Fur Shawl",
+    "name": "Furlined Regalia",
+    "flavour": "Warm, heavy and a little too proud.",
+    "note": "Spell damage, energy shield, area of effect and increased energy shield recharge rate (standing in for recovery rate), at 5% increased damage taken.",
+    "drop": [
+      "5% increased Damage taken",
+      "Energy Shield Recovery Rate"
+    ],
+    "mods": [
+      {
+        "stat": "damageTaken",
+        "kind": "inc",
+        "min": 5,
+        "max": 5
+      },
+      {
+        "stat": "esRechargeRate",
+        "kind": "inc",
+        "min": 30,
+        "max": 40
+      }
+    ]
+  },
+  {
+    "ref": "The Covenant",
+    "name": "Pact Silk Robe",
+    "flavour": "Sign in red; it keeps the books.",
+    "note": "Socketed gems cost and reserve life instead of mana, with intelligence, life and energy shield. Dropped: the socketed Added Chaos Damage support.",
+    "drop": [
+      "Supported by level 15 Added Chaos Damage",
+      "Socketed Gems have Blood Magic"
+    ],
+    "mods": [
+      {
+        "stat": "rule.socketedGemsUseLife",
+        "kind": "flag",
+        "min": 1,
+        "max": 1
+      }
+    ]
+  },
+  {
+    "ref": "The Iron Fortress",
+    "name": "Rampart Plate",
+    "flavour": "It does not fall; the ground gives way first.",
+    "note": "Attack block per 50 strength, strength, armour and a movement penalty. Dropped: unlucky spell block and the strength damage bonus rewrite.",
+    "drop": [
+      "Chance to Block Spell Damage is Unlucky",
+      "Strength's Damage Bonus instead grants"
+    ]
+  },
+  {
+    "ref": "The Rat Cage",
+    "name": "Hutch Jerkin",
+    "flavour": "Crowded inside, quick to leave.",
+    "note": "Evasion, huge life, movement speed, with a fire resistance penalty and increased fire damage taken. Dropped: 10% of fire damage taken as physical.",
+    "drop": [
+      "Fire Damage taken as Physical Damage"
+    ]
+  },
+  {
+    "ref": "The Restless Ward",
+    "name": "Drifting Veil",
+    "flavour": "It will not let you stop, and you will not want to.",
+    "note": "Life, evasion and energy shield, life regeneration per endurance charge and movement speed per frenzy charge. Dropped: increased charge duration.",
+    "drop": [
+      "Endurance, Frenzy and Power Charge Duration"
+    ]
+  },
+  {
+    "ref": "Thousand Ribbons",
+    "name": "Festival Silks",
+    "flavour": "A little of every colour, hung to dry.",
+    "note": "Added fire, cold and lightning damage to spells and attacks with small flat life, mana, energy shield, evasion and resistances. Dropped: the socketed Elemental Proliferation support.",
+    "drop": [
+      "Elemental Proliferation"
+    ]
+  },
+  {
+    "ref": "Viper's Scales",
+    "name": "Coilscale Armour",
+    "flavour": "Slow to wear, quick to bite.",
+    "note": "Armour and evasion, life, cold resistance, movement speed, 20% chance to poison on hit with attacks and cannot be poisoned.",
+    "drop": [
+      "chance to Poison on Hit with Attacks"
+    ],
+    "mods": [
+      {
+        "stat": "chance.poison",
+        "kind": "base",
+        "min": 20,
+        "max": 20,
+        "tags": [
+          "attack"
+        ]
+      }
+    ]
+  },
+  {
+    "ref": "Abberath's Hooves",
+    "name": "Tinderstep Boots",
+    "flavour": "Where it walks the grass gives up first.",
+    "note": "Strength, movement speed, ignite chance, fire damage per 20 strength, and igniting enemies nearby when an ignited one dies (a kill trigger). Dropped: the triggered fury skill and burning hoofprints.",
+    "drop": [
+      "Ignite a nearby Enemy on Killing",
+      "Abberath's Fury",
+      "Burning Hoofprints"
+    ],
+    "triggers": [
+      {
+        "on": "kill",
+        "targetHas": "ignite",
+        "chance": 100,
+        "cooldown": 0,
+        "effect": {
+          "kind": "spread",
+          "ailment": "ignite",
+          "radius": 3
+        }
+      }
+    ]
+  },
+  {
+    "ref": "Craiceann's Tracks",
+    "name": "Shellstride Greaves",
+    "flavour": "Sideways is still forward if you are armoured enough.",
+    "note": "Armour, life, cold resistance and movement speed on boots. Dropped: the crab barrier lines.",
+    "drop": [
+      "Crab Barriers"
+    ]
+  },
+  {
+    "ref": "Dance of the Offered",
+    "name": "Tithe Slippers",
+    "flavour": "Every step is paid for.",
+    "note": "Mana, lightning resistance, movement speed, quickened (20% attack, cast and movement speed) while not on low mana, and a steady mana drain.",
+    "drop": [
+      "Onslaught while not on Low Mana",
+      "Mana per Second"
+    ],
+    "mods": [
+      {
+        "stat": "attackSpeed",
+        "kind": "inc",
+        "min": 20,
+        "max": 20,
+        "condition": {
+          "id": "onLowMana",
+          "not": true
+        }
+      },
+      {
+        "stat": "castSpeed",
+        "kind": "inc",
+        "min": 20,
+        "max": 20,
+        "condition": {
+          "id": "onLowMana",
+          "not": true
+        }
+      },
+      {
+        "stat": "moveSpeed",
+        "kind": "inc",
+        "min": 20,
+        "max": 20,
+        "condition": {
+          "id": "onLowMana",
+          "not": true
+        }
+      },
+      {
+        "stat": "manaRegenFlat",
+        "kind": "base",
+        "min": -30,
+        "max": -40
+      }
+    ]
+  },
+  {
+    "ref": "Darkray Vectors",
+    "name": "Streak Boots",
+    "flavour": "Faster each time you forget to stop.",
+    "note": "Armour and evasion, lightning resistance, movement speed and dodge per frenzy charge, and one more frenzy charge. Dropped: reduced frenzy charge duration.",
+    "drop": [
+      "Maximum Frenzy Charge",
+      "Frenzy Charge Duration"
+    ],
+    "mods": [
+      {
+        "stat": "maxCharges.fervour",
+        "kind": "base",
+        "min": 1,
+        "max": 1
+      }
+    ]
+  },
+  {
+    "ref": "Death's Door",
+    "name": "Deathbed Greaves",
+    "flavour": "Nothing frightens these boots; they have been there already.",
+    "note": "Strength, armour and energy shield, all elemental resistances, movement speed, one more endurance charge, immunity to bleeding and longer elemental ailments on you.",
+    "drop": [
+      "Elemental Ailment Duration on You",
+      "Immune to Bleeding"
+    ],
+    "mods": [
+      {
+        "stat": "avoid.bleed",
+        "kind": "base",
+        "min": 100,
+        "max": 100
+      },
+      {
+        "stat": "durationOnSelf.ignite",
+        "kind": "inc",
+        "min": 50,
+        "max": 50
+      },
+      {
+        "stat": "durationOnSelf.shock",
+        "kind": "inc",
+        "min": 50,
+        "max": 50
+      },
+      {
+        "stat": "durationOnSelf.chill",
+        "kind": "inc",
+        "min": 50,
+        "max": 50
+      },
+      {
+        "stat": "durationOnSelf.freeze",
+        "kind": "inc",
+        "min": 50,
+        "max": 50
+      }
+    ]
+  },
+  {
+    "ref": "Zahndethus' Cassock",
+    "name": "Vesper Cassock",
+    "flavour": "Sung over, never sung to.",
+    "note": "Added lightning damage to attacks, energy shield and strong chaos resistance. Dropped: consecrated ground on block (ground effect).",
+    "drop": [
+      "Consecrated Ground"
+    ]
+  }
+]
