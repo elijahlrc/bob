@@ -449,6 +449,36 @@
    "ref": "Essence Drain",
    "status": "covered",
    "note": "A chaos projectile that leaves a draining damage over time and heals the caster from it."
+  },
+  "kindledFrost": {
+   "ref": "Cold to Fire Support",
+   "status": "covered",
+   "note": "Half of the cold damage is converted to fire, and some more cold damage is added as fire."
+  },
+  "deepWinter": {
+   "ref": "Hypothermia Support",
+   "status": "covered",
+   "note": "More damage against chilled enemies, more cold damage over time, and a stronger chill."
+  },
+  "wildfireSpread": {
+   "ref": "Elemental Proliferation Support",
+   "status": "covered",
+   "note": "A chance to freeze, shock and ignite on hit (the spreading to nearby enemies is dropped)."
+  },
+  "splitShot": {
+   "ref": "Fork Support",
+   "status": "covered",
+   "note": "The supported projectile splits into two on its first hit (modelled as a second projectile at slightly changed damage)."
+  },
+  "wideSalvo": {
+   "ref": "Greater Volley Support",
+   "status": "covered",
+   "note": "Four more parallel projectiles at the cost of less projectile damage."
+  },
+  "arrowTempest": {
+   "ref": "Arrow Nova Support",
+   "status": "covered",
+   "note": "Four more arrows, shot as a ring at the target place (modelled as more arrows with less damage)."
   }
  },
  "uniques": {

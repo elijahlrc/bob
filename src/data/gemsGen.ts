@@ -1406,4 +1406,150 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     mods: [],
     description: 'Raises the level of the supported skill.',
   },
+  {
+    kind: 'support',
+    id: 'kindledFrost',
+    name: 'Kindled Frost',
+    attr: 'str',
+    supports: [],
+    costMult: 1.1,
+    mods: [
+      {
+        stat: 'convertSkill.cold.fire',
+        kind: 'base',
+        value: 50,
+      },
+      {
+        stat: 'gain.cold.fire',
+        kind: 'base',
+        value: [10, 29],
+      },
+    ],
+    description:
+      'Half of the cold damage becomes fire, and some more cold damage is also gained as fire.',
+  },
+  {
+    kind: 'support',
+    id: 'deepWinter',
+    name: 'Deep Winter',
+    attr: 'dex',
+    supports: [],
+    costMult: 1.2,
+    mods: [
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [20, 39],
+        condition: {
+          id: 'targetChilled',
+        },
+      },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [20, 39],
+        damageTypes: ['cold'],
+        tags: ['dot'],
+      },
+      {
+        stat: 'effect.chill',
+        kind: 'inc',
+        value: 20,
+      },
+    ],
+    description:
+      'More damage against chilled enemies, more cold damage over time, and a stronger chill.',
+  },
+  {
+    kind: 'support',
+    id: 'wildfireSpread',
+    name: 'Wildfire Spread',
+    attr: 'int',
+    supports: [],
+    costMult: 1.1,
+    mods: [
+      {
+        stat: 'chance.freeze',
+        kind: 'base',
+        value: 20,
+      },
+      {
+        stat: 'chance.shock',
+        kind: 'base',
+        value: 20,
+      },
+      {
+        stat: 'chance.ignite',
+        kind: 'base',
+        value: 20,
+      },
+    ],
+    description: 'Hits have a chance to freeze, shock and ignite.',
+  },
+  {
+    kind: 'support',
+    id: 'splitShot',
+    name: 'Split Shot',
+    attr: 'dex',
+    supports: ['projectile'],
+    costMult: 1.3,
+    mods: [
+      {
+        stat: 'projectiles',
+        kind: 'base',
+        value: 1,
+      },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [-10, 9],
+      },
+    ],
+    description: 'Projectiles split in two on their first hit.',
+  },
+  {
+    kind: 'support',
+    id: 'wideSalvo',
+    name: 'Wide Salvo',
+    attr: 'dex',
+    supports: ['projectile'],
+    excludes: ['channelling'],
+    costMult: 1.65,
+    mods: [
+      {
+        stat: 'projectiles',
+        kind: 'base',
+        value: 4,
+      },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [-30, -21],
+        tags: ['projectile'],
+      },
+    ],
+    description: 'Fires four more projectiles in parallel, each hitting less hard.',
+  },
+  {
+    kind: 'support',
+    id: 'arrowTempest',
+    name: 'Arrow Tempest',
+    attr: 'dex',
+    supports: ['projectile', 'bow'],
+    excludes: ['channelling'],
+    costMult: 1.4,
+    mods: [
+      {
+        stat: 'projectiles',
+        kind: 'base',
+        value: 4,
+      },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [-40, -26],
+      },
+    ],
+    description: 'Four more arrows per shot, each hitting less hard.',
+  },
 ];
