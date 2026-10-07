@@ -160,6 +160,8 @@ export const CONDITIONS = [
   'offeringBone',
   'offeringFlesh',
   'offeringSpirit',
+  'catStealth',
+  'avianBoon',
   'heraldAsh',
   'heraldIce',
   'heraldThunder',

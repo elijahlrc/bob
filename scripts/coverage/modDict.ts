@@ -54,6 +54,8 @@ export const IGNORED: RegExp[] = [
   /^Cover Enemies in Ash/,
   /^Zealot's Oath$/,
   /^# increased Character Size$/,
+  /^Minions have # (to|increased|reduced) .*(Resistance|Resistances)$/,
+  /^Aspect of the (Cat|Avian|Spider|Crab) Reserves no Mana$/,
   /^Can have a second Enchantment Modifier$/,
   /^Can be modified while Corrupted$/,
   /^Can have up to # Implicit Modifiers while Item has this Modifier$/,
@@ -469,6 +471,21 @@ rule(/^Socketed Gems have # reduced Mana Reservation$/, (_m, n) => [
   });
 }
 rule(/^# reduced Effect of Curses on You$/, (_m, n) => [mk('curseEffectOnSelf', 'inc', neg(n[0]))]);
+for (const [word, id] of [
+  ['Cat', 'aspectOfPrey'],
+  ['Avian', 'aspectOfWing'],
+  ['Spider', 'aspectOfWeb'],
+] as const)
+  rule(new RegExp(`^Grants Level # Aspect of the ${word} Skill$`), (_m, n) => [
+    mk(`grantSkill.${id}`, 'base', n[0]),
+  ]);
+rule(/^Minions deal # increased Damage$/, (_m, n) => [mk('minionDamage', 'inc', n[0])]);
+rule(/^Minions have # increased Movement Speed$/, (_m, n) => [mk('minionSpeed', 'inc', n[0])]);
+rule(/^Minions have # increased Attack Speed$/, (_m, n) => [mk('minionSpeed', 'inc', n[0])]);
+rule(/^Minions have # increased maximum Life$/, (_m, n) => [mk('minionLife', 'inc', n[0])]);
+rule(/^# to Maximum number of (?:Skeletons|Zombies|Spectres|Raging Spirits|Golems)$/, (_m, n) => [
+  mk('minionCount', 'base', n[0]),
+]);
 rule(/^# to Level of Socketed Gems$/, (_m, n) => [mk('socketedGemLevel', 'base', n[0])]);
 for (const [word, tag] of [
   ['Fire', 'fire'],

@@ -435,6 +435,7 @@ Object.assign(STAT_TEXT, {
   noChaosDamage: { flag: 'Deals no Chaos Damage' },
   minionDamage: { name: 'Damage of your Minions', pct: true },
   minionSpeed: { name: 'Minion Attack and Movement Speed', pct: true },
+  minionLife: { name: 'Life of your Minions', pct: true },
   minionCount: { base: '{v} additional Minions' },
   esOnHit: { base: 'Gain {v} Energy Shield per Enemy Hit' },
   skillDuration: { name: 'Skill Effect Duration', pct: true },

@@ -28,7 +28,9 @@ export type BuffId =
   | 'smokeScreen'
   | 'offeringBone'
   | 'offeringFlesh'
-  | 'offeringSpirit';
+  | 'offeringSpirit'
+  | 'catStealth'
+  | 'avianBoon';
 export const BUFF_IDS: BuffId[] = [
   'fortify',
   'onslaught',
@@ -52,6 +54,8 @@ export const BUFF_IDS: BuffId[] = [
   'offeringBone',
   'offeringFlesh',
   'offeringSpirit',
+  'catStealth',
+  'avianBoon',
 ];
 
 export type BuffDef = {
@@ -71,6 +75,24 @@ export type BuffDef = {
 const when = (cond: CondId): { condition: { id: CondId } } => ({ condition: { id: cond } });
 
 export const BUFFS: Record<BuffId, BuffDef> = {
+  catStealth: {
+    id: 'catStealth',
+    name: 'Prowler’s Veil',
+    seconds: 6,
+    cond: 'catStealth',
+    text: 'Prowler’s Veil',
+    mods: [],
+    gem: true,
+  },
+  avianBoon: {
+    id: 'avianBoon',
+    name: 'Feathered Boon',
+    seconds: 8,
+    cond: 'avianBoon',
+    text: 'Feathered Boon',
+    mods: [],
+    gem: true,
+  },
   offeringBone: {
     id: 'offeringBone',
     name: 'Bone Ward',

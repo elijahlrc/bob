@@ -83,11 +83,20 @@ describe('every active gem', () => {
       const classId = ATTR_CLASS(def.attr);
       const main = weaponFor(def);
       const b = buildFor(
-        granted ? [] : def.utility ? ['crushingBlow', def.id] : [def.id],
+        granted
+          ? def.utility
+            ? ['crushingBlow']
+            : []
+          : def.utility
+            ? ['crushingBlow', def.id]
+            : [def.id],
         main,
         classId,
         def.needsShield ? 'shield' : def.needsDualWield || def.bothWeapons ? 'dual' : 'none',
       );
+      // An item-granted utility skill comes with a damage skill to stand beside, and a mod that grants it.
+      if (granted && def.utility)
+        b.equipment.body!.uniqueMods = [{ stat: `grantSkill.${def.id}`, kind: 'base', value: 20 }];
       const c = new Character(b, { areaLevel: 50 });
       const sheet = c.sheet();
       if (def.utility) {
@@ -115,7 +124,7 @@ describe('every active gem', () => {
       }
       for (const v of [sheet.life, sheet.mana, sheet.skill.totalDps, sheet.skill.avgHit, sheet.ehp])
         expect(finite(v)).toBe(true);
-      if (granted) return;
+      if (granted && !def.utility) return;
       expect(c.primary.skill.id).toBe(def.id);
       expect(c.primary.usable).toBe(true);
       const dealsDamage = !!def.baseMult || !!def.spellDamage?.length || def.skillType === 'attack';

@@ -120,7 +120,7 @@ describe('trigger supports and Ember Burst', () => {
   });
 
   it('Ember Burst is item-only: it never drops as a gem and bursts around the target', () => {
-    expect(GRANTED_GEMS.map((g) => g.id)).toEqual(['emberBurst']);
+    expect(GRANTED_GEMS.map((g) => g.id)).toContain('emberBurst');
     expect(gemDef('emberBurst').kind).toBe('active');
     const b = build('vanguard', 'cinderfallAxe');
     const c = ch(b);
