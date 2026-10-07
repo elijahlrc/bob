@@ -528,3 +528,23 @@ revert if they would rather not.
   scans once per build, item and passive mods remembered by object, layout scores remembered. Not done: candidate pruning,
   cheaper character builds for craft trials. The local speed tests keep floors of 200 and 400.
 - **Tests.** 1,681.
+
+### C7 done: integration (2026-10-07)
+
+- **Coverage.** Gems 325 of 349 (93.1%), uniques 769 of 782 (98.3%, flasks included). Four more rounds of unique drafting
+  (a to e files) used parallel agents; many decisions approximate a secondary line, each says so in its map note.
+- **Balance.** Small bot sims (4 runs of each of the six classes): 7 of 24 wins (29%) before the last unique rounds, 9 of 24
+  (38%) after them, 8 of 24 (33%) after the gem drop change; a 10-run Mystic check gave 2 wins (20%), so the casters are the
+  weakest class. The 25% to 50% band holds overall.
+- **Drops.** Gem drops are weighted: plain damage skills most, supports and auras less, special kinds (curses, minions,
+  deployables, channels, hexes) least, and the character's own attribute twice as often; maps 1 to 4 drop no special gem.
+- **UI.** A Codex on the title screen lists every gem and unique with the ones found in this browser marked (kept through the
+  store the controller was given); the gem inventory in Skills groups by role (skills, utility skills, supports, hexes, auras) and
+  has a search; gem cards describe curses, buffs, summons, blinks, travel, shield and two-weapon needs, herald triggers and
+  Blasphemy.
+- **Calc and sim.** Convergence cases for the new shapes (ground line and zone, nova, beam, returning projectile, chain, trap,
+  mine, totem, brand) hold the anchor (3% for shapes, 5% for traps and mines, 10% for totems and brands); standing
+  totems and brands count the character's own default attack, as the sim shows it fighting beside them.
+- **Bot speed.** About 200 times real time (DESIGN asks 500); see C3 to C6. Candidate pruning and cheaper character builds for
+  craft trials remain the way to win it back.
+- **Tests.** 1,754.

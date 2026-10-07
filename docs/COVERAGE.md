@@ -1,6 +1,6 @@
 # Bob — Coverage Plan: the gems and uniques of patch 3.9.0
 
-Status: **approved 2026-10-07; C0 to C6 done 2026-10-07 (gems 93.1%, uniques 90.4%); C7 in progress** · Owner: the user · Implementer: Claude
+Status: **approved 2026-10-07; C0 to C7 done 2026-10-07 (gems 93.1%, uniques 98.3%)** · Owner: the user · Implementer: Claude
 
 This plan extends [DESIGN.md](DESIGN.md) and [EXPANSION.md](EXPANSION.md). Its goal is to give Bob an analog of **at
 least 90% of the skill gems and 90% of the unique items** that existed in PoE 1 patch 3.9.0. Milestones are
@@ -16,7 +16,7 @@ Conventions follow DESIGN.md:
 
 ## Outcome (2026-10-07)
 
-- **Gems 325 of 349 (93.1%), uniques 707 of 782 (90.4%)**, measured by `npm run coverage`. Every entry has its own name, a
+- **Gems 325 of 349 (93.1%), uniques 769 of 782 (98.3%)**, measured by `npm run coverage`. Every entry has its own name, a
   note on what it does and what was simplified (`docs/coverage/map.json`), and every gem has a generated smoke test.
 - **Engine added on the way:** per-character condition bits (no cap on condition ids), 52-bit masks, skill types and the
   support fixpoint, the buff layer, utility skills with use policies (curses, marks, warcries, banners, guards, buffs,
