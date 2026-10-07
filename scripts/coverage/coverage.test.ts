@@ -60,3 +60,20 @@ describe('version comparison', () => {
     expect(versionAtMost('1.0.1', '3.9')).toBe(true);
   });
 });
+
+describe('generated uniques', () => {
+  it('src/data/uniquesGen.ts is exactly what the decisions produce (nothing hand-edited, nothing stale)', async () => {
+    const { render, loadDecisions, OUT } = await import('./emit-uniques');
+    const { readFileSync } = await import('node:fs');
+    expect(readFileSync(OUT, 'utf8')).toBe((await render(loadDecisions())).text);
+  });
+
+  it('every decision has our own name, a flavour line and a note', async () => {
+    const { loadDecisions } = await import('./emit-uniques');
+    for (const d of loadDecisions()) {
+      expect(d.name.length).toBeGreaterThan(2);
+      expect(d.flavour.length).toBeGreaterThan(5);
+      expect(d.note.length).toBeGreaterThan(5);
+    }
+  });
+});

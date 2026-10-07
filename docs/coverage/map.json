@@ -536,6 +536,176 @@
       "ref": "",
       "status": "excluded",
       "note": "predates the analog rule (EXPANSION 6.1); no defining mechanic mapped"
+    },
+    "kilnband": {
+      "ref": "Ahkeli's Meadow",
+      "status": "covered",
+      "note": "Fire resistance, strength and a little life and energy shield."
+    },
+    "furnaceLoop": {
+      "ref": "Ahkeli's Mountain",
+      "status": "covered",
+      "note": "Same stat line as its sibling: fire resistance and strength with small life and energy shield."
+    },
+    "smeltersRing": {
+      "ref": "Ahkeli's Valley",
+      "status": "covered",
+      "note": "Same stat line as its siblings."
+    },
+    "gildedTithe": {
+      "ref": "Andvarius",
+      "status": "covered",
+      "note": "Huge item rarity for the cost of elemental resistance."
+    },
+    "whisperersCap": {
+      "ref": "Asenath's Mark",
+      "status": "covered",
+      "note": "Attack and cast speed, mana regeneration, energy shield and movement speed on a circlet."
+    },
+    "magpieGauntlets": {
+      "ref": "Aurseize",
+      "status": "covered",
+      "note": "Armour and evasion with item rarity and all elemental resistances, at a movement speed cost."
+    },
+    "paupersRapier": {
+      "ref": "Aurumvorax",
+      "status": "covered",
+      "note": "Physical damage and crit multiplier with life on hit, paid for with item rarity and a thrusting base."
+    },
+    "triuneRod": {
+      "ref": "Axiom Perpetuum",
+      "status": "covered",
+      "note": "Added fire, cold and lightning damage to spells with strong spell crit."
+    },
+    "stillbreathSash": {
+      "ref": "Bated Breath",
+      "status": "covered",
+      "note": "Energy shield, recharge rate and intelligence on a belt."
+    },
+    "eclipseHelm": {
+      "ref": "Black Sun Crest",
+      "status": "covered",
+      "note": "+1 to socketed gems with armour and percentage attributes."
+    },
+    "cinderfeatherQuiver": {
+      "ref": "Blackgleam",
+      "status": "covered",
+      "note": "Added fire to bow attacks with attack speed and physical converted to fire."
+    },
+    "gutterStiletto": {
+      "ref": "Bloodplay",
+      "status": "covered",
+      "note": "Crit, attack speed, bleed chance and added physical on a dagger."
+    },
+    "tallowHammer": {
+      "ref": "Brightbeak",
+      "status": "covered",
+      "note": "Fast heavy mace: attack speed, crit and stun threshold with fire and lightning resistance."
+    },
+    "butchersFrock": {
+      "ref": "Carcass Jack",
+      "status": "covered",
+      "note": "Area of effect and area damage with evasion and energy shield."
+    },
+    "gravecapCirclet": {
+      "ref": "Chitus' Apex",
+      "status": "covered",
+      "note": "Strength, mana, resistances, experience and elemental damage."
+    },
+    "rockfallQuiver": {
+      "ref": "Craghead",
+      "status": "covered",
+      "note": "Added physical to bow attacks, stun duration and a lower enemy stun threshold, slower projectiles."
+    },
+    "coinbearerBuckler": {
+      "ref": "Crest of Perandus",
+      "status": "covered",
+      "note": "Life, regeneration, life leech, lightning resistance, block and movement speed on a buckler."
+    },
+    "wizenedGloves": {
+      "ref": "Doedre's Tenure",
+      "status": "covered",
+      "note": "Spell damage and energy shield at a cast speed cost."
+    },
+    "shardOfSlumber": {
+      "ref": "Dream Fragments",
+      "status": "covered",
+      "note": "Cold resistance, mana, regeneration and immunity to freeze and chill."
+    },
+    "lidlessEye": {
+      "ref": "Eye of Chayula",
+      "status": "covered",
+      "note": "All attributes and item rarity for 20% less life, with immunity to stun."
+    },
+    "emberstrideBoots": {
+      "ref": "Gang's Momentum",
+      "status": "covered",
+      "note": "Movement speed, fire resistance, chance to ignite and damage against ignited enemies."
+    },
+    "prismCrown": {
+      "ref": "Geofri's Crest",
+      "status": "covered",
+      "note": "+1 to socketed gems, armour and energy shield and all four resistances."
+    },
+    "maulwrightsClub": {
+      "ref": "Gorebreaker",
+      "status": "covered",
+      "note": "Huge physical damage, stun duration and threshold, melee damage against bleeding enemies."
+    },
+    "snareOfPlenty": {
+      "ref": "Greedtrap",
+      "status": "covered",
+      "note": "Attributes, energy shield, movement speed and item quantity on low life."
+    },
+    "frostbreakSledge": {
+      "ref": "Hrimnor's Dirge",
+      "status": "covered",
+      "note": "Slow heavy mace converting a half of physical to extra cold, big stun duration and leech."
+    },
+    "hailbreakHammer": {
+      "ref": "Hrimnor's Hymn",
+      "status": "covered",
+      "note": "Physical damage and stun threshold on a sledgehammer, a lower-level sibling."
+    },
+    "coldfangQuiver": {
+      "ref": "Hyrri's Bite",
+      "status": "covered",
+      "note": "Added cold to attacks, life on hit, attributes and area of effect."
+    },
+    "eelskinQuiver": {
+      "ref": "Hyrri's Demise",
+      "status": "covered",
+      "note": "Life on hit, attack speed, area of effect and added damage to attacks per ten points of each attribute."
+    },
+    "glacierCoffin": {
+      "ref": "Icetomb",
+      "status": "covered",
+      "note": "Strength, intelligence, cold resistance, armour and energy shield, immune to chill, long chill duration on enemies."
+    },
+    "chargingIdol": {
+      "ref": "Karui Charge",
+      "status": "covered",
+      "note": "Projectile damage and speed, attack speed, accuracy and movement speed."
+    },
+    "totemWard": {
+      "ref": "Karui Ward",
+      "status": "covered",
+      "note": "A cheaper sibling: projectile damage and speed, accuracy, strength and movement speed."
+    },
+    "sagesHammer": {
+      "ref": "Lavianga's Wisdom",
+      "status": "covered",
+      "note": "Physical damage, life, mana and area damage and effect on a mace at a movement cost."
+    },
+    "pileOfOdds": {
+      "ref": "Le Heup of All",
+      "status": "covered",
+      "note": "Damage, all attributes, item rarity and all resistances at random strength."
+    },
+    "skinnersKnife": {
+      "ref": "Mightflay",
+      "status": "covered",
+      "note": "Physical damage, added physical, strength and life on hit."
     }
   }
 }

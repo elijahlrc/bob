@@ -4,6 +4,7 @@ import type { TriggerDef } from './triggers';
 import { WAVE1_UNIQUES } from './uniquesWave1';
 import { WAVE2_UNIQUES } from './uniquesWave2';
 import { WAVE3_UNIQUES } from './uniquesWave3';
+import { GENERATED_UNIQUES } from './uniquesGen';
 
 /**
  * Unique items (DESIGN.md §11.7). Every name, flavour line and number is ours. `level` is the
@@ -420,6 +421,8 @@ export const UNIQUES: UniqueDef[] = [
   ...WAVE1_UNIQUES,
   ...WAVE2_UNIQUES,
   ...WAVE3_UNIQUES,
+  // The coverage plan's uniques (docs/coverage/uniques, generated).
+  ...GENERATED_UNIQUES,
 ];
 
 export function uniqueDef(id: string): UniqueDef {

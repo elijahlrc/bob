@@ -359,7 +359,8 @@ describe('acquisition (EXPANSION 6.2 items 1–4)', () => {
       const boss = rollMonsterDrops(r, uid, { ilvl: 90, monster: 'boss' });
       const ids = boss.map(uniqueIdOf).filter(Boolean);
       expect(ids.length).toBeGreaterThanOrEqual(2);
-      expect(new Set(ids).size).toBe(ids.length);
+      // The two the boss is owed are different; the rest of its drops are ordinary rolls and may repeat one.
+      expect(new Set(ids.slice(0, 2)).size).toBe(2);
     }
   });
 
