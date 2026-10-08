@@ -35,10 +35,17 @@ export class MapScene extends Phaser.Scene {
     );
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
       if (!this.style || !this.world || p.button !== 0) return;
-      const id = this.style.pick(p.worldX, p.worldY);
+      // A fingertip covers about 14 screen pixels around its centre; a mouse pointer none.
+      const slop = p.wasTouch ? 14 / this.cameras.main.zoom : 0;
+      const id = this.style.pick(p.worldX, p.worldY, slop);
       this.bus.emit('select', { id });
     });
-    this.events.once('shutdown', () => this.unsub.forEach((u) => u()));
+    const onResize = (size: Phaser.Structs.Size) => this.style?.resize?.(size.width, size.height);
+    this.scale.on('resize', onResize);
+    this.events.once('shutdown', () => {
+      this.scale.off('resize', onResize);
+      this.unsub.forEach((u) => u());
+    });
   }
 
   private clear(): void {

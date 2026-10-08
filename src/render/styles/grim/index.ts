@@ -19,9 +19,9 @@ import { CollapseFx } from './collapseFx';
 import { SkillFx } from './skillFx';
 import { isoFloors, isoWalls, ISO_H, ISO_W, WALL_LOW, WALL_TALL } from './isoPaint';
 
-/** Pixel zoom: 2x on normal windows, 1.5x on small ones (smaller pixels, wider view). */
-function pickZoom(width: number): number {
-  return width >= 1100 ? 2 : 1.5;
+/** Pixel zoom: 2x on wide windows, 1.5x on small ones, 1x on a phone (smaller pixels, wider view). */
+export function pickZoom(width: number): number {
+  return width >= 1100 ? 2 : width >= 640 ? 1.5 : 1;
 }
 const ELEMENT_TINT: Record<string, number> = {
   none: 0xffffff,
@@ -148,6 +148,11 @@ export class GrimStyle extends StyleBase {
     const props = buildProps();
     for (const [k, cv] of Object.entries(props))
       this.addTex('g_' + k, cv, k !== 'glow' && k !== 'smoke' && k !== 'beam');
+  }
+
+  /** The game area changed size: the camera follows `zoom` every frame, so setting it is enough. */
+  resize(width: number): void {
+    this.zoom = pickZoom(width);
   }
 
   // ---- World -----------------------------------------------------------------------------------

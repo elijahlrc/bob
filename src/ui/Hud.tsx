@@ -10,6 +10,7 @@ import { useTicks } from './hooks';
 import { useState } from 'preact/hooks';
 import { canAbandon } from '../sim/abandon';
 import { COLLAPSE_START, CRESCENDO_STEP_BONUS, HOLDOUT_WAVES, mapTypeDef } from '../data/mapTypes';
+import { infoProps } from './info';
 import { SkillBar } from './SkillBar';
 
 /** A resource orb: the fill height shows the amount; the skin comes from CSS. */
@@ -31,9 +32,11 @@ function Orb(props: {
   return (
     <div
       class={`orb ${kind}`}
-      title={`${label} ${Math.round(value)} / ${Math.round(max - reserved)}${
-        reserved > 0 ? ` (${Math.round(reserved)} of ${Math.round(max)} reserved by auras)` : ''
-      }`}
+      {...infoProps(
+        `${label} ${Math.round(value)} / ${Math.round(max - reserved)}${
+          reserved > 0 ? ` (${Math.round(reserved)} of ${Math.round(max)} reserved by auras)` : ''
+        }`,
+      )}
     >
       <div class="orb-glass">
         {resPct > 0 && <div class="orb-reserved" style={{ height: `${resPct}%` }} />}
@@ -117,7 +120,9 @@ function Charges({ w }: { w: World }) {
         <div
           key={h.id}
           class="hexchip"
-          title={`Hexed: ${HEXES[h.id].name}, ${hexText(h.id, h.effect)}. ${Math.ceil(h.t)} s left.`}
+          {...infoProps(
+            `Hexed: ${HEXES[h.id].name}, ${hexText(h.id, h.effect)}. ${Math.ceil(h.t)} s left.`,
+          )}
         >
           ☠ {HEXES[h.id].name}
         </div>
@@ -126,7 +131,9 @@ function Charges({ w }: { w: World }) {
         <div
           key={k}
           class={`charge ${k}`}
-          title={`${CHARGE_NAMES[k]}: ${ch.charges[k]} of ${ch.chargeMax[k]}. Each charge: ${CHARGE_TEXT[k]}. Lasts ${CHARGE_SECONDS} seconds.`}
+          {...infoProps(
+            `${CHARGE_NAMES[k]}: ${ch.charges[k]} of ${ch.chargeMax[k]}. Each charge: ${CHARGE_TEXT[k]}. Lasts ${CHARGE_SECONDS} seconds.`,
+          )}
         >
           {Array.from({ length: ch.chargeMax[k] }, (_, i) => (
             <span key={i} class={'pip' + (i < ch.charges[k] ? ' on' : '')} />
@@ -210,7 +217,7 @@ export function Hud({ c }: { c: Controller }) {
         <span>Level {w.build.level}</span>
         <span>Kills {w.stats.kills}</span>
         {w.plan.type !== 'plain' && (
-          <span title={mapTypeDef(w.plan.type).text}>
+          <span {...infoProps(mapTypeDef(w.plan.type).text)}>
             {mapTypeDef(w.plan.type).name}
             {w.plan.type === 'crescendo' &&
               ` +${Math.round(w.surge * CRESCENDO_STEP_BONUS * 100)}% (step ${w.surge})`}
@@ -304,7 +311,9 @@ export function Hud({ c }: { c: Controller }) {
                 <div
                   key={i}
                   class={'flask' + (f.activeT > 0 ? ' active' : '') + (ready ? ' ready' : '')}
-                  title={`${f.spec.name} (${kindLabel}) · ${f.charges.toFixed(0)}/${f.spec.maxCharges} charges, ${f.spec.perUse} per use. Used automatically.`}
+                  {...infoProps(
+                    `${f.spec.name} (${kindLabel}) · ${f.charges.toFixed(0)}/${f.spec.maxCharges} charges, ${f.spec.perUse} per use. Used automatically.`,
+                  )}
                 >
                   <div class="flask-neck" />
                   <div class="flask-body">

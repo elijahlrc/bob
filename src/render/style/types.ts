@@ -10,7 +10,10 @@ export interface MapStyle {
   onEvents(events: SimEvent[], world: World): void;
   /** Highlight (and show life/affix marks for) the inspected enemy. */
   setSelected(id: number | null): void;
-  /** The actor under a world-space point (an enemy), or null. Used for click-to-inspect. */
-  pick(wx: number, wy: number): number | null;
+  /** The actor under a world-space point (an enemy), or null. Used for click-to-inspect. `slop` widens every body
+   * by that many world pixels (a fingertip covers more than a mouse pointer). */
+  pick(wx: number, wy: number, slop?: number): number | null;
+  /** The game area changed size (a rotation, a resized window): pick the pixel zoom again. */
+  resize?(width: number, height: number): void;
   destroy(): void;
 }

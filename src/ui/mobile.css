@@ -433,3 +433,79 @@ body {
     height: var(--tap);
   }
 }
+
+/* ---- The map HUD on a small screen (Hud.tsx) ---- */
+@media (pointer: coarse) {
+  .hud-top > span {
+    pointer-events: auto;
+  }
+  .skill,
+  .flask {
+    /* The icons stay as drawn; the tap area grows around them. */
+    touch-action: manipulation;
+  }
+  .skill::before,
+  .flask::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+  }
+}
+@media (max-width: 600px) {
+  .hud {
+    --hud-bottom: 124px;
+  }
+  .hud-top {
+    right: calc(12px + var(--safe-right));
+    font-size: 12px;
+    gap: 2px 10px;
+  }
+  /* Abandon sits under the status line, the speed buttons under it, both on the right edge. */
+  .hud-abandon {
+    top: calc(40px + var(--safe-top));
+    right: calc(8px + var(--safe-right));
+    font-size: 12px;
+  }
+  .hud-bottom {
+    flex-wrap: nowrap;
+    gap: 8px;
+    justify-content: space-between;
+  }
+  .orb {
+    width: 64px;
+    height: 64px;
+  }
+  .orb-text {
+    font-size: 12px;
+  }
+  .hud-center {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .skillbar {
+    max-width: 100%;
+  }
+  .speeds {
+    position: fixed;
+    top: calc(84px + var(--safe-top));
+    right: calc(8px + var(--safe-right));
+    margin: 0;
+    flex-direction: column;
+    gap: 4px;
+  }
+  /* The enemy card is a sheet over the lower map, above the orbs. */
+  .inspect {
+    left: 8px;
+    right: 8px;
+    top: auto;
+    bottom: calc(var(--hud-bottom, 124px) + var(--safe-bottom));
+    width: auto;
+    max-height: 42vh;
+    overflow: auto;
+    box-sizing: border-box;
+  }
+  .hud-showcase {
+    top: calc(84px + var(--safe-top));
+    right: calc(60px + var(--safe-right));
+  }
+}

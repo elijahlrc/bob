@@ -197,7 +197,7 @@ export abstract class StyleBase implements MapStyle {
     this.selectedId = id;
   }
 
-  pick(wx: number, wy: number): number | null {
+  pick(wx: number, wy: number, slop = 0): number | null {
     let best: number | null = null;
     let bestD = Infinity;
     for (const a of this.world.actors) {
@@ -206,8 +206,8 @@ export abstract class StyleBase implements MapStyle {
       if (!m) continue;
       // Test against the whole body: from the feet up to the head.
       const cy = m.y - m.headUp * 0.5;
-      const rx = Math.max(m.r, m.headUp * 0.45);
-      const ry = Math.max(m.headUp * 0.6, m.r);
+      const rx = Math.max(m.r, m.headUp * 0.45) + slop;
+      const ry = Math.max(m.headUp * 0.6, m.r) + slop;
       const dx = (wx - m.x) / rx;
       const dy = (wy - cy) / ry;
       const d = dx * dx + dy * dy;
