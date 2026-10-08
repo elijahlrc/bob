@@ -199,6 +199,16 @@ function AbandonButton({ c, w }: { c: Controller; w: World }) {
   );
 }
 
+/** Simulated seconds on the level as m:ss (h:mm:ss past an hour). */
+function formatLevelTime(t: number): string {
+  const s = Math.floor(Math.max(0, t));
+  const sec = String(s % 60).padStart(2, '0');
+  const m = Math.floor(s / 60);
+  return m >= 60
+    ? `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}:${sec}`
+    : `${m}:${sec}`;
+}
+
 export function Hud({ c }: { c: Controller }) {
   useTicks(c);
   const w = c.world;
@@ -216,6 +226,9 @@ export function Hud({ c }: { c: Controller }) {
         </span>
         <span>Level {w.build.level}</span>
         <span>Kills {w.stats.kills}</span>
+        <span {...infoProps('Time spent on this level. It stops while the game is paused.')}>
+          {formatLevelTime(w.t)}
+        </span>
         {w.plan.type !== 'plain' && (
           <span {...infoProps(mapTypeDef(w.plan.type).text)}>
             {mapTypeDef(w.plan.type).name}
