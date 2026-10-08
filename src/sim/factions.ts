@@ -285,6 +285,8 @@ export function onMonsterDeath(w: World, a: Actor): void {
     for (let i = 0; i < BROOD_SPLIT; i++) spawnBeside(w, a, 'gnawer', 0.8);
   if (type === 'bloater' || a.modIds.includes('putrid'))
     openZone(w, a.x, a.y, 2, 4, 'caustic', monsterHitOf(a) * 0.8);
+  // A Cinderling burns out where it falls.
+  if (type === 'cinderling') openZone(w, a.x, a.y, 1.3, 3, 'burning', monsterHitOf(a) * 0.5);
   if (type === 'wisp') {
     // A nova that drains a fifth of the mana of the player.
     w.events.push({ t: 'explode', x: a.x, y: a.y, r: 2.5, dtype: 2 });
@@ -474,6 +476,29 @@ function tickChampion(w: World, m: Actor, dt: number): void {
     if (m.raiserT <= 0 && d < 16) {
       m.raiserT = HUNTSMASTER_INTERVAL;
       for (let i = 0; i < 3; i++) spawnBeside(w, m, 'hound', 1.4);
+    }
+  }
+  if (m.modIds.includes('cinderTyrant')) {
+    // A ring of fire goes out from it every ten seconds (a telegraphed blast), and three Cinderlings are lit at half life.
+    m.raiserT -= dt;
+    if (m.raiserT <= 0 && d < 12) {
+      m.raiserT = 10;
+      w.effects.push({
+        id: w.nextId++,
+        x: m.x,
+        y: m.y,
+        radius: 3.5,
+        t: 1,
+        total: 1,
+        kind: 'slam',
+        damage: 3 * monsterHitOf(m),
+        dtype: 3,
+        faction: 1,
+      });
+    }
+    if (m.bossPhase === 0 && frac <= 0.5) {
+      m.bossPhase = 1;
+      for (let i = 0; i < 3; i++) spawnBeside(w, m, 'cinderling', 1.4);
     }
   }
   if (m.modIds.includes('tidewarden')) {

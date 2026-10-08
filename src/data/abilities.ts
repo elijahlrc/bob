@@ -24,6 +24,7 @@ export type AbilityId =
   | 'suppress'
   | 'pull'
   | 'devour'
+  | 'trail'
   // Passive: applied where the rule lives.
   | 'rise'
   | 'burst'
@@ -156,6 +157,13 @@ export const ABILITY_INFO: Record<AbilityId, AbilityInfo> = {
     tag: 'suppressors',
     text: (a) =>
       `While it stands, your regeneration, leech and energy shield recharge stop within ${s(a.range)} tiles.`,
+  },
+  trail: {
+    name: 'Trail',
+    active: true,
+    tag: 'clouds',
+    text: (a) =>
+      `Leaves burning ground behind it as it walks, a pool every ${s(a.interval)} s, for ${s(a.amount)} s.`,
   },
   devour: {
     name: 'Devour',
@@ -314,6 +322,7 @@ export const TYPE_ABILITIES: Partial<Record<string, AbilityDef[]>> = {
   watcher: [{ id: 'hex', interval: 9 }],
   bell: [{ id: 'aura', range: 6 }],
   coffer: [{ id: 'ambush', range: 4 }],
+  slagbrute: [{ id: 'trail', interval: 0.8, range: 0.9, amount: 3 }],
 };
 
 /** The abilities a type has (none for most plain ones). */

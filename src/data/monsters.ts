@@ -60,11 +60,25 @@ export type MonsterTypeId =
   | 'tidecaller'
   | 'wrack'
   | 'leech'
-  | 'drowner';
+  | 'drowner'
+  // The Emberborn (docs/ROSTER.md 7.3)
+  | 'cinderling'
+  | 'slagbrute'
+  | 'pyrepriest'
+  | 'slagworm';
 
 /** The monster families (EXPANSION 7.3). The Choir, the Swarm and the Reliquary join in later milestones. */
 export type FactionId =
-  'ossuary' | 'rot' | 'hollow' | 'choir' | 'swarm' | 'reliquary' | 'kennel' | 'gilded' | 'drowned';
+  | 'ossuary'
+  | 'rot'
+  | 'hollow'
+  | 'choir'
+  | 'swarm'
+  | 'reliquary'
+  | 'kennel'
+  | 'gilded'
+  | 'drowned'
+  | 'emberborn';
 
 export const FACTION_NAMES: Record<FactionId, string> = {
   ossuary: 'Ossuary',
@@ -76,6 +90,7 @@ export const FACTION_NAMES: Record<FactionId, string> = {
   kennel: 'the Kennel',
   gilded: 'the Gilded',
   drowned: 'the Drowned',
+  emberborn: 'the Emberborn',
 };
 
 /** The body a type is drawn with (humanoid factions reuse the figure rig with a new palette). */
@@ -104,7 +119,8 @@ export type BodyKind =
   | 'bell'
   | 'spider'
   | 'chest'
-  | 'worm';
+  | 'worm'
+  | 'slag';
 
 /**
  * The pose family of an attack (docs/ROSTER.md 4.3): how the body moves when it strikes, apart from which rig it is. A type
@@ -1069,6 +1085,90 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     radius: 0.5,
     mods: [],
   },
+
+  // The Emberborn (docs/ROSTER.md 7.3): fire, and ground that burns.
+  cinderling: {
+    id: 'cinderling',
+    role: 'swarm',
+    name: 'Cinderling',
+    faction: 'emberborn',
+    body: 'orb',
+    archetype: 'bomber',
+    movement: [{ id: 'orbit', ring: 3, seconds: 1.2 }, { id: 'kamikaze' }],
+    innate: true,
+    noBody: true,
+    minLevel: 26,
+    lifeMult: 0.25,
+    dmgMult: 0.5,
+    range: 1,
+    attack: 'melee',
+    speed: 5.2,
+    attackTime: 1,
+    radius: 0.3,
+    mods: [mod('convert.physical.fire', 'base', 100), mod('chance.ignite', 'base', 25)],
+  },
+  slagbrute: {
+    id: 'slagbrute',
+    role: 'front',
+    name: 'Slag Brute',
+    faction: 'emberborn',
+    body: 'slag',
+    archetype: 'bruiser',
+    movement: [{ id: 'momentum', from: 0.5, to: 1.3, seconds: 2.5 }],
+    defence: { stun: 100 },
+    shape: { id: 'slam', radius: 2, mult: 1.5, lock: 0.3 },
+    innate: true,
+    minLevel: 26,
+    lifeMult: 2.4,
+    dmgMult: 1.4,
+    range: 1.7,
+    attack: 'melee',
+    speed: 1.7,
+    attackTime: 2.2,
+    radius: 0.75,
+    mods: [mod('convert.physical.fire', 'base', 100)],
+  },
+  pyrepriest: {
+    id: 'pyrepriest',
+    role: 'support',
+    name: 'Pyre Priest',
+    faction: 'emberborn',
+    body: 'mage',
+    archetype: 'artillery',
+    defence: { es: 0.4 },
+    shape: { id: 'lob', radius: 1.8, zone: 'burning', seconds: 4, dps: 0.5, mult: 0.5, lock: 0.35 },
+    innate: true,
+    minLevel: 26,
+    lifeMult: 0.8,
+    dmgMult: 0.9,
+    range: 8.5,
+    attack: 'spell',
+    speed: 2,
+    attackTime: 2.2,
+    radius: 0.4,
+    mods: [mod('convert.physical.fire', 'base', 100)],
+  },
+  slagworm: {
+    id: 'slagworm',
+    role: 'special',
+    name: 'Slagworm',
+    faction: 'emberborn',
+    body: 'worm',
+    archetype: 'ambusher',
+    movement: [{ id: 'burrow', dive: 9, seconds: 2.2 }],
+    shape: { id: 'nova', radius: 2.6, mult: 1.2 },
+    innate: true,
+    noBody: true,
+    minLevel: 30,
+    lifeMult: 1.1,
+    dmgMult: 1.5,
+    range: 1.2,
+    attack: 'melee',
+    speed: 3,
+    attackTime: 1.4,
+    radius: 0.55,
+    mods: [mod('convert.physical.fire', 'base', 100)],
+  },
 };
 
 /** Faction mods (EXPANSION 7.3): on every monster of the faction. */
@@ -1180,6 +1280,7 @@ export type MonsterModId =
   | 'huntsmaster'
   | 'treasurer'
   | 'tidewarden'
+  | 'cinderTyrant'
   // New counterplay mods (docs/ENEMIES.md 7.2)
   | 'charging'
   | 'flaskTaker'
@@ -1370,6 +1471,7 @@ MONSTER_MODS.push(
   { id: 'huntsmaster', name: 'The Huntsmaster', magic: false, chief: true, mods: [] },
   { id: 'treasurer', name: 'The Treasurer', magic: false, chief: true, mods: [] },
   { id: 'tidewarden', name: 'The Tidewarden', magic: false, chief: true, mods: [] },
+  { id: 'cinderTyrant', name: 'The Cinder Tyrant', magic: false, chief: true, mods: [] },
   // Counterplay mods: a rush that punishes kiting, a thief of flask charges, a hobbling touch.
   { id: 'charging', name: 'Charging', magic: true, minLevel: 12, mods: [] },
   { id: 'flaskTaker', name: 'Flask-taker', magic: true, minLevel: 20, mods: [] },

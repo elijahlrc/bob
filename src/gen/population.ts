@@ -95,6 +95,10 @@ export const TYPE_WEIGHTS: Record<MonsterTypeId, number> = {
   wrack: 30,
   leech: 40,
   drowner: 14,
+  cinderling: 40,
+  slagbrute: 28,
+  pyrepriest: 16,
+  slagworm: 12,
 };
 
 /** The share of every type on a theme's maps (sum 1): its factions, then the types within each. */

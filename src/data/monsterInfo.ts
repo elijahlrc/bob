@@ -16,6 +16,7 @@ export const FACTION_ASKS: Record<FactionId, string> = {
   kennel: 'being caught: leaps, charges and ambushes',
   gilded: 'recovery: flasks, regeneration and leech',
   drowned: 'being held: hooks, slows and shock',
+  emberborn: 'fire and burning ground: ignite, fire resistance, standing still',
 };
 
 /** What every monster of a faction does, where the faction has such a rule. */
@@ -26,6 +27,8 @@ export const FACTION_RULES: Partial<Record<FactionId, string>> = {
   gilded: 'Cutpurses steal flask charges; Bursars stop your recovery.',
   drowned:
     'Tidecallers hook you and drag you in; Wracks and Leeches slow you; Drowners come up under you.',
+  emberborn:
+    'Slag Brutes leave burning ground; Pyre Priests set fire to where you stand; Cinderlings burn out where they fall.',
   swarm: 'Gnawers come in packs of a dozen or more.',
   rot: 'Dead Shamblers rise again; Bloaters leave clouds.',
 };
@@ -41,6 +44,7 @@ export const FACTION_COLOR: Record<FactionId, number> = {
   kennel: 0xc89a68,
   gilded: 0xf0c848,
   drowned: 0x5ab8c8,
+  emberborn: 0xe8782a,
 };
 export const FACTION_GLYPH: Record<FactionId, string> = {
   ossuary: '◆',
@@ -52,6 +56,7 @@ export const FACTION_GLYPH: Record<FactionId, string> = {
   kennel: '▼',
   gilded: '★',
   drowned: '≈',
+  emberborn: '✦',
 };
 
 /** One clause on what a type does, for tooltips and the inspect card. */
@@ -96,6 +101,12 @@ export const TYPE_BLURBS: Record<MonsterTypeId, string> = {
   bell: 'Hangs in the air and tolls: a ring that staggers, and an aura that drives its allies on.',
   spinner: 'Keeps behind the swarm and lobs webs onto the ground that slow you.',
   coffer: 'Lies still as a chest until you come close, then springs open and bites; it pays well.',
+  cinderling:
+    'A bright flame that circles, then rushes in and bursts; it burns out where it falls.',
+  slagbrute:
+    'A molten brute that slams the ground, gathers speed and leaves burning ground behind it.',
+  pyrepriest: 'Keeps its distance and sets fire to the ground where you stand.',
+  slagworm: 'Sinks out of sight and comes up under you in a ring of fire.',
   tidecaller:
     'A drifting shade with a hook: marks a line, and drags what stands in it toward itself.',
   wrack: 'A sodden, heavy corpse that lurches in and swings in a wide arc; its blows slow you.',
@@ -241,6 +252,8 @@ export const TYPE_TAGS: Partial<Record<MonsterTypeId, ThreatTag[]>> = {
   spitter: ['ailments'],
   crawler: ['swarm', 'holders'],
   wrack: ['holders'],
+  cinderling: ['swarm'],
+  slagworm: ['blinkers'],
   leech: ['swarm', 'holders', 'drains'],
   drowner: ['blinkers'],
   heap: ['armoured'],

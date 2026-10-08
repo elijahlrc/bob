@@ -21,7 +21,8 @@ export type CurrencyId =
   | 'reliquarySlag'
   | 'houndtooth'
   | 'giltDust'
-  | 'brineSalt';
+  | 'brineSalt'
+  | 'emberAsh';
 
 export type CurrencyDef = {
   id: CurrencyId;
@@ -167,6 +168,15 @@ export const CURRENCIES: CurrencyDef[] = [
     families: ['lightRes', 'coldRes', 'stunAvoid'],
     faction: 'drowned',
   },
+  {
+    id: 'emberAsh',
+    name: 'Ember Ash',
+    text: 'Add an affix of your choice: fire resistance, added fire damage to attacks or chance to ignite.',
+    minMap: 26,
+    weight: 0,
+    families: ['fireRes', 'addFireAttacks', 'igniteChance'],
+    faction: 'emberborn',
+  },
 ];
 
 export function currencyDef(id: string): CurrencyDef {
@@ -220,6 +230,12 @@ export const TABLET_SETS: Record<string, { unique: string; tablets: number }[]> 
   kennel: [
     { unique: 'footlooseShoes', tablets: 4 },
     { unique: 'brawlStrap', tablets: 4 },
+  ],
+  emberborn: [
+    { unique: 'emberSignet', tablets: 3 },
+    { unique: 'embertoothTotem', tablets: 4 },
+    { unique: 'emberwritCirclet', tablets: 5 },
+    { unique: 'cinderstormBand', tablets: 6 },
   ],
   drowned: [
     { unique: 'brinewrackCollar', tablets: 4 },

@@ -1,6 +1,12 @@
 import { abilitiesOf, type AbilityDef } from '../data/abilities';
 import { monsterHitOf } from './combat';
-import { blinkBehind, hexPlayerAtRandom, raise as raiseCorpse, spawnBeside } from './factions';
+import {
+  blinkBehind,
+  hexPlayerAtRandom,
+  openZone,
+  raise as raiseCorpse,
+  spawnBeside,
+} from './factions';
 import type { Actor, World } from './types';
 
 /**
@@ -98,6 +104,13 @@ function advanceDash(w: World, m: Actor, dt: number): void {
 }
 
 const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
+  trail({ w, m, dt, ab, i }) {
+    // A pool of burning ground where it has been, while it walks (one a little way behind it, so it never stands in its own).
+    m.abT[i] = (m.abT[i] ?? ab.interval!) - dt;
+    if (m.abT[i] > 0 || !m.moving) return;
+    m.abT[i] = ab.interval!;
+    openZone(w, m.x, m.y, ab.range!, ab.amount!, 'burning', monsterHitOf(m) * 0.25);
+  },
   devour({ w, m, dt, ab }) {
     // Eats a body within reach, and is the better for it. It looks twice a second, and eats once in its interval; the first
     // meal does not wait out the delay every monster starts with.

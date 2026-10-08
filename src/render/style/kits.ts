@@ -57,6 +57,8 @@ const ADJUST: Partial<Record<MonsterTypeId, KitAdjust>> = {
   guard: { scale: 1.05 },
   gorger: { scale: 1.18 },
   wrack: { scale: 1.08, hunch: 7 },
+  pyrepriest: { scale: 1.12 },
+  slagworm: { scale: 0.78 },
   tidecaller: { scale: 1.3 },
   choirmaster: { scale: 1.12 },
 };
@@ -217,6 +219,18 @@ export function kitFront(type: MonsterTypeId | undefined, a: Anchors): Prim[] {
       cap(o, a.hand.x, a.hand.y, a.hand.x - 4, a.hand.y + 7, 0.4, 'wood');
       circ(o, a.hand.x - 4, a.hand.y + 8, 1.8, 'accent');
       circ(o, a.hipX - 4, a.hipY, 2.6, 'accent');
+      break;
+    case 'pyrepriest':
+      // A tall pointed hood, and a brazier on a pole that burns.
+      tri(
+        o,
+        [hx - r * 1.1, hy + r * 0.8, hx, hy - r * 1.2, hx + r * 1.1, hy + r * 0.8],
+        'metalShade',
+      );
+      cap(o, a.hand.x, a.hand.y + 6, a.hand.x + 2, a.hand.y - 12, 0.6, 'wood');
+      circ(o, a.hand.x + 2, a.hand.y - 13, 2.8, 'metalShade');
+      circ(o, a.hand.x + 2, a.hand.y - 15, 2.4, 'accent');
+      circ(o, a.hand.x + 2, a.hand.y - 16, 1.4, 'glow');
       break;
     case 'wrack':
       // Kelp hanging off the shoulders and the arms, and a barnacled crust on the head.

@@ -75,6 +75,18 @@ const KENNEL: Garb = {
   arms: 'clothShade',
   hands: 'skin',
 };
+/** The Emberborn are ash-grey and scorched: burnt cloth, grey skin, eyes like coals. */
+const EMBERBORN: Garb = {
+  torso: 'cloth',
+  torsoShade: 'clothShade',
+  legs: 'clothShade',
+  legsShade: 'clothShade',
+  foot: 'dark',
+  arms: 'cloth',
+  hands: 'skin',
+  skirt: 'cloth',
+  glowEyes: true,
+};
 /** The Drowned are sodden and pale: wet cloth, bluish skin, hands that have been in the water too long. */
 const DROWNED: Garb = {
   torso: 'cloth',
@@ -101,6 +113,14 @@ const HOLLOW: Garb = {
 const PLAIN: Garb = GILDED;
 
 const OVERRIDE: Partial<Record<MonsterTypeId, Partial<Garb>>> = {
+  // A Pyre Priest is armoured in ash-grey plate with its pauldrons, bare to the knee: no robe, so it is not a Hexer in red.
+  pyrepriest: {
+    skirt: undefined,
+    plate: true,
+    torso: 'metalShade',
+    torsoShade: 'metal',
+    arms: 'metalShade',
+  },
   // A Tidecaller is a shade of the water: it hangs in the air like the Hollow, in the Drowned's colours.
   tidecaller: { ...HOLLOW, reach: 12.5, tail: 0.6 },
   // The Hollow differ by what they trail and how they reach: a stalker is all arm, a wailer all hair and tail, a wight tall.
@@ -143,6 +163,7 @@ const BY_FACTION: Partial<Record<string, Garb>> = {
   rot: ROT,
   hollow: HOLLOW,
   drowned: DROWNED,
+  emberborn: EMBERBORN,
   choir: CHOIR,
   gilded: GILDED,
   kennel: KENNEL,
@@ -165,6 +186,7 @@ export const HELD: Partial<Record<MonsterTypeId, FigureKind | null>> = {
   handler: null,
   cutpurse: 'hero_dagger',
   wrack: null,
+  pyrepriest: null,
 };
 
 /** The garb of a type: its faction's, with its own changes. */

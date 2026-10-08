@@ -64,6 +64,7 @@ export type FigureKind =
   | 'spider'
   | 'chest'
   | 'worm'
+  | 'slag'
   | 'hero_mace'
   | 'hero_sword'
   | 'hero_bow'
@@ -471,6 +472,7 @@ const BUILDS: Record<FigureKind, Build> = {
   spider: { scale: 1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   chest: { scale: 1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   worm: { scale: 1.1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  slag: { scale: 1.25, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   hero_mace: { scale: 1.05, legLen: 9, torsoH: 14, shoulder: 8, skull: 5.5, ribW: 7 },
   hero_sword: { scale: 1, legLen: 9, torsoH: 14, shoulder: 7, skull: 5.5, ribW: 6.5 },
   hero_bow: { scale: 1, legLen: 9.5, torsoH: 13, shoulder: 6, skull: 5.5, ribW: 5.5 },
@@ -585,6 +587,7 @@ const CREATURES = new Set<FigureKind>([
   'spider',
   'chest',
   'worm',
+  'slag',
 ]);
 
 /**
@@ -797,6 +800,20 @@ function buildCreature(kind: FigureKind, pose: Pose, type?: MonsterTypeId): Prim
       // A flame of a thing: no limbs, a core in a halo, three tails that stream behind (`legA` is their sway).
       const y = -20 + lift;
       const sway = pose.legA * 5;
+      if (type === 'cinderling') {
+        // A flame: a teardrop of fire that leans with its sway, a bright heart, two coals for eyes.
+        tri(b, [-5.5 - sway * 0.4, y + 5, 5.5 - sway * 0.4, y + 5, 0.5 - sway, y - 13], 'accent');
+        tri(
+          b,
+          [-3.4 - sway * 0.3, y + 4.5, 3.4 - sway * 0.3, y + 4.5, 0.4 - sway * 0.8, y - 8],
+          'glow',
+        );
+        circ(b, 0, y + 3, 5, 'accent');
+        circ(b, 0, y + 3, 3.6, 'glow');
+        circ(b, -0.8, y + 1.6, 0.8, 'dark');
+        circ(b, 1.8, y + 1.6, 0.8, 'dark');
+        break;
+      }
       if (type === 'watcher') {
         // A floating eye: a pale ball with a coloured iris and a pupil that looks at what it sees, trailing tendrils.
         for (const d of [-1, 0, 1])
@@ -863,6 +880,34 @@ function buildCreature(kind: FigureKind, pose: Pose, type?: MonsterTypeId): Prim
       break;
     }
     case 'worm': {
+      if (type === 'slagworm') {
+        // Thicker, of dark stone with bands of fire, and horned.
+        const sw2 = pose.legA * 3;
+        circ(b, 0, -2, 8.5, 'metalShade');
+        circ(b, 1, -3, 6.2, 'accent');
+        for (let i = 0; i < 5; i++) {
+          const x = (Math.sin(i * 0.9) * 1.6 + sw2) * (i / 4) * 1.6;
+          const y = -5 - i * 5 + lift;
+          circ(b, x, y, 6.2 - i * 0.55, i % 2 ? 'accent' : 'metalShade');
+        }
+        const hx2 = sw2 * 1.6 + 2;
+        const hy2 = -31 + lift;
+        circ(b, hx2, hy2, 5.6, 'metal');
+        circ(b, hx2 + 2.6, hy2 + 0.8, 3, 'accent');
+        circ(b, hx2 + 2.6, hy2 + 0.8, 1.6, 'glow');
+        b.prims.push({
+          k: 'tri',
+          pts: [hx2 - 3, hy2 - 3, hx2 - 6, hy2 - 10, hx2, hy2 - 4],
+          role: 'accent',
+        });
+        b.prims.push({
+          k: 'tri',
+          pts: [hx2 + 1, hy2 - 4, hx2 + 3, hy2 - 11, hx2 + 5, hy2 - 3],
+          role: 'accent',
+        });
+        circ(b, hx2 - 1, hy2 - 1.6, 1, 'eye');
+        break;
+      }
       // A worm half out of the floor: a mound, a stack of segments that sway (legA), a head with a ringed maw.
       const sw = pose.legA * 3;
       circ(b, 0, -2, 7.5, 'boneShade');
@@ -893,6 +938,38 @@ function buildCreature(kind: FigureKind, pose: Pose, type?: MonsterTypeId): Prim
       }
       circ(b, hx - 1, hy - 2.6, 0.9, 'eye');
       circ(b, hx + 2, hy - 3, 0.9, 'eye');
+      break;
+    }
+    case 'slag': {
+      // A molten brute that walks on its knuckles: a great chest cracked with fire, a small horned head, arms to the ground.
+      const ph = pose.legA;
+      cap(b, -5, -6 + lift, -5 + ph * 2, 0, 3, 'metalShade');
+      cap(b, 6, -6 + lift, 6 - ph * 2, 0, 3, 'metal');
+      circ(b, 0, -16 + lift, 11, 'metalShade');
+      circ(b, -1, -17 + lift, 9.2, 'metal');
+      cap(b, -4, -21 + lift, 1, -14 + lift, 0.8, 'accent');
+      cap(b, 1, -14 + lift, -3, -9 + lift, 0.8, 'accent');
+      cap(b, 4, -21 + lift, 6, -15 + lift, 0.7, 'glow');
+      circ(b, 3, -29 + lift, 4.4, 'metalShade');
+      b.prims.push({
+        k: 'tri',
+        pts: [0.5, -32 + lift, -1, -38 + lift, 3, -32.6 + lift],
+        role: 'accent',
+      });
+      b.prims.push({
+        k: 'tri',
+        pts: [4, -32.6 + lift, 6.4, -38 + lift, 6.4, -31 + lift],
+        role: 'accent',
+      });
+      circ(b, 4.8, -29.4 + lift, 1.1, 'eye');
+      circ(b, 2.2, -29.4 + lift, 0.9, 'eye');
+      const swing = pose.armA * 5;
+      cap(b, 9, -20 + lift, 15, -6 - swing + lift, 3.6, 'metal');
+      circ(b, 16, -5 - swing + lift, 4.6, 'metalShade');
+      cap(b, -9, -19 + lift, -14, -6 + lift, 3.2, 'metalShade');
+      circ(b, -15, -5 + lift, 4.2, 'metalShade');
+      circ(b, -2, -6 + lift, 1.2, 'accent');
+      circ(b, 5, -7 + lift, 1, 'accent');
       break;
     }
     case 'bell': {

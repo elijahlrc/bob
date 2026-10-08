@@ -349,6 +349,44 @@ THEMES.push(
   },
 );
 
+/** The Emberborn (docs/ROSTER.md 7.3): two themes. */
+THEMES.push(
+  {
+    id: 'kilnHall',
+    name: 'Kiln Hall',
+    elementWeights: { fire: 3 },
+    typeWeights: { slagbrute: 2, cinderling: 1.5 },
+    factions: { emberborn: 85, ossuary: 15 },
+    fromMap: 26,
+    chief: { mod: 'cinderTyrant', type: 'slagbrute' },
+    itemQuantity: 0.2,
+    rareWeightMult: 1,
+    xpMult: 1,
+    extraRarePacks: 0,
+    extraChests: 0,
+    bonusText: '+20% item quantity',
+    floor: 0x3c2a24,
+    wall: 0x1c1210,
+  },
+  {
+    id: 'ashFurnace',
+    name: 'Ash Furnace',
+    elementWeights: { fire: 3 },
+    typeWeights: { pyrepriest: 2.5, slagworm: 2 },
+    factions: { emberborn: 85, ossuary: 15 },
+    fromMap: 30,
+    chief: { mod: 'cinderTyrant', type: 'slagbrute' },
+    itemQuantity: 0,
+    rareWeightMult: 1.15,
+    xpMult: 1,
+    extraRarePacks: 0,
+    extraChests: 0,
+    bonusText: '+15% item rarity',
+    floor: 0x30221e,
+    wall: 0x140c0a,
+  },
+);
+
 /** The Kennel and the Gilded (docs/ENEMIES.md 7.4): two themes each. */
 THEMES.push(
   {
@@ -437,6 +475,7 @@ const LED = [
   'kennelRun',
   'giltHall',
   'drownedVault',
+  'kilnHall',
 ];
 const reward = (t: ThemeDef) =>
   0.5 * t.itemQuantity +

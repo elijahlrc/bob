@@ -52,6 +52,7 @@ const FACTION_PRESSURE: Record<FactionId, number> = {
   kennel: 1.3,
   gilded: 1.25,
   drowned: 1.3,
+  emberborn: 1.3,
 };
 const ALL_VARIANTS = Object.keys(ELEMENT_WEIGHTS) as Variant[];
 

@@ -258,6 +258,12 @@ export const MOD_MARKS: Record<MonsterModId, ModMark> = {
     aura: true,
     desc: 'Stops your regeneration and leech near it, takes flask charges, and calls two Cutpurses at half life.',
   },
+  cinderTyrant: {
+    color: 0xe8782a,
+    shape: 'ring',
+    aura: true,
+    desc: 'A ring of fire goes out from it every ten seconds, and three Cinderlings are lit at half life.',
+  },
   tidewarden: {
     color: 0x5ab8c8,
     shape: 'ring',
