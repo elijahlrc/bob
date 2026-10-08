@@ -32,7 +32,7 @@
   what the bot measured). Offer sets are drawn by weight with distinct leading factions, rooms are packs with shapes by role
   (`src/gen/packs.ts`), the camp card says who is on the map (`src/run/themeInfo.ts`), monsters have kits and palettes, behaviours
   are abilities (`src/data/abilities.ts`, `src/sim/abilities.ts`), there are eight factions, and difficulty is a run setting
-  (scaling, base, variance; `src/data/difficulty.ts`; default scaling 1.5) with a Debug panel (dev builds or `?debug`).
+  (scaling, base, variance; `src/data/difficulty.ts`; default scaling 1.75) with a Debug panel (dev builds or `?debug`).
   `scripts/simpar.sh` runs the bot sim on all cores. Decisions go in DESIGN.md Appendix A.
 - **Roster plan:** [docs/ROSTER.md](docs/ROSTER.md) (milestones V0–V10): built (section 14 says what, and what changed). Bone is the
   Ossuary's alone (`BodyStyle`, `src/render/style/bodies.ts`); monsters attack in shapes with warnings on the ground

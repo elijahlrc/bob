@@ -508,7 +508,7 @@ No `Math.random`; the architecture rules in CLAUDE.md hold.
 
 ### 8.4 The new baseline
 
-"Substantially harder at baseline" means **the default, not just the slider**: a new run starts at scaling 1.5 (the plan started from 1.25; section 14 says why it moved).
+"Substantially harder at baseline" means **the default, not just the slider**: a new run starts at scaling 1.75 (the plan started from 1.25, moved to 1.5 and then, after the roster plan, to 1.75; see DESIGN.md Appendix A).
 
 - A scaling of 1.25 gives, for a normal monster, a combined hardness (life × damage; the early ease is the same at both
   settings and drops out of the ratio) of about ×1.45 at map 10, ×1.6 at map 20, ×2.0 at map 50 and ×4.4 at map 100 against

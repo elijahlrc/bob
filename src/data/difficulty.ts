@@ -15,7 +15,7 @@ export type Difficulty = {
 export const LEGACY: Difficulty = { scaling: 1, base: 1, variance: 0 };
 
 /** What a new run starts with: substantially harder than the legacy curve (docs/ENEMIES.md 8.4). */
-export const DEFAULT: Difficulty = { scaling: 1.5, base: 1, variance: 0.1 };
+export const DEFAULT: Difficulty = { scaling: 1.75, base: 1, variance: 0.1 };
 
 export const SCALING_RANGE = { min: 0.5, max: 2.5, step: 0.05 } as const;
 export const BASE_RANGE = { min: 0.25, max: 4, step: 0.05 } as const;
