@@ -68,7 +68,12 @@ describe('damage taken rules', () => {
     d[type] = amount;
     return d;
   };
-  const prof = { pen: [0, 0, 0, 0, 0], armourIgnore: 0 } as SkillProfile;
+  const prof = {
+    pen: [0, 0, 0, 0, 0],
+    armourIgnore: 0,
+    enemyPhysRed: 0,
+    doubleChance: 0,
+  } as SkillProfile;
   const target = (def: ReturnType<typeof dummyDefence>) => ({
     def,
     shock: 0,

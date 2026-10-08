@@ -76,7 +76,7 @@ export function gainTrophy(w: World, modIds: readonly string[]): void {
 export function gainCharge(w: World, kind: ChargeKind): void {
   const have = w.char.charges;
   const max = w.char.chargeMax[kind];
-  w.chargeT[kind] = CHARGE_SECONDS;
+  w.chargeT[kind] = CHARGE_SECONDS * w.char.db.mult(`chargeDuration.${kind}`);
   if (have[kind] >= max) return;
   swap(w, { ...have, [kind]: have[kind] + 1 });
   w.events.push({ t: 'charge', kind, count: w.char.charges[kind] });

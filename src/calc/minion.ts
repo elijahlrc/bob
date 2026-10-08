@@ -28,8 +28,10 @@ export function minionBody(
   lifeMult: number,
   takenMult: number,
   regenPct = 0,
+  physRed = 0,
+  block = 0,
 ): MinionBody {
-  const key = `${kind}|${level}|${lifeMult.toFixed(3)}|${takenMult.toFixed(3)}|${regenPct}`;
+  const key = `${kind}|${level}|${lifeMult.toFixed(3)}|${takenMult.toFixed(3)}|${regenPct}|${physRed}|${block}`;
   const hit = cache.get(key);
   if (hit) return hit;
   const m = MINIONS[kind];
@@ -44,6 +46,9 @@ export function minionBody(
     mod('resist.allEle', 'base', m.res),
     // Minions have no regeneration of their own: it comes from gear that says so (the minionRegen stat).
     mod('lifeRegenPct', 'base', regenPct),
+    mod('physReduction', 'base', physRed),
+    mod('blockAttack', 'base', block),
+    mod('blockSpell', 'base', block),
   ];
   const db = new ModDB(
     mods.map((x) => ({ ...x, source: { kind: 'monster', id: `minion_${kind}` } })),

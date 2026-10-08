@@ -93,6 +93,8 @@ export const SKILL_TAGS = [
   'slam',
   'physical',
   'chaos',
+  // The skill is an attack (a keyword: it reaches ailment damage, unlike `attack`, which scales hits).
+  'attackSkill',
 ] as const;
 export type SkillTag = (typeof SKILL_TAGS)[number];
 
@@ -183,6 +185,8 @@ export const CONDITIONS = [
   'wieldingClaw',
   'wieldingWand',
   'wieldingSceptre',
+  'wieldingTwoHand',
+  'wieldingOneHand',
 ] as const;
 export type CondId = (typeof CONDITIONS)[number];
 

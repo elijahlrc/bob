@@ -228,7 +228,10 @@ export function mitigate(p: SkillProfile, t: TargetState, dmg: number[]): number
     }
     if (i === PHYS) {
       const armour = def.armour * (1 - p.armourIgnore);
-      const red = Math.min(0.9, armourReduction(armour, dmg[i]) + def.physReduction);
+      const red = Math.min(
+        0.9,
+        armourReduction(armour, dmg[i]) + def.physReduction - p.enemyPhysRed,
+      );
       dmg[i] *= 1 - red;
     } else if (i === CHAOS && def.immuneChaos) {
       dmg[i] = 0;
@@ -274,11 +277,15 @@ export function ailmentsFromHit(
     a.ignite = IGNITE_DPS_FRAC * hm * agony * p.ignite.speed;
   }
   if (p.isAttack && HA.bleed[PHYS] > 0 && roll(p.bleed.chance)) {
-    a.bleed = (def.isPlayer ? MONSTER_BLEED_DPS_FRAC : BLEED_DPS_FRAC) * HA.bleed[PHYS] * agony;
+    a.bleed =
+      (def.isPlayer ? MONSTER_BLEED_DPS_FRAC : BLEED_DPS_FRAC) *
+      HA.bleed[PHYS] *
+      agony *
+      p.bleed.speed;
   }
   const poisonH = HA.poison[PHYS] + HA.poison[CHAOS];
   if (poisonH > 0 && roll(p.poison.chance)) {
-    a.poison = POISON_DPS_FRAC * poisonH * agony * resMult(CHAOS);
+    a.poison = POISON_DPS_FRAC * poisonH * agony * resMult(CHAOS) * p.poison.speed;
   }
   const shockH = from(p.ailmentFrom.shock);
   if (
@@ -388,7 +395,9 @@ export function resolveHit(
     hand.critChance > 0 &&
     rng.chance(hand.critChance) &&
     (isSpellHit || rng.chance(attackHitChance(p, hand, t.def)));
-  const cm = (res.crit ? hand.critMulti * (p.cruelAgony ? 0.7 : 1) : 1) * hand.hitMult;
+  let cm = (res.crit ? hand.critMulti * (p.cruelAgony ? 0.7 : 1) : 1) * hand.hitMult;
+  // Double damage doubles the hit before it is mitigated (and rolls only when something gives the chance).
+  if (p.doubleChance > 0 && rng.chance(p.doubleChance)) cm *= 2;
   for (let i = 0; i < NT; i++) res.dmg[i] = res.H[i] * cm;
   res.rawPhys = res.dmg[PHYS];
   mitigate(p, t, res.dmg);
@@ -442,16 +451,18 @@ export function expectedHit(
     avgHA.bleed[c.type] += base * ac.k[1];
     avgHA.poison[c.type] += base * ac.k[2];
   });
+  // Double damage, on average, scales the hit before it is mitigated.
+  const dbl = 1 + p.doubleChance;
   const nonCrit = mitigate(
     p,
     t,
-    avgH.map((h) => h * hand.hitMult),
+    avgH.map((h) => h * hand.hitMult * dbl),
   );
   const critM = hand.critMulti * (p.cruelAgony ? 0.7 : 1);
   const crit = mitigate(
     p,
     t,
-    avgH.map((h) => h * hand.hitMult * critM),
+    avgH.map((h) => h * hand.hitMult * critM * dbl),
   );
   const hc = p.isAttack ? attackHitChance(p, hand, t.def) : 1 - t.def.dodgeSpell;
   // An attack confirms a critical strike with a second accuracy check (3.9).

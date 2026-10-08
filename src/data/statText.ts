@@ -181,6 +181,8 @@ export const CONDITION_TEXT: Record<string, string> = {
   wieldingClaw: 'while wielding a Claw',
   wieldingWand: 'while wielding a Wand',
   wieldingSceptre: 'while wielding a Sceptre',
+  wieldingTwoHand: 'while wielding a Two Handed Weapon',
+  wieldingOneHand: 'while wielding a One Handed Weapon',
 };
 
 export const TAG_TEXT: Record<string, string> = {
@@ -286,6 +288,7 @@ Object.assign(STAT_TEXT, {
 } satisfies Record<string, StatText>);
 for (const k of CHARGE_KINDS) {
   const name = CHARGE_NAMES[k];
+  STAT_TEXT[`chargeDuration.${k}`] = { name: `${name} Charge Duration` };
   STAT_TEXT[`maxCharges.${k}`] = { base: `{v} to Maximum ${name} Charges` };
   STAT_TEXT[`chargeOn.kill.${k}`] = { base: `{v}% chance to gain a ${name} Charge on Kill` };
   STAT_TEXT[`chargeOn.block.${k}`] = {
@@ -306,12 +309,22 @@ for (const t of ['physical', 'lightning', 'cold', 'fire'])
     };
 
 TAG_TEXT.unarmed = 'while Unarmed';
+TAG_TEXT.attackSkill = 'from Attack Skills';
 TAG_TEXT.triggered = 'with Triggered Skills';
 TAG_TEXT.aura = 'with Auras';
 
 // ---- Added by the coverage plan (C2): the buff layer, impale, culling and the new tags -------------
 
 Object.assign(STAT_TEXT, {
+  dotMulti: { base: '{v}% to the Damage over Time Multiplier' },
+  'bleed.speed': { name: 'speed at which Bleeding deals its damage' },
+  'poison.speed': { name: 'speed at which Poison deals its damage' },
+  enemyPhysReduction: { base: 'Your Hits take {v}% off the Physical Damage Reduction of Enemies' },
+  doubleDamage: { base: '{v}% chance to deal Double Damage' },
+  shieldDefences: { name: 'Defences from your Shield' },
+  shieldEs: { name: 'Energy Shield from your Shield' },
+  minionPhysReduction: { base: 'Your Minions have {v}% additional Physical Damage Reduction' },
+  minionBlock: { base: 'Your Minions have {v}% Chance to Block' },
   hitTaken: { name: 'damage taken from Hits' },
   manaRegenPct: { base: 'Regenerate {v}% of Mana per second' },
   'chance.impale': { name: 'chance to Impale Enemies on Hit', pct: true },

@@ -97,6 +97,7 @@ import {
   type SkillDef,
 } from './gems';
 import {
+  armourStats,
   grantedKeystones,
   itemGlobalMods,
   itemHasRule,
@@ -460,6 +461,22 @@ export class Character {
     for (const slot of EQUIP_SLOTS) {
       const it = build.equipment[slot];
       if (it) mods.push(...itemGlobalMods(it));
+    }
+    // "Increased defences from your shield": the shield's own defences, more by what the tree and the gear say.
+    const shield = build.equipment.offHand;
+    if (shield && itemBase(shield.baseId).itemClass === 'shield') {
+      const sum = (stat: string) =>
+        mods.reduce((t, m) => (m.stat === stat && m.kind === 'inc' ? t + m.value : t), 0) / 100;
+      const all = sum('shieldDefences');
+      const es = sum('shieldEs');
+      const st = armourStats(shield);
+      const src = { kind: 'item' as const, id: `shield.${shield.uid}` };
+      if (all && st.armour)
+        mods.push(mod('armour', 'base', Math.round(st.armour * all), { source: src }));
+      if (all && st.evasion)
+        mods.push(mod('evasion', 'base', Math.round(st.evasion * all), { source: src }));
+      if ((all || es) && st.es)
+        mods.push(mod('es', 'base', Math.round(st.es * (all + es)), { source: src }));
     }
     for (const m of this.config.extraMods)
       mods.push({ ...m, source: { kind: 'monster', id: 'map' } });

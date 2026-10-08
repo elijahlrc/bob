@@ -66,6 +66,8 @@ export function summonMinions(w: World, c: SkillChoice, prof: SkillProfile): voi
     prof.minionLife,
     prof.minionTaken,
     prof.minionRegen,
+    prof.minionPhysReduction,
+    prof.minionBlock,
   );
   for (let i = have; i < n; i++) {
     const ang = (i / n) * Math.PI * 2;

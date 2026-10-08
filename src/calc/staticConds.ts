@@ -19,4 +19,6 @@ export const WIELD_CONDS: [CondId, SkillTag][] = [
   ['wieldingClaw', 'claw'],
   ['wieldingWand', 'wand'],
   ['wieldingSceptre', 'sceptre'],
+  ['wieldingTwoHand', 'twoHand'],
+  ['wieldingOneHand', 'oneHand'],
 ];

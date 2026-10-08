@@ -7,3 +7,4 @@ docs/coverage/pob-*.json
 docs/coverage/uniques/*.json
 docs/coverage/gems/*.json
 docs/coverage/map.json
+docs/tree/pob-tree.json

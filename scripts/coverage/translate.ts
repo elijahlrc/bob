@@ -17,6 +17,7 @@ import { pathToFileURL } from 'node:url';
 import type { UniqueMod } from '../../src/data/uniques';
 import type { CondId, DamageType, SkillTag } from '../../src/mods/types';
 import { CLAUSES, IGNORED, RULES } from './modDict';
+import { LATE_IGNORED } from './treeRules';
 import { pobBase } from './bobBase';
 import { COVERAGE_DIR, key, loadReference } from './reference';
 
@@ -124,6 +125,7 @@ export function translateLine(line: string, ctx: LineCtx): Translated {
     }
     return { kind: 'mods', mods };
   }
+  for (const re of LATE_IGNORED) if (re.test(text)) return { kind: 'ignored' };
   return { kind: 'unmapped', core: text };
 }
 

@@ -29,7 +29,9 @@
     "coverage:translate": "tsx scripts/coverage/translate.ts",
     "coverage:gems": "tsx scripts/coverage/gem-view.ts",
     "coverage:emit": "tsx scripts/coverage/emit-uniques.ts",
-    "coverage:emit-gems": "tsx scripts/coverage/emit-gems.ts"
+    "coverage:emit-gems": "tsx scripts/coverage/emit-gems.ts",
+    "tree:extract": "tsx scripts/tree/extract.ts",
+    "tree:lines": "tsx scripts/tree/lines.ts"
   },
   "dependencies": {
     "@preact/signals": "^2.11.3",

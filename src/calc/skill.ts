@@ -56,7 +56,7 @@ export type AilChunk = {
   type: number;
   min: number;
   max: number;
-  /** Multipliers for ignite, bleed and poison. */
+  /** Multipliers for ignite, bleed and poison (damage modifiers and the damage over time multiplier). */
   k: [number, number, number];
 };
 
@@ -96,14 +96,21 @@ export type SkillProfile = {
   minionTaken: number;
   /** Percent of its life a minion mends each second (minions have none of their own). */
   minionRegen: number;
+  /** Percent of physical damage reduction and chance to block that the minions have. */
+  minionPhysReduction: number;
+  minionBlock: number;
   minionCount: number;
   /** How many totems or brands can stand, or traps or mines go off, at once (1 and the support mods). */
   deployCount: number;
   cost: number;
   /** Ignite: `max` ignites can burn at once (the strongest count); `speed` makes them deal their damage faster. */
   ignite: AilmentSpec & { max: number; speed: number };
-  bleed: AilmentSpec;
-  poison: AilmentSpec;
+  bleed: AilmentSpec & { speed: number };
+  poison: AilmentSpec & { speed: number };
+  /** Chance (fraction) that a hit deals double damage. */
+  doubleChance: number;
+  /** Percentage points (fraction) taken off the physical damage reduction of what the skill hits. */
+  enemyPhysRed: number;
   shock: { chance: number; effect: number; dur: number };
   chill: { effect: number; dur: number };
   freeze: { chance: number; dur: number };
@@ -170,6 +177,32 @@ export type ProfileInput = {
 
 const DOT_TAGS = tagBit('dot');
 
+/**
+ * The keywords of a skill that reach the damage of its ailments (3.9): what kind of skill it is, the element it is, and
+ * what it is put down or summoned as. The modifiers that scale hits (attack, spell, melee, projectile, area, and the
+ * weapon held) are not among them; "ailment damage while wielding a sword" is a condition instead.
+ */
+const AILMENT_KEYWORDS = tagMask([
+  'attackSkill',
+  'totem',
+  'trap',
+  'mine',
+  'brand',
+  'minion',
+  'aura',
+  'curse',
+  'warcry',
+  'herald',
+  'guard',
+  'movement',
+  'channelling',
+  'fire',
+  'cold',
+  'lightning',
+  'chaos',
+  'physical',
+]);
+
 function ctxOf(tags: number, conds: number, statValue: (s: StatId) => number, anc = 0): ModCtx {
   return { tags, ancestry: anc, conds, statValue };
 }
@@ -232,7 +265,10 @@ function addedFlats(db: ModDB, ctx: ModCtx, eff: number): [number, number][] {
 export function buildProfile(inp: ProfileInput): SkillProfile {
   const { skill, db, conds, statValue } = inp;
   const isAttack = skill.type === 'attack';
-  const baseTags = maskOr(tagMask(skill.tags), tagMask(inp.extraTags));
+  const baseTags = maskOr(
+    maskOr(tagMask(skill.tags), tagMask(inp.extraTags)),
+    isAttack ? tagBit('attackSkill') : 0,
+  );
   const baseCtx = ctxOf(baseTags, conds, statValue);
   const avatar = db.flag('avatarOfFire', baseCtx);
   const neverCrit = db.flag('neverCrit', baseCtx);
@@ -287,8 +323,13 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     const ailChunks: AilChunk[] = [];
     // Only conditions about the player reach damage over time.
     const ownConds = maskAnd(conds, db.cond.all - db.cond.targetMask());
-    const ak = (tag: SkillTag, anc: number) =>
-      db.mult('damage', ctxOf(maskOr(DOT_TAGS, tagBit(tag)), ownConds, statValue, anc));
+    const ailTags = (tag: SkillTag) =>
+      maskOr(maskOr(DOT_TAGS, tagBit(tag)), maskAnd(tags, AILMENT_KEYWORDS));
+    // "Damage over Time Multiplier": added to the ailment's damage as a share of it.
+    const ak = (tag: SkillTag, anc: number) => {
+      const c = ctxOf(ailTags(tag), ownConds, statValue, anc);
+      return db.mult('damage', c) * (1 + Math.max(-0.9, db.sum('base', 'dotMulti', c) / 100));
+    };
     for (const c of chunks) {
       const cctx = { ...ctx, ancestry: c.anc };
       // An ailment takes the modifiers of the type it deals (ignite fire, bleed physical, poison chaos), whatever type
@@ -364,6 +405,12 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     };
   };
 
+  /** Bleeding and poison can also deal their damage faster, for a shorter time. */
+  const timed = (kind: 'bleed' | 'poison', raw: AilmentSpec) => {
+    const speed = Math.max(0.1, 1 + db.inc(`${kind}.speed`, baseCtx));
+    return { ...raw, dur: raw.dur / speed, speed };
+  };
+
   const perType = (stat: string, div = 100) =>
     DAMAGE_TYPES.map((_, t) => db.sum('base', stat, { ...baseCtx, ancestry: 1 << t }) / div);
 
@@ -396,6 +443,8 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     minionLife: db.mult('minionLife', baseCtx),
     minionTaken: db.mult('minionTaken', baseCtx),
     minionRegen: db.sum('base', 'minionRegen', baseCtx),
+    minionPhysReduction: db.sum('base', 'minionPhysReduction', baseCtx),
+    minionBlock: db.sum('base', 'minionBlock', baseCtx),
     minionCount: Math.round(db.sum('base', 'minionCount', baseCtx)),
     cost: Math.max(
       0,
@@ -404,10 +453,15 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
       ),
     ),
     ignite: igniteSpec(),
-    bleed: isAttack
-      ? ailment('chance.bleed', 'duration.bleed', BLEED_DURATION)
-      : { chance: 0, dur: BLEED_DURATION },
-    poison: ailment('chance.poison', 'duration.poison', POISON_DURATION),
+    bleed: timed(
+      'bleed',
+      isAttack
+        ? ailment('chance.bleed', 'duration.bleed', BLEED_DURATION)
+        : { chance: 0, dur: BLEED_DURATION },
+    ),
+    poison: timed('poison', ailment('chance.poison', 'duration.poison', POISON_DURATION)),
+    doubleChance: clamp(db.sum('base', 'doubleDamage', baseCtx) / 100, 0, 1),
+    enemyPhysRed: db.sum('base', 'enemyPhysReduction', baseCtx) / 100,
     shock: {
       chance: clamp(db.sum('base', 'chance.shock', baseCtx) / 100, 0, 1),
       effect: Math.max(0, 1 + db.inc('effect.shock', baseCtx) + ailEffect),
