@@ -108,9 +108,9 @@ export const HUB = {
 export const START_RADIUS = 800;
 export const HUB_RADIUS = 420;
 /** The first ring of a region, the gap between rings, and the arc a cluster needs along its ring (layout units). */
-const RING_START = 1150;
-const RING_STEP = 270;
-const SLOT_ARC = 300;
+export const RING_START = 1000;
+export const RING_STEP = 210;
+const SLOT_ARC = 290;
 const SECTOR = 60;
 /** The share of a region's sector its rings use; the rest is a gap between regions. */
 const SPREAD = 0.92;
@@ -331,10 +331,9 @@ export function buildClusterSpecs(): ClusterSpec[] {
           });
           continue;
         }
-        // Same-ring neighbour links on alternating pairs (skipping keystones).
+        // Each cluster joins its neighbour on the ring, so a ring is one road (keystones stand off the ring).
         const nextSlot = slot + 1;
-        if (nextSlot < n && (ring + slot) % 2 === 0 && !isKs(ring, nextSlot))
-          links.push(`@${ring}:${nextSlot}`);
+        if (nextSlot < n && !isKs(ring, nextSlot)) links.push(`@${ring}:${nextSlot}`);
         const p = take[free.indexOf(slot)];
         const spec: ClusterSpec = {
           id,

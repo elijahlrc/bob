@@ -69,3 +69,51 @@ See the end of this file; each step is appended when it lands.
 - **Keystones** added: Nimble Gambit, Spellslip, Volatile Servants (minions burst at low life), Idle Hands (no damage of your own
   but one more totem), Sigil Warden, Lone Vow (one aura, no reservation).
 - `SAVE_VERSION` is 4; the invariants in `tree.test.ts` and DESIGN §9 carry the new sizes (and at most four notables share a mod set).
+
+### Look and density (2026-10-08)
+
+The tree was a uniform web: filler was a third of the nodes, every notable was a dead-end stub, and the three node sizes
+were barely told apart. This pass follows the reference in what it is made of and how it reads, not in its layout (the
+positions, the shapes of the clusters and the arrangement of the regions stay our own, DESIGN §9.1). `npm run tree:mix`
+prints the numbers below.
+
+| Measure                      | Reference | Before   | After      |
+| ---------------------------- | --------- | -------- | ---------- |
+| Nodes                        | 1,632     | 2,257    | 1,708      |
+| Notables                     | 22.6%     | 16.7%    | 22.0%      |
+| Keystones                    | 1.7%      | 1.2%     | 1.6%       |
+| Attribute nodes (travel)     | 12.7%     | 34.4%    | 13.3%      |
+| Other small passives         | 63%       | 47.5%    | 62.7%      |
+| Notables a road runs through | most      | 0 of 376 | 281 of 376 |
+| Dead ends (one link)         | few       | 20%      | 8.8%       |
+| Routes the builder dropped   | —         | 83       | 2          |
+
+- **The roads.** A cluster is now a stretch of road with its notable on it (`inline` in `build.ts`): the smalls and the
+  notable stand in a line along the ring, or in a loop for the larger ones (the notable faces outward), and roads join
+  the two ends. A quarter of the notables stay on a stalk off the road (the pairs, chosen by a hash of the cluster id), so
+  there are still side trips. Every cluster joins its neighbour on the ring, so a ring is one road (it used to be every
+  other cluster).
+- **Less filler.** Rings are 210 apart (270), the first at 1,000 (1,150), a slot is 290 (300), and a road gets an attribute
+  node only where it is 225 units or longer (`TRAVEL_SPACING` 150; it was 110). The tree is a tenth narrower (radius 3,410
+  against 3,950).
+- **Look** (`TreeView.tsx`, `treeStyle.ts`, `tree.css`; the tree rules left `styles.css`):
+  - a node's colour says what it gives (life red, defence steel, evasion green, mana and energy shield blue, the three
+    elements and chaos by their own, minions teal, curses violet, attributes by attribute), from its first line;
+  - kinds differ by shape and frame: small is a ringed dot, notable has a gold outer ring and an emblem of its colour,
+    keystone is an octagon with a violet frame and a larger emblem; allocated nodes go gold with a halo, and the roads
+    between them glow; the path a click would buy is cyan;
+  - sizes keep a floor on screen (3.6 px for a small, 7 px for a notable, 11 px for a keystone, half of that with the whole
+    tree in view) and lines keep their width in pixels; names of keystones and class starts show from far out, of notables
+    from zoom 0.4; a "Colours" key sits in the corner;
+  - behind the nodes, each region is a wedge tinted by its attributes, with ring guides, the rim and the region's name.
+  - One group per node and no filters (a phone's GPU memory was a problem before, BUGS/PROGRESS 2026-10-08): about 8,000
+    elements, down from 12,000 in the first version.
+- **Saves.** `SAVE_VERSION` is 9. Node ids changed, so loading an older run keeps it but hands the allocated passives back as
+  unspent points (`migrate` in `save.ts`).
+- **Names.** Small passives lose the "Lesser" of their names ("Armour", "Attack Speed").
+- **Balance** (bot, seed 2, six runs per class, scaling 1.5): 4 of 36 runs won against 5 of 36 before; the median map the
+  classes reached averaged 54.8 against 53.8. Roads through notables did not make the bot stronger, within the noise of
+  that sample.
+- **Not done.** Ring roads are straight chords, not arcs; there are no node icons beyond the eighteen emblems; no search or
+  highlight of a stat; the small nodes of a cluster are still copies of one another (the reference has 445 distinct small
+  names, Bob 137); the real-device pass of the mobile plan has not seen the new look.

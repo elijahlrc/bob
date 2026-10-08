@@ -1,0 +1,251 @@
+/*
+ * The passive tree (TreeView.tsx). Colours follow what a node gives (treeStyle.ts sets --t on each node); sizes follow
+ * the zoom (TreeView sets --s-<kind>, --lo-<kind>, --fs and --sw on the svg), so a node never shrinks below a few
+ * pixels and a name is never smaller than text. Lines and frames keep their width in screen pixels.
+ */
+svg.tree {
+  --node-bg: #14111a;
+  --edge: #4a4458;
+  --gold: #e6b84a;
+  --gold-hi: #ffe6a0;
+}
+svg.tree line,
+svg.tree circle,
+svg.tree polygon {
+  vector-effect: non-scaling-stroke;
+}
+
+/* The map behind the tree. */
+.bd-div {
+  stroke: #ffffff;
+  stroke-opacity: 0.05;
+  stroke-width: 1px;
+}
+.bd-ring {
+  fill: none;
+  stroke: #ffffff;
+  stroke-opacity: 0.035;
+  stroke-width: 1px;
+}
+.bd-rim {
+  fill: none;
+  stroke: #c9a468;
+  stroke-opacity: 0.35;
+  stroke-width: 2px;
+}
+.bd-rim.thin {
+  stroke-opacity: 0.18;
+  stroke-width: 1px;
+}
+.bd-name {
+  fill: #c9a468;
+  fill-opacity: 0.55;
+  font-size: 150px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* Paths between nodes. */
+.edge {
+  stroke: var(--edge);
+  stroke-width: 1.6px;
+  pointer-events: none;
+}
+.edge.on {
+  stroke: var(--gold);
+  stroke-width: 2.6px;
+}
+.edge.glow {
+  stroke: var(--gold);
+  stroke-width: 8px;
+  stroke-opacity: 0.22;
+  stroke-linecap: round;
+}
+.edge.path {
+  stroke: #7af0ff;
+  stroke-width: 3.2px;
+  stroke-opacity: 0.9;
+}
+
+/* A node is one group; TreeView puts it in place and sizes it by the zoom (a floor on its size on screen). */
+.tn {
+  cursor: pointer;
+}
+.tn .pip,
+.tn .rim,
+.tn .halo,
+.tn.pr {
+  pointer-events: none;
+}
+.tn .ring {
+  fill: var(--node-bg);
+  stroke: var(--t);
+  stroke-opacity: 0.55;
+  stroke-width: 1.6px;
+}
+.tn .pip {
+  fill: var(--t);
+  fill-opacity: 0.6;
+}
+.tn .rim {
+  fill: none;
+  stroke: #8f7e5c;
+  stroke-opacity: 0.85;
+  stroke-width: 1.4px;
+}
+.tn .halo {
+  fill: var(--gold);
+  fill-opacity: 0.2;
+  pointer-events: none;
+}
+.tn.notable .ring {
+  stroke-opacity: 0.9;
+  stroke-width: 2.2px;
+}
+.tn.notable .pip {
+  fill-opacity: 0.85;
+}
+.tn.keystone .ring {
+  fill: #1c1226;
+  stroke-opacity: 1;
+  stroke-width: 2.6px;
+}
+.tn.keystone .rim {
+  stroke: #b58cf0;
+  stroke-width: 1.8px;
+}
+.tn.keystone .pip {
+  fill-opacity: 1;
+}
+.tn.travel .ring {
+  stroke-opacity: 0.5;
+  stroke-width: 1.4px;
+}
+.tn.can .ring {
+  stroke-opacity: 1;
+  stroke-width: 2.4px;
+}
+.tn.can .pip {
+  fill-opacity: 0.95;
+}
+.tn.can.notable .rim,
+.tn.can.keystone .rim {
+  stroke: var(--gold-hi);
+}
+.tn.on .ring {
+  fill: color-mix(in srgb, var(--t) 55%, #1a1408);
+  stroke: var(--gold-hi);
+  stroke-opacity: 1;
+  stroke-width: 2.2px;
+}
+.tn.on .pip {
+  fill: #fff7dc;
+  fill-opacity: 1;
+}
+.tn.on .rim {
+  stroke: var(--gold);
+  stroke-opacity: 1;
+  stroke-width: 2px;
+}
+.tn.start .ring {
+  fill: #2a2630;
+  stroke: #8a8494;
+  stroke-opacity: 0.7;
+  stroke-width: 2px;
+}
+.tn.start.mine .ring {
+  stroke: #fff;
+  stroke-opacity: 1;
+  stroke-width: 3px;
+}
+.tn.start .rim {
+  stroke: #6e6577;
+}
+.tn.start.mine .rim {
+  stroke: var(--gold-hi);
+}
+.path-ring {
+  fill: none;
+  stroke: #7af0ff;
+  stroke-width: 2.4px;
+  pointer-events: none;
+}
+
+/* Names: keystones and class starts from far out, notables once the view is close enough to read them. */
+.lb {
+  display: none;
+  pointer-events: none;
+  font-size: var(--fs);
+  fill: #d8cdb4;
+  stroke: #05040a;
+  stroke-width: var(--sw);
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+.lb.notable {
+  transform: translateY(var(--lo-notable, 30px));
+}
+.lb.keystone {
+  font-size: var(--fs-b);
+  fill: #cba8ff;
+  font-weight: bold;
+  transform: translateY(var(--lo-keystone, 40px));
+}
+.lb.start {
+  font-size: var(--fs-b);
+  fill: #fff;
+  font-weight: bold;
+  transform: translateY(var(--lo-start, 40px));
+}
+.lb.on {
+  fill: var(--gold-hi);
+}
+svg.tree.z-n .lb.notable,
+svg.tree.z-k .lb.keystone,
+svg.tree.z-k .lb.start {
+  display: inline;
+}
+
+/* The colour key, over the corner of the tree. */
+.tree-legend {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  z-index: 2;
+  background: #0d0b11ee;
+  border: 1px solid #4a3f33;
+  border-radius: var(--radius);
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.tree-legend summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+.tree-legend ul {
+  list-style: none;
+  margin: 6px 0 2px;
+  padding: 0;
+}
+.tree-legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.5;
+}
+.tree-legend i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.tree-legend i.sq {
+  border: 2px solid #9a8a6a;
+  background: transparent;
+}
+.tree-legend i.oct {
+  border: 2px solid #b58cf0;
+  background: transparent;
+  border-radius: 3px;
+}

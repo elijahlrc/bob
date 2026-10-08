@@ -23,9 +23,9 @@ function bfs(start: number): number[] {
 }
 
 describe('passive tree invariants (§9.3)', () => {
-  it('has 2,000–2,400 nodes and exactly 27 keystones (docs/TREE.md)', () => {
-    expect(nodes.length).toBeGreaterThanOrEqual(2000);
-    expect(nodes.length).toBeLessThanOrEqual(2400);
+  it('has 1,600–1,900 nodes and exactly 27 keystones (docs/TREE.md)', () => {
+    expect(nodes.length).toBeGreaterThanOrEqual(1600);
+    expect(nodes.length).toBeLessThanOrEqual(1900);
     expect(nodes.filter((n) => n.kind === 'keystone')).toHaveLength(27);
     const ksNames = nodes
       .filter((n) => n.kind === 'keystone')
@@ -38,6 +38,26 @@ describe('passive tree invariants (§9.3)', () => {
     const n = nodes.filter((x) => x.kind === 'notable').length;
     expect(n).toBeGreaterThanOrEqual(330);
     expect(n).toBeLessThanOrEqual(400);
+  });
+
+  it('has about the mix of node kinds of the reference tree: a fifth notables, few attribute nodes, little filler', () => {
+    const share = (kind: string) => nodes.filter((n) => n.kind === kind).length / nodes.length;
+    // The reference (docs/TREE.md): 23% notables, 1.7% keystones, 13% attribute nodes, the rest small passives.
+    expect(share('notable')).toBeGreaterThanOrEqual(0.2);
+    expect(share('notable')).toBeLessThanOrEqual(0.26);
+    expect(share('keystone')).toBeLessThanOrEqual(0.02);
+    expect(share('travel')).toBeGreaterThanOrEqual(0.08);
+    expect(share('travel')).toBeLessThanOrEqual(0.16);
+    expect(share('small')).toBeGreaterThanOrEqual(0.58);
+  });
+
+  it('has roads that run through notables, few dead ends and every link routed', () => {
+    const notables = nodes.filter((n) => n.kind === 'notable');
+    const inline = notables.filter((n) => n.links.length >= 2).length;
+    expect(inline / notables.length).toBeGreaterThanOrEqual(0.6);
+    const ends = nodes.filter((n) => n.links.length === 1).length;
+    expect(ends / nodes.length).toBeLessThanOrEqual(0.12);
+    expect(tree.dropped.length).toBeLessThanOrEqual(10);
   });
 
   it('is connected: every node is reachable from every class start', () => {

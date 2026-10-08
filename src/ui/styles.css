@@ -340,54 +340,6 @@ svg.tree {
   cursor: grab;
   touch-action: none;
 }
-.edge {
-  stroke: var(--border2);
-  stroke-width: 6;
-}
-.edge.on {
-  stroke: #d0a040;
-  stroke-width: 9;
-}
-.node {
-  fill: var(--btn);
-  stroke: #5a5466;
-  stroke-width: 3;
-  cursor: pointer;
-}
-.node.travel {
-  fill: #24222b;
-}
-.node.notable {
-  fill: #3a3446;
-  stroke: #9a8a6a;
-  stroke-width: 4;
-}
-.node.keystone {
-  fill: #40304a;
-  stroke: #c090ff;
-  stroke-width: 5;
-}
-.node.can {
-  stroke: #e0d0a0;
-}
-.node.on {
-  fill: #d0a040;
-  stroke: #ffe8a0;
-}
-.node.start {
-  fill: #555;
-  stroke: #888;
-}
-.node.start.mine {
-  stroke: #fff;
-  stroke-width: 5;
-}
-.path-ring {
-  fill: none;
-  stroke: #7af0ff;
-  stroke-width: 4;
-  pointer-events: none;
-}
 .tooltip {
   position: fixed;
   z-index: 10;

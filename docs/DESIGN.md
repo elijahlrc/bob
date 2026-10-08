@@ -485,17 +485,17 @@ Never weaken this test to make it pass. Fix the formula mismatch.
 ### 9.1 Structure (full size)
 
 The tree is comparable in size to PoE's, so a character's 123 points (5.3) cover only about 7% of it, and builds
-must choose. The sizes below are the 2026-10-07 targets of docs/TREE.md (the first version of this table had 21 keystones,
-130 notables and 1,250 to 1,350 nodes).
+must choose. The sizes below are the 2026-10-08 targets of docs/TREE.md (the first version of this table had 21 keystones,
+130 notables and 1,250 to 1,350 nodes; the 2026-10-07 one had 2,000 to 2,400 nodes, most of them filler).
 
-| Node kind                  | Target count    | Notes                                                                                    |
-| -------------------------- | --------------- | ---------------------------------------------------------------------------------------- |
-| Class starts               | 6               | —                                                                                        |
-| Keystones                  | 27              | Section 9.4                                                                              |
-| Notables                   | ~370            | Unique names. At most 4 notables share the same mod set (with different values allowed). |
-| Small passives in clusters | ~900            | Repeat the cluster's theme at about 1/3 of the notable's main stat                       |
-| Travel / attribute nodes   | ~950            | +10 to one attribute, or a minor generic stat                                            |
-| **Total**                  | **2,000–2,400** |                                                                                          |
+| Node kind                  | Target count    | Notes                                                                                                                            |
+| -------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Class starts               | 6               | —                                                                                                                                |
+| Keystones                  | 27              | Section 9.4                                                                                                                      |
+| Notables                   | ~370            | Unique names. At most 4 notables share the same mod set (with different values allowed).                                         |
+| Small passives in clusters | ~1,070          | Repeat the cluster's theme at about 1/3 of the notable's main stat                                                               |
+| Travel / attribute nodes   | ~230            | +10 to one attribute, where a road between two clusters is long                                                                  |
+| **Total**                  | **1,600–1,900** | The mix is the reference tree's (docs/TREE.md, "Look and density"): a fifth of the nodes are notables, an eighth attribute nodes |
 
 - **Layout:** the six class starts sit on an inner ring, in PoE order:
   - Mystic (Int) at the top;
@@ -526,13 +526,15 @@ At ~1,300 nodes, the tree is authored at the **cluster** level, never node by no
   - `src/data/tree/notableThemes.ts` defines about 40 parameterised themes (for example "melee physical + life";
     "crit chance + crit multi with daggers").
   - The spec instantiates each theme 2–4 times at different strengths and positions, each with its own name.
-- **Rendering:** SVG with about 1,300 circles and about 1,500 lines must pan and zoom at 60 fps on a mid-range laptop.
+- **Rendering:** SVG with about 1,700 nodes (one group each, about 8,000 elements with the lines and names) and about 2,100
+  lines must pan and zoom at 60 fps on a mid-range laptop.
   If it does not, switch the tree view to a `<canvas>` renderer behind the same component interface, and record it in
   Appendix A.
 
 ### 9.3 Tree invariants (tested)
 
-- The node count is 2,000–2,400 and the keystone count is 27.
+- The node count is 1,600–1,900 and the keystone count is 27.
+- A fifth to a quarter of the nodes are notables, at most 2% keystones, 8% to 16% attribute nodes; at least 60% of the notables stand on a road (a route can run through them), at most 12% of the nodes are dead ends, and at most 10 links are routed by the fallback.
 - The graph is connected, and every node is reachable from every class start.
 - No two nodes are closer than 40 units in layout space, and no edge passes through a node it isn't attached to.
 - Every cluster link references an existing cluster.
@@ -1289,6 +1291,8 @@ _(Filled in during implementation: date, decision, reason.)_
 | 2026-10-08 | Enemy variety plan, packs: a pack is one faction and one shape (Phalanx, Firing line, Escort, Swarm, Mixed arms, Ambush, Patrol) made from the roles of the types; each faction has its own weights. An Ambush lies in wait until the character is within 4.5 tiles or hits it; a Patrol walks between its room and the next at 45% speed until it notices the character. The Gnawer pack adds three to six Gnawers (was seven to thirteen) and a Swarm room keeps 60% of its monsters.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | The plan, section 4.2. By head count the Gnawers were over 40% of everything met from map 10, so one type was the main antagonist again.                                                                                              |
 | 2026-10-08 | Enemy variety plan, legibility and looks: the offer card shows faction chips with shares, one "asks" line per leading faction, a damage bar from the threat mix (affixes included), up to four threat tags, the commonest types, faction rules, the gate champion, the variance tier (Gentle, Even, Fierce) and the one resistance the map leans on hardest; the inspect card names the type, its faction and its abilities; the HUD names the factions; the recap names the killer's type and compares the damage taken with the card. Every type has a kit (`render/style/kits.ts`) so that no two share a silhouette, every faction a palette, and the element is an accent (eyes, glow, trim) and not a tint.                                                                                                                                                                                                                                                         | The plan, sections 5 and 6.                                                                                                                                                                                                           |
 | 2026-10-08 | Enemy variety plan, abilities and factions: a type's behaviours are a list in `data/abilities.ts` (`TYPE_ABILITIES`) run by `sim/abilities.ts`, and the cards read the same list. Two factions are added: **the Kennel** (Hound, Rend-boar, Handler, Stalker Cat: leaps, charges, a whistle, ambushes) and **the Gilded** (Cutpurse, Gilded Guard, Bursar, Gilt Slinger: stolen flask charges, reflected melee damage, no regeneration near a Bursar, kiting). New mods: Charging, Flask-taker, Hobbling. Champions: the Huntsmaster and the Treasurer. A stolen charge returns when the thief dies.                                                                                                                                                                                                                                                                                                                                                                      | The plan, sections 7.3 and 7.4: the roster asked nothing about mobility or about sustain.                                                                                                                                             |
+| 2026-10-08 | Skill gems are never thrown away with an item. An item that leaves the build (swapped out, unequipped, cleared from the off hand by a two-hander) goes to the inventory bare, and the gems that did not fit in the new item go beside it as gems of their own; `discard` and `salvage` (so the junk button and the clean-up too) release any gem an item still holds; `loadRun` frees gems stuck in carried items in older saves; the primary skill gem is cleared when it is no longer socketed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | A swap used to leave the gems that did not fit inside the old item, where they could not be socketed anywhere and were destroyed with the item by salvage, discard, the junk button or the clean-up.                                  |
+| 2026-10-08 | The passive tree follows the reference tree's mix of nodes and not its layout: a fifth notables, an eighth attribute nodes, notables on the roads (a route can run through them; a quarter stay on stalks), colour by what a node gives, and node sizes with a floor on screen. 1,708 nodes (§9.1 and §9.3 amended), `SAVE_VERSION` 9 (older runs keep their level and items and get the passives back). docs/TREE.md, "Look and density".                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
 ## Appendix B — Glossary
 

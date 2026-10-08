@@ -33,7 +33,8 @@
     "tree:extract": "tsx scripts/tree/extract.ts",
     "tree:lines": "tsx scripts/tree/lines.ts",
     "tree:names": "tsx scripts/tree/names.ts",
-    "tree:emit": "tsx scripts/tree/emit.ts"
+    "tree:emit": "tsx scripts/tree/emit.ts",
+    "tree:mix": "tsx scripts/tree/mix.ts"
   },
   "dependencies": {
     "@preact/signals": "^2.11.3",

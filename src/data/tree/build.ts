@@ -8,9 +8,12 @@ import type { Tree, TreeNode, TreeNodeKind } from './types';
 export const MIN_NODE_DIST = 40;
 /** A node closer than this to an edge it is not part of counts as "on" the edge. */
 export const EDGE_CLEARANCE = 22;
-const TRAVEL_SPACING = 110;
-const WHEEL_RADIUS = 100;
-const CHAIN_STEP = 70;
+const TRAVEL_SPACING = 150;
+/** The spacing of the nodes of a cluster along a road, and of a wheel's loop; the least radius of a wheel; the length of a notable's stalk. */
+const CHAIN_STEP = 62;
+const WHEEL_CHORD = 58;
+const WHEEL_MIN_RADIUS = 62;
+const STALK = 74;
 const SPUR_STEP = 65;
 
 const ATTR_NAME: Record<Attr, string> = { str: 'Strength', dex: 'Dexterity', int: 'Intelligence' };
@@ -57,6 +60,19 @@ export function segDist(
   return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
 }
 
+/** The name of a small node as shown: "Lesser armour" reads as "Armour" (the node says what it gives, as a name). */
+function tidyName(name: string): string {
+  const bare = name.replace(/^Lesser /, '');
+  return bare.charAt(0).toUpperCase() + bare.slice(1);
+}
+
+/** A small number from a cluster id, to vary shapes the same way every time. */
+function hashId(id: string): number {
+  let h = 7;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return h;
+}
+
 /** Lay out one cluster's nodes. Returns the node ids that travel paths may attach to. */
 function layoutCluster(b: Builder, c: ClusterSpec): number[] {
   const a = (c.a * Math.PI) / 180;
@@ -69,7 +85,7 @@ function layoutCluster(b: Builder, c: ClusterSpec): number[] {
   const theme = THEMES[c.theme];
   if (!theme) throw new Error(`unknown theme ${c.theme}`);
   const smallMods = c.gen ? c.gen.small.mods : theme.small;
-  const smallName = c.gen ? c.gen.small.name : theme.smallName;
+  const smallName = tidyName(c.gen ? c.gen.small.name : theme.smallName);
   const small = () => smallMods.map((m) => ({ ...m }));
   const smalls: number[] = [];
   const n = c.smallCount;
@@ -98,50 +114,77 @@ function layoutCluster(b: Builder, c: ClusterSpec): number[] {
       );
     return addNode(b, 'notable', c.notable!.name, theme.notable(c.notable!.strength), x, y, c.id);
   };
+  /** A line of the cluster's nodes along the ring with the notable among them: roads run through it (an inline cluster). */
+  const inline = (): number[] => {
+    const at = Math.ceil(n / 2);
+    const ids: number[] = [];
+    for (let j = 0; j <= n; j++) {
+      const o = (j - n / 2) * CHAIN_STEP;
+      const x = cx + tx * o;
+      const y = cy + ty * o;
+      ids.push(j === at ? finalNode(x, y) : addNode(b, 'small', smallName, small(), x, y, c.id));
+      if (j > 0) link(b, ids[j - 1], ids[j]);
+    }
+    return [ids[0], ids[n]];
+  };
   switch (c.kind) {
     case 'wheel': {
-      for (let i = 0; i < n; i++) {
-        const th = a + (2 * Math.PI * i) / n;
-        smalls.push(
-          addNode(
-            b,
-            'small',
-            smallName,
-            small(),
-            cx + WHEEL_RADIUS * Math.cos(th),
-            cy + WHEEL_RADIUS * Math.sin(th),
-            c.id,
-          ),
-        );
+      // A loop of the smalls and the notable (which faces outward); roads enter and leave at the two sides.
+      const m = n + 1;
+      const radius = Math.max(WHEEL_MIN_RADIUS, WHEEL_CHORD / (2 * Math.sin(Math.PI / m)));
+      const ids: number[] = [];
+      for (let i = 0; i < m; i++) {
+        const th = a + (2 * Math.PI * i) / m;
+        const x = cx + radius * Math.cos(th);
+        const y = cy + radius * Math.sin(th);
+        ids.push(i === 0 ? finalNode(x, y) : addNode(b, 'small', smallName, small(), x, y, c.id));
       }
-      for (let i = 0; i < n; i++) link(b, smalls[i], smalls[(i + 1) % n]);
-      const nb = finalNode(cx, cy);
-      link(b, nb, smalls[0]);
-      return smalls;
+      for (let i = 0; i < m; i++) link(b, ids[i], ids[(i + 1) % m]);
+      const side = Math.max(1, Math.round(m / 4));
+      return [ids[side], ids[m - side]];
     }
-    case 'chain': {
-      for (let i = 0; i < n; i++) {
-        const o = (i - (n - 1) / 2) * CHAIN_STEP;
-        smalls.push(addNode(b, 'small', smallName, small(), cx + tx * o, cy + ty * o, c.id));
-        if (i > 0) link(b, smalls[i - 1], smalls[i]);
-      }
-      const nb = finalNode(cx + ux * 80, cy + uy * 80);
-      link(b, nb, smalls[Math.floor(n / 2)]);
-      return smalls;
+    case 'chain':
+      return inline();
+    case 'spur': {
+      // Half the two-small clusters are inline; the others are a pair with the notable on a stalk beside it.
+      const h = hashId(c.id);
+      if (h % 2 === 0) return inline();
+      const sign = h & 4 ? 1 : -1;
+      const first = addNode(
+        b,
+        'small',
+        smallName,
+        small(),
+        cx - tx * (CHAIN_STEP / 2),
+        cy - ty * (CHAIN_STEP / 2),
+        c.id,
+      );
+      const second = addNode(
+        b,
+        'small',
+        smallName,
+        small(),
+        cx + tx * (CHAIN_STEP / 2),
+        cy + ty * (CHAIN_STEP / 2),
+        c.id,
+      );
+      link(b, first, second);
+      const root = h & 2 ? second : first;
+      const rx = b.nodes[root].x;
+      const ry = b.nodes[root].y;
+      link(b, finalNode(rx + ux * STALK * sign, ry + uy * STALK * sign), root);
+      return [first, second];
     }
-    case 'spur':
     case 'keystone': {
-      const start = c.kind === 'spur' ? -SPUR_STEP : -40;
+      // A dead end leaving the ring: two smalls and the keystone, only the innermost small takes roads.
       for (let i = 0; i < n; i++) {
-        const o = start + i * SPUR_STEP;
+        const o = -40 + i * SPUR_STEP;
         smalls.push(addNode(b, 'small', smallName, small(), cx + ux * o, cy + uy * o, c.id));
         if (i > 0) link(b, smalls[i - 1], smalls[i]);
       }
-      const o = start + n * SPUR_STEP + (c.kind === 'keystone' ? 10 : 0);
-      const nb = finalNode(cx + ux * o, cy + uy * o);
-      link(b, nb, smalls[n - 1]);
-      // Keystone clusters are dead ends: only the innermost small node takes travel paths.
-      return c.kind === 'keystone' ? [smalls[0]] : smalls.slice(0, Math.max(1, n - 1));
+      const o = -40 + n * SPUR_STEP + 10;
+      link(b, finalNode(cx + ux * o, cy + uy * o), smalls[n - 1]);
+      return [smalls[0]];
     }
   }
 }

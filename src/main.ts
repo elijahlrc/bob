@@ -5,6 +5,7 @@ import { Controller } from './run/controller';
 import { App } from './ui/App';
 import './ui/styles.css';
 import './ui/skins.css';
+import './ui/tree.css';
 import './ui/mobile.css';
 
 function storage(): Storage | null {

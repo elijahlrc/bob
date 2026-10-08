@@ -38,10 +38,18 @@ export function loadRun(store: KeyValueStore): LoadResult {
  */
 export function migrate(version: number, run: RunState): RunState | null {
   if (version === SAVE_VERSION) return run;
+  // Version 8 has the passive tree of before docs/TREE.md "Look and density": its node ids mean other nodes now, so the
+  // allocated passives are handed back as unspent points.
+  if (version === 8) {
+    run.version = SAVE_VERSION;
+    run.build = { ...run.build, allocated: [] };
+    return run;
+  }
   // Version 7 only lacks the difficulty settings: a run in progress keeps the curve it was balanced on.
   if (version === 7) {
     const old = run as RunState;
     old.version = SAVE_VERSION;
+    old.build = { ...old.build, allocated: [] };
     old.difficulty = { ...LEGACY };
     return old;
   }
@@ -49,6 +57,7 @@ export function migrate(version: number, run: RunState): RunState | null {
     const old = run as RunState & { newLoot?: number[] };
     delete old.newLoot;
     old.version = SAVE_VERSION;
+    old.build = { ...old.build, allocated: [] };
     old.unseen = [];
     old.acquired = {};
     old.favourites = [];

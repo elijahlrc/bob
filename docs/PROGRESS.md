@@ -766,3 +766,32 @@ E0 to E7 of the plan, in order, each committed with `npm run check` and `npm run
 - **E7, integration and measurement.** Default scaling 1.5. Measured numbers and the changes they caused are in
   `docs/ENEMIES.md` section 14. Not built: the Drowned, the Emberborn, the Veiled, per-type gaits.
 - **Known:** the sim speed tests fail when 32 test workers share the machine; `vite.config.ts` sets eight.
+
+### Lost skill gems fixed (2026-10-08)
+
+Equipping an item with fewer sockets than the one it replaced left the extra gems inside the old item, which went to the
+inventory with them. A gem there cannot be socketed anywhere, and salvage, discard, the junk button and the clean-up threw
+it away with the item. The same happened to the item that unequip, or a two-hander clearing the off hand, put in the
+inventory. Now every route out of the build, and every route that destroys an item, sets its gems free
+(`src/run/inventory.ts`, `craft.ts`); older saves are repaired on load. `src/run/gemSafety.test.ts` checks each route and a
+random sequence of 60 equipment changes over 25 seeds (the gems are all still there after every step).
+
+### GPU memory leak on long sessions fixed (2026-10-08)
+
+On a phone, after a long session the character and the walls stopped being drawn (everything else still was); a reload fixed it.
+Cause: every map baked its floor into canvas textures (`gc_<seed>_<x>_<y>`, about 3 MB of GPU memory a map at the measured
+sizes) and never removed them, so the texture memory grew with every map until the phone's GPU gave up on the oldest textures
+(the walls and the hero, which were uploaded first). `GrimStyle` now removes the floor textures when the map ends
+(`mapTextures` in `src/render/styles/grim/index.ts`). Measured in the browser pane over ten maps: before, 2.4 MB at the
+first map and 26.8 MB after eight, climbing without end; after, 4 to 9 MB, level (the rest is the monster and hero frames,
+which are kept and bounded by the number of types). If it still happens, the next suspects are those frames
+(`figKey`) and a lost WebGL context (Phaser restores textures itself).
+
+### Passive tree: density and look (2026-10-08)
+
+The tree reads more like the reference's: 1,708 nodes (was 2,257) of which 22% notables, 13% attribute nodes and 1.6% keystones,
+roads that run through 281 of 376 notables (none did), 150 dead ends (453) and 2 routes dropped (83). Nodes are coloured by
+what they give and shaped by kind, with emblems on notables and keystones, a tinted wedge per region, glowing allocated roads,
+names from zoom 0.4 and a colour key. Details and the numbers: `docs/TREE.md` "Look and density". `SAVE_VERSION` 9: node ids
+changed, so older runs get their passives back as unspent points. Bot balance unchanged within noise (4 of 36 won, was 5 of
+36). `npm run tree:mix` prints the mix. Not done: arcs for ring roads, icons, a stat search.
