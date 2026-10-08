@@ -32,7 +32,7 @@ import {
   type CraftResult,
 } from './craft';
 import { junkItems } from './inventoryOps';
-import { affixesFor, type RunState } from './run';
+import type { RunState } from './run';
 import { scoreTheme } from './threat';
 
 /**
@@ -227,8 +227,9 @@ export function botChalk(run: RunState): number {
   let done = 0;
   for (let guard = 0; guard < 4 && owned(run, 'chalk') > 0; guard++) {
     let best: { gain: number; apply: () => CraftResult } | null = null;
-    run.nextThemes.forEach((id, offer) => {
-      const have = affixesFor(run, id);
+    run.offers.forEach((o, offer) => {
+      const id = o.themeId;
+      const have = o.affixes;
       const cur = scoreTheme(ch, themeDef(id), mode, have).value;
       for (const opt of chalkOptions(run, offer)) {
         const v = scoreTheme(ch, themeDef(id), mode, [...have, opt]).value;

@@ -4,7 +4,6 @@ import { gemDef } from '../data/gems';
 import { getTree } from '../data/tree';
 import { EQUIP_SLOTS, type EquipSlot, type Item } from '../data/types';
 import { runMap, type MapResult } from '../sim/runMap';
-import { affixesFor } from './run';
 import { buildSignature, killerTracker, RunTally } from './metrics';
 import type { RunSummary } from './report';
 import {
@@ -214,9 +213,9 @@ export function randomCraft(run: RunState, rng: Rng): boolean {
     case 'seal':
       return useSeal(run, it.uid).ok;
     case 'chalk': {
-      const offer = rng.int(0, 1);
+      const offer = rng.int(0, run.offers.length - 1);
       if (rng.chance(0.5)) return chalkAdd(run, offer, rng.pick(chalkOptions(run, offer))).ok;
-      const cur = affixesFor(run, run.nextThemes[offer]);
+      const cur = run.offers[offer].affixes;
       return cur.length ? chalkRemove(run, offer, rng.pick(cur)).ok : false;
     }
     default: {
@@ -271,7 +270,7 @@ export function randomRun(
   let moves = 0;
   while (run.phase === 'camp' && run.map <= maxMap) {
     moves += randomCamp(run, rng, maxMoves);
-    const plan = planFor(run, rng.pick(run.nextThemes));
+    const plan = planFor(run, rng.pick(run.offers));
     const res = runMap(plan, run.build, run.xp, worldOptsFor(run, plan), undefined, killer.tick);
     maps.push({
       map: run.map,

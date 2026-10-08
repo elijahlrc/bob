@@ -33,7 +33,7 @@ import {
   rollUniqueFlask,
   socketLimit,
 } from '../gen/loot';
-import { affixesFor, uidSource, type RunState } from './run';
+import { uidSource, type RunState } from './run';
 
 /**
  * Crafting (EXPANSION section 8). The player chooses what changes; chance fills in the details or
@@ -615,31 +615,28 @@ export function tabletTargets(): string[] {
 /** The three affixes Chalk offers to add to an offered map. Fixed until the next craft. */
 export function chalkOptions(run: RunState, offer: number): string[] {
   const rng = craftRng(run, `chalk${offer}.`);
-  const have = new Set(affixesFor(run, run.nextThemes[offer]));
+  const have = new Set(run.offers[offer]?.affixes);
   const pool = MAP_AFFIXES.filter((a) => !a.chalkOnly && !have.has(a.id)).map((a) => a.id);
   return rng.shuffle(pool).slice(0, 3);
 }
 
 export function chalkAdd(run: RunState, offer: number, affixId: string): CraftResult {
-  const edit = run.mapEdits[offer];
-  if (!edit) return fail('No such map');
+  const target = run.offers[offer];
+  if (!target) return fail('No such map');
   if (!chalkOptions(run, offer).includes(affixId)) return fail('That affix is not on offer');
   if (!pay(run, 'chalk')) return fail("You have no Wayfinder's Chalk");
   run.craftSeq++;
-  edit.add = [...new Set([...edit.add, affixId])];
-  edit.remove = edit.remove.filter((id) => id !== affixId);
+  target.affixes = [...new Set([...target.affixes, affixId])].sort();
   return OK;
 }
 
 export function chalkRemove(run: RunState, offer: number, affixId: string): CraftResult {
-  const edit = run.mapEdits[offer];
-  if (!edit) return fail('No such map');
-  if (!affixesFor(run, run.nextThemes[offer]).includes(affixId))
-    return fail('The map has no such affix');
+  const target = run.offers[offer];
+  if (!target) return fail('No such map');
+  if (!target.affixes.includes(affixId)) return fail('The map has no such affix');
   if (owned(run, 'chalk') < 2) return fail("That needs 2 Wayfinder's Chalk");
   pay(run, 'chalk', 2);
   run.craftSeq++;
-  if (edit.add.includes(affixId)) edit.add = edit.add.filter((id) => id !== affixId);
-  else edit.remove = [...new Set([...edit.remove, affixId])];
+  target.affixes = target.affixes.filter((id) => id !== affixId);
   return OK;
 }

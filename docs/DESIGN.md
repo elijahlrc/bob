@@ -126,7 +126,7 @@ Title → Class select → [Camp → Map]×100 → Victory
 ```
 
 - **Camp** (DOM UI): passive tree, equipment and inventory, gem sockets, character sheet, a reward pick (1 of 3, when
-  earned), and the next-map choice (1 of 2). The game saves on entering camp.
+  earned), and the next-map choice (1 of 3, see docs/MAPS.md). The game saves on entering camp.
 - **Map** (Phaser): the character auto-walks the labyrinth. A map is cleared when the boss or final pack in the last
   room is dead **and** the character reaches the exit. Then it returns to camp.
 
@@ -166,7 +166,7 @@ mana flask.
   - That makes 123 points in total, the same as PoE.
 - **Refund points:** +1 per cleared map. Refunding a node costs 1 point and only works if the tree stays connected.
 - **Reward pick** (1 of 3): after every 5th map and after every mini-boss.
-- **Next-map choice:** two options with the same area level but different **themes** (section 12.6).
+- **Next-map choice:** three options (`docs/MAPS.md` section 4), each a map with its own theme, layout and affixes (section 12.6). All three are at the same area level for now; level offsets, Respite and map types follow in that plan.
 - **Auto-continue:** the camp has a toggle, on by default. When on, if there are no unspent passive points, no pending
   reward pick and no new unique or rare item, the next map starts with the first theme after a 2-second countdown the
   player can cancel. This keeps 100 maps from becoming 100 forced menu visits.
@@ -934,7 +934,7 @@ Magic monsters roll from the ✓ rows. Rares roll from all rows. There are no du
 
 ### 12.6 Map themes
 
-Each map offers 2 themes (5.3). A theme adjusts element weights and adds a small bonus:
+Each level offers 3 maps with different themes (5.3). A theme adjusts element weights and adds a small bonus:
 
 | Theme            | Element weights    | Bonus                               |
 | ---------------- | ------------------ | ----------------------------------- |
@@ -1259,6 +1259,7 @@ _(Filled in during implementation: date, decision, reason.)_
 | 2026-10-06 | Unique jewels are out of the plan.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | The user's review.                                                                                                                                                   |
 | 2026-10-07 | C1 mechanics audit: Bob's rules were brought in line with 3.9.0 (hit chance, crit cap and confirmation, crit ailments, bleed, shock and chill, stun, ES recharge, leech, regeneration, dual wielding, triggers, flasks, Fervour, boss curses). The full list, with the wiki revision behind each rule, is `docs/AUDIT-3.9.md`.                                                                                                                                                                                      | The user asked that mechanics match 3.9.0, not just content (COVERAGE C-1).                                                                                          |
 | 2026-10-07 | Divergences recorded by the audit (2.1 rows): bot-tuned monster accuracy, evasion and armour; per-level flat attack damage and the one-hand bonus; no gem quality; −200 resist floor; per-hit crit rolls; blocked hits skip on-hit effects; "increased damage taken" multiplies separately from shock; flasks do not end early at full life; fixed 6 s hex duration and own hex numbers; support cost multipliers do not raise aura reservation; Wounded Retort uses a share of life; ES leech uses the life rates. | Each is a deliberate simplification or a tuned number with no 3.9 basis; none is worth the engine cost.                                                              |
+| 2026-10-07 | Map choice (`docs/MAPS.md`, R0): the next-map choice is three stored offers (`RunState.offers`), each with its own layout seed, rolled when the previous level ends and kept in the save; Wayfinder's Chalk edits an offer's affix list in place (`mapEdits` is gone). `SAVE_VERSION` is 5.                                                                                                                                                                                                                         | The plan makes the route a real choice; storing the offers means a reload cannot re-roll them.                                                                       |
 
 ## Appendix B — Glossary
 

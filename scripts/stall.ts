@@ -1,6 +1,6 @@
 /* Finds "stalls": the player keeps engaging one target for a long time without damaging it. */
 import { CLASSES } from '../src/data/classes';
-import { newRun, planFor, worldOptsFor } from '../src/run/run';
+import { newRun, planFor, worldOptsFor, setMap } from '../src/run/run';
 import { createWorld, stepWorld } from '../src/sim/world';
 
 const seeds = Number(process.argv[2] ?? 30);
@@ -10,8 +10,8 @@ for (const cls of CLASSES) {
   for (let seed = 1; seed <= seeds; seed++) {
     for (const mapNo of maps) {
       const run = newRun(cls.id, seed);
-      run.map = mapNo;
-      const plan = planFor(run, run.nextThemes[0]);
+      setMap(run, mapNo);
+      const plan = planFor(run, run.offers[0]);
       const w = createWorld({ plan, build: run.build, xp: 0, opts: worldOptsFor(run, plan) });
       let target = 0;
       let since = 0;

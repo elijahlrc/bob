@@ -12,7 +12,7 @@ import { modsText } from '../mods/text';
 import { makeGem, makeItem } from './items';
 import { CONDITIONS } from '../mods/types';
 import { flaskSpec } from '../calc/flasks';
-import { newRun, rollRewards, type RunState } from '../run/run';
+import { newRun, rollRewards, type RunState, setMap } from '../run/run';
 import { slotsFor } from '../run/inventory';
 import {
   FACTION_POOL_WEIGHT,
@@ -387,7 +387,7 @@ describe('acquisition (EXPANSION 6.2 items 1–4)', () => {
 
   function atMap(map: number): RunState {
     const run = newRun('reaver', 5);
-    run.map = map;
+    setMap(run, map);
     run.build.level = map;
     return run;
   }

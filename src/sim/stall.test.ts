@@ -8,7 +8,7 @@ import { createWorld, stepWorld } from './world';
 describe('stall breaker', () => {
   it('drops a target that cannot be damaged, and the run carries on', () => {
     const run = newRun('strider', 3);
-    const plan = planFor(run, run.nextThemes[0]);
+    const plan = planFor(run, run.offers[0]);
     const w = createWorld({ plan, build: run.build, xp: 0, opts: worldOptsFor(run, plan) });
     // Make every monster's life snap back each tick: nothing can ever be killed.
     let sawEngage = false;
@@ -25,7 +25,7 @@ describe('stall breaker', () => {
 describe('aggro', () => {
   it('monsters near an attacking player wake up', () => {
     const run = newRun('strider', 5);
-    const plan = planFor(run, run.nextThemes[0]);
+    const plan = planFor(run, run.offers[0]);
     const w = createWorld({ plan, build: run.build, xp: 0, opts: worldOptsFor(run, plan) });
     const idle = () => w.actors.filter((a) => !a.isPlayer && a.alive && a.state === 'idle').length;
     const before = idle();
@@ -42,7 +42,7 @@ describe('bow campaign regression', () => {
     let stalls = 0;
     while (run.phase === 'camp' && run.map <= 16) {
       botCamp(run);
-      const plan = planFor(run, run.nextThemes[0]);
+      const plan = planFor(run, run.offers[0]);
       const res = runMap(plan, run.build, run.xp, worldOptsFor(run, plan), undefined, (w) => {
         for (const e of w.events) if (e.t === 'stall') stalls++;
       });

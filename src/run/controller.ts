@@ -8,7 +8,15 @@ import { botCamp } from './bot';
 import { galleryEntries, galleryRun, galleryWorld, type GalleryEntry } from './gallery';
 import { completeTabletSets } from './craft';
 import { loadFound, recordFound } from './codex';
-import { finishMap, newRun, passivePoints, planFor, worldOptsFor, type RunState } from './run';
+import {
+  finishMap,
+  newRun,
+  passivePoints,
+  planFor,
+  setMap,
+  worldOptsFor,
+  type RunState,
+} from './run';
 import { clearSave, loadRun, saveRun, SAVE_KEY, type KeyValueStore, type LoadResult } from './save';
 
 export type Screen = 'title' | 'classSelect' | 'camp' | 'map' | 'summary' | 'victory' | 'codex';
@@ -94,10 +102,10 @@ export class Controller {
     const cls = CLASSES[sc.classIdx];
     const run = newRun(cls.id, 1000 + sc.classIdx * 17 + sc.runs++ * 101);
     run.build.level = sc.boss ? 100 : 45;
-    run.map = sc.boss ? 100 : 30;
+    setMap(run, sc.boss ? 100 : 30);
     botCamp(run);
     this.run = run;
-    const plan = planFor(run, run.nextThemes[0]);
+    const plan = planFor(run, run.offers[0]);
     this.world = createWorld({
       plan,
       build: run.build,
@@ -178,11 +186,11 @@ export class Controller {
     this.goTo('camp');
   }
 
-  /** Start the next map with one of the two offered themes. */
-  startMap(themeIdx = 0): void {
+  /** Start the next map with one of the offered maps. */
+  startMap(offerIdx = 0): void {
     const run = this.run;
     if (!run) return;
-    const plan = planFor(run, run.nextThemes[themeIdx] ?? run.nextThemes[0]);
+    const plan = planFor(run, run.offers[offerIdx] ?? run.offers[0]);
     run.newLoot = [];
     this.undoStack = [];
     this.world = createWorld({ plan, build: run.build, xp: run.xp, opts: worldOptsFor(run, plan) });

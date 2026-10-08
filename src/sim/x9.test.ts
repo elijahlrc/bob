@@ -8,7 +8,7 @@ import { makeGem, makeItem } from '../gen/items';
 import { generateLabyrinth } from '../gen/labyrinth';
 import { rollCurrencyDrops } from '../gen/currencyDrops';
 import { populate, rollMonsterMods, typeShares } from '../gen/population';
-import { newRun, planFor, rollThemes } from '../run/run';
+import { newRun, planFor, rollThemes, setMap } from '../run/run';
 import { applyDamage, killActor } from './combat';
 import { createDummyWorld } from './dummy';
 import { isZone, NEST_MAX_ALIVE, shieldedByPylon } from './factions';
@@ -313,7 +313,7 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
   it('every map of the new themes runs the same way twice (determinism)', () => {
     for (const theme of ['gnawingWarrens', 'reliquaryVault']) {
       const r = newRun('vanguard', 61);
-      r.map = 40;
+      setMap(r, 40);
       r.build.level = 40;
       const go = () => runMap(planFor(r, theme), r.build, 0, { godMode: true, maxTime: 120 });
       expect(go().eventHash, theme).toBe(go().eventHash);

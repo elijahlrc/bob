@@ -6,7 +6,7 @@ import { themeDef, themesFor } from '../data/themes';
 import { makeGem, makeItem } from '../gen/items';
 import { generateLabyrinth } from '../gen/labyrinth';
 import { populate, rollMonsterMods, rollType, typeShares } from '../gen/population';
-import { newRun, planFor, rollThemes } from '../run/run';
+import { newRun, planFor, rollThemes, setMap } from '../run/run';
 import { applyDamage, killActor } from './combat';
 import { createDummyWorld } from './dummy';
 import {
@@ -363,7 +363,7 @@ describe('the factions (EXPANSION 7.3)', () => {
   for (const theme of ['charnelPits', 'hollowVigil']) {
     it(`a ${theme} map runs the same way twice (determinism)`, () => {
       const r = newRun('vanguard', 77);
-      r.map = 25;
+      setMap(r, 25);
       r.build.level = 30;
       const go = () => runMap(planFor(r, theme), r.build, 0, { godMode: true, maxTime: 150 });
       const a = go();

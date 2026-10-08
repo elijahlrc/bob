@@ -1,6 +1,6 @@
 /* Player hit rate against enemies with and without the Elusive affix. */
 import { CLASSES } from '../src/data/classes';
-import { newRun, planFor, worldOptsFor } from '../src/run/run';
+import { newRun, planFor, worldOptsFor, setMap } from '../src/run/run';
 import { createWorld, stepWorld } from '../src/sim/world';
 
 const maps = (process.argv[2] ?? '1,10,30,60').split(',').map(Number);
@@ -11,8 +11,8 @@ for (const mapNo of maps) {
     const chance: number[] = [];
     for (let seed = 1; seed <= 8; seed++) {
       const run = newRun(cls.id, seed);
-      run.map = mapNo;
-      const plan = planFor(run, run.nextThemes[0]);
+      setMap(run, mapNo);
+      const plan = planFor(run, run.offers[0]);
       const w = createWorld({ plan, build: run.build, xp: 0, opts: worldOptsFor(run, plan) });
       const elusive = new Set<number>();
       for (const a of w.actors) if (a.modIds.includes('elusive')) elusive.add(a.id);

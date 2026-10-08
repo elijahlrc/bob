@@ -15,7 +15,7 @@ import { rollUnique, rollUniqueFlask } from '../gen/loot';
 import { scoreBuild } from '../run/bot';
 import { itemReq } from '../calc/items';
 import { canEquip, slotsFor } from '../run/inventory';
-import { newRun } from '../run/run';
+import { newRun, setMap } from '../run/run';
 import { applyHit, killActor } from './combat';
 import { createDummyWorld, dummyDefence } from './dummy';
 import { autoFlaskPolicy } from './flaskPolicy';
@@ -193,7 +193,7 @@ describe('wave 2 uniques', () => {
 
   it('Frostwrit: no physical damage, a cold spell on melee crits, and the spell raises the score', () => {
     const run = newRun('vanguard', 1);
-    run.map = 40;
+    setMap(run, 40);
     const sword = (b: Build, spell: boolean) => {
       const it = b.equipment.mainHand!;
       it.sockets = [spell ? makeGem(uid, 'frostLance') : null, null, null];

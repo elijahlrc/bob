@@ -13,7 +13,7 @@ import { rollUnique } from '../gen/loot';
 import { generateLabyrinth } from '../gen/labyrinth';
 import { populate, rollMonsterMods } from '../gen/population';
 import { mod } from '../mods/types';
-import { newRun, planFor } from '../run/run';
+import { newRun, planFor, setMap } from '../run/run';
 import { gainCharge, tickCharges } from './charges';
 import { applyDamage, killActor } from './combat';
 import { createDummyWorld, dummyDefence } from './dummy';
@@ -363,7 +363,7 @@ describe('the Ashen Choir (EXPANSION 7.3)', () => {
 
   it('the Ashen Nave runs the same way twice (determinism)', () => {
     const r = newRun('vanguard', 77);
-    r.map = 30;
+    setMap(r, 30);
     r.build.level = 30;
     const go = () => runMap(planFor(r, 'ashenNave'), r.build, 0, { godMode: true, maxTime: 150 });
     const a = go();

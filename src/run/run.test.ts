@@ -15,6 +15,7 @@ import {
   SAVE_VERSION,
   takeReward,
   TOTAL_MAPS,
+  setMap,
 } from './run';
 import { clearSave, loadRun, MemoryStore, SAVE_KEY, saveRun } from './save';
 
@@ -93,7 +94,7 @@ describe('run progression (§5.3)', () => {
     finishMap(run, { ...cleared(1), status: 'dead' });
     expect(run.phase).toBe('dead');
     const run2 = newRun('mystic', 1);
-    run2.map = TOTAL_MAPS;
+    setMap(run2, TOTAL_MAPS);
     finishMap(run2, cleared(100));
     expect(run2.phase).toBe('victory');
   });
@@ -118,7 +119,7 @@ describe('run progression (§5.3)', () => {
 
   it('reward picks add the chosen offer to the inventory', () => {
     const run = newRun('shade', 3);
-    run.map = 5;
+    setMap(run, 5);
     run.reward = rollRewards(run);
     const pick = run.reward[1];
     takeReward(run, pick.uid);

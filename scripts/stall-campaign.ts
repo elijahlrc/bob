@@ -14,7 +14,7 @@ for (const cls of CLASSES.filter((c) => !only || c.id === only)) {
     const run = newRun(cls.id, seedBase + r);
     while (run.phase === 'camp' && run.map <= maxMap) {
       botCamp(run);
-      const plan = planFor(run, run.nextThemes[0]);
+      const plan = planFor(run, run.offers[0]);
       const recent: { t: number; k: string; mine: boolean }[] = [];
       const res = runMap(plan, run.build, run.xp, worldOptsFor(run, plan), undefined, (w) => {
         for (const e of w.events) {

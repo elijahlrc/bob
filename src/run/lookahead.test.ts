@@ -6,7 +6,7 @@ import { makeGem, makeItem } from '../gen/items';
 import { rollUnique } from '../gen/loot';
 import { botEquip, scoreBuild } from './bot';
 import { withEquipped } from './inventory';
-import { newRun, type RunState } from './run';
+import { newRun, type RunState, setMap } from './run';
 
 /**
  * Bot lookahead for stranded gems (EXPANSION 10.1 item 3): The Walled Heart has no sockets, so
@@ -16,7 +16,7 @@ function setup(): { run: RunState; heart: ReturnType<typeof rollUnique> } {
   const run = newRun('vanguard', 3);
   const uid = () => run.nextUid++;
   run.build.level = 60;
-  run.map = 60;
+  setMap(run, 60);
   // The main skill and its support live in the body armour; the two-hander has free sockets.
   const body = makeItem(uid, 'body_ar_3', 60, 4);
   body.sockets = [makeGem(uid, 'crushingBlow'), makeGem(uid, 'bruteForce'), null, null];

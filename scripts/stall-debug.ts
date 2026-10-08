@@ -10,7 +10,7 @@ const run = newRun(cls, seed);
 let done = false;
 while (run.phase === 'camp' && run.map <= 40 && !done) {
   botCamp(run);
-  const plan = planFor(run, run.nextThemes[0]);
+  const plan = planFor(run, run.offers[0]);
   // Pass 1: find the first stall in this map.
   let stallT = -1;
   let stallId = 0;

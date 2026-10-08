@@ -11,7 +11,7 @@ import { makeCharacter } from '../sim/world';
 import { cfgFor } from './bot';
 import { offersFor } from './preview';
 import { withStarterGems } from './starterGems';
-import { affixRewards, affixesFor, finishMap, newRun, planFor, worldOptsFor } from './run';
+import { affixRewards, finishMap, newRun, planFor, worldOptsFor, setMap } from './run';
 import { threatPreview } from './threat';
 
 describe('map affixes (EXPANSION 7.5)', () => {
@@ -104,7 +104,7 @@ describe('map affixes (EXPANSION 7.5)', () => {
     expect(r.quantity).toBeCloseTo(mapAffixDef('moreLife').reward.quantity!);
     expect(r.rarity).toBeCloseTo(0.3);
     const run = newRun('vanguard', 1);
-    run.map = 40;
+    setMap(run, 40);
     expect(worldOptsFor(run, makeMapPlan(1, 40, 'ashenCrypt', ['moreLife'])).loot).toBeDefined();
   });
 });
@@ -112,7 +112,7 @@ describe('map affixes (EXPANSION 7.5)', () => {
 describe('threat preview (EXPANSION section 9)', () => {
   const run = withStarterGems(newRun('vanguard', 1));
   run.build.level = 50;
-  run.map = 50;
+  setMap(run, 50);
   const ch = new Character(run.build, cfgFor(run));
   const theme = themeDef('ashenCrypt');
 
@@ -132,7 +132,7 @@ describe('threat preview (EXPANSION section 9)', () => {
     // Resistances well above the lowered cap, so the cap is what limits them.
     const capped = newRun('vanguard', 1);
     capped.build.level = 50;
-    capped.map = 50;
+    setMap(capped, 50);
     const ring = makeItem(() => 900, 'ring_all', 50, 0, 'unique');
     ring.uniqueMods = [mod('resist.allEle', 'base', 100), mod('resist.chaos', 'base', 100)];
     capped.build.equipment.ring1 = ring;
@@ -148,21 +148,22 @@ describe('threat preview (EXPANSION section 9)', () => {
   it('a resistant monster cuts the DPS of an element it resists, not of physical', () => {
     const fireRun = withStarterGems(newRun('mystic', 1));
     fireRun.build.level = 50;
-    fireRun.map = 50;
+    setMap(fireRun, 50);
     const c = new Character(fireRun.build, cfgFor(fireRun));
     const plain = threatPreview(c, theme, 'clearing', []).dps;
     expect(threatPreview(c, theme, 'clearing', ['fireproof']).dps).toBeLessThan(plain);
     expect(threatPreview(c, theme, 'clearing', ['coldproof']).dps).toBeCloseTo(plain, 0);
   });
 
-  it('the camp offers two maps, each with its affixes and numbers', () => {
+  it('the camp offers three maps, each with its affixes and numbers', () => {
     const r = newRun('reaver', 3);
-    r.map = 45;
+    setMap(r, 45);
     r.build.level = 45;
     const offers = offersFor(r);
-    expect(offers).toHaveLength(2);
+    expect(offers).toHaveLength(3);
+    expect(new Set(offers.map((o) => o.themeId)).size).toBe(3);
     for (const o of offers) {
-      expect(o.affixes).toEqual(affixesFor(r, o.themeId));
+      expect(o.affixes).toEqual(r.offers.find((x) => x.id === o.id)!.affixes);
       expect(o.dps).toBeGreaterThan(0);
       expect(o.ehp).toBeGreaterThan(0);
     }
@@ -173,8 +174,8 @@ describe('threat preview (EXPANSION section 9)', () => {
 describe('death recap (EXPANSION section 9)', () => {
   it('a death records the killer, the last seconds of damage and your defences', () => {
     const run = newRun('mystic', 4);
-    run.map = 40;
-    const plan = planFor(run, run.nextThemes[0]);
+    setMap(run, 40);
+    const plan = planFor(run, run.offers[0]);
     const res = runMap(plan, run.build, run.xp, worldOptsFor(run, plan));
     expect(res.status).toBe('dead');
     const r = res.recap!;
@@ -193,7 +194,7 @@ describe('death recap (EXPANSION section 9)', () => {
 
   it('a cleared map has no recap', () => {
     const run = newRun('vanguard', 2);
-    const plan = planFor(run, run.nextThemes[0]);
+    const plan = planFor(run, run.offers[0]);
     const res = runMap(plan, run.build, run.xp, worldOptsFor(run, plan));
     expect(res.status).toBe('cleared');
     expect(res.recap).toBeUndefined();

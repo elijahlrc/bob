@@ -592,3 +592,22 @@ Minions used to be untouchable (a departure from PoE that made them far stronger
   gem is usable in the gallery. 1,782 tests.
 - **Known.** Mystic seed 1000 (bot) dies on map 1; it did so before this work. The in-app browser pane runs the game at
   about 1.5 frames a second, so effects were checked frame by frame with `window.__dev`.
+
+### Map choice R0: three offers (2026-10-07)
+
+Plan: [MAPS.md](MAPS.md). R0 is a refactor with no change in difficulty: three offered maps instead of two.
+
+- **Offers.** `RunState.offers` (`src/run/offers.ts`) holds three `MapOffer`s (theme, affixes, layout id, area level, offset),
+  rolled when the previous level ends and stored in the save. `nextThemes`, `mapEdits` and `affixesFor` are gone.
+  `rollThemes` returns three different themes; the first two are the ones the old code returned for the same seed.
+- **Layouts.** Every offer has its own layout seed (`mapSeed(run, offer)`); before, the offers of a level shared one.
+- **Chalk.** Wayfinder's Chalk edits the offer's own affix list.
+- **API.** `planFor(run, offer | themeId)`; `setMap(run, n)` jumps to a level and rolls its offers (tests, demos).
+  The bot's `chooseTheme` is now `chooseOffer` and ranks all three. `MapRecord` records `areaLevel`.
+- **Save.** `SAVE_VERSION` 5.
+- **Tests.** `offers.test.ts` (three themes valid for the level, same seed same set, distinct layouts, a Chalk edit survives
+  save and load). The suite was green before (1,796) and after, apart from the 400x-real-time test in `x9.test.ts`, which
+  fails under the load of a parallel run and passes alone.
+- **Bot run on the new code** (`npm run sim -- --runs 3 --class all --seed 1`): 8 of 18 wins, no stuck maps, median level 27 / 53 / 79 at maps 25 / 50 / 75. There is no seed-for-seed comparison with the old code, because layouts changed for every map. One Mystic seed (1002) dies on map 1; the old code has the same problem on a different seed (1000), so it is the known Mystic map-1 weakness and not a result of this change.
+- **Browser.** Camp shows three offers (Archer's Gallery, Ashen Crypt, Bone Pits for seed-1 Vanguard) and a map starts with no
+  console errors. The pane was hidden, so the game did not advance to the end of the map.

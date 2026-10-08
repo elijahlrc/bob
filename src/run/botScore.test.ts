@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { Character } from '../calc/character';
 import { THEMES, themeDef } from '../data/themes';
 import { mod } from '../mods/types';
-import { cfgFor, chooseTheme, scoreBuild } from './bot';
-import { newRun, type RunState } from './run';
+import { cfgFor, chooseOffer, scoreBuild } from './bot';
+import { makeOffer } from './offers';
+import { newRun, type RunState, setMap } from './run';
 import { scoreTheme, themeThreat } from './threat';
 
 /** A run whose main-hand weapon carries extra mods. */
@@ -74,14 +75,17 @@ describe('theme threat and the theme-aware bot', () => {
 
   it('a build with high cold resistance does better against a cold theme than a fire one', () => {
     const run = withMods(newRun('vanguard', 1), [mod('resist.cold', 'base', 75)]);
-    run.map = 30;
+    setMap(run, 30);
     const ch = new Character(run.build, cfgFor(run));
     const rimed = scoreTheme(ch, themeDef('rimedCatacomb'), 'clearing');
     const ashen = scoreTheme(ch, themeDef('ashenCrypt'), 'clearing');
     expect(rimed.ehp).toBeGreaterThan(ashen.ehp);
     expect(rimed.value).toBeGreaterThan(ashen.value);
-    run.nextThemes = ['ashenCrypt', 'rimedCatacomb'];
-    expect(chooseTheme(run, 'best')).toBe('rimedCatacomb');
-    expect(chooseTheme(run, 'first')).toBe('ashenCrypt');
+    run.offers = ['ashenCrypt', 'rimedCatacomb'].map((id, slot) => makeOffer(1, 30, slot, id));
+    expect(chooseOffer(run, 'best').themeId).toBe('rimedCatacomb');
+    expect(chooseOffer(run, 'first').themeId).toBe('ashenCrypt');
+    // A third offer joins the comparison: the bot picks the best of all of them.
+    run.offers.push(makeOffer(1, 30, 2, 'thunderVault'));
+    expect(['rimedCatacomb', 'thunderVault']).toContain(chooseOffer(run, 'best').themeId);
   });
 });

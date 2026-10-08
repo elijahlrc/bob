@@ -4,7 +4,7 @@ import type { TriggerDef } from '../data/triggers';
 import type { Build } from '../data/types';
 import { makeGem, makeItem } from '../gen/items';
 import { mod, type Mod } from '../mods/types';
-import { newRun } from '../run/run';
+import { newRun, setMap } from '../run/run';
 import { scoreBuild } from '../run/bot';
 import { applyHit, killActor } from './combat';
 import { createDummyWorld, dummyDefence } from './dummy';
@@ -324,7 +324,7 @@ describe('triggers on the character sheet', () => {
     expect(without.triggered).toHaveLength(0);
     // The bot sees the extra damage.
     const run = newRun('vanguard', 1);
-    run.map = 40;
+    setMap(run, 40);
     expect(scoreBuild(run, b)).toBeGreaterThan(scoreBuild(run, buildFor([])));
   });
 

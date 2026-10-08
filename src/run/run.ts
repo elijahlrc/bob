@@ -2,7 +2,6 @@ import { ACTIVE_GEMS } from '../data/gems';
 import { Rng } from '../core/rng';
 import { classDef } from '../data/classes';
 import { factionOfSpec } from '../data/monsters';
-import { themesFor } from '../data/themes';
 import { TABLET_PREFIX } from '../data/currency';
 import type { AnyItem, Build, CurrencyItem, InventoryItem, Item } from '../data/types';
 import { rollCurrencyBundle, rollCurrencyDrops } from '../gen/currencyDrops';
@@ -17,16 +16,21 @@ import {
   uniqueIdOf,
 } from '../gen/loot';
 import { mapAffixDef } from '../data/mapAffixes';
-import { makeMapPlan, rollMapAffixes, type MapPlan } from '../gen/mapPlan';
+import { makeMapPlan, type MapPlan } from '../gen/mapPlan';
 import { flaskMask } from '../sim/combat';
 import type { DeathRecap, WorldOpts } from '../sim/types';
 import type { MapResult } from '../sim/runMap';
+import { makeOffer, rollOffers, type MapOffer } from './offers';
 
-export const SAVE_VERSION = 4;
+export { rollThemes } from './offers';
+
+export const SAVE_VERSION = 5;
 export const TOTAL_MAPS = 100;
 
 export type MapRecord = {
   map: number;
+  /** The level of the map that was played (differs from `map` once offers carry level offsets). */
+  areaLevel: number;
   status: MapResult['status'];
   time: number;
   levelAfter: number;
@@ -36,14 +40,6 @@ export type MapRecord = {
 
 /** A reforge whose three alternatives have been drawn and shown, and not yet picked (EXPANSION 8.1). */
 export type PendingCraft = { itemUid: number; pinned: string[]; options: Item[] };
-
-/** Wayfinder's Chalk edits to one of the two offered maps. */
-export type MapEdit = { add: string[]; remove: string[] };
-
-export const noMapEdits = (): MapEdit[] => [
-  { add: [], remove: [] },
-  { add: [], remove: [] },
-];
 
 export type RunState = {
   version: number;
@@ -57,8 +53,8 @@ export type RunState = {
   nextUid: number;
   bonusPoints: number;
   refundPoints: number;
-  /** Two theme ids offered for the next map. */
-  nextThemes: [string, string];
+  /** The maps offered for the next level, rolled when the previous level ended (docs/MAPS.md 4.1). */
+  offers: MapOffer[];
   autoContinue: boolean;
   phase: 'camp' | 'dead' | 'victory';
   history: MapRecord[];
@@ -79,8 +75,6 @@ export type RunState = {
   /** Rises with every craft that draws; craft rolls come from the run seed and this number. */
   craftSeq: number;
   pendingCraft: PendingCraft | null;
-  /** Chalk edits of the two offered maps; cleared when the next maps are offered. */
-  mapEdits: MapEdit[];
 };
 
 const BODY_FOR_CLASS: Record<string, string> = {
@@ -94,12 +88,6 @@ const BODY_FOR_CLASS: Record<string, string> = {
 
 export function uidSource(run: RunState): () => number {
   return () => run.nextUid++;
-}
-
-export function rollThemes(seed: number, map: number): [string, string] {
-  const r = new Rng(seed).fork(`themes${map}`);
-  const ids = r.shuffle(themesFor(map).map((t) => t.id));
-  return [ids[0], ids[1]];
 }
 
 /** A fresh run for a class (§5.2 starting kit). */
@@ -122,7 +110,7 @@ export function newRun(classId: string, seed: number): RunState {
     nextUid: 1,
     bonusPoints: 0,
     refundPoints: 0,
-    nextThemes: rollThemes(seed, 1),
+    offers: rollOffers(seed, 1),
     autoContinue: true,
     phase: 'camp',
     history: [],
@@ -134,7 +122,6 @@ export function newRun(classId: string, seed: number): RunState {
     tablets: {},
     craftSeq: 0,
     pendingCraft: null,
-    mapEdits: noMapEdits(),
   };
   const uid = uidSource(run);
   const main = makeItem(uid, cls.startWeapons[0], 1, 1);
@@ -159,23 +146,30 @@ export function newRun(classId: string, seed: number): RunState {
   return run;
 }
 
-/** Seed for a given map of a run. */
-export function mapSeed(run: RunState, map: number): number {
-  return new Rng(run.seed).fork(`map${map}`).nextU32();
+/** Seed of an offered map: every offer has its own layout (docs/MAPS.md 4.1). */
+export function mapSeed(run: RunState, offer: MapOffer): number {
+  return new Rng(run.seed).fork(`map.${offer.id}`).nextU32();
 }
 
-/** The affixes of the offered map with this theme. */
-export function affixesFor(run: RunState, themeId: string): string[] {
-  const offer = Math.max(0, run.nextThemes.indexOf(themeId as never));
-  const edit = run.mapEdits[offer];
-  const rolled = rollMapAffixes(run.seed, run.map, offer);
-  if (!edit) return rolled;
-  const kept = rolled.filter((id) => !edit.remove.includes(id));
-  return [...new Set([...kept, ...edit.add])].sort();
+/** Go to a given map number and roll its offers (a new level, and tests and demos that jump ahead). */
+export function setMap(run: RunState, map: number): void {
+  run.map = map;
+  run.offers = rollOffers(run.seed, map);
 }
 
-export function planFor(run: RunState, themeId: string): MapPlan {
-  return makeMapPlan(mapSeed(run, run.map), run.map, themeId, affixesFor(run, themeId));
+/**
+ * The plan of an offered map. A theme id stands for a map of that theme as the offer in its slot (or
+ * the first slot) would roll at the current map number; tests and tools use it to try a theme.
+ */
+export function planFor(run: RunState, offer: MapOffer | string): MapPlan {
+  if (typeof offer === 'string') {
+    const slot = Math.max(
+      0,
+      run.offers.findIndex((o) => o.themeId === offer),
+    );
+    offer = makeOffer(run.seed, run.map, slot, offer);
+  }
+  return makeMapPlan(mapSeed(run, offer), run.map, offer.themeId, offer.affixes);
 }
 
 /** What a map's affixes add to its loot, as fractions. */
@@ -226,6 +220,7 @@ export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
 export function finishMap(run: RunState, res: MapResult): void {
   run.history.push({
     map: run.map,
+    areaLevel: run.map,
     status: res.status,
     time: res.time,
     levelAfter: res.level,
@@ -260,8 +255,7 @@ export function finishMap(run: RunState, res: MapResult): void {
   if (run.map % 5 === 0) run.reward = rollRewards(run);
   else if (run.map <= SKILL_REWARD_MAPS) run.reward = rollSkillRewards(run);
   run.map += 1;
-  run.nextThemes = rollThemes(run.seed, run.map);
-  run.mapEdits = noMapEdits();
+  run.offers = rollOffers(run.seed, run.map);
   run.phase = 'camp';
 }
 

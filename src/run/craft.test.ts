@@ -34,7 +34,7 @@ import {
 } from './craft';
 import { Controller } from './controller';
 import { loadRun, MemoryStore, SAVE_KEY, saveRun } from './save';
-import { affixesFor, newRun, SAVE_VERSION, stash, type RunState } from './run';
+import { newRun, SAVE_VERSION, stash, type RunState, setMap } from './run';
 
 let n = 90000;
 const uid = () => n++;
@@ -42,7 +42,7 @@ const uid = () => n++;
 /** A run holding a rare body armour (in the inventory), with a pouch of everything. */
 function setup(over: { map?: number; rarity?: 'normal' | 'magic' | 'rare'; base?: string } = {}) {
   const run = newRun('vanguard', 11);
-  run.map = over.map ?? 60;
+  setMap(run, over.map ?? 60);
   run.build.level = 60;
   const base = itemBase(over.base ?? 'body_ar_3');
   const item = rollItemOf(new Rng(5), uid, base, 70, over.rarity ?? 'rare');
@@ -470,12 +470,12 @@ describe("tablets and Wayfinder's Chalk", () => {
     expect(chalkAdd(run, 0, 'nonsense').ok).toBe(false);
     expect(chalkAdd(run, 0, opts[0]).ok).toBe(true);
     expect(run.currency.chalk).toBe(49);
-    expect(affixesFor(run, run.nextThemes[0])).toContain(opts[0]);
+    expect(run.offers[0].affixes).toContain(opts[0]);
     expect(chalkOptions(run, 0)).not.toEqual(opts); // a craft happened
-    const have = affixesFor(run, run.nextThemes[0]);
+    const have = run.offers[0].affixes;
     expect(chalkRemove(run, 0, have[0]).ok).toBe(true);
     expect(run.currency.chalk).toBe(47);
-    expect(affixesFor(run, run.nextThemes[0])).not.toContain(have[0]);
+    expect(run.offers[0].affixes).not.toContain(have[0]);
     expect(chalkRemove(run, 0, 'nonsense').ok).toBe(false);
   });
 });

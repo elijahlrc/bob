@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { newRun } from './run';
+import { newRun, setMap } from './run';
 import { buildSignature, countUniques, RunTally, type KillerInfo } from './metrics';
 import { randomRun } from './randomBot';
 import { killerReport, signatureReport, uniquesReport, type RunSummary } from './report';
@@ -70,7 +70,7 @@ describe('run metrics', () => {
     expect(buildSignature(run.build)).toMatch(/^\w+ \| - \| -$/);
     expect(countUniques([])).toBe(0);
     const t = new RunTally();
-    run.map = 25;
+    setMap(run, 25);
     t.afterMap(run, []);
     expect(t.snapshots).toHaveLength(1);
     expect(t.snapshots[0].found).toBe(0);

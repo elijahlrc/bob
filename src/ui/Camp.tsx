@@ -8,7 +8,7 @@ import { xpToNext } from '../data/xpTable';
 import { resistPenaltyForMap } from '../gen/mapPlan';
 import type { Controller } from '../run/controller';
 import { chalkAdd, chalkOptions, chalkRemove } from '../run/craft';
-import { affixesFor, passivePoints } from '../run/run';
+import { passivePoints } from '../run/run';
 import { Items } from './Items';
 import { Reward } from './Reward';
 import { Sheet } from './Sheet';
@@ -22,7 +22,7 @@ type Tab = 'tree' | 'sheet' | 'skills' | 'items' | 'workbench';
 /** Wayfinder's Chalk on an offered map: add one of three affixes, or remove one (EXPANSION 8.2). */
 function Chalk({ c, offer }: { c: Controller; offer: number }) {
   const run = c.run!;
-  const have = affixesFor(run, run.nextThemes[offer]);
+  const have = run.offers[offer].affixes;
   const chalk = run.currency.chalk ?? 0;
   return (
     <div class="chalk">
@@ -163,7 +163,7 @@ export function Camp({ c }: { c: Controller }) {
           {offersFor(run).map((o, i) => {
             const t = themeDef(o.themeId);
             return (
-              <div key={o.themeId} class="theme-wrap">
+              <div key={o.id} class="theme-wrap">
                 <button class="btn theme" onClick={() => c.startMap(i)}>
                   <div class="theme-name">{t.name}</div>
                   <div class="muted">{t.bonusText}</div>
@@ -191,7 +191,7 @@ export function Camp({ c }: { c: Controller }) {
             onChange={(e) => c.setAutoContinue((e.target as HTMLInputElement).checked)}
           />{' '}
           Auto-continue
-          {left !== null && ` — ${themeDef(run.nextThemes[0]).name} in ${left.toFixed(1)} s`}
+          {left !== null && ` — ${themeDef(run.offers[0].themeId).name} in ${left.toFixed(1)} s`}
           {run.autoContinue && blocker && <div class="warn">Paused: {blocker}</div>}
         </label>
         <button class="btn" onClick={() => c.quit()}>

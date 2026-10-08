@@ -17,8 +17,8 @@ import {
 import { resistPenaltyForMap } from '../gen/mapPlan';
 import { runMap, type MapResult } from '../sim/runMap';
 import { canEquip, equip, equipFlask, slotsFor, unsocketGem, withEquipped } from './inventory';
+import type { MapOffer } from './offers';
 import {
-  affixesFor,
   finishMap,
   newRun,
   passivePoints,
@@ -112,18 +112,27 @@ function buildKey(run: RunState, b: Build): string {
 
 const scoreOf = scoreBuild;
 
-/** Which of the two offered themes the bot takes. */
+/** Which of the offered maps the bot takes. */
 export type ThemeRule = 'first' | 'best';
 
-/** The offered theme the build is best placed to beat (the first one when the rule is 'first'). */
-export function chooseTheme(run: RunState, rule: ThemeRule = 'best'): string {
-  const [a, b] = run.nextThemes;
-  if (rule === 'first') return a;
+/** The offered map the build is best placed to beat (the first one when the rule is 'first'). */
+export function chooseOffer(run: RunState, rule: ThemeRule = 'best'): MapOffer {
+  const [first, ...rest] = run.offers;
+  if (rule === 'first') return first;
   const ch = new Character(run.build, cfgFor(run));
   const boss = run.map % 10 === 0 ? 'boss' : 'clearing';
-  const va = scoreTheme(ch, themeDef(a), boss, affixesFor(run, a)).value;
-  const vb = scoreTheme(ch, themeDef(b), boss, affixesFor(run, b)).value;
-  return vb > va * 1.001 ? b : a;
+  const valueOf = (o: MapOffer) => scoreTheme(ch, themeDef(o.themeId), boss, o.affixes).value;
+  let best = first;
+  let bestValue = valueOf(first);
+  // A later offer must beat the best so far by 0.1%, so ties keep the earlier one.
+  for (const o of rest) {
+    const v = valueOf(o);
+    if (v > bestValue * 1.001) {
+      best = o;
+      bestValue = v;
+    }
+  }
+  return best;
 }
 
 // ---- Passives -----------------------------------------------------------------------------
@@ -531,7 +540,7 @@ export function botRun(
     const crafting = opts.crafting ?? 'greedy';
     botCamp(run, crafting);
     if (crafting === 'greedy') botChalk(run);
-    const plan = planFor(run, chooseTheme(run, opts.themes));
+    const plan = planFor(run, chooseOffer(run, opts.themes));
     const res = runMap(plan, run.build, run.xp, worldOptsFor(run, plan), undefined, killer.tick);
     maps.push({
       map: run.map,
@@ -582,7 +591,7 @@ export function botProbe(classId: string, seed: number, maxMap = 100): ProbeReco
   while (run.phase === 'camp' && run.map <= maxMap) {
     botCamp(run);
     const s = sheetOf(run);
-    const plan = planFor(run, run.nextThemes[0]);
+    const plan = planFor(run, run.offers[0]);
     const opts = { ...worldOptsFor(run, plan), godMode: true };
     let took = 0;
     const res = runMap(plan, run.build, run.xp, opts, undefined, (w) => {
