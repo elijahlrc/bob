@@ -21,5 +21,7 @@ export default defineConfig({
     // The timing tests (the sim speed floors) need cores to themselves: on a machine with many cores, one worker per core
     // starves them. Eight is as fast overall.
     maxWorkers: 8,
+    // Many tests play whole bot campaigns: a second or two here, several times that on a slow or busy machine.
+    testTimeout: 60000,
   },
 });
