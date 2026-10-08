@@ -14,7 +14,9 @@ for (const kind of ['notable', 'keystone', 'small', 'travel', 'start'])
 const ends = t.nodes.filter((x) => x.links.length === 1).length;
 const notables = t.nodes.filter((x) => x.kind === 'notable');
 const inline = notables.filter((x) => x.links.length >= 2).length;
-console.log(`dead ends ${ends} (${pct(ends)}), notables on a road ${inline} of ${notables.length}`);
+console.log(
+  `dead ends ${ends} (${pct(ends)}), notables on a road ${inline} of ${notables.length} (${((100 * inline) / notables.length).toFixed(0)}%)`,
+);
 console.log(`routes the builder could not draw: ${t.dropped.length}`);
 let edges = 0;
 let len = 0;
@@ -27,4 +29,8 @@ for (const a of t.nodes) {
       len += Math.hypot(a.x - t.nodes[m].x, a.y - t.nodes[m].y);
     }
 }
+const junctions = t.nodes.filter((x) => x.links.length >= 3).length;
 console.log(`edges ${edges}, mean length ${(len / edges).toFixed(0)}, radius ${reach.toFixed(0)}`);
+console.log(
+  `mean degree ${((2 * edges) / n).toFixed(2)}, loops ${edges - n + 1}, nodes with 3+ links ${junctions} (${pct(junctions)})`,
+);

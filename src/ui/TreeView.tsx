@@ -21,6 +21,7 @@ import {
   LABEL_K_KEYSTONE,
   LABEL_K_NOTABLE,
   NODE_RADIUS,
+  edgePath,
   octagon,
   shapeScale,
   TONE_COLOR,
@@ -36,7 +37,7 @@ const FIT_MIN_K = 0.15;
 
 const ATTR_WORD = { str: 'Strength', dex: 'Dexterity', int: 'Intelligence' } as const;
 /** The outer edge of a notable's and a keystone's frame, in tree units (labels sit below it). */
-const FRAME_R = { notable: 27, keystone: 43, start: 42 } as const;
+const FRAME_R = { notable: 30, keystone: 47, start: 42 } as const;
 const KINDS = ['small', 'travel', 'hub', 'notable', 'keystone', 'start'] as const;
 
 /** Where a node is, how large it is drawn at this zoom (the --s-* variables of the svg) and what colour it has. */
@@ -244,9 +245,8 @@ export function TreeView({ c }: { c: Controller }) {
         const o = tree.nodes[m];
         const lit =
           (allocSet.has(n.id) || n.id === start.id) && (allocSet.has(m) || m === start.id);
-        const line = (key: string, cls: string) => (
-          <line key={key} x1={n.x} y1={n.y} x2={o.x} y2={o.y} class={cls} />
-        );
+        const d = edgePath(n, o);
+        const line = (key: string, cls: string) => <path key={key} d={d} class={cls} />;
         if (lit) {
           on.push(line(`g${n.id}-${m}`, 'edge glow'));
           on.push(line(`${n.id}-${m}`, 'edge on'));
@@ -259,16 +259,16 @@ export function TreeView({ c }: { c: Controller }) {
           return (
             <>
               <polygon class="rim" points={octagon(FRAME_R.keystone)} />
-              <polygon class="ring" data-id={n.id} points={octagon(34, Math.PI / 8)} />
-              <path class="pip" d={TONE_GLYPH[toneIds[n.id]]} transform="scale(1.35)" />
+              <polygon class="ring" data-id={n.id} points={octagon(37, Math.PI / 8)} />
+              <path class="pip" d={TONE_GLYPH[toneIds[n.id]]} transform="scale(1.5)" />
             </>
           );
         case 'notable':
           return (
             <>
               <circle class="rim" r={FRAME_R.notable} />
-              <circle class="ring" data-id={n.id} r={21} />
-              <path class="pip" d={TONE_GLYPH[toneIds[n.id]]} transform="scale(0.88)" />
+              <circle class="ring" data-id={n.id} r={23} />
+              <path class="pip" d={TONE_GLYPH[toneIds[n.id]]} transform="scale(0.95)" />
             </>
           );
         case 'start':
@@ -287,7 +287,7 @@ export function TreeView({ c }: { c: Controller }) {
           return (
             <>
               <circle class="ring" data-id={n.id} r={NODE_RADIUS[n.kind]} />
-              <circle class="pip" r={n.kind === 'travel' ? 4.4 : 5.6} />
+              <circle class="pip" r={n.kind === 'travel' ? 3.4 : 4.4} />
             </>
           );
       }
@@ -530,16 +530,7 @@ export function TreeView({ c }: { c: Controller }) {
                           [start.id, ...alloc].find((a) => tree.nodes[id].links.includes(a)) ??
                             start.id
                         ];
-                  return (
-                    <line
-                      key={`l${id}`}
-                      class="edge path"
-                      x1={prev.x}
-                      y1={prev.y}
-                      x2={n.x}
-                      y2={n.y}
-                    />
-                  );
+                  return <path key={`l${id}`} class="edge path" d={edgePath(prev, n)} />;
                 })}
               {(hoverPath ?? [hn!.id]).map((id) => {
                 const n = tree.nodes[id];

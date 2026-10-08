@@ -14,6 +14,8 @@ export type TreeNode = {
   /** Class id for start nodes. */
   classStart?: string;
   cluster?: string;
+  /** The centre of the loop this node stands on, so the lines between neighbours on it can be drawn as arcs. */
+  orbit?: [number, number];
 };
 
 export type Tree = {

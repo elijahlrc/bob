@@ -23,9 +23,9 @@ function bfs(start: number): number[] {
 }
 
 describe('passive tree invariants (§9.3)', () => {
-  it('has 1,600–1,900 nodes and exactly 27 keystones (docs/TREE.md)', () => {
+  it('has 1,600–1,850 nodes and exactly 27 keystones (docs/TREE.md)', () => {
     expect(nodes.length).toBeGreaterThanOrEqual(1600);
-    expect(nodes.length).toBeLessThanOrEqual(1900);
+    expect(nodes.length).toBeLessThanOrEqual(1850);
     expect(nodes.filter((n) => n.kind === 'keystone')).toHaveLength(27);
     const ksNames = nodes
       .filter((n) => n.kind === 'keystone')
@@ -51,12 +51,24 @@ describe('passive tree invariants (§9.3)', () => {
     expect(share('small')).toBeGreaterThanOrEqual(0.58);
   });
 
-  it('has roads that run through notables, few dead ends and every link routed', () => {
-    const notables = nodes.filter((n) => n.kind === 'notable');
-    const inline = notables.filter((n) => n.links.length >= 2).length;
-    expect(inline / notables.length).toBeGreaterThanOrEqual(0.6);
+  it('is as connected as the reference tree: few loops, long roads, some dead ends, every link routed', () => {
+    // The reference (docs/TREE.md, `npm run tree:refmix`): 1,858 edges over 1,625 nodes (mean degree 2.29, 234 loops),
+    // 13% dead ends, 53% of the notables with two or more links, every keystone a dead end.
+    const edges = nodes.reduce((s, n) => s + n.links.length, 0) / 2;
+    expect((2 * edges) / nodes.length).toBeGreaterThanOrEqual(2.1);
+    expect((2 * edges) / nodes.length).toBeLessThanOrEqual(2.45);
+    expect(edges - nodes.length + 1).toBeGreaterThanOrEqual(150);
+    expect(edges - nodes.length + 1).toBeLessThanOrEqual(320);
     const ends = nodes.filter((n) => n.links.length === 1).length;
-    expect(ends / nodes.length).toBeLessThanOrEqual(0.12);
+    expect(ends / nodes.length).toBeGreaterThanOrEqual(0.08);
+    expect(ends / nodes.length).toBeLessThanOrEqual(0.16);
+    const junctions = nodes.filter((n) => n.links.length >= 3).length;
+    expect(junctions / nodes.length).toBeLessThanOrEqual(0.36);
+    const notables = nodes.filter((n) => n.kind === 'notable');
+    const inline = notables.filter((n) => n.links.length >= 2).length / notables.length;
+    expect(inline).toBeGreaterThanOrEqual(0.4);
+    expect(inline).toBeLessThanOrEqual(0.7);
+    for (const k of nodes.filter((n) => n.kind === 'keystone')) expect(k.links).toHaveLength(1);
     expect(tree.dropped.length).toBeLessThanOrEqual(10);
   });
 

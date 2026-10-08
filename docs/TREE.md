@@ -72,48 +72,67 @@ See the end of this file; each step is appended when it lands.
 
 ### Look and density (2026-10-08)
 
-The tree was a uniform web: filler was a third of the nodes, every notable was a dead-end stub, and the three node sizes
-were barely told apart. This pass follows the reference in what it is made of and how it reads, not in its layout (the
-positions, the shapes of the clusters and the arrangement of the regions stay our own, DESIGN §9.1). `npm run tree:mix`
-prints the numbers below.
+The tree was a uniform web: filler was a third of the nodes, every notable was a dead-end stub and the three node sizes were
+barely told apart. A first pass over-corrected (every ring one continuous road: twice the loops of the reference). This pass
+follows the reference in what it is made of, how connected it is and how it reads, not in its layout (positions, shapes and
+the arrangement of the regions stay our own, DESIGN §9.1). `npm run tree:mix` prints Bob's numbers and `npm run tree:refmix`
+the reference's (its links are one-directional in `pob-tree.json`; the script makes them symmetric).
 
-| Measure                      | Reference | Before   | After      |
-| ---------------------------- | --------- | -------- | ---------- |
-| Nodes                        | 1,632     | 2,257    | 1,708      |
-| Notables                     | 22.6%     | 16.7%    | 22.0%      |
-| Keystones                    | 1.7%      | 1.2%     | 1.6%       |
-| Attribute nodes (travel)     | 12.7%     | 34.4%    | 13.3%      |
-| Other small passives         | 63%       | 47.5%    | 62.7%      |
-| Notables a road runs through | most      | 0 of 376 | 281 of 376 |
-| Dead ends (one link)         | few       | 20%      | 8.8%       |
-| Routes the builder dropped   | —         | 83       | 2          |
+| Measure                         | Reference   | Before (2,257 nodes) | Now         |
+| ------------------------------- | ----------- | -------------------- | ----------- |
+| Nodes                           | 1,625       | 2,257                | 1,727       |
+| Notables                        | 22.7%       | 16.7%                | 21.8%       |
+| Keystones                       | 1.7%        | 1.2%                 | 1.6%        |
+| Attribute nodes (travel)        | 12.8%       | 34.4%                | 14.3%       |
+| Edges per node (mean degree)    | 1.14 (2.29) | 1.09 (2.17)          | 1.14 (2.29) |
+| Loops (edges − nodes + 1)       | 234         | 196                  | 248         |
+| Dead ends (one link)            | 13.0%       | 20%                  | 13.0%       |
+| Notables with two or more links | 53%         | 0%                   | 59%         |
+| Keystones with two links        | 7%          | 0%                   | 0%          |
+| Routes the builder dropped      | —           | 83                   | 3           |
 
-- **The roads.** A cluster is now a stretch of road with its notable on it (`inline` in `build.ts`): the smalls and the
-  notable stand in a line along the ring, or in a loop for the larger ones (the notable faces outward), and roads join
-  the two ends. A quarter of the notables stay on a stalk off the road (the pairs, chosen by a hash of the cluster id), so
-  there are still side trips. Every cluster joins its neighbour on the ring, so a ring is one road (it used to be every
-  other cluster).
-- **Less filler.** Rings are 210 apart (270), the first at 1,000 (1,150), a slot is 290 (300), and a road gets an attribute
-  node only where it is 225 units or longer (`TRAVEL_SPACING` 150; it was 110). The tree is a tenth narrower (radius 3,410
-  against 3,950).
+(The reference's 22% of nodes with three or more links counts the mastery and hub nodes with six and more; Bob's 32% is every
+loop's entry node.)
+
+What the real tree looks like (screenshots of the 3.x tree, read for structure and never traced):
+
+- **Sparse roads.** A few long edges, straight or bending round a ring, meet at junction nodes that are attribute nodes; between two
+  junctions there are many cluster-widths of nothing.
+- **Clusters are small loops.** A notable, usually with a decorative ring round it, and two to six small nodes on an orbit,
+  joined to a road at one or two nodes. Many notables are not on a road at all but at the end of a short stalk.
+- **Little else is connected.** Most nodes have two links; the loops are few and big.
+- PoE 2's tree (a plain graph render of it) is far more meshed, but curved edges and repeated shapes keep it legible; Last Epoch's
+  is a tidy grid of three tall trees with spend-points gates, which is a different design and was not taken.
+
+What was built:
+
+- **Clusters** (`build.ts`): a loop of the smalls and the notable (the notable faces outward, roads join at the two sides), or a
+  short line of smalls with the notable on a stalk (half of the two- and three-small clusters, by a hash of the id). The hub's
+  clusters stay stretches of road. Nodes on a loop know its centre (`orbit`) so that the lines between them are drawn as arcs.
+- **Roads** (`spec.ts`): ring neighbours are joined in stretches (`RING_LINKED` 50% of pairs, so an arc of road runs through a few
+  clusters and stops), a stretch has one way inward and a spoke more now and then (`SPOKE_CHANCE` 12%), and three rings of the
+  boundary between regions are crossed. Rings are 240 apart (the first at 1,050) and a slot is 340, so there is dark space
+  between clusters; a link longer than 255 (`TRAVEL_SPACING` 170) gets an attribute node, placed on the arc where the link is a
+  stretch of ring.
 - **Look** (`TreeView.tsx`, `treeStyle.ts`, `tree.css`; the tree rules left `styles.css`):
-  - a node's colour says what it gives (life red, defence steel, evasion green, mana and energy shield blue, the three
-    elements and chaos by their own, minions teal, curses violet, attributes by attribute), from its first line;
-  - kinds differ by shape and frame: small is a ringed dot, notable has a gold outer ring and an emblem of its colour,
-    keystone is an octagon with a violet frame and a larger emblem; allocated nodes go gold with a halo, and the roads
-    between them glow; the path a click would buy is cyan;
-  - sizes keep a floor on screen (3.6 px for a small, 7 px for a notable, 11 px for a keystone, half of that with the whole
-    tree in view) and lines keep their width in pixels; names of keystones and class starts show from far out, of notables
-    from zoom 0.4; a "Colours" key sits in the corner;
+  - a node's colour says what it gives (life red, defence steel, evasion green, mana and energy shield blue, the three elements
+    and chaos by their own, minions teal, curses violet, attributes by attribute), from its first line;
+  - kinds differ by size and frame (radius 10, 24, 38 for small, notable, keystone): small is a ringed dot, a notable has a gold
+    outer ring and an emblem of its colour, a keystone is an octagon with a violet frame and a larger emblem; allocated nodes
+    go gold with a halo and the roads between them glow; the path a click would buy is cyan;
+  - sizes keep a floor on screen (3 px for a small, 7.5 px for a notable, 11.5 px for a keystone, a third of that with the whole tree
+    in view) and lines keep their width in pixels; names of keystones and class starts show from far out, of notables from
+    zoom 0.4; a "Colours" key sits in the corner;
   - behind the nodes, each region is a wedge tinted by its attributes, with ring guides, the rim and the region's name.
-  - One group per node and no filters (a phone's GPU memory was a problem before, BUGS/PROGRESS 2026-10-08): about 8,000
-    elements, down from 12,000 in the first version.
-- **Saves.** `SAVE_VERSION` is 9. Node ids changed, so loading an older run keeps it but hands the allocated passives back as
+  - One group per node, one path per line and no filters (a phone's GPU memory was a problem before, PROGRESS 2026-10-08).
+- **Saves.** `SAVE_VERSION` is 10. Node ids changed, so loading an older run keeps it but hands the allocated passives back as
   unspent points (`migrate` in `save.ts`).
 - **Names.** Small passives lose the "Lesser" of their names ("Armour", "Attack Speed").
-- **Balance** (bot, seed 2, six runs per class, scaling 1.5): 4 of 36 runs won against 5 of 36 before; the median map the
-  classes reached averaged 54.8 against 53.8. Roads through notables did not make the bot stronger, within the noise of
-  that sample.
-- **Not done.** Ring roads are straight chords, not arcs; there are no node icons beyond the eighteen emblems; no search or
-  highlight of a stat; the small nodes of a cluster are still copies of one another (the reference has 445 distinct small
-  names, Bob 137); the real-device pass of the mobile plan has not seen the new look.
+- **Tests** (`tree.test.ts`): the mix of kinds, and the connectivity of the reference as ranges (mean degree 2.1 to 2.45, 150 to
+  320 loops, 8% to 16% dead ends, 40% to 70% of the notables with two links, every keystone a dead end). The first version of
+  these asked for 60% of notables on a road and at most 12% dead ends, which forced the over-connection; they were corrected
+  with the measured numbers, not loosened.
+- **Balance** (bot, seed 2, six runs per class, scaling 1.5): see PROGRESS 2026-10-08.
+- **Not done.** What each node grants is as before: the small nodes of a cluster are still copies of one another (the reference
+  has 445 distinct small names, Bob 137), attribute nodes are still +10, notables and keystones are unchanged. No node icons
+  beyond the 18 emblems; no search or highlight of a stat; the real-device pass of the mobile plan has not seen the new look.

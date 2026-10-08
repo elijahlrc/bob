@@ -10,6 +10,7 @@ svg.tree {
   --gold-hi: #ffe6a0;
 }
 svg.tree line,
+svg.tree path,
 svg.tree circle,
 svg.tree polygon {
   vector-effect: non-scaling-stroke;
@@ -48,6 +49,7 @@ svg.tree polygon {
 
 /* Paths between nodes. */
 .edge {
+  fill: none;
   stroke: var(--edge);
   stroke-width: 1.6px;
   pointer-events: none;

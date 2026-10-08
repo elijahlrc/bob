@@ -4,6 +4,7 @@
  */
 import type { Mod } from '../mods/types';
 import type { TreeNode, TreeNodeKind } from '../data/tree';
+import { isRingRoad } from '../data/tree/build';
 
 export type Tone =
   | 'life'
@@ -144,29 +145,29 @@ export function toneOf(n: Pick<TreeNode, 'mods' | 'kind'>): Tone {
 /** Radius of a node in tree units (also the reach of a tap). */
 export const NODE_RADIUS: Record<TreeNodeKind, number> = {
   start: 34,
-  keystone: 34,
-  notable: 22,
-  small: 12,
-  travel: 10,
-  hub: 12,
+  keystone: 38,
+  notable: 24,
+  small: 10,
+  travel: 8,
+  hub: 10,
 };
 
 /** The smallest radius, in screen pixels, a node of each kind is drawn with however far the view is zoomed out. */
 export const MIN_SCREEN_R: Record<TreeNodeKind, number> = {
   start: 12,
-  keystone: 11,
-  notable: 7,
-  small: 3.6,
-  travel: 3,
-  hub: 3.6,
+  keystone: 11.5,
+  notable: 7.5,
+  small: 3,
+  travel: 2.6,
+  hub: 3,
 };
 
-/** The zoom at which the minimum sizes apply in full; the whole tree in view (about a third of it) uses half of them. */
+/** The zoom at which the minimum sizes apply in full; the whole tree in view uses a third of them. */
 const FLOOR_FULL_K = 0.22;
 
 /** The factor a kind's shape is enlarged by at zoom `k`, so that it keeps at least its minimum size on screen. */
 export function shapeScale(kind: TreeNodeKind, k: number): number {
-  const floor = MIN_SCREEN_R[kind] * Math.min(1, Math.max(0.5, k / FLOOR_FULL_K));
+  const floor = MIN_SCREEN_R[kind] * Math.min(1, Math.max(0.35, k / FLOOR_FULL_K));
   return Math.max(1, floor / (NODE_RADIUS[kind] * k));
 }
 
@@ -182,4 +183,27 @@ export function octagon(r: number, turn = 0): string {
     pts.push(`${(r * Math.cos(a)).toFixed(1)},${(r * Math.sin(a)).toFixed(1)}`);
   }
   return pts.join(' ');
+}
+
+/**
+ * The SVG path of the line between two nodes: an arc about the centre of the loop they share, an arc about the middle of
+ * the tree for a stretch of ring, otherwise a straight line. (Where the arc goes round is set by which way the angle runs.)
+ */
+export function edgePath(
+  a: { x: number; y: number; orbit?: [number, number] },
+  b: { x: number; y: number; orbit?: [number, number] },
+): string {
+  const move = `M${a.x} ${a.y}`;
+  if (a.orbit && b.orbit && a.orbit[0] === b.orbit[0] && a.orbit[1] === b.orbit[1]) {
+    const [cx, cy] = a.orbit;
+    const r = (Math.hypot(a.x - cx, a.y - cy) + Math.hypot(b.x - cx, b.y - cy)) / 2;
+    const cross = (a.x - cx) * (b.y - cy) - (a.y - cy) * (b.x - cx);
+    return `${move}A${r.toFixed(1)} ${r.toFixed(1)} 0 0 ${cross > 0 ? 1 : 0} ${b.x} ${b.y}`;
+  }
+  if (isRingRoad(a, b)) {
+    const r = (Math.hypot(a.x, a.y) + Math.hypot(b.x, b.y)) / 2;
+    const cross = a.x * b.y - a.y * b.x;
+    return `${move}A${r.toFixed(1)} ${r.toFixed(1)} 0 0 ${cross > 0 ? 1 : 0} ${b.x} ${b.y}`;
+  }
+  return `${move}L${b.x} ${b.y}`;
 }

@@ -108,9 +108,9 @@ export const HUB = {
 export const START_RADIUS = 800;
 export const HUB_RADIUS = 420;
 /** The first ring of a region, the gap between rings, and the arc a cluster needs along its ring (layout units). */
-export const RING_START = 1000;
-export const RING_STEP = 210;
-const SLOT_ARC = 290;
+export const RING_START = 1050;
+export const RING_STEP = 240;
+const SLOT_ARC = 340;
 const SECTOR = 60;
 /** The share of a region's sector its rings use; the rest is a gap between regions. */
 const SPREAD = 0.92;
@@ -197,6 +197,16 @@ function slotAngle(region: RegionDef, ring: number, slot: number): number {
   const stagger = ring % 2 ? step * 0.25 : -step * 0.25;
   return region.angle + (slot - (n - 1) / 2) * step + stagger;
 }
+
+/** A number from 0 to 99 for a name, to choose the same way every time. */
+function pct(key: string): number {
+  let h = 11;
+  for (let i = 0; i < key.length; i++) h = (h * 33 + key.charCodeAt(i)) >>> 0;
+  return h % 100;
+}
+/** The share of ring neighbours that are joined, and the share of the clusters in a stretch that also have their own way inward. */
+const RING_LINKED = 50;
+const SPOKE_CHANCE = 12;
 
 const kindFor = (n: number): ClusterKind => (n >= 4 ? 'wheel' : n === 3 ? 'chain' : 'spur');
 
@@ -331,9 +341,10 @@ export function buildClusterSpecs(): ClusterSpec[] {
           });
           continue;
         }
-        // Each cluster joins its neighbour on the ring, so a ring is one road (keystones stand off the ring).
+        // Some neighbours on a ring are joined, in stretches (an arc of road through several clusters); keystones stand off it.
         const nextSlot = slot + 1;
-        if (nextSlot < n && !isKs(ring, nextSlot)) links.push(`@${ring}:${nextSlot}`);
+        if (nextSlot < n && !isKs(ring, nextSlot) && pct(`${reg.id}:${ring}:${slot}`) < RING_LINKED)
+          links.push(`@${ring}:${nextSlot}`);
         const p = take[free.indexOf(slot)];
         const spec: ClusterSpec = {
           id,
@@ -351,6 +362,17 @@ export function buildClusterSpecs(): ClusterSpec[] {
         out.push(spec);
       }
     }
+    // A stretch of linked neighbours needs only one way inward, and a few more now and then (the spokes of the region).
+    const where = new Map<string, [number, number]>();
+    ringIds.forEach((row, ring) => row.forEach((id, slot) => id && where.set(id, [ring, slot])));
+    for (const c of out) {
+      if (c.region !== reg.id || c.kind === 'keystone') continue;
+      const [ring, slot] = where.get(c.id)!;
+      const joinedBefore =
+        slot > 0 &&
+        out.some((o) => o.id === ringIds[ring][slot - 1] && o.links.includes(`@${ring}:${slot}`));
+      if (joinedBefore && pct(`${c.id}:spoke`) >= SPOKE_CHANCE) c.links.shift();
+    }
     // Resolve the same-ring neighbour links to ids.
     for (const c of out)
       if (c.region === reg.id)
@@ -366,7 +388,7 @@ export function buildClusterSpecs(): ClusterSpec[] {
   const find = (id: string | undefined) => out.find((c) => c.id === id);
   REGIONS.forEach((reg, i) => {
     const nextReg = REGIONS[(i + 1) % REGIONS.length];
-    for (let ring = 1; ring < 10; ring += 2) {
+    for (let ring = 1; ring < 12; ring += 3) {
       const ringOf = (r: RegionDef, slot: 'first' | 'last') => {
         const cands = out.filter(
           (c) =>

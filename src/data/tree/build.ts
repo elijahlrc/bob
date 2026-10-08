@@ -8,7 +8,7 @@ import type { Tree, TreeNode, TreeNodeKind } from './types';
 export const MIN_NODE_DIST = 40;
 /** A node closer than this to an edge it is not part of counts as "on" the edge. */
 export const EDGE_CLEARANCE = 22;
-const TRAVEL_SPACING = 150;
+const TRAVEL_SPACING = 170;
 /** The spacing of the nodes of a cluster along a road, and of a wheel's loop; the least radius of a wheel; the length of a notable's stalk. */
 const CHAIN_STEP = 62;
 const WHEEL_CHORD = 58;
@@ -114,7 +114,7 @@ function layoutCluster(b: Builder, c: ClusterSpec): number[] {
       );
     return addNode(b, 'notable', c.notable!.name, theme.notable(c.notable!.strength), x, y, c.id);
   };
-  /** A line of the cluster's nodes along the ring with the notable among them: roads run through it (an inline cluster). */
+  /** A line of the cluster's nodes along the ring with the notable among them: the hub's roads run through it. */
   const inline = (): number[] => {
     const at = Math.ceil(n / 2);
     const ids: number[] = [];
@@ -127,53 +127,48 @@ function layoutCluster(b: Builder, c: ClusterSpec): number[] {
     }
     return [ids[0], ids[n]];
   };
-  switch (c.kind) {
-    case 'wheel': {
-      // A loop of the smalls and the notable (which faces outward); roads enter and leave at the two sides.
-      const m = n + 1;
-      const radius = Math.max(WHEEL_MIN_RADIUS, WHEEL_CHORD / (2 * Math.sin(Math.PI / m)));
-      const ids: number[] = [];
-      for (let i = 0; i < m; i++) {
-        const th = a + (2 * Math.PI * i) / m;
-        const x = cx + radius * Math.cos(th);
-        const y = cy + radius * Math.sin(th);
-        ids.push(i === 0 ? finalNode(x, y) : addNode(b, 'small', smallName, small(), x, y, c.id));
-      }
-      for (let i = 0; i < m; i++) link(b, ids[i], ids[(i + 1) % m]);
-      const side = Math.max(1, Math.round(m / 4));
-      return [ids[side], ids[m - side]];
+  /** A loop of the smalls and the notable (which faces outward); roads enter and leave at the two sides. */
+  const loop = (): number[] => {
+    const m = n + 1;
+    const radius = Math.max(WHEEL_MIN_RADIUS, WHEEL_CHORD / (2 * Math.sin(Math.PI / m)));
+    const ids: number[] = [];
+    for (let i = 0; i < m; i++) {
+      const th = a + (2 * Math.PI * i) / m;
+      const x = cx + radius * Math.cos(th);
+      const y = cy + radius * Math.sin(th);
+      const id = i === 0 ? finalNode(x, y) : addNode(b, 'small', smallName, small(), x, y, c.id);
+      b.nodes[id].orbit = [Math.round(cx), Math.round(cy)];
+      ids.push(id);
     }
+    for (let i = 0; i < m; i++) link(b, ids[i], ids[(i + 1) % m]);
+    const side = Math.max(1, Math.round(m / 4));
+    return [ids[side], ids[m - side]];
+  };
+  /** A short line of smalls along the ring with the notable on a stalk beside the middle one. */
+  const stalk = (): number[] => {
+    const h = hashId(c.id);
+    const ids: number[] = [];
+    for (let j = 0; j < n; j++) {
+      const o = (j - (n - 1) / 2) * CHAIN_STEP;
+      ids.push(addNode(b, 'small', smallName, small(), cx + tx * o, cy + ty * o, c.id));
+      if (j > 0) link(b, ids[j - 1], ids[j]);
+    }
+    const root = ids[Math.floor(n / 2)];
+    const sign = h & 4 ? 1 : -1;
+    link(
+      b,
+      finalNode(b.nodes[root].x + ux * STALK * sign, b.nodes[root].y + uy * STALK * sign),
+      root,
+    );
+    return [ids[0], ids[n - 1]];
+  };
+  switch (c.kind) {
+    case 'wheel':
     case 'chain':
-      return inline();
     case 'spur': {
-      // Half the two-small clusters are inline; the others are a pair with the notable on a stalk beside it.
-      const h = hashId(c.id);
-      if (h % 2 === 0) return inline();
-      const sign = h & 4 ? 1 : -1;
-      const first = addNode(
-        b,
-        'small',
-        smallName,
-        small(),
-        cx - tx * (CHAIN_STEP / 2),
-        cy - ty * (CHAIN_STEP / 2),
-        c.id,
-      );
-      const second = addNode(
-        b,
-        'small',
-        smallName,
-        small(),
-        cx + tx * (CHAIN_STEP / 2),
-        cy + ty * (CHAIN_STEP / 2),
-        c.id,
-      );
-      link(b, first, second);
-      const root = h & 2 ? second : first;
-      const rx = b.nodes[root].x;
-      const ry = b.nodes[root].y;
-      link(b, finalNode(rx + ux * STALK * sign, ry + uy * STALK * sign), root);
-      return [first, second];
+      // The hub's own clusters are stretches of road; elsewhere half of the small clusters are loops and half are stalks.
+      if (c.region === 'hub') return c.kind === 'wheel' ? loop() : inline();
+      return n >= 4 || hashId(c.id) % 2 === 0 ? loop() : stalk();
     }
     case 'keystone': {
       // A dead end leaving the ring: two smalls and the keystone, only the innermost small takes roads.
@@ -214,6 +209,13 @@ function pointClear(b: Builder, x: number, y: number): boolean {
   return true;
 }
 
+/** Whether the line between two places is a stretch of ring: both far from the middle and at about the same distance. */
+export function isRingRoad(a: { x: number; y: number }, b: { x: number; y: number }): boolean {
+  const ra = Math.hypot(a.x, a.y);
+  const rb = Math.hypot(b.x, b.y);
+  return Math.min(ra, rb) > 600 && Math.abs(ra - rb) < 0.05 * Math.max(ra, rb);
+}
+
 /** Try to connect two attach sets with a straight travel path. */
 function travel(b: Builder, from: number[], to: number[], attrs: Attr[]): boolean {
   const pairs: [number, number, number][] = [];
@@ -231,10 +233,16 @@ function travel(b: Builder, from: number[], to: number[], attrs: Attr[]): boolea
     const count = Math.max(0, Math.round(len / TRAVEL_SPACING) - 1);
     const pts: [number, number][] = [];
     let ok = true;
+    // A road between two places at the same distance from the middle bends with the ring, as the line is drawn.
+    const ra = Math.hypot(A.x, A.y);
+    const rb = Math.hypot(B.x, B.y);
+    const onRing = isRingRoad(A, B);
+    const turn = onRing ? Math.atan2(A.x * B.y - A.y * B.x, A.x * B.x + A.y * B.y) : 0;
+    const base = Math.atan2(A.y, A.x);
     for (let i = 1; i <= count; i++) {
       const t = i / (count + 1);
-      const x = A.x + (B.x - A.x) * t;
-      const y = A.y + (B.y - A.y) * t;
+      const x = onRing ? (ra + (rb - ra) * t) * Math.cos(base + turn * t) : A.x + (B.x - A.x) * t;
+      const y = onRing ? (ra + (rb - ra) * t) * Math.sin(base + turn * t) : A.y + (B.y - A.y) * t;
       if (!pointClear(b, x, y)) {
         ok = false;
         break;

@@ -789,9 +789,11 @@ which are kept and bounded by the number of types). If it still happens, the nex
 
 ### Passive tree: density and look (2026-10-08)
 
-The tree reads more like the reference's: 1,708 nodes (was 2,257) of which 22% notables, 13% attribute nodes and 1.6% keystones,
-roads that run through 281 of 376 notables (none did), 150 dead ends (453) and 2 routes dropped (83). Nodes are coloured by
-what they give and shaped by kind, with emblems on notables and keystones, a tinted wedge per region, glowing allocated roads,
-names from zoom 0.4 and a colour key. Details and the numbers: `docs/TREE.md` "Look and density". `SAVE_VERSION` 9: node ids
-changed, so older runs get their passives back as unspent points. Bot balance unchanged within noise (4 of 36 won, was 5 of
-36). `npm run tree:mix` prints the mix. Not done: arcs for ring roads, icons, a stat search.
+The tree reads more like the reference's: 1,727 nodes (was 2,257) of which 22% notables, 14% attribute nodes and 1.6% keystones; as
+connected as the reference measured from its links (mean degree 2.29, 248 loops against 234, 13% dead ends, 59% of notables with
+two links against 53%), with 3 routes dropped (83). Clusters are loops (with the notable on them) and stalks that hang off long
+roads, the roads bend with the rings (arcs), and there is dark space between clusters. Nodes are coloured by what they give and
+shaped by kind, with emblems on notables and keystones, a tinted wedge per region, glowing allocated roads, names from zoom 0.4 and
+a colour key. Details and numbers: `docs/TREE.md` "Look and density". `SAVE_VERSION` 10: node ids changed, so older runs get their
+passives back as unspent points. `npm run tree:mix` and `npm run tree:refmix` print the two sets of numbers. Not done: what a
+node grants (small nodes are still copies, attribute nodes +10), icons, a stat search.

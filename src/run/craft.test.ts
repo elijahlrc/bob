@@ -34,7 +34,7 @@ import {
 } from './craft';
 import { Controller } from './controller';
 import { loadRun, MemoryStore, SAVE_KEY, saveRun } from './save';
-import { newRun, SAVE_VERSION, stash, type RunState, setMap } from './run';
+import { newRun, stash, type RunState, setMap } from './run';
 
 let n = 90000;
 const uid = () => n++;
@@ -498,7 +498,7 @@ describe('crafting is final (EXPANSION 8.4)', () => {
   it('saves from before the currency fields are rejected, not migrated', () => {
     const store = new MemoryStore();
     const run = newRun('vanguard', 1);
-    store.setItem(SAVE_KEY, JSON.stringify({ version: SAVE_VERSION - 4, run }));
+    store.setItem(SAVE_KEY, JSON.stringify({ version: 5, run }));
     expect(loadRun(store).status).toBe('incompatible');
     saveRun(store, run);
     expect(loadRun(store).status).toBe('ok');

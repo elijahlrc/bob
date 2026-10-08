@@ -38,9 +38,9 @@ export function loadRun(store: KeyValueStore): LoadResult {
  */
 export function migrate(version: number, run: RunState): RunState | null {
   if (version === SAVE_VERSION) return run;
-  // Version 8 has the passive tree of before docs/TREE.md "Look and density": its node ids mean other nodes now, so the
-  // allocated passives are handed back as unspent points.
-  if (version === 8) {
+  // Versions 8 and 9 have a passive tree of before docs/TREE.md "Look and density" and its second pass: their node ids mean
+  // other nodes now, so the allocated passives are handed back as unspent points.
+  if (version === 8 || version === 9) {
     run.version = SAVE_VERSION;
     run.build = { ...run.build, allocated: [] };
     return run;
