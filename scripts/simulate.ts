@@ -1,7 +1,7 @@
 /**
  * Headless bot runs (DESIGN.md §15.5).
  *
- *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|abandoner] [--craft greedy|random|none] [--report] [--scaling 1.25] [--base 1] [--variance 0.1] [--legacy]
+ *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|abandoner] [--craft greedy|random|none] [--report] [--scaling 1.5] [--base 1] [--variance 0.1] [--legacy]
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { median } from '../src/core/math';

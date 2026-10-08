@@ -3,8 +3,9 @@
  * Ossuary maps up to a map, then run that map under every theme with several seeds. Prints how often the
  * character clears it and how low its life fell, so a new faction can be tuned against the Ossuary.
  *
- *   npm run lethality -- --class vanguard --map 45 --seeds 4
+ *   npm run lethality -- --class vanguard --map 45 --seeds 4 [--scaling 1.5] [--base 1] [--variance 0.1]
  */
+import { clampDifficulty } from '../src/data/difficulty';
 import { THEMES } from '../src/data/themes';
 import { botCamp } from '../src/run/bot';
 import { botChalk } from '../src/run/botCraft';
@@ -22,6 +23,11 @@ const runSeed = Number(arg('seed', '7'));
 
 // Walk a run up to the map along Ossuary themes only, so every theme meets the same character.
 const run = newRun(classId, runSeed);
+run.difficulty = clampDifficulty({
+  scaling: Number(arg('scaling', String(run.difficulty.scaling))),
+  base: Number(arg('base', String(run.difficulty.base))),
+  variance: Number(arg('variance', String(run.difficulty.variance))),
+});
 while (run.phase === 'camp' && run.map < stopMap) {
   botCamp(run, 'greedy');
   botChalk(run);

@@ -1,8 +1,8 @@
 # Bob — Enemy Variety and Difficulty Plan
 
-Status: **proposal, 2026-10-07. Nothing is built.** Written from the code as it stands; the numbers marked _measured_
-come from reading the theme tables, and the rest must be measured with the bot (section 9) before they are trusted.
-Decisions the plan makes by default are in section 13; the user can overturn any of them.
+Status: **built, 2026-10-08 (E0 to E7).** Written 2026-10-07 from the code as it stood; section 14 says what was built, what
+changed on the way and what the bot measured. Decisions the plan makes by default are in section 13; the user can overturn
+any of them.
 
 ---
 
@@ -30,7 +30,7 @@ and **legibility** first, **appearance** second, and **new content** last.
 5. **Difficulty controls (section 8).** Three settings, **scaling** (how fast monsters grow with level), **base** (a flat
    multiplier at every level) and **variance** (a seeded spread between maps and packs), editable from a debug panel,
    stored in the run, available to the bot. The **baseline moves substantially harder**: scaling defaults to a value
-   above today's curve (starting point 1.25, final value fixed by measurement).
+   above today's curve (1.5 after measuring, section 14).
 
 Order of work: measure and plumb the difficulty model (E0), debug panel and the harder baseline (E1), distribution (E2),
 legibility (E3), appearance (E4), the ability layer (E5), new factions (E6), integration (E7).
@@ -210,7 +210,7 @@ antagonist type".
    and a **Holdout** wave is one template per wave.
 
 6. **Gates.** Every gate mini-boss is the champion of its theme's faction. Ossuary themes get their own champion (the
-   Bone Warden, our name, to be run through `ip.test.ts`) with a mechanic of its own: it raises a ring of Warriors at
+   Bone Warden, a Skeleton Warrior champion; our name, checked by `ip.test.ts`) with a mechanic of its own: it raises a ring of Warriors at
    each third of its life. Map 100 stays the Regent (the final boss is deliberately the baseline), and the Regent's
    escort is drawn from the **last theme's** faction instead of nothing.
 7. **Companions (optional, off by default).** A faction theme may take a seeded companion faction per map (the lead at
@@ -438,7 +438,7 @@ Three settings, stored in `RunState.difficulty` and edited from the debug panel 
 ```ts
 type Difficulty = {
   /** Monster strength grows this many "stat levels" per area level. 1 is the old curve. */
-  scaling: number; // default 1.25 (starting point; E1 and E7 set the final)
+  scaling: number; // default 1.5 (measured, section 14)
   /** A flat multiplier on the hardness of every monster at every level. 1 is the old curve. */
   base: number; // default 1
   /** Seeded spread of hardness between maps and between packs, 0 to 0.6. */
@@ -455,8 +455,8 @@ life   = monsterLife(statLevel) · easeLife(area) · √hardness · ...   // as 
 damage = monsterHit(statLevel)  · easeDamage(area) · √hardness · ...
 ```
 
-- **Scaling** is the slope: at 1.25, a level-40 monster has the life and damage of a level-50 one; at map 100 it has those
-  of a level-125 one. It is applied to **life and damage only** by default. Accuracy, evasion and armour (the other
+- **Scaling** is the slope: at 1.5, a level-40 monster has the life and damage of a level-59 one; at map 100 it has those
+  of a level-149 one. It is applied to **life and damage only** by default. Accuracy, evasion and armour (the other
   `monster*` curves) stay on the area level: the player's accuracy and evasion are tuned against those, so scaling them too
   would add a second difficulty axis that falls on attack builds (they would lose hit chance and face more life) and not
   on spell builds. Whether to scale them is an open question (section 13, item 12).
@@ -505,15 +505,15 @@ No `Math.random`; the architecture rules in CLAUDE.md hold.
 
 ### 8.4 The new baseline
 
-"Substantially harder at baseline" means **the default, not just the slider**: a new run starts at scaling 1.25.
+"Substantially harder at baseline" means **the default, not just the slider**: a new run starts at scaling 1.5 (the plan started from 1.25; section 14 says why it moved).
 
-- Starting point 1.25 gives, for a normal monster, a combined hardness (life × damage; the early ease is the same at both settings and drops out of the ratio) of about
-  ×1.45 at map 10, ×1.6 at map 20, ×2.0 at map 50 and ×4.4 at map 100 against the old curve (computed from the formulas
-  in 2.6; the panel's table recomputes it). A scaling of 1.5 would be ×2.5 at map 20, ×3.9 at map 50 and ×20 at map 100,
-  which is why the default is not higher: the curve is exponential in life and the top of the run would not be playable.
+- A scaling of 1.25 gives, for a normal monster, a combined hardness (life × damage; the early ease is the same at both
+  settings and drops out of the ratio) of about ×1.45 at map 10, ×1.6 at map 20, ×2.0 at map 50 and ×4.4 at map 100 against
+  the old curve (computed from the formulas in 2.6; the panel's table recomputes it). **1.5** gives ×2.0 at map 10, ×2.5 at
+  map 20, ×3.9 at map 50 and ×20 at map 100, and is the default: 2.0 was too much (the bot won none of 24 runs).
 - _Acceptance:_ with the same bot (`greedy`, six classes) the win rate falls to about **half** of today's (E0 records
   today's), the median map of death moves earlier by a fifth, and no class is below one clear at map 50. If the bot
-  cannot win at 1.25, the baseline is eased, not the acceptance. The final number is chosen in E7, after the roster
+  cannot win, the baseline is eased, not the acceptance. The final number is chosen in E7, after the roster
   changes of E2 and E6, which also raise difficulty (faction pressure 1.2 to 1.3 in `threat.ts`).
 - **Rewards do not follow difficulty** (section 3). A harder baseline is a tighter game, not a richer one. Raising
   `base` in the panel is not a way to farm. If the user wants it to pay, the lever is an `xpMult` and `quantity` on the
@@ -554,7 +554,7 @@ in DESIGN.md Appendix A. Sizes: S under a day, M a few days, L about a week.
 | #   | Milestone                           | What                                                                                                                                                                                                                                              | Size |
 | --- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | E0  | Measure and plumb difficulty        | Section 9's report; `difficulty.ts`; `statLevel`/`power` on the spec; sim flags; legacy equivalence test (defaults = LEGACY give identical stats); baseline numbers.                                                                              | M    |
-| E1  | Debug panel and the harder baseline | `Debug.tsx`, `Controller.setDifficulty`, save field, summary line, offer previews; set scaling to 1.25 as the default; measure; tune.                                                                                                             | M    |
+| E1  | Debug panel and the harder baseline | `Debug.tsx`, `Controller.setDifficulty`, save field, summary line, offer previews; set scaling as the default (1.5); measure; tune.                                                                                                               | M    |
 | E2  | Distribution                        | Theme weights, earlier `fromMap`, 85/15 faction themes, one or two extra themes per faction so the offer-set rules have a pool to choose from (4.2), offer-set rules, gate champions for the Ossuary, pack templates (without Ambush and Patrol). | M    |
 | E3  | Legibility                          | The card (5.1), the inspect type line, the HUD faction name, the recap.                                                                                                                                                                           | M    |
 | E4  | Appearance                          | Kits for the 17 humanoid-rig types, the palette and accent, gaits, the test.                                                                                                                                                                      | L    |
@@ -612,3 +612,81 @@ the answer to the complaint as it stands today and can ship before E4 to E6.
     high `base` still makes them hard.
 12. **Should scaling also raise monsters' accuracy, evasion and armour?** Default: no, life and damage only (8.1), until
     E7 measures hit chance by class at the new baseline.
+
+---
+
+## 14. As built (2026-10-08)
+
+Everything in sections 4 to 8 is built, in the order of section 10, and committed milestone by milestone. This section
+records what is different from the plan above and what the bot measured. The numbers are small samples (24 to 48 runs of
+the bot, 6 classes) and are read as a direction, not a result.
+
+### 14.1 What is where
+
+| Plan section     | Built as                                                                                                                                                                                                                                                                                   |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 8 The model      | `src/data/difficulty.ts` (`Difficulty`, `LEGACY`, `DEFAULT`, `statLevel`, `packPower`, `mapTier`); `MonsterSpec.statLevel` and `power`; `RunState.difficulty` (SAVE_VERSION 8, older saves get the legacy curve); `Character.config.difficulty` for the effective HP; `MapPlan.difficulty` |
+| 8.3 Debug panel  | `src/ui/Debug.tsx` on the title screen and at camp; shown in dev builds or with `?debug`; `Controller.setDifficulty` and `setStartDifficulty`                                                                                                                                              |
+| 9 Measuring      | `npm run sim`: `--scaling --base --variance --legacy`, a variety table by band of ten maps, `--dump`, `--merge` and `--from`, and `scripts/simpar.sh` to run it on all cores; `npm run lethality` takes the same flags                                                                     |
+| 4.2 Distribution | `themeWeight`, `leaderOf` and the rules in `rollThemes` (`src/run/offers.ts`); six extra themes for the first five factions and four for the new ones; `src/gen/packs.ts` (templates) and `populate`                                                                                       |
+| 5 Legibility     | `src/run/themeInfo.ts`, `src/data/monsterInfo.ts`, `src/ui/OfferInfo.tsx` (the card), the inspect card, the map HUD and the recap                                                                                                                                                          |
+| 6 Appearance     | `src/render/style/kits.ts` (kits), faction palettes and the element accent in `styles/grim/paint.ts`, three new beast rigs                                                                                                                                                                 |
+| 7.3 Abilities    | `src/data/abilities.ts` (the library and each type's list), `src/sim/abilities.ts` (the code)                                                                                                                                                                                              |
+| 7.4 Factions     | the Kennel and the Gilded: 8 types, 4 themes, 2 champions, 2 essences, tablets, rigs and kits                                                                                                                                                                                              |
+| 7.2 Mods         | Charging, Flask-taker and Hobbling                                                                                                                                                                                                                                                         |
+
+### 14.2 What changed on the way
+
+- **Default scaling is 1.5, not 1.25.** The new roster and the offer rules made the bot's choice matter: at 1.25 the greedy bot
+  won 14 of 24 runs (before this plan, at 1.25 on the old roster, it won 2 of 24, and 2 of 24 on the old game). At 1.5 it won 6
+  of 24, and then 8 of 36; at 2.0, none of 24. The median map reached fell from about 55 to about 41 at 1.5. A random-picking
+  bot won none of 24 and died mostly to the gate mini-bosses; its deaths before map 25 are about the same at 1.0 and at 1.5 (7
+  and 8 of 48), so the early game is not made a wall.
+- **Faction introduction maps** (4.2, rule 2): the Rot 4, the Swarm 6, the Hollow 11 (not 9: two Hollow themes beat a
+  physical character outright), the Choir 15, the Reliquary 25, the Kennel 11, the Gilded 18, and mixed themes from 30.
+- **The Gnawer pack** is three to six extra Gnawers per room (it was seven to thirteen), and a Swarm room keeps 60% of the
+  monsters a room of its size would have. By head count the Gnawers were over 40% of everything the bot met from map 10.
+- **The Bone Warden is a Skeleton Warrior champion** (the plan said Brute): a brute with the champion multipliers and a ring of
+  Warriors was a wall at map 10 (8 of 24 random-bot deaths on that one map).
+- **Gilded tuning:** the first cut caused half of the bot's deaths. The Guard has 1.5 times the life and 0.95 times the
+  damage, the Slinger 0.7 times the damage, and the Bursar's reach is 5 tiles. It now causes about a third.
+- **The test runner uses eight workers** (`vite.config.ts`): with one worker per core, the sim speed floors failed in every
+  full run on a 32-core machine.
+- **Quarry trash** is still drawn by the old per-monster roll (the champion rooms are not templates). The Holdout waves, the
+  Regent's escort (three monsters of the theme) and every room of a plain map use the templates.
+- **Hollow monsters are drawn at 80% opacity**, and every faction has its own palette. Per-type gaits (6.3) are not built
+  beyond the hunch, the scale and the telegraph on the ground.
+- **Companions** (4.2, rule 7) stay off, as planned: the maps already differ enough.
+
+### 14.3 What the bot measured
+
+Greedy bot (picks by the build's score), default settings, 36 runs:
+
+- wins 8 of 36 (22%); the plan's target was 10 to 25%;
+- deaths by faction: the Gilded 32%, the Reliquary 21%, the Kennel 18%, the Ossuary 14%, the Choir and the Hollow 7% each, so no
+  faction is over the 35% limit;
+- the Rot, the Swarm and the Hollow are the factions the bot steers around, and so kill little.
+
+Random bot (picks any offer), default settings. Share of the monsters placed, by band of ten maps:
+
+| Maps  | Ossuary                    | The largest other faction |
+| ----- | -------------------------- | ------------------------- |
+| 1–10  | 58% (limit 60% from map 4) | the Rot 28% (limit 30%)   |
+| 11–20 | 36% (limit 40%)            | the Hollow 21% (30%)      |
+| 21–30 | 15% (limit 25%)            | the Rot 22% (25%)         |
+| 31–40 | 14%                        | the Choir 18%             |
+| 41–50 | 6%                         | the Rot 25%               |
+| 51–90 | 3 to 11%                   | the Gilded 14 to 27%      |
+
+Types met per ten maps: 13 on maps 1 to 10, 27 on 11 to 20, 32 from 21 on (33 exist). The longest stretch of maps in which one
+faction supplied over 60% of the monsters is 4 (the Ossuary on the first maps), median 3 to 4.
+
+### 14.4 Left for later
+
+- The Drowned, the Emberborn and the Veiled of section 7.4 are not built. The ability layer needs only `pull` (declared in
+  `data/abilities.ts`, not coded) for the first.
+- Per-type gaits, and two of the new mods of 7.2 (Mirrored, Warding Pulse).
+- Variance is 0.1 by default; its effect was too small to see in the bot's results. A larger default would make Gentle and
+  Fierce maps more of a choice.
+- The Mystic dies early more often than the other classes at the new baseline (the bot spends a caster's points poorly in the
+  first twenty maps); it did before this plan too, on map 1.

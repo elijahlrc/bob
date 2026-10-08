@@ -28,8 +28,8 @@ export type ThemeDef = {
   wall: number;
 };
 
-/** The mini-boss of an Ossuary theme (docs/ENEMIES.md 4.2, rule 6): a brute that raises a ring of Warriors twice. */
-const OSSUARY_CHIEF: ThemeDef['chief'] = { mod: 'boneWarden', type: 'brute' };
+/** The mini-boss of an Ossuary theme (docs/ENEMIES.md 4.2, rule 6): a warrior that raises a ring of Warriors twice. */
+const OSSUARY_CHIEF: ThemeDef['chief'] = { mod: 'boneWarden', type: 'warrior' };
 
 export const THEMES: ThemeDef[] = [
   {
@@ -187,7 +187,7 @@ THEMES.push(
     elementWeights: { cold: 2 },
     typeWeights: {},
     factions: { hollow: 85, ossuary: 15 },
-    fromMap: 9,
+    fromMap: 11,
     chief: { mod: 'unremembered', type: 'gloomstalker' },
     itemQuantity: 0,
     rareWeightMult: 1.2,
@@ -261,9 +261,9 @@ THEMES.push(
     id: 'lamplitCloister',
     name: 'Lamplit Cloister',
     elementWeights: {},
-    typeWeights: { wisp: 2, wight: 3 },
+    typeWeights: { wisp: 1.5, wight: 1.5 },
     factions: { hollow: 85, ossuary: 15 },
-    fromMap: 12,
+    fromMap: 16,
     chief: { mod: 'unremembered', type: 'gloomstalker' },
     itemQuantity: 0,
     rareWeightMult: 1,

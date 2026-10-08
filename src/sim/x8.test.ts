@@ -405,7 +405,7 @@ describe('The Trophy Cord (EXPANSION 6.4)', () => {
 });
 
 describe('the Bone Warden (docs/ENEMIES.md 4.2, rule 6)', () => {
-  it('every Ossuary theme ends on it, and it is a brute', () => {
+  it('every Ossuary theme ends on it, and it is a warrior', () => {
     for (const id of [
       'ashenCrypt',
       'rimedCatacomb',
@@ -422,14 +422,14 @@ describe('the Bone Warden (docs/ENEMIES.md 4.2, rule 6)', () => {
       });
       const chief = pop.monsters.find((m) => m.spec.rarity === 'miniboss')!;
       expect(chief.name, id).toBe('The Bone Warden');
-      expect(chief.spec.type).toBe('brute');
+      expect(chief.spec.type).toBe('warrior');
       expect(chief.spec.mods).toContain('boneWarden');
     }
   });
 
   it('raises a ring of four Warriors at two thirds and again at one third of its life, no more', () => {
     const w = arena();
-    const warden = put(w, 'brute', 12, 0, { rarity: 'miniboss', mods: ['boneWarden'] });
+    const warden = put(w, 'warrior', 12, 0, { rarity: 'miniboss', mods: ['boneWarden'] });
     const warriors = () =>
       w.actors.filter(
         (a) => a.alive && a.mon?.spec.type === 'warrior' && a.summonedBy === warden.id,

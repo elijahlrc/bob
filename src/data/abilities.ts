@@ -301,7 +301,7 @@ export const TYPE_ABILITIES: Partial<Record<string, AbilityDef[]>> = {
   ],
   cutpurse: [{ id: 'steal', amount: 0.25 }],
   guard: [{ id: 'reflect', amount: 0.15 }],
-  bursar: [{ id: 'suppress', range: 6 }],
+  bursar: [{ id: 'suppress', range: 5 }],
   slinger: [{ id: 'kite' }],
 };
 

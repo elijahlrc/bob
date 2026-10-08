@@ -66,7 +66,13 @@ small-screen work is planned in [docs/MOBILE.md](docs/MOBILE.md).
 | `npm run sim -- --runs 10 --class all --write-xp`    | Re-measure mean map XP and regenerate `src/data/measuredXp.ts` |
 
 `npm run sim` options: `--runs N` per class, `--class all|id[,id]`, `--maps a-b` (stop after map b),
-`--seed N`, `--measure-xp`, `--write-xp`.
+`--seed N`, `--measure-xp`, `--write-xp`, `--report` (deaths, uniques, builds), and the difficulty settings
+`--scaling`, `--base`, `--variance` (or `--legacy` for the old curve). The report also lists who the bot met, by band of
+ten maps. `scripts/simpar.sh <dir> <runs> <chunk> [flags]` runs the same sim in parallel and merges the reports
+(`--dump file` and `--merge files...` are what it uses).
+
+Difficulty (scaling, base, variance) can be changed from the **Debug: difficulty** panel on the title screen and at camp.
+It shows in dev builds, or in any build opened with `?debug`. See `docs/ENEMIES.md` section 8.
 
 ## Layout
 

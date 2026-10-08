@@ -747,3 +747,22 @@ Plan: [MAPS.md](MAPS.md) section 9.2. First pass; the numbers are not tuned.
 
 `newRun` sets `autoContinue: false`; the camp checkbox, the countdown and the pause reasons are unchanged. Saves already in progress
 keep the setting they have. The bot does not use it.
+
+### Enemy variety and difficulty (docs/ENEMIES.md), built (2026-10-08)
+
+E0 to E7 of the plan, in order, each committed with `npm run check` and `npm run build` green (1,984 tests).
+
+- **E0/E1, difficulty.** `src/data/difficulty.ts`; the stat level and the hardness sample are on every `MonsterSpec` and in the
+  monster cache key; the effective HP and the theme score read them; `SAVE_VERSION` 8 (a version 7 save keeps the legacy curve).
+  The Debug panel (title screen and camp), the summary line for non-default settings, the Gentle/Even/Fierce chip on offers.
+  `npm run sim` takes `--scaling --base --variance --legacy` and prints who the bot met; `scripts/simpar.sh` runs it on all cores.
+- **E2, distribution.** Weighted offer sets with distinct leaders, at most one skeleton theme from map 4, six new themes, 85/15
+  faction themes, earlier introduction maps, the Bone Warden gate, pack templates by role.
+- **E3, legibility.** The camp card, inspect card, HUD and recap say who is on the map (`themeInfo.ts`, `OfferInfo.tsx`).
+- **E4, appearance.** Kits for 17 humanoid-rig types, faction palettes, the element as an accent, three beast rigs.
+- **E5, abilities.** The faction behaviours moved to data and `sim/abilities.ts` with the existing tests unchanged; Ambush and
+  Patrol packs.
+- **E6, the Kennel and the Gilded** with eight types, four themes, two champions, two essences, tablets, three mods.
+- **E7, integration and measurement.** Default scaling 1.5. Measured numbers and the changes they caused are in
+  `docs/ENEMIES.md` section 14. Not built: the Drowned, the Emberborn, the Veiled, per-type gaits.
+- **Known:** the sim speed tests fail when 32 test workers share the machine; `vite.config.ts` sets eight.

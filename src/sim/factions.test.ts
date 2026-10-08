@@ -72,8 +72,8 @@ describe('the factions (EXPANSION 7.3)', () => {
   it('the new themes arrive on their maps and spawn their own faction', () => {
     expect(themesFor(3).some((t) => t.id === 'charnelPits')).toBe(false);
     expect(themesFor(4).some((t) => t.id === 'charnelPits')).toBe(true);
-    expect(themesFor(8).some((t) => t.id === 'hollowVigil')).toBe(false);
-    expect(themesFor(9).some((t) => t.id === 'hollowVigil')).toBe(true);
+    expect(themesFor(10).some((t) => t.id === 'hollowVigil')).toBe(false);
+    expect(themesFor(11).some((t) => t.id === 'hollowVigil')).toBe(true);
     for (const map of [1, 5, 10, 20, 40])
       for (const id of rollThemes(3, map)) expect((themeDef(id).fromMap ?? 1) <= map).toBe(true);
     const shares = typeShares(themeDef('charnelPits'));

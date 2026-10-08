@@ -616,7 +616,18 @@ export class GrimStyle extends StyleBase {
       id: a.id,
       track: new AnimTrack(),
       kind,
-      data: { sprite, shadow, ring, light, gone: false, last: '', acc: 0, accent, variant },
+      data: {
+        sprite,
+        shadow,
+        ring,
+        light,
+        gone: false,
+        last: '',
+        acc: 0,
+        accent,
+        variant,
+        ghost: !!a.mon && factionOfSpec(a.mon.spec) === 'hollow',
+      },
     };
   }
 
@@ -659,7 +670,7 @@ export class GrimStyle extends StyleBase {
       d.sprite.setTint(tint).setTintMode(Phaser.TintModes.MULTIPLY);
     }
     // The Unremembered fades out of sight while it phases.
-    if (a.alive) d.sprite.setAlpha(a.phaseT > 0 ? 0.12 : a.hold ? 0.4 : 1);
+    if (a.alive) d.sprite.setAlpha(a.phaseT > 0 ? 0.12 : a.hold ? 0.4 : d.ghost ? 0.8 : 1);
     d.shadow
       .setPosition(px, py + 1)
       .setDepth(500)

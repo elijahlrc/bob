@@ -759,6 +759,10 @@ Drops: tablets for Gravedigger's Smock, Knucklebone Bindings, Unblinking Longbow
 - Drops: Reliquary Slag, extra Socket Augers; tablets for The Walled Heart, Meteorite Edge, The Lantern Bulwark and
   Thunderwire Hauberk.
 
+> **Later changes (docs/ENEMIES.md, 2026-10-08):** the introduction maps below moved (the Rot 4, the Swarm 6, the Hollow 11, the
+> Choir 15, the Reliquary 25, mixed themes 30), faction themes are 85% their faction, there are more themes per faction, and two
+> factions were added (the Kennel and the Gilded). Rooms are packs with shapes, not independent rolls.
+
 ### 7.4 Themes
 
 Themes become faction-led. The five Ossuary themes stay (maps 1+). New themes join as their faction does, and

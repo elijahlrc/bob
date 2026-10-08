@@ -46,6 +46,9 @@ export type Population = {
   waves?: Wave[];
 };
 
+/** A swarm template room keeps this share of the monsters a room of its size would have. */
+const SWARM_SHARE = 0.6;
+
 /** How common each type is within its faction. */
 export const TYPE_WEIGHTS: Record<MonsterTypeId, number> = {
   warrior: 50,
@@ -413,9 +416,13 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
         add(room, i === 0 ? normal('rare', types[i]) : normal('normal', types[i]), p, how),
       );
     } else if (roll < 0.7 - magicShift) {
-      const ps = spots(rng, lab, room, sized(rng.int(3, 7) + extra));
+      let ps = spots(rng, lab, room, sized(rng.int(3, 7) + extra));
       let packed = false;
       const plan = packPlan(rng, opts.theme, ps.length, throng);
+      // A swarm is made of small things in numbers (and a Gnawer brings more): its own count is smaller, so that a room of
+      // vermin is not twice the monsters of any other.
+      if (plan.template === 'swarm')
+        ps = ps.slice(0, Math.max(2, Math.ceil(ps.length * SWARM_SHARE)));
       const types = plan.types;
       const how = behave(room, plan);
       for (const [i, p] of ps.entries()) {

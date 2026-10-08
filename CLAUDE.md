@@ -28,10 +28,12 @@
     `$env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")`
   - Dev server: `npm run dev` on http://localhost:5173 (strict port).
 - **Map choice plan:** [docs/MAPS.md](docs/MAPS.md) (milestones R0–R7): three offers per level, level offsets of ±2, carry-over of life, mana, ES and flasks, Abandon, Respite and map types. R0 to R6 are built as a first pass (the numbers are not tuned; see `docs/PROGRESS.md`); R7, the phase-2 types, is not. Decisions go in DESIGN.md Appendix A.
-- **Enemy variety and difficulty plan:** [docs/ENEMIES.md](docs/ENEMIES.md) (milestones E0–E7): a proposal, nothing built yet. Who the
-  player meets (theme weights, offer-set rules, pack templates), what the camp card says about it, creature kits, a
-  data-driven ability layer, new factions, and the difficulty settings (scaling, base, variance) with a debug panel and a
-  harder baseline. Decisions go in DESIGN.md Appendix A.
+- **Enemy variety and difficulty plan:** [docs/ENEMIES.md](docs/ENEMIES.md) (milestones E0–E7): built (section 14 says what changed and
+  what the bot measured). Offer sets are drawn by weight with distinct leading factions, rooms are packs with shapes by role
+  (`src/gen/packs.ts`), the camp card says who is on the map (`src/run/themeInfo.ts`), monsters have kits and palettes, behaviours
+  are abilities (`src/data/abilities.ts`, `src/sim/abilities.ts`), there are eight factions, and difficulty is a run setting
+  (scaling, base, variance; `src/data/difficulty.ts`; default scaling 1.5) with a Debug panel (dev builds or `?debug`).
+  `scripts/simpar.sh` runs the bot sim on all cores. Decisions go in DESIGN.md Appendix A.
 - **Status:** M0–M7 of DESIGN.md are complete (see `docs/PROGRESS.md`). Further work is the stretch list
   or balance changes. Balance constants live in `src/data/constants.ts`. `npm run sim` (headless bot balance
   report) is useful for checking a balance change but is not required after every one; `--write-xp` regenerates
