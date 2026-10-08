@@ -251,8 +251,24 @@ export class GrimStyle extends StyleBase {
     const tid = world.plan.theme.id;
     const th = world.plan.theme;
     const floors = isoFloors(th.floor);
-    isoWalls(th.wall, WALL_TALL).forEach((c, i) => this.addTex(`gwt_${tid}_${i}`, c));
-    isoWalls(th.wall, WALL_LOW).forEach((c, i) => this.addTex(`gwl_${tid}_${i}`, c));
+    // One texture holds every wall variant: a lit sprite batch cannot span textures (Phaser 4 draws one texture per batch
+    // when lighting is on), and walls of random variants side by side in depth order would be a draw call each.
+    const wallAtlas = `gwa_${tid}`;
+    if (!s.textures.exists(wallAtlas)) {
+      const cubes = [
+        ...isoWalls(th.wall, WALL_TALL).map((c, i) => ({ name: `gwt_${i}`, c })),
+        ...isoWalls(th.wall, WALL_LOW).map((c, i) => ({ name: `gwl_${i}`, c })),
+      ];
+      const cell = ISO_W + 2;
+      const cv = document.createElement('canvas');
+      cv.width = cell * cubes.length;
+      cv.height = ISO_H + WALL_TALL + 2;
+      const ctx = cv.getContext('2d')!;
+      cubes.forEach(({ c }, i) => ctx.drawImage(c, i * cell + 1, 1));
+      this.addTex(wallAtlas, cv);
+      const tex = s.textures.get(wallAtlas);
+      cubes.forEach(({ name, c }, i) => tex.add(name, 0, i * cell + 1, 1, c.width, c.height));
+    }
     const isFloor = (x: number, y: number) =>
       x >= 0 && y >= 0 && x < lab.w && y < lab.h && lab.tiles[y * lab.w + x] === 1;
     const CH = 8;
@@ -303,7 +319,7 @@ export class GrimStyle extends StyleBase {
         const front = isFloor(x - 1, y) || isFloor(x, y - 1) || isFloor(x - 1, y - 1);
         const p = this.project(x + 1, y + 1);
         const img = s.add
-          .image(p.x, p.y, `${front ? 'gwl' : 'gwt'}_${tid}_${rng.int(0, 2)}`)
+          .image(p.x, p.y, wallAtlas, `${front ? 'gwl' : 'gwt'}_${rng.int(0, 2)}`)
           .setOrigin(0.5, 1)
           // Sorted by the middle of the footprint, like actors by their feet: a wall behind an actor must never draw over it
           // (the bottom corner, half a tile lower, did that to anyone in the half of a tile nearest a wall).

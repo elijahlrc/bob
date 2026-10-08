@@ -1,9 +1,17 @@
+import type { Minion } from './minions';
 import type { Actor } from './types';
 import { newMoveState } from './movement';
 
-/** A fresh actor with every field at its neutral value; callers fill in what makes it a player, monster or minion. */
+/**
+ * A fresh actor with every field at its neutral value; callers fill in what makes it a player, monster or minion.
+ *
+ * Every actor, whatever it is, is made with the same fields in the same order (the monster's `mon` and the minion's own
+ * fields included, unset). The sim's hot loops read actors of all three kinds; one shape for all keeps those reads
+ * monomorphic, where three shapes (and more as fields were added later) made them polymorphic and deoptimised them again
+ * in every new map.
+ */
 export function newActor(id: number, isPlayer: boolean, x: number, y: number, r: number): Actor {
-  return {
+  const a: Minion = {
     id,
     isPlayer,
     faction: isPlayer ? 0 : 1,
@@ -118,5 +126,15 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     dashY: 0,
     markX: 0,
     markY: 0,
+    mon: undefined,
+    key: '',
+    kind: undefined as never,
+    t: 0,
+    atkT: 0,
+    level: 0,
+    dmg: 0,
+    speed: 0,
+    boomed: false,
   };
+  return a;
 }
