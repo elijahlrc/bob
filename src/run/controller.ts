@@ -1,5 +1,6 @@
 import { Emitter } from '../core/events';
 import { DT } from '../data/constants';
+import { clampDifficulty, DEFAULT, type Difficulty } from '../data/difficulty';
 import { worldResult, type MapResult } from '../sim/runMap';
 import type { SimEvent, World } from '../sim/types';
 import { cancelAbandon, requestAbandon } from '../sim/abandon';
@@ -61,6 +62,8 @@ export class Controller {
   lastResult: MapResult | null = null;
   speed = 1;
   paused = false;
+  /** The difficulty a new run starts with (set from the debug panel on the title screen; docs/ENEMIES.md 8.3). */
+  startDifficulty: Difficulty = { ...DEFAULT };
   /** Enemy picked for inspection on the map. */
   selectedId: number | null = null;
   private acc = 0;
@@ -191,10 +194,24 @@ export class Controller {
   }
 
   startRun(classId: string, seed: number): void {
-    this.run = newRun(classId, seed);
+    this.run = newRun(classId, seed, this.startDifficulty);
     this.undoStack = [];
     this.lastResult = null;
     this.goTo('camp');
+  }
+
+  /** The difficulty of the next new run. */
+  setStartDifficulty(d: Partial<Difficulty>): void {
+    this.startDifficulty = clampDifficulty({ ...this.startDifficulty, ...d });
+    this.changed();
+  }
+
+  /** Change the settings of the run in progress; they apply from the next map, never to one being played (camp only). */
+  setDifficulty(d: Partial<Difficulty>): void {
+    const run = this.run;
+    if (!run || run.phase !== 'camp' || this.screen !== 'camp') return;
+    run.difficulty = clampDifficulty({ ...run.difficulty, ...d });
+    this.changed();
   }
 
   /** Start the next map with one of the offered maps. */

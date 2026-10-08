@@ -61,8 +61,15 @@ export type BodyKind =
   | 'golem'
   | 'pylon';
 
+/**
+ * What a type is for in a pack (docs/ENEMIES.md 4.2): `front` holds the line, `ranged` shoots from behind it, `support` heals,
+ * buffs or shields, `special` has a trick of its own (bursting, blinking, spawning), `swarm` comes in numbers.
+ */
+export type Role = 'front' | 'ranged' | 'support' | 'special' | 'swarm';
+
 export type MonsterTypeDef = {
   id: MonsterTypeId;
+  role: Role;
   name: string;
   faction: FactionId;
   /** The figure it is drawn with. */
@@ -91,6 +98,7 @@ export type MonsterTypeDef = {
 export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   warrior: {
     id: 'warrior',
+    role: 'front',
     faction: 'ossuary',
     body: 'warrior',
     name: 'Skeleton Warrior',
@@ -105,6 +113,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   brute: {
     id: 'brute',
+    role: 'front',
     faction: 'ossuary',
     body: 'brute',
     name: 'Skeleton Brute',
@@ -119,6 +128,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   archer: {
     id: 'archer',
+    role: 'ranged',
     faction: 'ossuary',
     body: 'archer',
     name: 'Skeleton Archer',
@@ -133,6 +143,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   mage: {
     id: 'mage',
+    role: 'ranged',
     faction: 'ossuary',
     body: 'mage',
     name: 'Skeleton Mage',
@@ -147,6 +158,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   shieldbearer: {
     id: 'shieldbearer',
+    role: 'front',
     name: 'Skeleton Shieldbearer',
     faction: 'ossuary',
     body: 'warrior',
@@ -162,6 +174,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   shambler: {
     id: 'shambler',
+    role: 'front',
     name: 'Shambler',
     faction: 'rot',
     body: 'warrior',
@@ -177,6 +190,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   bloater: {
     id: 'bloater',
+    role: 'special',
     name: 'Bloater',
     faction: 'rot',
     body: 'brute',
@@ -192,6 +206,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   spitter: {
     id: 'spitter',
+    role: 'ranged',
     name: 'Spitter',
     faction: 'rot',
     body: 'archer',
@@ -207,6 +222,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   hag: {
     id: 'hag',
+    role: 'support',
     name: 'Carrion Hag',
     faction: 'rot',
     body: 'mage',
@@ -222,6 +238,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   gloomstalker: {
     id: 'gloomstalker',
+    role: 'special',
     name: 'Gloomstalker',
     faction: 'hollow',
     body: 'warrior',
@@ -237,6 +254,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   wailer: {
     id: 'wailer',
+    role: 'ranged',
     name: 'Wailer',
     faction: 'hollow',
     body: 'mage',
@@ -252,6 +270,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   wisp: {
     id: 'wisp',
+    role: 'swarm',
     name: 'Mana Wisp',
     faction: 'hollow',
     body: 'warrior',
@@ -266,6 +285,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   hexer: {
     id: 'hexer',
+    role: 'ranged',
     name: 'Hexer',
     faction: 'choir',
     body: 'mage',
@@ -281,6 +301,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   censer: {
     id: 'censer',
+    role: 'support',
     name: 'Censer-bearer',
     faction: 'choir',
     body: 'warrior',
@@ -296,6 +317,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   flagellant: {
     id: 'flagellant',
+    role: 'front',
     name: 'Flagellant',
     faction: 'choir',
     body: 'brute',
@@ -311,6 +333,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   choirmaster: {
     id: 'choirmaster',
+    role: 'support',
     name: 'Choirmaster',
     faction: 'choir',
     body: 'mage',
@@ -326,6 +349,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   gnawer: {
     id: 'gnawer',
+    role: 'swarm',
     name: 'Gnawer',
     faction: 'swarm',
     body: 'gnawer',
@@ -341,6 +365,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   bat: {
     id: 'bat',
+    role: 'swarm',
     name: 'Carrion Bat',
     faction: 'swarm',
     body: 'bat',
@@ -357,6 +382,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   beetle: {
     id: 'beetle',
+    role: 'front',
     name: 'Bone Beetle',
     faction: 'swarm',
     body: 'beetle',
@@ -372,6 +398,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   nest: {
     id: 'nest',
+    role: 'special',
     name: 'Nest',
     faction: 'swarm',
     body: 'nest',
@@ -389,6 +416,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   sentinel: {
     id: 'sentinel',
+    role: 'front',
     name: 'Sentinel',
     faction: 'reliquary',
     body: 'sentinel',
@@ -405,6 +433,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   arbalest: {
     id: 'arbalest',
+    role: 'ranged',
     name: 'Arbalest',
     faction: 'reliquary',
     body: 'arbalest',
@@ -422,6 +451,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   golem: {
     id: 'golem',
+    role: 'front',
     name: 'Core Golem',
     faction: 'reliquary',
     body: 'golem',
@@ -437,6 +467,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   pylon: {
     id: 'pylon',
+    role: 'support',
     name: 'Warden Pylon',
     faction: 'reliquary',
     body: 'pylon',
@@ -454,6 +485,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
   },
   wight: {
     id: 'wight',
+    role: 'support',
     name: 'Lantern Wight',
     faction: 'hollow',
     body: 'mage',
@@ -561,6 +593,7 @@ export type MonsterModId =
   | 'precentor'
   | 'gnawingQueen'
   | 'reliquarian'
+  | 'boneWarden'
   | 'brood'
   // The Choir's faction mod, and the hex mods (EXPANSION 7.2).
   | 'zealous'
@@ -741,6 +774,7 @@ MONSTER_MODS.push(
   { id: 'precentor', name: 'The Precentor', magic: false, chief: true, mods: [] },
   { id: 'gnawingQueen', name: 'The Gnawing Queen', magic: false, chief: true, mods: [] },
   { id: 'reliquarian', name: 'The Reliquarian', magic: false, chief: true, mods: [] },
+  { id: 'boneWarden', name: 'The Bone Warden', magic: false, chief: true, mods: [] },
 );
 MONSTER_MODS.push({
   id: 'brood',

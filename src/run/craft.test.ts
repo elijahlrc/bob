@@ -498,7 +498,7 @@ describe('crafting is final (EXPANSION 8.4)', () => {
   it('saves from before the currency fields are rejected, not migrated', () => {
     const store = new MemoryStore();
     const run = newRun('vanguard', 1);
-    store.setItem(SAVE_KEY, JSON.stringify({ version: SAVE_VERSION - 2, run }));
+    store.setItem(SAVE_KEY, JSON.stringify({ version: SAVE_VERSION - 4, run }));
     expect(loadRun(store).status).toBe('incompatible');
     saveRun(store, run);
     expect(loadRun(store).status).toBe('ok');

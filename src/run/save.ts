@@ -1,4 +1,5 @@
 import { stampAll } from './found';
+import { LEGACY } from '../data/difficulty';
 import { SAVE_VERSION, type RunState } from './run';
 
 /** The subset of the Web Storage API the game needs (injected so `run/` stays headless). */
@@ -37,6 +38,13 @@ export function loadRun(store: KeyValueStore): LoadResult {
  */
 export function migrate(version: number, run: RunState): RunState | null {
   if (version === SAVE_VERSION) return run;
+  // Version 7 only lacks the difficulty settings: a run in progress keeps the curve it was balanced on.
+  if (version === 7) {
+    const old = run as RunState;
+    old.version = SAVE_VERSION;
+    old.difficulty = { ...LEGACY };
+    return old;
+  }
   if (version === 6) {
     const old = run as RunState & { newLoot?: number[] };
     delete old.newLoot;
@@ -46,6 +54,7 @@ export function migrate(version: number, run: RunState): RunState | null {
     old.favourites = [];
     // Nothing is known about when these were found: everything counts as found now, so nothing is old on day one.
     stampAll(old);
+    old.difficulty = { ...LEGACY };
     return old;
   }
   return null;

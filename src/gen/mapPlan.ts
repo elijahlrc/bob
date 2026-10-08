@@ -1,4 +1,5 @@
 import { Rng } from '../core/rng';
+import { LEGACY, type Difficulty } from '../data/difficulty';
 import { affixesConflict, affixReward, MAP_AFFIXES, mapAffixDef } from '../data/mapAffixes';
 import { CRAWL_SEGMENTS, mapTypeDef, THRONG_AFFIX, type MapTypeId } from '../data/mapTypes';
 import { themeDef, type ThemeDef } from '../data/themes';
@@ -17,6 +18,8 @@ export type MapPlan = {
   affixes: string[];
   /** The map type (docs/MAPS.md section 9). */
   type: MapTypeId;
+  /** The difficulty settings the monsters were made under (docs/ENEMIES.md 8). */
+  difficulty: Difficulty;
   /** Which map of a Crawl this is (0 for any other map), and how many there are. */
   segment: number;
   segments: number;
@@ -74,6 +77,9 @@ export function makeMapPlan(
   type: MapTypeId = 'plain',
   /** A Crawl is three maps in a row: which of them this is (0 to 2). */
   segment = 0,
+  /** The difficulty settings, and the map's own draw of the variance (`offerNoise`). */
+  difficulty: Difficulty = LEGACY,
+  mapNoise = 0,
 ): MapPlan {
   const root = new Rng(seed);
   const genRng = root.fork('mapgen');
@@ -100,6 +106,8 @@ export function makeMapPlan(
     // A Throng's monsters carry its own hidden affix; the player-facing affix list does not show it.
     affixes: type === 'throng' ? [...affixes, THRONG_AFFIX] : affixes,
     type,
+    difficulty,
+    mapNoise,
   });
   return {
     seed,
@@ -109,6 +117,7 @@ export function makeMapPlan(
     theme,
     affixes,
     type,
+    difficulty,
     segment,
     segments: crawl ? CRAWL_SEGMENTS : 1,
     xpMult,

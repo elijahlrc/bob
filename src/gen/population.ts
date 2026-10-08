@@ -1,4 +1,4 @@
-import type { Rng } from '../core/rng';
+import { Rng } from '../core/rng';
 import type { MonsterSpec } from '../calc/monster';
 import {
   BOSS_NAME,
@@ -14,9 +14,11 @@ import {
   type MonsterTypeId,
   type Variant,
 } from '../data/monsters';
+import { LEGACY, packPower, statLevel, type Difficulty } from '../data/difficulty';
 import { affixRarePacks, affixStrengthOf, mapAffixDef } from '../data/mapAffixes';
 import { HOLDOUT_FIRST, HOLDOUT_INTERVAL, HOLDOUT_WAVES, type MapTypeId } from '../data/mapTypes';
 import type { ThemeDef } from '../data/themes';
+import { packTypes } from './packs';
 import { isFloor, type Labyrinth, type Room } from './labyrinth';
 
 export type MonsterSpawn = {
@@ -187,10 +189,46 @@ export type PopulateOpts = {
   affixes?: string[];
   /** The map type (docs/MAPS.md 9): Quarry and Throng change who is on the map. */
   type?: MapTypeId;
+  /** The difficulty settings (docs/ENEMIES.md 8): the legacy curve when absent. */
+  difficulty?: Difficulty;
+  /** The map's own draw in [-1, 1] (`offerNoise`), the shared part of the variance. */
+  mapNoise?: number;
 };
 
-/** §10.3 room population. */
+/**
+ * The map's own draw of the difficulty variance, in [-1, 1]: fixed by the run seed and the offer, so the offer card can
+ * show it before the map is made and a reload gives the same value.
+ */
+export function offerNoise(seed: number, offerId: string): number {
+  return new Rng(seed).fork(`diff.${offerId}`).float(-1, 1);
+}
+
+/** §10.3 room population, then the difficulty settings applied to every monster. */
 export function populate(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
+  const pop = populateRaw(rng, lab, opts);
+  const d = opts.difficulty ?? LEGACY;
+  if (d.scaling === 1 && d.base === 1 && d.variance === 0) return pop;
+  const drng = rng.fork('difficulty');
+  const packNoise = new Map<number, number>();
+  const scale = (m: MonsterSpawn): MonsterSpawn => {
+    let n = packNoise.get(m.pack);
+    if (n === undefined) {
+      n = drng.fork(`pack${m.pack}`).float(-1, 1);
+      packNoise.set(m.pack, n);
+    }
+    const power = Math.round(packPower(d, opts.mapNoise ?? 0, n) * d.base * 100) / 100;
+    return { ...m, spec: { ...m.spec, statLevel: statLevel(opts.areaLevel, d), power } };
+  };
+  return {
+    ...pop,
+    monsters: pop.monsters.map(scale),
+    ...(pop.waves
+      ? { waves: pop.waves.map((w) => ({ ...w, monsters: w.monsters.map(scale) })) }
+      : {}),
+  };
+}
+
+function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
   const monsters: MonsterSpawn[] = [];
   const level = opts.areaLevel;
   let pack = 0;
@@ -198,8 +236,8 @@ export function populate(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Populati
     monsters.push({ spec, x: at.x, y: at.y, room: room.id, pack, name: monsterName(spec, rng) });
   };
   const affixField = opts.affixes?.length ? { affix: opts.affixes } : {};
-  const normal = (rarity: MonsterRarity = 'normal'): MonsterSpec => {
-    const type = rollType(rng, opts.theme);
+  const normal = (rarity: MonsterRarity = 'normal', forced?: MonsterTypeId): MonsterSpec => {
+    const type = forced ?? rollType(rng, opts.theme);
     return {
       type,
       variant: rollVariant(rng, type, opts.theme),
@@ -252,10 +290,11 @@ export function populate(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Populati
           ps.push({ x, y });
           break;
         }
+      const types = packTypes(rng, opts.theme, ps.length, throng);
       const mons: MonsterSpawn[] = ps.map((p, i) => {
         const rarity: MonsterRarity =
           last && i === 0 ? 'rare' : k % 2 === 1 && i < 2 ? 'magic' : 'normal';
-        const spec = normal(rarity);
+        const spec = normal(rarity, types[i]);
         return { spec, x: p.x, y: p.y, room: room.id, pack: k, name: monsterName(spec, rng) };
       });
       waves.push({ t: HOLDOUT_FIRST + k * HOLDOUT_INTERVAL, monsters: mons });
@@ -293,6 +332,10 @@ export function populate(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Populati
           ...affixField,
         };
         add(room, spec, { x: room.cx + 0.5, y: room.cy + 0.5 });
+        // The Regent's escort is made of the map's own monsters (docs/ENEMIES.md 4.2, rule 6).
+        const guard = spots(rng, lab, room, 3);
+        const gt = packTypes(rng, opts.theme, guard.length, throng);
+        guard.forEach((p, i) => add(room, normal('normal', gt[i]), p));
       } else {
         let leader: MonsterSpec = opts.endKind === 'miniboss' ? normal('miniboss') : normal('rare');
         // The mini-boss of a faction's own theme is its champion.
@@ -301,15 +344,17 @@ export function populate(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Populati
           leader = {
             ...leader,
             type: champ.type,
-            variant: MONSTER_TYPES[champ.type].elemental
-              ? rollVariant(rng, champ.type, opts.theme)
-              : 'none',
+            variant:
+              MONSTER_TYPES[champ.type].elemental || champ.mod === 'boneWarden'
+                ? rollVariant(rng, champ.type, opts.theme)
+                : 'none',
             mods: [...leader.mods.slice(0, 3), champ.mod].sort(),
           };
         const n = opts.endKind === 'miniboss' ? 4 : rng.int(2, 4);
         const ps = spots(rng, lab, room, n + 1);
         if (ps.length) add(room, leader, ps[0]);
-        for (let i = 1; i < ps.length; i++) add(room, normal(), ps[i]);
+        const escort = packTypes(rng, opts.theme, ps.length, throng);
+        for (let i = 1; i < ps.length; i++) add(room, normal('normal', escort[i]), ps[i]);
       }
       pack++;
       continue;
@@ -319,12 +364,16 @@ export function populate(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Populati
     if (extraRares > 0 && room.kind === 'main') {
       extraRares--;
       const ps = spots(rng, lab, room, 1 + rng.int(2, 4));
-      ps.forEach((p, i) => add(room, i === 0 ? normal('rare') : normal(), p));
+      const types = packTypes(rng, opts.theme, ps.length, throng);
+      ps.forEach((p, i) =>
+        add(room, i === 0 ? normal('rare', types[i]) : normal('normal', types[i]), p),
+      );
     } else if (roll < 0.7 - magicShift) {
       const ps = spots(rng, lab, room, sized(rng.int(3, 7) + extra));
       let packed = false;
-      for (const p of ps) {
-        const spec = normal();
+      const types = packTypes(rng, opts.theme, ps.length, throng);
+      for (const [i, p] of ps.entries()) {
+        const spec = normal('normal', types[i]);
         add(room, spec, p);
         // A Gnawer never comes alone: the first one in a room brings a pack of eight to fourteen.
         if (spec.type === 'gnawer' && spec.rarity === 'normal' && !packed) {
@@ -337,10 +386,12 @@ export function populate(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Populati
     } else if (roll < 0.92) {
       const nm = rng.int(2, 3);
       const ps = spots(rng, lab, room, sized(rng.int(3, 7) + extra));
-      ps.forEach((p, i) => add(room, i < nm ? normal('magic') : normal(), p));
+      const types = packTypes(rng, opts.theme, ps.length, throng);
+      ps.forEach((p, i) => add(room, normal(i < nm ? 'magic' : 'normal', types[i]), p));
     } else {
       const ps = spots(rng, lab, room, sized(1 + rng.int(2, 4) + extra));
-      ps.forEach((p, i) => add(room, i === 0 ? normal('rare') : normal(), p));
+      const types = packTypes(rng, opts.theme, ps.length, throng);
+      ps.forEach((p, i) => add(room, normal(i === 0 ? 'rare' : 'normal', types[i]), p));
     }
     pack++;
   }

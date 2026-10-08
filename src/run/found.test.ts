@@ -20,7 +20,15 @@ import {
 } from './found';
 import { equip, unequip } from './inventory';
 import { junkItems } from './inventoryOps';
-import { finishMap, newRun, setMap, takeReward, uidSource, type RunState } from './run';
+import {
+  finishMap,
+  newRun,
+  SAVE_VERSION,
+  setMap,
+  takeReward,
+  uidSource,
+  type RunState,
+} from './run';
 import { loadRun, MemoryStore, SAVE_KEY, saveRun } from './save';
 import { fullVitals } from '../sim/types';
 import type { MapResult } from '../sim/runMap';
@@ -292,7 +300,7 @@ describe('saves', () => {
     const res = loadRun(store);
     expect(res.status).toBe('ok');
     if (res.status !== 'ok') return;
-    expect(res.run.version).toBe(7);
+    expect(res.run.version).toBe(SAVE_VERSION);
     expect(res.run.unseen).toEqual([]);
     expect(res.run.favourites).toEqual([]);
     expect(res.run.acquired[77]).toBe(12);

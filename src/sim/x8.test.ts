@@ -245,11 +245,11 @@ describe('hexes in the sim (EXPANSION 5.7)', () => {
 });
 
 describe('the Ashen Choir (EXPANSION 7.3)', () => {
-  it('has four types, is offered from map 25, and its mini-boss is the Precentor', () => {
+  it('has four types, is offered from map 15, and its mini-boss is the Precentor', () => {
     const types = Object.values(MONSTER_TYPES).filter((t) => t.faction === 'choir');
     expect(types.map((t) => t.id).sort()).toEqual(['censer', 'choirmaster', 'flagellant', 'hexer']);
-    expect(themesFor(24).some((t) => t.id === 'ashenNave')).toBe(false);
-    expect(themesFor(25).some((t) => t.id === 'ashenNave')).toBe(true);
+    expect(themesFor(14).some((t) => t.id === 'ashenNave')).toBe(false);
+    expect(themesFor(15).some((t) => t.id === 'ashenNave')).toBe(true);
     const lab = generateLabyrinth(new Rng(4), { rooms: 6, sideBranches: 1 });
     const pop = populate(new Rng(9), lab, {
       areaLevel: 30,
@@ -401,5 +401,53 @@ describe('The Trophy Cord (EXPANSION 6.4)', () => {
     const a0 = belt.player.def.armour;
     killActor(belt, put(belt, 'warrior', 8, 0, { rarity: 'magic', mods: ['armoured'] }));
     expect(belt.player.def.armour).toBe(a0);
+  });
+});
+
+describe('the Bone Warden (docs/ENEMIES.md 4.2, rule 6)', () => {
+  it('every Ossuary theme ends on it, and it is a brute', () => {
+    for (const id of [
+      'ashenCrypt',
+      'rimedCatacomb',
+      'thunderVault',
+      'bonePits',
+      'archersGallery',
+    ]) {
+      const lab = generateLabyrinth(new Rng(4), { rooms: 6, sideBranches: 1 });
+      const pop = populate(new Rng(9), lab, {
+        areaLevel: 20,
+        endKind: 'miniboss',
+        theme: themeDef(id),
+        map: 20,
+      });
+      const chief = pop.monsters.find((m) => m.spec.rarity === 'miniboss')!;
+      expect(chief.name, id).toBe('The Bone Warden');
+      expect(chief.spec.type).toBe('brute');
+      expect(chief.spec.mods).toContain('boneWarden');
+    }
+  });
+
+  it('raises a ring of four Warriors at two thirds and again at one third of its life, no more', () => {
+    const w = arena();
+    const warden = put(w, 'brute', 12, 0, { rarity: 'miniboss', mods: ['boneWarden'] });
+    const warriors = () =>
+      w.actors.filter(
+        (a) => a.alive && a.mon?.spec.type === 'warrior' && a.summonedBy === warden.id,
+      );
+    run(w, 0.2);
+    expect(warriors()).toHaveLength(0);
+    warden.life = warden.def.maxLife * 0.6;
+    run(w, 0.2);
+    expect(warriors()).toHaveLength(4);
+    warden.life = warden.def.maxLife * 0.5;
+    run(w, 0.2);
+    expect(warriors()).toHaveLength(4);
+    warden.life = warden.def.maxLife * 0.3;
+    run(w, 0.2);
+    expect(warriors()).toHaveLength(8);
+    warden.life = warden.def.maxLife * 0.05;
+    run(w, 0.2);
+    expect(warriors()).toHaveLength(8);
+    expect(warriors().every((a) => a.noReward)).toBe(true);
   });
 });

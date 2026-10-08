@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks';
 import { copyText } from '../clipboard';
 import { classDef } from '../data/classes';
 import type { Controller } from '../run/controller';
+import { DebugPanel } from './Debug';
 
 /** Copies the saved run so it can be attached to a bug report, and says whether that worked. */
 function CopySave({ c }: { c: Controller }) {
@@ -59,6 +60,7 @@ export function Title({ c }: { c: Controller }) {
       )}
       {saved.status === 'ok' && <p class="muted">Starting a new run replaces the saved one.</p>}
       {saved.status === 'ok' && <CopySave c={c} />}
+      <DebugPanel c={c} />
       <div class="demo-panel">
         <div class="muted">Demo</div>
         <div class="showcase-row">

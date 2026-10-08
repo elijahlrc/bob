@@ -1,3 +1,4 @@
+import type { Difficulty } from '../data/difficulty';
 import { Character, diffSheets, type SheetDiff } from '../calc/character';
 import { itemReq } from '../calc/items';
 import { itemBase } from '../data/bases';
@@ -30,7 +31,7 @@ export function itemTitle(it: InventoryItem): string {
 export function compareDelta(
   build: Build,
   it: InventoryItem,
-  cfg: { areaLevel: number; resistPenalty: number },
+  cfg: { areaLevel: number; difficulty?: Difficulty; resistPenalty: number },
   slot?: EquipSlot,
 ): SheetDiff | null {
   if (it.kind !== 'item') return null;

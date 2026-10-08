@@ -1,4 +1,4 @@
-import type { MonsterSpec } from '../calc/monster';
+import { scaleOf, type MonsterSpec } from '../calc/monster';
 import { HEX_IDS, hexEffect, type HexId } from '../data/hexes';
 import { MONSTER_TYPES } from '../data/monsters';
 import { monsterHitOf, rawHit } from './combat';
@@ -54,6 +54,9 @@ export const RELIQUARIAN_STEP = 0.25;
 export const BROOD_SPLIT = 3;
 export const GOLEM_ZONE_SECONDS = 6;
 export const WIGHT_SHELL = 0.3;
+/** The Bone Warden raises a ring of Warriors at each of these shares of life lost. */
+export const WARDEN_STEP = 1 / 3;
+export const WARDEN_RING = 4;
 /** Zone damage is dealt in pulses this far apart (seconds). */
 const ZONE_PULSE = 0.25;
 /** A raised monster comes back with this share of its life. */
@@ -110,6 +113,7 @@ function spawnBeside(w: World, m: Actor, type: MonsterSpec['type'], spread = 1.2
     rarity: 'normal',
     level: m.mon!.spec.level,
     mods: [],
+    ...scaleOf(m.mon!.spec),
   };
   const ang = w.rngAi.float(0, Math.PI * 2);
   const pos = w.grid.collide(m.x + Math.cos(ang) * spread, m.y + Math.sin(ang) * spread, 0.4);
@@ -202,6 +206,7 @@ function raise(w: World, c: Corpse): Actor {
     rarity: 'normal',
     level: c.spec.level,
     mods: [],
+    ...scaleOf(c.spec),
   };
   const a = spawnMonster(w, spec, c.x, c.y, c.room, c.pack, c.name);
   a.life = a.def.maxLife * RAISED_LIFE;
@@ -413,6 +418,37 @@ function tickChampion(w: World, m: Actor, dt: number): void {
       w.events.push({ t: 'blink', id: m.id, x: m.x, y: m.y, end: true });
     }
   }
+  if (m.modIds.includes('boneWarden')) {
+    // A ring of Warriors rises at each third of its life lost.
+    const steps = Math.min(2, Math.floor((1 - frac) / WARDEN_STEP + 1e-9));
+    while (m.bossPhase < steps) {
+      m.bossPhase++;
+      for (let i = 0; i < WARDEN_RING; i++) {
+        const ang = (i / WARDEN_RING) * Math.PI * 2 + m.bossPhase;
+        const pos = w.grid.collide(m.x + Math.cos(ang) * 2.2, m.y + Math.sin(ang) * 2.2, 0.4);
+        const a = spawnMonster(
+          w,
+          {
+            type: 'warrior',
+            variant: 'none',
+            rarity: 'normal',
+            level: m.mon!.spec.level,
+            mods: [],
+            ...scaleOf(m.mon!.spec),
+          },
+          pos.x,
+          pos.y,
+          m.room,
+          m.pack,
+          MONSTER_TYPES.warrior.name,
+        );
+        a.noReward = true;
+        a.summonedBy = m.id;
+        a.state = 'chase';
+        w.events.push({ t: 'summon', id: a.id });
+      }
+    }
+  }
   if (m.modIds.includes('precentor')) {
     // Cycles the four hexes, heals itself now and then, and calls a Choirmaster at half life.
     m.raiserT -= dt;
@@ -433,6 +469,7 @@ function tickChampion(w: World, m: Actor, dt: number): void {
           rarity: 'normal',
           level: m.mon!.spec.level,
           mods: [],
+          ...scaleOf(m.mon!.spec),
         },
         pos.x,
         pos.y,

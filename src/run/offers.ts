@@ -1,6 +1,13 @@
 import { Rng } from '../core/rng';
 import { typesFor, type MapTypeId } from '../data/mapTypes';
-import { themesFor } from '../data/themes';
+import {
+  leaderOf,
+  OSSUARY_CAP_FROM,
+  ossuaryLed,
+  themesFor,
+  themeWeight,
+  type ThemeDef,
+} from '../data/themes';
 import { rollMapAffixes } from '../gen/mapPlan';
 import { fullVitals, type Vitals } from '../sim/types';
 
@@ -29,10 +36,26 @@ export type MapOffer = {
 /** Offers per level. */
 export const OFFERS_PER_SET = 3;
 
-/** Different themes for the offered maps of a level. */
+/**
+ * Different themes for the offered maps of a level (docs/ENEMIES.md 4.2). Drawn one at a time by weight from the stream
+ * of the level: each draw prefers a theme whose leading faction is not already in the set, and from map 4 the set holds
+ * at most one skeleton-led theme; when the pool cannot satisfy a rule the rule gives way (never to a repeated theme).
+ */
 export function rollThemes(seed: number, map: number): string[] {
   const r = new Rng(seed).fork(`themes${map}`);
-  return r.shuffle(themesFor(map).map((t) => t.id)).slice(0, OFFERS_PER_SET);
+  const pool = themesFor(map);
+  const chosen: ThemeDef[] = [];
+  while (chosen.length < OFFERS_PER_SET) {
+    const left = pool.filter((t) => !chosen.includes(t));
+    if (!left.length) break;
+    const leaders = new Set(chosen.map(leaderOf));
+    const capped = map >= OSSUARY_CAP_FROM && chosen.some(ossuaryLed);
+    const allowed = left.filter((t) => !(capped && ossuaryLed(t)));
+    const fresh = allowed.filter((t) => !leaders.has(leaderOf(t)));
+    const from = fresh.length ? fresh : allowed.length ? allowed : left;
+    chosen.push(r.weighted(from, (t) => themeWeight(t, map)));
+  }
+  return chosen.map((t) => t.id);
 }
 
 /** The offered maps' offsets from the map number: higher is harder and richer, lower is a place to recover. */

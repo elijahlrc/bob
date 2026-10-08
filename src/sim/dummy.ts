@@ -1,3 +1,4 @@
+import { LEGACY } from '../data/difficulty';
 import type { Defence } from '../calc/combat';
 import { themeDef } from '../data/themes';
 import type { Build } from '../data/types';
@@ -90,6 +91,7 @@ export function createDummyWorld(
     theme: themeDef('ashenCrypt'),
     affixes: [],
     type: 'plain',
+    difficulty: LEGACY,
     segment: 0,
     segments: 1,
     xpMult: themeDef('ashenCrypt').xpMult,

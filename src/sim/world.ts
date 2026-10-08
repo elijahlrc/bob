@@ -1,7 +1,7 @@
 import { MONSTER_TYPES } from '../data/monsters';
 import { Character } from '../calc/character';
 import { noCharges, type ChargeCounts } from '../calc/charges';
-import { buildMonster, type MonsterSpec } from '../calc/monster';
+import { buildMonster, scaleOf, type MonsterSpec } from '../calc/monster';
 import { Rng } from '../core/rng';
 import { DT } from '../data/constants';
 import { affixPlayerMods } from '../data/mapAffixes';
@@ -378,7 +378,14 @@ function bossHit(m: Actor): number {
 }
 
 function summon(w: World, m: Actor, type: 'warrior', variant: MonsterSpec['variant']): void {
-  const spec: MonsterSpec = { type, variant, rarity: 'normal', level: m.mon!.spec.level, mods: [] };
+  const spec: MonsterSpec = {
+    type,
+    variant,
+    rarity: 'normal',
+    level: m.mon!.spec.level,
+    mods: [],
+    ...scaleOf(m.mon!.spec),
+  };
   const ang = w.rngAi.float(0, Math.PI * 2);
   const pos = w.grid.collide(m.x + Math.cos(ang) * 1.2, m.y + Math.sin(ang) * 1.2, 0.4);
   const a = spawnMonster(w, spec, pos.x, pos.y, m.room, m.pack, monsterName(spec, w.rngAi));

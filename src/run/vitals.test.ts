@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Character } from '../calc/character';
+import { LEGACY } from '../data/difficulty';
 import { mod } from '../mods/types';
 import { lifeCap } from '../sim/combat';
 import { runMap } from '../sim/runMap';
@@ -51,7 +52,7 @@ describe('carry-over: the start of a map (docs/MAPS.md section 8.1)', () => {
   });
 
   it('a map hands back what is left, and the next one starts from it', () => {
-    const run = newRun('vanguard', 2);
+    const run = newRun('vanguard', 2, LEGACY);
     const plan = planFor(run, run.offers[0]);
     const res = runMap(plan, run.build, run.xp, worldOptsFor(run, plan));
     expect(res.status).toBe('cleared');
@@ -122,7 +123,7 @@ describe('camp rest (docs/MAPS.md section 8.2)', () => {
 
 describe('carry-over in the run', () => {
   it('finishing a map stores what is left plus the camp rest, not full', () => {
-    const run = newRun('vanguard', 2);
+    const run = newRun('vanguard', 2, LEGACY);
     const plan = planFor(run, run.offers[0]);
     const res = runMap(plan, run.build, run.xp, worldOptsFor(run, plan));
     const left = res.vitals;

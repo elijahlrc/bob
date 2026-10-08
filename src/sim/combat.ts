@@ -23,7 +23,7 @@ import {
 import { CRESCENDO_STEP_BONUS } from '../data/mapTypes';
 import { cannotBleed } from '../data/monsters';
 import { BUFFS, BUFF_IDS, DYN_SHIFT } from '../data/buffs';
-import { MONSTER_CONDS } from '../calc/monster';
+import { MONSTER_CONDS, scaleOf } from '../calc/monster';
 import { AURA_CONDS, WIELD_CONDS } from '../calc/staticConds';
 import { maskOr, type CondId } from '../mods/types';
 import { rollGains } from './buffs';
@@ -430,7 +430,7 @@ export function hit(
 /** Remember damage the player took, for the death recap. */
 export function logDamage(
   w: World,
-  src: Pick<Actor, 'name' | 'rarity' | 'modIds'> | null,
+  src: Pick<Actor, 'name' | 'rarity' | 'modIds' | 'mon'> | null,
   label: string,
   dtype: number,
   amount: number,
@@ -442,6 +442,7 @@ export function logDamage(
     name: src ? src.name : label,
     rarity: src ? src.rarity : 'effect',
     mods: src ? [...src.modIds] : [],
+    type: src?.mon?.spec.type,
     dtype,
     amount,
   });
@@ -628,7 +629,14 @@ function splitInTwo(w: World, a: Actor): void {
     const pos = w.grid.collide(a.x + dx, a.y, 0.4);
     const c = spawnMonster(
       w,
-      { type: spec.type, variant: spec.variant, rarity: 'normal', level: spec.level, mods: [] },
+      {
+        type: spec.type,
+        variant: spec.variant,
+        rarity: 'normal',
+        level: spec.level,
+        mods: [],
+        ...scaleOf(spec),
+      },
       pos.x,
       pos.y,
       a.room,

@@ -57,6 +57,28 @@ export function killerTracker(): { tick: (w: World) => void; get: () => KillerIn
   };
 }
 
+/**
+ * Who the player meets (docs/ENEMIES.md section 9): the head count of each monster type placed on the maps played, read
+ * from the plan on the first tick of each map. Summoned and split-off monsters are not counted. Pass `tick` to `runMap`.
+ */
+export function metTracker(): { tick: (w: World) => void; take: () => Record<string, number> } {
+  let last: unknown = null;
+  let met: Record<string, number> = {};
+  return {
+    tick(w) {
+      if (w.plan === last) return;
+      last = w.plan;
+      const all = [...w.plan.pop.monsters, ...(w.plan.pop.waves ?? []).flatMap((x) => x.monsters)];
+      for (const m of all) met[m.spec.type] = (met[m.spec.type] ?? 0) + 1;
+    },
+    take() {
+      const out = met;
+      met = {};
+      return out;
+    },
+  };
+}
+
 /** What a run looked like at one map. */
 export type BuildSnapshot = {
   map: number;

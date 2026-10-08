@@ -1,3 +1,4 @@
+import { DebugPanel } from './Debug';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { Character } from '../calc/character';
 import { classDef } from '../data/classes';
@@ -14,6 +15,7 @@ import { unseenItems } from '../run/found';
 import { useViewport } from './device';
 import { infoProps } from './info';
 import { Items } from './Items';
+import { OfferInfo } from './OfferInfo';
 import { Reward } from './Reward';
 import { Sheet } from './Sheet';
 import { Workbench } from './Workbench';
@@ -21,6 +23,7 @@ import { Skills } from './Skills';
 import { TreeView } from './TreeView';
 
 const COUNTDOWN = 2;
+const TIER_TEXT = { gentle: 'Gentle', even: 'Even', fierce: 'Fierce' } as const;
 const VERDICT_TEXT: Record<Verdict, string> = {
   comfortable: 'Comfortable',
   close: 'Close',
@@ -91,6 +94,8 @@ export function Camp({ c }: { c: Controller }) {
       ?.querySelector('.tab.on')
       ?.scrollIntoView({ inline: 'nearest', block: 'nearest' });
   }, [tab, compact]);
+  // On a narrow screen the types, rules and gate line of an offer card stay folded until asked for.
+  const [opened, setOpened] = useState<Record<string, boolean>>({});
   const [left, setLeft] = useState<number | null>(null);
   const blocker = run ? c.autoBlocker() : null;
   const auto = !!run && run.autoContinue && blocker === null;
@@ -132,10 +137,11 @@ export function Camp({ c }: { c: Controller }) {
       run
         ? new Character(run.build, {
             areaLevel: run.map,
+            difficulty: run.difficulty,
             resistPenalty: resistPenaltyForMap(run.map),
           })
         : null,
-    [run?.build],
+    [run?.build, run?.difficulty],
   );
   if (!run || !ch) return null;
   const sheet = ch.sheet();
@@ -200,6 +206,15 @@ export function Camp({ c }: { c: Controller }) {
                   </div>
                 )}
                 <div class="muted">{t.bonusText}</div>
+                <OfferInfo o={o} gate={run.map % 10 === 0} more={!compact || !!opened[o.id]} />
+                {o.tier && (
+                  <div
+                    class={`tier ${o.tier}`}
+                    title="This map is drawn harder or easier than the average for its level (the variance setting). It is fixed for the run."
+                  >
+                    {TIER_TEXT[o.tier]}
+                  </div>
+                )}
                 {o.affixes.map((id) => {
                   const a = mapAffixDef(id);
                   return (
@@ -221,11 +236,20 @@ export function Camp({ c }: { c: Controller }) {
                   </div>
                 )}
               </button>
+              {compact && (
+                <button
+                  class="btn small"
+                  onClick={() => setOpened({ ...opened, [o.id]: !opened[o.id] })}
+                >
+                  {opened[o.id] ? 'Fewer details' : 'Details'}
+                </button>
+              )}
               {(run.currency.chalk ?? 0) > 0 && o.kind === 'map' && <Chalk c={c} offer={i} />}
             </div>
           );
         })}
       </div>
+      <DebugPanel c={c} />
       <label class="muted">
         <input
           type="checkbox"

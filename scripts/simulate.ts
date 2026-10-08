@@ -1,13 +1,14 @@
 /**
  * Headless bot runs (DESIGN.md §15.5).
  *
- *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|abandoner] [--craft greedy|random|none] [--report]
+ *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|abandoner] [--craft greedy|random|none] [--report] [--scaling 1.25] [--base 1] [--variance 0.1] [--legacy]
  */
 import { writeFileSync } from 'node:fs';
 import { median } from '../src/core/math';
 import { CLASSES } from '../src/data/classes';
 import { botRun, type BotRunResult, type CraftPolicy, type ThemeRule } from '../src/run/bot';
-import { depthReport } from '../src/run/report';
+import { depthReport, varietyReport } from '../src/run/report';
+import { clampDifficulty, DEFAULT, difficultyText, type Difficulty } from '../src/data/difficulty';
 
 type Args = {
   runs: number;
@@ -24,6 +25,8 @@ type Args = {
   report: boolean;
   /** Leave a map when life drops below this fraction (the abandoner strategy). */
   abandonBelow?: number;
+  /** The difficulty settings (docs/ENEMIES.md 8): --scaling, --base, --variance; the new baseline otherwise. */
+  difficulty: Difficulty;
 };
 
 function parseArgs(argv: string[]): Args {
@@ -38,6 +41,7 @@ function parseArgs(argv: string[]): Args {
     themes: 'best',
     crafting: 'greedy',
     report: false,
+    difficulty: { ...DEFAULT },
   };
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
@@ -55,10 +59,15 @@ function parseArgs(argv: string[]): Args {
       if (v === 'anchor') a.themes = 'first';
       else if (v === 'random' || v === 'lowball' || v === 'resting') a.themes = v;
       else if (v === 'abandoner') a.abandonBelow = 0.3;
-    } else if (k === '--report') a.report = true;
+    } else if (k === '--scaling') a.difficulty.scaling = Number(v);
+    else if (k === '--base') a.difficulty.base = Number(v);
+    else if (k === '--variance') a.difficulty.variance = Number(v);
+    else if (k === '--legacy') a.difficulty = { scaling: 1, base: 1, variance: 0 };
+    else if (k === '--report') a.report = true;
     else if (k === '--craft')
       a.crafting = v === 'none' ? 'none' : v === 'random' ? 'random' : 'greedy';
   }
+  a.difficulty = clampDifficulty(a.difficulty);
   return a;
 }
 
@@ -72,6 +81,7 @@ for (const cls of args.classes) {
       themes: args.themes,
       crafting: args.crafting,
       abandonBelow: args.abandonBelow,
+      difficulty: args.difficulty,
     });
     const wallMs = performance.now() - start;
     const simSeconds = res.maps.reduce((s, m) => s + m.time, 0);
@@ -84,7 +94,7 @@ for (const cls of args.classes) {
 
 const lines: string[] = [];
 lines.push(
-  `Bot results — ${args.runs} run(s) per class, maps up to ${args.maxMap}, seed ${args.seed}`,
+  `Bot results — ${args.runs} run(s) per class, maps up to ${args.maxMap}, seed ${args.seed}, difficulty: ${difficultyText(args.difficulty)}`,
 );
 lines.push('');
 lines.push(
@@ -137,6 +147,11 @@ if (starts.length) {
     `Attrition, emptiest flask on entering: median ${(median(flaskStarts) * 100).toFixed(0)}%, p10 ${(pct(flaskStarts, 0.1) * 100).toFixed(0)}%; ${share(flaskStarts, 0.6)}% of maps entered below 60%`,
   );
 }
+lines.push(
+  '',
+  'Enemies met (share of the monsters placed, by band of ten maps):',
+  ...varietyReport(results),
+);
 lines.push(`Total wall time: ${((performance.now() - t0) / 1000).toFixed(1)} s`);
 console.log(lines.join('\n'));
 if (args.report) console.log('\n' + depthReport(results));

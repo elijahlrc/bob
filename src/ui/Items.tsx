@@ -86,7 +86,11 @@ export function Items({ c }: { c: Controller }) {
   useEffect(() => savePref('inv.desc', desc), [desc]);
   useEffect(() => savePref('inv.filter', filter), [filter]);
 
-  const cfg = { areaLevel: run.map, resistPenalty: resistPenaltyForMap(run.map) };
+  const cfg = {
+    areaLevel: run.map,
+    difficulty: run.difficulty,
+    resistPenalty: resistPenaltyForMap(run.map),
+  };
   const infos = useMemo(() => itemInfos(run), [run.build, run.inventory]);
   const lastDrops = useMemo(() => new Set(run.lastDrops ?? []), [run.lastDrops]);
   const lastCount = useMemo(

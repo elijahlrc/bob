@@ -70,10 +70,10 @@ describe('the factions (EXPANSION 7.3)', () => {
   });
 
   it('the new themes arrive on their maps and spawn their own faction', () => {
-    expect(themesFor(7).some((t) => t.id === 'charnelPits')).toBe(false);
-    expect(themesFor(8).some((t) => t.id === 'charnelPits')).toBe(true);
-    expect(themesFor(14).some((t) => t.id === 'hollowVigil')).toBe(false);
-    expect(themesFor(15).some((t) => t.id === 'hollowVigil')).toBe(true);
+    expect(themesFor(3).some((t) => t.id === 'charnelPits')).toBe(false);
+    expect(themesFor(4).some((t) => t.id === 'charnelPits')).toBe(true);
+    expect(themesFor(8).some((t) => t.id === 'hollowVigil')).toBe(false);
+    expect(themesFor(9).some((t) => t.id === 'hollowVigil')).toBe(true);
     for (const map of [1, 5, 10, 20, 40])
       for (const id of rollThemes(3, map)) expect((themeDef(id).fromMap ?? 1) <= map).toBe(true);
     const shares = typeShares(themeDef('charnelPits'));
@@ -81,13 +81,13 @@ describe('the factions (EXPANSION 7.3)', () => {
     const rot = shares
       .filter(([id]) => MONSTER_TYPES[id].faction === 'rot')
       .reduce((a, [, s]) => a + s, 0);
-    expect(rot).toBeCloseTo(0.7, 9);
+    expect(rot).toBeCloseTo(0.85, 9);
     const rng = new Rng(5);
     let rotCount = 0;
     for (let i = 0; i < 2000; i++)
       if (MONSTER_TYPES[rollType(rng, themeDef('charnelPits'))].faction === 'rot') rotCount++;
-    expect(rotCount / 2000).toBeGreaterThan(0.64);
-    expect(rotCount / 2000).toBeLessThan(0.76);
+    expect(rotCount / 2000).toBeGreaterThan(0.79);
+    expect(rotCount / 2000).toBeLessThan(0.91);
   });
 
   it('Hollow monsters take half the physical damage and cannot bleed; the Ossuary is unchanged', () => {

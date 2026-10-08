@@ -2,6 +2,7 @@ import { Character, type SteadyMode } from '../calc/character';
 import { NO_SHIFT } from '../calc/combat';
 import { baseXp, monsterHit, monsterLife } from '../calc/formulas';
 import { easeDamage, easeLife } from '../data/constants';
+import { LEGACY, statLevel, type Difficulty } from '../data/difficulty';
 import { mapTypeDef, THRONG_AFFIX, type MapTypeId } from '../data/mapTypes';
 import { buildMonster } from '../calc/monster';
 import {
@@ -179,8 +180,9 @@ export type ThemeScore = {
 };
 
 /** How much harder the monsters of one level are than those of another: their blows times their life (with the early easing). */
-export function levelHardness(level: number, ref: number): number {
-  const f = (m: number) => monsterHit(m) * easeDamage(m) * monsterLife(m) * easeLife(m);
+export function levelHardness(level: number, ref: number, d: Difficulty = LEGACY): number {
+  const f = (m: number) =>
+    monsterHit(statLevel(m, d)) * easeDamage(m) * monsterLife(statLevel(m, d)) * easeLife(m);
   return f(level) / f(ref);
 }
 
@@ -199,7 +201,7 @@ export function scoreTheme(
 ): ThemeScore {
   const threat = themeThreat(theme);
   const level = ch.config.areaLevel;
-  const hard = refLevel === undefined ? 1 : levelHardness(level, refLevel);
+  const hard = refLevel === undefined ? 1 : levelHardness(level, refLevel, ch.config.difficulty);
   const pay = refLevel === undefined ? 1 : Math.sqrt(baseXp(level) / baseXp(refLevel));
   // A Throng's monsters carry its hidden affix (fewer hit points and weaker blows, and a much bigger crowd).
   const onMonsters = type === 'throng' ? [...affixes, THRONG_AFFIX] : affixes;

@@ -246,6 +246,12 @@ export const MOD_MARKS: Record<MonsterModId, ModMark> = {
     aura: true,
     desc: 'Changes its core element at every quarter of its life, and is immune to the current one.',
   },
+  boneWarden: {
+    color: 0xe8e0c8,
+    shape: 'ring',
+    aura: true,
+    desc: 'Raises a ring of four Skeleton Warriors at two thirds and at one third of its life.',
+  },
   brood: {
     color: 0xc8a060,
     shape: 'circle',

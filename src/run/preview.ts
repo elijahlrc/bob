@@ -1,8 +1,11 @@
+import { mapTier, type MapTier } from '../data/difficulty';
+import { offerNoise } from '../gen/population';
 import { themeDef } from '../data/themes';
 import { offerCharacter } from './bot';
 import type { MapOffer } from './offers';
 import type { RunState } from './run';
 import { survivalRatio, threatPreview } from './threat';
+import { themeInfo, weakestAxis, type ThemeInfo } from './themeInfo';
 
 /** An offered map with what it means for this build. */
 /** How the offer looks for this build next to a plain map at its level: a rough guide, never a promise. */
@@ -27,6 +30,12 @@ export type OfferPreview = MapOffer & {
   /** Your DPS and effective HP on this map, as multiples of a plain map (the threat preview). */
   dps: number;
   ehp: number;
+  /** How hard this map's own draw of the variance makes it; absent when the run has no variance (docs/ENEMIES.md 8.1). */
+  tier?: MapTier;
+  /** What the monsters are: factions, damage mix, types and tags (docs/ENEMIES.md 5.1); absent for a Respite. */
+  info?: ThemeInfo;
+  /** The resistance this map leans on hardest, in words, when one stands out. */
+  weak?: string;
 };
 
 export function offersFor(run: RunState): OfferPreview[] {
@@ -50,6 +59,9 @@ export function offersFor(run: RunState): OfferPreview[] {
       run.vitals.life,
       run.map,
     );
-    return { ...offer, dps: p.dps, ehp: p.ehp, ratio, verdict: verdictOf(ratio) };
+    const info = themeInfo(themeDef(offer.themeId), offer.affixes, offer.type, offer.areaLevel);
+    const weak = weakestAxis(offerCharacter(run, offer), info.mix) ?? undefined;
+    const tier = mapTier(run.difficulty, offerNoise(run.seed, offer.id)) ?? undefined;
+    return { ...offer, dps: p.dps, ehp: p.ehp, ratio, verdict: verdictOf(ratio), tier, info, weak };
   });
 }

@@ -1,5 +1,6 @@
 import { ACTIVE_GEMS } from '../data/gems';
 import { Rng } from '../core/rng';
+import { DEFAULT, LEGACY, type Difficulty } from '../data/difficulty';
 import { classDef } from '../data/classes';
 import { factionOfSpec } from '../data/monsters';
 import { TABLET_PREFIX } from '../data/currency';
@@ -18,6 +19,7 @@ import {
 import { affixReward, mapAffixDef } from '../data/mapAffixes';
 import { CRESCENDO_LOOT_PER_STEP, mapTypeDef } from '../data/mapTypes';
 import { makeMapPlan, type MapPlan } from '../gen/mapPlan';
+import { offerNoise } from '../gen/population';
 import { flaskMask } from '../sim/combat';
 import { fullVitals, type DeathRecap, type Vitals, type WorldOpts } from '../sim/types';
 import type { MapResult } from '../sim/runMap';
@@ -27,7 +29,7 @@ import { makeOffer, rollOffers, type MapOffer } from './offers';
 
 export { rollThemes } from './offers';
 
-export const SAVE_VERSION = 7;
+export const SAVE_VERSION = 8;
 export const TOTAL_MAPS = 100;
 
 export type MapRecord = {
@@ -85,6 +87,8 @@ export type RunState = {
   pendingCraft: PendingCraft | null;
   /** What the character carries into the next map: life, mana, energy shield and flask charges (docs/MAPS.md 8). */
   vitals: Vitals;
+  /** How hard the monsters are (docs/ENEMIES.md 8): fixed for the run unless changed from the debug panel at camp. */
+  difficulty: Difficulty;
 };
 
 const BODY_FOR_CLASS: Record<string, string> = {
@@ -101,7 +105,7 @@ export function uidSource(run: RunState): () => number {
 }
 
 /** A fresh run for a class (§5.2 starting kit). */
-export function newRun(classId: string, seed: number): RunState {
+export function newRun(classId: string, seed: number, difficulty: Difficulty = DEFAULT): RunState {
   const cls = classDef(classId);
   const run: RunState = {
     version: SAVE_VERSION,
@@ -135,6 +139,7 @@ export function newRun(classId: string, seed: number): RunState {
     craftSeq: 0,
     pendingCraft: null,
     vitals: fullVitals(),
+    difficulty: { ...difficulty },
   };
   const uid = uidSource(run);
   const main = makeItem(uid, cls.startWeapons[0], 1, 1);
@@ -197,6 +202,8 @@ export function planFor(run: RunState, offer: MapOffer | string, segment = 0): M
     offer.areaLevel,
     offer.type,
     segment,
+    run.difficulty ?? LEGACY,
+    offerNoise(run.seed, offer.id),
   );
 }
 

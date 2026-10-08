@@ -68,13 +68,13 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
     expect(new Set(types.map((t) => MONSTER_TYPES[t].body)).size).toBe(8);
   });
 
-  it('the themes arrive on their maps; mixed themes from map 40 hold two new factions at 50/50', () => {
-    expect(themesFor(11).some((t) => t.id === 'gnawingWarrens')).toBe(false);
-    expect(themesFor(12).some((t) => t.id === 'gnawingWarrens')).toBe(true);
-    expect(themesFor(34).some((t) => t.id === 'reliquaryVault')).toBe(false);
-    expect(themesFor(35).some((t) => t.id === 'reliquaryVault')).toBe(true);
-    expect(themesFor(39).some((t) => t.id.startsWith('mix:'))).toBe(false);
-    expect(themesFor(40).filter((t) => t.id.startsWith('mix:'))).toHaveLength(10);
+  it('the themes arrive on their maps; mixed themes from map 30 hold two new factions at 50/50', () => {
+    expect(themesFor(5).some((t) => t.id === 'gnawingWarrens')).toBe(false);
+    expect(themesFor(6).some((t) => t.id === 'gnawingWarrens')).toBe(true);
+    expect(themesFor(24).some((t) => t.id === 'reliquaryVault')).toBe(false);
+    expect(themesFor(25).some((t) => t.id === 'reliquaryVault')).toBe(true);
+    expect(themesFor(29).some((t) => t.id.startsWith('mix:'))).toBe(false);
+    expect(themesFor(30).filter((t) => t.id.startsWith('mix:'))).toHaveLength(10);
     for (const t of MIXED_THEMES) {
       const factions = Object.keys(t.factions!);
       expect(factions).toHaveLength(2);

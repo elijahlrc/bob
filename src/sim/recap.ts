@@ -30,6 +30,11 @@ export function buildRecap(w: World): DeathRecap {
     killer: last?.name ?? 'Unknown',
     killerRarity: last?.rarity ?? 'normal',
     killerMods: last?.mods ?? [],
+    killerType: last?.type,
+    themeId: w.plan.theme.id,
+    affixes: [...w.plan.affixes],
+    areaLevel: w.plan.areaLevel,
+    mapType: w.plan.type,
     lines: [...byKey.values()].sort((a, b) => b.amount - a.amount),
     res: { fire: cap(3), cold: cap(2), lightning: cap(1), chaos: cap(4) },
     maxRes: {

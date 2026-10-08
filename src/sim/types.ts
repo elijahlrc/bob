@@ -300,6 +300,8 @@ export type DamageRecord = {
   name: string;
   rarity: string;
   mods: string[];
+  /** The monster type that dealt it (absent for an effect). */
+  type?: string;
   dtype: number;
   amount: number;
 };
@@ -310,6 +312,12 @@ export type DeathRecap = {
   killer: string;
   killerRarity: string;
   killerMods: string[];
+  /** The monster type of the killer (absent for an effect or an older save), and the map it died on. */
+  killerType?: string;
+  themeId?: string;
+  affixes?: string[];
+  areaLevel?: number;
+  mapType?: string;
   /** Damage taken in the last 5 seconds, by source and type, largest first. */
   lines: { name: string; dtype: number; amount: number }[];
   /** Resistances (fire, cold, lightning, chaos) and their caps, at the moment of death. */

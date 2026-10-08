@@ -4,6 +4,7 @@ import { flaskBase } from '../data/flasks';
 import { gemDef, type ActiveGemDef, type SupportGemDef } from '../data/gems';
 import { resolveActive } from '../calc/gems';
 import type { SkillType } from '../data/skillTypes';
+import type { Difficulty } from '../data/difficulty';
 import { themeDef } from '../data/themes';
 import { getTree } from '../data/tree';
 import {
@@ -33,7 +34,7 @@ import {
 import { Rng } from '../core/rng';
 import { botChalk, botCraft } from './botCraft';
 import { salvage } from './craft';
-import { buildSignature, killerTracker, RunTally } from './metrics';
+import { buildSignature, killerTracker, metTracker, RunTally } from './metrics';
 import { randomCraft } from './randomBot';
 import type { RunSummary } from './report';
 import { scoreTheme } from './threat';
@@ -48,6 +49,7 @@ import { markSeen } from './found';
 export function cfgFor(run: RunState) {
   return {
     areaLevel: run.map,
+    difficulty: run.difficulty,
     resistPenalty: resistPenaltyForMap(run.map),
     steady: 'clearing' as const,
   };
@@ -538,6 +540,10 @@ export type BotMapRecord = {
   startLife: number;
   /** The lowest flask charge fraction on entering the map (1 when there are no flasks). */
   startFlask: number;
+  /** The monsters placed on the map, by type (docs/ENEMIES.md section 9); empty for a Respite. */
+  met: Record<string, number>;
+  /** The theme played, and the difficulty draw the map had. */
+  themeId: string;
 };
 
 export type BotRunResult = RunSummary & {
@@ -554,6 +560,8 @@ export type BotRunOpts = {
   crafting?: CraftPolicy;
   /** Leave a map when life drops below this fraction (default: never abandon). */
   abandonBelow?: number;
+  /** The difficulty settings of the run (default: the new baseline). */
+  difficulty?: Difficulty;
 };
 
 /** Play a full run headlessly (§15.5). `maxMap` stops after that map. */
@@ -563,10 +571,11 @@ export function botRun(
   maxMap = 100,
   opts: BotRunOpts = {},
 ): BotRunResult {
-  const run = newRun(classId, seed);
+  const run = newRun(classId, seed, opts.difficulty);
   const maps: BotMapRecord[] = [];
   const tally = new RunTally();
   const killer = killerTracker();
+  const met = metTracker();
   const route = new Rng(seed).fork('route');
   while (run.phase === 'camp' && run.map <= maxMap) {
     const crafting = opts.crafting ?? 'greedy';
@@ -585,6 +594,8 @@ export function botRun(
         stuck: 0,
         startLife,
         startFlask,
+        met: {},
+        themeId: '',
       });
       takeRespite(run);
       continue;
@@ -595,7 +606,10 @@ export function botRun(
       opts.abandonBelow === undefined
         ? undefined
         : (o) => (o.abandonPolicy = woundedAbandonPolicy(opts.abandonBelow!)),
-      killer.tick,
+      (w) => {
+        killer.tick(w);
+        met.tick(w);
+      },
     );
     maps.push({
       map: run.map,
@@ -606,6 +620,8 @@ export function botRun(
       stuck: res.stuck,
       startLife,
       startFlask,
+      met: met.take(),
+      themeId: offer.themeId,
     });
     if (res.status === 'cleared') tally.afterMap(run, res.picked);
     finishMap(run, res);

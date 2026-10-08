@@ -1,6 +1,9 @@
 import { CLASSES } from '../data/classes';
 import { hex, MOD_MARKS, RARITY_COLOR } from '../data/monsterMarks';
-import { monsterModDef, MONSTER_TYPES, BOSS_NAME } from '../data/monsters';
+import { monsterModDef, MONSTER_TYPES, BOSS_NAME, FACTION_NAMES } from '../data/monsters';
+import { FACTION_GLYPH, FACTION_RULES, TYPE_BLURBS } from '../data/monsterInfo';
+import type { ThemeDef } from '../data/themes';
+import { themeInfo } from '../run/themeInfo';
 import { HEXES, hexText } from '../data/hexes';
 import { CHARGE_KINDS, CHARGE_NAMES, CHARGE_SECONDS, CHARGE_TEXT } from '../calc/charges';
 import type { Actor, World } from '../sim/types';
@@ -57,6 +60,18 @@ const RARITY_LABEL = {
   boss: 'Boss',
 } as const;
 
+/** The factions of a map's theme that are a quarter or more of its monsters, as a short label. */
+function leadNames(theme: ThemeDef): string {
+  return themeInfo(theme)
+    .asks.map((a) => `${FACTION_GLYPH[a.id]} ${a.name}`)
+    .join(' · ');
+}
+function leadText(theme: ThemeDef): string {
+  return themeInfo(theme)
+    .asks.map((a) => `${a.name} ask: ${a.text}.`)
+    .join(' ');
+}
+
 /** Details of the enemy the player clicked: every affix with its effect. */
 function Inspect({ a, c }: { a: Actor; c: Controller }) {
   const spec = a.mon?.spec;
@@ -73,6 +88,13 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
         {RARITY_LABEL[rarity]} {type}
         {spec ? ` · Level ${spec.level}` : ''}
       </div>
+      {spec && (
+        <div class="muted inspect-sub">
+          {FACTION_NAMES[MONSTER_TYPES[spec.type].faction]}: {TYPE_BLURBS[spec.type]}
+          {FACTION_RULES[MONSTER_TYPES[spec.type].faction] &&
+            ` ${FACTION_RULES[MONSTER_TYPES[spec.type].faction]}`}
+        </div>
+      )}
       <div class="inspect-life" title={`${Math.round(a.life)} / ${Math.round(maxLife)}`}>
         <div style={{ width: `${Math.max(0, Math.min(100, (a.life / maxLife) * 100))}%` }} />
         <span>
@@ -224,6 +246,7 @@ export function Hud({ c }: { c: Controller }) {
         <span>
           {sc ? 'Showcase' : `Map ${w.plan.map}`} · {w.plan.theme.name}
         </span>
+        <span {...infoProps(leadText(w.plan.theme))}>{leadNames(w.plan.theme)}</span>
         <span>Level {w.build.level}</span>
         <span>Kills {w.stats.kills}</span>
         <span {...infoProps('Time spent on this level. It stops while the game is paused.')}>

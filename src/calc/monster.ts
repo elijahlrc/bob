@@ -11,6 +11,7 @@ import {
   type Variant,
 } from '../data/monsters';
 import { affixMonsterMods } from '../data/mapAffixes';
+import { LEGACY, statLevel, type Difficulty } from '../data/difficulty';
 import { CondIndex, ModDB } from '../mods/modDb';
 import { maskAnd, mod, type Mod } from '../mods/types';
 import type { Defence } from './combat';
@@ -37,7 +38,16 @@ export type MonsterSpec = {
   mods: MonsterModId[];
   /** Ids of the map affixes that apply to every monster on the map. */
   affix?: string[];
+  /** The level its life and damage are read at (docs/ENEMIES.md 8.1); the area level when absent. */
+  statLevel?: number;
+  /** Its hardness multiplier (life times damage) from the difficulty settings; 1 when absent. */
+  power?: number;
 };
+
+/** The difficulty fields of a spec: what a monster summoned, raised or split off by this one inherits. */
+export function scaleOf(spec: MonsterSpec): Pick<MonsterSpec, 'statLevel' | 'power'> {
+  return { statLevel: spec.statLevel, power: spec.power };
+}
 
 export type MonsterStats = {
   spec: MonsterSpec;
@@ -96,7 +106,7 @@ function monsterSkill(spec: MonsterSpec, dmg: number): SkillDef {
 const cache = new Map<string, MonsterStats>();
 
 export function monsterKey(spec: MonsterSpec): string {
-  return `${spec.type}|${spec.variant}|${spec.rarity}|${spec.level}|${spec.mods.join(',')}|${(spec.affix ?? []).join(',')}`;
+  return `${spec.type}|${spec.variant}|${spec.rarity}|${spec.level}|${spec.mods.join(',')}|${(spec.affix ?? []).join(',')}|${spec.statLevel ?? ''}|${spec.power ?? ''}`;
 }
 
 /** Build (and memoise) a monster's stats from its spec. */
@@ -107,7 +117,10 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
   const t = MONSTER_TYPES[spec.type];
   const r = RARITY_MULTS[spec.rarity];
   const m = spec.level;
-  const life = Math.round(monsterLife(m) * easeLife(m) * t.lifeMult * r.life);
+  // Life and damage read the curves at the stat level and share the hardness multiplier; the rest stay on the area level.
+  const sl = spec.statLevel ?? m;
+  const share = Math.sqrt(spec.power ?? 1);
+  const life = Math.round(monsterLife(sl) * easeLife(m) * t.lifeMult * r.life * share);
   const mods: Mod[] = [
     mod('life', 'base', life),
     mod('accuracy', 'base', monsterAccuracy(m)),
@@ -133,7 +146,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
   const ctx = { tags: 0, ancestry: 0, conds: 0 };
   const stunThreshMult = spec.rarity === 'boss' ? 4 : spec.rarity === 'miniboss' ? 2 : 1;
   const defence = defenceFromDb(db, ctx, { isPlayer: false, resistPenalty: 0, stunThreshMult });
-  const dmg = monsterHit(m) * easeDamage(m) * t.dmgMult * r.dmg;
+  const dmg = monsterHit(sl) * easeDamage(m) * t.dmgMult * r.dmg * share;
   const skill = monsterSkill(spec, dmg);
   const hand: HandStats = {
     flats: [
@@ -183,6 +196,18 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
 }
 
 /** The reference monster (§8.1): a normal Skeleton Warrior at the area level. */
-export function referenceMonster(level: number): MonsterStats {
-  return buildMonster({ type: 'warrior', variant: 'none', rarity: 'normal', level, mods: [] });
+export function referenceMonster(level: number, d: Difficulty = LEGACY): MonsterStats {
+  return buildMonster({
+    type: 'warrior',
+    variant: 'none',
+    rarity: 'normal',
+    level,
+    mods: [],
+    ...scaleFor(level, d),
+  });
+}
+
+/** The difficulty fields of a normal monster at this area level under these settings (no variance). */
+export function scaleFor(level: number, d: Difficulty): Pick<MonsterSpec, 'statLevel' | 'power'> {
+  return d.scaling === 1 && d.base === 1 ? {} : { statLevel: statLevel(level, d), power: d.base };
 }

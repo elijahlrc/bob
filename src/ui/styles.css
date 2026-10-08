@@ -1558,3 +1558,107 @@ select option {
   background: var(--panel2);
   border-radius: 3px;
 }
+
+/* Debug controls (docs/ENEMIES.md 8.3). */
+.debug-panel {
+  max-width: min(520px, 92vw);
+  width: 100%;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 6px 12px;
+  font-size: 13px;
+}
+.debug-panel summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+.debug-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 70px;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+.debug-row input[type='number'] {
+  width: 70px;
+}
+.debug-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 6px 0;
+}
+.debug-table {
+  border-collapse: collapse;
+  margin: 6px 0;
+  width: 100%;
+}
+.debug-table th,
+.debug-table td {
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  text-align: right;
+}
+.debug-table td:first-child {
+  text-align: left;
+}
+.theme .tier {
+  font-size: 12px;
+  margin-top: 2px;
+}
+.tier.gentle {
+  color: #8fc98f;
+}
+.tier.fierce {
+  color: #e0907a;
+}
+.tier.even {
+  color: var(--muted);
+}
+
+/* Who is on an offered map (docs/ENEMIES.md 5.1). */
+.offer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 4px 0;
+  font-size: 12px;
+}
+.offer-info .chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+.offer-info .chip {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 6px;
+  white-space: nowrap;
+}
+.offer-info .chip.type {
+  border-style: dotted;
+}
+.offer-info .chip.tag {
+  color: var(--muted);
+}
+.offer-info .asks,
+.offer-info .rule {
+  color: var(--muted);
+}
+.offer-info .mixbar {
+  display: flex;
+  height: 5px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--border);
+}
+.offer-info .mixbar span {
+  display: block;
+  height: 100%;
+}
+.offer-info .weak {
+  color: #e8d070;
+}
+.offer-info .gate {
+  color: #ffb070;
+}

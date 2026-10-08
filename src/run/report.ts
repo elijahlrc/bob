@@ -1,4 +1,5 @@
 import { median } from '../core/math';
+import { FACTION_NAMES, MONSTER_TYPES, type FactionId, type MonsterTypeId } from '../data/monsters';
 import { SNAPSHOT_MAPS, type BuildSnapshot, type KillerInfo } from './metrics';
 
 /** What the depth report needs to know about one headless run (EXPANSION 10.3). */
@@ -146,6 +147,81 @@ export function signatureReport(runs: RunSummary[]): string[] {
     `Build signatures among ${wins.length} wins: ${rows.length} distinct; the most common is ${pct(rows[0][1], wins.length)}`,
   ];
   for (const [sig, n] of rows.slice(0, 5)) out.push(`  ${n}× ${sig}`);
+  return out;
+}
+
+/** The part of a bot run the variety report reads. */
+export type VarietyRun = { maps: { map: number; met?: Record<string, number> }[] };
+
+const FACTION_ORDER = Object.keys(FACTION_NAMES) as FactionId[];
+
+/** The faction share (0 to 1) of one map's head count. */
+function factionShares(met: Record<string, number>): Record<FactionId, number> {
+  const out = Object.fromEntries(FACTION_ORDER.map((f) => [f, 0])) as Record<FactionId, number>;
+  let total = 0;
+  for (const [t, n] of Object.entries(met)) {
+    const def = MONSTER_TYPES[t as MonsterTypeId];
+    if (!def) continue;
+    out[def.faction] += n;
+    total += n;
+  }
+  if (total > 0) for (const f of FACTION_ORDER) out[f] /= total;
+  return out;
+}
+
+/**
+ * Who the player met (docs/ENEMIES.md section 9), by band of ten maps: the share of the monsters placed by faction and the
+ * commonest types, then the variety index: distinct types per band, and the longest stretch of maps in which one faction
+ * supplied over 60% of the monsters. Each map counts once, so the shares are of the maps played, not of the head count.
+ */
+export function varietyReport(runs: VarietyRun[]): string[] {
+  const maps = runs.flatMap((r) => r.maps.filter((m) => m.met && Object.keys(m.met).length > 0));
+  if (!maps.length) return ['Enemies met: no maps played'];
+  const out = [
+    '| Maps | Maps played | ' +
+      FACTION_ORDER.map((f) => FACTION_NAMES[f]).join(' | ') +
+      ' | Commonest types | Distinct types |',
+    '| --- | --- | ' + FACTION_ORDER.map(() => '---').join(' | ') + ' | --- | --- |',
+  ];
+  for (let lo = 1; lo <= 100; lo += 10) {
+    const band = maps.filter((m) => m.map >= lo && m.map < lo + 10);
+    if (!band.length) continue;
+    // The share of the head count of the whole band, so a big map weighs more than a small one.
+    const sum: Record<string, number> = {};
+    for (const m of band) for (const [t, n] of Object.entries(m.met!)) sum[t] = (sum[t] ?? 0) + n;
+    const shares = factionShares(sum);
+    const total = Object.values(sum).reduce((a, b) => a + b, 0);
+    const top = Object.entries(sum)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 4)
+      .map(([t, n]) => `${MONSTER_TYPES[t as MonsterTypeId]?.name ?? t} ${pct(n, total)}`)
+      .join(', ');
+    out.push(
+      `| ${lo}–${lo + 9} | ${band.length} | ${FACTION_ORDER.map((f) => pct(shares[f], 1)).join(' | ')} | ${top} | ${Object.keys(sum).length} |`,
+    );
+  }
+  // Longest stretch of consecutive maps in one run led (over 60%) by the same faction.
+  let longest = 0;
+  const streaks: number[] = [];
+  for (const r of runs) {
+    let cur = 0;
+    let who: FactionId | null = null;
+    let best = 0;
+    for (const m of r.maps) {
+      if (!m.met || !Object.keys(m.met).length) continue;
+      const sh = factionShares(m.met);
+      const lead = FACTION_ORDER.find((f) => sh[f] > 0.6) ?? null;
+      if (lead !== null && lead === who) cur++;
+      else cur = lead === null ? 0 : 1;
+      who = lead;
+      best = Math.max(best, cur);
+    }
+    longest = Math.max(longest, best);
+    streaks.push(best);
+  }
+  out.push(
+    `Longest stretch of maps led (over 60%) by one faction: ${longest}; median over runs ${median(streaks)}`,
+  );
   return out;
 }
 

@@ -107,6 +107,7 @@ import {
   weaponStats,
 } from './items';
 import { referenceMonster } from './monster';
+import { LEGACY, statLevel, type Difficulty } from '../data/difficulty';
 import { buildProfile, type HandStats, type SkillProfile } from './skill';
 
 export type CalcConfig = {
@@ -114,6 +115,8 @@ export type CalcConfig = {
   conds?: CondId[];
   /** Area level for the reference monster. */
   areaLevel?: number;
+  /** The difficulty settings the reference monster is read under (docs/ENEMIES.md 8); the legacy curve when absent. */
+  difficulty?: Difficulty;
   resistPenalty?: number;
   /** Distance to the target for distance-scaled skills. */
   targetDistance?: number;
@@ -384,6 +387,7 @@ export class Character {
     this.config = {
       conds: config.conds ?? [],
       areaLevel: config.areaLevel ?? build.level,
+      difficulty: config.difficulty ?? LEGACY,
       resistPenalty: config.resistPenalty ?? 0,
       targetDistance: config.targetDistance ?? 4,
       steady: config.steady,
@@ -1149,7 +1153,7 @@ export class Character {
     const p = this.profile(choice, conds);
     const hexed = this.hexTarget();
     const t: TargetState = target ?? {
-      def: referenceMonster(this.config.areaLevel).defence,
+      def: referenceMonster(this.config.areaLevel, this.config.difficulty).defence,
       shock: 0,
       resShift: hexed.resShift,
       vuln: hexed.vuln,
@@ -1243,8 +1247,9 @@ export class Character {
    */
   ehp(def: Defence = this.defence(), hitMix: readonly number[] = DEFAULT_HIT_MIX): number {
     const level = this.config.areaLevel;
-    const hit = monsterHit(level);
-    const mon = referenceMonster(level);
+    const d = this.config.difficulty;
+    const hit = monsterHit(statLevel(level, d)) * Math.sqrt(d.base);
+    const mon = referenceMonster(level, d);
     const pool = def.maxLife - this.reservedLife + def.maxEs;
     let taken = 0;
     const resMult = (t: number) =>
