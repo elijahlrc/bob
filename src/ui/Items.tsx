@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 import { EQUIP_SLOTS, type InventoryItem, type EquipSlot } from '../data/types';
 import { resistPenaltyForMap } from '../gen/mapPlan';
 import type { Controller } from '../run/controller';
@@ -26,7 +26,8 @@ import {
   type ItemInfo,
   type SortKey,
 } from '../run/inventoryOps';
-import { markSeen } from '../run/found';
+import { isFavourite, markSeen, toggleFavourite } from '../run/found';
+import { CleanUp } from './CleanUp';
 import { useViewport } from './device';
 import { compareDelta, ItemCard, itemTitle, rarityClass } from './ItemCard';
 import { loadPref, savePref } from './prefs';
@@ -34,11 +35,13 @@ import { loadPref, savePref } from './prefs';
 type Sel =
   { from: 'inv'; uid: number } | { from: 'slot'; slot: EquipSlot } | { from: 'flask'; idx: number };
 
-type ListFilter = FilterKey | 'last';
+type ListFilter = FilterKey | 'last' | 'new' | 'fav';
 
 const FILTERS: [ListFilter, string][] = [
   ['all', 'All'],
+  ['new', 'New'],
   ['last', 'Last map'],
+  ['fav', '★ Favourites'],
   ['upgrades', 'Upgrades'],
   ['weapon', 'Weapons'],
   ['armour', 'Armour'],
@@ -70,11 +73,15 @@ export function Items({ c }: { c: Controller }) {
   const [sort, setSort] = useState<SortKey>(() => loadPref<SortKey>('inv.sort', 'newest'));
   const [desc, setDesc] = useState<boolean>(() => loadPref<boolean>('inv.desc', false));
   const [filter, setFilter] = useState<ListFilter>(() => loadPref<ListFilter>('inv.filter', 'all'));
-  // Items picked up since the last camp visit are tagged NEW (captured before they are acknowledged).
-  const fresh = useRef(new Set(run.unseen));
+  const [pinFav, setPinFav] = useState<boolean>(() => loadPref<boolean>('inv.pinFav', true));
+  const [cleaning, setCleaning] = useState(false);
+  useEffect(() => savePref('inv.pinFav', pinFav), [pinFav]);
+  // An item stays NEW until the player looks at it (selects it) or marks everything seen.
+  const unseen = useMemo(() => new Set(run.unseen), [run.unseen]);
+  const favs = useMemo(() => new Set(run.favourites), [run.favourites]);
   useEffect(() => {
-    if (run.unseen.length) c.act((r) => markSeen(r, 'all'));
-  }, []);
+    if (sel?.from === 'inv' && run.unseen.includes(sel.uid)) c.act((r) => markSeen(r, [sel.uid]));
+  }, [sel]);
   useEffect(() => savePref('inv.sort', sort), [sort]);
   useEffect(() => savePref('inv.desc', desc), [desc]);
   useEffect(() => savePref('inv.filter', filter), [filter]);
@@ -86,13 +93,29 @@ export function Items({ c }: { c: Controller }) {
     () => run.inventory.filter((x) => lastDrops.has(x.uid)).length,
     [run.inventory, lastDrops],
   );
+  const unseenCount = useMemo(
+    () => run.inventory.filter((x) => unseen.has(x.uid)).length,
+    [run.inventory, unseen],
+  );
+  const favCount = useMemo(
+    () => run.inventory.filter((x) => favs.has(x.uid)).length,
+    [run.inventory, favs],
+  );
   const visible = useMemo(() => {
     const pool =
       filter === 'last'
         ? run.inventory.filter((x) => lastDrops.has(x.uid))
-        : filterItems(run.inventory, infos, filter);
-    return sortItems(pool, infos, sort, desc);
-  }, [run.inventory, infos, sort, desc, filter, lastDrops]);
+        : filter === 'new'
+          ? run.inventory.filter((x) => unseen.has(x.uid))
+          : filter === 'fav'
+            ? run.inventory.filter((x) => favs.has(x.uid))
+            : filterItems(run.inventory, infos, filter);
+    const sorted = sortItems(pool, infos, sort, desc);
+    // Starred items go on top of whatever the sort is, keeping the sort inside both groups.
+    return pinFav && filter !== 'fav'
+      ? [...sorted.filter((x) => favs.has(x.uid)), ...sorted.filter((x) => !favs.has(x.uid))]
+      : sorted;
+  }, [run.inventory, infos, sort, desc, filter, lastDrops, unseen, favs, pinFav]);
   const junk = useMemo(() => junkItems(run), [run.build, run.inventory]);
   const upgrades = useMemo(
     () => run.inventory.filter((x) => isUpgrade(infos.get(x.uid)!)).length,
@@ -134,6 +157,7 @@ export function Items({ c }: { c: Controller }) {
       );
   };
   const doDiscard = (uid: number) => {
+    if (isFavourite(run, uid) && !confirm('This item is a favourite. Discard it anyway?')) return;
     // Keep the selection moving through the list so repeated discards are quick.
     const i = visible.findIndex((x) => x.uid === uid);
     c.act((r) => discard(r, uid));
@@ -176,11 +200,14 @@ export function Items({ c }: { c: Controller }) {
       setSel(null);
     } else if ((e.key === 'Delete' || e.key === 'x') && sel?.from === 'inv') {
       doDiscard(sel.uid);
+    } else if (e.key === 'f' && sel?.from === 'inv') {
+      c.act((r) => toggleFavourite(r, sel.uid));
     } else if (e.key === 'Escape') setSel(null);
   };
 
   return (
     <div class="items" tabIndex={0} onKeyDown={onKey}>
+      {cleaning && <CleanUp c={c} onClose={() => setCleaning(false)} />}
       <div class="equip-col">
         <div class="equip-grid">
           {EQUIP_SLOTS.map((slot) => {
@@ -311,6 +338,14 @@ export function Items({ c }: { c: Controller }) {
                   </button>
                 )}
                 {sel?.from === 'inv' && selected && (
+                  <button
+                    class="btn small"
+                    onClick={() => c.act((r) => toggleFavourite(r, selected.uid))}
+                  >
+                    {favs.has(selected.uid) ? '★ Favourite' : '☆ Favourite'}
+                  </button>
+                )}
+                {sel?.from === 'inv' && selected && (
                   <button class="btn small danger" onClick={() => doDiscard(selected.uid)}>
                     Discard
                   </button>
@@ -322,7 +357,7 @@ export function Items({ c }: { c: Controller }) {
         </div>
         {!coarse && (
           <div class="muted hint">
-            Keys: ↑/↓ browse · Enter equip · Del discard · U unequip · Ctrl+Z undo
+            Keys: ↑/↓ browse · Enter equip · F favourite · Del discard · U unequip · Ctrl+Z undo
           </div>
         )}
       </div>
@@ -348,6 +383,24 @@ export function Items({ c }: { c: Controller }) {
           <button class="btn small" disabled={!c.canUndo} onClick={() => c.undo()} title="Ctrl+Z">
             ↶ Undo
           </button>
+          <button
+            class="btn small"
+            disabled={!unseenCount}
+            onClick={() => c.act((r) => markSeen(r, 'all'))}
+          >
+            Mark all seen
+          </button>
+          <label class="muted pin">
+            <input
+              type="checkbox"
+              checked={pinFav}
+              onChange={(e) => setPinFav((e.target as HTMLInputElement).checked)}
+            />{' '}
+            Pin ★
+          </label>
+          <button class="btn small" onClick={() => setCleaning(true)}>
+            Clean up…
+          </button>
           <button class="btn small danger" disabled={!junk.length} onClick={salvageJunk}>
             Salvage junk ({junk.length})
           </button>
@@ -362,6 +415,8 @@ export function Items({ c }: { c: Controller }) {
               {label}
               {k === 'upgrades' && upgrades > 0 ? ` (${upgrades})` : ''}
               {k === 'last' ? ` (${lastCount})` : ''}
+              {k === 'new' ? ` (${unseenCount})` : ''}
+              {k === 'fav' ? ` (${favCount})` : ''}
             </button>
           ))}
           <span class="muted count">
@@ -385,7 +440,19 @@ export function Items({ c }: { c: Controller }) {
                 title={info.reason}
               >
                 <span class="row-name">
-                  {fresh.current.has(it.uid) && <span class="new-tag">NEW</span>}
+                  <span
+                    class={'row-star' + (favs.has(it.uid) ? ' on' : '')}
+                    role="button"
+                    aria-label={favs.has(it.uid) ? 'Remove from favourites' : 'Add to favourites'}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      c.act((r) => toggleFavourite(r, it.uid));
+                    }}
+                    onDblClick={(e) => e.stopPropagation()}
+                  >
+                    {favs.has(it.uid) ? '★' : '☆'}
+                  </span>
+                  {unseen.has(it.uid) && <span class="new-tag">NEW</span>}
                   {itemTitle(it)}
                 </span>
                 <span class="row-slot muted">{info.slotLabel}</span>

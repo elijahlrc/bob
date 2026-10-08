@@ -4,6 +4,7 @@ import { ITEM_BASES } from '../data/bases';
 import type { GemItem, InventoryItem } from '../data/types';
 import { rollFlask, rollItemOf } from '../gen/loot';
 import { Controller } from './controller';
+import { applyClean, cleanSummary } from './cleanUp';
 import {
   ageOf,
   DEFAULT_CLEAN,
@@ -314,5 +315,40 @@ describe('saves', () => {
     }
     store.setItem(SAVE_KEY, JSON.stringify({ version: 5, run }));
     expect(loadRun(store).status).toBe('incompatible');
+  });
+});
+
+describe('clean up', () => {
+  it('lists what it will salvage, and salvaging does exactly that', () => {
+    const run = newRun('vanguard', 21);
+    run.map = 40;
+    const old = [found(run, 'normal', 15), found(run, 'magic', 25), found(run, 'rare', 12)];
+    const young = found(run, 'rare', 3);
+    const star = found(run, 'rare', 30);
+    toggleFavourite(run, star.uid);
+    const fresh = found(run, 'magic', 30);
+    markSeen(run, [...old.map((x) => x.uid), young.uid, star.uid]);
+    const dust0 = run.dust;
+    const s = cleanSummary(run, DEFAULT_CLEAN);
+    expect(s.rows.map((r) => r.item.uid)).toEqual([old[1].uid, old[0].uid, old[2].uid]); // oldest first
+    expect(s.count).toBe(3);
+    expect(s.kept).toBe('Kept: 1 favourite, 1 not yet looked at, 1 newer');
+    expect(s.headline).toBe(`3 items found more than 10 levels ago, for ${s.dust} Bone Dust`);
+    const res = applyClean(run, DEFAULT_CLEAN);
+    expect(res).toEqual({ count: 3, dust: s.dust });
+    expect(run.dust).toBe(dust0 + s.dust);
+    const left = run.inventory.map((x) => x.uid);
+    expect(left).toEqual(expect.arrayContaining([young.uid, star.uid, fresh.uid]));
+    for (const o of old) expect(left).not.toContain(o.uid);
+  });
+
+  it('is a no-op with nothing old, and says so', () => {
+    const run = newRun('vanguard', 22);
+    found(run, 'rare', 1);
+    seeAll(run);
+    const s = cleanSummary(run, DEFAULT_CLEAN);
+    expect(s.count).toBe(0);
+    expect(s.headline).toBe('0 items found more than 10 levels ago, for 0 Bone Dust');
+    expect(applyClean(run, DEFAULT_CLEAN)).toEqual({ count: 0, dust: 0 });
   });
 });

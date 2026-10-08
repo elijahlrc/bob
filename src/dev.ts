@@ -3,6 +3,7 @@ import { Rng } from './core/rng';
 import { ITEM_BASES } from './data/bases';
 import type { InventoryItem } from './data/types';
 import { rollFlask, rollGem, rollItemOf } from './gen/loot';
+import { noteFound } from './run/found';
 import type { Controller } from './run/controller';
 import { uidSource } from './run/run';
 
@@ -80,6 +81,11 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
           added.push(rollItemOf(rng, uid, base, ilvl, rng.pick(['normal', 'magic', 'rare'])));
         }
       }
+      // Found on levels spread over the last 30, and not yet looked at.
+      added.forEach((it, i) => {
+        noteFound(run, it);
+        run.acquired[it.uid] = Math.max(1, run.map - ((i * 7) % 30));
+      });
       // A new array, because the screens memoise on the identity of the inventory.
       run.inventory = run.inventory.concat(added);
       controller.bus.emit('state', null);

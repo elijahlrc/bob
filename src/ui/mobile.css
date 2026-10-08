@@ -406,3 +406,30 @@ body {
     min-width: var(--tap);
   }
 }
+
+/* ---- Inventory tools on a small screen ---- */
+@media (pointer: coarse) {
+  .row-star {
+    min-width: 28px;
+    margin: -12px 4px -12px -6px;
+    padding: 12px 6px;
+  }
+  .clean-check {
+    min-height: var(--tap);
+  }
+}
+@media (max-width: 600px) {
+  .modal {
+    align-items: flex-end;
+  }
+  .modal-card {
+    width: 100%;
+    max-height: 92vh;
+    padding-bottom: calc(16px + var(--safe-bottom));
+    border-radius: 10px 10px 0 0;
+  }
+  .modal-x {
+    width: var(--tap);
+    height: var(--tap);
+  }
+}
