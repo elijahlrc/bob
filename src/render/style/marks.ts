@@ -15,7 +15,8 @@ type Pos = { x: number; y: number; headUp: number; r: number };
 
 /**
  * Style-agnostic enemy readouts drawn in world space: coloured affix pips above magic/rare monsters,
- * a faint ground aura for the "visible" affixes, thin life bars, and the selection bracket.
+ * a faint ground aura for the "visible" affixes, thin life bars (always on magic and up, and on any damaged
+ * monster), and the selection bracket.
  * Full details live in the inspect card (UI), opened by clicking an enemy.
  */
 export class MonsterMarks {
@@ -37,7 +38,7 @@ export class MonsterMarks {
     for (const a of world.actors) {
       if (a.isPlayer || !a.alive) continue;
       const sel = a.id === selectedId;
-      const interesting = a.rarity !== 'normal' || sel;
+      const interesting = a.rarity !== 'normal' || sel || a.life < a.def.maxLife;
       if (!interesting) continue;
       const p = pos(a);
       if (!p) continue;
