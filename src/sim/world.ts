@@ -24,7 +24,9 @@ import { tickTriggers } from './triggers';
 import { Grid } from './grid';
 import { newActor } from './actor';
 import { tickAbandon } from './abandon';
-import { crescendoStep } from '../data/mapTypes';
+import { tickCollapse } from './collapse';
+import { tickHoldout } from './holdout';
+import { crescendoStep, HOLDOUT_WAVES } from '../data/mapTypes';
 import type { Actor, World, WorldOpts } from './types';
 
 export function spawnMonster(
@@ -148,6 +150,9 @@ export function createWorld(inp: CreateWorldInput): World {
     status: 'running',
     abandonT: null,
     surge: 0,
+    collapseFront: 0,
+    collapseGap: Infinity,
+    holdout: { spawned: 0, cleared: 0, done: [], ids: [] },
     exitOpen: false,
     endRoom: plan.lab.mainPath[plan.lab.mainPath.length - 1],
     ai: {
@@ -385,6 +390,8 @@ function summon(w: World, m: Actor, type: 'warrior', variant: MonsterSpec['varia
 
 function checkExit(w: World): void {
   if (w.exitOpen) return;
+  // A Holdout is over when the last wave has come and gone.
+  if (w.plan.type === 'holdout' && w.holdout.spawned < HOLDOUT_WAVES) return;
   for (const a of w.actors)
     if (!a.isPlayer && a.alive && a.room === w.endRoom && !a.noReward) return;
   // A Quarry opens its exit only when every champion has fallen, wherever it stood.
@@ -403,6 +410,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   if (w.plan.type === 'crescendo') w.surge = crescendoStep(w.t);
   const p = w.player;
   refreshPlayerDefence(w);
+  tickHoldout(w);
   tickTriggers(w, dt);
   tickCharges(w, dt);
   tickBuffs(w, dt);
@@ -442,6 +450,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     p.mana = Math.max(0, p.def.maxMana - w.char.reservedMana);
   }
   if (!p.alive && w.status === 'running') w.status = 'dead';
+  tickCollapse(w);
   tickAbandon(w, dt);
   if (w.t >= (w.opts.maxTime ?? 900) && w.status === 'running') w.status = 'timeout';
 }

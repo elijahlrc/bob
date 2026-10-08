@@ -9,7 +9,7 @@ import { DELIVERY_NAME, ELEMENT_NAME } from '../calc/skillLook';
 import { useTicks } from './hooks';
 import { useState } from 'preact/hooks';
 import { canAbandon } from '../sim/abandon';
-import { CRESCENDO_STEP_BONUS, mapTypeDef } from '../data/mapTypes';
+import { COLLAPSE_START, CRESCENDO_STEP_BONUS, HOLDOUT_WAVES, mapTypeDef } from '../data/mapTypes';
 import { SkillBar } from './SkillBar';
 
 /** A resource orb: the fill height shows the amount; the skin comes from CSS. */
@@ -214,6 +214,13 @@ export function Hud({ c }: { c: Controller }) {
             {mapTypeDef(w.plan.type).name}
             {w.plan.type === 'crescendo' &&
               ` +${Math.round(w.surge * CRESCENDO_STEP_BONUS * 100)}% (step ${w.surge})`}
+            {w.plan.type === 'collapse' &&
+              (w.collapseFront <= 0
+                ? ` in ${Math.max(0, Math.ceil(COLLAPSE_START - w.t))} s`
+                : ` ${Math.max(0, w.collapseGap).toFixed(0)} tiles behind you`)}
+            {w.plan.type === 'crawl' && ` ${w.plan.segment + 1}/${w.plan.segments}`}
+            {w.plan.type === 'holdout' &&
+              ` wave ${w.holdout.spawned}/${HOLDOUT_WAVES} (${w.holdout.cleared} survived)`}
           </span>
         )}
         <span>{w.exitOpen ? 'Exit open' : ''}</span>

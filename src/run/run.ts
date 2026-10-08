@@ -167,7 +167,7 @@ export function setMap(run: RunState, map: number): void {
  * The plan of an offered map. A theme id stands for a map of that theme as the offer in its slot (or
  * the first slot) would roll at the current map number; tests and tools use it to try a theme.
  */
-export function planFor(run: RunState, offer: MapOffer | string): MapPlan {
+export function planFor(run: RunState, offer: MapOffer | string, segment = 0): MapPlan {
   if (typeof offer !== 'string' && offer.kind !== 'map') throw new Error('a Respite has no map');
   if (typeof offer === 'string') {
     const slot = Math.max(
@@ -176,13 +176,19 @@ export function planFor(run: RunState, offer: MapOffer | string): MapPlan {
     );
     offer = makeOffer(run.seed, run.map, slot, offer);
   }
+  // The later maps of a Crawl have layouts of their own.
+  const seed =
+    segment === 0
+      ? mapSeed(run, offer)
+      : new Rng(mapSeed(run, offer)).fork(`crawl${segment}`).nextU32();
   return makeMapPlan(
-    mapSeed(run, offer),
+    seed,
     run.map,
     offer.themeId,
     offer.affixes,
     offer.areaLevel,
     offer.type,
+    segment,
   );
 }
 
@@ -304,8 +310,10 @@ export function finishMap(run: RunState, res: MapResult): void {
       run.phase = 'victory';
       return;
     }
-    // Reward pick (1 of 3) after every 5th map and after every mini-boss (§5.3).
-    if (run.map % 5 === 0) run.reward = rollRewards(run);
+    // A Crawl pays one pick of its own (a unique among the three); otherwise a pick after every 5th map and every
+    // mini-boss (§5.3).
+    if (res.type === 'crawl') run.reward = rollCrawlReward(run);
+    else if (run.map % 5 === 0) run.reward = rollRewards(run);
     else if (run.map <= SKILL_REWARD_MAPS) run.reward = rollSkillRewards(run);
   }
   run.map += 1;
@@ -383,6 +391,15 @@ export function rollRewards(run: RunState): AnyItem[] {
     else out.push(rollDrop(rng, uid, { ilvl, monster: 'rare' }, rng.chance(0.7)));
   }
   return out;
+}
+
+/** The pick at the end of a Crawl: three offers, the first a unique the character could wear. */
+export function rollCrawlReward(run: RunState): AnyItem[] {
+  const offers = rollRewards(run);
+  const rng = new Rng(run.seed).fork(`crawlreward${run.map}`);
+  const unique = rollUniqueOf(rng, uidSource(run), Math.min(run.map, run.build.level));
+  if (unique && !offers.some((o) => uniqueIdOf(o) !== undefined)) offers[0] = unique;
+  return offers;
 }
 
 /** Take one reward offer (or none) into the inventory. */

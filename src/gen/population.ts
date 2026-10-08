@@ -15,7 +15,7 @@ import {
   type Variant,
 } from '../data/monsters';
 import { affixRarePacks, affixStrengthOf, mapAffixDef } from '../data/mapAffixes';
-import type { MapTypeId } from '../data/mapTypes';
+import { HOLDOUT_FIRST, HOLDOUT_INTERVAL, HOLDOUT_WAVES, type MapTypeId } from '../data/mapTypes';
 import type { ThemeDef } from '../data/themes';
 import { isFloor, type Labyrinth, type Room } from './labyrinth';
 
@@ -30,9 +30,14 @@ export type MonsterSpawn = {
 
 export type EndKind = 'rare' | 'miniboss' | 'boss';
 
+/** A Holdout wave: when it arrives and who is in it. */
+export type Wave = { t: number; monsters: MonsterSpawn[] };
+
 export type Population = {
   monsters: MonsterSpawn[];
   chests: { x: number; y: number; room: number }[];
+  /** A Holdout's waves (its monsters come in them, not at the start). */
+  waves?: Wave[];
 };
 
 /** How common each type is within its faction. */
@@ -226,6 +231,37 @@ export function populate(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Populati
       0,
     );
   const sized = (n: number) => Math.max(1, Math.round(n * packMult));
+  // A Holdout is eight waves into one arena, each from the edge, the last led by a rare.
+  if (opts.type === 'holdout') {
+    const room = lab.rooms[0];
+    const waves: Wave[] = [];
+    for (let k = 0; k < HOLDOUT_WAVES; k++) {
+      const last = k === HOLDOUT_WAVES - 1;
+      const n = sized(5 + k + extra) + (last ? 1 : 0);
+      const ps: { x: number; y: number }[] = [];
+      for (let i = 0; i < n; i++)
+        for (let tries = 0; tries < 40; tries++) {
+          const x = rng.float(room.rect.x + 1, room.rect.x + room.rect.w - 1);
+          const y = rng.float(room.rect.y + 1, room.rect.y + room.rect.h - 1);
+          if (
+            Math.hypot(x - lab.start.x, y - lab.start.y) < 10 ||
+            !isFloor(lab, Math.floor(x), Math.floor(y))
+          )
+            continue;
+          if (ps.some((p) => (p.x - x) ** 2 + (p.y - y) ** 2 < 0.8)) continue;
+          ps.push({ x, y });
+          break;
+        }
+      const mons: MonsterSpawn[] = ps.map((p, i) => {
+        const rarity: MonsterRarity =
+          last && i === 0 ? 'rare' : k % 2 === 1 && i < 2 ? 'magic' : 'normal';
+        const spec = normal(rarity);
+        return { spec, x: p.x, y: p.y, room: room.id, pack: k, name: monsterName(spec, rng) };
+      });
+      waves.push({ t: HOLDOUT_FIRST + k * HOLDOUT_INTERVAL, monsters: mons });
+    }
+    return { monsters: [], chests: [], waves };
+  }
   // A Quarry champion: the mini-boss recipe with three mods.
   const champion = (): MonsterSpec => {
     const spec = normal('miniboss');

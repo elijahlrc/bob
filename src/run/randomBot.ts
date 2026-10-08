@@ -3,7 +3,8 @@ import { BENCH_RECIPES, currencyDef } from '../data/currency';
 import { gemDef } from '../data/gems';
 import { getTree } from '../data/tree';
 import { EQUIP_SLOTS, type EquipSlot, type Item } from '../data/types';
-import { runMap, type MapResult } from '../sim/runMap';
+import type { MapResult } from '../sim/runMap';
+import { playOffer } from './play';
 import { buildSignature, killerTracker, RunTally } from './metrics';
 import type { RunSummary } from './report';
 import {
@@ -17,15 +18,7 @@ import {
   unequipFlask,
   unsocketGem,
 } from './inventory';
-import {
-  finishMap,
-  newRun,
-  passivePoints,
-  planFor,
-  takeReward,
-  worldOptsFor,
-  type RunState,
-} from './run';
+import { finishMap, newRun, passivePoints, takeReward, type RunState } from './run';
 import {
   addableFamilies,
   benchAdd,
@@ -270,8 +263,12 @@ export function randomRun(
   let moves = 0;
   while (run.phase === 'camp' && run.map <= maxMap) {
     moves += randomCamp(run, rng, maxMoves);
-    const plan = planFor(run, rng.pick(run.offers.filter((o) => o.kind === 'map')));
-    const res = runMap(plan, run.build, run.xp, worldOptsFor(run, plan), undefined, killer.tick);
+    const res = playOffer(
+      run,
+      rng.pick(run.offers.filter((o) => o.kind === 'map')),
+      undefined,
+      killer.tick,
+    );
     maps.push({
       map: run.map,
       status: res.status,

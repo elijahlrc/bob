@@ -4,9 +4,13 @@ import { worldResult, type MapResult } from '../sim/runMap';
 import type { SimEvent, World } from '../sim/types';
 import { cancelAbandon, requestAbandon } from '../sim/abandon';
 import { createWorld, stepWorld } from '../sim/world';
-import { mapTypeDef } from '../data/mapTypes';
+import { CRAWL_SEGMENTS, mapTypeDef } from '../data/mapTypes';
+import type { Build } from '../data/types';
+import type { Vitals } from '../sim/types';
 import { CLASSES } from '../data/classes';
 import { botCamp } from './bot';
+import type { MapOffer } from './offers';
+import { combineCrawl } from './play';
 import { galleryEntries, galleryRun, galleryWorld, type GalleryEntry } from './gallery';
 import { completeTabletSets } from './craft';
 import { loadFound, recordFound } from './codex';
@@ -205,9 +209,14 @@ export class Controller {
       this.changed();
       return;
     }
-    const plan = planFor(run, offer);
     run.newLoot = [];
     this.undoStack = [];
+    // A Crawl is three maps in a row: this remembers where it is and what the character carries between them.
+    this.crawl =
+      offer.type === 'crawl'
+        ? { offer, segment: 0, parts: [], build: run.build, xp: run.xp, start: run.vitals }
+        : null;
+    const plan = planFor(run, offer);
     this.world = createWorld({ plan, build: run.build, xp: run.xp, opts: worldOptsFor(run, plan) });
     this.acc = 0;
     this.screen = 'map';
@@ -268,7 +277,33 @@ export class Controller {
       this.nextShowcaseClass();
       return;
     }
-    const res = worldResult(w);
+    let res = worldResult(w);
+    const crawl = this.crawl;
+    if (crawl) {
+      crawl.parts.push(res);
+      if (res.status === 'cleared' && crawl.segment < CRAWL_SEGMENTS - 1) {
+        // The next map of the Crawl, at once: no camp, and the character is as the last map left it.
+        crawl.segment++;
+        crawl.build = { ...crawl.build, level: res.level };
+        crawl.xp = res.xp;
+        crawl.start = res.vitals;
+        const plan = planFor(run, crawl.offer, crawl.segment);
+        this.bus.emit('mapEnd', null);
+        this.world = createWorld({
+          plan,
+          build: crawl.build,
+          xp: crawl.xp,
+          opts: { ...worldOptsFor(run, plan), start: crawl.start },
+        });
+        this.acc = 0;
+        this.bus.emit('select', { id: null });
+        this.bus.emit('mapStart', { world: this.world });
+        this.changed();
+        return;
+      }
+      res = combineCrawl(crawl.parts);
+      this.crawl = null;
+    }
     this.lastResult = res;
     finishMap(run, res);
     this.world = null;
@@ -279,6 +314,16 @@ export class Controller {
     }
     this.goTo(run.phase === 'dead' ? 'summary' : run.phase === 'victory' ? 'victory' : 'camp');
   }
+
+  /** The Crawl being played, if any (docs/MAPS.md 9.2). */
+  private crawl: {
+    offer: MapOffer;
+    segment: number;
+    parts: MapResult[];
+    build: Build;
+    xp: number;
+    start: Vitals;
+  } | null = null;
 
   private undoStack: string[] = [];
 
@@ -382,6 +427,7 @@ export class Controller {
   quit(): void {
     if (this.world) this.bus.emit('mapEnd', null);
     this.world = null;
+    this.crawl = null;
     if (this.store) this.saved = loadRun(this.store);
     this.run = null;
     this.goTo('title');

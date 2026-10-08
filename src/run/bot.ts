@@ -19,6 +19,7 @@ import { woundedAbandonPolicy } from '../sim/abandon';
 import { runMap, type MapResult } from '../sim/runMap';
 import { canEquip, equip, equipFlask, slotsFor, unsocketGem, withEquipped } from './inventory';
 import type { MapOffer } from './offers';
+import { playOffer } from './play';
 import {
   finishMap,
   newRun,
@@ -587,11 +588,14 @@ export function botRun(
       takeRespite(run);
       continue;
     }
-    const plan = planFor(run, offer);
-    const worldOpts = worldOptsFor(run, plan);
-    if (opts.abandonBelow !== undefined)
-      worldOpts.abandonPolicy = woundedAbandonPolicy(opts.abandonBelow);
-    const res = runMap(plan, run.build, run.xp, worldOpts, undefined, killer.tick);
+    const res = playOffer(
+      run,
+      offer,
+      opts.abandonBelow === undefined
+        ? undefined
+        : (o) => (o.abandonPolicy = woundedAbandonPolicy(opts.abandonBelow!)),
+      killer.tick,
+    );
     maps.push({
       map: run.map,
       status: res.status,

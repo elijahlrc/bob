@@ -1,4 +1,5 @@
 import { Hasher } from '../core/hash';
+import type { MapTypeId } from '../data/mapTypes';
 import type { AnyItem, Build } from '../data/types';
 import type { MapPlan } from '../gen/mapPlan';
 import type { FlaskPolicy } from './flaskPolicy';
@@ -9,6 +10,8 @@ import { createWorld, stepWorld } from './world';
 
 export type MapResult = {
   status: MapStatus;
+  /** The map type, when it was not plain (a whole Crawl reports as 'crawl'). */
+  type?: MapTypeId;
   /** The level of the map that was played (the monsters' level). */
   areaLevel: number;
   time: number;
@@ -60,6 +63,7 @@ export function runMap(
 export function worldResult(w: World, eventHash = 0): MapResult {
   return {
     status: w.status,
+    ...(w.plan.type !== 'plain' ? { type: w.plan.type } : {}),
     areaLevel: w.plan.areaLevel,
     time: w.t,
     ticks: w.tick,

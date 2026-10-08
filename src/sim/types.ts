@@ -456,6 +456,11 @@ export type World = {
   abandonT: number | null;
   /** The Crescendo step the monsters are at (0 on any other map): they deal and take damage as if stronger (docs/MAPS.md 9.1). */
   surge: number;
+  /** Collapse: how far along the way the fall has reached (0 before it starts), and how far ahead of it the player is. */
+  collapseFront: number;
+  collapseGap: number;
+  /** Holdout: the waves that have come, which have been cleared, and the monsters in each. */
+  holdout: { spawned: number; cleared: number; done: boolean[]; ids: number[][] };
   exitOpen: boolean;
   endRoom: number;
   ai: PlayerAI;

@@ -2,7 +2,8 @@
  * Map types (docs/MAPS.md section 9): a type changes what a map is, whatever its theme and affixes.
  * An offered map has at most one. Types never appear on a mini-boss or boss map (every tenth).
  */
-export type MapTypeId = 'plain' | 'crescendo' | 'quarry' | 'throng';
+export type MapTypeId =
+  'plain' | 'crescendo' | 'quarry' | 'throng' | 'holdout' | 'collapse' | 'crawl';
 
 export type MapTypeDef = {
   id: MapTypeId;
@@ -52,6 +53,30 @@ export const MAP_TYPES: MapTypeDef[] = [
     // 2.5 times as big and engaged at once: this multiplier makes the map about 1.4 times a plain one in the threat model.
     pressure: 2.9,
   },
+  {
+    id: 'holdout',
+    name: 'Holdout',
+    text: 'A single arena. Hold the beacon while eight waves come, twelve seconds apart; each wave you survive opens a chest, and the last has a rare leading it.',
+    from: 25,
+    reward: { quantity: 0.2 },
+    pressure: 1.25,
+  },
+  {
+    id: 'collapse',
+    name: 'Collapse',
+    text: 'After one minute the way behind you starts to fall in, from the entrance onward, faster than you can ignore. Reach the exit before it reaches you.',
+    from: 30,
+    reward: { quantity: 0.3, experience: 0.1 },
+    pressure: 1.35,
+  },
+  {
+    id: 'crawl',
+    name: 'Crawl',
+    text: 'Three short maps in a row with no camp between them. At the end you pick one of three rewards, and one of them is a unique.',
+    from: 40,
+    reward: {},
+    pressure: 1.4,
+  },
 ];
 
 export function mapTypeDef(id: MapTypeId): MapTypeDef {
@@ -87,3 +112,18 @@ export function crescendoStep(t: number): number {
 
 /** Throng (docs/MAPS.md 9.2): the id of the hidden affix that gives its monsters their mods and its extra crowd. */
 export const THRONG_AFFIX = 'typeThrong';
+
+/** Holdout (docs/MAPS.md 9.2): the first wave comes this soon, then one every interval, eight in all. */
+export const HOLDOUT_WAVES = 8;
+export const HOLDOUT_FIRST = 4;
+export const HOLDOUT_INTERVAL = 12;
+
+/**
+ * Collapse: the fall starts at the entrance this many seconds in and moves along the way through the map at this
+ * speed (tiles a second). A character caught behind the front is crushed.
+ */
+export const COLLAPSE_START = 60;
+export const COLLAPSE_SPEED = 2.4;
+
+/** Crawl: the segments played back to back. */
+export const CRAWL_SEGMENTS = 3;

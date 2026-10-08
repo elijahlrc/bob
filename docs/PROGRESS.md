@@ -712,3 +712,27 @@ Plan: [MAPS.md](MAPS.md). First pass; the plan says to re-evaluate the numbers a
     won 3 of 18; the R0 bot (which chose among themes) won 8 of 18, and R1 to R5 with the same bot 1 of 18. The route choice
     cannot make up for maps that got harder: affixes now start at map 5, carry one more at every band from map 20, and there
     are 18 more of them, plus types and carry-over.
+
+### Map choice R7: Holdout, Collapse and Crawl (2026-10-07)
+
+Plan: [MAPS.md](MAPS.md) section 9.2. First pass; the numbers are not tuned.
+
+- **Holdout** (from map 25, `src/gen/arena.ts`, `src/sim/holdout.ts`): one 36 by 36 arena. The character walks to the centre and
+  stays. Eight waves arrive at 4, 16, … 88 s, already chasing (5 to 12 monsters each, magic ones in the odd waves, a rare
+  leading the last). A wave that is killed pays a chest's loot beside the character; the exit opens when the last wave is dead.
+  The plan stores the waves (`pop.waves`), so the same map is the same fight.
+- **Collapse** (from map 30, `src/sim/collapse.ts`): no side branches. From 60 s a front moves along the way through the map at
+  2.4 tiles a second; a character behind it takes an unavoidable hit named "The Collapse". It is a line along the path, not an
+  actor, so it needs no combat rules. The HUD shows the countdown and the distance ahead of the front. **There is no drawn
+  front in the map view yet.**
+- **Crawl** (from map 40, `src/run/play.ts`, the controller): three maps of three rooms, no side branches, the last ending on a
+  mini-boss, each with a layout of its own. The character and what it carries (`Vitals`, level, XP) pass from one to the next with
+  no camp (the controller starts the next at once; `playOffer` does the same headlessly). They count as one level, pay one
+  reward pick with a unique among the three, and a death or an abandon in any of them ends the Crawl (`combineCrawl`).
+- **Offer roll.** The three types join Crescendo, Quarry and Throng in the pool (equal chance among the types unlocked at that map).
+- **Tests.** 1,883 pass with `CI=1`: the path measure, the front, the crush, the waves and their chests and the exit, the
+  Crawl's plans, `combineCrawl`, the headless runner and the controller chaining all three maps and paying the pick.
+- **Browser.** A Holdout offer card with its text; the map shows the arena with wave 1 fighting the character at its centre
+  ("Holdout wave 1/8 (0 survived)"). Collapse and Crawl were checked by tests, not in the pane.
+- **Bot** (`npm run sim -- --runs 2 --class all --seed 3`, 12 runs): all complete, no stuck maps; 2 of 12 won. Not measured: how
+  often each new type kills, or whether any is dominated, so their pressure numbers (1.25, 1.35, 1.4) and rewards are guesses.

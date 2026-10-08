@@ -39,12 +39,25 @@ function worldOf(
 }
 
 describe('which types are offered (docs/MAPS.md 4.2 and 9)', () => {
-  it('Crescendo and Quarry from map 10, Throng from 12, never on a mini-boss or boss map', () => {
+  it('each type from its map, never on a mini-boss or boss map', () => {
     expect(typesFor(9)).toEqual([]);
     expect(typesFor(11).map((t) => t.id)).toEqual(['crescendo', 'quarry']);
     expect(typesFor(13).map((t) => t.id)).toEqual(['crescendo', 'quarry', 'throng']);
+    expect(typesFor(27).map((t) => t.id)).toContain('holdout');
+    expect(typesFor(24).map((t) => t.id)).not.toContain('holdout');
+    expect(typesFor(33).map((t) => t.id)).toContain('collapse');
+    expect(typesFor(37).map((t) => t.id)).not.toContain('crawl');
+    expect(typesFor(43).map((t) => t.id)).toContain('crawl');
     for (const map of [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]) expect(typesFor(map)).toEqual([]);
-    expect(MAP_TYPES.map((t) => t.id)).toEqual(['plain', 'crescendo', 'quarry', 'throng']);
+    expect(MAP_TYPES.map((t) => t.id)).toEqual([
+      'plain',
+      'crescendo',
+      'quarry',
+      'throng',
+      'holdout',
+      'collapse',
+      'crawl',
+    ]);
   });
 
   it('a set has at most one typed offer before map 40 and two after; the anchor can be typed', () => {

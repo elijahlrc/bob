@@ -1,7 +1,8 @@
 import { Rng } from '../core/rng';
 import { affixesConflict, affixReward, MAP_AFFIXES, mapAffixDef } from '../data/mapAffixes';
-import { mapTypeDef, THRONG_AFFIX, type MapTypeId } from '../data/mapTypes';
+import { CRAWL_SEGMENTS, mapTypeDef, THRONG_AFFIX, type MapTypeId } from '../data/mapTypes';
 import { themeDef, type ThemeDef } from '../data/themes';
+import { generateArena } from './arena';
 import { generateLabyrinth, type Labyrinth } from './labyrinth';
 import { populate, type EndKind, type Population } from './population';
 
@@ -16,6 +17,9 @@ export type MapPlan = {
   affixes: string[];
   /** The map type (docs/MAPS.md section 9). */
   type: MapTypeId;
+  /** Which map of a Crawl this is (0 for any other map), and how many there are. */
+  segment: number;
+  segments: number;
   /** XP multiplier of the map: the theme's bonus and the affixes' experience rewards. */
   xpMult: number;
   endKind: EndKind;
@@ -68,16 +72,21 @@ export function makeMapPlan(
   affixes: string[] = [],
   areaLevel: number = map,
   type: MapTypeId = 'plain',
+  /** A Crawl is three maps in a row: which of them this is (0 to 2). */
+  segment = 0,
 ): MapPlan {
   const root = new Rng(seed);
   const genRng = root.fork('mapgen');
+  const crawl = type === 'crawl';
   const drawn = map <= 4 ? 0 : genRng.int(0, 2);
-  // A Quarry is a short hunt: three rooms with a champion each, and no side branches.
-  const sideBranches = type === 'quarry' ? 0 : drawn;
-  const rooms = type === 'quarry' ? 4 : roomsForMap(map);
-  const lab = generateLabyrinth(genRng, { rooms, sideBranches });
+  // A Quarry is a short hunt and a Collapse a race: neither has side branches.
+  const sideBranches = type === 'quarry' || type === 'collapse' || crawl ? 0 : drawn;
+  // A Crawl's maps are short: three rooms, and the last of the three ends on a mini-boss.
+  const rooms = type === 'quarry' ? 4 : crawl ? 3 : roomsForMap(map);
+  const lab =
+    type === 'holdout' ? generateArena() : generateLabyrinth(genRng, { rooms, sideBranches });
   const theme = themeDef(themeId);
-  const endKind = endKindForMap(map);
+  const endKind = crawl && segment === CRAWL_SEGMENTS - 1 ? 'miniboss' : endKindForMap(map);
   const xpMult =
     theme.xpMult *
     (1 +
@@ -100,6 +109,8 @@ export function makeMapPlan(
     theme,
     affixes,
     type,
+    segment,
+    segments: crawl ? CRAWL_SEGMENTS : 1,
     xpMult,
     endKind,
     lab,
