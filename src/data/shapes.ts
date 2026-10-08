@@ -25,6 +25,8 @@ export type ShapeSpec = {
   width?: number;
   /** Lob: the zone it leaves, for how long, and its damage a second as a share of the type's hit. */
   zone?: ZoneKindId;
+  /** What its zone is called on the cards, where it is not the kind's own (a web is a chilling pool that slows). */
+  zoneName?: string;
   seconds?: number;
   dps?: number;
   /** Orb: the speed of the projectile as a share of an ordinary one. */
@@ -66,7 +68,7 @@ export const SHAPE_INFO: Record<ShapeId, ShapeInfo> = {
     name: 'Lob',
     tag: 'ground',
     text: (s) =>
-      `Lobs a ${ZONE_NAMES[s.zone ?? 'caustic']} onto your feet, a ${s.radius ?? 1.6}-tile circle that lasts ${s.seconds ?? 4} s.`,
+      `Lobs a ${s.zoneName ?? ZONE_NAMES[s.zone ?? 'caustic']} onto your feet, a ${s.radius ?? 1.6}-tile circle that lasts ${s.seconds ?? 4} s.`,
   },
   salvo: {
     name: 'Salvo',

@@ -47,7 +47,15 @@ export type MonsterTypeId =
   | 'cutpurse'
   | 'guard'
   | 'bursar'
-  | 'slinger';
+  | 'slinger'
+  // Additions to the factions that exist (docs/ROSTER.md 7.1)
+  | 'crawler'
+  | 'heap'
+  | 'gorger'
+  | 'watcher'
+  | 'bell'
+  | 'spinner'
+  | 'coffer';
 
 /** The monster families (EXPANSION 7.3). The Choir, the Swarm and the Reliquary join in later milestones. */
 export type FactionId =
@@ -84,7 +92,12 @@ export type BodyKind =
   // Bodies of the Rot and the Hollow that are not a person (docs/ROSTER.md 4.2).
   | 'bloat'
   | 'toad'
-  | 'orb';
+  | 'orb'
+  | 'crawler'
+  | 'heap'
+  | 'bell'
+  | 'spider'
+  | 'chest';
 
 /**
  * The pose family of an attack (docs/ROSTER.md 4.3): how the body moves when it strikes, apart from which rig it is. A type
@@ -128,6 +141,12 @@ export type MonsterTypeDef = {
   shape?: ShapeSpec;
   /** The pose family of its attack, when it is not the one its body implies (docs/ROSTER.md 4.3). */
   stance?: Stance;
+  /** Not met on maps below this level (a heavy type is no match for the first maps). */
+  minLevel?: number;
+  /** Its hits slow the character by 30% for 2 seconds (the Hobbling mod, as a trait of the type). */
+  hobbles?: boolean;
+  /** What it drops is this many times the usual (a chest that is found pays). */
+  bonusLoot?: number;
   /** Leaves no body when it dies (a spectre unravels, a flame goes out): nothing for a Hag to raise or a Shambler to rise from. */
   noBody?: boolean;
   /** What its body is made of, when it is not its faction's (docs/ROSTER.md 4.1). Only meaningful on a humanoid rig. */
@@ -799,6 +818,162 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     attackTime: 1.6,
     radius: 0.45,
     mods: [mod('convert.physical.cold', 'base', 100)],
+  },
+
+  // Additions to the factions that exist (docs/ROSTER.md 7.1): each on a body that is not a person.
+  crawler: {
+    id: 'crawler',
+    role: 'swarm',
+    name: 'Bone Crawler',
+    faction: 'ossuary',
+    body: 'crawler',
+    archetype: 'skirmisher',
+    movement: [{ id: 'skitter', angle: 40, every: 0.35 }],
+    defence: { evasion: 60, armour: -60, res: { fire: -30 } },
+    hobbles: true,
+    minLevel: 4,
+    lifeMult: 0.25,
+    dmgMult: 0.35,
+    range: 1,
+    attack: 'melee',
+    speed: 4.4,
+    attackTime: 1,
+    radius: 0.3,
+    mods: [],
+  },
+  heap: {
+    id: 'heap',
+    role: 'front',
+    name: 'Charnel Heap',
+    faction: 'ossuary',
+    body: 'heap',
+    archetype: 'bruiser',
+    movement: [{ id: 'momentum', from: 0.6, to: 1.2, seconds: 3 }],
+    defence: { armour: 60, immune: ['bleed'], hitCap: 0.25 },
+    shape: { id: 'slam', radius: 2.2, mult: 1.6, lock: 0.3 },
+    phases: [{ at: 0, do: 'split', into: 'crawler', count: 3 }],
+    minLevel: 18,
+    lifeMult: 3,
+    dmgMult: 1.5,
+    range: 1.8,
+    attack: 'melee',
+    speed: 1.4,
+    attackTime: 2.4,
+    radius: 0.8,
+    mods: [],
+  },
+  gorger: {
+    id: 'gorger',
+    role: 'front',
+    name: 'Gorger',
+    faction: 'rot',
+    body: 'bloat',
+    archetype: 'bruiser',
+    shape: { id: 'swing', arc: 140, radius: 2.4, lock: 0.3 },
+    innate: true,
+    minLevel: 10,
+    lifeMult: 2,
+    dmgMult: 1.3,
+    range: 1.6,
+    attack: 'melee',
+    speed: 2,
+    attackTime: 1.8,
+    radius: 0.7,
+    mods: [],
+  },
+  watcher: {
+    id: 'watcher',
+    role: 'ranged',
+    name: 'Hollow Watcher',
+    faction: 'hollow',
+    body: 'orb',
+    archetype: 'sniper',
+    movement: [{ id: 'cover', back: 4 }],
+    senses: { aggro: 12 },
+    shape: { id: 'lance', length: 12, width: 0.9, mult: 1.5, lock: 0.3 },
+    innate: true,
+    noBody: true,
+    minLevel: 14,
+    lifeMult: 0.6,
+    dmgMult: 1.1,
+    range: 9,
+    attack: 'spell',
+    speed: 1.2,
+    attackTime: 2.2,
+    radius: 0.4,
+    mods: [],
+  },
+  bell: {
+    id: 'bell',
+    role: 'support',
+    name: 'Tolling Bell',
+    faction: 'choir',
+    body: 'bell',
+    archetype: 'support',
+    defence: { armour: 100, es: 0.4 },
+    shape: { id: 'nova', radius: 3.2, mult: 1 },
+    stationary: true,
+    flies: true,
+    innate: true,
+    noBody: true,
+    minLevel: 22,
+    lifeMult: 1.4,
+    dmgMult: 0.5,
+    range: 2.8,
+    attack: 'melee',
+    speed: 0,
+    attackTime: 4,
+    radius: 0.6,
+    mods: [mod('stunDamage', 'inc', 200)],
+  },
+  spinner: {
+    id: 'spinner',
+    role: 'ranged',
+    name: 'Silkspinner',
+    faction: 'swarm',
+    body: 'spider',
+    archetype: 'controller',
+    stance: 'throw',
+    defence: { evasion: 30 },
+    shape: {
+      id: 'lob',
+      radius: 1.7,
+      zone: 'chilling',
+      zoneName: 'web',
+      seconds: 4,
+      dps: 0.12,
+      mult: 0.4,
+      lock: 0.3,
+    },
+    innate: true,
+    minLevel: 12,
+    lifeMult: 0.9,
+    dmgMult: 0.6,
+    range: 6,
+    attack: 'projectile',
+    speed: 2.6,
+    attackTime: 1.8,
+    radius: 0.45,
+    mods: [],
+  },
+  coffer: {
+    id: 'coffer',
+    role: 'special',
+    name: 'Lurking Coffer',
+    faction: 'gilded',
+    body: 'chest',
+    archetype: 'ambusher',
+    defence: { armour: 80 },
+    bonusLoot: 2.5,
+    minLevel: 8,
+    lifeMult: 1,
+    dmgMult: 1.6,
+    range: 1.2,
+    attack: 'melee',
+    speed: 3.2,
+    attackTime: 1.2,
+    radius: 0.55,
+    mods: [],
   },
 };
 

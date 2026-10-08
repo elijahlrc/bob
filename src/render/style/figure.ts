@@ -57,6 +57,12 @@ export type FigureKind =
   | 'bloat'
   | 'toad'
   | 'orb'
+  // Additions to the factions that exist (docs/ROSTER.md 7.1).
+  | 'crawler'
+  | 'heap'
+  | 'bell'
+  | 'spider'
+  | 'chest'
   | 'hero_mace'
   | 'hero_sword'
   | 'hero_bow'
@@ -344,6 +350,41 @@ function rigPose(kind: FigureKind, anim: AnimName, t: number, p: Pose): Pose {
         p.bob = 0;
       }
       break;
+    case 'bell':
+      if (anim === 'idle' || anim === 'walk') p.legA = s * 0.5;
+      else if (anim === 'attack') {
+        // It tolls: a violent swing and a ring of light that grows and fades.
+        p.legA = Math.sin(t * TAU * 4) * 0.9;
+        p.charge = Math.sin(clamp01(t) * Math.PI);
+      } else if (anim === 'death') {
+        p.scatter = 0;
+        p.rot = 0;
+        p.bob = ease(clamp01(t / 0.6)) * 18;
+        p.fade = ease(clamp01(t / 0.9)) * 0.4;
+      }
+      break;
+    case 'chest':
+      if (anim === 'walk') {
+        // Hops along on its legs.
+        const hop = Math.abs(s);
+        p.bob = -hop * 3;
+        p.legA = s * 0.9;
+        p.legB = -s * 0.9;
+      } else if (anim === 'death') {
+        // The lid falls open, and it lies there.
+        p.scatter = 0;
+        p.armA = -1.4;
+        p.rot = 0;
+        p.bob = 0;
+      }
+      break;
+    case 'crawler':
+      if (anim === 'walk') {
+        p.legA = s;
+        p.legB = -s;
+        p.bob = -Math.abs(Math.cos(t * TAU)) * 0.8;
+      }
+      break;
     default:
       break;
   }
@@ -414,6 +455,11 @@ const BUILDS: Record<FigureKind, Build> = {
   bloat: { scale: 1.05, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   toad: { scale: 1.1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   orb: { scale: 0.9, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  crawler: { scale: 1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  heap: { scale: 1.35, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  bell: { scale: 1.1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  spider: { scale: 1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  chest: { scale: 1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   hero_mace: { scale: 1.05, legLen: 9, torsoH: 14, shoulder: 8, skull: 5.5, ribW: 7 },
   hero_sword: { scale: 1, legLen: 9, torsoH: 14, shoulder: 7, skull: 5.5, ribW: 6.5 },
   hero_bow: { scale: 1, legLen: 9.5, torsoH: 13, shoulder: 6, skull: 5.5, ribW: 5.5 },
@@ -522,6 +568,11 @@ const CREATURES = new Set<FigureKind>([
   'bloat',
   'toad',
   'orb',
+  'crawler',
+  'heap',
+  'bell',
+  'spider',
+  'chest',
 ]);
 
 /**
@@ -529,7 +580,7 @@ const CREATURES = new Set<FigureKind>([
  * skeleton (feet at the origin, up is -y). The pose supplies the same numbers: `legA` and `legB` are the two gait
  * phases (wing beats for the bat), `bob` lifts the body, `armA` raises limbs, `charge` loads the crossbow.
  */
-function buildCreature(kind: FigureKind, pose: Pose): Prim[] {
+function buildCreature(kind: FigureKind, pose: Pose, type?: MonsterTypeId): Prim[] {
   const b: B = { prims: [] };
   const lift = pose.bob;
   switch (kind) {
@@ -652,15 +703,34 @@ function buildCreature(kind: FigureKind, pose: Pose): Prim[] {
       circ(b, sw - 1, -16 + lift, 11.5, 'clothShade');
       circ(b, sw, -17 + lift, 10, 'skin');
       circ(b, sw + 2, -14 + lift, 7, 'cloth');
-      for (const [x, y] of [
-        [-4, -20],
-        [3, -18],
-        [6, -12],
-        [-2, -10],
-        [-7, -14],
-        [1, -24],
-      ] as const)
-        circ(b, sw + x, y + lift, 1.6, 'accent');
+      if (type !== 'gorger')
+        for (const [x, y] of [
+          [-4, -20],
+          [3, -18],
+          [6, -12],
+          [-2, -10],
+          [-7, -14],
+          [1, -24],
+        ] as const)
+          circ(b, sw + x, y + lift, 1.6, 'accent');
+      else {
+        // A gorger is all belly and mouth: a wide maw across the belly, teeth, and a bib of what it has eaten.
+        box(b, sw + 2, -14 + lift, 11, 4.4, 0, 'dark');
+        for (let i = 0; i < 5; i++) {
+          const x = sw - 2.5 + i * 2.6;
+          b.prims.push({
+            k: 'tri',
+            pts: [x - 1.2, -16.2 + lift, x, -13 + lift, x + 1.2, -16.2 + lift],
+            role: 'bone',
+          });
+          b.prims.push({
+            k: 'tri',
+            pts: [x - 1.2, -11.8 + lift, x, -15 + lift, x + 1.2, -11.8 + lift],
+            role: 'bone',
+          });
+        }
+        circ(b, sw + 5, -7 + lift, 2.2, 'accent');
+      }
       cap(b, sw + 9, -22 + lift, sw + 12 + pose.armA * 2, -12 + lift, 2.1, 'skin');
       cap(b, sw - 9, -22 + lift, sw - 11 + pose.armB * 2, -13 + lift, 2, 'clothShade');
       circ(b, sw + 5, -28 + lift, 4.4, 'skin');
@@ -701,6 +771,17 @@ function buildCreature(kind: FigureKind, pose: Pose): Prim[] {
       // A flame of a thing: no limbs, a core in a halo, three tails that stream behind (`legA` is their sway).
       const y = -20 + lift;
       const sway = pose.legA * 5;
+      if (type === 'watcher') {
+        // A floating eye: a pale ball with a coloured iris and a pupil that looks at what it sees, trailing tendrils.
+        for (const d of [-1, 0, 1])
+          cap(b, d * 3, y + 6, d * 5 - sway * 0.5, y + 16 + Math.abs(d) * 3, 0.9, 'clothShade');
+        circ(b, 0, y, 8.6, 'clothShade');
+        circ(b, 0, y, 7.6, 'bone');
+        circ(b, 1.8, y, 4.4, 'eye');
+        circ(b, 2.6 + pose.head * 2, y, 2.1, 'dark');
+        circ(b, 3.4, y - 1.2, 0.8, 'glow');
+        break;
+      }
       tri(b, [-3, y + 2, 3, y + 2, -11 - sway, y + 13], 'clothShade');
       tri(b, [-2, y + 3, 2, y + 3, -5 - sway * 0.7, y + 17], 'cloth');
       tri(b, [0, y + 3, 4, y + 3, 3 - sway * 0.4, y + 11], 'clothShade');
@@ -709,6 +790,131 @@ function buildCreature(kind: FigureKind, pose: Pose): Prim[] {
       circ(b, 0, y, 4.6, 'glow');
       circ(b, 1.4, y - 0.6, 0.9, 'dark');
       circ(b, 3.4, y - 0.6, 0.9, 'dark');
+      break;
+    }
+    case 'crawler': {
+      // The top half of a skeleton that has learned to walk on its hands: a skull, a few ribs, a spine that trails, arms that reach.
+      const a = pose.legA;
+      const c = pose.legB;
+      cap(b, -2, -7 + lift, 5 + c * 6, 0, 1.3, 'boneShade');
+      cap(b, -10, -7 + lift, -15, -3 + lift + a, 1, 'boneShade');
+      cap(b, -9, -6.5 + lift, 4, -7.5 + lift, 3, 'boneShade');
+      for (let i = 0; i < 3; i++) box(b, -5 + i * 3.2, -9.2 + lift, 1.5, 5.4, 0.15, 'bone');
+      cap(b, 1, -7 + lift, 7 + a * 6, 0, 1.4, 'bone');
+      circ(b, 7 + a * 6, 0.2, 1.3, 'bone');
+      circ(b, 5 + c * 6, 0.2, 1.2, 'boneShade');
+      circ(b, 9, -8 + lift + pose.head * 2, 4.2, 'bone');
+      box(b, 11.5, -5.8 + lift, 4.6, 2, 0, 'boneShade');
+      circ(b, 10.4, -9 + lift, 1.4, 'dark');
+      circ(b, 10.8, -9.2 + lift, 0.7, 'eye');
+      break;
+    }
+    case 'heap': {
+      // A mound of fused bone: skulls in it, limbs out of it, a pair of stumps to walk on.
+      const ph = pose.legA;
+      cap(b, -5, -5 + lift, -5 + ph * 2, 0, 3.2, 'boneShade');
+      cap(b, 6, -5 + lift, 6 - ph * 2, 0, 3.2, 'bone');
+      circ(b, 0, -13 + lift, 13, 'boneShade');
+      circ(b, -3, -15 + lift, 10.5, 'bone');
+      circ(b, 4, -11 + lift, 8, 'boneShade');
+      for (const [x, y, r] of [
+        [-7, -18, 3.4],
+        [5, -20, 3],
+        [-9, -10, 3],
+        [8, -8, 3.2],
+        [0, -25, 3.2],
+      ] as const) {
+        circ(b, x, y + lift, r, 'bone');
+        circ(b, x - 1, y + lift - 0.3, r * 0.32, 'dark');
+        circ(b, x + 1.2, y + lift - 0.3, r * 0.32, 'dark');
+      }
+      const raise = pose.armA * 6;
+      cap(b, 10, -16 + lift, 17, -9 - raise + lift, 2.8, 'bone');
+      circ(b, 18, -8 - raise + lift, 3.6, 'boneShade');
+      cap(b, -11, -14 + lift, -16, -6 + lift, 2.4, 'boneShade');
+      circ(b, 3.5, -22 + lift, 1.4, 'eye');
+      circ(b, -3.5, -22.5 + lift, 1.2, 'eye');
+      break;
+    }
+    case 'bell': {
+      // A bell hung in the air: a chain, a swinging body, a clapper; a ring of light spreads from the lip as it tolls.
+      const y = -22 + lift;
+      const sw = pose.legA * 6;
+      if (pose.charge > 0.05) circ(b, sw, y + 7.4, 7 + pose.charge * 9, 'glow');
+      cap(b, 0, y - 14, sw * 0.15, y - 7, 0.8, 'metalShade');
+      circ(b, 0, y - 14, 1.6, 'metalShade');
+      b.prims.push({
+        k: 'tri',
+        pts: [-9 + sw, y + 7, 9 + sw, y + 7, sw * 0.4, y - 8],
+        role: 'metalShade',
+      });
+      b.prims.push({
+        k: 'tri',
+        pts: [-6 + sw, y + 7, 7 + sw, y + 7, sw * 0.4 + 1, y - 7],
+        role: 'metal',
+      });
+      box(b, sw, y + 7.4, 19, 2.6, 0, 'metalShade');
+      circ(b, sw * 0.4, y - 7, 2.6, 'metal');
+      cap(b, sw * 0.3, y + 1, -sw * 0.9, y + 9, 0.6, 'dark');
+      circ(b, -sw * 0.9, y + 10, 2.2, 'accent');
+      break;
+    }
+    case 'spider': {
+      // Eight legs in two banks, a swollen abdomen, a small head with four eyes and fangs.
+      const ph = pose.legA;
+      const leg = (x0: number, i: number, role: Role) => {
+        const dir = i - 1.5;
+        const kx = x0 + dir * 3;
+        const fx = x0 + dir * 5.5 + (i % 2 ? ph : -ph) * 3;
+        cap(b, x0, -9 + lift, kx, -15 + lift, 0.9, role);
+        cap(b, kx, -15 + lift, fx, 0, 0.8, role);
+      };
+      for (let i = 0; i < 4; i++) leg(-2 + i * 1.8, i, 'boneShade');
+      circ(b, -8, -11 + lift, 7, 'clothShade');
+      circ(b, -9, -12 + lift, 5, 'cloth');
+      circ(b, -9, -12 + lift, 1.6, 'accent');
+      for (let i = 0; i < 4; i++) leg(0.5 + i * 1.8, i, 'bone');
+      circ(b, 2, -10 + lift, 4.4, 'cloth');
+      const rear = Math.max(0, -pose.armA) * 0.8;
+      circ(b, 6.5, -9.5 + lift - rear, 3, 'clothShade');
+      for (const [x, y] of [
+        [8, -11],
+        [9, -9.8],
+        [7.2, -12.2],
+        [9.6, -11.6],
+      ] as const)
+        circ(b, x, y + lift - rear, 0.8, 'eye');
+      cap(b, 8.5, -8.3 + lift - rear, 9.5, -6 + lift - rear, 0.6, 'bone');
+      break;
+    }
+    case 'chest': {
+      // A treasure chest on short legs: iron bands, a lock, and a lid that rises on a mouth of teeth when it strikes.
+      const ph = pose.legA;
+      const open = Math.max(0, -pose.armA) * 1.5 + pose.charge * 5;
+      cap(b, -6, -5 + lift, -6 + ph * 3, 0, 1.6, 'wood');
+      cap(b, 6, -5 + lift, 6 - ph * 3, 0, 1.6, 'metalShade');
+      box(b, 0, -9 + lift, 18, 10, 0, 'wood');
+      box(b, 0, -9 + lift, 18, 1.8, 0, 'metalShade');
+      box(b, -6, -9 + lift, 1.8, 10, 0, 'metalShade');
+      box(b, 6, -9 + lift, 1.8, 10, 0, 'metalShade');
+      box(b, 0, -14.5 + lift, 18, 1.2 + open, 0, 'dark');
+      for (let i = 0; i < 5; i++) {
+        const x = -7 + i * 3.5;
+        b.prims.push({
+          k: 'tri',
+          pts: [x - 1.4, -14 + lift, x, -11.4 + lift, x + 1.4, -14 + lift],
+          role: 'bone',
+        });
+        b.prims.push({
+          k: 'tri',
+          pts: [x - 1.4, -15.2 - open + lift, x, -12.4 - open + lift, x + 1.4, -15.2 - open + lift],
+          role: 'bone',
+        });
+      }
+      box(b, 0, -17.5 - open + lift, 18, 5, 0, 'wood');
+      box(b, 0, -16 - open + lift, 18, 1.6, 0, 'metalShade');
+      circ(b, 0, -11 + lift, 2, 'accent');
+      if (open > 0.8) circ(b, 0, -14.4 + lift - open * 0.4, 1.3, 'eye');
       break;
     }
     case 'bat': {
@@ -835,7 +1041,12 @@ function buildCreature(kind: FigureKind, pose: Pose): Prim[] {
  * (docs/ENEMIES.md 6.1); `t` is the time through a looping animation, for things that swing.
  */
 export function buildFigure(kind: FigureKind, pose: Pose, type?: MonsterTypeId, t = 0): Prim[] {
-  if (CREATURES.has(kind)) return finish(buildCreature(kind, pose), BUILDS[kind].scale, pose);
+  if (CREATURES.has(kind))
+    return finish(
+      buildCreature(kind, pose, type),
+      BUILDS[kind].scale * (type ? (kitAdjust(type).scale ?? 1) : 1),
+      pose,
+    );
   const style = styleFor(type, kind);
   if (style !== 'bone') return buildLiving(kind, pose, type, t, style);
   const B_ = BUILDS[kind];

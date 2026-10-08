@@ -469,7 +469,7 @@ function onMonsterHitPlayer(w: World, src: Actor): void {
     if (steal && got > 0) src.fleeT = 5;
   }
   const p = w.player;
-  if (src.modIds.includes('hobbling') && !p.def.cannotBeChilled) {
+  if ((src.modIds.includes('hobbling') || src.mon?.kind.hobbles) && !p.def.cannotBeChilled) {
     p.ail.chill = Math.max(p.ail.chill, 0.3);
     p.ail.chillT = Math.max(p.ail.chillT, 2);
   }

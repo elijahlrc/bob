@@ -47,7 +47,10 @@ const dist = (a: Actor, b: Actor) => Math.hypot(a.x - b.x, a.y - b.y);
 describe('the Kennel and the Gilded as data (docs/ENEMIES.md 7.4)', () => {
   it('each has four types, all innate, with an ability or a role of its own', () => {
     for (const f of ['kennel', 'gilded'] as const) {
-      const types = Object.values(MONSTER_TYPES).filter((t) => t.faction === f);
+      // The Gilded gained the Lurking Coffer (docs/ROSTER.md 7.1), which is not a person's trick but a chest's.
+      const types = Object.values(MONSTER_TYPES).filter(
+        (t) => t.faction === f && t.id !== 'coffer',
+      );
       expect(types).toHaveLength(4);
       for (const t of types) expect(t.innate).toBe(true);
     }

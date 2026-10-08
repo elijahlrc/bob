@@ -90,7 +90,7 @@ export function themeInfo(
   type: MapTypeId = 'plain',
   level = 1,
 ): ThemeInfo {
-  const shares = typeShares(theme);
+  const shares = typeShares({ ...theme, level });
   const byFaction = new Map<FactionId, number>();
   const tagShare = new Map<ThreatTag, number>();
   let ranged = 0;

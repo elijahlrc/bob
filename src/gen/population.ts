@@ -84,18 +84,26 @@ export const TYPE_WEIGHTS: Record<MonsterTypeId, number> = {
   guard: 35,
   bursar: 12,
   slinger: 25,
+  crawler: 18,
+  heap: 4,
+  gorger: 14,
+  watcher: 10,
+  bell: 8,
+  spinner: 14,
+  coffer: 8,
 };
 
 /** The share of every type on a theme's maps (sum 1): its factions, then the types within each. */
 export function typeShares(
-  theme: Pick<ThemeDef, 'typeWeights' | 'factions'>,
+  theme: Pick<ThemeDef, 'typeWeights' | 'factions'> & { level?: number },
 ): [MonsterTypeId, number][] {
+  const level = theme.level ?? Infinity;
   const factions = theme.factions ?? { ossuary: 1 };
   const fTotal = Object.values(factions).reduce((a, b) => a + b, 0);
   const out: [MonsterTypeId, number][] = [];
   for (const [fac, fw] of Object.entries(factions)) {
     const types = (Object.keys(TYPE_WEIGHTS) as MonsterTypeId[]).filter(
-      (id) => MONSTER_TYPES[id].faction === fac,
+      (id) => MONSTER_TYPES[id].faction === fac && (MONSTER_TYPES[id].minLevel ?? 0) <= level,
     );
     const w = (id: MonsterTypeId) => TYPE_WEIGHTS[id] * (theme.typeWeights[id] ?? 1);
     const tTotal = types.reduce((a, id) => a + w(id), 0);
@@ -110,7 +118,10 @@ export const ELEMENT_WEIGHTS: Record<Variant, number> = {
   lightning: 15,
 };
 
-export function rollType(rng: Rng, theme: ThemeDef): MonsterTypeId {
+export function rollType(
+  rng: Rng,
+  theme: Pick<ThemeDef, 'typeWeights' | 'factions'> & { level?: number },
+): MonsterTypeId {
   const shares = typeShares(theme);
   return rng.weighted(
     shares.map(([id]) => id),
@@ -280,9 +291,15 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
     }
     return {};
   };
+  // What the map's monsters are drawn from: the theme, and the level (a heavy type has a first level).
+  const mix = {
+    typeWeights: opts.theme.typeWeights,
+    factions: opts.theme.factions,
+    level: opts.areaLevel,
+  };
   const affixField = opts.affixes?.length ? { affix: opts.affixes } : {};
   const normal = (rarity: MonsterRarity = 'normal', forced?: MonsterTypeId): MonsterSpec => {
-    const type = forced ?? rollType(rng, opts.theme);
+    const type = forced ?? rollType(rng, mix);
     return {
       type,
       variant: rollVariant(rng, type, opts.theme),
@@ -335,7 +352,7 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
           ps.push({ x, y });
           break;
         }
-      const types = packTypes(rng, opts.theme, ps.length, throng);
+      const types = packTypes(rng, mix, ps.length, throng);
       const mons: MonsterSpawn[] = ps.map((p, i) => {
         const rarity: MonsterRarity =
           last && i === 0 ? 'rare' : k % 2 === 1 && i < 2 ? 'magic' : 'normal';
@@ -379,7 +396,7 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
         add(room, spec, { x: room.cx + 0.5, y: room.cy + 0.5 });
         // The Regent's escort is made of the map's own monsters (docs/ENEMIES.md 4.2, rule 6).
         const guard = spots(rng, lab, room, 3);
-        const gt = packTypes(rng, opts.theme, guard.length, throng);
+        const gt = packTypes(rng, mix, guard.length, throng);
         guard.forEach((p, i) => add(room, normal('normal', gt[i]), p));
       } else {
         let leader: MonsterSpec = opts.endKind === 'miniboss' ? normal('miniboss') : normal('rare');
@@ -398,7 +415,7 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
         const n = opts.endKind === 'miniboss' ? 4 : rng.int(2, 4);
         const ps = spots(rng, lab, room, n + 1);
         if (ps.length) add(room, leader, ps[0]);
-        const escort = packTypes(rng, opts.theme, ps.length, throng);
+        const escort = packTypes(rng, mix, ps.length, throng);
         for (let i = 1; i < ps.length; i++) add(room, normal('normal', escort[i]), ps[i]);
       }
       pack++;
@@ -409,7 +426,7 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
     if (extraRares > 0 && room.kind === 'main') {
       extraRares--;
       const ps = spots(rng, lab, room, 1 + rng.int(2, 4));
-      const plan = packPlan(rng, opts.theme, ps.length, throng);
+      const plan = packPlan(rng, mix, ps.length, throng);
       const types = plan.types;
       const how = behave(room, plan);
       ps.forEach((p, i) =>
@@ -418,7 +435,7 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
     } else if (roll < 0.7 - magicShift) {
       let ps = spots(rng, lab, room, sized(rng.int(3, 7) + extra));
       let packed = false;
-      const plan = packPlan(rng, opts.theme, ps.length, throng);
+      const plan = packPlan(rng, mix, ps.length, throng);
       // A swarm is made of small things in numbers (and a Gnawer brings more): its own count is smaller, so that a room of
       // vermin is not twice the monsters of any other.
       if (plan.template === 'swarm')
@@ -439,12 +456,12 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
     } else if (roll < 0.92) {
       const nm = rng.int(2, 3);
       const ps = spots(rng, lab, room, sized(rng.int(3, 7) + extra));
-      const plan = packPlan(rng, opts.theme, ps.length, throng);
+      const plan = packPlan(rng, mix, ps.length, throng);
       const how = behave(room, plan);
       ps.forEach((p, i) => add(room, normal(i < nm ? 'magic' : 'normal', plan.types[i]), p, how));
     } else {
       const ps = spots(rng, lab, room, sized(1 + rng.int(2, 4) + extra));
-      const plan = packPlan(rng, opts.theme, ps.length, throng);
+      const plan = packPlan(rng, mix, ps.length, throng);
       const how = behave(room, plan);
       ps.forEach((p, i) => add(room, normal(i === 0 ? 'rare' : 'normal', plan.types[i]), p, how));
     }

@@ -55,6 +55,7 @@ const ADJUST: Partial<Record<MonsterTypeId, KitAdjust>> = {
   slinger: { scale: 0.9, hunch: 2 },
   handler: { scale: 1.06 },
   guard: { scale: 1.05 },
+  gorger: { scale: 1.18 },
   choirmaster: { scale: 1.12 },
 };
 

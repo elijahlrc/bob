@@ -84,6 +84,13 @@ export const TYPE_BLURBS: Record<MonsterTypeId, string> = {
   guard: 'Armoured; throws back part of the melee damage it takes.',
   bursar: 'While it stands, your regeneration, leech and energy shield recharge stop near it.',
   slinger: 'Slings two stones in quick succession and backs away as you close in.',
+  crawler: 'The top half of a skeleton on its hands: fast and fragile, and its grip slows you.',
+  heap: 'A slow mound of fused bone that slams the ground, and falls apart into Bone Crawlers.',
+  gorger: 'Eats the bodies of the dead to heal, and swings its arms in a wide arc.',
+  watcher: 'A floating eye that hangs back, marks a line and strikes along it, and curses you.',
+  bell: 'Hangs in the air and tolls: a ring that staggers, and an aura that drives its allies on.',
+  spinner: 'Keeps behind the swarm and lobs webs onto the ground that slow you.',
+  coffer: 'Lies still as a chest until you come close, then springs open and bites; it pays well.',
 };
 
 /**
@@ -222,5 +229,8 @@ export const TYPE_TAGS: Partial<Record<MonsterTypeId, ThreatTag[]>> = {
   golem: ['immunities', 'clouds'],
   bloater: ['clouds'],
   spitter: ['ailments'],
+  crawler: ['swarm', 'holders'],
+  heap: ['armoured'],
+  spinner: ['holders'],
   wailer: ['ailments'],
 };

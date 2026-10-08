@@ -246,7 +246,7 @@ export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
         theme: plan.theme,
         faction,
         classId: run.build.classId,
-        playerQuantity: db.mult('itemQuantity') * (1 + quantity),
+        playerQuantity: db.mult('itemQuantity') * (1 + quantity) * (m.mon.kind.bonusLoot ?? 1),
         playerRarity: db.mult('itemRarity') * (1 + rarity),
       });
       // A Quarry champion always drops a rare (sometimes a unique) and a stack of currency.

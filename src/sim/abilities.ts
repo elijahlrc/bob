@@ -98,6 +98,22 @@ function advanceDash(w: World, m: Actor, dt: number): void {
 }
 
 const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
+  devour({ w, m, dt, ab }) {
+    // Eats a body within reach, and is the better for it. It looks twice a second, and eats once in its interval; the first
+    // meal does not wait out the delay every monster starts with.
+    if (m.skillT > ab.interval!) m.skillT = 0.4;
+    m.skillT -= dt;
+    if (m.skillT > 0) return;
+    const c = w.corpses.find((o) => Math.hypot(o.x - m.x, o.y - m.y) <= ab.range!);
+    if (!c) {
+      m.skillT = 0.5;
+      return;
+    }
+    w.corpses.splice(w.corpses.indexOf(c), 1);
+    m.life = Math.min(m.def.maxLife, m.life + m.def.maxLife * ab.amount!);
+    m.skillT = ab.interval!;
+    w.events.push({ t: 'summon', id: m.id });
+  },
   raiseCorpses({ w, m, dt, d, ab }) {
     m.skillT -= dt;
     if (m.skillT > 0 || d > 16) return;

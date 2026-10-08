@@ -101,7 +101,8 @@ describe('heroes and the Ossuary are pinned', () => {
 
   it('the five Ossuary types and the bare bodies they are drawn on', () => {
     const out: Record<string, string> = {};
-    for (const id of TYPES.filter((i) => MONSTER_TYPES[i].faction === 'ossuary'))
+    // The five of the Ossuary that were drawn before the bodies of docs/ROSTER.md (the Crawler and the Heap came after).
+    for (const id of ['warrior', 'brute', 'archer', 'mage', 'shieldbearer'] as const)
       for (const a of ANIMS)
         out[`${id} ${a}`] = T.map((t) => hash(MONSTER_TYPES[id].body, a, t, id)).join(' ');
     for (const kind of ['warrior', 'brute', 'archer', 'mage'] as const)

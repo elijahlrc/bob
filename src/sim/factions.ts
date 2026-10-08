@@ -259,6 +259,10 @@ export function onMonsterDeath(w: World, a: Actor): void {
           : 'shocking';
     openZone(w, a.x, a.y, 2, GOLEM_ZONE_SECONDS, kind, monsterHitOf(a) * 0.8);
   }
+  // A type that breaks apart when it dies (a phase at nought of its life).
+  for (const ph of a.mon.kind.phases ?? [])
+    if (ph.do === 'split' && ph.at === 0 && ph.into)
+      for (let i = 0; i < (ph.count ?? 3); i++) spawnBeside(w, a, ph.into, 0.9);
   // A Brood monster splits into Gnawers.
   if (a.modIds.includes('brood'))
     for (let i = 0; i < BROOD_SPLIT; i++) spawnBeside(w, a, 'gnawer', 0.8);

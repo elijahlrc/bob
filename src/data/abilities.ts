@@ -23,6 +23,7 @@ export type AbilityId =
   | 'ambush'
   | 'suppress'
   | 'pull'
+  | 'devour'
   // Passive: applied where the rule lives.
   | 'rise'
   | 'burst'
@@ -155,6 +156,12 @@ export const ABILITY_INFO: Record<AbilityId, AbilityInfo> = {
     tag: 'suppressors',
     text: (a) =>
       `While it stands, your regeneration, leech and energy shield recharge stop within ${s(a.range)} tiles.`,
+  },
+  devour: {
+    name: 'Devour',
+    active: true,
+    text: (a) =>
+      `Every ${s(a.interval)} s eats a body within ${s(a.range)} tiles and heals ${pct(a.amount)} of its life: burn or break the corpses.`,
   },
   pull: {
     name: 'Pull',
@@ -303,6 +310,10 @@ export const TYPE_ABILITIES: Partial<Record<string, AbilityDef[]>> = {
   guard: [{ id: 'reflect', amount: 0.15 }],
   bursar: [{ id: 'suppress', range: 5 }],
   slinger: [{ id: 'kite' }],
+  gorger: [{ id: 'devour', interval: 3, range: 2.5, amount: 0.25 }],
+  watcher: [{ id: 'hex', interval: 9 }],
+  bell: [{ id: 'aura', range: 6 }],
+  coffer: [{ id: 'ambush', range: 4 }],
 };
 
 /** The abilities a type has (none for most plain ones). */
