@@ -118,6 +118,16 @@ describe('the factions (EXPANSION 7.3)', () => {
     expect(w.corpses).toHaveLength(0);
   });
 
+  it('a spectre unravels: the Hollow leave no body to raise', () => {
+    const w = arena();
+    for (const type of ['gloomstalker', 'wailer', 'wight'] as const) {
+      killActor(w, put(w, type, 8));
+      expect(w.corpses, type).toHaveLength(0);
+    }
+    killActor(w, put(w, 'warrior', 8));
+    expect(w.corpses).toHaveLength(1);
+  });
+
   it('corpses crumble after ten seconds', () => {
     const w = arena();
     const m = put(w, 'warrior', 8);

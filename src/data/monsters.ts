@@ -84,6 +84,13 @@ export type BodyKind =
 export type Stance = 'strike' | 'bow' | 'cast' | 'throw' | 'lash' | 'none';
 
 /**
+ * What a humanoid body is made of (docs/ROSTER.md 4.1): `bone` is the Ossuary's skeleton (a skull, ribs, bone limbs), `flesh`
+ * a solid body in a garment with a face, and `spectre` a body with no legs that hangs in the air. Bone is the Ossuary's
+ * alone, so that the player can learn that a skull means the Ossuary.
+ */
+export type BodyStyle = 'bone' | 'flesh' | 'spectre';
+
+/**
  * What a type is for in a pack (docs/ENEMIES.md 4.2): `front` holds the line, `ranged` shoots from behind it, `support` heals,
  * buffs or shields, `special` has a trick of its own (bursting, blinking, spawning), `swarm` comes in numbers.
  */
@@ -98,6 +105,10 @@ export type MonsterTypeDef = {
   body: BodyKind;
   /** The pose family of its attack, when it is not the one its body implies (docs/ROSTER.md 4.3). */
   stance?: Stance;
+  /** Leaves no body when it dies (a spectre unravels, a flame goes out): nothing for a Hag to raise or a Shambler to rise from. */
+  noBody?: boolean;
+  /** What its body is made of, when it is not its faction's (docs/ROSTER.md 4.1). Only meaningful on a humanoid rig. */
+  style?: BodyStyle;
   /** A caster is always elemental or chaos by nature, and never rolls an element variant. */
   innate?: boolean;
   /** Always carries an element (a Core Golem is fire, cold or lightning, never plain). */
@@ -234,6 +245,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     name: 'Spitter',
     faction: 'rot',
     body: 'archer',
+    stance: 'throw',
     innate: true,
     lifeMult: 0.7,
     dmgMult: 0.75,
@@ -345,6 +357,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     name: 'Flagellant',
     faction: 'choir',
     body: 'brute',
+    stance: 'lash',
     innate: true,
     lifeMult: 1.2,
     dmgMult: 1.1,
@@ -546,6 +559,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     name: 'Kennel Handler',
     faction: 'kennel',
     body: 'archer',
+    stance: 'lash',
     innate: true,
     lifeMult: 0.8,
     dmgMult: 0.5,
@@ -626,6 +640,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     name: 'Gilt Slinger',
     faction: 'gilded',
     body: 'archer',
+    stance: 'throw',
     innate: true,
     lifeMult: 0.7,
     dmgMult: 0.7,
@@ -663,6 +678,21 @@ export const FACTION_MODS: Partial<Record<FactionId, Mod[]>> = {
 /** Whether monsters of this faction cannot be made to bleed. */
 export function cannotBleed(type: MonsterTypeId): boolean {
   return MONSTER_TYPES[type].faction === 'hollow';
+}
+
+/** The body style of a faction's people: bone for the Ossuary, a spectre for the Hollow, flesh for the rest. */
+const FACTION_STYLE: Partial<Record<FactionId, BodyStyle>> = { ossuary: 'bone', hollow: 'spectre' };
+
+/** What a type's humanoid body is made of: its own style, or its faction's. A bare body (no type) is a skeleton. */
+export function bodyStyleOf(type: MonsterTypeId | undefined): BodyStyle {
+  if (!type) return 'bone';
+  const t = MONSTER_TYPES[type];
+  return t.style ?? FACTION_STYLE[t.faction] ?? 'flesh';
+}
+
+/** Whether a dead monster of this type leaves a body behind. */
+export function leavesBody(type: MonsterTypeId): boolean {
+  return !MONSTER_TYPES[type].noBody && bodyStyleOf(type) !== 'spectre';
 }
 
 /** The faction a monster belongs to. */

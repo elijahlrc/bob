@@ -1,10 +1,10 @@
 /**
  * A contact sheet of every monster type (docs/ROSTER.md 4.5), the review tool of every change to a body, a kit or a rig.
  *
- *   npm run sheet -- out.svg [--k 1.9] [--mono] [--poses idle,walk,attack] [--types warrior,hexer] [--report]
+ *   npm run sheet -- out.svg [--k 1.9] [--mono] [--poses idle,walk,attack] [--types warrior,hexer] [--cols 6] [--report]
  *
  * `--k` is pixels per figure unit: the game draws 0.6 times the camera zoom, so `--k 0.6` is a phone, `--k 1.2` a desktop.
- * `--mono` draws one flat colour, to judge outlines. `--report` also prints the pairs of types whose outlines overlap most.
+ * `--cols` is cells per row. `--mono` draws one flat colour, to judge outlines. `--report` also prints the pairs of types whose outlines overlap most.
  */
 import { writeFileSync } from 'node:fs';
 import { MONSTER_TYPES, type MonsterTypeId } from '../src/data/monsters';
@@ -35,6 +35,7 @@ if (out) {
     sheetSvg({
       k: Number(arg('k', '1.9')),
       mono: flag('mono'),
+      cols: Number(arg('cols', '6')),
       poses,
       types: types.length ? types : undefined,
     }),

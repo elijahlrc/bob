@@ -1,4 +1,11 @@
-import { MONSTER_TYPES, type MonsterTypeId, type Stance } from '../../data/monsters';
+import {
+  MONSTER_TYPES,
+  bodyStyleOf,
+  type BodyStyle,
+  type MonsterTypeId,
+  type Stance,
+} from '../../data/monsters';
+import { HELD, garbOf } from './bodies';
 import { kitAdjust, kitBack, kitFront, type Anchors } from './kits';
 /**
  * Style-independent character rig. A figure is a list of primitives in a local design space
@@ -69,6 +76,8 @@ export type Pose = {
   scatter: number;
   /** How far the bow is drawn / the staff glows, 0..1. */
   charge: number;
+  /** 0..1: the figure shrinks away (a spectre unravelling). */
+  fade: number;
 };
 
 export const FIGURE_HEIGHT = 48;
@@ -94,12 +103,24 @@ export function stanceFor(type: MonsterTypeId | undefined, kind: FigureKind): St
   return (type && MONSTER_TYPES[type].stance) || stanceOfKind(kind);
 }
 
+/** What a body is made of: heroes and the creature rigs have no style of their own (bone is the default of the pose). */
+export function styleFor(type: MonsterTypeId | undefined, kind: FigureKind): BodyStyle {
+  return isHero(kind) || CREATURES.has(kind) ? 'bone' : bodyStyleOf(type);
+}
+
+/** The pose of a monster type in an animation: its body, its stance and its style together. */
+export function poseForType(id: MonsterTypeId, anim: AnimName, t: number): Pose {
+  const body = MONSTER_TYPES[id].body;
+  return poseFor(body, anim, t, stanceFor(id, body), styleFor(id, body));
+}
+
 /** Pose for an animation at normalised time `t` (walk/idle loop 0..1; attack and death run 0..1). */
 export function poseFor(
   kind: FigureKind,
   anim: AnimName,
   t: number,
   stance: Stance = stanceOfKind(kind),
+  style: BodyStyle = 'bone',
 ): Pose {
   const p: Pose = {
     bob: 0,
@@ -113,6 +134,7 @@ export function poseFor(
     rot: 0,
     scatter: 0,
     charge: 0,
+    fade: 0,
   };
   const TAU = Math.PI * 2;
   switch (anim) {
@@ -123,6 +145,14 @@ export function poseFor(
       p.head = Math.sin(t * TAU + 1) * 0.05;
       p.legA = 0.08;
       p.legB = -0.08;
+      if (style === 'spectre') {
+        // Hangs in the air: a slow bob, the arms drifting, the tail swaying (legA is the sway of a body with no legs).
+        p.bob = Math.sin(t * TAU) * 1.6;
+        p.armA = 0.4 + Math.sin(t * TAU) * 0.15;
+        p.armB = -0.4 - Math.sin(t * TAU) * 0.15;
+        p.legA = Math.sin(t * TAU) * 0.35;
+        p.legB = 0;
+      }
       break;
     }
     case 'walk': {
@@ -135,6 +165,23 @@ export function poseFor(
       p.lean = 1;
       p.weapon = 0.3 + s * 0.15;
       p.head = Math.sin(t * TAU * 2) * 0.04;
+      if (style === 'flesh') {
+        // A living body: a shorter bounce, arms that hang and swing less, a head that rolls with the step.
+        p.bob = -Math.abs(Math.cos(t * TAU)) * 1.5;
+        p.armA = -s * 0.4;
+        p.armB = s * 0.4;
+        p.lean = 1.4;
+        p.head = Math.sin(t * TAU * 2) * 0.07;
+      } else if (style === 'spectre') {
+        // Glides: no steps, a float that rises and sinks once a cycle, the tail streaming behind.
+        p.legA = s * 0.6;
+        p.legB = 0;
+        p.bob = Math.sin(t * TAU) * 1.8;
+        p.armA = -0.5 + s * 0.2;
+        p.armB = 0.5 - s * 0.2;
+        p.lean = 2.2;
+        p.head = 0;
+      }
       break;
     }
     case 'attack': {
@@ -152,6 +199,18 @@ export function poseFor(
         p.legB = -0.35;
         p.armA = lerp(p.armA, 0.25, rec);
         p.armB = lerp(p.armB, -0.25, rec);
+      } else if (stance === 'throw') {
+        // Overhand: the arm goes back and up, then over, with the weight thrown forward.
+        p.armA = lerp(0.2, -2.7, wind) * (1 - strike) + 1.7 * strike;
+        p.armB = lerp(-0.2, 0.7, wind) * (1 - strike) - 0.4 * strike;
+        p.weapon = 0.2;
+        p.lean = lerp(0, -2.5, wind) * (1 - strike) + 4 * strike;
+        p.legA = 0.3 * strike;
+        p.legB = -0.2 * strike;
+        p.bob = -wind * 1.2 * (1 - strike);
+        p.armA = lerp(p.armA, 0.25, rec);
+        p.lean = lerp(p.lean, 0, rec);
+        p.charge = wind * (1 - strike);
       } else if (stance === 'cast') {
         p.charge = wind * (1 - rec * 0.5);
         p.armA = lerp(0.2, -1.9, wind) * (1 - strike) + 1.35 * strike;
@@ -200,6 +259,14 @@ export function poseFor(
       p.legB = -0.2 * e;
       p.head = e * 0.6;
       p.lean = -e * 3;
+      if (style === 'flesh') p.scatter = 0;
+      else if (style === 'spectre') {
+        // Unravels: the pieces drift apart and shrink, and nothing is left on the floor.
+        p.rot = -e * 0.5;
+        p.bob = e * 2;
+        p.fade = ease(clamp01((t - 0.15) / 0.85));
+        p.scatter = p.fade;
+      }
       break;
     }
   }
@@ -215,6 +282,9 @@ const cap = (b: B, x1: number, y1: number, x2: number, y2: number, r: number, ro
   b.prims.push({ k: 'cap', x1, y1, x2, y2, r, role });
 const box = (b: B, x: number, y: number, w: number, h: number, rot: number, role: Role) =>
   b.prims.push({ k: 'box', x, y, w, h, rot, role });
+
+const tri = (b: B, pts: [number, number, number, number, number, number], role: Role) =>
+  b.prims.push({ k: 'tri', pts, role });
 
 /** Two-segment limb from (x, y): angle a for the upper part, b for the lower. Returns the end point. */
 function limb(
@@ -612,6 +682,8 @@ function buildCreature(kind: FigureKind, pose: Pose): Prim[] {
  */
 export function buildFigure(kind: FigureKind, pose: Pose, type?: MonsterTypeId, t = 0): Prim[] {
   if (CREATURES.has(kind)) return finish(buildCreature(kind, pose), BUILDS[kind].scale, pose);
+  const style = styleFor(type, kind);
+  if (style !== 'bone') return buildLiving(kind, pose, type, t, style);
   const B_ = BUILDS[kind];
   const b: B = { prims: [] };
   const hero = isHero(kind);
@@ -764,9 +836,231 @@ export function buildFigure(kind: FigureKind, pose: Pose, type?: MonsterTypeId, 
   return finish(b.prims, B_.scale * (adj.scale ?? 1), pose);
 }
 
+/**
+ * A body that is not a skeleton (docs/ROSTER.md 4.1): a person of flesh in a garment, or a spectre with no legs. It stands
+ * on the same posed skeleton of limbs as the bone body (so every pose, gait and attack works), but is built of other
+ * things: a solid torso in the garb of its faction, a head with a face or a hood, no ribs, no skull.
+ */
+function buildLiving(
+  kind: FigureKind,
+  pose: Pose,
+  type: MonsterTypeId | undefined,
+  t: number,
+  style: BodyStyle,
+): Prim[] {
+  const B_ = BUILDS[kind];
+  const b: B = { prims: [] };
+  const adj = kitAdjust(type);
+  const g = garbOf(type);
+  const spectre = style === 'spectre';
+  const hipY = (spectre ? -B_.legLen * 1.5 : -B_.legLen * 2) + pose.bob;
+  const hipX = 0;
+  const shY = hipY - B_.torsoH + (adj.hunch ?? 0);
+  const shX = pose.lean + (adj.hunch ?? 0) * 0.5;
+  const reach = spectre ? (g.reach ?? 9) : 7;
+  const armR = spectre ? 1.1 : 1.5;
+  const sway = pose.legA * 4;
+  const tail = g.tail ?? 1;
+  // Behind the body: the far leg, or a spectre's trailing cloak, and the far arm.
+  if (spectre) {
+    tri(b, [shX - 5, shY + 2, shX + 5, shY + 2, hipX - 13 * tail - sway, -1], 'clothShade');
+  } else {
+    const footB = limb(
+      b,
+      hipX - 2,
+      hipY,
+      pose.legB,
+      pose.legB * 0.4 - 0.1,
+      B_.legLen,
+      B_.legLen,
+      1.8,
+      g.legsShade,
+      g.legsShade,
+    );
+    circ(b, footB.x + 1.5, footB.y, 1.9, g.foot);
+  }
+  limb(
+    b,
+    shX - B_.shoulder * 0.55,
+    shY + 2,
+    pose.armB,
+    pose.armB + 0.5,
+    reach,
+    reach,
+    armR,
+    g.arms,
+    g.hands,
+  );
+  // The body.
+  if (spectre) {
+    // A robe that narrows to a point under the hip.
+    tri(
+      b,
+      [
+        shX - B_.ribW * 1.15,
+        shY + 1,
+        shX + B_.ribW * 1.15,
+        shY + 1,
+        hipX - 2 - sway * 0.6,
+        hipY + B_.legLen * (1.2 - (tail < 1 ? 0.5 : 0)),
+      ],
+      g.torso,
+    );
+    tri(
+      b,
+      [
+        shX - B_.ribW * 0.5,
+        shY + 3,
+        shX + B_.ribW * 0.9,
+        shY + 3,
+        hipX - 1 - sway * 0.6,
+        hipY + B_.legLen * 0.9,
+      ],
+      g.torsoShade,
+    );
+    box(b, shX, shY + 1.5, B_.ribW * 2.4, 3.5, 0, g.torsoShade);
+  } else {
+    // A torso that narrows from the shoulders to the waist, two triangles between them.
+    const wS = B_.ribW * 0.95;
+    const wH = B_.ribW * 0.8;
+    cap(b, shX, shY, hipX, hipY, 2.2, g.torsoShade);
+    tri(b, [shX - wS, shY + 1, shX + wS, shY + 1, hipX + wH, hipY], g.torso);
+    tri(b, [shX - wS, shY + 1, hipX + wH, hipY, hipX - wH, hipY], g.torso);
+    box(b, hipX, hipY + 1, wH * 2.1, 3, 0, 'dark');
+    box(b, shX, shY + 1, wS * 2.2, 3.5, 0, g.torsoShade);
+    if (g.plate) {
+      circ(b, shX - B_.shoulder * 0.9, shY + 2, 3.6, 'metal');
+      circ(b, shX + B_.shoulder * 0.9, shY + 2, 3.6, 'metal');
+      box(b, (hipX + shX) / 2, (hipY + shY) / 2 + 2, B_.ribW * 1.4, 2, 0, 'accent');
+    }
+    // The near leg, then a skirt or coat that hides the legs.
+    const footA = limb(
+      b,
+      hipX + 2,
+      hipY,
+      pose.legA,
+      pose.legA * 0.4 - 0.1,
+      B_.legLen,
+      B_.legLen,
+      1.9,
+      g.legs,
+      g.legsShade,
+    );
+    circ(b, footA.x + 1.8, footA.y, 2.1, g.foot);
+    if (g.skirt) {
+      const sw = pose.legA * 2.5;
+      const w0 = B_.ribW;
+      const w1 = B_.ribW * 1.9;
+      const hem = -(g.hem ?? 1);
+      tri(b, [hipX - w0, hipY - 1, hipX + w0, hipY - 1, hipX - w1 + sw, hem], g.skirt);
+      tri(b, [hipX + w0, hipY - 1, hipX + w1 + sw, hem, hipX - w1 + sw, hem], g.skirt);
+      box(b, hipX + sw, hem - 0.6, w1 * 2, 1.6, 0, g.torsoShade);
+    }
+  }
+  // The head.
+  const hx = shX + pose.head * 6 + 1;
+  const hy = shY - B_.skull - 1.5;
+  if (spectre) {
+    tri(
+      b,
+      [
+        hx - B_.skull * 0.8,
+        hy - B_.skull * 0.5,
+        hx - B_.skull * 2.1 - sway * 0.3,
+        hy + B_.skull * 1.3,
+        hx - B_.skull * 0.1,
+        hy + B_.skull * 0.9,
+      ],
+      'clothShade',
+    );
+    if (g.streaming) {
+      // Bare-headed, with hair that streams out behind.
+      for (const d of [-1, 0, 1])
+        tri(
+          b,
+          [
+            hx - B_.skull * 0.4,
+            hy - B_.skull * 0.8 + d * 2,
+            hx - B_.skull * 3.2 - sway * 0.5,
+            hy + d * 5 + 3,
+            hx - B_.skull * 0.2,
+            hy + B_.skull * 0.8 + d * 2,
+          ],
+          'clothShade',
+        );
+      circ(b, hx, hy, B_.skull, 'bone');
+      circ(b, hx + 1.2, hy + 0.3, B_.skull * 0.55, 'dark');
+    } else {
+      circ(b, hx, hy, B_.skull * 1.12, 'clothShade');
+      if (g.point)
+        tri(
+          b,
+          [
+            hx - B_.skull * 0.9,
+            hy - B_.skull * 0.3,
+            hx - B_.skull * 0.3,
+            hy - B_.skull * 2.6,
+            hx + B_.skull * 0.9,
+            hy - B_.skull * 0.4,
+          ],
+          'clothShade',
+        );
+      circ(b, hx + 1.2, hy + 0.3, B_.skull * 0.78, 'dark');
+    }
+    circ(b, hx + 0.2, hy - 0.2, 1.1, 'eye');
+    circ(b, hx + 3.2, hy - 0.2, 1.1, 'eye');
+  } else {
+    cap(b, shX, shY + 1, hx, hy + B_.skull * 0.8, 2.3, 'skin');
+    circ(b, hx, hy, B_.skull, 'skin');
+    circ(b, hx + B_.skull * 0.95, hy + 1, 1.3, 'skin');
+    const eye: Role = g.glowEyes ? 'eye' : 'dark';
+    circ(b, hx + 1.4, hy - 0.5, g.glowEyes ? 1.1 : 0.9, eye);
+    circ(b, hx + 3.8, hy - 0.5, g.glowEyes ? 1.1 : 0.9, eye);
+    box(b, hx + 2.4, hy + B_.skull * 0.55, 2.8, 0.9, 0, 'dark');
+    if (g.hair) box(b, hx - 0.5, hy - B_.skull * 0.7, B_.skull * 1.9, 2.6, 0, g.hair);
+  }
+  // The near arm and what it holds.
+  const hand = limb(
+    b,
+    shX + B_.shoulder * 0.55,
+    shY + 2,
+    pose.armA,
+    pose.armA + 0.4,
+    reach,
+    reach,
+    armR * 1.07,
+    g.arms,
+    g.hands,
+  );
+  const wAng = pose.armA + pose.weapon - Math.PI / 2 + 0.3;
+  const held = type && type in HELD ? HELD[type] : kind;
+  if (!spectre && held)
+    weapon(b, held, hand.x, hand.y, isRanged(held) ? 0 : wAng, pose.charge, shX - B_.shoulder, shY);
+  if (type) {
+    const a: Anchors = {
+      hx,
+      hy,
+      skull: B_.skull,
+      shX,
+      shY,
+      hipX,
+      hipY,
+      hand,
+      wAng,
+      legLen: B_.legLen,
+      swing: pose.legA,
+      t,
+    };
+    b.prims.unshift(...kitBack(type, a));
+    b.prims.push(...kitFront(type, a));
+  }
+  return finish(b.prims, B_.scale * (adj.scale ?? 1), pose);
+}
+
 /** Apply scale, rotation and scatter to a built figure. */
 function finish(prims: Prim[], s: number, pose: Pose): Prim[] {
   const out: Prim[] = [];
+  s *= 1 - 0.85 * pose.fade;
   const rc = Math.cos(pose.rot);
   const rs = Math.sin(pose.rot);
   const tx = (x: number, y: number, i: number): [number, number] => {

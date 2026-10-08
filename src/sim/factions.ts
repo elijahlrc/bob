@@ -1,7 +1,7 @@
 import { scaleOf, type MonsterSpec } from '../calc/monster';
 import { HEX_IDS, hexEffect, type HexId } from '../data/hexes';
 import { PYLON_RANGE } from '../data/abilities';
-import { MONSTER_TYPES } from '../data/monsters';
+import { MONSTER_TYPES, leavesBody } from '../data/monsters';
 import { monsterHitOf, rawHit } from './combat';
 import { monsterHexesPlayer } from './hexes';
 import type { Actor, GroundEffect, World } from './types';
@@ -190,7 +190,7 @@ function caughtInBlast(w: World, a: Actor): boolean {
 
 /** A dead monster may leave a corpse: not if it shattered frozen, burned away ignited, or was blown up. */
 function leaveCorpse(w: World, a: Actor): void {
-  if (!a.mon || a.risen || a.dummy) return;
+  if (!a.mon || a.risen || a.dummy || !leavesBody(a.mon.spec.type)) return;
   if (a.ail.freezeT > 0 || a.ail.ignites.length > 0 || caughtInBlast(w, a)) return;
   w.corpses.push({
     id: a.id,

@@ -10,6 +10,7 @@ import {
   isHero,
   poseFor,
   stanceFor,
+  styleFor,
   type AnimName,
   type FigureKind,
   type Prim,
@@ -254,7 +255,7 @@ export function rasterFigure(
   const pal = isHero(kind) ? heroPalette(accent) : look ? monsterPalette(look) : UNDEAD;
   const prims = buildFigure(
     kind,
-    poseFor(kind, anim, t, stanceFor(look?.type, kind)),
+    poseFor(kind, anim, t, stanceFor(look?.type, kind), styleFor(look?.type, kind)),
     look?.type,
     t,
   );

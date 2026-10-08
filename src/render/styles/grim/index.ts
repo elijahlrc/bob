@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { Rng } from '../../../core/rng';
-import { factionOfSpec } from '../../../data/monsters';
+import { factionOfSpec, leavesBody } from '../../../data/monsters';
 import type {
   Actor,
   Chest,
@@ -631,6 +631,7 @@ export class GrimStyle extends StyleBase {
         accent,
         variant,
         ghost: !!a.mon && factionOfSpec(a.mon.spec) === 'hollow',
+        noCorpse: !!a.mon && !leavesBody(a.mon.spec.type),
       },
     };
   }
@@ -694,9 +695,13 @@ export class GrimStyle extends StyleBase {
     }
     // Corpse lifetime: stay down for a while, then fade out.
     if (!a.alive) {
-      if (t.deathT > 7) d.sprite.setAlpha(Math.max(0, 1 - (t.deathT - 7) / 2));
+      // A body that leaves nothing (a spectre) is gone as soon as it has unravelled.
+      const fadeFrom = d.noCorpse ? 0.45 : 7;
+      const life = d.noCorpse ? 0.9 : 9;
+      if (t.deathT > fadeFrom)
+        d.sprite.setAlpha(Math.max(0, 1 - (t.deathT - fadeFrom) / (life - fadeFrom)));
       d.sprite.setDepth(900 + py);
-      if (t.deathT > 9) {
+      if (t.deathT > life) {
         d.sprite.destroy();
         d.shadow.destroy();
         d.ring?.destroy();

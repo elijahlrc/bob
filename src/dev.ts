@@ -1,5 +1,7 @@
 import type Phaser from 'phaser';
 import { Rng } from './core/rng';
+import { MONSTER_TYPES, type MonsterTypeId } from './data/monsters';
+import { spawnMonster } from './sim/world';
 import { ITEM_BASES } from './data/bases';
 import type { InventoryItem } from './data/types';
 import { rollFlask, rollGem, rollItemOf } from './gen/loot';
@@ -64,6 +66,40 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
       controller.setSpeed(1);
       await dev.step(40);
       return n;
+    },
+    /**
+     * Put one of each of the monster types in `ids` in front of a frozen, deathless character, to look at them in the
+     * real renderer (docs/ROSTER.md 4.5). They stand still by default; with `fight` they walk up and attack.
+     */
+    async monsters(
+      ids: MonsterTypeId[] = Object.keys(MONSTER_TYPES) as MonsterTypeId[],
+      opts: { level?: number; fight?: boolean; warm?: number; cols?: number } = {},
+    ): Promise<number> {
+      controller.startShowcase(false);
+      controller.setSpeed(1);
+      await dev.step(5);
+      const w = controller.world;
+      if (!w) return 0;
+      w.opts.godMode = true;
+      w.player.stunT = 1e9;
+      for (const a of w.actors) if (!a.isPlayer) a.alive = false;
+      const cols = opts.cols ?? 4;
+      ids.forEach((id, i) => {
+        const x = w.player.x + 3 + (i % cols) * 1.9;
+        const y = w.player.y - 3 + Math.floor(i / cols) * 2.4;
+        const spec = {
+          type: id,
+          variant: 'none' as const,
+          rarity: 'normal' as const,
+          level: opts.level ?? 30,
+          mods: [],
+        };
+        const m = spawnMonster(w, spec, x, y, 0, 0, MONSTER_TYPES[id].name);
+        if (opts.fight) m.state = 'chase';
+        else m.dummy = true;
+      });
+      await dev.step(opts.warm ?? 10);
+      return ids.length;
     },
     /** Put `n` random items, gems and flasks in the camp inventory (for looking at the Items screen). */
     loot(n = 30, ilvl = 20): number {

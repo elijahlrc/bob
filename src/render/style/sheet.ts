@@ -1,6 +1,6 @@
 import { MONSTER_TYPES, type MonsterTypeId } from '../../data/monsters';
 import { monsterPalette } from '../styles/grim/paint';
-import { buildFigure, poseFor, stanceFor, type AnimName, type Prim, type Role } from './figure';
+import { buildFigure, poseForType, type AnimName, type Prim, type Role } from './figure';
 
 /**
  * A contact sheet of the monster roster (docs/ROSTER.md 4.5): every type drawn from the same primitives the game uses, as
@@ -24,16 +24,19 @@ export type SheetOpts = {
 const hex = (c: number[]) =>
   '#' + c.map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
 
+/** The dark edge the game paints round every figure. */
+const OUT = '#0a0809';
+
 function primSvg(p: Prim, fill: string): string {
   switch (p.k) {
     case 'circ':
-      return `<circle cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${p.r.toFixed(2)}" fill="${fill}"/>`;
+      return `<circle cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${p.r.toFixed(2)}" fill="${fill}" stroke="${OUT}" stroke-width="0.5"/>`;
     case 'cap':
       return `<line x1="${p.x1.toFixed(2)}" y1="${p.y1.toFixed(2)}" x2="${p.x2.toFixed(2)}" y2="${p.y2.toFixed(2)}" stroke="${fill}" stroke-width="${(p.r * 2).toFixed(2)}" stroke-linecap="round"/>`;
     case 'box':
-      return `<rect x="${(-p.w / 2).toFixed(2)}" y="${(-p.h / 2).toFixed(2)}" width="${p.w.toFixed(2)}" height="${p.h.toFixed(2)}" fill="${fill}" transform="translate(${p.x.toFixed(2)},${p.y.toFixed(2)}) rotate(${((p.rot * 180) / Math.PI).toFixed(2)})"/>`;
+      return `<rect x="${(-p.w / 2).toFixed(2)}" y="${(-p.h / 2).toFixed(2)}" width="${p.w.toFixed(2)}" height="${p.h.toFixed(2)}" fill="${fill}" stroke="${OUT}" stroke-width="0.5" transform="translate(${p.x.toFixed(2)},${p.y.toFixed(2)}) rotate(${((p.rot * 180) / Math.PI).toFixed(2)})"/>`;
     case 'tri':
-      return `<polygon points="${p.pts.map((n) => n.toFixed(2)).join(',')}" fill="${fill}"/>`;
+      return `<polygon points="${p.pts.map((n) => n.toFixed(2)).join(',')}" fill="${fill}" stroke="${OUT}" stroke-width="0.5"/>`;
   }
 }
 
@@ -41,7 +44,7 @@ function primSvg(p: Prim, fill: string): string {
 export function figureSvg(id: MonsterTypeId, anim: AnimName, t: number, mono: boolean): string {
   const def = MONSTER_TYPES[id];
   const pal = monsterPalette({ faction: def.faction, variant: 'none' });
-  const prims = buildFigure(def.body, poseFor(def.body, anim, t, stanceFor(id, def.body)), id, t);
+  const prims = buildFigure(def.body, poseForType(id, anim, t), id, t);
   return prims
     .map((p) => primSvg(p, mono ? '#e4e0d8' : hex(pal[p.role as Role] as unknown as number[])))
     .join('');

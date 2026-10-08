@@ -1,5 +1,5 @@
 import { MONSTER_TYPES, type MonsterTypeId } from '../../data/monsters';
-import { buildFigure, poseFor, stanceFor, type AnimName, type Prim } from './figure';
+import { buildFigure, poseForType, type AnimName, type Prim } from './figure';
 
 /**
  * Silhouettes (docs/ROSTER.md 4.5 and 8). The old "no two types share a silhouette" test compared the primitives as text,
@@ -108,9 +108,7 @@ const POSES: [AnimName, number][] = [
 /** The outline of a monster type in each pose (a normal monster, no rarity scale). */
 export function typeMasks(id: MonsterTypeId): Uint8Array[] {
   const body = MONSTER_TYPES[id].body;
-  return POSES.map(([anim, t]) =>
-    maskOf(buildFigure(body, poseFor(body, anim, t, stanceFor(id, body)), id, t)),
-  );
+  return POSES.map(([anim, t]) => maskOf(buildFigure(body, poseForType(id, anim, t), id, t)));
 }
 
 /** How alike two types look: the larger overlap of their outlines over the poses (1 is identical). */
