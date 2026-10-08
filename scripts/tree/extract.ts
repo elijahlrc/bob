@@ -89,6 +89,8 @@ export type RefNode = {
   group: number;
   /** Index into `sectors`: the class start nearest to the node's group. */
   sector: number;
+  /** How far from the middle of the tree the group is, 0 to 1 (no angle: the layout cannot be rebuilt from it). */
+  depth: number;
   /** Ids of the nodes it is linked to. */
   links: number[];
 };
@@ -103,11 +105,13 @@ type RawNode = {
   isJewelSocket?: boolean;
   ascendancyName?: string;
   isProxy?: boolean;
-  spc?: unknown[];
+  spc?: unknown[] | Record<string, number>;
   g: number;
   out?: Record<string, number> | number[];
   in?: Record<string, number> | number[];
 };
+
+const hasClass = (n: RawNode): boolean => !!n.spc && Object.keys(n.spc).length > 0;
 
 export function extract(luaPath: string): TreeRef {
   const raw = parseLua(readFileSync(luaPath, 'utf8')) as {
@@ -115,7 +119,7 @@ export function extract(luaPath: string): TreeRef {
     groups: Record<string, { x: number; y: number }>;
   };
   const all = Object.values(raw.nodes);
-  const starts = all.filter((n) => n.spc && n.spc.length > 0 && !n.ascendancyName);
+  const starts = all.filter((n) => hasClass(n) && !n.ascendancyName);
   const names = ['MARAUDER', 'RANGER', 'WITCH', 'DUELIST', 'TEMPLAR', 'SHADOW'];
   const startNodes = names.map((nm) =>
     starts.find((n) => n.dn === nm || (n.dn === 'SIX' && nm === 'SHADOW')),
@@ -137,10 +141,11 @@ export function extract(luaPath: string): TreeRef {
     return best;
   };
   const ids = (v: RawNode['out']): number[] => (v ? Object.values(v) : []);
+  const reach = Math.max(...Object.values(raw.groups).map((g) => Math.hypot(g.x, g.y)));
   const nodes: RefNode[] = [];
   for (const n of all) {
     if (n.ascendancyName || n.isProxy || n.m || n.isJewelSocket) continue;
-    if (n.spc && n.spc.length > 0) continue;
+    if (hasClass(n)) continue;
     const lines = n.sd ?? [];
     const kind = n.ks ? 'keystone' : n.not ? 'notable' : 'small';
     nodes.push({
@@ -150,6 +155,7 @@ export function extract(luaPath: string): TreeRef {
       lines,
       group: n.g,
       sector: sectorOf(n.g),
+      depth: Math.round((Math.hypot(raw.groups[n.g].x, raw.groups[n.g].y) / reach) * 1000) / 1000,
       links: [...new Set([...ids(n.out), ...ids(n.in)])].sort((a, b) => a - b),
     });
   }

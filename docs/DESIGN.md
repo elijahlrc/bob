@@ -480,17 +480,18 @@ Never weaken this test to make it pass. Fix the formula mismatch.
 
 ### 9.1 Structure (full size)
 
-The tree is comparable in size to PoE's, so a character's 123 points (5.3) cover only about 10% of it, and builds
-must choose.
+The tree is comparable in size to PoE's, so a character's 123 points (5.3) cover only about 7% of it, and builds
+must choose. The sizes below are the 2026-10-07 targets of docs/TREE.md (the first version of this table had 21 keystones,
+130 notables and 1,250 to 1,350 nodes).
 
 | Node kind                  | Target count    | Notes                                                                                    |
 | -------------------------- | --------------- | ---------------------------------------------------------------------------------------- |
 | Class starts               | 6               | —                                                                                        |
-| Keystones                  | 21              | Section 9.4                                                                              |
-| Notables                   | ~130            | Unique names. At most 3 notables share the same mod set (with different values allowed). |
-| Small passives in clusters | ~800            | Repeat the cluster's theme at about 1/3 of the notable's main stat                       |
-| Travel / attribute nodes   | ~350            | +10 to one attribute, or a minor generic stat                                            |
-| **Total**                  | **1,250–1,350** |                                                                                          |
+| Keystones                  | 27              | Section 9.4                                                                              |
+| Notables                   | ~370            | Unique names. At most 4 notables share the same mod set (with different values allowed). |
+| Small passives in clusters | ~900            | Repeat the cluster's theme at about 1/3 of the notable's main stat                       |
+| Travel / attribute nodes   | ~950            | +10 to one attribute, or a minor generic stat                                            |
+| **Total**                  | **2,000–2,400** |                                                                                          |
 
 - **Layout:** the six class starts sit on an inner ring, in PoE order:
   - Mystic (Int) at the top;
@@ -527,14 +528,14 @@ At ~1,300 nodes, the tree is authored at the **cluster** level, never node by no
 
 ### 9.3 Tree invariants (tested)
 
-- The node count is 1,250–1,350 and the keystone count is 21.
+- The node count is 2,000–2,400 and the keystone count is 27.
 - The graph is connected, and every node is reachable from every class start.
 - No two nodes are closer than 40 units in layout space, and no edge passes through a node it isn't attached to.
 - Every cluster link references an existing cluster.
 - Each class start reaches at least **4 keystones within 40 points** and at least **15 notables within 30 points**.
 - All notable names are unique, and every name passes the IP deny-list test.
 
-### 9.4 Keystones (21)
+### 9.4 Keystones (27: the 21 below, and the six of docs/TREE.md: Nimble Gambit, Spellslip, Volatile Servants, Idle Hands, Sigil Warden, Lone Vow)
 
 | Name (ours)         | Effect                                                                                                   | PoE analogue          |
 | ------------------- | -------------------------------------------------------------------------------------------------------- | --------------------- |

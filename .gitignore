@@ -27,3 +27,4 @@ Thumbs.db
 # Draft entries awaiting review (scripts/coverage/draft.ts)
 scripts/coverage/staging/
 scripts/coverage/_*
+scripts/tree/staging/

@@ -316,6 +316,9 @@ TAG_TEXT.aura = 'with Auras';
 // ---- Added by the coverage plan (C2): the buff layer, impale, culling and the new tags -------------
 
 Object.assign(STAT_TEXT, {
+  minionInstability: { flag: 'Minions burst when they fall to low life' },
+  idleHands: { flag: 'You deal no damage with your own skills' },
+  loneVow: { flag: 'Only your first aura is active, and it reserves nothing' },
   dotMulti: { base: '{v}% to the Damage over Time Multiplier' },
   'bleed.speed': { name: 'speed at which Bleeding deals its damage' },
   'poison.speed': { name: 'speed at which Poison deals its damage' },

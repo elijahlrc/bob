@@ -8,7 +8,7 @@ import type { Tree, TreeNode, TreeNodeKind } from './types';
 export const MIN_NODE_DIST = 40;
 /** A node closer than this to an edge it is not part of counts as "on" the edge. */
 export const EDGE_CLEARANCE = 22;
-const TRAVEL_SPACING = 92;
+const TRAVEL_SPACING = 110;
 const WHEEL_RADIUS = 100;
 const CHAIN_STEP = 70;
 const SPUR_STEP = 65;
@@ -68,7 +68,9 @@ function layoutCluster(b: Builder, c: ClusterSpec): number[] {
   const ty = ux;
   const theme = THEMES[c.theme];
   if (!theme) throw new Error(`unknown theme ${c.theme}`);
-  const small = () => theme.small.map((m) => ({ ...m }));
+  const smallMods = c.gen ? c.gen.small.mods : theme.small;
+  const smallName = c.gen ? c.gen.small.name : theme.smallName;
+  const small = () => smallMods.map((m) => ({ ...m }));
   const smalls: number[] = [];
   const n = c.smallCount;
   const finalNode = (x: number, y: number): number => {
@@ -84,6 +86,16 @@ function layoutCluster(b: Builder, c: ClusterSpec): number[] {
         c.id,
       );
     }
+    if (c.gen)
+      return addNode(
+        b,
+        'notable',
+        c.gen.notable.name,
+        c.gen.notable.mods.map((m) => ({ ...m })),
+        x,
+        y,
+        c.id,
+      );
     return addNode(b, 'notable', c.notable!.name, theme.notable(c.notable!.strength), x, y, c.id);
   };
   switch (c.kind) {
@@ -94,7 +106,7 @@ function layoutCluster(b: Builder, c: ClusterSpec): number[] {
           addNode(
             b,
             'small',
-            theme.smallName,
+            smallName,
             small(),
             cx + WHEEL_RADIUS * Math.cos(th),
             cy + WHEEL_RADIUS * Math.sin(th),
@@ -110,7 +122,7 @@ function layoutCluster(b: Builder, c: ClusterSpec): number[] {
     case 'chain': {
       for (let i = 0; i < n; i++) {
         const o = (i - (n - 1) / 2) * CHAIN_STEP;
-        smalls.push(addNode(b, 'small', theme.smallName, small(), cx + tx * o, cy + ty * o, c.id));
+        smalls.push(addNode(b, 'small', smallName, small(), cx + tx * o, cy + ty * o, c.id));
         if (i > 0) link(b, smalls[i - 1], smalls[i]);
       }
       const nb = finalNode(cx + ux * 80, cy + uy * 80);
@@ -122,7 +134,7 @@ function layoutCluster(b: Builder, c: ClusterSpec): number[] {
       const start = c.kind === 'spur' ? -SPUR_STEP : -40;
       for (let i = 0; i < n; i++) {
         const o = start + i * SPUR_STEP;
-        smalls.push(addNode(b, 'small', theme.smallName, small(), cx + ux * o, cy + uy * o, c.id));
+        smalls.push(addNode(b, 'small', smallName, small(), cx + ux * o, cy + uy * o, c.id));
         if (i > 0) link(b, smalls[i - 1], smalls[i]);
       }
       const o = start + n * SPUR_STEP + (c.kind === 'keystone' ? 10 : 0);

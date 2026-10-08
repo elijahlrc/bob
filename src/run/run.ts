@@ -22,7 +22,7 @@ import { flaskMask } from '../sim/combat';
 import type { DeathRecap, WorldOpts } from '../sim/types';
 import type { MapResult } from '../sim/runMap';
 
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 export const TOTAL_MAPS = 100;
 
 export type MapRecord = {

@@ -1,4 +1,6 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { bare } from '../../../scripts/coverage/reference';
 import { CLASSES } from '../classes';
 import { buildTree, EDGE_CLEARANCE, MIN_NODE_DIST, segDist } from './build';
 import { KEYSTONES } from './keystones';
@@ -21,10 +23,10 @@ function bfs(start: number): number[] {
 }
 
 describe('passive tree invariants (§9.3)', () => {
-  it('has 1,250–1,350 nodes and exactly 21 keystones', () => {
-    expect(nodes.length).toBeGreaterThanOrEqual(1250);
-    expect(nodes.length).toBeLessThanOrEqual(1350);
-    expect(nodes.filter((n) => n.kind === 'keystone')).toHaveLength(21);
+  it('has 2,000–2,400 nodes and exactly 27 keystones (docs/TREE.md)', () => {
+    expect(nodes.length).toBeGreaterThanOrEqual(2000);
+    expect(nodes.length).toBeLessThanOrEqual(2400);
+    expect(nodes.filter((n) => n.kind === 'keystone')).toHaveLength(27);
     const ksNames = nodes
       .filter((n) => n.kind === 'keystone')
       .map((n) => n.name)
@@ -32,10 +34,10 @@ describe('passive tree invariants (§9.3)', () => {
     expect(ksNames).toEqual(KEYSTONES.map((k) => k.name).sort());
   });
 
-  it('has about 130 notables', () => {
+  it('has about 370 notables', () => {
     const n = nodes.filter((x) => x.kind === 'notable').length;
-    expect(n).toBeGreaterThanOrEqual(120);
-    expect(n).toBeLessThanOrEqual(145);
+    expect(n).toBeGreaterThanOrEqual(330);
+    expect(n).toBeLessThanOrEqual(400);
   });
 
   it('is connected: every node is reachable from every class start', () => {
@@ -90,7 +92,7 @@ describe('passive tree invariants (§9.3)', () => {
     }
   });
 
-  it('notable names are unique and at most 3 notables share a mod set', () => {
+  it('notable names are unique and at most 4 notables share a mod set', () => {
     const notables = nodes.filter((n) => n.kind === 'notable');
     const names = notables.map((n) => n.name);
     expect(new Set(names).size).toBe(names.length);
@@ -101,7 +103,19 @@ describe('passive tree invariants (§9.3)', () => {
         .join(';');
     const counts = new Map<string, number>();
     for (const n of notables) counts.set(sig(n), (counts.get(sig(n)) ?? 0) + 1);
-    for (const [s, c] of counts) expect(c, s).toBeLessThanOrEqual(3);
+    for (const [s, c] of counts) expect(c, s).toBeLessThanOrEqual(4);
+  });
+
+  it('no notable or keystone is named like a passive of the reference tree (docs/tree/pob-tree.json)', () => {
+    const ref = JSON.parse(
+      readFileSync(new URL('../../../docs/tree/pob-tree.json', import.meta.url), 'utf8'),
+    ) as { nodes: { name: string; kind: string }[] };
+    const denied = new Set(ref.nodes.filter((n) => n.kind !== 'small').map((n) => bare(n.name)));
+    const bad = nodes
+      .filter((n) => n.kind === 'notable' || n.kind === 'keystone')
+      .filter((n) => denied.has(bare(n.name)))
+      .map((n) => n.name);
+    expect(bad).toEqual([]);
   });
 
   it('is deterministic and pinned (snapshot)', () => {

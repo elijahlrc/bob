@@ -55,8 +55,10 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
   }
 
   const blockCap = BLOCK_CAP + db.sum('base', 'blockCap', ctx);
-  const blockAttack = clamp(db.sum('base', 'blockAttack', ctx), 0, blockCap) / 100;
-  const blockSpell = clamp(db.sum('base', 'blockSpell', ctx), 0, blockCap) / 100;
+  const blockAttack =
+    clamp(db.sum('base', 'blockAttack', ctx) * db.more('blockAttack', ctx), 0, blockCap) / 100;
+  const blockSpell =
+    clamp(db.sum('base', 'blockSpell', ctx) * db.more('blockSpell', ctx), 0, blockCap) / 100;
 
   const res: number[] = [];
   const maxRes: number[] = [];

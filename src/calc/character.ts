@@ -781,6 +781,8 @@ export class Character {
       if (a.usable && b)
         reservedMana += Math.ceil((b.reservePct / 100) * pre.maxMana * (1 - Math.min(0.95, red)));
     }
+    const loneVow = db0.flag('loneVow', ctx0);
+    let aurasOn = 0;
     for (const sg of this.gems) {
       if (sg.def.kind !== 'aura') continue;
       const def = sg.def;
@@ -791,8 +793,10 @@ export class Character {
         : levelValue(def.reserveFlat ?? 0, sg.level);
       // Global reduced reservation, plus any this gem's item gives its own socketed gems.
       const itemRed = socketedReservationReduction(build.equipment[sg.slot]!) / 100;
-      const r = Math.ceil(base * (1 - Math.min(0.95, red + itemRed)));
-      const active = (life ? reservedLife : reservedMana) + r <= pool;
+      // Lone Vow: the first aura stands, reserves nothing, and no other aura does.
+      const r = loneVow ? 0 : Math.ceil(base * (1 - Math.min(0.95, red + itemRed)));
+      const active = loneVow ? aurasOn === 0 : (life ? reservedLife : reservedMana) + r <= pool;
+      if (active) aurasOn++;
       if (active) {
         if (life) reservedLife += r;
         else reservedMana += r;

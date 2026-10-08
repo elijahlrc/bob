@@ -48,3 +48,24 @@ Every stat the tree grants must be read by the sheet or the sim, or the bot neve
 ## Status
 
 See the end of this file; each step is appended when it lands.
+
+### Step 1 and 2 done (2026-10-07): vocabulary, reference, generated clusters
+
+- **Reference** (`npm run tree:extract`): 369 notables, 28 keystones, 1,228 small nodes, with their lines, cluster (group) and
+  rough depth; no coordinates. `npm run tree:lines` measures what Bob can say: of 369 notables, 296 have every line mapped or
+  deliberately ignored (it was 99 before this pass); the rest lose their unmappable lines (listed by the diagnostic).
+- **Engine stats added**: attack skills as an ailment keyword (`attackSkill`), the damage over time multiplier (`dotMulti`),
+  bleed and poison speed, enemy physical reduction, double damage, shield defences, minion physical reduction and block, charge
+  duration, duration of deployables and timed minions (`skillDuration`), weapon-held conditions for two and one handed.
+  Ailment damage still ignores the hit-scaling tags and the weapon held (3.9): "damage with ailments while wielding a sword"
+  is a condition, not a tag.
+- **Generated clusters** (`npm run tree:emit`): one cluster per reference notable with an analog (357), made of its translated
+  lines and small nodes that repeat the cluster's own small-node theme, named by us (`docs/tree/names/<region>.json`, written
+  one region at a time and checked against every reference name). Hand-made extras remain: the twelve notables of the depth
+  expansion and the hub.
+- **Layout**: regions fill rings out from the middle by the depth the reference cluster had, sorted by family inside a ring;
+  ring count follows the number of clusters. 1,753 nodes, 376 notables (94 with a condition or a scaling, 316 with two or more
+  lines), 27 keystones.
+- **Keystones** added: Nimble Gambit, Spellslip, Volatile Servants (minions burst at low life), Idle Hands (no damage of your own
+  but one more totem), Sigil Warden, Lone Vow (one aura, no reservation).
+- `SAVE_VERSION` is 4; the invariants in `tree.test.ts` and DESIGN §9 carry the new sizes (and at most four notables share a mod set).

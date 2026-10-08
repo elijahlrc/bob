@@ -1,8 +1,10 @@
 /**
- * Passive tree spec (DESIGN.md §9.2), authored at the cluster level. Each region lists its
- * themes, keystones and notable names; `buildClusterSpecs` places clusters on a polar layout
- * of our own design and links them. `build.ts` turns clusters into nodes and travel paths.
+ * Passive tree spec (DESIGN.md §9.2, docs/TREE.md), authored at the cluster level. The generated clusters
+ * (clustersGen.ts) fill the rings of each region; `buildClusterSpecs` places them on a polar layout of our own design
+ * and links them. `build.ts` turns clusters into nodes and travel paths.
  */
+import { GEN_CLUSTERS } from './clustersGen';
+import type { GenCluster } from './types';
 
 export type RegionId = 'str' | 'strdex' | 'dex' | 'dexint' | 'int' | 'strint';
 export type Attr = 'str' | 'dex' | 'int';
@@ -14,9 +16,9 @@ export type RegionDef = {
   /** Centre angle of the region's sector, degrees (0 = right, 90 = down). */
   angle: number;
   attrs: Attr[];
-  themes: string[];
+  /** The theme of the small nodes that lead to a keystone. */
+  keystoneTheme: string;
   keystones: string[];
-  notables: string[];
 };
 
 export type ClusterSpec = {
@@ -26,9 +28,12 @@ export type ClusterSpec = {
   r: number;
   a: number;
   kind: ClusterKind;
+  /** A theme of notableThemes.ts: the small nodes (hub and keystone clusters) and the notable of a hand-made cluster. */
   theme: string;
   smallCount: number;
   notable?: { name: string; strength: number };
+  /** A generated cluster: its own notable and small nodes. */
+  gen?: GenCluster;
   keystone?: string;
   links: string[];
   attrs: Attr[];
@@ -40,251 +45,48 @@ export const REGIONS: RegionDef[] = [
     classId: 'mystic',
     angle: -90,
     attrs: ['int'],
-    themes: ['spell', 'es', 'mana', 'castSpeed', 'elemental', 'wand', 'reservation', 'esRecharge'],
-    keystones: ['mindBulwark', 'manaBastion', 'feverPitch'],
-    notables: [
-      'Candlewick Mind',
-      'Inkwell of Stars',
-      'Cold Library',
-      'Starlit Lattice',
-      'Sigil Weaver',
-      'Lantern Saint',
-      'Wellspring of Ash',
-      'Ember Syntax',
-      'Reliquary Halo',
-      'Quicksilver Tongue',
-      'Glyph and Gutter',
-      'Thousand Margins',
-      'Aether Lung',
-      'Vellum Skin',
-      'Whispering Chalk',
-      'Moth to Flame',
-      'Prism Scholar',
-      'Stillwater Focus',
-      'Echoing Vault',
-      'Hush of Embers',
-      'Owl-Eyed Vigil',
-      'Silver Thread Ward',
-      'Lamplighter',
-      'Scriptorium',
-    ],
+    keystoneTheme: 'spell',
+    keystones: ['mindBulwark', 'manaBastion', 'feverPitch', 'volatileServants'],
   },
   {
     id: 'dexint',
     classId: 'shade',
     angle: -30,
     attrs: ['dex', 'int'],
-    themes: [
-      'dagger',
-      'claw',
-      'poison',
-      'critChance',
-      'critMulti',
-      'esEvasion',
-      'chaos',
-      'lifeOnHit',
-    ],
-    keystones: ['cruelAgony', 'shadeLeech', 'hollowVessel'],
-    notables: [
-      'Nightshade Kiss',
-      'Needle and Thread',
-      'Witherbloom',
-      'Glass Fang',
-      'Cutthroat Arithmetic',
-      'Moonless Edge',
-      'Venom Ledger',
-      'Silent Tally',
-      'Black Orchid Tea',
-      'Mirrorshade Veil',
-      'Gutter Saint',
-      "Spider's Patience",
-      'Ratcatcher',
-      'Rust in the Wound',
-      'Ichor Drip',
-      'Velvet Garrote',
-      'Fading Silhouette',
-      'Bitter Almond',
-      'Sharp Intent',
-      'Grave Dust Tincture',
-      'Coil and Strike',
-      'Pale Hand',
-      'Smoke Mantle',
-      'Hemlock Waltz',
-    ],
+    keystoneTheme: 'dagger',
+    keystones: ['cruelAgony', 'shadeLeech', 'hollowVessel', 'spellslip'],
   },
   {
     id: 'dex',
     classId: 'strider',
     angle: 30,
     attrs: ['dex'],
-    themes: [
-      'bow',
-      'projectile',
-      'evasion',
-      'moveSpeed',
-      'bowCrit',
-      'flaskEffect',
-      'projSpeed',
-      'flaskCharges',
-    ],
-    keystones: ['closeQuarters', 'arrowWeave', 'steadyDraw'],
-    notables: [
-      "Fletcher's Patience",
-      'Windborne Shafts',
-      'Gloaming Step',
-      'Mothwing Dodge',
-      'Hawk Under Moon',
-      'Quiver of Teeth',
-      'Taut Sinew',
-      'Distant Thunder',
-      "Wayfarer's Draught",
-      'Brimming Gourd',
-      'Long Shadow Stride',
-      'Whistling Shot',
-      'Feather and Flint',
-      'Scattered Starlings',
-      'Ghostlight Aim',
-      'Thistledown Feet',
-      "Hunter's Moon Vigil",
-      'Skipping Stone',
-      'Dust Devil',
-      'Copse Runner',
-      'Bramble Hide',
-      'Hollow Reed Volley',
-      "Plover's Feint",
-      'Cork and Ember',
-    ],
+    keystoneTheme: 'bow',
+    keystones: ['closeQuarters', 'arrowWeave', 'steadyDraw', 'nimbleGambit'],
   },
   {
     id: 'strdex',
     classId: 'reaver',
     angle: 90,
     attrs: ['str', 'dex'],
-    themes: [
-      'sword',
-      'axe',
-      'attackSpeed',
-      'block',
-      'bleed',
-      'dualWield',
-      'accuracy',
-      'lifeLeech',
-      'stunAvoid',
-    ],
-    keystones: ['platedHide', 'woundDance', 'shieldwall'],
-    notables: [
-      'Twin Fangs of Ash',
-      'Riposte of Bone',
-      'Hacksaw Grin',
-      'Crimson Notch',
-      'Lacquered Buckler',
-      'Red Ledger',
-      'Edge Whisperer',
-      'Splinterguard',
-      'Feint and Fall',
-      'Hilt and Hollow',
-      "Woodsman's Ire",
-      'Gash Merchant',
-      'Swaying Reed',
-      'Nimble Ribs',
-      'Steelsong',
-      'Parry the Grave',
-      'Wolfsbane Edge',
-      'Ledger of Cuts',
-      "Butcher's Rhythm",
-      'Spurred Heel',
-      'Bloodlatch',
-      'Notched Tally',
-      'Sure Footing',
-      'Brass Knuckle Pact',
-    ],
+    keystoneTheme: 'sword',
+    keystones: ['platedHide', 'woundDance', 'shieldwall', 'loneVow'],
   },
   {
     id: 'str',
     classId: 'vanguard',
     angle: 150,
     attrs: ['str'],
-    themes: [
-      'lifePct',
-      'armour',
-      'twoHand',
-      'mace',
-      'lifeRegen',
-      'meleePhys',
-      'physReduction',
-      'stunThreshold',
-      'stunDuration',
-    ],
-    keystones: ['bloodRite', 'unerringDiscipline', 'rootedStance'],
-    notables: [
-      'Barrowheart',
-      'Cairnstone Hide',
-      'Marrowsteel Grip',
-      'Kneecap Breaker',
-      'Gravebound Vigor',
-      'Ossified Will',
-      'Ironbone Plating',
-      'Unbowed Spine',
-      'Rattled Skull',
-      "Tombwarden's Bulk",
-      'Hammerfall Rite',
-      'Slagblood',
-      'Anvil Chest',
-      'Mausoleum Wall',
-      'Thudding Cadence',
-      'Cracked Earth',
-      'Shattering Swing',
-      'Bonemeal Feast',
-      'Sepulchre Stance',
-      'Hearthstone Lungs',
-      'Grinding Molars',
-      'Bellows Breath',
-      "Quarryman's Back",
-      'Knuckles of the Barrow',
-    ],
+    keystoneTheme: 'lifePct',
+    keystones: ['bloodRite', 'unerringDiscipline', 'rootedStance', 'idleHands'],
   },
   {
     id: 'strint',
     classId: 'zealot',
     angle: 210,
     attrs: ['str', 'int'],
-    themes: [
-      'sceptre',
-      'staff',
-      'eleRes',
-      'auraEffect',
-      'ignite',
-      'armourEs',
-      'maxRes',
-      'fireDamage',
-    ],
-    keystones: ['searingAvatar', 'prismaticBalance', 'livingWard'],
-    notables: [
-      'Censer Bearer',
-      'Hymn of Cinders',
-      'Bellringer',
-      'Gilded Rebuke',
-      'Pyre Psalm',
-      'Vestment of Wardings',
-      'Choir of Ash',
-      'Crozier Guard',
-      'Absolution Flame',
-      "Saint's Ballast",
-      'Votive Kindling',
-      'Tolling Rite',
-      'Hallowed Brazier',
-      "Pilgrim's Plate",
-      'Litany of Shields',
-      'Cathedral Bones',
-      'Sunken Chapel',
-      'Reliquary Knight',
-      "Martyr's Spark",
-      'Font of Rebuke',
-      'Ossuary Choir',
-      'Catechism of Iron',
-      'Incense Smoke',
-      'Vigil Lantern',
-    ],
+    keystoneTheme: 'sceptre',
+    keystones: ['searingAvatar', 'prismaticBalance', 'livingWard', 'sigilWarden'],
   },
 ];
 
@@ -305,50 +107,111 @@ export const HUB = {
 /** Layout constants. */
 export const START_RADIUS = 800;
 export const HUB_RADIUS = 420;
-export const RING_RADII = [1150, 1450, 1750, 2050, 2350, 2650];
-export const RING_SLOTS = [2, 3, 4, 5, 5, 6];
-/** Keystone slots per region: [ring, slot]. */
-export const KEYSTONE_SLOTS: [number, number][] = [
-  [2, 0],
-  [3, 4],
-  [5, 2],
-];
+/** The first ring of a region, the gap between rings, and the arc a cluster needs along its ring (layout units). */
+const RING_START = 1150;
+const RING_STEP = 270;
+const SLOT_ARC = 300;
 const SECTOR = 60;
-const SPREAD = 0.84;
+/** The share of a region's sector its rings use; the rest is a gap between regions. */
+const SPREAD = 0.92;
 
-const SMALLS: Record<ClusterKind, number> = { wheel: 7, chain: 5, spur: 4, keystone: 2 };
+/**
+ * The hand-made notables of the depth expansion (EXPANSION 6.5): charge sources, hex strength and payoffs that need a
+ * condition. They sit among the generated clusters of their region.
+ */
+export const EXTRA_NOTABLES: { region: RegionId; name: string; theme: string }[] = [
+  { region: 'str', name: 'Bulwark of Habit', theme: 'gritBlock' },
+  { region: 'str', name: 'Stored Fortitude', theme: 'gritRegen' },
+  { region: 'strint', name: 'Deepened Stance', theme: 'maxGrit' },
+  { region: 'strint', name: 'Grudge Engine', theme: 'beenHit' },
+  { region: 'strdex', name: 'Feast of Frenzy', theme: 'fervourKill' },
+  { region: 'strdex', name: 'Red Gait', theme: 'whileLeeching' },
+  { region: 'dex', name: 'Quickened Heartbeat', theme: 'maxFervour' },
+  { region: 'dex', name: 'Cold Clarity', theme: 'insightCrit' },
+  { region: 'dexint', name: "Hexbinder's Tithe", theme: 'hexEffect' },
+  { region: 'dexint', name: 'Hunter of the Marked', theme: 'vsHexed' },
+  { region: 'int', name: 'Spite-Proof Skin', theme: 'curseWard' },
+  { region: 'int', name: 'Marrow Veil', theme: 'chaosEs' },
+];
+
+/** The order families sit in around a region: related ones side by side. */
+const FAMILY_ORDER = [
+  'life',
+  'armour',
+  'block',
+  'res',
+  'evasion',
+  'es',
+  'mana',
+  'attr',
+  'leech',
+  'stun',
+  'melee',
+  'attack',
+  'dmg.physical',
+  'accuracy',
+  'speed',
+  'crit',
+  'pen',
+  'projectile',
+  'ranged',
+  'dot',
+  'ailment',
+  'dmg.fire',
+  'dmg.cold',
+  'dmg.lightning',
+  'dmg.chaos',
+  'damage',
+  'spell',
+  'aoe',
+  'curse',
+  'aura',
+  'minion',
+  'totem',
+  'trap',
+  'mine',
+  'brand',
+  'channelling',
+  'warcry',
+  'charges',
+  'flask',
+  'misc',
+];
+const familyIndex = (f: string): number => {
+  const i = FAMILY_ORDER.indexOf(f);
+  return i < 0 ? FAMILY_ORDER.length : i;
+};
+
+/** How many clusters fit on ring `ring` of a region. */
+function ringSlots(ring: number): number {
+  const r = RING_START + ring * RING_STEP;
+  const arc = ((r * Math.PI) / 180) * SECTOR * SPREAD;
+  return Math.max(2, Math.floor(arc / SLOT_ARC));
+}
+const ringRadius = (ring: number): number => RING_START + ring * RING_STEP;
 
 function slotAngle(region: RegionDef, ring: number, slot: number): number {
-  const n = RING_SLOTS[ring];
+  const n = ringSlots(ring);
   const step = (SECTOR * SPREAD) / n;
   // Stagger alternate rings by a quarter step so links don't line up radially.
   const stagger = ring % 2 ? step * 0.25 : -step * 0.25;
   return region.angle + (slot - (n - 1) / 2) * step + stagger;
 }
 
-/**
- * The notables of the depth expansion (EXPANSION 6.5): the cluster that holds each, its theme and its name. They
- * replace the notable that would otherwise sit there, so the tree keeps its size.
- */
-export const NEW_NOTABLES: Record<string, { name: string; theme: string }> = {
-  str_2_2: { name: 'Bulwark of Habit', theme: 'gritBlock' },
-  str_4_1: { name: 'Stored Fortitude', theme: 'gritRegen' },
-  strint_4_1: { name: 'Deepened Stance', theme: 'maxGrit' },
-  strdex_2_1: { name: 'Feast of Frenzy', theme: 'fervourKill' },
-  dex_4_2: { name: 'Quickened Heartbeat', theme: 'maxFervour' },
-  dex_2_2: { name: 'Cold Clarity', theme: 'insightCrit' },
-  dexint_2_1: { name: "Hexbinder's Tithe", theme: 'hexEffect' },
-  int_4_2: { name: 'Spite-Proof Skin', theme: 'curseWard' },
-  int_2_1: { name: 'Marrow Veil', theme: 'chaosEs' },
-  dexint_4_3: { name: 'Hunter of the Marked', theme: 'vsHexed' },
-  strdex_4_3: { name: 'Red Gait', theme: 'whileLeeching' },
-  strint_2_2: { name: 'Grudge Engine', theme: 'beenHit' },
+const kindFor = (n: number): ClusterKind => (n >= 4 ? 'wheel' : n === 3 ? 'chain' : 'spur');
+
+type Pending = {
+  id: string;
+  family: string;
+  depth: number;
+  smallCount: number;
+  gen?: GenCluster;
+  extra?: { name: string; theme: string };
 };
 
 /** Generate the cluster list (deterministic). */
 export function buildClusterSpecs(): ClusterSpec[] {
   const out: ClusterSpec[] = [];
-  const kinds: ClusterKind[] = ['wheel', 'chain', 'spur', 'chain', 'wheel', 'spur'];
   // Hub: a centre wheel and one cluster per region between the start and the centre.
   out.push({
     id: 'hub_c',
@@ -357,7 +220,7 @@ export function buildClusterSpecs(): ClusterSpec[] {
     a: 0,
     kind: 'wheel',
     theme: HUB.themes[0],
-    smallCount: SMALLS.wheel,
+    smallCount: 7,
     notable: { name: HUB.notables[0], strength: 1 },
     links: [],
     attrs: ['str', 'dex', 'int'],
@@ -386,47 +249,82 @@ export function buildClusterSpecs(): ClusterSpec[] {
       a: reg.angle + 30,
       kind: 'keystone',
       theme: 'allAttr',
-      smallCount: SMALLS.keystone,
+      smallCount: 2,
       keystone: k,
       links: [`hub_${reg.id}`],
       attrs: reg.attrs,
     });
   });
   for (const reg of REGIONS) {
-    let notableIdx = 0;
-    let themeIdx = 0;
-    let kindIdx = 0;
+    const pending: Pending[] = [
+      ...GEN_CLUSTERS.filter((g) => g.region === reg.id).map((g) => ({
+        id: g.id,
+        family: g.family,
+        depth: g.depth,
+        smallCount: g.smallCount,
+        gen: g,
+      })),
+      ...EXTRA_NOTABLES.filter((e) => e.region === reg.id).map((e, i) => ({
+        id: `${reg.id}_x${i}`,
+        family: 'charges',
+        depth: 0.5 + 0.2 * i,
+        smallCount: 3,
+        extra: e,
+      })),
+    ].sort((a, b) => a.depth - b.depth || (a.id < b.id ? -1 : 1));
+    // Rings out to where every cluster and keystone has a slot.
+    let rings = 0;
+    for (let have = 0; have < pending.length + reg.keystones.length; rings++)
+      have += ringSlots(rings);
+    // Keystones sit towards the rim, one on each of the outer rings, in the middle of the ring.
+    const ksSlot = new Map<number, number>();
+    reg.keystones.forEach((_, k) => {
+      const ring = Math.max(2, rings - 1 - k * 2);
+      ksSlot.set(ring, Math.floor(ringSlots(ring) / 2));
+    });
+    const isKs = (ring: number, slot: number) => ksSlot.get(ring) === slot;
+    // Fill the rings from the middle out with clusters by depth; within a ring they sit by family.
+    let next = 0;
     let ksIdx = 0;
-    for (let ring = 0; ring < RING_RADII.length; ring++) {
-      for (let slot = 0; slot < RING_SLOTS[ring]; slot++) {
-        const id = `${reg.id}_${ring}_${slot}`;
-        const isKs = KEYSTONE_SLOTS.some(([kr, ks]) => kr === ring && ks === slot);
+    const ringIds: (string | null)[][] = [];
+    for (let ring = 0; ring < rings; ring++) {
+      const n = ringSlots(ring);
+      const free: number[] = [];
+      for (let slot = 0; slot < n; slot++) if (!isKs(ring, slot)) free.push(slot);
+      const take = pending.slice(next, next + free.length);
+      next += take.length;
+      take.sort((a, b) => familyIndex(a.family) - familyIndex(b.family) || a.depth - b.depth);
+      ringIds[ring] = new Array(n).fill(null);
+      for (let slot = 0; slot < n; slot++) {
         const a = slotAngle(reg, ring, slot);
+        const id = isKs(ring, slot) ? `${reg.id}_k${ring}` : (take[free.indexOf(slot)]?.id ?? null);
+        ringIds[ring][slot] = id;
+        if (!id) continue;
         // Inward link: nearest non-keystone slot on the previous ring (or the class start).
         const links: string[] = [];
         if (ring === 0) links.push(`start_${reg.id}`);
         else {
           let best = -1;
           let bd = Infinity;
-          for (let j = 0; j < RING_SLOTS[ring - 1]; j++) {
-            if (KEYSTONE_SLOTS.some(([kr, ks]) => kr === ring - 1 && ks === j)) continue;
+          for (let j = 0; j < ringSlots(ring - 1); j++) {
+            if (isKs(ring - 1, j) || !ringIds[ring - 1][j]) continue;
             const d = Math.abs(slotAngle(reg, ring - 1, j) - a);
             if (d < bd) {
               bd = d;
               best = j;
             }
           }
-          links.push(`${reg.id}_${ring - 1}_${best}`);
+          links.push(ringIds[ring - 1][best] as string);
         }
-        if (isKs) {
+        if (isKs(ring, slot)) {
           out.push({
             id,
             region: reg.id,
-            r: RING_RADII[ring],
+            r: ringRadius(ring),
             a,
             kind: 'keystone',
-            theme: reg.themes[0],
-            smallCount: SMALLS.keystone,
+            theme: reg.keystoneTheme,
+            smallCount: 2,
             keystone: reg.keystones[ksIdx++],
             links,
             attrs: reg.attrs,
@@ -434,47 +332,56 @@ export function buildClusterSpecs(): ClusterSpec[] {
           continue;
         }
         // Same-ring neighbour links on alternating pairs (skipping keystones).
-        const next = slot + 1;
-        if (
-          next < RING_SLOTS[ring] &&
-          (ring + slot) % 2 === 0 &&
-          !KEYSTONE_SLOTS.some(([kr, ks]) => kr === ring && ks === next)
-        )
-          links.push(`${reg.id}_${ring}_${next}`);
-        const kind = kinds[kindIdx++ % kinds.length];
-        out.push({
+        const nextSlot = slot + 1;
+        if (nextSlot < n && (ring + slot) % 2 === 0 && !isKs(ring, nextSlot))
+          links.push(`@${ring}:${nextSlot}`);
+        const p = take[free.indexOf(slot)];
+        const spec: ClusterSpec = {
           id,
           region: reg.id,
-          r: RING_RADII[ring],
+          r: ringRadius(ring),
           a,
-          kind,
-          theme: reg.themes[themeIdx++ % reg.themes.length],
-          smallCount: SMALLS[kind],
-          notable: {
-            name: reg.notables[notableIdx++],
-            strength: ring === RING_RADII.length - 1 ? 1.5 : 1,
-          },
+          kind: kindFor(p.smallCount),
+          theme: p.extra?.theme ?? reg.keystoneTheme,
+          smallCount: p.smallCount,
           links,
           attrs: reg.attrs,
-        });
+        };
+        if (p.gen) spec.gen = p.gen;
+        else spec.notable = { name: (p.extra as { name: string }).name, strength: 1 };
+        out.push(spec);
       }
     }
+    // Resolve the same-ring neighbour links to ids.
+    for (const c of out)
+      if (c.region === reg.id)
+        c.links = c.links
+          .map((l) => {
+            if (!l.startsWith('@')) return l;
+            const [ring, slot] = l.slice(1).split(':').map(Number);
+            return ringIds[ring]?.[slot] ?? '';
+          })
+          .filter(Boolean);
   }
-  for (const [id, n] of Object.entries(NEW_NOTABLES)) {
-    const c = out.find((x) => x.id === id);
-    if (!c || !c.notable) throw new Error(`no notable cluster ${id}`);
-    c.theme = n.theme;
-    c.notable.name = n.name;
-  }
-  // Cross-region links at sector boundaries on odd rings: last slot of a region ↔ first of the next.
+  // Cross-region links at sector boundaries on odd rings: the last slot of a region and the first of the next.
+  const find = (id: string | undefined) => out.find((c) => c.id === id);
   REGIONS.forEach((reg, i) => {
     const nextReg = REGIONS[(i + 1) % REGIONS.length];
-    for (const ring of [1, 3, 5]) {
-      const last = RING_SLOTS[ring] - 1;
-      const a = out.find((c) => c.id === `${reg.id}_${ring}_${last}`);
-      const bId = `${nextReg.id}_${ring}_0`;
-      const b = out.find((c) => c.id === bId);
-      if (a && b && a.kind !== 'keystone' && b.kind !== 'keystone') a.links.push(bId);
+    for (let ring = 1; ring < 10; ring += 2) {
+      const ringOf = (r: RegionDef, slot: 'first' | 'last') => {
+        const cands = out.filter(
+          (c) =>
+            c.region === r.id &&
+            c.kind !== 'keystone' &&
+            Math.round((c.r - RING_START) / RING_STEP) === ring,
+        );
+        if (!cands.length) return undefined;
+        cands.sort((a, b) => a.a - b.a);
+        return slot === 'first' ? cands[0] : cands[cands.length - 1];
+      };
+      const a = ringOf(reg, 'last');
+      const b = ringOf(nextReg, 'first');
+      if (a && b && find(a.id) && find(b.id)) a.links.push(b.id);
     }
   });
   return out;

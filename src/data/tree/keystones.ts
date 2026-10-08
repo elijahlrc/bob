@@ -1,6 +1,6 @@
 import { mod, type Mod } from '../../mods/types';
 
-/** DESIGN.md §9.4: the 21 keystones. */
+/** DESIGN.md §9.4 and docs/TREE.md: the keystones. */
 export type KeystoneDef = { id: string; name: string; mods: Mod[]; description: string };
 
 const ELE = ['fire', 'cold', 'lightning'] as ('fire' | 'cold' | 'lightning')[];
@@ -148,6 +148,54 @@ export const KEYSTONES: KeystoneDef[] = [
     name: 'Shieldwall',
     mods: [mod('blockCap', 'base', 10), mod('evasion', 'more', -30)],
     description: 'Block chance cap +10%. 30% less evasion rating.',
+  },
+  {
+    id: 'nimbleGambit',
+    name: 'Nimble Gambit',
+    mods: [
+      mod('dodgeAttack', 'base', 30),
+      mod('armour', 'more', -50),
+      mod('es', 'more', -30),
+      mod('blockAttack', 'more', -30),
+      mod('blockSpell', 'more', -30),
+    ],
+    description:
+      '30% chance to dodge attack hits. 50% less armour, 30% less energy shield, 30% less chance to block.',
+  },
+  {
+    id: 'spellslip',
+    name: 'Spellslip',
+    mods: [mod('dodgeSpell', 'base', 30)],
+    description: '30% chance to dodge spell hits.',
+  },
+  {
+    id: 'volatileServants',
+    name: 'Volatile Servants',
+    mods: [mod('minionInstability', 'flag', 1)],
+    description:
+      'Minions burst when they fall to low life, dealing a third of their maximum life as fire damage around them.',
+  },
+  {
+    id: 'idleHands',
+    name: 'Idle Hands',
+    mods: [mod('idleHands', 'flag', 1), mod('deployCount', 'base', 1, { tags: ['totem'] })],
+    description:
+      'You deal no damage with your own skills (totems, traps, mines, brands and minions still do). One more totem.',
+  },
+  {
+    id: 'sigilWarden',
+    name: 'Sigil Warden',
+    mods: [
+      mod('deployCount', 'base', 1, { tags: ['brand'] }),
+      mod('damage', 'more', -40, { tags: ['totem'] }),
+    ],
+    description: 'One more brand at a time. Totems deal 40% less damage.',
+  },
+  {
+    id: 'loneVow',
+    name: 'Lone Vow',
+    mods: [mod('loneVow', 'flag', 1)],
+    description: 'Only your first aura is active, and it reserves no mana or life.',
   },
   {
     id: 'steadyDraw',

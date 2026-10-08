@@ -31,7 +31,9 @@
     "coverage:emit": "tsx scripts/coverage/emit-uniques.ts",
     "coverage:emit-gems": "tsx scripts/coverage/emit-gems.ts",
     "tree:extract": "tsx scripts/tree/extract.ts",
-    "tree:lines": "tsx scripts/tree/lines.ts"
+    "tree:lines": "tsx scripts/tree/lines.ts",
+    "tree:names": "tsx scripts/tree/names.ts",
+    "tree:emit": "tsx scripts/tree/emit.ts"
   },
   "dependencies": {
     "@preact/signals": "^2.11.3",

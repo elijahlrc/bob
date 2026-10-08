@@ -68,7 +68,8 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
   if (!c?.deploy) return;
   const target = actorById(w, act.targetId);
   const n = act.profile.deployCount;
-  const seconds = DEPLOY_SECONDS[c.deploy];
+  // "Increased duration" of totems, traps, mines and brands.
+  const seconds = DEPLOY_SECONDS[c.deploy] * act.profile.skillDuration;
   const put = (x: number, y: number) => {
     const spot = w.grid.collide(x, y, 0.3);
     w.deployables.push({

@@ -26,9 +26,14 @@ export type Minion = Actor & {
   level: number;
   dmg: number;
   speed: number;
+  /** Volatile Servants: it has burst already. */
+  boomed?: boolean;
 };
 
 const SEEK = 14;
+/** Volatile Servants: the share of life at which a minion bursts, and how far the burst reaches (tiles). */
+const LOW_LIFE = 0.2;
+const BURST_RADIUS = 2.5;
 const FOLLOW = 3.5;
 const TELEPORT = 20;
 
@@ -57,7 +62,8 @@ export function summonMinions(w: World, c: SkillChoice, prof: SkillProfile): voi
   if (u?.kind !== 'summon') return;
   const n = summonCount(c, prof);
   const have = minionCount(w, c.key);
-  for (const m of w.minions) if (m.key === c.key && m.alive) m.t = u.seconds ?? Infinity;
+  const seconds = u.seconds === undefined ? Infinity : u.seconds * prof.skillDuration;
+  for (const m of w.minions) if (m.key === c.key && m.alive) m.t = seconds;
   const p = w.player;
   const def = MINIONS[u.minion];
   const body = minionBody(
@@ -83,7 +89,7 @@ export function summonMinions(w: World, c: SkillChoice, prof: SkillProfile): voi
     m.state = 'chase';
     m.key = c.key;
     m.kind = u.minion;
-    m.t = u.seconds ?? Infinity;
+    m.t = seconds;
     m.atkT = 0;
     m.level = c.skill.level;
     m.dmg = prof.minionDamage;
@@ -109,6 +115,7 @@ export function tickMinions(w: World, dt: number): void {
   const foes = w.actors.filter(
     (e) => !e.isPlayer && e.alive && e.phaseT <= 0 && e.state !== 'idle',
   );
+  const unstable = w.char.db.flag('minionInstability');
   let j = 0;
   for (const m of w.minions) {
     m.t -= dt;
@@ -116,6 +123,14 @@ export function tickMinions(w: World, dt: number): void {
     // Damage over time, regeneration and ailment timers.
     tickActor(w, m, dt);
     if (!m.alive) continue;
+    // Volatile Servants: at low life a minion bursts for a third of its life as fire, once.
+    if (unstable && !m.boomed && m.life <= m.def.maxLife * LOW_LIFE) {
+      m.boomed = true;
+      for (const e of foes)
+        if (e.alive && Math.hypot(e.x - m.x, e.y - m.y) <= BURST_RADIUS + e.r)
+          rawHit(w, e, m.def.maxLife / 3, 3, 'Minion burst');
+      w.events.push({ t: 'explode', x: m.x, y: m.y, r: BURST_RADIUS, dtype: 3 });
+    }
     w.minions[j++] = m;
     const def = MINIONS[m.kind];
     m.moving = false;

@@ -90,6 +90,8 @@ export type SkillProfile = {
   pulses: number;
   /** What the character's minion modifiers do to minions this skill summons: damage and speed multipliers, extra minions. */
   minionDamage: number;
+  /** Multiplier on how long a deployable, a timed minion or a zone lasts. */
+  skillDuration: number;
   minionSpeed: number;
   /** Multipliers on their life and on the damage they take. */
   minionLife: number;
@@ -176,6 +178,8 @@ export type ProfileInput = {
 };
 
 const DOT_TAGS = tagBit('dot');
+/** Skills that are put down or summoned rather than used by the character. */
+const DEPLOYED_TAGS = tagMask(['totem', 'trap', 'mine', 'brand', 'minion']);
 
 /**
  * The keywords of a skill that reach the damage of its ailments (3.9): what kind of skill it is, the element it is, and
@@ -277,6 +281,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
   const noPhys = db.flag('noPhysicalDamage', baseCtx);
   const noChaos = db.flag('noChaosDamage', baseCtx);
   const spellBit = tagBit('spell');
+  const idleHands = db.flag('idleHands', baseCtx);
   const spellIncOnAttacks = isAttack && db.flag('spellIncAppliesToAttacks', baseCtx);
 
   function handProfile(hand: HandStats | null): HandProfile {
@@ -313,6 +318,8 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     // Step 3: conversion and gain.
     let chunks = convertChunks(base, db, ctx);
     if (avatar) chunks = chunks.filter((c) => c.type === FIRE);
+    // Idle Hands: only what is put down or summoned deals damage.
+    if (idleHands && maskAnd(tags, DEPLOYED_TAGS) === 0) chunks = [];
     if (noEle) chunks = chunks.filter((c) => c.type === PHYS || c.type === CHAOS);
     if (noPhys) chunks = chunks.filter((c) => c.type !== PHYS);
     if (noChaos) chunks = chunks.filter((c) => c.type !== CHAOS);
@@ -439,6 +446,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
         : 1,
     deployCount: Math.max(1, Math.round(1 + db.sum('base', 'deployCount', baseCtx))),
     minionDamage: db.mult('minionDamage', baseCtx),
+    skillDuration: db.mult('skillDuration', baseCtx),
     minionSpeed: db.mult('minionSpeed', baseCtx),
     minionLife: db.mult('minionLife', baseCtx),
     minionTaken: db.mult('minionTaken', baseCtx),
