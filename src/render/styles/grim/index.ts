@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { Rng } from '../../../core/rng';
 import { factionOfSpec, leavesBody } from '../../../data/monsters';
+import { revealed } from '../../../sim/movement';
 import { telegraphs, type Telegraph } from '../../../sim/telegraph';
 import type {
   Actor,
@@ -680,7 +681,15 @@ export class GrimStyle extends StyleBase {
     // The Unremembered fades out of sight while it phases.
     if (a.alive)
       d.sprite.setAlpha(
-        a.phaseT > 0 ? 0.12 : a.hold && a.state === 'idle' ? 0.4 : d.ghost ? 0.8 : 1,
+        a.phaseT > 0
+          ? 0.12
+          : a.hold && a.state === 'idle'
+            ? 0.4
+            : !revealed(this.world, a)
+              ? 0.15
+              : d.ghost
+                ? 0.8
+                : 1,
       );
     d.shadow
       .setPosition(px, py + 1)

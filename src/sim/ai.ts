@@ -28,6 +28,15 @@ import { flaskMask, monsterConds, playerConds } from './combat';
 import { canPay, payCost } from './cost';
 import { deployFull } from './deploy';
 import { inTelegraph, telegraphs } from './telegraph';
+import {
+  afterBlow,
+  revealed,
+  senseOf,
+  steer,
+  targetOf,
+  whileStunned,
+  withdrawing,
+} from './movement';
 import { chooseUtility } from './utility';
 import type { Actor, World } from './types';
 
@@ -44,12 +53,13 @@ export function step(w: World, a: Actor, dx: number, dy: number, dt: number): vo
   const nx = a.x + (dx / len) * d;
   const ny = a.y + (dy / len) * d;
   // Fliers cross walls; they only stay inside the map.
-  const c = a.flies
-    ? {
-        x: Math.max(0.5, Math.min(w.grid.w - 0.5, nx)),
-        y: Math.max(0.5, Math.min(w.grid.h - 0.5, ny)),
-      }
-    : w.grid.collide(nx, ny, a.r);
+  const c =
+    a.flies || a.phases
+      ? {
+          x: Math.max(0.5, Math.min(w.grid.w - 0.5, nx)),
+          y: Math.max(0.5, Math.min(w.grid.h - 0.5, ny)),
+        }
+      : w.grid.collide(nx, ny, a.r);
   a.x = c.x;
   a.y = c.y;
   a.moving = true;
@@ -115,6 +125,7 @@ function findTarget(w: World): Actor | null {
     const real = Math.hypot(m.x - p.x, m.y - p.y);
     if (real > ENGAGE_RANGE) continue;
     // Spawners and shield-givers come first: a nest feeds the pack and a pylon makes it untouchable.
+    if (!revealed(w, m)) continue;
     const support = !!m.mon && SUPPORT_TYPES.has(m.mon.spec.type);
     const d = real - (support ? SUPPORT_PRIORITY : 0);
     if (d > bd + 1e-9) continue;
@@ -435,7 +446,7 @@ export function playerAI(w: World, dt: number): void {
 function monsterMove(w: World, m: Actor, tx: number, ty: number, dt: number): void {
   if (m.stationary) return;
   const d = Math.hypot(tx - m.x, ty - m.y);
-  if (m.flies) {
+  if (m.flies || m.phases) {
     // Straight at the target, weaving from side to side.
     const wob = Math.sin(w.t * 5 + m.id) * 0.7;
     const dx = tx - m.x;
@@ -453,9 +464,10 @@ function monsterMove(w: World, m: Actor, tx: number, ty: number, dt: number): vo
 }
 
 export function alertPack(w: World, m: Actor): void {
+  const reach = (m.mon && senseOf(m).alert) ?? PACK_ALERT;
   for (const o of w.actors) {
     if (o.isPlayer || !o.alive || o.state !== 'idle') continue;
-    if (Math.hypot(o.x - m.x, o.y - m.y) <= PACK_ALERT) {
+    if (Math.hypot(o.x - m.x, o.y - m.y) <= reach) {
       o.state = 'chase';
       o.hold = false;
       o.lostT = 0;
@@ -500,17 +512,17 @@ function minionInSight(w: World, m: Actor, range: number): Actor | null {
  * Walk toward the player, noting whether it gets anywhere. A monster that keeps trying to walk and barely moves is held
  * up (by the minions, or by the crowd around it); `blockT` counts the seconds.
  */
-function chaseStep(w: World, m: Actor, tx: number, ty: number, dt: number): void {
+function chaseStep(w: World, m: Actor, tx: number, ty: number, dt: number, pace = 1): void {
   if (m.tryTick === w.tick - 1) {
     const moved = Math.hypot(m.x - m.prevX, m.y - m.prevY);
-    const want = m.def.moveSpeed * (1 - m.ail.chill) * speedMult(m) * dt;
+    const want = m.def.moveSpeed * (1 - m.ail.chill) * speedMult(m) * dt * pace;
     if (moved < want * 0.4) m.blockT += dt;
     else m.blockT = Math.max(0, m.blockT - 2 * dt);
   }
   m.tryTick = w.tick;
   m.prevX = m.x;
   m.prevY = m.y;
-  monsterMove(w, m, tx, ty, dt);
+  monsterMove(w, m, tx, ty, dt * pace);
 }
 
 /** A patrol walks from one of its two points to the other and back, slowly, until it notices the character. */
@@ -533,7 +545,9 @@ function patrolStep(w: World, m: Actor, dt: number): void {
 
 export function monsterAI(w: World, m: Actor, dt: number): void {
   m.moving = false;
-  if (m.dummy || !canAct(m)) return;
+  if (m.dummy) return;
+  whileStunned(m);
+  if (!canAct(m)) return;
   // A Gloomstalker stands still while its blink gathers.
   if (m.blinkT > 0 || m.phaseT > 0 || m.channelT > 0 || m.windT > 0 || m.dashT > 0) return;
   const p = w.player;
@@ -553,7 +567,7 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     m.noticeT -= dt;
     if (m.noticeT <= 0) {
       m.noticeT = 0.25;
-      if (d <= MONSTER_AGGRO && w.grid.los(m.x, m.y, p.x, p.y)) {
+      if (d <= (senseOf(m).aggro ?? MONSTER_AGGRO) && w.grid.los(m.x, m.y, p.x, p.y)) {
         m.state = 'chase';
         m.lostT = 0;
         alertPack(w, m);
@@ -579,7 +593,9 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
   if (los) m.lostT = 0;
   else {
     m.lostT += dt;
-    if (m.lostT > LEASH_TIME && m.rarity !== 'boss') {
+    // Some give up sooner, and a hunter never does (a leash of nought).
+    const leash = senseOf(m).leash ?? LEASH_TIME;
+    if (leash > 0 && m.lostT > leash && m.rarity !== 'boss') {
       m.state = 'leash';
       return;
     }
@@ -595,6 +611,17 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
   if (MONSTER_TYPES[m.mon!.spec.type].noAttack) return;
   const prof = m.mon!.profile(monsterConds(m));
   const range = m.mon!.range;
+  // Whom it goes for: the character, or (a hunter) its minions first.
+  const tg = targetOf(w, m);
+  const dtg = tg === p ? d : Math.hypot(tg.x - m.x, tg.y - m.y);
+  const tlos = tg === p ? los : w.grid.los(m.x, m.y, tg.x, tg.y);
+  // A monster that has struck and is withdrawing, or hiding behind a wall, does not strike until it has had its time.
+  afterBlow(w, m, tg);
+  if (withdrawing(m)) {
+    const s = steer(w, m, tg, dtg, dt);
+    if (s) chaseStep(w, m, s.x, s.y, dt, s.pace);
+    return;
+  }
   // Whether it fights at arm's length is the type's, not its shape's: a Sentinel's nova is still a melee blow.
   if (MONSTER_TYPES[m.mon!.spec.type].attack !== 'melee') {
     if (m.stationary) {
@@ -620,8 +647,8 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
       step(w, m, away.x - m.x, away.y - m.y, dt * (kites ? 0.8 : 0.5));
       return;
     }
-    if (d <= range && los) {
-      startAction(w, m, 'monster', prof, p);
+    if (dtg <= range && tlos) {
+      startAction(w, m, 'monster', prof, tg);
       return;
     }
     // It cannot hit the player from here: a minion in range and in sight is shot instead.
@@ -630,14 +657,15 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
       startAction(w, m, 'monster', prof, v);
       return;
     }
-    chaseStep(w, m, p.x, p.y, dt);
+    const s = steer(w, m, tg, dtg, dt);
+    if (s) chaseStep(w, m, s.x, s.y, dt, s.pace);
     return;
   }
-  if (d <= range + p.r + m.r) {
+  if (dtg <= range + tg.r + m.r) {
     m.blockT = 0;
     // A Bloater does not strike: it bursts on contact.
     if (m.mon!.spec.type === 'bloater') bloaterBurst(w, m);
-    else startAction(w, m, 'monster', prof, p);
+    else startAction(w, m, 'monster', prof, tg);
     return;
   }
   // Held up on the way to the player (by minions, say): whatever minion is in reach gets hit instead.
@@ -648,7 +676,8 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
       return;
     }
   }
-  chaseStep(w, m, p.x, p.y, dt);
+  const s = steer(w, m, tg, dtg, dt);
+  if (s) chaseStep(w, m, s.x, s.y, dt, s.pace);
 }
 
 /** No two actors can touch from further apart than this (the largest radius, a boss, twice over). */

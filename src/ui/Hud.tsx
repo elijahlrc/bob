@@ -4,6 +4,7 @@ import { monsterModDef, MONSTER_TYPES, BOSS_NAME, FACTION_NAMES } from '../data/
 import { abilitiesOf, abilityTexts } from '../data/abilities';
 import { ARCHETYPES } from '../data/archetypes';
 import { defenceTexts, profileOf } from '../data/defence';
+import { movementTexts, senseText } from '../data/movement';
 import { shapeText } from '../data/shapes';
 import { FACTION_GLYPH, FACTION_RULES, TYPE_BLURBS } from '../data/monsterInfo';
 import type { ThemeDef } from '../data/themes';
@@ -105,6 +106,8 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
         [
           shapeText(MONSTER_TYPES[spec.type].shape),
           ...abilityTexts(abilitiesOf(spec.type)),
+          ...movementTexts(MONSTER_TYPES[spec.type].movement),
+          ...senseText(MONSTER_TYPES[spec.type].senses),
           ...defenceTexts(
             profileOf(MONSTER_TYPES[spec.type].faction, MONSTER_TYPES[spec.type].defence),
           ),

@@ -346,6 +346,8 @@ export function blinkBehind(w: World, m: Actor): void {
   const pos = w.grid.collide(p.x + Math.cos(away) * 1.2, p.y + Math.sin(away) * 1.2, m.r);
   m.x = pos.x;
   m.y = pos.y;
+  // A veiled monster that blinks beside the character is seen.
+  m.revealT = 1.5;
   w.events.push({ t: 'blink', id: m.id, x: m.x, y: m.y, end: true });
 }
 

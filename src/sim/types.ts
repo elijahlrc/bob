@@ -1,4 +1,5 @@
 import type { Character, SkillChoice } from '../calc/character';
+import type { MoveState } from './movement';
 import type { Defence } from '../calc/combat';
 import type { FlaskSpec } from '../calc/flasks';
 import type { MonsterStats } from '../calc/monster';
@@ -127,6 +128,11 @@ export type Actor = {
   zealT: number;
   fervour: number;
   fervourT: number;
+  /** Passes through walls at a walk (the Hollow), and the state of its movement style (docs/ROSTER.md 6.3). */
+  phases: boolean;
+  mv: MoveState;
+  /** Seconds left in which a veiled monster is seen (it has just struck or been struck). */
+  revealT: number;
   /** Moves over walls (bats), never moves (nests, pylons, arbalests), and the time left of a beetle curled up. */
   flies: boolean;
   stationary: boolean;

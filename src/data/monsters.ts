@@ -1,6 +1,7 @@
 import { mod, type Element, type Mod } from '../mods/types';
 import type { ArchetypeId } from './archetypes';
 import type { DefenceProfile } from './defence';
+import type { MoveSpec, Senses } from './movement';
 import type { ShapeSpec } from './shapes';
 
 /** DESIGN.md §12. */
@@ -110,6 +111,10 @@ export type MonsterTypeDef = {
   faction: FactionId;
   /** The figure it is drawn with. */
   body: BodyKind;
+  /** How it moves, on top of the walk (docs/ROSTER.md 6.3). */
+  movement?: MoveSpec[];
+  /** What it notices and whom it goes for, where it is not the usual (docs/ROSTER.md 6.4). */
+  senses?: Senses;
   /** What combat role it is (docs/ROSTER.md 6.1): its stats, defence lean, movement and engagement come from the archetype. */
   archetype: ArchetypeId;
   /** What it is hard and soft to, on top of its faction's (docs/ROSTER.md 6.2). */
@@ -166,6 +171,8 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'ossuary',
     body: 'brute',
     archetype: 'bruiser',
+    movement: [{ id: 'momentum', from: 0.5, to: 1.5, seconds: 2.5 }],
+    senses: { aggro: 7 },
     defence: { armour: 80, stun: 100 },
     shape: { id: 'swing', arc: 150, radius: 2.4, lock: 0.3 },
     name: 'Skeleton Brute',
@@ -221,6 +228,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'ossuary',
     body: 'warrior',
     archetype: 'bulwark',
+    movement: [{ id: 'tether', anchors: ['archer', 'mage'], radius: 6 }],
     defence: { armour: 120 },
     lifeMult: 1.4,
     dmgMult: 0.8,
@@ -239,6 +247,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'rot',
     body: 'warrior',
     archetype: 'brawler',
+    movement: [{ id: 'lurch', go: 1, pace: 1.6, stop: 0.8 }],
     innate: true,
     lifeMult: 1.6,
     dmgMult: 0.9,
@@ -256,6 +265,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'rot',
     body: 'bloat',
     archetype: 'bomber',
+    movement: [{ id: 'kamikaze' }],
     defence: { res: { fire: -30 } },
     innate: true,
     lifeMult: 1.2,
@@ -312,6 +322,8 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'hollow',
     body: 'warrior',
     archetype: 'cutthroat',
+    movement: [{ id: 'phase' }],
+    senses: { leash: 0, veil: 2.5 },
     defence: { evasion: 150 },
     lifeMult: 0.6,
     dmgMult: 1.5,
@@ -330,6 +342,8 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'hollow',
     body: 'mage',
     archetype: 'controller',
+    movement: [{ id: 'phase' }],
+    senses: { leash: 3 },
     defence: { res: { cold: 10 } },
     shape: { id: 'nova', radius: 3, mult: 1.1 },
     innate: true,
@@ -349,6 +363,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'hollow',
     body: 'orb',
     archetype: 'bomber',
+    movement: [{ id: 'orbit', ring: 3.2, seconds: 1.6 }, { id: 'kamikaze' }],
     noBody: true,
     lifeMult: 0.25,
     dmgMult: 0.5,
@@ -384,6 +399,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'choir',
     body: 'warrior',
     archetype: 'bulwark',
+    movement: [{ id: 'tether', anchors: ['choirmaster'], radius: 7 }],
     defence: { armour: 85 },
     innate: true,
     lifeMult: 1.5,
@@ -422,6 +438,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'choir',
     body: 'mage',
     archetype: 'support',
+    movement: [{ id: 'follow' }],
     defence: { es: 0.6 },
     innate: true,
     lifeMult: 1.5,
@@ -440,6 +457,8 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'swarm',
     body: 'gnawer',
     archetype: 'skirmisher',
+    movement: [{ id: 'skitter', angle: 35, every: 0.4 }],
+    senses: { alert: 12 },
     defence: { evasion: 100 },
     innate: true,
     lifeMult: 0.25,
@@ -458,6 +477,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'swarm',
     body: 'bat',
     archetype: 'skirmisher',
+    movement: [{ id: 'swoop', back: 3 }],
     defence: { evasion: 50 },
     innate: true,
     flies: true,
@@ -477,6 +497,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'swarm',
     body: 'beetle',
     archetype: 'bulwark',
+    movement: [{ id: 'tether', anchors: ['nest'], radius: 7 }],
     defence: { armour: 150, res: { lightning: -50 } },
     innate: true,
     lifeMult: 1.5,
@@ -495,6 +516,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'swarm',
     body: 'nest',
     archetype: 'summoner',
+    senses: { alert: 12 },
     defence: { res: { fire: -20 } },
     innate: true,
     stationary: true,
@@ -515,6 +537,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'reliquary',
     body: 'sentinel',
     archetype: 'bruiser',
+    movement: [{ id: 'momentum', from: 0.6, to: 1.4, seconds: 3 }],
     defence: { armour: 100, stun: 200, hitCap: 0.2 },
     shape: { id: 'nova', radius: 2.2, mult: 1.3 },
     innate: true,
@@ -535,6 +558,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'reliquary',
     body: 'arbalest',
     archetype: 'sniper',
+    senses: { aggro: 14 },
     shape: { id: 'lance', length: 12, width: 0.9, mult: 1.6, lock: 0.25 },
     innate: true,
     stationary: true,
@@ -555,6 +579,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'reliquary',
     body: 'golem',
     archetype: 'bruiser',
+    movement: [{ id: 'momentum', from: 0.5, to: 1.5, seconds: 3 }],
     defence: { stun: 100 },
     elemental: true,
     lifeMult: 1.6,
@@ -596,6 +621,8 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'kennel',
     body: 'hound',
     archetype: 'hunter',
+    movement: [{ id: 'swoop', back: 3 }],
+    senses: { leash: 0, target: 'minions' },
     defence: { evasion: 30 },
     innate: true,
     lifeMult: 0.45,
@@ -614,6 +641,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'kennel',
     body: 'boar',
     archetype: 'bruiser',
+    movement: [{ id: 'momentum', from: 0.5, to: 1.4, seconds: 2.5 }],
     defence: { armour: 30 },
     shape: { id: 'swing', arc: 100, radius: 1.9, lock: 0.3 },
     innate: true,
@@ -653,6 +681,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'kennel',
     body: 'cat',
     archetype: 'ambusher',
+    movement: [{ id: 'cover', back: 4 }],
     defence: { evasion: 50 },
     innate: true,
     lifeMult: 0.8,
@@ -689,6 +718,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'gilded',
     body: 'brute',
     archetype: 'bulwark',
+    movement: [{ id: 'tether', anchors: ['bursar'], radius: 6 }],
     defence: { armour: 100 },
     innate: true,
     lifeMult: 1.8,
@@ -707,6 +737,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'gilded',
     body: 'mage',
     archetype: 'support',
+    movement: [{ id: 'follow' }],
     defence: { es: 0.4, res: { chaos: -30 } },
     innate: true,
     lifeMult: 1.1,
@@ -745,6 +776,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'hollow',
     body: 'mage',
     archetype: 'support',
+    movement: [{ id: 'phase' }, { id: 'follow' }],
     innate: true,
     lifeMult: 1.2,
     dmgMult: 0.5,

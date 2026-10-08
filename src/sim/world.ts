@@ -50,6 +50,9 @@ export function spawnMonster(
   a.rarity = spec.rarity;
   a.modIds = spec.mods;
   a.flies = !!MONSTER_TYPES[spec.type].flies;
+  a.phases = !!MONSTER_TYPES[spec.type].movement?.some((s) => s.id === 'phase');
+  const momentum = MONSTER_TYPES[spec.type].movement?.find((s) => s.id === 'momentum');
+  if (momentum) a.mv.ramp = momentum.from ?? 0.5;
   a.stationary = !!MONSTER_TYPES[spec.type].stationary;
   if (spec.type === 'pylon') w.hasPylons = true;
   a.room = room;

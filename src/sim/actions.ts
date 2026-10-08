@@ -35,6 +35,11 @@ export function startAction(
   };
   a.carry = 0;
   a.facing = Math.atan2(target.y - a.y, target.x - a.x);
+  if (!a.isPlayer) {
+    // A monster that strikes is seen, even a veiled one, and its movement style takes the cue (docs/ROSTER.md 6.3).
+    a.mv.attacked = true;
+    a.revealT = 1.5;
+  }
   w.events.push({ t: 'use', src: a.id, skill: p.skill.id });
   if (a.isPlayer && p.isAttack) fireTriggers(w, { on: 'attack', target, tags: p.tagMask });
   if (a.isPlayer && !p.isAttack) {

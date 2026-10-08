@@ -1,4 +1,5 @@
 import type { Actor } from './types';
+import { newMoveState } from './movement';
 
 /** A fresh actor with every field at its neutral value; callers fill in what makes it a player, monster or minion. */
 export function newActor(id: number, isPlayer: boolean, x: number, y: number, r: number): Actor {
@@ -85,6 +86,9 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     prevX: x,
     prevY: y,
     tryTick: -1,
+    phases: false,
+    mv: newMoveState(),
+    revealT: 0,
     flies: false,
     stationary: false,
     curlT: 0,

@@ -175,6 +175,8 @@ export function targetState(a: Actor): TargetState {
  */
 export function applyDamage(w: World, dst: Actor, dmg: number[]): number {
   if (!dst.alive || dst.phaseT > 0) return 0;
+  // A veiled monster that is hit is seen for a moment.
+  if (!dst.isPlayer && dst.revealT < 1) dst.revealT = 1;
   if (!dst.isPlayer && dst.mon) {
     // A Bone Beetle curled up takes 80% less physical damage; a Warden Pylon makes its allies untouchable.
     if (dst.curlT > 0) dmg[0] *= 0.2;
@@ -578,7 +580,7 @@ export function wake(w: World, a: Actor): void {
 
 /** A drop must land on floor: a flier that dies over a wall drops its loot where it can be reached. */
 function dropSpot(w: World, a: Actor, pos: { x: number; y: number }): { x: number; y: number } {
-  if (!a.flies || w.grid.isFloor(Math.floor(pos.x), Math.floor(pos.y))) return pos;
+  if (!(a.flies || a.phases) || w.grid.isFloor(Math.floor(pos.x), Math.floor(pos.y))) return pos;
   const p = w.player;
   let best = { x: p.x, y: p.y };
   let bd = Infinity;
