@@ -1,6 +1,7 @@
 import type Phaser from 'phaser';
 import { Rng } from './core/rng';
 import { ITEM_BASES } from './data/bases';
+import type { InventoryItem } from './data/types';
 import { rollFlask, rollGem, rollItemOf } from './gen/loot';
 import type { Controller } from './run/controller';
 import { uidSource } from './run/run';
@@ -69,17 +70,18 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
       if (!run) return 0;
       const rng = new Rng(n * 7919 + ilvl);
       const uid = uidSource(run);
+      const added: InventoryItem[] = [];
       for (let i = 0; i < n; i++) {
         const k = i % 6;
-        if (k === 5) run.inventory.push(rollGem(rng, uid, { classId: run.classId, ilvl }));
-        else if (k === 4) run.inventory.push(rollFlask(rng, uid, ilvl));
+        if (k === 5) added.push(rollGem(rng, uid, { classId: run.classId, ilvl }));
+        else if (k === 4) added.push(rollFlask(rng, uid, ilvl));
         else {
           const base = rng.pick(ITEM_BASES.filter((b) => b.level <= ilvl));
-          run.inventory.push(
-            rollItemOf(rng, uid, base, ilvl, rng.pick(['normal', 'magic', 'rare'])),
-          );
+          added.push(rollItemOf(rng, uid, base, ilvl, rng.pick(['normal', 'magic', 'rare'])));
         }
       }
+      // A new array, because the screens memoise on the identity of the inventory.
+      run.inventory = run.inventory.concat(added);
       controller.bus.emit('state', null);
       return run.inventory.length;
     },

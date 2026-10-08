@@ -360,3 +360,49 @@ body {
     font-size: 12px;
   }
 }
+
+/* ---- Skills on a touch screen (Skills.tsx): the selected gem's card and buttons are a sheet ---- */
+.gem-sheet {
+  position: fixed;
+  z-index: 15;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--camp-bar, 0px) + var(--safe-bottom));
+  max-height: 52vh;
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 10px calc(12px + var(--safe-right)) 10px calc(12px + var(--safe-left));
+  background: var(--panel);
+  border-top: 2px solid var(--hi);
+  box-shadow: 0 -6px 18px #000a;
+}
+.gem-sheet .sheet-x {
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 4px;
+  width: var(--tap);
+  height: var(--tap);
+  z-index: 1;
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: var(--muted);
+}
+.gem-sheet .item-actions {
+  align-items: center;
+}
+.skills-wrap:has(.gem-sheet) {
+  padding-bottom: 54vh;
+}
+@media (pointer: coarse) {
+  .socket,
+  .gem-chip,
+  .gem-name {
+    min-height: var(--tap);
+  }
+  .x,
+  .star {
+    min-width: var(--tap);
+  }
+}

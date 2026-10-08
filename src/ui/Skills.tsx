@@ -14,7 +14,8 @@ import {
   type SocketRef,
 } from '../run/inventoryOps';
 
-import { GemTip } from './GemCard';
+import { useViewport } from './device';
+import { GemCard, GemTip } from './GemCard';
 import { gemCardData } from './gemText';
 import { loadPref, savePref } from './prefs';
 
@@ -113,6 +114,7 @@ const sameSocket = (a: SocketRef, b: SocketRef) => a.slot === b.slot && a.socket
 
 export function Skills({ c, ch }: { c: Controller; ch: Character }) {
   const run = c.run!;
+  const { coarse } = useViewport();
   const [sel, setSel] = useState<Sel | null>(null);
   const [drag, setDrag] = useState<Drag | null>(null);
   const [over, setOver] = useState<string | null>(null);
@@ -121,11 +123,14 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
   const [tip, setTip] = useState<{ gemId: string; level: number; x: number; y: number } | null>(
     null,
   );
-  const hoverGem = (gemId: string, level: number) => ({
-    onMouseEnter: (e: MouseEvent) => setTip({ gemId, level, x: e.clientX, y: e.clientY }),
-    onMouseMove: (e: MouseEvent) => setTip({ gemId, level, x: e.clientX, y: e.clientY }),
-    onMouseLeave: () => setTip(null),
-  });
+  const hoverGem = (gemId: string, level: number) =>
+    coarse
+      ? {}
+      : {
+          onMouseEnter: (e: MouseEvent) => setTip({ gemId, level, x: e.clientX, y: e.clientY }),
+          onMouseMove: (e: MouseEvent) => setTip({ gemId, level, x: e.clientX, y: e.clientY }),
+          onMouseLeave: () => setTip(null),
+        };
   const gems = useMemo(
     () =>
       run.inventory
@@ -196,6 +201,17 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
     }
   };
 
+  const selGem: { gemId: string; level: number; uid?: number } | null = (() => {
+    if (!sel) return null;
+    if (sel.from === 'inv') {
+      const g = gems.find((x) => x.uid === sel.uid);
+      return g
+        ? { gemId: g.gemId, level: naturalGemLevel(gemDef(g.gemId), run.build.level, ch.attrs) }
+        : null;
+    }
+    const g = run.build.equipment[sel.slot]?.sockets[sel.socket];
+    return g ? { gemId: g.gemId, level: levelOf(g.uid), uid: g.uid } : null;
+  })();
   const summary = ch.skillSheet(
     ch.primary,
     undefined,
@@ -232,9 +248,10 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
         )}
         <p class="muted hint">
           Every skill you have equipped is used: the ★ primary is cast over and over, and every
-          other active skill is cast whenever it is off cooldown. Every socket on an item is linked.
-          Click a gem, then a socket — or drag gems onto sockets (drop on the gem list to remove).
-          Double-click a gem to auto-place or remove it. ★ sets the primary skill.
+          other active skill is cast whenever it is off cooldown. Every socket on an item is linked.{' '}
+          {coarse
+            ? 'Tap a gem, then a socket. Tap a placed gem for its options. ★ sets the primary skill.'
+            : 'Click a gem, then a socket — or drag gems onto sockets (drop on the gem list to remove). Double-click a gem to auto-place or remove it. ★ sets the primary skill.'}
         </p>
         {EQUIP_SLOTS.map((slot) => {
           const it = run.build.equipment[slot];
@@ -285,7 +302,7 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
                     class={`socket ${d.kind}${primary ? ' primary' : ''}${isSel ? ' sel' : ''}${
                       p ? ' target' : ''
                     }${dropHere ? ' drop' : ''}`}
-                    draggable
+                    draggable={!coarse}
                     onDragStart={() => setDrag({ from: 'socket', ...ref })}
                     onDragEnd={() => {
                       setDrag(null);
@@ -371,7 +388,10 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
           />
         )}
         {gems.length === 0 && (
-          <div class="muted">No spare gems. Drag socketed gems here to remove them.</div>
+          <div class="muted">
+            No spare gems.{' '}
+            {coarse ? 'Remove socketed gems with ×' : 'Drag socketed gems here to remove them'}.
+          </div>
         )}
         {GEM_GROUPS.map((group) => {
           const list = shownGems.filter((g) => groupOfGem(gemDef(g.gemId)) === group);
@@ -386,7 +406,7 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
                   <button
                     key={g.uid}
                     class={`gem-chip ${d.kind}${sel?.from === 'inv' && sel.uid === g.uid ? ' sel' : ''}`}
-                    draggable
+                    draggable={!coarse}
                     {...hoverGem(g.gemId, naturalGemLevel(d, run.build.level, ch.attrs))}
                     onDragStart={() => setDrag({ from: 'inv', uid: g.uid })}
                     onDragEnd={() => {
@@ -416,6 +436,47 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
         })}
       </div>
       {tip && <GemTip {...tip} />}
+      {coarse && selGem && sel && (
+        <div class="gem-sheet">
+          <button class="sheet-x" aria-label="Close" onClick={() => setSel(null)}>
+            ×
+          </button>
+          <GemCard gemId={selGem.gemId} level={selGem.level} />
+          <div class="item-actions">
+            {sel.from === 'inv' ? (
+              <>
+                <button
+                  class="btn small primary"
+                  onClick={() => {
+                    const ok = c.act((r) => quickSocket(r, sel.uid));
+                    setMsg(ok ? '' : 'No free socket — tap a socket to replace a gem');
+                    if (ok) setSel(null);
+                  }}
+                >
+                  Socket in the best place
+                </button>
+                <span class="muted">or tap a socket</span>
+              </>
+            ) : (
+              <>
+                <button class="btn small" onClick={() => unsocket(sel)}>
+                  Remove
+                </button>
+                {gemDef(selGem.gemId).kind === 'active' && selGem.uid !== undefined && (
+                  <button
+                    class="btn small"
+                    onClick={() => c.act((r) => setPrimary(r, selGem.uid!))}
+                  >
+                    ★ Make primary
+                  </button>
+                )}
+                <span class="muted">or tap another socket to move it</span>
+              </>
+            )}
+          </div>
+          {msg && <div class="warn">{msg}</div>}
+        </div>
+      )}
     </div>
   );
 }
