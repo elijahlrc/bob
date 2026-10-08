@@ -2,7 +2,9 @@ import { scaleOf, type MonsterSpec } from '../calc/monster';
 import { HEX_IDS, hexEffect, type HexId } from '../data/hexes';
 import { PYLON_RANGE } from '../data/abilities';
 import { MONSTER_TYPES, leavesBody } from '../data/monsters';
+import { ENRAGE_DAMAGE, ENRAGE_SPEED } from '../data/phases';
 import { monsterHitOf, rawHit } from './combat';
+import { rally } from './packs';
 import { monsterHexesPlayer } from './hexes';
 import type { Actor, GroundEffect, World } from './types';
 import { spawnMonster } from './world';
@@ -70,7 +72,12 @@ const RAISED_LIFE = 0.5;
 
 /** Everything that speeds an actor up or slows it down: hexes, the censer aura and Fervour. */
 export function speedMult(a: Actor): number {
-  return a.hexSpeed * (a.buffT > 0 ? 1 + CENSER_SPEED : 1) * (1 + FERVOUR_STEP * a.fervour);
+  return (
+    a.hexSpeed *
+    (a.buffT > 0 ? 1 + CENSER_SPEED : 1) *
+    (1 + FERVOUR_STEP * a.fervour) *
+    (a.enraged ? ENRAGE_SPEED : 1)
+  );
 }
 
 /** Everything that raises or lowers the damage an actor deals. */
@@ -79,7 +86,9 @@ export function damageMult(a: Actor): number {
     a.hexDmg *
     (a.buffT > 0 ? 1 + CENSER_DAMAGE : 1) *
     (a.zealT > 0 ? 1 + ZEAL_DAMAGE : 1) *
-    (1 + FERVOUR_STEP * a.fervour)
+    (1 + FERVOUR_STEP * a.fervour) *
+    (a.enraged ? ENRAGE_DAMAGE : 1) *
+    a.patMult
   );
 }
 
@@ -228,6 +237,12 @@ export function onMonsterDeath(w: World, a: Actor): void {
   if (!a.mon) return;
   const type = a.mon.spec.type;
   leaveCorpse(w, a);
+  // The pack reacts to the fall of its leader (docs/ROSTER.md 6.7), and a Mirrored twin's survivor has three seconds.
+  rally(w, a);
+  if (a.mirrorId) {
+    const twin = w.actors.find((o) => o.id === a.mirrorId && o.alive);
+    if (twin) twin.mirrorT = 3;
+  }
   // A thief that dies gives back what it took.
   if (a.stolen > 0) {
     const f = w.flasks.find((x) => x.spec.uid === a.stolenFlask);

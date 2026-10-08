@@ -63,6 +63,8 @@ export type MonsterStats = {
   xp: number;
   /** A carapace: no single hit removes more than this share of its life (docs/ROSTER.md 6.2). */
   hitCap?: number;
+  /** Its type's definition (the hot paths of the sim read it every tick). */
+  kind: MonsterTypeDef;
 };
 
 /** The condition bits of every monster kind (they share one index, so `monsterConds` means the same for all). */
@@ -278,6 +280,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
     radius: spec.rarity === 'boss' ? 0.9 : spec.rarity === 'miniboss' ? t.radius * 1.3 : t.radius,
     xp: Math.round(baseXp(m) * r.xp),
     hitCap: defProfile.hitCap,
+    kind: t,
   };
   cache.set(k, stats);
   return stats;

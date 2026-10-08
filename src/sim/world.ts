@@ -1,4 +1,5 @@
 import { MONSTER_TYPES } from '../data/monsters';
+import { tickPhases } from './phases';
 import { Character } from '../calc/character';
 import { noCharges, type ChargeCounts } from '../calc/charges';
 import { buildMonster, scaleOf, type MonsterSpec } from '../calc/monster';
@@ -11,7 +12,7 @@ import type { MapPlan } from '../gen/mapPlan';
 import { monsterName } from '../gen/population';
 import { tickSkillZones, updateAction, updateProjectiles } from './actions';
 import { monsterAI, playerAI, separate } from './ai';
-import { lifeCap, rawHit, refreshPlayerDefence, tickActor } from './combat';
+import { lifeCap, monsterHitOf, rawHit, refreshPlayerDefence, tickActor } from './combat';
 import { autoFlaskPolicy, type FlaskPolicy } from './flaskPolicy';
 import { abilitiesOf } from '../data/abilities';
 import { tickAbilities, tickChargingMod } from './abilities';
@@ -318,6 +319,13 @@ function tickEffects(w: World, dt: number): void {
     // A lasting zone just fades.
     if (isZone(e)) continue;
     w.events.push({ t: 'explode', x: e.x, y: e.y, r: e.radius, dtype: e.dtype });
+    // A warding pulse throws the character back, away from where it went off.
+    if (e.push && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r) {
+      const ang = Math.atan2(p.y - e.y, p.x - e.x);
+      const to = w.grid.collide(p.x + Math.cos(ang) * e.push, p.y + Math.sin(ang) * e.push, p.r);
+      p.x = to.x;
+      p.y = to.y;
+    }
     const label = e.kind === 'slam' ? 'Crushing slam' : 'Volatile explosion';
     if (e.damage > 0 && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r)
       rawHit(w, p, e.damage, e.dtype, label);
@@ -345,6 +353,51 @@ function tickMonsterMods(w: World, m: Actor, dt: number): void {
     }
   }
   if (m.modIds.includes('charging')) tickChargingMod(w, m, dt);
+  if (m.modIds.includes('wardingPulse')) {
+    m.pulseT -= dt;
+    if (m.pulseT <= 0) {
+      m.pulseT = 8;
+      w.effects.push({
+        id: w.nextId++,
+        x: m.x,
+        y: m.y,
+        radius: 3,
+        t: 1,
+        total: 1,
+        kind: 'slam',
+        damage: 0.6 * monsterHitOf(m),
+        dtype: 0,
+        faction: 1,
+        push: 3,
+      });
+    }
+  }
+  if (m.modIds.includes('mirrored') && m.mirrorId === 0) {
+    // The twin stands some way off, with everything but the mirror.
+    const spec = m.mon!.spec;
+    const ang = w.rngAi.float(0, Math.PI * 2);
+    const pos = w.grid.collide(m.x + Math.cos(ang) * 6, m.y + Math.sin(ang) * 6, 0.5);
+    const twin = spawnMonster(
+      w,
+      { ...spec, mods: spec.mods.filter((id) => id !== 'mirrored') },
+      pos.x,
+      pos.y,
+      m.room,
+      m.pack,
+      m.name,
+    );
+    twin.state = 'chase';
+    twin.mirrorId = m.id;
+    m.mirrorId = twin.id;
+  }
+  if (m.mirrorT > 0) {
+    m.mirrorT -= dt;
+    // The twin did not follow in time: the survivor is made whole, and the pair is no more.
+    if (m.mirrorT <= 0) {
+      m.life = m.def.maxLife;
+      m.mirrorId = 0;
+    }
+  }
   if (m.modIds.includes('raiser')) {
     m.raiserT -= dt;
     if (m.raiserT <= 0) {
@@ -447,6 +500,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     if (a.isPlayer) playerAI(w, dt);
     else {
       monsterAI(w, a, dt);
+      tickPhases(w, a);
       tickMonsterMods(w, a, dt);
       if (a.state === 'chase') {
         tickFactionBehaviour(w, a, dt);

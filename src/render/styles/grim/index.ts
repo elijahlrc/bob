@@ -676,6 +676,7 @@ export class GrimStyle extends StyleBase {
       if (a.ail.freezeT > 0) tint = 0x7ec8ff;
       else if (a.ail.chill > 0) tint = 0xb8dcff;
       else if (a.ail.poisons.length) tint = 0xc4f0a0;
+      else if (a.enraged) tint = 0xff9a8a;
       d.sprite.setTint(tint).setTintMode(Phaser.TintModes.MULTIPLY);
     }
     // The Unremembered fades out of sight while it phases.

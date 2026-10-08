@@ -1,4 +1,5 @@
 import { angleDiff } from '../core/math';
+import { MONSTER_TYPES } from '../data/monsters';
 import { BLOCK_WINDOW, ECHO_GAP, HIT_AT, PROJECTILE_SPEED, SHOT_ALERT } from '../data/constants';
 import type { SkillProfile } from '../calc/skill';
 import { rollGains } from './buffs';
@@ -20,7 +21,17 @@ export function startAction(
 ): void {
   const n = p.hands.length;
   const hand = n > 1 ? a.handIdx % n : 0;
-  const duration = p.isAttack && n > 1 && !p.bothHands ? p.hands[hand].time : p.useTime;
+  let duration = p.isAttack && n > 1 && !p.bothHands ? p.hands[hand].time : p.useTime;
+  // A monster that strikes in a rhythm: each blow takes a share of the usual time and carries the same share of the damage.
+  a.patMult = 1;
+  if (!a.isPlayer && a.mon) {
+    const pat = MONSTER_TYPES[a.mon.spec.type].pattern;
+    if (pat) {
+      a.patMult = pat[a.beat % pat.length];
+      a.beat++;
+      duration *= a.patMult;
+    }
+  }
   a.action = {
     profile: p,
     which,

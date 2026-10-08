@@ -2,6 +2,7 @@ import { mod, type Element, type Mod } from '../mods/types';
 import type { ArchetypeId } from './archetypes';
 import type { DefenceProfile } from './defence';
 import type { MoveSpec, Senses } from './movement';
+import type { PhaseSpec } from './phases';
 import type { ShapeSpec } from './shapes';
 
 /** DESIGN.md §12. */
@@ -111,6 +112,10 @@ export type MonsterTypeDef = {
   faction: FactionId;
   /** The figure it is drawn with. */
   body: BodyKind;
+  /** A rhythm of blows: each beat is a multiple of its attack time, with the damage to match (docs/ROSTER.md 6.5). */
+  pattern?: number[];
+  /** Things it does once, at a share of its life (docs/ROSTER.md 6.5). */
+  phases?: PhaseSpec[];
   /** How it moves, on top of the walk (docs/ROSTER.md 6.3). */
   movement?: MoveSpec[];
   /** What it notices and whom it goes for, where it is not the usual (docs/ROSTER.md 6.4). */
@@ -191,6 +196,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'ossuary',
     body: 'archer',
     archetype: 'gunner',
+    pattern: [0.7, 0.7, 1.6],
     defence: { armour: -30, evasion: -40 },
     shape: { id: 'salvo', count: 2, mult: 0.5 },
     name: 'Skeleton Archer',
@@ -303,6 +309,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'rot',
     body: 'mage',
     archetype: 'summoner',
+    phases: [{ at: 0.3, do: 'flee', seconds: 4 }],
     defence: { es: 0.3 },
     shape: { id: 'lob', radius: 1.8, zone: 'caustic', seconds: 4, dps: 0.5, mult: 0.6, lock: 0.3 },
     innate: true,
@@ -418,6 +425,8 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'choir',
     body: 'brute',
     archetype: 'rager',
+    pattern: [0.55, 0.55, 1.9],
+    phases: [{ at: 0.5, do: 'enrage' }],
     defence: { immune: ['bleed'] },
     shape: { id: 'swing', arc: 150, radius: 3, count: 2, mult: 0.6, lock: 0.3 },
     stance: 'lash',
@@ -621,6 +630,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'kennel',
     body: 'hound',
     archetype: 'hunter',
+    pattern: [0.8, 0.8, 1.4],
     movement: [{ id: 'swoop', back: 3 }],
     senses: { leash: 0, target: 'minions' },
     defence: { evasion: 30 },
@@ -641,6 +651,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'kennel',
     body: 'boar',
     archetype: 'bruiser',
+    phases: [{ at: 0.4, do: 'enrage' }],
     movement: [{ id: 'momentum', from: 0.5, to: 1.4, seconds: 2.5 }],
     defence: { armour: 30 },
     shape: { id: 'swing', arc: 100, radius: 1.9, lock: 0.3 },
@@ -662,6 +673,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'kennel',
     body: 'archer',
     archetype: 'summoner',
+    phases: [{ at: 0.3, do: 'flee', seconds: 4 }],
     defence: { evasion: 40 },
     stance: 'lash',
     innate: true,
@@ -756,6 +768,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'gilded',
     body: 'archer',
     archetype: 'gunner',
+    pattern: [0.7, 0.7, 1.6],
     defence: { evasion: 50 },
     shape: { id: 'salvo', count: 2, mult: 0.5 },
     stance: 'throw',
@@ -902,6 +915,8 @@ export type MonsterModId =
   | 'flaskTaker'
   | 'hobbling'
   | 'brood'
+  | 'wardingPulse'
+  | 'mirrored'
   // The Choir's faction mod, and the hex mods (EXPANSION 7.2).
   | 'zealous'
   | 'hexWarded'
@@ -1088,6 +1103,11 @@ MONSTER_MODS.push(
   { id: 'charging', name: 'Charging', magic: true, minLevel: 12, mods: [] },
   { id: 'flaskTaker', name: 'Flask-taker', magic: true, minLevel: 20, mods: [] },
   { id: 'hobbling', name: 'Hobbling', magic: true, minLevel: 15, mods: [] },
+);
+// Mods that apply to every faction: a pulse that throws the character back, and a twin that must fall with it (docs/ROSTER.md 7.5).
+MONSTER_MODS.push(
+  { id: 'wardingPulse', name: 'Warding Pulse', magic: false, minLevel: 20, mods: [] },
+  { id: 'mirrored', name: 'Mirrored', magic: false, minLevel: 25, mods: [] },
 );
 MONSTER_MODS.push({
   id: 'brood',

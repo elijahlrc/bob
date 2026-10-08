@@ -128,6 +128,17 @@ export type Actor = {
   zealT: number;
   fervour: number;
   fervourT: number;
+  /** Which beat of its rhythm it is on, the damage that beat carries, and whether it has enraged (docs/ROSTER.md 6.5). */
+  beat: number;
+  patMult: number;
+  enraged: boolean;
+  /** The phases (by index in the type's list) that have happened. */
+  phaseMask: number;
+  /** A Mirrored monster's twin, and the seconds the survivor has to follow it before it is made whole again. */
+  mirrorId: number;
+  mirrorT: number;
+  /** Seconds to a Warding Pulse. */
+  pulseT: number;
   /** Passes through walls at a walk (the Hollow), and the state of its movement style (docs/ROSTER.md 6.3). */
   phases: boolean;
   mv: MoveState;
@@ -216,6 +227,8 @@ export type GroundEffect = {
   acc?: number;
   dtype: number;
   faction: 0 | 1;
+  /** A pulse: how many tiles it throws the character back when it lands. */
+  push?: number;
 };
 
 /** A zone a player skill left on the ground: it hits what stands in it every `interval` s, `pulsesLeft` times. */

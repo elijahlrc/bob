@@ -288,6 +288,18 @@ export const MOD_MARKS: Record<MonsterModId, ModMark> = {
     aura: false,
     desc: 'Splits into three Gnawers when it dies.',
   },
+  wardingPulse: {
+    color: 0x90c0e8,
+    shape: 'ring',
+    aura: true,
+    desc: 'Every 8 seconds a ring goes out from it that throws you back three tiles: step out of it, or be moved.',
+  },
+  mirrored: {
+    color: 0xb8b0f0,
+    shape: 'triDown',
+    aura: false,
+    desc: 'A twin stands elsewhere. Kill one and the other has three seconds to follow before it is made whole.',
+  },
   putrid: {
     color: 0x6a9a2a,
     shape: 'diamond',

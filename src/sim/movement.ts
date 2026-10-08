@@ -1,5 +1,6 @@
 import type { MoveSpec, Senses } from '../data/movement';
 import { MONSTER_TYPES } from '../data/monsters';
+import { flankPoint, frontOf } from './packs';
 import type { Actor, World } from './types';
 
 /**
@@ -62,9 +63,21 @@ function hash01(id: number, n: number): number {
 }
 
 const NO_STYLES: MoveSpec[] = [];
-const styles = (m: Actor): MoveSpec[] => MONSTER_TYPES[m.mon!.spec.type].movement ?? NO_STYLES;
+
+/** A ranged member of a pack that is not a kiter keeps behind the front of it. */
+function isHoldingLine(m: Actor): boolean {
+  const t = m.mon!.kind;
+  return (
+    t.role === 'ranged' &&
+    t.attack !== 'melee' &&
+    !t.stationary &&
+    t.id !== 'slinger' &&
+    t.id !== 'handler'
+  );
+}
+const styles = (m: Actor): MoveSpec[] => m.mon!.kind.movement ?? NO_STYLES;
 const NO_SENSES: Senses = Object.freeze({});
-export const senseOf = (m: Actor): Senses => MONSTER_TYPES[m.mon!.spec.type].senses ?? NO_SENSES;
+export const senseOf = (m: Actor): Senses => m.mon!.kind.senses ?? NO_SENSES;
 const style = (m: Actor, id: MoveSpec['id']): MoveSpec | undefined =>
   styles(m).find((s) => s.id === id);
 
@@ -189,10 +202,28 @@ export type Steer = { x: number; y: number; pace: number } | null;
 export function steer(w: World, m: Actor, tgt: Actor, d: number, dt: number): Steer {
   const mv = m.mv;
   const list = styles(m);
-  // Most monsters have no style: the target, at their own pace, with nothing worked out.
-  if (list.length === 0) return { x: tgt.x, y: tgt.y, pace: 1 };
   let sx = tgt.x;
   let sy = tgt.y;
+  // A pack: a melee member takes a slot round the target, a ranged one keeps behind its front (docs/ROSTER.md 6.7).
+  if (m.pack >= 0 && d > 4) {
+    const slot = flankPoint(w, m, tgt, d);
+    if (slot) {
+      sx = slot.x;
+      sy = slot.y;
+    } else if (list.length === 0 && isHoldingLine(m)) {
+      const front = frontOf(w, m);
+      if (front) {
+        const dx = front.x - tgt.x;
+        const dy = front.y - tgt.y;
+        const l = Math.hypot(dx, dy) || 1;
+        sx = front.x + (dx / l) * 2.5;
+        sy = front.y + (dy / l) * 2.5;
+        if (Math.hypot(sx - m.x, sy - m.y) < 1.2) return null;
+      }
+    }
+  }
+  // Most monsters have no style: the target (or their place in the pack), at their own pace, with nothing more worked out.
+  if (list.length === 0) return { x: sx, y: sy, pace: 1 };
   let pace = 1;
   let seen: boolean | undefined;
   const los = (): boolean => (seen ??= w.grid.los(m.x, m.y, tgt.x, tgt.y));
