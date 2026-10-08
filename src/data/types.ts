@@ -148,6 +148,8 @@ export type ClassDef = {
   color: number;
   startWeapons: string[];
   startOffHand?: string;
+  /** Extra mods on the starting weapon and body armour only (the bases are shared with drops). */
+  startMods?: { weapon?: Mod[]; body?: Mod[] };
 };
 
 export type DamageRange = { type: DamageType; min: number; max: number };

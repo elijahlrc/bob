@@ -143,6 +143,7 @@ export function newRun(classId: string, seed: number, difficulty: Difficulty = D
   };
   const uid = uidSource(run);
   const main = makeItem(uid, cls.startWeapons[0], 1, 1);
+  main.implicits.push(...(cls.startMods?.weapon ?? []).map((m) => ({ ...m })));
   run.build.equipment.mainHand = main;
   if (cls.startWeapons[1]) run.build.equipment.offHand = makeItem(uid, cls.startWeapons[1], 1, 1);
   else if (cls.startOffHand)
@@ -153,6 +154,7 @@ export function newRun(classId: string, seed: number, difficulty: Difficulty = D
       cls.startOffHand.startsWith('quiver') ? 0 : 1,
     );
   const body: Item = makeItem(uid, BODY_FOR_CLASS[classId], 1, 2);
+  body.implicits.push(...(cls.startMods?.body ?? []).map((m) => ({ ...m })));
   run.build.equipment.body = body;
   run.build.flasks = [
     makeFlask(uid, 'flask_life_1', 1),

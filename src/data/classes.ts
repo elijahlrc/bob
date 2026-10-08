@@ -1,3 +1,4 @@
+import { mod } from '../mods/types';
 import type { ClassDef } from './types';
 
 /**
@@ -26,6 +27,15 @@ export const CLASSES: ClassDef[] = [
     attrs: { str: 14, dex: 14, int: 32 },
     color: 0x5a78d0,
     startWeapons: ['wand_1'],
+    // The wand attacks for a long while before the first spell gem arrives, and Willow Twig and a
+    // Threadbare Vestment alone could not clear map 1 (about 9 in 10 died there).
+    startMods: {
+      weapon: [
+        mod('damage.min', 'base', 3, { local: true, damageTypes: ['physical'] }),
+        mod('damage.max', 'base', 6, { local: true, damageTypes: ['physical'] }),
+      ],
+      body: [mod('es', 'base', 28, { local: true })],
+    },
   },
   {
     id: 'reaver',
