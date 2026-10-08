@@ -17,7 +17,7 @@ import type { World } from '../sim/types';
 import { createWorld, stepWorld } from '../sim/world';
 import { makeOffer, rollOffers, TWO_TYPES_FROM } from './offers';
 import { newRun, planFor, setMap, worldOptsFor, type RunState } from './run';
-import { scoreTheme, themeReward, threatPreview } from './threat';
+import { levelHardness, scoreTheme, survivalRatio, themeReward, threatPreview } from './threat';
 import { Character } from '../calc/character';
 import { cfgFor } from './bot';
 import { withStarterGems } from './starterGems';
@@ -251,5 +251,37 @@ describe('the threat model knows the types', () => {
     const base = threatPreview(ch, theme, 'clearing', [], 'plain');
     expect(p.dps).toBeGreaterThan(base.dps);
     expect(p.ehp).toBeLessThan(base.ehp);
+  });
+});
+
+describe('a higher offer is judged harder (docs/MAPS.md 5.1)', () => {
+  const run = withStarterGems(newRun('reaver', 1));
+  run.build.level = 40;
+  setMap(run, 40);
+  const at = (lvl: number) => new Character(run.build, { ...cfgFor(run), areaLevel: lvl });
+  const theme = themeDef('ashenCrypt');
+
+  it('monsters two levels up hit and last noticeably more', () => {
+    expect(levelHardness(40, 40)).toBe(1);
+    expect(levelHardness(42, 40)).toBeGreaterThan(1.1);
+    expect(levelHardness(38, 40)).toBeLessThan(0.9);
+  });
+
+  it('the same map scores lower two levels up and higher two levels down, next to the map number', () => {
+    const v = (lvl: number) => scoreTheme(at(lvl), theme, 'clearing', [], 'plain', 40).value;
+    expect(v(42)).toBeLessThan(v(40));
+    expect(v(38)).toBeGreaterThan(v(40));
+    // The verdict counts it too: the same plain map is a worse bet two levels up.
+    const ratio = (lvl: number) => survivalRatio(at(lvl), theme, 'clearing', [], 'plain', 1, 40);
+    expect(ratio(42)).toBeLessThan(ratio(40));
+    expect(ratio(40)).toBeCloseTo(1, 1);
+  });
+
+  it('a Crescendo map does not pull the character out while the exit is open', () => {
+    const w = worldOf(newRun('vanguard', 3), 'crescendo');
+    w.exitOpen = true;
+    w.t = CRESCENDO_LIMIT + 5;
+    stepWorld(w);
+    expect(w.status).toBe('running');
   });
 });

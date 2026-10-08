@@ -698,3 +698,17 @@ Plan: [MAPS.md](MAPS.md). First pass; the plan says to re-evaluate the numbers a
   weight 1, 3 of 24 and 68.4. That points the same way (less weight on reward is no worse) but the differences are inside
   the noise of 24 runs, so the cause is not settled. The bot's way of judging an offer, not the offers, is the first thing to
   improve before acceptance 1 can be measured at all.
+
+- **Review fixes after the strategy runs.**
+  - The offer score did not scale with the monsters' level: a character's effective HP barely moves with it (804, 798, 793 at
+    levels 38, 40, 42), so a +2 offer looked nearly free. `scoreTheme` and the verdict now divide by how much harder the
+    monsters of that level are than those of the map number (`levelHardness`: their blows times their life) and credit the
+    extra XP (the square root of the XP ratio).
+  - Throng's difficulty multiplier now sits in one place (the type: 2.9, about 1.4 times a plain map in the model).
+  - A Crescendo map no longer pulls the character out while the exit is open.
+  - Greedy again, with the corrected score (`--seed 2`, 24 runs): 3 wins and a mean median map of 72.5 (before: 3 and 68.4;
+    anchor 6 and 77.9; random 5 and 78.5). Still not better than anchor or random, and inside the noise.
+  - **The first lever is the maps, not the bot.** The anchor strategy alone, on seed 1 (the seed of the R0 and R1 to R5 runs),
+    won 3 of 18; the R0 bot (which chose among themes) won 8 of 18, and R1 to R5 with the same bot 1 of 18. The route choice
+    cannot make up for maps that got harder: affixes now start at map 5, carry one more at every band from map 20, and there
+    are 18 more of them, plus types and carry-over.

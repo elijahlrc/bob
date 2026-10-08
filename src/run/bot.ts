@@ -141,7 +141,7 @@ export function chooseOffer(run: RunState, rule: ThemeRule = 'best', rng?: Rng):
   const boss = run.map % 10 === 0 ? 'boss' : 'clearing';
   // An offer's monsters are at its own level, so each is scored by a character facing that level.
   const valueOf = (o: MapOffer) =>
-    scoreTheme(offerCharacter(run, o), themeDef(o.themeId), boss, o.affixes, o.type).value;
+    scoreTheme(offerCharacter(run, o), themeDef(o.themeId), boss, o.affixes, o.type, run.map).value;
   let best = first;
   let bestValue = valueOf(first);
   // A later offer must beat the best so far by 0.1%, so ties keep the earlier one.

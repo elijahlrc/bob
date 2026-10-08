@@ -1,5 +1,7 @@
 import { Character, type SteadyMode } from '../calc/character';
 import { NO_SHIFT } from '../calc/combat';
+import { baseXp, monsterHit, monsterLife } from '../calc/formulas';
+import { easeDamage, easeLife } from '../data/constants';
 import { mapTypeDef, THRONG_AFFIX, type MapTypeId } from '../data/mapTypes';
 import { buildMonster } from '../calc/monster';
 import {
@@ -128,7 +130,7 @@ export function affixThreat(
     pressure *= mapAffixDef(id).pressure ?? 1;
     // More monsters and more rare packs make a map harder in ways the mods do not show.
     const def = mapAffixDef(id);
-    if (def.packSize && !def.pressure) pressure *= 1 + def.packSize * 0.5;
+    if (def.packSize && !def.pressure && !def.fixed) pressure *= 1 + def.packSize * 0.5;
     if (affixRarePacks(id, level) > 0 && !def.pressure)
       pressure *= 1 + 0.03 * affixRarePacks(id, level);
   }
@@ -176,6 +178,12 @@ export type ThemeScore = {
   value: number;
 };
 
+/** How much harder the monsters of one level are than those of another: their blows times their life (with the early easing). */
+export function levelHardness(level: number, ref: number): number {
+  const f = (m: number) => monsterHit(m) * easeDamage(m) * monsterLife(m) * easeLife(m);
+  return f(level) / f(ref);
+}
+
 /**
  * How a character fares against a theme and its map affixes: DPS against the monsters it will meet,
  * effective HP against the damage they deal, and how hard the monsters are to kill and to survive.
@@ -186,9 +194,13 @@ export function scoreTheme(
   mode: SteadyMode,
   affixes: string[] = [],
   type: MapTypeId = 'plain',
+  /** The level offers are compared at (the map number): a higher offer is harder and pays more XP. Default: its own. */
+  refLevel?: number,
 ): ThemeScore {
   const threat = themeThreat(theme);
   const level = ch.config.areaLevel;
+  const hard = refLevel === undefined ? 1 : levelHardness(level, refLevel);
+  const pay = refLevel === undefined ? 1 : Math.sqrt(baseXp(level) / baseXp(refLevel));
   // A Throng's monsters carry its hidden affix (fewer hit points and weaker blows, and a much bigger crowd).
   const onMonsters = type === 'throng' ? [...affixes, THRONG_AFFIX] : affixes;
   const a = affixThreat(onMonsters, level);
@@ -253,9 +265,10 @@ export function scoreTheme(
     a.damage *
     (1 + g) *
     a.pressure *
-    mapTypeDef(type).pressure;
+    mapTypeDef(type).pressure *
+    hard;
   const value =
-    ((Math.max(0.1, dps) * ehp) / pressure) * (1 + themeReward(theme, affixes, level, type));
+    ((Math.max(0.1, dps) * ehp) / pressure) * (1 + themeReward(theme, affixes, level, type)) * pay;
   return { dps, ehp, pressure, value };
 }
 
@@ -283,9 +296,10 @@ export function survivalRatio(
   affixes: string[],
   type: MapTypeId,
   lifeFrac: number,
+  refLevel?: number,
 ): number {
   const base = scoreTheme(ch, NEUTRAL, mode, []);
-  const here = scoreTheme(ch, theme, mode, affixes, type);
+  const here = scoreTheme(ch, theme, mode, affixes, type, refLevel);
   const per = (s: ThemeScore) => (Math.max(0.1, s.dps) * s.ehp) / s.pressure;
   return (per(here) / Math.max(1e-9, per(base))) * Math.max(0.05, Math.min(1, lifeFrac));
 }

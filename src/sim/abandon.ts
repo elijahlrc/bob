@@ -31,7 +31,7 @@ export function cancelAbandon(w: World): boolean {
 export function tickAbandon(w: World, dt: number): void {
   if (w.status !== 'running') return;
   // A Crescendo map pulls the character out when its time is up, as an abandon (docs/MAPS.md 9.1).
-  if (w.plan.type === 'crescendo' && w.t >= CRESCENDO_LIMIT) {
+  if (w.plan.type === 'crescendo' && w.t >= CRESCENDO_LIMIT && !w.exitOpen) {
     w.status = 'abandoned';
     w.events.push({ t: 'abandoned' });
     return;

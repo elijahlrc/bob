@@ -48,6 +48,7 @@ export function offersFor(run: RunState): OfferPreview[] {
       offer.affixes,
       offer.type,
       run.vitals.life,
+      run.map,
     );
     return { ...offer, dps: p.dps, ehp: p.ehp, ratio, verdict: verdictOf(ratio) };
   });

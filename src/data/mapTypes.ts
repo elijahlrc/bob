@@ -48,8 +48,9 @@ export const MAP_TYPES: MapTypeDef[] = [
     text: 'A throng two and a half times the usual crowd, of weaker monsters with less life and damage.',
     from: 12,
     reward: { quantity: 0.4, experience: 0.25 },
-    // 2.5 times the monsters, each with 60% of the life and 80% of the damage: about 1.5 times the work and 2 times the blows.
-    pressure: 1.65,
+    // The hidden affix makes each monster 0.6 times the life and 0.8 times the damage (0.48 together), and the crowd is
+    // 2.5 times as big and engaged at once: this multiplier makes the map about 1.4 times a plain one in the threat model.
+    pressure: 2.9,
   },
 ];
 
