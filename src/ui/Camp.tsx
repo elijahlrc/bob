@@ -86,14 +86,15 @@ function Arriving({ run }: { run: RunState }) {
 export function Camp({ c }: { c: Controller }) {
   const run = c.run;
   const [tab, setTab] = useState<Tab>('sheet');
-  // Below the desktop width the side column becomes a tab, with a bar at the bottom (docs/MOBILE.md 3.3).
-  const compact = useViewport().layout !== 'desktop';
+  // The next map is a tab of its own at every width, with a bar at the bottom. On a narrow screen the offer cards also
+  // fold their detail lines until asked for (docs/MOBILE.md 3.3).
+  const narrow = useViewport().layout !== 'desktop';
   const tabsRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     tabsRef.current
       ?.querySelector('.tab.on')
       ?.scrollIntoView({ inline: 'nearest', block: 'nearest' });
-  }, [tab, compact]);
+  }, [tab]);
   // On a narrow screen the types, rules and gate line of an offer card stay folded until asked for.
   const [opened, setOpened] = useState<Record<string, boolean>>({});
   const [left, setLeft] = useState<number | null>(null);
@@ -206,7 +207,7 @@ export function Camp({ c }: { c: Controller }) {
                   </div>
                 )}
                 <div class="muted">{t.bonusText}</div>
-                <OfferInfo o={o} gate={run.map % 10 === 0} more={!compact || !!opened[o.id]} />
+                <OfferInfo o={o} gate={run.map % 10 === 0} more={!narrow || !!opened[o.id]} />
                 {o.tier && (
                   <div
                     class={`tier ${o.tier}`}
@@ -236,7 +237,7 @@ export function Camp({ c }: { c: Controller }) {
                   </div>
                 )}
               </button>
-              {compact && (
+              {narrow && (
                 <button
                   class="btn small"
                   onClick={() => setOpened({ ...opened, [o.id]: !opened[o.id] })}
@@ -249,28 +250,30 @@ export function Camp({ c }: { c: Controller }) {
           );
         })}
       </div>
-      <DebugPanel c={c} />
-      <label class="muted">
-        <input
-          type="checkbox"
-          checked={run.autoContinue}
-          onChange={(e) => c.setAutoContinue((e.target as HTMLInputElement).checked)}
-        />{' '}
-        Auto-continue
-        {left !== null && ` — ${themeDef(run.offers[0].themeId).name} in ${left.toFixed(1)} s`}
-        {run.autoContinue && blocker && <div class="warn">Paused: {blocker}</div>}
-      </label>
-      <button class="btn" onClick={() => c.quit()}>
-        Save and quit
-      </button>
-      <button class="btn danger" onClick={() => confirm('Abandon this run?') && c.abandon()}>
-        Abandon run
-      </button>
+      <div class="camp-foot">
+        <DebugPanel c={c} />
+        <label class="muted">
+          <input
+            type="checkbox"
+            checked={run.autoContinue}
+            onChange={(e) => c.setAutoContinue((e.target as HTMLInputElement).checked)}
+          />{' '}
+          Auto-continue
+          {left !== null && ` — ${themeDef(run.offers[0].themeId).name} in ${left.toFixed(1)} s`}
+          {run.autoContinue && blocker && <div class="warn">Paused: {blocker}</div>}
+        </label>
+        <button class="btn" onClick={() => c.quit()}>
+          Save and quit
+        </button>
+        <button class="btn danger" onClick={() => confirm('Abandon this run?') && c.abandon()}>
+          Abandon run
+        </button>
+      </div>
     </>
   );
-  const shown: Tab = compact || tab !== 'next' ? tab : 'sheet';
+  const shown: Tab = tab;
   return (
-    <div class={'screen camp' + (compact ? ' compact' : '')}>
+    <div class="screen camp tabbed">
       <div class="camp-main">
         <div class="tabs" ref={tabsRef}>
           <button class={'tab' + (shown === 'sheet' ? ' on' : '')} onClick={() => setTab('sheet')}>
@@ -294,11 +297,9 @@ export function Camp({ c }: { c: Controller }) {
           >
             Workbench{run.pendingCraft ? ' (pick a result)' : ''}
           </button>
-          {compact && (
-            <button class={'tab' + (shown === 'next' ? ' on' : '')} onClick={() => setTab('next')}>
-              Next map{run.reward ? ' (reward)' : ''}
-            </button>
-          )}
+          <button class={'tab' + (shown === 'next' ? ' on' : '')} onClick={() => setTab('next')}>
+            Next map{run.reward ? ' (reward)' : ''}
+          </button>
         </div>
         <div class="tab-body">
           {shown === 'tree' && <TreeView c={c} />}
@@ -308,23 +309,23 @@ export function Camp({ c }: { c: Controller }) {
           {shown === 'workbench' && <Workbench c={c} />}
           {shown === 'next' && <div class="camp-next camp-side-body">{side}</div>}
         </div>
-        {compact && (
-          <div class="camp-bar">
-            <span class="camp-bar-who">
-              {classDef(run.classId).name} · Level {run.build.level}
-            </span>
-            <button class="btn small" disabled={!c.canUndo} onClick={() => c.undo()}>
-              ↶ Undo
+        <div class="camp-bar">
+          <span class="camp-bar-who">
+            {classDef(run.classId).name} · Level {run.build.level}
+          </span>
+          {left !== null && shown !== 'next' && (
+            <span class="muted">Auto-continue: next map in {left.toFixed(1)} s</span>
+          )}
+          <button class="btn small" disabled={!c.canUndo} onClick={() => c.undo()}>
+            ↶ Undo
+          </button>
+          {shown !== 'next' && (
+            <button class="btn small primary" onClick={() => setTab('next')}>
+              Next map ▸
             </button>
-            {shown !== 'next' && (
-              <button class="btn small primary" onClick={() => setTab('next')}>
-                Next map ▸
-              </button>
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
-      {!compact && <div class="camp-side">{side}</div>}
     </div>
   );
 }

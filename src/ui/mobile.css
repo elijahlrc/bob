@@ -149,17 +149,17 @@ body {
   }
 }
 
-/* ---- Camp below the desktop width (Camp.tsx: the side column becomes a tab and a bar) ---- */
-.camp.compact {
+/* ---- The camp: tabs, with the next map a tab of its own, and a bar at the bottom (Camp.tsx) ---- */
+.camp.tabbed {
   flex-direction: column;
   --camp-bar: 52px;
 }
-.camp.compact .camp-main {
+.camp.tabbed .camp-main {
   flex: 1 1 auto;
   width: 100%;
   min-height: 0;
 }
-.camp.compact .tabs {
+.camp.tabbed .tabs {
   overflow-x: auto;
   flex-wrap: nowrap;
   scroll-snap-type: x proximity;
@@ -167,10 +167,10 @@ body {
   padding-left: calc(8px + var(--safe-left));
   padding-right: calc(8px + var(--safe-right));
 }
-.camp.compact .tabs::-webkit-scrollbar {
+.camp.tabbed .tabs::-webkit-scrollbar {
   display: none;
 }
-.camp.compact .tab {
+.camp.tabbed .tab {
   flex: 0 0 auto;
   white-space: nowrap;
   scroll-snap-align: start;
@@ -304,7 +304,14 @@ body {
   }
 }
 
-/* On a tablet the three offers sit side by side in the Next map tab. */
+/* The debug panel, auto-continue, save and abandon at the foot of the Next map tab. */
+.camp-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* From a tablet up the three offers sit side by side in the Next map tab, and the foot is a row. */
 @media (min-width: 601px) {
   .camp-next .theme-choice {
     flex-direction: row;
@@ -312,6 +319,19 @@ body {
   }
   .camp-next .theme-wrap {
     flex: 1 1 200px;
+    max-width: 560px;
+  }
+  .camp-foot {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+  }
+  .camp-foot .debug-panel {
+    flex: 1 1 100%;
+  }
+  .camp-foot .btn {
+    width: auto;
   }
 }
 

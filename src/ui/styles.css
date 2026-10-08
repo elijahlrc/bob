@@ -264,22 +264,6 @@ button {
   flex-direction: column;
   min-width: 0;
 }
-.camp-side {
-  width: 260px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  border-left: 1px solid #333;
-  background: var(--side);
-  overflow: auto;
-}
-.camp-side h2 {
-  margin: 0;
-}
-.camp-side .theme-choice {
-  flex-direction: column;
-}
 .notice {
   color: var(--hi);
 }
