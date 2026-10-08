@@ -28,9 +28,14 @@
     `$env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")`
   - Dev server: `npm run dev` on http://localhost:5173 (strict port).
 - **Map choice plan:** [docs/MAPS.md](docs/MAPS.md) (milestones R0–R7): three offers per level, level offsets of ±2, carry-over of life, mana, ES and flasks, Abandon, Respite and map types. R0 to R6 are built as a first pass (the numbers are not tuned; see `docs/PROGRESS.md`); R7, the phase-2 types, is not. Decisions go in DESIGN.md Appendix A.
+- **Enemy variety and difficulty plan:** [docs/ENEMIES.md](docs/ENEMIES.md) (milestones E0–E7): a proposal, nothing built yet. Who the
+  player meets (theme weights, offer-set rules, pack templates), what the camp card says about it, creature kits, a
+  data-driven ability layer, new factions, and the difficulty settings (scaling, base, variance) with a debug panel and a
+  harder baseline. Decisions go in DESIGN.md Appendix A.
 - **Status:** M0–M7 of DESIGN.md are complete (see `docs/PROGRESS.md`). Further work is the stretch list
-  or balance changes. Balance constants live in `src/data/constants.ts`; after changing them run
-  `npm run sim -- --runs 10 --class all` and, if XP pacing moved, `--write-xp`.
+  or balance changes. Balance constants live in `src/data/constants.ts`. `npm run sim` (headless bot balance
+  report) is useful for checking a balance change but is not required after every one; `--write-xp` regenerates
+  `src/data/measuredXp.ts` if you want XP pacing re-measured.
 - **Bash tool quirk:** in Bash, Node is not on PATH; use `export PATH="/c/Program Files/nodejs:$PATH"`.
   Backslash escapes in heredocs can be collapsed; write files with the Write tool instead.
 
