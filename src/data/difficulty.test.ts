@@ -64,8 +64,9 @@ describe('the difficulty model (docs/ENEMIES.md section 8)', () => {
 
   it('the new default is harder than the legacy curve, more so as the run goes on', () => {
     const at = (m: number) => relativeHardness(m, DEFAULT, monsterLife, monsterHit);
-    expect(at(1)).toBeCloseTo(1, 5);
-    expect(at(10)).toBeGreaterThan(1.2);
+    // The flat base applies from the first map; the scaling does not until the second.
+    expect(at(1)).toBeCloseTo(DEFAULT.base, 5);
+    expect(at(10)).toBeGreaterThan(1.2 * DEFAULT.base);
     expect(at(50)).toBeGreaterThan(at(10));
     expect(at(100)).toBeGreaterThan(at(50));
   });

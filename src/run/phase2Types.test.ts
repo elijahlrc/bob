@@ -217,6 +217,7 @@ describe('Crawl (docs/MAPS.md 9.2)', () => {
 
   it('the game chains the three maps without a camp and pays one pick with a unique in it', () => {
     const c = new Controller(null);
+    c.setStartDifficulty({ scaling: 1.5, base: 1, variance: 0.1 });
     c.startRun('vanguard', 6);
     const run = c.run!;
     setMap(run, 42);

@@ -172,8 +172,10 @@ describe('saving (§5.5)', () => {
 
 describe('the headless bot (§15.5)', () => {
   it('plays deterministically and levels up', () => {
-    const a = botRun('mystic', 22, 6);
-    const b = botRun('mystic', 22, 6);
+    // The settings the game started with: this test is about the bot, not about the default difficulty.
+    const difficulty = { scaling: 1.5, base: 1, variance: 0.1 };
+    const a = botRun('mystic', 22, 6, { difficulty });
+    const b = botRun('mystic', 22, 6, { difficulty });
     expect(a.maps.map((m) => [m.status, m.level])).toEqual(b.maps.map((m) => [m.status, m.level]));
     expect(a.maps[0].status).toBe('cleared');
   });

@@ -43,7 +43,7 @@ describe('the difficulty settings in the controller', () => {
     expect(c.startDifficulty).toEqual(DEFAULT);
     c.setStartDifficulty({ scaling: 1.5, variance: 0 });
     c.startRun('vanguard', 1);
-    expect(c.run!.difficulty).toEqual({ scaling: 1.5, base: 1, variance: 0 });
+    expect(c.run!.difficulty).toEqual({ scaling: 1.5, base: DEFAULT.base, variance: 0 });
   });
 
   it('changes at camp apply to the run, are clamped, and are ignored outside camp', () => {
