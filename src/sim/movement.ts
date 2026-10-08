@@ -32,6 +32,8 @@ export type MoveState = {
   anchorT: number;
   /** A tether: seconds it has held its ground (it comes out after three), or, below nought, seconds left of coming out. */
   holdT: number;
+  /** A burrow: seconds until it may dive again. */
+  burrowCd: number;
   /** Whether it could see its target when it last looked (a skitter looks at each turn, not each tick). */
   seen: boolean;
 };
@@ -50,6 +52,7 @@ export function newMoveState(): MoveState {
     anchorId: 0,
     anchorT: 0,
     holdT: 0,
+    burrowCd: 3,
     seen: false,
   };
 }
@@ -83,6 +86,7 @@ const style = (m: Actor, id: MoveSpec['id']): MoveSpec | undefined =>
 
 /** Whether the character can see this monster (a veiled one is seen only close up, or just after it strikes or is struck). */
 export function revealed(w: World, m: Actor): boolean {
+  if (m.burrowT > 0) return false;
   const veil = m.mon ? senseOf(m).veil : undefined;
   if (!veil || m.revealT > 0) return true;
   return Math.hypot(m.x - w.player.x, m.y - w.player.y) <= veil;
@@ -188,8 +192,10 @@ export function whileStunned(m: Actor): void {
 /** Whether a monster is withdrawing or hiding after a blow, and so does not strike. */
 export function withdrawing(m: Actor): boolean {
   const mv = m.mv;
-  if (mv.t <= 0) return false;
-  return mv.t > 0 && (mv.phase === 2 || (mv.phase === 1 && !!style(m, 'swoop')));
+  if (mv.phase !== 3 && mv.t <= 0) return false;
+  return (
+    mv.phase === 3 || (mv.t > 0 && (mv.phase === 2 || (mv.phase === 1 && !!style(m, 'swoop'))))
+  );
 }
 
 /** What a style wants this tick: a point to steer to and a share of its speed, or nothing (stand still). */
@@ -343,6 +349,30 @@ export function steer(w: World, m: Actor, tgt: Actor, d: number, dt: number): St
         sx = a.x + (dx / l) * 2.5;
         sy = a.y + (dy / l) * 2.5;
         if (Math.hypot(sx - m.x, sy - m.y) < 1.2) return null;
+        break;
+      }
+      case 'burrow': {
+        // A dive: under the floor, untouchable and unseen, straight at the target; then up, and it strikes.
+        if (mv.phase === 3) {
+          mv.t -= dt;
+          if (mv.t <= 0 || d <= 1.4) {
+            mv.phase = 0;
+            mv.burrowCd = s.dive ?? 8;
+            m.burrowT = 0;
+            m.phases = false;
+            m.revealT = 1.5;
+            break;
+          }
+          return { x: tgt.x, y: tgt.y, pace: 1.6 };
+        }
+        mv.burrowCd -= dt;
+        if (mv.burrowCd <= 0 && d > 4 && d < 14 && m.stunT <= 0) {
+          mv.phase = 3;
+          mv.t = s.seconds ?? 2.2;
+          m.burrowT = mv.t + 0.2;
+          m.phases = true;
+          return { x: tgt.x, y: tgt.y, pace: 1.6 };
+        }
         break;
       }
       case 'cover': {

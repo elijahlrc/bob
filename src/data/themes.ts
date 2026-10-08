@@ -310,6 +310,45 @@ THEMES.push(
   },
 );
 
+/** The Drowned (docs/ROSTER.md 7.2): two themes. */
+THEMES.push(
+  {
+    id: 'drownedVault',
+    name: 'Drowned Vault',
+    elementWeights: { lightning: 2 },
+    typeWeights: { wrack: 2, leech: 1.5 },
+    factions: { drowned: 85, ossuary: 15 },
+    fromMap: 20,
+    chief: { mod: 'tidewarden', type: 'wrack' },
+    extraCurrency: 1,
+    itemQuantity: 0,
+    rareWeightMult: 1,
+    xpMult: 1,
+    extraRarePacks: 0,
+    extraChests: 0,
+    bonusText: '+1 currency item',
+    floor: 0x24383c,
+    wall: 0x0e1a1e,
+  },
+  {
+    id: 'brineCistern',
+    name: 'Brine Cistern',
+    elementWeights: { cold: 2 },
+    typeWeights: { tidecaller: 2.5, drowner: 2 },
+    factions: { drowned: 85, ossuary: 15 },
+    fromMap: 24,
+    chief: { mod: 'tidewarden', type: 'wrack' },
+    itemQuantity: 0,
+    rareWeightMult: 1,
+    xpMult: 1.15,
+    extraRarePacks: 0,
+    extraChests: 0,
+    bonusText: '+15% experience',
+    floor: 0x2a4044,
+    wall: 0x102024,
+  },
+);
+
 /** The Kennel and the Gilded (docs/ENEMIES.md 7.4): two themes each. */
 THEMES.push(
   {
@@ -397,6 +436,7 @@ const LED = [
   'reliquaryVault',
   'kennelRun',
   'giltHall',
+  'drownedVault',
 ];
 const reward = (t: ThemeDef) =>
   0.5 * t.itemQuantity +

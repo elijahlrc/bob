@@ -96,6 +96,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     phases: false,
     mv: newMoveState(),
     revealT: 0,
+    burrowT: 0,
     flies: false,
     stationary: false,
     curlT: 0,

@@ -100,6 +100,8 @@ export type SkillDef = {
   travel?: number;
   /** A monster's attack: the share of the wind-up after which its aim stops following the target (docs/ROSTER.md 5.3). */
   lockAim?: number;
+  /** A monster's beam that drags the character this many tiles toward it when it lands (docs/ROSTER.md 7.2). */
+  pull?: number;
 };
 
 /** A spell's base damage in one type at a level, from explicit numbers or from the shared curve. */

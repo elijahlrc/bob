@@ -50,6 +50,8 @@ export const FACTION_DEFENCE: Partial<Record<FactionId, DefenceProfile>> = {
   },
   // Hounds and their keepers: chilled and shocked easily.
   kennel: { armour: -45, res: { cold: -25, lightning: -20 } },
+  // Water: fire is no match for it, cold slides off, and it conducts; nothing that lives in it freezes.
+  drowned: { res: { fire: 40, cold: 30, lightning: -40 }, immune: ['freeze'] },
   // Gilt does not burn, and conducts.
   gilded: { res: { fire: 20, cold: -35, lightning: -30 } },
 };

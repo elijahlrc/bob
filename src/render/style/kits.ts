@@ -56,6 +56,8 @@ const ADJUST: Partial<Record<MonsterTypeId, KitAdjust>> = {
   handler: { scale: 1.06 },
   guard: { scale: 1.05 },
   gorger: { scale: 1.18 },
+  wrack: { scale: 1.08, hunch: 7 },
+  tidecaller: { scale: 1.3 },
   choirmaster: { scale: 1.12 },
 };
 
@@ -215,6 +217,38 @@ export function kitFront(type: MonsterTypeId | undefined, a: Anchors): Prim[] {
       cap(o, a.hand.x, a.hand.y, a.hand.x - 4, a.hand.y + 7, 0.4, 'wood');
       circ(o, a.hand.x - 4, a.hand.y + 8, 1.8, 'accent');
       circ(o, a.hipX - 4, a.hipY, 2.6, 'accent');
+      break;
+    case 'wrack':
+      // Kelp hanging off the shoulders and the arms, and a barnacled crust on the head.
+      for (const d of [-1, 0, 1])
+        cap(
+          o,
+          a.shX + d * 4,
+          a.shY + 1,
+          a.shX + d * 5 - 2,
+          a.hipY + 4 + Math.abs(d) * 3 + a.swing * 2,
+          0.9,
+          'clothShade',
+        );
+      circ(o, hx - 1, hy - r * 0.5, 1.4, 'accent');
+      circ(o, hx + 2.4, hy - r * 0.8, 1.1, 'accent');
+      break;
+    case 'tidecaller':
+      // A hook on a chain, trailing from its hand.
+      cap(o, a.hand.x, a.hand.y, a.hand.x + 5, a.hand.y + 9, 0.5, 'metalShade');
+      cap(o, a.hand.x + 5, a.hand.y + 9, a.hand.x + 2, a.hand.y + 13, 0.8, 'metal');
+      o.push({
+        k: 'tri',
+        pts: [
+          a.hand.x + 2,
+          a.hand.y + 13,
+          a.hand.x + 5,
+          a.hand.y + 15,
+          a.hand.x + 6,
+          a.hand.y + 12,
+        ],
+        role: 'metal',
+      });
       break;
     case 'wight':
       // A hanging lantern.

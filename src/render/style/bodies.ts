@@ -75,6 +75,17 @@ const KENNEL: Garb = {
   arms: 'clothShade',
   hands: 'skin',
 };
+/** The Drowned are sodden and pale: wet cloth, bluish skin, hands that have been in the water too long. */
+const DROWNED: Garb = {
+  torso: 'cloth',
+  torsoShade: 'clothShade',
+  legs: 'cloth',
+  legsShade: 'clothShade',
+  foot: 'clothShade',
+  arms: 'cloth',
+  hands: 'skin',
+  glowEyes: true,
+};
 /** The Hollow hang in the air in hoods; their hands are the pale of their bone, their eyes glow. */
 const HOLLOW: Garb = {
   torso: 'cloth',
@@ -90,6 +101,8 @@ const HOLLOW: Garb = {
 const PLAIN: Garb = GILDED;
 
 const OVERRIDE: Partial<Record<MonsterTypeId, Partial<Garb>>> = {
+  // A Tidecaller is a shade of the water: it hangs in the air like the Hollow, in the Drowned's colours.
+  tidecaller: { ...HOLLOW, reach: 12.5, tail: 0.6 },
   // The Hollow differ by what they trail and how they reach: a stalker is all arm, a wailer all hair and tail, a wight tall.
   gloomstalker: { reach: 11.5, tail: 0.45 },
   wailer: { reach: 8, tail: 1.5, streaming: true },
@@ -129,6 +142,7 @@ const OVERRIDE: Partial<Record<MonsterTypeId, Partial<Garb>>> = {
 const BY_FACTION: Partial<Record<string, Garb>> = {
   rot: ROT,
   hollow: HOLLOW,
+  drowned: DROWNED,
   choir: CHOIR,
   gilded: GILDED,
   kennel: KENNEL,
@@ -150,6 +164,7 @@ export const HELD: Partial<Record<MonsterTypeId, FigureKind | null>> = {
   slinger: null,
   handler: null,
   cutpurse: 'hero_dagger',
+  wrack: null,
 };
 
 /** The garb of a type: its faction's, with its own changes. */

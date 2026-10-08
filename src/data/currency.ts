@@ -20,7 +20,8 @@ export type CurrencyId =
   | 'chitin'
   | 'reliquarySlag'
   | 'houndtooth'
-  | 'giltDust';
+  | 'giltDust'
+  | 'brineSalt';
 
 export type CurrencyDef = {
   id: CurrencyId;
@@ -157,6 +158,15 @@ export const CURRENCIES: CurrencyDef[] = [
     families: ['lifeRegen', 'manaRegen', 'lifeLeech'],
     faction: 'gilded',
   },
+  {
+    id: 'brineSalt',
+    name: 'Brine Salt',
+    text: 'Add an affix of your choice: lightning resistance, cold resistance or stun avoidance.',
+    minMap: 20,
+    weight: 0,
+    families: ['lightRes', 'coldRes', 'stunAvoid'],
+    faction: 'drowned',
+  },
 ];
 
 export function currencyDef(id: string): CurrencyDef {
@@ -210,6 +220,11 @@ export const TABLET_SETS: Record<string, { unique: string; tablets: number }[]> 
   kennel: [
     { unique: 'footlooseShoes', tablets: 4 },
     { unique: 'brawlStrap', tablets: 4 },
+  ],
+  drowned: [
+    { unique: 'brinewrackCollar', tablets: 4 },
+    { unique: 'tideturnGauntlets', tablets: 5 },
+    { unique: 'tidewallPlate', tablets: 6 },
   ],
   gilded: [
     { unique: 'pennyCap', tablets: 3 },

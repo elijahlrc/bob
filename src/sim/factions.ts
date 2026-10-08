@@ -156,6 +156,23 @@ export type Corpse = {
 export type ZoneKind = 'caustic' | 'burning' | 'chilling' | 'shocking';
 export const ZONE_KINDS: ZoneKind[] = ['caustic', 'burning', 'chilling', 'shocking'];
 
+/**
+ * Drag the character toward a monster (a Tidecaller's hook): up to `tiles`, never into it, and the character is staggered
+ * for a moment (a pulled character does not walk back into the pack the instant it lands).
+ */
+export function pullPlayer(w: World, from: Actor, tiles: number): void {
+  const p = w.player;
+  if (!p.alive) return;
+  const d = Math.hypot(from.x - p.x, from.y - p.y);
+  const k = Math.min(tiles, Math.max(0, d - (from.r + p.r + 0.6)));
+  if (k <= 0.05) return;
+  const to = w.grid.collide(p.x + ((from.x - p.x) / d) * k, p.y + ((from.y - p.y) / d) * k, p.r);
+  p.x = to.x;
+  p.y = to.y;
+  p.stunT = Math.max(p.stunT, 0.3);
+  w.events.push({ t: 'blink', id: p.id, x: p.x, y: p.y, end: true });
+}
+
 /** Whether a ground effect is a lasting zone (as opposed to a telegraphed blast). */
 export function isZone(e: GroundEffect): boolean {
   return (ZONE_KINDS as string[]).includes(e.kind);
@@ -457,6 +474,18 @@ function tickChampion(w: World, m: Actor, dt: number): void {
     if (m.raiserT <= 0 && d < 16) {
       m.raiserT = HUNTSMASTER_INTERVAL;
       for (let i = 0; i < 3; i++) spawnBeside(w, m, 'hound', 1.4);
+    }
+  }
+  if (m.modIds.includes('tidewarden')) {
+    // Hooks the character in every ten seconds, and calls three Brine Leeches at half life.
+    m.raiserT -= dt;
+    if (m.raiserT <= 0 && d > 3 && d < 14) {
+      m.raiserT = 10;
+      pullPlayer(w, m, 4);
+    }
+    if (m.bossPhase === 0 && frac <= 0.5) {
+      m.bossPhase = 1;
+      for (let i = 0; i < 3; i++) spawnBeside(w, m, 'leech', 1.4);
     }
   }
   if (m.modIds.includes('treasurer')) {

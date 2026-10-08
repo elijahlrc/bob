@@ -5,7 +5,7 @@ import type { SkillProfile } from '../calc/skill';
 import { rollGains } from './buffs';
 import { rollCharges } from './charges';
 import { hit, monsterHitOf } from './combat';
-import { openZone, registerBlast, shieldBlocks, speedMult } from './factions';
+import { openZone, pullPlayer, registerBlast, shieldBlocks, speedMult } from './factions';
 import { fireTriggers } from './triggers';
 import { placeDeployable } from './deploy';
 import { applyUtility } from './utility';
@@ -345,6 +345,12 @@ export function fire(w: World, a: Actor, act: Action): void {
     const x2 = a.x + Math.cos(ang) * len;
     const y2 = a.y + Math.sin(ang) * len;
     w.events.push({ t: 'beam', x: a.x, y: a.y, x2, y2, dtype: dominantType(p, act.hand) });
+    // A hook drags the character it catches.
+    if (!a.isPlayer && p.skill.pull) {
+      const t = w.player;
+      if (t.alive && segmentDist(t.x, t.y, a.x, a.y, x2, y2) <= (b.width * p.radiusMult) / 2 + t.r)
+        pullPlayer(w, a, p.skill.pull);
+    }
     for (const e of enemiesOf(w, a)) {
       if (segmentDist(e.x, e.y, a.x, a.y, x2, y2) > (b.width * p.radiusMult) / 2 + e.r) continue;
       hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));

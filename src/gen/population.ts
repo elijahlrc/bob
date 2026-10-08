@@ -91,6 +91,10 @@ export const TYPE_WEIGHTS: Record<MonsterTypeId, number> = {
   bell: 8,
   spinner: 14,
   coffer: 8,
+  tidecaller: 16,
+  wrack: 30,
+  leech: 40,
+  drowner: 14,
 };
 
 /** The share of every type on a theme's maps (sum 1): its factions, then the types within each. */

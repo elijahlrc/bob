@@ -55,11 +55,16 @@ export type MonsterTypeId =
   | 'watcher'
   | 'bell'
   | 'spinner'
-  | 'coffer';
+  | 'coffer'
+  // The Drowned (docs/ROSTER.md 7.2)
+  | 'tidecaller'
+  | 'wrack'
+  | 'leech'
+  | 'drowner';
 
 /** The monster families (EXPANSION 7.3). The Choir, the Swarm and the Reliquary join in later milestones. */
 export type FactionId =
-  'ossuary' | 'rot' | 'hollow' | 'choir' | 'swarm' | 'reliquary' | 'kennel' | 'gilded';
+  'ossuary' | 'rot' | 'hollow' | 'choir' | 'swarm' | 'reliquary' | 'kennel' | 'gilded' | 'drowned';
 
 export const FACTION_NAMES: Record<FactionId, string> = {
   ossuary: 'Ossuary',
@@ -70,6 +75,7 @@ export const FACTION_NAMES: Record<FactionId, string> = {
   reliquary: 'the Reliquary',
   kennel: 'the Kennel',
   gilded: 'the Gilded',
+  drowned: 'the Drowned',
 };
 
 /** The body a type is drawn with (humanoid factions reuse the figure rig with a new palette). */
@@ -97,7 +103,8 @@ export type BodyKind =
   | 'heap'
   | 'bell'
   | 'spider'
-  | 'chest';
+  | 'chest'
+  | 'worm';
 
 /**
  * The pose family of an attack (docs/ROSTER.md 4.3): how the body moves when it strikes, apart from which rig it is. A type
@@ -975,6 +982,93 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     radius: 0.55,
     mods: [],
   },
+
+  // The Drowned (docs/ROSTER.md 7.2): being held.
+  tidecaller: {
+    id: 'tidecaller',
+    role: 'support',
+    name: 'Tidecaller',
+    faction: 'drowned',
+    body: 'mage',
+    style: 'spectre',
+    archetype: 'controller',
+    defence: { es: 0.3 },
+    shape: { id: 'lance', length: 11, width: 0.8, mult: 0.8, lock: 0.3, pull: 3.5 },
+    innate: true,
+    minLevel: 20,
+    lifeMult: 0.9,
+    dmgMult: 0.6,
+    range: 8,
+    attack: 'spell',
+    speed: 2.4,
+    attackTime: 2.6,
+    radius: 0.4,
+    mods: [],
+  },
+  wrack: {
+    id: 'wrack',
+    role: 'front',
+    name: 'Wrack',
+    faction: 'drowned',
+    body: 'brute',
+    archetype: 'bruiser',
+    movement: [{ id: 'lurch', go: 1.1, pace: 1.5, stop: 0.7 }],
+    defence: { armour: 40 },
+    shape: { id: 'swing', arc: 150, radius: 2.4, lock: 0.3 },
+    hobbles: true,
+    innate: true,
+    minLevel: 20,
+    lifeMult: 2.2,
+    dmgMult: 1.2,
+    range: 1.5,
+    attack: 'melee',
+    speed: 1.8,
+    attackTime: 2,
+    radius: 0.6,
+    mods: [],
+  },
+  leech: {
+    id: 'leech',
+    role: 'swarm',
+    name: 'Brine Leech',
+    faction: 'drowned',
+    body: 'toad',
+    archetype: 'skirmisher',
+    movement: [{ id: 'hop', go: 0.8, pace: 2.2, stop: 0.5 }],
+    defence: { evasion: 40 },
+    hobbles: true,
+    innate: true,
+    minLevel: 20,
+    lifeMult: 0.3,
+    dmgMult: 0.35,
+    range: 1,
+    attack: 'melee',
+    speed: 3.8,
+    attackTime: 1,
+    radius: 0.3,
+    mods: [mod('leech.life', 'base', 8)],
+  },
+  drowner: {
+    id: 'drowner',
+    role: 'special',
+    name: 'Drowner',
+    faction: 'drowned',
+    body: 'worm',
+    archetype: 'ambusher',
+    movement: [{ id: 'burrow', dive: 8, seconds: 2.2 }],
+    shape: { id: 'slam', radius: 2, mult: 1.2, lock: 0.3 },
+    innate: true,
+    noBody: true,
+    minLevel: 22,
+    lifeMult: 1,
+    dmgMult: 1.6,
+    range: 1.2,
+    attack: 'melee',
+    speed: 3.2,
+    attackTime: 1.4,
+    radius: 0.5,
+    mods: [],
+  },
 };
 
 /** Faction mods (EXPANSION 7.3): on every monster of the faction. */
@@ -1085,6 +1179,7 @@ export type MonsterModId =
   | 'boneWarden'
   | 'huntsmaster'
   | 'treasurer'
+  | 'tidewarden'
   // New counterplay mods (docs/ENEMIES.md 7.2)
   | 'charging'
   | 'flaskTaker'
@@ -1274,6 +1369,7 @@ MONSTER_MODS.push(
   { id: 'boneWarden', name: 'The Bone Warden', magic: false, chief: true, mods: [] },
   { id: 'huntsmaster', name: 'The Huntsmaster', magic: false, chief: true, mods: [] },
   { id: 'treasurer', name: 'The Treasurer', magic: false, chief: true, mods: [] },
+  { id: 'tidewarden', name: 'The Tidewarden', magic: false, chief: true, mods: [] },
   // Counterplay mods: a rush that punishes kiting, a thief of flask charges, a hobbling touch.
   { id: 'charging', name: 'Charging', magic: true, minLevel: 12, mods: [] },
   { id: 'flaskTaker', name: 'Flask-taker', magic: true, minLevel: 20, mods: [] },

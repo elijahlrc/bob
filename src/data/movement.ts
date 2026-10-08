@@ -17,7 +17,8 @@ export type MovementId =
   | 'follow'
   | 'kamikaze'
   | 'phase'
-  | 'cover';
+  | 'cover'
+  | 'burrow';
 
 export type MoveSpec = {
   id: MovementId;
@@ -34,6 +35,8 @@ export type MoveSpec = {
   every?: number;
   /** Swoop: tiles it withdraws after a blow. Cover: tiles it looks for shelter within. */
   back?: number;
+  /** Burrow: seconds between dives (the `every` of a skitter's turns is a different thing: this one is `dive`). */
+  dive?: number;
   /** Orbit: the radius of its circle, in tiles, and the seconds it circles before it closes in. */
   ring?: number;
   /** Tether and follow: the types it keeps to (the nearest of them), and the tiles it stays within of them. */
@@ -86,6 +89,11 @@ export const MOVEMENT_INFO: Record<MovementId, MovementInfo> = {
   phase: {
     name: 'Phase',
     text: () => 'Passes through walls: a chokepoint is no answer.',
+  },
+  burrow: {
+    name: 'Burrow',
+    text: (m) =>
+      `Every ${m.dive ?? 8} s it sinks out of sight and comes up under you, untouchable on the way.`,
   },
   cover: {
     name: 'Cover',

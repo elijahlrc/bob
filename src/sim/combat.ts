@@ -174,7 +174,7 @@ export function targetState(a: Actor): TargetState {
  * Route damage per type into ES / mana / life (§6.3). Chaos bypasses ES. Returns total dealt.
  */
 export function applyDamage(w: World, dst: Actor, dmg: number[]): number {
-  if (!dst.alive || dst.phaseT > 0) return 0;
+  if (!dst.alive || dst.phaseT > 0 || dst.burrowT > 0) return 0;
   // A veiled monster that is hit is seen for a moment.
   if (!dst.isPlayer && dst.revealT < 1) dst.revealT = 1;
   if (!dst.isPlayer && dst.mon) {

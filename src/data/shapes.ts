@@ -20,6 +20,8 @@ export type ShapeSpec = {
   radius?: number;
   /** Salvo: shots in all, fired one after another (two at most: an action repeats once). */
   count?: number;
+  /** Lance: tiles it drags the character toward it, when the lane catches her. */
+  pull?: number;
   /** Lance: the length and the width of the lane. */
   length?: number;
   width?: number;
@@ -78,7 +80,10 @@ export const SHAPE_INFO: Record<ShapeId, ShapeInfo> = {
   lance: {
     name: 'Lance',
     tag: 'lanes',
-    text: () => 'Marks a line on the ground, then strikes everything on it: step out of the lane.',
+    text: (s) =>
+      s.pull
+        ? `Marks a line on the ground, then strikes what is on it and drags it ${s.pull} tiles toward itself: step out of the lane.`
+        : 'Marks a line on the ground, then strikes everything on it: step out of the lane.',
   },
   nova: {
     name: 'Nova',

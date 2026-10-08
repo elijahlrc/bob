@@ -118,6 +118,7 @@ function withShape(sk: SkillDef, t: MonsterTypeDef): SkillDef {
         ...sk,
         behaviour: { kind: 'beam', length: s.length ?? 10, width: s.width ?? 1 },
         lockAim,
+        pull: s.pull,
       };
     case 'salvo':
     case 'orb':

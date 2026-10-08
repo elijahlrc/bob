@@ -258,6 +258,12 @@ export const MOD_MARKS: Record<MonsterModId, ModMark> = {
     aura: true,
     desc: 'Stops your regeneration and leech near it, takes flask charges, and calls two Cutpurses at half life.',
   },
+  tidewarden: {
+    color: 0x5ab8c8,
+    shape: 'ring',
+    aura: true,
+    desc: 'Hooks you and drags you to it every ten seconds, and calls three Brine Leeches at half life.',
+  },
   charging: {
     color: 0xe09a50,
     shape: 'triUp',

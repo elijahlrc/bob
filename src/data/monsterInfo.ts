@@ -15,6 +15,7 @@ export const FACTION_ASKS: Record<FactionId, string> = {
   reliquary: 'armour and immunity',
   kennel: 'being caught: leaps, charges and ambushes',
   gilded: 'recovery: flasks, regeneration and leech',
+  drowned: 'being held: hooks, slows and shock',
 };
 
 /** What every monster of a faction does, where the faction has such a rule. */
@@ -23,6 +24,8 @@ export const FACTION_RULES: Partial<Record<FactionId, string>> = {
   reliquary: 'Core Golems are immune to one element and its ailments.',
   kennel: 'Hounds leap from a distance; Handlers speed the pack up.',
   gilded: 'Cutpurses steal flask charges; Bursars stop your recovery.',
+  drowned:
+    'Tidecallers hook you and drag you in; Wracks and Leeches slow you; Drowners come up under you.',
   swarm: 'Gnawers come in packs of a dozen or more.',
   rot: 'Dead Shamblers rise again; Bloaters leave clouds.',
 };
@@ -37,6 +40,7 @@ export const FACTION_COLOR: Record<FactionId, number> = {
   reliquary: 0xa8b0c0,
   kennel: 0xc89a68,
   gilded: 0xf0c848,
+  drowned: 0x5ab8c8,
 };
 export const FACTION_GLYPH: Record<FactionId, string> = {
   ossuary: '◆',
@@ -47,6 +51,7 @@ export const FACTION_GLYPH: Record<FactionId, string> = {
   reliquary: '■',
   kennel: '▼',
   gilded: '★',
+  drowned: '≈',
 };
 
 /** One clause on what a type does, for tooltips and the inspect card. */
@@ -91,6 +96,11 @@ export const TYPE_BLURBS: Record<MonsterTypeId, string> = {
   bell: 'Hangs in the air and tolls: a ring that staggers, and an aura that drives its allies on.',
   spinner: 'Keeps behind the swarm and lobs webs onto the ground that slow you.',
   coffer: 'Lies still as a chest until you come close, then springs open and bites; it pays well.',
+  tidecaller:
+    'A drifting shade with a hook: marks a line, and drags what stands in it toward itself.',
+  wrack: 'A sodden, heavy corpse that lurches in and swings in a wide arc; its blows slow you.',
+  leech: 'Hops onto you and drains your life as it clings; its grip slows you.',
+  drowner: 'Sinks out of sight and comes up under you with a slam.',
 };
 
 /**
@@ -230,6 +240,9 @@ export const TYPE_TAGS: Partial<Record<MonsterTypeId, ThreatTag[]>> = {
   bloater: ['clouds'],
   spitter: ['ailments'],
   crawler: ['swarm', 'holders'],
+  wrack: ['holders'],
+  leech: ['swarm', 'holders', 'drains'],
+  drowner: ['blinkers'],
   heap: ['armoured'],
   spinner: ['holders'],
   wailer: ['ailments'],

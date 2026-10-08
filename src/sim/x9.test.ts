@@ -76,7 +76,7 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
     expect(themesFor(29).some((t) => t.id.startsWith('mix:'))).toBe(false);
     expect(themesFor(30).filter((t) => t.id.startsWith('mix:'))).toHaveLength(MIXED_THEMES.length);
     // Seven faction-led themes, any two of them: 21 pairs.
-    expect(MIXED_THEMES).toHaveLength(21);
+    expect(MIXED_THEMES).toHaveLength(28);
     for (const t of MIXED_THEMES) {
       const factions = Object.keys(t.factions!);
       expect(factions).toHaveLength(2);

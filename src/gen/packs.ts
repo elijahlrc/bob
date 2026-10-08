@@ -30,10 +30,15 @@ export const TEMPLATE_WEIGHTS: Record<FactionId, Partial<Record<TemplateId, numb
   reliquary: { phalanx: 3, line: 3, escort: 3, mixed: 1 },
   kennel: { swarm: 3, escort: 3, phalanx: 2, ambush: 3, mixed: 1 },
   gilded: { line: 3, escort: 3, phalanx: 2, patrol: 2, mixed: 1 },
+  drowned: { swarm: 3, escort: 3, phalanx: 2, ambush: 2, line: 1, mixed: 1 },
 };
 
 /** What follows the leader of an escort (the Swarm's nests are followed by their vermin). */
-const ESCORT_FOLLOWERS: Partial<Record<FactionId, Role>> = { swarm: 'swarm', kennel: 'swarm' };
+const ESCORT_FOLLOWERS: Partial<Record<FactionId, Role>> = {
+  swarm: 'swarm',
+  kennel: 'swarm',
+  drowned: 'swarm',
+};
 
 /** The faction types that have a role. */
 function typesWithRole(faction: FactionId, role: Role, level = Infinity): MonsterTypeId[] {

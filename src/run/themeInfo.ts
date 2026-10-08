@@ -90,7 +90,8 @@ export function themeInfo(
   type: MapTypeId = 'plain',
   level = 1,
 ): ThemeInfo {
-  const shares = typeShares({ ...theme, level });
+  // A theme is offered from its first map, so a type of it is never hidden by a level lower than that.
+  const shares = typeShares({ ...theme, level: Math.max(level, theme.fromMap ?? 0) });
   const byFaction = new Map<FactionId, number>();
   const tagShare = new Map<ThreatTag, number>();
   let ranged = 0;

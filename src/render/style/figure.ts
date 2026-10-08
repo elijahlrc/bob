@@ -63,6 +63,7 @@ export type FigureKind =
   | 'bell'
   | 'spider'
   | 'chest'
+  | 'worm'
   | 'hero_mace'
   | 'hero_sword'
   | 'hero_bow'
@@ -378,6 +379,15 @@ function rigPose(kind: FigureKind, anim: AnimName, t: number, p: Pose): Pose {
         p.bob = 0;
       }
       break;
+    case 'worm':
+      if (anim === 'idle' || anim === 'walk') p.legA = s * 0.7;
+      else if (anim === 'death') {
+        p.scatter = 0;
+        p.rot = 0;
+        p.bob = ease(clamp01(t / 0.6)) * 10;
+        p.fade = ease(clamp01(t / 0.7)) * 0.9;
+      }
+      break;
     case 'crawler':
       if (anim === 'walk') {
         p.legA = s;
@@ -460,6 +470,7 @@ const BUILDS: Record<FigureKind, Build> = {
   bell: { scale: 1.1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   spider: { scale: 1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   chest: { scale: 1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  worm: { scale: 1.1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   hero_mace: { scale: 1.05, legLen: 9, torsoH: 14, shoulder: 8, skull: 5.5, ribW: 7 },
   hero_sword: { scale: 1, legLen: 9, torsoH: 14, shoulder: 7, skull: 5.5, ribW: 6.5 },
   hero_bow: { scale: 1, legLen: 9.5, torsoH: 13, shoulder: 6, skull: 5.5, ribW: 5.5 },
@@ -573,6 +584,7 @@ const CREATURES = new Set<FigureKind>([
   'bell',
   'spider',
   'chest',
+  'worm',
 ]);
 
 /**
@@ -740,6 +752,20 @@ function buildCreature(kind: FigureKind, pose: Pose, type?: MonsterTypeId): Prim
       break;
     }
     case 'toad': {
+      if (type === 'leech') {
+        // A slug: a long, low body that hunches as it hops, a sucker for a mouth, two eyes on stalks.
+        const hump = -pose.bob * 0.5;
+        cap(b, -9, -3.5 + lift, 6, -3.5 + lift, 3.6, 'clothShade');
+        cap(b, -8, -4 + lift - hump * 0.4, 5, -4 + lift - hump * 0.4, 2.8, 'cloth');
+        circ(b, 7.5, -3.8 + lift - hump * 0.3, 2.8, 'clothShade');
+        circ(b, 9, -3.8 + lift - hump * 0.3, 1.8, 'accent');
+        circ(b, 9.4, -3.8 + lift - hump * 0.3, 0.9, 'dark');
+        for (const x of [2, 5]) {
+          cap(b, x, -6.4 + lift - hump * 0.4, x + 0.8, -9.6 + lift - hump * 0.5, 0.5, 'clothShade');
+          circ(b, x + 0.8, -10 + lift - hump * 0.5, 0.9, 'eye');
+        }
+        break;
+      }
       // A low, wide amphibian: folded hind legs, a hump, bulging eyes and a throat sac that swells as it winds up to spit.
       // It hops (`bob`), rears its head when the arm goes back (`armA`) and lunges with `lean`.
       const ph = pose.legA;
@@ -834,6 +860,39 @@ function buildCreature(kind: FigureKind, pose: Pose, type?: MonsterTypeId): Prim
       cap(b, -11, -14 + lift, -16, -6 + lift, 2.4, 'boneShade');
       circ(b, 3.5, -22 + lift, 1.4, 'eye');
       circ(b, -3.5, -22.5 + lift, 1.2, 'eye');
+      break;
+    }
+    case 'worm': {
+      // A worm half out of the floor: a mound, a stack of segments that sway (legA), a head with a ringed maw.
+      const sw = pose.legA * 3;
+      circ(b, 0, -2, 7.5, 'boneShade');
+      circ(b, 1, -3, 5.5, 'clothShade');
+      for (let i = 0; i < 5; i++) {
+        const x = (Math.sin(i * 0.9) * 1.6 + sw) * (i / 4) * 1.6;
+        const y = -5 - i * 5 + lift;
+        circ(b, x, y, 5.4 - i * 0.55, i % 2 ? 'clothShade' : 'cloth');
+      }
+      const hx = sw * 1.6 + 2;
+      const hy = -31 + lift;
+      circ(b, hx, hy, 5, 'bone');
+      circ(b, hx + 2.4, hy + 0.6, 3, 'dark');
+      for (let k = 0; k < 4; k++) {
+        const a = (k / 4) * Math.PI * 2;
+        b.prims.push({
+          k: 'tri',
+          pts: [
+            hx + 2.4 + Math.cos(a) * 3.4 - 0.8,
+            hy + 0.6 + Math.sin(a) * 3.4,
+            hx + 2.4 + Math.cos(a) * 1.4,
+            hy + 0.6 + Math.sin(a) * 1.4,
+            hx + 2.4 + Math.cos(a) * 3.4 + 0.8,
+            hy + 0.6 + Math.sin(a) * 3.4,
+          ],
+          role: 'bone',
+        });
+      }
+      circ(b, hx - 1, hy - 2.6, 0.9, 'eye');
+      circ(b, hx + 2, hy - 3, 0.9, 'eye');
       break;
     }
     case 'bell': {
