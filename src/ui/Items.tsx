@@ -26,6 +26,7 @@ import {
   type ItemInfo,
   type SortKey,
 } from '../run/inventoryOps';
+import { useViewport } from './device';
 import { compareDelta, ItemCard, itemTitle, rarityClass } from './ItemCard';
 import { loadPref, savePref } from './prefs';
 
@@ -61,6 +62,7 @@ function Badge({ v, label }: { v: number; label: string }) {
 
 export function Items({ c }: { c: Controller }) {
   const run = c.run!;
+  const { coarse } = useViewport();
   const [sel, setSel] = useState<Sel | null>(null);
   const [hover, setHover] = useState<number | null>(null);
   const [msg, setMsg] = useState('');
@@ -236,11 +238,22 @@ export function Items({ c }: { c: Controller }) {
         </div>
         {sel?.from === 'inv' && selected?.kind === 'item' && (
           <div class="muted hint">
-            Click a highlighted slot to equip, or press Enter / double-click for the best slot.
+            {coarse
+              ? 'Tap a highlighted slot to equip, or use the Equip button for the best slot.'
+              : 'Click a highlighted slot to equip, or press Enter / double-click for the best slot.'}
           </div>
         )}
         <div class="item-detail">
-          {!shown && <div class="muted hint">Hover or select an item to see its details.</div>}
+          {sel && (
+            <button class="sheet-x" aria-label="Close" onClick={() => setSel(null)}>
+              ×
+            </button>
+          )}
+          {!shown && (
+            <div class="muted hint">
+              {coarse ? 'Select' : 'Hover or select'} an item to see its details.
+            </div>
+          )}
           {shown && (
             <>
               <div class={shownInfo?.replaces || shownInfo?.slot ? 'compare' : ''}>
@@ -306,9 +319,11 @@ export function Items({ c }: { c: Controller }) {
             </>
           )}
         </div>
-        <div class="muted hint">
-          Keys: ↑/↓ browse · Enter equip · Del discard · U unequip · Ctrl+Z undo
-        </div>
+        {!coarse && (
+          <div class="muted hint">
+            Keys: ↑/↓ browse · Enter equip · Del discard · U unequip · Ctrl+Z undo
+          </div>
+        )}
       </div>
       <div class="inv-col">
         <div class="inv-toolbar">
@@ -364,7 +379,7 @@ export function Items({ c }: { c: Controller }) {
                 }`}
                 onClick={() => setSel({ from: 'inv', uid: it.uid })}
                 onDblClick={() => doQuick(it.uid)}
-                onMouseEnter={() => setHover(it.uid)}
+                onMouseEnter={() => !coarse && setHover(it.uid)}
                 onMouseLeave={() => setHover(null)}
                 title={info.reason}
               >

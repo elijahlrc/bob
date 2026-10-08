@@ -4,6 +4,7 @@ import { Camp } from './Camp';
 import { ClassSelect } from './ClassSelect';
 import { Codex } from './Codex';
 import { Hud } from './Hud';
+import { InfoLayer } from './info';
 import { useControllerState } from './hooks';
 import { Summary } from './Summary';
 import { Title } from './Title';
@@ -24,6 +25,15 @@ export function App({ c }: { c: Controller }) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [c]);
+  return (
+    <>
+      <Screen c={c} />
+      <InfoLayer />
+    </>
+  );
+}
+
+function Screen({ c }: { c: Controller }) {
   switch (c.screen) {
     case 'title':
       return <Title c={c} />;

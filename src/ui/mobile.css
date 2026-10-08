@@ -114,3 +114,203 @@ body {
     flex: 1 1 140px;
   }
 }
+
+/* The popover that replaces a hover tooltip on a coarse pointer (info.tsx). */
+.info-pop {
+  position: fixed;
+  z-index: 30;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  background: #111018f2;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  line-height: 1.35;
+  pointer-events: none;
+  box-shadow: 0 4px 16px #000a;
+}
+
+/* A touch screen has no hover: a tapped button must not stay lit until the next tap. These repeat the resting skins. */
+@media (hover: none) {
+  :root .btn:hover {
+    background: linear-gradient(#3a2b1e, #24190f);
+  }
+  :root .btn.primary:hover {
+    background: linear-gradient(#a8601f, #5e3010);
+  }
+  :root .btn.on:hover {
+    background: linear-gradient(#d88a38, #8a4a18);
+  }
+  .class-card:hover {
+    background: var(--panel);
+  }
+  .inv-row:hover {
+    background: var(--panel);
+  }
+}
+
+/* ---- Camp below the desktop width (Camp.tsx: the side column becomes a tab and a bar) ---- */
+.camp.compact {
+  flex-direction: column;
+  --camp-bar: 52px;
+}
+.camp.compact .camp-main {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+}
+.camp.compact .tabs {
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  padding-left: calc(8px + var(--safe-left));
+  padding-right: calc(8px + var(--safe-right));
+}
+.camp.compact .tabs::-webkit-scrollbar {
+  display: none;
+}
+.camp.compact .tab {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  scroll-snap-align: start;
+}
+.camp-next {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.camp-next h2 {
+  margin: 0;
+}
+.camp-next .theme-choice {
+  flex-direction: column;
+}
+.camp-bar {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--camp-bar);
+  padding: 6px calc(12px + var(--safe-right)) calc(6px + var(--safe-bottom))
+    calc(12px + var(--safe-left));
+  background: var(--side);
+  border-top: 1px solid #333;
+}
+.camp-bar-who {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sheet-x {
+  display: none;
+}
+
+/* ---- The panels of the camp tabs on a phone ---- */
+@media (max-width: 600px) {
+  .items,
+  .skills-wrap,
+  .sheet {
+    padding: 10px;
+    gap: 10px;
+  }
+  .equip-col,
+  .inv-col,
+  .skills-wrap .skills,
+  .gem-inv {
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .inv-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'name ilvl'
+      'slot badges';
+    row-gap: 2px;
+  }
+  .inv-row .row-name {
+    grid-area: name;
+  }
+  .inv-row .row-ilvl {
+    grid-area: ilvl;
+    text-align: right;
+  }
+  .inv-row .row-slot {
+    grid-area: slot;
+  }
+  .inv-row .row-badges {
+    grid-area: badges;
+    justify-self: end;
+  }
+  .sheet table {
+    width: 100%;
+  }
+  .socket-item {
+    width: calc(50% - 4px);
+    min-width: 0;
+  }
+
+  /* The card of the selected item is a sheet over the bottom of the list, above the camp bar. */
+  .item-detail {
+    min-height: 0;
+  }
+  .item-detail:has(.item-card) {
+    position: fixed;
+    z-index: 15;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--camp-bar, 52px) + var(--safe-bottom));
+    max-height: 52vh;
+    overflow: auto;
+    box-sizing: border-box;
+    padding: 10px calc(12px + var(--safe-right)) 10px calc(12px + var(--safe-left));
+    background: var(--panel);
+    border-top: 2px solid var(--hi);
+    box-shadow: 0 -6px 18px #000a;
+  }
+  .item-detail:has(.item-card) .sheet-x {
+    display: block;
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    width: var(--tap);
+    height: var(--tap);
+    z-index: 1;
+    background: none;
+    border: none;
+    font-size: 26px;
+    color: var(--muted);
+  }
+  .items:has(.item-detail .item-card) {
+    padding-bottom: 54vh;
+  }
+}
+
+@media (max-width: 600px) {
+  /* The buttons of the item sheet stay in view while the card scrolls. */
+  .item-detail:has(.item-card) .item-actions {
+    position: sticky;
+    bottom: -10px;
+    margin: 6px -4px -10px;
+    padding: 8px 4px 10px;
+    background: var(--panel);
+    border-top: 1px solid var(--border2);
+  }
+}
+
+/* On a tablet the three offers sit side by side in the Next map tab. */
+@media (min-width: 601px) {
+  .camp-next .theme-choice {
+    flex-direction: row;
+    align-items: stretch;
+  }
+  .camp-next .theme-wrap {
+    flex: 1 1 200px;
+  }
+}

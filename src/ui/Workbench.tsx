@@ -44,6 +44,7 @@ import {
   type CraftResult,
 } from '../run/craft';
 import type { RunState } from '../run/run';
+import { infoProps } from './info';
 import { ItemCard, rarityClass } from './ItemCard';
 import { slotLabel } from '../run/inventoryOps';
 
@@ -143,12 +144,12 @@ export function Workbench({ c }: { c: Controller }) {
           <span class="muted">No currency yet. Monsters and rewards drop it.</span>
         )}
         {pouch.map((d) => (
-          <span key={d.id} class="chip" title={d.text}>
+          <span key={d.id} class="chip" {...infoProps(d.text)}>
             {d.name} × {owned(run, d.id)}
           </span>
         ))}
         {tablets.map(([id, n]) => (
-          <span key={id} class="chip" title={currencyText(TABLET_PREFIX + id)}>
+          <span key={id} class="chip" {...infoProps(currencyText(TABLET_PREFIX + id))}>
             {currencyLabel(TABLET_PREFIX + id)} × {n}
             {complete.includes(id) && (
               <button class="btn small" onClick={() => act((r) => redeemTablets(r, id))}>

@@ -1,5 +1,6 @@
 import { hex } from '../data/monsterMarks';
 import type { World } from '../sim/types';
+import { infoProps } from './info';
 import { skillSlots, type SkillSlot } from './skillStatus';
 
 /** Seconds as small text: one decimal under ten seconds, whole seconds above. */
@@ -15,7 +16,7 @@ function Slot({ s }: { s: SkillSlot }) {
     <div
       class={`skill ${s.state} d-${s.look.delivery}`}
       style={{ '--c': hex(s.look.color), '--cd': cd.toFixed(1) }}
-      title={s.detail}
+      {...infoProps(s.detail)}
     >
       <span class="skill-init">{s.look.initials}</span>
       {cd > 0 && <span class="skill-sweep" />}
