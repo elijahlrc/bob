@@ -1,4 +1,4 @@
-import { MONSTER_TYPES, type MonsterTypeId } from '../../data/monsters';
+import { MONSTER_TYPES, type MonsterTypeId, type Stance } from '../../data/monsters';
 import { kitAdjust, kitBack, kitFront, type Anchors } from './kits';
 /**
  * Style-independent character rig. A figure is a list of primitives in a local design space
@@ -84,8 +84,23 @@ export function isCaster(kind: FigureKind): boolean {
   return kind === 'mage' || kind === 'hero_wand';
 }
 
+/** The pose family a body implies: a bow for the archer rigs, a cast for the mage rigs, a strike for the rest. */
+export function stanceOfKind(kind: FigureKind): Stance {
+  return isRanged(kind) ? 'bow' : isCaster(kind) ? 'cast' : 'strike';
+}
+
+/** The pose family of a monster type on a body: its own, or the one the body implies. */
+export function stanceFor(type: MonsterTypeId | undefined, kind: FigureKind): Stance {
+  return (type && MONSTER_TYPES[type].stance) || stanceOfKind(kind);
+}
+
 /** Pose for an animation at normalised time `t` (walk/idle loop 0..1; attack and death run 0..1). */
-export function poseFor(kind: FigureKind, anim: AnimName, t: number): Pose {
+export function poseFor(
+  kind: FigureKind,
+  anim: AnimName,
+  t: number,
+  stance: Stance = stanceOfKind(kind),
+): Pose {
   const p: Pose = {
     bob: 0,
     lean: 0,
@@ -127,7 +142,7 @@ export function poseFor(kind: FigureKind, anim: AnimName, t: number): Pose {
       const wind = ease(clamp01(t / 0.4));
       const strike = ease(clamp01((t - 0.4) / 0.2));
       const rec = ease(clamp01((t - 0.6) / 0.4));
-      if (isRanged(kind)) {
+      if (stance === 'bow') {
         p.charge = wind * (1 - strike);
         p.armA = lerp(0.2, 1.5, wind) * (1 - strike) + 1.55 * strike;
         p.armB = lerp(-0.2, -1.2, wind) * (1 - strike) + lerp(-0.1, -0.3, strike) * strike;
@@ -137,7 +152,7 @@ export function poseFor(kind: FigureKind, anim: AnimName, t: number): Pose {
         p.legB = -0.35;
         p.armA = lerp(p.armA, 0.25, rec);
         p.armB = lerp(p.armB, -0.25, rec);
-      } else if (isCaster(kind)) {
+      } else if (stance === 'cast') {
         p.charge = wind * (1 - rec * 0.5);
         p.armA = lerp(0.2, -1.9, wind) * (1 - strike) + 1.35 * strike;
         p.armB = lerp(-0.2, -1.1, wind) * (1 - strike) - 0.4 * strike;

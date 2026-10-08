@@ -9,6 +9,7 @@ import {
   buildFigure,
   isHero,
   poseFor,
+  stanceFor,
   type AnimName,
   type FigureKind,
   type Prim,
@@ -251,7 +252,12 @@ export function rasterFigure(
 ): HTMLCanvasElement {
   const S = frameSize(kind, px);
   const pal = isHero(kind) ? heroPalette(accent) : look ? monsterPalette(look) : UNDEAD;
-  const prims = buildFigure(kind, poseFor(kind, anim, t), look?.type, t);
+  const prims = buildFigure(
+    kind,
+    poseFor(kind, anim, t, stanceFor(look?.type, kind)),
+    look?.type,
+    t,
+  );
   const scratch = document.createElement('canvas');
   scratch.width = scratch.height = S;
   const sctx = scratch.getContext('2d', { willReadFrequently: true })!;

@@ -78,6 +78,12 @@ export type BodyKind =
   | 'cat';
 
 /**
+ * The pose family of an attack (docs/ROSTER.md 4.3): how the body moves when it strikes, apart from which rig it is. A type
+ * that sets none gets the family its body implies (an `archer` body draws a bow, a `mage` body casts, the rest strike).
+ */
+export type Stance = 'strike' | 'bow' | 'cast' | 'throw' | 'lash' | 'none';
+
+/**
  * What a type is for in a pack (docs/ENEMIES.md 4.2): `front` holds the line, `ranged` shoots from behind it, `support` heals,
  * buffs or shields, `special` has a trick of its own (bursting, blinking, spawning), `swarm` comes in numbers.
  */
@@ -90,6 +96,8 @@ export type MonsterTypeDef = {
   faction: FactionId;
   /** The figure it is drawn with. */
   body: BodyKind;
+  /** The pose family of its attack, when it is not the one its body implies (docs/ROSTER.md 4.3). */
+  stance?: Stance;
   /** A caster is always elemental or chaos by nature, and never rolls an element variant. */
   innate?: boolean;
   /** Always carries an element (a Core Golem is fire, cold or lightning, never plain). */
