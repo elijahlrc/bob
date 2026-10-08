@@ -1,4 +1,5 @@
 import { ABANDON_FROM_MAP, ABANDON_SECONDS } from '../data/constants';
+import { CRESCENDO_LIMIT } from '../data/mapTypes';
 import { lifeCap } from './combat';
 import type { AbandonPolicy, World } from './types';
 
@@ -29,6 +30,12 @@ export function cancelAbandon(w: World): boolean {
 /** Called each tick after death is decided: asks the policy, runs the timer, and ends the map when it runs out. */
 export function tickAbandon(w: World, dt: number): void {
   if (w.status !== 'running') return;
+  // A Crescendo map pulls the character out when its time is up, as an abandon (docs/MAPS.md 9.1).
+  if (w.plan.type === 'crescendo' && w.t >= CRESCENDO_LIMIT) {
+    w.status = 'abandoned';
+    w.events.push({ t: 'abandoned' });
+    return;
+  }
   if (w.abandonT === null) {
     if (w.opts.abandonPolicy?.(w)) requestAbandon(w);
     return;

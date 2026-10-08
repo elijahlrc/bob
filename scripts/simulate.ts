@@ -1,7 +1,7 @@
 /**
  * Headless bot runs (DESIGN.md §15.5).
  *
- *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--craft greedy|random|none] [--report]
+ *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|abandoner] [--craft greedy|random|none] [--report]
  */
 import { writeFileSync } from 'node:fs';
 import { median } from '../src/core/math';
@@ -22,6 +22,8 @@ type Args = {
   /** How the bot spends currency: by the sheet, at random, or not at all. */
   crafting: CraftPolicy;
   report: boolean;
+  /** Leave a map when life drops below this fraction (the abandoner strategy). */
+  abandonBelow?: number;
 };
 
 function parseArgs(argv: string[]): Args {
@@ -48,7 +50,12 @@ function parseArgs(argv: string[]): Args {
     else if (k === '--write-xp') a.writeXp = a.measureXp = true;
     else if (k === '--json') a.json = true;
     else if (k === '--themes') a.themes = v === 'first' ? 'first' : 'best';
-    else if (k === '--report') a.report = true;
+    // Route strategies (docs/MAPS.md 10.3): anchor, greedy (the default), random, lowball, resting, abandoner.
+    else if (k === '--strategy') {
+      if (v === 'anchor') a.themes = 'first';
+      else if (v === 'random' || v === 'lowball' || v === 'resting') a.themes = v;
+      else if (v === 'abandoner') a.abandonBelow = 0.3;
+    } else if (k === '--report') a.report = true;
     else if (k === '--craft')
       a.crafting = v === 'none' ? 'none' : v === 'random' ? 'random' : 'greedy';
   }
@@ -64,6 +71,7 @@ for (const cls of args.classes) {
     const res = botRun(cls, args.seed * 1000 + r, args.maxMap, {
       themes: args.themes,
       crafting: args.crafting,
+      abandonBelow: args.abandonBelow,
     });
     const wallMs = performance.now() - start;
     const simSeconds = res.maps.reduce((s, m) => s + m.time, 0);

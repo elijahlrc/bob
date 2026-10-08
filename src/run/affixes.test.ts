@@ -22,7 +22,8 @@ import { threatPreview } from './threat';
 
 describe('map affixes (EXPANSION 7.5)', () => {
   it('every affix has text, a reward, and an effect', () => {
-    for (const a of MAP_AFFIXES) {
+    // The hidden affix of a map type pays through its type, so it has no reward of its own.
+    for (const a of MAP_AFFIXES.filter((x) => !x.fixed)) {
       expect(a.text.length, a.id).toBeGreaterThan(8);
       expect(rewardText(a).length, a.id).toBeGreaterThan(5);
       const effect =

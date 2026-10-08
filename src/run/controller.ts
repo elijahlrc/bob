@@ -4,6 +4,7 @@ import { worldResult, type MapResult } from '../sim/runMap';
 import type { SimEvent, World } from '../sim/types';
 import { cancelAbandon, requestAbandon } from '../sim/abandon';
 import { createWorld, stepWorld } from '../sim/world';
+import { mapTypeDef } from '../data/mapTypes';
 import { CLASSES } from '../data/classes';
 import { botCamp } from './bot';
 import { galleryEntries, galleryRun, galleryWorld, type GalleryEntry } from './gallery';
@@ -15,10 +16,14 @@ import {
   passivePoints,
   planFor,
   setMap,
+  takeRespite,
   worldOptsFor,
   type RunState,
 } from './run';
 import { clearSave, loadRun, saveRun, SAVE_KEY, type KeyValueStore, type LoadResult } from './save';
+
+/** Auto-continue pauses when life or any flask is below this fraction (docs/MAPS.md 10.2). */
+export const AUTO_PAUSE_BELOW = 0.5;
 
 export type Screen = 'title' | 'classSelect' | 'camp' | 'map' | 'summary' | 'victory' | 'codex';
 
@@ -191,7 +196,16 @@ export class Controller {
   startMap(offerIdx = 0): void {
     const run = this.run;
     if (!run) return;
-    const plan = planFor(run, run.offers[offerIdx] ?? run.offers[0]);
+    const offer = run.offers[offerIdx] ?? run.offers[0];
+    // A Respite is no map: the level passes and the character is whole again.
+    if (offer.kind === 'respite') {
+      this.undoStack = [];
+      this.lastResult = null;
+      takeRespite(run);
+      this.changed();
+      return;
+    }
+    const plan = planFor(run, offer);
     run.newLoot = [];
     this.undoStack = [];
     this.world = createWorld({ plan, build: run.build, xp: run.xp, opts: worldOptsFor(run, plan) });
@@ -351,6 +365,11 @@ export class Controller {
       return `${set.length} tablet set${set.length === 1 ? '' : 's'} to redeem (open the Workbench)`;
     if (run.newLoot.length > 0)
       return `${run.newLoot.length} new rare/unique item${run.newLoot.length === 1 ? '' : 's'} (open Items)`;
+    // The next map is the anchor: stop if it is not the plain map auto-continue is meant for, or the character is worn down.
+    if (run.offers[0].type !== 'plain')
+      return `the first map is a ${mapTypeDef(run.offers[0].type).name} map`;
+    if (run.vitals.life < AUTO_PAUSE_BELOW) return 'life is low';
+    if (Object.values(run.vitals.flasks).some((f) => f < AUTO_PAUSE_BELOW)) return 'a flask is low';
     return null;
   }
 

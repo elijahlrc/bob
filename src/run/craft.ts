@@ -625,7 +625,7 @@ export function chalkOptions(run: RunState, offer: number): string[] {
 
 export function chalkAdd(run: RunState, offer: number, affixId: string): CraftResult {
   const target = run.offers[offer];
-  if (!target) return fail('No such map');
+  if (!target || target.kind !== 'map') return fail('No such map');
   if (!chalkOptions(run, offer).includes(affixId)) return fail('That affix is not on offer');
   if (!pay(run, 'chalk')) return fail("You have no Wayfinder's Chalk");
   run.craftSeq++;
@@ -635,7 +635,7 @@ export function chalkAdd(run: RunState, offer: number, affixId: string): CraftRe
 
 export function chalkRemove(run: RunState, offer: number, affixId: string): CraftResult {
   const target = run.offers[offer];
-  if (!target) return fail('No such map');
+  if (!target || target.kind !== 'map') return fail('No such map');
   if (!target.affixes.includes(affixId)) return fail('The map has no such affix');
   if (owned(run, 'chalk') < 2) return fail("That needs 2 Wayfinder's Chalk");
   pay(run, 'chalk', 2);

@@ -20,6 +20,7 @@ import {
   STUN_GRACE,
   WOUND_DANCE_STACKS,
 } from '../data/constants';
+import { CRESCENDO_STEP_BONUS } from '../data/mapTypes';
 import { cannotBleed } from '../data/monsters';
 import { BUFFS, BUFF_IDS, DYN_SHIFT } from '../data/buffs';
 import { MONSTER_CONDS } from '../calc/monster';
@@ -177,6 +178,13 @@ export function applyDamage(w: World, dst: Actor, dmg: number[]): number {
     // A Bone Beetle curled up takes 80% less physical damage; a Warden Pylon makes its allies untouchable.
     if (dst.curlT > 0) dmg[0] *= 0.2;
     if (w.hasPylons && shieldedByPylon(w, dst)) return 0;
+  }
+  // Crescendo: the monsters grow stronger with time. What they deal is raised, and what they take is cut by the
+  // same step (so they have more life), without rebuilding them (docs/MAPS.md 9.1).
+  if (w.surge > 0) {
+    const f = 1 + CRESCENDO_STEP_BONUS * w.surge;
+    const m = dst.faction === 1 && !dst.isPlayer ? 1 / f : f;
+    for (let i = 0; i < 5; i++) dmg[i] *= m;
   }
   let total = 0;
   for (let i = 0; i < 5; i++) total += dmg[i];

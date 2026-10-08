@@ -377,7 +377,9 @@ export function playerAI(w: World, dt: number): void {
     let best: Actor | null = null;
     let bd = Infinity;
     for (const m of w.actors) {
-      if (m.isPlayer || !m.alive || m.room !== w.endRoom) continue;
+      // A Quarry's champions count wherever they stand.
+      const hunted = m.room === w.endRoom || (w.plan.type === 'quarry' && m.rarity === 'miniboss');
+      if (m.isPlayer || !m.alive || !hunted) continue;
       const d = Math.hypot(m.x - p.x, m.y - p.y);
       if (d < bd) {
         bd = d;

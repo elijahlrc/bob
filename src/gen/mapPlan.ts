@@ -1,5 +1,6 @@
 import { Rng } from '../core/rng';
 import { affixesConflict, affixReward, MAP_AFFIXES, mapAffixDef } from '../data/mapAffixes';
+import { mapTypeDef, THRONG_AFFIX, type MapTypeId } from '../data/mapTypes';
 import { themeDef, type ThemeDef } from '../data/themes';
 import { generateLabyrinth, type Labyrinth } from './labyrinth';
 import { populate, type EndKind, type Population } from './population';
@@ -13,6 +14,8 @@ export type MapPlan = {
   theme: ThemeDef;
   /** Ids of the map affixes (EXPANSION 7.5). */
   affixes: string[];
+  /** The map type (docs/MAPS.md section 9). */
+  type: MapTypeId;
   /** XP multiplier of the map: the theme's bonus and the affixes' experience rewards. */
   xpMult: number;
   endKind: EndKind;
@@ -64,23 +67,30 @@ export function makeMapPlan(
   themeId: string,
   affixes: string[] = [],
   areaLevel: number = map,
+  type: MapTypeId = 'plain',
 ): MapPlan {
   const root = new Rng(seed);
   const genRng = root.fork('mapgen');
-  const sideBranches = map <= 4 ? 0 : genRng.int(0, 2);
-  const lab = generateLabyrinth(genRng, { rooms: roomsForMap(map), sideBranches });
+  const drawn = map <= 4 ? 0 : genRng.int(0, 2);
+  // A Quarry is a short hunt: three rooms with a champion each, and no side branches.
+  const sideBranches = type === 'quarry' ? 0 : drawn;
+  const rooms = type === 'quarry' ? 4 : roomsForMap(map);
+  const lab = generateLabyrinth(genRng, { rooms, sideBranches });
   const theme = themeDef(themeId);
   const endKind = endKindForMap(map);
   const xpMult =
     theme.xpMult *
     (1 +
-      affixes.reduce((n, id) => n + (affixReward(mapAffixDef(id), areaLevel).experience ?? 0), 0));
+      affixes.reduce((n, id) => n + (affixReward(mapAffixDef(id), areaLevel).experience ?? 0), 0) +
+      (mapTypeDef(type).reward.experience ?? 0));
   const pop = populate(root.fork('monsters'), lab, {
     areaLevel,
     endKind,
     theme,
     map,
-    affixes,
+    // A Throng's monsters carry its own hidden affix; the player-facing affix list does not show it.
+    affixes: type === 'throng' ? [...affixes, THRONG_AFFIX] : affixes,
+    type,
   });
   return {
     seed,
@@ -89,6 +99,7 @@ export function makeMapPlan(
     resistPenalty: resistPenaltyForMap(map),
     theme,
     affixes,
+    type,
     xpMult,
     endKind,
     lab,

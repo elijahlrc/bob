@@ -1141,6 +1141,22 @@ select option {
   font-size: 12px;
   color: #e0b070;
 }
+.theme .verdict {
+  font-size: 12px;
+  font-weight: bold;
+}
+.verdict.comfortable {
+  color: #8fd28f;
+}
+.verdict.close {
+  color: #e8d070;
+}
+.verdict.dangerous {
+  color: #ff8a6a;
+}
+.theme.respite {
+  border-style: dashed;
+}
 
 .workbench {
   display: flex;

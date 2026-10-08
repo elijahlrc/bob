@@ -25,7 +25,7 @@
   - In PowerShell, refresh PATH first:
     `$env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")`
   - Dev server: `npm run dev` on http://localhost:5173 (strict port).
-- **Map choice plan:** [docs/MAPS.md](docs/MAPS.md) (milestones R0–R7): three offers per level, level offsets of ±2, carry-over of life, mana, ES and flasks, Abandon, Respite and map types. R0 is done; R1 onwards follows the plan, and its decisions go in DESIGN.md Appendix A.
+- **Map choice plan:** [docs/MAPS.md](docs/MAPS.md) (milestones R0–R7): three offers per level, level offsets of ±2, carry-over of life, mana, ES and flasks, Abandon, Respite and map types. R0 to R6 are built as a first pass (the numbers are not tuned; see `docs/PROGRESS.md`); R7, the phase-2 types, is not. Decisions go in DESIGN.md Appendix A.
 - **Status:** M0–M7 of DESIGN.md are complete (see `docs/PROGRESS.md`). Further work is the stretch list
   or balance changes. Balance constants live in `src/data/constants.ts`; after changing them run
   `npm run sim -- --runs 10 --class all` and, if XP pacing moved, `--write-xp`.

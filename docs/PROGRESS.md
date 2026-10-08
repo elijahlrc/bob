@@ -645,3 +645,50 @@ Plan: [MAPS.md](MAPS.md). First pass of the numbers; the plan says to re-evaluat
   with life, mana, flasks" and each offer's level with its offset ("Level 9 (+2)") and affix text scaled to the band
   ("+13% monsters (+5% experience)"); the map HUD shows Abandon, then "Leave this map?", then "Leaving in 5.0 s" with a Stay button;
   after the timer the run is back in camp on map 8 with the last map marked abandoned, life 43% and flasks 67%. No console errors.
+
+### Map choice R5 and R6: map types, Respite, verdicts, route strategies (2026-10-07)
+
+Plan: [MAPS.md](MAPS.md). First pass; the plan says to re-evaluate the numbers afterwards.
+
+- **R5 map types** (`src/data/mapTypes.ts`).
+  - **Crescendo:** no change for 30 s, then one step every 15 s (up to 16). Monsters deal and take damage as if 5% stronger
+    per step, through one hook in `applyDamage` (`w.surge`), so no monster is rebuilt. Kills pay 3% more per step, the type
+    pays +25% quantity, and 330 s pulls the character out as an abandon. The HUD shows "Crescendo +N% (step n)".
+  - **Quarry:** four rooms, no side branches, a champion (the mini-boss recipe with three mods) in each of three; the exit
+    opens only when all three are dead (`checkExit`, and the AI hunts a champion left behind); each drops a rare (15% of the
+    time a unique) and a currency stack.
+  - **Throng:** 2.5 times the monsters, all normal, with 60% life and 80% damage, through a hidden affix; +40% quantity and
+    +25% XP. The plan called it Stampede; a reference unique has that name and the IP scan caught it.
+  - An offer is typed with a 35% chance per slot, at most one typed offer per set before map 40 and two after, never on a
+    mini-boss or boss map; the first offer can be typed. The camp card and the HUD name the type.
+- **R6 Respite and legibility.**
+  - Respite is an offer kind (`MapOffer.kind`): one of the last two slots, 10% each, when life, mana or a flask is under 90%,
+    and always the last slot under 40% life; never on maps 1 to 4 or on mini-boss and boss maps. Taking it (`takeRespite`)
+    fills everything, passes the level and gives nothing.
+  - Auto-continue pauses for a typed first map, life under 50% or a flask under 50%.
+  - Each map offer shows a verdict (comfortable, close, dangerous): its survivability for your build, with the life you arrive
+    with, next to a plain map at its level (`survivalRatio`; thresholds 0.85 and 0.55). The tooltip says it is a guide.
+- **Bot.** `chooseOffer` skips Respites unless life is under 35%; `--strategy anchor|greedy|random|lowball|resting|abandoner`
+  in `npm run sim`.
+- **Browser.** The camp shows a Respite card, a Crescendo card with its text and the scaled affix lines, and verdict chips;
+  the map HUD showed "Crescendo +10% (step 2)" at 61 s. No console errors on the final code.
+- **Tests.** 1,869 pass with `CI=1`.
+- **Route strategies** (`npm run sim -- --runs 4 --class all --seed 2 --strategy …`, 24 runs each, run side by side):
+
+  | Strategy  | Wins | Mean of the classes' median map reached |
+  | --------- | ---- | --------------------------------------- |
+  | anchor    | 6    | 77.9                                    |
+  | random    | 5    | 78.5                                    |
+  | abandoner | 5    | 73.7                                    |
+  | resting   | 4    | 74.0                                    |
+  | greedy    | 3    | 68.4                                    |
+  | lowball   | 3    | 77.0                                    |
+
+  The plan's acceptance 1 (greedy beats anchor beats random) is **not met**: the greedy bot does worst. The win counts are
+  small (24 runs, so about ±2), but the median map reached says the same. The likely cause is the bot's offer score, which
+  multiplies survivability by (1 + reward) and now has bigger rewards to chase, so it takes the harder offers (+2 levels,
+  typed, more affixes). Acceptances 2 (no kind dominates), 3 (exploits stay within 10 points) and 5 (life attrition) were not
+  checked or not met either: the median life on entering a map is still 100% (about 22% of maps entered under 90%), and
+  win rates are low overall (R0: 8 of 18, R1 to R3: 6 of 18, R1 to R5: 1 of 18, R6 strategies: 3 to 6 of 24).
+
+- **Not built:** R7 (Holdout, Collapse, Crawl); the four EXPANSION 7.5 affixes that need new mechanics.

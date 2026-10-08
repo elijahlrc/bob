@@ -16,6 +16,7 @@ import {
   uniqueIdOf,
 } from '../gen/loot';
 import { affixReward, mapAffixDef } from '../data/mapAffixes';
+import { CRESCENDO_LOOT_PER_STEP, mapTypeDef } from '../data/mapTypes';
 import { makeMapPlan, type MapPlan } from '../gen/mapPlan';
 import { flaskMask } from '../sim/combat';
 import { fullVitals, type DeathRecap, type Vitals, type WorldOpts } from '../sim/types';
@@ -32,7 +33,8 @@ export type MapRecord = {
   map: number;
   /** The level of the map that was played (differs from `map` once offers carry level offsets). */
   areaLevel: number;
-  status: MapResult['status'];
+  /** 'respite' is a level passed by resting, with no map. */
+  status: MapResult['status'] | 'respite';
   time: number;
   levelAfter: number;
   kills: number;
@@ -166,6 +168,7 @@ export function setMap(run: RunState, map: number): void {
  * the first slot) would roll at the current map number; tests and tools use it to try a theme.
  */
 export function planFor(run: RunState, offer: MapOffer | string): MapPlan {
+  if (typeof offer !== 'string' && offer.kind !== 'map') throw new Error('a Respite has no map');
   if (typeof offer === 'string') {
     const slot = Math.max(
       0,
@@ -173,7 +176,14 @@ export function planFor(run: RunState, offer: MapOffer | string): MapPlan {
     );
     offer = makeOffer(run.seed, run.map, slot, offer);
   }
-  return makeMapPlan(mapSeed(run, offer), run.map, offer.themeId, offer.affixes, offer.areaLevel);
+  return makeMapPlan(
+    mapSeed(run, offer),
+    run.map,
+    offer.themeId,
+    offer.affixes,
+    offer.areaLevel,
+    offer.type,
+  );
 }
 
 /** What a map's affixes add to its rewards on a map of this level, as fractions. */
@@ -200,7 +210,14 @@ export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
       if (!m.mon) return [];
       // Item quantity and rarity from gear, and from any flask active right now.
       const db = w.char.dbWith(flaskMask(w));
-      const { quantity, rarity, currency } = affixRewards(plan.affixes, plan.areaLevel);
+      const affix = affixRewards(plan.affixes, plan.areaLevel);
+      const { rarity, currency } = affix;
+      // The map type pays too; a Crescendo kill pays more the later in the map it is made (docs/MAPS.md 9.1).
+      const type = mapTypeDef(plan.type);
+      const quantity =
+        affix.quantity +
+        (type.reward.quantity ?? 0) +
+        (plan.type === 'crescendo' ? CRESCENDO_LOOT_PER_STEP * w.surge : 0);
       const faction = factionOfSpec(m.mon.spec);
       const items: AnyItem[] = rollMonsterDrops(w.rngLoot, uid, {
         ilvl: m.mon.spec.level,
@@ -211,6 +228,16 @@ export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
         playerQuantity: db.mult('itemQuantity') * (1 + quantity),
         playerRarity: db.mult('itemRarity') * (1 + rarity),
       });
+      // A Quarry champion always drops a rare (sometimes a unique) and a stack of currency.
+      if (plan.type === 'quarry' && m.mon.spec.rarity === 'miniboss') {
+        const level = m.mon.spec.level;
+        const unique = w.rngLoot.chance(0.15) ? rollUniqueOf(w.rngLoot, uid, level, faction) : null;
+        items.push(
+          unique ??
+            rollDrop(w.rngLoot, uid, { ilvl: level, monster: 'rare', theme: plan.theme }, true),
+          rollCurrencyBundle(w.rngLoot, uid, plan.map),
+        );
+      }
       return items.concat(
         rollCurrencyDrops(w.rngLoot, uid, {
           map: plan.map,
@@ -284,6 +311,26 @@ export function finishMap(run: RunState, res: MapResult): void {
   run.map += 1;
   run.offers = rollOffers(run.seed, run.map, run.vitals);
   run.phase = 'camp';
+}
+
+/**
+ * Take the Respite offer (docs/MAPS.md 9.3): no map is played, life, mana, energy shield and flasks are full again,
+ * and the level counts as passed with no XP, loot or clear rewards.
+ */
+export function takeRespite(run: RunState): void {
+  if (run.phase !== 'camp' || run.map >= TOTAL_MAPS) return;
+  run.history.push({
+    map: run.map,
+    areaLevel: run.map,
+    status: 'respite',
+    time: 0,
+    levelAfter: run.build.level,
+    kills: 0,
+    stuck: 0,
+  });
+  run.vitals = fullVitals();
+  run.map += 1;
+  run.offers = rollOffers(run.seed, run.map, run.vitals);
 }
 
 /** Put picked-up currency or tablets in the pouch. */

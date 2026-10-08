@@ -14,7 +14,8 @@ import {
   type MonsterTypeId,
   type Variant,
 } from '../data/monsters';
-import { affixRarePacks, affixStrength, mapAffixDef } from '../data/mapAffixes';
+import { affixRarePacks, affixStrengthOf, mapAffixDef } from '../data/mapAffixes';
+import type { MapTypeId } from '../data/mapTypes';
 import type { ThemeDef } from '../data/themes';
 import { isFloor, type Labyrinth, type Room } from './labyrinth';
 
@@ -179,6 +180,8 @@ export type PopulateOpts = {
   map: number;
   /** Map affixes that apply to every monster. */
   affixes?: string[];
+  /** The map type (docs/MAPS.md 9): Quarry and Throng change who is on the map. */
+  type?: MapTypeId;
 };
 
 /** §10.3 room population. */
@@ -202,22 +205,49 @@ export function populate(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Populati
     };
   };
   const extra = Math.floor(opts.map / 20);
-  // Theme bonus: extra rare packs replace normal rooms' packs.
-  let extraRares =
-    opts.theme.extraRarePacks +
-    (opts.affixes ?? []).reduce((n, id) => n + affixRarePacks(id, level), 0);
+  const quarry = opts.type === 'quarry';
+  const throng = opts.type === 'throng';
+  // Theme bonus: extra rare packs replace normal rooms' packs (a Throng is all normal monsters).
+  let extraRares = throng
+    ? 0
+    : opts.theme.extraRarePacks +
+      (opts.affixes ?? []).reduce((n, id) => n + affixRarePacks(id, level), 0);
   // Affixes that add monsters to every pack, or turn some normal packs into magic ones (they scale with the level band).
-  const strength = affixStrength(level);
   const packMult =
-    1 + (opts.affixes ?? []).reduce((n, id) => n + (mapAffixDef(id).packSize ?? 0) * strength, 0);
+    1 +
+    (opts.affixes ?? []).reduce(
+      (n, id) => n + (mapAffixDef(id).packSize ?? 0) * affixStrengthOf(id, level),
+      0,
+    );
   const magicShift =
     0.22 *
-    (opts.affixes ?? []).reduce((n, id) => n + (mapAffixDef(id).magicBonus ?? 0) * strength, 0);
+    (opts.affixes ?? []).reduce(
+      (n, id) => n + (mapAffixDef(id).magicBonus ?? 0) * affixStrengthOf(id, level),
+      0,
+    );
   const sized = (n: number) => Math.max(1, Math.round(n * packMult));
+  // A Quarry champion: the mini-boss recipe with three mods.
+  const champion = (): MonsterSpec => {
+    const spec = normal('miniboss');
+    return { ...spec, mods: spec.mods.slice(0, 3) };
+  };
   for (const room of lab.rooms) {
     if (room.kind === 'start') continue;
+    if (quarry && room.kind !== 'end') {
+      // A few of the usual trash (a quarter) and a champion in every room on the way.
+      if (room.kind === 'main') {
+        const trash = Math.max(1, Math.round((rng.int(3, 7) + extra) * 0.25));
+        const ps = spots(rng, lab, room, 1 + trash);
+        ps.forEach((p, i) => add(room, i === 0 ? champion() : normal(), p));
+      }
+      pack++;
+      continue;
+    }
     if (room.kind === 'end') {
-      if (opts.endKind === 'boss') {
+      if (quarry) {
+        const ps = spots(rng, lab, room, 1 + rng.int(1, 2));
+        ps.forEach((p, i) => add(room, i === 0 ? champion() : normal(), p));
+      } else if (opts.endKind === 'boss') {
         const spec: MonsterSpec = {
           type: 'warrior',
           variant: 'none',
@@ -248,7 +278,8 @@ export function populate(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Populati
       pack++;
       continue;
     }
-    const roll = rng.next();
+    const drawn = rng.next();
+    const roll = throng ? 0 : drawn;
     if (extraRares > 0 && room.kind === 'main') {
       extraRares--;
       const ps = spots(rng, lab, room, 1 + rng.int(2, 4));

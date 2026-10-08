@@ -1,5 +1,6 @@
 import { Character, type SteadyMode } from '../calc/character';
 import { NO_SHIFT } from '../calc/combat';
+import { mapTypeDef, THRONG_AFFIX, type MapTypeId } from '../data/mapTypes';
 import { buildMonster } from '../calc/monster';
 import {
   affixMonsterMods,
@@ -135,7 +136,12 @@ export function affixThreat(
 }
 
 /** A small value for what a theme and its affixes pay out, as a fraction of a normal map's rewards. */
-export function themeReward(theme: ThemeDef, affixes: string[] = [], level = 100): number {
+export function themeReward(
+  theme: ThemeDef,
+  affixes: string[] = [],
+  level = 100,
+  type: MapTypeId = 'plain',
+): number {
   let r =
     0.5 * theme.itemQuantity +
     0.3 * (theme.rareWeightMult - 1) +
@@ -154,6 +160,10 @@ export function themeReward(theme: ThemeDef, affixes: string[] = [], level = 100
     r += 0.6 * (w.experience ?? 0) + 0.1 * (w.currency ?? 0);
     r += 0.05 * affixRarePacks(id, level);
   }
+  // The map type pays too; a Quarry's three guaranteed rare drops and currency stacks are worth about a third more.
+  const tr = mapTypeDef(type).reward;
+  r += 0.5 * (tr.quantity ?? 0) + 0.3 * (tr.rarity ?? 0) + 0.6 * (tr.experience ?? 0);
+  if (type === 'quarry') r += 0.3;
   return r;
 }
 
@@ -175,10 +185,13 @@ export function scoreTheme(
   theme: ThemeDef,
   mode: SteadyMode,
   affixes: string[] = [],
+  type: MapTypeId = 'plain',
 ): ThemeScore {
   const threat = themeThreat(theme);
   const level = ch.config.areaLevel;
-  const a = affixThreat(affixes, level);
+  // A Throng's monsters carry its hidden affix (fewer hit points and weaker blows, and a much bigger crowd).
+  const onMonsters = type === 'throng' ? [...affixes, THRONG_AFFIX] : affixes;
+  const a = affixThreat(onMonsters, level);
   // Affixes that change the player change the character itself.
   const playerMods = affixes.flatMap((id) => affixPlayerMods(id, level));
   const me = playerMods.length
@@ -194,7 +207,7 @@ export function scoreTheme(
       rarity: 'normal',
       level,
       mods: [],
-      affix: affixes,
+      affix: onMonsters,
     }).defence;
     const s = me.skillSheet(me.primary, { def, shock: 0, resShift: [...NO_SHIFT] }, conds);
     dps += threat.variants[v] * s.sustainedDps;
@@ -233,8 +246,16 @@ export function scoreTheme(
     (n, [id, share]) => n + share * (FACTION_PRESSURE[MONSTER_TYPES[id].faction] - 1),
     1,
   );
-  const pressure = threat.pressure * mechanics * a.life * a.damage * (1 + g) * a.pressure;
-  const value = ((Math.max(0.1, dps) * ehp) / pressure) * (1 + themeReward(theme, affixes, level));
+  const pressure =
+    threat.pressure *
+    mechanics *
+    a.life *
+    a.damage *
+    (1 + g) *
+    a.pressure *
+    mapTypeDef(type).pressure;
+  const value =
+    ((Math.max(0.1, dps) * ehp) / pressure) * (1 + themeReward(theme, affixes, level, type));
   return { dps, ehp, pressure, value };
 }
 
@@ -254,16 +275,35 @@ const NEUTRAL: ThemeDef = {
   wall: 0,
 };
 
+/** How a build fares on a map as a share of how it fares on a plain one at the same level, with the life it arrives with. */
+export function survivalRatio(
+  ch: Character,
+  theme: ThemeDef,
+  mode: SteadyMode,
+  affixes: string[],
+  type: MapTypeId,
+  lifeFrac: number,
+): number {
+  const base = scoreTheme(ch, NEUTRAL, mode, []);
+  const here = scoreTheme(ch, theme, mode, affixes, type);
+  const per = (s: ThemeScore) => (Math.max(0.1, s.dps) * s.ehp) / s.pressure;
+  return (per(here) / Math.max(1e-9, per(base))) * Math.max(0.05, Math.min(1, lifeFrac));
+}
+
 /** The threat preview of EXPANSION section 9: your DPS and effective HP on a map, against a plain one. */
 export function threatPreview(
   ch: Character,
   theme: ThemeDef,
   mode: SteadyMode,
   affixes: string[] = [],
+  type: MapTypeId = 'plain',
 ): { dps: number; ehp: number } {
   const base = scoreTheme(ch, NEUTRAL, mode, []);
-  const here = scoreTheme(ch, theme, mode, affixes);
-  const a = affixThreat(affixes, ch.config.areaLevel);
+  const here = scoreTheme(ch, theme, mode, affixes, type);
+  const a = affixThreat(
+    type === 'throng' ? [...affixes, THRONG_AFFIX] : affixes,
+    ch.config.areaLevel,
+  );
   // Tougher monsters take longer to kill, and harder-hitting ones take more of your life per hit.
   return {
     dps: here.dps / Math.max(1e-9, base.dps) / a.life,
@@ -271,6 +311,6 @@ export function threatPreview(
     ehp:
       here.ehp /
       Math.max(1e-9, base.ehp) /
-      (a.damage * (1 + a.gain.reduce((s, x) => s + x, 0)) * a.pressure),
+      (a.damage * (1 + a.gain.reduce((s, x) => s + x, 0)) * a.pressure * mapTypeDef(type).pressure),
   };
 }

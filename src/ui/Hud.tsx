@@ -9,6 +9,7 @@ import { DELIVERY_NAME, ELEMENT_NAME } from '../calc/skillLook';
 import { useTicks } from './hooks';
 import { useState } from 'preact/hooks';
 import { canAbandon } from '../sim/abandon';
+import { CRESCENDO_STEP_BONUS, mapTypeDef } from '../data/mapTypes';
 import { SkillBar } from './SkillBar';
 
 /** A resource orb: the fill height shows the amount; the skin comes from CSS. */
@@ -208,6 +209,13 @@ export function Hud({ c }: { c: Controller }) {
         </span>
         <span>Level {w.build.level}</span>
         <span>Kills {w.stats.kills}</span>
+        {w.plan.type !== 'plain' && (
+          <span title={mapTypeDef(w.plan.type).text}>
+            {mapTypeDef(w.plan.type).name}
+            {w.plan.type === 'crescendo' &&
+              ` +${Math.round(w.surge * CRESCENDO_STEP_BONUS * 100)}% (step ${w.surge})`}
+          </span>
+        )}
         <span>{w.exitOpen ? 'Exit open' : ''}</span>
       </div>
       {!sc && !c.gallery && <AbandonButton c={c} w={w} />}

@@ -89,6 +89,7 @@ export function createDummyWorld(
     resistPenalty: 0,
     theme: themeDef('ashenCrypt'),
     affixes: [],
+    type: 'plain',
     xpMult: themeDef('ashenCrypt').xpMult,
     endKind: 'rare',
     lab: {

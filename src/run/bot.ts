@@ -25,6 +25,7 @@ import {
   passivePoints,
   planFor,
   takeReward,
+  takeRespite,
   worldOptsFor,
   type RunState,
 } from './run';
@@ -118,17 +119,29 @@ export function offerCharacter(run: RunState, offer: MapOffer): Character {
   return new Character(run.build, { ...cfgFor(run), areaLevel: offer.areaLevel });
 }
 
+/** The bot rests (takes a Respite) when its life is below this fraction. */
+const REST_BELOW = 0.35;
+
 /** Which of the offered maps the bot takes. */
-export type ThemeRule = 'first' | 'best';
+export type ThemeRule = 'first' | 'best' | 'random' | 'lowball' | 'resting';
 
 /** The offered map the build is best placed to beat (the first one when the rule is 'first'). */
-export function chooseOffer(run: RunState, rule: ThemeRule = 'best'): MapOffer {
-  const [first, ...rest] = run.offers;
+export function chooseOffer(run: RunState, rule: ThemeRule = 'best', rng?: Rng): MapOffer {
+  const maps = run.offers.filter((o) => o.kind === 'map');
+  const [first, ...rest] = maps;
   if (rule === 'first') return first;
+  // The route strategies the plan measures the bot against (docs/MAPS.md 10.3).
+  if (rule === 'random') return rng ? rng.pick(run.offers) : first;
+  if (rule === 'lowball')
+    return maps.reduce((lo, o) => (o.areaLevel < lo.areaLevel ? o : lo), first);
+  if (rule === 'resting') {
+    const respite = run.offers.find((o) => o.kind === 'respite');
+    if (respite) return respite;
+  }
   const boss = run.map % 10 === 0 ? 'boss' : 'clearing';
   // An offer's monsters are at its own level, so each is scored by a character facing that level.
   const valueOf = (o: MapOffer) =>
-    scoreTheme(offerCharacter(run, o), themeDef(o.themeId), boss, o.affixes).value;
+    scoreTheme(offerCharacter(run, o), themeDef(o.themeId), boss, o.affixes, o.type).value;
   let best = first;
   let bestValue = valueOf(first);
   // A later offer must beat the best so far by 0.1%, so ties keep the earlier one.
@@ -139,6 +152,9 @@ export function chooseOffer(run: RunState, rule: ThemeRule = 'best'): MapOffer {
       bestValue = v;
     }
   }
+  // Worn down, the bot takes a Respite if one is offered: it costs the level, but it is the only full recovery.
+  const respite = run.offers.find((o) => o.kind === 'respite');
+  if (respite && run.vitals.life < REST_BELOW) return respite;
   return best;
 }
 
@@ -511,7 +527,7 @@ export function botCamp(run: RunState, policy: CraftPolicy = 'greedy'): void {
 
 export type BotMapRecord = {
   map: number;
-  status: MapResult['status'];
+  status: MapResult['status'] | 'respite';
   time: number;
   level: number;
   xp: number;
@@ -549,13 +565,29 @@ export function botRun(
   const maps: BotMapRecord[] = [];
   const tally = new RunTally();
   const killer = killerTracker();
+  const route = new Rng(seed).fork('route');
   while (run.phase === 'camp' && run.map <= maxMap) {
     const crafting = opts.crafting ?? 'greedy';
     botCamp(run, crafting);
     if (crafting === 'greedy') botChalk(run);
-    const plan = planFor(run, chooseOffer(run, opts.themes));
+    const offer = chooseOffer(run, opts.themes, route);
     const startLife = run.vitals.life;
     const startFlask = Math.min(1, ...Object.values(run.vitals.flasks));
+    if (offer.kind === 'respite') {
+      maps.push({
+        map: run.map,
+        status: 'respite',
+        time: 0,
+        level: run.build.level,
+        xp: 0,
+        stuck: 0,
+        startLife,
+        startFlask,
+      });
+      takeRespite(run);
+      continue;
+    }
+    const plan = planFor(run, offer);
     const worldOpts = worldOptsFor(run, plan);
     if (opts.abandonBelow !== undefined)
       worldOpts.abandonPolicy = woundedAbandonPolicy(opts.abandonBelow);

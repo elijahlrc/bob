@@ -1,4 +1,5 @@
 import { mod, type Mod } from '../mods/types';
+import { THRONG_AFFIX } from './mapTypes';
 
 /**
  * Map affixes (EXPANSION 7.5, docs/MAPS.md section 6): from map 5 an offered map can carry modifiers that
@@ -31,6 +32,8 @@ export type MapAffixDef = {
   pressure?: number;
   /** Never rolled at random; only added with Wayfinder's Chalk. */
   chalkOnly?: boolean;
+  /** Not a map affix proper: part of a map type. Its strength does not follow the level band. */
+  fixed?: boolean;
 };
 
 export const MAP_AFFIXES: MapAffixDef[] = [
@@ -269,6 +272,16 @@ export const MAP_AFFIXES: MapAffixDef[] = [
     pressure: 1.05,
   },
   {
+    id: THRONG_AFFIX,
+    name: 'Throng',
+    text: 'A throng two and a half times the usual crowd, of weaker monsters',
+    monsterMods: [mod('life', 'more', -40), mod('damage', 'more', -20)],
+    packSize: 1.5,
+    reward: {},
+    chalkOnly: true,
+    fixed: true,
+  },
+  {
     id: 'unguarded',
     name: 'Unguarded',
     text: 'Players have -{20}% chance to block attacks and spells',
@@ -288,6 +301,11 @@ export function affixStrength(level: number): number {
   return level < 30 ? 0.5 : level < 60 ? 0.75 : 1;
 }
 
+/** The strength of one affix on a map of this level (a map type's hidden affixes are always full). */
+export function affixStrengthOf(id: string, level: number): number {
+  return mapAffixDef(id).fixed ? 1 : affixStrength(level);
+}
+
 /** A number scaled by the band's strength, rounded; a value that would round to nothing stays at 1. */
 export function scaleValue(value: number, strength: number): number {
   const v = Math.round(value * strength);
@@ -302,29 +320,29 @@ function scaleMods(mods: Mod[] | undefined, strength: number): Mod[] {
 
 /** The mods an affix gives every monster on a map of this level. */
 export function affixMonsterMods(id: string, level: number): Mod[] {
-  return scaleMods(mapAffixDef(id).monsterMods, affixStrength(level));
+  return scaleMods(mapAffixDef(id).monsterMods, affixStrengthOf(id, level));
 }
 
 /** The mods an affix gives the player on a map of this level. */
 export function affixPlayerMods(id: string, level: number): Mod[] {
-  return scaleMods(mapAffixDef(id).playerMods, affixStrength(level));
+  return scaleMods(mapAffixDef(id).playerMods, affixStrengthOf(id, level));
 }
 
 /** Rare packs an affix adds on a map of this level (at least one). */
 export function affixRarePacks(id: string, level: number): number {
   const n = mapAffixDef(id).extraRarePacks ?? 0;
-  return n === 0 ? 0 : Math.max(1, scaleValue(n, affixStrength(level)));
+  return n === 0 ? 0 : Math.max(1, scaleValue(n, affixStrengthOf(id, level)));
 }
 
 /** The affix's text with its numbers for a map of this level. */
 export function affixText(a: MapAffixDef, level: number): string {
-  const s = affixStrength(level);
+  const s = affixStrengthOf(a.id, level);
   return a.text.replace(/\{(\d+)\}/g, (_, n: string) => String(scaleValue(Number(n), s)));
 }
 
 /** What an affix adds to a map's rewards on this level, as fractions. */
 export function affixReward(a: MapAffixDef, level: number): MapAffixDef['reward'] {
-  const s = affixStrength(level);
+  const s = affixStrengthOf(a.id, level);
   const out: MapAffixDef['reward'] = {};
   for (const k of ['quantity', 'rarity', 'experience', 'currency'] as const)
     if (a.reward[k]) out[k] = a.reward[k]! * s;

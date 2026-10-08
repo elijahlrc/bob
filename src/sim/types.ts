@@ -454,6 +454,8 @@ export type World = {
   status: MapStatus;
   /** Seconds until the player leaves after pressing Abandon, or null when not leaving. */
   abandonT: number | null;
+  /** The Crescendo step the monsters are at (0 on any other map): they deal and take damage as if stronger (docs/MAPS.md 9.1). */
+  surge: number;
   exitOpen: boolean;
   endRoom: number;
   ai: PlayerAI;

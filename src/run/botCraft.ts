@@ -226,12 +226,13 @@ export function botChalk(run: RunState): number {
   for (let guard = 0; guard < 4 && owned(run, 'chalk') > 0; guard++) {
     let best: { gain: number; apply: () => CraftResult } | null = null;
     run.offers.forEach((o, offer) => {
+      if (o.kind !== 'map') return;
       const id = o.themeId;
       const ch = offerCharacter(run, o);
       const have = o.affixes;
-      const cur = scoreTheme(ch, themeDef(id), mode, have).value;
+      const cur = scoreTheme(ch, themeDef(id), mode, have, o.type).value;
       for (const opt of chalkOptions(run, offer)) {
-        const v = scoreTheme(ch, themeDef(id), mode, [...have, opt]).value;
+        const v = scoreTheme(ch, themeDef(id), mode, [...have, opt], o.type).value;
         const gain = v / cur - 1;
         if (gain > 0.02 && (!best || gain > best.gain))
           best = { gain, apply: () => chalkAdd(run, offer, opt) };
@@ -243,6 +244,7 @@ export function botChalk(run: RunState): number {
             themeDef(id),
             mode,
             have.filter((x) => x !== old),
+            o.type,
           ).value;
           const gain = v / cur - 1;
           if (gain > 0.04 && (!best || gain > best.gain))

@@ -270,7 +270,7 @@ export function randomRun(
   let moves = 0;
   while (run.phase === 'camp' && run.map <= maxMap) {
     moves += randomCamp(run, rng, maxMoves);
-    const plan = planFor(run, rng.pick(run.offers));
+    const plan = planFor(run, rng.pick(run.offers.filter((o) => o.kind === 'map')));
     const res = runMap(plan, run.build, run.xp, worldOptsFor(run, plan), undefined, killer.tick);
     maps.push({
       map: run.map,

@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 import { Character } from '../calc/character';
 import { classDef } from '../data/classes';
 import { affixText, mapAffixDef, rewardText } from '../data/mapAffixes';
+import { mapTypeDef } from '../data/mapTypes';
 import { themeDef } from '../data/themes';
-import { offersFor } from '../run/preview';
+import { offersFor, type Verdict } from '../run/preview';
 import { xpToNext } from '../data/xpTable';
 import { resistPenaltyForMap } from '../gen/mapPlan';
 import type { Controller } from '../run/controller';
@@ -17,6 +18,11 @@ import { Skills } from './Skills';
 import { TreeView } from './TreeView';
 
 const COUNTDOWN = 2;
+const VERDICT_TEXT: Record<Verdict, string> = {
+  comfortable: 'Comfortable',
+  close: 'Close',
+  dangerous: 'Dangerous',
+};
 type Tab = 'tree' | 'sheet' | 'skills' | 'items' | 'workbench';
 
 /** Wayfinder's Chalk on an offered map: add one of three affixes, or remove one (EXPANSION 8.2). */
@@ -180,6 +186,23 @@ export function Camp({ c }: { c: Controller }) {
         )}
         <div class="theme-choice">
           {offersFor(run).map((o, i) => {
+            if (o.kind === 'respite')
+              return (
+                <div key={o.id} class="theme-wrap">
+                  <button
+                    class="btn theme respite"
+                    title="No map is played: the level passes with no loot, XP or clear rewards."
+                    onClick={() => c.startMap(i)}
+                  >
+                    <div class="theme-name">Respite</div>
+                    <div class="muted">Level {o.areaLevel} passes</div>
+                    <div class="affix">
+                      Life, mana, energy shield and flasks are made full again.
+                    </div>
+                    <div class="threat">No loot, no XP, no clear rewards.</div>
+                  </button>
+                </div>
+              );
             const t = themeDef(o.themeId);
             return (
               <div key={o.id} class="theme-wrap">
@@ -189,6 +212,11 @@ export function Camp({ c }: { c: Controller }) {
                     Level {o.areaLevel}
                     {o.offset !== 0 && ` (${o.offset > 0 ? '+' : '−'}${Math.abs(o.offset)})`}
                   </div>
+                  {o.type !== 'plain' && (
+                    <div class="affix" title={mapTypeDef(o.type).text}>
+                      <strong>{mapTypeDef(o.type).name}</strong>: {mapTypeDef(o.type).text}
+                    </div>
+                  )}
                   <div class="muted">{t.bonusText}</div>
                   {o.affixes.map((id) => {
                     const a = mapAffixDef(id);
@@ -202,8 +230,16 @@ export function Camp({ c }: { c: Controller }) {
                   <div class="threat">
                     For you: DPS ×{o.dps.toFixed(2)} · effective HP ×{o.ehp.toFixed(2)}
                   </div>
+                  {o.verdict && (
+                    <div
+                      class={`verdict ${o.verdict}`}
+                      title={`How you would fare here next to a plain map at its level, counting the life you arrive with (${Math.round((o.ratio ?? 0) * 100)}%). A rough guide, not a promise.`}
+                    >
+                      {VERDICT_TEXT[o.verdict]}
+                    </div>
+                  )}
                 </button>
-                {(run.currency.chalk ?? 0) > 0 && <Chalk c={c} offer={i} />}
+                {(run.currency.chalk ?? 0) > 0 && o.kind === 'map' && <Chalk c={c} offer={i} />}
               </div>
             );
           })}

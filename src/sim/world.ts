@@ -24,6 +24,7 @@ import { tickTriggers } from './triggers';
 import { Grid } from './grid';
 import { newActor } from './actor';
 import { tickAbandon } from './abandon';
+import { crescendoStep } from '../data/mapTypes';
 import type { Actor, World, WorldOpts } from './types';
 
 export function spawnMonster(
@@ -146,6 +147,7 @@ export function createWorld(inp: CreateWorldInput): World {
     xp: inp.xp,
     status: 'running',
     abandonT: null,
+    surge: 0,
     exitOpen: false,
     endRoom: plan.lab.mainPath[plan.lab.mainPath.length - 1],
     ai: {
@@ -385,6 +387,8 @@ function checkExit(w: World): void {
   if (w.exitOpen) return;
   for (const a of w.actors)
     if (!a.isPlayer && a.alive && a.room === w.endRoom && !a.noReward) return;
+  // A Quarry opens its exit only when every champion has fallen, wherever it stood.
+  if (w.plan.type === 'quarry' && w.actors.some((a) => a.alive && a.rarity === 'miniboss')) return;
   w.exitOpen = true;
   w.events.push({ t: 'exitOpen' });
 }
@@ -396,6 +400,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   const dt = DT;
   w.t += dt;
   w.tick++;
+  if (w.plan.type === 'crescendo') w.surge = crescendoStep(w.t);
   const p = w.player;
   refreshPlayerDefence(w);
   tickTriggers(w, dt);
