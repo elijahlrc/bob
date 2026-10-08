@@ -131,6 +131,21 @@ export type Actor = {
   flies: boolean;
   stationary: boolean;
   curlT: number;
+  /** Lies in wait (an Ambush) until the character is close or it is hit. */
+  hold: boolean;
+  /** A Patrol: the two points it walks between while it has not noticed the character, and which one it is heading for. */
+  patrol: { x: number; y: number }[] | null;
+  patrolI: number;
+  /** The next tile of the way to the patrol point, and when it is worked out again. */
+  pathT: number;
+  nextX: number;
+  nextY: number;
+  /** Timers of the abilities after the first eight, by index in the type's list (see sim/abilities.ts). */
+  abT: number[];
+  /** Where a charge or a leap is heading, and how long is left of it (zero: not in one). */
+  dashT: number;
+  dashX: number;
+  dashY: number;
   /** Where a burrowed Gnawing Queen will come up. */
   markX: number;
   markY: number;

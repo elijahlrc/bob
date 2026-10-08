@@ -9,6 +9,7 @@ import {
   TYPE_TAGS,
   type ThreatTag,
 } from '../data/monsterInfo';
+import { ABILITY_INFO, abilitiesOf } from '../data/abilities';
 import { THRONG_AFFIX, type MapTypeId } from '../data/mapTypes';
 import type { ThemeDef } from '../data/themes';
 import { typeShares } from '../gen/population';
@@ -56,8 +57,12 @@ export function themeInfo(
     const def = MONSTER_TYPES[id];
     byFaction.set(def.faction, (byFaction.get(def.faction) ?? 0) + share);
     if (def.attack !== 'melee') ranged += share;
-    for (const tag of TYPE_TAGS[id] ?? []) tagShare.set(tag, (tagShare.get(tag) ?? 0) + share);
-    if (def.role === 'swarm' && !(TYPE_TAGS[id] ?? []).includes('swarm'))
+    // A tag counts once per type, whether the type lists it or an ability of the type carries it.
+    const mine = new Set<ThreatTag>(TYPE_TAGS[id] ?? []);
+    for (const ab of abilitiesOf(id))
+      if (ABILITY_INFO[ab.id].tag) mine.add(ABILITY_INFO[ab.id].tag!);
+    for (const tag of mine) tagShare.set(tag, (tagShare.get(tag) ?? 0) + share);
+    if (def.role === 'swarm' && !mine.has('swarm'))
       tagShare.set('swarm', (tagShare.get('swarm') ?? 0) + share);
   }
   tagShare.set('ranged', ranged);

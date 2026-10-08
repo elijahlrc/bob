@@ -8,7 +8,7 @@ import { TYPE_WEIGHTS } from './population';
  * the types fill the shape, so a Rot room is "a Hag with four Shamblers" or "two Spitters behind three Shamblers" and not
  * the faction's average mix.
  */
-export type TemplateId = 'phalanx' | 'line' | 'escort' | 'swarm' | 'mixed';
+export type TemplateId = 'phalanx' | 'line' | 'escort' | 'swarm' | 'mixed' | 'ambush' | 'patrol';
 
 export const TEMPLATE_NAMES: Record<TemplateId, string> = {
   phalanx: 'Phalanx',
@@ -16,15 +16,17 @@ export const TEMPLATE_NAMES: Record<TemplateId, string> = {
   escort: 'Escort',
   swarm: 'Swarm',
   mixed: 'Mixed arms',
+  ambush: 'Ambush',
+  patrol: 'Patrol',
 };
 
 /** How often each faction forms each shape. Mixed arms is the old behaviour: every monster rolls its own type. */
 export const TEMPLATE_WEIGHTS: Record<FactionId, Partial<Record<TemplateId, number>>> = {
-  ossuary: { mixed: 3, line: 3, phalanx: 2, escort: 2 },
-  rot: { escort: 3, line: 3, phalanx: 2, mixed: 1 },
-  hollow: { swarm: 2, line: 2, escort: 3, mixed: 1 },
-  choir: { escort: 4, line: 2, phalanx: 2, mixed: 1 },
-  swarm: { swarm: 5, escort: 2, phalanx: 1, mixed: 1 },
+  ossuary: { mixed: 3, line: 3, phalanx: 2, escort: 2, ambush: 1, patrol: 1 },
+  rot: { escort: 3, line: 3, phalanx: 2, mixed: 1, ambush: 2 },
+  hollow: { swarm: 2, line: 2, escort: 3, mixed: 1, patrol: 1 },
+  choir: { escort: 3, line: 2, phalanx: 2, mixed: 1, patrol: 3 },
+  swarm: { swarm: 5, escort: 2, phalanx: 1, mixed: 1, ambush: 2 },
   reliquary: { phalanx: 3, line: 3, escort: 3, mixed: 1 },
 };
 
@@ -60,6 +62,11 @@ export function pickFaction(rng: Rng, theme: Pick<ThemeDef, 'factions'>): Factio
   return f.length === 1 ? f[0][0] : rng.weighted(f, ([, w]) => w)[0];
 }
 
+/** Whether the faction has a type that can lead an escort. */
+function hasLeader(faction: FactionId): boolean {
+  return typesWithRole(faction, 'support').length + typesWithRole(faction, 'special').length > 0;
+}
+
 /** The roles of the monsters of a pack of `n`, leader first; null for Mixed arms (each rolls its own type). */
 export function templateRoles(
   rng: Rng,
@@ -72,11 +79,7 @@ export function templateRoles(
   const ids = (Object.keys(weights) as TemplateId[]).filter((t) => {
     if (t === 'swarm') return typesWithRole(faction, 'swarm').length > 0;
     if (t === 'line') return typesWithRole(faction, 'ranged').length > 0;
-    if (t === 'escort')
-      return (
-        !plain &&
-        (typesWithRole(faction, 'support').length || typesWithRole(faction, 'special').length) > 0
-      );
+    if (t === 'escort' || t === 'ambush') return t === 'ambush' || (!plain && hasLeader(faction));
     return true;
   });
   const template = rng.weighted(ids, (t) => weights[t] ?? 0);
@@ -94,11 +97,22 @@ export function templateRoles(
         ],
       };
     }
-    case 'escort': {
+    case 'escort':
+    case 'ambush': {
+      // An ambush is an escort (or a line of the front, where there is no leader) that lies in wait.
+      if (!hasLeader(faction)) return { template, roles: fill('front') };
       const leaders = [...typesWithRole(faction, 'support'), ...typesWithRole(faction, 'special')];
       const lead: Role = MONSTER_TYPES[rng.pick(leaders)].role;
       const follow = ESCORT_FOLLOWERS[faction] ?? 'front';
       return { template, roles: [lead, ...fill(follow).slice(1)] };
+    }
+    case 'patrol': {
+      // A patrol is a short line on the march: some in front, the rest behind.
+      const shooters = typesWithRole(faction, 'ranged').length > 0 ? Math.round(n * 0.3) : 0;
+      return {
+        template,
+        roles: [...fill('front').slice(0, n - shooters), ...fill('ranged').slice(0, shooters)],
+      };
     }
     case 'swarm':
       return { template, roles: fill('swarm') };
@@ -119,15 +133,35 @@ function pickAny(
   return rng.weighted(pool, (id) => TYPE_WEIGHTS[id] * (theme.typeWeights[id] ?? 1));
 }
 
-/** The types of the monsters of one pack of `n` (docs/ENEMIES.md 4.2), leader first, and the shape it was made in. */
+/** One pack: the types of its monsters, leader first, the shape it was made in, and what it does before it sees you. */
+export type PackPlan = {
+  types: MonsterTypeId[];
+  template: TemplateId;
+  hold: boolean;
+  patrol: boolean;
+};
+
+/** The types of the monsters of one pack of `n` (docs/ENEMIES.md 4.2). */
+export function packPlan(
+  rng: Rng,
+  theme: Pick<ThemeDef, 'typeWeights' | 'factions'>,
+  n: number,
+  plain = false,
+): PackPlan {
+  const faction = pickFaction(rng, theme);
+  const { template, roles } = templateRoles(rng, faction, n, plain);
+  const types = roles
+    ? roles.map((r) => pickByRole(rng, theme, faction, r))
+    : Array.from({ length: n }, () => pickAny(rng, theme, faction));
+  return { types, template, hold: template === 'ambush', patrol: template === 'patrol' };
+}
+
+/** The types of a pack, for the places that need no more than that. */
 export function packTypes(
   rng: Rng,
   theme: Pick<ThemeDef, 'typeWeights' | 'factions'>,
   n: number,
   plain = false,
 ): MonsterTypeId[] {
-  const faction = pickFaction(rng, theme);
-  const { roles } = templateRoles(rng, faction, n, plain);
-  if (!roles) return Array.from({ length: n }, () => pickAny(rng, theme, faction));
-  return roles.map((r) => pickByRole(rng, theme, faction, r));
+  return packPlan(rng, theme, n, plain).types;
 }

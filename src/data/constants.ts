@@ -133,6 +133,10 @@ export const REPOSITION_TIME = 3;
 export const REPOSITION_DIST = 3.5;
 export const PACK_ALERT = 6;
 export const LEASH_TIME = 6;
+/** An Ambush wakes when the character is this close (tiles), sight line or not (docs/ENEMIES.md 4.2). */
+export const AMBUSH_RANGE = 4.5;
+/** A Patrol walks at this share of its speed. */
+export const PATROL_SPEED = 0.45;
 export const STUCK_TIME = 20;
 export const REPATH_INTERVAL = 0.5;
 export const RETREAT_TIME = 0.8;

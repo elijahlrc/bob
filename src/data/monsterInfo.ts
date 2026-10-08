@@ -87,7 +87,12 @@ export type ThreatTag =
   | 'immunities'
   | 'drains'
   | 'armoured'
-  | 'clouds';
+  | 'clouds'
+  | 'chargers'
+  | 'thieves'
+  | 'suppressors'
+  | 'holders'
+  | 'reflectors';
 
 export const TAG_ORDER: ThreatTag[] = [
   'ranged',
@@ -103,6 +108,11 @@ export const TAG_ORDER: ThreatTag[] = [
   'drains',
   'armoured',
   'clouds',
+  'chargers',
+  'thieves',
+  'suppressors',
+  'holders',
+  'reflectors',
 ];
 
 export const TAG_INFO: Record<ThreatTag, { name: string; text: string }> = {
@@ -119,7 +129,10 @@ export const TAG_INFO: Record<ThreatTag, { name: string; text: string }> = {
   spawners: { name: 'Spawners', text: 'Nests keep spawning until destroyed: kill them first.' },
   fliers: { name: 'Fliers', text: 'Fly over walls and weave: area damage helps.' },
   blinkers: { name: 'Blinkers', text: 'Appear next to you: do not rely on keeping your distance.' },
-  healers: { name: 'Healers', text: 'Heal or shield their allies: kill them first, or stun them.' },
+  healers: {
+    name: 'Healers',
+    text: 'Heal, shield or empower their allies: kill them first, or stun them.',
+  },
   ailments: {
     name: 'Ailments',
     text: 'Poison, bleed and chill: ailment avoidance and regeneration help.',
@@ -132,6 +145,26 @@ export const TAG_INFO: Record<ThreatTag, { name: string; text: string }> = {
   armoured: {
     name: 'Armoured',
     text: 'Heavily armoured: elemental, chaos or armour-piercing damage helps.',
+  },
+  chargers: {
+    name: 'Chargers',
+    text: 'Leap or rush at you from a distance: tough defences and stun resistance help; kiting does not.',
+  },
+  thieves: {
+    name: 'Thieves',
+    text: 'Take flask charges and run: kill them before they get away, or do not rely on flasks.',
+  },
+  suppressors: {
+    name: 'Suppressors',
+    text: 'Stop your life, mana and energy shield from recovering near them: kill them first.',
+  },
+  holders: {
+    name: 'Holders',
+    text: 'Pull or slow you: do not count on staying out of reach.',
+  },
+  reflectors: {
+    name: 'Reflectors',
+    text: 'Throw back part of the damage dealt to them: ranged and damage over time help.',
   },
   clouds: {
     name: 'Clouds',

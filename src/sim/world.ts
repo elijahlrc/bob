@@ -13,6 +13,7 @@ import { tickSkillZones, updateAction, updateProjectiles } from './actions';
 import { monsterAI, playerAI, separate } from './ai';
 import { lifeCap, rawHit, refreshPlayerDefence, tickActor } from './combat';
 import { autoFlaskPolicy, type FlaskPolicy } from './flaskPolicy';
+import { tickAbilities } from './abilities';
 import { isZone, tickCorpses, tickFactionBehaviour, tickZones } from './factions';
 import { BUFF_IDS, type BuffId } from '../data/buffs';
 import { rollGains, tickBuffs } from './buffs';
@@ -200,7 +201,11 @@ export function createWorld(inp: CreateWorldInput): World {
   player.mana = Math.max(0, player.def.maxMana - char.reservedMana) * frac(start?.mana);
   for (const f of w.flasks) f.charges = f.spec.maxCharges * frac(start?.flasks[f.spec.uid]);
   player.name = 'You';
-  for (const s of plan.pop.monsters) spawnMonster(w, s.spec, s.x, s.y, s.room, s.pack, s.name);
+  for (const s of plan.pop.monsters) {
+    const a = spawnMonster(w, s.spec, s.x, s.y, s.room, s.pack, s.name);
+    if (s.hold) a.hold = true;
+    if (s.patrol) a.patrol = s.patrol.map((p) => ({ ...p }));
+  }
   seedCharacters(w);
   return w;
 }
@@ -437,7 +442,10 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     else {
       monsterAI(w, a, dt);
       tickMonsterMods(w, a, dt);
-      if (a.state === 'chase') tickFactionBehaviour(w, a, dt);
+      if (a.state === 'chase') {
+        tickFactionBehaviour(w, a, dt);
+        tickAbilities(w, a, dt);
+      }
     }
     if (!a.action) a.carry = 0;
   }

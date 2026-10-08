@@ -7,7 +7,9 @@ import {
   BLOCK_WINDOW,
   LEASH_TIME,
   LOOT_RANGE,
+  AMBUSH_RANGE,
   MONSTER_AGGRO,
+  PATROL_SPEED,
   PACK_ALERT,
   REPATH_INTERVAL,
   REPOSITION_DIST,
@@ -497,6 +499,24 @@ function chaseStep(w: World, m: Actor, tx: number, ty: number, dt: number): void
   monsterMove(w, m, tx, ty, dt);
 }
 
+/** A patrol walks from one of its two points to the other and back, slowly, until it notices the character. */
+function patrolStep(w: World, m: Actor, dt: number): void {
+  const to = m.patrol![m.patrolI];
+  if (Math.hypot(to.x - m.x, to.y - m.y) < 1.2) {
+    m.patrolI = 1 - m.patrolI;
+    m.pathT = 0;
+    return;
+  }
+  m.pathT -= dt;
+  if (m.pathT <= 0) {
+    m.pathT = 0.4;
+    const n = w.grid.astar(m.x, m.y, to.x, to.y)?.[0];
+    m.nextX = n ? n.x : to.x;
+    m.nextY = n ? n.y : to.y;
+  }
+  step(w, m, m.nextX - m.x, m.nextY - m.y, dt * PATROL_SPEED);
+}
+
 export function monsterAI(w: World, m: Actor, dt: number): void {
   m.moving = false;
   if (m.dummy || !canAct(m)) return;
@@ -506,14 +526,27 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
   if (!p.alive) return;
   const d = Math.hypot(p.x - m.x, p.y - m.y);
   if (m.state === 'idle') {
-    m.noticeT -= dt;
-    if (m.noticeT > 0) return;
-    m.noticeT = 0.25;
-    if (d <= MONSTER_AGGRO && w.grid.los(m.x, m.y, p.x, p.y)) {
-      m.state = 'chase';
-      m.lostT = 0;
-      alertPack(w, m);
+    // An ambush lies still until the character is close, wherever the character is looking.
+    if (m.hold) {
+      if (d <= AMBUSH_RANGE) {
+        m.hold = false;
+        m.state = 'chase';
+        m.lostT = 0;
+        alertPack(w, m);
+      }
+      return;
     }
+    m.noticeT -= dt;
+    if (m.noticeT <= 0) {
+      m.noticeT = 0.25;
+      if (d <= MONSTER_AGGRO && w.grid.los(m.x, m.y, p.x, p.y)) {
+        m.state = 'chase';
+        m.lostT = 0;
+        alertPack(w, m);
+        return;
+      }
+    }
+    if (m.patrol && !m.stationary) patrolStep(w, m, dt);
     return;
   }
   if (m.state === 'leash') {

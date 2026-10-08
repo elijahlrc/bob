@@ -18,7 +18,7 @@ import { LEGACY, packPower, statLevel, type Difficulty } from '../data/difficult
 import { affixRarePacks, affixStrengthOf, mapAffixDef } from '../data/mapAffixes';
 import { HOLDOUT_FIRST, HOLDOUT_INTERVAL, HOLDOUT_WAVES, type MapTypeId } from '../data/mapTypes';
 import type { ThemeDef } from '../data/themes';
-import { packTypes } from './packs';
+import { packPlan, packTypes, type PackPlan } from './packs';
 import { isFloor, type Labyrinth, type Room } from './labyrinth';
 
 export type MonsterSpawn = {
@@ -28,6 +28,10 @@ export type MonsterSpawn = {
   room: number;
   pack: number;
   name: string;
+  /** Lies in wait (an Ambush) until the character comes close or something hits it. */
+  hold?: boolean;
+  /** Walks between these two points until it notices the character (a Patrol). */
+  patrol?: { x: number; y: number }[];
 };
 
 export type EndKind = 'rare' | 'miniboss' | 'boss';
@@ -232,8 +236,38 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
   const monsters: MonsterSpawn[] = [];
   const level = opts.areaLevel;
   let pack = 0;
-  const add = (room: Room, spec: MonsterSpec, at: { x: number; y: number }) => {
-    monsters.push({ spec, x: at.x, y: at.y, room: room.id, pack, name: monsterName(spec, rng) });
+  const add = (
+    room: Room,
+    spec: MonsterSpec,
+    at: { x: number; y: number },
+    extra: Partial<MonsterSpawn> = {},
+  ) => {
+    monsters.push({
+      spec,
+      x: at.x,
+      y: at.y,
+      room: room.id,
+      pack,
+      name: monsterName(spec, rng),
+      ...extra,
+    });
+  };
+  // What a pack does before it sees the character: lie in wait, or walk to the next room and back.
+  const behave = (room: Room, plan: PackPlan): Partial<MonsterSpawn> => {
+    if (plan.hold) return { hold: true };
+    if (plan.patrol && room.kind === 'main') {
+      const next =
+        lab.rooms.find((r) => r.kind !== 'side' && r.pathIndex === room.pathIndex + 1) ??
+        lab.rooms.find((r) => r.kind !== 'side' && r.pathIndex === room.pathIndex - 1);
+      if (next)
+        return {
+          patrol: [
+            { x: room.cx + 0.5, y: room.cy + 0.5 },
+            { x: next.cx + 0.5, y: next.cy + 0.5 },
+          ],
+        };
+    }
+    return {};
   };
   const affixField = opts.affixes?.length ? { affix: opts.affixes } : {};
   const normal = (rarity: MonsterRarity = 'normal', forced?: MonsterTypeId): MonsterSpec => {
@@ -364,17 +398,21 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
     if (extraRares > 0 && room.kind === 'main') {
       extraRares--;
       const ps = spots(rng, lab, room, 1 + rng.int(2, 4));
-      const types = packTypes(rng, opts.theme, ps.length, throng);
+      const plan = packPlan(rng, opts.theme, ps.length, throng);
+      const types = plan.types;
+      const how = behave(room, plan);
       ps.forEach((p, i) =>
-        add(room, i === 0 ? normal('rare', types[i]) : normal('normal', types[i]), p),
+        add(room, i === 0 ? normal('rare', types[i]) : normal('normal', types[i]), p, how),
       );
     } else if (roll < 0.7 - magicShift) {
       const ps = spots(rng, lab, room, sized(rng.int(3, 7) + extra));
       let packed = false;
-      const types = packTypes(rng, opts.theme, ps.length, throng);
+      const plan = packPlan(rng, opts.theme, ps.length, throng);
+      const types = plan.types;
+      const how = behave(room, plan);
       for (const [i, p] of ps.entries()) {
         const spec = normal('normal', types[i]);
-        add(room, spec, p);
+        add(room, spec, p, how);
         // A Gnawer never comes alone: the first one in a room brings three to six more (a pack of a dozen, with the room's own).
         if (spec.type === 'gnawer' && spec.rarity === 'normal' && !packed) {
           packed = true;
@@ -386,12 +424,14 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
     } else if (roll < 0.92) {
       const nm = rng.int(2, 3);
       const ps = spots(rng, lab, room, sized(rng.int(3, 7) + extra));
-      const types = packTypes(rng, opts.theme, ps.length, throng);
-      ps.forEach((p, i) => add(room, normal(i < nm ? 'magic' : 'normal', types[i]), p));
+      const plan = packPlan(rng, opts.theme, ps.length, throng);
+      const how = behave(room, plan);
+      ps.forEach((p, i) => add(room, normal(i < nm ? 'magic' : 'normal', plan.types[i]), p, how));
     } else {
       const ps = spots(rng, lab, room, sized(1 + rng.int(2, 4) + extra));
-      const types = packTypes(rng, opts.theme, ps.length, throng);
-      ps.forEach((p, i) => add(room, normal(i === 0 ? 'rare' : 'normal', types[i]), p));
+      const plan = packPlan(rng, opts.theme, ps.length, throng);
+      const how = behave(room, plan);
+      ps.forEach((p, i) => add(room, normal(i === 0 ? 'rare' : 'normal', plan.types[i]), p, how));
     }
     pack++;
   }

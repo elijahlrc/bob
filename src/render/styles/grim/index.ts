@@ -659,7 +659,7 @@ export class GrimStyle extends StyleBase {
       d.sprite.setTint(tint).setTintMode(Phaser.TintModes.MULTIPLY);
     }
     // The Unremembered fades out of sight while it phases.
-    if (a.alive) d.sprite.setAlpha(a.phaseT > 0 ? 0.12 : 1);
+    if (a.alive) d.sprite.setAlpha(a.phaseT > 0 ? 0.12 : a.hold ? 0.4 : 1);
     d.shadow
       .setPosition(px, py + 1)
       .setDepth(500)
