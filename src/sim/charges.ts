@@ -7,7 +7,7 @@ import {
   type ChargeEvent,
   type ChargeKind,
 } from '../calc/charges';
-import { mapAffixDef } from '../data/mapAffixes';
+import { affixPlayerMods } from '../data/mapAffixes';
 import { TROPHY_MODS, TROPHY_SECONDS, trophyMods } from '../data/trophy';
 import { refreshPlayerDefence } from './combat';
 import type { Mod } from '../mods/types';
@@ -41,7 +41,7 @@ export function characterWith(w: World, counts: ChargeCounts): Character {
       areaLevel: w.plan.areaLevel,
       resistPenalty: w.plan.resistPenalty,
       extraMods: [
-        ...w.plan.affixes.flatMap((id) => mapAffixDef(id).playerMods ?? []),
+        ...w.plan.affixes.flatMap((id) => affixPlayerMods(id, w.plan.areaLevel)),
         ...trophyMods(trophy),
       ],
       charges: counts,

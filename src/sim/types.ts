@@ -286,9 +286,12 @@ export type SimEvent =
   | { t: 'exitOpen' }
   | { t: 'cleared' }
   | { t: 'playerDied' }
+  | { t: 'abandonStarted' }
+  | { t: 'abandonCancelled' }
+  | { t: 'abandoned' }
   | { t: 'summon'; id: number };
 
-export type MapStatus = 'running' | 'cleared' | 'dead' | 'timeout';
+export type MapStatus = 'running' | 'cleared' | 'dead' | 'timeout' | 'abandoned';
 
 /** One piece of damage the player took (kept for the last few seconds, for the death recap). */
 export type DamageRecord = {
@@ -346,7 +349,27 @@ export type PlayerAI = {
   lootSince: number;
 };
 
+/**
+ * What a character carries from one map to the next (docs/MAPS.md section 8): fractions of the maximum,
+ * so a change of gear at camp keeps them meaningful. Flask charges are by flask uid; a flask missing here is full.
+ */
+export type Vitals = {
+  life: number;
+  mana: number;
+  es: number;
+  flasks: Record<number, number>;
+};
+
+export const fullVitals = (): Vitals => ({ life: 1, mana: 1, es: 1, flasks: {} });
+
+/** Decides each tick whether the player leaves the map (docs/MAPS.md section 7); the Abandon button is the manual one. */
+export type AbandonPolicy = (w: World) => boolean;
+
 export type WorldOpts = {
+  /** Asked every tick while the map runs; true starts the escape timer (if abandoning is allowed). */
+  abandonPolicy?: AbandonPolicy;
+  /** Life, mana, energy shield and flask charges the player starts with (default: all full). */
+  start?: Vitals;
   /** Called when a monster dies; returns dropped items. */
   loot?: (w: World, m: Actor) => AnyItem[];
   /** Called when a chest opens; returns its contents. */
@@ -429,6 +452,8 @@ export type World = {
   flasks: FlaskState[];
   xp: number;
   status: MapStatus;
+  /** Seconds until the player leaves after pressing Abandon, or null when not leaving. */
+  abandonT: number | null;
   exitOpen: boolean;
   endRoom: number;
   ai: PlayerAI;

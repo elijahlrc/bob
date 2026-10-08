@@ -63,7 +63,10 @@ export function Summary({ c }: { c: Controller }) {
         {won ? 'The Ossuary Regent has fallen.' : `Fell on map ${last?.map ?? run.map}${reason}.`}
       </p>
       <p class="muted">
-        Maps cleared: {run.history.filter((h) => h.status === 'cleared').length} · Kills: {kills}
+        Maps cleared: {run.history.filter((h) => h.status === 'cleared').length}
+        {run.history.some((h) => h.status === 'abandoned') &&
+          ` · abandoned: ${run.history.filter((h) => h.status === 'abandoned').length}`}{' '}
+        · Kills: {kills}
       </p>
       {!won && run.lastRecap && <Recap r={run.lastRecap} />}
       <button class="btn primary" onClick={() => c.quit()}>

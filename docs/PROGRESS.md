@@ -610,3 +610,38 @@ Plan: [MAPS.md](MAPS.md). R0 is a refactor with no change in difficulty: three o
 - **Bot run on the new code** (`npm run sim -- --runs 3 --class all --seed 1`): 8 of 18 wins, no stuck maps, median level 27 / 53 / 79 at maps 25 / 50 / 75. There is no seed-for-seed comparison with the old code, because layouts changed for every map. One Mystic seed (1002) dies on map 1; the old code has the same problem on a different seed (1000), so it is the known Mystic map-1 weakness and not a result of this change.
 - **Browser.** Camp shows three offers (Archer's Gallery, Ashen Crypt, Bone Pits for seed-1 Vanguard) and a map starts with no
   console errors. The pane was hidden, so the game did not advance to the end of the map.
+
+### Map choice R1 to R4: carry-over, abandon, level offsets, affixes (2026-10-07)
+
+Plan: [MAPS.md](MAPS.md). First pass of the numbers; the plan says to re-evaluate them afterwards.
+
+- **R1 carry-over.** `RunState.vitals` (life, mana, ES; flask charges by uid) is written from `MapResult.vitals` and the camp
+  restores what 10 s of sitting still would (`restAtCamp`, `CAMP_REST_SECONDS`). The next map starts from it
+  (`WorldOpts.start`). No mercy floor. The camp shows "Arriving with life, mana, flasks".
+- **R2 abandon.** `canAbandon`, `requestAbandon`, `cancelAbandon`, `tickAbandon` (`src/sim/abandon.ts`); a 5 s timer; not on
+  maps 1 to 4, on every tenth map, or once the exit is open. `finishMap` keeps loot and XP, advances the map number and pays
+  no refund point, bonus points or reward pick. HUD button with a confirm and a "Stay" button. `woundedAbandonPolicy` and
+  `BotRunOpts.abandonBelow` are the bot's side.
+- **R3 level offsets.** Offers after the first sit at 0, −2 or +2 from the map number (60/20/20; −2 doubles when hurt), from
+  map 5. `makeMapPlan(…, areaLevel)`; rooms, end room and resist tier stay on the map number. Previews and the bot score each
+  offer with a character facing that offer's level (`offerCharacter`). `MapRecord.areaLevel` records the level played.
+- **R4 affixes.** 18 new affixes (Swift, Kindled, Rimed, Charged, Unyielding, Mending, Warded, Keen-eyed, Sharpened, Piercing,
+  Afflicting, Teeming, Elite-laden, Sluggish, Sundered, Stifled, Dry, Unguarded), all built from stats the game already had,
+  so none needed new sim code except pack size and the magic share (population) and an XP multiplier on the plan. Affixes start
+  on map 5; values scale by the level band (0.5, 0.75, 1) and the text and rewards with them; counts are 0 / 0–1 / 1–2 / 2–3 /
+  3–4 by map number; conflicting affixes never share a map (and Chalk does not offer them). Rewards can be experience and
+  currency. Every affix has a threat-model entry (tested across several builds). **Not built:** Hexed, Hex-warded, Caustic,
+  Guarded (EXPANSION 7.5), which need new mechanics.
+- **Saves.** `SAVE_VERSION` 6.
+- **Tests.** 1,839 pass with `CI=1`. The wall-clock test in `x9.test.ts` still fails in the default parallel run (see R0).
+- **Bot run on R1 to R3** (`npm run sim -- --runs 3 --class all --seed 1`): 6 of 18 wins (R0 alone: 8 of 18), no stuck maps,
+  median level 27 / 53 / 81 at maps 25 / 50 / 75. Attrition is weak on life and strong on flasks: median life on entering a
+  map is 100% (17.7% of maps entered under 90%, 3.3% under 60%, none under 40%), while the emptiest flask is entered at a
+  median 32% (83% of maps under 60%). The plan's target for life (median 60 to 90%) is not met: camp's ten seconds, leech and
+  flasks bring the bot back to nearly full. The first lever is `CAMP_REST_SECONDS`.
+- **Names to check.** The new affix names have not been compared with the reference game's map mod names (the deny-list only
+  catches proper nouns); the plan makes that check the first R4 task and there is no reference table in `docs/coverage/` yet.
+- **Browser.** Checked in the in-app pane with `window.__dev` stepping the game (the pane runs it slowly): the camp shows "Arriving
+  with life, mana, flasks" and each offer's level with its offset ("Level 9 (+2)") and affix text scaled to the band
+  ("+13% monsters (+5% experience)"); the map HUD shows Abandon, then "Leave this map?", then "Leaving in 5.0 s" with a Stay button;
+  after the timer the run is back in camp on map 8 with the last map marked abandoned, life 43% and flasks 67%. No console errors.

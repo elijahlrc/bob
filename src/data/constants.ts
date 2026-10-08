@@ -159,3 +159,11 @@ export function easeDamage(m: number): number {
 // §10 Labyrinth.
 export const CELL = 14;
 export const MAP_MAX = 160;
+
+// Map choice (docs/MAPS.md section 8): camp restores what a character would recover sitting still this long.
+export const CAMP_REST_SECONDS = 10;
+
+/** Seconds between pressing Abandon and leaving the map; the character keeps fighting meanwhile (docs/MAPS.md section 7). */
+export const ABANDON_SECONDS = 5;
+/** Abandon is unavailable before this map (the first skill gems are picked after maps 1 to 4) and on every tenth map (mini-boss and boss). */
+export const ABANDON_FROM_MAP = 5;

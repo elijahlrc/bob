@@ -14,7 +14,7 @@ import {
   type MonsterTypeId,
   type Variant,
 } from '../data/monsters';
-import { mapAffixDef } from '../data/mapAffixes';
+import { affixRarePacks, affixStrength, mapAffixDef } from '../data/mapAffixes';
 import type { ThemeDef } from '../data/themes';
 import { isFloor, type Labyrinth, type Room } from './labyrinth';
 
@@ -205,7 +205,15 @@ export function populate(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Populati
   // Theme bonus: extra rare packs replace normal rooms' packs.
   let extraRares =
     opts.theme.extraRarePacks +
-    (opts.affixes ?? []).reduce((n, id) => n + (mapAffixDef(id).extraRarePacks ?? 0), 0);
+    (opts.affixes ?? []).reduce((n, id) => n + affixRarePacks(id, level), 0);
+  // Affixes that add monsters to every pack, or turn some normal packs into magic ones (they scale with the level band).
+  const strength = affixStrength(level);
+  const packMult =
+    1 + (opts.affixes ?? []).reduce((n, id) => n + (mapAffixDef(id).packSize ?? 0) * strength, 0);
+  const magicShift =
+    0.22 *
+    (opts.affixes ?? []).reduce((n, id) => n + (mapAffixDef(id).magicBonus ?? 0) * strength, 0);
+  const sized = (n: number) => Math.max(1, Math.round(n * packMult));
   for (const room of lab.rooms) {
     if (room.kind === 'start') continue;
     if (room.kind === 'end') {
@@ -245,8 +253,8 @@ export function populate(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Populati
       extraRares--;
       const ps = spots(rng, lab, room, 1 + rng.int(2, 4));
       ps.forEach((p, i) => add(room, i === 0 ? normal('rare') : normal(), p));
-    } else if (roll < 0.7) {
-      const ps = spots(rng, lab, room, rng.int(3, 7) + extra);
+    } else if (roll < 0.7 - magicShift) {
+      const ps = spots(rng, lab, room, sized(rng.int(3, 7) + extra));
       let packed = false;
       for (const p of ps) {
         const spec = normal();
@@ -261,10 +269,10 @@ export function populate(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Populati
       }
     } else if (roll < 0.92) {
       const nm = rng.int(2, 3);
-      const ps = spots(rng, lab, room, rng.int(3, 7) + extra);
+      const ps = spots(rng, lab, room, sized(rng.int(3, 7) + extra));
       ps.forEach((p, i) => add(room, i < nm ? normal('magic') : normal(), p));
     } else {
-      const ps = spots(rng, lab, room, 1 + rng.int(2, 4) + extra);
+      const ps = spots(rng, lab, room, sized(1 + rng.int(2, 4) + extra));
       ps.forEach((p, i) => add(room, i === 0 ? normal('rare') : normal(), p));
     }
     pack++;

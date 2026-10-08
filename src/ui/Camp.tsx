@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { Character } from '../calc/character';
 import { classDef } from '../data/classes';
-import { mapAffixDef, rewardText } from '../data/mapAffixes';
+import { affixText, mapAffixDef, rewardText } from '../data/mapAffixes';
 import { themeDef } from '../data/themes';
 import { offersFor } from '../run/preview';
 import { xpToNext } from '../data/xpTable';
 import { resistPenaltyForMap } from '../gen/mapPlan';
 import type { Controller } from '../run/controller';
 import { chalkAdd, chalkOptions, chalkRemove } from '../run/craft';
-import { passivePoints } from '../run/run';
+import { passivePoints, type RunState } from '../run/run';
 import { Items } from './Items';
 import { Reward } from './Reward';
 import { Sheet } from './Sheet';
@@ -23,6 +23,7 @@ type Tab = 'tree' | 'sheet' | 'skills' | 'items' | 'workbench';
 function Chalk({ c, offer }: { c: Controller; offer: number }) {
   const run = c.run!;
   const have = run.offers[offer].affixes;
+  const level = run.offers[offer].areaLevel;
   const chalk = run.currency.chalk ?? 0;
   return (
     <div class="chalk">
@@ -31,7 +32,7 @@ function Chalk({ c, offer }: { c: Controller; offer: number }) {
         <button
           key={id}
           class="btn small"
-          title={`Add: ${mapAffixDef(id).text} (${rewardText(mapAffixDef(id))})`}
+          title={`Add: ${affixText(mapAffixDef(id), level)} (${rewardText(mapAffixDef(id), level)})`}
           onClick={() => c.craft((r) => chalkAdd(r, offer, id))}
         >
           + {mapAffixDef(id).name}
@@ -42,12 +43,28 @@ function Chalk({ c, offer }: { c: Controller; offer: number }) {
           <button
             key={id}
             class="btn small danger"
-            title={`Remove: ${mapAffixDef(id).text} (costs 2)`}
+            title={`Remove: ${affixText(mapAffixDef(id), level)} (costs 2)`}
             onClick={() => c.craft((r) => chalkRemove(r, offer, id))}
           >
             − {mapAffixDef(id).name}
           </button>
         ))}
+    </div>
+  );
+}
+
+/** What the character carries into the next map (docs/MAPS.md section 8). */
+function Arriving({ run }: { run: RunState }) {
+  const pct = (f: number) => `${Math.round(f * 100)}%`;
+  const v = run.vitals;
+  const flasks = run.build.flasks.filter((f) => f !== null);
+  return (
+    <div
+      class="muted arriving"
+      title="Camp restores what ten seconds of sitting still would. Flasks refill only by killing."
+    >
+      Arriving with life {pct(v.life)} · mana {pct(v.mana)}
+      {flasks.length > 0 && ` · flasks ${flasks.map((f) => pct(v.flasks[f!.uid] ?? 1)).join(' ')}`}
     </div>
   );
 }
@@ -148,9 +165,11 @@ export function Camp({ c }: { c: Controller }) {
           />
         </div>
         <div class="muted">Next: map {run.map} of 100</div>
-        {last && last.status === 'cleared' && (
+        <Arriving run={run} />
+        {last && (last.status === 'cleared' || last.status === 'abandoned') && (
           <div class="muted">
-            Last map: {last.time.toFixed(0)} s · {last.kills} kills
+            Last map{last.status === 'abandoned' ? ' (abandoned, no clear rewards)' : ''}:{' '}
+            {last.time.toFixed(0)} s · {last.kills} kills
           </div>
         )}
         {run.reward && <Reward c={c} />}
@@ -166,12 +185,17 @@ export function Camp({ c }: { c: Controller }) {
               <div key={o.id} class="theme-wrap">
                 <button class="btn theme" onClick={() => c.startMap(i)}>
                   <div class="theme-name">{t.name}</div>
+                  <div class="muted">
+                    Level {o.areaLevel}
+                    {o.offset !== 0 && ` (${o.offset > 0 ? '+' : '−'}${Math.abs(o.offset)})`}
+                  </div>
                   <div class="muted">{t.bonusText}</div>
                   {o.affixes.map((id) => {
                     const a = mapAffixDef(id);
                     return (
                       <div key={id} class="affix">
-                        {a.text} <span class="muted">({rewardText(a)})</span>
+                        {affixText(a, o.areaLevel)}{' '}
+                        <span class="muted">({rewardText(a, o.areaLevel)})</span>
                       </div>
                     );
                   })}

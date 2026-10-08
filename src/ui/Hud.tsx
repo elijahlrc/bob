@@ -7,6 +7,8 @@ import type { Actor, World } from '../sim/types';
 import { SPEEDS, type Controller } from '../run/controller';
 import { DELIVERY_NAME, ELEMENT_NAME } from '../calc/skillLook';
 import { useTicks } from './hooks';
+import { useState } from 'preact/hooks';
+import { canAbandon } from '../sim/abandon';
 import { SkillBar } from './SkillBar';
 
 /** A resource orb: the fill height shows the amount; the skin comes from CSS. */
@@ -134,6 +136,61 @@ function Charges({ w }: { w: World }) {
   );
 }
 
+/** Leave the map early (docs/MAPS.md section 7): a confirm click, then a timer during which the character keeps fighting. */
+function AbandonButton({ c, w }: { c: Controller; w: World }) {
+  const [asking, setAsking] = useState(false);
+  if (w.abandonT !== null) {
+    return (
+      <div class="hud-abandon">
+        <span>Leaving in {Math.max(0, w.abandonT).toFixed(1)} s</span>
+        <button class="btn small" onClick={() => c.cancelAbandon()}>
+          Stay
+        </button>
+      </div>
+    );
+  }
+  if (!canAbandon(w)) {
+    return (
+      <div class="hud-abandon">
+        <button
+          class="btn small"
+          disabled
+          title="Not available on the first four maps, on mini-boss and boss maps, or once the exit is open."
+        >
+          Abandon map
+        </button>
+      </div>
+    );
+  }
+  return (
+    <div class="hud-abandon">
+      {asking ? (
+        <>
+          <span title="You keep the loot and XP you have, but the level earns no clear rewards.">
+            Leave this map?
+          </span>
+          <button
+            class="btn small danger"
+            onClick={() => {
+              setAsking(false);
+              c.abandonMap();
+            }}
+          >
+            Leave
+          </button>
+          <button class="btn small" onClick={() => setAsking(false)}>
+            Stay
+          </button>
+        </>
+      ) : (
+        <button class="btn small" onClick={() => setAsking(true)}>
+          Abandon map
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function Hud({ c }: { c: Controller }) {
   useTicks(c);
   const w = c.world;
@@ -153,6 +210,7 @@ export function Hud({ c }: { c: Controller }) {
         <span>Kills {w.stats.kills}</span>
         <span>{w.exitOpen ? 'Exit open' : ''}</span>
       </div>
+      {!sc && !c.gallery && <AbandonButton c={c} w={w} />}
       {sel && sel.alive && !sel.isPlayer && <Inspect a={sel} c={c} />}
       {c.gallery && (
         <div class="hud-showcase hud-gallery">

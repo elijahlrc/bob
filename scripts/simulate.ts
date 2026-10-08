@@ -115,6 +115,20 @@ for (const n of [1, 10, 25, 50, 75, 90, 100]) {
 }
 lines.push('');
 lines.push(`Pacing (median level after map): ${pacing.join(' · ')}`);
+const pct = (xs: number[], p: number) =>
+  [...xs].sort((a, b) => a - b)[Math.floor((xs.length - 1) * p)];
+const share = (xs: number[], below: number) =>
+  ((xs.filter((x) => x < below).length / Math.max(1, xs.length)) * 100).toFixed(1);
+const starts = allMaps.map((m) => m.startLife);
+const flaskStarts = allMaps.map((m) => m.startFlask);
+if (starts.length) {
+  lines.push(
+    `Attrition, life on entering a map: median ${(median(starts) * 100).toFixed(0)}%, p10 ${(pct(starts, 0.1) * 100).toFixed(0)}%; ${share(starts, 0.9)}% of maps entered below 90%, ${share(starts, 0.6)}% below 60%, ${share(starts, 0.4)}% below 40%`,
+  );
+  lines.push(
+    `Attrition, emptiest flask on entering: median ${(median(flaskStarts) * 100).toFixed(0)}%, p10 ${(pct(flaskStarts, 0.1) * 100).toFixed(0)}%; ${share(flaskStarts, 0.6)}% of maps entered below 60%`,
+  );
+}
 lines.push(`Total wall time: ${((performance.now() - t0) / 1000).toFixed(1)} s`);
 console.log(lines.join('\n'));
 if (args.report) console.log('\n' + depthReport(results));

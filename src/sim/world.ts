@@ -4,7 +4,7 @@ import { noCharges, type ChargeCounts } from '../calc/charges';
 import { buildMonster, type MonsterSpec } from '../calc/monster';
 import { Rng } from '../core/rng';
 import { DT } from '../data/constants';
-import { mapAffixDef } from '../data/mapAffixes';
+import { affixPlayerMods } from '../data/mapAffixes';
 import { MAX_LEVEL, xpToNext } from '../data/xpTable';
 import type { Build } from '../data/types';
 import type { MapPlan } from '../gen/mapPlan';
@@ -23,6 +23,7 @@ import { rebuildCharacter, seedCharacters, tickCharges } from './charges';
 import { tickTriggers } from './triggers';
 import { Grid } from './grid';
 import { newActor } from './actor';
+import { tickAbandon } from './abandon';
 import type { Actor, World, WorldOpts } from './types';
 
 export function spawnMonster(
@@ -68,7 +69,7 @@ export function makeCharacter(
   return new Character(build, {
     areaLevel: plan.areaLevel,
     resistPenalty: plan.resistPenalty,
-    extraMods: plan.affixes.flatMap((id) => mapAffixDef(id).playerMods ?? []),
+    extraMods: plan.affixes.flatMap((id) => affixPlayerMods(id, plan.areaLevel)),
     charges,
   });
 }
@@ -144,6 +145,7 @@ export function createWorld(inp: CreateWorldInput): World {
     })),
     xp: inp.xp,
     status: 'running',
+    abandonT: null,
     exitOpen: false,
     endRoom: plan.lab.mainPath[plan.lab.mainPath.length - 1],
     ai: {
@@ -183,9 +185,13 @@ export function createWorld(inp: CreateWorldInput): World {
     dmgLog: [],
   };
   player.def = char.defence();
-  player.life = lifeCap(w, player);
-  player.es = player.def.maxEs;
-  player.mana = Math.max(0, player.def.maxMana - char.reservedMana);
+  // The player starts with what the last map left (full on a new run), as fractions of the maximum.
+  const start = inp.opts?.start;
+  const frac = (f: number | undefined) => Math.min(1, Math.max(0, f ?? 1));
+  player.life = Math.max(1, lifeCap(w, player) * frac(start?.life));
+  player.es = player.def.maxEs * frac(start?.es);
+  player.mana = Math.max(0, player.def.maxMana - char.reservedMana) * frac(start?.mana);
+  for (const f of w.flasks) f.charges = f.spec.maxCharges * frac(start?.flasks[f.spec.uid]);
   player.name = 'You';
   for (const s of plan.pop.monsters) spawnMonster(w, s.spec, s.x, s.y, s.room, s.pack, s.name);
   seedCharacters(w);
@@ -431,5 +437,6 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     p.mana = Math.max(0, p.def.maxMana - w.char.reservedMana);
   }
   if (!p.alive && w.status === 'running') w.status = 'dead';
+  tickAbandon(w, dt);
   if (w.t >= (w.opts.maxTime ?? 900) && w.status === 'running') w.status = 'timeout';
 }

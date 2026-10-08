@@ -15,6 +15,7 @@ import {
   type Item,
 } from '../data/types';
 import { resistPenaltyForMap } from '../gen/mapPlan';
+import { woundedAbandonPolicy } from '../sim/abandon';
 import { runMap, type MapResult } from '../sim/runMap';
 import { canEquip, equip, equipFlask, slotsFor, unsocketGem, withEquipped } from './inventory';
 import type { MapOffer } from './offers';
@@ -112,6 +113,11 @@ function buildKey(run: RunState, b: Build): string {
 
 const scoreOf = scoreBuild;
 
+/** The character as it would meet an offered map: the same build, facing that map's monster level. */
+export function offerCharacter(run: RunState, offer: MapOffer): Character {
+  return new Character(run.build, { ...cfgFor(run), areaLevel: offer.areaLevel });
+}
+
 /** Which of the offered maps the bot takes. */
 export type ThemeRule = 'first' | 'best';
 
@@ -119,9 +125,10 @@ export type ThemeRule = 'first' | 'best';
 export function chooseOffer(run: RunState, rule: ThemeRule = 'best'): MapOffer {
   const [first, ...rest] = run.offers;
   if (rule === 'first') return first;
-  const ch = new Character(run.build, cfgFor(run));
   const boss = run.map % 10 === 0 ? 'boss' : 'clearing';
-  const valueOf = (o: MapOffer) => scoreTheme(ch, themeDef(o.themeId), boss, o.affixes).value;
+  // An offer's monsters are at its own level, so each is scored by a character facing that level.
+  const valueOf = (o: MapOffer) =>
+    scoreTheme(offerCharacter(run, o), themeDef(o.themeId), boss, o.affixes).value;
   let best = first;
   let bestValue = valueOf(first);
   // A later offer must beat the best so far by 0.1%, so ties keep the earlier one.
@@ -509,6 +516,10 @@ export type BotMapRecord = {
   level: number;
   xp: number;
   stuck: number;
+  /** Life fraction the character entered the map with (carry-over, docs/MAPS.md section 8). */
+  startLife: number;
+  /** The lowest flask charge fraction on entering the map (1 when there are no flasks). */
+  startFlask: number;
 };
 
 export type BotRunResult = RunSummary & {
@@ -523,6 +534,8 @@ export type BotRunOpts = {
   themes?: ThemeRule;
   /** How the bot spends currency (default 'greedy'). */
   crafting?: CraftPolicy;
+  /** Leave a map when life drops below this fraction (default: never abandon). */
+  abandonBelow?: number;
 };
 
 /** Play a full run headlessly (§15.5). `maxMap` stops after that map. */
@@ -541,7 +554,12 @@ export function botRun(
     botCamp(run, crafting);
     if (crafting === 'greedy') botChalk(run);
     const plan = planFor(run, chooseOffer(run, opts.themes));
-    const res = runMap(plan, run.build, run.xp, worldOptsFor(run, plan), undefined, killer.tick);
+    const startLife = run.vitals.life;
+    const startFlask = Math.min(1, ...Object.values(run.vitals.flasks));
+    const worldOpts = worldOptsFor(run, plan);
+    if (opts.abandonBelow !== undefined)
+      worldOpts.abandonPolicy = woundedAbandonPolicy(opts.abandonBelow);
+    const res = runMap(plan, run.build, run.xp, worldOpts, undefined, killer.tick);
     maps.push({
       map: run.map,
       status: res.status,
@@ -549,6 +567,8 @@ export function botRun(
       level: res.level,
       xp: res.xpGained,
       stuck: res.stuck,
+      startLife,
+      startFlask,
     });
     if (res.status === 'cleared') tally.afterMap(run, res.picked);
     finishMap(run, res);

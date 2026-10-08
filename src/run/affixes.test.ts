@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { Character } from '../calc/character';
 import { buildMonster, type MonsterSpec } from '../calc/monster';
-import { MAP_AFFIXES, mapAffixDef, rewardText } from '../data/mapAffixes';
+import {
+  affixesConflict,
+  affixText,
+  MAP_AFFIXES,
+  mapAffixDef,
+  rewardText,
+} from '../data/mapAffixes';
 import { themeDef } from '../data/themes';
 import { makeItem } from '../gen/items';
 import { mod } from '../mods/types';
@@ -20,33 +26,43 @@ describe('map affixes (EXPANSION 7.5)', () => {
       expect(a.text.length, a.id).toBeGreaterThan(8);
       expect(rewardText(a).length, a.id).toBeGreaterThan(5);
       const effect =
-        (a.monsterMods?.length ?? 0) + (a.playerMods?.length ?? 0) + (a.extraRarePacks ?? 0);
+        (a.monsterMods?.length ?? 0) +
+        (a.playerMods?.length ?? 0) +
+        (a.extraRarePacks ?? 0) +
+        (a.packSize ?? 0) +
+        (a.magicBonus ?? 0);
       expect(effect, a.id).toBeGreaterThan(0);
     }
     expect(new Set(MAP_AFFIXES.map((a) => a.id)).size).toBe(MAP_AFFIXES.length);
+    // Every number in the text scales with the level band, and none is left as a placeholder.
+    for (const a of MAP_AFFIXES)
+      for (const lvl of [5, 30, 60]) expect(affixText(a, lvl)).not.toMatch(/[{}]/);
   });
 
-  it('none before map 20, then 0–1, 1–2 and 2–3, all different, and always the same offer', () => {
-    for (let map = 1; map < 20; map++) expect(rollMapAffixes(7, map, 0)).toEqual([]);
+  it('none before map 5, then 0–1, 1–2, 2–3 and 3–4, never in conflict, and always the same offer', () => {
+    for (let map = 1; map < 5; map++) expect(rollMapAffixes(7, map, 0)).toEqual([]);
     const counts = (lo: number, hi: number) => {
       const seen = new Set<number>();
       for (let map = lo; map <= hi; map++)
         for (let seed = 1; seed <= 30; seed++)
-          for (const offer of [0, 1]) {
+          for (const offer of [0, 1, 2]) {
             const a = rollMapAffixes(seed, map, offer);
             expect(new Set(a).size).toBe(a.length);
+            for (const x of a)
+              for (const y of a) if (x < y) expect(affixesConflict(x, y), `${x} ${y}`).toBe(false);
             expect(rollMapAffixes(seed, map, offer)).toEqual(a);
             seen.add(a.length);
           }
       return [...seen].sort();
     };
-    expect(counts(20, 39)).toEqual([0, 1]);
-    expect(counts(40, 59)).toEqual([1, 2]);
-    expect(counts(60, 99)).toEqual([2, 3]);
+    expect(counts(5, 19)).toEqual([0, 1]);
+    expect(counts(20, 39)).toEqual([1, 2]);
+    expect(counts(40, 59)).toEqual([2, 3]);
+    expect(counts(60, 100)).toEqual([3, 4]);
   });
 
   it('the plan carries the affixes, and every monster on the map has them', () => {
-    const plan = makeMapPlan(5, 30, 'ashenCrypt', ['moreLife', 'fireproof']);
+    const plan = makeMapPlan(5, 60, 'ashenCrypt', ['moreLife', 'fireproof']);
     expect(plan.affixes).toEqual(['moreLife', 'fireproof']);
     expect(plan.pop.monsters.length).toBeGreaterThan(0);
     for (const m of plan.pop.monsters) expect(m.spec.affix).toEqual(['moreLife', 'fireproof']);
@@ -62,7 +78,7 @@ describe('map affixes (EXPANSION 7.5)', () => {
       type: 'warrior',
       variant: 'none',
       rarity: 'normal',
-      level: 40,
+      level: 60,
       mods: [],
     };
     const m = (id: string) => buildMonster({ ...base, affix: [id] });
@@ -99,8 +115,8 @@ describe('map affixes (EXPANSION 7.5)', () => {
   });
 
   it('affixes add to the loot: quantity and rarity multipliers', () => {
-    expect(affixRewards([])).toEqual({ quantity: 0, rarity: 0 });
-    const r = affixRewards(['moreLife', 'extraRares']);
+    expect(affixRewards([], 100)).toEqual({ quantity: 0, rarity: 0, experience: 0, currency: 0 });
+    const r = affixRewards(['moreLife', 'extraRares'], 100);
     expect(r.quantity).toBeCloseTo(mapAffixDef('moreLife').reward.quantity!);
     expect(r.rarity).toBeCloseTo(0.3);
     const run = newRun('vanguard', 1);
@@ -111,8 +127,8 @@ describe('map affixes (EXPANSION 7.5)', () => {
 
 describe('threat preview (EXPANSION section 9)', () => {
   const run = withStarterGems(newRun('vanguard', 1));
-  run.build.level = 50;
-  setMap(run, 50);
+  run.build.level = 60;
+  setMap(run, 60);
   const ch = new Character(run.build, cfgFor(run));
   const theme = themeDef('ashenCrypt');
 

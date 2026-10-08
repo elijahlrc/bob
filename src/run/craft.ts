@@ -9,7 +9,7 @@ import {
   tabletsNeeded,
   TABLET_SETS,
 } from '../data/currency';
-import { MAP_AFFIXES } from '../data/mapAffixes';
+import { affixesConflict, MAP_AFFIXES } from '../data/mapAffixes';
 import {
   EQUIP_SLOTS,
   type AffixRoll,
@@ -616,7 +616,10 @@ export function tabletTargets(): string[] {
 export function chalkOptions(run: RunState, offer: number): string[] {
   const rng = craftRng(run, `chalk${offer}.`);
   const have = new Set(run.offers[offer]?.affixes);
-  const pool = MAP_AFFIXES.filter((a) => !a.chalkOnly && !have.has(a.id)).map((a) => a.id);
+  // An affix is not offered if the map has it or one that conflicts with it (the same stat or element).
+  const pool = MAP_AFFIXES.filter(
+    (a) => !a.chalkOnly && ![...have].some((h) => affixesConflict(h, a.id)),
+  ).map((a) => a.id);
   return rng.shuffle(pool).slice(0, 3);
 }
 

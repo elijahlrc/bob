@@ -15,16 +15,17 @@ import {
   rollUniqueOf,
   uniqueIdOf,
 } from '../gen/loot';
-import { mapAffixDef } from '../data/mapAffixes';
+import { affixReward, mapAffixDef } from '../data/mapAffixes';
 import { makeMapPlan, type MapPlan } from '../gen/mapPlan';
 import { flaskMask } from '../sim/combat';
-import type { DeathRecap, WorldOpts } from '../sim/types';
+import { fullVitals, type DeathRecap, type Vitals, type WorldOpts } from '../sim/types';
 import type { MapResult } from '../sim/runMap';
+import { restAtCamp } from './camp';
 import { makeOffer, rollOffers, type MapOffer } from './offers';
 
 export { rollThemes } from './offers';
 
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 export const TOTAL_MAPS = 100;
 
 export type MapRecord = {
@@ -75,6 +76,8 @@ export type RunState = {
   /** Rises with every craft that draws; craft rolls come from the run seed and this number. */
   craftSeq: number;
   pendingCraft: PendingCraft | null;
+  /** What the character carries into the next map: life, mana, energy shield and flask charges (docs/MAPS.md 8). */
+  vitals: Vitals;
 };
 
 const BODY_FOR_CLASS: Record<string, string> = {
@@ -122,6 +125,7 @@ export function newRun(classId: string, seed: number): RunState {
     tablets: {},
     craftSeq: 0,
     pendingCraft: null,
+    vitals: fullVitals(),
   };
   const uid = uidSource(run);
   const main = makeItem(uid, cls.startWeapons[0], 1, 1);
@@ -154,7 +158,7 @@ export function mapSeed(run: RunState, offer: MapOffer): number {
 /** Go to a given map number and roll its offers (a new level, and tests and demos that jump ahead). */
 export function setMap(run: RunState, map: number): void {
   run.map = map;
-  run.offers = rollOffers(run.seed, map);
+  run.offers = rollOffers(run.seed, map, run.vitals);
 }
 
 /**
@@ -169,15 +173,21 @@ export function planFor(run: RunState, offer: MapOffer | string): MapPlan {
     );
     offer = makeOffer(run.seed, run.map, slot, offer);
   }
-  return makeMapPlan(mapSeed(run, offer), run.map, offer.themeId, offer.affixes);
+  return makeMapPlan(mapSeed(run, offer), run.map, offer.themeId, offer.affixes, offer.areaLevel);
 }
 
-/** What a map's affixes add to its loot, as fractions. */
-export function affixRewards(affixes: string[]): { quantity: number; rarity: number } {
-  const defs = affixes.map(mapAffixDef);
+/** What a map's affixes add to its rewards on a map of this level, as fractions. */
+export function affixRewards(
+  affixes: string[],
+  level: number,
+): { quantity: number; rarity: number; experience: number; currency: number } {
+  const sum = (k: 'quantity' | 'rarity' | 'experience' | 'currency') =>
+    affixes.reduce((n, id) => n + (affixReward(mapAffixDef(id), level)[k] ?? 0), 0);
   return {
-    quantity: defs.reduce((n, a) => n + (a.reward.quantity ?? 0), 0),
-    rarity: defs.reduce((n, a) => n + (a.reward.rarity ?? 0), 0),
+    quantity: sum('quantity'),
+    rarity: sum('rarity'),
+    experience: sum('experience'),
+    currency: sum('currency'),
   };
 }
 
@@ -185,11 +195,12 @@ export function affixRewards(affixes: string[]): { quantity: number; rarity: num
 export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
   const uid = uidSource(run);
   return {
+    start: run.vitals,
     loot: (w, m): AnyItem[] => {
       if (!m.mon) return [];
       // Item quantity and rarity from gear, and from any flask active right now.
       const db = w.char.dbWith(flaskMask(w));
-      const { quantity, rarity } = affixRewards(plan.affixes);
+      const { quantity, rarity, currency } = affixRewards(plan.affixes, plan.areaLevel);
       const faction = factionOfSpec(m.mon.spec);
       const items: AnyItem[] = rollMonsterDrops(w.rngLoot, uid, {
         ilvl: m.mon.spec.level,
@@ -205,7 +216,11 @@ export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
           map: plan.map,
           monster: m.mon.spec.rarity,
           faction,
-          quantity: db.mult('itemQuantity') * (1 + quantity) * (1 + plan.theme.itemQuantity),
+          quantity:
+            db.mult('itemQuantity') *
+            (1 + quantity) *
+            (1 + plan.theme.itemQuantity) *
+            (1 + currency),
           essenceBonus: plan.theme.extraEssence,
           currencyBonus: plan.theme.extraCurrency,
           bonusCurrency: plan.theme.bonusCurrency,
@@ -216,24 +231,8 @@ export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
   };
 }
 
-/** Apply a finished map's result to the run. */
-export function finishMap(run: RunState, res: MapResult): void {
-  run.history.push({
-    map: run.map,
-    areaLevel: run.map,
-    status: res.status,
-    time: res.time,
-    levelAfter: res.level,
-    kills: res.kills,
-    stuck: res.stuck,
-  });
-  run.build = { ...run.build, level: res.level };
-  run.xp = res.xp;
-  if (res.status !== 'cleared') {
-    run.phase = 'dead';
-    if (res.recap) run.lastRecap = res.recap;
-    return;
-  }
+/** Take what a map's character picked up: items to the inventory, currency and tablets to the pouch. */
+function collectPicked(run: RunState, res: MapResult): void {
   run.lastDrops = [];
   for (const it of res.picked) {
     if (it.kind !== 'currency') run.lastDrops.push(it.uid);
@@ -245,17 +244,45 @@ export function finishMap(run: RunState, res: MapResult): void {
     if (it.kind === 'item' && (it.rarity === 'rare' || it.rarity === 'unique'))
       run.newLoot.push(it.uid);
   }
-  run.refundPoints += 1;
-  if (run.map % 10 === 0 && run.map <= 80) run.bonusPoints += 3;
-  if (run.map >= TOTAL_MAPS) {
-    run.phase = 'victory';
+}
+
+/**
+ * Apply a finished map's result to the run. A cleared map pays everything; an abandoned one keeps the
+ * loot and XP already taken but earns no clear rewards, and the level counts as passed (docs/MAPS.md 7.2).
+ */
+export function finishMap(run: RunState, res: MapResult): void {
+  run.history.push({
+    map: run.map,
+    areaLevel: res.areaLevel,
+    status: res.status,
+    time: res.time,
+    levelAfter: res.level,
+    kills: res.kills,
+    stuck: res.stuck,
+  });
+  run.build = { ...run.build, level: res.level };
+  run.xp = res.xp;
+  if (res.status !== 'cleared' && res.status !== 'abandoned') {
+    run.phase = 'dead';
+    if (res.recap) run.lastRecap = res.recap;
     return;
   }
-  // Reward pick (1 of 3) after every 5th map and after every mini-boss (§5.3).
-  if (run.map % 5 === 0) run.reward = rollRewards(run);
-  else if (run.map <= SKILL_REWARD_MAPS) run.reward = rollSkillRewards(run);
+  collectPicked(run, res);
+  // Camp restores part of what the map cost (10 s of sitting still).
+  run.vitals = restAtCamp(run.build, run.map, res.vitals);
+  if (res.status === 'cleared') {
+    run.refundPoints += 1;
+    if (run.map % 10 === 0 && run.map <= 80) run.bonusPoints += 3;
+    if (run.map >= TOTAL_MAPS) {
+      run.phase = 'victory';
+      return;
+    }
+    // Reward pick (1 of 3) after every 5th map and after every mini-boss (§5.3).
+    if (run.map % 5 === 0) run.reward = rollRewards(run);
+    else if (run.map <= SKILL_REWARD_MAPS) run.reward = rollSkillRewards(run);
+  }
   run.map += 1;
-  run.offers = rollOffers(run.seed, run.map);
+  run.offers = rollOffers(run.seed, run.map, run.vitals);
   run.phase = 'camp';
 }
 

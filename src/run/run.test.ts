@@ -3,6 +3,7 @@ import { gemDef } from '../data/gems';
 import { describe, expect, it } from 'vitest';
 import { endKindForMap, resistPenaltyForMap, roomsForMap } from '../gen/mapPlan';
 import type { MapResult } from '../sim/runMap';
+import { fullVitals } from '../sim/types';
 import { botRun } from './bot';
 import { Controller } from './controller';
 import {
@@ -21,6 +22,7 @@ import { clearSave, loadRun, MemoryStore, SAVE_KEY, saveRun } from './save';
 
 const cleared = (level: number): MapResult => ({
   status: 'cleared',
+  areaLevel: level,
   time: 90,
   ticks: 5400,
   level,
@@ -31,6 +33,7 @@ const cleared = (level: number): MapResult => ({
   picked: [],
   eventHash: 0,
   lifeFrac: 1,
+  vitals: fullVitals(),
 });
 
 describe('map schedule (§5.3)', () => {

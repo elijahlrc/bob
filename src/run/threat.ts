@@ -1,7 +1,13 @@
 import { Character, type SteadyMode } from '../calc/character';
 import { NO_SHIFT } from '../calc/combat';
 import { buildMonster } from '../calc/monster';
-import { mapAffixDef } from '../data/mapAffixes';
+import {
+  affixMonsterMods,
+  affixPlayerMods,
+  affixReward,
+  affixRarePacks,
+  mapAffixDef,
+} from '../data/mapAffixes';
 import { MONSTER_TYPES, type FactionId, type MonsterTypeId, type Variant } from '../data/monsters';
 import type { ThemeDef } from '../data/themes';
 import { ELEMENT_WEIGHTS, neverPlain, typeShares } from '../gen/population';
@@ -87,29 +93,49 @@ export function themeThreat(theme: ThemeDef): ThemeThreat {
   return { ...t, pressure: t.pressure / BASE_PRESSURE };
 }
 
-/** What a map's affixes do to the monsters, in a form the threat model can use. */
-export function affixThreat(affixes: string[]): {
+/** What a map's affixes do to the monsters, in a form the threat model can use (on a map of this level). */
+export function affixThreat(
+  affixes: string[],
+  level: number,
+): {
   life: number;
+  /** Damage rate: "more damage" and the speed at which monsters attack. */
   damage: number;
-  chaosGain: number;
+  /** Extra damage as a share of the physical damage, per type (physical, lightning, cold, fire, chaos). */
+  gain: number[];
   cannotEvade: boolean;
+  /** What the mods cannot say (crits, penetration, stun, regeneration, ...): a multiplier on how hard the map is. */
+  pressure: number;
 } {
   let life = 1;
   let damage = 1;
-  let chaosGain = 0;
+  const gain = [0, 0, 0, 0, 0];
+  const GAIN_INDEX: Record<string, number> = { lightning: 1, cold: 2, fire: 3, chaos: 4 };
   let cannotEvade = false;
-  for (const id of affixes)
-    for (const m of mapAffixDef(id).monsterMods ?? []) {
+  let pressure = 1;
+  for (const id of affixes) {
+    for (const m of affixMonsterMods(id, level)) {
       if (m.stat === 'life' && m.kind === 'more') life *= 1 + m.value / 100;
       if (m.stat === 'damage' && m.kind === 'more') damage *= 1 + m.value / 100;
-      if (m.stat === 'gain.physical.chaos') chaosGain += m.value / 100;
+      if (m.stat === 'attackSpeed' && m.kind === 'inc') damage *= 1 + m.value / 100;
+      if (m.stat.startsWith('gain.physical.')) {
+        const k = GAIN_INDEX[m.stat.slice('gain.physical.'.length)];
+        if (k !== undefined) gain[k] += m.value / 100;
+      }
       if (m.stat === 'alwaysHit') cannotEvade = true;
     }
-  return { life, damage, chaosGain, cannotEvade };
+    pressure *= mapAffixDef(id).pressure ?? 1;
+    // More monsters and more rare packs make a map harder in ways the mods do not show.
+    const def = mapAffixDef(id);
+    if (def.packSize && !def.pressure) pressure *= 1 + def.packSize * 0.5;
+    if (affixRarePacks(id, level) > 0 && !def.pressure)
+      pressure *= 1 + 0.03 * affixRarePacks(id, level);
+  }
+  return { life, damage, gain, cannotEvade, pressure };
 }
 
 /** A small value for what a theme and its affixes pay out, as a fraction of a normal map's rewards. */
-export function themeReward(theme: ThemeDef, affixes: string[] = []): number {
+export function themeReward(theme: ThemeDef, affixes: string[] = [], level = 100): number {
   let r =
     0.5 * theme.itemQuantity +
     0.3 * (theme.rareWeightMult - 1) +
@@ -122,8 +148,11 @@ export function themeReward(theme: ThemeDef, affixes: string[] = []): number {
     (theme.bonusCurrency ? 0.03 : 0);
   for (const id of affixes) {
     const a = mapAffixDef(id);
-    r += 0.5 * (a.reward.quantity ?? 0) + 0.3 * (a.reward.rarity ?? 0);
-    r += 0.05 * (a.extraRarePacks ?? 0);
+    const w = affixReward(a, level);
+    r += 0.5 * (w.quantity ?? 0) + 0.3 * (w.rarity ?? 0);
+    // Experience counts as the themes' XP bonus does; currency as a tenth of the same share of quantity.
+    r += 0.6 * (w.experience ?? 0) + 0.1 * (w.currency ?? 0);
+    r += 0.05 * affixRarePacks(id, level);
   }
   return r;
 }
@@ -148,14 +177,14 @@ export function scoreTheme(
   affixes: string[] = [],
 ): ThemeScore {
   const threat = themeThreat(theme);
-  const a = affixThreat(affixes);
+  const level = ch.config.areaLevel;
+  const a = affixThreat(affixes, level);
   // Affixes that change the player change the character itself.
-  const playerMods = affixes.flatMap((id) => mapAffixDef(id).playerMods ?? []);
+  const playerMods = affixes.flatMap((id) => affixPlayerMods(id, level));
   const me = playerMods.length
     ? new Character(ch.build, { ...ch.config, extraMods: [...ch.config.extraMods, ...playerMods] })
     : ch;
   const conds = me.steadyMask(mode);
-  const level = me.config.areaLevel;
   let dps = 0;
   for (const v of ALL_VARIANTS) {
     if (threat.variants[v] <= 0) continue;
@@ -195,8 +224,8 @@ export function scoreTheme(
     const ratio = against('gloomstalker') / Math.max(1e-9, against('warrior'));
     dps *= 1 - hollow + hollow * ratio;
   }
-  const g = a.chaosGain;
-  const mix = g > 0 ? threat.mix.map((x, i) => (x + (i === 4 ? g : 0)) / (1 + g)) : threat.mix;
+  const g = a.gain.reduce((s, x) => s + x, 0);
+  const mix = g > 0 ? threat.mix.map((x, i) => (x + a.gain[i]) / (1 + g)) : threat.mix;
   const defence = me.defence(conds);
   const ehp = me.ehp(a.cannotEvade ? { ...defence, cannotEvade: true } : defence, mix);
   // Corpse raising, ground clouds and blinking add to what the plain numbers say.
@@ -204,8 +233,8 @@ export function scoreTheme(
     (n, [id, share]) => n + share * (FACTION_PRESSURE[MONSTER_TYPES[id].faction] - 1),
     1,
   );
-  const pressure = threat.pressure * mechanics * a.life * a.damage * (1 + g);
-  const value = ((Math.max(0.1, dps) * ehp) / pressure) * (1 + themeReward(theme, affixes));
+  const pressure = threat.pressure * mechanics * a.life * a.damage * (1 + g) * a.pressure;
+  const value = ((Math.max(0.1, dps) * ehp) / pressure) * (1 + themeReward(theme, affixes, level));
   return { dps, ehp, pressure, value };
 }
 
@@ -234,11 +263,14 @@ export function threatPreview(
 ): { dps: number; ehp: number } {
   const base = scoreTheme(ch, NEUTRAL, mode, []);
   const here = scoreTheme(ch, theme, mode, affixes);
-  const a = affixThreat(affixes);
+  const a = affixThreat(affixes, ch.config.areaLevel);
   // Tougher monsters take longer to kill, and harder-hitting ones take more of your life per hit.
   return {
     dps: here.dps / Math.max(1e-9, base.dps) / a.life,
-    // Gained chaos damage is extra damage on top of what the monsters already deal.
-    ehp: here.ehp / Math.max(1e-9, base.ehp) / (a.damage * (1 + a.chaosGain)),
+    // Gained damage of any type is extra damage on top of what the monsters already deal.
+    ehp:
+      here.ehp /
+      Math.max(1e-9, base.ehp) /
+      (a.damage * (1 + a.gain.reduce((s, x) => s + x, 0)) * a.pressure),
   };
 }

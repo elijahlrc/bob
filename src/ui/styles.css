@@ -970,6 +970,17 @@ select option {
     0 1px 3px #000;
   pointer-events: none;
 }
+.hud-abandon {
+  position: absolute;
+  top: 6px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 14px;
+  text-shadow: 0 1px 2px #000;
+  pointer-events: auto;
+}
 .hud-showcase {
   position: absolute;
   top: 40px;

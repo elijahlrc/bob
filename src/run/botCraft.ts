@@ -1,9 +1,8 @@
 import { family } from '../data/affixes';
 import { BENCH_RECIPES, CURRENCIES } from '../data/currency';
 import { themeDef } from '../data/themes';
-import { Character } from '../calc/character';
 import { EQUIP_SLOTS, type EquipSlot, type Item } from '../data/types';
-import { botRegem, cfgFor, scoreBuild } from './bot';
+import { botRegem, offerCharacter, scoreBuild } from './bot';
 import {
   addableFamilies,
   benchAdd,
@@ -222,13 +221,13 @@ export function botCraft(run: RunState): number {
  */
 export function botChalk(run: RunState): number {
   if (owned(run, 'chalk') < 1) return 0;
-  const ch = new Character(run.build, cfgFor(run));
   const mode = run.map % 10 === 0 ? 'boss' : 'clearing';
   let done = 0;
   for (let guard = 0; guard < 4 && owned(run, 'chalk') > 0; guard++) {
     let best: { gain: number; apply: () => CraftResult } | null = null;
     run.offers.forEach((o, offer) => {
       const id = o.themeId;
+      const ch = offerCharacter(run, o);
       const have = o.affixes;
       const cur = scoreTheme(ch, themeDef(id), mode, have).value;
       for (const opt of chalkOptions(run, offer)) {

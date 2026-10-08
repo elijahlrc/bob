@@ -10,7 +10,7 @@ import {
   type MonsterTypeId,
   type Variant,
 } from '../data/monsters';
-import { mapAffixDef } from '../data/mapAffixes';
+import { affixMonsterMods } from '../data/mapAffixes';
 import { CondIndex, ModDB } from '../mods/modDb';
 import { maskAnd, mod, type Mod } from '../mods/types';
 import type { Defence } from './combat';
@@ -122,7 +122,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
   // A Core Golem is immune to its element and to that element's ailments.
   if (t.elemental && spec.variant !== 'none') mods.push(mod(`immune.${spec.variant}`, 'flag', 1));
   for (const id of spec.mods) mods.push(...monsterModDef(id).mods);
-  for (const id of spec.affix ?? []) mods.push(...(mapAffixDef(id).monsterMods ?? []));
+  for (const id of spec.affix ?? []) mods.push(...affixMonsterMods(id, spec.level));
   // Shrouded: an energy shield shell worth a quarter of its life, which recharges when it is left alone.
   if (spec.mods.includes('shrouded')) mods.push(mod('es', 'base', Math.round(life * 0.25)));
   if (spec.rarity === 'boss') mods.push(mod('resist.allEle', 'base', 30));

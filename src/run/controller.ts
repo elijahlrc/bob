@@ -2,6 +2,7 @@ import { Emitter } from '../core/events';
 import { DT } from '../data/constants';
 import { worldResult, type MapResult } from '../sim/runMap';
 import type { SimEvent, World } from '../sim/types';
+import { cancelAbandon, requestAbandon } from '../sim/abandon';
 import { createWorld, stepWorld } from '../sim/world';
 import { CLASSES } from '../data/classes';
 import { botCamp } from './bot';
@@ -199,6 +200,15 @@ export class Controller {
     this.bus.emit('select', { id: null });
     this.bus.emit('mapStart', { world: this.world });
     this.changed();
+  }
+
+  /** The Abandon button: start the escape timer (the map ends when it runs out). */
+  abandonMap(): void {
+    if (this.world && requestAbandon(this.world)) this.changed();
+  }
+
+  cancelAbandon(): void {
+    if (this.world && cancelAbandon(this.world)) this.changed();
   }
 
   setSpeed(s: number): void {

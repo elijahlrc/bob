@@ -561,7 +561,7 @@ export function killActor(w: World, a: Actor): void {
     w.stats.kills++;
     p.tKill = 0;
     const xp =
-      (a.mon?.xp ?? 0) * levelPenalty(w.build.level, a.mon?.spec.level ?? 1) * w.plan.theme.xpMult;
+      (a.mon?.xp ?? 0) * levelPenalty(w.build.level, a.mon?.spec.level ?? 1) * w.plan.xpMult;
     w.xp += xp;
     w.stats.xpGained += xp;
     const kind =

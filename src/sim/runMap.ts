@@ -3,11 +3,14 @@ import type { AnyItem, Build } from '../data/types';
 import type { MapPlan } from '../gen/mapPlan';
 import type { FlaskPolicy } from './flaskPolicy';
 import { buildRecap } from './recap';
-import type { DeathRecap, MapStatus, World, WorldOpts } from './types';
+import type { DeathRecap, MapStatus, Vitals, World, WorldOpts } from './types';
+import { vitalsOf } from './vitals';
 import { createWorld, stepWorld } from './world';
 
 export type MapResult = {
   status: MapStatus;
+  /** The level of the map that was played (the monsters' level). */
+  areaLevel: number;
   time: number;
   ticks: number;
   /** Character level and XP progress after the map. */
@@ -20,6 +23,8 @@ export type MapResult = {
   /** Hash of the full event log (determinism checks). */
   eventHash: number;
   lifeFrac: number;
+  /** What the player carries out of the map (life, mana, energy shield and flask charges, as fractions). */
+  vitals: Vitals;
   /** Why the player died, when they did (EXPANSION section 9). */
   recap?: DeathRecap;
 };
@@ -55,6 +60,7 @@ export function runMap(
 export function worldResult(w: World, eventHash = 0): MapResult {
   return {
     status: w.status,
+    areaLevel: w.plan.areaLevel,
     time: w.t,
     ticks: w.tick,
     level: w.build.level,
@@ -65,6 +71,7 @@ export function worldResult(w: World, eventHash = 0): MapResult {
     picked: w.picked,
     eventHash,
     lifeFrac: w.player.life / Math.max(1, w.player.def.maxLife),
+    vitals: vitalsOf(w),
     ...(w.status === 'dead' ? { recap: buildRecap(w) } : {}),
   };
 }
