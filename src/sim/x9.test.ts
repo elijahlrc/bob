@@ -88,7 +88,7 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
     expect([...seen].some((id) => id.startsWith('mix:'))).toBe(true);
   });
 
-  it('Gnawers come in packs of eight to fourteen or more in a Warrens room', () => {
+  it('Gnawers come in packs of six or more in a Warrens room', () => {
     let packs = 0;
     for (let s = 0; s < 40; s++) {
       const lab = generateLabyrinth(new Rng(s), { rooms: 6, sideBranches: 1 });
@@ -101,7 +101,7 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
       const byPack = new Map<number, number>();
       for (const m of pop.monsters)
         if (m.spec.type === 'gnawer') byPack.set(m.pack, (byPack.get(m.pack) ?? 0) + 1);
-      for (const n of byPack.values()) if (n >= 8) packs++;
+      for (const n of byPack.values()) if (n >= 6) packs++;
     }
     expect(packs).toBeGreaterThan(10);
   });
@@ -320,9 +320,10 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
     }
   });
 
-  // Timing test: skipped on CI (shared runners are slower).
+  // Timing test: skipped on CI (shared runners are slower), and retried because a parallel test run can starve it.
   it.skipIf(!!process.env.CI)(
     'a room of forty Swarm actors keeps the sim above 400x real time',
+    { retry: 3 },
     () => {
       const w = arena(true);
       const actors: Actor[] = [];

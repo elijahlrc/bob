@@ -181,7 +181,7 @@ describe('the headless bot (§15.5)', () => {
   // Timing tests depend on the machine: they run locally and are skipped on CI (shared runners are slower).
   // The bot's own camp decisions count in the wall time here, and a stronger build clears maps in less simulated time, so
   // the floor is far below the 500× of the sim itself (the bot alone measured 500–560× when the coverage plan began).
-  it.skipIf(!!process.env.CI)('runs at least 200× real time', () => {
+  it.skipIf(!!process.env.CI)('runs at least 200× real time', { retry: 3 }, () => {
     const t0 = performance.now();
     const r = botRun('reaver', 5, 25);
     const wall = (performance.now() - t0) / 1000;

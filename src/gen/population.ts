@@ -375,10 +375,10 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
       for (const [i, p] of ps.entries()) {
         const spec = normal('normal', types[i]);
         add(room, spec, p);
-        // A Gnawer never comes alone: the first one in a room brings a pack of eight to fourteen.
+        // A Gnawer never comes alone: the first one in a room brings three to six more (a pack of a dozen, with the room's own).
         if (spec.type === 'gnawer' && spec.rarity === 'normal' && !packed) {
           packed = true;
-          const extraN = rng.int(7, 13);
+          const extraN = rng.int(3, 6);
           for (const q of spots(rng, lab, room, extraN))
             add(room, { ...normal(), type: 'gnawer', variant: 'none' }, q);
         }

@@ -1,5 +1,11 @@
 import { Rng } from '../../../core/rng';
 import {
+  FACTION_NAMES,
+  type FactionId,
+  type MonsterTypeId,
+  type Variant,
+} from '../../../data/monsters';
+import {
   buildFigure,
   isHero,
   poseFor,
@@ -73,6 +79,101 @@ function heroPalette(accent: number): Record<Role, RGB> {
   };
 }
 
+/** The faction palettes (docs/ENEMIES.md 6.2): the body is painted in them, not tinted, so the element stays an accent. */
+const FACTION_PALETTE: Record<FactionId, Partial<Record<Role, RGB>>> = {
+  ossuary: {},
+  rot: {
+    bone: hex(0xa9b07a),
+    boneShade: hex(0x6e7a4c),
+    cloth: hex(0x56603a),
+    clothShade: hex(0x3a4528),
+    accent: hex(0x9fd04a),
+    eye: hex(0xc6ff3a),
+    glow: hex(0xb6ff5a),
+    skin: hex(0x8a9a5a),
+  },
+  hollow: {
+    bone: hex(0xb8cce8),
+    boneShade: hex(0x7e93bd),
+    cloth: hex(0x44527a),
+    clothShade: hex(0x2e3856),
+    accent: hex(0x7ad0ff),
+    eye: hex(0xa8f0ff),
+    glow: hex(0xa8e8ff),
+    metal: hex(0x9ab0d0),
+  },
+  choir: {
+    bone: hex(0xd0b49a),
+    boneShade: hex(0x9a7e68),
+    cloth: hex(0x7a3a2c),
+    clothShade: hex(0x4e241c),
+    accent: hex(0xe0a040),
+    eye: hex(0xffd060),
+    glow: hex(0xffc060),
+    skin: hex(0xd8b090),
+    metal: hex(0xc8a860),
+  },
+  swarm: {
+    bone: hex(0xc8a870),
+    boneShade: hex(0x8a7048),
+    cloth: hex(0x6a5030),
+    clothShade: hex(0x453420),
+    accent: hex(0xd88a3a),
+    eye: hex(0xffa030),
+    wood: hex(0x5a4228),
+  },
+  reliquary: {
+    bone: hex(0xa8b0c0),
+    boneShade: hex(0x6e7686),
+    cloth: hex(0x4a505c),
+    metal: hex(0xc0c8d4),
+    metalShade: hex(0x70788a),
+    accent: hex(0xd0a850),
+    eye: hex(0xffd070),
+    glow: hex(0xffe090),
+  },
+};
+
+/** What the element does to a body: its colours take the eyes, the glow and the trim, and tint the rest a little. */
+const ELEMENT_ACCENT: Record<
+  Exclude<Variant, 'none'>,
+  { eye: RGB; glow: RGB; accent: RGB; wash: RGB }
+> = {
+  fire: { eye: hex(0xff8a30), glow: hex(0xffb060), accent: hex(0xff6a28), wash: hex(0xffa068) },
+  cold: { eye: hex(0x8fe0ff), glow: hex(0xb0e8ff), accent: hex(0x6ab8ff), wash: hex(0x90c8ff) },
+  lightning: {
+    eye: hex(0xf0d0ff),
+    glow: hex(0xe0c0ff),
+    accent: hex(0xc890ff),
+    wash: hex(0xc8a0ff),
+  },
+};
+
+const blend = (a: RGB, b: RGB, k: number): RGB => [
+  a[0] + (b[0] - a[0]) * k,
+  a[1] + (b[1] - a[1]) * k,
+  a[2] + (b[2] - a[2]) * k,
+];
+
+export type MonsterLook = { type: MonsterTypeId; faction: FactionId; variant: Variant };
+
+/** The palette of a monster: its faction's, with the element as an accent. */
+export function monsterPalette(look: Pick<MonsterLook, 'faction' | 'variant'>): Record<Role, RGB> {
+  const pal: Record<Role, RGB> = { ...UNDEAD, ...FACTION_PALETTE[look.faction] };
+  if (look.variant !== 'none') {
+    const e = ELEMENT_ACCENT[look.variant];
+    pal.eye = e.eye;
+    pal.glow = e.glow;
+    pal.accent = e.accent;
+    for (const r of ['bone', 'boneShade', 'cloth', 'clothShade'] as const)
+      pal[r] = blend(pal[r], e.wash, 0.22);
+  }
+  return pal;
+}
+
+/** A short name of a faction palette, for tests and tooltips. */
+export const FACTION_LABEL = FACTION_NAMES;
+
 const OUTLINE: RGB = [10, 8, 9];
 
 function fillPrim(ctx: CanvasRenderingContext2D, p: Prim, ox: number, oy: number, s: number): void {
@@ -122,10 +223,11 @@ export function rasterFigure(
   t: number,
   accent: number,
   px = FIG_PX,
+  look?: MonsterLook,
 ): HTMLCanvasElement {
   const S = frameSize(kind, px);
-  const pal = isHero(kind) ? heroPalette(accent) : UNDEAD;
-  const prims = buildFigure(kind, poseFor(kind, anim, t));
+  const pal = isHero(kind) ? heroPalette(accent) : look ? monsterPalette(look) : UNDEAD;
+  const prims = buildFigure(kind, poseFor(kind, anim, t), look?.type, t);
   const scratch = document.createElement('canvas');
   scratch.width = scratch.height = S;
   const sctx = scratch.getContext('2d', { willReadFrequently: true })!;

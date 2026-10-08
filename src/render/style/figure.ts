@@ -1,4 +1,5 @@
 import { MONSTER_TYPES, type MonsterTypeId } from '../../data/monsters';
+import { kitAdjust, kitBack, kitFront, type Anchors } from './kits';
 /**
  * Style-independent character rig. A figure is a list of primitives in a local design space
  * (origin at the feet, +x right, -y up, ~48 units tall for a person). Each visual style rasterises the
@@ -495,8 +496,11 @@ function buildCreature(kind: FigureKind, pose: Pose): Prim[] {
   return b.prims;
 }
 
-/** Build the primitives of a figure in a pose (back to front). */
-export function buildFigure(kind: FigureKind, pose: Pose): Prim[] {
+/**
+ * Build the primitives of a figure in a pose (back to front). A monster type adds its kit to the humanoid body
+ * (docs/ENEMIES.md 6.1); `t` is the time through a looping animation, for things that swing.
+ */
+export function buildFigure(kind: FigureKind, pose: Pose, type?: MonsterTypeId, t = 0): Prim[] {
   if (CREATURES.has(kind)) return finish(buildCreature(kind, pose), BUILDS[kind].scale, pose);
   const B_ = BUILDS[kind];
   const b: B = { prims: [] };
@@ -505,8 +509,9 @@ export function buildFigure(kind: FigureKind, pose: Pose): Prim[] {
   const shadeRole: Role = hero ? 'clothShade' : 'boneShade';
   const hipY = -B_.legLen * 2 + pose.bob;
   const hipX = 0;
-  const shY = hipY - B_.torsoH;
-  const shX = pose.lean;
+  const adj = type && !hero ? kitAdjust(type) : {};
+  const shY = hipY - B_.torsoH + (adj.hunch ?? 0);
+  const shX = pose.lean + (adj.hunch ?? 0) * 0.5;
   // Far arm and far leg first (behind the torso).
   const farLegAng = pose.legB;
   const nearLegAng = pose.legA;
@@ -628,7 +633,25 @@ export function buildFigure(kind: FigureKind, pose: Pose): Prim[] {
     circ(b, shX - 4, shY + 8, 4.2, 'metal');
     circ(b, shX - 4, shY + 8, 1.4, 'accent');
   }
-  return finish(b.prims, B_.scale, pose);
+  if (type && !hero) {
+    const a: Anchors = {
+      hx,
+      hy,
+      skull: B_.skull,
+      shX,
+      shY,
+      hipX,
+      hipY,
+      hand,
+      wAng,
+      legLen: B_.legLen,
+      swing: pose.legA,
+      t,
+    };
+    b.prims.unshift(...kitBack(type, a));
+    b.prims.push(...kitFront(type, a));
+  }
+  return finish(b.prims, B_.scale * (adj.scale ?? 1), pose);
 }
 
 /** Apply scale, rotation and scatter to a built figure. */

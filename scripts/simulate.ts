@@ -3,7 +3,7 @@
  *
  *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|abandoner] [--craft greedy|random|none] [--report] [--scaling 1.25] [--base 1] [--variance 0.1] [--legacy]
  */
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { median } from '../src/core/math';
 import { CLASSES } from '../src/data/classes';
 import { botRun, type BotRunResult, type CraftPolicy, type ThemeRule } from '../src/run/bot';
@@ -27,6 +27,10 @@ type Args = {
   abandonBelow?: number;
   /** The difficulty settings (docs/ENEMIES.md 8): --scaling, --base, --variance; the new baseline otherwise. */
   difficulty: Difficulty;
+  /** Index of the first run (so runs can be split over processes), a file to write the raw results to, files to merge. */
+  from: number;
+  dump?: string;
+  merge: string[];
 };
 
 function parseArgs(argv: string[]): Args {
@@ -42,6 +46,8 @@ function parseArgs(argv: string[]): Args {
     crafting: 'greedy',
     report: false,
     difficulty: { ...DEFAULT },
+    from: 0,
+    merge: [],
   };
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
@@ -63,6 +69,9 @@ function parseArgs(argv: string[]): Args {
     else if (k === '--base') a.difficulty.base = Number(v);
     else if (k === '--variance') a.difficulty.variance = Number(v);
     else if (k === '--legacy') a.difficulty = { scaling: 1, base: 1, variance: 0 };
+    else if (k === '--from') a.from = Number(v);
+    else if (k === '--dump') a.dump = v;
+    else if (k === '--merge') a.merge = argv.slice(i + 1);
     else if (k === '--report') a.report = true;
     else if (k === '--craft')
       a.crafting = v === 'none' ? 'none' : v === 'random' ? 'random' : 'greedy';
@@ -74,8 +83,16 @@ function parseArgs(argv: string[]): Args {
 const args = parseArgs(process.argv.slice(2));
 const results: (BotRunResult & { wallMs: number; simSeconds: number })[] = [];
 const t0 = performance.now();
-for (const cls of args.classes) {
-  for (let r = 0; r < args.runs; r++) {
+if (args.merge.length) {
+  // Join the raw results of runs made in other processes (--dump), then report on them as one.
+  for (const file of args.merge) {
+    const d = JSON.parse(readFileSync(file, 'utf8')) as { results: typeof results };
+    results.push(...d.results);
+  }
+  args.runs = Math.round(results.length / args.classes.length);
+}
+for (const cls of args.merge.length ? [] : args.classes) {
+  for (let r = args.from; r < args.from + args.runs; r++) {
     const start = performance.now();
     const res = botRun(cls, args.seed * 1000 + r, args.maxMap, {
       themes: args.themes,
@@ -87,11 +104,12 @@ for (const cls of args.classes) {
     const simSeconds = res.maps.reduce((s, m) => s + m.time, 0);
     results.push({ ...res, wallMs, simSeconds });
     process.stderr.write(
-      `${cls} run ${r + 1}/${args.runs}: ${res.won ? 'WON' : `reached map ${res.reached}`} · level ${res.maps.at(-1)?.level ?? 1} · ${(wallMs / 1000).toFixed(1)} s wall (${(simSeconds / (wallMs / 1000)).toFixed(0)}× real time)\n`,
+      `${cls} run ${r + 1}/${args.from + args.runs}: ${res.won ? 'WON' : `reached map ${res.reached}`} · level ${res.maps.at(-1)?.level ?? 1} · ${(wallMs / 1000).toFixed(1)} s wall (${(simSeconds / (wallMs / 1000)).toFixed(0)}× real time)\n`,
     );
   }
 }
 
+if (args.dump) writeFileSync(args.dump, JSON.stringify({ args, results }));
 const lines: string[] = [];
 lines.push(
   `Bot results — ${args.runs} run(s) per class, maps up to ${args.maxMap}, seed ${args.seed}, difficulty: ${difficultyText(args.difficulty)}`,

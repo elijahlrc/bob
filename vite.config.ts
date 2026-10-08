@@ -18,5 +18,8 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts', 'scripts/**/*.test.ts'],
+    // The timing tests (the sim speed floors) need cores to themselves: on a machine with many cores, one worker per core
+    // starves them. Eight is as fast overall.
+    maxWorkers: 8,
   },
 });

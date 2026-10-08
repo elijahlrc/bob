@@ -13,7 +13,7 @@ import type {
 import { StyleBase, AnimTrack, figureOf, heroColor, type ActorView } from '../../style/base';
 import type { MarkTheme } from '../../style/marks';
 import { isHero, type AnimName, type FigureKind } from '../../style/figure';
-import { buildProps, FIG_PX, FRAMES, rasterFigure } from './paint';
+import { buildProps, FIG_PX, FRAMES, rasterFigure, type MonsterLook } from './paint';
 import { DROP_COLOR, dropLabel, dropRarity } from '../../dropLabel';
 import { CollapseFx } from './collapseFx';
 import { SkillFx } from './skillFx';
@@ -23,25 +23,20 @@ import { isoFloors, isoWalls, ISO_H, ISO_W, WALL_LOW, WALL_TALL } from './isoPai
 export function pickZoom(width: number): number {
   return width >= 1100 ? 2 : width >= 640 ? 1.5 : 1;
 }
-const ELEMENT_TINT: Record<string, number> = {
-  none: 0xffffff,
-  fire: 0xffb878,
-  cold: 0xa8d8ff,
-  lightning: 0xd8b8ff,
-};
 const ELEMENT_LIGHT: Record<string, number> = {
   fire: 0xff7a2a,
   cold: 0x5aa8ff,
   lightning: 0xb070ff,
 };
-/** Palettes of the factions that reuse the humanoid rig (EXPANSION 7.3): the Ossuary stays bone-white. */
-const FACTION_TINT: Record<string, number> = {
-  rot: 0x9fd07a,
-  hollow: 0x8fb8e8,
-  choir: 0xe0a070,
-  swarm: 0xd8b880,
-  reliquary: 0xa8b0c0,
-};
+/** What a monster looks like: its type (the kit), faction (the palette) and element (the accent); heroes have none. */
+function lookOf(a: Actor): MonsterLook | undefined {
+  if (!a.mon) return undefined;
+  return {
+    type: a.mon.spec.type,
+    faction: factionOfSpec(a.mon.spec),
+    variant: a.mon.spec.variant,
+  };
+}
 /** How lasting ground zones are drawn, by kind. */
 const ZONE_LOOK: Record<string, { fill: number; edge: number }> = {
   caustic: { fill: 0x4a8a1a, edge: 0xa0e04a },
@@ -136,11 +131,18 @@ export class GrimStyle extends StyleBase {
     if (nearest) t.setFilter(Phaser.Textures.FilterMode.NEAREST);
   }
 
-  private figKey(kind: FigureKind, accent: number, anim: AnimName, i: number): string {
+  private figKey(
+    kind: FigureKind,
+    accent: number,
+    anim: AnimName,
+    i: number,
+    look?: MonsterLook,
+  ): string {
     const acc = isHero(kind) ? accent : 0;
-    const key = `gf_${kind}_${acc}_${anim}_${i}`;
+    const who = look ? `${look.type}_${look.variant}` : '';
+    const key = `gf_${kind}_${who}_${acc}_${anim}_${i}`;
     if (!this.scene.textures.exists(key))
-      this.addTex(key, rasterFigure(kind, anim, i / FRAMES[anim], acc, FIG_PX));
+      this.addTex(key, rasterFigure(kind, anim, i / FRAMES[anim], acc, FIG_PX, look));
     return key;
   }
 
@@ -588,16 +590,11 @@ export class GrimStyle extends StyleBase {
     const s = this.scene;
     const accent = a.isPlayer ? heroColor(this.world) : 0;
     const sprite = s.add
-      .image(0, 0, this.figKey(kind, accent, 'idle', 0))
+      .image(0, 0, this.figKey(kind, accent, 'idle', 0, lookOf(a)))
       .setOrigin(0.5, 0.84)
       .setLighting(true);
     const shadow = s.add.image(0, 0, 'g_shadow').setOrigin(0.5, 0.5);
     const variant = a.mon?.spec.variant ?? 'none';
-    if (variant !== 'none') sprite.setTint(ELEMENT_TINT[variant]);
-    else if (a.mon) {
-      const fac = factionOfSpec(a.mon.spec);
-      if (FACTION_TINT[fac]) sprite.setTint(FACTION_TINT[fac]);
-    }
     let ring: Phaser.GameObjects.Image | null = null;
     const rc = a.isPlayer ? undefined : RARITY_RING[a.rarity];
     if (rc !== undefined) {
@@ -635,7 +632,7 @@ export class GrimStyle extends StyleBase {
     const st = t.state(a);
     const n = FRAMES[st.anim];
     const idx = Math.min(n - 1, Math.floor(st.t * n));
-    const key = this.figKey(v.kind, d.accent, st.anim, idx);
+    const key = this.figKey(v.kind, d.accent, st.anim, idx, lookOf(a));
     if (key !== d.last) {
       d.sprite.setTexture(key);
       d.last = key;
@@ -655,8 +652,7 @@ export class GrimStyle extends StyleBase {
     // Tinting: white flash on hit, icy when chilled, element colour otherwise.
     if (t.hitT < 0.07 && a.alive) d.sprite.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
     else {
-      let tint = ELEMENT_TINT[d.variant] ?? 0xffffff;
-      if (tint === 0xffffff && a.mon) tint = FACTION_TINT[factionOfSpec(a.mon.spec)] ?? tint;
+      let tint = 0xffffff;
       if (a.ail.freezeT > 0) tint = 0x7ec8ff;
       else if (a.ail.chill > 0) tint = 0xb8dcff;
       else if (a.ail.poisons.length) tint = 0xc4f0a0;
