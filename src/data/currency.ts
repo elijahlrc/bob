@@ -18,7 +18,9 @@ export type CurrencyId =
   | 'ectoplasm'
   | 'censerAsh'
   | 'chitin'
-  | 'reliquarySlag';
+  | 'reliquarySlag'
+  | 'houndtooth'
+  | 'giltDust';
 
 export type CurrencyDef = {
   id: CurrencyId;
@@ -137,6 +139,24 @@ export const CURRENCIES: CurrencyDef[] = [
     families: ['armourLocal', 'physLocal', 'stunThreshold'],
     faction: 'reliquary',
   },
+  {
+    id: 'houndtooth',
+    name: 'Hound-tooth',
+    text: 'Add an affix of your choice: movement speed, accuracy or stun avoidance.',
+    minMap: 11,
+    weight: 0,
+    families: ['moveSpeed', 'accuracy', 'stunAvoid'],
+    faction: 'kennel',
+  },
+  {
+    id: 'giltDust',
+    name: 'Gilt Dust',
+    text: 'Add an affix of your choice: life regeneration, mana regeneration or life leech.',
+    minMap: 18,
+    weight: 0,
+    families: ['lifeRegen', 'manaRegen', 'lifeLeech'],
+    faction: 'gilded',
+  },
 ];
 
 export function currencyDef(id: string): CurrencyDef {
@@ -186,6 +206,15 @@ export const TABLET_SETS: Record<string, { unique: string; tablets: number }[]> 
     { unique: 'meteoriteEdge', tablets: 6 },
     { unique: 'lanternBulwark', tablets: 5 },
     { unique: 'thunderwireHauberk', tablets: 5 },
+  ],
+  kennel: [
+    { unique: 'footlooseShoes', tablets: 4 },
+    { unique: 'brawlStrap', tablets: 4 },
+  ],
+  gilded: [
+    { unique: 'pennyCap', tablets: 3 },
+    { unique: 'hoardersSash', tablets: 4 },
+    { unique: 'pileOfOdds', tablets: 5 },
   ],
 };
 

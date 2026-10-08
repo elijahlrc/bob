@@ -13,7 +13,7 @@ import { tickSkillZones, updateAction, updateProjectiles } from './actions';
 import { monsterAI, playerAI, separate } from './ai';
 import { lifeCap, rawHit, refreshPlayerDefence, tickActor } from './combat';
 import { autoFlaskPolicy, type FlaskPolicy } from './flaskPolicy';
-import { tickAbilities } from './abilities';
+import { tickAbilities, tickChargingMod } from './abilities';
 import { isZone, tickCorpses, tickFactionBehaviour, tickZones } from './factions';
 import { BUFF_IDS, type BuffId } from '../data/buffs';
 import { rollGains, tickBuffs } from './buffs';
@@ -314,7 +314,7 @@ function tickEffects(w: World, dt: number): void {
     if (isZone(e)) continue;
     w.events.push({ t: 'explode', x: e.x, y: e.y, r: e.radius, dtype: e.dtype });
     const label = e.kind === 'slam' ? 'Crushing slam' : 'Volatile explosion';
-    if (p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r)
+    if (e.damage > 0 && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r)
       rawHit(w, p, e.damage, e.dtype, label);
     // The player's minions standing in a monster's blast are hurt too.
     if (e.faction === 1)
@@ -339,6 +339,7 @@ function tickMonsterMods(w: World, m: Actor, dt: number): void {
       p.ail.chillT = Math.max(p.ail.chillT, 0.25);
     }
   }
+  if (m.modIds.includes('charging')) tickChargingMod(w, m, dt);
   if (m.modIds.includes('raiser')) {
     m.raiserT -= dt;
     if (m.raiserT <= 0) {

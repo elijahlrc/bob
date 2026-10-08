@@ -310,13 +310,94 @@ THEMES.push(
   },
 );
 
+/** The Kennel and the Gilded (docs/ENEMIES.md 7.4): two themes each. */
+THEMES.push(
+  {
+    id: 'kennelRun',
+    name: 'Kennel Run',
+    elementWeights: {},
+    typeWeights: { hound: 2 },
+    factions: { kennel: 85, ossuary: 15 },
+    fromMap: 11,
+    chief: { mod: 'huntsmaster', type: 'boar' },
+    itemQuantity: 0,
+    rareWeightMult: 1.15,
+    xpMult: 1,
+    extraRarePacks: 0,
+    extraChests: 0,
+    bonusText: '+15% item rarity',
+    floor: 0x3c3226,
+    wall: 0x1a140e,
+  },
+  {
+    id: 'boarPit',
+    name: 'Boar Pit',
+    elementWeights: {},
+    typeWeights: { boar: 3, cat: 2.5 },
+    factions: { kennel: 85, ossuary: 15 },
+    fromMap: 14,
+    chief: { mod: 'huntsmaster', type: 'boar' },
+    itemQuantity: 0,
+    rareWeightMult: 1,
+    xpMult: 1,
+    extraRarePacks: 1,
+    extraChests: 0,
+    bonusText: '+1 rare pack',
+    floor: 0x44362a,
+    wall: 0x1e160f,
+  },
+  {
+    id: 'giltHall',
+    name: 'Gilt Hall',
+    elementWeights: {},
+    typeWeights: { guard: 1.5 },
+    factions: { gilded: 85, ossuary: 15 },
+    fromMap: 18,
+    chief: { mod: 'treasurer', type: 'guard' },
+    extraCurrency: 1,
+    itemQuantity: 0,
+    rareWeightMult: 1,
+    xpMult: 1,
+    extraRarePacks: 0,
+    extraChests: 0,
+    bonusText: '+1 currency item',
+    floor: 0x45402a,
+    wall: 0x1e1b10,
+  },
+  {
+    id: 'countingHouse',
+    name: 'Counting House',
+    elementWeights: {},
+    typeWeights: { cutpurse: 2.5, slinger: 2, bursar: 2 },
+    factions: { gilded: 85, ossuary: 15 },
+    fromMap: 22,
+    chief: { mod: 'treasurer', type: 'guard' },
+    itemQuantity: 0,
+    rareWeightMult: 1,
+    xpMult: 1.15,
+    extraRarePacks: 0,
+    extraChests: 0,
+    bonusText: '+15% experience',
+    floor: 0x3a3a30,
+    wall: 0x181812,
+  },
+);
+
 /**
  * Mixed themes (EXPANSION 7.4), from map 30: two of the new factions at 50/50, with the stronger bonus of the two.
  * Generated from the faction-led themes, so each pair is its own theme with an id of `mix:<a>+<b>`.
  */
 /** Mixed themes join the pool at this map. */
 export const MIXED_FROM_MAP = 30;
-const LED = ['charnelPits', 'hollowVigil', 'ashenNave', 'gnawingWarrens', 'reliquaryVault'];
+const LED = [
+  'charnelPits',
+  'hollowVigil',
+  'ashenNave',
+  'gnawingWarrens',
+  'reliquaryVault',
+  'kennelRun',
+  'giltHall',
+];
 const reward = (t: ThemeDef) =>
   0.5 * t.itemQuantity +
   0.3 * (t.rareWeightMult - 1) +

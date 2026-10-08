@@ -1,3 +1,4 @@
+import { abilitiesOf } from '../data/abilities';
 import { skillRange } from '../calc/character';
 import type { Defence } from '../calc/combat';
 import type { SkillProfile } from '../calc/skill';
@@ -521,7 +522,7 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
   m.moving = false;
   if (m.dummy || !canAct(m)) return;
   // A Gloomstalker stands still while its blink gathers.
-  if (m.blinkT > 0 || m.phaseT > 0 || m.channelT > 0) return;
+  if (m.blinkT > 0 || m.phaseT > 0 || m.channelT > 0 || m.windT > 0 || m.dashT > 0) return;
   const p = w.player;
   if (!p.alive) return;
   const d = Math.hypot(p.x - m.x, p.y - m.y);
@@ -570,6 +571,13 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
       return;
     }
   }
+  // A thief that has taken something runs from the character with it.
+  if (m.fleeT > 0) {
+    m.fleeT -= dt;
+    const away = w.grid.collide(m.x - (p.x - m.x), m.y - (p.y - m.y), m.r);
+    step(w, m, away.x - m.x, away.y - m.y, dt);
+    return;
+  }
   // Nests and pylons do nothing but what the faction code gives them.
   if (MONSTER_TYPES[m.mon!.spec.type].noAttack) return;
   const prof = m.mon!.profile(monsterConds(m));
@@ -585,16 +593,18 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
       }
       return;
     }
-    // Retreat when crowded: short half-speed bursts with a cooldown, so they don't kite forever.
+    // Retreat when crowded: short half-speed bursts with a cooldown, so they don't kite forever. A kiter (a Slinger, a
+    // Handler) backs off sooner, faster and more often.
+    const kites = abilitiesOf(m.mon!.spec.type).some((a) => a.id === 'kite');
     m.retreatCd -= dt;
-    if (d < 2 && m.retreatT <= 0 && m.retreatCd <= 0) {
-      m.retreatT = RETREAT_TIME;
-      m.retreatCd = RETREAT_COOLDOWN;
+    if (d < (kites ? 4.5 : 2) && m.retreatT <= 0 && m.retreatCd <= 0) {
+      m.retreatT = kites ? RETREAT_TIME * 1.5 : RETREAT_TIME;
+      m.retreatCd = kites ? 1.2 : RETREAT_COOLDOWN;
     }
     if (m.retreatT > 0) {
       m.retreatT -= dt;
       const away = w.grid.collide(m.x - (p.x - m.x), m.y - (p.y - m.y), m.r);
-      step(w, m, away.x - m.x, away.y - m.y, dt * 0.5);
+      step(w, m, away.x - m.x, away.y - m.y, dt * (kites ? 0.8 : 0.5));
       return;
     }
     if (d <= range && los) {

@@ -135,17 +135,17 @@ export const ABILITY_INFO: Record<AbilityId, AbilityInfo> = {
     active: true,
     tag: 'healers',
     text: (a) =>
-      `Every ${s(a.interval)} s calls its pack to speed: allies within ${s(a.range)} tiles are ${pct(a.amount)} faster for a few seconds.`,
+      `Every ${s(a.interval)} s calls its pack to a frenzy: allies within ${s(a.range)} tiles move faster and hit harder for a few seconds.`,
   },
   kite: {
     name: 'Kite',
-    active: true,
+    active: false,
     tag: 'ranged',
     text: () => 'Backs away from you while it shoots.',
   },
   ambush: {
     name: 'Ambush',
-    active: true,
+    active: false,
     tag: 'chargers',
     text: (a) => `Lies still until you come within ${s(a.range)} tiles, then pounces.`,
   },
@@ -154,7 +154,7 @@ export const ABILITY_INFO: Record<AbilityId, AbilityInfo> = {
     active: true,
     tag: 'suppressors',
     text: (a) =>
-      `While it stands, you recover no life, mana or energy shield within ${s(a.range)} tiles.`,
+      `While it stands, your regeneration, leech and energy shield recharge stop within ${s(a.range)} tiles.`,
   },
   pull: {
     name: 'Pull',
@@ -212,7 +212,7 @@ export const ABILITY_INFO: Record<AbilityId, AbilityInfo> = {
     active: false,
     tag: 'thieves',
     text: (a) =>
-      `Its hits take ${s(a.amount)} flask charge from you; it runs, and drops the charges when it dies.`,
+      `Its hits take ${pct(a.amount)} of a flask's charges; it runs, and the charges come back when it dies.`,
   },
   reflect: {
     name: 'Reflect',
@@ -292,6 +292,17 @@ export const TYPE_ABILITIES: Partial<Record<string, AbilityDef[]>> = {
   ],
   golem: [{ id: 'deathZone' }],
   pylon: [{ id: 'protect', range: PYLON_RANGE }],
+  hound: [{ id: 'leap', interval: 5, range: 7, telegraph: 0.5 }],
+  boar: [{ id: 'charge', interval: 7, range: 10, telegraph: 0.6 }],
+  handler: [{ id: 'whistle', interval: 8, range: 8, amount: 0.2 }, { id: 'kite' }],
+  cat: [
+    { id: 'leap', interval: 6, range: 6, telegraph: 0.4 },
+    { id: 'ambush', range: 4.5 },
+  ],
+  cutpurse: [{ id: 'steal', amount: 0.25 }],
+  guard: [{ id: 'reflect', amount: 0.15 }],
+  bursar: [{ id: 'suppress', range: 6 }],
+  slinger: [{ id: 'kite' }],
 };
 
 /** The abilities a type has (none for most plain ones). */

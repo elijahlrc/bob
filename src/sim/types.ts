@@ -144,6 +144,16 @@ export type Actor = {
   abT: number[];
   /** Where a charge or a leap is heading, and how long is left of it (zero: not in one). */
   dashT: number;
+  /** Seconds of wind-up left before a leap or a charge (zero: not winding up). */
+  windT: number;
+  /** Tiles a second of the dash it is in. */
+  dashV: number;
+  /** Seconds left of running away (a Cutpurse that has stolen), and what it took: the flask and the charges. */
+  fleeT: number;
+  stolen: number;
+  stolenFlask: number;
+  /** The player: seconds left in which nothing recovers (a Bursar, the Treasurer). */
+  suppressT: number;
   dashX: number;
   dashY: number;
   /** Where a burrowed Gnawing Queen will come up. */

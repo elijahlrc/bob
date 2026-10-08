@@ -246,6 +246,36 @@ export const MOD_MARKS: Record<MonsterModId, ModMark> = {
     aura: true,
     desc: 'Changes its core element at every quarter of its life, and is immune to the current one.',
   },
+  huntsmaster: {
+    color: 0xc8984a,
+    shape: 'ring',
+    aura: true,
+    desc: 'Whistles up three Kennel Hounds every 10 seconds, and rushes at you in a line.',
+  },
+  treasurer: {
+    color: 0xf0c848,
+    shape: 'ring',
+    aura: true,
+    desc: 'Stops your regeneration and leech near it, takes flask charges, and calls two Cutpurses at half life.',
+  },
+  charging: {
+    color: 0xe09a50,
+    shape: 'triUp',
+    aura: false,
+    desc: 'Every 8 seconds it lowers its head and rushes at you in a line.',
+  },
+  flaskTaker: {
+    color: 0xd8c050,
+    shape: 'diamond',
+    aura: false,
+    desc: "Its hits take a fifth of a flask's charges from you.",
+  },
+  hobbling: {
+    color: 0x90a0c0,
+    shape: 'square',
+    aura: false,
+    desc: 'Its hits slow you by 30% for 2 seconds.',
+  },
   boneWarden: {
     color: 0xe8e0c8,
     shape: 'ring',

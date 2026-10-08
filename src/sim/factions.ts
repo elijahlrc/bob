@@ -1,6 +1,7 @@
 import { scaleOf, type MonsterSpec } from '../calc/monster';
 import { HEX_IDS, hexEffect, type HexId } from '../data/hexes';
 import { PYLON_RANGE } from '../data/abilities';
+import { tickChargingMod } from './abilities';
 import { MONSTER_TYPES } from '../data/monsters';
 import { monsterHitOf, rawHit } from './combat';
 import { monsterHexesPlayer } from './hexes';
@@ -61,6 +62,8 @@ export const GOLEM_ZONE_SECONDS = 6;
 /** The Bone Warden raises a ring of Warriors at each of these shares of life lost. */
 export const WARDEN_STEP = 1 / 3;
 export const WARDEN_RING = 4;
+export const HUNTSMASTER_INTERVAL = 10;
+export const TREASURER_RANGE = 7;
 /** Zone damage is dealt in pulses this far apart (seconds). */
 const ZONE_PULSE = 0.25;
 /** A raised monster comes back with this share of its life. */
@@ -226,6 +229,12 @@ export function onMonsterDeath(w: World, a: Actor): void {
   if (!a.mon) return;
   const type = a.mon.spec.type;
   leaveCorpse(w, a);
+  // A thief that dies gives back what it took.
+  if (a.stolen > 0) {
+    const f = w.flasks.find((x) => x.spec.uid === a.stolenFlask);
+    if (f) f.charges = Math.min(f.spec.maxCharges, f.charges + a.stolen);
+    a.stolen = 0;
+  }
   // A Core Golem leaves burning, chilled or shocked ground behind (6 s).
   if (type === 'golem' && a.mon.spec.variant !== 'none') {
     const kind =
@@ -420,6 +429,23 @@ function tickChampion(w: World, m: Actor, dt: number): void {
       immune[element] = true;
       m.def = { ...m.def, immune };
       w.events.push({ t: 'blink', id: m.id, x: m.x, y: m.y, end: true });
+    }
+  }
+  if (m.modIds.includes('huntsmaster')) {
+    // Whistles up three hounds every ten seconds, and rushes at you now and then.
+    m.raiserT -= dt;
+    if (m.raiserT <= 0 && d < 16) {
+      m.raiserT = HUNTSMASTER_INTERVAL;
+      for (let i = 0; i < 3; i++) spawnBeside(w, m, 'hound', 1.4);
+    }
+    tickChargingMod(w, m, dt);
+  }
+  if (m.modIds.includes('treasurer')) {
+    // Nothing recovers near it; its hits take flask charges; two Cutpurses come at half life.
+    if (d <= TREASURER_RANGE) p.suppressT = 0.25;
+    if (m.bossPhase === 0 && frac <= 0.5) {
+      m.bossPhase = 1;
+      for (let i = 0; i < 2; i++) spawnBeside(w, m, 'cutpurse', 1.6);
     }
   }
   if (m.modIds.includes('boneWarden')) {

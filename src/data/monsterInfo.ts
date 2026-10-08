@@ -13,12 +13,16 @@ export const FACTION_ASKS: Record<FactionId, string> = {
   choir: 'hexes, buffs and heals: what do you kill first?',
   swarm: 'numbers',
   reliquary: 'armour and immunity',
+  kennel: 'being caught: leaps, charges and ambushes',
+  gilded: 'recovery: flasks, regeneration and leech',
 };
 
 /** What every monster of a faction does, where the faction has such a rule. */
 export const FACTION_RULES: Partial<Record<FactionId, string>> = {
   hollow: 'Ethereal: takes 50% less physical damage and cannot bleed.',
   reliquary: 'Core Golems are immune to one element and its ailments.',
+  kennel: 'Hounds leap from a distance; Handlers speed the pack up.',
+  gilded: 'Cutpurses steal flask charges; Bursars stop your recovery.',
   swarm: 'Gnawers come in packs of a dozen or more.',
   rot: 'Dead Shamblers rise again; Bloaters leave clouds.',
 };
@@ -31,6 +35,8 @@ export const FACTION_COLOR: Record<FactionId, number> = {
   choir: 0xe0a070,
   swarm: 0xd8b880,
   reliquary: 0xa8b0c0,
+  kennel: 0xc89a68,
+  gilded: 0xf0c848,
 };
 export const FACTION_GLYPH: Record<FactionId, string> = {
   ossuary: '◆',
@@ -39,6 +45,8 @@ export const FACTION_GLYPH: Record<FactionId, string> = {
   choir: '▲',
   swarm: '▪',
   reliquary: '■',
+  kennel: '▼',
+  gilded: '★',
 };
 
 /** One clause on what a type does, for tooltips and the inspect card. */
@@ -68,6 +76,14 @@ export const TYPE_BLURBS: Record<MonsterTypeId, string> = {
   arbalest: 'Stands still and fires piercing bolts down a line.',
   golem: 'Immune to its element; leaves burning, chilled or shocked ground.',
   pylon: 'While it stands, allies near it take no damage.',
+  hound: 'Fast; crouches, then leaps onto you from a distance.',
+  boar: 'Lowers its head and rushes in a line; its tusks stagger.',
+  handler: 'Keeps its distance and whistles the pack into a faster, harder-hitting pack.',
+  cat: 'Lies in wait, then pounces for a big hit.',
+  cutpurse: 'Steals flask charges and runs; kill it to get them back.',
+  guard: 'Armoured; throws back part of the melee damage it takes.',
+  bursar: 'While it stands, your regeneration, leech and energy shield recharge stop near it.',
+  slinger: 'Shoots from range and backs away as you close in.',
 };
 
 /**

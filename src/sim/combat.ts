@@ -7,6 +7,7 @@ import {
   type TargetState,
 } from '../calc/combat';
 import { levelPenalty } from '../calc/formulas';
+import { abilitiesOf } from '../data/abilities';
 import type { SkillProfile } from '../calc/skill';
 import {
   BLEED_MOVING_MULT,
@@ -333,14 +334,11 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   // Siphoning monsters drain the player's mana; Thorned monsters reflect part of a melee hit.
   if (p.manaDrain > 0 && dst.isPlayer)
     dst.mana = Math.max(0, dst.mana - (dst.def.maxMana * p.manaDrain) / 100);
-  if (
-    src.isPlayer &&
-    wasAlive &&
-    dst.modIds.includes('thorned') &&
-    p.skill.behaviour.kind === 'melee' &&
-    res.total > 0
-  )
-    rawHit(w, src, res.total * THORNS_SHARE, 0);
+  if (src.isPlayer && wasAlive && p.skill.behaviour.kind === 'melee' && res.total > 0) {
+    const share = thornsShare(dst);
+    if (share > 0) rawHit(w, src, res.total * share, 0);
+  }
+  if (dst.isPlayer && !src.isPlayer && src.mon) onMonsterHitPlayer(w, src);
   const afterHit = () => {
     if (src.isPlayer) fireTriggers(w, { on: 'hit', target: dst, tags: p.tagMask, crit: res.crit });
     if (dst.isPlayer) fireTriggers(w, { on: 'hitTaken', damage: res.total });
@@ -425,6 +423,47 @@ export function hit(
   const h = p.hands[Math.min(hand, p.hands.length - 1)];
   const res = resolveHit(w.rngCombat, p, h, targetState(dst), dist, canStun);
   applyHit(w, src, dst, p, res);
+}
+
+/** The share of a melee hit that a monster throws back: the Thorned mod, or the reflection of a Gilded Guard. */
+export function thornsShare(m: Actor): number {
+  let share = m.modIds.includes('thorned') ? THORNS_SHARE : 0;
+  if (m.mon)
+    for (const a of abilitiesOf(m.mon.spec.type))
+      if (a.id === 'reflect') share = Math.max(share, a.amount ?? 0);
+  return share;
+}
+
+/** A flask loses charges to a thief: the one that is fullest, by the share of its maximum. */
+function takeFlaskCharges(w: World, m: Actor, share: number): number {
+  let best: (typeof w.flasks)[number] | null = null;
+  for (const f of w.flasks)
+    if (
+      f.charges > 0 &&
+      (!best || f.charges / f.spec.maxCharges > best.charges / best.spec.maxCharges)
+    )
+      best = f;
+  if (!best) return 0;
+  const take = Math.min(best.charges, best.spec.maxCharges * share);
+  best.charges -= take;
+  m.stolen += take;
+  m.stolenFlask = best.spec.uid;
+  return take;
+}
+
+/** What a monster's hit does to the player besides damage: steal charges (a Cutpurse, the Flask-taker mod), hobble. */
+function onMonsterHitPlayer(w: World, src: Actor): void {
+  const steal = abilitiesOf(src.mon!.spec.type).find((a) => a.id === 'steal');
+  if (steal || src.modIds.includes('flaskTaker') || src.modIds.includes('treasurer')) {
+    const got = takeFlaskCharges(w, src, steal?.amount ?? 0.2);
+    // A thief runs with what it took.
+    if (steal && got > 0) src.fleeT = 5;
+  }
+  const p = w.player;
+  if (src.modIds.includes('hobbling') && !p.def.cannotBeChilled) {
+    p.ail.chill = Math.max(p.ail.chill, 0.3);
+    p.ail.chillT = Math.max(p.ail.chillT, 2);
+  }
 }
 
 /** Remember damage the player took, for the death recap. */
@@ -675,6 +714,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   tickHexes(a, dt);
   if (a.curlT > 0) a.curlT -= dt;
   if (a.buffT > 0) a.buffT -= dt;
+  if (a.suppressT > 0) a.suppressT -= dt;
   if (a.zealT > 0) a.zealT -= dt;
   if (a.hexCd > 0) a.hexCd -= dt;
   // A beetle counts down the wait before it can curl up again (nothing else uses its faction timer).
@@ -751,13 +791,14 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     applyDamage(w, a, dmg);
     if (!a.alive) return;
   }
-  // Regeneration.
+  // Regeneration (a Bursar or the Treasurer near the player stops it, with leech and the recharge of energy shield).
   const cap = lifeCap(w, a);
-  if (def.lifeRegen > 0) {
+  const suppressed = a.suppressT > 0;
+  if (!suppressed && def.lifeRegen > 0) {
     if (def.regenToEs) a.es = Math.min(def.maxEs, a.es + def.lifeRegen * dt);
     else a.life = Math.min(cap, a.life + def.lifeRegen * dt);
   }
-  if (a.isPlayer) {
+  if (a.isPlayer && !suppressed) {
     const manaCap = Math.max(0, def.maxMana - w.char.reservedMana);
     a.mana = Math.min(manaCap, a.mana + def.manaRegen * dt);
     leechTick(
@@ -769,6 +810,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       def.leechRate,
     );
   }
+  if (suppressed) return;
   if (def.leechToEs)
     leechTick(
       a.leechLife,

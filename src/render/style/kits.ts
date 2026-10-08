@@ -50,6 +50,8 @@ const ADJUST: Partial<Record<MonsterTypeId, KitAdjust>> = {
   hag: { hunch: 3 },
   flagellant: { scale: 0.95 },
   censer: { scale: 1.05 },
+  cutpurse: { scale: 0.92, hunch: 2 },
+  guard: { scale: 1.05 },
   choirmaster: { scale: 1.12 },
 };
 
@@ -112,6 +114,25 @@ export function kitBack(type: MonsterTypeId | undefined, a: Anchors): Prim[] {
       break;
     case 'wisp':
       circ(o, a.hipX, a.shY + 4, 9, 'glow');
+      break;
+    case 'cutpurse':
+      // A short cloak.
+      tri(o, [a.shX - 6, a.shY, a.shX + 4, a.shY, a.hipX - 6, a.hipY + 6], 'clothShade');
+      break;
+    case 'guard':
+      // A gilded tabard.
+      box(o, a.shX - 1, (a.shY + a.hipY) / 2, 9, a.hipY - a.shY, 0, 'accent');
+      break;
+    case 'bursar':
+      tri(
+        o,
+        [a.shX - 7, a.shY + 1, a.shX + 7, a.shY + 1, a.hipX, a.hipY + a.legLen * 1.9],
+        'cloth',
+      );
+      break;
+    case 'handler':
+      // A heavy coat.
+      box(o, a.shX - 1, (a.shY + a.hipY) / 2 + 2, 11, a.hipY - a.shY + 4, 0, 'clothShade');
       break;
     case 'brute':
       break;
@@ -199,6 +220,45 @@ export function kitFront(type: MonsterTypeId | undefined, a: Anchors): Prim[] {
     case 'wisp':
       circ(o, hx, hy, r * 0.9, 'glow');
       circ(o, hx + 2, hy - 0.4, 1.3, 'eye');
+      break;
+    case 'cutpurse':
+      // A hood pulled low, a knife in the other hand and a fat purse at the belt.
+      tri(
+        o,
+        [hx - r * 1.2, hy + r * 0.8, hx - 1, hy - r * 1.7, hx + r * 1.2, hy + r * 0.8],
+        'clothShade',
+      );
+      circ(o, hx + 2.4, hy + 0.4, 1.1, 'eye');
+      circ(o, a.hipX + 4, a.hipY + 1, 3, 'accent');
+      cap(o, a.hipX + 4, a.hipY - 2, a.hipX + 4, a.hipY - 3.5, 0.6, 'dark');
+      break;
+    case 'guard':
+      // A gilded helm with a crest, and a coin on the chest.
+      box(o, hx, hy - r * 0.55, r * 2.2, 3.6, 0, 'metalShade');
+      box(o, hx, hy - r * 1.1, 2.4, r * 1.6, 0, 'accent');
+      circ(o, a.shX, a.shY + 8, 2.6, 'accent');
+      break;
+    case 'bursar':
+      // Round spectacles, a flat cap and a ledger.
+      circ(o, hx + 0.2, hy - 0.4, 2.6, 'metal');
+      circ(o, hx + 0.2, hy - 0.4, 1.6, 'dark');
+      box(o, hx, hy - r * 0.95, r * 2.2, 2.6, 0, 'clothShade');
+      box(o, a.hand.x + 2, a.hand.y, 6.5, 8, 0.2, 'accent');
+      box(o, a.hand.x + 2, a.hand.y, 5, 6.5, 0.2, 'bone');
+      break;
+    case 'handler':
+      // A wide hat, and a coiled lead over the shoulder.
+      box(o, hx, hy - r * 0.8, r * 3, 1.8, 0, 'wood');
+      box(o, hx, hy - r * 1.3, r * 1.6, r * 1.2, 0, 'wood');
+      circ(o, a.shX + 5, a.shY + 4, 3.4, 'accent');
+      circ(o, a.shX + 5, a.shY + 4, 2, 'dark');
+      break;
+    case 'slinger':
+      // A flat cap, a sling and a pouch of stones.
+      box(o, hx, hy - r * 0.9, r * 2.4, 2.4, 0, 'clothShade');
+      cap(o, a.hand.x, a.hand.y, a.hand.x - 4, a.hand.y + 7, 0.4, 'wood');
+      circ(o, a.hand.x - 4, a.hand.y + 8, 1.8, 'accent');
+      circ(o, a.hipX - 4, a.hipY, 2.6, 'accent');
       break;
     case 'wight':
       // A hooded head and a hanging lantern.

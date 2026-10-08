@@ -73,6 +73,14 @@ export const TYPE_WEIGHTS: Record<MonsterTypeId, number> = {
   censer: 25,
   flagellant: 30,
   choirmaster: 15,
+  hound: 45,
+  boar: 30,
+  handler: 12,
+  cat: 12,
+  cutpurse: 20,
+  guard: 35,
+  bursar: 12,
+  slinger: 25,
 };
 
 /** The share of every type on a theme's maps (sum 1): its factions, then the types within each. */

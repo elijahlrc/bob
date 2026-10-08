@@ -32,10 +32,21 @@ export type MonsterTypeId =
   | 'sentinel'
   | 'arbalest'
   | 'golem'
-  | 'pylon';
+  | 'pylon'
+  // The Kennel (docs/ENEMIES.md 7.4)
+  | 'hound'
+  | 'boar'
+  | 'handler'
+  | 'cat'
+  // The Gilded
+  | 'cutpurse'
+  | 'guard'
+  | 'bursar'
+  | 'slinger';
 
 /** The monster families (EXPANSION 7.3). The Choir, the Swarm and the Reliquary join in later milestones. */
-export type FactionId = 'ossuary' | 'rot' | 'hollow' | 'choir' | 'swarm' | 'reliquary';
+export type FactionId =
+  'ossuary' | 'rot' | 'hollow' | 'choir' | 'swarm' | 'reliquary' | 'kennel' | 'gilded';
 
 export const FACTION_NAMES: Record<FactionId, string> = {
   ossuary: 'Ossuary',
@@ -44,6 +55,8 @@ export const FACTION_NAMES: Record<FactionId, string> = {
   choir: 'the Ashen Choir',
   swarm: 'the Swarm',
   reliquary: 'the Reliquary',
+  kennel: 'the Kennel',
+  gilded: 'the Gilded',
 };
 
 /** The body a type is drawn with (humanoid factions reuse the figure rig with a new palette). */
@@ -59,7 +72,10 @@ export type BodyKind =
   | 'sentinel'
   | 'arbalest'
   | 'golem'
-  | 'pylon';
+  | 'pylon'
+  | 'hound'
+  | 'boar'
+  | 'cat';
 
 /**
  * What a type is for in a pack (docs/ENEMIES.md 4.2): `front` holds the line, `ranged` shoots from behind it, `support` heals,
@@ -483,6 +499,135 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     radius: 0.5,
     mods: [mod('armour', 'inc', 200)],
   },
+  hound: {
+    id: 'hound',
+    role: 'swarm',
+    name: 'Kennel Hound',
+    faction: 'kennel',
+    body: 'hound',
+    innate: true,
+    lifeMult: 0.45,
+    dmgMult: 0.6,
+    range: 1.0,
+    attack: 'melee',
+    speed: 3.6,
+    attackTime: 1.0,
+    radius: 0.35,
+    mods: [],
+  },
+  boar: {
+    id: 'boar',
+    role: 'front',
+    name: 'Rend-boar',
+    faction: 'kennel',
+    body: 'boar',
+    innate: true,
+    lifeMult: 1.5,
+    dmgMult: 1.0,
+    range: 1.3,
+    attack: 'melee',
+    speed: 2.4,
+    attackTime: 1.6,
+    radius: 0.6,
+    // The tusks stagger.
+    mods: [mod('stunDamage', 'inc', 150)],
+  },
+  handler: {
+    id: 'handler',
+    role: 'support',
+    name: 'Kennel Handler',
+    faction: 'kennel',
+    body: 'archer',
+    innate: true,
+    lifeMult: 0.8,
+    dmgMult: 0.5,
+    range: 6,
+    attack: 'projectile',
+    speed: 3.0,
+    attackTime: 1.5,
+    radius: 0.4,
+    mods: [],
+  },
+  cat: {
+    id: 'cat',
+    role: 'special',
+    name: 'Stalker Cat',
+    faction: 'kennel',
+    body: 'cat',
+    innate: true,
+    lifeMult: 0.8,
+    dmgMult: 1.4,
+    range: 1.2,
+    attack: 'melee',
+    speed: 3.8,
+    attackTime: 1.1,
+    radius: 0.4,
+    mods: [],
+  },
+  cutpurse: {
+    id: 'cutpurse',
+    role: 'special',
+    name: 'Cutpurse',
+    faction: 'gilded',
+    body: 'warrior',
+    innate: true,
+    lifeMult: 0.7,
+    dmgMult: 0.5,
+    range: 1.1,
+    attack: 'melee',
+    speed: 3.8,
+    attackTime: 1.0,
+    radius: 0.4,
+    mods: [mod('evasion', 'inc', 60)],
+  },
+  guard: {
+    id: 'guard',
+    role: 'front',
+    name: 'Gilded Guard',
+    faction: 'gilded',
+    body: 'brute',
+    innate: true,
+    lifeMult: 1.8,
+    dmgMult: 1.1,
+    range: 1.4,
+    attack: 'melee',
+    speed: 2.2,
+    attackTime: 1.7,
+    radius: 0.55,
+    mods: [mod('armour', 'inc', 60)],
+  },
+  bursar: {
+    id: 'bursar',
+    role: 'support',
+    name: 'Bursar',
+    faction: 'gilded',
+    body: 'mage',
+    innate: true,
+    lifeMult: 1.1,
+    dmgMult: 0.45,
+    range: 6,
+    attack: 'spell',
+    speed: 2.6,
+    attackTime: 1.6,
+    radius: 0.4,
+    mods: [],
+  },
+  slinger: {
+    id: 'slinger',
+    role: 'ranged',
+    name: 'Gilt Slinger',
+    faction: 'gilded',
+    body: 'archer',
+    innate: true,
+    lifeMult: 0.7,
+    dmgMult: 0.9,
+    range: 7,
+    attack: 'projectile',
+    speed: 3.2,
+    attackTime: 1.3,
+    radius: 0.4,
+    mods: [],
+  },
   wight: {
     id: 'wight',
     role: 'support',
@@ -594,6 +739,12 @@ export type MonsterModId =
   | 'gnawingQueen'
   | 'reliquarian'
   | 'boneWarden'
+  | 'huntsmaster'
+  | 'treasurer'
+  // New counterplay mods (docs/ENEMIES.md 7.2)
+  | 'charging'
+  | 'flaskTaker'
+  | 'hobbling'
   | 'brood'
   // The Choir's faction mod, and the hex mods (EXPANSION 7.2).
   | 'zealous'
@@ -775,6 +926,12 @@ MONSTER_MODS.push(
   { id: 'gnawingQueen', name: 'The Gnawing Queen', magic: false, chief: true, mods: [] },
   { id: 'reliquarian', name: 'The Reliquarian', magic: false, chief: true, mods: [] },
   { id: 'boneWarden', name: 'The Bone Warden', magic: false, chief: true, mods: [] },
+  { id: 'huntsmaster', name: 'The Huntsmaster', magic: false, chief: true, mods: [] },
+  { id: 'treasurer', name: 'The Treasurer', magic: false, chief: true, mods: [] },
+  // Counterplay mods: a rush that punishes kiting, a thief of flask charges, a hobbling touch.
+  { id: 'charging', name: 'Charging', magic: true, minLevel: 12, mods: [] },
+  { id: 'flaskTaker', name: 'Flask-taker', magic: true, minLevel: 20, mods: [] },
+  { id: 'hobbling', name: 'Hobbling', magic: true, minLevel: 15, mods: [] },
 );
 MONSTER_MODS.push({
   id: 'brood',

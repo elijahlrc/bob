@@ -42,6 +42,10 @@ export type FigureKind =
   | 'arbalest'
   | 'golem'
   | 'pylon'
+  // The Kennel: beasts on four legs.
+  | 'hound'
+  | 'boar'
+  | 'cat'
   | 'hero_mace'
   | 'hero_sword'
   | 'hero_bow'
@@ -242,6 +246,9 @@ const BUILDS: Record<FigureKind, Build> = {
   arbalest: { scale: 1.1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   golem: { scale: 1.4, legLen: 8, torsoH: 14, shoulder: 10, skull: 6, ribW: 8 },
   pylon: { scale: 1.2, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  hound: { scale: 1.2, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  boar: { scale: 1.25, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  cat: { scale: 1.25, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   hero_mace: { scale: 1.05, legLen: 9, torsoH: 14, shoulder: 8, skull: 5.5, ribW: 7 },
   hero_sword: { scale: 1, legLen: 9, torsoH: 14, shoulder: 7, skull: 5.5, ribW: 6.5 },
   hero_bow: { scale: 1, legLen: 9.5, torsoH: 13, shoulder: 6, skull: 5.5, ribW: 5.5 },
@@ -344,6 +351,9 @@ const CREATURES = new Set<FigureKind>([
   'arbalest',
   'golem',
   'pylon',
+  'hound',
+  'boar',
+  'cat',
 ]);
 
 /**
@@ -375,6 +385,91 @@ function buildCreature(kind: FigureKind, pose: Pose): Prim[] {
       });
       circ(b, 7, -8.3 + lift, 0.8, 'eye');
       circ(b, 4.6, -10.3 + lift, 1.4, 'bone');
+      break;
+    }
+    case 'hound': {
+      // A lean dog: four long legs, a deep chest, a pointed muzzle and a collar.
+      for (const [x, ph] of [
+        [-6, pose.legB],
+        [-2, pose.legA],
+        [4, pose.legB],
+        [8, pose.legA],
+      ] as const)
+        cap(b, x, -6 + lift, x + ph * 4, 0, 1.1, 'boneShade');
+      cap(b, -7, -9 + lift, 5, -9 + lift, 3.6, 'bone');
+      circ(b, -6, -10 + lift, 4.4, 'bone');
+      circ(b, 4, -10 + lift, 4.4, 'boneShade');
+      cap(b, 5, -11 + lift, 9, -13 + lift, 2.2, 'bone');
+      circ(b, 11, -13 + lift + pose.head * 2, 3.2, 'bone');
+      box(b, 14.5, -12.4 + lift, 4, 2.4, 0, 'boneShade');
+      b.prims.push({
+        k: 'tri',
+        pts: [9.5, -15.6 + lift, 10.5, -19 + lift, 12, -15.8 + lift],
+        role: 'boneShade',
+      });
+      circ(b, 12.4, -14 + lift, 0.8, 'eye');
+      cap(b, 6, -11 + lift, 8.5, -12.5 + lift, 1, 'accent');
+      cap(b, -10, -10 + lift, -14, -13 + lift - pose.legA * 2, 1, 'boneShade');
+      break;
+    }
+    case 'boar': {
+      // A heavy hog: a hump of shoulders, short thick legs, tusks and a ridge of bristles.
+      for (const [x, ph] of [
+        [-7, pose.legB],
+        [-3, pose.legA],
+        [4, pose.legB],
+        [8, pose.legA],
+      ] as const)
+        cap(b, x, -6 + lift, x + ph * 2.5, 0, 1.8, 'boneShade');
+      circ(b, 0, -11 + lift, 8.5, 'bone');
+      circ(b, -4, -13 + lift, 7, 'boneShade');
+      for (let i = 0; i < 4; i++)
+        b.prims.push({
+          k: 'tri',
+          pts: [-8 + i * 3.5, -18 + lift, -6.5 + i * 3.5, -23 + lift, -5 + i * 3.5, -18 + lift],
+          role: 'dark',
+        });
+      circ(b, 9, -9 + lift + pose.head * 2, 5, 'bone');
+      box(b, 14, -7.5 + lift, 5, 4, 0, 'boneShade');
+      b.prims.push({
+        k: 'tri',
+        pts: [12, -6 + lift, 17.5, -10 + lift, 13.5, -7.5 + lift],
+        role: 'metal',
+      });
+      b.prims.push({
+        k: 'tri',
+        pts: [7, -13.5 + lift, 8.5, -17 + lift, 10, -13 + lift],
+        role: 'boneShade',
+      });
+      circ(b, 10.5, -10.5 + lift, 0.9, 'eye');
+      break;
+    }
+    case 'cat': {
+      // A sleek, low cat: a long body, a long tail, tufted ears and stripes.
+      for (const [x, ph] of [
+        [-6, pose.legB],
+        [-2, pose.legA],
+        [4, pose.legB],
+        [7, pose.legA],
+      ] as const)
+        cap(b, x, -6 + lift, x + ph * 3.5, 0, 1, 'boneShade');
+      cap(b, -7, -9 + lift, 6, -9 + lift, 3.2, 'bone');
+      for (const x of [-4, -1, 2]) box(b, x, -11.4 + lift, 1.2, 3, 0.2, 'boneShade');
+      circ(b, 10, -11 + lift + pose.head * 2, 3.2, 'bone');
+      box(b, 13, -10 + lift, 2.5, 2, 0, 'boneShade');
+      b.prims.push({
+        k: 'tri',
+        pts: [8, -13.4 + lift, 8.6, -17 + lift, 10.4, -13.8 + lift],
+        role: 'boneShade',
+      });
+      b.prims.push({
+        k: 'tri',
+        pts: [10.6, -13.8 + lift, 12.4, -17 + lift, 12.8, -13 + lift],
+        role: 'boneShade',
+      });
+      circ(b, 11.4, -11.6 + lift, 0.8, 'eye');
+      cap(b, -9, -9 + lift, -14, -13 + lift, 1, 'bone');
+      cap(b, -14, -13 + lift, -16, -19 + lift - pose.legA * 2, 1, 'boneShade');
       break;
     }
     case 'bat': {

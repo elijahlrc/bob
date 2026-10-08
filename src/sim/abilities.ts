@@ -23,6 +23,80 @@ type Ctx = {
   i: number;
 };
 
+/** Tiles a second of a leap and of a charge. */
+const LEAP_SPEED = 15;
+const CHARGE_SPEED = 10;
+/** A charge runs on this far past the place it was aimed at. */
+const CHARGE_OVERSHOOT = 3;
+
+/** Run a leap or a charge: cooldown, then a warning on the ground, then the rush itself. */
+function dashing({ w, m, dt, d, ab, i }: Ctx, kind: 'leap' | 'charge'): void {
+  const p = w.player;
+  if (m.dashT > 0) {
+    advanceDash(w, m, dt);
+    return;
+  }
+  if (m.windT > 0) {
+    m.windT -= dt;
+    if (m.windT <= 0) beginDash(m, kind);
+    return;
+  }
+  m.abT[i] = (m.abT[i] ?? w.rngAi.float(0.5, ab.interval!)) - dt;
+  if (m.abT[i] > 0) return;
+  if (d < (kind === 'leap' ? 2.5 : 3) || d > ab.range! || !w.grid.los(m.x, m.y, p.x, p.y)) return;
+  if (m.action || m.stunT > 0) return;
+  m.abT[i] = ab.interval!;
+  m.windT = ab.telegraph!;
+  // The place it is aiming at is marked on the ground for the whole warning.
+  m.dashX = p.x;
+  m.dashY = p.y;
+  w.effects.push({
+    id: w.nextId++,
+    x: p.x,
+    y: p.y,
+    radius: kind === 'leap' ? 1 : 0.8,
+    t: ab.telegraph!,
+    total: ab.telegraph!,
+    kind: 'slam',
+    damage: 0,
+    dtype: 0,
+    faction: 1,
+  });
+}
+
+function beginDash(m: Actor, kind: 'leap' | 'charge'): void {
+  const dx = m.dashX - m.x;
+  const dy = m.dashY - m.y;
+  const len = Math.max(0.01, Math.hypot(dx, dy));
+  const dist = kind === 'charge' ? len + CHARGE_OVERSHOOT : len;
+  m.dashV = kind === 'charge' ? CHARGE_SPEED : LEAP_SPEED;
+  m.dashT = dist / m.dashV;
+  m.dashX = m.x + (dx / len) * dist;
+  m.dashY = m.y + (dy / len) * dist;
+}
+
+function advanceDash(w: World, m: Actor, dt: number): void {
+  const dx = m.dashX - m.x;
+  const dy = m.dashY - m.y;
+  const len = Math.hypot(dx, dy);
+  const move = Math.min(len, m.dashV * dt);
+  const to = w.grid.collide(
+    m.x + (dx / Math.max(len, 1e-6)) * move,
+    m.y + (dy / Math.max(len, 1e-6)) * move,
+    m.r,
+  );
+  const moved = Math.hypot(to.x - m.x, to.y - m.y);
+  m.x = to.x;
+  m.y = to.y;
+  m.moving = true;
+  m.dashT -= dt;
+  // It stops at a wall, when it has run its length, or when it has reached the character.
+  const p = w.player;
+  const reach = (m.mon?.range ?? 1) + p.r + m.r;
+  if (moved < move * 0.3 || len - move < 0.05 || Math.hypot(p.x - m.x, p.y - m.y) <= reach)
+    m.dashT = 0;
+}
+
 const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
   raiseCorpses({ w, m, dt, d, ab }) {
     m.skillT -= dt;
@@ -123,6 +197,18 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
       else m.skillT = 1;
     }
   },
+  leap: (c) => dashing(c, 'leap'),
+  charge: (c) => dashing(c, 'charge'),
+  whistle({ w, m, dt, d, ab, i }) {
+    m.abT[i] = (m.abT[i] ?? w.rngAi.float(1, ab.interval!)) - dt;
+    if (m.abT[i] > 0 || d > 14) return;
+    m.abT[i] = ab.interval!;
+    for (const o of w.actors)
+      if (!o.isPlayer && o.alive && Math.hypot(o.x - m.x, o.y - m.y) <= ab.range!) o.buffT = 4;
+  },
+  suppress({ w, d, ab }) {
+    if (d <= ab.range!) w.player.suppressT = 0.25;
+  },
   shell({ w, m, ab }) {
     for (const o of w.actors) {
       if (o.isPlayer || !o.alive || o === m || o.mon?.spec.type === m.mon?.spec.type) continue;
@@ -132,6 +218,24 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
     }
   },
 };
+
+/** The ids of the active abilities that have code (a test checks that every one a type lists is here). */
+export const IMPLEMENTED_ABILITIES = Object.keys(ACTIVE);
+
+/** The Charging mod (docs/ENEMIES.md 7.2): any monster that has it rushes like a boar. */
+export const CHARGING_MOD: AbilityDef = { id: 'charge', interval: 8, range: 9, telegraph: 0.6 };
+export function tickChargingMod(w: World, m: Actor, dt: number): void {
+  const p = w.player;
+  ACTIVE.charge?.({
+    w,
+    m,
+    dt,
+    d: Math.hypot(p.x - m.x, p.y - m.y),
+    ab: CHARGING_MOD,
+    // A slot of its own, past the abilities of any type.
+    i: 9,
+  });
+}
 
 /** Run every active ability of a chasing monster for one tick. */
 export function tickAbilities(w: World, m: Actor, dt: number): void {
