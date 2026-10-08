@@ -108,6 +108,34 @@ export function transferGems(
   return { next: { ...newItem, sockets: nextSockets }, prev: { ...oldItem, sockets: prevSockets } };
 }
 
+/**
+ * An item that is no longer worn goes to the inventory bare: its gems go beside it, as gems of their own. A gem left
+ * inside a carried item cannot be socketed anywhere and is thrown away with the item (salvage, discard, clean-up), so no
+ * path may leave one there.
+ */
+function stash(run: RunState, item: Item): void {
+  const gems = item.sockets.filter((g): g is GemItem => g !== null);
+  run.inventory.push(
+    gems.length ? { ...item, sockets: item.sockets.map(() => null) } : item,
+    ...gems,
+  );
+}
+
+/** Take the gems out of every carried item (a save from before `stash`, or any path that missed it). Returns how many. */
+export function releaseStrandedGems(run: RunState): number {
+  let n = 0;
+  const out: InventoryItem[] = [];
+  for (const it of run.inventory) {
+    if (it.kind === 'item' && it.sockets.some(Boolean)) {
+      const gems = it.sockets.filter((g): g is GemItem => g !== null);
+      n += gems.length;
+      out.push({ ...it, sockets: it.sockets.map(() => null) }, ...gems);
+    } else out.push(it);
+  }
+  if (n > 0) run.inventory = out;
+  return n;
+}
+
 /** The build with `item` placed in `slot` (gems carried over), for compare deltas. */
 export function withEquipped(build: Build, item: Item, slot: EquipSlot): Build {
   const { next } = transferGems(build.equipment[slot], item);
@@ -129,14 +157,15 @@ export function equip(run: RunState, uid: number, slot: EquipSlot): EquipCheck {
   take(run, uid);
   const eq = { ...run.build.equipment };
   const { next, prev } = transferGems(eq[slot], item);
-  if (prev) run.inventory.push(prev);
+  // Gems that did not fit in the new item come out of the old one.
+  if (prev) stash(run, prev);
   eq[slot] = next;
   // Two-handers clear an incompatible off hand.
   const base = itemBase(item.baseId);
   if (slot === 'mainHand' && base.hands === 2 && eq.offHand) {
     const ob = itemBase(eq.offHand.baseId);
     if (!(base.itemClass === 'bow' && ob.itemClass === 'quiver')) {
-      run.inventory.push(eq.offHand);
+      stash(run, eq.offHand);
       delete eq.offHand;
     }
   }
@@ -146,24 +175,39 @@ export function equip(run: RunState, uid: number, slot: EquipSlot): EquipCheck {
     eq.offHand &&
     itemBase(eq.offHand.baseId).itemClass === 'quiver'
   ) {
-    run.inventory.push(eq.offHand);
+    stash(run, eq.offHand);
     delete eq.offHand;
   }
   run.build = { ...run.build, equipment: eq };
+  dropLostPrimary(run);
   return { ok: true };
+}
+
+/** The primary skill gem is none any more once the gem is not in a socket. */
+function dropLostPrimary(run: RunState): void {
+  const p = run.build.primaryGem;
+  if (p === undefined) return;
+  const worn = Object.values(run.build.equipment).some((it) =>
+    it.sockets.some((g) => g?.uid === p),
+  );
+  if (!worn) run.build = { ...run.build, primaryGem: undefined };
 }
 
 export function unequip(run: RunState, slot: EquipSlot): void {
   const eq = { ...run.build.equipment };
   const old = eq[slot];
   if (!old) return;
-  run.inventory.push(old);
+  stash(run, old);
   delete eq[slot];
   run.build = { ...run.build, equipment: eq };
+  dropLostPrimary(run);
 }
 
+/** Throw an item away. A gem it holds is not thrown away with it: it stays in the inventory. */
 export function discard(run: RunState, uid: number): void {
-  take(run, uid);
+  const it = take(run, uid);
+  if (it?.kind === 'item')
+    run.inventory.push(...it.sockets.filter((g): g is GemItem => g !== null));
 }
 
 /** Put an inventory gem into a socket (the previous gem returns to the inventory). */

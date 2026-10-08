@@ -1,4 +1,5 @@
 import { stampAll } from './found';
+import { releaseStrandedGems } from './inventory';
 import { LEGACY } from '../data/difficulty';
 import { SAVE_VERSION, type RunState } from './run';
 
@@ -26,6 +27,8 @@ export function loadRun(store: KeyValueStore): LoadResult {
     const data = JSON.parse(raw) as { version?: number; run?: RunState };
     if (data.version === undefined || !data.run) return { status: 'incompatible' };
     const run = migrate(data.version, data.run);
+    // A gem left inside a carried item (an older save) is set free: it would be lost with the item.
+    if (run) releaseStrandedGems(run);
     return run ? { status: 'ok', run } : { status: 'incompatible' };
   } catch {
     return { status: 'incompatible' };

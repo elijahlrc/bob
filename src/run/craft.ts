@@ -477,8 +477,11 @@ export function salvageValue(it: InventoryItem): number {
 export function salvage(run: RunState, uid: number): CraftResult {
   const i = run.inventory.findIndex((x) => x.uid === uid);
   if (i < 0) return fail('Only carried items can be salvaged');
-  run.dust += salvageValue(run.inventory[i]);
+  const it = run.inventory[i];
+  run.dust += salvageValue(it);
   run.inventory.splice(i, 1);
+  // A gem inside the item is not salvaged with it.
+  if (it.kind === 'item') for (const g of it.sockets) if (g) run.inventory.push(g);
   return OK;
 }
 
