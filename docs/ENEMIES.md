@@ -274,6 +274,9 @@ beside the map's predicted mix. A death that followed the card's warning says so
 
 ### 6.1 Silhouettes: kits on the humanoid rig
 
+_Reopened by [ROSTER.md](ROSTER.md) (built 2026-10-08): "the body stays the skeleton" did not hold. Only the Ossuary is drawn
+on the skeleton now; everyone else is flesh, a spectre or a creature rig. The rest of this section is as it was built._
+
 `BodyKind` stays the posed skeleton of limbs (it carries the gait and the attack poses). A type adds a **kit**: a list of
 extra primitives attached to named body anchors (`head`, `shoulderL/R`, `back`, `handR/L`, `waist`) from the shapes the rig
 already draws (circles, capsules, boxes, triangles).
@@ -693,9 +696,8 @@ twentieth): nothing to trim.
 
 ### 14.4 Left for later
 
-- The Drowned, the Emberborn and the Veiled of section 7.4 are not built. The ability layer needs only `pull` (declared in
-  `data/abilities.ts`, not coded) for the first.
-- Per-type gaits, and two of the new mods of 7.2 (Mirrored, Warding Pulse).
+- The Drowned and the Emberborn of section 7.4 are built (ROSTER.md V8 and V9); the Veiled is not. Per-type gaits, the
+  Mirrored and Warding Pulse mods are built too (ROSTER.md V1, V2, V6).
 - Variance is 0.1 by default; its effect was too small to see in the bot's results. A larger default would make Gentle and
   Fierce maps more of a choice.
 - The Mystic dies early more often than the other classes at the new baseline (the bot spends a caster's points poorly in the

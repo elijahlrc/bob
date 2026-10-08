@@ -183,11 +183,11 @@ describe('senses and targets (docs/ROSTER.md 6.4)', () => {
   it('a pack wakes to the radius its type sets', () => {
     const w = arena();
     const gnawer = put(w, 'gnawer', 9, 0, false);
-    const sleeper = put(w, 'gnawer', 9, 11, false);
+    const sleeper = put(w, 'gnawer', 9, 8.5, false);
     const warrior = put(w, 'warrior', 14, 0.5, false);
     run(w, 0.6);
     expect(gnawer.state).toBe('chase');
-    // A Gnawer wakes the sleepers within twelve tiles, further than most.
+    // A Gnawer wakes the sleepers within nine tiles, further than most.
     expect(sleeper.state).toBe('chase');
     expect(warrior.state).toBe('chase');
   });

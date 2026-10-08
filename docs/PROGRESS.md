@@ -797,3 +797,17 @@ shaped by kind, with emblems on notables and keystones, a tinted wedge per regio
 a colour key. Details and numbers: `docs/TREE.md` "Look and density". `SAVE_VERSION` 10: node ids changed, so older runs get their
 passives back as unspent points. `npm run tree:mix` and `npm run tree:refmix` print the two sets of numbers. Not done: what a
 node grants (small nodes are still copies, attribute nodes +10), icons, a stat search.
+
+### Roster plan (docs/ROSTER.md), built (2026-10-08)
+
+V0 to V10 are built, one commit each. The enemies are no longer skeletons in hats: only the Ossuary is bone, the rest are people
+of flesh, hooded spectres or creature rigs (five new rigs, five more with the new factions), and `npm run sheet` draws every
+type from the game's primitives (`docs/screenshots/roster/before-sheet.svg` and `after-sheet.svg`). Pairs of types of
+different factions above 0.75 outline overlap: 19 of 476 before, 0 of 1,033 after. Monsters attack in shapes (swing, salvo,
+orb, lob, nova, lance, slam) with a warning on the ground that the character's dodge steps out of. Every type is one of sixteen
+archetypes with a defence profile paid for in life (`npm run matrix`), a movement style and senses; some strike in a rhythm and
+have phases; packs flank, keep behind their front and rally. Fourteen new types, and two new factions: the Drowned and the
+Emberborn. The bot sample at the end showed the game had become much harder (2 wins in 72 where there were 14); the causes
+were found in the deaths (a Mirrored twin on gate champions, a heavier Gnawing Queen, early Spitters and Gnawers, the Slag
+Brute) and fixed; section 14 of the plan has the numbers. Two timing floors moved: the forty-Swarm test is 250 times real time
+(it was 400) and the bot test 150 (it was 200); the sim is slower for the new behaviours.

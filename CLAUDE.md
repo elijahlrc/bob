@@ -34,11 +34,13 @@
   are abilities (`src/data/abilities.ts`, `src/sim/abilities.ts`), there are eight factions, and difficulty is a run setting
   (scaling, base, variance; `src/data/difficulty.ts`; default scaling 1.5) with a Debug panel (dev builds or `?debug`).
   `scripts/simpar.sh` runs the bot sim on all cores. Decisions go in DESIGN.md Appendix A.
-- **Roster plan:** [docs/ROSTER.md](docs/ROSTER.md) (milestones V0–V10): a plan only, nothing built. Most humanoid types are still the
-  skeleton rig (22 of 33), every attack is one of three, and a type sets only six numbers (armour, evasion, resistances, senses and
-  movement are the same for all). It proposes body styles (bone only for the Ossuary), non-humanoid rigs, attack shapes with
-  telegraphs, sixteen archetypes, defence profiles with a build matrix, a movement library, senses and targeting, packs that
-  flank, and two new factions (the Drowned, the Emberborn).
+- **Roster plan:** [docs/ROSTER.md](docs/ROSTER.md) (milestones V0–V10): built (section 14 says what, and what changed). Bone is the
+  Ossuary's alone (`BodyStyle`, `src/render/style/bodies.ts`); monsters attack in shapes with warnings on the ground
+  (`src/data/shapes.ts`, `src/sim/telegraph.ts`); every type is an archetype (`src/data/archetypes.ts`) with a defence profile
+  (`src/data/defence.ts`, `src/calc/matrix.ts`: a type's `lifeMult` is its toughness and its life pays for its defences), a
+  movement style and senses (`src/data/movement.ts`, `src/sim/movement.ts`), maybe a rhythm and phases (`src/data/phases.ts`),
+  and packs flank and rally (`src/sim/packs.ts`). There are ten factions and 48 types, including the Drowned and the Emberborn.
+  `npm run sheet` draws every type (the review tool for a body), `npm run matrix` prints the build matrix.
 - **Status:** M0–M7 of DESIGN.md are complete (see `docs/PROGRESS.md`). Further work is the stretch list
   or balance changes. Balance constants live in `src/data/constants.ts`. `npm run sim` (headless bot balance
   report) is useful for checking a balance change but is not required after every one; `--write-xp` regenerates

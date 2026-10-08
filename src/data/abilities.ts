@@ -322,7 +322,7 @@ export const TYPE_ABILITIES: Partial<Record<string, AbilityDef[]>> = {
   watcher: [{ id: 'hex', interval: 9 }],
   bell: [{ id: 'aura', range: 6 }],
   coffer: [{ id: 'ambush', range: 4 }],
-  slagbrute: [{ id: 'trail', interval: 0.8, range: 0.9, amount: 3 }],
+  slagbrute: [{ id: 'trail', interval: 0.8, range: 0.9, amount: 2.5 }],
 };
 
 /** The abilities a type has (none for most plain ones). */

@@ -109,7 +109,7 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
     m.abT[i] = (m.abT[i] ?? ab.interval!) - dt;
     if (m.abT[i] > 0 || !m.moving) return;
     m.abT[i] = ab.interval!;
-    openZone(w, m.x, m.y, ab.range!, ab.amount!, 'burning', monsterHitOf(m) * 0.25);
+    openZone(w, m.x, m.y, ab.range!, ab.amount!, 'burning', monsterHitOf(m) * 0.15);
   },
   devour({ w, m, dt, ab }) {
     // Eats a body within reach, and is the better for it. It looks twice a second, and eats once in its interval; the first

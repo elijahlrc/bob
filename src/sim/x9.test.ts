@@ -324,7 +324,7 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
 
   // Timing test: skipped on CI (shared runners are slower).
   it.skipIf(!!process.env.CI)(
-    'a room of forty Swarm actors keeps the sim above 400x real time',
+    'a room of forty Swarm actors keeps the sim above 250x real time',
     () => {
       const w = arena(true);
       const actors: Actor[] = [];
@@ -338,7 +338,8 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
       const simSeconds = 60;
       run(w, simSeconds);
       const wall = (performance.now() - t0) / 1000;
-      expect(simSeconds / wall).toBeGreaterThan(400);
+      // 400 when the test was written; it moves with how long the Gnawers spend walking (a slower one walks more), so 250, which also leaves room for a full parallel run.
+      expect(simSeconds / wall).toBeGreaterThan(250);
       expect(actors.length).toBe(40);
     },
   );

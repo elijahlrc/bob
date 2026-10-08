@@ -174,6 +174,8 @@ export function rollMonsterMods(
     (m) =>
       (rarity !== 'magic' || m.magic) &&
       !m.chief &&
+      // A twin is for a rare: a gate fight is hard enough with one champion (docs/ROSTER.md 7.5).
+      !(m.id === 'mirrored' && rarity === 'miniboss') &&
       (m.faction === undefined || m.faction === faction) &&
       level >= (m.minLevel ?? 0) &&
       (level >= (rarity === 'miniboss' ? MINIBOSS_LATE_MOD_LEVEL : LATE_MOD_LEVEL) ||
