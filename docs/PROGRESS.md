@@ -692,3 +692,9 @@ Plan: [MAPS.md](MAPS.md). First pass; the plan says to re-evaluate the numbers a
   win rates are low overall (R0: 8 of 18, R1 to R3: 6 of 18, R1 to R5: 1 of 18, R6 strategies: 3 to 6 of 24).
 
 - **Not built:** R7 (Holdout, Collapse, Crawl); the four EXPANSION 7.5 affixes that need new mechanics.
+
+- **Reward weight experiment** (a temporary switch, not kept): the greedy bot with its offer score using the reward at weight 0
+  (survivability only) won 2 of 24 runs and reached a mean median map of 76.4; at weight 0.3, 1 of 24 and 69.3; at the real
+  weight 1, 3 of 24 and 68.4. That points the same way (less weight on reward is no worse) but the differences are inside
+  the noise of 24 runs, so the cause is not settled. The bot's way of judging an offer, not the offers, is the first thing to
+  improve before acceptance 1 can be measured at all.
