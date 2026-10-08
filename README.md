@@ -46,7 +46,7 @@ small-screen work is planned in [docs/MOBILE.md](docs/MOBILE.md).
      Every socket on an item is linked; ★ sets the primary skill.
    - **Character** — the full stat sheet, aura reservations and warnings.
    - A **reward pick** (1 of 3) appears after every 5th map.
-   - Choose the next map (two themes with different bonuses), or leave **Auto-continue** on: when
+   - Choose the next map (three offers with different levels, bonuses and risks), or turn **Auto-continue** on (it is off by default): when
      nothing needs your attention, the next map starts after a short countdown.
 3. In a map the character fights **automatically**. Use the speed buttons (pause, 1×, 2×, 4×, 8×).
 4. Progress is saved when you reach camp. **Continue run** on the title screen resumes it.

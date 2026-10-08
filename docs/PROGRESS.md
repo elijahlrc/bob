@@ -742,3 +742,8 @@ Plan: [MAPS.md](MAPS.md) section 9.2. First pass; the numbers are not tuned.
   orange along the edge. In the browser pane (stepped by hand) the start room and corridor behind the front were dark rubble
   and the rooms ahead kept their flagstones. The rubble is dark against a dark map, so it reads best next to lit floor; a
   brighter edge or a rumble in the camera would make it clearer.
+
+### Auto-continue off by default (2026-10-07)
+
+`newRun` sets `autoContinue: false`; the camp checkbox, the countdown and the pause reasons are unchanged. Saves already in progress
+keep the setting they have. The bot does not use it.

@@ -171,7 +171,7 @@ mana flask.
 - **Refund points:** +1 per cleared map. Refunding a node costs 1 point and only works if the tree stays connected.
 - **Reward pick** (1 of 3): after every 5th map and after every mini-boss.
 - **Next-map choice:** three options (`docs/MAPS.md` section 4), each a map with its own theme, layout and affixes (section 12.6). All three are at the same area level for now; level offsets, Respite and map types follow in that plan.
-- **Auto-continue:** the camp has a toggle, on by default. When on, if there are no unspent passive points, no pending
+- **Auto-continue:** the camp has a toggle, off by default (changed 2026-10-07: with a real choice of map each level, the player starts each one). When on, if there are no unspent passive points, no pending
   reward pick and no new unique or rare item, the next map starts with the first theme after a 2-second countdown the
   player can cancel. This keeps 100 maps from becoming 100 forced menu visits.
 

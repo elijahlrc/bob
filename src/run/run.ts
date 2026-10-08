@@ -121,7 +121,7 @@ export function newRun(classId: string, seed: number): RunState {
     bonusPoints: 0,
     refundPoints: 0,
     offers: rollOffers(seed, 1),
-    autoContinue: true,
+    autoContinue: false,
     phase: 'camp',
     history: [],
     reward: null,
