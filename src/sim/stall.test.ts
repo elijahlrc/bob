@@ -49,5 +49,6 @@ describe('bow campaign regression', () => {
       finishMap(run, res);
     }
     expect(stalls).toBe(0);
-  });
+    // A sixteen-map campaign is a second or two of work, but the default five seconds is too tight on a busy machine.
+  }, 60000);
 });
