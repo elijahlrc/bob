@@ -34,9 +34,11 @@
   are abilities (`src/data/abilities.ts`, `src/sim/abilities.ts`), there are eight factions, and difficulty is a run setting
   (scaling, base, variance; `src/data/difficulty.ts`; default scaling 1.5) with a Debug panel (dev builds or `?debug`).
   `scripts/simpar.sh` runs the bot sim on all cores. Decisions go in DESIGN.md Appendix A.
-- **Roster plan:** [docs/ROSTER.md](docs/ROSTER.md) (milestones V0–V8): a plan only, nothing built. Most humanoid types are still the
-  skeleton rig (22 of 33), and every attack is one of three; it proposes body styles (bone only for the Ossuary), non-humanoid
-  rigs, attack shapes with telegraphs, behaviour reworks and two new factions (the Drowned, the Emberborn).
+- **Roster plan:** [docs/ROSTER.md](docs/ROSTER.md) (milestones V0–V10): a plan only, nothing built. Most humanoid types are still the
+  skeleton rig (22 of 33), every attack is one of three, and a type sets only six numbers (armour, evasion, resistances, senses and
+  movement are the same for all). It proposes body styles (bone only for the Ossuary), non-humanoid rigs, attack shapes with
+  telegraphs, sixteen archetypes, defence profiles with a build matrix, a movement library, senses and targeting, packs that
+  flank, and two new factions (the Drowned, the Emberborn).
 - **Status:** M0–M7 of DESIGN.md are complete (see `docs/PROGRESS.md`). Further work is the stretch list
   or balance changes. Balance constants live in `src/data/constants.ts`. `npm run sim` (headless bot balance
   report) is useful for checking a balance change but is not required after every one; `--write-xp` regenerates
