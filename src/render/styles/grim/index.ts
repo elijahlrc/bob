@@ -15,6 +15,7 @@ import type { MarkTheme } from '../../style/marks';
 import { isHero, type AnimName, type FigureKind } from '../../style/figure';
 import { buildProps, FIG_PX, FRAMES, rasterFigure } from './paint';
 import { DROP_COLOR, dropLabel, dropRarity } from '../../dropLabel';
+import { CollapseFx } from './collapseFx';
 import { SkillFx } from './skillFx';
 import { isoFloors, isoWalls, ISO_H, ISO_W, WALL_LOW, WALL_TALL } from './isoPaint';
 
@@ -99,6 +100,7 @@ export class GrimStyle extends StyleBase {
   private punch = 0;
   private zoom = 3;
   private rng = new Rng(7);
+  private collapse: CollapseFx | null = null;
 
   project(x: number, y: number): { x: number; y: number } {
     return { x: ((x - y) * ISO_W) / 2, y: ((x + y) * ISO_H) / 2 };
@@ -196,6 +198,11 @@ export class GrimStyle extends StyleBase {
       s,
     );
     this.placeProps(world, rng);
+    this.collapse?.destroy();
+    this.collapse =
+      world.plan.type === 'collapse'
+        ? new CollapseFx(this.scene, (x, y) => this.project(x, y), world)
+        : null;
 
     const pl0 = this.project(world.player.x, world.player.y);
     this.playerLight = this.addLight(pl0.x, pl0.y, 320, 0xffb060, 1.5);
@@ -1245,6 +1252,7 @@ export class GrimStyle extends StyleBase {
   // ---- Per-frame -------------------------------------------------------------------------------
   protected frame(world: World, dt: number): void {
     this.byId = new Map(world.actors.map((a) => [a.id, a]));
+    this.collapse?.update(world, dt);
     const cam = this.scene.cameras.main;
     const pp = this.playerPos(world);
     const p = this.project(pp.x, pp.y);
@@ -1320,6 +1328,8 @@ export class GrimStyle extends StyleBase {
     this.floaters = [];
     for (const l of [...this.lightsOwned]) this.dropLight(l);
     this.fx?.destroy();
+    this.collapse?.destroy();
+    this.collapse = null;
     this.torches = [];
     this.temps = [];
     this.bolts = [];

@@ -723,8 +723,8 @@ Plan: [MAPS.md](MAPS.md) section 9.2. First pass; the numbers are not tuned.
   The plan stores the waves (`pop.waves`), so the same map is the same fight.
 - **Collapse** (from map 30, `src/sim/collapse.ts`): no side branches. From 60 s a front moves along the way through the map at
   2.4 tiles a second; a character behind it takes an unavoidable hit named "The Collapse". It is a line along the path, not an
-  actor, so it needs no combat rules. The HUD shows the countdown and the distance ahead of the front. **There is no drawn
-  front in the map view yet.**
+  actor, so it needs no combat rules. The HUD shows the countdown and the distance ahead of the front. The map view
+  draws it (see the entry below).
 - **Crawl** (from map 40, `src/run/play.ts`, the controller): three maps of three rooms, no side branches, the last ending on a
   mini-boss, each with a layout of its own. The character and what it carries (`Vitals`, level, XP) pass from one to the next with
   no camp (the controller starts the next at once; `playOffer` does the same headlessly). They count as one level, pay one
@@ -736,3 +736,9 @@ Plan: [MAPS.md](MAPS.md) section 9.2. First pass; the numbers are not tuned.
   ("Holdout wave 1/8 (0 survived)"). Collapse and Crawl were checked by tests, not in the pane.
 - **Bot** (`npm run sim -- --runs 2 --class all --seed 3`, 12 runs): all complete, no stuck maps; 2 of 12 won. Not measured: how
   often each new type kills, or whether any is dominated, so their pressure numbers (1.25, 1.35, 1.4) and rewards are guesses.
+
+- **Collapse front drawn** (`src/render/styles/grim/collapseFx.ts`): every floor tile the front has passed turns to dark rubble with a few
+  chips and the odd ember, baked a two-tile band at a time into small images as the front crosses it; the tiles about to fall glow
+  orange along the edge. In the browser pane (stepped by hand) the start room and corridor behind the front were dark rubble
+  and the rooms ahead kept their flagstones. The rubble is dark against a dark map, so it reads best next to lit floor; a
+  brighter edge or a rumble in the camera would make it clearer.
