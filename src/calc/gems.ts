@@ -98,6 +98,8 @@ export type SkillDef = {
   bothWeapons?: boolean;
   utility?: UtilityDef;
   travel?: number;
+  /** A monster's attack: the share of the wind-up after which its aim stops following the target (docs/ROSTER.md 5.3). */
+  lockAim?: number;
 };
 
 /** A spell's base damage in one type at a level, from explicit numbers or from the shared curve. */

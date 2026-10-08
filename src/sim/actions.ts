@@ -3,8 +3,8 @@ import { BLOCK_WINDOW, ECHO_GAP, HIT_AT, PROJECTILE_SPEED, SHOT_ALERT } from '..
 import type { SkillProfile } from '../calc/skill';
 import { rollGains } from './buffs';
 import { rollCharges } from './charges';
-import { hit } from './combat';
-import { registerBlast, shieldBlocks, speedMult } from './factions';
+import { hit, monsterHitOf } from './combat';
+import { openZone, registerBlast, shieldBlocks, speedMult } from './factions';
 import { fireTriggers } from './triggers';
 import { placeDeployable } from './deploy';
 import { applyUtility } from './utility';
@@ -86,7 +86,10 @@ export function updateAction(w: World, a: Actor, dt: number): void {
   }
   if (a.ail.freezeT > 0) return;
   const t = actorById(w, act.targetId);
-  if (t && t.alive && !act.fired) {
+  // A monster's area attack stops following its target a way into the wind-up, so the warning on the ground can be left.
+  const lock = act.profile.skill.lockAim;
+  const locked = lock !== undefined && act.elapsed >= lock * act.duration;
+  if (t && t.alive && !act.fired && !locked) {
     act.aimX = t.x;
     act.aimY = t.y;
     a.facing = Math.atan2(t.y - a.y, t.x - a.x);
@@ -314,6 +317,9 @@ export function fire(w: World, a: Actor, act: Action): void {
       if (Math.hypot(e.x - cx, e.y - cy) > radius + e.r) continue;
       hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
     }
+    // A monster's lob leaves a zone where it landed: a ground effect, which the character can see and step out of.
+    if (b.zone && !a.isPlayer)
+      openZone(w, cx, cy, radius, b.zone.seconds, b.zone.kind, monsterHitOf(a) * b.zone.dps);
     return;
   }
   if (b.kind === 'beam') {

@@ -3,6 +3,7 @@ import {
   FACTION_MODS,
   MONSTER_TYPES,
   RARITY_MULTS,
+  type MonsterTypeDef,
   monsterModDef,
   variantMods,
   type MonsterModId,
@@ -64,7 +65,77 @@ export type MonsterStats = {
 export const MONSTER_CONDS = new CondIndex();
 MONSTER_CONDS.bit('onLowLife');
 
+/** A type's skill with its attack shape applied (docs/ROSTER.md 5.1): the behaviour and the aim lock; the mods are `shapeMods`. */
+function withShape(sk: SkillDef, t: MonsterTypeDef): SkillDef {
+  const s = t.shape;
+  if (!s || s.id === 'strike') return sk;
+  const lockAim = s.lock;
+  switch (s.id) {
+    case 'swing':
+      return {
+        ...sk,
+        behaviour: {
+          kind: 'melee',
+          range: t.range,
+          arc: s.arc ?? 120,
+          radius: s.radius ?? t.range + 0.8,
+        },
+        lockAim,
+      };
+    case 'slam':
+      return {
+        ...sk,
+        tags: [...sk.tags, 'slam'],
+        behaviour: { kind: 'burst', radius: s.radius ?? 2, origin: 'target', reach: t.range + 0.5 },
+        lockAim,
+      };
+    case 'lob':
+      return {
+        ...sk,
+        behaviour: {
+          kind: 'burst',
+          radius: s.radius ?? 1.6,
+          origin: 'target',
+          reach: t.range + 0.5,
+          zone: { kind: s.zone ?? 'caustic', seconds: s.seconds ?? 4, dps: s.dps ?? 0.4 },
+        },
+        lockAim,
+      };
+    case 'nova':
+      return {
+        ...sk,
+        tags: [...sk.tags, 'nova'],
+        behaviour: { kind: 'burst', radius: s.radius ?? 2.5, origin: 'self' },
+      };
+    case 'lance':
+      return {
+        ...sk,
+        behaviour: { kind: 'beam', length: s.length ?? 10, width: s.width ?? 1 },
+        lockAim,
+      };
+    case 'salvo':
+    case 'orb':
+      return { ...sk, behaviour: { kind: 'projectile', count: 1, spread: 0, range: t.range + 2 } };
+  }
+}
+
+/** The mods an attack shape adds to a monster's build: a volley fires again, an orb flies slowly. */
+function shapeMods(t: MonsterTypeDef): Mod[] {
+  const s = t.shape;
+  if (!s) return [];
+  if (s.id === 'salvo' || s.id === 'swing')
+    return (s.count ?? 1) > 1 ? [mod('repeats', 'base', Math.min(1, (s.count ?? 1) - 1))] : [];
+  if (s.id === 'orb')
+    return [mod('projectileSpeed', 'inc', -Math.round((1 - (s.speed ?? 0.5)) * 100))];
+  return [];
+}
+
 function monsterSkill(spec: MonsterSpec, dmg: number): SkillDef {
+  const t = MONSTER_TYPES[spec.type];
+  return withShape(monsterBaseSkill(spec, dmg), t);
+}
+
+function monsterBaseSkill(spec: MonsterSpec, dmg: number): SkillDef {
   const t = MONSTER_TYPES[spec.type];
   const base: SkillDef = {
     id: `monster_${t.id}`,
@@ -134,6 +205,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
     mod('moveSpeed', 'base', t.speed),
     mod('critMulti', 'base', MONSTER_CRIT_MULTI - BASE_CRIT_MULTI),
     ...t.mods,
+    ...shapeMods(t),
     ...(FACTION_MODS[t.faction] ?? []),
     ...variantMods(spec.variant, spec.type === 'mage'),
   ];
@@ -151,7 +223,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
   const ctx = { tags: 0, ancestry: 0, conds: 0 };
   const stunThreshMult = spec.rarity === 'boss' ? 4 : spec.rarity === 'miniboss' ? 2 : 1;
   const defence = defenceFromDb(db, ctx, { isPlayer: false, resistPenalty: 0, stunThreshMult });
-  const dmg = monsterHit(sl) * easeDamage(m) * t.dmgMult * r.dmg * share;
+  const dmg = monsterHit(sl) * easeDamage(m) * t.dmgMult * (t.shape?.mult ?? 1) * r.dmg * share;
   const skill = monsterSkill(spec, dmg);
   const hand: HandStats = {
     flats: [

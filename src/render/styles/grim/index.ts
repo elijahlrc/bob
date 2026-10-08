@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { Rng } from '../../../core/rng';
 import { factionOfSpec, leavesBody } from '../../../data/monsters';
+import { telegraphs, type Telegraph } from '../../../sim/telegraph';
 import type {
   Actor,
   Chest,
@@ -37,6 +38,8 @@ function lookOf(a: Actor): MonsterLook | undefined {
     variant: a.mon.spec.variant,
   };
 }
+/** The colour of a monster's warning, by the damage type it will deal (physical, lightning, cold, fire, chaos). */
+const TELEGRAPH_COLOR = [0xe0d0b0, 0xd0b0ff, 0x90d8ff, 0xff9a40, 0xa0e04a];
 /** How lasting ground zones are drawn, by kind. */
 const ZONE_LOOK: Record<string, { fill: number; edge: number }> = {
   caustic: { fill: 0x4a8a1a, edge: 0xa0e04a },
@@ -922,6 +925,66 @@ export class GrimStyle extends StyleBase {
     }
   }
 
+  /** A warning on the ground, in the colour of the damage it will do; it fills as the blow gathers. */
+  private drawTelegraph(g: Phaser.GameObjects.Graphics, t: Telegraph): void {
+    const col = TELEGRAPH_COLOR[t.dtype] ?? 0xe0d0b0;
+    const fill = 0.1 + 0.2 * t.progress;
+    const pt = (x: number, y: number) => {
+      const p = this.project(x, y);
+      return new Phaser.Math.Vector2(p.x, p.y);
+    };
+    if (t.kind === 'ring') {
+      const c = this.project(t.x, t.y);
+      const r = this.rpx(t.radius);
+      const sq = this.squash();
+      g.fillStyle(col, fill).fillEllipse(c.x, c.y, r * 2, r * 2 * sq);
+      g.lineStyle(1.5, col, 0.9).strokeEllipse(c.x, c.y, r * 2, r * 2 * sq);
+      g.lineStyle(1, 0xffffff, 0.8).strokeEllipse(
+        c.x,
+        c.y,
+        r * 2 * t.progress,
+        r * 2 * t.progress * sq,
+      );
+      return;
+    }
+    const outline: Phaser.Math.Vector2[] = [];
+    const inner: Phaser.Math.Vector2[] = [];
+    if (t.kind === 'arc') {
+      const steps = 10;
+      outline.push(pt(t.x, t.y));
+      inner.push(pt(t.x, t.y));
+      for (let i = 0; i <= steps; i++) {
+        const a = t.facing - t.half + (2 * t.half * i) / steps;
+        outline.push(pt(t.x + Math.cos(a) * t.radius, t.y + Math.sin(a) * t.radius));
+        inner.push(
+          pt(t.x + Math.cos(a) * t.radius * t.progress, t.y + Math.sin(a) * t.radius * t.progress),
+        );
+      }
+    } else {
+      const ang = Math.atan2(t.y2 - t.y, t.x2 - t.x);
+      const nx = -Math.sin(ang) * (t.width / 2);
+      const ny = Math.cos(ang) * (t.width / 2);
+      const f = t.progress;
+      const ex = t.x + (t.x2 - t.x) * f;
+      const ey = t.y + (t.y2 - t.y) * f;
+      outline.push(
+        pt(t.x + nx, t.y + ny),
+        pt(t.x2 + nx, t.y2 + ny),
+        pt(t.x2 - nx, t.y2 - ny),
+        pt(t.x - nx, t.y - ny),
+      );
+      inner.push(
+        pt(t.x + nx, t.y + ny),
+        pt(ex + nx, ey + ny),
+        pt(ex - nx, ey - ny),
+        pt(t.x - nx, t.y - ny),
+      );
+    }
+    g.fillStyle(col, fill).fillPoints(outline, true);
+    g.lineStyle(1.5, col, 0.9).strokePoints(outline, true, true);
+    g.fillStyle(col, 0.1 + 0.25 * t.progress).fillPoints(inner, true);
+  }
+
   protected updateGround(effects: GroundEffect[], dt: number, world: World): void {
     const g = this.gfx;
     g.clear();
@@ -933,6 +996,8 @@ export class GrimStyle extends StyleBase {
       if (c.spec.type === 'shambler' && c.age > 1)
         g.fillStyle(0x9fd07a, 0.35 * Math.sin(this.time * 6 + c.id) ** 2).fillEllipse(x, y, 7, 3);
     }
+    // The warnings of monsters' area attacks: a wedge, a ring or a lane that fills as the blow gathers (sim/telegraph.ts).
+    for (const t of telegraphs(world)) this.drawTelegraph(g, t);
     // Zones, deployables, minions, auras and every skill effect (src/render/styles/grim/skillFx.ts).
     // Effects keep the sim's pace: frozen while paused, slow when the game is slowed.
     const adv = world.t - this.lastSimT;

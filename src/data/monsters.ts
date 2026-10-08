@@ -1,4 +1,5 @@
 import { mod, type Element, type Mod } from '../mods/types';
+import type { ShapeSpec } from './shapes';
 
 /** DESIGN.md §12. */
 
@@ -107,6 +108,8 @@ export type MonsterTypeDef = {
   faction: FactionId;
   /** The figure it is drawn with. */
   body: BodyKind;
+  /** How it attacks, when it is not a plain strike (docs/ROSTER.md section 5). */
+  shape?: ShapeSpec;
   /** The pose family of its attack, when it is not the one its body implies (docs/ROSTER.md 4.3). */
   stance?: Stance;
   /** Leaves no body when it dies (a spectre unravels, a flame goes out): nothing for a Hag to raise or a Shambler to rise from. */
@@ -155,6 +158,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     role: 'front',
     faction: 'ossuary',
     body: 'brute',
+    shape: { id: 'swing', arc: 150, radius: 2.4, lock: 0.3 },
     name: 'Skeleton Brute',
     lifeMult: 1.7,
     dmgMult: 1.9,
@@ -170,6 +174,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     role: 'ranged',
     faction: 'ossuary',
     body: 'archer',
+    shape: { id: 'salvo', count: 2, mult: 0.6 },
     name: 'Skeleton Archer',
     lifeMult: 0.7,
     dmgMult: 0.8,
@@ -185,6 +190,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     role: 'ranged',
     faction: 'ossuary',
     body: 'mage',
+    shape: { id: 'orb', speed: 0.5, mult: 1.15 },
     name: 'Skeleton Mage',
     lifeMult: 0.6,
     dmgMult: 1.1,
@@ -249,6 +255,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     name: 'Spitter',
     faction: 'rot',
     body: 'toad',
+    shape: { id: 'lob', radius: 1.6, zone: 'caustic', seconds: 4, dps: 0.35, mult: 0.5, lock: 0.3 },
     stance: 'throw',
     innate: true,
     lifeMult: 0.7,
@@ -266,6 +273,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     name: 'Carrion Hag',
     faction: 'rot',
     body: 'mage',
+    shape: { id: 'lob', radius: 1.8, zone: 'caustic', seconds: 4, dps: 0.5, mult: 0.6, lock: 0.3 },
     innate: true,
     lifeMult: 1.0,
     dmgMult: 0.5,
@@ -298,10 +306,11 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     name: 'Wailer',
     faction: 'hollow',
     body: 'mage',
+    shape: { id: 'nova', radius: 3, mult: 1.1 },
     innate: true,
     lifeMult: 0.7,
     dmgMult: 1.0,
-    range: 7,
+    range: 3,
     attack: 'spell',
     speed: 2.8,
     attackTime: 1.5,
@@ -362,6 +371,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     name: 'Flagellant',
     faction: 'choir',
     body: 'brute',
+    shape: { id: 'swing', arc: 150, radius: 2.6, count: 2, mult: 0.6, lock: 0.3 },
     stance: 'lash',
     innate: true,
     lifeMult: 1.2,
@@ -462,6 +472,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     name: 'Sentinel',
     faction: 'reliquary',
     body: 'sentinel',
+    shape: { id: 'nova', radius: 2.2, mult: 1.3 },
     innate: true,
     lifeMult: 1.4,
     dmgMult: 1.1,
@@ -479,11 +490,12 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     name: 'Arbalest',
     faction: 'reliquary',
     body: 'arbalest',
+    shape: { id: 'lance', length: 12, width: 0.9, mult: 1.6, lock: 0.25 },
     innate: true,
     stationary: true,
     lifeMult: 1.0,
     dmgMult: 0.9,
-    range: 8,
+    range: 10,
     attack: 'projectile',
     speed: 0,
     attackTime: 2.0,
@@ -547,6 +559,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     name: 'Rend-boar',
     faction: 'kennel',
     body: 'boar',
+    shape: { id: 'swing', arc: 100, radius: 1.9, lock: 0.3 },
     innate: true,
     lifeMult: 1.5,
     dmgMult: 1.0,
@@ -645,6 +658,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     name: 'Gilt Slinger',
     faction: 'gilded',
     body: 'archer',
+    shape: { id: 'salvo', count: 2, mult: 0.6 },
     stance: 'throw',
     innate: true,
     lifeMult: 0.7,

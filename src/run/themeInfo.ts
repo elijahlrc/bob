@@ -10,6 +10,7 @@ import {
   type ThreatTag,
 } from '../data/monsterInfo';
 import { ABILITY_INFO, abilitiesOf } from '../data/abilities';
+import { SHAPE_INFO } from '../data/shapes';
 import { THRONG_AFFIX, type MapTypeId } from '../data/mapTypes';
 import type { ThemeDef } from '../data/themes';
 import { typeShares } from '../gen/population';
@@ -61,6 +62,7 @@ export function themeInfo(
     const mine = new Set<ThreatTag>(TYPE_TAGS[id] ?? []);
     for (const ab of abilitiesOf(id))
       if (ABILITY_INFO[ab.id].tag) mine.add(ABILITY_INFO[ab.id].tag!);
+    if (def.shape && SHAPE_INFO[def.shape.id].tag) mine.add(SHAPE_INFO[def.shape.id].tag!);
     for (const tag of mine) tagShare.set(tag, (tagShare.get(tag) ?? 0) + share);
     if (def.role === 'swarm' && !mine.has('swarm'))
       tagShare.set('swarm', (tagShare.get('swarm') ?? 0) + share);

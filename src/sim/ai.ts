@@ -27,8 +27,9 @@ import { bloaterBurst, isZone, speedMult } from './factions';
 import { flaskMask, monsterConds, playerConds } from './combat';
 import { canPay, payCost } from './cost';
 import { deployFull } from './deploy';
+import { inTelegraph, telegraphs } from './telegraph';
 import { chooseUtility } from './utility';
-import type { Actor, GroundEffect, World } from './types';
+import type { Actor, World } from './types';
 
 function canAct(a: Actor): boolean {
   return a.alive && !a.action && a.stunT <= 0 && a.ail.freezeT <= 0;
@@ -180,12 +181,23 @@ function chooseSkill(w: World, target: Actor) {
   };
 }
 
-/** A lasting zone or a blast about to land that covers a point, if any (with a margin in tiles). */
-export function hazardAt(w: World, x: number, y: number, margin = 0): GroundEffect | null {
+/**
+ * A lasting zone, a blast about to land or a monster's area attack winding up that covers a point, if any (with a margin in
+ * tiles). The warnings of docs/ROSTER.md 5.3 (a wedge, a ring, a lane) count as much as a ground effect.
+ */
+export function hazardAt(
+  w: World,
+  x: number,
+  y: number,
+  margin = 0,
+): { x: number; y: number; radius: number } | null {
   for (const e of w.effects) {
     const lands = !isZone(e) && e.faction === 1 && e.t > 0;
     if ((isZone(e) || lands) && Math.hypot(x - e.x, y - e.y) <= e.radius + margin) return e;
   }
+  for (const t of telegraphs(w))
+    if (inTelegraph(t, x, y, margin))
+      return { x: t.x, y: t.y, radius: 'radius' in t ? t.radius : t.width / 2 };
   return null;
 }
 
@@ -582,9 +594,9 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
   // Nests and pylons do nothing but what the faction code gives them.
   if (MONSTER_TYPES[m.mon!.spec.type].noAttack) return;
   const prof = m.mon!.profile(monsterConds(m));
-  const kind = prof.skill.behaviour.kind;
   const range = m.mon!.range;
-  if (kind !== 'melee') {
+  // Whether it fights at arm's length is the type's, not its shape's: a Sentinel's nova is still a melee blow.
+  if (MONSTER_TYPES[m.mon!.spec.type].attack !== 'melee') {
     if (m.stationary) {
       if (d <= range && los) startAction(w, m, 'monster', prof, p);
       else {

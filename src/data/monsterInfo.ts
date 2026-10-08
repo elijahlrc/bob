@@ -52,38 +52,38 @@ export const FACTION_GLYPH: Record<FactionId, string> = {
 /** One clause on what a type does, for tooltips and the inspect card. */
 export const TYPE_BLURBS: Record<MonsterTypeId, string> = {
   warrior: 'A plain melee fighter.',
-  brute: 'Slow and heavy: hits hard and staggers.',
-  archer: 'Shoots from range; its arrows can be evaded or blocked.',
-  mage: 'Casts elemental bolts from range.',
+  brute: 'Slow and heavy: swings a wide arc that staggers.',
+  archer: 'Looses two arrows in quick succession; they can be evaded or blocked.',
+  mage: 'Casts a large, slow orb from range.',
   shieldbearer: 'A tower shield stops arrows from the front; its bash staggers.',
   shambler: 'Slow; rises once more soon after it dies.',
   bloater: 'Walks up to you and bursts into a caustic cloud.',
-  spitter: 'Spits chaos bolts that poison.',
-  hag: 'Keeps her distance and raises nearby corpses.',
+  spitter: 'Lobs caustic poison onto the ground where you stand.',
+  hag: 'Keeps her distance, lobs rot onto the ground and raises nearby corpses.',
   gloomstalker: 'Fast and evasive; blinks next to you.',
-  wailer: 'Casts chilling bolts from range.',
+  wailer: 'Wails in a ring of cold around itself; stay out of reach or step away.',
   wisp: 'Fast and fragile; every hit drains your mana.',
   wight: 'Wraps nearby allies in energy shield.',
   hexer: 'Hexes you every few seconds.',
   censer: 'Its aura speeds up and strengthens allies nearby.',
-  flagellant: 'Grows more frenzied each time an ally dies.',
+  flagellant: 'Lashes in two quick arcs, and grows more frenzied each time an ally dies.',
   choirmaster: 'Channels a heal for nearby allies; a stun interrupts it.',
   gnawer: 'Comes in packs of a dozen; its bites can bleed.',
   bat: 'Flies over walls and weaves as it closes in.',
   beetle: 'Curls up when hit and takes far less physical damage.',
   nest: 'Stands still and spawns Gnawers until it is destroyed.',
-  sentinel: 'Slow and armoured; slams the ground where you stand.',
-  arbalest: 'Stands still and fires piercing bolts down a line.',
+  sentinel: 'Slow and armoured; slams the ground where you stand, and pulses a ring.',
+  arbalest: 'Stands still, marks a line on the ground and strikes everything on it.',
   golem: 'Immune to its element; leaves burning, chilled or shocked ground.',
   pylon: 'While it stands, allies near it take no damage.',
   hound: 'Fast; crouches, then leaps onto you from a distance.',
-  boar: 'Lowers its head and rushes in a line; its tusks stagger.',
+  boar: 'Lowers its head and rushes in a line, then gores in an arc; its tusks stagger.',
   handler: 'Keeps its distance and whistles the pack into a faster, harder-hitting pack.',
   cat: 'Lies in wait, then pounces for a big hit.',
   cutpurse: 'Steals flask charges and runs; kill it to get them back.',
   guard: 'Armoured; throws back part of the melee damage it takes.',
   bursar: 'While it stands, your regeneration, leech and energy shield recharge stop near it.',
-  slinger: 'Shoots from range and backs away as you close in.',
+  slinger: 'Slings two stones in quick succession and backs away as you close in.',
 };
 
 /**
@@ -108,7 +108,10 @@ export type ThreatTag =
   | 'thieves'
   | 'suppressors'
   | 'holders'
-  | 'reflectors';
+  | 'reflectors'
+  | 'ground'
+  | 'salvos'
+  | 'lanes';
 
 export const TAG_ORDER: ThreatTag[] = [
   'ranged',
@@ -129,6 +132,9 @@ export const TAG_ORDER: ThreatTag[] = [
   'suppressors',
   'holders',
   'reflectors',
+  'ground',
+  'salvos',
+  'lanes',
 ];
 
 export const TAG_INFO: Record<ThreatTag, { name: string; text: string }> = {
@@ -185,6 +191,18 @@ export const TAG_INFO: Record<ThreatTag, { name: string; text: string }> = {
   clouds: {
     name: 'Clouds',
     text: 'Leaves harmful ground: keep moving, and watch your chaos resistance.',
+  },
+  ground: {
+    name: 'Ground attacks',
+    text: 'Wedges, rings and pools shown on the ground before they land: the character steps out of them, so speed and reach help.',
+  },
+  salvos: {
+    name: 'Salvos',
+    text: 'Shots come in pairs: evasion and block help, and so does closing the distance.',
+  },
+  lanes: {
+    name: 'Lanes',
+    text: 'A line is marked, then struck: movement beats evasion here.',
   },
 };
 

@@ -2,6 +2,7 @@ import { CLASSES } from '../data/classes';
 import { hex, MOD_MARKS, RARITY_COLOR } from '../data/monsterMarks';
 import { monsterModDef, MONSTER_TYPES, BOSS_NAME, FACTION_NAMES } from '../data/monsters';
 import { abilitiesOf, abilityTexts } from '../data/abilities';
+import { shapeText } from '../data/shapes';
 import { FACTION_GLYPH, FACTION_RULES, TYPE_BLURBS } from '../data/monsterInfo';
 import type { ThemeDef } from '../data/themes';
 import { themeInfo } from '../run/themeInfo';
@@ -97,11 +98,13 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
         </div>
       )}
       {spec &&
-        abilityTexts(abilitiesOf(spec.type)).map((t) => (
-          <div key={t} class="muted inspect-sub">
-            {t}
-          </div>
-        ))}
+        [shapeText(MONSTER_TYPES[spec.type].shape), ...abilityTexts(abilitiesOf(spec.type))]
+          .filter((t): t is string => !!t)
+          .map((t) => (
+            <div key={t} class="muted inspect-sub">
+              {t}
+            </div>
+          ))}
       <div class="inspect-life" title={`${Math.round(a.life)} / ${Math.round(maxLife)}`}>
         <div style={{ width: `${Math.max(0, Math.min(100, (a.life / maxLife) * 100))}%` }} />
         <span>

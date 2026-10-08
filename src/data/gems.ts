@@ -32,7 +32,18 @@ export type SkillBehaviour =
    * An instant area. `origin` 'target' (the default) centres it on the target (slams, item-granted skills; `reach` is how
    * close the caster must be, default the radius); 'self' is a nova around the caster.
    */
-  | { kind: 'burst'; radius: number; origin?: 'target' | 'self'; reach?: number }
+  | {
+      kind: 'burst';
+      radius: number;
+      origin?: 'target' | 'self';
+      reach?: number;
+      /** A monster's burst that also leaves a lasting zone where it lands (a lob), by kind, seconds and damage a second. */
+      zone?: {
+        kind: 'caustic' | 'burning' | 'chilling' | 'shocking';
+        seconds: number;
+        dps: number;
+      };
+    }
   /** An instant line from the caster toward the target that hits everything on it (a beam, a channelled ray's tick). */
   | { kind: 'beam'; length: number; width: number }
   /**
