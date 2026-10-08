@@ -22,11 +22,12 @@ import { flaskMask } from '../sim/combat';
 import { fullVitals, type DeathRecap, type Vitals, type WorldOpts } from '../sim/types';
 import type { MapResult } from '../sim/runMap';
 import { restAtCamp } from './camp';
+import { noteFound, stampAll } from './found';
 import { makeOffer, rollOffers, type MapOffer } from './offers';
 
 export { rollThemes } from './offers';
 
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 export const TOTAL_MAPS = 100;
 
 export type MapRecord = {
@@ -63,8 +64,12 @@ export type RunState = {
   history: MapRecord[];
   /** Pending reward offers (1 of 3), if earned. */
   reward: AnyItem[] | null;
-  /** Items picked up since the last camp visit that are new uniques or rares. */
-  newLoot: number[];
+  /** Uids of the items, gems and flasks picked up that the player has not looked at yet (found.ts). */
+  unseen: number[];
+  /** The level (`run.map`) each item was found on, by uid: what "old" means for the clean-up. */
+  acquired: Record<number, number>;
+  /** Uids the player has starred: never offered by the clean-up, and pinned to the top of the list. */
+  favourites: number[];
   /** Uids of the items, gems and flasks the last cleared map dropped (the Items "Last map" filter). */
   lastDrops: number[];
   /** Why the run ended, if the player died. */
@@ -120,7 +125,9 @@ export function newRun(classId: string, seed: number): RunState {
     phase: 'camp',
     history: [],
     reward: null,
-    newLoot: [],
+    unseen: [],
+    acquired: {},
+    favourites: [],
     lastDrops: [],
     currency: {},
     dust: 0,
@@ -149,6 +156,7 @@ export function newRun(classId: string, seed: number): RunState {
     null,
     null,
   ];
+  stampAll(run, 1);
   return run;
 }
 
@@ -274,8 +282,7 @@ function collectPicked(run: RunState, res: MapResult): void {
       continue;
     }
     run.inventory.push(it);
-    if (it.kind === 'item' && (it.rarity === 'rare' || it.rarity === 'unique'))
-      run.newLoot.push(it.uid);
+    noteFound(run, it);
   }
 }
 
@@ -408,7 +415,10 @@ export function takeReward(run: RunState, uid: number | null): void {
   const it = run.reward.find((x) => x.uid === uid);
   if (it) {
     if (it.kind === 'currency') stash(run, it);
-    else run.inventory.push(it);
+    else {
+      run.inventory.push(it);
+      noteFound(run, it);
+    }
   }
   run.reward = null;
 }

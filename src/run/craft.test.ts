@@ -459,7 +459,7 @@ describe("tablets and Wayfinder's Chalk", () => {
     expect(run.tablets[id]).toBe(1);
     const got = run.inventory.find((x) => x.kind === 'item' && x.uniqueId === id);
     expect(got).toBeDefined();
-    expect(run.newLoot).toContain(got!.uid);
+    expect(run.unseen).toContain(got!.uid);
   });
 
   it('chalk offers three affixes that stay until the next craft; adding costs one, removing two', () => {
@@ -498,7 +498,7 @@ describe('crafting is final (EXPANSION 8.4)', () => {
   it('saves from before the currency fields are rejected, not migrated', () => {
     const store = new MemoryStore();
     const run = newRun('vanguard', 1);
-    store.setItem(SAVE_KEY, JSON.stringify({ version: SAVE_VERSION - 1, run }));
+    store.setItem(SAVE_KEY, JSON.stringify({ version: SAVE_VERSION - 2, run }));
     expect(loadRun(store).status).toBe('incompatible');
     saveRun(store, run);
     expect(loadRun(store).status).toBe('ok');

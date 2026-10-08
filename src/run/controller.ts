@@ -13,6 +13,7 @@ import type { MapOffer } from './offers';
 import { combineCrawl } from './play';
 import { galleryEntries, galleryRun, galleryWorld, type GalleryEntry } from './gallery';
 import { completeTabletSets } from './craft';
+import { pruneFound, unseenRares } from './found';
 import { loadFound, recordFound } from './codex';
 import {
   finishMap,
@@ -209,7 +210,7 @@ export class Controller {
       this.changed();
       return;
     }
-    run.newLoot = [];
+    pruneFound(run);
     this.undoStack = [];
     // A Crawl is three maps in a row: this remembers where it is and what the character carries between them.
     this.crawl =
@@ -329,7 +330,7 @@ export class Controller {
 
   /** The parts of a run a camp change can touch (undo snapshots). */
   private snapshot(run: RunState): string {
-    const { build, inventory, nextUid, bonusPoints, refundPoints, reward, newLoot } = run;
+    const { build, inventory, nextUid, bonusPoints, refundPoints, reward } = run;
     const { currency, dust, tablets } = run;
     return JSON.stringify({
       build,
@@ -338,7 +339,6 @@ export class Controller {
       bonusPoints,
       refundPoints,
       reward,
-      newLoot,
       currency,
       dust,
       tablets,
@@ -408,8 +408,8 @@ export class Controller {
     const set = completeTabletSets(run);
     if (set.length)
       return `${set.length} tablet set${set.length === 1 ? '' : 's'} to redeem (open the Workbench)`;
-    if (run.newLoot.length > 0)
-      return `${run.newLoot.length} new rare/unique item${run.newLoot.length === 1 ? '' : 's'} (open Items)`;
+    const rares = unseenRares(run).length;
+    if (rares > 0) return `${rares} new rare/unique item${rares === 1 ? '' : 's'} (open Items)`;
     // The next map is the anchor: stop if it is not the plain map auto-continue is meant for, or the character is worn down.
     if (run.offers[0].type !== 'plain')
       return `the first map is a ${mapTypeDef(run.offers[0].type).name} map`;

@@ -158,7 +158,7 @@ describe('undo', () => {
   it('reverts camp changes in order and ignores no-ops', () => {
     const c = new Controller(null);
     c.startRun('vanguard', 9);
-    c.act((r) => (r.newLoot = []));
+    c.act((r) => (r.unseen = []));
     expect(c.canUndo).toBe(false);
     c.act((r) => {
       r.build.equipment.mainHand = { ...r.build.equipment.mainHand!, sockets: [null] };

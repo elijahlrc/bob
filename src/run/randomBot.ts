@@ -43,6 +43,7 @@ import {
   useWhetstone,
 } from './craft';
 import { allocate, refund } from './tree';
+import { markSeen } from './found';
 
 /**
  * The random player (balance baseline): every decision a human could make in camp is drawn
@@ -224,7 +225,7 @@ export function randomCamp(run: RunState, rng: Rng, maxMoves = 8): number {
   if (run.reward) takeReward(run, rng.chance(0.25) ? null : rng.pick(run.reward).uid);
   let made = 0;
   for (let i = rng.int(0, maxMoves); i > 0; i--) if (randomMove(run, rng)) made++;
-  run.newLoot = [];
+  markSeen(run, 'all');
   return made;
 }
 

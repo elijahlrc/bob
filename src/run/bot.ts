@@ -38,6 +38,7 @@ import { randomCraft } from './randomBot';
 import type { RunSummary } from './report';
 import { scoreTheme } from './threat';
 import { allocate, pathTo } from './tree';
+import { markSeen } from './found';
 
 /**
  * The headless decision bot (DESIGN.md §15.5): greedy choices by Δ(DPS × EHP).
@@ -523,7 +524,7 @@ export function botCamp(run: RunState, policy: CraftPolicy = 'greedy'): void {
   botFlasks(run);
   botAllocate(run);
   botTidy(run);
-  run.newLoot = [];
+  markSeen(run, 'all');
 }
 
 export type BotMapRecord = {

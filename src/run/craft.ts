@@ -34,6 +34,7 @@ import {
   socketLimit,
 } from '../gen/loot';
 import { uidSource, type RunState } from './run';
+import { noteFound } from './found';
 
 /**
  * Crafting (EXPANSION section 8). The player chooses what changes; chance fills in the details or
@@ -595,12 +596,15 @@ export function redeemTablets(run: RunState, uniqueId: string): CraftResult {
   run.craftSeq++;
   const uid = uidSource(run);
   const flask = UNIQUE_FLASKS.find((u) => u.id === uniqueId);
-  if (flask) run.inventory.push(rollUniqueFlask(rng, uid, flask, Math.max(run.map, flask.level)));
-  else {
+  if (flask) {
+    const made = rollUniqueFlask(rng, uid, flask, Math.max(run.map, flask.level));
+    run.inventory.push(made);
+    noteFound(run, made);
+  } else {
     const def = uniqueDef(uniqueId);
     const it = rollUnique(rng, uid, def, Math.max(run.map, def.level));
     run.inventory.push(it);
-    run.newLoot.push(it.uid);
+    noteFound(run, it);
   }
   return OK;
 }

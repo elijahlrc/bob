@@ -11,6 +11,7 @@ import {
 } from '../data/types';
 import { canEquip, equip, equipFlask, slotsFor, socketGem, withEquipped } from './inventory';
 import { score, sheetOf } from './bot';
+import { isFavourite } from './found';
 import type { RunState } from './run';
 
 /** Headless helpers behind the inventory UI: upgrade hints, sorting, filtering, gem placement. */
@@ -343,11 +344,12 @@ export function moveGem(run: RunState, from: SocketRef, to: SocketRef): boolean 
   return true;
 }
 
-/** Inventory items the "discard junk" button removes: non-upgrade normal/magic items. */
+/** Inventory items the "discard junk" button removes: non-upgrade normal/magic items that are not favourites. */
 export function junkItems(run: RunState): InventoryItem[] {
   const infos = itemInfos(run);
   return run.inventory.filter((x) => {
     if (x.kind !== 'item' || (x.rarity !== 'normal' && x.rarity !== 'magic')) return false;
+    if (isFavourite(run, x.uid)) return false;
     return !isUpgrade(infos.get(x.uid)!);
   });
 }

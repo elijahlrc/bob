@@ -10,6 +10,7 @@ import { resistPenaltyForMap } from '../gen/mapPlan';
 import type { Controller } from '../run/controller';
 import { chalkAdd, chalkOptions, chalkRemove } from '../run/craft';
 import { passivePoints, type RunState } from '../run/run';
+import { unseenItems } from '../run/found';
 import { useViewport } from './device';
 import { infoProps } from './info';
 import { Items } from './Items';
@@ -140,6 +141,7 @@ export function Camp({ c }: { c: Controller }) {
   const sheet = ch.sheet();
   const last = c.lastResult;
   const pts = passivePoints(run);
+  const newCount = unseenItems(run).length;
   const side = (
     <>
       <h2>Camp</h2>
@@ -254,7 +256,7 @@ export function Camp({ c }: { c: Controller }) {
             Passive tree{pts > 0 ? ` (${pts})` : ''}
           </button>
           <button class={'tab' + (shown === 'items' ? ' on' : '')} onClick={() => setTab('items')}>
-            Items{run.newLoot.length ? ` (${run.newLoot.length} new)` : ''}
+            Items{newCount ? ` (${newCount} new)` : ''}
           </button>
           <button
             class={'tab' + (shown === 'skills' ? ' on' : '')}

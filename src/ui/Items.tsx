@@ -26,6 +26,7 @@ import {
   type ItemInfo,
   type SortKey,
 } from '../run/inventoryOps';
+import { markSeen } from '../run/found';
 import { useViewport } from './device';
 import { compareDelta, ItemCard, itemTitle, rarityClass } from './ItemCard';
 import { loadPref, savePref } from './prefs';
@@ -70,9 +71,9 @@ export function Items({ c }: { c: Controller }) {
   const [desc, setDesc] = useState<boolean>(() => loadPref<boolean>('inv.desc', false));
   const [filter, setFilter] = useState<ListFilter>(() => loadPref<ListFilter>('inv.filter', 'all'));
   // Items picked up since the last camp visit are tagged NEW (captured before they are acknowledged).
-  const fresh = useRef(new Set(run.newLoot));
+  const fresh = useRef(new Set(run.unseen));
   useEffect(() => {
-    if (run.newLoot.length) c.act((r) => (r.newLoot = []));
+    if (run.unseen.length) c.act((r) => markSeen(r, 'all'));
   }, []);
   useEffect(() => savePref('inv.sort', sort), [sort]);
   useEffect(() => savePref('inv.desc', desc), [desc]);

@@ -1,3 +1,4 @@
+import { stampAll } from './found';
 import { SAVE_VERSION, type RunState } from './run';
 
 /** The subset of the Web Storage API the game needs (injected so `run/` stays headless). */
@@ -22,11 +23,32 @@ export function loadRun(store: KeyValueStore): LoadResult {
   if (!raw) return { status: 'none' };
   try {
     const data = JSON.parse(raw) as { version?: number; run?: RunState };
-    if (data.version !== SAVE_VERSION || !data.run) return { status: 'incompatible' };
-    return { status: 'ok', run: data.run };
+    if (data.version === undefined || !data.run) return { status: 'incompatible' };
+    const run = migrate(data.version, data.run);
+    return run ? { status: 'ok', run } : { status: 'incompatible' };
   } catch {
     return { status: 'incompatible' };
   }
+}
+
+/**
+ * Bring a saved run up to the current version, or null if it is too old. Older saves are normally rejected (the game is
+ * still changing); version 6 is carried over because it only lacks the found, seen and favourite lists (found.ts).
+ */
+export function migrate(version: number, run: RunState): RunState | null {
+  if (version === SAVE_VERSION) return run;
+  if (version === 6) {
+    const old = run as RunState & { newLoot?: number[] };
+    delete old.newLoot;
+    old.version = SAVE_VERSION;
+    old.unseen = [];
+    old.acquired = {};
+    old.favourites = [];
+    // Nothing is known about when these were found: everything counts as found now, so nothing is old on day one.
+    stampAll(old);
+    return old;
+  }
+  return null;
 }
 
 export function clearSave(store: KeyValueStore): void {
