@@ -125,10 +125,14 @@ export class GrimStyle extends StyleBase {
   }
 
   // ---- Textures --------------------------------------------------------------------------------
-  private addTex(key: string, cv: HTMLCanvasElement, nearest = true): void {
+  /** Textures only this map uses (the baked floor chunks): removed with the map, or they pile up in the GPU map after map. */
+  private mapTextures: string[] = [];
+
+  private addTex(key: string, cv: HTMLCanvasElement, nearest = true, perMap = false): void {
     if (this.scene.textures.exists(key)) return;
     const t = this.scene.textures.addCanvas(key, cv)!;
     if (nearest) t.setFilter(Phaser.Textures.FilterMode.NEAREST);
+    if (perMap) this.mapTextures.push(key);
   }
 
   private figKey(
@@ -281,7 +285,7 @@ export class GrimStyle extends StyleBase {
           }
         if (!any) continue;
         const key = `gc_${world.plan.seed}_${cx}_${cy}`;
-        this.addTex(key, cnv);
+        this.addTex(key, cnv, true, true);
         const img = s.add.image(minX, minY, key).setOrigin(0, 0).setDepth(0).setLighting(true);
         this.owned.push(img);
       }
@@ -1337,6 +1341,10 @@ export class GrimStyle extends StyleBase {
   protected destroyAll(): void {
     for (const o of this.owned) o.destroy();
     this.owned = [];
+    // The images are gone, so the floor textures under them can go too (a long session on a phone ran out of GPU memory).
+    for (const k of this.mapTextures)
+      if (this.scene.textures.exists(k)) this.scene.textures.remove(k);
+    this.mapTextures = [];
     for (const d of this.decals) d.destroy();
     this.decals = [];
     for (const f of this.floaters) f.destroy();
