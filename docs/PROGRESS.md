@@ -606,8 +606,7 @@ Plan: [MAPS.md](MAPS.md). R0 is a refactor with no change in difficulty: three o
   The bot's `chooseTheme` is now `chooseOffer` and ranks all three. `MapRecord` records `areaLevel`.
 - **Save.** `SAVE_VERSION` 5.
 - **Tests.** `offers.test.ts` (three themes valid for the level, same seed same set, distinct layouts, a Chalk edit survives
-  save and load). The suite was green before (1,796) and after, apart from the 400x-real-time test in `x9.test.ts`, which
-  fails under the load of a parallel run and passes alone.
+  save and load). Before the change the suite passed in full (1,796 tests). After it, `npm run check` is **not green in the default parallel mode**: the wall-clock test in `x9.test.ts` ("a room of forty Swarm actors keeps the sim above 400x real time") measures 190 to 290x against its 400x threshold on this machine. It passes when run alone, with `--no-file-parallelism` (1,802 of 1,802) and with `CI=1` (the test skips itself on CI). The unchanged code measured 389x in one in-suite run, so the threshold is marginal here whatever the change; per-file durations are no slower on the new code. The threshold was not touched.
 - **Bot run on the new code** (`npm run sim -- --runs 3 --class all --seed 1`): 8 of 18 wins, no stuck maps, median level 27 / 53 / 79 at maps 25 / 50 / 75. There is no seed-for-seed comparison with the old code, because layouts changed for every map. One Mystic seed (1002) dies on map 1; the old code has the same problem on a different seed (1000), so it is the known Mystic map-1 weakness and not a result of this change.
 - **Browser.** Camp shows three offers (Archer's Gallery, Ashen Crypt, Bone Pits for seed-1 Vanguard) and a map starts with no
   console errors. The pane was hidden, so the game did not advance to the end of the map.

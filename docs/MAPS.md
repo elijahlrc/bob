@@ -1,6 +1,6 @@
 # Bob — Map Choice Plan: offers, attrition and map types
 
-Status: **proposal, revised 2026-10-07 with the user's answers** · Owner: the user · Implementer: Claude
+Status: **approved 2026-10-07; R0 (three offers) is built, R1 onwards is next**; revised with the user's answers · Owner: the user · Implementer: Claude
 
 This plan extends [DESIGN.md](DESIGN.md) and [EXPANSION.md](EXPANSION.md). **Implementation waits** until the passive-tree
 work stream has landed, because R0 rewrites `src/run/run.ts` and the DESIGN edits (section 13) touch `docs/DESIGN.md`,

@@ -5,7 +5,7 @@ import { makeGem, makeItem } from '../gen/items';
 import { createDummyWorld, dummyDefence } from '../sim/dummy';
 import type { World } from '../sim/types';
 import { spawnMonster } from '../sim/world';
-import { newRun, uidSource, type RunState } from './run';
+import { newRun, setMap, uidSource, type RunState } from './run';
 
 /**
  * The skill gallery: a demo arena that puts one skill at a time in the hands of a character facing three training
@@ -68,7 +68,7 @@ export function galleryRun(entry: GalleryEntry, seed: number): RunState {
   const uid = uidSource(run);
   const b = run.build;
   b.level = 60;
-  run.map = 30;
+  setMap(run, 30);
   b.equipment.mainHand = makeItem(uid, entry.weapon, 60, 1);
   if (entry.offHand) b.equipment.offHand = makeItem(uid, entry.offHand, 60, 1);
   else delete b.equipment.offHand;
