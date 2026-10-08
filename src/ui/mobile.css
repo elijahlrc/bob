@@ -509,3 +509,64 @@ body {
     right: calc(60px + var(--safe-right));
   }
 }
+
+/* ---- The Workbench on a phone: the list of items, then the panel for the chosen one ---- */
+@media (max-width: 600px) {
+  .workbench {
+    padding: 10px;
+  }
+  .wb-body {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .wb-side {
+    position: static;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+  }
+  .wb-list {
+    max-height: 36vh;
+  }
+  .wb-work {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  select {
+    max-width: 100%;
+    box-sizing: border-box;
+    background: var(--panel);
+    color: inherit;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 8px;
+  }
+  .wb-work input[type='range'] {
+    max-width: 60%;
+  }
+}
+
+/* Text of at least 12 px on a small or touch screen (the base sizes go down to 10). */
+@media (pointer: coarse), (max-width: 600px) {
+  .hint,
+  .cmp-title,
+  .gem-group-title,
+  .count,
+  .threat,
+  .verdict,
+  .chip,
+  .flaskslot,
+  .gem-tags,
+  .inv-row .muted,
+  .inv-row .row-slot,
+  .inv-row .row-ilvl {
+    font-size: 13px;
+  }
+  .new-tag,
+  .badge {
+    font-size: 12px;
+  }
+}

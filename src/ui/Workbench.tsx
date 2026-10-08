@@ -44,6 +44,7 @@ import {
   type CraftResult,
 } from '../run/craft';
 import type { RunState } from '../run/run';
+import { viewport } from './device';
 import { infoProps } from './info';
 import { ItemCard, rarityClass } from './ItemCard';
 import { slotLabel } from '../run/inventoryOps';
@@ -132,6 +133,9 @@ export function Workbench({ c }: { c: Controller }) {
     setMsg('');
     const found = locate(run, u)?.item;
     setSockets(found?.sockets.length ?? 0);
+    // On a phone the panel for the item is below the list: bring it into view.
+    if (viewport().layout === 'phone')
+      setTimeout(() => document.querySelector('.wb-work')?.scrollIntoView({ block: 'start' }), 0);
   };
 
   return (

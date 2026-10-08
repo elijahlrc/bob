@@ -1,3 +1,4 @@
+import { copyText } from './clipboard';
 import type { Controller } from './run/controller';
 
 const KEY = 'bob.crashlog';
@@ -69,8 +70,10 @@ function toast(e: Entry): void {
   const copy = document.createElement('button');
   copy.textContent = 'Copy report';
   copy.onclick = () =>
-    void navigator.clipboard?.writeText(`${e.message}
-${JSON.stringify(e.state, null, 2)}`);
+    void copyText(`${e.message}
+${JSON.stringify(e.state, null, 2)}`).then((ok) => {
+      copy.textContent = ok ? 'Copied' : 'Could not copy';
+    });
   box.append(copy);
   document.body.appendChild(box);
   setTimeout(() => box.remove(), 20000);
@@ -92,7 +95,10 @@ function show(e: Entry): void {
   head.textContent = 'Something went wrong. Copy this report and send it along.';
   const copy = document.createElement('button');
   copy.textContent = 'Copy report';
-  copy.onclick = () => void navigator.clipboard?.writeText(text);
+  copy.onclick = () =>
+    void copyText(text).then((ok) => {
+      copy.textContent = ok ? 'Copied' : 'Could not copy: select the text below by hand';
+    });
   const close = document.createElement('button');
   close.textContent = 'Dismiss';
   close.onclick = () => box!.remove();
