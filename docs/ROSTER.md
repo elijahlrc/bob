@@ -154,7 +154,7 @@ exact duplicates and says nothing about what a player sees. Section 8 replaces i
 | Decision                                      | Default in this plan                                                                                                                               |
 | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ENEMIES.md 6.1: "BodyKind stays the skeleton" | **Reopened.** Three body styles; bone only for the Ossuary. Recorded in DESIGN.md Appendix A when built.                                           |
-| Do existing types move to new rigs?           | Yes where it fits (Spitter, Bloater, Wisp, Gloomstalker, Wailer, Wight). Ids and stats do not change; the figure does.                             |
+| Do existing types move to new rigs?           | Yes where it fits (Spitter, Bloater, Wisp); the Hollow stays on a body style (4.1). Ids and stats do not change.                                   |
 | How many new factions?                        | Two committed (the Drowned, the Emberborn), one optional (the Briar). The Veiled of ENEMIES.md 7.4 stays out.                                      |
 | New enemies in the old factions               | Seven (section 7.1), each on a rig that is not a person.                                                                                           |
 | Champions and chiefs                          | Keep their type's body and gain a signature prop (a kit), not a new body. The Regent stays the crowned skeleton.                                   |
@@ -209,8 +209,8 @@ Rigs are built from the same primitives (`circ`, `cap`, `box`, `tri`) as the Swa
 | `crawler` | a torso on two arms, no legs, low and fast                          | none                           | Bone Crawler                                     |
 | `heap`    | a mound of fused bone with limbs and skulls                         | none                           | Charnel Heap                                     |
 | `bell`    | a bell hung in the air, a clapper that swings                       | none                           | Tolling Bell                                     |
-| `spider`  | eight legs, a bloated abdomen, a spinneret                          | none                           | Weaver                                           |
-| `chest`   | a treasure chest with legs and teeth                                | none                           | Strongbox                                        |
+| `spider`  | eight legs, a bloated abdomen, a spinneret                          | none                           | Silkspinner                                      |
+| `chest`   | a treasure chest with legs and teeth                                | none                           | Lurking Coffer                                   |
 | `worm`    | a segmented body that rises out of the floor                        | none                           | Drowner, Slagworm                                |
 | `sapling` | a walking tree: a trunk, root legs, branch arms (the Briar, 7.4)    | none                           | Heartwood, Thornling                             |
 
@@ -266,14 +266,16 @@ leave one (flesh does; a spectre, a worm and an orb do not).
 
 `MonsterTypeDef` gains `attackShape` (default `strike`, which is today's). `monsterSkill` builds the skill from it. Most
 shapes are the player's own behaviours, resolved by `actions.ts` today (section 2.2), so the work is the monster side
-(choosing when to use it, the telegraph, a card string), not new combat code:
+(choosing when to use it, the telegraph, a card string), not new combat code. One exception: `lob` does **not** use the
+player's `ground` behaviour, which makes a `SkillZone` that `hazardAt` cannot see. It lands a delayed `GroundEffect`, the
+kind the caustic, burning and golem zones already are, so that the character can step out of it:
 
 | Shape    | What it does                                                             | Built on                   | Telegraph                              |
 | -------- | ------------------------------------------------------------------------ | -------------------------- | -------------------------------------- |
 | `strike` | one melee hit, or one projectile (today)                                 | `melee`, `projectile`      | the wind-up pose                       |
 | `sweep`  | a wide arc in front of it, longer wind-up, hits what stands in the wedge | `melee` with `arc`         | a wedge on the ground                  |
 | `slam`   | a circle at the character's feet after a wind-up                         | `burst` (origin target)    | a ring that fills (as the Sentinel's)  |
-| `lob`    | a projectile that lands and leaves a zone (caustic, fire, frost)         | `ground` (delayed)         | a ring at the landing point            |
+| `lob`    | a projectile that lands and leaves a zone (caustic, fire, frost)         | a delayed `GroundEffect`   | a ring at the landing point            |
 | `volley` | three to five projectiles in a fan, each with a share of the hit         | `projectile` count, spread | a fan of faint lines, or the draw pose |
 | `lance`  | a line that hits everything along it, after the lane is shown            | `beam`                     | a lane that brightens                  |
 | `nova`   | a ring around itself that pushes or damages                              | `burst` (origin self)      | the ring, drawn as it expands          |
@@ -312,7 +314,8 @@ faction fields.
 Every non-strike shape draws its telegraph for 0.4 to 1.0 s at 1× speed (the Sentinel's is the model). For the character to
 answer them:
 
-- Extend `GroundEffect` with a `shape` (`circle` as today, `lane`, `wedge`), and make `hazardAt` shape-aware, so
+- Build `lob`, and every lasting zone a monster makes, on `GroundEffect` and never on `SkillZone`. Extend `GroundEffect`
+  with a `shape` (`circle` as today, `lane`, `wedge`), and make `hazardAt` shape-aware, so
   `avoidHazard` steps out of a lane or a wedge as it steps out of a ring. A lane and a wedge are cheap to test (a
   segment-distance and an angle test, both in `actions.ts` already).
 - The monster's resolution runs when the telegraph ends, against where things are _then_.
@@ -384,8 +387,8 @@ Each on a body that is not a person, so a faction's map has two silhouettes at t
 | the Rot    | **Gorger** (front)             | `bloat`   | eats a corpse in reach to heal a quarter of its life and swell; a `sweep` of the arms                        | killing in a way that leaves no body |
 | the Hollow | **Hollow Watcher** (ranged)    | `orb`     | a floating eye; `lance` a beam that curses on hit; hides behind walls (stays out of line until it fires)     | line of sight, curse immunity        |
 | the Choir  | **Tolling Bell** (support)     | `bell`    | hangs in the air; every 8 s a toll: a `nova` that staggers the character and gives the Choir a short haste   | reach, stagger resistance            |
-| the Swarm  | **Weaver** (ranged)            | `spider`  | spits a `lob` of web: a zone that slows; keeps behind the swarm                                              | slow immunity, ranged answers        |
-| the Gilded | **Strongbox** (special)        | `chest`   | lies still as a chest until within four tiles, then springs open and bites; drops one extra item when killed | ambush; pays for being found         |
+| the Swarm  | **Silkspinner** (ranged)       | `spider`  | spits a `lob` of web: a zone that slows; keeps behind the swarm                                              | slow immunity, ranged answers        |
+| the Gilded | **Lurking Coffer** (special)   | `chest`   | lies still as a chest until within four tiles, then springs open and bites; drops one extra item when killed | ambush; pays for being found         |
 
 ### 7.2 The Drowned (the question: being held)
 
@@ -418,7 +421,7 @@ molten orange; no flesh to speak of.
 
 A walking-plants faction, the one that is most unlike a person: roots and spores. Its questions are being **rooted** and
 **blinded** (an accuracy debuff), not another damage-over-time (the Rot already has poison). Types: **Heartwood** (front,
-`sapling`: roots the character when it stays in reach), **Thornling** (swarm, small `sapling`), **Spore Pod** (stationary
+`sapling`: roots the character when it stays in reach), **Thornling** (swarm, small `sapling`), **Blight Bulb** (stationary
 special, `pod`: releases a blinding cloud), **Dust Moth** (flier, ranged, `nova` of dust). Only built if the Drowned and the
 Emberborn show the pipeline is cheap (V8 decides).
 
@@ -519,5 +522,6 @@ Each ends with `npm run check`, `npm run build`, the contact sheet, a bot sample
 5. **Should the Codex show the roster?** A "Bestiary" tab drawing each type with the same primitives would let the player learn
    the silhouettes before a map, and costs little once the sheet exists. Default: not in this plan; a one-line addition to V8.
 6. **Do chiefs get their own bodies?** Default: no, a signature prop each (4.2 and section 3).
-7. **How much of 5.2 ships first?** Default: the `volley`, `lob`, `sweep` and `slam` shapes in V3; `lance` and `nova` follow
-   once `hazardAt` handles lanes and rings, since they are the two that ask the auto-dodge for something new.
+7. **How much of 5.2 ships first?** Default: the `volley`, `sweep`, `slam` and `orb` shapes in V3; `lob`, `lance` and `nova`
+   follow once `hazardAt` handles delayed ground, lanes and rings, since those are the three that ask the auto-dodge for
+   something new.
