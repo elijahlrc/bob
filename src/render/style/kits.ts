@@ -45,7 +45,6 @@ export type KitAdjust = {
 
 const ADJUST: Partial<Record<MonsterTypeId, KitAdjust>> = {
   shambler: { hunch: 5 },
-  wisp: { scale: 0.6 },
   gloomstalker: { scale: 1.05 },
   hag: { hunch: 4.5 },
   flagellant: { scale: 0.95 },
@@ -73,11 +72,6 @@ export function kitBack(type: MonsterTypeId | undefined, a: Anchors): Prim[] {
       for (let i = 0; i < 3; i++)
         cap(o, a.shX - 7 + i * 1.4, a.shY - 1, a.shX - 6 + i * 1.4, a.shY - 4, 0.7, 'accent');
       break;
-    case 'spitter':
-      // A gland sack on the back.
-      circ(o, a.shX - 6, a.shY + 6, 5, 'clothShade');
-      circ(o, a.shX - 7, a.shY + 5, 2.5, 'accent');
-      break;
     case 'shambler':
       // Rags hanging off the shoulders.
       tri(o, [a.shX - 6, a.shY, a.shX + 5, a.shY, a.shX - 2, a.hipY + 8], 'clothShade');
@@ -98,9 +92,6 @@ export function kitBack(type: MonsterTypeId | undefined, a: Anchors): Prim[] {
         [a.shX - 7, a.shY + 1, a.shX + 7, a.shY + 1, a.hipX, a.hipY + a.legLen * 1.9],
         'clothShade',
       );
-      break;
-    case 'wisp':
-      circ(o, a.hipX, a.shY + 4, 9, 'glow');
       break;
     case 'cutpurse':
       // A short cloak.
@@ -167,23 +158,6 @@ export function kitFront(type: MonsterTypeId | undefined, a: Anchors): Prim[] {
       circ(o, a.hipX + 3, a.hipY, 1.4, 'accent');
       circ(o, hx + 2, hy + r + 1, 1, 'accent');
       break;
-    case 'bloater':
-      // A swollen, pustulent belly.
-      circ(o, a.hipX + 1, a.hipY - 8, 10, 'clothShade');
-      circ(o, a.hipX + 1, a.hipY - 8, 7.5, 'cloth');
-      for (const [dx, dy] of [
-        [-3, -3],
-        [3, -1],
-        [0, 3],
-        [-4, 2],
-      ] as const)
-        circ(o, a.hipX + 1 + dx, a.hipY - 8 + dy, 1.6, 'accent');
-      break;
-    case 'spitter':
-      // A gaping jaw.
-      box(o, hx + 2, hy + r * 0.9, r * 1.2, 2.6, 0, 'dark');
-      circ(o, hx + 3.5, hy + r * 1.1, 1, 'accent');
-      break;
     case 'hag':
       // A hood and a hooked nose.
       tri(o, [hx - r * 1.2, hy + r, hx, hy - r * 1.8, hx + r * 1.2, hy + r], 'clothShade');
@@ -201,10 +175,6 @@ export function kitFront(type: MonsterTypeId | undefined, a: Anchors): Prim[] {
     case 'wailer':
       // An open, wailing mouth.
       box(o, hx + 1.5, hy + r * 0.75, 3, 5, 0, 'glow');
-      break;
-    case 'wisp':
-      circ(o, hx, hy, r * 0.9, 'glow');
-      circ(o, hx + 2, hy - 0.4, 1.3, 'eye');
       break;
     case 'cutpurse':
       // A hood pulled low, a knife in the other hand and a fat purse at the belt.

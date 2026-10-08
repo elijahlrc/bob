@@ -11,7 +11,7 @@ import { pairScores } from './silhouette';
 import { monsterPalette } from '../styles/grim/paint';
 import { buildFigure, poseFor, poseForType, stanceFor, type FigureKind } from './figure';
 
-describe('the creature rigs of the Swarm and the Reliquary (EXPANSION 7.3)', () => {
+describe('the creature rigs (EXPANSION 7.3, docs/ROSTER.md 4.2)', () => {
   const kinds: FigureKind[] = [
     'gnawer',
     'bat',
@@ -21,6 +21,9 @@ describe('the creature rigs of the Swarm and the Reliquary (EXPANSION 7.3)', () 
     'arbalest',
     'golem',
     'pylon',
+    'bloat',
+    'toad',
+    'orb',
   ];
 
   it('every rig builds in every pose, with finite shapes', () => {
@@ -164,10 +167,10 @@ describe('body styles (docs/ROSTER.md 4.1)', () => {
   });
 
   it('silhouettes differ: no two types of different factions are near twins, and none in a faction are', () => {
-    // These limits tighten as the milestones of docs/ROSTER.md land (to 0.75 and 0.85 in the end).
+    // The limit between factions is the plan's own (0.75). Within a faction it is 0.9 until V4 gives the Shieldbearer its own build (0.85 in the end).
     const pairs = pairScores();
     for (const p of pairs) {
-      const limit = p.sameFaction ? 0.9 : 0.85;
+      const limit = p.sameFaction ? 0.9 : 0.75;
       expect(p.sim, `${p.a} and ${p.b} are too much alike`).toBeLessThan(limit);
     }
   });

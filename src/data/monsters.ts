@@ -75,7 +75,11 @@ export type BodyKind =
   | 'pylon'
   | 'hound'
   | 'boar'
-  | 'cat';
+  | 'cat'
+  // Bodies of the Rot and the Hollow that are not a person (docs/ROSTER.md 4.2).
+  | 'bloat'
+  | 'toad'
+  | 'orb';
 
 /**
  * The pose family of an attack (docs/ROSTER.md 4.3): how the body moves when it strikes, apart from which rig it is. A type
@@ -228,7 +232,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     role: 'special',
     name: 'Bloater',
     faction: 'rot',
-    body: 'brute',
+    body: 'bloat',
     innate: true,
     lifeMult: 1.2,
     dmgMult: 0.5,
@@ -244,7 +248,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     role: 'ranged',
     name: 'Spitter',
     faction: 'rot',
-    body: 'archer',
+    body: 'toad',
     stance: 'throw',
     innate: true,
     lifeMult: 0.7,
@@ -309,7 +313,8 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     role: 'swarm',
     name: 'Mana Wisp',
     faction: 'hollow',
-    body: 'warrior',
+    body: 'orb',
+    noBody: true,
     lifeMult: 0.4,
     dmgMult: 0.5,
     range: 1.0,

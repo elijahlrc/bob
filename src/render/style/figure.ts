@@ -53,6 +53,10 @@ export type FigureKind =
   | 'hound'
   | 'boar'
   | 'cat'
+  // The Rot and the Hollow: a swollen corpse, a toad and a drifting flame.
+  | 'bloat'
+  | 'toad'
+  | 'orb'
   | 'hero_mace'
   | 'hero_sword'
   | 'hero_bow'
@@ -270,6 +274,79 @@ export function poseFor(
       break;
     }
   }
+  return rigPose(kind, anim, t, p);
+}
+
+/**
+ * The gaits and deaths of the rigs that are not a person (docs/ROSTER.md 4.4): a bloat waddles and deflates, a toad hops and
+ * flattens, an orb drifts on a curve and pops. They read the same pose numbers as the other creatures; only the values
+ * differ, so a rig's gait is one place to change.
+ */
+function rigPose(kind: FigureKind, anim: AnimName, t: number, p: Pose): Pose {
+  const TAU = Math.PI * 2;
+  const s = Math.sin(t * TAU);
+  switch (kind) {
+    case 'bloat':
+      if (anim === 'idle') {
+        p.bob = s * 0.6;
+        p.legA = 0.05;
+        p.legB = -0.05;
+        p.lean = 0;
+      } else if (anim === 'walk') {
+        p.legA = s * 0.45;
+        p.legB = -s * 0.45;
+        p.bob = -Math.abs(Math.cos(t * TAU)) * 1;
+        p.lean = s * 1.6;
+      } else if (anim === 'death') {
+        p.scatter = 0;
+        p.rot = 0;
+        p.lean = 0;
+        p.fade = ease(clamp01(t / 0.6)) * 0.6;
+        p.bob = 0;
+      }
+      break;
+    case 'toad':
+      if (anim === 'idle') {
+        p.bob = 0;
+        p.charge = 0.2 + 0.2 * s;
+        p.legA = 0;
+        p.legB = 0;
+      } else if (anim === 'walk') {
+        // Hops: up on the push, the legs stretched in the air, then a low crouch.
+        const hop = Math.abs(s);
+        p.bob = -hop * 5.5;
+        p.legA = hop * 0.9;
+        p.legB = hop * 0.9;
+        p.lean = 1;
+      } else if (anim === 'death') {
+        p.scatter = 0;
+        p.fade = 0;
+        p.rot = -ease(clamp01(t / 0.7)) * 0.5;
+        p.bob = ease(clamp01(t / 0.7)) * 3;
+        p.lean = 0;
+      }
+      break;
+    case 'orb':
+      if (anim === 'idle') {
+        p.bob = s * 2;
+        p.legA = s * 0.4;
+        p.legB = 0;
+      } else if (anim === 'walk') {
+        p.bob = s * 2.5;
+        p.legA = s * 0.7;
+        p.legB = 0;
+        p.lean = 2;
+      } else if (anim === 'death') {
+        // Pops: it shrinks to a spark and is gone.
+        p.scatter = 0;
+        p.rot = 0;
+        p.fade = ease(clamp01(t / 0.6));
+        p.bob = 0;
+      }
+      break;
+    default:
+      break;
+  }
   return p;
 }
 
@@ -334,6 +411,9 @@ const BUILDS: Record<FigureKind, Build> = {
   hound: { scale: 1.2, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   boar: { scale: 1.25, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   cat: { scale: 1.25, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  bloat: { scale: 1.05, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  toad: { scale: 1.1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  orb: { scale: 0.9, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   hero_mace: { scale: 1.05, legLen: 9, torsoH: 14, shoulder: 8, skull: 5.5, ribW: 7 },
   hero_sword: { scale: 1, legLen: 9, torsoH: 14, shoulder: 7, skull: 5.5, ribW: 6.5 },
   hero_bow: { scale: 1, legLen: 9.5, torsoH: 13, shoulder: 6, skull: 5.5, ribW: 5.5 },
@@ -439,6 +519,9 @@ const CREATURES = new Set<FigureKind>([
   'hound',
   'boar',
   'cat',
+  'bloat',
+  'toad',
+  'orb',
 ]);
 
 /**
@@ -555,6 +638,77 @@ function buildCreature(kind: FigureKind, pose: Pose): Prim[] {
       circ(b, 11.4, -11.6 + lift, 0.8, 'eye');
       cap(b, -9, -9 + lift, -14, -13 + lift, 1, 'bone');
       cap(b, -14, -13 + lift, -16, -19 + lift - pose.legA * 2, 1, 'boneShade');
+      break;
+    }
+    case 'bloat': {
+      // A huge round body on stub legs: a small sunken head, a stretched belly, pustules, arms that hang. It sways as it
+      // waddles (`lean`), and the pose's `fade` deflates it when it dies.
+      const sw = pose.lean * 0.6;
+      for (const [x, ph] of [
+        [-5, pose.legB],
+        [5, pose.legA],
+      ] as const)
+        cap(b, x + sw, -9 + lift, x + ph * 2.5 + sw * 0.4, 0, 2.6, 'clothShade');
+      circ(b, sw - 1, -16 + lift, 11.5, 'clothShade');
+      circ(b, sw, -17 + lift, 10, 'skin');
+      circ(b, sw + 2, -14 + lift, 7, 'cloth');
+      for (const [x, y] of [
+        [-4, -20],
+        [3, -18],
+        [6, -12],
+        [-2, -10],
+        [-7, -14],
+        [1, -24],
+      ] as const)
+        circ(b, sw + x, y + lift, 1.6, 'accent');
+      cap(b, sw + 9, -22 + lift, sw + 12 + pose.armA * 2, -12 + lift, 2.1, 'skin');
+      cap(b, sw - 9, -22 + lift, sw - 11 + pose.armB * 2, -13 + lift, 2, 'clothShade');
+      circ(b, sw + 5, -28 + lift, 4.4, 'skin');
+      circ(b, sw + 6.8, -28.6 + lift, 0.9, 'eye');
+      circ(b, sw + 4, -28.8 + lift, 0.9, 'eye');
+      box(b, sw + 6, -26 + lift, 3, 0.9, 0, 'dark');
+      break;
+    }
+    case 'toad': {
+      // A low, wide amphibian: folded hind legs, a hump, bulging eyes and a throat sac that swells as it winds up to spit.
+      // It hops (`bob`), rears its head when the arm goes back (`armA`) and lunges with `lean`.
+      const ph = pose.legA;
+      const rear = Math.max(0, -pose.armA) * 1.4;
+      const hx = 8 + pose.lean * 0.5;
+      const hy = -10 + lift - rear;
+      cap(b, -4, -6 + lift, -9, -3 + lift * 0.5, 2.3, 'clothShade');
+      cap(b, -9, -3 + lift * 0.5, -5 - ph * 4, 0, 1.7, 'clothShade');
+      cap(b, 4, -5 + lift, 6 + ph * 3, 0, 1.6, 'clothShade');
+      circ(b, -1, -9 + lift, 8, 'clothShade');
+      circ(b, 0, -9.5 + lift, 7, 'skin');
+      circ(b, -4, -13 + lift, 5.2, 'skin');
+      for (const [x, y] of [
+        [-5, -15],
+        [-1, -13],
+        [2, -6],
+      ] as const)
+        circ(b, x, y + lift, 1, 'clothShade');
+      circ(b, hx, hy, 5.2, 'skin');
+      box(b, hx + 3, hy + 2.2, 7, 2.4, 0, 'dark');
+      circ(b, hx + 1, hy - 4.6, 1.8, 'skin');
+      circ(b, hx + 1, hy - 4.8, 1, 'eye');
+      circ(b, hx + 5, hy - 3.6, 1.6, 'skin');
+      circ(b, hx + 5, hy - 3.8, 0.9, 'eye');
+      circ(b, hx + 1, hy + 4.5, 1.5 + pose.charge * 4.5, 'accent');
+      break;
+    }
+    case 'orb': {
+      // A flame of a thing: no limbs, a core in a halo, three tails that stream behind (`legA` is their sway).
+      const y = -20 + lift;
+      const sway = pose.legA * 5;
+      tri(b, [-3, y + 2, 3, y + 2, -11 - sway, y + 13], 'clothShade');
+      tri(b, [-2, y + 3, 2, y + 3, -5 - sway * 0.7, y + 17], 'cloth');
+      tri(b, [0, y + 3, 4, y + 3, 3 - sway * 0.4, y + 11], 'clothShade');
+      circ(b, 0, y, 7.8, 'clothShade');
+      circ(b, 0, y, 6.4, 'cloth');
+      circ(b, 0, y, 4.6, 'glow');
+      circ(b, 1.4, y - 0.6, 0.9, 'dark');
+      circ(b, 3.4, y - 0.6, 0.9, 'dark');
       break;
     }
     case 'bat': {
