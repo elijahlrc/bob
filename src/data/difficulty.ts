@@ -58,7 +58,7 @@ export const MAP_NOISE_SHARE = 0.6;
  */
 export function packPower(d: Difficulty, mapNoise: number, packNoise: number): number {
   const noise = MAP_NOISE_SHARE * mapNoise + (1 - MAP_NOISE_SHARE) * packNoise;
-  return Math.round((1 + d.variance * noise) * 100) / 100;
+  return Math.round((1 + d.variance * noise) * 20) / 20;
 }
 
 /** The tier a map's own draw falls in, for the offer card; null when there is no variance to show. */

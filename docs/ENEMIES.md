@@ -480,7 +480,7 @@ level; a test pins it).
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
 | `src/data/difficulty.ts` (new)             | `Difficulty`, `LEGACY`, `DEFAULT`, `statLevel`, `hardness`. Headless, pure.                                  |
 | `MonsterSpec` (`calc/monster.ts`)          | gains `statLevel` and `power` (the hardness sample), both defaulted so old specs read as legacy.             |
-| `monsterKey`                               | includes `statLevel` (rounded to a quarter) and `power` (rounded to a hundredth) so the cache stays correct. |
+| `monsterKey`                               | includes `statLevel` (rounded to a quarter) and `power` (rounded to a twentieth) so the cache stays correct. |
 | `populate` (`gen/population.ts`)           | `PopulateOpts.difficulty`; sets the two fields on each spec, one `power` draw per pack from the map's rng.   |
 | `Character.config` and `ehp`               | read the monster hit at `statLevel`, so the "For you" numbers stay honest; the bot's `levelHardness` too.    |
 | `threat.ts`                                | `levelHardness`, `scoreTheme` take the difficulty.                                                           |
@@ -578,7 +578,7 @@ the answer to the complaint as it stands today and can ship before E4 to E6.
 | Packs by template feel scripted                                      | Weights inside roles; Mixed arms stays a template; templates are chosen per room by the seeded stream.                  |
 | Art cost of E4 and E6                                                | Kits are small primitives on an existing rig; a faction's first cut can ship with two of four kits and the rest tinted. |
 | Seeds shift: every existing map changes with the new `rollThemes`    | Offers are stored in the save, so a run in progress is unaffected; new runs are new.                                    |
-| Difficulty cache key bloats the monster cache                        | `statLevel` is rounded to a quarter and `power` to a hundredth; a test caps the cache for a 100-map bot run.            |
+| Difficulty cache key bloats the monster cache                        | `statLevel` is rounded to a quarter and `power` to a twentieth; a test caps the cache for a 100-map bot run.            |
 
 ---
 
@@ -640,7 +640,7 @@ the bot, 6 classes) and are read as a direction, not a result.
 - **Default scaling is 1.5, not 1.25.** The new roster and the offer rules made the bot's choice matter: at 1.25 the greedy bot
   won 14 of 24 runs (before this plan, at 1.25 on the old roster, it won 2 of 24, and 2 of 24 on the old game). At 1.5 it won 6
   of 24, and then 8 of 36; at 2.0, none of 24. The median map reached fell from about 55 to about 41 at 1.5. A random-picking
-  bot won none of 24 and died mostly to the gate mini-bosses; its deaths before map 25 are about the same at 1.0 and at 1.5 (7
+  bot won none of 24 and died mostly to the gate mini-bosses (that was with a Brute as the Ossuary gate; with the Warrior it won 4 of 24); its deaths before map 25 are about the same at 1.0 and at 1.5 (7
   and 8 of 48), so the early game is not made a wall.
 - **Faction introduction maps** (4.2, rule 2): the Rot 4, the Swarm 6, the Hollow 11 (not 9: two Hollow themes beat a
   physical character outright), the Choir 15, the Reliquary 25, the Kennel 11, the Gilded 18, and mixed themes from 30.
@@ -667,19 +667,29 @@ Greedy bot (picks by the build's score), default settings, 36 runs:
   faction is over the 35% limit;
 - the Rot, the Swarm and the Hollow are the factions the bot steers around, and so kill little.
 
-Random bot (picks any offer), default settings. Share of the monsters placed, by band of ten maps:
+Random bot (picks any offer), default settings, 24 runs, after the last tuning: wins 4 of 24 (17%); deaths by faction the
+Ossuary 30%, the Rot 25%, the Swarm 15%, the rest 10% or less. Share of the monsters placed, by band of ten maps:
 
-| Maps  | Ossuary                    | The largest other faction |
-| ----- | -------------------------- | ------------------------- |
-| 1–10  | 58% (limit 60% from map 4) | the Rot 28% (limit 30%)   |
-| 11–20 | 36% (limit 40%)            | the Hollow 21% (30%)      |
-| 21–30 | 15% (limit 25%)            | the Rot 22% (25%)         |
-| 31–40 | 14%                        | the Choir 18%             |
-| 41–50 | 6%                         | the Rot 25%               |
-| 51–90 | 3 to 11%                   | the Gilded 14 to 27%      |
+| Maps   | Ossuary                                                                 | The largest other faction          |
+| ------ | ----------------------------------------------------------------------- | ---------------------------------- |
+| 1–10   | 61% (the first three maps are all Ossuary; the limit from map 4 is 60%) | the Rot 26% (limit 30%)            |
+| 11–20  | 26% (limit 40%)                                                         | the Swarm 25% (30%)                |
+| 21–30  | 21% (limit 25%)                                                         | the Hollow 19% (25%)               |
+| 31–40  | 2%                                                                      | the Swarm 25%                      |
+| 41–50  | 19%                                                                     | the Kennel 19%                     |
+| 51–60  | 18%                                                                     | the Reliquary 27% (limit 25%)      |
+| 61–70  | 5%                                                                      | the Gilded 24%                     |
+| 71–80  | 10%                                                                     | the Kennel 25%                     |
+| 81–90  | 1%                                                                      | the Kennel 21%                     |
+| 91–100 | 6%                                                                      | the Swarm 31% (limit 25%, 40 maps) |
 
-Types met per ten maps: 13 on maps 1 to 10, 27 on 11 to 20, 32 from 21 on (33 exist). The longest stretch of maps in which one
+Two bands are over the 25% limit (the Reliquary at 51 to 60, the Swarm at 91 to 100); both are samples of fewer than 80 maps.
+
+Types met per ten maps: 13 on maps 1 to 10, 29 on 11 to 20, 31 to 33 from 21 on (33 exist). The longest stretch of maps in which one
 faction supplied over 60% of the monsters is 4 (the Ossuary on the first maps), median 3 to 4.
+
+The monster cache (`buildMonster`) held about 5,300 builds after one bot run of 97 maps with variance 0.1 (`power` rounded to a
+twentieth): nothing to trim.
 
 ### 14.4 Left for later
 

@@ -1,7 +1,6 @@
 import { scaleOf, type MonsterSpec } from '../calc/monster';
 import { HEX_IDS, hexEffect, type HexId } from '../data/hexes';
 import { PYLON_RANGE } from '../data/abilities';
-import { tickChargingMod } from './abilities';
 import { MONSTER_TYPES } from '../data/monsters';
 import { monsterHitOf, rawHit } from './combat';
 import { monsterHexesPlayer } from './hexes';
@@ -432,13 +431,12 @@ function tickChampion(w: World, m: Actor, dt: number): void {
     }
   }
   if (m.modIds.includes('huntsmaster')) {
-    // Whistles up three hounds every ten seconds, and rushes at you now and then.
+    // Whistles up three hounds every ten seconds (it is a boar, and rushes like one).
     m.raiserT -= dt;
     if (m.raiserT <= 0 && d < 16) {
       m.raiserT = HUNTSMASTER_INTERVAL;
       for (let i = 0; i < 3; i++) spawnBeside(w, m, 'hound', 1.4);
     }
-    tickChargingMod(w, m, dt);
   }
   if (m.modIds.includes('treasurer')) {
     // Nothing recovers near it; its hits take flask charges; two Cutpurses come at half life.

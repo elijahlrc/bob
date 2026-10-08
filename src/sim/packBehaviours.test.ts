@@ -10,7 +10,9 @@ import { populate } from '../gen/population';
 import { newRun } from '../run/run';
 import { createDummyWorld } from './dummy';
 import type { Actor, World } from './types';
-import { spawnMonster, stepWorld } from './world';
+import { makeMapPlan } from '../gen/mapPlan';
+import { wake } from './combat';
+import { createWorld, spawnMonster, stepWorld } from './world';
 
 /** A world with a passive player (stunned for good) to watch the monsters on their own. */
 function arena(): World {
@@ -43,11 +45,40 @@ describe('Ambush and Patrol (docs/ENEMIES.md 4.2)', () => {
     far.hold = true;
     const near = put(w, 'warrior', AMBUSH_RANGE - 2, 2);
     near.hold = true;
+    // A packmate beside it, which the others wake with.
+    const mate = put(w, 'warrior', AMBUSH_RANGE + 1, 2);
+    mate.hold = true;
     run(w, 0.3);
     expect(near.state).toBe('chase');
     expect(near.hold).toBe(false);
-    // Its pack wakes with it; the one nine tiles away would have noticed a plain monster, and has not.
-    expect(far.hold || far.state === 'chase').toBe(true);
+    expect(mate.state).toBe('chase');
+    expect(mate.hold).toBe(false);
+    // The one nine tiles away would have noticed a plain monster, and has not.
+    expect(far.state).toBe('idle');
+    expect(far.hold).toBe(true);
+  });
+
+  it('a dormant monster that is hit wakes and stops lying in wait', () => {
+    const w = arena();
+    const m = put(w, 'warrior', 9);
+    m.hold = true;
+    wake(w, m);
+    expect(m.state).toBe('chase');
+    expect(m.hold).toBe(false);
+  });
+
+  it('a Stalker Cat lies in wait wherever the map puts it', () => {
+    let cats = 0;
+    for (let seed = 1; seed < 12; seed++) {
+      const plan = makeMapPlan(seed, 24, 'boarPit', [], 24);
+      const w = createWorld({ plan, build: newRun('vanguard', 1).build, xp: 0 });
+      for (const a of w.actors)
+        if (a.mon?.spec.type === 'cat') {
+          cats++;
+          expect(a.hold).toBe(true);
+        }
+    }
+    expect(cats).toBeGreaterThan(0);
   });
 
   it('a dormant monster that is not near does not wake on its own', () => {

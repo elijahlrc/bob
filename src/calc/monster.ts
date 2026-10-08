@@ -105,6 +105,11 @@ function monsterSkill(spec: MonsterSpec, dmg: number): SkillDef {
 
 const cache = new Map<string, MonsterStats>();
 
+/** How many monster builds are held (a test and the bot report read it: see docs/ENEMIES.md 14). */
+export function monsterCacheSize(): number {
+  return cache.size;
+}
+
 export function monsterKey(spec: MonsterSpec): string {
   return `${spec.type}|${spec.variant}|${spec.rarity}|${spec.level}|${spec.mods.join(',')}|${(spec.affix ?? []).join(',')}|${spec.statLevel ?? ''}|${spec.power ?? ''}`;
 }

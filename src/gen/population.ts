@@ -231,7 +231,7 @@ export function populate(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Populati
       n = drng.fork(`pack${m.pack}`).float(-1, 1);
       packNoise.set(m.pack, n);
     }
-    const power = Math.round(packPower(d, opts.mapNoise ?? 0, n) * d.base * 100) / 100;
+    const power = Math.round(packPower(d, opts.mapNoise ?? 0, n) * d.base * 20) / 20;
     return { ...m, spec: { ...m.spec, statLevel: statLevel(opts.areaLevel, d), power } };
   };
   return {

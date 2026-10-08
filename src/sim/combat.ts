@@ -560,10 +560,13 @@ export function rawHit(
 export function wake(w: World, a: Actor): void {
   if (a.isPlayer || a.state !== 'idle') return;
   a.state = 'chase';
+  a.hold = false;
   a.lostT = 0;
   for (const o of w.actors)
-    if (!o.isPlayer && o.alive && o.state === 'idle' && Math.hypot(o.x - a.x, o.y - a.y) <= 6)
+    if (!o.isPlayer && o.alive && o.state === 'idle' && Math.hypot(o.x - a.x, o.y - a.y) <= 6) {
       o.state = 'chase';
+      o.hold = false;
+    }
 }
 
 /** A drop must land on floor: a flier that dies over a wall drops its loot where it can be reached. */

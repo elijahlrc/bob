@@ -13,6 +13,7 @@ import { tickSkillZones, updateAction, updateProjectiles } from './actions';
 import { monsterAI, playerAI, separate } from './ai';
 import { lifeCap, rawHit, refreshPlayerDefence, tickActor } from './combat';
 import { autoFlaskPolicy, type FlaskPolicy } from './flaskPolicy';
+import { abilitiesOf } from '../data/abilities';
 import { tickAbilities, tickChargingMod } from './abilities';
 import { isZone, tickCorpses, tickFactionBehaviour, tickZones } from './factions';
 import { BUFF_IDS, type BuffId } from '../data/buffs';
@@ -203,7 +204,8 @@ export function createWorld(inp: CreateWorldInput): World {
   player.name = 'You';
   for (const s of plan.pop.monsters) {
     const a = spawnMonster(w, s.spec, s.x, s.y, s.room, s.pack, s.name);
-    if (s.hold) a.hold = true;
+    // A Stalker Cat lies in wait wherever it is; a pack that is an Ambush does so as a whole.
+    if (s.hold || abilitiesOf(s.spec.type).some((x) => x.id === 'ambush')) a.hold = true;
     if (s.patrol) a.patrol = s.patrol.map((p) => ({ ...p }));
   }
   seedCharacters(w);

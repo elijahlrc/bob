@@ -322,10 +322,9 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
     }
   });
 
-  // Timing test: skipped on CI (shared runners are slower), and retried because a parallel test run can starve it.
+  // Timing test: skipped on CI (shared runners are slower).
   it.skipIf(!!process.env.CI)(
     'a room of forty Swarm actors keeps the sim above 400x real time',
-    { retry: 3 },
     () => {
       const w = arena(true);
       const actors: Actor[] = [];

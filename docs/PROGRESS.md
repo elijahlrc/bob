@@ -750,7 +750,7 @@ keep the setting they have. The bot does not use it.
 
 ### Enemy variety and difficulty (docs/ENEMIES.md), built (2026-10-08)
 
-E0 to E7 of the plan, in order, each committed with `npm run check` and `npm run build` green (1,984 tests).
+E0 to E7 of the plan, in order, each committed with `npm run check` and `npm run build` green (1,986 tests).
 
 - **E0/E1, difficulty.** `src/data/difficulty.ts`; the stat level and the hardness sample are on every `MonsterSpec` and in the
   monster cache key; the effective HP and the theme score read them; `SAVE_VERSION` 8 (a version 7 save keeps the legacy curve).

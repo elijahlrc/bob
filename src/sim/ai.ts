@@ -445,6 +445,7 @@ export function alertPack(w: World, m: Actor): void {
     if (o.isPlayer || !o.alive || o.state !== 'idle') continue;
     if (Math.hypot(o.x - m.x, o.y - m.y) <= PACK_ALERT) {
       o.state = 'chase';
+      o.hold = false;
       o.lostT = 0;
     }
   }
