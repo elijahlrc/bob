@@ -15,7 +15,7 @@
   `npm run coverage:emit` / `coverage:emit-gems`, never by editing the generated `src/data/*Gen.ts`. Items are never
   edited in place (what an item gives is remembered by object).
 - **Mobile and inventory plan:** [docs/MOBILE.md](docs/MOBILE.md) (milestones P0–P9): make every screen usable in phone and tablet
-  browsers (touch rules, small-screen layouts, tree pinch zoom, HUD and map zoom), plus inventory tools (persistent New list, Clean up old items, favourites; P8–P9). P0 and the foundation of P1 are done; see its section 9.
+  browsers (touch rules, small-screen layouts, tree pinch zoom, HUD and map zoom), plus inventory tools (persistent New list, Clean up old items, favourites; P8–P9). P0 to P9 are built; the real-device pass is left (its section 9).
 - **Architecture boundaries (§14.2):**
   - `core`, `data`, `mods`, `calc`, `gen`, `sim` and `run` are headless: no Phaser, Preact or DOM.
   - No `Math.random`, `Date.now` or `performance.now` outside `render` and `ui`.

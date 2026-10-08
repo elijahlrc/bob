@@ -1,6 +1,6 @@
 # Bob — Mobile and Inventory Plan: touch, small screens, phones and inventory tools
 
-Status: **P0 and part of P1 done 2026-10-07 (section 9); the rest is a proposal** · Owner: the user · Implementer: Claude
+Status: **P0 to P9 are built; the real-device pass (P7) is left (section 9)** · Owner: the user · Implementer: Claude
 
 This plan makes every screen of the game usable in a phone or tablet browser (P0–P7), and adds the inventory tools a long
 run needs: a persistent "new" list, a clean-up of old items, and favourites (P8–P9). It extends [DESIGN.md](DESIGN.md); the
@@ -410,38 +410,45 @@ tabs, and an item-level clean-up rule (decision 10) as the primary rule.
 
 ## 9. Progress
 
-Work that does not touch files the MAPS plan is editing (`run.ts`, `controller.ts`, `Camp.tsx`, `Hud.tsx`, `styles.css` and
-the rest of `run` and `sim`) can go ahead; the rest waits for it. All of the work below is in new files, plus one line in
-`main.ts`, the viewport meta and one height in `index.html`, and a note in the README.
+All of it is committed on `main`. The milestones were built in the order P0, P1, P2 and P3, P4, P5, P8, P9, P6 and the rest of
+P3 and P7 (P8 had to wait for the MAPS plan to finish with `run.ts`).
 
-**P0, baseline and harness: done in part.**
+| #      | State                  | What was built                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------ | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **P0** | done, except one item  | `src/ui/device.ts` (breakpoints 600 and 960, `layoutFor`, `isCoarse`, `useViewport`) with tests; README note on `npm run dev -- --host`; baseline and result screenshots at 360×740 in `docs/screenshots/mobile/`; the findings below. **Not done:** photographs at 390, 768 and 844×390 (the layouts were checked at 360 and 768 by script and by eye, not photographed).                                 |
+| **P1** | done, except one item  | `src/ui/mobile.css`: `viewport-fit=cover`, `100dvh`, safe-area tokens, `overscroll-behavior`, `touch-action`, 44 px targets and 16 px inputs on coarse pointers, a 12–13 px text floor, no selection on the HUD, tree and canvas, phone padding and top-aligned scrolling screens. **Not done:** the optional overflow-check script.                                                                       |
+| **P2** | done                   | `src/ui/info.tsx`: `infoProps(text)` is a `title` on a mouse and a tap popover on a coarse pointer, used for orbs, charges, hex chips, flasks, skill slots, chips and the arriving line; Reward previews on the first tap and a **Take** button commits; hover is ignored on touch (a tap emulates it and it never ends); sticky hover styles reset. Undo is in the camp bar.                              |
+| **P3** | done                   | Camp below 960 px: a scrolling tab bar, a **Next map** tab (the side column), a bottom bar with the class, Undo and Next map; the item card is a bottom sheet with a close button and sticky buttons; Items, Skills, Workbench, Sheet, Codex, Summary, Title and Class select reflow at 360 px with no horizontal overflow.                                                                                |
+| **P4** | done                   | `TreeView`: pinch zoom, +, − and Centre buttons, a view fitted to the build on small screens, taps that reach the nearest node within 22 px (`treeHit.ts`, unit-tested), first tap shows a dock with Allocate or Refund, the second tap or the button commits, a larger drag threshold, the view keeps its centre when the area resizes.                                                                   |
+| **P5** | done                   | Gems by tap: tap a gem or a placed gem for a sheet with the card and **Socket in the best place**, **Remove** and **★ Make primary**; tap a socket to place or move; no HTML5 drag or hover tooltips on touch. Drag and drop is unchanged on desktop.                                                                                                                                                      |
+| **P6** | done, except two items | Phone HUD (64 px orbs, one centre column, speed buttons down the right edge, Abandon under the status line), the enemy card as a sheet above the orbs, pixel zoom 2 / 1.5 / 1 by width (1 under 640 px) that follows resizes (`MapScene` and `resize()`), finger-sized picking (14 px). **Not done:** the `resolution` experiment (Phaser 4.2.1 has no such game option) and frame timing on a phone (P7). |
+| **P7** | started                | `copyText` (`src/clipboard.ts`) falls back to a textarea when `navigator.clipboard` is missing, used by Copy save and the crash report. **Not done:** a real phone and tablet over the LAN, and a quality toggle (nothing measured yet says it is needed).                                                                                                                                                 |
+| **P8** | done                   | `src/run/found.ts`: `unseen`, `acquired` and `favourites` in `RunState`, `noteFound`, `markSeen`, `toggleFavourite`, `ageOf`, `oldItems`, `pruneFound`; `newLoot` is gone; `SAVE_VERSION` 7 with a 6→7 carry-over (a real save was migrated in the browser); `junkItems` skips favourites; Auto-continue pauses for unseen rares and uniques.                                                              |
+| **P9** | done                   | Items: **New** and **★ Favourites** filters with counts, a star on every row and in the card (key `F`), **Pin ★**, **Mark all seen**, items are seen when selected, **Clean up…** (`CleanUp.tsx`, `cleanUp.ts`) with a live preview, kept counts and a confirmation, a prompt before discarding a favourite. At 300 items opening the tab took 63 ms, at 1,000 items 114 ms.                               |
 
-- Done: `src/ui/device.ts` (breakpoints, `layoutFor`, `isCoarse`, `viewport`, `useViewport`) with tests, including one that keeps
-  the CSS breakpoints in step with the constants; a README note on `npm run dev -- --host`; baseline screenshots at 360×740 of
-  the title, class select, camp (Items tab) and map screens in `docs/screenshots/mobile/`; the findings below.
-- Not done: baselines at 390×844, 768×1024 and 844×390; the Summary screen (needs a finished run); a real device (P7).
+**Findings at 360×740** (the baseline, before any of this):
 
-Findings at 360×740:
+| Screen       | Finding                                                                                                                                                           |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Title        | Fits. The demo buttons touched the screen edges and the 64 px heading was wide.                                                                                   |
+| Class select | The grid was 624 px wide: the screen scrolled sideways and two classes were cut off.                                                                              |
+| Codex        | No horizontal overflow; every row was under 44 px tall and the search input was 13 px.                                                                            |
+| Camp         | The tab body was 67 px wide: the 260 px side column took the rest.                                                                                                |
+| Map          | Playable, but the orbs wrapped onto separate rows and took half the height; the Abandon button overlapped the status line.                                        |
+| Hidden tab   | `onFrame` clamps a frame to 0.1 s and `requestAnimationFrame` stops while the page is hidden, so a map pauses by itself. No `visibilitychange` handler is needed. |
 
-| Screen       | Finding                                                                                                                                                                                                        |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Title        | Fits. The three demo buttons touched the screen edges; the 64 px heading was wide. (Fixed in P1.)                                                                                                              |
-| Class select | The grid was 624 px wide (the screen scrolled sideways, two classes were cut off). (Fixed in P1.)                                                                                                              |
-| Codex        | No horizontal overflow. Every one of its ~330 rows is under 44 px tall (a coarse-pointer floor now applies); the search input was 13 px (16 px on coarse pointers now).                                        |
-| Camp         | **The tab body is 67 px wide**: the 260 px side column takes the rest, so no tab can be used. The tab bar is 447 px wide. This is P3.                                                                          |
-| Map          | Playable: the camera zoom is 1.5 (about 240 world pixels wide). The two orbs wrap onto separate rows and take half the screen height, the skill bar, flasks and speeds sit in a 190 px column. This is P6.     |
-| Map          | The "Abandon map" button (from the MAPS plan) overlaps the top status line at 360 px; to be handled when that button is laid out in P6.                                                                        |
-| Hidden tab   | `onFrame` clamps a frame to 0.1 s and `requestAnimationFrame` stops while the page is hidden, so a map pauses by itself and cannot spiral. **No `visibilitychange` handler is needed**; the P6 item is closed. |
+**Decisions made while building** (also in DESIGN.md Appendix A):
 
-**P1, foundation: done in part** (`src/ui/mobile.css`, loaded after the other styles; every rule is a no-op on desktop or scoped by
-`(pointer: coarse)` or a width query):
+- The inventory migration is a carry-over for version 6 only. Older saves are still rejected, as the game does for every
+  other version bump; version 6 was the one players have today.
+- The pixel zoom is 1 under 640 px, not 1.5: at 360 px it shows about 360 world pixels across instead of 240, enough to see
+  the pack ahead. The figures are small but readable (`p6-360-map-hud.jpg`).
+- A coarse pointer changes how taps work (preview, then commit); a small width changes layout. A laptop with a touch screen
+  keeps the desktop layout and gets the touch rules.
+- `oldItems` counts an item as old when it was found MORE than _n_ levels ago, by the map counter; an item that exists in a
+  version 6 save counts as found on the level the save was loaded on.
+- Clean up defaults: items and flasks, normal, magic and rare; gems and uniques are opt-in; unseen items are kept unless
+  asked for; favourites are never chosen.
 
-- Done: `viewport-fit=cover`; `100dvh` on `html`, `body` and `#app`; safe-area tokens and insets on `.hud-top` and `.hud-bottom`;
-  `overscroll-behavior: none`; `touch-action: manipulation` on `#ui`; no tap flash; on coarse pointers a 44 px floor for buttons,
-  tabs, class cards, inventory rows and codex rows, 16 px inputs, bigger checkboxes, and no text selection or callout on the HUD,
-  the tree and the canvas; on phones, side padding, a screen that starts at the top and scrolls when it is taller than the
-  window (plain centring cut off the top), a smaller title, a one-column class grid and wrapping demo and codex rows.
-- Checked: at 360 px the title, class select and codex have no horizontal overflow and the class select starts at the top and
-  scrolls; at 1280 px the computed title size, centring, padding and HUD insets are unchanged.
-- Not done: text floors (most text is still 10–13 px; they go in per screen with P3), hit areas for the 30–34 px skill and flask
-  icons (P6), the Summary screen at 360 px, and the optional overflow-check script.
+**What is left:** the real-device pass (P7), photographs at the other widths (P0), the optional overflow-check script (P1),
+frame timing on a phone (P6), and the decisions in section 7 that a real device may change.
