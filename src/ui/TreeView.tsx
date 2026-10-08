@@ -6,6 +6,16 @@ import type { Controller } from '../run/controller';
 import { passivePoints } from '../run/run';
 import { allocate, canRemove, pathTo, refund } from '../run/tree';
 import { hex } from './ClassSelect';
+import { useViewport } from './device';
+import {
+  fitView,
+  nearestNode,
+  pinchView,
+  zoomAt,
+  type HitNode,
+  type Pt,
+  type View,
+} from './treeHit';
 
 const RADIUS: Record<TreeNode['kind'], number> = {
   start: 34,
@@ -16,11 +26,17 @@ const RADIUS: Record<TreeNode['kind'], number> = {
   hub: 12,
 };
 
-type View = { x: number; y: number; k: number };
+/** On a coarse pointer a node is hit within this many screen pixels, however small it is drawn. */
+const FINGER_PX = 22;
+/** The view is never fitted to less than this scale, so a late-game tree still opens at a readable size. */
+const FIT_MIN_K = 0.15;
 
 export function TreeView({ c }: { c: Controller }) {
   const run = c.run!;
   const tree = getTree();
+  const { coarse, layout } = useViewport();
+  // A small screen gets the zoom buttons and a view fitted to the build; only a coarse pointer changes how taps work.
+  const small = coarse || layout !== 'desktop';
   const svgRef = useRef<SVGSVGElement>(null);
   const gRef = useRef<SVGGElement>(null);
   const start = tree.nodes[tree.starts[run.classId]];
@@ -28,25 +44,74 @@ export function TreeView({ c }: { c: Controller }) {
   const drag = useRef<{ x: number; y: number; vx: number; vy: number; moved: boolean } | null>(
     null,
   );
+  const pointers = useRef(new Map<number, Pt>());
+  const pinch = useRef<{ from: [Pt, Pt]; v: View } | null>(null);
+  const size = useRef({ w: 0, h: 0 });
   const [hover, setHover] = useState<{ id: number; mx: number; my: number } | null>(null);
+  // On a coarse pointer the first tap on a node shows it (the dock below); the second tap or the button commits.
+  const [picked, setPicked] = useState<number | null>(null);
   const points = passivePoints(run);
   const alloc = run.build.allocated;
   const allocSet = useMemo(() => new Set(alloc), [alloc]);
   const classColor = hex(classDef(run.classId).color);
+  const hitNodes = useMemo<HitNode[]>(
+    () => tree.nodes.map((n) => ({ id: n.id, x: n.x, y: n.y, r: RADIUS[n.kind] })),
+    [tree],
+  );
 
   const apply = () => {
     const v = view.current;
     gRef.current?.setAttribute('transform', `translate(${v.x} ${v.y}) scale(${v.k})`);
   };
+  const local = (e: PointerEvent): Pt => {
+    const r = svgRef.current!.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  };
 
-  // Centre on the class start initially.
+  // Centre on the class start initially (on a small screen: fit the build and the ring around it).
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
     const r = svg.getBoundingClientRect();
-    view.current = { k: 0.22, x: r.width / 2 - start.x * 0.22, y: r.height / 2 - start.y * 0.22 };
+    size.current = { w: r.width, h: r.height };
+    if (!small) {
+      view.current = { k: 0.22, x: r.width / 2 - start.x * 0.22, y: r.height / 2 - start.y * 0.22 };
+    } else {
+      const ids = [start.id, ...alloc];
+      const box = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
+      for (const id of ids) {
+        const n = tree.nodes[id];
+        box.minX = Math.min(box.minX, n.x);
+        box.minY = Math.min(box.minY, n.y);
+        box.maxX = Math.max(box.maxX, n.x);
+        box.maxY = Math.max(box.maxY, n.y);
+      }
+      const fit = fitView(box, r.width, r.height, 450);
+      const k = Math.max(FIT_MIN_K, fit.k);
+      const cx = (box.minX + box.maxX) / 2;
+      const cy = (box.minY + box.maxY) / 2;
+      view.current = { k, x: r.width / 2 - cx * k, y: r.height / 2 - cy * k };
+    }
     apply();
-  }, [run.classId]);
+  }, [run.classId, small]);
+
+  // Keep the centre of the view when the area changes (a rotation, the address bar, a window resize).
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => {
+      const r = svg.getBoundingClientRect();
+      const old = size.current;
+      if (old.w > 0) {
+        view.current.x += (r.width - old.w) / 2;
+        view.current.y += (r.height - old.h) / 2;
+        apply();
+      }
+      size.current = { w: r.width, h: r.height };
+    });
+    ro.observe(svg);
+    return () => ro.disconnect();
+  }, []);
 
   const reachable = useMemo(() => {
     const s = new Set<number>();
@@ -104,22 +169,34 @@ export function TreeView({ c }: { c: Controller }) {
     );
   }, [allocSet, reachable]);
 
+  // The node being looked at: the hovered one with a mouse, the tapped one with a finger.
+  const focusId = coarse ? picked : (hover?.id ?? null);
   const hoverPath = useMemo(() => {
-    if (!hover || allocSet.has(hover.id)) return null;
-    return pathTo(alloc, run.classId, hover.id);
-  }, [hover?.id, alloc]);
+    if (focusId === null || allocSet.has(focusId)) return null;
+    return pathTo(alloc, run.classId, focusId);
+  }, [focusId, alloc]);
+
+  const zoomBy = (f: number) => {
+    const r = svgRef.current!.getBoundingClientRect();
+    view.current = zoomAt(view.current, f, r.width / 2, r.height / 2);
+    apply();
+  };
+  const centre = () => {
+    const r = svgRef.current!.getBoundingClientRect();
+    const k = view.current.k;
+    view.current = { k, x: r.width / 2 - start.x * k, y: r.height / 2 - start.y * k };
+    apply();
+  };
 
   const onWheel = (e: WheelEvent) => {
     e.preventDefault();
-    const svg = svgRef.current!;
-    const r = svg.getBoundingClientRect();
-    const mx = e.clientX - r.left;
-    const my = e.clientY - r.top;
-    const v = view.current;
-    const k2 = Math.max(0.05, Math.min(1.5, v.k * Math.exp(-e.deltaY * 0.0015)));
-    v.x = mx - ((mx - v.x) * k2) / v.k;
-    v.y = my - ((my - v.y) * k2) / v.k;
-    v.k = k2;
+    const r = svgRef.current!.getBoundingClientRect();
+    view.current = zoomAt(
+      view.current,
+      Math.exp(-e.deltaY * 0.0015),
+      e.clientX - r.left,
+      e.clientY - r.top,
+    );
     apply();
   };
 
@@ -130,7 +207,27 @@ export function TreeView({ c }: { c: Controller }) {
     return () => svg.removeEventListener('wheel', onWheel);
   }, []);
 
+  const commit = (n: number) => {
+    if (allocSet.has(n)) c.act((r) => refund(r, n));
+    else c.act((r) => allocate(r, n));
+  };
+
   const onDown = (e: PointerEvent) => {
+    const p = local(e);
+    pointers.current.set(e.pointerId, p);
+    if (coarse) {
+      try {
+        svgRef.current?.setPointerCapture(e.pointerId);
+      } catch {
+        /* a pointer that has already ended: nothing to capture */
+      }
+    }
+    if (pointers.current.size === 2) {
+      const [a, b] = [...pointers.current.values()];
+      pinch.current = { from: [a, b], v: { ...view.current } };
+      drag.current = null;
+      return;
+    }
     drag.current = {
       x: e.clientX,
       y: e.clientY,
@@ -140,32 +237,69 @@ export function TreeView({ c }: { c: Controller }) {
     };
   };
   const onMove = (e: PointerEvent) => {
+    if (pointers.current.has(e.pointerId)) pointers.current.set(e.pointerId, local(e));
+    const pz = pinch.current;
+    if (pz && pointers.current.size >= 2) {
+      const [a, b] = [...pointers.current.values()];
+      view.current = pinchView(pz.v, pz.from, [a, b]);
+      apply();
+      return;
+    }
     const d = drag.current;
     if (d && e.buttons) {
       const dx = e.clientX - d.x;
       const dy = e.clientY - d.y;
-      if (Math.abs(dx) + Math.abs(dy) > 4) d.moved = true;
+      if (Math.abs(dx) + Math.abs(dy) > (coarse ? 10 : 4)) d.moved = true;
       view.current.x = d.vx + dx;
       view.current.y = d.vy + dy;
       apply();
       return;
     }
+    if (coarse) return;
     const id = (e.target as Element).getAttribute?.('data-id');
     if (id !== null && id !== undefined) setHover({ id: Number(id), mx: e.clientX, my: e.clientY });
     else if (hover) setHover(null);
   };
   const onUp = (e: PointerEvent) => {
+    pointers.current.delete(e.pointerId);
+    if (pointers.current.size < 2) pinch.current = null;
     const d = drag.current;
     drag.current = null;
-    if (d?.moved) return;
+    // A lifted finger after a pinch, or the end of a pan, is not a tap.
+    if (!d || d.moved) return;
+    if (coarse) {
+      const p = local(e);
+      const id = nearestNode(hitNodes, view.current, p.x, p.y, FINGER_PX);
+      if (id === null) setPicked(null);
+      else if (id === picked) commit(id);
+      else setPicked(id);
+      return;
+    }
     const id = (e.target as Element).getAttribute?.('data-id');
     if (id === null || id === undefined) return;
-    const n = Number(id);
-    if (allocSet.has(n)) c.act((r) => refund(r, n));
-    else c.act((r) => allocate(r, n));
+    commit(Number(id));
+  };
+  const onCancel = (e: PointerEvent) => {
+    pointers.current.delete(e.pointerId);
+    if (pointers.current.size < 2) pinch.current = null;
+    drag.current = null;
   };
 
-  const hn = hover ? tree.nodes[hover.id] : null;
+  const hn = focusId !== null ? tree.nodes[focusId] : null;
+  const nodeText = (n: TreeNode) => (
+    <>
+      <div class={`tt-name ${n.kind}`}>
+        {n.kind === 'start' ? classDef(n.classStart!).name : n.name}
+      </div>
+      {modsText(n.mods).map((l, i) => (
+        <div key={i} class="tt-mod">
+          {l}
+        </div>
+      ))}
+    </>
+  );
+  const isOn = hn ? allocSet.has(hn.id) : false;
+  const removable = hn && isOn ? canRemove(alloc, run.classId, hn.id) : false;
   return (
     <div class="tree-wrap">
       <div class="tree-bar">
@@ -175,7 +309,24 @@ export function TreeView({ c }: { c: Controller }) {
         <span>
           Refund points: <b>{run.refundPoints}</b>
         </span>
-        <span class="muted">Drag to pan · wheel to zoom · click to allocate or refund</span>
+        {small && (
+          <span class="tree-zoom">
+            <button class="btn small" aria-label="Zoom out" onClick={() => zoomBy(1 / 1.4)}>
+              −
+            </button>
+            <button class="btn small" aria-label="Zoom in" onClick={() => zoomBy(1.4)}>
+              +
+            </button>
+            <button class="btn small" onClick={centre}>
+              Centre
+            </button>
+          </span>
+        )}
+        <span class="muted tree-help">
+          {coarse
+            ? 'Drag to pan · pinch to zoom · tap a node to look, tap it again to allocate or refund'
+            : 'Drag to pan · wheel to zoom · click to allocate or refund'}
+        </span>
       </div>
       <svg
         ref={svgRef}
@@ -183,12 +334,13 @@ export function TreeView({ c }: { c: Controller }) {
         onPointerDown={onDown}
         onPointerMove={onMove}
         onPointerUp={onUp}
+        onPointerCancel={onCancel}
       >
         <g ref={gRef}>
           {layer}
-          {hoverPath && (
+          {(hoverPath || (hn && isOn)) && (
             <g>
-              {hoverPath.map((id) => {
+              {(hoverPath ?? [hn!.id]).map((id) => {
                 const n = tree.nodes[id];
                 return (
                   <circle key={id} cx={n.x} cy={n.y} r={RADIUS[n.kind] + 6} class="path-ring" />
@@ -198,19 +350,12 @@ export function TreeView({ c }: { c: Controller }) {
           )}
         </g>
       </svg>
-      {hn && hover && (
+      {hn && hover && !coarse && (
         <div class="tooltip" style={{ left: hover.mx + 16, top: hover.my + 12 }}>
-          <div class={`tt-name ${hn.kind}`}>
-            {hn.kind === 'start' ? classDef(hn.classStart!).name : hn.name}
-          </div>
-          {modsText(hn.mods).map((l, i) => (
-            <div key={i} class="tt-mod">
-              {l}
-            </div>
-          ))}
-          {allocSet.has(hn.id) ? (
+          {nodeText(hn)}
+          {isOn ? (
             <div class="tt-hint">
-              {canRemove(alloc, run.classId, hn.id)
+              {removable
                 ? run.refundPoints > 0
                   ? 'Click to refund (1 refund point)'
                   : 'No refund points'
@@ -222,6 +367,48 @@ export function TreeView({ c }: { c: Controller }) {
               {hoverPath.length > points ? ' — not enough points' : ' — click to allocate'}
             </div>
           ) : null}
+        </div>
+      )}
+      {hn && coarse && (
+        <div class="tree-dock">
+          <button class="sheet-x tree-dock-x" aria-label="Close" onClick={() => setPicked(null)}>
+            ×
+          </button>
+          {nodeText(hn)}
+          {hn.kind === 'start' ? null : isOn ? (
+            <>
+              <div class="tt-hint">
+                {removable
+                  ? run.refundPoints > 0
+                    ? 'Refunding costs 1 refund point.'
+                    : 'No refund points left.'
+                  : 'Other passives depend on this one.'}
+              </div>
+              <button
+                class="btn small danger"
+                disabled={!removable || run.refundPoints <= 0}
+                onClick={() => commit(hn.id)}
+              >
+                Refund
+              </button>
+            </>
+          ) : hoverPath ? (
+            <>
+              <div class="tt-hint">
+                {hoverPath.length} point{hoverPath.length === 1 ? '' : 's'}
+                {hoverPath.length > points ? ' — not enough points' : ''}
+              </div>
+              <button
+                class="btn small primary"
+                disabled={hoverPath.length > points}
+                onClick={() => commit(hn.id)}
+              >
+                Allocate
+              </button>
+            </>
+          ) : (
+            <div class="tt-hint">Not connected to your passives yet.</div>
+          )}
         </div>
       )}
     </div>

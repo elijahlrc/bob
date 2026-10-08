@@ -314,3 +314,49 @@ body {
     flex: 1 1 200px;
   }
 }
+
+/* ---- The passive tree on a small screen or a touch screen (TreeView.tsx) ---- */
+.tree-zoom {
+  display: inline-flex;
+  gap: 4px;
+}
+.tree-dock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  box-sizing: border-box;
+  max-height: 45%;
+  overflow: auto;
+  padding: 10px calc(12px + var(--safe-right)) 12px calc(12px + var(--safe-left));
+  background: var(--panel);
+  border-top: 2px solid var(--hi);
+  box-shadow: 0 -6px 18px #000a;
+  font-size: 14px;
+}
+.tree-dock .tt-hint {
+  margin: 4px 0 8px;
+}
+.tree-dock-x {
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 4px;
+  width: var(--tap);
+  height: var(--tap);
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: var(--muted);
+}
+@media (max-width: 600px) {
+  .tree-bar {
+    gap: 8px 12px;
+    padding: 6px 10px;
+  }
+  .tree-help {
+    flex: 1 1 100%;
+    font-size: 12px;
+  }
+}
