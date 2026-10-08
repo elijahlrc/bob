@@ -23,6 +23,10 @@ npm run dev
 
 Then open http://localhost:5173.
 
+To try it on a phone or tablet on the same network, run `npm run dev -- --host` and open `http://<this computer's address>:5173`
+on the device. The page works over plain `http://`, except "Copy save" (the clipboard needs a secure context). Touch and
+small-screen work is planned in [docs/MOBILE.md](docs/MOBILE.md).
+
 ## How to play
 
 1. **New Run**, then pick one of six classes (they differ in starting attributes, gear, skill and
