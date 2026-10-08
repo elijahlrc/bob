@@ -192,10 +192,10 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
     expect(w.effects.some((e) => e.kind === 'slam' && e.radius === 2)).toBe(true);
   });
 
-  it('an Arbalest never moves and fires a bolt that pierces everything in its line', () => {
+  it('an Arbalest never moves and strikes everything in a line it has marked (a lance)', () => {
     const w = arena(true);
     const a = put(w, 'arbalest', 6);
-    expect(a.mon!.profile(0).pierce).toBeGreaterThanOrEqual(99);
+    expect(a.mon!.profile(0).skill.behaviour.kind).toBe('beam');
     const x0 = a.x;
     run(w, 3);
     expect(a.x).toBe(x0);

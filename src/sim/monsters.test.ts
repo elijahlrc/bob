@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { BOSS_ATTACK_TIME, buildMonster, type MonsterSpec } from '../calc/monster';
 import { monsterLife } from '../calc/formulas';
 import { Rng } from '../core/rng';
-import { MONSTER_MODS } from '../data/monsters';
+import { meanDurability } from '../calc/matrix';
+import { profileOf } from '../data/defence';
+import { MONSTER_MODS, MONSTER_TYPES } from '../data/monsters';
 import { THEMES, themeDef } from '../data/themes';
 import { generateLabyrinth } from '../gen/labyrinth';
 import { makeMapPlan } from '../gen/mapPlan';
@@ -24,7 +26,13 @@ describe('monster stats (§12.1–12.5)', () => {
   it('types and rarities scale life', () => {
     const base = monsterLife(20);
     expect(buildMonster(spec()).defence.maxLife).toBe(base);
-    expect(buildMonster(spec({ type: 'brute' })).defence.maxLife).toBe(Math.round(base * 1.7));
+    // A type's life multiple is its toughness: with its defences paid for in life (docs/ROSTER.md 6.2).
+    const brute = MONSTER_TYPES.brute;
+    const paid = meanDurability(profileOf(brute.faction, brute.defence), 20);
+    expect(paid).toBeGreaterThan(1);
+    expect(buildMonster(spec({ type: 'brute' })).defence.maxLife).toBe(
+      Math.round(base * (brute.lifeMult / paid)),
+    );
     expect(buildMonster(spec({ rarity: 'rare' })).defence.maxLife).toBe(Math.round(base * 4.5));
     expect(buildMonster(spec({ rarity: 'boss' })).defence.maxLife).toBe(Math.round(base * 30));
     expect(buildMonster(spec({ rarity: 'rare', mods: ['fortified'] })).defence.maxLife).toBe(

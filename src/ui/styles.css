@@ -1594,6 +1594,7 @@ select option {
   color: var(--muted);
 }
 .offer-info .asks,
+.offer-info .leans,
 .offer-info .rule {
   color: var(--muted);
 }

@@ -47,6 +47,12 @@ export function OfferInfo({
           Asks: {a.text}
         </div>
       ))}
+      {(info.leans.hard.length > 0 || info.leans.soft.length > 0) && (
+        <div class="leans">
+          {info.leans.hard.length > 0 && <>Hard to {info.leans.hard.join(', ')}. </>}
+          {info.leans.soft.length > 0 && <>Soft to {info.leans.soft.join(', ')}.</>}
+        </div>
+      )}
       <div
         class="mixbar"
         {...infoProps(

@@ -1,5 +1,7 @@
 import type { Character } from '../calc/character';
 import { effectiveRes } from '../calc/formulas';
+import { durabilityTable } from '../calc/matrix';
+import { profileOf } from '../data/defence';
 import { FACTION_NAMES, MONSTER_TYPES, type FactionId, type MonsterTypeId } from '../data/monsters';
 import {
   FACTION_ASKS,
@@ -34,7 +36,45 @@ export type ThemeInfo = {
   tags: ThreatTag[];
   /** Faction rules that apply (a quarter or more of the monsters). */
   rules: string[];
+  /** The kinds of damage the monsters are hard and soft to, on the whole (docs/ROSTER.md 6.2). */
+  leans: { hard: string[]; soft: string[] };
 };
+
+/** The kinds of damage a lean is read for: the probes of the build matrix that stand for each. */
+const LEAN_KINDS: [string, string[]][] = [
+  ['physical', ['physical', 'flurry']],
+  ['fire', ['fire']],
+  ['cold', ['cold']],
+  ['lightning', ['lightning']],
+  ['chaos', ['chaos']],
+];
+/** A kind is hard or soft when the monsters take this much longer or less long to kill with it, on the whole. */
+export const LEAN_HARD = 1.25;
+export const LEAN_SOFT = 0.8;
+
+/** What the monsters of a map are hard and soft to, weighted by how many of each type there are. */
+export function themeLeans(shares: [MonsterTypeId, number][], level: number): ThemeInfo['leans'] {
+  const total = shares.reduce((s, x) => s + x[1], 0) || 1;
+  const hard: string[] = [];
+  const soft: string[] = [];
+  const tables = shares.map(([id, share]) => ({
+    share,
+    t: durabilityTable(
+      profileOf(MONSTER_TYPES[id].faction, MONSTER_TYPES[id].defence),
+      Math.max(1, level),
+    ),
+  }));
+  for (const [kind, probes] of LEAN_KINDS) {
+    const mean =
+      tables.reduce(
+        (s, x) => s + (x.share * probes.reduce((a, p) => a + x.t[p], 0)) / probes.length,
+        0,
+      ) / total;
+    if (mean >= LEAN_HARD) hard.push(kind);
+    else if (mean <= LEAN_SOFT) soft.push(kind);
+  }
+  return { hard, soft };
+}
 
 /** A faction is "present" at this share. */
 export const PRESENT_SHARE = 0.25;
@@ -99,6 +139,7 @@ export function themeInfo(
       })),
     tags,
     rules: present.map((f) => FACTION_RULES[f.id]).filter((r): r is string => !!r),
+    leans: themeLeans(shares, level),
   };
 }
 

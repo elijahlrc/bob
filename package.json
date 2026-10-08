@@ -20,6 +20,7 @@
     "random": "tsx scripts/random-play.ts",
     "lethality": "tsx scripts/theme-lethality.ts",
     "sheet": "tsx scripts/sheet.ts",
+    "matrix": "tsx scripts/matrix.ts",
     "economy": "tsx scripts/currency-economy.ts",
     "coverage": "tsx scripts/coverage/coverage.ts",
     "coverage:fetch": "tsx scripts/coverage/fetch-reference.ts",

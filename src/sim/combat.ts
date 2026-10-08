@@ -296,6 +296,13 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     }
     if (p.overload) src.tOverload = 0;
   }
+  // A carapace: no single hit takes more than a share of the monster's life (docs/ROSTER.md 6.2).
+  const cap = dst.isPlayer ? undefined : dst.mon?.hitCap;
+  if (cap) {
+    const total = res.dmg[0] + res.dmg[1] + res.dmg[2] + res.dmg[3] + res.dmg[4];
+    const most = cap * dst.def.maxLife;
+    if (total > most) for (let i = 0; i < 5; i++) res.dmg[i] *= most / total;
+  }
   // Leech and life on hit. Some monsters cannot be leeched from; some gear makes crit leech instant.
   const instant =
     src.def.instantLeech || p.instantLeechAlways || (res.crit && p.instantLeechOnCrit);

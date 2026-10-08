@@ -5,6 +5,7 @@ import { SHAPE_INFO, shapeText, type ShapeId } from '../data/shapes';
 import { makeGem, makeItem } from '../gen/items';
 import { newRun } from '../run/run';
 import { startAction } from './actions';
+import { hit } from './combat';
 import { hazardAt } from './ai';
 import { createDummyWorld } from './dummy';
 import { inTelegraph, telegraphs } from './telegraph';
@@ -70,7 +71,7 @@ describe('attack shapes (docs/ROSTER.md section 5)', () => {
     expect(kind('warrior')).not.toHaveProperty('arc');
   });
 
-  it('a volley fires again, and an orb flies slowly', () => {
+  it('a salvo fires again, and an orb flies slowly', () => {
     expect(buildMonster(spec('archer')).profile(0).repeats).toBe(1);
     expect(buildMonster(spec('slinger')).profile(0).repeats).toBe(1);
     expect(buildMonster(spec('flagellant')).profile(0).repeats).toBe(1);
@@ -79,14 +80,14 @@ describe('attack shapes (docs/ROSTER.md section 5)', () => {
     expect(buildMonster(spec('spitter')).profile(0).projSpeedMult).toBe(1);
   });
 
-  it("a shape spreads the type's hit: an arrow of a volley hits for less than a plain arrow", () => {
+  it("a shape spreads the type's hit: an arrow of a salvo hits for less than a plain arrow", () => {
     const hit = (id: MonsterTypeId) => {
       const c = buildMonster(spec(id)).profile(0).hands[0].chunks;
       return c.reduce((s, x) => s + (x.min + x.max) / 2, 0);
     };
-    // The Archer's dmgMult is 0.8 and its volley shares 0.6 of it.
+    // The Archer's dmgMult is 0.8 and each shot of its salvo is half of it.
     const plain = hit('warrior') * 0.8;
-    expect(hit('archer')).toBeCloseTo(plain * 0.6, 0);
+    expect(hit('archer')).toBeCloseTo(plain * 0.5, 0);
   });
 
   it('a swing winds up a wedge in front of the monster, and its aim stops following the target', () => {
@@ -180,5 +181,30 @@ describe('attack shapes (docs/ROSTER.md section 5)', () => {
     }
     expect(shapeText(undefined)).toBeNull();
     expect(shapeText({ id: 'strike' })).toBeNull();
+  });
+});
+
+describe('a carapace (docs/ROSTER.md 6.2)', () => {
+  it("no single hit takes more than its share of a Sentinel's life, and a hit under it is untouched", () => {
+    const w = arena();
+    const sentinel = put(w, 'sentinel', 12);
+    const big = put(w, 'warrior', 14);
+    // A far stronger monster of the same kind hits it: the hit would take most of its life, and is cut to a fifth.
+    const strong = spawnMonster(
+      w,
+      { ...spec('warrior'), level: 100, rarity: 'boss' },
+      w.player.x + 16,
+      w.player.y,
+      0,
+      0,
+      'big',
+    );
+    const max = sentinel.def.maxLife;
+    hit(w, strong, sentinel, strong.mon!.profile(0), 0, 1);
+    expect(max - sentinel.life).toBeLessThanOrEqual(max * 0.2 + 1e-6);
+    expect(max - sentinel.life).toBeGreaterThan(max * 0.05);
+    // The same hit on a warrior, which has no carapace, takes far more of its life.
+    hit(w, strong, big, strong.mon!.profile(0), 0, 1);
+    expect(big.def.maxLife - big.life).toBeGreaterThan(big.def.maxLife * 0.2);
   });
 });

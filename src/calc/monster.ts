@@ -13,6 +13,8 @@ import {
 } from '../data/monsters';
 import { affixMonsterMods } from '../data/mapAffixes';
 import { LEGACY, statLevel, type Difficulty } from '../data/difficulty';
+import { defenceMods, profileOf } from '../data/defence';
+import { meanDurability } from './matrix';
 import { CondIndex, ModDB } from '../mods/modDb';
 import { maskAnd, mod, type Mod } from '../mods/types';
 import type { Defence } from './combat';
@@ -59,6 +61,8 @@ export type MonsterStats = {
   range: number;
   radius: number;
   xp: number;
+  /** A carapace: no single hit removes more than this share of its life (docs/ROSTER.md 6.2). */
+  hitCap?: number;
 };
 
 /** The condition bits of every monster kind (they share one index, so `monsterConds` means the same for all). */
@@ -196,7 +200,12 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
   // Life and damage read the curves at the stat level and share the hardness multiplier; the rest stay on the area level.
   const sl = spec.statLevel ?? m;
   const share = Math.sqrt(spec.power ?? 1);
-  const life = Math.round(monsterLife(sl) * easeLife(m) * t.lifeMult * r.life * share);
+  // A type's `lifeMult` is its toughness: its life with its defences paid for (docs/ROSTER.md 6.2), so a type that is hard
+  // to one kind of damage has the less life, and is no harder to kill on the whole than its toughness says.
+  const defProfile = profileOf(t.faction, t.defence);
+  const life = Math.round(
+    monsterLife(sl) * easeLife(m) * (t.lifeMult / meanDurability(defProfile, m)) * r.life * share,
+  );
   const mods: Mod[] = [
     mod('life', 'base', life),
     mod('accuracy', 'base', monsterAccuracy(m)),
@@ -205,6 +214,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
     mod('moveSpeed', 'base', t.speed),
     mod('critMulti', 'base', MONSTER_CRIT_MULTI - BASE_CRIT_MULTI),
     ...t.mods,
+    ...defenceMods(defProfile, life),
     ...shapeMods(t),
     ...(FACTION_MODS[t.faction] ?? []),
     ...variantMods(spec.variant, spec.type === 'mage'),
@@ -267,6 +277,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
     range: t.range,
     radius: spec.rarity === 'boss' ? 0.9 : spec.rarity === 'miniboss' ? t.radius * 1.3 : t.radius,
     xp: Math.round(baseXp(m) * r.xp),
+    hitCap: defProfile.hitCap,
   };
   cache.set(k, stats);
   return stats;

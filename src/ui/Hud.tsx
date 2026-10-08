@@ -2,6 +2,8 @@ import { CLASSES } from '../data/classes';
 import { hex, MOD_MARKS, RARITY_COLOR } from '../data/monsterMarks';
 import { monsterModDef, MONSTER_TYPES, BOSS_NAME, FACTION_NAMES } from '../data/monsters';
 import { abilitiesOf, abilityTexts } from '../data/abilities';
+import { ARCHETYPES } from '../data/archetypes';
+import { defenceTexts, profileOf } from '../data/defence';
 import { shapeText } from '../data/shapes';
 import { FACTION_GLYPH, FACTION_RULES, TYPE_BLURBS } from '../data/monsterInfo';
 import type { ThemeDef } from '../data/themes';
@@ -88,7 +90,9 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
       <div class="inspect-name">{a.name || (rarity === 'boss' ? BOSS_NAME : type)}</div>
       <div class="muted inspect-sub">
         {RARITY_LABEL[rarity]} {type}
-        {spec ? ` · Level ${spec.level}` : ''}
+        {spec
+          ? ` · ${ARCHETYPES[MONSTER_TYPES[spec.type].archetype].name} · Level ${spec.level}`
+          : ''}
       </div>
       {spec && (
         <div class="muted inspect-sub">
@@ -98,7 +102,13 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
         </div>
       )}
       {spec &&
-        [shapeText(MONSTER_TYPES[spec.type].shape), ...abilityTexts(abilitiesOf(spec.type))]
+        [
+          shapeText(MONSTER_TYPES[spec.type].shape),
+          ...abilityTexts(abilitiesOf(spec.type)),
+          ...defenceTexts(
+            profileOf(MONSTER_TYPES[spec.type].faction, MONSTER_TYPES[spec.type].defence),
+          ),
+        ]
           .filter((t): t is string => !!t)
           .map((t) => (
             <div key={t} class="muted inspect-sub">

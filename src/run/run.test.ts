@@ -172,8 +172,8 @@ describe('saving (§5.5)', () => {
 
 describe('the headless bot (§15.5)', () => {
   it('plays deterministically and levels up', () => {
-    const a = botRun('mystic', 21, 6);
-    const b = botRun('mystic', 21, 6);
+    const a = botRun('mystic', 22, 6);
+    const b = botRun('mystic', 22, 6);
     expect(a.maps.map((m) => [m.status, m.level])).toEqual(b.maps.map((m) => [m.status, m.level]));
     expect(a.maps[0].status).toBe('cleared');
   });
