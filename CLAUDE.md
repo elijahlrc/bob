@@ -19,7 +19,7 @@
   - No `Math.random`, `Date.now` or `performance.now` outside `render` and `ui`.
   - Use the seeded RNG in `src/core/rng.ts`.
 - **Before every commit:** `npm run check` and `npm run build` must both be green. Never weaken tests to pass.
-- **Git:** commit at milestone ends. Never push, and never add a remote.
+- **Git:** commit at milestone ends. Don't push by default; push when the user asks. Never add a remote.
 - **Environment:**
   - Windows, Node 24.
   - In PowerShell, refresh PATH first:
