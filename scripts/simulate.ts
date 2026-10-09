@@ -89,12 +89,13 @@ function parseArgs(argv: string[]): Args {
 const args = parseArgs(process.argv.slice(2));
 const results: (BotRunResult & { wallMs: number; simSeconds: number })[] = [];
 const t0 = performance.now();
-const simLog = args.log
-  ? new SimLog(
-      args.log,
-      `bot:${args.themes}/${args.crafting}${args.abandonBelow === undefined ? '' : '/abandon'}`,
-    )
-  : null;
+const simLog =
+  args.log && !args.merge.length
+    ? new SimLog(
+        args.log,
+        `bot:${args.themes}/${args.crafting}${args.abandonBelow === undefined ? '' : '/abandon'}`,
+      )
+    : null;
 if (args.merge.length) {
   // Join the raw results of runs made in other processes (--dump), then report on them as one.
   for (const file of args.merge) {
