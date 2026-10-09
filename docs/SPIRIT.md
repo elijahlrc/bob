@@ -1,6 +1,6 @@
 # Bob — Spirit Plan: making every gem do what its reference gem does
 
-Status: **plan, 2026-10-08. Nothing is built.** It follows [AUDIT-GEMS.md](AUDIT-GEMS.md), which re-judged all 326 gems of the
+Status: **plan, 2026-10-08. Nothing is built; the user has said to implement all of it, on their go-ahead.** It follows [AUDIT-GEMS.md](AUDIT-GEMS.md), which re-judged all 326 gems of the
 coverage plan against what each is _for_ in the reference game (PoE 3.9.0): 155 faithful, 133 drifted, 38 gutted. This plan
 is the work to make the other 171 faithful. The user answered four of the open questions on 2026-10-08 (section 11); the rest have defaults, and the user can overturn any of them. It reopens
 several rows of [DESIGN.md](DESIGN.md) 2.1 and says so in section 3.
@@ -47,7 +47,7 @@ use; totems cannot be hit.
 | **S11 Corpses**                           | Every kill leaves one; skills that consume them (swap, raise, offer, detonate, desecrate, unearth)                                                                                                                                  | 4                                              | M                    |
 | **S12 Minions**                           | Golem and offering buffs that follow the minion, a spectre that is a monster, an animated guardian that wears items, minion auras                                                                                                   | 7                                              | M                    |
 | **S13 The long tail**                     | The 65 gems whose gap is their own: a stack, a weapon rule, a conditional, a per-charge scaling                                                                                                                                     | 65                                             | L (in three batches) |
-| **S14 Close**                             | A fresh re-audit, the residue, the docs, one bot sample                                                                                                                                                                             | the verdict                                    | M                    |
+| **S14 Close**                             | A fresh re-audit, the residue, the docs, a bot sample                                                                                                                                                                               | the verdict                                    | M                    |
 
 **Order of work.** S0, S1, S2, S3, S4 first: they repair the most gems per unit of engine, and they are what the user's
 Flicker Strike example is about. S5 to S12 follow the dependencies of section 7. S13 and S14 close. The plan can be stopped
@@ -570,10 +570,10 @@ is worth its cost.
 - **Primary:** the ledger. `npm run spirit` after each milestone: the gems it names read `faithful`, the loop tests pass.
 - **Per milestone:** `npm run check`, `npm run build`, the existing floors (`x9` forty-Swarm, the bot speed floor), the
   convergence tests, and the parity smoke.
-- **Balance: no per-milestone bot samples**, per the user's standing instruction (no incremental sims; at most one at the end,
-  only if its result would change what is done next). This plan will move balance a lot: cooldowns cut DPS, ramps reshape it,
+- **Balance: two bot samples in all**, per the user's answer of 2026-10-08 and standing instruction (no incremental sims): one at
+  the S4 stopping point, so the user can decide whether to continue, and one at S14. Nothing in between. This plan will move balance a lot: cooldowns cut DPS, ramps reshape it,
   Barrage and the shotgun skills raise single-target damage, statuses make enemies weaker, deployables make some builds stronger or weaker. The difficulty
-  default of 1.75 / 1.8 / 0.3 has never been measured and is measured once, at S14. The sample is read as a regression
+  default of 1.75 / 1.8 / 0.3 has never been measured and is first measured at S4. The sample is read as a regression
   detector, not a target (it is a weak proxy for a human; the user has said so).
 - **The re-audit is the verdict** (4.4).
 
@@ -583,7 +583,7 @@ is worth its cost.
 
 | Risk                                                                     | Answer                                                                                                                                                                                               |
 | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The balance moves a lot and is not measured until the end                | Stated up front; each part states its direction (section 6); one sample at S14; the difficulty knobs (scaling, base, variance) are the user's to turn                                                |
+| The balance moves a lot and is not measured until the end                | Stated up front; each part states its direction (section 6); a sample at S4 and one at S14; the difficulty knobs (scaling, base, variance) are the user's to turn                                    |
 | Barrage and the shotgun skills raise single-target damage                | That is the reference game's balance; the sheet's overlap model keeps the DPS honest; S14's sample shows the effect                                                                                  |
 | Calc and sim diverge on a new primitive                                  | Every primitive has a convergence test; the sheet is a first-class citizen of each milestone                                                                                                         |
 | The AI plays a skill badly (a bad stance swap, a wasted spend)           | The policy is data, stated on the card, tested; a bad policy is a data change                                                                                                                        |
@@ -634,15 +634,14 @@ decision, DESIGN.md Appendix A. One commit a milestone, with explicit paths.
 3. **The gems COVERAGE left out (D7).** None of them: the plan covers the 326 gems of the audit.
 4. **Curses (D4).** The 3.9 duration, effect lists and curse limit.
 
-**Defaults in effect until answered:**
-
-5. **How faithful in numbers.** The 3.9 value where the engine can now express the loop (costs, cooldowns, durations,
-   effectiveness), scaled by Bob's curves; Bob's tuned values stay where the reference game has none.
-6. **What the bot's sample is for.** One at S14, as a regression detector. If the result is far from the earlier numbers, the plan
-   does not rebalance gems; it reports and the user decides (the difficulty knobs, or a gem).
-7. **How far the AI's policies go (section 5).** As written. The most contestable rows are mines (the character detonates) and
-   stances (the character swaps). Both are what a player does, and the card will say so.
-8. **Where to start.** S0, then S1, then S2, in that order, stopping after S4 for a look (section 7).
+5. **Numbers.** The 3.9 value where the engine can express the loop (costs, cooldowns, durations, effectiveness), scaled by Bob's
+   curves; Bob's tuned values stay only where the reference game has none.
+6. **The AI's policies (section 5).** Accepted as written. They are the only allowed adaptations.
+7. **Bot samples.** One at the S4 stopping point and one at S14, and none in between. A sample is a regression detector. If a
+   result is far from the earlier numbers, the plan does not rebalance gems; it reports and the user decides (the difficulty
+   knobs, or a gem).
+8. **Starting.** The user, 2026-10-08: implement the entire plan, **but wait for their go-ahead**. Nothing is built until they
+   give it. The first milestones are S0, S1, S2 in that order, with the sample and a pause at S4.
 
 ---
 
