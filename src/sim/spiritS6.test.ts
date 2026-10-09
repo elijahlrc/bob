@@ -3,7 +3,7 @@ import type { Build } from '../data/types';
 import { makeGem, makeItem } from '../gen/items';
 import { newRun } from '../run/run';
 import { gainCharge } from './charges';
-import { killActor } from './combat';
+import { flaskMask, killActor, playerConds } from './combat';
 import { createDummyWorld, dummyDefence } from './dummy';
 import { bannerStage } from './banners';
 import { consecratedAt } from './fields';
@@ -280,6 +280,27 @@ describe('banners (standardOfValour, standardOfDread)', () => {
     const left = Math.ceil((b.t + 1) * 60);
     for (let i = 0; i < left; i++) stepWorld(world);
     expect(world.banner === null || world.banner !== b).toBe(true);
+  });
+
+  it('its stages strengthen what it gives the character as much as what it does to enemies', () => {
+    const { world } = carried('standardOfValour');
+    for (let i = 0; i < 12; i++) {
+      const m = neighbour(world, world.player.x + 3, world.player.y);
+      m.life = 1;
+      killActor(world, m);
+    }
+    neighbour(world, world.player.x + 2, world.player.y + 1);
+    neighbour(world, world.player.x + 2, world.player.y - 1);
+    const conds = playerConds(world, null);
+    const carriedAcc = world.char.profile(world.primary, conds, flaskMask(world)).hands[0].accuracy;
+    let guard = 0;
+    while (!world.banner!.placed && guard++ < 10 * 60) stepWorld(world);
+    const b = world.banner!;
+    expect(b.effect).toBeCloseTo(1.12, 5);
+    const placedAcc = world.char.profile(world.primary, conds, flaskMask(world)).hands[0].accuracy;
+    const none = world.char.profile(world.primary, conds, 0).hands[0].accuracy;
+    expect(carriedAcc).toBeCloseTo(none, 5);
+    expect(placedAcc).toBeGreaterThan(carriedAcc);
   });
 
   it('works only where it stands once it is down', () => {

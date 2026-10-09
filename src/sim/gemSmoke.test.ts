@@ -46,8 +46,8 @@ describe('every active gem', () => {
         seedFor(def, world, dummy);
         let seen = false;
         const u = def.utility;
-        // A guard waits for low life.
-        if (u.kind === 'buff' && u.policy === 'guard')
+        // A guard waits for low life, and a run (a buff the first skill ends) for a crowd or a hurt character.
+        if (u.kind === 'buff' && (u.policy === 'guard' || u.second))
           world.player.life = world.player.def.maxLife * 0.4;
         // A skill fed by rage starts with some.
         if (u.kind === 'buff' && u.rage) world.rage = 30;

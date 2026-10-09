@@ -16,7 +16,7 @@ Conventions follow DESIGN.md:
 
 ## Outcome (2026-10-07)
 
-- **Gems 325 of 349 (93.1%), uniques 769 of 782 (98.3%)**, measured by `npm run coverage`. Every entry has its own name, a
+- **Gems 325 of 349 (93.1%), uniques 769 of 782 (98.3%)**, measured by `npm run coverage` (after the spirit plan's cuts of 2026-10-09: gems 319, uniques 765). Every entry has its own name, a
   note on what it does and what was simplified (`docs/coverage/map.json`), and every gem has a generated smoke test.
 - **Engine added on the way:** per-character condition bits (no cap on condition ids), 52-bit masks, skill types and the
   support fixpoint, the buff layer, utility skills with use policies (curses, marks, warcries, banners, guards, buffs,

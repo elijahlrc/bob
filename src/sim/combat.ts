@@ -25,7 +25,7 @@ import {
 } from '../data/constants';
 import { CRESCENDO_STEP_BONUS } from '../data/mapTypes';
 import { cannotBleed } from '../data/monsters';
-import { BUFFS, BUFF_IDS, DYN_SHIFT } from '../data/buffs';
+import { BANNER_SHIFT, BUFFS, BUFF_IDS, DYN_SHIFT } from '../data/buffs';
 import { MONSTER_CONDS, scaleOf } from '../calc/monster';
 import { AURA_CONDS, WIELD_CONDS } from '../calc/staticConds';
 import { maskIntersects, maskOr, tagBit, type CondId, type Mod } from '../mods/types';
@@ -180,6 +180,8 @@ export function monsterConds(a: Actor): number {
 
 export function flaskMask(w: World): number {
   let m = w.rage << DYN_SHIFT;
+  // A banner that stands gives the character more of its buff for each stage it was put down with.
+  if (w.banner?.placed) m |= w.banner.stages << BANNER_SHIFT;
   w.flasks.forEach((f, i) => {
     if (f.activeT > 0 && f.spec.buff.length) m |= 1 << i;
   });

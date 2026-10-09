@@ -8980,18 +8980,6 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     flavour: 'Each wave leaves another layer.',
   },
   {
-    id: 'marshalsHauberk',
-    name: "Marshal's Hauberk",
-    baseId: 'body_ares_4',
-    level: 70,
-    mods: [
-      m('armour', 'inc', 150, 190, { local: true }),
-      m('es', 'inc', 150, 190, { local: true }),
-      m('life', 'base', 60, 90),
-    ],
-    flavour: 'The dead drop their blades; the blades do not stay dropped.',
-  },
-  {
     id: 'hexwovenRobe',
     name: 'Hexwoven Robe',
     baseId: 'body_es_4',
@@ -10368,19 +10356,6 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     flavour: 'A lighter swing for a shorter grave.',
   },
   {
-    id: 'bladewakeHammer',
-    name: 'Bladewake Hammer',
-    baseId: 'mace2_4',
-    level: 45,
-    mods: [
-      m('stunDuration', 'inc', 45),
-      m('damage', 'inc', 150, 200, { damageTypes: ['physical'], local: true }),
-      m('castSpeed', 'inc', 8, 12),
-      m('attackSpeed', 'inc', 8, 12, { local: true }),
-    ],
-    flavour: 'Every kill leaves something blunt and sharp behind.',
-  },
-  {
     id: 'regentsWrit',
     name: "Regent's Writ",
     baseId: 'sword2_3',
@@ -10412,31 +10387,6 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
       m('minionCount', 'base', 1),
     ],
     flavour: 'Ride out before the crown can fall.',
-  },
-  {
-    id: 'whirlwindFalchion',
-    name: 'Whirlwind Falchion',
-    baseId: 'sword2_5',
-    level: 60,
-    mods: [
-      m('accuracy', 'inc', 40),
-      m('damage', 'inc', 160, 190, { damageTypes: ['physical'], local: true }),
-      m('attackSpeed', 'inc', 25, 30, { local: true }),
-      m('moveSpeed', 'inc', 5),
-    ],
-    flavour: 'It spins on its own once the room is red.',
-  },
-  {
-    id: 'twinwhirlFalchion',
-    name: 'Twinwhirl Falchion',
-    baseId: 'sword2_5',
-    level: 65,
-    mods: [
-      m('damage', 'inc', 160, 190, { damageTypes: ['physical'], local: true }),
-      m('attackSpeed', 'inc', 25, 30, { local: true }),
-      m('moveSpeed', 'inc', 5),
-    ],
-    flavour: 'Two of everything, and both of them hungry.',
   },
   {
     id: 'bonepactWand',

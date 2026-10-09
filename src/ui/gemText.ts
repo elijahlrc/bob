@@ -85,7 +85,7 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
       stats: [
         `Carry it, holding ${num(b.reservePct)}% of your mana; cast again to put it down for ${num(b.placedSeconds)} s`,
         `Gains a stage for each ${b.stageOn === 'kill' ? 'kill' : 'impale'} while carried, up to ${b.maxStages}`,
-        `Each stage: ${num(per.area)}% more area, ${num(per.effect)}% more effect, ${num(per.seconds)} s longer once put down`,
+        `Each stage: ${num(per.area)}% more area, ${num(per.effect)}% more effect (on you and on enemies), ${num(per.seconds)} s longer once put down`,
         POLICY_TEXT.banner,
       ],
       effects: [
@@ -120,7 +120,7 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
     return {
       stats: [
         `Lasts ${num(u.seconds)} s`,
-        POLICY_TEXT[u.policy],
+        u.second ? 'Used when a crowd closes in or you are hurt' : POLICY_TEXT[u.policy],
         ...(u.cooldown ? [`${num(u.cooldown)} s cooldown`] : []),
       ],
       effects: modsText(gemMods(u.mods, level, def.id)),

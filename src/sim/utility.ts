@@ -81,6 +81,11 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
         const big =
           target.rarity === 'boss' || target.rarity === 'miniboss' || target.rarity === 'rare';
         if (!pack && !big) continue;
+      } else if (u.second) {
+        // A buff the first skill ends is a run: begun to get through a crowd or away when hurt, not at every fight.
+        const hurt = p.life < p.def.maxLife * 0.7 && enemiesNear(w, p.x, p.y, 5).length >= 1;
+        const crowded = enemiesNear(w, p.x, p.y, 4).length >= PACK_SIZE;
+        if (!hurt && !crowded) continue;
       } else if (enemiesNear(w, p.x, p.y, PACK_RADIUS).length < 1) continue;
       return { choice: c, prof, cd: u.cooldown ?? 0.5 };
     }
@@ -130,7 +135,7 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
       return { choice: c, prof, cd: summonRespawn(c) };
     }
     // A blink closes the gap to a target the primary skill cannot reach yet; one with an effect where it leaves or lands is also
-    // used when that would fall on a pack, and Withering Step when a fight is on.
+    // used when that would fall on a pack, and Withering Step to run through a pack (the character then makes no attack while it lasts).
     if (u.kind !== 'blink') continue;
     if (c.skill.cooldown !== undefined && !skillReady(w, c)) continue;
     if (blinkGroupBusy(w, c)) continue;
@@ -163,10 +168,7 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
       !!u.elusive &&
       w.buffT.elusive <= 0 &&
       d <= CAST_RANGE &&
-      (enemiesNear(w, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE ||
-        target.rarity === 'rare' ||
-        target.rarity === 'boss' ||
-        target.rarity === 'miniboss');
+      enemiesNear(w, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE;
     if (u.warp && w.warp) continue;
     if (gap || packHere || packThere || fight || corpseGo)
       return { choice: c, prof, cd: u.cooldown };

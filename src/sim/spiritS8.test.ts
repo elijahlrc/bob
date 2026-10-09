@@ -155,8 +155,15 @@ describe('Lightning Warp (boltStep)', () => {
 });
 
 describe('Withering Step (rotStride)', () => {
+  /** A pack stands about the target: Withering Step is for running through one. */
+  const pack = (w: World, dummy: Actor) => {
+    neighbour(w, dummy.x + 0.5, dummy.y + 1);
+    neighbour(w, dummy.x + 0.5, dummy.y - 1);
+  };
+
   it('grants Elusive, withers the enemies that come near once each, and ends with the next skill used', () => {
     const { world: w, dummy } = blinkWorld(['rotStride'], 5);
+    pack(w, dummy);
     const far = neighbour(w, w.player.x - 20, w.player.y);
     let elusive = false;
     for (let i = 0; i < 2 * 60 && !elusive; i++) {
@@ -170,7 +177,8 @@ describe('Withering Step (rotStride)', () => {
   });
 
   it('using any other skill ends the buff and its aura', () => {
-    const { world: w } = blinkWorld(['rotStride'], 5);
+    const { world: w, dummy } = blinkWorld(['rotStride'], 5);
+    pack(w, dummy);
     let elusive = false;
     for (let i = 0; i < 2 * 60 && !elusive; i++) {
       stepWorld(w);
@@ -179,11 +187,37 @@ describe('Withering Step (rotStride)', () => {
     expect(elusive).toBe(true);
     // The crushing blow is used next, or has been: either way the buff goes.
     let ended = false;
-    for (let i = 0; i < 6 * 60 && !ended; i++) {
+    for (let i = 0; i < 8 * 60 && !ended; i++) {
       stepWorld(w);
       ended = w.buffT.elusive === 0 && w.wither === null;
     }
     expect(ended).toBe(true);
+  });
+
+  it('the character runs on without attacking while it lasts, then goes back to the fight', () => {
+    const { world: w, dummy } = blinkWorld(['rotStride'], 5);
+    pack(w, dummy);
+    let elusive = false;
+    for (let i = 0; i < 2 * 60 && !elusive; i++) {
+      stepWorld(w);
+      elusive = w.buffT.elusive > 0;
+    }
+    expect(elusive).toBe(true);
+    const before = dummy.life;
+    let ran = 0;
+    while (w.buffT.elusive > 0 && ran++ < 8 * 60) {
+      stepWorld(w);
+      if (w.buffT.elusive > 0) expect(dummy.life).toBe(before);
+    }
+    expect(w.buffT.elusive).toBe(0);
+    run(w, 3);
+    expect(dummy.life).toBeLessThan(before);
+  });
+
+  it('is not begun for a lone enemy', () => {
+    const { world: w } = blinkWorld(['rotStride'], 5);
+    run(w, 3);
+    expect(w.buffT.elusive).toBe(0);
   });
 
   it('its cooldown does not run while Elusive lasts', () => {

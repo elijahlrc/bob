@@ -4952,11 +4952,6 @@
    "status": "covered",
    "note": "Huge armour, life and fire and cold resistance. The crab aspect and its barriers are approximated as a steelskin-style guard triggered when hit; the bleed immunity is dropped."
   },
-  "marshalsHauberk": {
-   "ref": "Chains of Command",
-   "status": "covered",
-   "note": "Armour, energy shield and life. The chance on kill to animate a weapon is dropped (Animate Weapon is not in the game), as are the animated-guardian damage and splash lines and the restriction on other minions."
-  },
   "hexwovenRobe": {
    "ref": "Doedre's Skin",
    "status": "covered",
@@ -5407,11 +5402,6 @@
    "status": "covered",
    "note": "Stun duration, socketed melee and minion gem levels, mana, minion life and a smaller skill effect duration bonus. The strength requirement reduction is dropped."
   },
-  "bladewakeHammer": {
-   "ref": "Jorrhast's Blacksteel",
-   "status": "covered",
-   "note": "Physical damage, attack and cast speed. The chance on kill to wake animated blades is dropped (Animate Weapon is not in the game), as are the duration and extra-copy lines."
-  },
   "regentsWrit": {
    "ref": "Queen's Decree",
    "status": "covered",
@@ -5421,16 +5411,6 @@
    "ref": "Queen's Escape",
    "status": "covered",
    "note": "Three additional minions, minion life, damage, movement speed and long minion durations, with accuracy on a sword."
-  },
-  "whirlwindFalchion": {
-   "ref": "The Dancing Dervish",
-   "status": "covered",
-   "note": "Physical damage, attack speed, accuracy and movement speed. The chance on kill to wake animated blades is dropped (Animate Weapon is not in the game)."
-  },
-  "twinwhirlFalchion": {
-   "ref": "The Dancing Duo",
-   "status": "covered",
-   "note": "Physical damage, attack speed and movement speed. The chance on kill to wake animated blades is dropped (Animate Weapon is not in the game)."
   },
   "bonepactWand": {
    "ref": "Midnight Bargain",

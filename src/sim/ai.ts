@@ -38,6 +38,7 @@ import {
   whileStunned,
   withdrawing,
 } from './movement';
+import { running } from './blinks';
 import { chooseUtility } from './utility';
 import type { Actor, World } from './types';
 
@@ -296,6 +297,8 @@ export function playerAI(w: World, dt: number): void {
     target = findTarget(w) ?? undefined;
   }
   if (target && target.id === ai.skipId && w.t < ai.skipUntil) target = undefined;
+  // Withering Step and Phase Run are run in: no attack until they are over (a skill used would end them).
+  if (target && running(w)) target = undefined;
   if (target) {
     // Stall breaker: a target that takes no damage for a long time is dropped for a while, so the
     // run moves on (and the monster, if it is chasing, comes to the player instead).

@@ -520,8 +520,13 @@ export function hasRecoverSource(mods: readonly Mod[]): boolean {
 // Rage: a count from 0 to the maximum, worth 1% increased attack damage, 0.5% increased attack speed and 0.2%
 // increased movement speed a point. One is lost every half second unless rage was gained or the player was hit lately.
 export const BASE_MAX_RAGE = 50;
-/** The dynamic mask the calc and the sim pass around holds flask bits below this shift and the rage count above. */
+/**
+ * The dynamic mask the calc and the sim pass around holds flask bits below DYN_SHIFT, then the rage count (up to RAGE_BITS bits),
+ * then, from BANNER_SHIFT, the stages of a banner that stands (its character buffs grow with them).
+ */
 export const DYN_SHIFT = 8;
+export const RAGE_MASK = 0xff;
+export const BANNER_SHIFT = 16;
 /** Rage the character sheet assumes when something can grant it. */
 export const ASSUMED_RAGE = 20;
 export const RAGE_DECAY_EVERY = 0.5;

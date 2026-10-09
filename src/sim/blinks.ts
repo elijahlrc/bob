@@ -29,6 +29,10 @@ export type WarpState = {
   profile: SkillProfile;
 };
 
+/** A blink that lands among this many enemies within this radius is a run through them; one that closes on a lone enemy is not. */
+const RUN_PACK_RADIUS = 7;
+const RUN_PACK_SIZE = 3;
+
 /** Withering Step: enemies that come within the radius are withered, the first time each does; any other skill ends it. */
 export type WitherState = {
   skill: string;
@@ -36,6 +40,8 @@ export type WitherState = {
   stacks: number;
   seconds: number;
   seen: number[];
+  /** It was begun amid a pack: the character runs on through it, with no attack, until it is over. */
+  run: boolean;
 };
 
 /** Projectiles a returning skill has caught (Venom Gyre) and the time they are kept. */
@@ -242,6 +248,7 @@ function arrive(
       stacks: Math.round(levelValue(u.elusive.stacks, c.skill.level)),
       seconds: u.elusive.seconds,
       seen: [],
+      run: enemiesAt(w, x, y, RUN_PACK_RADIUS).length >= RUN_PACK_SIZE,
     };
     // Those already near the landing are withered at once, not only the ones that come after.
     tickWither(w);
@@ -338,6 +345,21 @@ export function tickWither(w: World): void {
     s.seen.push(e.id);
     applyStatus(w, e, 'withered', { seconds: s.seconds, stacks: s.stacks });
   }
+}
+
+/**
+ * Whether the character is running: Withering Step or Phase Run was used and its effect, which the first skill used would end, is
+ * still on. The character then runs on along its way, past the enemies, and makes no attack until it is over.
+ */
+export function running(w: World): boolean {
+  if (w.wither?.run && w.buffT.elusive > 0) return true;
+  if (w.buffT.phaseRun <= 0) return false;
+  for (const c of w.char.utilities) {
+    const u = c.skill.utility;
+    if (u?.kind === 'buff' && u.second && w.buffT[u.buff] > 0 && w.buffT[u.second.buff] > 0)
+      return true;
+  }
+  return false;
 }
 
 /** The character uses a skill: Withering Step ends (the buff and its aura), unless the skill is the blink itself. */

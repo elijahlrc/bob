@@ -34,7 +34,9 @@ import {
   BASE_MAX_RAGE,
   BUFFS,
   BUFF_IDS,
+  BANNER_SHIFT,
   DYN_SHIFT,
+  RAGE_MASK,
   hasRageSource,
   hasRecoverSource,
   rageMods,
@@ -1347,7 +1349,9 @@ export class Character {
       costMult: choice.costMult,
       conds: c,
       statValue: (s: StatId) =>
-        s === 'rage' ? Math.min(this.rageMax, flaskMask >> DYN_SHIFT) : this.statValue(s),
+        s === 'rage'
+          ? Math.min(this.rageMax, (flaskMask >> DYN_SHIFT) & RAGE_MASK)
+          : this.statValue(s),
     });
     // What the skill and its supports give on events (charges, buffs, rage, recovery): rolled when the skill hits.
     p.gains = [...choice.skill.mods, ...supportMods].filter((m) => GAIN_STAT.test(m.stat));
@@ -1355,13 +1359,34 @@ export class Character {
     return p;
   }
 
-  /** The mod database with the flasks and the rage in the dynamic mask added (cached): flask bits, then rage << DYN_SHIFT. */
+  /** What a banner put down with this many stages adds to its character buff: the same mods again, for each percent of its effect per stage. */
+  private bannerExtra(stages: number): Mod[] {
+    const out: Mod[] = [];
+    for (const a of this.utilities) {
+      const u = a.skill.utility;
+      if (u?.kind !== 'buff' || !u.banner) continue;
+      const f = (u.banner.perStage.effect * stages) / 100;
+      const cond = { id: BUFFS[u.buff].cond };
+      for (const m of gemMods(u.mods, a.skill.level, a.skill.id))
+        out.push({
+          ...m,
+          value: m.value * f,
+          condition: cond,
+          source: { kind: 'gem' as const, id: a.skill.id },
+        });
+    }
+    return out;
+  }
+
+  /** The mod database with the flasks, the rage and the banner's stages in the dynamic mask added (cached). */
   dbWith(dyn: number): ModDB {
     if (!dyn) return this.db;
     let db = this.flaskDbs.get(dyn);
     if (!db) {
       const flasks = dyn & ((1 << DYN_SHIFT) - 1);
-      const extra: Mod[] = rageMods(Math.min(this.rageMax, dyn >> DYN_SHIFT));
+      const extra: Mod[] = rageMods(Math.min(this.rageMax, (dyn >> DYN_SHIFT) & RAGE_MASK));
+      const stages = dyn >> BANNER_SHIFT;
+      if (stages > 0) extra.push(...this.bannerExtra(stages));
       this.flasks.forEach((f, i) => {
         if (flasks & (1 << i)) extra.push(...f.buff);
       });

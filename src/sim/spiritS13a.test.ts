@@ -705,18 +705,22 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
   });
 
   it('Phase Run: speed and melee damage for a moment; the first skill used ends the speed, and the damage stays briefly', () => {
-    const { world: w } = world(['crushingBlow', 'slipstream'], 6, 'sword_3', STR);
+    const { world: w, dummy } = world(['crushingBlow', 'slipstream'], 1.4, 'sword_3', STR);
+    // A crowd is what it is used for.
+    neighbour(w, dummy.x + 0.5, dummy.y + 1);
+    neighbour(w, dummy.x + 0.5, dummy.y - 1);
     for (let i = 0; i < 60 && w.buffT.phaseRun <= 0; i++) stepWorld(w);
     expect(w.buffT.phaseRun).toBeGreaterThan(0);
     expect(w.buffT.phaseStrike).toBeGreaterThan(0);
-    // Walks into reach and strikes: the speed is over, the damage lingers a moment.
+    // The character runs on without an attack until the speed is over; then it strikes, and the damage lingers a moment.
+    const before = dummy.life;
     let ended = false;
     for (let i = 0; i < 60 * 4 && !ended; i++) {
       stepWorld(w);
+      if (w.buffT.phaseRun > 0) expect(dummy.life).toBe(before);
       if (w.buffT.phaseRun === 0) ended = true;
     }
     expect(ended).toBe(true);
-    expect(w.buffT.phaseStrike).toBeLessThanOrEqual(0.2);
   });
 });
 

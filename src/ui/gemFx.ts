@@ -279,13 +279,17 @@ export function utilityFxLines(u: UtilityDef, level: number): string[] {
     out.push(
       `Goes to the safest spot within ${num(u.distance)} when you are hurt or a pack closes in; smoke at both ends blinds what stands in it for ${num(u.escape.smoke.seconds)} s; the blink skills share a cooldown`,
     );
+  if (u.kind === 'blink' && u.elusive)
+    out.push(
+      'Landing among a pack, you run on through it without attacking until Elusive is over; the first skill you use ends it; not begun for a lone enemy',
+    );
   if (u.kind === 'buff' && u.shell)
     out.push(
       `${u.shell.absorb}% of the damage from hits goes into a pool of ${u.shell.capPct}% of your armour (at most ${u.shell.capMax}); when the buff ends or the pool is spent, ${num(lv(u.shell.reflect, level))}% of what it took goes out as fire around you`,
     );
   if (u.kind === 'buff' && u.second)
     out.push(
-      `The first skill you use ends the first effect; ${BUFFS[u.second.buff].name} stays ${num(u.second.keep)} s more`,
+      `The first skill you use ends the first effect; ${BUFFS[u.second.buff].name} stays ${num(u.second.keep)} s more; you run on without attacking until it is over`,
     );
   return out;
 }
