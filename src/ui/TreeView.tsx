@@ -545,7 +545,14 @@ export function TreeView({ c }: { c: Controller }) {
         </g>
       </svg>
       {hn && hover && !coarse && (
-        <div class="tooltip" style={{ left: hover.mx + 16, top: hover.my + 12 }}>
+        <div
+          class="tooltip"
+          style={{
+            // By the cursor, kept on screen (the tooltip is up to 320 px wide). Preact 11 adds no "px" to a number.
+            left: `${Math.max(4, Math.min(hover.mx + 16, window.innerWidth - 336))}px`,
+            top: `${Math.max(4, Math.min(hover.my + 12, window.innerHeight - 150))}px`,
+          }}
+        >
           {nodeText(hn)}
           {isOn ? (
             <div class="tt-hint">
