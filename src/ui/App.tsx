@@ -3,6 +3,7 @@ import type { Controller } from '../run/controller';
 import { Camp } from './Camp';
 import { ClassSelect } from './ClassSelect';
 import { Codex } from './Codex';
+import { ConfirmHost } from './Confirm';
 import { Hud } from './Hud';
 import { InfoLayer } from './info';
 import { useControllerState } from './hooks';
@@ -29,6 +30,7 @@ export function App({ c }: { c: Controller }) {
     <>
       <Screen c={c} />
       <InfoLayer />
+      <ConfirmHost />
     </>
   );
 }

@@ -6,7 +6,7 @@ import { triggerText } from '../data/triggers';
 import { flaskBase } from '../data/flasks';
 import { naturalGemLevel } from '../calc/gems';
 import { gemDef } from '../data/gems';
-import type { InventoryItem, Build, EquipSlot } from '../data/types';
+import type { InventoryItem, Build, EquipSlot, Item } from '../data/types';
 import type { Mod } from '../mods/types';
 import { modsText } from '../mods/text';
 import { slotsFor, withEquipped } from '../run/inventory';
@@ -41,6 +41,38 @@ export function compareDelta(
   return diffSheets(a, b);
 }
 
+/** A line with its numbers taken out: the same stat with another value has the same key. */
+const lineKey = (l: string): string => l.replace(/d+(.d+)?/g, 'N');
+
+/** Every stat line an item shows, implicit, explicit and rule lines alike. */
+export function itemLines(it: Item): string[] {
+  const all = [...it.affixes.flatMap((a) => a.mods), ...(it.uniqueMods ?? [])];
+  return [...modsText(it.implicits), ...modsText(all)];
+}
+
+/**
+ * How the lines of `it` differ from those of `other`, for a side-by-side compare: a stat `other` lacks is a 'gain' on
+ * the new item and a 'lost' on the old one; the same stat with another number is a 'diff' on both.
+ */
+export function lineMarks(
+  it: Item,
+  other: Item | undefined,
+  side: 'new' | 'old',
+): Map<string, 'gain' | 'lost' | 'diff'> {
+  const marks = new Map<string, 'gain' | 'lost' | 'diff'>();
+  if (!other) return marks;
+  const theirs = new Map(itemLines(other).map((l) => [lineKey(l), l]));
+  for (const l of itemLines(it)) {
+    const t = theirs.get(lineKey(l));
+    if (t === undefined) marks.set(l, side === 'new' ? 'gain' : 'lost');
+    else if (t !== l) marks.set(l, 'diff');
+  }
+  return marks;
+}
+
+const markClass = (m: Map<string, string> | undefined, l: string): string =>
+  m?.has(l) ? ' mark-' + m.get(l) : '';
+
 function DeltaLine({ label, v, pct }: { label: string; v: number; pct?: boolean }) {
   if (Math.abs(v) < 0.05) return null;
   const s = `${v > 0 ? '+' : ''}${pct ? Math.round(v) + '%' : Math.round(v * 10) / 10}`;
@@ -60,9 +92,12 @@ export function ItemCard({
   it,
   diff,
   build,
+  marks,
 }: {
   it: InventoryItem;
   diff?: SheetDiff | null;
+  /** Lines to highlight against another item (`lineMarks`), by line text. */
+  marks?: Map<string, 'gain' | 'lost' | 'diff'>;
   /** Used to work out what level a gem would have. */
   build?: Build;
 }) {
@@ -131,17 +166,17 @@ export function ItemCard({
       </div>
       {it.sockets.length > 0 && <div class="muted">Sockets: {it.sockets.length} (linked)</div>}
       {modsText(it.implicits).map((l, i) => (
-        <div key={`i${i}`} class="ic-mod implicit">
+        <div key={`i${i}`} class={'ic-mod implicit' + markClass(marks, l)}>
           {l}
         </div>
       ))}
       {modsText(explicit).map((l, i) => (
-        <div key={`e${i}`} class="ic-mod explicit">
+        <div key={`e${i}`} class={'ic-mod explicit' + markClass(marks, l)}>
           {l}
         </div>
       ))}
       {modsText(rules).map((l, i) => (
-        <div key={`r${i}`} class="ic-mod rule">
+        <div key={`r${i}`} class={'ic-mod rule' + markClass(marks, l)}>
           {l}
         </div>
       ))}

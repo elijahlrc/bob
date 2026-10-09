@@ -13,6 +13,7 @@ import type { Controller } from '../run/controller';
 import { chalkAdd, chalkOptions, chalkRemove } from '../run/craft';
 import { passivePoints, type RunState } from '../run/run';
 import { unseenItems } from '../run/found';
+import { ask } from './Confirm';
 import { useViewport } from './device';
 import { infoProps } from './info';
 import { Items } from './Items';
@@ -295,7 +296,18 @@ export function Camp({ c }: { c: Controller }) {
         <button class="btn" onClick={() => c.quit()}>
           Save and quit
         </button>
-        <button class="btn danger" onClick={() => confirm('Abandon this run?') && c.abandon()}>
+        <button
+          class="btn danger"
+          onClick={async () => {
+            const ok = await ask({
+              title: 'Abandon this run?',
+              body: 'The run ends here and the character is lost.',
+              confirm: 'Abandon the run',
+              danger: true,
+            });
+            if (ok) c.abandon();
+          }}
+        >
           Abandon run
         </button>
       </div>

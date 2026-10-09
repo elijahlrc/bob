@@ -8,6 +8,7 @@ import './ui/styles.css';
 import './ui/skins.css';
 import './ui/tree.css';
 import './ui/mobile.css';
+import './ui/items.css';
 
 function storage(): Storage | null {
   try {

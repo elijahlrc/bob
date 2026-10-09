@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { makeFlask, makeGem, makeItem } from '../gen/items';
 import { mod } from '../mods/types';
 import { Controller } from './controller';
+import { affixSummary } from './affixText';
+import { dryEquip, equip } from './inventory';
 import {
+  compareFlasks,
+  compareSlots,
   filterItems,
   itemInfos,
   junkItems,
@@ -10,6 +14,7 @@ import {
   placementsFor,
   quickEquip,
   quickSocket,
+  searchText,
   sortItems,
 } from './inventoryOps';
 import { newRun, type RunState } from './run';
@@ -171,5 +176,140 @@ describe('undo', () => {
     expect(c.undo()).toBe(true);
     expect(c.run!.inventory).toHaveLength(0);
     expect(c.canUndo).toBe(false);
+  });
+});
+
+describe('comparing an item with every slot it could go into', () => {
+  it('gives a ring both ring slots, each with what it would replace', () => {
+    const { run, uid } = setup();
+    run.build.level = 45;
+    const worn = makeItem(uid, 'ring_fire', 5);
+    run.build.equipment.ring1 = worn;
+    const ring = makeItem(uid, 'ring_cold', 5);
+    run.inventory.push(ring);
+    const slots = compareSlots(run, ring.uid);
+    expect(slots.map((s) => s.slot)).toEqual(['ring1', 'ring2']);
+    expect(slots.map((s) => s.label)).toEqual(['Ring 1', 'Ring 2']);
+    expect(slots[0].equipped?.uid).toBe(worn.uid);
+    expect(slots[0].toBag.map((x) => x.uid)).toEqual([worn.uid]);
+    expect(slots[0].alsoMoves).toEqual([]);
+    expect(slots[1].equipped).toBeUndefined();
+    expect(slots[1].toBag).toEqual([]);
+    expect(slots.filter((s) => s.best)).toHaveLength(1);
+    // The empty slot adds the ring on top of the worn one, so it is the better of the two here.
+    expect(slots[1].best).toBe(true);
+    expect(slots.every((s) => s.delta !== null)).toBe(true);
+  });
+
+  it('agrees with the slot the list shows for the item', () => {
+    const { run, uid } = setup('vanguard');
+    run.build.level = 40;
+    const a = makeItem(uid, 'sword_2', 20, 0, 'rare');
+    const b = makeItem(uid, 'ring_all', 40);
+    run.inventory.push(a, b);
+    const infos = itemInfos(run);
+    for (const it of [a, b]) {
+      const best = compareSlots(run, it.uid).find((s) => s.best);
+      expect(best?.slot ?? null).toBe(infos.get(it.uid)!.slot);
+    }
+  });
+
+  it('lets a one-hander go in either hand unless a two-hander is worn', () => {
+    const { run, uid } = setup('vanguard');
+    const sword = makeItem(uid, 'sword_1', 1);
+    run.inventory.push(sword);
+    const slots = compareSlots(run, sword.uid);
+    expect(slots.map((s) => s.slot)).toEqual(['mainHand', 'offHand']);
+    expect(slots[0].check.ok).toBe(true);
+    expect(slots[1].check).toMatchObject({ ok: false, reason: 'Two-handed weapon equipped' });
+    expect(slots[1].delta).toBeNull();
+  });
+
+  it('says what a two-hander sends back to the bag, and that is what equip does', () => {
+    const { run, uid } = setup('vanguard');
+    const sword = makeItem(uid, 'sword_1', 1);
+    const shield = makeItem(uid, 'shield_ar_1', 1);
+    run.build.equipment.mainHand = sword;
+    run.build.equipment.offHand = shield;
+    const mace = makeItem(uid, 'mace2_2', 15);
+    run.inventory.push(mace);
+    const [main] = compareSlots(run, mace.uid);
+    expect(main.slot).toBe('mainHand');
+    expect(main.toBag.map((x) => x.uid).sort()).toEqual([sword.uid, shield.uid].sort());
+    expect(main.alsoMoves.map((x) => x.uid)).toEqual([shield.uid]);
+    // The delta is measured without the shield, as equip leaves the character.
+    expect(main.delta).not.toBeNull();
+    const before = run.inventory.map((x) => x.uid);
+    expect(equip(run, mace.uid, 'mainHand').ok).toBe(true);
+    const came = run.inventory.map((x) => x.uid).filter((u) => !before.includes(u));
+    expect(came.sort()).toEqual([sword.uid, shield.uid].sort());
+  });
+
+  it('names the attribute an item is short of', () => {
+    const { run, uid } = setup('vanguard');
+    run.build.level = 70;
+    const ward = makeItem(uid, 'shield_es_4', 60);
+    run.inventory.push(ward);
+    const [c] = compareSlots(run, ward.uid);
+    expect(c.check.ok).toBe(false);
+    expect(c.check.short).toBeDefined();
+    expect(c.check.short!.have).toBeLessThan(c.check.short!.need);
+  });
+
+  it('dry equip leaves the run alone', () => {
+    const { run, uid } = setup('vanguard');
+    const sword = makeItem(uid, 'sword_1', 1);
+    run.inventory.push(sword);
+    const inv = JSON.stringify(run.inventory);
+    const build = JSON.stringify(run.build);
+    dryEquip(run, sword.uid, 'mainHand');
+    expect(JSON.stringify(run.inventory)).toBe(inv);
+    expect(JSON.stringify(run.build)).toBe(build);
+  });
+
+  it('compares a flask with the five slots and marks the one a plain equip uses', () => {
+    const { run, uid } = setup();
+    run.build.flasks = run.build.flasks.map((_f, i) => ({
+      ...makeFlask(uid, i === 3 ? 'flask_life_1' : 'flask_mana_1', 20),
+      name: `f${i}`,
+    }));
+    const flask = makeFlask(uid, 'flask_life_2', 20);
+    run.inventory.push(flask);
+    const slots = compareFlasks(run, flask.uid);
+    expect(slots).toHaveLength(5);
+    const chosen = slots.find((s) => s.chosen)!;
+    const r = quickEquip(run, flask.uid);
+    expect(r.flask).toBe(chosen.idx);
+    expect(chosen.idx).toBe(3);
+  });
+});
+
+describe('affix summaries', () => {
+  it("lists the names of an item's affixes without their numbers, and counts the rest", () => {
+    const { run, uid } = setup();
+    const it = makeItem(uid, 'ring_fire', 40, 0, 'rare');
+    it.affixes = [
+      { family: 'life', tier: 1, mods: [mod('life', 'base', 10)] },
+      { family: 'fireRes', tier: 1, mods: [mod('res.fire', 'base', 10)] },
+      { family: 'coldRes', tier: 1, mods: [mod('res.cold', 'base', 10)] },
+      { family: 'lightRes', tier: 1, mods: [mod('res.lightning', 'base', 10)] },
+    ];
+    const s = affixSummary(it);
+    expect(s).toMatch(/^.+, .+, .+ \+1$/);
+    expect(s).not.toMatch(/\d{2}/);
+    expect(affixSummary(it, 5)).not.toMatch(/\+\d$/);
+    expect(run).toBeDefined();
+  });
+});
+
+describe('searching', () => {
+  it('finds an item by its name, its base or the words of its affixes', () => {
+    const { uid } = setup();
+    const ring = makeItem(uid, 'ring_fire', 40, 0, 'rare');
+    ring.affixes = [{ family: 'fireRes', tier: 1, mods: [mod('res.fire', 'base', 22)] }];
+    const text = searchText(ring);
+    expect(text).toContain(ring.name.toLowerCase());
+    expect(text).toMatch(/fire/);
+    expect(searchText(makeGem(uid, 'kindle'))).toContain('kindle');
   });
 });

@@ -3,6 +3,7 @@ import type { Rarity } from '../data/types';
 import { applyClean, cleanSummary } from '../run/cleanUp';
 import type { Controller } from '../run/controller';
 import { DEFAULT_CLEAN, type CleanOpts } from '../run/found';
+import { ask } from './Confirm';
 import { itemTitle, rarityClass } from './ItemCard';
 import { loadPref, savePref } from './prefs';
 
@@ -43,13 +44,19 @@ export function CleanUp({ c, onClose }: { c: Controller; onClose: () => void }) 
   );
   const set = (p: Partial<CleanOpts>) => setOpts({ ...opts, ...p });
   const setN = (n: number) => set({ olderThan: Math.max(1, Math.min(100, Math.round(n) || 1)) });
-  const go = () => {
+  const go = async () => {
     if (!s.count) return;
     const rare = s.rows.filter(
       (r) => r.item.kind === 'item' && (r.item.rarity === 'rare' || r.item.rarity === 'unique'),
     ).length;
-    const note = rare ? ` ${rare} of them are rare or unique.` : '';
-    if (!confirm(`Salvage ${s.headline}?${note} This cannot be undone.`)) return;
+    const ok = await ask({
+      title: 'Salvage the old items?',
+      body: `${s.headline}.${rare ? ` ${rare} of them are rare or unique.` : ''} This cannot be undone.`,
+      facts: [`${s.count} item${s.count > 1 ? 's' : ''}`, `${s.dust} Bone Dust`],
+      confirm: `Salvage ${s.count} for ${s.dust} Bone Dust`,
+      danger: true,
+    });
+    if (!ok) return;
     c.craft((r) => applyClean(r, opts));
     onClose();
   };
@@ -128,7 +135,7 @@ export function CleanUp({ c, onClose }: { c: Controller; onClose: () => void }) 
           ))}
         </div>
         <div class="item-actions">
-          <button class="btn danger" disabled={!s.count} onClick={go}>
+          <button class="btn danger" disabled={!s.count} onClick={() => void go()}>
             Salvage {s.count} for {s.dust} Bone Dust
           </button>
           <button class="btn" onClick={onClose}>

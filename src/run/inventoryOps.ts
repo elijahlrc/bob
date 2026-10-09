@@ -1,15 +1,17 @@
-import { sheetDps } from '../calc/character';
+import { diffSheets, sheetDps, type SheetDiff } from '../calc/character';
 import { itemBase, isWeaponClass } from '../data/bases';
 import { flaskBase } from '../data/flasks';
+import { modsText } from '../mods/text';
 import { gemDef } from '../data/gems';
 import {
   EQUIP_SLOTS,
   type InventoryItem,
   type EquipSlot,
+  type FlaskItem,
   type Item,
   type Rarity,
 } from '../data/types';
-import { canEquip, equip, equipFlask, slotsFor, socketGem, withEquipped } from './inventory';
+import { dryEquip, equip, equipFlask, slotsFor, socketGem, type EquipCheck } from './inventory';
 import { score, sheetOf } from './bot';
 import { isFavourite } from './found';
 import type { RunState } from './run';
@@ -49,6 +51,11 @@ const SLOT_LABEL: Record<EquipSlot, string> = {
 };
 export function slotLabel(s: EquipSlot): string {
   return SLOT_LABEL[s];
+}
+
+/** A slot's name where two slots share a label: "Ring 1", "Ring 2". */
+export function slotName(s: EquipSlot): string {
+  return s === 'ring1' ? 'Ring 1' : s === 'ring2' ? 'Ring 2' : SLOT_LABEL[s];
 }
 
 export function groupOf(it: InventoryItem): ItemGroup {
@@ -107,12 +114,13 @@ export function itemInfos(run: RunState): Map<number, ItemInfo> {
       info.equippable = false;
       let best = -Infinity;
       for (const slot of slotsFor(it)) {
-        const chk = canEquip(run, it, slot);
-        if (!chk.ok) {
-          info.reason ??= chk.reason;
+        // The build the real equip would leave (a two-hander clears the off hand), not a guess at it.
+        const dry = dryEquip(run, it.uid, slot);
+        if (!dry.check.ok) {
+          info.reason ??= dry.check.reason;
           continue;
         }
-        const s = sheetOf(run, withEquipped(run.build, it, slot));
+        const s = sheetOf(run, dry.build);
         const sc = score(s);
         if (sc > best) {
           best = sc;
@@ -229,6 +237,22 @@ export function sortItems(
   });
 }
 
+/** The flask slot a flask goes into: an empty one, else the lowest-level flask of the same kind, else the lowest-level one. */
+export function flaskTarget(run: RunState, f: FlaskItem): number {
+  const flasks = run.build.flasks;
+  const empty = flasks.findIndex((x) => !x);
+  if (empty >= 0) return empty;
+  const rank = (x: (typeof flasks)[number]) => (x ? flaskBase(x.baseId).level : -1);
+  const kind = flaskBase(f.baseId).kind;
+  const same = flasks
+    .map((x, i) => ({ x, i }))
+    .filter((e) => e.x && flaskBase(e.x.baseId).kind === kind)
+    .sort((a, c) => rank(a.x) - rank(c.x));
+  return same.length
+    ? same[0].i
+    : flasks.map((x, i) => ({ x, i })).sort((a, c) => rank(a.x) - rank(c.x))[0].i;
+}
+
 /** Equip an inventory item into the best slot. Returns a message when it cannot. */
 export function quickEquip(
   run: RunState,
@@ -241,19 +265,7 @@ export function quickEquip(
   if (it.kind === 'flask') {
     const b = flaskBase(it.baseId);
     if (b.level > run.build.level) return { ok: false, reason: `Requires level ${b.level}` };
-    const flasks = run.build.flasks;
-    let idx = flasks.findIndex((f) => !f);
-    if (idx < 0) {
-      // Replace the lowest-level flask of the same kind, else the lowest-level one.
-      const rank = (f: (typeof flasks)[number]) => (f ? flaskBase(f.baseId).level : -1);
-      const same = flasks
-        .map((f, i) => ({ f, i }))
-        .filter((x) => x.f && flaskBase(x.f.baseId).kind === b.kind)
-        .sort((a, c) => rank(a.f) - rank(c.f));
-      idx = same.length
-        ? same[0].i
-        : flasks.map((f, i) => ({ f, i })).sort((a, c) => rank(a.f) - rank(c.f))[0].i;
-    }
+    const idx = flaskTarget(run, it);
     return equipFlask(run, uid, idx)
       ? { ok: true, flask: idx }
       : { ok: false, reason: 'Cannot equip' };
@@ -352,4 +364,107 @@ export function junkItems(run: RunState): InventoryItem[] {
     if (isFavourite(run, x.uid)) return false;
     return !isUpgrade(infos.get(x.uid)!);
   });
+}
+
+// ---- Compare, one entry per slot --------------------------------------------------------------
+
+/** What putting an inventory item into one particular slot would do. */
+export type SlotCompare = {
+  slot: EquipSlot;
+  /** "Ring 1". */
+  label: string;
+  /** The item worn there now. */
+  equipped?: Item;
+  check: EquipCheck;
+  /** Change to the character sheet (null when the item cannot go there). */
+  delta: SheetDiff | null;
+  dpsPct: number;
+  ehpPct: number;
+  scorePct: number;
+  /** Everything that goes back to the bag, the item that was worn there included. */
+  toBag: Item[];
+  /** What goes back besides the item worn there: a two-hander's off hand. */
+  alsoMoves: Item[];
+  /** The slot the bot's score likes best (what `itemInfos` calls the item's slot). */
+  best: boolean;
+};
+
+/** One entry for every slot the item may go into: rings give two, one-handers two, a two-hander its own. */
+export function compareSlots(run: RunState, uid: number): SlotCompare[] {
+  const it = run.inventory.find((x) => x.uid === uid);
+  if (!it || it.kind !== 'item') return [];
+  const base = sheetOf(run);
+  const baseScore = score(base);
+  const out: SlotCompare[] = slotsFor(it).map((slot) => {
+    const dry = dryEquip(run, uid, slot);
+    const equipped = run.build.equipment[slot];
+    const c: SlotCompare = {
+      slot,
+      label: slotName(slot),
+      equipped,
+      check: dry.check,
+      delta: null,
+      dpsPct: 0,
+      ehpPct: 0,
+      scorePct: 0,
+      toBag: dry.toBag,
+      alsoMoves: dry.toBag.filter((x) => x.uid !== equipped?.uid),
+      best: false,
+    };
+    if (dry.check.ok) {
+      const s = sheetOf(run, dry.build);
+      c.delta = diffSheets(base, s);
+      c.dpsPct = pct(sheetDps(base), sheetDps(s));
+      c.ehpPct = pct(base.ehp, s.ehp);
+      c.scorePct = pct(baseScore, score(s));
+    }
+    return c;
+  });
+  let best: SlotCompare | null = null;
+  for (const c of out) if (c.check.ok && (!best || c.scorePct > best.scorePct)) best = c;
+  if (best) best.best = true;
+  return out;
+}
+
+export type FlaskCompare = {
+  idx: number;
+  equipped: FlaskItem | null;
+  /** The slot a plain Equip uses (`flaskTarget`). */
+  chosen: boolean;
+  ok: boolean;
+  reason?: string;
+};
+
+/** The five flask slots a carried flask could go into, and which one a plain Equip picks. */
+export function compareFlasks(run: RunState, uid: number): FlaskCompare[] {
+  const f = run.inventory.find((x) => x.uid === uid);
+  if (!f || f.kind !== 'flask') return [];
+  const need = flaskBase(f.baseId).level;
+  const ok = need <= run.build.level;
+  const pick = flaskTarget(run, f);
+  return run.build.flasks.map((equipped, idx) => ({
+    idx,
+    equipped,
+    chosen: idx === pick,
+    ok,
+    reason: ok ? undefined : `Requires level ${need}`,
+  }));
+}
+
+/** Everything a search box looks at for an item: its name, its base, its rarity and the words of what it gives. */
+export function searchText(it: InventoryItem): string {
+  if (it.kind === 'gem') return gemDef(it.gemId).name.toLowerCase();
+  const lines = it.affixes.flatMap((a) => modsText(a.mods));
+  if (it.kind === 'flask')
+    return [it.name, flaskBase(it.baseId).name, ...lines].join(' ').toLowerCase();
+  return [
+    it.name,
+    itemBase(it.baseId).name,
+    it.rarity,
+    ...modsText(it.implicits),
+    ...lines,
+    ...modsText(it.uniqueMods ?? []),
+  ]
+    .join(' ')
+    .toLowerCase();
 }

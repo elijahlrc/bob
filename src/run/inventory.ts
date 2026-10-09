@@ -54,7 +54,12 @@ function attrsWithout(run: RunState, slot: EquipSlot | null): Attrs {
   return attrs;
 }
 
-export type EquipCheck = { ok: boolean; reason?: string };
+export type EquipCheck = {
+  ok: boolean;
+  reason?: string;
+  /** For a failed attribute requirement: which attribute, how much it needs and how much the character has without the old item. */
+  short?: { attr: 'str' | 'dex' | 'int'; need: number; have: number };
+};
 
 export function canEquip(run: RunState, item: Item, slot: EquipSlot): EquipCheck {
   if (!slotsFor(item).includes(slot)) return { ok: false, reason: 'Wrong slot' };
@@ -62,7 +67,12 @@ export function canEquip(run: RunState, item: Item, slot: EquipSlot): EquipCheck
   if (base.level > run.build.level) return { ok: false, reason: `Requires level ${base.level}` };
   const a = attrsWithout(run, slot);
   for (const k of ['str', 'dex', 'int'] as const)
-    if (a[k] < itemReq(item)[k]) return { ok: false, reason: `Requires ${itemReq(item)[k]} ${k}` };
+    if (a[k] < itemReq(item)[k])
+      return {
+        ok: false,
+        reason: `Requires ${itemReq(item)[k]} ${k}`,
+        short: { attr: k, need: itemReq(item)[k], have: a[k] },
+      };
   // A ring with the "no other ring" rule needs the other ring slot empty, and blocks a second ring.
   if (slot === 'ring1' || slot === 'ring2') {
     const other = run.build.equipment[slot === 'ring1' ? 'ring2' : 'ring1'];
@@ -181,6 +191,33 @@ export function equip(run: RunState, uid: number, slot: EquipSlot): EquipCheck {
   run.build = { ...run.build, equipment: eq };
   dropLostPrimary(run);
   return { ok: true };
+}
+
+/**
+ * What `equip` would do, without doing it: the check, the build afterwards (a two-hander's cleared off hand and the
+ * gems that move included, so a compare cannot disagree with the real thing) and what returns to the bag. It runs the
+ * real `equip` on a copy of the parts of the run it touches.
+ */
+export function dryEquip(
+  run: RunState,
+  uid: number,
+  slot: EquipSlot,
+): { check: EquipCheck; build: Build; toBag: Item[]; gemsToBag: number } {
+  const copy: RunState = {
+    ...run,
+    inventory: [...run.inventory],
+    build: { ...run.build, equipment: { ...run.build.equipment } },
+  };
+  const had = new Set(run.inventory.map((x) => x.uid));
+  const check = equip(copy, uid, slot);
+  if (!check.ok) return { check, build: run.build, toBag: [], gemsToBag: 0 };
+  const added = copy.inventory.filter((x) => !had.has(x.uid));
+  return {
+    check,
+    build: copy.build,
+    toBag: added.filter((x): x is Item => x.kind === 'item'),
+    gemsToBag: added.filter((x) => x.kind === 'gem').length,
+  };
 }
 
 /** The primary skill gem is none any more once the gem is not in a socket. */
