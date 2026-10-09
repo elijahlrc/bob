@@ -31,6 +31,7 @@ Conventions follow DESIGN.md:
   `npm run coverage -- --list`.
 - **Known divergences to keep in mind:** channelling and ramping skills are averaged into repeated hits; minions are
   hurt only by area attacks and by monsters held up behind them; deployables and utility skills follow simple use policies; many "support gem on item" lines are folded into stats.
+- **Spirit audit (2026-10-08):** `covered` meant "has the defining mechanic" and was judged coarsely. [AUDIT-GEMS.md](AUDIT-GEMS.md) re-judged all 326 gems against what each one is _for_ in the reference game: 154 faithful, 134 drifted, 38 gutted, with the missing engine pieces ranked (cooldowns and spending charges, channelling, an enemy status layer, ground effects, the projectile hit rule).
 
 ## 0. Summary
 
