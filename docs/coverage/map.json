@@ -173,22 +173,22 @@
   "brittleDoom": {
    "ref": "Elemental Weakness",
    "status": "covered",
-   "note": "applied by Hexing Strikes, not cast directly (C4 adds casting)"
+   "note": "A curse cast on a target and the enemies around it: their elemental resistances fall. Used by the AI on packs and rare enemies."
   },
   "leadenLimbs": {
    "ref": "Temporal Chains",
    "status": "covered",
-   "note": "applied by Hexing Strikes"
+   "note": "A curse cast on a target and the enemies around it: they act more slowly."
   },
   "feebleGrip": {
    "ref": "Enfeeble",
    "status": "covered",
-   "note": "applied by Hexing Strikes"
+   "note": "A curse cast on a target and the enemies around it: they deal less damage."
   },
   "openWounds": {
    "ref": "Vulnerability",
    "status": "covered",
-   "note": "applied by Hexing Strikes"
+   "note": "A curse cast on a target and the enemies around it: they take more physical damage."
   },
   "venomSeed": {
    "ref": "Added Chaos Damage Support",

@@ -359,7 +359,6 @@ const SPECIAL_TAGS = new Set<string>([
 ]);
 
 function isSpecial(g: GemDef): boolean {
-  if (g.kind === 'hex') return true;
   if (g.kind === 'aura') return g.reservePct === 0 || !!g.triggers;
   if (g.kind === 'support')
     return !!(

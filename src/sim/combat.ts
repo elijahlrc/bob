@@ -325,6 +325,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
 
   const wasAlive = dst.alive;
   if (src.isPlayer) applyPlayerHexes(w, dst);
+  if (src.isPlayer) noteCause(dst, p.tagMask, false);
   applyDamage(w, dst, res.dmg);
   if (wasAlive && dst.alive) {
     payImpales(w, dst);
@@ -535,7 +536,9 @@ export function rawHit(
   amount: number,
   type: number,
   label = 'Explosion',
+  by: 'player' | 'minion' = 'player',
 ): void {
+  noteCause(dst, 0, by === 'minion');
   const dmg = [0, 0, 0, 0, 0];
   dmg[type] = amount;
   const def = dst.def;
@@ -596,6 +599,15 @@ function dropSpot(w: World, a: Actor, pos: { x: number; y: number }): { x: numbe
       }
     }
   return best;
+}
+
+/**
+ * What last hurt an actor, for kill effects: the tags of the skill whose hit it was (none for damage over time and the like),
+ * and whether it was a minion. A kill trigger counts the player's kills, with the tags of the skill that made them.
+ */
+const causes = new WeakMap<Actor, { tags: number; minion: boolean }>();
+function noteCause(a: Actor, tags: number, minion: boolean): void {
+  if (!a.isPlayer) causes.set(a, { tags, minion });
 }
 
 export function killActor(w: World, a: Actor): void {
@@ -670,7 +682,8 @@ export function killActor(w: World, a: Actor): void {
   }
   if (a.modIds.includes('splitting') && a.mon) splitInTwo(w, a);
   onMonsterDeath(w, a);
-  fireTriggers(w, { on: 'kill', target: a });
+  const cause = causes.get(a);
+  if (!cause?.minion) fireTriggers(w, { on: 'kill', target: a, tags: cause?.tags ?? 0 });
 }
 
 /** A Splitting monster leaves two weaker copies behind (no XP or loot, and they do not split). */
@@ -800,6 +813,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       logDamage(w, null, 'Bleeding', 0, dmg[0]);
       logDamage(w, null, 'Poison', 4, dmg[4]);
     }
+    noteCause(a, 0, false);
     applyDamage(w, a, dmg);
     if (!a.alive) return;
   }

@@ -183,11 +183,6 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
       ...modsText(gemMods(def.mods, level, def.id)),
       ...modsText(gemMods(def.global ?? [], level, def.id)),
     ];
-  } else if (def.kind === 'hex') {
-    type = 'Hex gem';
-    stats.push('Needs Hexing Strikes in the same item to hex the enemies you hit');
-    stats.push(`Lasts ${HEX_SECONDS} seconds, renewed on each hit`);
-    effects = [hexText(def.hex, hexEffect(def.hex, level))];
   } else {
     type = 'Aura gem';
     if (def.reservePct) stats.push(`Reserves ${def.reservePct}% of your mana`);

@@ -347,6 +347,12 @@ export class Character {
   readonly burn: { pct: number; self: number } = { pct: 0, self: 0 };
   /** The utility skills (curses, buffs, warcries, blinks) the character casts by policy, not as damage. */
   readonly utilities: SkillChoice[] = [];
+  /** Curse gems that Hexing Strikes applies on hit: they are not cast as well. */
+  private readonly hexTouched = new Set<number>();
+  /** Whether Hexing Strikes applies this curse gem on hit. */
+  isHexTouched(uid: number): boolean {
+    return this.hexTouched.has(uid);
+  }
   /** The curses the character casts as skills (utility gems), strongest first. */
   readonly castCurses: PlayerHex[] = [];
   /** What the sheet assumes an enemy carries: the hit-applied hexes and the cast curses, within the hex limit. */
@@ -634,8 +640,7 @@ export class Character {
         const granted = m.stat.startsWith('grantSkill.');
         if (!granted && !m.stat.startsWith('socketSupport.')) continue;
         const def = gemDef(m.stat.slice(m.stat.indexOf('.') + 1));
-        if (granted ? def.kind === 'support' || def.kind === 'hex' : def.kind !== 'support')
-          continue;
+        if (granted ? def.kind === 'support' : def.kind !== 'support') continue;
         this.gems.push({
           gem: { kind: 'gem', uid: -1 - this.gems.length, gemId: def.id },
           def,
@@ -768,7 +773,7 @@ export class Character {
     for (const a of this.actives) {
       if (!a.usable || a.triggered || a.gemUid === null || casting.has(a.skill.id)) continue;
       casting.add(a.skill.id);
-      if (blasphemyOf(a)) continue;
+      if (blasphemyOf(a) || this.hexTouched.has(a.gemUid)) continue;
       if (a.skill.utility) this.utilities.push(a);
       else this.secondaryCandidates.push(a);
     }
@@ -989,8 +994,10 @@ export class Character {
       this.gems.some((g) => g.slot === prim.slot && g.def.kind === 'support' && g.def.hexOnHit)
     )
       for (const g of this.gems)
-        if (g.slot === prim.slot && g.def.kind === 'hex')
-          out.push({ id: g.def.hex, level: g.level, effect: 0 });
+        if (g.slot === prim.slot && g.def.kind === 'active' && g.def.utility?.kind === 'curse') {
+          out.push({ id: g.def.utility.hex, level: g.level, effect: 0 });
+          this.hexTouched.add(g.gem.uid);
+        }
     for (const a of this.actives) {
       const u = a.skill.utility;
       if (a.usable && u?.kind === 'curse' && blasphemyOf(a))
@@ -1014,6 +1021,7 @@ export class Character {
     for (const a of this.actives) {
       const u = a.skill.utility;
       if (!a.usable || a.triggered || u?.kind !== 'curse') continue;
+      if (a.gemUid !== null && this.hexTouched.has(a.gemUid)) continue;
       out.push({
         id: u.hex,
         level: a.skill.level,

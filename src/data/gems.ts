@@ -176,17 +176,7 @@ export type AuraGemDef = {
   description: string;
 };
 
-/** A hex gem (EXPANSION 5.7): applied to enemies you hit when linked with Hexing Strikes in the same item. */
-export type HexGemDef = {
-  kind: 'hex';
-  id: string;
-  name: string;
-  attr: GemAttr;
-  hex: HexId;
-  description: string;
-};
-
-export type GemDef = ActiveGemDef | SupportGemDef | AuraGemDef | HexGemDef;
+export type GemDef = ActiveGemDef | SupportGemDef | AuraGemDef;
 
 export const ACTIVE_GEMS: ActiveGemDef[] = [
   {
@@ -620,42 +610,6 @@ export const AURA_GEMS: AuraGemDef[] = [
   },
 ];
 
-/** Hex gems and the support that applies them (EXPANSION 5.7). */
-export const HEX_GEMS: HexGemDef[] = [
-  {
-    kind: 'hex',
-    id: 'brittleDoom',
-    name: 'Brittle Doom',
-    attr: 'int',
-    hex: 'brittleDoom',
-    description: 'Strips the elemental resistances of the hexed.',
-  },
-  {
-    kind: 'hex',
-    id: 'leadenLimbs',
-    name: 'Leaden Limbs',
-    attr: 'dex',
-    hex: 'leadenLimbs',
-    description: 'Slows the hexed in everything they do.',
-  },
-  {
-    kind: 'hex',
-    id: 'feebleGrip',
-    name: 'Feeble Grip',
-    attr: 'str',
-    hex: 'feebleGrip',
-    description: 'The hexed deal less damage.',
-  },
-  {
-    kind: 'hex',
-    id: 'openWounds',
-    name: 'Open Wounds',
-    attr: 'str',
-    hex: 'openWounds',
-    description: 'The hexed take more physical damage.',
-  },
-];
-
 export const HEXING_STRIKES: SupportGemDef = {
   kind: 'support',
   id: 'hexingStrikes',
@@ -763,13 +717,7 @@ SUPPORT_GEMS.push(...GEN_SUPPORT_GEMS);
 AURA_GEMS.push(...GEN_AURA_GEMS);
 
 /** Every gem that can drop. */
-export const ALL_GEMS: GemDef[] = [
-  ...ACTIVE_GEMS,
-  ...SUPPORT_GEMS,
-  HEXING_STRIKES,
-  ...AURA_GEMS,
-  ...HEX_GEMS,
-];
+export const ALL_GEMS: GemDef[] = [...ACTIVE_GEMS, ...SUPPORT_GEMS, HEXING_STRIKES, ...AURA_GEMS];
 const GEM_BY_ID = new Map<string, GemDef>([...ALL_GEMS, ...GRANTED_GEMS].map((g) => [g.id, g]));
 
 export function gemDef(id: string): GemDef {

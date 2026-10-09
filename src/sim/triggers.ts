@@ -18,7 +18,7 @@ export type TriggerEvent =
   | { on: 'hit'; target: Actor; tags: number; crit: boolean }
   | { on: 'attack'; target: Actor; tags: number }
   | { on: 'cast'; target: Actor; tags: number }
-  | { on: 'kill'; target: Actor }
+  | { on: 'kill'; target: Actor; tags: number }
   | { on: 'block' }
   | { on: 'hitTaken'; damage: number };
 
@@ -110,7 +110,11 @@ function nearestEnemy(w: World): Actor | null {
 }
 
 function castTriggered(w: World, choice: SkillChoice, ev: TriggerEvent): boolean {
-  const target = 'target' in ev && ev.target.alive ? ev.target : nearestEnemy(w);
+  // A spell cast on a kill goes to the next enemy, or lands where the dead one fell.
+  const target =
+    ('target' in ev && ev.target.alive ? ev.target : null) ??
+    nearestEnemy(w) ??
+    (ev.on === 'kill' ? ev.target : null);
   if (!target) return false;
   const prof = w.char.profile(choice, playerConds(w, target), flaskMask(w));
   const act: Action = {

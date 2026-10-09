@@ -95,7 +95,7 @@
       "blasphemy": { "reservePct": 35 },
       "description": "The supported curse stays on every enemy you hit, at the cost of reserved mana." } },
   { "ref": "Cast on Melee Kill Support", "note": "Spells linked to the supported melee skill are cast when it kills.",
-    "def": { "kind": "support", "id": "slayersEcho", "name": "Slayer's Echo", "attr": "str", "supports": ["melee"], "excludes": ["totem", "trap", "mine"], "costMult": 1.4, "mods": [],
+    "def": { "kind": "support", "id": "slayersEcho", "name": "Slayer's Echo", "attr": "str", "supports": ["spell"], "excludes": ["totem", "trap", "mine"], "costMult": 1.4, "mods": [],
       "trigger": { "on": "kill", "tags": ["melee"], "chance": 100, "cooldown": 0.25, "effect": { "kind": "castSocketed" } },
       "description": "Linked spells are cast when your melee blows kill." } },
   { "ref": "Cast when Stunned Support", "note": "Spells linked to the supported spell are cast when the character has taken a heavy blow (a stun is approximated by a large hit).",

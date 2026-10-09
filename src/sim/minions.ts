@@ -128,7 +128,7 @@ export function tickMinions(w: World, dt: number): void {
       m.boomed = true;
       for (const e of foes)
         if (e.alive && Math.hypot(e.x - m.x, e.y - m.y) <= BURST_RADIUS + e.r)
-          rawHit(w, e, m.def.maxLife / 3, 3, 'Minion burst');
+          rawHit(w, e, m.def.maxLife / 3, 3, 'Minion burst', 'minion');
       w.events.push({ t: 'explode', x: m.x, y: m.y, r: BURST_RADIUS, dtype: 3 });
     }
     w.minions[j++] = m;
@@ -164,11 +164,11 @@ export function tickMinions(w: World, dt: number): void {
     m.atkT = 1 / (def.rate * m.speed * (1 - m.ail.chill));
     const hit = spellBaseDamage(m.level) * def.dmg * m.dmg * MINION_ENEMY_RES;
     const t = DAMAGE_TYPES.indexOf(def.dtype);
-    rawHit(w, best, hit, t, 'Minion');
+    rawHit(w, best, hit, t, 'Minion', 'minion');
     if (def.splash > 0)
       for (const e of foes)
         if (e !== best && e.alive && Math.hypot(e.x - best.x, e.y - best.y) <= def.splash + e.r)
-          rawHit(w, e, hit * 0.5, t, 'Minion');
+          rawHit(w, e, hit * 0.5, t, 'Minion', 'minion');
   }
   w.minions.length = j;
 }

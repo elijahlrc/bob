@@ -1,0 +1,22 @@
+[
+  { "ref": "Elemental Weakness", "note": "A curse cast on a target and the enemies around it: their elemental resistances fall. Used by the AI on packs and rare enemies.",
+    "def": { "kind": "active", "id": "brittleDoom", "name": "Brittle Doom", "attr": "int", "skillType": "spell", "tags": ["spell", "curse", "area", "duration"], "types": ["triggerable"],
+      "behaviour": { "kind": "burst", "radius": 3.5, "reach": 9 }, "castTime": 0.5, "cost": [16, 33], "mods": [],
+      "utility": { "kind": "curse", "hex": "brittleDoom", "radius": 3.5 },
+      "description": "Curses enemies in an area: they lose elemental resistance." } },
+  { "ref": "Temporal Chains", "note": "A curse cast on a target and the enemies around it: they act more slowly.",
+    "def": { "kind": "active", "id": "leadenLimbs", "name": "Leaden Limbs", "attr": "dex", "skillType": "spell", "tags": ["spell", "curse", "area", "duration"], "types": ["triggerable"],
+      "behaviour": { "kind": "burst", "radius": 3.5, "reach": 9 }, "castTime": 0.5, "cost": [16, 33], "mods": [],
+      "utility": { "kind": "curse", "hex": "leadenLimbs", "radius": 3.5 },
+      "description": "Curses enemies in an area: they are slowed in everything they do." } },
+  { "ref": "Enfeeble", "note": "A curse cast on a target and the enemies around it: they deal less damage.",
+    "def": { "kind": "active", "id": "feebleGrip", "name": "Feeble Grip", "attr": "str", "skillType": "spell", "tags": ["spell", "curse", "area", "duration"], "types": ["triggerable"],
+      "behaviour": { "kind": "burst", "radius": 3.5, "reach": 9 }, "castTime": 0.5, "cost": [16, 33], "mods": [],
+      "utility": { "kind": "curse", "hex": "feebleGrip", "radius": 3.5 },
+      "description": "Curses enemies in an area: they deal less damage." } },
+  { "ref": "Vulnerability", "note": "A curse cast on a target and the enemies around it: they take more physical damage.",
+    "def": { "kind": "active", "id": "openWounds", "name": "Open Wounds", "attr": "str", "skillType": "spell", "tags": ["spell", "curse", "area", "duration", "physical"], "types": ["triggerable"],
+      "behaviour": { "kind": "burst", "radius": 3.5, "reach": 9 }, "castTime": 0.5, "cost": [16, 33], "mods": [],
+      "utility": { "kind": "curse", "hex": "openWounds", "radius": 3.5 },
+      "description": "Curses enemies in an area: they take more physical damage." } }
+]

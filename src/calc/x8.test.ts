@@ -112,7 +112,9 @@ describe('hexes in the calc (EXPANSION 5.7)', () => {
     expect(hexEffect('feebleGrip', 20)).toBe(25);
     expect(hexEffect('openWounds', 10)).toBeGreaterThan(20);
     expect(HEX_IDS).toHaveLength(4);
-    for (const id of HEX_IDS) expect(gemDef(id).kind).toBe('hex');
+    // The four are curses the character casts, and Hexing Strikes applies them on hit instead.
+    for (const id of HEX_IDS)
+      expect(gemDef(id)).toMatchObject({ kind: 'active', utility: { kind: 'curse' } });
     expect(gemDef('hexingStrikes').kind).toBe('support');
   });
 

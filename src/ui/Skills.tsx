@@ -19,13 +19,13 @@ import { GemCard, GemTip } from './GemCard';
 import { gemCardData } from './gemText';
 import { loadPref, savePref } from './prefs';
 
-const GEM_GROUPS = ['Skills', 'Utility skills', 'Supports', 'Hexes', 'Auras'] as const;
+const GEM_GROUPS = ['Skills', 'Utility skills', 'Supports', 'Auras'] as const;
 
-/** The inventory heading a gem sits under: damage skills, the utility skills a policy casts, supports, hexes, auras. */
+/** The inventory heading a gem sits under: damage skills, the utility skills a policy casts, supports, auras. */
 function groupOfGem(d: GemDef): (typeof GEM_GROUPS)[number] {
   if (d.kind === 'active') return d.utility ? 'Utility skills' : 'Skills';
   if (d.kind === 'support') return 'Supports';
-  return d.kind === 'hex' ? 'Hexes' : 'Auras';
+  return 'Auras';
 }
 
 type Sel = { from: 'inv'; uid: number } | ({ from: 'socket' } & SocketRef);
@@ -70,6 +70,7 @@ export function gemStatus(
     };
   }
   if (def.kind === 'active') {
+    if (ch.isHexTouched(uid)) return { ok: true, text: 'Hexes the enemies you hit' };
     const a = ch.actives.find((x) => x.gemUid === uid);
     if (!a || !a.usable) return null;
     const names = a.supports.map((x) => x.def.name);
@@ -97,15 +98,6 @@ export function gemStatus(
     const au = ch.auras.find((x) => x.def.id === def.id);
     if (au && !au.active) return { ok: false, text: 'Inactive: not enough mana to reserve it' };
     return au ? { ok: true, text: `Active, reserving ${Math.round(au.reserved)} mana` } : null;
-  }
-  if (def.kind === 'hex') {
-    const on = ch.hexes.some((h) => h.id === def.hex);
-    return on
-      ? { ok: true, text: 'Hexes the enemies you hit' }
-      : {
-          ok: false,
-          text: 'Not applied: needs Hexing Strikes in the same item as your main skill',
-        };
   }
   return null;
 }

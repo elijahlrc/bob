@@ -69,9 +69,9 @@ describe('gem status lines (is this gem doing anything?)', () => {
     );
   });
 
-  it('a hex gem without Hexing Strikes is flagged, with it is applied', () => {
+  it('a curse gem is cast by policy, and with Hexing Strikes it is applied on hit instead', () => {
     const lone = chOf(['crushingBlow', 'openWounds']);
-    expect(status(lone.ch, lone.body, 1)!.ok).toBe(false);
+    expect(status(lone.ch, lone.body, 1)!.text).toMatch(/^No supports linked/);
     const both = chOf(['crushingBlow', 'hexingStrikes', 'openWounds']);
     expect(status(both.ch, both.body, 2)).toEqual({ ok: true, text: 'Hexes the enemies you hit' });
   });
