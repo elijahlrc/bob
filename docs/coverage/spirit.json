@@ -548,16 +548,16 @@
       "ref": "Less Duration Support",
       "name": "Brief Burst",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["skill_duration_scaling_in_sim"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Shortens a duration skill's effect for more damage: trade lasting effect for burst (zones, buffs, minions and traps vanish sooner).",
         "bob": "skillDuration more (negative) and damage more. skillDuration is read for deployable lifetime, timed minions and the calc sheet's ground pulse count, but the sim's ground zones use b.duration / b.interval without the multiplier, and curses/buffs/ailments use other stats, so the downside barely exists in play while the damage bonus does.",
         "repair": "Apply profile.skillDuration to zone pulses in the sim and to buff/hex duration, so the shorter-lasting cost is real."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Less Duration Support",
         "status": "confirmed",
@@ -870,16 +870,16 @@
       "ref": "Infused Channelling Support",
       "name": "Charged Breath",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["damage_taken_while_using_skill", "buff_after_channel_ends"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Channelling support that shields you from damage while you channel and grants more damage for a few seconds after channelling stops.",
         "bob": "Only a flat more damage for channelling skills. The barrier (less damage taken while using the skill) and the post-channel timing window are gone; the port note admits the barrier is dropped.",
         "repair": "Give the supported skill a 'while using it' defence condition (less damage taken during its action) and a short damage buff after a channelled burst ends."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Infused Channelling Support",
         "status": "corrected",
@@ -1018,16 +1018,16 @@
       "ref": "Immolate Support",
       "name": "Cindering",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": ["conditional_added_damage_vs_ignited", "support_for_spells"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Adds fire damage only against burning (ignited) enemies; a payoff for ignite builds, usable on any skill that hits.",
         "bob": "Adds fire damage unconditionally to attacks only, plus 20% ignite chance (which creates its own burning enemy). The condition on the target being ignited is gone although the targetIgnited condition exists in the engine, and the gem is restricted to attacks.",
         "repair": "Add condition targetIgnited to the damage.min/max mods and drop the attack restriction (data-only)."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Immolate Support",
         "status": "confirmed",
@@ -1396,16 +1396,16 @@
       "ref": "Unleash Support",
       "name": "Double Release",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["seal_accumulation_while_idle", "reoccurrence_only_damage_penalty"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Seals accumulate over time while you are not casting and are spent to repeat the spell; best on slow, long-delay spells, no benefit if you cast quickly.",
         "bob": "One repeat on every use at less damage. The seal accumulation (repeats limited by idle time) is replaced by a constant, so fast spells repeat as much as slow ones.",
         "repair": "Make the repeat count depend on time since the last cast (seals per 0.9 s, capped), applied in the sim."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Unleash Support",
         "status": "corrected",
@@ -1508,16 +1508,16 @@
       "ref": "Ancestral Call Support",
       "name": "Echoing Blow",
       "kind": "support",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["extra_target_strikes", "melee_multistrike_separation"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A melee strike also strikes two extra nearby targets at once (not the same enemy); it extends a strike skill's reach across a pack and adds nothing against a single target.",
         "bob": "repeats +2 at slightly less damage. Echoes re-fire at the same targetId a moment later, and a non-arc melee strike only hits that one target, so against a single enemy it is a triple hit (like Multistrike) and never reaches other enemies. The sheet counts 1+repeats lands. The use case is inverted.",
         "repair": "Implement a hit-spreading effect: on a strike, also hit up to two other enemies near the target (excluding the target), instead of repeats."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Ancestral Call Support",
         "status": "confirmed",
@@ -1846,16 +1846,16 @@
       "ref": "Iron Grip Support",
       "name": "Firm Hold",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": ["attribute_bonus_extension"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Strength's melee damage bonus also applies to projectile attacks.",
         "bob": "Only some inc projectile damage. The engine has a 'strongarm' flag that does exactly this (character.ts), but the gem does not grant it.",
         "repair": "Give the support the strongarm flag as a global mod."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Iron Grip Support",
         "status": "confirmed",
@@ -1886,16 +1886,16 @@
       "ref": "Spell Cascade Support",
       "name": "Flanking Cast",
       "kind": "support",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["offset_cast_positions"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "The area spell also lands beside the target on both sides, widening the covered ground; no extra damage to a single target.",
         "bob": "repeats +2 on the same target spot at less damage and a smaller area. The echoes land at the same place a moment later, so it is a three-times repeat (like Spell Echo) rather than a spatial spread; lateral coverage is gone and single-target damage rises.",
         "repair": "Replace repeats with two extra instances of the area offset to either side of the target."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Spell Cascade Support",
         "status": "corrected",
@@ -2010,16 +2010,16 @@
       "ref": "Unbound Ailments Support",
       "name": "Freed Rot",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["non_damaging_ailment_effect", "shock_chill_freeze_duration"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Longer ailment duration, more ailment damage, stronger shock/chill and non-damaging ailments.",
         "bob": "Duration and damage for ignite, bleed, poison only; non-damaging ailment effect and shock/chill duration are not included (the engine has the stats).",
         "repair": "Add effect.shock/effect.chill/duration.shock stats."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Unbound Ailments Support",
         "status": "corrected",
@@ -2860,16 +2860,16 @@
       "ref": "Immolate Support",
       "name": "Kindle",
       "kind": "support",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["conditional_added_damage"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Added fire damage against burning (ignited) enemies: rewards stacking ignite from another source.",
         "bob": "Gives its own 30% ignite chance and more ignite damage; no added flat fire and no dependence on an already-ignited target. The engine has the targetIgnited condition, but the gem does not use it.",
         "repair": "Add flat fire damage under the targetIgnited condition and drop the self-ignite chance."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Immolate Support",
         "status": "corrected",
@@ -2945,16 +2945,16 @@
       "ref": "Close Combat Support",
       "name": "Knife Range",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["weapon_restriction", "self_buff_on_hit", "distance_scaled_damage"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "More melee damage to close enemies, scaling with distance; usable only with axes or swords; hits give a short speed buff for travel skills (poedb).",
         "bob": "Flat more damage to enemies within 2 tiles plus radius; no weapon restriction, no hit buff, no distance gradient. The damage trade works, but it loses its restriction-for-power.",
         "repair": "Restrict to axe and sword attacks (needs a support-side weapon filter)."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Close Combat Support",
         "status": "corrected",
@@ -3013,16 +3013,16 @@
       "ref": "Inspiration Support",
       "name": "Lightheart",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["mana_counter_reset"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Cheaper skill; casting builds Inspiration charges that raise elemental damage and crit chance until a mana-spent threshold clears them. Self-generating.",
         "bob": "Real 30% cost reduction, but the charge loop is folded into the shared Insight charge and the gem generates none; the per-charge crit and damage bonus only works if another item grants Insight. On its own it is just a cheaper skill.",
         "repair": "Give the gem a chargeOn.cast-style source (or its own charge that gains with mana spent and resets on a threshold)."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Inspiration Support",
         "status": "confirmed",
@@ -3054,16 +3054,16 @@
       "ref": "More Duration Support",
       "name": "Lingering Effect",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["skill_duration_scaling_in_sim"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Longer-lasting skill effects (zones, minions, trap and curse durations) with only a mana multiplier cost (poedb 3.27: no damage penalty).",
         "bob": "skillDuration more plus an invented 15% less damage. Because the sim ignores skillDuration for ground zones, curses and buffs, the benefit works only on deployables and timed minions while the damage penalty always applies; the sheet and the sim disagree for zone skills.",
         "repair": "Wire skillDuration into zone pulses and hex/buff duration in the sim; do not add an invented drawback."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "More Duration Support",
         "status": "confirmed",
@@ -3223,16 +3223,16 @@
       "ref": "Ruthless Support",
       "name": "Merciless Cadence",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["every_nth_use_bonus", "big_hit_stun_override"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Every third use of the melee attack is a big hit: much more damage, a longer stun, and extra bleed damage; a rhythm/burst support with a counter.",
         "bob": "Averaged into a permanent more melee damage and more bleed damage (value is exactly one third of the PoE big-hit bonus). No counter, no big hit, no stun component.",
         "repair": "Count melee uses of the supported skill in the sim and apply the big-hit mods (damage, bleed, stun duration) on every third; keep the sheet on the average."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Ruthless Support",
         "status": "confirmed",
@@ -3872,16 +3872,16 @@
       "ref": "Enhance Support",
       "name": "Refine Gem",
       "kind": "support",
-      "verdict": "gutted",
+      "verdict": "drifted",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["gem_quality"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Raises the quality of the supported gem, amplifying its quality bonus; a tuning/utility support rather than a damage gem.",
         "bob": "A small inc damage. There is no quality system (DESIGN 2.1: gem quality not modelled), so the gem has no real object; it is a stat gem with the old name.",
         "repair": "Reinterpret as a small levelBonus on the supported skill (the Empower hook), or introduce quality."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Enhance Support",
         "status": "confirmed",
@@ -3893,7 +3893,8 @@
         ],
         "check": "Holds: the wiki confirms it only adds quality to the supported gem and does nothing else; Bob's inc damage is a stand-in with no real object because quality is not modelled.",
         "decision": "Bob has no gem quality system, so this gem has no real effect to port. Introduce gem quality (an extra system that every gem would then need), turn it into a small level bonus on the supported skill like Empower, or drop it?"
-      }
+      },
+      "accepted": "Divergence D5: Bob has no gem quality, and Enhance only raises quality in 3.9. The gem stays a small damage stand-in for the supported skill."
     },
     "rendingEdge": {
       "ref": "Chance to Bleed Support",
@@ -4663,16 +4664,16 @@
       "ref": "Shockwave Support",
       "name": "Shattering Blows",
       "kind": "support",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["hit_splash_aoe", "weapon_restriction_on_support", "trigger_internal_cooldown"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Mace/staff hits trigger a shockwave: an area hit around the target, turning single-target strikes into area damage; weapon-restricted.",
         "bob": "Only +25% increased area of effect and +25% more melee damage. radiusMult only affects arcs, bursts, beams and zones; on a thrust strike it does nothing, so it is plain more melee damage. No shockwave and no mace/staff restriction.",
         "repair": "On hit, trigger a burst (castGranted) of the hit's damage around the target; restrict to maces and staves."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Shockwave Support",
         "status": "corrected",
@@ -5407,16 +5408,16 @@
       "ref": "Blasphemy Support",
       "name": "Standing Curse",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["enemy_aura"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Curse becomes a reserved-mana aura that applies to all enemies in an area around you, with no casting.",
         "bob": "Reserves 35% of mana and the curse is applied as a hex to every enemy the character hits (deriveHexes/applyPlayerHexes). It is an on-hit curse not an aura around the player: enemies not hit are never cursed, there is no radius, and it counts against the one-hex limit.",
         "repair": "Apply the curse to all enemies within a radius of the player while the aura stands (like the existing burning-aura tick)."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Blasphemy Support",
         "status": "confirmed",
@@ -5478,16 +5479,16 @@
       "ref": "Iron Will Support",
       "name": "Steel Resolve",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": ["attribute_bonus_extension"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Strength's melee damage bonus also applies to spell damage.",
         "bob": "Only some inc spell damage; no attribute bonus extension (and no flag in the engine for spells).",
         "repair": "Add a strength-to-spell-damage flag in character.ts and have the support grant it."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Iron Will Support",
         "status": "confirmed",
@@ -5779,16 +5780,16 @@
       "ref": "Intensify Support",
       "name": "Swelling Blast",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["stacks_on_cast_decay_on_move", "per_stack_area_penalty"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Intensity stacks build while you stand and cast, adding area damage; moving loses stacks. A commitment/ramp trade.",
         "bob": "Flat increased area of effect and more area damage. The stand-still ramp-up and loss on movement are averaged away although a stationary condition exists in the engine.",
         "repair": "Make the area damage bonus conditional on the stationary condition or build stacks while not moving."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Intensify Support",
         "status": "corrected",
@@ -5837,16 +5838,16 @@
       "ref": "Advanced Traps Support",
       "name": "Swift Snares",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "low",
-      "milestone": "S13",
-      "missing": ["trap_cooldown", "skill_duration_bonus"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Three-in-one trap support: faster throwing, faster trap cooldown recovery, and longer trap/effect duration.",
         "bob": "Only the throw speed (as cast/attack speed inc). The duration component is dropped even though deployable lifetime does scale with skillDuration (deploy.ts), and Bob has no trap cooldown at all.",
         "repair": "Add skillDuration to the mods so traps last longer; a trap cooldown system would be needed for the third stat."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Advanced Traps Support",
         "status": "corrected",
@@ -5994,16 +5995,16 @@
       "ref": "Combustion Support",
       "name": "Tinderbox",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["ailment_applies_res_shift"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Chance to ignite, more fire damage, and ignited enemies have reduced fire resistance (the resistance shred).",
         "bob": "Chance to ignite and more fire damage; the fire resistance reduction on ignited enemies is missing. Target resistance shifts exist (curses) but are not applied.",
         "repair": "Apply a fire-resistance shift to enemies the skill has ignited."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Combustion Support",
         "status": "confirmed",
@@ -6105,16 +6106,16 @@
       "ref": "Multistrike Support",
       "name": "Triple Cadence",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["repeat_ramp", "repeat_random_target", "shared_crit_roll"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Multistrike repeats twice with a random enemy each time, 35-44% more attack speed, -20..-10% damage on every strike, +22% on the first repeat and +44% on the second (3.9 data).",
         "bob": "Sets repeats 2 with speed and damage boosts; the second echo now lands before the action ends (S1). No ramp, no penalty, same target.",
         "repair": "S13c: the penalty and ramp as 3.9 has them, and a random nearby target for each repeat."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Multistrike Support",
         "status": "corrected",
@@ -6231,20 +6232,16 @@
       "ref": "Mirage Archer Support",
       "name": "Twin Shadow",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": [
-        "persistent_independent_attacker",
-        "weapon_restriction_on_support",
-        "summon_on_hit"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Bow attack summons a mirage archer for a few seconds that fires the same skill at 60% less attack speed and reduced damage; bow-only, an independent extra attacker.",
         "bob": "repeats +1 at -40 to -31% damage: one echo shot per use from the same spot a moment after the first (a separate fire(), so it can hit the same target again). The mirage's slow independent rate (-60% attack speed), its persistence, its position and the bow-only restriction are lost, making it stronger than PoE's.",
         "repair": "Spawn a timed clone that fires at a fraction of the character's rate from its own position, restricted to bows."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Mirage Archer Support",
         "status": "corrected",
@@ -6304,16 +6301,16 @@
       "ref": "Nightblade Support",
       "name": "Veil Cut",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["elusive_buff", "decaying_buff_effect", "weapon_restriction_on_support"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Critical strikes grant Elusive (evasion/avoidance and speed); while elusive the skill has extra crit chance and multiplier; dagger and claw only. A crit-defence loop.",
         "bob": "Unconditional crit chance inc and crit multiplier bonus. No Elusive buff (no BuffId for it), no crit-to-elusive-to-crit loop, no dagger/claw restriction. Port note acknowledges Elusive is only 'modelled' as the bonus.",
         "repair": "Add an elusive buff (evasion and move speed) granted by buffOn.crit and make the crit bonuses conditional on it; restrict to dagger/claw."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Nightblade Support",
         "status": "corrected",
@@ -6601,16 +6598,16 @@
       "ref": "Energy Leech Support",
       "name": "Ward Siphon",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "low",
-      "milestone": "S13",
-      "missing": ["leech_es_from_damage", "damage_while_leeching"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Hits leech energy shield as a share of damage dealt, with more damage while on full ES and while leeching ES; ES sustain that scales with damage.",
         "bob": "Flat esOnHit per hit (does not scale with damage) plus more damage while ES is full. No ES leech exists in the engine (leechLife/leechMana only), and the 'while leeching' bonus is gone.",
         "repair": "Add an ES leech channel that works like life leech, and a more-damage-while-leeching-ES condition."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Energy Leech Support",
         "status": "confirmed",
@@ -6643,16 +6640,16 @@
       "ref": "Meat Shield Support",
       "name": "Warding Pack",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["taunt_on_hit", "minion_defensive_stance", "near_owner_damage_bonus"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Minions switch to a defensive stance: they take less damage, taunt enemies on hit and stay close to you, damaging enemies near you more; they tank for you.",
         "bob": "Minion life more, minion damage taken less, minion speed. No taunt on hit (monsters do not target minions except hunters and when held up), no near-you damage bonus, no stance. Minions already follow at 3.5 tiles and body-block, so only the toughness half exists.",
         "repair": "Add a taunt effect on minion hits that makes monsters target that minion, and a damage bonus while the target is near the player."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Meat Shield Support",
         "status": "corrected",

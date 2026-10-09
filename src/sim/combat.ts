@@ -35,6 +35,7 @@ import { gainTrophy, rollCharges } from './charges';
 import { ALL_HEX_IDS, HEXES } from '../data/hexes';
 import { mineAuraAt, mineAuraHit } from './deploy';
 import { refreshOnKill, stanceFarLess } from './stances';
+import { afterPlayerHit } from './supportFx';
 import { applyHex, applyPlayerHexes, hexHit, hexKill, tickHexes } from './hexes';
 import {
   applyStatus,
@@ -88,6 +89,7 @@ const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
   blockedRecently: (_w, p) => p.tBlock < RECENT,
   beenHitRecently: (_w, p) => p.tBeenHit < RECENT,
   leeching: (_w, p) => p.leechLife.length > 0,
+  leechingEs: (_w, p) => p.leechEs.length > 0,
   esFull: (_w, p) => p.def.maxEs > 0 && p.es >= p.def.maxEs - 0.5,
   onLowMana: (w, p) => p.mana <= Math.max(1, p.def.maxMana - reservedMana(w)) * LOW_LIFE,
   cursed: (_w, p) => p.hexes.length > 0,
@@ -264,17 +266,23 @@ export function applyDamage(w: World, dst: Actor, dmg: number[]): number {
 
 function addLeech(
   src: Actor,
-  list: 'leechLife' | 'leechMana',
+  list: 'leechLife' | 'leechMana' | 'leechEs',
   amount: number,
   instant: boolean,
 ): void {
   if (amount <= 0) return;
   amount = Math.min(
     amount,
-    LEECH_INSTANCE_MAX * (list === 'leechLife' ? src.def.maxLife : src.def.maxMana),
+    LEECH_INSTANCE_MAX *
+      (list === 'leechLife'
+        ? src.def.maxLife
+        : list === 'leechEs'
+          ? src.def.maxEs
+          : src.def.maxMana),
   );
   if (instant) {
     if (list === 'leechLife') src.life += amount;
+    else if (list === 'leechEs') src.es = Math.min(src.def.maxEs, src.es + amount);
     else src.mana += amount;
     return;
   }
@@ -286,7 +294,10 @@ function addLeech(
 export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res: HitResult): void {
   if (src.isPlayer) {
     w.lastOutcome = res.outcome === 'hit' ? 'hit' : res.outcome === 'block' ? 'block' : 'miss';
-    if (res.outcome === 'hit') w.hitsLanded++;
+    if (res.outcome === 'hit') {
+      w.hitsLanded++;
+      if (w.critLock === null) w.critSeen = res.crit;
+    }
   }
   if (res.outcome === 'miss') {
     w.events.push({ t: 'miss', src: src.id, dst: dst.id });
@@ -298,6 +309,17 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (dealt !== 1 && res.outcome !== 'block') {
     for (let i = 0; i < res.dmg.length; i++) res.dmg[i] *= dealt;
     res.total *= dealt;
+  }
+  // Infused Channelling: while channelling, hits of the types the skill is made of do less.
+  if (dst.isPlayer && res.outcome !== 'block' && w.channel?.profile.infuse) {
+    const ch = w.channel.profile;
+    const less = ch.infuse!.barrier / 100;
+    const types = ['physical', 'lightning', 'cold', 'fire', 'chaos'];
+    for (let i = 0; i < 5; i++)
+      if ((ch.skill.tags as readonly string[]).includes(types[i])) {
+        res.total -= res.dmg[i] * less;
+        res.dmg[i] *= 1 - less;
+      }
   }
   // Flesh and Stone in the Sand stance: attacks by enemies that are not near do less.
   if (dst.isPlayer && !src.isPlayer && res.outcome !== 'block' && p.isAttack) {
@@ -385,6 +407,11 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (src.def.leechToEs && instant) src.es = Math.min(src.def.maxEs, src.es + ll);
   else addLeech(src, 'leechLife', ll, instant);
   addLeech(src, 'leechMana', lm, instant);
+  // Energy shield leeched from the damage (Energy Leech).
+  let le = 0;
+  if (!dst.def.cannotBeLeechedFrom)
+    for (let i = 0; i < 5; i++) le += res.dmg[i] * (p.leechEs[i] ?? 0);
+  if (le > 0) addLeech(src, 'leechEs', le, instant);
   if (p.lifeOnHit > 0) src.life = Math.min(lifeCap(w, src), src.life + p.lifeOnHit);
   if (p.esOnHit > 0 && src.isPlayer) src.es = Math.min(src.def.maxEs, src.es + p.esOnHit);
   if (p.manaOnHit > 0 && src.isPlayer)
@@ -416,6 +443,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     dst.skillT = 3;
   }
   wake(w, dst);
+  if (src.isPlayer && res.outcome === 'hit') afterPlayerHit(w, dst, p);
   // Siphoning monsters drain the player's mana; Thorned monsters reflect part of a melee hit.
   if (p.manaDrain > 0 && dst.isPlayer)
     dst.mana = Math.max(0, dst.mana - (dst.def.maxMana * p.manaDrain) / 100);
@@ -441,6 +469,12 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (src.isPlayer && !dst.isPlayer) {
     // Damage over time the skill (or a support) puts on what it hits.
     if (p.decay) applyDecay(w, dst, p.decay);
+    // A Ruthless Blow stuns.
+    if (p.stunFixed && dst.stunT <= 0 && dst.graceT <= 0 && res.outcome === 'hit') {
+      dst.stunT = p.stunFixed;
+      dst.action = null;
+      w.events.push({ t: 'stun', dst: dst.id, dur: p.stunFixed });
+    }
     if (p.skillDot && !p.skillDot.spec.hitless && !p.skillDot.spec.ground) {
       applySkillDot(w, dst, p);
       const splash = p.skillDot.spec.splash;
@@ -493,6 +527,12 @@ function applyAilments(w: World, dst: Actor, res: HitResult, p: SkillProfile): v
     });
     ail.igniteMax = p.ignite.max;
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'ignite' });
+    // Combustion: an enemy ignited by the skill is weaker to fire for as long as it burns.
+    if (p.igniteResShift > 0)
+      applyStatus(w, dst, 'exposedFire', {
+        seconds: p.ignite.dur * d.durOnSelf.ignite,
+        v: p.igniteResShift,
+      });
     // An ignite from a Torch Arrow also leaves a burning debuff worth a share of its damage.
     const bn = p.skill.burning;
     if (bn)
@@ -575,7 +615,7 @@ export function hit(
   const aura = src.isPlayer && w.deployables.length > 0 ? mineAuraAt(w, dst.x, dst.y) : null;
   if (aura && aura.double > 0)
     p = { ...p, doubleChance: Math.min(1, p.doubleChance + aura.double / 100) };
-  const res = resolveHit(w.rngCombat, p, h, ts, dist, canStun);
+  const res = resolveHit(w.rngCombat, p, h, ts, dist, canStun, undefined, w.critLock ?? undefined);
   applyHit(w, src, dst, p, res);
   if (aura && aura.max > 0 && dst.alive) mineAuraHit(w, dst);
 }
@@ -1040,6 +1080,15 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       def.maxLife,
       dt,
       a.life >= cap,
+      def.leechRate,
+    );
+  if (a.leechEs.length > 0)
+    leechTick(
+      a.leechEs,
+      (x) => (a.es = Math.min(def.maxEs, a.es + x)),
+      def.maxEs,
+      dt,
+      a.es >= def.maxEs,
       def.leechRate,
     );
   // ES recharge.

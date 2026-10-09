@@ -25,6 +25,8 @@ import type { World } from './types';
 /** Gain a buff, or refresh it to its full time. */
 export function gainBuff(w: World, id: BuffId): void {
   if (!w.char.buffSource[id]) return;
+  // Elusive cannot be renewed until it has run out.
+  if (id === 'elusive' && w.buffT.elusive > 0) return;
   const seconds = BUFFS[id].seconds * w.char.db.mult('buffDuration');
   w.buffT[id] = Math.max(w.buffT[id], seconds);
   w.events.push({ t: 'buff', id });

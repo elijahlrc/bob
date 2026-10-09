@@ -15,13 +15,17 @@
       { "stat": "critChance", "kind": "inc", "value": [30, 49] },
       { "stat": "damage", "kind": "more", "value": [25, 44], "tags": ["dot"], "condition": { "id": "critRecently" } } ],
       "description": "More critical strike chance, and damaging ailments caused by crits hurt more." } },
-  { "ref": "Ruthless Support", "note": "Every third melee hit deals far more damage (averaged over the three hits).",
-    "def": { "kind": "support", "id": "mercilessCadence", "name": "Merciless Cadence", "attr": "str", "supports": ["melee"], "excludes": ["channelling"], "costMult": 1.1, "mods": [
-      { "stat": "damage", "kind": "more", "value": [25, 44], "tags": ["melee"] },
-      { "stat": "damage", "kind": "more", "value": [25, 44], "tags": ["bleed"] } ],
-      "description": "Every third melee hit lands with great force; averaged here as more melee and bleed damage." } },
-  { "ref": "Infused Channelling Support", "note": "More damage for channelled skills (the barrier that cuts damage taken is dropped).",
+  { "ref": "Ruthless Support", "note": "Every third use of the melee attack is a Ruthless Blow: much more melee damage, much more bleed damage, and a stun.",
+    "def": { "kind": "support", "id": "mercilessCadence", "name": "Merciless Cadence", "attr": "str", "supports": ["melee"], "needs": ["attack"], "excludes": ["channelling"], "costMult": 1.1, "mods": [
+      { "stat": "ruthless.more", "kind": "base", "value": [75, 132] },
+      { "stat": "ruthless.bleed", "kind": "base", "value": [75, 132] },
+      { "stat": "ruthless.stun", "kind": "base", "value": 0.8 } ],
+      "description": "Every third melee blow lands with great force and stuns." } },
+  { "ref": "Infused Channelling Support", "note": "Channelling skills deal more damage; while channelling you take less damage from hits, and after channelling for a while you are Infused: more damage, lasting six seconds after you stop.",
     "def": { "kind": "support", "id": "chargedBreath", "name": "Charged Breath", "attr": "int", "supports": ["channelling"], "costMult": 1.4, "mods": [
-      { "stat": "damage", "kind": "more", "value": [20, 39] } ],
-      "description": "Channelled skills deal more damage." } }
+      { "stat": "damage", "kind": "more", "value": [20, 39] },
+      { "stat": "infuse.after", "kind": "base", "value": [1.6, 1.0] },
+      { "stat": "infuse.barrier", "kind": "base", "value": 8 },
+      { "stat": "damage", "kind": "more", "value": 10, "condition": { "id": "infusion" } } ],
+      "description": "Channelled skills hit harder, guard you while they last and leave you infused." } }
 ]

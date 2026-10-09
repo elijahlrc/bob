@@ -19,6 +19,7 @@ import type { CaughtState, WarpState, WitherState } from './blinks';
 import type { Field } from './fields';
 import type { SkillDot } from './skillDots';
 import type { OfferingState } from './minionFx';
+import type { Mirage } from './supportFx';
 import type { HexTotals } from '../data/hexes';
 import type { Deployable } from './deploy';
 import type { Minion } from './minions';
@@ -59,6 +60,10 @@ export type Action = {
   fired: boolean;
   /** Repeats (Echoing Cast) already fired after the first. */
   echoes: number;
+  /** What each repeat's damage is multiplied by (the ramp of Multistrike, the less of Unleash), by repeat. */
+  echoMult?: number[];
+  /** Whether the first strike of the use was a critical strike: the repeats share it. */
+  crit?: boolean;
   targetId: number;
   aimX: number;
   aimY: number;
@@ -87,6 +92,7 @@ export type Actor = {
   stunT: number;
   graceT: number;
   leechLife: number[];
+  leechEs: number[];
   leechMana: number[];
   sinceDamaged: number;
   tKill: number;
@@ -546,6 +552,20 @@ export type World = {
   berserkT: number;
   /** The offering that stands, if one does (src/sim/minionFx.ts). */
   offering: OfferingState | null;
+  /** Counters the supports keep (src/sim/supportFx.ts): uses of a skill, Intensity, Seals, a mirage archer, Inspiration's mana. */
+  uses: Record<string, number>;
+  intensity: Record<string, number>;
+  intensityT: Record<string, number>;
+  seals: Record<string, { n: number; t: number }>;
+  mirage: Mirage | null;
+  inspireMana: number;
+  /** The channelling skill whose Infusion is held, if one is. */
+  infusing: string | null;
+  shockCd: Record<string, number>;
+  inShock: boolean;
+  /** The critical roll the strikes of one use share: set while the extra strikes of a use are made. */
+  critLock: boolean | null;
+  critSeen: boolean;
   /** The channelled skill being held: its stages so far. */
   channel: ChannelState | null;
   /** The stages of a skill that grows with use, and how many hits the player has landed (a use that hits builds a stage). */

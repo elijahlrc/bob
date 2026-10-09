@@ -44,6 +44,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     stunT: 0,
     graceT: 0,
     leechLife: [],
+    leechEs: [],
     leechMana: [],
     sinceDamaged: 99,
     tKill: 99,

@@ -725,6 +725,13 @@ export class Character {
       for (const s of supports) costMult *= (s.def as SupportGemDef).costMult;
       let usable = true;
       let reason: string | undefined;
+      for (const s of supports) {
+        const lw = (s.def as SupportGemDef).limitWeapon;
+        if (lw && !lw.some((t) => weaponTags.has(t))) {
+          usable = false;
+          reason = `${s.def.name} limits ${skill.name} to ${lw.join(' or ')} weapons`;
+        }
+      }
       if (skill.requiresWeapon && !skill.requiresWeapon.some((t) => weaponTags.has(t))) {
         usable = false;
         reason = `${skill.name} needs a ${skill.requiresWeapon.join(' or ')}`;
@@ -1213,6 +1220,18 @@ export class Character {
     const supportMods: Mod[] = [];
     for (const s of choice.supports)
       supportMods.push(...gemMods((s.def as SupportGemDef).mods, s.level, s.def.id));
+    // A support can give a skill the strength bonus of a keystone: Iron Grip for physical projectile attacks, Iron Will for spells.
+    if (supportMods.some((m) => m.stat === 'ironGrip'))
+      supportMods.push(
+        mod('damage', 'inc', this.attrs.str * STR_MELEE_PHYS_INC, {
+          damageTypes: ['physical'],
+          tags: ['projectile', 'attack'],
+        }),
+      );
+    if (supportMods.some((m) => m.stat === 'ironWill'))
+      supportMods.push(
+        mod('damage', 'inc', this.attrs.str * STR_MELEE_PHYS_INC, { tags: ['spell'] }),
+      );
     const base = this.dbWith(flaskMask);
     let db = base;
     if (choice.skill.mods.length || supportMods.length) {

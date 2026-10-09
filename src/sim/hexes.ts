@@ -8,6 +8,7 @@ import {
   hexTotals,
   type HexId,
 } from '../data/hexes';
+import { blasphemyOf } from '../calc/character';
 import { reservedMana } from './reserve';
 import { gainBuff } from './buffs';
 import { gainCharge } from './charges';
@@ -61,6 +62,22 @@ export function applyPlayerHexes(w: World, dst: Actor): void {
   const ch = w.char;
   if (!ch.hexes.length || dst.isPlayer) return;
   for (const h of ch.hexes) applyHex(w, dst, h.id, h.effect, ch.hexLimit, h.level);
+}
+
+/** A curse under Blasphemy is an aura: every enemy within its reach, hit or not, is cursed (refreshed twice a second). */
+export function tickBlasphemy(w: World, dt: number): void {
+  if (Math.floor(w.t * 2) === Math.floor((w.t - dt) * 2)) return;
+  const p = w.player;
+  for (const c of w.char.actives) {
+    const u = c.skill.utility;
+    if (!c.usable || u?.kind !== 'curse' || !blasphemyOf(c)) continue;
+    const h = w.char.hexes.find((x) => x.id === u.hex);
+    if (!h) continue;
+    const radius = Math.max(u.radius, 3) * w.char.profile(c, 0).radiusMult * 1.5;
+    for (const e of w.actors)
+      if (!e.isPlayer && e.alive && Math.hypot(e.x - p.x, e.y - p.y) <= radius + e.r)
+        applyHex(w, e, h.id, h.effect, w.char.hexLimit, h.level);
+  }
 }
 
 /** A monster hexes the player: the effect is reduced by "reduced effect of curses on you". */

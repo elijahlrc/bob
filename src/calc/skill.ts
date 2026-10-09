@@ -135,6 +135,37 @@ export type SkillProfile = {
   ignite: AilmentSpec & { max: number; speed: number };
   bleed: AilmentSpec & { speed: number };
   poison: AilmentSpec & { speed: number };
+  /** Percent off the fire resistance of an enemy that the skill ignites (Combustion). */
+  igniteResShift: number;
+  /** Percent more melee damage at point blank, falling to none at five tiles (Close Combat). */
+  closeCombat: number;
+  /** Every third use is a Ruthless Blow: percent more melee and bleed damage, and a stun of this many seconds. */
+  ruthless: { more: number; bleed: number; stun: number } | null;
+  /** The strike also hits this many other enemies near it at once (Ancestral Call). */
+  extraTargets: number;
+  /** A spell also lands on the ground before and behind the target (Spell Cascade). */
+  cascade: boolean;
+  /** Melee repeats go to random enemies, each with more damage than the one before, and share one critical roll (Multistrike). */
+  multistrike: { ramp: number } | null;
+  /** Each cast builds a stack: percent more area damage and less area for each (Intensify). */
+  intensify: { more: number; area: number; max: number } | null;
+  /** The spell gains a seal while idle, and a cast spends them as repeats at this much less damage (Unleash). */
+  unleash: { every: number; less: number } | null;
+  /** A hit calls a mirage archer for some seconds that uses the skill at less damage and speed (Mirage Archer). */
+  mirage: { less: number; slow: number; seconds: number } | null;
+  /** A melee hit triggers a shockwave of so much of the base attack damage, with its own cooldown (Shockwave). */
+  shockwave: { mult: number; cooldown: number } | null;
+  /** Infused Channelling: seconds of channelling before the Infusion, and the percent less damage taken from matching hits while channelling. */
+  infuse: { after: number; barrier: number } | null;
+  /** The minions of the skill stay near the character and do more damage to the enemies near it (Meat Shield). */
+  minionDefensive: boolean;
+  minionNearMore: number;
+  /** The mana the supported skills may spend before the Inspiration charges are lost (0: none). */
+  inspire: number;
+  /** The share of the damage dealt of each type that is leeched as energy shield. */
+  leechEs: number[];
+  /** A Ruthless Blow stuns for this long (set on the blow's profile). */
+  stunFixed?: number;
   /** Damage over time the skill inflicts as a debuff of its own, and Decay's flat damage over time on every hit. */
   skillDot: SkillDotProfile | null;
   decay: { dps: number; seconds: number } | null;
@@ -606,6 +637,62 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     },
     cannotInflictEle,
     skillDot,
+    infuse:
+      db.sum('base', 'infuse.after', baseCtx) > 0
+        ? {
+            after: db.sum('base', 'infuse.after', baseCtx),
+            barrier: db.sum('base', 'infuse.barrier', baseCtx),
+          }
+        : null,
+    minionDefensive: db.flag('minion.defensive', baseCtx),
+    minionNearMore: db.sum('base', 'minion.nearMore', baseCtx),
+    inspire: db.sum('base', 'inspire.threshold', baseCtx),
+    leechEs: perType('leech.es').map((v) => v * db.mult('leechRecovery', baseCtx)),
+    igniteResShift: db.sum('base', 'ignite.resShift', baseCtx),
+    closeCombat: db.sum('base', 'closeCombat.more', baseCtx),
+    ruthless:
+      db.sum('base', 'ruthless.more', baseCtx) > 0
+        ? {
+            more: db.sum('base', 'ruthless.more', baseCtx),
+            bleed: db.sum('base', 'ruthless.bleed', baseCtx),
+            stun: db.sum('base', 'ruthless.stun', baseCtx),
+          }
+        : null,
+    extraTargets: Math.round(db.sum('base', 'extraTargets', baseCtx)),
+    cascade: db.flag('cascade', baseCtx),
+    multistrike: db.flag('repeatsRandom', baseCtx)
+      ? { ramp: db.sum('base', 'repeatRamp', baseCtx) }
+      : null,
+    intensify:
+      db.sum('base', 'intensify.more', baseCtx) > 0
+        ? {
+            more: db.sum('base', 'intensify.more', baseCtx),
+            area: db.sum('base', 'intensify.area', baseCtx),
+            max: Math.round(db.sum('base', 'intensify.max', baseCtx)),
+          }
+        : null,
+    unleash:
+      db.sum('base', 'unleash.every', baseCtx) > 0
+        ? {
+            every: db.sum('base', 'unleash.every', baseCtx),
+            less: db.sum('base', 'unleash.less', baseCtx),
+          }
+        : null,
+    mirage:
+      db.sum('base', 'mirage.seconds', baseCtx) > 0
+        ? {
+            less: db.sum('base', 'mirage.less', baseCtx),
+            slow: db.sum('base', 'mirage.slow', baseCtx),
+            seconds: db.sum('base', 'mirage.seconds', baseCtx),
+          }
+        : null,
+    shockwave:
+      db.sum('base', 'shockwave.mult', baseCtx) > 0
+        ? {
+            mult: db.sum('base', 'shockwave.mult', baseCtx),
+            cooldown: db.sum('base', 'shockwave.cooldown', baseCtx),
+          }
+        : null,
     decay:
       decayBase > 0
         ? { dps: decayBase * dotMult(CHAOS, 0), seconds: DECAY_SECONDS * lasting }
@@ -690,6 +777,9 @@ export function formedProfile(p: SkillProfile): SkillProfile {
 export function distanceMult(p: SkillProfile, d: number): number {
   let m = 1;
   const b = p.skill.behaviour;
+  // Close Combat: the melee damage is higher near the character, and none higher at five tiles.
+  if (p.closeCombat > 0 && p.skill.tags.includes('melee'))
+    m *= 1 + (p.closeCombat / 100) * clamp((5.3 - d) / 3.3, 0, 1);
   if (b.kind === 'projectile') {
     if (p.closeQuarters && p.isAttack) m *= 1.3 - (0.8 * (clamp(d, 1, 8) - 1)) / 7;
     if (b.falloff !== undefined && b.range) m *= 1 - (1 - b.falloff) * clamp(d / b.range, 0, 1);

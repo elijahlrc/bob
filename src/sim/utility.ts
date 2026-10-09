@@ -218,7 +218,7 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     return;
   }
   if (u.kind === 'buff' && u.banner) {
-    useBanner(w, c, act.profile.radiusMult);
+    useBanner(w, c, act.profile);
     return;
   }
   if (u.kind === 'buff') {

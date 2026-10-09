@@ -24,6 +24,8 @@ import { tickChannel } from './channel';
 import { tickBanner } from './banners';
 import { tickCaught, tickWarp, tickWither } from './blinks';
 import { tickLegion, tickOffering } from './minionFx';
+import { tickSupports } from './supportFx';
+import { tickBlasphemy } from './hexes';
 import { tickBerserk, tickDegen, tickStance } from './stances';
 import { tickProliferation } from './proliferate';
 import { tickFields } from './fields';
@@ -149,6 +151,17 @@ export function createWorld(inp: CreateWorldInput): World {
     caught: null,
     berserkT: 0,
     offering: null,
+    uses: {},
+    intensity: {},
+    intensityT: {},
+    seals: {},
+    mirage: null,
+    inspireMana: 0,
+    infusing: null,
+    shockCd: {},
+    inShock: false,
+    critLock: null,
+    critSeen: false,
     channel: null,
     stacks: null,
     hitsLanded: 0,
@@ -551,6 +564,8 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickDegen(w, dt);
   tickOffering(w, dt);
   tickLegion(w, dt);
+  tickSupports(w, dt);
+  tickBlasphemy(w, dt);
   tickProliferation(w, dt);
   updateProjectiles(w, dt);
   tickZones(w, dt);

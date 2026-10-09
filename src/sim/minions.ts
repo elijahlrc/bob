@@ -41,6 +41,9 @@ export type Minion = Actor & {
   fixedRate?: number;
   /** What the supports of its skill give it. */
   sup: MinionSup;
+  /** Meat Shield: it stays near the character, goes for the enemies near it, and hits those harder. */
+  defensive?: boolean;
+  nearMore?: number;
   /** A golem: the added physical damage it gives the other minions, and how much harder it hits for each of them near. */
   golem?: { min: number; max: number; perNearby: number; cap: number };
   /** A Guardian: the items it wears, by place. */
@@ -56,6 +59,8 @@ const SEEK = 14;
 const LOW_LIFE = 0.2;
 const BURST_RADIUS = 2.5;
 const FOLLOW = 3.5;
+const FOLLOW_CLOSE = 2;
+const DEFEND = 6;
 const TELEPORT = 20;
 
 /** The numbers of a minion's blows: its kind's, or, for a spectre, those of the monster it was. */
@@ -148,6 +153,8 @@ function makeMinion(
   m.dmg = prof.minionDamage;
   m.speed = prof.minionSpeed;
   m.sup = prof.minionSup;
+  m.defensive = prof.minionDefensive;
+  m.nearMore = prof.minionNearMore;
   w.minions.push(m);
   w.events.push({ t: 'summon', id: m.id });
   refreshMinionDef(m, auraNow(w));
@@ -334,6 +341,8 @@ export function tickMinions(w: World, dt: number): void {
     let best = null as (typeof foes)[number] | null;
     let bd = SEEK;
     for (const e of foes) {
+      // A defensive minion goes only for what is near its owner.
+      if (m.defensive && Math.hypot(e.x - p.x, e.y - p.y) > DEFEND) continue;
       const d = Math.hypot(e.x - m.x, e.y - m.y);
       if (d < bd) {
         best = e;
@@ -342,7 +351,8 @@ export function tickMinions(w: World, dt: number): void {
     }
     const speed = def.speed * m.speed * (1 + aura.move / 100) * (1 - m.ail.chill);
     if (!best) {
-      if (Math.hypot(p.x - m.x, p.y - m.y) > FOLLOW) step(w, m, p.x, p.y, dt, speed);
+      if (Math.hypot(p.x - m.x, p.y - m.y) > (m.defensive ? FOLLOW_CLOSE : FOLLOW))
+        step(w, m, p.x, p.y, dt, speed);
       continue;
     }
     m.facing = Math.atan2(best.y - m.y, best.x - m.x);

@@ -1,4 +1,5 @@
 import type { SkillChoice } from '../calc/character';
+import type { SkillProfile } from '../calc/skill';
 import { levelValue } from '../calc/gems';
 import type { UtilityDef } from '../data/gems';
 import { reservedMana } from './reserve';
@@ -71,7 +72,7 @@ export function bannerAction(w: World, c: SkillChoice, target: Actor): 'carry' |
 }
 
 /** Cast the banner skill: carry a new banner, or put the carried one down where the character stands. */
-export function useBanner(w: World, c: SkillChoice, radiusMult: number): void {
+export function useBanner(w: World, c: SkillChoice, prof: SkillProfile): void {
   const s = specOf(c);
   if (!s) return;
   const p = w.player;
@@ -84,7 +85,10 @@ export function useBanner(w: World, c: SkillChoice, radiusMult: number): void {
     b.y = p.y;
     b.radius = b.r0 * (1 + (g.area / 100) * b.stages);
     b.effect = 1 + (g.effect / 100) * b.stages;
-    b.t = (s.spec.placedSeconds + g.seconds * b.stages) * w.char.db.mult('buffDuration');
+    b.t =
+      (s.spec.placedSeconds + g.seconds * b.stages) *
+      w.char.db.mult('buffDuration') *
+      (c.skill.tags.includes('duration') ? prof.skillDuration : 1);
     const granted = s.spec.place.secondsPerStage * b.stages;
     if (granted > 0) {
       w.buffT[s.spec.place.buff] = Math.max(w.buffT[s.spec.place.buff], granted);
@@ -92,7 +96,7 @@ export function useBanner(w: World, c: SkillChoice, radiusMult: number): void {
     }
     return;
   }
-  const r0 = s.spec.radius * radiusMult;
+  const r0 = s.spec.radius * prof.radiusMult;
   w.banner = {
     key: c.key,
     placed: false,

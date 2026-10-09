@@ -16,6 +16,8 @@ export type ChannelState = {
   stage: number;
   /** When the skill was last used, and what it was aimed at. */
   lastT: number;
+  /** When it began. */
+  startT: number;
   profile: SkillProfile;
   hand: number;
   targetId: number;
@@ -83,6 +85,7 @@ export function channelUse(w: World, a: Actor, act: Action): void {
       key: p.skill.id,
       stage: 0,
       lastT: w.t,
+      startT: w.t,
       profile: p,
       hand: act.hand,
       targetId: act.targetId,
@@ -154,8 +157,19 @@ export function tickChannel(w: World): void {
     }
   }
   const st = w.channel;
+  // Infusion: after channelling a while it is held; it stays six seconds after the channel is over.
+  if (w.infusing) {
+    if (!st || st.key !== w.infusing) {
+      w.buffT.infusion = 6;
+      w.infusing = null;
+    } else w.buffT.infusion = 6;
+  }
   if (!st) return;
   const p = w.player;
+  if (st.profile.infuse && !w.infusing && w.t - st.startT >= st.profile.infuse.after) {
+    w.infusing = st.key;
+    w.buffT.infusion = 6;
+  }
   if (p.stunT > 0 || p.ail.freezeT > 0) {
     // Stunned or frozen, the stages are lost, and the orbs of a storm are let go.
     if (st.profile.skill.orb?.kind === 'zap') releaseZaps(w, st.profile.skill.id);

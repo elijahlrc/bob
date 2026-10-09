@@ -496,6 +496,8 @@ export type SupportGemDef = {
   extraTriggers?: TriggerDef[];
   /** Blasphemy: the supported curse is always on every enemy the character hits, and reserves mana instead of being cast. */
   blasphemy?: { reservePct: number };
+  /** The supported skill can be used only with weapons of these kinds. */
+  limitWeapon?: SkillTag[];
   description: string;
 };
 
@@ -821,13 +823,25 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
     id: 'kindle',
     name: 'Kindle',
     attr: 'str',
-    supports: [],
+    supports: ['attack'],
     costMult: 1.2,
     mods: [
-      { stat: 'chance.ignite', kind: 'base', value: 30 },
-      { stat: 'damage', kind: 'more', value: [40, 59], tags: ['ignite'] },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: [42, 205],
+        damageTypes: ['fire'],
+        condition: { id: 'targetIgnited' },
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: [63, 308],
+        damageTypes: ['fire'],
+        condition: { id: 'targetIgnited' },
+      },
     ],
-    description: 'Hits set targets ablaze.',
+    description: 'Adds fire damage to the attack against enemies that burn.',
   },
   {
     kind: 'support',

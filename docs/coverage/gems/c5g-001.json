@@ -55,11 +55,13 @@
       { "stat": "castSpeed", "kind": "inc", "value": -10 },
       { "stat": "attackSpeed", "kind": "inc", "value": -10 } ],
       "description": "Traps and mines hit harder, at a slower pace." } },
-  { "ref": "Advanced Traps Support", "note": "Traps are thrown faster.",
+  { "ref": "Advanced Traps Support", "note": "Traps are thrown faster and their stored uses come back faster; the effects the trap makes last longer (not the time the trap waits).",
     "def": { "kind": "support", "id": "swiftSnares", "name": "Swift Snares", "attr": "dex", "supports": ["trap"], "costMult": 1.2, "mods": [
       { "stat": "castSpeed", "kind": "inc", "value": [15, 34] },
-      { "stat": "attackSpeed", "kind": "inc", "value": [15, 34] } ],
-      "description": "Throws traps faster." } },
+      { "stat": "attackSpeed", "kind": "inc", "value": [15, 34] },
+      { "stat": "cooldownRecovery", "kind": "inc", "value": [50, 107] },
+      { "stat": "skillDuration", "kind": "inc", "value": [10, 29] } ],
+      "description": "Throws traps faster, and their uses return sooner." } },
   { "ref": "Swift Assembly Support", "note": "A trap or mine often comes with an extra one (modelled as one more at a time, at a small price in damage).",
     "def": { "kind": "support", "id": "doubleSet", "name": "Double Set", "attr": "dex", "supports": ["trap", "mine"], "costMult": 1.2, "mods": [
       { "stat": "deployCount", "kind": "base", "value": 1 },

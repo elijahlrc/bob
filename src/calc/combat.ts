@@ -383,6 +383,7 @@ export function resolveHit(
   dist: number,
   canStun: boolean,
   isSpellHit = !p.isAttack,
+  forceCrit?: boolean,
 ): HitResult {
   const res: HitResult = {
     outcome: 'hit',
@@ -422,9 +423,10 @@ export function resolveHit(
   }
   // 3.9: an attack must also pass an accuracy check to confirm a critical strike.
   res.crit =
-    hand.critChance > 0 &&
-    rng.chance(hand.critChance) &&
-    (isSpellHit || rng.chance(attackHitChance(p, hand, t.def, t.hitChanceMult, t.evasionLess)));
+    forceCrit ??
+    (hand.critChance > 0 &&
+      rng.chance(hand.critChance) &&
+      (isSpellHit || rng.chance(attackHitChance(p, hand, t.def, t.hitChanceMult, t.evasionLess))));
   let cm = (res.crit ? hand.critMulti * (p.cruelAgony ? 0.7 : 1) : 1) * hand.hitMult;
   // Double damage doubles the hit before it is mitigated (and rolls only when something gives the chance).
   if (p.doubleChance > 0 && rng.chance(p.doubleChance)) cm *= 2;

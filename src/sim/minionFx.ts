@@ -215,6 +215,9 @@ export function minionStrike(
       ? m.fixedHit * m.dmg * MINION_ENEMY_RES
       : spellBaseDamage(m.level) * st.dmg * m.dmg * MINION_ENEMY_RES;
   if (elemental && m.sup.eleMore > 0) base *= 1 + m.sup.eleMore / 100;
+  // A defensive minion hits harder what is near its owner.
+  if (m.nearMore && Math.hypot(target.x - w.player.x, target.y - w.player.y) <= 3.5)
+    base *= 1 + m.nearMore / 100;
   // A golem hits harder for each of the other minions near it.
   if (m.golem) {
     let near = 0;

@@ -108,10 +108,13 @@
     "def": { "kind": "support", "id": "packHaste", "name": "Pack Haste", "attr": "dex", "supports": ["minion"], "costMult": 1.2, "mods": [
       { "stat": "minionSpeed", "kind": "inc", "value": [25, 44] } ],
       "description": "Minions strike and move faster." } },
-  { "ref": "Meat Shield Support", "note": "The supported minions have more life and take less damage; they also move faster to keep up with the character.",
-    "def": { "kind": "support", "id": "wardingPack", "name": "Warding Pack", "attr": "str", "supports": ["minion"], "costMult": 1.2, "mods": [
-      { "stat": "minionLife", "kind": "more", "value": [10, 19] }, { "stat": "minionTaken", "kind": "more", "value": [-20, -29] }, { "stat": "minionSpeed", "kind": "inc", "value": [10, 29] } ],
-      "description": "Minions guard you: more life, less damage taken, and quicker to follow." } },
+  { "ref": "Meat Shield Support", "note": "The supported skill's minions are defensive: they stay close to the character and go for the enemies near it, take less damage, deal more damage to enemies near the character, and move faster. (No taunt on hit: monsters here do not pick minions.)",
+    "def": { "kind": "support", "id": "wardingPack", "name": "Warding Pack", "attr": "str", "supports": ["minion"], "costMult": 1.3, "mods": [
+      { "stat": "minionTaken", "kind": "more", "value": [-15, -24] },
+      { "stat": "minion.defensive", "kind": "flag", "value": 1 },
+      { "stat": "minion.nearMore", "kind": "base", "value": [20, 30] },
+      { "stat": "minionSpeed", "kind": "inc", "value": [10, 29] } ],
+      "description": "Minions guard you: they stay close, take less damage, and hit harder near you." } },
   { "ref": "Elemental Army Support", "note": "The supported minions gain elemental resistances and a higher maximum, deal more elemental damage (not physical or chaos), and their hits expose the enemy to the element they dealt.",
     "def": { "kind": "support", "id": "elementalPack", "name": "Elemental Pack", "attr": "int", "supports": ["minion"], "costMult": 1.3, "mods": [
       { "stat": "minion.res", "kind": "base", "value": [19, 29] },

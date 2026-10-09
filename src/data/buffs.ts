@@ -40,7 +40,9 @@ export type BuffId =
   | 'bladestormBlood'
   | 'bladestormSand'
   | 'guardianCairn'
-  | 'warchiefCairn';
+  | 'warchiefCairn'
+  | 'combatRush'
+  | 'infusion';
 export const BUFF_IDS: BuffId[] = [
   'fortify',
   'onslaught',
@@ -76,6 +78,8 @@ export const BUFF_IDS: BuffId[] = [
   'bladestormSand',
   'guardianCairn',
   'warchiefCairn',
+  'combatRush',
+  'infusion',
 ];
 
 export type BuffDef = {
@@ -144,6 +148,26 @@ export const BUFFS: Record<BuffId, BuffDef> = {
     seconds: 1,
     cond: 'warchiefCairn',
     text: 'Led by a Cairn',
+    mods: [],
+    gem: true,
+  },
+  combatRush: {
+    id: 'combatRush',
+    name: 'Combat Rush',
+    seconds: 2,
+    cond: 'combatRush',
+    text: '22% more attack and cast speed for skills that move you',
+    mods: [
+      mod('attackSpeed', 'more', 22, { tags: ['movement'], ...when('combatRush') }),
+      mod('castSpeed', 'more', 22, { tags: ['movement'], ...when('combatRush') }),
+    ],
+  },
+  infusion: {
+    id: 'infusion',
+    name: 'Infused',
+    seconds: 6,
+    cond: 'infusion',
+    text: 'Infused',
     mods: [],
     gem: true,
   },

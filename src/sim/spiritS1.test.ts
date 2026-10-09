@@ -102,9 +102,10 @@ describe('Multistrike (tripleCadence)', () => {
     expect(hits).toBeLessThanOrEqual(3 * uses);
   });
 
-  it('a single echo (Echoing Cast style) still lands once, as before', () => {
+  it('the extra strikes of Ancestral Call go to other enemies: against one enemy nothing is added', () => {
     const { uses, hits } = tally(holding('sword_3', ['crushingBlow', 'echoingBlow']), 20);
-    expect(hits).toBeGreaterThanOrEqual(2 * (uses - 1));
+    expect(hits).toBeGreaterThanOrEqual(uses - 1);
+    expect(hits).toBeLessThanOrEqual(uses);
   });
 });
 

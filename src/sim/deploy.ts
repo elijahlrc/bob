@@ -88,7 +88,7 @@ export function deploySecondsOf(c: SkillChoice, prof: SkillProfile): number {
     prof.deploySeconds > 0
       ? prof.deploySeconds
       : (c.skill.deploySeconds ?? DEPLOY_SECONDS[c.deploy!]);
-  return base * prof.skillDuration;
+  return c.deploy === 'trap' || c.deploy === 'mine' ? base : base * prof.skillDuration;
 }
 
 const enemies = (w: World): Actor[] =>
@@ -184,6 +184,19 @@ function shoot(
   };
   w.events.push({ t: 'use', src: w.player.id, skill: prof.skill.id });
   fire(w, from, act);
+}
+
+/** The character's skill fired from a spot at an enemy, at a share of its damage (the mirage archer). */
+export function shootFrom(
+  w: World,
+  x: number,
+  y: number,
+  c: SkillChoice,
+  target: Actor,
+  scale: number,
+): void {
+  const d: Deployable = { id: 0, kind: 'totem', key: c.key, x, y, t: 1, fireT: 0 };
+  shoot(w, d, c, target, scale);
 }
 
 /** The enemy nearest to a point within reach, if any. */

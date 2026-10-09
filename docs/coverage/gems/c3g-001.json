@@ -47,11 +47,12 @@
     "def": { "kind": "support", "id": "frostbreaker", "name": "Frostbreaker", "attr": "dex", "supports": [], "costMult": 1.4, "mods": [
       { "stat": "penetration", "kind": "base", "value": [18, 37], "damageTypes": ["cold"] } ],
       "description": "Hits penetrate enemy cold resistance." } },
-  { "ref": "Combustion Support", "note": "A chance to ignite, and more fire damage.",
+  { "ref": "Combustion Support", "note": "A chance to ignite, more fire damage, and the enemies the skill ignites have less fire resistance for as long as they burn.",
     "def": { "kind": "support", "id": "tinderbox", "name": "Tinderbox", "attr": "int", "supports": [], "costMult": 1.2, "mods": [
       { "stat": "chance.ignite", "kind": "base", "value": [30, 49] },
-      { "stat": "damage", "kind": "more", "value": [10, 29], "damageTypes": ["fire"] } ],
-      "description": "A chance to ignite and more fire damage." } },
+      { "stat": "damage", "kind": "more", "value": [10, 29], "damageTypes": ["fire"] },
+      { "stat": "ignite.resShift", "kind": "base", "value": [10, 19] } ],
+      "description": "A chance to ignite and more fire damage; the ignited are weaker to fire." } },
   { "ref": "Culling Strike Support", "note": "Hits kill enemies left at 10% life or less.",
     "def": { "kind": "support", "id": "mercyStroke", "name": "Mercy Stroke", "attr": "dex", "supports": [], "costMult": 1.1, "mods": [
       { "stat": "cullingStrike", "kind": "flag", "value": 1 },
@@ -61,8 +62,9 @@
     "def": { "kind": "support", "id": "freshVigour", "name": "Fresh Vigour", "attr": "str", "supports": ["attack"], "costMult": 1.3, "mods": [
       { "stat": "damage", "kind": "more", "value": [30, 49], "condition": { "id": "onFullLife" } } ],
       "description": "More damage while you are on full life." } },
-  { "ref": "Close Combat Support", "note": "More melee damage against nearby enemies (the buff on kill is dropped).",
-    "def": { "kind": "support", "id": "knifeRange", "name": "Knife Range", "attr": "dex", "supports": ["melee"], "costMult": 1.4, "mods": [
-      { "stat": "damage", "kind": "more", "value": [40, 59], "tags": ["melee"], "condition": { "id": "targetNearby" } } ],
-      "description": "More melee damage against nearby enemies." } }
+  { "ref": "Close Combat Support", "note": "Melee attacks with axes and swords only: up to 40-59% more melee damage against nearby enemies, less the farther they are (none at five tiles); a hit gives Combat Rush for two seconds, which quickens skills that move the character.",
+    "def": { "kind": "support", "id": "knifeRange", "name": "Knife Range", "attr": "dex", "supports": ["melee"], "costMult": 1.4, "limitWeapon": ["sword", "axe"], "mods": [
+      { "stat": "closeCombat.more", "kind": "base", "value": [40, 59] },
+      { "stat": "buffOn.hit.combatRush", "kind": "base", "value": 100 } ],
+      "description": "Melee damage rises against nearby enemies, with axes and swords only." } }
 ]

@@ -23,6 +23,7 @@ import {
 } from './shots';
 import { catchProjectile, skillUsed } from './blinks';
 import { placeBladestorm } from './stances';
+import { cascadeCast, extraStrikes, repeatTarget, startUse } from './supportFx';
 import { applyUtility } from './utility';
 import type { Action, Actor, World } from './types';
 
@@ -34,6 +35,12 @@ export function startAction(
   p: SkillProfile,
   target: Actor,
 ): void {
+  // What the supports make of this use: a Ruthless Blow, Intensity, the Seals spent as repeats.
+  const started = startUse(w, a, p);
+  p =
+    started.echoes > 0
+      ? { ...started.profile, repeats: started.profile.repeats + started.echoes }
+      : started.profile;
   const n = p.hands.length;
   const hand = n > 1 ? a.handIdx % n : 0;
   let duration = p.isAttack && n > 1 && !p.bothHands ? p.hands[hand].time : p.useTime;
@@ -55,6 +62,7 @@ export function startAction(
     elapsed: a.carry,
     fired: false,
     echoes: 0,
+    echoMult: started.echoMult,
     targetId: target.id,
     aimX: target.x,
     aimY: target.y,
@@ -140,7 +148,9 @@ export function updateAction(w: World, a: Actor, dt: number): void {
   act.elapsed += dt * (1 - a.ail.chill) * speedMult(a);
   if (!act.fired && act.elapsed >= HIT_AT * act.duration) {
     act.fired = true;
+    w.critSeen = false;
     fire(w, a, act);
+    act.crit = w.critSeen;
   }
   // Echoes: the same use lands again a moment after the first, without a new wind-up or a new cost.
   if (
@@ -150,12 +160,18 @@ export function updateAction(w: World, a: Actor, dt: number): void {
     act.elapsed >= echoeAt(act)
   ) {
     act.echoes++;
-    const t2 = actorById(w, act.targetId);
+    // The repeats of Multistrike go to random enemies near, harder each time, sharing the first strike's critical roll.
+    const t2 = repeatTarget(w, a, act) ?? actorById(w, act.targetId);
     if (t2 && t2.alive) {
       act.aimX = t2.x;
       act.aimY = t2.y;
+      if (act.profile.multistrike) act.targetId = t2.id;
     }
-    fire(w, a, act);
+    const mult = act.echoMult?.[act.echoes - 1] ?? 1;
+    const prof = mult === 1 ? act.profile : scaleProfile(act.profile, mult);
+    if (act.profile.multistrike) w.critLock = act.crit ?? null;
+    fire(w, a, { ...act, profile: prof });
+    w.critLock = null;
     w.events.push({ t: 'echo', src: a.id, skill: act.profile.skill.id });
   }
   if (act.elapsed >= act.duration) {
@@ -248,6 +264,7 @@ export function fire(w: World, a: Actor, act: Action): void {
   if (a.isPlayer && act.profile.skill.releasesCaught) releaseCaught(w, a);
   fireEffect(w, a, act);
   leaveGround(w, a, act);
+  cascadeCast(w, a, act);
   if (act.profile.skill.bladestorm) placeBladestorm(w, a, act);
   // An aftershock: the ground cracks, and a moment later it erupts, harder and wider.
   const aft = act.profile.skill.aftershock;
@@ -392,6 +409,8 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
     w.lastOutcome = null;
     if (p.bothHands) for (let h = 0; h < p.hands.length; h++) hit(w, a, target, p, h, d);
     else hit(w, a, target, p, act.hand, d);
+    // A strike that hits more enemies at once (Ancestral Call).
+    extraStrikes(w, a, act, target);
     // A strike that sends more out after it (bolts, blades, balls) does so only if it landed.
     if (w.lastOutcome === 'hit') afterStrike(w, a, act, target);
     return;

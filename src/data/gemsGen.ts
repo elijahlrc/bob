@@ -6120,8 +6120,13 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         value: [10, 29],
         damageTypes: ['fire'],
       },
+      {
+        stat: 'ignite.resShift',
+        kind: 'base',
+        value: [10, 19],
+      },
     ],
-    description: 'A chance to ignite and more fire damage.',
+    description: 'A chance to ignite and more fire damage; the ignited are weaker to fire.',
   },
   {
     kind: 'support',
@@ -6171,18 +6176,20 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     attr: 'dex',
     supports: ['melee'],
     costMult: 1.4,
+    limitWeapon: ['sword', 'axe'],
     mods: [
       {
-        stat: 'damage',
-        kind: 'more',
+        stat: 'closeCombat.more',
+        kind: 'base',
         value: [40, 59],
-        tags: ['melee'],
-        condition: {
-          id: 'targetNearby',
-        },
+      },
+      {
+        stat: 'buffOn.hit.combatRush',
+        kind: 'base',
+        value: 100,
       },
     ],
-    description: 'More melee damage against nearby enemies.',
+    description: 'Melee damage rises against nearby enemies, with axes and swords only.',
   },
   {
     kind: 'support',
@@ -6699,13 +6706,18 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1,
     mods: [
       {
+        stat: 'ironGrip',
+        kind: 'flag',
+        value: 1,
+      },
+      {
         stat: 'damage',
         kind: 'inc',
         value: [0, 38],
         tags: ['projectile'],
       },
     ],
-    description: 'Increases projectile damage of attacks.',
+    description: "Strength raises the physical damage of the skill's projectile attacks.",
   },
   {
     kind: 'support',
@@ -6716,13 +6728,18 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1,
     mods: [
       {
+        stat: 'ironWill',
+        kind: 'flag',
+        value: 1,
+      },
+      {
         stat: 'damage',
         kind: 'inc',
         value: [0, 38],
         tags: ['spell'],
       },
     ],
-    description: 'Increases the spell damage of the supported skill.',
+    description: 'Strength raises the spell damage of the skill.',
   },
   {
     kind: 'support',
@@ -6780,10 +6797,21 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage',
         kind: 'more',
-        value: [12, 25],
+        value: [-20, -10],
+        tags: ['attack'],
+      },
+      {
+        stat: 'repeatsRandom',
+        kind: 'flag',
+        value: 1,
+      },
+      {
+        stat: 'repeatRamp',
+        kind: 'base',
+        value: 22,
       },
     ],
-    description: 'Melee attacks strike three times in one go, quicker.',
+    description: 'Melee attacks strike three times in one go, quicker, each at random.',
   },
   {
     kind: 'support',
@@ -6965,8 +6993,33 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         kind: 'inc',
         value: [35, 54],
       },
+      {
+        stat: 'duration.shock',
+        kind: 'inc',
+        value: [35, 54],
+      },
+      {
+        stat: 'duration.chill',
+        kind: 'inc',
+        value: [35, 54],
+      },
+      {
+        stat: 'duration.freeze',
+        kind: 'inc',
+        value: [35, 54],
+      },
+      {
+        stat: 'effect.shock',
+        kind: 'inc',
+        value: [25, 34],
+      },
+      {
+        stat: 'effect.chill',
+        kind: 'inc',
+        value: [25, 34],
+      },
     ],
-    description: 'Ailments last longer and deal more damage.',
+    description: 'Ailments last longer, deal more damage, and shock and chill are stronger.',
   },
   {
     kind: 'support',
@@ -7177,24 +7230,27 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     name: 'Merciless Cadence',
     attr: 'str',
     supports: ['melee'],
+    needs: ['attack'],
     excludes: ['channelling'],
     costMult: 1.1,
     mods: [
       {
-        stat: 'damage',
-        kind: 'more',
-        value: [25, 44],
-        tags: ['melee'],
+        stat: 'ruthless.more',
+        kind: 'base',
+        value: [75, 132],
       },
       {
-        stat: 'damage',
-        kind: 'more',
-        value: [25, 44],
-        tags: ['bleed'],
+        stat: 'ruthless.bleed',
+        kind: 'base',
+        value: [75, 132],
+      },
+      {
+        stat: 'ruthless.stun',
+        kind: 'base',
+        value: 0.8,
       },
     ],
-    description:
-      'Every third melee hit lands with great force; averaged here as more melee and bleed damage.',
+    description: 'Every third melee blow lands with great force and stuns.',
   },
   {
     kind: 'support',
@@ -7209,8 +7265,26 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         kind: 'more',
         value: [20, 39],
       },
+      {
+        stat: 'infuse.after',
+        kind: 'base',
+        value: [1.6, 1],
+      },
+      {
+        stat: 'infuse.barrier',
+        kind: 'base',
+        value: 8,
+      },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: 10,
+        condition: {
+          id: 'infusion',
+        },
+      },
     ],
-    description: 'Channelled skills deal more damage.',
+    description: 'Channelled skills hit harder, guard you while they last and leave you infused.',
   },
   {
     kind: 'support',
@@ -7483,8 +7557,18 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         kind: 'inc',
         value: [15, 34],
       },
+      {
+        stat: 'cooldownRecovery',
+        kind: 'inc',
+        value: [50, 107],
+      },
+      {
+        stat: 'skillDuration',
+        kind: 'inc',
+        value: [10, 29],
+      },
     ],
-    description: 'Throws traps faster.',
+    description: 'Throws traps faster, and their uses return sooner.',
   },
   {
     kind: 'support',
@@ -7578,7 +7662,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.4,
     mods: [
       {
-        stat: 'repeats',
+        stat: 'extraTargets',
         kind: 'base',
         value: 2,
       },
@@ -7588,7 +7672,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         value: [-19, 0],
       },
     ],
-    description: 'The strike lands twice more on other targets near it.',
+    description: 'The strike lands on other enemies near it as well.',
   },
   {
     kind: 'support',
@@ -7692,9 +7776,9 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.3,
     mods: [
       {
-        stat: 'esOnHit',
+        stat: 'leech.es',
         kind: 'base',
-        value: [6, 60],
+        value: [1.5, 1.9],
       },
       {
         stat: 'damage',
@@ -7704,8 +7788,16 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
           id: 'esFull',
         },
       },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [20, 39],
+        condition: {
+          id: 'leechingEs',
+        },
+      },
     ],
-    description: 'Hits restore energy shield.',
+    description: 'Damage dealt returns as energy shield, and you hit harder while it does.',
   },
   {
     kind: 'support',
@@ -7738,28 +7830,29 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     id: 'cindering',
     name: 'Cindering',
     attr: 'str',
-    supports: ['attack'],
+    supports: ['spell'],
     costMult: 1.3,
     mods: [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [3, 60],
+        value: [42, 205],
         damageTypes: ['fire'],
+        condition: {
+          id: 'targetIgnited',
+        },
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [5, 90],
+        value: [63, 308],
         damageTypes: ['fire'],
-      },
-      {
-        stat: 'chance.ignite',
-        kind: 'base',
-        value: 20,
+        condition: {
+          id: 'targetIgnited',
+        },
       },
     ],
-    description: 'Adds fire damage to the attack and ignites more often.',
+    description: 'Adds fire damage to the spell against enemies that burn.',
   },
   {
     kind: 'support',
@@ -7815,9 +7908,15 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
           div: 1,
         },
       },
+      {
+        stat: 'inspire.threshold',
+        kind: 'base',
+        value: [122, 800],
+        geo: true,
+      },
     ],
     description:
-      'A cheaper skill that earns Insight each time it is used and grows stronger with it.',
+      'A cheaper skill that earns Insight each time it is used, and loses it when much mana has gone.',
   },
   {
     kind: 'support',
@@ -7835,13 +7934,22 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         value: [35, 54],
       },
       {
-        stat: 'damage',
-        kind: 'more',
+        stat: 'intensify.more',
+        kind: 'base',
         value: [10, 16],
-        tags: ['area'],
+      },
+      {
+        stat: 'intensify.area',
+        kind: 'base',
+        value: 12,
+      },
+      {
+        stat: 'intensify.max',
+        kind: 'base',
+        value: 4,
       },
     ],
-    description: 'Area spells grow in size and strength.',
+    description: 'Area spells swell with each cast, while you stand and cast.',
   },
   {
     kind: 'support',
@@ -7887,20 +7995,15 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     name: 'Lingering Effect',
     attr: 'str',
     supports: ['duration'],
-    costMult: 1.2,
+    costMult: 1.4,
     mods: [
       {
         stat: 'skillDuration',
-        kind: 'more',
-        value: [25, 44],
-      },
-      {
-        stat: 'damage',
-        kind: 'more',
-        value: -15,
+        kind: 'inc',
+        value: [45, 64],
       },
     ],
-    description: "The skill's effects last longer at less strength.",
+    description: "The skill's effects last longer.",
   },
   {
     kind: 'support',
@@ -7938,19 +8041,25 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     needs: ['attack'],
     excludes: ['totem', 'trap', 'mine', 'triggered'],
     costMult: 1.4,
+    limitWeapon: ['bow'],
     mods: [
       {
-        stat: 'repeats',
+        stat: 'mirage.seconds',
         kind: 'base',
-        value: 1,
+        value: 4,
       },
       {
-        stat: 'damage',
-        kind: 'more',
-        value: [-40, -31],
+        stat: 'mirage.less',
+        kind: 'base',
+        value: [40, 31],
+      },
+      {
+        stat: 'mirage.slow',
+        kind: 'base',
+        value: 60,
       },
     ],
-    description: 'A shadow of you fires with every shot.',
+    description: 'A shadow of you fires along with you for a while after a hit.',
   },
   {
     kind: 'support',
@@ -7959,19 +8068,31 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     attr: 'dex',
     supports: ['attack'],
     costMult: 1.4,
+    limitWeapon: ['dagger', 'claw'],
     mods: [
       {
+        stat: 'buffOn.crit.elusive',
+        kind: 'base',
+        value: 100,
+      },
+      {
         stat: 'critChance',
-        kind: 'inc',
-        value: [70, 100],
+        kind: 'base',
+        value: [0.7, 1],
+        condition: {
+          id: 'elusive',
+        },
       },
       {
         stat: 'critMulti',
         kind: 'base',
-        value: [40, 60],
+        value: [80, 99],
+        condition: {
+          id: 'elusive',
+        },
       },
     ],
-    description: 'Sharper critical strikes.',
+    description: 'Critical strikes make you elusive, and elusive you crit harder.',
   },
   {
     kind: 'support',
@@ -7995,18 +8116,19 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     name: 'Shattering Blows',
     attr: 'str',
     supports: ['melee'],
+    excludes: ['triggered', 'totem', 'channelling'],
     costMult: 1.4,
+    limitWeapon: ['mace', 'sceptre', 'staff'],
     mods: [
       {
-        stat: 'aoe',
-        kind: 'inc',
-        value: 25,
+        stat: 'shockwave.mult',
+        kind: 'base',
+        value: [160, 209.6],
       },
       {
-        stat: 'damage',
-        kind: 'more',
-        value: 25,
-        tags: ['melee'],
+        stat: 'shockwave.cooldown',
+        kind: 'base',
+        value: 1,
       },
     ],
     description: 'Blunt hits send a shockwave through the enemies around.',
@@ -8017,13 +8139,13 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     name: 'Flanking Cast',
     attr: 'int',
     supports: ['cascadable'],
-    excludes: ['totem', 'trap', 'mine', 'triggered'],
+    excludes: ['totem', 'trap', 'mine'],
     costMult: 1.4,
     mods: [
       {
-        stat: 'repeats',
-        kind: 'base',
-        value: 2,
+        stat: 'cascade',
+        kind: 'flag',
+        value: 1,
       },
       {
         stat: 'damage',
@@ -8033,10 +8155,10 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'aoe',
         kind: 'inc',
-        value: -20,
+        value: [-25, -16],
       },
     ],
-    description: 'The spell lands again on either side.',
+    description: 'The spell lands before and behind its target as well.',
   },
   {
     kind: 'support',
@@ -8049,17 +8171,17 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.4,
     mods: [
       {
-        stat: 'repeats',
+        stat: 'unleash.every',
         kind: 'base',
-        value: 1,
+        value: [0.9, 0.71],
       },
       {
-        stat: 'damage',
-        kind: 'more',
-        value: [-35, -26],
+        stat: 'unleash.less',
+        kind: 'base',
+        value: [35, 26],
       },
     ],
-    description: 'The spell is released again at once.',
+    description: 'The spell is released again for each seal it gained while resting.',
   },
   {
     kind: 'support',
@@ -8068,11 +8190,18 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     attr: 'int',
     supports: ['curse'],
     costMult: 1,
-    mods: [],
+    mods: [
+      {
+        stat: 'aoe',
+        kind: 'inc',
+        value: [0, 76],
+      },
+    ],
     blasphemy: {
       reservePct: 35,
     },
-    description: 'The supported curse stays on every enemy you hit, at the cost of reserved mana.',
+    description:
+      'The supported curse stands around you on every enemy in reach, at the cost of reserved mana.',
   },
   {
     kind: 'support',
@@ -8169,17 +8298,22 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     name: 'Warding Pack',
     attr: 'str',
     supports: ['minion'],
-    costMult: 1.2,
+    costMult: 1.3,
     mods: [
-      {
-        stat: 'minionLife',
-        kind: 'more',
-        value: [10, 19],
-      },
       {
         stat: 'minionTaken',
         kind: 'more',
-        value: [-20, -29],
+        value: [-15, -24],
+      },
+      {
+        stat: 'minion.defensive',
+        kind: 'flag',
+        value: 1,
+      },
+      {
+        stat: 'minion.nearMore',
+        kind: 'base',
+        value: [20, 30],
       },
       {
         stat: 'minionSpeed',
@@ -8187,7 +8321,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         value: [10, 29],
       },
     ],
-    description: 'Minions guard you: more life, less damage taken, and quicker to follow.',
+    description: 'Minions guard you: they stay close, take less damage, and hit harder near you.',
   },
   {
     kind: 'support',
