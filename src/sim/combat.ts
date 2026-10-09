@@ -33,6 +33,7 @@ import { bannerStage } from './banners';
 import { rollGains } from './buffs';
 import { gainTrophy, rollCharges } from './charges';
 import { ALL_HEX_IDS, HEXES } from '../data/hexes';
+import { mineAuraAt, mineAuraHit } from './deploy';
 import { refreshOnKill, stanceFarLess } from './stances';
 import { applyHex, applyPlayerHexes, hexHit, hexKill, tickHexes } from './hexes';
 import {
@@ -570,8 +571,13 @@ export function hit(
       critChance: h.critChance * (1 - hm.critChance),
       critMulti: Math.max(1, h.critMulti - hm.critMulti),
     };
+  // The mines near an enemy give the hits against it a chance to deal double damage, and some fire damage.
+  const aura = src.isPlayer && w.deployables.length > 0 ? mineAuraAt(w, dst.x, dst.y) : null;
+  if (aura && aura.double > 0)
+    p = { ...p, doubleChance: Math.min(1, p.doubleChance + aura.double / 100) };
   const res = resolveHit(w.rngCombat, p, h, ts, dist, canStun);
   applyHit(w, src, dst, p, res);
+  if (aura && aura.max > 0 && dst.alive) mineAuraHit(w, dst);
 }
 
 /** The share of a melee hit that a monster throws back: the Thorned mod, or the reflection of a Gilded Guard. */

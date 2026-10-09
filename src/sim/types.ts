@@ -243,7 +243,7 @@ export type Projectile = {
   forkLeft: number;
   chainLeft: number;
   /** An arrow that lands and bursts into a ring (nova), or goes on to scatter at its end (tornado); the arrows it sends. */
-  kind?: 'nova' | 'tornado';
+  kind?: 'nova' | 'tornado' | 'mortar';
   ring?: number;
   /** Where it changes form (Frost Lance), and whether it has. */
   formAt?: number;

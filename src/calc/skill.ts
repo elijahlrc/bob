@@ -133,6 +133,12 @@ export type SkillProfile = {
   perPoison: { per: number; max: number } | null;
   /** The tiles around an afflicted enemy to which its ignite, and its other elemental ailments, spread. */
   spreadAil: { ignite: number; ele: number };
+  /** Seconds a support makes what the skill puts down stand (Blastchain and High-Impact Mine: five). */
+  deploySeconds: number;
+  /** Percent more damage for each mine that has gone off before in the sequence (Chained Charges). */
+  mineChain: number;
+  /** The percent chance to deal double damage that each mine adds to hits against enemies near it (High-Impact Mine). */
+  mineDouble: number;
   /** Chance (fraction) that a hit deals double damage. */
   doubleChance: number;
   /** Percentage points (fraction) taken off the physical damage reduction of what the skill hits. */
@@ -513,6 +519,9 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
         ? Math.max(1, Math.floor((beh.duration * db.mult('skillDuration', baseCtx)) / beh.interval))
         : 1,
     deployCount: Math.max(1, Math.round(1 + db.sum('base', 'deployCount', baseCtx))),
+    deploySeconds: db.sum('base', 'deploySeconds', baseCtx),
+    mineChain: db.sum('base', 'mine.chain', baseCtx),
+    mineDouble: db.sum('base', 'mine.double', baseCtx),
     minionDamage: db.mult('minionDamage', baseCtx),
     skillDuration: db.mult('skillDuration', baseCtx),
     minionSpeed: db.mult('minionSpeed', baseCtx),

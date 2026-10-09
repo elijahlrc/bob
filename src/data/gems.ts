@@ -278,6 +278,21 @@ export type ActiveGemDef = {
   dot?: DotSpec;
   /** An arrow that ignites also inflicts a burning debuff worth a share of the ignite's damage, up to `cap` at once. */
   burning?: { pct: LevelValue; seconds: number; cap: number };
+  /** Seconds what the skill puts down stands (a trap, a mine, a totem), where it differs from the kind's usual. */
+  deploySeconds?: number;
+  /** A ballista: its totems attack at half speed. */
+  ballista?: boolean;
+  /** Arrows fired into the air that land in a line toward the target and burst where they land (Artillery Ballista). */
+  mortar?: { radius: number; from: number };
+  /** A totem that is active only while the character is near, and gives the character a buff while it is (the Cairns). */
+  ancestral?: { buff: BuffId; range: number; mods: GemMod[] };
+  /** Totems that cast a beam of damage over time at the character and at each other, in the range given (Cinder Bond). */
+  bond?: { width: number; range: number; end: number };
+  /** A mine that, going off, also sends projectiles raining down around it; and an aura that adds fire damage to hits near it. */
+  mineRain?: { count: number; perPrior: number; radius: number; spread: number };
+  mineAura?: { min: LevelValue; max: LevelValue; cap: LevelValue; radius: number };
+  /** Seconds between a mine being set off and its going (0.25 by default). */
+  detonation?: number;
   /** A storm the skill leaves in the stance the character is in: it hits for a time, and the character in it gains a buff (Bladestorm). */
   bladestorm?: {
     seconds: number;

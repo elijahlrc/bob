@@ -216,12 +216,39 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
     if (def.utility) stats.push(...utilityLines(def, level).stats);
     else stats.push(...behaviourLines(def.behaviour, level));
     if (def.travel) stats.push(`Carries you up to ${num(def.travel)} toward the target`);
+    if (def.ballista) stats.push('A ballista: its totems attack at half speed');
+    if (def.mortar)
+      stats.push('Arrows come down in a line toward the target and burst where they land');
+    if (def.bond)
+      stats.push(
+        `Its totems cast beams at you and at each other (up to ${num(def.bond.range)} away) that burn what they cross`,
+      );
+    if (def.ancestral)
+      stats.push(
+        `Active only while you are within ${num(def.ancestral.range)} of it; the bonus does not stack`,
+      );
+    if (def.mineRain)
+      stats.push(
+        `Rains ${def.mineRain.count} smaller bursts around the mine, one more for every ${def.mineRain.perPrior} mines before it`,
+      );
+    if (def.mineAura) stats.push('Mines near an enemy add fire damage to the hits against it');
+    if (def.deploySeconds) stats.push(`What it puts down stands for ${num(def.deploySeconds)} s`);
+    if (def.cooldown && def.cooldownUses && def.cooldownUses > 1)
+      stats.push(
+        `${num(levelValue(def.cooldown, level))} s cooldown, ${def.cooldownUses} uses stored`,
+      );
     if (def.needsShield) stats.push('Requires a shield');
     if (def.needsDualWield) stats.push('Requires two weapons');
     if (def.requiresWeapon?.length)
       stats.push(`Requires ${def.requiresWeapon.map(tagLabel).join(' or ')} weapon`);
     if (def.bothWeapons) stats.push('Hits with both weapons when dual wielding');
     effects = [...modsText(gemMods(def.mods, level, def.id)), ...utilityLines(def, level).effects];
+    if (def.ancestral)
+      effects.push(
+        ...modsText(gemMods(def.ancestral.mods, level, def.id)).map(
+          (m) => `While it is active: ${m}`,
+        ),
+      );
   } else if (def.kind === 'support') {
     type = 'Support gem';
     stats.push(

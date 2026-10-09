@@ -143,6 +143,15 @@ export type SkillDef = {
   dot?: DotSpec;
   burning?: { pct: LevelValue; seconds: number; cap: number };
   bladestorm?: ActiveGemDef['bladestorm'];
+  deploySeconds?: number;
+  ballista?: boolean;
+  mortar?: { radius: number; from: number };
+  ancestral?: { buff: BuffId; range: number; mods: GemMod[] };
+  bond?: { width: number; range: number; end: number };
+  mineRain?: { count: number; perPrior: number; radius: number; spread: number };
+  mineAura?: { min: LevelValue; max: LevelValue; cap: LevelValue; radius: number };
+  detonation?: number;
+
   form?: { after: number; speed: number; critMore: number; critMulti: LevelValue };
   recoverNear?: { normal: LevelValue; rare: LevelValue; radius: number };
   pausedBy?: BuffId;
@@ -283,6 +292,14 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     orb: def.orb,
     form: def.form,
     bladestorm: def.bladestorm,
+    deploySeconds: def.deploySeconds,
+    ballista: def.ballista,
+    mortar: def.mortar,
+    ancestral: def.ancestral,
+    bond: def.bond,
+    mineRain: def.mineRain,
+    mineAura: def.mineAura,
+    detonation: def.detonation,
     recoverNear: def.recoverNear,
     pausedBy: def.pausedBy,
     catches: def.catches,

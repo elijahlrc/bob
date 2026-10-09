@@ -38,7 +38,9 @@ export type BuffId =
   | 'bloodStance'
   | 'sandStance'
   | 'bladestormBlood'
-  | 'bladestormSand';
+  | 'bladestormSand'
+  | 'guardianCairn'
+  | 'warchiefCairn';
 export const BUFF_IDS: BuffId[] = [
   'fortify',
   'onslaught',
@@ -72,6 +74,8 @@ export const BUFF_IDS: BuffId[] = [
   'sandStance',
   'bladestormBlood',
   'bladestormSand',
+  'guardianCairn',
+  'warchiefCairn',
 ];
 
 export type BuffDef = {
@@ -124,6 +128,24 @@ export const BUFFS: Record<BuffId, BuffDef> = {
     cond: 'bladestormSand',
     text: '34% increased movement speed while in a storm of the Sand stance',
     mods: [mod('moveSpeed', 'inc', 34, when('bladestormSand'))],
+  },
+  guardianCairn: {
+    id: 'guardianCairn',
+    name: 'Guarded by a Cairn',
+    seconds: 1,
+    cond: 'guardianCairn',
+    text: 'Guarded by a Cairn',
+    mods: [],
+    gem: true,
+  },
+  warchiefCairn: {
+    id: 'warchiefCairn',
+    name: 'Led by a Cairn',
+    seconds: 1,
+    cond: 'warchiefCairn',
+    text: 'Led by a Cairn',
+    mods: [],
+    gem: true,
   },
   elusive: {
     id: 'elusive',

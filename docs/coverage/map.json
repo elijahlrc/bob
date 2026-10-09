@@ -1188,12 +1188,12 @@
   "chainedCharges": {
    "ref": "Blastchain Mine Support",
    "status": "covered",
-   "note": "The supported skill is laid as mines that go off together, each weaker."
+   "note": "The supported skill is laid as mines that stand five seconds and go off in a chain, a quarter second apart, each dealing 5% more than the one before it; each deals less."
   },
   "heavyCharge": {
    "ref": "High-Impact Mine Support",
    "status": "covered",
-   "note": "The supported skill is laid as a mine that hits harder against enemies near mines, at less base damage."
+   "note": "The supported skill is laid as mines that stand five seconds; each mine gives the hits against the enemies near it a 2% chance to deal double damage (they add up); the skill deals less."
   },
   "snareCluster": {
    "ref": "Cluster Traps Support",
@@ -1253,22 +1253,22 @@
   "cinderBond": {
    "ref": "Searing Bond",
    "status": "covered",
-   "note": "A pair of totems that burn the enemies near them (the damage over time is folded into repeated fire hits)."
+   "note": "A pair of totems that cast beams of fire at the character and at each other: what stands in a beam, or near either end of one, burns (damage over time that does not stack between beams). The totem does not hit."
   },
   "fatherTotem": {
    "ref": "Ancestral Protector",
    "status": "covered",
-   "note": "A totem that strikes enemies next to it with the character's weapon (the owner's attack speed bonus is dropped)."
+   "note": "A totem that strikes the enemies near it with the character's weapon; it is active only while the character is within about eight tiles of it, and while it is the character attacks faster."
   },
   "warchiefTotem": {
    "ref": "Ancestral Warchief",
    "status": "covered",
-   "note": "A totem that slams the ground beside it with the character's weapon."
+   "note": "A totem that slams the ground beside it with the character's weapon; it is active only while the character is within about eight tiles of it, and while it is the character's melee damage is higher."
   },
   "mortarBow": {
    "ref": "Artillery Ballista",
    "status": "covered",
-   "note": "Up to three ballista totems that rain fire arrows in an arc, using the character's bow."
+   "note": "Ballista totems (up to three, standing eight seconds, attacking at half speed) that fire six arrows into the air; they come down in a line toward the target and each bursts where it lands."
   },
   "lanceBow": {
    "ref": "Siege Ballista",
@@ -1278,7 +1278,7 @@
   "scatterBow": {
    "ref": "Shrapnel Ballista",
    "status": "covered",
-   "note": "Up to three ballista totems that fire a cone of arrows with added physical damage; an enemy can be hit by several of the arrows of one shot (one of two skills that can)."
+   "note": "Ballista totems (up to three, standing eight seconds, attacking at half speed) that fire a cone of arrows with added physical damage; an enemy can be hit by several of the arrows of one shot (one of two skills that can)."
   },
   "mendingTotem": {
    "ref": "Rejuvenation Totem",
@@ -1293,7 +1293,7 @@
   "jawsTrap": {
    "ref": "Bear Trap",
    "status": "covered",
-   "note": "A trap that crushes the enemy that steps in it and holds it for as long as its hit was a share of the enemy's life, then leaves it shackled: slow, fading, and taking 15% more from traps and mines."
+   "note": "A trap (four seconds, stored three uses of a four-second cooldown) that crushes the enemy that steps in it and holds it for as long as its hit was a share of the enemy's life, then leaves it shackled: slow, fading, and taking 15% more from traps and mines."
   },
   "blazeTrap": {
    "ref": "Fire Trap",
@@ -1343,7 +1343,7 @@
   "mortarCharge": {
    "ref": "Pyroclast Mine",
    "status": "covered",
-   "note": "A mine that throws fire in a burst when it goes off."
+   "note": "A mine (standing five seconds, set off with the rest of its set) that bursts in fire and then rains two more, smaller bursts around it, one more for every two mines that went off before it; the mines near an enemy add fire damage to the hits against it."
   },
   "stormCharge": {
    "ref": "Stormblast Mine",

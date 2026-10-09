@@ -10,7 +10,7 @@ import {
 import type { SkillProfile } from '../calc/skill';
 import { triggerText } from '../data/triggers';
 import { canPay } from '../sim/cost';
-import { DEPLOY_SECONDS, deployCap } from '../sim/deploy';
+import { deployCap, deploySecondsOf } from '../sim/deploy';
 import { summonCount, summonRespawn } from '../sim/minions';
 import type { World } from '../sim/types';
 
@@ -117,7 +117,7 @@ function damageSlot(w: World, c: SkillChoice, role: SkillRole): SkillSlot {
     b = {
       state: 'active',
       remaining: dep.soonest,
-      total: DEPLOY_SECONDS[c.deploy!],
+      total: deploySecondsOf(c, prof),
       words: `All ${dep.cap} ${plural(c.deploy!, dep.cap)} standing, the first ends in ${secs(dep.soonest)}`,
     };
   } else if (secondary && (w.secondaryReady[c.key] ?? 0) > w.t) {

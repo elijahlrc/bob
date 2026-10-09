@@ -149,6 +149,22 @@ export function fireProjectiles(w: World, a: Actor, act: Action): void {
     });
     return;
   }
+  if (p.skill.mortar) {
+    // Arrows fired into the air that come down in a line toward the target, each bursting where it lands.
+    const m = p.skill.mortar;
+    for (let i = 0; i < n; i++) {
+      const frac = n > 1 ? m.from + ((1 - m.from) * i) / (n - 1) : 1;
+      launch(w, a, p, act.hand, a.x, a.y, base, {
+        hitIds: [],
+        aimId: act.targetId,
+        range: Math.max(1, aimDist * frac),
+        explode: m.radius * p.radiusMult,
+        pierce: 999,
+        kind: 'mortar',
+      });
+    }
+    return;
+  }
   if (mode.tornado) {
     launch(w, a, p, act.hand, a.x, a.y, base, {
       hitIds: [],

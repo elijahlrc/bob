@@ -569,6 +569,7 @@ export class Character {
           utilBuffs.add('sandStance');
           if (!buffIdsGranted.has('sandStance')) this.briefBuffs.add('sandStance');
         }
+        if (gd?.kind === 'active' && gd.ancestral) utilBuffs.add(gd.ancestral.buff);
         if (gd?.kind === 'active' && gd.bladestorm) {
           for (const id of [gd.bladestorm.blood, gd.bladestorm.sand]) {
             utilBuffs.add(id);
@@ -887,6 +888,20 @@ export class Character {
             tagMask: tagMask(t.tags),
           }),
         );
+    }
+    // A totem that is active while the character is near gives the character its buff (the Cairns); the sheet counts it as up.
+    for (const a of this.actives) {
+      const an = a.usable ? a.skill.ancestral : undefined;
+      if (!an) continue;
+      const bd = BUFFS[an.buff];
+      db0.addAll(
+        gemMods(an.mods, a.skill.level, a.skill.id).map((m) => ({
+          ...m,
+          condition: { id: bd.cond },
+          source: { kind: 'gem' as const, id: a.skill.id },
+        })),
+      );
+      this.cond.bit(bd.cond);
     }
     // Utility buffs act while their timer runs (the sim) or, for the sheet, as if up; marks give their bonuses.
     for (const a of this.utilities) {
@@ -1277,7 +1292,7 @@ export class Character {
   ): SkillSheet {
     // A projectile that changes form with distance has changed by the time it reaches a target that far (Frost Lance).
     const p0 = this.profile(choice, conds);
-    const p =
+    let p =
       p0.skill.form && (this.config.targetDistance ?? 3) > p0.skill.form.after
         ? formedProfile(p0)
         : p0;
@@ -1293,6 +1308,9 @@ export class Character {
     // A totem or brand shoots on its own, whatever the character does; traps and mines go off several at a time.
     const deployN = choice.deploy ? p.deployCount : 1;
     const standing = choice.deploy === 'totem' || choice.deploy === 'brand';
+    // The mines laid together give the hits near them a chance to deal double damage (High-Impact Mine).
+    if (choice.deploy === 'mine' && p.mineDouble > 0)
+      p = { ...p, doubleChance: Math.min(1, p.doubleChance + (p.mineDouble * deployN) / 100) };
     // A skill with a cooldown of its own is used as often as the cooldown (and the charges that skip it) allow; the weapon fills the rest.
     const cdRate =
       usesOverride === undefined && !choice.deploy && choice.gemUid !== null
@@ -1339,6 +1357,9 @@ export class Character {
     }
     // A repeating skill (Echoing Cast) lands several times per use; a triggered one does not repeat.
     const lands = (choice.triggered ? 1 : 1 + p.repeats) * p.pulses * volley;
+    // A chain of mines: each deals more than the one before it, so a set deals more on average.
+    if (choice.deploy === 'mine' && p.mineChain > 0)
+      perUse *= 1 + ((p.mineChain / 100) * (deployN - 1)) / 2;
     let hitDps = perUse * usesPerSec * lands;
     if (cdRate !== undefined && timeShare - usesPerSec * p.useTime > 1e-6)
       hitDps +=

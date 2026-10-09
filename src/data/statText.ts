@@ -490,6 +490,11 @@ Object.assign(STAT_TEXT, {
   deployCount: { base: '{v} additional totems, traps, mines or brands at a time' },
   auraBurn: { base: 'Burn nearby Enemies for {v}% of your Maximum Life as Fire Damage per second' },
   cooldownRecovery: { name: 'Cooldown Recovery Speed', pct: true },
+  deploySeconds: { base: 'What it puts down stands for {v} seconds' },
+  'mine.chain': { base: 'Mines deal {v}% more damage for each mine that went off before them' },
+  'mine.double': {
+    base: 'Each mine gives hits against enemies near it a {v}% chance to deal double damage',
+  },
   'dot.decay': { base: 'Hits inflict Decay: {v} Chaos Damage per second, for 8 seconds' },
   'perPoison.more': { base: '{v}% more Damage with Hits for each Poison on the Enemy' },
   'perPoison.max': { base: 'Up to {v} Poisons count' },

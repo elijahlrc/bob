@@ -4275,14 +4275,21 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       radius: 3.4,
       origin: 'self',
     },
-    spellDamage: [
-      {
-        type: 'fire',
-        spread: [0.8, 1.2],
-      },
-    ],
-    effectiveness: 45,
-    castTime: 0.5,
+    dot: {
+      type: 'fire',
+      dps: [23.6, 1755.6],
+      seconds: 0.5,
+      stack: 'refresh',
+      hitless: true,
+      scales: ['spell'],
+    },
+    bond: {
+      width: 0.9,
+      range: 10,
+      end: 1.2,
+    },
+    deploySeconds: 8,
+    castTime: 1,
     crit: 0,
     cost: [18, 51],
     mods: [
@@ -4292,7 +4299,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         value: 1,
       },
     ],
-    description: 'Sets two totems that burn everything near them.',
+    description: 'Sets totems that burn everything in the beams between them and you.',
   },
   {
     kind: 'active',
@@ -4310,7 +4317,20 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cost: [8, 8],
     requiresWeapon: ['sword', 'axe', 'mace', 'staff', 'dagger', 'claw'],
     mods: [],
-    description: 'Sets a totem that strikes enemies beside it with your weapon.',
+    ancestral: {
+      buff: 'guardianCairn',
+      range: 8,
+      mods: [
+        {
+          stat: 'attackSpeed',
+          kind: 'more',
+          value: [10, 20],
+        },
+      ],
+    },
+    deploySeconds: 12,
+    description:
+      'Sets a totem that strikes enemies beside it with your weapon and quickens you while you are near.',
   },
   {
     kind: 'active',
@@ -4329,7 +4349,21 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cost: [10, 10],
     requiresWeapon: ['mace', 'axe', 'staff', 'sword'],
     mods: [],
-    description: 'Sets a totem that slams the ground beside it.',
+    ancestral: {
+      buff: 'warchiefCairn',
+      range: 8,
+      mods: [
+        {
+          stat: 'damage',
+          kind: 'more',
+          value: [8, 18],
+          tags: ['melee'],
+        },
+      ],
+    },
+    deploySeconds: 12,
+    description:
+      'Sets a totem that slams the ground beside it and strengthens your blows while you are near.',
   },
   {
     kind: 'active',
@@ -4337,17 +4371,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Mortar Bow',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'totem', 'projectile', 'fire', 'bow', 'duration'],
+    tags: ['attack', 'totem', 'projectile', 'area', 'fire', 'bow', 'duration'],
     types: ['totem'],
     behaviour: {
       kind: 'projectile',
       count: 6,
-      spread: 40,
+      spread: 0,
       range: 10,
     },
     baseMult: [33, 42],
     cost: [7, 11],
     requiresWeapon: ['bow'],
+    ballista: true,
+    deploySeconds: 8,
+    mortar: {
+      radius: 1.4,
+      from: 0.4,
+    },
     mods: [
       {
         stat: 'convertSkill.physical.fire',
@@ -4360,7 +4400,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         value: 2,
       },
     ],
-    description: 'Sets bow totems that arc fire arrows over the enemies.',
+    description: 'Sets bow totems that lob arrows to burst along the ground.',
   },
   {
     kind: 'active',
@@ -4406,6 +4446,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     baseMult: [33, 38],
     cost: [5, 11],
     requiresWeapon: ['bow'],
+    ballista: true,
+    deploySeconds: 8,
     mods: [
       {
         stat: 'damage.min',
@@ -4520,6 +4562,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     castTime: 1,
     crit: 6,
     cost: [6, 23],
+    cooldown: 4,
+    cooldownUses: 3,
+    deploySeconds: 4,
     mods: [
       {
         stat: 'status.immobilised.chance',
@@ -4868,8 +4913,22 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     castTime: 0.25,
     crit: 5.5,
     cost: [4, 6],
+    deploySeconds: 5,
+    detonation: 0.35,
+    mineRain: {
+      count: 2,
+      perPrior: 2,
+      radius: 0.55,
+      spread: 2.6,
+    },
+    mineAura: {
+      min: [1, 12],
+      max: [2, 18],
+      cap: [96, 901],
+      radius: 3.5,
+    },
     mods: [],
-    description: 'A mine that lobs fire when it goes off.',
+    description: 'A mine that lobs fire when it goes off, and more fire after.',
   },
   {
     kind: 'active',
@@ -7249,6 +7308,16 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         kind: 'more',
         value: [-35, -25],
       },
+      {
+        stat: 'mine.chain',
+        kind: 'base',
+        value: 5,
+      },
+      {
+        stat: 'deploySeconds',
+        kind: 'base',
+        value: 5,
+      },
     ],
     description: 'The skill is laid as mines that set one another off.',
   },
@@ -7268,15 +7337,18 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         value: [-30, -20],
       },
       {
-        stat: 'damage',
-        kind: 'more',
-        value: 40,
-        condition: {
-          id: 'targetNearby',
-        },
+        stat: 'mine.double',
+        kind: 'base',
+        value: 2,
+      },
+      {
+        stat: 'deploySeconds',
+        kind: 'base',
+        value: 5,
       },
     ],
-    description: 'The skill is laid as a mine that blasts everything close.',
+    description:
+      'The skill is laid as a mine whose aura makes the hits near it land doubly now and then.',
   },
   {
     kind: 'support',

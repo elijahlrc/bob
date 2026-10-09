@@ -569,8 +569,10 @@ export function updateProjectiles(w: World, dt: number): void {
           const rm = pr.profile.skill.returnMore;
           if (rm) pr.profile = scaleProfile(pr.profile, 1 + rm / 100);
         } else {
+          // An arrow fired into the air comes down and bursts.
+          if (pr.kind === 'mortar') explode(w, owner, pr, pr.x, pr.y);
           projectileLanded(w, pr, owner);
-          endProjectile(w, pr, 1);
+          endProjectile(w, pr, pr.kind === 'mortar' ? 3 : 1);
           alive = false;
           break;
         }
@@ -589,7 +591,7 @@ export function updateProjectiles(w: World, dt: number): void {
         const e = k < na ? w.actors[k] : w.minions[k - na];
         if (!e.alive || e.faction === pr.faction || pr.hitIds.includes(e.id)) continue;
         // The payload of an Arrow Nova passes through everything on its way down.
-        if (pr.kind === 'nova') continue;
+        if (pr.kind === 'nova' || pr.kind === 'mortar') continue;
         const rr = e.r + pr.r;
         const dx = e.x - pr.x;
         const dy = e.y - pr.y;

@@ -160,6 +160,8 @@ export const CONDITIONS = [
   'sandStance',
   'bladestormBlood',
   'bladestormSand',
+  'guardianCairn',
+  'warchiefCairn',
   'witherStep',
   'berserk',
   'regenTotem',
