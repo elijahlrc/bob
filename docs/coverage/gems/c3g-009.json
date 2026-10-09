@@ -100,9 +100,9 @@
       { "stat": "damage", "kind": "more", "value": [20, 39], "damageTypes": ["chaos"] },
       { "stat": "damage", "kind": "inc", "value": -25, "damageTypes": ["fire", "cold", "lightning"] } ],
       "description": "More chaos damage, less elemental damage." } },
-  { "ref": "Volley Support", "note": "Two more projectiles fired in parallel, for slightly less damage.",
+  { "ref": "Volley Support", "note": "Two more projectiles fired side by side with the others (the front is wider; the projectiles of one use still cannot hit the same enemy twice), for slightly less damage.",
     "def": { "kind": "support", "id": "twinSalvo", "name": "Twin Salvo", "attr": "dex", "supports": ["projectile"], "excludes": ["channelling"], "costMult": 1.4, "mods": [
-      { "stat": "projectiles", "kind": "base", "value": 2 },
+      { "stat": "projectiles", "kind": "base", "value": 2 }, { "stat": "projectilesParallel", "kind": "flag", "value": 1 },
       { "stat": "damage", "kind": "more", "value": [-12, -3] } ],
       "description": "Fires two more projectiles in parallel, a little weaker." } },
   { "ref": "Withering Touch Support", "note": "Gains physical damage as chaos, and a hit can wither the target: each stack, up to fifteen, makes it take 6% more chaos damage for two seconds.",

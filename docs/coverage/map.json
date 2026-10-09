@@ -318,7 +318,7 @@
   "quiverRush": {
    "ref": "Barrage",
    "status": "covered",
-   "note": "A wide volley from a bow or a wand (the repeated volleys are folded into the damage of one)."
+   "note": "A short preparation, then five projectiles loosed one after another, a little off line; because they come in sequence, every one of them can hit the same enemy."
   },
   "flurryOfEdges": {
    "ref": "Blade Flurry",
@@ -403,7 +403,7 @@
   "rimeSplinter": {
    "ref": "Frost Blades",
    "status": "covered",
-   "note": "A melee strike that releases cold blades from the first enemy hit (modelled as a fan of cold projectiles)."
+   "note": "A melee strike; when it lands, cold blades fly out from behind the enemy it struck, at the others near it."
   },
   "primalStrike": {
    "ref": "Elemental Hit",
@@ -468,17 +468,17 @@
   "splitShot": {
    "ref": "Fork Support",
    "status": "covered",
-   "note": "The supported projectile splits into two on its first hit (modelled as a second projectile at slightly changed damage)."
+   "note": "The supported projectile forks into two the first time it hits an enemy and does not pierce it; the pair fly on past it, away from each other."
   },
   "wideSalvo": {
    "ref": "Greater Volley Support",
    "status": "covered",
-   "note": "Four more parallel projectiles at the cost of less projectile damage."
+   "note": "Four more projectiles fired side by side, in lanes, at the cost of less projectile damage."
   },
   "arrowTempest": {
    "ref": "Arrow Nova Support",
    "status": "covered",
-   "note": "Four more arrows, shot as a ring at the target place (modelled as more arrows with less damage)."
+   "note": "The shot goes up and lands at the target place; four more arrows then fly out from it in a ring."
   },
   "glacierDart": {
    "ref": "Frostbolt",
@@ -488,7 +488,7 @@
   "stormQuill": {
    "ref": "Galvanic Arrow",
    "status": "covered",
-   "note": "A volley of three arrows that are half lightning and burst in a cone (the fading is folded into the damage)."
+   "note": "A volley of three short-lived arrows, half lightning; each shot also releases one lightning burst in a cone in front of the shooter that hits every enemy in it."
   },
   "rimeSpires": {
    "ref": "Glacial Cascade",
@@ -558,7 +558,7 @@
   "boltCleave": {
    "ref": "Lightning Strike",
    "status": "covered",
-   "note": "A strike that sends lightning projectiles from the target (modelled as a fan of lightning projectiles)."
+   "note": "A melee strike; when it lands, bolts of lightning fly out from the weapon in an arc, each hitting for three quarters of the strike."
   },
   "crackleRing": {
    "ref": "Lightning Tendrils",
@@ -568,7 +568,7 @@
   "slagBlow": {
    "ref": "Molten Strike",
    "status": "covered",
-   "note": "A strike that is mostly fire and throws molten balls from the target."
+   "note": "A melee strike, mostly fire; when it lands, molten balls are thrown to the ground around the enemy and burst there, each for half the strike."
   },
   "tempestMote": {
    "ref": "Orb of Storms",
@@ -613,7 +613,7 @@
   "splinterVolley": {
    "ref": "Shattering Steel",
    "status": "covered",
-   "note": "Throws a spread of steel shards that hit hardest up close, with a chance to impale."
+   "note": "Throws a spread of steel shards that hit hardest up close, with a chance to impale; an enemy can be hit by several of the shards of one throw (one of two skills that can)."
   },
   "staticRing": {
    "ref": "Shock Nova",
@@ -728,7 +728,7 @@
   "whirlShot": {
    "ref": "Tornado Shot",
    "status": "covered",
-   "note": "A bow shot with a main arrow and a ring of secondary arrows that burst from it as it flies (folded into a fan)."
+   "note": "A piercing arrow flies to the target place; on arriving it scatters three arrows in all directions."
   },
   "venomShower": {
    "ref": "Toxic Rain",
@@ -868,7 +868,7 @@
   "twinSalvo": {
    "ref": "Volley Support",
    "status": "covered",
-   "note": "Two more projectiles fired in parallel, for slightly less damage."
+   "note": "Two more projectiles fired side by side with the others (the front is wider; the projectiles of one use still cannot hit the same enemy twice), for slightly less damage."
   },
   "witherMark": {
    "ref": "Withering Touch Support",
@@ -1278,7 +1278,7 @@
   "scatterBow": {
    "ref": "Shrapnel Ballista",
    "status": "covered",
-   "note": "Up to three ballista totems that fire a spread of arrows with added physical damage."
+   "note": "Up to three ballista totems that fire a cone of arrows with added physical damage; an enemy can be hit by several of the arrows of one shot (one of two skills that can)."
   },
   "mendingTotem": {
    "ref": "Rejuvenation Totem",
@@ -1373,7 +1373,7 @@
   "rollingVolleys": {
    "ref": "Barrage Support",
    "status": "covered",
-   "note": "The supported bow or wand attack fires four more projectiles in a tight fan at less damage each."
+   "note": "The supported bow or wand attack fires three more projectiles, one after another, so all of them can hit the same enemy; each hits for about two thirds less and every projectile makes the attack take 5% longer."
   },
   "dazzle": {
    "ref": "Blind Support",

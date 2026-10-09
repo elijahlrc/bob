@@ -97,6 +97,15 @@ export type SkillDef = {
   cooldownUses?: number;
   /** Charges that can be spent to use the skill while it waits on its cooldown. */
   bypass?: { charge: 'grit' | 'fervour' | 'insight'; n: number };
+  afterHit?: {
+    kind: 'bolts' | 'blades' | 'balls';
+    count: number;
+    mult: number;
+    arc?: number;
+    range: number;
+    explodeRadius?: number;
+  };
+  cone?: { angle: number; length: number; mult: number };
   /** The skill spends every charge held when it lands, and waits for at least `min` of them. */
   consumeCharges?: { min: number };
   /** Spell base crit, percent. */
@@ -173,6 +182,11 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     cooldownUses: def.cooldownUses,
     bypass: def.bypass,
     consumeCharges: def.consumeCharges,
+    afterHit: def.afterHit && {
+      ...def.afterHit,
+      count: Math.round(levelValue(def.afterHit.count, level)),
+    },
+    cone: def.cone,
   };
 }
 

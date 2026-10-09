@@ -1230,6 +1230,8 @@ export class Character {
     let bl = 0;
     let po = 0;
     const n = p.hands.length;
+    // A barrage lands every projectile on one target; a shotgun some of them; a cone is a second hit with each shot.
+    const volley = volleyHits(p, this.config.targetDistance ?? 3);
     for (const h of p.hands) {
       const ex = expectedHit(p, h, t, d);
       const w = p.bothHands ? 1 : 1 / n;
@@ -1243,14 +1245,15 @@ export class Character {
       const handUses =
         (p.bothHands ? usesPerSec : usesPerSec / n) *
         (choice.triggered ? 1 : 1 + p.repeats) *
-        p.pulses;
+        p.pulses *
+        volley;
       const ail = expectedAilments(p, h, t, d, handUses, land);
       ign = Math.max(ign, ail.igniteDps);
       bl = Math.max(bl, ail.bleedDps);
       po += ail.poisonDps;
     }
     // A repeating skill (Echoing Cast) lands several times per use; a triggered one does not repeat.
-    const lands = (choice.triggered ? 1 : 1 + p.repeats) * p.pulses;
+    const lands = (choice.triggered ? 1 : 1 + p.repeats) * p.pulses * volley;
     let hitDps = perUse * usesPerSec * lands;
     if (cdRate !== undefined && timeShare - usesPerSec * p.useTime > 1e-6)
       hitDps +=
@@ -1560,6 +1563,26 @@ export class Character {
       warnings: this.warnings,
     };
   }
+}
+
+/**
+ * How many hits of a projectile skill's one use land on a single target. The projectiles of a use cannot hit the same enemy
+ * twice (3.9), so it is one, unless they are fired in sequence (all of them), or the skill is flagged to shotgun (those that
+ * fly within the target's width at its distance); a cone burst with each shot is one more.
+ */
+export function volleyHits(p: SkillProfile, distance: number): number {
+  const b = p.skill.behaviour;
+  let hits = 1;
+  if (b.kind === 'projectile') {
+    if (p.projMode.sequential) hits = p.projectiles;
+    else if (p.projMode.shotgun && p.projectiles > 1) {
+      const step = ((b.count > 1 && b.spread > 0 ? b.spread / (b.count - 1) : 10) * Math.PI) / 180;
+      const within = Math.atan(0.5 / Math.max(0.5, distance)) / step;
+      hits = Math.max(1, Math.min(p.projectiles, 1 + 2 * within));
+    }
+  }
+  if (p.skill.cone) hits += p.skill.cone.mult / 100;
+  return hits;
 }
 
 export function skillRange(p: SkillProfile): number {

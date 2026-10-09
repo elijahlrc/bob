@@ -76,6 +76,14 @@ describe('damage taken rules', () => {
     statuses: [],
     fleeChance: 0,
     exposure: 0,
+    projMode: {
+      sequential: false,
+      shotgun: false,
+      parallel: false,
+      nova: false,
+      tornado: false,
+      fork: false,
+    },
     doubleChance: 0,
   } as unknown as SkillProfile;
   const target = (def: ReturnType<typeof dummyDefence>) => ({

@@ -3,10 +3,11 @@
     "def": { "kind": "support", "id": "echoingBlow", "name": "Echoing Blow", "attr": "str", "supports": ["melee"], "needs": ["attack"], "excludes": ["triggered", "channelling"], "costMult": 1.4, "mods": [
       { "stat": "repeats", "kind": "base", "value": 2 }, { "stat": "damage", "kind": "more", "value": [-19, 0] } ],
       "description": "The strike lands twice more on other targets near it." } },
-  { "ref": "Barrage Support", "note": "The supported bow or wand attack fires four more projectiles in a tight fan at less damage each.",
+  { "ref": "Barrage Support", "note": "The supported bow or wand attack fires three more projectiles, one after another, so all of them can hit the same enemy; each hits for about two thirds less and every projectile makes the attack take 5% longer.",
     "def": { "kind": "support", "id": "rollingVolleys", "name": "Rolling Volleys", "attr": "dex", "supports": ["projectile"], "needs": ["attack"], "excludes": ["channelling"], "costMult": 1.4, "mods": [
-      { "stat": "projectiles", "kind": "base", "value": 4 }, { "stat": "damage", "kind": "more", "value": [-30, -20] } ],
-      "description": "Four more projectiles, each hitting less." } },
+      { "stat": "projectiles", "kind": "base", "value": 3 }, { "stat": "damage", "kind": "more", "value": [-68, -62] },
+      { "stat": "attackSpeed", "kind": "more", "value": -13 }, { "stat": "projectilesSequential", "kind": "flag", "value": 1 } ],
+      "description": "Three more projectiles, fired one after another so that they can all hit one enemy; each hits much less, and the attack takes longer." } },
   { "ref": "Blind Support", "note": "Hits can blind enemies (10% chance): a blinded enemy misses half of its attacks. A blind is not a curse.",
     "def": { "kind": "support", "id": "dazzle", "name": "Dazzle", "attr": "dex", "supports": [], "costMult": 1.1, "mods": [
       { "stat": "status.blind.chance", "kind": "base", "value": 10 },

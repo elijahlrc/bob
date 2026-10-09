@@ -159,6 +159,18 @@ export type ActiveGemDef = {
   cooldownUses?: number;
   /** Charges that can be spent to use the skill while it waits on its cooldown. */
   bypass?: { charge: 'grit' | 'fervour' | 'insight'; n: number };
+  /** A strike that, when it lands, sends more out: bolts from the weapon, blades from behind the enemy, balls that land and burst. */
+  afterHit?: {
+    kind: 'bolts' | 'blades' | 'balls';
+    count: LevelValue;
+    /** Their damage as a percentage of the strike's. */
+    mult: number;
+    arc?: number;
+    range: number;
+    explodeRadius?: number;
+  };
+  /** A burst in a cone in front of the shooter with each shot (Galvanic Arrow), its damage a percentage of the shot's. */
+  cone?: { angle: number; length: number; mult: number };
   /** The skill cannot be used directly: this trigger casts it (a counter-attack when the character is hit). */
   selfTrigger?: TriggerDef;
   /** The skill spends every charge the character holds when it lands (its damage grew with them); it waits for at least `min`. */

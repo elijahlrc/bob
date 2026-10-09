@@ -115,16 +115,16 @@
       "ref": "Arrow Nova Support",
       "name": "Arrow Tempest",
       "kind": "support",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S4",
-      "missing": ["projectile_nova_from_target"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "The bow shot flies up and lands at the target, then arrows burst out in a ring from there. (Row corrected after checking the 3.9 wiki; see the erratum.)",
         "bob": "Just +4 projectiles in a forward fan with less damage; no landing point, no ring.",
         "repair": "Fire a payload that lands at the aim point and spawns a ring of projectiles from it."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Arrow Nova Support",
         "status": "confirmed",
@@ -437,16 +437,16 @@
       "ref": "Lightning Strike",
       "name": "Bolt Cleave",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S4",
-      "missing": ["melee_hit_plus_spawned_projectiles"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A melee strike (half converted to lightning) that also throws projectiles from the struck enemy to hit farther-away targets; a melee skill with ranged reach.",
         "bob": "Behaviour is a pure projectile fan (5 bolts, 70 degrees, range 7) from the caster at -25% each; there is no melee hit, and all bolts share a per-use hit list so one target takes a single bolt. It plays as a short-range shotgun-free fan, not a strike with spawned bolts.",
         "repair": "Add a hybrid behaviour: a melee hit on the target followed by projectiles launched from the target's position at other enemies."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Lightning Strike",
         "status": "corrected",
@@ -3318,8 +3318,8 @@
       "kind": "active",
       "verdict": "drifted",
       "confidence": "medium",
-      "milestone": "S4",
-      "missing": ["projectile_land_explode"],
+      "milestone": "S10",
+      "missing": ["ballista_totem_rules", "projectile_land_explode"],
       "audit": {
         "poe": "A ballista totem lobs fire arrows that land in a line and each explode in an area, so it is an AoE ground-pounder from a bow totem.",
         "bob": "Up to three ballistas fire a 6-arrow fan of plain fire-converted projectiles (no explodeRadius, no area tag) that hit only what they touch; the ground-impact explosion that defines it is gone.",
@@ -3344,8 +3344,8 @@
       "kind": "active",
       "verdict": "drifted",
       "confidence": "medium",
-      "milestone": "S4",
-      "missing": ["secondary_projectile_rain", "mine_aura_debuff"],
+      "milestone": "S10",
+      "missing": ["mine_rules", "secondary_projectile_rain"],
       "audit": {
         "poe": "A mine that blasts an area and then rains fiery projectiles around it, while an aura makes nearby enemies take added fire damage.",
         "bob": "A mine with a single fire burst (radius 2.4, 80%); the follow-up projectile rain and the fire-damage-taken aura are absent.",
@@ -3767,16 +3767,16 @@
       "ref": "Barrage",
       "name": "Quiver Rush",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S4",
-      "missing": ["sequential_volleys", "projectile_random_spread"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Barrage (the active gem) makes a short preparation, then fires its projectiles one after another (40% of base damage each, small random spread of about 20 degrees); because they are sequential, they can all strike the same target, which is the skill (big single-target damage up close). (Row corrected after checking the 3.9 wiki; see the erratum.)",
         "bob": "A tight fan of 5 arrows fired together at 60-72% each. A use hits each target once, so it plays as a second Split Volley.",
         "repair": "Fire the volleys in sequence, each with its own hit list, at the gem's per-volley damage."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Barrage",
         "status": "corrected",
@@ -3789,7 +3789,8 @@
           "Mana 7 (level 1) to 11 (level 20). [pob]"
         ],
         "check": "The audit line (after its erratum) holds: the wiki says the projectiles are sequential and can all hit one target, 40-47.6% each, ~20 degrees. I dropped attack_time_per_projectile from missing (it belongs to Barrage Support, not the active gem; the PoB block in the input is the support) and note that Bob's 60-72% per arrow is about 50% too high for a 5-arrow salvo."
-      }
+      },
+      "effects": ["projectile", "hit"]
     },
     "rainOfSteel": {
       "ref": "Bladefall",
@@ -3954,16 +3955,16 @@
       "ref": "Chain Support",
       "name": "Ricochet",
       "kind": "support",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S4",
-      "missing": ["projectile_chain"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Projectiles (and chain skills) chain to further enemies after hitting, at a damage penalty; how projectiles clear packs.",
         "bob": "Adds chains +2 and a damage penalty, but only skills with chain behaviour read 'chains' (sim actions.ts chain branch). On a normal projectile skill (bow, bolt) the chains stat does nothing, so the support is a pure damage penalty. Works only on the ~5 chain-native skills.",
         "repair": "Let projectile skills chain on hit: redirect the projectile to the nearest unhit enemy up to the chain count."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Chain Support",
         "status": "confirmed",
@@ -4183,16 +4184,16 @@
       "ref": "Frost Blades",
       "name": "Rime Splinter",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S4",
-      "missing": ["projectile_from_hit_target", "melee_strike_then_projectiles"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A melee-range strike (extended range) that releases icy blades from the first enemy hit towards other enemies; a melee skill with a projectile shower from the target.",
         "bob": "A projectile fan of 5 cold blades (range 7, 60 degree spread) fired from the character; there is no melee hit and no origin at the enemy, and the player will stand off at range. Cold conversion 60% and added cold are read.",
         "repair": "Make the use a melee hit on the target and on contact spawn the fan from the target's position at the other enemies."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Frost Blades",
         "status": "confirmed",
@@ -4237,16 +4238,16 @@
       "ref": "Barrage Support",
       "name": "Rolling Volleys",
       "kind": "support",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S4",
-      "missing": ["sequential_volleys", "attack_time_per_projectile"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Barrage Support: supported bow or wand attacks fire their extra projectiles sequentially, so they can all hit the same target, at a damage penalty and an attack-time cost per projectile. (Row corrected after checking the 3.9 wiki; see the erratum.)",
         "bob": "Projectiles +4 at 20-30% less damage, fired together in a fan; a use hits each target once. It is Multiple Projectiles with bigger numbers.",
         "repair": "Sequential firing with a hit list per volley, and the attack-time cost per extra projectile."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Barrage Support",
         "status": "confirmed",
@@ -4516,8 +4517,8 @@
       "kind": "active",
       "verdict": "drifted",
       "confidence": "high",
-      "milestone": "S4",
-      "missing": ["projectile_shotgun"],
+      "milestone": "S10",
+      "missing": ["ballista_totem_rules"],
       "audit": {
         "poe": "A ballista totem fires a few arrows that can all hit the same enemy (shotgunning), turning close range into a burst with added physical damage. (Row corrected after checking the 3.9 wiki; see the erratum.)",
         "bob": "Fires a 3-arrow fan with added physical damage, but all projectiles of one use share a single hit list (src/sim/actions.ts useHits), so an enemy is hit once per use and there is no shotgun.",
@@ -4831,16 +4832,16 @@
       "ref": "Molten Strike",
       "name": "Slag Blow",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S4",
-      "missing": ["melee_hit_plus_spawned_projectiles", "projectile_from_target"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A melee strike (physical and fire) that launches molten balls from the struck enemy that explode on landing for area damage; a melee skill with its own AoE.",
         "bob": "Pure projectile behaviour: four balls fanned 90 degrees from the caster, range 6, each exploding in radius 1 at -50%. There is no melee hit; the explosions do shotgun a close target (explode() ignores the hit list).",
         "repair": "Same hybrid behaviour as Bolt Cleave: melee hit, then balls launched from the target that explode where they land."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Molten Strike",
         "status": "confirmed",
@@ -5288,16 +5289,16 @@
       "ref": "Fork Support",
       "name": "Split Shot",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S4",
-      "missing": ["projectile_split"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Projectiles fork into two on first hit if they do not pierce, covering enemies beside or behind.",
         "bob": "Just +1 projectile in the starting fan with a small damage change; nothing happens on hit. The shared hit-list means it only adds coverage (DESIGN.md decision 2026-10-06; src/sim/actions.ts fire(): all projectiles of one use share one hit list).",
         "repair": "On first hit, spawn two projectiles at an angle from the impact point."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Fork Support",
         "status": "confirmed",
@@ -5693,16 +5694,16 @@
       "ref": "Galvanic Arrow",
       "name": "Storm Quill",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S4",
-      "missing": ["cone_area_on_projectile"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Arrows plus a lightning burst that damages every enemy in a cone, with the arrows degrading in flight; a close-range cone shotgun. (Row corrected after checking the 3.9 wiki; see the erratum.)",
         "bob": "A fan of 3 bow arrows (range 7) with half lightning conversion and added lightning. There is no cone area damage (no explodeRadius or beam on the behaviour).",
         "repair": "Give the projectile an explode shape of a cone from the impact (or a beam hit at fire time) so the lightning burst exists."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Galvanic Arrow",
         "status": "confirmed",
@@ -6117,7 +6118,7 @@
       "kind": "active",
       "verdict": "drifted",
       "confidence": "low",
-      "milestone": "S4",
+      "milestone": "S8",
       "missing": ["catch_returning_projectile", "release_stored_projectiles_on_movement_skill"],
       "audit": {
         "poe": "A returning chaos projectile that can be caught; caught projectiles are released into a spiral when you use Whirling Blades, so it is a poison skill combined with a movement skill.",
@@ -6256,16 +6257,16 @@
       "ref": "Volley Support",
       "name": "Twin Salvo",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S4",
-      "missing": ["parallel_projectiles"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Two extra projectiles fired in parallel lanes (a wider frontage than a fan), minor penalty. They cannot hit the same target. (Row corrected after checking the 3.9 wiki; see the erratum.)",
         "bob": "+2 projectiles in a fan at less damage; the once-per-target rule is right, the parallel lanes are not modelled.",
         "repair": "A parallel placement option for projectile supports."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Volley Support",
         "status": "confirmed",
@@ -6753,16 +6754,16 @@
       "ref": "Tornado Shot",
       "name": "Whirl Shot",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S4",
-      "missing": ["projectile_split", "radial_burst_at_projectile_end"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A piercing arrow flies to the target spot and then fires secondary projectiles out in all directions from that point; the arrow splits at its end.",
         "bob": "A five-arrow bow fan (45 degrees) from the caster; no split at the end of the flight and no radial secondaries, and one arrow per target. It plays as a second Split Volley.",
         "repair": "After the main arrow travels to its end point, spawn secondary projectiles radially from that point."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Tornado Shot",
         "status": "confirmed",
@@ -6869,16 +6870,16 @@
       "ref": "Greater Volley Support",
       "name": "Wide Salvo",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S4",
-      "missing": ["parallel_projectiles"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Four extra projectiles fired in parallel lanes. They cannot hit the same target. (Row corrected after checking the 3.9 wiki; see the erratum.)",
         "bob": "+4 projectiles in a fan at less damage; the once-per-target rule is right, the parallel lanes are not modelled.",
         "repair": "A parallel placement option for projectile supports."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Greater Volley Support",
         "status": "confirmed",

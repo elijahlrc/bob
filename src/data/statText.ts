@@ -365,6 +365,17 @@ for (const id of STATUS_IDS) {
   STAT_TEXT[`status.${id}.v`] = { base: `${name} effect: {v}%` };
   STAT_TEXT[`status.${id}.x`] = { base: `${name} secondary effect: {v}%` };
 }
+// How projectiles go (docs/SPIRIT.md S4).
+STAT_TEXT.projectilesSequential = {
+  flag: 'Projectiles are fired one after another, and can each hit the same Enemy',
+};
+STAT_TEXT.projectilesShotgun = { flag: 'Projectiles can hit the same Enemy several times' };
+STAT_TEXT.projectilesParallel = { flag: 'Projectiles are fired side by side' };
+STAT_TEXT.arrowNova = { flag: 'Arrows land at the target and fly out from there in a ring' };
+STAT_TEXT.tornadoShot = {
+  flag: 'The Arrow flies to the target and scatters Arrows when it arrives',
+};
+STAT_TEXT.projectilesFork = { flag: 'Projectiles fork in two when they hit an Enemy' };
 STAT_TEXT['status.exposure.chance'] = {
   base: '{v}% chance to Expose Enemies to the Element they took most Damage from on Hit',
 };

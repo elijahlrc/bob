@@ -50,14 +50,20 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     behaviour: {
       kind: 'projectile',
       count: 5,
-      spread: 30,
+      spread: 20,
       range: 9,
     },
-    baseMult: [60, 72],
-    cost: [4, 10],
-    mods: [],
+    baseMult: [40, 47.6],
+    cost: [7, 11],
+    mods: [
+      {
+        stat: 'projectilesSequential',
+        kind: 'flag',
+        value: 1,
+      },
+    ],
     requiresWeapon: ['bow', 'wand'],
-    description: 'Looses a tight fan of arrows in a rush.',
+    description: 'Looses five arrows one after another; all of them can strike the same enemy.',
   },
   {
     kind: 'active',
@@ -548,12 +554,16 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     tags: ['attack', 'projectile', 'melee', 'cold'],
     types: ['repeatable'],
     behaviour: {
-      kind: 'projectile',
-      count: 5,
-      spread: 60,
-      range: 7,
+      kind: 'melee',
+      range: 1.9,
     },
-    baseMult: [100, 100],
+    afterHit: {
+      kind: 'blades',
+      count: [4, 7],
+      mult: 100,
+      range: 5,
+    },
+    baseMult: [100, 140],
     cost: [6, 6],
     requiresWeapon: ['sword', 'dagger', 'axe', 'mace', 'claw'],
     mods: [
@@ -575,7 +585,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         damageTypes: ['cold'],
       },
     ],
-    description: 'A strike that splinters into a fan of icy blades.',
+    description:
+      'A strike that, when it lands, sends icy blades flying from behind the enemy at the others near it.',
   },
   {
     kind: 'active',
@@ -961,6 +972,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       count: 3,
       spread: 25,
       range: 7,
+    },
+    cone: {
+      angle: 50,
+      length: 5,
+      mult: 100,
     },
     baseMult: [80, 99],
     cost: [6, 10],
@@ -1416,9 +1432,14 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     tags: ['attack', 'projectile', 'melee', 'strike', 'lightning'],
     types: ['repeatable'],
     behaviour: {
-      kind: 'projectile',
-      count: 5,
-      spread: 70,
+      kind: 'melee',
+      range: 1.7,
+    },
+    afterHit: {
+      kind: 'bolts',
+      count: [5, 7],
+      mult: 75,
+      arc: 85,
       range: 7,
     },
     baseMult: [135, 180],
@@ -1430,14 +1451,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'base',
         value: 50,
       },
-      {
-        stat: 'damage',
-        kind: 'more',
-        value: -25,
-        tags: ['projectile'],
-      },
     ],
-    description: 'A strike that sends bolts of lightning flying from where it lands.',
+    description:
+      'A strike that, when it lands, sends bolts of lightning flying from your weapon in an arc.',
   },
   {
     kind: 'active',
@@ -1480,11 +1496,15 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     tags: ['attack', 'projectile', 'melee', 'strike', 'area', 'fire'],
     types: ['repeatable'],
     behaviour: {
-      kind: 'projectile',
+      kind: 'melee',
+      range: 1.7,
+    },
+    afterHit: {
+      kind: 'balls',
       count: 4,
-      spread: 90,
-      range: 6,
-      explodeRadius: 1,
+      mult: 50,
+      range: 5,
+      explodeRadius: 1.2,
     },
     baseMult: [120, 139],
     cost: [6, 6],
@@ -1495,14 +1515,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'base',
         value: 60,
       },
-      {
-        stat: 'damage',
-        kind: 'more',
-        value: -50,
-        tags: ['projectile'],
-      },
     ],
-    description: 'A strike that splatters molten metal around the target.',
+    description:
+      'A strike that, when it lands, splatters molten metal on the ground around the enemy.',
   },
   {
     kind: 'active',
@@ -1761,7 +1776,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     behaviour: {
       kind: 'projectile',
       count: 3,
-      spread: 90,
+      spread: 30,
       range: 5,
     },
     baseMult: [48, 55],
@@ -1780,6 +1795,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         condition: {
           id: 'targetNearby',
         },
+      },
+      {
+        stat: 'projectilesShotgun',
+        kind: 'flag',
+        value: 1,
       },
     ],
     description: 'A spread of steel shards, deadliest at close range.',
@@ -2468,15 +2488,22 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     types: ['totemable', 'trappable', 'mineable', 'volleyable'],
     behaviour: {
       kind: 'projectile',
-      count: 5,
-      spread: 45,
-      range: 8,
+      count: 1,
+      spread: 0,
+      range: 9,
     },
-    baseMult: [70, 90],
+    baseMult: [90, 109],
     cost: [8, 8],
     requiresWeapon: ['bow'],
-    mods: [],
-    description: 'A main arrow with a spray of secondary arrows bursting from it.',
+    mods: [
+      {
+        stat: 'tornadoShot',
+        kind: 'flag',
+        value: 1,
+      },
+    ],
+    description:
+      'A piercing arrow that flies to the target place and scatters arrows all round when it arrives.',
   },
   {
     kind: 'active',
@@ -4085,8 +4112,14 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'base',
         value: 2,
       },
+      {
+        stat: 'projectilesShotgun',
+        kind: 'flag',
+        value: 1,
+      },
     ],
-    description: 'Sets bow totems that scatter arrows.',
+    description:
+      'Sets bow totems that scatter arrows; close up, several arrows of one shot hit the same enemy.',
   },
   {
     kind: 'active',
@@ -6066,8 +6099,8 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.3,
     mods: [
       {
-        stat: 'projectiles',
-        kind: 'base',
+        stat: 'projectilesFork',
+        kind: 'flag',
         value: 1,
       },
       {
@@ -6076,7 +6109,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         value: [-10, 9],
       },
     ],
-    description: 'Projectiles split in two on their first hit.',
+    description: 'Projectiles fork in two on their first hit.',
   },
   {
     kind: 'support',
@@ -6091,6 +6124,11 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         stat: 'projectiles',
         kind: 'base',
         value: 4,
+      },
+      {
+        stat: 'projectilesParallel',
+        kind: 'flag',
+        value: 1,
       },
       {
         stat: 'damage',
@@ -6116,12 +6154,18 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         value: 4,
       },
       {
+        stat: 'arrowNova',
+        kind: 'flag',
+        value: 1,
+      },
+      {
         stat: 'damage',
         kind: 'more',
         value: [-40, -26],
       },
     ],
-    description: 'Four more arrows per shot, each hitting less hard.',
+    description:
+      'The shot lands at the target place and four more arrows fly out from it in a ring.',
   },
   {
     kind: 'support',
@@ -6613,6 +6657,11 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         stat: 'projectiles',
         kind: 'base',
         value: 2,
+      },
+      {
+        stat: 'projectilesParallel',
+        kind: 'flag',
+        value: 1,
       },
       {
         stat: 'damage',
@@ -7137,15 +7186,26 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'projectiles',
         kind: 'base',
-        value: 4,
+        value: 3,
       },
       {
         stat: 'damage',
         kind: 'more',
-        value: [-30, -20],
+        value: [-68, -62],
+      },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -13,
+      },
+      {
+        stat: 'projectilesSequential',
+        kind: 'flag',
+        value: 1,
       },
     ],
-    description: 'Four more projectiles, each hitting less.',
+    description:
+      'Three more projectiles, fired one after another so that they can all hit one enemy; each hits much less, and the attack takes longer.',
   },
   {
     kind: 'support',

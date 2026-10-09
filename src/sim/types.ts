@@ -12,6 +12,7 @@ import type { BuffId } from '../data/buffs';
 import type { Corpse } from './factions';
 import type { HexState } from './hexes';
 import type { Fx } from './statuses';
+import type { PendingShot } from './shots';
 import type { HexTotals } from '../data/hexes';
 import type { Deployable } from './deploy';
 import type { Minion } from './minions';
@@ -219,6 +220,12 @@ export type Projectile = {
   dtype: number;
   /** A returning projectile: flying back toward its owner. */
   back?: boolean;
+  /** Forks left (a projectile forks once), and chains left. */
+  forkLeft: number;
+  chainLeft: number;
+  /** An arrow that lands and bursts into a ring (nova), or goes on to scatter at its end (tornado); the arrows it sends. */
+  kind?: 'nova' | 'tornado';
+  ring?: number;
 };
 
 export type GroundEffect = {
@@ -494,17 +501,21 @@ export type World = {
   utilityReady: Record<string, number>;
   /** Time since the burning aura last struck. */
   auraBurnT: number;
-  deploySeq: number;
-  /** The minions standing. */
   /** The totems, brands, traps and mines on the ground. */
   deployables: Deployable[];
   minions: Minion[];
   actors: Actor[];
+  deploySeq: number;
+  /** The minions standing. */
   player: Actor;
   nextId: number;
   projectiles: Projectile[];
   effects: GroundEffect[];
   /** Zones the player's skills left on the ground. */
+  /** The projectiles of a barrage still to be fired, one after another. */
+  shots: PendingShot[];
+  /** How the last hit of the player's resolved (a strike that sends more out waits to see it land). */
+  lastOutcome: 'hit' | 'miss' | 'block' | null;
   zones: SkillZone[];
   /** Bodies of dead monsters (EXPANSION 5.8), and recent explosions that destroy fresh ones. */
   corpses: Corpse[];

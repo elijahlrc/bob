@@ -20,6 +20,7 @@ import { isZone, tickCorpses, tickFactionBehaviour, tickZones } from './factions
 import { BUFF_IDS, type BuffId } from '../data/buffs';
 import { rollGains, tickBuffs } from './buffs';
 import { tickCooldowns } from './cooldowns';
+import { tickShots } from './shots';
 import { tickDeployables } from './deploy';
 import { tickMinions } from './minions';
 import { tickAuraBurn } from './utility';
@@ -128,6 +129,8 @@ export function createWorld(inp: CreateWorldInput): World {
     player,
     nextId: 2,
     projectiles: [],
+    shots: [],
+    lastOutcome: null,
     effects: [],
     zones: [],
     corpses: [],
@@ -489,9 +492,9 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickCharges(w, dt);
   tickCooldowns(w, dt);
   tickBuffs(w, dt);
-  tickDeployables(w, dt);
   tickAuraBurn(w, dt);
   tickMinions(w, dt);
+  tickDeployables(w, dt);
   tickSkillZones(w, dt);
   tickFlasks(w, dt, policy);
   // Flow field for monsters follows the player tile.
@@ -514,6 +517,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     if (!a.action) a.carry = 0;
   }
   updateProjectiles(w, dt);
+  tickShots(w);
   tickEffects(w, dt);
   tickZones(w, dt);
   tickCorpses(w, dt);

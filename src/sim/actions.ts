@@ -1,6 +1,6 @@
 import { angleDiff } from '../core/math';
 import { MONSTER_TYPES } from '../data/monsters';
-import { BLOCK_WINDOW, ECHO_GAP, HIT_AT, PROJECTILE_SPEED, SHOT_ALERT } from '../data/constants';
+import { BLOCK_WINDOW, ECHO_GAP, HIT_AT, SHOT_ALERT } from '../data/constants';
 import type { SkillProfile } from '../calc/skill';
 import { rollGains } from './buffs';
 import { CHARGE_KINDS } from '../calc/charges';
@@ -9,6 +9,13 @@ import { hit, monsterHitOf } from './combat';
 import { openZone, pullPlayer, registerBlast, shieldBlocks, speedMult } from './factions';
 import { fireTriggers } from './triggers';
 import { placeDeployable } from './deploy';
+import {
+  afterProjectileHit,
+  afterStrike,
+  coneBurst,
+  fireProjectiles,
+  projectileLanded,
+} from './shots';
 import { applyUtility } from './utility';
 import type { Action, Actor, World } from './types';
 
@@ -309,8 +316,11 @@ function fireEffect(w: World, a: Actor, act: Action): void {
       heavy: isHeavy(a, p),
     });
     // A skill that strikes with both weapons at once (Dual Strike) lands both blows.
+    w.lastOutcome = null;
     if (p.bothHands) for (let h = 0; h < p.hands.length; h++) hit(w, a, target, p, h, d);
     else hit(w, a, target, p, act.hand, d);
+    // A strike that sends more out after it (bolts, blades, balls) does so only if it landed.
+    if (w.lastOutcome === 'hit') afterStrike(w, a, act, target);
     return;
   }
   if (b.kind === 'chain') {
@@ -402,50 +412,9 @@ function fireEffect(w: World, a: Actor, act: Action): void {
     });
     return;
   }
-  // Projectiles.
-  const n = p.projectiles;
-  const base = Math.atan2(act.aimY - a.y, act.aimX - a.x);
-  const baseCount = b.count;
-  const step = ((b.spread > 0 && baseCount > 1 ? b.spread / (baseCount - 1) : 10) * Math.PI) / 180;
-  const speed = PROJECTILE_SPEED * p.projSpeedMult;
-  let dtype = 0;
-  const h = p.hands[Math.min(act.hand, p.hands.length - 1)];
-  let best = -1;
-  for (const c of h.chunks)
-    if (c.max > best) {
-      best = c.max;
-      dtype = c.type;
-    }
-  // All projectiles of one use share a hit list: a use hits each target at most once.
-  const useHits: number[] = [];
-  for (let i = 0; i < n; i++) {
-    const ang = fanAngle(base, i, n, step, w.tick);
-    const id = w.nextId++;
-    w.projectiles.push({
-      id,
-      owner: a.id,
-      faction: a.faction,
-      x: a.x,
-      y: a.y,
-      vx: Math.cos(ang) * speed,
-      vy: Math.sin(ang) * speed,
-      r: 0.15,
-      travelled: 0,
-      maxRange: (b.range ?? 9) + 2,
-      profile: p,
-      hand: act.hand,
-      hitIds: useHits,
-      pierceLeft: p.pierce,
-      aimId: act.targetId,
-      minDist: Infinity,
-      lastHitId: 0,
-      explodeRadius: (b.explodeRadius ?? 0) * p.radiusMult,
-      startX: a.x,
-      startY: a.y,
-      dtype,
-    });
-    w.events.push({ t: 'projectileSpawned', id });
-  }
+  // The burst in front of the shooter that goes with a shot, then the projectiles.
+  coneBurst(w, a, act);
+  fireProjectiles(w, a, act);
 }
 
 function explode(
@@ -506,6 +475,7 @@ export function updateProjectiles(w: World, dt: number): void {
         }
         if (pr.explodeRadius > 0)
           explode(w, owner, pr, pr.x - (pr.vx * dt) / steps, pr.y - (pr.vy * dt) / steps);
+        projectileLanded(w, pr, owner);
         endProjectile(w, pr, 0);
         alive = false;
         break;
@@ -526,6 +496,7 @@ export function updateProjectiles(w: World, dt: number): void {
           pr.hitIds = [];
           pr.pierceLeft = pr.profile.pierce;
         } else {
+          projectileLanded(w, pr, owner);
           endProjectile(w, pr, 1);
           alive = false;
           break;
@@ -542,6 +513,8 @@ export function updateProjectiles(w: World, dt: number): void {
       for (let k = 0; k < na + nm; k++) {
         const e = k < na ? w.actors[k] : w.minions[k - na];
         if (!e.alive || e.faction === pr.faction || pr.hitIds.includes(e.id)) continue;
+        // The payload of an Arrow Nova passes through everything on its way down.
+        if (pr.kind === 'nova') continue;
         const rr = e.r + pr.r;
         const dx = e.x - pr.x;
         const dy = e.y - pr.y;
@@ -564,6 +537,7 @@ export function updateProjectiles(w: World, dt: number): void {
         if (owner)
           hit(w, owner, e, pr.profile, pr.hand, Math.hypot(e.x - pr.startX, e.y - pr.startY));
         if (pr.pierceLeft > 0) pr.pierceLeft--;
+        else if (afterProjectileHit(w, pr, owner)) break;
         else {
           endProjectile(w, pr, 2);
           alive = false;
