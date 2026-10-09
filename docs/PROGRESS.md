@@ -828,3 +828,8 @@ the melee ailment bonus, Bladefall's volleys, Creeping Frost). The engine gained
 objects, skill damage over time, blinks, stances and rage, deployables, corpses, minion effects, and a bag of single-skill behaviours (`SkillFx` in `src/data/gems.ts`,
 carried out in `src/sim/skillFx.ts` and `supportFx.ts`). The 3.9 rule that the projectiles of one use hit an enemy once stands. A second audit by reviewers who had not
 seen the first verdicts (docs/AUDIT-GEMS.md) found 288 of 326 faithful as it stood and about thirty small gaps, which were repaired. See the plan's section 13 for each milestone.
+
+The bot sample at the end (60 runs, 10 for each class, maps 1 to 20, seed 3, the default difficulty 1.75 / 1.8 / 0.3, committed code) against the same sample on the code
+before the plan began: runs that died before map 20 were 31 of 60 (38 of 60 before); no class won the 20 maps either way (the bot is a weak proxy, and 20 maps is a short
+run); the sim runs at 450 to 570 times real time (560 to 800 before), the cost of the new behaviours. The sample is a regression detector and shows none. A crash in map generation
+("weighted pick with no positive weight", src/gen/packs.ts) stops some deeper runs; it is not from the plan, and a task is open for it.
