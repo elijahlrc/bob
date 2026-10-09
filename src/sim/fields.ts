@@ -1,6 +1,7 @@
 import type { SkillProfile } from '../calc/skill';
 import { spellBaseDamage } from '../data/constants';
 import type { ChargeKind } from '../calc/charges';
+import { segmentDist } from './actions';
 import { applySkillDot } from './skillDots';
 import { applyStatus } from './statuses';
 import { gainCharge } from './charges';
@@ -16,7 +17,17 @@ import type { Action, Actor, World } from './types';
  */
 
 export type FieldKind =
-  'consecrated' | 'chilling' | 'caustic' | 'pod' | 'crystal' | 'storm' | 'wall' | 'orb' | 'zap';
+  | 'consecrated'
+  | 'chilling'
+  | 'caustic'
+  | 'pod'
+  | 'crystal'
+  | 'storm'
+  | 'wall'
+  | 'orb'
+  | 'zap'
+  | 'trail'
+  | 'ghost';
 
 export type Field = {
   id: number;
@@ -44,6 +55,10 @@ export type Field = {
   tiles?: number[];
   /** An orb: the skill it belongs to, the stages built, and how fast they fade once the channel has ended. A zap: the place it jumps about. */
   skill?: string;
+  /** A trail: the far end of the segment it lies along. A ghost: how far it has run. */
+  x2?: number;
+  y2?: number;
+  moved?: number;
   stages?: number;
   decay?: number;
   tx?: number;
@@ -223,6 +238,49 @@ export function orbUse(w: World, a: Actor, act: Action, stage: number): void {
     });
     return;
   }
+  if (spec.kind === 'illusion') {
+    let g = w.fields.find((f) => f.kind === 'ghost' && f.skill === p.skill.id);
+    if (!g) {
+      const r = spec.radius * p.radiusMult;
+      g = {
+        id: w.nextId++,
+        owner: a.id,
+        kind: 'ghost',
+        x: a.x,
+        y: a.y,
+        tx: act.aimX,
+        ty: act.aimY,
+        r0: r,
+        grow: 1,
+        radius: r,
+        t: 60,
+        total: 60,
+        profile: p,
+        hand: act.hand,
+        pulseT: 0,
+        interval: 1,
+        dps: 0,
+        dtype: dominantType(p),
+        skill: p.skill.id,
+        moved: 0,
+        stages: 0,
+      };
+      w.fields.push(g);
+    }
+    g.tx = act.aimX;
+    g.ty = act.aimY;
+    g.profile = p;
+    g.stages = stage;
+    // A wave of damage for each so many stages, harder once the illusion has stopped.
+    if (stage % spec.waveStages === 0) {
+      const still =
+        (g.moved ?? 0) >= spec.distance || Math.hypot((g.tx ?? 0) - g.x, (g.ty ?? 0) - g.y) < 0.3;
+      const k = (spec.finalPerStage * stage) / 100;
+      const q = scaleProfile(p, still ? k * (1 + spec.stillMore / 100) : k);
+      blast(w, { ...g, profile: q }, g.x, g.y, g.radius);
+    }
+    return;
+  }
   const ang = w.rngTrig.float(0, Math.PI * 2);
   const d = spec.spread * Math.sqrt(w.rngTrig.float(0, 1));
   const spot = w.grid.collide(act.aimX + Math.cos(ang) * d, act.aimY + Math.sin(ang) * d, 0.3);
@@ -269,6 +327,27 @@ export function releaseZaps(w: World, skill: string): void {
       hit(w, p, e, q, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
   }
   w.fields.length = j;
+}
+
+/**
+ * The channel of an illusion skill ends. Let go, the character joins the illusion and a last wave breaks there, harder for each
+ * stage built; stunned or frozen, the illusion is just gone.
+ */
+export function releaseGhost(w: World, skill: string, interrupted: boolean): void {
+  const i = w.fields.findIndex((f) => f.kind === 'ghost' && f.skill === skill);
+  if (i < 0) return;
+  const g = w.fields[i];
+  w.fields.splice(i, 1);
+  const spec = g.profile?.skill.orb;
+  if (interrupted || spec?.kind !== 'illusion' || !g.profile) return;
+  const a = w.player;
+  const spot = w.grid.collide(g.x, g.y, a.r);
+  w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: false });
+  a.x = spot.x;
+  a.y = spot.y;
+  w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true });
+  const f = (spec.finalPerStage * (g.stages ?? 0)) / 100;
+  blast(w, { ...g, profile: scaleProfile(g.profile, f) }, a.x, a.y, g.radius * 1.3);
 }
 
 /** Blasts at a spot: the enemies in its radius are hit. */
@@ -365,6 +444,43 @@ export function tickFields(w: World, dt: number): void {
       if (f.t > 0) w.fields[j++] = f;
       continue;
     }
+    if (f.kind === 'ghost') {
+      const spec = f.profile!.skill.orb;
+      if (spec?.kind !== 'illusion' || w.channel?.key !== f.skill) continue;
+      // It runs ahead toward the target place, faster than the character, and stops where it has run far enough.
+      const dx = (f.tx ?? f.x) - f.x;
+      const dy = (f.ty ?? f.y) - f.y;
+      const d = Math.hypot(dx, dy);
+      const step = Math.min(
+        d,
+        p.def.moveSpeed * spec.speed * dt,
+        Math.max(0, spec.distance - (f.moved ?? 0)),
+      );
+      if (step > 1e-6) {
+        const spot = w.grid.collide(f.x + (dx / d) * step, f.y + (dy / d) * step, 0.3);
+        f.moved = (f.moved ?? 0) + Math.hypot(spot.x - f.x, spot.y - f.y);
+        f.x = spot.x;
+        f.y = spot.y;
+      }
+      w.fields[j++] = f;
+      continue;
+    }
+    if (f.kind === 'trail') {
+      f.pulseT -= dt;
+      if (f.pulseT <= 0 && f.t > 0) {
+        f.pulseT += f.interval;
+        for (const e of w.actors)
+          if (
+            !e.isPlayer &&
+            e.alive &&
+            e.phaseT <= 0 &&
+            segmentDist(e.x, e.y, f.x, f.y, f.x2!, f.y2!) <= f.radius + e.r
+          )
+            applySkillDot(w, e, f.profile!, { seconds: 0.5 });
+      }
+      if (f.t > 0) w.fields[j++] = f;
+      continue;
+    }
     if (f.kind === 'zap') {
       f.pulseT -= dt;
       if (f.pulseT <= 0 && f.t > 0) {
@@ -413,6 +529,13 @@ export function tickFields(w: World, dt: number): void {
       // Caustic ground renews the debuff of whoever stands in it, in short spans: patches do not add up.
       for (const e of enemiesIn(w, f.x, f.y, f.radius))
         applySkillDot(w, e, f.profile, { seconds: 0.5 });
+    } else if (f.kind === 'chilling' && pulse && f.profile && f.dps <= 0) {
+      // Chilled ground that deals no damage (Frostblink) only chills what stands on it.
+      for (const e of enemiesIn(w, f.x, f.y, f.radius)) {
+        if (e.def.cannotBeChilled) continue;
+        e.ail.chill = Math.max(e.ail.chill, f.profile.chill.effect);
+        e.ail.chillT = Math.max(e.ail.chillT, f.interval * 2);
+      }
     } else if (f.kind === 'chilling' && pulse && f.profile) {
       const q = scaleProfile(f.profile, f.dps * f.interval);
       for (const e of enemiesIn(w, f.x, f.y, f.radius))

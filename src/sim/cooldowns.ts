@@ -1,4 +1,5 @@
 import type { SkillChoice } from '../calc/character';
+import { levelValue } from '../calc/gems';
 import { spendCharges } from './charges';
 import type { World } from './types';
 
@@ -58,12 +59,29 @@ export function useSkill(w: World, c: SkillChoice): void {
   w.secondaryReady[c.key] = st.uses > 0 ? 0 : w.t + st.t;
 }
 
+/** How much faster a cooldown runs for the enemies near the character (Frostblink: a little for each, a lot for a rare one). */
+function recoverRate(w: World, c: SkillChoice): number {
+  const r = c.skill.recoverNear;
+  if (!r) return 1;
+  const p = w.player;
+  let more = 0;
+  for (const e of w.actors) {
+    if (e.isPlayer || !e.alive || Math.hypot(e.x - p.x, e.y - p.y) > r.radius + e.r) continue;
+    const big = e.rarity === 'rare' || e.rarity === 'miniboss' || e.rarity === 'boss';
+    more += levelValue(big ? r.rare : r.normal, c.skill.level);
+  }
+  return 1 + more / 100;
+}
+
 /** Run the cooldowns down: a use comes back when its timer ends. */
 export function tickCooldowns(w: World, dt: number): void {
   for (const key in w.cooldowns) {
     const st = w.cooldowns[key];
     if (st.t <= 0) continue;
-    st.t -= dt;
+    const c0 = w.char.actives.find((x) => x.key === key);
+    // A cooldown that waits out a buff (Withering Step) does not run while it lasts.
+    if (c0?.skill.pausedBy && w.buffT[c0.skill.pausedBy] > 0) continue;
+    st.t -= dt * (c0 ? recoverRate(w, c0) : 1);
     if (st.t > 0) continue;
     const c = w.char.actives.find((x) => x.key === key);
     const max = c ? maxUses(c) : 1;

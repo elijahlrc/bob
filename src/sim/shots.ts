@@ -1,4 +1,5 @@
 import type { SkillProfile } from '../calc/skill';
+import { formedProfile } from '../calc/skill';
 import { PROJECTILE_SPEED } from '../data/constants';
 import { actorById } from './actions';
 import { hit } from './combat';
@@ -108,6 +109,7 @@ function launch(
     chainLeft: o.chain ?? 0,
     kind: o.kind,
     ring: o.ring,
+    formAt: p.skill.form?.after,
   };
   w.projectiles.push(pr);
   w.events.push({ t: 'projectileSpawned', id: pr.id });
@@ -166,7 +168,10 @@ export function fireProjectiles(w: World, a: Actor, act: Action): void {
     // A barrage: one projectile after another, a little off line, each hitting on its own.
     const gap = Math.min(BARRAGE_GAP, (0.6 * act.duration) / Math.max(1, n));
     for (let i = 0; i < n; i++) {
-      const jitter = (w.rngCombat.float(0, 1) - 0.5) * BARRAGE_SPREAD;
+      // A barrage scatters about twenty degrees across; a skill that names a narrower spread keeps to it (Frost Lance).
+      const jitter =
+        (w.rngCombat.float(0, 1) - 0.5) *
+        (b.spread > 0 ? (b.spread * Math.PI) / 180 : BARRAGE_SPREAD);
       const shot: PendingShot = {
         at: w.t + i * gap,
         owner: a.id,
@@ -253,6 +258,44 @@ export function tickShots(w: World): void {
     );
   }
   w.shots.length = j;
+}
+
+/** A projectile that has gone far enough changes form: faster, through everything, with a far better chance to crit. */
+export function changeForm(pr: Projectile): void {
+  const f = pr.profile.skill.form;
+  if (!f || pr.formed) return;
+  pr.formed = true;
+  pr.vx *= f.speed;
+  pr.vy *= f.speed;
+  pr.maxRange = Math.max(pr.maxRange, pr.travelled + (pr.maxRange - pr.travelled) * f.speed);
+  pr.pierceLeft = 999;
+  pr.profile = formedProfile(pr.profile);
+}
+
+/** A skill that releases what a Venom Gyre caught sends it outward in a spiral, none of it returning. */
+export function releaseCaught(w: World, a: Actor): void {
+  const c = w.caught;
+  if (!c) return;
+  w.caught = null;
+  const b = c.profile.skill.behaviour;
+  if (b.kind !== 'projectile') return;
+  const profile: SkillProfile = {
+    ...c.profile,
+    skill: { ...c.profile.skill, behaviour: { ...b, returns: false } },
+  };
+  for (let i = 0; i < c.n; i++)
+    w.shots.push({
+      at: w.t + i * 0.04,
+      owner: a.id,
+      profile,
+      hand: c.hand,
+      x: a.x,
+      y: a.y,
+      angle: a.facing + (i * 2 * Math.PI) / Math.max(1, c.n) + i * 0.25,
+      aimId: 0,
+      hitIds: [],
+      dtype: 0,
+    });
 }
 
 function enemiesOfOwner(w: World, owner: Actor): Actor[] {

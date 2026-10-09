@@ -464,16 +464,16 @@
       "ref": "Lightning Warp",
       "name": "Bolt Step",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S8",
-      "missing": ["damage_on_blink", "delayed_teleport", "queued_casts"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Delayed teleport that deals lightning damage at both origin and destination; warps can be queued.",
         "bob": "Plain blink (distance 9, cd 3, cast 0.8). No delay mechanic, no area damage at either end, no queueing.",
         "repair": "Blink with a lightning area hit at both endpoints (the delay already roughly exists as cast time)."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Lightning Warp",
         "status": "corrected",
@@ -997,21 +997,16 @@
       "ref": "Flame Dash",
       "name": "Cinder Step",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S8",
-      "missing": [
-        "damage_on_blink",
-        "ground_effect",
-        "blink_cooldown_sharing",
-        "blink_stored_uses"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Blink that damages enemies on the way and leaves burning ground; shares cooldown with other blinks.",
         "bob": "Identical to Quick Step: blink distance 8, cd 3. applyUtility blink code has no damage and no ground effect; fire tags and cast time 0.7 are cosmetic.",
         "repair": "Let blink skills deal a spell hit at start/end point and drop a burning ground zone using the existing 'ground' zones."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Flame Dash",
         "status": "corrected",
@@ -1097,16 +1092,16 @@
       "ref": "Point Blank Support",
       "name": "Close Quarters",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S8",
-      "missing": ["distance_scaled_damage"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Projectiles deal more damage close up and less far away.",
         "bob": "More projectile damage against nearby enemies only; no far-range penalty, so no trade. The engine has a closeQuarters flag and distanceMult (1.5 down to 0.5), unused by the gem.",
         "repair": "Grant the closeQuarters flag so the distance curve applies."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Point Blank Support",
         "status": "corrected",
@@ -2136,16 +2131,16 @@
       "ref": "Ice Spear",
       "name": "Frost Lance",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S8",
-      "missing": ["projectile_form_change", "distance_scaled_crit", "extra_projectile"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Two spears that change into a much faster piercing second form with a huge critical-strike chance and multiplier boost; the crit-based second form is why crit casters use it.",
         "bob": "A single piercing cold projectile (pierce 99, one projectile) whose damage falls to 50% with distance (behaviour.falloff 0.5, applied in distanceMult), the opposite of Ice Spear's gain in the second form. No form change, no crit boost, no second spear.",
         "repair": "Add a behaviour field for a second form (after N tiles the projectile gains crit chance/multiplier and speed) instead of the falloff, and a second spear."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Ice Spear",
         "status": "confirmed",
@@ -4206,16 +4201,16 @@
       "ref": "Frostblink",
       "name": "Rime Step",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S8",
-      "missing": ["damage_on_blink", "ground_effect", "cooldown_recovery_from_nearby_enemies"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Blink dealing cold damage with chilled ground at the origin; cooldown recovers faster per nearby enemy (a pack-fighting blink).",
         "bob": "Plain blink (distance 9, cd 3.5, longer than PoE's 3). No damage, chill ground, or cooldown recovery from nearby enemies.",
         "repair": "Add blink damage/chill zone plus a cooldown reduction per nearby enemy to the blink utility."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Frostblink",
         "status": "confirmed",
@@ -4287,21 +4282,16 @@
       "ref": "Withering Step",
       "name": "Rotting Stride",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S8",
-      "missing": [
-        "elusive_defensive_buff",
-        "stacking_debuff_on_enemy",
-        "phasing",
-        "buff_ends_on_skill_use"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Grants Elusive (strong defence) and Phasing; enemies that come near are Withered; ends when you use a skill; blink cooldown.",
         "bob": "Upkeep buff (4 s, cd 5): moveSpeed inc 20 and chaos penetration 10..24 as a Wither stand-in. No Elusive, no wither stacks on enemies, no phasing, no end-on-skill.",
         "repair": "Add an Elusive-style evade/damage-reduction buff and a proximity wither (stacking chaos damage taken) aura."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Withering Step",
         "status": "confirmed",
@@ -4635,16 +4625,16 @@
       "ref": "Blink Arrow",
       "name": "Shadow Quiver",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S8",
-      "missing": ["teleport_to_target"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Fire an arrow, teleport to where it lands and leave a clone at your old spot for a few seconds; mobility plus a decoy/damage clone on a 3 s cooldown.",
         "bob": "Summons a stationary shadow archer clone for 3 s beside you; the player never teleports (no travel or blink in the definition), though the clone is kept.",
         "repair": "Add the blink utility alongside the summon so the player moves to the target while the clone stays behind."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Blink Arrow",
         "status": "confirmed",
@@ -5711,16 +5701,16 @@
       "ref": "Charged Dash",
       "name": "Storm Rush",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S8",
-      "missing": ["channel_ramp", "damage_waves_along_path"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Channel an illusion you steer, waves of lightning damage pulse along its path, then you teleport to it for a final wave.",
         "bob": "Attack with travel 8, half lightning conversion and a burst r2.2 with a flat +120% more damage standing in for stages. A dash plus lightning burst; no channel, no waves along the path.",
         "repair": "Fire several lightning pulses along the travel line and one at arrival, scaling with distance."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Charged Dash",
         "status": "corrected",
@@ -6106,16 +6096,16 @@
       "ref": "Venom Gyre",
       "name": "Toxin Circle",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "low",
-      "milestone": "S8",
-      "missing": ["catch_returning_projectile", "release_stored_projectiles_on_movement_skill"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A returning chaos projectile that can be caught; caught projectiles are released into a spiral when you use Whirling Blades, so it is a poison skill combined with a movement skill.",
         "bob": "A returning poison blade with 50% chaos and 100% poison chance (the engine reads both); no catching and no release by a movement skill, so it is a spinning poison boomerang.",
         "repair": "Store projectiles that come back to the owner and release them as a spiral when the character uses a blink or movement skill."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Venom Gyre",
         "status": "confirmed",

@@ -1,6 +1,6 @@
 import type { SkillProfile } from '../calc/skill';
 import { fireEffect } from './actions';
-import { orbUse, releaseZaps } from './fields';
+import { orbUse, releaseGhost, releaseZaps } from './fields';
 import { scaleProfile } from './shots';
 import type { Action, Actor, World } from './types';
 
@@ -53,6 +53,7 @@ export function releaseChannel(w: World, a: Actor): void {
   w.channel = null;
   const spec = st.profile.skill.channel;
   if (st.profile.skill.orb?.kind === 'zap') releaseZaps(w, st.profile.skill.id);
+  if (st.profile.skill.orb?.kind === 'illusion') releaseGhost(w, st.profile.skill.id, false);
   if (!spec?.release || st.stage <= 0) return;
   const r = spec.release;
   const f = Math.max(0, 1 + (r.base ?? 0) / 100 + (r.perStage * st.stage) / 100);
@@ -114,8 +115,9 @@ export function channelUse(w: World, a: Actor, act: Action): void {
   }
   st.stage = Math.min(spec.cap, st.stage + gain);
   if (p.skill.orb) orbUse(w, a, act, st.stage);
-  // An orb keeps being fed at the cap; the others are let go.
-  else if (st.stage >= spec.cap) releaseChannel(w, a);
+  // An orb keeps being fed at the cap; the others (and an illusion at its last stage) are let go.
+  if ((!p.skill.orb || p.skill.orb.kind === 'illusion') && st.stage >= spec.cap)
+    releaseChannel(w, a);
 }
 
 export type StackState = { key: string; n: number; lastHit: number; fadeT: number };
@@ -157,6 +159,7 @@ export function tickChannel(w: World): void {
   if (p.stunT > 0 || p.ail.freezeT > 0) {
     // Stunned or frozen, the stages are lost, and the orbs of a storm are let go.
     if (st.profile.skill.orb?.kind === 'zap') releaseZaps(w, st.profile.skill.id);
+    if (st.profile.skill.orb?.kind === 'illusion') releaseGhost(w, st.profile.skill.id, true);
     w.channel = null;
     return;
   }

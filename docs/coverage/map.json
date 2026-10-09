@@ -738,7 +738,7 @@
   "toxinCircle": {
    "ref": "Venom Gyre",
    "status": "covered",
-   "note": "A spinning projectile that poisons and returns, hitting on both legs."
+   "note": "A poisonous blade that pierces everything and returns, dealing a quarter as much on the way back; the character catches each one that returns (thirty at most, for twelve seconds), and Whirling Blades sends what was caught outward in a spiral."
   },
   "guardedStrike": {
    "ref": "Vigilant Strike",
@@ -823,7 +823,7 @@
   "closeQuarters": {
    "ref": "Point Blank Support",
    "status": "covered",
-   "note": "More projectile damage (the keystone range effect is dropped)."
+   "note": "Projectile attack hits count as having Point Blank: up to 30% more damage when the target is close to the shooter, less as the projectile travels farther (half at the end of its range), and projectile damage is higher at every range."
   },
   "glimpseOfCrit": {
    "ref": "Power Charge On Critical Support",
@@ -1008,17 +1008,17 @@
   "cinderStep": {
    "ref": "Flame Dash",
    "status": "covered",
-   "note": "A blink toward the target (the burning ground left behind is dropped)."
+   "note": "A blink toward the target: the enemies where it lands are burned, and the ground it crossed burns for four seconds. Three uses are stored, and it shares its cooldown with the other blink skills."
   },
   "rimeStep": {
    "ref": "Frostblink",
    "status": "covered",
-   "note": "A blink toward the target (the chilling ground and the cooldown recovery from nearby enemies are dropped)."
+   "note": "A blink toward the target: the enemies where it left are hurt and the ground there is chilled for three seconds. Its cooldown recovers faster for each enemy near the character, a little for a normal one and a lot for a rare one; it shares the cooldown of the other blink skills."
   },
   "boltStep": {
    "ref": "Lightning Warp",
    "status": "covered",
-   "note": "A warp toward the target (the shocking markers it leaves are dropped)."
+   "note": "A warp toward the target that takes as long as the run would have, a little less; lightning bursts around the place left and around the place reached. The character can act while it waits."
   },
   "shadowSwap": {
    "ref": "Bodyswap",
@@ -1033,7 +1033,7 @@
   "rotStride": {
    "ref": "Withering Step",
    "status": "covered",
-   "note": "A buff of movement speed that leaves the enemies near open to chaos (the withered stacks are folded into chaos penetration; the dash is dropped)."
+   "note": "A blink toward the target that grants Elusive (renewed in full) and withers the enemies that come near: the first time each does, four stacks at the first level and six at the last, for three seconds. Using any skill ends it. Its cooldown does not run while the buff lasts; it shares the cooldown of the other blink skills."
   },
   "skyfallLeap": {
    "ref": "Leap Slam",
@@ -1063,7 +1063,7 @@
   "stormRush": {
    "ref": "Charged Dash",
    "status": "covered",
-   "note": "A dash through the target that ends in a lightning burst (the stages while channelling are averaged)."
+   "note": "Channelled: an illusion runs ahead toward the target (faster than you), with a wave of lightning along its path for every two stages built, harder once it has stopped. Let go, and you join it, with a last wave that deals three quarters of the damage for each stage."
   },
   "blessedTrail": {
    "ref": "Consecrated Path",
@@ -1573,7 +1573,7 @@
   "shadowQuiver": {
    "ref": "Blink Arrow",
    "status": "covered",
-   "note": "Fires an arrow that leaves a shadow archer for three seconds."
+   "note": "Fires an arrow at the target place; when it lands the character is carried to it and a shadow archer is left where the character stood, for three seconds. It has a cooldown of three seconds and shares it with the other blink skills."
   },
   "mirrorQuiver": {
    "ref": "Mirror Arrow",

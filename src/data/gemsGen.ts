@@ -2687,10 +2687,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       spread: 0,
       range: 7,
       returns: true,
+      pierce: 99,
     },
-    baseMult: [60, 90],
-    cost: [6, 8],
+    baseMult: [90, 115],
+    cost: [5, 7],
     requiresWeapon: ['dagger', 'claw', 'sword'],
+    catches: 30,
+    returnMore: -75,
     mods: [
       {
         stat: 'convertSkill.physical.chaos',
@@ -2700,10 +2703,15 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'chance.poison',
         kind: 'base',
-        value: 100,
+        value: 40,
+      },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: 20,
       },
     ],
-    description: 'A spinning blade that poisons and comes back.',
+    description: 'A spinning blade that poisons, comes back, and is caught.',
   },
   {
     kind: 'active',
@@ -3639,22 +3647,52 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Cinder Step',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'movement', 'fire'],
+    tags: ['spell', 'movement', 'fire', 'area', 'duration'],
     types: ['triggerable'],
     behaviour: {
       kind: 'burst',
-      radius: 1,
+      radius: 1.5,
       origin: 'self',
     },
+    dot: {
+      type: 'fire',
+      dps: [18.9, 1262.7],
+      seconds: 0.5,
+      stack: 'refresh',
+      ground: true,
+      scales: ['spell'],
+    },
+    spellDamage: [
+      {
+        type: 'fire',
+        spread: [0.8, 1.2],
+      },
+    ],
+    effectiveness: 100,
     castTime: 0.7,
+    crit: 6,
     cost: [8, 23],
-    mods: [],
+    cooldown: 3,
+    cooldownUses: 3,
+    mods: [
+      {
+        stat: 'cooldownRecovery',
+        kind: 'inc',
+        value: [0, 76],
+      },
+    ],
     utility: {
       kind: 'blink',
-      distance: 8,
-      cooldown: 3,
+      distance: 9.5,
+      cooldown: 0.3,
+      burst: 'arrive',
+      trail: {
+        seconds: 4,
+        radius: 0.9,
+      },
     },
-    description: 'Vanish in a flash of fire and land close to your target.',
+    description:
+      'Vanish in a flash of fire, burning the ground behind you and the enemies where you land.',
   },
   {
     kind: 'active',
@@ -3662,22 +3700,48 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Rime Step',
     attr: 'dex',
     skillType: 'spell',
-    tags: ['spell', 'movement', 'cold'],
+    tags: ['spell', 'movement', 'cold', 'area', 'duration'],
     types: ['triggerable'],
     behaviour: {
       kind: 'burst',
-      radius: 1,
+      radius: 2,
       origin: 'self',
     },
-    castTime: 0.4,
-    cost: [8, 20],
-    mods: [],
+    spellDamage: [
+      {
+        type: 'cold',
+        spread: [0.8, 1.2],
+      },
+    ],
+    effectiveness: 140,
+    castTime: 0.15,
+    crit: 5,
+    cost: [12, 22],
+    cooldown: 3,
+    recoverNear: {
+      normal: [15, 19],
+      rare: [80, 99],
+      radius: 4,
+    },
+    mods: [
+      {
+        stat: 'cooldownRecovery',
+        kind: 'inc',
+        value: [0, 15],
+      },
+    ],
     utility: {
       kind: 'blink',
-      distance: 9,
-      cooldown: 3.5,
+      distance: 8,
+      cooldown: 0.3,
+      burst: 'depart',
+      chill: {
+        seconds: 3,
+        radius: 2,
+      },
     },
-    description: 'Step through the frost and land close to your target.',
+    description:
+      'Step through the frost: the cold bursts where you left and chills the ground there.',
   },
   {
     kind: 'active',
@@ -3685,22 +3749,34 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Bolt Step',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'movement', 'lightning'],
+    tags: ['spell', 'movement', 'lightning', 'area'],
     types: ['triggerable'],
     behaviour: {
       kind: 'burst',
-      radius: 1,
+      radius: 1.7,
       origin: 'self',
     },
+    spellDamage: [
+      {
+        type: 'lightning',
+        spread: [0.8, 1.2],
+      },
+    ],
+    effectiveness: 60,
     castTime: 0.8,
+    crit: 5,
     cost: [9, 26],
     mods: [],
     utility: {
       kind: 'blink',
       distance: 9,
-      cooldown: 3,
+      cooldown: 0.5,
+      warp: {
+        lessDuration: [20, 39],
+      },
     },
-    description: 'Become lightning and arrive next to your target.',
+    description:
+      'Become lightning and arrive next to your target after the time the run would take.',
   },
   {
     kind: 'active',
@@ -3777,30 +3853,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       radius: 1,
       origin: 'self',
     },
-    castTime: 0.2,
-    cost: [6, 14],
+    castTime: 0.1,
+    cost: [8, 23],
     mods: [],
+    cooldown: 3,
+    pausedBy: 'elusive',
     utility: {
-      kind: 'buff',
-      buff: 'witherStep',
-      seconds: 4,
-      policy: 'upkeep',
-      cooldown: 5,
-      mods: [
-        {
-          stat: 'moveSpeed',
-          kind: 'inc',
-          value: 20,
-        },
-        {
-          stat: 'penetration',
-          kind: 'base',
-          value: [10, 24],
-          damageTypes: ['chaos'],
-        },
-      ],
+      kind: 'blink',
+      distance: 8,
+      cooldown: 0.3,
+      elusive: {
+        stacks: [4, 6],
+        seconds: 3,
+        radius: [3, 3],
+      },
     },
-    description: 'A stride that rots the ground you cross and leaves enemies open to chaos.',
+    description:
+      'A stride that leaves you elusive and withers the enemies that close in, until you do something else.',
   },
   {
     kind: 'active',
@@ -3866,6 +3935,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     tags: ['attack', 'melee', 'movement', 'area'],
     types: ['repeatable'],
     travel: 7,
+    releasesCaught: true,
     behaviour: {
       kind: 'melee',
       range: 1.4,
@@ -3967,17 +4037,29 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Storm Rush',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'melee', 'movement', 'area', 'lightning'],
+    tags: ['attack', 'melee', 'movement', 'area', 'lightning', 'channelling'],
     types: ['repeatable'],
-    travel: 8,
     behaviour: {
       kind: 'burst',
       radius: 2.2,
-      reach: 2.2,
+      reach: 8,
     },
     baseMult: [95, 110],
     cost: [4, 4],
     requiresWeapon: ['sword', 'axe', 'mace', 'staff', 'dagger', 'claw'],
+    channel: {
+      cap: 10,
+      tick: false,
+    },
+    orb: {
+      kind: 'illusion',
+      speed: 1.3,
+      distance: 8,
+      radius: 2,
+      waveStages: 2,
+      finalPerStage: 75,
+      stillMore: 150,
+    },
     mods: [
       {
         stat: 'convertSkill.physical.lightning',
@@ -3985,12 +4067,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         value: 50,
       },
       {
-        stat: 'damage',
+        stat: 'attackSpeed',
         kind: 'more',
-        value: 120,
+        value: 60,
       },
     ],
-    description: 'Rush to the target and burst in lightning.',
+    description: 'Send an illusion rushing ahead in a trail of lightning, then join it.',
   },
   {
     kind: 'active',
@@ -5456,13 +5538,20 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     castTime: 1,
     cost: [14, 20],
     mods: [],
+    cooldown: 3,
     utility: {
-      kind: 'summon',
-      minion: 'clone',
-      count: 1,
-      seconds: 3,
+      kind: 'blink',
+      distance: 9,
+      cooldown: 0.3,
+      warp: {
+        speed: 1,
+      },
+      clone: {
+        minion: 'clone',
+        seconds: 3,
+      },
     },
-    description: 'Leaves a shadow archer that fires beside you.',
+    description: 'Fire an arrow and follow it, leaving a shadow archer where you stood.',
   },
   {
     kind: 'active',
@@ -6638,16 +6727,19 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.2,
     mods: [
       {
+        stat: 'closeQuarters',
+        kind: 'flag',
+        value: 1,
+      },
+      {
         stat: 'damage',
-        kind: 'more',
-        value: [20, 38],
+        kind: 'inc',
+        value: [0, 38],
         tags: ['projectile'],
-        condition: {
-          id: 'targetNearby',
-        },
       },
     ],
-    description: 'More projectile damage against nearby enemies.',
+    description:
+      'Projectile attacks hit hardest up close and weaker as they fly; projectile damage is higher at all ranges.',
   },
   {
     kind: 'support',

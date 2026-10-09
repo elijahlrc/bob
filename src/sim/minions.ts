@@ -99,6 +99,46 @@ export function summonMinions(w: World, c: SkillChoice, prof: SkillProfile): voi
   }
 }
 
+/** One minion put down at a spot (the clone a Blink Arrow leaves where the character stood). */
+export function summonAt(
+  w: World,
+  c: SkillChoice,
+  prof: SkillProfile,
+  kind: MinionId,
+  seconds: number,
+  x: number,
+  y: number,
+): void {
+  const def = MINIONS[kind];
+  const body = minionBody(
+    kind,
+    w.plan.areaLevel,
+    prof.minionLife,
+    prof.minionTaken,
+    prof.minionRegen,
+    prof.minionPhysReduction,
+    prof.minionBlock,
+  );
+  const spot = w.grid.collide(x, y, def.r);
+  const m = newActor(w.nextId++, false, spot.x, spot.y, def.r) as Minion;
+  m.faction = 0;
+  m.def = body.def;
+  m.life = body.life;
+  m.name = def.name;
+  m.rarity = 'normal';
+  m.noReward = true;
+  m.state = 'chase';
+  m.key = c.key;
+  m.kind = kind;
+  m.t = seconds * prof.skillDuration;
+  m.atkT = 0;
+  m.level = c.skill.level;
+  m.dmg = prof.minionDamage;
+  m.speed = prof.minionSpeed;
+  w.minions.push(m);
+  w.events.push({ t: 'summon', id: m.id });
+}
+
 function step(w: World, m: Minion, tx: number, ty: number, dt: number, speed: number): void {
   const d = Math.hypot(tx - m.x, ty - m.y);
   if (d < 1e-6 || speed <= 0) return;

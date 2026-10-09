@@ -116,7 +116,7 @@ import {
 } from './items';
 import { referenceMonster } from './monster';
 import { LEGACY, statLevel, type Difficulty } from '../data/difficulty';
-import { buildProfile, type HandStats, type SkillProfile } from './skill';
+import { buildProfile, formedProfile, type HandStats, type SkillProfile } from './skill';
 
 export type CalcConfig = {
   /** Conditions assumed true (calc engine toggles). */
@@ -1250,7 +1250,12 @@ export class Character {
     /** The share of the character's time the skill has: secondary casts take the rest. */
     timeShare = 1,
   ): SkillSheet {
-    const p = this.profile(choice, conds);
+    // A projectile that changes form with distance has changed by the time it reaches a target that far (Frost Lance).
+    const p0 = this.profile(choice, conds);
+    const p =
+      p0.skill.form && (this.config.targetDistance ?? 3) > p0.skill.form.after
+        ? formedProfile(p0)
+        : p0;
     const hexed = this.hexTarget();
     const t: TargetState = target ?? {
       def: referenceMonster(this.config.areaLevel, this.config.difficulty).defence,
@@ -1725,6 +1730,15 @@ export function channelMult(p: SkillProfile): number {
       o.interval
     );
   if (o?.kind === 'zap') return Math.max(1, Math.floor(o.seconds / o.jump + 1e-6));
+  // An illusion's waves grow with the stages (the later ones come once it has stopped), and the last wave joins them.
+  if (o?.kind === 'illusion') {
+    let total = (o.finalPerStage * c.cap) / 100;
+    const waves = Math.floor(c.cap / o.waveStages);
+    for (let i = 1; i <= waves; i++)
+      total +=
+        ((o.finalPerStage * i * o.waveStages) / 100) * (i > waves / 2 ? 1 + o.stillMore / 100 : 1);
+    return total / c.cap;
+  }
   let total = 0;
   const per = (c.perStage ?? 0) / 100;
   if (c.tick)

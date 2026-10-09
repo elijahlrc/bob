@@ -50,10 +50,11 @@
       { "stat": "convertSkill.physical.lightning", "kind": "base", "value": 50 },
       { "stat": "gain.physical.lightning", "kind": "base", "value": [10, 29] } ],
       "description": "Half of the physical damage becomes lightning, and some more is gained as lightning." } },
-  { "ref": "Point Blank Support", "note": "More projectile damage (the keystone range effect is dropped).",
+  { "ref": "Point Blank Support", "note": "Projectile attack hits count as having Point Blank: up to 30% more damage when the target is close to the shooter, less as the projectile travels farther (half at the end of its range), and projectile damage is higher at every range.",
     "def": { "kind": "support", "id": "closeQuarters", "name": "Close Quarters", "attr": "dex", "supports": ["projectile"], "needs": ["attack"], "costMult": 1.2, "mods": [
-      { "stat": "damage", "kind": "more", "value": [20, 38], "tags": ["projectile"], "condition": { "id": "targetNearby" } } ],
-      "description": "More projectile damage against nearby enemies." } },
+      { "stat": "closeQuarters", "kind": "flag", "value": 1 },
+      { "stat": "damage", "kind": "inc", "value": [0, 38], "tags": ["projectile"] } ],
+      "description": "Projectile attacks hit hardest up close and weaker as they fly; projectile damage is higher at all ranges." } },
   { "ref": "Power Charge On Critical Support", "note": "Critical strikes may grant an Insight charge, and the skill deals more damage for each charge held.",
     "def": { "kind": "support", "id": "glimpseOfCrit", "name": "Insightful Crit", "attr": "int", "supports": [], "costMult": 1.1, "mods": [
       { "stat": "chargeOn.crit.insight", "kind": "base", "value": [35, 54] },

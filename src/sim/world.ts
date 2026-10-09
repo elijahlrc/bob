@@ -22,6 +22,7 @@ import { rollGains, tickBuffs } from './buffs';
 import { tickCooldowns } from './cooldowns';
 import { tickChannel } from './channel';
 import { tickBanner } from './banners';
+import { tickCaught, tickWarp, tickWither } from './blinks';
 import { tickProliferation } from './proliferate';
 import { tickFields } from './fields';
 import { reservedMana } from './reserve';
@@ -137,6 +138,9 @@ export function createWorld(inp: CreateWorldInput): World {
     shots: [],
     fields: [],
     banner: null,
+    warp: null,
+    wither: null,
+    caught: null,
     channel: null,
     stacks: null,
     hitsLanded: 0,
@@ -531,6 +535,9 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickChannel(w);
   tickFields(w, dt);
   tickBanner(w, dt);
+  tickWarp(w, dt);
+  tickWither(w);
+  tickCaught(w, dt);
   tickProliferation(w, dt);
   updateProjectiles(w, dt);
   tickZones(w, dt);

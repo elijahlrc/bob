@@ -95,7 +95,7 @@ describe('keystones (§9.4) — every one has an effect', () => {
   it('Close Quarters: more damage up close, less far away', () => {
     const c = both('strider', 'closeQuarters').with;
     const p = c.profile(c.primary);
-    expect(distanceMult(p, 1)).toBeCloseTo(1.5);
+    expect(distanceMult(p, 1)).toBeCloseTo(1.3);
     expect(distanceMult(p, 8)).toBeCloseTo(0.5);
   });
 

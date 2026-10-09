@@ -33,7 +33,8 @@ export type BuffId =
   | 'avianBoon'
   | 'flickerStep'
   | 'punisher'
-  | 'adrenaline';
+  | 'adrenaline'
+  | 'elusive';
 export const BUFF_IDS: BuffId[] = [
   'fortify',
   'onslaught',
@@ -62,6 +63,7 @@ export const BUFF_IDS: BuffId[] = [
   'flickerStep',
   'punisher',
   'adrenaline',
+  'elusive',
 ];
 
 export type BuffDef = {
@@ -81,6 +83,18 @@ export type BuffDef = {
 const when = (cond: CondId): { condition: { id: CondId } } => ({ condition: { id: cond } });
 
 export const BUFFS: Record<BuffId, BuffDef> = {
+  elusive: {
+    id: 'elusive',
+    name: 'Elusive',
+    seconds: 5,
+    cond: 'elusive',
+    text: 'Elusive: 40% increased movement speed and 20% chance to dodge hits, fading to nothing over five seconds (here, half of that all the way)',
+    mods: [
+      mod('moveSpeed', 'inc', 20, when('elusive')),
+      mod('dodgeAttack', 'base', 10, when('elusive')),
+      mod('dodgeSpell', 'base', 10, when('elusive')),
+    ],
+  },
   adrenaline: {
     id: 'adrenaline',
     name: 'Adrenaline',

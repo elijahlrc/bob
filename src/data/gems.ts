@@ -148,7 +148,22 @@ export type UtilityDef =
       mods: GemMod[];
     }
   | { kind: 'curse'; hex: HexId; radius: number }
-  | { kind: 'blink'; distance: number; cooldown: number }
+  | {
+      kind: 'blink';
+      distance: number;
+      cooldown: number;
+      /** The skill's damage lands in a burst around the point left or the point reached. */
+      burst?: 'depart' | 'arrive';
+      /** Burning ground along the way across (it afflicts with the skill's damage over time), and chilling ground where it left. */
+      trail?: { seconds: number; radius: number };
+      chill?: { seconds: number; radius: number };
+      /** The teleport comes after a delay: the time the run would take (less by a percent), or an arrow's flight (times the usual arrow speed); bursts at both ends. */
+      warp?: { lessDuration: LevelValue } | { speed: number };
+      /** Elusive for the character, and the enemies that come within the radius are withered (stacks, seconds) until it does something else. */
+      elusive?: { stacks: LevelValue; seconds: number; radius: LevelValue };
+      /** A clone is left where the character stood. */
+      clone?: { minion: MinionId; seconds: number };
+    }
   /** A shout that puts statuses on the enemies around the character (a hinder that grows with the crowd, a death blast). */
   | {
       kind: 'shout';
@@ -258,6 +273,17 @@ export type ActiveGemDef = {
   dot?: DotSpec;
   /** An arrow that ignites also inflicts a burning debuff worth a share of the ignite's damage, up to `cap` at once. */
   burning?: { pct: LevelValue; seconds: number; cap: number };
+  /** A projectile that changes form after flying a way: faster, piercing, critical (Frost Lance). */
+  form?: { after: number; speed: number; critMore: number; critMulti: LevelValue };
+  /** A skill whose cooldown recovers faster for the enemies near the character (Frostblink). */
+  recoverNear?: { normal: LevelValue; rare: LevelValue; radius: number };
+  /** The skill's cooldown does not run while this buff lasts. */
+  pausedBy?: BuffId;
+  /** The percent more damage a returning projectile deals on the way back. */
+  returnMore?: number;
+  /** A returning projectile that the character catches on its way back, this many at most (Venom Gyre); a skill that releases what was caught. */
+  catches?: number;
+  releasesCaught?: boolean;
   /** Orbs a channelled skill leaves standing (docs/SPIRIT.md S6). */
   orb?:
     | {
@@ -274,6 +300,18 @@ export type ActiveGemDef = {
         count: number;
         radius: number;
         range: number;
+      }
+    | {
+        /** An illusion that runs ahead while channelling (waves of damage along its path) and the character joins it at the end (Charged Dash). */
+        kind: 'illusion';
+        /** Times the character's movement speed, and the most tiles it runs. */
+        speed: number;
+        distance: number;
+        radius: number;
+        /** A wave for each so many stages; the final wave deals this percent more for each stage; waves deal this percent more once the illusion has stopped. */
+        waveStages: number;
+        finalPerStage: number;
+        stillMore: number;
       }
     | {
         /** An orb for each use that jumps about the target place, exploding after each jump; when the channel ends the rest explode, harder. */
@@ -485,14 +523,16 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
     attr: 'int',
     skillType: 'spell',
     tags: ['spell', 'projectile', 'cold'],
-    behaviour: { kind: 'projectile', count: 1, spread: 0, pierce: 99, range: 9, falloff: 0.5 },
-    spellDamage: [{ type: 'cold', min: [7, 480], max: [11, 720] }],
-    effectiveness: 130,
-    castTime: 0.65,
-    crit: 6,
-    cost: [3, 20],
-    mods: [],
-    description: 'A piercing shard of ice that weakens with distance.',
+    behaviour: { kind: 'projectile', count: 2, spread: 6, range: 9 },
+    form: { after: 3, speed: 4, critMore: 600, critMulti: [30, 49] },
+    spellDamage: [{ type: 'cold', spread: [0.8, 1.2] }],
+    effectiveness: 80,
+    castTime: 0.7,
+    crit: 7,
+    cost: [8, 23],
+    mods: [{ stat: 'projectilesSequential', kind: 'flag', value: 1 }],
+    description:
+      'Two spears of ice in a row, slow at first and then, far from you, fast, piercing and critical.',
   },
 ];
 

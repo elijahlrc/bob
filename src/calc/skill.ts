@@ -639,12 +639,33 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
   };
 }
 
+const formedCache = new WeakMap<SkillProfile, SkillProfile>();
+/** A projectile that has changed form (Frost Lance): the same skill with its far better chance to crit and its bigger multiplier. */
+export function formedProfile(p: SkillProfile): SkillProfile {
+  const f = p.skill.form;
+  if (!f) return p;
+  let q = formedCache.get(p);
+  if (!q) {
+    const add = levelValue(f.critMulti, p.skill.level) / 100;
+    q = {
+      ...p,
+      hands: p.hands.map((h) => ({
+        ...h,
+        critChance: Math.min(1, h.critChance * (1 + f.critMore / 100)),
+        critMulti: h.critMulti + add,
+      })),
+    };
+    formedCache.set(p, q);
+  }
+  return q;
+}
+
 /** Distance-based damage multiplier for projectile skills (Close Quarters, falloff). */
 export function distanceMult(p: SkillProfile, d: number): number {
   let m = 1;
   const b = p.skill.behaviour;
   if (b.kind === 'projectile') {
-    if (p.closeQuarters && p.isAttack) m *= 1.5 - (clamp(d, 1, 8) - 1) / 7;
+    if (p.closeQuarters && p.isAttack) m *= 1.3 - (0.8 * (clamp(d, 1, 8) - 1)) / 7;
     if (b.falloff !== undefined && b.range) m *= 1 - (1 - b.falloff) * clamp(d / b.range, 0, 1);
   }
   return m;

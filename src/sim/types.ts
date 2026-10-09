@@ -15,6 +15,7 @@ import type { Fx } from './statuses';
 import type { PendingShot } from './shots';
 import type { ChannelState, StackState } from './channel';
 import type { BannerState } from './banners';
+import type { CaughtState, WarpState, WitherState } from './blinks';
 import type { Field } from './fields';
 import type { SkillDot } from './skillDots';
 import type { HexTotals } from '../data/hexes';
@@ -244,6 +245,9 @@ export type Projectile = {
   /** An arrow that lands and bursts into a ring (nova), or goes on to scatter at its end (tornado); the arrows it sends. */
   kind?: 'nova' | 'tornado';
   ring?: number;
+  /** Where it changes form (Frost Lance), and whether it has. */
+  formAt?: number;
+  formed?: boolean;
 };
 
 export type GroundEffect = {
@@ -533,6 +537,10 @@ export type World = {
   fields: Field[];
   /** The banner the character carries or has put down (src/sim/banners.ts). */
   banner: BannerState | null;
+  /** A teleport on its way, Withering Step's aura, and the projectiles a Venom Gyre has caught (src/sim/blinks.ts). */
+  warp: WarpState | null;
+  wither: WitherState | null;
+  caught: CaughtState | null;
   /** The channelled skill being held: its stages so far. */
   channel: ChannelState | null;
   /** The stages of a skill that grows with use, and how many hits the player has landed (a use that hits builds a stage). */

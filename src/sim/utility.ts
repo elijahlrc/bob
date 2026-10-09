@@ -3,6 +3,8 @@ import type { SkillProfile } from '../calc/skill';
 import { hexEffect } from '../data/hexes';
 import { actorById } from './actions';
 import { bannerAction, useBanner } from './banners';
+import { blinkCast, blinkGroupBusy } from './blinks';
+import { skillReady } from './cooldowns';
 import { levelValue } from '../calc/gems';
 import { gainBuff } from './buffs';
 import { applyStatus } from './statuses';
@@ -104,10 +106,30 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
       if (d > CAST_RANGE + 6 || minionCount(w, c.key) >= summonCount(c, prof)) continue;
       return { choice: c, prof, cd: summonRespawn(c) };
     }
-    // A blink closes the gap to a target the primary skill cannot reach yet.
+    // A blink closes the gap to a target the primary skill cannot reach yet; one with an effect where it leaves or lands is also
+    // used when that would fall on a pack, and Withering Step when a fight is on.
+    if (u.kind !== 'blink') continue;
+    if (c.skill.cooldown !== undefined && !skillReady(w, c)) continue;
+    if (blinkGroupBusy(w, c)) continue;
     const reach = skillRange(ch.profile(w.primary, conds, flaskMask(w))) + target.r;
-    if (d > reach + 2 && d <= u.distance + reach && w.grid.los(p.x, p.y, target.x, target.y))
-      return { choice: c, prof, cd: u.cooldown };
+    const gap =
+      d > reach + 2 && d <= u.distance + reach && w.grid.los(p.x, p.y, target.x, target.y);
+    const radius =
+      (prof.skill.behaviour.kind === 'burst' ? prof.skill.behaviour.radius : 2) * prof.radiusMult;
+    const packHere =
+      u.burst === 'depart' && enemiesNear(w, p.x, p.y, radius * 1.3).length >= PACK_SIZE;
+    const packThere =
+      u.burst === 'arrive' && gap && enemiesNear(w, target.x, target.y, radius * 1.3).length >= 2;
+    const fight =
+      !!u.elusive &&
+      w.buffT.elusive <= 0 &&
+      d <= CAST_RANGE &&
+      (enemiesNear(w, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE ||
+        target.rarity === 'rare' ||
+        target.rarity === 'boss' ||
+        target.rarity === 'miniboss');
+    if (u.warp && w.warp) continue;
+    if (gap || packHere || packThere || fight) return { choice: c, prof, cd: u.cooldown };
   }
   return null;
 }
@@ -196,14 +218,6 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
       applyHex(w, e, u.hex, Math.round(effect * 10) / 10, w.char.hexLimit, c.skill.level);
     return;
   }
-  // Blink: land next to the target, a little inside the primary skill's reach.
-  const d = Math.hypot(target.x - a.x, target.y - a.y);
-  const step = Math.max(0, Math.min(u.distance, d - (target.r + a.r + 1)));
-  const nx = a.x + ((target.x - a.x) / d) * step;
-  const ny = a.y + ((target.y - a.y) / d) * step;
-  const spot = w.grid.collide(nx, ny, a.r);
-  w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: false });
-  a.x = spot.x;
-  a.y = spot.y;
-  w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true });
+  // Blink: land next to the target, a little inside the primary skill's reach (src/sim/blinks.ts).
+  blinkCast(w, a, act.profile, c, target);
 }

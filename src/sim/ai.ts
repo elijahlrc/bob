@@ -319,6 +319,7 @@ export function playerAI(w: World, dt: number): void {
     // Arrows keep hitting walls (a wide fan in a narrow corridor): close in for a clearer shot.
     if (!melee && ai.repoT <= 0 && ai.blocked >= BLOCK_LIMIT && w.t - ai.blockedT <= BLOCK_WINDOW) {
       ai.repoT = REPOSITION_TIME;
+      useSkill(w, util.choice);
       ai.blocked = 0;
     }
     if (ai.repoT > 0) {

@@ -15,10 +15,13 @@ import { scaleProfile } from './shots';
 import {
   afterProjectileHit,
   afterStrike,
+  changeForm,
   coneBurst,
   fireProjectiles,
   projectileLanded,
+  releaseCaught,
 } from './shots';
+import { catchProjectile, skillUsed } from './blinks';
 import { applyUtility } from './utility';
 import type { Action, Actor, World } from './types';
 
@@ -63,6 +66,7 @@ export function startAction(
     a.revealT = 1.5;
   }
   w.events.push({ t: 'use', src: a.id, skill: p.skill.id });
+  if (a.isPlayer) skillUsed(w, p.skill.id);
   if (a.isPlayer && p.isAttack) fireTriggers(w, { on: 'attack', target, tags: p.tagMask });
   // Using a skill can grant a buff of its own (Flicker Strike's burst of speed).
   if (a.isPlayer) {
@@ -239,6 +243,8 @@ export function tickSkillZones(w: World, dt: number): void {
 
 /** Resolve an action's effect: strikes, chains or projectiles. Triggers call it with no wind-up. */
 export function fire(w: World, a: Actor, act: Action): void {
+  // Whirling Blades sends out what a Venom Gyre has caught.
+  if (a.isPlayer && act.profile.skill.releasesCaught) releaseCaught(w, a);
   fireEffect(w, a, act);
   leaveGround(w, a, act);
   // An aftershock: the ground cracks, and a moment later it erupts, harder and wider.
@@ -525,10 +531,12 @@ export function updateProjectiles(w: World, dt: number): void {
       pr.y += (pr.vy * dt) / steps;
       pr.travelled += (Math.hypot(pr.vx, pr.vy) * dt) / steps;
       const owner = actorById(w, pr.owner);
+      if (pr.formAt !== undefined && !pr.formed && pr.travelled >= pr.formAt) changeForm(pr);
       const aim = pr.aimId ? actorById(w, pr.aimId) : undefined;
       if (aim) pr.minDist = Math.min(pr.minDist, Math.hypot(aim.x - pr.x, aim.y - pr.y));
       if (!w.grid.isFloor(Math.floor(pr.x), Math.floor(pr.y))) {
-        if (owner?.isPlayer) {
+        // A shot that struck something before it reached the wall was not blocked by it.
+        if (owner?.isPlayer && pr.hitIds.length === 0) {
           w.stats.wallBlocked++;
           if (w.t - w.ai.blockedT > BLOCK_WINDOW) w.ai.blocked = 0;
           if (w.ai.blocked === 0) w.ai.blockedT = w.t;
@@ -556,6 +564,8 @@ export function updateProjectiles(w: World, dt: number): void {
           pr.maxRange = d + 1;
           pr.hitIds = [];
           pr.pierceLeft = pr.profile.pierce;
+          const rm = pr.profile.skill.returnMore;
+          if (rm) pr.profile = scaleProfile(pr.profile, 1 + rm / 100);
         } else {
           projectileLanded(w, pr, owner);
           endProjectile(w, pr, 1);
@@ -564,6 +574,8 @@ export function updateProjectiles(w: World, dt: number): void {
         }
       }
       if (pr.back && owner && Math.hypot(owner.x - pr.x, owner.y - pr.y) < 0.8) {
+        // A returning projectile that reaches its owner is caught, if the skill catches.
+        if (owner.isPlayer) catchProjectile(w, pr.profile, pr.hand);
         endProjectile(w, pr, 1);
         alive = false;
         break;
