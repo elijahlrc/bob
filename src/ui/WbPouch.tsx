@@ -134,6 +134,9 @@ export function Guide({ run, onClose }: { run: RunState; onClose: () => void }) 
             </div>
           ))}
         </div>
+        <button class="btn" onClick={onClose}>
+          Close
+        </button>
       </div>
     </div>
   );
