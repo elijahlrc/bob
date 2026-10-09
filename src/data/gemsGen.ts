@@ -338,7 +338,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     effectiveness: 140,
     castTime: 0.85,
     crit: 6,
-    cost: [7, 25],
+    cost: [11, 28],
+    cooldown: 3,
+    bypass: {
+      charge: 'fervour',
+      n: 1,
+    },
     mods: [
       {
         stat: 'effect.chill',
@@ -1999,24 +2004,40 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Anvil Drop',
     attr: 'str',
     skillType: 'attack',
-    tags: ['attack', 'melee', 'area', 'slam'],
+    tags: ['attack', 'melee', 'area'],
     types: ['repeatable'],
     behaviour: {
       kind: 'burst',
-      radius: 2.4,
-      reach: 3,
+      radius: 3,
+      origin: 'self',
     },
-    baseMult: [150, 190],
+    baseMult: [170, 255],
     cost: [8, 8],
-    requiresWeapon: ['mace', 'axe', 'staff'],
+    requiresWeapon: ['sword', 'axe', 'mace', 'staff', 'dagger', 'claw', 'sceptre'],
+    selfTrigger: {
+      on: 'hitTaken',
+      chance: 30,
+      cooldown: 1.2,
+      effect: {
+        kind: 'castSocketed',
+      },
+    },
     mods: [
       {
-        stat: 'stunDuration',
-        kind: 'inc',
-        value: 50,
+        stat: 'damage.min',
+        kind: 'base',
+        value: [8, 56],
+        damageTypes: ['physical'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: [12, 85],
+        damageTypes: ['physical'],
       },
     ],
-    description: 'A crushing blow that leaves enemies reeling.',
+    description:
+      'A counter-attack you cannot use on purpose: when you are hit, it may strike every enemy around you.',
   },
   {
     kind: 'active',
@@ -3251,15 +3272,21 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       radius: 1,
       origin: 'self',
     },
-    castTime: 0.25,
-    cost: [10, 20],
+    castTime: 0.1,
+    cost: [21, 36],
     mods: [],
     utility: {
       kind: 'buff',
       buff: 'deathless',
-      seconds: 4,
+      seconds: 1,
       policy: 'guard',
-      cooldown: 8,
+      cooldown: 3,
+      consume: {
+        charge: 'grit',
+        max: 5,
+        durationPct: 20,
+        physLess: 15,
+      },
       mods: [
         {
           stat: 'hitTaken',
@@ -3268,7 +3295,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         },
       ],
     },
-    description: 'A guard: a call that keeps you standing for a few seconds.',
+    description:
+      'A guard: a call that keeps you standing for a moment, and for longer, with much less physical damage, for each Grit charge you spend.',
   },
   {
     kind: 'active',
@@ -4630,6 +4658,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     castTime: 0.75,
     crit: 7,
     cost: [13, 25],
+    consumeCharges: {
+      min: 3,
+    },
     mods: [
       {
         stat: 'damage.min',
@@ -4690,6 +4721,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
           stat: 'charges.insight',
           div: 1,
         },
+      },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: -35,
+        tags: ['triggered'],
       },
     ],
     description: 'Lets out the charges you hold as a nova of fire, cold and lightning.',
@@ -5876,8 +5913,18 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         kind: 'base',
         value: 100,
       },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: 4,
+        per: {
+          stat: 'charges.grit',
+          div: 1,
+        },
+      },
     ],
-    description: 'Melee stuns are easier and grant a Grit charge.',
+    description:
+      'Melee stuns are easier and grant a Grit charge; each Grit charge you hold makes the skill hit harder.',
   },
   {
     kind: 'support',
@@ -6053,23 +6100,43 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [3, 40],
+        value: [8, 69],
         damageTypes: ['cold'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [5, 60],
+        value: [12, 103],
         damageTypes: ['cold'],
       },
       {
-        stat: 'chargeOn.kill.fervour',
+        stat: 'damage.min',
+        kind: 'base',
+        value: [2, 15],
+        damageTypes: ['cold'],
+        per: {
+          stat: 'charges.fervour',
+          div: 1,
+        },
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: [3, 23],
+        damageTypes: ['cold'],
+        per: {
+          stat: 'charges.fervour',
+          div: 1,
+        },
+      },
+      {
+        stat: 'chargeOn.killFrozen.fervour',
         kind: 'base',
         value: [50, 69],
       },
     ],
     description:
-      'A chance to freeze, added cold damage, and a chance to gain a Fervour charge on kills.',
+      'A chance to freeze, added cold damage that grows with your Fervour charges, and a chance to gain a Fervour charge when you kill a frozen enemy.',
   },
   {
     kind: 'support',
@@ -7207,6 +7274,11 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 0.7,
     mods: [
       {
+        stat: 'chargeOn.use.insight',
+        kind: 'base',
+        value: 100,
+      },
+      {
         stat: 'critChance',
         kind: 'inc',
         value: [6, 8],
@@ -7226,7 +7298,8 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         },
       },
     ],
-    description: 'A cheaper skill that grows stronger with Insight.',
+    description:
+      'A cheaper skill that earns Insight each time it is used and grows stronger with it.',
   },
   {
     kind: 'support',

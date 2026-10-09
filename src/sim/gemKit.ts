@@ -74,7 +74,7 @@ export function buildForActive(def: ActiveGemDef): Build {
       ? def.utility
         ? ['crushingBlow']
         : []
-      : def.utility
+      : def.utility || def.selfTrigger
         ? ['crushingBlow', def.id]
         : [def.id],
     weaponFor(def),

@@ -97,6 +97,8 @@ export type SkillDef = {
   cooldownUses?: number;
   /** Charges that can be spent to use the skill while it waits on its cooldown. */
   bypass?: { charge: 'grit' | 'fervour' | 'insight'; n: number };
+  /** The skill spends every charge held when it lands, and waits for at least `min` of them. */
+  consumeCharges?: { min: number };
   /** Spell base crit, percent. */
   crit: number;
   cost: number;
@@ -170,6 +172,7 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     cooldown: def.cooldown === undefined ? undefined : levelValue(def.cooldown, level),
     cooldownUses: def.cooldownUses,
     bypass: def.bypass,
+    consumeCharges: def.consumeCharges,
   };
 }
 

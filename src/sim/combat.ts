@@ -26,7 +26,7 @@ import { cannotBleed } from '../data/monsters';
 import { BUFFS, BUFF_IDS, DYN_SHIFT } from '../data/buffs';
 import { MONSTER_CONDS, scaleOf } from '../calc/monster';
 import { AURA_CONDS, WIELD_CONDS } from '../calc/staticConds';
-import { maskOr, type CondId } from '../mods/types';
+import { maskOr, type CondId, type Mod } from '../mods/types';
 import { rollGains } from './buffs';
 import { gainTrophy, rollCharges } from './charges';
 import { applyPlayerHexes, tickHexes } from './hexes';
@@ -255,6 +255,11 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     for (let i = 0; i < res.dmg.length; i++) res.dmg[i] *= dealt;
     res.total *= dealt;
   }
+  // Immortal Call: the endurance spent makes the physical part of a hit smaller while the guard stands.
+  if (dst.isPlayer && w.guard && w.buffT[w.guard.buff] > 0 && res.outcome !== 'block') {
+    res.total -= res.dmg[0] * (1 - w.guard.physMult);
+    res.dmg[0] *= w.guard.physMult;
+  }
   if (src.modIds.includes('hexcaller') && dst.isPlayer && res.outcome === 'hit' && src.hexCd <= 0) {
     src.hexCd = 4;
     hexPlayerAtRandom(w);
@@ -325,7 +330,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
 
   const wasAlive = dst.alive;
   if (src.isPlayer) applyPlayerHexes(w, dst);
-  if (src.isPlayer) noteCause(dst, p.tagMask, false);
+  if (src.isPlayer) noteCause(dst, p.tagMask, false, p.gains);
   applyDamage(w, dst, res.dmg);
   if (wasAlive && dst.alive) {
     payImpales(w, dst);
@@ -605,9 +610,9 @@ function dropSpot(w: World, a: Actor, pos: { x: number; y: number }): { x: numbe
  * What last hurt an actor, for kill effects: the tags of the skill whose hit it was (none for damage over time and the like),
  * and whether it was a minion. A kill trigger counts the player's kills, with the tags of the skill that made them.
  */
-const causes = new WeakMap<Actor, { tags: number; minion: boolean }>();
-function noteCause(a: Actor, tags: number, minion: boolean): void {
-  if (!a.isPlayer) causes.set(a, { tags, minion });
+const causes = new WeakMap<Actor, { tags: number; minion: boolean; gains: readonly Mod[] }>();
+function noteCause(a: Actor, tags: number, minion: boolean, gains: readonly Mod[] = []): void {
+  if (!a.isPlayer) causes.set(a, { tags, minion, gains });
 }
 
 export function killActor(w: World, a: Actor): void {
@@ -619,8 +624,11 @@ export function killActor(w: World, a: Actor): void {
   // A minion that falls is just gone (tickMinions clears it): nothing is earned, dropped or raised.
   if (!a.isPlayer && a.faction === 0) return;
   if (!a.isPlayer && !a.noReward) {
-    rollCharges(w, 'kill');
-    rollGains(w, 'kill');
+    // What the skill that made the kill gives on a kill (its own chances, and its supports').
+    const gains = causes.get(a)?.gains ?? [];
+    rollCharges(w, 'kill', gains);
+    if (a.ail.freezeT > 0) rollCharges(w, 'killFrozen', gains);
+    rollGains(w, 'kill', gains);
   }
   if (!a.isPlayer && a.rarity === 'rare') gainTrophy(w, a.modIds);
   if (a.isPlayer) {

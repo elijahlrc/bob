@@ -478,12 +478,14 @@ export type World = {
   trig: TriggerRuntime;
   /** When each secondary skill (by choice key) can next be cast (EXPANSION 5.5a). */
   secondaryReady: Record<string, number>;
-  /** When each utility skill (by choice key) can next be cast. */
-  utilityReady: Record<string, number>;
+  /** A guard that cut the physical damage taken for as long as its buff runs (spent charges made it stronger). */
+  guard: { buff: BuffId; physMult: number } | null;
   /** Skills with a cooldown of their own (by choice key): the uses held and the seconds until the next one is regained. */
   cooldowns: Record<string, { uses: number; t: number }>;
   /** Time since the burning aura last struck. */
   auraBurnT: number;
+  /** When each utility skill (by choice key) can next be cast. */
+  utilityReady: Record<string, number>;
   /** The totems, brands, traps and mines on the ground. */
   deployables: Deployable[];
   deploySeq: number;

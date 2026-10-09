@@ -109,6 +109,7 @@ export function createWorld(inp: CreateWorldInput): World {
     trophy: {},
     secondaryReady: {},
     cooldowns: {},
+    guard: null,
     utilityReady: {},
     auraBurnT: 0,
     deployables: [],
@@ -486,9 +487,9 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickHoldout(w);
   tickTriggers(w, dt);
   tickCharges(w, dt);
-  tickBuffs(w, dt);
   tickCooldowns(w, dt);
   tickAuraBurn(w, dt);
+  tickBuffs(w, dt);
   tickDeployables(w, dt);
   tickMinions(w, dt);
   tickSkillZones(w, dt);

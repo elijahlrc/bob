@@ -3,6 +3,7 @@ import type { SkillProfile } from '../calc/skill';
 import { hexEffect } from '../data/hexes';
 import { actorById } from './actions';
 import { gainBuff } from './buffs';
+import { spendCharges } from './charges';
 import { flaskMask, playerConds, rawHit } from './combat';
 import { canPay } from './cost';
 import { applyHex } from './hexes';
@@ -23,6 +24,9 @@ const PACK_SIZE = 3;
 /** A guard goes up when life falls below this share. */
 const GUARD_LIFE = 0.6;
 
+/** The key the guard skills share in `utilityReady`. */
+const GUARDS = '@guard';
+
 export type UtilityPick = { choice: SkillChoice; prof: SkillProfile; cd: number };
 
 function enemiesNear(w: World, x: number, y: number, r: number): Actor[] {
@@ -41,6 +45,8 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
   for (const c of ch.utilities) {
     if ((w.utilityReady[c.key] ?? 0) > w.t) continue;
     const u = c.skill.utility!;
+    // The guard skills wait on one another (3.9).
+    if (u.kind === 'buff' && u.policy === 'guard' && (w.utilityReady[GUARDS] ?? 0) > w.t) continue;
     const prof = ch.profile(c, conds, flaskMask(w));
     if (!canPay(w, c.costsLife, prof.cost)) continue;
     if (u.kind === 'buff') {
@@ -107,9 +113,27 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
   const u = c?.skill.utility;
   if (!c || !u) return;
   if (u.kind === 'buff') {
+    const before = w.buffT[u.buff];
     gainBuff(w, u.buff);
+    // The charges a guard spends make it last longer and take more of the physical damage away.
+    let spent = 0;
+    if (u.consume) {
+      spent = Math.min(u.consume.max, w.char.charges[u.consume.charge]);
+      if (spent > 0) spendCharges(w, u.consume.charge, spent);
+      w.guard = {
+        buff: u.buff,
+        physMult: Math.pow(1 - u.consume.physLess / 100, spent),
+      };
+    }
     // The buff's own length is the gem's: a utility buff lasts as long as its gem says.
-    w.buffT[u.buff] = Math.max(w.buffT[u.buff], u.seconds * w.char.db.mult('buffDuration'));
+    const length = u.seconds * (1 + ((u.consume?.durationPct ?? 0) / 100) * spent);
+    w.buffT[u.buff] = Math.max(before, length * w.char.db.mult('buffDuration'));
+    // A guard's cooldown does not run while it lasts, and the other guards wait out the same time.
+    if (u.policy === 'guard') {
+      const until = w.t + w.buffT[u.buff] + (u.cooldown ?? 0);
+      w.utilityReady[GUARDS] = until;
+      w.utilityReady[c.key] = until;
+    }
     return;
   }
   if (u.kind === 'summon') {

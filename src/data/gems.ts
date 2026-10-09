@@ -82,6 +82,13 @@ export type UtilityDef =
       seconds: number;
       policy: 'upkeep' | 'guard' | 'rally';
       cooldown?: number;
+      /** Spends charges when cast: up to `max` of them, each lengthening the buff and cutting the physical damage taken. */
+      consume?: {
+        charge: 'grit' | 'fervour' | 'insight';
+        max: number;
+        durationPct: number;
+        physLess: number;
+      };
       /** What the buff does while it lasts (the buff's condition is added to each). */
       mods: GemMod[];
     }
@@ -135,6 +142,10 @@ export type ActiveGemDef = {
   cooldownUses?: number;
   /** Charges that can be spent to use the skill while it waits on its cooldown. */
   bypass?: { charge: 'grit' | 'fervour' | 'insight'; n: number };
+  /** The skill cannot be used directly: this trigger casts it (a counter-attack when the character is hit). */
+  selfTrigger?: TriggerDef;
+  /** The skill spends every charge the character holds when it lands (its damage grew with them); it waits for at least `min`. */
+  consumeCharges?: { min: number };
   description: string;
 };
 

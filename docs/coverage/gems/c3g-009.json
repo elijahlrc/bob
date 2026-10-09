@@ -1,11 +1,13 @@
 [
-  { "ref": "Ice Bite Support", "note": "A chance to freeze, added cold damage that grows with Fervour charges (the charge on killing a frozen enemy is a plain chance on kill).",
+  { "ref": "Ice Bite Support", "note": "A chance to freeze, added cold damage that grows with the Fervour charges held, and a chance to gain a Fervour charge on killing a frozen enemy.",
     "def": { "kind": "support", "id": "frostFang", "name": "Frost Fang", "attr": "dex", "supports": [], "excludes": ["totem", "trap", "mine"], "costMult": 1.3, "mods": [
       { "stat": "chance.freeze", "kind": "base", "value": 15 },
-      { "stat": "damage.min", "kind": "base", "value": [3, 40], "damageTypes": ["cold"] },
-      { "stat": "damage.max", "kind": "base", "value": [5, 60], "damageTypes": ["cold"] },
-      { "stat": "chargeOn.kill.fervour", "kind": "base", "value": [50, 69] } ],
-      "description": "A chance to freeze, added cold damage, and a chance to gain a Fervour charge on kills." } },
+      { "stat": "damage.min", "kind": "base", "value": [8, 69], "damageTypes": ["cold"] },
+      { "stat": "damage.max", "kind": "base", "value": [12, 103], "damageTypes": ["cold"] },
+      { "stat": "damage.min", "kind": "base", "value": [2, 15], "damageTypes": ["cold"], "per": { "stat": "charges.fervour", "div": 1 } },
+      { "stat": "damage.max", "kind": "base", "value": [3, 23], "damageTypes": ["cold"], "per": { "stat": "charges.fervour", "div": 1 } },
+      { "stat": "chargeOn.killFrozen.fervour", "kind": "base", "value": [50, 69] } ],
+      "description": "A chance to freeze, added cold damage that grows with your Fervour charges, and a chance to gain a Fervour charge when you kill a frozen enemy." } },
   { "ref": "Impale Support", "note": "The supported attack impales, with a stronger impale and more physical damage.",
     "def": { "kind": "support", "id": "skewer", "name": "Skewer", "attr": "dex", "supports": ["attack"], "costMult": 1.3, "mods": [
       { "stat": "chance.impale", "kind": "base", "value": 40 },

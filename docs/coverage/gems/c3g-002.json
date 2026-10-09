@@ -39,8 +39,9 @@
   { "ref": "Endurance Charge on Melee Stun Support", "note": "Stunning with the supported melee skill grants a Grit charge.",
     "def": { "kind": "support", "id": "staggerResolve", "name": "Stagger Resolve", "attr": "str", "supports": ["melee"], "costMult": 1.1, "mods": [
       { "stat": "enemyStunThreshold", "kind": "base", "value": [0, 19] },
-      { "stat": "chargeOn.stun.grit", "kind": "base", "value": 100 } ],
-      "description": "Melee stuns are easier and grant a Grit charge." } },
+      { "stat": "chargeOn.stun.grit", "kind": "base", "value": 100 },
+      { "stat": "damage", "kind": "more", "value": 4, "per": { "stat": "charges.grit", "div": 1 } } ],
+      "description": "Melee stuns are easier and grant a Grit charge; each Grit charge you hold makes the skill hit harder." } },
   { "ref": "Empower Support", "note": "Raises the level of the supported skill.",
     "def": { "kind": "support", "id": "exaltedFocus", "name": "Exalted Focus", "attr": "str", "supports": [], "costMult": 1.25, "levelBonus": [0, 9], "mods": [],
       "description": "Raises the level of the supported skill." } }

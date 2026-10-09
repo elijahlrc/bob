@@ -731,6 +731,7 @@ export class Character {
       costsLife: costLifeAll,
     };
     this.buildTriggers(build);
+    this.linkSelfTriggers();
     // What supports give beyond their own skill: mods for the whole character, and triggers.
     for (const a of this.actives) {
       if (!a.usable || a.gemUid === null) continue;
@@ -965,6 +966,26 @@ export class Character {
         def,
         slot: sg.slot,
         skills,
+        tagMask: tagMask(def.tags),
+      });
+    }
+  }
+
+  /** Skills that only a trigger of their own casts (a counter-attack when hit): never the primary skill. */
+  private linkSelfTriggers(): void {
+    for (const sg of this.gems) {
+      if (sg.def.kind !== 'active' || !sg.def.selfTrigger) continue;
+      const idx = this.actives.findIndex((a) => a.gemUid === sg.gem.uid);
+      const choice = this.actives[idx];
+      if (!choice) continue;
+      const trig = choice.triggered ? choice : this.asTriggered(choice, `trig:${choice.key}`);
+      this.actives[idx] = trig;
+      const def = sg.def.selfTrigger;
+      this.triggers.push({
+        key: `${sg.slot}:self${sg.gem.uid}`,
+        def,
+        slot: sg.slot,
+        skills: [trig],
         tagMask: tagMask(def.tags),
       });
     }

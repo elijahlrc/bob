@@ -465,6 +465,7 @@ Object.assign(STAT_TEXT, {
 // Events added with the skill-scoped gains: a stun, the start of a spell.
 const MORE_EVENTS: Record<string, string> = {
   use: 'when you use this Skill',
+  killFrozen: 'when you Kill a Frozen Enemy',
   stun: 'when you Stun an Enemy',
   cast: 'when you Cast a Spell',
   meleeHit: 'on Melee Hit',

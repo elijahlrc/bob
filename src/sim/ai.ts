@@ -25,7 +25,7 @@ import { MONSTER_TYPES } from '../data/monsters';
 import { actorById, startAction } from './actions';
 import { bloaterBurst, isZone, speedMult } from './factions';
 import { flaskMask, monsterConds, playerConds } from './combat';
-import { offCooldown, useSkill } from './cooldowns';
+import { hasChargesToSpend, offCooldown, skillReady, useSkill } from './cooldowns';
 import { canPay, payCost } from './cost';
 import { deployFull } from './deploy';
 import { inTelegraph, telegraphs } from './telegraph';
@@ -168,6 +168,7 @@ function chooseSkill(w: World, target: Actor) {
   } | null = null;
   for (const c of w.char.secondaries) {
     // A skill with a cooldown of its own waits for a use (or the charges that stand in for one).
+    if (!hasChargesToSpend(w, c)) continue;
     if (c.skill.cooldown !== undefined ? !offCooldown(w, c) : (w.secondaryReady[c.key] ?? 0) > w.t)
       continue;
     const prof = w.char.profile(c, conds, flaskMask(w));
@@ -178,7 +179,7 @@ function chooseSkill(w: World, target: Actor) {
       second = { prof, costsLife: c.costsLife, key: c.key, cd, choice: c };
   }
   if (second) return { which: 'secondary' as const, ...second };
-  if (w.primary.usable && w.primary.gemUid !== null && offCooldown(w, w.primary)) {
+  if (w.primary.usable && w.primary.gemUid !== null && skillReady(w, w.primary)) {
     const prof = w.char.profile(w.primary, conds, flaskMask(w));
     // Against a target immune to everything the skill deals, fall back to the weapon.
     if (

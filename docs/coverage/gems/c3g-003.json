@@ -54,7 +54,7 @@
   { "ref": "Cold Snap", "note": "A burst of cold at the target that chills more than usual (the chilled ground is folded into the chill).",
     "def": { "kind": "active", "id": "suddenFrost", "name": "Sudden Frost", "attr": "int", "skillType": "spell", "tags": ["spell", "area", "cold", "duration"], "types": ["trappable", "totemable", "mineable", "repeatable", "triggerable", "cascadable"],
       "behaviour": { "kind": "burst", "radius": 2.2, "reach": 8 },
-      "spellDamage": [{ "type": "cold", "spread": [0.8, 1.2] }], "effectiveness": 140, "castTime": 0.85, "crit": 6, "cost": [7, 25], "mods": [{ "stat": "effect.chill", "kind": "inc", "value": [0, 19] }],
+      "spellDamage": [{ "type": "cold", "spread": [0.8, 1.2] }], "effectiveness": 140, "castTime": 0.85, "crit": 6, "cost": [11, 28], "cooldown": 3, "bypass": { "charge": "fervour", "n": 1 }, "mods": [{ "stat": "effect.chill", "kind": "inc", "value": [0, 19] }],
       "description": "A sudden burst of frost at a target place." } },
   { "ref": "Contagion", "note": "A chaos cloud that eats at everything in it (the spread on death is dropped).",
     "def": { "kind": "active", "id": "creepingPlague", "name": "Creeping Plague", "attr": "int", "skillType": "spell", "tags": ["spell", "area", "duration", "chaos", "dot"], "types": ["trappable", "totemable", "mineable", "repeatable", "triggerable", "damageOverTime"],

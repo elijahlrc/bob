@@ -3,7 +3,8 @@ import { MONSTER_TYPES } from '../data/monsters';
 import { BLOCK_WINDOW, ECHO_GAP, HIT_AT, PROJECTILE_SPEED, SHOT_ALERT } from '../data/constants';
 import type { SkillProfile } from '../calc/skill';
 import { rollGains } from './buffs';
-import { rollCharges } from './charges';
+import { CHARGE_KINDS } from '../calc/charges';
+import { rollCharges, spendCharges } from './charges';
 import { hit, monsterHitOf } from './combat';
 import { openZone, pullPlayer, registerBlast, shieldBlocks, speedMult } from './factions';
 import { fireTriggers } from './triggers';
@@ -54,7 +55,10 @@ export function startAction(
   w.events.push({ t: 'use', src: a.id, skill: p.skill.id });
   if (a.isPlayer && p.isAttack) fireTriggers(w, { on: 'attack', target, tags: p.tagMask });
   // Using a skill can grant a buff of its own (Flicker Strike's burst of speed).
-  if (a.isPlayer) rollGains(w, 'use', p.gains);
+  if (a.isPlayer) {
+    rollGains(w, 'use', p.gains);
+    rollCharges(w, 'use', p.gains);
+  }
   if (a.isPlayer && !p.isAttack) {
     fireTriggers(w, { on: 'cast', target, tags: p.tagMask });
     rollGains(w, 'cast', p.gains);
@@ -225,6 +229,16 @@ export function tickSkillZones(w: World, dt: number): void {
 
 /** Resolve an action's effect: strikes, chains or projectiles. Triggers call it with no wind-up. */
 export function fire(w: World, a: Actor, act: Action): void {
+  fireEffect(w, a, act);
+  // A skill that discharges the charges held (its damage grew with them) spends them once it has landed.
+  if (a.isPlayer && act.profile.skill.consumeCharges)
+    for (const kind of CHARGE_KINDS) {
+      const n = w.char.charges[kind];
+      if (n > 0) spendCharges(w, kind, n);
+    }
+}
+
+function fireEffect(w: World, a: Actor, act: Action): void {
   if (act.which === 'utility') {
     applyUtility(w, a, act);
     return;

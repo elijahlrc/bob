@@ -10,7 +10,7 @@ import {
 } from '../data/gems';
 import { typesAllow } from '../data/skillTypes';
 import { createDummyWorld } from './dummy';
-import { buildFor, classFor as ATTR_CLASS, weaponFor } from './gemKit';
+import { buildFor, buildForActive, classFor as ATTR_CLASS, weaponFor } from './gemKit';
 import { stepWorld } from './world';
 
 /**
@@ -25,25 +25,16 @@ describe('every active gem', () => {
   for (const def of [...ACTIVE_GEMS, ...GRANTED_GEMS]) {
     it(`${def.id}: its sheet computes and the sim uses it for ten seconds`, () => {
       const granted = GRANTED_GEMS.includes(def);
-      const classId = ATTR_CLASS(def.attr);
-      const main = weaponFor(def);
-      const b = buildFor(
-        granted
-          ? def.utility
-            ? ['crushingBlow']
-            : []
-          : def.utility
-            ? ['crushingBlow', def.id]
-            : [def.id],
-        main,
-        classId,
-        def.needsShield ? 'shield' : def.needsDualWield || def.bothWeapons ? 'dual' : 'none',
-      );
-      // An item-granted utility skill comes with a damage skill to stand beside, and a mod that grants it.
-      if (granted && def.utility)
-        b.equipment.body!.uniqueMods = [{ stat: `grantSkill.${def.id}`, kind: 'base', value: 20 }];
+      const b = buildForActive(def);
       const c = new Character(b, { areaLevel: 50 });
       const sheet = c.sheet();
+      if (def.selfTrigger) {
+        // A counter-attack: a trigger of its own casts it, and it is never the primary skill.
+        expect(c.primary.skill.id).toBe('crushingBlow');
+        expect(c.triggers.some((t) => t.skills.some((x) => x.skill.id === def.id))).toBe(true);
+        expect(finite(sheet.life)).toBe(true);
+        return;
+      }
       if (def.utility) {
         // A utility skill is cast by policy next to a damage skill: it never becomes the primary, and its effect shows up.
         expect(c.utilities.map((u) => u.skill.id)).toContain(def.id);

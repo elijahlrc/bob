@@ -33,6 +33,19 @@ export function offCooldown(w: World, c: SkillChoice): boolean {
   return c.skill.cooldown === undefined || usesHeld(w, c) > 0 || canBypass(w, c);
 }
 
+/** Whether the character holds what a charge-spending skill waits for (it is no use with nothing to spend). */
+export function hasChargesToSpend(w: World, c: SkillChoice): boolean {
+  const need = c.skill.consumeCharges;
+  if (!need) return true;
+  const held = w.char.charges;
+  return held.grit + held.fervour + held.insight >= need.min;
+}
+
+/** Whether the character can use the skill now: off cooldown, and holding what it spends. */
+export function skillReady(w: World, c: SkillChoice): boolean {
+  return offCooldown(w, c) && hasChargesToSpend(w, c);
+}
+
 /** The skill is used: take a use, or spend the charges that stand in for one. */
 export function useSkill(w: World, c: SkillChoice): void {
   if (c.skill.cooldown === undefined) return;

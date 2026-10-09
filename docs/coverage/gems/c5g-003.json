@@ -1,14 +1,15 @@
 [
-  { "ref": "Discharge", "note": "A nova around the character whose damage grows with the charges held: fire per Grit, cold per Fervour, lightning per Insight (the charges are not consumed here).",
+  { "ref": "Discharge", "note": "A nova around the character whose damage grows with the charges held: fire per Grit, cold per Fervour, lightning per Insight and the charges are spent when it lands. The character casts it once it holds at least three.",
     "def": { "kind": "active", "id": "chargeRelease", "name": "Charge Release", "attr": "int", "skillType": "spell", "tags": ["spell", "area", "fire", "cold", "lightning", "nova"], "types": ["triggerable", "repeatable"],
-      "behaviour": { "kind": "burst", "radius": 3.2, "origin": "self" }, "castTime": 0.75, "crit": 7, "cost": [13, 25],
+      "behaviour": { "kind": "burst", "radius": 3.2, "origin": "self" }, "castTime": 0.75, "crit": 7, "cost": [13, 25], "consumeCharges": { "min": 3 },
       "mods": [
         { "stat": "damage.min", "kind": "base", "value": [3, 120], "damageTypes": ["fire"], "per": { "stat": "charges.grit", "div": 1 } },
         { "stat": "damage.max", "kind": "base", "value": [5, 180], "damageTypes": ["fire"], "per": { "stat": "charges.grit", "div": 1 } },
         { "stat": "damage.min", "kind": "base", "value": [2, 100], "damageTypes": ["cold"], "per": { "stat": "charges.fervour", "div": 1 } },
         { "stat": "damage.max", "kind": "base", "value": [4, 150], "damageTypes": ["cold"], "per": { "stat": "charges.fervour", "div": 1 } },
         { "stat": "damage.min", "kind": "base", "value": [1, 20], "damageTypes": ["lightning"], "per": { "stat": "charges.insight", "div": 1 } },
-        { "stat": "damage.max", "kind": "base", "value": [8, 330], "damageTypes": ["lightning"], "per": { "stat": "charges.insight", "div": 1 } } ],
+        { "stat": "damage.max", "kind": "base", "value": [8, 330], "damageTypes": ["lightning"], "per": { "stat": "charges.insight", "div": 1 } },
+        { "stat": "damage", "kind": "more", "value": -35, "tags": ["triggered"] } ],
       "description": "Lets out the charges you hold as a nova of fire, cold and lightning." } },
   { "ref": "Siphoning Trap of Pain", "note": "A variant of the drain trap that deals chaos damage over time to the enemies near it and feeds the character.",
     "def": { "kind": "active", "id": "rotDrainTrap", "name": "Rot Drain Trap", "attr": "dex", "skillType": "spell", "tags": ["spell", "trap", "area", "chaos", "duration"], "types": ["trap"],

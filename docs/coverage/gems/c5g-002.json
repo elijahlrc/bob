@@ -40,11 +40,12 @@
       { "stat": "damage", "kind": "more", "value": [20, 39], "tags": ["ignite"] } ],
       "extraTriggers": [{ "on": "kill", "targetHas": "ignite", "chance": 100, "cooldown": 0, "effect": { "kind": "spread", "ailment": "ignite", "radius": 3 } }],
       "description": "Ignites spread from the enemies you kill." } },
-  { "ref": "Inspiration Support", "note": "The supported skill costs less mana and hits harder in critical strikes with each Insight charge held (the righteous charges are folded into Insight).",
+  { "ref": "Inspiration Support", "note": "The supported skill costs less mana, gains an Insight charge each time it is used, and hits harder in critical strikes and in elemental damage with each charge held (the reference gem's own charge type is Insight here; its reset when much mana has been spent is not modelled).",
     "def": { "kind": "support", "id": "lightheart", "name": "Lightheart", "attr": "str", "supports": [], "costMult": 0.7, "mods": [
+      { "stat": "chargeOn.use.insight", "kind": "base", "value": 100 },
       { "stat": "critChance", "kind": "inc", "value": [6, 8], "per": { "stat": "charges.insight", "div": 1 } },
       { "stat": "damage", "kind": "more", "value": [5, 7], "damageTypes": ["fire", "cold", "lightning"], "per": { "stat": "charges.insight", "div": 1 } } ],
-      "description": "A cheaper skill that grows stronger with Insight." } },
+      "description": "A cheaper skill that earns Insight each time it is used and grows stronger with it." } },
   { "ref": "Intensify Support", "note": "The supported area spell hits harder and wider, the charge-up between uses averaged into a flat bonus.",
     "def": { "kind": "support", "id": "swellingBlast", "name": "Swelling Blast", "attr": "int", "supports": ["area"], "needs": ["spell"], "excludes": ["totem", "trap", "mine", "channelling", "triggered"], "costMult": 1.4, "mods": [
       { "stat": "aoe", "kind": "inc", "value": [35, 54] }, { "stat": "damage", "kind": "more", "value": [10, 16], "tags": ["area"] } ],

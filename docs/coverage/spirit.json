@@ -32,16 +32,16 @@
       "ref": "Crushing Fist",
       "name": "Anvil Drop",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S2",
-      "missing": ["self_trigger_on_hit_taken", "skill_cooldown", "attack_unusable_if_triggerable"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "(From poedb, current version; no PoB data.) A retaliation skill: it can only be used for 2 s after you block a hit, then slams a giant fist for enormous area damage on a 4 s cooldown.",
         "bob": "A free-use mace/axe/staff slam at 150-190% with a stun duration bonus (not part of the original); the block-gated retaliation and its huge payoff are gone, so it is a generic slam spammed at will.",
         "repair": "Gate the skill on a 2 s window opened by a successful block (the sim has block events and triggers) with a cooldown, and give it the big retaliation multiplier."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Crushing Fist",
         "status": "corrected",
@@ -818,16 +818,16 @@
       "ref": "Discharge",
       "name": "Charge Release",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S2",
-      "missing": ["spend_charges_for_effect"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A nova that consumes all your charges and deals fire, cold and lightning damage per endurance, frenzy and power charge removed; the trade is spending your charge buffs for a burst.",
         "bob": "A nova with fire per Grit, cold per Fervour and lightning per Insight, but the charges are never consumed (no charge-spend path exists in src/sim/charges.ts), so it is a free charge-scaled nova that keeps the buffs.",
         "repair": "Add a consume-charges flag on cast that zeroes the held charges after the damage is computed."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Discharge",
         "status": "confirmed",
@@ -838,7 +838,8 @@
           "It needs charges to deal its damage; deals 35% less damage when triggered. [wiki][pob]"
         ],
         "check": "The audit's PoE line holds (Bob maps Grit to fire, Fervour to cold, Insight to lightning, as in the original). The only gap is that Bob never consumes the charges, so the trade is gone."
-      }
+      },
+      "effects": []
     },
     "chargedBlow": {
       "ref": "Static Strike",
@@ -972,7 +973,7 @@
       "kind": "active",
       "verdict": "drifted",
       "confidence": "high",
-      "milestone": "S2",
+      "milestone": "S7",
       "missing": ["overkill_damage_on_kill", "trigger_on_event"],
       "audit": {
         "poe": "25% reserved herald: physical gained as fire, more spell fire damage, and when you kill any enemy, overkill damage burns the enemies near it. Rewards big hits and dense packs, needs no ignite.",
@@ -1298,16 +1299,16 @@
       "ref": "Immortal Call",
       "name": "Deathless Call",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S2",
-      "missing": ["spend_charges_for_effect", "guard_cooldown_sharing"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Guard: less physical and elemental damage; consumes up to 5 endurance charges to extend the buff and reduce physical taken further (charges -> safety).",
         "bob": "Guard utility (life<60%, 4 s, cd 8): hitTaken more -25..-35. Grit charges are never consumed (no charge-spend primitive exists in sim/charges.ts) and bring no extra benefit.",
         "repair": "Add spend_charges_for_effect: on cast, remove held Grit charges to lengthen the buff and deepen the reduction."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Immortal Call",
         "status": "confirmed",
@@ -1318,7 +1319,8 @@
           "Works without charges since 3.7.0 (no more invulnerability window); with 5 charges the buff lasts about 2 s. [wiki]"
         ],
         "check": "The audit's PoE line holds. Bob's guard (4 s, cd 8, only when life is low, -25..-35% damage taken) is a longer, rarer window than the 1 s base / 3 s cooldown original and never touches the charges."
-      }
+      },
+      "effects": ["buff:deathless"]
     },
     "deepChill": {
       "ref": "Bonechill Support",
@@ -2086,16 +2088,16 @@
       "ref": "Ice Bite Support",
       "name": "Frost Fang",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S2",
-      "missing": ["kill_condition_on_charge_gain"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "15% freeze, added cold damage that grows with frenzy charges, and charge gain when killing a frozen enemy.",
         "bob": "15% freeze, flat added cold, and a chance to gain Fervour on any kill. The cold does not grow with charges (despite the port note) and the kill need not be of a frozen enemy.",
         "repair": "Add cold damage per Fervour charge and restrict the charge to kills of frozen enemies."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Ice Bite Support",
         "status": "corrected",
@@ -3038,8 +3040,8 @@
       "kind": "support",
       "verdict": "drifted",
       "confidence": "medium",
-      "milestone": "S2",
-      "missing": ["charges_on_mana_spent", "own_charge_type_with_reset"],
+      "milestone": "S13",
+      "missing": ["mana_counter_reset"],
       "audit": {
         "poe": "Cheaper skill; casting builds Inspiration charges that raise elemental damage and crit chance until a mana-spent threshold clears them. Self-generating.",
         "bob": "Real 30% cost reduction, but the charge loop is folded into the shared Insight charge and the gem generates none; the per-charge crit and damage bonus only works if another item grants Insight. On its own it is just a cheaper skill.",
@@ -5345,16 +5347,16 @@
       "ref": "Endurance Charge on Melee Stun Support",
       "name": "Stagger Resolve",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
+      "milestone": null,
       "missing": [],
       "audit": {
         "poe": "Melee stun grants an endurance charge, and supported skills deal more damage per endurance charge.",
         "bob": "Stun grants a Grit charge (rolled on stun events); no more damage per charge.",
         "repair": "Add a more-damage multiplier per Grit charge on the supported skill."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Endurance Charge on Melee Stun Support",
         "status": "corrected",
@@ -5685,7 +5687,7 @@
       "kind": "active",
       "verdict": "drifted",
       "confidence": "medium",
-      "milestone": "S2",
+      "milestone": "S6",
       "missing": ["timed_burst_on_kill"],
       "audit": {
         "poe": "25% reserved herald: added lightning damage; killing a shocked enemy makes lightning bolts strike enemies around you for 6 s. The reward is a lasting barrage after each shocked kill.",
@@ -5796,13 +5798,7 @@
       "verdict": "gutted",
       "confidence": "high",
       "milestone": "S6",
-      "missing": [
-        "skill_cooldown",
-        "cooldown_bypass",
-        "spend_charges_for_effect",
-        "charge_on_kill_in_area",
-        "ground_effect"
-      ],
+      "missing": ["ground_effect", "charge_on_kill_in_area"],
       "audit": {
         "poe": "A cold burst plus chilling ground with a 3 s cooldown that you skip by spending a Frenzy Charge, and enemies dying in the ground may grant Frenzy Charges. The charge loop (kill, gain, spend to recast) is the niche.",
         "bob": "A plain cold burst at the target (radius 2.2, 140% effectiveness) with more chill. No cooldown (the gem def has no cooldown field; SkillDef.cooldown is never set from gems, only the generic secondary rule applies), no charge spending, no charge gain on kills in the area, and no cold ground DoT. Bob does have a Fervour charge kind and chargeOn.kill hooks that could carry this.",

@@ -653,7 +653,7 @@
   "anvilDrop": {
    "ref": "Crushing Fist",
    "status": "covered",
-   "note": "A heavy slam with a shield-less weapon that stuns more easily (the retaliation condition is dropped)."
+   "note": "A counter-attack the character cannot use on purpose: when it is hit, there is a chance it strikes every enemy around it; it waits 1.2 seconds between strikes."
   },
   "snareShot": {
    "ref": "Ensnaring Arrow",
@@ -773,7 +773,7 @@
   "frostFang": {
    "ref": "Ice Bite Support",
    "status": "covered",
-   "note": "A chance to freeze, added cold damage that grows with Fervour charges (the charge on killing a frozen enemy is a plain chance on kill)."
+   "note": "A chance to freeze, added cold damage that grows with the Fervour charges held, and a chance to gain a Fervour charge on killing a frozen enemy."
   },
   "skewer": {
    "ref": "Impale Support",
@@ -988,7 +988,7 @@
   "deathlessCall": {
    "ref": "Immortal Call",
    "status": "covered",
-   "note": "A guard: for a few seconds the character takes much less damage (the endurance charges it would consume are dropped)."
+   "note": "A guard cast when life is low: for a second the character takes much less damage, longer and with much less physical damage for each Grit charge it spends (up to five). It waits three seconds, and other guards wait with it."
   },
   "bloodSurgeCall": {
    "ref": "Blood Rage",
@@ -1418,7 +1418,7 @@
   "lightheart": {
    "ref": "Inspiration Support",
    "status": "covered",
-   "note": "The supported skill costs less mana and hits harder in critical strikes with each Insight charge held (the righteous charges are folded into Insight)."
+   "note": "The supported skill costs less mana, gains an Insight charge each time it is used, and hits harder in critical strikes and in elemental damage with each charge held (the reference gem's own charge type is Insight here; its reset when much mana has been spent is not modelled)."
   },
   "swellingBlast": {
    "ref": "Intensify Support",
@@ -1493,7 +1493,7 @@
   "chargeRelease": {
    "ref": "Discharge",
    "status": "covered",
-   "note": "A nova around the character whose damage grows with the charges held: fire per Grit, cold per Fervour, lightning per Insight (the charges are not consumed here)."
+   "note": "A nova around the character whose damage grows with the charges held: fire per Grit, cold per Fervour, lightning per Insight and the charges are spent when it lands. The character casts it once it holds at least three."
   },
   "rotDrainTrap": {
    "ref": "Siphoning Trap of Pain",
