@@ -724,6 +724,26 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
   });
 });
 
+describe('carrying damage about oneself (searingMantle, orbitingBlades)', () => {
+  it('a character with a burning aura walks in among the enemies instead of standing off at its range', () => {
+    const plain = world(['arcChain'], 7, 'wand_3', INT);
+    run(plain.world, 4);
+    const burning = world(['arcChain', 'searingMantle'], 7, 'wand_3', INT);
+    run(burning.world, 4);
+    const d = (r: typeof plain) =>
+      Math.hypot(r.world.player.x - r.dummy.x, r.world.player.y - r.dummy.y);
+    expect(d(burning)).toBeLessThan(2.8 + burning.dummy.r);
+    expect(d(burning)).toBeLessThan(d(plain));
+  });
+
+  it('with blades circling it closes in on the enemies too', () => {
+    const { world: w, dummy } = world(['arcChain', 'orbitingBlades'], 7, 'wand_3', INT);
+    w.vortex = { key: 'orbitingBlades', blades: [20, 20, 20], acc: 0 };
+    run(w, 4);
+    expect(Math.hypot(w.player.x - dummy.x, w.player.y - dummy.y)).toBeLessThan(1.6 + dummy.r);
+  });
+});
+
 describe('repairs from the fresh audit (S14)', () => {
   it('Arc hits harder with more chains to come, and each jump reaches a second enemy', () => {
     const { world: w, dummy } = world(['arcChain'], 4, 'wand_3', INT);

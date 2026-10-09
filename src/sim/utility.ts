@@ -178,6 +178,21 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
 
 /** Radius of a burning aura, in tiles. */
 const BURN_RADIUS = 2.8;
+
+/**
+ * How near the character wants to stand to an enemy so that what it carries about itself reaches: a burning aura (Searing Mantle) or
+ * circling blades (Orbiting Blades). Zero when it carries nothing of the kind. The character walks in among the enemies, as a player
+ * of such a build does, instead of standing off at the range of its attack.
+ */
+export function contactRange(w: World): number {
+  let r = w.char.burn.pct > 0 ? BURN_RADIUS * 0.8 : 0;
+  const v = w.vortex;
+  if (v && v.blades.length > 0) {
+    const c = w.char.actives.find((x) => x.skill.id === v.key);
+    if (c?.skill.vortex) r = Math.max(r, c.skill.vortex.radius * 0.8);
+  }
+  return r;
+}
 const BURN_EVERY = 0.5;
 
 /** A burning aura damages the enemies near the player (and the player, without killing it) twice a second. */

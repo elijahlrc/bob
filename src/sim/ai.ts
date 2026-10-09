@@ -39,7 +39,7 @@ import {
   withdrawing,
 } from './movement';
 import { running } from './blinks';
-import { chooseUtility } from './utility';
+import { chooseUtility, contactRange } from './utility';
 import type { Actor, World } from './types';
 
 function canAct(a: Actor): boolean {
@@ -327,7 +327,10 @@ export function playerAI(w: World, dt: number): void {
     }
     const { which, prof, costsLife, key, cd, choice } = chooseSkill(w, target);
     const melee = prof.skill.behaviour.kind === 'melee';
-    const reach = skillRange(prof) + target.r + (melee ? p.r : 0);
+    // A burning aura or circling blades only reach what is close: walk in among the enemies, whatever the attack's range.
+    const contact = contactRange(w);
+    const reach0 = skillRange(prof) + target.r + (melee ? p.r : 0);
+    const reach = contact > 0 ? Math.min(reach0, contact + target.r) : reach0;
     const d = Math.hypot(target.x - p.x, target.y - p.y);
     const inRange = d <= reach && (melee || w.grid.los(p.x, p.y, target.x, target.y));
     // Arrows keep hitting walls (a wide fan in a narrow corridor): close in for a clearer shot.

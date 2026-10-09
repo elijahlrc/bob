@@ -158,7 +158,7 @@ export function fxLines(def: ActiveGemDef, level: number): string[] {
   if (def.vortex) {
     const v = def.vortex;
     out.push(
-      `Each cast adds a blade that circles you for ${num(v.seconds)} s (up to ${v.max}); every ${num(v.spin)} s, ${v.hitRate}% sooner for each blade, everything within ${num(v.radius)} is hit together, for ${v.more}% more damage and ${v.crit}% more critical chance for each blade`,
+      `Each cast adds a blade that circles you for ${num(v.seconds)} s (up to ${v.max}); every ${num(v.spin)} s, ${v.hitRate}% sooner for each blade, everything within ${num(v.radius)} is hit together, for ${v.more}% more damage and ${v.crit}% more critical chance for each blade; while blades circle you, you walk in among the enemies`,
     );
   }
   if (def.markers)
@@ -249,6 +249,10 @@ export function fxLines(def: ActiveGemDef, level: number): string[] {
 /** The lines for the special behaviours of an aura. */
 export function auraFxLines(def: AuraGemDef, level: number): string[] {
   const out: string[] = [];
+  if (def.mods.some((m) => m.stat === 'auraBurn'))
+    out.push(
+      'You walk in among the enemies so that the fire reaches them, whatever the range of your attacks',
+    );
   if (def.frost)
     out.push(
       `Enemies that hit you are chilled for ${num(def.frost.seconds)} s (${def.frost.slow}% slower); while you move you leave chilled ground for ${num(lv(def.frost.trail, level))} s`,
