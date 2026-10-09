@@ -1,6 +1,6 @@
 # Bob — Spirit audit of the gems against PoE 3.9.0
 
-Status: **done 2026-10-09**. Read-only: no gem, engine or balance value was changed. It follows [COVERAGE.md](COVERAGE.md) and
+Status: **done 2026-10-08; corrected the same day (see the erratum), repair plan in [SPIRIT.md](SPIRIT.md)**. Read-only: no gem, engine or balance value was changed. It follows [COVERAGE.md](COVERAGE.md) and
 [AUDIT-3.9.md](AUDIT-3.9.md) (which audited mechanics, not gems).
 
 ## Why
@@ -28,7 +28,7 @@ buff are gone. **Numbers faithful, spirit gone**, and the coverage status never 
    below. I checked against the code the engine claims that carry the most weight (marked **checked** in the engine facts); the
    rest are the reviewers' readings.
 
-**Read the verdicts as an informed first pass, not a finding of record.** They are model judgements: 113 high, 191 medium and 22 low confidence. No behaviour was run. A reviewer can be too hard
+**Read the verdicts as an informed first pass, not a finding of record.** They are model judgements: 113 high, 192 medium and 21 low confidence. No behaviour was run. A reviewer can be too hard
 (it reads the PoE loop from memory) or too easy; the low and medium rows are where to look first if a verdict looks wrong.
 
 ## Result
@@ -36,32 +36,45 @@ buff are gone. **Numbers faithful, spirit gone**, and the coverage status never 
 |                                 | Faithful | Drifted | Gutted |   Total |
 | ------------------------------- | -------: | ------: | -----: | ------: |
 | Active skills, auras and curses |       82 |      95 |     27 |     204 |
-| Support gems                    |       72 |      39 |     11 |     122 |
-| **All**                         |  **154** | **134** | **38** | **326** |
+| Support gems                    |       73 |      38 |     11 |     122 |
+| **All**                         |  **155** | **133** | **38** | **326** |
 
-So about **47% hold up**, 41% are blunted and 12% have lost what made them distinct. The user's worry was right, and the damage is
-concentrated: most of it traces to a dozen missing pieces of engine (next section), not to 172 separate mistakes.
+So about **48% hold up**, 41% are blunted and 12% have lost what made them distinct. The user's worry was right, and the damage is
+concentrated: most of it traces to a dozen missing pieces of engine (next section), not to 171 separate mistakes.
+
+## Erratum (2026-10-08): the projectile rule
+
+The first version of this audit said the shared projectile hit list (a target is hit once per use) was an engine gap that made
+every shotgun and projectile-count support weak against bosses. **That was wrong for the reference game.** Asked to verify, I read
+the 3.9 wiki through `npm run coverage:wiki`: the Split Arrow page says a single enemy cannot be hit by more than one projectile
+of a bow attack fired together, the Ethereal Knives page says the same of its knives, and the Freezing Pulse history records the
+2.0.0 change that removed shotgunning. The 3.9 data flags only two skills as able to shotgun (Shrapnel Ballista and Shattering
+Steel), and Barrage and Barrage Support fire sequentially, so their projectiles can all hit one target. The rule Bob uses is right;
+what it lacks is those exceptions. Nine rows were corrected (their text says so); Greater Multiple Projectiles became faithful.
+
+**Lesson for the rest of the audit:** the accounts the reviewers gave of the reference game were partly from memory, and this one
+was confidently wrong. The plan therefore reads the 3.9 wiki text for every gem before it is changed ([SPIRIT.md](SPIRIT.md) 4.2).
 
 ## Engine gaps, by how many gems each would repair
 
 A gem is counted once per gap, and may appear under several. The grouping is by the reviewers' primitive names, matched by keyword,
 so a count is approximate (give or take two). "Gutted" counts the gutted gems among the non-faithful ones.
 
-| Gap                                                                       | Gems | Gutted |
-| ------------------------------------------------------------------------- | ---: | -----: |
-| An enemy status layer: slow, maim, blind, hinder, exposure, vulnerability |   28 |      7 |
-| Ground effects and lingering objects                                      |   22 |      3 |
-| Projectile rules: the shared hit list, shotgun, split and nova            |   19 |      6 |
-| Skill damage over time, and ailment spread                                |   18 |      2 |
-| Channelling: ramp, stages and a release                                   |   16 |      4 |
-| Exerted attacks, retaliation windows, self-buffs on use                   |   16 |      6 |
-| Skill cooldowns, and spending charges                                     |   15 |      6 |
-| Blink and travel effects                                                  |    9 |      2 |
-| Self-cast curses, and the hex slot                                        |    9 |      1 |
-| Stances, absorb pools, rage                                               |    9 |      4 |
-| Minion buffs and commands                                                 |    9 |      2 |
-| Deployables that can be hit or that interact                              |    9 |      1 |
-| Corpses                                                                   |    8 |      3 |
+| Gap                                                                            | Gems | Gutted |
+| ------------------------------------------------------------------------------ | ---: | -----: |
+| An enemy status layer: slow, maim, blind, hinder, exposure, vulnerability      |   28 |      7 |
+| Ground effects and lingering objects                                           |   22 |      3 |
+| Skill damage over time, and ailment spread                                     |   18 |      2 |
+| Projectile rules: sequential volleys, shotgun skills, parallel, split and nova |   17 |      6 |
+| Channelling: ramp, stages and a release                                        |   16 |      4 |
+| Exerted attacks, retaliation windows, self-buffs on use                        |   16 |      6 |
+| Skill cooldowns, and spending charges                                          |   15 |      6 |
+| Blink and travel effects                                                       |    9 |      2 |
+| Self-cast curses, and the hex slot                                             |    9 |      1 |
+| Stances, absorb pools, rage                                                    |    9 |      4 |
+| Minion buffs and commands                                                      |    9 |      2 |
+| Deployables that can be hit or that interact                                   |    9 |      1 |
+| Corpses                                                                        |    8 |      3 |
 
 ### An enemy status layer: slow, maim, blind, hinder, exposure, vulnerability
 
@@ -75,17 +88,17 @@ Burning, chilled or consecrated ground, walls, placed Standards, orbs that sit a
 
 **Gems (22):** Orbiting Blades (Blade Vortex); Whirlwind Cleave (Bladestorm) ✗; Torch Arrow (Burning Arrow); Acid Arrow (Caustic Arrow); Sudden Frost (Cold Snap) ✗; Pyre Burst (Cremation); Faultline (Earthquake); Rime Core (Frost Bomb); Searing Lance (Scorching Ray); Glacier Wall (Frost Wall); Cleansing Blaze (Purifying Flame); Magma Crack (Tectonic Slam); Venom Shower (Toxic Rain); Hoarfrost Mote (Winter Orb) ✗; Standard of Valour (War Banner); Standard of Dread (Dread Banner); Cinder Step (Flame Dash); Rime Step (Frostblink); Blessed Trail (Consecrated Path); Fervent Halo (Zealotry); Rimeplate (Arctic Armour); Twin Shadow (Mirage Archer Support). _✗ = gutted._
 
-### Projectile rules: the shared hit list, shotgun, split and nova
-
-All projectiles of one use share a hit list (`useHits`, `src/sim/actions.ts`; a DESIGN decision of 2026-10-06), so a target is hit at most once per use. Extra projectiles only add coverage, and every shotgun skill and every projectile-count support is a damage penalty against one target (a boss). `chains` is read only by skills with chain behaviour, so Chain Support is inert on everything else. Hybrid "strike, then projectiles from the target" skills are pure projectile fans.
-
-**Gems (19):** Quiver Rush (Barrage) ✗; Rime Splinter (Frost Blades); Storm Quill (Galvanic Arrow); Bolt Cleave (Lightning Strike); Slag Blow (Molten Strike); Tempest Mote (Orb of Storms); Splinter Volley (Shattering Steel); Ghost Shard (Spectral Shield Throw); Whirl Shot (Tornado Shot); Prime Splash (Wild Strike) ✗; Hoarfrost Mote (Winter Orb) ✗; Scatter Bow (Shrapnel Ballista); Volley Split (Greater Multiple Projectiles); Ricochet (Chain) ✗; Split Shot (Fork); Wide Salvo (Greater Volley); Arrow Tempest (Arrow Nova) ✗; Twin Salvo (Volley); Rolling Volleys (Barrage Support) ✗. _✗ = gutted._
-
 ### Skill damage over time, and ailment spread
 
 Only ignite, bleed and poison exist as damage over time. Contagion, Blight, Caustic Arrow and Essence Drain are fast hits or poison; leech never reaches DoT ticks; Elemental Proliferation and Wildfire-style spread are missing.
 
 **Gems (18):** Orbiting Blades (Blade Vortex); Withering Breath (Blight); Torch Arrow (Burning Arrow); Acid Arrow (Caustic Arrow); Creeping Plague (Contagion); Primal Strike (Elemental Hit); Fuse Arrow (Explosive Arrow); Sap Bolt (Essence Drain); Venom Strike (Pestilent Strike); Searing Lance (Scorching Ray); Void Curse (Despair); Ruin Ritual (Bane) ✗; Cinder Bond (Searing Bond); Open Wounds (Vulnerability); Slow Rot (Decay); Wildfire Spread (Elemental Proliferation) ✗; Foul Brew (Vile Toxins); Wildfire Seed (Ignite Proliferation Support). _✗ = gutted._
+
+### Projectile rules: sequential volleys, shotgun skills, parallel, split and nova
+
+The once-per-target rule for simultaneous projectiles is the reference game's (the 3.9 wiki says a single enemy cannot be hit by more than one projectile of a bow attack fired together; shotgunning was removed in 2.0.0). What is missing is its exceptions and the shapes around it: Barrage and Barrage Support fire sequentially, so their projectiles can all hit one target; Shrapnel Ballista and Shattering Steel are flagged to shotgun; Volley fires in parallel lanes; Arrow Nova lands and bursts in a ring; Tornado Shot splits at the end of its flight; Fork splits on the first hit. `chains` is read only by skills with chain behaviour, so Chain Support does nothing on a projectile skill. Hybrid strike-then-projectiles skills are pure projectile fans.
+
+**Gems (17):** Quiver Rush (Barrage) ✗; Rime Splinter (Frost Blades); Bolt Cleave (Lightning Strike); Slag Blow (Molten Strike); Tempest Mote (Orb of Storms); Splinter Volley (Shattering Steel); Ghost Shard (Spectral Shield Throw); Whirl Shot (Tornado Shot); Prime Splash (Wild Strike) ✗; Hoarfrost Mote (Winter Orb) ✗; Scatter Bow (Shrapnel Ballista); Ricochet (Chain) ✗; Split Shot (Fork); Wide Salvo (Greater Volley); Arrow Tempest (Arrow Nova) ✗; Twin Salvo (Volley); Rolling Volleys (Barrage Support) ✗. _✗ = gutted._
 
 ### Channelling: ramp, stages and a release
 
@@ -143,7 +156,7 @@ Corpses are not objects in the sim, so the corpse skills and Offerings are reduc
 
 ### Gem-specific gaps
 
-45 further non-faithful gems need something particular to themselves (a conditional bonus, a weapon rule, a per-stack scaling, a stat the engine lacks); see each gem's "Missing" line below.
+46 further non-faithful gems need something particular to themselves (a conditional bonus, a weapon rule, a per-stack scaling, a stat the engine lacks); see each gem's "Missing" line below.
 
 ## Engine facts the reviewers found
 
@@ -162,7 +175,7 @@ These came up while checking what the gems actually do. Items marked **checked**
 **Engine behaviour that shapes many gems:**
 
 - Charges can only be gained; gems have no cooldown. **Checked.**
-- The shared projectile hit list, and calc DPS ignores projectile count. **Checked** (`useHits`).
+- The shared projectile hit list (`useHits`) matches the reference game for simultaneous projectiles (see the erratum above); calc DPS ignores projectile count, which is right for the once-per-target rule and wrong for sequential volleys and the two shotgun skills. **Checked.**
 - No maim, no blind, no skill damage over time. **Checked** (`maim` and `blind` do not appear in `src/sim` or `src/calc`).
 - Channelling is a tag only. **Checked.**
 - Totems, traps and mines are not actors. _(reviewer)_
@@ -179,7 +192,7 @@ Advice, not a plan: it needs the user's say on scope.
 
 1. **The cheap bugs above** (Cast on Melee Kill, the Multistrike echo, castable curses, Chain, Dual Strike's off hand, the overclaiming notes). Mostly data or a line of code; no new systems.
 2. **Cooldowns plus a spend-charges effect.** One primitive repairs Flicker Strike, Cold Snap, Vigilant Strike, Discharge, Immortal Call and Phase Run, and it matches the user's example directly. Then a **self-buff granted by using a skill** (Flicker's movement speed).
-3. **Decide the projectile hit rule.** The 2026-10-06 rule trades shotgun stacking away to keep one-target damage sane; it is why Barrage, Splitting Volley and every projectile-count support are weak against bosses. Options: let extra projectiles hit the same target at reduced damage, or give those supports a different job.
+3. **Projectile shapes and exceptions** (Barrage's sequential volleys, the two shotgun skills, Volley's parallel lanes, Arrow Nova, Tornado Shot, Fork and Chain). The once-per-target rule itself stays.
 4. **Channelling as ramp and release** (Cyclone, Flameblast, Blade Flurry, Winter Orb and the rest), the largest block of gutted skills.
 5. **An enemy status layer** (slow, maim, blind, exposure, vulnerability): unlocks the trap, curse, Standard and arrow skills together.
 6. **Ground effects on the player side**, then corpses, then minion commands. Each is a larger system with fewer gems.
@@ -188,12 +201,12 @@ Each gem's "Repair" line says the smallest change its reviewer saw. Any repair t
 
 ## Gutted gems (38)
 
-**Quiver Rush** (Barrage) · active · confidence low
+**Quiver Rush** (Barrage) · active · confidence medium
 
-- PoE: The join record is Barrage Support (extra projectiles, large less-damage and attack-time penalties), but Bob's def mirrors the active Barrage, which looses a rapid volley of arrows that all land on one target for big single-target damage (from memory of 3.9, not verified). Either way the point is many arrows stacking on the same enemy at close range.
-- Bob: A standalone bow/wand attack firing a tight fan of 5 arrows at 60-72% each. A use hits each target at most once (shared hit list in fire() in actions.ts, DESIGN decision log 2026-10-06), so the five arrows never stack on one target and it plays as a second Split Volley.
-- Missing: `projectile_shotgun_single_target`, `attack_time_per_projectile`
-- Repair: Let this skill opt out of the per-use hit list so its overlapping arrows each hit a single target, with an attack-time penalty per arrow; if the support reading is intended, make it a support instead.
+- PoE: Barrage (the active gem) makes a short preparation, then fires its projectiles one after another (40% of base damage each, small random spread of about 20 degrees); because they are sequential, they can all strike the same target, which is the skill (big single-target damage up close). (Row corrected after checking the 3.9 wiki; see the erratum.)
+- Bob: A tight fan of 5 arrows fired together at 60-72% each. A use hits each target once, so it plays as a second Split Volley.
+- Missing: `sequential_volleys`, `attack_time_per_projectile`
+- Repair: Fire the volleys in sequence, each with its own hit list, at the gem's per-volley damage.
 
 **Flurry of Edges** (Blade Flurry) · active · confidence medium
 
@@ -393,9 +406,9 @@ Each gem's "Repair" line says the smallest change its reviewer saw. Any repair t
 
 **Arrow Tempest** (Arrow Nova) · support · confidence high
 
-- PoE: The bow shot flies up and lands at the target, then arrows burst out in a ring from there.
-- Bob: Just +4 projectiles in a forward fan with less damage; no landing point, no ring. The shared hit-list limits it further.
-- Missing: `projectile_nova_from_target`, `projectile_shotgun`
+- PoE: The bow shot flies up and lands at the target, then arrows burst out in a ring from there. (Row corrected after checking the 3.9 wiki; see the erratum.)
+- Bob: Just +4 projectiles in a forward fan with less damage; no landing point, no ring.
+- Missing: `projectile_nova_from_target`
 - Repair: Fire a payload that lands at the aim point and spawns a ring of projectiles from it.
 
 **Echoing Blow** (Ancestral Call Support) · support · confidence medium
@@ -407,10 +420,10 @@ Each gem's "Repair" line says the smallest change its reviewer saw. Any repair t
 
 **Rolling Volleys** (Barrage Support) · support · confidence medium
 
-- PoE: Fires the projectiles in a tight parallel volley so they all land on the same target, at an attack-time penalty per projectile: a single-target boss-damage shotgun.
-- Bob: projectiles +4 at 20-30% less damage. Arrows fan out (10 degrees apart when the skill has one arrow) and the shared useHits list makes a use hit any enemy at most once, so on one target it deals one hit at reduced damage. It is Multiple Projectiles with bigger numbers (and far larger numbers than PoE's -62% damage).
-- Missing: `parallel_projectiles`, `multi_hit_same_target`, `attack_time_per_projectile`
-- Repair: Let supports set projectile spread to zero (parallel fire) and allow each projectile of one use to hit the same enemy; add the attack-time cost per extra projectile.
+- PoE: Barrage Support: supported bow or wand attacks fire their extra projectiles sequentially, so they can all hit the same target, at a damage penalty and an attack-time cost per projectile. (Row corrected after checking the 3.9 wiki; see the erratum.)
+- Bob: Projectiles +4 at 20-30% less damage, fired together in a fan; a use hits each target once. It is Multiple Projectiles with bigger numbers.
+- Missing: `sequential_volleys`, `attack_time_per_projectile`
+- Repair: Sequential firing with a hit list per volley, and the attack-time cost per extra projectile.
 
 **Guard Breaker** (Block Chance Reduction Support) · support · confidence medium
 
@@ -454,7 +467,7 @@ Each gem's "Repair" line says the smallest change its reviewer saw. Any repair t
 - Missing: `minion_burning_aura`, `minion_self_damage`
 - Repair: Give timed pulses of fire damage to enemies near each minion (scaled by minion life) and a small self-damage drain on the minion.
 
-## Drifted gems (134)
+## Drifted gems (133)
 
 **Frost Lance** (Ice Spear) · active · confidence medium
 
@@ -549,9 +562,9 @@ Each gem's "Repair" line says the smallest change its reviewer saw. Any repair t
 
 **Storm Quill** (Galvanic Arrow) · active · confidence medium
 
-- PoE: Arrows plus a lightning burst that damages every enemy in a cone, with the arrows degrading in flight; a close-range cone shotgun.
-- Bob: A fan of 3 bow arrows (range 7) with half lightning conversion and added lightning. There is no cone area damage (no explodeRadius or beam on the behaviour) and the single-target hit list makes the volley one arrow on one enemy.
-- Missing: `cone_area_on_projectile`, `projectile_shotgun_single_target`
+- PoE: Arrows plus a lightning burst that damages every enemy in a cone, with the arrows degrading in flight; a close-range cone shotgun. (Row corrected after checking the 3.9 wiki; see the erratum.)
+- Bob: A fan of 3 bow arrows (range 7) with half lightning conversion and added lightning. There is no cone area damage (no explodeRadius or beam on the behaviour).
+- Missing: `cone_area_on_projectile`
 - Repair: Give the projectile an explode shape of a cone from the impact (or a beam hit at fire time) so the lightning burst exists.
 
 **Rime Mallet** (Glacial Hammer) · active · confidence high
@@ -633,10 +646,10 @@ Each gem's "Repair" line says the smallest change its reviewer saw. Any repair t
 
 **Splinter Volley** (Shattering Steel) · active · confidence medium
 
-- PoE: Throw projectiles that shatter into pieces that all hit in a cone, so the damage is huge point-blank and falls off with distance; the skill is a shotgun.
+- PoE: Throw projectiles that shatter into pieces that all hit in a cone, so the damage is huge point-blank and falls off with distance; the skill is a shotgun. (Row corrected after checking the 3.9 wiki; see the erratum.)
 - Bob: Three-projectile spread with +60% more damage when the target is within about 2 tiles (real condition), and a 40% impale chance. But all projectiles of one use share a hit list, so a close target is hit once instead of by every fragment; the shotgun stacking that is the skill's point is missing.
-- Missing: `projectile_shotgun`, `multi_hit_same_target`
-- Repair: Allow multiple projectiles of one use to hit the same target for projectile skills flagged shotgun (or lift the per-use hit list for this skill), keeping the distance falloff.
+- Missing: `projectile_shotgun`
+- Repair: A per-skill shotgun flag (3.9 flags only Shrapnel Ballista and Shattering Steel), giving each projectile its own hit list.
 
 **Skyfall** (Storm Call) · active · confidence low
 
@@ -941,10 +954,10 @@ Each gem's "Repair" line says the smallest change its reviewer saw. Any repair t
 
 **Scatter Bow** (Shrapnel Ballista) · active · confidence high
 
-- PoE: A ballista totem fires a few arrows that can all hit the same enemy (shotgunning), turning close range into a burst with added physical damage.
+- PoE: A ballista totem fires a few arrows that can all hit the same enemy (shotgunning), turning close range into a burst with added physical damage. (Row corrected after checking the 3.9 wiki; see the erratum.)
 - Bob: Fires a 3-arrow fan with added physical damage, but all projectiles of one use share a single hit list (src/sim/actions.ts useHits), so an enemy is hit once per use and there is no shotgun.
 - Missing: `projectile_shotgun`
-- Repair: Add a shotgun flag on projectile behaviour that gives each projectile its own hit list so several arrows can strike one target.
+- Repair: A per-skill shotgun flag (3.9 flags only Shrapnel Ballista and Shattering Steel), giving each projectile its own hit list.
 
 **Bolt Trap** (Lightning Trap) · active · confidence medium
 
@@ -1121,13 +1134,6 @@ Each gem's "Repair" line says the smallest change its reviewer saw. Any repair t
 - Missing: `cast_curse`, `maim`, `bleed_on_hit_vs_cursed`, `damage_over_time_taken_increase`
 - Repair: Make it castable, add a physical DoT taken mod, and a self mod giving bleed chance against cursed targets (maim needs a new slow primitive).
 
-**Volley Split** (Greater Multiple Projectiles) · support · confidence high
-
-- PoE: Four additional projectiles at a damage penalty; extra projectiles can all hit one target (shotgun) and cover a wide arc.
-- Bob: Two extra projectiles in a 10-degree fan with a 25% damage penalty. A use hits each target at most once (DESIGN.md decision 2026-10-06; src/sim/actions.ts fire(): all projectiles of one use share one hit list) and calc DPS ignores projectile count, so against a single target (boss) the support is a pure damage penalty; it only widens coverage against groups.
-- Missing: `projectile_shotgun`
-- Repair: Let each projectile of a use hit independently (or give the support a per-projectile multiplier) so single-target damage scales with projectile count at close range.
-
 **Kindle** (Immolate) · support · confidence medium
 
 - PoE: Added fire damage against burning (ignited) enemies: rewards stacking ignite from another source.
@@ -1179,10 +1185,10 @@ Each gem's "Repair" line says the smallest change its reviewer saw. Any repair t
 
 **Wide Salvo** (Greater Volley) · support · confidence high
 
-- PoE: Four extra projectiles fired in parallel; at close range they all hit one target.
-- Bob: +4 projectiles in a fan (parallel placement not modelled) at less damage. The shared hit-list means no stacking on one target (DESIGN.md decision 2026-10-06; src/sim/actions.ts fire(): all projectiles of one use share one hit list), so against a boss it is a damage penalty.
-- Missing: `projectile_shotgun`, `parallel_projectiles`
-- Repair: Parallel lanes and per-projectile hits.
+- PoE: Four extra projectiles fired in parallel lanes. They cannot hit the same target. (Row corrected after checking the 3.9 wiki; see the erratum.)
+- Bob: +4 projectiles in a fan at less damage; the once-per-target rule is right, the parallel lanes are not modelled.
+- Missing: `parallel_projectiles`
+- Repair: A parallel placement option for projectile supports.
 
 **Frost Fang** (Ice Bite) · support · confidence high
 
@@ -1235,10 +1241,10 @@ Each gem's "Repair" line says the smallest change its reviewer saw. Any repair t
 
 **Twin Salvo** (Volley) · support · confidence high
 
-- PoE: Two extra parallel projectiles, minor penalty.
-- Bob: +2 projectiles in a fan; the shared hit-list limits it to coverage (DESIGN.md decision 2026-10-06; src/sim/actions.ts fire(): all projectiles of one use share one hit list).
-- Missing: `projectile_shotgun`, `parallel_projectiles`
-- Repair: As Wide Salvo.
+- PoE: Two extra projectiles fired in parallel lanes (a wider frontage than a fan), minor penalty. They cannot hit the same target. (Row corrected after checking the 3.9 wiki; see the erratum.)
+- Bob: +2 projectiles in a fan at less damage; the once-per-target rule is right, the parallel lanes are not modelled.
+- Missing: `parallel_projectiles`
+- Repair: A parallel placement option for projectile supports.
 
 **Wither Mark** (Withering Touch) · support · confidence medium
 
@@ -1394,7 +1400,7 @@ Each gem's "Repair" line says the smallest change its reviewer saw. Any repair t
 - Missing: `minion_resistances`, `exposure_on_minion_hit`
 - Repair: Pass minion resistance mods into minionBody and apply a resistance-lowering hex on minion hits.
 
-## Faithful gems (154)
+## Faithful gems (155)
 
 The reviewers judged these to keep the reason to use them. Low-confidence ones are marked.
 
@@ -1487,6 +1493,7 @@ The reviewers judged these to keep the reason to use them. Low-confidence ones a
 - **Channelled Elements** (Elemental Focus) · support: More elemental damage plus the cannotInflictEle flag; calc/combat.ts blocks ignite, shock, chill and freeze. Bleed and poison unaffected.
 - **Focused Ruin** (Controlled Destruction) · support: More spell damage and -100% inc crit chance, which the crit multiplier turns into zero crit chance unless other increases stack.
 - **Echoing Cast** (Spell Echo) · support: repeats +1 is read by the sim (updateAction fires the spell again 0.25 of the use time later, no extra cost); castSpeed -20% and damage -10% pay for it. Net DPS gain is similar to PoE. Triggered spells do not repeat. No totem/trap exclusion.
+- **Volley Split** (Greater Multiple Projectiles) · support: Two extra projectiles in a fan at a damage penalty; a use hits each target once, as in the reference game.
 - **Piercing Shot** (Pierce) · support: The pierce stat is read (pierceLeft in updateProjectiles); projectiles pass through and continue.
 - **Dense Blast** (Concentrated Effect) · support: aoe -30% (radius is the square root) and more area damage; both read.
 - **Wide Blast** (Increased Area of Effect) · support: aoe inc, read as a radius multiplier.

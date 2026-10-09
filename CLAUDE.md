@@ -8,7 +8,7 @@
     with the user on 2026-10-07). Reference data lives in `docs/coverage/` and `scripts/coverage/`, never in `src/`.
   - Every player-visible name and text in `src/` is our own; `src/data/ip.test.ts` checks them against the reference
     list. No PoE art or audio.
-- **Gem spirit audit:** [docs/AUDIT-GEMS.md](docs/AUDIT-GEMS.md) (2026-10-08): which gems kept the reason to use them in the reference game and which were flattened, with the engine gaps ranked. Read it before adding or reworking a gem.
+- **Gem spirit audit:** [docs/AUDIT-GEMS.md](docs/AUDIT-GEMS.md) (2026-10-08): which gems kept the reason to use them in the reference game and which were flattened, with the engine gaps ranked. Read it before adding or reworking a gem. The plan to repair them is [docs/SPIRIT.md](docs/SPIRIT.md) (milestones S0–S14; a plan, nothing built yet).
 - **Coverage plan:** [docs/COVERAGE.md](docs/COVERAGE.md) (milestones C0–C7): C0 to C6 are done (gems 93%, uniques 98% of
   the 3.9.0 list); C7 is the integration pass. `npm run coverage` prints where it stands, and `docs/coverage/README.md`
   describes the data and tools. Every new droppable gem or unique needs a line in `docs/coverage/map.json`. New content
