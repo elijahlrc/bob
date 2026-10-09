@@ -2,6 +2,7 @@ import type { SkillProfile } from '../calc/skill';
 import { spellBaseDamage } from '../data/constants';
 import type { ChargeKind } from '../calc/charges';
 import { segmentDist } from './actions';
+import { tickBladestorm } from './stances';
 import { applySkillDot } from './skillDots';
 import { applyStatus } from './statuses';
 import { gainCharge } from './charges';
@@ -27,7 +28,8 @@ export type FieldKind =
   | 'orb'
   | 'zap'
   | 'trail'
-  | 'ghost';
+  | 'ghost'
+  | 'bladestorm';
 
 export type Field = {
   id: number;
@@ -59,6 +61,10 @@ export type Field = {
   x2?: number;
   y2?: number;
   moved?: number;
+  /** A bladestorm: the way it drifts, and the stance it was made in. */
+  vx?: number;
+  vy?: number;
+  stance?: 'blood' | 'sand';
   stages?: number;
   decay?: number;
   tx?: number;
@@ -463,6 +469,11 @@ export function tickFields(w: World, dt: number): void {
         f.y = spot.y;
       }
       w.fields[j++] = f;
+      continue;
+    }
+    if (f.kind === 'bladestorm') {
+      tickBladestorm(w, f, dt);
+      if (f.t > 0) w.fields[j++] = f;
       continue;
     }
     if (f.kind === 'trail') {

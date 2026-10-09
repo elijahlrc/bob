@@ -541,6 +541,8 @@ export type World = {
   warp: WarpState | null;
   wither: WitherState | null;
   caught: CaughtState | null;
+  /** Seconds a Berserk has lasted (its drain of rage rises with it). */
+  berserkT: number;
   /** The channelled skill being held: its stages so far. */
   channel: ChannelState | null;
   /** The stages of a skill that grows with use, and how many hits the player has landed (a use that hits builds a stage). */

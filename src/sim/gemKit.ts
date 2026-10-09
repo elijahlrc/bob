@@ -165,6 +165,7 @@ export function runGem(def: ActiveGemDef, seconds = 10): GemRun {
     const u = def.utility;
     if (u.kind === 'buff' && u.policy === 'guard')
       world.player.life = world.player.def.maxLife * 0.4;
+    if (u.kind === 'buff' && u.rage) world.rage = 30;
   }
   const effects = new Set<string>();
   for (let i = 0; i < seconds * 60; i++) {

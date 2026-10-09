@@ -174,9 +174,26 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       origin: 'self',
     },
     baseMult: [105, 120],
-    cost: [5, 7],
-    mods: [],
-    description: 'A spinning attack that hits everything around you.',
+    cost: [8, 8],
+    requiresWeapon: ['sword', 'axe'],
+    bladestorm: {
+      seconds: 3,
+      radius: 2.4,
+      interval: 0.5,
+      more: -50,
+      max: 3,
+      blood: 'bladestormBlood',
+      sand: 'bladestormSand',
+      drift: 0.8,
+    },
+    mods: [
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -30,
+      },
+    ],
+    description: 'A spinning attack that hits everything around you and leaves a storm of blades.',
   },
   {
     kind: 'active',
@@ -3546,14 +3563,16 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       origin: 'self',
     },
     castTime: 0.25,
-    cost: [5, 12],
+    cost: [7, 16],
     mods: [],
     utility: {
       kind: 'buff',
       buff: 'bloodSurge',
       seconds: 9,
       policy: 'upkeep',
-      cooldown: 9,
+      cooldown: 1,
+      degen: 4,
+      refreshOnKill: true,
       mods: [
         {
           stat: 'attackSpeed',
@@ -3566,9 +3585,15 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
           value: 1.2,
           tags: ['attack'],
         },
+        {
+          stat: 'chargeOn.kill.fervour',
+          kind: 'base',
+          value: 25,
+        },
       ],
     },
-    description: 'Your blood runs hot: faster attacks that leech life.',
+    description:
+      'Your blood runs hot: faster attacks that leech life, at a cost in life each second.',
   },
   {
     kind: 'active',
@@ -3584,14 +3609,19 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       origin: 'self',
     },
     castTime: 0.25,
-    cost: [10, 18],
+    cost: [10, 16],
     mods: [],
     utility: {
       kind: 'buff',
       buff: 'berserk',
-      seconds: 8,
+      seconds: 4,
       policy: 'rally',
-      cooldown: 12,
+      cooldown: 5,
+      rage: {
+        min: 5,
+        drain: 5,
+        accel: 20,
+      },
       mods: [
         {
           stat: 'damage',
@@ -3616,7 +3646,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         },
       ],
     },
-    description: 'A fury that makes you hit harder and faster and take less.',
+    description:
+      'A fury fed by rage: you hit harder and faster, move faster and take less, until the rage is spent.',
   },
   {
     kind: 'active',
@@ -8351,31 +8382,76 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
     id: 'duneStance',
     name: 'Dune Stance',
     attr: 'str',
-    reservePct: 0,
-    mods: [
-      {
-        stat: 'damage',
-        kind: 'more',
-        value: [5, 12],
-        tags: ['melee', 'area'],
+    reservePct: 10,
+    mods: [],
+    stance: {
+      radius: 0,
+      blood: {
+        mods: [
+          {
+            stat: 'damage',
+            kind: 'more',
+            value: [10, 15],
+            tags: ['melee', 'area'],
+          },
+          {
+            stat: 'aoe',
+            kind: 'more',
+            value: -5,
+            tags: ['melee'],
+          },
+        ],
       },
-    ],
-    description: 'A stance that makes your melee area skills hit harder.',
+      sand: {
+        mods: [
+          {
+            stat: 'aoe',
+            kind: 'more',
+            value: [10, 15],
+            tags: ['melee'],
+          },
+          {
+            stat: 'damage',
+            kind: 'more',
+            value: -5,
+            tags: ['melee', 'area'],
+          },
+        ],
+      },
+    },
+    description:
+      'Two stances: one makes your melee area skills hit harder over less ground, the other over more ground and softer.',
   },
   {
     kind: 'aura',
     id: 'stoneStance',
     name: 'Stone Stance',
     attr: 'str',
-    reservePct: 0,
-    mods: [
-      {
-        stat: 'hitTaken',
-        kind: 'more',
-        value: [-9, -11],
+    reservePct: 25,
+    mods: [],
+    stance: {
+      radius: 3.7,
+      blood: {
+        mods: [],
+        enemies: {
+          id: 'maim',
+          seconds: 0.6,
+          v: 30,
+          x: [13, 16],
+        },
       },
-    ],
-    description: 'A stance that makes you take less from hits.',
+      sand: {
+        mods: [],
+        enemies: {
+          id: 'blind',
+          seconds: 0.6,
+          v: 50,
+        },
+        farLess: [9, 11],
+      },
+    },
+    description:
+      'Two stances: enemies near you are maimed and weakened, or blinded while the attacks of those farther off do less to you.',
   },
   {
     kind: 'aura',

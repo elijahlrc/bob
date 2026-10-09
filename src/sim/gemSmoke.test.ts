@@ -48,6 +48,8 @@ describe('every active gem', () => {
         // A guard waits for low life.
         if (u.kind === 'buff' && u.policy === 'guard')
           world.player.life = world.player.def.maxLife * 0.4;
+        // A skill fed by rage starts with some.
+        if (u.kind === 'buff' && u.rage) world.rage = 30;
         for (let i = 0; i < 20 * 60 && !seen; i++) {
           stepWorld(world);
           if (u.kind === 'buff') seen = world.buffT[u.buff] > 0;

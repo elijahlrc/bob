@@ -144,6 +144,11 @@ export type UtilityDef =
         /** Put down: a buff for so many seconds a stage, its effect rising by `effectPerStage` percent a stage. */
         place: { buff: BuffId; secondsPerStage: number };
       };
+      /** Needs this much rage to start, spends rage while it lasts (more each second) and ends when it is gone (Berserk). */
+      rage?: { min: number; drain: number; accel: number };
+      /** The percent of maximum life and energy shield lost a second while it lasts (Blood Rage), and a kill renews it. */
+      degen?: number;
+      refreshOnKill?: boolean;
       /** What the buff does while it lasts (the buff's condition is added to each). */
       mods: GemMod[];
     }
@@ -273,6 +278,19 @@ export type ActiveGemDef = {
   dot?: DotSpec;
   /** An arrow that ignites also inflicts a burning debuff worth a share of the ignite's damage, up to `cap` at once. */
   burning?: { pct: LevelValue; seconds: number; cap: number };
+  /** A storm the skill leaves in the stance the character is in: it hits for a time, and the character in it gains a buff (Bladestorm). */
+  bladestorm?: {
+    seconds: number;
+    radius: number;
+    interval: number;
+    /** Percent more (less, when negative) damage than the skill's own hit. */
+    more: number;
+    max: number;
+    /** The buffs the character in the storm gains, in the Blood stance and in the Sand stance; and how fast the Sand storm drifts ahead (tiles a second). */
+    blood: BuffId;
+    sand: BuffId;
+    drift: number;
+  };
   /** A projectile that changes form after flying a way: faster, piercing, critical (Frost Lance). */
   form?: { after: number; speed: number; critMore: number; critMulti: LevelValue };
   /** A skill whose cooldown recovers faster for the enemies near the character (Frostblink). */
@@ -406,6 +424,13 @@ export type SupportGemDef = {
   description: string;
 };
 
+/** What a stance does: mods on the character, a status on the enemies near, and less damage taken from the ones that are not. */
+export type StanceSide = {
+  mods: GemMod[];
+  enemies?: { id: StatusId; seconds: number; v: LevelValue; x?: LevelValue };
+  farLess?: LevelValue;
+};
+
 export type AuraGemDef = {
   kind: 'aura';
   id: string;
@@ -415,6 +440,15 @@ export type AuraGemDef = {
   reservePct?: number;
   reserveFlat?: LevelValue;
   mods: GemMod[];
+  /**
+   * A stance (docs/SPIRIT.md S9): effects for the Blood stance and for the Sand stance, and how far its effects on enemies reach.
+   * The character is in one stance at a time, shared by every stance gem.
+   */
+  stance?: {
+    radius: number;
+    blood: StanceSide;
+    sand: StanceSide;
+  };
   /** What the aura does on events while it is active (a herald's explosions). */
   triggers?: TriggerDef[];
   description: string;

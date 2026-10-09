@@ -380,16 +380,16 @@
       "ref": "Blood Rage",
       "name": "Surge of Blood",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S9",
-      "missing": ["buff_self_drawback", "refresh_on_kill", "charge_on_kill_while_buffed"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Buff: attack speed and life leech at the price of life degeneration; kills refresh the duration and may give a frenzy charge.",
         "bob": "Upkeep buff (9 s, cd 9): attackSpeed inc 5..15, leech.life 1.2 on attacks. Degen drawback, kill-refresh and charge-on-kill are all dropped.",
         "repair": "Add a buff-linked life drain mod, kill refresh of the buff timer, and chargeOn.kill.fervour inside the buff."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Blood Rage",
         "status": "corrected",
@@ -1487,16 +1487,16 @@
       "ref": "Blood and Sand",
       "name": "Dune Stance",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S9",
-      "missing": ["stance_toggle", "aoe_damage_tradeoff", "cooldown_bypass"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Stance toggled by recasting (2 s cooldown): Blood gives melee 10-15% more area damage and 5% less AoE, Sand gives 10-15% more AoE and 5% less area damage, so you pick damage or reach and swap as the fight changes.",
         "bob": "Free always-on buff of more melee-area damage with no cost, no AoE side and no toggle. Port note says the stances are averaged. The mod needs both melee and area tags on the skill.",
         "repair": "Model two stances (damage-vs-AoE) with an auto-swap policy (for example Blood vs bosses and tight packs, Sand vs wide packs) and give each its trade-off."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Blood and Sand",
         "status": "corrected",
@@ -3831,16 +3831,16 @@
       "ref": "Berserk",
       "name": "Rampage Call",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S9",
-      "missing": ["consume_rage", "resource_threshold_to_cast", "buff_length_from_resource"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Consumes Rage at an accelerating rate for a big buff (more damage, attack and move speed, less damage taken); needs minimum rage; length depends on stored rage.",
         "bob": "Rally buff (8 s, cd 12): more attack damage 15..20, more attack speed, move speed, less hit taken. Bob has rage (rageOn.*, w.rage), but Berserk neither requires nor consumes it - a cooldown buff with free uptime.",
         "repair": "Require min rage to cast, drain rage while active at an accelerating rate, and end the buff when rage runs out."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Berserk",
         "status": "confirmed",
@@ -5545,22 +5545,16 @@
       "ref": "Flesh and Stone",
       "name": "Stone Stance",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S9",
-      "missing": [
-        "stance_toggle",
-        "maim",
-        "blind",
-        "aura_enemy_debuff",
-        "range_conditional_damage_reduction"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Stance toggled by recasting: Flesh Stance maims nearby enemies and makes them take more physical damage from hits (offence); Sand Stance blinds nearby enemies and cuts damage taken from attacks by non-blind enemies (defence). 25% reserved in 3.9.",
         "bob": "Free always-on buff of less damage taken from hits (hitTaken more -9 to -11). No offensive stance, no maim or blind, no toggle, no reservation.",
         "repair": "Two stances swapped by policy: Flesh applies a phys-vuln debuff and slow to nearby enemies, Sand gives the damage reduction."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Flesh and Stone",
         "status": "corrected",
@@ -6756,16 +6750,16 @@
       "ref": "Bladestorm",
       "name": "Whirlwind Cleave",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S9",
-      "missing": ["ground_effect", "self_buff_in_zone", "stance_toggle"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A spin attack that leaves a bladestorm on the ground; in Blood Stance the storm stays and gives you attack speed while you fight inside it, in Sand Stance it drifts forward and speeds you up. The storm and stance are the skill.",
         "bob": "A self-centred burst (radius 2.2) at 105-120%: a basic spin attack. The storm, the stance and the buffs are all gone (the port note says so).",
         "repair": "Spawn a ground zone (the engine's ground behaviour already pulses) at the character on use, and give the character an attack-speed buff while inside it; stances can be one mode."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Bladestorm",
         "status": "confirmed",

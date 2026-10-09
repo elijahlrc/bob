@@ -338,7 +338,7 @@
   "whirlwindCleave": {
    "ref": "Bladestorm",
    "status": "covered",
-   "note": "A spinning attack around the character (the storm and stance are dropped)."
+   "note": "A spinning attack around the character that leaves a storm of blades for three seconds, half as hard as the spin, in the stance the character is in: a still one that makes you attack faster while you stand in it, or a drifting one that makes you move faster. Three storms at most."
   },
   "emberDownpour": {
    "ref": "Blast Rain",
@@ -993,12 +993,12 @@
   "bloodSurgeCall": {
    "ref": "Blood Rage",
    "status": "covered",
-   "note": "A buff kept up while enemies are near: faster attacks and life leech (the life drain and frenzy charge on kill are dropped)."
+   "note": "A buff kept up while enemies are near: faster attacks and life leech; it costs 4% of the maximum life (and energy shield) a second as physical damage over time, a kill renews it and may give a Fervour charge. The character lets it go when life runs low."
   },
   "rampage": {
    "ref": "Berserk",
    "status": "covered",
-   "note": "A buff cast when a pack or a rare enemy is near: more attack damage, speed and movement, and less damage taken (the rage threshold and loss are dropped)."
+   "note": "A buff that needs five rage to start, lasts as long as the rage does (it spends five a second, a fifth more every second), and while it lasts gives more attack damage, attack speed and movement speed and less damage taken. Its cooldown does not run while it lasts."
   },
   "quickStep": {
    "ref": "Dash",
@@ -1128,12 +1128,12 @@
   "duneStance": {
    "ref": "Blood and Sand",
    "status": "covered",
-   "note": "A stance with no reservation: the two stances are averaged into more melee area damage."
+   "note": "A stance that holds a tenth of the mana. In the Blood stance melee skills deal more area damage over less area; in the Sand stance they have more area and deal less damage in it. The character swaps stance by policy: the Sand stance when three or more enemies are near, the Blood stance otherwise; the stance is shared with Flesh and Stone and read by Bladestorm."
   },
   "stoneStance": {
    "ref": "Flesh and Stone",
    "status": "covered",
-   "note": "A stance with no reservation: the two stances are averaged into less damage taken from hits."
+   "note": "A stance that holds a quarter of the mana. In the Blood stance the enemies near are maimed, and a maimed enemy takes more physical damage; in the Sand stance they are blinded, and the character takes less damage from the attacks of enemies that are not near. Swapped by policy with Blood and Sand."
   },
   "rimePlate": {
    "ref": "Arctic Armour",

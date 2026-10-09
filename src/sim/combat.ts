@@ -33,6 +33,7 @@ import { bannerStage } from './banners';
 import { rollGains } from './buffs';
 import { gainTrophy, rollCharges } from './charges';
 import { ALL_HEX_IDS, HEXES } from '../data/hexes';
+import { refreshOnKill, stanceFarLess } from './stances';
 import { applyHex, applyPlayerHexes, hexHit, hexKill, tickHexes } from './hexes';
 import {
   applyStatus,
@@ -296,6 +297,14 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (dealt !== 1 && res.outcome !== 'block') {
     for (let i = 0; i < res.dmg.length; i++) res.dmg[i] *= dealt;
     res.total *= dealt;
+  }
+  // Flesh and Stone in the Sand stance: attacks by enemies that are not near do less.
+  if (dst.isPlayer && !src.isPlayer && res.outcome !== 'block' && p.isAttack) {
+    const far = stanceFarLess(w);
+    if (far && Math.hypot(src.x - dst.x, src.y - dst.y) > far.radius + src.r) {
+      for (let i = 0; i < res.dmg.length; i++) res.dmg[i] *= 1 - far.less;
+      res.total *= 1 - far.less;
+    }
   }
   // Immortal Call: the endurance spent makes the physical part of a hit smaller while the guard stands.
   if (dst.isPlayer && w.guard && w.buffT[w.guard.buff] > 0 && res.outcome !== 'block') {
@@ -757,6 +766,7 @@ export function killActor(w: World, a: Actor): void {
     if (a.ail.freezeT > 0) rollCharges(w, 'killFrozen', gains);
     rollGains(w, 'kill', gains);
     bannerStage(w, 'kill');
+    refreshOnKill(w);
   }
   if (!a.isPlayer && a.rarity === 'rare') gainTrophy(w, a.modIds);
   if (a.isPlayer) {

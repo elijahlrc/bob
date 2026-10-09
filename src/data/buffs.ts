@@ -34,7 +34,11 @@ export type BuffId =
   | 'flickerStep'
   | 'punisher'
   | 'adrenaline'
-  | 'elusive';
+  | 'elusive'
+  | 'bloodStance'
+  | 'sandStance'
+  | 'bladestormBlood'
+  | 'bladestormSand';
 export const BUFF_IDS: BuffId[] = [
   'fortify',
   'onslaught',
@@ -64,6 +68,10 @@ export const BUFF_IDS: BuffId[] = [
   'punisher',
   'adrenaline',
   'elusive',
+  'bloodStance',
+  'sandStance',
+  'bladestormBlood',
+  'bladestormSand',
 ];
 
 export type BuffDef = {
@@ -83,6 +91,40 @@ export type BuffDef = {
 const when = (cond: CondId): { condition: { id: CondId } } => ({ condition: { id: cond } });
 
 export const BUFFS: Record<BuffId, BuffDef> = {
+  bloodStance: {
+    id: 'bloodStance',
+    name: 'Blood Stance',
+    seconds: 1e9,
+    cond: 'bloodStance',
+    text: 'Blood Stance',
+    mods: [],
+    gem: true,
+  },
+  sandStance: {
+    id: 'sandStance',
+    name: 'Sand Stance',
+    seconds: 1e9,
+    cond: 'sandStance',
+    text: 'Sand Stance',
+    mods: [],
+    gem: true,
+  },
+  bladestormBlood: {
+    id: 'bladestormBlood',
+    name: 'In a Blood Storm',
+    seconds: 1,
+    cond: 'bladestormBlood',
+    text: '11% more attack speed while in a storm of the Blood stance',
+    mods: [mod('attackSpeed', 'more', 11, when('bladestormBlood'))],
+  },
+  bladestormSand: {
+    id: 'bladestormSand',
+    name: 'In a Sand Storm',
+    seconds: 1,
+    cond: 'bladestormSand',
+    text: '34% increased movement speed while in a storm of the Sand stance',
+    mods: [mod('moveSpeed', 'inc', 34, when('bladestormSand'))],
+  },
   elusive: {
     id: 'elusive',
     name: 'Elusive',

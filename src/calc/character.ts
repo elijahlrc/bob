@@ -563,6 +563,18 @@ export class Character {
     for (const slot of EQUIP_SLOTS)
       for (const g of build.equipment[slot]?.sockets ?? []) {
         const gd = g ? gemDef(g.gemId) : null;
+        // A stance the character holds, and the buffs of a storm it can make.
+        if (gd?.kind === 'aura' && gd.stance) {
+          utilBuffs.add('bloodStance');
+          utilBuffs.add('sandStance');
+          if (!buffIdsGranted.has('sandStance')) this.briefBuffs.add('sandStance');
+        }
+        if (gd?.kind === 'active' && gd.bladestorm) {
+          for (const id of [gd.bladestorm.blood, gd.bladestorm.sand]) {
+            utilBuffs.add(id);
+            if (!buffIdsGranted.has(id)) this.briefBuffs.add(id);
+          }
+        }
         if (gd?.kind === 'active' && gd.utility?.kind === 'buff') {
           utilBuffs.add(gd.utility.buff);
           // What a banner gives when it is put down is brief: the sheet does not count it as always up.
@@ -841,8 +853,21 @@ export class Character {
       if (active) {
         if (life) reservedLife += r;
         else reservedMana += r;
+        // A stance holds a set of effects for each of its two stances, each behind the condition of its stance.
+        const list = def.stance
+          ? [
+              ...gemMods(def.stance.blood.mods, sg.level, def.id).map((m) => ({
+                ...m,
+                condition: { id: 'bloodStance' as const },
+              })),
+              ...gemMods(def.stance.sand.mods, sg.level, def.id).map((m) => ({
+                ...m,
+                condition: { id: 'sandStance' as const },
+              })),
+            ]
+          : gemMods(def.mods, sg.level, def.id);
         db0.addAll(
-          gemMods(def.mods, sg.level, def.id).map((m) => ({
+          list.map((m) => ({
             ...m,
             value: m.value * auraEffect,
             source: { kind: 'aura', id: def.id },

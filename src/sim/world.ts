@@ -23,6 +23,7 @@ import { tickCooldowns } from './cooldowns';
 import { tickChannel } from './channel';
 import { tickBanner } from './banners';
 import { tickCaught, tickWarp, tickWither } from './blinks';
+import { tickBerserk, tickDegen, tickStance } from './stances';
 import { tickProliferation } from './proliferate';
 import { tickFields } from './fields';
 import { reservedMana } from './reserve';
@@ -108,7 +109,11 @@ export function createWorld(inp: CreateWorldInput): World {
     rngLoot: root.fork('loot'),
     rngTrig: root.fork('trigger'),
     chargeT: { grit: 0, fervour: 0, insight: 0 },
-    buffT: Object.fromEntries(BUFF_IDS.map((id) => [id, 0])) as Record<BuffId, number>,
+    buffT: {
+      ...Object.fromEntries(BUFF_IDS.map((id) => [id, 0])),
+      // Everyone starts in the Blood stance.
+      bloodStance: 1e9,
+    } as Record<BuffId, number>,
     rage: 0,
     rageT: 0,
     rageDrain: 0,
@@ -141,6 +146,7 @@ export function createWorld(inp: CreateWorldInput): World {
     warp: null,
     wither: null,
     caught: null,
+    berserkT: 0,
     channel: null,
     stacks: null,
     hitsLanded: 0,
@@ -538,6 +544,9 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickWarp(w, dt);
   tickWither(w);
   tickCaught(w, dt);
+  tickStance(w);
+  tickBerserk(w, dt);
+  tickDegen(w, dt);
   tickProliferation(w, dt);
   updateProjectiles(w, dt);
   tickZones(w, dt);

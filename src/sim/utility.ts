@@ -65,6 +65,9 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
     }
     if (u.kind === 'buff') {
       if (d > CAST_RANGE + 1) continue;
+      // Berserk needs rage to start; Blood Rage is not begun on low life.
+      if (u.rage && w.rage < u.rage.min) continue;
+      if (u.degen && p.life < p.def.maxLife * 0.6) continue;
       const left = w.buffT[u.buff];
       if (left > prof.useTime + 0.3) continue;
       if (u.policy === 'guard') {
@@ -184,6 +187,14 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
   }
   if (u.kind === 'buff') {
     const before = w.buffT[u.buff];
+    // Berserk lasts as long as the rage does, and its cooldown waits for the end.
+    if (u.rage) {
+      w.berserkT = 0.001;
+      w.buffT[u.buff] = 1e9;
+      w.utilityReady[c.key] = 1e9;
+      w.events.push({ t: 'buff', id: u.buff });
+      return;
+    }
     gainBuff(w, u.buff);
     // The charges a guard spends make it last longer and take more of the physical damage away.
     let spent = 0;

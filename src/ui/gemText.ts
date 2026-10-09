@@ -88,6 +88,27 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
       ],
     };
   }
+  if (u.kind === 'buff' && (u.rage || u.degen))
+    return {
+      stats: [
+        ...(u.rage
+          ? [
+              `Needs ${num(u.rage.min)} rage; lasts until the rage is gone, which it spends at ${num(u.rage.drain)} a second, ${num(u.rage.accel)}% faster every second`,
+            ]
+          : [`Lasts ${num(u.seconds)} s`]),
+        ...(u.degen
+          ? [
+              `You lose ${num(u.degen)}% of your life and energy shield each second as physical damage`,
+            ]
+          : []),
+        ...(u.refreshOnKill ? ['A kill renews it'] : []),
+        POLICY_TEXT[u.policy],
+        ...(u.cooldown
+          ? [`${num(u.cooldown)} s cooldown${u.rage ? ', which does not run while it lasts' : ''}`]
+          : []),
+      ],
+      effects: modsText(gemMods(u.mods, level, def.id)),
+    };
   if (u.kind === 'buff')
     return {
       stats: [
@@ -230,6 +251,33 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
       stats.push(`Reserves ${Math.round(levelValue(def.reserveFlat, level))} mana`);
     for (const t of def.triggers ?? []) stats.push(triggerText(t));
     effects = modsText(gemMods(def.mods, level, def.id));
+    // A stance has two sets of effects, one for each stance; the character swaps by policy (a crowd: the Sand stance).
+    if (def.stance) {
+      stats.push(
+        'Two stances; you take the Sand stance when three or more enemies are near, the Blood stance otherwise',
+      );
+      for (const [name, side] of [
+        ['Blood stance', def.stance.blood],
+        ['Sand stance', def.stance.sand],
+      ] as const) {
+        for (const m of modsText(gemMods(side.mods, level, def.id))) effects.push(`${name}: ${m}`);
+        if (side.enemies) {
+          const s = STATUSES[side.enemies.id];
+          effects.push(
+            `${name}: enemies near you are ${s.name.toLowerCase()} (${s.text
+              .replace('{v}', num(levelValue(side.enemies.v, level)))
+              .replace(
+                '{x}',
+                num(side.enemies.x === undefined ? 0 : levelValue(side.enemies.x, level)),
+              )})`,
+          );
+        }
+        if (side.farLess)
+          effects.push(
+            `${name}: ${num(levelValue(side.farLess, level))}% less damage from attacks by enemies that are not near`,
+          );
+      }
+    }
   }
   const attrs = gemAttrReq(def.attr, level);
   const req = [`level ${GEM_LEVEL_REQ[Math.min(level, 20) - 1]}`];

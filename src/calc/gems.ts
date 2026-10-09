@@ -142,6 +142,7 @@ export type SkillDef = {
   /** A debuff of damage over time the skill inflicts (docs/SPIRIT.md S7). */
   dot?: DotSpec;
   burning?: { pct: LevelValue; seconds: number; cap: number };
+  bladestorm?: ActiveGemDef['bladestorm'];
   form?: { after: number; speed: number; critMore: number; critMulti: LevelValue };
   recoverNear?: { normal: LevelValue; rare: LevelValue; radius: number };
   pausedBy?: BuffId;
@@ -281,6 +282,7 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     burning: def.burning,
     orb: def.orb,
     form: def.form,
+    bladestorm: def.bladestorm,
     recoverNear: def.recoverNear,
     pausedBy: def.pausedBy,
     catches: def.catches,

@@ -22,6 +22,7 @@ import {
   releaseCaught,
 } from './shots';
 import { catchProjectile, skillUsed } from './blinks';
+import { placeBladestorm } from './stances';
 import { applyUtility } from './utility';
 import type { Action, Actor, World } from './types';
 
@@ -247,6 +248,7 @@ export function fire(w: World, a: Actor, act: Action): void {
   if (a.isPlayer && act.profile.skill.releasesCaught) releaseCaught(w, a);
   fireEffect(w, a, act);
   leaveGround(w, a, act);
+  if (act.profile.skill.bladestorm) placeBladestorm(w, a, act);
   // An aftershock: the ground cracks, and a moment later it erupts, harder and wider.
   const aft = act.profile.skill.aftershock;
   if (aft && a.isPlayer && act.which !== 'deployed') {
