@@ -89,8 +89,14 @@ export function actorById(w: World, id: number): Actor | undefined {
   return undefined;
 }
 
-/** When the next echo lands: a share of the use time after the first (and each earlier echo). */
-const echoeAt = (act: Action) => (HIT_AT + ECHO_GAP * (act.echoes + 1)) * act.duration;
+/**
+ * When the next echo lands: a share of the use time after the first (and each earlier echo). The gap shrinks when there are
+ * several echoes, so the last one still lands before the use ends (Multistrike repeats twice).
+ */
+const echoeAt = (act: Action) =>
+  (HIT_AT +
+    Math.min(ECHO_GAP, (0.98 - HIT_AT) / Math.max(1, act.profile.repeats)) * (act.echoes + 1)) *
+  act.duration;
 
 /** Advance the current action; fire it at 60% of its use time. */
 export function updateAction(w: World, a: Actor, dt: number): void {
@@ -286,7 +292,9 @@ export function fire(w: World, a: Actor, act: Action): void {
       dtype: dominantType(p, act.hand),
       heavy: isHeavy(a, p),
     });
-    hit(w, a, target, p, act.hand, d);
+    // A skill that strikes with both weapons at once (Dual Strike) lands both blows.
+    if (p.bothHands) for (let h = 0; h < p.hands.length; h++) hit(w, a, target, p, h, d);
+    else hit(w, a, target, p, act.hand, d);
     return;
   }
   if (b.kind === 'chain') {

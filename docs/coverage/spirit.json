@@ -3535,16 +3535,16 @@
       "ref": "Cast on Melee Kill Support",
       "name": "Slayer's Echo",
       "kind": "support",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": ["trigger_link_to_non_supported_skill", "kill_trigger_tag_filter"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Linked spells are cast when the supported melee attack kills an enemy; a melee build gets automatic spells.",
         "bob": "Declared as supports ['melee'] with a kill trigger. Character.buildTriggers links a spell only if supportApplies(support, spell) passes, i.e. the spell must itself have the melee type; no spell does, so skills is empty and castSocketed returns false: it never casts, and only taxes the melee skill's cost by 1.4. (Also the 'melee' tag filter is ignored for kill events.) Static reading, not run.",
         "repair": "In buildTriggers, link the spells in the same item by their own applicability (spell + triggerable), not by the support's melee requirement; also check the killer's skill tags for kill events."
       },
-      "verified": false
+      "verified": true
     },
     "slipstream": {
       "ref": "Phase Run",
@@ -4391,9 +4391,9 @@
       "milestone": "S13",
       "missing": ["repeat_ramp", "repeat_random_target"],
       "audit": {
-        "poe": "Melee attack repeats twice, each repeat on a random enemy, with damage ramping up and a speed bonus.",
-        "bob": "Sets repeats 2 with speed and damage boosts. The sim lands echoes at 0.6+0.25n of the use time, so the second echo (1.1 of the use) comes after the action ends and appears never to fire (calc counts 3 lands; read from code, not run). Damage 'more' is positive (+12..25), not a penalty; no ramp; same target.",
-        "repair": "Fix echo timing for more than one repeat, make damage ramp per repeat, pick a new target."
+        "poe": "Multistrike repeats twice with a random enemy each time, 35-44% more attack speed, -20..-10% damage on every strike, +22% on the first repeat and +44% on the second (3.9 data).",
+        "bob": "Sets repeats 2 with speed and damage boosts; the second echo now lands before the action ends (S1). No ramp, no penalty, same target.",
+        "repair": "S13c: the penalty and ramp as 3.9 has them, and a random nearby target for each repeat."
       },
       "verified": false
     },

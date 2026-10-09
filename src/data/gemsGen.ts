@@ -7466,7 +7466,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       on: 'kill',
       tags: ['melee'],
       chance: 100,
-      cooldown: 0.25,
+      cooldown: 0.15,
       effect: {
         kind: 'castSocketed',
       },

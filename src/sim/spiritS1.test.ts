@@ -60,3 +60,59 @@ describe('Cast on Melee Kill (slayersEcho)', () => {
     }
   });
 });
+
+/** A character with the given gems in the main hand (the first is the primary skill), and `off` in the other. */
+function holding(main: string, gems: string[], off: 'none' | 'dual' = 'none'): Build {
+  const run = newRun('vanguard', 1);
+  const uid = () => run.nextUid++;
+  const b = run.build;
+  b.level = 40;
+  const weapon = makeItem(uid, main, 40, gems.length);
+  weapon.sockets = gems.map((g) => makeGem(uid, g));
+  b.equipment.mainHand = weapon;
+  if (off === 'dual') b.equipment.offHand = makeItem(uid, main, 40, 1);
+  else delete b.equipment.offHand;
+  b.primaryGem = weapon.sockets[0]!.uid;
+  b.flasks = [null, null, null, null, null];
+  return b;
+}
+
+/** Uses and hits of the player's skill over `seconds` against the dummy. */
+function tally(b: Build, seconds: number) {
+  const { world } = createDummyWorld(b, { distance: 1.4 });
+  world.opts.freeResources = true;
+  let uses = 0;
+  let hits = 0;
+  for (let i = 0; i < seconds * 60; i++) {
+    stepWorld(world);
+    for (const e of world.events) {
+      if (e.t === 'use' && e.src === world.player.id) uses++;
+      if (e.t === 'hit' && e.src === world.player.id) hits++;
+    }
+  }
+  return { uses, hits };
+}
+
+describe('Multistrike (tripleCadence)', () => {
+  it('strikes three times in a use: the second echo lands before the action ends', () => {
+    const { uses, hits } = tally(holding('sword_3', ['crushingBlow', 'tripleCadence']), 20);
+    expect(uses).toBeGreaterThan(10);
+    // The last use may be cut off by the end of the run.
+    expect(hits).toBeGreaterThanOrEqual(3 * (uses - 1));
+    expect(hits).toBeLessThanOrEqual(3 * uses);
+  });
+
+  it('a single echo (Echoing Cast style) still lands once, as before', () => {
+    const { uses, hits } = tally(holding('sword_3', ['crushingBlow', 'echoingBlow']), 20);
+    expect(hits).toBeGreaterThanOrEqual(2 * (uses - 1));
+  });
+});
+
+describe('Dual Strike (twinBlades)', () => {
+  it('hits with both weapons in one use against a single target', () => {
+    const { uses, hits } = tally(holding('dagger_3', ['twinBlades'], 'dual'), 20);
+    expect(uses).toBeGreaterThan(10);
+    expect(hits).toBeGreaterThanOrEqual(2 * (uses - 1));
+    expect(hits).toBeLessThanOrEqual(2 * uses);
+  });
+});
