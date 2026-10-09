@@ -532,6 +532,9 @@ export function alertPack(w: World, m: Actor): void {
 /** Seconds a chasing monster must be held up before it turns on a minion in its way. */
 const BLOCKED_TIME = 0.35;
 
+/** Seconds a ranged monster must be held up before it shoots a minion instead of walking on to the character. */
+const RANGED_BLOCKED_TIME = 1.5;
+
 /** The nearest standing minion a melee monster can strike from where it stands. */
 function minionInReach(w: World, m: Actor, range: number): Actor | null {
   let best: Actor | null = null;
@@ -707,8 +710,12 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
       startAction(w, m, 'monster', prof, tg);
       return;
     }
-    // It cannot hit the player from here: a minion in range and in sight is shot instead.
-    const v = w.minions.length > 0 ? minionInSight(w, m, range) : null;
+    // It cannot hit the player from here: it walks on toward the player, and shoots a minion in range and in sight only
+    // once it is held up (a ranged monster goes for the character, not for what stands about it).
+    const v =
+      w.minions.length > 0 && m.blockT >= RANGED_BLOCKED_TIME && tg === p
+        ? minionInSight(w, m, range)
+        : null;
     if (v) {
       startAction(w, m, 'monster', prof, v);
       return;

@@ -179,11 +179,11 @@ describe('mortal minions', () => {
     expect(w.player.life).toBe(w.player.def.maxLife);
   });
 
-  it('a ranged monster that cannot see the player shoots the minion it can', () => {
+  it('a ranged monster that cannot see the player walks on toward the player, not shooting the minion it can see', () => {
     const w = arena();
     const ms = summon(w);
     const g = w.grid;
-    // A wall hides the player from the archer; the minion stands in the open on the archer's side.
+    // A wall hides the player from the archer, with a way round it; the minion stands in the open on the archer's side.
     for (let y = 10; y <= 20; y++) g.tiles[y * g.w + 12] = WALL;
     g.refreshOpen();
     const keep = ms[0];
@@ -193,9 +193,30 @@ describe('mortal minions', () => {
     keep.y = 15.5;
     w.player.x = 8.5;
     w.player.y = 15.5;
-    monsterAt(w, 'archer', 20.5, 15.5);
-    w.player.life = w.player.def.maxLife;
-    run(w, 8, () => keep.life < keep.def.maxLife || !keep.alive);
+    const archer = monsterAt(w, 'archer', 20.5, 15.5);
+    archer.state = 'chase';
+    run(w, 1.2);
+    expect(keep.life).toBe(keep.def.maxLife);
+    expect(archer.x).toBeLessThan(20.5);
+  });
+
+  it('a ranged monster that is held up for long shoots the minion in its way', () => {
+    const w = arena();
+    const ms = summon(w);
+    const g = w.grid;
+    // The player is walled off entirely: the archer can get nowhere, so the minion it can see is its target.
+    for (let y = 1; y < g.h - 1; y++) g.tiles[y * g.w + 12] = WALL;
+    g.refreshOpen();
+    const keep = ms[0];
+    for (const v of ms) if (v !== keep) v.alive = false;
+    keep.speed = 0;
+    keep.x = 16.5;
+    keep.y = 15.5;
+    w.player.x = 8.5;
+    w.player.y = 15.5;
+    const archer = monsterAt(w, 'archer', 20.5, 15.5);
+    archer.state = 'chase';
+    run(w, 10, () => keep.life < keep.def.maxLife || !keep.alive);
     expect(keep.life < keep.def.maxLife || !keep.alive).toBe(true);
     expect(w.player.life).toBe(w.player.def.maxLife);
   });
