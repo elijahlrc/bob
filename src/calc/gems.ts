@@ -88,8 +88,15 @@ export type SkillDef = {
   /** Added damage effectiveness, percent. */
   effectiveness: number;
   castTime: number;
-  /** Seconds between uses when cast as a secondary skill; the default is 6 uses long, at least 3 s. */
+  /**
+   * Seconds between uses (a gem's own cooldown, which applies to the primary skill as well); without one a secondary skill
+   * waits the default, 6 uses long and at least 3 s.
+   */
   cooldown?: number;
+  /** How many uses the cooldown stores. */
+  cooldownUses?: number;
+  /** Charges that can be spent to use the skill while it waits on its cooldown. */
+  bypass?: { charge: 'grit' | 'fervour' | 'insight'; n: number };
   /** Spell base crit, percent. */
   crit: number;
   cost: number;
@@ -160,6 +167,9 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     bothWeapons: def.bothWeapons,
     utility: def.utility,
     travel: def.travel,
+    cooldown: def.cooldown === undefined ? undefined : levelValue(def.cooldown, level),
+    cooldownUses: def.cooldownUses,
+    bypass: def.bypass,
   };
 }
 

@@ -168,6 +168,7 @@ export const CONDITIONS = [
   'heraldIce',
   'heraldThunder',
   'heraldAgony',
+  'flickerStep',
   // State of the player (C3): moving, ailments on the player, the weapon held.
   'stationary',
   'ignited',

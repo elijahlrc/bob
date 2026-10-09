@@ -30,7 +30,8 @@ export type BuffId =
   | 'offeringFlesh'
   | 'offeringSpirit'
   | 'catStealth'
-  | 'avianBoon';
+  | 'avianBoon'
+  | 'flickerStep';
 export const BUFF_IDS: BuffId[] = [
   'fortify',
   'onslaught',
@@ -56,6 +57,7 @@ export const BUFF_IDS: BuffId[] = [
   'offeringSpirit',
   'catStealth',
   'avianBoon',
+  'flickerStep',
 ];
 
 export type BuffDef = {
@@ -75,6 +77,14 @@ export type BuffDef = {
 const when = (cond: CondId): { condition: { id: CondId } } => ({ condition: { id: cond } });
 
 export const BUFFS: Record<BuffId, BuffDef> = {
+  flickerStep: {
+    id: 'flickerStep',
+    name: 'Quicksilver',
+    seconds: 3,
+    cond: 'flickerStep',
+    text: '20% increased movement speed',
+    mods: [mod('moveSpeed', 'inc', 20, when('flickerStep'))],
+  },
   catStealth: {
     id: 'catStealth',
     name: 'Prowler’s Veil',
@@ -299,6 +309,7 @@ export const BUFFS: Record<BuffId, BuffDef> = {
 
 /** The events a buff can be gained on, and the stat id of the chance, in percent: `buffOn.<event>.<buff>`. */
 export const BUFF_EVENTS = [
+  'use',
   'stun',
   'cast',
   'kill',

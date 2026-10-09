@@ -53,6 +53,8 @@ export function startAction(
   }
   w.events.push({ t: 'use', src: a.id, skill: p.skill.id });
   if (a.isPlayer && p.isAttack) fireTriggers(w, { on: 'attack', target, tags: p.tagMask });
+  // Using a skill can grant a buff of its own (Flicker Strike's burst of speed).
+  if (a.isPlayer) rollGains(w, 'use', p.gains);
   if (a.isPlayer && !p.isAttack) {
     fireTriggers(w, { on: 'cast', target, tags: p.tagMask });
     rollGains(w, 'cast', p.gains);

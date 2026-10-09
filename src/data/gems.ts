@@ -129,6 +129,12 @@ export type ActiveGemDef = {
   utility?: UtilityDef;
   /** A damaging skill that also moves the caster this far toward the target (a leap, a charge). */
   travel?: number;
+  /** Seconds before the skill can be used again; a use lost to the wait is regained one at a time (docs/SPIRIT.md S2). */
+  cooldown?: LevelValue;
+  /** How many uses the cooldown stores (default one). */
+  cooldownUses?: number;
+  /** Charges that can be spent to use the skill while it waits on its cooldown. */
+  bypass?: { charge: 'grit' | 'fervour' | 'insight'; n: number };
   description: string;
 };
 

@@ -19,6 +19,7 @@ import { tickAbilities, tickChargingMod } from './abilities';
 import { isZone, tickCorpses, tickFactionBehaviour, tickZones } from './factions';
 import { BUFF_IDS, type BuffId } from '../data/buffs';
 import { rollGains, tickBuffs } from './buffs';
+import { tickCooldowns } from './cooldowns';
 import { tickDeployables } from './deploy';
 import { tickMinions } from './minions';
 import { tickAuraBurn } from './utility';
@@ -107,6 +108,7 @@ export function createWorld(inp: CreateWorldInput): World {
     chars: new Map(),
     trophy: {},
     secondaryReady: {},
+    cooldowns: {},
     utilityReady: {},
     auraBurnT: 0,
     deployables: [],
@@ -485,6 +487,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickTriggers(w, dt);
   tickCharges(w, dt);
   tickBuffs(w, dt);
+  tickCooldowns(w, dt);
   tickAuraBurn(w, dt);
   tickDeployables(w, dt);
   tickMinions(w, dt);

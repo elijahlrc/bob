@@ -315,6 +315,8 @@ export type SimEvent =
   | { t: 'beam'; x: number; y: number; x2: number; y2: number; dtype: number }
   | { t: 'blink'; id: number; x: number; y: number; end: boolean }
   | { t: 'charge'; kind: string; count: number }
+  /** Charges the character spent on purpose (to skip a cooldown, or to power a skill). */
+  | { t: 'spend'; kind: string; n: number }
   | { t: 'buff'; id: string }
   | { t: 'hex'; id: number; hex: string }
   | { t: 'deploy'; kind: string; x: number; y: number; end: boolean }
@@ -478,6 +480,8 @@ export type World = {
   secondaryReady: Record<string, number>;
   /** When each utility skill (by choice key) can next be cast. */
   utilityReady: Record<string, number>;
+  /** Skills with a cooldown of their own (by choice key): the uses held and the seconds until the next one is regained. */
+  cooldowns: Record<string, { uses: number; t: number }>;
   /** Time since the burning aura last struck. */
   auraBurnT: number;
   /** The totems, brands, traps and mines on the ground. */

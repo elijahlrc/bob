@@ -1,5 +1,5 @@
 import { abilitiesOf } from '../data/abilities';
-import { skillRange } from '../calc/character';
+import { skillRange, type SkillChoice } from '../calc/character';
 import type { Defence } from '../calc/combat';
 import type { SkillProfile } from '../calc/skill';
 import {
@@ -25,6 +25,7 @@ import { MONSTER_TYPES } from '../data/monsters';
 import { actorById, startAction } from './actions';
 import { bloaterBurst, isZone, speedMult } from './factions';
 import { flaskMask, monsterConds, playerConds } from './combat';
+import { offCooldown, useSkill } from './cooldowns';
 import { canPay, payCost } from './cost';
 import { deployFull } from './deploy';
 import { inTelegraph, telegraphs } from './telegraph';
@@ -163,17 +164,21 @@ function chooseSkill(w: World, target: Actor) {
     costsLife: boolean;
     key: string;
     cd: number;
+    choice: SkillChoice;
   } | null = null;
   for (const c of w.char.secondaries) {
-    if ((w.secondaryReady[c.key] ?? 0) > w.t) continue;
+    // A skill with a cooldown of its own waits for a use (or the charges that stand in for one).
+    if (c.skill.cooldown !== undefined ? !offCooldown(w, c) : (w.secondaryReady[c.key] ?? 0) > w.t)
+      continue;
     const prof = w.char.profile(c, conds, flaskMask(w));
     if (!canHurt(prof, target.def) || !canPay(w, c.costsLife, prof.cost)) continue;
     if (deployFull(w, c, prof) || !inReach(w, prof, target)) continue;
     const cd = w.char.cooldownOf(c, conds);
-    if (!second || cd > second.cd) second = { prof, costsLife: c.costsLife, key: c.key, cd };
+    if (!second || cd > second.cd)
+      second = { prof, costsLife: c.costsLife, key: c.key, cd, choice: c };
   }
   if (second) return { which: 'secondary' as const, ...second };
-  if (w.primary.usable && w.primary.gemUid !== null) {
+  if (w.primary.usable && w.primary.gemUid !== null && offCooldown(w, w.primary)) {
     const prof = w.char.profile(w.primary, conds, flaskMask(w));
     // Against a target immune to everything the skill deals, fall back to the weapon.
     if (
@@ -181,7 +186,14 @@ function chooseSkill(w: World, target: Actor) {
       canPay(w, w.primary.costsLife, prof.cost) &&
       !deployFull(w, w.primary, prof)
     )
-      return { which: 'primary' as const, prof, costsLife: w.primary.costsLife, key: '', cd: 0 };
+      return {
+        which: 'primary' as const,
+        prof,
+        costsLife: w.primary.costsLife,
+        key: '',
+        cd: 0,
+        choice: w.primary,
+      };
   }
   return {
     which: 'default' as const,
@@ -189,6 +201,7 @@ function chooseSkill(w: World, target: Actor) {
     costsLife: false,
     key: '',
     cd: 0,
+    choice: w.char.defaultAttack,
   };
 }
 
@@ -287,7 +300,7 @@ export function playerAI(w: World, dt: number): void {
       startAction(w, p, 'utility', util.prof, target);
       return;
     }
-    const { which, prof, costsLife, key, cd } = chooseSkill(w, target);
+    const { which, prof, costsLife, key, cd, choice } = chooseSkill(w, target);
     const melee = prof.skill.behaviour.kind === 'melee';
     const reach = skillRange(prof) + target.r + (melee ? p.r : 0);
     const d = Math.hypot(target.x - p.x, target.y - p.y);
@@ -306,7 +319,9 @@ export function playerAI(w: World, dt: number): void {
     }
     if (inRange) {
       if (which === 'primary' || which === 'secondary') payCost(w, costsLife, prof.cost);
-      if (which === 'secondary') w.secondaryReady[key] = w.t + cd;
+      if (which === 'secondary' && choice.skill.cooldown === undefined)
+        w.secondaryReady[key] = w.t + cd;
+      if (which === 'primary' || which === 'secondary') useSkill(w, choice);
       startAction(w, p, which, prof, target);
       return;
     }

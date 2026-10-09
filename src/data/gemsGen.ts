@@ -2531,17 +2531,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       kind: 'melee',
       range: 1.6,
     },
-    baseMult: [100, 140],
-    cost: [8, 8],
+    baseMult: [222, 260],
+    cost: [6, 6],
     requiresWeapon: ['sword', 'axe', 'mace', 'staff'],
+    cooldown: 4,
+    bypass: {
+      charge: 'grit',
+      n: 1,
+    },
     mods: [
       {
         stat: 'buffOn.meleeHit.fortify',
         kind: 'base',
         value: 100,
       },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -15,
+      },
     ],
-    description: 'A solid strike that makes you Fortified.',
+    description:
+      'A weighty blow that makes you Fortified. It waits four seconds between uses, unless you spend a Grit charge.',
   },
   {
     kind: 'active',
@@ -3654,6 +3665,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     baseMult: [142, 168],
     cost: [10, 10],
+    cooldown: 2,
+    bypass: {
+      charge: 'fervour',
+      n: 1,
+    },
     mods: [
       {
         stat: 'chargeOn.hit.fervour',
@@ -3662,15 +3678,26 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       },
       {
         stat: 'attackSpeed',
-        kind: 'more',
+        kind: 'inc',
         value: 10,
         per: {
           stat: 'charges.fervour',
           div: 1,
         },
       },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: 20,
+      },
+      {
+        stat: 'buffOn.use.flickerStep',
+        kind: 'base',
+        value: 100,
+      },
     ],
-    description: 'Vanish and strike, growing quicker with each Fervour charge.',
+    description:
+      'Vanish and strike. It waits two seconds between uses, unless you spend a Fervour charge; each charge quickens it, and each use speeds you for three seconds.',
   },
   {
     kind: 'active',

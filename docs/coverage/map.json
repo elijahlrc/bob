@@ -743,7 +743,7 @@
   "guardedStrike": {
    "ref": "Vigilant Strike",
    "status": "covered",
-   "note": "A strike that also fortifies the character for a while."
+   "note": "A weighty blow that fortifies the character: used once every four seconds, or again at once by spending an Endurance-style (Grit) charge."
   },
   "blizzardRing": {
    "ref": "Vortex",
@@ -1058,7 +1058,7 @@
   "blinkingCut": {
    "ref": "Flicker Strike",
    "status": "covered",
-   "note": "A strike that carries the character to the target and gains Fervour charges, attacking faster for each."
+   "note": "A strike that carries the character to the target. It waits two seconds between uses, unless a Fervour charge is spent; it gains Fervour charges on hit, attacks faster for each, and speeds the character for three seconds after each use."
   },
   "stormRush": {
    "ref": "Charged Dash",

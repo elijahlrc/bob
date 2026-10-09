@@ -22,6 +22,7 @@ import { minionUptime } from './minion';
 import {
   CHARGE_KINDS,
   chargeMods,
+  chargeStat,
   hasChargeSource,
   maxChargesOf,
   noCharges,
@@ -1171,9 +1172,18 @@ export class Character {
     // A totem or brand shoots on its own, whatever the character does; traps and mines go off several at a time.
     const deployN = choice.deploy ? p.deployCount : 1;
     const standing = choice.deploy === 'totem' || choice.deploy === 'brand';
+    // A skill with a cooldown of its own is used as often as the cooldown (and the charges that skip it) allow; the weapon fills the rest.
+    const cdRate =
+      usesOverride === undefined && !choice.deploy && choice.gemUid !== null
+        ? this.cooldownRate(choice, conds)
+        : undefined;
     const usesPerSec =
       usesOverride ??
-      (standing ? deployN / p.useTime : (timeShare / p.useTime) * (choice.deploy ? deployN : 1));
+      (cdRate !== undefined
+        ? Math.min(timeShare / p.useTime, cdRate)
+        : standing
+          ? deployN / p.useTime
+          : (timeShare / p.useTime) * (choice.deploy ? deployN : 1));
     const perType = [0, 0, 0, 0, 0];
     let perUse = 0;
     let hc = 0;
@@ -1206,6 +1216,11 @@ export class Character {
     // A repeating skill (Echoing Cast) lands several times per use; a triggered one does not repeat.
     const lands = (choice.triggered ? 1 : 1 + p.repeats) * p.pulses;
     let hitDps = perUse * usesPerSec * lands;
+    if (cdRate !== undefined && timeShare - usesPerSec * p.useTime > 1e-6)
+      hitDps +=
+        this.skillSheet(this.defaultAttack, target, conds).hitDps *
+        (timeShare - usesPerSec * p.useTime) *
+        0.9;
     // While its totems and brands stand and shoot, the character itself fights with its weapon.
     if (standing && usesOverride === undefined && choice.gemUid !== null)
       hitDps += this.skillSheet(this.defaultAttack, target, conds).hitDps * 0.9;
@@ -1300,10 +1315,34 @@ export class Character {
     return this.secondaryCache;
   }
 
+  /**
+   * Uses a second that a skill's own cooldown allows, counting the charges that skip it: each use gains charges at the skill's
+   * chance, and each charge spent buys one more use. Undefined for a skill with no cooldown.
+   */
+  cooldownRate(choice: SkillChoice, conds: number = this.configConds): number | undefined {
+    const cd0 = choice.skill.cooldown;
+    if (cd0 === undefined) return undefined;
+    const p = this.profile(choice, conds);
+    let rate = Math.max(0.1, this.db.mult('cooldownRecovery')) / Math.max(0.05, cd0);
+    const b = choice.skill.bypass;
+    if (b) {
+      let chance = 0;
+      for (const ev of ['hit', 'meleeHit'] as const) {
+        const stat = chargeStat(ev, b.charge);
+        chance += this.db.sum('base', stat);
+        for (const m of p.gains) if (m.stat === stat && m.kind === 'base') chance += m.value;
+      }
+      const gain = (chance / 100) * (1 + p.repeats);
+      rate /= Math.max(0.05, 1 - gain / b.n);
+    }
+    return Math.min(rate, 1 / p.useTime);
+  }
+
   /** Seconds before a secondary skill can be cast again (EXPANSION 5.5a). */
   cooldownOf(choice: SkillChoice, conds: number = this.configConds): number {
+    const rate = this.cooldownRate(choice, conds);
     return (
-      choice.skill.cooldown ??
+      (rate === undefined ? undefined : 1 / rate) ??
       Math.max(
         SECONDARY_MIN_COOLDOWN,
         SECONDARY_COOLDOWN_USES * this.profile(choice, conds).useTime,

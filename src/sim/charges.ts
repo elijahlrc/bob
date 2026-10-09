@@ -82,6 +82,16 @@ export function gainCharge(w: World, kind: ChargeKind): void {
   w.events.push({ t: 'charge', kind, count: w.char.charges[kind] });
 }
 
+/** Spend charges of a kind on purpose; returns whether the character held that many. */
+export function spendCharges(w: World, kind: ChargeKind, n: number): boolean {
+  const have = w.char.charges;
+  if (have[kind] < n) return false;
+  swap(w, { ...have, [kind]: have[kind] - n });
+  if (w.char.charges[kind] === 0) w.chargeT[kind] = 0;
+  w.events.push({ t: 'spend', kind, n });
+  return true;
+}
+
 /** Roll the chance of gaining each kind of charge on an event (a kill, a block, a critical strike). */
 export function rollCharges(w: World, event: ChargeEvent, extra: readonly Mod[] = []): void {
   for (const kind of CHARGE_KINDS) {
