@@ -817,3 +817,5 @@ Brute) and fixed; section 14 of the plan has the numbers. Two timing floors move
 A finished run (death or win) posts one record to a Supabase table: class, level, map, killer, map type and modifiers, build signature,
 seed and game version (`src/run/telemetry.ts`, `src/telemetry.ts`; `docs/TELEMETRY.md`, `docs/telemetry.sql`). On until switched off on
 the title screen; not sent from localhost or the dev server. The table takes inserts from the public key and nothing else.
+
+A second table, `sim_runs` (`docs/telemetry-dev.sql`), takes the same record from the dev server and from the bot sim (`npm run sim -- --log <batch>`, `scripts/simlog.ts`), with a source and a batch, for comparison with real play at the same version.

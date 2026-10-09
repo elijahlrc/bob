@@ -1,13 +1,16 @@
 /**
  * Headless bot runs (DESIGN.md §15.5).
  *
- *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|abandoner] [--craft greedy|random|none] [--report] [--scaling 1.5] [--base 1] [--variance 0.1] [--legacy]
+ *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|abandoner] [--craft greedy|random|none] [--report] [--scaling 1.5] [--base 1] [--variance 0.1] [--legacy] [--log <batch>]
+ *
+ * `--log <batch>` also sends each run that ends to the `sim_runs` table (scripts/simlog.ts, docs/TELEMETRY.md).
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { median } from '../src/core/math';
 import { CLASSES } from '../src/data/classes';
 import { botRun, type BotRunResult, type CraftPolicy, type ThemeRule } from '../src/run/bot';
 import { depthReport, varietyReport } from '../src/run/report';
+import { SimLog } from './simlog';
 import { clampDifficulty, DEFAULT, difficultyText, type Difficulty } from '../src/data/difficulty';
 
 type Args = {
@@ -29,6 +32,8 @@ type Args = {
   difficulty: Difficulty;
   /** Index of the first run (so runs can be split over processes), a file to write the raw results to, files to merge. */
   from: number;
+  /** A batch label: send the runs to the sim_runs table under it. */
+  log?: string;
   dump?: string;
   merge: string[];
 };
@@ -71,6 +76,7 @@ function parseArgs(argv: string[]): Args {
     else if (k === '--legacy') a.difficulty = { scaling: 1, base: 1, variance: 0 };
     else if (k === '--from') a.from = Number(v);
     else if (k === '--dump') a.dump = v;
+    else if (k === '--log') a.log = v;
     else if (k === '--merge') a.merge = argv.slice(i + 1);
     else if (k === '--report') a.report = true;
     else if (k === '--craft')
@@ -83,6 +89,12 @@ function parseArgs(argv: string[]): Args {
 const args = parseArgs(process.argv.slice(2));
 const results: (BotRunResult & { wallMs: number; simSeconds: number })[] = [];
 const t0 = performance.now();
+const simLog = args.log
+  ? new SimLog(
+      args.log,
+      `bot:${args.themes}/${args.crafting}${args.abandonBelow === undefined ? '' : '/abandon'}`,
+    )
+  : null;
 if (args.merge.length) {
   // Join the raw results of runs made in other processes (--dump), then report on them as one.
   for (const file of args.merge) {
@@ -99,6 +111,7 @@ for (const cls of args.merge.length ? [] : args.classes) {
       crafting: args.crafting,
       abandonBelow: args.abandonBelow,
       difficulty: args.difficulty,
+      onEnd: simLog ? (run, res) => simLog.add(run, res) : undefined,
     });
     const wallMs = performance.now() - start;
     const simSeconds = res.maps.reduce((s, m) => s + m.time, 0);
@@ -110,6 +123,9 @@ for (const cls of args.merge.length ? [] : args.classes) {
 }
 
 if (args.dump) writeFileSync(args.dump, JSON.stringify({ args, results }));
+if (simLog)
+  process.stderr.write(`${await simLog.flush()}
+`);
 const lines: string[] = [];
 lines.push(
   `Bot results — ${args.runs} run(s) per class, maps up to ${args.maxMap}, seed ${args.seed}, difficulty: ${difficultyText(args.difficulty)}`,

@@ -562,6 +562,8 @@ export type BotRunOpts = {
   abandonBelow?: number;
   /** The difficulty settings of the run (default: the new baseline). */
   difficulty?: Difficulty;
+  /** Called once when the run ends (a death or a win) with the run and the result of its last map. */
+  onEnd?: (run: RunState, res: MapResult) => void;
 };
 
 /** Play a full run headlessly (§15.5). `maxMap` stops after that map. */
@@ -625,6 +627,7 @@ export function botRun(
     });
     if (res.status === 'cleared') tally.afterMap(run, res.picked);
     finishMap(run, res);
+    if (run.phase !== 'camp') opts.onEnd?.(run, res);
   }
   const last = maps[maps.length - 1];
   const died = run.phase === 'dead';

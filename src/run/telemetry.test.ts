@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { DeathRecap } from '../sim/types';
 import type { MapResult } from '../sim/runMap';
 import { newRun } from './run';
-import { postRecord, runRecord } from './telemetry';
+import { postRecord, postRecords, runRecord, simRecord } from './telemetry';
 
 const recap: DeathRecap = {
   time: 41.6,
@@ -134,7 +134,7 @@ describe('sending a record', () => {
     expect(calls[0].url).toBe('https://abc.supabase.co/rest/v1/runs');
     expect(calls[0].init.method).toBe('POST');
     expect(calls[0].init.headers).toMatchObject({ apikey: 'sb_publishable_test' });
-    expect(JSON.parse(calls[0].init.body as string).class_id).toBe('vanguard');
+    expect(JSON.parse(calls[0].init.body as string)[0].class_id).toBe('vanguard');
   });
 
   it('never throws: an offline or refused request is just false', async () => {
@@ -149,5 +149,47 @@ describe('sending a record', () => {
       ),
     ).toBe(false);
     expect(await postRecord(async () => ({ ok: false }), sink, record)).toBe(false);
+  });
+});
+
+describe('records from the dev server and the bot', () => {
+  const sink = { url: 'https://abc.supabase.co', key: 'k' };
+
+  it('add a source and a batch to the same record, and go to the other table in one request', async () => {
+    const calls: { url: string; body: string }[] = [];
+    const base = runRecord(deadRun(), res, 'abc1234');
+    const records = [
+      simRecord(base, 'bot:best/greedy', 'seed2'),
+      simRecord(base, 'x'.repeat(200), 'b'),
+    ];
+    const ok = await postRecords(
+      async (url, init) => {
+        calls.push({ url, body: init.body as string });
+        return { ok: true };
+      },
+      sink,
+      'sim_runs',
+      records,
+    );
+    expect(ok).toBe(true);
+    expect(calls).toHaveLength(1);
+    expect(calls[0].url).toBe('https://abc.supabase.co/rest/v1/sim_runs');
+    const sent = JSON.parse(calls[0].body);
+    expect(sent).toHaveLength(2);
+    expect(sent[0]).toMatchObject({
+      source: 'bot:best/greedy',
+      batch: 'seed2',
+      game_version: 'abc1234',
+    });
+    expect(sent[1].source).toHaveLength(64);
+    // Every record has the same fields (the server refuses a batch whose objects differ).
+    expect(Object.keys(sent[0]).sort()).toEqual(Object.keys(sent[1]).sort());
+  });
+
+  it('sends nothing for no records', async () => {
+    let called = false;
+    const ok = await postRecords(async () => ((called = true), { ok: true }), sink, 'sim_runs', []);
+    expect(ok).toBe(true);
+    expect(called).toBe(false);
   });
 });

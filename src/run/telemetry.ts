@@ -79,31 +79,57 @@ export function runRecord(run: RunState, res: MapResult, version: string): RunRe
   };
 }
 
-/** Where records go: a Supabase table `runs` whose policy lets the public insert rows and nothing else (docs/TELEMETRY.md). */
+/**
+ * Where records go: a Supabase project whose tables `runs` (real players) and `sim_runs` (the dev server and the bot sim)
+ * let the public key insert rows and nothing else (docs/TELEMETRY.md). The key is the "publishable" one, which is meant to
+ * be public; the secret key must never be in the repo.
+ */
 export type Sink = { url: string; key: string };
 
+export const SINK: Sink = {
+  url: 'https://rqehhconrbuxewrhqjnw.supabase.co',
+  key: 'sb_publishable_mcqUSx6wYO-jZ6rkZx3XNg_8Ej144pW',
+};
+
+/** What a record from the dev server or a bot adds: where it came from and which batch of runs it belongs to. */
+export type SimRecord = RunRecord & { source: string; batch: string };
+
+export function simRecord(r: RunRecord, source: string, batch: string): SimRecord {
+  return { ...r, source: source.slice(0, MAX_TEXT), batch: batch.slice(0, MAX_TEXT) };
+}
+
+type Fetch = (url: string, init: Record<string, unknown>) => Promise<{ ok: boolean }>;
+
 /**
- * Post one record. Fire and forget: it resolves to whether the server took it and never throws, so a blocked or offline
- * request cannot disturb the game. `fetchFn` is injected so this stays testable and the run layer stays free of the DOM.
+ * Post records to a table in one request. Fire and forget: it resolves to whether the server took them and never throws, so
+ * a blocked or offline request cannot disturb the game or a sim. `fetchFn` is injected so this stays testable and the run
+ * layer stays free of the DOM.
  */
-export async function postRecord(
-  fetchFn: (url: string, init: Record<string, unknown>) => Promise<{ ok: boolean }>,
+export async function postRecords(
+  fetchFn: Fetch,
   sink: Sink,
-  record: RunRecord,
+  table: 'runs' | 'sim_runs',
+  records: readonly object[],
 ): Promise<boolean> {
+  if (!records.length) return true;
   try {
-    const res = await fetchFn(`${sink.url.replace(/\/+$/, '')}/rest/v1/runs`, {
+    const res = await fetchFn(`${sink.url.replace(/\/+$/, '')}/rest/v1/${table}`, {
       method: 'POST',
       headers: {
         apikey: sink.key,
         'Content-Type': 'application/json',
         Prefer: 'return=minimal',
       },
-      body: JSON.stringify(record),
-      keepalive: true,
+      body: JSON.stringify(records),
+      keepalive: records.length === 1,
     });
     return res.ok;
   } catch {
     return false;
   }
+}
+
+/** Post the record of a real player's run. */
+export function postRecord(fetchFn: Fetch, sink: Sink, record: RunRecord): Promise<boolean> {
+  return postRecords(fetchFn, sink, 'runs', [record]);
 }

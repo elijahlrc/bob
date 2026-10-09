@@ -1,16 +1,6 @@
-import { postRecord, runRecord, type Sink } from './run/telemetry';
+import { postRecords, runRecord, SINK, simRecord } from './run/telemetry';
 import type { Controller } from './run/controller';
 import { loadPref, savePref } from './ui/prefs';
-
-/**
- * Anonymous results of finished runs (docs/TELEMETRY.md). The project URL and the public key of the Supabase project go
- * here; with either empty nothing is sent and the title screen says nothing about it. The key is the "anon" or
- * "publishable" one, which is meant to be public: the table only lets it insert. Never put the service key here.
- */
-export const SINK: Sink = {
-  url: 'https://rqehhconrbuxewrhqjnw.supabase.co',
-  key: 'sb_publishable_mcqUSx6wYO-jZ6rkZx3XNg_8Ej144pW',
-};
 
 const PREF = 'telemetry';
 
@@ -28,23 +18,29 @@ export function setTelemetry(on: boolean): void {
   savePref(PREF, on);
 }
 
-/** Not from the dev server, a local file or a test browser: only the published game counts. */
-function published(): boolean {
-  if (import.meta.env.DEV) return false;
+/** Where this page is: the published game, the dev server or a local copy (which counts as development), or neither. */
+function where(): 'published' | 'dev' | null {
   const h = window.location.hostname;
-  return h !== '' && h !== 'localhost' && h !== '127.0.0.1' && !h.endsWith('.local');
+  if (import.meta.env.DEV || h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local'))
+    return 'dev';
+  return h === '' ? null : 'published';
 }
 
 const buildId = (): string => (typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'local');
 
-/** Send the result of every run that ends on `c`, when sending is configured, on and the game is the published one. */
+const post = (table: 'runs' | 'sim_runs', record: object) =>
+  postRecords((url, init) => fetch(url, init as RequestInit), SINK, table, [record]);
+
+/**
+ * Send the result of every run that ends on `c`, when sending is configured and on: from the published game to `runs`, from
+ * the dev server or a local copy to `sim_runs` (as source `dev`), so real play and development play never mix.
+ */
 export function installTelemetry(c: Controller): void {
   c.onRunEnd = (run, res) => {
-    if (!telemetryConfigured() || !telemetryOn() || !published()) return;
-    void postRecord(
-      (url, init) => fetch(url, init as RequestInit),
-      SINK,
-      runRecord(run, res, buildId()),
-    );
+    if (!telemetryConfigured() || !telemetryOn()) return;
+    const record = runRecord(run, res, buildId());
+    const at = where();
+    if (at === 'published') void post('runs', record);
+    else if (at === 'dev') void post('sim_runs', simRecord(record, 'dev', buildId()));
   };
 }
