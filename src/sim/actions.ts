@@ -9,6 +9,7 @@ import { hit, monsterHitOf } from './combat';
 import { openZone, pullPlayer, registerBlast, shieldBlocks, speedMult } from './factions';
 import { fireTriggers } from './triggers';
 import { placeDeployable } from './deploy';
+import { channelUse, stackedUse } from './channel';
 import {
   afterProjectileHit,
   afterStrike,
@@ -245,7 +246,7 @@ export function fire(w: World, a: Actor, act: Action): void {
     }
 }
 
-function fireEffect(w: World, a: Actor, act: Action): void {
+export function fireEffect(w: World, a: Actor, act: Action): void {
   if (act.which === 'utility') {
     applyUtility(w, a, act);
     return;
@@ -260,6 +261,15 @@ function fireEffect(w: World, a: Actor, act: Action): void {
   const p = act.profile;
   const b = p.skill.behaviour;
   const target = actorById(w, act.targetId);
+  // A channelled skill builds a stage with each use, and is released when the channel ends (src/sim/channel.ts).
+  if (p.skill.channel && a.isPlayer && act.which !== 'channelled') {
+    channelUse(w, a, act);
+    return;
+  }
+  if (p.skill.stacks && a.isPlayer && act.which !== 'channelled') {
+    stackedUse(w, a, act);
+    return;
+  }
   // A travelling skill (a leap, a charge) carries the caster toward the target before it lands.
   if (p.skill.travel && target && target.alive) {
     const d = Math.hypot(target.x - a.x, target.y - a.y);

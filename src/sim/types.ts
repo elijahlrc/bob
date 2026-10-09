@@ -13,6 +13,7 @@ import type { Corpse } from './factions';
 import type { HexState } from './hexes';
 import type { Fx } from './statuses';
 import type { PendingShot } from './shots';
+import type { ChannelState, StackState } from './channel';
 import type { HexTotals } from '../data/hexes';
 import type { Deployable } from './deploy';
 import type { Minion } from './minions';
@@ -36,7 +37,15 @@ export type Ailments = {
 export type Action = {
   profile: SkillProfile;
   /** Which skill: 'primary', 'secondary', 'default', 'monster' or 'triggered'. */
-  which: 'primary' | 'secondary' | 'default' | 'monster' | 'triggered' | 'utility' | 'deployed';
+  which:
+    | 'primary'
+    | 'secondary'
+    | 'default'
+    | 'monster'
+    | 'triggered'
+    | 'utility'
+    | 'deployed'
+    | 'channelled';
   hand: number;
   duration: number;
   elapsed: number;
@@ -503,21 +512,26 @@ export type World = {
   auraBurnT: number;
   /** The totems, brands, traps and mines on the ground. */
   deployables: Deployable[];
-  minions: Minion[];
-  actors: Actor[];
   deploySeq: number;
   /** The minions standing. */
   player: Actor;
   nextId: number;
+  minions: Minion[];
+  actors: Actor[];
   projectiles: Projectile[];
-  effects: GroundEffect[];
-  /** Zones the player's skills left on the ground. */
+  /** The channelled skill being held: its stages so far. */
+  channel: ChannelState | null;
+  /** The stages of a skill that grows with use, and how many hits the player has landed (a use that hits builds a stage). */
+  stacks: StackState | null;
+  hitsLanded: number;
   /** The projectiles of a barrage still to be fired, one after another. */
   shots: PendingShot[];
   /** How the last hit of the player's resolved (a strike that sends more out waits to see it land). */
   lastOutcome: 'hit' | 'miss' | 'block' | null;
   zones: SkillZone[];
   /** Bodies of dead monsters (EXPANSION 5.8), and recent explosions that destroy fresh ones. */
+  effects: GroundEffect[];
+  /** Zones the player's skills left on the ground. */
   corpses: Corpse[];
   /** Whether any Warden Pylon has been spawned (so damage need not look for one on most maps). */
   hasPylons: boolean;

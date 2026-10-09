@@ -78,10 +78,27 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       arc: 120,
       radius: 1.8,
     },
-    baseMult: [90, 126],
+    baseMult: [32, 45],
     cost: [2, 4],
-    mods: [],
-    description: 'A flurry of strikes in a wide arc, faster and fiercer the longer it lasts.',
+    requiresWeapon: ['dagger', 'claw', 'sword'],
+    channel: {
+      cap: 6,
+      tick: true,
+      perStage: 20,
+      release: {
+        perStage: 0,
+        repeat: true,
+      },
+    },
+    mods: [
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: 60,
+      },
+    ],
+    description:
+      'A flurry of strikes in a wide arc; each builds a stage, and letting go adds a strike for every stage built.',
   },
   {
     kind: 'active',
@@ -434,10 +451,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         spread: [0.8, 1.2],
       },
     ],
-    effectiveness: 45,
-    castTime: 0.25,
+    effectiveness: 30,
+    castTime: 0.22,
     crit: 6,
     cost: [2, 4],
+    channel: {
+      cap: 20,
+      tick: true,
+      tickMult: 50,
+      crowdStage: {
+        min: 3,
+        radius: 3.5,
+      },
+      release: {
+        perStage: 100,
+        base: -100,
+        behaviour: {
+          kind: 'beam',
+          length: 9,
+          width: 2.4,
+        },
+      },
+    },
     mods: [
       {
         stat: 'convertSkill.physical.lightning',
@@ -445,7 +480,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         value: 50,
       },
     ],
-    description: 'Gathers a storm around you that strikes the enemies nearby.',
+    description:
+      'Gathers a storm around you that zaps the enemies nearby; letting go sends a beam, stronger for every stage built.',
   },
   {
     kind: 'active',
@@ -808,18 +844,27 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         spread: [0.8, 1.2],
       },
     ],
-    effectiveness: 110,
-    castTime: 0.5,
+    effectiveness: 60,
+    castTime: 0.2,
     crit: 5,
     cost: [4, 7],
+    channel: {
+      cap: 10,
+      tick: false,
+      release: {
+        perStage: 109,
+        radiusPerStage: 40,
+      },
+    },
     mods: [
       {
         stat: 'chance.ignite',
         kind: 'base',
-        value: 15,
+        value: 50,
       },
     ],
-    description: 'Gathers fire around you and lets it out in a roar while you channel.',
+    description:
+      'Gathers fire around you while you channel and lets it out in one blast, bigger for every stage built.',
   },
   {
     kind: 'active',
@@ -1231,12 +1276,34 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         spread: [0.8, 1.2],
       },
     ],
-    effectiveness: 45,
+    effectiveness: 30,
     castTime: 0.2,
     crit: 5,
     cost: [2, 4],
-    mods: [],
-    description: 'A torrent of fire from your hand that widens the longer you hold it.',
+    channel: {
+      cap: 8,
+      tick: true,
+      perStage: 25,
+      tickRadiusPerStage: 12,
+      release: {
+        perStage: 0,
+        base: 500,
+        behaviour: {
+          kind: 'beam',
+          length: 9,
+          width: 5,
+        },
+      },
+    },
+    mods: [
+      {
+        stat: 'chance.ignite',
+        kind: 'base',
+        value: 20,
+      },
+    ],
+    description:
+      'A torrent of fire from your hand that widens and strengthens the longer you hold it; letting go sends a final wave.',
   },
   {
     kind: 'active',
@@ -1716,21 +1783,21 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     tags: ['attack', 'melee', 'area'],
     types: ['repeatable'],
     behaviour: {
-      kind: 'burst',
-      radius: 2.4,
-      origin: 'self',
+      kind: 'melee',
+      range: 2,
+      arc: 135,
+      radius: 2,
     },
     baseMult: [135, 155],
     cost: [6, 6],
     requiresWeapon: ['sword', 'dagger', 'claw'],
-    mods: [
-      {
-        stat: 'aoe',
-        kind: 'inc',
-        value: 50,
-      },
-    ],
-    description: 'A wide sweep that grows broader the more you use it.',
+    stacks: {
+      cap: 4,
+      areaPer: 50,
+      fadeAfter: 3,
+    },
+    mods: [],
+    description: 'A sweep that grows broader with every use that hits.',
   },
   {
     kind: 'active',
@@ -2282,26 +2349,30 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     types: ['totemable', 'volleyable', 'damageOverTime'],
     behaviour: {
       kind: 'projectile',
-      count: 3,
-      spread: 20,
+      count: 1,
+      spread: 0,
       range: 9,
+      pierce: 99,
     },
-    baseMult: [60, 80],
+    baseMult: [28, 35],
     cost: [2, 5],
     requiresWeapon: ['bow'],
+    channel: {
+      cap: 5,
+      tick: false,
+      release: {
+        perStage: 150,
+      },
+    },
     mods: [
       {
         stat: 'convertSkill.physical.chaos',
         kind: 'base',
-        value: 100,
-      },
-      {
-        stat: 'chance.poison',
-        kind: 'base',
         value: 60,
       },
     ],
-    description: 'A rising hail of poisonous arrows while you hold the shot.',
+    description:
+      'Hold the shot to build it up; letting go looses one piercing arrow, much stronger for every stage built.',
   },
   {
     kind: 'active',
@@ -3708,20 +3779,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     travel: 3,
     behaviour: {
       kind: 'burst',
-      radius: 2.4,
+      radius: 1.5,
       origin: 'self',
     },
-    baseMult: [90, 110],
+    baseMult: [44, 54],
     cost: [2, 2],
     requiresWeapon: ['sword', 'axe', 'mace', 'staff', 'dagger', 'claw'],
+    channel: {
+      cap: 5,
+      tick: true,
+      first: 50,
+      tickRadiusPerStage: 20,
+      stunImmune: true,
+    },
     mods: [
       {
-        stat: 'repeats',
-        kind: 'base',
-        value: 1,
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: 100,
       },
     ],
-    description: 'A spin that sweeps everything near, faster the longer it lasts.',
+    description:
+      'A spin that sweeps everything near, wider the longer it lasts, and cannot be broken by a stun.',
   },
   {
     kind: 'active',

@@ -1231,7 +1231,7 @@ export class Character {
     let po = 0;
     const n = p.hands.length;
     // A barrage lands every projectile on one target; a shotgun some of them; a cone is a second hit with each shot.
-    const volley = volleyHits(p, this.config.targetDistance ?? 3);
+    const volley = volleyHits(p, this.config.targetDistance ?? 3) * channelMult(p);
     for (const h of p.hands) {
       const ex = expectedHit(p, h, t, d);
       const w = p.bothHands ? 1 : 1 / n;
@@ -1583,6 +1583,27 @@ export function volleyHits(p: SkillProfile, distance: number): number {
   }
   if (p.skill.cone) hits += p.skill.cone.mult / 100;
   return hits;
+}
+
+/**
+ * What a use of a channelled skill is worth on average over a whole channel: the hits as it builds its stages, and the release
+ * at the end, shared out over the uses that built them (docs/SPIRIT.md S5).
+ */
+export function channelMult(p: SkillProfile): number {
+  const c = p.skill.channel;
+  if (!c) return 1;
+  let total = 0;
+  const per = (c.perStage ?? 0) / 100;
+  if (c.tick)
+    for (let s = 0; s < c.cap; s++)
+      total += (s === 0 && c.first !== undefined ? c.first / 100 : 1) * (1 + per * s);
+  if (c.release) {
+    const r = c.release;
+    total += r.repeat
+      ? c.cap * (1 + per * c.cap)
+      : Math.max(0, 1 + (r.base ?? 0) / 100 + (r.perStage * c.cap) / 100);
+  }
+  return total / c.cap;
 }
 
 export function skillRange(p: SkillProfile): number {

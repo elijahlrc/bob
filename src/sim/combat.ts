@@ -267,8 +267,10 @@ function addLeech(
 
 /** Apply a resolved hit from `src` to `dst`, including leech, ailments, stun and kill effects. */
 export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res: HitResult): void {
-  if (src.isPlayer)
+  if (src.isPlayer) {
     w.lastOutcome = res.outcome === 'hit' ? 'hit' : res.outcome === 'block' ? 'block' : 'miss';
+    if (res.outcome === 'hit') w.hitsLanded++;
+  }
   if (res.outcome === 'miss') {
     w.events.push({ t: 'miss', src: src.id, dst: dst.id });
     wake(w, dst);
@@ -411,7 +413,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     return;
   }
   applyAilments(w, dst, res, p);
-  if (res.stun > 0) {
+  if (res.stun > 0 && !(dst.isPlayer && w.channel?.profile.skill.channel?.stunImmune)) {
     dst.stunT = res.stun;
     dst.action = null;
     src.tStunEnemy = 0;

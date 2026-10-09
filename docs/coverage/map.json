@@ -323,7 +323,7 @@
   "flurryOfEdges": {
    "ref": "Blade Flurry",
    "status": "covered",
-   "note": "A channelled flurry of strikes in front of the character; the stacking damage is averaged into the base."
+   "note": "A channelled flurry: the character keeps striking, each strike building a stage worth 20% more damage (six at most); when it lets go it makes one more strike for each stage built, each at the full bonus."
   },
   "orbitingBlades": {
    "ref": "Blade Vortex",
@@ -383,7 +383,7 @@
   "judgementTempest": {
    "ref": "Divine Ire",
    "status": "covered",
-   "note": "A channelled storm around the character that zaps nearby enemies (the stages are averaged)."
+   "note": "A channelled storm: each use builds a stage and zaps the enemies nearby for half damage (a crowd builds stages faster); letting go fires a beam in front of the character that hits harder for every stage built."
   },
   "twinCut": {
    "ref": "Double Strike",
@@ -433,7 +433,7 @@
   "furnaceRoar": {
    "ref": "Flameblast",
    "status": "covered",
-   "note": "A channelled blast of fire around the caster (the stages are averaged into repeated bursts)."
+   "note": "A channelled blast of fire around the caster: each use builds a stage without hitting; when the channel ends, or ten stages are built, one explosion goes off whose damage and area grow with the stages."
   },
   "chillingShard": {
    "ref": "Freezing Pulse",
@@ -523,7 +523,7 @@
   "blazeStream": {
    "ref": "Incinerate",
    "status": "covered",
-   "note": "A channelled torrent of fire in a cone (the growth while channelling is averaged)."
+   "note": "A channelled torrent of fire in a cone: each use builds a stage (eight at most), 25% more damage and a wider, longer cone; when the channel ends, a final wave across the whole cone for much more damage."
   },
   "cinderBlow": {
    "ref": "Infernal Blow",
@@ -603,7 +603,7 @@
   "sweepingCut": {
    "ref": "Reave",
    "status": "covered",
-   "note": "A sweep of the weapon that builds in area with each use (the stacks are averaged into a larger sweep)."
+   "note": "A sweep of the weapon in a frontal arc: each use that hits builds a stage, 50% more area (four at most); with nothing hit for three seconds the stages fade, one a second."
   },
   "searingLance": {
    "ref": "Scorching Ray",
@@ -693,7 +693,7 @@
   "blightHail": {
    "ref": "Scourge Arrow",
    "status": "covered",
-   "note": "A channelled bow skill that builds up a growing hail of chaos arrows (the stacks are averaged into a steady volley)."
+   "note": "A channelled bow skill: each use builds a stage (five at most) without shooting; when the channel ends, one piercing chaos arrow flies for 150% more damage for every stage built (the spore pods that bloom into thorn arrows along its path are not modelled)."
   },
   "spiritSaw": {
    "ref": "Soulrend",
@@ -1053,7 +1053,7 @@
   "twisterBlade": {
    "ref": "Cyclone",
    "status": "covered",
-   "note": "A spinning attack around the character that builds up speed (the stages and the slower movement are averaged)."
+   "note": "A channelled spin around the character: it cannot be stunned while it spins; each use builds a stage (more area), and the first hit deals half."
   },
   "blinkingCut": {
    "ref": "Flicker Strike",

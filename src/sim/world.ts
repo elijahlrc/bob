@@ -20,6 +20,7 @@ import { isZone, tickCorpses, tickFactionBehaviour, tickZones } from './factions
 import { BUFF_IDS, type BuffId } from '../data/buffs';
 import { rollGains, tickBuffs } from './buffs';
 import { tickCooldowns } from './cooldowns';
+import { tickChannel } from './channel';
 import { tickShots } from './shots';
 import { tickDeployables } from './deploy';
 import { tickMinions } from './minions';
@@ -130,6 +131,9 @@ export function createWorld(inp: CreateWorldInput): World {
     nextId: 2,
     projectiles: [],
     shots: [],
+    channel: null,
+    stacks: null,
+    hitsLanded: 0,
     lastOutcome: null,
     effects: [],
     zones: [],
@@ -493,9 +497,9 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickCooldowns(w, dt);
   tickBuffs(w, dt);
   tickAuraBurn(w, dt);
-  tickMinions(w, dt);
   tickDeployables(w, dt);
   tickSkillZones(w, dt);
+  tickMinions(w, dt);
   tickFlasks(w, dt, policy);
   // Flow field for monsters follows the player tile.
   w.grid.buildFlow(p.x, p.y);
@@ -516,9 +520,10 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     }
     if (!a.action) a.carry = 0;
   }
-  updateProjectiles(w, dt);
   tickShots(w);
   tickEffects(w, dt);
+  tickChannel(w);
+  updateProjectiles(w, dt);
   tickZones(w, dt);
   tickCorpses(w, dt);
   separate(w);

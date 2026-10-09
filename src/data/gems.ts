@@ -159,7 +159,38 @@ export type ActiveGemDef = {
   cooldownUses?: number;
   /** Charges that can be spent to use the skill while it waits on its cooldown. */
   bypass?: { charge: 'grit' | 'fervour' | 'insight'; n: number };
+  /**
+   * A channelled skill (docs/SPIRIT.md S5): used again and again, building a stage each time, and released when the channel ends.
+   */
+  channel?: {
+    /** The stages it builds before it is released. */
+    cap: number;
+    /** Whether each use hits as it goes (Blade Flurry, Incinerate) or only builds a stage (Flameblast). */
+    tick: boolean;
+    /** The damage of a use's own hit as a percentage of the skill's (Divine Ire's zaps while channelling deal half). */
+    tickMult?: number;
+    /** The channelling character cannot be stunned (Cyclone). */
+    stunImmune?: boolean;
+    /** Percent more damage per stage built, on the hits as it goes. */
+    perStage?: number;
+    /** The damage of the first use, as a percentage of the others (Cyclone's first hit deals half). */
+    first?: number;
+    /** Percent more area per stage built, on the hits as it goes. */
+    tickRadiusPerStage?: number;
+    /** A use also builds an extra stage while this many enemies are within the radius (a crowd charges Divine Ire faster). */
+    crowdStage?: { min: number; radius: number };
+    /** What the release does: percent more damage in all and per stage, more area per stage, another shape, one strike per stage. */
+    release?: {
+      perStage: number;
+      base?: number;
+      radiusPerStage?: number;
+      behaviour?: SkillBehaviour;
+      repeat?: boolean;
+    };
+  };
   /** A strike that, when it lands, sends more out: bolts from the weapon, blades from behind the enemy, balls that land and burst. */
+  /** A skill that grows with use: each use that hits adds a stage (more area), and they fade when it stops hitting (Reave). */
+  stacks?: { cap: number; areaPer: number; fadeAfter: number };
   afterHit?: {
     kind: 'bolts' | 'blades' | 'balls';
     count: LevelValue;
