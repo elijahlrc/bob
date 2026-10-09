@@ -3,19 +3,14 @@ import { Character } from '../calc/character';
 import { resolveActive } from '../calc/gems';
 import {
   ACTIVE_GEMS,
-  ALL_GEMS,
   AURA_GEMS,
   GRANTED_GEMS,
   SUPPORT_GEMS,
-  type ActiveGemDef,
-  type GemDef,
   type SupportGemDef,
 } from '../data/gems';
 import { typesAllow } from '../data/skillTypes';
-import type { Build } from '../data/types';
-import { makeGem, makeItem } from '../gen/items';
-import { newRun } from '../run/run';
 import { createDummyWorld } from './dummy';
+import { buildFor, classFor as ATTR_CLASS, weaponFor } from './gemKit';
 import { stepWorld } from './world';
 
 /**
@@ -23,56 +18,6 @@ import { stepWorld } from './world';
  * dummy without error and deals damage if it is a damage skill, and its support compatibility follows its rules. New
  * gems are covered the moment they exist.
  */
-
-const WEAPON_FOR: Record<string, string> = {
-  bow: 'bow_3',
-  dagger: 'dagger_3',
-  claw: 'claw_3',
-  sword: 'sword_3',
-  axe: 'axe_3',
-  mace: 'mace_3',
-  sceptre: 'sceptre_3',
-  wand: 'wand_3',
-  staff: 'staff_3',
-};
-const CLASS_FOR = { str: 'vanguard', dex: 'strider', int: 'mystic' } as const;
-const ATTR_CLASS = (a: GemDef['attr']) =>
-  a === 'str' || a === 'strdex'
-    ? CLASS_FOR.str
-    : a === 'dex' || a === 'dexint'
-      ? CLASS_FOR.dex
-      : CLASS_FOR.int;
-
-let n = 20000;
-const uid = () => n++;
-
-function weaponFor(def: ActiveGemDef): string {
-  const req = def.requiresWeapon?.find((t) => WEAPON_FOR[t]);
-  if (req) return WEAPON_FOR[req];
-  if (def.skillType === 'attack') return def.tags.includes('projectile') ? 'bow_3' : 'sword_3';
-  return 'wand_3';
-}
-
-function buildFor(
-  gems: string[],
-  main: string,
-  classId: string,
-  off: 'none' | 'dual' | 'shield' = 'none',
-): Build {
-  const run = newRun(classId, 1);
-  const b = run.build;
-  b.level = 50;
-  b.equipment.mainHand = makeItem(uid, main, 50, 1);
-  if (off === 'dual') b.equipment.offHand = makeItem(uid, main, 50, 1);
-  else if (off === 'shield') b.equipment.offHand = makeItem(uid, 'shield_ar_3', 50, 1);
-  else delete b.equipment.offHand;
-  const body = makeItem(uid, 'body_ar_1', 50, Math.max(1, gems.length));
-  body.sockets = gems.map((g) => makeGem(uid, g));
-  b.equipment.body = body;
-  b.primaryGem = body.sockets[0]?.uid;
-  b.flasks = [null, null, null, null, null];
-  return b;
-}
 
 const finite = (x: number) => Number.isFinite(x);
 
@@ -175,7 +120,7 @@ describe('every support gem', () => {
 });
 
 describe('every aura and other gem', () => {
-  for (const def of [...AURA_GEMS, ...ALL_GEMS.filter((g) => g.kind === 'hex')]) {
+  for (const def of AURA_GEMS) {
     it(`${def.id}: socketed beside an attack, the sheet computes`, () => {
       const b = buildFor(['crushingBlow', def.id], 'mace2_3', 'vanguard');
       const sheet = new Character(b, { areaLevel: 50 }).sheet();

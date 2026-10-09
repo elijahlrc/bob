@@ -32,6 +32,7 @@
     "coverage:gems": "tsx scripts/coverage/gem-view.ts",
     "coverage:emit": "tsx scripts/coverage/emit-uniques.ts",
     "coverage:emit-gems": "tsx scripts/coverage/emit-gems.ts",
+    "spirit": "tsx scripts/spirit/report.ts",
     "tree:extract": "tsx scripts/tree/extract.ts",
     "tree:lines": "tsx scripts/tree/lines.ts",
     "tree:names": "tsx scripts/tree/names.ts",
