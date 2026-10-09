@@ -76,9 +76,18 @@ export function choiceByKey(w: World, key: string): SkillChoice | undefined {
   return w.char.actives.find((c) => c.key === key) ?? w.char.secondaries.find((c) => c.key === key);
 }
 
-export function deployedCount(w: World, key: string): number {
+/**
+ * How far from the character a deployable still counts as one of its skill's standing set, in tiles. What is left behind in
+ * an old room is no use to the fight, so the AI puts a new set down rather than waiting for the old to run out.
+ */
+export const DEPLOY_NEAR = 12;
+
+/** How many of a skill's deployables stand (all of them, or only those near the character). */
+export function deployedCount(w: World, key: string, nearOnly = false): number {
+  const p = w.player;
   let n = 0;
-  for (const d of w.deployables) if (d.key === key) n++;
+  for (const d of w.deployables)
+    if (d.key === key && (!nearOnly || Math.hypot(d.x - p.x, d.y - p.y) <= DEPLOY_NEAR)) n++;
   return n;
 }
 
@@ -87,10 +96,10 @@ export function deployCap(c: SkillChoice, prof: SkillProfile): number {
   return c.deploy === 'totem' || c.deploy === 'brand' ? prof.deployCount : prof.deployCount * SETS;
 }
 
-/** Whether the skill has all it can have down already: the AI uses another skill meanwhile. */
+/** Whether the skill has all it can have down already, near the character: the AI uses another skill meanwhile. */
 export function deployFull(w: World, c: SkillChoice, prof: SkillProfile): boolean {
   if (!c.deploy) return false;
-  return deployedCount(w, c.key) >= deployCap(c, prof);
+  return deployedCount(w, c.key, true) >= deployCap(c, prof);
 }
 
 /** How long what a skill puts down stands: its own length, or a support's, or the kind's usual. */
@@ -104,6 +113,61 @@ export function deploySecondsOf(c: SkillChoice, prof: SkillProfile): number {
 
 const enemies = (w: World): Actor[] =>
   w.actors.filter((e) => !e.isPlayer && e.alive && e.phaseT <= 0);
+
+/** A new totem stands at least this far from the totems of its own skill, in tiles, when there is room. */
+const TOTEM_APART = 2.5;
+/** How many spots are tried for a totem. */
+const TOTEM_TRIES = 12;
+
+/**
+ * Where a totem goes. It is put toward the target, with some randomness (so that a second totem does not stand on the first),
+ * and a spot is picked from a handful of tries: one that sees the target (a totem that shoots has to), apart from the
+ * skill's other totems and, for a totem of beams, the one whose beams would burn the most enemies.
+ */
+function totemSpot(
+  w: World,
+  a: Actor,
+  target: Actor | undefined,
+  c: SkillChoice,
+): { x: number; y: number } {
+  const dx = target ? target.x - a.x : 1;
+  const dy = target ? target.y - a.y : 0;
+  const len = Math.hypot(dx, dy) || 1;
+  const base = Math.atan2(dy, dx);
+  const bond = c.skill.bond;
+  const mine = w.deployables.filter((d) => d.key === c.key);
+  const foes = bond ? enemies(w) : [];
+  let best = { x: a.x + (dx / len) * TOTEM_OFFSET, y: a.y + (dy / len) * TOTEM_OFFSET };
+  let bestScore = -Infinity;
+  for (let i = 0; i < TOTEM_TRIES; i++) {
+    // The first try is the plain one (toward the target, a little beyond it for beams); the rest are spread about it.
+    const ang = base + (i === 0 ? 0 : w.rngTrig.float(-0.9, 0.9));
+    const reach = bond
+      ? Math.min(bond.range - 1, Math.max(2.5, len + (i === 0 ? 1 : w.rngTrig.float(-1.5, 3.5))))
+      : TOTEM_OFFSET + (i === 0 ? 0 : w.rngTrig.float(0, 2));
+    const spot = w.grid.collide(a.x + Math.cos(ang) * reach, a.y + Math.sin(ang) * reach, 0.3);
+    let score = 0;
+    if (target && !w.grid.los(spot.x, spot.y, target.x, target.y)) score -= 5;
+    if (bond) {
+      // The beams it would make: to the character and to the totems already standing.
+      if (!w.grid.los(spot.x, spot.y, a.x, a.y)) score -= 20;
+      const ends = [
+        { x: a.x, y: a.y },
+        ...mine.filter((m) => Math.hypot(m.x - spot.x, m.y - spot.y) <= bond.range),
+      ];
+      for (const e of ends)
+        for (const f of foes)
+          if (segmentDist(f.x, f.y, spot.x, spot.y, e.x, e.y) <= bond.width / 2 + f.r) score += 1;
+    }
+    for (const m of mine) if (Math.hypot(m.x - spot.x, m.y - spot.y) < TOTEM_APART) score -= 4;
+    score += w.rngTrig.float(0, 0.5);
+    if (score > bestScore) {
+      bestScore = score;
+      best = spot;
+    }
+  }
+  return best;
+}
 
 /** The use of a deploying skill lands: put its totem, brand, traps or mines down. */
 export function placeDeployable(w: World, a: Actor, act: Action): void {
@@ -141,22 +205,24 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
     w.events.push({ t: 'deploy', kind: c.deploy!, x: spot.x, y: spot.y, end: false });
   };
   if (c.deploy === 'totem') {
-    // Only as many as the skill allows stand: the oldest gives way.
+    // Only as many as the skill allows stand: the one furthest from the character (the one left behind) gives way.
     const mine = w.deployables.filter((d) => d.key === c.key);
-    if (mine.length >= n) w.deployables.splice(w.deployables.indexOf(mine[0]), 1);
-    const dx = target ? target.x - a.x : 1;
-    const dy = target ? target.y - a.y : 0;
-    const len = Math.hypot(dx, dy) || 1;
-    // A totem of beams stands beyond the enemy, so that the beam to the character crosses it.
-    const off = c.skill.bond && target ? len + 1 : TOTEM_OFFSET;
-    put(a.x + (dx / len) * off, a.y + (dy / len) * off);
+    if (mine.length >= n) {
+      mine.sort((u, v) => Math.hypot(v.x - a.x, v.y - a.y) - Math.hypot(u.x - a.x, u.y - a.y));
+      w.deployables.splice(w.deployables.indexOf(mine[0]), 1);
+    }
+    const spot = totemSpot(w, a, target, c);
+    put(spot.x, spot.y);
     return;
   }
   const tx = target ? target.x : a.x;
   const ty = target ? target.y : a.y;
   if (c.deploy === 'brand') {
     const mine = w.deployables.filter((d) => d.key === c.key);
-    if (mine.length >= n) w.deployables.splice(w.deployables.indexOf(mine[0]), 1);
+    if (mine.length >= n) {
+      mine.sort((u, v) => Math.hypot(v.x - a.x, v.y - a.y) - Math.hypot(u.x - a.x, u.y - a.y));
+      w.deployables.splice(w.deployables.indexOf(mine[0]), 1);
+    }
     put(tx, ty);
     return;
   }
@@ -328,10 +394,12 @@ export function mineAuraHit(w: World, dst: Actor): void {
   if (a && a.max > 0) rawHit(w, dst, a.min + w.rngCombat.float(0, 1) * (a.max - a.min), 3, 'Mine');
 }
 
-/** The beams of Cinder Bond: from each of its totems to the character and to the other totems, burning what they cross. */
-function bondBeams(w: World, bonds: Deployable[], c: SkillChoice, foes: Actor[]): void {
-  const spec = c.skill.bond!;
-  const prof = w.char.profile(c, w.char.configConds, flaskMask(w));
+/** The beams of a skill's totems: from each to the character and to the other totems, when in range and in sight. */
+function bondSegments(
+  w: World,
+  bonds: Deployable[],
+  spec: { range: number },
+): [Deployable, number, number][] {
   const p = w.player;
   const segs: [Deployable, number, number][] = [];
   for (const d of bonds) {
@@ -345,6 +413,43 @@ function bondBeams(w: World, bonds: Deployable[], c: SkillChoice, foes: Actor[])
       )
         segs.push([d, o.x, o.y]);
   }
+  return segs;
+}
+
+export type BondLink = {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  width: number;
+  key: string;
+};
+
+/** Every beam standing now (for the renderer): its two ends, its width and the skill that makes it. */
+export function bondLinks(w: World): BondLink[] {
+  if (w.deployables.length === 0) return [];
+  const byKey = new Map<string, Deployable[]>();
+  for (const d of w.deployables) {
+    if (d.kind !== 'totem') continue;
+    const list = byKey.get(d.key) ?? [];
+    list.push(d);
+    byKey.set(d.key, list);
+  }
+  const out: BondLink[] = [];
+  for (const [key, list] of byKey) {
+    const spec = choiceByKey(w, key)?.skill.bond;
+    if (!spec) continue;
+    for (const [d, x2, y2] of bondSegments(w, list, spec))
+      out.push({ x1: d.x, y1: d.y, x2, y2, width: spec.width, key });
+  }
+  return out;
+}
+
+/** The beams of Cinder Bond: from each of its totems to the character and to the other totems, burning what they cross. */
+function bondBeams(w: World, bonds: Deployable[], c: SkillChoice, foes: Actor[]): void {
+  const spec = c.skill.bond!;
+  const prof = w.char.profile(c, w.char.configConds, flaskMask(w));
+  const segs = bondSegments(w, bonds, spec);
   for (const e of foes)
     for (const [d, x2, y2] of segs) {
       const near =

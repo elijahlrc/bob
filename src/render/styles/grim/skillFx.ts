@@ -10,7 +10,7 @@ import {
   type Delivery,
 } from '../../../calc/skillLook';
 import { MINIONS } from '../../../data/minions';
-import { choiceByKey } from '../../../sim/deploy';
+import { bondLinks, choiceByKey } from '../../../sim/deploy';
 import type { Actor, SimEvent, World } from '../../../sim/types';
 
 /**
@@ -243,6 +243,8 @@ export class SkillFx {
   private cast(a: Actor): void {
     const act = a.action;
     if (!act) return;
+    // A skill of beams puts its totems down: no blast shows around the caster.
+    if (act.profile.skill.bond) return;
     const look = profileLook(act.profile);
     const c = look.color;
     switch (look.delivery) {
@@ -421,6 +423,7 @@ export class SkillFx {
   frame(w: World, dt: number, time: number, ground: Gfx): void {
     this.now = time;
     this.zones(ground, w, time);
+    this.bonds(ground, w, time);
     this.deployables(ground, w, time);
     this.minions(ground, w, time);
     this.upkeep(ground, w, time);
@@ -557,6 +560,29 @@ export class SkillFx {
         // Physical: dust ticks lying on the ground.
         g.fillStyle(0x6a5a48, 0.7 * fade).fillRect(px - 1.5, py, 3, 1);
       }
+    }
+  }
+
+  /** The beams between a skill's totems and the character (Cinder Bond): a glowing band on the ground, flickering. */
+  private bonds(g: Gfx, w: World, time: number): void {
+    for (const l of bondLinks(w)) {
+      const choice = choiceByKey(w, l.key);
+      const element = choice ? elementOfTags(choice.skill.tags, choice.skill.spellDamage) : 0;
+      const glow = ELEMENT_COLOR[element];
+      const a = this.host.project(l.x1, l.y1);
+      const b = this.host.project(l.x2, l.y2);
+      // The width in tiles, as pixels where the beam lies.
+      const o = this.host.project(l.x1 + l.width, l.y1);
+      const px = Math.max(3, Math.hypot(o.x - a.x, o.y - a.y) * 0.55);
+      const flick = 0.75 + 0.25 * Math.sin(time * 14 + l.x1 * 3 + l.y1);
+      g.lineStyle(px * 1.8, glow, 0.14 * flick).lineBetween(a.x, a.y - 4, b.x, b.y - 4);
+      g.lineStyle(px, glow, 0.38 * flick).lineBetween(a.x, a.y - 4, b.x, b.y - 4);
+      g.lineStyle(Math.max(1, px * 0.3), lighten(glow, 0.55), 0.9 * flick).lineBetween(
+        a.x,
+        a.y - 4,
+        b.x,
+        b.y - 4,
+      );
     }
   }
 
