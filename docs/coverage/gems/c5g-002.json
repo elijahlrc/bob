@@ -7,18 +7,20 @@
     "def": { "kind": "support", "id": "rollingVolleys", "name": "Rolling Volleys", "attr": "dex", "supports": ["projectile"], "needs": ["attack"], "excludes": ["channelling"], "costMult": 1.4, "mods": [
       { "stat": "projectiles", "kind": "base", "value": 4 }, { "stat": "damage", "kind": "more", "value": [-30, -20] } ],
       "description": "Four more projectiles, each hitting less." } },
-  { "ref": "Blind Support", "note": "Hits blind enemies (modelled as the hexed enemies dealing less damage).",
-    "def": { "kind": "support", "id": "dazzle", "name": "Dazzle", "attr": "dex", "supports": [], "costMult": 1.1, "mods": [],
-      "global": [{ "stat": "hexOnHit.feebleGrip", "kind": "base", "value": [3, 10] }],
-      "description": "Enemies you hit deal less damage, as if blinded." } },
-  { "ref": "Block Chance Reduction Support", "note": "Enemies block and dodge less (modelled as more accuracy for the supported skill).",
+  { "ref": "Blind Support", "note": "Hits can blind enemies (10% chance): a blinded enemy misses half of its attacks. A blind is not a curse.",
+    "def": { "kind": "support", "id": "dazzle", "name": "Dazzle", "attr": "dex", "supports": [], "costMult": 1.1, "mods": [
+      { "stat": "status.blind.chance", "kind": "base", "value": 10 },
+      { "stat": "statusDuration", "kind": "inc", "value": [0, 38] } ],
+      "description": "Hits can blind enemies, so that they miss half of their attacks." } },
+  { "ref": "Block Chance Reduction Support", "note": "Enemies block less against the supported skill, and a blocked hit leaves the blocker Overpowered, a further 5% less able to block for four seconds, stacking.",
     "def": { "kind": "support", "id": "guardBreaker", "name": "Guard Breaker", "attr": "dex", "supports": [], "costMult": 1.1, "mods": [
-      { "stat": "accuracy", "kind": "inc", "value": [20, 40] } ],
-      "description": "Your hits land past guards." } },
-  { "ref": "Chance to Flee Support", "note": "Hit enemies lose their nerve and slow down (modelled as a slowing hex on enemies hit).",
-    "def": { "kind": "support", "id": "rout", "name": "Rout", "attr": "dex", "supports": [], "costMult": 1.1, "mods": [],
-      "global": [{ "stat": "hexOnHit.leadenLimbs", "kind": "base", "value": [3, 10] }],
-      "description": "Enemies you hit falter and slow down." } },
+      { "stat": "enemyBlockReduction", "kind": "base", "value": [10, 20] },
+      { "stat": "status.overpowered.chance", "kind": "base", "value": 100 } ],
+      "description": "Enemies block less against your hits, and every block you meet makes the next likelier to fail." } },
+  { "ref": "Chance to Flee Support", "note": "Hits can make normal monsters flee (and magic ones half the time); rare monsters do not flee.",
+    "def": { "kind": "support", "id": "rout", "name": "Rout", "attr": "dex", "supports": [], "costMult": 1.1, "mods": [
+      { "stat": "status.flee.chance", "kind": "base", "value": [25, 44] } ],
+      "description": "Hits can make enemies lose their nerve and run." } },
   { "ref": "Energy Leech Support", "note": "Hits restore energy shield, and the skill deals more damage while the character is on full energy shield.",
     "def": { "kind": "support", "id": "wardSiphon", "name": "Ward Siphon", "attr": "int", "supports": [], "costMult": 1.3, "mods": [
       { "stat": "esOnHit", "kind": "base", "value": [6, 60] }, { "stat": "damage", "kind": "more", "value": [12, 24], "condition": { "id": "esFull" } } ],
@@ -62,11 +64,12 @@
     "def": { "kind": "support", "id": "lingeringEffect", "name": "Lingering Effect", "attr": "str", "supports": ["duration"], "costMult": 1.2, "mods": [
       { "stat": "skillDuration", "kind": "more", "value": [25, 44] }, { "stat": "damage", "kind": "more", "value": -15 } ],
       "description": "The skill's effects last longer at less strength." } },
-  { "ref": "Maim Support", "note": "Hits maim: enemies slow and take more physical damage (modelled as hexes on the enemies hit), and the skill deals more physical damage.",
+  { "ref": "Maim Support", "note": "Hits maim (30% chance, four seconds): a maimed enemy moves more slowly and takes more physical damage; the skill deals more physical damage.",
     "def": { "kind": "support", "id": "hamstring", "name": "Hamstring", "attr": "str", "supports": ["attack"], "costMult": 1.15, "mods": [
-      { "stat": "damage", "kind": "more", "value": [15, 30], "damageTypes": ["physical"] } ],
-      "global": [{ "stat": "hexOnHit.openWounds", "kind": "base", "value": [1, 6] }],
-      "description": "Hits cripple: enemies slow and take more physical damage." } },
+      { "stat": "damage", "kind": "more", "value": [15, 30], "damageTypes": ["physical"] },
+      { "stat": "status.maim.chance", "kind": "base", "value": 30 },
+      { "stat": "status.maim.x", "kind": "base", "value": [10, 14] } ],
+      "description": "Hits can maim: a maimed enemy moves slowly and takes more physical damage." } },
   { "ref": "Mirage Archer Support", "note": "A mirage of the archer fires with each attack, a little weaker and slower (modelled as one repeat of the attack).",
     "def": { "kind": "support", "id": "twinShadow", "name": "Twin Shadow", "attr": "dex", "supports": ["projectile"], "needs": ["attack"], "excludes": ["totem", "trap", "mine", "triggered"], "costMult": 1.4, "mods": [
       { "stat": "repeats", "kind": "base", "value": 1 }, { "stat": "damage", "kind": "more", "value": [-40, -31] } ],

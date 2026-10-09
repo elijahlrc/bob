@@ -488,9 +488,9 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickTriggers(w, dt);
   tickCharges(w, dt);
   tickCooldowns(w, dt);
-  tickAuraBurn(w, dt);
   tickBuffs(w, dt);
   tickDeployables(w, dt);
+  tickAuraBurn(w, dt);
   tickMinions(w, dt);
   tickSkillZones(w, dt);
   tickFlasks(w, dt, policy);

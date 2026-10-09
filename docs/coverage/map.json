@@ -218,7 +218,7 @@
   "deepChill": {
    "ref": "Bonechill Support",
    "status": "covered",
-   "note": "Increases the effect of the chill the supported skill inflicts."
+   "note": "Increases the effect of the chill the supported skill inflicts, and chilled enemies take more cold damage."
   },
   "bluntIntent": {
    "ref": "Brutality Support",
@@ -873,7 +873,7 @@
   "witherMark": {
    "ref": "Withering Touch Support",
    "status": "covered",
-   "note": "Gains physical damage as chaos, and the target is withered (takes more chaos damage)."
+   "note": "Gains physical damage as chaos, and a hit can wither the target: each stack, up to fifteen, makes it take 6% more chaos damage for two seconds."
   },
   "tripleShot": {
    "ref": "Multiple Projectiles Support",
@@ -1378,17 +1378,17 @@
   "dazzle": {
    "ref": "Blind Support",
    "status": "covered",
-   "note": "Hits blind enemies (modelled as the hexed enemies dealing less damage)."
+   "note": "Hits can blind enemies (10% chance): a blinded enemy misses half of its attacks. A blind is not a curse."
   },
   "guardBreaker": {
    "ref": "Block Chance Reduction Support",
    "status": "covered",
-   "note": "Enemies block and dodge less (modelled as more accuracy for the supported skill)."
+   "note": "Enemies block less against the supported skill, and a blocked hit leaves the blocker Overpowered, a further 5% less able to block for four seconds, stacking."
   },
   "rout": {
    "ref": "Chance to Flee Support",
    "status": "covered",
-   "note": "Hit enemies lose their nerve and slow down (modelled as a slowing hex on enemies hit)."
+   "note": "Hits can make normal monsters flee (and magic ones half the time); rare monsters do not flee."
   },
   "wardSiphon": {
    "ref": "Energy Leech Support",
@@ -1443,7 +1443,7 @@
   "hamstring": {
    "ref": "Maim Support",
    "status": "covered",
-   "note": "Hits maim: enemies slow and take more physical damage (modelled as hexes on the enemies hit), and the skill deals more physical damage."
+   "note": "Hits maim (30% chance, four seconds): a maimed enemy moves more slowly and takes more physical damage; the skill deals more physical damage."
   },
   "twinShadow": {
    "ref": "Mirage Archer Support",

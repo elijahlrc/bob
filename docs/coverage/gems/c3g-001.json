@@ -23,10 +23,11 @@
       { "stat": "damage", "kind": "more", "value": [40, 59], "damageTypes": ["physical"], "tags": ["melee"], "condition": { "id": "targetBleeding" } },
       { "stat": "chance.bleed", "kind": "base", "value": -1000 } ],
       "description": "More melee physical damage against bleeding enemies, but the skill cannot cause bleeding." } },
-  { "ref": "Bonechill Support", "note": "Increases the effect of the chill the supported skill inflicts.",
+  { "ref": "Bonechill Support", "note": "Increases the effect of the chill the supported skill inflicts, and chilled enemies take more cold damage.",
     "def": { "kind": "support", "id": "deepChill", "name": "Deep Chill", "attr": "int", "supports": ["cold"], "costMult": 1.2, "mods": [
-      { "stat": "effect.chill", "kind": "inc", "value": [25, 44] } ],
-      "description": "Increases the effect of the chill of cold skills." } },
+      { "stat": "effect.chill", "kind": "inc", "value": [25, 44] },
+      { "stat": "damage", "kind": "more", "value": [15, 30], "damageTypes": ["cold"], "condition": { "id": "targetChilled" } } ],
+      "description": "Chills hit harder, and chilled enemies take more cold damage." } },
   { "ref": "Brutality Support", "note": "A large more multiplier to physical damage, at the price of every other damage type.",
     "def": { "kind": "support", "id": "bluntIntent", "name": "Blunt Intent", "attr": "str", "supports": [], "costMult": 1.3, "mods": [
       { "stat": "damage", "kind": "more", "value": [40, 59], "damageTypes": ["physical"] },

@@ -120,6 +120,9 @@ export function noteEffects(w: World, into: Set<string>): void {
       case 'charge':
         into.add(`charge:${e.kind}`);
         break;
+      case 'status':
+        into.add(`status:${e.id}`);
+        break;
       case 'spend':
         into.add(`spend:${e.kind}`);
         break;

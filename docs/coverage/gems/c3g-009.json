@@ -105,9 +105,9 @@
       { "stat": "projectiles", "kind": "base", "value": 2 },
       { "stat": "damage", "kind": "more", "value": [-12, -3] } ],
       "description": "Fires two more projectiles in parallel, a little weaker." } },
-  { "ref": "Withering Touch Support", "note": "Gains physical damage as chaos, and the target is withered (takes more chaos damage).",
+  { "ref": "Withering Touch Support", "note": "Gains physical damage as chaos, and a hit can wither the target: each stack, up to fifteen, makes it take 6% more chaos damage for two seconds.",
     "def": { "kind": "support", "id": "witherMark", "name": "Wither Mark", "attr": "dex", "supports": ["attack"], "excludes": ["minion"], "costMult": 1.4, "mods": [
       { "stat": "gain.physical.chaos", "kind": "base", "value": [10, 29] },
-      { "stat": "penetration", "kind": "base", "value": 10, "damageTypes": ["chaos"] } ],
-      "description": "Gains physical damage as chaos, and leaves the target open to chaos." } }
+      { "stat": "status.withered.chance", "kind": "base", "value": 25 } ],
+      "description": "Gains physical damage as chaos, and hits can wither the target so that it takes more chaos damage." } }
 ]

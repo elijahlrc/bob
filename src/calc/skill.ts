@@ -24,6 +24,19 @@ import {
   maskOr,
 } from '../mods/types';
 import type { SkillDef } from './gems';
+import {
+  FLEE_CHANCE,
+  STATUSES,
+  STATUS_IDS,
+  statusChance,
+  statusExtra,
+  statusMagnitude,
+  statusSeconds,
+  type StatusId,
+} from '../data/statuses';
+
+/** A status a hit of a skill can inflict: how likely, how long, and how strong. */
+export type StatusRoll = { id: StatusId; chance: number; seconds: number; v: number; x: number };
 
 export const PHYS = 0;
 export const LIGHT = 1;
@@ -113,6 +126,12 @@ export type SkillProfile = {
   doubleChance: number;
   /** Percentage points (fraction) taken off the physical damage reduction of what the skill hits. */
   enemyPhysRed: number;
+  /** The share (fraction) by which the skill lowers the chance of what it hits to block. */
+  enemyBlockLess: number;
+  /** The statuses a hit of the skill can inflict (docs/SPIRIT.md S3), with their chances, lengths and magnitudes. */
+  statuses: StatusRoll[];
+  /** Chance (fraction) that a hit makes a monster flee. */
+  fleeChance: number;
   shock: { chance: number; effect: number; dur: number };
   chill: { effect: number; dur: number };
   freeze: { chance: number; dur: number };
@@ -470,6 +489,24 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     poison: timed('poison', ailment('chance.poison', 'duration.poison', POISON_DURATION)),
     doubleChance: clamp(db.sum('base', 'doubleDamage', baseCtx) / 100, 0, 1),
     enemyPhysRed: db.sum('base', 'enemyPhysReduction', baseCtx) / 100,
+    enemyBlockLess: clamp(db.sum('base', 'enemyBlockReduction', baseCtx) / 100, 0, 1),
+    statuses: STATUS_IDS.flatMap((id): StatusRoll[] => {
+      const chance = db.sum('base', statusChance(id), baseCtx) / 100;
+      if (chance <= 0) return [];
+      const d = STATUSES[id];
+      return [
+        {
+          id,
+          chance: clamp(chance, 0, 1),
+          seconds:
+            (db.sum('base', statusSeconds(id), baseCtx) || d.seconds) *
+            db.mult('statusDuration', baseCtx),
+          v: db.sum('base', statusMagnitude(id), baseCtx) || d.v,
+          x: db.sum('base', statusExtra(id), baseCtx),
+        },
+      ];
+    }),
+    fleeChance: clamp(db.sum('base', FLEE_CHANCE, baseCtx) / 100, 0, 1),
     shock: {
       chance: clamp(db.sum('base', 'chance.shock', baseCtx) / 100, 0, 1),
       effect: Math.max(0, 1 + db.inc('effect.shock', baseCtx) + ailEffect),

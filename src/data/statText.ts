@@ -2,6 +2,7 @@ import { CHARGE_KINDS, CHARGE_NAMES } from '../calc/charges';
 import { BUFF_IDS, BUFFS } from './buffs';
 import { ALL_GEMS, GRANTED_GEMS } from './gems';
 import { ALL_HEX_IDS, HEXES } from './hexes';
+import { STATUS_IDS, STATUSES } from './statuses';
 import { KEYSTONES } from './tree/keystones';
 /**
  * Per-stat text templates (DESIGN.md §7.1). Text is always generated from structured mods; it is
@@ -353,6 +354,21 @@ for (const id of BUFF_IDS) {
   for (const [event, phrase] of Object.entries(on))
     STAT_TEXT[`buffOn.${event}.${id}`] = { base: `{v}% chance to gain ${name} ${phrase}` };
 }
+// Statuses a skill inflicts on hit (docs/SPIRIT.md S3).
+for (const id of STATUS_IDS) {
+  const name = STATUSES[id].name;
+  STAT_TEXT[`status.${id}.chance`] =
+    id === 'overpowered'
+      ? { base: `{v}% chance to inflict ${name} when a Hit is Blocked` }
+      : { base: `{v}% chance to inflict ${name} on Hit` };
+  STAT_TEXT[`status.${id}.seconds`] = { base: `${name} lasts {v} seconds` };
+  STAT_TEXT[`status.${id}.v`] = { base: `${name} effect: {v}%` };
+  STAT_TEXT[`status.${id}.x`] = { base: `${name} secondary effect: {v}%` };
+}
+STAT_TEXT['status.flee.chance'] = { base: '{v}% chance to cause Monsters to Flee on Hit' };
+STAT_TEXT.statusDuration = { name: 'Duration of Statuses you inflict' };
+STAT_TEXT.enemyBlockReduction = { base: 'Enemies have {v}% reduced Chance to Block your Hits' };
+
 const RECOVER_POOL_TEXT: Record<string, string> = {
   life: 'Life',
   mana: 'Mana',

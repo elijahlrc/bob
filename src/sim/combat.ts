@@ -30,8 +30,16 @@ import { maskOr, type CondId, type Mod } from '../mods/types';
 import { rollGains } from './buffs';
 import { gainTrophy, rollCharges } from './charges';
 import { applyPlayerHexes, tickHexes } from './hexes';
+import {
+  blockLessOf,
+  hitChanceFactor,
+  hitTakenExtra,
+  rollStatuses,
+  statusTaken,
+  tickStatuses,
+} from './statuses';
 import { damageMult, hexPlayerAtRandom, onMonsterDeath, shieldedByPylon } from './factions';
-import { fireTriggers } from './triggers';
+import { corpseBlast, fireTriggers } from './triggers';
 import { spawnMonster } from './world';
 import type { Actor, Dot, World } from './types';
 
@@ -158,14 +166,17 @@ export function refreshPlayerDefence(w: World): void {
 }
 
 export function targetState(a: Actor): TargetState {
-  // Brittle Doom lowers the three elemental resistances; Open Wounds adds physical vulnerability.
-  const resShift = a.resShift.map((r, i) => r - a.hexRes[i]);
+  // Brittle Doom lowers the three elemental resistances; Open Wounds adds physical vulnerability; exposure and the like add to them.
+  const st = statusTaken(a);
+  const resShift = a.resShift.map((r, i) => r - a.hexRes[i] - st.res[i]);
   return {
     def: a.def,
     shock: a.ail.shock,
     resShift,
     vuln: a.hexVuln,
     vulnAll: a.hexVulnAll,
+    vulnType: st.vulnType,
+    blockLess: blockLessOf(a),
     es: a.es,
   };
 }
@@ -260,6 +271,14 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     res.total -= res.dmg[0] * (1 - w.guard.physMult);
     res.dmg[0] *= w.guard.physMult;
   }
+  // Traps and mines hit a shackled enemy harder; a snared one takes more from projectile attacks.
+  if (src.isPlayer && !dst.isPlayer && res.outcome !== 'block') {
+    const extra = hitTakenExtra(dst, p);
+    if (extra > 0) {
+      for (let i = 0; i < res.dmg.length; i++) res.dmg[i] *= 1 + extra;
+      res.total *= 1 + extra;
+    }
+  }
   if (src.modIds.includes('hexcaller') && dst.isPlayer && res.outcome === 'hit' && src.hexCd <= 0) {
     src.hexCd = 4;
     hexPlayerAtRandom(w);
@@ -275,6 +294,8 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       dst.life = Math.min(lifeCap(w, dst), dst.life + dst.def.maxLife * dst.def.lifeOnBlockPct);
     wake(w, dst);
     if (dst.isPlayer) fireTriggers(w, { on: 'block' });
+    // A skill that wears blocking down leaves a blocking enemy Overpowered.
+    if (src.isPlayer && !dst.isPlayer) rollStatuses(w, dst, p, true);
     return;
   }
   let dtype = 0;
@@ -333,6 +354,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (src.isPlayer) noteCause(dst, p.tagMask, false, p.gains);
   applyDamage(w, dst, res.dmg);
   if (wasAlive && dst.alive) {
+    if (src.isPlayer) rollStatuses(w, dst, p);
     payImpales(w, dst);
     recordImpale(w, dst, p, res);
     reflectBack(w, src, dst, p, res);
@@ -436,7 +458,10 @@ export function hit(
 ): void {
   const canStun = dst.stunT <= 0 && dst.graceT <= 0;
   const h = p.hands[Math.min(hand, p.hands.length - 1)];
-  const res = resolveHit(w.rngCombat, p, h, targetState(dst), dist, canStun);
+  const ts = targetState(dst);
+  // A blinded attacker misses more.
+  ts.hitChanceMult = hitChanceFactor(src);
+  const res = resolveHit(w.rngCombat, p, h, ts, dist, canStun);
   applyHit(w, src, dst, p, res);
 }
 
@@ -547,6 +572,7 @@ export function rawHit(
   const dmg = [0, 0, 0, 0, 0];
   dmg[type] = amount;
   const def = dst.def;
+  const st = statusTaken(dst);
   takenAs(def, dmg);
   const taken = def.damageTakenMult * def.hitTakenMult * shockTaken(def, dst.ail.shock);
   for (let i = 0; i < 5; i++) {
@@ -559,13 +585,13 @@ export function rawHit(
       const red = Math.min(0.9, def.armour / (def.armour + 10 * dmg[0]) + def.physReduction);
       dmg[0] *= 1 - red;
     } else {
-      const shift = dst.resShift[i] - dst.hexRes[i];
+      const shift = dst.resShift[i] - dst.hexRes[i] - st.res[i];
       const r = Math.max(-200, Math.min(def.res[i] + shift, def.maxRes[i]));
       dmg[i] *= 1 - r / 100;
     }
     dmg[i] *= taken * def.damageTakenType[i];
     if (i === 0) dmg[i] *= 1 + dst.hexVuln;
-    dmg[i] *= 1 + dst.hexVulnAll;
+    dmg[i] *= (1 + dst.hexVulnAll) * (1 + st.vulnType[i]);
   }
   const total = dmg[0] + dmg[1] + dmg[2] + dmg[3] + dmg[4];
   w.events.push({ t: 'hit', src: 0, dst: dst.id, amount: total, crit: false, dtype: type });
@@ -692,6 +718,8 @@ export function killActor(w: World, a: Actor): void {
   onMonsterDeath(w, a);
   const cause = causes.get(a);
   if (!cause?.minion) fireTriggers(w, { on: 'kill', target: a, tags: cause?.tags ?? 0 });
+  // A Doomed enemy blows up for a share of its own life.
+  if (a.fx.doomed) corpseBlast(w, a, a.fx.doomed.v, 'chaos', 3);
 }
 
 /** A Splitting monster leaves two weaker copies behind (no XP or loot, and they do not split). */
@@ -745,6 +773,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   a.tOverload += dt;
   a.sinceDamaged += dt;
   tickHexes(a, dt);
+  tickStatuses(a, dt);
   if (a.curlT > 0) a.curlT -= dt;
   if (a.buffT > 0) a.buffT -= dt;
   if (a.suppressT > 0) a.suppressT -= dt;

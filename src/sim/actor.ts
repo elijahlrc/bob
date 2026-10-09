@@ -78,6 +78,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     shellBy: 0,
     phaseT: 0,
     hexes: [],
+    fx: {},
     impales: [],
     hexRes: [0, 0, 0, 0, 0],
     hexVulnAll: 0,

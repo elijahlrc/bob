@@ -134,6 +134,12 @@ export type TargetState = {
   vuln?: number;
   /** Increased damage taken of every type, as a fraction (curses and marks). */
   vulnAll?: number;
+  /** Increased damage taken per type, as fractions (a Withered enemy takes more chaos damage). */
+  vulnType?: readonly number[];
+  /** Points (fraction) taken off the chance to block (Overpowered). */
+  blockLess?: number;
+  /** What a blinded attacker's chance to hit is multiplied by. */
+  hitChanceMult?: number;
 };
 
 export const NO_SHIFT: readonly number[] = [0, 0, 0, 0, 0];
@@ -177,17 +183,24 @@ export function emptyAilments(): AilmentResult {
 }
 
 /** Chance that an attack from this hand hits (evasion and evade bonuses). */
-export function attackHitChance(p: SkillProfile, hand: HandProfile, def: Defence): number {
+export function attackHitChance(
+  p: SkillProfile,
+  hand: HandProfile,
+  def: Defence,
+  mult = 1,
+): number {
   if (!p.isAttack || p.alwaysHit || def.cannotEvade) return 1;
   let c = hitChance(hand.accuracy, def.evasion);
   const isProj = p.skill.behaviour.kind === 'projectile';
   const bonus = isProj ? def.evadeProj : def.evadeMelee;
   if (bonus) c = Math.min(1, Math.max(0.05, c * (1 - bonus)));
-  return c * (1 - def.dodgeAttack);
+  return c * (1 - def.dodgeAttack) * mult;
 }
 
-export function blockChance(p: SkillProfile, def: Defence): number {
-  return p.isAttack ? def.blockAttack : def.blockSpell;
+/** The chance to block a hit of this skill: less for a skill that wears blocking down, and for each Overpowered stack. */
+export function blockChance(p: SkillProfile, def: Defence, less = 0): number {
+  const base = p.isAttack ? def.blockAttack : def.blockSpell;
+  return Math.max(0, base * (1 - p.enemyBlockLess) - less);
 }
 
 /** Move the "taken as" share of a physical hit into other types, before mitigation. Mutates `dmg`. */
@@ -242,6 +255,7 @@ export function mitigate(p: SkillProfile, t: TargetState, dmg: number[]): number
     dmg[i] *= taken * def.damageTakenType[i];
     if (i === PHYS && t.vuln) dmg[i] *= 1 + t.vuln;
     if (t.vulnAll) dmg[i] *= 1 + t.vulnAll;
+    if (t.vulnType?.[i]) dmg[i] *= 1 + t.vulnType[i];
   }
   return dmg;
 }
@@ -364,7 +378,7 @@ export function resolveHit(
     ailments: emptyAilments(),
     stun: 0,
   };
-  if (!isSpellHit && !rng.chance(attackHitChance(p, hand, t.def))) {
+  if (!isSpellHit && !rng.chance(attackHitChance(p, hand, t.def, t.hitChanceMult))) {
     res.outcome = 'miss';
     return res;
   }
@@ -372,7 +386,7 @@ export function resolveHit(
     res.outcome = 'miss';
     return res;
   }
-  const blk = blockChance(p, t.def);
+  const blk = blockChance(p, t.def, t.blockLess);
   if (blk > 0 && rng.chance(blk)) {
     res.outcome = 'block';
     return res;
@@ -394,7 +408,7 @@ export function resolveHit(
   res.crit =
     hand.critChance > 0 &&
     rng.chance(hand.critChance) &&
-    (isSpellHit || rng.chance(attackHitChance(p, hand, t.def)));
+    (isSpellHit || rng.chance(attackHitChance(p, hand, t.def, t.hitChanceMult)));
   let cm = (res.crit ? hand.critMulti * (p.cruelAgony ? 0.7 : 1) : 1) * hand.hitMult;
   // Double damage doubles the hit before it is mitigated (and rolls only when something gives the chance).
   if (p.doubleChance > 0 && rng.chance(p.doubleChance)) cm *= 2;
@@ -464,7 +478,7 @@ export function expectedHit(
     t,
     avgH.map((h) => h * hand.hitMult * critM * dbl),
   );
-  const hc = p.isAttack ? attackHitChance(p, hand, t.def) : 1 - t.def.dodgeSpell;
+  const hc = p.isAttack ? attackHitChance(p, hand, t.def, t.hitChanceMult) : 1 - t.def.dodgeSpell;
   // An attack confirms a critical strike with a second accuracy check (3.9).
   const cc = hand.critChance * (p.isAttack ? hc : 1);
   const perType = nonCrit.map((n, i) => n * (1 - cc) + crit[i] * cc);
@@ -475,7 +489,7 @@ export function expectedHit(
     const extra = mitigate(p, t, [stacks * p.impale.share * rawPhys, 0, 0, 0, 0]);
     perType[PHYS] += extra[PHYS];
   }
-  const bc = blockChance(p, t.def);
+  const bc = blockChance(p, t.def, t.blockLess);
   const total = perType.reduce((a, b) => a + b, 0);
   const esUp = (t.es ?? 0) > 0;
   const sNon = stunFromHit(p, nonCrit, t.def, true, null, esUp).chance;

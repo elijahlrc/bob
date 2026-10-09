@@ -5564,8 +5564,17 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         kind: 'inc',
         value: [25, 44],
       },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [15, 30],
+        damageTypes: ['cold'],
+        condition: {
+          id: 'targetChilled',
+        },
+      },
     ],
-    description: 'Increases the effect of the chill of cold skills.',
+    description: 'Chills hit harder, and chilled enemies take more cold damage.',
   },
   {
     kind: 'support',
@@ -6597,13 +6606,13 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         value: [10, 29],
       },
       {
-        stat: 'penetration',
+        stat: 'status.withered.chance',
         kind: 'base',
-        value: 10,
-        damageTypes: ['chaos'],
+        value: 25,
       },
     ],
-    description: 'Gains physical damage as chaos, and leaves the target open to chaos.',
+    description:
+      'Gains physical damage as chaos, and hits can wither the target so that it takes more chaos damage.',
   },
   {
     kind: 'support',
@@ -7114,15 +7123,19 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     attr: 'dex',
     supports: [],
     costMult: 1.1,
-    mods: [],
-    global: [
+    mods: [
       {
-        stat: 'hexOnHit.feebleGrip',
+        stat: 'status.blind.chance',
         kind: 'base',
-        value: [3, 10],
+        value: 10,
+      },
+      {
+        stat: 'statusDuration',
+        kind: 'inc',
+        value: [0, 38],
       },
     ],
-    description: 'Enemies you hit deal less damage, as if blinded.',
+    description: 'Hits can blind enemies, so that they miss half of their attacks.',
   },
   {
     kind: 'support',
@@ -7133,12 +7146,18 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.1,
     mods: [
       {
-        stat: 'accuracy',
-        kind: 'inc',
-        value: [20, 40],
+        stat: 'enemyBlockReduction',
+        kind: 'base',
+        value: [10, 20],
+      },
+      {
+        stat: 'status.overpowered.chance',
+        kind: 'base',
+        value: 100,
       },
     ],
-    description: 'Your hits land past guards.',
+    description:
+      'Enemies block less against your hits, and every block you meet makes the next likelier to fail.',
   },
   {
     kind: 'support',
@@ -7147,15 +7166,14 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     attr: 'dex',
     supports: [],
     costMult: 1.1,
-    mods: [],
-    global: [
+    mods: [
       {
-        stat: 'hexOnHit.leadenLimbs',
+        stat: 'status.flee.chance',
         kind: 'base',
-        value: [3, 10],
+        value: [25, 44],
       },
     ],
-    description: 'Enemies you hit falter and slow down.',
+    description: 'Hits can make enemies lose their nerve and run.',
   },
   {
     kind: 'support',
@@ -7398,15 +7416,18 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         value: [15, 30],
         damageTypes: ['physical'],
       },
-    ],
-    global: [
       {
-        stat: 'hexOnHit.openWounds',
+        stat: 'status.maim.chance',
         kind: 'base',
-        value: [1, 6],
+        value: 30,
+      },
+      {
+        stat: 'status.maim.x',
+        kind: 'base',
+        value: [10, 14],
       },
     ],
-    description: 'Hits cripple: enemies slow and take more physical damage.',
+    description: 'Hits can maim: a maimed enemy moves slowly and takes more physical damage.',
   },
   {
     kind: 'support',

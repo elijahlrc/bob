@@ -49,7 +49,7 @@ function canAct(a: Actor): boolean {
 export function step(w: World, a: Actor, dx: number, dy: number, dt: number): void {
   const len = Math.hypot(dx, dy);
   if (len < 1e-6) return;
-  const speed = a.def.moveSpeed * (1 - a.ail.chill) * speedMult(a);
+  const speed = a.def.moveSpeed * (1 - a.ail.chill) * moveMult(a);
   const d = Math.min(len, speed * dt);
   const nx = a.x + (dx / len) * d;
   const ny = a.y + (dy / len) * d;
@@ -531,7 +531,7 @@ function minionInSight(w: World, m: Actor, range: number): Actor | null {
 function chaseStep(w: World, m: Actor, tx: number, ty: number, dt: number, pace = 1): void {
   if (m.tryTick === w.tick - 1) {
     const moved = Math.hypot(m.x - m.prevX, m.y - m.prevY);
-    const want = m.def.moveSpeed * (1 - m.ail.chill) * speedMult(m) * dt * pace;
+    const want = m.def.moveSpeed * (1 - m.ail.chill) * moveMult(m) * dt * pace;
     if (moved < want * 0.4) m.blockT += dt;
     else m.blockT = Math.max(0, m.blockT - 2 * dt);
   }

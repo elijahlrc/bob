@@ -1,3 +1,4 @@
+import { moveFactor } from './statuses';
 import { scaleOf, type MonsterSpec } from '../calc/monster';
 import { HEX_IDS, hexEffect, type HexId } from '../data/hexes';
 import { PYLON_RANGE } from '../data/abilities';
@@ -78,6 +79,11 @@ export function speedMult(a: Actor): number {
     (1 + FERVOUR_STEP * a.fervour) *
     (a.enraged ? ENRAGE_SPEED : 1)
   );
+}
+
+/** The speed an actor walks at: all of that, and hindering, maiming, shackles and snares (docs/SPIRIT.md S3). */
+export function moveMult(a: Actor): number {
+  return speedMult(a) * moveFactor(a);
 }
 
 /** Everything that raises or lowers the damage an actor deals. */

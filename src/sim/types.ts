@@ -11,6 +11,7 @@ import type { MapPlan } from '../gen/mapPlan';
 import type { BuffId } from '../data/buffs';
 import type { Corpse } from './factions';
 import type { HexState } from './hexes';
+import type { Fx } from './statuses';
 import type { Deployable } from './deploy';
 import type { Minion } from './minions';
 import type { Grid } from './grid';
@@ -115,6 +116,8 @@ export type Actor = {
   phaseT: number;
   /** Hexes on this actor (EXPANSION 5.7) and what they add up to. */
   hexes: HexState[];
+  /** The statuses on this actor (docs/SPIRIT.md S3). */
+  fx: Fx;
   /** Impales on this actor: the physical damage each recorded, and the hits it has left. */
   impales: { dmg: number; hits: number }[];
   /** Resistance lowered by hexes, per damage type (index 0 unused). */
@@ -319,6 +322,8 @@ export type SimEvent =
   | { t: 'spend'; kind: string; n: number }
   | { t: 'buff'; id: string }
   | { t: 'hex'; id: number; hex: string }
+  /** A status was put on an enemy. */
+  | { t: 'status'; dst: number; id: string }
   | { t: 'deploy'; kind: string; x: number; y: number; end: boolean }
   | { t: 'stuck' }
   | { t: 'stall'; id: number }
@@ -482,12 +487,12 @@ export type World = {
   guard: { buff: BuffId; physMult: number } | null;
   /** Skills with a cooldown of their own (by choice key): the uses held and the seconds until the next one is regained. */
   cooldowns: Record<string, { uses: number; t: number }>;
-  /** Time since the burning aura last struck. */
-  auraBurnT: number;
   /** When each utility skill (by choice key) can next be cast. */
   utilityReady: Record<string, number>;
   /** The totems, brands, traps and mines on the ground. */
   deployables: Deployable[];
+  /** Time since the burning aura last struck. */
+  auraBurnT: number;
   deploySeq: number;
   /** The minions standing. */
   minions: Minion[];

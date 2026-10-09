@@ -1,6 +1,6 @@
 import type { SkillChoice } from '../calc/character';
 import type { TriggerDef, TriggerEffect } from '../data/triggers';
-import { DAMAGE_TYPES, maskSubset, tagBit } from '../mods/types';
+import { DAMAGE_TYPES, maskSubset, tagBit, type DamageType } from '../mods/types';
 import { fire } from './actions';
 import { registerBlast } from './factions';
 import { flaskMask, lifeCap, playerConds, pushDot, rawHit, wake } from './combat';
@@ -137,6 +137,17 @@ function castTriggered(w: World, choice: SkillChoice, ev: TriggerEvent): boolean
     w.trig.busy = false;
   }
   return true;
+}
+
+/** An enemy that dies under a status that makes it explode (Abyssal Cry): a blast of a share of its own life. */
+export function corpseBlast(
+  w: World,
+  dead: Actor,
+  pctOfMaxLife: number,
+  dtype: DamageType,
+  radius: number,
+): void {
+  explode(w, { kind: 'explode', pctOfMaxLife, dtype, radius }, dead);
 }
 
 function explode(w: World, e: Extract<TriggerEffect, { kind: 'explode' }>, dead: Actor): boolean {
