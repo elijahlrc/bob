@@ -268,7 +268,7 @@
   "slowRot": {
    "ref": "Decay Support",
    "status": "covered",
-   "note": "Hits inflict a long poison-like damage over time (modelled as a certain, long poison)."
+   "note": "Hits inflict Decay: a flat chaos damage over time for eight seconds, one at a time, that does not depend on the hit and is not poison."
   },
   "patientPower": {
    "ref": "Efficacy Support",
@@ -348,17 +348,17 @@
   "witheringBreath": {
    "ref": "Blight",
    "status": "covered",
-   "note": "A channelled breath of chaos in front of the character (the stacking debuff is averaged into short ticks)."
+   "note": "A channelled breath of chaos in front of the character that adds a layer of damage over time to every enemy in the area with each breath: a layer lasts two and a half seconds and there can be twenty; an enemy not already withered is slowed for a moment. It does not hit."
   },
   "torchArrow": {
    "ref": "Burning Arrow",
    "status": "covered",
-   "note": "A fire arrow that ignites harder than most."
+   "note": "A fire arrow that ignites harder than most; an ignite it causes also leaves a burning debuff worth a third of its damage, for four seconds, up to five at once."
   },
   "acidArrow": {
    "ref": "Caustic Arrow",
    "status": "covered",
-   "note": "A chaos arrow that bursts and poisons (the lasting cloud is folded into the poison)."
+   "note": "A chaos arrow that bursts where it lands and leaves caustic ground for two seconds: the enemies standing in it take chaos damage over time, which does not stack between patches. The ground comes even if the arrow misses."
   },
   "viperLash": {
    "ref": "Cobra Lash",
@@ -373,7 +373,7 @@
   "creepingPlague": {
    "ref": "Contagion",
    "status": "covered",
-   "note": "A chaos cloud that eats at everything in it (the spread on death is dropped)."
+   "note": "A debuff of chaos damage over time on every enemy in the area, for five seconds; it does not hit. When an enemy that carries it dies, it passes on to those near it with the time it had left."
   },
   "pyreBurst": {
    "ref": "Cremation",
@@ -448,7 +448,7 @@
   "sapBolt": {
    "ref": "Essence Drain",
    "status": "covered",
-   "note": "A chaos projectile that leaves a draining damage over time and heals the caster from it."
+   "note": "A chaos projectile whose small hit leaves a draining chaos damage over time on the enemies around where it lands; the caster mends from it while it lasts. It passes on from a corpse that also carried Contagion."
   },
   "kindledFrost": {
    "ref": "Cold to Fire Support",
@@ -463,7 +463,7 @@
   "wildfireSpread": {
    "ref": "Elemental Proliferation Support",
    "status": "covered",
-   "note": "A chance to freeze, shock and ignite on hit (the spreading to nearby enemies is dropped)."
+   "note": "A chance to freeze, shock and ignite on hit, and the elemental ailments spread to the enemies near the afflicted one, while it carries them and as it dies."
   },
   "splitShot": {
    "ref": "Fork Support",
@@ -608,7 +608,7 @@
   "searingLance": {
    "ref": "Scorching Ray",
    "status": "covered",
-   "note": "A channelled ray of fire that burns longer on the same target and lowers fire resistance (the stacks are averaged)."
+   "note": "A channelled ray of fire that sets a burning debuff on what it touches: each breath it stays in the ray adds a stage (eight at most, each adding three fifths of the first), and at the last stage the enemy is exposed to fire. It keeps burning for a moment after it leaves the ray. The ray does not hit."
   },
   "splinterVolley": {
    "ref": "Shattering Steel",
@@ -733,7 +733,7 @@
   "venomShower": {
    "ref": "Toxic Rain",
    "status": "covered",
-   "note": "Arrows rain on an area as a poisonous cloud (modelled as a zone with poison on every pulse)."
+   "note": "Arrows rain around the target (five of them) and each leaves a spore pod: for a second it afflicts the enemies near it with chaos damage over time and slows them a tenth (six pods at most), then it bursts for the arrow's damage."
   },
   "toxinCircle": {
    "ref": "Venom Gyre",
@@ -858,7 +858,7 @@
   "foulBrew": {
    "ref": "Vile Toxins Support",
    "status": "covered",
-   "note": "Poison deals more damage, and hits deal more for each poison on the target."
+   "note": "Poison deals more damage, and hits deal five percent more for each poison on the target, up to six at the first level and nine at the last."
   },
   "voidTwist": {
    "ref": "Void Manipulation Support",
@@ -928,7 +928,7 @@
   "ruinRitual": {
    "ref": "Bane",
    "status": "covered",
-   "note": "A curse that lowers chaos resistance and makes enemies take more damage (the curses it spreads on death are dropped)."
+   "note": "A ritual that puts a debuff of chaos damage over time on every enemy in the area and, with it, the curses linked to it (the other curse gems of its item); each curse makes the debuff last half as long again and deal a third more. It does not hit."
   },
   "ruinSigil": {
    "ref": "Assassin's Mark",
@@ -1148,7 +1148,7 @@
   "cinderHerald": {
    "ref": "Herald of Ash",
    "status": "covered",
-   "note": "An aura that reserves mana: physical damage gained as fire, and ignites spread from enemies killed while burning (the overkill burn is dropped)."
+   "note": "An aura that reserves mana: physical damage gained as fire, and any enemy you kill sets the enemies near its corpse burning for a quarter of the damage the blow had left over each second, for four seconds."
   },
   "rimeHerald": {
    "ref": "Herald of Ice",
@@ -1413,7 +1413,7 @@
   "wildfireSeed": {
    "ref": "Ignite Proliferation Support",
    "status": "covered",
-   "note": "Ignites spread to the enemies nearby when an ignited enemy is killed, and ignite damage rises."
+   "note": "Ignites spread to the enemies near the one that burns, while it burns and as it dies, and ignite damage rises."
   },
   "lightheart": {
    "ref": "Inspiration Support",

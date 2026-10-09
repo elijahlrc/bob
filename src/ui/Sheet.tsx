@@ -43,6 +43,7 @@ export function Sheet({ s }: { s: CharacterSheet }) {
     ['Mana cost', String(k.cost)],
     ['Hit DPS', f1(k.hitDps)],
     ['Ignite / bleed / poison DPS', `${f1(k.igniteDps)} / ${f1(k.bleedDps)} / ${f1(k.poisonDps)}`],
+    ['Debuff damage over time DPS', f1(k.dotDps)],
     ['Total DPS', f1(k.totalDps)],
   ];
   return (

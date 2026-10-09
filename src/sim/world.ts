@@ -22,6 +22,7 @@ import { rollGains, tickBuffs } from './buffs';
 import { tickCooldowns } from './cooldowns';
 import { tickChannel } from './channel';
 import { tickBanner } from './banners';
+import { tickProliferation } from './proliferate';
 import { tickFields } from './fields';
 import { reservedMana } from './reserve';
 import { tickShots } from './shots';
@@ -530,6 +531,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickChannel(w);
   tickFields(w, dt);
   tickBanner(w, dt);
+  tickProliferation(w, dt);
   updateProjectiles(w, dt);
   tickZones(w, dt);
   tickCorpses(w, dt);

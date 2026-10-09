@@ -12,6 +12,43 @@ export type LevelValue = number | readonly [number, number];
 
 export type GemMod = Omit<Mod, 'value'> & { value: LevelValue };
 
+/**
+ * Damage a skill does over time as a debuff of its own (docs/SPIRIT.md S7): not an ailment, so the ailment modifiers do not reach it,
+ * but damage over time, the skill's keywords and its type do. The base damage a second is the reference game's table for the level.
+ */
+export type DotSpec = {
+  type: DamageType;
+  /** Base damage a second at gem level 1 and 20. */
+  dps: LevelValue;
+  /** Seconds it lasts, before duration modifiers (which reach it only if the skill has the duration keyword). */
+  seconds: number;
+  /**
+   * 'refresh': one at a time, renewed by each application. 'layers': each application adds a layer with its own time, up to `cap`.
+   * 'stages': one that gains a stage with each application up to `cap`, each stage after the first adding `stagePct` of the base.
+   */
+  stack: 'refresh' | 'layers' | 'stages';
+  cap?: number;
+  stagePct?: number;
+  /** The skill deals no hit of its own: it only inflicts this on whatever it reaches. */
+  hitless?: boolean;
+  /** It comes only from the ground the skill leaves (`leaves`), not from the hit. */
+  ground?: boolean;
+  /** Skill keywords beyond its own damage-over-time ones whose modifiers reach it (spell, projectile, area). */
+  scales?: SkillTag[];
+  /** A hit also puts it on the enemies within this many tiles of the target. */
+  splash?: number;
+  /** When the enemy dies it passes on to those near it with the time it had left; 'carry' only goes along with one that spreads. */
+  spread?: boolean | 'carry';
+  /** The caster mends this percent of the debuff's damage a second, for each enemy that carries it. */
+  regen?: number;
+  /** An enemy that did not carry it is slowed by this percent for this long. */
+  hinder?: { v: number; seconds: number };
+  /** At the cap of stages the enemy is exposed to the element. */
+  exposure?: StatusId;
+  /** More damage for each curse the skill applies from its link (Bane), in percent, and the percent longer each makes it last. */
+  perCurse?: { more: LevelValue; longer: number };
+};
+
 export type GemAttr = 'str' | 'dex' | 'int' | 'dexint' | 'strint' | 'strdex';
 
 export type SkillBehaviour =
@@ -206,6 +243,21 @@ export type ActiveGemDef = {
     };
   };
   /** A strike that, when it lands, sends more out: bolts from the weapon, blades from behind the enemy, balls that land and burst. */
+  /** Arrows that fall around the target and each leave a spore pod: it afflicts and slows what is near, then bursts (Toxic Rain). */
+  pods?: {
+    /** Seconds before a pod bursts, the radius of its cloud and of its burst, and how far from the target the pods land (before more arrows widen it). */
+    seconds: number;
+    radius: number;
+    burstRadius: number;
+    spread: number;
+    /** The percent each pod slows the enemies near it, and the most the pods can slow them together. */
+    slow: number;
+    slowMax: number;
+  };
+  /** A debuff of damage over time the skill inflicts (docs/SPIRIT.md S7). */
+  dot?: DotSpec;
+  /** An arrow that ignites also inflicts a burning debuff worth a share of the ignite's damage, up to `cap` at once. */
+  burning?: { pct: LevelValue; seconds: number; cap: number };
   /** Orbs a channelled skill leaves standing (docs/SPIRIT.md S6). */
   orb?:
     | {
@@ -237,7 +289,7 @@ export type ActiveGemDef = {
       };
   /** Ground the skill leaves where it lands (docs/SPIRIT.md S6). */
   leaves?: {
-    kind: 'consecrated' | 'chilling';
+    kind: 'consecrated' | 'chilling' | 'caustic';
     seconds: number;
     radius: number;
     /** How many times larger the ground ends than it began. */

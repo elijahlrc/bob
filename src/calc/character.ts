@@ -83,7 +83,14 @@ import {
   maskOr,
   SKILL_TAGS,
 } from '../mods/types';
-import { expectedAilments, expectedHit, NO_SHIFT, type Defence, type TargetState } from './combat';
+import {
+  expectedAilments,
+  expectedHit,
+  NO_SHIFT,
+  shockTaken,
+  type Defence,
+  type TargetState,
+} from './combat';
 import { defenceFromDb } from './defence';
 import { flaskSpec, type FlaskSpec } from './flasks';
 import { armourReduction, effectiveRes, hitChance, monsterHit } from './formulas';
@@ -199,6 +206,8 @@ export type SkillChoice = {
   triggered?: boolean;
   /** The skill is put on the ground as a totem, brand, trap or mine (a support or the gem itself makes it so). */
   deploy?: DeployKind;
+  /** The curses linked to a skill that applies them (Bane): the gems of the same item. */
+  linked?: PlayerHex[];
 };
 
 /** A trigger an equipped item carries, with the skills it can cast. */
@@ -265,6 +274,8 @@ export type SkillSheet = {
   igniteDps: number;
   bleedDps: number;
   poisonDps: number;
+  /** Damage over time the skill (or a support) inflicts as debuffs of its own, and the burning of a Torch Arrow. */
+  dotDps: number;
   ailmentDps: number;
   totalDps: number;
   /** Fraction of uses the mana (or life) regeneration can pay for. */
@@ -779,6 +790,7 @@ export class Character {
     if (chosen && !chosen.usable) this.warnings.push(chosen.reason ?? 'Primary skill unusable');
     this.primary = chosen && chosen.usable ? chosen : this.defaultAttack;
     this.hexes = this.deriveHexes(db0, ctx0);
+    this.linkCurses(db0, ctx0);
     this.castCurses = this.deriveCurses(db0, ctx0);
     this.sheetHexes = [
       ...this.hexes,
@@ -1060,6 +1072,35 @@ export class Character {
     return out.slice(0, this.hexLimit);
   }
 
+  /**
+   * A skill that applies the curses linked to it (Bane) takes the curse gems of its own item; they are then applied by it and
+   * not cast on their own.
+   */
+  private linkCurses(db: ModDB, ctx: ModCtx): void {
+    const mult = db.mult('curseEffect', ctx);
+    for (const a of this.actives) {
+      if (!a.usable || !a.skill.dot?.perCurse) continue;
+      const g = this.gems.find((x) => x.gem.uid === a.gemUid);
+      if (!g) continue;
+      const linked: PlayerHex[] = [];
+      for (const o of this.gems)
+        if (
+          o.slot === g.slot &&
+          o.gem.uid !== g.gem.uid &&
+          o.def.kind === 'active' &&
+          o.def.utility?.kind === 'curse'
+        ) {
+          linked.push({
+            id: o.def.utility.hex,
+            level: o.level,
+            effect: Math.round(hexEffect(o.def.utility.hex, o.level) * mult * 10) / 10,
+          });
+          this.hexTouched.add(o.gem.uid);
+        }
+      a.linked = linked.sort((x, y) => y.effect - x.effect);
+    }
+  }
+
   /** The curses cast by utility gems: level sets the effect, curse effect scales it. */
   private deriveCurses(db: ModDB, ctx: ModCtx): PlayerHex[] {
     const out: PlayerHex[] = [];
@@ -1277,7 +1318,8 @@ export class Character {
     // While its totems and brands stand and shoot, the character itself fights with its weapon.
     if (standing && usesOverride === undefined && choice.gemUid !== null)
       hitDps += this.skillSheet(this.defaultAttack, target, conds).hitDps * 0.9;
-    const ailmentDps = ign + bl + po;
+    const dotDps = this.skillDotDps(choice, p, t, usesPerSec, ign);
+    const ailmentDps = ign + bl + po + dotDps;
     const totalDps = hitDps + ailmentDps;
     // Sustain: the share of uses the resource pool can pay for; the rest fall back to the default attack.
     let sustain = 1;
@@ -1308,6 +1350,7 @@ export class Character {
       igniteDps: ign,
       bleedDps: bl,
       poisonDps: po,
+      dotDps,
       ailmentDps,
       totalDps,
       sustain,
@@ -1315,6 +1358,60 @@ export class Character {
       cost: p.cost,
       range: skillRange(p),
     };
+  }
+
+  /**
+   * What the debuffs of damage over time a skill inflicts deal a second to one target when it is used as the sheet says: a
+   * renewed one all the time its uses keep up with its length, layers as many as the uses of its length fit, stages at the cap.
+   */
+  private skillDotDps(
+    choice: SkillChoice,
+    p: SkillProfile,
+    t: TargetState,
+    usesPerSec: number,
+    igniteDps: number,
+  ): number {
+    const def = t.def;
+    const taken = (type: number): number => {
+      if (def.immune[type] || (type === 4 && def.immuneChaos)) return 0;
+      const res =
+        type === 0 ? 0 : effectiveRes(def.res[type] + (t.resShift[type] ?? 0), def.maxRes[type]);
+      return (
+        (1 - res / 100) * def.damageTakenMult * shockTaken(def, t.shock) * def.damageTakenType[type]
+      );
+    };
+    let dps = 0;
+    const sd = p.skillDot;
+    if (sd) {
+      const spec = sd.spec;
+      let per = sd.dps;
+      let seconds = sd.seconds;
+      if (spec.perCurse) {
+        const n = Math.min(choice.linked?.length ?? 0, this.hexLimit);
+        per *= 1 + (levelValue(spec.perCurse.more, choice.skill.level) * n) / 100;
+        seconds *= 1 + (spec.perCurse.longer * n) / 100;
+      }
+      const uptime = Math.min(1, seconds * usesPerSec);
+      if (spec.stack === 'refresh') {
+        // Ground that lingers holds the debuff for as long as it lasts; a patch is renewed as the arrows come.
+        const ground = choice.skill.leaves ? choice.skill.leaves.seconds * usesPerSec : uptime;
+        dps = per * Math.min(1, spec.ground ? ground : uptime);
+      } else if (spec.stack === 'layers') {
+        dps = per * Math.min(spec.cap ?? 20, seconds * usesPerSec);
+      } else {
+        const stages = uptime >= 1 ? (spec.cap ?? 8) : 1;
+        dps = per * (1 + ((spec.stagePct ?? 0) / 100) * (stages - 1)) * uptime;
+      }
+      dps *= taken(sd.type);
+    }
+    if (p.decay) dps += p.decay.dps * taken(4) * Math.min(1, p.decay.seconds * usesPerSec);
+    // A Torch Arrow's ignite also leaves burning debuffs, each worth a share of it, a few at once.
+    const bn = choice.skill.burning;
+    if (bn && igniteDps > 0) {
+      const stacks = Math.min(bn.cap, Math.max(1, p.ignite.chance * usesPerSec * bn.seconds));
+      dps += (igniteDps * levelValue(bn.pct, choice.skill.level) * stacks) / 100;
+    }
+    return dps;
   }
 
   /**
@@ -1598,6 +1695,15 @@ export function volleyHits(p: SkillProfile, distance: number): number {
     }
   }
   if (p.skill.cone) hits += p.skill.cone.mult / 100;
+  // Pods fall in a scatter around the target: a standing target is inside the burst of some of them.
+  const pods = p.skill.pods;
+  if (pods) {
+    const spread = pods.spread * Math.sqrt(p.projectiles / 5);
+    hits = Math.max(
+      1,
+      p.projectiles * Math.min(1, (pods.burstRadius / Math.max(0.5, spread)) ** 2),
+    );
+  }
   return hits;
 }
 

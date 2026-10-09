@@ -38,11 +38,11 @@
       { "stat": "damage.min", "kind": "base", "value": [3, 60], "damageTypes": ["fire"] }, { "stat": "damage.max", "kind": "base", "value": [5, 90], "damageTypes": ["fire"] },
       { "stat": "chance.ignite", "kind": "base", "value": 20 } ],
       "description": "Adds fire damage to the attack and ignites more often." } },
-  { "ref": "Ignite Proliferation Support", "note": "Ignites spread to the enemies nearby when an ignited enemy is killed, and ignite damage rises.",
+  { "ref": "Ignite Proliferation Support", "note": "Ignites spread to the enemies near the one that burns, while it burns and as it dies, and ignite damage rises.",
     "def": { "kind": "support", "id": "wildfireSeed", "name": "Wildfire Seed", "attr": "int", "supports": [], "costMult": 1.3, "mods": [
-      { "stat": "damage", "kind": "more", "value": [20, 39], "tags": ["ignite"] } ],
-      "extraTriggers": [{ "on": "kill", "targetHas": "ignite", "chance": 100, "cooldown": 0, "effect": { "kind": "spread", "ailment": "ignite", "radius": 3 } }],
-      "description": "Ignites spread from the enemies you kill." } },
+      { "stat": "damage", "kind": "more", "value": [20, 39], "tags": ["ignite"] },
+      { "stat": "spread.ignite", "kind": "base", "value": [1.9, 2.7] } ],
+      "description": "Ignites spread to the enemies near a burning one." } },
   { "ref": "Inspiration Support", "note": "The supported skill costs less mana, gains an Insight charge each time it is used, and hits harder in critical strikes and in elemental damage with each charge held (the reference gem's own charge type is Insight here; its reset when much mana has been spent is not modelled).",
     "def": { "kind": "support", "id": "lightheart", "name": "Lightheart", "attr": "str", "supports": [], "costMult": 0.7, "mods": [
       { "stat": "chargeOn.use.insight", "kind": "base", "value": 100 },

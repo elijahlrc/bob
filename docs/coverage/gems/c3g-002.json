@@ -4,11 +4,10 @@
       { "stat": "damage", "kind": "more", "value": [45, 64], "tags": ["dot"] },
       { "stat": "damage", "kind": "more", "value": -10, "tags": ["hit"] } ],
       "description": "More damage over time from ailments, but less damage from hits." } },
-  { "ref": "Decay Support", "note": "Hits inflict a long poison-like damage over time (modelled as a certain, long poison).",
+  { "ref": "Decay Support", "note": "Hits inflict Decay: a flat chaos damage over time for eight seconds, one at a time, that does not depend on the hit and is not poison.",
     "def": { "kind": "support", "id": "slowRot", "name": "Slow Rot", "attr": "int", "supports": [], "costMult": 1.3, "mods": [
-      { "stat": "chance.poison", "kind": "base", "value": 100 },
-      { "stat": "duration.poison", "kind": "inc", "value": 400 } ],
-      "description": "Hits always poison, and the poison lasts much longer." } },
+      { "stat": "dot.decay", "kind": "base", "value": [120, 843] } ],
+      "description": "Hits leave a decay on the enemy: chaos damage over time that does not depend on the hit." } },
   { "ref": "Efficacy Support", "note": "More spell damage and more damage over time.",
     "def": { "kind": "support", "id": "patientPower", "name": "Patient Power", "attr": "int", "supports": [], "costMult": 1.3, "mods": [
       { "stat": "damage", "kind": "more", "value": [10, 20], "tags": ["spell"] },

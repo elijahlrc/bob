@@ -5,16 +5,16 @@
       "ref": "Caustic Arrow",
       "name": "Acid Arrow",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S7",
-      "missing": ["ground_effect", "skill_damage_over_time"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A chaos arrow that bursts and leaves caustic ground that damages enemies standing in it over time; area damage over time that scales with DoT and projectile modifiers.",
         "bob": "A bow arrow that explodes in radius 1.5 with 60% chaos conversion and a 100% poison chance. The lasting ground is replaced by poison on everyone hit by the burst, which follows the enemy and scales with poison mods instead of ground DoT.",
         "repair": "Leave a ground zone at the burst whose damage is a per-second chaos effect on enemies in it (the ground behaviour exists) rather than relying on poison."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Caustic Arrow",
         "status": "confirmed",
@@ -971,16 +971,16 @@
       "ref": "Herald of Ash",
       "name": "Cinder Herald",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S7",
-      "missing": ["overkill_damage_on_kill", "trigger_on_event"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "25% reserved herald: physical gained as fire, more spell fire damage, and when you kill any enemy, overkill damage burns the enemies near it. Rewards big hits and dense packs, needs no ignite.",
         "bob": "Gain-as-fire and spell fire more are real. The kill effect only spreads an existing ignite from a dead burning enemy (sim/triggers.ts spread); it needs an ignited victim, so non-ignite builds get nothing, and there is no overkill scaling.",
         "repair": "On any kill, ignite nearby enemies for a share of the dead enemy's overkill damage (needs the overkill amount passed to the kill event)."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Herald of Ash",
         "status": "confirmed",
@@ -1166,16 +1166,16 @@
       "ref": "Contagion",
       "name": "Creeping Plague",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S7",
-      "missing": ["skill_damage_over_time", "spread_on_death", "trigger_on_event"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Applies a chaos damage-over-time debuff to enemies in an area; when an affected enemy dies the debuff spreads to nearby enemies, so it snowballs through packs.",
         "bob": "A ground cloud at the target (radius 2.5, 5 s, hits every 0.5 s) as direct chaos hits on whoever stands in it. No debuff that stays on the enemy, no spread on death (trigger effects exist only for shock/ignite on item triggers), no spell DoT scaling.",
         "repair": "Make the cast apply a timed chaos DoT to enemies in the area, and on death of an affected enemy re-apply it to enemies nearby (extend the kill 'spread' trigger effect to this debuff)."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Contagion",
         "status": "confirmed",
@@ -2001,16 +2001,16 @@
       "ref": "Vile Toxins Support",
       "name": "Foul Brew",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S7",
-      "missing": ["damage_per_stack"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "More poison damage, and hits deal more per poison stack on the target, up to a cap.",
         "bob": "More poison damage plus a flat 12% under targetPoisoned; no per-stack scaling, contrary to the port note.",
         "repair": "Make the hit bonus scale with the target's poison count up to a cap."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Vile Toxins Support",
         "status": "confirmed",
@@ -4373,16 +4373,16 @@
       "ref": "Bane",
       "name": "Ruin Ritual",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S7",
-      "missing": ["damage_over_time_stacking", "apply_linked_curses", "scale_per_curse_applied"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A chaos damage-over-time debuff that also applies your linked curses to enemies in the area, growing stronger and longer for each curse applied (curse spreader/DoT).",
         "bob": "rotBane hex: -12..-21% chaos res and increased damage taken. No DoT, no linking of other curses, no scaling per curse; it is a generic curse.",
         "repair": "Give it an actual chaos DoT on enemies in radius and let it re-apply the character's other cast hexes (scaling DoT per hex applied)."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Bane",
         "status": "confirmed",
@@ -4468,16 +4468,16 @@
       "ref": "Essence Drain",
       "name": "Sap Bolt",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S7",
-      "missing": ["skill_damage_over_time", "leech_from_dot"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A projectile that applies a chaos damage-over-time debuff and heals you for a share of the debuff's damage; the debuff is spread by Contagion.",
         "bob": "A chaos projectile that bursts (radius 1.2) with 100% poison chance and leech.life 0.5. The leech applies only to the hit damage (leech is computed in applyHit), not to the poison ticks, so the sap heal is close to nothing; the DoT is poison, which does not use spell-damage scaling.",
         "repair": "Make the debuff a skill DoT with a life-leech share of its tick damage, instead of poison plus hit leech."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Essence Drain",
         "status": "confirmed",
@@ -4566,21 +4566,16 @@
       "ref": "Scorching Ray",
       "name": "Searing Lance",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S7",
-      "missing": [
-        "channel_ramp",
-        "damage_over_time_stacking",
-        "exposure_at_max_stages",
-        "lingering_burn"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A channelled fire beam that deals damage over time, intensifying with each stage you hold it on a target (up to 8), applies fire exposure at max stages, and leaves a burn on enemies that leave the beam.",
         "bob": "A short instant-line beam (length 4) fired repeatedly as spell hits with constant 25% fire penetration standing in for exposure; the stages, the damage-over-time nature and the lingering burn are not modelled (the port note claims averaged stacks, but no stack stat exists).",
         "repair": "Give beam skills a per-target stage count that adds damage per tick and applies exposure at max, plus a burn that outlasts the beam."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Scorching Ray",
         "status": "confirmed",
@@ -4960,16 +4955,16 @@
       "ref": "Decay Support",
       "name": "Slow Rot",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S7",
-      "missing": ["flat_dot_on_hit"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Hit inflicts a flat chaos damage over time for 10 s regardless of hit damage or type; works for any hitting skill.",
         "bob": "Modelled as 100% poison with +400% duration. Poison needs physical or chaos hit damage (elemental-only skills deal nothing) and scales with hit damage and poison stacks, unlike a flat DoT.",
         "repair": "Add a flat, level-based chaos DoT that ignores hit damage."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Decay Support",
         "status": "corrected",
@@ -6069,16 +6064,16 @@
       "ref": "Burning Arrow",
       "name": "Torch Arrow",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S7",
-      "missing": ["damage_over_time_stacking"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A fire arrow with a high ignite chance and ignite damage bonus; ignited enemies also get an extra stacking burning debuff (up to five) based on the ignite, and burning ground, so the ignite becomes the damage.",
         "bob": "A bow attack, 100% physical to fire, 50% ignite chance and 50-88% more ignite damage (the tagged mod does reach ignite damage). No stacking burning debuff and no burning ground, so the extra ignite scaling is absent.",
         "repair": "On ignite, apply a separate stacking burn (up to 5, a share of the ignite's damage) and optionally a short burning patch."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Burning Arrow",
         "status": "corrected",
@@ -6424,20 +6419,16 @@
       "ref": "Toxic Rain",
       "name": "Venom Shower",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S7",
-      "missing": [
-        "apply_slow_debuff_on_hit",
-        "detonate_at_end_of_duration",
-        "skill_damage_over_time"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Rain arrows into an area that leave spore pods which deal chaos damage over time, slow enemies' movement, and burst at the end of their life for area damage.",
         "bob": "A 1.5 s ground zone (radius 2.6) with 60% chaos conversion and poison on every pulse. Poison cloud is there; the movement slow and the final pod burst are not.",
         "repair": "Slow enemies standing in the zone and add a final burst when the zone expires."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Toxic Rain",
         "status": "corrected",
@@ -6892,16 +6883,16 @@
       "ref": "Ignite Proliferation Support",
       "name": "Wildfire Seed",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S7",
-      "missing": ["ailment_proliferation_on_apply"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Ignites you inflict spread to enemies within a radius while they burn; one ignited enemy lights a pack, plus more ignite damage.",
         "bob": "More ignite damage and an extra trigger that spreads the strongest ignite only when an ignited enemy is killed (triggers.ts spread). Nothing spreads while the enemy lives, so it does nothing against a boss or a pack until a kill happens. Trigger radius 3 tiles.",
         "repair": "Spread the ignite to enemies in radius at the moment it is applied (or periodically while it burns), not only on death."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Ignite Proliferation Support",
         "status": "confirmed",
@@ -6917,16 +6908,16 @@
       "ref": "Elemental Proliferation Support",
       "name": "Wildfire Spread",
       "kind": "support",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S7",
-      "missing": ["ailment_spread"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Elemental ailments inflicted spread to nearby enemies (the defining effect); also 20% freeze/shock/ignite chance (poedb).",
         "bob": "Only the 20% freeze, shock and ignite chance remains. The engine already has a kill-trigger 'spread' effect for ignite and shock (src/sim/triggers.ts), but the support does not use it.",
         "repair": "Give the support an extraTrigger of the spread kind on kill (add freeze/chill), or spread on inflict."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Elemental Proliferation Support",
         "status": "confirmed",
@@ -6985,16 +6976,16 @@
       "ref": "Blight",
       "name": "Withering Breath",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S7",
-      "missing": ["damage_over_time_stacking", "skill_damage_over_time", "hinder", "channel_ramp"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Channelled chaos debuff on enemies in front: each tick adds a stacking damage-over-time layer (up to 20, each with its own timer) and enemies not yet debuffed are hindered; mana-cheap clear and control.",
         "bob": "A chaos beam (4.5 long) hitting every 0.3 s at 40% effectiveness as direct hits; the sustained cone form survives. No stacking DoT, no hinder, no ramp; the engine has no skill DoT, only hits and the three ailments, so spell-DoT scaling is missing.",
         "repair": "Add a stacking debuff that deals chaos per second (own timer per stack) applied by the beam, plus a movement-slow debuff on first application."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Blight",
         "status": "confirmed",

@@ -140,8 +140,17 @@ function findTarget(w: World): Actor | null {
   return best;
 }
 
+/** A debuff that is renewed, not stacked, is cast again when it is about to end, not while it holds (Contagion). */
+function alreadyAfflicted(p: SkillProfile, target: Actor): boolean {
+  const sd = p.skillDot;
+  if (!sd || sd.spec.stack !== 'refresh' || !sd.spec.hitless) return false;
+  return target.sdots.some((d) => d.src === p.skill.id && d.t > 0.8);
+}
+
 /** Whether a skill can hurt a target at all: some of its damage is of a type the target is not immune to. */
 export function canHurt(p: SkillProfile, def: Defence): boolean {
+  const sd = p.skillDot;
+  if (sd && !def.immune[sd.type] && !(sd.type === 4 && def.immuneChaos)) return true;
   return p.hands.some((h) =>
     h.chunks.some((c) => c.max > 0 && !def.immune[c.type] && !(c.type === 4 && def.immuneChaos)),
   );
@@ -184,6 +193,7 @@ function chooseSkill(w: World, target: Actor) {
     // Against a target immune to everything the skill deals, fall back to the weapon.
     if (
       canHurt(prof, target.def) &&
+      !alreadyAfflicted(prof, target) &&
       canPay(w, w.primary.costsLife, prof.cost) &&
       !deployFull(w, w.primary, prof)
     )

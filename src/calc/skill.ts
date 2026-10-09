@@ -23,7 +23,8 @@ import {
   maskAnd,
   maskOr,
 } from '../mods/types';
-import type { SkillDef } from './gems';
+import type { DotSpec } from '../data/gems';
+import { levelValue, type SkillDef } from './gems';
 import {
   FLEE_CHANCE,
   STATUSES,
@@ -90,6 +91,9 @@ export type HandProfile = {
 
 export type AilmentSpec = { chance: number; dur: number };
 
+/** A skill's own damage over time (docs/SPIRIT.md S7): what it deals a second once the character's modifiers are on it, and how long. */
+export type SkillDotProfile = { spec: DotSpec; type: number; dps: number; seconds: number };
+
 export type SkillProfile = {
   skill: SkillDef;
   isAttack: boolean;
@@ -122,6 +126,13 @@ export type SkillProfile = {
   ignite: AilmentSpec & { max: number; speed: number };
   bleed: AilmentSpec & { speed: number };
   poison: AilmentSpec & { speed: number };
+  /** Damage over time the skill inflicts as a debuff of its own, and Decay's flat damage over time on every hit. */
+  skillDot: SkillDotProfile | null;
+  decay: { dps: number; seconds: number } | null;
+  /** More damage with hits for each poison on the target, in percent, up to this many poisons (Vile Toxins). */
+  perPoison: { per: number; max: number } | null;
+  /** The tiles around an afflicted enemy to which its ignite, and its other elemental ailments, spread. */
+  spreadAil: { ignite: number; ele: number };
   /** Chance (fraction) that a hit deals double damage. */
   doubleChance: number;
   /** Percentage points (fraction) taken off the physical damage reduction of what the skill hits. */
@@ -208,6 +219,8 @@ export type ProfileInput = {
 };
 
 const DOT_TAGS = tagBit('dot');
+/** How long Decay lasts, in seconds (3.9: eight). */
+const DECAY_SECONDS = 8;
 /** Skills that are put down or summoned rather than used by the character. */
 const DEPLOYED_TAGS = tagMask(['totem', 'trap', 'mine', 'brand', 'minion']);
 
@@ -448,6 +461,31 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     return { ...raw, dur: raw.dur / speed, speed };
   };
 
+  // Damage over time of its own: the table's damage a second, scaled by damage over time, the skill's keywords and its type.
+  const ownConds = maskAnd(conds, db.cond.all - db.cond.targetMask());
+  const dotMult = (type: number, scales: number) => {
+    const c = ctxOf(
+      maskOr(maskOr(DOT_TAGS, maskAnd(baseTags, AILMENT_KEYWORDS)), scales),
+      ownConds,
+      statValue,
+      1 << type,
+    );
+    return db.mult('damage', c) * (1 + Math.max(-0.9, db.sum('base', 'dotMulti', c) / 100));
+  };
+  const lasting = skill.tags.includes('duration') ? db.mult('skillDuration', baseCtx) : 1;
+  const skillDot: SkillDotProfile | null = skill.dot
+    ? {
+        spec: skill.dot,
+        type: DAMAGE_TYPES.indexOf(skill.dot.type),
+        dps:
+          levelValue(skill.dot.dps, skill.level, true) *
+          dotMult(DAMAGE_TYPES.indexOf(skill.dot.type), tagMask(skill.dot.scales ?? [])),
+        seconds: skill.dot.seconds * lasting,
+      }
+    : null;
+  const decayBase = db.sum('base', 'dot.decay', baseCtx);
+  const perPoisonPer = db.sum('base', 'perPoison.more', baseCtx);
+
   const perType = (stat: string, div = 100) =>
     DAMAGE_TYPES.map((_, t) => db.sum('base', stat, { ...baseCtx, ancestry: 1 << t }) / div);
 
@@ -541,6 +579,19 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
       dur: db.mult('duration.freeze', baseCtx),
     },
     cannotInflictEle,
+    skillDot,
+    decay:
+      decayBase > 0
+        ? { dps: decayBase * dotMult(CHAOS, 0), seconds: DECAY_SECONDS * lasting }
+        : null,
+    perPoison:
+      perPoisonPer > 0
+        ? { per: perPoisonPer, max: Math.round(db.sum('base', 'perPoison.max', baseCtx)) }
+        : null,
+    spreadAil: {
+      ignite: db.sum('base', 'spread.ignite', baseCtx),
+      ele: db.sum('base', 'spread.ele', baseCtx),
+    },
     impale: {
       chance: clamp(db.sum('base', 'chance.impale', baseCtx) / 100, 0, 1),
       share: IMPALE_SHARE * Math.max(0, 1 + db.inc('impaleEffect', baseCtx)),

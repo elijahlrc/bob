@@ -4,6 +4,7 @@ import {
   GEM_LEVEL_REQ,
   MAX_GEM_LEVEL,
   type ActiveGemDef,
+  type DotSpec,
   type GemAttr,
   type GemDef,
   type GemMod,
@@ -126,6 +127,20 @@ export type SkillDef = {
       repeat?: boolean;
     };
   };
+  /** Arrows that fall around the target and each leave a spore pod: it afflicts and slows what is near, then bursts (Toxic Rain). */
+  pods?: {
+    /** Seconds before a pod bursts, the radius of its cloud and of its burst, and how far from the target the pods land (before more arrows widen it). */
+    seconds: number;
+    radius: number;
+    burstRadius: number;
+    spread: number;
+    /** The percent each pod slows the enemies near it, and the most the pods can slow them together. */
+    slow: number;
+    slowMax: number;
+  };
+  /** A debuff of damage over time the skill inflicts (docs/SPIRIT.md S7). */
+  dot?: DotSpec;
+  burning?: { pct: LevelValue; seconds: number; cap: number };
   /** Orbs a channelled skill leaves standing (docs/SPIRIT.md S6). */
   orb?:
     | {
@@ -157,7 +172,7 @@ export type SkillDef = {
       };
   /** Ground the skill leaves where it lands (docs/SPIRIT.md S6). */
   leaves?: {
-    kind: 'consecrated' | 'chilling';
+    kind: 'consecrated' | 'chilling' | 'caustic';
     seconds: number;
     radius: number;
     /** How many times larger the ground ends than it began. */
@@ -281,6 +296,9 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     channel: def.channel,
     stacks: def.stacks,
     leaves: def.leaves,
+    dot: def.dot,
+    pods: def.pods,
+    burning: def.burning,
     orb: def.orb,
     crystal: def.crystal,
     wall: def.wall,

@@ -489,6 +489,11 @@ Object.assign(STAT_TEXT, {
   skillDuration: { name: 'Skill Effect Duration', pct: true },
   deployCount: { base: '{v} additional totems, traps, mines or brands at a time' },
   auraBurn: { base: 'Burn nearby Enemies for {v}% of your Maximum Life as Fire Damage per second' },
+  'dot.decay': { base: 'Hits inflict Decay: {v} Chaos Damage per second, for 8 seconds' },
+  'perPoison.more': { base: '{v}% more Damage with Hits for each Poison on the Enemy' },
+  'perPoison.max': { base: 'Up to {v} Poisons count' },
+  'spread.ignite': { base: 'Ignites spread to Enemies within {v} metres' },
+  'spread.ele': { base: 'Elemental Ailments spread to Enemies within {v} metres' },
   selfBurn: { base: 'Burn for {v}% of your Maximum Life per second (cannot kill you)' },
 } satisfies Record<string, StatText>);
 

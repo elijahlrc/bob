@@ -16,17 +16,20 @@ import type { PendingShot } from './shots';
 import type { ChannelState, StackState } from './channel';
 import type { BannerState } from './banners';
 import type { Field } from './fields';
+import type { SkillDot } from './skillDots';
 import type { HexTotals } from '../data/hexes';
 import type { Deployable } from './deploy';
 import type { Minion } from './minions';
 import type { Grid } from './grid';
 
-export type Dot = { dps: number; t: number; stack?: boolean };
+export type Dot = { dps: number; t: number; stack?: boolean; spread?: number };
 
 export type Ailments = {
   ignites: Dot[];
   /** How many ignites burn at once (the strongest count), set by whoever ignited it. */
   igniteMax: number;
+  /** The radius, in tiles, to which its shock, chill and freeze spread (Elemental Proliferation); 0 for none. */
+  spreadEle: number;
   bleeds: Dot[];
   poisons: Dot[];
   shock: number;
@@ -133,6 +136,10 @@ export type Actor = {
   fx: Fx;
   /** Impales on this actor: the physical damage each recorded, and the hits it has left. */
   impales: { dmg: number; hits: number }[];
+  /** Damage over time that skills inflicted as debuffs of their own (src/sim/skillDots.ts). */
+  sdots: SkillDot[];
+  /** The life a killing blow went past (Herald of Ash burns by it). */
+  overkill?: number;
   /** Resistance lowered by hexes, per damage type (index 0 unused). */
   hexRes: number[];
   hexVuln: number;
@@ -302,6 +309,7 @@ export type SimEvent =
   | { t: 'block'; src: number; dst: number }
   | { t: 'stun'; dst: number; dur: number }
   | { t: 'ailment'; dst: number; kind: string }
+  | { t: 'dot'; dst: number; id: string }
   | { t: 'death'; id: number }
   | { t: 'levelUp'; level: number }
   | { t: 'drop'; id: number }

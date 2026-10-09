@@ -90,11 +90,12 @@
       { "stat": "damage", "kind": "more", "value": [40, 59], "tags": ["dot"] },
       { "stat": "attackSpeed", "kind": "more", "value": -10 } ],
       "description": "Projectile attacks deal more physical damage and damage over time, a little slower." } },
-  { "ref": "Vile Toxins Support", "note": "Poison deals more damage, and hits deal more for each poison on the target.",
+  { "ref": "Vile Toxins Support", "note": "Poison deals more damage, and hits deal five percent more for each poison on the target, up to six at the first level and nine at the last.",
     "def": { "kind": "support", "id": "foulBrew", "name": "Foul Brew", "attr": "dex", "supports": [], "costMult": 1.2, "mods": [
       { "stat": "damage", "kind": "more", "value": [30, 49], "tags": ["poison"] },
-      { "stat": "damage", "kind": "more", "value": 12, "tags": ["hit"], "condition": { "id": "targetPoisoned" } } ],
-      "description": "Poison deals more damage, and hits deal more against poisoned enemies." } },
+      { "stat": "perPoison.more", "kind": "base", "value": 5 },
+      { "stat": "perPoison.max", "kind": "base", "value": [6, 9] } ],
+      "description": "Poison deals more damage, and hits deal more for each poison on the target." } },
   { "ref": "Void Manipulation Support", "note": "More chaos damage, less elemental damage.",
     "def": { "kind": "support", "id": "voidTwist", "name": "Void Twist", "attr": "dex", "supports": [], "costMult": 1.2, "mods": [
       { "stat": "damage", "kind": "more", "value": [20, 39], "damageTypes": ["chaos"] },

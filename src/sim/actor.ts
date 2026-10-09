@@ -31,6 +31,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     ail: {
       ignites: [],
       igniteMax: 1,
+      spreadEle: 0,
       bleeds: [],
       poisons: [],
       shock: 0,
@@ -81,6 +82,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     hexes: [],
     fx: {},
     impales: [],
+    sdots: [],
     hexRes: [0, 0, 0, 0, 0],
     hexVulnAll: 0,
     hexVuln: 0,

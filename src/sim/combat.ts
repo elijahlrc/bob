@@ -8,6 +8,7 @@ import {
 } from '../calc/combat';
 import { reservedMana } from './reserve';
 import { levelPenalty } from '../calc/formulas';
+import { levelValue } from '../calc/gems';
 import { abilitiesOf } from '../data/abilities';
 import type { SkillProfile } from '../calc/skill';
 import {
@@ -32,7 +33,7 @@ import { bannerStage } from './banners';
 import { rollGains } from './buffs';
 import { gainTrophy, rollCharges } from './charges';
 import { ALL_HEX_IDS, HEXES } from '../data/hexes';
-import { applyPlayerHexes, hexHit, hexKill, tickHexes } from './hexes';
+import { applyHex, applyPlayerHexes, hexHit, hexKill, tickHexes } from './hexes';
 import {
   applyStatus,
   blockLessOf,
@@ -44,6 +45,15 @@ import {
 } from './statuses';
 import { damageMult, hexPlayerAtRandom, onMonsterDeath, shieldedByPylon } from './factions';
 import { CRIT_ON_CONSECRATED, consecratedAt, fieldKill } from './fields';
+import { spreadAilments } from './proliferate';
+import {
+  applyBurning,
+  applyDecay,
+  applySkillDot,
+  decaySkillDots,
+  spreadSkillDots,
+  sumSkillDots,
+} from './skillDots';
 import { corpseBlast, fireTriggers } from './triggers';
 import { spawnMonster } from './world';
 import type { Actor, Dot, World } from './types';
@@ -193,6 +203,7 @@ export function targetState(a: Actor): TargetState {
     bleedChance: a.hexMore.bleedHit,
     stunBonus: a.hexMore.stun,
     es: a.es,
+    poisons: a.ail.poisons.length,
   };
 }
 
@@ -240,6 +251,7 @@ export function applyDamage(w: World, dst: Actor, dmg: number[]): number {
     lifeDmg -= m;
   }
   dst.life -= lifeDmg;
+  if (dst.life <= 0) dst.overkill = -dst.life;
   dst.sinceDamaged = 0;
   if (dst.isPlayer && w.opts.godMode && dst.life <= 0) dst.life = 1;
   if (dst.isPlayer) w.stats.damageTaken += total;
@@ -416,6 +428,23 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     return;
   }
   applyAilments(w, dst, res, p);
+  if (src.isPlayer && !dst.isPlayer) {
+    // Damage over time the skill (or a support) puts on what it hits.
+    if (p.decay) applyDecay(w, dst, p.decay);
+    if (p.skillDot && !p.skillDot.spec.hitless && !p.skillDot.spec.ground) {
+      applySkillDot(w, dst, p);
+      const splash = p.skillDot.spec.splash;
+      if (splash)
+        for (const e of w.actors)
+          if (
+            e !== dst &&
+            !e.isPlayer &&
+            e.alive &&
+            Math.hypot(e.x - dst.x, e.y - dst.y) <= splash * p.radiusMult + e.r
+          )
+            applySkillDot(w, e, p);
+    }
+  }
   if (res.stun > 0 && !(dst.isPlayer && w.channel?.profile.skill.channel?.stunImmune)) {
     dst.stunT = res.stun;
     dst.action = null;
@@ -446,9 +475,24 @@ function applyAilments(w: World, dst: Actor, res: HitResult, p: SkillProfile): v
   for (const name of AILMENT_NAMES)
     if (a[name] > 0 && d.avoid[name] > 0 && w.rngCombat.chance(d.avoid[name])) a[name] = 0;
   if (a.ignite > 0) {
-    pushDot(ail.ignites, { dps: a.ignite, t: p.ignite.dur * d.durOnSelf.ignite });
+    const spreadR = Math.max(p.spreadAil.ignite, p.spreadAil.ele) * p.radiusMult;
+    pushDot(ail.ignites, {
+      dps: a.ignite,
+      t: p.ignite.dur * d.durOnSelf.ignite,
+      spread: spreadR > 0 ? spreadR : undefined,
+    });
     ail.igniteMax = p.ignite.max;
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'ignite' });
+    // An ignite from a Torch Arrow also leaves a burning debuff worth a share of its damage.
+    const bn = p.skill.burning;
+    if (bn)
+      applyBurning(
+        w,
+        dst,
+        (a.ignite * levelValue(bn.pct, p.skill.level)) / 100,
+        bn.seconds,
+        bn.cap,
+      );
   }
   if (a.bleed > 0 && !(dst.mon && cannotBleed(dst.mon.spec.type))) {
     pushDot(ail.bleeds, { dps: a.bleed, t: p.bleed.dur * d.durOnSelf.bleed, stack: p.woundDance });
@@ -471,6 +515,8 @@ function applyAilments(w: World, dst: Actor, res: HitResult, p: SkillProfile): v
     ail.freezeT = a.freeze * d.durOnSelf.freeze;
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'freeze' });
   }
+  if (p.spreadAil.ele > 0 && (a.shock > 0 || a.chill > 0 || a.freeze > 0))
+    ail.spreadEle = Math.max(ail.spreadEle, p.spreadAil.ele * p.radiusMult);
 }
 
 /** Resolve and apply a hit from src to dst. */
@@ -482,6 +528,24 @@ export function hit(
   hand: number,
   dist: number,
 ): void {
+  // A skill that deals no hit of its own only inflicts its debuff.
+  if (src.isPlayer && p.skillDot?.spec.hitless) {
+    if (!dst.alive) return;
+    // Bane also puts the curses linked to it on the enemy, and grows with each.
+    const bane = p.skillDot.spec.perCurse;
+    if (bane) {
+      const linked = w.char.actives.find((x) => x.skill.id === p.skill.id)?.linked ?? [];
+      const n = Math.min(linked.length, w.char.hexLimit);
+      for (const h of linked.slice(0, n))
+        applyHex(w, dst, h.id, h.effect, w.char.hexLimit, h.level);
+      applySkillDot(w, dst, p, {
+        more: levelValue(bane.more, p.skill.level) * n,
+        seconds: p.skillDot.seconds * (1 + (bane.longer * n) / 100),
+      });
+    } else applySkillDot(w, dst, p);
+    wake(w, dst);
+    return;
+  }
   const canStun = dst.stunT <= 0 && dst.graceT <= 0;
   let h = p.hands[Math.min(hand, p.hands.length - 1)];
   const ts = targetState(dst);
@@ -759,6 +823,11 @@ export function killActor(w: World, a: Actor): void {
   onMonsterDeath(w, a);
   const cause = causes.get(a);
   if (!cause?.minion) fireTriggers(w, { on: 'kill', target: a, tags: cause?.tags ?? 0 });
+  // Ailments that spread go once more from the corpse.
+  if (!a.isPlayer && (a.ail.spreadEle > 0 || a.ail.ignites.some((d) => d.spread)))
+    spreadAilments(w, a);
+  // A debuff of damage over time passes on to those near the corpse.
+  if (!a.isPlayer && a.sdots.length > 0) spreadSkillDots(w, a);
   // A kill on chilling ground may give a charge.
   if (!a.isPlayer && w.fields.length > 0) fieldKill(w, a);
   // A Doomed enemy blows up for a share of its own life.
@@ -881,15 +950,30 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     for (const d of ail.poisons) dotChaos += d.dps;
     decay(ail.poisons, dtDot);
   }
-  if (dotPhys + dotFire + dotChaos > 0) {
+  // Debuffs that skills inflicted: Contagion, Blight, Essence Drain, Decay.
+  let dotLight = 0;
+  let dotCold = 0;
+  if (a.sdots.length) {
+    const own = [0, 0, 0, 0, 0];
+    sumSkillDots(w, a, own, dt);
+    dotPhys += own[0];
+    dotLight += own[1];
+    dotCold += own[2];
+    dotFire += own[3];
+    dotChaos += own[4];
+    decaySkillDots(a, dtDot);
+  }
+  if (dotPhys + dotFire + dotChaos + dotLight + dotCold > 0) {
     dotPhys *= 1 + hm.dotPhys + hm.dotAll;
     dotFire *= 1 + hm.dotAll;
     dotChaos *= 1 + hm.dotAll;
+    dotLight *= 1 + hm.dotAll;
+    dotCold *= 1 + hm.dotAll;
     const tt = def.damageTakenType;
     const dmg = [
       dotPhys * taken * tt[0] * dt,
-      0,
-      0,
+      dotLight * taken * tt[1] * dt,
+      dotCold * taken * tt[2] * dt,
       dotFire * taken * tt[3] * dt,
       dotChaos * taken * tt[4] * dt,
     ];

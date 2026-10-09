@@ -33,6 +33,8 @@ export type TriggerEffect =
   | { kind: 'spread'; ailment: 'shock' | 'ignite'; radius: number }
   /** Give up a share of maximum life to gain that much in another pool (Demon Stitcher analog). */
   | { kind: 'sacrifice'; pctOfLife: number; pool: 'es' | 'mana' }
+  /** Kill triggers: the enemies near the corpse burn for a share of the blow's overkill each second (Herald of Ash). */
+  | { kind: 'overkillBurn'; pct: number; seconds: number; radius: number }
   /** Kill triggers: bolts strike the enemies around the character for a while (Herald of Thunder). */
   | {
       kind: 'storm';
@@ -89,6 +91,8 @@ function effectText(e: TriggerEffect): string {
       return `the enemy explodes for ${e.pctOfMaxLife}% of its maximum life as ${e.dtype} damage`;
     case 'spread':
       return `spread its ${e.ailment} to nearby enemies`;
+    case 'overkillBurn':
+      return `enemies near the corpse burn for ${e.pct}% of the overkill damage each second, for ${e.seconds} seconds`;
     case 'storm':
       return `bolts of ${e.dtype} strike the enemies around you for ${e.seconds} seconds`;
     case 'sacrifice':

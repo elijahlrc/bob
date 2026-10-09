@@ -1,7 +1,8 @@
 import type { SkillChoice } from '../calc/character';
 import { reservedMana } from './reserve';
 import type { TriggerDef, TriggerEffect } from '../data/triggers';
-import { DAMAGE_TYPES, maskSubset, tagBit, type DamageType } from '../mods/types';
+import { DAMAGE_TYPES, maskOr, maskSubset, tagBit, type DamageType } from '../mods/types';
+import { applyFlatDot } from './skillDots';
 import { fire } from './actions';
 import { registerBlast } from './factions';
 import { startStorm } from './fields';
@@ -89,6 +90,8 @@ function perform(
       return ev.on === 'kill' && explode(w, e, ev.target);
     case 'spread':
       return ev.on === 'kill' && spread(w, e, ev.target);
+    case 'overkillBurn':
+      return ev.on === 'kill' && overkillBurn(w, e, ev.target);
     case 'storm':
       if (ev.on !== 'kill') return false;
       startStorm(
@@ -161,6 +164,28 @@ export function corpseBlast(
   radius: number,
 ): void {
   explode(w, { kind: 'explode', pctOfMaxLife, dtype, radius }, dead);
+}
+
+/** A kill that went past the enemy's life sets the enemies near it burning, by the damage it had to spare. */
+function overkillBurn(
+  w: World,
+  e: Extract<TriggerEffect, { kind: 'overkillBurn' }>,
+  dead: Actor,
+): boolean {
+  const over = dead.overkill ?? 0;
+  if (over <= 0) return false;
+  const ctx = {
+    tags: maskOr(tagBit('dot'), tagBit('fire')),
+    ancestry: 1 << DAMAGE_TYPES.indexOf('fire'),
+    conds: 0,
+    statValue: () => 0,
+  };
+  const dps = (over * e.pct * w.char.db.mult('damage', ctx)) / 100;
+  for (const o of w.actors) {
+    if (o.isPlayer || !o.alive || Math.hypot(o.x - dead.x, o.y - dead.y) > e.radius + o.r) continue;
+    applyFlatDot(w, o, '@herald', 3, dps, e.seconds);
+  }
+  return true;
 }
 
 function explode(w: World, e: Extract<TriggerEffect, { kind: 'explode' }>, dead: Actor): boolean {

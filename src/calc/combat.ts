@@ -143,6 +143,8 @@ export type TargetState = {
   /** Less evasion (fraction) and less physical damage reduction (points, fraction): Poacher's Mark, Punishment. */
   evasionLess?: number;
   physRedLess?: number;
+  /** How many poisons the target carries (Vile Toxins counts them). */
+  poisons?: number;
   /** Extra chance (fraction) to be bled by an attack hit (Vulnerability), and to be stunned (Warlord's Mark). */
   bleedChance?: number;
   stunBonus?: number;
@@ -260,6 +262,8 @@ export function mitigate(p: SkillProfile, t: TargetState, dmg: number[]): number
       dmg[i] *= 1 - r / 100;
     }
     dmg[i] *= taken * def.damageTakenType[i];
+    if (p.perPoison && t.poisons)
+      dmg[i] *= 1 + (p.perPoison.per * Math.min(p.perPoison.max, t.poisons)) / 100;
     if (i === PHYS && t.vuln) dmg[i] *= 1 + t.vuln;
     if (t.vulnAll) dmg[i] *= 1 + t.vulnAll;
     if (t.vulnType?.[i]) dmg[i] *= 1 + t.vulnType[i];

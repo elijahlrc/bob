@@ -225,18 +225,25 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       length: 4.5,
       width: 1.6,
     },
-    spellDamage: [
-      {
-        type: 'chaos',
-        spread: [0.8, 1.2],
+    dot: {
+      type: 'chaos',
+      dps: [3.1, 257.4],
+      seconds: 2.5,
+      stack: 'layers',
+      cap: 20,
+      hitless: true,
+      scales: ['spell'],
+      hinder: {
+        v: 80,
+        seconds: 0.8,
       },
-    ],
-    effectiveness: 40,
+    },
     castTime: 0.3,
     crit: 0,
-    cost: [1, 4],
+    cost: [2, 5],
     mods: [],
-    description: 'A withering breath that eats into everything in front of you while you hold it.',
+    description:
+      'A withering breath that lays layer upon layer of rot on everything in front of you while you hold it.',
   },
   {
     kind: 'active',
@@ -254,6 +261,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     baseMult: [150, 184],
     cost: [3, 7],
+    burning: {
+      pct: [30, 39],
+      seconds: 4,
+      cap: 5,
+    },
     mods: [
       {
         stat: 'chance.ignite',
@@ -273,7 +285,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       },
     ],
     requiresWeapon: ['bow'],
-    description: 'Looses a burning arrow that ignites its target.',
+    description: 'Looses a burning arrow that ignites its target and leaves it burning.',
   },
   {
     kind: 'active',
@@ -290,22 +302,30 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       range: 9,
       explodeRadius: 1.5,
     },
-    baseMult: [75, 90],
+    baseMult: [55, 64.4],
     cost: [4, 9],
+    dot: {
+      type: 'chaos',
+      dps: [8.8, 1927.1],
+      seconds: 0.5,
+      stack: 'refresh',
+      ground: true,
+      scales: ['projectile'],
+    },
+    leaves: {
+      kind: 'caustic',
+      seconds: 2,
+      radius: 2.2,
+    },
     mods: [
       {
         stat: 'convertSkill.physical.chaos',
         kind: 'base',
         value: 60,
       },
-      {
-        stat: 'chance.poison',
-        kind: 'base',
-        value: 100,
-      },
     ],
     requiresWeapon: ['bow'],
-    description: 'Looses an arrow that bursts into a poisonous cloud.',
+    description: 'Looses an arrow that bursts and leaves poisonous ground.',
   },
   {
     kind: 'active',
@@ -396,24 +416,25 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     tags: ['spell', 'area', 'duration', 'chaos', 'dot'],
     types: ['trappable', 'totemable', 'mineable', 'repeatable', 'triggerable', 'damageOverTime'],
     behaviour: {
-      kind: 'ground',
+      kind: 'burst',
       radius: 2.5,
-      duration: 5,
-      interval: 0.5,
       reach: 8,
     },
-    spellDamage: [
-      {
-        type: 'chaos',
-        spread: [0.8, 1.2],
-      },
-    ],
-    effectiveness: 14,
+    dot: {
+      type: 'chaos',
+      dps: [3.5, 235.9],
+      seconds: 5,
+      stack: 'refresh',
+      hitless: true,
+      scales: ['spell'],
+      spread: true,
+    },
     castTime: 0.6,
     crit: 0,
-    cost: [3, 18],
+    cost: [5, 20],
     mods: [],
-    description: 'A spreading plague that gnaws at the enemies in an area.',
+    description:
+      'A spreading plague that gnaws at every enemy in an area, and passes on when they die.',
   },
   {
     kind: 'active',
@@ -952,21 +973,22 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     attr: 'int',
     skillType: 'spell',
     tags: ['spell', 'projectile', 'chaos', 'duration', 'area'],
-    types: [
-      'totemable',
-      'trappable',
-      'mineable',
-      'volleyable',
-      'repeatable',
-      'triggerable',
-      'damageOverTime',
-    ],
+    types: ['totemable', 'volleyable', 'repeatable', 'triggerable', 'damageOverTime'],
     behaviour: {
       kind: 'projectile',
       count: 1,
       spread: 0,
       range: 9,
-      explodeRadius: 1.2,
+    },
+    dot: {
+      type: 'chaos',
+      dps: [31.2, 1503.2],
+      seconds: 3.8,
+      stack: 'refresh',
+      scales: ['spell'],
+      splash: 1.2,
+      spread: 'carry',
+      regen: 5,
     },
     spellDamage: [
       {
@@ -978,19 +1000,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     castTime: 0.7,
     crit: 5,
     cost: [8, 23],
-    mods: [
-      {
-        stat: 'chance.poison',
-        kind: 'base',
-        value: 100,
-      },
-      {
-        stat: 'leech.life',
-        kind: 'base',
-        value: 0.5,
-      },
-    ],
-    description: 'A bolt that saps the target over time and feeds you with what it drains.',
+    mods: [],
+    description: 'A bolt that saps its target over time and mends you with what it drains.',
   },
   {
     kind: 'active',
@@ -1830,25 +1841,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       length: 4,
       width: 0.8,
     },
-    spellDamage: [
-      {
-        type: 'fire',
-        spread: [0.8, 1.2],
-      },
-    ],
-    effectiveness: 45,
+    dot: {
+      type: 'fire',
+      dps: [11.7, 439.4],
+      seconds: 1.5,
+      stack: 'stages',
+      cap: 8,
+      stagePct: 60,
+      hitless: true,
+      scales: ['spell'],
+      exposure: 'exposedFire',
+    },
     castTime: 0.5,
     crit: 0,
     cost: [4, 11],
-    mods: [
-      {
-        stat: 'penetration',
-        kind: 'base',
-        value: 25,
-        damageTypes: ['fire'],
-      },
-    ],
-    description: 'A ray of fire that scorches the target and leaves it exposed.',
+    mods: [],
+    description:
+      'A ray of fire that burns hotter the longer it stays on the target, and leaves it exposed.',
   },
   {
     kind: 'active',
@@ -2630,29 +2639,39 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     tags: ['attack', 'area', 'chaos', 'duration', 'projectile', 'bow'],
     types: ['totemable', 'trappable', 'mineable', 'damageOverTime', 'triggerable'],
     behaviour: {
-      kind: 'ground',
-      radius: 2.6,
-      duration: 1.5,
-      interval: 0.5,
-      delay: 0.4,
-      reach: 9,
+      kind: 'projectile',
+      count: 5,
+      spread: 0,
+      range: 9,
     },
-    baseMult: [40, 55],
+    baseMult: [50, 72.8],
     cost: [8, 10],
     requiresWeapon: ['bow'],
+    pods: {
+      seconds: 1,
+      radius: 1.6,
+      burstRadius: 1.4,
+      spread: 2.2,
+      slow: 10,
+      slowMax: 60,
+    },
+    dot: {
+      type: 'chaos',
+      dps: [7.9, 285.1],
+      seconds: 0.5,
+      stack: 'refresh',
+      ground: true,
+      scales: ['projectile'],
+    },
     mods: [
       {
         stat: 'convertSkill.physical.chaos',
         kind: 'base',
-        value: 60,
-      },
-      {
-        stat: 'chance.poison',
-        kind: 'base',
-        value: 100,
+        value: 50,
       },
     ],
-    description: 'Arrows fall on an area and leave a poisonous cloud.',
+    description:
+      'Arrows fall around the target, each leaving a spore pod that poisons and slows, then bursts.',
   },
   {
     kind: 'active',
@@ -3058,23 +3077,31 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Ruin Ritual',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'curse', 'area', 'duration', 'chaos'],
-    types: ['triggerable'],
+    tags: ['spell', 'curse', 'area', 'duration', 'chaos', 'dot'],
+    types: ['triggerable', 'damageOverTime'],
     behaviour: {
       kind: 'burst',
       radius: 2.5,
       reach: 9,
     },
+    dot: {
+      type: 'chaos',
+      dps: [45.6, 895.6],
+      seconds: 2,
+      stack: 'refresh',
+      hitless: true,
+      scales: ['spell'],
+      perCurse: {
+        more: [28, 47],
+        longer: 50,
+      },
+    },
     castTime: 0.6,
+    crit: 0,
     cost: [10, 20],
     mods: [],
-    utility: {
-      kind: 'curse',
-      hex: 'rotBane',
-      radius: 2.5,
-    },
     description:
-      'A ritual that rots a small area: enemies lose chaos resistance and take more damage.',
+      'A ritual that rots a small area and brings the curses linked to it down on its enemies.',
   },
   {
     kind: 'active',
@@ -6010,17 +6037,13 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.3,
     mods: [
       {
-        stat: 'chance.poison',
+        stat: 'dot.decay',
         kind: 'base',
-        value: 100,
-      },
-      {
-        stat: 'duration.poison',
-        kind: 'inc',
-        value: 400,
+        value: [120, 843],
       },
     ],
-    description: 'Hits always poison, and the poison lasts much longer.',
+    description:
+      'Hits leave a decay on the enemy: chaos damage over time that does not depend on the hit.',
   },
   {
     kind: 'support',
@@ -6259,8 +6282,34 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         kind: 'base',
         value: 20,
       },
+      {
+        stat: 'duration.ignite',
+        kind: 'inc',
+        value: [0, 19],
+      },
+      {
+        stat: 'duration.shock',
+        kind: 'inc',
+        value: [0, 19],
+      },
+      {
+        stat: 'duration.chill',
+        kind: 'inc',
+        value: [0, 19],
+      },
+      {
+        stat: 'duration.freeze',
+        kind: 'inc',
+        value: [0, 19],
+      },
+      {
+        stat: 'spread.ele',
+        kind: 'base',
+        value: [1.6, 2],
+      },
     ],
-    description: 'Hits have a chance to freeze, shock and ignite.',
+    description:
+      'Hits have a chance to freeze, shock and ignite, and those ailments spread to the enemies near.',
   },
   {
     kind: 'support',
@@ -6782,16 +6831,17 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         tags: ['poison'],
       },
       {
-        stat: 'damage',
-        kind: 'more',
-        value: 12,
-        tags: ['hit'],
-        condition: {
-          id: 'targetPoisoned',
-        },
+        stat: 'perPoison.more',
+        kind: 'base',
+        value: 5,
+      },
+      {
+        stat: 'perPoison.max',
+        kind: 'base',
+        value: [6, 9],
       },
     ],
-    description: 'Poison deals more damage, and hits deal more against poisoned enemies.',
+    description: 'Poison deals more damage, and hits deal more for each poison on the target.',
   },
   {
     kind: 'support',
@@ -7530,21 +7580,13 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         value: [20, 39],
         tags: ['ignite'],
       },
-    ],
-    extraTriggers: [
       {
-        on: 'kill',
-        targetHas: 'ignite',
-        chance: 100,
-        cooldown: 0,
-        effect: {
-          kind: 'spread',
-          ailment: 'ignite',
-          radius: 3,
-        },
+        stat: 'spread.ignite',
+        kind: 'base',
+        value: [1.9, 2.7],
       },
     ],
-    description: 'Ignites spread from the enemies you kill.',
+    description: 'Ignites spread to the enemies near a burning one.',
   },
   {
     kind: 'support',
@@ -8307,18 +8349,18 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
     triggers: [
       {
         on: 'kill',
-        targetHas: 'ignite',
         chance: 100,
         cooldown: 0,
         effect: {
-          kind: 'spread',
-          ailment: 'ignite',
-          radius: 3,
+          kind: 'overkillBurn',
+          pct: 25,
+          seconds: 4,
+          radius: 2.4,
         },
       },
     ],
     description:
-      'Physical damage gained as fire, and burning enemies spread their fire when they die.',
+      'Physical damage gained as fire, and a kill sets the enemies near the corpse burning for the damage it had to spare.',
   },
   {
     kind: 'aura',

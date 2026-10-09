@@ -114,6 +114,9 @@ export function noteEffects(w: World, into: Set<string>): void {
       case 'ailment':
         into.add(`ailment:${e.kind}`);
         break;
+      case 'dot':
+        into.add('dot');
+        break;
       case 'deploy':
         into.add(`deploy:${e.kind}`);
         break;

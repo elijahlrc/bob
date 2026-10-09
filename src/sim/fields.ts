@@ -1,6 +1,7 @@
 import type { SkillProfile } from '../calc/skill';
 import { spellBaseDamage } from '../data/constants';
 import type { ChargeKind } from '../calc/charges';
+import { applySkillDot } from './skillDots';
 import { applyStatus } from './statuses';
 import { gainCharge } from './charges';
 import { hit, lifeCap, rawHit } from './combat';
@@ -14,7 +15,8 @@ import type { Action, Actor, World } from './types';
  * bursts, a storm of bolts that follows the character, a wall of ice that blocks the way.
  */
 
-export type FieldKind = 'consecrated' | 'chilling' | 'crystal' | 'storm' | 'wall' | 'orb' | 'zap';
+export type FieldKind =
+  'consecrated' | 'chilling' | 'caustic' | 'pod' | 'crystal' | 'storm' | 'wall' | 'orb' | 'zap';
 
 export type Field = {
   id: number;
@@ -86,12 +88,46 @@ export function leaveGround(w: World, a: Actor, act: Action): void {
     profile: p,
     hand: act.hand,
     pulseT: 0,
-    interval: 0.5,
+    interval: spec.kind === 'caustic' ? 0.25 : 0.5,
     dps: spec.dps ?? 0,
     killCharge: spec.killCharge,
     dtype: dominantType(p),
   });
   w.events.push({ t: 'explode', x, y, r, dtype: dominantType(p) });
+}
+
+/** Arrows fall around the target and each leaves a spore pod (Toxic Rain). */
+export function placePods(w: World, a: Actor, act: Action): void {
+  const p = act.profile;
+  const spec = p.skill.pods!;
+  const n = Math.max(1, p.projectiles);
+  // More arrows spread the pods over a wider place rather than piling them up.
+  const spread = spec.spread * Math.sqrt(n / 5) * p.radiusMult;
+  for (let i = 0; i < n; i++) {
+    const ang = w.rngTrig.float(0, Math.PI * 2);
+    const d = spread * Math.sqrt(w.rngTrig.float(0, 1));
+    const spot = w.grid.collide(act.aimX + Math.cos(ang) * d, act.aimY + Math.sin(ang) * d, 0.3);
+    const r = spec.radius * p.radiusMult;
+    w.fields.push({
+      id: w.nextId++,
+      owner: a.id,
+      kind: 'pod',
+      x: spot.x,
+      y: spot.y,
+      r0: r,
+      grow: 1,
+      radius: r,
+      t: spec.seconds,
+      total: spec.seconds,
+      profile: p,
+      hand: act.hand,
+      pulseT: 0,
+      interval: 0.25,
+      dps: 0,
+      dtype: dominantType(p),
+    });
+  }
+  w.events.push({ t: 'explode', x: act.aimX, y: act.aimY, r: spread, dtype: dominantType(p) });
 }
 
 /** A frost crystal: it stands for a moment, exposing what is near it, and bursts when its time is up. */
@@ -353,6 +389,30 @@ export function tickFields(w: World, dt: number): void {
     if (f.kind === 'consecrated') {
       if (p.alive && Math.hypot(p.x - f.x, p.y - f.y) <= f.radius + p.r)
         p.life = Math.min(lifeCap(w, p), p.life + p.def.maxLife * REGEN_CONSECRATED * dt);
+    } else if (f.kind === 'pod' && f.profile) {
+      const spec = f.profile.skill.pods!;
+      if (pulse)
+        for (const e of enemiesIn(w, f.x, f.y, f.radius)) {
+          applySkillDot(w, e, f.profile, { seconds: 0.5 });
+          // Each pod that reaches it slows it a little, up to a limit.
+          const reached = w.fields.filter(
+            (o) => o.kind === 'pod' && Math.hypot(e.x - o.x, e.y - o.y) <= o.radius + e.r,
+          ).length;
+          applyStatus(w, e, 'hinder', {
+            seconds: 0.5,
+            v: Math.min(spec.slowMax, spec.slow * reached),
+          });
+        }
+      if (f.t <= 0) {
+        const r = spec.burstRadius * f.profile.radiusMult;
+        w.events.push({ t: 'explode', x: f.x, y: f.y, r, dtype: f.dtype });
+        for (const e of enemiesIn(w, f.x, f.y, r))
+          hit(w, p, e, f.profile, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
+      }
+    } else if (f.kind === 'caustic' && pulse && f.profile) {
+      // Caustic ground renews the debuff of whoever stands in it, in short spans: patches do not add up.
+      for (const e of enemiesIn(w, f.x, f.y, f.radius))
+        applySkillDot(w, e, f.profile, { seconds: 0.5 });
     } else if (f.kind === 'chilling' && pulse && f.profile) {
       const q = scaleProfile(f.profile, f.dps * f.interval);
       for (const e of enemiesIn(w, f.x, f.y, f.radius))
