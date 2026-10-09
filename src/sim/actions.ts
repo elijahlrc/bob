@@ -10,7 +10,7 @@ import { openZone, pullPlayer, registerBlast, shieldBlocks, speedMult } from './
 import { fireTriggers } from './triggers';
 import { placeDeployable } from './deploy';
 import { channelUse, stackedUse } from './channel';
-import { leaveGround, placeCrystal, placePods, raiseWall } from './fields';
+import { leaveGround, placeCrystal, placeGeyser, placePods, raiseWall } from './fields';
 import { scaleProfile } from './shots';
 import {
   afterProjectileHit,
@@ -304,6 +304,10 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
   }
   if (p.skill.pods && a.isPlayer) {
     placePods(w, a, act);
+    return;
+  }
+  if (p.skill.geyser && a.isPlayer) {
+    placeGeyser(w, a, act);
     return;
   }
   // A slam that may spend a charge to hit harder over more ground.

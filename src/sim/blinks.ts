@@ -4,7 +4,8 @@ import type { SkillProfile } from '../calc/skill';
 import { PROJECTILE_SPEED } from '../data/constants';
 import type { UtilityDef } from '../data/gems';
 import { cooldownSeconds } from './cooldowns';
-import { hit } from './combat';
+import { hit, rawHit } from './combat';
+import { takeCorpse, type Corpse } from './factions';
 import { summonAt } from './minions';
 import { applyStatus } from './statuses';
 import type { Actor, World } from './types';
@@ -72,11 +73,16 @@ function burstRadius(p: SkillProfile): number {
 }
 
 /** The skill's damage lands around a spot. */
-function burstAt(w: World, a: Actor, p: SkillProfile, x: number, y: number): void {
+function burstAt(w: World, a: Actor, p: SkillProfile, x: number, y: number, u?: BlinkSpec): void {
   if (p.hands[0].chunks.length === 0) return;
   const r = burstRadius(p);
   w.events.push({ t: 'explode', x, y, r, dtype: p.hands[0].chunks[0].type });
-  for (const e of enemiesAt(w, x, y, r)) hit(w, a, e, p, 0, Math.hypot(e.x - a.x, e.y - a.y));
+  const own = u?.corpse && u.corpse.lifePct > 0 ? (a.def.maxLife * u.corpse.lifePct) / 100 : 0;
+  for (const e of enemiesAt(w, x, y, r)) {
+    hit(w, a, e, p, 0, Math.hypot(e.x - a.x, e.y - a.y));
+    // Bodyswap adds a share of the character's own life to what it deals.
+    if (own > 0 && e.alive) rawHit(w, e, own, p.hands[0].chunks[0].type, 'Bodyswap');
+  }
 }
 
 /** The blink skill is cast at the target: either the character goes now, or it is on its way. */
@@ -90,13 +96,41 @@ export function blinkCast(
   const b = blinkOf(c);
   if (!b) return;
   const { u } = b;
-  const d = Math.hypot(target.x - a.x, target.y - a.y);
-  const step = Math.max(0, Math.min(u.distance, d - (target.r + a.r + 1)));
+  // A blink that prefers a corpse goes to the one with the most enemies about it, if there is one within reach.
+  let corpse: Corpse | null = null;
+  if (u.corpse) {
+    let best = 0;
+    for (const c0 of w.corpses) {
+      if (Math.hypot(c0.x - a.x, c0.y - a.y) > u.distance + 1) continue;
+      const n = enemiesAt(w, c0.x, c0.y, 2.5).length;
+      if (n > best) {
+        best = n;
+        corpse = c0;
+      }
+    }
+  }
+  const goal = corpse ?? target;
+  const d = Math.hypot(goal.x - a.x, goal.y - a.y);
+  const step = corpse
+    ? Math.min(u.distance, d)
+    : Math.max(0, Math.min(u.distance, d - (target.r + a.r + 1)));
   const spot = w.grid.collide(
-    a.x + ((target.x - a.x) / Math.max(d, 1e-6)) * step,
-    a.y + ((target.y - a.y) / Math.max(d, 1e-6)) * step,
+    a.x + ((goal.x - a.x) / Math.max(d, 1e-6)) * step,
+    a.y + ((goal.y - a.y) / Math.max(d, 1e-6)) * step,
     a.r,
   );
+  if (corpse && u.corpse) {
+    // The corpse bursts for a share of its life, and the bursts are larger.
+    const big = { ...p, radiusMult: p.radiusMult * Math.sqrt(1 + u.corpse.areaMore / 100) };
+    takeCorpse(w, corpse);
+    const r = burstRadius(big);
+    w.events.push({ t: 'explode', x: corpse.x, y: corpse.y, r, dtype: 3 });
+    for (const e of enemiesAt(w, corpse.x, corpse.y, r))
+      rawHit(w, e, (corpse.life * u.corpse.explodePct) / 100, 3, 'Corpse');
+    noteBlinkUsed(w, c);
+    arrive(w, a, big, c, u, spot.x, spot.y);
+    return;
+  }
   noteBlinkUsed(w, c);
   if (u.warp) {
     // The teleport waits as long as the run would take; the character may act meanwhile (a new cast queues behind it).
@@ -129,14 +163,14 @@ function arrive(
 ): void {
   const fx = a.x;
   const fy = a.y;
-  if (u.burst === 'depart' || u.warp) burstAt(w, a, p, fx, fy);
+  if (u.burst === 'depart' || u.burst === 'both' || u.warp) burstAt(w, a, p, fx, fy, u);
   if (u.chill) w.fields.push(chillGround(w, a, p, fx, fy, u.chill));
   if (u.trail) w.fields.push(trailGround(w, a, p, fx, fy, x, y, u.trail));
   w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: false });
   a.x = x;
   a.y = y;
   w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true });
-  if (u.burst === 'arrive' || u.warp) burstAt(w, a, p, x, y);
+  if (u.burst === 'arrive' || u.burst === 'both' || u.warp) burstAt(w, a, p, x, y, u);
   if (u.clone) summonAt(w, c, p, u.clone.minion, u.clone.seconds, fx, fy);
   if (u.elusive) {
     // Elusive is renewed in full, and enemies that come near are withered until the character does something else.

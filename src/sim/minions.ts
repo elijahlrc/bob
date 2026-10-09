@@ -3,11 +3,16 @@ import type { SkillChoice } from '../calc/character';
 import { minionBody } from '../calc/minion';
 import type { SkillProfile } from '../calc/skill';
 import { spellBaseDamage } from '../data/constants';
-import { MINIONS, MINION_ENEMY_RES, type MinionId } from '../data/minions';
+import { weaponStats } from '../calc/items';
+import { isWeaponClass, itemBase } from '../data/bases';
+import { MONSTER_TYPES, type MonsterTypeId } from '../data/monsters';
+import { MINIONS, MINION_ENEMY_RES, type MinionDef, type MinionId } from '../data/minions';
+import type { Item } from '../data/types';
+import { takeCorpse, type Corpse } from './factions';
 import { DAMAGE_TYPES } from '../mods/types';
 import { newActor } from './actor';
 import { rawHit, tickActor } from './combat';
-import type { Actor, World } from './types';
+import type { Actor, Drop, World } from './types';
 
 /**
  * Minions in the sim (COVERAGE C6, made mortal afterwards): see src/data/minions.ts. A minion is an actor of the
@@ -28,6 +33,11 @@ export type Minion = Actor & {
   speed: number;
   /** Volatile Servants: it has burst already. */
   boomed?: boolean;
+  /** A spectre: the kind of monster it was. */
+  mtype?: MonsterTypeId;
+  /** An animated weapon: what each blow deals before the minion modifiers, and how often it strikes. */
+  fixedHit?: number;
+  fixedRate?: number;
 };
 
 const SEEK = 14;
@@ -36,6 +46,22 @@ const LOW_LIFE = 0.2;
 const BURST_RADIUS = 2.5;
 const FOLLOW = 3.5;
 const TELEPORT = 20;
+
+/** The numbers of a minion's blows: its kind's, or, for a spectre, those of the monster it was. */
+function statsOf(m: Minion): MinionDef {
+  const base = MINIONS[m.kind];
+  if (!m.mtype) return base;
+  const t = MONSTER_TYPES[m.mtype];
+  return {
+    ...base,
+    dmg: t.dmgMult,
+    rate: 1 / Math.max(0.3, t.attackTime),
+    reach: t.attack === 'melee' ? t.range + 0.3 : Math.min(8, t.range),
+    speed: Math.max(2.5, Math.min(5, t.speed)),
+    ranged: t.attack !== 'melee',
+    r: t.radius,
+  };
+}
 
 export function minionCount(w: World, key: string): number {
   let n = 0;
@@ -47,6 +73,8 @@ export function minionCount(w: World, key: string): number {
 export function summonCount(c: SkillChoice, prof: SkillProfile): number {
   const u = c.skill.utility;
   if (u?.kind !== 'summon') return 0;
+  // A spectre: one at first, a second from the thirteenth level of the gem.
+  if (u.corpse) return Math.max(1, (c.skill.level >= 13 ? 2 : 1) + prof.minionCount);
   return Math.max(1, Math.round(levelValue(u.count, c.skill.level)) + prof.minionCount);
 }
 
@@ -97,6 +125,117 @@ export function summonMinions(w: World, c: SkillChoice, prof: SkillProfile): voi
     w.minions.push(m);
     w.events.push({ t: 'summon', id: m.id });
   }
+}
+
+/** Raise the corpse as a spectre: the monster it was, at the gem's level, with the minion modifiers of the skill. */
+export function raiseSpectre(w: World, c: SkillChoice, prof: SkillProfile, corpse: Corpse): void {
+  const u = c.skill.utility;
+  if (u?.kind !== 'summon' || !u.corpse) return;
+  takeCorpse(w, corpse);
+  const t = MONSTER_TYPES[corpse.spec.type];
+  const level = Math.round(levelValue(u.corpse.level, c.skill.level));
+  const def = MINIONS[u.minion];
+  const body = minionBody(
+    u.minion,
+    level,
+    prof.minionLife * t.lifeMult,
+    prof.minionTaken,
+    prof.minionRegen,
+    prof.minionPhysReduction,
+    prof.minionBlock,
+  );
+  const m = newActor(w.nextId++, false, corpse.x, corpse.y, t.radius || def.r) as Minion;
+  m.faction = 0;
+  m.def = body.def;
+  m.life = body.life;
+  m.name = corpse.name;
+  m.rarity = 'normal';
+  m.noReward = true;
+  m.state = 'chase';
+  m.key = c.key;
+  m.kind = u.minion;
+  m.mtype = corpse.spec.type;
+  m.t = Infinity;
+  m.atkT = 0;
+  m.level = level;
+  m.dmg = prof.minionDamage;
+  m.speed = prof.minionSpeed;
+  w.minions.push(m);
+  w.events.push({ t: 'summon', id: m.id });
+}
+
+/**
+ * A melee weapon lying near the character that the character would not miss: a normal or magic one (a rare or a unique is kept),
+ * not above the level the gem allows.
+ */
+export function animatableDrop(w: World, c: SkillChoice, reach: number): Drop | null {
+  const u = c.skill.utility;
+  if (u?.kind !== 'summon' || !u.animate) return null;
+  const cap = levelValue(u.animate.maxIlvl, c.skill.level);
+  const p = w.player;
+  for (const d of w.drops) {
+    const it = d.item;
+    if (it.kind !== 'item' || (it.rarity !== 'normal' && it.rarity !== 'magic') || it.ilvl > cap)
+      continue;
+    const base = itemBase(it.baseId);
+    if (
+      !base.weapon ||
+      !isWeaponClass(base.itemClass) ||
+      base.itemClass === 'bow' ||
+      base.itemClass === 'wand'
+    )
+      continue;
+    if (Math.hypot(d.x - p.x, d.y - p.y) <= reach) return d;
+  }
+  return null;
+}
+
+/** A weapon lying on the ground is animated: it is used up, and a flying blade strikes with its damage and the gem's. */
+export function animateWeapon(w: World, c: SkillChoice, prof: SkillProfile, drop: Drop): void {
+  const u = c.skill.utility;
+  if (u?.kind !== 'summon' || !u.animate) return;
+  const item = drop.item as Item;
+  const i = w.drops.indexOf(drop);
+  if (i >= 0) w.drops.splice(i, 1);
+  const hand = weaponStats(item);
+  const lvl = c.skill.level;
+  let min = levelValue(u.animate.addMin, lvl);
+  let max = levelValue(u.animate.addMax, lvl);
+  for (const [a, b] of hand.flats) {
+    min += a;
+    max += b;
+  }
+  const def = MINIONS[u.minion];
+  const body = minionBody(
+    u.minion,
+    w.plan.areaLevel,
+    prof.minionLife,
+    prof.minionTaken,
+    prof.minionRegen,
+    prof.minionPhysReduction,
+    prof.minionBlock,
+  );
+  const p = w.player;
+  const spot = w.grid.collide(p.x + w.rngTrig.float(-1, 1), p.y + w.rngTrig.float(-1, 1), def.r);
+  const m = newActor(w.nextId++, false, spot.x, spot.y, def.r) as Minion;
+  m.faction = 0;
+  m.def = body.def;
+  m.life = body.life;
+  m.name = 'Animated weapon';
+  m.rarity = 'normal';
+  m.noReward = true;
+  m.state = 'chase';
+  m.key = c.key;
+  m.kind = u.minion;
+  m.t = (u.seconds ?? 37.5) * prof.skillDuration;
+  m.atkT = 0;
+  m.level = w.plan.areaLevel;
+  m.dmg = prof.minionDamage;
+  m.speed = prof.minionSpeed;
+  m.fixedHit = (min + max) / 2;
+  m.fixedRate = hand.aps * (1 + levelValue(u.animate.speed, lvl) / 100);
+  w.minions.push(m);
+  w.events.push({ t: 'summon', id: m.id });
 }
 
 /** One minion put down at a spot (the clone a Blink Arrow leaves where the character stood). */
@@ -172,7 +311,7 @@ export function tickMinions(w: World, dt: number): void {
       w.events.push({ t: 'explode', x: m.x, y: m.y, r: BURST_RADIUS, dtype: 3 });
     }
     w.minions[j++] = m;
-    const def = MINIONS[m.kind];
+    const def = statsOf(m);
     m.moving = false;
     m.atkT -= dt;
     if (Math.hypot(p.x - m.x, p.y - m.y) > TELEPORT) {
@@ -201,8 +340,11 @@ export function tickMinions(w: World, dt: number): void {
       continue;
     }
     if (m.atkT > 0 || def.dmg <= 0) continue;
-    m.atkT = 1 / (def.rate * m.speed * (1 - m.ail.chill));
-    const hit = spellBaseDamage(m.level) * def.dmg * m.dmg * MINION_ENEMY_RES;
+    m.atkT = 1 / ((m.fixedRate ?? def.rate) * m.speed * (1 - m.ail.chill));
+    const hit =
+      m.fixedHit !== undefined
+        ? m.fixedHit * m.dmg * MINION_ENEMY_RES
+        : spellBaseDamage(m.level) * def.dmg * m.dmg * MINION_ENEMY_RES;
     const t = DAMAGE_TYPES.indexOf(def.dtype);
     rawHit(w, best, hit, t, 'Minion', 'minion');
     if (def.splash > 0)

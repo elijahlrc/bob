@@ -95,6 +95,42 @@ export const activeGem = (id: string): ActiveGemDef => {
 
 export type GemRun = { world: World; dummy: Actor; effects: Set<string> };
 
+/** What a gem that works on something lying about is given to work on: a corpse for a spectre, a plain sword on the ground. */
+export function seedFor(def: ActiveGemDef, world: World, dummy: Actor): void {
+  const u = def.utility;
+  if (u?.kind === 'summon' && u.corpse)
+    world.corpses.push({
+      id: world.nextId++,
+      x: dummy.x + 1,
+      y: dummy.y,
+      age: 0,
+      spec: { type: 'warrior', variant: 'none', rarity: 'normal', level: 10, mods: [] },
+      room: -1,
+      pack: -1,
+      name: 'Warrior',
+      life: 200,
+    });
+  else if (u?.kind === 'summon' && u.animate)
+    world.drops.push({
+      id: world.nextId++,
+      x: world.player.x + 1,
+      y: world.player.y,
+      item: makeItem(() => 9999, 'sword_1', 5, 0),
+    });
+  else if (def.needsCorpse || (u?.kind === 'blink' && u.corpse))
+    world.corpses.push({
+      id: world.nextId++,
+      x: dummy.x + 0.5,
+      y: dummy.y + 0.5,
+      age: 0,
+      spec: { type: 'warrior', variant: 'none', rarity: 'normal', level: 10, mods: [] },
+      room: -1,
+      pack: -1,
+      name: 'Warrior',
+      life: 200,
+    });
+}
+
 /** The tags a sim step shows (the vocabulary of `effects` in docs/coverage/spirit.json). */
 export function noteEffects(w: World, into: Set<string>): void {
   for (const e of w.events) {
@@ -160,6 +196,7 @@ export function runGem(def: ActiveGemDef, seconds = 10): GemRun {
   const { world, dummy } = createDummyWorld(b, { distance: def.utility ? 2 : 2.5 });
   world.opts.freeResources = true;
   world.opts.godMode = true;
+  seedFor(def, world, dummy);
   if (def.utility) {
     dummy.rarity = 'boss';
     const u = def.utility;

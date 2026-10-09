@@ -23,7 +23,7 @@ import {
 } from '../data/constants';
 import { MONSTER_TYPES } from '../data/monsters';
 import { actorById, startAction } from './actions';
-import { bloaterBurst, isZone, speedMult } from './factions';
+import { bloaterBurst, corpseNear, isZone, speedMult } from './factions';
 import { flaskMask, monsterConds, playerConds } from './combat';
 import { hasChargesToSpend, offCooldown, skillReady, useSkill } from './cooldowns';
 import { canPay, payCost } from './cost';
@@ -147,6 +147,14 @@ function alreadyAfflicted(p: SkillProfile, target: Actor): boolean {
   return target.sdots.some((d) => d.src === p.skill.id && d.t > 0.8);
 }
 
+/** A skill that needs a corpse waits for one near the target, in reach of the character. */
+function corpseReady(w: World, p: SkillProfile, target: Actor): boolean {
+  if (!p.skill.needsCorpse) return true;
+  const pl = w.player;
+  const c = corpseNear(w, target.x, target.y, 6);
+  return !!c && Math.hypot(c.x - pl.x, c.y - pl.y) <= skillRange(p) + 2;
+}
+
 /** Whether a skill can hurt a target at all: some of its damage is of a type the target is not immune to. */
 export function canHurt(p: SkillProfile, def: Defence): boolean {
   const sd = p.skillDot;
@@ -182,7 +190,8 @@ function chooseSkill(w: World, target: Actor) {
       continue;
     const prof = w.char.profile(c, conds, flaskMask(w));
     if (!canHurt(prof, target.def) || !canPay(w, c.costsLife, prof.cost)) continue;
-    if (deployFull(w, c, prof) || !inReach(w, prof, target)) continue;
+    if (deployFull(w, c, prof) || !inReach(w, prof, target) || !corpseReady(w, prof, target))
+      continue;
     const cd = w.char.cooldownOf(c, conds);
     if (!second || cd > second.cd)
       second = { prof, costsLife: c.costsLife, key: c.key, cd, choice: c };
@@ -194,6 +203,7 @@ function chooseSkill(w: World, target: Actor) {
     if (
       canHurt(prof, target.def) &&
       !alreadyAfflicted(prof, target) &&
+      corpseReady(w, prof, target) &&
       canPay(w, w.primary.costsLife, prof.cost) &&
       !deployFull(w, w.primary, prof)
     )

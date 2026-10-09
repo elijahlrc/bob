@@ -143,6 +143,8 @@ export type SkillDef = {
   dot?: DotSpec;
   burning?: { pct: LevelValue; seconds: number; cap: number };
   bladestorm?: ActiveGemDef['bladestorm'];
+  needsCorpse?: boolean;
+  geyser?: ActiveGemDef['geyser'];
   deploySeconds?: number;
   ballista?: boolean;
   mortar?: { radius: number; from: number };
@@ -292,6 +294,8 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     orb: def.orb,
     form: def.form,
     bladestorm: def.bladestorm,
+    needsCorpse: def.needsCorpse,
+    geyser: def.geyser,
     deploySeconds: def.deploySeconds,
     ballista: def.ballista,
     mortar: def.mortar,

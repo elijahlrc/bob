@@ -10,7 +10,7 @@ import {
 } from '../data/gems';
 import { typesAllow } from '../data/skillTypes';
 import { createDummyWorld } from './dummy';
-import { buildFor, buildForActive, classFor as ATTR_CLASS, weaponFor } from './gemKit';
+import { buildFor, buildForActive, classFor as ATTR_CLASS, seedFor, weaponFor } from './gemKit';
 import { stepWorld } from './world';
 
 /**
@@ -43,6 +43,7 @@ describe('every active gem', () => {
         world.opts.freeResources = true;
         world.opts.godMode = true;
         dummy.rarity = 'boss'; // rallying skills wait for a pack or a big enemy
+        seedFor(def, world, dummy);
         let seen = false;
         const u = def.utility;
         // A guard waits for low life.

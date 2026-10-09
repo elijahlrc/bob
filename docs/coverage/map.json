@@ -378,7 +378,7 @@
   "pyreBurst": {
    "ref": "Cremation",
    "status": "covered",
-   "note": "Fire erupts in an area for several seconds (the corpse is not needed here)."
+   "note": "Needs a corpse near the target: it bursts for a share (4%) of the life it had as fire, and becomes a geyser for eight seconds that sends projectiles down about it, one after another, each bursting. Three geysers at most."
   },
   "judgementTempest": {
    "ref": "Divine Ire",
@@ -1023,7 +1023,7 @@
   "shadowSwap": {
    "ref": "Bodyswap",
    "status": "covered",
-   "note": "A blink toward the target (the corpse and the explosion it triggers are dropped)."
+   "note": "Destroys the character's body and recreates it at an enemy or, in preference, a corpse with enemies about it: it is not a swap (the target does not move). Fire damage bursts at the place left and the place reached, with a share of the character's life added; at a corpse the bursts are much larger and the corpse bursts for a share (6%) of the life it had."
   },
   "slipstream": {
    "ref": "Phase Run",
@@ -1558,12 +1558,12 @@
   "bindShade": {
    "ref": "Raise Spectre",
    "status": "covered",
-   "note": "Raises one or two bound shades that follow the character and fire chaos bolts at enemies (Bob's shades stand in for the reference's raised monsters)."
+   "note": "Raises the corpse of a defeated monster as a spectre: it is that monster, at the gem's level (31 to 80), with that monster's attack. The corpse is used up. One spectre at first, a second from the thirteenth level of the gem; it needs a corpse near."
   },
   "wakeBlades": {
    "ref": "Animate Weapon",
    "status": "covered",
-   "note": "Animates a few blades that fight for the character for a long while."
+   "note": "Animates a normal or magic melee weapon lying on the ground within the item level the gem allows (9 at the first level, 100 at the last): the weapon is used up and a flying blade strikes with its damage and the gem's added damage, for 37 s. Rare and unique weapons are kept."
   },
   "wakeSentinel": {
    "ref": "Animate Guardian",

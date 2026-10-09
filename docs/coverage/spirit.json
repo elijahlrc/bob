@@ -157,16 +157,16 @@
       "ref": "Raise Spectre",
       "name": "Bind Shade",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S11",
-      "missing": ["raise_from_corpse_type", "consume_corpse"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Raises a spectre of a defeated monster, so the choice of which monster to copy and its skills define the build.",
         "bob": "One or two generic chaos bolt shades (the 'spectre' minion), not tied to any monster or corpse.",
         "repair": "Let it pick a monster type from the roster (e.g. the most recent or chosen kill) and copy its attack into the minion."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Raise Spectre",
         "status": "confirmed",
@@ -3618,21 +3618,16 @@
       "ref": "Cremation",
       "name": "Pyre Burst",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": [
-        "consume_corpse",
-        "corpse_life_scaled_explosion",
-        "stationary_projectile_emitter",
-        "max_active_instances"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Consumes a targeted corpse: it explodes for a share of the corpse's life, then becomes a geyser that fires projectiles around it for 8 s. Needs a corpse, so it is a use-what-you-killed skill.",
         "bob": "A ground zone at the target (radius 2.5, 2.4 s, pulses every 0.8 s) with fire hits. No corpse needed or consumed (the engine has no corpses), no corpse-life explosion, shorter duration.",
         "repair": "Add a corpse record on enemy death and let the skill consume the nearest one, scaling an opening explosion by its life, then leave the existing ground zone for the geyser."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Cremation",
         "status": "corrected",
@@ -4651,21 +4646,16 @@
       "ref": "Bodyswap",
       "name": "Shadow Swap",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": [
-        "consume_corpse",
-        "teleport_to_target",
-        "damage_on_blink",
-        "percent_max_life_damage"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Swap places with a targeted enemy or corpse, damaging at both ends; if a corpse, it explodes (corpse-driven mobility/damage).",
         "bob": "Same blink as Dash (distance 8, cd 3). No swap with the target, no corpse, no damage; the port note admits both are dropped.",
         "repair": "Needs a corpse consumable: swap the player with a corpse or enemy and deal area damage at both points, exploding the corpse."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Bodyswap",
         "status": "corrected",
@@ -6543,16 +6533,16 @@
       "ref": "Animate Weapon",
       "name": "Wake Blades",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S11",
-      "missing": ["animate_item"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Animates weapons you found into timed minions that use the item's stats; you feed it good drops.",
         "bob": "Summons 2-5 generic blades for 37 s with minion damage from the gem level; the animated item and its stats are not involved.",
         "repair": "Source the blades' damage from a chosen or equipped weapon item."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Animate Weapon",
         "status": "confirmed",

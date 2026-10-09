@@ -3,6 +3,7 @@ import { spellBaseDamage } from '../data/constants';
 import type { ChargeKind } from '../calc/charges';
 import { segmentDist } from './actions';
 import { tickBladestorm } from './stances';
+import { corpseNear, takeCorpse } from './factions';
 import { applySkillDot } from './skillDots';
 import { applyStatus } from './statuses';
 import { gainCharge } from './charges';
@@ -29,7 +30,8 @@ export type FieldKind =
   | 'zap'
   | 'trail'
   | 'ghost'
-  | 'bladestorm';
+  | 'bladestorm'
+  | 'geyser';
 
 export type Field = {
   id: number;
@@ -356,6 +358,47 @@ export function releaseGhost(w: World, skill: string, interrupted: boolean): voi
   blast(w, { ...g, profile: scaleProfile(g.profile, f) }, a.x, a.y, g.radius * 1.3);
 }
 
+/**
+ * Pyre Burst: the corpse nearest the target bursts for a share of its life as fire, and becomes a geyser that sends projectiles
+ * down about it for a while. Three at most; the oldest gives way. With no corpse nothing happens.
+ */
+export function placeGeyser(w: World, a: Actor, act: Action): void {
+  const p = act.profile;
+  const spec = p.skill.geyser;
+  if (!spec || !a.isPlayer) return;
+  const corpse = corpseNear(w, act.aimX, act.aimY, 6);
+  if (!corpse) return;
+  takeCorpse(w, corpse);
+  const r = spec.explodeRadius * p.radiusMult;
+  w.events.push({ t: 'explode', x: corpse.x, y: corpse.y, r, dtype: 3 });
+  for (const e of enemiesIn(w, corpse.x, corpse.y, r))
+    rawHit(w, e, (corpse.life * spec.explodePct) / 100, 3, 'Corpse');
+  const mine = w.fields.filter((f) => f.kind === 'geyser');
+  if (mine.length >= spec.max) {
+    const oldest = mine.reduce((x, y) => (x.t < y.t ? x : y));
+    w.fields.splice(w.fields.indexOf(oldest), 1);
+  }
+  const reach = spec.radius * p.radiusMult;
+  w.fields.push({
+    id: w.nextId++,
+    owner: a.id,
+    kind: 'geyser',
+    x: corpse.x,
+    y: corpse.y,
+    r0: reach,
+    grow: 1,
+    radius: reach,
+    t: spec.seconds * p.skillDuration,
+    total: spec.seconds,
+    profile: p,
+    hand: act.hand,
+    pulseT: spec.interval,
+    interval: spec.interval,
+    dps: 0,
+    dtype: dominantType(p),
+  });
+}
+
 /** Blasts at a spot: the enemies in its radius are hit. */
 function blast(w: World, f: Field, x: number, y: number, r: number): void {
   const p = w.player;
@@ -469,6 +512,25 @@ export function tickFields(w: World, dt: number): void {
         f.y = spot.y;
       }
       w.fields[j++] = f;
+      continue;
+    }
+    if (f.kind === 'geyser') {
+      // One projectile after another comes down somewhere about the geyser, and bursts.
+      const spec = f.profile!.skill.geyser!;
+      f.pulseT -= dt;
+      while (f.pulseT <= 0) {
+        f.pulseT += f.interval;
+        const ang = w.rngTrig.float(0, Math.PI * 2);
+        const d = f.radius * Math.sqrt(w.rngTrig.float(0, 1));
+        blast(
+          w,
+          f,
+          f.x + Math.cos(ang) * d,
+          f.y + Math.sin(ang) * d,
+          spec.blast * f.profile!.radiusMult,
+        );
+      }
+      if (f.t > 0) w.fields[j++] = f;
       continue;
     }
     if (f.kind === 'bladestorm') {

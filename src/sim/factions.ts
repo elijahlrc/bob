@@ -157,6 +157,8 @@ export type Corpse = {
   room: number;
   pack: number;
   name: string;
+  /** The life the monster had at most: what a corpse explosion is a share of. */
+  life: number;
 };
 
 export type ZoneKind = 'caustic' | 'burning' | 'chilling' | 'shocking';
@@ -233,7 +235,28 @@ function leaveCorpse(w: World, a: Actor): void {
     room: a.room,
     pack: a.pack,
     name: a.name,
+    life: a.def.maxLife,
   });
+}
+
+/** The corpse nearest to a point within a reach, if there is one. */
+export function corpseNear(w: World, x: number, y: number, reach: number): Corpse | null {
+  let best: Corpse | null = null;
+  let bd = reach;
+  for (const c of w.corpses) {
+    const d = Math.hypot(c.x - x, c.y - y);
+    if (d <= bd) {
+      bd = d;
+      best = c;
+    }
+  }
+  return best;
+}
+
+/** A corpse is used up. */
+export function takeCorpse(w: World, c: Corpse): void {
+  const i = w.corpses.indexOf(c);
+  if (i >= 0) w.corpses.splice(i, 1);
 }
 
 /** Bring a corpse back as a weaker monster that gives no experience or loot, and cannot rise again. */

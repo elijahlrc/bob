@@ -158,7 +158,9 @@ export type UtilityDef =
       distance: number;
       cooldown: number;
       /** The skill's damage lands in a burst around the point left or the point reached. */
-      burst?: 'depart' | 'arrive';
+      burst?: 'depart' | 'arrive' | 'both';
+      /** Goes to a corpse in preference to an enemy (Bodyswap): the burst is this percent larger in area, the corpse bursts for a share of its life, and the character adds a share of its own life to the burst. */
+      corpse?: { areaMore: number; explodePct: number; lifePct: number };
       /** Burning ground along the way across (it afflicts with the skill's damage over time), and chilling ground where it left. */
       trail?: { seconds: number; radius: number };
       chill?: { seconds: number; radius: number };
@@ -192,6 +194,10 @@ export type UtilityDef =
       count: LevelValue;
       seconds?: number;
       ownerMods?: GemMod[];
+      /** Raised from a corpse: the minion is that monster, at this level (Raise Spectre). */
+      corpse?: { level: LevelValue };
+      /** Made from a weapon lying on the ground that is used up by it (Animate Weapon); the cap on its item level, the damage and speed it adds. */
+      animate?: { maxIlvl: LevelValue; addMin: LevelValue; addMax: LevelValue; speed: LevelValue };
     };
 
 export type ActiveGemDef = {
@@ -293,6 +299,18 @@ export type ActiveGemDef = {
   mineAura?: { min: LevelValue; max: LevelValue; cap: LevelValue; radius: number };
   /** Seconds between a mine being set off and its going (0.25 by default). */
   detonation?: number;
+  /** The skill cannot be used without a corpse (Pyre Burst). */
+  needsCorpse?: boolean;
+  /** A corpse made into a geyser that fires projectiles for a while, after exploding for a share of the corpse's life (Pyre Burst). */
+  geyser?: {
+    seconds: number;
+    radius: number;
+    interval: number;
+    blast: number;
+    max: number;
+    explodePct: number;
+    explodeRadius: number;
+  };
   /** A storm the skill leaves in the stance the character is in: it hits for a time, and the character in it gains a buff (Bladestorm). */
   bladestorm?: {
     seconds: number;

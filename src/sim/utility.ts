@@ -12,7 +12,16 @@ import { spendCharges } from './charges';
 import { flaskMask, playerConds, rawHit } from './combat';
 import { canPay } from './cost';
 import { applyHex } from './hexes';
-import { minionCount, summonCount, summonMinions, summonRespawn } from './minions';
+import {
+  animatableDrop,
+  animateWeapon,
+  minionCount,
+  raiseSpectre,
+  summonCount,
+  summonMinions,
+  summonRespawn,
+} from './minions';
+import { corpseNear } from './factions';
 import type { Action, Actor, World } from './types';
 
 /**
@@ -105,6 +114,12 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
       return { choice: c, prof, cd: 0.5 };
     }
     if (u.kind === 'summon') {
+      // A spectre needs a corpse to raise, an animated weapon one on the ground that the character can spare.
+      if (u.corpse && !corpseNear(w, p.x, p.y, CAST_RANGE)) continue;
+      if (u.animate) {
+        if (!animatableDrop(w, c, CAST_RANGE)) continue;
+        return { choice: c, prof, cd: summonRespawn(c) };
+      }
       // Minions are summoned in the first fight and again when they are gone or have run out.
       if (d > CAST_RANGE + 6 || minionCount(w, c.key) >= summonCount(c, prof)) continue;
       return { choice: c, prof, cd: summonRespawn(c) };
@@ -120,7 +135,16 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
     const radius =
       (prof.skill.behaviour.kind === 'burst' ? prof.skill.behaviour.radius : 2) * prof.radiusMult;
     const packHere =
-      u.burst === 'depart' && enemiesNear(w, p.x, p.y, radius * 1.3).length >= PACK_SIZE;
+      (u.burst === 'depart' || u.burst === 'both') &&
+      enemiesNear(w, p.x, p.y, radius * 1.3).length >= PACK_SIZE;
+    // Bodyswap goes to a corpse with enemies about it.
+    const corpseGo =
+      !!u.corpse &&
+      w.corpses.some(
+        (c0) =>
+          Math.hypot(c0.x - p.x, c0.y - p.y) <= u.distance + 1 &&
+          enemiesNear(w, c0.x, c0.y, 2.5).length >= 2,
+      );
     const packThere =
       u.burst === 'arrive' && gap && enemiesNear(w, target.x, target.y, radius * 1.3).length >= 2;
     const fight =
@@ -132,7 +156,8 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
         target.rarity === 'boss' ||
         target.rarity === 'miniboss');
     if (u.warp && w.warp) continue;
-    if (gap || packHere || packThere || fight) return { choice: c, prof, cd: u.cooldown };
+    if (gap || packHere || packThere || fight || corpseGo)
+      return { choice: c, prof, cd: u.cooldown };
   }
   return null;
 }
@@ -218,7 +243,13 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     return;
   }
   if (u.kind === 'summon') {
-    summonMinions(w, c, act.profile);
+    if (u.corpse) {
+      const corpse = corpseNear(w, a.x, a.y, CAST_RANGE);
+      if (corpse) raiseSpectre(w, c, act.profile, corpse);
+    } else if (u.animate) {
+      const drop = animatableDrop(w, c, CAST_RANGE);
+      if (drop) animateWeapon(w, c, act.profile, drop);
+    } else summonMinions(w, c, act.profile);
     return;
   }
   const target = actorById(w, act.targetId);
