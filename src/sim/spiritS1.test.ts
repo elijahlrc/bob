@@ -95,7 +95,7 @@ function tally(b: Build, seconds: number) {
 
 describe('Multistrike (tripleCadence)', () => {
   it('strikes three times in a use: the second echo lands before the action ends', () => {
-    const { uses, hits } = tally(holding('sword_3', ['crushingBlow', 'tripleCadence']), 20);
+    const { uses, hits } = tally(holding('sword_3', ['reapingArc', 'tripleCadence']), 20);
     expect(uses).toBeGreaterThan(10);
     // The last use may be cut off by the end of the run.
     expect(hits).toBeGreaterThanOrEqual(3 * (uses - 1));

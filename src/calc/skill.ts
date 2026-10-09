@@ -155,6 +155,12 @@ export type SkillProfile = {
   mirage: { less: number; slow: number; seconds: number } | null;
   /** A melee hit triggers a shockwave of so much of the base attack damage, with its own cooldown (Shockwave). */
   shockwave: { mult: number; cooldown: number } | null;
+  /** Seconds of stun a hit gives an enemy on full life, always (Leap Slam); 0 for none. */
+  stunFull: number;
+  /** Mana the supported skills must spend for Arcane Surge, and 0 for a support that does not count it. */
+  surgeThreshold: number;
+  /** The skill's cooldown recovery speed, with its supports'. */
+  cooldownRecovery: number;
   /** Enemies struck are thrown back this many tiles. */
   knockback: number;
   /** Percent more damage at the greatest distance (of the shot, or of the charge when `travel`), growing with the distance up to `dist` tiles. */
@@ -458,7 +464,18 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
       hitMultAcc += hm * (c.min + c.max);
       hitW += c.min + c.max;
     }
-    const hitMult = hitW > 0 ? hitMultAcc / hitW : 1;
+    // A chain's first hit is the strongest: each chain still to come adds to it.
+    const ramp = skill.behaviour.kind === 'chain' ? (skill.behaviour.ramp ?? 0) : 0;
+    const hitMult =
+      (hitW > 0 ? hitMultAcc / hitW : 1) *
+      (ramp > 0
+        ? 1 +
+          (ramp *
+            (skill.behaviour.kind === 'chain'
+              ? skill.behaviour.chains + db.sum('base', 'chains', baseCtx)
+              : 0)) /
+            100
+        : 1);
     // Crit.
     const baseCrit = isAttack ? (shieldAttack ? 5 : (hand?.crit ?? 0)) : skill.crit;
     let critChance = 0;
@@ -608,7 +625,16 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
           )
         : { chance: 0, dur: BLEED_DURATION },
     ),
-    poison: timed('poison', ailment('chance.poison', 'duration.poison', POISON_DURATION)),
+    poison: timed(
+      'poison',
+      ailment(
+        'chance.poison',
+        'duration.poison',
+        db.sum('base', 'poison.baseDur', baseCtx) > 0
+          ? db.sum('base', 'poison.baseDur', baseCtx) * db.mult('skillDuration', baseCtx)
+          : POISON_DURATION,
+      ),
+    ),
     doubleChance: clamp(db.sum('base', 'doubleDamage', baseCtx) / 100, 0, 1),
     enemyPhysRed: db.sum('base', 'enemyPhysReduction', baseCtx) / 100,
     enemyBlockLess: clamp(db.sum('base', 'enemyBlockReduction', baseCtx) / 100, 0, 1),
@@ -662,6 +688,9 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
         : null,
     minionDefensive: db.flag('minion.defensive', baseCtx),
     minionNearMore: db.sum('base', 'minion.nearMore', baseCtx),
+    stunFull: db.sum('base', 'stun.full', baseCtx),
+    surgeThreshold: db.sum('base', 'surge.threshold', baseCtx),
+    cooldownRecovery: db.mult('cooldownRecovery', baseCtx),
     knockback: db.sum('base', 'knockback', baseCtx),
     distMore:
       db.sum('base', 'distMore', baseCtx) !== 0

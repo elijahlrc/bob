@@ -1,3 +1,4 @@
+import { layCorpses } from './gemKit';
 import { describe, expect, it } from 'vitest';
 import { Character } from '../calc/character';
 import { minionBody, minionUptime } from '../calc/minion';
@@ -28,6 +29,8 @@ function arena() {
   const { world, dummy } = createDummyWorld(b, { distance: 3 });
   dummy.alive = false;
   world.opts.freeResources = false;
+  // Raise Husk uses up a corpse for each cast.
+  layCorpses(world, world.player.x, world.player.y, 30);
   return world;
 }
 

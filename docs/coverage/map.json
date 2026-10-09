@@ -298,7 +298,7 @@
   "tideGathering": {
    "ref": "Arcane Surge Support",
    "status": "covered",
-   "note": "Casting the supported spell grants Arcane Tide, a short buff of spell damage, cast speed and mana regeneration (the mana-spent threshold is dropped)."
+   "note": "After the supported skills have spent enough mana the character gains Arcane Surge; the supported spells also deal more damage while it lasts."
   },
   "staggerResolve": {
    "ref": "Endurance Charge on Melee Stun Support",
@@ -313,7 +313,7 @@
   "driftingStorm": {
    "ref": "Ball Lightning",
    "status": "covered",
-   "note": "A slow orb of lightning that keeps striking the area around it (modelled as a zone that pulses for two seconds)."
+   "note": "A slow orb that drifts toward the target and, every so often, strikes every enemy about it with lightning, without stopping on any."
   },
   "quiverRush": {
    "ref": "Barrage",
@@ -513,7 +513,7 @@
   "frostRing": {
    "ref": "Ice Nova",
    "status": "covered",
-   "note": "A ring of frost that expands from the caster and deals more to chilled enemies."
+   "note": "A ring of frost that expands from the caster (or from up to two of the character’s Glacier Darts, with 20% less area) and deals more to chilled enemies."
   },
   "frostQuill": {
    "ref": "Ice Shot",
@@ -523,7 +523,7 @@
   "blazeStream": {
    "ref": "Incinerate",
    "status": "covered",
-   "note": "A channelled torrent of fire in a cone: each use builds a stage (eight at most), 25% more damage and a wider, longer cone; when the channel ends, a final wave across the whole cone for much more damage."
+   "note": "A torrent of fire that widens and strengthens the longer it is held; letting go sends a final wave that always ignites, for 500% more ignite damage."
   },
   "cinderBlow": {
    "ref": "Infernal Blow",
@@ -533,7 +533,7 @@
   "twinSlash": {
    "ref": "Lacerate",
    "status": "covered",
-   "note": "Two slashes of force in a wide arc, with a chance to bleed."
+   "note": "Two sweeping slashes; in Blood Stance they bleed (chance and more bleed damage), in Sand Stance the arc is wider and they do not."
   },
   "hurledSteel": {
    "ref": "Lancing Steel",
@@ -623,7 +623,7 @@
   "skitterFlash": {
    "ref": "Spark",
    "status": "covered",
-   "note": "A cloud of erratic sparks that fly in all directions for two seconds."
+   "note": "Sparks that move at random, bouncing off walls, until they hit an enemy or run out their two seconds."
   },
   "phantomToss": {
    "ref": "Spectral Throw",
@@ -748,7 +748,7 @@
   "blizzardRing": {
    "ref": "Vortex",
    "status": "covered",
-   "note": "A slow expanding vortex of frost around the caster that chills for several seconds."
+   "note": "A blast of frost around the caster (or around up to five of the character’s Glacier Darts, with 20% less area) that leaves a vortex chilling and burning what is in it for three seconds; it has a short cooldown."
   },
   "tideOfJudgement": {
    "ref": "Wave of Conviction",
@@ -788,7 +788,7 @@
   "livewire": {
    "ref": "Innervate Support",
    "status": "covered",
-   "note": "Adds lightning damage, with a chance to shock (the buff after killing a shocked enemy is dropped)."
+   "note": "Adds lightning damage and a chance to shock; killing a shocked enemy gives Innervation for eight seconds, which adds lightning damage to every hit."
   },
   "firmHold": {
    "ref": "Iron Grip Support",
@@ -1038,7 +1038,7 @@
   "skyfallLeap": {
    "ref": "Leap Slam",
    "status": "covered",
-   "note": "A leap to the target that lands in a slam; stuns enemies on full life."
+   "note": "Leap to a target and slam down: enemies are thrown back, and one on full life is always stunned."
   },
   "bulwarkRush": {
    "ref": "Shield Charge",
@@ -1048,7 +1048,7 @@
   "spinningDash": {
    "ref": "Whirling Blades",
    "status": "covered",
-   "note": "A whirling dash through the target, hitting once along the way."
+   "note": "A dash through the target that hits everything on the way, then a sweep of the weapon at the end."
   },
   "twisterBlade": {
    "ref": "Cyclone",
@@ -1243,7 +1243,7 @@
   "pyreTotem": {
    "ref": "Holy Flame Totem",
    "status": "covered",
-   "note": "A totem that throws three flaming projectiles at enemies near it, for eight seconds."
+   "note": "A totem that flings fire at the enemies near it; the projectiles pierce everything."
   },
   "quakeTotem": {
    "ref": "Shockwave Totem",
@@ -1348,7 +1348,7 @@
   "stormCharge": {
    "ref": "Stormblast Mine",
    "status": "covered",
-   "note": "A mine that bursts in lightning with a stronger shock."
+   "note": "A mine that bursts in a storm when it goes off; enemies near the mines take 3% more damage from each, up to 150%."
   },
   "smokeCharge": {
    "ref": "Smoke Mine",
@@ -1458,7 +1458,7 @@
   "fury": {
    "ref": "Rage Support",
    "status": "covered",
-   "note": "Melee hits grant Rage, which boosts attacks."
+   "note": "Melee hits give a point of rage, once in 0.4 seconds however many enemies the swing hits; with ten rage or more the supported attacks add physical damage, and more for each ten."
   },
   "shatteringBlows": {
    "ref": "Shockwave Support",
@@ -1488,7 +1488,7 @@
   "reelingCast": {
    "ref": "Cast when Stunned Support",
    "status": "covered",
-   "note": "Spells linked to the supported spell are cast when the character has taken a heavy blow (a stun is approximated by a large hit)."
+   "note": "Linked spells are cast, with a chance, when the character is stunned (a quarter second cooldown)."
   },
   "chargeRelease": {
    "ref": "Discharge",
@@ -1503,7 +1503,7 @@
   "raiseHusk": {
    "ref": "Raise Zombie",
    "status": "covered",
-   "note": "Raises zombies (3 to 7) that follow the character and slam enemies; they have life, are hurt by enemy blows and area attacks, and are raised again when the skill is cast after they fall."
+   "note": "Raises husks of the dead beside you, using up a corpse for each cast."
   },
   "callBonewalkers": {
    "ref": "Summon Skeletons",
@@ -1548,7 +1548,7 @@
   "hallowedRelic": {
    "ref": "Summon Holy Relic",
    "status": "covered",
-   "note": "A relic that follows the character, shoots at enemies and regenerates the character's life."
+   "note": "A relic that stays near the character; when the character hits with an attack it sets off a nova that hurts the enemies about it and gives life regeneration to the character and, more, to its minions."
   },
   "whirringMotes": {
    "ref": "Summon Skitterbots",

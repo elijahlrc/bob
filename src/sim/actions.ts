@@ -28,6 +28,7 @@ import {
   addBlade,
   bounceOrbs,
   lineWave,
+  novaOnBolts,
   placeMarker,
   placeOrb,
   projectileFx,
@@ -325,6 +326,7 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
     lineWave(w, a, act);
     return;
   }
+  if (p.skill.castOn && a.isPlayer && novaOnBolts(w, a, act)) return;
   if (p.skill.vortex && a.isPlayer) {
     addBlade(w, p);
     return;
@@ -389,6 +391,14 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
         a.y + ((target.y - a.y) / d) * step,
         a.r,
       );
+      // A dash through the target hits everything within a body of the way.
+      if (p.skill.travelThrough && a.isPlayer) {
+        const x0 = a.x;
+        const y0 = a.y;
+        for (const e of enemiesOf(w, a))
+          if (e.phaseT <= 0 && segmentDist(e.x, e.y, x0, y0, spot.x, spot.y) <= e.r + a.r + 0.3)
+            hit(w, a, e, p, act.hand, Math.hypot(e.x - x0, e.y - y0));
+      }
       w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: false });
       a.x = spot.x;
       a.y = spot.y;
@@ -451,9 +461,37 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
     let from: Actor = a;
     for (let i = 0; i <= p.chains; i++) {
       const d = Math.hypot(cur.x - a.x, cur.y - a.y);
-      hit(w, a, cur, p, act.hand, d);
+      // The first hit is the strongest: each chain still to come adds to it.
+      // (The profile already carries the first hit's share, as the sheet counts it.)
+      const q = b.ramp
+        ? scaleProfile(p, (1 + (b.ramp * (p.chains - i)) / 100) / (1 + (b.ramp * p.chains) / 100))
+        : p;
+      hit(w, a, cur, q, act.hand, d);
       w.events.push({ t: 'chain', from: from.id, to: cur.id, dtype: dominantType(p, act.hand) });
       hitIds.push(cur.id);
+      // Each jump also reaches a second enemy beside the one it landed on, which does not chain on.
+      if (b.fork && i > 0) {
+        let second: Actor | null = null;
+        let sd = b.chainRange;
+        for (const e of enemiesOf(w, a)) {
+          if (hitIds.includes(e.id)) continue;
+          const dd = Math.hypot(e.x - cur.x, e.y - cur.y);
+          if (dd <= sd && w.grid.los(cur.x, cur.y, e.x, e.y)) {
+            sd = dd;
+            second = e;
+          }
+        }
+        if (second) {
+          hitIds.push(second.id);
+          w.events.push({
+            t: 'chain',
+            from: cur.id,
+            to: second.id,
+            dtype: dominantType(p, act.hand),
+          });
+          hit(w, a, second, q, act.hand, Math.hypot(second.x - a.x, second.y - a.y));
+        }
+      }
       if (i === p.chains) break;
       let best: Actor | null = null;
       let bd = b.chainRange;
@@ -589,7 +627,13 @@ export function updateProjectiles(w: World, dt: number): void {
       pr.travelled += (Math.hypot(pr.vx, pr.vy) * dt) / steps;
       const owner = actorById(w, pr.owner);
       if (pr.formAt !== undefined && !pr.formed && pr.travelled >= pr.formAt) changeForm(pr);
-      if (owner?.isPlayer && (pr.profile.skill.homing || pr.profile.skillDot?.spec.carried))
+      if (
+        owner?.isPlayer &&
+        (pr.profile.skill.homing ||
+          pr.profile.skill.wander ||
+          pr.profile.skill.pulse ||
+          pr.profile.skillDot?.spec.carried)
+      )
         projectileFx(w, pr, dt / steps);
       const aim = pr.aimId ? actorById(w, pr.aimId) : undefined;
       if (aim) pr.minDist = Math.min(pr.minDist, Math.hypot(aim.x - pr.x, aim.y - pr.y));
@@ -600,6 +644,16 @@ export function updateProjectiles(w: World, dt: number): void {
           if (w.t - w.ai.blockedT > BLOCK_WINDOW) w.ai.blocked = 0;
           if (w.ai.blocked === 0) w.ai.blockedT = w.t;
           w.ai.blocked++;
+        }
+        if (pr.profile.skill.wander && pr.travelled < pr.maxRange) {
+          // A wandering spark turns about at a wall and goes on.
+          pr.x -= (pr.vx * dt) / steps;
+          pr.y -= (pr.vy * dt) / steps;
+          const sp = Math.hypot(pr.vx, pr.vy);
+          const ang = Math.atan2(pr.vy, pr.vx) + Math.PI + w.rngCombat.float(-0.9, 0.9);
+          pr.vx = Math.cos(ang) * sp;
+          pr.vy = Math.sin(ang) * sp;
+          continue;
         }
         if (pr.profile.skill.fuse && owner?.isPlayer) stickArrow(w, pr, null);
         if (pr.explodeRadius > 0)
@@ -649,7 +703,7 @@ export function updateProjectiles(w: World, dt: number): void {
         const e = k < na ? w.actors[k] : w.minions[k - na];
         if (!e.alive || e.faction === pr.faction || pr.hitIds.includes(e.id)) continue;
         // The payload of an Arrow Nova passes through everything on its way down.
-        if (pr.kind === 'nova' || pr.kind === 'mortar') continue;
+        if (pr.kind === 'nova' || pr.kind === 'mortar' || pr.kind === 'orb') continue;
         const rr = e.r + pr.r;
         const dx = e.x - pr.x;
         const dy = e.y - pr.y;

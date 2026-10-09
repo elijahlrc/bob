@@ -174,8 +174,10 @@ export const HEXES: Record<HexId, HexDef> = {
     name: 'Rime Sap',
     low: 25,
     high: 44,
-    text: 'to cold resistance',
+    text: 'to cold resistance, and a better chance to be frozen',
     fx: { res: [2] },
+    selfMods: [{ stat: 'chance.freeze', kind: 'base', low: 10, high: 14 }],
+    selfCond: 'cursedFrost',
     seconds: [9, 10.9],
   },
   shockSap: {

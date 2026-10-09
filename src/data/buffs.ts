@@ -44,7 +44,8 @@ export type BuffId =
   | 'combatRush'
   | 'infusion'
   | 'smiteAura'
-  | 'phaseStrike';
+  | 'phaseStrike'
+  | 'innervation';
 export const BUFF_IDS: BuffId[] = [
   'fortify',
   'onslaught',
@@ -84,6 +85,7 @@ export const BUFF_IDS: BuffId[] = [
   'infusion',
   'smiteAura',
   'phaseStrike',
+  'innervation',
 ];
 
 export type BuffDef = {
@@ -166,6 +168,17 @@ export const BUFFS: Record<BuffId, BuffDef> = {
       mod('castSpeed', 'more', 22, { tags: ['movement'], ...when('combatRush') }),
     ],
   },
+  innervation: {
+    id: 'innervation',
+    name: 'Innervation',
+    seconds: 8,
+    cond: 'innervation',
+    text: 'lightning added to your hits',
+    mods: [
+      mod('damage.min', 'base', 11, { damageTypes: ['lightning'], ...when('innervation') }),
+      mod('damage.max', 'base', 160, { damageTypes: ['lightning'], ...when('innervation') }),
+    ],
+  },
   phaseStrike: {
     id: 'phaseStrike',
     name: 'Phase Strike',
@@ -177,7 +190,7 @@ export const BUFFS: Record<BuffId, BuffDef> = {
   },
   smiteAura: {
     id: 'smiteAura',
-    name: 'Smite Aura',
+    name: 'Thunder Aura',
     seconds: 4,
     cond: 'smiteAura',
     text: 'lightning added to your hits',
@@ -470,6 +483,8 @@ export const BUFF_EVENTS = [
   'stun',
   'cast',
   'kill',
+  'killShocked',
+  'surge',
   'hit',
   'meleeHit',
   'crit',

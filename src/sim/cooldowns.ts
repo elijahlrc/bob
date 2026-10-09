@@ -12,7 +12,7 @@ import type { World } from './types';
 
 /** The seconds a use takes to come back, with the character's cooldown recovery. */
 export function cooldownSeconds(w: World, c: SkillChoice): number {
-  return (c.skill.cooldown ?? 0) / Math.max(0.1, w.char.db.mult('cooldownRecovery'));
+  return (c.skill.cooldown ?? 0) / Math.max(0.1, w.char.profile(c, 0).cooldownRecovery);
 }
 
 const maxUses = (c: SkillChoice) => c.skill.cooldownUses ?? 1;

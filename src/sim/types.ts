@@ -252,7 +252,9 @@ export type Projectile = {
   forkLeft: number;
   chainLeft: number;
   /** An arrow that lands and bursts into a ring (nova), or goes on to scatter at its end (tornado); the arrows it sends. */
-  kind?: 'nova' | 'tornado' | 'mortar' | 'shield';
+  /** An orb's time to its next pulse. */
+  pulseT?: number;
+  kind?: 'nova' | 'tornado' | 'mortar' | 'shield' | 'orb';
   ring?: number;
   /** Where it changes form (Frost Lance), and whether it has. */
   formAt?: number;
@@ -569,8 +571,6 @@ export type World = {
   /** The critical roll the strikes of one use share: set while the extra strikes of a use are made. */
   critLock: boolean | null;
   critSeen: boolean;
-  /** The channelled skill being held: its stages so far. */
-  channel: ChannelState | null;
   /** The element of the next use of a skill that picks one (1 lightning, 2 cold, 3 fire), and the last one used. */
   elem: number;
   elemLast: number;
@@ -590,6 +590,13 @@ export type World = {
   virulence: number;
   trailT: number;
   /** The blades of Blade Vortex: seconds left of each, and the time toward the next round. */
+  /** The mana the supported skills have spent toward Arcane Surge. */
+  surgeMana: number;
+  /** The relic's regeneration: seconds left, and the life a second for the character and for the minions; and its nova's cooldown. */
+  relicRegen: { t: number; me: number; minions: number };
+  relicT: number;
+  /** When rage was last gained from a melee hit. */
+  rageGainT: number;
   vortex: { key: string; blades: number[]; acc: number } | null;
   /** The markers of Storm Call. */
   markers: { x: number; y: number; t: number; profile: SkillProfile; hand: number }[];
@@ -628,6 +635,8 @@ export type World = {
   lastTravel: number;
   /** The stages of a skill that grows with use, and how many hits the player has landed (a use that hits builds a stage). */
   stacks: StackState | null;
+  /** The channelled skill being held: its stages so far. */
+  channel: ChannelState | null;
   hitsLanded: number;
   /** The projectiles of a barrage still to be fired, one after another. */
   shots: PendingShot[];

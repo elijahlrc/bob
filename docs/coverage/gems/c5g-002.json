@@ -36,11 +36,7 @@
   { "ref": "Enlighten Support", "note": "Lowers the mana cost multiplier of the supported gem group (modelled as a cost multiplier below one).",
     "def": { "kind": "support", "id": "deepInsight", "name": "Deep Insight", "attr": "int", "supports": [], "costMult": 0.75, "mods": [],
       "description": "Makes the supported skill cheaper to cast." } },
-  { "ref": "Immolate Support", "note": "Spells deal added fire damage against burning enemies only; it has no ignite chance of its own.",
-    "def": { "kind": "support", "id": "cindering", "name": "Cindering", "attr": "str", "supports": ["spell"], "costMult": 1.3, "mods": [
-      { "stat": "damage.min", "kind": "base", "value": [42, 205], "damageTypes": ["fire"], "condition": { "id": "targetIgnited" } },
-      { "stat": "damage.max", "kind": "base", "value": [63, 308], "damageTypes": ["fire"], "condition": { "id": "targetIgnited" } } ],
-      "description": "Adds fire damage to the spell against enemies that burn." } },
+  {"ref":"Immolate Support","note":"Spells deal added fire damage against burning enemies only; it has no ignite chance of its own.","def":{"kind":"support","id":"cindering","name":"Cindering","attr":"str","supports":[],"costMult":1.3,"mods":[{"stat":"damage.min","kind":"base","value":[42,205],"damageTypes":["fire"],"condition":{"id":"targetIgnited"}},{"stat":"damage.max","kind":"base","value":[63,308],"damageTypes":["fire"],"condition":{"id":"targetIgnited"}}],"description":"Adds fire damage to the spell against enemies that burn."}},
   { "ref": "Ignite Proliferation Support", "note": "Ignites spread to the enemies near the one that burns, while it burns and as it dies, and ignite damage rises.",
     "def": { "kind": "support", "id": "wildfireSeed", "name": "Wildfire Seed", "attr": "int", "supports": [], "costMult": 1.3, "mods": [
       { "stat": "damage", "kind": "more", "value": [20, 39], "tags": ["ignite"] },
@@ -91,10 +87,7 @@
       { "stat": "critChance", "kind": "base", "value": [0.7, 1], "condition": { "id": "elusive" } },
       { "stat": "critMulti", "kind": "base", "value": [80, 99], "condition": { "id": "elusive" } } ],
       "description": "Critical strikes make you elusive, and elusive you crit harder." } },
-  { "ref": "Rage Support", "note": "Melee hits grant Rage, which boosts attacks.",
-    "def": { "kind": "support", "id": "fury", "name": "Fury Well", "attr": "str", "supports": ["melee"], "costMult": 1.3, "mods": [
-      { "stat": "rageOn.meleeHit", "kind": "base", "value": 1 } ],
-      "description": "Melee hits build Rage." } },
+  {"ref":"Rage Support","note":"Melee hits give a point of rage, once in 0.4 seconds however many enemies the swing hits; with ten rage or more the supported attacks add physical damage, and more for each ten.","def":{"kind":"support","id":"fury","name":"Fury Well","attr":"str","supports":["melee"],"costMult":1.3,"mods":[{"stat":"rageOn.meleeHit","kind":"base","value":1},{"stat":"damage.min","kind":"base","value":[1,3],"damageTypes":["physical"],"per":{"stat":"rage","div":10}},{"stat":"damage.max","kind":"base","value":[2,6],"damageTypes":["physical"],"per":{"stat":"rage","div":10}}],"description":"Melee hits build rage, which adds physical damage to your attacks."}},
   { "ref": "Shockwave Support", "note": "Maces, sceptres and staves only: a melee hit sets off a shockwave around the enemy hit, of 160% of the base attack damage whatever the hit was; one a second.",
     "def": { "kind": "support", "id": "shatteringBlows", "name": "Shattering Blows", "attr": "str", "supports": ["melee"], "excludes": ["triggered", "totem", "channelling"], "costMult": 1.4, "limitWeapon": ["mace", "sceptre", "staff"], "mods": [
       { "stat": "shockwave.mult", "kind": "base", "value": [160, 209.6] },
@@ -120,8 +113,5 @@
     "def": { "kind": "support", "id": "slayersEcho", "name": "Slayer's Echo", "attr": "str", "supports": ["spell"], "excludes": ["totem", "trap", "mine"], "costMult": 1.4, "mods": [],
       "trigger": { "on": "kill", "tags": ["melee"], "chance": 100, "cooldown": 0.15, "effect": { "kind": "castSocketed" } },
       "description": "Linked spells are cast when your melee blows kill." } },
-  { "ref": "Cast when Stunned Support", "note": "Spells linked to the supported spell are cast when the character has taken a heavy blow (a stun is approximated by a large hit).",
-    "def": { "kind": "support", "id": "reelingCast", "name": "Reeling Cast", "attr": "int", "supports": ["triggerable"], "needs": ["spell"], "excludes": ["totem", "trap", "mine"], "costMult": 1.3, "mods": [],
-      "trigger": { "on": "hitTaken", "chance": 100, "cooldown": 0.5, "threshold": 20, "effect": { "kind": "castSocketed" } },
-      "description": "Linked spells are cast when a heavy blow lands on you." } }
+  {"ref":"Cast when Stunned Support","note":"Linked spells are cast, with a chance, when the character is stunned (a quarter second cooldown).","def":{"kind":"support","id":"reelingCast","name":"Reeling Cast","attr":"int","supports":["triggerable"],"needs":["spell"],"excludes":["totem","trap","mine"],"costMult":1.3,"mods":[],"trigger":{"on":"stunned","chance":60,"cooldown":0.25,"effect":{"kind":"castSocketed"}},"description":"Linked spells are cast when you are stunned."}}
 ]

@@ -52,6 +52,8 @@ export type MinionDef = {
   color: number;
   /** The percent of its physical damage that is chaos instead. */
   chaos?: number;
+  /** Its nova, when it has one (the Relic): the damage as a share of the spell damage curve. */
+  nova?: number;
 };
 
 export const MINIONS: Record<MinionId, MinionDef> = {
@@ -235,7 +237,8 @@ export const MINIONS: Record<MinionId, MinionDef> = {
   relic: {
     id: 'relic',
     name: 'Hallowed Relic',
-    dmg: 0.8,
+    dmg: 0,
+    nova: 0.8,
     rate: 1,
     reach: 6,
     speed: 3,

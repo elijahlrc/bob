@@ -138,6 +138,18 @@ export function fireProjectiles(w: World, a: Actor, act: Action): void {
   const chain = p.pierce <= 0 ? p.chains : 0;
   const aimDist = Math.hypot(act.aimX - a.x, act.aimY - a.y);
 
+  if (p.skill.pulse) {
+    // A slow orb: it hurts what is about it as it drifts (src/sim/skillFx.ts) and strikes nothing by touching it.
+    launch(w, a, p, act.hand, a.x, a.y, base, {
+      hitIds: [],
+      aimId: act.targetId,
+      range: Math.max(3, Math.min(range, aimDist + 1)),
+      pierce: 99,
+      kind: 'orb',
+      speedMult: p.skill.pulse.speed,
+    });
+    return;
+  }
   if (p.skill.shield) {
     // The shield goes ahead alone; where it ends, it shatters into shards.
     const sp = p.skill.shield;

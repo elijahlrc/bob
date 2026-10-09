@@ -168,6 +168,7 @@ export const CONDITIONS = [
   'infusion',
   'smiteAura',
   'phaseStrike',
+  'innervation',
   'elemFire',
   'elemCold',
   'elemLightning',
@@ -189,6 +190,7 @@ export const CONDITIONS = [
   'punisher',
   // What waits for a particular curse or mark on the target.
   'cursedDespair',
+  'cursedFrost',
   'markedRuin',
   'markedWarlord',
   // State of the player (C3): moving, ailments on the player, the weapon held.

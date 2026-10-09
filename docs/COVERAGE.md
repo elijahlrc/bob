@@ -29,8 +29,10 @@ Conventions follow DESIGN.md:
   charges, rampage, ground-effect conditions, corpse skills (Desecrate, Detonate Dead, Unearth, Volatile Dead), Manabond,
   Plague Bearer, Herald of Purity, Tempest Shield, trap and mine remote controls, and a few unique flasks. Each is listed in
   `npm run coverage -- --list`.
-- **Known divergences to keep in mind:** channelling and ramping skills are averaged into repeated hits; minions are
-  hurt only by area attacks and by monsters held up behind them; deployables and utility skills follow simple use policies; many "support gem on item" lines are folded into stats.
+- **Known divergences to keep in mind:** the character, not a player, decides when to use a skill (the policies of [SPIRIT.md](SPIRIT.md) section 5);
+  there is no gem quality (Enhance is a stand-in); the corpse skills left out above stay out; ten gems are recorded as drifted in the spirit ledger,
+  each with the reason (`docs/coverage/spirit.json`); many "support gem on item" lines are folded into stats.
+- **Spirit ledger (2026-10-08, after S14):** `covered` in `map.json` now means `faithful` in `docs/coverage/spirit.json` (316 of 326 gems; `npm run spirit`), judged twice, the second time by reviewers who had not seen the first verdicts ([AUDIT-GEMS.md](AUDIT-GEMS.md), second section).
 - **Spirit audit (2026-10-08):** `covered` meant "has the defining mechanic" and was judged coarsely. [AUDIT-GEMS.md](AUDIT-GEMS.md) re-judged all 326 gems against what each one is _for_ in the reference game: 155 faithful, 133 drifted, 38 gutted, with the missing engine pieces ranked (cooldowns and spending charges, channelling, an enemy status layer, ground effects, the projectile hit rule).
 
 ## 0. Summary

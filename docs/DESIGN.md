@@ -60,19 +60,22 @@ These were decided with the user before this doc was written. Do not re-open the
 | Stun lock              | Possible                             | After a stun ends, that entity cannot be stunned again for 0.5 s.                                                                                                                                        |
 | Area level range       | Tops out around 84–86                | Area and monster levels run 1–100, one per map.                                                                                                                                                          |
 | Crafting / currency    | Many orbs                            | Items come from drops and the between-map reward choice. The depth expansion adds currencies that let the player choose what changes on an item (`docs/EXPANSION.md` section 8).                         |
-| Multiple skills        | Player presses many skills           | One **primary skill**, auto-used. Auras are always on. A free default attack is used when out of mana. The depth expansion adds triggered skills that follow the reference game's rules.                 |
+| Multiple skills        | Player presses many skills           | One **primary skill**, auto-used; it may be on cooldown or conditional, and the next skill or the default attack fills the gap. Auras are always on. Triggers follow the 3.9 rules.                      |
 | Acts / town            | Story acts, town hub                 | A camp screen between maps.                                                                                                                                                                              |
 | Resist penalty         | −30%/−60% after acts                 | 0 / −30 / −60 by run stage (section 5).                                                                                                                                                                  |
 | Mid-map saving         | n/a                                  | Saves happen only at camp. Reloading mid-map restarts that map from the same seed.                                                                                                                       |
 | Monster stats          | Per-level tables                     | Bot-tuned curves for life, damage, accuracy, evasion and armour (section 12.1). Monster accuracy is higher than 3.9's at the same level.                                                                 |
 | Attack damage          | Weapons only                         | Characters also add flat physical damage per level to attacks, and one-handed weapons deal 1.6× (`ATTACK_LEVEL_*`, `ONE_HAND_DAMAGE`): tuned numbers with no 3.9 counterpart.                            |
-| Gem quality            | Quality currencies                   | Not modelled: gems auto-level and there are no quality orbs.                                                                                                                                             |
+| Gem quality            | Quality currencies                   | Not modelled: gems auto-level and there are no quality orbs. Enhance is the one gem that cannot be faithful (a small damage stand-in).                                                                   |
 | Resist floor           | None                                 | Effective resistance is floored at −200%.                                                                                                                                                                |
 | Critical rolls         | Once per skill use                   | Once per target hit (the same expected value, a different variance).                                                                                                                                     |
-| Block                  | Blocked hits keep on-hit effects     | A blocked hit does nothing else.                                                                                                                                                                         |
+| Block                  | Blocked hits keep on-hit effects     | A blocked hit does nothing else, but it fires the block event: counter-attack skills (Reckoning, Riposte) answer a block.                                                                                |
 | Damage taken           | Shock sums with other increases      | Shock multiplies separately from "increased damage taken".                                                                                                                                               |
 | Flasks                 | End at full life or mana             | A recovery flask runs its full time. The bot never drinks a second life flask while one is active.                                                                                                       |
-| Curses                 | Self-cast, 9–11 s                    | Hexes last 6 s, are applied on hit, and use Bob's own numbers (close to 3.9's mid tier). Self-cast curses come with C4.                                                                                  |
+| Curses                 | Self-cast, 9–11 s                    | Cast by the character (Bob picks when), as long as the 3.9 gem says, with the 3.9 effect lists and curse limit; Hexing Strikes applies curses on hit.                                                    |
+| Projectiles            | A use hits a target once             | Kept (3.9 rule): the projectiles of one use hit an enemy once, except Barrage (fired in sequence) and the shotgun skills the 3.9 data flags (Shrapnel Ballista, Shattering Steel).                       |
+| Policies               | The player decides when              | The character decides: channelling while a target is in reach, retaliation on a block, stances by crowd, mines set off together, blinks by gap or danger. Allowed adaptations only.                      |
+| Left out               | All skill gems                       | Corpse skills (Desecrate, Detonate Dead, Unearth, Volatile Dead), Vaal skills, Manabond, Plague Bearer, Herald of Purity, Tempest Shield, remote trap and mine control.                                  |
 | Reservation            | Support multipliers apply            | Support cost multipliers do not raise an aura's reservation (every socket is linked).                                                                                                                    |
 | Trigger thresholds     | Fixed damage by gem level            | Wounded Retort fires after a share of maximum life, so it scales with Bob's life.                                                                                                                        |
 | Leech to ES            | 2% and 10% of max ES                 | Uses the life rates.                                                                                                                                                                                     |
@@ -776,6 +779,13 @@ tiers keep unlocking throughout the 100-map run. Families:
 - **Acquisition:** the skill gem picks after maps 1–4; gem drops; the camp reward pick (1 of 3 offers drawn from item, gem and flask pools); and
   side-branch chests (20% chance of a gem instead of an item).
 
+> **Since the coverage and spirit plans** (`docs/COVERAGE.md`, `docs/SPIRIT.md`) there are 326 mapped gems; the tables below are
+> the original set and some rows are updated. `src/data/gems.ts` and `src/data/gemsGen.ts` are the truth, and `docs/coverage/spirit.json` (`npm run spirit`)
+> says, for each gem, what its loop in the reference game is and whether Bob's version keeps it. A skill that does something of its own
+> names it in a field of the gem (`SkillFx` in `src/data/gems.ts`: a line wave with shockwaves, an element for each use, a buff of stacks that
+> sends out beams, a debuff of charges that bursts, a thrown shield that shatters, blades that circle, markers, an orb that strikes,
+> arrows that stick, spore pods, a siphon, and so on), and `src/sim/skillFx.ts` and `src/sim/supportFx.ts` carry it out; the card text is built from the same fields.
+
 **Active skills (7):**
 
 | Name (ours)   | Type                          | Attr | Behaviour                                                                                                     | Base % / effectiveness            | Notes                            | PoE analogue   |
@@ -806,7 +816,7 @@ tiers keep unlocking throughout the 100-map run. Families:
 | Precision Strikes   | 30%→49% increased crit chance; +15%→34% crit multiplier           | 1.2    | any        | Increased Critical Strikes  |
 | Rending Edge        | 25% chance to bleed; 30%→49% more bleed damage                    | 1.2    | attack     | Chance to Bleed             |
 | Toxin Coat          | 40% chance to poison; 20%→39% more poison damage                  | 1.2    | any        | Chance to Poison            |
-| Kindle              | 30% ignite chance; 40%→59% more ignite damage                     | 1.2    | any        | Immolate/Burning-ish        |
+| Kindle              | Attacks only: adds fire damage against burning enemies            | 1.2    | any        | Immolate/Burning-ish        |
 | Bloodthirst         | 2% of attack damage leeched as life                               | 1.3    | attack     | Life Leech                  |
 | Staggering Force    | 30%→49% increased stun duration; 20% reduced enemy stun threshold | 1.15   | attack     | (ours)                      |
 
@@ -814,15 +824,15 @@ That is 17 supports.
 
 **Auras (7):**
 
-| Name (ours)   | Reservation   | Effect at L1 → L20                                 | Attr    | PoE analogue  |
-| ------------- | ------------- | -------------------------------------------------- | ------- | ------------- |
-| Kindling Halo | 50%           | Adds 4–7 → 120–180 fire to attacks and spells      | Str     | Anger         |
-| Storm Halo    | 50%           | Adds 1–12 → 20–300 lightning to attacks and spells | Int     | Wrath         |
-| Frost Halo    | 50%           | Gain 10% → 19% of physical as extra cold           | Dex/Int | Hatred        |
-| Veil of Grace | 50%           | +60 → +1,700 evasion rating                        | Dex     | Grace         |
-| Iron Bastion  | 50%           | +20% → +39% more armour                            | Str     | Determination |
-| Arcane Ward   | 35%           | +60 → +500 max ES                                  | Int     | Discipline    |
-| Clear Mind    | 35 → 100 flat | +1.8 → 8 mana regen per second                     | Int     | Clarity       |
+| Name (ours)   | Reservation   | Effect at L1 → L20                                                                | Attr    | PoE analogue  |
+| ------------- | ------------- | --------------------------------------------------------------------------------- | ------- | ------------- |
+| Kindling Halo | 50%           | Adds 4–7 → 120–180 fire to attacks and spells                                     | Str     | Anger         |
+| Storm Halo    | 50%           | Adds 2–16 → 37–248 lightning to attacks; spells deal 15–21% more lightning damage | Int     | Wrath         |
+| Frost Halo    | 50%           | Gain 16% → 25% of physical as extra cold; 14–18% more cold damage                 | Dex/Int | Hatred        |
+| Veil of Grace | 50%           | +60 → +1,700 evasion rating                                                       | Dex     | Grace         |
+| Iron Bastion  | 50%           | +20% → +39% more armour                                                           | Str     | Determination |
+| Arcane Ward   | 35%           | +60 → +217 max ES; 30% increased ES recharge                                      | Int     | Discipline    |
+| Clear Mind    | 35 → 100 flat | +1.8 → 8 mana regen per second                                                    | Int     | Clarity       |
 
 ### 11.6 Flasks
 

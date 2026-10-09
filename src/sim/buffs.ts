@@ -22,6 +22,8 @@ import type { World } from './types';
  * engine's mods behind that condition apply. Rage is a count that drains when nothing feeds it.
  */
 
+const RAGE_GAIN_COOLDOWN = 0.4;
+
 /** Gain a buff, or refresh it to its full time. */
 export function gainBuff(w: World, id: BuffId): void {
   if (!w.char.buffSource[id]) return;
@@ -48,8 +50,14 @@ export function rollGains(w: World, event: BuffEvent, extra: readonly Mod[] = []
     const chance = ch.db.sum('base', buffStat(event, id)) + sumOf(extra, buffStat(event, id));
     if (chance > 0 && w.rngTrig.chance(Math.min(1, chance / 100))) gainBuff(w, id);
   }
-  if (ch.rageSource)
-    gainRage(w, ch.db.sum('base', rageStat(event)) + sumOf(extra, rageStat(event)));
+  if (ch.rageSource) {
+    // Rage from melee hits comes once in 0.4 s, however many enemies the swing hit.
+    if (event !== 'meleeHit' || w.t - w.rageGainT >= RAGE_GAIN_COOLDOWN) {
+      const pts = ch.db.sum('base', rageStat(event)) + sumOf(extra, rageStat(event));
+      if (pts > 0 && event === 'meleeHit') w.rageGainT = w.t;
+      gainRage(w, pts);
+    }
+  }
   for (const pool of RECOVER_POOLS) {
     const flat =
       ch.db.sum('base', recoverStat(event, pool)) + sumOf(extra, recoverStat(event, pool));

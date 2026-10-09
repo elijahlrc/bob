@@ -14,11 +14,10 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     tags: ['spell', 'projectile', 'area', 'lightning'],
     types: ['orb', 'totemable', 'trappable', 'mineable', 'triggerable', 'repeatable'],
     behaviour: {
-      kind: 'ground',
-      radius: 2.2,
-      duration: 2,
-      interval: 0.4,
-      reach: 9,
+      kind: 'projectile',
+      count: 1,
+      spread: 0,
+      range: 6,
     },
     spellDamage: [
       {
@@ -26,7 +25,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         spread: [0.1, 1.9],
       },
     ],
-    effectiveness: 45,
+    effectiveness: 60,
     castTime: 0.75,
     crit: 5,
     cost: [8, 22],
@@ -38,6 +37,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       },
     ],
     description: 'Looses a slow orb that strikes the ground around it with lightning.',
+    pulse: {
+      radius: 1.8,
+      interval: 0.35,
+      speed: 0.3,
+    },
   },
   {
     kind: 'active',
@@ -1414,7 +1418,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         },
       },
     ],
-    description: 'A ring of frost that spreads from you, hitting chilled enemies harder.',
+    description:
+      'A ring of frost that spreads from you, or from your Glacier Darts, hitting chilled enemies harder.',
+    castOn: {
+      skill: 'glacierDart',
+      max: 2,
+      areaLess: 20,
+    },
   },
   {
     kind: 'active',
@@ -1484,6 +1494,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
           length: 9,
           width: 5,
         },
+        ignite: 500,
       },
     },
     mods: [
@@ -1565,15 +1576,31 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         stat: 'chance.bleed',
         kind: 'base',
         value: 25,
+        condition: {
+          id: 'sandStance',
+          not: true,
+        },
       },
       {
         stat: 'damage',
         kind: 'more',
         value: [50, 88],
         tags: ['bleed'],
+        condition: {
+          id: 'sandStance',
+          not: true,
+        },
+      },
+      {
+        stat: 'aoe',
+        kind: 'inc',
+        value: 50,
+        condition: {
+          id: 'sandStance',
+        },
       },
     ],
-    description: 'Two sweeping slashes in a wide arc that may cause bleeding.',
+    description: 'Two sweeping slashes; bleeding in Blood Stance, a wider sweep in Sand Stance.',
   },
   {
     kind: 'active',
@@ -2190,7 +2217,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       kind: 'projectile',
       count: 5,
       spread: 140,
-      range: 7,
+      range: 11,
     },
     spellDamage: [
       {
@@ -2210,6 +2237,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       },
     ],
     description: 'Sends out sparks that skitter about in every direction.',
+    wander: {
+      turn: 6,
+    },
   },
   {
     kind: 'active',
@@ -2225,6 +2255,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       spread: 0,
       range: 8,
       returns: true,
+      pierce: 99,
     },
     baseMult: [80, 130],
     cost: [7, 9],
@@ -2761,6 +2792,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       spread: 0,
       range: 8,
       returns: true,
+      pierce: 99,
     },
     baseMult: [90, 130],
     cost: [7, 9],
@@ -3109,11 +3141,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     tags: ['spell', 'area', 'cold', 'duration', 'nova'],
     types: ['trappable', 'mineable', 'totemable', 'repeatable', 'triggerable', 'cascadable'],
     behaviour: {
-      kind: 'ground',
+      kind: 'burst',
       radius: 2.6,
-      duration: 3,
-      interval: 0.5,
-      reach: 6,
+      origin: 'self',
     },
     spellDamage: [
       {
@@ -3133,6 +3163,18 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       },
     ],
     description: 'A whirl of frost that sits where you place it and chills everything in it.',
+    leaves: {
+      kind: 'chilling',
+      seconds: 3,
+      radius: 2.6,
+      dps: 0.5,
+    },
+    cooldown: 1.8,
+    castOn: {
+      skill: 'glacierDart',
+      max: 5,
+      areaLess: 20,
+    },
   },
   {
     kind: 'active',
@@ -4314,6 +4356,16 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'inc',
         value: [20, 39],
       },
+      {
+        stat: 'stun.full',
+        kind: 'base',
+        value: 0.5,
+      },
+      {
+        stat: 'knockback',
+        kind: 'base',
+        value: 1.5,
+      },
     ],
     description: 'Leap to a target and slam down on it.',
   },
@@ -4418,6 +4470,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     requiresWeapon: ['dagger', 'claw', 'sword', 'axe'],
     mods: [],
     description: 'Spin through your target with your weapon out.',
+    travelThrough: true,
   },
   {
     kind: 'active',
@@ -4690,6 +4743,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       count: 3,
       spread: 25,
       range: 9,
+      pierce: 99,
     },
     spellDamage: [
       {
@@ -5452,6 +5506,14 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       },
     ],
     description: 'A mine that bursts in a storm when it goes off.',
+    mineAura: {
+      min: 0,
+      max: 0,
+      cap: 0,
+      radius: 3.5,
+      taken: 3,
+      takenCap: 150,
+    },
   },
   {
     kind: 'active',
@@ -5712,6 +5774,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       kind: 'summon',
       minion: 'zombie',
       count: [3, 7],
+      corpseCost: true,
     },
     description: 'Raises husks of the dead to fight beside you.',
   },
@@ -5974,15 +6037,16 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       kind: 'summon',
       minion: 'relic',
       count: 1,
-      ownerMods: [
-        {
-          stat: 'lifeRegen',
-          kind: 'base',
-          value: [3.5, 100],
-        },
-      ],
+      relic: {
+        radius: 2.6,
+        cooldown: 0.5,
+        regen: [3.5, 103],
+        minionRegen: [6, 309],
+        seconds: 1,
+      },
     },
-    description: 'Raises a relic that fires holy light and mends you.',
+    description:
+      'A relic that answers your attacks with a nova that hurts enemies and mends you and your minions.',
   },
   {
     kind: 'active',
@@ -6813,12 +6877,27 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.3,
     mods: [
       {
-        stat: 'buffOn.cast.arcaneSurge',
+        stat: 'surge.threshold',
+        kind: 'base',
+        value: [400, 15],
+      },
+      {
+        stat: 'buffOn.surge.arcaneSurge',
         kind: 'base',
         value: 100,
       },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [10, 19],
+        tags: ['spell'],
+        condition: {
+          id: 'arcaneSurge',
+        },
+      },
     ],
-    description: 'Casting the supported spell grants Arcane Tide.',
+    description:
+      'Spending enough mana on the supported spells grants Arcane Surge, which they also profit from.',
   },
   {
     kind: 'support',
@@ -7164,8 +7243,14 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         kind: 'base',
         value: 20,
       },
+      {
+        stat: 'buffOn.killShocked.innervation',
+        kind: 'base',
+        value: 100,
+      },
     ],
-    description: 'Adds a wide spread of lightning damage, and a chance to shock.',
+    description:
+      'Adds lightning damage and a chance to shock; killing a shocked enemy adds lightning to all your hits for a while.',
   },
   {
     kind: 'support',
@@ -8301,7 +8386,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     id: 'cindering',
     name: 'Cindering',
     attr: 'str',
-    supports: ['spell'],
+    supports: [],
     costMult: 1.3,
     mods: [
       {
@@ -8578,8 +8663,28 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         kind: 'base',
         value: 1,
       },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: [1, 3],
+        damageTypes: ['physical'],
+        per: {
+          stat: 'rage',
+          div: 10,
+        },
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: [2, 6],
+        damageTypes: ['physical'],
+        per: {
+          stat: 'rage',
+          div: 10,
+        },
+      },
     ],
-    description: 'Melee hits build Rage.',
+    description: 'Melee hits build rage, which adds physical damage to your attacks.',
   },
   {
     kind: 'support',
@@ -8705,15 +8810,14 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.3,
     mods: [],
     trigger: {
-      on: 'hitTaken',
-      chance: 100,
-      cooldown: 0.5,
-      threshold: 20,
+      on: 'stunned',
+      chance: 60,
+      cooldown: 0.25,
       effect: {
         kind: 'castSocketed',
       },
     },
-    description: 'Linked spells are cast when a heavy blow lands on you.',
+    description: 'Linked spells are cast when you are stunned.',
   },
   {
     kind: 'support',

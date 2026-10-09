@@ -2,8 +2,8 @@ import type { SkillChoice } from '../calc/character';
 import type { SkillProfile } from '../calc/skill';
 import { CHARGE_KINDS } from '../calc/charges';
 import { fireEffect } from './actions';
-import { gainBuff } from './buffs';
-import { chargeEnemy, gainBeamStack, orbAnswers } from './skillFx';
+import { gainBuff, rollGains } from './buffs';
+import { chargeEnemy, gainBeamStack, orbAnswers, relicNova } from './skillFx';
 import { shootFrom } from './deploy';
 import { spendCharges } from './charges';
 import { hit } from './combat';
@@ -107,6 +107,14 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
       echoMult = [...(echoMult ?? []), ...Array.from({ length: n }, () => m)];
     }
   }
+  // Arcane Surge: after the supported skills have spent enough mana the character gains it.
+  if (p.surgeThreshold > 0) {
+    w.surgeMana += p.cost;
+    if (w.surgeMana >= p.surgeThreshold) {
+      w.surgeMana -= p.surgeThreshold;
+      rollGains(w, 'surge', p.gains);
+    }
+  }
   // Inspiration: the mana a supported skill spends is counted, and the charges are lost when it passes the limit.
   if (p.inspire > 0) {
     w.inspireMana += p.cost;
@@ -185,6 +193,7 @@ function mirageShoots(w: World, m: Mirage): void {
 export function afterPlayerHit(w: World, dst: Actor, p: SkillProfile): void {
   // A skill whose hit gives the character a buff (Smite).
   if (p.skill.hitBuff && !p.skill.tags.includes('triggered')) gainBuff(w, p.skill.hitBuff.buff);
+  if (p.isAttack && !p.skill.tags.includes('triggered')) relicNova(w);
   if (!w.inFx) {
     if (p.skill.beams) gainBeamStack(w, p);
     if (p.skill.charge) chargeEnemy(w, dst, p);

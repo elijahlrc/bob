@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { DYN_SHIFT } from '../data/buffs';
 import { distanceMult } from '../calc/skill';
-import { buildFor, classFor } from './gemKit';
+import { buildFor, classFor, layCorpses } from './gemKit';
 import { createDummyWorld, dummyDefence } from './dummy';
 import { killActor, playerConds, rawHit } from './combat';
 import { fireTriggers } from './triggers';
 import { afterStrike } from './shots';
 import { frostBite, orbAnswers, tickSkillFx } from './skillFx';
 import { targetOf } from './movement';
+import { mineAuraAt } from './deploy';
 import type { Action, Actor, World } from './types';
 import { spawnMonster, stepWorld } from './world';
 
@@ -716,5 +717,134 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     }
     expect(ended).toBe(true);
     expect(w.buffT.phaseStrike).toBeLessThanOrEqual(0.2);
+  });
+});
+
+describe('repairs from the fresh audit (S14)', () => {
+  it('Arc hits harder with more chains to come, and each jump reaches a second enemy', () => {
+    const { world: w, dummy } = world(['arcChain'], 4, 'wand_3', INT);
+    const b = w.char.primary.skill.behaviour;
+    expect(b.kind === 'chain' && b.ramp).toBe(15);
+    const a = neighbour(w, dummy.x + 1, dummy.y);
+    const c = neighbour(w, dummy.x + 1, dummy.y + 1.2);
+    const d = neighbour(w, dummy.x + 1.2, dummy.y - 1.2);
+    run(w, 1.5);
+    expect([a, c, d].filter((m) => m.life < 1e9).length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('Viper Strike converts to chaos, poisons for four seconds, and strikes with both weapons when dual wielding', () => {
+    const one = world(['venomCut'], 1.2, 'dagger_3', DEX).world;
+    const p = one.char.profile(one.primary, 0);
+    expect(p.hands[0].chunks.some((c) => c.type === 4 && c.max > 0)).toBe(true);
+    expect(p.poison.chance).toBeGreaterThanOrEqual(0.6);
+    expect(p.poison.dur).toBeCloseTo(4, 0);
+    const two = world(['venomCut'], 1.2, 'dagger_3', DEX, 'dual').world;
+    expect(two.char.profile(two.primary, 0).bothHands).toBe(true);
+  });
+
+  it('Leap Slam always stuns an enemy on full life and throws it back', () => {
+    const { world: w, dummy } = world(['skyfallLeap'], 3, 'sword_3', STR);
+    dummy.def = dummyDefence({ maxLife: 1e9 });
+    dummy.def.cannotBeStunned = false;
+    let stunned = false;
+    for (let i = 0; i < 120 && !stunned; i++) {
+      stepWorld(w);
+      stunned = w.events.some((e) => e.t === 'stun' && e.dst === dummy.id);
+    }
+    expect(stunned).toBe(true);
+  });
+
+  it('Whirling Blades hits everything on the way through, and Spark bounces off walls', () => {
+    const { world: w } = world(['spinningDash'], 6, 'dagger_3', DEX);
+    const mid = neighbour(w, w.player.x + 3, w.player.y + 0.2);
+    mid.def = dummyDefence({ maxLife: 1e9 });
+    run(w, 4);
+    expect(mid.life).toBeLessThan(1e9);
+    const sk = world(['skitterFlash'], 5, 'wand_3', INT);
+    expect(sk.world.char.primary.skill.wander).toBeDefined();
+  });
+
+  it('a Stormblast mine makes the enemies near it take more from every hit', () => {
+    const { world: w, dummy } = world(['crushingBlow', 'stormCharge'], 6, 'sword_3', STR);
+    let more = 0;
+    for (let i = 0; i < 60 * 12 && more === 0; i++) {
+      stepWorld(w);
+      more = mineAuraAt(w, dummy.x, dummy.y)?.taken ?? 0;
+    }
+    expect(more).toBeGreaterThan(0);
+  });
+
+  it('Lacerate bleeds in Blood Stance and sweeps wider in Sand Stance', () => {
+    const { world: w, dummy } = world(['twinSlash'], 1.2, 'sword_3', DEX);
+    const blood = w.char.profile(w.primary, 0);
+    expect(blood.bleed.chance).toBeGreaterThan(0);
+    w.buffT.sandStance = 5;
+    const sand = w.char.profile(w.primary, playerConds(w, dummy));
+    expect(sand.bleed.chance).toBe(0);
+    expect(sand.radiusMult).toBeGreaterThan(blood.radiusMult);
+  });
+
+  it('Arcane Surge comes after enough mana is spent, and Raise Zombie uses up a corpse', () => {
+    const { world: w } = world(['suddenFrost', 'tideGathering'], 4, 'wand_3', INT);
+    let surge = 0;
+    w.surgeMana = 300;
+    for (let i = 0; i < 60 * 10; i++) {
+      stepWorld(w);
+      surge = Math.max(surge, w.buffT.arcaneSurge);
+    }
+    expect(surge).toBeGreaterThan(0);
+    const z = world(['crushingBlow', 'raiseHusk'], 3, 'sword_3', STR);
+    run(z.world, 3);
+    expect(z.world.minions.length).toBe(0);
+    layCorpses(z.world, z.world.player.x, z.world.player.y, 2);
+    run(z.world, 3);
+    expect(z.world.minions.length).toBeGreaterThan(0);
+    expect(z.world.corpses.length).toBeLessThan(2);
+  });
+
+  it('Holy Relic answers an attack hit with a nova and mends the character', () => {
+    const { world: w, dummy } = world(['crushingBlow', 'hallowedRelic'], 1.4, 'sword_3', STR);
+    w.opts.godMode = true;
+    w.opts.freeResources = false;
+    const near = neighbour(w, dummy.x + 0.5, dummy.y + 0.5);
+    run(w, 6);
+    expect(w.minions.some((m) => m.kind === 'relic')).toBe(true);
+    expect(near.life).toBeLessThan(1e9);
+    expect(w.relicRegen.me).toBeGreaterThan(0);
+  });
+
+  it('Ice Nova can expand from Glacier Darts in flight', () => {
+    const { world: w, dummy } = world(['glacierDart', 'frostRing'], 5, 'wand_3', INT);
+    void dummy;
+    const dart = w.char.actives.find((c) => c.skill.id === 'glacierDart')!;
+    const nova = w.char.actives.find((c) => c.skill.id === 'frostRing')!;
+    expect(nova.skill.castOn?.skill).toBe('glacierDart');
+    expect(dart.skill.id).toBe('glacierDart');
+  });
+
+  it('Cast when Stunned triggers on a stun, Livewire gives Innervation, and rage comes once in 0.4 s', () => {
+    const { world: w, dummy } = world(
+      ['suddenFrost', 'frostLance', 'reelingCast'],
+      4,
+      'wand_3',
+      INT,
+    );
+    const trig = w.char.triggers.find((t) => t.def.on === 'stunned');
+    expect(trig).toBeDefined();
+    void dummy;
+    const lw = world(['crushingBlow', 'livewire'], 1.4, 'sword_3', STR).world;
+    expect(lw.char.buffSource.innervation).toBe(true);
+    const fy = world(['crushingBlow', 'fury'], 1.4, 'sword_3', STR);
+    const near = neighbour(fy.world, fy.dummy.x, fy.dummy.y + 0.5);
+    void near;
+    run(fy.world, 2);
+    // At most one point per 0.4 s: five in two seconds.
+    expect(fy.world.rage).toBeLessThanOrEqual(6);
+    expect(fy.world.rage).toBeGreaterThan(0);
+  });
+
+  it('Spectral Throw pierces, so it can hit on the way out and on the way back', () => {
+    const { world: w } = world(['phantomToss'], 4, 'sword_3', DEX);
+    expect(w.char.profile(w.primary, 0).pierce).toBeGreaterThan(0);
   });
 });

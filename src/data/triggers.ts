@@ -20,7 +20,9 @@ export type TriggerOn =
   /** The player blocks a hit. */
   | 'block'
   /** The player takes damage (see `threshold`). */
-  | 'hitTaken';
+  | 'hitTaken'
+  /** The character is stunned. */
+  | 'stunned';
 
 export type TriggerEffect =
   /** Cast one of the active spells socketed in the same item. */
@@ -118,6 +120,8 @@ export function triggerCause(t: TriggerDef): string {
       return `when you kill ${t.targetHas ? `a ${TARGET_WORD[t.targetHas]} enemy` : 'an enemy'}`;
     case 'block':
       return 'when you block';
+    case 'stunned':
+      return 'when you are stunned';
     case 'hitTaken':
       return `when you take damage (after ${t.threshold ?? 0}% of maximum life)`;
   }

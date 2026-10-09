@@ -25,9 +25,9 @@ import { tickBanner } from './banners';
 import { tickCaught, tickWarp, tickWither } from './blinks';
 import { tickLegion, tickOffering } from './minionFx';
 import { tickSupports } from './supportFx';
-import { tickBlasphemy } from './hexes';
 import { tickSkillFx } from './skillFx';
 import { tickBerserk, tickDegen, tickStance } from './stances';
+import { tickBlasphemy } from './hexes';
 import { tickProliferation } from './proliferate';
 import { tickFields } from './fields';
 import { reservedMana } from './reserve';
@@ -168,6 +168,10 @@ export function createWorld(inp: CreateWorldInput): World {
     staticFx: null,
     shell: null,
     virulence: 0,
+    surgeMana: 0,
+    relicRegen: { t: 0, me: 0, minions: 0 },
+    relicT: -1,
+    rageGainT: -1,
     trailT: 0,
     vortex: null,
     markers: [],

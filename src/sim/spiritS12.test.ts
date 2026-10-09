@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { makeItem } from '../gen/items';
-import { buildFor, classFor } from './gemKit';
+import { buildFor, classFor, layCorpses } from './gemKit';
 import { createDummyWorld, dummyDefence } from './dummy';
 import type { Minion } from './minions';
 import type { World } from './types';
@@ -110,6 +110,7 @@ describe('Carrion Colossus (carrionColossus)', () => {
       STR,
     );
     dummy.rarity = 'boss';
+    layCorpses(w, dummy.x, dummy.y, 20);
     for (let i = 0; i < 8 * 60; i++) {
       stepWorld(w);
       if (

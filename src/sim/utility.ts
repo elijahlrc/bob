@@ -1,6 +1,6 @@
 import { skillRange, type SkillChoice } from '../calc/character';
 import type { SkillProfile } from '../calc/skill';
-import { hexEffect } from '../data/hexes';
+import { hexEffect, hexSeconds } from '../data/hexes';
 import { actorById } from './actions';
 import { bannerAction, useBanner } from './banners';
 import { blinkCast, blinkGroupBusy } from './blinks';
@@ -22,7 +22,7 @@ import {
   summonMinions,
   summonRespawn,
 } from './minions';
-import { corpseNear } from './factions';
+import { corpseNear, takeCorpse } from './factions';
 import { castOffering, guardianDrop, offeringWanted } from './minionFx';
 import { startShell } from './skillFx';
 import type { Action, Actor, World } from './types';
@@ -127,7 +127,7 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
         return { choice: c, prof, cd: 0.5 };
       }
       // A spectre needs a corpse to raise, an animated weapon one on the ground that the character can spare.
-      if (u.corpse && !corpseNear(w, p.x, p.y, CAST_RANGE)) continue;
+      if ((u.corpse || u.corpseCost) && !corpseNear(w, p.x, p.y, CAST_RANGE)) continue;
       if (u.animate) {
         if (!animatableDrop(w, c, CAST_RANGE)) continue;
         return { choice: c, prof, cd: 0.5 };
@@ -231,7 +231,11 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
         const v =
           levelValue(s.v, c.skill.level) +
           levelValue(s.perNearby ?? 0, c.skill.level) * (near.length - 1);
-        applyStatus(w, e, s.id, { seconds: s.seconds * w.char.db.mult('buffDuration'), v, x: s.x });
+        applyStatus(w, e, s.id, {
+          seconds: s.seconds * w.char.db.mult('buffDuration') * act.profile.skillDuration,
+          v,
+          x: s.x,
+        });
       }
     return;
   }
@@ -264,7 +268,10 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     }
     // The buff's own length is the gem's: a utility buff lasts as long as its gem says.
     const length = u.seconds * (1 + ((u.consume?.durationPct ?? 0) / 100) * spent);
-    w.buffT[u.buff] = Math.max(before, length * w.char.db.mult('buffDuration'));
+    w.buffT[u.buff] = Math.max(
+      before,
+      length * w.char.db.mult('buffDuration') * act.profile.skillDuration,
+    );
     if (u.second) w.buffT[u.second.buff] = Math.max(0, w.buffT[u.buff]);
     // A guard's cooldown does not run while it lasts, and the other guards wait out the same time.
     if (u.policy === 'guard') {
@@ -288,7 +295,14 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     } else if (u.animate) {
       const drop = animatableDrop(w, c, CAST_RANGE);
       if (drop) animateWeapon(w, c, act.profile, drop);
-    } else summonMinions(w, c, act.profile);
+    } else {
+      if (u.corpseCost) {
+        const corpse = corpseNear(w, a.x, a.y, CAST_RANGE);
+        if (!corpse) return;
+        takeCorpse(w, corpse);
+      }
+      summonMinions(w, c, act.profile);
+    }
     return;
   }
   const target = actorById(w, act.targetId);
@@ -296,7 +310,15 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
   if (u.kind === 'curse') {
     const effect = hexEffect(u.hex, c.skill.level) * w.char.db.mult('curseEffect');
     for (const e of enemiesNear(w, target.x, target.y, u.radius))
-      applyHex(w, e, u.hex, Math.round(effect * 10) / 10, w.char.hexLimit, c.skill.level);
+      applyHex(
+        w,
+        e,
+        u.hex,
+        Math.round(effect * 10) / 10,
+        w.char.hexLimit,
+        c.skill.level,
+        hexSeconds(u.hex, c.skill.level) * act.profile.skillDuration,
+      );
     return;
   }
   // Blink: land next to the target, a little inside the primary skill's reach (src/sim/blinks.ts).

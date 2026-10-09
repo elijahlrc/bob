@@ -1067,6 +1067,11 @@ export class Character {
         this.configConds = maskOr(this.configConds, this.cond.peek(id));
     for (const [id, tag] of WIELD_CONDS)
       if (this.weaponTags.has(tag)) this.configConds = maskOr(this.configConds, this.cond.peek(id));
+    // Two weapons or a shield in hand: the sheet takes them as held.
+    if (this.dualWielding)
+      this.configConds = maskOr(this.configConds, this.cond.peek('dualWielding'));
+    if (this.holdingShield)
+      this.configConds = maskOr(this.configConds, this.cond.peek('holdingShield'));
     // A skill that picks an element for each use: the sheet takes it as fire.
     if (this.actives.some((a) => a.usable && a.skill.element))
       this.configConds = maskOr(this.configConds, this.cond.peek('elemFire'));
@@ -1631,7 +1636,7 @@ export class Character {
     const cd0 = choice.skill.cooldown;
     if (cd0 === undefined) return undefined;
     const p = this.profile(choice, conds);
-    let rate = Math.max(0.1, this.db.mult('cooldownRecovery')) / Math.max(0.05, cd0);
+    let rate = Math.max(0.1, p.cooldownRecovery) / Math.max(0.05, cd0);
     const b = choice.skill.bypass;
     if (b) {
       let chance = 0;
@@ -1854,6 +1859,9 @@ export function volleyHits(p: SkillProfile, distance: number): number {
       hits = Math.max(1, Math.min(p.projectiles, 1 + 2 * within));
     }
   }
+  // A projectile that pierces and comes back hits a target in its path on both legs.
+  if (b.kind === 'projectile' && b.returns && p.pierce > 0)
+    hits *= 2 + (p.skill.returnMore ?? 0) / 100;
   if (p.skill.cone) hits += p.skill.cone.mult / 100;
   // Pods fall in a scatter around the target: a standing target is inside the burst of some of them.
   const pods = p.skill.pods;

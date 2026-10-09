@@ -12,6 +12,7 @@ import { STATUSES } from '../data/statuses';
 import { MINIONS } from '../data/minions';
 import { triggerCause, triggerText } from '../data/triggers';
 import { modsText } from '../mods/text';
+import { auraFxLines, fxLines, utilityFxLines } from './gemFx';
 
 export type GemCardData = {
   name: string;
@@ -231,7 +232,11 @@ function behaviourLines(b: SkillBehaviour, level: number): string[] {
     }
     case 'chain': {
       const n = b.chains + (b.chainsPer5 ?? 0) * per5;
-      return [`Chains ${n} time${n === 1 ? '' : 's'}`];
+      return [
+        `Chains ${n} time${n === 1 ? '' : 's'}`,
+        ...(b.ramp ? [`${b.ramp}% more damage for each chain still to come`] : []),
+        ...(b.fork ? ['Each chain also reaches a second enemy beside the first'] : []),
+      ];
     }
     case 'burst':
       return [
@@ -268,8 +273,10 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
     }
     if (def.castTime) stats.push(`Cast time ${num(def.castTime)} s`);
     if (def.crit) stats.push(`Base critical chance ${num(def.crit)}%`);
-    if (def.utility) stats.push(...utilityLines(def, level).stats);
+    if (def.utility)
+      stats.push(...utilityLines(def, level).stats, ...utilityFxLines(def.utility, level));
     else stats.push(...behaviourLines(def.behaviour, level));
+    stats.push(...fxLines(def, level));
     if (def.travel) stats.push(`Carries you up to ${num(def.travel)} toward the target`);
     if (def.ballista) stats.push('A ballista: its totems attack at half speed');
     if (def.mortar)
@@ -322,6 +329,8 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
       stats.push(
         `Stands on every enemy you hit, and reserves ${def.blasphemy.reservePct}% of your mana`,
       );
+    if (def.limitWeapon)
+      stats.push(`Only works with ${def.limitWeapon.map(tagLabel).join(' or ')} weapons`);
     const extra = Math.round((def.costMult - 1) * 100);
     if (extra) stats.push(`${extra > 0 ? '+' : ''}${extra}% mana cost of the supported skill`);
     effects = [
@@ -334,6 +343,7 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
     if (def.reserveFlat)
       stats.push(`Reserves ${Math.round(levelValue(def.reserveFlat, level))} mana`);
     for (const t of def.triggers ?? []) stats.push(triggerText(t));
+    stats.push(...auraFxLines(def, level));
     effects = modsText(gemMods(def.mods, level, def.id));
     // A stance has two sets of effects, one for each stance; the character swaps by policy (a crowd: the Sand stance).
     if (def.stance) {

@@ -17,12 +17,7 @@
     "def": { "kind": "support", "id": "crueltyEdge", "name": "Cruelty Edge", "attr": "int", "supports": [], "costMult": 1.3, "mods": [
       { "stat": "critMulti", "kind": "base", "value": [75, 103] } ],
       "description": "Increases the critical strike multiplier of the supported skill." } },
-  { "ref": "Innervate Support", "note": "Adds lightning damage, with a chance to shock (the buff after killing a shocked enemy is dropped).",
-    "def": { "kind": "support", "id": "livewire", "name": "Livewire", "attr": "int", "supports": [], "excludes": ["trap", "mine", "totem"], "costMult": 1.3, "mods": [
-      { "stat": "damage.min", "kind": "base", "value": [2, 40], "damageTypes": ["lightning"] },
-      { "stat": "damage.max", "kind": "base", "value": [12, 520], "damageTypes": ["lightning"] },
-      { "stat": "chance.shock", "kind": "base", "value": 20 } ],
-      "description": "Adds a wide spread of lightning damage, and a chance to shock." } },
+  {"ref":"Innervate Support","note":"Adds lightning damage and a chance to shock; killing a shocked enemy gives Innervation for eight seconds, which adds lightning damage to every hit.","def":{"kind":"support","id":"livewire","name":"Livewire","attr":"int","supports":[],"excludes":["trap","mine","totem"],"costMult":1.3,"mods":[{"stat":"damage.min","kind":"base","value":[2,40],"damageTypes":["lightning"]},{"stat":"damage.max","kind":"base","value":[12,520],"damageTypes":["lightning"]},{"stat":"chance.shock","kind":"base","value":20},{"stat":"buffOn.killShocked.innervation","kind":"base","value":100}],"description":"Adds lightning damage and a chance to shock; killing a shocked enemy adds lightning to all your hits for a while."}},
   { "ref": "Iron Grip Support", "note": "Projectile attacks: the skill has the strength bonus of Iron Grip (the physical damage of its projectile attacks rises with Strength), and its projectile damage is higher.",
     "def": { "kind": "support", "id": "firmHold", "name": "Firm Hold", "attr": "str", "supports": ["projectile", "attack"], "needs": ["attack"], "costMult": 1, "mods": [
       { "stat": "ironGrip", "kind": "flag", "value": 1 },

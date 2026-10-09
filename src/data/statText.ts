@@ -150,8 +150,10 @@ export const CONDITION_TEXT: Record<string, string> = {
   targetIgnited: 'against Ignited Enemies',
   targetShocked: 'against Shocked Enemies',
   targetFullLife: 'against Enemies on Full Life',
+  cursedFrost: 'against enemies cursed with Rime Sap',
   smiteAura: 'while the lightning aura of your strike lasts',
   phaseStrike: 'while Phase Run lasts',
+  innervation: 'while Innervated',
   elemFire: 'when the use is fire',
   elemCold: 'when the use is cold',
   elemLightning: 'when the use is lightning',
@@ -539,6 +541,11 @@ Object.assign(STAT_TEXT, {
   },
   'minion.defensive': { flag: 'Minions stay close to you and go for the enemies near you' },
   'minion.nearMore': { base: 'Minions deal {v}% more damage to enemies near you' },
+  'stun.full': { base: 'Hits always stun enemies on full life, for {v} seconds' },
+  'surge.threshold': { base: 'Gain Arcane Surge after spending {v} mana with supported skills' },
+  'poison.baseDur': {
+    base: 'Poison lasts {v} seconds, longer or shorter with skill effect duration',
+  },
   'bleed.baseDur': {
     base: 'Bleeding lasts {v} seconds, longer or shorter with skill effect duration',
   },
@@ -567,6 +574,8 @@ Object.assign(STAT_TEXT, {
 const MORE_EVENTS: Record<string, string> = {
   use: 'when you use this Skill',
   killFrozen: 'when you Kill a Frozen Enemy',
+  killShocked: 'when you Kill a Shocked Enemy',
+  surge: 'when you have spent enough mana',
   stun: 'when you Stun an Enemy',
   cast: 'when you Cast a Spell',
   meleeHit: 'on Melee Hit',

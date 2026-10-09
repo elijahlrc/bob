@@ -63,6 +63,20 @@ export function releaseChannel(w: World, a: Actor): void {
   let p = scaleProfile(st.profile, f);
   p = grown(p, (r.radiusPerStage ?? 0) * st.stage);
   if (r.behaviour) p = { ...p, skill: { ...p.skill, behaviour: r.behaviour } };
+  if (r.ignite !== undefined) {
+    const more = 1 + r.ignite / 100;
+    p = {
+      ...p,
+      ignite: { ...p.ignite, chance: 1 },
+      hands: p.hands.map((h) => ({
+        ...h,
+        ailChunks: h.ailChunks.map((c) => ({
+          ...c,
+          k: [c.k[0] * more, c.k[1], c.k[2]] as [number, number, number],
+        })),
+      })),
+    };
+  }
   if (r.repeat) {
     // One extra strike for each stage built, each at the full bonus (Blade Flurry).
     const q = scaleProfile(st.profile, 1 + ((spec.perStage ?? 0) * spec.cap) / 100);

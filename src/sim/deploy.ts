@@ -40,7 +40,15 @@ export type Deployable = {
   /** Set off by a skitterbot: it arms itself again afterwards. */
   rearm?: boolean;
   /** What the aura of a mine adds to the hits against the enemies near it. */
-  aura?: { double: number; min: number; max: number; cap: number; radius: number };
+  aura?: {
+    double: number;
+    min: number;
+    max: number;
+    cap: number;
+    radius: number;
+    taken?: number;
+    takenCap?: number;
+  };
 };
 
 /** How long each kind of deployable stands, in seconds (the skill bar counts down over this). */
@@ -114,6 +122,8 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
           max: mineAura ? levelValue(mineAura.max, c.skill.level) : 0,
           cap: mineAura ? levelValue(mineAura.cap, c.skill.level) : 0,
           radius: mineAura?.radius ?? MINE_RADIUS,
+          taken: mineAura?.taken ?? 0,
+          takenCap: mineAura?.takenCap ?? 0,
         }
       : undefined;
   const put = (x: number, y: number) => {
@@ -285,7 +295,9 @@ export function mineAuraAt(
   w: World,
   x: number,
   y: number,
-): { double: number; min: number; max: number } | null {
+): { double: number; min: number; max: number; taken: number } | null {
+  let taken = 0;
+  let takenCap = 0;
   let double = 0;
   let min = 0;
   let max = 0;
@@ -294,13 +306,20 @@ export function mineAuraAt(
     const a = d.aura;
     if (!a || d.kind !== 'mine' || Math.hypot(d.x - x, d.y - y) > a.radius) continue;
     double += a.double;
+    taken += a.taken ?? 0;
+    takenCap = Math.max(takenCap, a.takenCap ?? 0);
     min += a.min;
     max += a.max;
     cap = Math.max(cap, a.cap);
   }
-  if (double <= 0 && max <= 0) return null;
+  if (double <= 0 && max <= 0 && taken <= 0) return null;
   const k = cap > 0 && max > cap ? cap / max : 1;
-  return { double: Math.min(100, double), min: min * k, max: max * k };
+  return {
+    double: Math.min(100, double),
+    min: min * k,
+    max: max * k,
+    taken: takenCap > 0 ? Math.min(takenCap, taken) : taken,
+  };
 }
 
 /** The extra damage the aura of a mine adds to a hit that landed (fire, from Pyroclast). */

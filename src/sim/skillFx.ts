@@ -7,6 +7,8 @@ import { makeMinion } from './minions';
 import { enemiesOf } from './actions';
 import { hit, playerConds, rawHit } from './combat';
 import { corpseBlast } from './triggers';
+import { MINIONS, MINION_ENEMY_RES } from '../data/minions';
+import { spellBaseDamage } from '../data/constants';
 import { applySkillDot } from './skillDots';
 import type { Action, Actor, Projectile, World } from './types';
 
@@ -108,6 +110,30 @@ export function projectileFx(w: World, pr: Projectile, dt: number): void {
       pr.vx = Math.cos(heading + turn) * speed;
       pr.vy = Math.sin(heading + turn) * speed;
     }
+  }
+  // A drifting orb hurts what is about it every so often.
+  if (sk.pulse) {
+    pr.pulseT = (pr.pulseT ?? 0) - dt;
+    if (pr.pulseT <= 0) {
+      pr.pulseT += sk.pulse.interval;
+      const r = sk.pulse.radius * pr.profile.radiusMult;
+      w.events.push({ t: 'explode', x: pr.x, y: pr.y, r, dtype: 1 });
+      for (const e of w.actors)
+        if (
+          !e.isPlayer &&
+          e.alive &&
+          e.phaseT <= 0 &&
+          Math.hypot(e.x - pr.x, e.y - pr.y) <= r + e.r
+        )
+          hit(w, w.player, e, pr.profile, pr.hand, Math.hypot(e.x - w.player.x, e.y - w.player.y));
+    }
+  }
+  // A wanderer turns this way and that.
+  if (sk.wander) {
+    const heading = Math.atan2(pr.vy, pr.vx) + w.rngCombat.float(-1, 1) * sk.wander.turn * dt;
+    const speed = Math.hypot(pr.vx, pr.vy);
+    pr.vx = Math.cos(heading) * speed;
+    pr.vy = Math.sin(heading) * speed;
   }
   const carried = pr.profile.skillDot?.spec.carried;
   if (carried)
@@ -267,6 +293,7 @@ function tickCharged(w: World, dt: number): void {
 
 /** Every step: the buffs and debuffs the single skills keep. */
 export function tickSkillFx(w: World, dt: number): void {
+  if (w.relicRegen.t > 0) tickRelicRegen(w, dt);
   if (w.shell) tickShell(w);
   if (w.staticFx) tickBeams(w, dt);
   if (w.char.frostSpec) tickFrostTrail(w, dt);
@@ -779,4 +806,69 @@ function tickShell(w: World): void {
       Math.hypot(e.x - p.x, e.y - p.y) <= s.radius + e.r
     )
       rawHit(w, e, dmg, 3, 'Molten Shell');
+}
+
+// ---- Holy Relic: a nova when the character hits with an attack, and regeneration for those it helps
+
+/** The character hit with an attack: a relic that stands sets off its nova (not more than once in its cooldown). */
+export function relicNova(w: World): void {
+  const relic = w.minions.find((m) => m.kind === 'relic' && m.alive);
+  if (!relic) return;
+  const c = w.char.utilities.find((x) => x.key === relic.key);
+  const u = c?.skill.utility;
+  if (!c || u?.kind !== 'summon' || !u.relic) return;
+  if (w.t - w.relicT < u.relic.cooldown) return;
+  w.relicT = w.t;
+  const spec = u.relic;
+  const level = c.skill.level;
+  const r = spec.radius * w.char.profile(c, 0).radiusMult;
+  w.events.push({ t: 'explode', x: relic.x, y: relic.y, r, dtype: 0 });
+  const amount =
+    spellBaseDamage(relic.level) * (MINIONS.relic.nova ?? 0) * relic.dmg * MINION_ENEMY_RES;
+  for (const e of w.actors)
+    if (
+      !e.isPlayer &&
+      e.alive &&
+      e.phaseT <= 0 &&
+      Math.hypot(e.x - relic.x, e.y - relic.y) <= r + e.r
+    )
+      rawHit(w, e, amount, 0, 'Relic', 'minion');
+  w.relicRegen = {
+    t: spec.seconds,
+    me: levelValue(spec.regen, level),
+    minions: levelValue(spec.minionRegen, level),
+  };
+}
+
+function tickRelicRegen(w: World, dt: number): void {
+  const g = w.relicRegen;
+  g.t -= dt;
+  const p = w.player;
+  if (p.alive)
+    p.life = Math.min(Math.max(1, p.def.maxLife - w.char.reservedLife), p.life + g.me * dt);
+  for (const m of w.minions) if (m.alive) m.life = Math.min(m.def.maxLife, m.life + g.minions * dt);
+}
+
+// ---- Ice Nova: cast on the character's Frostbolt projectiles
+
+/** The spell is cast on the character's projectiles of the named skill, when there are any: a burst about each (up to the most). */
+export function novaOnBolts(w: World, a: Actor, act: Action): boolean {
+  const p = act.profile;
+  const spec = p.skill.castOn!;
+  const bolts = w.projectiles
+    .filter((pr) => pr.owner === a.id && pr.profile.skill.id === spec.skill)
+    .slice(0, spec.max);
+  if (bolts.length === 0) return false;
+  const b = p.skill.behaviour;
+  const r = (b.kind === 'burst' ? b.radius : 2) * p.radiusMult * (1 - spec.areaLess / 100);
+  const struck = new Set<number>();
+  for (const pr of bolts) {
+    w.events.push({ t: 'explode', x: pr.x, y: pr.y, r, dtype: mainType(act) });
+    for (const e of enemiesOf(w, a))
+      if (!struck.has(e.id) && e.phaseT <= 0 && Math.hypot(e.x - pr.x, e.y - pr.y) <= r + e.r) {
+        struck.add(e.id);
+        hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
+      }
+  }
+  return true;
 }

@@ -157,7 +157,7 @@
       "ref": "Raise Spectre",
       "name": "Bind Shade",
       "kind": "active",
-      "verdict": "faithful",
+      "verdict": "drifted",
       "confidence": "medium",
       "milestone": null,
       "missing": [],
@@ -179,7 +179,8 @@
         ],
         "check": "The audit's PoE line holds against the wiki, and its missing list is still right (the monster's own skills come with raise_from_corpse_type). The 1-to-2 count scaling in Bob matches, but a generic chaos-bolt shade that ignores the corpse is still gutted.",
         "decision": "The character cannot pick a corpse in an autobattler. Which rule should choose the monster: the most recent kill, the strongest or highest-level kill, or a monster type the player selects in the loadout?"
-      }
+      },
+      "accepted": "Open (the user's say): a spectre keeps only its monster's damage factor, rate and range, not its abilities; the nearest corpse is raised."
     },
     "bladeWind": {
       "ref": "Swordstorm",
@@ -627,7 +628,7 @@
       "ref": "Melee Physical Damage Support",
       "name": "Brute Force",
       "kind": "support",
-      "verdict": "faithful",
+      "verdict": "drifted",
       "confidence": "medium",
       "milestone": null,
       "missing": [],
@@ -636,7 +637,8 @@
         "bob": "More melee physical damage (melee tag, physical type). Melee-tagged mods never reach ailment damage (DESIGN 6.6), so the bleed/poison half of the PoE gem is absent.",
         "repair": "Optional: also give the multiplier to bleed and poison damage."
       },
-      "verified": false
+      "verified": false,
+      "accepted": "Open: the extra poison and bleed damage from melee hits is missing; ailments take no melee tag in Bob (the 3.9 rule as read in the first audit)."
     },
     "bulwarkRush": {
       "ref": "Shield Charge",
@@ -1797,7 +1799,7 @@
       "ref": "Critical Strike Affliction Support",
       "name": "Festering Crit",
       "kind": "support",
-      "verdict": "faithful",
+      "verdict": "drifted",
       "confidence": "medium",
       "milestone": null,
       "missing": [],
@@ -1806,7 +1808,8 @@
         "bob": "More damage tagged dot, gated on the critRecently condition, plus an extra crit chance bonus. The DoT tag reaches the ailment chunks and critRecently is read from the player's tCrit, so ailments applied soon after a crit hit harder. Approximates 'applied by a crit' with 'recently crit'.",
         "repair": ""
       },
-      "verified": false
+      "verified": false,
+      "accepted": "Not a 3.9 gem: as of 3.9 the page is Poison Support, which Toxin Coat already stands for."
     },
     "fieldOfCharges": {
       "ref": "Minefield Support",
@@ -3272,7 +3275,7 @@
       "ref": "Mirror Arrow",
       "name": "Mirror Quiver",
       "kind": "active",
-      "verdict": "faithful",
+      "verdict": "drifted",
       "confidence": "medium",
       "milestone": null,
       "missing": [],
@@ -3281,7 +3284,8 @@
         "bob": "Summons a bow clone for 3 s that shoots enemies; it appears next to the player instead of at the arrow's landing point.",
         "repair": "None needed."
       },
-      "verified": false
+      "verified": false,
+      "accepted": "Open (the user's say): the clone is a generic archer, not a copy that uses the character's bow and gear."
     },
     "mortarBow": {
       "ref": "Artillery Ballista",
@@ -3753,7 +3757,7 @@
       "ref": "Bladefall",
       "name": "Rain of Steel",
       "kind": "active",
-      "verdict": "faithful",
+      "verdict": "drifted",
       "confidence": "medium",
       "milestone": null,
       "missing": [],
@@ -3762,7 +3766,8 @@
         "bob": "Ground zone at the target (radius 2.5, 1.5 s, pulses every 0.3 s = 5 volleys) with +100% crit chance. The per-volley widening and damage fall-off are not modelled, so all five hit the same circle at equal strength.",
         "repair": "Optional: per-pulse radius growth and damage decay on ground behaviours."
       },
-      "verified": false
+      "verified": false,
+      "accepted": "Open (the user's say): the five volleys are identical; the original's each get wider and weaker."
     },
     "raiseHusk": {
       "ref": "Raise Zombie",
@@ -3995,7 +4000,7 @@
       "ref": "Creeping Frost",
       "name": "Rime Drift",
       "kind": "active",
-      "verdict": "faithful",
+      "verdict": "drifted",
       "confidence": "low",
       "milestone": null,
       "missing": [],
@@ -4004,7 +4009,8 @@
         "bob": "A 3 s cold ground zone at the target pulsing every 0.5 s, with increased chill effect (real: effect.chill is consumed, cold hits can chill). It is stationary and has no projectile or creeping, but the lasting chilling-field loop is there.",
         "repair": "Optionally let a ground zone drift toward the nearest enemy."
       },
-      "verified": false
+      "verified": false,
+      "accepted": "Open (the user's say): a stationary zone of repeated hits, not a projectile that leaves a creeping, damaging chilled area."
     },
     "rimeHerald": {
       "ref": "Herald of Ice",
@@ -4239,7 +4245,7 @@
         "check": "The audit already flagged this as not verified; confirmed absent from 3.9 (the wiki returns no revision at that date), so the gem should leave the 3.9 repair plan and not be given a fidelity spec.",
         "decision": "Not a 3.9 gem: remove it from the repair plan, and from the game, or keep it as a Bob original chaos variant of Drain Trap (then it simply copies whatever Drain Trap is repaired to, with chaos damage and poison)?"
       },
-      "accepted": "Not in 3.9 (The audit already flagged this as not verified; confirmed absent from 3.9 (the wiki returns no revision at that date), so the gem should leave the 3.9 repair plan and not be given a fidelity spec.)"
+      "accepted": "Not a 3.9 gem (the reference page is later); it stays as Bob's own variant of Siphoning Trap."
     },
     "rotStride": {
       "ref": "Withering Step",

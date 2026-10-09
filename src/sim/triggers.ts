@@ -23,6 +23,7 @@ export type TriggerEvent =
   | { on: 'cast'; target: Actor; tags: number }
   | { on: 'kill'; target: Actor; tags: number }
   | { on: 'block' }
+  | { on: 'stunned' }
   | { on: 'hitTaken'; damage: number };
 
 export const MAX_EXPLOSIONS_PER_TICK = 20;

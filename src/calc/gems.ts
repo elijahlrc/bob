@@ -128,6 +128,7 @@ export type SkillDef = SkillFx & {
       radiusPerStage?: number;
       behaviour?: SkillBehaviour;
       repeat?: boolean;
+      ignite?: number;
     };
   };
   /** Arrows that fall around the target and each leave a spore pod: it afflicts and slows what is near, then bursts (Toxic Rain). */
@@ -153,7 +154,8 @@ export type SkillDef = SkillFx & {
   ancestral?: { buff: BuffId; range: number; mods: GemMod[] };
   bond?: { width: number; range: number; end: number };
   mineRain?: { count: number; perPrior: number; radius: number; spread: number };
-  mineAura?: { min: LevelValue; max: LevelValue; cap: LevelValue; radius: number };
+  mineAura?: ActiveGemDef['mineAura'];
+  travelThrough?: boolean;
   detonation?: number;
 
   form?: { after: number; speed: number; critMore: number; critMulti: LevelValue };
@@ -315,6 +317,7 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     needsCorpse: def.needsCorpse,
     geyser: def.geyser,
     deploySeconds: def.deploySeconds,
+    travelThrough: def.travelThrough,
     ballista: def.ballista,
     mortar: def.mortar,
     ancestral: def.ancestral,

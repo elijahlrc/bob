@@ -5,17 +5,22 @@ into `src/` (DESIGN §3): names and text from the reference game live only in `d
 
 ## Files
 
-| File                    | What it is                                                                                                  | Made by                         |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------- |
-| `reference-3.9.0.json`  | Every gem and unique in scope: name, class, tags, release version, wiki page, current wiki mod text         | `npm run coverage:fetch`        |
-| `pob-skills.json`       | 3.9-era numbers for every gem: skill types, stats, level 1 and level 20 values, mana cost, effectiveness    | `npm run coverage:pob -- <dir>` |
-| `pob-uniques.json`      | 3.9-era unique item lines, with their `{variant:N}` markers                                                 | `npm run coverage:pob -- <dir>` |
-| `map.json`              | Bob id → reference name, status and a note. Hand-maintained: every droppable Bob gem and unique has a line  | by hand                         |
-| `bucket-overrides.json` | Optional `{"Reference name": "bucket"}` fixes to the keyword bucket tagging (`scripts/coverage/buckets.ts`) | by hand                         |
+| File                    | What it is                                                                                                                                                                                                                   | Made by                                                         |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `reference-3.9.0.json`  | Every gem and unique in scope: name, class, tags, release version, wiki page, current wiki mod text                                                                                                                          | `npm run coverage:fetch`                                        |
+| `pob-skills.json`       | 3.9-era numbers for every gem: skill types, stats, level 1 and level 20 values, mana cost, effectiveness                                                                                                                     | `npm run coverage:pob -- <dir>`                                 |
+| `pob-uniques.json`      | 3.9-era unique item lines, with their `{variant:N}` markers                                                                                                                                                                  | `npm run coverage:pob -- <dir>`                                 |
+| `map.json`              | Bob id → reference name, status and a note. Hand-maintained: every droppable Bob gem and unique has a line                                                                                                                   | by hand                                                         |
+| `spirit.json`           | The spirit ledger (docs/SPIRIT.md): for every mapped gem, the loop it has in the reference game, what Bob's version does, the verdict (faithful, drifted, gutted), what is missing, the 3.9 spec and whether it was verified | `npm run spirit` prints it; edited by hand or by the milestones |
+| `bucket-overrides.json` | Optional `{"Reference name": "bucket"}` fixes to the keyword bucket tagging (`scripts/coverage/buckets.ts`)                                                                                                                  | by hand                                                         |
 
 `reference-*.json` and `pob-*.json` are in `.prettierignore`: they are generated, not formatted.
 
 ## Commands
+
+- `npm run spirit` prints the spirit ledger's counts (faithful, drifted, gutted, and what is still open);
+  `scripts/spirit/spirit.test.ts` checks the ledger is sound. `tsx scripts/spirit/dump-batches.ts <dir>` writes the join of
+  every gem with its 3.9 reference, for a re-audit (docs/SPIRIT.md S14).
 
 - `npm run coverage` prints coverage by category, bucket and milestone (`-- --list` also lists what is uncovered).
   `scripts/coverage/coverage.test.ts` checks that `map.json` is sound: every Bob id is mapped and every mapping points

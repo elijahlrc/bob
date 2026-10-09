@@ -97,13 +97,13 @@ export const activeGem = (id: string): ActiveGemDef => {
 export type GemRun = { world: World; dummy: Actor; effects: Set<string> };
 
 /** What a gem that works on something lying about is given to work on: a corpse for a spectre, a plain sword on the ground. */
-export function seedFor(def: ActiveGemDef, world: World, dummy: Actor): void {
-  const u = def.utility;
-  if (u?.kind === 'summon' && u.corpse)
+/** Lay corpses beside a spot, for the skills that use them up. */
+export function layCorpses(world: World, x: number, y: number, n = 1): void {
+  for (let i = 0; i < n; i++)
     world.corpses.push({
       id: world.nextId++,
-      x: dummy.x + 1,
-      y: dummy.y,
+      x: x + 1,
+      y: y + i * 0.3,
       age: 0,
       spec: { type: 'warrior', variant: 'none', rarity: 'normal', level: 10, mods: [] },
       room: -1,
@@ -111,6 +111,12 @@ export function seedFor(def: ActiveGemDef, world: World, dummy: Actor): void {
       name: 'Warrior',
       life: 200,
     });
+}
+
+export function seedFor(def: ActiveGemDef, world: World, dummy: Actor): void {
+  const u = def.utility;
+  if (u?.kind === 'summon' && (u.corpse || u.corpseCost))
+    layCorpses(world, dummy.x, dummy.y, u.corpseCost ? 20 : 1);
   else if (u?.kind === 'summon' && u.warden)
     world.drops.push({
       id: world.nextId++,

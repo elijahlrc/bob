@@ -76,7 +76,17 @@ export type SkillBehaviour =
       meleeUnless?: SkillTag;
       meleeRange?: number;
     }
-  | { kind: 'chain'; range: number; chains: number; chainsPer5?: number; chainRange: number }
+  | {
+      kind: 'chain';
+      range: number;
+      chains: number;
+      chainsPer5?: number;
+      chainRange: number;
+      /** Percent more damage for each chain still to come (the first hit is the strongest). */
+      ramp?: number;
+      /** Each chain also reaches a second enemy near the one it jumps to, which does not chain further. */
+      fork?: boolean;
+    }
   /**
    * An instant area. `origin` 'target' (the default) centres it on the target (slams, item-granted skills; `reach` is how
    * close the caster must be, default the radius); 'self' is a nova around the caster.
@@ -233,8 +243,21 @@ export type UtilityDef =
       ownerMods?: GemMod[];
       /** Enemies within this many tiles of it go for it instead of the character (Decoy Totem). */
       taunt?: number;
+      /**
+       * A relic that stays near the character: when the character hits with an attack it sets off a nova of `radius` tiles (at most
+       * once in `cooldown` s) that hurts the enemies, and the character and the minions regenerate life for `seconds` s.
+       */
+      relic?: {
+        radius: number;
+        cooldown: number;
+        regen: LevelValue;
+        minionRegen: LevelValue;
+        seconds: number;
+      };
       /** Skitterbots: the first is a chilling bot, the second a shocking one; their auras reach `radius` tiles at these strengths (percent), and the skill holds `reserve` percent of the mana. */
       skitter?: { radius: number; chill: LevelValue; shock: LevelValue; reserve: number };
+      /** Uses up a corpse near the character for each cast, whatever the minions are (Raise Zombie). */
+      corpseCost?: boolean;
       /** Raised from a corpse: the minion is that monster, at this level (Raise Spectre). */
       corpse?: { level: LevelValue };
       /** Made from a weapon lying on the ground that is used up by it (Animate Weapon); the cap on its item level, the damage and speed it adds. */
@@ -371,6 +394,12 @@ export type SkillFx = {
   };
   /** The released arrow leaves a pod for each stage along its way; `delay` seconds later each blooms into `arrows` thorns (Scourge Arrow). */
   sporePods?: { arrows: number; less: number; range: number; delay: number };
+  /** The spell is cast on up to `max` of the character's projectiles of this skill instead of the character, with `areaLess` percent less area (Ice Nova on Frostbolt). */
+  castOn?: { skill: string; max: number; areaLess: number };
+  /** The projectile wanders: it turns about at random as it flies, and bounces off walls (Spark). */
+  wander?: { turn: number };
+  /** The projectile is a slow orb that hurts every enemy within `radius` of it every `interval` seconds as it drifts, and does not stop on one (Ball Lightning). */
+  pulse?: { radius: number; interval: number; speed: number };
   /** The character regains life and mana a second while enemies carry the skill's debuff: a flat amount, and more for each of them (Siphoning Trap). */
   siphon?: { life: LevelValue; lifeEach: LevelValue; mana: LevelValue; manaEach: LevelValue };
 };
@@ -389,6 +418,9 @@ export const FX_KEYS = [
   'fuse',
   'sporePods',
   'siphon',
+  'castOn',
+  'wander',
+  'pulse',
 ] as const satisfies readonly (keyof SkillFx)[];
 
 export type ActiveGemDef = SkillFx & {
@@ -459,6 +491,8 @@ export type ActiveGemDef = SkillFx & {
       radiusPerStage?: number;
       behaviour?: SkillBehaviour;
       repeat?: boolean;
+      /** The release always ignites, for this percent more ignite damage (Incinerate's final wave). */
+      ignite?: number;
     };
   };
   /** A strike that, when it lands, sends more out: bolts from the weapon, blades from behind the enemy, balls that land and burst. */
@@ -489,9 +523,19 @@ export type ActiveGemDef = SkillFx & {
   bond?: { width: number; range: number; end: number };
   /** A mine that, going off, also sends projectiles raining down around it; and an aura that adds fire damage to hits near it. */
   mineRain?: { count: number; perPrior: number; radius: number; spread: number };
-  mineAura?: { min: LevelValue; max: LevelValue; cap: LevelValue; radius: number };
+  mineAura?: {
+    min: LevelValue;
+    max: LevelValue;
+    cap: LevelValue;
+    radius: number;
+    /** Percent more damage an enemy near each mine takes from the character's hits, and the most. */
+    taken?: number;
+    takenCap?: number;
+  };
   /** Seconds between a mine being set off and its going (0.25 by default). */
   detonation?: number;
+  /** The character dashes through its target: everything within a body of the way is hit once on the way (Whirling Blades). */
+  travelThrough?: boolean;
   /** The skill cannot be used without a corpse (Pyre Burst). */
   needsCorpse?: boolean;
   /** A corpse made into a geyser that fires projectiles for a while, after exploding for a share of the corpse's life (Pyre Burst). */
@@ -707,8 +751,11 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
     mods: [
       { stat: 'stunDuration', kind: 'inc', value: 25 },
       { stat: 'stunDamage', kind: 'inc', value: 25 },
+      { stat: 'knockback', kind: 'base', value: 1.2 },
+      { stat: 'doubleDamage', kind: 'base', value: 20 },
     ],
-    description: 'A single heavy blow that staggers its target.',
+    description:
+      'A single heavy blow that staggers its target, throws it back, and sometimes hits twice as hard.',
   },
   {
     kind: 'active',
@@ -746,14 +793,20 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
     skillType: 'attack',
     tags: ['attack', 'melee', 'strike'],
     behaviour: { kind: 'melee', range: 1.4 },
-    baseMult: [100, 130],
+    baseMult: [90, 135],
     cost: [1, 7],
+    bothWeapons: true,
     mods: [
-      { stat: 'chance.poison', kind: 'base', value: 40 },
-      { stat: 'damage', kind: 'more', value: 25, tags: ['poison'] },
+      { stat: 'convertSkill.physical.chaos', kind: 'base', value: 50 },
+      { stat: 'damage.min', kind: 'base', value: [5, 169], damageTypes: ['chaos'] },
+      { stat: 'damage.max', kind: 'base', value: [7, 254], damageTypes: ['chaos'] },
+      { stat: 'chance.poison', kind: 'base', value: 60 },
+      { stat: 'poison.baseDur', kind: 'base', value: 4 },
+      { stat: 'damage', kind: 'more', value: -20, condition: { id: 'dualWielding' } },
+      { stat: 'attackSpeed', kind: 'more', value: -30, condition: { id: 'dualWielding' } },
     ],
     requiresWeapon: ['dagger', 'claw', 'sword'],
-    description: 'A quick cut that leaves a lingering venom.',
+    description: 'A quick cut that poisons; with two weapons it strikes with both.',
   },
   {
     kind: 'active',
@@ -778,7 +831,15 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
     attr: 'int',
     skillType: 'spell',
     tags: ['spell', 'chaining', 'lightning'],
-    behaviour: { kind: 'chain', range: 7, chains: 2, chainsPer5: 1, chainRange: 4 },
+    behaviour: {
+      kind: 'chain',
+      range: 7,
+      chains: 2,
+      chainsPer5: 1,
+      chainRange: 4,
+      ramp: 15,
+      fork: true,
+    },
     spellDamage: [{ type: 'lightning', min: [2, 70], max: [20, 650] }],
     effectiveness: 80,
     castTime: 0.8,
@@ -898,10 +959,10 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
     supports: ['projectile'],
     costMult: 1.5,
     mods: [
-      { stat: 'projectiles', kind: 'base', value: 2 },
-      { stat: 'damage', kind: 'more', value: -25, tags: ['projectile'] },
+      { stat: 'projectiles', kind: 'base', value: 4 },
+      { stat: 'damage', kind: 'more', value: [-35, -26], tags: ['projectile'] },
     ],
-    description: 'Two additional projectiles at reduced damage.',
+    description: 'Four additional projectiles at reduced damage.',
   },
   {
     kind: 'support',
@@ -983,7 +1044,7 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
     id: 'kindle',
     name: 'Kindle',
     attr: 'str',
-    supports: ['attack'],
+    supports: [],
     costMult: 1.2,
     mods: [
       {
@@ -1001,17 +1062,17 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
         condition: { id: 'targetIgnited' },
       },
     ],
-    description: 'Adds fire damage to the attack against enemies that burn.',
+    description: 'Adds fire damage to the skill against enemies that burn.',
   },
   {
     kind: 'support',
     id: 'bloodthirst',
     name: 'Bloodthirst',
     attr: 'str',
-    supports: ['attack'],
+    supports: [],
     costMult: 1.3,
-    mods: [{ stat: 'leech.life', kind: 'base', value: 2, tags: ['attack'] }],
-    description: 'Attack damage is leeched as life.',
+    mods: [{ stat: 'leech.life', kind: 'base', value: 2 }],
+    description: 'Damage the skill deals is leeched as life.',
   },
   {
     kind: 'support',

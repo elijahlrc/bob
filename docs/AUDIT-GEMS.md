@@ -1,6 +1,6 @@
 # Bob — Spirit audit of the gems against PoE 3.9.0
 
-Status: **done 2026-10-08; corrected the same day (see the erratum), repair plan in [SPIRIT.md](SPIRIT.md)**. Read-only: no gem, engine or balance value was changed. It follows [COVERAGE.md](COVERAGE.md) and
+Status: **done 2026-10-08; corrected the same day (see the erratum); repaired by the plan in [SPIRIT.md](SPIRIT.md) and audited again at its end (second section)**. Read-only: no gem, engine or balance value was changed. It follows [COVERAGE.md](COVERAGE.md) and
 [AUDIT-3.9.md](AUDIT-3.9.md) (which audited mechanics, not gems).
 
 ## Why
@@ -1559,3 +1559,30 @@ The reviewers judged these to keep the reason to use them. Low-confidence ones a
 - **Pack Haste** (Minion Speed Support) · support: minionSpeed inc multiplies the minion's movement speed and its attack rate (m.speed in tickMinions). Works.
 - **Frenzied Pack** (Feeding Frenzy Support) · support · _low confidence_: Averaged into permanent minion damage and a flat minion speed. The buff's uptime from minion hits is not modelled, but in PoE uptime is high when minions fight, so the net is similar. The aggro radius bonus is irrelevant because minions seek enemies 14 tiles away anyway.
 - **Hexing Strikes** (Hextouch Support) · support · _low confidence_: hexOnHit: the hex gems in the same item as the primary skill are applied to enemies hit (deriveHexes). Scoped to the primary skill's item only for choosing the hexes, but they are applied by all of the character's hits, and share the one-hex limit.
+
+---
+
+## Second audit (S14, 2026-10-08)
+
+After the repair plan ([SPIRIT.md](SPIRIT.md)) was built, the gems were audited again by the same process, with reviewers who were **not shown the old verdicts**
+or the plan: seven reviewers each took 40 to 51 gems (`tsx scripts/spirit/dump-batches.ts` writes the batches: the 3.9 data, Bob's definition and the
+port note), judged each against the code as it stood, and read the 3.9 wiki where it let them (it served a Cloudflare challenge for part of the run, and several
+reviewers fell back on the Path of Building numbers; their findings were checked again afterwards).
+
+|                            | Faithful | Drifted | Gutted |   Total |
+| -------------------------- | -------: | ------: | -----: | ------: |
+| First audit                |      155 |     133 |     38 |     326 |
+| Second audit, as reviewed  |  **288** |  **37** |  **1** | **326** |
+| After the repairs it found |      316 |      10 |      0 |     326 |
+
+What the reviewers found was mostly small and real: a support whose cooldown recovery never reached its skill (Advanced Traps), two returning projectiles that did
+not pierce and so never returned, Arc without its second arc, the trigger of Cast when Stunned, Heavy Strike without its knockback and double damage, Viper
+Strike without its chaos conversion, Lacerate without its stance trade, Raise Zombie without its corpse, Greater Multiple Projectiles with half its
+projectiles, and a few more. They are repaired (the list, with what was done, is the `disposition` field of
+[`docs/coverage/audit2.json`](coverage/audit2.json), which holds all 326 findings). Two of the reviewers' findings were wrong and are recorded as such (they judged
+from the later gem of the same name).
+
+Ten gems remain `drifted` in the ledger, each with an `accepted` line that says why: Enhance (no gem quality), four gems that are not 3.9 gems (Cluster Bolt, Ghost Coil,
+Siphoning Trap of Pain, Critical Strike Affliction), and five that wait for the user's say, because the repair is large or a choice: Raise Spectre (a spectre keeps only its monster's
+damage, rate and range, not its abilities), Mirror Arrow (a clone that uses the character's own bow and gear), Melee Physical Damage (more bleed and poison from
+melee hits), Bladefall (volleys that widen and weaken) and Creeping Frost (a projectile that leaves a creeping chilled area).

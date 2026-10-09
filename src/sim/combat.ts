@@ -59,6 +59,7 @@ import {
   sumSkillDots,
 } from './skillDots';
 import { corpseBlast, fireTriggers } from './triggers';
+import { scaleProfile } from './shots';
 import { chargedDeath, frostBite, gainVirulence, shellTakes } from './skillFx';
 import { spawnMonster } from './world';
 import type { Actor, Dot, World } from './types';
@@ -545,6 +546,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     dst.action = null;
     src.tStunEnemy = 0;
     w.events.push({ t: 'stun', dst: dst.id, dur: res.stun });
+    if (dst.isPlayer) fireTriggers(w, { on: 'stunned' });
     if (src.isPlayer) {
       rollGains(w, 'stun', p.gains);
       rollCharges(w, 'stun', p.gains);
@@ -666,11 +668,17 @@ export function hit(
     };
   // The mines near an enemy give the hits against it a chance to deal double damage, and some fire damage.
   const aura = src.isPlayer && w.deployables.length > 0 ? mineAuraAt(w, dst.x, dst.y) : null;
+  // Enemies near mines of Stormblast type take more from every hit.
+  if (aura && aura.taken > 0) p = scaleProfile(p, 1 + aura.taken / 100);
   if (aura && aura.double > 0)
     p = { ...p, doubleChance: Math.min(1, p.doubleChance + aura.double / 100) };
   // A charge counts the distance it ran, not the distance to the enemy.
   if (p.distMore?.travel && src.isPlayer) dist = w.lastTravel;
+  const wasFull = dst.life >= dst.def.maxLife - 0.5;
   const res = resolveHit(w.rngCombat, p, h, ts, dist, canStun, undefined, w.critLock ?? undefined);
+  // A hit of Leap Slam always stuns an enemy that was on full life.
+  if (p.stunFull > 0 && wasFull && canStun && res.outcome === 'hit' && res.stun < p.stunFull)
+    res.stun = p.stunFull;
   applyHit(w, src, dst, p, res);
   if (aura && aura.max > 0 && dst.alive) mineAuraHit(w, dst);
 }
@@ -865,6 +873,7 @@ export function killActor(w: World, a: Actor): void {
     const gains = causes.get(a)?.gains ?? [];
     rollCharges(w, 'kill', gains);
     if (a.ail.freezeT > 0) rollCharges(w, 'killFrozen', gains);
+    if (a.ail.shock > 0) rollGains(w, 'killShocked', gains);
     rollGains(w, 'kill', gains);
     bannerStage(w, 'kill');
     refreshOnKill(w);
