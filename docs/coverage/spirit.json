@@ -1107,33 +1107,6 @@
         "check": "Audit PoE line holds in spirit. Corrected numbers: the near bonus in 3.9 is up to 30% more (the engine's closeQuarters curve starts at 1.5x, which is the old 50% value), plus a separate 0-38% increased projectile damage; Bob's gem applies 20-38% MORE only to nearby targets, with no far penalty."
       }
     },
-    "clusterBolt": {
-      "ref": "Kinetic Blast of Clustering",
-      "name": "Cluster Bolt",
-      "kind": "active",
-      "verdict": "drifted",
-      "confidence": "medium",
-      "milestone": null,
-      "missing": [],
-      "audit": {
-        "poe": "(From poedb, current version; no PoB data.) A wand shot that makes several explosions; it adds physical damage equal to a share of your maximum mana and takes spell-damage scaling at 150% on the attack (arcane might), so it is a mana-scaling caster wand attack.",
-        "bob": "A wand projectile with one wide burst (area increase 10-40%) at 110-140%; nothing scales with maximum mana and no spell-damage conversion (the engine has a spellIncAppliesToAttacks flag that is unused here), and there is a single explosion rather than a cluster.",
-        "repair": "Add base physical damage as a percent of maximum mana (and use the existing spell-increase-on-attacks flag at partial strength); optionally several offset explosions."
-      },
-      "verified": false,
-      "spec": {
-        "page": null,
-        "status": "not-in-3.9",
-        "lines": [
-          "There is no wiki revision of \"Kinetic Blast of Clustering\" at 2020-03-12 and its release version is blank in the reference list: it is a later transfigured variant, not a 3.9 gem. The mana-scaling line in the audit describes that later gem. [wiki]",
-          "The 3.9 relative is Kinetic Blast: a wand attack (intelligence); the projectile creates 4 small explosions around its point of impact, spread over four arcs. [wiki][pob]",
-          "Each explosion deals 35% less area damage; 120% (level 1) to 147% (level 20) of base attack damage; 0 to 19% increased area of effect; mana 15 to 16. [wiki][pob]",
-          "Every enemy the projectile touches (pierce, chain, fork) produces 4 more explosions; each extra projectile adds 4 more. [wiki]"
-        ],
-        "check": "The gem is not a 3.9 gem, so it should leave the plan; its 3.9 base, Kinetic Blast, is already mapped to Bob's scatterBolt in docs/coverage/map.json, which is where the cluster-of-4 repair belongs."
-      },
-      "accepted": "Not in 3.9 (The gem is not a 3.9 gem, so it should leave the plan; its 3.9 base, Kinetic Blast, is already mapped to Bob's scatterBolt in docs/coverage/map.json, which is where the cluster-of-4 repair belongs.)"
-    },
     "crackleRing": {
       "ref": "Lightning Tendrils",
       "name": "Crackle Ring",
@@ -1795,22 +1768,6 @@
         "check": "Corrected: the verdict moves from drifted to faithful because both defining effects (more spell damage, increased spell crit chance) survive and only the 10% rider vs rares/uniques is dropped (still optional). The 3.9 wiki says nothing about the ground weakening curses, so that part of the audit line is unconfirmed [memory] and is dropped."
       }
     },
-    "festeringCrit": {
-      "ref": "Critical Strike Affliction Support",
-      "name": "Festering Crit",
-      "kind": "support",
-      "verdict": "drifted",
-      "confidence": "medium",
-      "milestone": null,
-      "missing": [],
-      "audit": {
-        "poe": "Ailments (DoTs) inflicted by critical strikes deal more damage over time (a damage-over-time multiplier on crit-applied ailments) (poedb, 3.27 numbers; memory for 3.9).",
-        "bob": "More damage tagged dot, gated on the critRecently condition, plus an extra crit chance bonus. The DoT tag reaches the ailment chunks and critRecently is read from the player's tCrit, so ailments applied soon after a crit hit harder. Approximates 'applied by a crit' with 'recently crit'.",
-        "repair": ""
-      },
-      "verified": false,
-      "accepted": "Not a 3.9 gem: as of 3.9 the page is Poison Support, which Toxin Coat already stands for."
-    },
     "fieldOfCharges": {
       "ref": "Minefield Support",
       "name": "Field of Charges",
@@ -2332,32 +2289,6 @@
         "repair": "None (engine-wide single-target dedupe)."
       },
       "verified": false
-    },
-    "ghostCoil": {
-      "ref": "Spectral Helix",
-      "name": "Ghost Coil",
-      "kind": "active",
-      "verdict": "drifted",
-      "confidence": "low",
-      "milestone": null,
-      "missing": [],
-      "audit": {
-        "poe": "(From poedb, current version; no PoB data.) Throws a spectral weapon that spirals outward through about 4 rotations and bounces off walls up to three times (extra projectiles become bounces).",
-        "bob": "The same returning projectile as Phantom Toss (out and back, hits both legs); no spiral, no wall bounces.",
-        "repair": "Give the projectile a spiral path and wall bounces in place of the plain return, with extra projectiles adding bounces."
-      },
-      "verified": false,
-      "spec": {
-        "page": null,
-        "status": "not-in-3.9",
-        "lines": [
-          "The wiki has no 'Spectral Helix' page as of 2020-03-12, nor as of 2021-01-01; the page exists only in later revisions. [wiki]",
-          "PoB 3.9 (v1.4.155) holds no skill data for it. [pob]",
-          "Later-version description (not 3.9, unverified here): a spectral weapon spiralling outward and bouncing off walls. [memory]"
-        ],
-        "check": "The audit's PoE line came from current poedb and describes a post-3.9 gem; it is not a 3.9 gem, so it should leave the repair plan (Bob's returning projectile is its own invention). It is the same out-and-back projectile as Phantom Toss."
-      },
-      "accepted": "Not in 3.9 (The audit's PoE line came from current poedb and describes a post-3.9 gem; it is not a 3.9 gem, so it should leave the repair plan (Bob's returning projectile is its own invention). It is the same out-and-back projectile as Phantom Toss.)"
     },
     "ghostShard": {
       "ref": "Spectral Shield Throw",
@@ -4219,33 +4150,6 @@
         ],
         "check": "Holds (the audit row was already corrected for the shotgun point). One extra note for the repair: Bob's numbers are far from 3.9, with 4 extra projectiles at 20-30% less damage versus 3 extra at 68-62% less, plus the attack-time cost."
       }
-    },
-    "rotDrainTrap": {
-      "ref": "Siphoning Trap of Pain",
-      "name": "Rot Drain Trap",
-      "kind": "active",
-      "verdict": "drifted",
-      "confidence": "low",
-      "milestone": null,
-      "missing": [],
-      "audit": {
-        "poe": "No 3.9 data (the poedb page lists it as a later transfigured gem). It is a chaos variant of Siphoning Trap: a trap whose beams damage and drain enemies while feeding you. From memory, not verified.",
-        "bob": "A chaos ground zone (radius 2.2, 3 s) with 50% poison chance and a 1% life leech; as with Drain Trap, the per-enemy feeding is just a small leech.",
-        "repair": "Same as Drain Trap: owner regen scaling with enemies in the zone."
-      },
-      "verified": false,
-      "spec": {
-        "page": null,
-        "status": "not-in-3.9",
-        "lines": [
-          "No wiki revision of 'Siphoning Trap of Pain' exists at 2020-03-12 and no PoB 3.9 skill matches; it is a later transfigured variant of Siphoning Trap, so there is no 3.9 behaviour to specify [wiki]",
-          "Lead only: poedb lists Siphoning Trap of Pain as a later transfigured gem (post-3.9 league content), a chaos variant of Siphoning Trap [memory, not verified]",
-          "The 3.9 base gem it derives from is Siphoning Trap: see drainTrap for the beams, regen and 10-target cap [wiki]"
-        ],
-        "check": "The audit already flagged this as not verified; confirmed absent from 3.9 (the wiki returns no revision at that date), so the gem should leave the 3.9 repair plan and not be given a fidelity spec.",
-        "decision": "Not a 3.9 gem: remove it from the repair plan, and from the game, or keep it as a Bob original chaos variant of Drain Trap (then it simply copies whatever Drain Trap is repaired to, with chaos damage and poison)?"
-      },
-      "accepted": "Not a 3.9 gem (the reference page is later); it stays as Bob's own variant of Siphoning Trap."
     },
     "rotStride": {
       "ref": "Withering Step",
@@ -6472,64 +6376,6 @@
         "repair": "None."
       },
       "verified": false
-    },
-    "wakeBlades": {
-      "ref": "Animate Weapon",
-      "name": "Wake Blades",
-      "kind": "active",
-      "verdict": "faithful",
-      "confidence": "medium",
-      "milestone": null,
-      "missing": [],
-      "audit": {
-        "poe": "Animates weapons you found into timed minions that use the item's stats; you feed it good drops.",
-        "bob": "Summons 2-5 generic blades for 37 s with minion damage from the gem level; the animated item and its stats are not involved.",
-        "repair": "Source the blades' damage from a chosen or equipped weapon item."
-      },
-      "verified": true,
-      "spec": {
-        "page": "Animate Weapon",
-        "status": "confirmed",
-        "lines": [
-          "Animates an identified melee weapon lying on the ground into a flying minion. The weapon is permanently consumed, ranged weapons are not allowed, and the weapon's item level must not exceed the gem's cap (9 at level 1, 100 at level 20). [wiki][pob]",
-          "The minion counts as using the original weapon. It takes minion modifiers and weapon supports (for example Elemental Damage with Attacks), but none of the player's own damage or weapon modifiers. [wiki]",
-          "The gem adds 4 to 6 physical damage to its attacks at level 1, up to 38 to 56 at level 20, and 0 to 38% increased attack speed. A 'deals 100 to 252% of damage' line is on the gem, but the 3.10 notes say it did nothing. [wiki][pob]",
-          "Base duration is 37.5 s and up to 50 animated weapons can exist at once (the cap is the number of weapons you feed it). Cast time 0.8 s, mana 7 at level 1, 26 at level 20. [wiki][pob]",
-          "Animated weapons fly, so ground effects cannot hurt them, and they can pass over other monsters. [wiki]",
-          "The 2-to-5 blade count in Bob looks like the 3.10 rework (5 to 14 weapons, 40 s, animated around the target). It is not the 3.9 mechanic. [wiki]"
-        ],
-        "check": "The audit's PoE line holds. Bob's 37 s timer matches the 3.9 duration (37.5 s). The gap is the item: each 3.9 blade is a consumed weapon, and its own stats drive the minion rather than the character's.",
-        "decision": "In PoE the weapon comes off the ground and is destroyed. Where should Bob source it: a spare weapon from the inventory that is consumed, a copy of the equipped weapon at no cost, or a generated weapon from the gem level? The answer also settles Wake Sentinel."
-      }
-    },
-    "wakeSentinel": {
-      "ref": "Animate Guardian",
-      "name": "Wake Sentinel",
-      "kind": "active",
-      "verdict": "faithful",
-      "confidence": "medium",
-      "milestone": null,
-      "missing": [],
-      "audit": {
-        "poe": "Animates a guardian that wears the weapons and armour you give it and gains their stats; dressing the guardian is the whole point.",
-        "bob": "One generic melee sentinel minion; no item is animated or worn.",
-        "repair": "Let the guardian take stats from a selected spare item."
-      },
-      "verified": true,
-      "spec": {
-        "page": "Animate Guardian",
-        "status": "confirmed",
-        "lines": [
-          "Animates identified items from the ground, one cast per item (cast time 0.6 s, mana 11 at level 1, 20 at level 20). All items attach to a single invisible Guardian, so there is only ever one. [wiki][pob]",
-          "Items allowed: helmet, body armour, gloves, boots, shield and melee weapons (two one-handers dual wield). Ranged weapons are excluded, and so are items containing gems. The item's requirement level must be within the gem's cap (33 at level 1, 100 at level 20). [wiki][pob]",
-          "Item modifiers apply to the Guardian as they would to a player (life, regeneration, resistances, auras and so on), but item-granted skills do not work. A new item of a slot already filled overwrites the old one, and each new armour piece restores 25% of its life. [wiki]",
-          "Items are consumed on animating. If the Guardian dies, its items are deleted for good; if it only despawns (gem unequipped), they come back. The Guardian persists across logout. [wiki]",
-          "The gem adds 22 to 34 flat physical damage at level 1, up to 56 to 84 at level 20. It adds up to 76% increased minion life and 76% increased melee physical damage. [wiki][pob]",
-          "The Guardian has no duration timer. [pob]"
-        ],
-        "check": "The audit's PoE line holds: the gem is used by feeding the Guardian equipment, and an item on the ground is the cast target. I added the numbers and rules (slots, requirement-level cap, 25% life per armour piece, loss on death only). A generic melee sentinel that has no items and consumes nothing keeps the verdict at gutted.",
-        "decision": "Same question as Wake Blades: which item does Bob animate (a spare inventory item that is consumed, or a copy of what the character wears)? Should the Guardian lose its gear when it dies, as in PoE?"
-      }
     },
     "warchiefTotem": {
       "ref": "Ancestral Warchief",

@@ -10,11 +10,6 @@
     "def": { "kind": "support", "id": "bloodRefund", "name": "Blood Refund", "attr": "str", "supports": ["attack"], "costMult": 1.5, "mods": [
       { "stat": "lifeOnHit", "kind": "base", "value": [3, 22] } ],
       "description": "Attacks restore life for each enemy they hit." } },
-  { "ref": "Critical Strike Affliction Support", "note": "More critical strike chance, and ailments from critical strikes deal more damage over time.",
-    "def": { "kind": "support", "id": "festeringCrit", "name": "Festering Crit", "attr": "dex", "supports": [], "costMult": 1.2, "mods": [
-      { "stat": "critChance", "kind": "inc", "value": [30, 49] },
-      { "stat": "damage", "kind": "more", "value": [25, 44], "tags": ["dot"], "condition": { "id": "critRecently" } } ],
-      "description": "More critical strike chance, and damaging ailments caused by crits hurt more." } },
   { "ref": "Ruthless Support", "note": "Every third use of the melee attack is a Ruthless Blow: much more melee damage, much more bleed damage, and a stun.",
     "def": { "kind": "support", "id": "mercilessCadence", "name": "Merciless Cadence", "attr": "str", "supports": ["melee"], "needs": ["attack"], "excludes": ["channelling"], "costMult": 1.1, "mods": [
       { "stat": "ruthless.more", "kind": "base", "value": [75, 132] },

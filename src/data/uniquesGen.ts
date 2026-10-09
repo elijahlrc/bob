@@ -8989,14 +8989,6 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
       m('es', 'inc', 150, 190, { local: true }),
       m('life', 'base', 60, 90),
     ],
-    triggers: [
-      {
-        on: 'kill',
-        chance: 10,
-        cooldown: 1,
-        effect: { kind: 'castGranted', skillId: 'wakeBlades', level: 18 },
-      },
-    ],
     flavour: 'The dead drop their blades; the blades do not stay dropped.',
   },
   {
@@ -10386,14 +10378,6 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
       m('castSpeed', 'inc', 8, 12),
       m('attackSpeed', 'inc', 8, 12, { local: true }),
     ],
-    triggers: [
-      {
-        on: 'kill',
-        chance: 25,
-        cooldown: 1,
-        effect: { kind: 'castGranted', skillId: 'wakeBlades', level: 20 },
-      },
-    ],
     flavour: 'Every kill leaves something blunt and sharp behind.',
   },
   {
@@ -10440,14 +10424,6 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
       m('attackSpeed', 'inc', 25, 30, { local: true }),
       m('moveSpeed', 'inc', 5),
     ],
-    triggers: [
-      {
-        on: 'kill',
-        chance: 10,
-        cooldown: 8,
-        effect: { kind: 'castGranted', skillId: 'wakeBlades', level: 15 },
-      },
-    ],
     flavour: 'It spins on its own once the room is red.',
   },
   {
@@ -10459,14 +10435,6 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
       m('damage', 'inc', 160, 190, { damageTypes: ['physical'], local: true }),
       m('attackSpeed', 'inc', 25, 30, { local: true }),
       m('moveSpeed', 'inc', 5),
-    ],
-    triggers: [
-      {
-        on: 'kill',
-        chance: 12,
-        cooldown: 8,
-        effect: { kind: 'castGranted', skillId: 'wakeBlades', level: 15 },
-      },
     ],
     flavour: 'Two of everything, and both of them hungry.',
   },

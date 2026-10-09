@@ -152,14 +152,6 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
       lines.push(
         `Raises a corpse near you as that monster, at level ${num(levelValue(u.corpse.level, level))}, with the attack it had; ${level >= 13 ? 2 : 1} at a time`,
       );
-    else if (u.animate)
-      lines.push(
-        `Uses up a normal or magic melee weapon on the ground (item level up to ${num(levelValue(u.animate.maxIlvl, level))}); it strikes with that weapon's damage and ${num(levelValue(u.animate.addMin, level))} to ${num(levelValue(u.animate.addMax, level))} added physical damage`,
-      );
-    else if (u.warden)
-      lines.push(
-        `Puts the normal or magic armour and weapons on the ground (up to level ${num(levelValue(u.warden.maxReq, level))}) on one Warden, a piece for each cast; ${num(levelValue(u.warden.addMin, level))} to ${num(levelValue(u.warden.addMax, level))} added physical damage`,
-      );
     else
       lines.push(
         `Summons ${n} ${m.name}${n === 1 ? '' : 's'}${u.seconds ? ` for ${num(u.seconds)} s` : ''}`,

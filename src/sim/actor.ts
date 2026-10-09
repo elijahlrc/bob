@@ -147,8 +147,6 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     fixedRate: undefined,
     sup: NO_SUP,
     golem: undefined,
-    gear: undefined,
-    gearKey: undefined,
     bodyDef: undefined,
     defKey: undefined,
   };

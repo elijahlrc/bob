@@ -236,12 +236,6 @@
       "missing": [],
       "loop": "Clarity: aura reserving a flat amount of mana (34-279) that grants flat mana regeneration per second."
     },
-    "clusterBolt": {
-      "reviewer": "faithful",
-      "confidence": "medium",
-      "missing": [],
-      "loop": "Kinetic Blast: a wand shot that explodes at impact in a cluster of 4 small explosions; area-oriented clearing that scales with projectile count."
-    },
     "crackleRing": {
       "reviewer": "faithful",
       "confidence": "medium",
@@ -450,19 +444,6 @@
       "confidence": "medium",
       "missing": [],
       "loop": "Ethereal Knives: a wide arc of physical knives (10 projectiles) in front of the caster."
-    },
-    "ghostCoil": {
-      "reviewer": "drifted",
-      "confidence": "medium",
-      "missing": [
-        "Return leg and repeat hits: the projectile stops at the first enemy (pierce 0)",
-        "Spiral path, nothing separates it from Phantom Toss"
-      ],
-      "loop": "Spectral Helix: throws a spectral copy of the weapon that spirals out and back, hitting enemies along its path (no PoB data; judged from the gem's tags Attack/Projectile and Bob's own description).",
-      "disposition": {
-        "status": "repaired",
-        "what": "Pierces, so it hits on both legs."
-      }
     },
     "ghostShard": {
       "reviewer": "faithful",
@@ -886,19 +867,6 @@
       "confidence": "high",
       "missing": [],
       "loop": "Frostblink: teleport, dealing cold damage and leaving chilled ground where you left; cooldown (shared with blinks) recovers faster per enemy nearby, much faster for rares/uniques."
-    },
-    "rotDrainTrap": {
-      "reviewer": "drifted",
-      "confidence": "low",
-      "missing": [
-        "damage-over-time debuff beams on many enemies (replaced by repeated hits in a circle)",
-        "chilling of tethered enemies"
-      ],
-      "loop": "Siphoning Trap of Pain (transfigured Siphoning Trap, not in 3.9): trap that tethers beams to the nearest 13-18 enemies for a heavy cold damage-over-time debuff, chilling them; no cooldown, no regeneration.",
-      "disposition": {
-        "status": "open",
-        "why": "Not a 3.9 gem (the reference page is later)."
-      }
     },
     "rotStride": {
       "reviewer": "faithful",
@@ -1360,18 +1328,6 @@
       "missing": [],
       "loop": "Despair: a curse lowering chaos resistance, increasing damage over time taken, and making cursed enemies take additional chaos damage when hit."
     },
-    "wakeBlades": {
-      "reviewer": "faithful",
-      "confidence": "high",
-      "missing": [],
-      "loop": "Animate Weapon: animate a weapon found on the ground to fight at your side for a limited time, limited by item level; it uses the weapon's damage plus the gem's added damage."
-    },
-    "wakeSentinel": {
-      "reviewer": "faithful",
-      "confidence": "high",
-      "missing": [],
-      "loop": "Animate Guardian: animate weapons and armour from the ground onto a single Guardian that fights beside you; multiple items attach to the same Guardian."
-    },
     "warchiefTotem": {
       "reviewer": "faithful",
       "confidence": "high",
@@ -1619,19 +1575,6 @@
       "confidence": "medium",
       "missing": [],
       "loop": "Burning Damage: more burning (ignite) damage for the supported skill, including skills that burn directly."
-    },
-    "festeringCrit": {
-      "reviewer": "gutted",
-      "confidence": "low",
-      "missing": [
-        "no chance to poison on hit and no more poison damage, which is all the resolved 3.9 text describes",
-        "if instead the original is a crit-ailment gem: the bonus keys off a previous crit rather than the crit that applied the ailment"
-      ],
-      "loop": "Critical Strike Affliction Support (no PoB data). The only 3.9 text the project tool resolves for this page is the Poison Support page (same dex, level 31): 60 percent chance to Poison on hit and more damage with poison. If the true gem is a crit-ailment gem the verdict would be drifted.",
-      "disposition": {
-        "status": "open",
-        "why": "Not a 3.9 gem: as of 3.9 the page is Poison Support, which Toxin Coat already stands for."
-      }
     },
     "fieldOfCharges": {
       "reviewer": "faithful",
@@ -2250,8 +2193,8 @@
     }
   },
   "counts": {
-    "faithful": 288,
-    "drifted": 37,
-    "gutted": 1
+    "faithful": 285,
+    "drifted": 35,
+    "gutted": 0
   }
 }

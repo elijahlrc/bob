@@ -260,8 +260,6 @@ export type UtilityDef =
       corpseCost?: boolean;
       /** Raised from a corpse: the minion is that monster, at this level (Raise Spectre). */
       corpse?: { level: LevelValue };
-      /** Made from a weapon lying on the ground that is used up by it (Animate Weapon); the cap on its item level, the damage and speed it adds. */
-      animate?: { maxIlvl: LevelValue; addMin: LevelValue; addMax: LevelValue; speed: LevelValue };
       /** A golem: the other minions deal this much added physical damage while it stands; it deals more for each of them near, and has more life. */
       golem?: {
         addMin: LevelValue;
@@ -269,14 +267,6 @@ export type UtilityDef =
         perNearby: number;
         cap: number;
         life: LevelValue;
-      };
-      /** The one Guardian that wears the armour and weapons lying on the ground, one piece per cast (Animate Guardian). */
-      warden?: {
-        maxReq: LevelValue;
-        addMin: LevelValue;
-        addMax: LevelValue;
-        life: LevelValue;
-        melee: LevelValue;
       };
     }
   /**

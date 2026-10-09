@@ -89,7 +89,7 @@ together.
 ## Third round: minions, deployables, aspects
 
 - **Minions exist** (`summon` utility gems: `raiseHusk`, `callBonewalkers`, `callFuries`, the six `*Colossus` golems,
-  `hallowedRelic`, `whirringMotes`, `bindShade`, `wakeBlades`, `wakeSentinel`, the offerings, ...). The translator maps
+  `hallowedRelic`, `whirringMotes`, `bindShade`, the offerings, ...). The translator maps
   "Grants Level N X Skill" for these, and the lines "Minions deal N% increased Damage" (`minionDamage`), "Minions have N%
   increased Movement/Attack Speed" (`minionSpeed`), "increased maximum Life" (`minionLife`, no effect: minions cannot be
   hurt) and "+N to Maximum number of Skeletons/Zombies/Spectres" (`minionCount`) are mapped. Hand-written: `minionDamage`

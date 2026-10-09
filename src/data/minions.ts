@@ -19,8 +19,6 @@ export type MinionId =
   | 'relic'
   | 'bot'
   | 'clone'
-  | 'blade'
-  | 'sentinel'
   | 'spectre'
   | 'radiant'
   | 'phantasm'
@@ -282,38 +280,6 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     res: 30,
     respawn: 4,
     color: 0x6a6a90,
-  },
-  blade: {
-    id: 'blade',
-    name: 'Waking Blade',
-    dmg: 0.8,
-    rate: 1.5,
-    reach: 1.3,
-    speed: 5,
-    ranged: false,
-    dtype: 'physical',
-    splash: 0,
-    life: 0.4,
-    r: 0.3,
-    res: 20,
-    respawn: 2,
-    color: 0xc0c0d0,
-  },
-  sentinel: {
-    id: 'sentinel',
-    name: 'Animated Sentinel',
-    dmg: 1.3,
-    rate: 0.9,
-    reach: 1.7,
-    speed: 3.4,
-    ranged: false,
-    dtype: 'physical',
-    splash: 0.8,
-    life: 2.4,
-    r: 0.5,
-    res: 40,
-    respawn: 5,
-    color: 0xb0a070,
   },
   spectre: {
     id: 'spectre',

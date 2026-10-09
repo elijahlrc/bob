@@ -1,19 +1,16 @@
 import { levelValue } from '../calc/gems';
 import type { SkillChoice } from '../calc/character';
 import type { Defence } from '../calc/combat';
-import { weaponStats } from '../calc/items';
 import { minionBody } from '../calc/minion';
 import type { SkillProfile } from '../calc/skill';
-import { isWeaponClass, itemBase } from '../data/bases';
 import { MINIONS, type MinionDef, type MinionId } from '../data/minions';
 import { MONSTER_TYPES, type MonsterTypeId } from '../data/monsters';
-import type { Item } from '../data/types';
 import { newActor } from './actor';
 import { rawHit, tickActor } from './combat';
 import { takeCorpse, type Corpse } from './factions';
-import { auraNow, minionStrike, refreshMinionDef, wearItem } from './minionFx';
+import { auraNow, minionStrike, refreshMinionDef } from './minionFx';
 import type { MinionSup } from './minionSup';
-import type { Actor, Drop, World } from './types';
+import type { Actor, World } from './types';
 
 /**
  * Minions in the sim (COVERAGE C6, made mortal afterwards): see src/data/minions.ts. A minion is an actor of the
@@ -49,9 +46,6 @@ export type Minion = Actor & {
   nearMore?: number;
   /** A golem: the added physical damage it gives the other minions, and how much harder it hits for each of them near. */
   golem?: { min: number; max: number; perNearby: number; cap: number };
-  /** A Guardian: the items it wears, by place. */
-  gear?: Map<string, Item>;
-  gearKey?: string;
   /** Its defence before the offering, the supports and the gear, and the signature of what it has now. */
   bodyDef?: Defence;
   defKey?: string;
@@ -94,7 +88,6 @@ export function summonCount(c: SkillChoice, prof: SkillProfile): number {
   if (u?.kind !== 'summon') return 0;
   // A spectre: one at first, a second from the thirteenth level of the gem.
   if (u.corpse) return Math.max(1, (c.skill.level >= 13 ? 2 : 1) + prof.minionCount);
-  if (u.warden) return 1;
   return Math.max(1, Math.round(levelValue(u.count, c.skill.level)) + prof.minionCount);
 }
 
@@ -220,74 +213,6 @@ export function raiseSpectre(w: World, c: SkillChoice, prof: SkillProfile, corps
     r: t.radius,
     name: corpse.name,
   });
-}
-
-/**
- * A melee weapon lying near the character that the character would not miss: a normal or magic one (a rare or a unique is kept),
- * not above the level the gem allows.
- */
-export function animatableDrop(w: World, c: SkillChoice, reach: number): Drop | null {
-  const u = c.skill.utility;
-  if (u?.kind !== 'summon' || !u.animate) return null;
-  const cap = levelValue(u.animate.maxIlvl, c.skill.level);
-  const p = w.player;
-  for (const d of w.drops) {
-    const it = d.item;
-    if (it.kind !== 'item' || (it.rarity !== 'normal' && it.rarity !== 'magic') || it.ilvl > cap)
-      continue;
-    const base = itemBase(it.baseId);
-    if (
-      !base.weapon ||
-      !isWeaponClass(base.itemClass) ||
-      base.itemClass === 'bow' ||
-      base.itemClass === 'wand'
-    )
-      continue;
-    if (Math.hypot(d.x - p.x, d.y - p.y) <= reach) return d;
-  }
-  return null;
-}
-
-/** A weapon lying on the ground is animated: it is used up, and a flying blade strikes with its damage and the gem's. */
-export function animateWeapon(w: World, c: SkillChoice, prof: SkillProfile, drop: Drop): void {
-  const u = c.skill.utility;
-  if (u?.kind !== 'summon' || !u.animate) return;
-  const item = drop.item as Item;
-  const i = w.drops.indexOf(drop);
-  if (i >= 0) w.drops.splice(i, 1);
-  const hand = weaponStats(item);
-  const lvl = c.skill.level;
-  let min = levelValue(u.animate.addMin, lvl);
-  let max = levelValue(u.animate.addMax, lvl);
-  for (const [a, b] of hand.flats) {
-    min += a;
-    max += b;
-  }
-  const p = w.player;
-  const m = makeMinion(
-    w,
-    c,
-    prof,
-    u.minion,
-    p.x + w.rngTrig.float(-1, 1),
-    p.y + w.rngTrig.float(-1, 1),
-    { seconds: u.seconds ?? 37.5, name: 'Animated weapon', blowLevel: w.plan.areaLevel },
-  );
-  m.fixedHit = (min + max) / 2;
-  m.fixedRate = hand.aps * (1 + levelValue(u.animate.speed, lvl) / 100);
-}
-
-/** Animate Guardian: the item lying on the ground is put on the one Guardian, which is made if there is none. */
-export function animateGuardian(w: World, c: SkillChoice, prof: SkillProfile, drop: Drop): void {
-  const u = c.skill.utility;
-  if (u?.kind !== 'summon' || !u.warden) return;
-  const p = w.player;
-  wearItem(w, c, drop, () =>
-    makeMinion(w, c, prof, u.minion, p.x + 0.8, p.y, {
-      lifeMult: 1 + levelValue(u.warden!.life, c.skill.level) / 100,
-      name: 'Warden',
-    }),
-  );
 }
 
 /** One minion put down at a spot (the clone a Blink Arrow leaves where the character stood). */

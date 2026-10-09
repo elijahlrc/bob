@@ -675,11 +675,6 @@
    "status": "covered",
    "note": "A two-handed swing in a full circle that always knocks enemies back."
   },
-  "clusterBolt": {
-   "ref": "Kinetic Blast of Clustering",
-   "status": "covered",
-   "note": "A wand shot that bursts into a large cluster of physical bursts."
-  },
   "cleansingBlaze": {
    "ref": "Purifying Flame",
    "status": "covered",
@@ -699,11 +694,6 @@
    "ref": "Soulrend",
    "status": "covered",
    "note": "A projectile that turns toward the enemies ahead and pierces them, leeching a share of its damage as energy shield, and afflicts every enemy about it with chaos damage over time all the way it flies."
-  },
-  "ghostCoil": {
-   "ref": "Spectral Helix",
-   "status": "covered",
-   "note": "A spectral weapon that flies out in a spiral and comes back (modelled as a returning projectile)."
   },
   "ghostShard": {
    "ref": "Spectral Shield Throw",
@@ -884,11 +874,6 @@
    "ref": "Life Gain on Hit Support",
    "status": "covered",
    "note": "Attacks gain life for each enemy hit."
-  },
-  "festeringCrit": {
-   "ref": "Critical Strike Affliction Support",
-   "status": "covered",
-   "note": "More critical strike chance, and ailments from critical strikes deal more damage over time."
   },
   "mercilessCadence": {
    "ref": "Ruthless Support",
@@ -1495,11 +1480,6 @@
    "status": "covered",
    "note": "A nova around the character whose damage grows with the charges held: fire per Grit, cold per Fervour, lightning per Insight and the charges are spent when it lands. The character casts it once it holds at least three."
   },
-  "rotDrainTrap": {
-   "ref": "Siphoning Trap of Pain",
-   "status": "covered",
-   "note": "A variant of the drain trap that deals chaos damage over time to the enemies near it and feeds the character."
-  },
   "raiseHusk": {
    "ref": "Raise Zombie",
    "status": "covered",
@@ -1559,16 +1539,6 @@
    "ref": "Raise Spectre",
    "status": "covered",
    "note": "Raises the corpse of a defeated monster as a spectre: it is that monster, at the gem's level (31 to 80), with that monster's attack. The corpse is used up. One spectre at first, a second from the thirteenth level of the gem; it needs a corpse near."
-  },
-  "wakeBlades": {
-   "ref": "Animate Weapon",
-   "status": "covered",
-   "note": "Animates a normal or magic melee weapon lying on the ground within the item level the gem allows (9 at the first level, 100 at the last): the weapon is used up and a flying blade strikes with its damage and the gem's added damage, for 37 s. Rare and unique weapons are kept."
-  },
-  "wakeSentinel": {
-   "ref": "Animate Guardian",
-   "status": "covered",
-   "note": "Animates the armour and weapons lying on the ground (normal or magic ones that the character can spare, within the level the gem allows; none with gems in them), one piece for each cast, onto the one Guardian: it has what the pieces give it, a quarter of its life comes back with each new piece of armour, and a weapon makes it strike with that weapon's damage. It has no time limit, and if it falls the pieces are lost."
   },
   "shadowQuiver": {
    "ref": "Blink Arrow",
@@ -4985,7 +4955,7 @@
   "marshalsHauberk": {
    "ref": "Chains of Command",
    "status": "covered",
-   "note": "Armour, energy shield and life, and each kill has a chance to animate a weapon. The animated-guardian damage and splash lines are dropped, as is the restriction on other minions."
+   "note": "Armour, energy shield and life. The chance on kill to animate a weapon is dropped (Animate Weapon is not in the game), as are the animated-guardian damage and splash lines and the restriction on other minions."
   },
   "hexwovenRobe": {
    "ref": "Doedre's Skin",
@@ -5440,7 +5410,7 @@
   "bladewakeHammer": {
    "ref": "Jorrhast's Blacksteel",
    "status": "covered",
-   "note": "Physical damage, attack and cast speed, and a chance on kill to wake animated blades (Wake Blades stands in for the reference trigger). The duration and extra-copy lines are dropped."
+   "note": "Physical damage, attack and cast speed. The chance on kill to wake animated blades is dropped (Animate Weapon is not in the game), as are the duration and extra-copy lines."
   },
   "regentsWrit": {
    "ref": "Queen's Decree",
@@ -5455,12 +5425,12 @@
   "whirlwindFalchion": {
    "ref": "The Dancing Dervish",
    "status": "covered",
-   "note": "Physical damage, attack speed, accuracy and movement speed, with a chance on kill to wake animated blades (Wake Blades stands in for the manifested dancer; the rampage requirement and the weapon-slot lock are dropped)."
+   "note": "Physical damage, attack speed, accuracy and movement speed. The chance on kill to wake animated blades is dropped (Animate Weapon is not in the game)."
   },
   "twinwhirlFalchion": {
    "ref": "The Dancing Duo",
    "status": "covered",
-   "note": "Physical damage, attack speed and movement speed, with a chance on kill to wake animated blades (Wake Blades stands in for the manifested dancers; the rampage requirement, weapon-slot lock and the second copy are dropped)."
+   "note": "Physical damage, attack speed and movement speed. The chance on kill to wake animated blades is dropped (Animate Weapon is not in the game)."
   },
   "bonepactWand": {
    "ref": "Midnight Bargain",

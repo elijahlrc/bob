@@ -12,18 +12,9 @@ import { spendCharges } from './charges';
 import { flaskMask, playerConds, rawHit } from './combat';
 import { canPay } from './cost';
 import { applyHex } from './hexes';
-import {
-  animatableDrop,
-  animateGuardian,
-  animateWeapon,
-  minionCount,
-  raiseSpectre,
-  summonCount,
-  summonMinions,
-  summonRespawn,
-} from './minions';
+import { minionCount, raiseSpectre, summonCount, summonMinions, summonRespawn } from './minions';
 import { corpseNear, takeCorpse } from './factions';
-import { castOffering, guardianDrop, offeringWanted } from './minionFx';
+import { castOffering, offeringWanted } from './minionFx';
 import { startShell } from './skillFx';
 import type { Action, Actor, World } from './types';
 
@@ -122,16 +113,8 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
     }
     if (u.kind === 'summon') {
       if (c.skill.cooldown !== undefined && !skillReady(w, c)) continue;
-      if (u.warden) {
-        if (!guardianDrop(w, c, CAST_RANGE)) continue;
-        return { choice: c, prof, cd: 0.5 };
-      }
-      // A spectre needs a corpse to raise, an animated weapon one on the ground that the character can spare.
+      // A spectre needs a corpse to raise.
       if ((u.corpse || u.corpseCost) && !corpseNear(w, p.x, p.y, CAST_RANGE)) continue;
-      if (u.animate) {
-        if (!animatableDrop(w, c, CAST_RANGE)) continue;
-        return { choice: c, prof, cd: 0.5 };
-      }
       // A decoy goes up when a pack closes in, or life runs low.
       if (
         u.taunt &&
@@ -286,15 +269,9 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     return;
   }
   if (u.kind === 'summon') {
-    if (u.warden) {
-      const drop = guardianDrop(w, c, CAST_RANGE);
-      if (drop) animateGuardian(w, c, act.profile, drop);
-    } else if (u.corpse) {
+    if (u.corpse) {
       const corpse = corpseNear(w, a.x, a.y, CAST_RANGE);
       if (corpse) raiseSpectre(w, c, act.profile, corpse);
-    } else if (u.animate) {
-      const drop = animatableDrop(w, c, CAST_RANGE);
-      if (drop) animateWeapon(w, c, act.profile, drop);
     } else {
       if (u.corpseCost) {
         const corpse = corpseNear(w, a.x, a.y, CAST_RANGE);

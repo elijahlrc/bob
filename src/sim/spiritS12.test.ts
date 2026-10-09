@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { makeItem } from '../gen/items';
 import { buildFor, classFor, layCorpses } from './gemKit';
 import { createDummyWorld, dummyDefence } from './dummy';
 import type { Minion } from './minions';
@@ -161,37 +160,5 @@ describe('minion supports (elementalPack, burningPack)', () => {
     run(w, 3);
     expect(dummy.sdots.filter((d) => d.src === '@legion').length).toBe(1);
     expect(m.life).toBeLessThan(lifeBefore);
-  });
-});
-
-describe('Animate Guardian (wakeSentinel)', () => {
-  it('wears the armour and weapons on the ground, one piece for each cast, keeps the better piece in a place', () => {
-    const { world: w, dummy } = world(['crushingBlow', 'wakeSentinel'], 3, 'sword_3', STR);
-    dummy.rarity = 'boss';
-    const helm1 = makeItem(() => 8001, 'helmet_ar_1', 5, 0);
-    const helm2 = makeItem(() => 8002, 'helmet_ar_1', 12, 0);
-    const worse = makeItem(() => 8003, 'helmet_ar_1', 3, 0);
-    const sword = makeItem(() => 8004, 'sword_2', 8, 0);
-    const rare = makeItem(() => 8005, 'body_ar_1', 5, 0);
-    rare.rarity = 'rare';
-    const at = (it: typeof helm1, dx: number) =>
-      w.drops.push({ id: w.nextId++, x: w.player.x + dx, y: w.player.y + 1, item: it });
-    at(rare, 0.5);
-    at(helm1, 1);
-    for (let i = 0; i < 6 * 60 && w.minions.length === 0; i++) stepWorld(w);
-    const g = minionsOf(w).find((m) => m.gear);
-    expect(g).toBeDefined();
-    expect(g!.gear!.get('helmet')).toBe(helm1);
-    // The rare armour is kept on the ground.
-    expect(w.drops.some((d) => d.item === rare)).toBe(true);
-    at(worse, 1.2);
-    at(helm2, 1.4);
-    at(sword, 1.6);
-    run(w, 6);
-    expect(g!.gear!.get('helmet')).toBe(helm2);
-    expect(w.drops.some((d) => d.item === worse)).toBe(true);
-    expect(g!.gear!.get('weapon1')).toBe(sword);
-    expect(g!.fixedHit).toBeGreaterThan(20);
-    expect(w.minions.filter((m) => m.key === g!.key).length).toBe(1);
   });
 });

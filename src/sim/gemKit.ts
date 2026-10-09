@@ -117,20 +117,6 @@ export function seedFor(def: ActiveGemDef, world: World, dummy: Actor): void {
   const u = def.utility;
   if (u?.kind === 'summon' && (u.corpse || u.corpseCost))
     layCorpses(world, dummy.x, dummy.y, u.corpseCost ? 20 : 1);
-  else if (u?.kind === 'summon' && u.warden)
-    world.drops.push({
-      id: world.nextId++,
-      x: world.player.x + 1,
-      y: world.player.y,
-      item: makeItem(() => 9998, 'body_ar_1', 5, 0),
-    });
-  else if (u?.kind === 'summon' && u.animate)
-    world.drops.push({
-      id: world.nextId++,
-      x: world.player.x + 1,
-      y: world.player.y,
-      item: makeItem(() => 9999, 'sword_1', 5, 0),
-    });
   else if (def.needsCorpse || (u?.kind === 'blink' && u.corpse))
     world.corpses.push({
       id: world.nextId++,

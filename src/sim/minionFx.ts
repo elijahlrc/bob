@@ -1,25 +1,22 @@
 import { levelValue } from '../calc/gems';
-import { itemMods } from '../calc/items';
 import type { Defence } from '../calc/combat';
-import { itemBase } from '../data/bases';
 import type { MinionDef } from '../data/minions';
 import { MINION_ENEMY_RES } from '../data/minions';
 import { DAMAGE_TYPES } from '../mods/types';
 import { spellBaseDamage } from '../data/constants';
 import type { SkillChoice } from '../calc/character';
-import type { Item } from '../data/types';
 import { rawHit } from './combat';
 import { corpseNear, takeCorpse } from './factions';
 import type { Minion } from './minions';
 import type { MinionSup } from './minionSup';
 import { applyFlatDot } from './skillDots';
 import { applyStatus } from './statuses';
-import type { Actor, Drop, World } from './types';
+import type { Actor, World } from './types';
 
 /**
  * What acts on minions besides their own numbers (docs/SPIRIT.md S12): an Offering that uses corpses and gives all the minions its
  * effects for a while, a Golem that gives the other minions added physical damage, the supports that give the minions of a skill
- * resistances, elemental damage, exposure or a burning aura, and a Guardian that wears the items lying on the ground.
+ * resistances, elemental damage, exposure or a burning aura.
  */
 
 export type { MinionSup };
@@ -88,56 +85,29 @@ export function auraNow(w: World): Aura {
   };
 }
 
-// ---- defence of a minion with its buffs and gear
-
-function gearSum(gear: Map<string, Item> | undefined) {
-  const out = { life: 0, armour: 0, res: [0, 0, 0, 0, 0] };
-  if (!gear) return out;
-  for (const it of gear.values()) {
-    const b = itemBase(it.baseId);
-    out.armour += b.defence?.armour ?? 0;
-    for (const m of itemMods(it)) {
-      if (m.kind !== 'base') continue;
-      if (m.stat === 'life') out.life += m.value;
-      else if (m.stat === 'armour') out.armour += m.value;
-      else if (m.stat === 'resist.fire') out.res[3] += m.value;
-      else if (m.stat === 'resist.cold') out.res[2] += m.value;
-      else if (m.stat === 'resist.lightning') out.res[1] += m.value;
-      else if (m.stat === 'resist.allEle') for (const i of [1, 2, 3]) out.res[i] += m.value;
-      else if (m.stat === 'resist.chaos') out.res[4] += m.value;
-    }
-  }
-  return out;
-}
+// ---- defence of a minion with its buffs
 
 const signature = (m: Minion, a: Aura): string =>
-  [a.blockAtk, a.blockSpell, a.heal, a.esPct, a.res, m.sup.res, m.sup.maxRes, m.gearKey ?? ''].join(
-    '|',
-  );
+  [a.blockAtk, a.blockSpell, a.heal, a.esPct, a.res, m.sup.res, m.sup.maxRes].join('|');
 
-/** The minion's defence with the offering's block, energy shield and resistances, the supports' resistances, and the gear it wears. */
+/** The minion's defence with the offering's block, energy shield and resistances, and the supports' resistances. */
 export function refreshMinionDef(m: Minion, a: Aura): void {
   const key = signature(m, a);
   if (m.defKey === key) return;
   m.defKey = key;
   const base = m.bodyDef ?? (m.bodyDef = m.def);
-  const g = gearSum(m.gear);
-  const maxLife = base.maxLife + g.life;
+  const maxLife = base.maxLife;
   const def: Defence = {
     ...base,
     maxLife,
-    armour: base.armour + g.armour,
     blockAttack: Math.min(0.75, base.blockAttack + a.blockAtk / 100),
     blockSpell: Math.min(0.75, base.blockSpell + a.blockSpell / 100),
     lifeOnBlockPct: a.heal > 0 ? a.heal / Math.max(1, maxLife) : base.lifeOnBlockPct,
     maxEs: base.maxEs + (maxLife * a.esPct) / 100,
-    res: base.res.map((r, i) =>
-      i >= 1 && i <= 3 ? r + a.res + m.sup.res + g.res[i] : r + g.res[i],
-    ),
+    res: base.res.map((r, i) => (i >= 1 && i <= 3 ? r + a.res + m.sup.res : r)),
     maxRes: base.maxRes.map((r, i) => (i >= 1 && i <= 3 ? r + m.sup.maxRes : r)),
   };
-  // Life gained from gear is whole at once; energy shield from an offering is recovered as it is granted.
-  m.life += maxLife - m.def.maxLife;
+  // Energy shield from an offering is recovered as it is granted.
   if (def.maxEs > m.def.maxEs) m.es += def.maxEs - m.def.maxEs;
   m.def = def;
 }
@@ -273,77 +243,4 @@ export function tickLegion(w: World, dt: number): void {
     if (m.sup.selfBurn > 0)
       rawHit(w, m, (m.def.maxLife * m.sup.selfBurn * dt) / 100, 3, 'Burning', 'minion');
   }
-}
-
-// ---- Animate Guardian
-
-const ARMOUR = ['helmet', 'body', 'gloves', 'boots', 'shield'];
-
-/** The slot an item can be worn in by a Guardian, if it can be worn. */
-function guardianSlot(it: Item, taken: Set<string>): string | null {
-  const b = itemBase(it.baseId);
-  if (it.sockets.some((s) => s !== null)) return null;
-  if (ARMOUR.includes(b.itemClass)) return b.itemClass;
-  if (b.weapon && b.itemClass !== 'bow' && b.itemClass !== 'wand')
-    return taken.has('weapon1') ? 'weapon2' : 'weapon1';
-  return null;
-}
-
-/** An item on the ground that a Guardian could wear, and the character can spare. */
-export function guardianDrop(w: World, c: SkillChoice, reach: number): Drop | null {
-  const u = c.skill.utility;
-  if (u?.kind !== 'summon' || !u.warden) return null;
-  const cap = levelValue(u.warden.maxReq, c.skill.level);
-  const g = w.minions.find((m) => m.key === c.key && m.alive);
-  const p = w.player;
-  for (const d of w.drops) {
-    const it = d.item;
-    if (it.kind !== 'item' || (it.rarity !== 'normal' && it.rarity !== 'magic') || it.ilvl > cap)
-      continue;
-    if (Math.hypot(d.x - p.x, d.y - p.y) > reach) continue;
-    const slot = guardianSlot(it, new Set(g?.gear?.keys()));
-    if (!slot) continue;
-    // A piece is not worn over a better one (the higher level stands for the better).
-    const old = g?.gear?.get(slot);
-    if (old && old.ilvl >= it.ilvl) continue;
-    return d;
-  }
-  return null;
-}
-
-/** The Guardian puts on the item. */
-export function wearItem(w: World, c: SkillChoice, drop: Drop, make: () => Minion): void {
-  const u = c.skill.utility;
-  if (u?.kind !== 'summon' || !u.warden) return;
-  const it = drop.item as Item;
-  const i = w.drops.indexOf(drop);
-  if (i >= 0) w.drops.splice(i, 1);
-  let g = w.minions.find((m) => m.key === c.key && m.alive);
-  if (!g) g = make();
-  g.gear ??= new Map();
-  const slot = guardianSlot(it, new Set(g.gear.keys()))!;
-  const was = g.gear.has(slot);
-  g.gear.set(slot, it);
-  g.gearKey = [...g.gear.entries()].map(([k, v]) => `${k}:${v.uid}`).join(',');
-  // A weapon makes it strike with that weapon's damage; every piece worn adds what it has.
-  const lv = c.skill.level;
-  let min = levelValue(u.warden.addMin, lv);
-  let max = levelValue(u.warden.addMax, lv);
-  let aps = 1.2;
-  let weapons = 0;
-  for (const [k, item] of g.gear) {
-    if (!k.startsWith('weapon')) continue;
-    weapons++;
-    const wb = itemBase(item.baseId).weapon!;
-    min += wb.min;
-    max += wb.max;
-    aps = wb.aps;
-  }
-  g.fixedHit = ((min + max) / 2) * (1 + levelValue(u.warden.melee, lv) / 100);
-  g.fixedRate = weapons > 0 ? aps : 1.2;
-  // A piece of armour new to its place mends a quarter of its life.
-  if (!was && ARMOUR.includes(slot))
-    g.life = Math.min(g.def.maxLife, g.life + g.def.maxLife * 0.25);
-  g.defKey = undefined;
-  refreshMinionDef(g, auraNow(w));
 }

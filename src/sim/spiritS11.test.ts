@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { makeItem } from '../gen/items';
 import { buildFor, classFor } from './gemKit';
 import { killActor } from './combat';
 import { createDummyWorld, dummyDefence } from './dummy';
@@ -179,32 +178,5 @@ describe('Pyre Burst (pyreBurst)', () => {
     }
     expect(most).toBeLessThanOrEqual(3);
     expect(most).toBeGreaterThanOrEqual(1);
-  });
-});
-
-describe('Animate Weapon (wakeBlades)', () => {
-  it('uses up a plain melee weapon on the ground and keeps a rare one', () => {
-    const { world: w, dummy } = world(['crushingBlow', 'wakeBlades'], 3, 'sword_3', DEX);
-    dummy.rarity = 'boss';
-    const plain = makeItem(() => 7001, 'sword_1', 5, 0);
-    const rare = makeItem(() => 7002, 'sword_1', 5, 0);
-    rare.rarity = 'rare';
-    const high = makeItem(() => 7003, 'sword_1', 90, 0);
-    for (const [it, dx] of [
-      [rare, 1],
-      [high, 1.5],
-      [plain, 2],
-    ] as const)
-      w.drops.push({ id: w.nextId++, x: w.player.x + dx, y: w.player.y + 1, item: it });
-    w.player.stunT = 0;
-    // The character animates before it picks anything up.
-    for (let i = 0; i < 3 * 60 && w.minions.length === 0; i++) stepWorld(w);
-    expect(w.minions.length).toBe(1);
-    expect(w.drops.some((d) => d.item === plain)).toBe(false);
-    expect(w.drops.some((d) => d.item === rare)).toBe(true);
-    expect(w.drops.some((d) => d.item === high)).toBe(true);
-    const m = w.minions[0];
-    expect(m.fixedHit).toBeGreaterThan(4);
-    expect(m.fixedRate).toBeGreaterThan(1);
   });
 });
