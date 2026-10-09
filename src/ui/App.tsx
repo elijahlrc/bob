@@ -3,7 +3,7 @@ import type { Controller } from '../run/controller';
 import { Camp } from './Camp';
 import { ClassSelect } from './ClassSelect';
 import { Codex } from './Codex';
-import { ConfirmHost } from './Confirm';
+import { ConfirmHost, dismissAsk } from './Confirm';
 import { Hud } from './Hud';
 import { InfoLayer } from './info';
 import { useControllerState } from './hooks';
@@ -12,6 +12,8 @@ import { Title } from './Title';
 
 export function App({ c }: { c: Controller }) {
   useControllerState(c);
+  // A question belongs to the screen it was asked on: a map that begins under it takes it away.
+  useEffect(() => dismissAsk(), [c.screen]);
   // N advances the showcase.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

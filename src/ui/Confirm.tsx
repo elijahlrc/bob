@@ -25,6 +25,17 @@ const set = (o: Open | null) => {
   listeners.forEach((l) => l(o));
 };
 
+/** Whether a question is waiting for an answer (auto-continue holds off while one is). */
+export const confirmOpen = (): boolean => current !== null;
+
+/** Answer the open question with no, when what it was about has gone (the map began, the screen changed). */
+export function dismissAsk(): void {
+  const o = current;
+  if (!o) return;
+  set(null);
+  o.resolve(false);
+}
+
 export function ask(options: ConfirmOptions): Promise<boolean> {
   // A second question while one is open answers the first with no.
   current?.resolve(false);

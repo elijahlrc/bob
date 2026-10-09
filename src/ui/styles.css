@@ -1464,3 +1464,21 @@ select option {
   accent-color: var(--accent-d);
   color-scheme: dark;
 }
+
+/* An offer card is a button: pressing its text takes the map, it never selects the words. */
+.btn.theme {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+/* With a mouse the preview of a reward follows the pointer instead of pushing the page down. */
+.reward-preview.float {
+  position: fixed;
+  z-index: 45;
+  left: 0;
+  top: 0;
+  width: min(360px, 92vw);
+  margin: 0;
+  pointer-events: none;
+  box-shadow: 0 6px 24px #000c;
+}

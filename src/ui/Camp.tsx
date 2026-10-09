@@ -13,7 +13,7 @@ import type { Controller } from '../run/controller';
 import { chalkAdd, chalkOptions, chalkRemove } from '../run/craft';
 import { passivePoints, type RunState } from '../run/run';
 import { unseenItems } from '../run/found';
-import { ask } from './Confirm';
+import { ask, confirmOpen } from './Confirm';
 import { useViewport } from './device';
 import { infoProps } from './info';
 import { Items } from './Items';
@@ -145,8 +145,14 @@ export function Camp({ c }: { c: Controller }) {
       return;
     }
     setLeft(COUNTDOWN);
-    const start = performance.now();
+    let start = performance.now();
     const id = setInterval(() => {
+      // A question to answer holds the countdown: the map must not begin under it.
+      if (confirmOpen()) {
+        start = performance.now();
+        setLeft(COUNTDOWN);
+        return;
+      }
       const remain = COUNTDOWN - (performance.now() - start) / 1000;
       if (remain <= 0) {
         clearInterval(id);

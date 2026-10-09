@@ -16,6 +16,14 @@ function show(o: Open): void {
   listeners.forEach((l) => l(o));
 }
 
+/**
+ * The text for something inside a button (an offer card): a hover tooltip with a mouse, and on a touch screen nothing, so that a
+ * tap on it is still a tap on the button.
+ */
+export function hoverInfo(text: string | undefined): { title?: string } {
+  return text && !isCoarse() ? { title: text } : {};
+}
+
 export function infoProps(text: string | undefined): {
   title?: string;
   onClick?: (e: MouseEvent) => void;

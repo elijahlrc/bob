@@ -3,7 +3,7 @@ import { MOD_MARKS } from '../data/monsterMarks';
 import { FACTION_COLOR, FACTION_GLYPH, TAG_INFO } from '../data/monsterInfo';
 import { themeDef } from '../data/themes';
 import type { OfferPreview } from '../run/preview';
-import { infoProps } from './info';
+import { hoverInfo } from './info';
 
 const hex = (n: number) => '#' + n.toString(16).padStart(6, '0');
 const pct = (f: number) => `${Math.round(f * 100)}%`;
@@ -28,7 +28,7 @@ export function OfferTable({ o }: { o: OfferPreview }) {
     <table class="offer-table">
       <tbody>
         <tr
-          {...infoProps(
+          {...hoverInfo(
             'Items dropped, over a plain map of this level (your own gear not counted).',
           )}
         >
@@ -36,22 +36,22 @@ export function OfferTable({ o }: { o: OfferPreview }) {
           <td>{bonus(r.quantity)}</td>
         </tr>
         <tr
-          {...infoProps(
+          {...hoverInfo(
             'Chance of magic, rare and unique items, over a plain map of this level (your own gear not counted).',
           )}
         >
           <th>Item rarity</th>
           <td>{bonus(r.rarity)}</td>
         </tr>
-        <tr {...infoProps('Experience from kills, over a plain map of this level.')}>
+        <tr {...hoverInfo('Experience from kills, over a plain map of this level.')}>
           <th>Experience</th>
           <td>{bonus(r.experience)}</td>
         </tr>
-        <tr {...infoProps('How many monsters this map holds.')}>
+        <tr {...hoverInfo('How many monsters this map holds.')}>
           <th>Monsters</th>
           <td>{m.total}</td>
         </tr>
-        <tr {...infoProps('Magic monsters, rare monsters, and bosses or champions on this map.')}>
+        <tr {...hoverInfo('Magic monsters, rare monsters, and bosses or champions on this map.')}>
           <th>Magic · Rare · Boss</th>
           <td>
             {count(m.magic)} · {count(m.rare)} · {count(m.boss)}
@@ -100,7 +100,7 @@ export function OfferInfo({
             key={f.id}
             class="chip faction"
             style={{ borderColor: hex(FACTION_COLOR[f.id]), color: hex(FACTION_COLOR[f.id]) }}
-            {...infoProps(`${f.name}: ${pct(f.share)} of the monsters.`)}
+            {...hoverInfo(`${f.name}: ${pct(f.share)} of the monsters.`)}
           >
             {FACTION_GLYPH[f.id]} {f.name} {pct(f.share)}
           </span>
@@ -119,7 +119,7 @@ export function OfferInfo({
       )}
       <div
         class="mixbar"
-        {...infoProps(
+        {...hoverInfo(
           'Damage the monsters deal, by type: ' +
             info.mix
               .map((x, i) => (x >= 0.02 ? `${MIX_NAME[i].toLowerCase()} ${pct(x)}` : ''))
@@ -136,7 +136,7 @@ export function OfferInfo({
       {info.tags.length > 0 && (
         <div class="chips">
           {info.tags.map((t) => (
-            <span key={t} class="chip tag" {...infoProps(TAG_INFO[t].text)}>
+            <span key={t} class="chip tag" {...hoverInfo(TAG_INFO[t].text)}>
               {TAG_INFO[t].name}
             </span>
           ))}
@@ -150,7 +150,7 @@ export function OfferInfo({
                 key={t.id}
                 class="chip type"
                 style={{ color: hex(FACTION_COLOR[t.faction]) }}
-                {...infoProps(`${t.name}: ${t.blurb}`)}
+                {...hoverInfo(`${t.name}: ${t.blurb}`)}
               >
                 {t.name} {pct(t.share)}
               </span>

@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks';
+import { useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { currencyLabel, currencyText } from '../data/currency';
 import type { Controller } from '../run/controller';
 import { takeReward } from '../run/run';
@@ -18,6 +18,22 @@ export function Reward({ c }: { c: Controller }) {
   const offers = run.reward ?? [];
   const shown = offers.find((o) => o.uid === (coarse ? (picked ?? hover) : hover));
   const take = (uid: number | null) => c.act((r) => takeReward(r, uid));
+  // With a mouse the preview floats by the pointer (it would push the page down in the flow), kept inside the window.
+  const tip = useRef<HTMLDivElement>(null);
+  const mouse = useRef({ x: 0, y: 0 });
+  const place = () => {
+    const el = tip.current;
+    if (!el) return;
+    const { x, y } = mouse.current;
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    let left = x + 18;
+    if (left + w > window.innerWidth - 8) left = Math.max(8, x - 18 - w);
+    const top = Math.max(8, Math.min(y + 18, window.innerHeight - 8 - h));
+    el.style.left = `${left}px`;
+    el.style.top = `${top}px`;
+  };
+  useLayoutEffect(place, [shown?.uid]);
   return (
     <div class="reward">
       <div class="notice">
@@ -31,7 +47,14 @@ export function Reward({ c }: { c: Controller }) {
           class={`inv-item ${o.kind === 'currency' ? 'flaskitem' : rarityClass(o)}${
             coarse && picked === o.uid ? ' sel' : ''
           }`}
-          onMouseEnter={() => setHover(o.uid)}
+          onMouseEnter={(e) => {
+            mouse.current = { x: e.clientX, y: e.clientY };
+            setHover(o.uid);
+          }}
+          onMouseMove={(e) => {
+            mouse.current = { x: e.clientX, y: e.clientY };
+            place();
+          }}
           onMouseLeave={() => setHover(null)}
           onClick={() => (coarse ? setPicked(o.uid) : take(o.uid))}
         >
@@ -47,7 +70,7 @@ export function Reward({ c }: { c: Controller }) {
         Skip
       </button>
       {shown && (
-        <div class="reward-preview">
+        <div class={coarse ? 'reward-preview' : 'reward-preview float'} ref={tip}>
           {shown.kind === 'currency' ? (
             <div class="item-card flaskitem">
               <div class="ic-name">
