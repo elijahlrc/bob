@@ -693,7 +693,7 @@
   "spiritSaw": {
    "ref": "Soulrend",
    "status": "covered",
-   "note": "A projectile that turns toward the enemies ahead and pierces them, leeching a share of its damage as energy shield, and afflicts every enemy about it with chaos damage over time all the way it flies."
+   "note": "A projectile that turns toward the enemies ahead and pierces them, leeching a share of its damage as energy shield, and afflicts every enemy about it with a short, strong chaos damage over time all the way it flies. As in 3.9 the hit itself is small (a tenth of the base damage) and the debuff is the damage; its numbers are the 3.9 ratio scaled up (about 3.8 times 0.69 of the base damage a second) because Bob adds flat damage to hits and not to damage over time, which puts a lone target at the middle of the spells and leaves the pierce and the crowd as its edge."
   },
   "ghostShard": {
    "ref": "Spectral Shield Throw",

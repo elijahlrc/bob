@@ -2740,10 +2740,10 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     spellDamage: [
       {
         type: 'chaos',
-        spread: [0.5, 1.5],
+        spread: [0.8, 1.2],
       },
     ],
-    effectiveness: 80,
+    effectiveness: 10,
     castTime: 0.8,
     crit: 5,
     cost: [14, 26],
@@ -2761,7 +2761,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [137, 1944],
+      dps: [17.1, 1003],
       seconds: 0.6,
       stack: 'refresh',
       carried: 1,
