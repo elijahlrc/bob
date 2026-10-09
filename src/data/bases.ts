@@ -518,6 +518,22 @@ export function itemBase(id: string): ItemBase {
   return b;
 }
 
+/** What a weapon of each class is called on its card: the type that skills ask for ("needs a bow", "a sword or a dagger"). */
+export const WEAPON_TYPE_NAME: Record<WeaponClass, string> = {
+  sword: 'One-Handed Sword',
+  axe: 'One-Handed Axe',
+  mace: 'One-Handed Mace',
+  sceptre: 'Sceptre',
+  dagger: 'Dagger',
+  claw: 'Claw',
+  wand: 'Wand',
+  sword2: 'Two-Handed Sword',
+  axe2: 'Two-Handed Axe',
+  mace2: 'Two-Handed Mace',
+  staff: 'Staff',
+  bow: 'Bow',
+};
+
 export function isWeaponClass(c: ItemClass): c is WeaponClass {
   return WEAPON_CLASS_DEFS.some((d) => d.cls === c);
 }

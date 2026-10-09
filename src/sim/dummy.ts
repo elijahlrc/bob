@@ -112,7 +112,7 @@ export function createDummyWorld(
     plan,
     build,
     xp: 0,
-    opts: { maxTime: opts.maxTime ?? 600, freeResources: true },
+    opts: { maxTime: opts.maxTime ?? 600, freeResources: true, autoAbandonAt: Infinity },
   });
   const dummy = spawnMonster(
     world,

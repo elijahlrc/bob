@@ -3,6 +3,7 @@ import { offerNoise } from '../gen/population';
 import { themeDef } from '../data/themes';
 import { offerCharacter } from './bot';
 import type { MapOffer } from './offers';
+import { offerRewards, type OfferRewards } from './rewards';
 import type { RunState } from './run';
 import { survivalRatio, threatPreview } from './threat';
 import { themeInfo, weakestAxis, type ThemeInfo } from './themeInfo';
@@ -36,6 +37,8 @@ export type OfferPreview = MapOffer & {
   info?: ThemeInfo;
   /** The resistance this map leans on hardest, in words, when one stands out. */
   weak?: string;
+  /** What the map pays and how many monsters it holds, for comparing the offers (a map offer only). */
+  rewards?: OfferRewards;
 };
 
 export function offersFor(run: RunState): OfferPreview[] {
@@ -62,6 +65,17 @@ export function offersFor(run: RunState): OfferPreview[] {
     const info = themeInfo(themeDef(offer.themeId), offer.affixes, offer.type, offer.areaLevel);
     const weak = weakestAxis(offerCharacter(run, offer), info.mix) ?? undefined;
     const tier = mapTier(run.difficulty, offerNoise(run.seed, offer.id)) ?? undefined;
-    return { ...offer, dps: p.dps, ehp: p.ehp, ratio, verdict: verdictOf(ratio), tier, info, weak };
+    const rewards = offerRewards(run, offer);
+    return {
+      ...offer,
+      dps: p.dps,
+      ehp: p.ehp,
+      ratio,
+      verdict: verdictOf(ratio),
+      tier,
+      info,
+      weak,
+      rewards,
+    };
   });
 }

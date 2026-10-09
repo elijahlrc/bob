@@ -1,7 +1,7 @@
 import type { Difficulty } from '../data/difficulty';
 import { Character, diffSheets, type SheetDiff } from '../calc/character';
 import { itemReq } from '../calc/items';
-import { itemBase } from '../data/bases';
+import { isWeaponClass, itemBase, WEAPON_TYPE_NAME } from '../data/bases';
 import { triggerText } from '../data/triggers';
 import { flaskBase } from '../data/flasks';
 import { naturalGemLevel } from '../calc/gems';
@@ -108,6 +108,7 @@ export function ItemCard({
     <div class={`item-card ${it.rarity}`}>
       <div class="ic-name">{it.name}</div>
       {it.name !== b.name && <div class="ic-base">{b.name}</div>}
+      {isWeaponClass(b.itemClass) && <div class="ic-type">{WEAPON_TYPE_NAME[b.itemClass]}</div>}
       {b.weapon && (
         <div class="muted">
           {b.weapon.min}–{b.weapon.max} physical · {b.weapon.aps} APS · {b.weapon.crit}% crit

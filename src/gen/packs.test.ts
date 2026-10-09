@@ -3,7 +3,14 @@ import { Rng } from '../core/rng';
 import { MONSTER_TYPES, type FactionId, type Role } from '../data/monsters';
 import { themeDef, THEMES } from '../data/themes';
 import { generateLabyrinth } from './labyrinth';
-import { packPlan, packTypes, pickByRole, pickFaction, TEMPLATE_WEIGHTS, templateRoles } from './packs';
+import {
+  packPlan,
+  packTypes,
+  pickByRole,
+  pickFaction,
+  TEMPLATE_WEIGHTS,
+  templateRoles,
+} from './packs';
 import { factionsAt, populate, typeShares } from './population';
 
 const FACTIONS = Object.keys(TEMPLATE_WEIGHTS) as FactionId[];
@@ -101,7 +108,11 @@ describe('a pack is never left with nothing to draw from', () => {
   const ROLES: Role[] = ['front', 'ranged', 'support', 'special', 'swarm'];
   const kiln = themeDef('kilnHall');
   const firstLevel = (f: FactionId) =>
-    Math.min(...Object.values(MONSTER_TYPES).filter((t) => t.faction === f).map((t) => t.minLevel ?? 0));
+    Math.min(
+      ...Object.values(MONSTER_TYPES)
+        .filter((t) => t.faction === f)
+        .map((t) => t.minLevel ?? 0),
+    );
 
   it('a theme met below the first level of its faction falls back to the factions that have a type', () => {
     const level = firstLevel('emberborn') - 1;

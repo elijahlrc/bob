@@ -171,3 +171,5 @@ export const CAMP_REST_SECONDS = 10;
 export const ABANDON_SECONDS = 5;
 /** Abandon is unavailable before this map (the first skill gems are picked after maps 1 to 4) and on every tenth map (mini-boss and boss). */
 export const ABANDON_FROM_MAP = 5;
+/** A map that has run this long (simulated seconds) turns into an abandon on its own, on every map: the way out for a character that is stuck. */
+export const AUTO_ABANDON_AFTER = 500;

@@ -14,6 +14,8 @@ export type MapTypeDef = {
   from: number;
   /** What the type adds to the map's rewards, as fractions. */
   reward: { quantity?: number; rarity?: number; experience?: number };
+  /** The loot the type pays that is not a percentage, in a few words for the comparison on the offer card. */
+  loot?: string;
   /** How much harder the map is in ways the monsters' mods do not show (the threat model's multiplier). */
   pressure: number;
 };
@@ -33,6 +35,7 @@ export const MAP_TYPES: MapTypeDef[] = [
     text: 'After 30 s the monsters grow stronger every 15 s (+5% damage and life each time, up to +80%); kills made later drop more. You are pulled out after 330 s.',
     from: 10,
     reward: { quantity: 0.25 },
+    loot: 'Later kills drop up to 48% more',
     pressure: 1.3,
   },
   {
@@ -41,6 +44,7 @@ export const MAP_TYPES: MapTypeDef[] = [
     text: 'A short hunt: three champions and few others. Each champion drops a rare (sometimes a unique) and a stack of currency.',
     from: 10,
     reward: {},
+    loot: 'Each champion drops a rare (or a unique) and currency',
     pressure: 1.2,
   },
   {
@@ -59,6 +63,7 @@ export const MAP_TYPES: MapTypeDef[] = [
     text: 'A single arena. Hold the beacon while eight waves come, twelve seconds apart; each wave you survive opens a chest, and the last has a rare leading it.',
     from: 25,
     reward: { quantity: 0.2 },
+    loot: 'A chest for every wave survived',
     pressure: 1.25,
   },
   {
@@ -75,6 +80,7 @@ export const MAP_TYPES: MapTypeDef[] = [
     text: 'Three short maps in a row with no camp between them. At the end you pick one of three rewards, and one of them is a unique.',
     from: 40,
     reward: {},
+    loot: 'Choice of three rewards, one a unique',
     pressure: 1.4,
   },
 ];

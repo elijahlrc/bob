@@ -136,7 +136,8 @@ export function typeShares(
     );
     const w = (id: MonsterTypeId) => TYPE_WEIGHTS[id] * (theme.typeWeights[id] ?? 1);
     const tTotal = types.reduce((a, id) => a + w(id), 0);
-    for (const id of types) out.push([id, (fw / fTotal) * (tTotal > 0 ? w(id) / tTotal : 1 / types.length)]);
+    for (const id of types)
+      out.push([id, (fw / fTotal) * (tTotal > 0 ? w(id) / tTotal : 1 / types.length)]);
   }
   return out;
 }

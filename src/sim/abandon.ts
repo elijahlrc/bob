@@ -1,4 +1,4 @@
-import { ABANDON_FROM_MAP, ABANDON_SECONDS } from '../data/constants';
+import { ABANDON_FROM_MAP, ABANDON_SECONDS, AUTO_ABANDON_AFTER } from '../data/constants';
 import { CRESCENDO_LIMIT } from '../data/mapTypes';
 import { lifeCap } from './combat';
 import type { AbandonPolicy, World } from './types';
@@ -21,7 +21,7 @@ export function requestAbandon(w: World): boolean {
 }
 
 export function cancelAbandon(w: World): boolean {
-  if (w.abandonT === null || w.status !== 'running') return false;
+  if (w.abandonT === null || w.abandonAuto || w.status !== 'running') return false;
   w.abandonT = null;
   w.events.push({ t: 'abandonCancelled' });
   return true;
@@ -37,12 +37,25 @@ export function tickAbandon(w: World, dt: number): void {
     return;
   }
   if (w.abandonT === null) {
+    // A map that drags on is left whatever kind it is (the first four, a mini-boss): the way out for a character that is
+    // stuck. The usual few seconds of fighting on, and it cannot be called off. A map whose exit is open is nearly done.
+    if (
+      w.t >= (w.opts.autoAbandonAt ?? AUTO_ABANDON_AFTER) &&
+      !w.exitOpen &&
+      w.plan.type !== 'crescendo'
+    ) {
+      w.abandonT = ABANDON_SECONDS;
+      w.abandonAuto = true;
+      w.events.push({ t: 'abandonStarted' });
+      return;
+    }
     if (w.opts.abandonPolicy?.(w)) requestAbandon(w);
     return;
   }
   // An open exit means the map is as good as cleared: stop leaving.
   if (w.exitOpen) {
     w.abandonT = null;
+    w.abandonAuto = false;
     return;
   }
   w.abandonT -= dt;

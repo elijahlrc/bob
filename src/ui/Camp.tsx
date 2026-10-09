@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { Character } from '../calc/character';
 import { classDef } from '../data/classes';
 import { affixText, mapAffixDef, rewardText } from '../data/mapAffixes';
+import { flaskBase } from '../data/flasks';
 import { mapTypeDef } from '../data/mapTypes';
 import { themeDef } from '../data/themes';
 import { offersFor, type Verdict } from '../run/preview';
@@ -15,7 +16,7 @@ import { unseenItems } from '../run/found';
 import { useViewport } from './device';
 import { infoProps } from './info';
 import { Items } from './Items';
-import { OfferInfo } from './OfferInfo';
+import { OfferInfo, OfferTable } from './OfferInfo';
 import { Reward } from './Reward';
 import { Sheet } from './Sheet';
 import { Workbench } from './Workbench';
@@ -67,18 +68,47 @@ function Chalk({ c, offer }: { c: Controller; offer: number }) {
 
 /** What the character carries into the next map (docs/MAPS.md section 8). */
 function Arriving({ run }: { run: RunState }) {
-  const pct = (f: number) => `${Math.round(f * 100)}%`;
   const v = run.vitals;
   const flasks = run.build.flasks.filter((f) => f !== null);
+  const pct = (f: number) => Math.round(Math.max(0, Math.min(1, f)) * 100);
+  const gauge = (kind: 'life' | 'mana', label: string, f: number) => (
+    <div class="bar arriving-bar" title={`${label} ${pct(f)}%`}>
+      <div class={`bar-fill arriving-${kind}`} style={{ width: `${pct(f)}%` }} />
+      <span class="bar-text">
+        {label} {pct(f)}%
+      </span>
+    </div>
+  );
   return (
     <div
-      class="muted arriving"
+      class="arriving"
+      aria-label={`Arriving with life ${pct(v.life)}%, mana ${pct(v.mana)}%`}
       {...infoProps(
-        'Camp restores what ten seconds of sitting still would. Flasks refill only by killing.',
+        'What you carry into the next map. Camp restores what ten seconds of sitting still would. Flasks refill only by killing.',
       )}
     >
-      Arriving with life {pct(v.life)} · mana {pct(v.mana)}
-      {flasks.length > 0 && ` · flasks ${flasks.map((f) => pct(v.flasks[f!.uid] ?? 1)).join(' ')}`}
+      <div class="arriving-bars">
+        {gauge('life', 'Life', v.life)}
+        {gauge('mana', 'Mana', v.mana)}
+      </div>
+      {flasks.length > 0 && (
+        <div class="arriving-flasks">
+          {flasks.map((f) => {
+            const fill = pct(v.flasks[f!.uid] ?? 1);
+            return (
+              <div key={f!.uid} class="flask" title={`${f!.name}: ${fill}%`}>
+                <div class="flask-neck" />
+                <div class="flask-body">
+                  <div
+                    class={'flask-fill ' + flaskBase(f!.baseId).kind}
+                    style={{ height: `${fill}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -206,7 +236,7 @@ export function Camp({ c }: { c: Controller }) {
                     <strong>{mapTypeDef(o.type).name}</strong>: {mapTypeDef(o.type).text}
                   </div>
                 )}
-                <div class="muted">{t.bonusText}</div>
+                <OfferTable o={o} />
                 <OfferInfo o={o} gate={run.map % 10 === 0} more={!narrow || !!opened[o.id]} />
                 {o.tier && (
                   <div

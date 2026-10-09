@@ -480,6 +480,8 @@ export type WorldOpts = {
   loot?: (w: World, m: Actor) => AnyItem[];
   /** Called when a chest opens; returns its contents. */
   chestLoot?: (w: World, c: Chest) => AnyItem[];
+  /** Simulated seconds after which the map starts an automatic abandon (default AUTO_ABANDON_AFTER; Infinity for none). */
+  autoAbandonAt?: number;
   /** Hard cap on simulated seconds. */
   maxTime?: number;
   /** Refill the player's life and mana every tick (training-dummy tests). */
@@ -540,10 +542,10 @@ export type World = {
   deployables: Deployable[];
   deploySeq: number;
   /** The minions standing. */
-  player: Actor;
-  nextId: number;
   minions: Minion[];
   actors: Actor[];
+  player: Actor;
+  nextId: number;
   projectiles: Projectile[];
   /** Ground and standing things the player's skills made: consecrated and chilling ground, crystals, storms, walls. */
   fields: Field[];
@@ -588,8 +590,6 @@ export type World = {
   } | null;
   /** Herald of Agony: the Virulence held (it runs out), and the time to the next patch of Rimeplate's trail. */
   virulence: number;
-  trailT: number;
-  /** The blades of Blade Vortex: seconds left of each, and the time toward the next round. */
   /** The mana the supported skills have spent toward Arcane Surge. */
   surgeMana: number;
   /** The relic's regeneration: seconds left, and the life a second for the character and for the minions; and its nova's cooldown. */
@@ -597,6 +597,8 @@ export type World = {
   relicT: number;
   /** When rage was last gained from a melee hit. */
   rageGainT: number;
+  trailT: number;
+  /** The blades of Blade Vortex: seconds left of each, and the time toward the next round. */
   vortex: { key: string; blades: number[]; acc: number } | null;
   /** The markers of Storm Call. */
   markers: { x: number; y: number; t: number; profile: SkillProfile; hand: number }[];
@@ -633,19 +635,19 @@ export type World = {
   inFx: boolean;
   /** How far the last travelling skill carried the character, in tiles. */
   lastTravel: number;
-  /** The stages of a skill that grows with use, and how many hits the player has landed (a use that hits builds a stage). */
-  stacks: StackState | null;
   /** The channelled skill being held: its stages so far. */
   channel: ChannelState | null;
+  /** The stages of a skill that grows with use, and how many hits the player has landed (a use that hits builds a stage). */
+  stacks: StackState | null;
   hitsLanded: number;
   /** The projectiles of a barrage still to be fired, one after another. */
   shots: PendingShot[];
   /** How the last hit of the player's resolved (a strike that sends more out waits to see it land). */
   lastOutcome: 'hit' | 'miss' | 'block' | null;
-  zones: SkillZone[];
-  /** Bodies of dead monsters (EXPANSION 5.8), and recent explosions that destroy fresh ones. */
   effects: GroundEffect[];
   /** Zones the player's skills left on the ground. */
+  zones: SkillZone[];
+  /** Bodies of dead monsters (EXPANSION 5.8), and recent explosions that destroy fresh ones. */
   corpses: Corpse[];
   /** Whether any Warden Pylon has been spawned (so damage need not look for one on most maps). */
   hasPylons: boolean;
@@ -661,6 +663,8 @@ export type World = {
   status: MapStatus;
   /** Seconds until the player leaves after pressing Abandon, or null when not leaving. */
   abandonT: number | null;
+  /** The escape timer was started by the map running too long, not by the player: it cannot be cancelled. */
+  abandonAuto: boolean;
   /** The Crescendo step the monsters are at (0 on any other map): they deal and take damage as if stronger (docs/MAPS.md 9.1). */
   surge: number;
   /** Collapse: how far along the way the fall has reached (0 before it starts), and how far ahead of it the player is. */

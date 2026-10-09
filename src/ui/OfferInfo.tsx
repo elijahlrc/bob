@@ -12,6 +12,70 @@ const pct = (f: number) => `${Math.round(f * 100)}%`;
 const MIX_COLOR = ['#eadfc8', '#c89cff', '#9ad8ff', '#ff9a40', '#9ae05a'];
 const MIX_NAME = ['Physical', 'Lightning', 'Cold', 'Fire', 'Chaos'];
 
+const bonus = (f: number) =>
+  f > 0.0049 ? <span class="gain">+{Math.round(f * 100)}%</span> : <span class="muted">—</span>;
+const count = (n: number) => (n > 0 ? n : <span class="muted">—</span>);
+
+/**
+ * What the map pays and how many monsters it has, with the same rows on every offer card so that the cards can be read
+ * across. The percentages are over a plain map of the same level and leave out the character's own gear.
+ */
+export function OfferTable({ o }: { o: OfferPreview }) {
+  const r = o.rewards;
+  if (!r) return null;
+  const m = r.monsters;
+  return (
+    <table class="offer-table">
+      <tbody>
+        <tr
+          {...infoProps(
+            'Items dropped, over a plain map of this level (your own gear not counted).',
+          )}
+        >
+          <th>Item quantity</th>
+          <td>{bonus(r.quantity)}</td>
+        </tr>
+        <tr
+          {...infoProps(
+            'Chance of magic, rare and unique items, over a plain map of this level (your own gear not counted).',
+          )}
+        >
+          <th>Item rarity</th>
+          <td>{bonus(r.rarity)}</td>
+        </tr>
+        <tr {...infoProps('Experience from kills, over a plain map of this level.')}>
+          <th>Experience</th>
+          <td>{bonus(r.experience)}</td>
+        </tr>
+        <tr {...infoProps('How many monsters this map holds.')}>
+          <th>Monsters</th>
+          <td>{m.total}</td>
+        </tr>
+        <tr {...infoProps('Magic monsters, rare monsters, and bosses or champions on this map.')}>
+          <th>Magic · Rare · Boss</th>
+          <td>
+            {count(m.magic)} · {count(m.rare)} · {count(m.boss)}
+          </td>
+        </tr>
+        <tr>
+          <th>Bonus loot</th>
+          <td>
+            {r.bonus.length ? (
+              r.bonus.map((b) => (
+                <div key={b} class="gain">
+                  {b}
+                </div>
+              ))
+            ) : (
+              <span class="muted">—</span>
+            )}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  );
+}
+
 /** The part of an offer card that says who is on the map (docs/ENEMIES.md 5.1). */
 export function OfferInfo({
   o,

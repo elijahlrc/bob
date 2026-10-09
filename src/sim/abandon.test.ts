@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ABANDON_SECONDS, DT } from '../data/constants';
+import { ABANDON_SECONDS, AUTO_ABANDON_AFTER, DT } from '../data/constants';
 import { newRun, planFor, setMap, worldOptsFor } from '../run/run';
 import { woundedAbandonPolicy, canAbandon, cancelAbandon, requestAbandon } from './abandon';
 import { killActor } from './combat';
@@ -102,5 +102,43 @@ describe('abandon (docs/MAPS.md section 7)', () => {
     expect(policy(w)).toBe(false);
     w.player.life = w.player.def.maxLife * 0.2;
     expect(policy(w)).toBe(true);
+  });
+});
+
+describe('a map that drags on is left on its own', () => {
+  it('after 500 seconds, on any map, with the usual few seconds to go and no way to call it off', () => {
+    for (const map of [1, 10, 7]) {
+      const w = worldAt(map, { godMode: true });
+      w.t = AUTO_ABANDON_AFTER - 1;
+      steps(w, 0.5);
+      expect(w.abandonT, `map ${map}`).toBeNull();
+      steps(w, 2);
+      expect(w.abandonT).not.toBeNull();
+      expect(w.abandonAuto).toBe(true);
+      expect(cancelAbandon(w)).toBe(false);
+      steps(w, ABANDON_SECONDS + 1);
+      expect(w.status, `map ${map}`).toBe('abandoned');
+      expect(w.t).toBeCloseTo(AUTO_ABANDON_AFTER + ABANDON_SECONDS, 0);
+    }
+  });
+
+  it('not when the exit is open, and not when the map opts out', () => {
+    const open = worldAt(7, { godMode: true });
+    open.exitOpen = true;
+    open.t = AUTO_ABANDON_AFTER + 10;
+    steps(open, 1);
+    expect(open.abandonT).toBeNull();
+    const never = worldAt(7, { godMode: true, autoAbandonAt: Infinity });
+    never.t = AUTO_ABANDON_AFTER + 10;
+    steps(never, 1);
+    expect(never.abandonT).toBeNull();
+  });
+
+  it('a player who is already leaving keeps the choice to stay', () => {
+    const w = worldAt(7, { godMode: true });
+    w.t = AUTO_ABANDON_AFTER - 3;
+    expect(requestAbandon(w)).toBe(true);
+    expect(w.abandonAuto).toBe(false);
+    expect(cancelAbandon(w)).toBe(true);
   });
 });

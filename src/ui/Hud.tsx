@@ -198,10 +198,17 @@ function AbandonButton({ c, w }: { c: Controller; w: World }) {
   if (w.abandonT !== null) {
     return (
       <div class="hud-abandon">
-        <span>Leaving in {Math.max(0, w.abandonT).toFixed(1)} s</span>
-        <button class="btn small" onClick={() => c.cancelAbandon()}>
-          Stay
-        </button>
+        <span
+          title={w.abandonAuto ? 'A map is left on its own after about eight minutes.' : undefined}
+        >
+          {w.abandonAuto ? 'Taking too long: leaving' : 'Leaving'} in{' '}
+          {Math.max(0, w.abandonT).toFixed(1)} s
+        </span>
+        {!w.abandonAuto && (
+          <button class="btn small" onClick={() => c.cancelAbandon()}>
+            Stay
+          </button>
+        )}
       </div>
     );
   }

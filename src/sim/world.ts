@@ -1,4 +1,5 @@
 import { MONSTER_TYPES } from '../data/monsters';
+import { reservedMana } from './reserve';
 import { tickPhases } from './phases';
 import { Character } from '../calc/character';
 import { noCharges, type ChargeCounts } from '../calc/charges';
@@ -26,11 +27,10 @@ import { tickCaught, tickWarp, tickWither } from './blinks';
 import { tickLegion, tickOffering } from './minionFx';
 import { tickSupports } from './supportFx';
 import { tickSkillFx } from './skillFx';
-import { tickBerserk, tickDegen, tickStance } from './stances';
 import { tickBlasphemy } from './hexes';
+import { tickBerserk, tickDegen, tickStance } from './stances';
 import { tickProliferation } from './proliferate';
 import { tickFields } from './fields';
-import { reservedMana } from './reserve';
 import { tickShots } from './shots';
 import { tickDeployables } from './deploy';
 import { tickMinions } from './minions';
@@ -215,6 +215,7 @@ export function createWorld(inp: CreateWorldInput): World {
     xp: inp.xp,
     status: 'running',
     abandonT: null,
+    abandonAuto: false,
     surge: 0,
     collapseFront: 0,
     collapseGap: Infinity,
@@ -547,8 +548,8 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickBuffs(w, dt);
   tickAuraBurn(w, dt);
   tickDeployables(w, dt);
-  tickSkillZones(w, dt);
   tickMinions(w, dt);
+  tickSkillZones(w, dt);
   tickFlasks(w, dt, policy);
   // Flow field for monsters follows the player tile.
   w.grid.buildFlow(p.x, p.y);
@@ -570,7 +571,6 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     if (!a.action) a.carry = 0;
   }
   tickShots(w);
-  tickEffects(w, dt);
   tickChannel(w);
   tickFields(w, dt);
   tickBanner(w, dt);
@@ -587,6 +587,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickBlasphemy(w, dt);
   tickProliferation(w, dt);
   updateProjectiles(w, dt);
+  tickEffects(w, dt);
   tickZones(w, dt);
   tickCorpses(w, dt);
   separate(w);

@@ -22,7 +22,7 @@ import {
   STUCK_TIME,
 } from '../data/constants';
 import { MONSTER_TYPES } from '../data/monsters';
-import { actorById, startAction } from './actions';
+import { actorById, segmentDist, startAction } from './actions';
 import { bloaterBurst, corpseNear, isZone, moveMult } from './factions';
 import { flaskMask, monsterConds, playerConds } from './combat';
 import { hasChargesToSpend, offCooldown, skillReady, useSkill } from './cooldowns';
@@ -247,6 +247,15 @@ export function hazardAt(
   return null;
 }
 
+/** Whether a living monster stands on the straight way from one point to another, for a body of radius `r`. */
+function bodyOnWay(w: World, x0: number, y0: number, x1: number, y1: number, r: number): boolean {
+  for (const m of w.actors) {
+    if (m.isPlayer || !m.alive) continue;
+    if (segmentDist(m.x, m.y, x0, y0, x1, y1) < r + m.r + 0.05) return true;
+  }
+  return false;
+}
+
 /**
  * Step out of a hazard (EXPANSION 5.8): the nearest clear spot, but only one from which the target is still in
  * reach, so the player never walks out of the fight. Returns whether it moved.
@@ -267,6 +276,8 @@ function avoidHazard(w: World, dt: number): boolean {
       const c = w.grid.collide(p.x + Math.cos(ang) * len, p.y + Math.sin(ang) * len, p.r);
       if (Math.hypot(c.x - p.x, c.y - p.y) < len - 0.2) continue;
       if (hazardAt(w, c.x, c.y, p.r + 0.3) || !w.grid.los(p.x, p.y, c.x, c.y)) continue;
+      // A way out through a monster is none: the body shoves it along and its warning goes with it.
+      if (bodyOnWay(w, p.x, p.y, c.x, c.y, p.r)) continue;
       if (target && target.alive) {
         const d = Math.hypot(target.x - c.x, target.y - c.y);
         if (d > reach || (!melee && !w.grid.los(c.x, c.y, target.x, target.y))) continue;

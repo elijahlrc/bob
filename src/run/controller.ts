@@ -127,7 +127,13 @@ export class Controller {
       plan,
       build: run.build,
       xp: 0,
-      opts: { ...worldOptsFor(run, plan), godMode: true, freeResources: true, maxTime: 900 },
+      opts: {
+        ...worldOptsFor(run, plan),
+        godMode: true,
+        freeResources: true,
+        maxTime: 900,
+        autoAbandonAt: Infinity,
+      },
     });
     this.acc = 0;
     this.screen = 'map';
