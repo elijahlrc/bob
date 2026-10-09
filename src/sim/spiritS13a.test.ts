@@ -848,3 +848,29 @@ describe('repairs from the fresh audit (S14)', () => {
     expect(w.char.profile(w.primary, 0).pierce).toBeGreaterThan(0);
   });
 });
+
+describe('Cobra Lash (viperLash)', () => {
+  it('is a chaos projectile that flies on from enemy to enemy, not a bolt of lightning', () => {
+    const { world: w, dummy } = world(['viperLash'], 4, 'dagger_3', DEX);
+    const sk = w.char.primary.skill;
+    expect(sk.behaviour.kind).toBe('projectile');
+    expect(sk.tags).not.toContain('lightning');
+    const p = w.char.profile(w.primary, 0);
+    expect(p.chains).toBeGreaterThanOrEqual(3);
+    expect(p.hands[0].chunks.every((c) => c.type === 0 || c.type === 4)).toBe(true);
+    const second = neighbour(w, dummy.x + 1.5, dummy.y + 1.0);
+    let spawned = 0;
+    let bolts = 0;
+    for (let i = 0; i < 60 * 4; i++) {
+      stepWorld(w);
+      for (const e of w.events) {
+        if (e.t === 'projectileSpawned') spawned++;
+        if (e.t === 'chain') bolts++;
+      }
+    }
+    expect(spawned).toBeGreaterThan(0);
+    expect(bolts).toBe(0);
+    expect(dummy.life).toBeLessThan(1e9);
+    expect(second.life).toBeLessThan(1e9);
+  });
+});

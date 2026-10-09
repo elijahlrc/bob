@@ -363,7 +363,7 @@
   "viperLash": {
    "ref": "Cobra Lash",
    "status": "covered",
-   "note": "A poisonous projectile that chains between enemies, from a dagger or a claw."
+   "note": "A poisonous projectile fired by a dagger or claw, which flies on to the next enemy near the one it hit, three times at first and five at the highest level."
   },
   "suddenFrost": {
    "ref": "Cold Snap",
