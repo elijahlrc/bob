@@ -405,6 +405,34 @@
 .ix-tidy-check {
   font-size: 13px;
 }
+/* On a phone the button can sit anywhere in a wrapped row, so the menu is a sheet above the camp bar instead. */
+@media (max-width: 600px) {
+  .ix-tidy-veil {
+    z-index: 19;
+    background: #0006;
+  }
+  .ix-tidy-pop {
+    position: fixed;
+    z-index: 20;
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: calc(var(--camp-bar, 52px) + var(--safe-bottom, 0px));
+    min-width: 0;
+    max-height: 70vh;
+    overflow: auto;
+    padding: 12px calc(12px + var(--safe-right, 0px)) 12px calc(12px + var(--safe-left, 0px));
+    border-width: 2px 0 0;
+    border-top-color: var(--hi);
+    border-radius: 0;
+  }
+  .ix-tidy-pop .btn,
+  .ix-tidy-check {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+}
 .ix-chips {
   display: flex;
   flex-wrap: wrap;
