@@ -208,7 +208,7 @@ function utilitySlot(w: World, c: SkillChoice): SkillSlot {
         for (const h of a.hexes) if (h.id === u.hex && h.t > most) most = h.t;
     if (most > 0)
       up = { state: 'active', remaining: most, total: 0, words: `On an enemy, ${secs(most)} left` };
-  } else cooldown = u.cooldown;
+  } else cooldown = u.kind === 'offering' ? 0.5 : u.cooldown;
   let b: Built;
   if (cast) {
     b = {

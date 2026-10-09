@@ -119,6 +119,15 @@ export type SkillProfile = {
   minionPhysReduction: number;
   minionBlock: number;
   minionCount: number;
+  /** What supports give the minions of the skill: resistances, elemental damage, exposure, a burning aura and the burn they take. */
+  minionSup: {
+    res: number;
+    maxRes: number;
+    eleMore: number;
+    exposure: number;
+    burn: number;
+    selfBurn: number;
+  };
   /** How many totems or brands can stand, or traps or mines go off, at once (1 and the support mods). */
   deployCount: number;
   cost: number;
@@ -531,6 +540,14 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     minionPhysReduction: db.sum('base', 'minionPhysReduction', baseCtx),
     minionBlock: db.sum('base', 'minionBlock', baseCtx),
     minionCount: Math.round(db.sum('base', 'minionCount', baseCtx)),
+    minionSup: {
+      res: db.sum('base', 'minion.res', baseCtx),
+      maxRes: db.sum('base', 'minion.maxRes', baseCtx),
+      eleMore: db.sum('base', 'minion.eleMore', baseCtx),
+      exposure: db.sum('base', 'minion.exposure', baseCtx),
+      burn: db.sum('base', 'minion.burn', baseCtx) * db.mult('minionDamage', baseCtx),
+      selfBurn: db.sum('base', 'minion.selfBurn', baseCtx),
+    },
     cost: Math.max(
       0,
       Math.round(

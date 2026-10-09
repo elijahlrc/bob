@@ -1607,7 +1607,9 @@ export class Character {
             ? HEX_SECONDS * 0.9
             : u.kind === 'summon'
               ? (u.seconds ?? 90)
-              : u.cooldown;
+              : u.kind === 'offering'
+                ? u.seconds
+                : u.cooldown;
       const rate = 1 / Math.max(every, p.useTime);
       return { choice, rate, busy: rate * p.useTime };
     });

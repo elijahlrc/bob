@@ -26,9 +26,9 @@ export function levelValue(v: LevelValue, level: number, geometric = false): num
 }
 
 export function gemMods(mods: readonly GemMod[], level: number, sourceId: string): Mod[] {
-  return mods.map((m) => ({
+  return mods.map(({ geo, ...m }) => ({
     ...m,
-    value: Math.round(levelValue(m.value, level) * 10) / 10,
+    value: Math.round(levelValue(m.value, level, geo) * 10) / 10,
     source: { kind: 'gem', id: sourceId },
   }));
 }

@@ -1,5 +1,11 @@
 import { gemAttrReq, gemMods, levelValue, spellDamageAt } from '../calc/gems';
-import { GEM_LEVEL_REQ, type ActiveGemDef, type GemDef, type SkillBehaviour } from '../data/gems';
+import {
+  GEM_LEVEL_REQ,
+  type ActiveGemDef,
+  type GemDef,
+  type LevelValue,
+  type SkillBehaviour,
+} from '../data/gems';
 import { BUFFS } from '../data/buffs';
 import { HEXES, hexEffect, hexSeconds, hexText } from '../data/hexes';
 import { STATUSES } from '../data/statuses';
@@ -140,12 +146,61 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
   if (u.kind === 'summon') {
     const m = MINIONS[u.minion];
     const n = Math.round(levelValue(u.count, level));
+    const lines: string[] = [];
+    if (u.corpse)
+      lines.push(
+        `Raises a corpse near you as that monster, at level ${num(levelValue(u.corpse.level, level))}, with the attack it had; ${level >= 13 ? 2 : 1} at a time`,
+      );
+    else if (u.animate)
+      lines.push(
+        `Uses up a normal or magic melee weapon on the ground (item level up to ${num(levelValue(u.animate.maxIlvl, level))}); it strikes with that weapon's damage and ${num(levelValue(u.animate.addMin, level))} to ${num(levelValue(u.animate.addMax, level))} added physical damage`,
+      );
+    else if (u.warden)
+      lines.push(
+        `Puts the normal or magic armour and weapons on the ground (up to level ${num(levelValue(u.warden.maxReq, level))}) on one Warden, a piece for each cast; ${num(levelValue(u.warden.addMin, level))} to ${num(levelValue(u.warden.addMax, level))} added physical damage`,
+      );
+    else
+      lines.push(
+        `Summons ${n} ${m.name}${n === 1 ? '' : 's'}${u.seconds ? ` for ${num(u.seconds)} s` : ''}`,
+      );
+    lines.push(
+      'They follow you and strike the nearest enemy; they can fall, and casting again fills their places',
+    );
+    if (def.cooldown) lines.push(`${num(levelValue(def.cooldown, level))} s cooldown`);
+    const effects = modsText(gemMods(u.ownerMods ?? [], level, def.id));
+    if (u.golem)
+      effects.push(
+        `The other minions deal ${num(levelValue(u.golem.addMin, level))} to ${num(levelValue(u.golem.addMax, level))} added physical damage while it stands`,
+        `It deals ${num(u.golem.perNearby)}% more damage for each of them near it, up to ${num(u.golem.cap)}%, and has ${num(levelValue(u.golem.life, level))}% more life`,
+      );
+    return { stats: lines, effects };
+  }
+  if (u.kind === 'offering') {
+    const fx: [string, LevelValue | undefined, string][] = [
+      ['Minions attack', u.atkInc, '% faster'],
+      ['Minions move', u.moveInc, '% faster'],
+      ['Minions cast', u.castInc, '% faster'],
+      ['Minions have', u.blockAtk, '% more chance to block attacks'],
+      ['Minions have', u.blockSpell, '% more chance to block spells'],
+      ['Minions recover', u.healOnBlock, ' life when they block'],
+      ['Minions gain', u.physAsChaos, '% of their physical damage as chaos damage'],
+      ['Minions have', u.res, '% to all elemental resistances'],
+    ];
     return {
       stats: [
-        `Summons ${n} ${m.name}${n === 1 ? '' : 's'}${u.seconds ? ` for ${num(u.seconds)} s` : ''}`,
-        'They follow you and strike the nearest enemy; they can fall, and casting again fills their places',
+        `Uses a corpse and up to ${u.maxCorpses - 1} more about it; lasts ${num(u.seconds)} s and ${num(u.perCorpse)} s more for each extra corpse`,
+        'Only one offering stands at a time; cast when you have minions and a corpse is near',
       ],
-      effects: modsText(gemMods(u.ownerMods ?? [], level, def.id)),
+      effects: [
+        ...fx
+          .filter((x) => x[1] !== undefined)
+          .map((x) => `${x[0]} ${num(levelValue(x[1]!, level))}${x[2]}`),
+        ...(u.esPerCorpse
+          ? [
+              `Minions gain ${num(u.esPerCorpse)}% of their life as energy shield for each corpse used`,
+            ]
+          : []),
+      ],
     };
   }
   return {

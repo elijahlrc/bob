@@ -112,6 +112,8 @@ export function deliveryOf(
         return 'blink';
       case 'summon':
         return 'summon';
+      case 'offering':
+        return 'buff';
     }
   }
   switch (b.kind) {

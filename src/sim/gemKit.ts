@@ -110,6 +110,13 @@ export function seedFor(def: ActiveGemDef, world: World, dummy: Actor): void {
       name: 'Warrior',
       life: 200,
     });
+  else if (u?.kind === 'summon' && u.warden)
+    world.drops.push({
+      id: world.nextId++,
+      x: world.player.x + 1,
+      y: world.player.y,
+      item: makeItem(() => 9998, 'body_ar_1', 5, 0),
+    });
   else if (u?.kind === 'summon' && u.animate)
     world.drops.push({
       id: world.nextId++,

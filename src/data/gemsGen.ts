@@ -5472,26 +5472,20 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     castTime: 1,
     cost: [30, 54],
     mods: [],
+    cooldown: 6,
     utility: {
       kind: 'summon',
       minion: 'carrionGolem',
       count: 1,
-      ownerMods: [
-        {
-          stat: 'damage.min',
-          kind: 'base',
-          value: [1, 20],
-          damageTypes: ['physical'],
-        },
-        {
-          stat: 'damage.max',
-          kind: 'base',
-          value: [2, 30],
-          damageTypes: ['physical'],
-        },
-      ],
+      golem: {
+        addMin: [7, 27],
+        addMax: [11, 41],
+        perNearby: 8,
+        cap: 80,
+        life: [30, 68],
+      },
     },
-    description: 'Raises a colossus of carrion that adds physical damage to your hits.',
+    description: 'Raises a colossus of carrion that makes your other minions hit harder.',
   },
   {
     kind: 'active',
@@ -5639,8 +5633,15 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       kind: 'summon',
       minion: 'sentinel',
       count: 1,
+      warden: {
+        maxReq: [33, 100],
+        addMin: [22, 56],
+        addMax: [34, 84],
+        life: [0, 76],
+        melee: [0, 76],
+      },
     },
-    description: 'Wakes a sentinel to guard you.',
+    description: 'Wakes the armour and arms you find into a warden that wears them.',
   },
   {
     kind: 'active',
@@ -5716,25 +5717,16 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cost: [16, 33],
     mods: [],
     utility: {
-      kind: 'buff',
+      kind: 'offering',
       buff: 'offeringBone',
-      seconds: 8,
-      policy: 'rally',
-      cooldown: 8,
-      mods: [
-        {
-          stat: 'blockAttack',
-          kind: 'base',
-          value: [25, 35],
-        },
-        {
-          stat: 'blockSpell',
-          kind: 'base',
-          value: [25, 34],
-        },
-      ],
+      seconds: 5,
+      perCorpse: 1,
+      maxCorpses: 5,
+      blockAtk: [25, 35],
+      blockSpell: [25, 34],
+      healOnBlock: [11, 594],
     },
-    description: 'An offering of bone that raises your guard.',
+    description: "An offering of bone that raises your minions' guard.",
   },
   {
     kind: 'active',
@@ -5753,30 +5745,16 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cost: [16, 33],
     mods: [],
     utility: {
-      kind: 'buff',
+      kind: 'offering',
       buff: 'offeringFlesh',
-      seconds: 8,
-      policy: 'rally',
-      cooldown: 8,
-      mods: [
-        {
-          stat: 'attackSpeed',
-          kind: 'inc',
-          value: [20, 30],
-        },
-        {
-          stat: 'castSpeed',
-          kind: 'inc',
-          value: [20, 30],
-        },
-        {
-          stat: 'moveSpeed',
-          kind: 'inc',
-          value: [20, 29],
-        },
-      ],
+      seconds: 5,
+      perCorpse: 1,
+      maxCorpses: 5,
+      atkInc: [20, 30],
+      castInc: [20, 30],
+      moveInc: [20, 29],
     },
-    description: 'An offering of flesh that quickens you.',
+    description: 'An offering of flesh that quickens your minions.',
   },
   {
     kind: 'active',
@@ -5795,25 +5773,16 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cost: [16, 33],
     mods: [],
     utility: {
-      kind: 'buff',
+      kind: 'offering',
       buff: 'offeringSpirit',
-      seconds: 8,
-      policy: 'rally',
-      cooldown: 8,
-      mods: [
-        {
-          stat: 'gain.physical.chaos',
-          kind: 'base',
-          value: [20, 29],
-        },
-        {
-          stat: 'resist.allEle',
-          kind: 'base',
-          value: [20, 39],
-        },
-      ],
+      seconds: 5,
+      perCorpse: 1,
+      maxCorpses: 5,
+      esPerCorpse: 4,
+      physAsChaos: [20, 29],
+      res: [20, 30],
     },
-    description: 'An offering of spirit that warms your resolve.',
+    description: "An offering of spirit that warms your minions' resolve.",
   },
   {
     kind: 'active',
@@ -8229,12 +8198,28 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.3,
     mods: [
       {
-        stat: 'minionDamage',
-        kind: 'more',
+        stat: 'minion.res',
+        kind: 'base',
+        value: [19, 29],
+      },
+      {
+        stat: 'minion.maxRes',
+        kind: 'base',
+        value: [0, 2],
+      },
+      {
+        stat: 'minion.eleMore',
+        kind: 'base',
         value: [20, 29],
       },
+      {
+        stat: 'minion.exposure',
+        kind: 'base',
+        value: 10,
+      },
     ],
-    description: 'Minions hit harder with elemental damage.',
+    description:
+      'Minions shrug off the elements, hit harder with them and leave the enemy open to them.',
   },
   {
     kind: 'support',
@@ -8266,12 +8251,18 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.3,
     mods: [
       {
-        stat: 'minionDamage',
-        kind: 'more',
-        value: 18,
+        stat: 'minion.burn',
+        kind: 'base',
+        value: [15.6, 1316],
+        geo: true,
+      },
+      {
+        stat: 'minion.selfBurn',
+        kind: 'base',
+        value: 40,
       },
     ],
-    description: 'Minions are wreathed in fire and deal more damage.',
+    description: 'Minions are wreathed in fire that burns what is near, and them.',
   },
 ];
 

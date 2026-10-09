@@ -1,5 +1,6 @@
 import { hexTotals } from '../data/hexes';
 import type { Minion } from './minions';
+import { NO_SUP } from './minionSup';
 import type { Actor } from './types';
 import { newMoveState } from './movement';
 
@@ -140,6 +141,15 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     dmg: 0,
     speed: 0,
     boomed: false,
+    mtype: undefined,
+    fixedHit: undefined,
+    fixedRate: undefined,
+    sup: NO_SUP,
+    golem: undefined,
+    gear: undefined,
+    gearKey: undefined,
+    bodyDef: undefined,
+    defKey: undefined,
   };
   return a;
 }

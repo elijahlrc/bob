@@ -1,17 +1,18 @@
 import { levelValue } from '../calc/gems';
 import type { SkillChoice } from '../calc/character';
+import type { Defence } from '../calc/combat';
+import { weaponStats } from '../calc/items';
 import { minionBody } from '../calc/minion';
 import type { SkillProfile } from '../calc/skill';
-import { spellBaseDamage } from '../data/constants';
-import { weaponStats } from '../calc/items';
 import { isWeaponClass, itemBase } from '../data/bases';
+import { MINIONS, type MinionDef, type MinionId } from '../data/minions';
 import { MONSTER_TYPES, type MonsterTypeId } from '../data/monsters';
-import { MINIONS, MINION_ENEMY_RES, type MinionDef, type MinionId } from '../data/minions';
 import type { Item } from '../data/types';
-import { takeCorpse, type Corpse } from './factions';
-import { DAMAGE_TYPES } from '../mods/types';
 import { newActor } from './actor';
 import { rawHit, tickActor } from './combat';
+import { takeCorpse, type Corpse } from './factions';
+import { auraNow, minionStrike, refreshMinionDef, wearItem } from './minionFx';
+import type { MinionSup } from './minionSup';
 import type { Actor, Drop, World } from './types';
 
 /**
@@ -27,7 +28,7 @@ export type Minion = Actor & {
   /** Seconds left; Infinity until the map ends. */
   t: number;
   atkT: number;
-  /** The summoning gem's level, and the multipliers of the minion modifiers when it was summoned. */
+  /** The level its blows are read at (the summoning gem's, or a spectre's), and the multipliers of the minion modifiers. */
   level: number;
   dmg: number;
   speed: number;
@@ -35,9 +36,19 @@ export type Minion = Actor & {
   boomed?: boolean;
   /** A spectre: the kind of monster it was. */
   mtype?: MonsterTypeId;
-  /** An animated weapon: what each blow deals before the minion modifiers, and how often it strikes. */
+  /** An animated weapon or a Guardian: what each blow deals before the minion modifiers, and how often it strikes. */
   fixedHit?: number;
   fixedRate?: number;
+  /** What the supports of its skill give it. */
+  sup: MinionSup;
+  /** A golem: the added physical damage it gives the other minions, and how much harder it hits for each of them near. */
+  golem?: { min: number; max: number; perNearby: number; cap: number };
+  /** A Guardian: the items it wears, by place. */
+  gear?: Map<string, Item>;
+  gearKey?: string;
+  /** Its defence before the offering, the supports and the gear, and the signature of what it has now. */
+  bodyDef?: Defence;
+  defKey?: string;
 };
 
 const SEEK = 14;
@@ -75,6 +86,7 @@ export function summonCount(c: SkillChoice, prof: SkillProfile): number {
   if (u?.kind !== 'summon') return 0;
   // A spectre: one at first, a second from the thirteenth level of the gem.
   if (u.corpse) return Math.max(1, (c.skill.level >= 13 ? 2 : 1) + prof.minionCount);
+  if (u.warden) return 1;
   return Math.max(1, Math.round(levelValue(u.count, c.skill.level)) + prof.minionCount);
 }
 
@@ -82,6 +94,64 @@ export function summonCount(c: SkillChoice, prof: SkillProfile): number {
 export function summonRespawn(c: SkillChoice): number {
   const u = c.skill.utility;
   return u?.kind === 'summon' ? MINIONS[u.minion].respawn : 1;
+}
+
+type Make = {
+  /** The level its body is made at (the map's by default) and the level its blows are read at (the gem's by default). */
+  bodyLevel?: number;
+  blowLevel?: number;
+  lifeMult?: number;
+  seconds?: number;
+  mtype?: MonsterTypeId;
+  r?: number;
+  name?: string;
+};
+
+/** A minion of a skill, put down at a spot with the numbers of the skill's modifiers and supports. */
+function makeMinion(
+  w: World,
+  c: SkillChoice,
+  prof: SkillProfile,
+  kind: MinionId,
+  x: number,
+  y: number,
+  o: Make = {},
+): Minion {
+  const def = MINIONS[kind];
+  const body = minionBody(
+    kind,
+    o.bodyLevel ?? w.plan.areaLevel,
+    prof.minionLife * (o.lifeMult ?? 1),
+    prof.minionTaken,
+    prof.minionRegen,
+    prof.minionPhysReduction,
+    prof.minionBlock,
+  );
+  const r = o.r ?? def.r;
+  const spot = w.grid.collide(x, y, r);
+  const m = newActor(w.nextId++, false, spot.x, spot.y, r) as Minion;
+  m.faction = 0;
+  m.def = body.def;
+  m.bodyDef = body.def;
+  m.life = body.life;
+  m.name = o.name ?? def.name;
+  m.rarity = 'normal';
+  m.noReward = true;
+  // Always awake, so nothing treats it as a sleeping monster.
+  m.state = 'chase';
+  m.key = c.key;
+  m.kind = kind;
+  m.mtype = o.mtype;
+  m.t = o.seconds === undefined ? Infinity : o.seconds * prof.skillDuration;
+  m.atkT = 0;
+  m.level = o.blowLevel ?? c.skill.level;
+  m.dmg = prof.minionDamage;
+  m.speed = prof.minionSpeed;
+  m.sup = prof.minionSup;
+  w.minions.push(m);
+  w.events.push({ t: 'summon', id: m.id });
+  refreshMinionDef(m, auraNow(w));
+  return m;
 }
 
 /** The summon lands: the skill's minions that stand are renewed, and new ones fill the places of those that fell. */
@@ -93,37 +163,28 @@ export function summonMinions(w: World, c: SkillChoice, prof: SkillProfile): voi
   const seconds = u.seconds === undefined ? Infinity : u.seconds * prof.skillDuration;
   for (const m of w.minions) if (m.key === c.key && m.alive) m.t = seconds;
   const p = w.player;
-  const def = MINIONS[u.minion];
-  const body = minionBody(
-    u.minion,
-    w.plan.areaLevel,
-    prof.minionLife,
-    prof.minionTaken,
-    prof.minionRegen,
-    prof.minionPhysReduction,
-    prof.minionBlock,
-  );
   for (let i = have; i < n; i++) {
     const ang = (i / n) * Math.PI * 2;
-    const spot = w.grid.collide(p.x + Math.cos(ang) * 1.2, p.y + Math.sin(ang) * 1.2, def.r);
-    const m = newActor(w.nextId++, false, spot.x, spot.y, def.r) as Minion;
-    m.faction = 0;
-    m.def = body.def;
-    m.life = body.life;
-    m.name = def.name;
-    m.rarity = 'normal';
-    m.noReward = true;
-    // Always awake, so nothing treats it as a sleeping monster.
-    m.state = 'chase';
-    m.key = c.key;
-    m.kind = u.minion;
-    m.t = seconds;
-    m.atkT = 0;
-    m.level = c.skill.level;
-    m.dmg = prof.minionDamage;
-    m.speed = prof.minionSpeed;
-    w.minions.push(m);
-    w.events.push({ t: 'summon', id: m.id });
+    const g = u.golem;
+    const m = makeMinion(
+      w,
+      c,
+      prof,
+      u.minion,
+      p.x + Math.cos(ang) * 1.2,
+      p.y + Math.sin(ang) * 1.2,
+      {
+        seconds: u.seconds,
+        lifeMult: g ? 1 + levelValue(g.life, c.skill.level) / 100 : 1,
+      },
+    );
+    if (g)
+      m.golem = {
+        min: levelValue(g.addMin, c.skill.level),
+        max: levelValue(g.addMax, c.skill.level),
+        perNearby: g.perNearby,
+        cap: g.cap,
+      };
   }
 }
 
@@ -134,34 +195,14 @@ export function raiseSpectre(w: World, c: SkillChoice, prof: SkillProfile, corps
   takeCorpse(w, corpse);
   const t = MONSTER_TYPES[corpse.spec.type];
   const level = Math.round(levelValue(u.corpse.level, c.skill.level));
-  const def = MINIONS[u.minion];
-  const body = minionBody(
-    u.minion,
-    level,
-    prof.minionLife * t.lifeMult,
-    prof.minionTaken,
-    prof.minionRegen,
-    prof.minionPhysReduction,
-    prof.minionBlock,
-  );
-  const m = newActor(w.nextId++, false, corpse.x, corpse.y, t.radius || def.r) as Minion;
-  m.faction = 0;
-  m.def = body.def;
-  m.life = body.life;
-  m.name = corpse.name;
-  m.rarity = 'normal';
-  m.noReward = true;
-  m.state = 'chase';
-  m.key = c.key;
-  m.kind = u.minion;
-  m.mtype = corpse.spec.type;
-  m.t = Infinity;
-  m.atkT = 0;
-  m.level = level;
-  m.dmg = prof.minionDamage;
-  m.speed = prof.minionSpeed;
-  w.minions.push(m);
-  w.events.push({ t: 'summon', id: m.id });
+  makeMinion(w, c, prof, u.minion, corpse.x, corpse.y, {
+    bodyLevel: level,
+    blowLevel: level,
+    lifeMult: t.lifeMult,
+    mtype: corpse.spec.type,
+    r: t.radius,
+    name: corpse.name,
+  });
 }
 
 /**
@@ -205,37 +246,31 @@ export function animateWeapon(w: World, c: SkillChoice, prof: SkillProfile, drop
     min += a;
     max += b;
   }
-  const def = MINIONS[u.minion];
-  const body = minionBody(
-    u.minion,
-    w.plan.areaLevel,
-    prof.minionLife,
-    prof.minionTaken,
-    prof.minionRegen,
-    prof.minionPhysReduction,
-    prof.minionBlock,
-  );
   const p = w.player;
-  const spot = w.grid.collide(p.x + w.rngTrig.float(-1, 1), p.y + w.rngTrig.float(-1, 1), def.r);
-  const m = newActor(w.nextId++, false, spot.x, spot.y, def.r) as Minion;
-  m.faction = 0;
-  m.def = body.def;
-  m.life = body.life;
-  m.name = 'Animated weapon';
-  m.rarity = 'normal';
-  m.noReward = true;
-  m.state = 'chase';
-  m.key = c.key;
-  m.kind = u.minion;
-  m.t = (u.seconds ?? 37.5) * prof.skillDuration;
-  m.atkT = 0;
-  m.level = w.plan.areaLevel;
-  m.dmg = prof.minionDamage;
-  m.speed = prof.minionSpeed;
+  const m = makeMinion(
+    w,
+    c,
+    prof,
+    u.minion,
+    p.x + w.rngTrig.float(-1, 1),
+    p.y + w.rngTrig.float(-1, 1),
+    { seconds: u.seconds ?? 37.5, name: 'Animated weapon', blowLevel: w.plan.areaLevel },
+  );
   m.fixedHit = (min + max) / 2;
   m.fixedRate = hand.aps * (1 + levelValue(u.animate.speed, lvl) / 100);
-  w.minions.push(m);
-  w.events.push({ t: 'summon', id: m.id });
+}
+
+/** Animate Guardian: the item lying on the ground is put on the one Guardian, which is made if there is none. */
+export function animateGuardian(w: World, c: SkillChoice, prof: SkillProfile, drop: Drop): void {
+  const u = c.skill.utility;
+  if (u?.kind !== 'summon' || !u.warden) return;
+  const p = w.player;
+  wearItem(w, c, drop, () =>
+    makeMinion(w, c, prof, u.minion, p.x + 0.8, p.y, {
+      lifeMult: 1 + levelValue(u.warden!.life, c.skill.level) / 100,
+      name: 'Warden',
+    }),
+  );
 }
 
 /** One minion put down at a spot (the clone a Blink Arrow leaves where the character stood). */
@@ -248,34 +283,7 @@ export function summonAt(
   x: number,
   y: number,
 ): void {
-  const def = MINIONS[kind];
-  const body = minionBody(
-    kind,
-    w.plan.areaLevel,
-    prof.minionLife,
-    prof.minionTaken,
-    prof.minionRegen,
-    prof.minionPhysReduction,
-    prof.minionBlock,
-  );
-  const spot = w.grid.collide(x, y, def.r);
-  const m = newActor(w.nextId++, false, spot.x, spot.y, def.r) as Minion;
-  m.faction = 0;
-  m.def = body.def;
-  m.life = body.life;
-  m.name = def.name;
-  m.rarity = 'normal';
-  m.noReward = true;
-  m.state = 'chase';
-  m.key = c.key;
-  m.kind = kind;
-  m.t = seconds * prof.skillDuration;
-  m.atkT = 0;
-  m.level = c.skill.level;
-  m.dmg = prof.minionDamage;
-  m.speed = prof.minionSpeed;
-  w.minions.push(m);
-  w.events.push({ t: 'summon', id: m.id });
+  makeMinion(w, c, prof, kind, x, y, { seconds });
 }
 
 function step(w: World, m: Minion, tx: number, ty: number, dt: number, speed: number): void {
@@ -295,10 +303,13 @@ export function tickMinions(w: World, dt: number): void {
     (e) => !e.isPlayer && e.alive && e.phaseT <= 0 && e.state !== 'idle',
   );
   const unstable = w.char.db.flag('minionInstability');
+  const aura = auraNow(w);
   let j = 0;
   for (const m of w.minions) {
     m.t -= dt;
     if (!m.alive || m.t <= 0) continue;
+    // The offering, the golem and the supports show in its defence.
+    refreshMinionDef(m, aura);
     // Damage over time, regeneration and ailment timers.
     tickActor(w, m, dt);
     if (!m.alive) continue;
@@ -329,7 +340,7 @@ export function tickMinions(w: World, dt: number): void {
         bd = d;
       }
     }
-    const speed = def.speed * m.speed * (1 - m.ail.chill);
+    const speed = def.speed * m.speed * (1 + aura.move / 100) * (1 - m.ail.chill);
     if (!best) {
       if (Math.hypot(p.x - m.x, p.y - m.y) > FOLLOW) step(w, m, p.x, p.y, dt, speed);
       continue;
@@ -340,17 +351,8 @@ export function tickMinions(w: World, dt: number): void {
       continue;
     }
     if (m.atkT > 0 || def.dmg <= 0) continue;
-    m.atkT = 1 / ((m.fixedRate ?? def.rate) * m.speed * (1 - m.ail.chill));
-    const hit =
-      m.fixedHit !== undefined
-        ? m.fixedHit * m.dmg * MINION_ENEMY_RES
-        : spellBaseDamage(m.level) * def.dmg * m.dmg * MINION_ENEMY_RES;
-    const t = DAMAGE_TYPES.indexOf(def.dtype);
-    rawHit(w, best, hit, t, 'Minion', 'minion');
-    if (def.splash > 0)
-      for (const e of foes)
-        if (e !== best && e.alive && Math.hypot(e.x - best.x, e.y - best.y) <= def.splash + e.r)
-          rawHit(w, e, hit * 0.5, t, 'Minion', 'minion');
+    m.atkT = 1 / ((m.fixedRate ?? def.rate) * m.speed * (1 + aura.atk / 100) * (1 - m.ail.chill));
+    minionStrike(w, m, def, best, foes, aura);
   }
   w.minions.length = j;
 }

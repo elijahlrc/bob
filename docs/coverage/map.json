@@ -1543,7 +1543,7 @@
   "carrionColossus": {
    "ref": "Summon Carrion Golem",
    "status": "covered",
-   "note": "A carrion golem that fights beside the character and adds physical damage to its minions (folded into the character's added damage)."
+   "note": "One carrion golem (the only golem) that fights beside the character: while it stands, the other minions deal added physical damage, and the golem deals 8% more damage for each of them near it (80% at most) and has more life."
   },
   "hallowedRelic": {
    "ref": "Summon Holy Relic",
@@ -1568,7 +1568,7 @@
   "wakeSentinel": {
    "ref": "Animate Guardian",
    "status": "covered",
-   "note": "Animates a guardian that fights beside the character."
+   "note": "Animates the armour and weapons lying on the ground (normal or magic ones that the character can spare, within the level the gem allows; none with gems in them), one piece for each cast, onto the one Guardian: it has what the pieces give it, a quarter of its life comes back with each new piece of armour, and a weapon makes it strike with that weapon's damage. It has no time limit, and if it falls the pieces are lost."
   },
   "shadowQuiver": {
    "ref": "Blink Arrow",
@@ -1583,17 +1583,17 @@
   "boneWardRite": {
    "ref": "Bone Offering",
    "status": "covered",
-   "note": "An offering cast when enemies are near that gives block chance for a few seconds (the corpse is not used here)."
+   "note": "Uses a corpse and up to four more about it: for five seconds, and one more for each extra corpse, the minions have more chance to block attacks and spells and recover life when they block. Only one offering at a time."
   },
   "fleshSurgeRite": {
    "ref": "Flesh Offering",
    "status": "covered",
-   "note": "An offering cast when enemies are near that quickens attacks, casting and movement for a few seconds."
+   "note": "Uses a corpse and up to four more about it: for five seconds, and one more for each extra corpse, the minions attack, cast and move faster. Only one offering at a time."
   },
   "spiritWardRite": {
    "ref": "Spirit Offering",
    "status": "covered",
-   "note": "An offering cast when enemies are near that gives resistances and chaos damage from physical for a few seconds."
+   "note": "Uses a corpse and up to four more about it: for five seconds, and one more for each extra corpse, the minions gain energy shield (4% of their life for each corpse), a share of their physical damage as chaos damage, and elemental resistances. Only one offering at a time."
   },
   "packFury": {
    "ref": "Minion Damage Support",
@@ -1618,7 +1618,7 @@
   "elementalPack": {
    "ref": "Elemental Army Support",
    "status": "covered",
-   "note": "The supported minions deal more elemental damage and shrug off elements (the exposure is dropped)."
+   "note": "The supported minions gain elemental resistances and a higher maximum, deal more elemental damage (not physical or chaos), and their hits expose the enemy to the element they dealt."
   },
   "frenziedPack": {
    "ref": "Feeding Frenzy Support",
@@ -1628,7 +1628,7 @@
   "burningPack": {
    "ref": "Infernal Legion Support",
    "status": "covered",
-   "note": "The supported minions burn the ground around them; here they simply deal more damage."
+   "note": "The supported minions burn the enemies near them for fire damage over time (it does not stack between minions) and burn themselves for 40% of their life a second, less their fire resistance."
   }
  },
  "uniques": {

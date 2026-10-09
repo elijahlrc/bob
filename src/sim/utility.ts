@@ -14,6 +14,7 @@ import { canPay } from './cost';
 import { applyHex } from './hexes';
 import {
   animatableDrop,
+  animateGuardian,
   animateWeapon,
   minionCount,
   raiseSpectre,
@@ -22,6 +23,7 @@ import {
   summonRespawn,
 } from './minions';
 import { corpseNear } from './factions';
+import { castOffering, guardianDrop, offeringWanted } from './minionFx';
 import type { Action, Actor, World } from './types';
 
 /**
@@ -113,12 +115,21 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
       if (!pack && !big && target.life < 0.5 * target.def.maxLife) continue;
       return { choice: c, prof, cd: 0.5 };
     }
+    if (u.kind === 'offering') {
+      if (!offeringWanted(w, CAST_RANGE + 2)) continue;
+      return { choice: c, prof, cd: 0.5 };
+    }
     if (u.kind === 'summon') {
+      if (c.skill.cooldown !== undefined && !skillReady(w, c)) continue;
+      if (u.warden) {
+        if (!guardianDrop(w, c, CAST_RANGE)) continue;
+        return { choice: c, prof, cd: 0.5 };
+      }
       // A spectre needs a corpse to raise, an animated weapon one on the ground that the character can spare.
       if (u.corpse && !corpseNear(w, p.x, p.y, CAST_RANGE)) continue;
       if (u.animate) {
         if (!animatableDrop(w, c, CAST_RANGE)) continue;
-        return { choice: c, prof, cd: summonRespawn(c) };
+        return { choice: c, prof, cd: 0.5 };
       }
       // Minions are summoned in the first fight and again when they are gone or have run out.
       if (d > CAST_RANGE + 6 || minionCount(w, c.key) >= summonCount(c, prof)) continue;
@@ -242,8 +253,15 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     }
     return;
   }
+  if (u.kind === 'offering') {
+    castOffering(w, c);
+    return;
+  }
   if (u.kind === 'summon') {
-    if (u.corpse) {
+    if (u.warden) {
+      const drop = guardianDrop(w, c, CAST_RANGE);
+      if (drop) animateGuardian(w, c, act.profile, drop);
+    } else if (u.corpse) {
       const corpse = corpseNear(w, a.x, a.y, CAST_RANGE);
       if (corpse) raiseSpectre(w, c, act.profile, corpse);
     } else if (u.animate) {

@@ -18,6 +18,7 @@ import type { BannerState } from './banners';
 import type { CaughtState, WarpState, WitherState } from './blinks';
 import type { Field } from './fields';
 import type { SkillDot } from './skillDots';
+import type { OfferingState } from './minionFx';
 import type { HexTotals } from '../data/hexes';
 import type { Deployable } from './deploy';
 import type { Minion } from './minions';
@@ -543,6 +544,8 @@ export type World = {
   caught: CaughtState | null;
   /** Seconds a Berserk has lasted (its drain of rage rises with it). */
   berserkT: number;
+  /** The offering that stands, if one does (src/sim/minionFx.ts). */
+  offering: OfferingState | null;
   /** The channelled skill being held: its stages so far. */
   channel: ChannelState | null;
   /** The stages of a skill that grows with use, and how many hits the player has landed (a use that hits builds a stage). */

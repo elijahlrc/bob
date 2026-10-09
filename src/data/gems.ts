@@ -10,7 +10,11 @@ import { GEN_ACTIVE_GEMS, GEN_AURA_GEMS, GEN_SUPPORT_GEMS } from './gemsGen';
 /** A value authored at gem level 1 and level 20 (DESIGN.md §11.5). */
 export type LevelValue = number | readonly [number, number];
 
-export type GemMod = Omit<Mod, 'value'> & { value: LevelValue };
+export type GemMod = Omit<Mod, 'value'> & {
+  value: LevelValue;
+  /** The value grows from the first level to the last as a curve (damage tables), not a line. */
+  geo?: boolean;
+};
 
 /**
  * Damage a skill does over time as a debuff of its own (docs/SPIRIT.md S7): not an ailment, so the ailment modifiers do not reach it,
@@ -198,6 +202,44 @@ export type UtilityDef =
       corpse?: { level: LevelValue };
       /** Made from a weapon lying on the ground that is used up by it (Animate Weapon); the cap on its item level, the damage and speed it adds. */
       animate?: { maxIlvl: LevelValue; addMin: LevelValue; addMax: LevelValue; speed: LevelValue };
+      /** A golem: the other minions deal this much added physical damage while it stands; it deals more for each of them near, and has more life. */
+      golem?: {
+        addMin: LevelValue;
+        addMax: LevelValue;
+        perNearby: number;
+        cap: number;
+        life: LevelValue;
+      };
+      /** The one Guardian that wears the armour and weapons lying on the ground, one piece per cast (Animate Guardian). */
+      warden?: {
+        maxReq: LevelValue;
+        addMin: LevelValue;
+        addMax: LevelValue;
+        life: LevelValue;
+        melee: LevelValue;
+      };
+    }
+  /**
+   * An offering (docs/SPIRIT.md S12): uses up a corpse and up to four more about it, and for a time (longer for each corpse) gives
+   * the minions the effects below. Only one stands at a time; a new one replaces it.
+   */
+  | {
+      kind: 'offering';
+      buff: BuffId;
+      seconds: number;
+      perCorpse: number;
+      maxCorpses: number;
+      atkInc?: LevelValue;
+      moveInc?: LevelValue;
+      castInc?: LevelValue;
+      blockAtk?: LevelValue;
+      blockSpell?: LevelValue;
+      /** Life a minion recovers each time it blocks. */
+      healOnBlock?: LevelValue;
+      /** Percent of its life a minion gains as energy shield for each corpse used. */
+      esPerCorpse?: number;
+      physAsChaos?: LevelValue;
+      res?: LevelValue;
     };
 
 export type ActiveGemDef = {

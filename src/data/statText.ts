@@ -490,6 +490,14 @@ Object.assign(STAT_TEXT, {
   deployCount: { base: '{v} additional totems, traps, mines or brands at a time' },
   auraBurn: { base: 'Burn nearby Enemies for {v}% of your Maximum Life as Fire Damage per second' },
   cooldownRecovery: { name: 'Cooldown Recovery Speed', pct: true },
+  'minion.res': { base: 'Minions have {v}% to all Elemental Resistances' },
+  'minion.maxRes': { base: 'Minions have {v}% to all maximum Elemental Resistances' },
+  'minion.eleMore': { base: 'Minions deal {v}% more Elemental Damage' },
+  'minion.exposure': {
+    base: 'Minion hits expose the enemy: {v}% to the Resistance of the element they dealt',
+  },
+  'minion.burn': { base: 'Minions burn Enemies near them for {v} Fire Damage per second' },
+  'minion.selfBurn': { base: 'Minions burn for {v}% of their Maximum Life per second' },
   deploySeconds: { base: 'What it puts down stands for {v} seconds' },
   'mine.chain': { base: 'Mines deal {v}% more damage for each mine that went off before them' },
   'mine.double': {
