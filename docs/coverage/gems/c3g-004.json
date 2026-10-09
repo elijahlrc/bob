@@ -48,11 +48,5 @@
       "behaviour": { "kind": "burst", "radius": 2.4, "reach": 3 }, "aftershock": { "delay": 1, "more": 70, "radius": 55 }, "baseMult": [85, 120], "cost": [10, 10], "requiresWeapon": ["axe", "mace", "staff", "sceptre"],
       "mods": [{ "stat": "attackSpeed", "kind": "more", "value": -25 }],
       "description": "Slams the ground, cracking it open to erupt again moments later." } },
-  { "ref": "Essence Drain", "note": "A chaos projectile whose small hit leaves a draining chaos damage over time on the enemies around where it lands; the caster mends from it while it lasts. It passes on from a corpse that also carried Contagion.",
-    "def": { "kind": "active", "id": "sapBolt", "name": "Sap Bolt", "attr": "int", "skillType": "spell", "tags": ["spell", "projectile", "chaos", "duration", "area"], "types": ["totemable", "volleyable", "repeatable", "triggerable", "damageOverTime"],
-      "behaviour": { "kind": "projectile", "count": 1, "spread": 0, "range": 9 },
-      "dot": { "type": "chaos", "dps": [31.2, 1503.2], "seconds": 3.8, "stack": "refresh", "scales": ["spell"], "splash": 1.2, "spread": "carry", "regen": 5 },
-      "spellDamage": [{ "type": "chaos", "spread": [0.8, 1.2] }], "effectiveness": 60, "castTime": 0.7, "crit": 5, "cost": [8, 23],
-      "mods": [],
-      "description": "A bolt that saps its target over time and mends you with what it drains." } }
+  {"ref":"Essence Drain","note":"A chaos projectile whose small hit leaves a draining chaos damage over time on the enemies around where it lands; the caster mends from it while it lasts. It passes on from a corpse that also carried Contagion.","def":{"kind":"active","id":"sapBolt","name":"Sap Bolt","attr":"int","skillType":"spell","tags":["spell","projectile","chaos","duration","area"],"types":["totemable","volleyable","repeatable","triggerable","damageOverTime"],"behaviour":{"kind":"projectile","count":1,"spread":0,"range":9},"dot":{"type":"chaos","dps":[13.7,802.9],"seconds":3.8,"stack":"refresh","scales":["spell"],"splash":1.2,"spread":"carry","regen":5},"spellDamage":[{"type":"chaos","spread":[0.8,1.2]}],"effectiveness":20,"castTime":0.7,"crit":5,"cost":[8,23],"mods":[],"description":"A bolt that saps its target over time and mends you with what it drains."}}
 ]

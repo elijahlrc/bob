@@ -348,7 +348,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cost: [4, 9],
     dot: {
       type: 'chaos',
-      dps: [8.8, 1927.1],
+      dps: [6.9, 401.4],
       seconds: 0.5,
       stack: 'refresh',
       ground: true,
@@ -468,7 +468,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [3.5, 235.9],
+      dps: [6.9, 401.4],
       seconds: 5,
       stack: 'refresh',
       hitless: true,
@@ -1125,7 +1125,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [31.2, 1503.2],
+      dps: [13.7, 802.9],
       seconds: 3.8,
       stack: 'refresh',
       scales: ['spell'],
@@ -1139,7 +1139,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         spread: [0.8, 1.2],
       },
     ],
-    effectiveness: 60,
+    effectiveness: 20,
     castTime: 0.7,
     crit: 5,
     cost: [8, 23],
@@ -2118,7 +2118,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'fire',
-      dps: [11.7, 439.4],
+      dps: [6.9, 401.4],
       seconds: 1.5,
       stack: 'stages',
       cap: 8,
@@ -3009,7 +3009,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [7.9, 285.1],
+      dps: [8.2, 480.9],
       seconds: 0.5,
       stack: 'refresh',
       ground: true,
@@ -3476,7 +3476,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [45.6, 895.6],
+      dps: [6.9, 401.4],
       seconds: 2,
       stack: 'refresh',
       hitless: true,
@@ -4773,7 +4773,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'fire',
-      dps: [23.6, 1755.6],
+      dps: [6.9, 401.4],
       seconds: 0.5,
       stack: 'refresh',
       hitless: true,
@@ -5353,7 +5353,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cooldown: 4,
     dot: {
       type: 'cold',
-      dps: [15.5, 426.3],
+      dps: [6.9, 401.4],
       seconds: 3,
       stack: 'refresh',
       hitless: true,
