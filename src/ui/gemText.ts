@@ -1,6 +1,7 @@
 import { gemAttrReq, gemMods, levelValue, spellDamageAt } from '../calc/gems';
 import { GEM_LEVEL_REQ, type ActiveGemDef, type GemDef, type SkillBehaviour } from '../data/gems';
-import { HEXES, HEX_SECONDS, hexEffect, hexText } from '../data/hexes';
+import { HEXES, hexEffect, hexSeconds, hexText } from '../data/hexes';
+import { STATUSES } from '../data/statuses';
 import { MINIONS } from '../data/minions';
 import { triggerCause, triggerText } from '../data/triggers';
 import { modsText } from '../mods/text';
@@ -52,7 +53,7 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
   if (u.kind === 'curse')
     return {
       stats: [
-        `Curses enemies in a radius of ${num(u.radius)}, for ${HEX_SECONDS} seconds`,
+        `Curses enemies in a radius of ${num(u.radius)}, for ${num(hexSeconds(u.hex, level))} seconds`,
         'Cast on packs and strong enemies, one curse at a time',
       ],
       effects: [
@@ -75,6 +76,25 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
         ...(u.cooldown ? [`${num(u.cooldown)} s cooldown`] : []),
       ],
       effects: modsText(gemMods(u.mods, level, def.id)),
+    };
+  if (u.kind === 'shout')
+    return {
+      stats: [
+        `Shouts at enemies in a radius of ${num(u.radius)}`,
+        POLICY_TEXT.rally,
+        `${num(u.cooldown)} s cooldown, shared with the other warcries`,
+      ],
+      effects: u.statuses.map((s) => {
+        const d = STATUSES[s.id];
+        const v = levelValue(s.v, level);
+        const more = s.perNearby
+          ? `, and ${num(levelValue(s.perNearby, level))}% more for each other enemy nearby`
+          : '';
+        return `${d.name} for ${num(s.seconds)} s: ${d.text
+          .replace('{v}', num(v))
+          .replace('{x}', num(s.x ?? 0))
+          .replace('{n}', '1')}${more}`;
+      }),
     };
   if (u.kind === 'summon') {
     const m = MINIONS[u.minion];

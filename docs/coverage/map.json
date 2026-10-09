@@ -173,22 +173,22 @@
   "brittleDoom": {
    "ref": "Elemental Weakness",
    "status": "covered",
-   "note": "A curse cast on a target and the enemies around it: their elemental resistances fall. Used by the AI on packs and rare enemies."
+   "note": "A curse cast on a target and the enemies around it for about nine to eleven seconds: their elemental resistances fall by 20% to 39%. One curse at a time, unless the character can hold more; bosses take a third less."
   },
   "leadenLimbs": {
    "ref": "Temporal Chains",
    "status": "covered",
-   "note": "A curse cast on a target and the enemies around it: they act more slowly."
+   "note": "A curse cast on a target and the enemies around it for five to six seconds: normal and magic enemies act 20% to 29% more slowly (rare and unique ones half as much), and effects on them, such as bleeds, run out 40% more slowly."
   },
   "feebleGrip": {
    "ref": "Enfeeble",
    "status": "covered",
-   "note": "A curse cast on a target and the enemies around it: they deal less damage."
+   "note": "A curse cast on a target and the enemies around it: normal and magic enemies deal 21% to 30% less damage (rare and unique ones about half as much), with less accuracy, 25% less critical strike chance and a smaller critical multiplier."
   },
   "openWounds": {
    "ref": "Vulnerability",
    "status": "covered",
-   "note": "A curse cast on a target and the enemies around it: they take more physical damage."
+   "note": "A curse cast on a target and the enemies around it: they take 30% to 39% more physical damage, and more physical damage over time, and attacks have a 20% chance to make them bleed and a 20% chance to maim them."
   },
   "venomSeed": {
    "ref": "Added Chaos Damage Support",
@@ -658,7 +658,7 @@
   "snareShot": {
    "ref": "Ensnaring Arrow",
    "status": "covered",
-   "note": "An arrow that tethers its target, slowing it (modelled as a hit that also slows by chilling)."
+   "note": "An arrow that snares what it hits: a snared enemy moves 40% more slowly (up to three snares) and takes 15% to 20% more damage from projectile attacks."
   },
   "glacierWall": {
    "ref": "Frost Wall",
@@ -753,7 +753,7 @@
   "tideOfJudgement": {
    "ref": "Wave of Conviction",
    "status": "covered",
-   "note": "A wave of fire, lightning and physical force that shifts which element is weakest to it (averaged into a mix)."
+   "note": "A wave of physical force, a quarter of it turned to fire and a quarter to lightning; each enemy it hits is exposed to the element it took the most damage from (25% less resistance for four seconds)."
   },
   "primeSplash": {
    "ref": "Wild Strike",
@@ -768,7 +768,7 @@
   "rotTouch": {
    "ref": "Wither",
    "status": "covered",
-   "note": "A channelled chaos cloud that stacks a debuff making enemies take more chaos damage (averaged into a lower chaos resistance)."
+   "note": "A chaos spell that does no damage itself: while enemies are near it goes on hindering them (30% to 36% slower) and withering them, each stack making them take 6% more chaos damage, up to fifteen stacks."
   },
   "frostFang": {
    "ref": "Ice Bite Support",
@@ -918,12 +918,12 @@
   "voidCurse": {
    "ref": "Despair",
    "status": "covered",
-   "note": "A curse that lowers chaos resistance (20% to 29%); the extra damage over time taken is folded into the weaker chaos resistance."
+   "note": "A curse cast on a target and the enemies around it: their chaos resistance falls by 20% to 29%, they take 15% to 25% more damage over time, and hits against them add chaos damage."
   },
   "penance": {
    "ref": "Punishment",
    "status": "covered",
-   "note": "A curse that makes the cursed take more damage from melee hits (modelled as more damage taken of every type)."
+   "note": "A curse cast on a target and the enemies around it: they have 20% less physical damage reduction, and a melee hit against one makes you a Punisher (30% more melee physical damage, 15% more attack speed) for nine seconds."
   },
   "ruinRitual": {
    "ref": "Bane",
@@ -933,12 +933,12 @@
   "ruinSigil": {
    "ref": "Assassin's Mark",
    "status": "covered",
-   "note": "A mark: enemies under it take more damage, and the character has more critical strike chance and multiplier against them (the life and mana on kill are dropped)."
+   "note": "A mark: hits against the marked enemy have a higher critical strike chance and multiplier; killing it restores 16 to 25 life and mana and has a 21% to 30% chance to give an Insight charge."
   },
   "plentySigil": {
    "ref": "Poacher's Mark",
    "status": "covered",
-   "note": "A mark: marked enemies take more damage, and the character gains Fervour charges when they die (the flask charges and life on being hit are dropped)."
+   "note": "A mark: the marked enemy has 30% to 49% less evasion; attack hits against it give life and mana back; killing it doubles the flask charges gained and has a 21% to 30% chance to give a Fervour charge."
   },
   "huntSigil": {
    "ref": "Sniper's Mark",
@@ -948,7 +948,7 @@
   "warlordSigil": {
    "ref": "Warlord's Mark",
    "status": "covered",
-   "note": "A mark: the character stuns the marked for longer and leeches life from melee hits on them (the stun recovery malus is folded into the stun duration)."
+   "note": "A mark: the marked enemy is 10% likelier to be stunned and stays stunned longer; your attack hits leech 2% of their damage as life and as mana; killing it has a 21% to 30% chance to give a Grit charge."
   },
   "steadfastBellow": {
    "ref": "Enduring Cry",
@@ -963,7 +963,7 @@
   "kindledBellow": {
    "ref": "Infernal Cry",
    "status": "covered",
-   "note": "A warcry that exerts the next attacks for more damage (modelled as more attack damage while it lasts); the death nova is dropped."
+   "note": "A warcry cast when a pack or a rare enemy is near: it hinders the enemies around the character, more with each other enemy nearby, and makes them burst for a share of their own life if they die while it lasts. Warcries wait four seconds on one another."
   },
   "standardOfValour": {
    "ref": "War Banner",
@@ -1293,7 +1293,7 @@
   "jawsTrap": {
    "ref": "Bear Trap",
    "status": "covered",
-   "note": "A trap that crushes the enemy that steps in it and holds it for a few seconds."
+   "note": "A trap that crushes the enemy that steps in it and holds it for as long as its hit was a share of the enemy's life, then leaves it shackled: slow, fading, and taking 15% more from traps and mines."
   },
   "blazeTrap": {
    "ref": "Fire Trap",

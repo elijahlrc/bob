@@ -130,6 +130,8 @@ export type SkillProfile = {
   enemyBlockLess: number;
   /** The statuses a hit of the skill can inflict (docs/SPIRIT.md S3), with their chances, lengths and magnitudes. */
   statuses: StatusRoll[];
+  /** Chance (fraction) that a hit exposes the enemy to the element it took the most damage from. */
+  exposure: number;
   /** Chance (fraction) that a hit makes a monster flee. */
   fleeChance: number;
   shock: { chance: number; effect: number; dur: number };
@@ -506,6 +508,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
         },
       ];
     }),
+    exposure: clamp(db.sum('base', 'status.exposure.chance', baseCtx) / 100, 0, 1),
     fleeChance: clamp(db.sum('base', FLEE_CHANCE, baseCtx) / 100, 0, 1),
     shock: {
       chance: clamp(db.sum('base', 'chance.shock', baseCtx) / 100, 0, 1),

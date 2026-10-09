@@ -106,10 +106,10 @@ describe('charges in the calc (EXPANSION 5.6)', () => {
 describe('hexes in the calc (EXPANSION 5.7)', () => {
   it('there are four hexes with the effects of the plan, from level 1 to 20', () => {
     expect(hexEffect('brittleDoom', 1)).toBe(20);
-    expect(hexEffect('brittleDoom', 20)).toBe(35);
-    expect(hexEffect('leadenLimbs', 1)).toBe(15);
-    expect(hexEffect('leadenLimbs', 20)).toBe(25);
-    expect(hexEffect('feebleGrip', 20)).toBe(25);
+    expect(hexEffect('brittleDoom', 20)).toBe(39);
+    expect(hexEffect('leadenLimbs', 1)).toBe(20);
+    expect(hexEffect('leadenLimbs', 20)).toBe(29);
+    expect(hexEffect('feebleGrip', 20)).toBe(30);
     expect(hexEffect('openWounds', 10)).toBeGreaterThan(20);
     expect(HEX_IDS).toHaveLength(4);
     // The four are curses the character casts, and Hexing Strikes applies them on hit instead.

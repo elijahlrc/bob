@@ -1,3 +1,4 @@
+import { hexTotals } from '../data/hexes';
 import type { Minion } from './minions';
 import type { Actor } from './types';
 import { newMoveState } from './movement';
@@ -85,6 +86,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     hexVuln: 0,
     hexDmg: 1,
     hexSpeed: 1,
+    hexMore: hexTotals([]),
     buffT: 0,
     zealT: 0,
     fervour: 0,

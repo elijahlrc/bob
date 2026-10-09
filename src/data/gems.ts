@@ -3,6 +3,7 @@ import type { TriggerDef } from './triggers';
 import type { BuffId } from './buffs';
 import type { MinionId } from './minions';
 import type { HexId } from './hexes';
+import type { StatusId } from './statuses';
 import type { SkillType } from './skillTypes';
 import { GEN_ACTIVE_GEMS, GEN_AURA_GEMS, GEN_SUPPORT_GEMS } from './gemsGen';
 
@@ -94,6 +95,22 @@ export type UtilityDef =
     }
   | { kind: 'curse'; hex: HexId; radius: number }
   | { kind: 'blink'; distance: number; cooldown: number }
+  /** A shout that puts statuses on the enemies around the character (a hinder that grows with the crowd, a death blast). */
+  | {
+      kind: 'shout';
+      radius: number;
+      cooldown: number;
+      /** 'rally' (the default) waits for a pack or a rare enemy; 'upkeep' goes on as long as an enemy is within the radius. */
+      policy?: 'rally' | 'upkeep';
+      statuses: {
+        id: StatusId;
+        seconds: number;
+        v: LevelValue;
+        /** More of the main magnitude for each other enemy in the radius, in percent points. */
+        perNearby?: LevelValue;
+        x?: number;
+      }[];
+    }
   /** Summons minions (COVERAGE C6): `count` of them at once, for `seconds` if they are time-limited. `ownerMods` is what the character gains while they stand. */
   | {
       kind: 'summon';

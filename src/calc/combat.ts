@@ -140,6 +140,12 @@ export type TargetState = {
   blockLess?: number;
   /** What a blinded attacker's chance to hit is multiplied by. */
   hitChanceMult?: number;
+  /** Less evasion (fraction) and less physical damage reduction (points, fraction): Poacher's Mark, Punishment. */
+  evasionLess?: number;
+  physRedLess?: number;
+  /** Extra chance (fraction) to be bled by an attack hit (Vulnerability), and to be stunned (Warlord's Mark). */
+  bleedChance?: number;
+  stunBonus?: number;
 };
 
 export const NO_SHIFT: readonly number[] = [0, 0, 0, 0, 0];
@@ -188,9 +194,10 @@ export function attackHitChance(
   hand: HandProfile,
   def: Defence,
   mult = 1,
+  evasionLess = 0,
 ): number {
   if (!p.isAttack || p.alwaysHit || def.cannotEvade) return 1;
-  let c = hitChance(hand.accuracy, def.evasion);
+  let c = hitChance(hand.accuracy, def.evasion * (1 - evasionLess));
   const isProj = p.skill.behaviour.kind === 'projectile';
   const bonus = isProj ? def.evadeProj : def.evadeMelee;
   if (bonus) c = Math.min(1, Math.max(0.05, c * (1 - bonus)));
@@ -243,7 +250,7 @@ export function mitigate(p: SkillProfile, t: TargetState, dmg: number[]): number
       const armour = def.armour * (1 - p.armourIgnore);
       const red = Math.min(
         0.9,
-        armourReduction(armour, dmg[i]) + def.physReduction - p.enemyPhysRed,
+        armourReduction(armour, dmg[i]) + def.physReduction - p.enemyPhysRed - (t.physRedLess ?? 0),
       );
       dmg[i] *= 1 - red;
     } else if (i === CHAOS && def.immuneChaos) {
@@ -290,7 +297,11 @@ export function ailmentsFromHit(
     const hm = p.ailmentFrom.ignite.reduce((s, i) => s + HA.ignite[i] * resMult(i), 0);
     a.ignite = IGNITE_DPS_FRAC * hm * agony * p.ignite.speed;
   }
-  if (p.isAttack && HA.bleed[PHYS] > 0 && roll(p.bleed.chance)) {
+  if (
+    p.isAttack &&
+    HA.bleed[PHYS] > 0 &&
+    (roll(p.bleed.chance) || (t.bleedChance ? roll(t.bleedChance) : false))
+  ) {
     a.bleed =
       (def.isPlayer ? MONSTER_BLEED_DPS_FRAC : BLEED_DPS_FRAC) *
       HA.bleed[PHYS] *
@@ -336,6 +347,7 @@ export function stunFromHit(
   canStun: boolean,
   rng: Rng | null,
   esUp = false,
+  bonus = 0,
 ): { chance: number; duration: number } {
   if (!canStun || def.cannotBeStunned) return { chance: 0, duration: 0 };
   // 3.9: melee physical damage stuns best (x1.25), non-melee non-physical worst (x0.75).
@@ -347,7 +359,7 @@ export function stunFromHit(
   }
   s *= p.stunDamageMult;
   const eff = def.stunThreshold * (1 - p.enemyStunThreshRed);
-  const chance = stunChance(s, eff, STUN_MIN_CHANCE);
+  const chance = Math.min(1, stunChance(s, eff, STUN_MIN_CHANCE) + bonus);
   const duration = STUN_BASE_DURATION * p.stunDurMult * def.stunDurOnSelf;
   // While energy shield is up, half of all stuns are ignored (not with Eldritch Battery-style rules).
   const ignore = esUp && !def.esProtectsMana ? STUN_ES_IGNORE : 0;
@@ -378,7 +390,7 @@ export function resolveHit(
     ailments: emptyAilments(),
     stun: 0,
   };
-  if (!isSpellHit && !rng.chance(attackHitChance(p, hand, t.def, t.hitChanceMult))) {
+  if (!isSpellHit && !rng.chance(attackHitChance(p, hand, t.def, t.hitChanceMult, t.evasionLess))) {
     res.outcome = 'miss';
     return res;
   }
@@ -408,7 +420,7 @@ export function resolveHit(
   res.crit =
     hand.critChance > 0 &&
     rng.chance(hand.critChance) &&
-    (isSpellHit || rng.chance(attackHitChance(p, hand, t.def, t.hitChanceMult)));
+    (isSpellHit || rng.chance(attackHitChance(p, hand, t.def, t.hitChanceMult, t.evasionLess)));
   let cm = (res.crit ? hand.critMulti * (p.cruelAgony ? 0.7 : 1) : 1) * hand.hitMult;
   // Double damage doubles the hit before it is mitigated (and rolls only when something gives the chance).
   if (p.doubleChance > 0 && rng.chance(p.doubleChance)) cm *= 2;
@@ -425,7 +437,7 @@ export function resolveHit(
     t,
     (c) => c > 0 && rng.chance(c),
   );
-  res.stun = stunFromHit(p, res.dmg, t.def, canStun, rng, (t.es ?? 0) > 0).duration;
+  res.stun = stunFromHit(p, res.dmg, t.def, canStun, rng, (t.es ?? 0) > 0, t.stunBonus).duration;
   return res;
 }
 
@@ -478,7 +490,9 @@ export function expectedHit(
     t,
     avgH.map((h) => h * hand.hitMult * critM * dbl),
   );
-  const hc = p.isAttack ? attackHitChance(p, hand, t.def, t.hitChanceMult) : 1 - t.def.dodgeSpell;
+  const hc = p.isAttack
+    ? attackHitChance(p, hand, t.def, t.hitChanceMult, t.evasionLess)
+    : 1 - t.def.dodgeSpell;
   // An attack confirms a critical strike with a second accuracy check (3.9).
   const cc = hand.critChance * (p.isAttack ? hc : 1);
   const perType = nonCrit.map((n, i) => n * (1 - cc) + crit[i] * cc);
@@ -492,8 +506,8 @@ export function expectedHit(
   const bc = blockChance(p, t.def, t.blockLess);
   const total = perType.reduce((a, b) => a + b, 0);
   const esUp = (t.es ?? 0) > 0;
-  const sNon = stunFromHit(p, nonCrit, t.def, true, null, esUp).chance;
-  const sCrit = stunFromHit(p, crit, t.def, true, null, esUp).chance;
+  const sNon = stunFromHit(p, nonCrit, t.def, true, null, esUp, t.stunBonus).chance;
+  const sCrit = stunFromHit(p, crit, t.def, true, null, esUp, t.stunBonus).chance;
   return {
     hitChance: hc,
     blockChance: bc,

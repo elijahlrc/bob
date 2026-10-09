@@ -131,13 +131,13 @@ describe('charges in the sim (EXPANSION 5.6)', () => {
 });
 
 describe('hexes in the sim (EXPANSION 5.7)', () => {
-  it('last six seconds and are renewed by their source', () => {
+  it('last as long as their gem says (six seconds from a monster) and are renewed by their source', () => {
     const w = arena();
     const m = put(w, 'warrior', 8);
-    applyHex(w, m, 'openWounds', 25, 1);
+    applyHex(w, m, 'openWounds', 25, 1, 1, HEX_SECONDS);
     expect(m.hexVuln).toBeCloseTo(0.25, 6);
     run(w, HEX_SECONDS - 1);
-    applyHex(w, m, 'openWounds', 25, 1);
+    applyHex(w, m, 'openWounds', 25, 1, 1, HEX_SECONDS);
     run(w, HEX_SECONDS - 1);
     expect(m.hexes).toHaveLength(1);
     run(w, 1.5);

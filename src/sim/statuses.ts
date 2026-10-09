@@ -66,7 +66,7 @@ export function moveFactor(a: Actor): number {
   if (fx.hinder) m *= 1 - fx.hinder.v / 100;
   if (fx.maim) m *= 1 - fx.maim.v / 100;
   // A shackle starts strong and fades to nothing over its time.
-  if (fx.bound) m *= 1 - (fx.bound.v / 100) * Math.max(0, fx.bound.t / fx.bound.t0);
+  if (fx.bound) m *= 1 - (fx.bound.v / 100) * Math.max(0, Math.min(1, fx.bound.t / fx.bound.t0));
   if (fx.ensnared) m *= Math.pow(1 - fx.ensnared.v / 100, fx.ensnared.n);
   return Math.max(0, m);
 }
@@ -109,13 +109,44 @@ export function hitTakenExtra(a: Actor, p: SkillProfile): number {
 }
 
 /** A hit of the player's lands: roll the statuses and the flee the skill can inflict. */
-export function rollStatuses(w: World, dst: Actor, p: SkillProfile, blocked = false): void {
+export function rollStatuses(
+  w: World,
+  dst: Actor,
+  p: SkillProfile,
+  blocked = false,
+  hit?: { dmg: number[]; total: number },
+): void {
   if (!dst.alive || dst.isPlayer) return;
+  const holds = p.statuses.some((s) => s.id === 'immobilised');
   for (const s of p.statuses) {
     // Overpowered is what a blocked hit does; every other status needs the hit to land.
     if ((s.id === 'overpowered') !== blocked) continue;
+    // A shackle comes with the hold that ends before it, not on its own.
+    if (s.id === 'bound' && holds) continue;
     if (s.chance < 1 && !w.rngTrig.chance(s.chance)) continue;
+    if (s.id === 'immobilised' && hit) {
+      // A hold lasts 0.15 s for each percent of the enemy's life the hit took, up to five seconds (Bear Trap), and a shackle follows it.
+      const pct = (100 * hit.total) / Math.max(1, dst.def.maxLife);
+      const seconds =
+        Math.min(5, Math.max(0.3, 0.15 * pct)) * (s.seconds / STATUSES.immobilised.seconds);
+      applyStatus(w, dst, 'immobilised', { seconds });
+      const b = p.statuses.find((x) => x.id === 'bound');
+      if (b) {
+        applyStatus(w, dst, 'bound', { seconds: seconds + b.seconds, v: b.v, x: b.x });
+        dst.fx.bound!.t0 = b.seconds;
+      }
+      continue;
+    }
     applyStatus(w, dst, s.id, { seconds: s.seconds, v: s.v, x: s.x });
+  }
+  if (!blocked && p.exposure > 0 && hit && w.rngTrig.chance(p.exposure)) {
+    // Exposed to the element that took the most damage from the hit.
+    let best = 1;
+    for (const i of [2, 3]) if (hit.dmg[i] > hit.dmg[best]) best = i;
+    if (hit.dmg[best] > 0) {
+      const id = (Object.keys(EXPOSURE_TYPE) as StatusId[]).find((k) => EXPOSURE_TYPE[k] === best);
+      if (id) applyStatus(w, dst, id);
+    }
   }
   if (!blocked && p.fleeChance > 0 && w.rngTrig.chance(p.fleeChance)) {
     // Rare monsters do not flee, and magic ones shrug it off half the time.

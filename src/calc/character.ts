@@ -548,6 +548,11 @@ export class Character {
       for (const g of build.equipment[slot]?.sockets ?? []) {
         const gd = g ? gemDef(g.gemId) : null;
         if (gd?.kind === 'active' && gd.utility?.kind === 'buff') utilBuffs.add(gd.utility.buff);
+        // Punishment: a melee hit on the cursed enemy grants a buff.
+        if (gd?.kind === 'active' && gd.utility?.kind === 'curse') {
+          const mb = HEXES[gd.utility.hex].meleeBuff;
+          if (mb) utilBuffs.add(mb);
+        }
       }
     for (const id of BUFF_IDS) {
       this.buffSource[id] = buffIdsGranted.has(id) || utilBuffs.has(id);
@@ -870,12 +875,18 @@ export class Character {
               (sm.kind === 'base' && sm.stat === 'critMulti' ? 1 : mult),
             tags: sm.tags,
             damageTypes: sm.damageTypes,
-            condition: { id: 'targetCursed' },
+            condition: { id: hd.selfCond ?? 'targetCursed' },
             source: { kind: 'gem', id: a.skill.id },
           });
         }
         this.cond.bit('targetCursed');
+        if (hd.selfCond) this.cond.bit(hd.selfCond);
       }
+    }
+    // The sheet takes the target to carry the curses and marks the character casts.
+    for (const h of this.sheetHexes) {
+      const c = HEXES[h.id].selfCond;
+      if (c) this.configConds = maskOr(this.configConds, this.cond.peek(c));
     }
     this.reservedLife = reservedLife;
     this.reservedMana = reservedMana;
@@ -1078,6 +1089,10 @@ export class Character {
     for (const id of BUFF_IDS)
       if (this.buffSource[id]) m = maskOr(m, this.cond.peek(BUFFS[id].cond));
     if (this.sheetHexes.length) m = maskOr(m, this.cond.peek('targetCursed'));
+    for (const h of this.sheetHexes) {
+      const c = HEXES[h.id].selfCond;
+      if (c) m = maskOr(m, this.cond.peek(c));
+    }
     if (mode === 'clearing') m = maskOr(m, this.cond.peek('killedRecently'));
     const d = this.defence(m);
     if (this.reservedLife >= 0.65 * d.maxLife) m = maskOr(m, this.cond.peek('onLowLife'));

@@ -53,6 +53,7 @@ describe('every active gem', () => {
           if (u.kind === 'buff') seen = world.buffT[u.buff] > 0;
           else if (u.kind === 'curse') seen = dummy.hexes.some((h) => h.id === u.hex);
           else if (u.kind === 'summon') seen = world.minions.length > 0;
+          else if (u.kind === 'shout') seen = Object.keys(dummy.fx).length > 0;
           else seen = true;
         }
         expect(seen).toBe(true);

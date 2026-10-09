@@ -607,16 +607,16 @@
       "ref": "Elemental Weakness",
       "name": "Brittle Doom",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S3",
-      "missing": ["cast_curse", "curse_area_application"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Cast curse that lowers all elemental resistances of enemies in an area for the duration.",
         "bob": "A hex-kind gem that only works when Hexing Strikes sits in the same item as the primary skill; it is not castable (other curses like Tinder Curse are utility casts). The resistance reduction is real (hexTotals res, applied to enemies hit).",
         "repair": "Convert it to an active spell with utility.kind curse like the other curses, keeping Hexing Strikes as an alternative route."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Elemental Weakness",
         "status": "confirmed",
@@ -1770,16 +1770,16 @@
       "ref": "Enfeeble",
       "name": "Feeble Grip",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["cast_curse", "enemy_accuracy_crit_reduction", "curse_effect_vs_rarity"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Cast curse that reduces enemy damage dealt, accuracy and critical strike chance and multiplier, a defensive curse against hard hitters.",
         "bob": "Hex-kind gem usable only via Hexing Strikes on hit. Only the less damage dealt effect is real (damageMult in applyHit); accuracy, crit chance and crit multiplier reduction are missing.",
         "repair": "Make it castable and add accuracy and crit penalties on cursed monsters."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Enfeeble",
         "status": "corrected",
@@ -2797,10 +2797,10 @@
       "ref": "Bear Trap",
       "name": "Jaws Trap",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "drifted",
       "confidence": "high",
-      "milestone": "S3",
-      "missing": ["immobilise_enemy", "enemy_slow_debuff", "damage_taken_from_traps_mines"],
+      "milestone": "S10",
+      "missing": ["trap_cooldown_stored_uses", "trap_lifetime"],
       "audit": {
         "poe": "A trap that damages one enemy and immobilises it, then slows it and makes it take more damage from your traps and mines; it is a trap/mine setup and control tool.",
         "bob": "A trap with a big physical burst (200% effectiveness) and a 30% lower enemy stun threshold; nothing holds or slows the enemy and there is no trap/mine vulnerability, so the port note 'holds it for a few seconds' is false. The enemyStunThreshold stat only affects stun chance (src/calc/combat.ts).",
@@ -2908,21 +2908,16 @@
       "ref": "Infernal Cry",
       "name": "Kindled Bellow",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": [
-        "hinder_debuff_scaled_by_nearby_enemies",
-        "taunt_nearby_enemies",
-        "death_explosion_debuff",
-        "warcry_shared_cooldown"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "No PoB data; memory plus poedb (current values, 3.9 similar): warcry that exerts your next attacks (Combust: fire area hit on the first hit of each exerted attack), converts phys to fire scaling with enemy power, and makes enemies explode on death.",
         "bob": "Plain timed buff (8 s, cd 8): 25..40% more attack damage and 20% ignite chance. No exert counter, no Combust, no death explosion, no fire conversion.",
         "repair": "Add an exert_next_attacks primitive (counter of N attacks that get more damage plus an extra fire area hit) and use it for the warcry family."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Infernal Cry",
         "status": "corrected",
@@ -2934,7 +2929,8 @@
         ],
         "check": "The audit's PoE line does not hold for 3.9: it describes the later Infernal Cry (exerted attacks, Combust, fire conversion, enemy-power scaling), not the 3.9 Abyssal Cry. Bob's gem (timed attack-damage and ignite buff) shares nothing with the 3.9 loop, so the verdict stays gutted, but the audit's repair (an exert_next_attacks primitive) would build a post-3.9 mechanic; the missing list is replaced.",
         "decision": "The 3.9 gem is Abyssal Cry: a chaos hinder-and-taunt that makes enemies explode on death. Bob's Kindled Bellow is fire-themed and described as a damage buff. Do we rebuild it as the Abyssal Cry loop (chaos explosion, rename or keep the fire theme), keep it as Bob's own buff warcry, or drop it from the plan? Also, does taunt matter in Bob, or do enemies already target only the character?"
-      }
+      },
+      "effects": ["status:hinder"]
     },
     "kindledFrost": {
       "ref": "Cold to Fire Support",
@@ -3012,16 +3008,16 @@
       "ref": "Temporal Chains",
       "name": "Leaden Limbs",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S3",
-      "missing": ["cast_curse", "effect_expiry_slow"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Cast curse that slows enemies' actions and also makes buffs and ailments on them expire more slowly (40% slower, so their debuffs and effects on them last longer), a utility curse for control and DoT builds.",
         "bob": "Hex-kind gem usable only via Hexing Strikes on hit. The slow is real (speedMult drives action timing and movement in the sim). The slower expiry of effects on enemies (Bob's own ailments and hexes) is absent.",
         "repair": "Make it castable and scale tick-down of ailments and hexes on cursed targets by the curse's slow factor."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Temporal Chains",
         "status": "confirmed",
@@ -3372,21 +3368,16 @@
       "ref": "Vulnerability",
       "name": "Open Wounds",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S7",
-      "missing": [
-        "cast_curse",
-        "maim",
-        "bleed_on_hit_vs_cursed",
-        "damage_over_time_taken_increase"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Cast curse: enemies take increased physical damage and increased physical damage over time, and your attacks against them can bleed and maim.",
         "bob": "Hex-kind gem usable only via Hexing Strikes on hit; physical vulnerability is real (hexVuln in rawHit and hits). No physical DoT vulnerability, no bleed-and-maim on attack, and the engine has no maim at all.",
         "repair": "Make it castable, add a physical DoT taken mod, and a self mod giving bleed chance against cursed targets (maim needs a new slow primitive)."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Vulnerability",
         "status": "confirmed",
@@ -3475,21 +3466,16 @@
       "ref": "Punishment",
       "name": "Penance",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S3",
-      "missing": [
-        "melee_only_damage_bonus_vs_cursed",
-        "attack_speed_vs_cursed",
-        "buff_granted_on_hit",
-        "enemy_physical_reduction_debuff"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Curse that makes the cursed enemy grant the attacker a melee buff when hit by melee: more melee damage and increased attack speed. A melee-only curse.",
         "bob": "hardTimes hex: target takes 10..19% increased damage of every type (vulnAll). No attack speed, not melee-restricted (spell and bow builds benefit equally), no buff-on-hit step.",
         "repair": "Make it a mark-style hex with selfMods (more melee damage and attack speed against the target) instead of vulnAll."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Punishment",
         "status": "corrected",
@@ -3537,16 +3523,16 @@
       "ref": "Poacher's Mark",
       "name": "Plenty Sigil",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S3",
-      "missing": ["recover_on_hit_vs_marked", "flask_charge_on_kill", "evasion_reduction_debuff"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Mark: enemy is less evasive; hits on it return life and mana, kills fill flask charges and may give a frenzy charge.",
         "bob": "flaskMark hex: 6..15% increased damage taken, and the character gets chargeOn.kill.fervour 20..35 vs the marked. Evasion reduction, life/mana on hit and flask charges dropped.",
         "repair": "Add recover.hit life/mana and flask-charge-on-kill selfMods to the hex."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Poacher's Mark",
         "status": "confirmed",
@@ -4338,21 +4324,16 @@
       "ref": "Wither",
       "name": "Rot Touch",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": [
-        "stacking_debuff_on_enemy",
-        "damage_taken_increase_debuff",
-        "utility_cast_no_damage",
-        "slow_debuff"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A channelled debuff cloud that deals no damage: slows enemies and stacks Withered (up to 15, each +chaos damage taken), amplifying your other chaos skills.",
         "bob": "A damaging chaos spell burst around the caster (30% effectiveness) with +20 chaos penetration on its own hits only. No enemy debuff, no stacking, no benefit to any other skill; it is a primary chaos nova, the opposite of Wither's support role.",
         "repair": "Make it a utility skill (policy upkeep) that applies a stacking 'withered' status on enemies in range (+chaos damage taken per stack, max 15) via the hex/status layer."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Wither",
         "status": "confirmed",
@@ -4363,7 +4344,8 @@
           "Withered amplifies all of your other chaos damage, which is the point of the gem (a support-style debuffer). [wiki]"
         ],
         "check": "The audit line holds against the 3.9 wiki and PoB (6% per stack, 15 stacks, slow, no damage)."
-      }
+      },
+      "effects": ["status:withered"]
     },
     "rout": {
       "ref": "Chance to Flee Support",
@@ -4423,16 +4405,16 @@
       "ref": "Assassin's Mark",
       "name": "Ruin Sigil",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S3",
-      "missing": ["recover_on_kill_of_marked", "charge_on_kill_of_marked"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Mark: enemy is far easier to crit (and for more), and killing it grants life, mana and a chance for a power charge.",
         "bob": "critMark hex: +40..85% inc crit chance and +15..40 crit multi for the character vs the target (character.ts selfMods under 'targetCursed', real), plus a small 6..15% damage-taken. Kill rewards (life, mana, Insight charge) dropped. Quirk: selfMods apply whenever the target holds any hex, not specifically this mark.",
         "repair": "Add recover.kill.life/mana and chargeOn.kill.insight to the hex selfMods conditioned on the target having this mark."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Assassin's Mark",
         "status": "confirmed",
@@ -5084,16 +5066,16 @@
       "ref": "Ensnaring Arrow",
       "name": "Snare Shot",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": ["apply_slow_debuff_on_hit", "target_damage_taken_debuff", "tether"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "An arrow that tethers the enemy to the ground behind it: the enemy is slowed, takes increased projectile and attack damage, and must stay within the area or the snare breaks.",
         "bob": "A plain bow projectile with +15% more damage only when the target is already chilled. The arrow is physical and nothing in the gem chills, so the condition is almost never true (the port note's 'slows by chilling' is not implemented).",
         "repair": "Apply a movement slow and a damage-taken increase to the hit target for a few seconds (the chill slow mechanism can be set directly) and drop the chilled-target condition."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Ensnaring Arrow",
         "status": "confirmed",
@@ -6022,16 +6004,16 @@
       "ref": "Wave of Conviction",
       "name": "Tide of Judgement",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S3",
-      "missing": ["exposure_debuff", "resist_shift_on_hit"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Cone wave of phys/fire/lightning damage whose defining effect is applying Exposure (-resist) matching the element the target took most damage from; only one wave at a time.",
         "bob": "A 'beam' spell (length 5, width 3) dealing fire + physical with 50% phys to lightning. No exposure/resist-shift debuff exists anywhere in src (grep 'exposure' finds nothing); the port note's 'shifts which element is weakest' is not implemented.",
         "repair": "Add an enemy 'exposure' status (timed -X% resist to the element of the highest damage dealt in the hit) applied by hit, and give the gem a mod that triggers it."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Wave of Conviction",
         "status": "confirmed",
@@ -6533,16 +6515,16 @@
       "ref": "Despair",
       "name": "Void Curse",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S3",
-      "missing": ["dot_taken_increase_debuff", "added_damage_taken_on_hit"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Curse: -chaos resistance, increased damage over time taken, and flat extra chaos damage taken on each hit; the pick for chaos DoT builds.",
         "bob": "chaosSap hex: only -20..-29% chaos resistance. Increased DoT taken and added chaos damage per hit are not modelled (port note says folded into resistance).",
         "repair": "Add 'increased damage over time taken' (and a small flat chaos-per-hit) as hex effects on this hex."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Despair",
         "status": "confirmed",
@@ -6745,16 +6727,16 @@
       "ref": "Warlord's Mark",
       "name": "Warlord Sigil",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S3",
-      "missing": ["charge_on_kill_of_marked", "mana_leech_vs_marked", "stun_vulnerability_debuff"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Mark: enemy is more easily stunned; hitting it leeches life and mana, killing it can give an endurance charge.",
         "bob": "stunMark hex: stunDuration inc 40..90 and melee life leech 0.4..1.2 for the character vs the marked, plus damage taken. No mana leech, no Grit charge on kill, no stun-chance/threshold effect (only duration).",
         "repair": "Add chargeOn.kill.grit and mana leech to the selfMods, and an enemy stun-threshold reduction on the hex."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Warlord's Mark",
         "status": "confirmed",

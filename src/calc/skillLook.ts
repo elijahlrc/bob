@@ -106,6 +106,8 @@ export function deliveryOf(
         return tags.includes('warcry') ? 'warcry' : tags.includes('guard') ? 'guard' : 'buff';
       case 'curse':
         return 'curse';
+      case 'shout':
+        return 'warcry';
       case 'blink':
         return 'blink';
       case 'summon':

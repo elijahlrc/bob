@@ -2058,15 +2058,18 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     requiresWeapon: ['bow'],
     mods: [
       {
-        stat: 'damage',
-        kind: 'more',
-        value: 15,
-        condition: {
-          id: 'targetChilled',
-        },
+        stat: 'status.ensnared.chance',
+        kind: 'base',
+        value: 100,
+      },
+      {
+        stat: 'status.ensnared.x',
+        kind: 'base',
+        value: [15, 20],
       },
     ],
-    description: 'An arrow that pins its target down.',
+    description:
+      'An arrow that snares its target: it slows, and takes more from projectile attacks.',
   },
   {
     kind: 'active',
@@ -2624,26 +2627,33 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     spellDamage: [
       {
-        type: 'fire',
+        type: 'physical',
         spread: [0.8, 1.2],
       },
-      {
-        type: 'physical',
-        spread: [0.4, 0.6],
-      },
     ],
-    effectiveness: 90,
+    effectiveness: 160,
     castTime: 0.7,
     crit: 6,
     cost: [8, 20],
     mods: [
       {
+        stat: 'convertSkill.physical.fire',
+        kind: 'base',
+        value: 25,
+      },
+      {
         stat: 'convertSkill.physical.lightning',
         kind: 'base',
-        value: 50,
+        value: 25,
+      },
+      {
+        stat: 'status.exposure.chance',
+        kind: 'base',
+        value: 100,
       },
     ],
-    description: 'A wave of elemental force that breaks over the enemies in front of you.',
+    description:
+      'A wave of force that breaks over the enemies in front of you and leaves them exposed to the element that hurt them most.',
   },
   {
     kind: 'active',
@@ -2735,31 +2745,36 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     attr: 'int',
     skillType: 'spell',
     tags: ['spell', 'area', 'chaos', 'channelling', 'duration'],
-    types: ['totemable', 'damageOverTime'],
+    types: ['totemable'],
     behaviour: {
       kind: 'burst',
       radius: 2.4,
       origin: 'self',
     },
-    spellDamage: [
-      {
-        type: 'chaos',
-        spread: [0.8, 1.2],
-      },
-    ],
-    effectiveness: 30,
-    castTime: 0.4,
+    castTime: 0.28,
     crit: 0,
-    cost: [2, 6],
-    mods: [
-      {
-        stat: 'penetration',
-        kind: 'base',
-        value: 20,
-        damageTypes: ['chaos'],
-      },
-    ],
-    description: 'A rotting touch that leaves enemies open to chaos.',
+    cost: [3, 9],
+    mods: [],
+    utility: {
+      kind: 'shout',
+      radius: 2.4,
+      cooldown: 0.3,
+      policy: 'upkeep',
+      statuses: [
+        {
+          id: 'hinder',
+          seconds: 0.5,
+          v: [30, 36],
+        },
+        {
+          id: 'withered',
+          seconds: 2,
+          v: 6,
+        },
+      ],
+    },
+    description:
+      'A rotting touch that slows the enemies near you and leaves them open to chaos, stack on stack.',
   },
   {
     kind: 'active',
@@ -2851,7 +2866,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       hex: 'chaosSap',
       radius: 3.5,
     },
-    description: 'Curses enemies in an area: they lose chaos resistance.',
+    description:
+      'Curses enemies in an area: they lose chaos resistance and suffer more from damage over time, and your hits add chaos damage to them.',
   },
   {
     kind: 'active',
@@ -2874,7 +2890,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       hex: 'hardTimes',
       radius: 3.5,
     },
-    description: 'Curses enemies in an area: they take more damage.',
+    description:
+      'Curses enemies in an area: they lose physical damage reduction, and hitting them in melee makes you hit harder and faster.',
   },
   {
     kind: 'active',
@@ -2921,7 +2938,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       hex: 'critMark',
       radius: 2,
     },
-    description: 'Marks an enemy: it takes more damage and is easier to critically strike.',
+    description:
+      'Marks an enemy: you crit it more often and harder, and killing it restores life and mana and may give an Insight charge.',
   },
   {
     kind: 'active',
@@ -2944,7 +2962,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       hex: 'flaskMark',
       radius: 2,
     },
-    description: 'Marks an enemy: killing it may grant a Fervour charge.',
+    description:
+      'Marks an enemy: it has less evasion, hitting it with attacks restores life and mana, and killing it fills your flasks and may give a Fervour charge.',
   },
   {
     kind: 'active',
@@ -2990,7 +3009,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       hex: 'stunMark',
       radius: 2,
     },
-    description: 'Marks an enemy: it stays stunned longer and feeds your melee hits.',
+    description:
+      'Marks an enemy: it is easier to stun, your attacks leech life and mana from it, and killing it may give a Grit charge.',
   },
   {
     kind: 'active',
@@ -3070,41 +3090,39 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
   {
     kind: 'active',
     id: 'kindledBellow',
-    name: 'Kindled Bellow',
+    name: 'Graveyard Bellow',
     attr: 'str',
     skillType: 'spell',
-    tags: ['spell', 'warcry', 'duration', 'fire'],
+    tags: ['spell', 'warcry', 'duration', 'chaos', 'area'],
     types: ['triggerable'],
     behaviour: {
       kind: 'burst',
-      radius: 3,
+      radius: 4,
       origin: 'self',
     },
     castTime: 0.25,
-    cost: [6, 14],
+    cost: [10, 16],
     mods: [],
     utility: {
-      kind: 'buff',
-      buff: 'infernalCry',
-      seconds: 8,
-      policy: 'rally',
-      cooldown: 8,
-      mods: [
+      kind: 'shout',
+      radius: 4,
+      cooldown: 4,
+      statuses: [
         {
-          stat: 'damage',
-          kind: 'more',
-          value: [25, 40],
-          tags: ['attack'],
+          id: 'hinder',
+          seconds: 6,
+          v: [20, 26],
+          perNearby: [0.6, 0.86],
         },
         {
-          stat: 'chance.ignite',
-          kind: 'base',
-          value: 20,
+          id: 'doomed',
+          seconds: 6,
+          v: 8,
         },
       ],
     },
     description:
-      'A bellow that sets the next blows ablaze: more attack damage and a chance to ignite.',
+      'A bellow that slows the enemies around you, more of them the more there are, and makes those that die while it lasts burst.',
   },
   {
     kind: 'active',
@@ -4159,12 +4177,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cost: [6, 23],
     mods: [
       {
-        stat: 'enemyStunThreshold',
+        stat: 'status.immobilised.chance',
         kind: 'base',
-        value: 30,
+        value: 100,
+      },
+      {
+        stat: 'status.bound.chance',
+        kind: 'base',
+        value: 100,
+      },
+      {
+        stat: 'status.bound.x',
+        kind: 'base',
+        value: 15,
       },
     ],
-    description: 'A trap that bites the enemy that steps in it.',
+    description:
+      'A trap that bites the enemy that steps in it and holds it in place, then leaves it shackled.',
   },
   {
     kind: 'active',
@@ -5365,7 +5394,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       hex: 'brittleDoom',
       radius: 3.5,
     },
-    description: 'Curses enemies in an area: they lose elemental resistance.',
+    description: 'Curses enemies in an area: they lose elemental resistances.',
   },
   {
     kind: 'active',
@@ -5388,7 +5417,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       hex: 'leadenLimbs',
       radius: 3.5,
     },
-    description: 'Curses enemies in an area: they are slowed in everything they do.',
+    description:
+      'Curses enemies in an area: they act more slowly, and effects on them last longer.',
   },
   {
     kind: 'active',
@@ -5411,7 +5441,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       hex: 'feebleGrip',
       radius: 3.5,
     },
-    description: 'Curses enemies in an area: they deal less damage.',
+    description: 'Curses enemies in an area: they deal less damage, hit less often and crit less.',
   },
   {
     kind: 'active',
@@ -5434,7 +5464,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       hex: 'openWounds',
       radius: 3.5,
     },
-    description: 'Curses enemies in an area: they take more physical damage.',
+    description:
+      'Curses enemies in an area: they take more physical damage, and may be bled and maimed by attacks.',
   },
 ];
 

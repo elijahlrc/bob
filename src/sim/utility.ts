@@ -2,7 +2,9 @@ import { skillRange, type SkillChoice } from '../calc/character';
 import type { SkillProfile } from '../calc/skill';
 import { hexEffect } from '../data/hexes';
 import { actorById } from './actions';
+import { levelValue } from '../calc/gems';
 import { gainBuff } from './buffs';
+import { applyStatus } from './statuses';
 import { spendCharges } from './charges';
 import { flaskMask, playerConds, rawHit } from './combat';
 import { canPay } from './cost';
@@ -26,6 +28,9 @@ const GUARD_LIFE = 0.6;
 
 /** The key the guard skills share in `utilityReady`. */
 const GUARDS = '@guard';
+/** The key the warcries share. */
+const WARCRIES = '@warcry';
+const WARCRY_SECONDS = 4;
 
 export type UtilityPick = { choice: SkillChoice; prof: SkillProfile; cd: number };
 
@@ -45,6 +50,8 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
   for (const c of ch.utilities) {
     if ((w.utilityReady[c.key] ?? 0) > w.t) continue;
     const u = c.skill.utility!;
+    // The warcries wait on one another (3.9: a shared four seconds).
+    if (c.skill.tags.includes('warcry') && (w.utilityReady[WARCRIES] ?? 0) > w.t) continue;
     // The guard skills wait on one another (3.9).
     if (u.kind === 'buff' && u.policy === 'guard' && (w.utilityReady[GUARDS] ?? 0) > w.t) continue;
     const prof = ch.profile(c, conds, flaskMask(w));
@@ -63,6 +70,18 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
         if (!pack && !big) continue;
       } else if (enemiesNear(w, p.x, p.y, PACK_RADIUS).length < 1) continue;
       return { choice: c, prof, cd: u.cooldown ?? 0.5 };
+    }
+    if (u.kind === 'shout') {
+      // Cast when a pack or a rare enemy is near, like a rallying cry; a standing channel (Wither) goes on while any enemy is near.
+      if (u.policy === 'upkeep') {
+        if (enemiesNear(w, p.x, p.y, u.radius).length < 1) continue;
+        return { choice: c, prof, cd: u.cooldown };
+      }
+      const pack = enemiesNear(w, p.x, p.y, u.radius + 2).length >= PACK_SIZE;
+      const big =
+        target.rarity === 'boss' || target.rarity === 'miniboss' || target.rarity === 'rare';
+      if (d > u.radius + 2 || (!pack && !big)) continue;
+      return { choice: c, prof, cd: u.cooldown };
     }
     if (u.kind === 'curse') {
       if (d > CAST_RANGE || !w.grid.los(p.x, p.y, target.x, target.y)) continue;
@@ -112,6 +131,18 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
   const c = w.char.utilities.find((x) => x.skill.id === act.profile.skill.id);
   const u = c?.skill.utility;
   if (!c || !u) return;
+  if (c.skill.tags.includes('warcry')) w.utilityReady[WARCRIES] = w.t + WARCRY_SECONDS;
+  if (u.kind === 'shout') {
+    const near = enemiesNear(w, a.x, a.y, u.radius);
+    for (const e of near)
+      for (const s of u.statuses) {
+        const v =
+          levelValue(s.v, c.skill.level) +
+          levelValue(s.perNearby ?? 0, c.skill.level) * (near.length - 1);
+        applyStatus(w, e, s.id, { seconds: s.seconds * w.char.db.mult('buffDuration'), v, x: s.x });
+      }
+    return;
+  }
   if (u.kind === 'buff') {
     const before = w.buffT[u.buff];
     gainBuff(w, u.buff);
@@ -145,7 +176,7 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
   if (u.kind === 'curse') {
     const effect = hexEffect(u.hex, c.skill.level) * w.char.db.mult('curseEffect');
     for (const e of enemiesNear(w, target.x, target.y, u.radius))
-      applyHex(w, e, u.hex, Math.round(effect * 10) / 10, w.char.hexLimit);
+      applyHex(w, e, u.hex, Math.round(effect * 10) / 10, w.char.hexLimit, c.skill.level);
     return;
   }
   // Blink: land next to the target, a little inside the primary skill's reach.

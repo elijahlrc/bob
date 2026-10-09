@@ -26,11 +26,13 @@ import { cannotBleed } from '../data/monsters';
 import { BUFFS, BUFF_IDS, DYN_SHIFT } from '../data/buffs';
 import { MONSTER_CONDS, scaleOf } from '../calc/monster';
 import { AURA_CONDS, WIELD_CONDS } from '../calc/staticConds';
-import { maskOr, type CondId, type Mod } from '../mods/types';
+import { maskIntersects, maskOr, tagBit, type CondId, type Mod } from '../mods/types';
 import { rollGains } from './buffs';
 import { gainTrophy, rollCharges } from './charges';
-import { applyPlayerHexes, tickHexes } from './hexes';
+import { ALL_HEX_IDS, HEXES } from '../data/hexes';
+import { applyPlayerHexes, hexHit, hexKill, tickHexes } from './hexes';
 import {
+  applyStatus,
   blockLessOf,
   hitChanceFactor,
   hitTakenExtra,
@@ -105,6 +107,12 @@ const TARGET_TESTS: Partial<Record<CondId, TargetTest>> = {
   targetNearby: (t, from) => Math.hypot(t.x - from.x, t.y - from.y) <= 2 + t.r,
 };
 
+// What waits for a particular curse or mark on the target (the bonuses against Despair, Punishment and the marks).
+for (const id of ALL_HEX_IDS) {
+  const cond = HEXES[id].selfCond;
+  if (cond) TARGET_TESTS[cond] = (t) => t.hexes.some((h) => h.id === id);
+}
+
 type Compiled = { n: number; player: [number, PlayerTest][]; target: [number, TargetTest][] };
 const compiled = new WeakMap<object, Compiled>();
 
@@ -177,6 +185,10 @@ export function targetState(a: Actor): TargetState {
     vulnAll: a.hexVulnAll,
     vulnType: st.vulnType,
     blockLess: blockLessOf(a),
+    evasionLess: a.hexMore.evasion,
+    physRedLess: a.hexMore.physRed,
+    bleedChance: a.hexMore.bleedHit,
+    stunBonus: a.hexMore.stun,
     es: a.es,
   };
 }
@@ -353,8 +365,15 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (src.isPlayer) applyPlayerHexes(w, dst);
   if (src.isPlayer) noteCause(dst, p.tagMask, false, p.gains);
   applyDamage(w, dst, res.dmg);
+  // A mark gives life and mana back on each attack hit.
+  if (src.isPlayer && p.isAttack) hexHit(w, dst, maskIntersects(p.tagMask, tagBit('melee')));
   if (wasAlive && dst.alive) {
-    if (src.isPlayer) rollStatuses(w, dst, p);
+    if (src.isPlayer) {
+      rollStatuses(w, dst, p, false, res);
+      // Vulnerability: a chance to be maimed by an attack.
+      if (p.isAttack && dst.hexMore.maimHit > 0 && w.rngTrig.chance(dst.hexMore.maimHit))
+        applyStatus(w, dst, 'maim', { seconds: 4 });
+    }
     payImpales(w, dst);
     recordImpale(w, dst, p, res);
     reflectBack(w, src, dst, p, res);
@@ -457,10 +476,17 @@ export function hit(
   dist: number,
 ): void {
   const canStun = dst.stunT <= 0 && dst.graceT <= 0;
-  const h = p.hands[Math.min(hand, p.hands.length - 1)];
+  let h = p.hands[Math.min(hand, p.hands.length - 1)];
   const ts = targetState(dst);
-  // A blinded attacker misses more.
-  ts.hitChanceMult = hitChanceFactor(src);
+  // A blinded attacker misses more, and an enfeebled one is less accurate and crits less.
+  const hm = src.hexMore;
+  ts.hitChanceMult = hitChanceFactor(src) * (1 - hm.acc * 0.5);
+  if (hm.critChance > 0 || hm.critMulti > 0)
+    h = {
+      ...h,
+      critChance: h.critChance * (1 - hm.critChance),
+      critMulti: Math.max(1, h.critMulti - hm.critMulti),
+    };
   const res = resolveHit(w.rngCombat, p, h, ts, dist, canStun);
   applyHit(w, src, dst, p, res);
 }
@@ -678,7 +704,10 @@ export function killActor(w: World, a: Actor): void {
           : a.rarity === 'magic'
             ? 'magic'
             : 'normal';
-    const gain = FLASK_CHARGES_ON_KILL[kind] * w.char.db.mult('flaskCharges');
+    // Killing an enemy under a hex that fills flasks (Mark of Plenty) doubles what the flasks gain.
+    const cause0 = causes.get(a);
+    const hexFlasks = cause0?.minion ? 0 : hexKill(w, a);
+    const gain = FLASK_CHARGES_ON_KILL[kind] * w.char.db.mult('flaskCharges') * (1 + hexFlasks);
     for (const f of w.flasks) f.charges = Math.min(f.spec.maxCharges, f.charges + gain);
     const lok =
       w.char.db.sum('base', 'lifeOnKill') +
@@ -802,8 +831,10 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     ail.chillT -= dt;
     if (ail.chillT <= 0) ail.chill = 0;
   }
-  // Damage over time.
+  // Damage over time. Temporal Chains lets effects on a cursed enemy run out more slowly; Vulnerability and Despair raise what they deal.
   const taken = def.damageTakenMult * shockTaken(def, ail.shock);
+  const hm = a.hexMore;
+  const dtDot = dt * (1 - hm.expireSlow);
   let dotPhys = 0;
   let dotFire = 0;
   let dotChaos = 0;
@@ -817,7 +848,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       const top = ail.ignites.map((d) => d.dps).sort((x, y) => y - x);
       for (let i = 0; i < Math.min(ail.igniteMax, top.length); i++) dotFire += top[i];
     }
-    decay(ail.ignites, dt);
+    decay(ail.ignites, dtDot);
   }
   if (ail.bleeds.length) {
     const stacking = ail.bleeds.some((d) => d.stack);
@@ -830,13 +861,16 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       if (a.moving && !def.noMovingBleed) b *= BLEED_MOVING_MULT;
     }
     dotPhys += b;
-    decay(ail.bleeds, dt);
+    decay(ail.bleeds, dtDot);
   }
   if (ail.poisons.length) {
     for (const d of ail.poisons) dotChaos += d.dps;
-    decay(ail.poisons, dt);
+    decay(ail.poisons, dtDot);
   }
   if (dotPhys + dotFire + dotChaos > 0) {
+    dotPhys *= 1 + hm.dotPhys + hm.dotAll;
+    dotFire *= 1 + hm.dotAll;
+    dotChaos *= 1 + hm.dotAll;
     const tt = def.damageTakenType;
     const dmg = [
       dotPhys * taken * tt[0] * dt,

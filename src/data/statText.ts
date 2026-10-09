@@ -365,6 +365,9 @@ for (const id of STATUS_IDS) {
   STAT_TEXT[`status.${id}.v`] = { base: `${name} effect: {v}%` };
   STAT_TEXT[`status.${id}.x`] = { base: `${name} secondary effect: {v}%` };
 }
+STAT_TEXT['status.exposure.chance'] = {
+  base: '{v}% chance to Expose Enemies to the Element they took most Damage from on Hit',
+};
 STAT_TEXT['status.flee.chance'] = { base: '{v}% chance to cause Monsters to Flee on Hit' };
 STAT_TEXT.statusDuration = { name: 'Duration of Statuses you inflict' };
 STAT_TEXT.enemyBlockReduction = { base: 'Enemies have {v}% reduced Chance to Block your Hits' };

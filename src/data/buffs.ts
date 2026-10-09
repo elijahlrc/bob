@@ -31,7 +31,8 @@ export type BuffId =
   | 'offeringSpirit'
   | 'catStealth'
   | 'avianBoon'
-  | 'flickerStep';
+  | 'flickerStep'
+  | 'punisher';
 export const BUFF_IDS: BuffId[] = [
   'fortify',
   'onslaught',
@@ -58,6 +59,7 @@ export const BUFF_IDS: BuffId[] = [
   'catStealth',
   'avianBoon',
   'flickerStep',
+  'punisher',
 ];
 
 export type BuffDef = {
@@ -77,6 +79,21 @@ export type BuffDef = {
 const when = (cond: CondId): { condition: { id: CondId } } => ({ condition: { id: cond } });
 
 export const BUFFS: Record<BuffId, BuffDef> = {
+  punisher: {
+    id: 'punisher',
+    name: 'Punisher',
+    seconds: 9,
+    cond: 'punisher',
+    text: '30% more melee physical damage, 15% increased attack speed',
+    mods: [
+      mod('damage', 'more', 30, {
+        tags: ['melee'],
+        damageTypes: ['physical'],
+        ...when('punisher'),
+      }),
+      mod('attackSpeed', 'inc', 15, when('punisher')),
+    ],
+  },
   flickerStep: {
     id: 'flickerStep',
     name: 'Quicksilver',

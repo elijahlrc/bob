@@ -12,6 +12,7 @@ import type { BuffId } from '../data/buffs';
 import type { Corpse } from './factions';
 import type { HexState } from './hexes';
 import type { Fx } from './statuses';
+import type { HexTotals } from '../data/hexes';
 import type { Deployable } from './deploy';
 import type { Minion } from './minions';
 import type { Grid } from './grid';
@@ -126,6 +127,8 @@ export type Actor = {
   hexVulnAll: number;
   hexDmg: number;
   hexSpeed: number;
+  /** The rest of what the hexes on this actor do (damage over time taken, accuracy, evasion, chances to be bled or maimed...). */
+  hexMore: HexTotals;
   /** The Choir (EXPANSION 7.3): the censer aura time left, a Zealous boost, and Fervour stacks with their time left. */
   buffT: number;
   zealT: number;
@@ -489,12 +492,12 @@ export type World = {
   cooldowns: Record<string, { uses: number; t: number }>;
   /** When each utility skill (by choice key) can next be cast. */
   utilityReady: Record<string, number>;
-  /** The totems, brands, traps and mines on the ground. */
-  deployables: Deployable[];
   /** Time since the burning aura last struck. */
   auraBurnT: number;
   deploySeq: number;
   /** The minions standing. */
+  /** The totems, brands, traps and mines on the ground. */
+  deployables: Deployable[];
   minions: Minion[];
   actors: Actor[];
   player: Actor;

@@ -169,6 +169,11 @@ export const CONDITIONS = [
   'heraldThunder',
   'heraldAgony',
   'flickerStep',
+  'punisher',
+  // What waits for a particular curse or mark on the target.
+  'cursedDespair',
+  'markedRuin',
+  'markedWarlord',
   // State of the player (C3): moving, ailments on the player, the weapon held.
   'stationary',
   'ignited',
