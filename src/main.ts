@@ -9,6 +9,7 @@ import './ui/skins.css';
 import './ui/tree.css';
 import './ui/mobile.css';
 import './ui/items.css';
+import './ui/workbench.css';
 
 function storage(): Storage | null {
   try {

@@ -117,6 +117,14 @@ function Arriving({ run }: { run: RunState }) {
 export function Camp({ c }: { c: Controller }) {
   const run = c.run;
   const [tab, setTab] = useState<Tab>('sheet');
+  // An item the Items tab sends to the Workbench ("Craft…") and back ("Show in Items"); `n` makes a repeat count.
+  const [focus, setFocus] = useState<{ uid: number; n: number; to: 'items' | 'workbench' } | null>(
+    null,
+  );
+  const goTo = (to: 'items' | 'workbench', uid: number) => {
+    setFocus((f) => ({ uid, n: (f?.n ?? 0) + 1, to }));
+    setTab(to);
+  };
   // The next map is a tab of its own at every width, with a bar at the bottom. On a narrow screen the offer cards also
   // fold their detail lines until asked for (docs/MOBILE.md 3.3).
   const narrow = useViewport().layout !== 'desktop';
@@ -347,14 +355,35 @@ export function Camp({ c }: { c: Controller }) {
           {shown === 'tree' && <TreeView c={c} />}
           {shown === 'sheet' && <Sheet s={sheet} />}
           {shown === 'skills' && <Skills c={c} ch={ch} />}
-          {shown === 'items' && <Items c={c} />}
-          {shown === 'workbench' && <Workbench c={c} />}
+          {shown === 'items' && (
+            <Items
+              c={c}
+              focus={focus?.to === 'items' ? focus : null}
+              onCraft={(uid) => goTo('workbench', uid)}
+            />
+          )}
+          {shown === 'workbench' && (
+            <Workbench
+              c={c}
+              focus={focus?.to === 'workbench' ? focus : null}
+              onShowInItems={(uid) => goTo('items', uid)}
+            />
+          )}
           {shown === 'next' && <div class="camp-next camp-side-body">{side}</div>}
         </div>
         <div class="camp-bar">
           <span class="camp-bar-who">
             {classDef(run.classId).name} · Level {run.build.level}
           </span>
+          {run.pendingCraft && shown !== 'workbench' && (
+            <button
+              class="btn small"
+              onClick={() => goTo('workbench', run.pendingCraft!.itemUid)}
+              title="A reforge is waiting for you to pick a result."
+            >
+              Pick the reforge
+            </button>
+          )}
           {left !== null && shown !== 'next' && (
             <span class="muted">Auto-continue: next map in {left.toFixed(1)} s</span>
           )}

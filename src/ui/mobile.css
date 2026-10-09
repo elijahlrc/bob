@@ -41,7 +41,6 @@ body {
   .btn.small,
   .tab,
   .class-card,
-  .inv-row,
   .codex-head {
     min-height: var(--tap);
   }
@@ -141,9 +140,6 @@ body {
   .class-card:hover {
     background: var(--panel);
   }
-  .inv-row:hover {
-    background: var(--panel);
-  }
 }
 
 /* ---- The camp: tabs, with the next map a tab of its own, and a bar at the bottom (Camp.tsx) ---- */
@@ -209,14 +205,11 @@ body {
 
 /* ---- The panels of the camp tabs on a phone ---- */
 @media (max-width: 600px) {
-  .items,
   .skills-wrap,
   .sheet {
     padding: 10px;
     gap: 10px;
   }
-  .equip-col,
-  .inv-col,
   .skills-wrap .skills,
   .gem-inv {
     flex: 1 1 100%;
@@ -224,80 +217,12 @@ body {
     min-width: 0;
     box-sizing: border-box;
   }
-  .inv-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-      'name ilvl'
-      'slot badges';
-    row-gap: 2px;
-  }
-  .inv-row .row-name {
-    grid-area: name;
-  }
-  .inv-row .row-ilvl {
-    grid-area: ilvl;
-    text-align: right;
-  }
-  .inv-row .row-slot {
-    grid-area: slot;
-  }
-  .inv-row .row-badges {
-    grid-area: badges;
-    justify-self: end;
-  }
   .sheet table {
     width: 100%;
   }
   .socket-item {
     width: calc(50% - 4px);
     min-width: 0;
-  }
-
-  /* The card of the selected item is a sheet over the bottom of the list, above the camp bar. */
-  .item-detail {
-    min-height: 0;
-  }
-  .item-detail:has(.item-card) {
-    position: fixed;
-    z-index: 15;
-    left: 0;
-    right: 0;
-    bottom: calc(var(--camp-bar, 52px) + var(--safe-bottom));
-    max-height: 52vh;
-    overflow: auto;
-    box-sizing: border-box;
-    padding: 10px calc(12px + var(--safe-right)) 10px calc(12px + var(--safe-left));
-    background: var(--panel);
-    border-top: 2px solid var(--hi);
-    box-shadow: 0 -6px 18px #000a;
-  }
-  .item-detail:has(.item-card) .sheet-x {
-    display: block;
-    position: absolute;
-    top: 4px;
-    right: 8px;
-    width: var(--tap);
-    height: var(--tap);
-    z-index: 1;
-    background: none;
-    border: none;
-    font-size: 26px;
-    color: var(--muted);
-  }
-  .items:has(.item-detail .item-card) {
-    padding-bottom: 54vh;
-  }
-}
-
-@media (max-width: 600px) {
-  /* The buttons of the item sheet stay in view while the card scrolls. */
-  .item-detail:has(.item-card) .item-actions {
-    position: sticky;
-    bottom: -10px;
-    margin: 6px -4px -10px;
-    padding: 8px 4px 10px;
-    background: var(--panel);
-    border-top: 1px solid var(--border2);
   }
 }
 
@@ -527,30 +452,6 @@ body {
   }
 }
 
-/* ---- The Workbench on a phone: the list of items, then the panel for the chosen one ---- */
-@media (max-width: 600px) {
-  .workbench {
-    padding: 10px;
-  }
-  .wb-body {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .wb-side {
-    position: static;
-    min-width: 0;
-    max-width: none;
-    width: 100%;
-  }
-  .wb-list {
-    max-height: 36vh;
-  }
-  .wb-work {
-    min-width: 0;
-    width: 100%;
-  }
-}
-
 @media (max-width: 600px) {
   select {
     max-width: 100%;
@@ -560,9 +461,6 @@ body {
     border: 1px solid var(--border);
     border-radius: 4px;
     padding: 6px 8px;
-  }
-  .wb-work input[type='range'] {
-    max-width: 60%;
   }
 }
 
@@ -575,11 +473,7 @@ body {
   .threat,
   .verdict,
   .chip,
-  .flaskslot,
-  .gem-tags,
-  .inv-row .muted,
-  .inv-row .row-slot,
-  .inv-row .row-ilvl {
+  .gem-tags {
     font-size: 13px;
   }
   .new-tag,

@@ -1,0 +1,543 @@
+/*
+ * The Workbench (docs/ITEMS.md section 4): the pouch, the item and its affixes, the actions by intent, and the result panel.
+ * Three columns from 1100 px (items, work, result), two to 601 px (the item picker is a sheet), one on a phone, where the
+ * result is a sheet above the camp bar. Class names start with wx-; .ix-* are shared with the Items tab.
+ */
+.wx {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  min-width: 0;
+}
+.wx-pouch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: stretch;
+}
+.wx-dust {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 6px;
+}
+.wx-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 3px 10px;
+  text-align: left;
+  font-size: 13px;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.wx-chip:disabled {
+  cursor: default;
+  opacity: 0.8;
+}
+.wx-chip small {
+  font-size: 11px;
+  color: var(--muted);
+}
+.wx-chip.tablet {
+  cursor: default;
+}
+.wx-guide-btn {
+  margin-left: auto;
+}
+.wx-intro {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: #23201a;
+  border-left: 3px solid var(--accent);
+  font-size: 13px;
+}
+.wx-body {
+  display: grid;
+  gap: 14px;
+  align-items: start;
+  grid-template-columns: 250px minmax(0, 1fr) minmax(320px, 400px);
+}
+.wx-pickcol,
+.wx-resultcol {
+  position: sticky;
+  top: 8px;
+  max-height: calc(100vh - 170px);
+  overflow: auto;
+  min-width: 0;
+}
+.wx-work {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.wx-none {
+  padding: 20px 0;
+}
+
+/* ---- Picking the item ---- */
+.wx-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wx-search {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 4px 8px;
+  color: inherit;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 14px;
+}
+.wx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.wx-pick {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 8px;
+  text-align: left;
+  font-size: 13px;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: 5px;
+  cursor: pointer;
+}
+.wx-pick.sel {
+  outline: 2px solid var(--hi);
+}
+.wx-pick-where {
+  flex: none;
+  min-width: 52px;
+  font-size: 11px;
+}
+.wx-pick-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wx-change {
+  align-self: flex-start;
+}
+
+/* ---- The item and its affixes ---- */
+.wx-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+}
+.wx-item-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wx-item-head .ix-title {
+  white-space: normal;
+}
+.wx-room {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.wx-room-chip {
+  font-size: 12px;
+  padding: 1px 8px;
+  border-radius: 8px;
+  background: var(--btn);
+}
+.wx-room-chip.sealed {
+  color: #ff7070;
+  background: #351818;
+}
+.wx-affixes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.wx-affix {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'kind text'
+    'kind meta';
+  column-gap: 8px;
+  align-items: center;
+  padding: 5px 8px;
+  text-align: left;
+  font-size: 13px;
+  color: #9ab8ff;
+  background: #14131a;
+  border: 1px solid var(--border2);
+  border-radius: 5px;
+  cursor: pointer;
+}
+label.wx-affix {
+  grid-template-columns: auto auto minmax(0, 1fr);
+  grid-template-areas: 'box kind text' 'box kind meta';
+}
+label.wx-affix input {
+  grid-area: box;
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+}
+.wx-affix.fixed {
+  cursor: default;
+  color: #e0b070;
+}
+.wx-affix.sel {
+  outline: 2px solid var(--hi);
+}
+.wx-affix.pinned {
+  background: #1d2a1d;
+  border-color: #3c6a3c;
+}
+.wx-affix.flash {
+  animation: wx-flash 2.4s ease-out;
+}
+@keyframes wx-flash {
+  0% {
+    background: #3b5a2a;
+  }
+  100% {
+    background: #14131a;
+  }
+}
+.wx-affix:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.wx-affix-kind {
+  grid-area: kind;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  min-width: 46px;
+}
+.wx-affix-text {
+  grid-area: text;
+}
+.wx-affix-meta {
+  grid-area: meta;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+.wx-bar {
+  display: inline-block;
+  width: 56px;
+  height: 5px;
+  border-radius: 3px;
+  background: #2a2733;
+  overflow: hidden;
+}
+.wx-bar > i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+/* ---- Actions by intent ---- */
+.wx-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wx-group {
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+}
+.wx-group.hot {
+  outline: 2px solid var(--hi);
+}
+.wx-group-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 10px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 14px;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: default;
+}
+.wx-group-head small {
+  font-weight: normal;
+  flex: 1;
+}
+.wx-group-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 2px 10px 10px;
+}
+.wx-select {
+  max-width: 100%;
+  padding: 4px 6px;
+  color: inherit;
+  background: var(--btn);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 13px;
+}
+.wx-chosen {
+  padding: 3px 8px;
+  color: #9ab8ff;
+  background: #14131a;
+  border-left: 3px solid var(--hi);
+}
+.wx-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.wx-row-title {
+  font-weight: bold;
+  font-size: 13px;
+}
+.wx-row-text {
+  font-size: 12px;
+}
+.wx-routes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: flex-start;
+}
+.wx-route {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 100%;
+}
+.wx-why {
+  font-size: 11px;
+  color: #e0a070;
+  max-width: 230px;
+}
+.wx-pins {
+  font-size: 13px;
+  width: 100%;
+}
+.wx-stepper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---- The result ---- */
+.wx-result {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  box-sizing: border-box;
+}
+.wx-result-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wx-result-head b {
+  flex: 1;
+}
+.wx-close {
+  display: block;
+  position: static;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 20px;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.wx-hint {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.wx-costs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+.wx-cost.short {
+  color: #ff8a60;
+}
+.wx-odds {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+}
+.wx-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 8px;
+  align-items: start;
+}
+.wx-options > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wx-log ul {
+  margin: 2px 0 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: #c8c0a8;
+}
+.wx-apply {
+  align-items: center;
+}
+
+/* ---- The currency guide ---- */
+.wx-guide {
+  width: min(640px, 94vw);
+}
+.wx-guide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wx-guide-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border2);
+  font-size: 13px;
+}
+.wx-verb {
+  color: var(--hi);
+  font-size: 12px;
+}
+.confirm-facts {
+  margin: 0;
+  padding-left: 20px;
+}
+
+/* ---- A tablet: the result stays beside the work, the item picker is a sheet ---- */
+@media (max-width: 1099px) {
+  .wx-body {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  }
+}
+
+/* ---- A phone: one column; a staged craft opens as a sheet above the camp bar ---- */
+@media (max-width: 600px) {
+  .wx {
+    padding: 8px;
+  }
+  .wx-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .wx-body.has-result {
+    padding-bottom: 60vh;
+  }
+  .wx-resultcol {
+    display: none;
+  }
+  .wx-resultcol.on {
+    display: block;
+    position: fixed;
+    z-index: 15;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--camp-bar, 52px) + var(--safe-bottom, 0px));
+    top: auto;
+    max-height: 58vh;
+    overflow: auto;
+    background: var(--panel);
+    border-top: 2px solid var(--hi);
+    box-shadow: 0 -6px 18px #000a;
+  }
+  .wx-resultcol .wx-result {
+    border: none;
+    border-radius: 0;
+    padding: 8px calc(12px + var(--safe-right, 0px)) 8px calc(12px + var(--safe-left, 0px));
+  }
+  .wx-apply {
+    position: sticky;
+    bottom: -8px;
+    padding: 8px 0;
+    background: var(--panel);
+    border-top: 1px solid var(--border2);
+  }
+  .wx-group-head {
+    cursor: pointer;
+    min-height: 44px;
+    align-items: center;
+  }
+  .wx-resultcol .ix-pair {
+    gap: 6px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .wx-resultcol .ix-pair .item-card {
+    font-size: 11.5px;
+    padding: 6px;
+  }
+}
+
+@media (pointer: coarse) {
+  .wx-chip,
+  .wx-pick,
+  .wx-affix {
+    min-height: 44px;
+  }
+  .wx-select,
+  .wx-search {
+    font-size: 16px;
+    min-height: 40px;
+  }
+  .wx-close {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* The pouch is one row you scroll sideways when the screen is narrow. */
+@media (max-width: 1099px) {
+  .wx-pouch {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .wx-pouch > * {
+    flex: none;
+  }
+  .wx-guide-btn {
+    order: -1;
+    margin-left: 0;
+  }
+  .wx-dust {
+    order: -2;
+  }
+}

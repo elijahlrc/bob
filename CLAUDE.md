@@ -15,6 +15,7 @@
   goes through decision files (`docs/coverage/gems/`, `docs/coverage/uniques/`; see `docs/coverage/AUTHORING.md`) and
   `npm run coverage:emit` / `coverage:emit-gems`, never by editing the generated `src/data/*Gen.ts`. Items are never
   edited in place (what an item gives is remembered by object).
+- **Items and Workbench UX plan:** [docs/ITEMS.md](docs/ITEMS.md) (milestones U0–U9), built (2026-10-09): the Items tab compares an item with every slot it fits (`compareSlots` in `src/run/inventoryOps.ts`), the Workbench stages every craft in a result panel first (`planCraft` / `applyCraft` in `src/run/craftPlan.ts`, built on the real `craft.ts` code and never showing the real roll of a rolled craft), and `src/ui/Confirm.tsx` replaces `window.confirm`. New item or craft UI goes in `items.css` / `workbench.css`.
 - **Mobile and inventory plan:** [docs/MOBILE.md](docs/MOBILE.md) (milestones P0–P9): make every screen usable in phone and tablet
   browsers (touch rules, small-screen layouts, tree pinch zoom, HUD and map zoom), plus inventory tools (persistent New list, Clean up old items, favourites; P8–P9). P0 to P9 are built; the real-device pass is left (its section 9).
 - **Architecture boundaries (§14.2):**

@@ -1,7 +1,8 @@
 # Bob — Items and Workbench UX plan
 
-Status: **proposal, 2026-10-09.** Nothing here is decided until the user answers section 7; nothing is built. Milestones
-are **U0–U9**. Sibling plan: [MOBILE.md](MOBILE.md) (touch rules, the camp layout, the inventory tools P8–P9, all built).
+Status: **built, 2026-10-09**, with the defaults of section 7 taken (the user delegated the calls and will review the UI). Milestones
+were **U0–U9**. Left out of the build: swipe between items on the phone sheet (Prev/Next buttons are there), the density switch (section 3.5) and a
+"capped" note on resistances. The Workbench tab already carried a badge for a waiting reforge; the camp bar now also offers "Pick the reforge". Sibling plan: [MOBILE.md](MOBILE.md) (touch rules, the camp layout, the inventory tools P8–P9, all built).
 This plan keeps those rules (every action reachable by thumb, never commit on a first tap you cannot read) and builds on them.
 
 Code read for this plan: `src/ui/Items.tsx`, `ItemCard.tsx`, `CleanUp.tsx`, `Workbench.tsx`, `src/run/inventoryOps.ts`,

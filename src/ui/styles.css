@@ -485,47 +485,6 @@ svg.tree {
   border: 1px dashed #555;
   border-radius: var(--radius);
 }
-.items {
-  display: flex;
-  gap: 16px;
-  padding: 16px;
-  align-items: flex-start;
-}
-.equip-col {
-  width: 380px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.equip-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-}
-.flask-row {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 4px;
-}
-.eq-slot,
-.inv-item {
-  background: var(--panel);
-  border: 1px solid var(--border2);
-  border-radius: var(--radius);
-  padding: 6px 8px;
-  text-align: left;
-  font-size: 13px;
-  cursor: pointer;
-  overflow: hidden;
-}
-.eq-slot.sel,
-.inv-item.sel {
-  outline: 2px solid var(--hi);
-}
-.flaskslot {
-  font-size: 11px;
-  overflow-wrap: anywhere;
-}
 .magic {
   color: #8aa8ff;
 }
@@ -540,16 +499,6 @@ svg.tree {
 }
 .flaskitem {
   color: #ff90b0;
-}
-.inv-col {
-  flex: 1;
-  min-width: 0;
-}
-.inv-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 4px;
-  margin-top: 6px;
 }
 .item-card {
   background: #111018;
@@ -633,28 +582,8 @@ svg.tree {
 .reward-preview {
   margin-top: 4px;
 }
-/* Inventory management */
-.items {
-  outline: none;
-}
 .hint {
   font-size: 12px;
-}
-.inv-toolbar {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.inv-toolbar select {
-  background: var(--panel);
-  color: inherit;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 3px 6px;
-}
-.spacer {
-  flex: 1;
 }
 .chips {
   display: flex;
@@ -679,33 +608,6 @@ svg.tree {
 .count {
   margin-left: auto;
   font-size: 12px;
-}
-.inv-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.inv-row {
-  display: grid;
-  grid-template-columns: minmax(120px, 1fr) 80px 38px auto;
-  gap: 8px;
-  align-items: center;
-  background: var(--panel);
-  border: 1px solid #2f2b38;
-  border-radius: 5px;
-  padding: 4px 8px;
-  text-align: left;
-  font-size: 13px;
-  cursor: pointer;
-}
-.inv-row:hover {
-  background: var(--panel2);
-}
-.inv-row.sel {
-  outline: 2px solid var(--hi);
-}
-.inv-row.unusable {
-  opacity: 0.55;
 }
 .row-name {
   overflow: hidden;
@@ -744,23 +646,6 @@ svg.tree {
   padding: 0 4px;
   margin-right: 6px;
 }
-.eq-slot.target {
-  outline: 2px dashed #60e070;
-  background: #17301c;
-}
-.eq-slot.blocked {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-.compare {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-}
-.compare > div {
-  flex: 1;
-  min-width: 0;
-}
 .cmp-title {
   font-size: 11px;
   margin-bottom: 2px;
@@ -772,12 +657,6 @@ svg.tree {
 .btn.primary {
   background: var(--accent-d);
   border-color: var(--accent);
-}
-.items {
-  flex-wrap: wrap;
-}
-.equip-col {
-  width: min(560px, 100%);
 }
 /* Skills / sockets */
 .skills-wrap {
@@ -861,21 +740,6 @@ svg.tree {
 }
 select option {
   background: var(--panel);
-}
-.equip-col {
-  flex: 0 1 340px;
-  width: auto;
-  min-width: 300px;
-}
-.inv-col {
-  flex: 1 1 300px;
-  min-width: 300px;
-}
-.inv-row {
-  grid-template-columns: minmax(110px, 1fr) 72px 34px auto;
-}
-.inv-row {
-  grid-template-columns: minmax(110px, 1fr) 72px 34px 150px;
 }
 
 /* ---- Orb HUD ---- */
@@ -986,12 +850,6 @@ select option {
   display: flex;
   gap: 8px;
   justify-content: center;
-}
-
-/* Reserve room for the hover/selection card so hovering never shifts the inventory list under the cursor
-   (the list sits below this column when the window is narrow). */
-.item-detail {
-  min-height: 340px;
 }
 
 /* ---- Enemy inspect card ---- */
@@ -1140,87 +998,12 @@ select option {
 .theme.respite {
   border-style: dashed;
 }
-
-.workbench {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.wb-pouch {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-}
 .chip {
   padding: 2px 8px;
   border: 1px solid #3a3a48;
   border-radius: 10px;
   background: #1a1922;
   font-size: 13px;
-}
-.wb-body {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-.wb-side {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 240px;
-  max-width: 280px;
-  position: sticky;
-  top: 0;
-}
-.wb-search {
-  width: 100%;
-  box-sizing: border-box;
-}
-.wb-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  max-height: calc(100vh - 150px);
-  overflow-y: auto;
-  scrollbar-color: #3a3a48 #14131a;
-  scrollbar-width: thin;
-}
-/* The rows clip their text, so without this a long list squeezes them down to slivers. */
-.wb-list > * {
-  flex: none;
-}
-.wb-work {
-  flex: 1;
-  min-width: 300px;
-}
-.wb-box {
-  margin: 8px 0;
-  padding: 6px 10px;
-  border: 1px solid #2c2c38;
-  border-radius: 4px;
-}
-.wb-box h4,
-.wb-work h4 {
-  margin: 4px 0;
-}
-.wb-affix {
-  padding: 2px 0;
-}
-.wb-ops {
-  margin-left: 8px;
-  display: inline-flex;
-  gap: 4px;
-}
-.wb-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.wb-pick {
-  padding: 8px;
-  border: 1px solid #5a4a2a;
-  background: #1c1810;
 }
 .theme-wrap {
   display: flex;
@@ -1451,9 +1234,6 @@ select option {
 }
 .row-star:hover {
   color: var(--hi);
-}
-.inv-toolbar .pin {
-  white-space: nowrap;
 }
 .modal {
   position: fixed;

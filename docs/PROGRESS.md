@@ -833,3 +833,13 @@ The bot sample at the end (60 runs, 10 for each class, maps 1 to 20, seed 3, the
 before the plan began: runs that died before map 20 were 31 of 60 (38 of 60 before); no class won the 20 maps either way (the bot is a weak proxy, and 20 maps is a short
 run); the sim runs at 450 to 570 times real time (560 to 800 before), the cost of the new behaviours. The sample is a regression detector and shows none. A crash in map generation
 ("weighted pick with no positive weight", src/gen/packs.ts) stops some deeper runs; it is not from the plan, and a task is open for it.
+
+### Items and Workbench UX (docs/ITEMS.md), built (2026-10-09)
+
+U0 to U9 are built. **Items:** one pinned selection; a comparison for every slot an item fits (rings, one-handers, flasks) with its own Equip or Swap button and
+what goes back to the bag; three columns on a desktop, two on a tablet, a sheet over the camp bar on a phone with the gear folded; search, combinable filters, a
+Tidy menu, a capacity bar, drag to equip. **Workbench:** actions grouped by intent, every craft staged in a result panel (before, after, cost, odds, the change to a
+worn item's owner) before it is paid for, tier and roll position on each affix, a reforge pick that opens in the same panel, a status line and a short log, a pouch
+that says what each currency does and a guide. The logic is headless (`compareSlots`, `dryEquip`, `planCraft`, `applyCraft`, `affixInfo` and the rest of
+`src/run/craftPlan.ts`) with tests. No cost, odd or unlock changed. Found on the way: `itemInfos` scored a two-hander without clearing the off hand it displaces; it now
+scores the build `equip` would leave. A browser pass was done at 1280 and 375 wide; a real-device pass is left (MOBILE.md section 9).

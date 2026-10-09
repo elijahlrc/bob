@@ -1,3 +1,4 @@
+import { FACTION_NAMES, type FactionId } from './monsters';
 import { UNIQUE_FLASKS } from './uniqueFlasks';
 import { UNIQUES } from './uniques';
 /**
@@ -304,4 +305,34 @@ export function currencyText(id: string): string {
     return `A set of ${tabletsNeeded(u)} is exchanged at the Workbench for this unique.`;
   }
   return currencyDef(id).text;
+}
+
+/** Each currency in a few words, the verb the player is buying (shown under its name in the Workbench). */
+export const CURRENCY_VERBS: Record<CurrencyId, string> = {
+  ember: 'rerolls affixes',
+  pearl: 'adds an affix',
+  thread: 'removes an affix',
+  whetstone: 'maxes one affix roll',
+  auger: 'sets the sockets',
+  die: 'remakes a normal item',
+  seal: 'seals an item for good',
+  chalk: 'edits an offered map',
+  plagueIchor: 'adds a chaos affix you choose',
+  ectoplasm: 'adds a defence or mana affix you choose',
+  censerAsh: 'adds an aura affix you choose',
+  chitin: 'adds a speed or area affix you choose',
+  reliquarySlag: 'adds a physical or armour affix you choose',
+  houndtooth: 'adds a movement affix you choose',
+  giltDust: 'adds a regeneration or leech affix you choose',
+  brineSalt: 'adds a resistance or stun affix you choose',
+  emberAsh: 'adds a fire affix you choose',
+};
+
+/** Where a currency comes from, for the guide. */
+export function currencySource(id: CurrencyId): string {
+  const d = currencyDef(id);
+  const where = d.faction
+    ? `dropped by ${FACTION_NAMES[d.faction as FactionId] ?? d.faction}`
+    : 'drops anywhere';
+  return `${where}, from map ${d.minMap}`;
 }

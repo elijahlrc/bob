@@ -1,521 +1,549 @@
-import { useState } from 'preact/hooks';
-import { Character, diffSheets, type SheetDiff } from '../calc/character';
-import { family, familyMods, type Family } from '../data/affixes';
+import { useEffect, useState } from 'preact/hooks';
 import { itemBase } from '../data/bases';
-import {
-  augerCost,
-  BENCH_RECIPES,
-  CURRENCIES,
-  currencyDef,
-  currencyLabel,
-  currencyText,
-  TABLET_PREFIX,
-} from '../data/currency';
-import { EQUIP_SLOTS, type EquipSlot, type Item } from '../data/types';
+import { EQUIP_SLOTS, type Item } from '../data/types';
 import { modsText } from '../mods/text';
-import { cfgFor } from '../run/bot';
 import type { Controller } from '../run/controller';
+import { locate, pickReforge, type CraftResult } from '../run/craft';
 import {
-  addableFamilies,
-  benchAdd,
-  benchRemove,
-  benchRemoveBench,
-  benchSocketCost,
-  benchSockets,
-  completeTabletSets,
-  drawReforge,
-  locate,
-  owned,
-  pickReforge,
-  POLISH_LIMIT,
-  redeemTablets,
-  reforgeCost,
-  salvage,
-  salvageValue,
-  socketCeiling,
-  socketCost,
-  useAuger,
-  useDie,
-  useEssence,
-  usePearl,
-  useSeal,
-  useThread,
-  useWhetstone,
-  type CraftResult,
-} from '../run/craft';
+  affixInfo,
+  applyCraft,
+  describeChange,
+  planCraft,
+  slotRoom,
+  type CraftAction,
+  type CraftPlan,
+} from '../run/craftPlan';
+import { slotLabel, slotName } from '../run/inventoryOps';
 import type { RunState } from '../run/run';
-import { viewport } from './device';
-import { infoProps } from './info';
-import { ItemCard, rarityClass } from './ItemCard';
-import { slotLabel } from '../run/inventoryOps';
+import { isFavourite } from '../run/found';
+import { ask } from './Confirm';
+import { useViewport } from './device';
+import { rarityClass } from './ItemCard';
+import { loadPref, savePref } from './prefs';
+import { Actions } from './WbActions';
+import { Guide, Pouch, type GroupId } from './WbPouch';
+import { ResultPanel } from './WbResult';
 
-/** "+N to maximum Life": what a family adds, with the numbers left out. */
-function familyLabel(f: Family): string {
-  const top = f.tiers[f.tiers.length - 1];
-  const text = modsText(
-    familyMods(
-      f,
-      top.ranges.map((r) => r[1]),
-    ),
-  )
-    .join(' and ')
-    .replace(/\d+(\.\d+)?/g, 'N');
-  return `${f.type === 'prefix' ? 'Prefix' : 'Suffix'}: ${text}`;
-}
-
-const affixLabel = (id: string) => familyLabel(family(id));
-
-type Row = { item: Item; where: string };
+type Row = { item: Item; where: string; worn: boolean };
 
 /** Every item the player has that can be crafted: worn first, then carried. */
 function craftable(run: RunState): Row[] {
   const rows: Row[] = [];
   for (const slot of EQUIP_SLOTS) {
     const it = run.build.equipment[slot];
-    if (it) rows.push({ item: it, where: slotLabel(slot) });
+    if (it) rows.push({ item: it, where: slotName(slot), worn: true });
   }
-  for (const it of run.inventory) if (it.kind === 'item') rows.push({ item: it, where: 'Carried' });
+  for (const it of run.inventory)
+    if (it.kind === 'item') rows.push({ item: it, where: 'Bag', worn: false });
   return rows;
 }
 
-/** How wearing `next` instead of the current item changes the character (worn items only). */
-function diffFor(run: RunState, current: Item, next: Item): SheetDiff | null {
-  const slot = EQUIP_SLOTS.find((s) => run.build.equipment[s]?.uid === current.uid) as
-    EquipSlot | undefined;
-  if (!slot) return null;
-  const a = new Character(run.build, cfgFor(run)).sheet();
-  const b = new Character(
-    { ...run.build, equipment: { ...run.build.equipment, [slot]: next } },
-    cfgFor(run),
-  ).sheet();
-  return diffSheets(a, b);
-}
+type Filter = 'all' | 'worn' | 'bag';
 
-export function Workbench({ c }: { c: Controller }) {
-  const run = c.run!;
-  const [uid, setUid] = useState<number | null>(null);
-  const [pins, setPins] = useState<string[]>([]);
-  const [msg, setMsg] = useState('');
-  const [pearlFam, setPearlFam] = useState('');
-  const [essence, setEssence] = useState('');
-  const [essFam, setEssFam] = useState('');
-  const [essReplace, setEssReplace] = useState('');
-  const [sockets, setSockets] = useState(0);
+function Picker({
+  run,
+  rows,
+  uid,
+  onChoose,
+}: {
+  run: RunState;
+  rows: Row[];
+  uid: number | null;
+  onChoose: (uid: number) => void;
+}) {
   const [query, setQuery] = useState('');
-  const rows = craftable(run);
+  const [filter, setFilter] = useState<Filter>('all');
   const q = query.trim().toLowerCase();
-  const shown = q
-    ? rows.filter(
-        (r) =>
-          r.item.name.toLowerCase().includes(q) ||
-          r.where.toLowerCase().includes(q) ||
-          itemBase(r.item.baseId).name.toLowerCase().includes(q),
-      )
-    : rows;
-  const loc = uid !== null ? locate(run, uid) : null;
-  const it = loc?.item ?? null;
-
-  const act = (r: (run: RunState) => CraftResult | void) =>
-    c.craft((run) => {
-      const res = r(run);
-      setMsg(res && !res.ok ? res.reason : '');
-    });
-
-  const pending = run.pendingCraft;
-  const pendingItem = pending ? locate(run, pending.itemUid)?.item : null;
-  const pouch = CURRENCIES.filter((d) => owned(run, d.id) > 0);
-  const tablets = Object.entries(run.tablets).filter(([, n]) => n > 0);
-  const complete = completeTabletSets(run);
-
-  const choose = (u: number) => {
-    setUid(u);
-    setPins([]);
-    setMsg('');
-    const found = locate(run, u)?.item;
-    setSockets(found?.sockets.length ?? 0);
-    // On a phone the panel for the item is below the list: bring it into view.
-    if (viewport().layout === 'phone')
-      setTimeout(() => document.querySelector('.wb-work')?.scrollIntoView({ block: 'start' }), 0);
-  };
-
+  const shown = rows.filter(
+    (r) =>
+      (filter === 'all' || (filter === 'worn') === r.worn) &&
+      (!q ||
+        r.item.name.toLowerCase().includes(q) ||
+        r.where.toLowerCase().includes(q) ||
+        itemBase(r.item.baseId).name.toLowerCase().includes(q)),
+  );
   return (
-    <div class="workbench">
-      <div class="wb-pouch">
-        <div>
-          <b>Bone Dust</b> {run.dust}
-        </div>
-        {pouch.length === 0 && (
-          <span class="muted">No currency yet. Monsters and rewards drop it.</span>
-        )}
-        {pouch.map((d) => (
-          <span key={d.id} class="chip" {...infoProps(d.text)}>
-            {d.name} × {owned(run, d.id)}
-          </span>
-        ))}
-        {tablets.map(([id, n]) => (
-          <span key={id} class="chip" {...infoProps(currencyText(TABLET_PREFIX + id))}>
-            {currencyLabel(TABLET_PREFIX + id)} × {n}
-            {complete.includes(id) && (
-              <button class="btn small" onClick={() => act((r) => redeemTablets(r, id))}>
-                Redeem
-              </button>
-            )}
-          </span>
+    <div class="wx-picker">
+      <input
+        class="wx-search"
+        type="search"
+        placeholder={`Search ${rows.length} items`}
+        aria-label="Search items"
+        value={query}
+        onInput={(e) => setQuery((e.target as HTMLInputElement).value)}
+      />
+      <div class="ix-chips">
+        {(['all', 'worn', 'bag'] as const).map((f) => (
+          <button
+            key={f}
+            class={'chip' + (filter === f ? ' on' : '')}
+            aria-pressed={filter === f}
+            onClick={() => setFilter(f)}
+          >
+            {f === 'all' ? 'All' : f === 'worn' ? 'Worn' : 'Bag'}
+          </button>
         ))}
       </div>
-      {msg && <div class="warn">{msg}</div>}
-
-      {pending && pendingItem && (
-        <div class="wb-pick">
-          <div class="notice">
-            Pick a result for {pendingItem.name}. The Embers are spent either way.
-          </div>
-          <div class="wb-options">
-            <div>
-              <div class="muted">Keep the original</div>
-              <ItemCard it={pendingItem} />
-              <button class="btn small" onClick={() => act((r) => pickReforge(r, null))}>
-                Keep it
-              </button>
-            </div>
-            {pending.options.map((o, i) => (
-              <div key={i}>
-                <div class="muted">Alternative {i + 1}</div>
-                <ItemCard it={o} diff={diffFor(run, pendingItem, o)} />
-                <button class="btn small primary" onClick={() => act((r) => pickReforge(r, i))}>
-                  Take this
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div class="wb-body">
-        <div class="wb-side">
-          {rows.length > 12 && (
-            <input
-              class="wb-search"
-              type="search"
-              placeholder={`Search ${rows.length} items`}
-              value={query}
-              onInput={(e) => setQuery((e.target as HTMLInputElement).value)}
-            />
-          )}
-          <div class="wb-list">
-            {shown.map(({ item, where }) => (
-              <button
-                key={item.uid}
-                class={`inv-item ${rarityClass(item)}${uid === item.uid ? ' sel' : ''}`}
-                onClick={() => choose(item.uid)}
-              >
-                <span class="muted">{where}</span> {item.name}
-              </button>
-            ))}
-            {shown.length === 0 && <div class="muted">No item matches.</div>}
-          </div>
-        </div>
-        {it && !pending && (
-          <ItemWork
-            run={run}
-            it={it}
-            pins={pins}
-            setPins={setPins}
-            act={act}
-            pearlFam={pearlFam}
-            setPearlFam={setPearlFam}
-            essence={essence}
-            setEssence={setEssence}
-            essFam={essFam}
-            setEssFam={setEssFam}
-            essReplace={essReplace}
-            setEssReplace={setEssReplace}
-            sockets={sockets}
-            setSockets={setSockets}
-            carried={loc?.slot === null}
-            onSalvaged={() => setUid(null)}
-          />
-        )}
-        {!it && <div class="muted">Choose an item to work on.</div>}
+      <div class="wx-list">
+        {shown.map(({ item, where, worn }) => (
+          <button
+            key={item.uid}
+            class={`wx-pick ${rarityClass(item)}${uid === item.uid ? ' sel' : ''}`}
+            onClick={() => onChoose(item.uid)}
+          >
+            <span class="muted wx-pick-where">{worn ? where : 'Bag'}</span>
+            <span class="wx-pick-name">
+              {isFavourite(run, item.uid) ? '★ ' : ''}
+              {item.name}
+            </span>
+            {item.sealed && <span class="badge down">sealed</span>}
+          </button>
+        ))}
+        {shown.length === 0 && <div class="muted">No item matches.</div>}
       </div>
     </div>
   );
 }
 
-type WorkProps = {
-  run: RunState;
+/** The item's affixes as the form the crafts work on: pick one for the Change group, or tick the ones a reforge keeps. */
+function AffixList({
+  it,
+  selAffix,
+  setSelAffix,
+  pinning,
+  pins,
+  setPins,
+  flash,
+  locked,
+}: {
   it: Item;
+  selAffix: string | null;
+  setSelAffix: (f: string | null) => void;
+  pinning: boolean;
   pins: string[];
   setPins: (p: string[]) => void;
-  act: (r: (run: RunState) => CraftResult | void) => void;
-  pearlFam: string;
-  setPearlFam: (s: string) => void;
-  essence: string;
-  setEssence: (s: string) => void;
-  essFam: string;
-  setEssFam: (s: string) => void;
-  essReplace: string;
-  setEssReplace: (s: string) => void;
-  sockets: number;
-  setSockets: (n: number) => void;
-  carried: boolean;
-  onSalvaged: () => void;
-};
-
-function ItemWork(p: WorkProps) {
-  const { run, it, act } = p;
-  const addable = addableFamilies(it);
-  const essDef = p.essence ? currencyDef(p.essence) : null;
-  const essOptions = essDef?.families?.map(family) ?? [];
-  const polished = it.polished ?? [];
-  const sealed = !!it.sealed;
-  const ceiling = socketCeiling(it);
-  const cost = socketCost(it.sockets.length, p.sockets);
-  const dustCost = benchSocketCost(it.sockets.length, p.sockets, run.map);
-  const have = (id: string) => owned(run, id);
-  const buttons = (label: string, id: string, n: number, on: () => void, ok = true) => (
-    <button class="btn small" disabled={!ok || have(id) < n || sealed} onClick={on}>
-      {label} ({n} {currencyDef(id).name}
-      {n > 1 ? 's' : ''})
-    </button>
-  );
+  flash: Set<string>;
+  locked: boolean;
+}) {
+  if (it.affixes.length === 0 && (it.uniqueMods ?? []).length === 0)
+    return <div class="muted">No affixes yet.</div>;
   return (
-    <div class="wb-work">
-      <ItemCard it={it} />
-      {sealed && <div class="warn">Sealed: this item can never be changed again.</div>}
-      <h4>Affixes</h4>
-      {it.affixes.length === 0 && <div class="muted">No affixes.</div>}
-      {it.affixes.map((a) => (
-        <div key={a.family} class="wb-affix">
-          {it.rarity === 'rare' && (
-            <label title="Pin: keep this affix in a reforge">
-              <input
-                type="checkbox"
-                checked={p.pins.includes(a.family)}
-                disabled={sealed}
-                onChange={(e) =>
-                  p.setPins(
-                    (e.target as HTMLInputElement).checked
-                      ? [...p.pins, a.family]
-                      : p.pins.filter((f) => f !== a.family),
-                  )
-                }
-              />{' '}
-              pin
-            </label>
-          )}{' '}
-          {modsText(a.mods).join(' · ')}
-          {a.bench ? ' (bench)' : ''}
-          {polished.includes(a.family) ? ' (polished)' : ''}
-          <span class="wb-ops">
-            <button
-              class="btn small"
-              disabled={sealed || have('thread') < 1}
-              title="Unravelling Thread: remove this affix"
-              onClick={() => act((r) => useThread(r, it.uid, a.family))}
-            >
-              Remove
-            </button>
-            <button
-              class="btn small"
-              disabled={
-                sealed ||
-                have('whetstone') < 1 ||
-                polished.includes(a.family) ||
-                polished.length >= POLISH_LIMIT
+    <div class="wx-affixes">
+      {it.affixes.map((a) => {
+        const info = affixInfo(it, a);
+        const pinned = pins.includes(a.family);
+        const sel = !pinning && selAffix === a.family;
+        const body = (
+          <>
+            <span class="wx-affix-kind muted">{info.type === 'prefix' ? 'Prefix' : 'Suffix'}</span>
+            <span class="wx-affix-text">{modsText(a.mods).join(' and ')}</span>
+            <span class="wx-affix-meta">
+              <span class="muted" title="Higher tiers are stronger and rarer.">
+                tier {info.tier}/{info.tiers}
+              </span>
+              <span
+                class="wx-bar"
+                title={`Where the value sits in its tier: ${Math.round(info.at * 100)}%`}
+              >
+                <i style={{ width: `${Math.round(info.at * 100)}%` }} />
+              </span>
+              {info.polished && <span class="badge up">raised</span>}
+              {info.bench && <span class="badge">bench</span>}
+            </span>
+          </>
+        );
+        const cls = `wx-affix${sel ? ' sel' : ''}${pinned ? ' pinned' : ''}${flash.has(a.family) ? ' flash' : ''}`;
+        return pinning ? (
+          <label key={a.family} class={cls}>
+            <input
+              type="checkbox"
+              checked={pinned}
+              disabled={locked}
+              onChange={(e) =>
+                setPins(
+                  (e.target as HTMLInputElement).checked
+                    ? [...pins, a.family]
+                    : pins.filter((f) => f !== a.family),
+                )
               }
-              title="Whetstone: raise this affix to the maximum of its tier"
-              onClick={() => act((r) => useWhetstone(r, it.uid, a.family))}
-            >
-              Polish
-            </button>
-            <button
-              class="btn small"
-              disabled={sealed || run.dust < 25 || run.map < 10}
-              title="Bench: remove this affix for 25 Bone Dust"
-              onClick={() => act((r) => benchRemove(r, it.uid, a.family))}
-            >
-              Bench remove
-            </button>
-          </span>
+            />
+            {body}
+          </label>
+        ) : (
+          <button
+            key={a.family}
+            class={cls}
+            aria-pressed={sel}
+            disabled={locked}
+            onClick={() => setSelAffix(sel ? null : a.family)}
+          >
+            {body}
+          </button>
+        );
+      })}
+      {(it.uniqueMods ?? []).map((m, i) => (
+        <div key={`u${i}`} class="wx-affix fixed">
+          <span class="wx-affix-kind muted">Unique</span>
+          <span class="wx-affix-text">{modsText([m]).join(' and ')}</span>
         </div>
       ))}
-      {it.affixes.some((a) => a.bench) && (
-        <button class="btn small" onClick={() => act((r) => benchRemoveBench(r, it.uid))}>
-          Remove the bench affix (free)
-        </button>
-      )}
+    </div>
+  );
+}
 
-      {it.rarity === 'rare' && !sealed && (
-        <div class="wb-box">
-          <h4>Reforging Ember</h4>
-          <div class="muted">
-            Pin the affixes to keep, then pick one of three alternatives for the rest, or the
-            original.
-          </div>
+/** What gets a confirmation before it is paid for: the gambles and the things that cannot be taken back at all. */
+function needsConfirm(a: CraftAction): boolean {
+  return a.kind === 'die' || a.kind === 'seal' || a.kind === 'salvage';
+}
+
+const costText = (plan: CraftPlan) =>
+  plan.cost.map((c) => `${c.n} ${c.label}`).join(' and ') || 'nothing';
+
+/**
+ * The Workbench (docs/ITEMS.md section 4): choose an item, choose what to do to it, see the result, pay. Every craft is
+ * staged in the result panel first, built by `planCraft` from the real craft code.
+ */
+export function Workbench({
+  c,
+  focus,
+  onShowInItems,
+}: {
+  c: Controller;
+  /** Choose this item when it changes (the Items tab's "Craft…"). */
+  focus?: { uid: number; n: number } | null;
+  onShowInItems?: (uid: number) => void;
+}) {
+  const run = c.run!;
+  const { layout, width } = useViewport();
+  const phone = layout === 'phone';
+  const wide = width >= 1100;
+  const [uid, setUid] = useState<number | null>(null);
+  const [staged, setStaged] = useState<CraftAction | null>(null);
+  const [selAffix, setSelAffix] = useState<string | null>(null);
+  const [mode, setMode] = useState<'view' | 'reforge'>('view');
+  const [pins, setPins] = useState<string[]>([]);
+  const [addFam, setAddFam] = useState('');
+  const [essence, setEssence] = useState('');
+  const [essReplace, setEssReplace] = useState<Record<string, string>>({});
+  const [sockets, setSockets] = useState(0);
+  const [open, setOpen] = useState<GroupId | null>(null);
+  const [status, setStatus] = useState('');
+  const [logs, setLogs] = useState<Record<number, string[]>>({});
+  const [flash, setFlash] = useState<Set<string>>(new Set());
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [guide, setGuide] = useState(false);
+  const [intro, setIntro] = useState<boolean>(() => loadPref<boolean>('wb.intro', true));
+
+  const rows = craftable(run);
+  const loc = uid !== null ? locate(run, uid) : null;
+  const it = loc?.item ?? null;
+  const pending = run.pendingCraft;
+  const locked = !!pending;
+
+  const choose = (u: number) => {
+    setUid(u);
+    setStaged(null);
+    setSelAffix(null);
+    setMode('view');
+    setPins([]);
+    setAddFam('');
+    setEssence('');
+    setEssReplace({});
+    setFlash(new Set());
+    setSockets(locate(run, u)?.item.sockets.length ?? 0);
+    setPickerOpen(false);
+  };
+  // "Craft…" from the Items tab, or a reforge that is still waiting for its pick.
+  useEffect(() => {
+    if (focus && locate(run, focus.uid)) choose(focus.uid);
+  }, [focus?.n]);
+  useEffect(() => {
+    if (pending && uid === null && locate(run, pending.itemUid)) choose(pending.itemUid);
+  }, []);
+
+  const plan = it && staged ? planCraft(run, it.uid, staged) : null;
+  // A staged craft that stopped making sense (the item changed under it) is dropped.
+  useEffect(() => {
+    if (staged && !it) setStaged(null);
+  }, [staged, it]);
+
+  const stage = (a: CraftAction | null) => {
+    setStaged(a);
+    // On a phone the result is a sheet; nothing else to do. Elsewhere it is already beside the work.
+  };
+  const openGroup = (g: GroupId) => {
+    setOpen(g);
+    setTimeout(() => {
+      const el = document.querySelector(`[data-group="${g}"]`);
+      el?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      el?.classList.add('hot');
+      setTimeout(() => el?.classList.remove('hot'), 1200);
+    }, 0);
+  };
+
+  const apply = async () => {
+    if (!it || !staged || !plan?.ok) return;
+    const action = staged;
+    if (needsConfirm(action)) {
+      const ok = await ask({
+        title:
+          action.kind === 'seal'
+            ? 'Seal this item?'
+            : action.kind === 'die'
+              ? 'Throw the Knucklebone Die?'
+              : 'Salvage this item?',
+        body:
+          action.kind === 'salvage'
+            ? `${it.name} is broken down for good.`
+            : action.kind === 'seal'
+              ? 'It can never be changed again. It may gain something, or be remade.'
+              : `${it.name} is remade by chance.`,
+        facts: [
+          ...(plan.odds ?? []),
+          ...(plan.gain ? [`Gives ${plan.gain}`] : []),
+          `Costs ${costText(plan)}`,
+        ],
+        confirm:
+          action.kind === 'salvage'
+            ? 'Salvage it'
+            : action.kind === 'seal'
+              ? 'Seal it'
+              : 'Throw it',
+        danger: true,
+      });
+      if (!ok) return;
+    }
+    const before = it;
+    let res: CraftResult | undefined;
+    c.craft((r) => {
+      res = applyCraft(r, before.uid, action);
+    });
+    const done = res as CraftResult | undefined;
+    if (!done || !done.ok) {
+      setStatus(done && !done.ok ? done.reason : 'That did not work.');
+      return;
+    }
+    const after = locate(c.run!, before.uid)?.item ?? null;
+    const drew = action.kind === 'reforge';
+    const lines = drew
+      ? ['Three alternatives drawn']
+      : after
+        ? describeChange(before, after)
+        : ['Salvaged'];
+    const said = drew
+      ? `Drew three alternatives for ${before.name}. Spent ${costText(plan)}. Pick one, or keep the original.`
+      : `${plan.verb}: ${lines.join('; ')}. Spent ${costText(plan)}.`;
+    setStatus(said);
+    setLogs((l) => ({
+      ...l,
+      [before.uid]: [`${plan.verb}: ${lines.join('; ')}`, ...(l[before.uid] ?? [])].slice(0, 5),
+    }));
+    setStaged(null);
+    setMode('view');
+    setPins([]);
+    if (!after) {
+      setUid(null);
+    } else {
+      setSockets(after.sockets.length);
+      const was = new Map(before.affixes.map((a) => [a.family, JSON.stringify(a.mods)]));
+      const fams = new Set(
+        after.affixes
+          .filter((a) => was.get(a.family) !== JSON.stringify(a.mods))
+          .map((a) => a.family),
+      );
+      setFlash(fams);
+      setTimeout(() => setFlash(new Set()), 2500);
+      if (selAffix && !after.affixes.some((a) => a.family === selAffix)) setSelAffix(null);
+    }
+  };
+
+  const pick = (i: number | null) => {
+    const orig = pending ? locate(run, pending.itemUid)?.item : null;
+    c.craft((r) => pickReforge(r, i));
+    setStatus(
+      i === null
+        ? `Kept ${orig?.name ?? 'the original'}. The Embers are spent.`
+        : `Took alternative ${i + 1}.`,
+    );
+    if (orig) {
+      setLogs((l) => ({
+        ...l,
+        [orig.uid]: [
+          i === null ? 'Reroll: kept the original' : `Reroll: took alternative ${i + 1}`,
+          ...(l[orig.uid] ?? []),
+        ].slice(0, 5),
+      }));
+      if (i !== null)
+        setFlash(new Set(locate(c.run!, orig.uid)?.item.affixes.map((a) => a.family) ?? []));
+      setTimeout(() => setFlash(new Set()), 2500);
+    }
+  };
+
+  const room = it ? slotRoom(it) : null;
+  const resultOn = !!(plan || pending);
+  const result = (
+    <ResultPanel
+      run={run}
+      item={it}
+      plan={plan}
+      pick={!!pending}
+      log={uid !== null ? (logs[uid] ?? []) : []}
+      onApply={() => void apply()}
+      onCancel={() => setStaged(null)}
+      onPick={pick}
+    />
+  );
+
+  return (
+    <div class="wx">
+      {guide && <Guide run={run} onClose={() => setGuide(false)} />}
+      <Pouch c={c} run={run} onGroup={openGroup} onGuide={() => setGuide(true)} />
+      {intro && (
+        <div class="wx-intro">
+          <span>
+            <b>How this works:</b> pick an item, pick what to do to it, and look at the result
+            before you pay.
+          </span>
           <button
             class="btn small"
-            disabled={
-              have('ember') < reforgeCost(p.pins.length) || p.pins.length >= it.affixes.length
-            }
-            onClick={() => act((r) => drawReforge(r, it.uid, p.pins))}
+            onClick={() => {
+              setIntro(false);
+              savePref('wb.intro', false);
+            }}
           >
-            Reforge ({reforgeCost(p.pins.length)} Reforging Ember
-            {reforgeCost(p.pins.length) > 1 ? 's' : ''})
+            Got it
           </button>
         </div>
       )}
-
-      {!sealed && !it.uniqueId && (
-        <div class="wb-box">
-          <h4>Add an affix</h4>
-          <select
-            value={p.pearlFam}
-            onChange={(e) => p.setPearlFam((e.target as HTMLSelectElement).value)}
-          >
-            <option value="">Choose an affix…</option>
-            {addable.map((f) => (
-              <option key={f.id} value={f.id}>
-                {familyLabel(f)}
-              </option>
-            ))}
-          </select>{' '}
-          {buttons(
-            'Marrow Pearl',
-            'pearl',
-            1,
-            () => act((r) => usePearl(r, it.uid, p.pearlFam)),
-            !!p.pearlFam,
-          )}
-          {BENCH_RECIPES.filter((r) => r.kind === 'add').map((r) =>
-            r.kind === 'add' ? (
-              <button
-                key={r.family}
-                class="btn small"
-                disabled={run.dust < r.dust || run.map < r.minMap}
-                title={`Bench: ${r.label}, ${r.dust} Bone Dust, at a mid-low tier. Unlocks at map ${r.minMap}.`}
-                onClick={() => act((rn) => benchAdd(rn, it.uid, r.family))}
-              >
-                {r.label} ({r.dust})
-              </button>
-            ) : null,
-          )}
+      {status && (
+        <div class="ix-status" role="status">
+          {status}{' '}
+          <button class="link" onClick={() => setStatus('')}>
+            Dismiss
+          </button>
         </div>
       )}
-
-      {!sealed && !it.uniqueId && CURRENCIES.some((d) => d.families && have(d.id) > 0) && (
-        <div class="wb-box">
-          <h4>Essence</h4>
-          <select
-            value={p.essence}
-            onChange={(e) => {
-              p.setEssence((e.target as HTMLSelectElement).value);
-              p.setEssFam('');
-              p.setEssReplace('');
-            }}
-          >
-            <option value="">Choose an essence…</option>
-            {CURRENCIES.filter((d) => d.families && have(d.id) > 0).map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name} × {have(d.id)}
-              </option>
-            ))}
-          </select>{' '}
-          {essDef && (
+      <div class={'wx-body' + (resultOn ? ' has-result' : '')}>
+        {wide && (
+          <div class="wx-pickcol">
+            <Picker run={run} rows={rows} uid={uid} onChoose={choose} />
+          </div>
+        )}
+        <div class="wx-work">
+          {!wide && (
+            <button class="btn wx-change" onClick={() => setPickerOpen(true)}>
+              {it ? 'Change item…' : 'Choose an item…'}
+            </button>
+          )}
+          {pickerOpen && !wide && (
+            <div class="modal" onClick={() => setPickerOpen(false)}>
+              <div
+                class="modal-card"
+                role="dialog"
+                aria-label="Choose an item"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  class="sheet-x modal-x"
+                  aria-label="Close"
+                  onClick={() => setPickerOpen(false)}
+                >
+                  ×
+                </button>
+                <h3>Choose an item</h3>
+                <Picker run={run} rows={rows} uid={uid} onChoose={choose} />
+              </div>
+            </div>
+          )}
+          {!it && <div class="muted wx-none">Choose an item to work on.</div>}
+          {it && room && (
             <>
-              <select
-                value={p.essFam}
-                onChange={(e) => p.setEssFam((e.target as HTMLSelectElement).value)}
-              >
-                <option value="">Choose an affix…</option>
-                {essOptions.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {familyLabel(f)}
-                  </option>
+              <div class="wx-item">
+                <div class="wx-item-head">
+                  <span class={'ix-title ' + rarityClass(it)}>{it.name}</span>
+                  {onShowInItems && (
+                    <button class="btn small" onClick={() => onShowInItems(it.uid)}>
+                      Show in Items
+                    </button>
+                  )}
+                </div>
+                <div class="muted">
+                  {itemBase(it.baseId).name} · item level {it.ilvl}
+                  {loc?.slot ? ` · worn as ${slotLabel(loc.slot)}` : ' · in the bag'}
+                </div>
+                <div class="wx-room">
+                  <span class="wx-room-chip">
+                    Prefixes {room.prefix.used}/{room.prefix.cap}
+                  </span>
+                  <span class="wx-room-chip">
+                    Suffixes {room.suffix.used}/{room.suffix.cap}
+                  </span>
+                  {room.sockets.max > 0 && (
+                    <span class="wx-room-chip">
+                      Sockets {room.sockets.n}/{room.sockets.max}
+                    </span>
+                  )}
+                  {it.sealed && <span class="wx-room-chip sealed">Sealed</span>}
+                  {it.uniqueId && <span class="wx-room-chip">Unique</span>}
+                </div>
+                {modsText(it.implicits).map((l, i) => (
+                  <div key={i} class="ic-mod implicit">
+                    {l}
+                  </div>
                 ))}
-              </select>{' '}
-              <select
-                value={p.essReplace}
-                onChange={(e) => p.setEssReplace((e.target as HTMLSelectElement).value)}
-              >
-                <option value="">Replace nothing</option>
-                {it.affixes.map((a) => (
-                  <option key={a.family} value={a.family}>
-                    Replace: {affixLabel(a.family)}
-                  </option>
-                ))}
-              </select>{' '}
-              <button
-                class="btn small"
-                disabled={!p.essFam}
-                onClick={() =>
-                  act((r) => useEssence(r, it.uid, p.essence, p.essFam, p.essReplace || undefined))
-                }
-              >
-                Use
-              </button>
+                <AffixList
+                  it={it}
+                  selAffix={selAffix}
+                  setSelAffix={setSelAffix}
+                  pinning={mode === 'reforge'}
+                  pins={pins}
+                  setPins={(p) => {
+                    setPins(p);
+                    if (staged?.kind === 'reforge') setStaged(null);
+                  }}
+                  flash={flash}
+                  locked={locked}
+                />
+              </div>
+              <Actions
+                run={run}
+                it={it}
+                carried={loc?.slot === null}
+                staged={staged}
+                stage={stage}
+                selAffix={selAffix}
+                mode={mode}
+                setMode={(m) => {
+                  setMode(m);
+                  if (m === 'view') {
+                    setPins([]);
+                    if (staged?.kind === 'reforge') setStaged(null);
+                  }
+                }}
+                pins={pins}
+                addFam={addFam}
+                setAddFam={setAddFam}
+                essence={essence}
+                setEssence={setEssence}
+                essReplace={essReplace}
+                setEssReplace={setEssReplace}
+                sockets={sockets}
+                setSockets={(n) => {
+                  setSockets(n);
+                  if (staged?.kind === 'sockets') setStaged(null);
+                }}
+                open={open}
+                setOpen={setOpen}
+                phone={phone}
+                locked={locked}
+              />
             </>
           )}
         </div>
-      )}
-
-      {!sealed && !it.fixedSockets && ceiling > 0 && (
-        <div class="wb-box">
-          <h4>Sockets</h4>
-          <div class="muted">
-            {it.sockets.length} of up to {ceiling}. The first three are free; the 4th, 5th and 6th
-            cost 1, 2 and 3 Socket Augers ({[4, 5, 6].map((k) => augerCost(k)).join(', ')}).
-          </div>
-          <input
-            type="range"
-            min={0}
-            max={ceiling}
-            value={p.sockets}
-            onInput={(e) => p.setSockets(Number((e.target as HTMLInputElement).value))}
-          />{' '}
-          {p.sockets} sockets{' '}
-          {buttons(
-            'Set',
-            'auger',
-            cost,
-            () => act((r) => useAuger(r, it.uid, p.sockets)),
-            p.sockets !== it.sockets.length,
-          )}
-          {p.sockets > it.sockets.length && (
-            <button
-              class="btn small"
-              disabled={dustCost === null || run.dust < (dustCost ?? 0)}
-              title="Bench: raise the socket count for Bone Dust"
-              onClick={() => act((r) => benchSockets(r, it.uid, p.sockets))}
-            >
-              Bench ({dustCost ?? 'locked'} Dust)
-            </button>
-          )}
-        </div>
-      )}
-
-      <div class="wb-box">
-        <h4>Gambles and the rest</h4>
-        {it.rarity === 'normal' &&
-          buttons('Throw the Knucklebone Die', 'die', 1, () => act((r) => useDie(r, it.uid)))}
-        {!sealed &&
-          buttons('Rot Seal', 'seal', 1, () => {
-            if (confirm('Seal this item? It can never be changed again.'))
-              act((r) => useSeal(r, it.uid));
-          })}
-        {p.carried && (
-          <button
-            class="btn small danger"
-            onClick={() => {
-              act((r) => salvage(r, it.uid));
-              p.onSalvaged();
-            }}
-          >
-            Salvage for {salvageValue(it)} Bone Dust
-          </button>
-        )}
+        <aside class={'wx-resultcol' + (resultOn ? ' on' : '')} aria-label="Result">
+          {result}
+        </aside>
       </div>
-      <div class="muted">{itemBase(it.baseId).name}</div>
     </div>
   );
 }
