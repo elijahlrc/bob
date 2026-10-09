@@ -185,7 +185,7 @@ const BURN_RADIUS = 2.8;
  * of such a build does, instead of standing off at the range of its attack.
  */
 export function contactRange(w: World): number {
-  let r = w.char.burn.pct > 0 ? BURN_RADIUS * 0.8 : 0;
+  let r = w.char.burn.pct > 0 && !burnOff.has(w) ? BURN_RADIUS * 0.8 : 0;
   const v = w.vortex;
   if (v && v.blades.length > 0) {
     const c = w.char.actives.find((x) => x.skill.id === v.key);
@@ -194,6 +194,11 @@ export function contactRange(w: World): number {
   return r;
 }
 const BURN_EVERY = 0.5;
+/** The character switches a burning aura off below this share of its life, as a player clicks Righteous Fire off, and on again from the second. */
+export const BURN_OFF_BELOW = 0.4;
+export const BURN_ON_FROM = 0.75;
+/** The worlds whose character has its burning aura switched off just now. */
+const burnOff = new WeakSet<World>();
 
 /** A burning aura damages the enemies near the player (and the player, without killing it) twice a second. */
 export function tickAuraBurn(w: World, dt: number): void {
@@ -204,6 +209,14 @@ export function tickAuraBurn(w: World, dt: number): void {
   w.auraBurnT -= BURN_EVERY;
   const p = w.player;
   if (!p.alive) return;
+  const frac = p.life / Math.max(1, p.def.maxLife);
+  if (burnOff.has(w)) {
+    if (frac >= BURN_ON_FROM) burnOff.delete(w);
+    else return;
+  } else if (frac < BURN_OFF_BELOW) {
+    burnOff.add(w);
+    return;
+  }
   // The enemies burn for a share of the character's life, with the character's damage over time modifiers.
   const amount = (b.pct / 100) * p.def.maxLife * BURN_EVERY * w.char.db.mult('damage');
   if (amount > 0)

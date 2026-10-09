@@ -251,7 +251,7 @@ export function auraFxLines(def: AuraGemDef, level: number): string[] {
   const out: string[] = [];
   if (def.mods.some((m) => m.stat === 'auraBurn'))
     out.push(
-      'You walk in among the enemies so that the fire reaches them, whatever the range of your attacks',
+      'You walk in among the enemies so that the fire reaches them, whatever the range of your attacks; it switches off below 40% of your life and on again from 75%',
     );
   if (def.frost)
     out.push(

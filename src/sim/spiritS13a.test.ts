@@ -10,6 +10,7 @@ import { frostBite, orbAnswers, tickSkillFx } from './skillFx';
 import { targetOf } from './movement';
 import { mineAuraAt } from './deploy';
 import type { Action, Actor, World } from './types';
+import { contactRange } from './utility';
 import { spawnMonster, stepWorld } from './world';
 
 /** Tests of the spirit plan's S13a/S13b (docs/SPIRIT.md): attacks, spells, auras and traps rebuilt to be like their 3.9 originals. */
@@ -734,6 +735,25 @@ describe('carrying damage about oneself (searingMantle, orbitingBlades)', () => 
       Math.hypot(r.world.player.x - r.dummy.x, r.world.player.y - r.dummy.y);
     expect(d(burning)).toBeLessThan(2.8 + burning.dummy.r);
     expect(d(burning)).toBeLessThan(d(plain));
+  });
+
+  it('the burning aura switches off at low life and on again once the life is back', () => {
+    const { world: w, dummy } = world(['arcChain', 'searingMantle'], 1.5, 'wand_3', INT);
+    w.opts.godMode = false;
+    w.opts.freeResources = false;
+    const p = w.player;
+    run(w, 1.5);
+    expect(dummy.life).toBeLessThan(1e9);
+    // Hurt below the threshold: the fire goes out and the enemy is left alone by it, and the character stops closing in for it.
+    p.life = p.def.maxLife * 0.2;
+    run(w, 0.6);
+    expect(contactRange(w)).toBe(0);
+    run(w, 1);
+    expect(contactRange(w)).toBe(0);
+    // Healed past the second threshold: it is lit again.
+    p.life = p.def.maxLife;
+    run(w, 1);
+    expect(contactRange(w)).toBeGreaterThan(0);
   });
 
   it('with blades circling it closes in on the enemies too', () => {
