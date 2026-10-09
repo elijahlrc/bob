@@ -42,7 +42,7 @@ describe('secondary casts (EXPANSION 5.5a)', () => {
     const s = c.sheet();
     expect(s.secondary).toHaveLength(1);
     expect(s.secondaryDps).toBeGreaterThan(0);
-    expect(sheetDps(s)).toBeCloseTo(s.skill.sustainedDps + s.triggeredDps + s.secondaryDps, 6);
+    expect(sheetDps(s)).toBeCloseTo(s.skill.totalDps + s.triggeredDps + s.secondaryDps, 6);
   });
 
   it('a skill that cannot reach as far as the primary is not a secondary', () => {

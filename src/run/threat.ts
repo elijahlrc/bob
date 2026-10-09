@@ -228,7 +228,7 @@ export function scoreTheme(
       affix: onMonsters,
     }).defence;
     const s = me.skillSheet(me.primary, { def, shock: 0, resShift: [...NO_SHIFT] }, conds);
-    dps += threat.variants[v] * s.sustainedDps;
+    dps += threat.variants[v] * s.totalDps;
   }
   // The Hollow are ethereal (half physical damage taken) and evasive: a build is slower to kill them.
   const hollow = typeShares(theme)
@@ -251,7 +251,7 @@ export function scoreTheme(
           resShift: [...NO_SHIFT],
         },
         conds,
-      ).sustainedDps;
+      ).totalDps;
     const ratio = against('gloomstalker') / Math.max(1e-9, against('warrior'));
     dps *= 1 - hollow + hollow * ratio;
   }

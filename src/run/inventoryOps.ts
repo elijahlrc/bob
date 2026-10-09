@@ -30,7 +30,7 @@ export type ItemInfo = {
   slot: EquipSlot | null;
   equippable: boolean;
   reason?: string;
-  /** Percent change in sustained DPS / effective HP / the bot's score if equipped in `slot`. */
+  /** Percent change in DPS / effective HP / the bot's score if equipped in `slot`. */
   dpsPct: number;
   ehpPct: number;
   scorePct: number;
@@ -281,7 +281,7 @@ export function quickEquip(
 export type SocketRef = { slot: EquipSlot; socket: number };
 
 export type Placement = SocketRef & {
-  /** Percent change in sustained DPS / effective HP if the gem goes here. */
+  /** Percent change in DPS / effective HP if the gem goes here. */
   dpsPct: number;
   ehpPct: number;
   scorePct: number;

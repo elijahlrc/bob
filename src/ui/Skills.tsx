@@ -221,10 +221,11 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
           {summary.isDefault ? ' (default attack)' : ''}
           <span class="muted">
             {' '}
-            · {Math.round(summary.sustainedDps * 10) / 10} DPS
+            · {Math.round(summary.totalDps * 10) / 10} DPS
             {summary.sustain < 1
-              ? ` (${Math.round(summary.sustain * 100)}% mana-sustained)`
-              : ''} · {Math.round(ch.ehp())} effective HP
+              ? ` (mana regeneration alone pays for ${Math.round(summary.sustain * 100)}% of its casts)`
+              : ''}{' '}
+            · {Math.round(ch.ehp())} effective HP
           </span>
         </div>
         {secondary.length > 0 && (

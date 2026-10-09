@@ -251,7 +251,7 @@ export type SecondarySheet = {
 
 /** The DPS a character sheet reports: the primary skill, its triggered skills and its secondary casts. */
 export function sheetDps(s: CharacterSheet): number {
-  return s.skill.sustainedDps + s.triggeredDps + s.secondaryDps + s.minionDps;
+  return s.skill.totalDps + s.triggeredDps + s.secondaryDps + s.minionDps;
 }
 
 export type AuraState = {
@@ -282,10 +282,8 @@ export type SkillSheet = {
   dotDps: number;
   ailmentDps: number;
   totalDps: number;
-  /** Fraction of uses the mana (or life) regeneration can pay for. */
+  /** Fraction of uses the mana (or life) regeneration alone can pay for (shown, never counted in the DPS). */
   sustain: number;
-  /** DPS blending in the default attack for the unsustained share. */
-  sustainedDps: number;
   cost: number;
   range: number;
 };
@@ -1511,19 +1509,15 @@ export class Character {
     const dotDps = this.skillDotDps(choice, p, t, usesPerSec, ign);
     const ailmentDps = ign + bl + po + dotDps;
     const totalDps = hitDps + ailmentDps;
-    // Sustain: the share of uses the resource pool can pay for; the rest fall back to the default attack.
+    // Sustain: the share of uses the resource regeneration alone can pay for. It is information only: the DPS above is
+    // the skill at full rate, since flasks, uniques and the tree all change mana in ways a sheet cannot foresee.
     let sustain = 1;
-    let sustainedDps = totalDps;
     if (p.cost > 0 && choice.gemUid !== null && usesOverride === undefined) {
       const d = this.defence(conds);
       const regen = Math.max(0, (choice.costsLife ? d.lifeRegen : d.manaRegen) - resourceTaken);
       // A deployed skill is paid for when it is put down, not at each of its shots.
       const paid = choice.deploy ? timeShare / p.useTime : usesPerSec;
       sustain = Math.min(1, regen / (p.cost * paid));
-      if (sustain < 1) {
-        const dflt = this.skillSheet(this.defaultAttack, target, conds);
-        sustainedDps = sustain * totalDps + (1 - sustain) * dflt.totalDps;
-      }
     }
     return {
       name: choice.skill.name,
@@ -1547,7 +1541,6 @@ export class Character {
       ailmentDps,
       totalDps,
       sustain,
-      sustainedDps,
       cost: p.cost,
       range: skillRange(p),
     };

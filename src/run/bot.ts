@@ -62,14 +62,14 @@ export function sheetOf(run: RunState, build: Build = run.build): CharacterSheet
 
 const skillCache = new Map<string, { dps: number; isDefault: boolean }>();
 
-/** The primary skill's sustained damage of a build, and whether it fell back to the default attack (remembered like scores). */
+/** The primary skill's damage of a build, and whether it fell back to the default attack (remembered like scores). */
 function skillOf(run: RunState, build: Build): { dps: number; isDefault: boolean } {
   const key = buildKey(run, build);
   let r = skillCache.get(key);
   if (!r) {
     const s = sheetOf(run, build).skill;
     if (skillCache.size > 20000) skillCache.clear();
-    skillCache.set(key, (r = { dps: s.sustainedDps, isDefault: s.isDefault }));
+    skillCache.set(key, (r = { dps: s.totalDps, isDefault: s.isDefault }));
   }
   return r;
 }
