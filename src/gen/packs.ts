@@ -1,7 +1,7 @@
 import type { Rng } from '../core/rng';
 import { MONSTER_TYPES, type FactionId, type MonsterTypeId, type Role } from '../data/monsters';
 import type { ThemeDef } from '../data/themes';
-import { TYPE_WEIGHTS } from './population';
+import { factionsAt, TYPE_WEIGHTS } from './population';
 
 /**
  * Pack templates (docs/ENEMIES.md 4.2, rule 5): a room is one pack of one faction, and a pack has a shape. The roles of
@@ -58,6 +58,12 @@ export type ThemeMix = Pick<ThemeDef, 'typeWeights'> & {
   level?: number;
 };
 
+/** One of the pool by the type weights and the theme's leanings; a pool that weighs nothing is drawn from evenly. */
+function weightedType(rng: Rng, theme: ThemeMix, pool: MonsterTypeId[]): MonsterTypeId {
+  const weight = (id: MonsterTypeId) => TYPE_WEIGHTS[id] * (theme.typeWeights[id] ?? 1);
+  return pool.some((id) => weight(id) > 0) ? rng.weighted(pool, weight) : rng.pick(pool);
+}
+
 /** One type of the faction for a role, by the type weights and the theme's leanings; falls back to the front line. */
 export function pickByRole(
   rng: Rng,
@@ -72,15 +78,15 @@ export function pickByRole(
     pool = (Object.keys(MONSTER_TYPES) as MonsterTypeId[]).filter(
       (id) => MONSTER_TYPES[id].faction === faction && (MONSTER_TYPES[id].minLevel ?? 0) <= level,
     );
-  return rng.weighted(pool, (id) => TYPE_WEIGHTS[id] * (theme.typeWeights[id] ?? 1));
+  return weightedType(rng, theme, pool);
 }
 
-/** The faction of a pack: by the theme's shares (the Ossuary when it names none). */
+/** The faction of a pack: by the theme's shares (the Ossuary when it names none, or none of them has a type yet). */
 export function pickFaction(
   rng: Rng,
-  theme: Pick<ThemeDef, 'factions'> | { factions?: ThemeDef['factions'] },
+  theme: Pick<ThemeDef, 'factions'> | { factions?: ThemeDef['factions']; level?: number },
 ): FactionId {
-  const f = Object.entries(theme.factions ?? { ossuary: 1 }) as [FactionId, number][];
+  const f = factionsAt(theme.factions, 'level' in theme ? theme.level : undefined);
   return f.length === 1 ? f[0][0] : rng.weighted(f, ([, w]) => w)[0];
 }
 
@@ -158,7 +164,7 @@ function pickAny(rng: Rng, theme: ThemeMix, faction: FactionId): MonsterTypeId {
   const pool = (Object.keys(MONSTER_TYPES) as MonsterTypeId[]).filter(
     (id) => MONSTER_TYPES[id].faction === faction && (MONSTER_TYPES[id].minLevel ?? 0) <= level,
   );
-  return rng.weighted(pool, (id) => TYPE_WEIGHTS[id] * (theme.typeWeights[id] ?? 1));
+  return weightedType(rng, theme, pool);
 }
 
 /** One pack: the types of its monsters, leader first, the shape it was made in, and what it does before it sees you. */

@@ -101,21 +101,42 @@ export const TYPE_WEIGHTS: Record<MonsterTypeId, number> = {
   slagworm: 12,
 };
 
+/** Whether the faction has any type that can appear on a map of this level (a faction's types all have a first level). */
+export function factionHasTypes(faction: FactionId, level = Infinity): boolean {
+  return Object.values(MONSTER_TYPES).some(
+    (t) => t.faction === faction && (t.minLevel ?? 0) <= level,
+  );
+}
+
+/**
+ * The faction shares of a theme at a map level: only the factions that have a type at that level (a theme can be met
+ * a map or two below the first level of its faction); the Ossuary when none does, so a pack is never left with no types.
+ */
+export function factionsAt(
+  factions: ThemeDef['factions'] | undefined,
+  level = Infinity,
+): [FactionId, number][] {
+  const f = (Object.entries(factions ?? { ossuary: 1 }) as [FactionId, number][]).filter(
+    ([id, w]) => w > 0 && factionHasTypes(id, level),
+  );
+  return f.length ? f : [['ossuary', 1]];
+}
+
 /** The share of every type on a theme's maps (sum 1): its factions, then the types within each. */
 export function typeShares(
   theme: Pick<ThemeDef, 'typeWeights' | 'factions'> & { level?: number },
 ): [MonsterTypeId, number][] {
   const level = theme.level ?? Infinity;
-  const factions = theme.factions ?? { ossuary: 1 };
-  const fTotal = Object.values(factions).reduce((a, b) => a + b, 0);
+  const factions = factionsAt(theme.factions, level);
+  const fTotal = factions.reduce((a, [, w]) => a + w, 0);
   const out: [MonsterTypeId, number][] = [];
-  for (const [fac, fw] of Object.entries(factions)) {
+  for (const [fac, fw] of factions) {
     const types = (Object.keys(TYPE_WEIGHTS) as MonsterTypeId[]).filter(
       (id) => MONSTER_TYPES[id].faction === fac && (MONSTER_TYPES[id].minLevel ?? 0) <= level,
     );
     const w = (id: MonsterTypeId) => TYPE_WEIGHTS[id] * (theme.typeWeights[id] ?? 1);
     const tTotal = types.reduce((a, id) => a + w(id), 0);
-    for (const id of types) out.push([id, (fw / fTotal) * (w(id) / tTotal)]);
+    for (const id of types) out.push([id, (fw / fTotal) * (tTotal > 0 ? w(id) / tTotal : 1 / types.length)]);
   }
   return out;
 }

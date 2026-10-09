@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { Rng } from '../core/rng';
 import { MONSTER_TYPES, type FactionId, type Role } from '../data/monsters';
-import { themeDef } from '../data/themes';
+import { themeDef, THEMES } from '../data/themes';
 import { generateLabyrinth } from './labyrinth';
-import { packTypes, pickFaction, TEMPLATE_WEIGHTS, templateRoles } from './packs';
-import { populate } from './population';
+import { packPlan, packTypes, pickByRole, pickFaction, TEMPLATE_WEIGHTS, templateRoles } from './packs';
+import { factionsAt, populate, typeShares } from './population';
 
 const FACTIONS = Object.keys(TEMPLATE_WEIGHTS) as FactionId[];
 
@@ -94,5 +94,45 @@ describe('pack templates (docs/ENEMIES.md 4.2)', () => {
       for (const roles of byRoom.values()) shapes.add([...new Set(roles)].sort().join('+'));
     }
     expect(shapes.size).toBeGreaterThan(3);
+  });
+});
+
+describe('a pack is never left with nothing to draw from', () => {
+  const ROLES: Role[] = ['front', 'ranged', 'support', 'special', 'swarm'];
+  const kiln = themeDef('kilnHall');
+  const firstLevel = (f: FactionId) =>
+    Math.min(...Object.values(MONSTER_TYPES).filter((t) => t.faction === f).map((t) => t.minLevel ?? 0));
+
+  it('a theme met below the first level of its faction falls back to the factions that have a type', () => {
+    const level = firstLevel('emberborn') - 1;
+    expect(factionsAt(kiln.factions, level).map(([f]) => f)).toEqual(['ossuary']);
+    for (let seed = 1; seed <= 100; seed++) {
+      const theme = { ...kiln, level };
+      expect(pickFaction(new Rng(seed), theme)).toBe('ossuary');
+      const types = packPlan(new Rng(seed), theme, 5).types;
+      expect(types).toHaveLength(5);
+      for (const t of types) expect(MONSTER_TYPES[t].minLevel ?? 0).toBeLessThanOrEqual(level);
+    }
+    const shares = typeShares({ ...kiln, level });
+    expect(shares.reduce((a, [, w]) => a + w, 0)).toBeCloseTo(1);
+  });
+
+  it('every theme at every level yields a pack of the right size from types that exist at that level', () => {
+    for (const theme of THEMES)
+      for (const level of [1, 5, 12, 20, 25, 26, 30, 45])
+        for (let seed = 1; seed <= 12; seed++) {
+          const types = packPlan(new Rng(seed), { ...theme, level }, 4 + (seed % 3)).types;
+          expect(types.length).toBeGreaterThan(0);
+          for (const t of types) expect(MONSTER_TYPES[t].minLevel ?? 0).toBeLessThanOrEqual(level);
+        }
+  });
+
+  it('a pool the theme weighs at nothing is drawn from evenly', () => {
+    const zero = { typeWeights: { warrior: 0, brute: 0, archer: 0, mage: 0, shieldbearer: 0 } };
+    for (const role of ROLES)
+      for (let seed = 1; seed <= 20; seed++) {
+        const t = pickByRole(new Rng(seed), { ...zero, level: 1 }, 'ossuary', role);
+        expect(MONSTER_TYPES[t].faction).toBe('ossuary');
+      }
   });
 });
