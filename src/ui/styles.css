@@ -1599,3 +1599,10 @@ select option {
 .offer-info .gate {
   color: #ffb070;
 }
+.telemetry {
+  display: block;
+  max-width: 420px;
+  margin: 12px auto 0;
+  font-size: 12px;
+  cursor: pointer;
+}

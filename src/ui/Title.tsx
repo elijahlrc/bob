@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks';
 import { copyText } from '../clipboard';
 import { classDef } from '../data/classes';
 import type { Controller } from '../run/controller';
+import { setTelemetry, telemetryConfigured, telemetryOn } from '../telemetry';
 import { DebugPanel } from './Debug';
 
 /** Copies the saved run so it can be attached to a bug report, and says whether that worked. */
@@ -24,6 +25,29 @@ function CopySave({ c }: { c: Controller }) {
           ? 'Could not copy'
           : 'Copy save (for bug reports)'}
     </button>
+  );
+}
+
+/** Says that finished runs are reported without anything about the player, and lets the player turn that off. */
+function TelemetryNotice() {
+  const [on, setOn] = useState(telemetryOn());
+  if (!telemetryConfigured()) return null;
+  return (
+    <label
+      class="telemetry muted"
+      title="Sent when a run ends: class, level, map, what killed you and the map's modifiers. No name, no save, no cookies."
+    >
+      <input
+        type="checkbox"
+        checked={on}
+        onChange={(e) => {
+          const v = (e.currentTarget as HTMLInputElement).checked;
+          setTelemetry(v);
+          setOn(v);
+        }}
+      />{' '}
+      Send anonymous run results (what killed you, where, as which class) to help balance the game
+    </label>
   );
 }
 
@@ -60,6 +84,7 @@ export function Title({ c }: { c: Controller }) {
       )}
       {saved.status === 'ok' && <p class="muted">Starting a new run replaces the saved one.</p>}
       {saved.status === 'ok' && <CopySave c={c} />}
+      <TelemetryNotice />
       <DebugPanel c={c} />
       <div class="demo-panel">
         <div class="muted">Demo</div>

@@ -74,6 +74,9 @@ export class Controller {
     return loadFound(this.store);
   }
 
+  /** Called once when a run ends, by a death or a win (anonymous run statistics: docs/TELEMETRY.md). */
+  onRunEnd: ((run: RunState, res: MapResult) => void) | null = null;
+
   /** Result of looking for a saved run at boot. */
   saved: LoadResult = { status: 'none' };
 
@@ -324,6 +327,7 @@ export class Controller {
     }
     this.lastResult = res;
     finishMap(run, res);
+    if (run.phase !== 'camp') this.onRunEnd?.(run, res);
     this.world = null;
     this.bus.emit('mapEnd', null);
     if (run.phase !== 'camp' && this.store) {

@@ -5,6 +5,8 @@ export default defineConfig({
   plugins: [preact()],
   // Relative asset paths so `dist/` works when hosted under a sub-path (e.g. GitHub Pages).
   base: './',
+  // The commit a build was made from (set by the deploy workflow), so run statistics can be told apart by balance version.
+  define: { __BUILD_ID__: JSON.stringify(process.env.GITHUB_SHA?.slice(0, 7) ?? 'local') },
   server: {
     port: 5173,
     strictPort: true,

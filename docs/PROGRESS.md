@@ -811,3 +811,9 @@ Emberborn. The bot sample at the end showed the game had become much harder (2 w
 were found in the deaths (a Mirrored twin on gate champions, a heavier Gnawing Queen, early Spitters and Gnawers, the Slag
 Brute) and fixed; section 14 of the plan has the numbers. Two timing floors moved: the forty-Swarm test is 250 times real time
 (it was 400) and the bot test 150 (it was 200); the sim is slower for the new behaviours.
+
+### Anonymous run statistics (2026-10-08)
+
+A finished run (death or win) posts one record to a Supabase table: class, level, map, killer, map type and modifiers, build signature,
+seed and game version (`src/run/telemetry.ts`, `src/telemetry.ts`; `docs/TELEMETRY.md`, `docs/telemetry.sql`). On until switched off on
+the title screen; not sent from localhost or the dev server. The table takes inserts from the public key and nothing else.

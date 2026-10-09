@@ -1,6 +1,7 @@
 import { h, render } from 'preact';
 import { createGame } from './render/game';
 import { installCrashLog } from './crashlog';
+import { installTelemetry } from './telemetry';
 import { Controller } from './run/controller';
 import { App } from './ui/App';
 import './ui/styles.css';
@@ -18,6 +19,7 @@ function storage(): Storage | null {
 
 const controller = new Controller(storage());
 installCrashLog(controller);
+installTelemetry(controller);
 const game = createGame('app', controller.bus);
 render(h(App, { c: controller }), document.getElementById('ui')!);
 
