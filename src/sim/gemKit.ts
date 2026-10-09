@@ -38,6 +38,7 @@ const uid = () => n++;
 
 /** A weapon the gem can be used with. */
 export function weaponFor(def: ActiveGemDef): string {
+  if (def.needsTwoHand) return 'sword2_3';
   const req = def.requiresWeapon?.find((t) => WEAPON_FOR[t]);
   if (req) return WEAPON_FOR[req];
   if (def.skillType === 'attack') return def.tags.includes('projectile') ? 'bow_3' : 'sword_3';

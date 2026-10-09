@@ -63,6 +63,8 @@ export type Defence = {
   damageTakenMult: number;
   /** Multiplier on damage taken from hits only, not from damage over time (Fortify). */
   hitTakenMult: number;
+  /** Less (or more) damage taken from hits, by damage type (Rimeplate); one when absent. */
+  hitTakenType?: number[];
   ailmentThreshold: number;
   stunThreshold: number;
   /** Fraction 0..1. */
@@ -244,6 +246,7 @@ export function mitigate(p: SkillProfile, t: TargetState, dmg: number[]): number
   const taken = def.damageTakenMult * def.hitTakenMult * shockTaken(def, t.shock);
   for (let i = 0; i < NT; i++) {
     if (dmg[i] <= 0) continue;
+    if (def.hitTakenType) dmg[i] *= def.hitTakenType[i];
     if (def.immune[i]) {
       dmg[i] = 0;
       continue;

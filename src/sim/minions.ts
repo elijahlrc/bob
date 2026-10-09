@@ -41,6 +41,9 @@ export type Minion = Actor & {
   fixedRate?: number;
   /** What the supports of its skill give it. */
   sup: MinionSup;
+  /** A Skitterbot: the aura it carries, and the seconds before it may set off a trap or mine again. */
+  bot?: { kind: 'chill' | 'shock'; v: number; radius: number };
+  botCd?: number;
   /** Meat Shield: it stays near the character, goes for the enemies near it, and hits those harder. */
   defensive?: boolean;
   nearMore?: number;
@@ -113,7 +116,7 @@ type Make = {
 };
 
 /** A minion of a skill, put down at a spot with the numbers of the skill's modifiers and supports. */
-function makeMinion(
+export function makeMinion(
   w: World,
   c: SkillChoice,
   prof: SkillProfile,
@@ -153,6 +156,7 @@ function makeMinion(
   m.dmg = prof.minionDamage;
   m.speed = prof.minionSpeed;
   m.sup = prof.minionSup;
+  m.botCd = 0;
   m.defensive = prof.minionDefensive;
   m.nearMore = prof.minionNearMore;
   w.minions.push(m);
@@ -185,6 +189,12 @@ export function summonMinions(w: World, c: SkillChoice, prof: SkillProfile): voi
         lifeMult: g ? 1 + levelValue(g.life, c.skill.level) / 100 : 1,
       },
     );
+    if (u.skitter)
+      m.bot = {
+        kind: i % 2 === 0 ? 'chill' : 'shock',
+        v: levelValue(i % 2 === 0 ? u.skitter.chill : u.skitter.shock, c.skill.level),
+        radius: u.skitter.radius,
+      };
     if (g)
       m.golem = {
         min: levelValue(g.addMin, c.skill.level),
@@ -332,7 +342,7 @@ export function tickMinions(w: World, dt: number): void {
     const def = statsOf(m);
     m.moving = false;
     m.atkT -= dt;
-    if (Math.hypot(p.x - m.x, p.y - m.y) > TELEPORT) {
+    if (m.kind !== 'decoy' && Math.hypot(p.x - m.x, p.y - m.y) > TELEPORT) {
       m.x = p.x;
       m.y = p.y;
     }

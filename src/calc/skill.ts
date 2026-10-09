@@ -155,6 +155,14 @@ export type SkillProfile = {
   mirage: { less: number; slow: number; seconds: number } | null;
   /** A melee hit triggers a shockwave of so much of the base attack damage, with its own cooldown (Shockwave). */
   shockwave: { mult: number; cooldown: number } | null;
+  /** Enemies struck are thrown back this many tiles. */
+  knockback: number;
+  /** Percent more damage at the greatest distance (of the shot, or of the charge when `travel`), growing with the distance up to `dist` tiles. */
+  distMore: { more: number; dist: number; travel: boolean } | null;
+  /** Every third use freezes as if it dealt this percent more damage. */
+  freezeThird: number;
+  /** A frozen enemy on less than a third of its life is shattered by a hit. */
+  shatter: boolean;
   /** Infused Channelling: seconds of channelling before the Infusion, and the percent less damage taken from matching hits while channelling. */
   infuse: { after: number; barrier: number } | null;
   /** The minions of the skill stay near the character and do more damage to the enemies near it (Meat Shield). */
@@ -371,6 +379,8 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
   const noChaos = db.flag('noChaosDamage', baseCtx);
   const spellBit = tagBit('spell');
   const idleHands = db.flag('idleHands', baseCtx);
+  // An attack with the shield, not the weapon: only the skill's own damage counts.
+  const shieldAttack = db.flag('shieldAttack', baseCtx);
   const spellIncOnAttacks = isAttack && db.flag('spellIncAppliesToAttacks', baseCtx);
 
   function handProfile(hand: HandStats | null): HandProfile {
@@ -383,7 +393,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     for (let t = 0; t < NT; t++) {
       let min = added[t][0];
       let max = added[t][1];
-      if (hand) {
+      if (hand && !shieldAttack) {
         min += hand.flats[t][0];
         max += hand.flats[t][1];
       }
@@ -450,7 +460,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     }
     const hitMult = hitW > 0 ? hitMultAcc / hitW : 1;
     // Crit.
-    const baseCrit = isAttack ? (hand?.crit ?? 0) : skill.crit;
+    const baseCrit = isAttack ? (shieldAttack ? 5 : (hand?.crit ?? 0)) : skill.crit;
     let critChance = 0;
     if (!neverCrit) {
       const c = (baseCrit + db.sum('base', 'critChance', ctx)) * db.mult('critChance', ctx);
@@ -589,7 +599,13 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     bleed: timed(
       'bleed',
       isAttack
-        ? ailment('chance.bleed', 'duration.bleed', BLEED_DURATION)
+        ? ailment(
+            'chance.bleed',
+            'duration.bleed',
+            db.sum('base', 'bleed.baseDur', baseCtx) > 0
+              ? db.sum('base', 'bleed.baseDur', baseCtx) * db.mult('skillDuration', baseCtx)
+              : BLEED_DURATION,
+          )
         : { chance: 0, dur: BLEED_DURATION },
     ),
     poison: timed('poison', ailment('chance.poison', 'duration.poison', POISON_DURATION)),
@@ -646,6 +662,17 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
         : null,
     minionDefensive: db.flag('minion.defensive', baseCtx),
     minionNearMore: db.sum('base', 'minion.nearMore', baseCtx),
+    knockback: db.sum('base', 'knockback', baseCtx),
+    distMore:
+      db.sum('base', 'distMore', baseCtx) !== 0
+        ? {
+            more: db.sum('base', 'distMore', baseCtx),
+            dist: Math.max(0.5, db.sum('base', 'distMax', baseCtx)),
+            travel: db.flag('distTravel', baseCtx),
+          }
+        : null,
+    freezeThird: db.sum('base', 'freeze.third', baseCtx),
+    shatter: db.flag('shatter', baseCtx),
     inspire: db.sum('base', 'inspire.threshold', baseCtx),
     leechEs: perType('leech.es').map((v) => v * db.mult('leechRecovery', baseCtx)),
     igniteResShift: db.sum('base', 'ignite.resShift', baseCtx),
@@ -780,6 +807,8 @@ export function distanceMult(p: SkillProfile, d: number): number {
   // Close Combat: the melee damage is higher near the character, and none higher at five tiles.
   if (p.closeCombat > 0 && p.skill.tags.includes('melee'))
     m *= 1 + (p.closeCombat / 100) * clamp((5.3 - d) / 3.3, 0, 1);
+  // More damage the farther the shot has flown or the charge has run.
+  if (p.distMore) m *= 1 + (p.distMore.more / 100) * clamp(d / p.distMore.dist, 0, 1);
   if (b.kind === 'projectile') {
     if (p.closeQuarters && p.isAttack) m *= 1.3 - (0.8 * (clamp(d, 1, 8) - 1)) / 7;
     if (b.falloff !== undefined && b.range) m *= 1 - (1 - b.falloff) * clamp(d / b.range, 0, 1);

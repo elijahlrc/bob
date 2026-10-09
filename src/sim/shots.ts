@@ -1,5 +1,6 @@
 import type { SkillProfile } from '../calc/skill';
 import { formedProfile } from '../calc/skill';
+import { levelValue } from '../calc/gems';
 import { PROJECTILE_SPEED } from '../data/constants';
 import { actorById } from './actions';
 import { hit } from './combat';
@@ -61,7 +62,7 @@ export function scaleProfile(p: SkillProfile, f: number): SkillProfile {
   return q;
 }
 
-function launch(
+export function launch(
   w: World,
   owner: Actor,
   p: SkillProfile,
@@ -137,6 +138,19 @@ export function fireProjectiles(w: World, a: Actor, act: Action): void {
   const chain = p.pierce <= 0 ? p.chains : 0;
   const aimDist = Math.hypot(act.aimX - a.x, act.aimY - a.y);
 
+  if (p.skill.shield) {
+    // The shield goes ahead alone; where it ends, it shatters into shards.
+    const sp = p.skill.shield;
+    launch(w, a, p, act.hand, a.x, a.y, base, {
+      hitIds: [],
+      aimId: act.targetId,
+      range,
+      pierce: 0,
+      kind: 'shield',
+      ring: Math.round(levelValue(sp.shards, p.skill.level)) + Math.max(0, n - b.count),
+    });
+    return;
+  }
   if (mode.nova) {
     // The arrow goes up and comes down at the target; the ring comes from where it lands.
     launch(w, a, p, act.hand, a.x, a.y, base, {
@@ -372,17 +386,21 @@ export function afterProjectileHit(w: World, pr: Projectile, owner: Actor | unde
 /** A projectile that lands (Arrow Nova) or reaches the end of its way (Tornado Shot) sends its arrows out all round. */
 export function projectileLanded(w: World, pr: Projectile, owner: Actor | undefined): void {
   if (!pr.ring || !owner) return;
-  const p = pr.profile;
-  const hitIds: number[] = [];
+  const shield = pr.kind === 'shield' ? pr.profile.skill.shield : undefined;
+  const p = shield ? scaleProfile(pr.profile, 1 - shield.less / 100) : pr.profile;
+  // The shards do not strike again what the shield did.
+  const hitIds: number[] = shield ? [...pr.hitIds] : [];
   const phase = w.rngCombat.float(0, Math.PI * 2);
   for (let i = 0; i < pr.ring; i++) {
     const ang =
-      pr.kind === 'nova' ? phase + (i / pr.ring) * Math.PI * 2 : w.rngCombat.float(0, Math.PI * 2);
+      pr.kind === 'nova' || shield
+        ? phase + (i / pr.ring) * Math.PI * 2
+        : w.rngCombat.float(0, Math.PI * 2);
     launch(w, owner, p, pr.hand, pr.x, pr.y, ang, {
       hitIds,
       aimId: pr.aimId,
       range: BURST_RANGE,
-      pierce: p.pierce,
+      pierce: shield ? 99 : p.pierce,
     });
   }
 }
@@ -397,7 +415,66 @@ export function afterStrike(w: World, a: Actor, act: Action, struck: Actor | nul
   const p = scaleProfile(act.profile, spec.mult / 100);
   const hitIds: number[] = [];
   const toward = Math.atan2(struck.y - a.y, struck.x - a.x);
-  if (spec.kind === 'bolts') {
+  // The use's element picks what an element strike sends out: an area, a wave of three, a chain of lightning.
+  const kind =
+    spec.kind === 'element'
+      ? act.elem === 3
+        ? 'area'
+        : act.elem === 2
+          ? 'wave'
+          : 'chain'
+      : spec.kind;
+  if (kind === 'area') {
+    // The enemies about the one struck, which is not hit again; the area is larger about one that suffers the element's ailment.
+    const big =
+      spec.ailmentRadius && struck.alive && ailedBy(struck, act.elem ?? 0)
+        ? 1 + spec.ailmentRadius / 100
+        : 1;
+    const r = (spec.explodeRadius ?? 1.4) * p.radiusMult * big;
+    w.events.push({
+      t: 'explode',
+      x: struck.x,
+      y: struck.y,
+      r,
+      dtype: dominantType(act.profile, act.hand),
+    });
+    for (const e of enemiesOfOwner(w, a))
+      if (e.id !== struck.id && Math.hypot(e.x - struck.x, e.y - struck.y) <= r + e.r)
+        hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
+  } else if (kind === 'wave') {
+    // Three icy projectiles through everything in front.
+    const arc = ((spec.arc ?? 70) * Math.PI) / 180;
+    for (let i = 0; i < spec.count; i++) {
+      const ang = spec.count > 1 ? toward + (i / (spec.count - 1) - 0.5) * arc : toward;
+      launch(w, a, p, act.hand, a.x, a.y, ang, {
+        hitIds: [],
+        aimId: struck.id,
+        range: spec.range,
+        pierce: 99,
+      });
+    }
+  } else if (kind === 'chain') {
+    // A bolt of lightning that leaps from the one struck to the nearest ones, each once.
+    const done = new Set<number>([struck.id]);
+    let from: Actor = struck;
+    for (let i = 0; i < (spec.chains ?? 4); i++) {
+      let best: Actor | null = null;
+      let bd = CHAIN_RANGE;
+      for (const e of enemiesOfOwner(w, a)) {
+        if (done.has(e.id)) continue;
+        const d = Math.hypot(e.x - from.x, e.y - from.y);
+        if (d <= bd && w.grid.los(from.x, from.y, e.x, e.y)) {
+          bd = d;
+          best = e;
+        }
+      }
+      if (!best) break;
+      done.add(best.id);
+      w.events.push({ t: 'chain', from: from.id, to: best.id, dtype: 1 });
+      hit(w, a, best, p, act.hand, Math.hypot(best.x - a.x, best.y - a.y));
+      from = best;
+    }
+  } else if (spec.kind === 'bolts') {
     const arc = ((spec.arc ?? 85) * Math.PI) / 180;
     for (let i = 0; i < spec.count; i++) {
       const ang = spec.count > 1 ? toward + (i / (spec.count - 1) - 0.5) * arc : toward;
@@ -444,6 +521,17 @@ export function afterStrike(w: World, a: Actor, act: Action, struck: Actor | nul
       });
     }
   }
+}
+
+/** Whether the enemy suffers the ailment its element goes with (ignite for fire, chill or freeze for cold, shock for lightning). */
+function ailedBy(e: Actor, elem: number): boolean {
+  return elem === 3
+    ? e.ail.ignites.length > 0
+    : elem === 2
+      ? e.ail.chill > 0 || e.ail.freezeT > 0
+      : elem === 1
+        ? e.ail.shock > 0
+        : false;
 }
 
 /** A burst in a cone in front of the shooter that hits everything in it (Galvanic Arrow), once for the shot, not for each arrow. */

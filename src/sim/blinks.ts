@@ -3,6 +3,7 @@ import { levelValue } from '../calc/gems';
 import type { SkillProfile } from '../calc/skill';
 import { PROJECTILE_SPEED } from '../data/constants';
 import type { UtilityDef } from '../data/gems';
+import { gainBuff } from './buffs';
 import { cooldownSeconds } from './cooldowns';
 import { hit, rawHit } from './combat';
 import { takeCorpse, type Corpse } from './factions';
@@ -96,6 +97,10 @@ export function blinkCast(
   const b = blinkOf(c);
   if (!b) return;
   const { u } = b;
+  if (u.escape) {
+    escapeCast(w, a, p, c, u);
+    return;
+  }
   // A blink that prefers a corpse goes to the one with the most enemies about it, if there is one within reach.
   let corpse: Corpse | null = null;
   if (u.corpse) {
@@ -149,6 +154,61 @@ export function blinkCast(
     return;
   }
   arrive(w, a, p, c, u, spot.x, spot.y);
+}
+
+/** Smoke Mine: the character goes to the safest spot in reach, smoke at both ends, and the buff that follows. */
+function escapeCast(w: World, a: Actor, p: SkillProfile, c: SkillChoice, u: BlinkSpec): void {
+  const esc = u.escape!;
+  const foes = enemiesAt(w, a.x, a.y, 12);
+  let best: { x: number; y: number } | null = null;
+  let bd = -1;
+  for (let i = 0; i < 16; i++) {
+    const ang = (i / 16) * Math.PI * 2;
+    const spot = w.grid.collide(
+      a.x + Math.cos(ang) * u.distance,
+      a.y + Math.sin(ang) * u.distance,
+      a.r,
+    );
+    if (Math.hypot(spot.x - a.x, spot.y - a.y) < 2.5 || !w.grid.los(a.x, a.y, spot.x, spot.y))
+      continue;
+    let near = 99;
+    for (const e of foes) near = Math.min(near, Math.hypot(e.x - spot.x, e.y - spot.y));
+    if (near > bd) {
+      bd = near;
+      best = spot;
+    }
+  }
+  if (!best) return;
+  noteBlinkUsed(w, c);
+  const sm = esc.smoke;
+  for (const [x, y] of [
+    [a.x, a.y],
+    [best.x, best.y],
+  ]) {
+    const r = sm.radius * p.radiusMult;
+    w.fields.push({
+      id: w.nextId++,
+      owner: a.id,
+      kind: 'smoke',
+      x,
+      y,
+      r0: r,
+      grow: 1,
+      radius: r,
+      t: sm.seconds * p.skillDuration,
+      total: sm.seconds * p.skillDuration,
+      hand: 0,
+      pulseT: 0,
+      interval: 0.5,
+      dps: sm.blind,
+      dtype: 0,
+    });
+  }
+  w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: false });
+  a.x = best.x;
+  a.y = best.y;
+  w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true });
+  gainBuff(w, esc.buff);
 }
 
 /** The character goes: the skill's burst and ground at the point left, the way across, the burst where it lands. */

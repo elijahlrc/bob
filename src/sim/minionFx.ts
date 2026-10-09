@@ -232,6 +232,12 @@ export function minionStrike(
   parts[dtype] += dtype === 0 ? 0 : base;
   parts[0] += phys;
   parts[4] += (phys * aura.chaos) / 100;
+  // A crawler's blows are partly chaos.
+  if (st.chaos) {
+    const moved = (parts[0] * st.chaos) / 100;
+    parts[0] -= moved;
+    parts[4] += moved;
+  }
   for (let t = 0; t < 5; t++) {
     if (parts[t] <= 0) continue;
     rawHit(w, target, parts[t], t, 'Minion', 'minion');

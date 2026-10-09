@@ -105,7 +105,7 @@ describe('the once-per-target rule, and its exceptions', () => {
 
   it('a skill flagged to shotgun hits one enemy with several shards at close range', () => {
     const { world, dummy } = createDummyWorld(holding('sword_3', ['splinterVolley']), {
-      distance: 1.2,
+      distance: 0.9,
       maxTime: 60,
     });
     world.opts.freeResources = true;

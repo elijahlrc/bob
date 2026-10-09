@@ -23,7 +23,9 @@ export type MinionId =
   | 'sentinel'
   | 'spectre'
   | 'radiant'
-  | 'phantasm';
+  | 'phantasm'
+  | 'crawler'
+  | 'decoy';
 
 export type MinionDef = {
   id: MinionId;
@@ -48,9 +50,44 @@ export type MinionDef = {
   respawn: number;
   /** Colour on the map. */
   color: number;
+  /** The percent of its physical damage that is chaos instead. */
+  chaos?: number;
 };
 
 export const MINIONS: Record<MinionId, MinionDef> = {
+  crawler: {
+    id: 'crawler',
+    name: 'Agony Crawler',
+    dmg: 1.2,
+    rate: 1.5,
+    reach: 1.6,
+    speed: 5,
+    ranged: false,
+    dtype: 'physical',
+    splash: 1,
+    life: 1,
+    r: 0.35,
+    res: 0,
+    respawn: 1,
+    color: 0xc0e060,
+    chaos: 40,
+  },
+  decoy: {
+    id: 'decoy',
+    name: 'Lure Post',
+    dmg: 0,
+    rate: 1,
+    reach: 1,
+    speed: 0,
+    ranged: false,
+    dtype: 'physical',
+    splash: 0,
+    life: 6,
+    r: 0.5,
+    res: 30,
+    respawn: 4,
+    color: 0xffd070,
+  },
   skeleton: {
     id: 'skeleton',
     name: 'Bone Servant',

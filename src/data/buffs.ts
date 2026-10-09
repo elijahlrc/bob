@@ -42,7 +42,9 @@ export type BuffId =
   | 'guardianCairn'
   | 'warchiefCairn'
   | 'combatRush'
-  | 'infusion';
+  | 'infusion'
+  | 'smiteAura'
+  | 'phaseStrike';
 export const BUFF_IDS: BuffId[] = [
   'fortify',
   'onslaught',
@@ -80,6 +82,8 @@ export const BUFF_IDS: BuffId[] = [
   'warchiefCairn',
   'combatRush',
   'infusion',
+  'smiteAura',
+  'phaseStrike',
 ];
 
 export type BuffDef = {
@@ -161,6 +165,24 @@ export const BUFFS: Record<BuffId, BuffDef> = {
       mod('attackSpeed', 'more', 22, { tags: ['movement'], ...when('combatRush') }),
       mod('castSpeed', 'more', 22, { tags: ['movement'], ...when('combatRush') }),
     ],
+  },
+  phaseStrike: {
+    id: 'phaseStrike',
+    name: 'Phase Strike',
+    seconds: 1.8,
+    cond: 'phaseStrike',
+    text: 'more melee damage',
+    mods: [],
+    gem: true,
+  },
+  smiteAura: {
+    id: 'smiteAura',
+    name: 'Smite Aura',
+    seconds: 4,
+    cond: 'smiteAura',
+    text: 'lightning added to your hits',
+    mods: [],
+    gem: true,
   },
   infusion: {
     id: 'infusion',

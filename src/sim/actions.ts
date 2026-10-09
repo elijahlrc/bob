@@ -24,6 +24,15 @@ import {
 import { catchProjectile, skillUsed } from './blinks';
 import { placeBladestorm } from './stances';
 import { cascadeCast, extraStrikes, repeatTarget, startUse } from './supportFx';
+import {
+  addBlade,
+  bounceOrbs,
+  lineWave,
+  placeMarker,
+  placeOrb,
+  projectileFx,
+  stickArrow,
+} from './skillFx';
 import { applyUtility } from './utility';
 import type { Action, Actor, World } from './types';
 
@@ -63,6 +72,7 @@ export function startAction(
     fired: false,
     echoes: 0,
     echoMult: started.echoMult,
+    elem: started.elem,
     targetId: target.id,
     aimX: target.x,
     aimY: target.y,
@@ -181,7 +191,7 @@ export function updateAction(w: World, a: Actor, dt: number): void {
   }
 }
 
-function enemiesOf(w: World, a: Actor): Actor[] {
+export function enemiesOf(w: World, a: Actor): Actor[] {
   if (a.isPlayer) return w.actors.filter((o) => !o.isPlayer && o.alive);
   if (!w.player.alive) return [];
   // A monster's area attack catches the player's minions too.
@@ -264,6 +274,7 @@ export function fire(w: World, a: Actor, act: Action): void {
   if (a.isPlayer && act.profile.skill.releasesCaught) releaseCaught(w, a);
   fireEffect(w, a, act);
   leaveGround(w, a, act);
+  bounceOrbs(w, a, act);
   cascadeCast(w, a, act);
   if (act.profile.skill.bladestorm) placeBladestorm(w, a, act);
   // An aftershock: the ground cracks, and a moment later it erupts, harder and wider.
@@ -310,6 +321,22 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
   const p = act.profile;
   const b = p.skill.behaviour;
   const target = actorById(w, act.targetId);
+  if (p.skill.wave && a.isPlayer) {
+    lineWave(w, a, act);
+    return;
+  }
+  if (p.skill.vortex && a.isPlayer) {
+    addBlade(w, p);
+    return;
+  }
+  if (p.skill.markers && a.isPlayer) {
+    placeMarker(w, act);
+    return;
+  }
+  if (p.skill.stormOrb && a.isPlayer) {
+    placeOrb(w, a, act);
+    return;
+  }
   // A frost crystal waits and bursts; a wall of ice goes up and holds the way (src/sim/fields.ts).
   if (p.skill.crystal && a.isPlayer) {
     placeCrystal(w, a, act);
@@ -354,7 +381,9 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
   if (p.skill.travel && target && target.alive) {
     const d = Math.hypot(target.x - a.x, target.y - a.y);
     const step = Math.max(0, Math.min(p.skill.travel, d - (target.r + a.r + 0.8)));
+    w.lastTravel = 0;
     if (step > 0.05) {
+      w.lastTravel = step;
       const spot = w.grid.collide(
         a.x + ((target.x - a.x) / d) * step,
         a.y + ((target.y - a.y) / d) * step,
@@ -455,10 +484,13 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
         dominant = c.type;
       }
     w.events.push({ t: 'explode', x: cx, y: cy, r: radius, dtype: dominant });
-    for (const e of enemiesOf(w, a)) {
-      if (Math.hypot(e.x - cx, e.y - cy) > radius + e.r) continue;
+    const inside = enemiesOf(w, a).filter((e) => Math.hypot(e.x - cx, e.y - cy) <= radius + e.r);
+    // A debuff that holds only so many enemies takes the nearest.
+    const cap = p.skillDot?.spec.maxTargets;
+    if (cap && inside.length > cap)
+      inside.sort((x, y) => Math.hypot(x.x - cx, x.y - cy) - Math.hypot(y.x - cx, y.y - cy));
+    for (const e of cap ? inside.slice(0, cap) : inside)
       hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
-    }
     // A monster's lob leaves a zone where it landed: a ground effect, which the character can see and step out of.
     if (b.zone && !a.isPlayer)
       openZone(w, cx, cy, radius, b.zone.seconds, b.zone.kind, monsterHitOf(a) * b.zone.dps);
@@ -557,6 +589,8 @@ export function updateProjectiles(w: World, dt: number): void {
       pr.travelled += (Math.hypot(pr.vx, pr.vy) * dt) / steps;
       const owner = actorById(w, pr.owner);
       if (pr.formAt !== undefined && !pr.formed && pr.travelled >= pr.formAt) changeForm(pr);
+      if (owner?.isPlayer && (pr.profile.skill.homing || pr.profile.skillDot?.spec.carried))
+        projectileFx(w, pr, dt / steps);
       const aim = pr.aimId ? actorById(w, pr.aimId) : undefined;
       if (aim) pr.minDist = Math.min(pr.minDist, Math.hypot(aim.x - pr.x, aim.y - pr.y));
       if (!w.grid.isFloor(Math.floor(pr.x), Math.floor(pr.y))) {
@@ -567,6 +601,7 @@ export function updateProjectiles(w: World, dt: number): void {
           if (w.ai.blocked === 0) w.ai.blockedT = w.t;
           w.ai.blocked++;
         }
+        if (pr.profile.skill.fuse && owner?.isPlayer) stickArrow(w, pr, null);
         if (pr.explodeRadius > 0)
           explode(w, owner, pr, pr.x - (pr.vx * dt) / steps, pr.y - (pr.vy * dt) / steps);
         projectileLanded(w, pr, owner);
@@ -634,11 +669,20 @@ export function updateProjectiles(w: World, dt: number): void {
           alive = false;
           break;
         }
+        // An arrow of Explosive Arrow sticks in the enemy, to explode.
+        if (pr.profile.skill.fuse && owner?.isPlayer) {
+          stickArrow(w, pr, e);
+          endProjectile(w, pr, 2);
+          alive = false;
+          break;
+        }
         if (owner)
           hit(w, owner, e, pr.profile, pr.hand, Math.hypot(e.x - pr.startX, e.y - pr.startY));
         if (pr.pierceLeft > 0) pr.pierceLeft--;
         else if (afterProjectileHit(w, pr, owner)) break;
         else {
+          // A thrown shield shatters where it hits.
+          if (pr.kind === 'shield') projectileLanded(w, pr, owner);
           endProjectile(w, pr, 2);
           alive = false;
           break;

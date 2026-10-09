@@ -2,6 +2,7 @@ import type { SkillProfile } from '../calc/skill';
 import { fireEffect } from './actions';
 import { orbUse, releaseGhost, releaseZaps } from './fields';
 import { scaleProfile } from './shots';
+import { scatterSpores } from './skillFx';
 import type { Action, Actor, World } from './types';
 
 /**
@@ -69,6 +70,7 @@ export function releaseChannel(w: World, a: Actor): void {
     return;
   }
   fireEffect(w, a, actFrom(st, p));
+  if (st.profile.skill.sporePods) scatterSpores(w, a, actFrom(st, p), st.stage);
 }
 
 /** A channelled skill is used: build a stage, hit if it hits as it goes, and release at the cap. */

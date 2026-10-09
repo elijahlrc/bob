@@ -31,7 +31,8 @@ export type FieldKind =
   | 'trail'
   | 'ghost'
   | 'bladestorm'
-  | 'geyser';
+  | 'geyser'
+  | 'smoke';
 
 export type Field = {
   id: number;
@@ -613,6 +614,10 @@ export function tickFields(w: World, dt: number): void {
       const q = scaleProfile(f.profile, f.dps * f.interval);
       for (const e of enemiesIn(w, f.x, f.y, f.radius))
         hit(w, p, e, q, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
+    } else if (f.kind === 'smoke' && pulse) {
+      // Smoke blinds what stands in it.
+      for (const e of enemiesIn(w, f.x, f.y, f.radius))
+        applyStatus(w, e, 'blind', { seconds: f.interval * 2, v: f.dps });
     } else if (f.kind === 'crystal' && f.profile) {
       const spec = f.profile.skill.crystal!;
       if (pulse)

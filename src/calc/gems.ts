@@ -3,7 +3,9 @@ import { spellBaseDamage } from '../data/constants';
 import {
   GEM_LEVEL_REQ,
   MAX_GEM_LEVEL,
+  FX_KEYS,
   type ActiveGemDef,
+  type SkillFx,
   type DotSpec,
   type GemAttr,
   type GemDef,
@@ -75,7 +77,7 @@ export function gemLevel(def: GemDef, charLevel: number, attrs: Attrs, bonus: nu
 }
 
 /** A level-resolved skill, ready for the profile builder. Monsters and the default attack use it too. */
-export type SkillDef = {
+export type SkillDef = SkillFx & {
   id: string;
   name: string;
   type: 'attack' | 'spell';
@@ -196,12 +198,14 @@ export type SkillDef = {
   /** A skill that grows with use: each use that hits adds a stage (more area), and they fade when it stops hitting (Reave). */
   stacks?: { cap: number; areaPer: number; fadeAfter: number };
   afterHit?: {
-    kind: 'bolts' | 'blades' | 'balls';
+    kind: 'bolts' | 'blades' | 'balls' | 'area' | 'element';
     count: number;
     mult: number;
     arc?: number;
     range: number;
     explodeRadius?: number;
+    ailmentRadius?: number;
+    chains?: number;
   };
   cone?: { angle: number; length: number; mult: number };
   /** The skill spends every charge held when it lands, and waits for at least `min` of them. */
@@ -212,6 +216,7 @@ export type SkillDef = {
   mods: Mod[];
   requiresWeapon?: SkillTag[];
   bothWeapons?: boolean;
+  needsTwoHand?: boolean;
   utility?: UtilityDef;
   travel?: number;
   /** A monster's attack: the share of the wind-up after which its aim stops following the target (docs/ROSTER.md 5.3). */
@@ -246,6 +251,13 @@ function defaultTypes(def: ActiveGemDef): SkillType[] {
     : ['repeatable'];
 }
 
+/** The special doings a gem names, as the skill carries them. */
+function fxOf(def: SkillFx): SkillFx {
+  const o: Record<string, unknown> = {};
+  for (const k of FX_KEYS) if (def[k] !== undefined) o[k] = def[k];
+  return o as SkillFx;
+}
+
 export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
   const b = def.behaviour;
   const per5 = Math.floor(level / 5);
@@ -274,6 +286,7 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     mods: gemMods(def.mods, level, def.id),
     requiresWeapon: def.requiresWeapon,
     bothWeapons: def.bothWeapons,
+    needsTwoHand: def.needsTwoHand,
     utility: def.utility,
     travel: def.travel,
     cooldown: def.cooldown === undefined ? undefined : levelValue(def.cooldown, level),
@@ -283,7 +296,12 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     afterHit: def.afterHit && {
       ...def.afterHit,
       count: Math.round(levelValue(def.afterHit.count, level)),
+      chains:
+        def.afterHit.chains === undefined
+          ? undefined
+          : Math.round(levelValue(def.afterHit.chains, level)),
     },
+    ...fxOf(def),
     cone: def.cone,
     channel: def.channel,
     stacks: def.stacks,

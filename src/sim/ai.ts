@@ -23,7 +23,7 @@ import {
 } from '../data/constants';
 import { MONSTER_TYPES } from '../data/monsters';
 import { actorById, startAction } from './actions';
-import { bloaterBurst, corpseNear, isZone, speedMult } from './factions';
+import { bloaterBurst, corpseNear, isZone, moveMult } from './factions';
 import { flaskMask, monsterConds, playerConds } from './combat';
 import { hasChargesToSpend, offCooldown, skillReady, useSkill } from './cooldowns';
 import { canPay, payCost } from './cost';
@@ -318,6 +318,7 @@ export function playerAI(w: World, dt: number): void {
     if (util) {
       payCost(w, util.choice.costsLife, util.prof.cost);
       w.utilityReady[util.choice.key] = w.t + util.cd;
+      useSkill(w, util.choice);
       startAction(w, p, 'utility', util.prof, target);
       return;
     }
@@ -329,7 +330,6 @@ export function playerAI(w: World, dt: number): void {
     // Arrows keep hitting walls (a wide fan in a narrow corridor): close in for a clearer shot.
     if (!melee && ai.repoT <= 0 && ai.blocked >= BLOCK_LIMIT && w.t - ai.blockedT <= BLOCK_WINDOW) {
       ai.repoT = REPOSITION_TIME;
-      useSkill(w, util.choice);
       ai.blocked = 0;
     }
     if (ai.repoT > 0) {
@@ -604,7 +604,9 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     m.noticeT -= dt;
     if (m.noticeT <= 0) {
       m.noticeT = 0.25;
-      if (d <= (senseOf(m).aggro ?? MONSTER_AGGRO) && w.grid.los(m.x, m.y, p.x, p.y)) {
+      // Phase Run halves how far the character is noticed from.
+      const seen = (senseOf(m).aggro ?? MONSTER_AGGRO) * (w.buffT.phaseRun > 0 ? 0.5 : 1);
+      if (d <= seen && w.grid.los(m.x, m.y, p.x, p.y)) {
         m.state = 'chase';
         m.lostT = 0;
         alertPack(w, m);
@@ -769,7 +771,8 @@ export function separate(w: World): void {
         }
       }
     }
-    // Player vs monster: the monster yields most of the overlap.
+    // Player vs monster: the monster yields most of the overlap; under Phase Run the character passes through.
+    if (w.buffT.phaseRun > 0) continue;
     const dx = a.x - p.x;
     const dy = a.y - p.y;
     const rr = a.r + p.r;

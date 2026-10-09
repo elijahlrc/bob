@@ -26,6 +26,7 @@ import { tickCaught, tickWarp, tickWither } from './blinks';
 import { tickLegion, tickOffering } from './minionFx';
 import { tickSupports } from './supportFx';
 import { tickBlasphemy } from './hexes';
+import { tickSkillFx } from './skillFx';
 import { tickBerserk, tickDegen, tickStance } from './stances';
 import { tickProliferation } from './proliferate';
 import { tickFields } from './fields';
@@ -162,6 +163,20 @@ export function createWorld(inp: CreateWorldInput): World {
     inShock: false,
     critLock: null,
     critSeen: false,
+    elem: 3,
+    elemLast: 0,
+    staticFx: null,
+    shell: null,
+    virulence: 0,
+    trailT: 0,
+    vortex: null,
+    markers: [],
+    stormOrb: null,
+    fuses: [],
+    spores: [],
+    charged: {},
+    inFx: false,
+    lastTravel: 0,
     channel: null,
     stacks: null,
     hitsLanded: 0,
@@ -333,8 +348,7 @@ function tickFlasks(w: World, dt: number, policy: FlaskPolicy): void {
     const step = Math.min(dt, f.activeT);
     f.activeT -= dt;
     if (f.lifeRate) p.life = Math.min(lifeCap(w, p), p.life + f.lifeRate * step);
-    if (f.manaRate)
-      p.mana = Math.min(p.def.maxMana - reservedMana(w), p.mana + f.manaRate * step);
+    if (f.manaRate) p.mana = Math.min(p.def.maxMana - reservedMana(w), p.mana + f.manaRate * step);
     if (f.activeT <= 0) {
       f.activeT = 0;
       if (f.queued) {
@@ -565,6 +579,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickOffering(w, dt);
   tickLegion(w, dt);
   tickSupports(w, dt);
+  tickSkillFx(w, dt);
   tickBlasphemy(w, dt);
   tickProliferation(w, dt);
   updateProjectiles(w, dt);

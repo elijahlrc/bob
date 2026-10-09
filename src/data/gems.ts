@@ -35,6 +35,10 @@ export type DotSpec = {
   stagePct?: number;
   /** The skill deals no hit of its own: it only inflicts this on whatever it reaches. */
   hitless?: boolean;
+  /** A projectile of the skill puts it on every enemy within this many tiles of it, all the way it flies (Soulrend). */
+  carried?: number;
+  /** A burst of the skill puts it on at most this many enemies, the nearest. */
+  maxTargets?: number;
   /** It comes only from the ground the skill leaves (`leaves`), not from the hit. */
   ground?: boolean;
   /** Skill keywords beyond its own damage-over-time ones whose modifiers reach it (spell, projectile, area). */
@@ -68,6 +72,9 @@ export type SkillBehaviour =
       falloff?: number;
       /** The projectile turns around at the end of its range and flies back, hitting again on the way. */
       returns?: boolean;
+      /** With a weapon that does not have this tag the skill is a melee strike of this reach instead (Puncture). */
+      meleeUnless?: SkillTag;
+      meleeRange?: number;
     }
   | { kind: 'chain'; range: number; chains: number; chainsPer5?: number; chainRange: number }
   /**
@@ -148,6 +155,23 @@ export type UtilityDef =
         /** Put down: a buff for so many seconds a stage, its effect rising by `effectPerStage` percent a stage. */
         place: { buff: BuffId; secondsPerStage: number };
       };
+      /**
+       * A shell (Molten Shell): `absorb` percent of the damage from hits is taken from a pool as big as `capPct` percent of the armour
+       * (at most `capMax`); when the buff ends or the pool is spent, `reflect` percent of what it took goes out as fire to the enemies
+       * within `radius` tiles.
+       */
+      shell?: {
+        absorb: number;
+        capPct: number;
+        capMax: number;
+        reflect: LevelValue;
+        radius: number;
+      };
+      /**
+       * A second buff given with the first for the same time, with its own mods; the first skill used ends the first buff and cuts the
+       * second to `keep` seconds (Phase Run: the speed ends with the first skill, the melee damage stays a moment).
+       */
+      second?: { buff: BuffId; mods: GemMod[]; keep: number };
       /** Needs this much rage to start, spends rage while it lasts (more each second) and ends when it is gone (Berserk). */
       rage?: { min: number; drain: number; accel: number };
       /** The percent of maximum life and energy shield lost a second while it lasts (Blood Rage), and a kill renews it. */
@@ -174,6 +198,15 @@ export type UtilityDef =
       elusive?: { stacks: LevelValue; seconds: number; radius: LevelValue };
       /** A clone is left where the character stood. */
       clone?: { minion: MinionId; seconds: number };
+      /**
+       * The character goes to the safest spot within reach, not to the target; smoke at both ends blinds what stands in it, and a buff
+       * (with the gem's mods) follows (Smoke Mine). It is used to get away: when life is low or a pack is near.
+       */
+      escape?: {
+        smoke: { radius: number; seconds: number; blind: number };
+        buff: BuffId;
+        mods: GemMod[];
+      };
     }
   /** A shout that puts statuses on the enemies around the character (a hinder that grows with the crowd, a death blast). */
   | {
@@ -198,6 +231,10 @@ export type UtilityDef =
       count: LevelValue;
       seconds?: number;
       ownerMods?: GemMod[];
+      /** Enemies within this many tiles of it go for it instead of the character (Decoy Totem). */
+      taunt?: number;
+      /** Skitterbots: the first is a chilling bot, the second a shocking one; their auras reach `radius` tiles at these strengths (percent), and the skill holds `reserve` percent of the mana. */
+      skitter?: { radius: number; chill: LevelValue; shock: LevelValue; reserve: number };
       /** Raised from a corpse: the minion is that monster, at this level (Raise Spectre). */
       corpse?: { level: LevelValue };
       /** Made from a weapon lying on the ground that is used up by it (Animate Weapon); the cap on its item level, the damage and speed it adds. */
@@ -242,7 +279,119 @@ export type UtilityDef =
       res?: LevelValue;
     };
 
-export type ActiveGemDef = {
+/**
+ * What single skills do beyond the common machinery (docs/SPIRIT.md S13): each field is one skill's own way, read by src/sim/skillFx.ts.
+ * Level-dependent numbers stay as they are written; the sim reads them at the skill's level.
+ */
+export type SkillFx = {
+  /** A hit with the skill gives this buff (Smite); the buff's mods are the gem's, by level. */
+  hitBuff?: { buff: BuffId; mods: GemMod[] };
+  /** A line wave from the caster toward the target; then, around each enemy it struck (or about the target), a shockwave (Sunder, Purifying Flame). */
+  wave?: {
+    length: number;
+    width: number;
+    /** An area about the target hit as hard as the wave, by enemies the wave did not strike. */
+    burst?: number;
+    shockRadius: number;
+    shockAt: 'hit' | 'target';
+    /** The shockwave's damage as a percentage of the hit's. */
+    shockMult: number;
+  };
+  /** Each use picks fire, cold or lightning, as the conditions elemFire, elemCold and elemLightning (Elemental Hit, Wild Strike). */
+  element?: { noRepeat: boolean };
+  /**
+   * A hit gives a stack of a timed buff (up to `max`, each with its own `seconds`); while it lasts beams of lightning strike up to
+   * `count` enemies within `radius` tiles of the character every `interval` seconds, faster by `perStack` percent for each stack,
+   * for less damage while standing still or moving (Static Strike).
+   */
+  beams?: {
+    count: LevelValue;
+    interval: number;
+    perStack: number;
+    lessStill: LevelValue;
+    lessMoving: LevelValue;
+    radius: number;
+    seconds: number;
+    max: number;
+  };
+  /**
+   * Each hit puts a charge on the enemy (up to `max`, lasting `seconds`); at the most, when it runs out, or when the enemy dies,
+   * the charges go off in an area of `radius` for `perCharge` percent of the hit's damage each; an enemy that dies with it bursts
+   * for `deathPct` percent of its life as fire (Infernal Blow).
+   */
+  charge?: { max: number; seconds: number; perCharge: number; radius: number; deathPct: number };
+  /**
+   * One projectile that does not pierce; where it ends (on an enemy, a wall, or the end of its way) it shatters into `shards`
+   * (and one more for each extra projectile the skill has) that fly out all round, pierce, and deal `less` percent less damage
+   * (Spectral Shield Throw).
+   */
+  shield?: { shards: LevelValue; less: number };
+  /** The projectile turns toward the nearest enemy within `radius` tiles of it ahead, at most `turn` radians a second (Soulrend). */
+  homing?: { turn: number; radius: number };
+  /**
+   * Each cast adds a blade that circles the caster for `seconds` (at most `max`, the oldest replaced); every `spin` seconds, shortened
+   * by `hitRate` percent for each blade, everything within `radius` is hit together, for `more` percent more damage and `crit`
+   * percent more critical chance for each blade (Blade Vortex).
+   */
+  vortex?: {
+    seconds: number;
+    max: number;
+    spin: number;
+    hitRate: number;
+    more: number;
+    crit: number;
+    radius: number;
+  };
+  /** A cast sets a marker; `delay` seconds later it is struck for area damage, and every other marker with it (Storm Call). */
+  markers?: { delay: number; radius: number };
+  /**
+   * A cast puts an orb by the caster for `seconds`, in place of the last; every `interval` seconds it strikes the nearest enemy within
+   * `radius`, and the bolt splits to `split` more within `reach`; a lightning skill cast inside it makes it strike once more
+   * (Orb of Storms).
+   */
+  stormOrb?: {
+    seconds: number;
+    interval: LevelValue;
+    radius: number;
+    split: LevelValue;
+    reach: number;
+  };
+  /** After the first burst the orb bounces on the same way `chains` times, `spacing` tiles apart, bursting again each `delay` seconds later (Rolling Magma). */
+  bounces?: { spacing: number; chains: LevelValue; delay: number };
+  /**
+   * The arrow sticks in what it hits and explodes `seconds` later; the others that stick in the same enemy join that explosion, which
+   * widens by `radiusPer` tiles for each (up to `maxExtra`) and makes the ignite `ignitePer` percent stronger for each (Explosive Arrow).
+   */
+  fuse?: {
+    seconds: number;
+    radius: number;
+    radiusPer: number;
+    maxExtra: LevelValue;
+    ignitePer: number;
+  };
+  /** The released arrow leaves a pod for each stage along its way; `delay` seconds later each blooms into `arrows` thorns (Scourge Arrow). */
+  sporePods?: { arrows: number; less: number; range: number; delay: number };
+  /** The character regains life and mana a second while enemies carry the skill's debuff: a flat amount, and more for each of them (Siphoning Trap). */
+  siphon?: { life: LevelValue; lifeEach: LevelValue; mana: LevelValue; manaEach: LevelValue };
+};
+export const FX_KEYS = [
+  'hitBuff',
+  'wave',
+  'element',
+  'beams',
+  'charge',
+  'shield',
+  'homing',
+  'vortex',
+  'markers',
+  'stormOrb',
+  'bounces',
+  'fuse',
+  'sporePods',
+  'siphon',
+] as const satisfies readonly (keyof SkillFx)[];
+
+export type ActiveGemDef = SkillFx & {
   kind: 'active';
   id: string;
   name: string;
@@ -269,6 +418,8 @@ export type ActiveGemDef = {
   bothWeapons?: boolean;
   /** Only usable while dual wielding. */
   needsDualWield?: boolean;
+  /** Only usable with a two-handed weapon. */
+  needsTwoHand?: boolean;
   /** Only usable while holding a shield. */
   needsShield?: boolean;
   /** A utility skill (a curse, a buff, a warcry, a blink): it does not deal damage and is never the primary skill. */
@@ -452,13 +603,18 @@ export type ActiveGemDef = {
   /** A skill that grows with use: each use that hits adds a stage (more area), and they fade when it stops hitting (Reave). */
   stacks?: { cap: number; areaPer: number; fadeAfter: number };
   afterHit?: {
-    kind: 'bolts' | 'blades' | 'balls';
+    /** 'area' hits the enemies about the one struck; 'element' does what the element of the use says (fire: an area, cold: a wave of three, lightning: a chain). */
+    kind: 'bolts' | 'blades' | 'balls' | 'area' | 'element';
     count: LevelValue;
     /** Their damage as a percentage of the strike's. */
     mult: number;
     arc?: number;
     range: number;
     explodeRadius?: number;
+    /** The percent larger the area is about an enemy suffering the ailment of the use's element. */
+    ailmentRadius?: number;
+    /** Chains of the lightning of an element strike. */
+    chains?: LevelValue;
   };
   /** A burst in a cone in front of the shooter with each shot (Galvanic Arrow), its damage a percentage of the shot's. */
   cone?: { angle: number; length: number; mult: number };
@@ -528,6 +684,10 @@ export type AuraGemDef = {
   };
   /** What the aura does on events while it is active (a herald's explosions). */
   triggers?: TriggerDef[];
+  /** Rimeplate: the enemies that hit the character are chilled (`seconds`, `slow` percent), and while it moves the ground it crosses chills for `trail` seconds. */
+  frost?: { seconds: number; slow: number; trail: LevelValue; radius: number };
+  /** Herald of Agony: poisoning builds Virulence (up to `max`) and calls a crawler whose strength grows with it (percent per point). */
+  agony?: { max: number; dmgPer: LevelValue; atkPer: LevelValue };
   description: string;
 };
 
@@ -927,10 +1087,29 @@ export const AURA_GEMS: AuraGemDef[] = [
     attr: 'int',
     reservePct: 50,
     mods: [
-      { stat: 'damage.min', kind: 'base', value: [1, 20], damageTypes: ['lightning'] },
-      { stat: 'damage.max', kind: 'base', value: [12, 300], damageTypes: ['lightning'] },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: [2, 16],
+        damageTypes: ['lightning'],
+        tags: ['attack'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: [37, 248],
+        damageTypes: ['lightning'],
+        tags: ['attack'],
+      },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [15, 21],
+        damageTypes: ['lightning'],
+        tags: ['spell'],
+      },
     ],
-    description: 'Adds lightning damage to attacks and spells.',
+    description: 'Adds lightning damage to attacks; spells deal more lightning damage instead.',
   },
   {
     kind: 'aura',
@@ -938,8 +1117,11 @@ export const AURA_GEMS: AuraGemDef[] = [
     name: 'Frost Halo',
     attr: 'dexint',
     reservePct: 50,
-    mods: [{ stat: 'gain.physical.cold', kind: 'base', value: [10, 19] }],
-    description: 'Gain physical damage as extra cold damage.',
+    mods: [
+      { stat: 'gain.physical.cold', kind: 'base', value: [16, 25] },
+      { stat: 'damage', kind: 'more', value: [14, 18], damageTypes: ['cold'] },
+    ],
+    description: 'Gain physical damage as extra cold damage, and deal more cold damage.',
   },
   {
     kind: 'aura',
@@ -965,8 +1147,11 @@ export const AURA_GEMS: AuraGemDef[] = [
     name: 'Arcane Ward',
     attr: 'int',
     reservePct: 35,
-    mods: [{ stat: 'es', kind: 'base', value: [60, 500] }],
-    description: 'Grants energy shield.',
+    mods: [
+      { stat: 'es', kind: 'base', value: [60, 217] },
+      { stat: 'esRechargeRate', kind: 'inc', value: 30 },
+    ],
+    description: 'Grants energy shield and faster energy shield recharge.',
   },
   {
     kind: 'aura',

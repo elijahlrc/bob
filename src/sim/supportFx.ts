@@ -2,6 +2,8 @@ import type { SkillChoice } from '../calc/character';
 import type { SkillProfile } from '../calc/skill';
 import { CHARGE_KINDS } from '../calc/charges';
 import { fireEffect } from './actions';
+import { gainBuff } from './buffs';
+import { chargeEnemy, gainBeamStack, orbAnswers } from './skillFx';
 import { shootFrom } from './deploy';
 import { spendCharges } from './charges';
 import { hit } from './combat';
@@ -23,7 +25,12 @@ const MIRAGE_RANGE = 9.3;
 const SHOCK_RADIUS = 2.2;
 
 /** What a use of the skill starts as: the profile it is made at, and the multipliers of the repeats that follow. */
-export type UseStart = { profile: SkillProfile; echoes: number; echoMult?: number[] };
+export type UseStart = {
+  profile: SkillProfile;
+  echoes: number;
+  echoMult?: number[];
+  elem?: number;
+};
 
 /** A Ruthless Blow: the melee damage and bleed damage higher, and a stun. */
 function ruthlessProfile(p: SkillProfile): SkillProfile {
@@ -49,9 +56,33 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
   let echoMult: number[] | undefined;
   if (!a.isPlayer) return { profile: p, echoes };
   const id = p.skill.id;
+  // A skill that picks an element for each use has the one chosen before; the next one is chosen now.
+  let elem: number | undefined;
+  if (p.skill.element) {
+    elem = w.elem;
+    const choices = [1, 2, 3].filter((x) => !(p.skill.element!.noRepeat && x === elem));
+    w.elemLast = elem;
+    w.elem = choices[w.rngCombat.int(0, choices.length - 1)];
+  }
   if (p.ruthless) {
     const n = (w.uses[id] = (w.uses[id] ?? 0) + 1);
     if (n % 3 === 0) p = ruthlessProfile(p);
+  }
+  // Every third use freezes as though it dealt much more.
+  orbAnswers(w, p);
+  // The first skill used after a Phase Run ends its speed; the damage stays a moment.
+  if (!p.skill.utility)
+    for (const c of w.char.utilities) {
+      const u = c.skill.utility;
+      if (u?.kind === 'buff' && u.second && w.buffT[u.buff] > 0) {
+        w.buffT[u.buff] = 0;
+        w.buffT[u.second.buff] = Math.min(w.buffT[u.second.buff], u.second.keep);
+      }
+    }
+  if (p.freezeThird > 0) {
+    const n = (w.uses[id] = (w.uses[id] ?? 0) + 1);
+    if (n % 3 === 0)
+      p = { ...p, freeze: { ...p.freeze, dur: p.freeze.dur * (1 + p.freezeThird / 100) } };
   }
   if (p.intensify) {
     const st = (w.intensity[id] ??= 0);
@@ -87,7 +118,7 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
       }
     }
   }
-  return { profile: p, echoes, echoMult };
+  return { profile: p, echoes, echoMult, elem };
 }
 
 /** The Seals gained while the spell is not cast, the Intensity lost while the character moves, the mirage and the cooldowns. */
@@ -152,6 +183,12 @@ function mirageShoots(w: World, m: Mirage): void {
 
 /** After a hit of the player's lands: a mirage archer is called, a shockwave goes off. */
 export function afterPlayerHit(w: World, dst: Actor, p: SkillProfile): void {
+  // A skill whose hit gives the character a buff (Smite).
+  if (p.skill.hitBuff && !p.skill.tags.includes('triggered')) gainBuff(w, p.skill.hitBuff.buff);
+  if (!w.inFx) {
+    if (p.skill.beams) gainBeamStack(w, p);
+    if (p.skill.charge) chargeEnemy(w, dst, p);
+  }
   if (p.mirage && !w.mirage && p.isAttack && dst.alive) {
     const c = w.char.actives.find((x) => x.skill.id === p.skill.id);
     if (c)

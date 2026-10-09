@@ -348,6 +348,9 @@ export class Character {
   readonly auras: AuraState[] = [];
   readonly reservedMana: number = 0;
   readonly reservedLife: number = 0;
+  /** Rimeplate and Herald of Agony, when their auras stand. */
+  frostSpec: { seconds: number; slow: number; trail: number; radius: number } | null = null;
+  agonySpec: { max: number; dmgPer: number; atkPer: number; level: number } | null = null;
   readonly actives: SkillChoice[] = [];
   readonly triggers: TriggerSource[] = [];
   readonly primary: SkillChoice;
@@ -570,6 +573,9 @@ export class Character {
           if (!buffIdsGranted.has('sandStance')) this.briefBuffs.add('sandStance');
         }
         if (gd?.kind === 'active' && gd.ancestral) utilBuffs.add(gd.ancestral.buff);
+        if (gd?.kind === 'active' && gd.hitBuff) utilBuffs.add(gd.hitBuff.buff);
+        if (gd?.kind === 'active' && gd.utility?.kind === 'blink' && gd.utility.escape)
+          utilBuffs.add(gd.utility.escape.buff);
         if (gd?.kind === 'active' && gd.bladestorm) {
           for (const id of [gd.bladestorm.blood, gd.bladestorm.sand]) {
             utilBuffs.add(id);
@@ -578,6 +584,7 @@ export class Character {
         }
         if (gd?.kind === 'active' && gd.utility?.kind === 'buff') {
           utilBuffs.add(gd.utility.buff);
+          if (gd.utility.second) utilBuffs.add(gd.utility.second.buff);
           // What a banner gives when it is put down is brief: the sheet does not count it as always up.
           const pb = gd.utility.banner?.place.buff;
           if (pb) {
@@ -612,22 +619,31 @@ export class Character {
       Math.round((db0.sum('base', s, ctx0) + all) * db0.mult(s, ctx0));
     this.attrs = { str: attr('str'), dex: attr('dex'), int: attr('int') };
     const attrs = this.attrs;
+    const shieldItem = build.equipment.offHand;
+    const shieldStats =
+      shieldItem && itemBase(shieldItem.baseId).itemClass === 'shield'
+        ? armourStats(shieldItem)
+        : { armour: 0, evasion: 0, es: 0 };
     this.statValue = (s: StatId) =>
-      s === 'str'
-        ? attrs.str
-        : s === 'dex'
-          ? attrs.dex
-          : s === 'int'
-            ? attrs.int
-            : s === 'level'
-              ? level
-              : s === 'charges.grit'
-                ? held.grit
-                : s === 'charges.fervour'
-                  ? held.fervour
-                  : s === 'charges.insight'
-                    ? held.insight
-                    : 0;
+      s === 'shieldDef'
+        ? shieldStats.armour + shieldStats.evasion
+        : s === 'shieldEs'
+          ? shieldStats.es
+          : s === 'str'
+            ? attrs.str
+            : s === 'dex'
+              ? attrs.dex
+              : s === 'int'
+                ? attrs.int
+                : s === 'level'
+                  ? level
+                  : s === 'charges.grit'
+                    ? held.grit
+                    : s === 'charges.fervour'
+                      ? held.fervour
+                      : s === 'charges.insight'
+                        ? held.insight
+                        : 0;
     const src = { kind: 'base' as const, id: 'attributes' };
     const aMods: Mod[] = [
       mod('life', 'base', attrs.str * STR_LIFE, { source: src }),
@@ -717,6 +733,13 @@ export class Character {
         skill = resolveActive(sg.def, Math.min(MAX_GEM_LEVEL, sg.level + levelBonus));
       if (skill.behaviour.kind === 'melee' && skill.behaviour.range2h && weaponTags.has('twoHand'))
         skill.behaviour = { ...skill.behaviour, range: skill.behaviour.range2h };
+      // A shot with a bow, a stab with a blade.
+      if (
+        skill.behaviour.kind === 'projectile' &&
+        skill.behaviour.meleeUnless &&
+        !weaponTags.has(skill.behaviour.meleeUnless)
+      )
+        skill.behaviour = { kind: 'melee', range: skill.behaviour.meleeRange ?? 1.5 };
       const addedTags = [...resolved.types].filter(
         (t): t is SkillTag =>
           (SKILL_TAGS as readonly string[]).includes(t) && !skill.tags.includes(t as SkillTag),
@@ -735,6 +758,10 @@ export class Character {
       if (skill.requiresWeapon && !skill.requiresWeapon.some((t) => weaponTags.has(t))) {
         usable = false;
         reason = `${skill.name} needs a ${skill.requiresWeapon.join(' or ')}`;
+      }
+      if (skill.needsTwoHand && !weaponTags.has('twoHand')) {
+        usable = false;
+        reason = `${skill.name} needs a two-handed weapon`;
       }
       if (sg.def.needsDualWield && !this.dualWielding) {
         usable = false;
@@ -842,6 +869,14 @@ export class Character {
       if (a.usable && b)
         reservedMana += Math.ceil((b.reservePct / 100) * pre.maxMana * (1 - Math.min(0.95, red)));
     }
+    // Skitterbots hold a share of the mana while the skill stands.
+    for (const a of this.actives) {
+      const u = a.usable ? a.skill.utility : undefined;
+      if (u?.kind === 'summon' && u.skitter)
+        reservedMana += Math.ceil(
+          (u.skitter.reserve / 100) * pre.maxMana * (1 - Math.min(0.95, red)),
+        );
+    }
     const loneVow = db0.flag('loneVow', ctx0);
     let aurasOn = 0;
     for (const sg of this.gems) {
@@ -861,6 +896,20 @@ export class Character {
       if (active) {
         if (life) reservedLife += r;
         else reservedMana += r;
+        if (def.frost)
+          this.frostSpec = {
+            seconds: def.frost.seconds,
+            slow: def.frost.slow,
+            trail: levelValue(def.frost.trail, sg.level),
+            radius: def.frost.radius,
+          };
+        if (def.agony)
+          this.agonySpec = {
+            max: def.agony.max,
+            dmgPer: levelValue(def.agony.dmgPer, sg.level),
+            atkPer: levelValue(def.agony.atkPer, sg.level),
+            level: sg.level,
+          };
         // A stance holds a set of effects for each of its two stances, each behind the condition of its stance.
         const list = def.stance
           ? [
@@ -896,6 +945,20 @@ export class Character {
           }),
         );
     }
+    // A skill whose hit gives the character a buff (Smite): the buff's mods are the gem's, by level, and hold while the buff lasts.
+    for (const a of this.actives) {
+      const hb = a.usable ? a.skill.hitBuff : undefined;
+      if (!hb) continue;
+      const bd = BUFFS[hb.buff];
+      db0.addAll(
+        gemMods(hb.mods, a.skill.level, a.skill.id).map((m) => ({
+          ...m,
+          condition: { id: bd.cond },
+          source: { kind: 'gem' as const, id: a.skill.id },
+        })),
+      );
+      this.cond.bit(bd.cond);
+    }
     // A totem that is active while the character is near gives the character its buff (the Cairns); the sheet counts it as up.
     for (const a of this.actives) {
       const an = a.usable ? a.skill.ancestral : undefined;
@@ -925,6 +988,27 @@ export class Character {
         if (this.config.steady && uptime < 0.5)
           db0.addAll(mods.map((m) => ({ ...m, value: m.value * uptime, source: src })));
         else db0.addAll(mods.map((m) => ({ ...m, condition: { id: bd.cond }, source: src })));
+        this.cond.bit(bd.cond);
+        if (u.second) {
+          const sd = BUFFS[u.second.buff];
+          db0.addAll(
+            gemMods(u.second.mods, a.skill.level, a.skill.id).map((m) => ({
+              ...m,
+              condition: { id: sd.cond },
+              source: src,
+            })),
+          );
+          this.cond.bit(sd.cond);
+        }
+      } else if (u.kind === 'blink' && u.escape) {
+        const bd = BUFFS[u.escape.buff];
+        db0.addAll(
+          gemMods(u.escape.mods, a.skill.level, a.skill.id).map((m) => ({
+            ...m,
+            condition: { id: bd.cond },
+            source: { kind: 'gem' as const, id: a.skill.id },
+          })),
+        );
         this.cond.bit(bd.cond);
       } else if (u.kind === 'summon') {
         // The minions are assumed standing: what they give their owner is always on.
@@ -983,6 +1067,9 @@ export class Character {
         this.configConds = maskOr(this.configConds, this.cond.peek(id));
     for (const [id, tag] of WIELD_CONDS)
       if (this.weaponTags.has(tag)) this.configConds = maskOr(this.configConds, this.cond.peek(id));
+    // A skill that picks an element for each use: the sheet takes it as fire.
+    if (this.actives.some((a) => a.usable && a.skill.element))
+      this.configConds = maskOr(this.configConds, this.cond.peek('elemFire'));
     if (this.config.steady)
       this.configConds = maskOr(this.configConds, this.steadyMask(this.config.steady));
   }
@@ -1252,7 +1339,8 @@ export class Character {
       extraTags: [...this.extraTags(), ...choice.addedTags],
       costMult: choice.costMult,
       conds: c,
-      statValue: this.statValue,
+      statValue: (s: StatId) =>
+        s === 'rage' ? Math.min(this.rageMax, flaskMask >> DYN_SHIFT) : this.statValue(s),
     });
     // What the skill and its supports give on events (charges, buffs, rage, recovery): rolled when the skill hits.
     p.gains = [...choice.skill.mods, ...supportMods].filter((m) => GAIN_STAT.test(m.stat));

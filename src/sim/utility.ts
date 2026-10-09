@@ -24,6 +24,7 @@ import {
 } from './minions';
 import { corpseNear } from './factions';
 import { castOffering, guardianDrop, offeringWanted } from './minionFx';
+import { startShell } from './skillFx';
 import type { Action, Actor, World } from './types';
 
 /**
@@ -131,6 +132,16 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
         if (!animatableDrop(w, c, CAST_RANGE)) continue;
         return { choice: c, prof, cd: 0.5 };
       }
+      // A decoy goes up when a pack closes in, or life runs low.
+      if (
+        u.taunt &&
+        enemiesNear(w, p.x, p.y, PACK_RADIUS).length < PACK_SIZE &&
+        target.rarity !== 'boss' &&
+        target.rarity !== 'miniboss' &&
+        target.rarity !== 'rare' &&
+        p.life >= p.def.maxLife * 0.7
+      )
+        continue;
       // Minions are summoned in the first fight and again when they are gone or have run out.
       if (d > CAST_RANGE + 6 || minionCount(w, c.key) >= summonCount(c, prof)) continue;
       return { choice: c, prof, cd: summonRespawn(c) };
@@ -140,6 +151,13 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
     if (u.kind !== 'blink') continue;
     if (c.skill.cooldown !== undefined && !skillReady(w, c)) continue;
     if (blinkGroupBusy(w, c)) continue;
+    // A blink to get away is used when hurt with enemies about, or when a pack has closed in.
+    if (u.escape) {
+      const hurt = p.life < p.def.maxLife * 0.7 && enemiesNear(w, p.x, p.y, 5).length >= 1;
+      const crowded = enemiesNear(w, p.x, p.y, 4).length >= PACK_SIZE;
+      if (hurt || crowded) return { choice: c, prof, cd: u.cooldown };
+      continue;
+    }
     const reach = skillRange(ch.profile(w.primary, conds, flaskMask(w))) + target.r;
     const gap =
       d > reach + 2 && d <= u.distance + reach && w.grid.los(p.x, p.y, target.x, target.y);
@@ -232,6 +250,8 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
       return;
     }
     gainBuff(w, u.buff);
+    if (u.second) gainBuff(w, u.second.buff);
+    if (u.shell) startShell(w, u.buff, u.shell, c.skill.level, act.profile);
     // The charges a guard spends make it last longer and take more of the physical damage away.
     let spent = 0;
     if (u.consume) {
@@ -245,6 +265,7 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     // The buff's own length is the gem's: a utility buff lasts as long as its gem says.
     const length = u.seconds * (1 + ((u.consume?.durationPct ?? 0) / 100) * spent);
     w.buffT[u.buff] = Math.max(before, length * w.char.db.mult('buffDuration'));
+    if (u.second) w.buffT[u.second.buff] = Math.max(0, w.buffT[u.buff]);
     // A guard's cooldown does not run while it lasts, and the other guards wait out the same time.
     if (u.policy === 'guard') {
       const until = w.t + w.buffT[u.buff] + (u.cooldown ?? 0);

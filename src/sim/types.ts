@@ -64,6 +64,8 @@ export type Action = {
   echoMult?: number[];
   /** Whether the first strike of the use was a critical strike: the repeats share it. */
   crit?: boolean;
+  /** The element this use picked (1 lightning, 2 cold, 3 fire), for a skill that picks one. */
+  elem?: number;
   targetId: number;
   aimX: number;
   aimY: number;
@@ -250,7 +252,7 @@ export type Projectile = {
   forkLeft: number;
   chainLeft: number;
   /** An arrow that lands and bursts into a ring (nova), or goes on to scatter at its end (tornado); the arrows it sends. */
-  kind?: 'nova' | 'tornado' | 'mortar';
+  kind?: 'nova' | 'tornado' | 'mortar' | 'shield';
   ring?: number;
   /** Where it changes form (Frost Lance), and whether it has. */
   formAt?: number;
@@ -322,6 +324,7 @@ export type SimEvent =
   | { t: 'ailment'; dst: number; kind: string }
   | { t: 'dot'; dst: number; id: string }
   | { t: 'death'; id: number }
+  | { t: 'shatter'; id: number }
   | { t: 'levelUp'; level: number }
   | { t: 'drop'; id: number }
   | { t: 'pickup'; id: number }
@@ -568,6 +571,61 @@ export type World = {
   critSeen: boolean;
   /** The channelled skill being held: its stages so far. */
   channel: ChannelState | null;
+  /** The element of the next use of a skill that picks one (1 lightning, 2 cold, 3 fire), and the last one used. */
+  elem: number;
+  elemLast: number;
+  /** The buff of Static Strike: its stacks (seconds left) and the time toward the next beams. */
+  staticFx: { key: string; stacks: number[]; acc: number } | null;
+  /** Molten Shell: the pool left, the damage it has taken, and what comes of it. */
+  shell: {
+    left: number;
+    taken: number;
+    absorb: number;
+    reflect: number;
+    radius: number;
+    buff: BuffId;
+    profile: SkillProfile;
+  } | null;
+  /** Herald of Agony: the Virulence held (it runs out), and the time to the next patch of Rimeplate's trail. */
+  virulence: number;
+  trailT: number;
+  /** The blades of Blade Vortex: seconds left of each, and the time toward the next round. */
+  vortex: { key: string; blades: number[]; acc: number } | null;
+  /** The markers of Storm Call. */
+  markers: { x: number; y: number; t: number; profile: SkillProfile; hand: number }[];
+  /** The orb of Orb of Storms. */
+  stormOrb: {
+    x: number;
+    y: number;
+    t: number;
+    acc: number;
+    profile: SkillProfile;
+    hand: number;
+  } | null;
+  /** The arrows stuck in an enemy (or the ground) awaiting their fuse. */
+  fuses: {
+    target: number;
+    x: number;
+    y: number;
+    t: number;
+    arrows: { profile: SkillProfile; hand: number }[];
+  }[];
+  /** The pods of Scourge Arrow waiting to bloom. */
+  spores: {
+    x: number;
+    y: number;
+    t: number;
+    profile: SkillProfile;
+    hand: number;
+    arrows: number;
+    range: number;
+  }[];
+  /** The enemies carrying a charged debuff (Infernal Blow), by id. */
+  charged: Record<number, { n: number; t: number; key: string }>;
+  /** Set while a skill's own secondary hits are made, so they do not feed the skill again. */
+  inFx: boolean;
+  /** How far the last travelling skill carried the character, in tiles. */
+  lastTravel: number;
   /** The stages of a skill that grows with use, and how many hits the player has landed (a use that hits builds a stage). */
   stacks: StackState | null;
   hitsLanded: number;

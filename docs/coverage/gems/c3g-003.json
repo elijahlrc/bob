@@ -14,11 +14,7 @@
       "channel": { "cap": 6, "tick": true, "perStage": 20, "release": { "perStage": 0, "repeat": true } },
       "mods": [{ "stat": "attackSpeed", "kind": "more", "value": 60 }],
       "description": "A flurry of strikes in a wide arc; each builds a stage, and letting go adds a strike for every stage built." } },
-  { "ref": "Blade Vortex", "note": "Blades orbit the caster and cut everything near (modelled as a nova that repeats every cast).",
-    "def": { "kind": "active", "id": "orbitingBlades", "name": "Orbiting Blades", "attr": "dex", "skillType": "spell", "tags": ["spell", "area", "duration", "physical"], "types": ["totemable", "repeatable", "triggerable"],
-      "behaviour": { "kind": "burst", "radius": 2.4, "origin": "self" },
-      "spellDamage": [{ "type": "physical", "spread": [0.8, 1.2] }], "effectiveness": 75, "castTime": 0.6, "crit": 6, "cost": [4, 14], "mods": [],
-      "description": "Blades circle you, cutting every enemy that comes near." } },
+  {"ref":"Blade Vortex","note":"Each cast adds a blade that circles the character for five seconds (up to ten); the blades hit everything around together, the rounds coming 35% sooner, the damage 35% greater and the critical chance 10% better for each blade.","def":{"kind":"active","id":"orbitingBlades","name":"Orbiting Blades","attr":"dex","skillType":"spell","tags":["spell","area","duration","physical"],"types":["totemable","repeatable","triggerable"],"behaviour":{"kind":"burst","radius":1.6,"origin":"self"},"spellDamage":[{"type":"physical","spread":[0.8,1.2]}],"effectiveness":25,"castTime":0.5,"crit":6,"cost":[6,16],"mods":[{"stat":"aoe","kind":"inc","value":[0,40]}],"description":"Each cast sets a blade circling you; the more blades, the harder and faster they cut.","vortex":{"seconds":5,"max":10,"spin":0.6,"hitRate":35,"more":35,"crit":10,"radius":1.6}}},
   { "ref": "Bladefall", "note": "Volleys of blades rain on an area (modelled as a zone that pulses five times).",
     "def": { "kind": "active", "id": "rainOfSteel", "name": "Rain of Steel", "attr": "dex", "skillType": "spell", "tags": ["spell", "area", "duration", "physical"], "types": ["trappable", "mineable", "totemable", "cascadable", "repeatable", "triggerable"],
       "behaviour": { "kind": "ground", "radius": 2.5, "duration": 1.5, "interval": 0.3, "reach": 9 },
@@ -87,8 +83,5 @@
     "def": { "kind": "active", "id": "twinCut", "name": "Twin Cut", "attr": "dex", "skillType": "attack", "tags": ["attack", "melee", "strike", "physical"], "types": ["repeatable"],
       "behaviour": { "kind": "melee", "range": 1.5 }, "baseMult": [91, 112], "cost": [3, 4], "mods": [{ "stat": "repeats", "kind": "base", "value": 1 }, { "stat": "chance.bleed", "kind": "base", "value": 25 }],
       "description": "Two fast strikes in the time of one." } },
-  { "ref": "Dual Strike", "note": "Strikes with both weapons at once, with more critical chance; dual wielding only.",
-    "def": { "kind": "active", "id": "twinBlades", "name": "Twin Blades", "attr": "dex", "skillType": "attack", "tags": ["attack", "melee", "strike"], "types": ["repeatable"],
-      "behaviour": { "kind": "melee", "range": 1.5 }, "baseMult": [125, 170], "cost": [3, 4], "bothWeapons": true, "needsDualWield": true, "mods": [{ "stat": "critChance", "kind": "inc", "value": [50, 107] }],
-      "description": "Strikes with both weapons at once. Needs two weapons." } }
+  {"ref":"Dual Strike","note":"Strikes with both weapons at once, with more critical chance; against enemies on full life it crits twice as often and deals 30% more damage. Dual wielding only.","def":{"kind":"active","id":"twinBlades","name":"Twin Blades","attr":"dex","skillType":"attack","tags":["attack","melee","strike"],"types":["repeatable"],"behaviour":{"kind":"melee","range":1.5},"baseMult":[125,170],"cost":[5,5],"bothWeapons":true,"needsDualWield":true,"mods":[{"stat":"critChance","kind":"inc","value":[50,107]},{"stat":"critChance","kind":"more","value":100,"condition":{"id":"targetFullLife"}},{"stat":"damage","kind":"more","value":30,"condition":{"id":"targetFullLife"}}],"description":"Strikes with both weapons at once. Needs two weapons."}}
 ]

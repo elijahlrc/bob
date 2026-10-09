@@ -16,6 +16,7 @@ export type StatusId =
   | 'exposedFire'
   | 'overpowered'
   | 'doomed'
+  | 'venomed'
   | 'regenLess'
   | 'scarred'
   | 'unnerved';
@@ -33,6 +34,7 @@ export const STATUS_IDS: StatusId[] = [
   'exposedFire',
   'overpowered',
   'doomed',
+  'venomed',
   'regenLess',
   'scarred',
   'unnerved',
@@ -163,6 +165,14 @@ export const STATUSES: Record<StatusId, StatusDef> = {
     v: 15,
     max: 1,
     text: '{v}% less accuracy',
+  },
+  venomed: {
+    id: 'venomed',
+    name: 'Venomed',
+    seconds: 1,
+    v: 50,
+    max: 1,
+    text: 'if it dies poisoned, the enemies around it take {v}% of its remaining poison damage each second',
   },
   doomed: {
     id: 'doomed',

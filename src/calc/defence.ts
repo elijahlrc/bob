@@ -105,6 +105,7 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
     physReduction: clamp(db.sum('base', 'physReduction', ctx) / 100, 0, 0.9),
     damageTakenMult: db.mult('damageTaken', ctx),
     hitTakenMult: db.mult('hitTaken', ctx),
+    hitTakenType: [0, 1, 2, 3, 4].map((i) => db.mult('hitTakenType', { ...ctx, ancestry: 1 << i })),
     ailmentThreshold: opts.isPlayer ? maxLife + maxEs : maxLife,
     // Chaos Inoculation: the stun threshold uses the life the character would have without it (3.9).
     stunThreshold: fullLife * db.mult('stunThreshold', ctx) * (opts.stunThreshMult ?? 1),

@@ -3,6 +3,7 @@ import { levelValue } from '../calc/gems';
 import type { SkillProfile } from '../calc/skill';
 import { actorById, fire, segmentDist } from './actions';
 import { flaskMask, playerConds, rawHit } from './combat';
+import type { Minion } from './minions';
 import { scaleProfile } from './shots';
 import { applySkillDot } from './skillDots';
 import type { Action, Actor, World } from './types';
@@ -36,6 +37,8 @@ export type Deployable = {
   aimY?: number;
   /** A totem that is only active while the character is near. */
   active?: boolean;
+  /** Set off by a skitterbot: it arms itself again afterwards. */
+  rearm?: boolean;
   /** What the aura of a mine adds to the hits against the enemies near it. */
   aura?: { double: number; min: number; max: number; cap: number; radius: number };
 };
@@ -217,7 +220,7 @@ function nearestFoe(foes: Actor[], x: number, y: number, reach: number): Actor |
  * A mine is set off: every armed mine of its skill goes, in order of nearness to the enemy that did it. They go together after
  * the detonation time, or one after another when the skill chains them.
  */
-function setOffMines(w: World, key: string, c: SkillChoice, by: Actor): void {
+function setOffMines(w: World, key: string, c: SkillChoice, by: Actor, rearm = false): void {
   const prof = w.char.profile(c, w.char.configConds, flaskMask(w));
   const det = c.skill.detonation ?? DETONATION;
   const chained = prof.mineChain > 0;
@@ -229,7 +232,14 @@ function setOffMines(w: World, key: string, c: SkillChoice, by: Actor): void {
     d.seq = i;
     d.aimX = by.x;
     d.aimY = by.y;
+    d.rearm = rearm;
   });
+}
+
+/** A skitterbot that is free to set off a trap or a mine, with enemies about. */
+function freeBot(w: World): Minion | null {
+  for (const m of w.minions) if (m.alive && m.bot && (m.botCd ?? 0) <= 0) return m;
+  return null;
 }
 
 /** A mine goes: its skill's burst at the nearest enemy, harder for the mines that went before it, and the rain that follows. */
@@ -356,13 +366,26 @@ export function tickDeployables(w: World, dt: number): void {
       if (d.goAt !== undefined) {
         if (w.t >= d.goAt) {
           detonate(w, d, c, foes);
-          keep = false;
+          if (d.rearm) {
+            d.goAt = undefined;
+            d.seq = undefined;
+            d.rearm = false;
+            d.fireT = MINE_ARM;
+          } else keep = false;
         }
       } else if (d.fireT <= 0) {
         // An armed mine with an enemy near sets the whole set off.
         const by = nearestFoe(foes, d.x, d.y, MINE_RADIUS);
         if (by) setOffMines(w, d.key, c, by);
-        else d.fireT = 0.05;
+        else {
+          // A skitterbot finds the mine and sets it off when enemies are about, then waits three seconds; the mines arm again.
+          const far = nearestFoe(foes, d.x, d.y, MINE_SEEK - 2);
+          const bot = far ? freeBot(w) : null;
+          if (far && bot) {
+            bot.botCd = 3;
+            setOffMines(w, d.key, c, far, true);
+          } else d.fireT = 0.05;
+        }
       }
     } else if (keep && c && d.fireT <= 0) {
       if (d.kind === 'totem' || d.kind === 'brand') {
@@ -391,7 +414,16 @@ export function tickDeployables(w: World, dt: number): void {
         if (best) {
           shoot(w, d, c, best);
           keep = false;
-        } else d.fireT = 0.05;
+        } else {
+          // A skitterbot sets off a trap with enemies about.
+          const far = nearestFoe(foes, d.x, d.y, TRAP_RADIUS * 4);
+          const bot = far ? freeBot(w) : null;
+          if (far && bot) {
+            bot.botCd = 3;
+            shoot(w, d, c, far);
+            keep = false;
+          } else d.fireT = 0.05;
+        }
       }
     }
     if (keep) w.deployables[j++] = d;

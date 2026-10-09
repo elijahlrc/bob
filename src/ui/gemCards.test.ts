@@ -26,7 +26,8 @@ describe('gem cards', () => {
     expect(gemCardData(find('callBonewalkers'), 10).stats.join(' ')).toMatch(/Summons/);
     expect(gemCardData(find('steadfastBellow'), 10).stats.join(' ')).toMatch(/Cast when a pack/);
     expect(gemCardData(find('quickStep'), 10).stats.join(' ')).toMatch(/Jumps up to/);
-    expect(gemCardData(find('rimeRebuke'), 10).stats.join(' ')).toMatch(/shield/);
+    expect(gemCardData(find('bladeWind'), 10).stats.join(' ')).toMatch(/shield/);
+    expect(gemCardData(find('rimeRebuke'), 10).stats.join(' ')).toMatch(/block/i);
     expect(gemCardData(find('rimeHerald'), 10).stats.join(' ')).toMatch(/frozen/);
   });
 });

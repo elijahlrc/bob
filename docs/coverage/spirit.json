@@ -75,16 +75,16 @@
       "ref": "Discipline",
       "name": "Arcane Ward",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": ["aura_secondary_stat"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Reserve mana for flat energy shield plus 30% increased ES recharge rate, so ES builds recover faster.",
         "bob": "Reserves 35% mana for flat ES only. The engine does have an esRechargeRate stat (defence.ts) that this aura never sets, so the recharge half is missing.",
         "repair": "Add an esRechargeRate inc mod (about 30) to the aura's mods."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Discipline",
         "status": "confirmed",
@@ -185,16 +185,16 @@
       "ref": "Swordstorm",
       "name": "Blade Wind",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": ["trigger_on_block", "needs_shield", "cone_aoe", "skill_cooldown"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "(From poedb, current version; no PoB data.) A dual-wield retaliation: usable for 2 s after a block, it rains blades in front eight times, each with both weapons' damage combined, on a 3 s cooldown.",
         "bob": "A free-use self-centred burst that echoes once (repeats:1), usable with one weapon of sword, axe or mace; no block gate, no dual-wield requirement (the engine supports needsDualWield) and no eight-hit barrage.",
         "repair": "Gate on a post-block window with a 3 s cooldown, require dual wielding, and land several hits with both weapons."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Swordstorm (page then titled Reckoning)",
         "status": "corrected",
@@ -295,16 +295,16 @@
       "ref": "Scourge Arrow",
       "name": "Blight Hail",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["spore_pods_along_path"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Hold to gain stages, release to fire an arrow that leaves spore pods that bloom into thorn arrows; more stages mean more pods and damage. A commitment-for-power chaos/poison bow skill.",
         "bob": "A steady three-arrow chaos fan with 60% poison chance (both real) and a cheap per-use cost; there is no stage build-up and no spore pods blooming later, so it is an averaged volley without the ramp or the lingering pods.",
         "repair": "Add a stage count that rises while the skill is used on a target and scales the arrow count/damage, and leave pods along the path that fire thorn arrows."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Scourge Arrow",
         "status": "corrected",
@@ -491,16 +491,16 @@
       "ref": "Lightning Trap",
       "name": "Bolt Trap",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["crit_vs_shocked"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A trap that fires a ring of lightning projectiles with shock chance and extra critical chance against shocked enemies, so shock feeds crits.",
         "bob": "A 9-projectile 360 degree ring with 20% shock chance and scaling shock effect; the crit-chance-versus-shocked-enemies stat (80-118%) that is in the reference data is not on the definition.",
         "repair": "Add critChance inc 80-118 with condition targetShocked (the engine already supports it, as Spire Trap shows)."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Lightning Trap",
         "status": "confirmed",
@@ -642,16 +642,16 @@
       "ref": "Shield Charge",
       "name": "Bulwark Rush",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": ["distance_scaling_damage", "shield_stat_damage", "hits_along_path"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Charge with the off-hand shield: damage and stun chance grow the further you travel, repeated hits along the path, damage derived from shield stats.",
         "bob": "Attack needing a shield with travel 8, melee range 1.5, flat 'more damage' 50 and enemy stun threshold. The port note's 'hits harder the farther it ran' is not implemented (travel is not tied to damage); no shield-derived damage.",
         "repair": "Scale the charge's damage and stun with the actual travel distance and add damage from the shield's armour/evasion."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Shield Charge",
         "status": "confirmed",
@@ -839,20 +839,16 @@
       "ref": "Static Strike",
       "name": "Charged Blow",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": [
-        "self_buff_on_use",
-        "periodic_aoe_pulse_while_buffed",
-        "buff_stacks_increase_rate"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Hit an enemy to gain a 4 s buff, stackable to three, during which beams automatically zap several nearby enemies every ~0.4 s (stronger while you move); you pick it for the persistent AoE aura after a strike.",
         "bob": "A plain melee strike with 60% lightning conversion and a flat +30% more damage; no buff, no zaps, no area (single-target melee behaviour).",
         "repair": "On hit, grant a timed stacking self buff that makes the character fire a lightning pulse at nearby enemies on an interval (rate per stack), and remove the flat more-damage."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Static Strike",
         "status": "confirmed",
@@ -911,16 +907,16 @@
       "ref": "Infernal Blow",
       "name": "Cinder Blow",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": ["debuff_stack_detonate", "explode_on_death", "aoe_from_single_target_hit"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A fire strike that stacks a charged debuff on the target (6 stacks or expiry or death detonates it for AoE damage), and every debuffed enemy explodes on death; you pick it to turn single-target hits into delayed area bursts.",
         "bob": "A plain melee strike, 50% fire conversion plus a flat 20% more damage; nothing is stacked or detonated (the 'area' tag has no area behind it, behaviour is single-target melee).",
         "repair": "Add a per-target hit-stack debuff that detonates as an area burst at N stacks, on expiry and on death (the sim already has kill triggers and per-target ailment lists to hang it on), and drop the flat +20% more."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Infernal Blow",
         "status": "confirmed",
@@ -1044,16 +1040,16 @@
       "ref": "Purifying Flame",
       "name": "Cleansing Blaze",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["secondary_expanding_shockwave", "line_wave"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A holy fire wave that hits in a line, leaves Consecrated Ground (sustain for you) and then sends a larger shockwave that hits enemies standing on it; the fire and consecrated ground combo is the draw.",
         "bob": "A burst (radius 2.4) of fire and physical spell damage at the target; the line wave, consecrated ground and follow-up shockwave are dropped, as the port note admits.",
         "repair": "Leave a timed ground zone under the target that regenerates the owner's life while standing in it and carries a delayed second burst."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Purifying Flame",
         "status": "corrected",
@@ -1438,16 +1434,16 @@
       "ref": "Siphoning Trap",
       "name": "Drain Trap",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["regen_per_affected_enemy", "regen_while_any_enemy_affected", "max_beam_targets"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A trap whose beams chill and deal cold damage over time to up to ten enemies and give you large life and mana regeneration for each enemy affected, a sustain trap.",
         "bob": "A cold ground zone that chills and hits for 3 s with a flat 1% life leech; the per-enemy life and mana regeneration (hundreds a second at high level) is reduced to leech on weak damage, so the sustain is negligible.",
         "repair": "Add a timed owner life/mana regen that scales with the number of enemies inside the zone, in place of the 1% leech."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Siphoning Trap",
         "status": "corrected",
@@ -2094,16 +2090,16 @@
       "ref": "Hatred",
       "name": "Frost Halo",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["aura_more_damage_multiplier"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Aura (50% reserved) giving 16-25% of physical damage as extra cold plus 14-18% more cold damage; the more-cold multiplier makes it good for non-physical cold builds too.",
         "bob": "Reserves 50% mana and adds gain.physical.cold (read by convertChunks, so it works). No more-cold-damage multiplier.",
         "repair": "Add a more cold damage mod (damageTypes cold) to the aura."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Hatred",
         "status": "confirmed",
@@ -2281,16 +2277,16 @@
       "ref": "Explosive Arrow",
       "name": "Fuse Arrow",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["stick_and_fuse", "detonate_stacked", "per_stack_scaling"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Arrows stick into the target and explode after a fuse; several stuck arrows are consumed by the first explosion, adding their damage and radius, so you shoot a stack and watch it go off. Ignite bonus per stack.",
         "bob": "A bow arrow that explodes in radius 1.8 at once with fire conversion and added fire. The sticking, the fuse timer, the stack consumption and the per-stack bonuses are gone, so it is a fire arrow with an explosion.",
         "repair": "Let the arrow attach to its target and explode after a timer, with the first explosion absorbing the other stuck arrows' damage and radius."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Explosive Arrow",
         "status": "confirmed",
@@ -2364,16 +2360,16 @@
       "ref": "Spectral Shield Throw",
       "name": "Ghost Shard",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["damage_from_shield_defences", "projectile_split", "radial_shatter_on_impact"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Throws a spectral copy of your shield whose damage scales with the shield's armour and evasion, shattering on impact into shards that fly in all directions; the build-around for shield defences.",
         "bob": "Needs a shield, then fires a nine-shard physical fan over 120 degrees with flat added damage by gem level. Nothing reads the shield's defences (the port note says it scales with them; the gem has no such mod), and the shatter is a forward fan, not a burst from the impact point.",
         "repair": "Add added physical damage per N of shield armour and evasion (the shield stats are already computed in character.ts) and make the shards fan out from the first impact."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Spectral Shield Throw",
         "status": "confirmed",
@@ -2448,20 +2444,16 @@
       "ref": "Puncture",
       "name": "Gouge Shot",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": [
-        "ailment_duration_override",
-        "skill_duration_scales_ailment",
-        "melee_when_melee_weapon"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Always bleeds the target; the bleed lasts 8 s (skill duration, so duration mods scale it) with a 30-49% more bleed damage bonus; a long-bleed applicator for bows, daggers, claws and swords.",
         "bob": "100% bleed chance and bleed-tagged more damage are real, but there is no duration modifier, so the bleed uses the base 5 s (BLEED_DURATION) - the port note's 'eight seconds' is not implemented. It is always a range-9 projectile, even with a dagger or claw.",
         "repair": "Add a duration.bleed increase (about +60%) to the gem and let skill-duration mods feed bleed duration; make the stab a melee hit when a melee weapon is held."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Puncture",
         "status": "confirmed",
@@ -2547,16 +2539,16 @@
       "ref": "Holy Sweep",
       "name": "Halo Sweep",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["knockback_on_hit", "two_handed_requirement"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "(From poedb, current version; no PoB data.) A two-handed mace/staff circular swing with 50% lightning conversion that also calls down holy hammers on up to three struck enemies.",
         "bob": "A 360-degree self burst with 50% lightning conversion usable with swords, maces, axes and staves (no two-hand limit); the hammers that land on struck enemies are missing.",
         "repair": "After the sweep, add reduced-damage area hits on up to three enemies it struck."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Holy Sweep (page then titled Sweep)",
         "status": "corrected",
@@ -3141,16 +3133,16 @@
       "ref": "Decoy Totem",
       "name": "Lure Totem",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["taunt_decoy", "deployable_life", "enemy_target_redirect"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A sturdy totem that taunts nearby monsters so they attack it instead of you, soaking hits and giving a zone of safety.",
         "bob": "Only a guard buff of 15-25% less damage taken for 8 s when life is low; there is no totem, no taunt and no redirect. Deployables are not actors, enemies cannot target them (src/sim/deploy.ts), so nothing absorbs hits.",
         "repair": "Make deployables targetable actors with life and let enemy AI pick a taunting totem within radius before the player."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Decoy Totem",
         "status": "confirmed",
@@ -3374,16 +3366,16 @@
       "ref": "Blade Vortex",
       "name": "Orbiting Blades",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["stack_on_recast", "persistent_self_aoe", "per_stack_scaling"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Each cast adds a blade (max 10) to a persistent orbit around you that hits everything nearby every 0.6 s, with hit rate, crit and damage rising per blade; the loop is stacking blades, then fighting from the middle of them.",
         "bob": "A self-centred nova (radius 2.4) fired every cast (0.6 s). No persistent blades, no stacking per cast, no per-blade scaling; the hit rate does match a full orbit roughly.",
         "repair": "Make the cast add a stack to a timed self-centred zone that pulses on its own, with per-stack hit rate, crit and damage."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Blade Vortex",
         "status": "confirmed",
@@ -3544,20 +3536,16 @@
       "ref": "Elemental Hit",
       "name": "Primal Strike",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": [
-        "random_element_per_use",
-        "damage_per_target_ailment",
-        "aoe_on_hit_scaled_by_ailment"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Each attack randomly picks fire, cold or lightning (never twice in a row) and deals only that element, with an area burst that is larger if the target has the matching ailment, and extra damage per elemental ailment on the target.",
         "bob": "A melee strike with no physical or chaos damage, and added fire and cold damage together every hit (no lightning), plus 10-16% ignite/freeze/shock chances. Nothing picks an element, no area burst, no ailment-count damage bonus.",
         "repair": "Pick one of three elements per use (not repeating) that sets the added damage and the ailment, add a small area burst on hit and a more-damage per distinct elemental ailment on the target."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Elemental Hit",
         "status": "confirmed",
@@ -3575,21 +3563,16 @@
       "ref": "Wild Strike",
       "name": "Prime Splash",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": [
-        "random_element_per_use",
-        "convert_all_phys_to_element",
-        "secondary_effect_on_hit",
-        "projectile_split"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Melee strike converting all physical to a random element per use; depending on the element it also releases a fire explosion, an arcing lightning bolt, or an icy wave.",
         "bob": "Melee single-target hit with 'noPhysicalDamage' (calc/skill.ts filters out phys chunks, so the weapon's damage is discarded) and flat added fire damage, plus 15% each ignite/freeze/shock chance. No random element, no conversion of weapon damage, and the 'projectile' tag adds nothing: no explosion, arc or wave is fired (behaviour is plain melee).",
         "repair": "Roll an element per use (hit-level conversion of 100% phys to it) and fire a follow-up area / chain / cone for that element from the target."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Wild Strike",
         "status": "confirmed",
@@ -4042,16 +4025,16 @@
       "ref": "Glacial Hammer",
       "name": "Rime Mallet",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": ["shatter_frozen_execute", "combo_counter", "conditional_added_damage"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A heavy cold-converted mace/staff hit with a freeze chance; frozen enemies on low life shatter, the third strike in a row freezes more easily, and it adds cold damage to chilled enemies. The freeze to shatter combo is the niche.",
         "bob": "Heavy melee at 155-200% with 60% cold conversion, 25% freeze chance and increased chill effect (all read). The shatter, the third-hit combo and the damage vs chilled enemies are gone (the port note admits the shatter is dropped).",
         "repair": "Add an execute on frozen enemies below a third of life (the engine has a culling check that could take a frozen condition) and a consecutive-hit counter for extra freeze."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Glacial Hammer",
         "status": "confirmed",
@@ -4069,21 +4052,16 @@
       "ref": "Arctic Armour",
       "name": "Rimeplate",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": [
-        "condition_stationary_use",
-        "chill_attackers_on_hit",
-        "ground_effect",
-        "damage_type_scoped_reduction"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Reserved buff that cuts physical and fire hit damage only while stationary, chills (30% slow) any attacker that hits you, and lays chilled ground when you move. A stand-and-tank defence that punishes melee attackers.",
         "bob": "Reserves 25% mana for a flat all-type hitTaken reduction at all times. The engine has a stationary condition (sim combat.ts) and nothing to chill attackers on being hit; neither is used.",
         "repair": "Gate the reduction on the stationary condition for physical and fire only, and add a hit-taken trigger that chills the attacker."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Arctic Armour",
         "status": "confirmed",
@@ -4101,16 +4079,16 @@
       "ref": "Glacial Shield Swipe",
       "name": "Rime Rebuke",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": ["trigger_on_block", "skill_cooldown", "both_hands_when_dual_wielding"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "(From poedb, current version; no PoB data.) A shield retaliation: usable for 2 s after a block, sweeps a cone of ice, 100% cold, and always freezes, with off-hand damage scaled by the shield's defences; 3.5 s cooldown.",
         "bob": "A free-use shield swipe with only 50% cold conversion and a 20% freeze chance; the block-gated retaliation, guaranteed freeze and shield scaling are all gone.",
         "repair": "Gate on a post-block window with a 3.5 s cooldown, convert 100% to cold with guaranteed freeze, and scale damage with shield defences."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Glacial Shield Swipe (page then titled Riposte)",
         "status": "corrected",
@@ -4418,16 +4396,16 @@
       "ref": "Sunder",
       "name": "Rupture Line",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["line_wave", "secondary_aoe_on_each_enemy_hit"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A slam sending a wave of broken ground forward; each enemy it hits releases a circular shockwave that damages enemies around it, so one hit spreads through a pack.",
         "bob": "One burst of radius 2.2 centred on the target with a flat +15% more damage standing in for the secondary wave; no line wave and no per-enemy secondary shockwave.",
         "repair": "Add a forward line hit followed by a smaller, reduced-damage burst around each enemy hit, once per enemy."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Sunder",
         "status": "confirmed",
@@ -4751,16 +4729,16 @@
       "ref": "Storm Call",
       "name": "Skyfall",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "low",
-      "milestone": "S13",
-      "missing": ["delayed_detonation_marker", "chain_detonate_markers"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Place a marker that is struck by lightning after a short delay for area damage; when it goes off, every other marker you have placed also goes off.",
         "bob": "A ground zone at the target: 0.4 s delay then a pulse every 0.5 s for 1.5 s (three pulses, each a full hit), with shock effect. It is a short lingering storm instead of a single delayed strike, and markers neither coexist nor trigger one another.",
         "repair": "Make it a single delayed strike that records markers and detonates all live markers together."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Storm Call",
         "status": "confirmed",
@@ -4819,16 +4797,16 @@
       "ref": "Molten Shell",
       "name": "Slag Carapace",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": ["absorb_pool", "damage_burst_from_absorbed", "armour_buff"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Guard that adds armour and absorbs damage, then explodes dealing fire damage to nearby enemies based on the damage it absorbed; the reflect is the point.",
         "bob": "Same as Iron Hide: hitTaken more -25..-40 for 4 s, cd 6 (buff moltenGuard). No armour, no absorb pool, no reflected/exploding damage; the 'fire' flavour does nothing.",
         "repair": "Track damage absorbed by the guard in a pool and, at expiry or depletion, deal a fire burst around the player scaled by it."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Molten Shell",
         "status": "confirmed",
@@ -4846,16 +4824,16 @@
       "ref": "Rolling Magma",
       "name": "Slag Lob",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["aoe_at_each_chain_or_bounce", "ground_bounce_forward"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "(From poedb, current version; no PoB data.) Lob a fiery orb that explodes in an area where it hits the ground, then bounces forward 2-3 times, exploding at each bounce; area damage along a line.",
         "bob": "Chain behaviour (3 chains, range 4): the bolt jumps from enemy to enemy like a lightning arc and each link is a single-target hit; no explosion at each landing, and it needs enemies to chain.",
         "repair": "Make each chain link an area burst (explodeRadius) and let the orb bounce forward regardless of enemies."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Rolling Magma (page then titled Magma Orb)",
         "status": "confirmed",
@@ -4899,16 +4877,16 @@
       "ref": "Phase Run",
       "name": "Slipstream Run",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["spend_charges_for_effect", "buff_replaced_on_skill_use", "phasing"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Move-speed and phasing buff; on using any skill it is replaced by a melee physical damage buff; Frenzy charges are consumed to extend duration.",
         "bob": "Upkeep buff (2 s, cd 4): moveSpeed inc 30..39 and more melee physical damage 20..30, both at once. No phasing, no aggro reduction, no skill-use swap, no charge consumption.",
         "repair": "Make the damage portion arm on first attack after the move buff and let Fervour charges extend duration."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Phase Run",
         "status": "corrected",
@@ -4951,22 +4929,16 @@
       "ref": "Smoke Mine",
       "name": "Smoke Charge",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": [
-        "teleport_to_target",
-        "blind_enemies",
-        "escape_policy",
-        "ground_cloud_zone",
-        "shared_blink_cooldown"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A mine you detonate to teleport to it, leaving smoke that blinds enemies at both ends and granting a movement speed buff; an escape and mobility tool on a shared blink cooldown.",
         "bob": "A rally-policy buff cast when a pack is near: 5 s of 10-29% move speed and +40% evasion. No mine, no teleport and no blind; the engine has no blind, and its blink utility only closes distance to a target.",
         "repair": "Use the blink utility kind with an escape mode (teleport back toward a safe spot when hurt) plus the buff, and add a blind status on enemies near the departure point."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Smoke Mine",
         "status": "corrected",
@@ -4987,16 +4959,16 @@
       "ref": "Chain Hook",
       "name": "Snag Lash",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["pull_to_target", "area_scales_with_resource"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Chain pulls you to a distant enemy or hits directly when close, with a cone behind; gains rage per hit, and the cone grows with rage.",
         "bob": "Melee arc 90 range 3.4, rageOn.meleeHit 1 (rage is real in sim/buffs.ts). No pull, and no area growth per rage - the rage feeds only the generic rage bonuses.",
         "repair": "Add area scaling per rage held and a short pull (travel) to a distant target."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Chain Hook",
         "status": "confirmed",
@@ -5054,21 +5026,16 @@
       "ref": "Herald of Agony",
       "name": "Sour Herald",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": [
-        "stacking_resource_decay",
-        "minion_command",
-        "spend_charges_for_effect",
-        "scaling_minion_from_stacks"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "25% reserved herald: 20% chance to poison and 10% more poison damage; poisoning builds Virulence (cap 40, decays faster the more you hold), which buffs an Agony Crawler minion (attack speed, physical damage, added physical) that dies when Virulence runs out.",
         "bob": "Only the buff half: chance.poison 20 and a more poison damage mod (the engine reads both). No Virulence resource and no crawler minion, though the engine has summon utilities and minions.",
         "repair": "Add a Virulence stack gained on poison and decaying, plus an owner-linked crawler minion whose damage scales with the stack."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Herald of Agony",
         "status": "corrected",
@@ -5101,16 +5068,16 @@
       "ref": "Perforate",
       "name": "Spear Burst",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "low",
-      "milestone": "S13",
-      "missing": ["multi_hit_sequence", "stance_toggle"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Slam the ground to raise a sequence of six spikes (Blood Stance) that can each hit an enemy, or thrust them outward (Sand Stance); a multi-hit ground slam.",
         "bob": "A single burst (radius 2.4) at 140-196% with a flat 25% bleed chance; the sequence of hits (and the per-hit scaling that offsets it) is collapsed into one hit, and stance is dropped.",
         "repair": "Use the repeats primitive (or a multi-pulse burst) to land several reduced hits so on-hit effects like bleed and impale roll per spike."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Perforate",
         "status": "confirmed",
@@ -5158,16 +5125,16 @@
       "ref": "Soulrend",
       "name": "Spirit Saw",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["projectile_homing", "energy_shield_leech_from_hit", "area_dot_while_travelling"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A homing, piercing projectile that leeches energy shield and keeps applying a short strong chaos damage-over-time debuff to everything near it as it travels.",
         "bob": "A slow piercing chaos projectile with 100% poison chance. It does not home, and nothing returns energy shield (the port note claims it does; the gem has no leech or ES stat).",
         "repair": "Add ES leech from the hit (the leech machinery exists) and homing toward enemies in front."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Soulrend",
         "status": "confirmed",
@@ -5212,20 +5179,16 @@
       "ref": "Shattering Steel",
       "name": "Splinter Volley",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": [
-        "projectile_shotgun",
-        "damage_scaled_by_projectile_distance",
-        "shatter_area_at_impact"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Throw projectiles that shatter into pieces that all hit in a cone, so the damage is huge point-blank and falls off with distance; the skill is a shotgun. (Row corrected after checking the 3.9 wiki; see the erratum.)",
         "bob": "Three-projectile spread with +60% more damage when the target is within about 2 tiles (real condition), and a 40% impale chance. But all projectiles of one use share a hit list, so a close target is hit once instead of by every fragment; the shotgun stacking that is the skill's point is missing.",
         "repair": "A per-skill shotgun flag (3.9 flags only Shrapnel Ballista and Shattering Steel), giving each projectile its own hit list."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Shattering Steel",
         "status": "corrected",
@@ -5590,16 +5553,16 @@
       "ref": "Wrath",
       "name": "Storm Halo",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["aura_more_damage_multiplier"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Aura (50% reserved) that adds lightning damage to attacks and gives spells a more-lightning-damage multiplier (15-21%); the multiplier is why lightning casters take it.",
         "bob": "Reserves 50% mana and adds flat lightning min/max as base damage (engine reads damage.min/max base in addedFlats; spells get it scaled by effectiveness). No spell-damage multiplier.",
         "repair": "Add a damage more mod (lightning, spell tag) to the aura's mods alongside the added flat damage."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Wrath",
         "status": "corrected",
@@ -5866,21 +5829,16 @@
       "ref": "Orb of Storms",
       "name": "Tempest Mote",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": [
-        "orb_auto_target_bolts",
-        "empower_on_cast_inside_area",
-        "projectile_split",
-        "replace_previous_instance"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A stationary orb that fires splitting lightning bolts at nearby enemies for 6 s; using a lightning skill inside its cloud makes it fire extra bolts, and recasting replaces it.",
         "bob": "A 6 s ground zone (radius 2) that pulses full spell hits every 1.2 s on whatever stands in it; no target-seeking bolts, no splitting, no interaction with casting other lightning skills, no replace-on-recast.",
         "repair": "Give ground zones an optional 'bolt' mode that strikes the nearest enemy within a larger radius each interval, and an extra-bolt trigger when the owner casts a lightning skill while inside."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Orb of Storms",
         "status": "confirmed",
@@ -5913,16 +5871,16 @@
       "ref": "Smite",
       "name": "Thunder Rebuke",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": ["self_buff_on_use", "secondary_area_strike", "buff_granted_on_hit"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Melee strike plus a lightning strike at a nearby location, and on hit a buff aura giving you and allies added lightning damage; picked for the buff.",
         "bob": "Melee arc 90 strike with half lightning, shock chance and -25% more damage. The follow-up lightning area and the aura buff are dropped.",
         "repair": "On hit, grant a timed buff giving added lightning damage, and add a second area hit."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Smite",
         "status": "confirmed",
@@ -6163,16 +6121,16 @@
       "ref": "Dual Strike",
       "name": "Twin Blades",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": ["both_hands_single_target_hit", "conditional_bonus_vs_full_life"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Dual-wield only: strikes with both weapons in one hit, extra crit chance, and big crit and damage bonuses against full-life enemies as an opener.",
         "bob": "Marked bothWeapons and needsDualWield with +50-107% crit chance. In the sim only the arc melee branch hits with all hands: a single-target melee use goes through hit(..., act.hand) once, so each use strikes with one alternating weapon while the calc sheet counts both hands. No full-life bonuses.",
         "repair": "In fire() make the non-arc melee branch hit with every hand when p.bothHands, and add a target-full-life condition for the bonuses."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Dual Strike",
         "status": "confirmed",
@@ -6400,16 +6358,16 @@
       "ref": "Pestilent Strike",
       "name": "Venom Strike",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S13",
-      "missing": ["trigger_on_event", "spread_poison_on_death", "consume_status_for_aoe_dot"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A chaos/poison strike that marks the enemy; when a marked enemy dies poisoned it spreads a chaos damage-over-time debuff, based on its poisons, to enemies around it.",
         "bob": "Half-chaos melee strike with 60% poison chance and +30% poison duration (both real); the on-death poison spread is not implemented. It is a straightforward poison applicator.",
         "repair": "Add a kill-trigger effect for this skill that deals an area chaos DoT scaled by the dead enemy's poison stack (the kill-trigger plumbing already exists)."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Pestilent Strike",
         "status": "confirmed",
@@ -6748,21 +6706,16 @@
       "ref": "Summon Skitterbots",
       "name": "Whirring Motes",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S13",
-      "missing": [
-        "trap_mine_damage_more",
-        "mine_rearm",
-        "aura_applies_ailment_to_nearby_enemies",
-        "reservation_upkeep"
-      ],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Two skitterbots that trigger your traps and detonate your mines (re-arming them), grant more trap and mine damage, and add chill and shock auras; a trap/mine enabler.",
         "bob": "Two damageless follower motes (dmg 0, inert in tickMinions) and flat shock/chill effect and 10% shock chance on the owner; the trap/mine damage bonus and mine re-arm are absent.",
         "repair": "Add a more-damage mod for trap and mine skills gated on the motes being summoned and let mines re-arm while the motes stand."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Summon Skitterbots",
         "status": "corrected",

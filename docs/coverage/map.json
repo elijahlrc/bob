@@ -328,7 +328,7 @@
   "orbitingBlades": {
    "ref": "Blade Vortex",
    "status": "covered",
-   "note": "Blades orbit the caster and cut everything near (modelled as a nova that repeats every cast)."
+   "note": "Each cast adds a blade that circles the character for five seconds (up to ten); the blades hit everything around together, the rounds coming 35% sooner, the damage 35% greater and the critical chance 10% better for each blade."
   },
   "rainOfSteel": {
    "ref": "Bladefall",
@@ -393,7 +393,7 @@
   "twinBlades": {
    "ref": "Dual Strike",
    "status": "covered",
-   "note": "Strikes with both weapons at once, with more critical chance; dual wielding only."
+   "note": "Strikes with both weapons at once, with more critical chance; against enemies on full life it crits twice as often and deals 30% more damage. Dual wielding only."
   },
   "quickeningShot": {
    "ref": "Frenzy",
@@ -408,7 +408,7 @@
   "primalStrike": {
    "ref": "Elemental Hit",
    "status": "covered",
-   "note": "An attack that deals only elemental damage, added from all three elements, with a chance to freeze, shock or ignite (the random element is averaged)."
+   "note": "Each use picks one of fire, cold or lightning at random (never the one before), and deals only that element; it freezes, shocks and ignites more readily, deals more damage for each elemental ailment on the enemy, and hits an area about it that is larger against an enemy suffering the element’s ailment."
   },
   "ghostBlades": {
    "ref": "Ethereal Knives",
@@ -418,7 +418,7 @@
   "fuseArrow": {
    "ref": "Explosive Arrow",
    "status": "covered",
-   "note": "A fire arrow that sticks and then explodes (the fuse is folded into an immediate burst)."
+   "note": "An arrow that sticks in the enemy it hits and explodes a second later; arrows that stick in the same enemy after it join its explosion, which widens and burns harder for each."
   },
   "emberHail": {
    "ref": "Firestorm",
@@ -498,7 +498,7 @@
   "rimeMallet": {
    "ref": "Glacial Hammer",
    "status": "covered",
-   "note": "A heavy cold-converted strike that chills and may freeze (the shatter on the third hit is dropped)."
+   "note": "A heavy cold blow with a mace, sceptre or staff: more damage and cold against the chilled, every third strike freezes as though it dealt much more, and a frozen enemy on under a third of its life shatters."
   },
   "quakeBlow": {
    "ref": "Ground Slam",
@@ -528,7 +528,7 @@
   "cinderBlow": {
    "ref": "Infernal Blow",
    "status": "covered",
-   "note": "A strike that is half fire and builds a charged debuff that explodes (the explosion is folded into extra damage)."
+   "note": "A fire strike that puts a charge on the enemy (up to six, renewed by hits, lasting under a second); at six, when they run out or when it dies, the charges burst in an area for 66% of the hit each, and an enemy that dies carrying them bursts as fire for 6% of its life."
   },
   "twinSlash": {
    "ref": "Lacerate",
@@ -573,17 +573,17 @@
   "tempestMote": {
    "ref": "Orb of Storms",
    "status": "covered",
-   "note": "A slow orb that calls down lightning bolts around it for six seconds."
+   "note": "Puts an orb of storm by the character for six seconds, in place of the one before; it strikes the nearest enemy in reach with lightning that splits to two to four more, and a lightning skill cast inside it makes it strike once more."
   },
   "spearBurst": {
    "ref": "Perforate",
    "status": "covered",
-   "note": "Spears of force burst from the ground in front of the character (the stance is dropped)."
+   "note": "Spears rise from the ground in sequence ahead: six spikes at 65% less damage each in Blood Stance, one wide thrust in Sand Stance. No bleed."
   },
   "venomStrike": {
    "ref": "Pestilent Strike",
    "status": "covered",
-   "note": "A strike that is half chaos with a good chance to poison, and bursts the poison on nearby enemies (the burst is dropped)."
+   "note": "A claw or dagger strike that poisons heavily; an enemy it struck that dies while poisoned sets off a poisonous cloud on the enemies around it."
   },
   "mindDrain": {
    "ref": "Power Siphon",
@@ -593,7 +593,7 @@
   "gougeShot": {
    "ref": "Puncture",
    "status": "covered",
-   "note": "A stab or shot that always bleeds, with the bleed lasting eight seconds."
+   "note": "A shot with a bow or a stab with a blade that always bleeds; the bleed lasts eight seconds and lengthens with skill effect duration."
   },
   "arrowShower": {
    "ref": "Rain of Arrows",
@@ -613,7 +613,7 @@
   "splinterVolley": {
    "ref": "Shattering Steel",
    "status": "covered",
-   "note": "Throws a spread of steel shards that hit hardest up close, with a chance to impale; an enemy can be hit by several of the shards of one throw (one of two skills that can)."
+   "note": "Three steel shards in a fixed fan, each bursting where it hits; the farther a shard has flown the harder it hits, and several can hit one close enemy."
   },
   "staticRing": {
    "ref": "Shock Nova",
@@ -633,17 +633,17 @@
   "chargedBlow": {
    "ref": "Static Strike",
    "status": "covered",
-   "note": "A heavy strike that is mostly lightning and zaps nearby enemies for four seconds (the zaps are averaged)."
+   "note": "A lightning strike; each hit gives a stack of a four-second buff (up to three), and while it lasts beams strike the enemies near the character every 0.4 seconds, more often with each stack, for much less damage while standing still."
   },
   "skyfall": {
    "ref": "Storm Call",
    "status": "covered",
-   "note": "Calls bolts of lightning down on the area around the caster for 1.5 seconds (the delayed second strike is dropped)."
+   "note": "Sets a marker where it is aimed; a second and a half later the marker is struck once by lightning, and every other marker with it."
   },
   "ruptureLine": {
    "ref": "Sunder",
    "status": "covered",
-   "note": "A slam that sends a shockwave forward with a weaker second wave (the waves are averaged)."
+   "note": "A slam that sends a wave of broken ground straight ahead; each enemy it strikes sets off a shockwave that hits the others about it for 60% less damage."
   },
   "rimeDrift": {
    "ref": "Creeping Frost",
@@ -668,12 +668,12 @@
   "rimeRebuke": {
    "ref": "Glacial Shield Swipe",
    "status": "covered",
-   "note": "A shield swipe that is half cold, in a wide arc (the retaliation condition is dropped)."
+   "note": "A counter-attack that triggers by itself when the character blocks: a single strike, with both weapons when dual wielding, at most once in 0.8 seconds."
   },
   "haloSweep": {
    "ref": "Holy Sweep",
    "status": "covered",
-   "note": "A sweeping attack of lightning in a wide arc."
+   "note": "A two-handed swing in a full circle that always knocks enemies back."
   },
   "clusterBolt": {
    "ref": "Kinetic Blast of Clustering",
@@ -683,22 +683,22 @@
   "cleansingBlaze": {
    "ref": "Purifying Flame",
    "status": "covered",
-   "note": "A burst of holy fire that leaves consecrated ground for four seconds (life regeneration for the character on it, better chances to crit what stands on it)."
+   "note": "A wave of divine fire along a line, then consecrated ground and a burst about the target, and a larger shockwave that hits the enemies on the ground the wave missed for 25% less damage."
   },
   "slagLob": {
    "ref": "Rolling Magma",
    "status": "covered",
-   "note": "A fire projectile that chains between enemies, bursting at each."
+   "note": "Lobs an orb to the spot aimed at; it bursts where it lands, then bounces on the same way and bursts again, whether or not an enemy is there (two or three bursts in all)."
   },
   "blightHail": {
    "ref": "Scourge Arrow",
    "status": "covered",
-   "note": "A channelled bow skill: each use builds a stage (five at most) without shooting; when the channel ends, one piercing chaos arrow flies for 150% more damage for every stage built (the spore pods that bloom into thorn arrows along its path are not modelled)."
+   "note": "Hold to charge up to five stages, 150% more damage for each; letting go looses one piercing arrow that leaves a spore pod per stage along its way, and each pod blooms into nine thorn arrows for half damage."
   },
   "spiritSaw": {
    "ref": "Soulrend",
    "status": "covered",
-   "note": "A slow, spinning chaos projectile that eats at what it hits and returns the caster's energy shield."
+   "note": "A projectile that turns toward the enemies ahead and pierces them, leeching a share of its damage as energy shield, and afflicts every enemy about it with chaos damage over time all the way it flies."
   },
   "ghostCoil": {
    "ref": "Spectral Helix",
@@ -708,7 +708,7 @@
   "ghostShard": {
    "ref": "Spectral Shield Throw",
    "status": "covered",
-   "note": "Throws spectral shards of the shield, hitting harder the more armour and evasion the shield has (the scaling is averaged)."
+   "note": "Throws a spectral copy of the shield: one projectile that does not pierce, whose damage comes from the shield; where it hits it shatters into shards that fly all round, pierce, and deal 25% less."
   },
   "brimstoneStorm": {
    "ref": "Storm Burst",
@@ -718,7 +718,7 @@
   "bladeWind": {
    "ref": "Swordstorm",
    "status": "covered",
-   "note": "A flurry of blade-wind strikes in all directions (the retaliation condition is dropped)."
+   "note": "A counter-attack that triggers by itself when the character blocks with a shield: a cone of blades in front, at most once in 0.4 seconds."
   },
   "magmaCrack": {
    "ref": "Tectonic Slam",
@@ -758,7 +758,7 @@
   "primeSplash": {
    "ref": "Wild Strike",
    "status": "covered",
-   "note": "A strike that carries a random element and fires that element's projectiles from the target (averaged over the elements)."
+   "note": "All the weapon’s physical damage becomes a random element for each use (fire, cold or lightning, equally likely); after the strike, fire makes an explosion about the enemy, cold sends three icy projectiles through everything ahead, and lightning arcs from it to the enemies near."
   },
   "hoarfrostMote": {
    "ref": "Winter Orb",
@@ -983,7 +983,7 @@
   "slagCarapace": {
    "ref": "Molten Shell",
    "status": "covered",
-   "note": "A guard: for a few seconds the character takes less damage from hits (the share absorbed and reflected as fire is folded into the reduction)."
+   "note": "A guard: for three seconds it adds armour and takes 75% of the damage from hits into a pool as big as a fifth of the armour (at most 10000); when the buff ends or the pool is spent, the damage it took goes out as fire to the enemies around, many times over."
   },
   "deathlessCall": {
    "ref": "Immortal Call",
@@ -1028,7 +1028,7 @@
   "slipstream": {
    "ref": "Phase Run",
    "status": "covered",
-   "note": "A buff of movement speed and more melee physical damage, kept up in fights."
+   "note": "A burst of speed for 1.8 seconds, with more melee damage, through enemies (they do not push the character) and half as far seen; the first skill used ends the speed, and the damage stays a moment longer. Each Frenzy charge spent doubles the time."
   },
   "rotStride": {
    "ref": "Withering Step",
@@ -1043,7 +1043,7 @@
   "bulwarkRush": {
    "ref": "Shield Charge",
    "status": "covered",
-   "note": "A charge with a shield to the target that hits harder the farther it ran."
+   "note": "A charge behind the shield, toward the target: the damage comes from the shield (and its armour and evasion), not the weapon, and grows with how far the charge ran."
   },
   "spinningDash": {
    "ref": "Whirling Blades",
@@ -1073,7 +1073,7 @@
   "snagLash": {
    "ref": "Chain Hook",
    "status": "covered",
-   "note": "A hooked strike that reaches far and gains rage when it hits."
+   "note": "A hook thrown at a distant enemy pulls the character to it and strikes an area; a hit gives a point of rage, and the area grows with the rage held."
   },
   "quickeningHalo": {
    "ref": "Haste",
@@ -1138,7 +1138,7 @@
   "rimePlate": {
    "ref": "Arctic Armour",
    "status": "covered",
-   "note": "An aura that reserves mana and cuts the damage taken from hits (the chill on attackers is dropped)."
+   "note": "A coat of frost: while the character stands still, hits do 8-13% less physical and 8-12% less fire damage; enemies that hit it are chilled for half a second, and while it moves it leaves chilled ground behind."
   },
   "searingMantle": {
    "ref": "Righteous Fire",
@@ -1163,12 +1163,12 @@
   "sourHerald": {
    "ref": "Herald of Agony",
    "status": "covered",
-   "note": "An aura that reserves mana: a chance to poison and more poison damage (the scorpion minion is dropped)."
+   "note": "Poison chance and more poison damage; each poison the character puts on an enemy gives a point of Virulence (up to 40, lost faster the more is held) and calls a crawler that cannot be hurt and grows stronger and quicker with it; with no Virulence left, the crawler is gone."
   },
   "thunderRebuke": {
    "ref": "Smite",
    "status": "covered",
-   "note": "A strike with a mace, sceptre or staff that is half lightning, with a chance to shock (the aura for allies is dropped)."
+   "note": "A strike that also calls lightning down about the enemy it struck (the enemy itself is not hit again); a hit gives the character an aura for four seconds that adds lightning to its hits and a chance to shock."
   },
   "standingCast": {
    "ref": "Spell Totem Support",
@@ -1288,7 +1288,7 @@
   "lureTotem": {
    "ref": "Decoy Totem",
    "status": "covered",
-   "note": "A totem that draws the enemies' attention (modelled as a guard buff of less damage taken, cast when hurt)."
+   "note": "Sets a totem for eight seconds that the enemies around it go for instead of the character; it has life of its own and deals no damage."
   },
   "jawsTrap": {
    "ref": "Bear Trap",
@@ -1333,7 +1333,7 @@
   "drainTrap": {
    "ref": "Siphoning Trap",
    "status": "covered",
-   "note": "A trap that chills the enemies near it with cold damage over time and gives the character life and mana from each enemy affected (folded into leech)."
+   "note": "A trap with a four-second cooldown: it ties beams to the ten nearest enemies for three seconds, chilling them and burning them with cold; the character regains life and mana a second, a flat amount while any is held and more for each."
   },
   "icicleCharge": {
    "ref": "Icicle Mine",
@@ -1353,7 +1353,7 @@
   "smokeCharge": {
    "ref": "Smoke Mine",
    "status": "covered",
-   "note": "A mine whose smoke quickens the character and hides it for a few seconds (modelled as a buff cast when a pack is near)."
+   "note": "Throws a mine and goes to it the moment it goes off: the character gets away to the safest spot in reach when it is hurt or a pack has closed in; smoke at both ends blinds what stands in it, and a speed buff follows. The blink skills share a cooldown."
   },
   "doomSigil": {
    "ref": "Armageddon Brand",
@@ -1553,7 +1553,7 @@
   "whirringMotes": {
    "ref": "Summon Skitterbots",
    "status": "covered",
-   "note": "Two motes that follow the character and make shocks and chills stronger (the auras on enemies are folded into the character's ailment effect)."
+   "note": "Two motes follow the character and hold part of its mana: one chills and one shocks the enemies near it; they set off traps and mines (each once in three seconds, and the mines arm again), and the character’s traps and mines deal 10% more damage."
   },
   "bindShade": {
    "ref": "Raise Spectre",

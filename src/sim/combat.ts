@@ -52,12 +52,14 @@ import { spreadAilments } from './proliferate';
 import {
   applyBurning,
   applyDecay,
+  applyFlatDot,
   applySkillDot,
   decaySkillDots,
   spreadSkillDots,
   sumSkillDots,
 } from './skillDots';
 import { corpseBlast, fireTriggers } from './triggers';
+import { chargedDeath, frostBite, gainVirulence, shellTakes } from './skillFx';
 import { spawnMonster } from './world';
 import type { Actor, Dot, World } from './types';
 
@@ -94,6 +96,9 @@ const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
   onLowMana: (w, p) => p.mana <= Math.max(1, p.def.maxMana - reservedMana(w)) * LOW_LIFE,
   cursed: (_w, p) => p.hexes.length > 0,
   stationary: (_w, p) => !p.moving,
+  elemFire: (w) => w.elem === 3,
+  elemCold: (w) => w.elem === 2,
+  elemLightning: (w) => w.elem === 1,
   ignited: (_w, p) => p.ail.ignites.length > 0,
   shocked: (_w, p) => p.ail.shock > 0,
   chilled: (_w, p) => p.ail.chill > 0,
@@ -114,6 +119,7 @@ const TARGET_TESTS: Partial<Record<CondId, TargetTest>> = {
   targetCursed: (t) => t.hexes.length > 0,
   targetIgnited: (t) => t.ail.ignites.length > 0,
   targetShocked: (t) => t.ail.shock > 0,
+  targetFullLife: (t) => t.life >= t.def.maxLife - 0.5,
   targetChilled: (t) => t.ail.chill > 0,
   targetFrozen: (t) => t.ail.freezeT > 0,
   targetBleeding: (t) => t.ail.bleeds.length > 0,
@@ -233,6 +239,16 @@ export function applyDamage(w: World, dst: Actor, dmg: number[]): number {
   let total = 0;
   for (let i = 0; i < 5; i++) total += dmg[i];
   if (total <= 0) return 0;
+  // A shell takes most of what hits the character, up to its pool.
+  if (dst.isPlayer && w.shell) {
+    const taken = shellTakes(w, total);
+    if (taken > 0) {
+      const f = 1 - taken / total;
+      for (let i = 0; i < 5; i++) dmg[i] *= f;
+      total -= taken;
+      if (total <= 0) return 0;
+    }
+  }
   const def = dst.def;
   let rest = total - dmg[CHAOS];
   let chaos = dmg[CHAOS];
@@ -290,6 +306,24 @@ function addLeech(
   if (arr.length < 40) arr.push(amount);
 }
 
+/** An enemy struck is thrown back, away from the attacker, up to the distance or the first wall; bosses stand fast. */
+export function knockBack(w: World, src: Actor, dst: Actor, dist: number): void {
+  if (!dst.alive || dst.isPlayer || dst.rarity === 'boss') return;
+  const ang = Math.atan2(dst.y - src.y, dst.x - src.x);
+  const step = 0.25;
+  let x = dst.x;
+  let y = dst.y;
+  for (let d = step; d <= dist + 1e-6; d += step) {
+    const c = w.grid.collide(dst.x + Math.cos(ang) * d, dst.y + Math.sin(ang) * d, dst.r);
+    if (Math.hypot(c.x - (dst.x + Math.cos(ang) * d), c.y - (dst.y + Math.sin(ang) * d)) > 0.05)
+      break;
+    x = c.x;
+    y = c.y;
+  }
+  dst.x = x;
+  dst.y = y;
+}
+
 /** Apply a resolved hit from `src` to `dst`, including leech, ailments, stun and kill effects. */
 export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res: HitResult): void {
   if (src.isPlayer) {
@@ -321,6 +355,8 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
         res.dmg[i] *= 1 - less;
       }
   }
+  // Rimeplate: what hits the character is chilled a moment.
+  if (dst.isPlayer && !src.isPlayer && res.outcome === 'hit' && w.char.frostSpec) frostBite(w, src);
   // Flesh and Stone in the Sand stance: attacks by enemies that are not near do less.
   if (dst.isPlayer && !src.isPlayer && res.outcome !== 'block' && p.isAttack) {
     const far = stanceFarLess(w);
@@ -475,6 +511,21 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       dst.action = null;
       w.events.push({ t: 'stun', dst: dst.id, dur: p.stunFixed });
     }
+    if (p.knockback > 0 && res.outcome === 'hit') knockBack(w, src, dst, p.knockback);
+    // A frozen enemy on less than a third of its life is shattered.
+    if (
+      p.shatter &&
+      dst.alive &&
+      dst.ail.freezeT > 0 &&
+      dst.life < dst.def.maxLife / 3 &&
+      dst.rarity !== 'boss' &&
+      dst.rarity !== 'miniboss'
+    ) {
+      w.events.push({ t: 'shatter', id: dst.id });
+      killActor(w, dst);
+      afterHit();
+      return;
+    }
     if (p.skillDot && !p.skillDot.spec.hitless && !p.skillDot.spec.ground) {
       applySkillDot(w, dst, p);
       const splash = p.skillDot.spec.splash;
@@ -551,6 +602,8 @@ function applyAilments(w: World, dst: Actor, res: HitResult, p: SkillProfile): v
   if (a.poison > 0) {
     pushDot(ail.poisons, { dps: a.poison, t: p.poison.dur * d.durOnSelf.poison }, 400);
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'poison' });
+    // Herald of Agony: a poison the character's hit put on gives a point of Virulence.
+    if (!dst.isPlayer && w.char.agonySpec) gainVirulence(w);
   }
   if (a.shock > 0 && a.shock >= ail.shock) {
     ail.shock = a.shock;
@@ -615,6 +668,8 @@ export function hit(
   const aura = src.isPlayer && w.deployables.length > 0 ? mineAuraAt(w, dst.x, dst.y) : null;
   if (aura && aura.double > 0)
     p = { ...p, doubleChance: Math.min(1, p.doubleChance + aura.double / 100) };
+  // A charge counts the distance it ran, not the distance to the enemy.
+  if (p.distMore?.travel && src.isPlayer) dist = w.lastTravel;
   const res = resolveHit(w.rngCombat, p, h, ts, dist, canStun, undefined, w.critLock ?? undefined);
   applyHit(w, src, dst, p, res);
   if (aura && aura.max > 0 && dst.alive) mineAuraHit(w, dst);
@@ -886,8 +941,22 @@ export function killActor(w: World, a: Actor): void {
   if (!a.isPlayer && a.sdots.length > 0) spreadSkillDots(w, a);
   // A kill on chilling ground may give a charge.
   if (!a.isPlayer && w.fields.length > 0) fieldKill(w, a);
+  // A charged enemy (Infernal Blow) goes off.
+  if (w.charged[a.id]) chargedDeath(w, a);
+  // A Venomed enemy that dies poisoned passes the rest of its poison on to those around it.
+  if (a.fx.venomed && a.ail.poisons.length > 0) venomBurst(w, a, a.fx.venomed.v);
   // A Doomed enemy blows up for a share of its own life.
   if (a.fx.doomed) corpseBlast(w, a, a.fx.doomed.v, 'chaos', 3);
+}
+
+/** The poison an enemy still carried, dealt to the enemies about it as chaos damage over a second. */
+function venomBurst(w: World, dead: Actor, pct: number): void {
+  let rest = 0;
+  for (const d of dead.ail.poisons) rest += d.dps * Math.max(0, d.t);
+  if (rest <= 0) return;
+  for (const e of w.actors)
+    if (!e.isPlayer && e.alive && e !== dead && Math.hypot(e.x - dead.x, e.y - dead.y) <= 2.7 + e.r)
+      applyFlatDot(w, e, 'venom', 4, (rest * pct) / 100, 1);
 }
 
 /** A Splitting monster leaves two weaker copies behind (no XP or loot, and they do not split). */
