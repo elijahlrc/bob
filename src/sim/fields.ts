@@ -288,8 +288,8 @@ export function orbUse(w: World, a: Actor, act: Action, stage: number): void {
     if (stage % spec.waveStages === 0) {
       const still =
         (g.moved ?? 0) >= spec.distance || Math.hypot((g.tx ?? 0) - g.x, (g.ty ?? 0) - g.y) < 0.3;
-      const k = (spec.finalPerStage * stage) / 100;
-      const q = scaleProfile(p, still ? k * (1 + spec.stillMore / 100) : k);
+      // A wave is one hit of the skill (3.9: only the final wave grows with the stages), more once the illusion has stopped.
+      const q = scaleProfile(p, still ? 1 + spec.stillMore / 100 : 1);
       blast(w, { ...g, profile: q }, g.x, g.y, g.radius);
     }
     return;

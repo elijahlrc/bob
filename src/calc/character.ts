@@ -1923,13 +1923,11 @@ export function channelMult(p: SkillProfile): number {
       o.interval
     );
   if (o?.kind === 'zap') return Math.max(1, Math.floor(o.seconds / o.jump + 1e-6));
-  // An illusion's waves grow with the stages (the later ones come once it has stopped), and the last wave joins them.
+  // An illusion's waves are a hit each (the later ones, once it has stopped, are bigger), and the last wave grows with the stages.
   if (o?.kind === 'illusion') {
     let total = (o.finalPerStage * c.cap) / 100;
     const waves = Math.floor(c.cap / o.waveStages);
-    for (let i = 1; i <= waves; i++)
-      total +=
-        ((o.finalPerStage * i * o.waveStages) / 100) * (i > waves / 2 ? 1 + o.stillMore / 100 : 1);
+    for (let i = 1; i <= waves; i++) total += i > waves / 2 ? 1 + o.stillMore / 100 : 1;
     return total / c.cap;
   }
   let total = 0;

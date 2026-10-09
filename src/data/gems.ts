@@ -595,7 +595,7 @@ export type ActiveGemDef = SkillFx & {
         speed: number;
         distance: number;
         radius: number;
-        /** A wave for each so many stages; the final wave deals this percent more for each stage; waves deal this percent more once the illusion has stopped. */
+        /** A wave for each so many stages, one hit each; the final wave deals this percent of a hit for each stage; waves deal this percent more once the illusion has stopped. */
         waveStages: number;
         finalPerStage: number;
         stillMore: number;
