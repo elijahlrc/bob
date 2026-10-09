@@ -56,6 +56,8 @@ export type RunState = {
   build: Build;
   xp: number;
   inventory: InventoryItem[];
+  /** Items put aside with Discard: out of the bag and out of every craft, until they are put back or all salvaged at once. */
+  discarded?: InventoryItem[];
   nextUid: number;
   bonusPoints: number;
   refundPoints: number;

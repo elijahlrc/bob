@@ -358,10 +358,12 @@ export class Controller {
   /** The parts of a run a camp change can touch (undo snapshots). */
   private snapshot(run: RunState): string {
     const { build, inventory, nextUid, bonusPoints, refundPoints, reward } = run;
+    const discarded = run.discarded ?? [];
     const { currency, dust, tablets } = run;
     return JSON.stringify({
       build,
       inventory,
+      discarded,
       nextUid,
       bonusPoints,
       refundPoints,

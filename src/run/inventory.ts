@@ -247,6 +247,28 @@ export function discard(run: RunState, uid: number): void {
     run.inventory.push(...it.sockets.filter((g): g is GemItem => g !== null));
 }
 
+/**
+ * Put an item aside (the Discard of the Items tab): it leaves the bag, and every craft, and waits in the discarded pile to be
+ * put back or salvaged with the rest. A gem it holds stays in the bag, as with `discard`.
+ */
+export function discardToPile(run: RunState, uid: number): boolean {
+  const it = take(run, uid);
+  if (!it) return false;
+  if (it.kind === 'item') {
+    run.inventory.push(...it.sockets.filter((g): g is GemItem => g !== null));
+    (run.discarded ??= []).push({ ...it, sockets: it.sockets.map(() => null) });
+  } else (run.discarded ??= []).push(it);
+  return true;
+}
+
+/** Take an item out of the discarded pile and back into the bag. */
+export function putBack(run: RunState, uid: number): boolean {
+  const i = run.discarded?.findIndex((x) => x.uid === uid) ?? -1;
+  if (i < 0 || !run.discarded) return false;
+  run.inventory.push(run.discarded.splice(i, 1)[0]);
+  return true;
+}
+
 /** Put an inventory gem into a socket (the previous gem returns to the inventory). */
 export function socketGem(run: RunState, slot: EquipSlot, socket: number, gemUid: number): boolean {
   const item = run.build.equipment[slot];

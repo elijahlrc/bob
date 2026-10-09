@@ -485,6 +485,19 @@ export function salvage(run: RunState, uid: number): CraftResult {
   return OK;
 }
 
+/** What the discarded pile would give if it were all salvaged. */
+export const discardedValue = (run: RunState): number =>
+  (run.discarded ?? []).reduce((n, x) => n + salvageValue(x), 0);
+
+/** Break down everything in the discarded pile for Bone Dust. Final. */
+export function salvageDiscarded(run: RunState): { count: number; dust: number } {
+  const pile = run.discarded ?? [];
+  const dust = discardedValue(run);
+  run.dust += dust;
+  run.discarded = [];
+  return { count: pile.length, dust };
+}
+
 /** Whether a Dust recipe is unlocked at this point of the run. */
 export const unlocked = (run: RunState, minMap: number): boolean => run.map >= minMap;
 

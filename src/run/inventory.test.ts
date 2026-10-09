@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { makeFlask, makeGem, makeItem } from '../gen/items';
+import { discardedValue, salvageDiscarded, salvageValue } from './craft';
 import { newRun } from './run';
 import { withStarterGems } from './starterGems';
 import {
   canEquip,
   discard,
+  discardToPile,
   equip,
   equipFlask,
+  putBack,
   slotsFor,
   socketGem,
   unequip,
@@ -89,5 +92,39 @@ describe('gem transfer on equip', () => {
     expect(sockets.filter(Boolean).map((g) => g!.gemId)).toEqual(['crushingBlow', 'bruteForce']);
     const old = run.inventory.find((x) => x.kind === 'item')!;
     expect(old.kind === 'item' && old.sockets.every((s) => s === null)).toBe(true);
+  });
+});
+
+describe('the discarded pile', () => {
+  it('discarding sets an item aside: out of the bag, a held gem stays, and it can be put back', () => {
+    const { run, uid } = setup();
+    const it = makeItem(uid, 'sword_1', 1);
+    const gem = makeGem(uid, 'kindle');
+    it.sockets = [gem];
+    run.inventory.push(it);
+    expect(discardToPile(run, it.uid)).toBe(true);
+    expect(run.inventory.some((x) => x.uid === it.uid)).toBe(false);
+    expect(run.discarded!.map((x) => x.uid)).toEqual([it.uid]);
+    expect(run.inventory.some((x) => x.uid === gem.uid)).toBe(true);
+    expect(putBack(run, it.uid)).toBe(true);
+    expect(run.discarded).toEqual([]);
+    expect(run.inventory.some((x) => x.uid === it.uid)).toBe(true);
+    expect(discardToPile(run, 99999)).toBe(false);
+  });
+
+  it('salvaging the pile pays for every item in it, once, and empties it', () => {
+    const { run, uid } = setup();
+    const a = makeItem(uid, 'sword_1', 1);
+    const b = makeItem(uid, 'ring_fire', 1);
+    run.inventory.push(a, b);
+    discardToPile(run, a.uid);
+    discardToPile(run, b.uid);
+    const worth = discardedValue(run);
+    expect(worth).toBe(salvageValue(a) + salvageValue(b));
+    const dust = run.dust;
+    expect(salvageDiscarded(run)).toEqual({ count: 2, dust: worth });
+    expect(run.dust).toBe(dust + worth);
+    expect(run.discarded).toEqual([]);
+    expect(salvageDiscarded(run)).toEqual({ count: 0, dust: 0 });
   });
 });

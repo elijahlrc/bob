@@ -184,9 +184,11 @@ At ≥ 1100 px, three columns:
   "was that old one worth keeping?", and the old gear is easy to lose in a 60-row list.
 - **Unequip** is a visible button in the worn item's panel and the **×** on the slot.
 - **Favourite** stays in the header (a 44 px target on touch).
-- **Getting rid of an item** is one menu, **Salvage ▾**, with the two real verbs spelled out: **Salvage for 8 Bone Dust
-  (final)** and **Discard (undoable, no Dust)**. Salvage from this screen is new (it exists in the Workbench and in bulk);
-  it uses `salvage`, `c.craft`, and the same confirmation as everything else (3.6). A favourite asks first, as now.
+- **Getting rid of an item** is one button, **Discard**. It puts the item in the **discarded pile** (`run.discarded`, `discardToPile`):
+  out of the bag and of every craft, undoable, and listed under the **Discarded (n)** view, where **Put back in the bag** returns it.
+  **Salvage n discarded → x Dust** in the bag's toolbar breaks the whole pile down at once (`salvageDiscarded`, `c.craft`) after the
+  confirmation of 3.6; that is the only final step. A favourite asks before it is discarded, as now. (An earlier design had a
+  **Salvage ▾** menu of two verbs, two clicks deep.)
 - **Craft…** opens the Workbench with this item selected (4.1). It is absent for gems and for sealed items.
 - Gems stay a Skills-screen job (see section 8); the Items panel keeps its "Socket (best free socket)" shortcut.
 
@@ -454,7 +456,7 @@ Each has a default that the plan assumes; say "agreed" and the defaults stand.
 | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | **D1** | Hover over a row today previews its card in the panel. Replace that with a pinned panel (hover only outlines target slots), or keep a peek-while-nothing-is-selected?                                                                    | **Pinned only.** Peek is what makes the buttons move under the pointer.                                  |
 | **D2** | Add drag-and-drop to equip and unequip on desktop (as the Skills screen does for gems)?                                                                                                                                                  | **Yes**, as a shortcut; taps remain complete.                                                            |
-| **D3** | Getting rid of an item: one **Salvage ▾** menu with both verbs spelled out, or keep a bare Discard?                                                                                                                                      | **The menu**, Salvage first (Dust), Discard second (undoable, no Dust).                                  |
+| **D3** | Getting rid of an item: one **Salvage ▾** menu with both verbs spelled out, or keep a bare Discard? _(Changed 2026-10-09: a bare Discard into a pile, and one Salvage for the whole pile.)_                                              | **The menu**, Salvage first (Dust), Discard second (undoable, no Dust).                                  |
 | **D4** | Show an affix's **tier and where its roll sits in the tier's range**? It is the data Polish and Reforge depend on, but it shows internals the game has so far hidden.                                                                    | **Show it**, in the Workbench only; the Items card keeps plain lines.                                    |
 | **D5** | Merge the "Usable" filter away, and make "what" and "view" filters combine?                                                                                                                                                              | **Yes.**                                                                                                 |
 | **D6** | Currency names: keep them and add a verb subtitle ("Marrow Pearl — adds an affix"), or rename them to plain verbs (names are ours; a rename touches saves, `src/data/ip.test.ts`, docs and the bot reports)?                             | **Keep and subtitle.**                                                                                   |

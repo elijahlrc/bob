@@ -115,6 +115,7 @@ export function oldItems(run: RunState, opts: CleanOpts = DEFAULT_CLEAN): CleanP
 export function pruneFound(run: RunState): void {
   const live = new Set<number>();
   for (const it of run.inventory) live.add(it.uid);
+  for (const it of run.discarded ?? []) live.add(it.uid);
   for (const it of Object.values(run.build.equipment)) {
     live.add(it.uid);
     for (const g of it.sockets) if (g) live.add(g.uid);

@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import type { EquipSlot, InventoryItem } from '../data/types';
 import type { Controller } from '../run/controller';
-import { salvage, salvageValue } from '../run/craft';
+import { discardedValue, salvageDiscarded, salvage, salvageValue } from '../run/craft';
 import {
   canEquip,
-  discard,
+  discardToPile,
   dryEquip,
   equip,
   equipFlask,
+  putBack,
   slotsFor,
   unequip,
   unequipFlask,
@@ -37,7 +38,7 @@ import { loadPref, savePref } from './prefs';
 type Drag = { kind: 'inv'; uid: number } | { kind: 'slot'; slot: EquipSlot } | null;
 
 const WHATS: What[] = ['all', 'weapon', 'armour', 'jewellery', 'flask', 'gem'];
-const VIEWS: View[] = ['all', 'new', 'upgrades', 'last', 'fav'];
+const VIEWS: View[] = ['all', 'new', 'upgrades', 'last', 'fav', 'discarded'];
 
 /** The filters were one row of chips once (`inv.filter`); a saved value from then is read as either half. */
 function loadWhat(): What {
@@ -93,7 +94,16 @@ export function Items({
     if (sel?.from === 'inv' && run.unseen.includes(sel.uid)) c.act((r) => markSeen(r, [sel.uid]));
   }, [sel]);
 
-  const infos = useMemo(() => itemInfos(run), [run.build, run.inventory]);
+  // The bag and the pile are changed in place, so their sizes stand in for "it changed" next to the references.
+  const pile = run.discarded ?? [];
+  const rev = `${run.inventory.length}:${pile.length}`;
+  const infos = useMemo(() => itemInfos(run), [run.build, run.inventory, rev]);
+  // The discarded pile: rows like the bag's, with their own facts (what each would be worth worn is still shown).
+  const pileInfos = useMemo(
+    () => itemInfos({ ...run, inventory: pile }),
+    [run.build, run.discarded, rev],
+  );
+  const listInfos = useMemo(() => new Map([...infos, ...pileInfos]), [infos, pileInfos]);
   const lastDrops = useMemo(() => new Set(run.lastDrops ?? []), [run.lastDrops]);
   const counts = useMemo(
     () => ({
@@ -101,35 +111,51 @@ export function Items({
       upgrades: run.inventory.filter((x) => isUpgrade(infos.get(x.uid)!)).length,
       last: run.inventory.filter((x) => lastDrops.has(x.uid)).length,
       fav: run.inventory.filter((x) => favs.has(x.uid)).length,
+      discarded: pile.length,
     }),
-    [run.inventory, infos, unseen, lastDrops, favs],
+    [run.inventory, run.discarded, rev, infos, unseen, lastDrops, favs],
   );
   const q = search.trim().toLowerCase();
   const visible = useMemo(() => {
-    let pool: InventoryItem[] = run.inventory;
+    let pool: InventoryItem[] = view === 'discarded' ? pile : run.inventory;
     if (view === 'new') pool = pool.filter((x) => unseen.has(x.uid));
     else if (view === 'last') pool = pool.filter((x) => lastDrops.has(x.uid));
     else if (view === 'fav') pool = pool.filter((x) => favs.has(x.uid));
     else if (view === 'upgrades') pool = filterItems(pool, infos, 'upgrades');
-    if (what !== 'all') pool = filterItems(pool, infos, what);
+    if (what !== 'all') pool = filterItems(pool, listInfos, what);
     if (q) pool = pool.filter((x) => searchText(x).includes(q));
-    const sorted = sortItems(pool, infos, sort, desc);
+    const sorted = sortItems(pool, listInfos, sort, desc);
     // Starred items go on top of whatever the sort is, keeping the sort inside both groups.
     return pinFav && view !== 'fav'
       ? [...sorted.filter((x) => favs.has(x.uid)), ...sorted.filter((x) => !favs.has(x.uid))]
       : sorted;
-  }, [run.inventory, infos, sort, desc, what, view, q, lastDrops, unseen, favs, pinFav]);
-  const junk = useMemo(() => junkItems(run), [run.build, run.inventory]);
+  }, [
+    run.inventory,
+    run.discarded,
+    rev,
+    listInfos,
+    sort,
+    desc,
+    what,
+    view,
+    q,
+    lastDrops,
+    unseen,
+    favs,
+    pinFav,
+  ]);
+  const junk = useMemo(() => junkItems(run), [run.build, run.inventory, rev]);
 
   // Keep the selected row in view (above the sheet on a phone) when the selection changes.
   useEffect(() => {
-    if (sel?.from === 'inv')
+    if (sel?.from === 'inv' || sel?.from === 'pile')
       document.querySelector('.ix-row.sel')?.scrollIntoView({ block: 'nearest' });
   }, [sel]);
 
   const lookup = (s: Sel | null): InventoryItem | null => {
     if (!s) return null;
     if (s.from === 'inv') return run.inventory.find((x) => x.uid === s.uid) ?? null;
+    if (s.from === 'pile') return pile.find((x) => x.uid === s.uid) ?? null;
     if (s.from === 'slot') return run.build.equipment[s.slot] ?? null;
     return run.build.flasks[s.idx] ?? null;
   };
@@ -243,26 +269,35 @@ export function Items({
     )
       return;
     const next = stepAfter(uid);
-    c.act((r) => discard(r, uid));
-    say(`Discarded ${itemTitle(it)}.`);
+    c.act((r) => discardToPile(r, uid));
+    say(`Discarded ${itemTitle(it)}. It waits in Discarded until you salvage them or put it back.`);
     setSel(next);
   };
-  const doSalvage = async (uid: number) => {
-    const it = run.inventory.find((x) => x.uid === uid);
+  const doPutBack = (uid: number) => {
+    const it = pile.find((x) => x.uid === uid);
     if (!it) return;
-    const dust = salvageValue(it);
+    const i = visible.findIndex((x) => x.uid === uid);
+    const next = visible[i + 1] ?? visible[i - 1];
+    c.act((r) => putBack(r, uid));
+    say(`Put ${itemTitle(it)} back in the bag.`);
+    setSel(next ? { from: 'pile', uid: next.uid } : null);
+  };
+  /** Salvage everything discarded: the one step that cannot be taken back. */
+  const salvageAllDiscarded = async () => {
+    if (!pile.length) return;
+    const dust = discardedValue(run);
     const ok = await ask({
-      title: 'Salvage for Bone Dust?',
-      body: `${itemTitle(it)}${isFavourite(run, uid) ? ' (a favourite)' : ''} is broken down for good. Salvage cannot be undone.`,
-      facts: [`${dust} Bone Dust`],
-      confirm: `Salvage for ${dust} Bone Dust`,
+      title: 'Salvage everything discarded?',
+      body: 'Every discarded item is broken down for good. This cannot be undone.',
+      facts: [`${pile.length} item${pile.length > 1 ? 's' : ''}`, `${dust} Bone Dust`],
+      confirm: `Salvage ${pile.length} for ${dust} Bone Dust`,
       danger: true,
     });
     if (!ok) return;
-    const next = stepAfter(uid);
-    c.craft((r) => salvage(r, uid));
-    say(`Salvaged ${itemTitle(it)} for ${dust} Bone Dust.`, false);
-    setSel(next);
+    c.craft((r) => salvageDiscarded(r));
+    say(`Salvaged ${pile.length} discarded items for ${dust} Bone Dust.`, false);
+    setSel(null);
+    if (view === 'discarded') setView('all');
   };
   const salvageJunk = async () => {
     if (!junk.length) return;
@@ -280,9 +315,10 @@ export function Items({
     setSel(null);
   };
   const step = (dir: -1 | 1) => {
-    const cur = sel?.from === 'inv' ? visible.findIndex((x) => x.uid === sel.uid) : -1;
+    const from = view === 'discarded' ? 'pile' : 'inv';
+    const cur = sel?.from === from ? visible.findIndex((x) => x.uid === sel.uid) : -1;
     const n = Math.max(0, Math.min(visible.length - 1, cur + dir));
-    if (visible[n]) setSel({ from: 'inv', uid: visible[n].uid });
+    if (visible[n]) setSel({ from, uid: visible[n].uid });
   };
   const bestUpgrade = () => {
     let best: InventoryItem | null = null;
@@ -392,7 +428,7 @@ export function Items({
           onUnequip={unequipSlot}
           onUnequipFlask={unequipFlaskAt}
           onFavourite={star}
-          onSalvage={(uid) => void doSalvage(uid)}
+          onPutBack={doPutBack}
           onDiscard={(uid) => void doDiscard(uid)}
           onSocket={doQuick}
           onCraft={(uid) => onCraft?.(uid)}
@@ -407,13 +443,15 @@ export function Items({
       <section class="ix-listcol" aria-label="Bag">
         <ItemList
           rows={visible}
-          infos={infos}
-          selUid={sel?.from === 'inv' ? sel.uid : null}
+          infos={listInfos}
+          selUid={sel?.from === 'inv' || sel?.from === 'pile' ? sel.uid : null}
           favs={favs}
           unseen={unseen}
           coarse={coarse}
           total={run.inventory.length}
           counts={counts}
+          discardedDust={discardedValue(run)}
+          onSalvageDiscarded={() => void salvageAllDiscarded()}
           search={search}
           setSearch={setSearch}
           sort={sort}
@@ -431,7 +469,7 @@ export function Items({
           onMarkSeen={() => c.act((r) => markSeen(r, 'all'))}
           onCleanUp={() => setCleaning(true)}
           onSalvageJunk={() => void salvageJunk()}
-          onSelect={(uid) => setSel({ from: 'inv', uid })}
+          onSelect={(uid) => setSel({ from: view === 'discarded' ? 'pile' : 'inv', uid })}
           onQuick={doQuick}
           onStar={star}
           onPeek={setPeek}

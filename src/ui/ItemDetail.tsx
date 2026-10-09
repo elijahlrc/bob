@@ -16,7 +16,10 @@ import type { RunState } from '../run/run';
 import { ItemCard, itemTitle, lineMarks, rarityClass } from './ItemCard';
 
 export type Sel =
-  { from: 'inv'; uid: number } | { from: 'slot'; slot: EquipSlot } | { from: 'flask'; idx: number };
+  | { from: 'inv'; uid: number }
+  | { from: 'pile'; uid: number }
+  | { from: 'slot'; slot: EquipSlot }
+  | { from: 'flask'; idx: number };
 
 export type Status = { text: string; undo: boolean } | null;
 
@@ -74,8 +77,8 @@ type Actions = {
   onUnequip: (slot: EquipSlot) => void;
   onUnequipFlask: (idx: number) => void;
   onFavourite: (uid: number) => void;
-  onSalvage: (uid: number) => void;
   onDiscard: (uid: number) => void;
+  onPutBack: (uid: number) => void;
   onSocket: (uid: number) => void;
   onCraft: (uid: number) => void;
   onClose: () => void;
@@ -97,36 +100,16 @@ type Props = Actions & {
   phone: boolean;
 };
 
-function Menu({ it, a }: { it: InventoryItem; a: Actions }) {
-  const [open, setOpen] = useState(false);
+/** The one way to get rid of something: put it aside in the discarded pile (it can be put back, or salvaged with the rest). */
+function DiscardButton({ it, a }: { it: InventoryItem; a: Actions }) {
   return (
-    <span class="ix-menu">
-      <button class="btn small" aria-expanded={open} onClick={() => setOpen(!open)}>
-        Get rid of ▾
-      </button>
-      {open && (
-        <span class="ix-menu-pop">
-          <button
-            class="btn small danger"
-            onClick={() => {
-              setOpen(false);
-              a.onSalvage(it.uid);
-            }}
-          >
-            Salvage → {salvageValue(it)} Bone Dust (final)
-          </button>
-          <button
-            class="btn small"
-            onClick={() => {
-              setOpen(false);
-              a.onDiscard(it.uid);
-            }}
-          >
-            Discard (no Dust, can be undone)
-          </button>
-        </span>
-      )}
-    </span>
+    <button
+      class="btn small"
+      title="Put it aside. Nothing is lost: salvage everything discarded at once, or put it back."
+      onClick={() => a.onDiscard(it.uid)}
+    >
+      Discard
+    </button>
   );
 }
 
@@ -246,7 +229,7 @@ function ItemBody({
         <button class="btn small" onClick={() => a.onCraft(item.uid)} disabled={!!item.sealed}>
           Craft…
         </button>
-        <Menu it={item} a={a} />
+        <DiscardButton it={item} a={a} />
       </div>
     </>
   );
@@ -319,7 +302,7 @@ function FlaskBody({
         <button class="btn small" onClick={() => a.onFavourite(flask.uid)}>
           {favourite ? '★ Favourite' : '☆ Favourite'}
         </button>
-        <Menu it={flask} a={a} />
+        <DiscardButton it={flask} a={a} />
       </div>
     </>
   );
@@ -375,7 +358,7 @@ export function ItemDetail(p: Props) {
           <b>Pick something</b>
           <div class="muted">
             {p.coarse ? 'Tap' : 'Click'} an item in the bag to see how it changes you, slot by slot.
-            Then equip it, swap it, or get rid of it.
+            Then equip it, swap it, or discard it.
           </div>
           {p.upgrades > 0 && (
             <button class="btn small primary" onClick={p.onBestUpgrade}>
@@ -388,6 +371,27 @@ export function ItemDetail(p: Props) {
               Drag an item onto a slot to equip it.
             </div>
           )}
+        </div>
+      </div>
+    );
+  }
+
+  if (sel.from === 'pile') {
+    return (
+      <div class="ix-detail">
+        {head(itemTitle(selected), rarityClass(selected))}
+        {status}
+        <div class="ix-body">
+          <ItemCard it={selected} build={run.build} />
+          <div class="item-actions ix-actions">
+            <button class="btn primary" onClick={() => a.onPutBack(selected.uid)}>
+              Put back in the bag
+            </button>
+          </div>
+          <div class="ix-note">
+            Discarded: out of the bag, and out of the Workbench. It is broken down for{' '}
+            {salvageValue(selected)} Bone Dust with the rest when you salvage the discarded items.
+          </div>
         </div>
       </div>
     );
@@ -415,7 +419,7 @@ export function ItemDetail(p: Props) {
               <button class="btn small" onClick={() => a.onFavourite(selected.uid)}>
                 {p.favourite ? '★ Favourite' : '☆ Favourite'}
               </button>
-              <Menu it={selected} a={a} />
+              <DiscardButton it={selected} a={a} />
             </div>
             <div class="ix-note">Choose which socket on the Skills tab.</div>
           </>

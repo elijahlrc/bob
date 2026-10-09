@@ -13,7 +13,7 @@ import { itemTitle, rarityClass } from './ItemCard';
 
 /** What kind of thing (one at a time) and which view of the bag (one at a time); the two combine. */
 export type What = Extract<FilterKey, 'all' | 'weapon' | 'armour' | 'jewellery' | 'flask' | 'gem'>;
-export type View = 'all' | 'new' | 'upgrades' | 'last' | 'fav';
+export type View = 'all' | 'new' | 'upgrades' | 'last' | 'fav' | 'discarded';
 
 const WHATS: [What, string][] = [
   ['all', 'All'],
@@ -29,6 +29,7 @@ const VIEWS: [Exclude<View, 'all'>, string][] = [
   ['upgrades', 'Upgrades'],
   ['last', 'Last map'],
   ['fav', '★ Favourites'],
+  ['discarded', 'Discarded'],
 ];
 
 function Badge({ v, label }: { v: number; label: string }) {
@@ -123,7 +124,10 @@ type Props = {
   unseen: Set<number>;
   coarse: boolean;
   total: number;
-  counts: { new: number; upgrades: number; last: number; fav: number };
+  counts: { new: number; upgrades: number; last: number; fav: number; discarded: number };
+  /** What salvaging the whole discarded pile would give. */
+  discardedDust: number;
+  onSalvageDiscarded: () => void;
   search: string;
   setSearch: (s: string) => void;
   sort: SortKey;
@@ -198,6 +202,15 @@ export function ItemList(p: Props) {
         >
           ⇅ Reverse
         </button>
+        {p.counts.discarded > 0 && (
+          <button
+            class="btn small danger"
+            title="Break down every discarded item for Bone Dust. It cannot be undone."
+            onClick={p.onSalvageDiscarded}
+          >
+            Salvage {p.counts.discarded} discarded → {p.discardedDust} Dust
+          </button>
+        )}
         <span class="ix-tidy">
           <button class="btn small" aria-expanded={tidy} onClick={() => setTidy(!tidy)}>
             Tidy ▾
@@ -246,7 +259,7 @@ export function ItemList(p: Props) {
       </div>
       <div class="ix-chips" role="group" aria-label="View">
         {VIEWS.map(([k, label]) => {
-          const n = p.counts[k === 'fav' ? 'fav' : k];
+          const n = p.counts[k];
           return (
             <button
               key={k}
@@ -270,9 +283,11 @@ export function ItemList(p: Props) {
       <div class="ix-list">
         {p.rows.length === 0 && (
           <div class="muted ix-nothing">
-            {p.total === 0
-              ? 'The bag is empty.'
-              : 'Nothing here. Try another filter or clear the search.'}
+            {p.view === 'discarded'
+              ? 'Nothing is discarded.'
+              : p.total === 0
+                ? 'The bag is empty.'
+                : 'Nothing here. Try another filter or clear the search.'}
           </div>
         )}
         {p.rows.map((it) => (

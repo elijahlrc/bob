@@ -1239,6 +1239,8 @@ select option {
   position: fixed;
   inset: 0;
   z-index: 40;
+  /* The page root lets clicks through to the map, and a dialog mounted beside the screen inherits that. */
+  pointer-events: auto;
   display: flex;
   align-items: center;
   justify-content: center;
