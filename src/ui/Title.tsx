@@ -86,20 +86,6 @@ export function Title({ c }: { c: Controller }) {
       {saved.status === 'ok' && <CopySave c={c} />}
       <TelemetryNotice />
       <DebugPanel c={c} />
-      <div class="demo-panel">
-        <div class="muted">Demo</div>
-        <div class="showcase-row">
-          <button class="btn" onClick={() => c.startShowcase(false)}>
-            ▶ Showcase: crypt
-          </button>
-          <button class="btn" onClick={() => c.startShowcase(true)}>
-            ▶ Showcase: boss
-          </button>
-          <button class="btn" onClick={() => c.startGallery()}>
-            ▶ Skill gallery
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

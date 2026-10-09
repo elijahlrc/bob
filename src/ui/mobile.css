@@ -110,9 +110,6 @@ body {
   .codex .menu.row {
     flex-wrap: wrap;
   }
-  .demo-panel .showcase-row .btn {
-    flex: 1 1 140px;
-  }
 }
 
 /* The popover that replaces a hover tooltip on a coarse pointer (info.tsx). */

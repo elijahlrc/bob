@@ -987,13 +987,6 @@ select option {
   gap: 8px;
   justify-content: center;
 }
-.demo-panel {
-  margin-top: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: center;
-}
 
 /* Reserve room for the hover/selection card so hovering never shifts the inventory list under the cursor
    (the list sits below this column when the window is narrow). */
@@ -1686,4 +1679,8 @@ select option {
   margin: 12px auto 0;
   font-size: 12px;
   cursor: pointer;
+}
+.telemetry input {
+  accent-color: var(--accent-d);
+  color-scheme: dark;
 }
