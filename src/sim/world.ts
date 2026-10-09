@@ -21,6 +21,7 @@ import { BUFF_IDS, type BuffId } from '../data/buffs';
 import { rollGains, tickBuffs } from './buffs';
 import { tickCooldowns } from './cooldowns';
 import { tickChannel } from './channel';
+import { tickFields } from './fields';
 import { tickShots } from './shots';
 import { tickDeployables } from './deploy';
 import { tickMinions } from './minions';
@@ -131,6 +132,7 @@ export function createWorld(inp: CreateWorldInput): World {
     nextId: 2,
     projectiles: [],
     shots: [],
+    fields: [],
     channel: null,
     stacks: null,
     hitsLanded: 0,
@@ -523,6 +525,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickShots(w);
   tickEffects(w, dt);
   tickChannel(w);
+  tickFields(w, dt);
   updateProjectiles(w, dt);
   tickZones(w, dt);
   tickCorpses(w, dt);

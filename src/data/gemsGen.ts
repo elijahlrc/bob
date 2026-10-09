@@ -352,6 +352,17 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       radius: 2.2,
       reach: 8,
     },
+    leaves: {
+      kind: 'chilling',
+      seconds: 5,
+      radius: 2.2,
+      grow: 2,
+      dps: 0.67,
+      killCharge: {
+        kind: 'fervour',
+        chance: 25,
+      },
+    },
     spellDamage: [
       {
         type: 'cold',
@@ -917,14 +928,19 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       radius: 2.4,
       reach: 3,
     },
+    aftershock: {
+      delay: 1,
+      more: 70,
+      radius: 55,
+    },
     baseMult: [85, 120],
     cost: [10, 10],
-    requiresWeapon: ['axe', 'mace', 'staff'],
+    requiresWeapon: ['axe', 'mace', 'staff', 'sceptre'],
     mods: [
       {
-        stat: 'damage',
+        stat: 'attackSpeed',
         kind: 'more',
-        value: 70,
+        value: -25,
       },
     ],
     description: 'Slams the ground, cracking it open to erupt again moments later.',
@@ -1411,6 +1427,15 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       interval: 0.5,
       reach: 8,
     },
+    cooldown: 2.5,
+    crystal: {
+      radius: 2.4,
+      seconds: 2,
+      interval: 0.5,
+      exposure: 25,
+      regenLess: 75,
+      debuffSeconds: 5,
+    },
     spellDamage: [
       {
         type: 'cold',
@@ -1421,16 +1446,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     castTime: 0.5,
     crit: 6,
     cost: [4, 16],
-    mods: [
-      {
-        stat: 'penetration',
-        kind: 'base',
-        value: 25,
-        damageTypes: ['cold'],
-      },
-    ],
+    mods: [],
     description:
-      'A crystal of cold that pulses for a while and leaves enemies more exposed to frost (it penetrates cold resistance).',
+      'A crystal of cold that exposes the enemies near it to frost and stops their regeneration, then bursts.',
   },
   {
     kind: 'active',
@@ -2174,6 +2192,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       line: 5,
       reach: 6,
     },
+    wall: {
+      length: 4,
+      seconds: 3.9,
+      push: 1.3,
+    },
+    cooldown: 3,
     spellDamage: [
       {
         type: 'cold',
@@ -2184,14 +2208,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     castTime: 0.5,
     crit: 5,
     cost: [9, 33],
-    mods: [
-      {
-        stat: 'chance.freeze',
-        kind: 'base',
-        value: 15,
-      },
-    ],
-    description: 'Raises a wall of ice that holds enemies back.',
+    mods: [],
+    description:
+      'Raises a wall of ice across the way: nothing crosses it, and what stood under it is hit and pushed back.',
   },
   {
     kind: 'active',
@@ -2289,6 +2308,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       radius: 2.4,
       reach: 7,
     },
+    leaves: {
+      kind: 'consecrated',
+      seconds: 4,
+      radius: 2.4,
+    },
     spellDamage: [
       {
         type: 'fire',
@@ -2304,7 +2328,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     crit: 6,
     cost: [8, 20],
     mods: [],
-    description: 'A burst of purifying fire that scorches an area.',
+    description: 'A burst of purifying fire that leaves consecrated ground.',
   },
   {
     kind: 'active',
@@ -2532,22 +2556,29 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       radius: 2.4,
       reach: 4,
     },
-    baseMult: [160, 200],
-    cost: [8, 8],
-    requiresWeapon: ['mace', 'axe', 'staff', 'sword'],
+    chargedSlam: {
+      chance: 35,
+      charge: 'grit',
+      more: 60,
+      radius: 40,
+    },
+    baseMult: [170, 200],
+    cost: [10, 10],
+    requiresWeapon: ['mace', 'axe', 'staff', 'sword', 'sceptre'],
     mods: [
       {
         stat: 'convertSkill.physical.fire',
         kind: 'base',
-        value: 50,
+        value: 60,
       },
       {
-        stat: 'chance.ignite',
-        kind: 'base',
-        value: 20,
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -20,
       },
     ],
-    description: 'A slam that splits the ground into rivers of fire.',
+    description:
+      'A slam that splits the ground into rivers of fire; now and then it spends a Grit charge to hit much harder.',
   },
   {
     kind: 'active',
@@ -3896,6 +3927,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       radius: 2,
       reach: 2,
     },
+    leaves: {
+      kind: 'consecrated',
+      seconds: 4,
+      radius: 2.2,
+    },
     baseMult: [150, 184],
     cost: [8, 8],
     requiresWeapon: ['sword', 'axe', 'mace', 'staff'],
@@ -3905,8 +3941,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'base',
         value: 50,
       },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -20,
+      },
     ],
-    description: 'Run to the target in a trail of fire and strike.',
+    description: 'Run to the target and slam, leaving consecrated ground where you land.',
   },
   {
     kind: 'active',
@@ -8175,12 +8216,12 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
       {
         stat: 'auraBurn',
         kind: 'base',
-        value: 15,
+        value: 20,
       },
       {
         stat: 'selfBurn',
         kind: 'base',
-        value: 6,
+        value: 90,
       },
       {
         stat: 'damage',
@@ -8288,16 +8329,19 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
         on: 'kill',
         targetHas: 'shock',
         chance: 100,
-        cooldown: 0,
+        cooldown: 1,
         effect: {
-          kind: 'explode',
-          pctOfMaxLife: 7,
+          kind: 'storm',
+          seconds: 6,
+          interval: 0.25,
+          radius: 4.5,
           dtype: 'lightning',
-          radius: 3,
+          effectiveness: 120,
         },
       },
     ],
-    description: 'Added lightning damage, and shocked enemies burst in lightning.',
+    description:
+      'Added lightning damage, and killing a shocked enemy calls down bolts around you for a while.',
   },
   {
     kind: 'aura',

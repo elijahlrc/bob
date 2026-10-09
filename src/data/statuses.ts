@@ -15,7 +15,8 @@ export type StatusId =
   | 'exposedCold'
   | 'exposedFire'
   | 'overpowered'
-  | 'doomed';
+  | 'doomed'
+  | 'regenLess';
 
 export const STATUS_IDS: StatusId[] = [
   'hinder',
@@ -30,6 +31,7 @@ export const STATUS_IDS: StatusId[] = [
   'exposedFire',
   'overpowered',
   'doomed',
+  'regenLess',
 ];
 
 export type StatusDef = {
@@ -133,6 +135,14 @@ export const STATUSES: Record<StatusId, StatusDef> = {
     v: 5,
     max: 100,
     text: '{n} stacks: {v}% reduced chance to block each',
+  },
+  regenLess: {
+    id: 'regenLess',
+    name: 'Frostbitten',
+    seconds: 5,
+    v: 75,
+    max: 1,
+    text: '{v}% reduced life and energy shield regeneration',
   },
   doomed: {
     id: 'doomed',

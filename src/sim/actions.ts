@@ -10,6 +10,8 @@ import { openZone, pullPlayer, registerBlast, shieldBlocks, speedMult } from './
 import { fireTriggers } from './triggers';
 import { placeDeployable } from './deploy';
 import { channelUse, stackedUse } from './channel';
+import { leaveGround, placeCrystal, raiseWall } from './fields';
+import { scaleProfile } from './shots';
 import {
   afterProjectileHit,
   afterStrike,
@@ -238,6 +240,28 @@ export function tickSkillZones(w: World, dt: number): void {
 /** Resolve an action's effect: strikes, chains or projectiles. Triggers call it with no wind-up. */
 export function fire(w: World, a: Actor, act: Action): void {
   fireEffect(w, a, act);
+  leaveGround(w, a, act);
+  // An aftershock: the ground cracks, and a moment later it erupts, harder and wider.
+  const aft = act.profile.skill.aftershock;
+  if (aft && a.isPlayer && act.which !== 'deployed') {
+    const b = act.profile.skill.behaviour;
+    const atSelf = b.kind === 'burst' && b.origin === 'self';
+    const q = scaleProfile(act.profile, 1 + aft.more / 100);
+    w.zones.push({
+      id: w.nextId++,
+      owner: a.id,
+      profile: q,
+      hand: act.hand,
+      x: atSelf ? a.x : act.aimX,
+      y: atSelf ? a.y : act.aimY,
+      radius: (b.kind === 'burst' ? b.radius : 2) * q.radiusMult * (1 + aft.radius / 100),
+      delayT: aft.delay,
+      interval: 1,
+      pulseT: 0,
+      pulsesLeft: 1,
+      dtype: 0,
+    });
+  }
   // A skill that discharges the charges held (its damage grew with them) spends them once it has landed.
   if (a.isPlayer && act.profile.skill.consumeCharges)
     for (const kind of CHARGE_KINDS) {
@@ -261,6 +285,29 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
   const p = act.profile;
   const b = p.skill.behaviour;
   const target = actorById(w, act.targetId);
+  // A frost crystal waits and bursts; a wall of ice goes up and holds the way (src/sim/fields.ts).
+  if (p.skill.crystal && a.isPlayer) {
+    placeCrystal(w, a, act);
+    return;
+  }
+  if (p.skill.wall && a.isPlayer) {
+    raiseWall(w, a, act);
+    return;
+  }
+  // A slam that may spend a charge to hit harder over more ground.
+  if (p.skill.chargedSlam && a.isPlayer && act.which !== 'channelled') {
+    const cs = p.skill.chargedSlam;
+    if (w.char.charges[cs.charge] > 0 && w.rngTrig.chance(cs.chance / 100)) {
+      spendCharges(w, cs.charge, 1);
+      const q = scaleProfile(p, 1 + cs.more / 100);
+      fireEffect(w, a, {
+        ...act,
+        profile: { ...q, radiusMult: q.radiusMult * (1 + cs.radius / 100) },
+        which: 'channelled',
+      });
+      return;
+    }
+  }
   // A channelled skill builds a stage with each use, and is released when the channel ends (src/sim/channel.ts).
   if (p.skill.channel && a.isPlayer && act.which !== 'channelled') {
     channelUse(w, a, act);

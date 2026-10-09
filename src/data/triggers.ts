@@ -33,6 +33,15 @@ export type TriggerEffect =
   | { kind: 'spread'; ailment: 'shock' | 'ignite'; radius: number }
   /** Give up a share of maximum life to gain that much in another pool (Demon Stitcher analog). */
   | { kind: 'sacrifice'; pctOfLife: number; pool: 'es' | 'mana' }
+  /** Kill triggers: bolts strike the enemies around the character for a while (Herald of Thunder). */
+  | {
+      kind: 'storm';
+      seconds: number;
+      interval: number;
+      radius: number;
+      dtype: DamageType;
+      effectiveness: number;
+    }
   /** Recover a share of maximum life, or of armour, into a pool. */
   | { kind: 'recover'; pool: 'life' | 'es' | 'mana'; pctOf: 'maxLife' | 'armour'; value: number };
 
@@ -80,6 +89,8 @@ function effectText(e: TriggerEffect): string {
       return `the enemy explodes for ${e.pctOfMaxLife}% of its maximum life as ${e.dtype} damage`;
     case 'spread':
       return `spread its ${e.ailment} to nearby enemies`;
+    case 'storm':
+      return `bolts of ${e.dtype} strike the enemies around you for ${e.seconds} seconds`;
     case 'sacrifice':
       return `sacrifice ${e.pctOfLife}% of life to gain that much ${e.pool === 'es' ? 'energy shield' : e.pool}`;
     case 'recover':

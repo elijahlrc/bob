@@ -3,6 +3,7 @@ import type { TriggerDef, TriggerEffect } from '../data/triggers';
 import { DAMAGE_TYPES, maskSubset, tagBit, type DamageType } from '../mods/types';
 import { fire } from './actions';
 import { registerBlast } from './factions';
+import { startStorm } from './fields';
 import { flaskMask, lifeCap, playerConds, pushDot, rawHit, wake } from './combat';
 import type { Actor, Action, World } from './types';
 
@@ -87,6 +88,17 @@ function perform(
       return ev.on === 'kill' && explode(w, e, ev.target);
     case 'spread':
       return ev.on === 'kill' && spread(w, e, ev.target);
+    case 'storm':
+      if (ev.on !== 'kill') return false;
+      startStorm(
+        w,
+        e.seconds,
+        e.interval,
+        e.radius,
+        e.effectiveness,
+        DAMAGE_TYPES.indexOf(e.dtype),
+      );
+      return true;
     case 'recover':
       return recover(w, e);
     case 'sacrifice':

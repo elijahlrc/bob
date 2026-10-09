@@ -189,6 +189,37 @@ export type ActiveGemDef = {
     };
   };
   /** A strike that, when it lands, sends more out: bolts from the weapon, blades from behind the enemy, balls that land and burst. */
+  /** Ground the skill leaves where it lands (docs/SPIRIT.md S6). */
+  leaves?: {
+    kind: 'consecrated' | 'chilling';
+    seconds: number;
+    radius: number;
+    /** How many times larger the ground ends than it began. */
+    grow?: number;
+    /** Chilling ground: the share of a hit it deals each second. */
+    dps?: number;
+    killCharge?: { kind: 'grit' | 'fervour' | 'insight'; chance: number };
+  };
+  /** A crystal that stands a moment, exposes what is near, and bursts (Frost Bomb). */
+  crystal?: {
+    radius: number;
+    seconds: number;
+    interval: number;
+    exposure: number;
+    regenLess: number;
+    debuffSeconds: number;
+  };
+  /** A wall of ice across the way, that holds the tiles shut for a while and pushes what stands there back (Frost Wall). */
+  wall?: { length: number; seconds: number; push: number };
+  /** A second, harder hit a moment after the first, over a larger area (Earthquake). */
+  aftershock?: { delay: number; more: number; radius: number };
+  /** A chance to spend a charge to make the use a Charged Slam (Tectonic Slam). */
+  chargedSlam?: {
+    chance: number;
+    charge: 'grit' | 'fervour' | 'insight';
+    more: number;
+    radius: number;
+  };
   /** A skill that grows with use: each use that hits adds a stage (more area), and they fade when it stops hitting (Reave). */
   stacks?: { cap: number; areaPer: number; fadeAfter: number };
   afterHit?: {

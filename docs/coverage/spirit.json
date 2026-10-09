@@ -254,16 +254,16 @@
       "ref": "Consecrated Path",
       "name": "Blessed Trail",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S6",
-      "missing": ["ground_effect", "ground_enemy_crit_bonus"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Teleport to a nearby enemy, slam, and leave consecrated ground (life regeneration) in an area.",
         "bob": "Attack with travel 7 and a half-fire burst r2 150..184%; ground dropped, so the teleport-slam survives but without a lasting effect.",
         "repair": "Leave a 'ground' zone granting life regeneration to the player standing in it."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Consecrated Path",
         "status": "corrected",
@@ -1058,12 +1058,7 @@
       "verdict": "drifted",
       "confidence": "medium",
       "milestone": "S13",
-      "missing": [
-        "ground_effect",
-        "consecrated_ground_regen",
-        "consecrated_ground_crit_bonus",
-        "secondary_expanding_shockwave"
-      ],
+      "missing": ["secondary_expanding_shockwave", "line_wave"],
       "audit": {
         "poe": "A holy fire wave that hits in a line, leaves Consecrated Ground (sustain for you) and then sends a larger shockwave that hits enemies standing on it; the fire and consecrated ground combo is the draw.",
         "bob": "A burst (radius 2.4) of fire and physical spell damage at the target; the line wave, consecrated ground and follow-up shockwave are dropped, as the port note admits.",
@@ -1744,16 +1739,16 @@
       "ref": "Earthquake",
       "name": "Faultline",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S6",
-      "missing": ["delayed_aftershock"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A slam that damages an area and then erupts again as a large aftershock after a short delay.",
         "bob": "A slam burst (radius 2.4) at 85-120% with a flat +70% more damage; the aftershock is folded into the one hit rather than a second eruption, even though a ground zone with a delay is supported (Ember Downpour uses it). Total damage is about two thirds of the PoE sum and enemies are hit once.",
         "repair": "Add a second burst on the same spot after a short delay (a ground behaviour with delay and two pulses) instead of the flat more-damage mod."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Earthquake",
         "status": "confirmed",
@@ -2427,16 +2422,16 @@
       "ref": "Frost Wall",
       "name": "Glacier Wall",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S6",
-      "missing": ["ground_barrier_blocks_movement", "knockback", "skill_cooldown"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Creates a wall of ice that blocks enemy movement and damages and pushes back those under it; used for crowd control and kiting.",
         "bob": "A 5-tile line ground zone lasting 3 s, pulsing cold damage with a 15% freeze chance. It damages but does not block or push, so only the freeze chance stands in for control.",
         "repair": "Let a ground line act as terrain monsters path around (or are held by), plus an outward push on pulse."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Frost Wall",
         "status": "corrected",
@@ -3188,16 +3183,16 @@
       "ref": "Tectonic Slam",
       "name": "Magma Crack",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S6",
-      "missing": ["spend_charges_for_effect", "slam_fissures"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A fire slam that sends fissures forward; with an Endurance Charge it can spend the charge for a Charged Slam with more damage, bigger area and more fissures.",
         "bob": "A burst slam with 50% fire conversion and a 20% ignite chance (the ignite is not in the original); it never consumes charges, so the grit (Endurance analog) interaction is missing.",
         "repair": "Let the slam spend one Grit charge for more damage and area (charges and their spending hooks exist in sim/charges.ts)."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Tectonic Slam",
         "status": "corrected",
@@ -3996,16 +3991,16 @@
       "ref": "Frost Bomb",
       "name": "Rime Core",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S6",
-      "missing": ["detonate_at_end_of_duration", "debuff_regen_reduction", "skill_cooldown"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Place a crystal that pulses a debuff (cold exposure, slowed regen) and then explodes for heavy cold damage when its duration ends; you pick it as a set-and-detonate exposure applier.",
         "bob": "A 2 s ground zone pulsing full spell hits every 0.5 s with 25% cold penetration standing in for exposure (penetration is read by the engine); there is no end-of-life explosion and no regen debuff.",
         "repair": "Let a ground zone carry an 'on expiry' burst (a heavier hit at the zone's end) and make the pulses debuff-only or weak."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Frost Bomb",
         "status": "corrected",
@@ -4603,16 +4598,16 @@
       "ref": "Righteous Fire",
       "name": "Searing Mantle",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S6",
-      "missing": ["self_damage_through_resists", "aura_burn_scaled_by_damage_mods"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "No-reservation toggle: you burn yourself for a large share of life per second (fire damage mitigated by your fire resistance, offset by regen) while enemies near you take fire damage that scales with your damage modifiers, and spells deal more damage. Defines a commit-to-regen-and-fire-res build.",
         "bob": "auraBurn and selfBurn are real (sim/utility.ts tickAuraBurn): a fixed share of max life per second to enemies within 2.8 tiles (their resists apply) and a flat self drain that cannot kill. Self damage ignores fire resistance and ES; the enemy damage is not scaled by any damage modifier; the spell more mod works.",
         "repair": "Run the self burn through the player's fire resistance and damage-taken mods, and scale the enemy burn with fire/DoT modifiers."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Righteous Fire",
         "status": "confirmed",
@@ -5668,16 +5663,16 @@
       "ref": "Herald of Thunder",
       "name": "Storm Herald",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S6",
-      "missing": ["timed_burst_on_kill"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "25% reserved herald: added lightning damage; killing a shocked enemy makes lightning bolts strike enemies around you for 6 s. The reward is a lasting barrage after each shocked kill.",
         "bob": "Added lightning damage works. Killing a shocked enemy fires one lightning explosion (7% of its max life, radius 3) at its corpse and nothing more; no lasting bolts around the player.",
         "repair": "On shocked kill, start a 6 s timer that strikes random nearby enemies every fraction of a second."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Herald of Thunder",
         "status": "confirmed",
@@ -5778,16 +5773,16 @@
       "ref": "Cold Snap",
       "name": "Sudden Frost",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "high",
-      "milestone": "S6",
-      "missing": ["ground_effect", "charge_on_kill_in_area"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "A cold burst plus chilling ground with a 3 s cooldown that you skip by spending a Frenzy Charge, and enemies dying in the ground may grant Frenzy Charges. The charge loop (kill, gain, spend to recast) is the niche.",
         "bob": "A plain cold burst at the target (radius 2.2, 140% effectiveness) with more chill. No cooldown (the gem def has no cooldown field; SkillDef.cooldown is never set from gems, only the generic secondary rule applies), no charge spending, no charge gain on kills in the area, and no cold ground DoT. Bob does have a Fervour charge kind and chargeOn.kill hooks that could carry this.",
         "repair": "Add a data cooldown to gems plus a spend-a-charge bypass in the cooldown check, and a kill-in-zone charge gain tied to the zone the skill leaves."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Cold Snap",
         "status": "confirmed",

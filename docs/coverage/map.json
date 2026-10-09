@@ -368,7 +368,7 @@
   "suddenFrost": {
    "ref": "Cold Snap",
    "status": "covered",
-   "note": "A burst of cold at the target that chills more than usual (the chilled ground is folded into the chill)."
+   "note": "A burst of cold at the target that leaves chilled ground for five seconds, growing to twice its size, that hurts with cold; a kill on it has a 25% chance to give a Fervour charge. It waits three seconds, unless a Fervour charge is spent."
   },
   "creepingPlague": {
    "ref": "Contagion",
@@ -443,7 +443,7 @@
   "faultline": {
    "ref": "Earthquake",
    "status": "covered",
-   "note": "A heavy slam that cracks the ground and erupts after a moment (the aftershock is averaged into one stronger hit)."
+   "note": "A heavy slam that cracks the ground; a second later it erupts in an aftershock over a wider area for 70% more damage."
   },
   "sapBolt": {
    "ref": "Essence Drain",
@@ -543,7 +543,7 @@
   "rimeCore": {
    "ref": "Frost Bomb",
    "status": "covered",
-   "note": "A cold crystal that pulses for two seconds (the lowered cold resistance and regeneration debuff are dropped)."
+   "note": "A cold crystal that stands for two seconds: its pulses leave enemies near it exposed to cold (25% less resistance) and regenerating 75% less for five seconds; then it bursts, and the burst is the only hit. It waits two and a half seconds."
   },
   "scatterBolt": {
    "ref": "Kinetic Blast",
@@ -663,7 +663,7 @@
   "glacierWall": {
    "ref": "Frost Wall",
    "status": "covered",
-   "note": "A wall of ice that hits what stands under it (modelled as a line of ground that lasts three seconds)."
+   "note": "A wall of ice across the way for three to five seconds: nothing walks through it; what stood under it is hit and pushed back. It waits three seconds between casts."
   },
   "rimeRebuke": {
    "ref": "Glacial Shield Swipe",
@@ -683,7 +683,7 @@
   "cleansingBlaze": {
    "ref": "Purifying Flame",
    "status": "covered",
-   "note": "A burst of holy fire that burns the ground in an area (modelled as a short zone, with the consecrated ground dropped)."
+   "note": "A burst of holy fire that leaves consecrated ground for four seconds (life regeneration for the character on it, better chances to crit what stands on it)."
   },
   "slagLob": {
    "ref": "Rolling Magma",
@@ -723,7 +723,7 @@
   "magmaCrack": {
    "ref": "Tectonic Slam",
    "status": "covered",
-   "note": "A slam that is half fire and sends fissures out in front of the character."
+   "note": "A slam, mostly fire: each use has a 35% chance to spend a Grit charge for a Charged Slam, 60% more damage over more ground."
   },
   "whirlShot": {
    "ref": "Tornado Shot",
@@ -1068,7 +1068,7 @@
   "blessedTrail": {
    "ref": "Consecrated Path",
    "status": "covered",
-   "note": "A travelling attack that is half fire and leaves holy ground behind (the ground is dropped)."
+   "note": "A slam that carries the character to the target; it is half fire and leaves consecrated ground for four seconds: the character regenerates life on it and hits against enemies on it crit twice as often."
   },
   "snagLash": {
    "ref": "Chain Hook",
@@ -1143,7 +1143,7 @@
   "searingMantle": {
    "ref": "Righteous Fire",
    "status": "covered",
-   "note": "A burning aura with no reservation: the character burns itself without dying and burns the enemies near, with more spell damage."
+   "note": "A burning aura with no reservation: the enemies near burn for a fifth of the character's life a second; the character burns for nine tenths of its life a second as fire damage that its fire resistance and energy shield answer to, and never dies of it; more spell damage."
   },
   "cinderHerald": {
    "ref": "Herald of Ash",
@@ -1158,7 +1158,7 @@
   "stormHerald": {
    "ref": "Herald of Thunder",
    "status": "covered",
-   "note": "An aura that reserves mana: added lightning damage, and shocked enemies burst in lightning when killed."
+   "note": "An aura that reserves mana: added lightning damage, and killing a shocked enemy calls down bolts on the enemies around the character for six seconds."
   },
   "sourHerald": {
    "ref": "Herald of Agony",

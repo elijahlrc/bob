@@ -41,6 +41,7 @@ import {
   tickStatuses,
 } from './statuses';
 import { damageMult, hexPlayerAtRandom, onMonsterDeath, shieldedByPylon } from './factions';
+import { CRIT_ON_CONSECRATED, consecratedAt, fieldKill } from './fields';
 import { corpseBlast, fireTriggers } from './triggers';
 import { spawnMonster } from './world';
 import type { Actor, Dot, World } from './types';
@@ -485,6 +486,9 @@ export function hit(
   // A blinded attacker misses more, and an enfeebled one is less accurate and crits less.
   const hm = src.hexMore;
   ts.hitChanceMult = hitChanceFactor(src) * (1 - hm.acc * 0.5);
+  // Consecrated ground makes hits against what stands on it crit twice as often.
+  if (src.isPlayer && !dst.isPlayer && w.fields.length > 0 && consecratedAt(w, dst.x, dst.y))
+    h = { ...h, critChance: h.critChance * CRIT_ON_CONSECRATED };
   if (hm.critChance > 0 || hm.critMulti > 0)
     h = {
       ...h,
@@ -751,6 +755,8 @@ export function killActor(w: World, a: Actor): void {
   onMonsterDeath(w, a);
   const cause = causes.get(a);
   if (!cause?.minion) fireTriggers(w, { on: 'kill', target: a, tags: cause?.tags ?? 0 });
+  // A kill on chilling ground may give a charge.
+  if (!a.isPlayer && w.fields.length > 0) fieldKill(w, a);
   // A Doomed enemy blows up for a share of its own life.
   if (a.fx.doomed) corpseBlast(w, a, a.fx.doomed.v, 'chaos', 3);
 }
@@ -895,9 +901,11 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   // Regeneration (a Bursar or the Treasurer near the player stops it, with leech and the recharge of energy shield).
   const cap = lifeCap(w, a);
   const suppressed = a.suppressT > 0;
-  if (!suppressed && def.lifeRegen > 0) {
-    if (def.regenToEs) a.es = Math.min(def.maxEs, a.es + def.lifeRegen * dt);
-    else a.life = Math.min(cap, a.life + def.lifeRegen * dt);
+  // A Frost Bomb leaves an enemy regenerating very little.
+  const regen = def.lifeRegen * (a.fx.regenLess ? 1 - a.fx.regenLess.v / 100 : 1);
+  if (!suppressed && regen > 0) {
+    if (def.regenToEs) a.es = Math.min(def.maxEs, a.es + regen * dt);
+    else a.life = Math.min(cap, a.life + regen * dt);
   }
   if (a.isPlayer && !suppressed) {
     const manaCap = Math.max(0, def.maxMana - w.char.reservedMana);

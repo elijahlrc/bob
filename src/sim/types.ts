@@ -14,6 +14,7 @@ import type { HexState } from './hexes';
 import type { Fx } from './statuses';
 import type { PendingShot } from './shots';
 import type { ChannelState, StackState } from './channel';
+import type { Field } from './fields';
 import type { HexTotals } from '../data/hexes';
 import type { Deployable } from './deploy';
 import type { Minion } from './minions';
@@ -519,6 +520,8 @@ export type World = {
   minions: Minion[];
   actors: Actor[];
   projectiles: Projectile[];
+  /** Ground and standing things the player's skills made: consecrated and chilling ground, crystals, storms, walls. */
+  fields: Field[];
   /** The channelled skill being held: its stages so far. */
   channel: ChannelState | null;
   /** The stages of a skill that grows with use, and how many hits the player has landed (a use that hits builds a stage). */

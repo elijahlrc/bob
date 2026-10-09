@@ -120,10 +120,18 @@ export function tickAuraBurn(w: World, dt: number): void {
   w.auraBurnT -= BURN_EVERY;
   const p = w.player;
   if (!p.alive) return;
-  const amount = (b.pct / 100) * p.def.maxLife * BURN_EVERY;
+  // The enemies burn for a share of the character's life, with the character's damage over time modifiers.
+  const amount = (b.pct / 100) * p.def.maxLife * BURN_EVERY * w.char.db.mult('damage');
   if (amount > 0)
     for (const e of enemiesNear(w, p.x, p.y, BURN_RADIUS)) rawHit(w, e, amount, 3, 'Burning aura');
-  if (b.self > 0) p.life = Math.max(1, p.life - (b.self / 100) * p.def.maxLife * BURN_EVERY);
+  // The character burns too, as fire damage that its resistance and energy shield answer to; it never kills.
+  if (b.self > 0) {
+    const was = w.opts.godMode;
+    w.opts.godMode = true;
+    rawHit(w, p, (b.self / 100) * p.def.maxLife * BURN_EVERY, 3, 'Righteous Fire');
+    w.opts.godMode = was;
+    p.life = Math.max(1, p.life);
+  }
 }
 
 /** What a utility cast does when it lands: the buff starts, the curse falls on the target and the pack around it, the player blinks. */

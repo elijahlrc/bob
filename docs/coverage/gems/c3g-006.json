@@ -63,10 +63,11 @@
       "behaviour": { "kind": "projectile", "count": 5, "spread": 30, "range": 8 }, "baseMult": [135, 180], "cost": [8, 10], "requiresWeapon": ["sword", "axe"],
       "mods": [{ "stat": "chance.impale", "kind": "base", "value": 100 }],
       "description": "A thrust that hurls a main blade that impales, with shards flying beside it." } },
-  { "ref": "Frost Bomb", "note": "A cold crystal that pulses for two seconds (the lowered cold resistance and regeneration debuff are dropped).",
+  { "ref": "Frost Bomb", "note": "A cold crystal that stands for two seconds: its pulses leave enemies near it exposed to cold (25% less resistance) and regenerating 75% less for five seconds; then it bursts, and the burst is the only hit. It waits two and a half seconds.",
     "def": { "kind": "active", "id": "rimeCore", "name": "Rime Core", "attr": "int", "skillType": "spell", "tags": ["spell", "area", "duration", "cold"], "types": ["orb", "repeatable", "trappable", "totemable", "mineable", "triggerable", "cascadable"],
-      "behaviour": { "kind": "ground", "radius": 2.4, "duration": 2, "interval": 0.5, "reach": 8 },
+      "behaviour": { "kind": "ground", "radius": 2.4, "duration": 2, "interval": 0.5, "reach": 8 }, "cooldown": 2.5,
+      "crystal": { "radius": 2.4, "seconds": 2, "interval": 0.5, "exposure": 25, "regenLess": 75, "debuffSeconds": 5 },
       "spellDamage": [{ "type": "cold", "spread": [0.8, 1.2] }], "effectiveness": 200, "castTime": 0.5, "crit": 6, "cost": [4, 16],
-      "mods": [{ "stat": "penetration", "kind": "base", "value": 25, "damageTypes": ["cold"] }],
-      "description": "A crystal of cold that pulses for a while and leaves enemies more exposed to frost (it penetrates cold resistance)." } }
+      "mods": [],
+      "description": "A crystal of cold that exposes the enemies near it to frost and stops their regeneration, then bursts." } }
 ]
