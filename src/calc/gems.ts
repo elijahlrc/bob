@@ -168,6 +168,8 @@ export type SkillDef = SkillFx & {
   orb?: ActiveGemDef['orb'];
   /** Ground the skill leaves where it lands (docs/SPIRIT.md S6). */
   leaves?: {
+    creep?: number;
+    max?: number;
     kind: 'consecrated' | 'chilling' | 'caustic';
     seconds: number;
     radius: number;

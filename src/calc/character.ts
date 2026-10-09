@@ -263,6 +263,8 @@ export type SkillSheet = {
   name: string;
   id: string;
   isDefault: boolean;
+  /** A line about how to read the figures (a skill that picks its element at random counts it as fire). */
+  note?: string;
   avgHit: number;
   perType: number[];
   critChance: number;
@@ -1502,6 +1504,9 @@ export class Character {
       name: choice.skill.name,
       id: choice.skill.id,
       isDefault: choice.gemUid === null,
+      note: choice.skill.element
+        ? 'Each use picks fire, cold or lightning at random; the figures are for fire'
+        : undefined,
       avgHit: perType.reduce((a, b) => a + b, 0),
       perType,
       critChance: cc,

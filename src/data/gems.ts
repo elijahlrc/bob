@@ -390,6 +390,13 @@ export type SkillFx = {
   wander?: { turn: number };
   /** The projectile is a slow orb that hurts every enemy within `radius` of it every `interval` seconds as it drifts, and does not stop on one (Ball Lightning). */
   pulse?: { radius: number; interval: number; speed: number };
+  /** The arrow flies to the target place (or the first enemy) and leaves a clone of the character there for `seconds`, which fires with the character's bow and deals `more` percent more damage (Mirror Arrow). */
+  mirror?: { seconds: number; more: number };
+  /**
+   * A sequence of `extra` + 1 volleys over ground that widens, each `delay` seconds after the last, each wider (by `widen` percent a
+   * volley), `lessPer` percent less damaging and `critLessPer` percent less likely to crit than the one before (Bladefall).
+   */
+  volleys?: { extra: number; lessPer: number; critLessPer: number; delay: number; widen: number };
   /** The character regains life and mana a second while enemies carry the skill's debuff: a flat amount, and more for each of them (Siphoning Trap). */
   siphon?: { life: LevelValue; lifeEach: LevelValue; mana: LevelValue; manaEach: LevelValue };
 };
@@ -411,6 +418,8 @@ export const FX_KEYS = [
   'castOn',
   'wander',
   'pulse',
+  'mirror',
+  'volleys',
 ] as const satisfies readonly (keyof SkillFx)[];
 
 export type ActiveGemDef = SkillFx & {
@@ -613,6 +622,9 @@ export type ActiveGemDef = SkillFx & {
     /** Chilling ground: the share of a hit it deals each second. */
     dps?: number;
     killCharge?: { kind: 'grit' | 'fervour' | 'insight'; chance: number };
+    /** Chilling ground that drifts toward the nearest enemy at this many tiles a second; at most `max` patches of the skill at once (Creeping Frost). */
+    creep?: number;
+    max?: number;
   };
   /** A crystal that stands a moment, exposes what is near, and bursts (Frost Bomb). */
   crystal?: {
@@ -867,9 +879,10 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
     supports: ['melee'],
     costMult: 1.4,
     mods: [
-      { stat: 'damage', kind: 'more', value: [40, 59], damageTypes: ['physical'], tags: ['melee'] },
+      { stat: 'damage', kind: 'more', value: [30, 49], damageTypes: ['physical'], tags: ['melee'] },
+      { stat: 'meleeAilmentMore', kind: 'base', value: [30, 49] },
     ],
-    description: 'More melee physical damage.',
+    description: 'More melee physical damage, and more bleed and poison damage from melee hits.',
   },
   {
     kind: 'support',

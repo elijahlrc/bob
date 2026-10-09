@@ -35,6 +35,7 @@ export function Sheet({ s }: { s: CharacterSheet }) {
   ];
   const skill: [string, string][] = [
     ['Skill', `${k.name}${k.isDefault ? ' (default attack)' : ''}`],
+    ...(k.note ? ([['', k.note]] as [string, string][]) : []),
     ['Average hit', f1(k.avgHit)],
     ['Uses per second', f1(k.usesPerSec)],
     ['Crit chance / multiplier', `${pct(k.critChance)} / ${pct(k.critMulti)}`],

@@ -822,9 +822,9 @@ A second table, `sim_runs` (`docs/telemetry-dev.sql`), takes the same record fro
 
 ### Spirit plan (docs/SPIRIT.md), built (2026-10-08)
 
-S0 to S14 are built, local commits only. Every one of the 326 mapped gems has a verdict in the spirit ledger (`docs/coverage/spirit.json`, `npm run spirit`): 316 faithful,
-10 drifted with a reason (no gem quality; four gems that are not 3.9 gems; five whose repair waits for the user's say: Raise Spectre's abilities, Mirror Arrow's clone,
-the melee ailment bonus, Bladefall's volleys, Creeping Frost). The engine gained cooldowns and charge spending, an enemy status layer, channelling, ground and lasting
+S0 to S14 are built, local commits only. Every one of the 320 mapped gems has a verdict in the spirit ledger (`docs/coverage/spirit.json`, `npm run spirit`): 318 faithful,
+2 drifted with a reason (Enhance, no gem quality; Raise Spectre keeps only its monster's numbers, not its abilities). On 2026-10-09 six gems were cut (four that are not 3.9 gems, and
+Animate Weapon and Animate Guardian, which used up ground loot) and the last open repairs were made (Mirror Arrow's clone, Melee Physical Damage's ailments, Bladefall, Creeping Frost). The engine gained cooldowns and charge spending, an enemy status layer, channelling, ground and lasting
 objects, skill damage over time, blinks, stances and rage, deployables, corpses, minion effects, and a bag of single-skill behaviours (`SkillFx` in `src/data/gems.ts`,
 carried out in `src/sim/skillFx.ts` and `supportFx.ts`). The 3.9 rule that the projectiles of one use hit an enemy once stands. A second audit by reviewers who had not
 seen the first verdicts (docs/AUDIT-GEMS.md) found 288 of 326 faithful as it stood and about thirty small gaps, which were repaired. See the plan's section 13 for each milestone.

@@ -541,6 +541,7 @@ Object.assign(STAT_TEXT, {
   },
   'minion.defensive': { flag: 'Minions stay close to you and go for the enemies near you' },
   'minion.nearMore': { base: 'Minions deal {v}% more damage to enemies near you' },
+  meleeAilmentMore: { base: '{v}% more Damage with Bleeding and Poison caused by Melee Hits' },
   'stun.full': { base: 'Hits always stun enemies on full life, for {v} seconds' },
   'surge.threshold': { base: 'Gain Arcane Surge after spending {v} mana with supported skills' },
   'poison.baseDur': {

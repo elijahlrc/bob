@@ -3,6 +3,7 @@ import { formedProfile } from '../calc/skill';
 import { levelValue } from '../calc/gems';
 import { PROJECTILE_SPEED } from '../data/constants';
 import { actorById } from './actions';
+import { mirrorLanded } from './skillFx';
 import { hit } from './combat';
 import type { Action, Actor, Projectile, World } from './types';
 
@@ -138,6 +139,29 @@ export function fireProjectiles(w: World, a: Actor, act: Action): void {
   const chain = p.pierce <= 0 ? p.chains : 0;
   const aimDist = Math.hypot(act.aimX - a.x, act.aimY - a.y);
 
+  if (p.skill.leaves?.creep !== undefined) {
+    // The skull flies to the place aimed at (or to the first enemy) and bursts there, leaving chilled ground that creeps.
+    launch(w, a, p, act.hand, a.x, a.y, base, {
+      hitIds: [],
+      aimId: act.targetId,
+      range: Math.max(2, Math.min(range, aimDist)),
+      explode,
+      pierce: 0,
+      kind: 'creep',
+    });
+    return;
+  }
+  if (p.skill.mirror) {
+    // The arrow goes where it is aimed, or to the first enemy, and leaves the clone where it ends.
+    launch(w, a, p, act.hand, a.x, a.y, base, {
+      hitIds: [],
+      aimId: act.targetId,
+      range: Math.max(2, Math.min(range, aimDist)),
+      pierce: 0,
+      kind: 'mirror',
+    });
+    return;
+  }
   if (p.skill.pulse) {
     // A slow orb: it hurts what is about it as it drifts (src/sim/skillFx.ts) and strikes nothing by touching it.
     launch(w, a, p, act.hand, a.x, a.y, base, {
@@ -397,6 +421,7 @@ export function afterProjectileHit(w: World, pr: Projectile, owner: Actor | unde
 
 /** A projectile that lands (Arrow Nova) or reaches the end of its way (Tornado Shot) sends its arrows out all round. */
 export function projectileLanded(w: World, pr: Projectile, owner: Actor | undefined): void {
+  if (pr.kind === 'mirror' && owner) mirrorLanded(w, pr);
   if (!pr.ring || !owner) return;
   const shield = pr.kind === 'shield' ? pr.profile.skill.shield : undefined;
   const p = shield ? scaleProfile(pr.profile, 1 - shield.less / 100) : pr.profile;

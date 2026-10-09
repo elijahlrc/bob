@@ -27,6 +27,8 @@ import { cascadeCast, extraStrikes, repeatTarget, startUse } from './supportFx';
 import {
   addBlade,
   bounceOrbs,
+  fireVolleys,
+  leaveCreeping,
   lineWave,
   novaOnBolts,
   placeMarker,
@@ -327,6 +329,10 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
     return;
   }
   if (p.skill.castOn && a.isPlayer && novaOnBolts(w, a, act)) return;
+  if (p.skill.volleys && a.isPlayer) {
+    fireVolleys(w, a, act);
+    return;
+  }
   if (p.skill.vortex && a.isPlayer) {
     addBlade(w, p);
     return;
@@ -594,6 +600,7 @@ function explode(
     if (Math.hypot(e.x - x, e.y - y) <= pr.explodeRadius + e.r)
       hit(w, owner, e, pr.profile, pr.hand, Math.hypot(e.x - pr.startX, e.y - pr.startY));
   }
+  if (pr.kind === 'creep') leaveCreeping(w, owner, pr, x, y);
   if (pr.faction === 1)
     for (const e of w.minions)
       if (e.alive && Math.hypot(e.x - x, e.y - y) <= pr.explodeRadius + e.r)
@@ -682,9 +689,9 @@ export function updateProjectiles(w: World, dt: number): void {
           if (rm) pr.profile = scaleProfile(pr.profile, 1 + rm / 100);
         } else {
           // An arrow fired into the air comes down and bursts.
-          if (pr.kind === 'mortar') explode(w, owner, pr, pr.x, pr.y);
+          if (pr.kind === 'mortar' || pr.kind === 'creep') explode(w, owner, pr, pr.x, pr.y);
           projectileLanded(w, pr, owner);
-          endProjectile(w, pr, pr.kind === 'mortar' ? 3 : 1);
+          endProjectile(w, pr, pr.kind === 'mortar' || pr.kind === 'creep' ? 3 : 1);
           alive = false;
           break;
         }
@@ -736,7 +743,7 @@ export function updateProjectiles(w: World, dt: number): void {
         else if (afterProjectileHit(w, pr, owner)) break;
         else {
           // A thrown shield shatters where it hits.
-          if (pr.kind === 'shield') projectileLanded(w, pr, owner);
+          if (pr.kind === 'shield' || pr.kind === 'mirror') projectileLanded(w, pr, owner);
           endProjectile(w, pr, 2);
           alive = false;
           break;

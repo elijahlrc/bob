@@ -1573,16 +1573,13 @@ reviewers fell back on the Path of Building numbers; their findings were checked
 | -------------------------- | -------: | ------: | -----: | ------: |
 | First audit                |      155 |     133 |     38 |     326 |
 | Second audit, as reviewed  |  **288** |  **37** |  **1** | **326** |
-| After the repairs it found |      316 |      10 |      0 |     326 |
+| After the repairs it found |      318 |       2 |      0 |     320 |
 
 What the reviewers found was mostly small and real: a support whose cooldown recovery never reached its skill (Advanced Traps), two returning projectiles that did
 not pierce and so never returned, Arc without its second arc, the trigger of Cast when Stunned, Heavy Strike without its knockback and double damage, Viper
 Strike without its chaos conversion, Lacerate without its stance trade, Raise Zombie without its corpse, Greater Multiple Projectiles with half its
 projectiles, and a few more. They are repaired (the list, with what was done, is the `disposition` field of
-[`docs/coverage/audit2.json`](coverage/audit2.json), which holds all 326 findings). Two of the reviewers' findings were wrong and are recorded as such (they judged
+[`docs/coverage/audit2.json`](coverage/audit2.json), which holds the findings (326 when it was made; six gems have been cut since)). Two of the reviewers' findings were wrong and are recorded as such (they judged
 from the later gem of the same name).
 
-Ten gems remain `drifted` in the ledger, each with an `accepted` line that says why: Enhance (no gem quality), four gems that are not 3.9 gems (Cluster Bolt, Ghost Coil,
-Siphoning Trap of Pain, Critical Strike Affliction), and five that wait for the user's say, because the repair is large or a choice: Raise Spectre (a spectre keeps only its monster's
-damage, rate and range, not its abilities), Mirror Arrow (a clone that uses the character's own bow and gear), Melee Physical Damage (more bleed and poison from
-melee hits), Bladefall (volleys that widen and weaken) and Creeping Frost (a projectile that leaves a creeping chilled area).
+After the audit the user decided on the rest (2026-10-09): Mirror Arrow's clone now fires with the character's own bow (the arrow flies, the clone lasts three seconds, 75% more damage, and Blink Arrow's clone is the same), Melee Physical Damage also boosts the bleed and poison of melee hits, Bladefall falls in six volleys that widen and weaken, and Creeping Frost bursts and leaves chilled ground that creeps toward enemies. Six gems were cut: four that are not 3.9 gems (Spectral Helix, Siphoning Trap of Pain, Cluster Bolt, Critical Strike Affliction) and Animate Weapon and Animate Guardian, which used up loot lying on the ground; the four uniques that triggered Animate Weapon lose that line. That leaves 320 gems, of which 318 are faithful. The two that are not: Enhance (no gem quality) and Raise Spectre (a spectre keeps only its monster's damage, rate, range, speed and life, not its abilities; the user accepted it as it is).

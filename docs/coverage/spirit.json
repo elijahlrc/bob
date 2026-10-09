@@ -180,7 +180,7 @@
         "check": "The audit's PoE line holds against the wiki, and its missing list is still right (the monster's own skills come with raise_from_corpse_type). The 1-to-2 count scaling in Bob matches, but a generic chaos-bolt shade that ignores the corpse is still gutted.",
         "decision": "The character cannot pick a corpse in an autobattler. Which rule should choose the monster: the most recent kill, the strongest or highest-level kill, or a monster type the player selects in the loadout?"
       },
-      "accepted": "Open (the user's say): a spectre keeps only its monster's damage factor, rate and range, not its abilities; the nearest corpse is raised."
+      "accepted": "Accepted (the user, 2026-10-09): a spectre keeps only its monster's damage factor, rate, range, speed and life, not its abilities; the corpse is the nearest."
     },
     "bladeWind": {
       "ref": "Swordstorm",
@@ -628,7 +628,7 @@
       "ref": "Melee Physical Damage Support",
       "name": "Brute Force",
       "kind": "support",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
       "milestone": null,
       "missing": [],
@@ -637,8 +637,7 @@
         "bob": "More melee physical damage (melee tag, physical type). Melee-tagged mods never reach ailment damage (DESIGN 6.6), so the bleed/poison half of the PoE gem is absent.",
         "repair": "Optional: also give the multiplier to bleed and poison damage."
       },
-      "verified": false,
-      "accepted": "Open: the extra poison and bleed damage from melee hits is missing; ailments take no melee tag in Bob (the 3.9 rule as read in the first audit)."
+      "verified": true
     },
     "bulwarkRush": {
       "ref": "Shield Charge",
@@ -3206,7 +3205,7 @@
       "ref": "Mirror Arrow",
       "name": "Mirror Quiver",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
       "milestone": null,
       "missing": [],
@@ -3215,8 +3214,7 @@
         "bob": "Summons a bow clone for 3 s that shoots enemies; it appears next to the player instead of at the arrow's landing point.",
         "repair": "None needed."
       },
-      "verified": false,
-      "accepted": "Open (the user's say): the clone is a generic archer, not a copy that uses the character's bow and gear."
+      "verified": true
     },
     "mortarBow": {
       "ref": "Artillery Ballista",
@@ -3688,7 +3686,7 @@
       "ref": "Bladefall",
       "name": "Rain of Steel",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
       "milestone": null,
       "missing": [],
@@ -3697,8 +3695,7 @@
         "bob": "Ground zone at the target (radius 2.5, 1.5 s, pulses every 0.3 s = 5 volleys) with +100% crit chance. The per-volley widening and damage fall-off are not modelled, so all five hit the same circle at equal strength.",
         "repair": "Optional: per-pulse radius growth and damage decay on ground behaviours."
       },
-      "verified": false,
-      "accepted": "Open (the user's say): the five volleys are identical; the original's each get wider and weaker."
+      "verified": true
     },
     "raiseHusk": {
       "ref": "Raise Zombie",
@@ -3931,7 +3928,7 @@
       "ref": "Creeping Frost",
       "name": "Rime Drift",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "low",
       "milestone": null,
       "missing": [],
@@ -3940,8 +3937,7 @@
         "bob": "A 3 s cold ground zone at the target pulsing every 0.5 s, with increased chill effect (real: effect.chill is consumed, cold hits can chill). It is stationary and has no projectile or creeping, but the lasting chilling-field loop is there.",
         "repair": "Optionally let a ground zone drift toward the nearest enemy."
       },
-      "verified": false,
-      "accepted": "Open (the user's say): a stationary zone of repeated hits, not a projectile that leaves a creeping, damaging chilled area."
+      "verified": true
     },
     "rimeHerald": {
       "ref": "Herald of Ice",

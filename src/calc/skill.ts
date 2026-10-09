@@ -438,9 +438,16 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     const ailTags = (tag: SkillTag) =>
       maskOr(maskOr(DOT_TAGS, tagBit(tag)), maskAnd(tags, AILMENT_KEYWORDS));
     // "Damage over Time Multiplier": added to the ailment's damage as a share of it.
+    // Melee Physical Damage also makes the bleed and poison of melee hits stronger (they take no melee tag of their own).
+    const meleeAilments =
+      baseTags & tagBit('melee') ? 1 + db.sum('base', 'meleeAilmentMore', baseCtx) / 100 : 1;
     const ak = (tag: SkillTag, anc: number) => {
       const c = ctxOf(ailTags(tag), ownConds, statValue, anc);
-      return db.mult('damage', c) * (1 + Math.max(-0.9, db.sum('base', 'dotMulti', c) / 100));
+      return (
+        db.mult('damage', c) *
+        (1 + Math.max(-0.9, db.sum('base', 'dotMulti', c) / 100)) *
+        (tag === 'bleed' || tag === 'poison' ? meleeAilments : 1)
+      );
     };
     for (const c of chunks) {
       const cctx = { ...ctx, ancestry: c.anc };

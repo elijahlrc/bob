@@ -333,7 +333,7 @@
   "rainOfSteel": {
    "ref": "Bladefall",
    "status": "covered",
-   "note": "Volleys of blades rain on an area (modelled as a zone that pulses five times)."
+   "note": "Rain of blades over six volleys, each falling one width further on than the last, wider, 6% less damaging and 20% less likely to crit than the one before; the first falls where the spell is aimed."
   },
   "whirlwindCleave": {
    "ref": "Bladestorm",
@@ -648,7 +648,7 @@
   "rimeDrift": {
    "ref": "Creeping Frost",
    "status": "covered",
-   "note": "A slow cold projectile that leaves a field of frost where it ends (modelled as a short zone at its end)."
+   "note": "A frozen skull flies to the place aimed at (or to the first enemy) and bursts for cold damage, leaving chilled ground that burns and slows for five seconds and creeps toward nearby enemies; up to ten patches at once."
   },
   "anvilDrop": {
    "ref": "Crushing Fist",
@@ -1548,7 +1548,7 @@
   "mirrorQuiver": {
    "ref": "Mirror Arrow",
    "status": "covered",
-   "note": "Fires an arrow that leaves a mirrored archer for three seconds."
+   "note": "Fires an arrow at the target place; where it ends a clone of the character stands for three seconds, firing with the character’s own bow for 75% more damage."
   },
   "boneWardRite": {
    "ref": "Bone Offering",

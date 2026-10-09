@@ -48,8 +48,8 @@
       ],
       "loop": "Raise Spectre: raises a defeated monster from a corpse as a minion that keeps the basic abilities/skills it had in life (the whole point is choosing which monster to raise); level set by the gem (31-80), 1-2 spectres.",
       "disposition": {
-        "status": "open",
-        "why": "A spectre keeps only its monster’s damage factor, rate and range, not its abilities; the nearest corpse is raised."
+        "status": "accepted",
+        "why": "The user accepted it as it is (2026-10-09)."
       }
     },
     "bladeWind": {
@@ -623,8 +623,8 @@
       ],
       "loop": "Mirror Arrow: fires an arrow that summons a clone for 3 s, with a 3 s cooldown; the clone is a minion that uses your bow and quiver, i.e. copies your attacks.",
       "disposition": {
-        "status": "open",
-        "why": "The clone is a generic archer, not a copy that uses the character’s bow and gear."
+        "status": "repaired",
+        "what": "The arrow flies and leaves a clone that fires with the character’s own weapon, 75% more damage (Blink Arrow’s clone too)."
       }
     },
     "mortarBow": {
@@ -753,8 +753,8 @@
       ],
       "loop": "Bladefall: ethereal weapons rain in 5 cascading volleys, each wider but 6% less damaging (and 20% less crit chance) than the last; enemies are mostly hit once, more where volleys overlap; +100% crit chance.",
       "disposition": {
-        "status": "open",
-        "why": "The five volleys are identical; the original’s each get wider and weaker."
+        "status": "repaired",
+        "what": "Six volleys, each wider, 6% weaker and less likely to crit."
       }
     },
     "raiseHusk": {
@@ -822,8 +822,8 @@
       ],
       "loop": "Creeping Frost: icy projectile that bursts on impact/at the target area, dealing area damage and leaving chilling ground that deals cold damage over time and creeps across the ground toward nearby enemies for its duration (up to 10 areas).",
       "disposition": {
-        "status": "open",
-        "why": "A stationary zone of repeated hits, not a projectile that leaves a creeping, damaging chilled area."
+        "status": "repaired",
+        "what": "A skull that bursts and leaves chilled ground that creeps toward enemies, ten patches at most."
       }
     },
     "rimeHerald": {
@@ -1422,8 +1422,8 @@
       ],
       "loop": "Melee Physical Damage: more physical damage for melee attacks, and (in 3.9) the same percentage more damage with poison and bleeding caused by melee hits, which is why bleed builds take it.",
       "disposition": {
-        "status": "open",
-        "why": "The extra poison and bleed damage from melee hits is missing (ailments take no melee tag, a 3.9 rule)."
+        "status": "repaired",
+        "what": "More bleed and poison damage from melee hits."
       }
     },
     "bulwarkStrikes": {

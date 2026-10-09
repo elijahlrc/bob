@@ -224,8 +224,21 @@ export function summonAt(
   seconds: number,
   x: number,
   y: number,
-): void {
-  makeMinion(w, c, prof, kind, x, y, { seconds });
+): Minion {
+  return makeMinion(w, c, prof, kind, x, y, { seconds });
+}
+
+/**
+ * A clone of the character fights with the character's weapon: its blows are the weapon's damage (flat parts and all), at the
+ * weapon's speed, and a share more (Mirror Arrow, Blink Arrow: 75% more).
+ */
+export function cloneOfPlayer(w: World, m: Minion, morePct: number): void {
+  const hand = w.char.hands[0];
+  if (!hand) return;
+  let sum = 0;
+  for (const [a, b] of hand.flats) sum += (a + b) / 2;
+  m.fixedHit = sum * (1 + morePct / 100);
+  m.fixedRate = hand.aps;
 }
 
 function step(w: World, m: Minion, tx: number, ty: number, dt: number, speed: number): void {

@@ -874,3 +874,68 @@ describe('Cobra Lash (viperLash)', () => {
     expect(second.life).toBeLessThan(1e9);
   });
 });
+
+describe('Mirror Arrow and Blink Arrow clones', () => {
+  it('Mirror Arrow leaves a clone where the arrow ends, which fires with the character’s weapon', () => {
+    const { world: w, dummy } = world(['mirrorQuiver'], 6, 'bow_3', DEX);
+    expect(w.char.primary.skill.behaviour.kind).toBe('projectile');
+    let clone;
+    for (let i = 0; i < 60 * 4 && !clone; i++) {
+      stepWorld(w);
+      clone = w.minions.find((m) => m.kind === 'clone' && m.alive);
+    }
+    expect(clone).toBeDefined();
+    const hand = w.char.hands[0];
+    const avg = hand.flats.reduce((s, [a, b]) => s + (a + b) / 2, 0);
+    expect(clone!.fixedHit).toBeCloseTo(avg * 1.75, 5);
+    expect(clone!.fixedRate).toBeCloseTo(hand.aps, 5);
+    run(w, 3);
+    expect(dummy.life).toBeLessThan(1e9);
+  });
+});
+
+describe('Bladefall, Creeping Frost and Melee Physical Damage', () => {
+  it('Bladefall falls in six volleys, each wider and weaker', () => {
+    const { world: w, dummy } = world(['rainOfSteel'], 6, 'wand_3', DEX);
+    const seen: { r: number; hitMult: number }[] = [];
+    for (let i = 0; i < 60 * 3; i++) {
+      stepWorld(w);
+      if (seen.length === 0 && w.zones.length >= 6)
+        for (const z of w.zones) seen.push({ r: z.radius, hitMult: z.profile.hands[0].hitMult });
+    }
+    expect(seen).toHaveLength(6);
+    for (let k = 1; k < 6; k++) {
+      expect(seen[k].r).toBeGreaterThan(seen[k - 1].r);
+      expect(seen[k].hitMult).toBeCloseTo(seen[k - 1].hitMult * 0.94, 5);
+    }
+    expect(dummy.life).toBeLessThan(1e9);
+  });
+
+  it('Creeping Frost bursts, then leaves chilled ground that creeps toward an enemy, ten patches at most', () => {
+    const { world: w, dummy } = world(['rimeDrift'], 5, 'wand_3', INT);
+    expect(w.char.primary.skill.behaviour.kind).toBe('projectile');
+    let patch: { x: number; y: number } | undefined;
+    let start = 0;
+    let moved = 0;
+    for (let i = 0; i < 60 * 8; i++) {
+      stepWorld(w);
+      const f = w.fields.find((x) => x.kind === 'chilling' && x.creep);
+      if (f && !patch) {
+        patch = f;
+        start = Math.hypot(f.x - dummy.x, f.y - dummy.y);
+      }
+      if (f && patch) moved = Math.max(moved, start - Math.hypot(f.x - dummy.x, f.y - dummy.y));
+      expect(w.fields.filter((x) => x.creep).length).toBeLessThanOrEqual(10);
+    }
+    expect(patch).toBeDefined();
+    expect(dummy.life).toBeLessThan(1e9);
+  });
+
+  it('Melee Physical Damage also makes the bleed and poison of melee hits stronger', () => {
+    const plain = world(['venomCut'], 1.2, 'dagger_3', DEX).world;
+    const sup = world(['venomCut', 'bruteForce'], 1.2, 'dagger_3', DEX).world;
+    const a = plain.char.profile(plain.primary, 0).hands[0].ailChunks[0].k[2];
+    const b = sup.char.profile(sup.primary, 0).hands[0].ailChunks[0].k[2];
+    expect(b).toBeGreaterThan(a * 1.25);
+  });
+});

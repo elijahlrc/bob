@@ -8,6 +8,7 @@ import { applySkillDot } from './skillDots';
 import { applyStatus } from './statuses';
 import { gainCharge } from './charges';
 import { hit, lifeCap, rawHit } from './combat';
+import { creepToward } from './skillFx';
 import { scaleProfile } from './shots';
 import type { Action, Actor, World } from './types';
 
@@ -64,6 +65,8 @@ export type Field = {
   x2?: number;
   y2?: number;
   moved?: number;
+  /** Chilling ground that creeps toward the nearest enemy: tiles a second. */
+  creep?: number;
   /** A bladestorm: the way it drifts, and the stance it was made in. */
   vx?: number;
   vy?: number;
@@ -92,7 +95,8 @@ function dominantType(p: SkillProfile): number {
 export function leaveGround(w: World, a: Actor, act: Action): void {
   const p = act.profile;
   const spec = p.skill.leaves;
-  if (!spec || !a.isPlayer) return;
+  // Ground that creeps is left where the projectile bursts, not at the aim.
+  if (!spec || !a.isPlayer || spec.creep !== undefined) return;
   const b = p.skill.behaviour;
   const atSelf = (b.kind === 'burst' && b.origin === 'self') || b.kind === 'melee';
   const x = atSelf ? a.x : act.aimX;
@@ -467,6 +471,7 @@ export function tickFields(w: World, dt: number): void {
       f.x = p.x;
       f.y = p.y;
     }
+    if (f.creep) creepToward(w, f, dt);
     if (f.kind === 'orb') {
       f.x = p.x;
       f.y = p.y;

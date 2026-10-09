@@ -140,6 +140,10 @@ export function fxLines(def: ActiveGemDef, level: number): string[] {
     out.push(
       `Cast on up to ${def.castOn.max} of your ${def.castOn.skill} projectiles instead of you, with ${def.castOn.areaLess}% less area`,
     );
+  if (def.mirror)
+    out.push(
+      `The arrow flies to the target place and leaves a clone of you there for ${num(def.mirror.seconds)} s; it fires with your bow for ${def.mirror.more}% more damage`,
+    );
   if (def.pulse)
     out.push(
       `A slow orb: every ${num(def.pulse.interval)} s it hurts every enemy within ${num(def.pulse.radius)} of it, and does not stop on any`,

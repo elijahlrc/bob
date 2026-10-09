@@ -3,13 +3,14 @@ import type { SkillProfile } from '../calc/skill';
 import type { BuffId } from '../data/buffs';
 import { levelValue } from '../calc/gems';
 import { launch, scaleProfile } from './shots';
-import { makeMinion } from './minions';
+import { cloneOfPlayer, makeMinion, summonAt } from './minions';
 import { enemiesOf } from './actions';
 import { hit, playerConds, rawHit } from './combat';
 import { corpseBlast } from './triggers';
 import { MINIONS, MINION_ENEMY_RES } from '../data/minions';
 import { spellBaseDamage } from '../data/constants';
 import { applySkillDot } from './skillDots';
+import type { Field } from './fields';
 import type { Action, Actor, Projectile, World } from './types';
 
 /**
@@ -871,4 +872,132 @@ export function novaOnBolts(w: World, a: Actor, act: Action): boolean {
       }
   }
   return true;
+}
+
+// ---- Mirror Arrow: a clone where the arrow ends
+
+/** The arrow has ended: the character's clone stands there for a few seconds and fires with the character's bow. */
+export function mirrorLanded(w: World, pr: Projectile): void {
+  const spec = pr.profile.skill.mirror;
+  const c = w.char.actives.find((x) => x.skill.id === pr.profile.skill.id);
+  if (!spec || !c) return;
+  const m = summonAt(
+    w,
+    c,
+    pr.profile,
+    'clone',
+    spec.seconds * pr.profile.skillDuration,
+    pr.x,
+    pr.y,
+  );
+  cloneOfPlayer(w, m, spec.more);
+}
+
+// ---- Bladefall: volleys that widen and weaken
+
+/** The volleys land one after another, each a ring wider and weaker (and less likely to crit) than the one before, and a wave beyond it. */
+export function fireVolleys(w: World, a: Actor, act: Action): void {
+  const p = act.profile;
+  const spec = p.skill.volleys!;
+  const b = p.skill.behaviour;
+  const r0 = (b.kind === 'burst' ? b.radius : 2) * p.radiusMult;
+  const ang = Math.atan2(act.aimY - a.y, act.aimX - a.x);
+  let along = 0;
+  for (let k = 0; k <= spec.extra; k++) {
+    const r = r0 * (1 + (spec.widen / 100) * k);
+    const cx = act.aimX + Math.cos(ang) * along;
+    const cy = act.aimY + Math.sin(ang) * along;
+    // The next volley falls one width further on, so the waves meet.
+    along += r * 0.9;
+    const f = Math.pow(1 - spec.lessPer / 100, k);
+    const q: SkillProfile = {
+      ...p,
+      hands: p.hands.map((h) => ({
+        ...h,
+        hitMult: h.hitMult * f,
+        critChance: h.critChance * Math.max(0, 1 - (spec.critLessPer / 100) * k),
+      })),
+    };
+    const spot = w.grid.collide(cx, cy, 0.3);
+    w.zones.push({
+      id: w.nextId++,
+      owner: a.id,
+      profile: q,
+      hand: act.hand,
+      x: spot.x,
+      y: spot.y,
+      x2: undefined,
+      y2: undefined,
+      radius: r,
+      delayT: spec.delay * k,
+      interval: 1,
+      pulseT: 0,
+      pulsesLeft: 1,
+      dtype: mainTypeOf(p),
+    });
+  }
+}
+
+// ---- Creeping Frost: chilled ground that creeps toward enemies
+
+/** The skull has burst: the chilled ground it leaves, at most so many patches at once. */
+export function leaveCreeping(
+  w: World,
+  owner: Actor | undefined,
+  pr: Projectile,
+  x: number,
+  y: number,
+): void {
+  const spec = pr.profile.skill.leaves;
+  if (!spec || !owner || spec.creep === undefined) return;
+  const mine = w.fields.filter((f) => f.kind === 'chilling' && f.skill === pr.profile.skill.id);
+  if (spec.max && mine.length >= spec.max) {
+    const oldest = mine.reduce((m, f) => (f.t < m.t ? f : m));
+    w.fields.splice(w.fields.indexOf(oldest), 1);
+  }
+  const r = spec.radius * pr.profile.radiusMult;
+  const t = spec.seconds * pr.profile.skillDuration;
+  w.fields.push({
+    id: w.nextId++,
+    owner: owner.id,
+    kind: 'chilling',
+    x,
+    y,
+    r0: r,
+    grow: spec.grow ?? 1,
+    radius: r,
+    t,
+    total: t,
+    profile: pr.profile,
+    hand: pr.hand,
+    pulseT: 0,
+    interval: 0.5,
+    dps: spec.dps ?? 0,
+    dtype: 2,
+    skill: pr.profile.skill.id,
+    creep: spec.creep,
+  });
+}
+
+/** Chilled ground that creeps drifts toward the nearest enemy within reach. */
+export function creepToward(w: World, f: Field, dt: number): void {
+  let best: Actor | null = null;
+  let bd = 7;
+  for (const e of w.actors) {
+    if (e.isPlayer || !e.alive || e.phaseT > 0) continue;
+    const d = Math.hypot(e.x - f.x, e.y - f.y);
+    if (d < bd) {
+      bd = d;
+      best = e;
+    }
+  }
+  if (!best || bd < 0.3) return;
+  const step = Math.min(bd, (f.creep ?? 0) * dt);
+  const spot = w.grid.collide(
+    f.x + ((best.x - f.x) / bd) * step,
+    f.y + ((best.y - f.y) / bd) * step,
+    0.3,
+  );
+  f.x = spot.x;
+  f.y = spot.y;
 }

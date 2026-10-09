@@ -7,7 +7,7 @@ import { gainBuff } from './buffs';
 import { cooldownSeconds } from './cooldowns';
 import { hit, rawHit } from './combat';
 import { takeCorpse, type Corpse } from './factions';
-import { summonAt } from './minions';
+import { cloneOfPlayer, summonAt } from './minions';
 import { applyStatus } from './statuses';
 import type { Actor, World } from './types';
 
@@ -231,7 +231,7 @@ function arrive(
   a.y = y;
   w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true });
   if (u.burst === 'arrive' || u.burst === 'both' || u.warp) burstAt(w, a, p, x, y, u);
-  if (u.clone) summonAt(w, c, p, u.clone.minion, u.clone.seconds, fx, fy);
+  if (u.clone) cloneOfPlayer(w, summonAt(w, c, p, u.clone.minion, u.clone.seconds, fx, fy), 75);
   if (u.elusive) {
     // Elusive is renewed in full, and enemies that come near are withered until the character does something else.
     w.buffT.elusive = Math.max(0, 5 * w.char.db.mult('buffDuration'));

@@ -254,7 +254,7 @@ export type Projectile = {
   /** An arrow that lands and bursts into a ring (nova), or goes on to scatter at its end (tornado); the arrows it sends. */
   /** An orb's time to its next pulse. */
   pulseT?: number;
-  kind?: 'nova' | 'tornado' | 'mortar' | 'shield' | 'orb';
+  kind?: 'nova' | 'tornado' | 'mortar' | 'shield' | 'orb' | 'mirror' | 'creep';
   ring?: number;
   /** Where it changes form (Frost Lance), and whether it has. */
   formAt?: number;
