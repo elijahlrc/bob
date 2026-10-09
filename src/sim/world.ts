@@ -42,6 +42,7 @@ import { newActor } from './actor';
 import { tickAbandon } from './abandon';
 import { tickCollapse } from './collapse';
 import { tickHoldout } from './holdout';
+import { tickStranded } from './strand';
 import { crescendoStep, HOLDOUT_WAVES } from '../data/mapTypes';
 import type { Actor, World, WorldOpts } from './types';
 
@@ -55,6 +56,18 @@ export function spawnMonster(
   name: string,
 ): Actor {
   const stats = buildMonster(spec);
+  const def = MONSTER_TYPES[spec.type];
+  // Whatever placed it, a walker never starts where the character cannot reach (in a wall, or outside the map): it is
+  // set down on the nearest spot that can be reached. A flier or phaser may hover over a wall, but not off the map.
+  const walker = !def.flies && !def.movement?.some((s) => s.id === 'phase');
+  const onMap = x >= 0 && y >= 0 && x < w.grid.w && y < w.grid.h;
+  if (walker ? !w.grid.reachable(x, y) : !onMap) {
+    const at = w.grid.nearestReachable(x, y);
+    if (at) {
+      x = at.x;
+      y = at.y;
+    }
+  }
   const a = newActor(w.nextId++, false, x, y, stats.radius);
   a.mon = stats;
   a.def = stats.defence;
@@ -102,6 +115,7 @@ export function createWorld(inp: CreateWorldInput): World {
   const build = { ...inp.build };
   const char = makeCharacter(build, plan);
   const grid = new Grid(plan.lab.w, plan.lab.h, plan.lab.tiles);
+  grid.markReach(plan.lab.start.x, plan.lab.start.y);
   const player = newActor(1, true, plan.lab.start.x, plan.lab.start.y, 0.4);
   const w: World = {
     plan,
@@ -435,8 +449,18 @@ function tickMonsterMods(w: World, m: Actor, dt: number): void {
   if (m.modIds.includes('mirrored') && m.mirrorId === 0) {
     // The twin stands some way off, with everything but the mirror.
     const spec = m.mon!.spec;
-    const ang = w.rngAi.float(0, Math.PI * 2);
-    const pos = w.grid.collide(m.x + Math.cos(ang) * 6, m.y + Math.sin(ang) * 6, 0.5);
+    // Six tiles off at the first angle that is open floor in sight of it (six tiles can be a wall or another room).
+    const ang0 = w.rngAi.float(0, Math.PI * 2);
+    let pos = { x: m.x, y: m.y };
+    for (let k = 0; k < 16; k++) {
+      const ang = ang0 + (k * Math.PI) / 8;
+      const tx = m.x + Math.cos(ang) * 6;
+      const ty = m.y + Math.sin(ang) * 6;
+      if (w.grid.clear(tx, ty) && w.grid.reachable(tx, ty) && w.grid.los(m.x, m.y, tx, ty)) {
+        pos = { x: tx, y: ty };
+        break;
+      }
+    }
     const twin = spawnMonster(
       w,
       { ...spec, mods: spec.mods.filter((id) => id !== 'mirrored') },
@@ -591,6 +615,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickZones(w, dt);
   tickCorpses(w, dt);
   separate(w);
+  tickStranded(w, dt);
   checkExit(w);
   while (w.build.level < MAX_LEVEL && w.xp >= xpToNext(w.build.level)) {
     w.xp -= xpToNext(w.build.level);

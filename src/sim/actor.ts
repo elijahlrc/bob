@@ -107,6 +107,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     phaseMask: 0,
     mirrorId: 0,
     mirrorT: 0,
+    strandT: 0,
     pulseT: 8,
     phases: false,
     mv: newMoveState(),

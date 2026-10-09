@@ -69,9 +69,16 @@ export function dummyDefence(over: Partial<Defence> = {}): Defence {
 /** An open arena with the player and one stationary training dummy `distance` tiles away. */
 export function createDummyWorld(
   build: Build,
-  opts: { distance: number; defence?: Partial<Defence>; seed?: number; maxTime?: number },
+  opts: {
+    distance: number;
+    defence?: Partial<Defence>;
+    seed?: number;
+    maxTime?: number;
+    /** The arena's width and height in tiles (30 by default). */
+    size?: number;
+  },
 ): { world: World; dummy: Actor } {
-  const size = 30;
+  const size = opts.size ?? 30;
   const tiles = new Uint8Array(size * size);
   for (let y = 1; y < size - 1; y++) for (let x = 1; x < size - 1; x++) tiles[y * size + x] = FLOOR;
   const room = {

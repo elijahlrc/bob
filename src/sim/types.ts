@@ -172,6 +172,8 @@ export type Actor = {
   /** A Mirrored monster's twin, and the seconds the survivor has to follow it before it is made whole again. */
   mirrorId: number;
   mirrorT: number;
+  /** Seconds this monster has stood where the character cannot reach it (see strand.ts). */
+  strandT: number;
   /** Seconds to a Warding Pulse. */
   pulseT: number;
   /** Passes through walls at a walk (the Hollow), and the state of its movement style (docs/ROSTER.md 6.3). */

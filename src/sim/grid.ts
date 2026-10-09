@@ -54,6 +54,83 @@ export class Grid {
       }
   }
 
+  /** The floor the character can walk to from where it starts (null until `markReach`: then every floor tile counts). */
+  private reach: Uint8Array | null = null;
+
+  /**
+   * Flood the floor from a point (four ways, as a path goes: A* does not cut corners) and remember which tiles it
+   * touches. Call it once the map is laid out; walls a skill raises later do not change it.
+   */
+  markReach(x: number, y: number): void {
+    const { w, h } = this;
+    const seen = new Uint8Array(w * h);
+    const sx = Math.floor(x);
+    const sy = Math.floor(y);
+    if (this.isFloor(sx, sy)) {
+      const q = [sy * w + sx];
+      seen[q[0]] = 1;
+      for (let head = 0; head < q.length; head++) {
+        const n = q[head];
+        const nx = n % w;
+        const ny = (n - nx) / w;
+        for (let k = 0; k < 4; k++) {
+          const mx = nx + (k === 0 ? 1 : k === 1 ? -1 : 0);
+          const my = ny + (k === 2 ? 1 : k === 3 ? -1 : 0);
+          if (!this.isFloor(mx, my) || seen[my * w + mx]) continue;
+          seen[my * w + mx] = 1;
+          q.push(my * w + mx);
+        }
+      }
+    }
+    this.reach = seen;
+  }
+
+  /** Whether a walker standing here is on floor the character can get to (outside the map, or in a wall, it is not). */
+  reachable(x: number, y: number): boolean {
+    const tx = Math.floor(x);
+    const ty = Math.floor(y);
+    if (!this.isFloor(tx, ty)) return false;
+    return !this.reach || this.reach[ty * this.w + tx] === 1;
+  }
+
+  /**
+   * The nearest spot a walker can stand on and be reached from, searching outward from a point: an open tile if there
+   * is one near, else any reachable floor. Null when the map has no reachable floor at all.
+   */
+  nearestReachable(x: number, y: number): { x: number; y: number } | null {
+    const reach = this.reach;
+    const cx = Math.floor(x);
+    const cy = Math.floor(y);
+    const reachFloor = (tx: number, ty: number) =>
+      this.isFloor(tx, ty) && (!reach || reach[ty * this.w + tx] === 1);
+    const far = Math.max(this.w, this.h);
+    let any: { x: number; y: number } | null = null;
+    let anyD = Infinity;
+    for (let ring = 0; ring <= far; ring++) {
+      let best: { x: number; y: number } | null = null;
+      let bestD = Infinity;
+      for (let ty = cy - ring; ty <= cy + ring; ty++)
+        for (let tx = cx - ring; tx <= cx + ring; tx++) {
+          if (Math.max(Math.abs(tx - cx), Math.abs(ty - cy)) !== ring) continue;
+          if (!reachFloor(tx, ty)) continue;
+          const d = (tx + 0.5 - x) ** 2 + (ty + 0.5 - y) ** 2;
+          if (this.clear(tx + 0.5, ty + 0.5)) {
+            if (d < bestD) {
+              bestD = d;
+              best = { x: tx + 0.5, y: ty + 0.5 };
+            }
+          } else if (d < anyD) {
+            anyD = d;
+            any = { x: tx + 0.5, y: ty + 0.5 };
+          }
+        }
+      // An open tile wins; a tight one (beside a wall) is taken only when no open tile turns up within a few more rings.
+      if (best) return best;
+      if (any && ring > 3) return any;
+    }
+    return any;
+  }
+
   /** Whether a circle of radius one tile or less centred here is clear of every wall (a fast check). */
   clear(x: number, y: number): boolean {
     const tx = Math.floor(x);

@@ -153,7 +153,11 @@ describe('triggers: casting a socketed spell (EXPANSION 5.5)', () => {
 
 describe('triggers: effects on kills, blocks and damage taken', () => {
   function pack(trigger: TriggerDef, n: number, spacing = 0.1) {
-    const { world, dummy } = createDummyWorld(buildFor([trigger], []), { distance: 2 });
+    // A line of n enemies has to fit inside the arena: a monster placed in a wall is set down elsewhere.
+    const { world, dummy } = createDummyWorld(buildFor([trigger], []), {
+      distance: 2,
+      size: Math.max(30, Math.ceil(n * spacing) + 20),
+    });
     dummy.def = dummyDefence({ maxLife: 1000 });
     dummy.life = 1000;
     const others: Actor[] = [];
