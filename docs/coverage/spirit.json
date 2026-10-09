@@ -580,16 +580,16 @@
       "ref": "Storm Burst",
       "name": "Thunder Spiral",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "low",
-      "milestone": "S6",
-      "missing": ["persistent_jumping_orbs", "channel_release_burst"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Channel to release lightning orbs that repeatedly jump toward a target spot; when you stop channelling, all remaining orbs explode for higher damage in a larger area, so you choose when to cash out.",
         "bob": "A rapid burst (0.25 s cast time) on the target with half the physical converted to lightning; averaged into repeated hits with no release explosion.",
         "repair": "Accumulate orbs while the skill is used on a target and detonate them as a larger burst when the target dies or the skill stops."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Storm Burst",
         "status": "corrected",
@@ -2690,16 +2690,16 @@
       "ref": "Winter Orb",
       "name": "Hoarfrost Mote",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S6",
-      "missing": ["channel_ramp", "persistent_summoned_orb", "projectile_from_origin"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Channelled orb above you that pelts the ground with cold projectiles; channelling builds stages (more duration/fire rate) that decay when you stop - commit-to-ramp skill.",
         "bob": "A plain 'burst' nova around the caster at 45% effectiveness, 0.3 s cast, chill. 'channelling' is only a tag in calc/skill.ts (no ramp state); nothing builds up, no orb, no projectiles.",
         "repair": "Add a channel_ramp primitive (stages that rise per use and decay after a gap) that scales hit rate/damage, and use it here."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Winter Orb",
         "status": "confirmed",
@@ -5366,16 +5366,16 @@
       "ref": "Dread Banner",
       "name": "Standard of Dread",
       "kind": "active",
-      "verdict": "drifted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S6",
-      "missing": ["placed_aura_object", "stages_from_kills", "enemy_accuracy_debuff"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Banner: allies impale with attacks, enemies' accuracy is lowered, fortify; grows by stages from impales; carried then placed.",
         "bob": "Timed buff (8 s, cd 6): chance.impale 20, hitTaken more -12 (fortify stand-in), impaleEffect inc. Impale/fortify work in skill.ts; enemy accuracy debuff, stages, carry/place missing.",
         "repair": "Same placed-banner primitive as War Banner, with stages fed by impales."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "Dread Banner",
         "status": "confirmed",
@@ -5392,16 +5392,16 @@
       "ref": "War Banner",
       "name": "Standard of Valour",
       "kind": "active",
-      "verdict": "gutted",
+      "verdict": "faithful",
       "confidence": "medium",
-      "milestone": "S6",
-      "missing": ["placed_aura_object", "stages_from_kills", "enemy_damage_taken_debuff"],
+      "milestone": null,
+      "missing": [],
       "audit": {
         "poe": "Banner: reserves mana while carried, is placed to become a stationary aura that grows by stages from kills; gives allies accuracy and makes enemies take increased physical damage, plus adrenaline.",
         "bob": "Timed buff on the character (8 s, cd 6): inc accuracy and +10% attack, cast and move speed (invented numbers; real mods). No enemy phys-damage debuff, no stages/kill scaling, no carry/place or reservation.",
         "repair": "Make the banner a placed aura (stationary object) with kill-fed stages and an enemy 'physical damage taken' debuff in radius."
       },
-      "verified": false,
+      "verified": true,
       "spec": {
         "page": "War Banner",
         "status": "corrected",

@@ -180,6 +180,9 @@ export function blasphemyOf(c: SkillChoice): { reservePct: number } | undefined 
   return undefined;
 }
 
+/** Seconds between casts of a banner skill, for the share of time it takes (one carried at a time, put down now and then). */
+const BANNER_EVERY = 40;
+
 export type SkillChoice = {
   key: string;
   gemUid: number | null;
@@ -362,6 +365,8 @@ export class Character {
   readonly chargeSource: Record<ChargeKind, boolean>;
   /** Which buffs something can grant (their effects are in the database, behind their conditions), and whether rage. */
   readonly buffSource: Record<BuffId, boolean>;
+  /** Buffs only a banner's placing gives: brief, so the sheet does not count them as up. */
+  readonly briefBuffs = new Set<BuffId>();
   readonly rageSource: boolean;
   /** Whether anything can grant a buff or rage (so the sim can skip rolling when nothing can). */
   readonly anyGain: boolean;
@@ -547,7 +552,15 @@ export class Character {
     for (const slot of EQUIP_SLOTS)
       for (const g of build.equipment[slot]?.sockets ?? []) {
         const gd = g ? gemDef(g.gemId) : null;
-        if (gd?.kind === 'active' && gd.utility?.kind === 'buff') utilBuffs.add(gd.utility.buff);
+        if (gd?.kind === 'active' && gd.utility?.kind === 'buff') {
+          utilBuffs.add(gd.utility.buff);
+          // What a banner gives when it is put down is brief: the sheet does not count it as always up.
+          const pb = gd.utility.banner?.place.buff;
+          if (pb) {
+            utilBuffs.add(pb);
+            if (!buffIdsGranted.has(pb)) this.briefBuffs.add(pb);
+          }
+        }
         // Punishment: a melee hit on the cursed enemy grants a buff.
         if (gd?.kind === 'active' && gd.utility?.kind === 'curse') {
           const mb = HEXES[gd.utility.hex].meleeBuff;
@@ -1087,7 +1100,8 @@ export class Character {
     let m = maskOr(this.cond.peek('hitRecently'), this.cond.peek('usedFlaskRecently'));
     // A buff that something can grant is assumed up, as a charge is assumed held.
     for (const id of BUFF_IDS)
-      if (this.buffSource[id]) m = maskOr(m, this.cond.peek(BUFFS[id].cond));
+      if (this.buffSource[id] && !this.briefBuffs.has(id))
+        m = maskOr(m, this.cond.peek(BUFFS[id].cond));
     if (this.sheetHexes.length) m = maskOr(m, this.cond.peek('targetCursed'));
     for (const h of this.sheetHexes) {
       const c = HEXES[h.id].selfCond;
@@ -1438,7 +1452,9 @@ export class Character {
       const p = this.profile(choice, conds);
       const every =
         u.kind === 'buff'
-          ? (u.cooldown ?? u.seconds * 0.9)
+          ? u.banner
+            ? BANNER_EVERY
+            : (u.cooldown ?? u.seconds * 0.9)
           : u.kind === 'curse'
             ? HEX_SECONDS * 0.9
             : u.kind === 'summon'
@@ -1592,6 +1608,17 @@ export function volleyHits(p: SkillProfile, distance: number): number {
 export function channelMult(p: SkillProfile): number {
   const c = p.skill.channel;
   if (!c) return 1;
+  // An orb's hits come from its own volleys and jumps, at the rate they have once the stages are built and while channelling.
+  const o = p.skill.orb;
+  if (o?.kind === 'frost')
+    return (
+      (o.count *
+        (1 + (o.speedPerStage * c.cap) / 100) *
+        (1 + o.channelMore / 100) *
+        (p.skill.castTime ?? 0.5)) /
+      o.interval
+    );
+  if (o?.kind === 'zap') return Math.max(1, Math.floor(o.seconds / o.jump + 1e-6));
   let total = 0;
   const per = (c.perStage ?? 0) / 100;
   if (c.tick)

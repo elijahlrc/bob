@@ -32,7 +32,8 @@ export type BuffId =
   | 'catStealth'
   | 'avianBoon'
   | 'flickerStep'
-  | 'punisher';
+  | 'punisher'
+  | 'adrenaline';
 export const BUFF_IDS: BuffId[] = [
   'fortify',
   'onslaught',
@@ -60,6 +61,7 @@ export const BUFF_IDS: BuffId[] = [
   'avianBoon',
   'flickerStep',
   'punisher',
+  'adrenaline',
 ];
 
 export type BuffDef = {
@@ -79,6 +81,20 @@ export type BuffDef = {
 const when = (cond: CondId): { condition: { id: CondId } } => ({ condition: { id: cond } });
 
 export const BUFFS: Record<BuffId, BuffDef> = {
+  adrenaline: {
+    id: 'adrenaline',
+    name: 'Adrenaline',
+    seconds: 1,
+    cond: 'adrenaline',
+    text: '100% increased damage, 25% increased attack, cast and movement speed, 10% additional physical damage reduction',
+    mods: [
+      mod('damage', 'inc', 100, when('adrenaline')),
+      mod('attackSpeed', 'inc', 25, when('adrenaline')),
+      mod('castSpeed', 'inc', 25, when('adrenaline')),
+      mod('moveSpeed', 'inc', 25, when('adrenaline')),
+      mod('physReduction', 'base', 10, when('adrenaline')),
+    ],
+  },
   punisher: {
     id: 'punisher',
     name: 'Punisher',

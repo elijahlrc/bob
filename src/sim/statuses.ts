@@ -73,7 +73,9 @@ export function moveFactor(a: Actor): number {
 
 /** What the chance to hit of an attacker is multiplied by: a blinded one misses more. */
 export function hitChanceFactor(a: Actor): number {
-  return a.fx.blind ? 1 - a.fx.blind.v / 100 : 1;
+  let m = a.fx.blind ? 1 - a.fx.blind.v / 100 : 1;
+  if (a.fx.unnerved) m *= 1 - a.fx.unnerved.v / 100;
+  return m;
 }
 
 /** Points (fraction) off an enemy's chance to block: Overpowered, each stack. */
@@ -94,6 +96,7 @@ export function statusTaken(a: Actor): { res: number[]; vulnType: number[] } {
     if (type !== undefined && s) res[type] += s.v;
   }
   if (fx.maim) vulnType[0] += fx.maim.x / 100;
+  if (fx.scarred) vulnType[0] += fx.scarred.v / 100;
   if (fx.withered) vulnType[4] += (fx.withered.n * fx.withered.v) / 100;
   return { res, vulnType };
 }

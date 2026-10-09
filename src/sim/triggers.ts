@@ -1,4 +1,5 @@
 import type { SkillChoice } from '../calc/character';
+import { reservedMana } from './reserve';
 import type { TriggerDef, TriggerEffect } from '../data/triggers';
 import { DAMAGE_TYPES, maskSubset, tagBit, type DamageType } from '../mods/types';
 import { fire } from './actions';
@@ -230,7 +231,7 @@ function sacrifice(w: World, e: Extract<TriggerEffect, { kind: 'sacrifice' }>): 
   if (amount <= 0) return false;
   p.life -= amount;
   if (e.pool === 'es') p.es = Math.min(p.def.maxEs, p.es + amount);
-  else p.mana = Math.min(p.def.maxMana - w.char.reservedMana, p.mana + amount);
+  else p.mana = Math.min(p.def.maxMana - reservedMana(w), p.mana + amount);
   return true;
 }
 
@@ -240,7 +241,7 @@ function recover(w: World, e: Extract<TriggerEffect, { kind: 'recover' }>): bool
   if (amount <= 0) return false;
   if (e.pool === 'life') p.life = Math.min(lifeCap(w, p), p.life + amount);
   else if (e.pool === 'es') p.es = Math.min(p.def.maxEs, p.es + amount);
-  else p.mana = Math.min(p.def.maxMana - w.char.reservedMana, p.mana + amount);
+  else p.mana = Math.min(p.def.maxMana - reservedMana(w), p.mana + amount);
   return true;
 }
 

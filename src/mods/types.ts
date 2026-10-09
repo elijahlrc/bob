@@ -154,6 +154,7 @@ export const CONDITIONS = [
   'infernalCry',
   'warBanner',
   'dreadBanner',
+  'adrenaline',
   'witherStep',
   'berserk',
   'regenTotem',

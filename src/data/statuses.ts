@@ -16,7 +16,9 @@ export type StatusId =
   | 'exposedFire'
   | 'overpowered'
   | 'doomed'
-  | 'regenLess';
+  | 'regenLess'
+  | 'scarred'
+  | 'unnerved';
 
 export const STATUS_IDS: StatusId[] = [
   'hinder',
@@ -32,6 +34,8 @@ export const STATUS_IDS: StatusId[] = [
   'overpowered',
   'doomed',
   'regenLess',
+  'scarred',
+  'unnerved',
 ];
 
 export type StatusDef = {
@@ -143,6 +147,22 @@ export const STATUSES: Record<StatusId, StatusDef> = {
     v: 75,
     max: 1,
     text: '{v}% reduced life and energy shield regeneration',
+  },
+  scarred: {
+    id: 'scarred',
+    name: 'Scarred',
+    seconds: 0.6,
+    v: 8,
+    max: 1,
+    text: '{v}% increased physical damage taken',
+  },
+  unnerved: {
+    id: 'unnerved',
+    name: 'Unnerved',
+    seconds: 0.6,
+    v: 15,
+    max: 1,
+    text: '{v}% less accuracy',
   },
   doomed: {
     id: 'doomed',

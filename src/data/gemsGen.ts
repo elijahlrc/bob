@@ -2496,8 +2496,21 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     types: ['totemable'],
     behaviour: {
       kind: 'burst',
-      radius: 2.4,
-      reach: 5,
+      radius: 1.2,
+      reach: 8,
+    },
+    channel: {
+      cap: 999,
+      tick: false,
+    },
+    orb: {
+      kind: 'zap',
+      seconds: 1.2,
+      jump: 0.4,
+      radius: 1.2,
+      releaseRadius: 2.2,
+      spread: 2,
+      releaseMore: 75,
     },
     spellDamage: [
       {
@@ -2505,7 +2518,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         spread: [0.8, 1.2],
       },
     ],
-    effectiveness: 60,
+    effectiveness: 25,
     castTime: 0.25,
     crit: 6,
     cost: [2, 5],
@@ -2516,7 +2529,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         value: 50,
       },
     ],
-    description: 'A storm of lightning balls that jump about the target place while you channel.',
+    description:
+      'Channel to send orbs of lightning jumping about the target place; let go and they all burst.',
   },
   {
     kind: 'active',
@@ -2845,8 +2859,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     types: ['totemable', 'orb'],
     behaviour: {
       kind: 'burst',
-      radius: 2.4,
-      origin: 'self',
+      radius: 2.2,
+      reach: 7,
+    },
+    channel: {
+      cap: 10,
+      tick: false,
+    },
+    orb: {
+      kind: 'frost',
+      seconds: 1.2,
+      secondsPerStage: 25,
+      interval: 1.6,
+      speedPerStage: 15,
+      channelMore: 100,
+      count: 3,
+      radius: 1.8,
+      range: 7,
     },
     spellDamage: [
       {
@@ -2854,10 +2883,10 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         spread: [0.8, 1.2],
       },
     ],
-    effectiveness: 45,
-    castTime: 0.3,
+    effectiveness: 50,
+    castTime: 0.25,
     crit: 6,
-    cost: [3, 9],
+    cost: [2, 4],
     mods: [
       {
         stat: 'effect.chill',
@@ -2865,7 +2894,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         value: 20,
       },
     ],
-    description: 'A mote of frost that follows you and pulses cold as long as you hold it.',
+    description:
+      'Channel to hold an orb of frost over you that pelts the enemies near with exploding ice; the longer you channel, the longer it lasts and the faster it fires.',
   },
   {
     kind: 'active',
@@ -3259,46 +3289,52 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Standard of Valour',
     attr: 'str',
     skillType: 'spell',
-    tags: ['spell', 'warcry', 'duration', 'area'],
+    tags: ['spell', 'duration', 'area'],
     types: ['triggerable'],
     behaviour: {
       kind: 'burst',
       radius: 3,
       origin: 'self',
     },
-    castTime: 0.6,
-    cost: [8, 14],
+    castTime: 0.5,
+    cost: [0, 0],
     mods: [],
     utility: {
       kind: 'buff',
       buff: 'warBanner',
-      seconds: 8,
-      policy: 'rally',
-      cooldown: 6,
+      seconds: 10,
+      policy: 'banner',
+      cooldown: 1,
+      banner: {
+        radius: 4.5,
+        reservePct: 10,
+        placedSeconds: 10,
+        stageOn: 'kill',
+        maxStages: 50,
+        perStage: {
+          area: 8,
+          effect: 1,
+          seconds: 1,
+        },
+        enemy: {
+          id: 'scarred',
+          v: [8, 11],
+        },
+        place: {
+          buff: 'adrenaline',
+          secondsPerStage: 0.05,
+        },
+      },
       mods: [
         {
           stat: 'accuracy',
           kind: 'inc',
           value: [15, 21],
         },
-        {
-          stat: 'attackSpeed',
-          kind: 'inc',
-          value: 10,
-        },
-        {
-          stat: 'castSpeed',
-          kind: 'inc',
-          value: 10,
-        },
-        {
-          stat: 'moveSpeed',
-          kind: 'inc',
-          value: 10,
-        },
       ],
     },
-    description: 'Plants a banner that quickens you while it stands.',
+    description:
+      'Carry a banner that gives stages for each kill, then put it down: it stands for a while and the enemies near it take more physical damage.',
   },
   {
     kind: 'active',
@@ -3306,32 +3342,47 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Standard of Dread',
     attr: 'str',
     skillType: 'spell',
-    tags: ['spell', 'warcry', 'duration', 'area'],
+    tags: ['spell', 'duration', 'area'],
     types: ['triggerable'],
     behaviour: {
       kind: 'burst',
       radius: 3,
       origin: 'self',
     },
-    castTime: 0.6,
-    cost: [8, 14],
+    castTime: 0.5,
+    cost: [0, 0],
     mods: [],
     utility: {
       kind: 'buff',
       buff: 'dreadBanner',
-      seconds: 8,
-      policy: 'rally',
-      cooldown: 6,
+      seconds: 10,
+      policy: 'banner',
+      cooldown: 1,
+      banner: {
+        radius: 4.5,
+        reservePct: 10,
+        placedSeconds: 10,
+        stageOn: 'impale',
+        maxStages: 50,
+        perStage: {
+          area: 8,
+          effect: 1,
+          seconds: 1,
+        },
+        enemy: {
+          id: 'unnerved',
+          v: [15, 21],
+        },
+        place: {
+          buff: 'fortify',
+          secondsPerStage: 0.05,
+        },
+      },
       mods: [
         {
           stat: 'chance.impale',
           kind: 'base',
           value: 20,
-        },
-        {
-          stat: 'hitTaken',
-          kind: 'more',
-          value: -12,
         },
         {
           stat: 'impaleEffect',
@@ -3340,7 +3391,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         },
       ],
     },
-    description: 'Plants a banner that leaves your hits impaling and your body fortified.',
+    description:
+      'Carry a banner that gives stages for each impale, then put it down: it stands for a while and the enemies near it hit less often.',
   },
   {
     kind: 'active',

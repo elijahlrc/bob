@@ -2,6 +2,7 @@ import { skillRange, type SkillChoice } from '../calc/character';
 import type { SkillProfile } from '../calc/skill';
 import { hexEffect } from '../data/hexes';
 import { actorById } from './actions';
+import { bannerAction, useBanner } from './banners';
 import { levelValue } from '../calc/gems';
 import { gainBuff } from './buffs';
 import { applyStatus } from './statuses';
@@ -56,6 +57,10 @@ export function chooseUtility(w: World, target: Actor): UtilityPick | null {
     if (u.kind === 'buff' && u.policy === 'guard' && (w.utilityReady[GUARDS] ?? 0) > w.t) continue;
     const prof = ch.profile(c, conds, flaskMask(w));
     if (!canPay(w, c.costsLife, prof.cost)) continue;
+    if (u.kind === 'buff' && u.banner) {
+      if (!bannerAction(w, c, target)) continue;
+      return { choice: c, prof, cd: u.cooldown ?? 1 };
+    }
     if (u.kind === 'buff') {
       if (d > CAST_RANGE + 1) continue;
       const left = w.buffT[u.buff];
@@ -149,6 +154,10 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
           levelValue(s.perNearby ?? 0, c.skill.level) * (near.length - 1);
         applyStatus(w, e, s.id, { seconds: s.seconds * w.char.db.mult('buffDuration'), v, x: s.x });
       }
+    return;
+  }
+  if (u.kind === 'buff' && u.banner) {
+    useBanner(w, c, act.profile.radiusMult);
     return;
   }
   if (u.kind === 'buff') {

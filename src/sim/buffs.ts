@@ -11,6 +11,7 @@ import {
   type BuffEvent,
   type BuffId,
 } from '../data/buffs';
+import { reservedMana } from './reserve';
 import type { Mod } from '../mods/types';
 import { sumOf } from './charges';
 import { lifeCap } from './combat';
@@ -58,7 +59,7 @@ export function rollGains(w: World, event: BuffEvent, extra: readonly Mod[] = []
     const amount = flat + (pct / 100) * max;
     if (pool === 'life') p.life = Math.min(lifeCap(w, p), p.life + amount);
     else if (pool === 'mana')
-      p.mana = Math.min(Math.max(0, p.def.maxMana - ch.reservedMana), p.mana + amount);
+      p.mana = Math.min(Math.max(0, p.def.maxMana - reservedMana(w)), p.mana + amount);
     else p.es = Math.min(p.def.maxEs, p.es + amount);
   }
   // Being hit holds the rage you have, as gaining it does.

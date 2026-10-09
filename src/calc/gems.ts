@@ -126,6 +126,35 @@ export type SkillDef = {
       repeat?: boolean;
     };
   };
+  /** Orbs a channelled skill leaves standing (docs/SPIRIT.md S6). */
+  orb?:
+    | {
+        /** An orb over the character that pelts the ground around with explosions; the stages built lengthen it and quicken it. */
+        kind: 'frost';
+        seconds: number;
+        /** Percent longer for each stage built. */
+        secondsPerStage: number;
+        /** Seconds between volleys at no stages, the percent faster for each stage, and the percent more often while channelling. */
+        interval: number;
+        speedPerStage: number;
+        channelMore: number;
+        /** Explosions in a volley, the radius of each, and how far from the character they land. */
+        count: number;
+        radius: number;
+        range: number;
+      }
+    | {
+        /** An orb for each use that jumps about the target place, exploding after each jump; when the channel ends the rest explode, harder. */
+        kind: 'zap';
+        seconds: number;
+        /** Seconds between jumps, the radius of a jump's blast and of the final one, how far from the target place an orb lands. */
+        jump: number;
+        radius: number;
+        releaseRadius: number;
+        spread: number;
+        /** Percent more damage on the final blast for each jump the orb still had left. */
+        releaseMore: number;
+      };
   /** Ground the skill leaves where it lands (docs/SPIRIT.md S6). */
   leaves?: {
     kind: 'consecrated' | 'chilling';
@@ -252,6 +281,7 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     channel: def.channel,
     stacks: def.stacks,
     leaves: def.leaves,
+    orb: def.orb,
     crystal: def.crystal,
     wall: def.wall,
     aftershock: def.aftershock,

@@ -713,7 +713,7 @@
   "brimstoneStorm": {
    "ref": "Storm Burst",
    "status": "covered",
-   "note": "A channelled storm that fires jumping lightning orbs around the caster (averaged into repeated bursts)."
+   "note": "While channelling, each use makes an orb at a spot near the target place; for 1.2 s it jumps about the place every 0.4 s, exploding in a small area after each jump. Let go, and every orb left explodes in a larger area, for 75% more damage for each jump it still had."
   },
   "bladeWind": {
    "ref": "Swordstorm",
@@ -763,7 +763,7 @@
   "hoarfrostMote": {
    "ref": "Winter Orb",
    "status": "covered",
-   "note": "A channelled orb of cold that grows stronger the longer it is held (averaged), pulsing around the caster."
+   "note": "A channelled orb that hangs over the character and pelts the ground around with cold explosions. Each use builds a stage (ten at most); stages lengthen the orb by a quarter and quicken its volleys by 15%, and channelling doubles the rate. Let go, and the stages fade over what is left of the orb's time."
   },
   "rotTouch": {
    "ref": "Wither",
@@ -968,12 +968,12 @@
   "standardOfValour": {
    "ref": "War Banner",
    "status": "covered",
-   "note": "A banner that gives more accuracy and the character's speed and damage a lift for as long as it stands (modelled as a timed buff, recast when it ends; the stages are averaged)."
+   "note": "A banner you carry (it holds a tenth of your mana) and put down: while it is up its aura raises the accuracy of you and your allies near it and makes the enemies near it take more physical damage. Each kill while you carry it gives a stage; when it is put down each stage widens it, strengthens it and lengthens it, and gives you a moment of Adrenaline. One banner at a time."
   },
   "standardOfDread": {
    "ref": "Dread Banner",
    "status": "covered",
-   "note": "A banner that makes the character's hits impale and gives a fortifying effect (modelled as a timed buff of impale chance and less damage taken from hits)."
+   "note": "A banner you carry (it holds a tenth of your mana) and put down: while it is up its aura gives you and your allies near it a chance to impale and makes the enemies near it less accurate. Each impale while you carry it gives a stage (five a second at most); when it is put down each stage widens it, strengthens it and lengthens it, and gives you a moment of Fortify. One banner at a time."
   },
   "ironHide": {
    "ref": "Steelskin",

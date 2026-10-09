@@ -6,6 +6,7 @@ import {
   type HitResult,
   type TargetState,
 } from '../calc/combat';
+import { reservedMana } from './reserve';
 import { levelPenalty } from '../calc/formulas';
 import { abilitiesOf } from '../data/abilities';
 import type { SkillProfile } from '../calc/skill';
@@ -27,6 +28,7 @@ import { BUFFS, BUFF_IDS, DYN_SHIFT } from '../data/buffs';
 import { MONSTER_CONDS, scaleOf } from '../calc/monster';
 import { AURA_CONDS, WIELD_CONDS } from '../calc/staticConds';
 import { maskIntersects, maskOr, tagBit, type CondId, type Mod } from '../mods/types';
+import { bannerStage } from './banners';
 import { rollGains } from './buffs';
 import { gainTrophy, rollCharges } from './charges';
 import { ALL_HEX_IDS, HEXES } from '../data/hexes';
@@ -75,7 +77,7 @@ const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
   beenHitRecently: (_w, p) => p.tBeenHit < RECENT,
   leeching: (_w, p) => p.leechLife.length > 0,
   esFull: (_w, p) => p.def.maxEs > 0 && p.es >= p.def.maxEs - 0.5,
-  onLowMana: (w, p) => p.mana <= Math.max(1, p.def.maxMana - w.char.reservedMana) * LOW_LIFE,
+  onLowMana: (w, p) => p.mana <= Math.max(1, p.def.maxMana - reservedMana(w)) * LOW_LIFE,
   cursed: (_w, p) => p.hexes.length > 0,
   stationary: (_w, p) => !p.moving,
   ignited: (_w, p) => p.ail.ignites.length > 0,
@@ -170,8 +172,8 @@ export function refreshPlayerDefence(w: World): void {
   const cap = lifeCap(w, p);
   if (p.life > cap) p.life = cap;
   if (p.es > p.def.maxEs) p.es = p.def.maxEs;
-  if (p.mana > p.def.maxMana - w.char.reservedMana)
-    p.mana = Math.max(0, p.def.maxMana - w.char.reservedMana);
+  if (p.mana > p.def.maxMana - reservedMana(w))
+    p.mana = Math.max(0, p.def.maxMana - reservedMana(w));
 }
 
 export function targetState(a: Actor): TargetState {
@@ -364,7 +366,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (p.lifeOnHit > 0) src.life = Math.min(lifeCap(w, src), src.life + p.lifeOnHit);
   if (p.esOnHit > 0 && src.isPlayer) src.es = Math.min(src.def.maxEs, src.es + p.esOnHit);
   if (p.manaOnHit > 0 && src.isPlayer)
-    src.mana = Math.min(Math.max(0, src.def.maxMana - w.char.reservedMana), src.mana + p.manaOnHit);
+    src.mana = Math.min(Math.max(0, src.def.maxMana - reservedMana(w)), src.mana + p.manaOnHit);
 
   const wasAlive = dst.alive;
   if (src.isPlayer) applyPlayerHexes(w, dst);
@@ -591,6 +593,7 @@ function recordImpale(w: World, dst: Actor, p: SkillProfile, res: HitResult): vo
   if (imp.chance <= 0 || !dst.alive || (res.rawPhys ?? 0) <= 0) return;
   if (!w.rngCombat.chance(imp.chance)) return;
   dst.impales.push({ dmg: (res.rawPhys ?? 0) * imp.share, hits: imp.hits });
+  bannerStage(w, 'impale');
   while (dst.impales.length > imp.max) dst.impales.shift();
 }
 
@@ -689,6 +692,7 @@ export function killActor(w: World, a: Actor): void {
     rollCharges(w, 'kill', gains);
     if (a.ail.freezeT > 0) rollCharges(w, 'killFrozen', gains);
     rollGains(w, 'kill', gains);
+    bannerStage(w, 'kill');
   }
   if (!a.isPlayer && a.rarity === 'rare') gainTrophy(w, a.modIds);
   if (a.isPlayer) {
@@ -722,7 +726,7 @@ export function killActor(w: World, a: Actor): void {
       (w.char.db.sum('base', 'lifeOnKillPct') / 100) * p.def.maxLife;
     if (lok > 0) p.life = Math.min(lifeCap(w, p), p.life + lok);
     const mok = w.char.db.sum('base', 'manaOnKill');
-    if (mok > 0) p.mana = Math.min(p.def.maxMana - w.char.reservedMana, p.mana + mok);
+    if (mok > 0) p.mana = Math.min(p.def.maxMana - reservedMana(w), p.mana + mok);
     if (w.opts.loot) {
       for (const item of w.opts.loot(w, a)) {
         const id = w.nextId++;
@@ -908,7 +912,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     else a.life = Math.min(cap, a.life + regen * dt);
   }
   if (a.isPlayer && !suppressed) {
-    const manaCap = Math.max(0, def.maxMana - w.char.reservedMana);
+    const manaCap = Math.max(0, def.maxMana - reservedMana(w));
     a.mana = Math.min(manaCap, a.mana + def.manaRegen * dt);
     leechTick(
       a.leechMana,

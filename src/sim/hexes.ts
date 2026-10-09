@@ -8,6 +8,7 @@ import {
   hexTotals,
   type HexId,
 } from '../data/hexes';
+import { reservedMana } from './reserve';
 import { gainBuff } from './buffs';
 import { gainCharge } from './charges';
 import { lifeCap } from './combat';
@@ -81,7 +82,7 @@ export function hexHit(w: World, dst: Actor, melee = false): void {
     if (give.life) p.life = Math.min(lifeCap(w, p), p.life + atLevel(give.life, h.level));
     if (give.mana)
       p.mana = Math.min(
-        Math.max(0, p.def.maxMana - w.char.reservedMana),
+        Math.max(0, p.def.maxMana - reservedMana(w)),
         p.mana + atLevel(give.mana, h.level),
       );
   }
@@ -100,7 +101,7 @@ export function hexKill(w: World, dead: Actor): number {
     if (give.life) p.life = Math.min(lifeCap(w, p), p.life + atLevel(give.life, h.level));
     if (give.mana)
       p.mana = Math.min(
-        Math.max(0, p.def.maxMana - w.char.reservedMana),
+        Math.max(0, p.def.maxMana - reservedMana(w)),
         p.mana + atLevel(give.mana, h.level),
       );
     if (give.charge && w.rngTrig.chance(atLevel(give.charge.chance, h.level) / 100))

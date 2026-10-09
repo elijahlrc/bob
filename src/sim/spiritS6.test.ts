@@ -5,7 +5,9 @@ import { newRun } from '../run/run';
 import { gainCharge } from './charges';
 import { killActor } from './combat';
 import { createDummyWorld, dummyDefence } from './dummy';
+import { bannerStage } from './banners';
 import { consecratedAt } from './fields';
+import { reservedMana } from './reserve';
 import type { Actor, World } from './types';
 import { spawnMonster, stepWorld } from './world';
 
@@ -232,5 +234,180 @@ describe('Herald of Thunder (stormHerald)', () => {
     expect(world.fields.some((f) => f.kind === 'storm')).toBe(true);
     for (let i = 0; i < 3 * 60; i++) stepWorld(world);
     expect(other.life).toBeLessThan(1e9);
+  });
+});
+
+describe('banners (standardOfValour, standardOfDread)', () => {
+  const carried = (gem: string) => {
+    const b = holding('sword_3', ['crushingBlow'], 'vanguard', [gem]);
+    const run = createDummyWorld(b, { distance: 4, maxTime: 120 });
+    run.world.opts.freeResources = true;
+    for (let i = 0; i < 3 * 60 && !run.world.banner; i++) stepWorld(run.world);
+    return run;
+  };
+
+  it('is carried first: it holds mana, and its aura works on the character and the enemies near', () => {
+    const { world, dummy } = carried('standardOfValour');
+    expect(world.banner).not.toBeNull();
+    expect(world.banner!.placed).toBe(false);
+    expect(reservedMana(world)).toBeGreaterThan(world.char.reservedMana);
+    for (let i = 0; i < 30; i++) stepWorld(world);
+    expect(world.buffT.warBanner).toBeGreaterThan(0);
+    expect(dummy.fx.scarred).toBeDefined();
+  });
+
+  it('gains a stage for each kill, then is put down: the stages widen it, lengthen it and give Adrenaline', () => {
+    const { world } = carried('standardOfValour');
+    const b = world.banner!;
+    for (let i = 0; i < 12; i++) {
+      const m = neighbour(world, world.player.x + 3, world.player.y);
+      m.life = 1;
+      killActor(world, m);
+    }
+    // Two more stand about, so it is a fight.
+    neighbour(world, world.player.x + 2, world.player.y + 1);
+    neighbour(world, world.player.x + 2, world.player.y - 1);
+    expect(b.stages).toBe(12);
+    const r0 = b.r0;
+    let guard = 0;
+    while (!b.placed && guard++ < 10 * 60) stepWorld(world);
+    expect(b.placed).toBe(true);
+    expect(b.radius).toBeCloseTo(r0 * (1 + 0.08 * b.stages), 5);
+    expect(b.t).toBeGreaterThan(10 + b.stages - 1);
+    expect(world.buffT.adrenaline).toBeGreaterThan(0.05 * b.stages - 0.5);
+    // Mana is free again, and the banner ends in time.
+    expect(reservedMana(world)).toBe(world.char.reservedMana);
+    const left = Math.ceil((b.t + 1) * 60);
+    for (let i = 0; i < left; i++) stepWorld(world);
+    expect(world.banner === null || world.banner !== b).toBe(true);
+  });
+
+  it('works only where it stands once it is down', () => {
+    const { world } = carried('standardOfValour');
+    for (let i = 0; i < 12; i++) {
+      const m = neighbour(world, world.player.x + 3, world.player.y);
+      m.life = 1;
+      killActor(world, m);
+    }
+    neighbour(world, world.player.x + 2, world.player.y + 1);
+    neighbour(world, world.player.x + 2, world.player.y - 1);
+    let guard = 0;
+    while (!world.banner!.placed && guard++ < 10 * 60) stepWorld(world);
+    const b = world.banner!;
+    world.player.x = b.x + b.radius + 3;
+    world.player.stunT = 1e9;
+    const far = neighbour(world, b.x + b.radius + 6, b.y);
+    const near = neighbour(world, b.x + 1, b.y);
+    for (let i = 0; i < 30; i++) stepWorld(world);
+    expect(near.fx.scarred).toBeDefined();
+    expect(far.fx.scarred).toBeUndefined();
+    expect(world.buffT.warBanner).toBe(0);
+  });
+
+  it('the dread banner takes its stages from impales, five a second at most, and unnerves enemies', () => {
+    const { world, dummy } = carried('standardOfDread');
+    const b = world.banner!;
+    for (let i = 0; i < 12; i++) bannerStage(world, 'impale');
+    expect(b.stages).toBe(5);
+    for (let i = 0; i < 30; i++) stepWorld(world);
+    expect(dummy.fx.unnerved).toBeDefined();
+    // Kills give nothing to this one.
+    const m = neighbour(world, world.player.x + 3, world.player.y);
+    m.life = 1;
+    killActor(world, m);
+    expect(b.stages).toBe(5);
+  });
+});
+
+describe('Winter Orb (hoarfrostMote)', () => {
+  const orbWorld = () => {
+    const run = createDummyWorld(holding('wand_3', ['hoarfrostMote'], 'mystic'), {
+      distance: 4,
+      maxTime: 60,
+    });
+    run.world.opts.freeResources = true;
+    return run;
+  };
+
+  it('hangs over the character, builds stages while channelled and pelts the enemies near', () => {
+    const { world, dummy } = orbWorld();
+    let hits = 0;
+    for (let i = 0; i < 4 * 60; i++) {
+      stepWorld(world);
+      for (const e of world.events) if (e.t === 'hit' && e.dst === dummy.id) hits++;
+    }
+    const orb = world.fields.find((f) => f.kind === 'orb');
+    expect(orb).toBeDefined();
+    expect(orb!.stages).toBeGreaterThanOrEqual(5);
+    expect(hits).toBeGreaterThan(8);
+    expect(orb!.x).toBeCloseTo(world.player.x, 5);
+  });
+
+  it('keeps going after the channel ends, and its stages fade with its time', () => {
+    const { world, dummy } = orbWorld();
+    for (let i = 0; i < 4 * 60; i++) stepWorld(world);
+    const orb = world.fields.find((f) => f.kind === 'orb')!;
+    const held = orb.stages!;
+    world.player.stunT = 1e9;
+    let hits = 0;
+    for (let i = 0; i < 60; i++) {
+      stepWorld(world);
+      for (const e of world.events) if (e.t === 'hit' && e.dst === dummy.id) hits++;
+    }
+    expect(world.channel).toBeNull();
+    expect(hits).toBeGreaterThan(0);
+    expect(orb.stages!).toBeLessThan(held);
+    for (let i = 0; i < 8 * 60; i++) stepWorld(world);
+    expect(world.fields.some((f) => f.kind === 'orb')).toBe(false);
+  });
+
+  it('fires faster with stages and faster still while channelled', () => {
+    const { world } = orbWorld();
+    const spec = (): number => {
+      const o = world.fields.find((f) => f.kind === 'orb')!;
+      return o.stages ?? 0;
+    };
+    for (let i = 0; i < 90; i++) stepWorld(world);
+    const early = spec();
+    for (let i = 0; i < 3 * 60; i++) stepWorld(world);
+    expect(spec()).toBeGreaterThan(early);
+  });
+});
+
+describe('Storm Burst (brimstoneStorm)', () => {
+  const stormWorld = () => {
+    const run = createDummyWorld(holding('wand_3', ['brimstoneStorm'], 'mystic'), {
+      distance: 4,
+      maxTime: 60,
+    });
+    run.world.opts.freeResources = true;
+    return run;
+  };
+
+  it('makes an orb for each use, and each jumps about the target place blasting after every jump', () => {
+    const { world, dummy } = stormWorld();
+    let max = 0;
+    let hits = 0;
+    for (let i = 0; i < 3 * 60; i++) {
+      stepWorld(world);
+      max = Math.max(max, world.fields.filter((f) => f.kind === 'zap').length);
+      for (const e of world.events) if (e.t === 'hit' && e.dst === dummy.id) hits++;
+    }
+    expect(max).toBeGreaterThanOrEqual(3);
+    expect(hits).toBeGreaterThan(5);
+  });
+
+  it('lets every orb left explode, wider and harder, when the channel ends', () => {
+    const { world } = stormWorld();
+    for (let i = 0; i < 2 * 60; i++) stepWorld(world);
+    const zaps = world.fields.filter((f) => f.kind === 'zap');
+    expect(zaps.length).toBeGreaterThan(0);
+    const spec = zaps[0].profile!.skill.orb!;
+    world.player.stunT = 1e9;
+    let widest = 0;
+    stepWorld(world);
+    for (const e of world.events) if (e.t === 'explode') widest = Math.max(widest, e.r);
+    expect(widest).toBeGreaterThanOrEqual(spec.kind === 'zap' ? spec.releaseRadius : 99);
+    expect(world.fields.some((f) => f.kind === 'zap')).toBe(false);
   });
 });

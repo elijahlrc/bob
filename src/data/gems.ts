@@ -81,7 +81,7 @@ export type UtilityDef =
       kind: 'buff';
       buff: BuffId;
       seconds: number;
-      policy: 'upkeep' | 'guard' | 'rally';
+      policy: 'upkeep' | 'guard' | 'rally' | 'banner';
       cooldown?: number;
       /** Spends charges when cast: up to `max` of them, each lengthening the buff and cutting the physical damage taken. */
       consume?: {
@@ -89,6 +89,23 @@ export type UtilityDef =
         max: number;
         durationPct: number;
         physLess: number;
+      };
+      /** A banner (docs/SPIRIT.md S6): cast once to carry it, cast again to put it down. */
+      banner?: {
+        /** Radius of its aura in tiles, before area modifiers. */
+        radius: number;
+        /** The share of maximum mana held while it is carried. */
+        reservePct: number;
+        /** Seconds it stands once put down, before the stages. */
+        placedSeconds: number;
+        stageOn: 'kill' | 'impale';
+        maxStages: number;
+        /** What each stage adds once it is down: area, aura effect (percent) and seconds. */
+        perStage: { area: number; effect: number; seconds: number };
+        /** Put on the enemies in the aura: the status and its magnitude. */
+        enemy: { id: StatusId; v: LevelValue };
+        /** Put down: a buff for so many seconds a stage, its effect rising by `effectPerStage` percent a stage. */
+        place: { buff: BuffId; secondsPerStage: number };
       };
       /** What the buff does while it lasts (the buff's condition is added to each). */
       mods: GemMod[];
@@ -189,6 +206,35 @@ export type ActiveGemDef = {
     };
   };
   /** A strike that, when it lands, sends more out: bolts from the weapon, blades from behind the enemy, balls that land and burst. */
+  /** Orbs a channelled skill leaves standing (docs/SPIRIT.md S6). */
+  orb?:
+    | {
+        /** An orb over the character that pelts the ground around with explosions; the stages built lengthen it and quicken it. */
+        kind: 'frost';
+        seconds: number;
+        /** Percent longer for each stage built. */
+        secondsPerStage: number;
+        /** Seconds between volleys at no stages, the percent faster for each stage, and the percent more often while channelling. */
+        interval: number;
+        speedPerStage: number;
+        channelMore: number;
+        /** Explosions in a volley, the radius of each, and how far from the character they land. */
+        count: number;
+        radius: number;
+        range: number;
+      }
+    | {
+        /** An orb for each use that jumps about the target place, exploding after each jump; when the channel ends the rest explode, harder. */
+        kind: 'zap';
+        seconds: number;
+        /** Seconds between jumps, the radius of a jump's blast and of the final one, how far from the target place an orb lands. */
+        jump: number;
+        radius: number;
+        releaseRadius: number;
+        spread: number;
+        /** Percent more damage on the final blast for each jump the orb still had left. */
+        releaseMore: number;
+      };
   /** Ground the skill leaves where it lands (docs/SPIRIT.md S6). */
   leaves?: {
     kind: 'consecrated' | 'chilling';

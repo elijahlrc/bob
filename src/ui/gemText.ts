@@ -1,5 +1,6 @@
 import { gemAttrReq, gemMods, levelValue, spellDamageAt } from '../calc/gems';
 import { GEM_LEVEL_REQ, type ActiveGemDef, type GemDef, type SkillBehaviour } from '../data/gems';
+import { BUFFS } from '../data/buffs';
 import { HEXES, hexEffect, hexSeconds, hexText } from '../data/hexes';
 import { STATUSES } from '../data/statuses';
 import { MINIONS } from '../data/minions';
@@ -44,6 +45,7 @@ const POLICY_TEXT = {
   upkeep: 'Cast again when it ends, while enemies are near',
   guard: 'Cast when your life is low',
   rally: 'Cast when a pack or a strong enemy is near',
+  banner: 'Carried as soon as enemies are near; put down once it holds stages and a fight is on',
 } as const;
 
 /** What a utility skill (a curse, a buff, a summon, a blink) does, in plain lines. */
@@ -68,6 +70,24 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
         }),
       ],
     };
+  if (u.kind === 'buff' && u.banner) {
+    const b = u.banner;
+    const d = STATUSES[b.enemy.id];
+    const per = b.perStage;
+    return {
+      stats: [
+        `Carry it, holding ${num(b.reservePct)}% of your mana; cast again to put it down for ${num(b.placedSeconds)} s`,
+        `Gains a stage for each ${b.stageOn === 'kill' ? 'kill' : 'impale'} while carried, up to ${b.maxStages}`,
+        `Each stage: ${num(per.area)}% more area, ${num(per.effect)}% more effect, ${num(per.seconds)} s longer once put down`,
+        POLICY_TEXT.banner,
+      ],
+      effects: [
+        ...modsText(gemMods(u.mods, level, def.id)),
+        `Enemies near it: ${d.text.replace('{v}', num(levelValue(b.enemy.v, level)))}`,
+        `Putting it down gives ${BUFFS[b.place.buff].name} for ${num(b.place.secondsPerStage)} s for each stage`,
+      ],
+    };
+  }
   if (u.kind === 'buff')
     return {
       stats: [

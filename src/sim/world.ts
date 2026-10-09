@@ -21,7 +21,9 @@ import { BUFF_IDS, type BuffId } from '../data/buffs';
 import { rollGains, tickBuffs } from './buffs';
 import { tickCooldowns } from './cooldowns';
 import { tickChannel } from './channel';
+import { tickBanner } from './banners';
 import { tickFields } from './fields';
+import { reservedMana } from './reserve';
 import { tickShots } from './shots';
 import { tickDeployables } from './deploy';
 import { tickMinions } from './minions';
@@ -133,6 +135,7 @@ export function createWorld(inp: CreateWorldInput): World {
     projectiles: [],
     shots: [],
     fields: [],
+    banner: null,
     channel: null,
     stacks: null,
     hitsLanded: 0,
@@ -305,7 +308,7 @@ function tickFlasks(w: World, dt: number, policy: FlaskPolicy): void {
     f.activeT -= dt;
     if (f.lifeRate) p.life = Math.min(lifeCap(w, p), p.life + f.lifeRate * step);
     if (f.manaRate)
-      p.mana = Math.min(p.def.maxMana - w.char.reservedMana, p.mana + f.manaRate * step);
+      p.mana = Math.min(p.def.maxMana - reservedMana(w), p.mana + f.manaRate * step);
     if (f.activeT <= 0) {
       f.activeT = 0;
       if (f.queued) {
@@ -526,6 +529,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickEffects(w, dt);
   tickChannel(w);
   tickFields(w, dt);
+  tickBanner(w, dt);
   updateProjectiles(w, dt);
   tickZones(w, dt);
   tickCorpses(w, dt);
@@ -538,7 +542,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   if (w.build.level >= MAX_LEVEL) w.xp = 0;
   if (w.opts.freeResources && p.alive) {
     p.life = lifeCap(w, p);
-    p.mana = Math.max(0, p.def.maxMana - w.char.reservedMana);
+    p.mana = Math.max(0, p.def.maxMana - reservedMana(w));
   }
   if (!p.alive && w.status === 'running') w.status = 'dead';
   tickCollapse(w);

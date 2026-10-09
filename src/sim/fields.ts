@@ -14,7 +14,7 @@ import type { Action, Actor, World } from './types';
  * bursts, a storm of bolts that follows the character, a wall of ice that blocks the way.
  */
 
-export type FieldKind = 'consecrated' | 'chilling' | 'crystal' | 'storm' | 'wall';
+export type FieldKind = 'consecrated' | 'chilling' | 'crystal' | 'storm' | 'wall' | 'orb' | 'zap';
 
 export type Field = {
   id: number;
@@ -40,6 +40,12 @@ export type Field = {
   dtype: number;
   /** A wall: the tiles it holds shut. */
   tiles?: number[];
+  /** An orb: the skill it belongs to, the stages built, and how fast they fade once the channel has ended. A zap: the place it jumps about. */
+  skill?: string;
+  stages?: number;
+  decay?: number;
+  tx?: number;
+  ty?: number;
 };
 
 const REGEN_CONSECRATED = 0.06;
@@ -143,6 +149,123 @@ export function startStorm(
   });
 }
 
+/** An orb skill is used while channelling: a frost orb is made or fed, a storm orb is made at a spot near the target place. */
+export function orbUse(w: World, a: Actor, act: Action, stage: number): void {
+  const p = act.profile;
+  const spec = p.skill.orb;
+  if (!spec || !a.isPlayer) return;
+  const dur = w.char.db.mult('skillDuration');
+  if (spec.kind === 'frost') {
+    const total = spec.seconds * dur * (1 + (spec.secondsPerStage * stage) / 100);
+    const have = w.fields.find((f) => f.kind === 'orb' && f.skill === p.skill.id);
+    if (have) {
+      have.stages = stage;
+      have.t = have.total = total;
+      have.profile = p;
+      have.decay = undefined;
+      return;
+    }
+    w.fields.push({
+      id: w.nextId++,
+      owner: a.id,
+      kind: 'orb',
+      x: a.x,
+      y: a.y,
+      r0: spec.radius * p.radiusMult,
+      grow: 1,
+      radius: spec.radius * p.radiusMult,
+      t: total,
+      total,
+      profile: p,
+      hand: act.hand,
+      pulseT: 0.3,
+      interval: spec.interval,
+      dps: 0,
+      dtype: dominantType(p),
+      skill: p.skill.id,
+      stages: stage,
+    });
+    return;
+  }
+  const ang = w.rngTrig.float(0, Math.PI * 2);
+  const d = spec.spread * Math.sqrt(w.rngTrig.float(0, 1));
+  const spot = w.grid.collide(act.aimX + Math.cos(ang) * d, act.aimY + Math.sin(ang) * d, 0.3);
+  const total = spec.seconds * dur;
+  w.fields.push({
+    id: w.nextId++,
+    owner: a.id,
+    kind: 'zap',
+    x: spot.x,
+    y: spot.y,
+    tx: act.aimX,
+    ty: act.aimY,
+    r0: spec.radius * p.radiusMult,
+    grow: 1,
+    radius: spec.radius * p.radiusMult,
+    t: total,
+    total,
+    profile: p,
+    hand: act.hand,
+    pulseT: spec.jump,
+    interval: spec.jump,
+    dps: 0,
+    dtype: dominantType(p),
+    skill: p.skill.id,
+  });
+}
+
+/** The channel of a storm-orb skill ends: every orb that is left explodes, harder for each jump it still had. */
+export function releaseZaps(w: World, skill: string): void {
+  const p = w.player;
+  let j = 0;
+  for (const f of w.fields) {
+    if (f.kind !== 'zap' || f.skill !== skill || !f.profile) {
+      w.fields[j++] = f;
+      continue;
+    }
+    const spec = f.profile.skill.orb;
+    if (spec?.kind !== 'zap') continue;
+    const left = Math.max(0, Math.floor(f.t / spec.jump + 1e-6));
+    const q = scaleProfile(f.profile, 1 + (spec.releaseMore * left) / 100);
+    const r = spec.releaseRadius * f.profile.radiusMult;
+    w.events.push({ t: 'explode', x: f.x, y: f.y, r, dtype: f.dtype });
+    for (const e of enemiesIn(w, f.x, f.y, r))
+      hit(w, p, e, q, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
+  }
+  w.fields.length = j;
+}
+
+/** Blasts at a spot: the enemies in its radius are hit. */
+function blast(w: World, f: Field, x: number, y: number, r: number): void {
+  const p = w.player;
+  w.events.push({ t: 'explode', x, y, r, dtype: f.dtype });
+  for (const e of enemiesIn(w, x, y, r))
+    hit(w, p, e, f.profile!, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
+}
+
+/** One run of a frost orb: a volley of explosions on the ground near the character, where the enemies are. */
+function volley(w: World, f: Field): void {
+  const spec = f.profile!.skill.orb;
+  if (spec?.kind !== 'frost') return;
+  const p = w.player;
+  const near = enemiesIn(w, p.x, p.y, spec.range);
+  for (let i = 0; i < spec.count; i++) {
+    let x: number;
+    let y: number;
+    if (near.length) {
+      const e = near[w.rngTrig.int(0, near.length - 1)];
+      x = e.x + w.rngTrig.float(-0.6, 0.6);
+      y = e.y + w.rngTrig.float(-0.6, 0.6);
+    } else {
+      const ang = w.rngTrig.float(0, Math.PI * 2);
+      const d = spec.range * Math.sqrt(w.rngTrig.float(0, 1)) * 0.6;
+      x = p.x + Math.cos(ang) * d;
+      y = p.y + Math.sin(ang) * d;
+    }
+    blast(w, f, x, y, f.radius);
+  }
+}
+
 function enemiesIn(w: World, x: number, y: number, r: number): Actor[] {
   return w.actors.filter(
     (e) => !e.isPlayer && e.alive && e.phaseT <= 0 && Math.hypot(e.x - x, e.y - y) <= r + e.r,
@@ -178,6 +301,51 @@ export function tickFields(w: World, dt: number): void {
     if (f.kind === 'storm') {
       f.x = p.x;
       f.y = p.y;
+    }
+    if (f.kind === 'orb') {
+      f.x = p.x;
+      f.y = p.y;
+      // Stages hold while the channel goes on and then fade over what is left of the orb's time.
+      const live = w.channel?.key === f.skill;
+      if (live) f.stages = w.channel!.stage;
+      else {
+        f.decay ??= (f.stages ?? 0) / Math.max(0.5, f.t);
+        f.stages = Math.max(0, (f.stages ?? 0) - f.decay * dt);
+      }
+      const spec = f.profile!.skill.orb;
+      if (spec?.kind === 'frost') {
+        // Cast speed quickens the volleys too.
+        const cast = (f.profile!.skill.castTime ?? 0.5) / Math.max(0.05, f.profile!.useTime);
+        const rate =
+          (1 + (spec.speedPerStage * (f.stages ?? 0)) / 100) *
+          (live ? 1 + spec.channelMore / 100 : 1) *
+          cast;
+        f.pulseT -= dt * rate;
+        if (f.pulseT <= 0) {
+          f.pulseT += spec.interval;
+          volley(w, f);
+        }
+      }
+      if (f.t > 0) w.fields[j++] = f;
+      continue;
+    }
+    if (f.kind === 'zap') {
+      f.pulseT -= dt;
+      if (f.pulseT <= 0 && f.t > 0) {
+        f.pulseT += f.interval;
+        const spec = f.profile!.skill.orb;
+        if (spec?.kind === 'zap') {
+          // It jumps to a new spot near the target place and blasts there.
+          const ang = w.rngTrig.float(0, Math.PI * 2);
+          const d = spec.spread * Math.sqrt(w.rngTrig.float(0, 1));
+          const spot = w.grid.collide(f.tx! + Math.cos(ang) * d, f.ty! + Math.sin(ang) * d, 0.3);
+          f.x = spot.x;
+          f.y = spot.y;
+          blast(w, f, f.x, f.y, f.radius);
+        }
+      }
+      if (f.t > 0) w.fields[j++] = f;
+      continue;
     }
     f.pulseT -= dt;
     const pulse = f.pulseT <= 0;
