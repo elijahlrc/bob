@@ -167,7 +167,9 @@ describe('the strategy: roles and order', () => {
     expect(out.flameBolt ?? 0).toBe(0);
     expect(out.defaultAttack).toBeGreaterThan(3);
     // Only as often as its pause allows (ten seconds: at once, then every pause).
-    expect(out.crushingBlow).toBeLessThanOrEqual(Math.ceil(10 / c.cooldownOf(c.secondaries[0])) + 1);
+    expect(out.crushingBlow).toBeLessThanOrEqual(
+      Math.ceil(10 / c.cooldownOf(c.secondaries[0])) + 1,
+    );
   });
 });
 
