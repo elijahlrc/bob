@@ -9,6 +9,7 @@ import {
   FRACTURE_SECONDS,
   FRACTURE_TAKEN,
   ROT_REGEN,
+  TOLL_DAMAGE,
   TOLL_EVERY,
   TOLL_TELL,
   bossForMap,
@@ -116,7 +117,7 @@ describe('the Tollkeeper (docs/BOSSES.md 4)', () => {
     run(w, TOLL_EVERY + TOLL_TELL + 0.5);
     const st = bossState(m)!;
     expect(st.tolls).toBe(1);
-    expect(bossDamageMult(m)).toBeCloseTo(1.1);
+    expect(bossDamageMult(m)).toBeCloseTo(1 + TOLL_DAMAGE);
     expect(w.effects.some((e) => e.label === 'Toll' && e.shape === 'donut')).toBe(true);
     // The next comes ten seconds of its clock later, and the swing takes its own time (a blow in hand finishes first).
     let n = 0;

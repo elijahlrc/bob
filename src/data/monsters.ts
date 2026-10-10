@@ -1202,7 +1202,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'choir',
     body: 'tollkeeper',
     archetype: 'bruiser',
-    defence: { armour: 150, res: { lightning: 30, cold: -30 } },
+    defence: { armour: 100, res: { lightning: 30, cold: -30 } },
     shape: { id: 'swing', arc: 120, radius: 2.2, lock: 0.35 },
     bossOnly: true,
     noBody: true,

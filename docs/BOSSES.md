@@ -1,7 +1,7 @@
 # Bob — Bosses: six fights that each ask the build one question
 
-Status: **plan, 2026-10-10.** Nothing built yet. Written from the code as it stands. Decisions that need the user are in
-section 17; the plan takes the stated defaults until they are answered.
+Status: **built, 2026-10-10** (section 18 says what was built and how it differs). Decisions that need the user are in
+section 17; the defaults are in effect.
 
 ---
 
@@ -699,3 +699,72 @@ B1 is the point to stop and play before building the other five.
 7. **Does the bot prepare for a boss** (read the card at camp)? Default: no. The gauntlet then measures unprepared builds,
    which is the lower bound the ceilings are about.
 8. **The Unmaker's fourth theft (flasks):** in, or too cruel at 20%? Default: in. It is last, and its shard is frail.
+
+---
+
+## 18. As built (2026-10-10)
+
+Built the same day, all milestones at once (the user asked for the whole plan without stopping). Local commits only.
+
+### 18.1 What is where
+
+| Piece                                                                                | Where                                                                                                      |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| The bosses' data and cards, the schedule, every tuning number                        | `src/data/bosses.ts`                                                                                       |
+| The eight types (six bosses, the Witness, the shard), boss-only                      | `src/data/monsters.ts` (`bossOnly`), kept out of every pack pool in `gen/packs.ts` and `gen/population.ts` |
+| The arena appended past the last room                                                | `src/gen/bossArena.ts`, from `gen/mapPlan.ts`                                                              |
+| The fights                                                                           | `src/sim/bosses.ts`, called from the encounter hooks (`sim/encounters.ts`) and `monsterAI` (`bossAI`)      |
+| What the Unmaker holds                                                               | `src/sim/theft.ts`, read by `characterWith` (`sim/charges.ts`) as trophies are                             |
+| Ailments and stuns outside a hit, the boss lock (rule 6)                             | `src/sim/afflict.ts`                                                                                       |
+| Cleansing flasks for poison, shock and curses; immunity during every cleansing flask | `data/flasks.ts`, `calc/flasks.ts`, `sim/world.ts`, `sim/flaskPolicy.ts`                                   |
+| The tells                                                                            | `src/render/styles/grim/bossFx.ts`; the figures in `render/style/figure.ts`                                |
+| The boss bar, the card, ailment and theft chips                                      | `src/ui/Hud.tsx`, `src/ui/BossCard.tsx`                                                                    |
+| The card and readiness at camp; the offer line                                       | `src/ui/Camp.tsx`, `src/ui/OfferInfo.tsx`, `src/run/bossInfo.ts`                                           |
+| Tests                                                                                | `src/sim/bosses.test.ts` (every mechanic, the boss maps, rule 4)                                           |
+| The gauntlet                                                                         | `scripts/boss-gauntlet.ts`                                                                                 |
+| Dev                                                                                  | `__dev.fight(id, { level, until })`                                                                        |
+
+### 18.2 What changed on the way
+
+- **The arena** is appended to the side of the labyrinth whose way out from the last room crosses no floor, joined by a
+  straight corridor (radius 11). The boss stands alone; the Magistrate's Witnesses rise when the fight begins.
+- **The flat boss bonuses** (+30% elemental resistance, 4× stun threshold, the 1.6 s swing, the boss radius) apply only to
+  the old kind of boss; the six take their card's numbers. Curse effect is the card's too (the Magistrate is hex-warded).
+- **A timed move waits for the boss to be between blows**, as windows do: a boss in a fight is otherwise never between
+  them.
+- **The Courser's evasion is +100%**, not the "very evasive" first written: a probe showed a third of the swings that reached
+  it landing, which on top of the canter would have hit melee attack builds twice.
+- **The Rotwife regrows 0.4% a second, not 0.6%**: the rule 4 test showed 0.6% put a chaos build with no ailment at about
+  2.1× (over the ceiling).
+- **The Magistrate is weak to lightning** (section 3), so that lightning builds have a boss that favours them.
+- **The Unmaker** hits in the element it stole (it takes that element's variant) and drinks the flasks it holds. It does
+  **not** yet wear the stolen defence or copy the stolen supports' shape; the theft itself, the shards and the stagger are
+  as planned.
+- **Ailment avoidance from items and passives** was not added: the cleansing flasks (now all of 3.9's: removal on use and
+  immunity during the effect) are every build's answer, and the holes in immunity (shocking ground, hobble) are closed.
+- **Rule 5** is measured by the gauntlet (the Sentence's share of the pool), not a unit test: the pool of a curve
+  character is the bot's.
+- **Rewards** needed nothing: a boss already drops two uniques, three times the currency of a normal monster's roll (twice a
+  champion's), the theme's bonus currency and 30× experience.
+
+### 18.3 The measurement (one 24-run bot sample)
+
+Four bot runs of each class, every boss fight watched (`scripts/boss-gauntlet.ts`). The bot's builds are much weaker than a
+player's, and most runs ended before map 50 for reasons that are not the bosses.
+
+| Boss              | Fought | Won | Died there | Mean kill time | Slowest | Mean low point | Notes                                                    |
+| ----------------- | ------ | --- | ---------- | -------------- | ------- | -------------- | -------------------------------------------------------- |
+| Tollkeeper (10)   | 17     | 11  | 3          | 67 s           | 129 s   | 59%            | 8.1 tolls                                                |
+| Courser (30)      | 9      | 9   | 0          | 83 s           | 281 s   | 88%            | 8.2 gallops blocked by minions                           |
+| Magistrate (50)   | 3      | 2   | 1          | 96 s           | 149 s   | 54%            | 7.3 Sentences, the largest 26% of the pool before armour |
+| Prism Warden (70) | 1      | 1   | 0          | 58 s           |         | 85%            |                                                          |
+| Rotwife (90)      | 1      | 1   | 0          | 109 s          |         | 87%            |                                                          |
+| Unmaker (100)     | 0      |     |            |                |         |                | no run reached it                                        |
+
+The user, 2026-10-10: the bot's builds are not a player's, the game runs at up to 8× speed, and a one-minute fight is not
+the target. So the bosses' life was **not** cut from this sample. The one change made from it is the Tollkeeper's armour
+(+150% to +100%): the strider (bow, many small physical hits) lost both its fights there, which is the build-category wall
+the plan's rule 3 is about. What the target length of a fight should be is open question 9.
+
+9. **(added) How long a boss fight should take** for a player's build at 1× speed. Default: as built, with no target set
+   from the bot.

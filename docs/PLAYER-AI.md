@@ -40,6 +40,8 @@ have to handle everything that reaches it. A ranged character can be set to **ki
 - **Nests and pylons come first.** For targeting, they count as 4 tiles closer than they really are, so the
   character breaks off to kill them. It goes for a **pylon even through a wall**: everything a pylon protects is
   untouchable until it falls. A nest it must still see.
+- **So do a boss's creatures** (docs/BOSSES.md): the Magistrate's Witnesses, which it must see, and the Unmaker's
+  shards, which it goes for even through a wall, since a shard holds a piece of your build until it breaks.
 - **It doesn't stick to a target.** It looks again about ten times a second and always switches to whatever is
   now nearest. In a crowd it hits whichever enemy is closest, and will not focus a rare at the back of the pack.
   _Area damage, chaining and pierce suit this habit._
@@ -59,6 +61,8 @@ have to handle everything that reaches it. A ranged character can be set to **ki
 
 If the character is standing in a **lasting ground zone**, a **blast about to land**, or a **monster's area attack
 that is winding up** (the warnings drawn on the ground: circles, wedges, rings and lanes), it tries to step out.
+**A boss is never dropped**: its shield or its regrowth can
+hold its life up for a while, and there is nothing to move on to.
 
 - It checks 16 directions at 1.5, 2.5 and 3.5 tiles and takes the **shortest step** that lands outside every
   warning.
@@ -66,6 +70,8 @@ that is winding up** (the warnings drawn on the ground: circles, wedges, rings a
   of the fight.**
 - It won't step **through a monster's body**: the monster would push it along, and the warning would move with
   it.
+- **A blow that follows it cannot be stepped out of** (the Magistrate's Sentence): the character does not try,
+  and keeps attacking. Only defences answer it.
 - **If no step works, it stays where it is and takes the hit.**
 
 _Strategy:_
@@ -254,6 +260,12 @@ Flasks are drunk automatically, on top of whatever else the character is doing:
 - **Life-to-energy-shield flask** (one that leaves you at 1 life for two seconds): only at **90%+ life**, with
   the nearest enemy **6 to 16 tiles away**, and only if your energy shield is at least 70% of your life. The
   character drinks it before a fight, not in one.
+- **Cleansing flasks** (a suffix that removes an ailment and keeps it off while the flask runs): drunk as soon as
+  that ailment is on the character, whatever the life threshold. A life flask that cleanses still waits for no other
+  life flask to be running.
+- **Before a blow it cannot dodge**: when a Sentence is about to land and would take more than the character's life and
+  energy shield, a life flask is drunk at once, whatever the threshold.
+- **Stolen flasks**: while the Unmaker holds them (docs/BOSSES.md 9), none can be drunk.
 - **Burning aura** (Righteous Fire analog): it is **switched off below 40% life** and back on at **75%**, the way
   a player would click it off.
 
