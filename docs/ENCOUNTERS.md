@@ -290,9 +290,30 @@ These are left to last because they need pack-level state and are the most likel
 
 ---
 
-## 9. What the character must learn
+## 9. What the character must learn (deferred)
 
-Each is small and lives in `sim/ai.ts` (`playerAI`, `avoidHazard`, the target choice). [PLAYER-AI.md](PLAYER-AI.md) is the
+**Decision (user, 2026-10-09): no changes to the character's decisions for now.** The monster mechanics are built first,
+against the character as it is. Read against the code (`findTarget`, `avoidHazard`, `bodyOnWay`, `hazardAt` and the stall
+breaker in `sim/ai.ts`), nothing below breaks its behaviour if two rules hold:
+
+1. **A window is the pylon's path.** A monster in a window takes no damage through the same early return in `hit()` that a
+   Warden Pylon's protection uses. A **Fade** uses `phaseT`, which `findTarget` already skips. Windows last 1.5 to 3 s,
+   far under the 20 s stall breaker. The **Aegis** regrows only when the Sentinel has not been **attacked** for 5 s (not
+   merely not damaged), so a slow hitter still gets through.
+2. **A shaped blast tells `hazardAt` its shape.** This is part of building the shapes, not a new reflex: it says where the
+   danger is, and the dodge decides as it does today. A lane read as a circle would send the character the wrong way. A
+   pending blast is a hazard from the moment it is placed (`hazardAt` counts every non-zone effect with time left), so the
+   dodge already avoids a pattern's later blasts. The cost is more time dodging, so patterns stay sparse.
+
+Held back until the reflexes exist, because without them they are a tax on one kind of build and nothing more:
+
+- **Counter-stance:** a melee character keeps striking into it.
+- **Keening and Closing ring:** the dodge looks only 1.5 to 3.5 tiles out and never inward, so a ranged character stays in
+  the hit.
+- **Latched:** a leech sitting on the character counts as a body on every way out (`bodyOnWay`), so the character could
+  never dodge while it held on. Built only once the latched monster is taken out of `bodyOnWay` and `separate`.
+
+The reflexes, for when they are wanted. Each is small and lives in `sim/ai.ts` (`playerAI`, `avoidHazard`, the target choice). [PLAYER-AI.md](PLAYER-AI.md) is the
 player-facing account of these rules and needs a line for each. It is untracked work in the shared tree, so coordinate with
 whoever is writing it before editing.
 
@@ -395,16 +416,16 @@ existing tests are the characterisation, as in ENEMIES.md 7.3: they pass unchang
 Each ends with `npm run check`, the x9 speed floor and a commit of my own files only (the tree is shared). No bot sims while
 building (the user's standing preference); one at the end.
 
-| #   | Milestone             | What                                                                                                                                                                                                                                                                                        |
-| --- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| N1  | **First slice**       | One idea from each of A, B, C on the early Ossuary and Rot, so it is felt from map 4: the sidearm engine with the Warrior's spear and the Shambler's bile; shaped blasts and the Mage's **March**; modes with the Shieldbearer's **Brace** and the hold-off reflex. Then the user plays it. |
-| N2  | Sidearms              | The rest of section 3's table, the Slinger's and Handler's changes, the zone-stacking rule.                                                                                                                                                                                                 |
-| N3  | Patterns              | The scheduler's remaining patterns (Mortar, Cross, Toll waves, Closing ring, Keening, Spiral), the donut and look-ahead reflexes.                                                                                                                                                           |
-| N4  | Windows and modes     | Aegis, Fade, Sanctuary, Petrify, Counter-stance, Carapace shed; Core vent, Quench, Gorged, Last rites, Grieving, Riled, Molten, Broken guard; the Adaptive mod; phases moved onto modes.                                                                                                    |
-| N5  | Debuffs               | Statuses and the HUD row: Blind, Latched, Tithe, Marked, the Hexer's sigil, the sidearm effects.                                                                                                                                                                                            |
-| N6  | Cards, tags, threat   | The inspect card lists every trick; the camp tags; `threat.ts`; the build-question test; docs (ROSTER.md, ENEMIES.md, PROGRESS.md; PLAYER-AI.md with its author).                                                                                                                           |
-| N7  | Pack plays (optional) | Volley call, Encircle, Converge.                                                                                                                                                                                                                                                            |
-| N8  | One sample            | One 24-run bot sample: deaths by type and by mechanic, to see that no single mechanic is the top killer. Tuning is in the data.                                                                                                                                                             |
+| #   | Milestone             | What                                                                                                                                                                                                                                                                                                                                                               |
+| --- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| N1  | **First slice**       | One idea from each of A, B, C on the early Ossuary and Rot, so it is felt from map 4: the sidearm engine with the Warrior's spear and the Shambler's bile; shaped blasts and the Mage's **March**; modes with the Shieldbearer's **Brace** (no hold-off reflex: the character hits the shield, as it hits a pylon-shielded monster today). Then the user plays it. |
+| N2  | Sidearms              | The rest of section 3's table, the Slinger's and Handler's changes, the zone-stacking rule.                                                                                                                                                                                                                                                                        |
+| N3  | Patterns              | The scheduler's remaining patterns (Mortar, Cross, Toll waves, Closing ring, Keening, Spiral), the donut and look-ahead reflexes.                                                                                                                                                                                                                                  |
+| N4  | Windows and modes     | Aegis, Fade, Sanctuary, Petrify, Counter-stance, Carapace shed; Core vent, Quench, Gorged, Last rites, Grieving, Riled, Molten, Broken guard; the Adaptive mod; phases moved onto modes.                                                                                                                                                                           |
+| N5  | Debuffs               | Statuses and the HUD row: Blind, Latched, Tithe, Marked, the Hexer's sigil, the sidearm effects.                                                                                                                                                                                                                                                                   |
+| N6  | Cards, tags, threat   | The inspect card lists every trick; the camp tags; `threat.ts`; the build-question test; docs (ROSTER.md, ENEMIES.md, PROGRESS.md; PLAYER-AI.md with its author).                                                                                                                                                                                                  |
+| N7  | Pack plays (optional) | Volley call, Encircle, Converge.                                                                                                                                                                                                                                                                                                                                   |
+| N8  | One sample            | One 24-run bot sample: deaths by type and by mechanic, to see that no single mechanic is the top killer. Tuning is in the data.                                                                                                                                                                                                                                    |
 
 N1 is a vertical slice. It proves each engine piece on a type met early, and it is the point to stop and see whether the
 encounters feel better before building out the rest.
@@ -429,8 +450,8 @@ encounters feel better before building out the rest.
 
 ## 15. Open questions (defaults in effect until answered)
 
-1. **Is the first slice (N1) the right place to stop and play?** Default: yes. Spear, bile, March, Brace and the hold-off
-   reflex, then look.
+1. **Is the first slice (N1) the right place to stop and play?** Default: yes. Spear, bile, March and Brace, with no change to
+   the character, then look.
 2. **Should DoTs keep ticking through an invulnerability window?** Default: yes. It is a deliberate edge for ailment builds.
 3. **Should windows exist on normal monsters, or only on magic, rare and above?** Default: on normal monsters of the
    non-fodder types, with the pack budget.
