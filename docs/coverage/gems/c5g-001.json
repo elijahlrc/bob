@@ -17,13 +17,13 @@
       { "stat": "castSpeed", "kind": "inc", "value": [0, 19] } ],
       "description": "The skill is thrown as a trap." } },
   { "ref": "Blastchain Mine Support", "note": "The supported skill is laid as mines that stand five seconds and go off in a chain, a quarter second apart, each dealing 5% more than the one before it; each deals less.",
-    "def": { "kind": "support", "id": "chainedCharges", "name": "Chained Charges", "attr": "int", "supports": ["mineable"], "excludes": ["triggered", "trap"], "adds": ["mine"], "costMult": 1.5, "mods": [
+    "def": { "kind": "support", "id": "chainedCharges", "name": "Chained Charges", "attr": "int", "supports": ["mineable"], "excludes": ["triggered", "trap"], "adds": ["mine"], "costMult": 0.3, "mods": [
       { "stat": "damage", "kind": "more", "value": [-35, -25] },
       { "stat": "mine.chain", "kind": "base", "value": 5 },
       { "stat": "deploySeconds", "kind": "base", "value": 5 } ],
       "description": "The skill is laid as mines that set one another off." } },
   { "ref": "High-Impact Mine Support", "note": "The supported skill is laid as mines that stand five seconds; each mine gives the hits against the enemies near it a 2% chance to deal double damage (they add up); the skill deals less.",
-    "def": { "kind": "support", "id": "heavyCharge", "name": "Heavy Charge", "attr": "int", "supports": ["mineable"], "excludes": ["triggered", "trap"], "adds": ["mine"], "costMult": 1.5, "mods": [
+    "def": { "kind": "support", "id": "heavyCharge", "name": "Heavy Charge", "attr": "int", "supports": ["mineable"], "excludes": ["triggered", "trap"], "adds": ["mine"], "costMult": 0.3, "mods": [
       { "stat": "damage", "kind": "more", "value": [-30, -20] },
       { "stat": "mine.double", "kind": "base", "value": 2 },
       { "stat": "deploySeconds", "kind": "base", "value": 5 } ],

@@ -191,6 +191,12 @@ export function blasphemyOf(c: SkillChoice): { reservePct: number } | undefined 
 
 /** Seconds between casts of a banner skill, for the share of time it takes (one carried at a time, put down now and then). */
 const BANNER_EVERY = 40;
+/**
+ * Seconds between the casts of a utility skill the policy casts when the fight calls for it (src/sim/utility.ts), for the
+ * share of time and the mana it takes: a blink goes to a gap or a pack about once a pack, a guard when life runs low.
+ */
+const BLINK_EVERY = 8;
+const GUARD_EVERY = 15;
 
 export type SkillChoice = {
   key: string;
@@ -1737,14 +1743,19 @@ export class Character {
         u.kind === 'buff'
           ? u.banner
             ? BANNER_EVERY
-            : (u.cooldown ?? u.seconds * 0.9)
-          : u.kind === 'curse'
-            ? HEX_SECONDS * 0.9
-            : u.kind === 'summon'
-              ? (u.seconds ?? 90)
-              : u.kind === 'offering'
-                ? u.seconds
-                : u.cooldown;
+            : u.policy === 'guard'
+              ? Math.max(u.cooldown ?? 0, GUARD_EVERY)
+              : // An upkeep or rally buff is cast again as it ends, whatever pause the skill keeps after a cast.
+                Math.max(u.cooldown ?? 0, u.seconds)
+          : u.kind === 'blink'
+            ? Math.max(u.cooldown, choice.skill.cooldown ?? 0, BLINK_EVERY)
+            : u.kind === 'curse'
+              ? HEX_SECONDS * 0.9
+              : u.kind === 'summon'
+                ? (u.seconds ?? 90)
+                : u.kind === 'offering'
+                  ? u.seconds
+                  : u.cooldown;
       const rate = 1 / Math.max(every, p.useTime);
       return { choice, rate, busy: rate * p.useTime };
     });

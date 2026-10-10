@@ -559,7 +559,9 @@ for (const [phrase, event] of RECOVER_EVENTS)
       mk(`recoverPct.${event}.${pool}`, 'base', n[0]),
     ]);
   }
-rule(/^# Mana gained for each Enemy hit by Attacks$/, (_m, n) => [mk('manaOnHit', 'base', n[0])]);
+rule(/^# Mana gained for each Enemy hit by Attacks$/, (_m, n) => [
+  mk('manaOnHit', 'base', n[0], { tags: ['attack'] }),
+]);
 
 // Buffs and rage on events.
 const BUFF_WORDS: Record<string, string> = {

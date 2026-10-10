@@ -74,9 +74,25 @@ function skillOf(run: RunState, build: Build): { dps: number; isDefault: boolean
   return r;
 }
 
-/** The bot's objective: total DPS × effective HP (geometric-safe for zeros). */
+/**
+ * What the bot expects of mana, kept out of the sheet's DPS (docs/DESIGN.md, 2026-10-09). The share of the primary skill's uses
+ * it can pay for is the sheet's sustain (regeneration; in life for a skill that costs life) plus a flask's worth, about 5% of the
+ * pool a second as the bot's one mana flask gives; the rest of its uses fall to a weak default attack. A player weighs mana by
+ * reading the Skills tab; the bot has to be told.
+ */
+const BOT_FLASK_MANA = 0.05;
+const BOT_FALLBACK_DPS = 0.2;
+export function manaFactor(s: CharacterSheet): number {
+  const k = s.skill;
+  const need = k.cost * k.usesPerSec;
+  if (k.isDefault || need <= 0) return 1;
+  const paid = Math.min(1, k.sustain + (BOT_FLASK_MANA * s.mana) / need);
+  return BOT_FALLBACK_DPS + (1 - BOT_FALLBACK_DPS) * paid;
+}
+
+/** The bot's objective: total DPS (as far as its mana can pay for it) × effective HP (geometric-safe for zeros). */
 export function score(s: CharacterSheet): number {
-  return Math.max(0.1, sheetDps(s)) * Math.max(1, s.ehp);
+  return Math.max(0.1, sheetDps(s) * manaFactor(s)) * Math.max(1, s.ehp);
 }
 
 /** How much a build's clearing score counts against its boss score. */

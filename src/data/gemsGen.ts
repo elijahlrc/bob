@@ -7773,7 +7773,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     supports: ['mineable'],
     excludes: ['triggered', 'trap'],
     adds: ['mine'],
-    costMult: 1.5,
+    costMult: 0.3,
     mods: [
       {
         stat: 'damage',
@@ -7801,7 +7801,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     supports: ['mineable'],
     excludes: ['triggered', 'trap'],
     adds: ['mine'],
-    costMult: 1.5,
+    costMult: 0.3,
     mods: [
       {
         stat: 'damage',
