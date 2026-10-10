@@ -855,3 +855,17 @@ Molten, Broken guard, and the Adaptive rare mod. **Debuffs:** Blind, the Handler
 Hexer's sigil, the Slinger's hobbling stones. **Pack plays:** a Loosing call, an Encircle, a Converge. Every one has a tell
 on the floor or the body (`render/styles/grim/encounterFx.ts`), a line on the inspect card, and counts toward the camp card's
 tags. The character's own decisions are unchanged (user, 2026-10-09). No balance sample yet.
+
+### Strategy tab, built (2026-10-09)
+
+A camp tab sets how the character mixes its skills and fights. Every skill has a role (main, periodic, keep up, opener,
+emergency, auto, off), a condition (packs, few enemies, rares, bosses) and a place in the order; the main skills are the
+fillers. Global settings: target priority, spacing (hold, close in, kite), the life flask threshold and when utility flasks
+are drunk. Defaults reproduce the old behaviour; a periodic skill no longer needs the main skill's reach, and a ready
+periodic skill stands in for a main skill on cooldown before the weapon does. The sheet shows the rotation's DPS against a
+pack and a boss (comparisons weigh them 70/30). docs/PLAYER-AI.md explains the character's whole decision logic. The bot
+uses the defaults. Bot sample (8 runs a class, seed 7, `scripts/simpar.sh`): median map reached unchanged for five classes
+(strider 16.5 to 14.5), mean map reached 27.0 before and 24.2 after, the gap coming from a few long runs ending sooner and
+others going deeper; a sample this small cannot tell that from noise. A ready periodic skill does not stand in for a main
+skill that waits for mana (the weapon lets the mana come back). `x9.test.ts`'s 250x speed check is flaky near its floor
+before and after this change.

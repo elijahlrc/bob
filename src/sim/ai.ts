@@ -268,22 +268,26 @@ function chooseSkill(w: World, target: Actor): Pick {
     if (!usable(c, prof) || !inReach(w, prof, target)) continue;
     return { which: 'secondary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
   }
+  let starved = false;
   for (const e of w.char.mains) {
     if (!whenHolds(w, e.when, target)) continue;
     const c = e.choice;
     const prof = w.char.profile(c, conds, flaskMask(w));
+    if (!canPay(w, c.costsLife, prof.cost)) starved = true;
     // Against a target immune to everything the skill deals, the next skill (or the weapon) is used.
     if (!usable(c, prof) || alreadyAfflicted(prof, target)) continue;
     return { which: 'primary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
   }
-  // No main skill can be used (its cooldown, its cost, an immune target): a periodic skill that is ready is better than the weapon.
-  for (const e of w.char.rotation) {
-    const c = e.choice;
-    if (c.skill.utility || e.role !== 'periodic' || !whenHolds(w, e.when, target)) continue;
-    const prof = w.char.profile(c, conds, flaskMask(w));
-    if (!usable(c, prof) || !inReach(w, prof, target)) continue;
-    return { which: 'secondary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
-  }
+  // No main skill can be used (its cooldown, an immune target): a periodic skill that is ready is better than the weapon. Not when
+  // the main skill waits for mana: the free weapon lets the mana come back, where another skill would keep it low.
+  if (!starved)
+    for (const e of w.char.rotation) {
+      const c = e.choice;
+      if (c.skill.utility || e.role !== 'periodic' || !whenHolds(w, e.when, target)) continue;
+      const prof = w.char.profile(c, conds, flaskMask(w));
+      if (!usable(c, prof) || !inReach(w, prof, target)) continue;
+      return { which: 'secondary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
+    }
   return {
     which: 'default',
     prof: w.char.profile(w.char.defaultAttack, conds, flaskMask(w)),

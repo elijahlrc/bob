@@ -18,6 +18,11 @@
 - **Items and Workbench UX plan:** [docs/ITEMS.md](docs/ITEMS.md) (milestones U0–U9), built (2026-10-09): the Items tab compares an item with every slot it fits (`compareSlots` in `src/run/inventoryOps.ts`), the Workbench stages every craft in a result panel first (`planCraft` / `applyCraft` in `src/run/craftPlan.ts`, built on the real `craft.ts` code and never showing the real roll of a rolled craft), and `src/ui/Confirm.tsx` replaces `window.confirm`. New item or craft UI goes in `items.css` / `workbench.css`.
 - **Mobile and inventory plan:** [docs/MOBILE.md](docs/MOBILE.md) (milestones P0–P9): make every screen usable in phone and tablet
   browsers (touch rules, small-screen layouts, tree pinch zoom, HUD and map zoom), plus inventory tools (persistent New list, Clean up old items, favourites; P8–P9). P0 to P9 are built; the real-device pass is left (its section 9).
+- **Strategy tab** (2026-10-09): `Build.strategy` gives each skill a role, a condition and an order, plus target priority,
+  spacing (hold, close in, kite) and flask thresholds (`src/data/strategy.ts`, `src/calc/strategy.ts`, `src/ui/Strategy.tsx`).
+  `Character.mains` / `rotation` hold the resolved order; the sim's `chooseSkill` (`src/sim/ai.ts`) walks it. The sheet
+  works out a pack and a boss rotation (`sheet().scenarios`, weighed by `sheetDps`). Player-facing explanation of the whole
+  AI: [docs/PLAYER-AI.md](docs/PLAYER-AI.md); keep it current when the character's decisions change.
 - **Architecture boundaries (§14.2):**
   - `core`, `data`, `mods`, `calc`, `gen`, `sim` and `run` are headless: no Phaser, Preact or DOM.
   - No `Math.random`, `Date.now` or `performance.now` outside `render` and `ui`.
