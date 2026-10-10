@@ -148,6 +148,27 @@ describe('the strategy: roles and order', () => {
     // Far more often than its usual pause allows.
     expect(u.flameBolt).toBeGreaterThan(20 / c.cooldownOf(c.secondaries[0]) + 2);
   });
+  it('a main skill that waits for mana is not stood in for by a periodic skill: the weapon lets the mana come back', () => {
+    const b = build(['flameBolt', 'crushingBlow']);
+    const c = new Character(b, {});
+    const mainCost = c.profile(c.primary).cost;
+    const boltCost = c.profile(c.secondaries[0]).cost;
+    expect(mainCost).toBeGreaterThan(boltCost);
+    const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
+    world.opts.freeResources = false;
+    const out: Record<string, number> = {};
+    // Mana held between the two costs: the periodic skill could be paid for, the main one not.
+    for (let i = 0; i < 60 * 10; i++) {
+      world.player.mana = (mainCost + boltCost) / 2;
+      stepWorld(world);
+      for (const e of world.events)
+        if (e.t === 'use' && e.src === world.player.id) out[e.skill] = (out[e.skill] ?? 0) + 1;
+    }
+    expect(out.flameBolt ?? 0).toBe(0);
+    expect(out.defaultAttack).toBeGreaterThan(3);
+    // Only as often as its pause allows (ten seconds: at once, then every pause).
+    expect(out.crushingBlow).toBeLessThanOrEqual(Math.ceil(10 / c.cooldownOf(c.secondaries[0])) + 1);
+  });
 });
 
 describe('the strategy: conditions', () => {
@@ -195,6 +216,31 @@ describe('the strategy: target and spacing', () => {
       stepWorld(world);
       expect(world.ai.targetId).toBe(want === 'rare' ? rare.id : near.id);
     }
+  });
+
+  it('weakest: the enemy with the least of its life left goes first', () => {
+    const b = { ...build(['crushingBlow']), strategy: { target: 'lowest' as const } };
+    const { world } = createDummyWorld(b, { distance: 8.5, maxTime: 60 });
+    put(world, 0, 3);
+    const hurt = put(world, 0, -6);
+    hurt.life = hurt.def.maxLife * 0.2;
+    stepWorld(world);
+    expect(world.ai.targetId).toBe(hurt.id);
+  });
+
+  it('stick to target: the target is kept when another enemy comes nearer', () => {
+    const results: Record<string, boolean> = {};
+    for (const target of ['nearest', 'stick'] as const) {
+      const b = { ...build(['crushingBlow']), strategy: { target } };
+      const { world } = createDummyWorld(b, { distance: 8.5, maxTime: 60 });
+      const first = put(world, 0, 5);
+      stepWorld(world);
+      expect(world.ai.targetId).toBe(first.id);
+      put(world, 1.5, 0);
+      for (let i = 0; i < 12; i++) stepWorld(world);
+      results[target] = world.ai.targetId === first.id;
+    }
+    expect(results).toEqual({ nearest: false, stick: true });
   });
 
   it('a kiting archer steps back from an enemy that comes close; one that holds its ground does not', () => {
