@@ -29,6 +29,8 @@ const ROLE_HELP: Record<SkillRole, string> = {
   keepUp: 'Kept going: a buff renewed as it ends, a curse or debuff kept on the target.',
   opener: 'Used once at the start of each fight, and once on each rare or boss.',
   emergency: 'Used when life falls below a threshold.',
+  escape:
+    'A way out: used when life falls below a threshold with an enemy near, or when 3 or more are close. A blink goes to the safest spot, not toward the enemy.',
   auto: "The skill's own judgement (shown below).",
   off: 'Never used.',
 };
@@ -132,7 +134,7 @@ function SkillRow(p: {
             onChange={(v) => set({ every: v === 0 ? undefined : v })}
           />
         )}
-        {e.role === 'emergency' && (
+        {(e.role === 'emergency' || e.role === 'escape') && (
           <Pick<number>
             label="Below"
             value={e.life}

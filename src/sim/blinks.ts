@@ -107,9 +107,11 @@ export function blinkCast(
     escapeCast(w, a, p, c, u);
     return;
   }
+  // An escape skill (the Strategy tab) takes the character away from the enemies, with the skill's own effects at both ends.
+  const away = w.char.rotation.some((e) => e.choice === c && e.role === 'escape');
   // A blink that prefers a corpse goes to the one with the most enemies about it, if there is one within reach.
   let corpse: Corpse | null = null;
-  if (u.corpse) {
+  if (u.corpse && !away) {
     let best = 0;
     for (const c0 of w.corpses) {
       if (Math.hypot(c0.x - a.x, c0.y - a.y) > u.distance + 1) continue;
@@ -125,11 +127,14 @@ export function blinkCast(
   const step = corpse
     ? Math.min(u.distance, d)
     : Math.max(0, Math.min(u.distance, d - (target.r + a.r + 1)));
-  const spot = w.grid.collide(
-    a.x + ((goal.x - a.x) / Math.max(d, 1e-6)) * step,
-    a.y + ((goal.y - a.y) / Math.max(d, 1e-6)) * step,
-    a.r,
-  );
+  const spot = away
+    ? safestSpot(w, a, u.distance)
+    : w.grid.collide(
+        a.x + ((goal.x - a.x) / Math.max(d, 1e-6)) * step,
+        a.y + ((goal.y - a.y) / Math.max(d, 1e-6)) * step,
+        a.r,
+      );
+  if (!spot) return;
   if (corpse && u.corpse) {
     // The corpse bursts for a share of its life, and the bursts are larger.
     const big = { ...p, radiusMult: p.radiusMult * Math.sqrt(1 + u.corpse.areaMore / 100) };
@@ -162,17 +167,16 @@ export function blinkCast(
   arrive(w, a, p, c, u, spot.x, spot.y);
 }
 
-/** Smoke Mine: the character goes to the safest spot in reach, smoke at both ends, and the buff that follows. */
-function escapeCast(w: World, a: Actor, p: SkillProfile, c: SkillChoice, u: BlinkSpec): void {
-  const esc = u.escape!;
+/** The spot within reach of a blink that is furthest from every enemy near, in sight and at least 2.5 tiles away (none if there is none). */
+function safestSpot(w: World, a: Actor, distance: number): { x: number; y: number } | null {
   const foes = enemiesAt(w, a.x, a.y, 12);
   let best: { x: number; y: number } | null = null;
   let bd = -1;
   for (let i = 0; i < 16; i++) {
     const ang = (i / 16) * Math.PI * 2;
     const spot = w.grid.collide(
-      a.x + Math.cos(ang) * u.distance,
-      a.y + Math.sin(ang) * u.distance,
+      a.x + Math.cos(ang) * distance,
+      a.y + Math.sin(ang) * distance,
       a.r,
     );
     if (Math.hypot(spot.x - a.x, spot.y - a.y) < 2.5 || !w.grid.los(a.x, a.y, spot.x, spot.y))
@@ -184,6 +188,13 @@ function escapeCast(w: World, a: Actor, p: SkillProfile, c: SkillChoice, u: Blin
       best = spot;
     }
   }
+  return best;
+}
+
+/** Smoke Mine: the character goes to the safest spot in reach, smoke at both ends, and the buff that follows. */
+function escapeCast(w: World, a: Actor, p: SkillProfile, c: SkillChoice, u: BlinkSpec): void {
+  const esc = u.escape!;
+  const best = safestSpot(w, a, u.distance);
   if (!best) return;
   noteBlinkUsed(w, c);
   const sm = esc.smoke;

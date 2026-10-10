@@ -73,6 +73,14 @@ export function describeEntry(ch: Character, e: RotationEntry<SkillChoice>): str
       return `Once at the start of each fight, and once on each rare or boss${when}`;
     case 'emergency':
       return `When life falls below ${pct(e.life)}${when}`;
+    case 'escape':
+      return (
+        `When life falls below ${pct(e.life)} with an enemy near, or with 3 or more enemies close: ` +
+        (c.skill.utility?.kind === 'blink'
+          ? 'goes to the safest spot in reach, away from them'
+          : 'runs for it') +
+        when
+      );
     case 'keepUp':
       return keepUpText(c) + when;
     case 'auto':

@@ -1,6 +1,7 @@
 import type { SkillDef } from './gems';
 import {
   EMERGENCY_LIFE,
+  ESCAPE_LIFE,
   type SkillRole,
   type SkillTactic,
   type SkillWhen,
@@ -32,6 +33,8 @@ export function rolesFor(skill: SkillDef): SkillRole[] {
     case 'buff':
       if (u.banner) return ['auto', 'off'];
       if (u.policy === 'guard') return ['auto', 'emergency', 'keepUp', 'off'];
+      // A run (Phase Run) is a way out.
+      if (u.second) return ['auto', 'escape', 'keepUp', 'opener', 'emergency', 'off'];
       return ['auto', 'keepUp', 'opener', 'emergency', 'off'];
     case 'shout':
       if (u.policy === 'upkeep') return ['auto', 'off'];
@@ -41,7 +44,7 @@ export function rolesFor(skill: SkillDef): SkillRole[] {
     case 'summon':
       return u.taunt ? ['auto', 'emergency', 'off'] : ['auto', 'off'];
     case 'blink':
-      return u.escape ? ['auto', 'emergency', 'off'] : ['auto', 'off'];
+      return u.escape ? ['auto', 'escape', 'emergency', 'off'] : ['auto', 'escape', 'off'];
     default:
       return ['auto', 'off'];
   }
@@ -75,7 +78,7 @@ export function entryOf<C>(
     role,
     when,
     every: skill.cooldown === undefined ? t.every : undefined,
-    life: t.life ?? EMERGENCY_LIFE,
+    life: t.life ?? (role === 'escape' ? ESCAPE_LIFE : EMERGENCY_LIFE),
     isDefault: role === fallback && when === 'any' && t.every === undefined && t.life === undefined,
   };
 }

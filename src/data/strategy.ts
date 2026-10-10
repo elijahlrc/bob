@@ -10,10 +10,13 @@
  * - `keepUp`: kept going: a buff renewed as it ends, a curse or a debuff kept on the target, minions kept standing.
  * - `opener`: used once at the start of each fight, and once on each rare or boss enemy.
  * - `emergency`: used when life falls below a threshold.
+ * - `escape`: a blink or a run, used to get away: when hurt with an enemy near, or crowded. A blink goes to the safest spot in
+ *   reach, not toward the enemy.
  * - `auto`: a utility skill's own judgement (a guard when hurt, a warcry for a pack, a blink to close a gap).
  * - `off`: never used.
  */
-export type SkillRole = 'main' | 'periodic' | 'keepUp' | 'opener' | 'emergency' | 'auto' | 'off';
+export type SkillRole =
+  'main' | 'periodic' | 'keepUp' | 'opener' | 'emergency' | 'escape' | 'auto' | 'off';
 
 /**
  * When a skill may be used, on top of its role.
@@ -29,7 +32,7 @@ export type SkillTactic = {
   when?: SkillWhen;
   /** A periodic skill without a cooldown of its own: seconds between uses (unset: six of its use times, at least 3 s). */
   every?: number;
-  /** An emergency skill: the share of life below which it is used. */
+  /** An emergency or escape skill: the share of life below which it is used (an escape skill also goes when crowded). */
   life?: number;
 };
 
@@ -84,6 +87,11 @@ export const KITE_COOLDOWN = 1.5;
 export const FIGHT_GAP = 2;
 /** The default life threshold of an emergency skill. */
 export const EMERGENCY_LIFE = 0.5;
+/** The default life threshold of an escape skill, and the crowd (3 or more enemies within `ESCAPE_CROWD_RADIUS`) that also sends it. */
+export const ESCAPE_LIFE = 0.7;
+export const ESCAPE_CROWD_RADIUS = 4;
+/** An escape skill needs an enemy this near to be hurt by. */
+export const ESCAPE_NEAR = 5;
 /** Enemies this near the character make a pack, for the `pack` and `single` conditions. */
 export const PACK_RADIUS = 7;
 export const PACK_SIZE = 3;
@@ -102,6 +110,7 @@ export const ROLE_NAMES: Record<SkillRole, string> = {
   keepUp: 'Keep up',
   opener: 'Opener',
   emergency: 'Emergency',
+  escape: 'Escape',
   auto: 'Auto',
   off: 'Off',
 };

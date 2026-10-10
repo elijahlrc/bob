@@ -1692,7 +1692,13 @@ export class Character {
   get rotation(): RotationEntry<SkillChoice>[] {
     if (!this.rotationCache) {
       const rank = (e: RotationEntry<SkillChoice>) =>
-        e.role === 'emergency' ? 0 : e.choice.skill.utility ? 1 : e.role === 'periodic' ? 3 : 2;
+        e.role === 'emergency' || e.role === 'escape'
+          ? 0
+          : e.choice.skill.utility
+            ? 1
+            : e.role === 'periodic'
+              ? 3
+              : 2;
       const pause = new Map(
         this.rotationBase.map((e) => [e, e.role === 'periodic' ? this.cooldownOf(e.choice) : 0]),
       );
@@ -1832,7 +1838,13 @@ export class Character {
   ): { choice: SkillChoice; rate: number; busy: number }[] {
     // A utility skill kept for emergencies is not counted: a fight that goes well never calls for it.
     const cast = this.rotation
-      .filter((e) => e.choice.skill.utility && e.role !== 'emergency' && whenFits(e.when, scenario))
+      .filter(
+        (e) =>
+          e.choice.skill.utility &&
+          e.role !== 'emergency' &&
+          e.role !== 'escape' &&
+          whenFits(e.when, scenario),
+      )
       .map((e) => e.choice);
     return cast.map((choice) => {
       const u = choice.skill.utility!;

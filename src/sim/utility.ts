@@ -17,7 +17,7 @@ import { corpseNear, takeCorpse } from './factions';
 import { castOffering, offeringWanted } from './minionFx';
 import { startShell } from './skillFx';
 import type { Action, Actor, World } from './types';
-import { PACK_RADIUS, PACK_SIZE } from '../data/strategy';
+import { ESCAPE_CROWD_RADIUS, ESCAPE_NEAR, PACK_RADIUS, PACK_SIZE } from '../data/strategy';
 import type { RotationEntry } from '../calc/strategy';
 
 /**
@@ -72,6 +72,7 @@ export function utilityPick(
   if (e.role === 'auto') return autoPick(w, c, prof, target, d);
   if (e.role === 'opener' && !openerDue(w, c.key, target)) return null;
   if (e.role === 'emergency' && p.life >= p.def.maxLife * e.life) return null;
+  if (e.role === 'escape' && !wantsOut(w, e.life)) return null;
   const near = (r: number) => enemiesNear(w, p.x, p.y, r).length >= 1;
   if (u.kind === 'buff') {
     if (d > CAST_RANGE + 1 || !near(PACK_RADIUS)) return null;
@@ -95,12 +96,22 @@ export function utilityPick(
     if (d > CAST_RANGE + 6 || minionCount(w, c.key) >= summonCount(c, prof)) return null;
     return { choice: c, prof, cd: summonRespawn(c) };
   }
-  if (u.kind === 'blink' && u.escape) {
+  if (u.kind === 'blink') {
     if (c.skill.cooldown !== undefined && !skillReady(w, c)) return null;
     if (blinkGroupBusy(w, c) || !near(5)) return null;
     return { choice: c, prof, cd: u.cooldown };
   }
   return null;
+}
+
+/**
+ * Whether the character wants out (the `escape` role): hurt, with an enemy near enough to be hurt by, or boxed in by a pack. The
+ * same rule as the escape skills that decide for themselves.
+ */
+export function wantsOut(w: World, life: number): boolean {
+  const p = w.player;
+  const hurt = p.life < p.def.maxLife * life && enemiesNear(w, p.x, p.y, ESCAPE_NEAR).length >= 1;
+  return hurt || enemiesNear(w, p.x, p.y, ESCAPE_CROWD_RADIUS).length >= PACK_SIZE;
 }
 
 /** An opener is due on its first use of a fight, and on a rare or boss target it has not yet been used on. */

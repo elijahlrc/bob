@@ -266,3 +266,65 @@ describe('the strategy: target and spacing', () => {
     expect(kites.hold).toBe(0);
   });
 });
+
+describe('the escape role', () => {
+  const dist = (w: World, x: number, y: number) => Math.hypot(w.player.x - x, w.player.y - y);
+
+  it('is offered to blinks and runs, not to damage skills', async () => {
+    const { rolesFor } = await import('../calc/strategy');
+    const { gemDef } = await import('../data/gems');
+    const role = (id: string) => rolesFor(gemDef(id) as never);
+    expect(role('cinderStep')).toContain('escape');
+    expect(role('rimeStep')).toContain('escape');
+    expect(role('slipstream')).toContain('escape');
+    expect(role('flameBolt')).not.toContain('escape');
+    expect(role('ironHide')).not.toContain('escape');
+  });
+
+  it('a blink with the escape role stays put in a fight that goes well', () => {
+    const b = withStrategy(build(['crushingBlow', 'cinderStep']), { 1: { role: 'escape' } });
+    const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
+    expect(uses(world, 10).cinderStep ?? 0).toBe(0);
+  });
+
+  it('goes when life is low with an enemy near, to a spot away from the enemies', () => {
+    const b = withStrategy(build(['crushingBlow', 'cinderStep']), { 1: { role: 'escape' } });
+    const { world, dummy } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
+    world.opts.freeResources = false;
+    world.opts.godMode = true;
+    world.player.life = world.player.def.maxLife * 0.5;
+    const before = dist(world, dummy.x, dummy.y);
+    let blinked = false;
+    for (let i = 0; i < 300 && !blinked; i++) {
+      stepWorld(world);
+      blinked = world.events.some((e) => e.t === 'blink' && e.end);
+    }
+    expect(blinked).toBe(true);
+    expect(dist(world, dummy.x, dummy.y)).toBeGreaterThan(before + 2);
+  });
+
+  it('goes when three enemies crowd the character, however healthy', () => {
+    const b = withStrategy(build(['crushingBlow', 'cinderStep']), { 1: { role: 'escape' } });
+    const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
+    world.opts.godMode = true;
+    for (const [dx, dy] of [
+      [1.5, 1],
+      [1.5, -1],
+    ])
+      put(world, dx, dy);
+    expect(uses(world, 5).cinderStep ?? 0).toBeGreaterThan(0);
+  });
+
+  it('the threshold can be set, and an escape run (Phase Run) goes too', () => {
+    const b = withStrategy(build(['crushingBlow', 'slipstream']), {
+      1: { role: 'escape', life: 0.3 },
+    });
+    const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
+    world.opts.freeResources = false;
+    world.opts.godMode = true;
+    world.player.life = world.player.def.maxLife * 0.5;
+    expect(uses(world, 5).slipstream ?? 0).toBe(0);
+    world.player.life = world.player.def.maxLife * 0.25;
+    expect(uses(world, 5).slipstream ?? 0).toBeGreaterThan(0);
+  });
+});

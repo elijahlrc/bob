@@ -84,15 +84,16 @@ _Strategy:_
 Every active skill you socket has a **role**, and the skills that aren't main skills have an **order**. Both are
 on the Strategy tab.
 
-| Role          | What it means                                                                                       | Default for              |
-| ------------- | --------------------------------------------------------------------------------------------------- | ------------------------ |
-| **Main**      | The filler: used whenever no other skill is called for.                                             | The ★ primary skill      |
-| **Periodic**  | Used every so often: when its own cooldown allows, or after a pause.                                | Every other damage skill |
-| **Keep up**   | Kept going: a buff renewed as it runs out, a curse or a damage-over-time debuff kept on the target. | —                        |
-| **Opener**    | Used once at the start of each fight, and once on each rare, champion or boss.                      | —                        |
-| **Emergency** | Used when life falls below a threshold you pick (30% to 70%).                                       | —                        |
-| **Auto**      | A utility skill's own judgement (section 5).                                                        | Every utility skill      |
-| **Off**       | Never used.                                                                                         | —                        |
+| Role          | What it means                                                                                                                                                                                                           | Default for              |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| **Main**      | The filler: used whenever no other skill is called for.                                                                                                                                                                 | The ★ primary skill      |
+| **Periodic**  | Used every so often: when its own cooldown allows, or after a pause.                                                                                                                                                    | Every other damage skill |
+| **Keep up**   | Kept going: a buff renewed as it runs out, a curse or a damage-over-time debuff kept on the target.                                                                                                                     | —                        |
+| **Opener**    | Used once at the start of each fight, and once on each rare, champion or boss.                                                                                                                                          | —                        |
+| **Emergency** | Used when life falls below a threshold you pick (30% to 70%).                                                                                                                                                           | —                        |
+| **Escape**    | A way out: a blink or a run, used when life falls below a threshold (30% to 70%) with an enemy within 5 tiles, or when 3 or more enemies are within 4. A blink goes to the safest spot in reach, away from the enemies. | —                        |
+| **Auto**      | A utility skill's own judgement (section 5).                                                                                                                                                                            | Every utility skill      |
+| **Off**       | Never used.                                                                                                                                                                                                             | —                        |
 
 Every role can also have a **condition**: any fight, **packs** (3 or more enemies within 7 tiles of the character),
 **few enemies** (fewer than that), **rares and bosses** (the target is rare, a champion or a boss) or **bosses
@@ -230,7 +231,9 @@ _Strategy:_
 - **Other roles** replace these rules. **Keep up** casts a buff whenever an enemy is within 7 tiles and the buff is
   running out, keeps a curse on any target (not only packs and rares), and uses a warcry whenever an enemy is in its
   radius. **Opener** does the same once a fight and once on each rare. **Emergency** waits for life below its
-  threshold, which is also how to make a guard, a decoy or an escape blink wait longer or fire sooner. A banner,
+  threshold, which is how to make a guard or a decoy wait longer or fire sooner. **Escape** is for blinks and runs: it uses the
+  blink to get away (to the safest spot, not toward the enemy) when hurt with an enemy near or when boxed in, instead of the
+  blink closing a gap. A banner,
   an offering, a minion summon and a gap-closing blink only have Auto or Off.
 - **Curses mostly go on packs and big enemies.** A lone, normal enemy below half life won't be cursed.
 - **Guards react to damage.** A guard goes up after you've already fallen below 60%. Big single hits can kill
