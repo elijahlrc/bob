@@ -25,7 +25,7 @@ import { MONSTER_TYPES } from '../data/monsters';
 import { actorById, segmentDist, startAction } from './actions';
 import { bloaterBurst, corpseNear, isZone, moveMult } from './factions';
 import { flaskMask, monsterConds, playerConds } from './combat';
-import { hasChargesToSpend, offCooldown, skillReady, useSkill } from './cooldowns';
+import { skillReady, useSkill } from './cooldowns';
 import { canPay, payCost } from './cost';
 import { deployFull } from './deploy';
 import { inTelegraph, telegraphs } from './telegraph';
@@ -41,7 +41,19 @@ import {
   withdrawing,
 } from './movement';
 import { running } from './blinks';
-import { chooseUtility, contactRange } from './utility';
+import { contactRange, enemiesNear, markOpened, openerDue, utilityPick } from './utility';
+import type { RotationEntry } from '../calc/strategy';
+import {
+  CLOSE_RANGE,
+  FIGHT_GAP,
+  KITE_COOLDOWN,
+  KITE_RANGE,
+  KITE_TIME,
+  PACK_RADIUS,
+  PACK_SIZE,
+  STRATEGY_DEFAULTS,
+  type SkillWhen,
+} from '../data/strategy';
 import type { Actor, World } from './types';
 
 function canAct(a: Actor): boolean {
@@ -119,8 +131,12 @@ const LOOT_GIVE_UP = 20;
 const SUPPORT_TYPES = new Set(['nest', 'pylon']);
 const SUPPORT_PRIORITY = 4;
 
+/** How much nearer a rare, champion or boss enemy counts with the `rares` target priority, in tiles. */
+const RARE_PRIORITY = 4;
+
 function findTarget(w: World): Actor | null {
   const p = w.player;
+  const prio = w.char.build.strategy?.target ?? STRATEGY_DEFAULTS.target;
   let best: Actor | null = null;
   let bd = Infinity;
   for (const m of w.actors) {
@@ -131,7 +147,13 @@ function findTarget(w: World): Actor | null {
     // Spawners and shield-givers come first: a nest feeds the pack and a pylon makes it untouchable.
     if (!revealed(w, m)) continue;
     const support = !!m.mon && SUPPORT_TYPES.has(m.mon.spec.type);
-    const d = real - (support ? SUPPORT_PRIORITY : 0);
+    // The target priority (Strategy tab): rares count as nearer, or the weakest goes first (distance breaks a tie).
+    const d =
+      prio === 'lowest'
+        ? (support ? -1000 : 0) + (m.life / Math.max(1, m.def.maxLife)) * 100 + real * 0.01
+        : real -
+          (support ? SUPPORT_PRIORITY : 0) -
+          (prio === 'rares' && isBig(m) ? RARE_PRIORITY : 0);
     if (d > bd + 1e-9) continue;
     if (Math.abs(d - bd) <= 1e-9 && best && m.life >= best.life) continue;
     // Out of sight is no reason to ignore a pylon: everything around it is untouchable until it falls.
@@ -176,56 +198,98 @@ function inReach(w: World, prof: SkillProfile, target: Actor): boolean {
   return d <= reach && (melee || w.grid.los(p.x, p.y, target.x, target.y));
 }
 
-function chooseSkill(w: World, target: Actor) {
+type Pick = {
+  which: 'utility' | 'secondary' | 'primary' | 'default';
+  prof: SkillProfile;
+  costsLife: boolean;
+  choice: SkillChoice;
+  entry?: RotationEntry<SkillChoice>;
+  /** Seconds before a utility skill can be cast again. */
+  cd: number;
+};
+
+const isBig = (a: Actor) => a.rarity === 'boss' || a.rarity === 'miniboss' || a.rarity === 'rare';
+
+/** Whether a skill's condition (Strategy tab) holds in the fight as it is now. */
+function whenHolds(w: World, when: SkillWhen, target: Actor): boolean {
+  if (when === 'any') return true;
+  if (when === 'rare') return isBig(target);
+  if (when === 'boss') return target.rarity === 'boss' || target.rarity === 'miniboss';
+  const p = w.player;
+  const pack = enemiesNear(w, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE;
+  return when === 'pack' ? pack : !pack;
+}
+
+/** A damage skill that keeps its debuff on the target is not cast again while the debuff has a while to run. */
+function debuffHolds(prof: SkillProfile, target: Actor): boolean {
+  return target.sdots.some((d) => d.src === prof.skill.id && d.t > prof.useTime + 0.3);
+}
+
+/**
+ * What the character does now against its target (the Strategy tab, docs/PLAYER-AI.md): the first of its skills, in the order the
+ * strategy gives, whose role and condition call for it and that it can use from where it stands; then the first main skill it can
+ * use (it walks into reach for it); then, with no main skill to use, a periodic one that is ready early; and last the weapon.
+ */
+function chooseSkill(w: World, target: Actor): Pick {
   const conds = playerConds(w, target);
-  // Secondary casts first (EXPANSION 5.5a): the ready one with the longest cooldown.
-  let second: {
-    prof: SkillProfile;
-    costsLife: boolean;
-    key: string;
-    cd: number;
-    choice: SkillChoice;
-  } | null = null;
-  for (const c of w.char.secondaries) {
-    // A skill with a cooldown of its own waits for a use (or the charges that stand in for one).
-    if (!hasChargesToSpend(w, c)) continue;
-    if (c.skill.cooldown !== undefined ? !offCooldown(w, c) : (w.secondaryReady[c.key] ?? 0) > w.t)
+  const p = w.player;
+  const usable = (c: SkillChoice, prof: SkillProfile): boolean =>
+    skillReady(w, c) &&
+    canHurt(prof, target.def) &&
+    canPay(w, c.costsLife, prof.cost) &&
+    !deployFull(w, c, prof) &&
+    corpseReady(w, prof, target);
+  for (const e of w.char.rotation) {
+    if (!whenHolds(w, e.when, target)) continue;
+    const c = e.choice;
+    if (c.skill.utility) {
+      const u = utilityPick(w, e, target);
+      if (u)
+        return {
+          which: 'utility',
+          prof: u.prof,
+          costsLife: c.costsLife,
+          choice: c,
+          entry: e,
+          cd: u.cd,
+        };
       continue;
-    const prof = w.char.profile(c, conds, flaskMask(w));
-    if (!canHurt(prof, target.def) || !canPay(w, c.costsLife, prof.cost)) continue;
-    if (deployFull(w, c, prof) || !inReach(w, prof, target) || !corpseReady(w, prof, target))
-      continue;
-    const cd = w.char.cooldownOf(c, conds);
-    if (!second || cd > second.cd)
-      second = { prof, costsLife: c.costsLife, key: c.key, cd, choice: c };
-  }
-  if (second) return { which: 'secondary' as const, ...second };
-  if (w.primary.usable && w.primary.gemUid !== null && skillReady(w, w.primary)) {
-    const prof = w.char.profile(w.primary, conds, flaskMask(w));
-    // Against a target immune to everything the skill deals, fall back to the weapon.
+    }
     if (
-      canHurt(prof, target.def) &&
-      !alreadyAfflicted(prof, target) &&
-      corpseReady(w, prof, target) &&
-      canPay(w, w.primary.costsLife, prof.cost) &&
-      !deployFull(w, w.primary, prof)
+      e.role === 'periodic' &&
+      c.skill.cooldown === undefined &&
+      (w.secondaryReady[c.key] ?? 0) > w.t
     )
-      return {
-        which: 'primary' as const,
-        prof,
-        costsLife: w.primary.costsLife,
-        key: '',
-        cd: 0,
-        choice: w.primary,
-      };
+      continue;
+    if (e.role === 'opener' && !openerDue(w, c.key, target)) continue;
+    if (e.role === 'emergency' && p.life >= p.def.maxLife * e.life) continue;
+    const prof = w.char.profile(c, conds, flaskMask(w));
+    if (e.role === 'keepUp' && debuffHolds(prof, target)) continue;
+    if (!usable(c, prof) || !inReach(w, prof, target)) continue;
+    return { which: 'secondary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
+  }
+  for (const e of w.char.mains) {
+    if (!whenHolds(w, e.when, target)) continue;
+    const c = e.choice;
+    const prof = w.char.profile(c, conds, flaskMask(w));
+    // Against a target immune to everything the skill deals, the next skill (or the weapon) is used.
+    if (!usable(c, prof) || alreadyAfflicted(prof, target)) continue;
+    return { which: 'primary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
+  }
+  // No main skill can be used (its cooldown, its cost, an immune target): a periodic skill that is ready is better than the weapon.
+  for (const e of w.char.rotation) {
+    const c = e.choice;
+    if (c.skill.utility || e.role !== 'periodic' || !whenHolds(w, e.when, target)) continue;
+    const prof = w.char.profile(c, conds, flaskMask(w));
+    if (!usable(c, prof) || !inReach(w, prof, target)) continue;
+    return { which: 'secondary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
   }
   return {
-    which: 'default' as const,
+    which: 'default',
     prof: w.char.profile(w.char.defaultAttack, conds, flaskMask(w)),
     costsLife: false,
-    key: '',
-    cd: 0,
     choice: w.char.defaultAttack,
+    cd: 0,
   };
 }
 
@@ -297,6 +361,64 @@ function avoidHazard(w: World, dt: number): boolean {
   return true;
 }
 
+/**
+ * The `kite` spacing (Strategy tab): a ranged character steps back when an enemy comes within `KITE_RANGE`, to a spot from which
+ * its target is still in reach and in sight, for a moment, and then fights on. Returns whether it moved.
+ */
+function kiteStep(w: World, target: Actor, dt: number): boolean {
+  const p = w.player;
+  const ai = w.ai;
+  ai.kiteCd -= dt;
+  if (ai.kiteT > 0) {
+    ai.kiteT -= dt;
+    if (Math.hypot(ai.kiteX - p.x, ai.kiteY - p.y) > 0.2) {
+      moveTo(w, p, ai.kiteX, ai.kiteY, dt);
+      return true;
+    }
+    ai.kiteT = 0;
+  }
+  if (w.char.build.strategy?.spacing !== 'kite' || ai.kiteCd > 0) return false;
+  const prof = w.char.profile(w.primary, 0);
+  if (prof.skill.behaviour.kind === 'melee') return false;
+  const range = skillRange(prof) + target.r;
+  // A skill of short reach gains nothing by backing off.
+  if (range < KITE_RANGE + 2) return false;
+  let near: Actor | null = null;
+  let nd = KITE_RANGE;
+  for (const m of w.actors) {
+    if (m.isPlayer || !m.alive || m.phaseT > 0 || m.stationary) continue;
+    const d = Math.hypot(m.x - p.x, m.y - p.y);
+    if (d < nd) {
+      nd = d;
+      near = m;
+    }
+  }
+  if (!near) return false;
+  let best: { x: number; y: number; score: number } | null = null;
+  for (let k = 0; k < 16; k++) {
+    const ang = (k / 16) * Math.PI * 2;
+    for (const len of [2.5, 3.5]) {
+      const c = w.grid.collide(p.x + Math.cos(ang) * len, p.y + Math.sin(ang) * len, p.r);
+      if (Math.hypot(c.x - p.x, c.y - p.y) < len - 0.2) continue;
+      if (hazardAt(w, c.x, c.y, p.r + 0.3) || !w.grid.los(p.x, p.y, c.x, c.y)) continue;
+      if (bodyOnWay(w, p.x, p.y, c.x, c.y, p.r)) continue;
+      if (Math.hypot(target.x - c.x, target.y - c.y) > range) continue;
+      if (!w.grid.los(c.x, c.y, target.x, target.y)) continue;
+      const score = Math.hypot(near.x - c.x, near.y - c.y);
+      if (!best || score > best.score) best = { x: c.x, y: c.y, score };
+    }
+  }
+  // Only a step that gains real distance is worth taking.
+  if (!best || best.score < nd + 1.5) return false;
+  ai.kiteT = KITE_TIME;
+  ai.kiteCd = KITE_COOLDOWN;
+  ai.kiteX = best.x;
+  ai.kiteY = best.y;
+  w.stats.kites++;
+  moveTo(w, p, best.x, best.y, dt);
+  return true;
+}
+
 export function playerAI(w: World, dt: number): void {
   const p = w.player;
   const ai = w.ai;
@@ -309,7 +431,10 @@ export function playerAI(w: World, dt: number): void {
   if (target && (!target.alive || Math.hypot(target.x - p.x, target.y - p.y) > ENGAGE_RANGE + 3))
     target = undefined;
   ai.scanT -= dt;
-  if (!target || ai.scanT <= 0) {
+  const strategy = w.char.build.strategy;
+  // With the `stick` priority, a target is kept until it falls or gets away.
+  const stick = strategy?.target === 'stick' && !!target;
+  if (!target || (ai.scanT <= 0 && !stick)) {
     ai.scanT = 0.1;
     target = findTarget(w) ?? undefined;
   }
@@ -334,20 +459,27 @@ export function playerAI(w: World, dt: number): void {
     }
     ai.targetId = target.id;
     ai.mode = 'engage';
-    const util = chooseUtility(w, target);
-    if (util) {
-      payCost(w, util.choice.costsLife, util.prof.cost);
-      w.utilityReady[util.choice.key] = w.t + util.cd;
-      useSkill(w, util.choice);
-      startAction(w, p, 'utility', util.prof, target);
+    // A new fight begins after a quiet spell (an opener is used once a fight).
+    if (w.t - ai.lastEngaged > FIGHT_GAP) ai.fight++;
+    ai.lastEngaged = w.t;
+    if (kiteStep(w, target, dt)) return;
+    const pick = chooseSkill(w, target);
+    const { which, prof, costsLife, choice, entry } = pick;
+    if (which === 'utility') {
+      payCost(w, costsLife, prof.cost);
+      w.utilityReady[choice.key] = w.t + pick.cd;
+      useSkill(w, choice);
+      if (entry?.role === 'opener') markOpened(w, choice.key, target);
+      startAction(w, p, 'utility', prof, target);
       return;
     }
-    const { which, prof, costsLife, key, cd, choice } = chooseSkill(w, target);
     const melee = prof.skill.behaviour.kind === 'melee';
     // A burning aura or circling blades only reach what is close: walk in among the enemies, whatever the attack's range.
     const contact = contactRange(w);
     const reach0 = skillRange(prof) + target.r + (melee ? p.r : 0);
-    const reach = contact > 0 ? Math.min(reach0, contact + target.r) : reach0;
+    // The `close` spacing (Strategy tab): a ranged character stands nearer than its skill's range.
+    const close = !melee && strategy?.spacing === 'close' ? CLOSE_RANGE + target.r : Infinity;
+    const reach = Math.min(reach0, contact > 0 ? contact + target.r : Infinity, close);
     const d = Math.hypot(target.x - p.x, target.y - p.y);
     const inRange = d <= reach && (melee || w.grid.los(p.x, p.y, target.x, target.y));
     // Arrows keep hitting walls (a wide fan in a narrow corridor): close in for a clearer shot.
@@ -365,8 +497,9 @@ export function playerAI(w: World, dt: number): void {
     if (inRange) {
       if (which === 'primary' || which === 'secondary') payCost(w, costsLife, prof.cost);
       if (which === 'secondary' && choice.skill.cooldown === undefined)
-        w.secondaryReady[key] = w.t + cd;
+        w.secondaryReady[choice.key] = w.t + w.char.cooldownOf(choice, playerConds(w, target));
       if (which === 'primary' || which === 'secondary') useSkill(w, choice);
+      if (entry?.role === 'opener') markOpened(w, choice.key, target);
       startAction(w, p, which, prof, target);
       return;
     }

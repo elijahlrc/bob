@@ -17,6 +17,8 @@ import { corpseNear, takeCorpse } from './factions';
 import { castOffering, offeringWanted } from './minionFx';
 import { startShell } from './skillFx';
 import type { Action, Actor, World } from './types';
+import { PACK_RADIUS, PACK_SIZE } from '../data/strategy';
+import type { RotationEntry } from '../calc/strategy';
 
 /**
  * Utility skills in the sim (COVERAGE 5.1): curses, buffs, guards, warcries and blinks have no damage of their own,
@@ -26,9 +28,6 @@ import type { Action, Actor, World } from './types';
 
 /** How far a utility is cast from, in tiles (a curse is a spell: it needs the target in sight). */
 const CAST_RANGE = 9;
-/** Enemies this close to the player make a pack for a warcry or a guard. */
-const PACK_RADIUS = 7;
-const PACK_SIZE = 3;
 /** A guard goes up when life falls below this share. */
 const GUARD_LIFE = 0.6;
 
@@ -40,139 +39,195 @@ const WARCRY_SECONDS = 4;
 
 export type UtilityPick = { choice: SkillChoice; prof: SkillProfile; cd: number };
 
-function enemiesNear(w: World, x: number, y: number, r: number): Actor[] {
+export function enemiesNear(w: World, x: number, y: number, r: number): Actor[] {
   return w.actors.filter(
     (e) => !e.isPlayer && e.alive && e.phaseT <= 0 && Math.hypot(e.x - x, e.y - y) <= r,
   );
 }
 
-/** The utility skill to cast now against this target, if the policy says so. */
-export function chooseUtility(w: World, target: Actor): UtilityPick | null {
+const isBig = (a: Actor) => a.rarity === 'boss' || a.rarity === 'miniboss' || a.rarity === 'rare';
+
+/**
+ * Whether a utility skill is to be cast now against this target, by its role on the Strategy tab: `auto` is the skill's own
+ * judgement (below), `keepUp` keeps it going whenever an enemy is near, `opener` casts it at the start of a fight and on each rare,
+ * and `emergency` when life falls below the entry's threshold. The caller has checked the entry's condition (`when`).
+ */
+export function utilityPick(
+  w: World,
+  e: RotationEntry<SkillChoice>,
+  target: Actor,
+): UtilityPick | null {
   const ch = w.char;
-  if (!ch.utilities.length) return null;
+  const c = e.choice;
   const p = w.player;
+  if ((w.utilityReady[c.key] ?? 0) > w.t) return null;
+  const u = c.skill.utility!;
+  // The warcries wait on one another (3.9: a shared four seconds).
+  if (c.skill.tags.includes('warcry') && (w.utilityReady[WARCRIES] ?? 0) > w.t) return null;
+  // The guard skills wait on one another (3.9).
+  if (u.kind === 'buff' && u.policy === 'guard' && (w.utilityReady[GUARDS] ?? 0) > w.t) return null;
   const d = Math.hypot(target.x - p.x, target.y - p.y);
-  const conds = playerConds(w, target);
-  for (const c of ch.utilities) {
-    if ((w.utilityReady[c.key] ?? 0) > w.t) continue;
-    const u = c.skill.utility!;
-    // The warcries wait on one another (3.9: a shared four seconds).
-    if (c.skill.tags.includes('warcry') && (w.utilityReady[WARCRIES] ?? 0) > w.t) continue;
-    // The guard skills wait on one another (3.9).
-    if (u.kind === 'buff' && u.policy === 'guard' && (w.utilityReady[GUARDS] ?? 0) > w.t) continue;
-    const prof = ch.profile(c, conds, flaskMask(w));
-    if (!canPay(w, c.costsLife, prof.cost)) continue;
-    if (u.kind === 'buff' && u.banner) {
-      if (!bannerAction(w, c, target)) continue;
-      return { choice: c, prof, cd: u.cooldown ?? 1 };
-    }
-    if (u.kind === 'buff') {
-      if (d > CAST_RANGE + 1) continue;
-      // Berserk needs rage to start; Blood Rage is not begun on low life.
-      if (u.rage && w.rage < u.rage.min) continue;
-      if (u.degen && p.life < p.def.maxLife * 0.6) continue;
-      const left = w.buffT[u.buff];
-      if (left > prof.useTime + 0.3) continue;
-      if (u.policy === 'guard') {
-        const hit = p.life / Math.max(1, p.def.maxLife) < GUARD_LIFE;
-        if (!hit || left > 0) continue;
-      } else if (u.policy === 'rally') {
-        const pack = enemiesNear(w, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE;
-        const big =
-          target.rarity === 'boss' || target.rarity === 'miniboss' || target.rarity === 'rare';
-        if (!pack && !big) continue;
-      } else if (u.second) {
-        // A buff the first skill ends is a run: begun to get through a crowd or away when hurt, not at every fight.
-        const hurt = p.life < p.def.maxLife * 0.7 && enemiesNear(w, p.x, p.y, 5).length >= 1;
-        const crowded = enemiesNear(w, p.x, p.y, 4).length >= PACK_SIZE;
-        if (!hurt && !crowded) continue;
-      } else if (enemiesNear(w, p.x, p.y, PACK_RADIUS).length < 1) continue;
-      return { choice: c, prof, cd: u.cooldown ?? 0.5 };
-    }
-    if (u.kind === 'shout') {
-      // Cast when a pack or a rare enemy is near, like a rallying cry; a standing channel (Wither) goes on while any enemy is near.
-      if (u.policy === 'upkeep') {
-        if (enemiesNear(w, p.x, p.y, u.radius).length < 1) continue;
-        return { choice: c, prof, cd: u.cooldown };
-      }
-      const pack = enemiesNear(w, p.x, p.y, u.radius + 2).length >= PACK_SIZE;
-      const big =
-        target.rarity === 'boss' || target.rarity === 'miniboss' || target.rarity === 'rare';
-      if (d > u.radius + 2 || (!pack && !big)) continue;
-      return { choice: c, prof, cd: u.cooldown };
-    }
-    if (u.kind === 'curse') {
-      if (d > CAST_RANGE || !w.grid.los(p.x, p.y, target.x, target.y)) continue;
-      const have = target.hexes.find((h) => h.id === u.hex);
-      if (have && have.t > prof.useTime + 0.5) continue;
-      if (!have && target.hexes.length >= Math.max(1, ch.hexLimit)) continue;
-      const pack = enemiesNear(w, target.x, target.y, u.radius).length >= PACK_SIZE;
-      const big =
-        target.rarity === 'boss' || target.rarity === 'miniboss' || target.rarity === 'rare';
-      if (!pack && !big && target.life < 0.5 * target.def.maxLife) continue;
-      return { choice: c, prof, cd: 0.5 };
-    }
-    if (u.kind === 'offering') {
-      if (!offeringWanted(w, CAST_RANGE + 2)) continue;
-      return { choice: c, prof, cd: 0.5 };
-    }
-    if (u.kind === 'summon') {
-      if (c.skill.cooldown !== undefined && !skillReady(w, c)) continue;
-      // A spectre needs a corpse to raise.
-      if ((u.corpse || u.corpseCost) && !corpseNear(w, p.x, p.y, CAST_RANGE)) continue;
-      // A decoy goes up when a pack closes in, or life runs low.
-      if (
-        u.taunt &&
-        enemiesNear(w, p.x, p.y, PACK_RADIUS).length < PACK_SIZE &&
-        target.rarity !== 'boss' &&
-        target.rarity !== 'miniboss' &&
-        target.rarity !== 'rare' &&
-        p.life >= p.def.maxLife * 0.7
-      )
-        continue;
-      // Minions are summoned in the first fight and again when they are gone or have run out.
-      if (d > CAST_RANGE + 6 || minionCount(w, c.key) >= summonCount(c, prof)) continue;
-      return { choice: c, prof, cd: summonRespawn(c) };
-    }
-    // A blink closes the gap to a target the primary skill cannot reach yet; one with an effect where it leaves or lands is also
-    // used when that would fall on a pack, and Withering Step to run through a pack (the character then makes no attack while it lasts).
-    if (u.kind !== 'blink') continue;
-    if (c.skill.cooldown !== undefined && !skillReady(w, c)) continue;
-    if (blinkGroupBusy(w, c)) continue;
-    // A blink to get away is used when hurt with enemies about, or when a pack has closed in.
-    if (u.escape) {
+  const prof = ch.profile(c, playerConds(w, target), flaskMask(w));
+  if (!canPay(w, c.costsLife, prof.cost)) return null;
+  if (e.role === 'auto') return autoPick(w, c, prof, target, d);
+  if (e.role === 'opener' && !openerDue(w, c.key, target)) return null;
+  if (e.role === 'emergency' && p.life >= p.def.maxLife * e.life) return null;
+  const near = (r: number) => enemiesNear(w, p.x, p.y, r).length >= 1;
+  if (u.kind === 'buff') {
+    if (d > CAST_RANGE + 1 || !near(PACK_RADIUS)) return null;
+    if (u.rage && w.rage < u.rage.min) return null;
+    if (w.buffT[u.buff] > prof.useTime + 0.3) return null;
+    return { choice: c, prof, cd: u.cooldown ?? 0.5 };
+  }
+  if (u.kind === 'shout') {
+    if (d > u.radius + 2) return null;
+    return { choice: c, prof, cd: u.cooldown };
+  }
+  if (u.kind === 'curse') {
+    if (d > CAST_RANGE || !w.grid.los(p.x, p.y, target.x, target.y)) return null;
+    const have = target.hexes.find((h) => h.id === u.hex);
+    if (have && have.t > prof.useTime + 0.5) return null;
+    if (!have && target.hexes.length >= Math.max(1, ch.hexLimit)) return null;
+    return { choice: c, prof, cd: 0.5 };
+  }
+  if (u.kind === 'summon') {
+    if (c.skill.cooldown !== undefined && !skillReady(w, c)) return null;
+    if (d > CAST_RANGE + 6 || minionCount(w, c.key) >= summonCount(c, prof)) return null;
+    return { choice: c, prof, cd: summonRespawn(c) };
+  }
+  if (u.kind === 'blink' && u.escape) {
+    if (c.skill.cooldown !== undefined && !skillReady(w, c)) return null;
+    if (blinkGroupBusy(w, c) || !near(5)) return null;
+    return { choice: c, prof, cd: u.cooldown };
+  }
+  return null;
+}
+
+/** An opener is due on its first use of a fight, and on a rare or boss target it has not yet been used on. */
+export function openerDue(w: World, key: string, target: Actor): boolean {
+  const o = w.openers[key];
+  if (!o || o.fight !== w.ai.fight) return true;
+  return isBig(target) && !o.ids.includes(target.id);
+}
+
+/** An opener has been used against this target. */
+export function markOpened(w: World, key: string, target: Actor): void {
+  const o = w.openers[key];
+  const ids = o && o.fight === w.ai.fight ? o.ids : [];
+  w.openers[key] = { fight: w.ai.fight, ids: [...ids.slice(-15), target.id] };
+}
+
+/** A utility skill's own judgement (the `auto` role), ahead of the damage skills by default (COVERAGE 5.1). */
+function autoPick(
+  w: World,
+  c: SkillChoice,
+  prof: SkillProfile,
+  target: Actor,
+  d: number,
+): UtilityPick | null {
+  const ch = w.char;
+  const p = w.player;
+  const u = c.skill.utility!;
+  if (u.kind === 'buff' && u.banner) {
+    if (!bannerAction(w, c, target)) return null;
+    return { choice: c, prof, cd: u.cooldown ?? 1 };
+  }
+  if (u.kind === 'buff') {
+    if (d > CAST_RANGE + 1) return null;
+    // Berserk needs rage to start; Blood Rage is not begun on low life.
+    if (u.rage && w.rage < u.rage.min) return null;
+    if (u.degen && p.life < p.def.maxLife * 0.6) return null;
+    const left = w.buffT[u.buff];
+    if (left > prof.useTime + 0.3) return null;
+    if (u.policy === 'guard') {
+      const hit = p.life / Math.max(1, p.def.maxLife) < GUARD_LIFE;
+      if (!hit || left > 0) return null;
+    } else if (u.policy === 'rally') {
+      const pack = enemiesNear(w, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE;
+      if (!pack && !isBig(target)) return null;
+    } else if (u.second) {
+      // A buff the first skill ends is a run: begun to get through a crowd or away when hurt, not at every fight.
       const hurt = p.life < p.def.maxLife * 0.7 && enemiesNear(w, p.x, p.y, 5).length >= 1;
       const crowded = enemiesNear(w, p.x, p.y, 4).length >= PACK_SIZE;
-      if (hurt || crowded) return { choice: c, prof, cd: u.cooldown };
-      continue;
-    }
-    const reach = skillRange(ch.profile(w.primary, conds, flaskMask(w))) + target.r;
-    const gap =
-      d > reach + 2 && d <= u.distance + reach && w.grid.los(p.x, p.y, target.x, target.y);
-    const radius =
-      (prof.skill.behaviour.kind === 'burst' ? prof.skill.behaviour.radius : 2) * prof.radiusMult;
-    const packHere =
-      (u.burst === 'depart' || u.burst === 'both') &&
-      enemiesNear(w, p.x, p.y, radius * 1.3).length >= PACK_SIZE;
-    // Bodyswap goes to a corpse with enemies about it.
-    const corpseGo =
-      !!u.corpse &&
-      w.corpses.some(
-        (c0) =>
-          Math.hypot(c0.x - p.x, c0.y - p.y) <= u.distance + 1 &&
-          enemiesNear(w, c0.x, c0.y, 2.5).length >= 2,
-      );
-    const packThere =
-      u.burst === 'arrive' && gap && enemiesNear(w, target.x, target.y, radius * 1.3).length >= 2;
-    const fight =
-      !!u.elusive &&
-      w.buffT.elusive <= 0 &&
-      d <= CAST_RANGE &&
-      enemiesNear(w, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE;
-    if (u.warp && w.warp) continue;
-    if (gap || packHere || packThere || fight || corpseGo)
-      return { choice: c, prof, cd: u.cooldown };
+      if (!hurt && !crowded) return null;
+    } else if (enemiesNear(w, p.x, p.y, PACK_RADIUS).length < 1) return null;
+    return { choice: c, prof, cd: u.cooldown ?? 0.5 };
   }
+  if (u.kind === 'shout') {
+    // Cast when a pack or a rare enemy is near, like a rallying cry; a standing channel (Wither) goes on while any enemy is near.
+    if (u.policy === 'upkeep') {
+      if (enemiesNear(w, p.x, p.y, u.radius).length < 1) return null;
+      return { choice: c, prof, cd: u.cooldown };
+    }
+    const pack = enemiesNear(w, p.x, p.y, u.radius + 2).length >= PACK_SIZE;
+    if (d > u.radius + 2 || (!pack && !isBig(target))) return null;
+    return { choice: c, prof, cd: u.cooldown };
+  }
+  if (u.kind === 'curse') {
+    if (d > CAST_RANGE || !w.grid.los(p.x, p.y, target.x, target.y)) return null;
+    const have = target.hexes.find((h) => h.id === u.hex);
+    if (have && have.t > prof.useTime + 0.5) return null;
+    if (!have && target.hexes.length >= Math.max(1, ch.hexLimit)) return null;
+    const pack = enemiesNear(w, target.x, target.y, u.radius).length >= PACK_SIZE;
+    if (!pack && !isBig(target) && target.life < 0.5 * target.def.maxLife) return null;
+    return { choice: c, prof, cd: 0.5 };
+  }
+  if (u.kind === 'offering') {
+    if (!offeringWanted(w, CAST_RANGE + 2)) return null;
+    return { choice: c, prof, cd: 0.5 };
+  }
+  if (u.kind === 'summon') {
+    if (c.skill.cooldown !== undefined && !skillReady(w, c)) return null;
+    // A spectre needs a corpse to raise.
+    if ((u.corpse || u.corpseCost) && !corpseNear(w, p.x, p.y, CAST_RANGE)) return null;
+    // A decoy goes up when a pack closes in, or life runs low.
+    if (
+      u.taunt &&
+      enemiesNear(w, p.x, p.y, PACK_RADIUS).length < PACK_SIZE &&
+      !isBig(target) &&
+      p.life >= p.def.maxLife * 0.7
+    )
+      return null;
+    // Minions are summoned in the first fight and again when they are gone or have run out.
+    if (d > CAST_RANGE + 6 || minionCount(w, c.key) >= summonCount(c, prof)) return null;
+    return { choice: c, prof, cd: summonRespawn(c) };
+  }
+  // A blink closes the gap to a target the primary skill cannot reach yet; one with an effect where it leaves or lands is also
+  // used when that would fall on a pack, and Withering Step to run through a pack (the character then makes no attack while it lasts).
+  if (u.kind !== 'blink') return null;
+  if (c.skill.cooldown !== undefined && !skillReady(w, c)) return null;
+  if (blinkGroupBusy(w, c)) return null;
+  // A blink to get away is used when hurt with enemies about, or when a pack has closed in.
+  if (u.escape) {
+    const hurt = p.life < p.def.maxLife * 0.7 && enemiesNear(w, p.x, p.y, 5).length >= 1;
+    const crowded = enemiesNear(w, p.x, p.y, 4).length >= PACK_SIZE;
+    return hurt || crowded ? { choice: c, prof, cd: u.cooldown } : null;
+  }
+  const conds = playerConds(w, target);
+  const reach = skillRange(ch.profile(w.primary, conds, flaskMask(w))) + target.r;
+  const gap = d > reach + 2 && d <= u.distance + reach && w.grid.los(p.x, p.y, target.x, target.y);
+  const radius =
+    (prof.skill.behaviour.kind === 'burst' ? prof.skill.behaviour.radius : 2) * prof.radiusMult;
+  const packHere =
+    (u.burst === 'depart' || u.burst === 'both') &&
+    enemiesNear(w, p.x, p.y, radius * 1.3).length >= PACK_SIZE;
+  // Bodyswap goes to a corpse with enemies about it.
+  const corpseGo =
+    !!u.corpse &&
+    w.corpses.some(
+      (c0) =>
+        Math.hypot(c0.x - p.x, c0.y - p.y) <= u.distance + 1 &&
+        enemiesNear(w, c0.x, c0.y, 2.5).length >= 2,
+    );
+  const packThere =
+    u.burst === 'arrive' && gap && enemiesNear(w, target.x, target.y, radius * 1.3).length >= 2;
+  const fight =
+    !!u.elusive &&
+    w.buffT.elusive <= 0 &&
+    d <= CAST_RANGE &&
+    enemiesNear(w, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE;
+  if (u.warp && w.warp) return null;
+  if (gap || packHere || packThere || fight || corpseGo) return { choice: c, prof, cd: u.cooldown };
   return null;
 }
 

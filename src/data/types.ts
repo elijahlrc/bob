@@ -1,5 +1,6 @@
 import type { DamageType, Mod, SkillTag } from '../mods/types';
 import type { TriggerDef } from './triggers';
+import type { Strategy } from './strategy';
 
 export type Attrs = { str: number; dex: number; int: number };
 
@@ -139,6 +140,8 @@ export type Build = {
   flasks: (FlaskItem | null)[];
   /** uid of the primary active gem, if chosen. */
   primaryGem?: number;
+  /** How the character mixes its skills and fights (the Strategy tab); unset parts take their defaults. */
+  strategy?: Strategy;
 };
 
 export type ClassDef = {

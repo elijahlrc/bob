@@ -124,11 +124,12 @@ const keyOf = (x: object | null | undefined): string => {
   return k;
 };
 
-/** Everything a build's score depends on: the character, its gear, its tree, and the map (for the area level). */
+/** Everything a build's score depends on: the character, its gear, its tree, its strategy, and the map (for the area level). */
 function buildKey(run: RunState, b: Build): string {
   const parts = [run.map, b.classId, b.level, b.primaryGem ?? '', b.allocated.join(',')];
   for (const slot of EQUIP_SLOTS) parts.push(keyOf(b.equipment[slot]));
   for (const f of b.flasks) parts.push(keyOf(f));
+  parts.push(keyOf(b.strategy));
   return parts.join('|');
 }
 

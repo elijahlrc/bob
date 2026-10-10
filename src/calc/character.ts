@@ -53,6 +53,8 @@ import {
   type HexId,
 } from '../data/hexes';
 import type { TriggerDef } from '../data/triggers';
+import { PACK_WEIGHT, type SkillWhen } from '../data/strategy';
+import { entryOf, ordered, tacticOf, type RotationEntry } from './strategy';
 import { itemBase, isWeaponClass } from '../data/bases';
 import {
   MAX_GEM_LEVEL,
@@ -256,8 +258,24 @@ export type SecondarySheet = {
 };
 
 /** The DPS a character sheet reports: the primary skill, its triggered skills and its secondary casts. */
-export function sheetDps(s: CharacterSheet): number {
+/** The damage of one sheet's rotation: the main skill, the periodic ones, what triggers cast and the minions. */
+export function scenarioDps(s: CharacterSheet): number {
   return s.skill.totalDps + s.triggeredDps + s.secondaryDps + s.minionDps;
+}
+
+/** The damage comparisons use: against packs and against bosses, weighed by how often each is fought. */
+export function sheetDps(s: CharacterSheet): number {
+  if (!s.scenarios) return scenarioDps(s);
+  return PACK_WEIGHT * s.scenarios.pack + (1 - PACK_WEIGHT) * s.scenarios.boss;
+}
+
+/** The two kinds of fight the sheet works a rotation out for. */
+export type Scenario = 'pack' | 'boss';
+
+/** Whether a skill's condition holds in a kind of fight (a boss fight has few enemies, a rare and a boss). */
+export function whenFits(when: SkillWhen, scenario: Scenario): boolean {
+  if (when === 'any') return true;
+  return scenario === 'pack' ? when === 'pack' : when !== 'pack';
 }
 
 export type AuraState = {
@@ -326,6 +344,8 @@ export type CharacterSheet = {
   minionDps: number;
   ehp: number;
   auras: { name: string; reserved: number; active: boolean }[];
+  /** The rotation's total damage against a pack and against a boss (`sheet()` without a scenario fills it in). */
+  scenarios?: { pack: number; boss: number };
   warnings: string[];
 };
 
@@ -396,9 +416,13 @@ export class Character {
   readonly rageMax: number;
   /** The dynamic state (rage) the sheet assumes when none is given: part of the cache key like active flasks. */
   private readonly defaultDyn: number;
-  /** Every other usable active skill that the primary's position can reach (see `secondaries`). */
-  private secondaryCandidates: SkillChoice[] = [];
-  private secondaryCache: SkillChoice[] | null = null;
+  /** The main skills (fillers), in the order the strategy gives: the first is the primary skill. */
+  readonly mains: RotationEntry<SkillChoice>[];
+  /** The other skills the character casts, utility skills among them, in the order it considers them (see `rotation`). */
+  private readonly rotationBase: RotationEntry<SkillChoice>[];
+  private rotationCache: RotationEntry<SkillChoice>[] | null = null;
+  /** The skills the strategy has switched off. */
+  readonly unused: RotationEntry<SkillChoice>[];
   readonly defaultAttack: SkillChoice;
   readonly hands: HandStats[];
   readonly dualWielding: boolean;
@@ -843,7 +867,33 @@ export class Character {
       this.actives.find((a) => a.gemUid === build.primaryGem && !a.triggered && !a.skill.utility) ??
       this.actives.find((a) => a.usable && !a.triggered && !a.skill.utility);
     if (chosen && !chosen.usable) this.warnings.push(chosen.reason ?? 'Primary skill unusable');
-    this.primary = chosen && chosen.usable ? chosen : this.defaultAttack;
+    const starred = chosen && chosen.usable ? chosen : this.defaultAttack;
+    // Every skill the character casts itself, once a skill: the starred one first.
+    const casting = new Set<string>();
+    const cast: SkillChoice[] = [];
+    for (const a of starred.gemUid === null ? this.actives : [starred, ...this.actives]) {
+      if (!a.usable || a.triggered || a.gemUid === null || casting.has(a.skill.id)) continue;
+      casting.add(a.skill.id);
+      if (a !== starred && (blasphemyOf(a) || this.hexTouched.has(a.gemUid))) continue;
+      cast.push(a);
+    }
+    // The strategy (the Strategy tab): each skill's role, and the order the character considers them in.
+    const strat = build.strategy;
+    const entries = cast.map((a) =>
+      entryOf(
+        a,
+        a.skill,
+        tacticOf(strat, a.gemUid),
+        a.skill.utility ? 'auto' : a === starred ? 'main' : 'periodic',
+      ),
+    );
+    const uidOf = (c: SkillChoice) => c.gemUid;
+    const isMain = (e: RotationEntry<SkillChoice>) => e.role === 'main';
+    this.mains = ordered(entries.filter(isMain), uidOf, strat?.order);
+    this.rotationBase = entries.filter((e) => !isMain(e) && e.role !== 'off');
+    this.unused = entries.filter((e) => e.role === 'off');
+    // The primary skill is the first main one; with none, the weapon.
+    this.primary = this.mains[0]?.choice ?? this.defaultAttack;
     this.hexes = this.deriveHexes(db0, ctx0);
     this.linkCurses(db0, ctx0);
     this.castCurses = this.deriveCurses(db0, ctx0);
@@ -856,14 +906,7 @@ export class Character {
     // The enemies the character hits are hexed (for the sheet; the sim tracks it per enemy).
     if (this.sheetHexes.length)
       this.configConds = maskOr(this.configConds, this.cond.peek('targetCursed'));
-    const casting = new Set([this.primary.skill.id]);
-    for (const a of this.actives) {
-      if (!a.usable || a.triggered || a.gemUid === null || casting.has(a.skill.id)) continue;
-      casting.add(a.skill.id);
-      if (blasphemyOf(a) || this.hexTouched.has(a.gemUid)) continue;
-      if (a.skill.utility) this.utilities.push(a);
-      else this.secondaryCandidates.push(a);
-    }
+    for (const a of cast) if (a.skill.utility) this.utilities.push(a);
 
     // 4. Auras and reservation.
     const pre = defenceFromDb(db0, ctx0, { isPlayer: true, resistPenalty: 0 });
@@ -1642,19 +1685,52 @@ export class Character {
   }
 
   /**
-   * The skills cast whenever ready (EXPANSION 5.5a): every other usable active skill, one per skill, whose
-   * reach is at least the primary's. The character stands where the primary can reach its target, so a
-   * shorter-ranged secondary (a melee skill behind a bow) would never fire.
+   * The skills other than the main ones, in the order the character considers them (the Strategy tab): the order the strategy
+   * gives, or by default the emergency skills, the utility skills, the other damage skills, and the periodic ones, the longest
+   * pause first.
+   */
+  get rotation(): RotationEntry<SkillChoice>[] {
+    if (!this.rotationCache) {
+      const rank = (e: RotationEntry<SkillChoice>) =>
+        e.role === 'emergency' ? 0 : e.choice.skill.utility ? 1 : e.role === 'periodic' ? 3 : 2;
+      const pause = new Map(
+        this.rotationBase.map((e) => [e, e.role === 'periodic' ? this.cooldownOf(e.choice) : 0]),
+      );
+      const byDefault = [...this.rotationBase].sort(
+        (a, b) => rank(a) - rank(b) || pause.get(b)! - pause.get(a)!,
+      );
+      this.rotationCache = ordered(byDefault, (c) => c.gemUid, this.build.strategy?.order);
+    }
+    return this.rotationCache;
+  }
+
+  /** What the strategy makes of a skill the character casts (undefined for one it does not, or the weapon). */
+  entryOf(c: SkillChoice): RotationEntry<SkillChoice> | undefined {
+    return (
+      this.mains.find((e) => e.choice === c) ??
+      this.rotationBase.find((e) => e.choice === c) ??
+      this.unused.find((e) => e.choice === c)
+    );
+  }
+
+  /**
+   * The damage skills cast every so often (EXPANSION 5.5a): the periodic ones of the strategy. One with less reach than the main
+   * skill fires when an enemy happens to be within its reach.
    */
   get secondaries(): SkillChoice[] {
-    if (!this.secondaryCache && this.secondaryCandidates.length === 0) this.secondaryCache = [];
-    if (!this.secondaryCache) {
-      const reach = skillRange(this.profile(this.primary, this.configConds));
-      this.secondaryCache = this.secondaryCandidates.filter(
-        (c) => skillRange(this.profile(c, this.configConds)) >= reach - 0.05,
-      );
-    }
-    return this.secondaryCache;
+    return this.rotation
+      .filter((e) => e.role === 'periodic' && !e.choice.skill.utility)
+      .map((e) => e.choice);
+  }
+
+  /** The main skill in a kind of fight: the first main skill whose condition fits it, or the weapon. */
+  mainFor(scenario: Scenario): SkillChoice {
+    return this.mains.find((e) => whenFits(e.when, scenario))?.choice ?? this.defaultAttack;
+  }
+
+  /** Whether any skill waits for a kind of fight: then a pack and a boss make different rotations. */
+  get splitsByFight(): boolean {
+    return [...this.mains, ...this.rotationBase].some((e) => e.when !== 'any');
   }
 
   /**
@@ -1683,6 +1759,9 @@ export class Character {
   /** Seconds before a secondary skill can be cast again (EXPANSION 5.5a). */
   cooldownOf(choice: SkillChoice, conds: number = this.configConds): number {
     const rate = this.cooldownRate(choice, conds);
+    // The pause the strategy sets on a periodic skill without a cooldown of its own.
+    const every = rate === undefined ? this.entryOf(choice)?.every : undefined;
+    if (every !== undefined) return Math.max(every, this.profile(choice, conds).useTime);
     return (
       (rate === undefined ? undefined : 1 / rate) ??
       Math.max(
@@ -1699,10 +1778,24 @@ export class Character {
    */
   private secondaryLoad(
     conds: number,
+    scenario: Scenario = 'pack',
   ): { choice: SkillChoice; cd: number; rate: number; busy: number }[] {
-    if (!this.secondaries.length) return [];
-    const u = this.profile(this.primary, conds).useTime;
-    const rows = this.secondaries.map((choice) => {
+    const main = this.mainFor(scenario);
+    const p0 = this.profile(main, conds);
+    const reach = skillRange(p0);
+    // The character stands where the main skill reaches: a periodic skill with less reach is counted as never cast.
+    const list = this.rotation
+      .filter(
+        (e) =>
+          e.role === 'periodic' &&
+          !e.choice.skill.utility &&
+          whenFits(e.when, scenario) &&
+          skillRange(this.profile(e.choice, conds)) >= reach - 0.05,
+      )
+      .map((e) => e.choice);
+    if (!list.length) return [];
+    const u = p0.useTime;
+    const rows = list.map((choice) => {
       const p = this.profile(choice, conds);
       const cd = Math.max(this.cooldownOf(choice, conds), p.useTime);
       const cycle = p.useTime + Math.ceil((cd - p.useTime) / u - 1e-9) * u;
@@ -1735,8 +1828,13 @@ export class Character {
   /** How the utility skills take the character's time: each is cast once per cooldown (or per buff or curse duration). */
   utilityLoad(
     conds: number = this.configConds,
+    scenario: Scenario = 'pack',
   ): { choice: SkillChoice; rate: number; busy: number }[] {
-    return this.utilities.map((choice) => {
+    // A utility skill kept for emergencies is not counted: a fight that goes well never calls for it.
+    const cast = this.rotation
+      .filter((e) => e.choice.skill.utility && e.role !== 'emergency' && whenFits(e.when, scenario))
+      .map((e) => e.choice);
+    return cast.map((choice) => {
       const u = choice.skill.utility!;
       const p = this.profile(choice, conds);
       const every =
@@ -1762,13 +1860,20 @@ export class Character {
   }
 
   /** The share of time the primary skill has left after the secondary casts and the utility skills. */
-  primaryShare(conds: number = this.configConds): number {
-    const u = this.utilityLoad(conds).reduce((a, r) => a + r.busy, 0);
-    return Math.max(0.1, 1 - this.secondaryLoad(conds).reduce((a, r) => a + r.busy, 0) - u);
+  primaryShare(conds: number = this.configConds, scenario: Scenario = 'pack'): number {
+    const u = this.utilityLoad(conds, scenario).reduce((a, r) => a + r.busy, 0);
+    return Math.max(
+      0.1,
+      1 - this.secondaryLoad(conds, scenario).reduce((a, r) => a + r.busy, 0) - u,
+    );
   }
 
-  secondarySheets(conds: number = this.configConds, target?: TargetState): SecondarySheet[] {
-    return this.secondaryLoad(conds).map(({ choice, cd, rate }) => {
+  secondarySheets(
+    conds: number = this.configConds,
+    target?: TargetState,
+    scenario: Scenario = 'pack',
+  ): SecondarySheet[] {
+    return this.secondaryLoad(conds, scenario).map(({ choice, cd, rate }) => {
       const sheet = this.skillSheet(choice, target, conds, rate);
       return {
         key: choice.key,
@@ -1785,17 +1890,22 @@ export class Character {
    * The skills the character's triggers cast, with how often each fires (EXPANSION 5.5). Kill, block and
    * hit-taken triggers depend on the fight and are not estimated here.
    */
-  triggerSheets(conds: number = this.configConds, target?: TargetState): TriggeredSheet[] {
+  triggerSheets(
+    conds: number = this.configConds,
+    target?: TargetState,
+    scenario: Scenario = 'pack',
+  ): TriggeredSheet[] {
     const out: TriggeredSheet[] = [];
     if (this.triggers.length === 0) return out;
-    const p = this.profile(this.primary, conds);
+    const main = this.mainFor(scenario);
+    const p = this.profile(main, conds);
     const prim = this.skillSheet(
-      this.primary,
+      main,
       target,
       conds,
       undefined,
       0,
-      this.primaryShare(conds),
+      this.primaryShare(conds, scenario),
     );
     for (const src of this.triggers) {
       const d = src.def;
@@ -1829,14 +1939,30 @@ export class Character {
     return out;
   }
 
-  sheet(conds: number = this.configConds): CharacterSheet {
+  /**
+   * The character sheet. The damage is that of the rotation against a pack; when some skill waits for a kind of fight, the
+   * rotation against a boss is worked out too, and `scenarios` holds both totals (comparisons weigh them, see `sheetDps`).
+   */
+  sheet(conds: number = this.configConds, scenario?: Scenario): CharacterSheet {
+    if (scenario) return this.sheetFor(conds, scenario);
+    const pack = this.sheetFor(conds, 'pack');
+    const packDps = scenarioDps(pack);
+    const bossDps = this.splitsByFight ? scenarioDps(this.sheetFor(conds, 'boss')) : packDps;
+    return { ...pack, scenarios: { pack: packDps, boss: bossDps } };
+  }
+
+  private sheetFor(conds: number, scenario: Scenario): CharacterSheet {
     const d = this.defence(conds);
-    const triggered = this.triggerSheets(conds);
-    const secondary = this.secondarySheets(conds);
+    const main = this.mainFor(scenario);
+    const triggered = this.triggerSheets(conds, undefined, scenario);
+    const secondary = this.secondarySheets(conds, undefined, scenario);
     const triggeredMana =
       triggered.reduce((a, t) => a + t.manaPerSec, 0) +
       secondary.reduce((a, t) => a + t.manaPerSec, 0) +
-      this.utilityLoad(conds).reduce((a, r) => a + this.profile(r.choice, conds).cost * r.rate, 0);
+      this.utilityLoad(conds, scenario).reduce(
+        (a, r) => a + this.profile(r.choice, conds).cost * r.rate,
+        0,
+      );
     return {
       level: this.build.level,
       attrs: this.attrs,
@@ -1857,12 +1983,12 @@ export class Character {
       lifeRegen: d.lifeRegen,
       manaRegen: d.manaRegen,
       skill: this.skillSheet(
-        this.primary,
+        main,
         undefined,
         conds,
         undefined,
         triggeredMana,
-        this.primaryShare(conds),
+        this.primaryShare(conds, scenario),
       ),
       triggered,
       triggeredDps: triggered.reduce((a, t) => a + t.dps, 0),

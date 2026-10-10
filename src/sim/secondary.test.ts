@@ -45,8 +45,8 @@ describe('secondary casts (EXPANSION 5.5a)', () => {
     expect(sheetDps(s)).toBeCloseTo(s.skill.totalDps + s.triggeredDps + s.secondaryDps, 6);
   });
 
-  it('a skill that cannot reach as far as the primary is not a secondary', () => {
-    // A bow primary stands off; a melee skill would never be in reach, so it must not be credited either.
+  it('a periodic skill that cannot reach as far as the main skill is not credited, and fires only in reach', () => {
+    // A bow primary stands off; a melee skill is in reach only when an enemy comes close, so the sheet credits it nothing.
     const run = newRun('strider', 1);
     const uid = () => run.nextUid++;
     const bow = run.build;
@@ -63,7 +63,7 @@ describe('secondary casts (EXPANSION 5.5a)', () => {
     bow.flasks = [null, null, null, null, null];
     const c = new Character(bow, { targetDistance: 4 });
     expect(c.primary.skill.id).toBe('splitVolley');
-    expect(c.secondaries).toEqual([]);
+    expect(c.secondaries.map((x) => x.skill.id)).toEqual(['crushingBlow']);
     expect(c.sheet().secondaryDps).toBe(0);
     const { world } = createDummyWorld(bow, { distance: 4, maxTime: 60, seed: 1 });
     let melee = 0;

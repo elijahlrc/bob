@@ -1,4 +1,4 @@
-import { LOW_LIFE } from '../data/constants';
+import { STRATEGY_DEFAULTS } from '../data/strategy';
 import type { World } from './types';
 
 /**
@@ -12,6 +12,10 @@ export const autoFlaskPolicy: FlaskPolicy = (w) => {
   const out: number[] = [];
   const cap = Math.max(1, p.def.maxLife - w.char.reservedLife);
   const cost = w.primary.usable ? w.char.profile(w.primary).cost : 0;
+  // The thresholds the Strategy tab sets.
+  const strategy = w.char.build.strategy;
+  const lifeAt = strategy?.lifeFlask ?? STRATEGY_DEFAULTS.lifeFlask;
+  const utilityUse = strategy?.utilityFlask ?? STRATEGY_DEFAULTS.utilityFlask;
   let nearbyRare = false;
   let nearby = 0;
   let nearest = Infinity;
@@ -40,12 +44,7 @@ export const autoFlaskPolicy: FlaskPolicy = (w) => {
   w.flasks.forEach((f, i) => {
     if (f.charges < f.spec.perUse) return;
     const k = f.spec.kind;
-    if (
-      (k === 'life' || k === 'hybrid') &&
-      !usedLife &&
-      !lifeActive &&
-      p.life < cap * Math.max(0.5, LOW_LIFE)
-    ) {
+    if ((k === 'life' || k === 'hybrid') && !usedLife && !lifeActive && p.life < cap * lifeAt) {
       out.push(i);
       usedLife = true;
       return;
@@ -62,7 +61,12 @@ export const autoFlaskPolicy: FlaskPolicy = (w) => {
         const safe =
           nearest > 6 && nearest < 16 && p.life >= cap * 0.9 && p.def.maxEs >= p.life * 0.7;
         if (safe) out.push(i);
-      } else if (nearbyRare || nearby >= 5) out.push(i);
+      } else if (
+        nearbyRare ||
+        (utilityUse === 'packs' && nearby >= 5) ||
+        (utilityUse === 'always' && nearby >= 1)
+      )
+        out.push(i);
     }
   });
   return out;
