@@ -40,7 +40,7 @@ const classes = cls === 'all' ? CLASSES.map((c) => c.id) : cls.split(',');
 const dump = arg('dump', '');
 const mergeAt = process.argv.indexOf('--merge');
 
-let fights: Fight[] = [];
+const fights: Fight[] = [];
 if (mergeAt >= 0) {
   for (const f of process.argv.slice(mergeAt + 1))
     fights.push(...(JSON.parse(readFileSync(f, 'utf8')) as Fight[]));
