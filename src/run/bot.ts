@@ -1,3 +1,4 @@
+import type { World } from '../sim/types';
 import { Character, sheetDps, type CharacterSheet } from '../calc/character';
 import { itemBase } from '../data/bases';
 import { flaskBase } from '../data/flasks';
@@ -581,6 +582,8 @@ export type BotRunOpts = {
   difficulty?: Difficulty;
   /** Called once when the run ends (a death or a win) with the run and the result of its last map. */
   onEnd?: (run: RunState, res: MapResult) => void;
+  /** Called every tick of every map (a measurement watches the fights: scripts/boss-gauntlet.ts). */
+  onTick?: (w: World, run: RunState) => void;
 };
 
 /** Play a full run headlessly (§15.5). `maxMap` stops after that map. */
@@ -628,6 +631,7 @@ export function botRun(
       (w) => {
         killer.tick(w);
         met.tick(w);
+        opts.onTick?.(w, run);
       },
     );
     maps.push({

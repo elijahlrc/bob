@@ -247,7 +247,7 @@ export const FRACTURE_TAKEN = 0.4;
 export const PRISM_PATTERN_EVERY = 4.5;
 
 // The Rotwife (section 8).
-export const ROT_REGEN = 0.006;
+export const ROT_REGEN = 0.004;
 export const ROT_PATCH_EVERY = 1.4;
 export const ROT_PATCH_SECONDS = 8;
 export const ROT_ROTATION = ['bleed', 'poison', 'ignite', 'freeze', 'shock'] as const;

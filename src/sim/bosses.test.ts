@@ -1,6 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import type { MonsterSpec } from '../calc/monster';
-import { BOSSES, BOSS_IDS, TOLL_EVERY, TOLL_TELL, bossForMap, type BossId } from '../data/bosses';
+import {
+  ADAPT_MAX,
+  ATTUNE_SECONDS,
+  ATTUNE_SHIFT,
+  BOSSES,
+  BOSS_IDS,
+  FRACTURE_SECONDS,
+  FRACTURE_TAKEN,
+  ROT_REGEN,
+  TOLL_EVERY,
+  TOLL_TELL,
+  bossForMap,
+  type BossId,
+} from '../data/bosses';
+import { PROBES, durabilityTable } from '../calc/matrix';
+import { typeProfile } from '../data/defence';
 import { MONSTER_TYPES, type MonsterTypeId } from '../data/monsters';
 import { THEMES } from '../data/themes';
 import { makeMapPlan } from '../gen/mapPlan';
@@ -398,5 +413,49 @@ describe('the Unmaker (docs/BOSSES.md 9)', () => {
     expect(m.alive).toBe(false);
     expect(theftOf(w)).toEqual({});
     expect(bossState(m)!.shards).toHaveLength(0);
+  });
+});
+
+describe('the kill-side ceiling (docs/BOSSES.md 2, rule 4)', () => {
+  /**
+   * How much longer each reference damage profile takes to kill a boss over a whole fight than a plain monster: its defence
+   * profile through the build matrix, with the windows of its fight weighed in by time. A fight of `FIGHT` seconds at the
+   * curve's damage is assumed where a rate (a regrowth) matters.
+   */
+  const FIGHT = 60;
+  function wholeFight(id: BossId): Record<string, number> {
+    const def = BOSSES[id];
+    const t = MONSTER_TYPES[def.type];
+    const table = durabilityTable(typeProfile(t), def.map);
+    const out: Record<string, number> = {};
+    for (const pr of PROBES) {
+      let f = table[pr.id];
+      const spell = !pr.attack && !pr.dot;
+      if (id === 'magistrate' && spell) f /= 0.75;
+      if (id === 'prismWarden' && pr.dtype >= 1 && pr.dtype <= 3) {
+        // Immune for one attunement of three, Fractured for the first seconds of the next.
+        const cycle = 3 * (ATTUNE_SECONDS + ATTUNE_SHIFT);
+        f /= (cycle - ATTUNE_SECONDS + FRACTURE_SECONDS * FRACTURE_TAKEN) / cycle;
+      }
+      // The Rotwife regrows unless something eats at her: hits that leave no ailment must outpace it.
+      if (id === 'rotwife' && !pr.dot) f /= 1 - ROT_REGEN * FIGHT;
+      out[pr.id] = f;
+    }
+    return out;
+  }
+
+  it.each(BOSS_IDS)('%s: no damage profile takes more than twice its mean to kill it', (id) => {
+    const f = wholeFight(id);
+    const vals = Object.values(f);
+    const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+    for (const [probe, v] of Object.entries(f))
+      expect(
+        v / mean,
+        `${id} ${probe} (${v.toFixed(2)} against a mean of ${mean.toFixed(2)})`,
+      ).toBeLessThanOrEqual(2);
+  });
+
+  it('the Unmaker hardens a single-type build to at most 2.5 times', () => {
+    expect(1 / (1 - ADAPT_MAX)).toBeLessThanOrEqual(2.5);
   });
 });
