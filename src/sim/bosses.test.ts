@@ -460,3 +460,27 @@ describe('the kill-side ceiling (docs/BOSSES.md 2, rule 4)', () => {
     expect(1 / (1 - ADAPT_MAX)).toBeLessThanOrEqual(2.5);
   });
 });
+
+describe('a boss map at camp (docs/BOSSES.md 10)', () => {
+  it('is the one offer of its level, at its own level, with no Respite and no map type', async () => {
+    const { rollOffers } = await import('../run/offers');
+    for (const id of BOSS_IDS) {
+      const offers = rollOffers(5, BOSSES[id].map, { life: 0.2, mana: 0.2, es: 0.2, flasks: {} });
+      expect(offers).toHaveLength(1);
+      expect(offers[0].kind).toBe('map');
+      expect(offers[0].type).toBe('plain');
+      expect(offers[0].offset).toBe(0);
+    }
+    expect(rollOffers(5, 20).length).toBe(3);
+  });
+
+  it('a boss map takes twice as long before it is left on its own', async () => {
+    const { autoAbandonAt } = await import('./abandon');
+    const { AUTO_ABANDON_AFTER } = await import('../data/constants');
+    const w = createDummyWorld(newRun('vanguard', 1).build, { distance: 30 }).world;
+    w.opts.autoAbandonAt = undefined;
+    expect(autoAbandonAt(w)).toBe(AUTO_ABANDON_AFTER);
+    w.plan = { ...w.plan, endKind: 'boss' };
+    expect(autoAbandonAt(w)).toBe(2 * AUTO_ABANDON_AFTER);
+  });
+});

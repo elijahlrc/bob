@@ -27,7 +27,8 @@ const cleared = (level: number): MapResult => ({
 
 describe('map offers (docs/MAPS.md section 4)', () => {
   it('a level offers three maps with three different themes that exist at that level', () => {
-    for (const map of [1, 4, 8, 15, 25, 40, 60, 100]) {
+    // (A boss map has a single offer: docs/BOSSES.md 10.)
+    for (const map of [1, 4, 8, 15, 25, 40, 60, 99]) {
       for (let seed = 1; seed <= 10; seed++) {
         const offers = rollOffers(seed, map);
         expect(offers).toHaveLength(OFFERS_PER_SET);
@@ -65,7 +66,8 @@ describe('map offers (docs/MAPS.md section 4)', () => {
       let lower = 0;
       let sets = 0;
       for (let seed = 1; seed <= 400; seed++) {
-        const offers = rollOffers(seed, 30, vitals);
+        // A tenth map that is not a boss's: three offers and never a Respite, so a hurt character's sets are all maps.
+        const offers = rollOffers(seed, 20, vitals);
         sets++;
         if (offers.some((o) => o.offset !== 0)) off++;
         if (offers.some((o) => o.offset < 0)) lower++;
@@ -144,7 +146,7 @@ describe('map offers (docs/MAPS.md section 4)', () => {
 
   it('the offers, with Chalk edits, survive a save and a load', () => {
     const run = newRun('vanguard', 4);
-    setMap(run, 50);
+    setMap(run, 51);
     stash(run, { kind: 'currency', uid: 1, id: 'chalk', count: 3 });
     const opts = chalkOptions(run, 2);
     expect(chalkAdd(run, 2, opts[0]).ok).toBe(true);
@@ -156,7 +158,7 @@ describe('map offers (docs/MAPS.md section 4)', () => {
     if (loaded.status !== 'ok') return;
     expect(loaded.run.offers).toEqual(run.offers);
     // Editing one offer leaves the others alone.
-    expect(run.offers[0]).toEqual(rollOffers(4, 50)[0]);
+    expect(run.offers[0]).toEqual(rollOffers(4, 51)[0]);
   });
 
   it('a theme id as a plan asks for that theme’s map at the current level', () => {

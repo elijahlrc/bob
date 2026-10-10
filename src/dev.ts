@@ -9,6 +9,7 @@ import { rollFlask, rollGem, rollItemOf } from './gen/loot';
 import { noteFound } from './run/found';
 import type { Controller } from './run/controller';
 import { uidSource } from './run/run';
+import { rollOffers } from './run/offers';
 
 /**
  * Dev-only helpers on `window.__dev` for driving the game from the browser console or an automation
@@ -202,6 +203,16 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
       if (opts.until) controller.setSpeed(0);
       await dev.step(1);
       return n;
+    },
+    /** Send the run at camp to map `map` with fresh offers (to look at a boss map's offer, docs/BOSSES.md 10). */
+    campAt(map: number): number {
+      const run = controller.run;
+      if (!run) return 0;
+      run.map = map;
+      run.offers = rollOffers(run.seed, map, run.vitals);
+      controller.goTo('camp');
+      controller.bus.emit('state', null);
+      return run.offers.length;
     },
     /** Put `n` random items, gems and flasks in the camp inventory (for looking at the Items screen). */
     loot(n = 30, ilvl = 20): number {

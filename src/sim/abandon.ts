@@ -12,6 +12,15 @@ export function canAbandon(w: World): boolean {
   return w.status === 'running' && !w.exitOpen && map >= ABANDON_FROM_MAP && map % 10 !== 0;
 }
 
+/** A boss map takes twice as long before it is left on its own (docs/BOSSES.md 10): a boss is a long fight. */
+export const BOSS_ABANDON_MULT = 2;
+
+/** When a map that drags on starts to leave on its own, in simulated seconds. */
+export function autoAbandonAt(w: World): number {
+  const at = w.opts.autoAbandonAt ?? AUTO_ABANDON_AFTER;
+  return w.plan.endKind === 'boss' ? at * BOSS_ABANDON_MULT : at;
+}
+
 /** Start the escape timer. The character keeps fighting; if it dies first, the run ends as usual. */
 export function requestAbandon(w: World): boolean {
   if (w.abandonT !== null || !canAbandon(w)) return false;
@@ -39,11 +48,7 @@ export function tickAbandon(w: World, dt: number): void {
   if (w.abandonT === null) {
     // A map that drags on is left whatever kind it is (the first four, a mini-boss): the way out for a character that is
     // stuck. The usual few seconds of fighting on, and it cannot be called off. A map whose exit is open is nearly done.
-    if (
-      w.t >= (w.opts.autoAbandonAt ?? AUTO_ABANDON_AFTER) &&
-      !w.exitOpen &&
-      w.plan.type !== 'crescendo'
-    ) {
+    if (w.t >= autoAbandonAt(w) && !w.exitOpen && w.plan.type !== 'crescendo') {
       w.abandonT = ABANDON_SECONDS;
       w.abandonAuto = true;
       w.events.push({ t: 'abandonStarted' });

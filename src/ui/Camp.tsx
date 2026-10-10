@@ -18,8 +18,9 @@ import { useViewport } from './device';
 import { infoProps } from './info';
 import { Items } from './Items';
 import { OfferInfo, OfferTable } from './OfferInfo';
-import { BossAhead } from './BossCard';
-import { bossForMap } from '../data/bosses';
+import { BossAhead, BossCard, BossReadiness } from './BossCard';
+import { BOSSES, bossForMap } from '../data/bosses';
+import type { OfferPreview } from '../run/preview';
 import { Reward } from './Reward';
 import { Sheet } from './Sheet';
 import { Workbench } from './Workbench';
@@ -35,6 +36,60 @@ const VERDICT_TEXT: Record<Verdict, string> = {
   dangerous: 'Dangerous',
 };
 type Tab = 'tree' | 'sheet' | 'skills' | 'strategy' | 'items' | 'workbench' | 'next';
+
+/**
+ * A boss map's offer (docs/BOSSES.md 10): the one way on, presented as a level apart from all the others. The boss's
+ * portrait and name, its question and its card, where the build stands, then the map that leads to it.
+ */
+function BossOffer({ c, o, ch }: { c: Controller; o: OfferPreview; ch: Character }) {
+  const run = c.run!;
+  const id = bossForMap(run.map)!;
+  const boss = BOSSES[id];
+  const name = boss.name[0].toUpperCase() + boss.name.slice(1);
+  const t = themeDef(o.themeId);
+  return (
+    <div class="boss-offer">
+      <div class="boss-offer-banner">
+        <span>Boss</span>
+        <span class="boss-offer-map">
+          Map {run.map}
+          {id === 'unmaker' ? ' · the last' : ''}
+        </span>
+      </div>
+      <div class="boss-offer-body">
+        {c.portrait && <img class="boss-portrait" src={c.portrait(boss.type)} alt={name} />}
+        <div class="boss-offer-text">
+          <div class="boss-offer-name">{name}</div>
+          <div class="boss-offer-test">{boss.test}</div>
+          <BossCard boss={boss} test={false} />
+          <BossReadiness boss={boss} ch={ch} />
+        </div>
+      </div>
+      <div class="boss-offer-map-info">
+        <div class="boss-offer-way">
+          The way there: <strong>{t.name}</strong>, level {o.areaLevel}. {name} waits alone in an
+          arena past its last room. There is no other map this time, and no leaving early.
+        </div>
+        <OfferTable o={o} />
+        {o.affixes.map((aid) => {
+          const a = mapAffixDef(aid);
+          return (
+            <div key={aid} class="affix">
+              {affixText(a, o.areaLevel)} <span class="muted">({rewardText(a, o.areaLevel)})</span>
+            </div>
+          );
+        })}
+        <div class="threat">
+          For you: DPS ×{o.dps.toFixed(2)} · effective HP ×{o.ehp.toFixed(2)}
+        </div>
+      </div>
+      <button class="btn boss-go" onClick={() => c.startMap(0)}>
+        Face {boss.name}
+      </button>
+      {(run.currency.chalk ?? 0) > 0 && <Chalk c={c} offer={0} />}
+    </div>
+  );
+}
 
 /** Wayfinder's Chalk on an offered map: add one of three affixes, or remove one (EXPANSION 8.2). */
 function Chalk({ c, offer }: { c: Controller; offer: number }) {
@@ -224,86 +279,92 @@ export function Camp({ c }: { c: Controller }) {
           You have {pts} unspent passive point{pts > 1 ? 's' : ''}.
         </div>
       )}
-      <div class="theme-choice">
-        {offersFor(run).map((o, i) => {
-          if (o.kind === 'respite')
+      {bossForMap(run.map) && run.offers.length === 1 ? (
+        <BossOffer c={c} o={offersFor(run)[0]} ch={ch} />
+      ) : (
+        <div class="theme-choice">
+          {offersFor(run).map((o, i) => {
+            if (o.kind === 'respite')
+              return (
+                <div key={o.id} class="theme-wrap">
+                  <button
+                    class="btn theme respite"
+                    title="No map is played: the level passes with no loot, XP or clear rewards."
+                    onClick={() => c.startMap(i)}
+                  >
+                    <div class="theme-name">Respite</div>
+                    <div class="muted">Level {o.areaLevel} passes</div>
+                    <div class="affix">
+                      Life, mana, energy shield and flasks are made full again.
+                    </div>
+                    <div class="threat">No loot, no XP, no clear rewards.</div>
+                  </button>
+                </div>
+              );
+            const t = themeDef(o.themeId);
             return (
               <div key={o.id} class="theme-wrap">
-                <button
-                  class="btn theme respite"
-                  title="No map is played: the level passes with no loot, XP or clear rewards."
-                  onClick={() => c.startMap(i)}
-                >
-                  <div class="theme-name">Respite</div>
-                  <div class="muted">Level {o.areaLevel} passes</div>
-                  <div class="affix">Life, mana, energy shield and flasks are made full again.</div>
-                  <div class="threat">No loot, no XP, no clear rewards.</div>
+                <button class="btn theme" onClick={() => c.startMap(i)}>
+                  <div class="theme-name">{t.name}</div>
+                  <div class="muted">
+                    Level {o.areaLevel}
+                    {o.offset !== 0 && ` (${o.offset > 0 ? '+' : '−'}${Math.abs(o.offset)})`}
+                  </div>
+                  {o.type !== 'plain' && (
+                    <div class="affix" title={mapTypeDef(o.type).text}>
+                      <strong>{mapTypeDef(o.type).name}</strong>: {mapTypeDef(o.type).text}
+                    </div>
+                  )}
+                  <OfferTable o={o} />
+                  <OfferInfo
+                    o={o}
+                    gate={run.map % 10 === 0}
+                    boss={bossForMap(run.map) ?? undefined}
+                    more={!narrow || !!opened[o.id]}
+                  />
+                  {o.tier && (
+                    <div
+                      class={`tier ${o.tier}`}
+                      title="This map is drawn harder or easier than the average for its level (the variance setting). It is fixed for the run."
+                    >
+                      {TIER_TEXT[o.tier]}
+                    </div>
+                  )}
+                  {o.affixes.map((id) => {
+                    const a = mapAffixDef(id);
+                    return (
+                      <div key={id} class="affix">
+                        {affixText(a, o.areaLevel)}{' '}
+                        <span class="muted">({rewardText(a, o.areaLevel)})</span>
+                      </div>
+                    );
+                  })}
+                  <div class="threat">
+                    For you: DPS ×{o.dps.toFixed(2)} · effective HP ×{o.ehp.toFixed(2)}
+                  </div>
+                  {o.verdict && (
+                    <div
+                      class={`verdict ${o.verdict}`}
+                      title={`How you would fare here next to a plain map at its level, counting the life you arrive with (${Math.round((o.ratio ?? 0) * 100)}%). A rough guide, not a promise.`}
+                    >
+                      {VERDICT_TEXT[o.verdict]}
+                    </div>
+                  )}
                 </button>
+                {narrow && (
+                  <button
+                    class="btn small"
+                    onClick={() => setOpened({ ...opened, [o.id]: !opened[o.id] })}
+                  >
+                    {opened[o.id] ? 'Fewer details' : 'Details'}
+                  </button>
+                )}
+                {(run.currency.chalk ?? 0) > 0 && o.kind === 'map' && <Chalk c={c} offer={i} />}
               </div>
             );
-          const t = themeDef(o.themeId);
-          return (
-            <div key={o.id} class="theme-wrap">
-              <button class="btn theme" onClick={() => c.startMap(i)}>
-                <div class="theme-name">{t.name}</div>
-                <div class="muted">
-                  Level {o.areaLevel}
-                  {o.offset !== 0 && ` (${o.offset > 0 ? '+' : '−'}${Math.abs(o.offset)})`}
-                </div>
-                {o.type !== 'plain' && (
-                  <div class="affix" title={mapTypeDef(o.type).text}>
-                    <strong>{mapTypeDef(o.type).name}</strong>: {mapTypeDef(o.type).text}
-                  </div>
-                )}
-                <OfferTable o={o} />
-                <OfferInfo
-                  o={o}
-                  gate={run.map % 10 === 0}
-                  boss={bossForMap(run.map) ?? undefined}
-                  more={!narrow || !!opened[o.id]}
-                />
-                {o.tier && (
-                  <div
-                    class={`tier ${o.tier}`}
-                    title="This map is drawn harder or easier than the average for its level (the variance setting). It is fixed for the run."
-                  >
-                    {TIER_TEXT[o.tier]}
-                  </div>
-                )}
-                {o.affixes.map((id) => {
-                  const a = mapAffixDef(id);
-                  return (
-                    <div key={id} class="affix">
-                      {affixText(a, o.areaLevel)}{' '}
-                      <span class="muted">({rewardText(a, o.areaLevel)})</span>
-                    </div>
-                  );
-                })}
-                <div class="threat">
-                  For you: DPS ×{o.dps.toFixed(2)} · effective HP ×{o.ehp.toFixed(2)}
-                </div>
-                {o.verdict && (
-                  <div
-                    class={`verdict ${o.verdict}`}
-                    title={`How you would fare here next to a plain map at its level, counting the life you arrive with (${Math.round((o.ratio ?? 0) * 100)}%). A rough guide, not a promise.`}
-                  >
-                    {VERDICT_TEXT[o.verdict]}
-                  </div>
-                )}
-              </button>
-              {narrow && (
-                <button
-                  class="btn small"
-                  onClick={() => setOpened({ ...opened, [o.id]: !opened[o.id] })}
-                >
-                  {opened[o.id] ? 'Fewer details' : 'Details'}
-                </button>
-              )}
-              {(run.currency.chalk ?? 0) > 0 && o.kind === 'map' && <Chalk c={c} offer={i} />}
-            </div>
-          );
-        })}
-      </div>
+          })}
+        </div>
+      )}
       <div class="camp-foot">
         <DebugPanel c={c} />
         <label class="muted">
@@ -313,7 +374,8 @@ export function Camp({ c }: { c: Controller }) {
             onChange={(e) => c.setAutoContinue((e.target as HTMLInputElement).checked)}
           />{' '}
           Auto-continue
-          {left !== null && ` — ${themeDef(run.offers[0].themeId).name} in ${left.toFixed(1)} s`}
+          {left !== null &&
+            ` — ${bossForMap(run.map) ? BOSSES[bossForMap(run.map)!].name : themeDef(run.offers[0].themeId).name} in ${left.toFixed(1)} s`}
           {run.autoContinue && blocker && <div class="warn">Paused: {blocker}</div>}
         </label>
         {c.saveFailed && (

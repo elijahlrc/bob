@@ -1,3 +1,4 @@
+import type { MonsterTypeId } from '../data/monsters';
 import { Emitter } from '../core/events';
 import { DT } from '../data/constants';
 import { clampDifficulty, DEFAULT, type Difficulty } from '../data/difficulty';
@@ -75,6 +76,8 @@ export class Controller {
   startDifficulty: Difficulty = { ...DEFAULT };
   /** Enemy picked for inspection on the map. */
   selectedId: number | null = null;
+  /** Paints a monster type as a picture (a data URL) for the menus; set by main.ts from the renderer, null headless. */
+  portrait: ((type: MonsterTypeId) => string) | null = null;
   private acc = 0;
 
   private store: KeyValueStore | null;

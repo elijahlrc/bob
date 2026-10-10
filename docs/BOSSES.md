@@ -747,6 +747,13 @@ Built the same day, all milestones at once (the user asked for the whole plan wi
 - **Rewards** needed nothing: a boss already drops two uniques, three times the currency of a normal monster's roll (twice a
   champion's), the theme's bonus currency and 30× experience.
 
+- **A boss map is one offer** (the user, 2026-10-10): the level select shows the boss's own panel instead of three cards,
+  set apart from every other level (a banner, the boss's portrait, its question, its card, where the build stands, the
+  map that leads to it, and one "Face …" button). No Respite, no map type, no level offset on a boss map. The side strip
+  shows the next boss only before its map.
+- **A boss map is left on its own after twice the usual time** (about 17 minutes instead of 8; the user, 2026-10-10), so
+  a long boss fight is not cut short, while a character that cannot win is still not stuck for ever.
+
 ### 18.3 The measurement (one 24-run bot sample)
 
 Four bot runs of each class, every boss fight watched (`scripts/boss-gauntlet.ts`). The bot's builds are much weaker than a

@@ -4,6 +4,7 @@ import { installCrashLog } from './crashlog';
 import { installTelemetry } from './telemetry';
 import { Controller } from './run/controller';
 import { App } from './ui/App';
+import { monsterPortrait } from './render/styles/grim/portrait';
 import './ui/styles.css';
 import './ui/skins.css';
 import './ui/tree.css';
@@ -21,6 +22,7 @@ function storage(): Storage | null {
 }
 
 const controller = new Controller(storage());
+controller.portrait = monsterPortrait;
 installCrashLog(controller);
 installTelemetry(controller);
 const game = createGame('app', controller.bus);

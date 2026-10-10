@@ -9,6 +9,7 @@ import {
   type ThemeDef,
 } from '../data/themes';
 import { rollMapAffixes } from '../gen/mapPlan';
+import { bossForMap } from '../data/bosses';
 import { fullVitals, type Vitals } from '../sim/types';
 
 /**
@@ -123,11 +124,13 @@ export function makeRespite(map: number, slot: number): MapOffer {
 }
 
 /**
- * The set of offers for a level. Rolled once when the previous level ends, then stored in the save.
+ * The set of offers for a level. Rolled once when the previous level ends, then stored in the save. A boss map has one.
  * The first offer (the anchor) is always a map at the map's own level; the others may sit two levels above or
  * below it, and one of them may be a Respite when the character is worn down (docs/MAPS.md 4.2).
  */
 export function rollOffers(seed: number, map: number, vitals: Vitals = fullVitals()): MapOffer[] {
+  // A boss map is the one way on (docs/BOSSES.md 10): a single map at its own level, its theme the first drawn.
+  if (bossForMap(map)) return [makeOffer(seed, map, 0, rollThemes(seed, map)[0])];
   const rng = new Rng(seed).fork(`offsets${map}`);
   const weights = isHurt(vitals) ? [60, 40, 20] : OFFSET_WEIGHTS;
   const typeRng = new Rng(seed).fork(`types${map}`);

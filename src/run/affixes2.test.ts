@@ -240,7 +240,7 @@ describe('every affix has a threat entry (docs/MAPS.md 10.3)', () => {
 describe('Chalk does not offer an affix that conflicts with one the map has', () => {
   it('a map with a fire-proofed monster mix is not offered extra fire damage or warding', () => {
     const run = newRun('vanguard', 2);
-    setMap(run, 50);
+    setMap(run, 51);
     run.offers[1].affixes = ['fireproof'];
     for (let i = 0; i < 20; i++) {
       run.craftSeq = i;

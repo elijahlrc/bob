@@ -1614,3 +1614,124 @@ select option {
   color: #ffd8b0;
   font-size: 14px;
 }
+
+/* ---- A boss map's offer (docs/BOSSES.md 10): one level, set apart from all the others ---- */
+.boss-offer {
+  position: relative;
+  margin: 10px 0;
+  padding: 0 0 12px;
+  border: 2px solid #b8401f;
+  border-radius: var(--radius);
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(200, 60, 30, 0.28), transparent 60%),
+    linear-gradient(#2a0d09, #160807);
+  box-shadow:
+    0 0 0 1px #000,
+    0 0 24px rgba(220, 70, 30, 0.35),
+    inset 0 0 40px rgba(0, 0, 0, 0.6);
+  animation: boss-glow 3s ease-in-out infinite;
+}
+@keyframes boss-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px #000,
+      0 0 18px rgba(220, 70, 30, 0.3),
+      inset 0 0 40px rgba(0, 0, 0, 0.6);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px #000,
+      0 0 34px rgba(255, 110, 40, 0.5),
+      inset 0 0 40px rgba(0, 0, 0, 0.6);
+  }
+}
+.boss-offer-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 6px 14px;
+  background: linear-gradient(90deg, #7a1c10, #3a0e08);
+  border-bottom: 1px solid #000;
+  color: #ffd8b0;
+  font-size: 13px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+}
+.boss-offer-map {
+  letter-spacing: 0.08em;
+  color: #e8b890;
+}
+.boss-offer-body {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 10px 14px 0;
+}
+.boss-portrait {
+  flex: 0 0 auto;
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  object-position: bottom;
+  image-rendering: pixelated;
+  background: radial-gradient(circle at 50% 80%, rgba(255, 120, 60, 0.25), transparent 65%);
+  border-bottom: 2px solid #5a1a10;
+}
+.boss-offer-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.boss-offer-name {
+  font-size: 26px;
+  line-height: 1.1;
+  color: #ffe4c4;
+  text-shadow:
+    0 0 10px rgba(255, 90, 40, 0.6),
+    0 2px 2px #000;
+}
+.boss-offer-test {
+  margin: 2px 0 6px;
+  color: #f0b890;
+  font-size: 14px;
+}
+.boss-offer-map-info {
+  margin: 10px 14px 0;
+  padding-top: 8px;
+  border-top: 1px solid #4a1a12;
+  font-size: 13px;
+}
+.boss-offer-way {
+  margin-bottom: 6px;
+  color: #e8dcc8;
+}
+.btn.boss-go {
+  display: block;
+  margin: 12px auto 0;
+  padding: 10px 28px;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  color: #fff0e0;
+  background: linear-gradient(#b8401f, #7a1c10);
+  border-color: #ffb070;
+}
+.btn.boss-go:hover {
+  background: linear-gradient(#d8502a, #8a2414);
+}
+@media (max-width: 640px) {
+  .boss-offer-body {
+    flex-direction: column;
+    align-items: center;
+  }
+  .boss-portrait {
+    width: 120px;
+    height: 120px;
+  }
+  .boss-offer-name {
+    font-size: 22px;
+    text-align: center;
+  }
+  .boss-card-cols {
+    grid-template-columns: 1fr;
+  }
+}

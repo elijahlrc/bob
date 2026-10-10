@@ -24,7 +24,7 @@ import { SPEEDS, type Controller } from '../run/controller';
 import { DELIVERY_NAME, ELEMENT_NAME } from '../calc/skillLook';
 import { useTicks } from './hooks';
 import { useState } from 'preact/hooks';
-import { canAbandon } from '../sim/abandon';
+import { autoAbandonAt, canAbandon } from '../sim/abandon';
 import { COLLAPSE_START, CRESCENDO_STEP_BONUS, HOLDOUT_WAVES, mapTypeDef } from '../data/mapTypes';
 import { infoProps } from './info';
 import { SkillBar } from './SkillBar';
@@ -324,7 +324,11 @@ function AbandonButton({ c, w }: { c: Controller; w: World }) {
     return (
       <div class="hud-abandon">
         <span
-          title={w.abandonAuto ? 'A map is left on its own after about eight minutes.' : undefined}
+          title={
+            w.abandonAuto
+              ? `A map is left on its own after about ${Math.round(autoAbandonAt(w) / 60)} minutes${w.plan.endKind === 'boss' ? ' (twice as long on a boss map)' : ''}.`
+              : undefined
+          }
         >
           {w.abandonAuto ? 'Taking too long: leaving' : 'Leaving'} in{' '}
           {Math.max(0, w.abandonT).toFixed(1)} s
