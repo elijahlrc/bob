@@ -3,7 +3,11 @@ import { hex, MOD_MARKS, RARITY_COLOR } from '../data/monsterMarks';
 import { monsterModDef, MONSTER_TYPES, BOSS_NAME, FACTION_NAMES } from '../data/monsters';
 import { abilitiesOf, abilityTexts } from '../data/abilities';
 import { ARCHETYPES } from '../data/archetypes';
-import { defenceTexts, profileOf } from '../data/defence';
+import { defenceTexts, typeProfile } from '../data/defence';
+import { bossOfType } from '../data/bosses';
+import { BossCardOf } from './BossCard';
+import { bossReadout } from '../sim/bosses';
+import { flasksSealed, theftOf } from '../sim/theft';
 import { movementTexts, senseText } from '../data/movement';
 import { patternText, phaseTexts } from '../data/phases';
 import { shapeText } from '../data/shapes';
@@ -87,6 +91,7 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
   const rarity = a.rarity === 'player' ? 'normal' : a.rarity;
   const maxLife = Math.max(1, a.def.maxLife);
   const type = spec ? MONSTER_TYPES[spec.type].name : '';
+  const boss = spec && bossOfType(spec.type);
   return (
     <div class="inspect" style={{ '--rar': hex(RARITY_COLOR[rarity]) }}>
       <button class="inspect-x" title="Close" onClick={() => c.bus.emit('select', { id: null })}>
@@ -99,7 +104,13 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
           ? ` · ${ARCHETYPES[MONSTER_TYPES[spec.type].archetype].name} · Level ${spec.level}`
           : ''}
       </div>
-      {spec && (
+      {spec && boss && (
+        <>
+          <div class="muted inspect-sub">{TYPE_BLURBS[spec.type]}</div>
+          <BossCardOf type={spec.type} />
+        </>
+      )}
+      {spec && !boss && (
         <div class="muted inspect-sub">
           {FACTION_NAMES[MONSTER_TYPES[spec.type].faction]}: {TYPE_BLURBS[spec.type]}
           {FACTION_RULES[MONSTER_TYPES[spec.type].faction] &&
@@ -107,6 +118,7 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
         </div>
       )}
       {spec &&
+        !boss &&
         [
           shapeText(MONSTER_TYPES[spec.type].shape),
           ...encounterTexts(spec.type),
@@ -115,9 +127,7 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
           patternText(MONSTER_TYPES[spec.type].pattern),
           ...phaseTexts(MONSTER_TYPES[spec.type].phases),
           ...senseText(MONSTER_TYPES[spec.type].senses),
-          ...defenceTexts(
-            profileOf(MONSTER_TYPES[spec.type].faction, MONSTER_TYPES[spec.type].defence),
-          ),
+          ...defenceTexts(typeProfile(MONSTER_TYPES[spec.type])),
         ]
           .filter((t): t is string => !!t)
           .map((t) => (
@@ -160,10 +170,92 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
   );
 }
 
+/** The boss of the fight, across the top of the screen: its name, its life and shield, and what it is doing. */
+function BossBar({ w }: { w: World }) {
+  const p = w.player;
+  const b = w.actors.find(
+    (a) =>
+      a.alive &&
+      a.rarity === 'boss' &&
+      a.mon?.kind.bossOnly &&
+      a.state === 'chase' &&
+      Math.hypot(a.x - p.x, a.y - p.y) < 22,
+  );
+  if (!b) return null;
+  const max = Math.max(1, b.def.maxLife);
+  const lines = bossReadout(w, b);
+  return (
+    <div class="boss-bar">
+      <div class="boss-bar-name">{b.name}</div>
+      <div class="boss-bar-life">
+        <div style={{ width: `${Math.max(0, Math.min(100, (b.life / max) * 100))}%` }} />
+        {b.def.maxEs > 0 && (
+          <div
+            class="boss-bar-es"
+            style={{ width: `${Math.max(0, Math.min(100, (b.es / b.def.maxEs) * 100))}%` }}
+          />
+        )}
+      </div>
+      {lines.length > 0 && <div class="boss-bar-state">{lines.join(' · ')}</div>}
+    </div>
+  );
+}
+
+/** The ailments on the character, as chips with their stacks (docs/BOSSES.md 11.2). */
+const AIL_CHIPS: [string, (w: World) => number, string][] = [
+  ['Bleeding', (w) => w.player.ail.bleeds.length, 'Bleeding: damage over time, more while moving.'],
+  ['Poisoned', (w) => w.player.ail.poisons.length, 'Poisoned: chaos damage over time; it stacks.'],
+  ['Burning', (w) => w.player.ail.ignites.length, 'Ignited: fire damage over time.'],
+  ['Frozen', (w) => (w.player.ail.freezeT > 0 ? 1 : 0), 'Frozen: you cannot act.'],
+  [
+    'Chilled',
+    (w) => (w.player.ail.freezeT <= 0 && w.player.ail.chill > 0 ? 1 : 0),
+    'Chilled: you act and move more slowly.',
+  ],
+  ['Shocked', (w) => (w.player.ail.shock > 0 ? 1 : 0), 'Shocked: you take more damage.'],
+];
+
+/** What the Unmaker holds of the character (docs/BOSSES.md 9), as chips. */
+function theftChips(w: World): { name: string; text: string }[] {
+  const t = theftOf(w);
+  const out: { name: string; text: string }[] = [];
+  const back = 'Break its shard to take it back.';
+  if (t.res)
+    out.push({
+      name: 'Resistance stolen',
+      text: `The Unmaker holds 50 of your highest resistance. ${back}`,
+    });
+  if (t.defence)
+    out.push({
+      name: 'Defence stolen',
+      text: `The Unmaker holds half of your ${t.defence === 'es' ? 'energy shield' : t.defence}. ${back}`,
+    });
+  if (t.supports?.length)
+    out.push({
+      name: 'Supports stolen',
+      text: `The Unmaker holds your main skill's two strongest supports. ${back}`,
+    });
+  if (t.flasks)
+    out.push({
+      name: 'Flasks stolen',
+      text: `The Unmaker holds your flasks, and drinks them. ${back}`,
+    });
+  return out;
+}
+
 /** What monsters have left on the character besides hexes (docs/ENCOUNTERS.md 7): a blinding, a mark, a draining beam. */
 function playerDebuffs(w: World): { name: string; text: string }[] {
   const out: { name: string; text: string }[] = [];
   const p = w.player;
+  for (const [name, n, text] of AIL_CHIPS) {
+    const k = n(w);
+    if (k > 0)
+      out.push({
+        name: k > 1 ? `${name} ×${k}` : name,
+        text: `${text} A cleansing flask of its kind removes it, and keeps it off while it runs.`,
+      });
+  }
+  out.push(...theftChips(w));
   if (p.fx.blind)
     out.push({
       name: 'Blinded',
@@ -335,6 +427,7 @@ export function Hud({ c }: { c: Controller }) {
         <span>{w.exitOpen ? 'Exit open' : ''}</span>
       </div>
       {!sc && !c.gallery && <AbandonButton c={c} w={w} />}
+      <BossBar w={w} />
       {sel && sel.alive && !sel.isPlayer && <Inspect a={sel} c={c} />}
       {c.gallery && (
         <div class="hud-showcase hud-gallery">
@@ -412,7 +505,12 @@ export function Hud({ c }: { c: Controller }) {
               return (
                 <div
                   key={i}
-                  class={'flask' + (f.activeT > 0 ? ' active' : '') + (ready ? ' ready' : '')}
+                  class={
+                    'flask' +
+                    (f.activeT > 0 ? ' active' : '') +
+                    (ready ? ' ready' : '') +
+                    (flasksSealed(w) ? ' sealed' : '')
+                  }
                   {...infoProps(
                     `${f.spec.name} (${kindLabel}) · ${f.charges.toFixed(0)}/${f.spec.maxCharges} charges, ${f.spec.perUse} per use. Used automatically.`,
                   )}

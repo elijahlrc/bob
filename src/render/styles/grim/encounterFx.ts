@@ -534,7 +534,8 @@ export class EncounterFx {
   /** Draw the pattern blasts, the windows and the modes; advance the short effects. `dt` keeps the sim's pace. */
   frame(w: World, dt: number, time: number, g: Gfx): void {
     for (const e of w.effects) {
-      if (e.shape || e.label) this.drawBlast(g, e, time);
+      // A Sentence is drawn by the bosses' module (an hourglass, not a warning to step out of).
+      if ((e.shape || e.label) && !e.unavoidable) this.drawBlast(g, e, time);
       else if (e.kind === 'sigil') this.drawSigil(g, e, time);
     }
     this.drawOnPlayer(g, w, time);

@@ -1522,3 +1522,95 @@ select option {
   pointer-events: none;
   box-shadow: 0 6px 24px #000c;
 }
+
+/* ---- Bosses (docs/BOSSES.md): the bar across the top in a fight, a boss's card, the readiness lines at camp ---- */
+.boss-bar {
+  position: absolute;
+  top: 34px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(520px, calc(100% - 32px));
+  text-align: center;
+  pointer-events: none;
+  text-shadow: 0 1px 2px #000;
+}
+.boss-bar-name {
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  color: #ffd8b0;
+}
+.boss-bar-life {
+  position: relative;
+  height: 12px;
+  margin: 3px 0;
+  background: #2a0c0c;
+  border: 1px solid #000;
+  box-shadow: 0 0 0 1px #7a3020;
+}
+.boss-bar-life > div {
+  height: 100%;
+  background: linear-gradient(#e04030, #8a1c14);
+}
+.boss-bar-life > .boss-bar-es {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: #9ad8ff;
+}
+.boss-bar-state {
+  font-size: 12px;
+  color: #e8dcc8;
+}
+.boss-card {
+  margin: 6px 0;
+  font-size: 12px;
+}
+.boss-card-test {
+  color: #ffd8b0;
+  margin-bottom: 4px;
+}
+.boss-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  color: #c8b8a0;
+  margin-bottom: 4px;
+}
+.boss-card-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.boss-card-title {
+  font-weight: bold;
+  color: #e8dcc8;
+  margin-bottom: 2px;
+}
+.flask.sealed {
+  filter: grayscale(1) brightness(0.5);
+}
+.boss-readiness {
+  margin-top: 4px;
+  font-size: 12px;
+}
+.boss-readiness .ok {
+  color: #9ad870;
+}
+.boss-readiness .warn {
+  color: #f0c050;
+}
+.boss-readiness .bad {
+  color: #ff6a50;
+}
+.boss-ahead {
+  margin: 8px 0;
+  padding: 6px 8px;
+  border: 1px solid #7a3020;
+  border-radius: var(--radius);
+  background: rgba(60, 16, 10, 0.35);
+}
+.boss-ahead-name {
+  color: #ffd8b0;
+  font-size: 14px;
+}

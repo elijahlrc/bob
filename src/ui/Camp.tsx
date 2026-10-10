@@ -18,6 +18,8 @@ import { useViewport } from './device';
 import { infoProps } from './info';
 import { Items } from './Items';
 import { OfferInfo, OfferTable } from './OfferInfo';
+import { BossAhead } from './BossCard';
+import { bossForMap } from '../data/bosses';
 import { Reward } from './Reward';
 import { Sheet } from './Sheet';
 import { Workbench } from './Workbench';
@@ -209,6 +211,7 @@ export function Camp({ c }: { c: Controller }) {
       </div>
       <div class="muted">Next: map {run.map} of 100</div>
       <Arriving run={run} />
+      <BossAhead map={run.map} ch={ch} />
       {last && (last.status === 'cleared' || last.status === 'abandoned') && (
         <div class="muted">
           Last map{last.status === 'abandoned' ? ' (abandoned, no clear rewards)' : ''}:{' '}
@@ -253,7 +256,12 @@ export function Camp({ c }: { c: Controller }) {
                   </div>
                 )}
                 <OfferTable o={o} />
-                <OfferInfo o={o} gate={run.map % 10 === 0} more={!narrow || !!opened[o.id]} />
+                <OfferInfo
+                  o={o}
+                  gate={run.map % 10 === 0}
+                  boss={bossForMap(run.map) ?? undefined}
+                  more={!narrow || !!opened[o.id]}
+                />
                 {o.tier && (
                   <div
                     class={`tier ${o.tier}`}

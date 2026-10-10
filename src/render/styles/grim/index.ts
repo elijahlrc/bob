@@ -27,6 +27,7 @@ import {
   sidearmStance,
 } from './encounterFx';
 import { isoFloors, isoWalls, ISO_H, ISO_W, WALL_LOW, WALL_TALL } from './isoPaint';
+import { BossFx } from './bossFx';
 
 /** Pixel zoom: 2x on wide windows, 1.5x on small ones, 1x on a phone (smaller pixels, wider view). */
 export function pickZoom(width: number): number {
@@ -92,6 +93,7 @@ export class GrimStyle extends StyleBase {
   private bolts: Bolt[] = [];
   private fx!: SkillFx;
   private enc!: EncounterFx;
+  private boss!: BossFx;
   private lastSimT = 0;
   private temps: TempLight[] = [];
   private torches: Torch[] = [];
@@ -222,6 +224,7 @@ export class GrimStyle extends StyleBase {
     };
     this.fx = new SkillFx(host, s);
     this.enc = new EncounterFx(host);
+    this.boss = new BossFx(host);
     this.placeProps(world, rng);
     this.collapse?.destroy();
     this.collapse =
@@ -702,6 +705,10 @@ export class GrimStyle extends StyleBase {
       if (a.ail.freezeT > 0) tint = 0x7ec8ff;
       else if (a.ail.chill > 0) tint = 0xb8dcff;
       else if (a.ail.poisons.length) tint = 0xc4f0a0;
+      // The rest of the ailments show on the body too (docs/BOSSES.md 11.2).
+      else if (a.ail.ignites.length) tint = 0xffc898;
+      else if (a.ail.shock > 0) tint = 0xe4ccff;
+      else if (a.ail.bleeds.length) tint = 0xffb4b4;
       else if (a.enraged) tint = 0xff9a8a;
       // A monster's modes show on its body: stone, quenched, swollen, molten (docs/ENCOUNTERS.md 6).
       const look = a.enc ? encounterSprite(a) : null;
@@ -1066,6 +1073,8 @@ export class GrimStyle extends StyleBase {
     this.fx.frame(world, simDt, this.time, g);
     // Pattern blasts and windows (docs/ENCOUNTERS.md), drawn by their own module.
     this.enc.frame(world, simDt, this.time, g);
+    // The bosses' tells (docs/BOSSES.md).
+    this.boss.frame(world, simDt, this.time, g);
     for (const e of effects) {
       if (e.shape) continue;
       const { x, y } = this.project(e.x, e.y);
@@ -1189,6 +1198,7 @@ export class GrimStyle extends StyleBase {
     const em = this.em;
     this.fx.onEvent(e, world);
     this.enc.onEvent(e, world);
+    this.boss.onEvent(e, world);
     switch (e.t) {
       case 'hit': {
         const dst = this.byId.get(e.dst) ?? world.actors.find((a) => a.id === e.dst);

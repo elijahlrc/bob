@@ -1,3 +1,4 @@
+import { BOSSES, type BossId } from '../data/bosses';
 import { monsterModDef } from '../data/monsters';
 import { MOD_MARKS } from '../data/monsterMarks';
 import { FACTION_COLOR, FACTION_GLYPH, TAG_INFO } from '../data/monsterInfo';
@@ -80,11 +81,14 @@ export function OfferTable({ o }: { o: OfferPreview }) {
 export function OfferInfo({
   o,
   gate,
+  boss,
   more,
 }: {
   o: OfferPreview;
   /** The map is a gate (every tenth): its mini-boss is named. */
   gate: boolean;
+  /** The boss that ends the map, on a boss map (docs/BOSSES.md): it takes the champion's place. */
+  boss?: BossId;
   /** Show the lines that are left out of a narrow card until it is expanded. */
   more: boolean;
 }) {
@@ -161,7 +165,13 @@ export function OfferInfo({
               {r}
             </div>
           ))}
-          {gate && champ && theme.chief && (
+          {boss && (
+            <div class="gate">
+              <strong>{BOSSES[boss].name[0].toUpperCase() + BOSSES[boss].name.slice(1)}</strong>{' '}
+              waits at the end: {BOSSES[boss].test}
+            </div>
+          )}
+          {gate && !boss && champ && theme.chief && (
             <div class="gate">
               <strong>{champ.name}</strong> waits at the end: {MOD_MARKS[theme.chief.mod].desc}
             </div>

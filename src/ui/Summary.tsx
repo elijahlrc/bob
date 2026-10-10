@@ -100,9 +100,7 @@ export function Summary({ c }: { c: Controller }) {
       <p>
         {classDef(run.classId).name} · Level {run.build.level}
       </p>
-      <p>
-        {won ? 'The Ossuary Regent has fallen.' : `Fell on map ${last?.map ?? run.map}${reason}.`}
-      </p>
+      <p>{won ? 'The Unmaker has fallen.' : `Fell on map ${last?.map ?? run.map}${reason}.`}</p>
       <p class="muted">
         Maps cleared: {run.history.filter((h) => h.status === 'cleared').length}
         {run.history.some((h) => h.status === 'abandoned') &&
