@@ -95,7 +95,7 @@ section 13.
 | --- | ---------------- | -------------------------------------------------------------------- | ---------------------------------------- | ---------------------------- | ------------------------------- |
 | 10  | The Tollkeeper   | single-target damage (with stun and chill as answers)                | lightning spells, light physical         | physical (armour), lightning | cold                            |
 | 30  | The Courser      | mobility and reach                                                   | fire attacks, burning ground             | fire, attacks (evasion)      | cold (chill and freeze)         |
-| 50  | The Magistrate   | surviving one huge hit, and choosing targets                         | physical                                 | curses, a share of spells    | fire                            |
+| 50  | The Magistrate   | surviving one huge hit, and choosing targets                         | physical                                 | curses, a share of spells    | lightning                       |
 | 70  | The Prism Warden | all three elemental resistances, and damage of more than one element | fire, cold and lightning spells, in turn | the element it is attuned to | the element it just left; chaos |
 | 90  | The Rotwife      | ailments and chaos resistance                                        | chaos, physical, every ailment           | chaos                        | fire; curses at full effect     |
 | 100 | The Unmaker      | build depth                                                          | what it has stolen                       | the type dealt to it most    | breaking its shards             |
@@ -256,7 +256,7 @@ each tied to the Magistrate by a chain of light.
 | ---------------------------------------------- | ---------------------------------------------------------- |
 | Immune to curses ("the court admits no magic") | The Sentence: one huge physical blow; no evasion, no block |
 | Blocks 25% of spells                           | The Sentence stuns: stun avoidance matters                 |
-| Fire −25%                                      | Witnesses curse you and make the Sentence heavier          |
+| Lightning −25%                                 | Witnesses curse you and make the Sentence heavier          |
 | Its Witnesses are frail: kill them first       | Ordinary physical melee between Sentences                  |
 
 **Against each kind of build.**
@@ -267,7 +267,7 @@ each tied to the Magistrate by a chain of light.
 | Evasion, block             | Harder: those defences do nothing against the Sentence. Their answers are the pool, killing Witnesses, and a life flask before the blow (the new reflex, section 11). Guard: rule 5's 70% with all four Witnesses alive. |
 | Low-life energy shield     | Neutral: energy shield counts in full; the Sentence is physical, not chaos.                                                                                                                                              |
 | Attacks                    | Unaffected by its defences.                                                                                                                                                                                              |
-| Spells                     | 25% are blocked (1.33×). Fire spells are the answer (−25%).                                                                                                                                                              |
+| Spells                     | 25% are blocked (1.33×). Lightning spells are the answer (−25%).                                                                                                                                                         |
 | Curse-reliant builds       | Lose their curse on the Magistrate (not on the Witnesses).                                                                                                                                                               |
 | Area damage, chain, pierce | Good: Witnesses die in passing.                                                                                                                                                                                          |
 | Single target              | Must turn to the Witnesses (the targeting rule, section 11).                                                                                                                                                             |
@@ -359,7 +359,7 @@ regrowth.
 
 | To kill it                                                   | To survive it                                               |
 | ------------------------------------------------------------ | ----------------------------------------------------------- |
-| Chaos resistance +40% (never immune)                         | Every ailment, in a rotation, stacking                      |
+| Chaos resistance +25% (never immune)                         | Every ailment, in a rotation, stacking                      |
 | Regrows, but not while she suffers a damage-over-time effect | Chaos: at most half of her damage; rot patches on the floor |
 | Fire −25%                                                    | Cleansing flasks and ailment immunities are the answer      |
 | Curses at full effect                                        |                                                             |
@@ -373,12 +373,14 @@ regrowth.
 | Low-life energy shield without chaos resistance | The worst case on the survive side: chaos goes past energy shield. Guard: chaos is at most half of her damage, and the rot is avoidable. |
 | Damage over time (ignite, poison, bleed)        | The best on the kill side: any DoT stops her regrowth.                                                                                   |
 | Hits with no ailment                            | Must out-damage 0.6% a second: about 1.4× at the curve's damage. Hits that ignite often (fire) avoid it.                                 |
-| Chaos damage                                    | Resisted (+40%, 1.67×). Still under the ceiling, and poison stops the regrowth.                                                          |
+| Fast hits                                       | Good: many hits bleed, poison or ignite often, which keeps her regrowth stopped.                                                         |
+| Chaos damage                                    | Resisted (+25%, 1.33×). Poison stops the regrowth.                                                                                       |
 | Curse builds                                    | The best: full effect.                                                                                                                   |
 
 **Veto check.** Every survive-side test has a general answer (life and flasks) and a specific one (immunities, chaos
-resistance). Every kill-side penalty is moderate and has its own counter. The worst kill-side case, chaos hits with no
-ailment, is 1.67× resisted, and it stays under 2× because the regrowth stops while poison is on her.
+resistance). Every kill-side penalty is moderate and has its own counter. The worst kill-side case is a chaos build that
+hits without any ailment: it takes both penalties, 1.33× for the resistance and about 1.4× for the regrowth, so about
+1.87×. That is under the 2× ceiling, and it is why her chaos resistance is +25% and not the +40% of the first draft.
 
 ---
 
@@ -550,7 +552,9 @@ Bot samples are run sparingly: the user's standing preference is no incremental 
   - each answer works: a stun cancels a toll; chill slows the Courser; killing a Witness shrinks the Sentence; a broken
     shard returns its piece;
   - rule 6's guard.
-- **The ceilings** (rules 4 and 5) as tests:
+- **The ceilings** (rules 4 and 5) as tests. The Courser's melee penalty is about position, not defences, so the matrix
+  cannot see it. Its ceiling is checked by a test of a standing melee character's hit rate against the canter, and by the
+  gauntlet.
   - the kill side reads each boss's profile through `calc/matrix.ts` with its windows weighted by time;
   - the survive side computes the Sentence and the other big blows against a reference pool per map, read from the
     curve the bot's characters follow.
@@ -573,13 +577,13 @@ Bot samples are run sparingly: the user's standing preference is no incremental 
 | Build category              | Tollkeeper | Courser | Magistrate | Prism Warden | Rotwife | Unmaker |
 | --------------------------- | :--------: | :-----: | :--------: | :----------: | :-----: | :-----: |
 | Melee, big hits             |     +      |   −−    |            |              |         |         |
-| Melee, fast hits            |     −      |    −    |            |              |         |         |
+| Melee, fast hits            |     −      |    −    |            |              |    +    |         |
 | Bow and wand                |     −      |    +    |            |              |         |         |
 | Spells (hits)               |            |    +    |     −      |              |         |         |
 | Damage over time            |     +      |    +    |            |              |    +    |         |
-| Fire                        |            |    −    |     +      |      −       |    +    |    −    |
+| Fire                        |            |    −    |            |      −       |    +    |    −    |
 | Cold                        |     +      |    +    |            |      −       |         |    −    |
-| Lightning                   |     −      |         |            |      −       |         |    −    |
+| Lightning                   |     −      |         |     +      |      −       |         |    −    |
 | Chaos                       |            |         |            |      +       |    −    |    −    |
 | Two or more elements        |            |         |            |      +       |         |    +    |
 | Minions                     |            |    +    |     +      |              |         |         |
@@ -589,13 +593,18 @@ Bot samples are run sparingly: the user's standing preference is no incremental 
 | Armour and life             |            |         |     +      |              |         |         |
 | Evasion, attack block       |            |    +    |     −−     |      −       |         |         |
 | Spell block, spell dodge    |     +      |         |            |      +       |         |         |
-| Energy shield               |            |         |            |              |    −    |         |
+| Energy shield               |            |         |     +      |              |    −    |         |
 | Ailment immunity, cleansing |            |         |            |      +       |   ++    |         |
 | Stun, stun avoidance        |     +      |         |     +      |              |         |         |
-| One great pillar            |            |         |            |              |         |   −−    |
+| One great pillar            |     +      |         |            |              |         |   −−    |
 
-Every row has at least one `+` or is neutral where it has a `−`, and no build has two `−−`. Every column has builds it
-favours. A test holds the table to the data, as in ENCOUNTERS.md section 10: every boss trait has a row entry.
+Every row that has a `−` or `−−` also has a `+` somewhere, and no build has two `−−`. A few of the `+` entries above
+need a word:
+
+- energy shield at the Magistrate: half of all stuns are ignored while energy shield is up, which blunts the Sentence's
+  stun;
+- one great pillar at the Tollkeeper: a single huge damage pillar is exactly what beats a clock. Every column has builds it
+  favours. A test holds the table to the data, as in ENCOUNTERS.md section 10: every boss trait has a row entry.
 
 ### 14.1 What exists today for each category (code audit, 2026-10-10)
 
@@ -645,16 +654,16 @@ The categories above are real in the code. Counts are of active gems in `ALL_GEM
 Each ends with `npm run check`, the x9 speed floor, a look in the browser pane, and a commit of my own files only (the
 tree is shared; never `git stash`; the user pushes).
 
-| #   | Milestone        | What                                                                                                                                                                                                                                  |
-| --- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| B0  | Frame            | `bosses.ts`, the schedule, the arena, the boss strip and readiness lines, the boss bar, the targeting and stall-breaker rules, rule 6, `__dev.boss`, the ceiling tests. The Regent moves to map 100 as a placeholder for the Unmaker. |
-| B1  | The Tollkeeper   | The first boss, end to end, as a vertical slice. Then the user plays it.                                                                                                                                                              |
-| B2  | The Courser      | The two gaits, lanes, minion blocking, chill on its clock.                                                                                                                                                                            |
-| B3  | The Magistrate   | Witnesses, the Sentence, the flask reflex, `spellBlock` in the profile, curse effect per boss.                                                                                                                                        |
-| B4  | The Prism Warden | Attunement, Fractured, the three patterns, the crystal shield.                                                                                                                                                                        |
-| B5  | The Rotwife      | The ailment audit and polish of section 11.2 first, then her rotation, rot and regrowth.                                                                                                                                              |
-| B6  | The Unmaker      | Theft, shards, what it wears, adaptation. The Regent is retired (open question 2).                                                                                                                                                    |
-| B7  | One measurement  | The gauntlet and one 24-run bot sample. Tuning is in `bosses.ts`. Docs: PROGRESS.md, DESIGN.md, PLAYER-AI.md (with its author).                                                                                                       |
+| #   | Milestone        | What                                                                                                                                                                                                                                                                                                                               |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| B0  | Frame            | `bosses.ts`, the schedule (each gate turns into a boss map only when its boss lands; until then it keeps its champion), the arena, the boss strip and readiness lines, the boss bar, the targeting and stall-breaker rules, rule 6, `__dev.boss`, the ceiling tests. The Regent moves to map 100 as a placeholder for the Unmaker. |
+| B1  | The Tollkeeper   | The first boss, end to end, as a vertical slice. Then the user plays it.                                                                                                                                                                                                                                                           |
+| B2  | The Courser      | The two gaits, lanes, minion blocking, chill on its clock.                                                                                                                                                                                                                                                                         |
+| B3  | The Magistrate   | Witnesses, the Sentence, the flask reflex, `spellBlock` in the profile, curse effect per boss.                                                                                                                                                                                                                                     |
+| B4  | The Prism Warden | Attunement, Fractured, the three patterns, the crystal shield.                                                                                                                                                                                                                                                                     |
+| B5  | The Rotwife      | The ailment audit and polish of section 11.2 first, then her rotation, rot and regrowth.                                                                                                                                                                                                                                           |
+| B6  | The Unmaker      | Theft, shards, what it wears, adaptation. The Regent is retired (open question 2).                                                                                                                                                                                                                                                 |
+| B7  | One measurement  | The gauntlet and one 24-run bot sample. Tuning is in `bosses.ts`. Docs: PROGRESS.md, DESIGN.md, PLAYER-AI.md (with its author).                                                                                                                                                                                                    |
 
 B1 is the point to stop and play before building the other five.
 
