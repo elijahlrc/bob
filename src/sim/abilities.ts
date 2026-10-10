@@ -9,6 +9,7 @@ import {
   spawnBeside,
 } from './factions';
 import { markPlayer, noteDevoured, quenched } from './encounters';
+import { awaitsEncircle } from './packPlays';
 import type { Actor, World } from './types';
 
 /**
@@ -55,6 +56,8 @@ function dashing({ w, m, dt, d, ab, i }: Ctx, kind: 'leap' | 'charge'): void {
     if (m.windT <= 0) beginDash(m, kind);
     return;
   }
+  // A hound whose pack is about to Encircle waits to leap with the rest (docs/ENCOUNTERS.md 8).
+  if (kind === 'leap' && awaitsEncircle(w, m)) return;
   m.abT[i] = (m.abT[i] ?? w.rngAi.float(0.5, ab.interval!)) - dt;
   if (m.abT[i] > 0) return;
   if (d < (kind === 'leap' ? 2.5 : 3) || d > ab.range! || !w.grid.los(m.x, m.y, p.x, p.y)) return;

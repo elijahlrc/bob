@@ -67,8 +67,6 @@ describe('pack plays (docs/ENCOUNTERS.md 8)', () => {
   it('hounds of a pack hold a ring round the character, then leap together', () => {
     const w = arena();
     const h = [0, 1, 2].map((i) => put(w, 'hound', 8, i - 1, 7));
-    // Keep their own leaps back until the pack plays.
-    for (const m of h) m.abT[0] = 99;
     let ring = false;
     for (let i = 0; i < 300 && !ring; i++) {
       stepWorld(w);

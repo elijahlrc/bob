@@ -29,6 +29,8 @@ type Play = {
   members: Actor[];
   /** A ring: the angle its slots start from. */
   base: number;
+  /** Hounds: whether three or more of the pack were near at the last look (a hound then waits for the pack to leap). */
+  hounds: boolean;
 };
 
 const state = new WeakMap<World, { next: number; packs: Map<number, Play> }>();
@@ -42,7 +44,7 @@ function stateOf(w: World) {
 function playOf(w: World, pack: number): Play {
   const s = stateOf(w);
   let p = s.packs.get(pack);
-  if (!p) s.packs.set(pack, (p = { kind: null, t: 0, cd: 2, members: [], base: 0 }));
+  if (!p) s.packs.set(pack, (p = { kind: null, t: 0, cd: 0, members: [], base: 0, hounds: false }));
   return p;
 }
 
@@ -85,7 +87,7 @@ export function tickPackPlays(w: World, dt: number): void {
       const l = loosers.get(a.pack) ?? [];
       l.push(a);
       loosers.set(a.pack, l);
-    } else if (type === 'hound' && d <= 9 && a.dashT <= 0 && a.windT <= 0) {
+    } else if (type === 'hound' && d <= 9 && a.dashT <= 0) {
       const l = hounds.get(a.pack) ?? [];
       l.push(a);
       hounds.set(a.pack, l);
@@ -106,7 +108,9 @@ export function tickPackPlays(w: World, dt: number): void {
       castPattern(w, m, act, 'volley');
     }
   }
+  for (const pl of s.packs.values()) pl.hounds = false;
   for (const [pack, list] of hounds) {
+    playOf(w, pack).hounds = list.length >= 3;
     const pl = playOf(w, pack);
     if (list.length < 3 || pl.cd > 0 || pl.kind) continue;
     pl.kind = 'ring';
@@ -120,6 +124,8 @@ export function tickPackPlays(w: World, dt: number): void {
       cy += m.y;
     }
     pl.base = Math.atan2(cy / list.length - p.y, cx / list.length - p.x);
+    // A leap that was gathering is given up: they go together.
+    for (const m of list) m.windT = 0;
     w.events.push({ t: 'window', id: list[0].id, kind: 'encircle' });
   }
   for (const nest of nests) {
@@ -150,7 +156,9 @@ export function ringSlot(
   if (!pl || pl.kind !== 'ring' || pl.t <= 0) return null;
   const k = pl.members.indexOf(m);
   if (k < 0) return null;
-  const ang = pl.base + (k / pl.members.length) * Math.PI * 2;
+  // The slots spread over the 240 degrees on the pack's side: none has to run through the character to reach its own.
+  const n = pl.members.length;
+  const ang = pl.base + ((k + 0.5) / n - 0.5) * ((240 * Math.PI) / 180);
   const x = tgt.x + Math.cos(ang) * RING_RADIUS;
   const y = tgt.y + Math.sin(ang) * RING_RADIUS;
   return { x, y, pace: 1.3 };
@@ -162,4 +170,11 @@ export function activeRings(w: World): { t: number; n: number }[] {
   for (const pl of stateOf(w).packs.values())
     if (pl.kind === 'ring' && pl.t > 0) out.push({ t: pl.t, n: pl.members.length });
   return out;
+}
+
+/** Whether a hound should keep its own leap back: its pack is about to Encircle (three or more near, the play ready). */
+export function awaitsEncircle(w: World, m: Actor): boolean {
+  if (m.pack < 0 || m.mon?.spec.type !== 'hound') return false;
+  const pl = stateOf(w).packs.get(m.pack);
+  return !!pl && pl.hounds && (pl.kind === 'ring' || (pl.kind === null && pl.cd <= 0));
 }
