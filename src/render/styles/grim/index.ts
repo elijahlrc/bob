@@ -55,6 +55,7 @@ const ZONE_LOOK: Record<string, { fill: number; edge: number }> = {
   burning: { fill: 0xa04010, edge: 0xff9a40 },
   chilling: { fill: 0x2a5a8a, edge: 0x9ad8ff },
   shocking: { fill: 0x4a2a8a, edge: 0xc8a0ff },
+  sigil: { fill: 0x3a1050, edge: 0xd070ff },
 };
 const DTYPE_COLOR = [0xeadfc8, 0xc89cff, 0x9ad8ff, 0xff9a40, 0x9ae05a];
 const RARITY_RING: Record<string, number> = {

@@ -51,6 +51,7 @@ import { tickCollapse } from './collapse';
 import { tickHoldout } from './holdout';
 import { tickStranded } from './strand';
 import { initEncounter, tickEncounter } from './encounters';
+import { tickPackPlays } from './packPlays';
 import { inBlast, pending } from './blasts';
 import { crescendoStep, HOLDOUT_WAVES } from '../data/mapTypes';
 import type { Actor, World, WorldOpts } from './types';
@@ -151,6 +152,7 @@ export function createWorld(inp: CreateWorldInput): World {
     cooldowns: {},
     guard: null,
     utilityReady: {},
+    openers: {},
     auraBurnT: 0,
     deployables: [],
     deploySeq: 0,
@@ -267,6 +269,12 @@ export function createWorld(inp: CreateWorldInput): World {
       stuckY: plan.lab.start.y,
       lootId: 0,
       lootSince: 0,
+      fight: 0,
+      lastEngaged: -1e9,
+      kiteT: 0,
+      kiteX: 0,
+      kiteY: 0,
+      kiteCd: 0,
     },
     opts: inp.opts ?? {},
     stats: {
@@ -274,6 +282,7 @@ export function createWorld(inp: CreateWorldInput): World {
       xpGained: 0,
       stuck: 0,
       stalls: 0,
+      kites: 0,
       wallBlocked: 0,
       picked: 0,
       damageTaken: 0,
@@ -625,6 +634,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     }
     if (!a.action) a.carry = 0;
   }
+  tickPackPlays(w, dt);
   tickShots(w);
   tickChannel(w);
   tickFields(w, dt);

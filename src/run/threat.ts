@@ -14,6 +14,7 @@ import {
 } from '../data/mapAffixes';
 import { MONSTER_TYPES, type FactionId, type MonsterTypeId, type Variant } from '../data/monsters';
 import type { ThemeDef } from '../data/themes';
+import { TYPE_SIDEARMS } from '../data/encounters';
 import { ELEMENT_WEIGHTS, neverPlain, typeShares } from '../gen/population';
 
 /**
@@ -56,6 +57,17 @@ const FACTION_PRESSURE: Record<FactionId, number> = {
 };
 const ALL_VARIANTS = Object.keys(ELEMENT_WEIGHTS) as Variant[];
 
+/**
+ * What a type's sidearm adds to its pace of damage (docs/ENCOUNTERS.md 3), as hits a second: its share of a hit over its
+ * timer. A pattern counts as one and a half hits (several blasts, not all of them caught).
+ */
+function sidearmRate(id: MonsterTypeId): number {
+  const s = TYPE_SIDEARMS[id];
+  if (!s) return 0;
+  const mult = s.pattern ? 1.5 : (s.shape?.mult ?? 1) * (s.ring ? 2 : 1);
+  return mult / s.every;
+}
+
 function rawThreat(
   theme: Pick<ThemeDef, 'typeWeights' | 'elementWeights' | 'factions'>,
 ): ThemeThreat {
@@ -84,7 +96,7 @@ function rawThreat(
         mix[ELEMENT_INDEX[v]] += dmg * conv;
       }
       variants[v] += share;
-      pressure += (share * t.dmgMult * t.lifeMult) / t.attackTime;
+      pressure += share * t.dmgMult * t.lifeMult * (1 / t.attackTime + sidearmRate(id));
       total += share;
     }
   }

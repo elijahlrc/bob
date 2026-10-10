@@ -843,3 +843,15 @@ worn item's owner) before it is paid for, tier and roll position on each affix, 
 that says what each currency does and a guide. The logic is headless (`compareSlots`, `dryEquip`, `planCraft`, `applyCraft`, `affixInfo` and the rest of
 `src/run/craftPlan.ts`) with tests. No cost, odd or unlock changed. Found on the way: `itemInfos` scored a two-hander without clearing the off hand it displaces; it now
 scores the build `equip` would leave. A browser pass was done at 1280 and 375 wide; a real-device pass is left (MOBILE.md section 9).
+
+### Encounters (docs/ENCOUNTERS.md), built (2026-10-09)
+
+Monsters do more than walk up and hit. **Sidearms:** 19 types have a second attack, used out of melee reach or on a clock
+(a slow bone spear, lobs of bile, coals, slag and burrs, a boulder, a lash, a blinding shade, slowing chains and clots, a
+ring of spores). **Patterns:** telegraphed blasts in sequence and in shapes (March, Mortar, Cross, Toll waves, Closing ring,
+Keening, Twin hooks), with faint outlines for the steps still to come. **Windows:** Brace, Counter-stance, Sanctuary, Aegis,
+Fade, Petrify; hits only, so damage over time goes on. **Modes:** Core vent, Quench, Gorged, Last rites, Grieving, Riled,
+Molten, Broken guard, and the Adaptive rare mod. **Debuffs:** Blind, the Handler's mark, the Bursar's Tithe beam, the
+Hexer's sigil, the Slinger's hobbling stones. **Pack plays:** a Loosing call, an Encircle, a Converge. Every one has a tell
+on the floor or the body (`render/styles/grim/encounterFx.ts`), a line on the inspect card, and counts toward the camp card's
+tags. The character's own decisions are unchanged (user, 2026-10-09). No balance sample yet.

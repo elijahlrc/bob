@@ -139,7 +139,9 @@ export type ThreatTag =
   | 'reflectors'
   | 'ground'
   | 'salvos'
-  | 'lanes';
+  | 'lanes'
+  | 'patterns'
+  | 'guards';
 
 export const TAG_ORDER: ThreatTag[] = [
   'ranged',
@@ -163,6 +165,8 @@ export const TAG_ORDER: ThreatTag[] = [
   'ground',
   'salvos',
   'lanes',
+  'patterns',
+  'guards',
 ];
 
 export const TAG_INFO: Record<ThreatTag, { name: string; text: string }> = {
@@ -231,6 +235,14 @@ export const TAG_INFO: Record<ThreatTag, { name: string; text: string }> = {
   lanes: {
     name: 'Lanes',
     text: 'A line is marked, then struck: movement beats evasion here.',
+  },
+  patterns: {
+    name: 'Patterns',
+    text: 'Blasts land in sequence and in shapes (lines, crosses, rings): reach and room to step help; a crowded melee fight does not.',
+  },
+  guards: {
+    name: 'Guards',
+    text: 'Some cannot be hurt for a moment (a shield, plates, stone, a sanctuary): damage over time, many quick hits and a stun get through.',
   },
 };
 

@@ -312,11 +312,12 @@ describe('the Ashen Choir (EXPANSION 7.3)', () => {
     expect(ally2.life).toBeCloseTo(ally2.def.maxLife * 0.3, 3);
   });
 
-  it('a Hexer hexes the player every six seconds, and the Zealous mod spurs allies when it dies', () => {
+  it('a Hexer draws a sigil that hexes the player standing in it, and the Zealous mod spurs allies when it dies', () => {
     const w = arena();
     const h = put(w, 'hexer', 8);
     h.skillT = 0;
-    run(w, 0.2);
+    // The sigil (docs/ENCOUNTERS.md 7) bites after half a second's grace; the character here cannot step out.
+    run(w, 1);
     expect(w.player.hexes).toHaveLength(1);
     const z = put(w, 'warrior', 10, 0, { rarity: 'magic', mods: ['zealous'] });
     const ally = put(w, 'warrior', 12);

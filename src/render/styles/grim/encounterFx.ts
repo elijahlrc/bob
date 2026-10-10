@@ -11,6 +11,9 @@ import type { Stance } from '../../../data/monsters';
 import { ELEMENT_COLOR } from '../../../calc/skillLook';
 import type { Actor, GroundEffect, SimEvent, World } from '../../../sim/types';
 import type { FxHost } from './skillFx';
+import { markOf } from '../../../sim/encounters';
+import { tithing } from '../../../sim/abilities';
+import { activeRings, RING_RADIUS } from '../../../sim/packPlays';
 
 /**
  * How the encounters look (docs/ENCOUNTERS.md): the warnings of shaped blasts and the later steps of a pattern, what each
@@ -32,6 +35,8 @@ const HOLY = 0xffe8a8;
 const AEGIS = 0x9ac8ff;
 const EXPOSED = 0xff4a3a;
 const ROT = 0xa0e04a;
+/** A Tithe: old gold. */
+const TITHE = 0xe8c060;
 
 const lighten = (c: number, f: number): number => {
   const m = (v: number) => Math.round(v + (255 - v) * f);
@@ -438,12 +443,104 @@ export class EncounterFx {
     }
   }
 
+  /** A Hexer's sigil: a turning six-pointed star inside the pool, so it reads as a curse and not as a cloud. */
+  private drawSigil(g: Gfx, e: GroundEffect, time: number): void {
+    const fade = Math.min(1, e.t);
+    const r = e.radius * 0.85;
+    for (const off of [0, Math.PI / 3]) {
+      const pts: Pt[] = [];
+      for (let i = 0; i < 3; i++) {
+        const ang = off + (i / 3) * Math.PI * 2 + time * 0.8;
+        pts.push(this.pt(e.x + Math.cos(ang) * r, e.y + Math.sin(ang) * r));
+      }
+      g.lineStyle(1.5, 0xe0a0ff, 0.9 * fade);
+      g.strokePoints(pts as Phaser.Math.Vector2[], true, true);
+    }
+    g.lineStyle(1, 0xe0a0ff, 0.6 * fade);
+    this.circleLine(g, e.x, e.y, r);
+  }
+
+  /** A Bursar's Tithe: a gold beam from the character to it, with motes of life flowing along it to the Bursar. */
+  private drawTithe(g: Gfx, a: Actor, w: World, time: number): void {
+    const p = w.player;
+    const s = this.pt(p.x, p.y);
+    const t = this.pt(a.x, a.y);
+    const sy = s.y - 10;
+    const ty = t.y - 12;
+    g.lineStyle(4, TITHE, 0.25).lineBetween(s.x, sy, t.x, ty);
+    g.lineStyle(1.5, TITHE, 0.85).lineBetween(s.x, sy, t.x, ty);
+    g.fillStyle(0xff6050, 0.95);
+    for (let i = 0; i < 4; i++) {
+      const f = (time * 0.9 + i / 4) % 1;
+      g.fillRect(s.x + (t.x - s.x) * f - 1, sy + (ty - sy) * f - 1, 2, 2);
+    }
+  }
+
+  /**
+   * An Encircle: a dashed red ring round the character where the hounds hold, and a sweep that closes as the moment of the
+   * leap comes.
+   */
+  private drawRing(g: Gfx, w: World, left: number, time: number): void {
+    const p = w.player;
+    const n = 28;
+    g.lineStyle(2, EXPOSED, 0.75);
+    for (let i = 0; i < n; i += 2) {
+      const a0 = (i / n) * Math.PI * 2 + time * 0.4;
+      const a1 = ((i + 1) / n) * Math.PI * 2 + time * 0.4;
+      const q0 = this.pt(p.x + Math.cos(a0) * RING_RADIUS, p.y + Math.sin(a0) * RING_RADIUS);
+      const q1 = this.pt(p.x + Math.cos(a1) * RING_RADIUS, p.y + Math.sin(a1) * RING_RADIUS);
+      g.lineBetween(q0.x, q0.y, q1.x, q1.y);
+    }
+    // The sweep: how much of the hold is gone.
+    const k = Math.max(0, Math.min(1, 1 - left / 2));
+    const pts: Pt[] = [];
+    for (let i = 0; i <= 24; i++) {
+      const a = -Math.PI / 2 + k * Math.PI * 2 * (i / 24);
+      pts.push(
+        this.pt(p.x + Math.cos(a) * (RING_RADIUS - 0.3), p.y + Math.sin(a) * (RING_RADIUS - 0.3)),
+      );
+    }
+    g.lineStyle(3, EXPOSED, 0.95);
+    g.strokePoints(pts as Phaser.Math.Vector2[], false, false);
+  }
+
+  /** What is on the character: a red reticle over its head while it is marked, a dark veil while it is blinded. */
+  private drawOnPlayer(g: Gfx, w: World, time: number): void {
+    const p = w.player;
+    if (!p.alive) return;
+    const c = this.pt(p.x, p.y);
+    if (markOf(w)) {
+      const y = c.y - 30;
+      const r = 5 + Math.sin(time * 8);
+      g.lineStyle(1.5, EXPOSED, 0.95).strokeCircle(c.x, y, r);
+      for (let i = 0; i < 4; i++) {
+        const ang = (i / 4) * Math.PI * 2;
+        g.lineBetween(
+          c.x + Math.cos(ang) * (r - 2),
+          y + Math.sin(ang) * (r - 2),
+          c.x + Math.cos(ang) * (r + 3),
+          y + Math.sin(ang) * (r + 3),
+        );
+      }
+    }
+    if (p.fx.blind) {
+      g.fillStyle(0x10081a, 0.55).fillEllipse(c.x, c.y - 20, 14, 5);
+      g.fillStyle(0x7a5aa8, 0.5).fillEllipse(c.x + Math.sin(time * 3) * 2, c.y - 21, 8, 3);
+    }
+  }
+
   // ---- Per frame and events ----------------------------------------------------------------------------------------
 
   /** Draw the pattern blasts, the windows and the modes; advance the short effects. `dt` keeps the sim's pace. */
   frame(w: World, dt: number, time: number, g: Gfx): void {
-    for (const e of w.effects) if (e.shape || e.label) this.drawBlast(g, e, time);
+    for (const e of w.effects) {
+      if (e.shape || e.label) this.drawBlast(g, e, time);
+      else if (e.kind === 'sigil') this.drawSigil(g, e, time);
+    }
+    this.drawOnPlayer(g, w, time);
+    for (const r of activeRings(w)) this.drawRing(g, w, r.t, time);
     for (const a of w.actors) {
+      if (a.alive && a.mon?.spec.type === 'bursar' && tithing(a)) this.drawTithe(g, a, w, time);
       if (!a.alive || !a.enc || !a.mon) continue;
       const e = a.enc;
       if (e.warnT > 0 || e.openT > 0) {
@@ -545,6 +642,24 @@ export class EncounterFx {
             break;
           case 'molten':
             em.flame.explode(10, p.x, p.y - 8);
+            break;
+          case 'mark':
+            this.pulse(a, EXPOSED, 2.5);
+            this.say(a, 'Mark!', EXPOSED);
+            break;
+          case 'sigil':
+            this.pulse(a, 0xd070ff, 1);
+            break;
+          case 'call':
+            this.pulse(a, BRACE, 1.2);
+            this.say(a, 'Loose!', BRACE);
+            break;
+          case 'encircle':
+            this.say(a, 'Encircle', EXPOSED);
+            break;
+          case 'converge':
+            this.pulse(a, ROT, 6);
+            this.say(a, 'Converge', ROT);
             break;
           default:
             if (e.kind.startsWith('adapt')) {

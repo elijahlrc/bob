@@ -273,7 +273,8 @@ export type GroundEffect = {
   radius: number;
   t: number;
   total: number;
-  kind: 'volatile' | 'slam' | 'explosion' | 'caustic' | 'burning' | 'chilling' | 'shocking';
+  kind:
+    'volatile' | 'slam' | 'explosion' | 'caustic' | 'burning' | 'chilling' | 'shocking' | 'sigil';
   /** A blast: damage when it lands. A lasting zone (caustic, burning, chilling, shocking): damage per second. */
   damage: number;
   /** Zones: time since the last damage pulse. */
@@ -520,6 +521,14 @@ export type PlayerAI = {
   /** The drop or chest the player is heading for, and since when (a loot hunt that goes nowhere is dropped). */
   lootId: number;
   lootSince: number;
+  /** The fights so far (an opener is used once a fight), and when the character last had a target. */
+  fight: number;
+  lastEngaged: number;
+  /** A kiting step (the `kite` spacing): seconds left, where to, and seconds before the next. */
+  kiteT: number;
+  kiteX: number;
+  kiteY: number;
+  kiteCd: number;
 };
 
 /**
@@ -603,6 +612,8 @@ export type World = {
   cooldowns: Record<string, { uses: number; t: number }>;
   /** When each utility skill (by choice key) can next be cast. */
   utilityReady: Record<string, number>;
+  /** The openers used (by choice key): in which fight, and on which rare or boss targets. */
+  openers: Record<string, { fight: number; ids: number[] }>;
   /** Time since the burning aura last struck. */
   auraBurnT: number;
   /** The totems, brands, traps and mines on the ground. */
@@ -748,6 +759,8 @@ export type World = {
     xpGained: number;
     stuck: number;
     stalls: number;
+    /** Kiting steps taken (the `kite` spacing). */
+    kites: number;
     /** Player projectiles stopped by walls. */
     wallBlocked: number;
     picked: number;

@@ -1,6 +1,6 @@
 # Bob — Encounters: what monsters do besides walk up and hit
 
-Status: **plan, 2026-10-09. Nothing is built.** It replaces `SIDEARMS.md` (2026-10-09), which is part A here. Written from
+Status: **built, 2026-10-09** (section 16 says what was built and how it differs). It replaces `SIDEARMS.md` (2026-10-09), which is part A here. Written from
 the code as it stands. Decisions that need the user are in section 15; the plan takes the stated defaults until they are
 answered.
 
@@ -456,3 +456,44 @@ encounters feel better before building out the rest.
 6. **Pack plays (N7)**: worth their cost? Default: after N6, if the user wants them.
 7. **Should a gate champion borrow patterns** (a long one per chief)? Default: not in this plan. A follow-up, once patterns
    exist.
+
+---
+
+## 16. As built (2026-10-09)
+
+Built in three commits after the plan, then debuffs, pack plays and the cards. The user's decisions on 2026-10-09: build
+everything but **Latched**, and leave the **character's decisions unchanged** (section 9).
+
+| Where                                   | What                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/data/encounters.ts`                | The data: `TYPE_SIDEARMS` (19 types), `PATTERNS` (March, Mortar, Cross, Toll waves, Closing ring, Keening, Twin hooks, the archers' lanes), `TYPE_WINDOWS` (Brace, Counter-stance, Sanctuary), `TYPE_MODES`, texts, tags                                                                                                                                                                                                                                                       |
+| `src/calc/monster.ts`                   | `MonsterStats.sidearm`: a second profile with its own ModDB (`sidearmSkill`, `sidearmMods`)                                                                                                                                                                                                                                                                                                                                                                                    |
+| `src/sim/blasts.ts`                     | `inBlast` (circle, lane, wedge, donut) and `castPattern`; `GroundEffect` has `shape`, `delay`, `label`, `owner`, `pull`, `leaves`                                                                                                                                                                                                                                                                                                                                              |
+| `src/sim/encounters.ts`                 | `Actor.enc` (one object, only for the types that need it); the sidearm step, windows, every mode, the hit gate (`turnsAside`), `modeTaken`, `noteTaken`, the Counter-stance answer, the mark                                                                                                                                                                                                                                                                                   |
+| `src/sim/packPlays.ts`                  | Loosing call, Encircle, Converge                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `src/sim/abilities.ts`                  | `tithe`, `sigil` (the Hexer's hex is now a sigil), the whistle marks, `startCharge` (Riled)                                                                                                                                                                                                                                                                                                                                                                                    |
+| `src/render/styles/grim/encounterFx.ts` | Every tell: shaped warnings with a dark wash and rim runes, a faint outline for a pattern's later steps, the landings, the shield arc, the raised blade, the ring of light, the plates, the stone silhouette, the open core, chant threads, the Tithe beam, the mark over the character, the sigil star, the Encircle ring, and a floater as a mode fires; projectile sprites (spear, boulder, gobbet, shade, chain, clot, spore) and a throw, cast or lash pose for a sidearm |
+| Cards                                   | The inspect card lists the sidearm, the window and each mode; the camp card counts them toward the tags, with two new ones (Patterns, Guards); `threat.ts` counts a sidearm in a type's pressure; the HUD shows Blinded, Marked and Tithed beside the hexes                                                                                                                                                                                                                    |
+| `__dev.stage(types, opts)`              | Puts types at a distance with their sidearms (and windows) ready, steps until a condition and pauses, to look at an encounter in the real renderer                                                                                                                                                                                                                                                                                                                             |
+
+**Different from the plan:**
+
+- A pattern is a sidearm that casts a pattern, not a second mechanism: one timer, one range window, one pose.
+- A later step of a pattern is a hazard to the dodge only once its warning shows; before that it is drawn as a faint outline
+  for the player.
+- Windows and modes are one state object (`EncState`) and one file, not a general trigger engine: each mode reads its numbers
+  from `TYPE_MODES`. The phases (`data/phases.ts`) were not moved onto modes (no gain the player sees).
+- **Petrify** went to the Charnel Heap and not the Core Golem (two tricks at most a type); the Golem has Core vent.
+- The Beetle's **Carapace** is its curl, changed: 90% less physical damage for 2 s, and fire or a stun opens it.
+- **Riled** replaces the Rend-boar's enrage; **Last rites** replaces the Hag's flight; the Hexer's **sigil** replaces its hex.
+- The **Tithe** draws its owner's hit a second (a share of 0.3 was lost under regeneration); its beam is broken by distance
+  or by a wall.
+- The **Loosing call** needs two archers or slingers, not three (a Firing line has two or three).
+- A Counter-stance answers with a raw physical blow of 1.5 times the Guard's hit, at most one every 0.35 s.
+- **Not built:** the pack's "window budget" (at most half a pack in a window at once). Windows are staggered by a random first
+  timer instead; to be added if a braced front line is seen to stall the character.
+- Every test of the old behaviours passes; four were changed because the rule they pinned changed on purpose (the Beetle's
+  curl, a Sentinel's carapace test that now has to remove its Aegis first, the enrage and flight tests, which moved to the
+  Flagellant and the Handler).
+
+No bot sample has been run (the user's standing preference); damage numbers are the plan's starting values.

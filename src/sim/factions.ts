@@ -164,8 +164,10 @@ export type Corpse = {
   life: number;
 };
 
-export type ZoneKind = 'caustic' | 'burning' | 'chilling' | 'shocking';
-export const ZONE_KINDS: ZoneKind[] = ['caustic', 'burning', 'chilling', 'shocking'];
+export type ZoneKind = 'caustic' | 'burning' | 'chilling' | 'shocking' | 'sigil';
+export const ZONE_KINDS: ZoneKind[] = ['caustic', 'burning', 'chilling', 'shocking', 'sigil'];
+/** Seconds between two hexes from a Hexer's sigil to whoever stands in it (docs/ENCOUNTERS.md 7). */
+export const SIGIL_EVERY = 1.5;
 
 /**
  * Drag the character toward a monster (a Tidecaller's hook): up to `tiles`, never into it, and the character is staggered
@@ -208,7 +210,14 @@ export function openZone(
     total: seconds,
     kind,
     damage: dps,
-    dtype: kind === 'caustic' ? 4 : kind === 'burning' ? 3 : kind === 'chilling' ? 2 : 1,
+    dtype:
+      kind === 'caustic' || kind === 'sigil'
+        ? 4
+        : kind === 'burning'
+          ? 3
+          : kind === 'chilling'
+            ? 2
+            : 1,
     faction: 1,
     acc: 0,
   });
@@ -366,6 +375,15 @@ export function tickZones(w: World, dt: number): void {
   for (const e of w.effects) {
     if (!isZone(e)) continue;
     const inside = (a: Actor) => a.alive && Math.hypot(a.x - e.x, a.y - e.y) <= e.radius + a.r;
+    // A Hexer's sigil hexes the character who stands in it, once in a while (docs/ENCOUNTERS.md 7).
+    if (e.kind === 'sigil') {
+      e.acc = (e.acc ?? 0) + dt;
+      if (inside(p) && e.acc >= SIGIL_EVERY) {
+        e.acc = 0;
+        hexPlayerAtRandom(w);
+      }
+      continue;
+    }
     // The player and the player's minions are caught by a monster's zone alike.
     const caught: Actor[] = [];
     if (inside(p)) caught.push(p);

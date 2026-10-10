@@ -49,7 +49,14 @@ import {
   tickStatuses,
 } from './statuses';
 import { damageMult, hexPlayerAtRandom, onMonsterDeath, shieldedByPylon } from './factions';
-import { counterBlow, modeTaken, noteAttacked, noteTaken, turnsAside } from './encounters';
+import {
+  counterBlow,
+  markedMult,
+  modeTaken,
+  noteAttacked,
+  noteTaken,
+  turnsAside,
+} from './encounters';
 import { CURL_LESS, CURL_SECONDS } from '../data/encounters';
 import { CRIT_ON_CONSECRATED, consecratedAt, fieldKill } from './fields';
 import { spreadAilments } from './proliferate';
@@ -393,6 +400,14 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     if (extra > 0) {
       for (let i = 0; i < res.dmg.length; i++) res.dmg[i] *= 1 + extra;
       res.total *= 1 + extra;
+    }
+  }
+  // Marked by a Handler: its pack hits the character harder (docs/ENCOUNTERS.md 7).
+  if (dst.isPlayer && !src.isPlayer && src.mon && res.outcome !== 'block') {
+    const k = markedMult(w, src);
+    if (k !== 1) {
+      for (let i = 0; i < 5; i++) res.dmg[i] *= k;
+      res.total *= k;
     }
   }
   if (src.modIds.includes('hexcaller') && dst.isPlayer && res.outcome === 'hit' && src.hexCd <= 0) {

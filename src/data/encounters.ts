@@ -1,5 +1,6 @@
 import type { MonsterTypeId, Stance } from './monsters';
-import type { ShapeSpec, ZoneKindId } from './shapes';
+import { SHAPE_INFO, type ShapeSpec, type ZoneKindId } from './shapes';
+import type { ThreatTag } from './monsterInfo';
 
 /**
  * Encounters (docs/ENCOUNTERS.md): what a monster does besides walk up and hit. Three kinds of data, by type, in the manner of
@@ -658,4 +659,18 @@ function sidearmText(s: SidearmSpec): string {
     default:
       return `An attack ${range} away.`;
   }
+}
+
+/** The threat tags a type's encounters carry on the camp card: its sidearm's shape, a pattern, a guard. */
+export function encounterTags(type: MonsterTypeId): ThreatTag[] {
+  const out: ThreatTag[] = [];
+  const s = TYPE_SIDEARMS[type];
+  if (s?.pattern) out.push('patterns');
+  else if (s?.shape && SHAPE_INFO[s.shape.id].tag) out.push(SHAPE_INFO[s.shape.id].tag!);
+  const guarded =
+    TYPE_WINDOWS[type]?.id === 'brace' ||
+    TYPE_WINDOWS[type]?.id === 'sanctuary' ||
+    (TYPE_MODES[type] ?? []).some((m) => m.id === 'aegis' || m.id === 'fade' || m.id === 'petrify');
+  if (guarded) out.push('guards');
+  return out;
 }

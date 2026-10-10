@@ -8,6 +8,8 @@ import { movementTexts, senseText } from '../data/movement';
 import { patternText, phaseTexts } from '../data/phases';
 import { shapeText } from '../data/shapes';
 import { encounterTexts } from '../data/encounters';
+import { MARK_MORE, markOf } from '../sim/encounters';
+import { tithing } from '../sim/abilities';
 import { FACTION_GLYPH, FACTION_RULES, TYPE_BLURBS } from '../data/monsterInfo';
 import type { ThemeDef } from '../data/themes';
 import { themeInfo } from '../run/themeInfo';
@@ -158,14 +160,43 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
   );
 }
 
+/** What monsters have left on the character besides hexes (docs/ENCOUNTERS.md 7): a blinding, a mark, a draining beam. */
+function playerDebuffs(w: World): { name: string; text: string }[] {
+  const out: { name: string; text: string }[] = [];
+  const p = w.player;
+  if (p.fx.blind)
+    out.push({
+      name: 'Blinded',
+      text: `Blinded: your attacks are half as likely to hit. ${Math.ceil(p.fx.blind.t)} s left.`,
+    });
+  const mark = markOf(w);
+  if (mark)
+    out.push({
+      name: 'Marked',
+      text: `Marked by a Handler: its pack hits you ${Math.round(MARK_MORE * 100)}% harder. ${Math.ceil(mark.until - w.t)} s left.`,
+    });
+  if (w.actors.some((a) => a.alive && tithing(a)))
+    out.push({
+      name: 'Tithed',
+      text: 'A Bursar is draining your life through a beam: kill it, or get out of its sight.',
+    });
+  return out;
+}
+
 /** Pips for each kind of charge the character can gain (EXPANSION 5.6). */
 function Charges({ w }: { w: World }) {
   const ch = w.char;
   const kinds = CHARGE_KINDS.filter((k) => ch.chargeSource[k] || ch.charges[k] > 0);
   const hexes = w.player.hexes;
-  if (!kinds.length && !hexes.length) return null;
+  const debuffs = playerDebuffs(w);
+  if (!kinds.length && !hexes.length && !debuffs.length) return null;
   return (
     <div class="charges">
+      {debuffs.map((d) => (
+        <div key={d.name} class="hexchip" {...infoProps(d.text)}>
+          ⚠ {d.name}
+        </div>
+      ))}
       {hexes.map((h) => (
         <div
           key={h.id}

@@ -25,6 +25,8 @@ export type AbilityId =
   | 'pull'
   | 'devour'
   | 'trail'
+  | 'tithe'
+  | 'sigil'
   // Passive: applied where the rule lives.
   | 'rise'
   | 'burst'
@@ -137,7 +139,7 @@ export const ABILITY_INFO: Record<AbilityId, AbilityInfo> = {
     active: true,
     tag: 'healers',
     text: (a) =>
-      `Every ${s(a.interval)} s calls its pack to a frenzy: allies within ${s(a.range)} tiles move faster and hit harder for a few seconds.`,
+      `Every ${s(a.interval)} s calls its pack to a frenzy: allies within ${s(a.range)} tiles move faster and hit harder for a few seconds, and you are marked: its pack hits you 20% harder for 4 s.`,
   },
   kite: {
     name: 'Kite',
@@ -157,6 +159,20 @@ export const ABILITY_INFO: Record<AbilityId, AbilityInfo> = {
     tag: 'suppressors',
     text: (a) =>
       `While it stands, your regeneration, leech and energy shield recharge stop within ${s(a.range)} tiles.`,
+  },
+  tithe: {
+    name: 'Tithe',
+    active: true,
+    tag: 'drains',
+    text: (a) =>
+      `While you are within ${s(a.range)} tiles and in its sight, a beam drains your life into it: kill it or break the line.`,
+  },
+  sigil: {
+    name: 'Sigil',
+    active: true,
+    tag: 'hexes',
+    text: (a) =>
+      `Every ${s(a.interval)} s draws a sigil under your feet for ${s(a.amount)} s: standing in it hexes you.`,
   },
   trail: {
     name: 'Trail',
@@ -281,7 +297,8 @@ export const TYPE_ABILITIES: Partial<Record<string, AbilityDef[]>> = {
   gloomstalker: [{ id: 'blink', interval: BLINK_INTERVAL, telegraph: BLINK_TELEGRAPH }],
   wisp: [{ id: 'wispNova' }],
   wight: [{ id: 'shell', range: WIGHT_RANGE, amount: WIGHT_SHELL }],
-  hexer: [{ id: 'hex', interval: HEXER_INTERVAL }],
+  // The Hexer's hex is a sigil on the ground (docs/ENCOUNTERS.md 7).
+  hexer: [{ id: 'sigil', interval: HEXER_INTERVAL + 1, range: 1.6, amount: 4 }],
   censer: [{ id: 'aura', range: CENSER_RANGE }],
   flagellant: [{ id: 'fervour' }],
   choirmaster: [
@@ -317,7 +334,10 @@ export const TYPE_ABILITIES: Partial<Record<string, AbilityDef[]>> = {
   ],
   cutpurse: [{ id: 'steal', amount: 0.25 }],
   guard: [{ id: 'reflect', amount: 0.15 }],
-  bursar: [{ id: 'suppress', range: 5 }],
+  bursar: [
+    { id: 'suppress', range: 5 },
+    { id: 'tithe', range: 8, amount: 1 },
+  ],
   slinger: [{ id: 'kite' }],
   gorger: [{ id: 'devour', interval: 3, range: 2.5, amount: 0.25 }],
   watcher: [{ id: 'hex', interval: 9 }],

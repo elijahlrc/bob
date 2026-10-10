@@ -1,6 +1,7 @@
 import type { MoveSpec, Senses } from '../data/movement';
 import { MONSTER_TYPES } from '../data/monsters';
 import { flankPoint, frontOf } from './packs';
+import { ringSlot } from './packPlays';
 import type { Actor, World } from './types';
 
 /**
@@ -207,6 +208,9 @@ export type Steer = { x: number; y: number; pace: number } | null;
  */
 export function steer(w: World, m: Actor, tgt: Actor, d: number, dt: number): Steer {
   const mv = m.mv;
+  // A hound of an Encircle holds its place on the ring until the pack leaps (docs/ENCOUNTERS.md 8).
+  const ring = m.pack >= 0 ? ringSlot(w, m, tgt) : null;
+  if (ring) return Math.hypot(ring.x - m.x, ring.y - m.y) < 0.4 ? null : ring;
   const list = styles(m);
   let sx = tgt.x;
   let sy = tgt.y;

@@ -469,3 +469,26 @@ export function onEncounterDeath(w: World, a: Actor): void {
     }
   }
 }
+
+/** Marked (docs/ENCOUNTERS.md 7): the pack whose Handler marked the character, until when, and how much harder it hits. */
+const marks = new WeakMap<World, { pack: number; until: number }>();
+export const MARK_SECONDS = 4;
+export const MARK_MORE = 0.2;
+
+/** A Handler marks the character for its pack. */
+export function markPlayer(w: World, by: Actor): void {
+  marks.set(w, { pack: by.pack, until: w.t + MARK_SECONDS });
+  w.events.push({ t: 'window', id: by.id, kind: 'mark' });
+}
+
+/** The mark on the character now, if any. */
+export function markOf(w: World): { pack: number; until: number } | null {
+  const m = marks.get(w);
+  return m && m.until > w.t ? m : null;
+}
+
+/** What a monster's hit on the character is multiplied by: more if its pack has marked it. */
+export function markedMult(w: World, src: Actor): number {
+  const m = markOf(w);
+  return m && src.pack === m.pack ? 1 + MARK_MORE : 1;
+}

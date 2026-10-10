@@ -1,13 +1,14 @@
 import { abilitiesOf, type AbilityDef } from '../data/abilities';
-import { monsterHitOf } from './combat';
+import { monsterHitOf, rawHit } from './combat';
 import {
   blinkBehind,
   hexPlayerAtRandom,
   openZone,
   raise as raiseCorpse,
+  SIGIL_EVERY,
   spawnBeside,
 } from './factions';
-import { noteDevoured, quenched } from './encounters';
+import { markPlayer, noteDevoured, quenched } from './encounters';
 import type { Actor, World } from './types';
 
 /**
@@ -35,6 +36,12 @@ const LEAP_SPEED = 15;
 const CHARGE_SPEED = 10;
 /** A charge runs on this far past the place it was aimed at. */
 const CHARGE_OVERSHOOT = 3;
+
+/** Seconds between two draws of a Tithe. */
+const TITHE_PULSE = 0.5;
+/** The Bursars whose beam is on the character now (the renderer draws it). */
+const tithers = new WeakSet<Actor>();
+export const tithing = (a: Actor): boolean => tithers.has(a);
 
 /** Run a leap or a charge: cooldown, then a warning on the ground, then the rush itself. */
 function dashing({ w, m, dt, d, ab, i }: Ctx, kind: 'leap' | 'charge'): void {
@@ -251,9 +258,38 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
     m.abT[i] = ab.interval!;
     for (const o of w.actors)
       if (!o.isPlayer && o.alive && Math.hypot(o.x - m.x, o.y - m.y) <= ab.range!) o.buffT = 4;
+    // And marks the quarry: the pack hits the character harder for a while (docs/ENCOUNTERS.md 7).
+    if (d <= 10) markPlayer(w, m);
   },
   suppress({ w, d, ab }) {
     if (d <= ab.range!) w.player.suppressT = 0.25;
+  },
+  tithe({ w, m, dt, d, ab, i }) {
+    // A beam that drains the character's life into the Bursar while it can see the character (docs/ENCOUNTERS.md 7).
+    const p = w.player;
+    const on = d <= ab.range! && w.grid.los(m.x, m.y, p.x, p.y);
+    if (!on) {
+      tithers.delete(m);
+      return;
+    }
+    tithers.add(m);
+    m.abT[i] = (m.abT[i] ?? TITHE_PULSE) - dt;
+    if (m.abT[i] > 0) return;
+    m.abT[i] = TITHE_PULSE;
+    const amount = monsterHitOf(m) * ab.amount! * TITHE_PULSE;
+    rawHit(w, p, amount, 4, 'Tithe');
+    m.life = Math.min(m.def.maxLife, m.life + amount);
+  },
+  sigil({ w, m, dt, d, ab }) {
+    // The Hexer draws its hex on the ground under the character: standing in it hexes (docs/ENCOUNTERS.md 7).
+    m.skillT -= dt;
+    const p = w.player;
+    if (m.skillT > 0 || d > 9 || !w.grid.los(m.x, m.y, p.x, p.y)) return;
+    m.skillT = ab.interval!;
+    openZone(w, p.x, p.y, ab.range!, ab.amount!, 'sigil', 0);
+    // Half a second's grace before it bites: the time to step out.
+    w.effects[w.effects.length - 1].acc = SIGIL_EVERY - 0.5;
+    w.events.push({ t: 'window', id: m.id, kind: 'sigil' });
   },
   shell({ w, m, ab }) {
     for (const o of w.actors) {
