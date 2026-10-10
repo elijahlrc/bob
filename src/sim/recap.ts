@@ -1,7 +1,16 @@
-import type { DeathRecap, World } from './types';
+import { enemiesNear } from './utility';
+import type { DeathRecap, RecapHit, World } from './types';
 
-/** Seconds of damage the recap covers. */
+/** Seconds of damage the recap's lines cover. */
 export const RECAP_SECONDS = 5;
+/** Seconds of single hits the telemetry record keeps, and the most hits it keeps. */
+export const RECAP_HIT_SECONDS = 10;
+export const RECAP_HITS = 14;
+/** How near a monster is to count as "near" at the moment of death, in tiles. */
+export const RECAP_NEAR = 8;
+
+/** Damage over time is logged every tick: it is a total in the recap, not a list of hits. */
+const OVER_TIME = new Set(['Burning', 'Bleeding', 'Poison']);
 
 /** Build the death recap for a player who has just died (EXPANSION section 9). */
 export function buildRecap(w: World): DeathRecap {
@@ -25,6 +34,20 @@ export function buildRecap(w: World): DeathRecap {
   if (ail.shock > 0) ailments.push(`shocked (${Math.round(ail.shock * 100)}% more damage taken)`);
   if (ail.chill > 0) ailments.push('chilled');
   if (ail.freezeT > 0) ailments.push('frozen');
+  // The hits of the last seconds, oldest first, and no more than the record has room for (the latest are kept).
+  const hits: RecapHit[] = w.dmgLog
+    .filter((d) => w.t - d.t <= RECAP_HIT_SECONDS && !OVER_TIME.has(d.name))
+    .slice(-RECAP_HITS)
+    .map((d) => ({
+      ago: w.t - d.t,
+      name: d.name,
+      via: d.via,
+      rarity: d.rarity,
+      dtype: d.dtype,
+      amount: d.amount,
+      hp: d.hp,
+    }));
+  const near = enemiesNear(w, w.player.x, w.player.y, RECAP_NEAR);
   return {
     time: w.t,
     killer: last?.name ?? 'Unknown',
@@ -46,5 +69,29 @@ export function buildRecap(w: World): DeathRecap {
     ailments,
     maxLife: def.maxLife,
     maxEs: def.maxEs,
+    hits,
+    vitals: { life: w.player.life, es: w.player.es, mana: w.player.mana },
+    defence: {
+      armour: def.armour,
+      evasion: def.evasion,
+      blockAttack: def.blockAttack,
+      blockSpell: def.blockSpell,
+      physReduction: def.physReduction,
+      lifeRegen: def.lifeRegen,
+      movement: def.moveSpeed,
+    },
+    flasks: w.flasks.map((f) => ({
+      kind: f.spec.kind,
+      charges: f.charges,
+      max: f.spec.maxCharges,
+      active: f.activeT > 0,
+      uses: f.uses,
+    })),
+    near: {
+      all: near.length,
+      magic: near.filter((e) => e.rarity === 'magic').length,
+      rare: near.filter((e) => e.rarity === 'rare').length,
+      boss: near.filter((e) => e.rarity === 'boss' || e.rarity === 'miniboss').length,
+    },
   };
 }

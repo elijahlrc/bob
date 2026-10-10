@@ -1232,9 +1232,9 @@ export const RARITY_MULTS: Record<
 > = {
   normal: { life: 1, dmg: 1, xp: 1, mods: [0, 0] },
   magic: { life: 2, dmg: 1.15, xp: 2, mods: [1, 2] },
-  rare: { life: 4.5, dmg: 1.35, xp: 5, mods: [2, 4] },
-  miniboss: { life: 6.75, dmg: 1.5, xp: 8, mods: [4, 4] },
-  boss: { life: 30, dmg: 2, xp: 30, mods: [0, 0] },
+  rare: { life: 12, dmg: 1.35, xp: 5, mods: [2, 4] },
+  miniboss: { life: 30, dmg: 1.5, xp: 8, mods: [4, 4] },
+  boss: { life: 200, dmg: 2, xp: 30, mods: [0, 0] },
 };
 
 export type MonsterModId =

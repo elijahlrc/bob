@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { DeathRecap } from '../sim/types';
 import type { MapResult } from '../sim/runMap';
 import { newRun } from './run';
-import { postRecord, postRecords, runRecord, simRecord } from './telemetry';
+import { DETAILS_ROOM, postRecord, postRecords, runRecord, simRecord } from './telemetry';
 
 const recap: DeathRecap = {
   time: 41.6,
@@ -23,6 +23,30 @@ const recap: DeathRecap = {
   ailments: ['ignite'],
   maxLife: 901.2,
   maxEs: 0,
+  hits: [
+    { ago: 4.2, name: 'Gnawer', rarity: 'rare', dtype: 0, amount: 412.4, hp: 901.2 },
+    {
+      ago: 0.3,
+      name: 'Crushing slam',
+      via: 'Core Golem',
+      rarity: 'effect',
+      dtype: 0,
+      amount: 400,
+      hp: 480,
+    },
+  ],
+  vitals: { life: -20.4, es: 0, mana: 33.3 },
+  defence: {
+    armour: 1200,
+    evasion: 300,
+    blockAttack: 0.25,
+    blockSpell: 0,
+    physReduction: 0.1,
+    lifeRegen: 12.6,
+    movement: 130,
+  },
+  flasks: [{ kind: 'life', charges: 7.5, max: 24, active: false, uses: 3 }],
+  near: { all: 6, magic: 2, rare: 1, boss: 0 },
 };
 const res = { status: 'dead', areaLevel: 37, type: 'crescendo', level: 41 } as MapResult;
 
@@ -64,11 +88,17 @@ describe('the record of a finished run', () => {
       game_version: 'abc1234',
     });
     expect(r.details).toMatchObject({ maps_played: 1, seconds: 80, kills: 120, max_life: 901 });
-    expect((r.details.last_damage as unknown[])[0]).toEqual({
-      from: 'Gnawer',
-      type: 0,
-      amount: 812,
-    });
+    const d = r.details as Record<string, unknown>;
+    // A hit: tenths of a second before the death, from, via, rarity, damage type, amount, life and shield just before.
+    expect(d.hits).toEqual([
+      [42, 'Gnawer', '', 'rare', 0, 412, 901],
+      [3, 'Crushing slam', 'Core Golem', 'effect', 0, 400, 480],
+    ]);
+    expect(d.vit).toEqual([-20, 0, 33]);
+    expect(d.def).toEqual({ arm: 1200, eva: 300, blk: [25, 0], pr: 10, reg: 13, ms: 130 });
+    expect(d.flasks).toEqual([['life', 8, 24, 0, 3]]);
+    expect(d.near).toEqual([6, 2, 1, 0]);
+    expect((d.gear as string[]).some((g) => g.startsWith('mainHand|'))).toBe(true);
   });
 
   it('records a win without a killer', () => {
@@ -95,6 +125,7 @@ describe('the record of a finished run', () => {
     expect(r.killer_mods).toHaveLength(12);
     expect(r.game_version.length).toBe(64);
     expect(JSON.stringify(r).length).toBeLessThan(3000);
+    expect(JSON.stringify(r.details).length).toBeLessThanOrEqual(DETAILS_ROOM);
     expect(Object.keys(r).sort()).toEqual(
       [
         'outcome',
@@ -114,6 +145,28 @@ describe('the record of a finished run', () => {
         'details',
       ].sort(),
     );
+  });
+});
+
+describe('a record that would not fit', () => {
+  it('sheds the build, then the oldest hits, to stay within what the table takes', () => {
+    const run = deadRun();
+    run.lastRecap = {
+      ...recap,
+      hits: Array.from({ length: 14 }, (_, i) => ({
+        ago: i,
+        name: 'N'.repeat(40),
+        via: 'V'.repeat(40),
+        rarity: 'miniboss',
+        dtype: 4,
+        amount: 123456.7,
+        hp: 98765.4,
+      })),
+    };
+    const d = runRecord(run, res, 'abc1234').details as Record<string, unknown>;
+    expect(JSON.stringify(d).length).toBeLessThanOrEqual(DETAILS_ROOM);
+    // The latest hits stay; the first to go are the oldest.
+    expect((d.hits as number[][]).at(-1)![0]).toBe(130);
   });
 });
 

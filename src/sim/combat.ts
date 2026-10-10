@@ -77,7 +77,7 @@ import type { Actor, Dot, World } from './types';
 
 const CHAOS = 4;
 /** Seconds of damage kept for the death recap. */
-const DAMAGE_LOG_TIME = 6;
+const DAMAGE_LOG_TIME = 10;
 /** Share of a melee hit that a Thorned monster reflects as physical damage. */
 const THORNS_SHARE = 0.1;
 const OVERLOAD_TIME = 8;
@@ -779,6 +779,7 @@ export function logDamage(
   label: string,
   dtype: number,
   amount: number,
+  via?: string,
 ): void {
   if (amount <= 0) return;
   const log = w.dmgLog;
@@ -788,8 +789,10 @@ export function logDamage(
     rarity: src ? src.rarity : 'effect',
     mods: src ? [...src.modIds] : [],
     type: src?.mon?.spec.type,
+    via,
     dtype,
     amount,
+    hp: w.player.life + w.player.es,
   });
   while (log.length > 0 && w.t - log[0].t > DAMAGE_LOG_TIME) log.shift();
 }
@@ -834,6 +837,7 @@ export function rawHit(
   type: number,
   label = 'Explosion',
   by: 'player' | 'minion' = 'player',
+  via?: string,
 ): void {
   noteCause(dst, 0, by === 'minion');
   const dmg = [0, 0, 0, 0, 0];
@@ -862,7 +866,7 @@ export function rawHit(
   }
   const total = dmg[0] + dmg[1] + dmg[2] + dmg[3] + dmg[4];
   w.events.push({ t: 'hit', src: 0, dst: dst.id, amount: total, crit: false, dtype: type });
-  if (dst.isPlayer) logDamage(w, null, label, type, total);
+  if (dst.isPlayer) logDamage(w, null, label, type, total, via);
   applyDamage(w, dst, dmg);
 }
 

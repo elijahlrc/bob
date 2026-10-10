@@ -1,3 +1,4 @@
+import { EQUIP_SLOTS, type Build } from '../data/types';
 import type { MapResult } from '../sim/runMap';
 import { buildSignature } from './metrics';
 import type { RunState } from './run';
@@ -29,10 +30,35 @@ export type RunRecord = {
 
 const MAX_TEXT = 64;
 const MAX_LIST = 12;
+/** A monster's name in a hit of the death record: shorter, so the hits fit. */
+const HIT_TEXT = 24;
+/** The room for `details` in characters of JSON: the table refuses a row whose `details` is 4096 bytes or more as jsonb, which is about 1.45 times the compact JSON for rows of short arrays (measured). */
+export const DETAILS_ROOM = 2600;
 
 const text = (s: string | undefined | null): string | null => (s ? s.slice(0, MAX_TEXT) : null);
 const list = (xs: readonly string[] | undefined): string[] =>
   (xs ?? []).slice(0, MAX_LIST).map((x) => x.slice(0, MAX_TEXT));
+
+/** What the character wears: per slot, the rarity, the item level, and the gems socketed (docs/TELEMETRY.md). */
+function gearOf(build: Build): string[] {
+  return EQUIP_SLOTS.flatMap((slot) => {
+    const it = build.equipment[slot];
+    if (!it) return [];
+    const gems = it.sockets.filter((g) => g !== null).map((g) => g.gemId);
+    return [`${slot}|${it.rarity[0]}${it.ilvl}|${gems.join('+')}`.slice(0, 120)];
+  });
+}
+
+/**
+ * Keep `details` within the room the table allows (a record the table refuses is lost whole): drop the least useful first, the
+ * oldest hits last.
+ */
+function fit(details: Record<string, unknown>): void {
+  const size = () => JSON.stringify(details).length;
+  for (const key of ['strat', 'gear']) if (size() > DETAILS_ROOM) delete details[key];
+  const hits = details.hits as unknown[] | undefined;
+  while (hits && hits.length > 1 && size() > DETAILS_ROOM) hits.shift();
+}
 
 /** The record of a run that has just ended (`run.phase` is 'dead' or 'victory'), from the result of its last map. */
 export function runRecord(run: RunState, res: MapResult, version: string): RunRecord {
@@ -47,6 +73,15 @@ export function runRecord(run: RunState, res: MapResult, version: string): RunRe
     build: buildSignature(run.build),
     map_status: res.status,
   };
+  details.gear = gearOf(run.build);
+  const strat = run.build.strategy;
+  if (strat)
+    details.strat = [
+      strat.target ?? '',
+      strat.spacing ?? '',
+      strat.lifeFlask ?? '',
+      strat.utilityFlask ?? '',
+    ];
   if (recap) {
     details.max_life = Math.round(recap.maxLife);
     details.max_es = Math.round(recap.maxEs);
@@ -54,12 +89,40 @@ export function runRecord(run: RunState, res: MapResult, version: string): RunRe
     details.max_res = recap.maxRes;
     details.ailments = list(recap.ailments);
     details.seconds_on_map = Math.round(recap.time);
-    details.last_damage = recap.lines.slice(0, 4).map((l) => ({
-      from: l.name.slice(0, MAX_TEXT),
-      type: l.dtype,
-      amount: Math.round(l.amount),
-    }));
+    details.hits = recap.hits?.map((h) => [
+      Math.round(h.ago * 10),
+      h.name.slice(0, HIT_TEXT),
+      (h.via ?? '').slice(0, HIT_TEXT),
+      h.rarity,
+      h.dtype,
+      Math.round(h.amount),
+      Math.round(h.hp),
+    ]);
+    if (recap.vitals)
+      details.vit = [recap.vitals.life, recap.vitals.es, recap.vitals.mana].map(Math.round);
+    if (recap.defence) {
+      const d = recap.defence;
+      details.def = {
+        arm: d.armour,
+        eva: d.evasion,
+        blk: [Math.round(d.blockAttack * 100), Math.round(d.blockSpell * 100)],
+        pr: Math.round(d.physReduction * 100),
+        reg: Math.round(d.lifeRegen),
+        ms: Math.round(d.movement),
+      };
+    }
+    if (recap.flasks)
+      details.flasks = recap.flasks.map((f) => [
+        f.kind,
+        Math.round(f.charges),
+        f.max,
+        f.active ? 1 : 0,
+        f.uses,
+      ]);
+    if (recap.near)
+      details.near = [recap.near.all, recap.near.magic, recap.near.rare, recap.near.boss];
   }
+  fit(details);
   return {
     outcome: run.phase === 'victory' ? 'won' : 'died',
     class_id: run.classId,

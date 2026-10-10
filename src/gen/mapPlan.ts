@@ -31,7 +31,7 @@ export type MapPlan = {
 };
 
 export function roomsForMap(n: number): number {
-  return 4 + Math.floor(n / 25);
+  return 4 + Math.floor(n / 20);
 }
 
 export function resistPenaltyForMap(n: number): number {

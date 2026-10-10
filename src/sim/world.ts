@@ -54,7 +54,7 @@ import { initEncounter, tickEncounter } from './encounters';
 import { tickPackPlays } from './packPlays';
 import { inBlast, pending } from './blasts';
 import { crescendoStep, HOLDOUT_WAVES } from '../data/mapTypes';
-import type { Actor, World, WorldOpts } from './types';
+import type { Actor, GroundEffect, World, WorldOpts } from './types';
 
 export function spawnMonster(
   w: World,
@@ -237,6 +237,7 @@ export function createWorld(inp: CreateWorldInput): World {
       manaRate: 0,
       esRate: 0,
       esT: 0,
+      uses: 0,
     })),
     xp: inp.xp,
     status: 'running',
@@ -359,6 +360,7 @@ function useFlask(w: World, i: number): void {
     f.esT = LIFE_TO_ES_TIME;
   }
   f.charges -= s.perUse;
+  f.uses++;
   p.tFlask = 0;
   if (s.removeIgnite) p.ail.ignites.length = 0;
   if (s.removeBleed) p.ail.bleeds.length = 0;
@@ -400,6 +402,11 @@ function tickFlasks(w: World, dt: number, policy: FlaskPolicy): void {
   }
 }
 
+/** The name of the monster that laid a ground effect (for the death recap), if it is still known. */
+function viaOf(w: World, e: GroundEffect): string | undefined {
+  return e.owner === undefined ? undefined : actorById(w, e.owner)?.name;
+}
+
 function tickEffects(w: World, dt: number): void {
   const p = w.player;
   let j = 0;
@@ -422,7 +429,7 @@ function tickEffects(w: World, dt: number): void {
       // ground behind.
       w.events.push({ t: 'blast', e });
       const caught = p.alive && inBlast(e, p.x, p.y, p.r);
-      if (caught && e.damage > 0) rawHit(w, p, e.damage, e.dtype, e.label ?? 'Blast');
+      if (caught && e.damage > 0) rawHit(w, p, e.damage, e.dtype, e.label ?? 'Blast', 'player', viaOf(w, e));
       const owner = e.pull && caught ? actorById(w, e.owner ?? 0) : undefined;
       if (owner?.alive) pullPlayer(w, owner, e.pull!);
       for (const m of w.minions)
@@ -441,7 +448,7 @@ function tickEffects(w: World, dt: number): void {
     }
     const label = e.label ?? (e.kind === 'slam' ? 'Crushing slam' : 'Volatile explosion');
     if (e.damage > 0 && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r)
-      rawHit(w, p, e.damage, e.dtype, label);
+      rawHit(w, p, e.damage, e.dtype, label, 'player', viaOf(w, e));
     // The player's minions standing in a monster's blast are hurt too.
     if (e.faction === 1)
       for (const m of w.minions)
@@ -481,6 +488,7 @@ function tickMonsterMods(w: World, m: Actor, dt: number): void {
         damage: 0.6 * monsterHitOf(m),
         dtype: 0,
         faction: 1,
+        owner: m.id,
         push: 3,
       });
     }
@@ -544,6 +552,7 @@ function tickMonsterMods(w: World, m: Actor, dt: number): void {
         damage: 4 * bossHit(m),
         dtype: 0,
         faction: 1,
+        owner: m.id,
       });
     }
     const frac = m.life / m.def.maxLife;

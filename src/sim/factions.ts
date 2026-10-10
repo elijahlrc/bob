@@ -505,6 +505,7 @@ function tickChampion(w: World, m: Actor, dt: number): void {
           damage: 3 * monsterHitOf(m),
           dtype: 0,
           faction: 1,
+          owner: m.id,
         });
       }
     }
@@ -545,6 +546,7 @@ function tickChampion(w: World, m: Actor, dt: number): void {
         damage: 3 * monsterHitOf(m),
         dtype: 3,
         faction: 1,
+        owner: m.id,
       });
     }
     if (m.bossPhase === 0 && frac <= 0.5) {

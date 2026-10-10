@@ -33,10 +33,10 @@ describe('monster stats (§12.1–12.5)', () => {
     expect(buildMonster(spec({ type: 'brute' })).defence.maxLife).toBe(
       Math.round(base * (brute.lifeMult / paid)),
     );
-    expect(buildMonster(spec({ rarity: 'rare' })).defence.maxLife).toBe(Math.round(base * 4.5));
-    expect(buildMonster(spec({ rarity: 'boss' })).defence.maxLife).toBe(Math.round(base * 30));
+    expect(buildMonster(spec({ rarity: 'rare' })).defence.maxLife).toBe(Math.round(base * 12));
+    expect(buildMonster(spec({ rarity: 'boss' })).defence.maxLife).toBe(Math.round(base * 200));
     expect(buildMonster(spec({ rarity: 'rare', mods: ['fortified'] })).defence.maxLife).toBe(
-      Math.round(base * 4.5) * 2,
+      Math.round(base * 12) * 2,
     );
   });
 
@@ -127,9 +127,41 @@ describe('population (§10.3)', () => {
       }
     }
     const total = normal + magicPacks + rarePacks;
-    expect(normal / total).toBeCloseTo(0.7, 1);
-    expect(magicPacks / total).toBeCloseTo(0.22, 1);
-    expect(rarePacks / total).toBeCloseTo(0.08, 1);
+    // On map 30 the mix has moved a third of the way from 70/22/8 to 40/30/30 (docs/DESIGN.md, 2026-10-10).
+    expect(normal / total).toBeCloseTo(0.61, 1);
+    expect(magicPacks / total).toBeCloseTo(0.244, 1);
+    expect(rarePacks / total).toBeCloseTo(0.146, 1);
+  });
+
+  it('has more magic and rare packs deeper in the run', () => {
+    const share = (map: number) => {
+      let rare = 0;
+      let magic = 0;
+      let all = 0;
+      for (let s = 0; s < 120; s++) {
+        const lab = generateLabyrinth(new Rng(s), { rooms: 6, sideBranches: 1 });
+        const pop = populate(new Rng(s + 1000), lab, {
+          areaLevel: map,
+          endKind: 'rare',
+          theme: themeDef('ashenCrypt'),
+          map,
+        });
+        const end = lab.mainPath[lab.mainPath.length - 1];
+        const packs = new Map<number, string[]>();
+        for (const m of pop.monsters)
+          if (m.room !== end) packs.set(m.pack, [...(packs.get(m.pack) ?? []), m.spec.rarity]);
+        for (const p of packs.values()) {
+          all++;
+          if (p.includes('rare')) rare++;
+          else if (p.includes('magic')) magic++;
+        }
+      }
+      return { rare: rare / all, magic: magic / all };
+    };
+    const early = share(1);
+    const late = share(90);
+    expect(late.rare).toBeGreaterThan(early.rare * 2);
+    expect(late.magic).toBeGreaterThan(early.magic);
   });
 
   it('mini-bosses every 10th map, the unique boss on map 100', () => {

@@ -176,6 +176,15 @@ export function rollVariant(rng: Rng, type: MonsterTypeId, theme: ThemeDef): Var
 const LATE_MODS: MonsterModId[] = ['fortified', 'raiser', 'rimeAura', 'frenzied'];
 export const LATE_MOD_LEVEL = 15;
 export const MINIBOSS_LATE_MOD_LEVEL = 50;
+/**
+ * How the mix of ordinary rooms' packs shifts with the map number (nothing on map 1, all of it on map 100): plain packs lose
+ * `NORMAL_FADE` of the rooms and rare packs gain `RARE_GROWTH`, magic packs taking the rest. Map 1: 70% plain, 22% magic, 8%
+ * rare; map 60: 52%, 27%, 21%; map 100: 40%, 30%, 30%.
+ */
+export const NORMAL_FADE = 0.3;
+export const RARE_GROWTH = 0.22;
+/** One more magic monster in a magic pack, and in a rare's escort, for every this many maps. */
+export const MAGIC_BAND_MAPS = 25;
 
 export function rollMonsterMods(
   rng: Rng,
@@ -363,6 +372,12 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
       0,
     );
   const sized = (n: number) => Math.max(1, Math.round(n * packMult));
+  // As the run goes on, fewer packs are plain: magic packs and rare packs take their share (docs/DESIGN.md, 2026-10-10).
+  const depth = Math.min(1, opts.map / 100);
+  const normalCut = 0.7 - NORMAL_FADE * depth;
+  const magicCut = 0.92 - RARE_GROWTH * depth;
+  // A magic pack has more magic monsters, and a rare comes with magic escorts, deeper in.
+  const magicBand = Math.floor(opts.map / MAGIC_BAND_MAPS);
   // A Holdout is eight waves into one arena, each from the edge, the last led by a rare.
   if (opts.type === 'holdout') {
     const room = lab.rooms[0];
@@ -464,7 +479,7 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
       ps.forEach((p, i) =>
         add(room, i === 0 ? normal('rare', types[i]) : normal('normal', types[i]), p, how),
       );
-    } else if (roll < 0.7 - magicShift) {
+    } else if (roll < normalCut - magicShift) {
       let ps = spots(rng, lab, room, sized(rng.int(3, 7) + extra));
       let packed = false;
       const plan = packPlan(rng, mix, ps.length, throng);
@@ -485,8 +500,8 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
             add(room, { ...normal(), type: 'gnawer', variant: 'none' }, q);
         }
       }
-    } else if (roll < 0.92) {
-      const nm = rng.int(2, 3);
+    } else if (roll < magicCut) {
+      const nm = rng.int(2, 3) + magicBand;
       const ps = spots(rng, lab, room, sized(rng.int(3, 7) + extra));
       const plan = packPlan(rng, mix, ps.length, throng);
       const how = behave(room, plan);
@@ -495,7 +510,14 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
       const ps = spots(rng, lab, room, sized(1 + rng.int(2, 4) + extra));
       const plan = packPlan(rng, mix, ps.length, throng);
       const how = behave(room, plan);
-      ps.forEach((p, i) => add(room, normal(i === 0 ? 'rare' : 'normal', plan.types[i]), p, how));
+      ps.forEach((p, i) =>
+        add(
+          room,
+          normal(i === 0 ? 'rare' : i <= magicBand ? 'magic' : 'normal', plan.types[i]),
+          p,
+          how,
+        ),
+      );
     }
     pack++;
   }

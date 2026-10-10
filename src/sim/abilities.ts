@@ -211,6 +211,7 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
         damage: ab.amount! * monsterHitOf(m),
         dtype: 0,
         faction: 1,
+        owner: m.id,
       });
     }
   },

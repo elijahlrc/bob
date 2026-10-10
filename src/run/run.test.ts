@@ -53,7 +53,7 @@ describe('map schedule (§5.3)', () => {
   it('rooms, resist penalty and end rooms', () => {
     expect(roomsForMap(1)).toBe(4);
     expect(roomsForMap(25)).toBe(5);
-    expect(roomsForMap(100)).toBe(8);
+    expect(roomsForMap(100)).toBe(9);
     expect([1, 30, 31, 60, 61, 100].map(resistPenaltyForMap)).toEqual([0, 0, 30, 30, 60, 60]);
     expect([5, 10, 20, 99, 100].map(endKindForMap)).toEqual([
       'rare',

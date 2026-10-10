@@ -200,7 +200,7 @@ does the work: `baseXp(level)`, item level and monster stats all follow the offe
 | ------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | Monster level, item level | the offer's `areaLevel` | clamped to 1–100                                                                                                   |
 | Monster XP                | the offer's `areaLevel` | `baseXp(areaLevel) · rarity · levelPenalty(player level, areaLevel)`. `levelPenalty` needs no change.              |
-| Rooms on the main path    | the counter             | `4 + floor(n/25)`, so an offset cannot shorten a map                                                               |
+| Rooms on the main path    | the counter             | `4 + floor(n/20)`, so an offset cannot shorten a map                                                               |
 | Side branches             | the counter             | none on levels 1–4, else 0–2                                                                                       |
 | Resist penalty tier       | the counter             | 0 / 30 / 60, so an offset cannot dodge a tier                                                                      |
 | End room                  | the counter             | boss at 100, mini-boss at multiples of 10, else a rare pack. The boss or mini-boss uses the offer's monster level. |

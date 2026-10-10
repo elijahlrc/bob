@@ -879,13 +879,17 @@ from before slots is adopted as a slot on first start. Code: the slot layer is i
 `saves` and the current slot. A save that does not fit in the browser's storage shows a warning in the camp. No save
 limit; the browser's storage (about 5 MB) is the cap.
 
-### Evasion and accuracy follow the reference game (docs/EVASION.md), built (2026-10-10)
+### Difficulty and the death record (2026-10-10)
 
-Monster evasion and accuracy were straight lines tuned by the bot; the reference game's are exponentials, so a character hit
-100% of the time at any level and a monster hit a character 100% of the time whatever its evasion. They are now fitted to the
-reference game's per-level monster tables (evasion exactly, accuracy within 2 points), the table itself kept in
-`docs/coverage/pob-monster-stats.json` and checked by `formulas.test.ts`. The player side was compared (base stats and
-attribute bonuses are the same; item bases are 0.7 to 0.85 times as large) and left alone; `npm run evasion` prints the
-comparison. The build matrix's reference player has its own accuracy curve now. Bot sample (8 runs a class, seeds 7 and 11,
-`scripts/simpar.sh`): mean map reached 27.2 before and 28.8 after, inside the noise; pacing unchanged. The medians for the strider
-and the shade were lower on both seeds, which eight runs cannot tell from noise: look at them first if a balance pass follows.
+A player reached map 60 and died there after adding every modifier to the boss map; they found rares like magic monsters and
+bosses like rares. **Rares are 12× a normal monster's life (were 4.5), mini-bosses 30× (6.75), the unique boss 200× (30)**; the
+pack mix of ordinary rooms moves from 70/22/8% plain/magic/rare on map 1 to 40/30/30 on map 100, a magic group and a rare's
+escort gain a magic monster per 25 maps, and the main path is `4 + floor(n/20)` rooms (4–9). The Crawl chain test moved to map
+22 (the starting kit at map 42 now times out). **The death record** (docs/TELEMETRY.md) now holds every hit of the last 10 s
+with its time, source (a slam or blast names the monster behind it), the life and shield before it, the defences (armour,
+evasion, block, reduction, regeneration), flasks (charges, running, times drunk), the monsters near by rarity, and the gear
+with its gems. It stays within the table's 4 KB for `details` by shedding data (measured: the jsonb is about 1.45 times the
+compact JSON). Bot sample after (12 a class, seed 5, with another change to monster evasion in the same tree): no wins, medians
+2.5 to 16 by class, 42% of deaths by rares, 15% by mini-bosses. The bots at the previous push (24 runs in `sim_runs`) had a
+median of 7 and a best of 31, so this sample is no worse in kind, but it has no same-seed baseline and cannot say how much of
+the difference is the monsters and how much the other change.

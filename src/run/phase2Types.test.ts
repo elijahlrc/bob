@@ -220,10 +220,10 @@ describe('Crawl (docs/MAPS.md 9.2)', () => {
     c.setStartDifficulty({ scaling: 1.5, base: 1, variance: 0.1 });
     c.startRun('vanguard', 6);
     const run = c.run!;
-    setMap(run, 42);
+    setMap(run, 22);
     run.build.level = 45;
     botCamp(run);
-    run.offers[0] = makeOffer(run.seed, 42, 0, 'ashenCrypt', 0, 'crawl');
+    run.offers[0] = makeOffer(run.seed, 22, 0, 'ashenCrypt', 0, 'crawl');
     c.setAutoContinue(false);
     let starts = 0;
     c.bus.on('mapStart', ({ world }) => {
@@ -240,8 +240,8 @@ describe('Crawl (docs/MAPS.md 9.2)', () => {
     expect(starts).toBe(CRAWL_SEGMENTS);
     expect(ends).toBe(CRAWL_SEGMENTS);
     expect(run.history).toHaveLength(1);
-    expect(run.history[0]).toMatchObject({ map: 42, status: 'cleared' });
-    expect(run.map).toBe(43);
+    expect(run.history[0]).toMatchObject({ map: 22, status: 'cleared' });
+    expect(run.map).toBe(23);
     expect(run.reward).not.toBeNull();
     expect(run.reward!.some((it) => it.kind === 'item' && it.rarity === 'unique')).toBe(true);
   });

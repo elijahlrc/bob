@@ -379,6 +379,8 @@ export type FlaskState = {
   /** Energy shield returned over time by a life-to-ES flask, and the time left. */
   esRate: number;
   esT: number;
+  /** Times drunk on this map. */
+  uses: number;
 };
 
 export type SimEvent =
@@ -468,8 +470,23 @@ export type DamageRecord = {
   mods: string[];
   /** The monster type that dealt it (absent for an effect). */
   type?: string;
+  /** The monster behind a slam or a blast, whose name the effect hides. */
+  via?: string;
   dtype: number;
   amount: number;
+  /** Life and energy shield the player had just before it. */
+  hp: number;
+};
+
+/** One hit in a death recap: how long before the death, from whom, and what the player had left before it. */
+export type RecapHit = {
+  ago: number;
+  name: string;
+  via?: string;
+  rarity: string;
+  dtype: number;
+  amount: number;
+  hp: number;
 };
 
 /** Why the player died (EXPANSION section 9): the last seconds of damage, the killer, and your defences. */
@@ -493,6 +510,23 @@ export type DeathRecap = {
   ailments: string[];
   maxLife: number;
   maxEs: number;
+  /** What the death record adds (absent from an older save): every hit of the last seconds, in order. */
+  hits?: RecapHit[];
+  /** Life, energy shield and mana at the moment of death. */
+  vitals?: { life: number; es: number; mana: number };
+  defence?: {
+    armour: number;
+    evasion: number;
+    blockAttack: number;
+    blockSpell: number;
+    physReduction: number;
+    lifeRegen: number;
+    movement: number;
+  };
+  /** The flasks: charges, whether one was running, and how many times it was drunk on the map. */
+  flasks?: { kind: string; charges: number; max: number; active: boolean; uses: number }[];
+  /** The living monsters within 8 tiles: all, magic, rare, and bosses. */
+  near?: { all: number; magic: number; rare: number; boss: number };
 };
 
 export type PlayerAI = {
