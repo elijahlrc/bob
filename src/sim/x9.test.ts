@@ -143,7 +143,7 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
     expect(dRat).toBeGreaterThan(dBat + 1.5);
   });
 
-  it('a Bone Beetle curls up when hit: 80% less physical damage for 1.5 s, then a 3 s wait', () => {
+  it('a Bone Beetle curls up when hit: 90% less physical damage for 2 s, then a 3 s wait', () => {
     const w = arena();
     const b = put(w, 'beetle', 12);
     const hit = () => {
@@ -154,10 +154,10 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
     const first = hit();
     expect(first).toBeGreaterThan(0);
     // Curl is triggered by a landed hit (the hit code), so trigger it as it would.
-    b.curlT = 1.5;
+    b.curlT = 2;
     const curled = hit();
-    expect(curled).toBeCloseTo(first * 0.2, 6);
-    run(w, 1.6);
+    expect(curled).toBeCloseTo(first * 0.1, 6);
+    run(w, 2.1);
     expect(hit()).toBeCloseTo(first, 6);
   });
 

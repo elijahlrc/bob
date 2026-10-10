@@ -316,6 +316,30 @@ export type EncState = {
   winT: number;
   warnT: number;
   openT: number;
+  /** What it has taken lately, as shares of its life: a burst (decaying over about a second) and hits (over two). */
+  burst: number;
+  hits: number;
+  /** Shares of its life lost to each damage type, all told (Quench, Adaptive). */
+  lost: number[];
+  /** Aegis: plates left, and seconds since it was last attacked. */
+  plates: number;
+  calmT: number;
+  /** Seconds left: of being exposed (Broken guard, Core vent), of stone (Petrify), of a vent, of swelling, of a chant. */
+  vulnT: number;
+  stoneT: number;
+  ventT: number;
+  gorgedT: number;
+  ritesT: number;
+  /** Seconds before a mode may fire again (Fade, Core vent, Riled), and before a Counter-stance answers again. */
+  modeCd: number;
+  counterCd: number;
+  /** One-off modes that have happened (Petrify, Last rites, Quench), a Fade in progress, and the second Cross of a vent. */
+  done: number;
+  fading: boolean;
+  ventCross: boolean;
+  /** Molten stacks; whether it was stunned last tick (a stun's start breaks a guard). */
+  molten: number;
+  wasStunned: boolean;
 };
 
 /** A zone a player skill left on the ground: it hits what stands in it every `interval` s, `pulsesLeft` times. */

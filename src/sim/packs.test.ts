@@ -83,11 +83,11 @@ describe('rhythms (docs/ROSTER.md 6.5)', () => {
 describe('phases (docs/ROSTER.md 6.5)', () => {
   it('a type enrages at a share of its life: faster, harder-hitting, and only once', () => {
     const w = arena();
-    const m = put(w, 'boar', 14);
+    const m = put(w, 'flagellant', 14);
     expect(m.enraged).toBe(false);
     const s0 = speedMult(m);
     const d0 = damageMult(m);
-    m.life = m.def.maxLife * 0.39;
+    m.life = m.def.maxLife * 0.49;
     tickPhases(w, m);
     expect(m.enraged).toBe(true);
     expect(speedMult(m) / s0).toBeCloseTo(1.3, 5);
@@ -97,7 +97,7 @@ describe('phases (docs/ROSTER.md 6.5)', () => {
 
   it('a summoner runs when hurt, then comes back', () => {
     const w = arena();
-    const hag = put(w, 'hag', 10);
+    const hag = put(w, 'handler', 10);
     hag.life = hag.def.maxLife * 0.29;
     tickPhases(w, hag);
     expect(hag.fleeT).toBeGreaterThan(3);
@@ -127,8 +127,8 @@ describe('phases (docs/ROSTER.md 6.5)', () => {
   });
 
   it('phases have words', () => {
-    expect(phaseTexts(MONSTER_TYPES.boar.phases).join(' ')).toContain('Enrages at 40%');
-    expect(phaseTexts(MONSTER_TYPES.hag.phases).join(' ')).toContain('Runs from you');
+    expect(phaseTexts(MONSTER_TYPES.flagellant.phases).join(' ')).toContain('Enrages at 50%');
+    expect(phaseTexts(MONSTER_TYPES.handler.phases).join(' ')).toContain('Runs from you');
     expect(phaseTexts(undefined)).toEqual([]);
   });
 });

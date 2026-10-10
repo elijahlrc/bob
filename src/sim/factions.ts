@@ -7,6 +7,7 @@ import { ENRAGE_DAMAGE, ENRAGE_SPEED } from '../data/phases';
 import { monsterHitOf, rawHit } from './combat';
 import { rally } from './packs';
 import { monsterHexesPlayer } from './hexes';
+import { encDamageMult, encMoveMult, onEncounterDeath } from './encounters';
 import type { Actor, GroundEffect, World } from './types';
 import { spawnMonster } from './world';
 
@@ -77,7 +78,8 @@ export function speedMult(a: Actor): number {
     a.hexSpeed *
     (a.buffT > 0 ? 1 + CENSER_SPEED : 1) *
     (1 + FERVOUR_STEP * a.fervour) *
-    (a.enraged ? ENRAGE_SPEED : 1)
+    (a.enraged ? ENRAGE_SPEED : 1) *
+    (a.enc ? encMoveMult(a) : 1)
   );
 }
 
@@ -94,6 +96,7 @@ export function damageMult(a: Actor): number {
     (a.zealT > 0 ? 1 + ZEAL_DAMAGE : 1) *
     (1 + FERVOUR_STEP * a.fervour) *
     (a.enraged ? ENRAGE_DAMAGE : 1) *
+    (a.enc ? encDamageMult(a) : 1) *
     a.patMult
   );
 }
@@ -283,6 +286,7 @@ export function onMonsterDeath(w: World, a: Actor): void {
   if (!a.mon) return;
   const type = a.mon.spec.type;
   leaveCorpse(w, a);
+  onEncounterDeath(w, a);
   // The pack reacts to the fall of its leader (docs/ROSTER.md 6.7), and a Mirrored twin's survivor has three seconds.
   rally(w, a);
   if (a.mirrorId) {

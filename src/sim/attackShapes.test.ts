@@ -200,6 +200,8 @@ describe('a carapace (docs/ROSTER.md 6.2)', () => {
       'big',
     );
     const max = sentinel.def.maxLife;
+    // Its Aegis would turn the blow aside (docs/ENCOUNTERS.md 5): this is about the carapace.
+    sentinel.enc!.plates = 0;
     hit(w, strong, sentinel, strong.mon!.profile(0), 0, 1);
     expect(max - sentinel.life).toBeLessThanOrEqual(max * 0.2 + 1e-6);
     expect(max - sentinel.life).toBeGreaterThan(max * 0.05);

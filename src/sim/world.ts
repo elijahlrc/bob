@@ -50,7 +50,7 @@ import { tickAbandon } from './abandon';
 import { tickCollapse } from './collapse';
 import { tickHoldout } from './holdout';
 import { tickStranded } from './strand';
-import { initEncounter, tickWindow } from './encounters';
+import { initEncounter, tickEncounter } from './encounters';
 import { inBlast, pending } from './blasts';
 import { crescendoStep, HOLDOUT_WAVES } from '../data/mapTypes';
 import type { Actor, World, WorldOpts } from './types';
@@ -620,7 +620,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
       if (a.state === 'chase') {
         tickFactionBehaviour(w, a, dt);
         tickAbilities(w, a, dt);
-        if (a.enc) tickWindow(w, a, dt);
+        if (a.enc) tickEncounter(w, a, dt);
       }
     }
     if (!a.action) a.carry = 0;

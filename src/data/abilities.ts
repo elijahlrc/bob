@@ -192,7 +192,8 @@ export const ABILITY_INFO: Record<AbilityId, AbilityInfo> = {
   curl: {
     name: 'Curl up',
     active: false,
-    text: () => 'Curls up when hit and takes far less physical damage.',
+    text: () =>
+      'Curls up when hit: 90% less physical damage for 2 s. Fire or a stun opens it again.',
   },
   shield: {
     name: 'Shield',

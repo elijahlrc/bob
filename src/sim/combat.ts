@@ -49,7 +49,8 @@ import {
   tickStatuses,
 } from './statuses';
 import { damageMult, hexPlayerAtRandom, onMonsterDeath, shieldedByPylon } from './factions';
-import { windowStops } from './encounters';
+import { counterBlow, modeTaken, noteAttacked, noteTaken, turnsAside } from './encounters';
+import { CURL_LESS, CURL_SECONDS } from '../data/encounters';
 import { CRIT_ON_CONSECRATED, consecratedAt, fieldKill } from './fields';
 import { spreadAilments } from './proliferate';
 import {
@@ -232,7 +233,7 @@ export function applyDamage(w: World, dst: Actor, dmg: number[]): number {
   if (!dst.isPlayer && dst.revealT < 1) dst.revealT = 1;
   if (!dst.isPlayer && dst.mon) {
     // A Bone Beetle curled up takes 80% less physical damage; a Warden Pylon makes its allies untouchable.
-    if (dst.curlT > 0) dmg[0] *= 0.2;
+    if (dst.curlT > 0) dmg[0] *= 1 - CURL_LESS;
     if (w.hasPylons && shieldedByPylon(w, dst)) return 0;
   }
   // Crescendo: the monsters grow stronger with time. What they deal is raised, and what they take is cut by the
@@ -339,13 +340,16 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       if (w.critLock === null) w.critSeen = res.crit;
     }
   }
+  // An Aegis counts the time since it was last attacked, whatever came of the attack.
+  if (dst.enc && !dst.isPlayer) noteAttacked(dst);
   if (res.outcome === 'miss') {
     w.events.push({ t: 'miss', src: src.id, dst: dst.id });
     wake(w, dst);
     return;
   }
-  // A monster in its window (a Brace) turns the hit aside: no damage, no ailment, no leech. Damage over time goes on.
-  if (dst.enc && !dst.isPlayer && windowStops(dst, src)) {
+  // A monster's guard (a Brace, an Aegis, a stone skin, a Sanctuary) turns the hit aside: no damage, no ailment, no leech.
+  // Damage over time goes on (docs/ENCOUNTERS.md 5).
+  if (!dst.isPlayer && dst.mon && turnsAside(w, dst, src)) {
     if (src.isPlayer) w.lastOutcome = 'block';
     w.events.push({ t: 'block', src: src.id, dst: dst.id });
     wake(w, dst);
@@ -394,6 +398,11 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (src.modIds.includes('hexcaller') && dst.isPlayer && res.outcome === 'hit' && src.hexCd <= 0) {
     src.hexCd = 4;
     hexPlayerAtRandom(w);
+  }
+  // A monster's modes change what the hit does to it: exposed, quenched, swollen, fed by fire (docs/ENCOUNTERS.md 6).
+  if (!dst.isPlayer && dst.enc && res.outcome !== 'block') {
+    modeTaken(w, dst, res.dmg);
+    res.total = res.dmg[0] + res.dmg[1] + res.dmg[2] + res.dmg[3] + res.dmg[4];
   }
   if (res.outcome === 'block') {
     w.events.push({ t: 'block', src: src.id, dst: dst.id });
@@ -486,10 +495,18 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     if (p.culling && !dst.isPlayer && dst.life <= dst.def.maxLife * CULLING_SHARE)
       killActor(w, dst);
   }
-  // A beetle that is hit curls up for a moment (then cannot again for three seconds).
-  if (wasAlive && dst.alive && dst.mon?.spec.type === 'beetle' && dst.skillT <= 0) {
-    dst.curlT = 1.5;
-    dst.skillT = 3;
+  // A beetle that is hit curls up for a moment (then cannot again for three seconds); fire opens it again.
+  if (wasAlive && dst.alive && dst.mon?.spec.type === 'beetle') {
+    if (dst.curlT > 0 && res.dmg[3] > 0) dst.curlT = 0;
+    else if (dst.skillT <= 0) {
+      dst.curlT = CURL_SECONDS;
+      dst.skillT = 3;
+    }
+  }
+  // What a monster has taken feeds its modes (a Fade, a Core vent, a Quench), and a Counter-stance answers a blow.
+  if (!dst.isPlayer && dst.enc && wasAlive) {
+    noteTaken(w, dst, res.dmg);
+    counterBlow(w, dst, src, p);
   }
   wake(w, dst);
   if (src.isPlayer && res.outcome === 'hit') afterPlayerHit(w, dst, p);
@@ -1036,7 +1053,8 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   a.sinceDamaged += dt;
   tickHexes(a, dt);
   tickStatuses(a, dt);
-  if (a.curlT > 0) a.curlT -= dt;
+  // A stun opens a curled beetle.
+  if (a.curlT > 0) a.curlT = a.stunT > 0 ? 0 : a.curlT - dt;
   if (a.buffT > 0) a.buffT -= dt;
   if (a.suppressT > 0) a.suppressT -= dt;
   if (a.zealT > 0) a.zealT -= dt;

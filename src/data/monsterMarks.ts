@@ -222,6 +222,12 @@ export const MOD_MARKS: Record<MonsterModId, ModMark> = {
     aura: false,
     desc: 'When it dies, nearby allies deal 20% more damage for 6 seconds.',
   },
+  adaptive: {
+    color: 0x60e0c0,
+    shape: 'diamond',
+    aura: false,
+    desc: 'After a quarter of its life is lost to one element, it resists that element by 50% for 6 s.',
+  },
   hexWarded: {
     color: 0xb0b0c8,
     shape: 'square',

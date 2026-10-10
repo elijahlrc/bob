@@ -19,7 +19,13 @@ import { buildProps, FIG_PX, FRAMES, rasterFigure, type MonsterLook } from './pa
 import { DROP_COLOR, dropLabel, dropRarity } from '../../dropLabel';
 import { CollapseFx } from './collapseFx';
 import { SkillFx, type FxHost } from './skillFx';
-import { EncounterFx, projectileSpins, projectileTexture, sidearmStance } from './encounterFx';
+import {
+  EncounterFx,
+  encounterSprite,
+  projectileSpins,
+  projectileTexture,
+  sidearmStance,
+} from './encounterFx';
 import { isoFloors, isoWalls, ISO_H, ISO_W, WALL_LOW, WALL_TALL } from './isoPaint';
 
 /** Pixel zoom: 2x on wide windows, 1.5x on small ones, 1x on a phone (smaller pixels, wider view). */
@@ -211,6 +217,7 @@ export class GrimStyle extends StyleBase {
         this.world.minions.find((m) => m.id === id) ??
         this.world.actors.find((a) => a.id === id) ??
         null,
+      floater: (x, y, text, color, big) => this.floater(x, y, text, color, big),
     };
     this.fx = new SkillFx(host, s);
     this.enc = new EncounterFx(host);
@@ -695,7 +702,13 @@ export class GrimStyle extends StyleBase {
       else if (a.ail.chill > 0) tint = 0xb8dcff;
       else if (a.ail.poisons.length) tint = 0xc4f0a0;
       else if (a.enraged) tint = 0xff9a8a;
-      d.sprite.setTint(tint).setTintMode(Phaser.TintModes.MULTIPLY);
+      // A monster's modes show on its body: stone, quenched, swollen, molten (docs/ENCOUNTERS.md 6).
+      const look = a.enc ? encounterSprite(a) : null;
+      if (look?.tint !== undefined && (tint === 0xffffff || look.fill)) tint = look.tint;
+      d.sprite.setScale(look?.scale ?? 1);
+      d.sprite
+        .setTint(tint)
+        .setTintMode(look?.fill ? Phaser.TintModes.FILL : Phaser.TintModes.MULTIPLY);
     }
     // The Unremembered fades out of sight while it phases.
     if (a.alive)

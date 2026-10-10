@@ -7,6 +7,7 @@ import {
   raise as raiseCorpse,
   spawnBeside,
 } from './factions';
+import { noteDevoured, quenched } from './encounters';
 import type { Actor, World } from './types';
 
 /**
@@ -52,8 +53,13 @@ function dashing({ w, m, dt, d, ab, i }: Ctx, kind: 'leap' | 'charge'): void {
   if (d < (kind === 'leap' ? 2.5 : 3) || d > ab.range! || !w.grid.los(m.x, m.y, p.x, p.y)) return;
   if (m.action || m.stunT > 0) return;
   m.abT[i] = ab.interval!;
-  m.windT = ab.telegraph!;
-  // The place it is aiming at is marked on the ground for the whole warning.
+  aimDash(w, m, kind, ab.telegraph!);
+}
+
+/** Wind up a leap or a charge at where the character stands now: the place is marked on the ground for the whole warning. */
+function aimDash(w: World, m: Actor, kind: 'leap' | 'charge', telegraph: number): void {
+  const p = w.player;
+  m.windT = telegraph;
   m.dashX = p.x;
   m.dashY = p.y;
   w.effects.push({
@@ -61,13 +67,21 @@ function dashing({ w, m, dt, d, ab, i }: Ctx, kind: 'leap' | 'charge'): void {
     x: p.x,
     y: p.y,
     radius: kind === 'leap' ? 1 : 0.8,
-    t: ab.telegraph!,
-    total: ab.telegraph!,
+    t: telegraph,
+    total: telegraph,
     kind: 'slam',
     damage: 0,
     dtype: 0,
     faction: 1,
   });
+  // A charge is not abandoned by a blow it was in the middle of.
+  m.action = null;
+}
+
+/** A charge on the spot, with a short warning (a Riled Rend-boar, docs/ENCOUNTERS.md 6); the charge ability carries it out. */
+export function startCharge(w: World, m: Actor, telegraph: number): void {
+  if (m.stunT > 0 || m.dashT > 0 || m.windT > 0) return;
+  aimDash(w, m, 'charge', telegraph);
 }
 
 function beginDash(m: Actor, kind: 'leap' | 'charge'): void {
@@ -107,7 +121,8 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
   trail({ w, m, dt, ab, i }) {
     // A pool of burning ground where it has been, while it walks (one a little way behind it, so it never stands in its own).
     m.abT[i] = (m.abT[i] ?? ab.interval!) - dt;
-    if (m.abT[i] > 0 || !m.moving) return;
+    // A quenched Slag Brute leaves nothing behind it (docs/ENCOUNTERS.md 6).
+    if (m.abT[i] > 0 || !m.moving || quenched(m)) return;
     m.abT[i] = ab.interval!;
     openZone(w, m.x, m.y, ab.range!, ab.amount!, 'burning', monsterHitOf(m) * 0.15);
   },
@@ -126,6 +141,8 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
     m.life = Math.min(m.def.maxLife, m.life + m.def.maxLife * ab.amount!);
     m.skillT = ab.interval!;
     w.events.push({ t: 'summon', id: m.id });
+    // And swells with it (Gorged, docs/ENCOUNTERS.md 6).
+    noteDevoured(w, m);
   },
   raiseCorpses({ w, m, dt, d, ab }) {
     m.skillT -= dt;

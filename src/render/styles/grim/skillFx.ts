@@ -33,6 +33,8 @@ export type FxHost = {
   flash(x: number, y: number, color: number, scale?: number, intensity?: number): void;
   shake(amount: number): void;
   actorById(id: number): Actor | null;
+  /** A short line of text over a point on screen (a mode's name as it fires). */
+  floater?(x: number, y: number, text: string, color: number, big: boolean): void;
 };
 
 type Fx = { t: number; total: number; air: boolean; draw: (g: Gfx, k: number) => void };

@@ -401,7 +401,7 @@ export const TYPE_SIDEARMS: Partial<Record<MonsterTypeId, SidearmSpec>> = {
 
 // ---- Windows -------------------------------------------------------------------------------------------------------
 
-export type WindowId = 'brace';
+export type WindowId = 'brace' | 'counter' | 'sanctuary';
 
 export type WindowSpec = {
   id: WindowId;
@@ -425,17 +425,208 @@ export const TYPE_WINDOWS: Partial<Record<MonsterTypeId, WindowSpec>> = {
     near: 4,
     text: 'Plants its shield: for 2 s nothing that hits it from the front gets through. Hit it from the side, or let damage over time do the work.',
   },
+  guard: {
+    id: 'counter',
+    name: 'Counter-stance',
+    every: 9,
+    seconds: 1.5,
+    warn: 0.35,
+    near: 3,
+    text: 'Raises its blade: for 1.5 s every melee blow on it is answered by a heavy one. Strike from range, or wait.',
+  },
+  choirmaster: {
+    id: 'sanctuary',
+    name: 'Sanctuary',
+    every: 12,
+    seconds: 3,
+    warn: 0.4,
+    near: 9,
+    text: 'Sings for 3 s: allies within 4 tiles take no hits while it does. A stun silences it, and it is not protected itself.',
+  },
 };
 
 /** The half-angle of the front a Brace covers, radians (120° in all). */
 export const BRACE_HALF = Math.PI / 3;
+/** The reach of a Sanctuary, tiles. */
+export const SANCTUARY_RANGE = 4;
+/** A Counter-stance's answer: this share of the Guard's hit, and the least time between two answers. */
+export const COUNTER_MULT = 1.5;
+export const COUNTER_GAP = 0.35;
+
+// ---- Modes ---------------------------------------------------------------------------------------------------------
+
+/**
+ * A mode (docs/ENCOUNTERS.md 5 and 6): what a monster does when it is hurt in a certain way, or a guard it carries. Each is
+ * run by `sim/encounters.ts`; the numbers are here.
+ */
+export type ModeId =
+  | 'aegis'
+  | 'fade'
+  | 'petrify'
+  | 'coreVent'
+  | 'quench'
+  | 'gorged'
+  | 'lastRites'
+  | 'grieving'
+  | 'riled'
+  | 'molten'
+  | 'brokenGuard';
+
+export type ModeSpec = {
+  id: ModeId;
+  name: string;
+  text: string;
+  /** A share of its life: the threshold it acts at, or what it must take (in a burst, or of one damage type). */
+  at?: number;
+  share?: number;
+  seconds?: number;
+  cooldown?: number;
+  /** More damage taken (a share) while it lasts; or less, when negative. */
+  taken?: number;
+  /** Slower by this share. */
+  slow?: number;
+  heal?: number;
+  range?: number;
+  hits?: number;
+  max?: number;
+  step?: number;
+};
+
+export const TYPE_MODES: Partial<Record<MonsterTypeId, ModeSpec[]>> = {
+  sentinel: [
+    {
+      id: 'aegis',
+      name: 'Aegis',
+      max: 4,
+      seconds: 5,
+      text: 'Four plates turn aside the next four hits, however hard; they grow back when it has not been struck for 5 s. Many quick hits break it; one big one is wasted on it.',
+    },
+    {
+      id: 'brokenGuard',
+      name: 'Broken guard',
+      seconds: 3,
+      taken: 0.5,
+      text: 'A stun breaks its guard: its plates fall and it takes 50% more damage for 3 s.',
+    },
+  ],
+  shieldbearer: [
+    {
+      id: 'brokenGuard',
+      name: 'Broken guard',
+      seconds: 3,
+      taken: 0.5,
+      text: 'A stun breaks its guard: it drops its Brace and takes 50% more damage for 3 s.',
+    },
+  ],
+  gloomstalker: [
+    {
+      id: 'fade',
+      name: 'Fade',
+      share: 0.25,
+      seconds: 1.5,
+      cooldown: 8,
+      text: 'Hurt for a quarter of its life at once, it fades out of reach for 1.5 s and comes back behind you. Steady damage does better than one big blow.',
+    },
+  ],
+  heap: [
+    {
+      id: 'petrify',
+      name: 'Petrify',
+      at: 0.4,
+      seconds: 3,
+      heal: 0.15,
+      text: 'At 40% life it fuses to stone for 3 s: nothing hurts it, it mends 15%, then it bursts in a ring. Kill it past the mark in one go, or step out of the ring.',
+    },
+  ],
+  golem: [
+    {
+      id: 'coreVent',
+      name: 'Core vent',
+      share: 0.3,
+      seconds: 4,
+      taken: 0.5,
+      cooldown: 14,
+      text: 'Hurt for 30% of its life at once, its core opens for 4 s: it takes 50% more damage, and casts a Cross of lanes twice.',
+    },
+  ],
+  slagbrute: [
+    {
+      id: 'quench',
+      name: 'Quench',
+      share: 0.2,
+      slow: 0.5,
+      taken: 0.3,
+      text: 'A fifth of its life lost to cold quenches it for good: half as fast, no burning trail, and 30% more physical damage taken.',
+    },
+  ],
+  gorger: [
+    {
+      id: 'gorged',
+      name: 'Gorged',
+      seconds: 10,
+      slow: 0.3,
+      taken: -0.2,
+      text: 'After it eats a body it swells for 10 s: slower, harder to hurt, and it bursts in a caustic cloud if it dies swollen.',
+    },
+  ],
+  hag: [
+    {
+      id: 'lastRites',
+      name: 'Last rites',
+      at: 0.3,
+      seconds: 3,
+      range: 8,
+      text: 'At 30% life it chants for 3 s, and every body within 8 tiles bursts when it ends. A stun or its death stops it.',
+    },
+  ],
+  wailer: [
+    {
+      id: 'grieving',
+      name: 'Grieving',
+      range: 6,
+      text: 'When an ally dies within 6 tiles it keens at once.',
+    },
+  ],
+  boar: [
+    {
+      id: 'riled',
+      name: 'Riled',
+      hits: 6,
+      cooldown: 8,
+      text: 'Hit six times in quick succession, it charges at once.',
+    },
+  ],
+  cinderling: [
+    {
+      id: 'molten',
+      name: 'Molten',
+      max: 5,
+      step: 0.12,
+      text: 'Fire does not hurt it: each fiery hit makes it bigger and 12% harder-hitting, five times at most.',
+    },
+  ],
+};
+
+/** The Bone Beetle's curl (a passive ability, docs/ENCOUNTERS.md 5): how long, and how much less physical damage. */
+export const CURL_SECONDS = 2;
+export const CURL_LESS = 0.9;
+
+/** A type's mode of this id, if it has it. */
+export function modeOf(type: MonsterTypeId, id: ModeId): ModeSpec | undefined {
+  return TYPE_MODES[type]?.find((m) => m.id === id);
+}
+
+/** The Adaptive mod (docs/ENCOUNTERS.md 6): the share of its life from one element it takes before it resists it, by how much, and for how long. */
+export const ADAPT_SHARE = 0.25;
+export const ADAPT_RESIST = 50;
+export const ADAPT_SECONDS = 6;
 
 /** Whether a type has anything of this file (its actor carries the state for it). */
 export function hasEncounter(type: MonsterTypeId): boolean {
-  return !!TYPE_SIDEARMS[type] || !!TYPE_WINDOWS[type];
+  return !!TYPE_SIDEARMS[type] || !!TYPE_WINDOWS[type] || !!TYPE_MODES[type];
 }
 
-/** The lines the inspect card says about a type's sidearm and window. */
+/** The lines the inspect card says about a type's sidearm, window and modes. */
 export function encounterTexts(type: MonsterTypeId): string[] {
   const out: string[] = [];
   const s = TYPE_SIDEARMS[type];
@@ -446,6 +637,7 @@ export function encounterTexts(type: MonsterTypeId): string[] {
   }
   const w = TYPE_WINDOWS[type];
   if (w) out.push(`${w.name}: ${w.text}`);
+  for (const m of TYPE_MODES[type] ?? []) out.push(`${m.name}: ${m.text}`);
   return out;
 }
 

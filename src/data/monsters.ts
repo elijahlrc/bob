@@ -351,7 +351,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'rot',
     body: 'mage',
     archetype: 'summoner',
-    phases: [{ at: 0.3, do: 'flee', seconds: 4 }],
+    // Last rites replaces its flight at 30% (docs/ENCOUNTERS.md 6).
     defence: { es: 0.3 },
     shape: { id: 'lob', radius: 1.8, zone: 'caustic', seconds: 3, dps: 0.3, mult: 0.6, lock: 0.3 },
     innate: true,
@@ -693,7 +693,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     faction: 'kennel',
     body: 'boar',
     archetype: 'bruiser',
-    phases: [{ at: 0.4, do: 'enrage' }],
+    // Riled replaces its enrage (docs/ENCOUNTERS.md 6): many quick hits make it charge at once.
     movement: [{ id: 'momentum', from: 0.5, to: 1.4, seconds: 2.5 }],
     defence: { armour: 30 },
     shape: { id: 'swing', arc: 100, radius: 1.9, lock: 0.3 },
@@ -1293,6 +1293,7 @@ export type MonsterModId =
   // The Choir's faction mod, and the hex mods (EXPANSION 7.2).
   | 'zealous'
   | 'hexWarded'
+  | 'adaptive'
   | 'hexcaller';
 
 export type MonsterModDef = {
@@ -1498,6 +1499,8 @@ MONSTER_MODS.push(
   { id: 'zealous', name: 'Zealous', magic: true, minLevel: 25, faction: 'choir', mods: [] },
   { id: 'hexWarded', name: 'Hex-warded', magic: true, minLevel: 25, mods: [] },
   { id: 'hexcaller', name: 'Hexcaller', magic: false, minLevel: 25, mods: [] },
+  // docs/ENCOUNTERS.md 6: it resists the element that hurts it most, for a while.
+  { id: 'adaptive', name: 'Adaptive', magic: false, minLevel: 30, mods: [] },
 );
 
 export function monsterModDef(id: MonsterModId): MonsterModDef {
