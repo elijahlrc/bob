@@ -11,13 +11,20 @@ import { MAX_LEVEL, xpToNext } from '../data/xpTable';
 import type { Build } from '../data/types';
 import type { MapPlan } from '../gen/mapPlan';
 import { monsterName } from '../gen/population';
-import { tickSkillZones, updateAction, updateProjectiles } from './actions';
+import { actorById, tickSkillZones, updateAction, updateProjectiles } from './actions';
 import { monsterAI, playerAI, separate } from './ai';
 import { lifeCap, monsterHitOf, rawHit, refreshPlayerDefence, tickActor } from './combat';
 import { autoFlaskPolicy, type FlaskPolicy } from './flaskPolicy';
 import { abilitiesOf } from '../data/abilities';
 import { tickAbilities, tickChargingMod } from './abilities';
-import { isZone, tickCorpses, tickFactionBehaviour, tickZones } from './factions';
+import {
+  isZone,
+  openZone,
+  pullPlayer,
+  tickCorpses,
+  tickFactionBehaviour,
+  tickZones,
+} from './factions';
 import { BUFF_IDS, type BuffId } from '../data/buffs';
 import { rollGains, tickBuffs } from './buffs';
 import { tickCooldowns } from './cooldowns';
@@ -43,6 +50,8 @@ import { tickAbandon } from './abandon';
 import { tickCollapse } from './collapse';
 import { tickHoldout } from './holdout';
 import { tickStranded } from './strand';
+import { initEncounter, tickWindow } from './encounters';
+import { inBlast, pending } from './blasts';
 import { crescendoStep, HOLDOUT_WAVES } from '../data/mapTypes';
 import type { Actor, World, WorldOpts } from './types';
 
@@ -82,6 +91,7 @@ export function spawnMonster(
   if (momentum) a.mv.ramp = momentum.from ?? 0.5;
   a.stationary = !!MONSTER_TYPES[spec.type].stationary;
   if (spec.type === 'pylon') w.hasPylons = true;
+  initEncounter(w, a);
   a.room = room;
   a.pack = pack;
   w.actors.push(a);
@@ -385,6 +395,12 @@ function tickEffects(w: World, dt: number): void {
   const p = w.player;
   let j = 0;
   for (const e of w.effects) {
+    // A later step of a pattern waits before its warning shows.
+    if (pending(e)) {
+      e.delay! -= dt;
+      w.effects[j++] = e;
+      continue;
+    }
     e.t -= dt;
     if (e.t > 0) {
       w.effects[j++] = e;
@@ -392,6 +408,20 @@ function tickEffects(w: World, dt: number): void {
     }
     // A lasting zone just fades.
     if (isZone(e)) continue;
+    if (e.shape) {
+      // A shaped blast (docs/ENCOUNTERS.md 4): it strikes what its shape covers, drags what a hook catches, and may leave
+      // ground behind.
+      w.events.push({ t: 'blast', e });
+      const caught = p.alive && inBlast(e, p.x, p.y, p.r);
+      if (caught && e.damage > 0) rawHit(w, p, e.damage, e.dtype, e.label ?? 'Blast');
+      const owner = e.pull && caught ? actorById(w, e.owner ?? 0) : undefined;
+      if (owner?.alive) pullPlayer(w, owner, e.pull!);
+      for (const m of w.minions)
+        if (m.alive && inBlast(e, m.x, m.y, m.r))
+          rawHit(w, m, e.damage, e.dtype, e.label ?? 'Blast');
+      if (e.leaves) openZone(w, e.x, e.y, e.radius, e.leaves.seconds, e.leaves.kind, e.leaves.dps);
+      continue;
+    }
     w.events.push({ t: 'explode', x: e.x, y: e.y, r: e.radius, dtype: e.dtype });
     // A warding pulse throws the character back, away from where it went off.
     if (e.push && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r) {
@@ -400,7 +430,7 @@ function tickEffects(w: World, dt: number): void {
       p.x = to.x;
       p.y = to.y;
     }
-    const label = e.kind === 'slam' ? 'Crushing slam' : 'Volatile explosion';
+    const label = e.label ?? (e.kind === 'slam' ? 'Crushing slam' : 'Volatile explosion');
     if (e.damage > 0 && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r)
       rawHit(w, p, e.damage, e.dtype, label);
     // The player's minions standing in a monster's blast are hurt too.
@@ -590,6 +620,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
       if (a.state === 'chase') {
         tickFactionBehaviour(w, a, dt);
         tickAbilities(w, a, dt);
+        if (a.enc) tickWindow(w, a, dt);
       }
     }
     if (!a.action) a.carry = 0;

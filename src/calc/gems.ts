@@ -18,6 +18,7 @@ import {
 import type { Attrs } from '../data/types';
 import type { SkillType } from '../data/skillTypes';
 import type { BuffId } from '../data/buffs';
+import type { HitEffect, PatternId, ProjectileLook } from '../data/encounters';
 import type { DamageType, Mod, SkillTag } from '../mods/types';
 
 /** Interpolate an L1/L20 value; levels above 20 extrapolate the same curve. */
@@ -227,6 +228,12 @@ export type SkillDef = SkillFx & {
   lockAim?: number;
   /** A monster's beam that drags the character this many tiles toward it when it lands (docs/ROSTER.md 7.2). */
   pull?: number;
+  /** A monster's pattern of blasts, cast when the action fires (docs/ENCOUNTERS.md 4). */
+  pattern?: PatternId;
+  /** How a monster's thrown projectile looks. */
+  look?: ProjectileLook;
+  /** What a monster's hit does to the character besides damage. */
+  debuff?: HitEffect;
 };
 
 /** A spell's base damage in one type at a level, from explicit numbers or from the shared curve. */

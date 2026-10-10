@@ -3,6 +3,7 @@ import {
   FACTION_NAMES,
   type FactionId,
   type MonsterTypeId,
+  type Stance,
   type Variant,
 } from '../../../data/monsters';
 import {
@@ -214,7 +215,13 @@ const blend = (a: RGB, b: RGB, k: number): RGB => [
   a[2] + (b[2] - a[2]) * k,
 ];
 
-export type MonsterLook = { type: MonsterTypeId; faction: FactionId; variant: Variant };
+/** What a monster looks like; `stance` is the pose of the attack it is making, when it is not its type's own (a thrown sidearm). */
+export type MonsterLook = {
+  type: MonsterTypeId;
+  faction: FactionId;
+  variant: Variant;
+  stance?: Stance;
+};
 
 /** The palette of a monster: its faction's, with the element as an accent. */
 export function monsterPalette(look: Pick<MonsterLook, 'faction' | 'variant'>): Record<Role, RGB> {
@@ -288,7 +295,7 @@ export function rasterFigure(
   const pal = isHero(kind) ? heroPalette(accent) : look ? monsterPalette(look) : UNDEAD;
   const prims = buildFigure(
     kind,
-    poseFor(kind, anim, t, stanceFor(look?.type, kind), styleFor(look?.type, kind)),
+    poseFor(kind, anim, t, look?.stance ?? stanceFor(look?.type, kind), styleFor(look?.type, kind)),
     look?.type,
     t,
   );
@@ -480,6 +487,56 @@ export function buildProps(): Record<string, HTMLCanvasElement> {
         const d = Math.hypot(x - 4.5, y - 4.5);
         if (d < 4.8) px(c, d < 2 ? '#fff' : d < 3.6 ? '#ddd' : '#aaa', x, y);
       }
+  });
+  // What monsters throw (docs/ENCOUNTERS.md 3): each its own shape, so a spear is not read as an arrow.
+  PROPS.p_spear = canvas(20, 5, (c) => {
+    px(c, '#3a2c20', 0, 2, 3, 1);
+    px(c, '#d8cfb4', 2, 2, 13, 1);
+    px(c, '#b8ad90', 3, 3, 11, 1);
+    px(c, '#f2ecda', 14, 1, 4, 3);
+    px(c, '#ffffff', 18, 2, 2, 1);
+  });
+  PROPS.p_boulder = canvas(11, 11, (c, w, h, rng) => {
+    for (let y = 0; y < h; y++)
+      for (let x = 0; x < w; x++) {
+        const d = Math.hypot(x - 5, (y - 5) * 1.1);
+        if (d < 5.2 - rng.float(0, 0.8))
+          px(c, d < 2 ? '#a89a88' : x + y < 9 ? '#8a7c6c' : '#5a5046', x, y);
+      }
+    px(c, '#3a342e', 6, 3, 1, 3);
+    px(c, '#3a342e', 3, 6, 3, 1);
+  });
+  PROPS.p_gobbet = canvas(9, 8, (c) => {
+    px(c, '#4a7a1a', 1, 2, 7, 4);
+    px(c, '#6aa82a', 2, 1, 5, 6);
+    px(c, '#b8f070', 3, 2, 2, 2);
+    px(c, '#3a5a10', 0, 4, 2, 2);
+  });
+  PROPS.p_clot = canvas(9, 8, (c) => {
+    px(c, '#1a4a6a', 1, 2, 7, 4);
+    px(c, '#3a7aa8', 2, 1, 5, 6);
+    px(c, '#c0eaff', 3, 2, 2, 2);
+  });
+  PROPS.p_shade = canvas(14, 9, (c, w, h) => {
+    for (let y = 0; y < h; y++)
+      for (let x = 0; x < w; x++) {
+        const d = Math.hypot((x - 9) / 1.3, y - 4);
+        if (d < 4 - (x < 9 ? (9 - x) * 0.25 : 0))
+          px(c, d < 1.5 ? '#e0d0ff' : d < 2.6 ? '#7a5aa8' : '#2a1a40', x, y);
+      }
+  });
+  PROPS.p_chain = canvas(16, 5, (c) => {
+    for (let i = 0; i < 4; i++) {
+      px(c, '#c0b070', i * 4, 1, 3, 1);
+      px(c, '#c0b070', i * 4, 3, 3, 1);
+      px(c, '#8a7a40', i * 4, 2, 1, 1);
+    }
+    px(c, '#e8d890', 12, 0, 4, 5);
+  });
+  PROPS.p_spore = canvas(7, 7, (c) => {
+    px(c, '#6a8a2a', 1, 1, 5, 5);
+    px(c, '#c8e870', 2, 2, 3, 3);
+    px(c, '#fff8c0', 3, 3, 1, 1);
   });
   PROPS.star = canvas(9, 9, (c) => {
     px(c, '#ffe45a', 4, 0, 1, 9);

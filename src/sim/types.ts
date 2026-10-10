@@ -9,6 +9,7 @@ import type { MonsterModId, MonsterRarity } from '../data/monsters';
 import type { AnyItem, Build } from '../data/types';
 import type { MapPlan } from '../gen/mapPlan';
 import type { BuffId } from '../data/buffs';
+import type { BlastShape } from '../data/encounters';
 import type { Corpse } from './factions';
 import type { HexState } from './hexes';
 import type { Fx } from './statuses';
@@ -198,6 +199,8 @@ export type Actor = {
   nextY: number;
   /** Timers of the abilities after the first eight, by index in the type's list (see sim/abilities.ts). */
   abT: number[];
+  /** Sidearm, window and mode state (docs/ENCOUNTERS.md), for the types that have any. */
+  enc: EncState | undefined;
   /** Where a charge or a leap is heading, and how long is left of it (zero: not in one). */
   dashT: number;
   /** Seconds of wind-up left before a leap or a charge (zero: not winding up). */
@@ -279,6 +282,40 @@ export type GroundEffect = {
   faction: 0 | 1;
   /** A pulse: how many tiles it throws the character back when it lands. */
   push?: number;
+  /**
+   * A blast's shape (docs/ENCOUNTERS.md 4); a circle when absent. A lane runs from (x, y) to (x2, y2) and is `width` wide; a
+   * wedge opens from (x, y) toward `facing`, `half` radians either side; a donut strikes between `inner` and `radius`.
+   */
+  shape?: BlastShape;
+  x2?: number;
+  y2?: number;
+  width?: number;
+  facing?: number;
+  half?: number;
+  inner?: number;
+  /** Seconds before its warning starts (a later step of a pattern); it is neither drawn nor a hazard until then. */
+  delay?: number;
+  /** What the death recap calls it. */
+  label?: string;
+  /** The monster that laid it (a hook drags toward it; some blasts end with their caster). */
+  owner?: number;
+  /** A hook: tiles it drags the character toward its owner when it lands on it. */
+  pull?: number;
+  /** Ground it leaves where it lands, and for how long. */
+  leaves?: { kind: 'caustic' | 'burning' | 'chilling' | 'shocking'; seconds: number; dps: number };
+};
+
+/**
+ * What a monster of the encounters (docs/ENCOUNTERS.md) carries: the timers of its sidearm and its window, and what it has
+ * taken lately. Only types that have any of it get one (`hasEncounter`).
+ */
+export type EncState = {
+  /** Seconds to its sidearm. */
+  sideT: number;
+  /** Its window: seconds to the next, the tell left before it opens, and the time left while it is open. */
+  winT: number;
+  warnT: number;
+  openT: number;
 };
 
 /** A zone a player skill left on the ground: it hits what stands in it every `interval` s, `pulsesLeft` times. */
@@ -362,6 +399,10 @@ export type SimEvent =
       heavy: boolean;
     }
   | { t: 'explode'; x: number; y: number; r: number; dtype: number }
+  /** A shaped blast of a pattern landed (docs/ENCOUNTERS.md 4); the effect carries its shape. */
+  | { t: 'blast'; e: GroundEffect }
+  /** A monster began the tell of its window (a Brace). */
+  | { t: 'window'; id: number; kind: string }
   | { t: 'beam'; x: number; y: number; x2: number; y2: number; dtype: number }
   | { t: 'blink'; id: number; x: number; y: number; end: boolean }
   | { t: 'charge'; kind: string; count: number }

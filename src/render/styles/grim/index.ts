@@ -18,7 +18,8 @@ import { isHero, type AnimName, type FigureKind } from '../../style/figure';
 import { buildProps, FIG_PX, FRAMES, rasterFigure, type MonsterLook } from './paint';
 import { DROP_COLOR, dropLabel, dropRarity } from '../../dropLabel';
 import { CollapseFx } from './collapseFx';
-import { SkillFx } from './skillFx';
+import { SkillFx, type FxHost } from './skillFx';
+import { EncounterFx, projectileSpins, projectileTexture, sidearmStance } from './encounterFx';
 import { isoFloors, isoWalls, ISO_H, ISO_W, WALL_LOW, WALL_TALL } from './isoPaint';
 
 /** Pixel zoom: 2x on wide windows, 1.5x on small ones, 1x on a phone (smaller pixels, wider view). */
@@ -37,6 +38,7 @@ function lookOf(a: Actor): MonsterLook | undefined {
     type: a.mon.spec.type,
     faction: factionOfSpec(a.mon.spec),
     variant: a.mon.spec.variant,
+    stance: sidearmStance(a),
   };
 }
 /** The colour of a monster's warning, by the damage type it will deal (physical, lightning, cold, fire, chaos). */
@@ -82,6 +84,7 @@ export class GrimStyle extends StyleBase {
   private gfx!: Phaser.GameObjects.Graphics;
   private bolts: Bolt[] = [];
   private fx!: SkillFx;
+  private enc!: EncounterFx;
   private lastSimT = 0;
   private temps: TempLight[] = [];
   private torches: Torch[] = [];
@@ -147,7 +150,7 @@ export class GrimStyle extends StyleBase {
     look?: MonsterLook,
   ): string {
     const acc = isHero(kind) ? accent : 0;
-    const who = look ? `${look.type}_${look.variant}` : '';
+    const who = look ? `${look.type}_${look.variant}${look.stance ? `_${look.stance}` : ''}` : '';
     const key = `gf_${kind}_${who}_${acc}_${anim}_${i}`;
     if (!this.scene.textures.exists(key))
       this.addTex(key, rasterFigure(kind, anim, i / FRAMES[anim], acc, FIG_PX, look));
@@ -194,24 +197,23 @@ export class GrimStyle extends StyleBase {
     this.gfx = s.add.graphics().setDepth(600);
     this.owned.push(this.gfx);
     this.fx?.destroy();
-    this.fx = new SkillFx(
-      {
-        project: (x, y) => this.project(x, y),
-        rpx: (r) => this.rpx(r),
-        squash: () => this.squash(),
-        em: this.em,
-        flash: (x, y, c, sc, i) => this.flash(x, y, c, sc, i),
-        shake: (a) => {
-          this.shake = Math.max(this.shake, a);
-        },
-        actorById: (id) =>
-          this.byId.get(id) ??
-          this.world.minions.find((m) => m.id === id) ??
-          this.world.actors.find((a) => a.id === id) ??
-          null,
+    const host: FxHost = {
+      project: (x, y) => this.project(x, y),
+      rpx: (r) => this.rpx(r),
+      squash: () => this.squash(),
+      em: this.em,
+      flash: (x, y, c, sc, i) => this.flash(x, y, c, sc, i),
+      shake: (a) => {
+        this.shake = Math.max(this.shake, a);
       },
-      s,
-    );
+      actorById: (id) =>
+        this.byId.get(id) ??
+        this.world.minions.find((m) => m.id === id) ??
+        this.world.actors.find((a) => a.id === id) ??
+        null,
+    };
+    this.fx = new SkillFx(host, s);
+    this.enc = new EncounterFx(host);
     this.placeProps(world, rng);
     this.collapse?.destroy();
     this.collapse =
@@ -752,10 +754,26 @@ export class GrimStyle extends StyleBase {
   // ---- Projectiles -----------------------------------------------------------------------------
   protected createProjectile(p: Projectile) {
     const s = this.scene;
+    const col = DTYPE_COLOR[p.dtype];
+    // A thrown thing of a monster's sidearm (docs/ENCOUNTERS.md 3) flies as itself, with a halo so it is seen coming.
+    const look = p.profile.skill.look;
+    if (look) {
+      const img = s.add.image(0, 0, projectileTexture(look)).setDepth(80000);
+      img.setScale(look === 'boulder' ? 1.3 : look === 'spear' ? 1.25 : 1);
+      const glow = s.add
+        .image(0, 0, 'g_glow')
+        .setDepth(79999)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setTint(p.dtype === 0 ? 0xffe8c0 : col)
+        .setScale(look === 'boulder' ? 0.7 : 0.45)
+        .setAlpha(0.55);
+      const light = this.addLight(0, 0, 80, p.dtype === 0 ? 0xffd8a0 : col, 0.9);
+      this.owned.push(img, glow);
+      return { img, glow, light, acc: 0, spin: projectileSpins(look) };
+    }
     // Attacks fly as arrows, spells as orbs; the element tints either (a bigger orb bursts where it lands).
     const arrow = p.profile.skill.type === 'attack';
     const phys = p.dtype === 0;
-    const col = DTYPE_COLOR[p.dtype];
     const img = s.add.image(0, 0, arrow ? 'g_arrow' : 'g_orb').setDepth(80000);
     const glow = s.add
       .image(0, 0, 'g_glow')
@@ -777,9 +795,11 @@ export class GrimStyle extends StyleBase {
       glow: Phaser.GameObjects.Image;
       light: Phaser.GameObjects.Light | null;
       acc: number;
+      spin?: boolean;
     };
     const { x, y } = this.project(p.x, p.y);
-    q.img.setPosition(x, y).setRotation(this.ang(p.vx, p.vy));
+    // A boulder or a gobbet tumbles; everything else points where it flies.
+    q.img.setPosition(x, y).setRotation(q.spin ? this.time * 9 + p.id : this.ang(p.vx, p.vy));
     q.glow.setPosition(x, y);
     q.light?.setPosition(x, y);
     q.acc += dt;
@@ -1028,8 +1048,12 @@ export class GrimStyle extends StyleBase {
     // Effects keep the sim's pace: frozen while paused, slow when the game is slowed.
     const adv = world.t - this.lastSimT;
     this.lastSimT = world.t;
-    this.fx.frame(world, dt > 0 ? dt * Math.min(1, adv / dt) : 0, this.time, g);
+    const simDt = dt > 0 ? dt * Math.min(1, adv / dt) : 0;
+    this.fx.frame(world, simDt, this.time, g);
+    // Pattern blasts and windows (docs/ENCOUNTERS.md), drawn by their own module.
+    this.enc.frame(world, simDt, this.time, g);
     for (const e of effects) {
+      if (e.shape) continue;
       const { x, y } = this.project(e.x, e.y);
       const r = this.rpx(e.radius);
       const sq = this.squash();
@@ -1150,6 +1174,7 @@ export class GrimStyle extends StyleBase {
   protected handleEvent(e: SimEvent, world: World): void {
     const em = this.em;
     this.fx.onEvent(e, world);
+    this.enc.onEvent(e, world);
     switch (e.t) {
       case 'hit': {
         const dst = this.byId.get(e.dst) ?? world.actors.find((a) => a.id === e.dst);

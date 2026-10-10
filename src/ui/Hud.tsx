@@ -7,6 +7,7 @@ import { defenceTexts, profileOf } from '../data/defence';
 import { movementTexts, senseText } from '../data/movement';
 import { patternText, phaseTexts } from '../data/phases';
 import { shapeText } from '../data/shapes';
+import { encounterTexts } from '../data/encounters';
 import { FACTION_GLYPH, FACTION_RULES, TYPE_BLURBS } from '../data/monsterInfo';
 import type { ThemeDef } from '../data/themes';
 import { themeInfo } from '../run/themeInfo';
@@ -106,6 +107,7 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
       {spec &&
         [
           shapeText(MONSTER_TYPES[spec.type].shape),
+          ...encounterTexts(spec.type),
           ...abilityTexts(abilitiesOf(spec.type)),
           ...movementTexts(MONSTER_TYPES[spec.type].movement),
           patternText(MONSTER_TYPES[spec.type].pattern),

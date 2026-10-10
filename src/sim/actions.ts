@@ -37,6 +37,7 @@ import {
   stickArrow,
 } from './skillFx';
 import { applyUtility } from './utility';
+import { castPattern } from './blasts';
 import type { Action, Actor, World } from './types';
 
 /** Begin an action (attack or cast). The previous action's overflow time carries over. */
@@ -324,6 +325,11 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
   const p = act.profile;
   const b = p.skill.behaviour;
   const target = actorById(w, act.targetId);
+  // A monster's pattern: the cast lays its blasts, each with its own warning (docs/ENCOUNTERS.md 4).
+  if (p.skill.pattern && !a.isPlayer) {
+    castPattern(w, a, act, p.skill.pattern);
+    return;
+  }
   if (p.skill.wave && a.isPlayer) {
     lineWave(w, a, act);
     return;

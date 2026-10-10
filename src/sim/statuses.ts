@@ -39,6 +39,19 @@ export function applyStatus(w: World, a: Actor, id: StatusId, o: StatusOpts = {}
   }
 }
 
+/** Seconds a monster's blinding shade lasts on the character (docs/ENCOUNTERS.md 7). */
+export const BLIND_SECONDS = 3;
+
+/** A monster blinds the character: its attacks miss more (the same Blinded as the character's skills inflict). */
+export function blindPlayer(w: World, seconds: number): void {
+  const p = w.player;
+  if (!p.alive) return;
+  const v = STATUSES.blind.v;
+  const have = p.fx.blind;
+  if (have) have.t = have.t0 = Math.max(have.t, seconds);
+  else p.fx.blind = { t: seconds, t0: seconds, v, x: 0, n: 1 };
+}
+
 /** Count the times down; a status that ends is removed. */
 export function tickStatuses(a: Actor, dt: number): void {
   for (const key in a.fx) {

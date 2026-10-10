@@ -39,6 +39,8 @@ import { afterPlayerHit } from './supportFx';
 import { applyHex, applyPlayerHexes, hexHit, hexKill, tickHexes } from './hexes';
 import {
   applyStatus,
+  BLIND_SECONDS,
+  blindPlayer,
   blockLessOf,
   hitChanceFactor,
   hitTakenExtra,
@@ -47,6 +49,7 @@ import {
   tickStatuses,
 } from './statuses';
 import { damageMult, hexPlayerAtRandom, onMonsterDeath, shieldedByPylon } from './factions';
+import { windowStops } from './encounters';
 import { CRIT_ON_CONSECRATED, consecratedAt, fieldKill } from './fields';
 import { spreadAilments } from './proliferate';
 import {
@@ -341,6 +344,13 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     wake(w, dst);
     return;
   }
+  // A monster in its window (a Brace) turns the hit aside: no damage, no ailment, no leech. Damage over time goes on.
+  if (dst.enc && !dst.isPlayer && windowStops(dst, src)) {
+    if (src.isPlayer) w.lastOutcome = 'block';
+    w.events.push({ t: 'block', src: src.id, dst: dst.id });
+    wake(w, dst);
+    return;
+  }
   // Feeble Grip makes a hexed attacker deal less; the auras and Fervour of the Choir make its monsters deal more.
   const dealt = damageMult(src);
   if (dealt !== 1 && res.outcome !== 'block') {
@@ -490,7 +500,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     const share = thornsShare(dst);
     if (share > 0) rawHit(w, src, res.total * share, 0);
   }
-  if (dst.isPlayer && !src.isPlayer && src.mon) onMonsterHitPlayer(w, src);
+  if (dst.isPlayer && !src.isPlayer && src.mon) onMonsterHitPlayer(w, src, p);
   const afterHit = () => {
     if (src.isPlayer) fireTriggers(w, { on: 'hit', target: dst, tags: p.tagMask, crit: res.crit });
     if (dst.isPlayer) fireTriggers(w, { on: 'hitTaken', damage: res.total });
@@ -712,7 +722,7 @@ function takeFlaskCharges(w: World, m: Actor, share: number): number {
 }
 
 /** What a monster's hit does to the player besides damage: steal charges (a Cutpurse, the Flask-taker mod), hobble. */
-function onMonsterHitPlayer(w: World, src: Actor): void {
+function onMonsterHitPlayer(w: World, src: Actor, prof: SkillProfile): void {
   const steal = abilitiesOf(src.mon!.spec.type).find((a) => a.id === 'steal');
   if (steal || src.modIds.includes('flaskTaker') || src.modIds.includes('treasurer')) {
     const got = takeFlaskCharges(w, src, steal?.amount ?? 0.2);
@@ -720,10 +730,14 @@ function onMonsterHitPlayer(w: World, src: Actor): void {
     if (steal && got > 0) src.fleeT = 5;
   }
   const p = w.player;
-  if ((src.modIds.includes('hobbling') || src.mon?.kind.hobbles) && !p.def.cannotBeChilled) {
+  const debuff = prof.skill.debuff;
+  const hobbles = src.modIds.includes('hobbling') || src.mon?.kind.hobbles || debuff === 'hobble';
+  if (hobbles && !p.def.cannotBeChilled) {
     p.ail.chill = Math.max(p.ail.chill, 0.3);
     p.ail.chillT = Math.max(p.ail.chillT, 2);
   }
+  // A sidearm that blinds (docs/ENCOUNTERS.md 7): the character's attacks miss more for a while.
+  if (debuff === 'blind') blindPlayer(w, BLIND_SECONDS);
 }
 
 /** Remember damage the player took, for the death recap. */

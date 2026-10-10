@@ -12,6 +12,7 @@ import {
   type Variant,
 } from '../data/monsters';
 import { affixMonsterMods } from '../data/mapAffixes';
+import { TYPE_SIDEARMS, type SidearmSpec } from '../data/encounters';
 import { LEGACY, statLevel, type Difficulty } from '../data/difficulty';
 import { defenceMods, profileOf } from '../data/defence';
 import { meanDurability } from './matrix';
@@ -65,7 +66,12 @@ export type MonsterStats = {
   hitCap?: number;
   /** Its type's definition (the hot paths of the sim read it every tick). */
   kind: MonsterTypeDef;
+  /** Its second attack, when its type has one and the map is high enough for it (docs/ENCOUNTERS.md 3). */
+  sidearm?: { spec: SidearmSpec; profile: (conds: number) => SkillProfile };
 };
+
+/** The id of a type's sidearm skill (the renderer picks the pose of a throw or a cast by it). */
+export const sidearmSkillId = (type: MonsterTypeId) => `monster_${type}_side`;
 
 /** The condition bits of every monster kind (they share one index, so `monsterConds` means the same for all). */
 export const MONSTER_CONDS = new CondIndex();
@@ -142,8 +148,67 @@ function monsterSkill(spec: MonsterSpec, dmg: number): SkillDef {
   return withShape(monsterBaseSkill(spec, dmg), t);
 }
 
-function monsterBaseSkill(spec: MonsterSpec, dmg: number): SkillDef {
+/**
+ * A sidearm's skill (docs/ENCOUNTERS.md 3): a projectile attack (or a spell, for a caster) shaped by its own shape, or a cast
+ * that lays a pattern of blasts, or a ring of slow shots. The type's own range and shape do not apply to it.
+ */
+function sidearmSkill(spec: MonsterSpec, s: SidearmSpec, dmg: number): SkillDef {
   const t = MONSTER_TYPES[spec.type];
+  const spell = t.attack === 'spell';
+  // As the type would be if this were its only attack: thrown from range, with this shape.
+  const asRanged: MonsterTypeDef = {
+    ...t,
+    attack: spell ? 'spell' : 'projectile',
+    range: s.to,
+    shape: s.shape,
+  };
+  const base = monsterBaseSkill({ ...spec, variant: spell ? spec.variant : 'none' }, dmg, asRanged);
+  const sk: SkillDef = {
+    ...base,
+    id: sidearmSkillId(t.id),
+    name: s.name,
+    castTime: s.time ?? t.attackTime,
+    look: s.look,
+    debuff: s.effect,
+  };
+  if (s.pattern)
+    return {
+      ...sk,
+      // The blasts are laid when the cast fires; the burst itself reaches nothing.
+      behaviour: { kind: 'burst', radius: 0, origin: 'self' },
+      pattern: s.pattern,
+    };
+  if (s.ring) {
+    const step = 360 / (s.ring + 1);
+    return {
+      ...sk,
+      behaviour: {
+        kind: 'projectile',
+        count: s.ring,
+        spread: step * (s.ring - 1),
+        range: s.to + 2,
+      },
+    };
+  }
+  return withShape(sk, asRanged);
+}
+
+/** The mods a sidearm adds to its own build: a slow flight, a second shot, a damage type, a poison. */
+function sidearmMods(s: SidearmSpec): Mod[] {
+  const out: Mod[] = [];
+  if (s.shape?.id === 'orb' || s.ring)
+    out.push(mod('projectileSpeed', 'inc', -Math.round((1 - (s.shape?.speed ?? 0.5)) * 100)));
+  if (s.shape?.id === 'salvo' && (s.shape.count ?? 1) > 1) out.push(mod('repeats', 'base', 1));
+  if (s.convert) out.push(mod(`convert.physical.${s.convert}`, 'base', 100));
+  if (s.effect === 'poison') out.push(mod('chance.poison', 'base', 100));
+  return out;
+}
+
+function monsterBaseSkill(
+  spec: MonsterSpec,
+  dmg: number,
+  t: MonsterTypeDef = MONSTER_TYPES[spec.type],
+): SkillDef {
   const base: SkillDef = {
     id: `monster_${t.id}`,
     name: t.name,
@@ -236,8 +301,55 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
   const ctx = { tags: 0, ancestry: 0, conds: 0 };
   const stunThreshMult = spec.rarity === 'boss' ? 4 : spec.rarity === 'miniboss' ? 2 : 1;
   const defence = defenceFromDb(db, ctx, { isPlayer: false, resistPenalty: 0, stunThreshMult });
-  const dmg = monsterHit(sl) * easeDamage(m) * t.dmgMult * (t.shape?.mult ?? 1) * r.dmg * share;
-  const skill = monsterSkill(spec, dmg);
+  const baseHit = monsterHit(sl) * easeDamage(m) * t.dmgMult * r.dmg * share;
+  const dmg = baseHit * (t.shape?.mult ?? 1);
+  // The Ossuary Regent's crushing swing takes 1.6 s (§12.7).
+  const time = spec.rarity === 'boss' ? BOSS_ATTACK_TIME : t.attackTime;
+  const profile = skillProfiles(monsterSkill(spec, dmg), db, dmg, time, t.range);
+  const side = TYPE_SIDEARMS[spec.type];
+  let sidearm: MonsterStats['sidearm'];
+  if (side && m >= (side.minLevel ?? 0)) {
+    const sdmg = baseHit * (side.shape?.mult ?? 1);
+    const sdb = new ModDB(
+      [...mods, ...sidearmMods(side)].map((x) => ({ ...x, source: { kind: 'monster', id: k } })),
+      MONSTER_CONDS,
+    );
+    sidearm = {
+      spec: side,
+      profile: skillProfiles(
+        sidearmSkill(spec, side, sdmg),
+        sdb,
+        sdmg,
+        side.time ?? t.attackTime,
+        side.to,
+      ),
+    };
+  }
+  const stats: MonsterStats = {
+    spec,
+    db,
+    defence,
+    profile,
+    moveSpeed: defence.moveSpeed,
+    range: t.range,
+    radius: spec.rarity === 'boss' ? 0.9 : spec.rarity === 'miniboss' ? t.radius * 1.3 : t.radius,
+    xp: Math.round(baseXp(m) * r.xp),
+    hitCap: defProfile.hitCap,
+    kind: t,
+    sidearm,
+  };
+  cache.set(k, stats);
+  return stats;
+}
+
+/** A monster skill's profile by the conditions in force (memoised: a monster is asked many times a second). */
+function skillProfiles(
+  skill: SkillDef,
+  db: ModDB,
+  dmg: number,
+  time: number,
+  range: number,
+): (conds: number) => SkillProfile {
   const hand: HandStats = {
     flats: [
       [dmg * 0.75, dmg * 1.25],
@@ -246,15 +358,14 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
       [0, 0],
       [0, 0],
     ],
-    // The Ossuary Regent's crushing swing takes 1.6 s (§12.7).
-    aps: 1 / (spec.rarity === 'boss' ? BOSS_ATTACK_TIME : t.attackTime),
+    aps: 1 / time,
     crit: 5,
-    range: t.range,
+    range,
     tags: [],
   };
   const profiles = new Map<number, SkillProfile>();
   const relevant = db.condsUsed();
-  const profile = (conds: number) => {
+  return (conds: number) => {
     const c = maskAnd(conds, relevant);
     let p = profiles.get(c);
     if (!p) {
@@ -271,20 +382,6 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
     }
     return p;
   };
-  const stats: MonsterStats = {
-    spec,
-    db,
-    defence,
-    profile,
-    moveSpeed: defence.moveSpeed,
-    range: t.range,
-    radius: spec.rarity === 'boss' ? 0.9 : spec.rarity === 'miniboss' ? t.radius * 1.3 : t.radius,
-    xp: Math.round(baseXp(m) * r.xp),
-    hitCap: defProfile.hitCap,
-    kind: t,
-  };
-  cache.set(k, stats);
-  return stats;
 }
 
 /** The reference monster (§8.1): a normal Skeleton Warrior at the area level. */

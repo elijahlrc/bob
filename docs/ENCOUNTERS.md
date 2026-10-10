@@ -260,18 +260,17 @@ player sees on the camp card and can avoid.
 
 A **status** on the player: one record, a timer, a HUD icon, and one place in the code that applies its effect.
 
-| Status      | What it does                                                                            | Source (type, how)                                   | The character's answer                             |
-| ----------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------- |
-| **Hobble**  | 30% slower for 2 s (exists as the Hobbling mod)                                         | Guard, Wrack, Slinger, Handler sidearms              | speed, `cannotBeChilled` (as today)                |
-| **Blind**   | a lower chance to hit for 3 s (the size to be checked against the 3.9 rule)             | Gloomstalker sidearm; Hollow Watcher lance           | accuracy; spells ignore it                         |
-| **Hexed**   | a hex (exists): from the Hexer's **sigil**, a ground zone that hexes while stood in     | Hexer                                                | the dodge leaves the sigil; curse immunity         |
-| **Latched** | a Brine Leech holds on: it moves with the character and drains life until killed        | Brine Leech (Drowned), on a bite                     | it is the nearest enemy, so the character kills it |
-| **Tithe**   | a beam from a Bursar drains life while the character is within 8 tiles and in its sight | Bursar (Gilded)                                      | a new priority: a tethering monster counts as near |
-| **Marked**  | takes 20% more damage from the marker's pack for 4 s; the mark shows                    | Kennel Handler: its whistle marks as well as rallies | killing the Handler; defences                      |
-| **Poison**  | (exists) from a sidearm's chance                                                        | Gorger                                               | chaos resistance; flasks                           |
+| Status     | What it does                                                                            | Source (type, how)                                   | The character's answer                             |
+| ---------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------- |
+| **Hobble** | 30% slower for 2 s (exists as the Hobbling mod)                                         | Guard, Wrack, Slinger, Handler sidearms              | speed, `cannotBeChilled` (as today)                |
+| **Blind**  | a lower chance to hit for 3 s (the size to be checked against the 3.9 rule)             | Gloomstalker sidearm; Hollow Watcher lance           | accuracy; spells ignore it                         |
+| **Hexed**  | a hex (exists): from the Hexer's **sigil**, a ground zone that hexes while stood in     | Hexer                                                | the dodge leaves the sigil; curse immunity         |
+| **Tithe**  | a beam from a Bursar drains life while the character is within 8 tiles and in its sight | Bursar (Gilded)                                      | a new priority: a tethering monster counts as near |
+| **Marked** | takes 20% more damage from the marker's pack for 4 s; the mark shows                    | Kennel Handler: its whistle marks as well as rallies | killing the Handler; defences                      |
+| **Poison** | (exists) from a sidearm's chance                                                        | Gorger                                               | chaos resistance; flasks                           |
 
 Most of these are cheap: `hobble`, `poison` and `hex` exist and only need a source. **Blind** needs one line in the hit
-chance. **Latched** and **Tithe** are the two new mechanics.
+chance. **Tithe** is the one new mechanic. (Latched, a leech riding the character, was dropped on 2026-10-09.)
 
 ---
 
@@ -296,22 +295,18 @@ These are left to last because they need pack-level state and are the most likel
 against the character as it is. Read against the code (`findTarget`, `avoidHazard`, `bodyOnWay`, `hazardAt` and the stall
 breaker in `sim/ai.ts`), nothing below breaks its behaviour if two rules hold:
 
-1. **A window is the pylon's path.** A monster in a window takes no damage through the same early return in `hit()` that a
-   Warden Pylon's protection uses. A **Fade** uses `phaseT`, which `findTarget` already skips. Windows last 1.5 to 3 s,
-   far under the 20 s stall breaker. The **Aegis** regrows only when the Sentinel has not been **attacked** for 5 s (not
-   merely not damaged), so a slow hitter still gets through.
+1. **A window turns hits aside, as a block does.** The gate is in `applyHit` (where the attacker is known, so a Brace can
+   guard its front), not in `applyDamage`: damage over time keeps ticking. A **Fade** uses `phaseT`, which `findTarget`
+   already skips. Windows last 1.5 to 3 s, far under the 20 s stall breaker. The **Aegis** regrows only when the Sentinel
+   has not been **attacked** for 5 s (not merely not damaged), so a slow hitter still gets through.
 2. **A shaped blast tells `hazardAt` its shape.** This is part of building the shapes, not a new reflex: it says where the
-   danger is, and the dodge decides as it does today. A lane read as a circle would send the character the wrong way. A
-   pending blast is a hazard from the moment it is placed (`hazardAt` counts every non-zone effect with time left), so the
-   dodge already avoids a pattern's later blasts. The cost is more time dodging, so patterns stay sparse.
+   danger is, and the dodge decides as it does today. A lane read as a circle would send the character the wrong way. _As
+   built:_ a later step of a pattern is a hazard only once its warning shows (it is drawn as a faint outline before that,
+   for the player), so the dodge reacts to what is on the ground now, as it always has.
 
-Held back until the reflexes exist, because without them they are a tax on one kind of build and nothing more:
-
-- **Counter-stance:** a melee character keeps striking into it.
-- **Keening and Closing ring:** the dodge looks only 1.5 to 3.5 tiles out and never inward, so a ranged character stays in
-  the hit.
-- **Latched:** a leech sitting on the character counts as a body on every way out (`bodyOnWay`), so the character could
-  never dodge while it held on. Built only once the latched monster is taken out of `bodyOnWay` and `separate`.
+**Decision (user, 2026-10-09): Latched is dropped.** Counter-stance, Keening and Closing ring are built without the reflexes:
+a melee character keeps striking into a Counter-stance, and the dodge (1.5 to 3.5 tiles, outward) often stays in a Keening.
+They are a tax on one kind of build until the reflexes come.
 
 The reflexes, for when they are wanted. Each is small and lives in `sim/ai.ts` (`playerAI`, `avoidHazard`, the target choice). [PLAYER-AI.md](PLAYER-AI.md) is the
 player-facing account of these rules and needs a line for each. It is untracked work in the shared tree, so coordinate with
@@ -347,7 +342,6 @@ something. `+` means the mechanic is easier for that build, `−` harder.
 | March, Mortar, Cross |           |                 |               |      |               |   −   |       +        |         |      |
 | Molten               |           |                 |               |  +   |               |       |                |         |      |
 | Blind                |           |                 |               |      |               |   −   |   + (spells)   |         |      |
-| Latched              |           |                 |               |  +   |               |   +   |                |    +    |      |
 
 Quench asks for two elements, and Molten punishes fire, so neither fits a column. The rows show a balance: fast hitters and
 big hitters each have their bad encounters, and so do melee and ranged. A test will hold the table to the data (each
@@ -367,18 +361,18 @@ mechanic that a type lists has a row) so that it does not drift.
 A faction spreads its families over its types, so that each faction gains at least two families on top of what it has, and
 its own question stays at the front.
 
-| Faction (question)            | Sidearms                      | Patterns                                   | Windows                                    | Modes                                    | Debuffs                   |
-| ----------------------------- | ----------------------------- | ------------------------------------------ | ------------------------------------------ | ---------------------------------------- | ------------------------- |
-| Ossuary (stun, block, arrows) | Warrior spear, Brute ring     | Mage: **March**                            | Shieldbearer: **Brace**; Heap: **Petrify** | Shieldbearer: Broken guard               | (Volley call, F)          |
-| Rot (chaos, corpses)          | Shambler bile, Gorger gobbet  | Spitter: **Mortar** of bile                | none                                       | Gorger: Gorged; Hag: Last rites          | poison                    |
-| Hollow (physical fails, mana) | Gloomstalker shade            | Wailer: **Keening**                        | Gloomstalker: **Fade**                     | Wailer: Grieving                         | Blind                     |
-| Choir (hexes, heals)          | Censer coals, Flagellant lash | Tolling Bell: **Toll waves**               | Choirmaster: **Sanctuary**                 | none                                     | Hexer sigil               |
-| Swarm (numbers)               | none (fodder)                 | Nest: **Spiral** of spores                 | Beetle: **Carapace shed**                  | none                                     | (Converge, F)             |
-| Reliquary (armour, immunity)  | Golem boulder                 | Arbalest: **Cross**                        | Sentinel: **Aegis**                        | Golem: Core vent; Sentinel: Broken guard | none                      |
-| Kennel (being caught)         | Handler net                   | (Encircle, F)                              | none                                       | Rend-boar: Riled                         | Handler's whistle: Marked |
-| Gilded (sustain denial)       | Cutpurse burrs, Guard chain   | none                                       | Guard: **Counter-stance**                  | none                                     | Tithe                     |
-| Drowned (being held)          | Wrack brine                   | Tidecaller: **Cross** of hooks (two lanes) | none                                       | none                                     | Latched                   |
-| Emberborn (fire, ground)      | Slag Brute slag               | Pyre Priest: **Closing ring**              | none                                       | Slag Brute: Quench; Cinderling: Molten   | none                      |
+| Faction (question)            | Sidearms                      | Patterns                      | Windows                                    | Modes                                    | Debuffs                   |
+| ----------------------------- | ----------------------------- | ----------------------------- | ------------------------------------------ | ---------------------------------------- | ------------------------- |
+| Ossuary (stun, block, arrows) | Warrior spear, Brute ring     | Mage: **March**               | Shieldbearer: **Brace**; Heap: **Petrify** | Shieldbearer: Broken guard               | (Volley call, F)          |
+| Rot (chaos, corpses)          | Shambler bile, Gorger gobbet  | Spitter: **Mortar** of bile   | none                                       | Gorger: Gorged; Hag: Last rites          | poison                    |
+| Hollow (physical fails, mana) | Gloomstalker shade            | Wailer: **Keening**           | Gloomstalker: **Fade**                     | Wailer: Grieving                         | Blind                     |
+| Choir (hexes, heals)          | Censer coals, Flagellant lash | Tolling Bell: **Toll waves**  | Choirmaster: **Sanctuary**                 | none                                     | Hexer sigil               |
+| Swarm (numbers)               | none (fodder)                 | Nest: **Spiral** of spores    | Beetle: **Carapace shed**                  | none                                     | (Converge, F)             |
+| Reliquary (armour, immunity)  | Golem boulder                 | Arbalest: **Cross**           | Sentinel: **Aegis**                        | Golem: Core vent; Sentinel: Broken guard | none                      |
+| Kennel (being caught)         | Handler net                   | (Encircle, F)                 | none                                       | Rend-boar: Riled                         | Handler's whistle: Marked |
+| Gilded (sustain denial)       | Cutpurse burrs, Guard chain   | none                          | Guard: **Counter-stance**                  | none                                     | Tithe                     |
+| Drowned (being held)          | Wrack brine                   | Tidecaller: **Twin hooks**    | none                                       | none                                     | none                      |
+| Emberborn (fire, ground)      | Slag Brute slag               | Pyre Priest: **Closing ring** | none                                       | Slag Brute: Quench; Cinderling: Molten   | none                      |
 
 At the limit of two are:
 
@@ -422,7 +416,7 @@ building (the user's standing preference); one at the end.
 | N2  | Sidearms              | The rest of section 3's table, the Slinger's and Handler's changes, the zone-stacking rule.                                                                                                                                                                                                                                                                        |
 | N3  | Patterns              | The scheduler's remaining patterns (Mortar, Cross, Toll waves, Closing ring, Keening, Spiral), the donut and look-ahead reflexes.                                                                                                                                                                                                                                  |
 | N4  | Windows and modes     | Aegis, Fade, Sanctuary, Petrify, Counter-stance, Carapace shed; Core vent, Quench, Gorged, Last rites, Grieving, Riled, Molten, Broken guard; the Adaptive mod; phases moved onto modes.                                                                                                                                                                           |
-| N5  | Debuffs               | Statuses and the HUD row: Blind, Latched, Tithe, Marked, the Hexer's sigil, the sidearm effects.                                                                                                                                                                                                                                                                   |
+| N5  | Debuffs               | Statuses and the HUD row: Blind, Tithe, Marked, the Hexer's sigil, the sidearm effects.                                                                                                                                                                                                                                                                            |
 | N6  | Cards, tags, threat   | The inspect card lists every trick; the camp tags; `threat.ts`; the build-question test; docs (ROSTER.md, ENEMIES.md, PROGRESS.md; PLAYER-AI.md with its author).                                                                                                                                                                                                  |
 | N7  | Pack plays (optional) | Volley call, Encircle, Converge.                                                                                                                                                                                                                                                                                                                                   |
 | N8  | One sample            | One 24-run bot sample: deaths by type and by mechanic, to see that no single mechanic is the top killer. Tuning is in the data.                                                                                                                                                                                                                                    |

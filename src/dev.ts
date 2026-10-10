@@ -73,7 +73,7 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
      */
     async monsters(
       ids: MonsterTypeId[] = Object.keys(MONSTER_TYPES) as MonsterTypeId[],
-      opts: { level?: number; fight?: boolean; warm?: number; cols?: number } = {},
+      opts: { level?: number; fight?: boolean; warm?: number; cols?: number; ring?: number } = {},
     ): Promise<number> {
       controller.startShowcase(false);
       controller.setSpeed(1);
@@ -87,7 +87,7 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
       ids.forEach((id, i) => {
         // Spread round the character, each pushed to the nearest open floor.
         const ang = (i / ids.length) * Math.PI * 2;
-        const ring = 2.5 + (i % cols) * 0.5;
+        const ring = (opts.ring ?? 2.5) + (i % cols) * 0.5;
         const spot = w.grid.collide(
           w.player.x + Math.cos(ang) * ring,
           w.player.y + Math.sin(ang) * ring,
@@ -108,6 +108,44 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
       });
       await dev.step(opts.warm ?? 10);
       return ids.length;
+    },
+    /**
+     * Stage an encounter to look at (docs/ENCOUNTERS.md): the types at `ring` tiles, fighting, with their sidearms ready (and
+     * windows too, with `windows`); step until `until` says so, then pause on that frame. Returns the frames it took, or -1.
+     */
+    async stage(
+      ids: MonsterTypeId[],
+      opts: {
+        ring?: number;
+        level?: number;
+        windows?: boolean;
+        until?: (w: NonNullable<Controller['world']>) => boolean;
+        max?: number;
+      } = {},
+    ): Promise<number> {
+      controller.setSpeed(1);
+      await dev.monsters(ids, {
+        fight: true,
+        ring: opts.ring ?? 6,
+        level: opts.level ?? 40,
+        warm: 1,
+      });
+      const w = controller.world;
+      if (!w) return -1;
+      for (const m of w.actors)
+        if (m.enc) {
+          m.enc.sideT = 0;
+          m.enc.winT = opts.windows ? 0 : 99;
+        }
+      let n = 0;
+      for (; n < (opts.max ?? 600); n++) {
+        game.step(performance.now(), 16.7);
+        if (opts.until?.(w)) break;
+        if (n % 30 === 0) await sleep(0);
+      }
+      controller.setSpeed(0);
+      await dev.step(1);
+      return n >= (opts.max ?? 600) ? -1 : n;
     },
     /** Put `n` random items, gems and flasks in the camp inventory (for looking at the Items screen). */
     loot(n = 30, ilvl = 20): number {

@@ -29,6 +29,8 @@ import { hasChargesToSpend, offCooldown, skillReady, useSkill } from './cooldown
 import { canPay, payCost } from './cost';
 import { deployFull } from './deploy';
 import { inTelegraph, telegraphs } from './telegraph';
+import { inBlast, pending } from './blasts';
+import { inWindow, trySidearm, tryWindow } from './encounters';
 import {
   afterBlow,
   revealed,
@@ -238,8 +240,12 @@ export function hazardAt(
   margin = 0,
 ): { x: number; y: number; radius: number } | null {
   for (const e of w.effects) {
-    const lands = !isZone(e) && e.faction === 1 && e.t > 0;
-    if ((isZone(e) || lands) && Math.hypot(x - e.x, y - e.y) <= e.radius + margin) return e;
+    if (isZone(e)) {
+      if (Math.hypot(x - e.x, y - e.y) <= e.radius + margin) return e;
+      continue;
+    }
+    // A blast is a hazard once its warning shows (a later step of a pattern is not yet), by its shape.
+    if (e.faction === 1 && e.t > 0 && !pending(e) && inBlast(e, x, y, margin)) return e;
   }
   for (const t of telegraphs(w))
     if (inTelegraph(t, x, y, margin))
@@ -607,6 +613,8 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
   if (!canAct(m)) return;
   // A Gloomstalker stands still while its blink gathers.
   if (m.blinkT > 0 || m.phaseT > 0 || m.channelT > 0 || m.windT > 0 || m.dashT > 0) return;
+  // A monster in a window (a Brace) holds its ground until it ends.
+  if (m.enc && (inWindow(m) || tryWindow(w, m))) return;
   const p = w.player;
   if (!p.alive) return;
   const d = Math.hypot(p.x - m.x, p.y - m.y);
@@ -666,6 +674,8 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     step(w, m, away.x - m.x, away.y - m.y, dt);
     return;
   }
+  // A second attack on the way in: a thrown spear, a lob, a pattern (docs/ENCOUNTERS.md 3).
+  if (m.mon!.sidearm && trySidearm(w, m, dt, d, los)) return;
   // Nests and pylons do nothing but what the faction code gives them.
   if (MONSTER_TYPES[m.mon!.spec.type].noAttack) return;
   const prof = m.mon!.profile(monsterConds(m));

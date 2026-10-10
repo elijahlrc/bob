@@ -819,6 +819,8 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     dmgMult: 0.7,
     range: 7,
     attack: 'projectile',
+    // Its stones hobble (docs/ENCOUNTERS.md 7).
+    hobbles: true,
     speed: 3,
     attackTime: 1.3,
     radius: 0.4,

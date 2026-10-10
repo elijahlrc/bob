@@ -123,6 +123,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     nextX: 0,
     nextY: 0,
     abT: [],
+    enc: undefined,
     dashT: 0,
     windT: 0,
     dashV: 0,
