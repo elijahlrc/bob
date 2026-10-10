@@ -893,3 +893,16 @@ compact JSON). Bot sample after (12 a class, seed 5, with another change to mons
 2.5 to 16 by class, 42% of deaths by rares, 15% by mini-bosses. The bots at the previous push (24 runs in `sim_runs`) had a
 median of 7 and a best of 31, so this sample is no worse in kind, but it has no same-seed baseline and cannot say how much of
 the difference is the monsters and how much the other change.
+
+### Bosses (docs/BOSSES.md), built (2026-10-10)
+
+Six bosses end maps 10, 30, 50, 70, 90 and 100, each asking the build one question and showing its card (what it deals,
+resists and is weak to, what it takes to kill and to survive) at camp from five maps ahead, with lines read from the
+character. The Tollkeeper (single-target damage against a toll clock; stun and chill answer it), the Courser (never stops;
+reach and mobility), the Magistrate (an unavoidable Sentence made heavier by Witnesses), the Prism Warden (attunes to each
+element in turn, immune to it), the Rotwife (every ailment in turn; regrows unless a DoT is on her) and the Unmaker (steals
+the build's best resistance, defence, supports and flasks as shards). Champions stay on maps 20 to 80; the Ossuary Regent
+is retired. A test holds every boss to the plan's rule that no damage profile takes more than twice the mean to kill it.
+On the character's side: 3.9's cleansing flasks are complete (poison, shock and curses added, immunity during every
+cleansing flask), drunk when the ailment is on; a boss cannot freeze or stun the character twice within 4 s. One 24-run
+gauntlet (`scripts/boss-gauntlet.ts`) is recorded in docs/BOSSES.md 18.3; boss life is not tuned from the bot.
