@@ -1,3 +1,4 @@
+import { bossAI } from './bosses';
 import { abilitiesOf } from '../data/abilities';
 import { skillRange, type SkillChoice } from '../calc/character';
 import type { Defence } from '../calc/combat';
@@ -127,8 +128,13 @@ function clearPath(w: World, x0: number, y0: number, x1: number, y1: number, r: 
 /** Seconds the player will chase one drop or chest before it gives up on it. */
 const LOOT_GIVE_UP = 20;
 
-/** Types the player shoots first when they are within reach (EXPANSION 5.9). */
-const SUPPORT_TYPES = new Set(['nest', 'pylon']);
+/**
+ * Types the player shoots first when they are within reach (EXPANSION 5.9): nests and pylons, and what a boss brings (a
+ * Magistrate's Witnesses, the Unmaker's shards: docs/BOSSES.md 11.1).
+ */
+const SUPPORT_TYPES = new Set(['nest', 'pylon', 'witness', 'shard']);
+/** Of those, the ones that must be in sight: a pylon and a shard are gone for even through a wall. */
+const SUPPORT_NEEDS_SIGHT = new Set(['nest', 'witness']);
 const SUPPORT_PRIORITY = 4;
 
 /** How much nearer a rare, champion or boss enemy counts with the `rares` target priority, in tiles. */
@@ -158,12 +164,16 @@ function findTarget(w: World): Actor | null {
     if (Math.abs(d - bd) <= 1e-9 && best && m.life >= best.life) continue;
     // Out of sight is no reason to ignore a pylon: everything around it is untouchable until it falls.
     if (!support && !w.grid.los(p.x, p.y, m.x, m.y)) continue;
-    if (support && m.mon!.spec.type === 'nest' && !w.grid.los(p.x, p.y, m.x, m.y)) continue;
+    if (support && SUPPORT_NEEDS_SIGHT.has(m.mon!.spec.type) && !w.grid.los(p.x, p.y, m.x, m.y))
+      continue;
     best = m;
     bd = d;
   }
   return best;
 }
+
+/** The character's choice of target now (for tests). */
+export const findTargetForTest = (w: World): Actor | null => findTarget(w);
 
 /** A debuff that is renewed, not stacked, is cast again when it is about to end, not while it holds (Contagion). */
 function alreadyAfflicted(p: SkillProfile, target: Actor): boolean {
@@ -312,8 +322,10 @@ export function hazardAt(
       if (Math.hypot(x - e.x, y - e.y) <= e.radius + margin) return e;
       continue;
     }
-    // A blast is a hazard once its warning shows (a later step of a pattern is not yet), by its shape.
-    if (e.faction === 1 && e.t > 0 && !pending(e) && inBlast(e, x, y, margin)) return e;
+    // A blast is a hazard once its warning shows (a later step of a pattern is not yet), by its shape. A blow that follows
+    // the character (a Sentence) cannot be stepped out of, so the character does not try.
+    if (e.faction === 1 && e.t > 0 && !e.unavoidable && !pending(e) && inBlast(e, x, y, margin))
+      return e;
   }
   for (const t of telegraphs(w))
     if (inTelegraph(t, x, y, margin))
@@ -452,7 +464,8 @@ export function playerAI(w: World, dt: number): void {
       ai.watchId = target.id;
       ai.watchLife = target.life;
       ai.watchT = w.t;
-    } else if (w.t - ai.watchT > STALL_TIME) {
+    } else if (w.t - ai.watchT > STALL_TIME && target.rarity !== 'boss') {
+      // (A boss is never given up on: its shield or its regrowth may hold its life up for a while, docs/BOSSES.md 11.1.)
       ai.skipId = target.id;
       ai.skipUntil = w.t + SKIP_TIME;
       ai.watchId = 0;
@@ -793,6 +806,8 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     else step(w, m, m.homeX - m.x, m.homeY - m.y, dt);
     return;
   }
+  // A boss of its own kind moves and strikes its own way for a while, or always (docs/BOSSES.md).
+  if (m.enc && m.rarity === 'boss' && bossAI(w, m, dt)) return;
   const los = d < 16 && w.grid.los(m.x, m.y, p.x, p.y);
   if (los) m.lostT = 0;
   else {

@@ -11,6 +11,7 @@ import { affixPlayerMods } from '../data/mapAffixes';
 import { TROPHY_MODS, TROPHY_SECONDS, trophyMods } from '../data/trophy';
 import { refreshPlayerDefence } from './combat';
 import type { Mod } from '../mods/types';
+import { theftBuild, theftKey, theftMods } from './theft';
 import type { World } from './types';
 
 /** The sum of the base mods of one stat in a short list (what a skill and its supports give). */
@@ -34,15 +35,17 @@ const trophyIds = (w: World) => Object.keys(w.trophy).sort();
 /** The character for the world's build with these charges (built once, then kept). */
 export function characterWith(w: World, counts: ChargeCounts): Character {
   const trophy = trophyIds(w);
-  const k = key(counts, trophy);
+  // What the Unmaker holds of the build is part of it too (docs/BOSSES.md 9).
+  const k = key(counts, trophy) + theftKey(w);
   let ch = w.chars.get(k);
   if (!ch) {
-    ch = new Character(w.build, {
+    ch = new Character(theftBuild(w, w.build), {
       areaLevel: w.plan.areaLevel,
       resistPenalty: w.plan.resistPenalty,
       extraMods: [
         ...w.plan.affixes.flatMap((id) => affixPlayerMods(id, w.plan.areaLevel)),
         ...trophyMods(trophy),
+        ...theftMods(w),
       ],
       charges: counts,
     });
@@ -125,6 +128,11 @@ export function tickCharges(w: World, dt: number): void {
 /** Register the world's starting character, so returning to no charges does not rebuild it. */
 export function seedCharacters(w: World): void {
   w.chars.set(key(w.char.charges, trophyIds(w)), w.char);
+}
+
+/** What the Unmaker holds changed: the character as it now is (its charges kept). */
+export function rebuildForTheft(w: World): void {
+  swap(w, { ...w.char.charges });
 }
 
 /** After the build changes (a level up): rebuild for the charges now held. */

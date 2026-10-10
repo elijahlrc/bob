@@ -65,6 +65,15 @@ export type FigureKind =
   | 'chest'
   | 'worm'
   | 'slag'
+  // The bosses (docs/BOSSES.md).
+  | 'tollkeeper'
+  | 'courser'
+  | 'magistrate'
+  | 'witness'
+  | 'prism'
+  | 'rotwife'
+  | 'unmaker'
+  | 'shard'
   | 'hero_mace'
   | 'hero_sword'
   | 'hero_bow'
@@ -473,6 +482,14 @@ const BUILDS: Record<FigureKind, Build> = {
   chest: { scale: 1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   worm: { scale: 1.1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   slag: { scale: 1.25, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  tollkeeper: { scale: 2.2, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  courser: { scale: 1.8, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  magistrate: { scale: 1.95, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  witness: { scale: 0.95, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  prism: { scale: 2.0, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  rotwife: { scale: 2.1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  unmaker: { scale: 2.3, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  shard: { scale: 0.8, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   hero_mace: { scale: 1.05, legLen: 9, torsoH: 14, shoulder: 8, skull: 5.5, ribW: 7 },
   hero_sword: { scale: 1, legLen: 9, torsoH: 14, shoulder: 7, skull: 5.5, ribW: 6.5 },
   hero_bow: { scale: 1, legLen: 9.5, torsoH: 13, shoulder: 6, skull: 5.5, ribW: 5.5 },
@@ -588,6 +605,14 @@ const CREATURES = new Set<FigureKind>([
   'chest',
   'worm',
   'slag',
+  'tollkeeper',
+  'courser',
+  'magistrate',
+  'witness',
+  'prism',
+  'rotwife',
+  'unmaker',
+  'shard',
 ]);
 
 /**
@@ -938,6 +963,239 @@ function buildCreature(kind: FigureKind, pose: Pose, type?: MonsterTypeId): Prim
       }
       circ(b, hx - 1, hy - 2.6, 0.9, 'eye');
       circ(b, hx + 2, hy - 3, 0.9, 'eye');
+      break;
+    }
+    case 'tollkeeper': {
+      // A hunched bronze warden: two thick legs, a cowled head thrust forward, a yoke on its shoulders and a great bell
+      // hung behind it that swings back when it tolls; a flail in its near hand.
+      const ph = pose.legA;
+      const toll = pose.charge;
+      cap(b, -4, -10 + lift, -4 + ph * 3, 0, 2.6, 'clothShade');
+      cap(b, 4, -10 + lift, 4 - ph * 3, 0, 2.6, 'cloth');
+      // The bell, behind: it swings back with the toll and glows at the lip.
+      const bx = -8 - toll * 3;
+      const by = -26 + lift;
+      if (toll > 0.05) circ(b, bx, by + 9, 6 + toll * 8, 'glow');
+      b.prims.push({
+        k: 'tri',
+        pts: [bx - 9, by + 9, bx + 9, by + 9, bx, by - 8],
+        role: 'metalShade',
+      });
+      b.prims.push({
+        k: 'tri',
+        pts: [bx - 6, by + 9, bx + 7, by + 9, bx + 0.5, by - 6],
+        role: 'metal',
+      });
+      box(b, bx, by + 9.5, 19, 2.4, 0, 'metalShade');
+      cap(b, -14, -30 + lift, 8, -27 + lift, 1.6, 'wood');
+      // The body under the yoke.
+      circ(b, 0, -18 + lift, 9, 'clothShade');
+      circ(b, 1, -19 + lift, 7.5, 'cloth');
+      box(b, 0, -12 + lift, 16, 3, 0, 'metalShade');
+      // A cowled head, low and forward.
+      circ(b, 7, -26 + lift + pose.head * 2, 4.6, 'clothShade');
+      circ(b, 8.4, -25.5 + lift, 1, 'eye');
+      // The flail.
+      const swing = pose.armA * 6;
+      cap(b, 6, -20 + lift, 13, -12 - swing + lift, 2, 'cloth');
+      cap(b, 13, -12 - swing + lift, 17, -5 - swing + lift, 0.5, 'metalShade');
+      circ(b, 17.5, -4 - swing + lift, 2.6, 'metal');
+      break;
+    }
+    case 'courser': {
+      // A burning horse and its rider grown into it: four long legs, a deep chest, a mane of fire, and a lance held low.
+      const legs: [number, number][] = [
+        [-9, pose.legB],
+        [-5, pose.legA],
+        [6, pose.legB],
+        [10, pose.legA],
+      ];
+      for (const [x, ph] of legs) {
+        cap(b, x, -12 + lift, x + ph * 5, -5 + lift, 1.6, 'boneShade');
+        cap(b, x + ph * 5, -5 + lift, x + ph * 3, 0, 1.2, 'boneShade');
+        circ(b, x + ph * 3, 0, 1.4, 'glow');
+      }
+      cap(b, -11, -15 + lift, 9, -15 + lift, 5.4, 'bone');
+      circ(b, 8, -16 + lift, 5.6, 'boneShade');
+      cap(b, 10, -18 + lift, 15, -25 + lift, 2.6, 'bone');
+      cap(b, 15, -25 + lift + pose.head * 2, 19, -23 + lift, 2.2, 'boneShade');
+      circ(b, 16.5, -26 + lift, 0.8, 'eye');
+      for (let i = 0; i < 4; i++)
+        b.prims.push({
+          k: 'tri',
+          pts: [
+            9 + i * 1.6,
+            -19 + lift - i * 1.7,
+            5 + i * 1.4,
+            -26 + lift - i * 1.5,
+            11 + i * 1.6,
+            -22 + lift - i * 1.7,
+          ],
+          role: 'glow',
+        });
+      cap(b, -14, -16 + lift, -19, -11 + lift - pose.legA * 2, 1.4, 'glow');
+      // The rider: a torso rising from the back, a helm, and the lance.
+      cap(b, 1, -19 + lift, 3, -31 + lift, 3, 'metalShade');
+      circ(b, 3.5, -34 + lift, 3, 'metal');
+      circ(b, 5, -34 + lift, 0.8, 'eye');
+      const lance = pose.armA * 4;
+      cap(b, -6, -26 + lift - lance, 19, -22 + lift + lance, 0.9, 'wood');
+      b.prims.push({
+        k: 'tri',
+        pts: [19, -23.5 + lift + lance, 23, -22 + lift + lance, 19, -20.5 + lift + lance],
+        role: 'metal',
+      });
+      break;
+    }
+    case 'magistrate': {
+      // A tall judge in a long robe with a high hat, a chain of office, and a headsman's axe for a gavel.
+      const ph = pose.legA;
+      b.prims.push({
+        k: 'tri',
+        pts: [-9 + ph * 1.5, 0, 9 + ph * 1.5, 0, 0, -32 + lift],
+        role: 'clothShade',
+      });
+      b.prims.push({ k: 'tri', pts: [-6, 0, 7, 0, 0.5, -30 + lift], role: 'cloth' });
+      cap(b, -6, -30 + lift, 6, -30 + lift, 3.4, 'cloth');
+      cap(b, -4, -27 + lift, 4, -24 + lift, 0.7, 'accent');
+      circ(b, 0, -23.5 + lift, 1.3, 'accent');
+      circ(b, 1.5, -36 + lift + pose.head * 2, 4.2, 'skin');
+      circ(b, 3.5, -36.5 + lift, 0.8, 'eye');
+      box(b, 1, -43 + lift, 7, 7, 0, 'dark');
+      box(b, 1, -40 + lift, 9, 1.4, 0, 'accent');
+      // The axe: held upright, brought forward and down in the blow (armA). Kept close to the body: a big figure has no
+      // more room to the side than a small one.
+      const up = Math.max(-0.5, Math.min(1, pose.armA));
+      const hx = 8 + Math.sin(up) * 3;
+      const hy = -27 + lift - Math.cos(up) * 4;
+      cap(b, 5, -30 + lift, hx, hy, 1.6, 'cloth');
+      const ang = -Math.PI / 2 + up * 0.9;
+      const tx = hx + Math.cos(ang) * 13;
+      const ty = hy + Math.sin(ang) * 13;
+      cap(b, hx, hy, tx, ty, 0.9, 'wood');
+      b.prims.push({
+        k: 'tri',
+        pts: [tx - 1, ty - 1, tx + 3, ty + 2, tx, ty + 5],
+        role: 'metal',
+      });
+      if (pose.charge > 0.05) circ(b, tx + 1, ty + 2, 2 + pose.charge * 3, 'glow');
+      break;
+    }
+    case 'witness': {
+      // A hooded figure kneeling on a plinth, its eyes on the character; the chain to the Magistrate is drawn on the floor.
+      box(b, 0, -2.5, 14, 5, 0, 'metalShade');
+      box(b, 0, -5.5, 11, 1.6, 0, 'metal');
+      b.prims.push({ k: 'tri', pts: [-6, -6, 6, -6, 0, -24 + lift], role: 'clothShade' });
+      circ(b, 1, -22 + lift, 3.6, 'clothShade');
+      circ(b, 2.6, -22 + lift, 0.8, 'eye');
+      circ(b, 0, -22 + lift, 0.8, 'eye');
+      cap(b, 2, -14 + lift, 7, -12 + lift, 1, 'cloth');
+      break;
+    }
+    case 'prism': {
+      // A knight of faceted crystal, hollow, a core burning in the colour of its attunement, a shield of light on its arm.
+      const ph = pose.legA;
+      cap(b, -3, -12 + lift, -3 + ph * 3, 0, 2, 'metalShade');
+      cap(b, 3, -12 + lift, 3 - ph * 3, 0, 2, 'metal');
+      b.prims.push({
+        k: 'tri',
+        pts: [-9, -14 + lift, 9, -14 + lift, 0, -36 + lift],
+        role: 'metalShade',
+      });
+      b.prims.push({
+        k: 'tri',
+        pts: [-6, -14 + lift, 7, -16 + lift, 2, -33 + lift],
+        role: 'metal',
+      });
+      b.prims.push({
+        k: 'tri',
+        pts: [-9, -14 + lift, 0, -9 + lift, 9, -14 + lift],
+        role: 'metalShade',
+      });
+      circ(b, 0.5, -22 + lift, 3 + pose.charge * 2, 'glow');
+      circ(b, 0.5, -22 + lift, 1.6, 'eye');
+      b.prims.push({
+        k: 'tri',
+        pts: [-2, -38 + lift, 3, -45 + lift + pose.head * 2, 6, -37 + lift],
+        role: 'metal',
+      });
+      // The shield: a pane held out front.
+      const raise = pose.armA * 3;
+      b.prims.push({
+        k: 'tri',
+        pts: [9, -30 + lift - raise, 15, -22 + lift - raise, 9, -12 + lift - raise],
+        role: 'glow',
+      });
+      cap(b, 5, -26 + lift, 9, -21 + lift - raise, 1.4, 'metalShade');
+      break;
+    }
+    case 'rotwife': {
+      // A bloated crone in rags, bent over a great swollen belly, long arms ending in claws, a train of rot behind her.
+      const ph = pose.legA;
+      cap(b, -16, -1, -4, -2, 2.6, 'clothShade');
+      circ(b, -15, -1.5, 2.2, 'accent');
+      cap(b, -3, -8 + lift, -3 + ph * 2.5, 0, 2, 'skin');
+      cap(b, 3, -8 + lift, 3 - ph * 2.5, 0, 2, 'skin');
+      circ(b, 0, -15 + lift, 10, 'clothShade');
+      circ(b, 2, -14 + lift, 8, 'skin');
+      circ(b, 3, -13 + lift, 1.6, 'accent');
+      circ(b, -2, -17 + lift, 1.2, 'accent');
+      for (let i = 0; i < 5; i++)
+        b.prims.push({
+          k: 'tri',
+          pts: [-9 + i * 4, -8 + lift, -7 + i * 4, -2 + lift + (i % 2) * 2, -5 + i * 4, -8 + lift],
+          role: 'clothShade',
+        });
+      circ(b, -1, -25 + lift, 6, 'clothShade');
+      circ(b, 4, -27 + lift + pose.head * 2, 3.6, 'skin');
+      circ(b, 5.5, -27.5 + lift, 0.7, 'eye');
+      cap(b, 0, -29 + lift, -6, -22 + lift, 1.2, 'dark');
+      const reach = pose.armA * 5;
+      cap(b, 4, -22 + lift, 12, -12 - reach + lift, 1.4, 'skin');
+      for (const dy of [-1.5, 0, 1.5])
+        cap(b, 12, -12 - reach + lift, 15, -12 - reach + lift + dy * 1.5, 0.5, 'bone');
+      cap(b, -4, -22 + lift, -8, -10 + lift, 1.3, 'skin');
+      break;
+    }
+    case 'unmaker': {
+      // A figure cut out of the world: a tall silhouette of nothing with a rim of pale light, long arms, no face but two
+      // points where its eyes should be. Each part is drawn twice: a little larger in light, then in the dark.
+      const ph = pose.legA;
+      const reach = pose.armA * 7;
+      for (const [role, pad] of [
+        ['glow', 1.1],
+        ['dark', 0],
+      ] as const) {
+        cap(b, -3, -16 + lift, -3 + ph * 3, 0, 2 + pad, role);
+        cap(b, 3, -16 + lift, 3 - ph * 3, 0, 2 + pad, role);
+        cap(b, 0, -16 + lift, 0, -36 + lift, 5.5 + pad, role);
+        circ(b, 1, -42 + lift + pose.head * 2, 4.6 + pad, role);
+        cap(b, 3, -34 + lift, 14, -20 - reach + lift, 1.6 + pad, role);
+        cap(b, 14, -20 - reach + lift, 19, -12 - reach + lift, 1 + pad, role);
+        cap(b, -3, -34 + lift, -9, -16 + lift, 1.6 + pad, role);
+      }
+      circ(b, 0, -42 + lift, 0.9, 'eye');
+      circ(b, 2.8, -42 + lift, 0.9, 'eye');
+      if (pose.charge > 0.05) circ(b, 17, -12 + lift, 1.2 + pose.charge * 2, 'glow');
+      break;
+    }
+    case 'shard': {
+      // A piece of the character, held in the air: a slim crystal that turns, with a spark at its heart.
+      const tilt = pose.legA * 3;
+      b.prims.push({
+        k: 'tri',
+        pts: [-3 + tilt, -12 + lift, 3 + tilt, -12 + lift, tilt * 0.3, -24 + lift],
+        role: 'glow',
+      });
+      b.prims.push({
+        k: 'tri',
+        pts: [-3 + tilt, -12 + lift, 3 + tilt, -12 + lift, -tilt * 0.3, -4 + lift],
+        role: 'metal',
+      });
+      circ(b, tilt * 0.2, -12 + lift, 1.4, 'eye');
+      // Its light on the floor below, and a mote that circles it.
+      circ(b, 0, -0.5, 2.4, 'glow');
+      circ(b, Math.cos(pose.legA * 4) * 4, -14 + lift + Math.sin(pose.legA * 4) * 2, 0.7, 'glow');
       break;
     }
     case 'slag': {
@@ -1608,7 +1866,8 @@ export type FrameCounts = Record<AnimName, number>;
 
 /** Figure kind used for a monster type; heroes by weapon class. */
 export function monsterFigure(type: MonsterTypeId, rarity: string): FigureKind {
-  return rarity === 'boss' ? 'boss' : MONSTER_TYPES[type].body;
+  // The old boss was a Warrior drawn on the boss rig; the bosses of docs/BOSSES.md have bodies of their own.
+  return rarity === 'boss' && !MONSTER_TYPES[type].bossOnly ? 'boss' : MONSTER_TYPES[type].body;
 }
 
 export function heroFigure(mainHandClass: string | undefined): FigureKind {

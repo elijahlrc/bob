@@ -110,7 +110,7 @@ describe('a pack is never left with nothing to draw from', () => {
   const firstLevel = (f: FactionId) =>
     Math.min(
       ...Object.values(MONSTER_TYPES)
-        .filter((t) => t.faction === f)
+        .filter((t) => t.faction === f && !t.bossOnly)
         .map((t) => t.minLevel ?? 0),
     );
 

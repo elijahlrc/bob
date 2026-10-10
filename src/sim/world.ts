@@ -34,7 +34,7 @@ import { tickCaught, tickWarp, tickWither } from './blinks';
 import { tickLegion, tickOffering } from './minionFx';
 import { tickSupports } from './supportFx';
 import { tickSkillFx } from './skillFx';
-import { tickBlasphemy } from './hexes';
+import { recompute, tickBlasphemy } from './hexes';
 import { tickBerserk, tickDegen, tickStance } from './stances';
 import { tickProliferation } from './proliferate';
 import { tickFields } from './fields';
@@ -53,6 +53,8 @@ import { tickStranded } from './strand';
 import { initEncounter, tickEncounter } from './encounters';
 import { tickPackPlays } from './packPlays';
 import { inBlast, pending } from './blasts';
+import { afflictPlayer, stunPlayer } from './afflict';
+import { flasksSealed } from './theft';
 import { crescendoStep, HOLDOUT_WAVES } from '../data/mapTypes';
 import type { Actor, GroundEffect, World, WorldOpts } from './types';
 
@@ -335,7 +337,8 @@ const LIFE_TO_ES_TIME = 2;
 function useFlask(w: World, i: number): void {
   const f = w.flasks[i];
   const p = w.player;
-  if (f.charges < f.spec.perUse) return;
+  // The Unmaker holds the flasks (docs/BOSSES.md 9).
+  if (f.charges < f.spec.perUse || flasksSealed(w)) return;
   const s = f.spec;
   if (s.kind === 'life' || s.kind === 'hybrid' || s.kind === 'mana') {
     if (f.activeT > 0) {
@@ -367,6 +370,15 @@ function useFlask(w: World, i: number): void {
   if (s.removeFreeze) {
     p.ail.freezeT = 0;
     p.ail.chill = 0;
+  }
+  if (s.removePoison) p.ail.poisons.length = 0;
+  if (s.removeShock) {
+    p.ail.shock = 0;
+    p.ail.shockT = 0;
+  }
+  if (s.removeCurse && p.hexes.length > 0) {
+    p.hexes.length = 0;
+    recompute(p);
   }
   w.events.push({ t: 'flaskUsed', idx: i });
   rollGains(w, 'flask');
@@ -417,6 +429,11 @@ function tickEffects(w: World, dt: number): void {
       w.effects[j++] = e;
       continue;
     }
+    // A blow that follows the character until it lands (a Sentence).
+    if (e.follow && p.alive) {
+      e.x = p.x;
+      e.y = p.y;
+    }
     e.t -= dt;
     if (e.t > 0) {
       w.effects[j++] = e;
@@ -429,7 +446,12 @@ function tickEffects(w: World, dt: number): void {
       // ground behind.
       w.events.push({ t: 'blast', e });
       const caught = p.alive && inBlast(e, p.x, p.y, p.r);
-      if (caught && e.damage > 0) rawHit(w, p, e.damage, e.dtype, e.label ?? 'Blast', 'player', viaOf(w, e));
+      if (caught && e.damage > 0)
+        rawHit(w, p, e.damage, e.dtype, e.label ?? 'Blast', 'player', viaOf(w, e));
+      // What a boss's blast does besides damage (docs/BOSSES.md): a Sentence stuns, a toll shocks.
+      if (caught && p.alive && e.stun) stunPlayer(w, e.stun);
+      if (caught && p.alive && e.afflict)
+        afflictPlayer(w, e.afflict.kind, e.afflict.value, e.afflict.seconds, true);
       const owner = e.pull && caught ? actorById(w, e.owner ?? 0) : undefined;
       if (owner?.alive) pullPlayer(w, owner, e.pull!);
       for (const m of w.minions)
@@ -458,7 +480,7 @@ function tickEffects(w: World, dt: number): void {
   w.effects.length = j;
 }
 
-/** Behaviours driven by monster mods (§12.5) and the boss (§12.7). */
+/** Behaviours driven by monster mods (§12.5). The bosses are `sim/bosses.ts` (docs/BOSSES.md). */
 function tickMonsterMods(w: World, m: Actor, dt: number): void {
   if (m.state !== 'chase') return;
   const p = w.player;
@@ -537,40 +559,6 @@ function tickMonsterMods(w: World, m: Actor, dt: number): void {
       for (let k = 0; k < Math.min(2, 6 - alive); k++) summon(w, m, 'warrior', m.mon!.spec.variant);
     }
   }
-  if (m.rarity === 'boss') {
-    m.slamT -= dt;
-    if (m.slamT <= 0) {
-      m.slamT = 7;
-      w.effects.push({
-        id: w.nextId++,
-        x: p.x,
-        y: p.y,
-        radius: 3,
-        t: 1.2,
-        total: 1.2,
-        kind: 'slam',
-        damage: 4 * bossHit(m),
-        dtype: 0,
-        faction: 1,
-        owner: m.id,
-      });
-    }
-    const frac = m.life / m.def.maxLife;
-    const phases = [0.75, 0.5, 0.25];
-    while (m.bossPhase < 3 && frac <= phases[m.bossPhase]) {
-      m.bossPhase++;
-      const variants = ['fire', 'cold', 'lightning'] as const;
-      const v = variants[w.rngAi.int(0, 2)];
-      for (let k = 0; k < 4; k++) summon(w, m, 'warrior', v);
-    }
-  }
-}
-
-function bossHit(m: Actor): number {
-  const p = m.mon!.profile(0);
-  let s = 0;
-  for (const c of p.hands[0].chunks) s += (c.min + c.max) / 2;
-  return s;
 }
 
 function summon(w: World, m: Actor, type: 'warrior', variant: MonsterSpec['variant']): void {

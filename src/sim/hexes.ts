@@ -13,6 +13,8 @@ import { reservedMana } from './reserve';
 import { gainBuff } from './buffs';
 import { gainCharge } from './charges';
 import { lifeCap } from './combat';
+import { bossOfType } from '../data/bosses';
+import { flaskWards } from './afflict';
 import type { Actor, World } from './types';
 
 /**
@@ -35,7 +37,11 @@ export function applyHex(
   seconds?: number,
 ): void {
   if (!a.alive || a.modIds.includes('hexWarded')) return;
-  if (a.rarity === 'boss') effect *= BOSS_CURSE_EFFECT;
+  // Bosses take a third less (3.9); a boss of docs/BOSSES.md takes what its card says (the Rotwife all of it).
+  if (a.rarity === 'boss')
+    effect *= a.mon
+      ? (bossOfType(a.mon.spec.type)?.curseEffect ?? BOSS_CURSE_EFFECT)
+      : BOSS_CURSE_EFFECT;
   // A curse lasts as long as its gem says; the hexes monsters cast (and ones with no length of their own) last six seconds.
   const length = seconds ?? hexSeconds(id, level);
   const have = a.hexes.find((h) => h.id === id);
@@ -83,6 +89,8 @@ export function tickBlasphemy(w: World, dt: number): void {
 /** A monster hexes the player: the effect is reduced by "reduced effect of curses on you". */
 export function monsterHexesPlayer(w: World, id: HexId, effect: number): void {
   const p = w.player;
+  // A flask of Unbinding keeps curses off while it runs (docs/BOSSES.md 11.2).
+  if (flaskWards(w, 'curse')) return;
   const mult = Math.max(0, w.char.db.mult('curseEffectOnSelf'));
   applyHex(w, p, id, effect * mult, BASE_HEX_LIMIT, 10, HEX_SECONDS);
 }

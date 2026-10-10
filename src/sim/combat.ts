@@ -73,6 +73,8 @@ import { corpseBlast, fireTriggers } from './triggers';
 import { scaleProfile } from './shots';
 import { chargedDeath, frostBite, gainVirulence, shellTakes } from './skillFx';
 import { spawnMonster } from './world';
+import { afflictPlayer, bossLocked, flaskWards, isBossSide, lockBoss } from './afflict';
+import { bossHitPlayer } from './bosses';
 import type { Actor, Dot, World } from './types';
 
 const CHAOS = 4;
@@ -546,7 +548,15 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     afterHit();
     return;
   }
+  // A boss's freeze or stun cannot come again soon after the last (docs/BOSSES.md rule 6).
+  const bossLock = dst.isPlayer && isBossSide(src);
+  if (bossLock && bossLocked(w)) {
+    res.ailments.freeze = 0;
+    res.stun = 0;
+  }
+  const frozeBefore = dst.ail.freezeT;
   applyAilments(w, dst, res, p);
+  if (bossLock && (dst.ail.freezeT > frozeBefore || res.stun > 0)) lockBoss(w);
   if (src.isPlayer && !dst.isPlayer) {
     // Damage over time the skill (or a support) puts on what it hits.
     if (p.decay) applyDecay(w, dst, p.decay);
@@ -615,6 +625,10 @@ function applyAilments(w: World, dst: Actor, res: HitResult, p: SkillProfile): v
   // Chances to avoid an ailment, and how long each lasts on this actor.
   for (const name of AILMENT_NAMES)
     if (a[name] > 0 && d.avoid[name] > 0 && w.rngCombat.chance(d.avoid[name])) a[name] = 0;
+  // A cleansing flask that is running keeps its ailment off the character (3.9; docs/BOSSES.md 11.2).
+  if (dst.isPlayer && w.flasks.some((f) => f.activeT > 0))
+    for (const name of AILMENT_NAMES)
+      if (a[name] > 0 && flaskWards(w, name === 'chill' ? 'freeze' : name)) a[name] = 0;
   if (a.ignite > 0) {
     const spreadR = Math.max(p.spreadAil.ignite, p.spreadAil.ele) * p.radiusMult;
     pushDot(ail.ignites, {
@@ -761,13 +775,11 @@ function onMonsterHitPlayer(w: World, src: Actor, prof: SkillProfile): void {
     // A thief runs with what it took.
     if (steal && got > 0) src.fleeT = 5;
   }
-  const p = w.player;
   const debuff = prof.skill.debuff;
   const hobbles = src.modIds.includes('hobbling') || src.mon?.kind.hobbles || debuff === 'hobble';
-  if (hobbles && !p.def.cannotBeChilled) {
-    p.ail.chill = Math.max(p.ail.chill, 0.3);
-    p.ail.chillT = Math.max(p.ail.chillT, 2);
-  }
+  // A hobble is a chill: whatever keeps a chill off keeps it off (docs/BOSSES.md 11.2).
+  if (hobbles) afflictPlayer(w, 'chill', 0.3, 2);
+  if (src.mon?.kind.bossOnly) bossHitPlayer(w, src);
   // A sidearm that blinds (docs/ENCOUNTERS.md 7): the character's attacks miss more for a while.
   if (debuff === 'blind') blindPlayer(w, BLIND_SECONDS);
 }

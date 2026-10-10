@@ -14,7 +14,8 @@ import {
 import { affixMonsterMods } from '../data/mapAffixes';
 import { TYPE_SIDEARMS, type SidearmSpec } from '../data/encounters';
 import { LEGACY, statLevel, type Difficulty } from '../data/difficulty';
-import { defenceMods, profileOf } from '../data/defence';
+import { defenceMods, typeProfile } from '../data/defence';
+import { bossOfType } from '../data/bosses';
 import { meanDurability } from './matrix';
 import { CondIndex, ModDB } from '../mods/modDb';
 import { maskAnd, mod, type Mod } from '../mods/types';
@@ -270,7 +271,10 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
   const share = Math.sqrt(spec.power ?? 1);
   // A type's `lifeMult` is its toughness: its life with its defences paid for (docs/ROSTER.md 6.2), so a type that is hard
   // to one kind of damage has the less life, and is no harder to kill on the whole than its toughness says.
-  const defProfile = profileOf(t.faction, t.defence);
+  const defProfile = typeProfile(t);
+  // A boss's card is the whole truth (docs/BOSSES.md 11.3): none of the flat boss bonuses below apply to it.
+  const boss = bossOfType(spec.type);
+  const oldBoss = spec.rarity === 'boss' && !t.bossOnly;
   const life = Math.round(
     monsterLife(sl) * easeLife(m) * (t.lifeMult / meanDurability(defProfile, m)) * r.life * share,
   );
@@ -285,7 +289,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
     ...defenceMods(defProfile, life),
     ...shapeMods(t),
     ...(FACTION_MODS[t.faction] ?? []),
-    ...variantMods(spec.variant, spec.type === 'mage'),
+    ...variantMods(spec.variant, spec.type === 'mage' || !!t.bossOnly),
   ];
   // A Core Golem is immune to its element and to that element's ailments.
   if (t.elemental && spec.variant !== 'none') mods.push(mod(`immune.${spec.variant}`, 'flag', 1));
@@ -293,18 +297,24 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
   for (const id of spec.affix ?? []) mods.push(...affixMonsterMods(id, spec.level));
   // Shrouded: an energy shield shell worth a quarter of its life, which recharges when it is left alone.
   if (spec.mods.includes('shrouded')) mods.push(mod('es', 'base', Math.round(life * 0.25)));
-  if (spec.rarity === 'boss') mods.push(mod('resist.allEle', 'base', 30));
+  if (oldBoss) mods.push(mod('resist.allEle', 'base', 30));
   const db = new ModDB(
     mods.map((x) => ({ ...x, source: { kind: 'monster', id: k } })),
     MONSTER_CONDS,
   );
   const ctx = { tags: 0, ancestry: 0, conds: 0 };
-  const stunThreshMult = spec.rarity === 'boss' ? 4 : spec.rarity === 'miniboss' ? 2 : 1;
+  const stunThreshMult = boss
+    ? boss.stunMult
+    : spec.rarity === 'boss'
+      ? 4
+      : spec.rarity === 'miniboss'
+        ? 2
+        : 1;
   const defence = defenceFromDb(db, ctx, { isPlayer: false, resistPenalty: 0, stunThreshMult });
   const baseHit = monsterHit(sl) * easeDamage(m) * t.dmgMult * r.dmg * share;
   const dmg = baseHit * (t.shape?.mult ?? 1);
   // The Ossuary Regent's crushing swing takes 1.6 s (§12.7).
-  const time = spec.rarity === 'boss' ? BOSS_ATTACK_TIME : t.attackTime;
+  const time = oldBoss ? BOSS_ATTACK_TIME : t.attackTime;
   const profile = skillProfiles(monsterSkill(spec, dmg), db, dmg, time, t.range);
   const side = TYPE_SIDEARMS[spec.type];
   let sidearm: MonsterStats['sidearm'];
@@ -332,7 +342,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
     profile,
     moveSpeed: defence.moveSpeed,
     range: t.range,
-    radius: spec.rarity === 'boss' ? 0.9 : spec.rarity === 'miniboss' ? t.radius * 1.3 : t.radius,
+    radius: oldBoss ? 0.9 : spec.rarity === 'miniboss' ? t.radius * 1.3 : t.radius,
     xp: Math.round(baseXp(m) * r.xp),
     hitCap: defProfile.hitCap,
     kind: t,

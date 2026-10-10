@@ -5,7 +5,10 @@ import { ARCHETYPES, ARCHETYPE_IDS } from './archetypes';
 import { defenceMods, defenceTexts, profileOf } from './defence';
 import { FACTION_NAMES, MONSTER_TYPES, type FactionId, type MonsterTypeId } from './monsters';
 
-const TYPES = Object.keys(MONSTER_TYPES) as MonsterTypeId[];
+// The bosses are not pack monsters and keep no archetype's envelope (docs/BOSSES.md): their cards are their own.
+const TYPES = (Object.keys(MONSTER_TYPES) as MonsterTypeId[]).filter(
+  (id) => !MONSTER_TYPES[id].bossOnly,
+);
 const FACTIONS = Object.keys(FACTION_NAMES) as FactionId[];
 const inside = (v: number, r: readonly [number, number]) => v >= r[0] - 1e-9 && v <= r[1] + 1e-9;
 const spec = (type: MonsterTypeId, level = 30): MonsterSpec => ({

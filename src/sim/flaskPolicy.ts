@@ -1,5 +1,40 @@
 import { STRATEGY_DEFAULTS } from '../data/strategy';
+import { armourReduction } from '../calc/formulas';
+import type { FlaskSpec } from '../calc/flasks';
+import { flasksSealed } from './theft';
 import type { World } from './types';
+
+/** Whether a cleansing flask would clear something on the character now (docs/BOSSES.md 11.2). */
+function cleansNow(w: World, s: FlaskSpec): boolean {
+  const p = w.player;
+  const a = p.ail;
+  return (
+    (s.removeBleed && a.bleeds.length > 0) ||
+    (s.removePoison && a.poisons.length > 0) ||
+    (s.removeIgnite && a.ignites.length > 0) ||
+    (s.removeFreeze && (a.freezeT > 0 || a.chill >= 0.2)) ||
+    (s.removeShock && a.shockT > 0) ||
+    (s.removeCurse && p.hexes.length > 0)
+  );
+}
+
+/**
+ * A blow that cannot be dodged is about to land (a Sentence, docs/BOSSES.md 11.1), and it would take more than the character
+ * has: a life flask now, whatever the threshold.
+ */
+function braceFor(w: World): boolean {
+  const p = w.player;
+  for (const e of w.effects) {
+    if (!e.unavoidable || e.t > 0.6 || e.damage <= 0) continue;
+    const taken =
+      e.dtype === 0
+        ? e.damage *
+          (1 - Math.min(0.9, armourReduction(p.def.armour, e.damage) + p.def.physReduction))
+        : e.damage * (1 - Math.min(p.def.res[e.dtype], p.def.maxRes[e.dtype]) / 100);
+    if (p.life + p.es < taken * 1.15) return true;
+  }
+  return false;
+}
 
 /**
  * Automatic flask use (§6.9). Replaceable later by manual input: the sim asks the policy which
@@ -10,6 +45,9 @@ export type FlaskPolicy = (w: World) => number[];
 export const autoFlaskPolicy: FlaskPolicy = (w) => {
   const p = w.player;
   const out: number[] = [];
+  // The Unmaker holds them (docs/BOSSES.md 9).
+  if (flasksSealed(w)) return out;
+  const brace = w.effects.length > 0 && braceFor(w);
   const cap = Math.max(1, p.def.maxLife - w.char.reservedLife);
   const cost = w.primary.usable ? w.char.profile(w.primary).cost : 0;
   // The thresholds the Strategy tab sets.
@@ -44,7 +82,14 @@ export const autoFlaskPolicy: FlaskPolicy = (w) => {
   w.flasks.forEach((f, i) => {
     if (f.charges < f.spec.perUse) return;
     const k = f.spec.kind;
-    if ((k === 'life' || k === 'hybrid') && !usedLife && !lifeActive && p.life < cap * lifeAt) {
+    // A flask that cleanses is drunk for what it cleanses, as a player would (3.9 cleansing suffixes).
+    const cleanse = f.activeT <= 0 && cleansNow(w, f.spec);
+    if (
+      (k === 'life' || k === 'hybrid') &&
+      !usedLife &&
+      !lifeActive &&
+      (p.life < cap * lifeAt || brace || cleanse)
+    ) {
       out.push(i);
       usedLife = true;
       return;
@@ -54,8 +99,13 @@ export const autoFlaskPolicy: FlaskPolicy = (w) => {
       if (f.activeT <= 0) out.push(i);
       return;
     }
+    if (k === 'mana' && cleanse) {
+      out.push(i);
+      return;
+    }
     if (k === 'utility' && f.activeT <= 0) {
-      if (f.spec.lifeToEs) {
+      if (cleanse) out.push(i);
+      else if (f.spec.lifeToEs) {
         // It leaves you at 1 life for two seconds: drink it early, with a fight coming but no enemy
         // close, at nearly full life, and only if the energy shield can hold what comes back.
         const safe =

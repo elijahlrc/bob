@@ -107,6 +107,18 @@ export const TYPE_BLURBS: Record<MonsterTypeId, string> = {
     'A molten brute that slams the ground, gathers speed and leaves burning ground behind it.',
   pyrepriest: 'Keeps its distance and sets fire to the ground where you stand.',
   slagworm: 'Sinks out of sight and comes up under you in a ring of fire.',
+  tollkeeper:
+    'Tolls its bell every ten seconds, and every toll makes it stronger. Stun it in the swing to stop the toll.',
+  courser:
+    'Never stops: circles you at a canter, striking as it passes, then gallops off in lanes of fire.',
+  magistrate:
+    'Passes a Sentence every fifteen seconds that cannot be dodged; its Witnesses make it heavier.',
+  witness: "Weighs the Magistrate's Sentence and curses you while it stands.",
+  prismWarden:
+    'Attunes to fire, cold and lightning in turn, and is immune to the element it holds.',
+  rotwife: 'Every blow carries a different ailment; she regrows unless something is eating at her.',
+  unmaker: 'Steals the best part of your build and wears it; break the shard to take it back.',
+  shard: 'A piece of you, held by the Unmaker. Breaking it returns it.',
   tidecaller:
     'A drifting shade with a hook: marks a line, and drags what stands in it toward itself.',
   wrack: 'A sodden, heavy corpse that lurches in and swings in a wide arc; its blows slow you.',

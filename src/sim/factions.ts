@@ -8,6 +8,7 @@ import { monsterHitOf, rawHit } from './combat';
 import { rally } from './packs';
 import { monsterHexesPlayer } from './hexes';
 import { encDamageMult, encMoveMult, onEncounterDeath } from './encounters';
+import { flaskWards } from './afflict';
 import type { Actor, GroundEffect, World } from './types';
 import { spawnMonster } from './world';
 
@@ -102,7 +103,7 @@ export function damageMult(a: Actor): number {
 }
 
 /** The level of a hex a monster casts: it rises with the area level, one step every five levels. */
-function monsterHexEffect(w: World, id: HexId): number {
+export function monsterHexEffect(w: World, id: HexId): number {
   return hexEffect(id, Math.max(1, Math.min(20, Math.floor(w.plan.areaLevel / 5) + 1)));
 }
 
@@ -369,6 +370,15 @@ export function tickCorpses(w: World, dt: number): void {
   w.corpses.length = j;
 }
 
+/** Whether a chilling or shocking zone leaves this actor alone (docs/BOSSES.md 11.2). */
+function zoneWarded(w: World, a: Actor, kind: 'chill' | 'shock'): boolean {
+  const d = a.def;
+  if (d.immuneAilments || d.avoid[kind] >= 1) return true;
+  if (kind === 'chill')
+    return d.cannotBeChilled || d.immune[2] || (a.isPlayer && flaskWards(w, 'freeze'));
+  return d.immune[1] || d.unaffectedByShock || (a.isPlayer && flaskWards(w, 'shock'));
+}
+
 /** Lasting zones hurt the player and the player's minions standing in them, in pulses. */
 export function tickZones(w: World, dt: number): void {
   const p = w.player;
@@ -390,10 +400,11 @@ export function tickZones(w: World, dt: number): void {
     for (const m of w.minions) if (inside(m)) caught.push(m);
     if (caught.length === 0) continue;
     for (const a of caught) {
-      if (e.kind === 'chilling' && !a.def.cannotBeChilled) {
+      // Ground that chills or shocks does nothing to what cannot be (an immunity, a cleansing flask running).
+      if (e.kind === 'chilling' && !zoneWarded(w, a, 'chill')) {
         a.ail.chill = Math.max(a.ail.chill, 0.3);
         a.ail.chillT = Math.max(a.ail.chillT, 0.5);
-      } else if (e.kind === 'shocking') {
+      } else if (e.kind === 'shocking' && !zoneWarded(w, a, 'shock')) {
         a.ail.shock = Math.max(a.ail.shock, 0.2);
         a.ail.shockT = Math.max(a.ail.shockT, 0.5);
       }

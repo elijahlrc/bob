@@ -50,6 +50,14 @@ export const SCALE_OF: Record<FigureKind, number> = {
   chest: 1,
   worm: 1.1,
   slag: 1.25,
+  tollkeeper: 2.2,
+  courser: 1.8,
+  magistrate: 1.95,
+  witness: 0.95,
+  prism: 2.0,
+  rotwife: 2.1,
+  unmaker: 2.3,
+  shard: 0.8,
   hero_mace: 1.05,
   hero_sword: 1,
   hero_bow: 1,
@@ -223,9 +231,32 @@ export type MonsterLook = {
   stance?: Stance;
 };
 
-/** The palette of a monster: its faction's, with the element as an accent. */
-export function monsterPalette(look: Pick<MonsterLook, 'faction' | 'variant'>): Record<Role, RGB> {
-  const pal: Record<Role, RGB> = { ...UNDEAD, ...FACTION_PALETTE[look.faction] };
+/** The bosses that are not painted in their faction's colours (docs/BOSSES.md): crystal, and a hole in the world. */
+const TYPE_PALETTE: Partial<Record<MonsterTypeId, Partial<Record<Role, RGB>>>> = {
+  prismWarden: {
+    metal: hex(0xd8f0ff),
+    metalShade: hex(0x7a98b8),
+    glow: hex(0xe8f8ff),
+    eye: hex(0xffffff),
+  },
+  unmaker: {
+    dark: hex(0x07060a),
+    glow: hex(0xe8e4f4),
+    eye: hex(0xf4f0ff),
+  },
+  shard: { glow: hex(0xf0ecff), metal: hex(0xb0a8d0), eye: hex(0xffffff) },
+  tollkeeper: { metal: hex(0xc89a50), metalShade: hex(0x8a6430) },
+};
+
+/** The palette of a monster: its faction's (or its own, for some bosses), with the element as an accent. */
+export function monsterPalette(
+  look: Pick<MonsterLook, 'faction' | 'variant'> & { type?: MonsterTypeId },
+): Record<Role, RGB> {
+  const pal: Record<Role, RGB> = {
+    ...UNDEAD,
+    ...FACTION_PALETTE[look.faction],
+    ...(look.type ? TYPE_PALETTE[look.type] : undefined),
+  };
   if (look.variant !== 'none') {
     const e = ELEMENT_ACCENT[look.variant];
     pal.eye = e.eye;

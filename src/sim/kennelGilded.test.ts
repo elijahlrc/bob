@@ -49,7 +49,7 @@ describe('the Kennel and the Gilded as data (docs/ENEMIES.md 7.4)', () => {
     for (const f of ['kennel', 'gilded'] as const) {
       // The Gilded gained the Lurking Coffer (docs/ROSTER.md 7.1), which is not a person's trick but a chest's.
       const types = Object.values(MONSTER_TYPES).filter(
-        (t) => t.faction === f && t.id !== 'coffer',
+        (t) => t.faction === f && t.id !== 'coffer' && !t.bossOnly,
       );
       expect(types).toHaveLength(4);
       for (const t of types) expect(t.innate).toBe(true);

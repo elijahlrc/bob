@@ -47,6 +47,7 @@ function typesWithRole(faction: FactionId, role: Role, level = Infinity): Monste
   return (Object.keys(MONSTER_TYPES) as MonsterTypeId[]).filter(
     (id) =>
       MONSTER_TYPES[id].faction === faction &&
+      !MONSTER_TYPES[id].bossOnly &&
       MONSTER_TYPES[id].role === role &&
       (MONSTER_TYPES[id].minLevel ?? 0) <= level,
   );
@@ -76,7 +77,10 @@ export function pickByRole(
   if (!pool.length) pool = typesWithRole(faction, 'front', level);
   if (!pool.length)
     pool = (Object.keys(MONSTER_TYPES) as MonsterTypeId[]).filter(
-      (id) => MONSTER_TYPES[id].faction === faction && (MONSTER_TYPES[id].minLevel ?? 0) <= level,
+      (id) =>
+        MONSTER_TYPES[id].faction === faction &&
+        !MONSTER_TYPES[id].bossOnly &&
+        (MONSTER_TYPES[id].minLevel ?? 0) <= level,
     );
   return weightedType(rng, theme, pool);
 }
@@ -162,7 +166,10 @@ export function templateRoles(
 function pickAny(rng: Rng, theme: ThemeMix, faction: FactionId): MonsterTypeId {
   const level = theme.level ?? Infinity;
   const pool = (Object.keys(MONSTER_TYPES) as MonsterTypeId[]).filter(
-    (id) => MONSTER_TYPES[id].faction === faction && (MONSTER_TYPES[id].minLevel ?? 0) <= level,
+    (id) =>
+      MONSTER_TYPES[id].faction === faction &&
+      !MONSTER_TYPES[id].bossOnly &&
+      (MONSTER_TYPES[id].minLevel ?? 0) <= level,
   );
   return weightedType(rng, theme, pool);
 }

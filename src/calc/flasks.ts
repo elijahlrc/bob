@@ -16,9 +16,13 @@ export type FlaskSpec = {
   instant: boolean;
   /** Mods granted while the flask is active (utility buffs and "during effect" affixes). */
   buff: Mod[];
+  /** Cleansing: removes the ailment on use, and keeps it off while the flask runs (3.9's suffixes). */
   removeIgnite: boolean;
   removeFreeze: boolean;
   removeBleed: boolean;
+  removePoison: boolean;
+  removeShock: boolean;
+  removeCurse: boolean;
   /** On use, all but 1 life returns as energy shield over a short time (the Martyr's Draught). */
   lifeToEs: boolean;
 };
@@ -68,6 +72,9 @@ export function flaskSpec(f: FlaskItem, charDb: ModDB): FlaskSpec {
     removeIgnite: local.flag('removeIgnite'),
     removeFreeze: local.flag('removeFreeze'),
     removeBleed: local.flag('removeBleed'),
+    removePoison: local.flag('removePoison'),
+    removeShock: local.flag('removeShock'),
+    removeCurse: local.flag('removeCurse'),
     lifeToEs: local.flag('flask.lifeToEs'),
   };
 }

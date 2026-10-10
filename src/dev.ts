@@ -1,6 +1,7 @@
 import type Phaser from 'phaser';
 import { Rng } from './core/rng';
 import { MONSTER_TYPES, type MonsterTypeId } from './data/monsters';
+import { BOSSES, type BossId } from './data/bosses';
 import { spawnMonster } from './sim/world';
 import { ITEM_BASES } from './data/bases';
 import type { InventoryItem } from './data/types';
@@ -146,6 +147,61 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
       controller.setSpeed(0);
       await dev.step(1);
       return n >= (opts.max ?? 600) ? -1 : n;
+    },
+    /**
+     * Stage a boss of docs/BOSSES.md against the showcase character: everything else is cleared, the boss stands `dist`
+     * tiles off and fights. The character is deathless unless `mortal`. Returns the frames stepped (until `until`, if set).
+     */
+    async fight(
+      id: BossId,
+      opts: {
+        level?: number;
+        dist?: number;
+        mortal?: boolean;
+        until?: (w: NonNullable<Controller['world']>) => boolean;
+        max?: number;
+      } = {},
+    ): Promise<number> {
+      controller.startShowcase(false);
+      controller.setSpeed(1);
+      await dev.step(5);
+      const w = controller.world;
+      if (!w) return -1;
+      w.opts.godMode = !opts.mortal;
+      for (const a of w.actors) if (!a.isPlayer) a.alive = false;
+      const p = w.player;
+      const ang = Math.atan2(w.plan.lab.exit.y - p.y, w.plan.lab.exit.x - p.x);
+      const spot = w.grid.collide(
+        p.x + Math.cos(ang) * (opts.dist ?? 6),
+        p.y + Math.sin(ang) * (opts.dist ?? 6),
+        0.9,
+      );
+      const def = BOSSES[id];
+      const room = w.plan.lab.rooms.findIndex(
+        (r) =>
+          spot.x >= r.rect.x &&
+          spot.x < r.rect.x + r.rect.w &&
+          spot.y >= r.rect.y &&
+          spot.y < r.rect.y + r.rect.h,
+      );
+      const spec = {
+        type: def.type,
+        variant: 'none' as const,
+        rarity: 'boss' as const,
+        level: opts.level ?? def.map,
+        mods: id === 'magistrate' ? (['hexWarded'] as const).slice() : [],
+      };
+      const m = spawnMonster(w, spec, spot.x, spot.y, Math.max(0, room), 999, def.name);
+      m.state = 'chase';
+      let n = 0;
+      for (; n < (opts.max ?? (opts.until ? 1800 : 30)); n++) {
+        game.step(performance.now(), 16.7);
+        if (opts.until?.(w)) break;
+        if (n % 30 === 0) await sleep(0);
+      }
+      if (opts.until) controller.setSpeed(0);
+      await dev.step(1);
+      return n;
     },
     /** Put `n` random items, gems and flasks in the camp inventory (for looking at the Items screen). */
     loot(n = 30, ilvl = 20): number {

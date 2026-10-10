@@ -4,6 +4,8 @@ import { affixesConflict, affixReward, MAP_AFFIXES, mapAffixDef } from '../data/
 import { CRAWL_SEGMENTS, mapTypeDef, THRONG_AFFIX, type MapTypeId } from '../data/mapTypes';
 import { themeDef, type ThemeDef } from '../data/themes';
 import { generateArena } from './arena';
+import { attachArena } from './bossArena';
+import { BOSSES, bossForMap } from '../data/bosses';
 import { generateLabyrinth, type Labyrinth } from './labyrinth';
 import { populate, type EndKind, type Population } from './population';
 
@@ -38,8 +40,12 @@ export function resistPenaltyForMap(n: number): number {
   return n <= 30 ? 0 : n <= 60 ? 30 : 60;
 }
 
+/**
+ * How a map ends: a boss on the boss maps (docs/BOSSES.md: 10, 30, 50, 70, 90 and 100), the theme's champion on the other
+ * tenth maps, a rare otherwise.
+ */
 export function endKindForMap(n: number): EndKind {
-  return n === 100 ? 'boss' : n % 10 === 0 ? 'miniboss' : 'rare';
+  return bossForMap(n) ? 'boss' : n % 10 === 0 ? 'miniboss' : 'rare';
 }
 
 /** How many affixes a map carries, by map number (docs/MAPS.md 6.1): none on the first four maps, then more as the run goes on. */
@@ -89,10 +95,13 @@ export function makeMapPlan(
   const sideBranches = type === 'quarry' || type === 'collapse' || crawl ? 0 : drawn;
   // A Crawl's maps are short: three rooms, and the last of the three ends on a mini-boss.
   const rooms = type === 'quarry' ? 4 : crawl ? 3 : roomsForMap(map);
-  const lab =
-    type === 'holdout' ? generateArena() : generateLabyrinth(genRng, { rooms, sideBranches });
   const theme = themeDef(themeId);
   const endKind = crawl && segment === CRAWL_SEGMENTS - 1 ? 'miniboss' : endKindForMap(map);
+  // A boss is fought in an arena past the last room (docs/BOSSES.md 12).
+  const boss = endKind === 'boss' ? bossForMap(map) : null;
+  const maze =
+    type === 'holdout' ? generateArena() : generateLabyrinth(genRng, { rooms, sideBranches });
+  const lab = boss ? attachArena(maze) : maze;
   const xpMult =
     theme.xpMult *
     (1 +
@@ -108,6 +117,7 @@ export function makeMapPlan(
     type,
     difficulty,
     mapNoise,
+    boss: boss ? BOSSES[boss].type : undefined,
   });
   return {
     seed,

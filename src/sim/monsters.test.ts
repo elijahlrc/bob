@@ -164,15 +164,13 @@ describe('population (§10.3)', () => {
     expect(late.magic).toBeGreaterThan(early.magic);
   });
 
-  it('mini-bosses every 10th map, the unique boss on map 100', () => {
+  it('mini-bosses on the tenth maps between the bosses, and the Unmaker on map 100 (docs/BOSSES.md)', () => {
     expect(
-      makeMapPlan(1, 10, 'ashenCrypt').pop.monsters.some((m) => m.spec.rarity === 'miniboss'),
+      makeMapPlan(1, 20, 'ashenCrypt').pop.monsters.some((m) => m.spec.rarity === 'miniboss'),
     ).toBe(true);
     const p100 = makeMapPlan(1, 100, 'ashenCrypt');
     expect(p100.pop.monsters.filter((m) => m.spec.rarity === 'boss')).toHaveLength(1);
-    expect(p100.pop.monsters.find((m) => m.spec.rarity === 'boss')!.name).toBe(
-      'the Ossuary Regent',
-    );
+    expect(p100.pop.monsters.find((m) => m.spec.rarity === 'boss')!.name).toBe('the Unmaker');
   });
 
   it('themes bias elements and types', () => {
@@ -247,27 +245,5 @@ describe('monster behaviours in the sim (§12.5, §12.7)', () => {
     m.dummy = true;
     stepWorld(w);
     expect(w.player.ail.chill).toBeCloseTo(0.15);
-  });
-
-  it('the Ossuary Regent slams and raises the dead at 75/50/25% life', () => {
-    const w = arena();
-    const boss = spawnMonster(
-      w,
-      spec({ rarity: 'boss', level: 30 }),
-      w.player.x + 6,
-      w.player.y,
-      0,
-      9,
-      'the Ossuary Regent',
-    );
-    boss.state = 'chase';
-    boss.dummy = true;
-    for (let i = 0; i < 60 * 8; i++) stepWorld(w);
-    expect(
-      w.effects.some((e) => e.kind === 'slam') || w.events.some((e) => e.t === 'explode'),
-    ).toBe(true);
-    boss.life = boss.def.maxLife * 0.49;
-    stepWorld(w);
-    expect(w.actors.filter((a) => a.summonedBy === boss.id)).toHaveLength(8);
   });
 });

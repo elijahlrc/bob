@@ -132,9 +132,14 @@ export const STAT_TEXT: Record<string, StatText> = {
   cannotBeChilled: { flag: 'Cannot be Chilled' },
   cannotBeFrozen: { flag: 'Cannot be Frozen' },
   alwaysFreezeOnCrit: { flag: 'Always Freeze on Critical Strike' },
-  removeIgnite: { flag: 'Removes Burning on use' },
-  removeFreeze: { flag: 'Removes Freeze and Chill on use' },
-  removeBleed: { flag: 'Removes Bleeding on use' },
+  removeIgnite: { flag: 'Removes Burning on use; Immunity to Ignite during Flask effect' },
+  removeFreeze: {
+    flag: 'Removes Freeze and Chill on use; Immunity to Freeze and Chill during Flask effect',
+  },
+  removeBleed: { flag: 'Removes Bleeding on use; Immunity to Bleeding during Flask effect' },
+  removePoison: { flag: 'Removes Poison on use; Immunity to Poison during Flask effect' },
+  removeShock: { flag: 'Removes Shock on use; Immunity to Shock during Flask effect' },
+  removeCurse: { flag: 'Removes Curses on use; Immunity to Curses during Flask effect' },
 };
 
 export const CONDITION_TEXT: Record<string, string> = {

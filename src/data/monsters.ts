@@ -65,7 +65,16 @@ export type MonsterTypeId =
   | 'cinderling'
   | 'slagbrute'
   | 'pyrepriest'
-  | 'slagworm';
+  | 'slagworm'
+  // The bosses and what they bring (docs/BOSSES.md): never met in packs.
+  | 'tollkeeper'
+  | 'courser'
+  | 'magistrate'
+  | 'witness'
+  | 'prismWarden'
+  | 'rotwife'
+  | 'unmaker'
+  | 'shard';
 
 /** The monster families (EXPANSION 7.3). The Choir, the Swarm and the Reliquary join in later milestones. */
 export type FactionId =
@@ -120,7 +129,16 @@ export type BodyKind =
   | 'spider'
   | 'chest'
   | 'worm'
-  | 'slag';
+  | 'slag'
+  // The bosses (docs/BOSSES.md).
+  | 'tollkeeper'
+  | 'courser'
+  | 'magistrate'
+  | 'witness'
+  | 'prism'
+  | 'rotwife'
+  | 'unmaker'
+  | 'shard';
 
 /**
  * The pose family of an attack (docs/ROSTER.md 4.3): how the body moves when it strikes, apart from which rig it is. A type
@@ -184,6 +202,11 @@ export type MonsterTypeDef = {
   noAttack?: boolean;
   /** Moves over walls, though it still needs line of sight to shoot. */
   flies?: boolean;
+  /**
+   * A boss or a boss's own creature (docs/BOSSES.md): never rolled for a pack, its defences are its own (not its faction's),
+   * and the flat boss bonuses do not apply to it (its card says everything).
+   */
+  bossOnly?: true;
   lifeMult: number;
   dmgMult: number;
   /** Attack reach (melee) or preferred range (ranged), tiles. */
@@ -1171,7 +1194,169 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     radius: 0.55,
     mods: [mod('convert.physical.fire', 'base', 100)],
   },
+  // The bosses (docs/BOSSES.md). Their life is the boss rarity's times `lifeMult`; their fights are `sim/bosses.ts`.
+  tollkeeper: {
+    id: 'tollkeeper',
+    role: 'front',
+    name: 'the Tollkeeper',
+    faction: 'choir',
+    body: 'tollkeeper',
+    archetype: 'bruiser',
+    defence: { armour: 150, res: { lightning: 30, cold: -30 } },
+    shape: { id: 'swing', arc: 120, radius: 2.2, lock: 0.35 },
+    bossOnly: true,
+    noBody: true,
+    lifeMult: 0.4,
+    dmgMult: 0.8,
+    range: 1.6,
+    attack: 'melee',
+    speed: 2.2,
+    attackTime: 1.5,
+    radius: 0.8,
+    mods: [],
+  },
+  courser: {
+    id: 'courser',
+    role: 'front',
+    name: 'the Courser',
+    faction: 'emberborn',
+    body: 'courser',
+    archetype: 'hunter',
+    defence: { evasion: 100, res: { fire: 40, cold: -25 } },
+    bossOnly: true,
+    noBody: true,
+    lifeMult: 0.4,
+    dmgMult: 0.55,
+    range: 1.4,
+    attack: 'melee',
+    speed: 6,
+    attackTime: 0.9,
+    radius: 0.7,
+    mods: [mod('convert.physical.fire', 'base', 70)],
+  },
+  magistrate: {
+    id: 'magistrate',
+    role: 'front',
+    name: 'the Magistrate',
+    faction: 'gilded',
+    body: 'magistrate',
+    archetype: 'bruiser',
+    defence: { res: { lightning: -25 } },
+    shape: { id: 'swing', arc: 100, radius: 2.4, lock: 0.35 },
+    bossOnly: true,
+    noBody: true,
+    lifeMult: 0.45,
+    dmgMult: 0.7,
+    range: 1.8,
+    attack: 'melee',
+    speed: 2.4,
+    attackTime: 1.6,
+    radius: 0.85,
+    mods: [mod('blockSpell', 'base', 25)],
+  },
+  witness: {
+    id: 'witness',
+    role: 'support',
+    name: 'Witness',
+    faction: 'gilded',
+    body: 'witness',
+    archetype: 'support',
+    bossOnly: true,
+    stationary: true,
+    noAttack: true,
+    noBody: true,
+    lifeMult: 2.5,
+    dmgMult: 0,
+    range: 0,
+    attack: 'melee',
+    speed: 0,
+    attackTime: 1,
+    radius: 0.45,
+    mods: [],
+  },
+  prismWarden: {
+    id: 'prismWarden',
+    role: 'front',
+    name: 'the Prism Warden',
+    faction: 'reliquary',
+    body: 'prism',
+    archetype: 'artillery',
+    defence: { es: 0.5 },
+    bossOnly: true,
+    noBody: true,
+    lifeMult: 0.45,
+    dmgMult: 0.6,
+    range: 7,
+    attack: 'spell',
+    speed: 2.4,
+    attackTime: 1.3,
+    radius: 0.85,
+    mods: [],
+  },
+  rotwife: {
+    id: 'rotwife',
+    role: 'front',
+    name: 'the Rotwife',
+    faction: 'rot',
+    body: 'rotwife',
+    archetype: 'brawler',
+    defence: { res: { chaos: 25, fire: -25 } },
+    bossOnly: true,
+    noBody: true,
+    lifeMult: 0.45,
+    dmgMult: 0.6,
+    range: 1.5,
+    attack: 'melee',
+    speed: 2.6,
+    attackTime: 1.2,
+    radius: 0.85,
+    mods: [mod('convert.physical.chaos', 'base', 40)],
+  },
+  unmaker: {
+    id: 'unmaker',
+    role: 'front',
+    name: 'the Unmaker',
+    faction: 'ossuary',
+    body: 'unmaker',
+    archetype: 'bruiser',
+    defence: { hitCap: 0.1, immune: ['stun'] },
+    bossOnly: true,
+    noBody: true,
+    style: 'flesh',
+    lifeMult: 0.5,
+    dmgMult: 0.7,
+    range: 1.8,
+    attack: 'melee',
+    speed: 3,
+    attackTime: 1.3,
+    radius: 0.9,
+    mods: [],
+  },
+  shard: {
+    id: 'shard',
+    role: 'support',
+    name: 'Stolen shard',
+    faction: 'ossuary',
+    body: 'shard',
+    archetype: 'support',
+    bossOnly: true,
+    noAttack: true,
+    flies: true,
+    noBody: true,
+    style: 'flesh',
+    lifeMult: 1,
+    dmgMult: 0,
+    range: 0,
+    attack: 'melee',
+    speed: 0,
+    attackTime: 1,
+    radius: 0.4,
+    mods: [],
+  },
 };
+
+/** Whether a type is a boss or a boss's own creature, never met in a pack (docs/BOSSES.md). */
+export const isBossType = (type: MonsterTypeId): boolean => !!MONSTER_TYPES[type].bossOnly;
 
 /** Faction mods (EXPANSION 7.3): on every monster of the faction. */
 /** Faction-wide mods that are not defences (the Hollow's ethereal rule is in `FACTION_DEFENCE`). */

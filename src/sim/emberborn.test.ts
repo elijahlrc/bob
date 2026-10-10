@@ -56,7 +56,9 @@ const run = (w: World, seconds: number) => {
 describe('the Emberborn as data (docs/ROSTER.md 7.3)', () => {
   it('is a faction with four types of fire, a place in the offers, an essence and tablets', () => {
     expect(FACTION_NAMES.emberborn).toBe('the Emberborn');
-    const types = Object.values(MONSTER_TYPES).filter((t) => t.faction === 'emberborn');
+    const types = Object.values(MONSTER_TYPES).filter(
+      (t) => t.faction === 'emberborn' && !t.bossOnly,
+    );
     expect(types.map((t) => t.id).sort()).toEqual([
       'cinderling',
       'pyrepriest',

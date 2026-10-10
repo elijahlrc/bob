@@ -55,9 +55,10 @@ describe('map schedule (§5.3)', () => {
     expect(roomsForMap(25)).toBe(5);
     expect(roomsForMap(100)).toBe(9);
     expect([1, 30, 31, 60, 61, 100].map(resistPenaltyForMap)).toEqual([0, 0, 30, 30, 60, 60]);
+    // The bosses end maps 10, 30, 50, 70, 90 and 100; the other tenth maps keep their champions (docs/BOSSES.md).
     expect([5, 10, 20, 99, 100].map(endKindForMap)).toEqual([
       'rare',
-      'miniboss',
+      'boss',
       'miniboss',
       'rare',
       'boss',

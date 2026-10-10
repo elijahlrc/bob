@@ -246,7 +246,7 @@ describe('hexes in the sim (EXPANSION 5.7)', () => {
 
 describe('the Ashen Choir (EXPANSION 7.3)', () => {
   it('has five types, is offered from map 15, and its mini-boss is the Precentor', () => {
-    const types = Object.values(MONSTER_TYPES).filter((t) => t.faction === 'choir');
+    const types = Object.values(MONSTER_TYPES).filter((t) => t.faction === 'choir' && !t.bossOnly);
     expect(types.map((t) => t.id).sort()).toEqual([
       'bell',
       'censer',

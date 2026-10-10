@@ -99,12 +99,21 @@ export const TYPE_WEIGHTS: Record<MonsterTypeId, number> = {
   slagbrute: 28,
   pyrepriest: 16,
   slagworm: 12,
+  // The bosses and their creatures are placed by the boss maps, never rolled (docs/BOSSES.md).
+  tollkeeper: 0,
+  courser: 0,
+  magistrate: 0,
+  witness: 0,
+  prismWarden: 0,
+  rotwife: 0,
+  unmaker: 0,
+  shard: 0,
 };
 
 /** Whether the faction has any type that can appear on a map of this level (a faction's types all have a first level). */
 export function factionHasTypes(faction: FactionId, level = Infinity): boolean {
   return Object.values(MONSTER_TYPES).some(
-    (t) => t.faction === faction && (t.minLevel ?? 0) <= level,
+    (t) => t.faction === faction && !t.bossOnly && (t.minLevel ?? 0) <= level,
   );
 }
 
@@ -132,7 +141,10 @@ export function typeShares(
   const out: [MonsterTypeId, number][] = [];
   for (const [fac, fw] of factions) {
     const types = (Object.keys(TYPE_WEIGHTS) as MonsterTypeId[]).filter(
-      (id) => MONSTER_TYPES[id].faction === fac && (MONSTER_TYPES[id].minLevel ?? 0) <= level,
+      (id) =>
+        MONSTER_TYPES[id].faction === fac &&
+        !MONSTER_TYPES[id].bossOnly &&
+        (MONSTER_TYPES[id].minLevel ?? 0) <= level,
     );
     const w = (id: MonsterTypeId) => TYPE_WEIGHTS[id] * (theme.typeWeights[id] ?? 1);
     const tTotal = types.reduce((a, id) => a + w(id), 0);
@@ -221,7 +233,8 @@ export function rareName(rng: Rng): string {
 }
 
 export function monsterName(spec: MonsterSpec, rng: Rng): string {
-  if (spec.rarity === 'boss') return BOSS_NAME;
+  if (spec.rarity === 'boss')
+    return MONSTER_TYPES[spec.type].bossOnly ? MONSTER_TYPES[spec.type].name : BOSS_NAME;
   const champion = spec.mods.find((m) => monsterModDef(m).chief);
   if (champion) return monsterModDef(champion).name;
   if (spec.rarity === 'rare' || spec.rarity === 'miniboss') return rareName(rng);
@@ -260,6 +273,8 @@ export type PopulateOpts = {
   difficulty?: Difficulty;
   /** The map's own draw in [-1, 1] (`offerNoise`), the shared part of the variance. */
   mapNoise?: number;
+  /** The boss's type, on a boss map (docs/BOSSES.md): it stands alone in the arena. */
+  boss?: MonsterTypeId;
 };
 
 /**
@@ -432,19 +447,18 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
         const ps = spots(rng, lab, room, 1 + rng.int(1, 2));
         ps.forEach((p, i) => add(room, i === 0 ? champion() : normal(), p));
       } else if (opts.endKind === 'boss') {
+        // A boss stands alone in the middle of its arena (docs/BOSSES.md 12): what it brings, it brings itself. The
+        // Magistrate is hex-warded ("the court admits no magic").
+        const type = opts.boss ?? 'unmaker';
         const spec: MonsterSpec = {
-          type: 'warrior',
+          type,
           variant: 'none',
           rarity: 'boss',
           level,
-          mods: [],
+          mods: type === 'magistrate' ? ['hexWarded'] : [],
           ...affixField,
         };
         add(room, spec, { x: room.cx + 0.5, y: room.cy + 0.5 });
-        // The Regent's escort is made of the map's own monsters (docs/ENEMIES.md 4.2, rule 6).
-        const guard = spots(rng, lab, room, 3);
-        const gt = packTypes(rng, mix, guard.length, throng);
-        guard.forEach((p, i) => add(room, normal('normal', gt[i]), p));
       } else {
         let leader: MonsterSpec = opts.endKind === 'miniboss' ? normal('miniboss') : normal('rare');
         // The mini-boss of a faction's own theme is its champion.

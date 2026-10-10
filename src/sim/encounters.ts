@@ -17,6 +17,15 @@ import { castPattern } from './blasts';
 import { startCharge } from './abilities';
 import { blinkBehind, openZone } from './factions';
 import { monsterConds, monsterHitOf, rawHit } from './combat';
+import {
+  bossDamageMult,
+  bossDeath,
+  bossNoteTaken,
+  bossSpeedMult,
+  bossTaken,
+  initBoss,
+  tickBoss,
+} from './bosses';
 import type { Action, Actor, EncState, World } from './types';
 
 /**
@@ -40,7 +49,8 @@ const sanctuaries = new WeakMap<World, Actor[]>();
 /** Give a new monster its encounter state, with the first sidearm and window a random part of their time away. */
 export function initEncounter(w: World, a: Actor): void {
   const type = a.mon?.spec.type;
-  if (!type || (!hasEncounter(type) && !a.modIds.includes('adaptive'))) return;
+  const boss = !!a.mon?.kind.bossOnly;
+  if (!type || (!hasEncounter(type) && !a.modIds.includes('adaptive') && !boss)) return;
   const side = a.mon!.sidearm?.spec;
   const win = TYPE_WINDOWS[type];
   const enc: EncState = {
@@ -67,6 +77,8 @@ export function initEncounter(w: World, a: Actor): void {
     wasStunned: false,
   };
   a.enc = enc;
+  // A boss keeps its fight beside this (docs/BOSSES.md).
+  if (boss) initBoss(w, a);
 }
 
 /**
@@ -148,6 +160,7 @@ export function tickEncounter(w: World, m: Actor, dt: number): void {
   if (!e || !m.mon) return;
   const type = m.mon.spec.type;
   const p = w.player;
+  if (m.mon.kind.bossOnly) tickBoss(w, m, dt);
   e.burst *= Math.exp(-dt / BURST_TAU);
   e.hits *= Math.exp(-dt / HITS_TAU);
   e.calmT += dt;
@@ -336,6 +349,7 @@ export function modeTaken(w: World, dst: Actor, dmg: number[]): void {
   const e = dst.enc;
   if (!e || !dst.mon) return;
   const type = dst.mon.spec.type;
+  if (dst.rarity === 'boss') bossTaken(dst, dmg);
   if (e.vulnT > 0 || e.ventT > 0) {
     const t = 1 + (modeOf(type, e.ventT > 0 ? 'coreVent' : 'brokenGuard')?.taken ?? 0.5);
     for (let i = 0; i < 5; i++) dmg[i] *= t;
@@ -369,6 +383,7 @@ export function noteTaken(w: World, m: Actor, dmg: number[]): void {
   }
   e.burst += total / max;
   e.hits += 1;
+  if (m.rarity === 'boss') bossNoteTaken(m, dmg);
   const fade = modeOf(type, 'fade');
   if (fade && !e.fading && e.modeCd <= 0 && e.burst >= (fade.share ?? 0.25)) {
     e.fading = true;
@@ -440,13 +455,15 @@ export function noteDevoured(w: World, m: Actor): void {
 /** What the modes do to a monster's damage (Molten) and pace (Quench, Gorged). */
 export function encDamageMult(m: Actor): number {
   const e = m.enc;
-  if (!e || e.molten === 0) return 1;
-  return 1 + e.molten * (modeOf(m.mon!.spec.type, 'molten')?.step ?? 0.12);
+  if (!e) return 1;
+  const boss = m.rarity === 'boss' ? bossDamageMult(m) : 1;
+  if (e.molten === 0) return boss;
+  return boss * (1 + e.molten * (modeOf(m.mon!.spec.type, 'molten')?.step ?? 0.12));
 }
 export function encMoveMult(m: Actor): number {
   const e = m.enc;
   if (!e) return 1;
-  let k = 1;
+  let k = m.rarity === 'boss' ? bossSpeedMult(m) : 1;
   if (e.done & DONE_QUENCH) k *= 1 - (modeOf(m.mon!.spec.type, 'quench')?.slow ?? 0.5);
   if (e.gorgedT > 0) k *= 1 - (modeOf(m.mon!.spec.type, 'gorged')?.slow ?? 0.3);
   return k;
@@ -457,6 +474,7 @@ export const quenched = (m: Actor): boolean => !!m.enc && (m.enc.done & DONE_QUE
 /** A monster with encounter state dies: a swollen Gorger bursts, a chant stops, a Wailer near grieves. */
 export function onEncounterDeath(w: World, a: Actor): void {
   const e = a.enc;
+  if (a.mon?.kind.bossOnly) bossDeath(w, a);
   if (e?.gorgedT && e.gorgedT > 0) openZone(w, a.x, a.y, 2.2, 4, 'caustic', monsterHitOf(a) * 0.4);
   if (e && e.ritesT > 0) cancelRites(w, a);
   if (e) closeWindow(w, a);

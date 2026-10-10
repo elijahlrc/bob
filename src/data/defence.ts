@@ -61,9 +61,15 @@ export const FACTION_DEFENCE: Partial<Record<FactionId, DefenceProfile>> = {
 const add = (a: number | undefined, b: number | undefined): number | undefined =>
   a === undefined && b === undefined ? undefined : (a ?? 0) + (b ?? 0);
 
-/** A type's whole profile: its faction's, with its own on top (numbers add, immunities join, a carapace takes the lower). */
-export function profileOf(faction: FactionId, own: DefenceProfile | undefined): DefenceProfile {
-  const f = FACTION_DEFENCE[faction] ?? {};
+/**
+ * A type's whole profile: its faction's, with its own on top (numbers add, immunities join, a carapace takes the lower). A
+ * faction of null is none (a boss's profile is its own: docs/BOSSES.md).
+ */
+export function profileOf(
+  faction: FactionId | null,
+  own: DefenceProfile | undefined,
+): DefenceProfile {
+  const f = (faction && FACTION_DEFENCE[faction]) || {};
   const o = own ?? {};
   const res: Partial<Record<Element, number>> = { ...f.res };
   for (const [k, v] of Object.entries(o.res ?? {}) as [Element, number][])
@@ -81,6 +87,15 @@ export function profileOf(faction: FactionId, own: DefenceProfile | undefined): 
     hitCap: caps.length ? Math.min(...caps) : undefined,
     stun: add(f.stun, o.stun),
   };
+}
+
+/** A monster type's profile: its faction's and its own, or only its own for a boss (docs/BOSSES.md). */
+export function typeProfile(t: {
+  faction: FactionId;
+  defence?: DefenceProfile;
+  bossOnly?: true;
+}): DefenceProfile {
+  return profileOf(t.bossOnly ? null : t.faction, t.defence);
 }
 
 /** The mods that give a monster of `life` this profile. */

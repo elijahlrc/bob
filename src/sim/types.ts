@@ -304,6 +304,15 @@ export type GroundEffect = {
   pull?: number;
   /** Ground it leaves where it lands, and for how long. */
   leaves?: { kind: 'caustic' | 'burning' | 'chilling' | 'shocking'; seconds: number; dps: number };
+  /**
+   * A blow that follows the character until it lands and cannot be stepped out of (the Magistrate's Sentence, docs/BOSSES.md
+   * 6): the dodge leaves it alone, and only defences answer it.
+   */
+  follow?: boolean;
+  unavoidable?: boolean;
+  /** Seconds it stuns the character it lands on, and an ailment it puts on it (a toll's shock). */
+  stun?: number;
+  afflict?: { kind: 'shock' | 'chill' | 'freeze' | 'ignite'; value: number; seconds: number };
 };
 
 /**
