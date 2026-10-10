@@ -10,6 +10,7 @@ import './ui/tree.css';
 import './ui/mobile.css';
 import './ui/items.css';
 import './ui/workbench.css';
+import './ui/strategy.css';
 
 function storage(): Storage | null {
   try {

@@ -22,6 +22,7 @@ import { Reward } from './Reward';
 import { Sheet } from './Sheet';
 import { Workbench } from './Workbench';
 import { Skills } from './Skills';
+import { Strategy } from './Strategy';
 import { TreeView } from './TreeView';
 
 const COUNTDOWN = 2;
@@ -31,7 +32,7 @@ const VERDICT_TEXT: Record<Verdict, string> = {
   close: 'Close',
   dangerous: 'Dangerous',
 };
-type Tab = 'tree' | 'sheet' | 'skills' | 'items' | 'workbench' | 'next';
+type Tab = 'tree' | 'sheet' | 'skills' | 'strategy' | 'items' | 'workbench' | 'next';
 
 /** Wayfinder's Chalk on an offered map: add one of three affixes, or remove one (EXPANSION 8.2). */
 function Chalk({ c, offer }: { c: Controller; offer: number }) {
@@ -348,6 +349,12 @@ export function Camp({ c }: { c: Controller }) {
             Skills
           </button>
           <button
+            class={'tab' + (shown === 'strategy' ? ' on' : '')}
+            onClick={() => setTab('strategy')}
+          >
+            Strategy
+          </button>
+          <button
             class={'tab' + (shown === 'workbench' ? ' on' : '')}
             onClick={() => setTab('workbench')}
           >
@@ -361,6 +368,7 @@ export function Camp({ c }: { c: Controller }) {
           {shown === 'tree' && <TreeView c={c} />}
           {shown === 'sheet' && <Sheet s={sheet} />}
           {shown === 'skills' && <Skills c={c} ch={ch} />}
+          {shown === 'strategy' && <Strategy c={c} ch={ch} />}
           {shown === 'items' && (
             <Items
               c={c}

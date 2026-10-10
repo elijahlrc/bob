@@ -256,15 +256,18 @@ function utilitySlot(w: World, c: SkillChoice): SkillSlot {
 }
 
 /**
- * Every skill the character has equipped, in the order the bar shows them: the primary, the secondaries, the
+ * Every skill the character has equipped, in the order the bar shows them: the main skills, the other damage skills, the
  * utilities, the auras, then skills cast by triggers. The basic attack stands in only when there is no primary skill.
  */
 export function skillSlots(w: World): SkillSlot[] {
   const ch = w.char;
   const out: SkillSlot[] = [];
   out.push(damageSlot(w, ch.primary, ch.primary.gemUid === null ? 'Basic attack' : 'Primary'));
-  for (const c of ch.secondaries) out.push(damageSlot(w, c, 'Secondary'));
-  for (const c of ch.utilities) out.push(utilitySlot(w, c));
+  // The other main skills (the Strategy tab), then the other damage skills in the order the character considers them.
+  for (const e of ch.mains.slice(1)) out.push(damageSlot(w, e.choice, 'Primary'));
+  for (const e of ch.rotation)
+    if (!e.choice.skill.utility) out.push(damageSlot(w, e.choice, 'Secondary'));
+  for (const c of ch.utilities) if (ch.entryOf(c)?.role !== 'off') out.push(utilitySlot(w, c));
   for (const a of ch.auras) {
     const look = auraLook(a.def);
     out.push({

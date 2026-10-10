@@ -69,12 +69,32 @@ export function Sheet({ s }: { s: CharacterSheet }) {
           ))}
         </tbody>
       </table>
+      {s.scenarios && s.scenarios.pack !== s.scenarios.boss && (
+        <table class="triggered">
+          <tbody>
+            <tr>
+              <td colSpan={2}>
+                <b>Rotation by fight</b>{' '}
+                <span class="muted">(some skills wait for a kind of fight: Strategy tab)</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Total DPS against a pack</td>
+              <td>{f1(s.scenarios.pack)}</td>
+            </tr>
+            <tr>
+              <td>Total DPS against a boss</td>
+              <td>{f1(s.scenarios.boss)}</td>
+            </tr>
+          </tbody>
+        </table>
+      )}
       {s.secondary.length > 0 && (
         <table class="triggered">
           <tbody>
             <tr>
               <td colSpan={2}>
-                <b>Secondary casts</b> <span class="muted">(used whenever ready)</span>
+                <b>Periodic skills</b> <span class="muted">(used every so often)</span>
               </td>
             </tr>
             {s.secondary.map((t) => (
@@ -86,7 +106,7 @@ export function Sheet({ s }: { s: CharacterSheet }) {
               </tr>
             ))}
             <tr>
-              <td>Total DPS with secondary casts</td>
+              <td>Total DPS with periodic skills</td>
               <td>{f1(k.totalDps + s.secondaryDps + s.triggeredDps)}</td>
             </tr>
           </tbody>

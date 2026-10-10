@@ -496,7 +496,7 @@ export function playerAI(w: World, dt: number): void {
     }
     if (inRange) {
       if (which === 'primary' || which === 'secondary') payCost(w, costsLife, prof.cost);
-      if (which === 'secondary' && choice.skill.cooldown === undefined)
+      if (entry?.role === 'periodic' && choice.skill.cooldown === undefined)
         w.secondaryReady[choice.key] = w.t + w.char.cooldownOf(choice, playerConds(w, target));
       if (which === 'primary' || which === 'secondary') useSkill(w, choice);
       if (entry?.role === 'opener') markOpened(w, choice.key, target);
