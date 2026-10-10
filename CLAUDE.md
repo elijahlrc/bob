@@ -23,6 +23,9 @@
   `Character.mains` / `rotation` hold the resolved order; the sim's `chooseSkill` (`src/sim/ai.ts`) walks it. The sheet
   works out a pack and a boss rotation (`sheet().scenarios`, weighed by `sheetDps`). Player-facing explanation of the whole
   AI: [docs/PLAYER-AI.md](docs/PLAYER-AI.md); keep it current when the character's decisions change.
+- **Save slots** (2026-10-10): one save per run (`bob.saves` list, `bob.save.<id>` values; DESIGN.md 5.5, `src/run/save.ts`). The
+  controller keeps the current run's slot outside `RunState`; the title screen lists them. `loadRun` / `saveRun` / `clearSave`
+  still work on one key (default `bob.save`, the pre-slots save).
 - **Architecture boundaries (§14.2):**
   - `core`, `data`, `mods`, `calc`, `gen`, `sim` and `run` are headless: no Phaser, Preact or DOM.
   - No `Math.random`, `Date.now` or `performance.now` outside `render` and `ui`.

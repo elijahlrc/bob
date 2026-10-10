@@ -18,7 +18,20 @@ import {
   TOTAL_MAPS,
   setMap,
 } from './run';
-import { clearSave, loadRun, MemoryStore, SAVE_KEY, saveRun } from './save';
+import {
+  clearSave,
+  deleteSlot,
+  listSlots,
+  loadRun,
+  MemoryStore,
+  newSlot,
+  SAVE_KEY,
+  saveRun,
+  saveSlot,
+  slotKey,
+  SLOTS_KEY,
+  type SlotSummary,
+} from './save';
 
 const cleared = (level: number): MapResult => ({
   status: 'cleared',
@@ -158,15 +171,135 @@ describe('saving (§5.5)', () => {
     const store = new MemoryStore();
     const c = new Controller(store);
     c.startRun('vanguard', 5);
-    expect(loadRun(store).status).toBe('ok');
+    expect(listSlots(store).map((s) => s.result.status)).toEqual(['ok']);
     c.act((r) => (r.refundPoints = 7));
     const c2 = new Controller(store);
-    expect(c2.saved.status).toBe('ok');
-    c2.continueRun();
+    expect(c2.saves).toHaveLength(1);
+    expect(c2.saves[0].result.status).toBe('ok');
+    c2.continueRun(c2.saves[0].id);
     expect(c2.screen).toBe('camp');
     expect(c2.run!.refundPoints).toBe(7);
     c2.abandon();
-    expect(loadRun(store).status).toBe('none');
+    expect(c2.saves).toHaveLength(0);
+    expect(listSlots(store)).toHaveLength(0);
+  });
+});
+
+describe('save slots', () => {
+  const okRun = (s: SlotSummary) => (s.result.status === 'ok' ? s.result.run : null);
+
+  it('a new run leaves the older saves alone', () => {
+    const store = new MemoryStore();
+    const a = new Controller(store);
+    a.startRun('vanguard', 1);
+    a.act((r) => (r.refundPoints = 3));
+    a.quit();
+    a.startRun('zealot', 2);
+    a.act((r) => (r.refundPoints = 9));
+    a.quit();
+
+    const b = new Controller(store);
+    expect(b.saves).toHaveLength(2);
+    // The most recently saved comes first.
+    expect(b.saves.map((s) => okRun(s)!.classId)).toEqual(['zealot', 'vanguard']);
+    expect(b.saves.map((s) => okRun(s)!.refundPoints)).toEqual([9, 3]);
+  });
+
+  it('continuing a run saves into its own slot and moves it to the front', () => {
+    const store = new MemoryStore();
+    const a = new Controller(store);
+    a.startRun('vanguard', 1);
+    a.quit();
+    a.startRun('zealot', 2);
+    a.quit();
+    const older = a.saves[1].id;
+    a.continueRun(older);
+    a.act((r) => (r.refundPoints = 5));
+    a.quit();
+    expect(a.saves.map((s) => s.id)[0]).toBe(older);
+    expect(a.saves).toHaveLength(2);
+    expect(okRun(a.saves[0])!.refundPoints).toBe(5);
+    expect(okRun(a.saves[1])!.refundPoints).not.toBe(5);
+  });
+
+  it('abandoning or losing a run deletes only its slot', () => {
+    const store = new MemoryStore();
+    const a = new Controller(store);
+    a.startRun('vanguard', 1);
+    a.quit();
+    a.startRun('zealot', 2);
+    a.abandon();
+    expect(a.saves.map((s) => okRun(s)!.classId)).toEqual(['vanguard']);
+    a.discardSave(a.saves[0].id);
+    expect(a.saves).toHaveLength(0);
+    expect(new Controller(store).saves).toHaveLength(0);
+  });
+
+  it('ids are not reused after a delete', () => {
+    const store = new MemoryStore();
+    const first = newSlot(store);
+    saveSlot(store, first, newRun('vanguard', 1));
+    deleteSlot(store, first);
+    expect(newSlot(store)).not.toBe(first);
+  });
+
+  it('the save from before slots becomes a slot', () => {
+    const store = new MemoryStore();
+    saveRun(store, newRun('mystic', 4));
+    const c = new Controller(store);
+    expect(c.saves).toHaveLength(1);
+    expect(okRun(c.saves[0])!.classId).toBe('mystic');
+    expect(store.getItem(SAVE_KEY)).toBeNull();
+    // A new run goes beside it, and a second start finds both.
+    c.startRun('vanguard', 1);
+    c.quit();
+    expect(new Controller(store).saves).toHaveLength(2);
+  });
+
+  it('keeps an incompatible save listed so it can be discarded', () => {
+    const store = new MemoryStore();
+    store.setItem(SAVE_KEY, JSON.stringify({ version: 99, run: {} }));
+    const c = new Controller(store);
+    expect(c.saves.map((s) => s.result.status)).toEqual(['incompatible']);
+    c.discardSave(c.saves[0].id);
+    expect(c.saves).toHaveLength(0);
+  });
+
+  it('a lost slot list does not lose or overwrite the saves', () => {
+    const store = new MemoryStore();
+    const a = new Controller(store);
+    a.startRun('vanguard', 1);
+    a.quit();
+    store.setItem(SLOTS_KEY, '{nope');
+    const b = new Controller(store);
+    b.startRun('zealot', 2);
+    b.quit();
+    // The new run took a free id: the old save is still stored and was not overwritten.
+    const old = loadRun(store, slotKey(1));
+    expect(old.status === 'ok' && old.run.classId).toBe('vanguard');
+    expect(b.saves.map((s) => okRun(s)!.classId)).toEqual(['zealot']);
+  });
+
+  it('the showcase and the gallery write no save', () => {
+    const store = new MemoryStore();
+    const c = new Controller(store);
+    c.startShowcase();
+    c.exitShowcase();
+    c.startGallery();
+    c.exitShowcase();
+    expect(c.saves).toHaveLength(0);
+    expect(store.getItem(SLOTS_KEY)).toBeNull();
+  });
+
+  it('a save that does not fit is reported, not thrown', () => {
+    const store = new MemoryStore();
+    const c = new Controller(store);
+    c.startRun('vanguard', 1);
+    store.setItem = () => {
+      throw new Error('QuotaExceededError');
+    };
+    expect(() => c.act((r) => (r.refundPoints = 2))).not.toThrow();
+    expect(c.saveFailed).toBe(true);
   });
 });
 

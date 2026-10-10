@@ -308,6 +308,12 @@ export function Camp({ c }: { c: Controller }) {
           {left !== null && ` — ${themeDef(run.offers[0].themeId).name} in ${left.toFixed(1)} s`}
           {run.autoContinue && blocker && <div class="warn">Paused: {blocker}</div>}
         </label>
+        {c.saveFailed && (
+          <div class="warn">
+            The browser has no room to save this run. Delete an old save on the title screen to make
+            room.
+          </div>
+        )}
         <button class="btn" onClick={() => c.quit()}>
           Save and quit
         </button>

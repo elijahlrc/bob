@@ -26,7 +26,16 @@ import {
   worldOptsFor,
   type RunState,
 } from './run';
-import { clearSave, loadRun, saveRun, SAVE_KEY, type KeyValueStore, type LoadResult } from './save';
+import {
+  deleteSlot,
+  listSlots,
+  newSlot,
+  saveSlot,
+  slotKey,
+  type KeyValueStore,
+  type SlotId,
+  type SlotSummary,
+} from './save';
 
 /** Auto-continue pauses when life or any flask is below this fraction (docs/MAPS.md 10.2). */
 export const AUTO_PAUSE_BELOW = 0.5;
@@ -77,22 +86,33 @@ export class Controller {
   /** Called once when a run ends, by a death or a win (anonymous run statistics: docs/TELEMETRY.md). */
   onRunEnd: ((run: RunState, res: MapResult) => void) | null = null;
 
-  /** Result of looking for a saved run at boot. */
-  saved: LoadResult = { status: 'none' };
+  /** The saved runs found at boot, the most recently saved first (§5.5). */
+  saves: SlotSummary[] = [];
+  /** The slot the current run is saved in; null for showcase, gallery and runs without a store. */
+  private slot: SlotId | null = null;
+  /** True when the last save did not fit in the browser's storage (the camp warns about it). */
+  saveFailed = false;
 
   constructor(store: KeyValueStore | null = null) {
     this.store = store;
-    if (store) {
-      this.saved = loadRun(store);
-    }
+    this.refreshSaves();
     this.bus.on('frame', ({ dtMs }) => this.onFrame(dtMs));
     this.bus.on('select', ({ id }) => (this.selectedId = id));
   }
 
+  private refreshSaves(): void {
+    this.saves = this.store ? listSlots(this.store) : [];
+  }
+
   private changed(): void {
-    // The game saves on entering camp and on any camp change (§5.5).
-    if (this.store && this.run && this.screen === 'camp') {
-      saveRun(this.store, this.run);
+    // The game saves on entering camp and on any camp change (§5.5), into the run's own slot.
+    if (this.store && this.run && this.screen === 'camp' && this.slot !== null) {
+      try {
+        saveSlot(this.store, this.slot, this.run);
+        this.saveFailed = false;
+      } catch {
+        this.saveFailed = true;
+      }
       recordFound(this.store, this.run);
     }
     this.bus.emit('state', null);
@@ -181,19 +201,21 @@ export class Controller {
     this.goTo('title');
   }
 
-  /** Resume the saved run at camp. */
-  continueRun(): void {
-    if (this.saved.status !== 'ok') return;
-    this.run = this.saved.run;
+  /** Resume a saved run at camp. */
+  continueRun(id: SlotId): void {
+    const found = this.saves.find((s) => s.id === id);
+    if (!found || found.result.status !== 'ok') return;
+    this.run = found.result.run;
+    this.slot = id;
     this.undoStack = [];
     this.lastResult = null;
     this.goTo('camp');
   }
 
-  /** Discard an incompatible or unwanted save. */
-  discardSave(): void {
-    if (this.store) clearSave(this.store);
-    this.saved = { status: 'none' };
+  /** Delete a save: an incompatible one, or one the player no longer wants. */
+  discardSave(id: SlotId): void {
+    if (this.store) deleteSlot(this.store, id);
+    this.refreshSaves();
     this.changed();
   }
 
@@ -204,6 +226,8 @@ export class Controller {
 
   startRun(classId: string, seed: number): void {
     this.run = newRun(classId, seed, this.startDifficulty);
+    // A new run gets a slot of its own: the saves of earlier runs stay as they are.
+    this.slot = this.store ? newSlot(this.store) : null;
     this.undoStack = [];
     this.lastResult = null;
     this.goTo('camp');
@@ -336,9 +360,11 @@ export class Controller {
     if (run.phase !== 'camp') this.onRunEnd?.(run, res);
     this.world = null;
     this.bus.emit('mapEnd', null);
-    if (run.phase !== 'camp' && this.store) {
-      clearSave(this.store);
-      this.saved = { status: 'none' };
+    // A run that ended in death or victory leaves no save behind.
+    if (run.phase !== 'camp' && this.store && this.slot !== null) {
+      deleteSlot(this.store, this.slot);
+      this.slot = null;
+      this.refreshSaves();
     }
     this.goTo(run.phase === 'dead' ? 'summary' : run.phase === 'victory' ? 'victory' : 'camp');
   }
@@ -447,25 +473,26 @@ export class Controller {
     return null;
   }
 
-  /** The raw saved run (for bug reports), or null. */
-  exportSave(): string | null {
-    return this.store?.getItem(SAVE_KEY) ?? null;
+  /** The raw saved run of a slot (for bug reports), or null. */
+  exportSave(id: SlotId): string | null {
+    return this.store?.getItem(slotKey(id)) ?? null;
   }
 
-  /** Abandon the run and return to the title screen. */
+  /** Leave the run (it stays saved) and return to the title screen. */
   quit(): void {
     if (this.world) this.bus.emit('mapEnd', null);
     this.world = null;
     this.crawl = null;
-    if (this.store) this.saved = loadRun(this.store);
     this.run = null;
+    this.slot = null;
+    this.refreshSaves();
     this.goTo('title');
   }
 
-  /** Abandon the current run entirely (deletes the save). */
+  /** Abandon the current run entirely (deletes its save; the others stay). */
   abandon(): void {
-    if (this.store) clearSave(this.store);
-    this.saved = { status: 'none' };
+    if (this.store && this.slot !== null) deleteSlot(this.store, this.slot);
+    this.slot = null;
     this.quit();
   }
 }

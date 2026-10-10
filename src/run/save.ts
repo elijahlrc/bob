@@ -10,18 +10,21 @@ export type KeyValueStore = {
   removeItem(key: string): void;
 };
 
+/** The key of the one save the game had before save slots; adopted as slot 1 the first time slots are listed. */
 export const SAVE_KEY = 'bob.save';
+/** The list of slots: `{ next, slots }`, newest first. */
+export const SLOTS_KEY = 'bob.saves';
 
 export type LoadResult =
   { status: 'none' } | { status: 'incompatible' } | { status: 'ok'; run: RunState };
 
-/** §5.5: `{ version: 1, run }` under `bob.save`. */
-export function saveRun(store: KeyValueStore, run: RunState): void {
-  store.setItem(SAVE_KEY, JSON.stringify({ version: SAVE_VERSION, run }));
+/** §5.5: `{ version, run }` under the given key (a slot's, see `slotKey`). */
+export function saveRun(store: KeyValueStore, run: RunState, key: string = SAVE_KEY): void {
+  store.setItem(key, JSON.stringify({ version: SAVE_VERSION, run }));
 }
 
-export function loadRun(store: KeyValueStore): LoadResult {
-  const raw = store.getItem(SAVE_KEY);
+export function loadRun(store: KeyValueStore, key: string = SAVE_KEY): LoadResult {
+  const raw = store.getItem(key);
   if (!raw) return { status: 'none' };
   try {
     const data = JSON.parse(raw) as { version?: number; run?: RunState };
@@ -72,8 +75,96 @@ export function migrate(version: number, run: RunState): RunState | null {
   return null;
 }
 
-export function clearSave(store: KeyValueStore): void {
-  store.removeItem(SAVE_KEY);
+export function clearSave(store: KeyValueStore, key: string = SAVE_KEY): void {
+  store.removeItem(key);
+}
+
+// ---- Save slots (§5.5): each run has its own save, so starting a new run never replaces an older one. ----
+
+export type SlotId = number;
+
+/** What the title screen needs to show one slot. */
+export type SlotSummary = { id: SlotId; result: LoadResult };
+
+type SlotIndex = { next: number; slots: SlotId[] };
+
+export function slotKey(id: SlotId): string {
+  return `${SAVE_KEY}.${id}`;
+}
+
+function readIndex(store: KeyValueStore): SlotIndex {
+  const legacy = store.getItem(SAVE_KEY);
+  let index: SlotIndex | null = null;
+  try {
+    const raw = store.getItem(SLOTS_KEY);
+    const data = raw ? (JSON.parse(raw) as Partial<SlotIndex>) : null;
+    if (data && Array.isArray(data.slots) && typeof data.next === 'number')
+      index = { next: data.next, slots: data.slots.filter((s) => Number.isInteger(s)) };
+  } catch {
+    // An unreadable list starts empty; the saves themselves are not touched.
+  }
+  index ??= { next: 1, slots: [] };
+  // The single save from before slots becomes a slot of its own (copied first, so a failure loses nothing).
+  if (legacy !== null) {
+    try {
+      const id = allocate(store, index);
+      store.setItem(slotKey(id), legacy);
+      index.slots.push(id);
+      writeIndex(store, index);
+      store.removeItem(SAVE_KEY);
+    } catch {
+      // A full store: the old save stays where it is and is adopted on a later start.
+    }
+  }
+  return index;
+}
+
+function writeIndex(store: KeyValueStore, index: SlotIndex): void {
+  store.setItem(SLOTS_KEY, JSON.stringify(index));
+}
+
+/** The next unused id (an id whose save exists is never reused, even if the list was lost). */
+function allocate(store: KeyValueStore, index: SlotIndex): SlotId {
+  while (index.slots.includes(index.next) || store.getItem(slotKey(index.next)) !== null)
+    index.next++;
+  return index.next++;
+}
+
+/** Every slot, the most recently saved first. A slot whose save is gone is dropped from the list. */
+export function listSlots(store: KeyValueStore): SlotSummary[] {
+  const index = readIndex(store);
+  const out = index.slots.map((id) => ({ id, result: loadRun(store, slotKey(id)) }));
+  const kept = out.filter((s) => s.result.status !== 'none');
+  if (kept.length !== index.slots.length) {
+    index.slots = kept.map((s) => s.id);
+    writeIndex(store, index);
+  }
+  return kept;
+}
+
+/** Reserve a slot for a new run. It shows in the list once the run has been saved. */
+export function newSlot(store: KeyValueStore): SlotId {
+  const index = readIndex(store);
+  const id = allocate(store, index);
+  writeIndex(store, index);
+  return id;
+}
+
+/** Save the run into its slot and make that slot the first in the list. */
+export function saveSlot(store: KeyValueStore, id: SlotId, run: RunState): void {
+  saveRun(store, run, slotKey(id));
+  const index = readIndex(store);
+  if (index.slots[0] === id) return;
+  index.slots = [id, ...index.slots.filter((s) => s !== id)];
+  writeIndex(store, index);
+}
+
+export function deleteSlot(store: KeyValueStore, id: SlotId): void {
+  clearSave(store, slotKey(id));
+  const index = readIndex(store);
+  if (!index.slots.includes(id)) return;
+  index.slots = index.slots.filter((s) => s !== id);
+  writeIndex(store, index);
 }
 
 /** An in-memory store (tests, headless bot). */

@@ -869,3 +869,12 @@ uses the defaults. Bot sample (8 runs a class, seed 7, `scripts/simpar.sh`): med
 others going deeper; a sample this small cannot tell that from noise. A ready periodic skill does not stand in for a main
 skill that waits for mana (the weapon lets the mana come back). `x9.test.ts`'s 250x speed check is flaky near its floor
 before and after this change.
+
+### Save slots, built (2026-10-10)
+
+Every run has its own save, so a new run no longer replaces the old one (DESIGN.md 5.5). The title screen lists the saves
+(class, level, map; most recently saved first), each with Continue, Copy and Delete (after a confirmation); an
+incompatible save shows as a row that can be discarded. Death, victory and Abandon delete only that run's slot. The save
+from before slots is adopted as a slot on first start. Code: the slot layer is in `src/run/save.ts`, the controller keeps
+`saves` and the current slot. A save that does not fit in the browser's storage shows a warning in the camp. No save
+limit; the browser's storage (about 5 MB) is the cap.

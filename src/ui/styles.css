@@ -571,6 +571,27 @@ svg.tree {
   gap: 8px;
   align-items: center;
 }
+.saves {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: min(100%, 640px);
+  max-height: 40vh;
+  overflow-y: auto;
+}
+.save-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.save-row .save-name {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+span.save-name {
+  padding: 0 4px;
+}
 .reward {
   display: flex;
   flex-direction: column;
