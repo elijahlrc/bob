@@ -878,3 +878,14 @@ incompatible save shows as a row that can be discarded. Death, victory and Aband
 from before slots is adopted as a slot on first start. Code: the slot layer is in `src/run/save.ts`, the controller keeps
 `saves` and the current slot. A save that does not fit in the browser's storage shows a warning in the camp. No save
 limit; the browser's storage (about 5 MB) is the cap.
+
+### Evasion and accuracy follow the reference game (docs/EVASION.md), built (2026-10-10)
+
+Monster evasion and accuracy were straight lines tuned by the bot; the reference game's are exponentials, so a character hit
+100% of the time at any level and a monster hit a character 100% of the time whatever its evasion. They are now fitted to the
+reference game's per-level monster tables (evasion exactly, accuracy within 2 points), the table itself kept in
+`docs/coverage/pob-monster-stats.json` and checked by `formulas.test.ts`. The player side was compared (base stats and
+attribute bonuses are the same; item bases are 0.7 to 0.85 times as large) and left alone; `npm run evasion` prints the
+comparison. The build matrix's reference player has its own accuracy curve now. Bot sample (8 runs a class, seeds 7 and 11,
+`scripts/simpar.sh`): mean map reached 27.2 before and 28.8 after, inside the noise; pacing unchanged. The medians for the strider
+and the shade were lower on both seeds, which eight runs cannot tell from noise: look at them first if a balance pass follows.

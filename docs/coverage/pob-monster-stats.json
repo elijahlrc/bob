@@ -1,0 +1,11 @@
+{
+  "source": {
+    "repo": "PathOfBuildingCommunity/PathOfBuilding",
+    "file": "src/Data/Misc.lua",
+    "tables": "data.monsterEvasionTable, data.monsterAccuracyTable",
+    "read": "2026-10-10",
+    "note": "Reference data only (DESIGN.md 3): the base evasion and accuracy rating of a monster by monster level, index 0 = level 1, 100 entries each. Cross-checks: level 84 accuracy is 538, as the PoE wiki's Evasion page says; evasion is (50 + 16 L) * 1.0212^L, the formula on the wiki's Talk:Evasion page, to within rounding. Nothing here is loaded by the game; src/ has its own fitted curves (scripts/coverage/fit-monster-defence.ts)."
+  },
+  "evasion": [67, 86, 104, 124, 144, 166, 188, 211, 234, 259, 285, 311, 339, 368, 397, 428, 460, 493, 527, 563, 600, 638, 677, 718, 760, 804, 849, 896, 944, 994, 1046, 1100, 1155, 1212, 1271, 1332, 1395, 1460, 1528, 1597, 1669, 1743, 1819, 1898, 1979, 2063, 2150, 2239, 2331, 2426, 2524, 2626, 2730, 2837, 2948, 3063, 3180, 3302, 3427, 3556, 3689, 3826, 3967, 4112, 4262, 4416, 4575, 4739, 4907, 5081, 5260, 5444, 5633, 5828, 6029, 6235, 6448, 6667, 6892, 7124, 7362, 7608, 7860, 8120, 8388, 8663, 8946, 9237, 9536, 9844, 10160, 10486, 10821, 11165, 11519, 11883, 12258, 12643, 13038, 13445],
+  "accuracy": [14, 15, 15, 16, 17, 18, 19, 20, 21, 23, 24, 25, 26, 28, 29, 31, 32, 34, 35, 37, 39, 41, 43, 45, 47, 49, 52, 54, 57, 59, 62, 65, 68, 71, 74, 77, 81, 84, 88, 92, 96, 100, 105, 109, 114, 119, 124, 129, 135, 140, 146, 152, 159, 165, 172, 179, 187, 195, 203, 211, 220, 229, 238, 247, 257, 268, 279, 290, 301, 314, 326, 339, 352, 366, 381, 396, 412, 428, 444, 462, 480, 499, 518, 538, 559, 580, 603, 626, 650, 675, 701, 728, 755, 784, 814, 845, 877, 910, 945, 980]
+}

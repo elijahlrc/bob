@@ -26,6 +26,11 @@
 - **Save slots** (2026-10-10): one save per run (`bob.saves` list, `bob.save.<id>` values; DESIGN.md 5.5, `src/run/save.ts`). The
   controller keeps the current run's slot outside `RunState`; the title screen lists them. `loadRun` / `saveRun` / `clearSave`
   still work on one key (default `bob.save`, the pre-slots save).
+- **Evasion and accuracy** (2026-10-10): a monster's evasion and accuracy by level are fitted to the reference game's monster
+  tables (`monsterEvasion` / `monsterAccuracy`, `src/calc/formulas.ts`; the table is `docs/coverage/pob-monster-stats.json`;
+  `npm run evasion` compares the two games; docs/EVASION.md), so the same rating gives about the same hit chance as there.
+- **Patch notes:** [docs/PATCH-NOTES.md](docs/PATCH-NOTES.md), player-facing, newest first: add an entry for every change a player would
+  notice.
 - **Architecture boundaries (§14.2):**
   - `core`, `data`, `mods`, `calc`, `gen`, `sim` and `run` are headless: no Phaser, Preact or DOM.
   - No `Math.random`, `Date.now` or `performance.now` outside `render` and `ui`.

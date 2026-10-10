@@ -3,6 +3,12 @@ import {
   ACCURACY_FACTOR,
   ARMOUR_CAP,
   MIN_HIT_CHANCE,
+  MONSTER_ACCURACY_BASE,
+  MONSTER_ACCURACY_GROWTH,
+  MONSTER_ACCURACY_LINEAR,
+  MONSTER_EVASION_BASE,
+  MONSTER_EVASION_GROWTH,
+  MONSTER_EVASION_LINEAR,
   MONSTER_HIT_BASE,
   MONSTER_HIT_COEF,
   MONSTER_HIT_EXP,
@@ -64,11 +70,25 @@ export function monsterLife(m: number): number {
 export function monsterHit(m: number): number {
   return MONSTER_HIT_BASE + MONSTER_HIT_COEF * Math.pow(m, MONSTER_HIT_EXP);
 }
+/** §12.1 Monster accuracy rating at a level (fitted to the reference game's table: see the constants). */
 export function monsterAccuracy(m: number): number {
-  return 20 + 14 * m;
+  return Math.round(
+    (MONSTER_ACCURACY_BASE + MONSTER_ACCURACY_LINEAR * m) * Math.pow(MONSTER_ACCURACY_GROWTH, m),
+  );
 }
+/** §12.1 Monster evasion rating at a level (fitted to the reference game's table: see the constants). */
 export function monsterEvasion(m: number): number {
-  return 30 + 12 * m;
+  return Math.round(
+    (MONSTER_EVASION_BASE + MONSTER_EVASION_LINEAR * m) * Math.pow(MONSTER_EVASION_GROWTH, m),
+  );
+}
+/**
+ * The accuracy of a typical character at a level, for the build matrix: 2 per level, some dexterity and a weapon's
+ * implicit (a level 60 character has about 520). It is what the matrix's reference player hits with, so a monster's
+ * evasion costs it hits as it would a real character.
+ */
+export function referenceAccuracy(level: number): number {
+  return 12 + 8.4 * level;
 }
 export function monsterArmour(m: number): number {
   return 20 + 10 * m;

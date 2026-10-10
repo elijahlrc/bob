@@ -149,6 +149,19 @@ export const MONSTER_LIFE_LINEAR = 12;
 export const MONSTER_HIT_BASE = 2;
 export const MONSTER_HIT_COEF = 0.085;
 export const MONSTER_HIT_EXP = 1.5;
+/**
+ * A monster's evasion rating by level is `(BASE + LINEAR · m) · GROWTH^m`, and its accuracy the same with its own numbers.
+ * Fitted to the reference game's monster tables (docs/coverage/pob-monster-stats.json, `npm run evasion`) so that the
+ * same accuracy against the same evasion hits as often: evasion equals the table at every level, accuracy is within 2 points
+ * of it (4% at worst, where the numbers are small).
+ * The tables are an exponential in the level, not a straight line (docs/EVASION.md).
+ */
+export const MONSTER_EVASION_BASE = 50;
+export const MONSTER_EVASION_LINEAR = 16;
+export const MONSTER_EVASION_GROWTH = 1.0212;
+export const MONSTER_ACCURACY_BASE = 12.9;
+export const MONSTER_ACCURACY_LINEAR = 0.385;
+export const MONSTER_ACCURACY_GROWTH = 1.0299;
 /** Early-map easing: monster life and damage ramp from these fractions to full by EASE_LEVEL. */
 export const EASE_LEVEL = 20;
 export const EASE_LIFE = 0.5;

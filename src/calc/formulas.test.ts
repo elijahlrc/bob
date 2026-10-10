@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   armourReduction,
@@ -11,17 +12,18 @@ import {
   monsterEvasion,
   monsterHit,
   monsterLife,
+  referenceAccuracy,
   stunChance,
 } from './formulas';
 
 describe('§12.1 monster scaling fixtures', () => {
   const rows = [
-    [1, 33, 2, 34, 42, 30, 8],
-    [10, 154, 5, 160, 150, 120, 63],
-    [25, 376, 13, 370, 330, 270, 241],
-    [50, 891, 32, 720, 630, 520, 694],
-    [75, 2009, 57, 1070, 930, 770, 1296],
-    [100, 5429, 87, 1420, 1230, 1020, 2020],
+    [1, 33, 2, 14, 67, 30, 8],
+    [10, 154, 5, 22, 259, 120, 63],
+    [25, 376, 13, 47, 760, 270, 241],
+    [50, 891, 32, 140, 2426, 520, 694],
+    [75, 2009, 57, 381, 6029, 770, 1296],
+    [100, 5429, 87, 978, 13445, 1020, 2020],
   ];
   for (const [m, life, hit, acc, eva, arm, xp] of rows) {
     it(`level ${m}`, () => {
@@ -33,6 +35,30 @@ describe('§12.1 monster scaling fixtures', () => {
       expect(baseXp(m)).toBe(xp);
     });
   }
+});
+
+describe('§12.1 monster evasion and accuracy follow the reference tables (docs/EVASION.md)', () => {
+  const table = JSON.parse(
+    readFileSync(new URL('../../docs/coverage/pob-monster-stats.json', import.meta.url), 'utf8'),
+  ) as { evasion: number[]; accuracy: number[] };
+
+  it('has the tables for levels 1 to 100', () => {
+    expect(table.evasion).toHaveLength(100);
+    expect(table.accuracy).toHaveLength(100);
+  });
+
+  it('evasion is the table to the unit, accuracy within two points', () => {
+    table.evasion.forEach((v, i) => expect(monsterEvasion(i + 1)).toBe(v));
+    table.accuracy.forEach((v, i) =>
+      expect(Math.abs(monsterAccuracy(i + 1) - v)).toBeLessThanOrEqual(2),
+    );
+  });
+
+  it('the reference player of the build matrix is about as accurate as a plain-geared character', () => {
+    // 2 per level, 2 per point of dexterity (one a level) and the best sword implicit: 640 at level 60.
+    expect(referenceAccuracy(60)).toBeGreaterThan(450);
+    expect(referenceAccuracy(60)).toBeLessThan(700);
+  });
 });
 
 describe('§6.3 defences', () => {

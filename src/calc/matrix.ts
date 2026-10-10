@@ -4,10 +4,10 @@ import {
   armourReduction,
   effectiveRes,
   hitChance,
-  monsterAccuracy,
   monsterArmour,
   monsterEvasion,
   monsterHit,
+  referenceAccuracy,
 } from './formulas';
 
 /**
@@ -41,8 +41,6 @@ export const PROBES: Probe[] = [
   { id: 'dot', name: 'Damage over time', dtype: 4, attack: false, hit: 1, dot: true },
 ];
 
-/** How much more accurate than a monster of its level the reference character is. */
-const REF_ACCURACY = 0.6;
 /** The most a probe can be made softer or harder than plain (an immunity counts as this). */
 export const MAX_FACTOR = 3;
 
@@ -94,7 +92,7 @@ function taken(n: Numbers, pr: Probe, level: number): number {
     return (poison + ignite + bleed) / 3;
   }
   let f = 1;
-  if (pr.attack) f *= hitChance(monsterAccuracy(level) * REF_ACCURACY, n.evasion);
+  if (pr.attack) f *= hitChance(referenceAccuracy(level), n.evasion);
   if (pr.dtype === 0) {
     const red = Math.min(
       0.9,
