@@ -109,6 +109,14 @@ export const TYPE_BLURBS: Record<MonsterTypeId, string> = {
   slagworm: 'Sinks out of sight and comes up under you in a ring of fire.',
   tollkeeper:
     'Tolls its bell every ten seconds, and every toll makes it stronger. Stun it in the swing to stop the toll.',
+  siegeMarshal:
+    'Commands from where he stands while his regiments fight; the more of them stand, the less he takes.',
+  duellist:
+    'Fights behind a veil that nothing critical can pass; when it drops he lunges in a fan of steel.',
+  bulwarkEngine:
+    'Plated, slow and heavy: its plates wear down by what hits it, and when they give it stops dead. Its blows stun.',
+  ash: 'The armoured twin: slow, physical, and hard to move. Weak to the elements.',
+  cinder: 'The quick twin: evasive, burning, and hard against the elements. Weak to a blade.',
   courser:
     'Never stops: circles you at a canter, striking as it passes, then gallops off in lanes of fire.',
   magistrate:

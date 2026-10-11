@@ -1,3 +1,4 @@
+import { bossOfType } from '../data/bosses';
 import { Rng } from '../core/rng';
 import type { MonsterSpec } from '../calc/monster';
 import {
@@ -105,6 +106,11 @@ export const TYPE_WEIGHTS: Record<MonsterTypeId, number> = {
   magistrate: 0,
   witness: 0,
   prismWarden: 0,
+  siegeMarshal: 0,
+  duellist: 0,
+  bulwarkEngine: 0,
+  ash: 0,
+  cinder: 0,
   rotwife: 0,
   unmaker: 0,
   shard: 0,
@@ -458,7 +464,17 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
           mods: type === 'magistrate' ? ['hexWarded'] : [],
           ...affixField,
         };
-        add(room, spec, { x: room.cx + 0.5, y: room.cy + 0.5 });
+        // The Twins stand side by side, each a boss in its own right.
+        const partners = bossOfType(type)?.partners ?? [];
+        const side = partners.length ? 1.6 : 0;
+        add(room, spec, { x: room.cx + 0.5 - side, y: room.cy + 0.5 });
+        partners.forEach((t, i) =>
+          add(
+            room,
+            { ...spec, type: t, mods: [] },
+            { x: room.cx + 0.5 + side * (i + 1), y: room.cy + 0.5 },
+          ),
+        );
       } else {
         let leader: MonsterSpec = opts.endKind === 'miniboss' ? normal('miniboss') : normal('rare');
         // The mini-boss of a faction's own theme is its champion.

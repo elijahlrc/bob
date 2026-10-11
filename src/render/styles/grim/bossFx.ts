@@ -2,8 +2,10 @@ import type Phaser from 'phaser';
 import { ELEMENT_COLOR } from '../../../calc/skillLook';
 import {
   ATTUNE_SHIFT,
+  BAR_SHARE,
   BOSSES,
   CANTER_RADIUS,
+  HORN_TELL,
   ROT_ROTATION,
   SENTENCE_TELL,
   TOLL_EVERY,
@@ -328,6 +330,100 @@ export class BossFx {
       this.host.em.spark.explode(1, c.x + (Math.random() - 0.5) * 16, c.y - 30);
   }
 
+  // ---- The Siege Marshal ------------------------------------------------------------------------------------------------
+
+  private drawSiege(g: Gfx, a: Actor, st: BossState, time: number): void {
+    // While he commands, a thread of gold runs from his baton to each soldier standing: what they take off him.
+    if (st.holding) {
+      const c = this.pt(a.x, a.y);
+      for (const x of st.soldiers) {
+        if (!x.alive) continue;
+        const q = this.pt(x.x, x.y);
+        g.lineStyle(1.5, GOLD, 0.25 + 0.15 * Math.sin(time * 4 + x.id));
+        g.lineBetween(c.x, c.y - 60, q.x, q.y - 14);
+      }
+      // The horn: a ring closing on the arena's edge before a regiment comes.
+      if (st.hornT > 0) {
+        const k = 1 - st.hornT / HORN_TELL;
+        g.lineStyle(2, GOLD, 0.8 * (1 - k));
+        this.ring(g, a.x, a.y, 9 - 2 * k);
+      }
+    }
+    if (st.routedT > 0) {
+      g.lineStyle(3, EXPOSED, 0.6 + 0.4 * Math.sin(time * 16));
+      this.ring(g, a.x, a.y, 1.6);
+    }
+  }
+
+  // ---- The Veiled Duellist ----------------------------------------------------------------------------------------------
+
+  private drawDuel(g: Gfx, a: Actor, st: BossState, time: number): void {
+    const c = this.pt(a.x, a.y);
+    if (st.veiled) {
+      // The veil: a shimmering sheet over him, and a crossed-out mark over his head (nothing critical gets through).
+      g.fillStyle(0x6a7ab8, 0.28 + 0.1 * Math.sin(time * 5)).fillEllipse(c.x, c.y - 44, 54, 100);
+      g.lineStyle(1.5, 0xc8d4ff, 0.6).strokeEllipse(c.x, c.y - 44, 54, 100);
+      g.fillStyle(0x000000, 0.5).fillCircle(c.x, c.y - 100, 6);
+      g.lineStyle(2, 0xc8d4ff, 1).strokeCircle(c.x, c.y - 100, 4);
+      g.lineBetween(c.x - 3, c.y - 103, c.x + 3, c.y - 97);
+    } else if (st.flurryT > 0) {
+      g.lineStyle(2, 0xffffff, 0.5 + 0.5 * Math.sin(time * 20));
+      this.ring(g, a.x, a.y, 1.1);
+    }
+    if (st.bareT > 0) {
+      g.lineStyle(3, EXPOSED, 0.6 + 0.4 * Math.sin(time * 16));
+      this.ring(g, a.x, a.y, 1.4);
+    }
+  }
+
+  // ---- The Bulwark Engine -----------------------------------------------------------------------------------------------
+
+  private drawEngine(g: Gfx, a: Actor, st: BossState): void {
+    // Its plates, as a ring of eight round it: each worn away in turn as the bar goes down.
+    const frac = st.brokenT > 0 ? 0 : Math.max(0, st.bar) / Math.max(1, a.def.maxLife * BAR_SHARE);
+    for (let i = 0; i < 8; i++) {
+      const on = (i + 1) / 8 <= frac + 0.0001;
+      const ang = (i / 8) * Math.PI * 2 - Math.PI / 2;
+      g.lineStyle(on ? 4 : 2, on ? 0xc8b890 : 0x5a4c3c, on ? 0.9 : 0.4);
+      this.arc(g, a.x, a.y, 1.6, ang, ang + 0.5);
+    }
+    if (st.brokenT > 0) {
+      g.lineStyle(3, EXPOSED, 0.6 + 0.4 * Math.sin(Date.now() / 60));
+      this.ring(g, a.x, a.y, 1.8);
+      if (Math.random() < 0.3) {
+        const c = this.pt(a.x, a.y);
+        this.host.em.smoke.explode(1, c.x + (Math.random() - 0.5) * 30, c.y - 60);
+      }
+    }
+  }
+
+  // ---- The Sundered Twins -----------------------------------------------------------------------------------------------
+
+  private drawTwins(g: Gfx, a: Actor, st: BossState, w: World, time: number): void {
+    // A thread between the two, ash and ember, while both stand (drawn once, from Ash).
+    if (st.twin === 'ash') {
+      const o = w.actors.find((x) => x !== a && x.alive && bossState(x)?.id === 'twins');
+      if (o) {
+        const p0 = this.pt(a.x, a.y);
+        const p1 = this.pt(o.x, o.y);
+        const n = 12;
+        for (let i = 0; i <= n; i++) {
+          const f = i / n;
+          const col = i % 2 ? 0xa8a8a8 : 0xff8a30;
+          g.fillStyle(col, 0.5).fillCircle(
+            p0.x + (p1.x - p0.x) * f,
+            p0.y - 26 + (p1.y - p0.y) * f + Math.sin(time * 3 + i) * 2,
+            1.6,
+          );
+        }
+      }
+    }
+    if (st.grief) {
+      g.lineStyle(3, EXPOSED, 0.5 + 0.3 * Math.sin(time * 9));
+      this.ring(g, a.x, a.y, 1.5);
+    }
+  }
+
   // ---- What is on the character -----------------------------------------------------------------------------------------
 
   /** Every ailment on the character, as a row of icons over its head (docs/BOSSES.md 11.2), whatever gave it. */
@@ -379,6 +475,18 @@ export class BossFx {
           break;
         case 'unmaker':
           this.drawUnmaker(g, a, st, w, time);
+          break;
+        case 'siegeMarshal':
+          this.drawSiege(g, a, st, time);
+          break;
+        case 'duellist':
+          this.drawDuel(g, a, st, time);
+          break;
+        case 'bulwarkEngine':
+          this.drawEngine(g, a, st);
+          break;
+        case 'twins':
+          this.drawTwins(g, a, st, w, time);
           break;
       }
     }
@@ -470,7 +578,30 @@ export class BossFx {
       this.beam(a, w.player, GOLD);
       this.say(w.player.x, w.player.y, `${THEFT_TEXT[what] ?? what} returned`, GOLD);
       this.pulse(a.x, a.y, EXPOSED, 2);
-    } else if (k === 'dismissed') {
+    } else if (k === 'horn') this.say(a.x, a.y, 'The horn sounds', GOLD);
+    else if (k === 'march') {
+      const st = bossState(a);
+      for (const x of st?.soldiers ?? []) if (x.alive) this.pulse(x.x, x.y, GOLD, 1.2);
+    } else if (k === 'routed') {
+      this.say(a.x, a.y, 'Routed', EXPOSED, true);
+      this.pulse(a.x, a.y, EXPOSED, 3);
+    } else if (k === 'unveil') this.say(a.x, a.y, 'The veil drops', 0xc8d4ff);
+    else if (k === 'veil') this.say(a.x, a.y, 'Veiled', 0xc8d4ff);
+    else if (k === 'flurry') this.say(a.x, a.y, 'Flurry', 0xffffff);
+    else if (k === 'bare') this.pulse(a.x, a.y, EXPOSED, 2);
+    else if (k === 'broken') {
+      this.say(a.x, a.y, 'Plates broken', EXPOSED, true);
+      this.host.shake(5);
+      this.host.em.dust.explode(16, p.x, p.y);
+      this.pulse(a.x, a.y, EXPOSED, 3);
+    } else if (k === 'replated') this.say(a.x, a.y, 'Replated', 0xc8b890);
+    else if (k === 'grind') this.say(a.x, a.y, 'Grind', 0xc8b890);
+    else if (k === 'grief') {
+      this.say(a.x, a.y, 'Grief', EXPOSED, true);
+      this.pulse(a.x, a.y, EXPOSED, 4, 0.9);
+      this.host.shake(4);
+    } else if (k === 'echo') this.say(a.x, a.y, 'Echo', DTYPE[3]);
+    else if (k === 'dismissed') {
       this.host.em.smoke.explode(8, p.x, p.y - 8);
     }
   }

@@ -1524,14 +1524,20 @@ select option {
 }
 
 /* ---- Bosses (docs/BOSSES.md): the bar across the top in a fight, a boss's description at camp ---- */
-.boss-bar {
+.boss-bars {
   position: absolute;
   top: 34px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(520px, calc(100% - 32px));
-  text-align: center;
+  width: min(560px, calc(100% - 32px));
+  display: flex;
+  gap: 14px;
   pointer-events: none;
+}
+.boss-bar {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
   text-shadow: 0 1px 2px #000;
 }
 .boss-bar-name {

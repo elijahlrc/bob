@@ -1,12 +1,21 @@
 import type { MonsterTypeId } from './monsters';
 
 /**
- * The six bosses (docs/BOSSES.md): one on each of maps 10, 30, 50, 70 and 90, and the last on map 100. Each asks the build one
+ * The ten bosses (docs/BOSSES.md): one on every tenth map, and the last on map 100. Each asks the build one
  * question, and its brief says in a line or two what it does, so a player can get ready from five maps out.
  * The fights are `sim/bosses.ts`; the numbers that tune them are here.
  */
 export type BossId =
-  'tollkeeper' | 'courser' | 'magistrate' | 'prismWarden' | 'rotwife' | 'unmaker';
+  | 'tollkeeper'
+  | 'siegeMarshal'
+  | 'courser'
+  | 'duellist'
+  | 'magistrate'
+  | 'bulwarkEngine'
+  | 'prismWarden'
+  | 'twins'
+  | 'rotwife'
+  | 'unmaker';
 
 export type BossDef = {
   id: BossId;
@@ -14,6 +23,8 @@ export type BossDef = {
   map: number;
   /** Its monster type (its body, its stats). */
   type: MonsterTypeId;
+  /** The types that stand beside it from the start, each a boss in its own right (the Twins). */
+  partners?: MonsterTypeId[];
   name: string;
   /** The question it asks, in a phrase. */
   test: string;
@@ -39,6 +50,16 @@ export const BOSSES: Record<BossId, BossDef> = {
     stunMult: 1.5,
     curseEffect: 0.67,
   },
+  siegeMarshal: {
+    id: 'siegeMarshal',
+    map: 20,
+    type: 'siegeMarshal',
+    name: 'the Siege Marshal',
+    test: 'Endurance: a long fight with no single spike.',
+    brief: ['A general who has no wish to fight you himself.', 'He has an army for that.'],
+    stunMult: 4,
+    curseEffect: 0.67,
+  },
   courser: {
     id: 'courser',
     map: 30,
@@ -46,6 +67,16 @@ export const BOSSES: Record<BossId, BossDef> = {
     name: 'the Courser',
     test: 'Mobility and reach: it never stops moving.',
     brief: ['A rider that never stands still.', 'Fire follows its hooves.'],
+    stunMult: 4,
+    curseEffect: 0.67,
+  },
+  duellist: {
+    id: 'duellist',
+    map: 40,
+    type: 'duellist',
+    name: 'the Veiled Duellist',
+    test: 'Critical strikes, both ways.',
+    brief: ['A swordsman who fights from behind a veil,', 'and lifts it only to strike.'],
     stunMult: 4,
     curseEffect: 0.67,
   },
@@ -62,6 +93,19 @@ export const BOSSES: Record<BossId, BossDef> = {
     stunMult: 4,
     curseEffect: 0,
   },
+  bulwarkEngine: {
+    id: 'bulwarkEngine',
+    map: 60,
+    type: 'bulwarkEngine',
+    name: 'the Bulwark Engine',
+    test: 'Hit size and stun, both ways.',
+    brief: [
+      'A machine of plates and pistons, built to outlast a siege.',
+      'Its blows are slow, and they are not gentle.',
+    ],
+    stunMult: 4,
+    curseEffect: 0.67,
+  },
   prismWarden: {
     id: 'prismWarden',
     map: 70,
@@ -71,6 +115,20 @@ export const BOSSES: Record<BossId, BossDef> = {
     brief: [
       'A warden in a shell of crystal.',
       'It turns from fire to frost to lightning, and back.',
+    ],
+    stunMult: 4,
+    curseEffect: 0.67,
+  },
+  twins: {
+    id: 'twins',
+    map: 80,
+    type: 'ash',
+    partners: ['cinder'],
+    name: 'the Sundered Twins',
+    test: 'Defence and offence of two kinds at once.',
+    brief: [
+      'Two siblings, one of ash and one of cinder.',
+      'Neither fights the way the other does.',
     ],
     stunMult: 4,
     curseEffect: 0.67,
@@ -98,6 +156,7 @@ export const BOSSES: Record<BossId, BossDef> = {
 };
 
 export const BOSS_IDS = Object.keys(BOSSES) as BossId[];
+const BOSS_LIST = BOSS_IDS.map((id) => BOSSES[id]);
 
 /** The boss that ends a map, if one does. */
 export function bossForMap(map: number): BossId | null {
@@ -106,7 +165,7 @@ export function bossForMap(map: number): BossId | null {
 
 /** The boss of a monster type, if it is one. */
 export function bossOfType(type: MonsterTypeId): BossDef | undefined {
-  return BOSSES[type as BossId];
+  return BOSS_LIST.find((b) => b.type === type || b.partners?.includes(type));
 }
 
 /** The camp shows the next boss's card from this many maps before its map. */
@@ -122,6 +181,72 @@ export function bossAhead(map: number): { boss: BossDef; maps: number } | null {
 
 /** After a boss freezes or stuns the character, it cannot again for this long (docs/BOSSES.md rule 6). */
 export const BOSS_LOCK_SECONDS = 4;
+
+// The Siege Marshal (section 5a).
+/** The regiments that march in, the time before the next comes on its own, and the strength at which it comes sooner. */
+export const WAVES = 3;
+export const WAVE_PUSH_SECONDS = 22;
+export const WAVE_THIN = 2;
+/** The horn sounds this long before a wave arrives. */
+export const HORN_TELL = 1.6;
+/** Each soldier standing takes this share off the damage the Marshal takes, up to the cap. */
+export const COMMAND_PER = 0.06;
+export const COMMAND_MAX = 0.6;
+/** When the last soldier falls the Marshal is routed: he takes more for a while. */
+export const ROUTED_SECONDS = 6;
+export const ROUTED_TAKEN = 0.2;
+/** The regiments by wave: type and number. */
+export const REGIMENTS: { type: MonsterTypeId; n: number }[][] = [
+  [
+    { type: 'shieldbearer', n: 3 },
+    { type: 'warrior', n: 2 },
+  ],
+  [
+    { type: 'archer', n: 4 },
+    { type: 'shieldbearer', n: 1 },
+  ],
+  [
+    { type: 'mage', n: 3 },
+    { type: 'warrior', n: 2 },
+  ],
+];
+
+// The Veiled Duellist (section 5b).
+/** The veil is up this long, then down for the rest of the cycle. */
+export const VEIL_SECONDS = 3;
+export const VEIL_CYCLE = 9;
+/** When the veil drops he lunges: lanes of steel shown this long first, each a crit of this many of his blows. */
+export const FLURRY_TELL = 0.9;
+export const FLURRY_LANES = 3;
+export const FLURRY_SPREAD = 0.32;
+export const FLURRY_LENGTH = 7;
+export const FLURRY_WIDTH = 1.2;
+export const FLURRY_MULT = 1.7;
+/** After the flurry he is bare: he takes more for a moment. */
+export const BARE_SECONDS = 2.5;
+export const BARE_TAKEN = 0.25;
+
+// The Bulwark Engine (section 5c).
+/** The armour bar, as a share of its life dealt in hits; a hit of at least BIG_HIT of its life counts in full, a smaller one by its size down to the floor. */
+export const BAR_SHARE = 0.1;
+export const BIG_HIT = 0.012;
+export const BAR_FLOOR = 0.3;
+/** Damage over time chips at this share of what it deals. */
+export const BAR_DOT = 0.3;
+/** While the bar stands it takes this much less from hits; broken, it is stunned and takes more. */
+export const PLATED_LESS = 0.35;
+export const BROKEN_SECONDS = 5;
+export const BROKEN_TAKEN = 0.5;
+/** Its blows stun the character (once in the boss lock). */
+export const ENGINE_STUN = 0.7;
+/** Every so often it grinds: a pattern of pistons on the floor. */
+export const GRIND_EVERY = 13;
+
+// The Sundered Twins (section 5d).
+/** The survivor of a pair is faster and hits harder, and from time to time sends the dead twin's own kind of blow after the character. */
+export const GRIEF_SPEED = 0.3;
+export const GRIEF_DAMAGE = 0.25;
+export const ECHO_EVERY = 6;
 
 // The Tollkeeper (section 4).
 export const TOLL_EVERY = 10;

@@ -164,10 +164,16 @@ describe('population (§10.3)', () => {
     expect(late.magic).toBeGreaterThan(early.magic);
   });
 
-  it('mini-bosses on the tenth maps between the bosses, and the Unmaker on map 100 (docs/BOSSES.md)', () => {
-    expect(
-      makeMapPlan(1, 20, 'ashenCrypt').pop.monsters.some((m) => m.spec.rarity === 'miniboss'),
-    ).toBe(true);
+  it('every tenth map ends on its boss, and the Unmaker on map 100 (docs/BOSSES.md)', () => {
+    for (const map of [10, 20, 30, 40, 50, 60, 70, 80, 90]) {
+      const bosses = makeMapPlan(1, map, 'ashenCrypt').pop.monsters.filter(
+        (m) => m.spec.rarity === 'boss',
+      );
+      expect(bosses.length, `map ${map}`).toBeGreaterThanOrEqual(1);
+      expect(
+        makeMapPlan(1, map, 'ashenCrypt').pop.monsters.some((m) => m.spec.rarity === 'miniboss'),
+      ).toBe(false);
+    }
     const p100 = makeMapPlan(1, 100, 'ashenCrypt');
     expect(p100.pop.monsters.filter((m) => m.spec.rarity === 'boss')).toHaveLength(1);
     expect(p100.pop.monsters.find((m) => m.spec.rarity === 'boss')!.name).toBe('the Unmaker');

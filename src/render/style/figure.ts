@@ -67,10 +67,15 @@ export type FigureKind =
   | 'slag'
   // The bosses (docs/BOSSES.md).
   | 'tollkeeper'
+  | 'siegeMarshal'
   | 'courser'
+  | 'duellist'
   | 'magistrate'
   | 'witness'
+  | 'bulwarkEngine'
   | 'prism'
+  | 'ash'
+  | 'cinder'
   | 'rotwife'
   | 'unmaker'
   | 'shard'
@@ -483,6 +488,11 @@ const BUILDS: Record<FigureKind, Build> = {
   worm: { scale: 1.1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   slag: { scale: 1.25, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   tollkeeper: { scale: 2.2, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  siegeMarshal: { scale: 2.0, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  duellist: { scale: 1.75, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  bulwarkEngine: { scale: 2.3, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  ash: { scale: 2.1, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
+  cinder: { scale: 1.7, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   courser: { scale: 1.8, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   magistrate: { scale: 1.95, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
   witness: { scale: 0.95, legLen: 4, torsoH: 6, shoulder: 3, skull: 3, ribW: 3 },
@@ -606,10 +616,15 @@ const CREATURES = new Set<FigureKind>([
   'worm',
   'slag',
   'tollkeeper',
+  'siegeMarshal',
   'courser',
+  'duellist',
   'magistrate',
   'witness',
+  'bulwarkEngine',
   'prism',
+  'ash',
+  'cinder',
   'rotwife',
   'unmaker',
   'shard',
@@ -1000,6 +1015,173 @@ function buildCreature(kind: FigureKind, pose: Pose, type?: MonsterTypeId): Prim
       cap(b, 6, -20 + lift, 13, -12 - swing + lift, 2, 'cloth');
       cap(b, 13, -12 - swing + lift, 17, -5 - swing + lift, 0.5, 'metalShade');
       circ(b, 17.5, -4 - swing + lift, 2.6, 'metal');
+      break;
+    }
+    case 'siegeMarshal': {
+      // A tall officer in a long coat and a plumed helm: a baton raised in one hand, a sabre in the other.
+      const ph = pose.legA;
+      cap(b, -3, -12 + lift, -3 + ph * 3, 0, 2.2, 'metalShade');
+      cap(b, 3, -12 + lift, 3 - ph * 3, 0, 2.2, 'metal');
+      b.prims.push({
+        k: 'tri',
+        pts: [-9, -10 + lift, 9, -10 + lift, 0, -31 + lift],
+        role: 'clothShade',
+      });
+      b.prims.push({
+        k: 'tri',
+        pts: [-6, -12 + lift, 7, -12 + lift, 1, -30 + lift],
+        role: 'cloth',
+      });
+      circ(b, -8, -28 + lift, 3, 'metal');
+      circ(b, 8, -28 + lift, 3, 'metal');
+      circ(b, 2, -24 + lift, 1.2, 'accent');
+      circ(b, 1, -36 + lift + pose.head * 2, 3.8, 'skin');
+      circ(b, 3, -36.5 + lift, 0.7, 'eye');
+      box(b, 1, -41 + lift, 9, 4, 0, 'metal');
+      b.prims.push({
+        k: 'tri',
+        pts: [-2, -43 + lift, 3, -53 + lift, 6, -43 + lift],
+        role: 'accent',
+      });
+      // The baton, held up behind: where his regiments are told to go.
+      cap(b, -7, -28 + lift, -12, -35 + lift, 1.2, 'cloth');
+      cap(b, -12, -35 + lift, -14, -43 + lift, 0.9, 'accent');
+      // The sabre: raised, then brought down in the blow.
+      const cut = Math.max(-0.5, Math.min(1, pose.armA));
+      cap(b, 7, -28 + lift, 13, -24 + lift - cut * 5, 1.4, 'cloth');
+      cap(b, 13, -24 + lift - cut * 5, 22, -33 + lift + cut * 10, 0.9, 'metal');
+      break;
+    }
+    case 'duellist': {
+      // A slim swordsman in a long dark coat and a wide hat, a veil hanging from the brim, a rapier held out in front.
+      const ph = pose.legA;
+      cap(b, -2, -13 + lift, -2 + ph * 3, 0, 1.4, 'dark');
+      cap(b, 2, -13 + lift, 2 - ph * 3, 0, 1.4, 'dark');
+      b.prims.push({ k: 'tri', pts: [-6, -12 + lift, 6, -12 + lift, 0, -31 + lift], role: 'dark' });
+      b.prims.push({
+        k: 'tri',
+        pts: [2, -12 + lift, 6, -12 + lift, 3, -29 + lift],
+        role: 'accent',
+      });
+      circ(b, 1, -35 + lift + pose.head * 2, 3.2, 'skin');
+      circ(b, 2.8, -35.4 + lift, 0.6, 'eye');
+      cap(b, -6, -38 + lift, 8, -38 + lift, 1, 'dark');
+      box(b, 1, -42 + lift, 6, 6, 0, 'dark');
+      b.prims.push({
+        k: 'tri',
+        pts: [4, -44 + lift, 11, -50 + lift, 8, -41 + lift],
+        role: 'accent',
+      });
+      b.prims.push({
+        k: 'tri',
+        pts: [-5, -38 + lift, 8, -38 + lift, 1.5, -27 + lift],
+        role: 'cloth',
+      });
+      cap(b, -4, -27 + lift, -10, -31 + lift, 1, 'dark');
+      const lunge = Math.max(-0.4, Math.min(1, pose.armA));
+      cap(b, 5, -27 + lift, 11 + lunge * 3, -25 + lift, 1.2, 'dark');
+      cap(b, 11 + lunge * 3, -25 + lift, 21 + lunge * 4, -25.5 + lift, 0.5, 'metal');
+      cap(b, 12 + lunge * 3, -28 + lift, 12 + lunge * 3, -22 + lift, 0.8, 'accent');
+      break;
+    }
+    case 'bulwarkEngine': {
+      // A walking siege engine: a box of riveted plates on two piston legs, a slit for a face, a chimney, a slab for a fist.
+      const ph = pose.legA;
+      cap(b, -8, -16 + lift, -8 + ph * 3, 0, 3.2, 'metalShade');
+      cap(b, 8, -16 + lift, 8 - ph * 3, 0, 3.2, 'metal');
+      box(b, 0, -26 + lift, 22, 18, 0, 'metalShade');
+      box(b, 1, -26 + lift, 18, 14, 0, 'metal');
+      for (const x of [-6, 0, 6]) box(b, x, -26 + lift, 4, 16, 0, 'metalShade');
+      for (const [x, y] of [
+        [-8, -32],
+        [8, -32],
+        [-8, -20],
+        [8, -20],
+      ] as const)
+        circ(b, x, y + lift, 1, 'accent');
+      box(b, 0, -39 + lift, 12, 6, 0, 'metalShade');
+      box(b, 2, -39 + lift, 6, 1.6, 0, 'glow');
+      cap(b, -8, -35 + lift, -8, -46 + lift, 2, 'metalShade');
+      circ(b, -8.5, -48 + lift - pose.head, 2, 'dark');
+      const slam = pose.armA * 6;
+      cap(b, 11, -30 + lift, 15, -14 - slam + lift, 3, 'metal');
+      circ(b, 16, -12 - slam + lift, 4, 'metalShade');
+      cap(b, -11, -30 + lift, -15, -14 + lift, 3, 'metalShade');
+      circ(b, -16, -12 + lift, 4, 'metalShade');
+      break;
+    }
+    case 'ash': {
+      // A hulking figure in ashen plate, cracked, with a great hammer.
+      const ph = pose.legA;
+      cap(b, -4, -12 + lift, -4 + ph * 2, 0, 3, 'metalShade');
+      cap(b, 4, -12 + lift, 4 - ph * 2, 0, 3, 'metal');
+      b.prims.push({
+        k: 'tri',
+        pts: [-10, -14 + lift, 10, -14 + lift, 0, -3 + lift],
+        role: 'clothShade',
+      });
+      circ(b, 0, -22 + lift, 9, 'metalShade');
+      circ(b, 0, -23 + lift, 7.4, 'metal');
+      cap(b, -3, -27 + lift, 2, -18 + lift, 0.6, 'dark');
+      cap(b, 2, -18 + lift, -1, -15 + lift, 0.6, 'dark');
+      circ(b, -9, -28 + lift, 4, 'metal');
+      circ(b, 9, -28 + lift, 4, 'metal');
+      circ(b, 1, -34 + lift + pose.head * 2, 4.4, 'metalShade');
+      circ(b, 3.2, -34.5 + lift, 0.8, 'eye');
+      cap(b, -9, -26 + lift, -13, -14 + lift, 2.6, 'metalShade');
+      // The hammer: carried high, brought down in the blow.
+      const up = Math.max(-0.4, Math.min(1, pose.armA));
+      cap(b, 9, -27 + lift, 15, -20 + lift - up * 8, 2.4, 'metal');
+      cap(b, 15, -20 + lift - up * 8, 20, -36 + lift - up * 10, 1.1, 'wood');
+      box(b, 20.5, -38 + lift - up * 10, 10, 7, 0, 'metalShade');
+      break;
+    }
+    case 'cinder': {
+      // A lean figure of embers with a flame for a head, a spark in its palm, and a trail of sparks.
+      const ph = pose.legA;
+      cap(b, -2, -13 + lift, -2 + ph * 3, 0, 1.6, 'dark');
+      cap(b, 2, -13 + lift, 2 - ph * 3, 0, 1.6, 'dark');
+      b.prims.push({
+        k: 'tri',
+        pts: [-6, -12 + lift, 6, -12 + lift, 0, -30 + lift],
+        role: 'clothShade',
+      });
+      b.prims.push({
+        k: 'tri',
+        pts: [-3, -13 + lift, 4, -13 + lift, 1, -27 + lift],
+        role: 'accent',
+      });
+      circ(b, 0.5, -21 + lift, 2.4 + pose.charge * 2, 'glow');
+      circ(b, 1, -31 + lift, 2.8, 'dark');
+      b.prims.push({
+        k: 'tri',
+        pts: [-3, -32 + lift, 5, -32 + lift, 1, -46 + lift - pose.head * 2],
+        role: 'accent',
+      });
+      b.prims.push({
+        k: 'tri',
+        pts: [-1.5, -32 + lift, 3.5, -32 + lift, 1, -41 + lift],
+        role: 'glow',
+      });
+      circ(b, 2.2, -31 + lift, 0.7, 'eye');
+      const raise = pose.armA * 5;
+      cap(b, 4, -24 + lift, 11, -26 - raise + lift, 1.2, 'dark');
+      circ(b, 12.5, -27 - raise + lift, 2.4 + pose.charge * 2, 'glow');
+      cap(b, -4, -24 + lift, -9, -20 + lift, 1.1, 'dark');
+      circ(
+        b,
+        Math.cos(pose.legA * 4) * 5 - 6,
+        -8 + lift + Math.sin(pose.legA * 4) * 3,
+        0.8,
+        'glow',
+      );
+      circ(
+        b,
+        Math.sin(pose.legA * 3) * 5 - 8,
+        -16 + lift + Math.cos(pose.legA * 5) * 3,
+        0.6,
+        'accent',
+      );
       break;
     }
     case 'courser': {

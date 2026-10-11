@@ -28,7 +28,7 @@ const cleared = (level: number): MapResult => ({
 describe('map offers (docs/MAPS.md section 4)', () => {
   it('a level offers three maps with three different themes that exist at that level', () => {
     // (A boss map has a single offer: docs/BOSSES.md 10.)
-    for (const map of [1, 4, 8, 15, 25, 40, 60, 99]) {
+    for (const map of [1, 4, 8, 15, 25, 41, 61, 99]) {
       for (let seed = 1; seed <= 10; seed++) {
         const offers = rollOffers(seed, map);
         expect(offers).toHaveLength(OFFERS_PER_SET);
@@ -66,8 +66,8 @@ describe('map offers (docs/MAPS.md section 4)', () => {
       let lower = 0;
       let sets = 0;
       for (let seed = 1; seed <= 400; seed++) {
-        // A tenth map that is not a boss's: three offers and never a Respite, so a hurt character's sets are all maps.
-        const offers = rollOffers(seed, 20, vitals);
+        // Map 25: three offers (a tenth map is a boss's, and has one).
+        const offers = rollOffers(seed, 25, vitals);
         sets++;
         if (offers.some((o) => o.offset !== 0)) off++;
         if (offers.some((o) => o.offset < 0)) lower++;
@@ -75,7 +75,7 @@ describe('map offers (docs/MAPS.md section 4)', () => {
       return { off: off / sets, lower: lower / sets };
     };
     const well = count(fullVitals());
-    const hurt = count({ ...fullVitals(), life: 0.3 });
+    const hurt = count({ ...fullVitals(), life: 0.5 });
     expect(well.off).toBeGreaterThan(0.5); // two slots, each off-level 40% of the time
     expect(well.off).toBeLessThan(0.75);
     expect(hurt.lower).toBeGreaterThan(well.lower + 0.08);
@@ -99,11 +99,11 @@ describe('map offers (docs/MAPS.md section 4)', () => {
     const level = (p: typeof flat) => Math.max(...p.pop.monsters.map((m) => m.spec.level));
     expect(level(up)).toBeGreaterThan(level(flat));
     expect(level(flat)).toBeGreaterThan(level(down));
-    // The mini-boss comes with the map number, not the offered level: 38 +2 is still not a mini-boss map.
+    // The boss comes with the map number, not the offered level: 38 +2 is still not a boss map.
     setMap(run, 39);
     expect(planFor(run, makeOffer(run.seed, 39, 0, 'ashenCrypt', 2)).endKind).toBe('rare');
     setMap(run, 40);
-    expect(planFor(run, makeOffer(run.seed, 40, 0, 'ashenCrypt', -2)).endKind).toBe('miniboss');
+    expect(planFor(run, makeOffer(run.seed, 40, 0, 'ashenCrypt', -2)).endKind).toBe('boss');
   });
 
   it('a result records the level that was played', () => {

@@ -168,7 +168,7 @@ export function OfferInfo({
           {boss && (
             <div class="gate">
               <strong>{BOSSES[boss].name[0].toUpperCase() + BOSSES[boss].name.slice(1)}</strong>{' '}
-              waits at the end: {BOSSES[boss].test}
+              waits at the end. {BOSSES[boss].brief.join(' ')}
             </div>
           )}
           {gate && !boss && champ && theme.chief && (

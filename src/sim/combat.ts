@@ -74,7 +74,7 @@ import { scaleProfile } from './shots';
 import { chargedDeath, frostBite, gainVirulence, shellTakes } from './skillFx';
 import { spawnMonster } from './world';
 import { afflictPlayer, bossLocked, flaskWards, isBossSide, lockBoss } from './afflict';
-import { bossHitPlayer } from './bosses';
+import { bossHitPlayer, bossVeiled } from './bosses';
 import type { Actor, Dot, World } from './types';
 
 const CHAOS = 4;
@@ -718,6 +718,9 @@ export function hit(
   // Consecrated ground makes hits against what stands on it crit twice as often.
   if (src.isPlayer && !dst.isPlayer && w.fields.length > 0 && consecratedAt(w, dst.x, dst.y))
     h = { ...h, critChance: h.critChance * CRIT_ON_CONSECRATED };
+  // The Veiled Duellist's veil: nothing crits it while it is up (docs/BOSSES.md 5b).
+  const veiled = !dst.isPlayer && dst.enc !== undefined && bossVeiled(dst);
+  if (veiled) h = { ...h, critChance: 0 };
   if (hm.critChance > 0 || hm.critMulti > 0)
     h = {
       ...h,
@@ -733,7 +736,16 @@ export function hit(
   // A charge counts the distance it ran, not the distance to the enemy.
   if (p.distMore?.travel && src.isPlayer) dist = w.lastTravel;
   const wasFull = dst.life >= dst.def.maxLife - 0.5;
-  const res = resolveHit(w.rngCombat, p, h, ts, dist, canStun, undefined, w.critLock ?? undefined);
+  const res = resolveHit(
+    w.rngCombat,
+    p,
+    h,
+    ts,
+    dist,
+    canStun,
+    undefined,
+    veiled ? false : (w.critLock ?? undefined),
+  );
   // A hit of Leap Slam always stuns an enemy that was on full life.
   if (p.stunFull > 0 && wasFull && canStun && res.outcome === 'hit' && res.stun < p.stunFull)
     res.stun = p.stunFull;

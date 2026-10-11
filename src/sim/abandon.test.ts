@@ -108,7 +108,7 @@ describe('abandon (docs/MAPS.md section 7)', () => {
 describe('a map that drags on is left on its own', () => {
   it('after 500 seconds, on any map, with the usual few seconds to go and no way to call it off', () => {
     // (A boss map waits twice as long: docs/BOSSES.md 10, tested in sim/bosses.test.ts.)
-    for (const map of [1, 20, 7]) {
+    for (const map of [1, 25, 7]) {
       const w = worldAt(map, { godMode: true });
       w.t = AUTO_ABANDON_AFTER - 1;
       steps(w, 0.5);

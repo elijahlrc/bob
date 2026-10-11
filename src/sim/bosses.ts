@@ -5,26 +5,52 @@ import {
   ADAPT_WINDOW,
   ATTUNE_SECONDS,
   ATTUNE_SHIFT,
+  BARE_SECONDS,
+  BARE_TAKEN,
+  BAR_DOT,
+  BAR_FLOOR,
+  BAR_SHARE,
+  BIG_HIT,
   BOSSES,
+  BROKEN_SECONDS,
+  BROKEN_TAKEN,
   CANTER_RADIUS,
   CANTER_SECONDS,
   CANTER_SPEED,
+  COMMAND_MAX,
+  COMMAND_PER,
   COURSER_CHILL,
   DRINK_REGEN,
+  ECHO_EVERY,
+  ENGINE_STUN,
   EXPOSED_SECONDS,
   EXPOSED_TAKEN,
   FRACTURE_SECONDS,
+  FLURRY_LANES,
+  FLURRY_LENGTH,
+  FLURRY_MULT,
+  FLURRY_SPREAD,
+  FLURRY_TELL,
+  FLURRY_WIDTH,
   FRACTURE_TAKEN,
   GALLOP_LENGTH,
   GALLOP_SPEED,
   GALLOP_TELL,
+  GRIEF_DAMAGE,
+  GRIEF_SPEED,
+  GRIND_EVERY,
+  HORN_TELL,
   LANE_BURN_SECONDS,
   LANE_WIDTH,
+  PLATED_LESS,
   PRISM_PATTERN_EVERY,
+  REGIMENTS,
   ROT_PATCH_EVERY,
   ROT_PATCH_SECONDS,
   ROT_REGEN,
   ROT_ROTATION,
+  ROUTED_SECONDS,
+  ROUTED_TAKEN,
   SENTENCE_EVERY,
   SENTENCE_MULT,
   SENTENCE_STUN,
@@ -45,6 +71,11 @@ import {
   TOLL_SHOCK,
   TOLL_SPEED,
   TOLL_TELL,
+  VEIL_CYCLE,
+  VEIL_SECONDS,
+  WAVES,
+  WAVE_PUSH_SECONDS,
+  WAVE_THIN,
   WITNESSES,
   WITNESS_HEX_STEP,
   WITNESS_WEIGHT,
@@ -55,7 +86,7 @@ import {
 import { HEX_IDS } from '../data/hexes';
 import { affixPlayerMods } from '../data/mapAffixes';
 import type { MonsterTypeId, Variant } from '../data/monsters';
-import { afflictPlayer } from './afflict';
+import { afflictPlayer, stunPlayer } from './afflict';
 import { castPattern } from './blasts';
 import { rebuildForTheft } from './charges';
 import { hit, monsterConds, monsterHitOf, refreshPlayerDefence } from './combat';
@@ -119,6 +150,28 @@ export type BossState = {
   exposedT: number;
   dealt: number[];
   adapt: number[];
+  // The Siege Marshal.
+  holding: boolean;
+  wave: number;
+  waveT: number;
+  hornT: number;
+  soldiers: Actor[];
+  routedT: number;
+  // The Veiled Duellist.
+  veiled: boolean;
+  phaseT: number;
+  flurryT: number;
+  bareT: number;
+  // The Bulwark Engine.
+  bar: number;
+  brokenT: number;
+  lastLife: number;
+  hitLoss: number;
+  grindT: number;
+  // The Sundered Twins.
+  twin: 'ash' | 'cinder';
+  grief: boolean;
+  echoT: number;
 };
 
 const states = new WeakMap<Actor, BossState>();
@@ -166,6 +219,24 @@ export function initBoss(w: World, a: Actor): void {
     exposedT: 0,
     dealt: [0, 0, 0, 0, 0],
     adapt: [0, 0, 0, 0, 0],
+    holding: true,
+    wave: 0,
+    waveT: 0,
+    hornT: 0,
+    soldiers: [],
+    routedT: 0,
+    veiled: true,
+    phaseT: VEIL_SECONDS,
+    flurryT: 0,
+    bareT: 0,
+    bar: a.def.maxLife * BAR_SHARE,
+    brokenT: 0,
+    lastLife: a.life,
+    hitLoss: 0,
+    grindT: GRIND_EVERY * 0.7,
+    twin: a.mon!.spec.type === 'cinder' ? 'cinder' : 'ash',
+    grief: false,
+    echoT: ECHO_EVERY,
   });
   void w;
 }
@@ -185,8 +256,22 @@ export function tickBoss(w: World, m: Actor, dt: number): void {
     w.events.push({ t: 'window', id: m.id, kind: 'bossBegins' });
     if (st.id === 'magistrate') raiseWitnesses(w, m, st, true);
     if (st.id === 'prismWarden') attune(w, m, st, 3);
+    if (st.id === 'siegeMarshal') callRegiment(w, m, st);
+    if (st.id === 'duellist') st.phaseT = VEIL_SECONDS;
   }
   switch (st.id) {
+    case 'siegeMarshal':
+      tickSiege(w, m, st, dt);
+      break;
+    case 'duellist':
+      tickDuel(w, m, st, dt);
+      break;
+    case 'bulwarkEngine':
+      tickEngine(w, m, st, dt);
+      break;
+    case 'twins':
+      tickTwins(st, dt);
+      break;
     case 'tollkeeper':
       tickToll(w, m, st, dt);
       break;
@@ -244,6 +329,33 @@ export function bossAI(w: World, m: Actor, dt: number): boolean {
         w.events.push({ t: 'window', id: m.id, kind: 'pattern' });
       }
       return st.shiftT > 0;
+    case 'siegeMarshal':
+      // Until his regiments are spent he commands from where he stands.
+      if (!st.holding) return false;
+      m.moving = false;
+      m.facing = Math.atan2(p.y - m.y, p.x - m.x);
+      return true;
+    case 'duellist':
+      if (st.due && st.flurryT <= 0 && !st.veiled && p.alive) {
+        st.due = false;
+        flurry(w, m, st);
+      }
+      if (st.flurryT > 0) m.facing = Math.atan2(p.y - m.y, p.x - m.x);
+      return st.flurryT > 0;
+    case 'bulwarkEngine':
+      if (st.due && m.stunT <= 0 && p.alive) {
+        st.due = false;
+        const act = { profile: m.mon!.profile(0), aimX: p.x, aimY: p.y } as Action;
+        castPattern(w, m, act, 'march');
+        w.events.push({ t: 'window', id: m.id, kind: 'grind' });
+      }
+      return false;
+    case 'twins':
+      if (st.due && st.grief && p.alive) {
+        st.due = false;
+        echo(w, m, st);
+      }
+      return false;
     default:
       return false;
   }
@@ -252,11 +364,15 @@ export function bossAI(w: World, m: Actor, dt: number): boolean {
 /** A boss's damage and pace (from `encDamageMult` and `encMoveMult`): the toll's stacks. */
 export function bossDamageMult(m: Actor): number {
   const st = states.get(m);
-  return st?.id === 'tollkeeper' ? 1 + TOLL_DAMAGE * st.tolls : 1;
+  if (st?.id === 'tollkeeper') return 1 + TOLL_DAMAGE * st.tolls;
+  if (st?.id === 'twins' && st.grief) return 1 + GRIEF_DAMAGE;
+  return 1;
 }
 export function bossSpeedMult(m: Actor): number {
   const st = states.get(m);
-  return st?.id === 'tollkeeper' ? 1 + TOLL_SPEED * st.tolls : 1;
+  if (st?.id === 'tollkeeper') return 1 + TOLL_SPEED * st.tolls;
+  if (st?.id === 'twins' && st.grief) return 1 + GRIEF_SPEED;
+  return 1;
 }
 
 /** What a hit on a boss does to it (from `modeTaken`): a Fractured element, the Unmaker's adaptation and exposure. */
@@ -264,6 +380,21 @@ export function bossTaken(dst: Actor, dmg: number[]): void {
   const st = states.get(dst);
   if (!st) return;
   if (st.id === 'prismWarden' && st.fracturedT > 0) dmg[st.fractured] *= 1 + FRACTURE_TAKEN;
+  if (st.id === 'siegeMarshal') {
+    const k = (1 - commandLess(st)) * (st.routedT > 0 ? 1 + ROUTED_TAKEN : 1);
+    for (let i = 0; i < 5; i++) dmg[i] *= k;
+  }
+  if (st.id === 'duellist' && st.bareT > 0) for (let i = 0; i < 5; i++) dmg[i] *= 1 + BARE_TAKEN;
+  if (st.id === 'bulwarkEngine') {
+    if (st.brokenT > 0) for (let i = 0; i < 5; i++) dmg[i] *= 1 + BROKEN_TAKEN;
+    else {
+      // A hit wears the bar down by its size: a big one by all of it, a small one by a share (never none).
+      const total = dmg[0] + dmg[1] + dmg[2] + dmg[3] + dmg[4];
+      const big = Math.min(1, total / dst.def.maxLife / BIG_HIT);
+      st.bar -= total * (BAR_FLOOR + (1 - BAR_FLOOR) * big);
+      for (let i = 0; i < 5; i++) dmg[i] *= 1 - PLATED_LESS;
+    }
+  }
   if (st.id === 'unmaker') {
     const exposed = st.exposedT > 0 ? 1 + EXPOSED_TAKEN : 1;
     for (let i = 0; i < 5; i++) dmg[i] *= (1 - st.adapt[i]) * exposed;
@@ -273,6 +404,7 @@ export function bossTaken(dst: Actor, dmg: number[]): void {
 /** What a boss has taken (from `noteTaken`): the Unmaker learns the damage it is dealt most. */
 export function bossNoteTaken(m: Actor, dmg: number[]): void {
   const st = states.get(m);
+  if (st?.id === 'bulwarkEngine') st.hitLoss += dmg[0] + dmg[1] + dmg[2] + dmg[3] + dmg[4];
   if (st?.id !== 'unmaker') return;
   for (let i = 0; i < 5; i++) st.dealt[i] += dmg[i];
 }
@@ -280,6 +412,8 @@ export function bossNoteTaken(m: Actor, dmg: number[]): void {
 /** A boss's blow lands on the character (from `onMonsterHitPlayer`): the Rotwife's ailment of the moment. */
 export function bossHitPlayer(w: World, src: Actor): void {
   const st = states.get(src);
+  // The Engine's blows knock the character senseless for a moment (once in the boss lock).
+  if (st?.id === 'bulwarkEngine') stunPlayer(w, ENGINE_STUN);
   if (st?.id !== 'rotwife') return;
   const kind = ROT_ROTATION[st.rot % ROT_ROTATION.length];
   st.rot++;
@@ -317,7 +451,10 @@ export function bossDeath(w: World, a: Actor): void {
     // The fight is over: what it brought goes with it, and what it held comes back.
     for (const x of st.witnesses) if (x.alive) dismiss(w, x);
     for (const s of st.shards) if (s.actor.alive) dismiss(w, s.actor);
+    for (const x of st.soldiers) if (x.alive) dismiss(w, x);
     st.shards = [];
+    // The other twin takes it hard.
+    if (st.id === 'twins') grieve(w, a);
     if (st.id === 'unmaker' && hasTheft(w)) {
       setTheft(w, {});
       rebuildForTheft(w);
@@ -776,6 +913,201 @@ function tickRot(w: World, m: Actor, st: BossState, dt: number): void {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+// The Siege Marshal (section 5a).
+
+/** The share off what the Marshal takes while his soldiers stand. */
+export function commandLess(st: BossState): number {
+  return Math.min(COMMAND_MAX, COMMAND_PER * livingSoldiers(st));
+}
+
+export function livingSoldiers(st: BossState): number {
+  return st.soldiers.filter((x) => x.alive).length;
+}
+
+/** The horn sounds: the next regiment marches in when it dies away. */
+function callRegiment(w: World, m: Actor, st: BossState): void {
+  st.hornT = HORN_TELL;
+  w.events.push({ t: 'window', id: m.id, kind: 'horn' });
+}
+
+/** A regiment takes its places round the arena, and starts for the character. */
+function marchIn(w: World, m: Actor, st: BossState): void {
+  const room = w.plan.lab.rooms[m.room];
+  const cx = room ? room.cx + 0.5 : m.x;
+  const cy = room ? room.cy + 0.5 : m.y;
+  const r = room ? Math.min(room.rect.w, room.rect.h) / 2 - 2.5 : 6;
+  const ranks = REGIMENTS[Math.min(st.wave, REGIMENTS.length - 1)];
+  const total = ranks.reduce((n, g) => n + g.n, 0);
+  const start = w.rngAi.float(0, Math.PI * 2);
+  st.soldiers = st.soldiers.filter((x) => x.alive);
+  let k = 0;
+  for (const g of ranks)
+    for (let i = 0; i < g.n; i++, k++) {
+      const ang = start + (k / total) * Math.PI * 2;
+      const at = w.grid.nearestReachable(cx + Math.cos(ang) * r, cy + Math.sin(ang) * r) ?? {
+        x: cx,
+        y: cy,
+      };
+      st.soldiers.push(bring(w, m, g.type, at.x, at.y));
+    }
+  st.wave++;
+  st.waveT = WAVE_PUSH_SECONDS;
+  w.events.push({ t: 'window', id: m.id, kind: 'march' });
+}
+
+function tickSiege(w: World, m: Actor, st: BossState, dt: number): void {
+  if (st.routedT > 0) st.routedT -= dt;
+  if (!st.holding) return;
+  if (st.hornT > 0) {
+    st.hornT -= dt;
+    if (st.hornT <= 0) marchIn(w, m, st);
+    return;
+  }
+  const alive = livingSoldiers(st);
+  if (st.wave < WAVES) {
+    // The next regiment comes when the last has thinned, or when its time is up, whichever is first.
+    st.waveT -= dt;
+    if (alive <= WAVE_THIN || st.waveT <= 0) callRegiment(w, m, st);
+  } else if (alive === 0) {
+    // All spent: he comes down himself, and for a moment he is alone.
+    st.holding = false;
+    st.routedT = ROUTED_SECONDS;
+    w.events.push({ t: 'window', id: m.id, kind: 'routed' });
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// The Veiled Duellist (section 5b).
+
+/** Whether the veil is up: nothing that hits him can crit (from `hit`). */
+export function bossVeiled(m: Actor): boolean {
+  const st = states.get(m);
+  return st?.id === 'duellist' && st.veiled;
+}
+
+function tickDuel(w: World, m: Actor, st: BossState, dt: number): void {
+  if (st.bareT > 0) st.bareT -= dt;
+  if (st.flurryT > 0) {
+    st.flurryT -= dt;
+    if (st.flurryT <= 0) {
+      st.bareT = BARE_SECONDS;
+      w.events.push({ t: 'window', id: m.id, kind: 'bare' });
+    }
+  }
+  st.phaseT -= dt;
+  if (st.phaseT > 0) return;
+  if (st.veiled) {
+    // The veil drops, and he lunges as soon as he is between blows.
+    st.veiled = false;
+    st.phaseT = VEIL_CYCLE - VEIL_SECONDS;
+    st.due = true;
+    w.events.push({ t: 'window', id: m.id, kind: 'unveil' });
+  } else {
+    st.veiled = true;
+    st.phaseT = VEIL_SECONDS;
+    st.due = false;
+    w.events.push({ t: 'window', id: m.id, kind: 'veil' });
+  }
+}
+
+/** The lunge: lanes of steel fan out toward the character, shown first, each a critical blow. */
+function flurry(w: World, m: Actor, st: BossState): void {
+  const p = w.player;
+  st.flurryT = FLURRY_TELL;
+  const base = Math.atan2(p.y - m.y, p.x - m.x);
+  const dmg = monsterHitOf(m) * FLURRY_MULT;
+  for (let i = 0; i < FLURRY_LANES; i++) {
+    const ang = base + (i - (FLURRY_LANES - 1) / 2) * FLURRY_SPREAD;
+    const to = runOut(w, m.x, m.y, ang, FLURRY_LENGTH, 0.3);
+    w.effects.push({
+      id: w.nextId++,
+      x: m.x,
+      y: m.y,
+      x2: to.x,
+      y2: to.y,
+      width: FLURRY_WIDTH,
+      radius: Math.hypot(to.x - m.x, to.y - m.y) / 2,
+      t: FLURRY_TELL,
+      total: FLURRY_TELL,
+      kind: 'slam',
+      damage: dmg,
+      dtype: 0,
+      faction: 1,
+      shape: 'lane',
+      label: 'Flurry',
+      owner: m.id,
+    });
+  }
+  w.events.push({ t: 'window', id: m.id, kind: 'flurry' });
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// The Bulwark Engine (section 5c).
+
+function tickEngine(w: World, m: Actor, st: BossState, dt: number): void {
+  // Life lost to something other than a hit (a burn, a bleed, a poison) wears the plates too, a little.
+  const dot = Math.max(0, st.lastLife - m.life - st.hitLoss);
+  st.lastLife = m.life;
+  st.hitLoss = 0;
+  if (st.brokenT > 0) {
+    st.brokenT -= dt;
+    if (st.brokenT <= 0) {
+      st.bar = m.def.maxLife * BAR_SHARE;
+      w.events.push({ t: 'window', id: m.id, kind: 'replated' });
+    }
+    return;
+  }
+  st.bar -= dot * BAR_DOT;
+  if (st.bar <= 0) {
+    // The plates give: it stops dead, and takes more for a while.
+    st.brokenT = BROKEN_SECONDS;
+    m.stunT = Math.max(m.stunT, BROKEN_SECONDS);
+    m.action = null;
+    w.events.push({ t: 'window', id: m.id, kind: 'broken' });
+    w.events.push({ t: 'stun', dst: m.id, dur: BROKEN_SECONDS });
+    return;
+  }
+  st.grindT -= dt;
+  if (st.grindT <= 0) {
+    st.grindT = GRIND_EVERY;
+    st.due = true;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// The Sundered Twins (section 5d).
+
+function tickTwins(st: BossState, dt: number): void {
+  if (!st.grief) return;
+  st.echoT -= dt;
+  if (st.echoT <= 0 && !st.due) {
+    st.echoT = ECHO_EVERY;
+    st.due = true;
+  }
+}
+
+/** One twin has fallen: the other takes it hard (faster, harder, and it sends the dead one's own kind of blow). */
+function grieve(w: World, dead: Actor): void {
+  const o = w.actors.find((x) => x !== dead && x.alive && states.get(x)?.id === 'twins');
+  const st = o && states.get(o);
+  if (!o || !st || st.grief) return;
+  st.grief = true;
+  st.echoT = ECHO_EVERY * 0.5;
+  w.events.push({ t: 'window', id: o.id, kind: 'grief' });
+}
+
+/** The survivor casts the other's kind of blow: Ash sends Cinder's fire, Cinder sends Ash's steel. */
+function echo(w: World, m: Actor, st: BossState): void {
+  const p = w.player;
+  const act = { profile: m.mon!.profile(0), aimX: p.x, aimY: p.y } as Action;
+  const from = w.effects.length;
+  castPattern(w, m, act, st.twin === 'ash' ? 'closingRing' : 'cross');
+  const dtype = st.twin === 'ash' ? 3 : 0;
+  for (let i = from; i < w.effects.length; i++) w.effects[i].dtype = dtype;
+  w.events.push({ t: 'window', id: m.id, kind: 'echo' });
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 // The Unmaker (section 9).
 
 function hasTheft(w: World): boolean {
@@ -934,6 +1266,27 @@ export function bossReadout(w: World, m: Actor): string[] {
     case 'rotwife':
       out.push(`Next blow: ${ROT_ROTATION[st.rot % ROT_ROTATION.length]}`);
       if (st.regrowing) out.push('Regrowing');
+      break;
+    case 'siegeMarshal':
+      if (st.holding) {
+        out.push(`Regiment ${st.wave} of ${WAVES}: ${livingSoldiers(st)} standing`);
+        if (commandLess(st) > 0) out.push(`Takes ${Math.round(commandLess(st) * 100)}% less`);
+      } else if (st.routedT > 0) out.push('Routed');
+      break;
+    case 'duellist':
+      out.push(
+        st.veiled ? 'Veiled' : st.flurryT > 0 ? 'Lunging' : st.bareT > 0 ? 'Bare' : 'Unveiled',
+      );
+      break;
+    case 'bulwarkEngine':
+      out.push(
+        st.brokenT > 0
+          ? 'Plates broken'
+          : `Plating ${Math.max(0, Math.round((st.bar / (m.def.maxLife * BAR_SHARE)) * 100))}%`,
+      );
+      break;
+    case 'twins':
+      if (st.grief) out.push('Grieving');
       break;
     case 'unmaker': {
       const held = st.shards.filter((s) => s.actor.alive).map((s) => s.kind);

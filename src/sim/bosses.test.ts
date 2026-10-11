@@ -4,15 +4,36 @@ import {
   ADAPT_MAX,
   ATTUNE_SECONDS,
   ATTUNE_SHIFT,
+  BARE_TAKEN,
+  BAR_DOT,
+  BAR_FLOOR,
+  BAR_SHARE,
+  BIG_HIT,
   BOSSES,
   BOSS_IDS,
+  BOSS_LOCK_SECONDS,
+  BROKEN_SECONDS,
+  BROKEN_TAKEN,
+  COMMAND_PER,
+  ECHO_EVERY,
+  FLURRY_LANES,
+  FLURRY_TELL,
   FRACTURE_SECONDS,
   FRACTURE_TAKEN,
+  GRIEF_DAMAGE,
+  GRIEF_SPEED,
+  HORN_TELL,
+  PLATED_LESS,
   ROT_REGEN,
+  ROUTED_TAKEN,
   TOLL_DAMAGE,
   TOLL_EVERY,
   TOLL_TELL,
+  VEIL_CYCLE,
+  VEIL_SECONDS,
+  WAVE_PUSH_SECONDS,
   bossForMap,
+  bossOfType,
   type BossId,
 } from '../data/bosses';
 import { PROBES, durabilityTable } from '../calc/matrix';
@@ -23,7 +44,14 @@ import { makeMapPlan } from '../gen/mapPlan';
 import { typeShares } from '../gen/population';
 import { makeGem, makeItem } from '../gen/items';
 import { newRun } from '../run/run';
-import { bossDamageMult, bossState } from './bosses';
+import {
+  bossDamageMult,
+  bossSpeedMult,
+  bossState,
+  bossTaken,
+  commandLess,
+  livingSoldiers,
+} from './bosses';
 import { createDummyWorld } from './dummy';
 import type { Actor, World } from './types';
 import { spawnMonster, stepWorld } from './world';
@@ -62,7 +90,7 @@ const run = (w: World, seconds: number) => {
 };
 
 describe('the boss maps (docs/BOSSES.md 12)', () => {
-  it('maps 10, 30, 50, 70, 90 and 100 end on their boss, alone in an arena past the last room', () => {
+  it('every tenth map ends on its boss, alone in an arena past the last room', () => {
     for (const id of BOSS_IDS) {
       const map = BOSSES[id].map;
       expect(bossForMap(map)).toBe(id);
@@ -70,12 +98,15 @@ describe('the boss maps (docs/BOSSES.md 12)', () => {
       expect(plan.endKind).toBe('boss');
       const end = plan.lab.rooms[plan.lab.mainPath[plan.lab.mainPath.length - 1]];
       const inEnd = plan.pop.monsters.filter((m) => m.room === end.id);
-      expect(inEnd.map((m) => m.spec.type)).toEqual([BOSSES[id].type]);
-      expect(inEnd[0].spec.rarity).toBe('boss');
-      expect(inEnd[0].name).toBe(BOSSES[id].name);
+      expect(inEnd.map((m) => m.spec.type)).toEqual([
+        BOSSES[id].type,
+        ...(BOSSES[id].partners ?? []),
+      ]);
+      for (const m of inEnd) expect(m.spec.rarity).toBe('boss');
+      expect(inEnd[0].name).toBe(MONSTER_TYPES[BOSSES[id].type].name);
     }
-    // The other tenth maps keep their champions.
-    expect(makeMapPlan(7, 20, 'ashenCrypt').endKind).toBe('miniboss');
+    // The maps between them do not.
+    expect(makeMapPlan(7, 25, 'ashenCrypt').endKind).toBe('rare');
   });
 
   it('the arena can be walked to from the start', () => {
@@ -417,6 +448,310 @@ describe('the Unmaker (docs/BOSSES.md 9)', () => {
   });
 });
 
+describe('the Siege Marshal (docs/BOSSES.md 5a)', () => {
+  it('commands from where he stands while three regiments march in, then comes down alone and routed', () => {
+    const w = bossArena(22);
+    w.player.stunT = 1e9;
+    const m = putBoss(w, 'siegeMarshal', 5, 0, 20);
+    const st = bossState(m)!;
+    const x0 = m.x;
+    const y0 = m.y;
+    run(w, HORN_TELL + 0.3);
+    expect(st.wave).toBe(1);
+    expect(livingSoldiers(st)).toBe(5);
+    expect(st.soldiers.every((s) => s.noReward && s.alive)).toBe(true);
+    // The more of them stand, the less he takes.
+    expect(commandLess(st)).toBeCloseTo(5 * COMMAND_PER);
+    // Each regiment is called when the last has thinned.
+    for (const s of st.soldiers.slice(0, 4)) s.alive = false;
+    run(w, HORN_TELL + 0.3);
+    expect(st.wave).toBe(2);
+    for (const s of st.soldiers) s.alive = false;
+    run(w, HORN_TELL + 0.3);
+    expect(st.wave).toBe(3);
+    expect(st.holding).toBe(true);
+    // He has not moved a step.
+    expect(Math.hypot(m.x - x0, m.y - y0)).toBeLessThan(0.01);
+    // The last regiment spent, he comes down, and is routed for a while.
+    for (const s of st.soldiers) s.alive = false;
+    run(w, 0.3);
+    expect(st.holding).toBe(false);
+    expect(st.routedT).toBeGreaterThan(0);
+    const dmg = [100, 0, 0, 0, 0];
+    bossTaken(m, dmg);
+    expect(dmg[0]).toBeCloseTo(100 * (1 + ROUTED_TAKEN));
+  });
+
+  it('a regiment comes on its own if the last is not thinned in time', () => {
+    const w = bossArena(22);
+    w.player.stunT = 1e9;
+    const m = putBoss(w, 'siegeMarshal', 5, 0, 20);
+    const st = bossState(m)!;
+    run(w, HORN_TELL + 0.3);
+    expect(st.wave).toBe(1);
+    for (const s of st.soldiers) s.life = 1e9;
+    run(w, WAVE_PUSH_SECONDS + HORN_TELL + 0.5);
+    expect(st.wave).toBe(2);
+  });
+
+  it('the soldiers go with him when he falls', async () => {
+    const { rawHit } = await import('./combat');
+    const w = bossArena(22);
+    w.player.stunT = 1e9;
+    const m = putBoss(w, 'siegeMarshal', 5, 0, 20);
+    const st = bossState(m)!;
+    run(w, HORN_TELL + 0.3);
+    const soldiers = [...st.soldiers];
+    rawHit(w, m, 1e12, 0);
+    expect(m.alive).toBe(false);
+    expect(soldiers.every((s) => !s.alive)).toBe(true);
+  });
+});
+
+describe('the Veiled Duellist (docs/BOSSES.md 5b)', () => {
+  const crits = async (veiled: boolean) => {
+    const { hit } = await import('./combat');
+    const w = bossArena(42);
+    w.player.stunT = 1e9;
+    const m = putBoss(w, 'duellist', 5, 0, 40);
+    const st = bossState(m)!;
+    st.veiled = veiled;
+    st.phaseT = 1e9;
+    const prof = w.char.profile(w.char.primary);
+    const sure = {
+      ...prof,
+      hands: prof.hands.map((h) => ({ ...h, critChance: 1, accuracy: 1e9 })),
+    };
+    let n = 0;
+    for (let i = 0; i < 30; i++) {
+      m.life = m.def.maxLife;
+      w.events.length = 0;
+      hit(w, w.player, m, sure, 0, 1);
+      for (const e of w.events) if (e.t === 'hit' && e.dst === m.id && e.crit) n++;
+    }
+    return n;
+  };
+
+  it('nothing crits it behind the veil, and everything can once it drops', async () => {
+    expect(await crits(true)).toBe(0);
+    expect(await crits(false)).toBeGreaterThan(20);
+  });
+
+  it('the veil is up a third of the time; when it drops he lunges in a fan of lanes, then is bare', () => {
+    const w = bossArena(42);
+    const m = putBoss(w, 'duellist', 6, 0, 40);
+    const st = bossState(m)!;
+    expect(VEIL_SECONDS / VEIL_CYCLE).toBeCloseTo(1 / 3);
+    expect(st.veiled).toBe(true);
+    run(w, VEIL_SECONDS + 0.2);
+    expect(st.veiled).toBe(false);
+    for (let i = 0; i < 60 * 3 && !w.effects.some((e) => e.label === 'Flurry'); i++) stepWorld(w);
+    const lanes = w.effects.filter((e) => e.label === 'Flurry');
+    expect(lanes).toHaveLength(FLURRY_LANES);
+    expect(lanes.every((e) => e.shape === 'lane' && !e.unavoidable)).toBe(true);
+    run(w, FLURRY_TELL + 0.2);
+    expect(st.bareT).toBeGreaterThan(0);
+    const dmg = [100, 0, 0, 0, 0];
+    bossTaken(m, dmg);
+    expect(dmg[0]).toBeCloseTo(100 * (1 + BARE_TAKEN));
+    // The veil comes back at the end of the cycle.
+    run(w, VEIL_CYCLE);
+    expect(st.veiled || st.phaseT < VEIL_CYCLE).toBe(true);
+  });
+});
+
+describe('the Bulwark Engine (docs/BOSSES.md 5c)', () => {
+  it('takes less from hits while its plates stand, and a big hit wears them down faster than a small one', () => {
+    const w = bossArena(62);
+    w.player.stunT = 1e9;
+    const m = putBoss(w, 'bulwarkEngine', 6, 0, 60);
+    const st = bossState(m)!;
+    const max = m.def.maxLife;
+    const bar0 = st.bar;
+    const small = [max * 0.0005, 0, 0, 0, 0];
+    bossTaken(m, small);
+    expect(small[0]).toBeCloseTo(max * 0.0005 * (1 - PLATED_LESS));
+    const smallChip = bar0 - st.bar;
+    st.bar = bar0;
+    const big = [max * BIG_HIT * 2, 0, 0, 0, 0];
+    bossTaken(m, big);
+    const bigChip = bar0 - st.bar;
+    // A hit is worth more to the bar the bigger it is, per point of damage, up to a size.
+    expect(bigChip / (max * BIG_HIT * 2)).toBeCloseTo(1);
+    expect(smallChip / (max * 0.0005)).toBeGreaterThan(BAR_FLOOR - 0.001);
+    expect(smallChip / (max * 0.0005)).toBeLessThan(0.5);
+  });
+
+  it('small hits eventually break it (rule 3: never a wall for many small hits)', () => {
+    const w = bossArena(62);
+    w.player.stunT = 1e9;
+    const m = putBoss(w, 'bulwarkEngine', 6, 0, 60);
+    const st = bossState(m)!;
+    const tiny = m.def.maxLife * 0.0002;
+    let n = 0;
+    while (st.bar > 0 && n < 100000) {
+      bossTaken(m, [tiny, 0, 0, 0, 0]);
+      n++;
+    }
+    // The bar is a tenth of its life, and a hit of this size is worth BAR_FLOOR of itself at the least.
+    expect(n).toBeLessThan((m.def.maxLife * BAR_SHARE) / (tiny * BAR_FLOOR) + 2);
+    run(w, 0.1);
+    expect(st.brokenT).toBeGreaterThan(0);
+    expect(m.stunT).toBeGreaterThan(BROKEN_SECONDS - 0.5);
+    // Broken, it takes more; then the plates come back.
+    const dmg = [100, 0, 0, 0, 0];
+    bossTaken(m, dmg);
+    expect(dmg[0]).toBeCloseTo(100 * (1 + BROKEN_TAKEN));
+    run(w, BROKEN_SECONDS + 0.5);
+    expect(st.brokenT).toBeLessThanOrEqual(0);
+    expect(st.bar).toBeGreaterThan(0);
+  });
+
+  it('damage over time wears the plates too, and is not itself reduced', () => {
+    const w = bossArena(62);
+    w.player.stunT = 1e9;
+    const m = putBoss(w, 'bulwarkEngine', 12, 0, 60);
+    const st = bossState(m)!;
+    run(w, 0.1);
+    const bar0 = st.bar;
+    const lost = m.def.maxLife * 0.02;
+    m.life -= lost;
+    run(w, 0.05);
+    expect(bar0 - st.bar).toBeCloseTo(lost * BAR_DOT, 0);
+  });
+
+  it('its blows stun the character, once in the boss lock', () => {
+    const w = bossArena(62);
+    w.opts.godMode = true;
+    putBoss(w, 'bulwarkEngine', 1.8, 0, 60);
+    let stuns = 0;
+    for (let i = 0; i < 60 * 12; i++) {
+      stepWorld(w);
+      for (const e of w.events) if (e.t === 'stun' && e.dst === w.player.id) stuns++;
+    }
+    expect(stuns).toBeGreaterThan(0);
+    expect(stuns).toBeLessThan(12 / BOSS_LOCK_SECONDS + 2);
+  });
+});
+
+describe('the Sundered Twins (docs/BOSSES.md 5d)', () => {
+  function putTwins(w: World): [Actor, Actor] {
+    const ash = putBoss(w, 'twins', 6, -1.5, 80);
+    const spec: MonsterSpec = {
+      type: 'cinder',
+      variant: 'none',
+      rarity: 'boss',
+      level: 80,
+      mods: [],
+    };
+    const cinder = spawnMonster(w, spec, w.player.x + 6, w.player.y + 1.5, 0, 900, 'Cinder');
+    cinder.state = 'chase';
+    return [ash, cinder];
+  }
+
+  it('are two bosses with a life each, and different defences (armour against evasion)', () => {
+    const w = bossArena(82);
+    w.player.stunT = 1e9;
+    const [ash, cinder] = putTwins(w);
+    expect(ash.rarity === 'boss' && cinder.rarity === 'boss').toBe(true);
+    expect(bossState(ash)!.id).toBe('twins');
+    expect(bossState(cinder)!.id).toBe('twins');
+    expect(bossState(ash)!.twin).toBe('ash');
+    expect(bossState(cinder)!.twin).toBe('cinder');
+    expect(ash.def.armour).toBeGreaterThan(cinder.def.armour);
+    expect(cinder.def.evasion).toBeGreaterThan(ash.def.evasion);
+    expect(bossOfType('cinder')?.id).toBe('twins');
+    expect(bossOfType('ash')?.id).toBe('twins');
+  });
+
+  it('when one dies the other grieves: faster, harder, and it sends the dead one’s own kind of blow', async () => {
+    const { rawHit } = await import('./combat');
+    for (const [first, kind, dtype] of [
+      ['ash', 'steel', 0],
+      ['cinder', 'fire', 3],
+    ] as const) {
+      const w = bossArena(82);
+      w.player.stunT = 1e9;
+      const twins = putTwins(w);
+      const dead = twins[first === 'ash' ? 0 : 1];
+      const live = twins[first === 'ash' ? 1 : 0];
+      const st = bossState(live)!;
+      expect(bossDamageMult(live)).toBe(1);
+      rawHit(w, dead, 1e12, 0);
+      expect(dead.alive).toBe(false);
+      expect(live.alive).toBe(true);
+      expect(st.grief).toBe(true);
+      expect(bossDamageMult(live)).toBeCloseTo(1 + GRIEF_DAMAGE);
+      expect(bossSpeedMult(live)).toBeCloseTo(1 + GRIEF_SPEED);
+      // Its echo: Cinder, left alone, sends Ash's steel (lanes); Ash sends Cinder's fire (a ring).
+      for (let i = 0; i < 60 * (ECHO_EVERY + 2) && !w.effects.some((e) => e.owner === live.id); i++)
+        stepWorld(w);
+      const echoes = w.effects.filter((e) => e.owner === live.id);
+      expect(echoes.length, kind).toBeGreaterThan(0);
+      expect(echoes.every((e) => e.dtype === dtype)).toBe(true);
+    }
+  });
+
+  it('the map is not over until both have fallen', async () => {
+    const { rawHit } = await import('./combat');
+    const w = bossArena(82);
+    w.player.stunT = 1e9;
+    const [ash, cinder] = putTwins(w);
+    expect(ash.noReward || cinder.noReward).toBeFalsy();
+    rawHit(w, ash, 1e12, 0);
+    expect(cinder.alive).toBe(true);
+    rawHit(w, cinder, 1e12, 0);
+    expect(cinder.alive).toBe(false);
+  });
+});
+
+describe('on a real boss map', () => {
+  async function arenaWorld(map: number): Promise<World> {
+    const { setMap, planFor, worldOptsFor } = await import('../run/run');
+    const { createWorld } = await import('./world');
+    const run = newRun('vanguard', 5);
+    setMap(run, map);
+    const plan = planFor(run, run.offers[0]);
+    const w = createWorld({
+      plan,
+      build: run.build,
+      xp: 0,
+      opts: { ...worldOptsFor(run, plan), godMode: true },
+    });
+    // Stand the character in the arena, a little off its middle.
+    const end = plan.lab.rooms[plan.lab.mainPath[plan.lab.mainPath.length - 1]];
+    w.player.x = end.cx + 0.5 - 5;
+    w.player.y = end.cy + 0.5;
+    return w;
+  }
+
+  it('the Marshal’s regiments take their places on the arena floor', async () => {
+    const w = await arenaWorld(20);
+    const m = w.actors.find((a) => a.mon?.spec.type === 'siegeMarshal')!;
+    m.state = 'chase';
+    run(w, HORN_TELL + 0.5);
+    const st = bossState(m)!;
+    expect(st.soldiers).toHaveLength(5);
+    for (const s of st.soldiers)
+      expect(w.grid.isFloor(Math.floor(s.x), Math.floor(s.y))).toBe(true);
+  });
+
+  it('the Twins stand together in the arena, and the exit waits for both', async () => {
+    const w = await arenaWorld(80);
+    const twins = w.actors.filter((a) => a.rarity === 'boss' && a.alive);
+    expect(twins.map((a) => a.mon!.spec.type).sort()).toEqual(['ash', 'cinder']);
+    expect(Math.hypot(twins[0].x - twins[1].x, twins[0].y - twins[1].y)).toBeGreaterThan(2);
+    const { rawHit } = await import('./combat');
+    for (const a of w.actors) if (!a.isPlayer && !twins.includes(a)) a.alive = false;
+    rawHit(w, twins[0], 1e12, 0);
+    run(w, 0.5);
+    expect(w.exitOpen).toBe(false);
+    rawHit(w, twins[1], 1e12, 0);
+    run(w, 0.5);
+    expect(w.exitOpen).toBe(true);
+  });
+});
+
 describe('the kill-side ceiling (docs/BOSSES.md 2, rule 4)', () => {
   /**
    * How much longer each reference damage profile takes to kill a boss over a whole fight than a plain monster: its defence
@@ -426,11 +761,13 @@ describe('the kill-side ceiling (docs/BOSSES.md 2, rule 4)', () => {
   const FIGHT = 60;
   function wholeFight(id: BossId): Record<string, number> {
     const def = BOSSES[id];
-    const t = MONSTER_TYPES[def.type];
-    const table = durabilityTable(typeProfile(t), def.map);
+    // The Twins are two bodies of equal life: the fight is the mean of their two tables.
+    const tables = [def.type, ...(def.partners ?? [])].map((ty) =>
+      durabilityTable(typeProfile(MONSTER_TYPES[ty]), def.map),
+    );
     const out: Record<string, number> = {};
     for (const pr of PROBES) {
-      let f = table[pr.id];
+      let f = tables.reduce((n, tb) => n + tb[pr.id], 0) / tables.length;
       const spell = !pr.attack && !pr.dot;
       if (id === 'magistrate' && spell) f /= 0.75;
       if (id === 'prismWarden' && pr.dtype >= 1 && pr.dtype <= 3) {
@@ -456,6 +793,41 @@ describe('the kill-side ceiling (docs/BOSSES.md 2, rule 4)', () => {
       ).toBeLessThanOrEqual(2);
   });
 
+  it('the Engine: a build of the smallest hits takes at most twice as long as one of the biggest', () => {
+    // Per cycle: the plated stretch (the bar worn down at the hits' weight, the damage cut), then the broken window.
+    const killTime = (weight: number, dps: number) => {
+      const bar = BAR_SHARE;
+      let life = 1;
+      let t = 0;
+      while (life > 0 && t < 1e4) {
+        const raw = bar / weight;
+        const plated = raw * (1 - PLATED_LESS);
+        if (plated >= life) return t + life / (dps * (1 - PLATED_LESS));
+        life -= plated;
+        t += raw / dps;
+        const open = BROKEN_SECONDS * dps * (1 + BROKEN_TAKEN);
+        if (open >= life) return t + life / (dps * (1 + BROKEN_TAKEN));
+        life -= open;
+        t += BROKEN_SECONDS;
+      }
+      return t;
+    };
+    for (const dps of [0.005, 0.01, 0.02, 0.05, 0.1]) {
+      const small = killTime(BAR_FLOOR, dps);
+      const big = killTime(1, dps);
+      expect(small / big, `at ${dps} of its life a second`).toBeLessThanOrEqual(2);
+      // Damage over time is not reduced, and chips at the floor: it never takes longer than the smallest hits.
+      expect(1 / dps / small, `dot at ${dps}`).toBeLessThanOrEqual(2);
+    }
+  });
+
+  it('the Duellist: the veil costs a build of crits at most a third more time', () => {
+    // Behind the veil a hit that would have crit lands at its base; the best case for a crit build is a 5x multiplier.
+    const veil = VEIL_SECONDS / VEIL_CYCLE;
+    const loss = 1 / (1 - veil * (1 - 1 / 5));
+    expect(loss).toBeLessThanOrEqual(1.4);
+  });
+
   it('the Unmaker hardens a single-type build to at most 2.5 times', () => {
     expect(1 / (1 - ADAPT_MAX)).toBeLessThanOrEqual(2.5);
   });
@@ -471,7 +843,7 @@ describe('a boss map at camp (docs/BOSSES.md 10)', () => {
       expect(offers[0].type).toBe('plain');
       expect(offers[0].offset).toBe(0);
     }
-    expect(rollOffers(5, 20).length).toBe(3);
+    expect(rollOffers(5, 25).length).toBe(3);
   });
 
   it('a boss map takes twice as long before it is left on its own', async () => {

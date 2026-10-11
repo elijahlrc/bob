@@ -68,10 +68,15 @@ export type MonsterTypeId =
   | 'slagworm'
   // The bosses and what they bring (docs/BOSSES.md): never met in packs.
   | 'tollkeeper'
+  | 'siegeMarshal'
   | 'courser'
+  | 'duellist'
   | 'magistrate'
   | 'witness'
+  | 'bulwarkEngine'
   | 'prismWarden'
+  | 'ash'
+  | 'cinder'
   | 'rotwife'
   | 'unmaker'
   | 'shard';
@@ -132,10 +137,15 @@ export type BodyKind =
   | 'slag'
   // The bosses (docs/BOSSES.md).
   | 'tollkeeper'
+  | 'siegeMarshal'
   | 'courser'
+  | 'duellist'
   | 'magistrate'
   | 'witness'
+  | 'bulwarkEngine'
   | 'prism'
+  | 'ash'
+  | 'cinder'
   | 'rotwife'
   | 'unmaker'
   | 'shard';
@@ -1214,6 +1224,104 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     attackTime: 1.5,
     radius: 0.8,
     mods: [],
+  },
+  siegeMarshal: {
+    id: 'siegeMarshal',
+    role: 'front',
+    name: 'the Siege Marshal',
+    faction: 'ossuary',
+    body: 'siegeMarshal',
+    archetype: 'bruiser',
+    defence: { armour: 40 },
+    shape: { id: 'swing', arc: 120, radius: 2.2, lock: 0.35 },
+    bossOnly: true,
+    noBody: true,
+    lifeMult: 0.45,
+    dmgMult: 0.7,
+    range: 1.7,
+    attack: 'melee',
+    speed: 3,
+    attackTime: 1.4,
+    radius: 0.8,
+    mods: [],
+  },
+  duellist: {
+    id: 'duellist',
+    role: 'front',
+    name: 'the Veiled Duellist',
+    faction: 'gilded',
+    body: 'duellist',
+    archetype: 'hunter',
+    bossOnly: true,
+    noBody: true,
+    lifeMult: 0.45,
+    dmgMult: 0.55,
+    range: 1.4,
+    attack: 'melee',
+    speed: 5,
+    attackTime: 0.8,
+    radius: 0.65,
+    mods: [],
+  },
+  bulwarkEngine: {
+    id: 'bulwarkEngine',
+    role: 'front',
+    name: 'the Bulwark Engine',
+    faction: 'reliquary',
+    body: 'bulwarkEngine',
+    archetype: 'bruiser',
+    defence: { immune: ['stun'] },
+    shape: { id: 'swing', arc: 160, radius: 3, lock: 0.5 },
+    bossOnly: true,
+    noBody: true,
+    lifeMult: 0.5,
+    dmgMult: 1,
+    range: 2.2,
+    attack: 'melee',
+    speed: 1.8,
+    attackTime: 2.2,
+    radius: 1.1,
+    mods: [],
+  },
+  ash: {
+    id: 'ash',
+    role: 'front',
+    name: 'Ash',
+    faction: 'ossuary',
+    body: 'ash',
+    archetype: 'bruiser',
+    defence: { armour: 100, res: { fire: -15, cold: -15, lightning: -15 } },
+    shape: { id: 'swing', arc: 130, radius: 2.3, lock: 0.4 },
+    bossOnly: true,
+    noBody: true,
+    lifeMult: 0.25,
+    dmgMult: 0.9,
+    range: 1.7,
+    attack: 'melee',
+    speed: 2.3,
+    attackTime: 1.8,
+    radius: 0.85,
+    mods: [],
+  },
+  cinder: {
+    id: 'cinder',
+    role: 'ranged',
+    name: 'Cinder',
+    faction: 'emberborn',
+    body: 'cinder',
+    archetype: 'artillery',
+    defence: { evasion: 80, armour: -50, res: { fire: 40, cold: 15, lightning: 15 } },
+    shape: { id: 'orb', speed: 0.6, mult: 0.9 },
+    bossOnly: true,
+    noBody: true,
+    lifeMult: 0.25,
+    dmgMult: 0.6,
+    range: 7,
+    attack: 'spell',
+    speed: 3.4,
+    attackTime: 1.2,
+    radius: 0.6,
+    mods: [mod('convert.physical.fire', 'base', 100)],
   },
   courser: {
     id: 'courser',

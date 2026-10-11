@@ -1,6 +1,7 @@
-# Bob — Bosses: six fights that each ask the build one question
+# Bob — Bosses: ten fights that each ask the build one question
 
-Status: **built, 2026-10-10** (section 18 says what was built and how it differs). Decisions that need the user are in
+Status: **built, 2026-10-10** (section 18 says what was built and how it differs). Four more were added on **2026-10-11**
+on maps 20, 40, 60 and 80 (section 19), so a boss now ends every tenth map. Decisions that need the user are in
 section 17; the defaults are in effect.
 
 ---
@@ -780,3 +781,102 @@ the plan's rule 3 is about. What the target length of a fight should be is open 
 
 9. **(added) How long a boss fight should take** for a player's build at 1× speed. Default: as built, with no target set
    from the bot.
+
+---
+
+## 19. Four more: maps 20, 40, 60 and 80 (2026-10-11)
+
+The user, 2026-10-11: the bosses add a great deal to the game's strategy, so add four more at the tenth maps that lack one
+(20, 40, 60 and 80), drawing on the pitches that were nearly included. Eight were pitched (the Carapace Knight, the Bulwark
+Engine, the Sundered Twins, the Hollow Choir, the Veiled Duellist, the Culler, the Glass Saint, the Siege Marshal); the
+user kept **the Bulwark Engine, the Sundered Twins, the Veiled Duellist and the Siege Marshal**. All four keep every rule of
+section 2.
+
+| Map | Boss                | Main test                                | Deals                          | Soft to                                    |
+| --- | ------------------- | ---------------------------------------- | ------------------------------ | ------------------------------------------ |
+| 20  | The Siege Marshal   | endurance: a long fight with no spike    | physical (sabre), his soldiers | anything: he is gentle                     |
+| 40  | The Veiled Duellist | critical strikes, both ways              | physical, in a fan of crits    | anything that does not need to crit        |
+| 60  | The Bulwark Engine  | hit size, and stun, both ways            | physical, slow and heavy       | many small hits, given time                |
+| 80  | The Sundered Twins  | defence and offence of two kinds at once | physical (Ash), fire (Cinder)  | the elements (Ash), a plain blade (Cinder) |
+
+### 19.1 The Siege Marshal — map 20
+
+**The question:** can you keep your feet through a whole battle? It is an early boss, so it is the gentlest: no spike, no
+clock, only attrition.
+
+- He stands at the middle of the arena and **commands**. A horn sounds (a 1.6 s tell), then a regiment marches in from the
+  arena's edge: **three regiments** (shieldbearers and warriors; archers and a shieldbearer; mages and warriors). They are
+  his, not rolled: no experience, no loot, and they leave with him.
+- **Command.** While his soldiers stand he takes **6% less** from every hit for each, up to 60%. It applies to every damage
+  type alike, so no build is favoured by it. When the last of the third regiment falls he **comes down himself**, and for
+  6 s he is **routed** (takes 20% more) before he fights, with a sabre.
+- The next regiment comes when the last has **thinned to two**, or **22 s** after it came, whichever is first: he cannot be
+  outlasted by standing back, and a build that clears slowly meets more of them at once.
+- Answers: damage (the whole fight shortens), clear speed and area (the soldiers), recovery and flasks (the attrition), and
+  defences of every kind (the soldiers attack in different ways). Nothing in it is specific.
+
+### 19.2 The Veiled Duellist — map 40
+
+**The question:** how much of your damage depends on crits, and can you take his?
+
+- He fights behind a **veil**: while it is up, **nothing can crit him**. The veil is up for **3 s of every 9** (a third).
+  Every hit that would have crit lands at its base instead.
+- When the veil drops he **lunges**: three lanes of steel fan toward the character, shown for 0.9 s on the floor, each a
+  blow of **1.7×** his usual (the crit). They can be stepped out of like any blast. After the lunge he is **bare** for
+  2.5 s (takes 25% more).
+- Between lunges he fights with quick, light blows.
+- The veil costs a build that lives on crits at most about a third more time, however large its multiplier (tested), and
+  the bare window gives every build something back. A build with no crits loses nothing to the veil. Defending against
+  his lunge is life, armour or evasion and the usual reflex of stepping out of the lanes; no stat in the game reduces the
+  extra damage of a crit taken (open question 10).
+
+### 19.3 The Bulwark Engine — map 60
+
+**The question:** are your hits big enough, and can you take a stun?
+
+- Its **plates** are a bar worth **10% of its life**. While they stand, **hits take 35% less**. A hit wears the bar down
+  by its damage times a weight: **1.0 for a hit of 1.2% of its life or more, falling to 0.3 for the smallest**, never
+  lower. So big hits break it fast and small ones take about three times as long, and never fail to.
+- **Damage over time** (a burn, a bleed, a poison) is not reduced by the plates, and chips the bar at 0.3 of what it deals:
+  rule 3 holds, and a damage-over-time build is neither helped nor hindered by them.
+- When the bar goes the plates **give**: it stops dead for **5 s** (stunned, whatever its stun threshold, which is
+  otherwise immune) and takes **50% more**. Then they are replaced and the bar is full.
+- Its blows are slow and heavy, and **stun the character** (0.7 s, once in the boss lock of rule 6). Every 13 s it
+  **grinds**: a line of pistons marching at the character, the March pattern.
+- Stun avoidance helps against it. It is the second boss that stuns the character (the Magistrate's Sentence is the
+  other), and the only one that asks it every blow.
+- Tested: over a range of damage rates, the smallest hits take at most twice as long to kill it as the biggest.
+
+### 19.4 The Sundered Twins — map 80
+
+**The question:** can you deal with two sorts of enemy at once, with two sorts of defence?
+
+- **Ash** is slow, armoured and physical, and weak to the elements (-15% to each). **Cinder** is quick, evasive and
+  elemental (it deals fire; resistant to all three elements, and with no armour), and casts from range. They stand together
+  in the arena. Each has **its own life**, half of the fight's each, and its own bar.
+- **When one dies, the other grieves.** The user asked what happens when one dies. The pitch said "shared life", which would
+  have left nothing to happen, so it is two lives instead: the survivor is **30% faster and deals 25% more**, and every
+  6 s it sends **the dead twin's own kind of blow**. Cinder, alone, casts Ash's steel (the Cross, eight lanes, physical);
+  Ash, alone, casts Cinder's fire (the Closing ring, fire).
+- The map is over only when both have fallen (the exit opens when none of the arena's own is left).
+- The order is the player's: the character takes whichever is nearest. A build strong against one twin kills it first and
+  meets the other grieving. The fight's length is the mean of the two bodies (the kill-side ceiling is held to it).
+
+### 19.5 As built
+
+- Data in `src/data/bosses.ts` (`siegeMarshal`, `duellist`, `bulwarkEngine`, `twins` with `partners: ['cinder']`;
+  `bossOfType` finds a boss by any of its types), monsters in `src/data/monsters.ts` (`siegeMarshal`, `duellist`,
+  `bulwarkEngine`, `ash`, `cinder`), fights in `src/sim/bosses.ts`, the veil's crit rule in `sim/combat.ts` (`hit`), the
+  second twin placed by `gen/population.ts`, the HUD's bar for each boss in a fight (`ui/Hud.tsx`), the tells in
+  `bossFx.ts`, the rigs in `render/style/figure.ts`. Tests in `src/sim/bosses.test.ts`.
+- **A boss now ends every tenth map.** `endKindForMap` never returns a mini-boss for one, so **the nine theme champions
+  (`ThemeDef.chief`) have no map to end now**, except a Crawl's last segment and a Quarry's. (Open question 11.)
+- The camp's description of each (two lines, in the style of the others, advising nothing) is `BossDef.brief`.
+
+### 19.6 Open questions (defaults in effect)
+
+10. **A defence against crits.** The Duellist's lunge is a crit in all but name; nothing reduces a crit taken. A small
+    passive or item mod ("hits against you have less extra damage when they crit") would give it a specific answer.
+11. **The nine champions.** The theme champions (the Bone Warden, the Treasurer, the Cinder Tyrant and so on) are met
+    nowhere on the maps now that every tenth map is a boss's. They could stand beside the boss as its escort, take the
+    place of a rare at the end of other maps, or be left to the Quarry and the Crawl.

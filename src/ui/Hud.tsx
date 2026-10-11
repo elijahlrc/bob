@@ -170,10 +170,10 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
   );
 }
 
-/** The boss of the fight, across the top of the screen: its name, its life and shield, and what it is doing. */
+/** The boss of the fight, across the top of the screen: its name, its life and shield, and what it is doing (two, for the Twins). */
 function BossBar({ w }: { w: World }) {
   const p = w.player;
-  const b = w.actors.find(
+  const bosses = w.actors.filter(
     (a) =>
       a.alive &&
       a.rarity === 'boss' &&
@@ -181,22 +181,30 @@ function BossBar({ w }: { w: World }) {
       a.state === 'chase' &&
       Math.hypot(a.x - p.x, a.y - p.y) < 22,
   );
-  if (!b) return null;
-  const max = Math.max(1, b.def.maxLife);
-  const lines = bossReadout(w, b);
+  if (bosses.length === 0) return null;
   return (
-    <div class="boss-bar">
-      <div class="boss-bar-name">{b.name}</div>
-      <div class="boss-bar-life">
-        <div style={{ width: `${Math.max(0, Math.min(100, (b.life / max) * 100))}%` }} />
-        {b.def.maxEs > 0 && (
-          <div
-            class="boss-bar-es"
-            style={{ width: `${Math.max(0, Math.min(100, (b.es / b.def.maxEs) * 100))}%` }}
-          />
-        )}
-      </div>
-      {lines.length > 0 && <div class="boss-bar-state">{lines.join(' · ')}</div>}
+    <div class="boss-bars">
+      {bosses.map((b) => {
+        const max = Math.max(1, b.def.maxLife);
+        const lines = bossReadout(w, b);
+        return (
+          <div class="boss-bar" key={b.id}>
+            <div class="boss-bar-name">{b.name}</div>
+            <div class="boss-bar-life">
+              <div style={{ width: `${Math.max(0, Math.min(100, (b.life / max) * 100))}%` }} />
+              {b.def.maxEs > 0 && (
+                <div
+                  class="boss-bar-es"
+                  style={{
+                    width: `${Math.max(0, Math.min(100, (b.es / b.def.maxEs) * 100))}%`,
+                  }}
+                />
+              )}
+            </div>
+            {lines.length > 0 && <div class="boss-bar-state">{lines.join(' · ')}</div>}
+          </div>
+        );
+      })}
     </div>
   );
 }

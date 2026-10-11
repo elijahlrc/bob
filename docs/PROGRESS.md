@@ -917,3 +917,13 @@ is retired. A test holds every boss to the plan's rule that no damage profile ta
 On the character's side: 3.9's cleansing flasks are complete (poison, shock and curses added, immunity during every
 cleansing flask), drunk when the ailment is on; a boss cannot freeze or stun the character twice within 4 s. One 24-run
 gauntlet (`scripts/boss-gauntlet.ts`) is recorded in docs/BOSSES.md 18.3; boss life is not tuned from the bot.
+
+### Four more bosses (docs/BOSSES.md 19), built (2026-10-11)
+
+A boss now ends every tenth map. The Siege Marshal (20) commands from where he stands while three regiments march in, taking
+6% less per soldier standing, then comes down routed; the Veiled Duellist (40) fights behind a veil nothing can crit, and
+lunges in a fan of crits when it drops; the Bulwark Engine (60) is plated against hits, the plates wearing down by hit size
+(small hits eventually, damage over time too), and stops dead for five seconds when they give; the Sundered Twins (80) are
+two bosses, armoured Ash and evasive Cinder, each with a life bar, and the survivor grieves (faster, harder, and it sends the
+dead one's kind of blow). The boss warning at camp is two lines of description, nothing about how to fight. The nine theme
+champions no longer end any tenth map.

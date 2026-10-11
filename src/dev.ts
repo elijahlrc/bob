@@ -192,8 +192,29 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
         level: opts.level ?? def.map,
         mods: id === 'magistrate' ? (['hexWarded'] as const).slice() : [],
       };
-      const m = spawnMonster(w, spec, spot.x, spot.y, Math.max(0, room), 999, def.name);
+      const m = spawnMonster(
+        w,
+        spec,
+        spot.x,
+        spot.y,
+        Math.max(0, room),
+        999,
+        MONSTER_TYPES[def.type].name,
+      );
       m.state = 'chase';
+      for (const [i, t] of (def.partners ?? []).entries()) {
+        const at = w.grid.collide(spot.x + 2 * (i + 1), spot.y, 0.9);
+        const o = spawnMonster(
+          w,
+          { ...spec, type: t, mods: [] },
+          at.x,
+          at.y,
+          Math.max(0, room),
+          999,
+          MONSTER_TYPES[t].name,
+        );
+        o.state = 'chase';
+      }
       let n = 0;
       for (; n < (opts.max ?? (opts.until ? 1800 : 30)); n++) {
         game.step(performance.now(), 16.7);
