@@ -825,6 +825,9 @@ clock, only attrition.
   blow of **1.7×** his usual (the crit). They can be stepped out of like any blast. After the lunge he is **bare** for
   2.5 s (takes 25% more).
 - Between lunges he fights with quick, light blows.
+- The lanes fan out from him, so at his feet they overlap: a character that stays in reach through the tell takes all three
+  (about 4.5 times a blow of his, the size of a Sentence), and one that steps out takes none. It is the sharpest moment
+  of the four new fights; the lanes are 0.45 radians apart to give the step sideways room.
 - The veil costs a build that lives on crits at most about a third more time, however large its multiplier (tested), and
   the bare window gives every build something back. A build with no crits loses nothing to the veil. Defending against
   his lunge is life, armour or evasion and the usual reflex of stepping out of the lanes; no stat in the game reduces the

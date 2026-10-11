@@ -66,7 +66,8 @@ describe('map offers (docs/MAPS.md section 4)', () => {
       let lower = 0;
       let sets = 0;
       for (let seed = 1; seed <= 400; seed++) {
-        // Map 25: three offers (a tenth map is a boss's, and has one).
+        // Map 25: three offers (a tenth map is a boss's, and has one). A Respite may take a slot now and then for a character
+        // below 90%, as on any map; the sets are still counted over the maps that are left.
         const offers = rollOffers(seed, 25, vitals);
         sets++;
         if (offers.some((o) => o.offset !== 0)) off++;

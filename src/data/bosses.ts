@@ -218,7 +218,7 @@ export const VEIL_CYCLE = 9;
 /** When the veil drops he lunges: lanes of steel shown this long first, each a crit of this many of his blows. */
 export const FLURRY_TELL = 0.9;
 export const FLURRY_LANES = 3;
-export const FLURRY_SPREAD = 0.32;
+export const FLURRY_SPREAD = 0.45;
 export const FLURRY_LENGTH = 7;
 export const FLURRY_WIDTH = 1.2;
 export const FLURRY_MULT = 1.7;
