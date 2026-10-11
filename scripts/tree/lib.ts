@@ -1,12 +1,19 @@
 /** Helpers shared by the tree tools (audit, pictures, explore). */
 import { getTree, type TreeNode } from '../../src/data/tree';
+import { buildLayoutTree } from '../../src/data/tree/layout';
 import { REGIONS, type RegionId } from '../../src/data/tree/spec';
 
-export const tree = getTree();
+/** `TREE=new` reads the district layout (docs/TREE-REDESIGN.md) instead of the tree the game uses; `TREE_REGIONS=int,dex` limits it to some regions. */
+export const layout =
+  process.env.TREE === 'new'
+    ? buildLayoutTree({ regions: process.env.TREE_REGIONS?.split(',') as never })
+    : null;
+export const tree = layout ?? getTree();
 export const nodes = tree.nodes;
 
 /** Which region a node stands in: by direction from the middle; the middle itself is the hub. */
-export function regionOf(n: Pick<TreeNode, 'x' | 'y'>): RegionId | 'hub' {
+export function regionOf(n: Pick<TreeNode, 'x' | 'y' | 'region'>): RegionId | 'hub' {
+  if (n.region) return n.region;
   if (Math.hypot(n.x, n.y) < 700) return 'hub';
   const a = (Math.atan2(n.y, n.x) * 180) / Math.PI;
   let best: RegionId = REGIONS[0].id;

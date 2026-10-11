@@ -38,7 +38,6 @@
     "tree:lines": "tsx scripts/tree/lines.ts",
     "tree:names": "tsx scripts/tree/names.ts",
     "tree:emit": "tsx scripts/tree/emit.ts",
-    "tree:mix": "tsx scripts/tree/mix.ts",
     "tree:refmix": "tsx scripts/tree/refmix.ts",
     "tree:audit": "tsx scripts/tree/audit.ts",
     "tree:pic": "tsx scripts/tree/pic.ts",

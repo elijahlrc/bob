@@ -194,7 +194,7 @@ for (const reg of REGIONS) {
     .map((x) => d[x.id])
     .sort((a, b) => a - b);
   console.log(
-    `${reg.id.padEnd(7)} first notable ${first(d, 'notable')}, first keystone ${first(d, 'keystone')}, keystones (nearest 6) ${ks.slice(0, 6).join(',')}; other starts: ${others.join(', ')}`,
+    `${reg.id.padEnd(7)} first notable ${first(d, 'notable')}, first keystone ${first(d, 'keystone')}, keystones: nearest ${ks[0]}, median ${ks[ks.length >> 1]}, farthest ${ks[ks.length - 1]}; other starts: ${others.join(', ')}`,
   );
 }
 const reachCheck = REGIONS.map((r) => {

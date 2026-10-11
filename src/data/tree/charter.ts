@@ -127,7 +127,7 @@ export const DISTRICTS: District[] = [
     name: 'Knife Alley',
     region: 'dexint',
     theme: 'Daggers, claws and the critical strike: quick, close, and unforgiving.',
-    template: 'knot',
+    template: 'ladder',
     groups: {
       daggers: ['g238', 'g304', 'g190', 'g44'],
       claws: ['g306', 'g151', 'g296', 'g81'],
@@ -153,7 +153,7 @@ export const DISTRICTS: District[] = [
     name: 'Longbow Reach',
     region: 'dex',
     theme: 'Bows and projectiles, and the elements an arrow can carry.',
-    template: 'avenue',
+    template: 'fork',
     groups: {
       bow: ['g191', 'g353', 'g250', 'g262', 'g275', 'g213'],
       projectile: ['g269', 'g308', 'g42', 'g99'],
@@ -194,7 +194,7 @@ export const DISTRICTS: District[] = [
     name: 'The Parry Yard',
     region: 'dex',
     theme: 'Block, with a shield or a second weapon.',
-    template: 'knot',
+    template: 'avenue',
     groups: { block: ['g201', 'g34', 'g63', 'g317'], shield: ['g83', 'g33'] },
     nexus: [],
     keystones: [],
@@ -220,7 +220,7 @@ export const DISTRICTS: District[] = [
     name: 'Bladework',
     region: 'strdex',
     theme: 'Swords, axes, maces and heavy two-handers: the melee weapons, each with its own arm.',
-    template: 'avenue',
+    template: 'fork',
     groups: {
       axes: ['g323', 'g136', 'g277'],
       swords: ['g349', 'g310'],
@@ -235,7 +235,7 @@ export const DISTRICTS: District[] = [
     name: 'The Bulwark',
     region: 'strdex',
     theme: 'Armour and evasion together, the shield and the block.',
-    template: 'ring',
+    template: 'knot',
     groups: {
       armour: ['g98', 'g252', 'g109', 'g261'],
       shield: ['g311', 'g263', 'g69', 'g232'],
@@ -249,7 +249,7 @@ export const DISTRICTS: District[] = [
     name: 'Bloodrun',
     region: 'strdex',
     theme: 'Leech, bleeding and the charges a fight feeds.',
-    template: 'fork',
+    template: 'avenue',
     groups: {
       leech: ['g8', 'g206', 'g115'],
       charges: ['g19', 'g120', 'g316', 'g347'],
@@ -288,7 +288,7 @@ export const DISTRICTS: District[] = [
     name: 'Hammerfall',
     region: 'str',
     theme: 'Two-handers, maces, one-handers and axes: the heavy end of melee, and the stun.',
-    template: 'avenue',
+    template: 'fork',
     groups: {
       twoHand: ['g146', 'g72', 'g184'],
       maces: ['g300', 'g21', 'g87', 'g211'],
@@ -313,7 +313,7 @@ export const DISTRICTS: District[] = [
     name: 'The Cairn',
     region: 'str',
     theme: 'Endurance, shields and the standing stones.',
-    template: 'fork',
+    template: 'avenue',
     groups: { grit: ['g198', 'g4', 'g160', 'g292'], deploy: ['g339'] },
     nexus: [],
     keystones: ['rootedStance', 'idleHands'],
@@ -376,7 +376,7 @@ export const DISTRICTS: District[] = [
     name: 'The Cassock',
     region: 'strint',
     theme: 'Armour, energy shield and life in one robe.',
-    template: 'knot',
+    template: 'avenue',
     groups: {
       armour: ['g140', 'g108', 'g142', 'g188'],
       life: ['g216', 'g351', 'g313', 'g106'],

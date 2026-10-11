@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { classDef } from '../data/classes';
 import { getTree, type TreeNode } from '../data/tree';
-import { HUB_RADIUS, REGIONS, RING_START, RING_STEP, START_RADIUS } from '../data/tree/spec';
+import { HUB_RADIUS, REGIONS, START_RADIUS } from '../data/tree/spec';
 import { modsText } from '../mods/text';
 import type { Controller } from '../run/controller';
 import { passivePoints } from '../run/run';
@@ -55,11 +55,10 @@ function regionColor(attrs: readonly ('str' | 'dex' | 'int')[]): string {
   return `rgb(${mix.join(',')})`;
 }
 
-/** The map behind the tree: a tinted wedge per region, rings, the rim and the names of the regions. */
+/** The map behind the tree: a tinted wedge per region, the two rings of the middle, the rim and the names of the regions. */
 function Backdrop({ maxR }: { maxR: number }) {
   const R = maxR + 260;
   const rings: number[] = [HUB_RADIUS, START_RADIUS];
-  for (let r = RING_START; r < maxR + RING_STEP / 2; r += RING_STEP) rings.push(r);
   const pt = (r: number, deg: number) => {
     const a = (deg * Math.PI) / 180;
     return `${(r * Math.cos(a)).toFixed(1)} ${(r * Math.sin(a)).toFixed(1)}`;

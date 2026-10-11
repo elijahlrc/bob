@@ -4,7 +4,7 @@
  */
 import type { Mod } from '../mods/types';
 import type { TreeNode, TreeNodeKind } from '../data/tree';
-import { isRingRoad } from '../data/tree/build';
+import { isRingRoad } from '../data/tree/builder';
 
 export type Tone =
   | 'life'

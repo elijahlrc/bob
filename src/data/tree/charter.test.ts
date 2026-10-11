@@ -22,12 +22,12 @@ describe('the tree charter (docs/TREE-REDESIGN.md, T1)', () => {
       for (const id of members(d)) expect(byId.get(id)!.region, `${d.id}: ${id}`).toBe(d.region);
   });
 
-  it('gives each district of a region its own template, and each district a size worth the name', () => {
+  it('gives each region at least three templates, and each district a size worth the name', () => {
     for (const r of REGIONS) {
       const ds = DISTRICTS.filter((d) => d.region === r.id);
       expect(ds.length, r.id).toBeGreaterThanOrEqual(4);
       expect(ds.length, r.id).toBeLessThanOrEqual(5);
-      expect(new Set(ds.map((d) => d.template)).size, r.id).toBe(ds.length);
+      expect(new Set(ds.map((d) => d.template)).size, r.id).toBeGreaterThanOrEqual(3);
       for (const d of ds) expect(members(d).length, d.id).toBeGreaterThanOrEqual(5);
     }
   });

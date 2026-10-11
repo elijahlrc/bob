@@ -11,7 +11,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { Canvas, hex, type Rgb } from './png';
-import { nodes, regionOf, tree } from './lib';
+import { layout, nodes, regionOf, tree } from './lib';
 import { REGIONS, type RegionId } from '../../src/data/tree/spec';
 import { TONE_COLOR, toneOf } from '../../src/ui/treeStyle';
 
@@ -126,6 +126,12 @@ for (const n of nodes) {
 }
 
 cv.save(out);
+if (layout) {
+  console.log(`dropped roads: ${layout.dropped.length} ${layout.dropped.slice(0, 12).join(' | ')}`);
+  console.log(
+    `unplaced clusters: ${layout.unplaced.length} ${layout.unplaced.slice(0, 12).join(' | ')}`,
+  );
+}
 console.log(
   `${out}: ${width}x${height}, box ${box.map(Math.round).join(',')}, ${tree.nodes.length} nodes in the tree`,
 );

@@ -14,6 +14,10 @@ export type TreeNode = {
   /** Class id for start nodes. */
   classStart?: string;
   cluster?: string;
+  /** The district (docs/TREE-REDESIGN.md) a node of the new layout stands in; a hub, wayside or old-layout node has none. */
+  district?: string;
+  /** The region a node of the new layout stands in (the middle is 'hub'). */
+  region?: RegionId | 'hub';
   /** The centre of the loop this node stands on, so the lines between neighbours on it can be drawn as arcs. */
   orbit?: [number, number];
 };
