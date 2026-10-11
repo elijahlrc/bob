@@ -18,9 +18,12 @@
 - **Items and Workbench UX plan:** [docs/ITEMS.md](docs/ITEMS.md) (milestones U0–U9), built (2026-10-09): the Items tab compares an item with every slot it fits (`compareSlots` in `src/run/inventoryOps.ts`), the Workbench stages every craft in a result panel first (`planCraft` / `applyCraft` in `src/run/craftPlan.ts`, built on the real `craft.ts` code and never showing the real roll of a rolled craft), and `src/ui/Confirm.tsx` replaces `window.confirm`. New item or craft UI goes in `items.css` / `workbench.css`.
 - **Mobile and inventory plan:** [docs/MOBILE.md](docs/MOBILE.md) (milestones P0–P9): make every screen usable in phone and tablet
   browsers (touch rules, small-screen layouts, tree pinch zoom, HUD and map zoom), plus inventory tools (persistent New list, Clean up old items, favourites; P8–P9). P0 to P9 are built; the real-device pass is left (its section 9).
-- **Passive tree redesign plan** (2026-10-11): [docs/TREE-REDESIGN.md](docs/TREE-REDESIGN.md) (milestones T0–T9), planned, not built: roads
-  separate from clusters, authored districts with landmarks, a power table so notables beat small nodes, locality of archetypes.
-  [docs/TREE.md](docs/TREE.md) is the earlier parity pass (size, mix, connectivity numbers).
+- **Passive tree redesign** (2026-10-11): [docs/TREE-REDESIGN.md](docs/TREE-REDESIGN.md) (milestones T0–T9; T0–T5 built): the tree is laid out from a charter of districts
+  (`src/data/tree/charter.ts`) and a plan (`plan.ts`) by `layout.ts`, roads first (generic stats, `roads.ts`) with every cluster hung
+  from one by a single entrance, an open middle, keystone peninsulas; notables are priced against small nodes (`power.ts`,
+  `scripts/tree/balance.ts`, run by `npm run tree:emit`). How the tree looks is judged from `npm run tree:pic` pictures, `tree:audit`
+  and simulated players, not by tests of numbers. `tree:explore` builds with the tree from a terminal. [docs/TREE.md](docs/TREE.md) is
+  the earlier parity pass (size, clusters, vocabulary).
 - **Strategy tab** (2026-10-09): `Build.strategy` gives each skill a role, a condition and an order, plus target priority,
   spacing (hold, close in, kite) and flask thresholds (`src/data/strategy.ts`, `src/calc/strategy.ts`, `src/ui/Strategy.tsx`).
   `Character.mains` / `rotation` hold the resolved order; the sim's `chooseSkill` (`src/sim/ai.ts`) walks it. The sheet

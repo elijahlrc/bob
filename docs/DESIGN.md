@@ -492,17 +492,17 @@ Never weaken this test to make it pass. Fix the formula mismatch.
 ### 9.1 Structure (full size)
 
 The tree is comparable in size to PoE's, so a character's 123 points (5.3) cover only about 7% of it, and builds
-must choose. The sizes below are the 2026-10-08 targets of docs/TREE.md (the first version of this table had 21 keystones,
-130 notables and 1,250 to 1,350 nodes; the 2026-10-07 one had 2,000 to 2,400 nodes, most of them filler).
+must choose. The layout and its reasons are in docs/TREE-REDESIGN.md (2026-10-11); the sizes of docs/TREE.md still hold for
+the clusters.
 
-| Node kind                  | Target count    | Notes                                                                                                                            |
-| -------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Class starts               | 6               | —                                                                                                                                |
-| Keystones                  | 27              | Section 9.4                                                                                                                      |
-| Notables                   | ~370            | Unique names. At most 4 notables share the same mod set (with different values allowed).                                         |
-| Small passives in clusters | ~1,070          | Repeat the cluster's theme at about 1/3 of the notable's main stat                                                               |
-| Travel / attribute nodes   | ~250            | +10 to one attribute, where a road between two clusters is long                                                                  |
-| **Total**                  | **1,600–1,850** | The mix is the reference tree's (docs/TREE.md, "Look and density"): a fifth of the nodes are notables, an eighth attribute nodes |
+| Node kind                  | Target count | Notes                                                                                                                         |
+| -------------------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| Class starts               | 6            | —                                                                                                                             |
+| Keystones                  | 27           | Section 9.4; each at the end of a peninsula of four small nodes themed to it                                                  |
+| Notables                   | ~370         | Unique names. At most 4 notables share the same mod set (with different values allowed). Each is worth at least 3 small nodes |
+| Small passives in clusters | ~1,070       | Repeat the cluster's theme; all small nodes of one stat give the same value                                                   |
+| Road nodes                 | ~650         | Attribute nodes where roads fork and in turn along them, and small nodes of generic stats of the region                       |
+| **Total**                  | **~2,150**   | Roads are about a third of the nodes                                                                                          |
 
 - **Layout:** the six class starts sit on an inner ring, in PoE order:
   - Mystic (Int) at the top;
@@ -511,44 +511,47 @@ must choose. The sizes below are the 2026-10-08 targets of docs/TREE.md (the fir
   - Reaver (Str/Dex) at the bottom;
   - Vanguard (Str) at the lower left;
   - Zealot (Str/Int) at the upper left.
-- Each start is surrounded by its region. The space between neighbouring regions holds hybrid themes.
-- The outer ring holds the strongest notables and most keystones, reached through long travel paths.
-- The centre is a hub that lets builds cross to another region.
+- Each start has a 60° wedge of the tree, drawn as before. A wedge holds four or five **districts**, each a theme with a shape
+  (a honeycomb of closely linked clusters, a ring, a road that forks, an avenue, a ladder), and clusters that belong to no district
+  (about a quarter), standing beside a road. The regions differ in shape and reach; they are not copies of one another.
+- **Roads first.** A road is made of attribute nodes and small nodes of generic stats of the region (never a weapon or a skill
+  type); a cluster hangs from a road by one entrance, so passing never takes its nodes. A keystone is a dead end.
+- The centre is an open middle: a ring road joined to the class starts, a hub cluster between each pair of class directions
+  (generic, not one attribute's), three keystones inside the ring, and a wheel at the centre with three spokes.
 - **IP:** the layout is our own. Do not reproduce PoE's tree shape, node positions or cluster arrangement. Only the
-  _kinds_ of nodes and the general region-by-attribute idea are borrowed.
+  _kinds_ of nodes, the general region-by-attribute idea, and rates (how strongly an archetype keeps to one corner, how
+  generic a road is) are borrowed, from the reference data in `docs/tree/pob-tree.json`.
 
 ### 9.2 Spec-driven generation
 
-At ~1,300 nodes, the tree is authored at the **cluster** level, never node by node.
+The tree is authored at the **district** level, never node by node.
 
-- `src/data/tree/spec.ts` lists about 160 clusters:
-  `{ id, region, center: {r, θ}, kind: 'wheel'|'chain'|'spur'|'keystone', small: ModTemplate, smallCount, notable?: NotableDef, links: ClusterId[] }`.
-- **Travel paths** between linked clusters are generated automatically.
-  - Each path is a run of travel nodes spaced along the link.
-  - Its attribute follows the regions it passes through.
-- `src/data/tree/build.ts` is a pure, deterministic function that lays out nodes `(x, y)` with ids and edges.
-  - It runs once at startup and is memoised.
-  - A snapshot test pins the node count, edge count and every keystone's id and position.
-- Notables are authored with **theme templates**:
-  - `src/data/tree/notableThemes.ts` defines about 40 parameterised themes (for example "melee physical + life";
-    "crit chance + crit multi with daggers").
-  - The spec instantiates each theme 2–4 times at different strengths and positions, each with its own name.
-- **Rendering:** SVG with about 1,700 nodes (one group each, about 8,000 elements with the lines and names) and about 2,100
-  lines must pan and zoom at 60 fps on a mid-range laptop.
+- `src/data/tree/charter.ts` lists the districts (a theme, a template, groups of clusters, a nexus slot, the keystones at the
+  tip); the clusters themselves are generated (`clustersGen.ts`, from `scripts/tree/emit.ts`).
+- `src/data/tree/plan.ts` says where each district stands and which roads join them (proposed by `scripts/tree/pack.ts`, kept by
+  hand); `roads.ts` is what the roads are made of.
+- `src/data/tree/layout.ts` is a pure, deterministic function that lays out nodes `(x, y)` with ids and edges (templates,
+  roads, clusters hung from them, keystone peninsulas, the middle, wayside clusters). It runs once at startup and is memoised.
+  A snapshot test pins the node count, edge count and every keystone's id and position.
+- `src/data/tree/power.ts` prices a node in small nodes; `scripts/tree/balance.ts` repairs the generated clusters to it.
+- Tools: `npm run tree:audit`, `tree:pic`, `tree:explore`, `tree:charter`.
+- **Rendering:** SVG with about 2,150 nodes (one group each) must pan and zoom at 60 fps on a mid-range laptop.
   If it does not, switch the tree view to a `<canvas>` renderer behind the same component interface, and record it in
   Appendix A.
 
 ### 9.3 Tree invariants (tested)
 
-- The node count is 1,600–1,850 and the keystone count is 27.
-- A fifth to a quarter of the nodes are notables, at most 2% keystones, 8% to 16% attribute nodes. The tree is as connected as the
-  reference: mean degree 2.1 to 2.45, 150 to 320 loops, 8% to 16% dead ends, 40% to 70% of the notables with two or more links,
-  every keystone a dead end, and at most 10 links routed by the fallback.
-- The graph is connected, and every node is reachable from every class start.
+- The keystone count is 27 and the notable count about 370.
+- Every cluster and every road is laid out (none dropped, none unplaced).
+- The graph is connected, and every node is reachable from every class start; links are symmetric.
 - No two nodes are closer than 40 units in layout space, and no edge passes through a node it isn't attached to.
-- Every cluster link references an existing cluster.
+- Every keystone is a dead end; every cluster hangs from exactly one entrance (the middle's wheel from its three spokes).
+- No small node on a road names a weapon, a skill type or a condition.
 - Each class start reaches at least **4 keystones within 40 points** and at least **15 notables within 30 points**.
+- Every notable is worth at least three small nodes (two and a half with several lines); all small nodes of one stat give one value.
 - All notable names are unique, and every name passes the IP deny-list test.
+- How the tree looks is not tested: it is judged from pictures (`tree:pic`) and the audit (`tree:audit`), and by simulated players
+  (docs/TREE-REDESIGN.md, T6.1).
 
 ### 9.4 Keystones (27: the 21 below, and the six of docs/TREE.md: Nimble Gambit, Spellslip, Volatile Servants, Idle Hands, Sigil Warden, Lone Vow)
 
@@ -1344,6 +1347,9 @@ _(Filled in during implementation: date, decision, reason.)_
 | 2026-10-10 | Difficulty: rares and bosses are tougher, deeper maps are fuller and a little longer. Life multiples: rare 4.5 → 12, mini-boss 6.75 → 30, unique boss 30 → 200 (magic stays 2); damage and experience multiples unchanged. The pack mix of ordinary rooms moves with the map number from 70% plain / 22% magic / 8% rare on map 1 to 40 / 30 / 30 on map 100 (`NORMAL_FADE`, `RARE_GROWTH`), a magic group has one more magic monster and a rare one magic escort for every 25 maps (`MAGIC_BAND_MAPS`), and rooms on the main path are `4 + floor(n / 20)` (4–9, were 4–8).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | A player's run on map 60 (a level-64 Vanguard with a chaos bow and every map modifier added) was nearly survived and "clear everything trivially"; rares felt magic and the bosses felt rare. Kept as three constants and the table so it can be turned back; experience and loot per kill are unchanged, but a deeper map holds more rares, so it pays more of both. One 72-run bot sample is the check (docs/PROGRESS.md). |
 | 2026-10-10 | Save slots: the slot id is the controller's, not a field of `RunState` (so no `SAVE_VERSION` bump), and ids come from a counter in the slot list, since `run/` has no clock or RNG; "most recent first" is list order. A save that does not fit in storage sets `Controller.saveFailed` and the camp warns, instead of throwing.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Starting a new run overwrote the only save (user, 2026-10-10).                                                                                                                                                                                                                                                                                                                                                               |
 | 2026-10-10 | Monster evasion and accuracy follow the reference game's monster tables, replacing the bot-tuned straight lines (`30 + 12 m`, `20 + 14 m`): evasion `(50 + 16 m) · 1.0212^m`, accuracy `(12.9 + 0.385 m) · 1.0299^m` (a fit; the 100-entry tables stay in `docs/coverage/`, `src/` has the formulas). The build matrix's reference player now has its own accuracy curve (`referenceAccuracy`, `12 + 8.4 · level`, what `0.6 ·` the old monster accuracy came to) instead of a share of the monster's. The player side was compared and left as it is: base evasion and accuracy and the attribute bonuses are the reference game's, item bases are about 0.7 to 0.85 times as large (docs/EVASION.md).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | The user asked that the same investment in evasion or accuracy gives the same interaction with enemies as in the reference game; a plain-geared level 60 character hit 100% of the time, and monsters hit it 100% of the time whatever its evasion.                                                                                                                                                                          |
+| 2026-10-11 | The passive tree is laid out from a charter of districts and a plan (docs/TREE-REDESIGN.md), roads first, each cluster hung by one entrance, replacing the rings of docs/TREE.md. The band tests that pinned that design (node count, kind mix, degree, loops, dead ends, notables on a road) are retired; the new tests are facts. `SAVE_VERSION` 11 hands passives back.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | The tree was the right size with no design: coin-flip links, clusters as roads, six copies of one flower. How a tree looks is a matter of taste, so it is judged by pictures and players, and only what is a fact is tested.                                                                                                                                                                                                 |
+| 2026-10-11 | A node's strength is priced in small nodes (`power.ts`): a notable is worth at least three (two and a half with several lines); small nodes of one stat give one value (the median); the repair raises values and adds no lines. Builds are a little stronger as a result (user decision D4).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | A '+5% life' notable beside 4-5% small nodes was no reason to walk anywhere.                                                                                                                                                                                                                                                                                                                                                 |
+| 2026-10-11 | Locality of archetypes is a tendency, not a quota; the wedges stay as the backdrop and no district is drawn; no new nodes are written (a district's nexus is an existing notable that pairs two of its groups, or a plain junction); the middle has three spokes and finer roads (`HUB_STEP` 100) so that crossing it costs what a class's own corner does.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | User decisions D1, D2 and D5 of 2026-10-11. A regular six-spoke middle was another flower.                                                                                                                                                                                                                                                                                                                                   |
 
 ## Appendix B — Glossary
 
