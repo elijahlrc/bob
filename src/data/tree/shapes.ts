@@ -49,8 +49,8 @@ export function placeCluster(
   const a = Math.atan2(uy, ux);
   const theme = THEMES[c.theme];
   if (!theme) throw new Error(`unknown theme ${c.theme}`);
-  const smallMods = c.gen ? c.gen.small.mods : theme.small;
-  const smallName = tidyName(c.gen ? c.gen.small.name : theme.smallName);
+  const smallMods = c.smallMods ?? (c.gen ? c.gen.small.mods : theme.small);
+  const smallName = tidyName(c.smallName ?? (c.gen ? c.gen.small.name : theme.smallName));
   const small = () => smallMods.map((m) => ({ ...m }));
   const n = c.smallCount;
   const ids: number[] = [];

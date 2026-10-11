@@ -3,6 +3,7 @@
  * hand-made notables, and the cluster record the builders take (docs/TREE-REDESIGN.md). The layout is `layout.ts`, the charter
  * `charter.ts`, the geometry `plan.ts`.
  */
+import type { Mod } from '../../mods/types';
 import type { GenCluster } from './types';
 
 export type RegionId = 'str' | 'strdex' | 'dex' | 'dexint' | 'int' | 'strint';
@@ -31,6 +32,9 @@ export type ClusterSpec = {
   /** A generated cluster: its own notable and small nodes. */
   gen?: GenCluster;
   keystone?: string;
+  /** The small nodes of the cluster, when they are not the theme's or the generated cluster's. */
+  smallMods?: Mod[];
+  smallName?: string;
   attrs: Attr[];
 };
 

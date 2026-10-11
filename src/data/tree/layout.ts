@@ -22,6 +22,8 @@ import {
 import { DISTRICTS, districtOf, type District } from './charter';
 import { GEN_CLUSTERS } from './clustersGen';
 import { PLACEMENT, REGION_LINKS } from './plan';
+import { THEMES } from './notableThemes';
+import { modKey, unitsOf } from './power';
 import { ROAD_POOLS } from './roads';
 import { placeCluster } from './shapes';
 import {
@@ -597,27 +599,47 @@ function layoutRegion(
   for (const [from, to] of REGION_LINKS[reg.id] ?? [])
     road(ref(from), ref(to), undefined, `${from}>${to}`);
 
-  // Keystones at the tip of their district.
+  // Keystones at the tip of their district: each takes the junction farthest from the middle that has room, and its own.
+  const taken = new Set<number>();
   for (const d of DISTRICTS.filter((x) => x.region === reg.id)) {
     const sh = shapes.get(d.id)!;
     const ids = junctionIds.get(d.id)!;
-    d.keystones.forEach((k, n) => {
+    const radius = (j: number) => Math.hypot(b.nodes[ids[j]].x, b.nodes[ids[j]].y);
+    const tipOrder = [...new Set([...sh.shape.tips, ...Object.values(sh.shape.gates)])].sort(
+      (p, q) => radius(q) - radius(p) || p - q,
+    );
+    d.keystones.forEach((k) => {
+      const theme = SPUR[k]?.theme ?? reg.keystoneTheme;
       const spec: ClusterSpec = {
         id: `${reg.id}_k_${k}`,
         region: reg.id,
         kind: 'keystone',
-        theme: reg.keystoneTheme,
-        smallCount: 2,
+        theme,
+        smallCount: SPUR_LENGTH,
         keystone: k,
         attrs: reg.attrs,
       };
+      const lend = SPUR[k]?.gen && GEN_CLUSTERS.find((g) => g.id === SPUR[k].gen);
+      if (lend) spec.gen = lend;
+      else {
+        // The theme's small node, at the value every small node of that stat has.
+        spec.smallMods = THEMES[theme].small.map((m) => ({
+          ...m,
+          value: UNITS.byKey.get(modKey(m)) ?? m.value,
+        }));
+        spec.smallName = THEMES[theme].smallName;
+      }
       let placed = false;
-      for (const tip of sh.shape.tips) {
+      for (const tip of tipOrder) {
+        if (taken.has(ids[tip])) continue;
         const J = b.nodes[ids[tip]];
-        const out0: Vec = [J.x - sh.centre[0], J.y - sh.centre[1]];
-        const len = Math.hypot(out0[0], out0[1]) || 1;
-        const spread = d.keystones.length > 1 ? (n - (d.keystones.length - 1) / 2) * 50 : 0;
-        const base = rot([out0[0] / len, out0[1] / len], spread);
+        const away: Vec = [J.x - sh.centre[0], J.y - sh.centre[1]];
+        const la = Math.hypot(away[0], away[1]) || 1;
+        const lr = Math.hypot(J.x, J.y) || 1;
+        // Outward from the district, and outward from the middle of the tree.
+        const mix: Vec = [away[0] / la + (J.x / lr) * 1.2, away[1] / la + (J.y / lr) * 1.2];
+        const lm = Math.hypot(mix[0], mix[1]) || 1;
+        const base: Vec = [mix[0] / lm, mix[1] / lm];
         const cands: Candidate[] = [0, 15, -15, 30, -30, 50, -50].flatMap((deg) =>
           [250, 330].map((dist) => {
             const f = rot(base, deg);
@@ -625,6 +647,7 @@ function layoutRegion(
           }),
         );
         if (hang(ctx, spec, ids[tip], cands, d.id) !== null) {
+          taken.add(ids[tip]);
           placed = true;
           break;
         }
@@ -683,6 +706,42 @@ function layoutRegion(
 }
 
 const HUB_R = HUB_RADIUS;
+
+/** What one small node gives, by stat, as the generated clusters give it. */
+const UNITS = unitsOf(GEN_CLUSTERS.flatMap((g) => g.small.mods));
+
+/** How many small nodes lead to a keystone: its peninsula. */
+const SPUR_LENGTH = 4;
+/**
+ * What the small nodes leading to a keystone give: the theme (notableThemes.ts) or the small node of a generated cluster of the
+ * subject, so that the approach is about what the keystone is. A dead end, so it may be as niche as the keystone.
+ */
+const SPUR: Record<string, { theme?: string; gen?: string }> = {
+  unerringDiscipline: { theme: 'accuracy' },
+  hollowVessel: { theme: 'es' },
+  bloodRite: { theme: 'lifePct' },
+  platedHide: { theme: 'armour' },
+  mindBulwark: { theme: 'mana' },
+  searingAvatar: { theme: 'fireDamage' },
+  closeQuarters: { theme: 'projectile' },
+  feverPitch: { theme: 'critChance' },
+  rootedStance: { theme: 'stunThreshold' },
+  prismaticBalance: { theme: 'elemental' },
+  livingWard: { theme: 'lifeRegen' },
+  shadeLeech: { theme: 'lifeLeech' },
+  woundDance: { theme: 'bleed' },
+  cruelAgony: { theme: 'poison' },
+  manaBastion: { theme: 'es' },
+  arrowWeave: { theme: 'evasion' },
+  shieldwall: { theme: 'block' },
+  nimbleGambit: { theme: 'moveSpeed' },
+  spellslip: { theme: 'castSpeed' },
+  steadyDraw: { theme: 'bow' },
+  volatileServants: { gen: 'g132' },
+  idleHands: { gen: 'g339' },
+  sigilWarden: { gen: 'g155' },
+  loneVow: { gen: 'g175' },
+};
 /** The middle's roads are finer than a region's, so that crossing it costs what a class's own corner does. */
 const HUB_STEP = 100;
 
