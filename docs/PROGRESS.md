@@ -926,4 +926,4 @@ lunges in a fan of crits when it drops; the Bulwark Engine (60) is plated agains
 (small hits eventually, damage over time too), and stops dead for five seconds when they give; the Sundered Twins (80) are
 two bosses, armoured Ash and evasive Cinder, each with a life bar, and the survivor grieves (faster, harder, and it sends the
 dead one's kind of blow). The boss warning at camp is two lines of description, nothing about how to fight. The nine theme
-champions no longer end any tenth map.
+champions now end ordinary maps in the place of the end-of-map rare (from map 5).

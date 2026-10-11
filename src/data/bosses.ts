@@ -126,10 +126,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     partners: ['cinder'],
     name: 'the Sundered Twins',
     test: 'Defence and offence of two kinds at once.',
-    brief: [
-      'Two siblings, one of ash and one of cinder.',
-      'Neither fights the way the other does.',
-    ],
+    brief: ['Two siblings, one in plate and one in flame.', "Each is changed by the other's loss."],
     stunMult: 4,
     curseEffect: 0.67,
   },

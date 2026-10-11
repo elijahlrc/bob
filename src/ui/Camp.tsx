@@ -5,6 +5,7 @@ import { classDef } from '../data/classes';
 import { affixText, mapAffixDef, rewardText } from '../data/mapAffixes';
 import { flaskBase } from '../data/flasks';
 import { mapTypeDef } from '../data/mapTypes';
+import { endChampion } from '../data/champions';
 import { themeDef } from '../data/themes';
 import { offersFor, type Verdict } from '../run/preview';
 import { xpToNext } from '../data/xpTable';
@@ -316,7 +317,11 @@ export function Camp({ c }: { c: Controller }) {
                   <OfferTable o={o} />
                   <OfferInfo
                     o={o}
-                    gate={run.map % 10 === 0}
+                    champion={
+                      o.type !== 'quarry' &&
+                      o.type !== 'crawl' &&
+                      !!endChampion(t, run.map, o.areaLevel, bossForMap(run.map) ? 'boss' : 'rare')
+                    }
                     boss={bossForMap(run.map) ?? undefined}
                     more={!narrow || !!opened[o.id]}
                   />

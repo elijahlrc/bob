@@ -872,14 +872,10 @@ clock, only attrition.
   `bulwarkEngine`, `ash`, `cinder`), fights in `src/sim/bosses.ts`, the veil's crit rule in `sim/combat.ts` (`hit`), the
   second twin placed by `gen/population.ts`, the HUD's bar for each boss in a fight (`ui/Hud.tsx`), the tells in
   `bossFx.ts`, the rigs in `render/style/figure.ts`. Tests in `src/sim/bosses.test.ts`.
-- **A boss now ends every tenth map.** `endKindForMap` never returns a mini-boss for one, so **the nine theme champions
-  (`ThemeDef.chief`) have no map to end now**, except a Crawl's last segment and a Quarry's. (Open question 11.)
+- **A boss now ends every tenth map**, so the nine theme champions (`ThemeDef.chief`) took no map. The user chose (2026-10-11) that **they replace the end-of-map rare on other maps**: from map 5 (`CHAMPION_FROM_MAP`), a plain end, when the champion's type is met at that level, the end room's leader is the theme's champion in a rare's power (its type, its signature mod, up to three of the rare's own). Not on a boss map, a Quarry or a Crawl. `data/champions.ts` (`endChampion`), `gen/population.ts`, and the offer card names it (`OfferInfo`). Tests: `gen/champions.test.ts`.
 - The camp's description of each (two lines, in the style of the others, advising nothing) is `BossDef.brief`.
 
 ### 19.6 Open questions (defaults in effect)
 
 10. **A defence against crits.** The Duellist's lunge is a crit in all but name; nothing reduces a crit taken. A small
     passive or item mod ("hits against you have less extra damage when they crit") would give it a specific answer.
-11. **The nine champions.** The theme champions (the Bone Warden, the Treasurer, the Cinder Tyrant and so on) are met
-    nowhere on the maps now that every tenth map is a boss's. They could stand beside the boss as its escort, take the
-    place of a rare at the end of other maps, or be left to the Quarry and the Crawl.

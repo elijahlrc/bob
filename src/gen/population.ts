@@ -1,4 +1,5 @@
 import { bossOfType } from '../data/bosses';
+import { endChampion } from '../data/champions';
 import { Rng } from '../core/rng';
 import type { MonsterSpec } from '../calc/monster';
 import {
@@ -477,9 +478,14 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
         );
       } else {
         let leader: MonsterSpec = opts.endKind === 'miniboss' ? normal('miniboss') : normal('rare');
-        // The mini-boss of a faction's own theme is its champion.
-        const champ = opts.theme.chief;
-        if (champ && opts.endKind === 'miniboss')
+        // The mini-boss of a faction's own theme is its champion, and on an ordinary map the champion takes the rare's place.
+        const champ =
+          opts.endKind === 'miniboss'
+            ? opts.theme.chief
+            : opts.type === 'crawl'
+              ? undefined
+              : endChampion(opts.theme, opts.map, opts.areaLevel, opts.endKind);
+        if (champ)
           leader = {
             ...leader,
             type: champ.type,

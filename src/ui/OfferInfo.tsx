@@ -80,13 +80,13 @@ export function OfferTable({ o }: { o: OfferPreview }) {
 /** The part of an offer card that says who is on the map (docs/ENEMIES.md 5.1). */
 export function OfferInfo({
   o,
-  gate,
+  champion,
   boss,
   more,
 }: {
   o: OfferPreview;
-  /** The map is a gate (every tenth): its mini-boss is named. */
-  gate: boolean;
+  /** A champion ends the map (docs/BOSSES.md 19): it is named. */
+  champion: boolean;
   /** The boss that ends the map, on a boss map (docs/BOSSES.md): it takes the champion's place. */
   boss?: BossId;
   /** Show the lines that are left out of a narrow card until it is expanded. */
@@ -171,7 +171,7 @@ export function OfferInfo({
               waits at the end. {BOSSES[boss].brief.join(' ')}
             </div>
           )}
-          {gate && !boss && champ && theme.chief && (
+          {champion && !boss && champ && theme.chief && (
             <div class="gate">
               <strong>{champ.name}</strong> waits at the end: {MOD_MARKS[theme.chief.mod].desc}
             </div>
