@@ -505,3 +505,24 @@ Node ids and the layout are unchanged, so saves load as before. New tests in `tr
 measured from the tree's own small nodes), one value per line across the generated clusters, no tag or condition in the hub's small
 nodes. Bot sample (8 runs a class, seed 5, scaling 1.5, before and after; `scripts/simpar.sh`): median map reached 10 → 12.5
 (vanguard), 10 → 10, 4.5 → 5, 10 → 10, 6.5 → 6.5, 15 → 14.5 (shade); no class collapsed, and eight runs cannot tell more.
+
+### T3 and T4, the layout (2026-10-11)
+
+Built together (a committed state with new node ids needs the save bump). `builder.ts` (nodes, links, clearance, `travel`, now with a
+pool of generic road stats and a no-crossing check), `shapes.ts` (loop, stalk and dead-end spur, each with one entrance),
+`layout.ts` (five district templates as tables of junctions, roads and slots; a collision-safe `hang`; roads that bend round a
+blocked cell; the open middle; keystones; wayside clusters), `plan.ts` (placement and roads by hand, from `scripts/tree/pack.ts`),
+`roads.ts` (the pools). Choices made while building, none in the plan: the knot is a honeycomb (a square grid looked artificial);
+templates vary between regions (the first pass gave every region one knot, one ring and one fork, which was the old
+sameness again, so int has one of each, the others a different mix and only three regions have a knot); the middle has three
+spokes, not six, and finer roads (`HUB_STEP` 100) so that crossing it costs what a class's own corner does; roads are
+`ROAD_STEP` 185 apart (115 gave 2,760 nodes). The wedges and the camera are unchanged (D1). The old ring builder, `build.ts`,
+`tree:mix` and the band tests are gone; `SAVE_VERSION` is 11 and a version 10 save keeps its run and gets its passives back.
+
+### T5, peninsulas (2026-10-11); what is not built
+
+Keystones sit on a peninsula of four small nodes themed to the keystone (`SPUR` in `layout.ts`; the minion, totem, brand and
+aura keystones borrow the small node of a generated cluster of that subject), at the district's junction farthest from the middle,
+pointing out. **Not built**, the plan's cheapest items to drop: the great wheels and the row and twin cluster shapes (the ring and
+honeycomb districts carry the landmarks), the three named bridges between regions (no new nodes: a bridge would be a road
+between two outer gates with an existing notable at its middle). Whether they are missed is for the audit to say.

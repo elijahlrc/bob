@@ -5,6 +5,20 @@ the docs each entry links to.
 
 ## 2026-10-11
 
+### Passive tree: a new layout
+
+The passive tree has been redrawn (docs/TREE-REDESIGN.md). Your allocated passives are handed back as unspent points; nothing else
+about your run changes.
+
+- **Not a flower any more.** The six regions are no longer copies of one another: each has its own shape and landmarks (a
+  honeycomb of closely linked clusters, a big ring, a road that forks, a long ladder), and the centre is an open crossroads.
+- **Roads are generic.** The nodes you pass through on the way between clusters give plain stats of the region (life, mana,
+  energy shield, armour, evasion, damage, speed), never a weapon or skill type, so passing through costs you something you can use.
+- **Clusters hang off the road.** A cluster of a notable and its small nodes is a side trip with one way in: you take it when you
+  want it, and passing never forces you to take its nodes.
+- **Keystones sit at the end of a peninsula** of four small nodes that fit the keystone.
+- Roads take more points than before (about a fifth fewer notables for 100 points), and every notable is worth more.
+
 ### Passive tree: notables are worth taking, and the middle is for everyone
 
 First part of a redesign of the passive tree (docs/TREE-REDESIGN.md). Nothing moves yet, so saves are untouched.

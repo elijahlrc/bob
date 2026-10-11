@@ -927,3 +927,28 @@ lunges in a fan of crits when it drops; the Bulwark Engine (60) is plated agains
 two bosses, armoured Ash and evasive Cinder, each with a life bar, and the survivor grieves (faster, harder, and it sends the
 dead one's kind of blow). The boss warning at camp is two lines of description, nothing about how to fight. The nine theme
 champions now end ordinary maps in the place of the end-of-map rare (from map 5).
+
+### Passive tree redesign (docs/TREE-REDESIGN.md), T0 to T5 built (2026-10-11)
+
+The tree was the right size and had no design: six identical wedges of rings, clusters that were the roads, coin-flip links.
+It is now laid out from a charter (`src/data/tree/charter.ts`: 27 districts of a theme each, groups, a nexus, the keystones at
+the tip; 95 clusters wayside on purpose) and a plan (`plan.ts`: where each stands, which roads join them; proposed by
+`scripts/tree/pack.ts`, then kept by hand), by `layout.ts`. Roads come first: junction nodes and small nodes of generic stats
+(`roads.ts`, never a weapon or a skill type), and every cluster hangs from one by a single entrance (`shapes.ts`), so a road
+never runs through a cluster. Five district templates (honeycomb, ring, fork, avenue, ladder), an open middle (a ring road, a
+hub cluster between each pair of class directions, three keystones inside, a wheel with three spokes), keystone peninsulas
+of four small nodes themed to the keystone. 2,165 nodes (was 1,727: roads are a third of them); a class start is 12 steps from
+a neighbour's and 17 to 23 from the far ones, as before. `SAVE_VERSION` 11 hands passives back.
+
+Strength and sense first (T2): notables are worth at least three small nodes (`power.ts`, `balance.ts`: 30 raised), small
+nodes of a stat give one value, a cluster's small nodes match its notable, the hub's themes are generic.
+
+Tools: `npm run tree:audit` (the measurements, for information), `tree:pic` (a PNG of the tree or a region, no dependency),
+`tree:explore` (build with the tree from a terminal), `tree:charter`. The band tests that pinned the old design are retired;
+`tree.test.ts` now tests facts (one entrance per cluster, generic roads, nothing overlaps, notables beat small nodes).
+
+Bot sample (8 a class, seed 5, scaling 1.5), old tree / new tree: median map reached vanguard 10 / 8.5, strider 10 / 8.5, mystic
+4.5 / 2.5, reaver 10 / 10, zealot 6.5 / 6.5, shade 15 / 8.5. Eight runs cannot tell much, but the direction is down. A greedy
+100-point build takes 24 to 27 notables on the new tree against 31 to 34 on the old (each notable worth more, the roads
+longer). T8 of the plan looks at it with more runs; the knobs are the power table and the road density (`ROAD_STEP`).
+Next: the audit by twelve simulated players (T6.1) and the response to it (T6.2).
