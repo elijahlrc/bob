@@ -1564,28 +1564,8 @@ select option {
 }
 .boss-card {
   margin: 6px 0;
-  font-size: 12px;
-}
-.boss-card-test {
-  color: #ffd8b0;
-  margin-bottom: 4px;
-}
-.boss-card-head {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 10px;
-  color: #c8b8a0;
-  margin-bottom: 4px;
-}
-.boss-card-cols {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.boss-card-title {
-  font-weight: bold;
-  color: #e8dcc8;
-  margin-bottom: 2px;
+  font-size: 14px;
+  color: #f0d8c0;
 }
 .flask.sealed {
   filter: grayscale(1) brightness(0.5);
@@ -1690,11 +1670,6 @@ select option {
     0 0 10px rgba(255, 90, 40, 0.6),
     0 2px 2px #000;
 }
-.boss-offer-test {
-  margin: 2px 0 6px;
-  color: #f0b890;
-  font-size: 14px;
-}
 .boss-offer-map-info {
   margin: 10px 14px 0;
   padding-top: 8px;
@@ -1730,8 +1705,5 @@ select option {
   .boss-offer-name {
     font-size: 22px;
     text-align: center;
-  }
-  .boss-card-cols {
-    grid-template-columns: 1fr;
   }
 }

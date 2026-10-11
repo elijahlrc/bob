@@ -3,30 +3,13 @@ import { bossAhead, bossOfType, type BossDef } from '../data/bosses';
 import type { MonsterTypeId } from '../data/monsters';
 import { bossReadiness } from '../run/bossInfo';
 
-/** A boss's card (docs/BOSSES.md 10): what it takes to kill it, and what it takes to survive it. */
-export function BossCard({ boss, test = true }: { boss: BossDef; test?: boolean }) {
+/** A boss's warning (docs/BOSSES.md 10): one to three lines, the broad strokes of what it does. */
+export function BossCard({ boss }: { boss: BossDef }) {
   return (
     <div class="boss-card">
-      {test && <div class="boss-card-test">{boss.test}</div>}
-      <div class="boss-card-head">
-        <span>Deals {boss.deals}</span>
-        <span>Resists {boss.resists}</span>
-        <span>Weak to {boss.weak}</span>
-      </div>
-      <div class="boss-card-cols">
-        <div>
-          <div class="boss-card-title">To kill it</div>
-          {boss.kill.map((t) => (
-            <div key={t}>· {t}</div>
-          ))}
-        </div>
-        <div>
-          <div class="boss-card-title">To survive it</div>
-          {boss.survive.map((t) => (
-            <div key={t}>· {t}</div>
-          ))}
-        </div>
-      </div>
+      {boss.brief.map((t) => (
+        <div key={t}>{t}</div>
+      ))}
     </div>
   );
 }
@@ -53,7 +36,7 @@ export function BossReadiness({ boss, ch }: { boss: BossDef; ch: Character }) {
 }
 
 /**
- * The next boss, at camp, from five maps before it (docs/BOSSES.md 10): its name, how far off it is, its card, and where the
+ * The next boss, at camp, from five maps before it (docs/BOSSES.md 10): its name, how far off it is, its warning, and where the
  * build stands against it.
  */
 export function BossAhead({ map, ch }: { map: number; ch: Character }) {

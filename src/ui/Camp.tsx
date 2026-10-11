@@ -39,7 +39,7 @@ type Tab = 'tree' | 'sheet' | 'skills' | 'strategy' | 'items' | 'workbench' | 'n
 
 /**
  * A boss map's offer (docs/BOSSES.md 10): the one way on, presented as a level apart from all the others. The boss's
- * portrait and name, its question and its card, where the build stands, then the map that leads to it.
+ * portrait and name, a short warning, where the build stands, then the map that leads to it.
  */
 function BossOffer({ c, o, ch }: { c: Controller; o: OfferPreview; ch: Character }) {
   const run = c.run!;
@@ -60,8 +60,7 @@ function BossOffer({ c, o, ch }: { c: Controller; o: OfferPreview; ch: Character
         {c.portrait && <img class="boss-portrait" src={c.portrait(boss.type)} alt={name} />}
         <div class="boss-offer-text">
           <div class="boss-offer-name">{name}</div>
-          <div class="boss-offer-test">{boss.test}</div>
-          <BossCard boss={boss} test={false} />
+          <BossCard boss={boss} />
           <BossReadiness boss={boss} ch={ch} />
         </div>
       </div>
