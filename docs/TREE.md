@@ -1,5 +1,8 @@
 # Passive tree parity (3.9)
 
+_Follow-up, 2026-10-11:_ the tree's design (roads, districts, landmarks, node strength) is planned in
+[TREE-REDESIGN.md](TREE-REDESIGN.md).
+
 Goal: a tree with the breadth of the 3.9 tree: far more notables with several lines each (some conditional), keystones that
 change how a build plays, and nodes for every system added since the tree was written (minions, totems, traps, mines,
 brands, curses, warcries, guards, auras and heralds, ailment damage over time). Layout, names and numbers stay our own
