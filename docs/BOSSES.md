@@ -751,9 +751,11 @@ Built the same day, all milestones at once (the user asked for the whole plan wi
   set apart from every other level (a banner, the boss's portrait, its question, its card, where the build stands, the
   map that leads to it, and one "Face …" button). No Respite, no map type, no level offset on a boss map. The side strip
   shows the next boss only before its map.
-- **The warning is a brief** (the user, 2026-10-11: the card was too didactic): one to three lines of broad strokes
-  (`BossDef.brief`, two for each boss) in place of the question, the deals/resists/weak head and the two kill and survive
-  columns. The detail stays in this document and in the readiness lines.
+- **The warning describes, and does not advise** (the user, 2026-10-11: the card was too didactic, and discovery is part
+  of the joy): two lines of what the boss is (`BossDef.brief`), with nothing about resistances, weaknesses or how to
+  fight it. The question, the deals/resists/weak head, the kill and survive columns and the readiness lines (and
+  `src/run/bossInfo.ts` with them) are gone from the screen; the detail stays in this document. The player finds out
+  what a boss is hard and soft to by fighting it.
 - **A boss map is left on its own after twice the usual time** (about 17 minutes instead of 8; the user, 2026-10-10), so
   a long boss fight is not cut short, while a character that cannot win is still not stuck for ever.
 

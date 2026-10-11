@@ -18,7 +18,7 @@ import { useViewport } from './device';
 import { infoProps } from './info';
 import { Items } from './Items';
 import { OfferInfo, OfferTable } from './OfferInfo';
-import { BossAhead, BossCard, BossReadiness } from './BossCard';
+import { BossAhead, BossCard } from './BossCard';
 import { BOSSES, bossForMap } from '../data/bosses';
 import type { OfferPreview } from '../run/preview';
 import { Reward } from './Reward';
@@ -39,9 +39,9 @@ type Tab = 'tree' | 'sheet' | 'skills' | 'strategy' | 'items' | 'workbench' | 'n
 
 /**
  * A boss map's offer (docs/BOSSES.md 10): the one way on, presented as a level apart from all the others. The boss's
- * portrait and name, a short warning, where the build stands, then the map that leads to it.
+ * portrait and name, a short description, then the map that leads to it.
  */
-function BossOffer({ c, o, ch }: { c: Controller; o: OfferPreview; ch: Character }) {
+function BossOffer({ c, o }: { c: Controller; o: OfferPreview }) {
   const run = c.run!;
   const id = bossForMap(run.map)!;
   const boss = BOSSES[id];
@@ -61,7 +61,6 @@ function BossOffer({ c, o, ch }: { c: Controller; o: OfferPreview; ch: Character
         <div class="boss-offer-text">
           <div class="boss-offer-name">{name}</div>
           <BossCard boss={boss} />
-          <BossReadiness boss={boss} ch={ch} />
         </div>
       </div>
       <div class="boss-offer-map-info">
@@ -265,7 +264,7 @@ export function Camp({ c }: { c: Controller }) {
       </div>
       <div class="muted">Next: map {run.map} of 100</div>
       <Arriving run={run} />
-      <BossAhead map={run.map} ch={ch} />
+      <BossAhead map={run.map} />
       {last && (last.status === 'cleared' || last.status === 'abandoned') && (
         <div class="muted">
           Last map{last.status === 'abandoned' ? ' (abandoned, no clear rewards)' : ''}:{' '}
@@ -279,7 +278,7 @@ export function Camp({ c }: { c: Controller }) {
         </div>
       )}
       {bossForMap(run.map) && run.offers.length === 1 ? (
-        <BossOffer c={c} o={offersFor(run)[0]} ch={ch} />
+        <BossOffer c={c} o={offersFor(run)[0]} />
       ) : (
         <div class="theme-choice">
           {offersFor(run).map((o, i) => {

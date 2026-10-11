@@ -1523,7 +1523,7 @@ select option {
   box-shadow: 0 6px 24px #000c;
 }
 
-/* ---- Bosses (docs/BOSSES.md): the bar across the top in a fight, a boss's card, the readiness lines at camp ---- */
+/* ---- Bosses (docs/BOSSES.md): the bar across the top in a fight, a boss's description at camp ---- */
 .boss-bar {
   position: absolute;
   top: 34px;
@@ -1569,19 +1569,6 @@ select option {
 }
 .flask.sealed {
   filter: grayscale(1) brightness(0.5);
-}
-.boss-readiness {
-  margin-top: 4px;
-  font-size: 12px;
-}
-.boss-readiness .ok {
-  color: #9ad870;
-}
-.boss-readiness .warn {
-  color: #f0c050;
-}
-.boss-readiness .bad {
-  color: #ff6a50;
 }
 .boss-ahead {
   margin: 8px 0;

@@ -17,7 +17,7 @@ export type BossDef = {
   name: string;
   /** The question it asks, in a phrase. */
   test: string;
-  /** The warning at camp: one to three lines, the broad strokes of what it does. */
+  /** The warning at camp: one to three lines that describe the boss and say nothing of how to fight it. */
   brief: string[];
   /** Its stun threshold, as a multiple of a normal monster's (bosses are 4 times). */
   stunMult: number;
@@ -33,8 +33,8 @@ export const BOSSES: Record<BossId, BossDef> = {
     name: 'the Tollkeeper',
     test: 'Single-target damage: it grows stronger with every toll.',
     brief: [
-      'Tolls every 10 seconds, and grows stronger with every toll.',
-      'Heavily armoured and resistant to lightning; weak to cold.',
+      'Rings a bell every ten seconds, and each ring is lightning.',
+      'Behind his armour, he is never quite the same after.',
     ],
     stunMult: 1.5,
     curseEffect: 0.67,
@@ -45,10 +45,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     type: 'courser',
     name: 'the Courser',
     test: 'Mobility and reach: it never stops moving.',
-    brief: [
-      'Never stops moving: it circles you, charges, and sets the floor alight.',
-      'Very evasive; weak to cold.',
-    ],
+    brief: ['A rider that never stands still.', 'Fire follows its hooves.'],
     stunMult: 4,
     curseEffect: 0.67,
   },
@@ -59,8 +56,8 @@ export const BOSSES: Record<BossId, BossDef> = {
     name: 'the Magistrate',
     test: 'One huge hit, and clearing the room to make it smaller.',
     brief: [
-      'Passes Sentence now and then: one enormous physical blow.',
-      'Witnesses curse you and make it heavier. Kill them first.',
+      'Court is in session.',
+      'The Magistrate passes sentence, and his witnesses stand to speak.',
     ],
     stunMult: 4,
     curseEffect: 0,
@@ -72,8 +69,8 @@ export const BOSSES: Record<BossId, BossDef> = {
     name: 'the Prism Warden',
     test: 'All three elemental resistances, and more than one element.',
     brief: [
-      'Casts one element at a time, and is immune to the one it is attuned to.',
-      'A crystal shield soaks the damage; chaos goes past it.',
+      'A warden in a shell of crystal.',
+      'It turns from fire to frost to lightning, and back.',
     ],
     stunMult: 4,
     curseEffect: 0.67,
@@ -84,10 +81,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     type: 'rotwife',
     name: 'the Rotwife',
     test: 'Ailments, and chaos resistance.',
-    brief: [
-      'Inflicts every ailment in turn, and rots the floor with chaos.',
-      'Regrows, unless she is burning, bleeding or poisoned.',
-    ],
+    brief: ['She carries every affliction there is,', 'and she does not keep them to herself.'],
     stunMult: 4,
     curseEffect: 1,
   },
@@ -97,10 +91,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     type: 'unmaker',
     name: 'the Unmaker',
     test: 'Build depth: it steals the best of your build.',
-    brief: [
-      'Steals the best of your build, and uses it against you.',
-      'Hardens to what you hit it with most. Break its shards to take the pieces back.',
-    ],
+    brief: ['It unmakes what you have made.', 'And it wears what it takes.'],
     stunMult: 4,
     curseEffect: 0.67,
   },
