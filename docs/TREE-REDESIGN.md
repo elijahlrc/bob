@@ -1,6 +1,6 @@
 # Bob — Passive tree redesign plan
 
-Status: **plan, 2026-10-11**. Nothing here is built. Milestones are **T0–T9** (section 9). This follows [TREE.md](TREE.md), which
+Status: **plan, 2026-10-11, with the user's answers of the same day folded in** (section 11). Nothing here is built. Milestones are **T0–T9** (section 9), with an audit by simulated players (T6.1) and a response to it (T6.2) between the layout and the balance pass. This follows [TREE.md](TREE.md), which
 made the tree big enough (1,727 nodes, 27 keystones, 376 notables) and gave it the right mix of kinds and the right
 connectivity _numbers_. This plan is about what those numbers hide: the tree is the right size and has no design.
 
@@ -35,8 +35,9 @@ to form a road, so the builder connects the clusters to each other.
 **districts** (a fire-and-ice district, a minion district…), each with a sub-theme per cluster group, a landmark notable and its
 own approach roads; lay districts out by hand-set position, size and template, not by slot arithmetic; make roads out of generic
 region-flavoured small nodes and hang every cluster off a road by one entrance; price every node in a single power table so
-notables always beat smalls and no notable is a small node with a longer name; and enforce all of it with tests that print
-the measurements.
+notables always beat smalls and no notable is a small node with a longer name. Whether the result is right is a matter of look
+and feel, so it is judged by looking: pictures at each milestone, a printed audit that is information and not a gate, and
+twelve simulated players who build with the tree and report where it frustrated them (T6.1).
 
 **What does not change.** The set of reference-derived notables and their names (357 generated clusters, 12 hand-made notables,
 the hub's notables), the keystones (27), the node count (1,600–1,850), the engine vocabulary, class starts and the bot's way
@@ -131,10 +132,10 @@ A **district** is 8–16 clusters, 45–70 nodes, one theme sentence, and:
 
 - a **core** (the first cluster you reach, always generic enough to be taken on the way: a mana cluster, a life cluster),
 - **two to four groups** of clusters, each of one family (a fire group, a cold group, a lightning group; a cast speed group),
-- a **nexus**: one notable placed between two groups that pays for having both (the example of fire and cold; section 4.4),
+- a **nexus**: an existing notable placed between two groups whose lines touch both (the example of fire and cold; section 4.4). If no existing notable fits, the district has none: no new nodes are written,
 - a **tip**: the far end, where the district's keystone or its strongest notable sits (a peninsula, section 5.3).
 
-Districts are the unit of design, of layout, of the review pictures and of the labels the player sees (T7).
+Districts are the unit of design, of layout and of the review pictures. The player still sees the six wedges and nothing new behind the nodes (D1).
 
 ### 3.4 The hub
 
@@ -159,14 +160,14 @@ New `src/data/tree/power.ts` (headless data, with a test):
 - A **flat generic** class (life, energy shield, armour, evasion, damage, attack and cast speed) has a **cap**, since three
   units of life is a lot more than three units of a niche stat: a notable of a flat generic stat alone cannot exceed 3 units.
 
-### 4.2 The rules (checked by tests, section 8)
+### 4.2 The rules (the small and notable rows are tested, section 8)
 
 | Kind      | Rule                                                                                                                                                                                                        |
 | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Small     | 0.8–1.2 units. Smalls of one stat have one value across the tree.                                                                                                                                           |
 | Road node | exactly 1 unit, generic.                                                                                                                                                                                    |
 | Notable   | **at least 2.5 units, and either two or more lines or one line of at least 3 units.** Median 4–5, none above 8 (the cap is ours; the present median is 5 with a tail to 20, and T2 reads the tail by hand). |
-| Nexus     | 5–8 units, two groups' worth (section 4.4).                                                                                                                                                                 |
+| Nexus     | An existing notable that touches two groups of its district; it follows the notable rule, no more (section 4.4).                                                                                            |
 | Keystone  | outside the table (they change how a build plays), but each keystone has a line in the plan saying which build wants it and which stat it costs.                                                            |
 
 ### 4.3 Repair order for a notable that fails
@@ -183,13 +184,14 @@ Small nodes are regenerated from the repaired notable: the small gives the notab
 cannot be done (a charge) the nearest relative. Target: **at least 95% of clusters share a stat family between small and
 notable** (the test counts the same thing for the tree as it is built, not the looser keyword test of the reference).
 
-### 4.4 Nexus notables and conjunctions
+### 4.4 Nexus slots
 
-A nexus is hand-written (about 12–18 in all, 2–4 per region) and pays for two or three groups of its district. Examples of the
-shape, not final text: a fire-and-cold conjunction that adds damage for each element the character has dealt in the last 4 s;
-a minion-and-curse nexus that applies the character's curses to a minion's targets. A nexus is only written if the engine
-already expresses it (the same rule as TREE.md: every stat must be read by the sheet or sim). Gaps are listed at the end of T6 and
-decided by the user, not built in this plan (section 10).
+**No new nodes are written in this plan (D5).** A district's nexus is a slot between two of its groups, filled by an existing
+notable whose lines touch both (a notable with a fire line and a cold line, or a minion line and a curse line). The generator
+has 357 to choose from and the T1 supply check lists, per district, which notables could fill the slot. A district with no
+fit has a plain junction there. The fire-and-ice "unique node" of the feedback is therefore a layout idea now (the notable that
+already pairs two elements sits where the two groups meet), and a hand-written conjunction is a later plan, together with the
+engine work it would need.
 
 ---
 
@@ -197,10 +199,11 @@ decided by the user, not built in this plan (section 10).
 
 ### 5.1 Region shapes
 
-The six regions keep their class, attributes, direction and neighbours (`REGIONS`), but lose their equal wedges.
+The six regions keep their class, attributes, direction and neighbours (`REGIONS`), but stop being copies of one another.
 
-- **Unequal sector widths**: width follows the number of districts (3–5). The regions are not a regular hexagon around the
-  hub. Class starts stay on the inner ring (`START_RADIUS` 800).
+- **The wedges stay (D1).** Six equal 60° wedges are still drawn behind the tree, and a district lives inside its region's wedge.
+  Unequal means the _contents_: the number of districts (3–5), how far each region reaches, how dense it is and what shape it
+  makes. Class starts stay on the inner ring (`START_RADIUS` 800).
 - **Unequal reach**: each region's outermost tip sits at its own radius; two of six regions have a long arm (a peninsula
   of 6–10 nodes of generic road to a far district), two are compact and deep, two are broad and shallow. Which is decided in T1
   from the districts, by hand.
@@ -222,7 +225,7 @@ Each district uses one of five internal layouts, drawn by the builder from the s
 | **Ladder** | two parallel roads with rungs; sparse; two gates                                                   | a corridor between regions         |
 
 Density is stated: a Knot has a loop per three clusters, an Avenue one per six, a Ladder only the rungs; the mean degree of a
-district is part of its spec and is checked.
+district is part of its spec and is printed by the audit.
 
 ### 5.3 Landmarks and keystone peninsulas
 
@@ -235,7 +238,7 @@ district is part of its spec and is checked.
   an evasion district, say), each a Ladder whose junction carries a notable of its own. The boundary links every third ring
   (end of `spec.ts`) go.
 - **Distance as design**: a class start reaches its own first district's core in at most four steps; its second district in
-  eight to twelve; a neighbouring region's near district in 14–20; a far region's, 28 or more. The test pins these. Today the
+  eight to twelve; a neighbouring region's near district in 14–20; a far region's, 28 or more. These are targets the audit reports, not tests. Today the
   first notable is three steps from every start, and the keystones are 5–29 steps away at random.
 
 ### 5.4 Sizing against 123 points
@@ -248,9 +251,11 @@ the bot's end builds against this and adjusts the district sizes (the knobs are 
 
 ## 6. Locality (answers 5)
 
-The rule: **each archetype family has one or two home regions and appears nowhere else, except that each of its neighbours may
-hold one cluster of it** (the reference does the same, with its minions: 56% in one sector and the next); **generic families have
-no rule**. The classes' own weapons fix the weapon homes.
+The rule is a tendency, not a quota (D2): **an archetype family has one or two home regions and most of its clusters are there;
+the more broadly useful the archetype, the further it spreads** (a mana or critical strike cluster anywhere; a wand cluster
+nowhere but home). The reference does the same, with its minions at 56% in one sector and most of the rest in the next.
+**Generic families have no rule.** The classes' own weapons fix the weapon homes. No count is tested; the audit prints each
+family's spread and the simulated players say whether it felt right.
 
 | Family                                  | Home (district it lives in)                                                       | Currently                                                                   |
 | --------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
@@ -263,8 +268,8 @@ no rule**. The classes' own weapons fix the weapon homes.
 | Totem, brand, warcry, channelling       | one district each: totem strdex, brand int–dexint border, warcry str, channel int | totem 43% top region                                                        |
 | Life, mana, crit, block, speed, charges | everywhere                                                                        | unchanged; the reference spreads them too (22–29% top sector)               |
 
-The home column is a draft for the user to veto in T1 (D2). Weapon-specific smalls are capped at **15% of all smalls** (28% today)
-and never sit on roads.
+The home column is a draft, judged by eye. The one firm rule: a weapon-specific small node never sits on a road (section 3.1), and
+the audit watches their share of all small nodes (28% today).
 
 A build is never forced into a home region's weapon: a Strider can take a sword district, and the cost is the walk (section 5.3),
 which is the point of locality.
@@ -291,28 +296,33 @@ arithmetic of section 5.4 works).
 
 ---
 
-## 8. Tests and measures
+## 8. Checking the design
 
-**`npm run tree:audit`** (T0; replaces `tree:mix` and absorbs `tree:refmix`) prints every number in this plan so a milestone can
-be checked by diffing it: family by region, locality (top-region share per family), notable power in units, coherence,
-share of route nodes by kind and by genericness, road-only groups, district purity, steps from each start to each district
-and keystone.
+Whether a tree is well designed is a matter of taste, and no band of numbers says it is. So the checks are, in order of weight:
 
-New or changed tests in `src/data/tree/tree.test.ts` (each with its reference number; none is loosened, they are replaced by
-a measurement of the new design):
+1. **Looking.** From T3 on, every milestone ends with pictures of the tree from `tree:svg` at three zooms
+   (`docs/screenshots/tree/`), and the user looks.
+2. **Simulated players** (T6.1): twelve agents build with the tree and report friction; I triage the reports (T6.2).
+3. **`npm run tree:audit`** (T0; replaces `tree:mix` and absorbs `tree:refmix`) prints the measurements of this plan for
+   information: family by region and each family's spread, notable power in units, how well a cluster's small nodes agree with
+   its notable, the share of route nodes by kind and by genericness, road-only nodes, steps from each start to each district
+   and keystone, density by region. Nothing is pass or fail; a milestone's report is read as a diff against the one before.
+4. **Tests**, only for what is a fact and not a taste:
 
-| Test                                                                                                                                    | Reference or reason                                                                                                                                                                                                                                                                            |
-| --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| every small is 0.8–1.2 units; every notable ≥ 2.5                                                                                       | section 4.2                                                                                                                                                                                                                                                                                    |
-| ≥ 95% of clusters share a stat family                                                                                                   | reference 93% on the looser test                                                                                                                                                                                                                                                               |
-| road-only nodes ≥ 18% of non-keystone nodes                                                                                             | reference: 350 of 1,625 nodes (22%) are in road-only groups; Bob's attribute dots alone are 14%. Counted as `kind: .small.` nodes with no `cluster` plus junctions                                                                                                                             |
-| no weapon-specific small on a road; ≤ 15% overall                                                                                       | measured 28% now                                                                                                                                                                                                                                                                               |
-| no cluster node on the only route between places                                                                                        | except the spec's declared shortcuts                                                                                                                                                                                                                                                           |
-| steps from each start (section 5.3)                                                                                                     | the numbers of 5.3                                                                                                                                                                                                                                                                             |
-| locality per family (section 6)                                                                                                         | the reference's 56–100% for archetypes                                                                                                                                                                                                                                                         |
-| the share of travel (attribute) nodes 8–16%                                                                                             | stays: about half of road nodes are still attribute dots (section 3.1), so the share holds; the _road_ share is the new test above                                                                                                                                                             |
-| mean degree 2.1–2.45, loops 150–320, dead ends 8–16%                                                                                    | mean degree and loops stay (reference). Dead ends are the band most likely to move: a stalk with one entrance has dead ends where today's loops have none, so measure it on the new design and re-derive the band from the design, never loosen it. The new tests add the per-district density |
-| reach test (4 keystones in 40 steps, 15 notables in 30), connectivity, no overlap, symmetric links, IP name check, determinism snapshot | stay, snapshot re-recorded                                                                                                                                                                                                                                                                     |
+| Test                                                                                                | Why                                                                     |
+| --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| connected from every class start; links symmetric; no overlap; no edge through a node               | the tree has to work (kept)                                             |
+| every keystone has one link; 27 keystones; notable names unique; at most 4 notables share a mod set | content invariants (kept)                                               |
+| the reach test: each start reaches 4 keystones within 40 steps and 15 notables within 30            | a build must have somewhere to go (kept)                                |
+| no node named like one of the reference tree's notables or keystones                                | the IP rule (kept)                                                      |
+| determinism snapshot                                                                                | re-recorded when the layout lands                                       |
+| every small node 0.8–1.2 units and every notable at least 2.5 (section 4.2)                         | point 2 is a balance bug, not a taste: a notable must beat a small node |
+| no weapon-specific small node on a road                                                             | point 4, written as a rule because a road is a promise (section 2)      |
+
+**Tests retired.** The band tests in `tree.test.ts` that pin the _old_ design go when the layout that replaces it lands (T4): the
+node-count and notable-count bands, the mix of kinds, mean degree, loops, dead ends, junction share and the share of notables
+on a road. They measured the reference's connectivity and made the flower; the audit prints the same numbers for the new tree.
+This is a change of design at the user's direction, recorded in DESIGN.md Appendix A, not a test loosened to pass.
 
 Also kept: the bot must be able to allocate the new nodes (every stat the tree grants is read by the sheet or the sim, per
 TREE.md), and `npm run check` and `npm run build` are green before each commit.
@@ -324,66 +334,102 @@ TREE.md), and `npm run check` and `npm run build` are green before each commit.
 Each milestone ends green (`npm run check`, `npm run build`), with a commit, and from T3 on with a picture of the tree from
 `tree:svg` at three zooms in `docs/screenshots/tree/`. T2 can ship on its own.
 
-| #      | Name                           | Scope                                                                                                                                                                                                                                                                                                                  | Done when                                                                                                                                                   |
-| ------ | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **T0** | Audit and review tools         | `scripts/tree/audit.ts` (the measures of section 8; the scratch scripts of this plan promoted), `scripts/tree/svg.ts` (a static SVG of the tree, coloured by district and family, with district names), baseline numbers pasted into this file, CLAUDE.md pointer.                                                     | `npm run tree:audit` reproduces the table of section 1; `tree:svg` draws the present tree.                                                                  |
-| **T1** | Charter                        | `docs/tree/charter.json`: districts (region, theme, template, families, nexus idea, tip), the locality homes, road pools, per-region reach; a supply check (every district has enough analogs, with sector as a hint only); the player-visible district names. The user reads section 7 and 6 and marks changes.       | The supply check passes; every one of the 357 clusters has a district; the user has seen the table (D1, D2).                                                |
-| **T2** | Power and coherence            | `src/data/tree/power.ts`, `tree:power` report, repair rules in `emit.ts` plus `docs/tree/overrides.json`, regenerated `clustersGen.ts`, generic hub themes (3.4). **No layout change; node ids unchanged.**                                                                                                            | Section 4.2 holds for every node; coherence ≥ 95%; `bot` sim run (T8-style, small) shows no class collapsing. A save from before still loads.               |
-| **T3** | Skeleton and roads             | The district spec types (`DistrictSpec`, `Road`, `Template`) and the road builder: junction and road nodes from pools, one-entrance attach, no hash links (`RING_LINKED`, `SPOKE_CHANCE`, the odd-ring boundary links removed). One region (int) first, the others on the old layout, so the pictures can be compared. | The int region has no cluster node on any route between two places; its road nodes are generic; `tree.test.ts` passes for it.                               |
-| **T4** | Districts and templates        | Templates (Avenue, Ring, Fork, Knot, Ladder), cluster shapes (row, twin, great wheel), the placement function, the five other regions, unequal sectors and reach; `SAVE_VERSION` bumped and `migrate` hands passives back as before.                                                                                   | All six regions on the new layout; section 5.3's step counts hold; the picture shows six different silhouettes.                                             |
-| **T5** | Peninsulas, bridges, landmarks | Keystone approaches, the three bridges, the great wheels, nexus placement (nodes still carry placeholder text from the generator).                                                                                                                                                                                     | Each keystone is a dead end 4–8 nodes long at a distinct tip; bridges exist and are named; every district has a nexus slot.                                 |
-| **T6** | Nexus notables and locality    | The 12–18 hand-written nexus nodes (4.4); locality enforced by the emitter (section 6); the list of engine gaps (a conjunction the sheet cannot express).                                                                                                                                                              | The locality test passes; weapon-specific smalls ≤ 15% and none on roads; the gap list is written for D5.                                                   |
-| **T7** | The tree screen                | `TreeView.tsx`: district backdrops replace the wedges, district names at far zoom, nexus and great wheels labelled, a search or highlight of a stat family (cheap now that families exist), the cyan route preview unchanged; `treeStyle.ts` colours by district accent; phone check at 375×812.                       | At 1280×720 and 375×812 the districts can be read and named from the whole-tree view; no change to taps or the pinch zoom.                                  |
-| **T8** | Balance and the bot            | `scripts/simpar.sh` on all classes (12 a class, two seeds) before and after; the bot's tree choices (does it take the nexus, does it cross a bridge); the 123-point sizing of 5.4; adjust unit and cap values. Findings go in `docs/PROGRESS.md`; **no tuning of anything but the power table and district sizes.**    | Median map reached per class is not lower than before by more than the noise of two seeds, or the cause is written down; no class never reaches a district. |
-| **T9** | Wrap-up                        | DESIGN.md §9 and Appendix A (the decisions of section 11), TREE.md status line, PROGRESS entry, patch notes (the tree has changed; refund of passives), CLAUDE.md line, dead code removed (`RING_START`, `RING_STEP`, `FAMILY_ORDER` ring sorting, wedge drawing), real-device pass noted for MOBILE.md §9.            | The documents agree with the code; `grep` finds no use of the removed constants.                                                                            |
+| #        | Name                           | Scope                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Done when                                                                                                                                                   |
+| -------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **T0**   | Audit and review tools         | `scripts/tree/audit.ts` (the measures of section 8, as information; the scratch scripts of this plan promoted), `scripts/tree/svg.ts` (a static SVG/PNG of the tree, coloured by district and family, region by region), `scripts/tree/explore.ts` (the text interface the T6.1 players use: show a node, nodes near it, the path and cost between two, allocate, deallocate, search by stat, summary of the build), baseline numbers pasted into this file, CLAUDE.md pointer. | `npm run tree:audit` reproduces the table of section 1; `tree:svg` draws the present tree; a build of 100 points can be made and summarised with `explore`. |
+| **T1**   | Charter                        | `docs/tree/charter.json`: districts (region, theme, template, families, nexus slot, tip), the locality homes, road pools, per-region reach; a supply check (every district has enough analogs, with sector as a hint only; which existing notables could fill each nexus slot); the player-visible district names. **The user reads sections 6 and 7 before T3 starts.**                                                                                                        | The supply check passes; every one of the 357 clusters has a district; the user has seen the table.                                                         |
+| **T2**   | Power and coherence            | `src/data/tree/power.ts`, `tree:power` report, repair rules in `emit.ts` plus `docs/tree/overrides.json`, regenerated `clustersGen.ts`, generic hub themes (3.4). **No layout change; node ids unchanged.**                                                                                                                                                                                                                                                                     | Section 4.2 holds for every node; coherence ≥ 95%; `bot` sim run (T8-style, small) shows no class collapsing. A save from before still loads.               |
+| **T3**   | Skeleton and roads             | The district spec types (`DistrictSpec`, `Road`, `Template`) and the road builder: junction and road nodes from pools, one-entrance attach, no hash links (`RING_LINKED`, `SPOKE_CHANCE`, the odd-ring boundary links removed). One region (int) first, the others on the old layout, so the pictures can be compared.                                                                                                                                                          | The int region has no cluster node on any route between two places; its road nodes are generic; `tree.test.ts` passes for it.                               |
+| **T4**   | Districts and templates        | Templates (Avenue, Ring, Fork, Knot, Ladder), cluster shapes (row, twin, great wheel), the placement function, the five other regions, unequal sectors and reach; `SAVE_VERSION` bumped and `migrate` hands passives back as before.                                                                                                                                                                                                                                            | All six regions on the new layout; section 5.3's step counts hold; the picture shows six different silhouettes.                                             |
+| **T5**   | Peninsulas, bridges, landmarks | Keystone approaches, the three bridges, the great wheels, nexus slots filled with existing notables (4.4).                                                                                                                                                                                                                                                                                                                                                                      | Each keystone is a dead end 4–8 nodes long at a distinct tip; bridges exist and are named; a nexus slot holds a notable or a plain junction.                |
+| **T6**   | Locality                       | Locality applied by the emitter (section 6): clusters of an archetype family move to a district at home, spread by how broadly the archetype is used; weapon-specific smalls leave the roads. **No new nodes and no engine work.**                                                                                                                                                                                                                                              | The audit shows archetypes mostly at home; no weapon-specific small on a road.                                                                              |
+| **T6.1** | Audit by simulated players     | Twelve agents, each given a short brief of a build to make (section 9.1) and `explore` plus the region pictures; each allocates about 100 points and keeps a log. Raw reports go to `docs/tree/playtest/`.                                                                                                                                                                                                                                                                      | Twelve reports exist, in the format of 9.1; nothing in the tree has changed yet.                                                                            |
+| **T6.2** | Response to the audit          | I triage every complaint (confirmed, plausible or artifact; 9.1), check the confirmed and plausible ones against the tree data, and make small changes within the spec only (9.2). The triage table, with what was done and what was declined and why, goes in `docs/tree/playtest/triage.md`.                                                                                                                                                                                  | Every complaint has a verdict; every change is small and listed; pictures before and after; anything larger is on a "later" list, not done.                 |
+| **T7**   | Tree screen                    | Only what the audit shows is missing, if anything: the wedges, colours and camera stay as they are (D1). Likely at most the wedge fitting the new layout. Phone check at 375×812.                                                                                                                                                                                                                                                                                               | The tree screen still reads at 1280×720 and 375×812; no change to taps or the pinch zoom.                                                                   |
+| **T8**   | Balance and the bot            | `scripts/simpar.sh` on all classes (12 a class, two seeds) before and after; the bot's tree choices (does it take the nexus, does it cross a bridge); the 123-point sizing of 5.4; adjust unit and cap values. Findings go in `docs/PROGRESS.md`; **no tuning of anything but the power table and district sizes.**                                                                                                                                                             | Median map reached per class is not lower than before by more than the noise of two seeds, or the cause is written down; no class never reaches a district. |
+| **T9**   | Wrap-up                        | DESIGN.md §9 and Appendix A (the decisions of section 11), TREE.md status line, PROGRESS entry, patch notes (the tree has changed; refund of passives), CLAUDE.md line, dead code removed (`RING_START`, `RING_STEP`, `FAMILY_ORDER` ring sorting), real-device pass noted for MOBILE.md §9.                                                                                                                                                                                    | The documents agree with the code; `grep` finds no use of the removed constants.                                                                            |
 
 **Order.** T0 → T1 first (T1 needs the user's eyes). T2 is independent of the layout and ships alone: it fixes points 2 and the
 hub half of 4 at once. T3 → T4 → T5 are the layout, in order, one region first so that a mistake is cheap. T6 needs T5's
-slots. T7 can start after T4 (it needs district data, not final layout). T8 needs everything.
+slots. T6.1 needs a finished layout and locality, and comes before the bot pass so that T8 balances the tree the players saw after
+T6.2. T7 only if the audit asks for it. T8 needs everything.
+
+### 9.1 T6.1: the simulated players
+
+Twelve agents (the Agent tool, run in parallel), two per class start, each a player who knows action RPGs and has never seen
+the plan. Each gets one brief and the tools: the `explore` interface, the pictures of the region they start in and the
+neighbouring ones, and the one-line rule "you have about 100 passive points; build the character the brief describes; do not
+simulate the game". Nobody is told what the designers intended. The briefs mix home and off-class builds, so that the cost of
+crossing the tree is also tried: for example a Vanguard two-hand slammer, a Vanguard who wants minions, a Strider bow and
+a Strider who wants traps, a Mystic caster of fire and cold, a Mystic who wants armour, a Reaver sword and bleed, a Reaver
+totem build, a Zealot aura and curse build, a Zealot who wants a bow, a Shade trapper, a Shade poison dagger, and a Shade
+who wants a life-based melee build.
+
+Each agent writes, in this order: (1) a first impression from the picture, before using the tool (what they expect, where they
+would go); (2) a log of the allocation, with the decision points; (3) a table of **frictions**, each with node ids, a kind
+(_lost_: could not tell where to go; _wasted_: points spent on nodes they did not want; _missing_: an option they expected;
+_dead_: a region or cluster that looked pointless; _confusing_: a node or road that did not read; _weak_: a node not worth its
+point; _good_: something that worked), a severity from 1 to 3 and what they would change; (4) the build they ended with and how
+far it matches the brief.
+
+**Simulated players are not always right.** They get tool interfaces wrong, misread a stat, ask for what the game lacks, and
+complain about a cost that is intended (a long walk to an off-class archetype). The triage of T6.2 does not count votes. A
+complaint is **confirmed** if two or more agents independently report it or it can be shown in the tree data; **plausible** if
+one agent reports it and it fits the principles of section 2; **artifact** if it comes from the interface, a misreading, a request
+out of scope (a node type that does not exist) or the intended cost of crossing. Only the first two are acted on, and each is
+checked against the data first.
+
+### 9.2 T6.2: what counts as a small change
+
+Allowed: moving a cluster to another slot or district, adding or removing a link, lengthening or shortening a spur, changing
+a road pool's weights, a value in the power table, regrouping a cluster's families, swapping which existing notable fills a nexus
+slot. Not allowed: a new template, new nodes, a new stat, anything in the engine, a change of the wedges. A fix that needs more
+goes on a "later" list in the triage file, with the complaint that asked for it.
 
 ---
 
 ## 10. Not in this plan
 
 - **New keystone mechanics.** The 27 stay; only their placement and approach change.
-- **Engine work for nexus nodes the engine cannot express**: listed at the end of T6 for the user to choose (D5).
+- **New nodes of any kind**, including hand-written conjunction nodes for a nexus, and the engine work they would need (D5).
 - **Masteries, jewels, ascendancies, a bigger point budget**, and any respec or refund rule beyond the one the save migration
   already has.
-- **Node art**: the 18 emblems and the colour language stay (TREE.md); T7 only adds district accents.
+- **Node art**: the 18 emblems and the colour language stay (TREE.md); nothing in this plan changes them.
 - **A different tree screen** (a grid, a list, a three-tree layout): the camera, pinch zoom and taps stay as MOBILE.md built them.
 
 ---
 
-## 11. Decisions for the user
+## 11. Decisions
 
-Each has a default; say "agreed" and they stand. I will not pause for an answer: T0 and T2 do not depend on any of them.
+The answers of 2026-10-11. Appendix A of DESIGN.md records them in T9.
 
-| #      | Question                                                                                                                                                                  | Default                                                                                     |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| **D1** | Are the districts of section 7 the right ones? (Strike, rename or add; a region may have three or five.)                                                                  | **As drafted**, adjusted by the supply check in T1.                                         |
-| **D2** | Locality: archetypes at home with one cluster allowed in each neighbour, or strict (home only)?                                                                           | **One cluster in each neighbour.** Strict makes off-class builds feel punished.             |
-| **D3** | Regions unequal on purpose (some larger, some with a long arm), or equal in size but different in shape?                                                                  | **Unequal.** Equal sizes are part of why the tree reads as a flower.                        |
-| **D4** | Notables get stronger relative to smalls (a median of 4–5 units against the present 5 with many at 1–2): accept a build-power change, to be re-balanced by the bot in T8? | **Yes.** The power table is the only knob.                                                  |
-| **D5** | Nexus notables the engine cannot express: build the engine support, write a weaker version, or leave the slot as a plain notable?                                         | **Weaker version where it is close, plain notable otherwise.** No engine work in this plan. |
-| **D6** | Save compatibility: bump the version in T4 and hand all passives back (as TREE.md did), once.                                                                             | **Yes, once, in T4.** T2 changes values but not ids.                                        |
+| #      | Question                                                      | Answer                                                                                                                                                     |
+| ------ | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **D1** | New backgrounds for districts?                                | **No.** The wedges are fine as they are. Districts live inside the wedges and are not drawn. (The charter in section 7 still needs the user's eyes at T1.) |
+| **D2** | Locality: home with one cluster in each neighbour, or strict? | **Neither as a rule.** It is subjective and depends on how broadly used the archetype is; mostly they spread a bit. Section 6 is a tendency, not a quota.  |
+| **D3** | Regions unequal on purpose?                                   | **Yes.** Unequal contents (districts, reach, density, shape); the wedges stay equal (D1).                                                                  |
+| **D4** | Notables stronger relative to smalls, re-balanced by the bot? | **Yes.** The power table is the knob.                                                                                                                      |
+| **D5** | Nexus notables the engine cannot express?                     | **No new nodes for now.** A nexus is a slot filled by an existing notable, or nothing. No engine work.                                                     |
+| **D6** | Save compatibility: bump once and refund passives?            | **Yes,** once, in T4. T2 changes values but not ids.                                                                                                       |
 
-Decisions to record in DESIGN.md Appendix A when made: the road/cluster separation (3.1), the power table and its caps (4), the
-district as the unit of design (3.3), locality rule and homes (6), distances from a start (5.3), and the removal of hash-chosen
-links.
+Decisions to record in DESIGN.md Appendix A: the road/cluster separation (3.1), the power table and its caps (4), the district as
+the unit of design (3.3), locality as a tendency (6), distances from a start (5.3), the removal of hash-chosen links, and the
+retirement of the old band tests (section 8).
 
 ---
 
 ## 12. Risks
 
-| Risk                                                                                                                 | Mitigation                                                                                                                                                                 |
-| -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Hand layout is more work than slot arithmetic, and a template that collides with another breaks the no-overlap test. | One region first (T3); the existing clearance tests run on every change; `tree:svg` makes a bad layout visible in seconds.                                                 |
-| Buffing notables makes builds stronger and breaks the difficulty tuning.                                             | D4: one table, and T8 measures before and after on the same seeds. The cap on flat generic stats limits the worst case.                                                    |
-| A power table can be gamed by the stats it cannot price (charges, conditionals).                                     | The first table is a seed; T2 lists everything it could not price, and those notables get a hand-set unit value with a comment.                                            |
-| Districts built on the reference's sectors inherit its imbalances (a sector with five analogs of one family).        | The supply check in T1 counts per district; where supply is short the translator makes a new analog (it has the machinery), never a copy.                                  |
-| The bot's `tree` scoring ignores the nexus or avoids bridges, so the sim says the new tree is worse.                 | T8 reads what it takes; the bot chooses by build score, so a better node is taken; any engine stat unread by the sheet is found by the existing "every stat is read" test. |
-| Players lose their allocated passives on the save bump.                                                              | Same migration as TREE.md's: points handed back as unspent, once (D6), noted in the patch notes.                                                                           |
-| Other agents change `build.ts`, `spec.ts` or `TreeView.tsx` at the same time.                                        | T3 starts by announcing the files; new code goes in new files (`districts.ts`, `roads.ts`, `power.ts`), and the old layout code is removed only in T9.                     |
+| Risk                                                                                                                                      | Mitigation                                                                                                                                                                 |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hand layout is more work than slot arithmetic, and a template that collides with another breaks the no-overlap test.                      | One region first (T3); the existing clearance tests run on every change; `tree:svg` makes a bad layout visible in seconds.                                                 |
+| Buffing notables makes builds stronger and breaks the difficulty tuning.                                                                  | D4: one table, and T8 measures before and after on the same seeds. The cap on flat generic stats limits the worst case.                                                    |
+| A power table can be gamed by the stats it cannot price (charges, conditionals).                                                          | The first table is a seed; T2 lists everything it could not price, and those notables get a hand-set unit value with a comment.                                            |
+| Districts built on the reference's sectors inherit its imbalances (a sector with five analogs of one family).                             | The supply check in T1 counts per district; where supply is short the translator makes a new analog (it has the machinery), never a copy.                                  |
+| The bot's `tree` scoring ignores the nexus or avoids bridges, so the sim says the new tree is worse.                                      | T8 reads what it takes; the bot chooses by build score, so a better node is taken; any engine stat unread by the sheet is found by the existing "every stat is read" test. |
+| The simulated players mislead (they complain about intended costs, misuse the tool, or agree with each other because they share a model). | The triage rule of 9.1: no vote counting, confirm against the tree data, prefer data to opinion; the user looks at the pictures too.                                       |
+| Players lose their allocated passives on the save bump.                                                                                   | Same migration as TREE.md's: points handed back as unspent, once (D6), noted in the patch notes.                                                                           |
+| Other agents change `build.ts`, `spec.ts` or `TreeView.tsx` at the same time.                                                             | T3 starts by announcing the files; new code goes in new files (`districts.ts`, `roads.ts`, `power.ts`), and the old layout code is removed only in T9.                     |
 
 ---
 
