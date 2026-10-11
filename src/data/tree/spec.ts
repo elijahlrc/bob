@@ -91,7 +91,7 @@ export const REGIONS: RegionDef[] = [
 ];
 
 export const HUB = {
-  themes: ['allAttr', 'hubLife', 'hubDamage', 'ailmentEffect', 'hubFlask', 'hubCast', 'hubMana'],
+  themes: ['allAttr', 'hubLife', 'hubDamage', 'hubRes', 'hubMana', 'hubEs', 'hubDefence'],
   notables: [
     'Crossroads Bones',
     "Pilgrim's Rest",

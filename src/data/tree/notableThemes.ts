@@ -417,44 +417,43 @@ export const THEMES: Record<string, Theme> = {
     small: [mod('allAttr', 'base', 4)],
     notable: (s) => [mod('allAttr', 'base', r(12 * s)), mod('life', 'inc', r(3 * s))],
   },
+  // The hub's themes are generic on purpose (docs/TREE-REDESIGN.md 3.4): the middle of the tree is everyone's road, so its small nodes
+  // give what any build wants, and none of them belongs to one attribute. Values are the units of src/data/tree/power.ts.
   hubLife: {
     id: 'hubLife',
     smallName: 'Life',
-    small: [mod('life', 'inc', 3)],
-    notable: (s) => [mod('life', 'inc', r(8 * s)), mod('mana', 'inc', r(6 * s))],
+    small: [mod('life', 'inc', 5)],
+    notable: (s) => [mod('life', 'inc', r(10 * s)), mod('mana', 'inc', r(8 * s))],
   },
   hubDamage: {
     id: 'hubDamage',
     smallName: 'Damage',
-    small: [mod('damage', 'inc', 5)],
-    notable: (s) => [mod('damage', 'inc', r(14 * s)), mod('attackSpeed', 'inc', r(3 * s))],
-  },
-  ailmentEffect: {
-    id: 'ailmentEffect',
-    smallName: 'Ailment Effect',
-    small: [mod('ailmentEffect', 'inc', 4)],
-    notable: (s) => [
-      mod('ailmentEffect', 'inc', r(12 * s)),
-      mod('damage', 'inc', r(10 * s), { tags: ['dot'] }),
-    ],
-  },
-  hubFlask: {
-    id: 'hubFlask',
-    smallName: 'Flask Charges',
-    small: [mod('flaskCharges', 'inc', 4)],
-    notable: (s) => [mod('flaskCharges', 'inc', r(15 * s)), mod('flaskEffect', 'inc', r(6 * s))],
-  },
-  hubCast: {
-    id: 'hubCast',
-    smallName: 'Cast and Attack Speed',
-    small: [mod('castSpeed', 'inc', 2), mod('attackSpeed', 'inc', 2)],
-    notable: (s) => [mod('castSpeed', 'inc', r(5 * s)), mod('attackSpeed', 'inc', r(5 * s))],
+    small: [mod('damage', 'inc', 7)],
+    notable: (s) => [mod('damage', 'inc', r(16 * s)), mod('attackSpeed', 'inc', r(4 * s))],
   },
   hubMana: {
     id: 'hubMana',
     smallName: 'Mana Regeneration',
-    small: [mod('manaRegen', 'inc', 6)],
+    small: [mod('manaRegen', 'inc', 10)],
     notable: (s) => [mod('manaRegen', 'inc', r(20 * s)), mod('lifeRegenPct', 'base', r1(0.4 * s))],
+  },
+  hubEs: {
+    id: 'hubEs',
+    smallName: 'Maximum Energy Shield',
+    small: [mod('es', 'inc', 5)],
+    notable: (s) => [mod('es', 'inc', r(12 * s)), mod('life', 'inc', r(4 * s))],
+  },
+  hubRes: {
+    id: 'hubRes',
+    smallName: 'Elemental Resistances',
+    small: [mod('resist.allEle', 'base', 4)],
+    notable: (s) => [mod('resist.allEle', 'base', r(8 * s)), mod('life', 'inc', r(5 * s))],
+  },
+  hubDefence: {
+    id: 'hubDefence',
+    smallName: 'Armour and Evasion',
+    small: [mod('armour', 'inc', 6), mod('evasion', 'inc', 6)],
+    notable: (s) => [mod('armour', 'inc', r(20 * s)), mod('evasion', 'inc', r(20 * s))],
   },
 };
 
@@ -535,7 +534,7 @@ Object.assign(THEMES, {
   vsHexed: {
     id: 'vsHexed',
     smallName: 'Damage',
-    small: [mod('damage', 'inc', 4)],
+    small: [mod('damage', 'inc', 7)],
     notable: (s) => [
       mod('damage', 'more', r(10 * s), { condition: { id: 'targetCursed' } }),
       mod('damage', 'inc', r(6 * s)),
@@ -544,7 +543,7 @@ Object.assign(THEMES, {
   whileLeeching: {
     id: 'whileLeeching',
     smallName: 'Damage',
-    small: [mod('damage', 'inc', 4)],
+    small: [mod('damage', 'inc', 7)],
     notable: (s) => [
       mod('damage', 'more', r(10 * s), { condition: { id: 'leeching' } }),
       mod('leech.life', 'base', r1(0.3 * s), { tags: ['attack'] }),
@@ -553,7 +552,7 @@ Object.assign(THEMES, {
   beenHit: {
     id: 'beenHit',
     smallName: 'Armour',
-    small: [mod('armour', 'inc', 8)],
+    small: [mod('armour', 'inc', 12)],
     notable: (s) => [
       mod('damage', 'more', r(10 * s), { condition: { id: 'beenHitRecently' } }),
       mod('armour', 'inc', r(12 * s)),

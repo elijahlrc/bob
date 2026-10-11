@@ -3,6 +3,23 @@
 Player-facing notes, newest first. Add an entry for every change a player would notice. The design reasons and numbers are in
 the docs each entry links to.
 
+## 2026-10-11
+
+### Passive tree: notables are worth taking, and the middle is for everyone
+
+First part of a redesign of the passive tree (docs/TREE-REDESIGN.md). Nothing moves yet, so saves are untouched.
+
+- **Notables beat small nodes.** About thirty notables were worth one or two small nodes (a "5% maximum life" notable beside
+  4–5% small nodes). Every notable is now worth at least three small nodes, or two and a half if it has several lines: the weak ones
+  now give, for example, 15% maximum life, 25% maximum mana, 60% critical strike chance.
+- **One value per stat.** Small nodes of one stat used to come in several sizes (maximum life was 1.7%, 3%, 4% or 5%); each stat
+  now has one. Most small life nodes are now 5%.
+- **Clusters make sense.** About sixty clusters had small nodes that had nothing to do with their notable (a damage notable with
+  leech nodes); their small nodes now give what the notable gives.
+- **The middle of the tree is generic.** The hub next to each class start used to give Cast and Attack Speed, Flask Charges or
+  Ailment Effect, so a Vanguard's first nodes were cast speed. It now gives life, damage, mana regeneration, energy shield,
+  resistances, or armour and evasion.
+
 ## 2026-10-10
 
 ### Save slots

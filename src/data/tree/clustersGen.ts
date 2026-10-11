@@ -15,7 +15,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     smallCount: 3,
     notable: {
       name: 'Twinhawk Gaze',
-      mods: [m('accuracy', 'inc', 12, { condition: { id: 'dualWielding' } })],
+      mods: [m('accuracy', 'inc', 18, { condition: { id: 'dualWielding' } })],
     },
     small: {
       name: 'Accuracy Rating while Dual Wielding',
@@ -73,8 +73,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'accuracy',
     depth: 0.529,
     smallCount: 3,
-    notable: { name: 'Windline Sight', mods: [m('accuracy', 'inc', 15)] },
-    small: { name: 'Accuracy Rating', mods: [m('accuracy', 'inc', 5)] },
+    notable: { name: 'Windline Sight', mods: [m('accuracy', 'inc', 30)] },
+    small: { name: 'Accuracy Rating', mods: [m('accuracy', 'inc', 10)] },
   },
   {
     id: 'g4',
@@ -120,7 +120,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'misc',
     depth: 0.112,
     smallCount: 2,
-    notable: { name: 'Slow Vigil', mods: [m('skillDuration', 'inc', 25)] },
+    notable: { name: 'Slow Vigil', mods: [m('skillDuration', 'inc', 30)] },
     small: { name: 'Skill Effect Duration', mods: [m('skillDuration', 'inc', 10)] },
   },
   {
@@ -169,7 +169,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Damage Leeched as Life with Attacks',
-      mods: [m('leech.life', 'base', 0.4, { tags: ['attack'] }), m('leechRate', 'inc', 10)],
+      mods: [m('leech.life', 'base', 0.4, { tags: ['attack'] }), m('leechRate', 'inc', 20)],
     },
   },
   {
@@ -244,7 +244,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Accuracy Rating',
-      mods: [m('accuracy', 'inc', 10), m('critChance', 'inc', 15)],
+      mods: [m('accuracy', 'inc', 10), m('critChance', 'inc', 20)],
     },
   },
   {
@@ -263,7 +263,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Lesser fire Damage',
-      mods: [m('damage', 'inc', 8, { damageTypes: ['fire'] }), m('lifeRegenPct', 'base', 0.4)],
+      mods: [m('damage', 'inc', 10, { damageTypes: ['fire'] }), m('lifeRegenPct', 'base', 0.4)],
     },
   },
   {
@@ -276,7 +276,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Gale-Footed Stalk',
       mods: [m('attackSpeed', 'inc', 6), m('moveSpeed', 'inc', 4)],
     },
-    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 8)] },
+    small: { name: 'Lesser attack Speed', mods: [m('attackSpeed', 'inc', 3)] },
   },
   {
     id: 'g14',
@@ -286,7 +286,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     smallCount: 3,
     notable: {
       name: 'Unbroken Drawstring',
-      mods: [m('attackSpeed', 'inc', 10, { tags: ['channelling'] })],
+      mods: [m('attackSpeed', 'inc', 12, { tags: ['channelling'] })],
     },
     small: {
       name: 'Attack Speed with Channelling Skills',
@@ -303,7 +303,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Thistledown Step',
       mods: [m('evasion', 'inc', 20), m('moveSpeed', 'inc', 5)],
     },
-    small: { name: 'Evasion Rating', mods: [m('evasion', 'inc', 14)] },
+    small: { name: 'Evasion Rating', mods: [m('evasion', 'inc', 12)] },
   },
   {
     id: 'g16',
@@ -315,7 +315,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Vellum Ward',
       mods: [m('es', 'base', 9), m('es', 'inc', 14), m('esRechargeRate', 'inc', 10)],
     },
-    small: { name: 'Maximum Energy Shield', mods: [m('es', 'inc', 6)] },
+    small: { name: 'Maximum Energy Shield', mods: [m('es', 'inc', 5)] },
   },
   {
     id: 'g17',
@@ -327,10 +327,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: "Chorister's Eye",
       mods: [m('accuracy', 'inc', 30), m('minionDamage', 'inc', 15)],
     },
-    small: {
-      name: 'Minion Attack and Movement Speed',
-      mods: [m('minionSpeed', 'inc', 4), m('minionSpeed', 'inc', 4)],
-    },
+    small: { name: 'Accuracy Rating', mods: [m('accuracy', 'inc', 10)] },
   },
   {
     id: 'g18',
@@ -362,7 +359,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.471,
     smallCount: 2,
     notable: { name: 'Teeth-Set Stoicism', mods: [m('maxCharges.grit', 'base', 1)] },
-    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 8)] },
+    small: { name: 'Grit Charge Duration', mods: [m('chargeDuration.grit', 'inc', 18)] },
   },
   {
     id: 'g20',
@@ -429,7 +426,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: "Quartermaster's Reserve",
       mods: [m('mana', 'base', 15), m('mana', 'inc', 15)],
     },
-    small: { name: 'Maximum Mana', mods: [m('mana', 'base', 10), m('mana', 'inc', 10)] },
+    small: { name: 'Maximum Mana', mods: [m('mana', 'base', 20), m('mana', 'inc', 8)] },
   },
   {
     id: 'g23',
@@ -446,7 +443,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Lesser fire Damage',
-      mods: [m('damage', 'inc', 8, { damageTypes: ['fire'] }), m('lifeRegenPct', 'base', 0.4)],
+      mods: [m('damage', 'inc', 10, { damageTypes: ['fire'] }), m('lifeRegenPct', 'base', 0.4)],
     },
   },
   {
@@ -464,8 +461,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'mana',
     depth: 0.675,
     smallCount: 2,
-    notable: { name: 'Chalice Deep', mods: [m('mana', 'inc', 8)] },
-    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 2.7)] },
+    notable: { name: 'Chalice Deep', mods: [m('mana', 'inc', 25)] },
+    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 8)] },
   },
   {
     id: 'g26',
@@ -482,7 +479,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('int', 'base', 10),
       ],
     },
-    small: { name: 'Lesser attack Speed', mods: [m('attackSpeed', 'inc', 4)] },
+    small: { name: 'Lesser attack Speed', mods: [m('attackSpeed', 'inc', 3)] },
   },
   {
     id: 'g27',
@@ -490,10 +487,10 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'mine',
     depth: 0.593,
     smallCount: 2,
-    notable: { name: 'Buried Thornseed', mods: [m('aoe', 'inc', 10, { tags: ['mine'] })] },
+    notable: { name: 'Buried Thornseed', mods: [m('aoe', 'inc', 18, { tags: ['mine'] })] },
     small: {
       name: 'Damage with Mine Skills',
-      mods: [m('damage', 'inc', 6, { tags: ['mine'] }), m('aoe', 'inc', 6, { tags: ['mine'] })],
+      mods: [m('damage', 'inc', 14, { tags: ['mine'] }), m('aoe', 'inc', 6, { tags: ['mine'] })],
     },
   },
   {
@@ -512,7 +509,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('dex', 'base', 20),
       ],
     },
-    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5)] },
+    small: { name: 'Accuracy Rating', mods: [m('accuracy', 'inc', 10)] },
   },
   {
     id: 'g29',
@@ -520,7 +517,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'life',
     depth: 0.521,
     smallCount: 3,
-    notable: { name: 'Marrow Reservoir', mods: [m('life', 'inc', 8)] },
+    notable: { name: 'Marrow Reservoir', mods: [m('life', 'inc', 15)] },
     small: { name: 'Maximum Life', mods: [m('life', 'inc', 5)] },
   },
   {
@@ -620,7 +617,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('dex', 'base', 10),
       ],
     },
-    small: { name: 'Lesser attack Speed', mods: [m('attackSpeed', 'inc', 4)] },
+    small: { name: 'Lesser attack Speed', mods: [m('attackSpeed', 'inc', 3)] },
   },
   {
     id: 'g35',
@@ -639,7 +636,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Damage with Trap Skills',
       mods: [
-        m('damage', 'inc', 12, { tags: ['trap'] }),
+        m('damage', 'inc', 16, { tags: ['trap'] }),
         m('castSpeed', 'inc', 4, { tags: ['trap'] }),
       ],
     },
@@ -664,8 +661,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'The Damage over Time Multiplier with Poison',
       mods: [
         m('dotMulti', 'base', 2, { tags: ['poison'] }),
-        m('attackSpeed', 'inc', 4),
-        m('damage', 'inc', 8, { tags: ['poison'] }),
+        m('attackSpeed', 'inc', 3),
+        m('damage', 'inc', 25, { tags: ['poison'] }),
       ],
     },
   },
@@ -745,15 +742,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Wide Shadow Cast',
       mods: [m('damage', 'inc', 18), m('projectileSpeed', 'inc', 10), m('aoe', 'inc', 10)],
     },
-    small: {
-      name: 'Evasion Rating',
-      mods: [
-        m('evasion', 'inc', 12),
-        m('es', 'base', 5),
-        m('life', 'base', 12),
-        m('resist.allEle', 'base', 4),
-      ],
-    },
+    small: { name: 'Lesser damage', mods: [m('damage', 'inc', 7)] },
   },
   {
     id: 'g41',
@@ -762,7 +751,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.339,
     smallCount: 2,
     notable: { name: "Wayfarer's Margin", mods: [m('str', 'base', 20), m('dex', 'base', 20)] },
-    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5), m('mana', 'inc', 8)] },
+    small: { name: 'Lesser strength', mods: [m('str', 'base', 10)] },
   },
   {
     id: 'g42',
@@ -780,7 +769,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Projectile Speed',
       mods: [
-        m('projectileSpeed', 'inc', 10),
+        m('projectileSpeed', 'inc', 7),
         m('damage', 'inc', 10, { tags: ['attack', 'projectile'] }),
       ],
     },
@@ -830,7 +819,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'crit',
     depth: 0.403,
     smallCount: 2,
-    notable: { name: 'Keyhole Glimpse', mods: [m('critChance', 'inc', 30)] },
+    notable: { name: 'Keyhole Glimpse', mods: [m('critChance', 'inc', 60)] },
     small: { name: 'Lesser critical Strike Chance', mods: [m('critChance', 'inc', 20)] },
   },
   {
@@ -849,7 +838,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Damage with Mine Skills',
       mods: [
-        m('damage', 'inc', 10, { tags: ['mine'] }),
+        m('damage', 'inc', 14, { tags: ['mine'] }),
         m('reducedReservation', 'base', 5, { tags: ['mine'] }),
       ],
     },
@@ -868,7 +857,10 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('chance.impale', 'base', 15, { tags: ['attack'] }),
       ],
     },
-    small: { name: 'Lesser impale Effect', mods: [m('impaleEffect', 'inc', 10)] },
+    small: {
+      name: 'Physical Damage with Attacks',
+      mods: [m('damage', 'inc', 12, { damageTypes: ['physical'], tags: ['attack'] })],
+    },
   },
   {
     id: 'g48',
@@ -885,7 +877,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Lesser chaos Damage',
-      mods: [m('damage', 'inc', 15, { damageTypes: ['chaos'] })],
+      mods: [m('damage', 'inc', 10, { damageTypes: ['chaos'] })],
     },
   },
   {
@@ -921,7 +913,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       mods: [
         m('damage', 'inc', 10, { tags: ['bow'] }),
         m('chance.poison', 'base', 10, { tags: ['attack'] }),
-        m('damage', 'inc', 16, { tags: ['dot'], condition: { id: 'wieldingBow' } }),
+        m('damage', 'inc', 10, { tags: ['dot'], condition: { id: 'wieldingBow' } }),
       ],
     },
   },
@@ -933,9 +925,12 @@ export const GEN_CLUSTERS: GenCluster[] = [
     smallCount: 2,
     notable: {
       name: 'Brimming Inkwell',
-      mods: [m('damage', 'inc', 24, { condition: { id: 'esFull' } })],
+      mods: [m('damage', 'inc', 40, { condition: { id: 'esFull' } })],
     },
-    small: { name: 'Life and Mana Leeched per second', mods: [m('leechRate', 'inc', 30)] },
+    small: {
+      name: 'Damage while Energy Shield is full',
+      mods: [m('damage', 'inc', 12, { condition: { id: 'esFull' } })],
+    },
   },
   {
     id: 'g52',
@@ -953,7 +948,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Lesser cast Speed',
-      mods: [m('castSpeed', 'inc', 3), m('critChance', 'inc', 15, { tags: ['spell'] })],
+      mods: [m('castSpeed', 'inc', 4), m('critChance', 'inc', 15, { tags: ['spell'] })],
     },
   },
   {
@@ -992,9 +987,9 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Physical Damage with Two Handed Weapons with Melee',
       mods: [
-        m('damage', 'inc', 10, { damageTypes: ['physical'], tags: ['twoHand', 'melee'] }),
+        m('damage', 'inc', 12, { damageTypes: ['physical'], tags: ['twoHand', 'melee'] }),
         m('attackSpeed', 'inc', 3, { tags: ['twoHand', 'melee'] }),
-        m('damage', 'inc', 10, {
+        m('damage', 'inc', 12, {
           tags: ['dot', 'attackSkill'],
           condition: { id: 'wieldingTwoHand' },
         }),
@@ -1011,7 +1006,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Lampwick Reservoir',
       mods: [m('damage', 'inc', 10, { tags: ['spell'] }), m('mana', 'inc', 15)],
     },
-    small: { name: 'Maximum Mana', mods: [m('mana', 'base', 20), m('mana', 'inc', 10)] },
+    small: { name: 'Maximum Mana', mods: [m('mana', 'base', 20), m('mana', 'inc', 8)] },
   },
   {
     id: 'g56',
@@ -1039,8 +1034,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Attack Speed with Channelling Skills',
       mods: [
-        m('attackSpeed', 'inc', 3, { tags: ['channelling'] }),
-        m('castSpeed', 'inc', 3, { tags: ['channelling'] }),
+        m('attackSpeed', 'inc', 4, { tags: ['channelling'] }),
+        m('castSpeed', 'inc', 5, { tags: ['channelling'] }),
         m('damage', 'inc', 8, { tags: ['channelling'] }),
       ],
     },
@@ -1055,7 +1050,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Roadworn Plate',
       mods: [m('armour', 'inc', 24), m('resist.allEle', 'base', 12), m('moveSpeed', 'inc', 3)],
     },
-    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 14), m('resist.allEle', 'base', 3)] },
+    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 12), m('resist.allEle', 'base', 4)] },
   },
   {
     id: 'g59',
@@ -1064,7 +1059,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.231,
     smallCount: 2,
     notable: { name: 'Dim Wellspring', mods: [m('mana', 'inc', 25), m('manaRegen', 'inc', 15)] },
-    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 10), m('manaRegen', 'inc', 10)] },
+    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 8), m('manaRegen', 'inc', 10)] },
   },
   {
     id: 'g60',
@@ -1080,7 +1075,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('int', 'base', 20),
       ],
     },
-    small: { name: 'Damage with Spells', mods: [m('damage', 'inc', 6.7, { tags: ['spell'] })] },
+    small: { name: 'Damage with Spells', mods: [m('damage', 'inc', 7, { tags: ['spell'] })] },
   },
   {
     id: 'g61',
@@ -1099,7 +1094,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Lesser lightning Damage',
-      mods: [m('damage', 'inc', 15, { damageTypes: ['lightning'] })],
+      mods: [m('damage', 'inc', 10, { damageTypes: ['lightning'] })],
     },
   },
   {
@@ -1131,8 +1126,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Chance to Block Attack Damage while Dual Wielding',
       mods: [
         m('blockAttack', 'base', 3, { condition: { id: 'dualWielding' } }),
-        m('damage', 'inc', 8, { tags: ['attack'], condition: { id: 'dualWielding' } }),
-        m('damage', 'inc', 8, { tags: ['dot', 'attackSkill'], condition: { id: 'dualWielding' } }),
+        m('damage', 'inc', 10, { tags: ['attack'], condition: { id: 'dualWielding' } }),
+        m('damage', 'inc', 10, { tags: ['dot', 'attackSkill'], condition: { id: 'dualWielding' } }),
       ],
     },
   },
@@ -1153,7 +1148,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Lesser fire Damage',
-      mods: [m('damage', 'inc', 15, { damageTypes: ['fire'] })],
+      mods: [m('damage', 'inc', 10, { damageTypes: ['fire'] })],
     },
   },
   {
@@ -1180,7 +1175,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('damage', 'inc', 12, { damageTypes: ['physical'] }),
       ],
     },
-    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5)] },
+    small: { name: 'Lesser armour', mods: [m('armour', 'base', 90)] },
   },
   {
     id: 'g67',
@@ -1198,7 +1193,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('int', 'base', 20),
       ],
     },
-    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5)] },
+    small: { name: 'Lesser attack Speed', mods: [m('attackSpeed', 'inc', 3)] },
   },
   {
     id: 'g68',
@@ -1257,8 +1252,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Lesser lightning Damage',
       mods: [
-        m('damage', 'inc', 8, { damageTypes: ['lightning'] }),
-        m('damage', 'inc', 8, { damageTypes: ['physical'] }),
+        m('damage', 'inc', 10, { damageTypes: ['lightning'] }),
+        m('damage', 'inc', 10, { damageTypes: ['physical'] }),
       ],
     },
   },
@@ -1270,18 +1265,11 @@ export const GEN_CLUSTERS: GenCluster[] = [
     smallCount: 3,
     notable: {
       name: 'Buttress Stance',
-      mods: [m('armour', 'inc', 30, { condition: { id: 'fortified' } })],
+      mods: [m('armour', 'inc', 40, { condition: { id: 'fortified' } })],
     },
     small: {
-      name: 'Physical Damage with Melee while Fortified',
-      mods: [
-        m('damage', 'inc', 14, {
-          damageTypes: ['physical'],
-          tags: ['melee'],
-          condition: { id: 'fortified' },
-        }),
-        m('damage', 'inc', 14, { tags: ['dot', 'attackSkill', 'melee'] }),
-      ],
+      name: 'Armour while Fortified',
+      mods: [m('armour', 'inc', 12, { condition: { id: 'fortified' } })],
     },
   },
   {
@@ -1331,8 +1319,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Lesser lightning Damage',
       mods: [
-        m('damage', 'inc', 8, { damageTypes: ['lightning'] }),
-        m('damage', 'inc', 8, { damageTypes: ['physical'] }),
+        m('damage', 'inc', 10, { damageTypes: ['lightning'] }),
+        m('damage', 'inc', 10, { damageTypes: ['physical'] }),
       ],
     },
   },
@@ -1403,13 +1391,10 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'totem',
     depth: 0.673,
     smallCount: 4,
-    notable: { name: 'Moss-Eyed Idol', mods: [m('damage', 'inc', 24, { tags: ['totem'] })] },
+    notable: { name: 'Moss-Eyed Idol', mods: [m('damage', 'inc', 40, { tags: ['totem'] })] },
     small: {
-      name: 'Cast Speed with Totem Skills',
-      mods: [
-        m('castSpeed', 'inc', 10, { tags: ['totem'] }),
-        m('attackSpeed', 'inc', 5, { tags: ['totem'] }),
-      ],
+      name: 'Damage with Totem Skills',
+      mods: [m('damage', 'inc', 12, { tags: ['totem'] })],
     },
   },
   {
@@ -1418,7 +1403,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'evasion',
     depth: 0.464,
     smallCount: 2,
-    notable: { name: 'Mistcloak Drift', mods: [m('evasion', 'inc', 30)] },
+    notable: { name: 'Mistcloak Drift', mods: [m('evasion', 'inc', 40)] },
     small: { name: 'Evasion Rating', mods: [m('evasion', 'inc', 12)] },
   },
   {
@@ -1444,12 +1429,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
       ],
     },
     small: {
-      name: 'Damage with Claws',
-      mods: [
-        m('damage', 'inc', 8, { tags: ['claw'] }),
-        m('attackSpeed', 'inc', 4, { tags: ['claw'] }),
-        m('damage', 'inc', 8, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingClaw' } }),
-      ],
+      name: 'Critical Strike Chance with Claws',
+      mods: [m('critChance', 'inc', 15, { tags: ['claw'] })],
     },
   },
   {
@@ -1462,7 +1443,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Wide Constellation',
       mods: [m('aoe', 'inc', 10), m('damage', 'inc', 20, { tags: ['area'] })],
     },
-    small: { name: 'Lesser area of Effect', mods: [m('aoe', 'inc', 3.3)] },
+    small: { name: 'Lesser area of Effect', mods: [m('aoe', 'inc', 5)] },
   },
   {
     id: 'g83',
@@ -1523,11 +1504,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
       ],
     },
     small: {
-      name: 'Damage with Wands',
-      mods: [
-        m('damage', 'inc', 15, { tags: ['wand'] }),
-        m('damage', 'inc', 15, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingWand' } }),
-      ],
+      name: 'Attack Speed with Wands',
+      mods: [m('attackSpeed', 'inc', 4, { tags: ['wand'] })],
     },
   },
   {
@@ -1536,8 +1514,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'es',
     depth: 0.612,
     smallCount: 2,
-    notable: { name: 'Thin Veil', mods: [m('es', 'inc', 5)] },
-    small: { name: 'Maximum Energy Shield', mods: [m('es', 'inc', 1.7)] },
+    notable: { name: 'Thin Veil', mods: [m('es', 'inc', 15)] },
+    small: { name: 'Maximum Energy Shield', mods: [m('es', 'inc', 5)] },
   },
   {
     id: 'g87',
@@ -1587,7 +1565,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Lesser cold Damage',
-      mods: [m('damage', 'inc', 12, { damageTypes: ['cold'] }), m('effect.chill', 'inc', 10)],
+      mods: [m('damage', 'inc', 15, { damageTypes: ['cold'] }), m('effect.chill', 'inc', 10)],
     },
   },
   {
@@ -1596,8 +1574,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'evasion',
     depth: 0.53,
     smallCount: 3,
-    notable: { name: 'Leafshade Slip', mods: [m('evasion', 'inc', 20)] },
-    small: { name: 'Evasion Rating', mods: [m('evasion', 'inc', 14)] },
+    notable: { name: 'Leafshade Slip', mods: [m('evasion', 'inc', 40)] },
+    small: { name: 'Evasion Rating', mods: [m('evasion', 'inc', 12)] },
   },
   {
     id: 'g90',
@@ -1615,7 +1593,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.456,
     smallCount: 2,
     notable: { name: 'Cloistered Ink', mods: [m('blockSpell', 'base', 6), m('mana', 'inc', 15)] },
-    small: { name: 'Maximum Mana', mods: [m('mana', 'base', 20), m('mana', 'inc', 10)] },
+    small: { name: 'Maximum Mana', mods: [m('mana', 'base', 20), m('mana', 'inc', 8)] },
   },
   {
     id: 'g92',
@@ -1627,7 +1605,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Fleetblood Hunt',
       mods: [m('damage', 'inc', 20, { tags: ['attack'] }), m('buffOn.kill.onslaught', 'base', 10)],
     },
-    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 10), m('evasion', 'inc', 10)] },
+    small: { name: 'Damage with Attacks', mods: [m('damage', 'inc', 4, { tags: ['attack'] })] },
   },
   {
     id: 'g93',
@@ -1643,7 +1621,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('resist.chaos', 'base', 8),
       ],
     },
-    small: { name: 'Lesser chaos Resistance', mods: [m('resist.chaos', 'base', 8)] },
+    small: { name: 'Lesser chaos Resistance', mods: [m('resist.chaos', 'base', 6)] },
   },
   {
     id: 'g94',
@@ -1655,7 +1633,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Quilted Resolve',
       mods: [m('es', 'inc', 10), m('life', 'inc', 8), m('str', 'base', 10)],
     },
-    small: { name: 'Maximum Energy Shield', mods: [m('es', 'inc', 5), m('life', 'inc', 4)] },
+    small: { name: 'Maximum Energy Shield', mods: [m('es', 'inc', 5), m('life', 'inc', 5)] },
   },
   {
     id: 'g95',
@@ -1664,7 +1642,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.322,
     smallCount: 3,
     notable: { name: 'Mended Mask', mods: [m('es', 'inc', 10), m('life', 'inc', 6)] },
-    small: { name: 'Maximum Energy Shield', mods: [m('es', 'inc', 5), m('life', 'inc', 3)] },
+    small: { name: 'Maximum Energy Shield', mods: [m('es', 'inc', 5), m('life', 'inc', 5)] },
   },
   {
     id: 'g96',
@@ -1672,8 +1650,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'life',
     depth: 0.541,
     smallCount: 3,
-    notable: { name: 'Sapwood Vigor', mods: [m('life', 'inc', 10)] },
-    small: { name: 'Maximum Life', mods: [m('life', 'inc', 4)] },
+    notable: { name: 'Sapwood Vigor', mods: [m('life', 'inc', 15)] },
+    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5)] },
   },
   {
     id: 'g97',
@@ -1690,10 +1668,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('minionRegen', 'base', 1),
       ],
     },
-    small: {
-      name: 'Minion Attack and Movement Speed',
-      mods: [m('minionSpeed', 'inc', 4), m('minionSpeed', 'inc', 4)],
-    },
+    small: { name: 'Life of your Minions', mods: [m('minionLife', 'inc', 10)] },
   },
   {
     id: 'g98',
@@ -1705,7 +1680,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Mailed Dancer',
       mods: [m('armour', 'inc', 24), m('evasion', 'inc', 24), m('resist.allEle', 'base', 10)],
     },
-    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 8)] },
+    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 12)] },
   },
   {
     id: 'g99',
@@ -1721,7 +1696,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('dex', 'base', 20),
       ],
     },
-    small: { name: 'Accuracy Rating', mods: [m('accuracy', 'base', 6.7)] },
+    small: { name: 'Accuracy Rating', mods: [m('accuracy', 'base', 10)] },
   },
   {
     id: 'g100',
@@ -1755,10 +1730,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('minionCount', 'base', 1),
       ],
     },
-    small: {
-      name: 'Life of your Minions',
-      mods: [m('minionLife', 'inc', 10), m('minionRegen', 'base', 1)],
-    },
+    small: { name: 'Minion Attack and Movement Speed', mods: [m('minionSpeed', 'inc', 4)] },
   },
   {
     id: 'g102',
@@ -1767,7 +1739,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.472,
     smallCount: 4,
     notable: { name: 'Open Lexicon', mods: [m('maxCharges.insight', 'base', 1)] },
-    small: { name: 'Lesser intelligence', mods: [m('int', 'base', 10)] },
+    small: { name: 'Insight Charge Duration', mods: [m('chargeDuration.insight', 'inc', 18)] },
   },
   {
     id: 'g103',
@@ -1797,7 +1769,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'melee',
     depth: 0.499,
     smallCount: 2,
-    notable: { name: 'Wide Swath', mods: [m('aoe', 'inc', 10, { tags: ['melee'] })] },
+    notable: { name: 'Wide Swath', mods: [m('aoe', 'inc', 15, { tags: ['melee'] })] },
     small: {
       name: 'Damage with Melee',
       mods: [m('damage', 'inc', 10, { tags: ['melee'] }), m('aoe', 'inc', 5, { tags: ['melee'] })],
@@ -1825,11 +1797,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
       ],
     },
     small: {
-      name: 'Damage with Trap Skills',
-      mods: [
-        m('damage', 'inc', 16, { tags: ['trap'] }),
-        m('damage', 'inc', 16, { tags: ['mine'] }),
-      ],
+      name: 'Skill Effect Duration with Mine Skills',
+      mods: [m('skillDuration', 'inc', 10, { tags: ['mine'] })],
     },
   },
   {
@@ -1842,7 +1811,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Vesper Draught',
       mods: [m('life', 'inc', 6), m('manaRegen', 'inc', 20), m('lifeRegenPct', 'base', 0.8)],
     },
-    small: { name: 'Maximum Life', mods: [m('life', 'inc', 4), m('manaRegen', 'inc', 10)] },
+    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5), m('manaRegen', 'inc', 10)] },
   },
   {
     id: 'g107',
@@ -1859,8 +1828,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
       ],
     },
     small: {
-      name: 'Damage with Brand Skills',
-      mods: [m('damage', 'inc', 12, { tags: ['brand'] })],
+      name: 'Skill Effect Duration with Brand Skills',
+      mods: [m('skillDuration', 'inc', 10, { tags: ['brand'] })],
     },
   },
   {
@@ -1873,7 +1842,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Sackcloth Vigor',
       mods: [m('armour', 'inc', 20), m('life', 'inc', 5), m('lifeRegenPct', 'base', 1)],
     },
-    small: { name: 'Regenerate 0.5% of Life per second', mods: [m('lifeRegenPct', 'base', 0.5)] },
+    small: { name: 'Regenerate 0.4% of Life per second', mods: [m('lifeRegenPct', 'base', 0.4)] },
   },
   {
     id: 'g109',
@@ -1885,7 +1854,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Gambeson Mantle',
       mods: [m('armour', 'inc', 24), m('evasion', 'inc', 24), m('resist.allEle', 'base', 12)],
     },
-    small: { name: 'Fervour Charge Duration', mods: [m('chargeDuration.fervour', 'inc', 18)] },
+    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 12)] },
   },
   {
     id: 'g110',
@@ -1934,10 +1903,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Moonmoss Draught',
       mods: [m('mana', 'inc', 15), m('flaskManaRecovery', 'inc', 25), m('flaskEffect', 'inc', 8)],
     },
-    small: {
-      name: 'Maximum Mana',
-      mods: [m('mana', 'inc', 10), m('flaskManaRecovery', 'inc', 15)],
-    },
+    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 8), m('flaskManaRecovery', 'inc', 10)] },
   },
   {
     id: 'g113',
@@ -1980,7 +1946,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('damage', 'inc', 30, { condition: { id: 'leeching' } }),
       ],
     },
-    small: { name: 'Life and Mana Leeched per second', mods: [m('leechRate', 'inc', 10)] },
+    small: { name: 'Life and Mana Leeched per second', mods: [m('leechRate', 'inc', 20)] },
   },
   {
     id: 'g116',
@@ -2007,7 +1973,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Critical Strike Chance while wielding a Staff',
       mods: [
-        m('critChance', 'inc', 20, { condition: { id: 'wieldingStaff' } }),
+        m('critChance', 'inc', 30, { condition: { id: 'wieldingStaff' } }),
         m('critMulti', 'base', 8, { condition: { id: 'wieldingStaff' } }),
       ],
     },
@@ -2031,8 +1997,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Accuracy Rating with Wands',
       mods: [
         m('accuracy', 'inc', 10, { tags: ['wand'] }),
-        m('damage', 'inc', 10, { tags: ['wand'] }),
-        m('damage', 'inc', 10, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingWand' } }),
+        m('damage', 'inc', 15, { tags: ['wand'] }),
+        m('damage', 'inc', 15, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingWand' } }),
       ],
     },
   },
@@ -2111,7 +2077,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Evasion Rating',
-      mods: [m('evasion', 'inc', 12), m('resist.allEle', 'base', 3)],
+      mods: [m('evasion', 'inc', 12), m('resist.allEle', 'base', 4)],
     },
   },
   {
@@ -2121,7 +2087,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.223,
     smallCount: 2,
     notable: { name: 'Cairnlight Well', mods: [m('mana', 'inc', 16), m('cost', 'inc', -5)] },
-    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 5), m('cost', 'inc', -3)] },
+    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 8), m('cost', 'inc', -3)] },
   },
   {
     id: 'g125',
@@ -2148,7 +2114,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Tidepool Mind',
       mods: [m('mana', 'inc', 20), m('manaRegen', 'inc', 20), m('int', 'base', 20)],
     },
-    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5)] },
+    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 8)] },
   },
   {
     id: 'g127',
@@ -2160,7 +2126,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Mossgrave Rest',
       mods: [m('lifeRegenPct', 'base', 1.8), m('stunThreshold', 'inc', 20), m('str', 'base', 20)],
     },
-    small: { name: 'Regenerate 0.6% of Life per second', mods: [m('lifeRegenPct', 'base', 0.6)] },
+    small: { name: 'Regenerate 0.4% of Life per second', mods: [m('lifeRegenPct', 'base', 0.4)] },
   },
   {
     id: 'g128',
@@ -2188,8 +2154,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('damage', 'inc', 10, { tags: ['mace'] }),
         m('damage', 'inc', 10, { tags: ['sceptre'] }),
         m('aoe', 'inc', 5),
-        m('damage', 'inc', 10, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingMace' } }),
-        m('damage', 'inc', 10, {
+        m('damage', 'inc', 14, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingMace' } }),
+        m('damage', 'inc', 14, {
           tags: ['dot', 'attackSkill'],
           condition: { id: 'wieldingSceptre' },
         }),
@@ -2206,7 +2172,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: "Cutthroat's Spoils",
       mods: [m('life', 'inc', 10), m('lifeOnKill', 'base', 5), m('str', 'base', 20)],
     },
-    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 8)] },
+    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5)] },
   },
   {
     id: 'g130',
@@ -2266,7 +2232,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Inkbound Servants',
       mods: [m('minionLife', 'inc', 15), m('minionPhysReduction', 'base', 15)],
     },
-    small: { name: 'Life of your Minions', mods: [m('minionLife', 'inc', 12)] },
+    small: { name: 'Life of your Minions', mods: [m('minionLife', 'inc', 10)] },
   },
   {
     id: 'g133',
@@ -2295,8 +2261,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Damage with Attacks while Dual Wielding',
       mods: [
-        m('damage', 'inc', 12, { tags: ['attack'], condition: { id: 'dualWielding' } }),
-        m('damage', 'inc', 12, { tags: ['dot', 'attackSkill'], condition: { id: 'dualWielding' } }),
+        m('damage', 'inc', 10, { tags: ['attack'], condition: { id: 'dualWielding' } }),
+        m('damage', 'inc', 10, { tags: ['dot', 'attackSkill'], condition: { id: 'dualWielding' } }),
       ],
     },
   },
@@ -2343,7 +2309,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       mods: [
         m('damage', 'inc', 10, { tags: ['axe'] }),
         m('attackSpeed', 'inc', 3, { tags: ['axe'] }),
-        m('damage', 'inc', 10, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingAxe' } }),
+        m('damage', 'inc', 12, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingAxe' } }),
       ],
     },
   },
@@ -2363,8 +2329,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
       ],
     },
     small: {
-      name: 'Chance to cause Bleeding with Attacks',
-      mods: [m('chance.bleed', 'base', 15, { tags: ['attack'] })],
+      name: 'The Damage over Time Multiplier with Bleeding',
+      mods: [m('dotMulti', 'base', 3, { tags: ['bleed'] })],
     },
   },
   {
@@ -2386,7 +2352,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Critical Strike Chance against Shocked Enemies',
       mods: [
         m('critChance', 'inc', 15, { condition: { id: 'targetShocked' } }),
-        m('damage', 'inc', 10),
+        m('damage', 'inc', 7),
       ],
     },
   },
@@ -2406,7 +2372,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Lesser chaos Damage',
-      mods: [m('damage', 'inc', 15, { damageTypes: ['chaos'] })],
+      mods: [m('damage', 'inc', 10, { damageTypes: ['chaos'] })],
     },
   },
   {
@@ -2425,7 +2391,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('int', 'base', 10),
       ],
     },
-    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 6.7)] },
+    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 12)] },
   },
   {
     id: 'g141',
@@ -2433,8 +2399,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'melee',
     depth: 0.668,
     smallCount: 2,
-    notable: { name: 'Forgehand', mods: [m('damage', 'inc', 12, { tags: ['melee'] })] },
-    small: { name: 'Damage with Melee', mods: [m('damage', 'inc', 4, { tags: ['melee'] })] },
+    notable: { name: 'Forgehand', mods: [m('damage', 'inc', 30, { tags: ['melee'] })] },
+    small: { name: 'Damage with Melee', mods: [m('damage', 'inc', 10, { tags: ['melee'] })] },
   },
   {
     id: 'g142',
@@ -2442,8 +2408,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'armour',
     depth: 0.494,
     smallCount: 2,
-    notable: { name: 'Mailed Cassock', mods: [m('armour', 'inc', 30)] },
-    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 14), m('mana', 'inc', 8)] },
+    notable: { name: 'Mailed Cassock', mods: [m('armour', 'inc', 40)] },
+    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 12), m('mana', 'inc', 8)] },
   },
   {
     id: 'g143',
@@ -2459,7 +2425,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('flaskManaRecovery', 'inc', 20),
       ],
     },
-    small: { name: 'Maximum Energy Shield', mods: [m('es', 'inc', 6)] },
+    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 8)] },
   },
   {
     id: 'g144',
@@ -2467,8 +2433,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'trap',
     depth: 0.53,
     smallCount: 2,
-    notable: { name: 'Hairpin Trigger', mods: [m('damage', 'inc', 20, { tags: ['trap'] })] },
-    small: { name: 'Damage with Trap Skills', mods: [m('damage', 'inc', 14, { tags: ['trap'] })] },
+    notable: { name: 'Hairpin Trigger', mods: [m('damage', 'inc', 50, { tags: ['trap'] })] },
+    small: { name: 'Damage with Trap Skills', mods: [m('damage', 'inc', 16, { tags: ['trap'] })] },
   },
   {
     id: 'g145',
@@ -2502,7 +2468,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Physical Damage with Two Handed Weapons with Melee',
       mods: [
         m('damage', 'inc', 12, { damageTypes: ['physical'], tags: ['twoHand', 'melee'] }),
-        m('leechRate', 'inc', 25),
+        m('leechRate', 'inc', 20),
         m('damage', 'inc', 12, {
           tags: ['dot', 'attackSkill'],
           condition: { id: 'wieldingTwoHand' },
@@ -2520,7 +2486,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Summoned Choir',
       mods: [m('minionDamage', 'inc', 15), m('minionSpeed', 'inc', 8)],
     },
-    small: { name: 'Damage of your Minions', mods: [m('minionDamage', 'inc', 12)] },
+    small: { name: 'Damage of your Minions', mods: [m('minionDamage', 'inc', 10)] },
   },
   {
     id: 'g148',
@@ -2549,7 +2515,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Fevered Nick',
       mods: [m('life', 'inc', 8), m('leech.life', 'base', 0.4, { tags: ['attack'] })],
     },
-    small: { name: 'Fervour Charge Duration', mods: [m('chargeDuration.fervour', 'inc', 18)] },
+    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5)] },
   },
   {
     id: 'g150',
@@ -2561,7 +2527,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Quiet Reservoir',
       mods: [m('es', 'base', 9), m('mana', 'base', 20), m('int', 'base', 20)],
     },
-    small: { name: 'Maximum Energy Shield', mods: [m('es', 'base', 3)] },
+    small: { name: 'Maximum Energy Shield', mods: [m('es', 'base', 5)] },
   },
   {
     id: 'g151',
@@ -2616,7 +2582,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Lesser fire Damage',
-      mods: [m('damage', 'inc', 12, { damageTypes: ['fire'] })],
+      mods: [m('damage', 'inc', 10, { damageTypes: ['fire'] })],
     },
   },
   {
@@ -2636,7 +2602,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Minion Attack and Movement Speed',
-      mods: [m('minionSpeed', 'inc', 5), m('minionDamage', 'inc', 10)],
+      mods: [m('minionSpeed', 'inc', 4), m('minionDamage', 'inc', 10)],
     },
   },
   {
@@ -2671,7 +2637,10 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('resist.lightning', 'base', 15),
       ],
     },
-    small: { name: 'Lesser intelligence', mods: [m('int', 'base', 10)] },
+    small: {
+      name: 'Lesser lightning Damage',
+      mods: [m('damage', 'inc', 10, { damageTypes: ['lightning'] })],
+    },
   },
   {
     id: 'g157',
@@ -2702,7 +2671,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Featherblade Omen',
       mods: [m('critMulti', 'base', 12), m('critChance', 'inc', 45)],
     },
-    small: { name: 'Lesser critical Strike Chance', mods: [m('critChance', 'inc', 15)] },
+    small: { name: 'Lesser critical Strike Chance', mods: [m('critChance', 'inc', 20)] },
   },
   {
     id: 'g159',
@@ -2746,7 +2715,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('blockAttack', 'base', 3, { condition: { id: 'holdingShield' } }),
       ],
     },
-    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 14), m('resist.allEle', 'base', 3)] },
+    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 12), m('resist.allEle', 'base', 4)] },
   },
   {
     id: 'g161',
@@ -2763,7 +2732,10 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('damage', 'inc', 30, { tags: ['poison'] }),
       ],
     },
-    small: { name: 'Chance to Poison on Hit', mods: [m('chance.poison', 'base', 10)] },
+    small: {
+      name: 'The Damage over Time Multiplier with Poison',
+      mods: [m('dotMulti', 'base', 2, { tags: ['poison'] })],
+    },
   },
   {
     id: 'g162',
@@ -2781,7 +2753,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('int', 'base', 10),
       ],
     },
-    small: { name: 'Lesser attack Speed', mods: [m('attackSpeed', 'inc', 4)] },
+    small: { name: 'Damage with Attacks', mods: [m('damage', 'inc', 4, { tags: ['attack'] })] },
   },
   {
     id: 'g163',
@@ -2812,7 +2784,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.564,
     smallCount: 2,
     notable: { name: 'Veilstep', mods: [m('evasion', 'inc', 18), m('es', 'inc', 12)] },
-    small: { name: 'Insight Charge Duration', mods: [m('chargeDuration.insight', 'inc', 18)] },
+    small: { name: 'Evasion Rating', mods: [m('evasion', 'inc', 12)] },
   },
   {
     id: 'g165',
@@ -2832,7 +2804,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       mods: [
         m('damage', 'inc', 12, { tags: ['dagger'] }),
         m('chance.poison', 'base', 10, { tags: ['attack'] }),
-        m('damage', 'inc', 20, {
+        m('damage', 'inc', 12, {
           tags: ['dot', 'attackSkill'],
           condition: { id: 'wieldingDagger' },
         }),
@@ -2932,7 +2904,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Tankard Mail',
       mods: [m('armour', 'inc', 16), m('life', 'inc', 6), m('flaskLifeRecovery', 'inc', 20)],
     },
-    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 8), m('life', 'inc', 4)] },
+    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 12), m('life', 'inc', 5)] },
   },
   {
     id: 'g172',
@@ -2984,7 +2956,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Lesser attack Speed',
-      mods: [m('attackSpeed', 'inc', 3), m('impaleEffect', 'inc', 5)],
+      mods: [m('attackSpeed', 'inc', 3), m('impaleEffect', 'inc', 10)],
     },
   },
   {
@@ -3044,11 +3016,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
       ],
     },
     small: {
-      name: 'Damage with Trap Skills',
-      mods: [
-        m('damage', 'inc', 16, { tags: ['trap'] }),
-        m('damage', 'inc', 16, { tags: ['mine'] }),
-      ],
+      name: 'Critical Strike Chance with Trap Skills',
+      mods: [m('critChance', 'inc', 20, { tags: ['trap'] })],
     },
   },
   {
@@ -3080,7 +3049,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('str', 'base', 20),
       ],
     },
-    small: { name: 'Regenerate 0.3% of Life per second', mods: [m('lifeRegenPct', 'base', 0.3)] },
+    small: { name: 'Regenerate 0.4% of Life per second', mods: [m('lifeRegenPct', 'base', 0.4)] },
   },
   {
     id: 'g180',
@@ -3114,7 +3083,10 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('resist.fire', 'base', 15),
       ],
     },
-    small: { name: 'Lesser intelligence', mods: [m('int', 'base', 10)] },
+    small: {
+      name: 'Lesser fire Damage',
+      mods: [m('damage', 'inc', 10, { damageTypes: ['fire'] })],
+    },
   },
   {
     id: 'g183',
@@ -3219,7 +3191,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Damage of your Minions',
-      mods: [m('minionDamage', 'inc', 8), m('aoe', 'inc', 8, { tags: ['minion'] })],
+      mods: [m('minionDamage', 'inc', 10), m('aoe', 'inc', 8, { tags: ['minion'] })],
     },
   },
   {
@@ -3237,7 +3209,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('int', 'base', 10),
       ],
     },
-    small: { name: 'Lesser damage', mods: [m('damage', 'inc', 6.7)] },
+    small: { name: 'Lesser damage', mods: [m('damage', 'inc', 7)] },
   },
   {
     id: 'g188',
@@ -3254,7 +3226,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('resist.allEle', 'base', 8),
       ],
     },
-    small: { name: 'Insight Charge Duration', mods: [m('chargeDuration.insight', 'inc', 18)] },
+    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 12)] },
   },
   {
     id: 'g189',
@@ -3275,7 +3247,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Lesser elemental Damage with Attacks',
       mods: [
-        m('damage', 'inc', 12, { damageTypes: ['fire', 'cold', 'lightning'], tags: ['attack'] }),
+        m('damage', 'inc', 10, { damageTypes: ['fire', 'cold', 'lightning'], tags: ['attack'] }),
       ],
     },
   },
@@ -3297,13 +3269,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         }),
       ],
     },
-    small: {
-      name: 'Critical Strike Chance with Daggers',
-      mods: [
-        m('critChance', 'inc', 18, { tags: ['dagger'] }),
-        m('critMulti', 'base', 14, { tags: ['dagger'] }),
-      ],
-    },
+    small: { name: 'Damage with Daggers', mods: [m('damage', 'inc', 12, { tags: ['dagger'] })] },
   },
   {
     id: 'g191',
@@ -3324,7 +3290,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Damage with Bows',
       mods: [
         m('damage', 'inc', 10, { tags: ['bow'] }),
-        m('evasion', 'inc', 10),
+        m('evasion', 'inc', 12),
         m('damage', 'inc', 10, { tags: ['dot'], condition: { id: 'wieldingBow' } }),
       ],
     },
@@ -3347,7 +3313,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'The Damage over Time Multiplier',
       mods: [
         m('dotMulti', 'base', 4, { damageTypes: ['fire'] }),
-        m('damage', 'inc', 10, { damageTypes: ['fire'], tags: ['attack'] }),
+        m('damage', 'inc', 12, { damageTypes: ['fire'], tags: ['attack'] }),
       ],
     },
   },
@@ -3373,7 +3339,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Damage with Staves',
       mods: [
         m('damage', 'inc', 15, { tags: ['staff'] }),
-        m('armour', 'inc', 15),
+        m('armour', 'inc', 12),
         m('damage', 'inc', 15, {
           tags: ['dot', 'attackSkill'],
           condition: { id: 'wieldingStaff' },
@@ -3400,7 +3366,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Ossuary Mender',
       mods: [m('minionLife', 'inc', 20), m('lifeRegenPct', 'base', 1), m('minionRegen', 'base', 1)],
     },
-    small: { name: 'Life of your Minions', mods: [m('minionLife', 'inc', 12)] },
+    small: { name: 'Life of your Minions', mods: [m('minionLife', 'inc', 10)] },
   },
   {
     id: 'g196',
@@ -3412,7 +3378,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Marrow Hymn',
       mods: [m('life', 'inc', 8), m('auraEffect', 'inc', 3), m('str', 'base', 20)],
     },
-    small: { name: 'Grit Charge Duration', mods: [m('chargeDuration.grit', 'inc', 18)] },
+    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5)] },
   },
   {
     id: 'g197',
@@ -3428,7 +3394,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('int', 'base', 20),
       ],
     },
-    small: { name: 'Damage with Spells', mods: [m('damage', 'inc', 5.3, { tags: ['spell'] })] },
+    small: { name: 'Damage with Spells', mods: [m('damage', 'inc', 7, { tags: ['spell'] })] },
   },
   {
     id: 'g198',
@@ -3437,7 +3403,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.524,
     smallCount: 4,
     notable: { name: 'Gritstone Heart', mods: [m('maxCharges.grit', 'base', 1)] },
-    small: { name: 'Lesser strength', mods: [m('str', 'base', 10)] },
+    small: { name: 'Grit Charge Duration', mods: [m('chargeDuration.grit', 'inc', 18)] },
   },
   {
     id: 'g199',
@@ -3457,7 +3423,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Damage with Claws',
       mods: [
         m('damage', 'inc', 8, { tags: ['claw'] }),
-        m('attackSpeed', 'inc', 3, { tags: ['claw'] }),
+        m('attackSpeed', 'inc', 4, { tags: ['claw'] }),
         m('damage', 'inc', 8, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingClaw' } }),
       ],
     },
@@ -3477,7 +3443,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Critical Strike Chance with Melee',
-      mods: [m('critChance', 'inc', 20, { tags: ['melee'] })],
+      mods: [m('critChance', 'inc', 25, { tags: ['melee'] })],
     },
   },
   {
@@ -3512,7 +3478,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.39,
     smallCount: 2,
     notable: { name: 'Meager Offering', mods: [m('mana', 'inc', 22), m('cost', 'inc', -6)] },
-    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 5), m('cost', 'inc', -3)] },
+    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 8), m('cost', 'inc', -3)] },
   },
   {
     id: 'g203',
@@ -3529,7 +3495,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('str', 'base', 30),
       ],
     },
-    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 5.3)] },
+    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 12)] },
   },
   {
     id: 'g204',
@@ -3557,7 +3523,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('chargeOn.stun.grit', 'base', 10),
       ],
     },
-    small: { name: 'Stun Duration on Enemies', mods: [m('stunDuration', 'inc', 25)] },
+    small: { name: 'Grit Charge Duration', mods: [m('chargeDuration.grit', 'inc', 18)] },
   },
   {
     id: 'g206',
@@ -3571,7 +3537,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Damage Leeched as Life with Attacks',
-      mods: [m('leech.life', 'base', 0.4, { tags: ['attack'] }), m('leechRate', 'inc', 10)],
+      mods: [m('leech.life', 'base', 0.4, { tags: ['attack'] }), m('leechRate', 'inc', 20)],
     },
   },
   {
@@ -3617,9 +3583,9 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Chance to Block Attack Damage while Dual Wielding',
       mods: [
-        m('blockAttack', 'base', 1, { condition: { id: 'dualWielding' } }),
+        m('blockAttack', 'base', 3, { condition: { id: 'dualWielding' } }),
         m('attackSpeed', 'inc', 3, { condition: { id: 'dualWielding' } }),
-        m('castSpeed', 'inc', 3, { condition: { id: 'dualWielding' } }),
+        m('castSpeed', 'inc', 4, { condition: { id: 'dualWielding' } }),
       ],
     },
   },
@@ -3700,7 +3666,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('damageTaken.lightning', 'inc', -5),
       ],
     },
-    small: { name: 'All Elemental Resistances', mods: [m('resist.allEle', 'base', 5)] },
+    small: { name: 'All Elemental Resistances', mods: [m('resist.allEle', 'base', 4)] },
   },
   {
     id: 'g213',
@@ -3731,11 +3697,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'flask',
     depth: 0.356,
     smallCount: 2,
-    notable: { name: 'Phial Tinkerer', mods: [m('flaskEffect', 'inc', 10)] },
-    small: {
-      name: 'Mana Recovery from Flasks',
-      mods: [m('flaskManaRecovery', 'inc', 10), m('flaskDuration', 'inc', 5)],
-    },
+    notable: { name: 'Phial Tinkerer', mods: [m('flaskEffect', 'inc', 15)] },
+    small: { name: 'Effect of Flasks', mods: [m('flaskEffect', 'inc', 5)] },
   },
   {
     id: 'g215',
@@ -3752,7 +3715,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('dex', 'base', 30),
       ],
     },
-    small: { name: 'Evasion Rating', mods: [m('evasion', 'inc', 6)] },
+    small: { name: 'Evasion Rating', mods: [m('evasion', 'inc', 12)] },
   },
   {
     id: 'g216',
@@ -3770,13 +3733,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.604,
     smallCount: 3,
     notable: { name: 'Wickfed Insight', mods: [m('chargeOn.kill.insight', 'base', 10)] },
-    small: {
-      name: 'Damage with Wands',
-      mods: [
-        m('damage', 'inc', 15, { tags: ['wand'] }),
-        m('damage', 'inc', 15, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingWand' } }),
-      ],
-    },
+    small: { name: 'Insight Charge Duration', mods: [m('chargeDuration.insight', 'inc', 18)] },
   },
   {
     id: 'g218',
@@ -3818,7 +3775,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('physReduction', 'base', 5),
       ],
     },
-    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 10), m('resist.allEle', 'base', 5)] },
+    small: { name: 'Lesser armour', mods: [m('armour', 'inc', 12), m('resist.allEle', 'base', 4)] },
   },
   {
     id: 'g220',
@@ -3830,7 +3787,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Sapdraught Mending',
       mods: [m('life', 'inc', 6), m('flaskLifeRecovery', 'inc', 30), m('flaskEffect', 'inc', 8)],
     },
-    small: { name: 'Maximum Life', mods: [m('life', 'inc', 3), m('flaskLifeRecovery', 'inc', 10)] },
+    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5), m('flaskLifeRecovery', 'inc', 10)] },
   },
   {
     id: 'g221',
@@ -3878,7 +3835,10 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('ailmentEffect', 'inc', 10),
       ],
     },
-    small: { name: 'Lesser critical Strike Chance', mods: [m('critChance', 'inc', 20)] },
+    small: {
+      name: 'Lesser elemental Damage',
+      mods: [m('damage', 'inc', 10, { damageTypes: ['fire', 'cold', 'lightning'] })],
+    },
   },
   {
     id: 'g224',
@@ -3899,7 +3859,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Physical Damage with Bows',
       mods: [
         m('damage', 'inc', 10, { damageTypes: ['physical'], tags: ['bow'] }),
-        m('aoe', 'inc', 8),
+        m('aoe', 'inc', 5),
         m('damage', 'inc', 10, { tags: ['dot'], condition: { id: 'wieldingBow' } }),
       ],
     },
@@ -3914,7 +3874,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Cloaked Silence',
       mods: [m('es', 'inc', 18), m('esRechargeRate', 'inc', 10)],
     },
-    small: { name: 'Maximum Energy Shield', mods: [m('es', 'inc', 6)] },
+    small: { name: 'Maximum Energy Shield', mods: [m('es', 'inc', 5)] },
   },
   {
     id: 'g226',
@@ -3943,8 +3903,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
       ],
     },
     small: {
-      name: 'Critical Strike Chance while wielding a Staff',
-      mods: [m('critChance', 'inc', 30, { condition: { id: 'wieldingStaff' } })],
+      name: 'Chance to Block Spell Damage while wielding a Staff',
+      mods: [m('blockSpell', 'base', 2, { condition: { id: 'wieldingStaff' } })],
     },
   },
   {
@@ -3962,7 +3922,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Lesser cold Damage',
-      mods: [m('damage', 'inc', 12, { damageTypes: ['cold'] }), m('effect.chill', 'inc', 10)],
+      mods: [m('damage', 'inc', 15, { damageTypes: ['cold'] }), m('effect.chill', 'inc', 10)],
     },
   },
   {
@@ -3997,8 +3957,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Damage with Mine Skills',
       mods: [
-        m('damage', 'inc', 8, { tags: ['mine'] }),
-        m('reducedReservation', 'base', 4, { tags: ['mine'] }),
+        m('damage', 'inc', 14, { tags: ['mine'] }),
+        m('reducedReservation', 'base', 5, { tags: ['mine'] }),
       ],
     },
   },
@@ -4017,7 +3977,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('evasion', 'inc', 30),
       ],
     },
-    small: { name: 'Accuracy Rating', mods: [m('accuracy', 'inc', 8), m('evasion', 'inc', 12)] },
+    small: { name: 'Accuracy Rating', mods: [m('accuracy', 'inc', 10), m('evasion', 'inc', 12)] },
   },
   {
     id: 'g232',
@@ -4033,17 +3993,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('blockAttack', 'base', 5, { condition: { id: 'holdingShield' } }),
       ],
     },
-    small: {
-      name: 'Damage with Attacks while holding a Shield',
-      mods: [
-        m('damage', 'inc', 10, { tags: ['attack'], condition: { id: 'holdingShield' } }),
-        m('attackSpeed', 'inc', 3, { condition: { id: 'holdingShield' } }),
-        m('damage', 'inc', 10, {
-          tags: ['dot', 'attackSkill'],
-          condition: { id: 'holdingShield' },
-        }),
-      ],
-    },
+    small: { name: 'Defences from your Shield', mods: [m('shieldDefences', 'inc', 40)] },
   },
   {
     id: 'g233',
@@ -4063,8 +4013,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Lesser lightning Damage',
       mods: [
-        m('damage', 'inc', 8, { damageTypes: ['lightning'] }),
-        m('damage', 'inc', 8, { damageTypes: ['physical'] }),
+        m('damage', 'inc', 10, { damageTypes: ['lightning'] }),
+        m('damage', 'inc', 10, { damageTypes: ['physical'] }),
       ],
     },
   },
@@ -4104,7 +4054,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('cost', 'inc', -15, { tags: ['minion'] }),
       ],
     },
-    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 5), m('minionDamage', 'inc', 10)] },
+    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 8), m('minionDamage', 'inc', 10)] },
   },
   {
     id: 'g236',
@@ -4139,7 +4089,10 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('resist.cold', 'base', 15),
       ],
     },
-    small: { name: 'Lesser intelligence', mods: [m('int', 'base', 10)] },
+    small: {
+      name: 'Lesser cold Damage',
+      mods: [m('damage', 'inc', 15, { damageTypes: ['cold'] })],
+    },
   },
   {
     id: 'g238',
@@ -4164,7 +4117,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Damage with Daggers',
       mods: [
         m('damage', 'inc', 12, { tags: ['dagger'] }),
-        m('leech.life', 'base', 0.3, { tags: ['attack'] }),
+        m('leech.life', 'base', 0.4, { tags: ['attack'] }),
         m('leechRate', 'inc', 20),
         m('damage', 'inc', 12, {
           tags: ['dot', 'attackSkill'],
@@ -4187,7 +4140,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('manaOnKill', 'base', 10),
       ],
     },
-    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 10), m('manaOnKill', 'base', 5)] },
+    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 8), m('manaOnKill', 'base', 5)] },
   },
   {
     id: 'g240',
@@ -4205,7 +4158,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'All Elemental Resistances',
       mods: [
-        m('resist.allEle', 'base', 3),
+        m('resist.allEle', 'base', 4),
         m('damage', 'inc', 10, { damageTypes: ['fire', 'cold', 'lightning'] }),
       ],
     },
@@ -4227,7 +4180,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Lesser chaos Damage',
-      mods: [m('damage', 'inc', 6.7, { damageTypes: ['chaos'] })],
+      mods: [m('damage', 'inc', 10, { damageTypes: ['chaos'] })],
     },
   },
   {
@@ -4288,8 +4241,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Damage with Spells while holding a Shield',
       mods: [
-        m('damage', 'inc', 8, { tags: ['spell'], condition: { id: 'holdingShield' } }),
-        m('blockAttack', 'base', 1, { condition: { id: 'holdingShield' } }),
+        m('damage', 'inc', 10, { tags: ['spell'], condition: { id: 'holdingShield' } }),
+        m('blockAttack', 'base', 2, { condition: { id: 'holdingShield' } }),
       ],
     },
   },
@@ -4308,7 +4261,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('deployCount', 'base', 2, { tags: ['mine'] }),
       ],
     },
-    small: { name: 'Lesser critical Strike Chance', mods: [m('critChance', 'inc', 20)] },
+    small: { name: 'Damage with Trap Skills', mods: [m('damage', 'inc', 16, { tags: ['trap'] })] },
   },
   {
     id: 'g246',
@@ -4336,7 +4289,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'crit',
     depth: 0.487,
     smallCount: 2,
-    notable: { name: 'Knife-Edge Gloss', mods: [m('critMulti', 'base', 30)] },
+    notable: { name: 'Knife-Edge Gloss', mods: [m('critMulti', 'base', 40)] },
     small: { name: 'Lesser critical Strike Multiplier', mods: [m('critMulti', 'base', 12)] },
   },
   {
@@ -4379,7 +4332,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Accuracy Rating',
-      mods: [m('accuracy', 'inc', 10), m('critChance', 'inc', 15)],
+      mods: [m('accuracy', 'inc', 10), m('critChance', 'inc', 20)],
     },
   },
   {
@@ -4401,7 +4354,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Attack Speed with Bows',
       mods: [
-        m('attackSpeed', 'inc', 4, { tags: ['bow'] }),
+        m('attackSpeed', 'inc', 3, { tags: ['bow'] }),
         m('accuracy', 'inc', 8, { tags: ['bow'] }),
       ],
     },
@@ -4441,10 +4394,10 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'crit',
     depth: 0.59,
     smallCount: 2,
-    notable: { name: 'Keen Orison', mods: [m('critChance', 'inc', 30, { tags: ['spell'] })] },
+    notable: { name: 'Keen Orison', mods: [m('critChance', 'inc', 45, { tags: ['spell'] })] },
     small: {
       name: 'Critical Strike Chance with Spells',
-      mods: [m('critChance', 'inc', 10, { tags: ['spell'] })],
+      mods: [m('critChance', 'inc', 15, { tags: ['spell'] })],
     },
   },
   {
@@ -4454,7 +4407,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.529,
     smallCount: 4,
     notable: { name: 'Fervid Thicket', mods: [m('maxCharges.fervour', 'base', 1)] },
-    small: { name: 'Lesser dexterity', mods: [m('dex', 'base', 10)] },
+    small: { name: 'Fervour Charge Duration', mods: [m('chargeDuration.fervour', 'inc', 18)] },
   },
   {
     id: 'g255',
@@ -4471,7 +4424,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('resist.allEle', 'base', 8),
       ],
     },
-    small: { name: 'Evasion Rating', mods: [m('evasion', 'inc', 10), m('es', 'inc', 5)] },
+    small: { name: 'Evasion Rating', mods: [m('evasion', 'inc', 12), m('es', 'inc', 5)] },
   },
   {
     id: 'g256',
@@ -4483,7 +4436,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Spurred Haste',
       mods: [m('attackSpeed', 'inc', 12), m('accuracy', 'inc', 10), m('dex', 'base', 20)],
     },
-    small: { name: 'Lesser attack Speed', mods: [m('attackSpeed', 'inc', 4)] },
+    small: { name: 'Lesser attack Speed', mods: [m('attackSpeed', 'inc', 3)] },
   },
   {
     id: 'g257',
@@ -4504,7 +4457,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Physical Damage with Bows',
       mods: [
         m('damage', 'inc', 10, { damageTypes: ['physical'], tags: ['bow'] }),
-        m('aoe', 'inc', 8),
+        m('aoe', 'inc', 5),
         m('damage', 'inc', 10, { tags: ['dot'], condition: { id: 'wieldingBow' } }),
       ],
     },
@@ -4526,7 +4479,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('int', 'base', 10),
       ],
     },
-    small: { name: 'Lesser damage', mods: [m('damage', 'inc', 4.7)] },
+    small: { name: 'Lesser damage', mods: [m('damage', 'inc', 7)] },
   },
   {
     id: 'g259',
@@ -4548,9 +4501,9 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Physical Damage with Two Handed Weapons with Melee',
       mods: [
-        m('damage', 'inc', 10, { damageTypes: ['physical'], tags: ['twoHand', 'melee'] }),
+        m('damage', 'inc', 12, { damageTypes: ['physical'], tags: ['twoHand', 'melee'] }),
         m('attackSpeed', 'inc', 3, { tags: ['twoHand', 'melee'] }),
-        m('damage', 'inc', 10, {
+        m('damage', 'inc', 12, {
           tags: ['dot', 'attackSkill'],
           condition: { id: 'wieldingTwoHand' },
         }),
@@ -4567,7 +4520,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Spoils of the Alley',
       mods: [m('life', 'inc', 6), m('lifeOnKill', 'base', 10)],
     },
-    small: { name: 'Maximum Life', mods: [m('life', 'inc', 4), m('lifeOnKill', 'base', 5)] },
+    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5), m('lifeOnKill', 'base', 5)] },
   },
   {
     id: 'g261',
@@ -4625,8 +4578,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Damage with Attacks while holding a Shield',
       mods: [
-        m('damage', 'inc', 12, { tags: ['attack'], condition: { id: 'holdingShield' } }),
-        m('damage', 'inc', 12, {
+        m('damage', 'inc', 10, { tags: ['attack'], condition: { id: 'holdingShield' } }),
+        m('damage', 'inc', 10, {
           tags: ['dot', 'attackSkill'],
           condition: { id: 'holdingShield' },
         }),
@@ -4650,7 +4603,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Lesser attack Speed',
-      mods: [m('attackSpeed', 'inc', 4), m('accuracy', 'inc', 10)],
+      mods: [m('attackSpeed', 'inc', 3), m('accuracy', 'inc', 10)],
     },
   },
   {
@@ -4660,7 +4613,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.555,
     smallCount: 2,
     notable: { name: 'Granite Sinew', mods: [m('str', 'base', 40), m('str', 'inc', 8)] },
-    small: { name: 'Lesser strength', mods: [m('str', 'base', 15)] },
+    small: { name: 'Lesser strength', mods: [m('str', 'base', 10)] },
   },
   {
     id: 'g266',
@@ -4707,7 +4660,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('maxResist.lightning', 'base', 1),
       ],
     },
-    small: { name: 'Maximum Energy Shield', mods: [m('es', 'inc', 6)] },
+    small: { name: 'Maximum Energy Shield', mods: [m('es', 'inc', 5)] },
   },
   {
     id: 'g268',
@@ -4732,7 +4685,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('dex', 'base', 20),
       ],
     },
-    small: { name: 'Projectile Speed', mods: [m('projectileSpeed', 'inc', 6.7)] },
+    small: { name: 'Projectile Speed', mods: [m('projectileSpeed', 'inc', 7)] },
   },
   {
     id: 'g270',
@@ -4740,7 +4693,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'mana',
     depth: 0.555,
     smallCount: 3,
-    notable: { name: 'Deep Well Chant', mods: [m('mana', 'inc', 15)] },
+    notable: { name: 'Deep Well Chant', mods: [m('mana', 'inc', 25)] },
     small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 8)] },
   },
   {
@@ -4804,7 +4757,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'mana',
     depth: 0.581,
     smallCount: 3,
-    notable: { name: 'Stoppered Reserve', mods: [m('mana', 'inc', 15)] },
+    notable: { name: 'Stoppered Reserve', mods: [m('mana', 'inc', 25)] },
     small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 8)] },
   },
   {
@@ -4846,11 +4799,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
       ],
     },
     small: {
-      name: 'Damage with Wands',
-      mods: [
-        m('damage', 'inc', 15, { tags: ['wand'] }),
-        m('damage', 'inc', 15, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingWand' } }),
-      ],
+      name: 'Critical Strike Chance with Wands',
+      mods: [m('critChance', 'inc', 20, { tags: ['wand'] })],
     },
   },
   {
@@ -4873,7 +4823,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       mods: [
         m('damage', 'inc', 10, { tags: ['axe'] }),
         m('critChance', 'inc', 20, { tags: ['axe'] }),
-        m('damage', 'inc', 10, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingAxe' } }),
+        m('damage', 'inc', 12, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingAxe' } }),
       ],
     },
   },
@@ -4915,8 +4865,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'life',
     depth: 0.667,
     smallCount: 2,
-    notable: { name: 'Bloodwell', mods: [m('life', 'inc', 5)] },
-    small: { name: 'Maximum Life', mods: [m('life', 'inc', 1.7)] },
+    notable: { name: 'Bloodwell', mods: [m('life', 'inc', 15)] },
+    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5)] },
   },
   {
     id: 'g281',
@@ -4956,7 +4906,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'misc',
     depth: 0.099,
     smallCount: 2,
-    notable: { name: 'Long Campaign', mods: [m('skillDuration', 'inc', 25)] },
+    notable: { name: 'Long Campaign', mods: [m('skillDuration', 'inc', 30)] },
     small: { name: 'Skill Effect Duration', mods: [m('skillDuration', 'inc', 10)] },
   },
   {
@@ -4973,7 +4923,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('damage', 'inc', 12, { damageTypes: ['physical'] }),
       ],
     },
-    small: { name: 'Evasion Rating', mods: [m('evasion', 'inc', 8), m('life', 'inc', 4)] },
+    small: { name: 'Evasion Rating', mods: [m('evasion', 'inc', 12), m('life', 'inc', 5)] },
   },
   {
     id: 'g285',
@@ -4985,7 +4935,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Forgeproof Blood',
       mods: [m('life', 'inc', 6), m('maxResist.fire', 'base', 1), m('resist.fire', 'base', 8)],
     },
-    small: { name: 'Maximum Life', mods: [m('life', 'inc', 4), m('resist.allEle', 'base', 3)] },
+    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5), m('resist.allEle', 'base', 4)] },
   },
   {
     id: 'g286',
@@ -5002,7 +4952,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Critical Strike Chance with Spells',
-      mods: [m('critChance', 'inc', 16.7, { tags: ['spell'] })],
+      mods: [m('critChance', 'inc', 15, { tags: ['spell'] })],
     },
   },
   {
@@ -5022,7 +4972,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Damage with Spells',
-      mods: [m('damage', 'inc', 10, { tags: ['spell'] }), m('aoe', 'inc', 5, { tags: ['spell'] })],
+      mods: [m('damage', 'inc', 7, { tags: ['spell'] }), m('aoe', 'inc', 5, { tags: ['spell'] })],
     },
   },
   {
@@ -5040,7 +4990,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Damage with Totem Skills',
-      mods: [m('damage', 'inc', 14, { tags: ['totem'] })],
+      mods: [m('damage', 'inc', 12, { tags: ['totem'] })],
     },
   },
   {
@@ -5053,7 +5003,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Tideflask Ritual',
       mods: [m('manaRegen', 'inc', 15), m('flaskCharges', 'inc', 15)],
     },
-    small: { name: 'Mana Recovery from Flasks', mods: [m('flaskManaRecovery', 'inc', 10)] },
+    small: { name: 'Mana Regeneration Rate', mods: [m('manaRegen', 'inc', 10)] },
   },
   {
     id: 'g290',
@@ -5065,7 +5015,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Keenhand Quiver',
       mods: [m('attackSpeed', 'inc', 8), m('accuracy', 'inc', 15), m('dex', 'base', 20)],
     },
-    small: { name: 'Lesser attack Speed', mods: [m('attackSpeed', 'inc', 2.7)] },
+    small: { name: 'Lesser attack Speed', mods: [m('attackSpeed', 'inc', 3)] },
   },
   {
     id: 'g291',
@@ -5167,7 +5117,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('int', 'base', 20),
       ],
     },
-    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5)] },
+    small: { name: 'Maximum Mana', mods: [m('mana', 'base', 20)] },
   },
   {
     id: 'g296',
@@ -5199,7 +5149,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.514,
     smallCount: 2,
     notable: { name: 'Unending Stacks', mods: [m('int', 'base', 40), m('int', 'inc', 8)] },
-    small: { name: 'Lesser intelligence', mods: [m('int', 'base', 15)] },
+    small: { name: 'Lesser intelligence', mods: [m('int', 'base', 10)] },
   },
   {
     id: 'g298',
@@ -5218,7 +5168,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Damage with Trap Skills',
       mods: [
         m('damage', 'inc', 16, { tags: ['trap'] }),
-        m('damage', 'inc', 16, { tags: ['mine'] }),
+        m('damage', 'inc', 14, { tags: ['mine'] }),
       ],
     },
   },
@@ -5256,12 +5206,12 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Physical Damage with Maces',
       mods: [
-        m('damage', 'inc', 10, { damageTypes: ['physical'], tags: ['mace'] }),
-        m('damage', 'inc', 10, { damageTypes: ['physical'], tags: ['sceptre'] }),
+        m('damage', 'inc', 14, { damageTypes: ['physical'], tags: ['mace'] }),
+        m('damage', 'inc', 14, { damageTypes: ['physical'], tags: ['sceptre'] }),
         m('critChance', 'inc', 20, { tags: ['mace'] }),
         m('critChance', 'inc', 20, { tags: ['sceptre'] }),
-        m('damage', 'inc', 10, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingMace' } }),
-        m('damage', 'inc', 10, {
+        m('damage', 'inc', 14, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingMace' } }),
+        m('damage', 'inc', 14, {
           tags: ['dot', 'attackSkill'],
           condition: { id: 'wieldingSceptre' },
         }),
@@ -5309,8 +5259,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'flask',
     depth: 0.179,
     smallCount: 2,
-    notable: { name: 'Poultice Moss', mods: [m('flaskLifeRecovery', 'inc', 15)] },
-    small: { name: 'Life Recovery from Flasks', mods: [m('flaskLifeRecovery', 'inc', 5)] },
+    notable: { name: 'Poultice Moss', mods: [m('flaskLifeRecovery', 'inc', 30)] },
+    small: { name: 'Life Recovery from Flasks', mods: [m('flaskLifeRecovery', 'inc', 10)] },
   },
   {
     id: 'g304',
@@ -5335,7 +5285,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Accuracy Rating with Daggers',
       mods: [
         m('accuracy', 'inc', 6, { tags: ['dagger'] }),
-        m('critChance', 'inc', 15, { tags: ['dagger'] }),
+        m('critChance', 'inc', 18, { tags: ['dagger'] }),
       ],
     },
   },
@@ -5357,7 +5307,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'The Damage over Time Multiplier with Bleeding',
       mods: [
         m('dotMulti', 'base', 3, { tags: ['bleed'] }),
-        m('damage', 'inc', 15, { tags: ['bleed'] }),
+        m('damage', 'inc', 25, { tags: ['bleed'] }),
       ],
     },
   },
@@ -5379,9 +5329,9 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Damage with Claws',
       mods: [
-        m('damage', 'inc', 10, { tags: ['claw'] }),
+        m('damage', 'inc', 8, { tags: ['claw'] }),
         m('critChance', 'inc', 15, { tags: ['claw'] }),
-        m('damage', 'inc', 10, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingClaw' } }),
+        m('damage', 'inc', 8, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingClaw' } }),
       ],
     },
   },
@@ -5400,7 +5350,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Lesser lightning Damage',
-      mods: [m('damage', 'inc', 15, { damageTypes: ['lightning'] })],
+      mods: [m('damage', 'inc', 10, { damageTypes: ['lightning'] })],
     },
   },
   {
@@ -5409,8 +5359,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'misc',
     depth: 0.624,
     smallCount: 2,
-    notable: { name: 'Tailwind Shaft', mods: [m('projectileSpeed', 'inc', 15)] },
-    small: { name: 'Projectile Speed', mods: [m('projectileSpeed', 'inc', 5)] },
+    notable: { name: 'Tailwind Shaft', mods: [m('projectileSpeed', 'inc', 25)] },
+    small: { name: 'Projectile Speed', mods: [m('projectileSpeed', 'inc', 7)] },
   },
   {
     id: 'g309',
@@ -5483,7 +5433,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Damage with Attacks while holding a Shield',
       mods: [
         m('damage', 'inc', 10, { tags: ['attack'], condition: { id: 'holdingShield' } }),
-        m('shieldDefences', 'inc', 30),
+        m('shieldDefences', 'inc', 40),
         m('damage', 'inc', 10, {
           tags: ['dot', 'attackSkill'],
           condition: { id: 'holdingShield' },
@@ -5520,7 +5470,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Plaguewarded Flesh',
       mods: [m('life', 'inc', 8), m('resist.chaos', 'base', 8), m('str', 'base', 10)],
     },
-    small: { name: 'Maximum Life', mods: [m('life', 'inc', 4), m('resist.chaos', 'base', 4)] },
+    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5), m('resist.chaos', 'base', 6)] },
   },
   {
     id: 'g314',
@@ -5539,7 +5489,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Attack Speed with Melee',
-      mods: [m('attackSpeed', 'inc', 1.3, { tags: ['melee'] })],
+      mods: [m('attackSpeed', 'inc', 1.5, { tags: ['melee'] })],
     },
   },
   {
@@ -5576,10 +5526,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('damage', 'inc', 5, { per: { stat: 'charges.fervour', div: 1 } }),
       ],
     },
-    small: {
-      name: 'Attack Speed per 1 charges.fervour',
-      mods: [m('attackSpeed', 'inc', 2, { per: { stat: 'charges.fervour', div: 1 } })],
-    },
+    small: { name: 'Fervour Charge Duration', mods: [m('chargeDuration.fervour', 'inc', 18)] },
   },
   {
     id: 'g317',
@@ -5646,7 +5593,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('aoe', 'inc', 40, { tags: ['trap'] }),
       ],
     },
-    small: { name: 'Damage with Trap Skills', mods: [m('damage', 'inc', 14, { tags: ['trap'] })] },
+    small: { name: 'Damage with Trap Skills', mods: [m('damage', 'inc', 16, { tags: ['trap'] })] },
   },
   {
     id: 'g320',
@@ -5664,13 +5611,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('poison.speed', 'inc', 5),
       ],
     },
-    small: {
-      name: 'Damage with Bleeding',
-      mods: [
-        m('damage', 'inc', 25, { tags: ['bleed'] }),
-        m('damage', 'inc', 25, { tags: ['poison'] }),
-      ],
-    },
+    small: { name: 'The Damage over Time Multiplier', mods: [m('dotMulti', 'base', 3)] },
   },
   {
     id: 'g321',
@@ -5740,7 +5681,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Damage with Axes',
       mods: [
-        m('damage', 'inc', 12, { tags: ['axe'] }),
+        m('damage', 'inc', 10, { tags: ['axe'] }),
         m('accuracy', 'inc', 8, { tags: ['axe'] }),
         m('damage', 'inc', 12, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingAxe' } }),
       ],
@@ -5770,7 +5711,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Lesser fire Damage',
-      mods: [m('damage', 'inc', 15, { damageTypes: ['fire'] })],
+      mods: [m('damage', 'inc', 10, { damageTypes: ['fire'] })],
     },
   },
   {
@@ -5793,13 +5734,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
       ],
     },
     small: {
-      name: 'Critical Strike Chance with Maces',
-      mods: [
-        m('critChance', 'inc', 20, { tags: ['mace'] }),
-        m('critChance', 'inc', 20, { tags: ['sceptre'] }),
-        m('critMulti', 'base', 16, { tags: ['mace'] }),
-        m('critMulti', 'base', 16, { tags: ['sceptre'] }),
-      ],
+      name: 'Accuracy Rating with Maces',
+      mods: [m('accuracy', 'inc', 8, { tags: ['mace'] })],
     },
   },
   {
@@ -5830,7 +5766,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'totem',
     depth: 0.572,
     smallCount: 2,
-    notable: { name: 'Roadside Effigy', mods: [m('damage', 'inc', 30, { tags: ['totem'] })] },
+    notable: { name: 'Roadside Effigy', mods: [m('damage', 'inc', 40, { tags: ['totem'] })] },
     small: {
       name: 'Damage with Totem Skills',
       mods: [
@@ -5861,7 +5797,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Pealing Bells',
       mods: [m('aoe', 'inc', 10), m('damage', 'inc', 20, { tags: ['area'] })],
     },
-    small: { name: 'Lesser area of Effect', mods: [m('aoe', 'inc', 10)] },
+    small: { name: 'Lesser area of Effect', mods: [m('aoe', 'inc', 5)] },
   },
   {
     id: 'g331',
@@ -5877,11 +5813,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
       ],
     },
     small: {
-      name: 'Critical Strike Chance with Trap Skills',
-      mods: [
-        m('critChance', 'inc', 20, { tags: ['trap'] }),
-        m('critChance', 'inc', 20, { tags: ['mine'] }),
-      ],
+      name: 'Critical Strike Multiplier with Trap Skills',
+      mods: [m('critMulti', 'base', 15, { tags: ['trap'] })],
     },
   },
   {
@@ -5899,7 +5832,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Critical Strike Chance with Spells',
-      mods: [m('critChance', 'inc', 20, { tags: ['spell'] })],
+      mods: [m('critChance', 'inc', 15, { tags: ['spell'] })],
     },
   },
   {
@@ -5913,11 +5846,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
       mods: [m('damage', 'inc', 30, { tags: ['channelling'] })],
     },
     small: {
-      name: 'Attack Speed with Channelling Skills',
-      mods: [
-        m('attackSpeed', 'inc', 5, { tags: ['channelling'] }),
-        m('castSpeed', 'inc', 5, { tags: ['channelling'] }),
-      ],
+      name: 'Damage with Channelling Skills',
+      mods: [m('damage', 'inc', 8, { tags: ['channelling'] })],
     },
   },
   {
@@ -5932,7 +5862,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Maximum Energy Shield',
-      mods: [m('es', 'base', 7), m('esRechargeRate', 'inc', 10)],
+      mods: [m('es', 'base', 5), m('esRechargeRate', 'inc', 10)],
     },
   },
   {
@@ -5950,7 +5880,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('int', 'base', 30),
       ],
     },
-    small: { name: 'Damage with Spells', mods: [m('damage', 'inc', 5.3, { tags: ['spell'] })] },
+    small: { name: 'Damage with Spells', mods: [m('damage', 'inc', 7, { tags: ['spell'] })] },
   },
   {
     id: 'g336',
@@ -5967,7 +5897,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       mods: [
         m('damage', 'inc', 12, { damageTypes: ['physical'], tags: ['wand'] }),
         m('attackSpeed', 'inc', 4, { tags: ['wand'] }),
-        m('damage', 'inc', 12, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingWand' } }),
+        m('damage', 'inc', 15, { tags: ['dot', 'attackSkill'], condition: { id: 'wieldingWand' } }),
       ],
     },
   },
@@ -5988,7 +5918,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Damage with Channelling Skills with Attacks',
       mods: [
         m('damage', 'inc', 10, { tags: ['channelling', 'attack'] }),
-        m('attackSpeed', 'inc', 3, { tags: ['channelling'] }),
+        m('attackSpeed', 'inc', 4, { tags: ['channelling'] }),
       ],
     },
   },
@@ -6068,7 +5998,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.601,
     smallCount: 2,
     notable: { name: 'Tall Pine Poise', mods: [m('dex', 'base', 40), m('dex', 'inc', 8)] },
-    small: { name: 'Lesser dexterity', mods: [m('dex', 'base', 15)] },
+    small: { name: 'Lesser dexterity', mods: [m('dex', 'base', 10)] },
   },
   {
     id: 'g342',
@@ -6112,8 +6042,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Attack Speed with Wands',
       mods: [
-        m('attackSpeed', 'inc', 3, { tags: ['wand'] }),
-        m('accuracy', 'inc', 6, { tags: ['wand'] }),
+        m('attackSpeed', 'inc', 4, { tags: ['wand'] }),
+        m('accuracy', 'inc', 10, { tags: ['wand'] }),
       ],
     },
   },
@@ -6127,7 +6057,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Slow Incense',
       mods: [m('manaRegen', 'inc', 40), m('lifeRegenPct', 'base', 1)],
     },
-    small: { name: 'Mana Regeneration Rate', mods: [m('manaRegen', 'inc', 13.3)] },
+    small: { name: 'Mana Regeneration Rate', mods: [m('manaRegen', 'inc', 10)] },
   },
   {
     id: 'g345',
@@ -6168,10 +6098,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
       ],
     },
     small: {
-      name: 'Elemental Damage with Staves',
-      mods: [
-        m('damage', 'inc', 16, { damageTypes: ['fire', 'cold', 'lightning'], tags: ['staff'] }),
-      ],
+      name: 'Accuracy Rating with Staves',
+      mods: [m('accuracy', 'inc', 6, { tags: ['staff'] })],
     },
   },
   {
@@ -6187,10 +6115,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('damage', 'inc', 5, { per: { stat: 'charges.grit', div: 1 } }),
       ],
     },
-    small: {
-      name: 'Attack Speed per 1 charges.fervour',
-      mods: [m('attackSpeed', 'inc', 2, { per: { stat: 'charges.fervour', div: 1 } })],
-    },
+    small: { name: 'Grit Charge Duration', mods: [m('chargeDuration.grit', 'inc', 18)] },
   },
   {
     id: 'g348',
@@ -6204,7 +6129,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     },
     small: {
       name: 'Damage Leeched as Mana with Attacks',
-      mods: [m('leech.mana', 'base', 0.4, { tags: ['attack'] }), m('leechRate', 'inc', 10)],
+      mods: [m('leech.mana', 'base', 0.4, { tags: ['attack'] }), m('leechRate', 'inc', 20)],
     },
   },
   {
@@ -6247,7 +6172,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Haloed Margin',
       mods: [m('aoe', 'inc', 30, { tags: ['aura'] }), m('auraEffect', 'inc', 6)],
     },
-    small: { name: 'Mana Reserved', mods: [m('reducedReservation', 'base', 4)] },
+    small: { name: 'Area of Effect with Auras', mods: [m('aoe', 'inc', 12, { tags: ['aura'] })] },
   },
   {
     id: 'g351',
@@ -6256,7 +6181,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     depth: 0.459,
     smallCount: 3,
     notable: { name: 'Humble Tithe', mods: [m('life', 'inc', 8), m('cost', 'inc', -6)] },
-    small: { name: 'Maximum Life', mods: [m('life', 'inc', 4), m('cost', 'inc', -3)] },
+    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5), m('cost', 'inc', -3)] },
   },
   {
     id: 'g352',
@@ -6273,7 +6198,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('lifeRegenPct', 'base', 1),
       ],
     },
-    small: { name: 'Maximum Mana', mods: [m('mana', 'inc', 8), m('flaskEffect', 'inc', 5)] },
+    small: { name: 'Maximum Life', mods: [m('life', 'inc', 5)] },
   },
   {
     id: 'g353',
@@ -6294,9 +6219,9 @@ export const GEN_CLUSTERS: GenCluster[] = [
     small: {
       name: 'Damage with Bows',
       mods: [
-        m('damage', 'inc', 15, { tags: ['bow'] }),
-        m('accuracy', 'inc', 6),
-        m('damage', 'inc', 15, { tags: ['dot'], condition: { id: 'wieldingBow' } }),
+        m('damage', 'inc', 10, { tags: ['bow'] }),
+        m('accuracy', 'inc', 10),
+        m('damage', 'inc', 10, { tags: ['dot'], condition: { id: 'wieldingBow' } }),
       ],
     },
   },
@@ -6348,7 +6273,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'crit',
     depth: 0.555,
     smallCount: 2,
-    notable: { name: "Falcon's Descent", mods: [m('critMulti', 'base', 30)] },
-    small: { name: 'Lesser critical Strike Chance', mods: [m('critChance', 'inc', 25)] },
+    notable: { name: "Falcon's Descent", mods: [m('critMulti', 'base', 40)] },
+    small: { name: 'Lesser critical Strike Multiplier', mods: [m('critMulti', 'base', 12)] },
   },
 ];

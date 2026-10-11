@@ -11,6 +11,7 @@ import { pathToFileURL } from 'node:url';
 import { format, resolveConfig } from 'prettier';
 import { modsText } from '../../src/mods/text';
 import type { ModT } from '../coverage/translate';
+import { balance, type BalanceReport } from './balance';
 import { buildClusters, loadOverrides, SECTOR_REGION, TREE_DIR } from './clusters';
 import { loadTreeRef } from './lines';
 import { asMods, deniedNames, loadAllNames } from './names';
@@ -49,10 +50,16 @@ const freeSmallName = (mods: ModT[]): string => {
   return denied.has(key(n)) ? `Lesser ${n.charAt(0).toLowerCase()}${n.slice(1)}` : n;
 };
 
-export async function render(): Promise<{ text: string; count: number; missing: number[] }> {
+export async function render(): Promise<{
+  text: string;
+  count: number;
+  missing: number[];
+  report: BalanceReport;
+}> {
   const ref = loadTreeRef();
   const names = loadAllNames();
-  const { built } = buildClusters(ref, loadOverrides());
+  const { built: translated } = buildClusters(ref, loadOverrides());
+  const { built, report } = balance(translated);
   const missing = built.filter((b) => !names[String(b.ref)]).map((b) => b.ref);
   const rows = built
     .filter((b) => names[String(b.ref)])
@@ -81,13 +88,18 @@ ${rows.join('\n')}
 ];
 `;
   const text = await format(raw, { ...(await resolveConfig(OUT)), filepath: OUT });
-  return { text, count: rows.length, missing };
+  return { text, count: rows.length, missing, report };
 }
 
 async function main(): Promise<void> {
-  const { text, count, missing } = await render();
+  const { text, count, missing, report } = await render();
   if (missing.length)
     console.log(`${missing.length} notables have no name yet; they are left out.`);
+  console.log(
+    `balance: ${report.normalised} small values made one value per stat, ${report.coherent} clusters given small nodes that match their notable, ${report.raised.length} notables raised to the floor, ${report.stillWeak.length} still under it`,
+  );
+  if (process.argv.includes('--report'))
+    for (const r of [...report.raised, ...report.stillWeak]) console.log('  ' + r);
   writeFileSync(OUT, text);
   console.log(`emitted ${count} clusters to ${OUT}`);
 }

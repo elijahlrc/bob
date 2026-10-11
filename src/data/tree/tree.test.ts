@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { bare } from '../../../scripts/coverage/reference';
 import { CLASSES } from '../classes';
 import { buildTree, EDGE_CLEARANCE, MIN_NODE_DIST, segDist } from './build';
+import { GEN_CLUSTERS } from './clustersGen';
 import { KEYSTONES } from './keystones';
+import { floorFor, modKey, powerOf, unitsOf } from './power';
 import { buildClusterSpecs } from './spec';
 
 const tree = buildTree();
@@ -148,6 +150,38 @@ describe('passive tree invariants (§9.3)', () => {
       .filter((n) => denied.has(bare(n.name)))
       .map((n) => n.name);
     expect(bad).toEqual([]);
+  });
+
+  it('a notable is worth more than a small node (docs/TREE-REDESIGN.md section 4)', () => {
+    const units = unitsOf(nodes.filter((n) => n.kind === 'small').flatMap((n) => n.mods));
+    const weak = nodes
+      .filter((n) => n.kind === 'notable')
+      .map((n) => ({ n, p: powerOf(n.mods, units) }))
+      .filter(({ n, p }) => p < floorFor(n.mods.length) - 1e-9)
+      .map(({ n, p }) => `${n.name} ${p.toFixed(2)}`);
+    expect(weak).toEqual([]);
+  });
+
+  it('the small nodes of a stat give one value, across the generated clusters', () => {
+    const seen = new Map<string, number>();
+    const odd: string[] = [];
+    for (const g of GEN_CLUSTERS)
+      for (const m of g.small.mods) {
+        const k = modKey(m);
+        if (seen.has(k) && seen.get(k) !== m.value) odd.push(`${g.small.name}: ${k}`);
+        seen.set(k, m.value);
+      }
+    expect(odd).toEqual([]);
+  });
+
+  it('the hub gives what any build wants: no weapon, skill-type or condition in its small nodes', () => {
+    const hub = nodes.filter((n) => n.kind === 'small' && n.cluster?.startsWith('hub'));
+    expect(hub.length).toBeGreaterThan(0);
+    for (const n of hub)
+      for (const m of n.mods) {
+        expect(m.tags ?? [], n.name).toEqual([]);
+        expect(m.condition, n.name).toBeUndefined();
+      }
   });
 
   it('is deterministic and pinned (snapshot)', () => {

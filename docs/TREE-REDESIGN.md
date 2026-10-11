@@ -467,3 +467,41 @@ Measured on `buildTree()` on 2026-10-11 (1,727 nodes). `tree:audit` (T0) reprodu
 - **Reference** (`pob-tree.json`): 536 groups, 303 with a notable, 206 without; smalls in road-only groups: 188 attribute, 95
   offence, 22 life, 14 other, 11 mana, 11 energy shield, 6 defence, 3 resistance; smalls in notable clusters: 546 offence, 85
   other, 76 life, 57 mana, 40 defence, 33 energy shield, 20 attribute, 17 resistance.
+
+---
+
+## 14. Progress
+
+### T0, tools (2026-10-11)
+
+`npm run tree:audit` (the measurements of section 13, for information; `docs/tree/audit-t0.txt` is the baseline), `npm run tree:pic`
+(a PNG of the tree or a region, no dependency: `scripts/tree/png.ts` is a small rasteriser with a bitmap font; `docs/screenshots/tree/t0-baseline.png`),
+`npm run tree:explore` (build with the tree from a terminal: `new`, `show`, `near`, `reach`, `region`, `find`, `alloc`, `unalloc`,
+`summary`, `legend`; the interface the T6.1 players use). The plan's user answers of the same day are folded into sections 3.3, 3.4,
+4.4, 5.1, 6, 8 and 11: no new backgrounds, no new nodes, locality as a tendency, wayside clusters, an open and mixed centre.
+
+### T1, charter (2026-10-11)
+
+`src/data/tree/charter.ts` (typed data, not `docs/tree/charter.json` as the plan said: the layout reads it at build time). 27 districts,
+four or five a region, each with groups, a template, a nexus (an existing cluster that pairs two groups, or none) and the keystones
+at its tip; 262 of the 357 clusters are in districts and 95 (27%) are wayside on purpose. `npm run tree:charter` prints the supply; `charter.test.ts` checks it (every
+id exists once, in its own region, districts of a region have different templates, every region keystone is placed once, wayside
+is between 15% and 50% of a region). The list was written by hand from the generated clusters, with the user's leave to choose
+the districts. Names are working titles and are not drawn.
+
+### T2, power and coherence (2026-10-11)
+
+`src/data/tree/power.ts` (units are the median of the small nodes of the same line; stats no small node gives have hand-set fallbacks;
+counted stats such as a maximum charge are priced per +1) and `scripts/tree/balance.ts`, run by `npm run tree:emit` after the
+translation (`--report` lists every change):
+
+- 196 small-node values were made one value per line (maximum life 1.7/3/4/5 became 5; energy shield 5; armour and evasion 12);
+- 63 clusters whose small nodes shared no stat with their notable were given small nodes that match it (3 could not be: they stay);
+- 30 notables under the floor were raised to it (no line was added; values only, so Bloodwell 5% life became 15%);
+- the hub's themes are generic (`hubLife`, `hubDamage`, `hubRes`, `hubMana`, `hubEs`, `hubDefence`); the three hand-made notables
+  below the floor (priced as "more" damage) were fixed by the fallback and their small nodes brought to the units.
+
+Node ids and the layout are unchanged, so saves load as before. New tests in `tree.test.ts`: every notable at least the floor (units
+measured from the tree's own small nodes), one value per line across the generated clusters, no tag or condition in the hub's small
+nodes. Bot sample (8 runs a class, seed 5, scaling 1.5, before and after; `scripts/simpar.sh`): median map reached 10 → 12.5
+(vanguard), 10 → 10, 4.5 → 5, 10 → 10, 6.5 → 6.5, 15 → 14.5 (shade); no class collapsed, and eight runs cannot tell more.
