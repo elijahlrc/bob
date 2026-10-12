@@ -899,7 +899,7 @@ look at every boss for regeneration that can lock a build out.
   (`BOSS_MAP_NO_AFFIX`, so the offer does not name an affix that does nothing), and a boss's own mending pauses while it is
   hurt and for 2 s after (`MEND_PAUSE`, `mayMend` in `sim/bosses.ts`). That covers the Rotwife's regrowth and the Unmaker's
   drink of the flasks. Both are now a price for a pause (a build that is out of mana and standing back), not a wall.
-- **The Courser:** life 0.4 to 0.28 of toughness, damage 0.55 to 0.8, the gallop runs up to 16 tiles (was 11, so across
+- **The Courser:** life 0.4 to 0.28 of toughness, damage 0.55 to 0.8 (then, the same day, life doubled to 0.56 and damage to 1.0), the gallop runs up to 16 tiles (was 11, so across
   the whole arena), and the body strides, bobs and swings its lance about a half as far again.
 - **Not changed:** the other map affixes that harden a boss (Hardy, the resistance ones, Unyielding) still apply: they are
   the map's price and pay their reward.

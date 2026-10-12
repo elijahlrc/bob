@@ -932,7 +932,7 @@ champions now end ordinary maps in the place of the end-of-map rare (from map 5)
 
 The Courser was unbeatable out of mana: the Mending map affix (2% of life a second) reached it. A map's regeneration no longer
 reaches any boss, a boss map never rolls Mending, and a boss that mends itself (the Rotwife, the Unmaker's drink) does not
-while it is being hurt or for 2 s after (rule 10). The Courser has less life (0.28), hits harder (0.8), gallops up to 16
+while it is being hurt or for 2 s after (rule 10). The Courser has life 0.56 (cut to 0.28, then doubled), hits harder (1.0), gallops up to 16
 tiles, and strides, bobs and swings its lance further.
 
 ### Passive tree redesign (docs/TREE-REDESIGN.md), T0 to T5 built (2026-10-11)
