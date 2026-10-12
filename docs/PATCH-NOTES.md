@@ -10,6 +10,9 @@ the docs each entry links to.
 - Every region of the tree has its own shape and themed districts, and you can reach any region through the middle.
 - Notables are stronger relative to small nodes, and clusters make more sense.
 - Search box on the passive tree screen.
+- Neighbouring regions of the tree now connect half way out and near the edge, not only through the middle; long roads have
+  side entrances; the paths around the class starts are tidier. Your passives are refunded again.
+- New tree colours and icons for spells, energy shield and generic damage (previously shown as mana and attack).
 - Steady Draw is no longer neutral (35% more damage), and several keystone cards now show their numbers.
 
 ## 2026-10-10

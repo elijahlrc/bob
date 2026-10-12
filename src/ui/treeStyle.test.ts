@@ -33,6 +33,18 @@ describe('how the passive tree is drawn', () => {
     ).toBe('cold');
   });
 
+  it('tells mana, spells and energy shield apart, and damage for every build from an attack’s', () => {
+    const tone = (m: ReturnType<typeof mod>) => toneOf({ kind: 'small', mods: [m] });
+    expect(tone(mod('mana', 'inc', 8))).toBe('mana');
+    expect(tone(mod('damage', 'inc', 10, { tags: ['spell'] }))).toBe('spell');
+    expect(tone(mod('castSpeed', 'inc', 4))).toBe('spell');
+    expect(tone(mod('es', 'inc', 6))).toBe('es');
+    expect(tone(mod('damage', 'inc', 10))).toBe('damage');
+    expect(tone(mod('damage', 'inc', 10, { tags: ['bow'] }))).toBe('attack');
+    expect(tone(mod('damage', 'inc', 10, { tags: ['mine'] }))).toBe('minion');
+    expect(tone(mod('dotMulti', 'more', 10, { tags: ['poison'] }))).toBe('chaos');
+  });
+
   it('keeps a floor on the size of a node on screen, and grows nothing that is already large enough', () => {
     expect(shapeScale('small', 0.22) * NODE_RADIUS.small * 0.22).toBeGreaterThanOrEqual(2.99);
     expect(shapeScale('notable', 1)).toBe(1);

@@ -10,7 +10,10 @@ export type Tone =
   | 'life'
   | 'defence'
   | 'evasion'
+  | 'es'
+  | 'damage'
   | 'attack'
+  | 'spell'
   | 'crit'
   | 'mana'
   | 'fire'
@@ -30,16 +33,19 @@ export const TONE_COLOR: Record<Tone, string> = {
   life: '#e0604f',
   defence: '#a9b6c8',
   evasion: '#6fc46a',
+  es: '#a8c8ff',
+  damage: '#ece4d4',
   attack: '#e29a3c',
+  spell: '#9b7bff',
   crit: '#f0d060',
-  mana: '#5b8cf0',
+  mana: '#4d8ef5',
   fire: '#f0703a',
   cold: '#5ccff0',
   lightning: '#f4ee58',
-  chaos: '#b068e0',
+  chaos: '#c45ad6',
   physical: '#cdb08a',
   minion: '#44c8a8',
-  curse: '#d072c4',
+  curse: '#e6789e',
   utility: '#9aa2ac',
   str: '#d8654a',
   dex: '#6cc070',
@@ -52,7 +58,11 @@ export const TONE_GLYPH: Record<Tone, string> = {
   life: 'M-3,-9H3V-3H9V3H3V9H-3V3H-9V-3H-3Z',
   defence: 'M0,-10L9,-6V1C9,6 4,9 0,11C-4,9 -9,6 -9,1V-6Z',
   evasion: 'M-9,7L0,-9L9,7L0,2Z',
+  es: 'M0,-10.5A10.5,10.5 0 1 1 0,10.5A10.5,10.5 0 1 1 0,-10.5ZM0,-5.5A5.5,5.5 0 1 0 0,5.5A5.5,5.5 0 1 0 0,-5.5Z',
+  damage:
+    'M0,-11L2.5,-5.5L7.8,-7.8L5.5,-2.5L11,0L5.5,2.5L7.8,7.8L2.5,5.5L0,11L-2.5,5.5L-7.8,7.8L-5.5,2.5L-11,0L-5.5,-2.5L-7.8,-7.8L-2.5,-5.5Z',
   attack: 'M0,-11L3,-6V3H8V6H3V11H-3V6H-8V3H-3V-6Z',
+  spell: 'M0,-11L2.6,-3.6H10.5L4.1,1.3L6.5,9L0,4.3L-6.5,9L-4.1,1.3L-10.5,-3.6H-2.6Z',
   crit: 'M0,-11L2.5,-2.5L11,0L2.5,2.5L0,11L-2.5,2.5L-11,0L-2.5,-2.5Z',
   mana: 'M0,-11C5,-4 8,0 8,4A8,8 0 0 1 -8,4C-8,0 -5,-4 0,-11Z',
   fire: 'M0,-11C3,-6 8,-3 8,3A8,8 0 0 1 -8,3C-8,-1 -5,-3 -3,-6C-2,-3 0,-4 0,-11Z',
@@ -74,9 +84,12 @@ export const TONE_LABEL: [Tone, string][] = [
   ['life', 'Life and recovery'],
   ['defence', 'Armour, block, resistances'],
   ['evasion', 'Evasion and movement'],
-  ['attack', 'Attack and projectiles'],
+  ['es', 'Energy shield'],
+  ['mana', 'Mana and reservation'],
+  ['damage', 'Damage of every kind'],
+  ['attack', 'Attacks, weapons, accuracy'],
+  ['spell', 'Spells and cast speed'],
   ['crit', 'Critical strikes, penetration'],
-  ['mana', 'Mana, energy shield, spells'],
   ['fire', 'Fire'],
   ['cold', 'Cold'],
   ['lightning', 'Lightning'],
@@ -99,22 +112,29 @@ function toneOfMod(m: Mod): Tone | null {
     const t = m.damageTypes?.[0];
     if (t === 'fire' || t === 'cold' || t === 'lightning' || t === 'chaos' || t === 'physical')
       return t;
-    const tags = m.tags ?? [];
-    if (tags.includes('spell')) return 'mana';
-    if (tags.includes('minion') || tags.includes('totem') || tags.includes('trap')) return 'minion';
+    const tags: readonly string[] = m.tags ?? [];
+    if (tags.includes('spell')) return 'spell';
+    if (['minion', 'totem', 'trap', 'mine', 'brand'].some((x) => tags.includes(x))) return 'minion';
     for (const e of ['fire', 'cold', 'lightning'] as const) if (tags.includes(e)) return e;
     if (tags.includes('poison') || tags.includes('chaos')) return 'chaos';
     if (tags.includes('bleed')) return 'physical';
     if (tags.includes('dot')) return 'chaos';
-    return 'attack';
+    // Damage of no kind at all is for every build; anything else here (attacks, a weapon, melee, projectiles) is an attack's.
+    return tags.length ? 'attack' : 'damage';
+  }
+  if (s === 'dotMulti') {
+    const t = m.damageTypes?.[0];
+    if (t === 'fire' || t === 'cold' || t === 'lightning' || t === 'physical') return t;
+    return m.tags?.includes('bleed') ? 'physical' : 'chaos';
   }
   if (/^(life|leech\.life|lifeRegen|lifeOn|recover)/.test(s)) return 'life';
   if (/^(armour|block|physReduction|stun|enemyStun|shieldDef|resist|maxResist|damageTaken)/.test(s))
     return 'defence';
   if (/^(evasion|evade|dodge|moveSpeed)/.test(s)) return 'evasion';
   if (/^(critChance|critMulti|penetration|neverCrit)/.test(s)) return 'crit';
-  if (/^(mana|es|shieldEs|castSpeed|reducedReservation|cost|leech\.mana|esRecharge)/.test(s))
-    return 'mana';
+  if (/^(es|shieldEs|esRecharge|leechToES|regenToES)/.test(s)) return 'es';
+  if (/^castSpeed/.test(s)) return 'spell';
+  if (/^(mana|reducedReservation|cost|leech\.mana)/.test(s)) return 'mana';
   if (/^(minion|deploy|totem|trap|mine)/.test(s)) return 'minion';
   if (/^(curse|aura|hexLimit)/.test(s)) return 'curse';
   if (/^(flask|charge|maxCharges|buffOn)/.test(s)) return 'utility';
@@ -123,7 +143,7 @@ function toneOfMod(m: Mod): Tone | null {
   if (/shock|\.lightning/.test(s)) return 'lightning';
   if (/poison|chaos/.test(s)) return 'chaos';
   if (/bleed|impale|physical/.test(s)) return 'physical';
-  if (/^(attackSpeed|accuracy|projectile|aoe|dotMulti|ailment)/.test(s)) return 'attack';
+  if (/^(attackSpeed|accuracy|projectile|aoe|ailment)/.test(s)) return 'attack';
   return null;
 }
 

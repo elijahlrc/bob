@@ -29,7 +29,7 @@ import { makeOffer, rollOffers, type MapOffer } from './offers';
 
 export { rollThemes } from './offers';
 
-export const SAVE_VERSION = 11;
+export const SAVE_VERSION = 12;
 export const TOTAL_MAPS = 100;
 
 export type MapRecord = {

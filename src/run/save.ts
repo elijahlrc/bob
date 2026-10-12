@@ -44,9 +44,10 @@ export function loadRun(store: KeyValueStore, key: string = SAVE_KEY): LoadResul
  */
 export function migrate(version: number, run: RunState): RunState | null {
   if (version === SAVE_VERSION) return run;
-  // Version 10 has the passive tree of before docs/TREE-REDESIGN.md (roads, districts): its node ids mean other nodes now, so
-  // the allocated passives are handed back as unspent points.
-  if (version === 10) {
+  // Version 10 has the passive tree of before docs/TREE-REDESIGN.md (roads, districts), and version 11 the one of before its
+  // iteration 3 (crossings between regions, forks from the middle): their node ids mean other nodes now, so the allocated
+  // passives are handed back as unspent points.
+  if (version === 10 || version === 11) {
     run.version = SAVE_VERSION;
     run.build = { ...run.build, allocated: [] };
     return run;

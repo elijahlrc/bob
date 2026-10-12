@@ -8,7 +8,7 @@
 import { DISTRICTS } from '../../src/data/tree/charter';
 import { frameOf, shapeOfDistrict } from '../../src/data/tree/layout';
 import { PLACEMENT } from '../../src/data/tree/plan';
-import { HUB_RADIUS, REGIONS, START_RADIUS } from '../../src/data/tree/spec';
+import { REGIONS, START_RADIUS } from '../../src/data/tree/spec';
 
 type Vec = [number, number];
 /** How far a district's clusters reach from its junctions, and what to leave between two districts and at the wedge's edges. */
@@ -19,7 +19,6 @@ const EDGE = 150;
 const only = process.argv.slice(2);
 const out: string[] = [];
 const links: string[] = [];
-const hubLinks: string[] = [];
 for (const reg of REGIONS) {
   if (only.length && !only.includes(reg.id)) continue;
   const axis = (reg.angle * Math.PI) / 180;
@@ -101,27 +100,10 @@ for (const reg of REGIONS) {
     if (other && i > 1) rl.push(`    ['${other.t.name}', '${other.m.name}'],`);
   });
   links.push(`  ${reg.id}: [`, ...rl, '  ],');
-  // The middle's ring reaches the first district at the two junctions either side of the class's own.
-  const core = placed[0];
-  const k0 = ((Math.round(reg.angle / 30) % 12) + 12) % 12;
-  const near = (k: number) => {
-    const at: Vec = [
-      HUB_RADIUS * Math.cos((k * Math.PI) / 6),
-      HUB_RADIUS * Math.sin((k * Math.PI) / 6),
-    ];
-    return Object.entries(core.gates).sort((a, b) => dist(a[1], at) - dist(b[1], at))[0][0];
-  };
-  const hl = [(k0 + 11) % 12, (k0 + 1) % 12].map((k) => `    [${k}, '${core.id}:${near(k)}'],`);
-  hubLinks.push(`  ${reg.id}: [`, ...hl, '  ],');
 }
 console.log('export const PLACEMENT: Record<string, Placement> = {\n' + out.join('\n') + '\n};\n');
 console.log(
   'export const REGION_LINKS: Partial<Record<RegionId, [string, string][]>> = {\n' +
     links.join('\n') +
     '\n};\n',
-);
-console.log(
-  'export const HUB_LINKS: Partial<Record<RegionId, [number, string][]>> = {\n' +
-    hubLinks.join('\n') +
-    '\n};',
 );

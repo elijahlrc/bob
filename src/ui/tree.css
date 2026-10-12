@@ -242,6 +242,12 @@ svg.tree.z-k .lb.start {
   height: 10px;
   border-radius: 50%;
 }
+/* The colour of a tone with the emblem its notables carry. */
+.tree-legend svg.glyph {
+  width: 13px;
+  height: 13px;
+  flex: none;
+}
 .tree-legend i.sq {
   border: 2px solid #9a8a6a;
   background: transparent;

@@ -98,17 +98,3 @@ export const REGION_LINKS: Partial<Record<RegionId, [string, string][]>> = {
     ['pyreAndStorm:arm0', 'cassock:out'],
   ],
 };
-
-/**
- * Where the ring road of the middle meets a region besides its class start: the ring's junctions either side of the class's
- * (numbered round from the right, thirty degrees each). A road from each goes to the nearest gate of the region's districts that
- * it can reach. A class start cannot be walked through, so without these a region would be shut behind its own start.
- */
-export const HUB_LINKS: Partial<Record<RegionId, number[]>> = {
-  int: [8, 10],
-  dexint: [0, 11],
-  dex: [0, 2],
-  strdex: [2, 4],
-  str: [4, 6],
-  strint: [6, 8],
-};

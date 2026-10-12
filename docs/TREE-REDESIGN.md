@@ -535,7 +535,7 @@ Two rounds of twelve agents each (24 builds of about 100 points, home and agains
 
 **Round 1** found that nine of twelve could not leave their own region: a class start cannot be walked through, and a region's only
 door was its own start (1,667 to 1,759 of 2,165 nodes out of reach; the old connectivity test let paths run through starts). Fixed
-with two roads from the ring of the middle into every region (`HUB_LINKS`) and a test that walks the tree as a player does. Also:
+with two roads from the ring of the middle into every region (then `HUB_LINKS`; since iteration 3, forks) and a test that walks the tree as a player does. Also:
 roads were half +10 attribute nodes (now one in three, junctions are small nodes of the region's stats, roads 215 apart, no accuracy
 filler on dex roads), Steady Draw was exactly neutral (35% more damage now), keystone cards lacked their numbers, "per 1
 charges.grit" leaked into text. Declined: "make starts passable" (the roads are the fix), "a notable beside every start".
@@ -549,3 +549,33 @@ a Mystic, minion block near the minions; and a game rule, three players' complai
 
 What the audit changed in the plan: the plan expected the layout to be judged on its look; the players judged it on whether they
 could get where they meant to go, and the biggest defect was one the tests did not know to look for. The tests now say it.
+
+### Iteration 3, crossings and forks (2026-10-11)
+
+The user's review of the built tree, three points, to be met by small changes rather than a new layout:
+
+1. **The regions met only in the middle**, which shut out builds across two regions. Now `bridges` (`layout.ts`) joins each pair of
+   neighbouring regions with a road half way out (1,700 to 3,000 from the centre) and one near the rim (beyond 3,300), between the
+   nearest road nodes of the two sides that have room (a road node on at most two roads and with at most three links, so no node
+   becomes a star), straight or with one bend. Eleven of the twelve are built (dex and strdex have no room half way out; they meet at
+   the fork, below).
+2. **The paths around the starts were ugly.** The ring sent two roads from each junction between two classes, one into each
+   region, to the nearest gate: they ran as long diagonals beside the starts, three nearly parallel lines meeting past every start.
+   Now `gateways` sends one road from each of those junctions straight out along the line between the two regions to a fork (1,000
+   to 1,400 from the centre), and from the fork one short road into each region. `HUB_LINKS` is gone.
+3. **Long roads could be entered only at their ends; honeycombs were so connected no path was a choice.** A district wider than
+   1,100 with fewer than three ways in gets a side door from its junction farthest from them, and once the tree is laid
+   (`chainDoors`, after the crossings) every road of nine nodes or more each on two roads gets one from its middle, to the nearest
+   road within 900 that is at least nine steps away by road. A honeycomb (`knot`) keeps a tree through its corners and about a
+   third of its other sides, by a hash, and drops corners left as empty dead ends.
+
+Measured, before and after: roads between regions outside the middle 0 and 11 (plus the six forks); roads of nine nodes or
+more with nothing along them 3 and 0 (longest 13 and 7); loops of roads inside int 16 and 8, strdex 14 and 8, str 14 and 7; from an
+outer notable (beyond 2,500) to the nearest outer notable of the next region, median steps 31 to 41 and 16 to 22; from a start to
+the nearest district of another region 12 to 16 and 7 to 13 steps. 2,052 nodes (was 2,032). `SAVE_VERSION` 12 hands passives
+back again. The three crossing edges inside overlapping clusters were there before and still are.
+
+The tree screen also reads better at a glance: three more colours, each with its own emblem in the legend: **spells** (violet,
+a star; spell damage and cast speed, which were mana's), **energy shield** (pale blue, a ring; was mana's) and **damage of every
+kind** (warm white, a burst; untyped damage, which was coloured as an attack). Damage-over-time multipliers are chaos's (poison) or
+their element's, and mine damage is the minions' and deployables', as trap and totem damage were.

@@ -18,10 +18,11 @@ import {
   segDist,
   travel,
   type Builder,
+  type RoadOptions,
 } from './builder';
 import { DISTRICTS, districtOf, type District } from './charter';
 import { GEN_CLUSTERS } from './clustersGen';
-import { HUB_LINKS, PLACEMENT, REGION_LINKS } from './plan';
+import { PLACEMENT, REGION_LINKS } from './plan';
 import { THEMES } from './notableThemes';
 import { modKey, unitsOf } from './power';
 import { ROAD_POOLS } from './roads';
@@ -230,6 +231,49 @@ function knot(ms: Member[]): Shape {
     const pick = n === 0 ? corners[hashOf(who[0]?.id ?? 'x') % 6] : ranked[0];
     if (who[n]) slots.push({ member: who[n], j: pick, at: [cx, cy], hug: true });
   });
+  // Not every side of every cell is a road (a full mesh made every way as good as another): a tree through the corners and about a
+  // third of the other sides, chosen by a hash; then corners left as empty dead ends are dropped.
+  const parent = junctions.map((_, i) => i);
+  const find = (x: number): number => (parent[x] === x ? x : (parent[x] = find(parent[x])));
+  const byHash = [...edges].sort(
+    (p, q) => hashOf(`side ${p[0]}-${p[1]}`) - hashOf(`side ${q[0]}-${q[1]}`) || p[0] - q[0],
+  );
+  let kept: [number, number][] = byHash.filter(([a, c]) => {
+    const ra = find(a);
+    const rc = find(c);
+    if (ra !== rc) {
+      parent[ra] = rc;
+      return true;
+    }
+    return hashOf(`loop ${a}-${c}`) % 100 < 34;
+  });
+  const hung = new Set(slots.map((s) => s.j));
+  for (let before = -1; kept.length !== before;) {
+    before = kept.length;
+    const deg = junctions.map(() => 0);
+    for (const [a, c] of kept) {
+      deg[a]++;
+      deg[c]++;
+    }
+    kept = kept.filter(
+      ([a, c]) => !((deg[a] === 1 && !hung.has(a)) || (deg[c] === 1 && !hung.has(c))),
+    );
+  }
+  const used = new Set(kept.flat());
+  for (const j of hung) used.add(j);
+  const newId = new Map<number, number>();
+  const kj: Vec[] = [];
+  junctions.forEach((p, i) => {
+    if (used.has(i)) {
+      newId.set(i, kj.length);
+      kj.push(p);
+    }
+  });
+  junctions.length = 0;
+  junctions.push(...kj);
+  edges.length = 0;
+  edges.push(...kept.map(([a, c]) => [newId.get(a)!, newId.get(c)!] as [number, number]));
+  for (const s of slots) s.j = newId.get(s.j)!;
   const best = (f: (a: Vec) => number) =>
     junctions.reduce((m, p, id) => (f(p) < f(junctions[m]) ? id : m), 0);
   const gates = {
@@ -479,11 +523,138 @@ function junctionNode(
   );
 }
 
+/** A road between two nodes: straight if it can be, else bending round what is in the way through one junction to the side. */
+function connect(b: Builder, from: number, to: number, opts: RoadOptions): boolean {
+  if (travel(b, [from], [to], opts)) return true;
+  const A = b.nodes[from];
+  const B = b.nodes[to];
+  const dx = B.x - A.x;
+  const dy = B.y - A.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const [nx, ny] = [-dy / len, dx / len];
+  for (const off of [
+    140, -140, 260, -260, 400, -400, 560, -560, 760, -760, 1000, -1000, 1300, -1300,
+  ])
+    for (const t of [0.5, 0.35, 0.65, 0.25, 0.75, 0.15, 0.85, 0.05, 0.95]) {
+      const wx = A.x + dx * t + nx * off;
+      const wy = A.y + dy * t + ny * off;
+      if (!pointClear(b, wx, wy)) continue;
+      const L = b.nodes.length;
+      const E = b.edges.length;
+      const at = opts.attrs[L % opts.attrs.length];
+      const w = addNode(
+        b,
+        'travel',
+        ATTR_NAME[at],
+        [mod(at, 'base', 10)],
+        wx,
+        wy,
+        undefined,
+        opts.district,
+      );
+      if (travel(b, [from], [w], opts) && travel(b, [w], [to], opts)) return true;
+      rollback(b, L, E);
+    }
+  return false;
+}
+
+/**
+ * A node a new road may join: a road node (not of a cluster, not a start) on at most two roads, and with at most three links in
+ * all (a cluster hung from it counts), so that no node becomes a star.
+ */
+const joinable = (b: Builder, id: number): boolean => {
+  const n = b.nodes[id];
+  if (n.cluster || (n.kind !== 'small' && n.kind !== 'travel') || n.links.length > 3) return false;
+  return n.links.filter((m) => !b.nodes[m].cluster).length <= 2;
+};
+
+/** Distances in steps from a node, as far as `limit`. */
+function graphSteps(b: Builder, from: number, limit: number): Map<number, number> {
+  const d = new Map<number, number>([[from, 0]]);
+  const q = [from];
+  for (let h = 0; h < q.length; h++) {
+    const x = q[h];
+    if (d.get(x)! >= limit) continue;
+    for (const m of b.nodes[x].links)
+      if (!d.has(m)) {
+        d.set(m, d.get(x)! + 1);
+        q.push(m);
+      }
+  }
+  return d;
+}
+
+/** A road from a node to the nearest of `cands` that is near on the map but far by road (iteration 3: a way in from the side). */
+function sideDoor(b: Builder, from: number, cands: number[], opts: RoadOptions): boolean {
+  const near = graphSteps(b, from, 9);
+  const F = b.nodes[from];
+  return cands
+    .filter((i) => !near.has(i))
+    .map((i) => ({ i, d: Math.hypot(b.nodes[i].x - F.x, b.nodes[i].y - F.y) }))
+    .filter((c) => c.d <= 900)
+    .sort((p, q) => p.d - q.d || p.i - q.i)
+    .slice(0, 8)
+    .some((c) => connect(b, from, c.i, opts));
+}
+
+/**
+ * Long roads with nothing along them (nine nodes or more, each on two roads only) get a road from their middle to the nearest
+ * road near by, in whichever region it is. Run once the whole tree is laid, so that the crossings between regions count too.
+ */
+function chainDoors(b: Builder): void {
+  const isRoad = (i: number) => !b.nodes[i].cluster && b.nodes[i].kind !== 'start';
+  const roadNbrs = (i: number) => b.nodes[i].links.filter(isRoad);
+  const seen = new Set<number>();
+  const chains: number[][] = [];
+  for (let i = 0; i < b.nodes.length; i++) {
+    if (!isRoad(i) || b.nodes[i].region === 'hub' || seen.has(i) || roadNbrs(i).length !== 2)
+      continue;
+    // Walk both ways along nodes on two roads.
+    const sides: number[][] = [];
+    seen.add(i);
+    for (const dir of roadNbrs(i)) {
+      let prev = i;
+      let cur = dir;
+      const part: number[] = [];
+      while (isRoad(cur) && !seen.has(cur) && roadNbrs(cur).length === 2) {
+        seen.add(cur);
+        part.push(cur);
+        const next = roadNbrs(cur).find((m) => m !== prev)!;
+        prev = cur;
+        cur = next;
+      }
+      sides.push(part);
+    }
+    const chain = [...(sides[0] ?? []).reverse(), i, ...(sides[1] ?? [])];
+    if (chain.length >= 9) chains.push(chain);
+  }
+  for (const chain of chains) {
+    const set = new Set(chain);
+    // The middle first, then its neighbours along the road.
+    const mid = Math.floor(chain.length / 2);
+    const order = [0, 1, -1, 2, -2].map((o) => chain[mid + o]).filter((x) => x !== undefined);
+    const cands = b.nodes
+      .filter((n) => !set.has(n.id) && n.region !== 'hub' && joinable(b, n.id))
+      .map((n) => n.id);
+    for (const from of order) {
+      const reg = REGIONS.find((r) => r.id === b.nodes[from].region);
+      if (!reg) continue;
+      const before = b.nodes.length;
+      const ok = sideDoor(b, from, cands, {
+        attrs: reg.attrs,
+        pool: ROAD_POOLS[reg.id],
+        spacing: ROAD_STEP,
+      });
+      for (let k = before; k < b.nodes.length; k++) b.nodes[k].region = reg.id;
+      if (ok) break;
+    }
+  }
+}
+
 function layoutRegion(
   b: Builder,
   reg: RegionDef,
   start: number,
-  ring: number[],
   dropped: string[],
   unplaced: string[],
 ): void {
@@ -499,43 +670,7 @@ function layoutRegion(
   const road = (from: number, to: number, district?: string, tag = '', quiet = false): boolean => {
     const before = b.nodes.length;
     const why: string[] = [];
-    const opts = { attrs: reg.attrs, pool, spacing: ROAD_STEP, district, why };
-    let ok = travel(b, [from], [to], opts);
-    if (!ok) {
-      // Blocked: bend round it, through a junction to one side of the straight line.
-      const A = b.nodes[from];
-      const B = b.nodes[to];
-      const dx = B.x - A.x;
-      const dy = B.y - A.y;
-      const len = Math.hypot(dx, dy) || 1;
-      const [nx, ny] = [-dy / len, dx / len];
-      search: for (const off of [
-        140, -140, 260, -260, 400, -400, 560, -560, 760, -760, 1000, -1000, 1300, -1300,
-      ])
-        for (const t of [0.5, 0.35, 0.65, 0.25, 0.75, 0.15, 0.85, 0.05, 0.95]) {
-          const wx = A.x + dx * t + nx * off;
-          const wy = A.y + dy * t + ny * off;
-          if (!pointClear(b, wx, wy)) continue;
-          const L = b.nodes.length;
-          const E = b.edges.length;
-          const at = reg.attrs[L % reg.attrs.length];
-          const w = addNode(
-            b,
-            'travel',
-            ATTR_NAME[at],
-            [mod(at, 'base', 10)],
-            wx,
-            wy,
-            undefined,
-            district,
-          );
-          if (travel(b, [from], [w], opts) && travel(b, [w], [to], opts)) {
-            ok = true;
-            break search;
-          }
-          rollback(b, L, E);
-        }
-    }
+    const ok = connect(b, from, to, { attrs: reg.attrs, pool, spacing: ROAD_STEP, district, why });
     if (!ok && !quiet) dropped.push(`${tag} ${from}-${to} (${why[0] ?? '?'})`);
     for (let i = before; i < b.nodes.length; i++) roads.push(i);
     return ok;
@@ -627,21 +762,44 @@ function layoutRegion(
   };
   for (const [from, to] of REGION_LINKS[reg.id] ?? [])
     road(ref(from), ref(to), undefined, `${from}>${to}`);
-  // The middle's ring reaches the region besides its class start (a start cannot be walked through): a road from each of two
-  // junctions of the ring to the nearest gate of the region's districts that it can reach, the straight way first.
-  for (const k of HUB_LINKS[reg.id] ?? []) {
-    const from = b.nodes[ring[k]];
-    const gates = [...junctionIds.entries()]
-      .flatMap(([d, ids]) => Object.values(shapes.get(d)!.shape.gates).map((j) => ids[j]))
-      .sort(
-        (p, q) =>
-          Math.hypot(b.nodes[p].x - from.x, b.nodes[p].y - from.y) -
-          Math.hypot(b.nodes[q].x - from.x, b.nodes[q].y - from.y),
-      );
-    if (!gates.slice(0, 10).some((g) => road(ring[k], g, undefined, `hub ${k}`, true)))
-      dropped.push(`hub ${k} into ${reg.id}: no road`);
-  }
+  const regionRoads = (): number[] => {
+    const out: number[] = [];
+    for (let i = L0; i < b.nodes.length; i++) if (joinable(b, i)) out.push(i);
+    return out;
+  };
 
+  // Side doors. A long district (a ladder, an avenue) entered only at its ends gets a road from the junction farthest from its
+  // entries to the nearest road outside it (long roads get theirs once the whole tree is laid: chainDoors).
+  for (const d of DISTRICTS.filter((x) => x.region === reg.id)) {
+    const ids = junctionIds.get(d.id)!;
+    const pts = ids.map((i) => b.nodes[i]);
+    const extent = Math.max(
+      ...pts.flatMap((p) => pts.map((q) => Math.hypot(p.x - q.x, p.y - q.y))),
+    );
+    if (extent < 1100) continue;
+    const entries = ids.filter((i) =>
+      b.nodes[i].links.some((m) => !b.nodes[m].cluster && b.nodes[m].district !== d.id),
+    );
+    if (entries.length >= 3) continue;
+    const far = [...ids]
+      .filter((i) => b.nodes[i].links.length <= 3)
+      .sort((p, q) => {
+        const gap = (i: number) =>
+          Math.min(
+            ...entries.map((e) =>
+              Math.hypot(b.nodes[i].x - b.nodes[e].x, b.nodes[i].y - b.nodes[e].y),
+            ),
+            1e9,
+          );
+        return gap(q) - gap(p);
+      })[0];
+    if (far !== undefined) {
+      const before = b.nodes.length;
+      const cands = regionRoads().filter((i) => b.nodes[i].district !== d.id);
+      sideDoor(b, far, cands, { attrs: reg.attrs, pool, spacing: ROAD_STEP });
+      for (let i = before; i < b.nodes.length; i++) roads.push(i);
+    }
+  }
   // Keystones at the tip of their district: each takes the junction farthest from the middle that has room, and its own.
   const taken = new Set<number>();
   for (const d of DISTRICTS.filter((x) => x.region === reg.id)) {
@@ -907,6 +1065,139 @@ export function buildLayoutTree(opts: { regions?: RegionId[] } = {}): LayoutTree
   const ring = layoutHub(b, starts, dropped, unplaced);
   for (const reg of REGIONS)
     if (!opts.regions || opts.regions.includes(reg.id))
-      layoutRegion(b, reg, starts[reg.classId], ring, dropped, unplaced);
+      layoutRegion(b, reg, starts[reg.classId], dropped, unplaced);
+  gateways(b, ring, starts, dropped, opts.regions);
+  bridges(b, opts.regions);
+  chainDoors(b);
   return { nodes: b.nodes, starts, dropped, unplaced };
+}
+
+/**
+ * The middle's ring reaches the regions besides their class starts (a start cannot be walked through). From each junction of the
+ * ring between two classes, one road goes straight out along the line between the two regions to a fork, and from the fork a short
+ * road enters each of the two regions at its nearest road with room, away from its start. Iteration 3: two roads from each such
+ * junction, one to each region, ran as long diagonals beside the class starts, three nearly parallel lines meeting past every start.
+ */
+const FORK_RADII = [1100, 1200, 1000, 1300, 1400];
+function gateways(
+  b: Builder,
+  ring: number[],
+  starts: Record<string, number>,
+  dropped: string[],
+  only?: RegionId[],
+): void {
+  const enter = (from: number, reg: RegionDef): boolean => {
+    const F = b.nodes[from];
+    const S = b.nodes[starts[reg.classId]];
+    const cands = b.nodes
+      .filter(
+        (n) => n.region === reg.id && joinable(b, n.id) && Math.hypot(n.x - S.x, n.y - S.y) >= 350,
+      )
+      .sort(
+        (p, q) =>
+          Math.hypot(p.x - F.x, p.y - F.y) - Math.hypot(q.x - F.x, q.y - F.y) || p.id - q.id,
+      );
+    const pool = ROAD_POOLS[reg.id];
+    if (
+      cands
+        .slice(0, 12)
+        .some((c) => connect(b, from, c.id, { attrs: reg.attrs, pool, spacing: ROAD_STEP }))
+    ) {
+      return true;
+    }
+    return false;
+  };
+  const attrs: Attr[] = ['str', 'dex', 'int'];
+  for (let k = 0; k < 12; k += 2) {
+    const deg = k * 30;
+    const sides = REGIONS.filter((r) => {
+      const gap = ((((r.angle - deg) % 360) + 540) % 360) - 180;
+      return Math.abs(Math.abs(gap) - 30) < 1;
+    }).filter((r) => !only || only.includes(r.id));
+    if (!sides.length) continue;
+    // The fork: the first point along the line, as near the ring as there is room, from which both regions can be entered.
+    const L = b.nodes.length;
+    const E = b.edges.length;
+    const tryFork = (x: number, y: number): RegionDef[] | null => {
+      const at = attrs[(k / 2) % 3];
+      const w = addNode(b, 'travel', ATTR_NAME[at], [mod(at, 'base', 10)], x, y, undefined, 'hub');
+      const trunk = { attrs, pool: ROAD_POOLS.hub, spacing: ROAD_STEP, district: 'hub' };
+      if (!travel(b, [ring[k]], [w], trunk)) return null;
+      for (let i = w; i < b.nodes.length; i++) b.nodes[i].region = 'hub';
+      const missed: RegionDef[] = [];
+      for (const reg of sides) {
+        const before = b.nodes.length;
+        if (!enter(w, reg)) missed.push(reg);
+        for (let i = before; i < b.nodes.length; i++) b.nodes[i].region = reg.id;
+      }
+      return missed;
+    };
+    let best: { x: number; y: number; missed: number } | null = null;
+    let missed: RegionDef[] | null = null;
+    search: for (const r of FORK_RADII)
+      for (const tilt of [0, 4, -4, 8, -8]) {
+        const ang = ((deg + tilt) * Math.PI) / 180;
+        const [x, y] = [r * Math.cos(ang), r * Math.sin(ang)];
+        if (!pointClear(b, x, y)) continue;
+        missed = tryFork(x, y);
+        if (missed && !missed.length) break search;
+        if (missed && missed.length < sides.length && (!best || missed.length < best.missed))
+          best = { x, y, missed: missed.length };
+        rollback(b, L, E);
+        missed = null;
+      }
+    if (!missed && best) missed = tryFork(best.x, best.y);
+    // What the fork could not reach (or every side, without a fork) is entered straight from the ring.
+    for (const reg of missed ?? sides) {
+      const before = b.nodes.length;
+      if (!enter(ring[k], reg)) dropped.push(`hub ${k} into ${reg.id}: no road`);
+      for (let i = before; i < b.nodes.length; i++) b.nodes[i].region = reg.id;
+    }
+  }
+}
+
+/**
+ * The crossings between neighbouring regions (iteration 3, the user: "the pie slices only connect in the middle"): one road half way
+ * out and one near the rim between each pair of neighbours, joining the nearest road nodes of the two sides that have room. The
+ * roads are made of both regions' stats.
+ */
+const BANDS: [number, number][] = [
+  [1700, 3000],
+  [3300, 6000],
+];
+function bridges(b: Builder, only?: RegionId[]): void {
+  REGIONS.forEach((A, i) => {
+    const B = REGIONS[(i + 1) % REGIONS.length];
+    if (only && !(only.includes(A.id) && only.includes(B.id))) return;
+    for (const [lo, hi] of BANDS) {
+      const side = (r: RegionId) =>
+        b.nodes
+          .filter((n) => n.region === r && joinable(b, n.id))
+          .filter((n) => {
+            const rr = Math.hypot(n.x, n.y);
+            return rr >= lo && rr <= hi;
+          });
+      const as = side(A.id);
+      const bs = side(B.id);
+      const pairs = as
+        .flatMap((p) => bs.map((q) => ({ p: p.id, q: q.id, d: Math.hypot(p.x - q.x, p.y - q.y) })))
+        .filter((x) => x.d <= (lo > 3000 ? 2000 : 1700))
+        .sort((x, y) => x.d - y.d || x.p - y.p || x.q - y.q);
+      const attrs = [...new Set([...A.attrs, ...B.attrs])];
+      const pool = [...ROAD_POOLS[A.id], ...ROAD_POOLS[B.id]];
+      const L = b.nodes.length;
+      const made = pairs
+        .slice(0, 40)
+        .find((x) => connect(b, x.p, x.q, { attrs, pool, spacing: ROAD_STEP }));
+      if (!made) continue;
+      // The new road nodes belong to the nearer region.
+      const P = b.nodes[made.p];
+      const Q = b.nodes[made.q];
+      for (let k = L; k < b.nodes.length; k++) {
+        const n = b.nodes[k];
+        n.region =
+          Math.hypot(n.x - P.x, n.y - P.y) <= Math.hypot(n.x - Q.x, n.y - Q.y) ? A.id : B.id;
+      }
+    }
+  });
 }

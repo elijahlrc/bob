@@ -543,7 +543,10 @@ export function TreeView({ c }: { c: Controller }) {
           <ul>
             {TONE_LABEL.map(([tone, label]) => (
               <li key={tone}>
-                <i style={{ background: TONE_COLOR[tone] }} /> {label}
+                <svg class="glyph" viewBox="-12 -12 24 24" aria-hidden="true">
+                  <path d={TONE_GLYPH[tone]} fill={TONE_COLOR[tone]} />
+                </svg>{' '}
+                {label}
               </li>
             ))}
             <li>

@@ -953,3 +953,6 @@ runs have a spread of a few maps, but the shade was low in both samples (8.5 and
 dagger and crit districts are 12 to 16 steps from its start, and the bot does not plan a walk. Nothing was tuned from the bot.
 The audit by two rounds of twelve simulated players (T6.1, T6.2) followed: regions are joined through the middle, roads are less filler,
 a search box is on the tree screen, the middle is worth taking (docs/TREE-REDESIGN.md 14, docs/tree/playtest).
+Iteration 3 (the user's review): neighbouring regions are joined half way out and near the rim, the middle reaches the regions by
+one forked road between each two starts, long roads have side doors and honeycombs fewer sides; three more colours on the tree
+screen (spells, energy shield, damage of every kind). 2,052 nodes; `SAVE_VERSION` 12 hands passives back.
