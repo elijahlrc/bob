@@ -129,5 +129,6 @@ export function modsText(mods: readonly Mod[]): string[] {
     }
     out.push(modText(m));
   }
-  return out;
+  // A flag whose line is said by another mod of the node has no text of its own.
+  return out.filter((l) => l.trim() !== '');
 }

@@ -5,7 +5,8 @@
 import { GEN_CLUSTERS } from '../../src/data/tree/clustersGen';
 import { REGIONS } from '../../src/data/tree/spec';
 import type { Mod } from '../../src/mods/types';
-import { classOf, nodes, pct, regionOf, steps, tree } from './lib';
+import { DISTRICTS } from '../../src/data/tree/charter';
+import { classOf, nodes, pct, playerSteps, regionOf, tree } from './lib';
 
 const n = nodes.length;
 const count = (kind: string) => nodes.filter((x) => x.kind === kind).length;
@@ -185,7 +186,7 @@ console.log('\n== Distances (steps along links)');
 const first = (d: number[], kind: string) =>
   Math.min(...nodes.filter((x) => x.kind === kind && d[x.id] > 0).map((x) => d[x.id]));
 for (const reg of REGIONS) {
-  const d = steps([tree.starts[reg.classId]]);
+  const d = playerSteps(tree.starts[reg.classId]);
   const others = REGIONS.filter((o) => o.id !== reg.id).map(
     (o) => `${o.id} ${d[tree.starts[o.classId]]}`,
   );
@@ -198,7 +199,28 @@ for (const reg of REGIONS) {
   );
 }
 const reachCheck = REGIONS.map((r) => {
-  const d = steps([tree.starts[r.classId]]);
+  const d = playerSteps(tree.starts[r.classId]);
   return `${classOf(r.id)}: ${nodes.filter((x) => x.kind === 'keystone' && d[x.id] <= 40).length} keystones within 40, ${nodes.filter((x) => x.kind === 'notable' && d[x.id] <= 30).length} notables within 30`;
 });
 console.log('reach: ' + reachCheck.join('; '));
+
+console.log(
+  '\n== Districts: steps from each class start to the nearest notable of each district (never through another start)',
+);
+for (const reg of REGIONS) {
+  const d = playerSteps(tree.starts[reg.classId]);
+  const near = (id: string) =>
+    Math.min(
+      ...nodes
+        .filter((x) => x.district === id && x.kind === 'notable')
+        .map((x) => (d[x.id] < 0 ? 999 : d[x.id])),
+    );
+  const own = DISTRICTS.filter((x) => x.region === reg.id).map((x) => `${x.id} ${near(x.id)}`);
+  const unreachable = nodes.filter((x) => d[x.id] < 0).length;
+  const others = DISTRICTS.filter((x) => x.region !== reg.id)
+    .map((x) => near(x.id))
+    .sort((a, b) => a - b);
+  console.log(
+    `${reg.id.padEnd(7)} own: ${own.join(', ')}; nodes a player cannot reach ${unreachable}; other regions' districts: nearest ${others[0]}, median ${others[others.length >> 1]}`,
+  );
+}

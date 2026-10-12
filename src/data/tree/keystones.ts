@@ -201,10 +201,10 @@ export const KEYSTONES: KeystoneDef[] = [
     id: 'steadyDraw',
     name: 'Steady Draw',
     mods: [
-      mod('damage', 'more', 25, { tags: ['bow'] }),
+      mod('damage', 'more', 35, { tags: ['bow'] }),
       mod('attackSpeed', 'more', -20, { tags: ['bow'] }),
     ],
-    description: 'Bow attacks deal 25% more damage with 20% less attack speed.',
+    description: 'Bow attacks deal 35% more damage with 20% less attack speed.',
   },
 ];
 

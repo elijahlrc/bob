@@ -21,7 +21,7 @@ import {
 } from './builder';
 import { DISTRICTS, districtOf, type District } from './charter';
 import { GEN_CLUSTERS } from './clustersGen';
-import { PLACEMENT, REGION_LINKS } from './plan';
+import { HUB_LINKS, PLACEMENT, REGION_LINKS } from './plan';
 import { THEMES } from './notableThemes';
 import { modKey, unitsOf } from './power';
 import { ROAD_POOLS } from './roads';
@@ -43,7 +43,7 @@ import type { Tree } from './types';
 const PITCH = 300;
 const SIDE = 150;
 const HEX = 215;
-const ROAD_STEP = 185;
+const ROAD_STEP = 215;
 const RUNG = 300;
 
 type Vec = [number, number];
@@ -441,10 +441,49 @@ function around(p: Vec, face: Vec, wide = false): Candidate[] {
 export type LayoutTree = Tree & { dropped: string[]; unplaced: string[] };
 
 /** The region's districts, roads, keystones and wayside clusters, laid out; appended to `b`. */
+/**
+ * A junction of a road: an attribute node every third one, the rest small nodes of the road's generic stats, so that a road gives
+ * what the region wants and not +10 of one attribute node after another.
+ */
+function junctionNode(
+  b: Builder,
+  attrs: Attr[],
+  pool: RoadStat[],
+  i: number,
+  at: Vec,
+  district: string,
+): number {
+  if (i % 3 === 0) {
+    const a = attrs[Math.floor(i / 3) % attrs.length];
+    return addNode(
+      b,
+      'travel',
+      ATTR_NAME[a],
+      [mod(a, 'base', 10)],
+      at[0],
+      at[1],
+      undefined,
+      district,
+    );
+  }
+  const s = pool[hashOf(`${district}:j${i}`) % pool.length];
+  return addNode(
+    b,
+    'small',
+    s.name,
+    s.mods.map((m) => ({ ...m })),
+    at[0],
+    at[1],
+    undefined,
+    district,
+  );
+}
+
 function layoutRegion(
   b: Builder,
   reg: RegionDef,
   start: number,
+  ring: number[],
   dropped: string[],
   unplaced: string[],
 ): void {
@@ -457,7 +496,7 @@ function layoutRegion(
     { shape: Shape; to: (p: Vec) => Vec; dir: (p: Vec) => Vec; centre: Vec }
   >();
   const roads: number[] = [];
-  const road = (from: number, to: number, district?: string, tag = ''): void => {
+  const road = (from: number, to: number, district?: string, tag = '', quiet = false): boolean => {
     const before = b.nodes.length;
     const why: string[] = [];
     const opts = { attrs: reg.attrs, pool, spacing: ROAD_STEP, district, why };
@@ -470,8 +509,10 @@ function layoutRegion(
       const dy = B.y - A.y;
       const len = Math.hypot(dx, dy) || 1;
       const [nx, ny] = [-dy / len, dx / len];
-      search: for (const off of [140, -140, 260, -260, 400, -400, 560, -560, 760, -760])
-        for (const t of [0.5, 0.35, 0.65, 0.25, 0.75]) {
+      search: for (const off of [
+        140, -140, 260, -260, 400, -400, 560, -560, 760, -760, 1000, -1000, 1300, -1300,
+      ])
+        for (const t of [0.5, 0.35, 0.65, 0.25, 0.75, 0.15, 0.85, 0.05, 0.95]) {
           const wx = A.x + dx * t + nx * off;
           const wy = A.y + dy * t + ny * off;
           if (!pointClear(b, wx, wy)) continue;
@@ -495,8 +536,9 @@ function layoutRegion(
           rollback(b, L, E);
         }
     }
-    if (!ok) dropped.push(`${tag} ${from}-${to} (${why[0] ?? '?'})`);
+    if (!ok && !quiet) dropped.push(`${tag} ${from}-${to} (${why[0] ?? '?'})`);
     for (let i = before; i < b.nodes.length; i++) roads.push(i);
+    return ok;
   };
 
   type Failed = {
@@ -515,20 +557,7 @@ function layoutRegion(
     const { centre, to, dir } = frameOf(reg, pl);
     const [cx, cy] = centre;
     shapes.set(d.id, { shape, to, dir, centre: [cx, cy] });
-    const ids = shape.junctions.map((p, i) => {
-      const at = reg.attrs[i % reg.attrs.length];
-      const g = to(p);
-      return addNode(
-        b,
-        'travel',
-        ATTR_NAME[at],
-        [mod(at, 'base', 10)],
-        g[0],
-        g[1],
-        undefined,
-        d.id,
-      );
-    });
+    const ids = shape.junctions.map((p, i) => junctionNode(b, reg.attrs, pool, i, to(p), d.id));
     junctionIds.set(d.id, ids);
     for (const [i, j] of shape.edges) road(ids[i], ids[j], d.id, d.id);
     for (const s of shape.slots) {
@@ -598,6 +627,20 @@ function layoutRegion(
   };
   for (const [from, to] of REGION_LINKS[reg.id] ?? [])
     road(ref(from), ref(to), undefined, `${from}>${to}`);
+  // The middle's ring reaches the region besides its class start (a start cannot be walked through): a road from each of two
+  // junctions of the ring to the nearest gate of the region's districts that it can reach, the straight way first.
+  for (const k of HUB_LINKS[reg.id] ?? []) {
+    const from = b.nodes[ring[k]];
+    const gates = [...junctionIds.entries()]
+      .flatMap(([d, ids]) => Object.values(shapes.get(d)!.shape.gates).map((j) => ids[j]))
+      .sort(
+        (p, q) =>
+          Math.hypot(b.nodes[p].x - from.x, b.nodes[p].y - from.y) -
+          Math.hypot(b.nodes[q].x - from.x, b.nodes[q].y - from.y),
+      );
+    if (!gates.slice(0, 10).some((g) => road(ring[k], g, undefined, `hub ${k}`, true)))
+      dropped.push(`hub ${k} into ${reg.id}: no road`);
+  }
 
   // Keystones at the tip of their district: each takes the junction farthest from the middle that has room, and its own.
   const taken = new Set<number>();
@@ -755,7 +798,7 @@ function layoutHub(
   starts: Record<string, number>,
   dropped: string[],
   unplaced: string[],
-): void {
+): number[] {
   const L0 = b.nodes.length;
   const attrs: Attr[] = ['str', 'dex', 'int'];
   const pool = ROAD_POOLS.hub;
@@ -770,29 +813,15 @@ function layoutHub(
     HUB_R * Math.cos((k * Math.PI) / 6),
     HUB_R * Math.sin((k * Math.PI) / 6),
   ];
-  for (let k = 0; k < 12; k++) {
-    const a = attrs[k % 3];
-    ring.push(
-      addNode(
-        b,
-        'travel',
-        ATTR_NAME[a],
-        [mod(a, 'base', 10)],
-        at(k)[0],
-        at(k)[1],
-        undefined,
-        'hub',
-      ),
-    );
-  }
+  for (let k = 0; k < 12; k++) ring.push(junctionNode(b, attrs, pool, k, at(k), 'hub'));
   for (let k = 0; k < 12; k++) road(ring[k], ring[(k + 1) % 12], `ring ${k}`);
   const axisIndex = (deg: number): number => ((Math.round(deg / 30) % 12) + 12) % 12;
   REGIONS.forEach((reg, i) => {
     const k = axisIndex(reg.angle);
     road(ring[k], starts[reg.classId], `start ${reg.id}`);
-    // The hub cluster of the region sits on the boundary after it, facing out.
+    // The hub cluster of the region sits on the boundary after it, inside the ring, so that the way out of the ring is free for a road.
     const kb = (k + 1) % 12;
-    const out: Vec = [Math.cos((kb * Math.PI) / 6), Math.sin((kb * Math.PI) / 6)];
+    const out: Vec = [-Math.cos((kb * Math.PI) / 6), -Math.sin((kb * Math.PI) / 6)];
     const spec: ClusterSpec = {
       id: `hub_${reg.id}`,
       region: 'hub',
@@ -804,25 +833,27 @@ function layoutHub(
     };
     if (hang(ctx, spec, ring[kb], around(at(kb), out), 'hub') === null)
       unplaced.push(spec.id + '@hub');
-    // Three of the boundaries also carry a keystone on the inner side.
-    if (i % 2 === 0) {
+    // Three of the classes' junctions also carry a keystone on the inner side (the ones without a spoke), so that every junction
+    // between two classes is free for a road into the region beside it.
+    if (i % 2 === 1) {
+      const n = (i - 1) / 2;
       const ks: ClusterSpec = {
-        id: `hubks_${i / 2}`,
+        id: `hubks_${n}`,
         region: 'hub',
         kind: 'keystone',
         theme: 'allAttr',
         smallCount: 2,
-        keystone: HUB.keystones[i / 2],
+        keystone: HUB.keystones[n],
         attrs,
       };
-      const inward: Vec = [-out[0], -out[1]];
+      const inward: Vec = [-Math.cos((k * Math.PI) / 6), -Math.sin((k * Math.PI) / 6)];
       const cands = [0, 12, -12].flatMap((deg) =>
         [175, 215].map((d) => {
           const f = rot(inward, deg);
-          return { centre: [at(kb)[0] + f[0] * d, at(kb)[1] + f[1] * d] as Vec, face: f };
+          return { centre: [at(k)[0] + f[0] * d, at(k)[1] + f[1] * d] as Vec, face: f };
         }),
       );
-      if (hang(ctx, ks, ring[kb], cands, 'hub') === null) unplaced.push(ks.id + '@hub');
+      if (hang(ctx, ks, ring[k], cands, 'hub') === null) unplaced.push(ks.id + '@hub');
     }
   });
   // The wheel at the middle, and a spoke from it to each class's junction of the ring.
@@ -848,6 +879,7 @@ function layoutHub(
     road(j, near, `spoke ${reg.id}`);
   }
   for (let i = L0; i < b.nodes.length; i++) b.nodes[i].region = 'hub';
+  return ring;
 }
 
 /** Build the passive tree from the charter and the plan (all regions, or the ones asked for: a tool of review). */
@@ -870,9 +902,9 @@ export function buildLayoutTree(opts: { regions?: RegionId[] } = {}): LayoutTree
     b.nodes[id].region = reg.id;
     starts[reg.classId] = id;
   }
-  layoutHub(b, starts, dropped, unplaced);
+  const ring = layoutHub(b, starts, dropped, unplaced);
   for (const reg of REGIONS)
     if (!opts.regions || opts.regions.includes(reg.id))
-      layoutRegion(b, reg, starts[reg.classId], dropped, unplaced);
+      layoutRegion(b, reg, starts[reg.classId], ring, dropped, unplaced);
   return { nodes: b.nodes, starts, dropped, unplaced };
 }

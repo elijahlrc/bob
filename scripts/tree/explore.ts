@@ -64,7 +64,7 @@ function oneLine(id: number, b: Build): string {
   const c = costOf(b, id);
   const n = nodes[id];
   const kind = n.kind === 'travel' ? 'road' : n.kind;
-  return `#${id} ${kind} "${n.name}" [${regionOf(n)}] cost ${c === null ? '-' : c}: ${lines(id)}`;
+  return `#${id} ${kind} "${n.name}" [${regionOf(n)}] @${n.x},${n.y} ${c === null ? 'UNREACHABLE (cannot be taken)' : 'cost ' + c}: ${lines(id)}`;
 }
 
 switch (cmd) {

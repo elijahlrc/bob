@@ -108,25 +108,33 @@ export const STAT_TEXT: Record<string, StatText> = {
   alwaysHit: { flag: "Your hits can't be Evaded" },
   lifeIsOne: { flag: 'Maximum Life becomes 1' },
   immuneChaos: { flag: 'Immune to Chaos Damage' },
-  skillsCostLife: { flag: 'Skills cost Life instead of Mana; Auras reserve Life' },
-  evasionToArmour: { flag: 'Evasion Rating is converted to Armour' },
-  manaBeforeLife30: { flag: '30% of Damage is taken from Mana before Life' },
-  avatarOfFire: { flag: '50% of non-Fire Damage converted to Fire; deal no non-Fire Damage' },
-  closeQuarters: { flag: 'Projectiles deal more Damage at close range, less at long range' },
-  instantLeechNoRegen: { flag: 'Life Leech is instant; you have no Life Regeneration' },
-  feverPitch: {
-    flag: '40% more Elemental Damage for 8 seconds after a Critical Strike; Critical Strike Multiplier is 100%',
+  skillsCostLife: {
+    flag: 'Skills cost Life instead of Mana; Maximum Mana is 0; Auras reserve Life',
   },
-  painConduit: { flag: '30% more Spell Damage while on Low Life' },
+  evasionToArmour: { flag: 'Evasion Rating is converted to Armour; Dexterity gives no Evasion' },
+  manaBeforeLife30: { flag: '30% of Damage is taken from Mana before Life' },
+  avatarOfFire: { flag: 'Deal no non-Fire Damage' },
+  closeQuarters: {
+    flag: 'Projectile Attacks deal up to 50% more Damage at close range, falling to 50% less at long range',
+  },
+  instantLeechNoRegen: { flag: 'Life Leech is instant; you have no Life Regeneration' },
+  feverPitch: { flag: 'Critical Strike Multiplier is 100%' },
+  painConduit: { flag: '' },
   cannotBeStunned: { flag: 'Cannot be Stunned' },
   cannotEvade: { flag: 'Cannot Evade enemy Attacks' },
-  prismaticBalance: { flag: 'Hits shift Enemy Elemental Resistances for 5 seconds' },
+  prismaticBalance: {
+    flag: "Your Hits give the target +25% resistance to the Hit's elements and -50% to the others for 5 seconds",
+  },
   regenToES: { flag: 'Life Regeneration applies to Energy Shield instead' },
   leechToES: { flag: 'Life Leech applies to Energy Shield instead' },
   strongarm: { flag: "Strength's Damage bonus applies to Projectile Attacks" },
   woundDance: { flag: 'Bleeding stacks up to 8 times; no extra Damage while moving' },
-  cruelAgony: { flag: 'Ailments are affected by Critical Strike Multiplier' },
-  manaBastion: { flag: 'Energy Shield protects Mana instead of Life' },
+  cruelAgony: {
+    flag: 'Ailments from Critical Strikes use your Critical Strike Multiplier; Critical Strikes deal 30% less Hit Damage',
+  },
+  manaBastion: {
+    flag: 'Energy Shield protects Mana instead of Life; Skill costs are paid from Energy Shield first',
+  },
   arrowWeave: { flag: 'Evade Projectiles more easily, Melee Attacks less easily' },
   cannotInflictEle: { flag: 'Cannot inflict Elemental Ailments' },
   cannotBeChilled: { flag: 'Cannot be Chilled' },
@@ -232,6 +240,9 @@ export const TAG_TEXT: Record<string, string> = {
   lightning: 'with Lightning Skills',
 };
 
+/** "a" or "an" before a word. */
+const an = (w: string): string => (/^[aeiou]/i.test(w) ? 'an' : 'a');
+
 export const PER_TEXT: Record<string, string> = {
   str: 'Strength',
   dex: 'Dexterity',
@@ -302,16 +313,21 @@ Object.assign(STAT_TEXT, {
 } satisfies Record<string, StatText>);
 for (const k of CHARGE_KINDS) {
   const name = CHARGE_NAMES[k];
+  PER_TEXT[`charges.${k}`] = `${name} Charge`;
   STAT_TEXT[`chargeDuration.${k}`] = { name: `${name} Charge Duration` };
   STAT_TEXT[`maxCharges.${k}`] = { base: `{v} to Maximum ${name} Charges` };
-  STAT_TEXT[`chargeOn.kill.${k}`] = { base: `{v}% chance to gain a ${name} Charge on Kill` };
+  STAT_TEXT[`chargeOn.kill.${k}`] = {
+    base: `{v}% chance to gain ${an(name)} ${name} Charge on Kill`,
+  };
   STAT_TEXT[`chargeOn.block.${k}`] = {
-    base: `{v}% chance to gain a ${name} Charge when you Block`,
+    base: `{v}% chance to gain ${an(name)} ${name} Charge when you Block`,
   };
   STAT_TEXT[`chargeOn.crit.${k}`] = {
-    base: `{v}% chance to gain a ${name} Charge on Critical Strike`,
+    base: `{v}% chance to gain ${an(name)} ${name} Charge on Critical Strike`,
   };
-  STAT_TEXT[`chargeOn.hit.${k}`] = { base: `{v}% chance to gain a ${name} Charge on Hit` };
+  STAT_TEXT[`chargeOn.hit.${k}`] = {
+    base: `{v}% chance to gain ${an(name)} ${name} Charge on Hit`,
+  };
 }
 for (const id of ALL_HEX_IDS)
   STAT_TEXT[`hexOnHit.${id}`] = { base: `Hexes Enemies you Hit with level {v} ${HEXES[id].name}` };
@@ -595,7 +611,7 @@ for (const [event, phrase] of Object.entries(MORE_EVENTS)) {
   STAT_TEXT[`rageOn.${event}`] ??= { base: `Gain {v} Rage ${phrase}` };
   for (const k of CHARGE_KINDS)
     STAT_TEXT[`chargeOn.${event}.${k}`] ??= {
-      base: `{v}% chance to gain a ${CHARGE_NAMES[k]} Charge ${phrase}`,
+      base: `{v}% chance to gain ${an(CHARGE_NAMES[k])} ${CHARGE_NAMES[k]} Charge ${phrase}`,
     };
   for (const [pool, label] of Object.entries({ life: 'Life', mana: 'Mana', es: 'Energy Shield' })) {
     STAT_TEXT[`recover.${event}.${pool}`] ??= { base: `Gain {v} ${label} ${phrase}` };

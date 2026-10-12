@@ -201,7 +201,7 @@ export function travel(b: Builder, from: number[], to: number[], o: RoadOptions)
     let prev = p;
     pts.forEach(([x, y], i) => {
       let id: number;
-      if (o.pool && i % 2 === 0) {
+      if (o.pool && i % 3 !== 2) {
         const s = o.pool[hashOf(`${o.district ?? ''}:${p}:${q}:${i}`) % o.pool.length];
         id = addNode(
           b,
@@ -214,7 +214,7 @@ export function travel(b: Builder, from: number[], to: number[], o: RoadOptions)
           o.district,
         );
       } else {
-        const at = attrs[(o.pool ? (i - 1) / 2 : i) % attrs.length];
+        const at = attrs[(o.pool ? Math.floor(i / 3) : i) % attrs.length];
         id = addNode(
           b,
           'travel',

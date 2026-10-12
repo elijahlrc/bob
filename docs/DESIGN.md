@@ -577,7 +577,7 @@ The tree is authored at the **district** level, never node by node.
 | Mana Bastion        | ES protects mana instead of life. Skill costs are paid from ES before mana.                              | Eldritch Battery      |
 | Arrow Weave         | +40% chance to evade projectile attacks; −30% chance to evade melee attacks.                             | Arrow Dancing         |
 | Shieldwall          | Block chance cap +10%. 30% less evasion rating.                                                          | (ours)                |
-| Steady Draw         | Bow attacks: 25% more damage, 20% less attack speed.                                                     | (ours)                |
+| Steady Draw         | Bow attacks: 35% more damage, 20% less attack speed.                                                     | (ours)                |
 
 "Chance to evade" adjusts the hit check: `hitChance · (1 − evadeBonus)`, clamped as in 6.3.
 

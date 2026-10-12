@@ -226,11 +226,11 @@ describe('keystones (§9.4) — every one has an effect', () => {
     expect(d.evasion / d0.evasion).toBeCloseTo(0.7, 1);
   });
 
-  it('Steady Draw: bows deal 25% more damage, 20% less attack speed', () => {
+  it('Steady Draw: bows deal 35% more damage, 20% less attack speed', () => {
     const { without, with: w } = both('strider', 'steadyDraw');
     const p0 = without.profile(without.primary);
     const p1 = w.profile(w.primary);
-    expect(p1.hands[0].chunks[0].min / p0.hands[0].chunks[0].min).toBeCloseTo(1.25);
+    expect(p1.hands[0].chunks[0].min / p0.hands[0].chunks[0].min).toBeCloseTo(1.35);
     expect(p1.useTime / p0.useTime).toBeCloseTo(1 / 0.8);
   });
 });

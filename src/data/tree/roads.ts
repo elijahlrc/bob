@@ -19,6 +19,7 @@ const P = {
   attackSpeed: { name: 'Attack Speed', mods: [mod('attackSpeed', 'inc', 3)] },
   crit: { name: 'Critical Strike Chance', mods: [mod('critChance', 'inc', 20)] },
   accuracy: { name: 'Accuracy Rating', mods: [mod('accuracy', 'inc', 10)] },
+  moveSpeed: { name: 'Movement Speed', mods: [mod('moveSpeed', 'inc', 5)] },
   regen: { name: 'Life Regeneration', mods: [mod('lifeRegenPct', 'base', 0.4)] },
   res: { name: 'Elemental Resistances', mods: [mod('resist.allEle', 'base', 4)] },
 } satisfies Record<string, RoadStat>;
@@ -27,7 +28,7 @@ const P = {
 export const ROAD_POOLS: Record<RegionId | 'hub', RoadStat[]> = {
   int: [P.es, P.mana, P.spellDamage, P.castSpeed],
   dexint: [P.evasion, P.es, P.damage, P.crit],
-  dex: [P.evasion, P.accuracy, P.attackSpeed, P.life],
+  dex: [P.evasion, P.moveSpeed, P.attackSpeed, P.life],
   strdex: [P.armour, P.evasion, P.damage, P.life],
   str: [P.life, P.armour, P.damage, P.regen],
   strint: [P.life, P.mana, P.armour, P.es],

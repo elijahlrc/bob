@@ -52,3 +52,17 @@ export function classOf(region: RegionId): string {
 }
 
 export const pct = (a: number, b: number): string => `${((100 * a) / (b || 1)).toFixed(0)}%`;
+
+/** Steps from a class start to every node by the ways a player can take: never through another class's start. */
+export function playerSteps(start: number): number[] {
+  const d = new Array<number>(nodes.length).fill(-1);
+  d[start] = 0;
+  const q = [start];
+  for (let h = 0; h < q.length; h++)
+    for (const m of nodes[q[h]].links)
+      if (d[m] < 0 && nodes[m].kind !== 'start') {
+        d[m] = d[q[h]] + 1;
+        q.push(m);
+      }
+  return d;
+}

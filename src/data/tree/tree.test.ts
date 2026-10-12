@@ -51,6 +51,25 @@ describe('passive tree invariants (§9.3)', () => {
     }
   });
 
+  it('can be walked: a class reaches every node but the other starts without passing through one (a start cannot be taken)', () => {
+    for (const c of CLASSES) {
+      const start = tree.starts[c.id];
+      const seen = new Set<number>([start]);
+      const q = [start];
+      for (let h = 0; h < q.length; h++)
+        for (const m of nodes[q[h]].links)
+          if (!seen.has(m) && nodes[m].kind !== 'start') {
+            seen.add(m);
+            q.push(m);
+          }
+      const lost = nodes.filter((n) => n.kind !== 'start' && !seen.has(n.id));
+      expect(
+        lost.map((n) => n.name),
+        c.id,
+      ).toEqual([]);
+    }
+  });
+
   it('links are symmetric', () => {
     for (const n of nodes) for (const m of n.links) expect(nodes[m].links).toContain(n.id);
   });

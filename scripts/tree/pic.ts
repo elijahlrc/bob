@@ -108,21 +108,46 @@ for (const n of nodes) {
   }
 }
 
-const fontPx = Math.max(1, Math.round(width / 1500));
+const fontPx = Math.max(1, Math.round(width / 900));
+// Labels: starts and keystones first, then notables, and a label that would lie on one already drawn is left out (the ids in the
+// region pictures and `explore find` tell the rest).
+type Label = { text: string; x: number; y: number; rank: number; colour: Rgb };
+const wanted: Label[] = [];
 for (const n of nodes) {
   const x = X(n.x);
   const y = Y(n.y);
   if (x < 0 || y < 0 || x > width || y > height) continue;
-  const label =
+  const text =
     n.kind === 'start'
       ? `${(n.classStart ?? '').toUpperCase()} START`
       : (n.kind === 'notable' && (labels === 'all' || labels === 'notables')) ||
           (n.kind === 'keystone' && labels !== 'none')
         ? n.name + (showIds ? ` ${n.id}` : '')
         : '';
-  if (!label) continue;
-  const off = (radius[n.kind] * grow + 4) * 1;
-  cv.text(label, x + off, y, fontPx, n.kind === 'keystone' ? [220, 190, 255] : [225, 220, 205]);
+  if (!text) continue;
+  const off = radius[n.kind] * grow + 4;
+  wanted.push({
+    text,
+    x: x + off,
+    y,
+    rank: n.kind === 'start' ? 0 : n.kind === 'keystone' ? 1 : 2,
+    colour: n.kind === 'keystone' ? [220, 190, 255] : [225, 220, 205],
+  });
+}
+wanted.sort((p, q) => p.rank - q.rank);
+const boxes: [number, number, number, number][] = [];
+for (const l of wanted) {
+  const w = l.text.length * 6 * fontPx;
+  const h = 8 * fontPx;
+  const box: [number, number, number, number] = [
+    l.x - 2,
+    l.y - h / 2 - 1,
+    l.x + w + 2,
+    l.y + h / 2 + 1,
+  ];
+  if (boxes.some((o) => box[0] < o[2] && box[2] > o[0] && box[1] < o[3] && box[3] > o[1])) continue;
+  boxes.push(box);
+  cv.text(l.text, l.x, l.y, fontPx, l.colour);
 }
 
 cv.save(out);
