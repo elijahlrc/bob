@@ -153,10 +153,11 @@ function findTarget(w: World): Actor | null {
     // Spawners and shield-givers come first: a nest feeds the pack and a pylon makes it untouchable.
     if (!revealed(w, m)) continue;
     const support = !!m.mon && SUPPORT_TYPES.has(m.mon.spec.type);
-    // The target priority (Strategy tab): rares count as nearer, or the weakest goes first (distance breaks a tie).
+    // The target priority (Strategy tab): rares count as nearer, or the weakest goes first (distance breaks a tie). Weakest is
+    // the least life left in points, not as a share: by share a boss with a scratch on it outranks its whole fresh escort.
     const d =
       prio === 'lowest'
-        ? (support ? -1000 : 0) + (m.life / Math.max(1, m.def.maxLife)) * 100 + real * 0.01
+        ? (support ? -1e9 : 0) + m.life + real * 1e-6
         : real -
           (support ? SUPPORT_PRIORITY : 0) -
           (prio === 'rares' && isBig(m) ? RARE_PRIORITY : 0);

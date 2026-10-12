@@ -494,6 +494,23 @@ describe('the Siege Marshal (docs/BOSSES.md 5a)', () => {
     expect(st.wave).toBe(2);
   });
 
+  it('"weakest" takes his soldiers before him, even once he has a scratch on him', async () => {
+    const { findTargetForTest } = await import('./ai');
+    const w = bossArena(22);
+    w.char.build.strategy = { target: 'lowest' };
+    const m = putBoss(w, 'siegeMarshal', 5, 0, 20);
+    const st = bossState(m)!;
+    run(w, HORN_TELL + 0.3);
+    m.life = m.def.maxLife * 0.99;
+    for (const s of st.soldiers) {
+      s.x = w.player.x + 2;
+      s.y = w.player.y;
+    }
+    expect(findTargetForTest(w)?.mon?.spec.type).not.toBe('siegeMarshal');
+    for (const s of st.soldiers) s.alive = false;
+    expect(findTargetForTest(w)).toBe(m);
+  });
+
   it('the soldiers go with him when he falls', async () => {
     const { rawHit } = await import('./combat');
     const w = bossArena(22);

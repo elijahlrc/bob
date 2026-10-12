@@ -40,7 +40,7 @@ export type SkillTactic = {
  * Whom the character fights first.
  * - `nearest`: the nearest enemy (support monsters first).
  * - `rares`: rare, champion and boss enemies as if they were 4 tiles nearer.
- * - `lowest`: the enemy with the smallest share of its life left.
+ * - `lowest`: the enemy with the least life left, in points (support monsters first).
  * - `stick`: the current target until it falls or gets away.
  */
 export type TargetPriority = 'nearest' | 'rares' | 'lowest' | 'stick';

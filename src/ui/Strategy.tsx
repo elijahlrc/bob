@@ -298,7 +298,8 @@ export function Strategy({ c, ch }: { c: Controller; ch: Character }) {
 const TARGET_TEXT: Record<TargetPriority, string> = {
   nearest: 'Fights the nearest enemy, switching as others come nearer; nests and pylons first.',
   rares: 'Rares, champions and bosses count as 4 tiles nearer: it breaks off for them.',
-  lowest: 'Finishes the enemy with the least of its life left first.',
+  lowest:
+    'Goes for the enemy with the least life left, so small fry fall before a boss; nests and pylons first.',
   stick: 'Keeps its target until it falls or gets away, whatever comes nearer.',
 };
 
