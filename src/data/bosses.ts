@@ -267,7 +267,7 @@ export const CANTER_RADIUS = 2.1;
 export const CANTER_SPEED = 4;
 /** How long it canters, then gallops, and how far each gallop runs. */
 export const CANTER_SECONDS = 5.5;
-export const GALLOP_LENGTH = 11;
+export const GALLOP_LENGTH = 16;
 export const GALLOP_SPEED = 9;
 /** The lane is shown this long before it runs, and burns this long after. */
 export const GALLOP_TELL = 0.7;
@@ -296,6 +296,10 @@ export const PRISM_PATTERN_EVERY = 4.5;
 
 // The Rotwife (section 8).
 export const ROT_REGEN = 0.004;
+/** A boss that mends itself (the Rotwife's regrowth, the Unmaker's drink) does not while it is being hurt, nor for this long after. */
+export const MEND_PAUSE = 2;
+/** Map affixes a boss map never rolls: they would do nothing to a boss (a map's regeneration does not reach it). */
+export const BOSS_MAP_NO_AFFIX = ['mending'];
 export const ROT_PATCH_EVERY = 1.4;
 export const ROT_PATCH_SECONDS = 8;
 export const ROT_ROTATION = ['bleed', 'poison', 'ignite', 'freeze', 'shock'] as const;

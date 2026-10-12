@@ -9,7 +9,7 @@ import {
   type ThemeDef,
 } from '../data/themes';
 import { rollMapAffixes } from '../gen/mapPlan';
-import { bossForMap } from '../data/bosses';
+import { BOSS_MAP_NO_AFFIX, bossForMap } from '../data/bosses';
 import { fullVitals, type Vitals } from '../sim/types';
 
 /**
@@ -90,7 +90,7 @@ export function makeOffer(
     areaLevel,
     offset: areaLevel - map,
     themeId,
-    affixes: rollMapAffixes(seed, map, slot),
+    affixes: rollMapAffixes(seed, map, slot, bossForMap(map) ? BOSS_MAP_NO_AFFIX : []),
   };
 }
 

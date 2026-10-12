@@ -20,6 +20,7 @@ import {
   FLURRY_TELL,
   FRACTURE_SECONDS,
   FRACTURE_TAKEN,
+  MEND_PAUSE,
   GRIEF_DAMAGE,
   GRIEF_SPEED,
   HORN_TELL,
@@ -360,11 +361,11 @@ describe('the Rotwife (docs/BOSSES.md 8)', () => {
     const m = putBoss(w, 'rotwife', 4, 0, 90);
     run(w, 0.2);
     m.life = m.def.maxLife * 0.5;
-    run(w, 1);
+    run(w, MEND_PAUSE + 1);
     expect(m.life).toBeGreaterThan(m.def.maxLife * 0.5);
     m.life = m.def.maxLife * 0.5;
     m.ail.poisons.push({ dps: 1, t: 5 });
-    run(w, 1);
+    run(w, MEND_PAUSE + 1);
     expect(m.life).toBeLessThanOrEqual(m.def.maxLife * 0.5);
   });
 
@@ -414,6 +415,8 @@ describe('the Unmaker (docs/BOSSES.md 9)', () => {
     run(w, 0.1);
     expect(bossState(m)!.thefts).toBe(4);
     expect(flasksSealed(w)).toBe(true);
+    // (Its life was set by hand, which counts as a hurt: it drinks once the pause is over.)
+    run(w, MEND_PAUSE + 0.2);
     const at = m.life;
     run(w, 1);
     expect(m.life).toBeGreaterThan(at);
@@ -766,6 +769,81 @@ describe('on a real boss map', () => {
     rawHit(w, twins[1], 1e12, 0);
     run(w, 0.5);
     expect(w.exitOpen).toBe(true);
+  });
+});
+
+describe('no boss can out-heal a build (docs/BOSSES.md 2, rule 10)', () => {
+  it('no map affix gives a boss regeneration, on any map', async () => {
+    const { buildMonster } = await import('../calc/monster');
+    const { MAP_AFFIXES } = await import('../data/mapAffixes');
+    const affixes = MAP_AFFIXES.map((a) => a.id);
+    for (const id of BOSS_IDS) {
+      for (const ty of [BOSSES[id].type, ...(BOSSES[id].partners ?? [])]) {
+        const spec: MonsterSpec = {
+          type: ty,
+          variant: 'none',
+          rarity: 'boss',
+          level: BOSSES[id].map,
+          mods: [],
+          affix: affixes,
+        };
+        expect(buildMonster(spec).defence.lifeRegen, ty).toBe(0);
+      }
+    }
+    // (An ordinary monster still gets it.)
+    const plain: MonsterSpec = {
+      type: 'warrior',
+      variant: 'none',
+      rarity: 'normal',
+      level: 30,
+      mods: [],
+      affix: ['mending'],
+    };
+    expect(buildMonster(plain).defence.lifeRegen).toBeGreaterThan(0);
+  });
+
+  it('a boss map never rolls Mending', async () => {
+    const { rollOffers } = await import('../run/offers');
+    for (const id of BOSS_IDS)
+      for (let seed = 1; seed <= 40; seed++)
+        for (const o of rollOffers(seed, BOSSES[id].map))
+          expect(o.affixes).not.toContain('mending');
+  });
+
+  it('the Rotwife does not mend while she is being hurt, nor for a moment after', () => {
+    const w = bossArena(92);
+    w.player.stunT = 1e9;
+    const m = putBoss(w, 'rotwife', 4, 0, 90);
+    run(w, 0.2);
+    m.life = m.def.maxLife * 0.5;
+    // Something light hits her every half second: she never gains.
+    for (let i = 0; i < 10; i++) {
+      const before = m.life;
+      m.life -= 10;
+      run(w, 0.5);
+      expect(m.life, `tick ${i}`).toBeLessThanOrEqual(before - 10 + 1e-6);
+    }
+    // Left alone, she begins to knit once the pause is over.
+    run(w, MEND_PAUSE + 0.3);
+    const at = m.life;
+    run(w, 1);
+    expect(m.life).toBeGreaterThan(at);
+  });
+
+  it('the Unmaker does not drink the flasks while it is being hurt', () => {
+    const w = bossArena(100);
+    w.player.stunT = 1e9;
+    const m = putBoss(w, 'unmaker', 5, 0, 100);
+    run(w, 0.2);
+    m.life = m.def.maxLife * 0.19;
+    run(w, 0.1);
+    expect(bossState(m)!.thefts).toBe(4);
+    for (let i = 0; i < 10; i++) {
+      const before = m.life;
+      m.life -= 10;
+      run(w, 0.5);
+      expect(m.life, `tick ${i}`).toBeLessThanOrEqual(before - 10 + 1e-6);
+    }
   });
 });
 

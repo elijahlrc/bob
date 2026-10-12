@@ -57,13 +57,21 @@ export function affixCountRange(map: number): [number, number] {
  * The affixes an offered map carries. Rolled from the run seed, the map and which offer it is, so the offer
  * is fixed. Affixes that conflict (the same stat, or the same element) never share a map.
  */
-export function rollMapAffixes(seed: number, map: number, offer: number): string[] {
+export function rollMapAffixes(
+  seed: number,
+  map: number,
+  offer: number,
+  /** Affixes this map never rolls (a boss map's). */
+  exclude: readonly string[] = [],
+): string[] {
   const [lo, hi] = affixCountRange(map);
   if (hi === 0) return [];
   const rng = new Rng(seed).fork(`affixes${map}.${offer}`);
   const want = rng.int(lo, hi);
   const picked: string[] = [];
-  for (const id of rng.shuffle(MAP_AFFIXES.filter((a) => !a.chalkOnly).map((a) => a.id))) {
+  for (const id of rng.shuffle(
+    MAP_AFFIXES.filter((a) => !a.chalkOnly && !exclude.includes(a.id)).map((a) => a.id),
+  )) {
     if (picked.length >= want) break;
     if (picked.every((p) => !affixesConflict(p, id))) picked.push(id);
   }

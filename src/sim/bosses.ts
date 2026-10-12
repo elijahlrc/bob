@@ -47,6 +47,7 @@ import {
   REGIMENTS,
   ROT_PATCH_EVERY,
   ROT_PATCH_SECONDS,
+  MEND_PAUSE,
   ROT_REGEN,
   ROT_ROTATION,
   ROUTED_SECONDS,
@@ -144,6 +145,9 @@ export type BossState = {
   rot: number;
   patchT: number;
   regrowing: boolean;
+  /** Seconds left before a boss that mends itself may (it was hurt just now), and its life at the last look. */
+  hurtT: number;
+  seenLife: number;
   // The Unmaker.
   thefts: number;
   shards: { actor: Actor; kind: TheftKind; angle: number }[];
@@ -214,6 +218,8 @@ export function initBoss(w: World, a: Actor): void {
     rot: 0,
     patchT: ROT_PATCH_EVERY,
     regrowing: false,
+    hurtT: 0,
+    seenLife: a.life,
     thefts: 0,
     shards: [],
     exposedT: 0,
@@ -902,9 +908,24 @@ function sufferingDot(m: Actor): boolean {
   return a.ignites.length > 0 || a.bleeds.length > 0 || a.poisons.length > 0 || m.sdots.length > 0;
 }
 
+/**
+ * Whether a boss may mend itself now. It may not while it is being hurt, or for a moment after: so that a build that hits it
+ * at all, however weakly (a weapon, with the mana gone), always wears it down. Regeneration is a cost of pausing, never a wall
+ * (docs/BOSSES.md 2, rule 10). Call it once a tick, before the boss mends.
+ */
+function mayMend(m: Actor, st: BossState, dt: number): boolean {
+  if (m.life < st.seenLife - 1e-6) st.hurtT = MEND_PAUSE;
+  else st.hurtT -= dt;
+  st.seenLife = m.life;
+  return st.hurtT <= 0;
+}
+
 function tickRot(w: World, m: Actor, st: BossState, dt: number): void {
-  st.regrowing = !sufferingDot(m) && m.life < m.def.maxLife;
-  if (st.regrowing) m.life = Math.min(m.def.maxLife, m.life + m.def.maxLife * ROT_REGEN * dt);
+  st.regrowing = mayMend(m, st, dt) && !sufferingDot(m) && m.life < m.def.maxLife;
+  if (st.regrowing) {
+    m.life = Math.min(m.def.maxLife, m.life + m.def.maxLife * ROT_REGEN * dt);
+    st.seenLife = m.life;
+  }
   st.patchT -= dt;
   if (st.patchT <= 0 && m.moving) {
     st.patchT = ROT_PATCH_EVERY;
@@ -1229,8 +1250,10 @@ function tickUnmaker(w: World, m: Actor, st: BossState, dt: number): void {
     s.actor.y = m.y + Math.sin(t + s.angle) * SHARD_ORBIT;
   }
   // While it holds the flasks, it drinks them.
-  if (theftOf(w).flasks)
+  if (mayMend(m, st, dt) && theftOf(w).flasks) {
     m.life = Math.min(m.def.maxLife, m.life + m.def.maxLife * DRINK_REGEN * dt);
+    st.seenLife = m.life;
+  }
 }
 
 /** What the HUD's boss bar says of a boss now (docs/BOSSES.md 10). */

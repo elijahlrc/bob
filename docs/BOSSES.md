@@ -87,6 +87,10 @@ section 13.
 9. **The answer is in reach.** The specific answer to a test is something the run can offer before that map: a gem, a
    flask, an item mod or a passive. The camp shows the boss's card from five maps ahead (section 10), so there is time
    to get it.
+10. **No out-healing (added 2026-10-12).** No regeneration can outpace a build that is hitting the boss at all. A map's
+    regeneration (the Mending affix) never reaches a boss, and a boss's own mending (the Rotwife's regrowth, the Unmaker's
+    drink) pauses while it is being hurt and for `MEND_PAUSE` (2 s) after. A build with no mana left, hitting with its
+    weapon alone, still wears every boss down; regeneration costs a pause and is never a wall. Tested for every boss.
 
 ---
 
@@ -879,3 +883,23 @@ clock, only attrition.
 
 10. **A defence against crits.** The Duellist's lunge is a crit in all but name; nothing reduces a crit taken. A small
     passive or item mod ("hits against you have less extra damage when they crit") would give it a specific answer.
+
+---
+
+## 20. A pass on the Courser and on regeneration (2026-10-12)
+
+The user, 2026-10-12, fighting the Courser: its regeneration was higher than the build could out-damage once its mana was
+gone, so it could not be hurt; its blows were weak; its life bar was enormous; and it should move in larger strokes. Then:
+look at every boss for regeneration that can lock a build out.
+
+- **Where the regeneration came from.** The Courser has none of its own. It was the **Mending** map affix (monsters regenerate
+  2% of their life a second, 1.5% on a map in the 30s), which every monster on a map carries, a boss included. On a boss
+  that is hundreds of life a second for ever.
+- **Rule 10** (section 2): a map's regeneration does not reach a boss (`calc/monster.ts`), a boss map does not roll Mending
+  (`BOSS_MAP_NO_AFFIX`, so the offer does not name an affix that does nothing), and a boss's own mending pauses while it is
+  hurt and for 2 s after (`MEND_PAUSE`, `mayMend` in `sim/bosses.ts`). That covers the Rotwife's regrowth and the Unmaker's
+  drink of the flasks. Both are now a price for a pause (a build that is out of mana and standing back), not a wall.
+- **The Courser:** life 0.4 to 0.28 of toughness, damage 0.55 to 0.8, the gallop runs up to 16 tiles (was 11, so across
+  the whole arena), and the body strides, bobs and swings its lance about a half as far again.
+- **Not changed:** the other map affixes that harden a boss (Hardy, the resistance ones, Unyielding) still apply: they are
+  the map's price and pay their reward.

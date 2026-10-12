@@ -637,7 +637,8 @@ const CREATURES = new Set<FigureKind>([
  */
 function buildCreature(kind: FigureKind, pose: Pose, type?: MonsterTypeId): Prim[] {
   const b: B = { prims: [] };
-  const lift = pose.bob;
+  // The Courser's whole body rises and falls with its stride, more than the rest.
+  const lift = kind === 'courser' ? pose.bob * 2 : pose.bob;
   switch (kind) {
     case 'gnawer': {
       // A low, long rodent: four scrabbling legs, a tail, a pointed head.
@@ -1193,14 +1194,14 @@ function buildCreature(kind: FigureKind, pose: Pose, type?: MonsterTypeId): Prim
         [10, pose.legA],
       ];
       for (const [x, ph] of legs) {
-        cap(b, x, -12 + lift, x + ph * 5, -5 + lift, 1.6, 'boneShade');
-        cap(b, x + ph * 5, -5 + lift, x + ph * 3, 0, 1.2, 'boneShade');
-        circ(b, x + ph * 3, 0, 1.4, 'glow');
+        cap(b, x, -12 + lift, x + ph * 8, -5 + lift, 1.6, 'boneShade');
+        cap(b, x + ph * 8, -5 + lift, x + ph * 5, 0, 1.2, 'boneShade');
+        circ(b, x + ph * 5, 0, 1.4, 'glow');
       }
       cap(b, -11, -15 + lift, 9, -15 + lift, 5.4, 'bone');
       circ(b, 8, -16 + lift, 5.6, 'boneShade');
       cap(b, 10, -18 + lift, 15, -25 + lift, 2.6, 'bone');
-      cap(b, 15, -25 + lift + pose.head * 2, 19, -23 + lift, 2.2, 'boneShade');
+      cap(b, 15, -25 + lift + pose.head * 3.5, 19, -23 + lift, 2.2, 'boneShade');
       circ(b, 16.5, -26 + lift, 0.8, 'eye');
       for (let i = 0; i < 4; i++)
         b.prims.push({
@@ -1215,12 +1216,12 @@ function buildCreature(kind: FigureKind, pose: Pose, type?: MonsterTypeId): Prim
           ],
           role: 'glow',
         });
-      cap(b, -14, -16 + lift, -19, -11 + lift - pose.legA * 2, 1.4, 'glow');
+      cap(b, -14, -16 + lift, -19, -11 + lift - pose.legA * 4, 1.4, 'glow');
       // The rider: a torso rising from the back, a helm, and the lance.
       cap(b, 1, -19 + lift, 3, -31 + lift, 3, 'metalShade');
       circ(b, 3.5, -34 + lift, 3, 'metal');
       circ(b, 5, -34 + lift, 0.8, 'eye');
-      const lance = pose.armA * 4;
+      const lance = pose.armA * 6;
       cap(b, -6, -26 + lift - lance, 19, -22 + lift + lance, 0.9, 'wood');
       b.prims.push({
         k: 'tri',

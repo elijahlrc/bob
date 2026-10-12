@@ -294,7 +294,13 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
   // A Core Golem is immune to its element and to that element's ailments.
   if (t.elemental && spec.variant !== 'none') mods.push(mod(`immune.${spec.variant}`, 'flag', 1));
   for (const id of spec.mods) mods.push(...monsterModDef(id).mods);
-  for (const id of spec.affix ?? []) mods.push(...affixMonsterMods(id, spec.level));
+  // A boss mends only as its own fight says: a map's regeneration does not reach it (docs/BOSSES.md 2, rule 10).
+  for (const id of spec.affix ?? [])
+    mods.push(
+      ...affixMonsterMods(id, spec.level).filter(
+        (x) => !(spec.rarity === 'boss' && x.stat === 'lifeRegenPct'),
+      ),
+    );
   // Shrouded: an energy shield shell worth a quarter of its life, which recharges when it is left alone.
   if (spec.mods.includes('shrouded')) mods.push(mod('es', 'base', Math.round(life * 0.25)));
   if (oldBoss) mods.push(mod('resist.allEle', 'base', 30));

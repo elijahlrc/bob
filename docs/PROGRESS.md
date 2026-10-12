@@ -928,6 +928,13 @@ two bosses, armoured Ash and evasive Cinder, each with a life bar, and the survi
 dead one's kind of blow). The boss warning at camp is two lines of description, nothing about how to fight. The nine theme
 champions now end ordinary maps in the place of the end-of-map rare (from map 5). Since 2026-10-12 that is a 25% roll per map, and the offer card does not announce it.
 
+### Courser pass and no out-healing (docs/BOSSES.md 20), built (2026-10-12)
+
+The Courser was unbeatable out of mana: the Mending map affix (2% of life a second) reached it. A map's regeneration no longer
+reaches any boss, a boss map never rolls Mending, and a boss that mends itself (the Rotwife, the Unmaker's drink) does not
+while it is being hurt or for 2 s after (rule 10). The Courser has less life (0.28), hits harder (0.8), gallops up to 16
+tiles, and strides, bobs and swings its lance further.
+
 ### Passive tree redesign (docs/TREE-REDESIGN.md), T0 to T5 built (2026-10-11)
 
 The tree was the right size and had no design: six identical wedges of rings, clusters that were the roads, coin-flip links.
