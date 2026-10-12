@@ -8,7 +8,13 @@ import type { ThemeDef } from './themes';
  */
 export const CHAMPION_FROM_MAP = 5;
 
-/** The champion that ends a map of this theme, if one does: a plain end (not a boss's, a Quarry's or a Crawl's), late enough. */
+/** How often a map that could end on its champion does (the user: they should turn up now and then, unannounced). */
+export const CHAMPION_CHANCE = 0.25;
+
+/**
+ * The champion that may end a map of this theme: a plain end (not a boss's, a Quarry's or a Crawl's), late enough. Whether it does
+ * is a roll per map (`CHAMPION_CHANCE`, made in `population.ts`); nothing on the offer card says.
+ */
 export function endChampion(
   theme: ThemeDef,
   map: number,

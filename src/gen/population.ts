@@ -1,5 +1,5 @@
 import { bossOfType } from '../data/bosses';
-import { endChampion } from '../data/champions';
+import { CHAMPION_CHANCE, endChampion } from '../data/champions';
 import { Rng } from '../core/rng';
 import type { MonsterSpec } from '../calc/monster';
 import {
@@ -484,7 +484,9 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
             ? opts.theme.chief
             : opts.type === 'crawl'
               ? undefined
-              : endChampion(opts.theme, opts.map, opts.areaLevel, opts.endKind);
+              : rng.fork('champion').chance(CHAMPION_CHANCE)
+                ? endChampion(opts.theme, opts.map, opts.areaLevel, opts.endKind)
+                : undefined;
         if (champ)
           leader = {
             ...leader,

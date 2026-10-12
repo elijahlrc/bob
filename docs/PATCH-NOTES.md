@@ -33,6 +33,8 @@ the docs each entry links to.
 - Each class start now leads straight into its two basic clusters, which in turn link to the clusters around them, so the area
   around a start is well connected.
 - Your passives are refunded once more.
+- The special enemy at the end of an ordinary map (a theme's champion) now turns up only now and then, about one map in four, and the
+  level select no longer warns of it. Boss maps still show their boss.
 - Steady Draw is no longer neutral (35% more damage), and several keystone cards now show their numbers.
 
 ## 2026-10-10

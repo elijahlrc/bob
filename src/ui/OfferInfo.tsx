@@ -1,8 +1,5 @@
 import { BOSSES, type BossId } from '../data/bosses';
-import { monsterModDef } from '../data/monsters';
-import { MOD_MARKS } from '../data/monsterMarks';
 import { FACTION_COLOR, FACTION_GLYPH, TAG_INFO } from '../data/monsterInfo';
-import { themeDef } from '../data/themes';
 import type { OfferPreview } from '../run/preview';
 import { hoverInfo } from './info';
 
@@ -80,13 +77,10 @@ export function OfferTable({ o }: { o: OfferPreview }) {
 /** The part of an offer card that says who is on the map (docs/ENEMIES.md 5.1). */
 export function OfferInfo({
   o,
-  champion,
   boss,
   more,
 }: {
   o: OfferPreview;
-  /** A champion ends the map (docs/BOSSES.md 19): it is named. */
-  champion: boolean;
   /** The boss that ends the map, on a boss map (docs/BOSSES.md): it takes the champion's place. */
   boss?: BossId;
   /** Show the lines that are left out of a narrow card until it is expanded. */
@@ -94,8 +88,6 @@ export function OfferInfo({
 }) {
   const info = o.info;
   if (!info) return null;
-  const theme = themeDef(o.themeId);
-  const champ = theme.chief ? monsterModDef(theme.chief.mod) : null;
   return (
     <div class="offer-info">
       <div class="chips">
@@ -169,11 +161,6 @@ export function OfferInfo({
             <div class="gate">
               <strong>{BOSSES[boss].name[0].toUpperCase() + BOSSES[boss].name.slice(1)}</strong>{' '}
               waits at the end. {BOSSES[boss].brief.join(' ')}
-            </div>
-          )}
-          {champion && !boss && champ && theme.chief && (
-            <div class="gate">
-              <strong>{champ.name}</strong> waits at the end: {MOD_MARKS[theme.chief.mod].desc}
             </div>
           )}
         </>
