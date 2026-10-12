@@ -16,12 +16,14 @@ describe('migrating a save of the passive tree before the district layout (docs/
     expect(out!.classId).toBe('vanguard');
   });
 
-  it('hands them back from a save of the tree before iteration 3 too', () => {
-    const run = newRun('mystic', 1);
-    run.build.allocated = getTree().nodes[getTree().starts[run.classId]].links.slice(0, 1);
-    run.version = 11;
-    const out = migrate(11, run);
-    expect(out!.version).toBe(SAVE_VERSION);
-    expect(out!.build.allocated).toEqual([]);
+  it('hands them back from a save of the tree before iterations 3 and 4 too', () => {
+    for (const v of [11, 12]) {
+      const run = newRun('mystic', 1);
+      run.build.allocated = getTree().nodes[getTree().starts[run.classId]].links.slice(0, 1);
+      run.version = v;
+      const out = migrate(v, run);
+      expect(out!.version).toBe(SAVE_VERSION);
+      expect(out!.build.allocated).toEqual([]);
+    }
   });
 });

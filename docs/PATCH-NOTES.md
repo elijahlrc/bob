@@ -13,6 +13,8 @@ the docs each entry links to.
 - Neighbouring regions of the tree now connect half way out and near the edge, not only through the middle; long roads have
   side entrances; the paths around the class starts are tidier. Your passives are refunded again.
 - New tree colours and icons for spells, energy shield and generic damage (previously shown as mana and attack).
+- Every class start now has two roads out into its region, each leading to a different group of passives, and quick ways across to
+  the neighbouring regions. Your passives are refunded once more.
 - Steady Draw is no longer neutral (35% more damage), and several keystone cards now show their numbers.
 
 ## 2026-10-10

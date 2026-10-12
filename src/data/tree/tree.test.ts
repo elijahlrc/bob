@@ -158,6 +158,45 @@ describe('passive tree invariants (§9.3)', () => {
     }
   });
 
+  it('each class start has the spoke into the middle and two roads out into its region, and a start to start way round the middle', () => {
+    for (const c of CLASSES) {
+      const s = tree.starts[c.id];
+      const out = nodes[s].links.filter((m) => nodes[m].region !== 'hub');
+      expect(nodes[s].links.length, c.id).toBe(3);
+      expect(out.length, c.id).toBe(2);
+      // Within 8 steps (never through another start) there are options: several notables and two ways on.
+      const d = new Map<number, number>([[s, 0]]);
+      const q = [s];
+      for (let h = 0; h < q.length; h++)
+        for (const m of nodes[q[h]].links)
+          if (!d.has(m) && nodes[m].kind !== 'start' && d.get(q[h])! < 8) {
+            d.set(m, d.get(q[h])! + 1);
+            q.push(m);
+          }
+      const near = [...d.keys()].filter((i) => nodes[i].kind === 'notable').length;
+      expect(near, c.id).toBeGreaterThanOrEqual(6);
+    }
+  });
+
+  it('each class start reaches both neighbouring regions without using the middle, within 20 steps', () => {
+    for (const c of CLASSES) {
+      const s = tree.starts[c.id];
+      const own = nodes[s].region;
+      const d = new Map<number, number>([[s, 0]]);
+      const q = [s];
+      for (let h = 0; h < q.length; h++)
+        for (const m of nodes[q[h]].links)
+          if (!d.has(m) && nodes[m].kind !== 'start' && nodes[m].region !== 'hub') {
+            d.set(m, d.get(q[h])! + 1);
+            q.push(m);
+          }
+      const reached = new Set<string>();
+      for (const [i, v] of d)
+        if (v <= 20 && nodes[i].region !== own) reached.add(String(nodes[i].region));
+      expect(reached.size, `${c.id}: ${[...reached]}`).toBeGreaterThanOrEqual(2);
+    }
+  });
+
   it('notable names are unique and at most 4 notables share a mod set', () => {
     const notables = nodes.filter((n) => n.kind === 'notable');
     const names = notables.map((n) => n.name);

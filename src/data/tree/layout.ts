@@ -598,6 +598,62 @@ function sideDoor(b: Builder, from: number, cands: number[], opts: RoadOptions):
 }
 
 /**
+ * A quick way across from the start of each class (iteration 4): from the third node or so of each road out of the start, a road to
+ * the nearest road of another region within reach, so that a build may leave its region early.
+ */
+function startSkips(b: Builder, starts: Record<string, number>, only?: RegionId[]): void {
+  for (const reg of REGIONS) {
+    if (only && !only.includes(reg.id)) continue;
+    const S = b.nodes[starts[reg.classId]];
+    const isRoad = (i: number) => !b.nodes[i].cluster && b.nodes[i].kind !== 'start';
+    for (const out of S.links.filter((m) => b.nodes[m].region === reg.id && isRoad(m))) {
+      // The nodes of the road, walked out from the start while each is on two roads.
+      const chain: number[] = [out];
+      for (;;) {
+        const last = chain[chain.length - 1];
+        const prev = chain[chain.length - 2] ?? starts[reg.classId];
+        const nexts = b.nodes[last].links.filter((m) => m !== prev && isRoad(m));
+        if (
+          chain.length >= 6 ||
+          nexts.length !== 1 ||
+          b.nodes[last].links.filter(isRoad).length !== 2
+        )
+          break;
+        chain.push(nexts[0]);
+      }
+      const cands = b.nodes
+        .filter((n) => n.region !== reg.id && n.region !== 'hub' && joinable(b, n.id))
+        .map((n) => n.id);
+      for (const from of [2, 3, 1, 4, 0, 5].map((k) => chain[k]).filter((x) => x !== undefined)) {
+        const L = b.nodes.length;
+        if (
+          !sideDoor(b, from, cands, {
+            attrs: reg.attrs,
+            pool: ROAD_POOLS[reg.id],
+            spacing: ROAD_STEP,
+          })
+        )
+          continue;
+        // The new nodes belong to the nearer end's region.
+        const ends = new Set<number>();
+        for (let k = L; k < b.nodes.length; k++)
+          for (const m of b.nodes[k].links) if (m < L && m !== from) ends.add(m);
+        const T = b.nodes[[...ends][0] ?? from];
+        const F = b.nodes[from];
+        for (let k = L; k < b.nodes.length; k++) {
+          const n = b.nodes[k];
+          n.region =
+            Math.hypot(n.x - F.x, n.y - F.y) <= Math.hypot(n.x - T.x, n.y - T.y)
+              ? reg.id
+              : T.region;
+        }
+        break;
+      }
+    }
+  }
+}
+
+/**
  * Long roads with nothing along them (nine nodes or more, each on two roads only) get a road from their middle to the nearest
  * road near by, in whichever region it is. Run once the whole tree is laid, so that the crossings between regions count too.
  */
@@ -762,6 +818,28 @@ function layoutRegion(
   };
   for (const [from, to] of REGION_LINKS[reg.id] ?? [])
     road(ref(from), ref(to), undefined, `${from}>${to}`);
+  // A second road out of the class start (iteration 4, the user: two major paths out of the start): to the nearest junction of a
+  // district that lies another way (at least 40 degrees from the first road), so that each start has two ways to go, each with the
+  // branches of its district.
+  {
+    const S = b.nodes[start];
+    const first = S.links.find((m) => m >= L0);
+    if (first !== undefined) {
+      const a: Vec = [b.nodes[first].x - S.x, b.nodes[first].y - S.y];
+      const la = Math.hypot(a[0], a[1]) || 1;
+      const cands = [...junctionIds.values()]
+        .flat()
+        .filter((i) => b.nodes[i].links.length <= 4)
+        .map((i) => {
+          const v: Vec = [b.nodes[i].x - S.x, b.nodes[i].y - S.y];
+          const lv = Math.hypot(v[0], v[1]) || 1;
+          return { i, d: lv, cos: (a[0] * v[0] + a[1] * v[1]) / (la * lv) };
+        })
+        .filter((c) => c.d >= 350 && c.d <= 1600 && c.cos <= 0.766)
+        .sort((x, y) => x.d - y.d || x.i - y.i);
+      cands.slice(0, 10).some((c) => road(start, c.i, undefined, 'start 2', true));
+    }
+  }
   const regionRoads = (): number[] => {
     const out: number[] = [];
     for (let i = L0; i < b.nodes.length; i++) if (joinable(b, i)) out.push(i);
@@ -1068,6 +1146,7 @@ export function buildLayoutTree(opts: { regions?: RegionId[] } = {}): LayoutTree
       layoutRegion(b, reg, starts[reg.classId], dropped, unplaced);
   gateways(b, ring, starts, dropped, opts.regions);
   bridges(b, opts.regions);
+  startSkips(b, starts, opts.regions);
   chainDoors(b);
   return { nodes: b.nodes, starts, dropped, unplaced };
 }

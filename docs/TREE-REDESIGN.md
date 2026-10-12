@@ -579,3 +579,19 @@ The tree screen also reads better at a glance: three more colours, each with its
 a star; spell damage and cast speed, which were mana's), **energy shield** (pale blue, a ring; was mana's) and **damage of every
 kind** (warm white, a burst; untyped damage, which was coloured as an attack). Damage-over-time multipliers are chaos's (poison) or
 their element's, and mine damage is the minions' and deployables', as trap and totem damage were.
+
+### Iteration 4, the first steps from a start (2026-10-11)
+
+The user: some classes need more basic stuff at the start of their tree (noticed on the Mystic); two major paths out of the start,
+each with side options, and quick skips to nearby regions, is a good baseline for every class; "two outward facing paths and the
+inward one". Measured, a start had one road into its region (and the spoke to the middle): within 8 steps the Mystic had 6 notables
+and the Vanguard 2 (the others 14 to 18).
+
+- **A second road out of every start** (`layout.ts`, in `layoutRegion` after the plan's roads): to the nearest junction of a
+  district (within 350 to 1,600) that lies at least 40 degrees away from the first road, so that the two go different ways and each
+  has the branches of its district. Every start now has three links: the spoke and two roads out (a test says so).
+- **A quick skip from each road** (`startSkips`, after the crossings): from about the third node of each road out of the start, a
+  road to the nearest road of another region within 900 that is not near by road. Without the middle, every start now reaches both
+  neighbouring regions within 6 to 18 steps (it reached none before iteration 3); a test says within 20.
+- Notables within 8 steps of a start, before and after: Mystic 6 and 13, Vanguard 2 and 7, Zealot 14 and 18, Shade 15 and 19, Strider
+  18 and 19, Reaver 17 and 17. 2,061 nodes (was 2,052). `SAVE_VERSION` 13 hands passives back again.

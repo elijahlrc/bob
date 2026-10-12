@@ -955,4 +955,5 @@ The audit by two rounds of twelve simulated players (T6.1, T6.2) followed: regio
 a search box is on the tree screen, the middle is worth taking (docs/TREE-REDESIGN.md 14, docs/tree/playtest).
 Iteration 3 (the user's review): neighbouring regions are joined half way out and near the rim, the middle reaches the regions by
 one forked road between each two starts, long roads have side doors and honeycombs fewer sides; three more colours on the tree
-screen (spells, energy shield, damage of every kind). 2,052 nodes; `SAVE_VERSION` 12 hands passives back.
+screen (spells, energy shield, damage of every kind). Iteration 4: every start has two roads out and the spoke in, with a quick skip
+to the neighbouring regions (the user: some starts had too little to choose from). 2,061 nodes; `SAVE_VERSION` 13 hands passives back.
