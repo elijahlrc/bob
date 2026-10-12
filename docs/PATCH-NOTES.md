@@ -5,30 +5,12 @@ the docs each entry links to.
 
 ## 2026-10-11
 
-### Bosses
-
-- **A boss ends every tenth map**, ten in all, each asking your build a different question: the Tollkeeper (10), Siege Marshal (20),
-  Courser (30), Veiled Duellist (40), Magistrate (50), Bulwark Engine (60), Prism Warden (70), Sundered Twins (80), Rotwife (90)
-  and the Unmaker (100). Details in docs/BOSSES.md.
-- At camp, a short note describes the boss from five maps ahead. A boss map is offered on its own, and you have twice the usual
-  time to leave it.
-- Theme champions now end ordinary maps from map 5, in place of the end-of-map rare. The Ossuary Regent is gone.
-- Cleansing flasks cover poison, shock and curses, and a boss cannot freeze or stun you twice within 4 seconds.
-
-### The passive tree, redrawn
-
-Your allocated passives are handed back as unspent points. Details in docs/TREE-REDESIGN.md.
-
-- **A new layout.** The regions are no longer copies of each other: each has its own shape and themed districts (fire and cold,
-  minions, traps and mines, totems, and so on). The middle is an open crossroads, and you can reach any region through it.
-- **Cleaner roads.** The nodes between clusters give plain stats of the region, never a weapon or skill type, and a cluster is a
-  side trip you can skip. Keystones sit at the end of a short approach that fits them.
-- **Notables are worth taking.** Every notable is worth at least three small nodes, each stat's small nodes give one value, and
-  clusters give what their notable gives. The middle's notables are as strong as a region's.
-- **Search the tree** with the box at the top of the passive tree screen: it rings every node that matches your words.
-- 100 points now buy somewhat fewer notables than before (about 23 to 30, from 31 to 34), as the walks are longer.
-- **Keystone fixes:** Steady Draw is 35% more damage (it was neutral); several keystone cards now give their numbers; charge text
-  no longer shows "per 1 charges.grit".
+- Bosses: a boss now ends every tenth map (ten in all), each with its own mechanic. See docs/BOSSES.md.
+- The passive tree has a new layout. Your allocated passives are refunded as unspent points. See docs/TREE-REDESIGN.md.
+- Every region of the tree has its own shape and themed districts, and you can reach any region through the middle.
+- Notables are stronger relative to small nodes, and clusters make more sense.
+- Search box on the passive tree screen.
+- Steady Draw is no longer neutral (35% more damage), and several keystone cards now show their numbers.
 
 ## 2026-10-10
 
