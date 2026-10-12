@@ -937,7 +937,7 @@ the tip; 95 clusters wayside on purpose) and a plan (`plan.ts`: where each stand
 (`roads.ts`, never a weapon or a skill type), and every cluster hangs from one by a single entrance (`shapes.ts`), so a road
 never runs through a cluster. Five district templates (honeycomb, ring, fork, avenue, ladder), an open middle (a ring road, a
 hub cluster between each pair of class directions, three keystones inside, a wheel with three spokes), keystone peninsulas
-of four small nodes themed to the keystone. 2,165 nodes (was 1,727: roads are a third of them); a class start is 12 steps from
+of four small nodes themed to the keystone. 2,032 nodes (was 1,727: roads are a quarter of them); a class start is 12 steps from
 a neighbour's and 17 to 23 from the far ones, as before. `SAVE_VERSION` 11 hands passives back.
 
 Strength and sense first (T2): notables are worth at least three small nodes (`power.ts`, `balance.ts`: 30 raised), small

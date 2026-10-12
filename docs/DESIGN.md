@@ -501,8 +501,8 @@ the clusters.
 | Keystones                  | 27           | Section 9.4; each at the end of a peninsula of four small nodes themed to it                                                  |
 | Notables                   | ~370         | Unique names. At most 4 notables share the same mod set (with different values allowed). Each is worth at least 3 small nodes |
 | Small passives in clusters | ~1,070       | Repeat the cluster's theme; all small nodes of one stat give the same value                                                   |
-| Road nodes                 | ~650         | Attribute nodes where roads fork and in turn along them, and small nodes of generic stats of the region                       |
-| **Total**                  | **~2,150**   | Roads are about a third of the nodes                                                                                          |
+| Road nodes                 | ~500         | Attribute nodes where roads fork and in turn along them, and small nodes of generic stats of the region                       |
+| **Total**                  | **~2,030**   | Roads are about a quarter of the nodes                                                                                        |
 
 - **Layout:** the six class starts sit on an inner ring, in PoE order:
   - Mystic (Int) at the top;
@@ -535,7 +535,7 @@ The tree is authored at the **district** level, never node by node.
   A snapshot test pins the node count, edge count and every keystone's id and position.
 - `src/data/tree/power.ts` prices a node in small nodes; `scripts/tree/balance.ts` repairs the generated clusters to it.
 - Tools: `npm run tree:audit`, `tree:pic`, `tree:explore`, `tree:charter`.
-- **Rendering:** SVG with about 2,150 nodes (one group each) must pan and zoom at 60 fps on a mid-range laptop.
+- **Rendering:** SVG with about 2,030 nodes (one group each) must pan and zoom at 60 fps on a mid-range laptop.
   If it does not, switch the tree view to a `<canvas>` renderer behind the same component interface, and record it in
   Appendix A.
 

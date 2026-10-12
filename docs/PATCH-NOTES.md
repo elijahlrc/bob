@@ -5,44 +5,56 @@ the docs each entry links to.
 
 ## 2026-10-11
 
-### Passive tree: a new layout
+### The passive tree, redrawn
 
-The passive tree has been redrawn (docs/TREE-REDESIGN.md). Your allocated passives are handed back as unspent points; nothing else
-about your run changes.
+The whole passive tree has a new layout (docs/TREE-REDESIGN.md). **Your allocated passives are handed back as unspent points**, since
+the nodes are in new places; nothing else about your run changes. It has 2,032 nodes (it had 1,727); a notable is still one point and
+so is every small node.
 
-- **Not a flower any more.** The six regions are no longer copies of one another: each has its own shape and landmarks (a
-  honeycomb of closely linked clusters, a big ring, a road that forks, a long ladder), and the centre is an open crossroads.
-- **Roads are generic.** The nodes you pass through on the way between clusters give plain stats of the region (life, mana,
-  energy shield, armour, evasion, damage, speed), never a weapon or skill type, so passing through costs you something you can use.
-- **Clusters hang off the road.** A cluster of a notable and its small nodes is a side trip with one way in: you take it when you
-  want it, and passing never forces you to take its nodes.
-- **Keystones sit at the end of a peninsula** of four small nodes that fit the keystone.
-- Roads take more points than before (about a fifth fewer notables for 100 points), and every notable is worth more.
-- **Search the tree.** A box at the top of the passive tree screen finds nodes by words ("spell crit", "minion", "fire"): every
-  match is ringed and Next takes you to one. A node's lines are matched by every word, in any order.
-- **Classes are joined through the middle.** You can walk from any class to any region by the ring of the middle; a class start is
-  still a door you cannot walk through.
-- **The middle is worth the walk**: its notables are as strong as a region's, and its roads give life, damage, resistances and
-  movement speed.
-- **Roads give fewer attribute nodes** (one in three), no accuracy filler on the dexterity roads, and cost less per notable.
-- **Archetypes at home:** trap, mine, minion block and totem nodes that stood away from their kind are moved into their district.
-- Cards: Steady Draw is 35% more damage (it was neutral), keystone cards give their numbers (Close Quarters, Prismatic Balance, Cruel Agony,
-  Volatile Servants), lines that say the same thing are one line with the sum, and charge text no longer reads "per 1 charges.grit".
+**The shape**
 
-### Passive tree: notables are worth taking, and the middle is for everyone
+- **No longer a flower.** The six regions are not copies of one another. Each has its own landmarks: a honeycomb of closely linked
+  clusters, a big ring, a road that forks into arms, a long ladder, an avenue. Each region is made of four or five themed
+  districts (the Conflux of fire, cold and lightning; the Bone Court of minions; Snare Row of traps and mines; the Standards of
+  totems; and so on) and a few clusters that stand alone beside a road.
+- **The middle is an open crossroads.** A ring road joins the six class starts, with a hub cluster between each pair of classes and
+  three keystones inside it. **You can walk from any class into any other region through the middle** (a class start is still a
+  door you cannot walk through), and the middle's notables are as strong as a region's, with roads that give life, damage,
+  resistances and movement speed.
+- **Roads first.** The nodes you pass on the way between places are plain stats of the region (life, mana, energy shield, armour,
+  evasion, damage, speed), never a weapon or a skill type, and one in three is an attribute node. A cluster of a notable and its
+  small nodes is a side trip with a single way in, so passing it never makes you take its nodes.
+- **Keystones sit at the end of a peninsula** of four small nodes that fit them (the way to Nimble Gambit is movement speed).
+- **Archetypes at home.** Trap, mine, minion block and totem nodes that stood away from their kind moved into their district.
+- Walking takes a little more than before: 100 points buy about 23 to 30 notables where they bought 31 to 34 (a notable now costs
+  about 3.3 to 4 points to reach, from about 3). A district costs most for its first notable and little for the rest.
 
-First part of a redesign of the passive tree (docs/TREE-REDESIGN.md). Nothing moves yet, so saves are untouched.
+**Strength and sense**
 
-- **Notables beat small nodes.** About thirty notables were worth one or two small nodes (a "5% maximum life" notable beside
-  4–5% small nodes). Every notable is now worth at least three small nodes, or two and a half if it has several lines: the weak ones
-  now give, for example, 15% maximum life, 25% maximum mana, 60% critical strike chance.
+- **Every notable is worth at least three small nodes** (two and a half with several lines). About thirty were worth one or two: a
+  notable of "5% maximum life" beside small nodes of 4 to 5%. Those now give, for example, 15% maximum life, 25% maximum mana or
+  60% critical strike chance.
 - **One value per stat.** Small nodes of one stat used to come in several sizes (maximum life was 1.7%, 3%, 4% or 5%); each stat
-  now has one. Most small life nodes are now 5%.
-- **Clusters make sense.** About sixty clusters had small nodes that had nothing to do with their notable (a damage notable with
-  leech nodes); their small nodes now give what the notable gives.
-- **The middle of the tree is generic.** The hub next to each class start used to give Cast and Attack Speed, Flask Charges or
-  Ailment Effect, so a Vanguard's first nodes were cast speed. It now gives life, damage, mana regeneration, energy shield,
-  resistances, or armour and evasion.
+  has one now. Most small life nodes are 5%.
+- **A cluster agrees with itself.** About sixty clusters had small nodes unrelated to their notable (a damage notable with leech
+  nodes); they now give what the notable gives. Lines that said the same thing are one line with the total ("3 additional
+  Minions" instead of three lines of "1 additional Minion").
+
+**Finding your way**
+
+- **Search the tree.** A box at the top of the passive tree screen finds nodes by words ("minion", "fire", "spell crit"): every
+  word has to be in the node's name or lines, in any order, every match is ringed, and Next takes you to one.
+
+**Keystones and cards**
+
+- **Steady Draw** is 35% more damage with 20% less attack speed (it was exactly neutral).
+- The cards of **Close Quarters, Prismatic Balance, Cruel Agony, Mana Bastion, Blood Rite, Plated Hide and Volatile Servants** give
+  their numbers and say what they cost; Searing Avatar says that what is not converted to fire is not dealt; Fever Pitch, Pain
+  Conduit and Searing Avatar no longer say the same thing twice.
+- Charge text no longer reads "per 1 charges.grit", and "a Insight Charge" is "an Insight Charge" (this was also on uniques).
+
+**Not here yet** (they need new nodes): life on hit, spreading poison, ignite damage, warcry, stun power, and more curses near the
+Mystic. A refund still keeps the road nodes of the notable you give back.
 
 ## 2026-10-10
 
