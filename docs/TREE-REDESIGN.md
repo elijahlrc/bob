@@ -526,3 +526,26 @@ aura keystones borrow the small node of a generated cluster of that subject), at
 pointing out. **Not built**, the plan's cheapest items to drop: the great wheels and the row and twin cluster shapes (the ring and
 honeycomb districts carry the landmarks), the three named bridges between regions (no new nodes: a bridge would be a road
 between two outer gates with an existing notable at its middle). Whether they are missed is for the audit to say.
+
+### T6.1 and T6.2, the audit by simulated players (2026-10-11)
+
+Two rounds of twelve agents each (24 builds of about 100 points, home and against the grain of the start; raw reports in
+`docs/tree/playtest/round1` and `round2`, the triage with every verdict, and what was declined and why, in `triage-round1.md` and
+`triage-round2.md`). The agents had pictures (`tree:pic`) and `tree:explore` and no access to the docs or the source.
+
+**Round 1** found that nine of twelve could not leave their own region: a class start cannot be walked through, and a region's only
+door was its own start (1,667 to 1,759 of 2,165 nodes out of reach; the old connectivity test let paths run through starts). Fixed
+with two roads from the ring of the middle into every region (`HUB_LINKS`) and a test that walks the tree as a player does. Also:
+roads were half +10 attribute nodes (now one in three, junctions are small nodes of the region's stats, roads 215 apart, no accuracy
+filler on dex roads), Steady Draw was exactly neutral (35% more damage now), keystone cards lacked their numbers, "per 1
+charges.grit" leaked into text. Declined: "make starts passable" (the roads are the fix), "a notable beside every start".
+
+**Round 2** (scores 7 to 8 of 10): eight could not tell from the picture where a theme lives. Fixed with a search box on the tree
+screen (every word, any order; matches ringed; Next jumps), `explore find` by all words and a `path` command. The middle was worth
+nothing (its notables were three small nodes' worth against five; its roads gave mana and energy shield): now as strong as a region's
+median and generic-only roads. Five archetype clusters moved to their district (`docs/tree/overrides.json`); repeated lines on a
+card are one line with the sum. **Later** (new nodes, D5): life on hit, spreading poison, ignite damage, warcry, stun power, curses near
+a Mystic, minion block near the minions; and a game rule, three players' complaint: a refund keeps the road nodes of a notable.
+
+What the audit changed in the plan: the plan expected the layout to be judged on its look; the players judged it on whether they
+could get where they meant to go, and the biggest defect was one the tests did not know to look for. The tests now say it.

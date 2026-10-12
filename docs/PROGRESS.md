@@ -947,8 +947,9 @@ Tools: `npm run tree:audit` (the measurements, for information), `tree:pic` (a P
 `tree:explore` (build with the tree from a terminal), `tree:charter`. The band tests that pinned the old design are retired;
 `tree.test.ts` now tests facts (one entrance per cluster, generic roads, nothing overlaps, notables beat small nodes).
 
-Bot sample (8 a class, seed 5, scaling 1.5), old tree / new tree: median map reached vanguard 10 / 8.5, strider 10 / 8.5, mystic
-4.5 / 2.5, reaver 10 / 10, zealot 6.5 / 6.5, shade 15 / 8.5. Eight runs cannot tell much, but the direction is down. A greedy
-100-point build takes 24 to 27 notables on the new tree against 31 to 34 on the old (each notable worth more, the roads
-longer). T8 of the plan looks at it with more runs; the knobs are the power table and the road density (`ROAD_STEP`).
-Next: the audit by twelve simulated players (T6.1) and the response to it (T6.2).
+Bot sample (16 a class, seed 5, scaling 1.5), median map reached, old tree / new tree after the audit (below): vanguard 7 / 8.5, strider 9.5 / 9,
+mystic 5 / 4.5, reaver 10 / 12.5, zealot 7 / 5.5, shade 15 / 9; wins 2 of 96 old, 2 of 96 new. Two classes better, two worse, two level; sixteen
+runs have a spread of a few maps, but the shade was low in both samples (8.5 and 9 against 15) and is the one to look at first: its
+dagger and crit districts are 12 to 16 steps from its start, and the bot does not plan a walk. Nothing was tuned from the bot.
+The audit by two rounds of twelve simulated players (T6.1, T6.2) followed: regions are joined through the middle, roads are less filler,
+a search box is on the tree screen, the middle is worth taking (docs/TREE-REDESIGN.md 14, docs/tree/playtest).
