@@ -19,6 +19,9 @@ the docs each entry links to.
   A few core options come next, and the narrow, unusual ideas are further out.
 - More crossings between regions (some long), a looser, less regular middle, and new shapes: clusters can be arcs or wings, two
   notables can share a ring, and some notables sit in a line.
+- The ground around every start is fuller: basic clusters and notables (life regeneration, resistances, speeds, armour, evasion,
+  mana and the like) stand beside the roads, and near a start each stretch of road is a line of one stat, with a different stat on
+  each branch, some ending in a notable.
 - Your passives are refunded once more.
 - Steady Draw is no longer neutral (35% more damage), and several keystone cards now show their numbers.
 

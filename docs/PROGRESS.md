@@ -961,3 +961,6 @@ Iteration 5 (the user: the starts lack the basics): districts in tiers by distan
 start, narrow waysides far out, 19 crossings between regions, a looser middle with the keystones on its wheel, more cluster shapes
 (crescent, wing, two notables in a ring, a line of two or three), the tree build fast again (0.74 s); critiqued by an independent
 agent and revised. 2,133 nodes; `SAVE_VERSION` 14 hands passives back.
+Iteration 6 (the user: still sparse round the starts; a fork of plain lines is no decision): roads near a start are threads of one
+stat with different stats at a fork, basic notables on a few of them, six basic clusters a class in the emptiest ground beside the
+roads. 2,260 nodes; `SAVE_VERSION` 15 hands passives back.

@@ -638,3 +638,27 @@ points were weighed (below).
   crossings being long (the user wants some dear), ruler-straight roads (the user wants side doors, not shorter roads), junctions of
   the district templates with fans under 20 degrees (30, as before iteration 3, the worst junction degree 6, was 8).
   `SAVE_VERSION` 14 hands passives back.
+
+### Iteration 6, threads and basic clusters round the starts (2026-10-11)
+
+The user, three times: still sparse around the starts; add about 50 basic and notable nodes in the sparse sections, looking at the
+reference tree for inspiration; "don't measure, look at it": long costly stretches with no nodes right outside the starts; and "a
+fork between various simple basic lines does not add any decision, it is brainless; the reference does this much better". Looked at
+by eye (the six starts, `tree:pic`), the cause was iteration 5's own: the first district pushed 1,150 from the start left long,
+ruler-straight roads of plain nodes with forks between them and big empty pockets beside them. (The reference data has depth and
+sector, no places; the kinds near its starts are life, mana, damage, attributes, accuracy, the speeds, energy shield, resistances.)
+
+- **Threads** (`threadStarts`, `roads.ts THREADS`): within 2,300 of a start, outside the kit's first 6 steps, every stretch of road
+  between two forks is one stat from the class's palette (generic: life, ES, armour, evasion, the speeds, crit, accuracy, mana,
+  resistances), and the stretches that leave a fork get different stats; so a fork is a choice between lines about something.
+- **Notables on the path** (`PATH_NOTABLES`): the node beside the far fork of a few of the nearest threads is a basic notable of the
+  thread's stat (Hushed Reserve for an ES line, Ox-Hearted for life, Plate and Padding for armour; ours; 13 are placed).
+- **Basic clusters in the voids** (`fillSparse`, `FILL`): six a class (a notable and three small nodes, themed to the basics: life
+  regeneration, resistances, stun threshold, physical melee, projectile speed, mana, reservation and the like), each hung where the
+  ground beside a road within 3,100 of the start is emptiest (the farthest from any cluster node), the first for every class
+  before any class has two. About 120 nodes in all (2,133 to 2,260 with the 13 on-path notables, which change nodes). Asked for
+  about 50: at that number the voids did not change on the picture; trim by deleting entries of `FILL`.
+- Tried and left: pulling the first district in again (`pack.ts` with APRON 650): the wedge is full, the districts stand where they
+  stood; and counting bare runs of road (forks cut them short) or steps to the nearest cluster (a 3-node stretch is a wide void
+  at this scale): the emptiness of the ground, by eye, was the right measure.
+  `SAVE_VERSION` 15 hands passives back.

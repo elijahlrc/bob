@@ -449,6 +449,19 @@ export const THEMES: Record<string, Theme> = {
     small: [mod('resist.allEle', 'base', 4)],
     notable: (s) => [mod('resist.allEle', 'base', r(8 * s)), mod('life', 'inc', r(5 * s))],
   },
+  // For the basic notables on the paths near a start (layout.ts, threadStarts): their own sets, with the stun threshold of a fighter.
+  hardy: {
+    id: 'hardy',
+    smallName: 'Life',
+    small: [mod('life', 'inc', 5)],
+    notable: (s) => [mod('life', 'inc', r(9 * s)), mod('stunThreshold', 'inc', r(15 * s))],
+  },
+  sturdy: {
+    id: 'sturdy',
+    smallName: 'Armour',
+    small: [mod('armour', 'inc', 12)],
+    notable: (s) => [mod('armour', 'inc', r(24 * s)), mod('stunThreshold', 'inc', r(12 * s))],
+  },
   hubDefence: {
     id: 'hubDefence',
     smallName: 'Armour and Evasion',

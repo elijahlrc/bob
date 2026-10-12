@@ -2,7 +2,7 @@
 
 exports[`passive tree invariants (§9.3) > is deterministic and pinned (snapshot) 1`] = `
 {
-  "edges": 2359,
+  "edges": 2493,
   "keystones": [
     {
       "id": 75,
@@ -167,6 +167,6 @@ exports[`passive tree invariants (§9.3) > is deterministic and pinned (snapshot
       "y": -1068,
     },
   ],
-  "nodes": 2133,
+  "nodes": 2260,
 }
 `;

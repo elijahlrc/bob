@@ -86,7 +86,7 @@ export const STARTERS: Record<
   ],
   dexint: [
     { name: 'Dusk Step', theme: 'esEvasion', smalls: 'evasion' },
-    { name: 'Sure Sight', theme: 'accuracy' },
+    { name: 'Sure Sight', theme: 'accuracy', smalls: 'accuracy' },
   ],
   dex: [
     { name: 'Light Tread', theme: 'evasion', smalls: 'moveSpeed' },
@@ -105,3 +105,141 @@ export const STARTERS: Record<
     { name: 'Quiet Focus', theme: 'spell', smalls: 'damage' },
   ],
 };
+
+/**
+ * Basic clusters added where the ground around a start is thinnest (iteration 6, the user: still sparse around the starts; about
+ * fifty nodes of the basics). What the reference tree has near its class starts is the model of the mix (life, mana, damage,
+ * attributes, accuracy, the speeds, energy shield, resistances: only the kinds, none of its nodes, names or places); these are ours.
+ * `fillSparse` in layout.ts puts them, each class at least one, the rest where the ground is emptiest. `smalls` names a stat of the
+ * roads for the small nodes instead of the theme's; `strength` raises the notable (the floor of power.ts).
+ */
+export type FillSpec = {
+  name: string;
+  theme: string;
+  smalls?: keyof typeof P;
+  strength?: number;
+  smallCount?: number;
+};
+export const FILL: Record<RegionId, FillSpec[]> = {
+  int: [
+    { name: 'Still Waters', theme: 'mana', smalls: 'castSpeed' },
+    { name: 'Kindled Mind', theme: 'spell', smalls: 'crit' },
+    { name: 'Quiet Tide', theme: 'esRecharge' },
+    { name: 'Candle at Noon', theme: 'spell' },
+    { name: 'Weighed Silence', theme: 'reservation' },
+    { name: 'Clear Skies', theme: 'maxRes' },
+  ],
+  dexint: [
+    { name: 'Quiet Footing', theme: 'moveSpeed', smalls: 'evasion', strength: 1.4 },
+    { name: 'Sharp Instinct', theme: 'accuracy', smalls: 'accuracy' },
+    { name: 'Dim Lantern', theme: 'castSpeed' },
+    { name: 'Thin Ice Step', theme: 'esEvasion' },
+    { name: "Cat's Patience", theme: 'accuracy', smalls: 'accuracy' },
+    { name: 'Shadow Stitch', theme: 'esEvasion' },
+  ],
+  dex: [
+    { name: 'Swift Quiver', theme: 'projectile' },
+    { name: "Hawk's Patience", theme: 'accuracy', smalls: 'attackSpeed', smallCount: 4 },
+    { name: 'Reed-Walker', theme: 'moveSpeed', strength: 1.4 },
+    { name: 'Dry Wind', theme: 'moveSpeed', smalls: 'evasion', strength: 1.4 },
+    { name: 'Quick Draw Habit', theme: 'attackSpeed' },
+    { name: 'Far Sight', theme: 'projSpeed' },
+  ],
+  strdex: [
+    { name: 'Hardened Hands', theme: 'armour' },
+    { name: 'Even Breath', theme: 'lifeRegen', smallCount: 4 },
+    { name: 'Rolled Shoulder', theme: 'physReduction' },
+    { name: 'Boot Leather', theme: 'moveSpeed', strength: 1.4 },
+    { name: 'Anvil Hours', theme: 'meleePhys' },
+    { name: 'Layered Wool', theme: 'physReduction', smalls: 'regen' },
+  ],
+  str: [
+    { name: 'Mulish Will', theme: 'lifeRegen' },
+    { name: 'Stone Resolve', theme: 'eleRes' },
+    { name: 'Set Jaw', theme: 'stunThreshold' },
+    { name: 'Crude Plate', theme: 'armour', smalls: 'armour' },
+    { name: 'Heft', theme: 'meleePhys', smalls: 'damage' },
+    { name: 'Banked Coals', theme: 'lifeRegen', smalls: 'regen' },
+  ],
+  strint: [
+    { name: 'Candleward', theme: 'eleRes' },
+    { name: 'Measured Breath', theme: 'mana' },
+    { name: 'Plain Habit', theme: 'armourEs' },
+    { name: 'Vestry Hours', theme: 'es', smalls: 'armour' },
+    { name: 'Tithe of Calm', theme: 'reservation' },
+    { name: 'Warm Hands', theme: 'lifeRegen', smalls: 'regen' },
+  ],
+};
+
+/**
+ * The threads of a start (iteration 6, the user: a fork between various simple basic lines is brainless; take inspiration from the
+ * reference tree). Near a class start every stretch of road between two forks is one stat, a thread, and the threads that leave a
+ * fork are different stats; so a fork is a choice between lines that are about something, and a few lead to a basic notable on the
+ * path. `THREADS` is the stats a class's threads are drawn from, in turn (life and energy shield once each at most: a lever).
+ */
+export const THREADS: Record<RegionId, (keyof typeof P)[]> = {
+  int: ['es', 'mana', 'castSpeed', 'spellDamage', 'crit', 'res'],
+  dexint: ['evasion', 'es', 'crit', 'castSpeed', 'attackSpeed', 'accuracy'],
+  dex: ['evasion', 'attackSpeed', 'moveSpeed', 'accuracy', 'life', 'damage'],
+  strdex: ['life', 'armour', 'attackSpeed', 'evasion', 'damage', 'accuracy'],
+  str: ['life', 'armour', 'damage', 'regen', 'attackSpeed', 'res'],
+  strint: ['life', 'es', 'armour', 'mana', 'castSpeed', 'res'],
+};
+
+/** The theme (notableThemes.ts) of a basic notable at the end of a thread of a stat. */
+const THREAD_THEME: Partial<Record<keyof typeof P, { theme: string; strength?: number }>> = {
+  life: { theme: 'hardy' },
+  es: { theme: 'esRecharge' },
+  armour: { theme: 'sturdy' },
+  evasion: { theme: 'evasion' },
+  mana: { theme: 'mana' },
+  castSpeed: { theme: 'castSpeed' },
+  attackSpeed: { theme: 'attackSpeed' },
+  crit: { theme: 'critChance', strength: 1.3 },
+  accuracy: { theme: 'accuracy' },
+  moveSpeed: { theme: 'moveSpeed', strength: 1.4 },
+  regen: { theme: 'lifeRegen' },
+  res: { theme: 'eleRes' },
+  spellDamage: { theme: 'spell' },
+};
+
+/** The basic notables on the paths near a start: a thread of this stat leads to it. Names are ours. */
+export const PATH_NOTABLES: Record<RegionId, { stat: keyof typeof P; name: string }[]> = {
+  int: [
+    { stat: 'es', name: 'Hushed Reserve' },
+    { stat: 'mana', name: 'Deep Draught' },
+    { stat: 'spellDamage', name: 'Practised Weave' },
+    { stat: 'crit', name: 'Clear Sight' },
+  ],
+  dexint: [
+    { stat: 'evasion', name: 'Reed in the Wind' },
+    { stat: 'es', name: 'Shaded Ward' },
+    { stat: 'crit', name: 'Hairline Cut' },
+    { stat: 'castSpeed', name: 'Quick Whisper' },
+  ],
+  dex: [
+    { stat: 'evasion', name: 'Dust Behind' },
+    { stat: 'attackSpeed', name: 'Loosed Cord' },
+    { stat: 'moveSpeed', name: 'Long Stride' },
+    { stat: 'accuracy', name: 'Steady Aim' },
+  ],
+  strdex: [
+    { stat: 'life', name: 'Hale Constitution' },
+    { stat: 'armour', name: 'Plate and Padding' },
+    { stat: 'attackSpeed', name: 'Practised Swing' },
+    { stat: 'evasion', name: 'Sidestep Drill' },
+  ],
+  str: [
+    { stat: 'life', name: 'Ox-Hearted' },
+    { stat: 'armour', name: 'Wrapped in Hide' },
+    { stat: 'regen', name: 'Tireless Breath' },
+    { stat: 'res', name: 'Weathered Skin' },
+  ],
+  strint: [
+    { stat: 'life', name: 'Lantern-Bearer' },
+    { stat: 'es', name: 'Sacristy Glow' },
+    { stat: 'armour', name: 'Chainmail Prayer' },
+    { stat: 'mana', name: 'Chapel Hush' },
+  ],
+};
+export { THREAD_THEME };

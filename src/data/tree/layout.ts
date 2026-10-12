@@ -26,7 +26,17 @@ import { PLACEMENT, REGION_LINKS } from './plan';
 import { THEMES } from './notableThemes';
 import { fnv1a, mix32 } from '../../core/hash';
 import { modKey, unitsOf } from './power';
-import { P as ROAD_STATS, ROAD_POOLS, START_KIT, STARTERS } from './roads';
+import {
+  FILL,
+  type FillSpec,
+  PATH_NOTABLES,
+  P as ROAD_STATS,
+  ROAD_POOLS,
+  START_KIT,
+  STARTERS,
+  THREADS,
+  THREAD_THEME,
+} from './roads';
 import { placeCluster } from './shapes';
 import {
   EXTRA_NOTABLES,
@@ -1426,6 +1436,8 @@ export function buildLayoutTree(opts: { regions?: RegionId[] } = {}): LayoutTree
     if (!opts.regions || opts.regions.includes(reg.id))
       layoutRegion(b, reg, starts[reg.classId], dropped, unplaced);
   gateways(b, ring, starts, dropped, opts.regions);
+  threadStarts(b, starts, opts.regions);
+  fillSparse(b, starts, opts.regions);
   bridges(b, opts.regions);
   startSkips(b, starts, opts.regions);
   chainDoors(b);
@@ -1521,6 +1533,223 @@ function gateways(
  * out and one near the rim between each pair of neighbours, joining the nearest road nodes of the two sides that have room. The
  * roads are made of both regions' stats.
  */
+/** How far from its start the roads of a class are threads, and how many steps round the start are left to the kit. */
+const THREAD_FAR = 2300;
+const KIT_STEPS = 6;
+/** The basic notables on the paths of a class (PATH_NOTABLES) need a thread this long (road nodes) to stand at the end of. */
+const PATH_MIN_RUN = 2;
+
+/**
+ * The threads of the roads near each start (iteration 6; roads.ts THREADS). A chain is a run of road nodes between two forks (or a
+ * node a cluster hangs on). Each is given one stat from the class's palette, and the chains that leave a fork get different ones, so
+ * a fork is a choice between lines that are about something; then a few of the nearest chains, as their stats ask, end in a basic
+ * notable on the path (the node beside the fork they lead to).
+ */
+function threadStarts(b: Builder, starts: Record<string, number>, only?: RegionId[]): void {
+  for (const reg of REGIONS) {
+    if (only && !only.includes(reg.id)) continue;
+    const start = starts[reg.classId];
+    const S = b.nodes[start];
+    const roadLinks = (id: number) => b.nodes[id].links.filter((m) => !b.nodes[m].cluster);
+    // Steps from the start along every link: the kit's steps, and which end of a chain is the far one.
+    const depth = graphSteps(b, start, 80);
+    const interior = (id: number): boolean => {
+      const n = b.nodes[id];
+      return (
+        n.region === reg.id &&
+        !n.cluster &&
+        (n.kind === 'small' || n.kind === 'travel') &&
+        Math.hypot(n.x - S.x, n.y - S.y) <= THREAD_FAR &&
+        (depth.get(id) ?? 99) > KIT_STEPS &&
+        roadLinks(id).length === 2 &&
+        !n.links.some((m) => b.nodes[m].cluster)
+      );
+    };
+    type Chain = { nodes: number[]; ends: [number, number]; near: number };
+    const chains: Chain[] = [];
+    const seen = new Set<number>();
+    for (const n of b.nodes) {
+      if (seen.has(n.id) || !interior(n.id)) continue;
+      // Walk both ways to the nodes that bound the chain.
+      const walk = (first: number, from: number): { run: number[]; end: number } => {
+        const run: number[] = [];
+        let prev = from;
+        let cur = first;
+        while (interior(cur) && !seen.has(cur) && run.length < 60) {
+          run.push(cur);
+          const next = roadLinks(cur).find((m) => m !== prev)!;
+          prev = cur;
+          cur = next;
+        }
+        return { run, end: cur };
+      };
+      seen.add(n.id);
+      const [p, q] = roadLinks(n.id);
+      const left = walk(p, n.id);
+      const right = walk(q, n.id);
+      for (const i of [...left.run, ...right.run]) seen.add(i);
+      const nodes = [...left.run.reverse(), n.id, ...right.run];
+      chains.push({
+        nodes,
+        ends: [left.end, right.end],
+        near: Math.min(...nodes.map((i) => depth.get(i) ?? 99)),
+      });
+    }
+    chains.sort((x, y) => x.near - y.near || x.nodes[0] - y.nodes[0]);
+    // A stat for each: the palette in turn from a hash, not one a fork already has.
+    const palette = THREADS[reg.id];
+    const at = new Map<number, Set<number>>();
+    const statOf = new Map<Chain, number>();
+    for (const c of chains) {
+      const taken = new Set([...(at.get(c.ends[0]) ?? []), ...(at.get(c.ends[1]) ?? [])]);
+      const from = hashOf(`thread ${c.nodes[0]}`) % palette.length;
+      let pick = from;
+      for (let k = 0; k < palette.length; k++) {
+        const cand = (from + k) % palette.length;
+        if (!taken.has(cand)) {
+          pick = cand;
+          break;
+        }
+      }
+      statOf.set(c, pick);
+      for (const e of c.ends) at.set(e, new Set([...(at.get(e) ?? []), pick]));
+    }
+    // A few of the nearest threads end in a notable: of the stat it asks, on a chain long enough, the node beside its far fork.
+    const takenChains = new Set<Chain>();
+    for (const want of PATH_NOTABLES[reg.id]) {
+      const idx = palette.indexOf(want.stat);
+      const c =
+        chains.find(
+          (x) => !takenChains.has(x) && statOf.get(x) === idx && x.nodes.length >= PATH_MIN_RUN,
+        ) ?? chains.find((x) => !takenChains.has(x) && x.nodes.length >= PATH_MIN_RUN);
+      if (!c) continue;
+      takenChains.add(c);
+      statOf.set(c, idx);
+      const th = THREAD_THEME[want.stat];
+      const theme = th ? THEMES[th.theme] : undefined;
+      if (!theme) continue;
+      const far =
+        (depth.get(c.nodes[0]) ?? 0) >= (depth.get(c.nodes[c.nodes.length - 1]) ?? 0)
+          ? 0
+          : c.nodes.length - 1;
+      const id = c.nodes[far];
+      b.nodes[id].kind = 'notable';
+      b.nodes[id].name = want.name;
+      b.nodes[id].mods = theme.notable(th!.strength ?? 1).map((m) => ({ ...m }));
+    }
+    for (const c of chains) {
+      const stat = ROAD_STATS[palette[statOf.get(c)!]];
+      for (const id of c.nodes) {
+        const n = b.nodes[id];
+        if (n.kind !== 'small') continue;
+        n.name = stat.name;
+        n.mods = stat.mods.map((m) => ({ ...m }));
+      }
+    }
+  }
+}
+
+/**
+ * Basic clusters hung where the roads outside the class starts go longest with nothing to take (iteration 6, the user: long costly
+ * stretches with no nodes right outside of the starts). How far a road node is from a cluster is counted in steps along the roads, from
+ * every node a cluster hangs on. Each class gets its first at the node farthest from any cluster within reach of its start, then
+ * every next one goes to the farthest of all, so that the long walks are cut and the empty ground beside them fills.
+ */
+const FILL_FAR = 3100;
+/** A road node nearer than this (in steps) to a cluster is not far enough from one to need another. */
+const FILL_MIN_GAP = 2;
+function fillSparse(b: Builder, starts: Record<string, number>, only?: RegionId[]): void {
+  const regions = REGIONS.filter((r) => !only || only.includes(r.id));
+  const queue = new Map(regions.map((r) => [r.id, [...(FILL[r.id] ?? [])]]));
+  const placed = new Map(regions.map((r) => [r.id, 0]));
+  /** Steps along the roads (never through a cluster) from each road node to the nearest node a cluster hangs on. */
+  const gaps = (): Int32Array => {
+    const d = new Int32Array(b.nodes.length).fill(-1);
+    const q: number[] = [];
+    for (const n of b.nodes)
+      if (!n.cluster && n.links.some((m) => b.nodes[m].cluster)) {
+        d[n.id] = 0;
+        q.push(n.id);
+      }
+    for (let h = 0; h < q.length; h++)
+      for (const m of b.nodes[q[h]].links)
+        if (d[m] < 0 && !b.nodes[m].cluster && b.nodes[m].kind !== 'start') {
+          d[m] = d[q[h]] + 1;
+          q.push(m);
+        }
+    return d;
+  };
+  /** The distance from a point to the nearest node of a cluster. */
+  const emptiness = (x: number, y: number): number => {
+    let e = 1e9;
+    for (const m of b.nodes) if (m.cluster) e = Math.min(e, Math.hypot(m.x - x, m.y - y));
+    return e;
+  };
+  const failed = new Set<number>();
+  for (;;) {
+    const open = regions.filter((r) => queue.get(r.id)!.length > 0);
+    if (!open.length) break;
+    // The classes with none yet come first; then the farthest from any cluster of all.
+    const firsts = open.filter((r) => placed.get(r.id) === 0);
+    const pool = firsts.length ? firsts : open;
+    const d = gaps();
+    const cands: { reg: RegionDef; id: number; gap: number }[] = [];
+    for (const reg of pool) {
+      const S = b.nodes[starts[reg.classId]];
+      for (const n of b.nodes) {
+        if (n.region !== reg.id || failed.has(n.id) || d[n.id] < FILL_MIN_GAP) continue;
+        if (n.cluster || (n.kind !== 'small' && n.kind !== 'travel') || n.links.length < 2)
+          continue;
+        if (n.links.length > 3 || Math.hypot(n.x - S.x, n.y - S.y) > FILL_FAR) continue;
+        cands.push({ reg, id: n.id, gap: Math.round(emptiness(n.x, n.y)) });
+      }
+    }
+    // The emptiest ground first.
+    cands.sort((p, q) => q.gap - p.gap || p.id - q.id);
+    let done = false;
+    for (const c of cands.slice(0, 16)) {
+      const spec = fillSpec(c.reg, queue.get(c.reg.id)![0]);
+      const ctx: Ctx = { b, attrs: c.reg.attrs, pool: ROAD_POOLS[c.reg.id], centres: [] };
+      const node = b.nodes[c.id];
+      const a = b.nodes[node.links[0]];
+      const z = b.nodes[node.links[node.links.length - 1]];
+      const t: Vec = [z.x - a.x, z.y - a.y];
+      const len = Math.hypot(t[0], t[1]) || 1;
+      const flip = hashOf(`${spec.id}:${node.id}`) % 2 ? 1 : -1;
+      for (const side of [flip, -flip]) {
+        const f: Vec = [(-t[1] / len) * side, (t[0] / len) * side];
+        if (hang(ctx, spec, node.id, around([node.x, node.y], f, true), undefined) !== null) {
+          queue.get(c.reg.id)!.shift();
+          placed.set(c.reg.id, placed.get(c.reg.id)! + 1);
+          done = true;
+          break;
+        }
+      }
+      if (done) break;
+      failed.add(c.id);
+    }
+    if (!done) {
+      // A class with nowhere left to try gives up its next one (the others go on).
+      for (const r of pool) if (!cands.some((c) => c.reg === r)) queue.get(r.id)!.shift();
+    }
+  }
+}
+
+/** The cluster of a fill entry. */
+function fillSpec(reg: RegionDef, f: FillSpec): ClusterSpec {
+  const road = f.smalls ? ROAD_STATS[f.smalls] : undefined;
+  return {
+    id: `${reg.id}_f_${hashOf(f.name) % 100000}`,
+    region: reg.id,
+    kind: 'chain',
+    theme: f.theme,
+    smallCount: f.smallCount ?? 3,
+    notable: { name: f.name, strength: f.strength ?? 1 },
+    attrs: reg.attrs,
+    ...(road ? { smallMods: road.mods, smallName: road.name } : {}),
+  };
+}
+
 /**
  * Where a crossing may be: the distance from the middle of the tree of both its ends, and its length. Three bands (inner, middle and
  * rim), one crossing in each between every two neighbours, and between every other pair one more, a long one, that costs many nodes

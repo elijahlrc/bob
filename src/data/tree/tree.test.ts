@@ -5,6 +5,7 @@ import { CLASSES } from '../classes';
 import { EDGE_CLEARANCE, MIN_NODE_DIST, segDist } from './builder';
 import { GEN_CLUSTERS } from './clustersGen';
 import { KEYSTONES } from './keystones';
+import { FILL } from './roads';
 import { buildLayoutTree } from './layout';
 import { floorFor, modKey, powerOf, unitsOf } from './power';
 
@@ -30,13 +31,13 @@ function bfs(start: number): number[] {
  * judged by the pictures (`npm run tree:pic`) and the audit (`npm run tree:audit`), not here.
  */
 describe('passive tree invariants (§9.3)', () => {
-  it('has exactly 27 keystones, named as the keystone list, and about 370 notables', () => {
+  it('has exactly 27 keystones, named as the keystone list, and about 420 notables', () => {
     const ks = nodes.filter((n) => n.kind === 'keystone');
     expect(ks).toHaveLength(27);
     expect(ks.map((n) => n.name).sort()).toEqual(KEYSTONES.map((k) => k.name).sort());
     const n = nodes.filter((x) => x.kind === 'notable').length;
     expect(n).toBeGreaterThanOrEqual(330);
-    expect(n).toBeLessThanOrEqual(400);
+    expect(n).toBeLessThanOrEqual(440);
   });
 
   it('lays out every cluster and every road', () => {
@@ -191,6 +192,12 @@ describe('passive tree invariants (§9.3)', () => {
       expect(within(8), c.id).toBeGreaterThanOrEqual(3);
       expect(within(14), c.id).toBeGreaterThanOrEqual(15);
     }
+  });
+
+  it('basic clusters stand in the empty ground round every start (FILL), at least three of its six, and its roads are threads of one stat', () => {
+    const names = new Set(nodes.filter((n) => n.kind === 'notable').map((n) => n.name));
+    for (const [region, list] of Object.entries(FILL))
+      expect(list.filter((f) => names.has(f.name)).length, region).toBeGreaterThanOrEqual(3);
   });
 
   it('each class start reaches both neighbouring regions without using the middle, within 20 steps', () => {
