@@ -8,3 +8,5 @@ docs/coverage/uniques/*.json
 docs/coverage/gems/*.json
 docs/coverage/map.json
 docs/tree/pob-tree.json
+# The baked passive tree: one generated line (npm run tree:bake).
+src/data/tree/treeBaked.ts

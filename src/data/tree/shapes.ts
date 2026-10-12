@@ -25,8 +25,15 @@ const WING_HALF = (35 * Math.PI) / 180;
 /** The name of a small node as shown: "Lesser armour" reads as "Armour". */
 export function tidyName(name: string): string {
   const bare = name.replace(/^Lesser /, '');
-  return bare.charAt(0).toUpperCase() + bare.slice(1);
+  const shown = bare.charAt(0).toUpperCase() + bare.slice(1);
+  return OUR_WORDS[shown] ?? shown;
 }
+
+/** Labels of small nodes that read exactly as the name of a gem of the reference game: ours say it another way (ip.test.ts). */
+const OUR_WORDS: Record<string, string> = {
+  'Life Leech': 'Life Leeched',
+  'Elemental Damage with Attacks': 'Elemental Attack Damage',
+};
 
 export type ClusterShape = 'loop' | 'stalk' | 'spur' | 'crescent' | 'wing' | 'twin' | 'string';
 

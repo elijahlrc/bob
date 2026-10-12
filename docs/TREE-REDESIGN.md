@@ -674,7 +674,7 @@ isolated: two or three, perhaps two by two and a one by one, instead of one.
   is a section of one simple stat from the region's pool, which is now only life, energy shield, armour, evasion, mana, regeneration,
   movement speed and resistances (no damage, crit, speeds). Roads were a third attribute nodes, now 77% (`ROAD_POOLS`). The threads of
   iteration 6 are sections too: one chain in four near a start, and the kit of the first steps stays.
-- **No plain increased damage** anywhere (a test says so): out of the road pools, kits, threads, starters, fills and the hub (the
+- **No plain increased damage** anywhere (the emitter drops it; no test pins it): out of the road pools, kits, threads, starters, fills and the hub (the
   hub's damage notable is attack and cast speed); the five generated clusters that had it lose it in the emitter (`balance.ts`: a
   small node of it becomes the notable's own stat, a notable keeps its other lines); two hand-made themes (against cursed enemies,
   while leeching) have conditional damage and a curse effect instead. Damage that needs something (a tag, a type, a condition) stays.
@@ -687,3 +687,39 @@ isolated: two or three, perhaps two by two and a one by one, instead of one.
   keystone 9 to 12, the median keystone 23 to 27 (as before); 22 crossings between regions.
 - Found on the way: the fill clusters' nodes had no region (a line lost in a rewrite; a test says every node has one now).
   `SAVE_VERSION` 16 hands passives back.
+
+### Iteration 8, clusters joined to a second place (2026-10-12)
+
+The user: many more potential paths, by joining clusters to two different sections (a picture: a short link between two clusters); the
+class starts joined straight into clusters of core stats, which are in turn joined to the clusters near them, so the starting area is
+knit together; and two rules: a build must have some chance of wanting both clusters of a link, and following a link must generally
+cost more nodes than the highway, so that it is worth it only for the clusters.
+
+- **`linkClusters`** (`layout.ts`, after every road is laid): a short link (the road code: attribute nodes, 150 apart; none when the
+  nodes are near) joins a node of one cluster to a node of another within 700 units; so a cluster can be passed through, and passing
+  takes its nodes. About half of the other clusters get one (by a hash), none more than two, the starters three. Keystone clusters and
+  the middle's are left as they are.
+- **Rule 1, a build wants both** (`affinity.ts`): a cluster is a set of categories read off its notable (life, armour, evasion, energy
+  shield, resistances, mana, spells, attacks, crit, elemental, chaos, physical, minions, traps and the like, curses and auras,
+  charges, flasks), and two categories either go in one build or do not (the defences all go together; life with physical and charges;
+  spells with crit, elements, energy shield and curses; attacks with crit, physical, elements and the defences; and so on). A link
+  needs one pair that goes.
+- **Rule 2, dearer than the highway**: the steps through the two clusters (in at one, along its ring, the link, along the other's ring,
+  out) must exceed the steps along the roads between the nodes they hang from (the table and the counts are measured when the link is
+  made; a link that would be a shortcut is taken back). In a sample the way through was 3 to 10 steps against 0 to 5 by road.
+- **The starts**: each start is joined straight into its two starter clusters (the hand-made basic notables), those are joined into
+  the related clusters near them, up to three links each; a start then has the spoke, two roads and up to two clusters.
+  2,617 nodes (the link nodes; was 2,500); about half the clusters have a second entrance (210 have two, 26 three).
+- **Baked at build time** (the user: a slow layout is fine if it is done once, at build time): the layout takes about 1.5 s and the
+  game used to do it in the browser (and every test file that touched the tree did it again). `npm run tree:bake`
+  (`scripts/tree/bake.ts`) now lays the tree out and writes the finished nodes to `src/data/tree/treeBaked.ts` (604 KB of JSON in one
+  string literal, parsed once); `getTree()` returns it, and `layout.ts` no longer runs in the game. Run it after anything that
+  changes the tree (the charter, the plan, roads, shapes, the clusters, `roads.ts`); a test compares the file with a fresh layout and
+  fails until you do. The suite went from 112 s to 27 s (the speed test that failed under load stopped failing), and the bundle grew by
+  about 0.45 MB (73 KB gzipped). The tools still lay out afresh (`TREE=new`).
+  Two small-node labels that read exactly as reference gems ("Life Leech", "Elemental Damage with Attacks") say it another way now
+  (the IP scan sees the baked tree).
+- Found on the way: `rollback` left a link between two old nodes in their lists when it was undone (some pairs were joined six
+  times); it takes back exactly the edges it added now. The test of one entrance per cluster is now one to four; a start test allows
+  its links. The test of plain damage was removed at the user's word (the emitter drops it).
+  `SAVE_VERSION` 17 hands passives back.

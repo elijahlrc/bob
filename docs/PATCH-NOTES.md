@@ -27,6 +27,11 @@ the docs each entry links to.
   condition).
 - Groups of related clusters (life, fire, minions and so on) are broken into smaller groups spread through each region, so they
   are less big and less isolated.
+- Many clusters are now linked to a neighbouring cluster, so there are far more ways through the tree. A link joins clusters that
+  work together (life with armour, energy shield with mana, spells with critical strikes, and so on), and it always costs more
+  passives than the plain attribute road beside it, so it is worth taking only for the clusters on it.
+- Each class start now leads straight into its two basic clusters, which in turn link to the clusters around them, so the area
+  around a start is well connected.
 - Your passives are refunded once more.
 - Steady Draw is no longer neutral (35% more damage), and several keystone cards now show their numbers.
 

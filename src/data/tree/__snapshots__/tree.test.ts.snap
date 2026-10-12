@@ -2,7 +2,7 @@
 
 exports[`passive tree invariants (§9.3) > is deterministic and pinned (snapshot) 1`] = `
 {
-  "edges": 2761,
+  "edges": 3033,
   "keystones": [
     {
       "id": 75,
@@ -119,54 +119,54 @@ exports[`passive tree invariants (§9.3) > is deterministic and pinned (snapshot
       "y": 4300,
     },
     {
-      "id": 1849,
+      "id": 1852,
       "name": "Blood Rite",
       "x": -1741,
       "y": 1133,
     },
     {
-      "id": 1854,
+      "id": 1857,
       "name": "Unerring Discipline",
       "x": -3373,
       "y": 1947,
     },
     {
-      "id": 1859,
+      "id": 1862,
       "name": "Rooted Stance",
       "x": -5242,
       "y": 182,
     },
     {
-      "id": 1864,
+      "id": 1867,
       "name": "Idle Hands",
       "x": -5062,
       "y": 591,
     },
     {
-      "id": 2210,
+      "id": 2213,
       "name": "Living Ward",
       "x": -1734,
       "y": -1306,
     },
     {
-      "id": 2215,
+      "id": 2218,
       "name": "Searing Avatar",
       "x": -2718,
       "y": -2138,
     },
     {
-      "id": 2220,
+      "id": 2223,
       "name": "Prismatic Balance",
       "x": -2691,
       "y": -3089,
     },
     {
-      "id": 2225,
+      "id": 2228,
       "name": "Sigil Warden",
       "x": -3749,
       "y": -2349,
     },
   ],
-  "nodes": 2500,
+  "nodes": 2628,
 }
 `;

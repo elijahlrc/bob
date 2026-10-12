@@ -20,6 +20,7 @@ import {
   type Builder,
   type RoadOptions,
 } from './builder';
+import { categoriesOf, related, type Category } from './affinity';
 import { DISTRICTS, districtOf, type District } from './charter';
 import { GEN_CLUSTERS } from './clustersGen';
 import { PLACEMENT, REGION_LINKS } from './plan';
@@ -383,9 +384,17 @@ function specOf(id: string, region: RegionDef): ClusterSpec {
 }
 
 function rollback(b: Builder, L: number, E: number): void {
-  // Only the old nodes an undone edge ended at have links to take back.
+  // Every edge added since is taken back, at the old nodes it ended at too (one between two old nodes included).
+  const undone = new Set<string>();
+  for (let e = E; e < b.edges.length; e++) {
+    const [p, q] = b.edges[e];
+    undone.add(`${p}-${q}`);
+    undone.add(`${q}-${p}`);
+  }
   for (let e = E; e < b.edges.length; e++)
-    for (const i of b.edges[e]) if (i < L) b.nodes[i].links = b.nodes[i].links.filter((m) => m < L);
+    for (const i of b.edges[e])
+      if (i < L)
+        b.nodes[i].links = b.nodes[i].links.filter((m) => m < L && !undone.has(`${i}-${m}`));
   b.nodes.length = L;
   b.edges.length = E;
 }
@@ -682,7 +691,7 @@ function sideDoor(b: Builder, from: number, cands: number[], opts: RoadOptions):
     .filter((c) => c.d <= 900)
     .sort((p, q) => p.d - q.d || p.i - q.i)
     .slice(0, 8)
-    .some((c) => connect(b, from, c.i, opts));
+    .some((c) => connect(b, from, c.i, opts, true));
 }
 
 /**
@@ -862,17 +871,17 @@ function layoutRegion(
     tag = '',
     quiet = false,
     free = false,
+    few = false,
   ): boolean => {
     const before = b.nodes.length;
     const why: string[] = [];
-    const ok = connect(b, from, to, {
-      attrs: reg.attrs,
-      pool,
-      spacing: ROAD_STEP,
-      district,
-      free,
-      why,
-    });
+    const ok = connect(
+      b,
+      from,
+      to,
+      { attrs: reg.attrs, pool, spacing: ROAD_STEP, district, free, why },
+      few,
+    );
     if (!ok && !quiet) dropped.push(`${tag} ${from}-${to} (${why[0] ?? '?'})`);
     for (let i = before; i < b.nodes.length; i++) roads.push(i);
     return ok;
@@ -1005,7 +1014,7 @@ function layoutRegion(
       )
       .sort((p, q) => p.d - q.d || p.x - q.x || p.y - q.y)
       .slice(0, 16);
-    if (!near.some((c) => road(c.x, c.y, undefined, '', true, true)))
+    if (!near.some((c) => road(c.x, c.y, undefined, '', true, true, true)))
       dropped.push(`${from}>${to} (no way between the two)`);
   }
   // A second road out of the class start (iteration 4, the user: two major paths out of the start): to the nearest junction of a
@@ -1429,6 +1438,194 @@ function layoutHub(
   return ring;
 }
 
+/**
+ * Clusters joined to a second place (iteration 8, the user: many more paths; "connect more of our clusters to two different
+ * sections"). A short link joins a node of one cluster to a node of another, so a cluster can be passed through, and a start
+ * is joined straight into its two starter clusters, which are joined to the clusters near them (the start is well knit). Two rules:
+ *
+ *  - the two clusters are ones a build might want both of (`affinity.ts`): no point joining them otherwise;
+ *  - the way through them costs more nodes than the road already between the two places (the way in to one, the way out of the
+ *    other), so a link is never a shortcut and is worth it only for the clusters on it.
+ *
+ * About half of the other clusters are joined once (by a hash), no cluster more than twice, a starter three times; keystone clusters
+ * and the middle's are left as they are.
+ */
+const LINK_MIN = 100;
+const LINK_MAX = 700;
+const LINK_STEP = 150;
+const LINK_SHARE = 2; // one cluster in LINK_SHARE
+function linkClusters(b: Builder, starts: Record<string, number>, only?: RegionId[]): void {
+  type Info = {
+    id: string;
+    nodes: number[];
+    cats: Set<Category>;
+    region: RegionId;
+    entrance: number;
+    road: number;
+    links: number;
+  };
+  const byId = new Map<string, number[]>();
+  for (const n of b.nodes)
+    if (n.cluster) (byId.get(n.cluster) ?? byId.set(n.cluster, []).get(n.cluster)!).push(n.id);
+  const infos = new Map<string, Info>();
+  for (const [id, nodes] of byId) {
+    if (id.startsWith('hub') || nodes.some((i) => b.nodes[i].kind === 'keystone')) continue;
+    const region = b.nodes[nodes[0]].region;
+    if (!region || region === 'hub' || (only && !only.includes(region as RegionId))) continue;
+    // Where it hangs: the node with a link out of the cluster, and the road node it meets.
+    let entrance = -1;
+    let road = -1;
+    for (const i of nodes)
+      for (const m of b.nodes[i].links)
+        if (b.nodes[m].cluster !== id && entrance < 0) {
+          entrance = i;
+          road = m;
+        }
+    if (entrance < 0) continue;
+    const notables = nodes.filter((i) => b.nodes[i].kind === 'notable');
+    const mods = (notables.length ? notables : nodes).flatMap((i) => b.nodes[i].mods);
+    infos.set(id, {
+      id,
+      nodes,
+      cats: categoriesOf(mods),
+      region: region as RegionId,
+      entrance,
+      road,
+      links: 0,
+    });
+  }
+  const ids = [...infos.keys()].sort();
+  /** Steps along the roads between two nodes (never through a class start), up to a limit. */
+  const roadSteps = (from: number, to: number, limit: number): number => {
+    const d = new Map<number, number>([[from, 0]]);
+    const q = [from];
+    for (let h = 0; h < q.length; h++) {
+      const x = q[h];
+      if (x === to) return d.get(x)!;
+      if (d.get(x)! >= limit) continue;
+      for (const m of b.nodes[x].links)
+        if (!d.has(m) && (b.nodes[m].kind !== 'start' || m === to)) {
+          d.set(m, d.get(x)! + 1);
+          q.push(m);
+        }
+    }
+    return limit + 1;
+  };
+  /** Steps inside a cluster between two of its nodes. */
+  const inside = (c: Info, from: number, to: number): number => {
+    const d = new Map<number, number>([[from, 0]]);
+    const q = [from];
+    for (let h = 0; h < q.length; h++) {
+      if (q[h] === to) return d.get(to)!;
+      for (const m of b.nodes[q[h]].links)
+        if (!d.has(m) && b.nodes[m].cluster === c.id) {
+          d.set(m, d.get(q[h])! + 1);
+          q.push(m);
+        }
+    }
+    return 99;
+  };
+  const regOf = (id: RegionId) => REGIONS.find((r) => r.id === id)!;
+  const near = (x: number, y: number, c: Info) =>
+    Math.min(...c.nodes.map((i) => Math.hypot(b.nodes[i].x - x, b.nodes[i].y - y)));
+  const linked = new Set<string>();
+  const key = (p: string, q: string) => (p < q ? p + '|' + q : q + '|' + p);
+
+  /** Join A to B if some build wants both and the way through costs more nodes than the road between them. */
+  const join = (A: Info, B: Info): boolean => {
+    const pairs = A.nodes
+      .flatMap((a) =>
+        B.nodes.map((c) => ({
+          a,
+          c,
+          d: Math.hypot(b.nodes[a].x - b.nodes[c].x, b.nodes[a].y - b.nodes[c].y),
+        })),
+      )
+      .filter((x) => x.d >= LINK_MIN && x.d <= LINK_MAX)
+      .sort((p, q) => p.d - q.d || p.a - q.a || p.c - q.c)
+      .slice(0, 8);
+    const reg = regOf(A.region);
+    const highway = roadSteps(A.road, B.road, 40);
+    for (const x of pairs) {
+      const L = b.nodes.length;
+      const E = b.edges.length;
+      const pool = ROAD_POOLS[reg.id];
+      if (!travel(b, [x.a], [x.c], { attrs: reg.attrs, pool, spacing: LINK_STEP })) continue;
+      const added = b.nodes.length - L;
+      const through = 1 + inside(A, A.entrance, x.a) + (added + 1) + inside(B, x.c, B.entrance) + 1;
+      if (through > highway) {
+        for (let i = L; i < b.nodes.length; i++) b.nodes[i].region = A.region;
+        return true;
+      }
+      rollback(b, L, E);
+    }
+    return false;
+  };
+  const mate = (A: Info, cap: number, force: boolean): void => {
+    const cands = ids
+      .map((id) => infos.get(id)!)
+      .filter(
+        (B) => B !== A && B.links < cap && !linked.has(key(A.id, B.id)) && related(A.cats, B.cats),
+      )
+      .map((B) => ({ B, d: near(b.nodes[B.nodes[0]].x, b.nodes[B.nodes[0]].y, A) }))
+      .filter((x) => x.d <= LINK_MAX + 120)
+      .sort((p, q) => p.d - q.d || (p.B.id < q.B.id ? -1 : 1));
+    let tries = 0;
+    for (const { B } of cands) {
+      if (tries++ >= 6) break;
+      if (join(A, B)) {
+        linked.add(key(A.id, B.id));
+        A.links++;
+        B.links++;
+        if (!force) return;
+        if (A.links >= cap) return;
+      }
+    }
+  };
+
+  // 1. Each start straight into its two starter clusters.
+  const starters: Info[] = [];
+  for (const reg of REGIONS) {
+    if (only && !only.includes(reg.id)) continue;
+    const S = starts[reg.classId];
+    for (const k of [0, 1]) {
+      const c = infos.get(`${reg.id}_s${k}`);
+      if (!c) continue;
+      starters.push(c);
+      const highway = roadSteps(S, c.road, 40);
+      const order = [...c.nodes].sort(
+        (p, q) =>
+          Math.hypot(b.nodes[p].x - b.nodes[S].x, b.nodes[p].y - b.nodes[S].y) -
+            Math.hypot(b.nodes[q].x - b.nodes[S].x, b.nodes[q].y - b.nodes[S].y) || p - q,
+      );
+      for (const a of order.slice(0, 5)) {
+        const L = b.nodes.length;
+        const E = b.edges.length;
+        if (
+          !travel(b, [S], [a], { attrs: reg.attrs, pool: ROAD_POOLS[reg.id], spacing: LINK_STEP })
+        )
+          continue;
+        const added = b.nodes.length - L;
+        const through = added + 1 + inside(c, a, c.entrance) + 1;
+        if (through > highway) {
+          for (let i = L; i < b.nodes.length; i++) b.nodes[i].region = reg.id;
+          c.links++;
+          break;
+        }
+        rollback(b, L, E);
+      }
+    }
+  }
+  // 2. The starters into the clusters near them, so that the starting area is knit together.
+  for (const c of starters) mate(c, 3, true);
+  // 3. About half of the rest, once each.
+  for (const id of ids) {
+    const A = infos.get(id)!;
+    if (A.links >= 1 || hashOf(`link ${id}`) % LINK_SHARE !== 0) continue;
+    mate(A, 2, false);
+  }
+}
+
 /** Build the passive tree from the charter and the plan (all regions, or the ones asked for: a tool of review). */
 export function buildLayoutTree(opts: { regions?: RegionId[] } = {}): LayoutTree {
   const b: Builder = { nodes: [], edges: [] };
@@ -1459,6 +1656,7 @@ export function buildLayoutTree(opts: { regions?: RegionId[] } = {}): LayoutTree
   bridges(b, opts.regions);
   startSkips(b, starts, opts.regions);
   chainDoors(b);
+  linkClusters(b, starts, opts.regions);
   return { nodes: b.nodes, starts, dropped, unplaced };
 }
 

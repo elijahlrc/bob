@@ -1,15 +1,12 @@
-import { buildLayoutTree } from './layout';
+import { BAKED_TREE } from './treeBaked';
 import type { Tree } from './types';
 
 export type { Tree, TreeNode, TreeNodeKind } from './types';
 
-let memo: Tree | null = null;
-
-/** The passive tree, built once from the spec and memoised. */
+/**
+ * The passive tree. It is laid out once, at build time (`npm run tree:bake` writes `treeBaked.ts` from `layout.ts`), not in the browser:
+ * the layout takes seconds. The tools that want a fresh layout call `buildLayoutTree` themselves.
+ */
 export function getTree(): Tree {
-  if (!memo) {
-    const t = buildLayoutTree();
-    memo = { nodes: t.nodes, starts: t.starts };
-  }
-  return memo;
+  return BAKED_TREE;
 }

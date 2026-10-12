@@ -967,3 +967,6 @@ roads. 2,260 nodes; `SAVE_VERSION` 15 hands passives back.
 Iteration 7 (the user: subtle points): highways are 77% attribute nodes with a few single-stat sections, no plain increased damage
 anywhere, each group of related clusters split into pods (74 pods from 27 districts). 2,500 nodes; `SAVE_VERSION` 16 hands passives
 back.
+Iteration 8 (the user: more paths): about half of the clusters joined to a second related cluster by a short link that costs more nodes
+than the road between them, each start joined into its two starter clusters, which are knit to the clusters near them. 2,628 nodes;
+`SAVE_VERSION` 17 hands passives back. The tree is baked at build time (`npm run tree:bake`), not laid out in the browser.

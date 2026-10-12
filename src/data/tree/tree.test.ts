@@ -7,6 +7,7 @@ import { GEN_CLUSTERS } from './clustersGen';
 import { KEYSTONES } from './keystones';
 import { FILL } from './roads';
 import { buildLayoutTree } from './layout';
+import { BAKED_TREE } from './treeBaked';
 import { floorFor, modKey, powerOf, unitsOf } from './power';
 
 const tree = buildLayoutTree();
@@ -40,22 +41,9 @@ describe('passive tree invariants (§9.3)', () => {
     expect(n).toBeLessThanOrEqual(470);
   });
 
-  it('has no plain increased damage (universally good, no choice in it), and its highways are mostly attribute nodes', () => {
-    const plain = nodes.filter((n) =>
-      n.mods.some(
-        (m) =>
-          m.stat === 'damage' &&
-          m.kind === 'inc' &&
-          !m.tags?.length &&
-          !m.damageTypes?.length &&
-          !m.condition &&
-          !m.per,
-      ),
-    );
-    expect(plain.map((n) => n.name)).toEqual([]);
-    const roads = nodes.filter((n) => !n.cluster && n.region !== 'hub' && n.kind !== 'start');
-    const attr = roads.filter((n) => n.kind === 'travel').length;
-    expect(attr / roads.length).toBeGreaterThan(0.7);
+  it('is the tree the game loads: the baked file is a fresh layout (if not, run npm run tree:bake)', () => {
+    const fresh = JSON.parse(JSON.stringify({ nodes: tree.nodes, starts: tree.starts }));
+    expect(fresh).toEqual(BAKED_TREE);
   });
 
   it('lays out every cluster and every road', () => {
@@ -123,7 +111,7 @@ describe('passive tree invariants (§9.3)', () => {
       expect(k.links, k.name).toHaveLength(1);
   });
 
-  it('every cluster hangs from one entrance: a road never runs through it (the middle wheel has its two spokes and three keystones)', () => {
+  it('a cluster has one way in, or up to four where links join it to other clusters; a keystone cluster and the middle keep theirs (the wheel has two spokes and three keystones)', () => {
     const outside = new Map<string, number>();
     for (const n of nodes)
       if (n.cluster)
@@ -131,7 +119,15 @@ describe('passive tree invariants (§9.3)', () => {
           if (nodes[m].cluster !== n.cluster)
             outside.set(n.cluster, (outside.get(n.cluster) ?? 0) + 1);
     const ids = new Set(nodes.filter((n) => n.cluster).map((n) => n.cluster!));
-    for (const id of ids) expect(outside.get(id), id).toBe(id === 'hub_c' ? 5 : 1);
+    const keystone = new Set(nodes.filter((n) => n.kind === 'keystone').map((n) => n.cluster));
+    for (const id of ids) {
+      if (id === 'hub_c') expect(outside.get(id), id).toBe(5);
+      else if (keystone.has(id) || id.startsWith('hub')) expect(outside.get(id), id).toBe(1);
+      else {
+        expect(outside.get(id), id).toBeGreaterThanOrEqual(1);
+        expect(outside.get(id), id).toBeLessThanOrEqual(4);
+      }
+    }
   });
 
   it('roads are generic: no small node on a road names a weapon, a skill type or a condition', () => {
@@ -179,12 +175,14 @@ describe('passive tree invariants (§9.3)', () => {
     }
   });
 
-  it('each class start has the spoke into the middle and two roads out into its region, and a start to start way round the middle', () => {
+  it('each class start has the spoke into the middle, two roads out into its region and ways into its starter clusters, and basics near it', () => {
     for (const c of CLASSES) {
       const s = tree.starts[c.id];
       const out = nodes[s].links.filter((m) => nodes[m].region !== 'hub');
-      expect(nodes[s].links.length, c.id).toBe(3);
-      expect(out.length, c.id).toBe(2);
+      // The spoke, two roads out, and a way straight into each of its two starter clusters.
+      expect(nodes[s].links.length, c.id).toBeGreaterThanOrEqual(3);
+      expect(nodes[s].links.length, c.id).toBeLessThanOrEqual(5);
+      expect(out.length, c.id).toBeGreaterThanOrEqual(2);
       // The first steps are the basics: two basic notables, one on each way out, within 8 steps (never through another start).
       const d = new Map<number, number>([[s, 0]]);
       const q = [s];

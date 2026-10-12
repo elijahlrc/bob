@@ -22,7 +22,8 @@
   (`src/data/tree/charter.ts`) and a plan (`plan.ts`) by `layout.ts`, roads first (generic stats, `roads.ts`) with every cluster hung
   from one by a single entrance, an open middle, keystone peninsulas; notables are priced against small nodes (`power.ts`,
   `scripts/tree/balance.ts`, run by `npm run tree:emit`). How the tree looks is judged from `npm run tree:pic` pictures, `tree:audit`
-  and simulated players, not by tests of numbers. `tree:explore` builds with the tree from a terminal. [docs/TREE.md](docs/TREE.md) is
+  and simulated players, not by tests of numbers. `tree:explore` builds with the tree from a terminal. **The game does no layout at run time:** after any change that moves the tree (charter,
+  plan, roads, shapes, clusters) run `npm run tree:bake`, which writes `src/data/tree/treeBaked.ts`; a test fails while it is stale. [docs/TREE.md](docs/TREE.md) is
   the earlier parity pass (size, clusters, vocabulary).
 - **Strategy tab** (2026-10-09): `Build.strategy` gives each skill a role, a condition and an order, plus target priority,
   spacing (hold, close in, kite) and flask thresholds (`src/data/strategy.ts`, `src/calc/strategy.ts`, `src/ui/Strategy.tsx`).
