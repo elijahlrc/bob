@@ -183,6 +183,8 @@ describe('passive tree invariants (§9.3)', () => {
       expect(nodes[s].links.length, c.id).toBeGreaterThanOrEqual(3);
       expect(nodes[s].links.length, c.id).toBeLessThanOrEqual(5);
       expect(out.length, c.id).toBeGreaterThanOrEqual(2);
+      // Direct: the start is joined to each of its two starter clusters by one edge, with no road node between.
+      expect(nodes[s].links.filter((m) => nodes[m].cluster).length, c.id).toBe(2);
       // The first steps are the basics: two basic notables, one on each way out, within 8 steps (never through another start).
       const d = new Map<number, number>([[s, 0]]);
       const q = [s];

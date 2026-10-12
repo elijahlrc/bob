@@ -1069,55 +1069,6 @@ function layoutRegion(
         }
       });
   }
-  // One basic notable of the class hung on each way out: a side option on the lead-in.
-  {
-    const S = b.nodes[start];
-    S.links
-      .filter((m) => m >= L0)
-      .forEach((out, k) => {
-        const st = STARTERS[reg.id][k];
-        if (!st) return;
-        const lead: number[] = [];
-        let prev = start;
-        let cur = out;
-        for (let step = 0; step < 6; step++) {
-          const n = b.nodes[cur];
-          if (n.cluster) break;
-          lead.push(cur);
-          const roadLinks = n.links.filter((m) => !b.nodes[m].cluster);
-          const nexts = roadLinks.filter((m) => m !== prev && m >= L0);
-          if (nexts.length !== 1 || roadLinks.length > 2) break;
-          prev = cur;
-          cur = nexts[0];
-        }
-        const road = st.smalls ? ROAD_STATS[st.smalls] : undefined;
-        const spec: ClusterSpec = {
-          id: `${reg.id}_s${k}`,
-          region: reg.id,
-          kind: 'chain',
-          theme: st.theme,
-          smallCount: 3,
-          notable: { name: st.name, strength: 1 },
-          attrs: reg.attrs,
-          ...(road ? { smallMods: road.mods, smallName: road.name } : {}),
-        };
-        let placed = false;
-        for (const at of [1, 2, 0, 3, 4].filter((x) => x < lead.length)) {
-          const node = b.nodes[lead[at]];
-          const a = b.nodes[node.links[0]];
-          const c = b.nodes[node.links[node.links.length - 1]];
-          const t: Vec = [c.x - a.x, c.y - a.y];
-          const len = Math.hypot(t[0], t[1]) || 1;
-          const flip = hashOf(`${spec.id}:${node.id}`) % 2 ? 1 : -1;
-          const f: Vec = [(-t[1] / len) * flip, (t[0] / len) * flip];
-          if (hang(ctx, spec, node.id, around([node.x, node.y], f, true)) !== null) {
-            placed = true;
-            break;
-          }
-        }
-        if (!placed) unplaced.push(`${spec.id}@start`);
-      });
-  }
   const regionRoads = (): number[] => {
     const out: number[] = [];
     for (let i = L0; i < b.nodes.length; i++) if (joinable(b, i)) out.push(i);
@@ -1454,7 +1405,7 @@ const LINK_MIN = 100;
 const LINK_MAX = 700;
 const LINK_STEP = 150;
 const LINK_SHARE = 2; // one cluster in LINK_SHARE
-function linkClusters(b: Builder, starts: Record<string, number>, only?: RegionId[]): void {
+function linkClusters(b: Builder, only?: RegionId[]): void {
   type Info = {
     id: string;
     nodes: number[];
@@ -1583,41 +1534,48 @@ function linkClusters(b: Builder, starts: Record<string, number>, only?: RegionI
     }
   };
 
-  // 1. Each start straight into its two starter clusters.
+  // 1. The starter clusters of each start (they stand beside it, joined to it by an edge: layoutRegion).
   const starters: Info[] = [];
   for (const reg of REGIONS) {
     if (only && !only.includes(reg.id)) continue;
-    const S = starts[reg.classId];
     for (const k of [0, 1]) {
       const c = infos.get(`${reg.id}_s${k}`);
-      if (!c) continue;
-      starters.push(c);
-      const highway = roadSteps(S, c.road, 40);
-      const order = [...c.nodes].sort(
-        (p, q) =>
-          Math.hypot(b.nodes[p].x - b.nodes[S].x, b.nodes[p].y - b.nodes[S].y) -
-            Math.hypot(b.nodes[q].x - b.nodes[S].x, b.nodes[q].y - b.nodes[S].y) || p - q,
-      );
-      for (const a of order.slice(0, 5)) {
-        const L = b.nodes.length;
-        const E = b.edges.length;
-        if (
-          !travel(b, [S], [a], { attrs: reg.attrs, pool: ROAD_POOLS[reg.id], spacing: LINK_STEP })
-        )
-          continue;
-        const added = b.nodes.length - L;
-        const through = added + 1 + inside(c, a, c.entrance) + 1;
-        if (through > highway) {
-          for (let i = L; i < b.nodes.length; i++) b.nodes[i].region = reg.id;
-          c.links++;
-          break;
-        }
-        rollback(b, L, E);
-      }
+      if (c) starters.push(c);
     }
   }
   // 2. The starters into the clusters near them, so that the starting area is knit together.
   for (const c of starters) mate(c, 3, true);
+  // A start cannot be walked through, so a starter cluster must lead on: if no related cluster would take it, it joins the nearest road
+  // (the way on from the basics matters more than the pairing or the cost).
+  for (const c of starters) {
+    if (c.links > 0) continue;
+    const reg = regOf(c.region);
+    const roads = b.nodes
+      .filter((n) => n.region === c.region && joinable(b, n.id) && !n.cluster)
+      .map((n) => ({ n, d: near(n.x, n.y, c) }))
+      .filter((x) => x.d >= LINK_MIN && x.d <= LINK_MAX * 2)
+      .sort((p, q) => p.d - q.d || p.n.id - q.n.id)
+      .slice(0, 10);
+    for (const { n } of roads) {
+      const from = [...c.nodes].sort(
+        (p, q) =>
+          Math.hypot(b.nodes[p].x - n.x, b.nodes[p].y - n.y) -
+          Math.hypot(b.nodes[q].x - n.x, b.nodes[q].y - n.y),
+      )[0];
+      const L = b.nodes.length;
+      if (
+        travel(b, [from], [n.id], {
+          attrs: reg.attrs,
+          pool: ROAD_POOLS[reg.id],
+          spacing: LINK_STEP,
+        })
+      ) {
+        for (let i = L; i < b.nodes.length; i++) b.nodes[i].region = c.region;
+        c.links++;
+        break;
+      }
+    }
+  }
   // 3. About half of the rest, once each.
   for (const id of ids) {
     const A = infos.get(id)!;
@@ -1651,12 +1609,13 @@ export function buildLayoutTree(opts: { regions?: RegionId[] } = {}): LayoutTree
     if (!opts.regions || opts.regions.includes(reg.id))
       layoutRegion(b, reg, starts[reg.classId], dropped, unplaced);
   gateways(b, ring, starts, dropped, opts.regions);
+  startClusters(b, starts, unplaced, opts.regions);
   threadStarts(b, starts, opts.regions);
   fillSparse(b, starts, opts.regions);
   bridges(b, opts.regions);
   startSkips(b, starts, opts.regions);
   chainDoors(b);
-  linkClusters(b, starts, opts.regions);
+  linkClusters(b, opts.regions);
   return { nodes: b.nodes, starts, dropped, unplaced };
 }
 
@@ -1688,8 +1647,8 @@ function gateways(
     const pool = ROAD_POOLS[reg.id];
     if (
       cands
-        .slice(0, 12)
-        .some((c) => connect(b, from, c.id, { attrs: reg.attrs, pool, spacing: ROAD_STEP }))
+        .slice(0, 40)
+        .some((c) => connect(b, from, c.id, { attrs: reg.attrs, pool, spacing: ROAD_STEP }, true))
     ) {
       return true;
     }
@@ -1749,6 +1708,56 @@ function gateways(
  * out and one near the rim between each pair of neighbours, joining the nearest road nodes of the two sides that have room. The
  * roads are made of both regions' stats.
  */
+/**
+ * The class's two basic clusters stand beside the start, each joined to it by a single edge (the user: a direct connection is one edge,
+ * not a road: the way straight into the basics, or along the attribute highway). They are hung once every road exists, in the free
+ * ground beside the start, so that they cannot shut a road out. The start cannot be walked through, so each is also joined on to the
+ * clusters near it (linkClusters).
+ */
+function startClusters(
+  b: Builder,
+  starts: Record<string, number>,
+  unplaced: string[],
+  only?: RegionId[],
+): void {
+  for (const reg of REGIONS) {
+    if (only && !only.includes(reg.id)) continue;
+    const start = starts[reg.classId];
+    const S = b.nodes[start];
+    const len = Math.hypot(S.x, S.y) || 1;
+    const out: Vec = [S.x / len, S.y / len];
+    const ctx: Ctx = { b, attrs: reg.attrs, pool: ROAD_POOLS[reg.id], centres: [] };
+    STARTERS[reg.id].forEach((st, k) => {
+      const road = st.smalls ? ROAD_STATS[st.smalls] : undefined;
+      const spec: ClusterSpec = {
+        id: `${reg.id}_s${k}`,
+        region: reg.id,
+        kind: 'chain',
+        theme: st.theme,
+        smallCount: 3,
+        notable: { name: st.name, strength: 1 },
+        attrs: reg.attrs,
+        ...(road ? { smallMods: road.mods, smallName: road.name } : {}),
+      };
+      // One each side of the way out, leaning outwards, at about the reach of a cluster from the start; the other side if that is full.
+      const cands = [k === 0 ? 62 : -62, k === 0 ? -62 : 62].flatMap((lean) =>
+        [0, 18, -18, 36, -36, 54, -54].flatMap((deg) =>
+          [175, 215, 255].map((d) => {
+            const f = rot(rot(out, lean), deg);
+            return { centre: [S.x + f[0] * d, S.y + f[1] * d] as Vec, face: f };
+          }),
+        ),
+      );
+      const from = b.nodes.length;
+      if (hang(ctx, spec, start, cands) === null) {
+        unplaced.push(`${spec.id}@start`);
+        return;
+      }
+      for (let i = from; i < b.nodes.length; i++) b.nodes[i].region = reg.id;
+    });
+  }
+}
+
 /** How far from its start the roads of a class are threads, and how many steps round the start are left to the kit. */
 const THREAD_FAR = 2300;
 const KIT_STEPS = 6;

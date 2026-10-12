@@ -708,7 +708,10 @@ cost more nodes than the highway, so that it is worth it only for the clusters.
   out) must exceed the steps along the roads between the nodes they hang from (the table and the counts are measured when the link is
   made; a link that would be a shortcut is taken back). In a sample the way through was 3 to 10 steps against 0 to 5 by road.
 - **The starts**: each start is joined straight into its two starter clusters (the hand-made basic notables), those are joined into
-  the related clusters near them, up to three links each; a start then has the spoke, two roads and up to two clusters.
+  the related clusters near them, up to three links each; a start then has the spoke, two roads and two clusters. _Straight_ means
+  one edge: the starter clusters stand beside the start (113 to 262 units, hung from the start itself, after every road exists so
+  that they cannot shut one out) with no road node between. (The first version hung them down the lead-in road and joined the start
+  to them by a link that had to cost more than the highway, which made it no shortcut at all: a mistake, the user's correction.)
   2,617 nodes (the link nodes; was 2,500); about half the clusters have a second entrance (210 have two, 26 three).
 - **Baked at build time** (the user: a slow layout is fine if it is done once, at build time): the layout takes about 1.5 s and the
   game used to do it in the browser (and every test file that touched the tree did it again). `npm run tree:bake`

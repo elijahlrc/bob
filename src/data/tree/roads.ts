@@ -166,7 +166,7 @@ export const FILL: Record<RegionId, FillSpec[]> = {
     { name: 'Plain Habit', theme: 'armourEs' },
     { name: 'Vestry Hours', theme: 'es', smalls: 'armour' },
     { name: 'Tithe of Calm', theme: 'reservation' },
-    { name: 'Warm Hands', theme: 'lifeRegen', smalls: 'regen' },
+    { name: 'Warm Hands', theme: 'physReduction', smalls: 'regen' },
   ],
 };
 
