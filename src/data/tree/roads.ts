@@ -13,7 +13,6 @@ export const P = {
   es: { name: 'Maximum Energy Shield', mods: [mod('es', 'inc', 5)] },
   armour: { name: 'Armour', mods: [mod('armour', 'inc', 12)] },
   evasion: { name: 'Evasion Rating', mods: [mod('evasion', 'inc', 12)] },
-  damage: { name: 'Damage', mods: [mod('damage', 'inc', 7)] },
   spellDamage: { name: 'Spell Damage', mods: [mod('damage', 'inc', 7, { tags: ['spell'] })] },
   castSpeed: { name: 'Cast Speed', mods: [mod('castSpeed', 'inc', 4)] },
   attackSpeed: { name: 'Attack Speed', mods: [mod('attackSpeed', 'inc', 3)] },
@@ -26,13 +25,13 @@ export const P = {
 
 /** The pool of each region's roads, and of the middle's. */
 export const ROAD_POOLS: Record<RegionId | 'hub', RoadStat[]> = {
-  int: [P.es, P.mana, P.spellDamage, P.castSpeed],
-  dexint: [P.evasion, P.es, P.damage, P.crit],
-  dex: [P.evasion, P.moveSpeed, P.attackSpeed, P.life],
-  strdex: [P.armour, P.evasion, P.damage, P.life],
-  str: [P.life, P.armour, P.damage, P.regen],
+  int: [P.es, P.mana],
+  dexint: [P.evasion, P.es],
+  dex: [P.evasion, P.moveSpeed, P.life],
+  strdex: [P.armour, P.evasion, P.life],
+  str: [P.life, P.armour, P.regen],
   strint: [P.life, P.mana, P.armour, P.es],
-  hub: [P.life, P.damage, P.res, P.moveSpeed],
+  hub: [P.life, P.res, P.moveSpeed],
 };
 
 /**
@@ -48,23 +47,23 @@ export const START_KIT: Record<RegionId, [RoadStat[], RoadStat[]]> = {
   ],
   dexint: [
     [P.evasion, P.es, P.crit, P.evasion],
-    [P.damage, P.castSpeed, P.attackSpeed, P.evasion],
+    [P.accuracy, P.castSpeed, P.attackSpeed, P.evasion],
   ],
   dex: [
     [P.evasion, P.life, P.attackSpeed, P.moveSpeed],
-    [P.accuracy, P.attackSpeed, P.damage, P.evasion],
+    [P.accuracy, P.attackSpeed, P.crit, P.evasion],
   ],
   strdex: [
     [P.life, P.armour, P.attackSpeed, P.evasion],
-    [P.damage, P.armour, P.accuracy, P.attackSpeed],
+    [P.accuracy, P.armour, P.attackSpeed, P.res],
   ],
   str: [
-    [P.life, P.armour, P.damage, P.armour],
-    [P.armour, P.attackSpeed, P.regen, P.damage],
+    [P.life, P.armour, P.attackSpeed, P.armour],
+    [P.armour, P.attackSpeed, P.regen, P.accuracy],
   ],
   strint: [
-    [P.life, P.armour, P.es, P.damage],
-    [P.armour, P.damage, P.castSpeed, P.regen],
+    [P.life, P.armour, P.es, P.castSpeed],
+    [P.armour, P.res, P.castSpeed, P.regen],
   ],
 };
 
@@ -94,15 +93,15 @@ export const STARTERS: Record<
   ],
   strdex: [
     { name: 'Stout Frame', theme: 'lifePct', smalls: 'armour' },
-    { name: 'Whetted Edge', theme: 'meleePhys', smalls: 'damage' },
+    { name: 'Whetted Edge', theme: 'meleePhys', smalls: 'attackSpeed' },
   ],
   str: [
-    { name: 'Iron Constitution', theme: 'lifePct', smalls: 'damage' },
+    { name: 'Iron Constitution', theme: 'lifePct', smalls: 'regen' },
     { name: 'Thick Hide', theme: 'armour', smalls: 'armour' },
   ],
   strint: [
     { name: 'Vigil Mantle', theme: 'armourEs', smalls: 'armour' },
-    { name: 'Quiet Focus', theme: 'spell', smalls: 'damage' },
+    { name: 'Quiet Focus', theme: 'spell', smalls: 'castSpeed' },
   ],
 };
 
@@ -158,7 +157,7 @@ export const FILL: Record<RegionId, FillSpec[]> = {
     { name: 'Stone Resolve', theme: 'eleRes' },
     { name: 'Set Jaw', theme: 'stunThreshold' },
     { name: 'Crude Plate', theme: 'armour', smalls: 'armour' },
-    { name: 'Heft', theme: 'meleePhys', smalls: 'damage' },
+    { name: 'Heft', theme: 'meleePhys', smalls: 'attackSpeed' },
     { name: 'Banked Coals', theme: 'lifeRegen', smalls: 'regen' },
   ],
   strint: [
@@ -180,9 +179,9 @@ export const FILL: Record<RegionId, FillSpec[]> = {
 export const THREADS: Record<RegionId, (keyof typeof P)[]> = {
   int: ['es', 'mana', 'castSpeed', 'spellDamage', 'crit', 'res'],
   dexint: ['evasion', 'es', 'crit', 'castSpeed', 'attackSpeed', 'accuracy'],
-  dex: ['evasion', 'attackSpeed', 'moveSpeed', 'accuracy', 'life', 'damage'],
-  strdex: ['life', 'armour', 'attackSpeed', 'evasion', 'damage', 'accuracy'],
-  str: ['life', 'armour', 'damage', 'regen', 'attackSpeed', 'res'],
+  dex: ['evasion', 'attackSpeed', 'moveSpeed', 'accuracy', 'life', 'crit'],
+  strdex: ['life', 'armour', 'attackSpeed', 'evasion', 'res', 'accuracy'],
+  str: ['life', 'armour', 'accuracy', 'regen', 'attackSpeed', 'res'],
   strint: ['life', 'es', 'armour', 'mana', 'castSpeed', 'res'],
 };
 
@@ -199,7 +198,7 @@ const THREAD_THEME: Partial<Record<keyof typeof P, { theme: string; strength?: n
   accuracy: { theme: 'accuracy' },
   moveSpeed: { theme: 'moveSpeed', strength: 1.4 },
   regen: { theme: 'lifeRegen' },
-  res: { theme: 'eleRes' },
+  res: { theme: 'maxRes' },
   spellDamage: { theme: 'spell' },
 };
 
@@ -209,25 +208,22 @@ export const PATH_NOTABLES: Record<RegionId, { stat: keyof typeof P; name: strin
     { stat: 'es', name: 'Hushed Reserve' },
     { stat: 'mana', name: 'Deep Draught' },
     { stat: 'spellDamage', name: 'Practised Weave' },
-    { stat: 'crit', name: 'Clear Sight' },
   ],
   dexint: [
     { stat: 'evasion', name: 'Reed in the Wind' },
     { stat: 'es', name: 'Shaded Ward' },
-    { stat: 'crit', name: 'Hairline Cut' },
     { stat: 'castSpeed', name: 'Quick Whisper' },
   ],
   dex: [
     { stat: 'evasion', name: 'Dust Behind' },
     { stat: 'attackSpeed', name: 'Loosed Cord' },
-    { stat: 'moveSpeed', name: 'Long Stride' },
-    { stat: 'accuracy', name: 'Steady Aim' },
+    { stat: 'life', name: 'Long Wind' },
   ],
   strdex: [
     { stat: 'life', name: 'Hale Constitution' },
     { stat: 'armour', name: 'Plate and Padding' },
     { stat: 'attackSpeed', name: 'Practised Swing' },
-    { stat: 'evasion', name: 'Sidestep Drill' },
+    { stat: 'res', name: 'Cold Water Drill' },
   ],
   str: [
     { stat: 'life', name: 'Ox-Hearted' },
@@ -239,7 +235,7 @@ export const PATH_NOTABLES: Record<RegionId, { stat: keyof typeof P; name: strin
     { stat: 'life', name: 'Lantern-Bearer' },
     { stat: 'es', name: 'Sacristy Glow' },
     { stat: 'armour', name: 'Chainmail Prayer' },
-    { stat: 'mana', name: 'Chapel Hush' },
+    { stat: 'res', name: 'Chapel Hush' },
   ],
 };
 export { THREAD_THEME };

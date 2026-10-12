@@ -5,6 +5,9 @@
  *   2. a cluster's small nodes agree with its notable (they give the notable's own stat, or its nearest relative);
  *   3. a notable is worth at least `NOTABLE_FLOOR` small nodes, `NOTABLE_SINGLE_LINE` if it has one line.
  *
+ * Before them, plain increased damage is dropped (iteration 7, the user: universally good, no choice in it): a small node of it
+ * becomes the notable's own stat in step 2, a notable keeps its other lines.
+ *
  * Nothing here adds a line or a node: it only changes values and replaces a small node's stat. `npm run tree:emit` prints the report.
  */
 import {
@@ -59,11 +62,20 @@ export type BalanceReport = {
   stillWeak: string[];
 };
 
+/** Increased damage of every kind, for every build: no tag, no type, no condition. */
+const isPlainDamage = (m: ModT): boolean =>
+  m.stat === 'damage' &&
+  m.kind === 'inc' &&
+  !m.tags?.length &&
+  !m.damageTypes?.length &&
+  !m.condition &&
+  !m.per;
+
 export function balance(built: ClusterBuilt[]): { built: ClusterBuilt[]; report: BalanceReport } {
   const out = built.map((b) => ({
     ...b,
-    notable: mergeSame(b.notable),
-    small: mergeSame(b.small),
+    notable: mergeSame(b.notable).filter((m) => !isPlainDamage(m) || b.notable.length === 1),
+    small: mergeSame(b.small).filter((m) => !isPlainDamage(m)),
   }));
   const report: BalanceReport = { normalised: 0, coherent: 0, raised: [], stillWeak: [] };
 

@@ -22,6 +22,11 @@ the docs each entry links to.
 - The ground around every start is fuller: basic clusters and notables (life regeneration, resistances, speeds, armour, evasion,
   mana and the like) stand beside the roads, and near a start each stretch of road is a line of one stat, with a different stat on
   each branch, some ending in a notable.
+- The roads between clusters are now mostly attribute nodes, with the odd stretch of life, energy shield, armour, evasion or the
+  like. There are no plain "increased damage" nodes any more: damage nodes now ask for something (a skill type, a damage type, a
+  condition).
+- Groups of related clusters (life, fire, minions and so on) are broken into smaller groups spread through each region, so they
+  are less big and less isolated.
 - Your passives are refunded once more.
 - Steady Draw is no longer neutral (35% more damage), and several keystone cards now show their numbers.
 

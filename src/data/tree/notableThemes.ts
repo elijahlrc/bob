@@ -425,11 +425,12 @@ export const THEMES: Record<string, Theme> = {
     small: [mod('life', 'inc', 5)],
     notable: (s) => [mod('life', 'inc', r(10 * s)), mod('mana', 'inc', r(8 * s))],
   },
+  // (Was plain increased damage: universally good, no choice in it. Iteration 7.)
   hubDamage: {
     id: 'hubDamage',
-    smallName: 'Damage',
-    small: [mod('damage', 'inc', 7)],
-    notable: (s) => [mod('damage', 'inc', r(16 * s)), mod('attackSpeed', 'inc', r(4 * s))],
+    smallName: 'Attack Speed',
+    small: [mod('attackSpeed', 'inc', 3)],
+    notable: (s) => [mod('attackSpeed', 'inc', r(6 * s)), mod('castSpeed', 'inc', r(5 * s))],
   },
   hubMana: {
     id: 'hubMana',
@@ -546,17 +547,17 @@ Object.assign(THEMES, {
   },
   vsHexed: {
     id: 'vsHexed',
-    smallName: 'Damage',
-    small: [mod('damage', 'inc', 7)],
+    smallName: 'Damage against Cursed Enemies',
+    small: [mod('damage', 'inc', 7, { condition: { id: 'targetCursed' } })],
     notable: (s) => [
       mod('damage', 'more', r(10 * s), { condition: { id: 'targetCursed' } }),
-      mod('damage', 'inc', r(6 * s)),
+      mod('curseEffect', 'inc', r(10 * s)),
     ],
   },
   whileLeeching: {
     id: 'whileLeeching',
-    smallName: 'Damage',
-    small: [mod('damage', 'inc', 7)],
+    smallName: 'Damage while Leeching',
+    small: [mod('damage', 'inc', 7, { condition: { id: 'leeching' } })],
     notable: (s) => [
       mod('damage', 'more', r(10 * s), { condition: { id: 'leeching' } }),
       mod('leech.life', 'base', r1(0.3 * s), { tags: ['attack'] }),

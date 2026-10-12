@@ -662,3 +662,28 @@ sector, no places; the kinds near its starts are life, mana, damage, attributes,
   stood; and counting bare runs of road (forks cut them short) or steps to the nearest cluster (a 3-node stretch is a wide void
   at this scale): the emptiness of the ground, by eye, was the right measure.
   `SAVE_VERSION` 15 hands passives back.
+
+### Iteration 7, attribute highways, no plain damage, pods (2026-10-12)
+
+The user, three subtle points: (1) too many nodes with content on the highways; they should be almost only attribute nodes, with a few
+special sections of life or energy shield or other super simple stats; (2) base "increased damage" nodes should not exist at all
+(universally good, no trade-off); (3) the groups of related clusters (five life clusters together) are good but a bit too big and
+isolated: two or three, perhaps two by two and a one by one, instead of one.
+
+- **Highways** (`builder.ts travel`, `layout.ts junctionNode`): a road is attribute nodes; one road in six (and one junction in six)
+  is a section of one simple stat from the region's pool, which is now only life, energy shield, armour, evasion, mana, regeneration,
+  movement speed and resistances (no damage, crit, speeds). Roads were a third attribute nodes, now 77% (`ROAD_POOLS`). The threads of
+  iteration 6 are sections too: one chain in four near a start, and the kit of the first steps stays.
+- **No plain increased damage** anywhere (a test says so): out of the road pools, kits, threads, starters, fills and the hub (the
+  hub's damage notable is attack and cast speed); the five generated clusters that had it lose it in the emitter (`balance.ts`: a
+  small node of it becomes the notable's own stat, a notable keeps its other lines); two hand-made themes (against cursed enemies,
+  while leeching) have conditional damage and a curse effect instead. Damage that needs something (a tag, a type, a condition) stays.
+- **Pods** (`charter.ts splitIntoPods`): each group of related clusters is split into pods of four (two by two) and what is left (a
+  two or three; a lone one is a wayside cluster by the road, as are the nexus clusters): 27 authored districts become 74 pods, in the
+  same tiers and order, each a small district (knot, avenue or ladder: a ring is 400 across before it holds a cluster). Keystones go
+  to the biggest pods in turn. `pack.ts` (now REACH 380, GAP 100, APRON 700 by default) places them; the layout tries the nearest other
+  junctions of two pods when a planned gate is shut, before it gives a road up. The tree is wider (about 11,000 across) and has 2,500
+  nodes (was 2,260: the roads between 74 pods); routes are 65 to 71% attribute nodes, the first notable is 5 steps away, the nearest
+  keystone 9 to 12, the median keystone 23 to 27 (as before); 22 crossings between regions.
+- Found on the way: the fill clusters' nodes had no region (a line lost in a rewrite; a test says every node has one now).
+  `SAVE_VERSION` 16 hands passives back.

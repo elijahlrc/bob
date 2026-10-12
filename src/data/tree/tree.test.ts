@@ -31,18 +31,38 @@ function bfs(start: number): number[] {
  * judged by the pictures (`npm run tree:pic`) and the audit (`npm run tree:audit`), not here.
  */
 describe('passive tree invariants (§9.3)', () => {
-  it('has exactly 27 keystones, named as the keystone list, and about 420 notables', () => {
+  it('has exactly 27 keystones, named as the keystone list, and about 445 notables', () => {
     const ks = nodes.filter((n) => n.kind === 'keystone');
     expect(ks).toHaveLength(27);
     expect(ks.map((n) => n.name).sort()).toEqual(KEYSTONES.map((k) => k.name).sort());
     const n = nodes.filter((x) => x.kind === 'notable').length;
     expect(n).toBeGreaterThanOrEqual(330);
-    expect(n).toBeLessThanOrEqual(440);
+    expect(n).toBeLessThanOrEqual(470);
+  });
+
+  it('has no plain increased damage (universally good, no choice in it), and its highways are mostly attribute nodes', () => {
+    const plain = nodes.filter((n) =>
+      n.mods.some(
+        (m) =>
+          m.stat === 'damage' &&
+          m.kind === 'inc' &&
+          !m.tags?.length &&
+          !m.damageTypes?.length &&
+          !m.condition &&
+          !m.per,
+      ),
+    );
+    expect(plain.map((n) => n.name)).toEqual([]);
+    const roads = nodes.filter((n) => !n.cluster && n.region !== 'hub' && n.kind !== 'start');
+    const attr = roads.filter((n) => n.kind === 'travel').length;
+    expect(attr / roads.length).toBeGreaterThan(0.7);
   });
 
   it('lays out every cluster and every road', () => {
     expect(tree.dropped).toEqual([]);
     expect(tree.unplaced).toEqual([]);
+    // Every node belongs to a region (or the middle).
+    expect(nodes.filter((n) => !n.region).map((n) => n.name)).toEqual([]);
   });
 
   it('is connected: every node is reachable from every class start', () => {

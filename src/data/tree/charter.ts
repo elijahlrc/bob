@@ -30,9 +30,9 @@ export type District = {
 /**
  * The districts of a region are listed nearest the class start first, in three tiers (the user, iteration 5): the first, the very
  * core basics of the class (life, energy shield, armour, evasion, the speeds), a few pretty core archetypes next, and the narrow or
- * odd ideas last, outward. `scripts/tree/pack.ts` places them in this order.
+ * odd ideas last, outward. These are the districts as authored; `DISTRICTS` below splits each group of related clusters into pods.
  */
-export const DISTRICTS: District[] = [
+export const BASE_DISTRICTS: District[] = [
   // --- int (Mystic) -----------------------------------------------------------------------------------------------
   {
     id: 'wellspring',
@@ -394,6 +394,76 @@ export const DISTRICTS: District[] = [
     keystones: [],
   },
 ];
+
+/**
+ * How many clusters stand together: a group of related clusters is pods of four (two by two) and what is left (iteration 7, the user:
+ * the groups of related clusters are a bit too big and isolated; two or three of them, perhaps two by two and a one by one, are
+ * better than one). A one by one is not a pod: it is a wayside cluster, beside a road.
+ */
+const POD = 4;
+function podSizes(n: number): number[] {
+  const out: number[] = [];
+  let left = n;
+  while (left > POD) {
+    out.push(POD);
+    left -= POD;
+  }
+  out.push(left);
+  return out;
+}
+
+const hashOfId = (key: string): number => {
+  let h = 7;
+  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+  return h;
+};
+
+/** The pods of the authored districts: same tiers and order, each a small district of its own (the nexus of a district stands by the road). */
+function splitIntoPods(base: District[]): District[] {
+  const out: District[] = [];
+  for (const d of base) {
+    const pods: { group: string; ids: string[] }[] = [];
+    for (const [group, ids] of Object.entries(d.groups)) {
+      let at = 0;
+      for (const size of podSizes(ids.length)) {
+        if (size >= 2) pods.push({ group, ids: ids.slice(at, at + size) });
+        at += size;
+      }
+    }
+    // A district of nothing but ones is one pod, so that its keystones have a home.
+    if (!pods.length)
+      pods.push({ group: Object.keys(d.groups)[0] ?? 'all', ids: Object.values(d.groups).flat() });
+    // The keystones of the district go to its biggest pods, one each in turn.
+    const bySize = pods
+      .map((_, i) => i)
+      .sort((a, b) => pods[b].ids.length - pods[a].ids.length || a - b);
+    const keys: string[][] = pods.map(() => []);
+    d.keystones.forEach((k, i) => keys[bySize[i % bySize.length]].push(k));
+    pods.forEach((pod, i) => {
+      const id = `${d.id}_${pod.group}${i + 1}`;
+      // Compact shapes: a ring is four hundred across before it holds a cluster.
+      const choices: Template[] =
+        pod.ids.length >= 4
+          ? ['knot', 'avenue', 'ladder']
+          : pod.ids.length === 3
+            ? ['avenue', 'knot']
+            : ['avenue'];
+      out.push({
+        id,
+        name: `${d.name}, ${pod.group} ${i + 1}`,
+        region: d.region,
+        theme: d.theme,
+        template: choices[hashOfId(id) % choices.length],
+        groups: { [pod.group]: pod.ids },
+        nexus: [],
+        keystones: keys[i],
+      });
+    });
+  }
+  return out;
+}
+
+export const DISTRICTS: District[] = splitIntoPods(BASE_DISTRICTS);
 
 /** The district a cluster belongs to, if it belongs to one. */
 export function districtOf(clusterId: string): District | undefined {

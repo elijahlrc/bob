@@ -510,8 +510,9 @@ function junctionNode(
   at: Vec,
   district: string,
 ): number {
-  if (i % 3 === 0) {
-    const a = attrs[Math.floor(i / 3) % attrs.length];
+  // Attribute nodes, and one junction in six a node of the simple stat of the region.
+  if (hashOf(`${district}:j${i}:special`) % 6 !== 0) {
+    const a = attrs[i % attrs.length];
     return addNode(
       b,
       'travel',
@@ -988,8 +989,25 @@ function layoutRegion(
     if (!sh || !ids || sh.shape.gates[gate] === undefined) throw new Error(`no gate ${name}`);
     return ids[sh.shape.gates[gate]];
   };
-  for (const [from, to] of REGION_LINKS[reg.id] ?? [])
-    road(ref(from), ref(to), undefined, `${from}>${to}`, false, true);
+  // The plan's roads between the pods. A planned gate may be shut (clusters hang at it, another road crosses): the road then goes between
+  // the nearest other junctions of the two districts, before it is given up.
+  const junctionsOf = (name: string): number[] =>
+    name === 'start' ? [start] : (junctionIds.get(name.split(':')[0]) ?? []);
+  for (const [from, to] of REGION_LINKS[reg.id] ?? []) {
+    if (road(ref(from), ref(to), undefined, '', true, true)) continue;
+    const near = junctionsOf(from)
+      .flatMap((x) =>
+        junctionsOf(to).map((y) => ({
+          x,
+          y,
+          d: Math.hypot(b.nodes[x].x - b.nodes[y].x, b.nodes[x].y - b.nodes[y].y),
+        })),
+      )
+      .sort((p, q) => p.d - q.d || p.x - q.x || p.y - q.y)
+      .slice(0, 16);
+    if (!near.some((c) => road(c.x, c.y, undefined, '', true, true)))
+      dropped.push(`${from}>${to} (no way between the two)`);
+  }
   // A second road out of the class start (iteration 4, the user: two major paths out of the start): to the nearest junction of a
   // district other than the first road's, and far enough that the
   // lead-in has room for the basics, so that each start has two ways to go, each into a district.
@@ -1601,6 +1619,8 @@ function threadStarts(b: Builder, starts: Record<string, number>, only?: RegionI
     const at = new Map<number, Set<number>>();
     const statOf = new Map<Chain, number>();
     for (const c of chains) {
+      // Most of a highway stays attribute nodes: a thread is a section, one chain in four.
+      if (hashOf('thread-section ' + c.nodes[0]) % 4 !== 0) continue;
       const taken = new Set([...(at.get(c.ends[0]) ?? []), ...(at.get(c.ends[1]) ?? [])]);
       const from = hashOf(`thread ${c.nodes[0]}`) % palette.length;
       let pick = from;
@@ -1638,10 +1658,13 @@ function threadStarts(b: Builder, starts: Record<string, number>, only?: RegionI
       b.nodes[id].mods = theme.notable(th!.strength ?? 1).map((m) => ({ ...m }));
     }
     for (const c of chains) {
-      const stat = ROAD_STATS[palette[statOf.get(c)!]];
+      const pick = statOf.get(c);
+      if (pick === undefined) continue;
+      const stat = ROAD_STATS[palette[pick]];
       for (const id of c.nodes) {
         const n = b.nodes[id];
-        if (n.kind !== 'small') continue;
+        if (n.kind !== 'small' && n.kind !== 'travel') continue;
+        n.kind = 'small';
         n.name = stat.name;
         n.mods = stat.mods.map((m) => ({ ...m }));
       }
@@ -1710,6 +1733,7 @@ function fillSparse(b: Builder, starts: Record<string, number>, only?: RegionId[
     for (const c of cands.slice(0, 16)) {
       const spec = fillSpec(c.reg, queue.get(c.reg.id)![0]);
       const ctx: Ctx = { b, attrs: c.reg.attrs, pool: ROAD_POOLS[c.reg.id], centres: [] };
+      const from = b.nodes.length;
       const node = b.nodes[c.id];
       const a = b.nodes[node.links[0]];
       const z = b.nodes[node.links[node.links.length - 1]];
@@ -1721,6 +1745,8 @@ function fillSparse(b: Builder, starts: Record<string, number>, only?: RegionId[
         if (hang(ctx, spec, node.id, around([node.x, node.y], f, true), undefined) !== null) {
           queue.get(c.reg.id)!.shift();
           placed.set(c.reg.id, placed.get(c.reg.id)! + 1);
+          // The new nodes (the cluster, and the road to it) are the class's.
+          for (let i = from; i < b.nodes.length; i++) b.nodes[i].region = c.reg.id;
           done = true;
           break;
         }

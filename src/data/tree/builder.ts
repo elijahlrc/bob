@@ -227,10 +227,17 @@ export function travel(b: Builder, from: number[], to: number[], o: RoadOptions)
     }
     if (!ok) continue;
     let prev = p;
+    // A highway is attribute nodes (the user, iteration 7); one road in six is a section of one simple stat (life, energy shield and
+    // the like: the pool), all of it that stat.
+    const special =
+      !!o.pool && pts.length >= 2 && hashOf(`special:${o.district ?? ''}:${p}:${q}`) % 6 === 0;
+    const statOfRoad = o.pool
+      ? o.pool[hashOf(`stat:${o.district ?? ''}:${p}:${q}`) % o.pool.length]
+      : undefined;
     pts.forEach(([x, y], i) => {
       let id: number;
-      if (o.pool && i % 3 !== 2) {
-        const s = o.pool[hashOf(`${o.district ?? ''}:${p}:${q}:${i}`) % o.pool.length];
+      if (special && statOfRoad) {
+        const s = statOfRoad;
         id = addNode(
           b,
           'small',
@@ -242,7 +249,7 @@ export function travel(b: Builder, from: number[], to: number[], o: RoadOptions)
           o.district,
         );
       } else {
-        const at = attrs[(o.pool ? Math.floor(i / 3) : i) % attrs.length];
+        const at = attrs[(o.pool ? Math.floor(i / 2) : i) % attrs.length];
         id = addNode(
           b,
           'travel',

@@ -12,11 +12,11 @@ import { REGIONS, START_RADIUS } from '../../src/data/tree/spec';
 
 type Vec = [number, number];
 /** How far a district's clusters reach from its junctions, and what to leave between two districts and at the wedge's edges. */
-const REACH = Number(process.env.REACH ?? 290);
-const GAP = Number(process.env.GAP ?? 60);
+const REACH = Number(process.env.REACH ?? 380);
+const GAP = Number(process.env.GAP ?? 100);
 const EDGE = 150;
 /** How far the first district (the very core of the class) stands from the class start: room for the basics of its lead-in. */
-const APRON = Number(process.env.APRON ?? 1150);
+const APRON = Number(process.env.APRON ?? 700);
 
 const only = process.argv.slice(2);
 const out: string[] = [];

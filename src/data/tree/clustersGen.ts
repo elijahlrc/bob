@@ -735,9 +735,9 @@ export const GEN_CLUSTERS: GenCluster[] = [
     smallCount: 3,
     notable: {
       name: 'Wide Shadow Cast',
-      mods: [m('damage', 'inc', 18), m('projectileSpeed', 'inc', 10), m('aoe', 'inc', 10)],
+      mods: [m('projectileSpeed', 'inc', 10), m('aoe', 'inc', 10)],
     },
-    small: { name: 'Lesser damage', mods: [m('damage', 'inc', 7)] },
+    small: { name: 'Projectile Speed', mods: [m('projectileSpeed', 'inc', 7)] },
   },
   {
     id: 'g41',
@@ -1343,10 +1343,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'damage',
     depth: 0.631,
     smallCount: 2,
-    notable: {
-      name: 'Processional Haste',
-      mods: [m('damage', 'inc', 12), m('minionSpeed', 'inc', 20)],
-    },
+    notable: { name: 'Processional Haste', mods: [m('minionSpeed', 'inc', 25)] },
     small: { name: 'Minion Attack and Movement Speed', mods: [m('minionSpeed', 'inc', 8)] },
   },
   {
@@ -2322,16 +2319,12 @@ export const GEN_CLUSTERS: GenCluster[] = [
       mods: [
         m('duration.shock', 'inc', 20),
         m('critChance', 'inc', 40, { condition: { id: 'targetShocked' } }),
-        m('damage', 'inc', 30),
         m('effect.shock', 'inc', 30),
       ],
     },
     small: {
       name: 'Critical Strike Chance against Shocked Enemies',
-      mods: [
-        m('critChance', 'inc', 15, { condition: { id: 'targetShocked' } }),
-        m('damage', 'inc', 7),
-      ],
+      mods: [m('critChance', 'inc', 15, { condition: { id: 'targetShocked' } })],
     },
   },
   {
@@ -3170,14 +3163,9 @@ export const GEN_CLUSTERS: GenCluster[] = [
     smallCount: 2,
     notable: {
       name: 'Masked Precision',
-      mods: [
-        m('damage', 'inc', 20),
-        m('critChance', 'inc', 20),
-        m('dex', 'base', 10),
-        m('int', 'base', 10),
-      ],
+      mods: [m('critChance', 'inc', 20), m('dex', 'base', 10), m('int', 'base', 10)],
     },
-    small: { name: 'Lesser damage', mods: [m('damage', 'inc', 7)] },
+    small: { name: 'Lesser critical Strike Chance', mods: [m('critChance', 'inc', 20)] },
   },
   {
     id: 'g188',
@@ -4433,7 +4421,6 @@ export const GEN_CLUSTERS: GenCluster[] = [
     notable: {
       name: 'Sanctified Fervor',
       mods: [
-        m('damage', 'inc', 14),
         m('minionDamage', 'inc', 10),
         m('attackSpeed', 'inc', 5),
         m('castSpeed', 'inc', 5),
@@ -4441,7 +4428,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
         m('int', 'base', 10),
       ],
     },
-    small: { name: 'Lesser damage', mods: [m('damage', 'inc', 7)] },
+    small: { name: 'Damage of your Minions', mods: [m('minionDamage', 'inc', 10)] },
   },
   {
     id: 'g259',
