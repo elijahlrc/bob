@@ -24,8 +24,9 @@ import { DISTRICTS, districtOf, type District } from './charter';
 import { GEN_CLUSTERS } from './clustersGen';
 import { PLACEMENT, REGION_LINKS } from './plan';
 import { THEMES } from './notableThemes';
+import { fnv1a, mix32 } from '../../core/hash';
 import { modKey, unitsOf } from './power';
-import { ROAD_POOLS } from './roads';
+import { P as ROAD_STATS, ROAD_POOLS, START_KIT, STARTERS } from './roads';
 import { placeCluster } from './shapes';
 import {
   EXTRA_NOTABLES,
@@ -372,9 +373,11 @@ function specOf(id: string, region: RegionDef): ClusterSpec {
 }
 
 function rollback(b: Builder, L: number, E: number): void {
+  // Only the old nodes an undone edge ended at have links to take back.
+  for (let e = E; e < b.edges.length; e++)
+    for (const i of b.edges[e]) if (i < L) b.nodes[i].links = b.nodes[i].links.filter((m) => m < L);
   b.nodes.length = L;
   b.edges.length = E;
-  for (const n of b.nodes) n.links = n.links.filter((m) => m < L);
 }
 
 /** Whether the nodes and edges added since (L, E) keep clear of what was there before. */
@@ -524,18 +527,58 @@ function junctionNode(
 }
 
 /** A road between two nodes: straight if it can be, else bending round what is in the way through one junction to the side. */
-function connect(b: Builder, from: number, to: number, opts: RoadOptions): boolean {
-  if (travel(b, [from], [to], opts)) return true;
+/** The least angle between a new road and an old one at a node they share (the critique of iteration 5: fans of roads 12 degrees apart). */
+const MIN_SPREAD = (22 * Math.PI) / 180;
+
+/** Whether the edges added since (L, E) leave node `id` at least MIN_SPREAD from the edges it had before. */
+function spreadOk(b: Builder, id: number, L: number, E: number): boolean {
+  const added = new Set<number>();
+  for (let e = E; e < b.edges.length; e++) {
+    const [p, q] = b.edges[e];
+    if (p === id) added.add(q);
+    else if (q === id) added.add(p);
+  }
+  if (!added.size) return true;
+  const n = b.nodes[id];
+  const angle = (m: number) => Math.atan2(b.nodes[m].y - n.y, b.nodes[m].x - n.x);
+  for (const m of added)
+    for (const o of n.links) {
+      if (added.has(o) || o >= L) continue;
+      const d = Math.abs(angle(m) - angle(o));
+      if (Math.min(d, 2 * Math.PI - d) < MIN_SPREAD) return false;
+    }
+  return true;
+}
+
+function connect(b: Builder, from: number, to: number, opts: RoadOptions, few = false): boolean {
+  // The roads of a district's template are as designed; every other road keeps its distance from the ones it joins.
+  const spread = (L: number, E: number) =>
+    opts.district !== undefined ||
+    opts.free === true ||
+    (spreadOk(b, from, L, E) && spreadOk(b, to, L, E));
+  {
+    const L = b.nodes.length;
+    const E = b.edges.length;
+    if (travel(b, [from], [to], opts)) {
+      if (spread(L, E)) return true;
+      rollback(b, L, E);
+    }
+  }
   const A = b.nodes[from];
   const B = b.nodes[to];
   const dx = B.x - A.x;
   const dy = B.y - A.y;
   const len = Math.hypot(dx, dy) || 1;
   const [nx, ny] = [-dy / len, dx / len];
-  for (const off of [
-    140, -140, 260, -260, 400, -400, 560, -560, 760, -760, 1000, -1000, 1300, -1300,
-  ])
-    for (const t of [0.5, 0.35, 0.65, 0.25, 0.75, 0.15, 0.85, 0.05, 0.95]) {
+  // The places to bend through: many for a road that must be made, a few where many pairs of ends are tried (a search each).
+  const offs = few
+    ? [200, -200, 500, -500, 900, -900]
+    : [140, -140, 260, -260, 400, -400, 560, -560, 760, -760, 1000, -1000, 1300, -1300];
+  const ts = few
+    ? [0.5, 0.3, 0.7, 0.15, 0.85]
+    : [0.5, 0.35, 0.65, 0.25, 0.75, 0.15, 0.85, 0.05, 0.95];
+  for (const off of offs)
+    for (const t of ts) {
       const wx = A.x + dx * t + nx * off;
       const wy = A.y + dy * t + ny * off;
       if (!pointClear(b, wx, wy)) continue;
@@ -552,7 +595,7 @@ function connect(b: Builder, from: number, to: number, opts: RoadOptions): boole
         undefined,
         opts.district,
       );
-      if (travel(b, [from], [w], opts) && travel(b, [w], [to], opts)) return true;
+      if (travel(b, [from], [w], opts) && travel(b, [w], [to], opts) && spread(L, E)) return true;
       rollback(b, L, E);
     }
   return false;
@@ -564,9 +607,43 @@ function connect(b: Builder, from: number, to: number, opts: RoadOptions): boole
  */
 const joinable = (b: Builder, id: number): boolean => {
   const n = b.nodes[id];
-  if (n.cluster || (n.kind !== 'small' && n.kind !== 'travel') || n.links.length > 3) return false;
+  if (n.cluster || (n.kind !== 'small' && n.kind !== 'travel') || n.links.length > 4) return false;
   return n.links.filter((m) => !b.nodes[m].cluster).length <= 2;
 };
+
+/** Whether a cluster is of a narrow idea: a weapon or a skill type, charges, curses, auras, minions, traps and the like. */
+const NICHE_TAGS = new Set([
+  'mace',
+  'sword',
+  'axe',
+  'bow',
+  'dagger',
+  'claw',
+  'wand',
+  'staff',
+  'sceptre',
+  'twoHand',
+  'oneHand',
+  'dualWield',
+  'trap',
+  'mine',
+  'totem',
+  'brand',
+  'channelling',
+  'minion',
+]);
+const NICHE_STAT =
+  /^(minion|deploy|totem|trap|mine|curse|hex|aura|charge|maxCharges|skillDuration|chargeOn|chargeDuration)/;
+function isNiche(spec: ClusterSpec): boolean {
+  if (spec.id.includes('_x')) return true; // the hand-made notables are charges and hexes
+  const mods = [...(spec.gen?.notable.mods ?? []), ...(spec.gen?.small.mods ?? [])];
+  return mods.some((m) => NICHE_STAT.test(m.stat) || (m.tags ?? []).some((t) => NICHE_TAGS.has(t)));
+}
+/** From this far from the middle of the tree a wayside cluster may be a narrow one. */
+const NICHE_RADIUS = 2700;
+
+/** How many steps from a class start are kept for the basics: no wayside cluster hangs from a road node this near. */
+const APRON_STEPS = 10;
 
 /** Distances in steps from a node, as far as `limit`. */
 function graphSteps(b: Builder, from: number, limit: number): Map<number, number> {
@@ -707,6 +784,50 @@ function chainDoors(b: Builder): void {
   }
 }
 
+/**
+ * Which clusters of a district are fused into one shape: within a group of one subject, about a tenth of the clusters pair with the
+ * next into a ring of two notables, and another tenth lead a line of two or three; by a hash, so it is the same every time. Only
+ * clusters of few small nodes fuse, so that a ring or a line stays about the size of one cluster and a half.
+ */
+function fusionsOf(
+  d: { id: string; groups: Record<string, string[]> },
+  reg: RegionDef,
+): Map<string, { parts: string[]; shape: 'twin' | 'string' }> {
+  const out = new Map<string, { parts: string[]; shape: 'twin' | 'string' }>();
+  const size = (id: string) => specOf(id, reg).smallCount;
+  // What a cluster is about: its notable's first line. Two of the same are not fused (the critique of iteration 5: 25% mana twice).
+  const stat = (id: string) => specOf(id, reg).gen?.notable.mods[0]?.stat ?? id;
+  for (const list of Object.values(d.groups)) {
+    let i = 0;
+    while (i < list.length) {
+      const h = hashOf(`fuse ${list[i]}`) % 20;
+      const rest = list.length - i;
+      if (
+        h < 2 &&
+        rest >= 2 &&
+        size(list[i]) + size(list[i + 1]) <= 8 &&
+        stat(list[i]) !== stat(list[i + 1])
+      ) {
+        out.set(list[i], { parts: [list[i], list[i + 1]], shape: 'twin' });
+        i += 2;
+      } else if (h < 4 && rest >= 2) {
+        const three =
+          h === 3 && rest >= 3 && size(list[i]) + size(list[i + 1]) + size(list[i + 2]) <= 9;
+        const k = three ? 3 : 2;
+        const picked = list.slice(i, i + k);
+        if (
+          picked.reduce((n, id) => n + size(id) + 1, 0) <= 9 &&
+          new Set(picked.map(stat)).size === picked.length
+        ) {
+          out.set(list[i], { parts: list.slice(i, i + k), shape: 'string' });
+          i += k;
+        } else i++;
+      } else i++;
+    }
+  }
+  return out;
+}
+
 function layoutRegion(
   b: Builder,
   reg: RegionDef,
@@ -723,10 +844,24 @@ function layoutRegion(
     { shape: Shape; to: (p: Vec) => Vec; dir: (p: Vec) => Vec; centre: Vec }
   >();
   const roads: number[] = [];
-  const road = (from: number, to: number, district?: string, tag = '', quiet = false): boolean => {
+  const road = (
+    from: number,
+    to: number,
+    district?: string,
+    tag = '',
+    quiet = false,
+    free = false,
+  ): boolean => {
     const before = b.nodes.length;
     const why: string[] = [];
-    const ok = connect(b, from, to, { attrs: reg.attrs, pool, spacing: ROAD_STEP, district, why });
+    const ok = connect(b, from, to, {
+      attrs: reg.attrs,
+      pool,
+      spacing: ROAD_STEP,
+      district,
+      free,
+      why,
+    });
     if (!ok && !quiet) dropped.push(`${tag} ${from}-${to} (${why[0] ?? '?'})`);
     for (let i = before; i < b.nodes.length; i++) roads.push(i);
     return ok;
@@ -751,10 +886,9 @@ function layoutRegion(
     const ids = shape.junctions.map((p, i) => junctionNode(b, reg.attrs, pool, i, to(p), d.id));
     junctionIds.set(d.id, ids);
     for (const [i, j] of shape.edges) road(ids[i], ids[j], d.id, d.id);
-    for (const s of shape.slots) {
-      const spec = specOf(s.member.id, reg);
+    // Where a cluster of a slot may hang from its junction.
+    const candsFor = (s: Slot): Candidate[] => {
       const J = shape.junctions[s.j];
-      let cands: Candidate[];
       if (s.at && s.hug) {
         // Leaning into the cell from the corner it hangs from, then the middle of the cell.
         const dx = s.at[0] - J[0];
@@ -762,22 +896,50 @@ function layoutRegion(
         const len = Math.hypot(dx, dy) || 1;
         const l: Vec = [dx / len, dy / len];
         const f = dir(l);
-        cands = [SIDE * 1.15, SIDE * 1.4, len].map((dd) => ({
+        return [SIDE * 1.15, SIDE * 1.4, len].map((dd) => ({
           centre: to([J[0] + l[0] * dd, J[1] + l[1] * dd]),
           face: f,
         }));
-      } else if (s.at) {
+      }
+      if (s.at) {
         const c = to(s.at);
         const f = dir(s.at.map((x, i) => x - J[i]) as Vec);
         const len = Math.hypot(f[0], f[1]) || 1;
-        cands = [{ centre: c, face: [f[0] / len, f[1] / len] }];
-      } else {
-        const f = dir(s.face!);
-        const g = to(J);
-        cands = around(g, f);
+        return [{ centre: c, face: [f[0] / len, f[1] / len] }];
       }
-      if (hang(ctx, spec, ids[s.j], cands, d.id) === null)
-        failed.push({ spec, slot: s, ids, shape, to, centre });
+      return around(to(J), dir(s.face!));
+    };
+    const attempt = (s: Slot, spec: ClusterSpec): boolean =>
+      hang(ctx, spec, ids[s.j], candsFor(s), d.id) !== null;
+    // Related clusters of a group may be fused into one shape (two notables in a ring, a line of two or three).
+    const fused = fusionsOf(d, reg);
+    const absorbed = new Set([...fused.values()].flatMap((f) => f.parts.slice(1)));
+    const absorbedSlots = new Map<string, Slot>();
+    for (const s of shape.slots) {
+      const id = s.member.id;
+      if (absorbed.has(id)) {
+        absorbedSlots.set(id, s);
+        continue;
+      }
+      const spec = specOf(id, reg);
+      const f = fused.get(id);
+      if (f) {
+        const composite: ClusterSpec = {
+          ...spec,
+          also: f.parts.slice(1).map((x) => specOf(x, reg)),
+          shape: f.shape,
+        };
+        if (attempt(s, composite)) {
+          continue;
+        }
+        // No room for the fused shape: the clusters go on their own.
+        for (const x of f.parts.slice(1)) {
+          const slot = absorbedSlots.get(x) ?? shape.slots.find((q) => q.member.id === x)!;
+          const xs = specOf(x, reg);
+          if (!attempt(slot, xs)) failed.push({ spec: xs, slot, ids, shape, to, centre });
+        }
+      }
+      if (!attempt(s, spec)) failed.push({ spec, slot: s, ids, shape, to, centre });
     }
   }
   // A slot that found no room at its own junction tries the nearest junctions of its district, in every direction.
@@ -817,28 +979,107 @@ function layoutRegion(
     return ids[sh.shape.gates[gate]];
   };
   for (const [from, to] of REGION_LINKS[reg.id] ?? [])
-    road(ref(from), ref(to), undefined, `${from}>${to}`);
+    road(ref(from), ref(to), undefined, `${from}>${to}`, false, true);
   // A second road out of the class start (iteration 4, the user: two major paths out of the start): to the nearest junction of a
-  // district that lies another way (at least 40 degrees from the first road), so that each start has two ways to go, each with the
-  // branches of its district.
+  // district other than the first road's, and far enough that the
+  // lead-in has room for the basics, so that each start has two ways to go, each into a district.
+  const firstDistrict = REGION_LINKS[reg.id]?.find(([f]) => f === 'start')?.[1].split(':')[0];
   {
     const S = b.nodes[start];
     const first = S.links.find((m) => m >= L0);
     if (first !== undefined) {
       const a: Vec = [b.nodes[first].x - S.x, b.nodes[first].y - S.y];
       const la = Math.hypot(a[0], a[1]) || 1;
-      const cands = [...junctionIds.values()]
-        .flat()
+      const cands = [...junctionIds.entries()]
+        .filter(([id]) => id !== firstDistrict)
+        .flatMap(([, ids]) => ids)
         .filter((i) => b.nodes[i].links.length <= 4)
         .map((i) => {
           const v: Vec = [b.nodes[i].x - S.x, b.nodes[i].y - S.y];
           const lv = Math.hypot(v[0], v[1]) || 1;
           return { i, d: lv, cos: (a[0] * v[0] + a[1] * v[1]) / (la * lv) };
         })
-        .filter((c) => c.d >= 350 && c.d <= 1600 && c.cos <= 0.766)
+        .filter((c) => c.d >= 700 && c.d <= 3200 && c.cos <= 0.985)
         .sort((x, y) => x.d - y.d || x.i - y.i);
-      cands.slice(0, 10).some((c) => road(start, c.i, undefined, 'start 2', true));
+      cands.slice(0, 24).some((c) => road(start, c.i, undefined, 'start 2', true));
     }
+  }
+  // The basics of the class on the first road nodes of each way out of the start (iteration 5, the user: the first ten or so very
+  // core): the small nodes of the lead-in, up to the first fork, are the class's kit instead of a draw from the region's pool.
+  {
+    const kit = START_KIT[reg.id];
+    const S = b.nodes[start];
+    S.links
+      .filter((m) => m >= L0)
+      .forEach((out, k) => {
+        const list = kit[k] ?? kit[0];
+        let prev = start;
+        let cur = out;
+        let used = 0;
+        for (let step = 0; step < 8; step++) {
+          const n = b.nodes[cur];
+          if (n.cluster) break;
+          if (n.kind === 'small' && used < list.length) {
+            n.name = list[used].name;
+            n.mods = list[used].mods.map((m) => ({ ...m }));
+            used++;
+          }
+          const roadLinks = n.links.filter((m) => !b.nodes[m].cluster);
+          const nexts = roadLinks.filter((m) => m !== prev && m >= L0);
+          if (nexts.length !== 1 || roadLinks.length > 2) break;
+          prev = cur;
+          cur = nexts[0];
+        }
+      });
+  }
+  // One basic notable of the class hung on each way out: a side option on the lead-in.
+  {
+    const S = b.nodes[start];
+    S.links
+      .filter((m) => m >= L0)
+      .forEach((out, k) => {
+        const st = STARTERS[reg.id][k];
+        if (!st) return;
+        const lead: number[] = [];
+        let prev = start;
+        let cur = out;
+        for (let step = 0; step < 6; step++) {
+          const n = b.nodes[cur];
+          if (n.cluster) break;
+          lead.push(cur);
+          const roadLinks = n.links.filter((m) => !b.nodes[m].cluster);
+          const nexts = roadLinks.filter((m) => m !== prev && m >= L0);
+          if (nexts.length !== 1 || roadLinks.length > 2) break;
+          prev = cur;
+          cur = nexts[0];
+        }
+        const road = st.smalls ? ROAD_STATS[st.smalls] : undefined;
+        const spec: ClusterSpec = {
+          id: `${reg.id}_s${k}`,
+          region: reg.id,
+          kind: 'chain',
+          theme: st.theme,
+          smallCount: 3,
+          notable: { name: st.name, strength: 1 },
+          attrs: reg.attrs,
+          ...(road ? { smallMods: road.mods, smallName: road.name } : {}),
+        };
+        let placed = false;
+        for (const at of [1, 2, 0, 3, 4].filter((x) => x < lead.length)) {
+          const node = b.nodes[lead[at]];
+          const a = b.nodes[node.links[0]];
+          const c = b.nodes[node.links[node.links.length - 1]];
+          const t: Vec = [c.x - a.x, c.y - a.y];
+          const len = Math.hypot(t[0], t[1]) || 1;
+          const flip = hashOf(`${spec.id}:${node.id}`) % 2 ? 1 : -1;
+          const f: Vec = [(-t[1] / len) * flip, (t[0] / len) * flip];
+          if (hang(ctx, spec, node.id, around([node.x, node.y], f, true)) !== null) {
+            placed = true;
+            break;
+          }
+        }
+        if (!placed) unplaced.push(`${spec.id}@start`);
+      });
   }
   const regionRoads = (): number[] => {
     const out: number[] = [];
@@ -951,20 +1192,26 @@ function layoutRegion(
     })),
   ];
   // Any road node of the region can carry one; first with room round it, then with less.
+  // Not in the first ten or so steps from the class start: those are the basics (the user, iteration 5).
+  const apron = graphSteps(b, start, APRON_STEPS);
   const carriers: number[] = [];
   for (let i = L0; i < b.nodes.length; i++) {
     const n = b.nodes[i];
+    if (apron.has(i)) continue;
     if (!n.cluster && (n.kind === 'travel' || n.kind === 'small') && n.links.length >= 2)
       carriers.push(i);
   }
   void roads;
+  // The narrow ones (a weapon, a skill type, charges, hexes) keep to the outer half of the region (the user: the weird stuff outward).
+  const far = carriers.filter((i) => Math.hypot(b.nodes[i].x, b.nodes[i].y) >= NICHE_RADIUS);
   for (const spec of way) {
     let placed = false;
-    const n = carriers.length;
+    const list = isNiche(spec) && far.length ? far : carriers;
+    const n = list.length;
     const startAt = n ? hashOf(spec.id) % n : 0;
     for (const room of [215, 170, 130]) {
       for (let k = 0; k < n && !placed; k++) {
-        const node = b.nodes[carriers[(startAt + k * 7) % n]];
+        const node = b.nodes[list[(startAt + k * 7) % n]];
         const p: Vec = [node.x, node.y];
         if (ctx.centres.some((c) => Math.hypot(c[0] - p[0], c[1] - p[1]) < room)) continue;
         const a = b.nodes[node.links[0]];
@@ -1024,7 +1271,7 @@ const SPUR: Record<string, { theme?: string; gen?: string }> = {
   loneVow: { gen: 'g175' },
 };
 /** The middle's roads are finer than a region's, so that crossing it costs what a class's own corner does. */
-const HUB_STEP = 100;
+const HUB_STEP = 140;
 
 /**
  * The open middle of the tree (docs/TREE-REDESIGN.md 3.4): a ring road joined to the six class starts, a hub cluster between each
@@ -1047,12 +1294,38 @@ function layoutHub(
       dropped.push(`hub ${tag} (${why[0] ?? '?'})`);
   };
   const ring: number[] = [];
-  const at = (k: number): Vec => [
-    HUB_R * Math.cos((k * Math.PI) / 6),
-    HUB_R * Math.sin((k * Math.PI) / 6),
-  ];
+  // The ring wobbles (iteration 5, the user: the middle was a little too uniform): each junction a little in or out, by a hash.
+  // (A mixed hash: the plain one of the builder ramps from key to key and the ring only shifted.)
+  const wobble = (key: string): number => mix32(fnv1a(key)) / 0xffffffff - 0.5;
+  const at = (k: number): Vec => {
+    const r = HUB_R * (1 + 0.3 * wobble(`hub ring r ${k}`));
+    const th = (k * Math.PI) / 6 + (wobble(`hub ring a ${k}`) * 8 * Math.PI) / 180;
+    return [r * Math.cos(th), r * Math.sin(th)];
+  };
   for (let k = 0; k < 12; k++) ring.push(junctionNode(b, attrs, pool, k, at(k), 'hub'));
-  for (let k = 0; k < 12; k++) road(ring[k], ring[(k + 1) % 12], `ring ${k}`);
+  // ...and is open in places: up to three of its twelve arcs are left out, never two side by side, and never so that a part of the
+  // ring is cut off (the two spokes below join it to the wheel at the middle).
+  const SPOKES = [9, 5];
+  const open = new Set<number>();
+  {
+    const order = [...Array(12).keys()].sort(
+      (p, q) => hashOf(`hub arc ${p}`) - hashOf(`hub arc ${q}`) || p - q,
+    );
+    const connected = (gone: Set<number>): boolean => {
+      const parent = [...Array(13).keys()]; // 12 junctions and the wheel
+      const find = (x: number): number => (parent[x] === x ? x : (parent[x] = find(parent[x])));
+      for (let k = 0; k < 12; k++) if (!gone.has(k)) parent[find(k)] = find((k + 1) % 12);
+      for (const k of SPOKES) parent[find(k)] = find(12);
+      return new Set([...Array(13).keys()].map(find)).size === 1;
+    };
+    for (const k of order) {
+      if (open.size >= 3) break;
+      if (open.has((k + 11) % 12) || open.has((k + 1) % 12)) continue;
+      const trial = new Set([...open, k]);
+      if (connected(trial)) open.add(k);
+    }
+  }
+  for (let k = 0; k < 12; k++) if (!open.has(k)) road(ring[k], ring[(k + 1) % 12], `ring ${k}`);
   const axisIndex = (deg: number): number => ((Math.round(deg / 30) % 12) + 12) % 12;
   REGIONS.forEach((reg, i) => {
     const k = axisIndex(reg.angle);
@@ -1060,39 +1333,19 @@ function layoutHub(
     // The hub cluster of the region sits on the boundary after it, inside the ring, so that the way out of the ring is free for a road.
     const kb = (k + 1) % 12;
     const out: Vec = [-Math.cos((kb * Math.PI) / 6), -Math.sin((kb * Math.PI) / 6)];
+    // Six clusters, six shapes: not six rings of five.
     const spec: ClusterSpec = {
       id: `hub_${reg.id}`,
       region: 'hub',
       kind: 'wheel',
       theme: HUB.themes[1 + i],
-      smallCount: 4,
+      smallCount: [4, 3, 4, 2, 3, 4][i],
+      form: (['loop', 'crescent', 'wing', 'stalk', 'wing', 'crescent'] as const)[i],
       notable: { name: HUB.notables[1 + i], strength: HUB_STRENGTH },
       attrs,
     };
     if (hang(ctx, spec, ring[kb], around(at(kb), out), 'hub') === null)
       unplaced.push(spec.id + '@hub');
-    // Three of the classes' junctions also carry a keystone on the inner side (the ones without a spoke), so that every junction
-    // between two classes is free for a road into the region beside it.
-    if (i % 2 === 1) {
-      const n = (i - 1) / 2;
-      const ks: ClusterSpec = {
-        id: `hubks_${n}`,
-        region: 'hub',
-        kind: 'keystone',
-        theme: 'allAttr',
-        smallCount: 2,
-        keystone: HUB.keystones[n],
-        attrs,
-      };
-      const inward: Vec = [-Math.cos((k * Math.PI) / 6), -Math.sin((k * Math.PI) / 6)];
-      const cands = [0, 12, -12].flatMap((deg) =>
-        [175, 215].map((d) => {
-          const f = rot(inward, deg);
-          return { centre: [at(k)[0] + f[0] * d, at(k)[1] + f[1] * d] as Vec, face: f };
-        }),
-      );
-      if (hang(ctx, ks, ring[k], cands, 'hub') === null) unplaced.push(ks.id + '@hub');
-    }
   });
   // The wheel at the middle, and a spoke from it to each class's junction of the ring.
   const wheel: ClusterSpec = {
@@ -1105,8 +1358,8 @@ function layoutHub(
     attrs,
   };
   const { ids } = placeCluster(b, wheel, 0, 0, [0, -1], [0, 0], 'hub');
-  // Three spokes, to every other class, so that the middle is not a regular star.
-  for (const reg of REGIONS.filter((_, i) => i % 2 === 0)) {
+  // Two spokes, not a star of six (nor of three).
+  for (const reg of REGIONS.filter((r) => SPOKES.includes(axisIndex(r.angle)))) {
     const j = ring[axisIndex(reg.angle)];
     const J = b.nodes[j];
     const near = [...ids].sort(
@@ -1116,6 +1369,34 @@ function layoutHub(
     )[0];
     road(j, near, `spoke ${reg.id}`);
   }
+  // The three keystones of the middle stand on the wheel, not on the ring beside a class start (the critique of iteration 5: a
+  // keystone that is no use to the class stood five steps from it): they point towards the starts of the Shade, the Reaver and the
+  // Zealot, and are about as far from every class.
+  [1, 3, 5].forEach((ri, n) => {
+    const ks: ClusterSpec = {
+      id: `hubks_${n}`,
+      region: 'hub',
+      kind: 'keystone',
+      theme: 'allAttr',
+      smallCount: 2,
+      keystone: HUB.keystones[n],
+      attrs,
+    };
+    const a = (REGIONS[ri].angle * Math.PI) / 180;
+    const d: Vec = [Math.cos(a), Math.sin(a)];
+    const root = [...ids].sort(
+      (p, q) =>
+        Math.hypot(b.nodes[p].x - d[0] * 100, b.nodes[p].y - d[1] * 100) -
+        Math.hypot(b.nodes[q].x - d[0] * 100, b.nodes[q].y - d[1] * 100),
+    )[0];
+    const cands = [0, 10, -10, 20, -20].flatMap((deg) =>
+      [200, 230, 260].map((dist) => {
+        const f = rot(d, deg);
+        return { centre: [f[0] * dist, f[1] * dist] as Vec, face: f };
+      }),
+    );
+    if (hang(ctx, ks, root, cands, 'hub') === null) unplaced.push(ks.id + '@hub');
+  });
   for (let i = L0; i < b.nodes.length; i++) b.nodes[i].region = 'hub';
   return ring;
 }
@@ -1240,35 +1521,52 @@ function gateways(
  * out and one near the rim between each pair of neighbours, joining the nearest road nodes of the two sides that have room. The
  * roads are made of both regions' stats.
  */
-const BANDS: [number, number][] = [
-  [1700, 3000],
-  [3300, 6000],
+/**
+ * Where a crossing may be: the distance from the middle of the tree of both its ends, and its length. Three bands (inner, middle and
+ * rim), one crossing in each between every two neighbours, and between every other pair one more, a long one, that costs many nodes
+ * (iteration 5, the user: half as many crossings again, some of them dear).
+ */
+type Band = { lo: number; hi: number; minD: number; maxD: number };
+const BANDS: Band[] = [
+  { lo: 1300, hi: 2400, minD: 0, maxD: 1700 },
+  { lo: 2400, hi: 3500, minD: 0, maxD: 1800 },
+  { lo: 3500, hi: 6000, minD: 0, maxD: 2400 },
 ];
+const LONG_BAND: Band = { lo: 1500, hi: 5200, minD: 900, maxD: 2500 };
 function bridges(b: Builder, only?: RegionId[]): void {
   REGIONS.forEach((A, i) => {
     const B = REGIONS[(i + 1) % REGIONS.length];
     if (only && !(only.includes(A.id) && only.includes(B.id))) return;
-    for (const [lo, hi] of BANDS) {
+    const used: number[] = [];
+    for (const band of [...BANDS, LONG_BAND]) {
+      const { lo, hi, minD, maxD } = band;
+      // The long one for every other pair, and for a pair that found less than two in the bands.
+      if (band === LONG_BAND && i % 2 !== 0 && used.length >= 4) continue;
       const side = (r: RegionId) =>
         b.nodes
           .filter((n) => n.region === r && joinable(b, n.id))
           .filter((n) => {
             const rr = Math.hypot(n.x, n.y);
             return rr >= lo && rr <= hi;
-          });
+          })
+          // Not beside a crossing of this pair already made: the crossings are spread along the border.
+          .filter((n) =>
+            used.every((u) => Math.hypot(b.nodes[u].x - n.x, b.nodes[u].y - n.y) >= 600),
+          );
       const as = side(A.id);
       const bs = side(B.id);
       const pairs = as
         .flatMap((p) => bs.map((q) => ({ p: p.id, q: q.id, d: Math.hypot(p.x - q.x, p.y - q.y) })))
-        .filter((x) => x.d <= (lo > 3000 ? 2000 : 1700))
+        .filter((x) => x.d >= minD && x.d <= maxD)
         .sort((x, y) => x.d - y.d || x.p - y.p || x.q - y.q);
       const attrs = [...new Set([...A.attrs, ...B.attrs])];
       const pool = [...ROAD_POOLS[A.id], ...ROAD_POOLS[B.id]];
       const L = b.nodes.length;
       const made = pairs
-        .slice(0, 40)
-        .find((x) => connect(b, x.p, x.q, { attrs, pool, spacing: ROAD_STEP }));
+        .slice(0, band === LONG_BAND ? 60 : 150)
+        .find((x) => connect(b, x.p, x.q, { attrs, pool, spacing: ROAD_STEP }, band !== LONG_BAND));
       if (!made) continue;
+      used.push(made.p, made.q);
       // The new road nodes belong to the nearer region.
       const P = b.nodes[made.p];
       const Q = b.nodes[made.q];

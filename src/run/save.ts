@@ -46,8 +46,8 @@ export function migrate(version: number, run: RunState): RunState | null {
   if (version === SAVE_VERSION) return run;
   // Version 10 has the passive tree of before docs/TREE-REDESIGN.md (roads, districts), version 11 the one of before its
   // iteration 3 (crossings between regions, forks from the middle) and version 12 the one of before iteration 4 (two roads out of
-  // each start): their node ids mean other nodes now, so the allocated passives are handed back as unspent points.
-  if (version === 10 || version === 11 || version === 12) {
+  // each start) and version 13 the one of before iteration 5 (tiers, starter kits, shapes): their node ids mean other nodes now, so the allocated passives are handed back as unspent points.
+  if (version === 10 || version === 11 || version === 12 || version === 13) {
     run.version = SAVE_VERSION;
     run.build = { ...run.build, allocated: [] };
     return run;

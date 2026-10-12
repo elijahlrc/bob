@@ -595,3 +595,46 @@ and the Vanguard 2 (the others 14 to 18).
   neighbouring regions within 6 to 18 steps (it reached none before iteration 3); a test says within 20.
 - Notables within 8 steps of a start, before and after: Mystic 6 and 13, Vanguard 2 and 7, Zealot 14 and 18, Shade 15 and 19, Strider
   18 and 19, Reaver 17 and 17. 2,061 nodes (was 2,052). `SAVE_VERSION` 13 hands passives back again.
+
+### Iteration 5, tiers, starter kits, the middle, crossings and shapes (2026-10-11)
+
+The user: the starts still lack basic stuff near them; all classes should reach some life or energy shield (not too much: a balance
+lever) and the basics of the class early; "the first 10 or so should be very core, the next 40 a few pretty core archetype options,
+the outer stuff the narrow weird ideas"; the middle too uniform, too connected, too dense; 50 to 80% more crossings between
+regions, some dear; not every notable in a little ring. An independent agent critiqued the result (picture and numbers) and its
+points were weighed (below).
+
+- **Tiers.** The districts of a region are listed in the charter nearest the start first: the very core basics (Wellspring, Veil,
+  Windwalk, Bulwark, Ironhold, Cassock), a few core archetypes, the narrow ones last. `pack.ts` packs in that order, each no nearer
+  the middle than the one before (less 100), the first at least 1,150 from the start (`APRON`). The curses left the Veil (it is the
+  Shade's core) for the Venom Quarter. Narrow wayside clusters (a weapon, a skill type, charges, hexes, minions) hang only from 2,700
+  out (`isNiche`); no wayside hangs within 10 steps of a start.
+- **The apron.** Within about 6 steps of a start only the class's kit: the small nodes of each of the two roads out are set from
+  `START_KIT` (`roads.ts`; e.g. Mystic: ES, cast speed, mana, spell damage on one road, crit, spell damage, cast speed, mana on the
+  other), and one hand-made basic notable hangs on each road (`STARTERS`: 12 in all, e.g. Lamplit Well, Iron Constitution, Light
+  Tread; their small nodes are another stat of the road so that life and ES do not pile up). Life and ES on the way out are 5 to
+  10% a road, with the notables 10 to 15%. The second road goes to the next district.
+- **Crossings.** `bridges`: one road per neighbouring pair in each of three radius bands (inner, middle, rim) and a long one,
+  that costs many nodes, between pairs that lack them; a node takes a crossing if it has at most two roads and four links. 19
+  crossings (was 12, +58%), every pair 2 to 4. New roads keep at least 22 degrees from the roads of the node they join (`spreadOk`);
+  the plan's own roads and a district's template are as authored.
+- **The middle.** The ring wobbles in radius (15%) and angle (4 degrees) by a mixed hash, three of its twelve arcs are left out
+  (never two side by side, never cutting a part off), the nodes are 140 apart (was 100), two spokes (was three), six hub clusters of
+  six different shapes. The three keystones of the middle moved from the ring beside the starts of the Shade, Reaver and Zealot (a
+  keystone of no use to the class five steps away: the critique) to the central wheel, about as far from every class. 97 hub
+  nodes (was 122).
+- **Shapes** (`shapes.ts`): a cluster is a loop, a stalk, a crescent (open arc, notable at the apex) or a wing (V, notable at the
+  apex), by a hash of its id and its small nodes; related clusters of a group (never two of the same stat) are sometimes fused: a
+  **twin** (one ring, two notables) or a **string** (a line of two or three, each notable after its own small nodes: a dead end).
+  A fused cluster has the id of the first, one entrance, and falls back to its parts when there is no room. 31 clusters hold more
+  than one notable.
+- **Speed.** The bend search of `connect` made the build 6.6 s; exact clearance shortcuts (boxes, squared distances, a rollback that
+  touches what it changed), a cheaper bend search where many pairs are tried and a cap on the long ones: 0.74 s (it was 0.8 s before
+  iteration 3).
+- **The critique, and what was done.** Done: the keystones; the kit (the two Mystic roads were the same, too much mana, Vanguard
+  regen, Strider without life); the Shade's core district holding curses; the starters of identical text; fusing two clusters of the
+  same stat; the middle's wobble (the hash ramped, the ring only shifted: the critique saw 465 to 474); crossings between nodes at
+  a near angle; the weakened start test (now 3 notables within 8 steps, 15 within 14, no keystone within 8). Not done: the rim
+  crossings being long (the user wants some dear), ruler-straight roads (the user wants side doors, not shorter roads), junctions of
+  the district templates with fans under 20 degrees (30, as before iteration 3, the worst junction degree 6, was 8).
+  `SAVE_VERSION` 14 hands passives back.

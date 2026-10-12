@@ -15,6 +15,8 @@ type Vec = [number, number];
 const REACH = Number(process.env.REACH ?? 290);
 const GAP = Number(process.env.GAP ?? 60);
 const EDGE = 150;
+/** How far the first district (the very core of the class) stands from the class start: room for the basics of its lead-in. */
+const APRON = Number(process.env.APRON ?? 1150);
 
 const only = process.argv.slice(2);
 const out: string[] = [];
@@ -25,12 +27,18 @@ for (const reg of REGIONS) {
   const start: Vec = [START_RADIUS * Math.cos(axis), START_RADIUS * Math.sin(axis)];
   const placed: { id: string; pts: Vec[]; gates: Record<string, Vec> }[] = [];
   const lines: string[] = [];
+  /** The tiers run outward: a district stands no nearer the middle than the one before it (less a little, so they may interleave). */
+  let lastR = 1100;
   for (const d of DISTRICTS.filter((x) => x.region === reg.id)) {
     const shape = shapeOfDistrict(d);
     // The attempt order: nearest the middle first, the districts of the pinned table keep theirs.
     let pick: { r: number; a: number; turn: number } | null = null;
     if (PLACEMENT[d.id] && process.env.KEEP) pick = PLACEMENT[d.id];
-    for (let r = 1100; r <= 7000 && !pick; r += 50)
+    for (
+      let r = Math.max(1100, lastR - Number(process.env.TIER_SLACK ?? 100));
+      r <= 7000 && !pick;
+      r += 50
+    )
       for (const a of [0, 4, -4, 8, -8, 12, -12, 16, -16, 20, -20, 24, -24, 28, -28])
         for (const turn of [0, 90, 45, -45, 135, 180]) {
           const f = frameOf(reg, { r, a, turn });
@@ -47,7 +55,10 @@ for (const reg of REGIONS) {
           });
           if (!fits) continue;
           const clear =
-            pts.every((p) => Math.hypot(p[0] - start[0], p[1] - start[1]) >= 520) &&
+            pts.every(
+              (p) =>
+                Math.hypot(p[0] - start[0], p[1] - start[1]) >= (placed.length === 0 ? APRON : 520),
+            ) &&
             placed.every((q) =>
               q.pts.every((u) =>
                 pts.every((p) => Math.hypot(u[0] - p[0], u[1] - p[1]) >= 2 * REACH + GAP),
@@ -62,6 +73,7 @@ for (const reg of REGIONS) {
       lines.push(`  // ${d.id}: no room found`);
       continue;
     }
+    lastR = pick.r;
     const f = frameOf(reg, pick);
     placed.push({
       id: d.id,

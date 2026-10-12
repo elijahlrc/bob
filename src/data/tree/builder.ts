@@ -81,7 +81,13 @@ export function segmentClear(
   by: number,
   skip: Set<number>,
 ): boolean {
+  // A node outside the segment's box widened by the clearance is clear of it (the same answer, without the arithmetic).
+  const x0 = Math.min(ax, bx) - EDGE_CLEARANCE;
+  const x1 = Math.max(ax, bx) + EDGE_CLEARANCE;
+  const y0 = Math.min(ay, by) - EDGE_CLEARANCE;
+  const y1 = Math.max(ay, by) + EDGE_CLEARANCE;
   for (const nd of b.nodes) {
+    if (nd.x < x0 || nd.x > x1 || nd.y < y0 || nd.y > y1) continue;
     if (skip.has(nd.id)) continue;
     if (segDist(nd.x, nd.y, ax, ay, bx, by) < EDGE_CLEARANCE) return false;
   }
@@ -89,10 +95,23 @@ export function segmentClear(
 }
 
 export function pointClear(b: Builder, x: number, y: number): boolean {
-  for (const nd of b.nodes) if (Math.hypot(nd.x - x, nd.y - y) < MIN_NODE_DIST) return false;
+  const min2 = MIN_NODE_DIST * MIN_NODE_DIST;
+  for (const nd of b.nodes) {
+    const dx = nd.x - x;
+    const dy = nd.y - y;
+    if (dx * dx + dy * dy < min2) return false;
+  }
   for (const [p, q] of b.edges) {
     const A = b.nodes[p];
     const B = b.nodes[q];
+    // Farther than the clearance from the edge's box: clear.
+    if (
+      (x < A.x - EDGE_CLEARANCE && x < B.x - EDGE_CLEARANCE) ||
+      (x > A.x + EDGE_CLEARANCE && x > B.x + EDGE_CLEARANCE) ||
+      (y < A.y - EDGE_CLEARANCE && y < B.y - EDGE_CLEARANCE) ||
+      (y > A.y + EDGE_CLEARANCE && y > B.y + EDGE_CLEARANCE)
+    )
+      continue;
     if (segDist(x, y, A.x, A.y, B.x, B.y) < EDGE_CLEARANCE) return false;
   }
   return true;
@@ -120,6 +139,8 @@ export type RoadOptions = {
   spacing?: number;
   /** The district the road lies in, if it lies in one. */
   district?: string;
+  /** A road of the plan, as authored: no minimum angle to the roads it joins (layout.ts, connect). */
+  free?: boolean;
   /** A place to write why a road could not be made (a tool of review). */
   why?: string[];
 };
@@ -145,6 +166,13 @@ export function crossesEdge(
     if (i === p || i === q || j === p || j === q) continue;
     const A = b.nodes[i];
     const B = b.nodes[j];
+    if (
+      (A.x < Math.min(a[0], c[0]) && B.x < Math.min(a[0], c[0])) ||
+      (A.x > Math.max(a[0], c[0]) && B.x > Math.max(a[0], c[0])) ||
+      (A.y < Math.min(a[1], c[1]) && B.y < Math.min(a[1], c[1])) ||
+      (A.y > Math.max(a[1], c[1]) && B.y > Math.max(a[1], c[1]))
+    )
+      continue;
     const d1 = orient(a[0], a[1], c[0], c[1], A.x, A.y);
     const d2 = orient(a[0], a[1], c[0], c[1], B.x, B.y);
     const d3 = orient(A.x, A.y, B.x, B.y, a[0], a[1]);

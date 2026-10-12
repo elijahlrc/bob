@@ -27,8 +27,13 @@ export type District = {
   keystones: string[];
 };
 
+/**
+ * The districts of a region are listed nearest the class start first, in three tiers (the user, iteration 5): the first, the very
+ * core basics of the class (life, energy shield, armour, evasion, the speeds), a few pretty core archetypes next, and the narrow or
+ * odd ideas last, outward. `scripts/tree/pack.ts` places them in this order.
+ */
 export const DISTRICTS: District[] = [
-  // --- int (Mystic) ----------------------------------------------------------------------------------------------------
+  // --- int (Mystic) -----------------------------------------------------------------------------------------------
   {
     id: 'wellspring',
     name: 'The Wellspring',
@@ -41,6 +46,21 @@ export const DISTRICTS: District[] = [
     },
     nexus: ['g150'],
     keystones: ['mindBulwark', 'manaBastion'],
+  },
+  {
+    id: 'spellforge',
+    name: 'The Spellforge',
+    region: 'int',
+    theme:
+      'Spell damage, critical strikes with spells, and the sigils (brands, totems, mines) a caster leaves behind.',
+    template: 'ring',
+    groups: {
+      spell: ['g197', 'g335', 'g60', 'g55', 'g287'],
+      crit: ['g204', 'g247', 'g52'],
+      sigils: ['g155', 'g234'],
+    },
+    nexus: ['g286'],
+    keystones: [],
   },
   {
     id: 'conflux',
@@ -68,21 +88,6 @@ export const DISTRICTS: District[] = [
     keystones: ['volatileServants'],
   },
   {
-    id: 'spellforge',
-    name: 'The Spellforge',
-    region: 'int',
-    theme:
-      'Spell damage, critical strikes with spells, and the sigils (brands, totems, mines) a caster leaves behind.',
-    template: 'ring',
-    groups: {
-      spell: ['g197', 'g335', 'g60', 'g55', 'g287'],
-      crit: ['g204', 'g247', 'g52'],
-      sigils: ['g155', 'g234'],
-    },
-    nexus: ['g286'],
-    keystones: [],
-  },
-  {
     id: 'quillwork',
     name: 'Quillwork',
     region: 'int',
@@ -93,34 +98,16 @@ export const DISTRICTS: District[] = [
     keystones: [],
   },
 
-  // --- dexint (Shade) --------------------------------------------------------------------------------------------------
+  // --- dexint (Shade) ---------------------------------------------------------------------------------------------
   {
-    id: 'snareRow',
-    name: 'Snare Row',
+    id: 'veil',
+    name: 'The Veil',
     region: 'dexint',
-    theme: 'Traps and mines: what they do, how they are set off, how many there are.',
-    template: 'avenue',
-    groups: {
-      trap: ['g319', 'g144', 'g318', 'g298', 'g35'],
-      trigger: ['g331', 'g177'],
-      mines: ['g230', 'g46', 'g105', 'g27', 'g111'],
-    },
-    nexus: ['g245'],
-    keystones: [],
-  },
-  {
-    id: 'venomQuarter',
-    name: 'The Venom Quarter',
-    region: 'dexint',
-    theme: 'Poison, chaos and slow damage, and the ailments that ride along.',
-    template: 'fork',
-    groups: {
-      poison: ['g161', 'g50', 'g53', 'g271'],
-      chaos: ['g93', 'g282', 'g241'],
-      ailment: ['g242', 'g223', 'g312'],
-    },
+    theme: 'Evasion with energy shield: the very core of a Shade.',
+    template: 'ring',
+    groups: { evasion: ['g255', 'g218', 'g164'], es: ['g95', 'g94'] },
     nexus: [],
-    keystones: ['cruelAgony'],
+    keystones: ['spellslip', 'hollowVessel'],
   },
   {
     id: 'knifeAlley',
@@ -137,17 +124,49 @@ export const DISTRICTS: District[] = [
     keystones: ['shadeLeech'],
   },
   {
-    id: 'veil',
-    name: 'The Veil',
+    id: 'venomQuarter',
+    name: 'The Venom Quarter',
     region: 'dexint',
-    theme: 'Evasion with energy shield, and the curses that make the dark safer.',
-    template: 'ring',
-    groups: { evasion: ['g255', 'g218', 'g164'], es: ['g95', 'g94'], hex: ['g210', 'g65'] },
+    theme: 'Poison, chaos and slow damage, and the ailments that ride along.',
+    template: 'fork',
+    groups: {
+      poison: ['g161', 'g50', 'g53', 'g271'],
+      chaos: ['g93', 'g282', 'g241'],
+      ailment: ['g242', 'g223', 'g312'],
+      hex: ['g210', 'g65'],
+    },
     nexus: [],
-    keystones: ['spellslip', 'hollowVessel'],
+    keystones: ['cruelAgony'],
+  },
+  {
+    id: 'snareRow',
+    name: 'Snare Row',
+    region: 'dexint',
+    theme: 'Traps and mines: what they do, how they are set off, how many there are.',
+    template: 'avenue',
+    groups: {
+      trap: ['g319', 'g144', 'g318', 'g298', 'g35'],
+      trigger: ['g331', 'g177'],
+      mines: ['g230', 'g46', 'g105', 'g27', 'g111'],
+    },
+    nexus: ['g245'],
+    keystones: [],
   },
 
-  // --- dex (Strider) ---------------------------------------------------------------------------------------------------
+  // --- dex (Strider) ----------------------------------------------------------------------------------------------
+  {
+    id: 'windwalk',
+    name: 'Windwalk',
+    region: 'dex',
+    theme: 'Evasion and speed: never where the blow lands.',
+    template: 'ring',
+    groups: {
+      evasion: ['g215', 'g284', 'g79', 'g123', 'g89'],
+      speed: ['g290', 'g13', 'g264', 'g162'],
+    },
+    nexus: ['g15'],
+    keystones: ['arrowWeave', 'nimbleGambit'],
+  },
   {
     id: 'longbowReach',
     name: 'Longbow Reach',
@@ -163,17 +182,18 @@ export const DISTRICTS: District[] = [
     keystones: ['closeQuarters', 'steadyDraw'],
   },
   {
-    id: 'windwalk',
-    name: 'Windwalk',
+    id: 'moonwell',
+    name: 'The Moonwell',
     region: 'dex',
-    theme: 'Evasion and speed: never where the blow lands.',
-    template: 'ring',
+    theme: 'Flasks, life and the mana that keeps a ranger moving.',
+    template: 'ladder',
     groups: {
-      evasion: ['g215', 'g284', 'g79', 'g123', 'g89'],
-      speed: ['g290', 'g13', 'g264', 'g162'],
+      flask: ['g303', 'g100', 'g220', 'g112', 'g272'],
+      mana: ['g239', 'g130', 'g32'],
+      life: ['g352', 'g96'],
     },
-    nexus: ['g15'],
-    keystones: ['arrowWeave', 'nimbleGambit'],
+    nexus: [],
+    keystones: [],
   },
   {
     id: 'thornwood',
@@ -199,22 +219,22 @@ export const DISTRICTS: District[] = [
     nexus: [],
     keystones: [],
   },
+
+  // --- strdex (Reaver) --------------------------------------------------------------------------------------------
   {
-    id: 'moonwell',
-    name: 'The Moonwell',
-    region: 'dex',
-    theme: 'Flasks, life and the mana that keeps a ranger moving.',
-    template: 'ladder',
+    id: 'bulwark',
+    name: 'The Bulwark',
+    region: 'strdex',
+    theme: 'Armour and evasion together, the shield and the block.',
+    template: 'knot',
     groups: {
-      flask: ['g303', 'g100', 'g220', 'g112', 'g272'],
-      mana: ['g239', 'g130', 'g32'],
-      life: ['g352', 'g96'],
+      armour: ['g98', 'g252', 'g109', 'g261'],
+      shield: ['g311', 'g263', 'g69', 'g232'],
+      block: ['g134', 'g176', 'g291'],
     },
     nexus: [],
-    keystones: [],
+    keystones: ['platedHide', 'shieldwall'],
   },
-
-  // --- strdex (Reaver) -------------------------------------------------------------------------------------------------
   {
     id: 'bladework',
     name: 'Bladework',
@@ -229,20 +249,6 @@ export const DISTRICTS: District[] = [
     },
     nexus: ['g77'],
     keystones: [],
-  },
-  {
-    id: 'bulwark',
-    name: 'The Bulwark',
-    region: 'strdex',
-    theme: 'Armour and evasion together, the shield and the block.',
-    template: 'knot',
-    groups: {
-      armour: ['g98', 'g252', 'g109', 'g261'],
-      shield: ['g311', 'g263', 'g69', 'g232'],
-      block: ['g134', 'g176', 'g291'],
-    },
-    nexus: [],
-    keystones: ['platedHide', 'shieldwall'],
   },
   {
     id: 'bloodrun',
@@ -269,7 +275,7 @@ export const DISTRICTS: District[] = [
     keystones: ['loneVow'],
   },
 
-  // --- str (Vanguard) --------------------------------------------------------------------------------------------------
+  // --- str (Vanguard) ---------------------------------------------------------------------------------------------
   {
     id: 'ironhold',
     name: 'Ironhold',
@@ -319,7 +325,34 @@ export const DISTRICTS: District[] = [
     keystones: ['rootedStance', 'idleHands'],
   },
 
-  // --- strint (Zealot) -------------------------------------------------------------------------------------------------
+  // --- strint (Zealot) --------------------------------------------------------------------------------------------
+  {
+    id: 'cassock',
+    name: 'The Cassock',
+    region: 'strint',
+    theme: 'Armour, energy shield and life in one robe.',
+    template: 'avenue',
+    groups: {
+      armour: ['g140', 'g108', 'g142', 'g188'],
+      life: ['g216', 'g351', 'g313', 'g106'],
+    },
+    nexus: [],
+    keystones: ['livingWard'],
+  },
+  {
+    id: 'pyreAndStorm',
+    name: 'Pyre and Storm',
+    region: 'strint',
+    theme: 'Fire, cold and lightning, spell critical strikes, and the balance between them.',
+    template: 'fork',
+    groups: {
+      fire: ['g125', 'g153', 'g70', 'g233'],
+      storm: ['g73', 'g168'],
+      spellcraft: ['g293', 'g243', 'g253', 'g159'],
+    },
+    nexus: ['g172'],
+    keystones: ['searingAvatar', 'prismaticBalance'],
+  },
   {
     id: 'sanctum',
     name: 'The Sanctum',
@@ -347,20 +380,6 @@ export const DISTRICTS: District[] = [
     keystones: [],
   },
   {
-    id: 'pyreAndStorm',
-    name: 'Pyre and Storm',
-    region: 'strint',
-    theme: 'Fire, cold and lightning, spell critical strikes, and the balance between them.',
-    template: 'fork',
-    groups: {
-      fire: ['g125', 'g153', 'g70', 'g233'],
-      storm: ['g73', 'g168'],
-      spellcraft: ['g293', 'g243', 'g253', 'g159'],
-    },
-    nexus: ['g172'],
-    keystones: ['searingAvatar', 'prismaticBalance'],
-  },
-  {
     id: 'crozierHall',
     name: 'Crozier Hall',
     region: 'strint',
@@ -373,19 +392,6 @@ export const DISTRICTS: District[] = [
     },
     nexus: [],
     keystones: [],
-  },
-  {
-    id: 'cassock',
-    name: 'The Cassock',
-    region: 'strint',
-    theme: 'Armour, energy shield and life in one robe.',
-    template: 'avenue',
-    groups: {
-      armour: ['g140', 'g108', 'g142', 'g188'],
-      life: ['g216', 'g351', 'g313', 'g106'],
-    },
-    nexus: [],
-    keystones: ['livingWard'],
   },
 ];
 

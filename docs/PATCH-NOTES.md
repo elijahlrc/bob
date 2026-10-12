@@ -14,7 +14,12 @@ the docs each entry links to.
   side entrances; the paths around the class starts are tidier. Your passives are refunded again.
 - New tree colours and icons for spells, energy shield and generic damage (previously shown as mana and attack).
 - Every class start now has two roads out into its region, each leading to a different group of passives, and quick ways across to
-  the neighbouring regions. Your passives are refunded once more.
+  the neighbouring regions.
+- The passives near a start are now the basics of the class: life or energy shield, armour or evasion, attack or cast speed.
+  A few core options come next, and the narrow, unusual ideas are further out.
+- More crossings between regions (some long), a looser, less regular middle, and new shapes: clusters can be arcs or wings, two
+  notables can share a ring, and some notables sit in a line.
+- Your passives are refunded once more.
 - Steady Draw is no longer neutral (35% more damage), and several keystone cards now show their numbers.
 
 ## 2026-10-10

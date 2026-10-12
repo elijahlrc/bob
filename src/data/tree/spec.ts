@@ -36,6 +36,11 @@ export type ClusterSpec = {
   smallMods?: Mod[];
   smallName?: string;
   attrs: Attr[];
+  /** Clusters fused into this one (iteration 5): a ring of two notables or a line of two or three, with one entrance and one id. */
+  also?: ClusterSpec[];
+  shape?: 'twin' | 'string';
+  /** The shape of a single cluster, when it is chosen rather than left to a hash of its id. */
+  form?: 'loop' | 'stalk' | 'crescent' | 'wing';
 };
 
 export const REGIONS: RegionDef[] = [

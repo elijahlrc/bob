@@ -102,7 +102,7 @@ describe('passive tree invariants (§9.3)', () => {
       expect(k.links, k.name).toHaveLength(1);
   });
 
-  it('every cluster hangs from one entrance: a road never runs through it (the middle wheel has its three spokes)', () => {
+  it('every cluster hangs from one entrance: a road never runs through it (the middle wheel has its two spokes and three keystones)', () => {
     const outside = new Map<string, number>();
     for (const n of nodes)
       if (n.cluster)
@@ -110,7 +110,7 @@ describe('passive tree invariants (§9.3)', () => {
           if (nodes[m].cluster !== n.cluster)
             outside.set(n.cluster, (outside.get(n.cluster) ?? 0) + 1);
     const ids = new Set(nodes.filter((n) => n.cluster).map((n) => n.cluster!));
-    for (const id of ids) expect(outside.get(id), id).toBe(id === 'hub_c' ? 3 : 1);
+    for (const id of ids) expect(outside.get(id), id).toBe(id === 'hub_c' ? 5 : 1);
   });
 
   it('roads are generic: no small node on a road names a weapon, a skill type or a condition', () => {
@@ -164,7 +164,7 @@ describe('passive tree invariants (§9.3)', () => {
       const out = nodes[s].links.filter((m) => nodes[m].region !== 'hub');
       expect(nodes[s].links.length, c.id).toBe(3);
       expect(out.length, c.id).toBe(2);
-      // Within 8 steps (never through another start) there are options: several notables and two ways on.
+      // The first steps are the basics: two basic notables, one on each way out, within 8 steps (never through another start).
       const d = new Map<number, number>([[s, 0]]);
       const q = [s];
       for (let h = 0; h < q.length; h++)
@@ -174,7 +174,22 @@ describe('passive tree invariants (§9.3)', () => {
             q.push(m);
           }
       const near = [...d.keys()].filter((i) => nodes[i].kind === 'notable').length;
-      expect(near, c.id).toBeGreaterThanOrEqual(6);
+      expect(near, c.id).toBeGreaterThanOrEqual(3);
+      // No keystone is at the doorstep: they change how you play, and are not the very core.
+      expect(
+        [...d.keys()].filter((i) => nodes[i].kind === 'keystone').map((i) => nodes[i].name),
+        c.id,
+      ).toEqual([]);
+    }
+  });
+
+  it('the first steps from a start are core and the next ones offer options: at least 3 notables within 8 steps and 15 within 14', () => {
+    for (const c of CLASSES) {
+      const d = bfs(tree.starts[c.id]);
+      const within = (k: number) =>
+        nodes.filter((n) => n.kind === 'notable' && d[n.id] <= k).length;
+      expect(within(8), c.id).toBeGreaterThanOrEqual(3);
+      expect(within(14), c.id).toBeGreaterThanOrEqual(15);
     }
   });
 

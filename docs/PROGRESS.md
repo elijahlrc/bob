@@ -956,4 +956,8 @@ a search box is on the tree screen, the middle is worth taking (docs/TREE-REDESI
 Iteration 3 (the user's review): neighbouring regions are joined half way out and near the rim, the middle reaches the regions by
 one forked road between each two starts, long roads have side doors and honeycombs fewer sides; three more colours on the tree
 screen (spells, energy shield, damage of every kind). Iteration 4: every start has two roads out and the spoke in, with a quick skip
-to the neighbouring regions (the user: some starts had too little to choose from). 2,061 nodes; `SAVE_VERSION` 13 hands passives back.
+to the neighbouring regions (the user: some starts had too little to choose from).
+Iteration 5 (the user: the starts lack the basics): districts in tiers by distance, a class kit and a basic notable on each road out of a
+start, narrow waysides far out, 19 crossings between regions, a looser middle with the keystones on its wheel, more cluster shapes
+(crescent, wing, two notables in a ring, a line of two or three), the tree build fast again (0.74 s); critiqued by an independent
+agent and revised. 2,133 nodes; `SAVE_VERSION` 14 hands passives back.
