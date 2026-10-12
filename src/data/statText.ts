@@ -113,7 +113,7 @@ export const STAT_TEXT: Record<string, StatText> = {
   },
   evasionToArmour: { flag: 'Evasion Rating is converted to Armour; Dexterity gives no Evasion' },
   manaBeforeLife30: { flag: '30% of Damage is taken from Mana before Life' },
-  avatarOfFire: { flag: 'Deal no non-Fire Damage' },
+  avatarOfFire: { flag: 'Deal no non-Fire Damage: what is not converted to Fire is not dealt' },
   closeQuarters: {
     flag: 'Projectile Attacks deal up to 50% more Damage at close range, falling to 50% less at long range',
   },
@@ -346,7 +346,9 @@ TAG_TEXT.aura = 'with Auras';
 // ---- Added by the coverage plan (C2): the buff layer, impale, culling and the new tags -------------
 
 Object.assign(STAT_TEXT, {
-  minionInstability: { flag: 'Minions burst when they fall to low life' },
+  minionInstability: {
+    flag: 'Minions burst when they fall to low life, dealing a third of their maximum life as fire damage around them',
+  },
   idleHands: { flag: 'You deal no damage with your own skills' },
   loneVow: { flag: 'Only your first aura is active, and it reserves nothing' },
   dotMulti: { base: '{v}% to the Damage over Time Multiplier' },

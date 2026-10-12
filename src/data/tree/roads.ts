@@ -32,5 +32,5 @@ export const ROAD_POOLS: Record<RegionId | 'hub', RoadStat[]> = {
   strdex: [P.armour, P.evasion, P.damage, P.life],
   str: [P.life, P.armour, P.damage, P.regen],
   strint: [P.life, P.mana, P.armour, P.es],
-  hub: [P.life, P.damage, P.mana, P.es, P.res],
+  hub: [P.life, P.damage, P.res, P.moveSpeed],
 };

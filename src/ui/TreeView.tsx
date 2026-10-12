@@ -3,6 +3,7 @@ import { classDef } from '../data/classes';
 import { getTree, type TreeNode } from '../data/tree';
 import { HUB_RADIUS, REGIONS, START_RADIUS } from '../data/tree/spec';
 import { modsText } from '../mods/text';
+import { searchMatches } from './treeSearch';
 import type { Controller } from '../run/controller';
 import { passivePoints } from '../run/run';
 import { allocate, canRemove, pathTo, refund } from '../run/tree';
@@ -143,6 +144,17 @@ export function TreeView({ c }: { c: Controller }) {
   const [hover, setHover] = useState<{ id: number; mx: number; my: number } | null>(null);
   // On a coarse pointer the first tap on a node shows it (the dock below); the second tap or the button commits.
   const [picked, setPicked] = useState<number | null>(null);
+  // A search: every word has to be in the name or the lines of a node, in any order; the matches are ringed on the tree.
+  const [query, setQuery] = useState('');
+  const [matchAt, setMatchAt] = useState(0);
+  const texts = useMemo(
+    () => tree.nodes.map((n) => (n.name + ' ' + modsText(n.mods).join(' ')).toLowerCase()),
+    [tree],
+  );
+  const matches = useMemo(
+    () => searchMatches(query, texts, (i) => tree.nodes[i].kind === 'start'),
+    [query, texts],
+  );
   const points = passivePoints(run);
   const alloc = run.build.allocated;
   const allocSet = useMemo(() => new Set(alloc), [alloc]);
@@ -348,6 +360,18 @@ export function TreeView({ c }: { c: Controller }) {
     apply();
   };
 
+  /** Bring the next match to the middle of the view. */
+  const nextMatch = () => {
+    if (!matches.length) return;
+    const id = matches[matchAt % matches.length];
+    setMatchAt(matchAt + 1);
+    const n = tree.nodes[id];
+    const r = svgRef.current!.getBoundingClientRect();
+    const k = Math.max(view.current.k, 0.4);
+    view.current = { k, x: r.width / 2 - n.x * k, y: r.height / 2 - n.y * k };
+    apply();
+  };
+
   const onWheel = (e: WheelEvent) => {
     e.preventDefault();
     const r = svgRef.current!.getBoundingClientRect();
@@ -469,6 +493,31 @@ export function TreeView({ c }: { c: Controller }) {
         <span>
           Refund points: <b>{run.refundPoints}</b>
         </span>
+        <span class="tree-search">
+          <input
+            type="search"
+            placeholder="Find: minion, fire, spell crit…"
+            aria-label="Find passives"
+            value={query}
+            onInput={(e) => {
+              setQuery((e.target as HTMLInputElement).value);
+              setMatchAt(0);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') nextMatch();
+            }}
+          />
+          {query.trim() !== '' && (
+            <>
+              <span class="muted">{matches.length} found</span>
+              {matches.length > 0 && (
+                <button class="btn small" onClick={nextMatch}>
+                  Next
+                </button>
+              )}
+            </>
+          )}
+        </span>
         {small && (
           <span class="tree-zoom">
             <button class="btn small" aria-label="Zoom out" onClick={() => zoomBy(1 / 1.4)}>
@@ -517,6 +566,13 @@ export function TreeView({ c }: { c: Controller }) {
         <g ref={gRef}>
           <Backdrop maxR={maxR} />
           {layer}
+          {matches.length > 0 && (
+            <g class="search">
+              {matches.map((id) => (
+                <circle key={id} class="sr" cx={tree.nodes[id].x} cy={tree.nodes[id].y} />
+              ))}
+            </g>
+          )}
           {(hoverPath || (hn && isOn)) && (
             <g class="preview">
               {hoverPath &&

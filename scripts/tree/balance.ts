@@ -37,6 +37,21 @@ function relative(m: ModT): ModT | null {
   return null;
 }
 
+/** Lines that say the same thing (the same stat, for the same things) become one with the sum: a card does not list "1 additional Minion" three times. */
+function mergeSame(mods: ModT[]): ModT[] {
+  const at = new Map<string, number>();
+  const out: ModT[] = [];
+  for (const m of mods) {
+    const k = JSON.stringify([m.stat, m.kind, m.tags, m.damageTypes, m.condition, m.per, m.local]);
+    const i = at.get(k);
+    if (i === undefined || m.kind === 'flag') {
+      at.set(k, out.length);
+      out.push({ ...m });
+    } else out[i] = { ...out[i], min: out[i].min + m.min, max: out[i].max + m.max };
+  }
+  return out;
+}
+
 export type BalanceReport = {
   normalised: number;
   coherent: number;
@@ -47,8 +62,8 @@ export type BalanceReport = {
 export function balance(built: ClusterBuilt[]): { built: ClusterBuilt[]; report: BalanceReport } {
   const out = built.map((b) => ({
     ...b,
-    notable: b.notable.map((m) => ({ ...m })),
-    small: b.small.map((m) => ({ ...m })),
+    notable: mergeSame(b.notable),
+    small: mergeSame(b.small),
   }));
   const report: BalanceReport = { normalised: 0, coherent: 0, raised: [], stillWeak: [] };
 

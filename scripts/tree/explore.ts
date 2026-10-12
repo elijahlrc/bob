@@ -8,6 +8,7 @@
  *   npm run tree:explore -- reach [hops] --build b.json      what can be had within a few steps of the build, by cost
  *   npm run tree:explore -- region <id> --build b.json       every notable and keystone in a region (or hub), by cost
  *   npm run tree:explore -- find <text...> --build b.json    nodes whose name or lines contain the text, by cost
+ *   npm run tree:explore -- path <id> --build b.json         what the road to a node passes through, and what it all gives
  *   npm run tree:explore -- alloc <id...> --build b.json     take nodes (the path to each is taken with it)
  *   npm run tree:explore -- unalloc <id...> --build b.json   give nodes back (the build must stay connected)
  *   npm run tree:explore -- summary --build b.json           points used, what the build gives in total
@@ -17,7 +18,7 @@
  * the number of points it takes to reach it from the build (one point a node, the path included).
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { modText } from '../../src/mods/text';
+import { modsText, modText } from '../../src/mods/text';
 import type { Mod } from '../../src/mods/types';
 import { canRemove, pathTo } from '../../src/run/tree';
 import { TONE_LABEL, toneOf } from '../../src/ui/treeStyle';
@@ -46,7 +47,7 @@ const save = (b: Build) => writeFileSync(file, JSON.stringify(b));
 const lines = (id: number): string => {
   const n = nodes[id];
   if (n.kind === 'start') return 'class start';
-  return n.mods.length ? n.mods.map((m: Mod) => modText(m)).join('; ') : '(nothing)';
+  return n.mods.length ? modsText(n.mods).join('; ') : '(nothing)';
 };
 const label = (id: number): string => {
   const n = nodes[id];
@@ -132,11 +133,13 @@ switch (cmd) {
   case 'find': {
     const b = load();
     const q = args.join(' ').toLowerCase();
-    const hit = nodes.filter(
-      (n) =>
-        n.kind !== 'start' &&
-        (n.name.toLowerCase().includes(q) || lines(n.id).toLowerCase().includes(q)),
-    );
+    // Every word of the search has to appear (in the name or the lines), in any order: "spell crit" finds "Critical Strike Chance with Spells".
+    const words = q.split(/\s+/).filter(Boolean);
+    const hit = nodes.filter((n) => {
+      if (n.kind === 'start') return false;
+      const text = (n.name + ' ' + lines(n.id)).toLowerCase();
+      return words.every((w) => text.includes(w));
+    });
     hit.sort((p, r) => (costOf(b, p.id) ?? 999) - (costOf(b, r.id) ?? 999));
     const notable = hit.filter((n) => n.kind === 'notable' || n.kind === 'keystone');
     const small = hit.filter((n) => n.kind !== 'notable' && n.kind !== 'keystone');
@@ -149,6 +152,40 @@ switch (cmd) {
         `  (${small.length} small or road nodes; the nearest ${Math.min(8, small.length)}:)`,
       );
     for (const n of small.slice(0, 8)) console.log(`  ${oneLine(n.id, b)}`);
+    break;
+  }
+  case 'path': {
+    // What the road to a node passes through, and what the whole way gives, before a point is spent.
+    const b = load();
+    const id = Number(args[0]);
+    const path = pathTo(b.allocated, b.class, id);
+    if (!path) {
+      console.log(`#${id}: cannot be reached`);
+      break;
+    }
+    if (!path.length) {
+      console.log(`#${id}: already taken`);
+      break;
+    }
+    console.log(`${path.length} points to take #${id}:`);
+    for (const p of path) console.log(`  ${oneLine(p, b)}`);
+    const sum = new Map<string, Mod>();
+    const key = (m: Mod) =>
+      [
+        m.stat,
+        m.kind,
+        (m.tags ?? []).join('+'),
+        (m.damageTypes ?? []).join('+'),
+        m.condition?.id ?? '',
+      ].join('|');
+    for (const p of path)
+      for (const m of nodes[p].mods)
+        sum.set(
+          key(m),
+          sum.has(key(m)) ? { ...m, value: sum.get(key(m))!.value + m.value } : { ...m },
+        );
+    console.log('The whole way gives:');
+    for (const m of sum.values()) console.log(`  ${modText(m)}`);
     break;
   }
   case 'alloc': {
@@ -235,6 +272,6 @@ switch (cmd) {
   }
   default:
     console.log(
-      'commands: new, show, near, reach, region, find, alloc, unalloc, summary, legend (see the top of scripts/tree/explore.ts)',
+      'commands: new, show, near, reach, region, find, path, alloc, unalloc, summary, legend (see the top of scripts/tree/explore.ts)',
     );
 }

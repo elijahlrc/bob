@@ -67,7 +67,7 @@ export async function render(): Promise<{
       const name = names[String(b.ref)];
       return `  {
     id: ${q('g' + i)},
-    region: ${q(SECTOR_REGION[b.sector])},
+    region: ${q(b.region ?? SECTOR_REGION[b.sector])},
     family: ${q(b.family)},
     depth: ${b.depth},
     smallCount: ${b.smallCount},

@@ -483,7 +483,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
   },
   {
     id: 'g27',
-    region: 'dex',
+    region: 'dexint',
     family: 'mine',
     depth: 0.593,
     smallCount: 2,
@@ -621,7 +621,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
   },
   {
     id: 'g35',
-    region: 'dex',
+    region: 'dexint',
     family: 'trap',
     depth: 0.346,
     smallCount: 2,
@@ -696,18 +696,13 @@ export const GEN_CLUSTERS: GenCluster[] = [
       name: 'Moth Choir',
       mods: [
         m('skillDuration', 'inc', 15),
-        m('minionDamage', 'inc', 20),
-        m('minionDamage', 'inc', 20),
+        m('minionDamage', 'inc', 40),
         m('skillDuration', 'inc', 15, { tags: ['minion'] }),
       ],
     },
     small: {
       name: 'Minion Attack and Movement Speed',
-      mods: [
-        m('minionSpeed', 'inc', 4),
-        m('minionSpeed', 'inc', 4),
-        m('skillDuration', 'inc', 8, { tags: ['minion'] }),
-      ],
+      mods: [m('minionSpeed', 'inc', 8), m('skillDuration', 'inc', 8, { tags: ['minion'] })],
     },
   },
   {
@@ -1350,17 +1345,9 @@ export const GEN_CLUSTERS: GenCluster[] = [
     smallCount: 2,
     notable: {
       name: 'Processional Haste',
-      mods: [
-        m('damage', 'inc', 12),
-        m('minionSpeed', 'inc', 10),
-        m('minionSpeed', 'inc', 5),
-        m('minionSpeed', 'inc', 5),
-      ],
+      mods: [m('damage', 'inc', 12), m('minionSpeed', 'inc', 20)],
     },
-    small: {
-      name: 'Minion Attack and Movement Speed',
-      mods: [m('minionSpeed', 'inc', 4), m('minionSpeed', 'inc', 4)],
-    },
+    small: { name: 'Minion Attack and Movement Speed', mods: [m('minionSpeed', 'inc', 8)] },
   },
   {
     id: 'g77',
@@ -1722,15 +1709,9 @@ export const GEN_CLUSTERS: GenCluster[] = [
     smallCount: 4,
     notable: {
       name: 'Moth Procession',
-      mods: [
-        m('minionSpeed', 'inc', 8),
-        m('minionSpeed', 'inc', 8),
-        m('minionCount', 'base', 1),
-        m('minionCount', 'base', 1),
-        m('minionCount', 'base', 1),
-      ],
+      mods: [m('minionSpeed', 'inc', 16), m('minionCount', 'base', 3)],
     },
-    small: { name: 'Minion Attack and Movement Speed', mods: [m('minionSpeed', 'inc', 4)] },
+    small: { name: 'Minion Attack and Movement Speed', mods: [m('minionSpeed', 'inc', 8)] },
   },
   {
     id: 'g102',
@@ -1879,7 +1860,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
   },
   {
     id: 'g111',
-    region: 'int',
+    region: 'dexint',
     family: 'mine',
     depth: 0.193,
     smallCount: 3,
@@ -1919,14 +1900,11 @@ export const GEN_CLUSTERS: GenCluster[] = [
   },
   {
     id: 'g114',
-    region: 'dexint',
+    region: 'strint',
     family: 'minion',
     depth: 0.108,
     smallCount: 2,
-    notable: {
-      name: "Understudy's Guard",
-      mods: [m('minionBlock', 'base', 10), m('minionBlock', 'base', 10)],
-    },
+    notable: { name: "Understudy's Guard", mods: [m('minionBlock', 'base', 20)] },
     small: {
       name: 'Life of your Minions',
       mods: [m('minionLife', 'inc', 10), m('minionBlock', 'base', 5)],
@@ -2496,12 +2474,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     smallCount: 2,
     notable: {
       name: 'Marginal Familiars',
-      mods: [
-        m('minionLife', 'inc', 10),
-        m('minionDamage', 'inc', 15),
-        m('minionCount', 'base', 1),
-        m('minionCount', 'base', 1),
-      ],
+      mods: [m('minionLife', 'inc', 10), m('minionDamage', 'inc', 15), m('minionCount', 'base', 2)],
     },
     small: { name: 'Life of your Minions', mods: [m('minionLife', 'inc', 10)] },
   },
@@ -2593,16 +2566,11 @@ export const GEN_CLUSTERS: GenCluster[] = [
     smallCount: 3,
     notable: {
       name: 'Swift Scriveners',
-      mods: [
-        m('minionSpeed', 'inc', 10),
-        m('minionDamage', 'inc', 20),
-        m('minionSpeed', 'inc', 5),
-        m('minionSpeed', 'inc', 5),
-      ],
+      mods: [m('minionSpeed', 'inc', 20), m('minionDamage', 'inc', 20)],
     },
     small: {
       name: 'Minion Attack and Movement Speed',
-      mods: [m('minionSpeed', 'inc', 4), m('minionDamage', 'inc', 10)],
+      mods: [m('minionSpeed', 'inc', 8), m('minionDamage', 'inc', 10)],
     },
   },
   {
@@ -3931,14 +3899,8 @@ export const GEN_CLUSTERS: GenCluster[] = [
     family: 'minion',
     depth: 0.465,
     smallCount: 3,
-    notable: {
-      name: 'Hurried Throng',
-      mods: [m('minionSpeed', 'inc', 8), m('minionSpeed', 'inc', 8)],
-    },
-    small: {
-      name: 'Minion Attack and Movement Speed',
-      mods: [m('minionSpeed', 'inc', 4), m('minionSpeed', 'inc', 4)],
-    },
+    notable: { name: 'Hurried Throng', mods: [m('minionSpeed', 'inc', 25)] },
+    small: { name: 'Minion Attack and Movement Speed', mods: [m('minionSpeed', 'inc', 8)] },
   },
   {
     id: 'g230',
@@ -4307,7 +4269,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
       ],
     },
     small: {
-      name: 'Chance to gain a Insight Charge on Kill',
+      name: 'Chance to gain an Insight Charge on Kill',
       mods: [
         m('chargeOn.kill.insight', 'base', 2),
         m('chargeOn.kill.fervour', 'base', 2),
@@ -4977,7 +4939,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
   },
   {
     id: 'g288',
-    region: 'int',
+    region: 'strdex',
     family: 'totem',
     depth: 0.335,
     smallCount: 2,
@@ -6009,8 +5971,7 @@ export const GEN_CLUSTERS: GenCluster[] = [
     notable: {
       name: 'Quickraised Pennant',
       mods: [
-        m('castSpeed', 'inc', 30, { tags: ['totem'] }),
-        m('castSpeed', 'inc', 6, { tags: ['totem'] }),
+        m('castSpeed', 'inc', 36, { tags: ['totem'] }),
         m('attackSpeed', 'inc', 10, { tags: ['totem'] }),
       ],
     },

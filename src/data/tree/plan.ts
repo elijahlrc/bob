@@ -16,13 +16,13 @@ export const PLACEMENT: Record<string, Placement> = {
   wellspring: { r: 2000, a: 0, turn: 135 },
   conflux: { r: 3450, a: -16, turn: 45 },
   boneCourt: { r: 3200, a: 20, turn: -45 },
-  spellforge: { r: 4400, a: 8, turn: 0 },
-  quillwork: { r: 4850, a: -20, turn: 90 },
+  spellforge: { r: 4200, a: 4, turn: 0 },
+  quillwork: { r: 4500, a: 24, turn: 0 },
   // dexint
-  snareRow: { r: 1400, a: 0, turn: 90 },
-  venomQuarter: { r: 2400, a: 8, turn: 45 },
-  knifeAlley: { r: 3300, a: -8, turn: 45 },
-  veil: { r: 3900, a: 20, turn: 0 },
+  snareRow: { r: 1650, a: -12, turn: -45 },
+  venomQuarter: { r: 2250, a: 12, turn: -45 },
+  knifeAlley: { r: 3450, a: -12, turn: 90 },
+  veil: { r: 3800, a: 20, turn: 0 },
   // dex
   longbowReach: { r: 1550, a: 0, turn: 45 },
   windwalk: { r: 3050, a: 16, turn: 0 },
@@ -41,10 +41,10 @@ export const PLACEMENT: Record<string, Placement> = {
   cairn: { r: 3850, a: 4, turn: 0 },
   // strint
   sanctum: { r: 1750, a: -12, turn: 0 },
-  reliquary: { r: 2200, a: 24, turn: 180 },
-  pyreAndStorm: { r: 3000, a: -4, turn: -45 },
-  crozierHall: { r: 3600, a: 20, turn: 45 },
-  cassock: { r: 3700, a: -20, turn: 45 },
+  reliquary: { r: 2200, a: 20, turn: 180 },
+  pyreAndStorm: { r: 3050, a: -16, turn: 45 },
+  crozierHall: { r: 3600, a: 16, turn: 90 },
+  cassock: { r: 4100, a: -8, turn: -45 },
 };
 
 export const REGION_LINKS: Partial<Record<RegionId, [string, string][]>> = {
@@ -52,15 +52,16 @@ export const REGION_LINKS: Partial<Record<RegionId, [string, string][]>> = {
     ['start', 'wellspring:out'],
     ['wellspring:in', 'conflux:in'],
     ['wellspring:left', 'boneCourt:in'],
-    ['boneCourt:out', 'spellforge:in'],
     ['conflux:arm1', 'spellforge:left'],
-    ['conflux:arm0', 'quillwork:outB'],
+    ['boneCourt:out', 'spellforge:in'],
+    ['boneCourt:out', 'quillwork:in'],
   ],
   dexint: [
     ['start', 'snareRow:in'],
     ['snareRow:in', 'venomQuarter:in'],
-    ['venomQuarter:in', 'knifeAlley:inB'],
-    ['venomQuarter:arm1', 'veil:in'],
+    ['venomQuarter:arm1', 'knifeAlley:outB'],
+    ['snareRow:out', 'knifeAlley:inB'],
+    ['venomQuarter:arm2', 'veil:in'],
     ['knifeAlley:outB', 'veil:left'],
   ],
   dex: [
@@ -89,10 +90,12 @@ export const REGION_LINKS: Partial<Record<RegionId, [string, string][]>> = {
   strint: [
     ['start', 'sanctum:in'],
     ['sanctum:right', 'reliquary:out'],
-    ['sanctum:out', 'pyreAndStorm:arm0'],
-    ['reliquary:in', 'pyreAndStorm:in'],
-    ['pyreAndStorm:in', 'crozierHall:inB'],
-    ['pyreAndStorm:arm0', 'cassock:in'],
+    ['sanctum:out', 'pyreAndStorm:in'],
+    ['reliquary:in', 'pyreAndStorm:arm2'],
+    ['reliquary:in', 'crozierHall:outB'],
+    ['pyreAndStorm:arm2', 'crozierHall:inB'],
+    ['crozierHall:inB', 'cassock:in'],
+    ['pyreAndStorm:arm0', 'cassock:out'],
   ],
 };
 

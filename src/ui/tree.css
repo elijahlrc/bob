@@ -251,3 +251,26 @@ svg.tree.z-k .lb.start {
   background: transparent;
   border-radius: 3px;
 }
+
+/* The search: a ring on every match (docs/TREE-REDESIGN.md, T6.2: players could not tell where a theme lives), and its box. */
+.tree-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tree-search input {
+  min-width: 190px;
+  padding: 3px 8px;
+  background: var(--panel);
+  color: inherit;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  font: inherit;
+}
+.tree .sr {
+  fill: none;
+  stroke: #66f0ff;
+  stroke-width: calc(var(--sw) * 0.5);
+  r: calc(var(--fs) * 0.95);
+  pointer-events: none;
+}

@@ -18,6 +18,16 @@ about your run changes.
   want it, and passing never forces you to take its nodes.
 - **Keystones sit at the end of a peninsula** of four small nodes that fit the keystone.
 - Roads take more points than before (about a fifth fewer notables for 100 points), and every notable is worth more.
+- **Search the tree.** A box at the top of the passive tree screen finds nodes by words ("spell crit", "minion", "fire"): every
+  match is ringed and Next takes you to one. A node's lines are matched by every word, in any order.
+- **Classes are joined through the middle.** You can walk from any class to any region by the ring of the middle; a class start is
+  still a door you cannot walk through.
+- **The middle is worth the walk**: its notables are as strong as a region's, and its roads give life, damage, resistances and
+  movement speed.
+- **Roads give fewer attribute nodes** (one in three), no accuracy filler on the dexterity roads, and cost less per notable.
+- **Archetypes at home:** trap, mine, minion block and totem nodes that stood away from their kind are moved into their district.
+- Cards: Steady Draw is 35% more damage (it was neutral), keystone cards give their numbers (Close Quarters, Prismatic Balance, Cruel Agony,
+  Volatile Servants), lines that say the same thing are one line with the sum, and charge text no longer reads "per 1 charges.grit".
 
 ### Passive tree: notables are worth taking, and the middle is for everyone
 

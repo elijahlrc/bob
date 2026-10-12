@@ -122,7 +122,7 @@ for (const n of nodes) {
       ? `${(n.classStart ?? '').toUpperCase()} START`
       : (n.kind === 'notable' && (labels === 'all' || labels === 'notables')) ||
           (n.kind === 'keystone' && labels !== 'none')
-        ? n.name + (showIds ? ` ${n.id}` : '')
+        ? n.name + (showIds ? ` #${n.id}` : '')
         : '';
   if (!text) continue;
   const off = radius[n.kind] * grow + 4;

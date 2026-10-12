@@ -1,0 +1,22 @@
+{
+  "6233": {
+    "region": "dexint",
+    "note": "mine area: with the mines of Snare Row"
+  },
+  "7136": {
+    "region": "dexint",
+    "note": "trap count: with the traps of Snare Row"
+  },
+  "21602": {
+    "region": "dexint",
+    "note": "mine cast speed: with the mines of Snare Row"
+  },
+  "21973": {
+    "region": "strint",
+    "note": "minion block: with the minions of the Reliquary"
+  },
+  "53757": {
+    "region": "strdex",
+    "note": "totem damage: with the totems of the Standards"
+  }
+}

@@ -6,6 +6,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { ctxFor, translateLine, type ModT } from '../coverage/translate';
+import type { RegionId } from '../../src/data/tree/spec';
 import type { RefNode, TreeRef } from './extract';
 
 export type Override = {
@@ -17,6 +18,8 @@ export type Override = {
   mods?: ModT[];
   /** The family the cluster sorts under on the tree (see `familyOf`). */
   family?: string;
+  /** The region it stands in, when not the region of the reference's sector (an archetype kept at home, docs/TREE-REDESIGN.md 6). */
+  region?: RegionId;
   note?: string;
 };
 export type Overrides = Record<string, Override>;
@@ -32,6 +35,7 @@ export type ClusterBuilt = {
   small: ModT[];
   smallCount: number;
   family: string;
+  region?: RegionId;
 };
 
 const ctx = ctxFor('ring', 'ring');
@@ -176,6 +180,7 @@ export function buildClusters(
       small,
       smallCount,
       family: o.family ?? familyOf(notable),
+      ...(o.region ? { region: o.region } : {}),
     });
   }
   return { built, skipped };

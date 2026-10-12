@@ -749,6 +749,8 @@ function layoutRegion(
 }
 
 const HUB_R = HUB_RADIUS;
+/** The middle's notables are as strong as a region's median one (about five small nodes), or nobody would walk there. */
+const HUB_STRENGTH = 1.6;
 
 /** What one small node gives, by stat, as the generated clusters give it. */
 const UNITS = unitsOf(GEN_CLUSTERS.flatMap((g) => g.small.mods));
@@ -828,7 +830,7 @@ function layoutHub(
       kind: 'wheel',
       theme: HUB.themes[1 + i],
       smallCount: 4,
-      notable: { name: HUB.notables[1 + i], strength: 1 },
+      notable: { name: HUB.notables[1 + i], strength: HUB_STRENGTH },
       attrs,
     };
     if (hang(ctx, spec, ring[kb], around(at(kb), out), 'hub') === null)
@@ -863,7 +865,7 @@ function layoutHub(
     kind: 'wheel',
     theme: HUB.themes[0],
     smallCount: 7,
-    notable: { name: HUB.notables[0], strength: 1 },
+    notable: { name: HUB.notables[0], strength: HUB_STRENGTH },
     attrs,
   };
   const { ids } = placeCluster(b, wheel, 0, 0, [0, -1], [0, 0], 'hub');
