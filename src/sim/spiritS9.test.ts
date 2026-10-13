@@ -207,6 +207,22 @@ describe('Blood Rage (bloodSurgeCall)', () => {
     void before;
   });
 
+  it('gives a Fervour charge on a kill while it is up', () => {
+    const { world: w } = world(['crushingBlow', 'bloodSurgeCall'], 1.5, 'sword_3', DEX);
+    for (let i = 0; i < 3 * 60 && w.buffT.bloodSurge <= 0; i++) stepWorld(w);
+    expect(w.buffT.bloodSurge).toBeGreaterThan(0);
+    const kills = (n: number) => {
+      for (let i = 0; i < n; i++) {
+        const m = neighbour(w, w.player.x + 2, w.player.y);
+        m.def = dummyDefence({ maxLife: 10 });
+        m.life = 1;
+        killActor(w, m);
+      }
+    };
+    kills(100);
+    expect(w.char.charges.fervour).toBeGreaterThan(0);
+  });
+
   it('is let go when life runs low', () => {
     const { world: w } = world(['crushingBlow', 'bloodSurgeCall'], 1.5, 'sword_3', DEX);
     w.opts.freeResources = false;
