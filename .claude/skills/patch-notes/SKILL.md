@@ -20,7 +20,7 @@ is, and a push to `main` builds and deploys the game (`.github/workflows/pages.y
   every commit in the range, not only your own.
 - Read `docs/PATCH-NOTES.md` as it stands. Other sessions sometimes add entries to it directly: do not repeat what is already
   there, and keep the same date heading if today's already exists.
-- Uncommitted work in the tree is not part of the release; leave it alone (see step 5).
+- Uncommitted work in the tree is not part of the release; leave it alone (see step 6).
 - If there is nothing new, say so and stop.
 
 ## 2. Work out what a player sees
