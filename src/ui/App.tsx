@@ -7,6 +7,7 @@ import { ConfirmHost, dismissAsk } from './Confirm';
 import { Hud } from './Hud';
 import { InfoLayer } from './info';
 import { useControllerState } from './hooks';
+import { PatchNotes } from './PatchNotes';
 import { Summary } from './Summary';
 import { Title } from './Title';
 
@@ -43,6 +44,8 @@ function Screen({ c }: { c: Controller }) {
       return <Title c={c} />;
     case 'codex':
       return <Codex c={c} />;
+    case 'patchNotes':
+      return <PatchNotes c={c} />;
     case 'classSelect':
       return <ClassSelect c={c} />;
     case 'camp':

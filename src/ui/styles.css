@@ -1230,6 +1230,35 @@ select option {
   color: #8fd18f;
 }
 
+/* Patch notes */
+.patchnotes .menu.row {
+  flex-direction: row;
+  gap: 8px;
+}
+.patch-list {
+  max-height: 75vh;
+  overflow-y: auto;
+  text-align: left;
+  width: min(720px, 94vw);
+}
+.patch-list h2 {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 18px;
+  margin: 18px 0 6px;
+}
+.patch-list h3 {
+  font-size: 15px;
+  margin: 12px 0 4px;
+}
+.patch-list ul {
+  margin: 4px 0;
+  padding-left: 20px;
+}
+.patch-list li,
+.patch-list p {
+  margin: 3px 0;
+}
+
 .gem-inv .search {
   width: 100%;
   margin: 4px 0 6px;

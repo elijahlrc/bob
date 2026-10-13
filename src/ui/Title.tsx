@@ -112,6 +112,9 @@ export function Title({ c }: { c: Controller }) {
         <button class="btn" onClick={() => c.goTo('codex')}>
           Codex
         </button>
+        <button class="btn" onClick={() => c.goTo('patchNotes')}>
+          Patch notes
+        </button>
       </div>
       {anyOk && (
         <p class="muted">Each run keeps its own save; a new run leaves the others alone.</p>

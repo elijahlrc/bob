@@ -41,7 +41,8 @@ import {
 /** Auto-continue pauses when life or any flask is below this fraction (docs/MAPS.md 10.2). */
 export const AUTO_PAUSE_BELOW = 0.5;
 
-export type Screen = 'title' | 'classSelect' | 'camp' | 'map' | 'summary' | 'victory' | 'codex';
+export type Screen =
+  'title' | 'classSelect' | 'camp' | 'map' | 'summary' | 'victory' | 'codex' | 'patchNotes';
 
 export type BusEvents = {
   /** The inspected enemy changed (click on the map; null clears). */
