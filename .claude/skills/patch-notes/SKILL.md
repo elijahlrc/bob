@@ -66,16 +66,35 @@ list of major changes is what they want; when in doubt, cut.
 - `npx prettier --write docs/PATCH-NOTES.md`.
 - Re-read the new bullets once against the rules in step 3 before going on (search them for `**`, backticks, `docs/`, `I`,
   `3.9`, `unchanged`, `.ts`).
-- If the user said `draft`: show the notes and stop here, with the file written but not committed.
 
-## 5. Check and commit
+## 5. Audit (Opus)
+
+Before anything is committed, have a fresh reviewer read the new notes. Launch one agent with the Agent tool, `model: "opus"`,
+`subagent_type: "general-purpose"`, `run_in_background: false`, and a prompt that contains, verbatim: the new bullets (and
+their `###` headings), the full text of step 3 above (the style rules), and the commit range from step 1 (it may read the
+commits and code to confirm a claim). Tell it to change nothing and to answer with one verdict per bullet:
+
+- **PASS**, or **FIX** with the specific rule it breaks and a replacement wording;
+- **CUT** for a bullet a player would not notice, that duplicates another, or that is not true of the commits;
+- anything that makes the list unfit for public consumption as a whole: dev or process language, anything that reads as
+  internal, spoilers of unreleased content, tone that blames or apologises, unclear wording a player could not follow, a list
+  that is too long or detailed to be "a short list of major changes", an unexplained balance move (direction and who is
+  affected).
+
+Apply every FIX and CUT yourself (re-run prettier), unless you can show the auditor is wrong; then keep the bullet and note why
+in the report. If more than a couple of bullets changed, run the audit once more on the result. Stop after two rounds: what is
+left over goes to the user in the report, not into a third loop. Do not skip the audit for a short list.
+
+If the user said `draft`: show the notes and stop here, with the file written but not committed.
+
+## 6. Check and commit
 
 - `npm run check` and `npm run build` must both be green (project rule). A flaky timing test (the speed check `x9`) that passes
   when run alone does not block; any other failure does: report it and stop without pushing. Do not weaken tests.
 - Commit only the notes file, so other sessions' staged or unstaged work is left where it is:
   `git commit -m "Patch notes YYYY-MM-DD" -m "<attribution line from the session>" -- docs/PATCH-NOTES.md`.
 
-## 6. Push (this deploys the game)
+## 7. Push (this deploys the game)
 
 - Must be on `main`. `git fetch origin main`; if `origin/main` has commits `main` lacks (`git rev-list --count HEAD..origin/main`),
   stop and tell the user rather than merging or rebasing.
@@ -84,7 +103,7 @@ list of major changes is what they want; when in doubt, cut.
 - GitHub Actions then runs check and build and deploys to Pages; give the user the Actions link
   (`https://github.com/<owner>/<repo>/actions` from `git remote get-url origin`). Do not poll CI.
 
-## 7. Report
+## 8. Report
 
 Show the notes as they were filed (plain text in a fenced block, so they can be copied), then in two or three lines: the commit
-and push result (hash, how many commits went out), anything you could not confirm, and anything left out on purpose.
+and push result (hash, how many commits went out), anything you could not confirm, what the audit changed or left standing, and anything left out on purpose.
