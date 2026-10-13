@@ -165,6 +165,11 @@ All nine milestones were built in one pass. How it differs from the plan above:
   keep the total.
 - **Found on the way:** docs/BUGS.md 2, a Spitter rare can hold the bow strider dodging its pools for a minute. The stall test
   runs with the usual density until that is fixed.
-- **Not checked:** how the bot's clear times and deaths move with the new layouts and styles (only that every biome clears on
-  early maps), and the phone layout of the new banner and the density line. The look is a first pass, judged by eye in the
+- **Bot results by biome** (`npm run sim -- --runs 16 --class all --maps 1-12 --density standard --biome <id>`, seed 3, median map
+  reached by class): the chain biomes (crypt, shrine, forge) are as before (about 10 for most classes); ruins is the same; caves
+  (cavern, marsh) are harder, about 5 to 6 (more deaths on maps 1 to 5); hollow and warren are easier (about 10 to 12 for the
+  classes that stalled lower). With everything rolled, the median map reached is 1 to 3 lower than with crypt and standard
+  density only. The user said balance need not be kept exactly, so nothing was tuned; the knobs are the pack counts per area,
+  the cave passage width (`layouts.ts`) and `AREA_REF` (`population.ts`). `--biome` and `--density` are flags of `npm run sim`.
+- **Not checked:** the phone layout of the new banner (the density line on the card was seen at phone width). The look is a first pass, judged by eye in the
   Browser pane; the ruins cobble in particular is busy.

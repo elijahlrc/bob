@@ -1,7 +1,7 @@
 /**
  * Headless bot runs (DESIGN.md §15.5).
  *
- *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|abandoner] [--craft greedy|random|none] [--report] [--scaling 1.5] [--base 1] [--variance 0.1] [--legacy] [--log <batch>]
+ *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|abandoner] [--craft greedy|random|none] [--report] [--scaling 1.5] [--base 1] [--variance 0.1] [--legacy] [--biome <id>] [--density <id>] [--log <batch>]
  *
  * `--log <batch>` also sends each run that ends to the `sim_runs` table (scripts/simlog.ts, docs/TELEMETRY.md).
  */
@@ -11,6 +11,8 @@ import { CLASSES } from '../src/data/classes';
 import { botRun, type BotRunResult, type CraftPolicy, type ThemeRule } from '../src/run/bot';
 import { depthReport, varietyReport } from '../src/run/report';
 import { SimLog } from './simlog';
+import { forceBiome, type BiomeId } from '../src/data/biomes';
+import { forceDensity, type DensityId } from '../src/data/density';
 import { clampDifficulty, DEFAULT, difficultyText, type Difficulty } from '../src/data/difficulty';
 
 type Args = {
@@ -73,6 +75,8 @@ function parseArgs(argv: string[]): Args {
     } else if (k === '--scaling') a.difficulty.scaling = Number(v);
     else if (k === '--base') a.difficulty.base = Number(v);
     else if (k === '--variance') a.difficulty.variance = Number(v);
+    else if (k === '--biome') forceBiome(v as BiomeId);
+    else if (k === '--density') forceDensity(v as DensityId);
     else if (k === '--legacy') a.difficulty = { scaling: 1, base: 1, variance: 0 };
     else if (k === '--from') a.from = Number(v);
     else if (k === '--dump') a.dump = v;
