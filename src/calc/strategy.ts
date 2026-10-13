@@ -15,8 +15,12 @@ export type RotationEntry<C> = {
   when: SkillWhen;
   /** Seconds between uses of a periodic skill without a cooldown of its own (undefined: the usual pause). */
   every?: number;
-  /** The share of life below which an emergency skill is used. */
+  /** The share of life below which an emergency or escape skill is used. */
   life: number;
+  /** An escape skill goes when life is low with an enemy near. */
+  lowLife: boolean;
+  /** An escape skill goes when 3 or more enemies are close, however healthy. */
+  surrounded: boolean;
   /** Whether the role and the condition are the defaults (nothing set on the Strategy tab). */
   isDefault: boolean;
 };
@@ -79,7 +83,15 @@ export function entryOf<C>(
     when,
     every: skill.cooldown === undefined ? t.every : undefined,
     life: t.life ?? (role === 'escape' ? ESCAPE_LIFE : EMERGENCY_LIFE),
-    isDefault: role === fallback && when === 'any' && t.every === undefined && t.life === undefined,
+    lowLife: t.lowLife !== false,
+    surrounded: t.surrounded !== false,
+    isDefault:
+      role === fallback &&
+      when === 'any' &&
+      t.every === undefined &&
+      t.life === undefined &&
+      t.lowLife === undefined &&
+      t.surrounded === undefined,
   };
 }
 

@@ -72,7 +72,7 @@ export function utilityPick(
   if (e.role === 'auto') return autoPick(w, c, prof, target, d);
   if (e.role === 'opener' && !openerDue(w, c.key, target)) return null;
   if (e.role === 'emergency' && p.life >= p.def.maxLife * e.life) return null;
-  if (e.role === 'escape' && !wantsOut(w, e.life)) return null;
+  if (e.role === 'escape' && !wantsOut(w, e)) return null;
   const near = (r: number) => enemiesNear(w, p.x, p.y, r).length >= 1;
   if (u.kind === 'buff') {
     if (d > CAST_RANGE + 1 || !near(PACK_RADIUS)) return null;
@@ -105,13 +105,21 @@ export function utilityPick(
 }
 
 /**
- * Whether the character wants out (the `escape` role): hurt, with an enemy near enough to be hurt by, or boxed in by a pack. The
- * same rule as the escape skills that decide for themselves.
+ * Whether the character wants out (the `escape` role): hurt, with an enemy near enough to be hurt by, or boxed in by a pack,
+ * each as far as the entry has it switched on. The same rule as the escape skills that decide for themselves.
  */
-export function wantsOut(w: World, life: number): boolean {
+export function wantsOut(
+  w: World,
+  e: Pick<RotationEntry<SkillChoice>, 'life' | 'lowLife' | 'surrounded'>,
+): boolean {
   const p = w.player;
-  const hurt = p.life < p.def.maxLife * life && enemiesNear(w, p.x, p.y, ESCAPE_NEAR).length >= 1;
-  return hurt || enemiesNear(w, p.x, p.y, ESCAPE_CROWD_RADIUS).length >= PACK_SIZE;
+  const hurt =
+    e.lowLife &&
+    p.life < p.def.maxLife * e.life &&
+    enemiesNear(w, p.x, p.y, ESCAPE_NEAR).length >= 1;
+  return (
+    hurt || (e.surrounded && enemiesNear(w, p.x, p.y, ESCAPE_CROWD_RADIUS).length >= PACK_SIZE)
+  );
 }
 
 /** An opener is due on its first use of a fight, and on a rare or boss target it has not yet been used on. */

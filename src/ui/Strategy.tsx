@@ -1,6 +1,7 @@
 import type { Character, SkillChoice } from '../calc/character';
 import { rolesFor, takesWhen, type RotationEntry } from '../calc/strategy';
 import {
+  ESCAPE_LIFE_CHOICES,
   EVERY_CHOICES,
   LIFE_CHOICES,
   LIFE_FLASK_CHOICES,
@@ -30,7 +31,7 @@ const ROLE_HELP: Record<SkillRole, string> = {
   opener: 'Used once at the start of each fight, and once on each rare or boss.',
   emergency: 'Used when life falls below a threshold.',
   escape:
-    'A way out: used when life falls below a threshold with an enemy near, or when 3 or more are close. A blink goes to the safest spot, not toward the enemy.',
+    'A way out: used when life falls below a threshold with an enemy near ("Low health"), or when 3 or more enemies are close ("Surrounded"); tick either or both. A blink goes to the safest spot, not toward the enemy.',
   auto: "The skill's own judgement (shown below).",
   off: 'Never used.',
 };
@@ -134,7 +135,42 @@ function SkillRow(p: {
             onChange={(v) => set({ every: v === 0 ? undefined : v })}
           />
         )}
-        {(e.role === 'emergency' || e.role === 'escape') && (
+        {e.role === 'escape' && (
+          <>
+            <label class="sx-check" title="Goes when life is low with an enemy within 5 tiles.">
+              <input
+                type="checkbox"
+                checked={e.lowLife}
+                onChange={(ev) =>
+                  set({ lowLife: (ev.target as HTMLInputElement).checked ? undefined : false })
+                }
+              />
+              <span>Low health</span>
+            </label>
+            {e.lowLife && (
+              <Pick<number>
+                label="Below"
+                value={e.life}
+                options={ESCAPE_LIFE_CHOICES.map((v): [number, string] => [v, `${pct(v)} life`])}
+                onChange={(v) => set({ life: v })}
+              />
+            )}
+            <label
+              class="sx-check"
+              title="Goes when 3 or more enemies are within 4 tiles, however healthy."
+            >
+              <input
+                type="checkbox"
+                checked={e.surrounded}
+                onChange={(ev) =>
+                  set({ surrounded: (ev.target as HTMLInputElement).checked ? undefined : false })
+                }
+              />
+              <span>Surrounded</span>
+            </label>
+          </>
+        )}
+        {e.role === 'emergency' && (
           <Pick<number>
             label="Below"
             value={e.life}
@@ -147,7 +183,14 @@ function SkillRow(p: {
             class="btn small sx-reset"
             title="Back to this skill's default role"
             onClick={() =>
-              set({ role: undefined, when: undefined, every: undefined, life: undefined })
+              set({
+                role: undefined,
+                when: undefined,
+                every: undefined,
+                life: undefined,
+                lowLife: undefined,
+                surrounded: undefined,
+              })
             }
           >
             Default

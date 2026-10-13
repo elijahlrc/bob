@@ -315,6 +315,64 @@ describe('the escape role', () => {
     expect(uses(world, 5).cinderStep ?? 0).toBeGreaterThan(0);
   });
 
+  it('"Surrounded" can be switched off: a crowd alone then does not send it', () => {
+    const b = withStrategy(build(['crushingBlow', 'cinderStep']), {
+      1: { role: 'escape', surrounded: false },
+    });
+    const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
+    world.opts.godMode = true;
+    for (const [dx, dy] of [
+      [1.5, 1],
+      [1.5, -1],
+    ])
+      put(world, dx, dy);
+    expect(uses(world, 5).cinderStep ?? 0).toBe(0);
+  });
+
+  it('"Low health" can be switched off: low life alone then does not send it, a crowd still does', () => {
+    const b = withStrategy(build(['crushingBlow', 'cinderStep']), {
+      1: { role: 'escape', lowLife: false },
+    });
+    const low = createDummyWorld(b, { distance: 1.6, maxTime: 60 }).world;
+    low.opts.freeResources = false;
+    low.opts.godMode = true;
+    low.player.life = low.player.def.maxLife * 0.1;
+    expect(uses(low, 5).cinderStep ?? 0).toBe(0);
+
+    const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
+    world.opts.godMode = true;
+    for (const [dx, dy] of [
+      [1.5, 1],
+      [1.5, -1],
+    ])
+      put(world, dx, dy);
+    expect(uses(world, 5).cinderStep ?? 0).toBeGreaterThan(0);
+  });
+
+  it('with both off it never goes, and an escape can wait for 10% life', async () => {
+    const none = withStrategy(build(['crushingBlow', 'cinderStep']), {
+      1: { role: 'escape', lowLife: false, surrounded: false },
+    });
+    const a = createDummyWorld(none, { distance: 1.6, maxTime: 60 }).world;
+    a.opts.freeResources = false;
+    a.opts.godMode = true;
+    a.player.life = a.player.def.maxLife * 0.05;
+    expect(uses(a, 5).cinderStep ?? 0).toBe(0);
+
+    const late = withStrategy(build(['crushingBlow', 'cinderStep']), {
+      1: { role: 'escape', surrounded: false, life: 0.1 },
+    });
+    const w = createDummyWorld(late, { distance: 1.6, maxTime: 60 }).world;
+    w.opts.freeResources = false;
+    w.opts.godMode = true;
+    w.player.life = w.player.def.maxLife * 0.2;
+    expect(uses(w, 5).cinderStep ?? 0).toBe(0);
+    w.player.life = w.player.def.maxLife * 0.05;
+    expect(uses(w, 5).cinderStep ?? 0).toBeGreaterThan(0);
+    const { ESCAPE_LIFE_CHOICES } = await import('../data/strategy');
+    expect(Math.min(...ESCAPE_LIFE_CHOICES)).toBe(0.1);
+  });
+
   it('the threshold can be set, and an escape run (Phase Run) goes too', () => {
     const b = withStrategy(build(['crushingBlow', 'slipstream']), {
       1: { role: 'escape', life: 0.3 },

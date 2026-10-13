@@ -73,14 +73,20 @@ export function describeEntry(ch: Character, e: RotationEntry<SkillChoice>): str
       return `Once at the start of each fight, and once on each rare or boss${when}`;
     case 'emergency':
       return `When life falls below ${pct(e.life)}${when}`;
-    case 'escape':
+    case 'escape': {
+      const goes = [
+        e.lowLife ? `life falls below ${pct(e.life)} with an enemy near` : '',
+        e.surrounded ? '3 or more enemies are close' : '',
+      ].filter(Boolean);
+      if (!goes.length) return 'Never used: neither "Low health" nor "Surrounded" is ticked';
       return (
-        `When life falls below ${pct(e.life)} with an enemy near, or with 3 or more enemies close: ` +
+        `When ${goes.join(', or when ')}: ` +
         (c.skill.utility?.kind === 'blink'
           ? 'goes to the safest spot in reach, away from them'
           : 'runs for it') +
         when
       );
+    }
     case 'keepUp':
       return keepUpText(c) + when;
     case 'auto':

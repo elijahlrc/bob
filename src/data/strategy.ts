@@ -10,8 +10,8 @@
  * - `keepUp`: kept going: a buff renewed as it ends, a curse or a debuff kept on the target, minions kept standing.
  * - `opener`: used once at the start of each fight, and once on each rare or boss enemy.
  * - `emergency`: used when life falls below a threshold.
- * - `escape`: a blink or a run, used to get away: when hurt with an enemy near, or crowded. A blink goes to the safest spot in
- *   reach, not toward the enemy.
+ * - `escape`: a blink or a run, used to get away: when hurt with an enemy near, or when surrounded (each can be switched off).
+ *   A blink goes to the safest spot in reach, not toward the enemy.
  * - `auto`: a utility skill's own judgement (a guard when hurt, a warcry for a pack, a blink to close a gap).
  * - `off`: never used.
  */
@@ -32,8 +32,12 @@ export type SkillTactic = {
   when?: SkillWhen;
   /** A periodic skill without a cooldown of its own: seconds between uses (unset: six of its use times, at least 3 s). */
   every?: number;
-  /** An emergency or escape skill: the share of life below which it is used (an escape skill also goes when crowded). */
+  /** An emergency or escape skill: the share of life below which it is used. */
   life?: number;
+  /** An escape skill: whether it goes when life is low with an enemy near (unset: yes). */
+  lowLife?: boolean;
+  /** An escape skill: whether it goes when 3 or more enemies are close, however healthy (unset: yes). */
+  surrounded?: boolean;
 };
 
 /**
@@ -102,6 +106,8 @@ export const PACK_WEIGHT = 0.7;
 export const EVERY_CHOICES = [1.5, 3, 5, 8, 12];
 /** The life thresholds an emergency skill can be given. */
 export const LIFE_CHOICES = [0.3, 0.4, 0.5, 0.6, 0.7];
+/** The life thresholds an escape skill can be given: a wider range, since a blink can wait until the last moment or go early. */
+export const ESCAPE_LIFE_CHOICES = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
 export const LIFE_FLASK_CHOICES = [0.35, 0.5, 0.65, 0.8];
 
 export const ROLE_NAMES: Record<SkillRole, string> = {

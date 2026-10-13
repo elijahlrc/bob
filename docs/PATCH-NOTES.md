@@ -6,6 +6,7 @@ change, and our own names only. Dash bullets under plain headings.
 
 ## 2026-10-12
 
+- A skill set to the Escape role on the Strategy tab has two boxes, Low health and Surrounded, so a blink can go only when life is low, only when enemies crowd in, or both. Before, it always went when three enemies were close, even at full life. The life threshold now goes from 10% to 80%.
 - The main menu has a Patch notes screen.
 - A support that can do nothing for a skill is no longer offered for it. One already socketed stays, greyed out with the reason, and no longer adds mana cost or lowers damage.
 - Arrow Shower and Ember Downpour now come down as six arrows and take extra arrows. Rime Splinter, Bolt Cleave, Slag Blow and Whirl Shot send more projectiles when a support adds them.

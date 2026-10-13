@@ -106,6 +106,13 @@
   padding: 3px 6px;
   max-width: 100%;
 }
+.sx-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
 .sx-says {
   font-size: 13px;
 }
