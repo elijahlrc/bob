@@ -134,9 +134,10 @@ export function channelUse(w: World, a: Actor, act: Action): void {
   }
   st.stage = Math.min(spec.cap, st.stage + gain);
   if (p.skill.orb) orbUse(w, a, act, st.stage);
-  // An orb keeps being fed at the cap; the others (and an illusion at its last stage) are let go.
-  if ((!p.skill.orb || p.skill.orb.kind === 'illusion') && st.stage >= spec.cap)
-    releaseChannel(w, a);
+  // An orb keeps being fed at the cap, and so does a channel with nothing to release (Cyclone just keeps its stages and spins on);
+  // the others (and an illusion at its last stage) are let go.
+  const letGo = p.skill.orb ? p.skill.orb.kind === 'illusion' : !!spec.release;
+  if (letGo && st.stage >= spec.cap) releaseChannel(w, a);
 }
 
 export type StackState = { key: string; n: number; lastHit: number; fadeT: number };

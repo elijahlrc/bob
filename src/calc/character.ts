@@ -2089,8 +2089,10 @@ export function channelMult(p: SkillProfile): number {
     for (let i = 1; i <= waves; i++) total += i > waves / 2 ? 1 + o.stillMore / 100 : 1;
     return total / c.cap;
   }
-  let total = 0;
   const per = (c.perStage ?? 0) / 100;
+  // A channel with nothing to release is held at its cap (Cyclone): over a fight it is the full hit, the weak first one aside.
+  if (c.tick && !c.release) return 1 + per * c.cap;
+  let total = 0;
   if (c.tick)
     for (let s = 0; s < c.cap; s++)
       total += (s === 0 && c.first !== undefined ? c.first / 100 : 1) * (1 + per * s);

@@ -209,4 +209,27 @@ describe('Cyclone (twisterBlade): the first spin hits for half, and a stun canno
     expect(first.length).toBeGreaterThan(0);
     expect(later.length).toBeGreaterThan(0);
   });
+
+  it('keeps its stages at the cap and spins on, instead of starting over', () => {
+    const b = holding('sword_3', ['twisterBlade'], 'strider');
+    const cap = new Character(b, {}).primary.skill.channel!.cap;
+    const { world } = createDummyWorld(b, { distance: 1.2, maxTime: 60 });
+    world.opts.freeResources = true;
+    let atCap = 0;
+    let started = false;
+    for (let i = 0; i < 60 * 8; i++) {
+      stepWorld(world);
+      const st = world.channel;
+      if (st) started = true;
+      // Once it is going the channel is never let go while there is something to hit.
+      if (started) expect(st).not.toBeNull();
+      if (st && st.stage === cap) atCap++;
+    }
+    expect(atCap).toBeGreaterThan(60 * 5);
+  });
+
+  it('is worth its full hit on the sheet, not a cycle that keeps starting over', () => {
+    const c = new Character(holding('sword_3', ['twisterBlade'], 'strider'), {});
+    expect(channelMult(c.profile(c.primary, 0))).toBe(1);
+  });
 });
