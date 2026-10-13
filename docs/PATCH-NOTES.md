@@ -20,6 +20,7 @@ change, and our own names only. Dash bullets under plain headings.
 - From map 3 a map can be Sparse, Packed, Clustered or Scattered, shown on its offer. Sparse has fewer monsters but more magic and rare ones, Packed half as many again, Clustered a few large packs, and Scattered small groups everywhere.
 - Quarry is always set in a Cavern, Holdout in a Hollow, Collapse in Ruins and Crawl in a Warren.
 - The new biomes are still being balance-tested. For now Caverns and Marshes are harder than the others and the Hollow and the Warren a little easier, so runs are somewhat harder overall.
+- The Tollkeeper grows much deadlier as the fight goes on: each toll now raises its damage by a quarter (was a tenth), and its rings hit a third harder at the first toll and about two thirds harder by the third.
 
 ## 2026-10-12
 
