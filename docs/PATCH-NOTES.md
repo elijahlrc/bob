@@ -6,6 +6,7 @@ change, and our own names only. Dash bullets under plain headings.
 
 ## 2026-10-13
 
+- Enemies with energy shield now show it on their health bar, a blue strip above the life that drains first. The enemy card shows it too.
 - Drain Trap now draws its beams, a glowing line from each enemy it holds to you with a red and a blue mote running along it for the life and mana it gives.
 - Skills that leave something standing are now drawn: the blades circling you (Blade Vortex), the orb of Orb of Storms, the markers waiting to be struck (Storm Call), the arrows stuck in an enemy (Explosive Arrow) and the pods in the ground (Scourge Arrow), the mirage archer, the charges on an enemy (Infernal Blow) and the shell about you (Molten Shell). Before, only the blasts they made could be seen.
 - Livewire Snares now gives its charges. Skills that deal no hit of their own, such as Drain Trap, Creeping Plague, Withering Breath, Searing Lance and Cinder Bond, never counted as hitting, so nothing that is gained on a hit (charges, buffs, rage, life or mana) worked with them. It does now whenever they land on an enemy, except for curses.

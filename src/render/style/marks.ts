@@ -38,7 +38,8 @@ export class MonsterMarks {
     for (const a of world.actors) {
       if (a.isPlayer || !a.alive) continue;
       const sel = a.id === selectedId;
-      const interesting = a.rarity !== 'normal' || sel || a.life < a.def.maxLife;
+      const interesting =
+        a.rarity !== 'normal' || sel || a.life < a.def.maxLife || a.es < a.def.maxEs;
       if (!interesting) continue;
       const p = pos(a);
       if (!p) continue;
@@ -77,17 +78,25 @@ export class MonsterMarks {
       const frac = Math.max(0, Math.min(1, a.life / maxLife));
       const w = u * (a.rarity === 'boss' ? 16 : 11);
       const h = u * 1.5;
+      // Energy shield: a thinner strip stacked on top of the life bar, so a shielded monster reads as two layers.
+      const maxEs = a.def.maxEs;
+      const esFrac = maxEs > 0 ? Math.max(0, Math.min(1, a.es / maxEs)) : 0;
+      const eh = maxEs > 0 ? u * 0.9 : 0;
       const bx = p.x - w / 2;
-      let by = p.y - p.headUp - h - u * 1.2;
-      if (a.rarity !== 'normal' || frac < 1) {
+      let by = p.y - p.headUp - h - eh - u * 1.2;
+      if (a.rarity !== 'normal' || frac < 1 || esFrac < 1) {
         g.fillStyle(this.theme.outline, 0.85).fillRect(
           bx - u * 0.4,
           by - u * 0.4,
           w + u * 0.8,
-          h + u * 0.8,
+          h + eh + u * 0.8,
         );
-        g.fillStyle(0x401010, 1).fillRect(bx, by, w, h);
-        g.fillStyle(rc, 1).fillRect(bx, by, w * frac, h);
+        if (maxEs > 0) {
+          g.fillStyle(0x102838, 1).fillRect(bx, by, w, eh);
+          g.fillStyle(0x6ad0ff, 1).fillRect(bx, by, w * esFrac, eh);
+        }
+        g.fillStyle(0x401010, 1).fillRect(bx, by + eh, w, h);
+        g.fillStyle(rc, 1).fillRect(bx, by + eh, w * frac, h);
       }
 
       // Affix pips, one per affix, centred above the bar.

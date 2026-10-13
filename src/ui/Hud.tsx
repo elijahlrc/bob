@@ -135,6 +135,17 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
               {t}
             </div>
           ))}
+      {a.def.maxEs > 0 && (
+        <div
+          class="inspect-life inspect-es"
+          title={`Energy shield ${Math.round(a.es)} / ${Math.round(a.def.maxEs)}`}
+        >
+          <div style={{ width: `${Math.max(0, Math.min(100, (a.es / a.def.maxEs) * 100))}%` }} />
+          <span>
+            {Math.round(a.es).toLocaleString()} / {Math.round(a.def.maxEs).toLocaleString()}
+          </span>
+        </div>
+      )}
       <div class="inspect-life" title={`${Math.round(a.life)} / ${Math.round(maxLife)}`}>
         <div style={{ width: `${Math.max(0, Math.min(100, (a.life / maxLife) * 100))}%` }} />
         <span>

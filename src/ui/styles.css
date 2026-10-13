@@ -939,6 +939,13 @@ select option {
   height: 100%;
   background: var(--rar, #c03030);
 }
+.inspect-es {
+  background: #102838;
+  margin-bottom: 3px;
+}
+.inspect-es > div {
+  background: #4aa8d8;
+}
 .inspect-life > span {
   position: absolute;
   inset: 0;
