@@ -1,13 +1,22 @@
 ---
 name: patch-notes
-description: Write Bob's patch notes from the commits since the last notes, add them to docs/PATCH-NOTES.md (the game's Patch notes screen), commit and push (which deploys the game). Pass "draft" to stop before committing.
+description: Write Bob's patch notes from the commits since the last notes, add them to docs/PATCH-NOTES.md (the game's Patch notes screen), commit and push (which deploys the game). "draft" writes and audits them and stops; running it again without "draft" submits that draft.
 disable-model-invocation: true
 ---
 
 # Patch notes: write, file, commit, push
 
-The user running `/patch-notes` is asking for all of it: write the notes, add them to the game, and push. Only `draft` (as an
-argument or in the request) stops after showing the notes. Do not ask for confirmation before filing or pushing.
+The user running `/patch-notes` is asking for all of it: write the notes, add them to the game, and push. Do not ask for
+confirmation before filing or pushing.
+
+It is meant to be run in two passes:
+
+1. `/patch-notes draft` writes the notes, audits them and leaves them in `docs/PATCH-NOTES.md` **uncommitted**, then stops. The
+   user reads them and may edit the file or ask for changes.
+2. `/patch-notes` (no `draft`) then **submits that draft**: it takes the uncommitted notes in the file as they are (hand edits
+   included), audits them once more, checks, commits and pushes. It does not write them again.
+
+Run with no draft waiting, `/patch-notes` does both passes in one go. Which case applies is decided in step 1.
 
 `docs/PATCH-NOTES.md` is the single source: the Patch notes screen on the title menu (`src/ui/PatchNotes.tsx`) shows it as it
 is, and a push to `main` builds and deploys the game (`.github/workflows/pages.yml`). Nothing else needs editing.
@@ -15,13 +24,21 @@ is, and a push to `main` builds and deploys the game (`.github/workflows/pages.y
 ## 1. Find what changed
 
 - `git fetch origin`, then `git status -sb` to see where `main` stands against `origin/main`.
+- **Is a draft waiting?** `git diff HEAD -- docs/PATCH-NOTES.md` (and `git status --short docs/PATCH-NOTES.md`). Uncommitted
+  changes to the notes file are a draft, written by an earlier `/patch-notes draft` (or by hand, or by another session).
+  - **Draft waiting, no `draft` argument: submit it.** Do not rewrite it. Show its added lines to be sure they are notes (not
+    something unrelated), check that no player-visible commit since the last notes is missing from it (the range below; if one
+    is, add a bullet for it following steps 2 to 4), then go straight to step 5 (audit), 6 and 7.
+  - **Draft waiting, with `draft`: refine it.** Start from the draft rather than discarding it: add what the commits since then
+    need, fix what no longer holds, then step 5 and stop.
+  - **No draft:** write one as below.
 - The range to cover is everything since the notes were last written: `base=$(git log -1 --format=%H -- docs/PATCH-NOTES.md)`,
   then `git log --format='%h %ad %an%n%s%n%b%n---' --date=short $base..HEAD`. Other sessions commit to the same branch, so cover
   every commit in the range, not only your own.
 - Read `docs/PATCH-NOTES.md` as it stands. Other sessions sometimes add entries to it directly: do not repeat what is already
   there, and keep the same date heading if today's already exists.
-- Uncommitted work in the tree is not part of the release; leave it alone (see step 6).
-- If there is nothing new, say so and stop.
+- Other uncommitted work in the tree is not part of the release; leave it alone (see step 6).
+- If there is no draft and nothing new, say so and stop.
 
 ## 2. Work out what a player sees
 
@@ -85,7 +102,8 @@ Apply every FIX and CUT yourself (re-run prettier), unless you can show the audi
 in the report. If more than a couple of bullets changed, run the audit once more on the result. Stop after two rounds: what is
 left over goes to the user in the report, not into a third loop. Do not skip the audit for a short list.
 
-If the user said `draft`: show the notes and stop here, with the file written but not committed.
+If the user said `draft`: show the notes and stop here, with the file written but **not committed**, and tell the user that
+`/patch-notes` with no argument will submit them (hand edits to the file are kept; the audit runs once more on them).
 
 ## 6. Check and commit
 
