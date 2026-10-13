@@ -8,14 +8,14 @@ logic behind "interesting" vs "boring" supports is. No source code under `src` w
 
 ## 0. Sources and method
 
-| Tag | Source | Notes |
-|---|---|---|
+| Tag     | Source                                                                                                                                                                                                                           | Notes                                                                                                                                                                            |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | PoB-3.9 | Path of Building repo, commit `0c3db4a2...` (2020-03-09, last commit before 3.10). Files `Data/3_0/Skills/{act_dex,sup_dex,sup_int,sup_str}.lua`, `Data/Global.lua`, `Data/3_0/SkillStatMap.lua`, `Modules/CalcOffence-3_0.lua`. | Facts only (numbers, skill-type lists). Exported from game data, so this is the closest thing to a 3.9 primary source. `manaMultiplier = N` means a cost multiplier of (100+N)%. |
-| PoB-cur | Same repo, current `master` (`src/Data/Skills/*.lua`). | Used only to show what changed since 3.9. |
-| Wiki | poewiki.net, via its MediaWiki API (`api.php?action=query&prop=revisions`), raw wikitext incl. version history tables. | The wiki is currently at ~3.29 so "current" numbers on it are NOT 3.9. Version-history rows were used to back-derive 3.9 values and cross-checked against PoB-3.9. |
-| GGG-1 | "Skill Revamps - Part 3" (Apr 2018, pre-3.3.0), https://www.pathofexile.com/forum/view-thread/2133090 | GGG primary. Rain of Arrows / Blast Rain / Barrage design reasoning. |
-| GGG-2 | "New Bow Support Gems in Conquerors of the Atlas" (3.9.0, Natalia_GGG), mirrored at https://devtrackers.gg/pathofexile/p/76515e91-new-bow-support-gems-in-path-of-exile-conquerors-of-the-atlas | GGG staff post, read via the mirror (the original forum URL was not located). Greater Volley / Barrage / Arrow Nova reasoning. |
-| GGG-3 | "Development Manifesto - Game Balance in Path of Exile: Expedition" (3.15, Jul 2021), https://www.pathofexile.com/forum/view-post/24190927 | GGG primary. Post-3.9 (so a later philosophy statement), but the clearest statement of support-gem design intent. |
+| PoB-cur | Same repo, current `master` (`src/Data/Skills/*.lua`).                                                                                                                                                                           | Used only to show what changed since 3.9.                                                                                                                                        |
+| Wiki    | poewiki.net, via its MediaWiki API (`api.php?action=query&prop=revisions`), raw wikitext incl. version history tables.                                                                                                           | The wiki is currently at ~3.29 so "current" numbers on it are NOT 3.9. Version-history rows were used to back-derive 3.9 values and cross-checked against PoB-3.9.               |
+| GGG-1   | "Skill Revamps - Part 3" (Apr 2018, pre-3.3.0), https://www.pathofexile.com/forum/view-thread/2133090                                                                                                                            | GGG primary. Rain of Arrows / Blast Rain / Barrage design reasoning.                                                                                                             |
+| GGG-2   | "New Bow Support Gems in Conquerors of the Atlas" (3.9.0, Natalia_GGG), mirrored at https://devtrackers.gg/pathofexile/p/76515e91-new-bow-support-gems-in-path-of-exile-conquerors-of-the-atlas                                  | GGG staff post, read via the mirror (the original forum URL was not located). Greater Volley / Barrage / Arrow Nova reasoning.                                                   |
+| GGG-3   | "Development Manifesto - Game Balance in Path of Exile: Expedition" (3.15, Jul 2021), https://www.pathofexile.com/forum/view-post/24190927                                                                                       | GGG primary. Post-3.9 (so a later philosophy statement), but the clearest statement of support-gem design intent.                                                                |
 
 Wiki page URLs used: `https://www.poewiki.net/wiki/<Name>` for Rain_of_Arrows, Blast_Rain, Greater_Multiple_Projectiles_Support,
 Lesser_Multiple_Projectiles_Support (now "Multiple Projectiles Support"), Volley_Support, Greater_Volley_Support, Fork_Support,
@@ -38,7 +38,7 @@ that it was only a unique-item support effect). There is no "Lesser Spell Echo" 
 
 - Tags shown on the gem in 3.9: Attack, AoE, Projectile, Bow (the Projectile gem tag was added in 3.4.0, Wiki version history).
   Internally (PoB-3.9) RoA has skill types `Attack, ProjectileAttack, Area, ProjectileDamage, SkillCanMirageArcher,
-  SkillCanTotem/Trap/Mine, Triggerable` plus the special `Type73`, and stats `base_is_projectile`, `is_area_damage`,
+SkillCanTotem/Trap/Mine, Triggerable` plus the special `Type73`, and stats `base_is_projectile`, `is_area_damage`,
   `skill_can_fire_arrows`, `cannot_pierce`. It does NOT carry the generic `Projectile` skill type that Pierce/Fork/Chain
   require. PoB's own comment on `Type73` reads "Allows LMP/GMP on Rain of Arrows and Toxic Rain" (Data/Global.lua).
 - How it works (GGG-1 and Wiki): the skill fires many arrows into the air that land after a delay and each deals area
@@ -70,11 +70,11 @@ total spread "without impacting damage to individual targets".
 
 Consequence (my arithmetic from the verified numbers; assumes the extra arrows land away from a lone target, as GGG-1 says):
 
-| Case | Total arrow damage | Damage to one boss in the centre |
-|---|---|---|
-| RoA L20 + GMP L20 | 26 x 0.74 / 22 = 0.87x | 0.74x (pure loss) |
-| RoA L1 + GMP L1 | 22 x 0.65 / 18 = 0.79x | 0.65x |
-| RoA L20 + LMP L20 (+2, 6% less) | 24 x 0.94 / 22 = 1.03x | 0.94x |
+| Case                            | Total arrow damage     | Damage to one boss in the centre |
+| ------------------------------- | ---------------------- | -------------------------------- |
+| RoA L20 + GMP L20               | 26 x 0.74 / 22 = 0.87x | 0.74x (pure loss)                |
+| RoA L1 + GMP L1                 | 22 x 0.65 / 18 = 0.79x | 0.65x                            |
+| RoA L20 + LMP L20 (+2, 6% less) | 24 x 0.94 / 22 = 1.03x | 0.94x                            |
 
 So on RoA, GMP is a coverage tool paid for with more cost (165%) and less damage per arrow. The wiki's editorial note says
 the same ("likely unattractive", the extra count is additive to a large default count). The key design fact: the support is
@@ -91,20 +91,20 @@ arrows never collide.
 
 ### 1.4 Per-support compatibility with RoA (PoB-3.9 skill-type lists + Wiki)
 
-| Support | Works on RoA? | Why / what it does | Source |
-|---|---|---|---|
-| Greater Multiple Projectiles (+4) | Yes | `Type73` accepted; +4 arrows, 35..26% less proj. damage; 165% cost | PoB-3.9 |
-| Lesser Multiple Projectiles (+2) | Yes | `Type73`; +2 arrows, 15..6% less; 140% cost | PoB-3.9 |
-| Volley / Greater Volley | No | needs `SkillCanVolley`, RoA does not have it | PoB-3.9 |
-| Fork, Chain, Pierce | No | require `Projectile`/`Type54`/`Type56`; RoA has none; arrows cannot collide | PoB-3.9, Wiki |
-| Faster / Slower Projectiles | Yes | require `Projectile` or `ProjectileDamage`; speed changes landing delay. Wiki (0.9.5g): "made to work with RoA" | PoB-3.9, Wiki |
-| Point Blank (gem) | Yes | needs `ProjectileAttack`; uses use-to-hit distance | PoB-3.9, Wiki |
-| Barrage Support | Listed as allowed | requires (`Type73`) AND (`ProjectileAttack`); real in-game behaviour with RoA not verified | PoB-3.9 only |
-| Arrow Nova | No | requires `SkillCanVolley` and excludes skills with secondary projectiles | PoB-3.9 |
-| Mirage Archer | Yes | RoA has `SkillCanMirageArcher` | PoB-3.9 |
-| Spell Echo / Spell Cascade | No | spells only | PoB-3.9 |
-| Multistrike | No | melee only | PoB-3.9 |
-| Trap / Mine (Blastchain) / Ballista | Yes | RoA has `SkillCanTrap/Mine/Totem`; Ballista needs `Attack` + `SkillCanTotem` | PoB-3.9 |
+| Support                             | Works on RoA?     | Why / what it does                                                                                              | Source        |
+| ----------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------- | ------------- |
+| Greater Multiple Projectiles (+4)   | Yes               | `Type73` accepted; +4 arrows, 35..26% less proj. damage; 165% cost                                              | PoB-3.9       |
+| Lesser Multiple Projectiles (+2)    | Yes               | `Type73`; +2 arrows, 15..6% less; 140% cost                                                                     | PoB-3.9       |
+| Volley / Greater Volley             | No                | needs `SkillCanVolley`, RoA does not have it                                                                    | PoB-3.9       |
+| Fork, Chain, Pierce                 | No                | require `Projectile`/`Type54`/`Type56`; RoA has none; arrows cannot collide                                     | PoB-3.9, Wiki |
+| Faster / Slower Projectiles         | Yes               | require `Projectile` or `ProjectileDamage`; speed changes landing delay. Wiki (0.9.5g): "made to work with RoA" | PoB-3.9, Wiki |
+| Point Blank (gem)                   | Yes               | needs `ProjectileAttack`; uses use-to-hit distance                                                              | PoB-3.9, Wiki |
+| Barrage Support                     | Listed as allowed | requires (`Type73`) AND (`ProjectileAttack`); real in-game behaviour with RoA not verified                      | PoB-3.9 only  |
+| Arrow Nova                          | No                | requires `SkillCanVolley` and excludes skills with secondary projectiles                                        | PoB-3.9       |
+| Mirage Archer                       | Yes               | RoA has `SkillCanMirageArcher`                                                                                  | PoB-3.9       |
+| Spell Echo / Spell Cascade          | No                | spells only                                                                                                     | PoB-3.9       |
+| Multistrike                         | No                | melee only                                                                                                      | PoB-3.9       |
+| Trap / Mine (Blastchain) / Ballista | Yes               | RoA has `SkillCanTrap/Mine/Totem`; Ballista needs `Attack` + `SkillCanTotem`                                    | PoB-3.9       |
 
 Which other skills share `Type73` (accept GMP/LMP though they are not "ordinary projectile" skills): Artillery Ballista,
 Blast Rain, Rain of Arrows, Vaal Rain of Arrows, Toxic Rain (PoB-3.9 data; in current PoB the flag is renamed
@@ -136,17 +136,17 @@ All numbers below are PoB-3.9 unless noted. "L1/L20" are gem levels. Cost multip
 
 ### 2.2 Trap / Mine / Totem multiplication (3.9 values)
 
-| Support | Effect | L1 | L20 | Cost mult | Notes |
-|---|---|---|---|---|---|
-| Multiple Traps | throw 3 traps total (2 extra, in a line); +3 max traps | 50% less dmg | 31% less | 140% | Wiki: 3.9 numbers still apply (3.17 later raised the penalty to 58%..52%) |
-| Cluster Traps | 3 traps thrown at once randomly within 20 units of target; +5 max traps | 55% less | 36% less | 150% | With Multiple Traps: 5 traps in the random spread. 3.17 later: 61..55% less |
-| Swift Assembly | chance to throw +1/+2/+3 extra traps or mines | 9 / 6 / 3 % | 18 / 12 / 6 % | 120% | mean +0.6 trap at L20 (Wiki). Mines take 10% more time per extra mine |
-| Trap and Mine Damage | pure damage: more damage for trap & mine skills | +30% more | +49% more | 130% | -10% (reduced) trap & mine throw speed |
-| Charged Mines | 20->30% chance to gain frenzy/power charge on detonation; +10% mine laying speed per frenzy charge; +25% mine crit chance per power charge | | | 130% | utility |
-| Minefield (PoB only) | +4 mines per throw (5 total); mine laying speed 65%..60% less; +4 max remote mines | | | 120% | not read on the wiki |
-| Blastchain Mine | spell/bow-wand attack is thrown as a mine; mines detonate in a chain 0.25 s apart; each prior mine in the sequence adds 5% more damage; mine lasts 5 s | 35% less | 25% less | 30% | cost multiplier is BELOW 100% (PoB `manaMultiplier = -70`); wiki 3.15 row confirms 30% before 3.15, 50% after, 65% since 3.29 |
-| Multiple Totems | summon 2 totems per cast, +2 max totems | 40% less | 21% less | 150% | Wiki: a single-totem skill gets 2.4x total damage in the best case |
-| Ballista Totem | converts bow/wand attack into a ballista; +2 max ballistas | 50% less dmg | 41% less | 120% | also 50% less attack speed; 3.9.0 rework (Wiki) |
+| Support              | Effect                                                                                                                                                 | L1           | L20           | Cost mult | Notes                                                                                                                         |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------ | ------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Multiple Traps       | throw 3 traps total (2 extra, in a line); +3 max traps                                                                                                 | 50% less dmg | 31% less      | 140%      | Wiki: 3.9 numbers still apply (3.17 later raised the penalty to 58%..52%)                                                     |
+| Cluster Traps        | 3 traps thrown at once randomly within 20 units of target; +5 max traps                                                                                | 55% less     | 36% less      | 150%      | With Multiple Traps: 5 traps in the random spread. 3.17 later: 61..55% less                                                   |
+| Swift Assembly       | chance to throw +1/+2/+3 extra traps or mines                                                                                                          | 9 / 6 / 3 %  | 18 / 12 / 6 % | 120%      | mean +0.6 trap at L20 (Wiki). Mines take 10% more time per extra mine                                                         |
+| Trap and Mine Damage | pure damage: more damage for trap & mine skills                                                                                                        | +30% more    | +49% more     | 130%      | -10% (reduced) trap & mine throw speed                                                                                        |
+| Charged Mines        | 20->30% chance to gain frenzy/power charge on detonation; +10% mine laying speed per frenzy charge; +25% mine crit chance per power charge             |              |               | 130%      | utility                                                                                                                       |
+| Minefield (PoB only) | +4 mines per throw (5 total); mine laying speed 65%..60% less; +4 max remote mines                                                                     |              |               | 120%      | not read on the wiki                                                                                                          |
+| Blastchain Mine      | spell/bow-wand attack is thrown as a mine; mines detonate in a chain 0.25 s apart; each prior mine in the sequence adds 5% more damage; mine lasts 5 s | 35% less     | 25% less      | 30%       | cost multiplier is BELOW 100% (PoB `manaMultiplier = -70`); wiki 3.15 row confirms 30% before 3.15, 50% after, 65% since 3.29 |
+| Multiple Totems      | summon 2 totems per cast, +2 max totems                                                                                                                | 40% less     | 21% less      | 150%      | Wiki: a single-totem skill gets 2.4x total damage in the best case                                                            |
+| Ballista Totem       | converts bow/wand attack into a ballista; +2 max ballistas                                                                                             | 50% less dmg | 41% less      | 120%      | also 50% less attack speed; 3.9.0 rework (Wiki)                                                                               |
 
 Totals if all copies hit one target (my arithmetic): Multiple Traps L20 3 x 0.69 = 2.07x; Cluster L20 3 x 0.64 = 1.92x; both
 (5 traps) 5 x 0.69 x 0.64 = 2.2x; Multiple Totems L20 2 x 0.79 = 1.58x. At L1: Multiple Traps 1.5x, Cluster 1.35x, Multiple
@@ -155,13 +155,13 @@ Swift Assembly mimics the Cluster pattern; i.e. the placement geometry is part o
 
 ### 2.3 Repeats
 
-| Support | Applies to | Effect (3.9) | Cost | Notes |
-|---|---|---|---|---|
-| Spell Echo | non-instant, non-triggered, non-totem/trap/mine, non-reserving, non-Vaal spells (`SpellCanRepeat`) | repeats once (2 casts total); +51% (L1) to +70% (L20) more cast speed; 10% less damage | 140% | A repeat is part of the original cast: no extra cost, no extra cooldown, same crit roll, no new "on cast" triggers (Wiki, citing Mark_GGG). The tooltip does not show repeats: total time is 2x. |
-| Greater Spell Echo | (3.28+ gem; 3.9 only via a unique) | repeats twice; more cast speed; increased AoE and more spell damage per repeat | n/a in 3.9 | Not a 3.9 gem. |
-| Awakened Spell Echo | | 1 repeat; +71..84% cast speed; 15% less damage; 15..29% chance for double damage on final repeat | 140% | Level req 72 |
-| Multistrike | melee attacks (`AttackCanRepeat`, not Vaal) | repeats twice; repeat targets a random nearby enemy; +35..44% more melee attack speed; 20..10% less damage; PoB-3.9 game-data export: first repeat 22% more, second 44% more, flat at L1 and L20 (use these as the 3.9 numbers) | 160% | The wiki's 3.7.0 row claims 40..50% and 80..99% scaling with level; it is the outlier versus the data export and probably superseded by a later change that the version table does not list. Time between uses is 3x attack time. |
-| Mirage Archer | bow attacks (not totem/trap/mine/minion/Vaal) | when you hit with the skill, a Mirage Archer is summoned above you for 4 s and uses the skill; 40..31% less damage and 60% less attack speed | 140% | L20 yields 27.6% extra DPS (Wiki: 0.69 x 0.40). Targeting range lowered to 70 units in 3.9.0. |
+| Support             | Applies to                                                                                         | Effect (3.9)                                                                                                                                                                                                                    | Cost       | Notes                                                                                                                                                                                                                             |
+| ------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Spell Echo          | non-instant, non-triggered, non-totem/trap/mine, non-reserving, non-Vaal spells (`SpellCanRepeat`) | repeats once (2 casts total); +51% (L1) to +70% (L20) more cast speed; 10% less damage                                                                                                                                          | 140%       | A repeat is part of the original cast: no extra cost, no extra cooldown, same crit roll, no new "on cast" triggers (Wiki, citing Mark_GGG). The tooltip does not show repeats: total time is 2x.                                  |
+| Greater Spell Echo  | (3.28+ gem; 3.9 only via a unique)                                                                 | repeats twice; more cast speed; increased AoE and more spell damage per repeat                                                                                                                                                  | n/a in 3.9 | Not a 3.9 gem.                                                                                                                                                                                                                    |
+| Awakened Spell Echo |                                                                                                    | 1 repeat; +71..84% cast speed; 15% less damage; 15..29% chance for double damage on final repeat                                                                                                                                | 140%       | Level req 72                                                                                                                                                                                                                      |
+| Multistrike         | melee attacks (`AttackCanRepeat`, not Vaal)                                                        | repeats twice; repeat targets a random nearby enemy; +35..44% more melee attack speed; 20..10% less damage; PoB-3.9 game-data export: first repeat 22% more, second 44% more, flat at L1 and L20 (use these as the 3.9 numbers) | 160%       | The wiki's 3.7.0 row claims 40..50% and 80..99% scaling with level; it is the outlier versus the data export and probably superseded by a later change that the version table does not list. Time between uses is 3x attack time. |
+| Mirage Archer       | bow attacks (not totem/trap/mine/minion/Vaal)                                                      | when you hit with the skill, a Mirage Archer is summoned above you for 4 s and uses the skill; 40..31% less damage and 60% less attack speed                                                                                    | 140%       | L20 yields 27.6% extra DPS (Wiki: 0.69 x 0.40). Targeting range lowered to 70 units in 3.9.0.                                                                                                                                     |
 
 ### 2.4 Spell Cascade (also section 3)
 
@@ -260,6 +260,7 @@ reoccurrence with cast time penalty), Trauma (stacking risk/reward: more added d
 (changes aim into a landing nova).
 
 What makes them interesting (verified patterns, interpreted):
+
 - A real trade-off, not a flat penalty: Barrage costs attack time per projectile; Multiple Totems and traps cost damage per copy;
   Multistrike/Echo trade damage for speed; Unleash penalises cast time; Trauma hurts you; Slower Projectiles trades speed for damage.
 - Positional / geometric identity: Volley fires parallel lines from points beside you; GMP fans out; Fork spreads at 60 degrees; Cluster
@@ -277,25 +278,25 @@ What makes them interesting (verified patterns, interpreted):
 All "less/more" are multiplicative (PoB: `Damage MORE`). Cost multiplier is as of 3.9 (PoB-3.9, confirmed by wiki 3.15
 rows). Level requirement in parentheses.
 
-| Support (req lv) | Projectiles | Damage multiplier | Other | Cost |
-|---|---|---|---|---|
-| Lesser Multiple Projectiles (8) | +2, fan | 15% less -> 6% less projectile dmg | spread arc controlled by cursor | 140% |
-| Greater Multiple Projectiles (38) | +4, fan, wider minimum spread | 35% less -> 26% less | mutually exclusive with LMP | 165% |
-| Awakened GMP (72) | +5 | 30% less -> 18% less (L1..L20) | +250% terrain attachment chance reduction (technical) | 165% |
-| Volley (4) | +2 via side points (max 2 points per side, projectiles divided among them), parallel (80 units apart) | 12% less -> 3% less | needs `SkillCanVolley`; excludes secondary projectiles | 140% |
-| Greater Volley (38) | +4 via side points (max 4 points per side, so 2 per side at +4) | 30% less -> 21% less | as above; lower multiplier than GMP "given the shape" (GGG-2) | 165% (wiki 3.15 row: 165% before 3.15) |
-| Fork (31) | projectiles fork once on first hit (not pierced) into two | 10% less (L1) -> 9% more (L20) | | 130% |
-| Awakened Fork (72) | fork twice | 0% -> 24% more | | 130% |
-| Chain (38) | +2 chains | 30% less -> 11% less (hits only) | works on non-projectile chain skills too (Arc) | 150% |
-| Awakened Chain (72) | +3 chains | 19% less -> 5% more | | 150% |
-| Pierce (1) | +2 pierces (L1) -> +4 (L20) | 0% -> 19% more projectile damage | | 110% |
-| Faster Projectiles (31) | none | +50 -> 69% projectile speed; +20 -> 29% increased projectile damage | excludes `Type51` skills | 110% |
-| Slower Projectiles (31) | none | 30 -> 49% less speed; 20 -> 29% more projectile damage | traded for hit count on slow-moving AoE (Ball Lightning) | 140% |
-| Point Blank (gem, 18) | none | 0 -> 38% increased projectile damage; keystone behaviour: up to 30% more damage at start of the flight, falls off with distance (3.9.0, from 50%) | `ProjectileAttack` only | 120% |
-| Barrage Support (38) | +3, sequential | 68% less -> 62% less; +5% attack time per projectile | bow & wand only, cannot support triggered/channelled | 150% |
-| Arrow Nova (8) | +4 as a nova on landing | 40% less -> 26% less | bow arrows only; cannot support skills that already fire arrows into the air | 140% |
-| Spell Cascade (4) | +2 areas (front, back) | AoE 25 -> 16% less; damage 40 -> 21% less | | 140% |
-| Spell Echo (38) | +1 repeat | 10% less; +51 -> 70% more cast speed | | 140% |
+| Support (req lv)                  | Projectiles                                                                                           | Damage multiplier                                                                                                                                 | Other                                                                        | Cost                                   |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------------------- |
+| Lesser Multiple Projectiles (8)   | +2, fan                                                                                               | 15% less -> 6% less projectile dmg                                                                                                                | spread arc controlled by cursor                                              | 140%                                   |
+| Greater Multiple Projectiles (38) | +4, fan, wider minimum spread                                                                         | 35% less -> 26% less                                                                                                                              | mutually exclusive with LMP                                                  | 165%                                   |
+| Awakened GMP (72)                 | +5                                                                                                    | 30% less -> 18% less (L1..L20)                                                                                                                    | +250% terrain attachment chance reduction (technical)                        | 165%                                   |
+| Volley (4)                        | +2 via side points (max 2 points per side, projectiles divided among them), parallel (80 units apart) | 12% less -> 3% less                                                                                                                               | needs `SkillCanVolley`; excludes secondary projectiles                       | 140%                                   |
+| Greater Volley (38)               | +4 via side points (max 4 points per side, so 2 per side at +4)                                       | 30% less -> 21% less                                                                                                                              | as above; lower multiplier than GMP "given the shape" (GGG-2)                | 165% (wiki 3.15 row: 165% before 3.15) |
+| Fork (31)                         | projectiles fork once on first hit (not pierced) into two                                             | 10% less (L1) -> 9% more (L20)                                                                                                                    |                                                                              | 130%                                   |
+| Awakened Fork (72)                | fork twice                                                                                            | 0% -> 24% more                                                                                                                                    |                                                                              | 130%                                   |
+| Chain (38)                        | +2 chains                                                                                             | 30% less -> 11% less (hits only)                                                                                                                  | works on non-projectile chain skills too (Arc)                               | 150%                                   |
+| Awakened Chain (72)               | +3 chains                                                                                             | 19% less -> 5% more                                                                                                                               |                                                                              | 150%                                   |
+| Pierce (1)                        | +2 pierces (L1) -> +4 (L20)                                                                           | 0% -> 19% more projectile damage                                                                                                                  |                                                                              | 110%                                   |
+| Faster Projectiles (31)           | none                                                                                                  | +50 -> 69% projectile speed; +20 -> 29% increased projectile damage                                                                               | excludes `Type51` skills                                                     | 110%                                   |
+| Slower Projectiles (31)           | none                                                                                                  | 30 -> 49% less speed; 20 -> 29% more projectile damage                                                                                            | traded for hit count on slow-moving AoE (Ball Lightning)                     | 140%                                   |
+| Point Blank (gem, 18)             | none                                                                                                  | 0 -> 38% increased projectile damage; keystone behaviour: up to 30% more damage at start of the flight, falls off with distance (3.9.0, from 50%) | `ProjectileAttack` only                                                      | 120%                                   |
+| Barrage Support (38)              | +3, sequential                                                                                        | 68% less -> 62% less; +5% attack time per projectile                                                                                              | bow & wand only, cannot support triggered/channelled                         | 150%                                   |
+| Arrow Nova (8)                    | +4 as a nova on landing                                                                               | 40% less -> 26% less                                                                                                                              | bow arrows only; cannot support skills that already fire arrows into the air | 140%                                   |
+| Spell Cascade (4)                 | +2 areas (front, back)                                                                                | AoE 25 -> 16% less; damage 40 -> 21% less                                                                                                         |                                                                              | 140%                                   |
+| Spell Echo (38)                   | +1 repeat                                                                                             | 10% less; +51 -> 70% more cast speed                                                                                                              |                                                                              | 140%                                   |
 
 Versions that changed since 3.9 (so the player-visible values you read on the wiki today differ): GMP cost 165% -> 160% (3.15) -> 150%
 (3.15.0d); GMP/LMP quality changed to projectile damage (3.15); LMP renamed Multiple Projectiles (3.28); Greater supports became
@@ -313,6 +314,7 @@ GMP 35..26, Greater Volley 30..21.
 ## 6. Verified vs. unverified
 
 Verified (read directly in a primary source at the time of research):
+
 - RoA fires many arrows, half random / half ring-targeted, additional arrows widen the spread and do not raise damage to one
   target (GGG-1 forum thread + wiki).
 - RoA 18 arrows (L1) / 22 arrows (L20) on the current wiki; 17..21 "additional arrows" in PoB-3.9 data; damage 48..60% in 3.9
@@ -328,6 +330,7 @@ Verified (read directly in a primary source at the time of research):
 - GGG design statements in GGG-1, GGG-2, GGG-3 (paraphrased above).
 
 Unverified or inferred:
+
 - Spell Cascade delay between cascades and exact positional offsets (no source gave a number).
 - The exact 3.9 RoA arrow counts (derived from the current wiki and PoB additional-arrow stats, not a 3.9 page).
 - How exactly the arrow rings place the extra arrows relative to a single boss (GGG-1 says extra arrows go to outer rings).
