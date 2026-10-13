@@ -96,8 +96,12 @@
   .mr-table {
     font-size: 13px;
   }
-  .mr-barcell {
-    min-width: 56px;
+  /* Phones: the bars, hit counts and misses go, so the table fits (the numbers that matter stay), and names may wrap. */
+  .mr-opt {
+    display: none;
+  }
+  .mr-name {
+    white-space: normal;
   }
   .mr-table th,
   .mr-table td {

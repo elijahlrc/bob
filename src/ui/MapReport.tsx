@@ -82,14 +82,16 @@ function Dealt({ r }: { r: MapReport }) {
           <thead>
             <tr>
               <th>Source</th>
-              <th />
+              <th class="mr-opt" />
               <th>Damage</th>
               <th>Share</th>
               <th title="Average damage a second over the whole map">Per second</th>
-              <th>Hits</th>
+              <th class="mr-opt">Hits</th>
               <th>Crit</th>
               <th title="The biggest single hit">Biggest</th>
-              <th title="Attacks that missed or were turned aside">Missed</th>
+              <th class="mr-opt" title="Attacks that missed or were turned aside">
+                Missed
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -99,16 +101,16 @@ function Dealt({ r }: { r: MapReport }) {
               return (
                 <tr key={`${x.kind}${x.name}`}>
                   <Name r={x} />
-                  <td class="mr-barcell">
+                  <td class="mr-barcell mr-opt">
                     <TypeBar dmg={x.dmg} scale={top > 0 ? t / top : 0} />
                   </td>
                   <td class="num">{f0(t)}</td>
                   <td class="num">{pct((t / all) * 100)}</td>
                   <td class="num">{r.time > 0 ? f0(t / r.time) : '–'}</td>
-                  <td class="num">{x.hits > 0 ? f0(x.hits) : '–'}</td>
+                  <td class="num mr-opt">{x.hits > 0 ? f0(x.hits) : '–'}</td>
                   <td class="num">{x.hits > 0 ? pct((x.crits / x.hits) * 100) : '–'}</td>
                   <td class="num">{x.max > 0 ? f0(x.max) : '–'}</td>
-                  <td class="num">{x.misses > 0 ? pct((x.misses / tries) * 100) : '–'}</td>
+                  <td class="num mr-opt">{x.misses > 0 ? pct((x.misses / tries) * 100) : '–'}</td>
                 </tr>
               );
             })}
@@ -157,10 +159,10 @@ function Taken({ r }: { r: MapReport }) {
             <thead>
               <tr>
                 <th>Source</th>
-                <th />
+                <th class="mr-opt" />
                 <th>Damage</th>
                 <th>Share</th>
-                <th>Hits</th>
+                <th class="mr-opt">Hits</th>
                 <th title="The biggest single hit">Biggest</th>
               </tr>
             </thead>
@@ -170,12 +172,12 @@ function Taken({ r }: { r: MapReport }) {
                 return (
                   <tr key={`${x.kind}${x.name}`}>
                     <Name r={x} />
-                    <td class="mr-barcell">
+                    <td class="mr-barcell mr-opt">
                       <TypeBar dmg={x.dmg} scale={top > 0 ? t / top : 0} />
                     </td>
                     <td class="num">{f0(t)}</td>
                     <td class="num">{pct((t / all) * 100)}</td>
-                    <td class="num">{x.hits > 0 ? f0(x.hits) : '–'}</td>
+                    <td class="num mr-opt">{x.hits > 0 ? f0(x.hits) : '–'}</td>
                     <td class="num">{x.max > 0 ? f0(x.max) : '–'}</td>
                   </tr>
                 );
