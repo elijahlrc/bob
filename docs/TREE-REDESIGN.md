@@ -735,9 +735,9 @@ onto others; it has undo, a search, and a Check button (every class can reach ev
 Save (Ctrl+S) writes `src/data/tree/treeEdits.json`, a patch against the baked tree (`edits.ts`: moves, kinds, names, stats, added and removed
 nodes, links); `getTree()` applies it, and packs the ids so `tree.nodes[id]` stays the node. Nodes touched by hand are ringed orange.
 
-- The patch lives beside the bake: `npm run tree:bake` still writes the generated layout and the freshness test still compares that.
-  A rebake after hand edits renumbers nodes, so the patch (which names nodes by baked id) would land on the wrong ones: bake first, edit after,
-  or empty the patch (Revert all, Save) before a bake.
+- `npm run tree:edit` first checks that the baked tree is a fresh layout and rebakes it if not, then starts the dev server on the first free
+  port from 5173. If hand edits are saved and the bake is stale it does not rebake (that renumbers nodes, and the patch names nodes by baked id):
+  it opens the editor on the current bake and says how to take the new layout (empty treeEdits.json, run again).
 - Removing a node shifts the ids after it, so characters saved with passives on later nodes get other nodes: the same as after a bake.
 - A node made a keystone has no keystone effect (those belong to the keystone names); the editor edits placement, type and links, not stat values.
 - `npm run tree:pic`, `tree:audit` and the other tools still read the generated layout, not the edits.
