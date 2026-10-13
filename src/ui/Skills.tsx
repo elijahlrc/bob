@@ -126,6 +126,9 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
           onMouseMove: (e: MouseEvent) => setTip({ gemId, level, x: e.clientX, y: e.clientY }),
           onMouseLeave: () => setTip(null),
         };
+  // Socketing and unsocketing edit the inventory array in place, so its identity says nothing about what is in it: key the list
+  // on the gems it holds instead.
+  const gemKey = run.inventory.flatMap((x) => (x.kind === 'gem' ? [x.uid] : [])).join(',');
   const gems = useMemo(
     () =>
       run.inventory
@@ -136,7 +139,7 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
           const db = gemDef(b.gemId);
           return order[da.kind] - order[db.kind] || da.name.localeCompare(db.name);
         }),
-    [run.inventory],
+    [gemKey],
   );
   const needle = q.trim().toLowerCase();
   const shownGems = needle
@@ -156,7 +159,7 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
     if (placing !== null)
       for (const p of placementsFor(run, placing)) m.set(`${p.slot}:${p.socket}`, p);
     return m;
-  }, [placing, run.build, run.inventory]);
+  }, [placing, run.build, gemKey]);
   // Best placement per inventory gem, for the list badges.
   const best = useMemo(() => {
     const m = new Map<number, Placement | null>();
