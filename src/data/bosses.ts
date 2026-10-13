@@ -249,7 +249,7 @@ export const ECHO_EVERY = 6;
 export const TOLL_EVERY = 10;
 export const TOLL_TELL = 2;
 /** What each toll adds, for good: damage, speed, and a ring to the next toll's waves. */
-export const TOLL_DAMAGE = 0.1;
+export const TOLL_DAMAGE = 0.25;
 export const TOLL_SPEED = 0.06;
 export const TOLL_RINGS = 3;
 /** The toll's rings: the first's radius, the gap between rings, how wide each is, and the time between them. */
@@ -258,7 +258,7 @@ export const TOLL_RING_STEP = 2.2;
 export const TOLL_RING_WIDTH = 1.1;
 export const TOLL_RING_DELAY = 0.45;
 /** A toll's ring hits for this many of its blows, and shocks. */
-export const TOLL_RING_MULT = 0.9;
+export const TOLL_RING_MULT = 1.2;
 export const TOLL_SHOCK = 0.2;
 
 // The Courser (section 5).
