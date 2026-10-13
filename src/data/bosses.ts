@@ -246,9 +246,12 @@ export const GRIEF_DAMAGE = 0.25;
 export const ECHO_EVERY = 6;
 
 // The Tollkeeper (section 4).
-export const TOLL_EVERY = 10;
+export const TOLL_EVERY = 12;
 export const TOLL_TELL = 2;
-/** What each toll adds, for good: damage, speed, and a ring to the next toll's waves. */
+/** Its damage before the first toll (a multiple of the usual), then what each toll adds, for good: damage, speed, and a ring to the next toll's waves. */
+export const TOLL_START = 0.5;
+/** Its flail (the melee between tolls) hits for this much of what its stacks say; the toll's rings are not cut. */
+export const TOLL_FLAIL = 0.5;
 export const TOLL_DAMAGE = 0.25;
 export const TOLL_SPEED = 0.06;
 export const TOLL_RINGS = 3;

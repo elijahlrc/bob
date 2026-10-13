@@ -29,6 +29,8 @@ import {
   ROUTED_TAKEN,
   TOLL_DAMAGE,
   TOLL_EVERY,
+  TOLL_FLAIL,
+  TOLL_START,
   TOLL_TELL,
   VEIL_CYCLE,
   VEIL_SECONDS,
@@ -46,6 +48,7 @@ import { typeShares } from '../gen/population';
 import { makeGem, makeItem } from '../gen/items';
 import { newRun } from '../run/run';
 import {
+  bossBlowMult,
   bossDamageMult,
   bossSpeedMult,
   bossState,
@@ -141,21 +144,28 @@ describe('the boss maps (docs/BOSSES.md 12)', () => {
 });
 
 describe('the Tollkeeper (docs/BOSSES.md 4)', () => {
-  it('tolls every ten seconds, with rings that shock, and grows stronger with each', () => {
+  it('tolls on its clock, with rings that shock, and grows stronger with each', () => {
     const w = bossArena(12);
     // Held still, so its blows do not stun the bell (that is the other test).
     w.player.stunT = 1e9;
     const m = putBoss(w, 'tollkeeper', 5, 0, 10);
-    run(w, TOLL_EVERY + TOLL_TELL + 0.5);
+    run(w, TOLL_EVERY + TOLL_TELL + 2);
     const st = bossState(m)!;
     expect(st.tolls).toBe(1);
-    expect(bossDamageMult(m)).toBeCloseTo(1 + TOLL_DAMAGE);
+    expect(bossDamageMult(m)).toBeCloseTo(TOLL_START + TOLL_DAMAGE);
     expect(w.effects.some((e) => e.label === 'Toll' && e.shape === 'donut')).toBe(true);
     // The next comes ten seconds of its clock later, and the swing takes its own time (a blow in hand finishes first).
     let n = 0;
     for (; n < 60 * (TOLL_EVERY + TOLL_TELL + 2) && st.tolls < 2; n++) stepWorld(w);
     expect(st.tolls).toBe(2);
     expect(n / 60).toBeGreaterThan(TOLL_EVERY + TOLL_TELL - 1);
+  });
+
+  it('its flail is cut, but the tolls own damage is not', () => {
+    const w = bossArena(12);
+    const m = putBoss(w, 'tollkeeper', 5, 0, 10);
+    expect(bossBlowMult(m)).toBe(TOLL_FLAIL);
+    expect(bossDamageMult(m)).toBeCloseTo(TOLL_START);
   });
 
   it('a stun in the swing cancels the toll', () => {

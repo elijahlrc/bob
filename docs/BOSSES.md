@@ -135,16 +135,17 @@ floor, and the toll count burns on the bell.
 
 **The fight.**
 
-- **Tolls.** Every **10 s** the bell swings back (a 2 s tell: the bell rises, a ring of runes fills on the floor), then
+- **Tolls.** Every **12 s** the bell swings back (a 2 s tell: the bell rises, a ring of runes fills on the floor), then
   tolls: **Toll waves**, the existing pattern, as expanding lightning rings with gaps, cast as a spell. Each toll also
   **shocks** whatever it hits.
-- **Each toll adds a stack, for good:** +10% damage, +6% attack speed, and one more ring in the next toll's waves. The
-  first few tolls are easy to step through; by the sixth the rings are close together and the swings come fast.
-- **Between tolls** it swings a heavy flail: light physical melee.
+- **It starts weak, and each toll adds a stack, for good.** It opens at **half** its usual damage; each toll adds +25% of the usual damage, +6% attack speed, and one more ring in the next toll's waves. The
+  first few tolls are easy to step through; by the sixth the rings are close together and the swings come fast. (Until 2026-10-13
+  it opened at full damage with a toll every 10 s; the bots died to it on map 10 in 35 of 60 runs.)
+- **Between tolls** it swings a heavy flail: light physical melee, at half the damage its stacks give it (the rings are not cut).
 - **Three answers to the clock:**
-  - **Damage:** kill it before the stacks matter. The median build at the curve should need four or five tolls (40 to
-    50 s).
-  - **Stun:** a stun during the 2 s tell **cancels that toll** and restarts the 10 s clock. A stunned bell rings flat
+  - **Damage:** kill it before the stacks matter. The median build at the curve should need four or five tolls (48 to
+    60 s).
+  - **Stun:** a stun during the 2 s tell **cancels that toll** and restarts the 12 s clock. A stunned bell rings flat
     (a dull grey ring, no stack). For this to be a real answer, its stun threshold is 1.5× a normal monster's, not the
     4× that bosses get today.
   - **Chill and freeze:** the toll clock runs at the boss's action speed, so chill slows it and freeze stops it.
@@ -170,7 +171,7 @@ floor, and the toll count burns on the bell.
 | Minions, totems                                    | Neutral. Toll waves hit minions too, but minions are cheap to resummon.                                                                                  |
 
 **Veto check.** No build is shut out: the clock is soft (stacks, not a death timer), so a slow build fights a harder boss
-but not an impossible one. At the sixth toll the boss deals 1.6× damage at 1.36× speed, which a map-10 character on the
+but not an impossible one. At the sixth toll the boss deals 2.0× damage at 1.36× speed, which a map-10 character on the
 curve survives for a while with flasks. The 2× ceiling holds, with the physical flurry at 1.6× its worst.
 
 ---

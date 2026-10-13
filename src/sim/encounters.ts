@@ -18,6 +18,7 @@ import { startCharge } from './abilities';
 import { blinkBehind, openZone } from './factions';
 import { monsterConds, monsterHitOf, rawHit } from './combat';
 import {
+  bossBlowMult,
   bossDamageMult,
   bossDeath,
   bossNoteTaken,
@@ -456,7 +457,7 @@ export function noteDevoured(w: World, m: Actor): void {
 export function encDamageMult(m: Actor): number {
   const e = m.enc;
   if (!e) return 1;
-  const boss = m.rarity === 'boss' ? bossDamageMult(m) : 1;
+  const boss = m.rarity === 'boss' ? bossDamageMult(m) * bossBlowMult(m) : 1;
   if (e.molten === 0) return boss;
   return boss * (1 + e.molten * (modeOf(m.mon!.spec.type, 'molten')?.step ?? 0.12));
 }

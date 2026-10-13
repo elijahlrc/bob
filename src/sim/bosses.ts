@@ -63,6 +63,7 @@ import {
   THEFT_ORDER,
   TOLL_DAMAGE,
   TOLL_EVERY,
+  TOLL_FLAIL,
   TOLL_RINGS,
   TOLL_RING_DELAY,
   TOLL_RING_MULT,
@@ -71,6 +72,7 @@ import {
   TOLL_RING_WIDTH,
   TOLL_SHOCK,
   TOLL_SPEED,
+  TOLL_START,
   TOLL_TELL,
   VEIL_CYCLE,
   VEIL_SECONDS,
@@ -370,9 +372,13 @@ export function bossAI(w: World, m: Actor, dt: number): boolean {
 /** A boss's damage and pace (from `encDamageMult` and `encMoveMult`): the toll's stacks. */
 export function bossDamageMult(m: Actor): number {
   const st = states.get(m);
-  if (st?.id === 'tollkeeper') return 1 + TOLL_DAMAGE * st.tolls;
+  if (st?.id === 'tollkeeper') return TOLL_START + TOLL_DAMAGE * st.tolls;
   if (st?.id === 'twins' && st.grief) return 1 + GRIEF_DAMAGE;
   return 1;
+}
+/** What a boss's own melee blows are cut or raised by, apart from its spells and ground effects (the Tollkeeper's flail). */
+export function bossBlowMult(m: Actor): number {
+  return states.get(m)?.id === 'tollkeeper' ? TOLL_FLAIL : 1;
 }
 export function bossSpeedMult(m: Actor): number {
   const st = states.get(m);
