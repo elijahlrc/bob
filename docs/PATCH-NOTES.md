@@ -21,6 +21,7 @@ change, and our own names only. Dash bullets under plain headings.
 - Quarry is always set in a Cavern, Holdout in a Hollow, Collapse in Ruins and Crawl in a Warren.
 - The new biomes are still being balance-tested. For now Caverns and Marshes are harder than the others and the Hollow and the Warren a little easier, so runs are somewhat harder overall.
 - The Tollkeeper grows much deadlier as the fight goes on: each toll now raises its damage by a quarter (was a tenth), and its rings hit a third harder at the first toll and about two thirds harder by the third.
+- The Tollkeeper starts the fight much weaker: it opens at half damage, rings included, and climbs back to its old strength over its first two tolls. It tolls every 12 seconds instead of 10, and its flail between tolls is halved again, so its melee starts at a quarter of what it was.
 
 ## 2026-10-12
 
@@ -89,6 +90,8 @@ grow in steps.
 
 ### Monsters and combat
 
+- Rare monsters have more than two and a half times the life they had and mini-bosses about four and a half times, so they take much longer to bring down.
+- Deeper maps hold more magic and rare monsters: by map 60 about one pack in five is a rare pack, up from one in twelve, and magic packs and the monsters around a rare gain one more magic monster every 25 maps.
 - Many monsters now have a second attack. Ranged and ground attacks are used while the character is out of melee reach, or on a
   timer: thrown bone spears, lobs of bile, boulders, slowing chains, rings of spores. The Slinger's stones slow the character.
 - New telegraphed blast patterns: March, Mortar, Cross, Toll waves, Closing ring, Keening and Twin hooks. Each blast shows its
