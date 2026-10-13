@@ -8,6 +8,7 @@ import { TYPE_BLURBS } from '../data/monsterInfo';
 import { themeDef } from '../data/themes';
 import { themeInfo } from '../run/themeInfo';
 import type { MapTypeId } from '../data/mapTypes';
+import { MapReportView } from './MapReport';
 
 const f0 = (v: number) => Math.round(v).toLocaleString();
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -111,6 +112,7 @@ export function Summary({ c }: { c: Controller }) {
         <p class="muted">Difficulty: {difficultyText(run.difficulty)}</p>
       )}
       {!won && run.lastRecap && <Recap r={run.lastRecap} />}
+      {c.lastResult?.report && <MapReportView r={c.lastResult.report} title="The last map" />}
       <button class="btn primary" onClick={() => c.quit()}>
         Back to title
       </button>

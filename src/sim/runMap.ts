@@ -3,6 +3,7 @@ import type { MapTypeId } from '../data/mapTypes';
 import type { AnyItem, Build } from '../data/types';
 import type { MapPlan } from '../gen/mapPlan';
 import type { FlaskPolicy } from './flaskPolicy';
+import { buildReport, type MapReport } from './ledger';
 import { buildRecap } from './recap';
 import type { DeathRecap, MapStatus, Vitals, World, WorldOpts } from './types';
 import { vitalsOf } from './vitals';
@@ -30,6 +31,8 @@ export type MapResult = {
   vitals: Vitals;
   /** Why the player died, when they did (EXPANSION section 9). */
   recap?: DeathRecap;
+  /** What was dealt and taken on the map, by source and damage type (the map report screen). */
+  report?: MapReport;
 };
 
 export function hashEvents(h: Hasher, w: World): void {
@@ -77,5 +80,6 @@ export function worldResult(w: World, eventHash = 0): MapResult {
     lifeFrac: w.player.life / Math.max(1, w.player.def.maxLife),
     vitals: vitalsOf(w),
     ...(w.status === 'dead' ? { recap: buildRecap(w) } : {}),
+    report: buildReport(w),
   };
 }

@@ -6,6 +6,7 @@ change, and our own names only. Dash bullets under plain headings.
 
 ## 2026-10-13
 
+- New Last map tab in camp, and the same report on the death screen: for the map just played, the damage each skill, minion and ailment dealt by type, and what hurt you, by source and type.
 - Enemies with energy shield now show it on their health bar, a blue strip above the life that drains first. The enemy card shows it too.
 - Drain Trap now draws its beams, a glowing line from each enemy it holds to you with a red and a blue mote running along it for the life and mana it gives.
 - Skills that leave something standing are now drawn: the blades of Orbiting Blades, the Tempest Mote orb, Skyfall's markers, Fuse Arrow's arrows, Blight Hail's pods, the Twin Shadow archer, Cinder Blow's charges and Slag Carapace's shell.

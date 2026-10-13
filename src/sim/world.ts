@@ -46,6 +46,7 @@ import { rebuildCharacter, seedCharacters, tickCharges } from './charges';
 import { tickTriggers } from './triggers';
 import { Grid } from './grid';
 import { newActor } from './actor';
+import { newLedger } from './ledger';
 import { tickAbandon } from './abandon';
 import { tickCollapse } from './collapse';
 import { tickHoldout } from './holdout';
@@ -293,6 +294,7 @@ export function createWorld(inp: CreateWorldInput): World {
     },
     picked: [],
     dmgLog: [],
+    ledger: newLedger(),
   };
   player.def = char.defence();
   // The player starts with what the last map left (full on a new run), as fractions of the maximum.

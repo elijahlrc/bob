@@ -176,7 +176,7 @@ export function tickDegen(w: World, dt: number): void {
     }
     // Physical damage over time: physical damage reduction answers to it, armour does not.
     const share = (u.degen / 100) * dt * (1 - p.def.physReduction);
-    applyDamage(w, p, [share * p.def.maxLife, 0, 0, 0, 0]);
+    applyDamage(w, p, [share * p.def.maxLife, 0, 0, 0, 0], { name: c.skill.name, kind: 'effect' });
     p.es = Math.max(0, p.es - (u.degen / 100) * p.def.maxEs * dt);
   }
 }

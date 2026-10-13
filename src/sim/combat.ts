@@ -7,6 +7,15 @@ import {
   type TargetState,
 } from '../calc/combat';
 import { reservedMana } from './reserve';
+import {
+  dotSources,
+  monsterSrc,
+  noteDamage,
+  noteHit,
+  noteMiss,
+  notePools,
+  type DmgSrc,
+} from './ledger';
 import { levelPenalty } from '../calc/formulas';
 import { levelValue } from '../calc/gems';
 import { abilitiesOf } from '../data/abilities';
@@ -69,6 +78,7 @@ import {
   decaySkillDots,
   spreadSkillDots,
   sumSkillDots,
+  type SkillDot,
 } from './skillDots';
 import { corpseBlast, fireTriggers } from './triggers';
 import { scaleProfile } from './shots';
@@ -237,7 +247,7 @@ export function targetState(a: Actor): TargetState {
 /**
  * Route damage per type into ES / mana / life (§6.3). Chaos bypasses ES. Returns total dealt.
  */
-export function applyDamage(w: World, dst: Actor, dmg: number[]): number {
+export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): number {
   if (!dst.alive || dst.phaseT > 0 || dst.burrowT > 0) return 0;
   // A veiled monster that is hit is seen for a moment.
   if (!dst.isPlayer && dst.revealT < 1) dst.revealT = 1;
@@ -266,6 +276,7 @@ export function applyDamage(w: World, dst: Actor, dmg: number[]): number {
       if (total <= 0) return 0;
     }
   }
+  noteDamage(w, dst, dmg, src);
   const def = dst.def;
   let rest = total - dmg[CHAOS];
   let chaos = dmg[CHAOS];
@@ -276,17 +287,22 @@ export function applyDamage(w: World, dst: Actor, dmg: number[]): number {
     chaos = 0;
   }
   // ES absorbs non-chaos damage first (unless it protects mana instead).
+  let esTaken = 0;
+  let manaTaken = 0;
   if (!def.esProtectsMana && dst.es > 0) {
     const a = Math.min(dst.es, rest);
     dst.es -= a;
     rest -= a;
+    esTaken = a;
   }
   let lifeDmg = rest + chaos;
   if (def.manaBeforeLife > 0 && dst.mana > 0) {
     const m = Math.min(dst.mana, lifeDmg * def.manaBeforeLife);
     dst.mana -= m;
     lifeDmg -= m;
+    manaTaken = m;
   }
+  if (dst.isPlayer) notePools(w, esTaken, manaTaken, lifeDmg);
   dst.life -= lifeDmg;
   if (dst.life <= 0) dst.overkill = -dst.life;
   dst.sinceDamaged = 0;
@@ -352,14 +368,18 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   }
   // An Aegis counts the time since it was last attacked, whatever came of the attack.
   if (dst.enc && !dst.isPlayer) noteAttacked(dst);
+  // The map report names what dealt the hit (only for hits on the character or on a monster).
+  const how = dst.isPlayer || dst.faction === 1 ? sourceOf(src, dst, p) : undefined;
   if (res.outcome === 'miss') {
     w.events.push({ t: 'miss', src: src.id, dst: dst.id });
+    if (how) noteMiss(w, dst, how, false);
     wake(w, dst);
     return;
   }
   // A monster's guard (a Brace, an Aegis, a stone skin, a Sanctuary) turns the hit aside: no damage, no ailment, no leech.
   // Damage over time goes on (docs/ENCOUNTERS.md 5).
   if (!dst.isPlayer && dst.mon && turnsAside(w, dst, src)) {
+    if (how) noteMiss(w, dst, how, true);
     if (src.isPlayer) w.lastOutcome = 'block';
     w.events.push({ t: 'block', src: src.id, dst: dst.id });
     wake(w, dst);
@@ -424,6 +444,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   }
   if (res.outcome === 'block') {
     w.events.push({ t: 'block', src: src.id, dst: dst.id });
+    if (how) noteMiss(w, dst, how, true);
     dst.tBlock = 0;
     if (dst.isPlayer) {
       rollCharges(w, 'block');
@@ -440,6 +461,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   let dtype = 0;
   for (let i = 1; i < 5; i++) if (res.dmg[i] > res.dmg[dtype]) dtype = i;
   w.events.push({ t: 'hit', src: src.id, dst: dst.id, amount: res.total, crit: res.crit, dtype });
+  if (how) noteHit(w, dst, how, res.total, res.crit);
   if (dst.isPlayer) logDamage(w, src, src.name, dtype, res.total);
   src.tHit = 0;
   dst.tBeenHit = 0;
@@ -496,7 +518,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   const wasAlive = dst.alive;
   if (src.isPlayer) applyPlayerHexes(w, dst);
   if (src.isPlayer) noteCause(dst, p.tagMask, false, p.gains);
-  applyDamage(w, dst, res.dmg);
+  applyDamage(w, dst, res.dmg, how);
   // A mark gives life and mana back on each attack hit.
   if (src.isPlayer && p.isAttack) hexHit(w, dst, maskIntersects(p.tagMask, tagBit('melee')));
   if (wasAlive && dst.alive) {
@@ -899,7 +921,19 @@ export function rawHit(
   const total = dmg[0] + dmg[1] + dmg[2] + dmg[3] + dmg[4];
   w.events.push({ t: 'hit', src: 0, dst: dst.id, amount: total, crit: false, dtype: type });
   if (dst.isPlayer) logDamage(w, null, label, type, total, via);
-  applyDamage(w, dst, dmg);
+  // The map report: an effect on the character is its own row (a blast counts as a hit), one on a monster is the skill's or the minion's.
+  const how: DmgSrc = dst.isPlayer
+    ? { name: label, kind: 'effect' }
+    : { name: label, kind: by === 'minion' ? 'minion' : 'skill' };
+  if (dst.isPlayer) noteHit(w, dst, how, total, false);
+  applyDamage(w, dst, dmg, how);
+}
+
+/** Who a hit is credited to in the map report. */
+function sourceOf(src: Actor, dst: Actor, p: SkillProfile): DmgSrc {
+  if (src.isPlayer) return { name: p.skill.name, kind: 'skill' };
+  if (src.faction === 0) return { name: src.name || 'Minion', kind: 'minion' };
+  return dst.isPlayer ? monsterSrc(src) : { name: 'Other', kind: 'effect' };
 }
 
 /** Wake a monster that took damage (and its pack). */
@@ -1172,11 +1206,17 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     for (const d of ail.poisons) dotChaos += d.dps;
     decay(ail.poisons, dtDot);
   }
+  // What ignite, bleed and poison give of this tick: the map report shares the tick between them and the skills' debuffs.
+  const fromIgnite = dotFire;
+  const fromBleed = dotPhys;
+  const fromPoison = dotChaos;
+  let fromSkills: SkillDot[] | null = null;
   // Debuffs that skills inflicted: Contagion, Blight, Essence Drain, Decay.
   let dotLight = 0;
   let dotCold = 0;
   if (a.sdots.length) {
     const own = [0, 0, 0, 0, 0];
+    fromSkills = [...a.sdots];
     sumSkillDots(w, a, own, dt);
     dotPhys += own[0];
     dotLight += own[1];
@@ -1205,7 +1245,11 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       logDamage(w, null, 'Poison', 4, dmg[4]);
     }
     noteCause(a, 0, false);
-    applyDamage(w, a, dmg);
+    applyDamage(w, a, dmg, {
+      name: 'Damage over time',
+      kind: 'ailment',
+      split: dotSources(a.isPlayer, fromIgnite, fromBleed, fromPoison, fromSkills),
+    });
     if (!a.alive) return;
   }
   // Regeneration (a Bursar or the Treasurer near the player stops it, with leech and the recharge of energy shield).

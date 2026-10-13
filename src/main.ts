@@ -12,6 +12,7 @@ import './ui/mobile.css';
 import './ui/items.css';
 import './ui/workbench.css';
 import './ui/strategy.css';
+import './ui/report.css';
 
 function storage(): Storage | null {
   try {

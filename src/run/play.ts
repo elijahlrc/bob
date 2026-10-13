@@ -1,4 +1,5 @@
 import { CRAWL_SEGMENTS } from '../data/mapTypes';
+import { combineReports } from '../sim/ledger';
 import { runMap, type MapResult } from '../sim/runMap';
 import type { World, WorldOpts } from '../sim/types';
 import type { MapOffer } from './offers';
@@ -17,6 +18,7 @@ export function combineCrawl(parts: MapResult[]): MapResult {
     kills: sum((r) => r.kills),
     stuck: sum((r) => r.stuck),
     picked: parts.flatMap((r) => r.picked),
+    report: combineReports(parts.flatMap((r) => (r.report ? [r.report] : []))),
   };
 }
 

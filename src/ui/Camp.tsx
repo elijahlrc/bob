@@ -18,6 +18,7 @@ import { ask, confirmOpen } from './Confirm';
 import { useViewport } from './device';
 import { infoProps } from './info';
 import { Items } from './Items';
+import { MapReportView } from './MapReport';
 import { OfferInfo, OfferTable } from './OfferInfo';
 import { BossAhead, BossCard } from './BossCard';
 import { BOSSES, bossForMap } from '../data/bosses';
@@ -37,7 +38,7 @@ const VERDICT_TEXT: Record<Verdict, string> = {
   close: 'Close',
   dangerous: 'Dangerous',
 };
-type Tab = 'tree' | 'sheet' | 'skills' | 'strategy' | 'items' | 'workbench' | 'next';
+type Tab = 'tree' | 'sheet' | 'skills' | 'strategy' | 'items' | 'workbench' | 'report' | 'next';
 
 /**
  * A boss map's offer (docs/BOSSES.md 10): the one way on, presented as a level apart from all the others. The boss's
@@ -175,6 +176,9 @@ function Arriving({ run }: { run: RunState }) {
 export function Camp({ c }: { c: Controller }) {
   const run = c.run;
   const [tab, setTab] = useState<Tab>('sheet');
+  // The countdown to the next map waits while the report of the last one is on screen.
+  const tabRef = useRef(tab);
+  tabRef.current = tab;
   // An item the Items tab sends to the Workbench ("Craft…") and back ("Show in Items"); `n` makes a repeat count.
   const [focus, setFocus] = useState<{ uid: number; n: number; to: 'items' | 'workbench' } | null>(
     null,
@@ -207,7 +211,7 @@ export function Camp({ c }: { c: Controller }) {
     let start = performance.now();
     const id = setInterval(() => {
       // A question to answer holds the countdown: the map must not begin under it.
-      if (confirmOpen()) {
+      if (confirmOpen() || tabRef.current === 'report') {
         start = performance.now();
         setLeft(COUNTDOWN);
         return;
@@ -439,6 +443,15 @@ export function Camp({ c }: { c: Controller }) {
           >
             Workbench{CRAFTING_OPEN && run.pendingCraft ? ' (pick a result)' : ''}
           </button>
+          {last?.report && (
+            <button
+              class={'tab' + (shown === 'report' ? ' on' : '')}
+              onClick={() => setTab('report')}
+              title="What each skill dealt and what hurt you on the map you just played."
+            >
+              Last map
+            </button>
+          )}
           <button class={'tab' + (shown === 'next' ? ' on' : '')} onClick={() => setTab('next')}>
             Next map{run.reward ? ' (reward)' : ''}
           </button>
@@ -462,6 +475,12 @@ export function Camp({ c }: { c: Controller }) {
               onShowInItems={(uid) => goTo('items', uid)}
             />
           )}
+          {shown === 'report' && last?.report && (
+            <MapReportView
+              r={last.report}
+              title={`Map ${run.history[run.history.length - 1]?.map ?? ''} · ${last.status}`}
+            />
+          )}
           {shown === 'next' && <div class="camp-next camp-side-body">{side}</div>}
         </div>
         <div class="camp-bar">
@@ -478,7 +497,11 @@ export function Camp({ c }: { c: Controller }) {
             </button>
           )}
           {left !== null && shown !== 'next' && (
-            <span class="muted">Auto-continue: next map in {left.toFixed(1)} s</span>
+            <span class="muted">
+              {shown === 'report'
+                ? 'Auto-continue waits while you read the report'
+                : `Auto-continue: next map in ${left.toFixed(1)} s`}
+            </span>
           )}
           <button class="btn small" disabled={!c.canUndo} onClick={() => c.undo()}>
             ↶ Undo

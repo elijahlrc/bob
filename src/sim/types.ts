@@ -25,6 +25,7 @@ import type { HexTotals } from '../data/hexes';
 import type { Deployable } from './deploy';
 import type { Minion } from './minions';
 import type { Grid } from './grid';
+import type { Ledger } from './ledger';
 
 export type Dot = { dps: number; t: number; stack?: boolean; spread?: number };
 
@@ -837,4 +838,6 @@ export type World = {
   picked: AnyItem[];
   /** Damage the player took in the last few seconds. */
   dmgLog: DamageRecord[];
+  /** Everything dealt and taken on the map, by source and type (the map report). */
+  ledger: Ledger;
 };
