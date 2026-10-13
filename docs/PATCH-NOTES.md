@@ -8,8 +8,8 @@ change, and our own names only. Dash bullets under plain headings.
 
 - Enemies with energy shield now show it on their health bar, a blue strip above the life that drains first. The enemy card shows it too.
 - Drain Trap now draws its beams, a glowing line from each enemy it holds to you with a red and a blue mote running along it for the life and mana it gives.
-- Skills that leave something standing are now drawn: the blades circling you (Blade Vortex), the orb of Orb of Storms, the markers waiting to be struck (Storm Call), the arrows stuck in an enemy (Explosive Arrow) and the pods in the ground (Scourge Arrow), the mirage archer, the charges on an enemy (Infernal Blow) and the shell about you (Molten Shell). Before, only the blasts they made could be seen.
-- Livewire Snares now gives its charges. Skills that deal no hit of their own, such as Drain Trap, Creeping Plague, Withering Breath, Searing Lance and Cinder Bond, never counted as hitting, so nothing that is gained on a hit (charges, buffs, rage, life or mana) worked with them. It does now whenever they land on an enemy, except for curses.
+- Skills that leave something standing are now drawn: the blades of Orbiting Blades, the Tempest Mote orb, Skyfall's markers, Fuse Arrow's arrows, Blight Hail's pods, the Twin Shadow archer, Cinder Blow's charges and Slag Carapace's shell.
+- Skills that deal no hit of their own, such as Drain Trap, Creeping Plague and Withering Breath, now give what a hit gives (charges, buffs, rage, life and mana) when they land, so Livewire Snares works with Drain Trap. Curses do not.
 - Every map now has a biome: Crypt, Cavern, Ruins, Marsh, Forge, Hollow, Shrine or Warren. It sets the layout and look of the map and is shown when you enter. It is separate from the theme, so any theme can turn up in any biome.
 - New layouts: Caverns and Marshes are winding caves, the Hollow is wide open ground with pillars, Ruins have more than one way round, and the Warren is a tangle of small chambers and narrow passages.
 - Each biome has its own floors, walls, lighting and decorations, such as pools, moss, glowing fungus, lava cracks, candles, roots and rubble.
