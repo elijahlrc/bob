@@ -52,8 +52,9 @@ performance work with no visible effect, balance of unreleased content.
 
 ## 3. Write the notes (the style rules)
 
-- **Major changes only, as a short list.** Roughly 3 to 10 bullets for a release, never more than 12. One line each, 240
-  characters at most; split a long one or cut it. Merge related commits into one bullet (five tree iterations are one bullet
+- **Major changes only, as a short list.** Roughly 3 to 10 bullets for a release. That is a guide, not a hard limit: a big
+  release may have more, and the audit must not fail a list for its length alone. One bullet is one line of at most 600
+  characters; split a longer one or cut it. Merge related commits into one bullet (five tree iterations are one bullet
   about the tree). Name the effect, with a number only when it helps ("about three times the damage").
 - **Plain text.** No bold, no backticks, no links, no tables. A dash bullet per note.
 - **Public-facing, impersonal.** No "I", no "we", no "you asked", no mention of the developer, the user or a session. "Your
@@ -95,7 +96,7 @@ commits and code to confirm a claim). Tell it to change nothing and to answer wi
 - **CUT** for a bullet a player would not notice, that duplicates another, or that is not true of the commits;
 - anything that makes the list unfit for public consumption as a whole: dev or process language, anything that reads as
   internal, spoilers of unreleased content, tone that blames or apologises, unclear wording a player could not follow, a list
-  that is too long or detailed to be "a short list of major changes", an unexplained balance move (direction and who is
+  that is padded with minor changes (its length alone is not a fault), an unexplained balance move (direction and who is
   affected).
 
 Apply every FIX and CUT yourself (re-run prettier), unless you can show the auditor is wrong; then keep the bullet and note why
