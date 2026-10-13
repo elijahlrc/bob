@@ -2,6 +2,7 @@ import { skillRange, type DeployKind, type SkillChoice } from '../calc/character
 import { levelValue } from '../calc/gems';
 import type { SkillProfile } from '../calc/skill';
 import { actorById, fire, segmentDist } from './actions';
+import { SCATTER_RADIUS } from '../data/constants';
 import { flaskMask, playerConds, rawHit } from './combat';
 import type { Minion } from './minions';
 import { scaleProfile } from './shots';
@@ -227,6 +228,13 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
     return;
   }
   for (let i = 0; i < n; i++) {
+    if (act.profile.deployScatter) {
+      // Scattered: at random over a wide place round the target, some of them far from it.
+      const ang = w.rngTrig.float(0, Math.PI * 2);
+      const d = SCATTER_RADIUS * Math.sqrt(w.rngTrig.float(0, 1));
+      put(tx + Math.cos(ang) * d, ty + Math.sin(ang) * d);
+      continue;
+    }
     const ang = (i / n) * Math.PI * 2;
     put(tx + (n > 1 ? Math.cos(ang) * 1.2 : 0), ty + (n > 1 ? Math.sin(ang) * 1.2 : 0));
   }

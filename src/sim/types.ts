@@ -371,7 +371,13 @@ export type SkillZone = {
   /** Pulses still to come: duration over interval, rounded down (the calc counts the same). */
   pulsesLeft: number;
   dtype: number;
+  /** A rain with more arrows than its skill starts with: where they burst (src/sim/rain.ts); `stack`: every spot hits an enemy under it. */
+  spots?: RainSpot[];
+  stack?: boolean;
 };
+
+/** One burst of a rain of arrows. */
+export type RainSpot = { x: number; y: number; r: number };
 
 export type Drop = { id: number; x: number; y: number; item: AnyItem };
 export type Chest = { id: number; x: number; y: number; room: number; opened: boolean };

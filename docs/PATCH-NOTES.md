@@ -6,6 +6,19 @@ the docs each entry links to.
 ## 2026-10-11
 
 - Bosses: a boss now ends every tenth map (ten in all), each with its own mechanic. See docs/BOSSES.md.
+- A support gem that cannot do anything to a skill is no longer offered for it: more projectiles on a skill that fires none, pierce
+  on a rain of arrows, a damage bonus on a curse. One you have already socketed stays, greyed out with the reason, and no longer
+  costs mana or damage. Before, such a gem cost both and did nothing. See docs/SUPPORTS-PLAN.md.
+- Arrow Shower and Ember Downpour now come down as six arrows and take extra projectiles. With Arrow Shower the extra arrows land on
+  rings around the shower and reach more ground; an enemy is still hit once. With Ember Downpour they are more explosions on the
+  same place and each one hits.
+- Rime Splinter, Bolt Cleave, Slag Blow and Whirl Shot send more projectiles when a support adds them.
+- Triple Cadence was about four times as strong as the plain skill; it now attacks 55% slower and comes to about one and a half
+  times. Snare Cluster throws five traps scattered over a wide place (it was Triple Snare at a higher price). Kindle is now for
+  attacks and Cindering for spells. Wide Crush needs a skill with an area. Echoing Cast no longer works on totems and brands.
+  Blunt Intent and the penetration supports need a skill that deals the damage they work on.
+- New support: Flanking Volley, the attack version of Flanking Cast. The attack comes down before and behind its target, with less
+  area and less damage. It works with Arrow Shower, Ember Downpour and slams; Flanking Cast is for spells only.
 - The passive tree has a new layout. Your allocated passives are refunded as unspent points. See docs/TREE-REDESIGN.md.
 - Every region of the tree has its own shape and themed districts, and you can reach any region through the middle.
 - Notables are stronger relative to small nodes, and clusters make more sense.

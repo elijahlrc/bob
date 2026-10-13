@@ -245,6 +245,13 @@ function behaviourLines(b: SkillBehaviour, level: number): string[] {
           ? `Leaves a strip ${num(b.line)} long for ${num(b.duration)} s`
           : `Leaves a zone of radius ${num(b.radius)} for ${num(b.duration)} s`,
         `Hits every ${num(b.interval)} s${b.delay ? ` after ${num(b.delay)} s` : ''}`,
+        ...(b.count === undefined
+          ? []
+          : [
+              b.spread === 'stack'
+                ? `Comes down as ${b.count} explosions on the same place; each extra projectile is one more`
+                : `Comes down as ${b.count} arrows; extra projectiles land on rings round it and reach more ground, and an enemy is hit once`,
+            ]),
       ];
   }
 }

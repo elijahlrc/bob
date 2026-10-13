@@ -222,7 +222,7 @@ export function fireProjectiles(w: World, a: Actor, act: Action): void {
       range: Math.min(range, Math.max(1, aimDist)),
       pierce: 99,
       kind: 'tornado',
-      ring: TORNADO_SECONDARIES,
+      ring: TORNADO_SECONDARIES + Math.max(0, n - b.count),
     });
     return;
   }
@@ -451,6 +451,8 @@ export function afterStrike(w: World, a: Actor, act: Action, struck: Actor | nul
   if (!spec || !struck) return;
   const p = scaleProfile(act.profile, spec.mult / 100);
   const hitIds: number[] = [];
+  // More projectiles (a support, an item) send more bolts, blades or balls.
+  const count = spec.count + Math.max(0, act.profile.projectiles - 1);
   const toward = Math.atan2(struck.y - a.y, struck.x - a.x);
   // The use's element picks what an element strike sends out: an area, a wave of three, a chain of lightning.
   const kind =
@@ -481,8 +483,8 @@ export function afterStrike(w: World, a: Actor, act: Action, struck: Actor | nul
   } else if (kind === 'wave') {
     // Three icy projectiles through everything in front.
     const arc = ((spec.arc ?? 70) * Math.PI) / 180;
-    for (let i = 0; i < spec.count; i++) {
-      const ang = spec.count > 1 ? toward + (i / (spec.count - 1) - 0.5) * arc : toward;
+    for (let i = 0; i < count; i++) {
+      const ang = count > 1 ? toward + (i / (count - 1) - 0.5) * arc : toward;
       launch(w, a, p, act.hand, a.x, a.y, ang, {
         hitIds: [],
         aimId: struck.id,
@@ -513,8 +515,8 @@ export function afterStrike(w: World, a: Actor, act: Action, struck: Actor | nul
     }
   } else if (spec.kind === 'bolts') {
     const arc = ((spec.arc ?? 85) * Math.PI) / 180;
-    for (let i = 0; i < spec.count; i++) {
-      const ang = spec.count > 1 ? toward + (i / (spec.count - 1) - 0.5) * arc : toward;
+    for (let i = 0; i < count; i++) {
+      const ang = count > 1 ? toward + (i / (count - 1) - 0.5) * arc : toward;
       launch(w, a, p, act.hand, a.x, a.y, ang, { hitIds, aimId: struck.id, range: spec.range });
     }
   } else if (spec.kind === 'blades') {
@@ -523,7 +525,7 @@ export function afterStrike(w: World, a: Actor, act: Action, struck: Actor | nul
       (e) =>
         e.alive && e.id !== struck.id && Math.hypot(e.x - struck.x, e.y - struck.y) <= spec.range,
     );
-    for (let i = 0; i < spec.count; i++) {
+    for (let i = 0; i < count; i++) {
       const t = others.length ? others[i % others.length] : null;
       const ang = t
         ? Math.atan2(t.y - struck.y, t.x - struck.x)
@@ -536,7 +538,7 @@ export function afterStrike(w: World, a: Actor, act: Action, struck: Actor | nul
     }
   } else {
     // Balls: thrown to the ground around the struck enemy, and burst where they land.
-    for (let i = 0; i < spec.count; i++) {
+    for (let i = 0; i < count; i++) {
       const ang = toward + (w.rngCombat.float(0, 1) - 0.5) * ((270 * Math.PI) / 180) + Math.PI * 0;
       const d = 0.6 + w.rngCombat.float(0, 1) * 1.6;
       const spot = w.grid.collide(struck.x + Math.cos(ang) * d, struck.y + Math.sin(ang) * d, 0.2);

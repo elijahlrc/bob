@@ -928,6 +928,16 @@ two bosses, armoured Ash and evasive Cinder, each with a life bar, and the survi
 dead one's kind of blow). The boss warning at camp is two lines of description, nothing about how to fight. The nine theme
 champions now end ordinary maps in the place of the end-of-map rare (from map 5). Since 2026-10-12 that is a 25% roll per map, and the offer card does not announce it.
 
+### Supports that can do nothing, rains of arrows, support balance (docs/SUPPORTS-PLAN.md), built (2026-10-12)
+
+Twin Salvo did nothing on Arrow Shower and still cost mana and damage: the types allowed it and nothing checked the effect could
+happen. A support is now offered only where its defining effect can act (`src/calc/reach.ts`, read from the gem data: tags, damage types,
+which behaviours honour a stat, whether the skill makes hits), a socketed one that cannot stays greyed with the reason, and the profile
+builder asks the same file for the projectile count. Arrow Shower and Ember Downpour start with six arrows and take more (rings that
+widen the shower and hit once; stacked explosions that each hit). Strikes that send bolts take more. Triple Cadence dealt about 4.7 times
+the plain skill and now about 1.45; Snare Cluster scatters five traps; Kindle (attacks) and Cindering (spells) are no longer one gem
+twice; Wide Crush needs an area; Flanking Volley is the attack twin of Flanking Cast. `scripts/audit-supports.ts` prints the pool.
+
 ### Courser pass and no out-healing (docs/BOSSES.md 20), built (2026-10-12)
 
 The Courser was unbeatable out of mana: the Mending map affix (2% of life a second) reached it. A map's regeneration no longer

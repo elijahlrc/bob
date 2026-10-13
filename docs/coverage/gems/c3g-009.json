@@ -36,10 +36,10 @@
     "def": { "kind": "support", "id": "siphonDraught", "name": "Siphon Draught", "attr": "dex", "supports": ["attack"], "costMult": 1.2, "mods": [
       { "stat": "leech.mana", "kind": "base", "value": [2, 3.9] } ],
       "description": "Attacks leech mana from the damage they deal." } },
-  { "ref": "Multistrike Support", "note": "The melee attack repeats twice more, each repeat on a random enemy in reach and harder than the one before (22% and 44% more), faster, at less damage; the strikes share one critical roll.",
+  { "ref": "Multistrike Support", "note": "The melee attack repeats twice more, each repeat on a random enemy in reach and harder than the one before (22% and 44% more), at less damage; the strikes share one critical roll. In the reference game the three blows take three attack times, made 35-44% shorter each; here the repeats fall inside one attack, so the whole cost is written as less attack speed (the three blows take about 2.2 attack times at level 1 and 2.1 at level 20), which keeps its damage where the reference game has it, about 1.45 times the plain skill. Before this it was 4.7 times.",
     "def": { "kind": "support", "id": "tripleCadence", "name": "Triple Cadence", "attr": "str", "supports": ["melee"], "needs": ["attack"], "excludes": ["channelling"], "costMult": 1.6, "mods": [
       { "stat": "repeats", "kind": "base", "value": 2 },
-      { "stat": "attackSpeed", "kind": "more", "value": [35, 44] },
+      { "stat": "attackSpeed", "kind": "more", "value": [-55, -52] },
       { "stat": "damage", "kind": "more", "value": [-20, -10], "tags": ["attack"] },
       { "stat": "repeatsRandom", "kind": "flag", "value": 1 },
       { "stat": "repeatRamp", "kind": "base", "value": 22 } ],
@@ -60,7 +60,7 @@
       { "stat": "damage", "kind": "more", "value": 4, "per": { "stat": "charges.insight", "div": 1 } } ],
       "description": "Critical strikes may grant Insight, and the skill hits harder for each charge." } },
   { "ref": "Pulverise Support", "note": "Melee skills hit a larger area and harder, but a little slower.",
-    "def": { "kind": "support", "id": "wideCrush", "name": "Wide Crush", "attr": "str", "supports": ["melee"], "costMult": 1.4, "mods": [
+    "def": { "kind": "support", "id": "wideCrush", "name": "Wide Crush", "attr": "str", "supports": ["melee"], "needs": ["area"], "costMult": 1.4, "mods": [
       { "stat": "damage", "kind": "more", "value": [40, 59], "tags": ["area"] },
       { "stat": "aoe", "kind": "inc", "value": [25, 34] },
       { "stat": "attackSpeed", "kind": "more", "value": -15 } ],

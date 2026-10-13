@@ -63,6 +63,9 @@ export function gemStatus(
     const on = ch.actives.filter((a) => a.supports.some((x) => x.gem.uid === uid));
     if (on.length)
       return { ok: true, text: `Supporting: ${on.map((a) => a.skill.name).join(', ')}` };
+    // Linked to a skill it fits by type but cannot act on: say what it cannot do.
+    const idle = ch.actives.flatMap((a) => (a.inert ?? []).filter((x) => x.gem.gem.uid === uid));
+    if (idle.length) return { ok: false, text: `No effect: ${idle[0].why}` };
     const needs = def.supports.length ? def.supports.join(' or ') : 'an active skill';
     return {
       ok: false,

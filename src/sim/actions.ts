@@ -9,6 +9,7 @@ import { hit, monsterHitOf } from './combat';
 import { openZone, pullPlayer, registerBlast, shieldBlocks, speedMult } from './factions';
 import { fireTriggers } from './triggers';
 import { placeDeployable } from './deploy';
+import { plantRain, pulseRain } from './rain';
 import { channelUse, stackedUse } from './channel';
 import { leaveGround, placeCrystal, placeGeyser, placePods, raiseWall } from './fields';
 import { scaleProfile } from './shots';
@@ -251,6 +252,12 @@ export function tickSkillZones(w: World, dt: number): void {
     if (z.pulseT <= 0) {
       z.pulseT += z.interval;
       z.pulsesLeft--;
+      if (z.spots) {
+        // A rain with extra arrows bursts in several places (src/sim/rain.ts).
+        pulseRain(w, owner, z, enemiesOf(w, owner));
+        if (z.pulsesLeft > 0) w.zones[j++] = z;
+        continue;
+      }
       w.events.push({
         t: 'explode',
         x: z.x2 === undefined ? z.x : (z.x + z.x2) / 2,
@@ -568,21 +575,27 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
   if (b.kind === 'ground') {
     const line = b.line !== undefined;
     const ang = Math.atan2(act.aimY - a.y, act.aimX - a.x);
+    const radius = b.radius * p.radiusMult;
+    // More arrows than the skill starts with: a rain of several bursts (rings or a stack, by the skill).
+    const rain = line ? null : plantRain(w, p, act.aimX, act.aimY, radius);
     w.zones.push({
       id: w.nextId++,
       owner: a.id,
-      profile: p,
+      profile: rain ? rain.profile : p,
       hand: act.hand,
       x: line ? a.x : act.aimX,
       y: line ? a.y : act.aimY,
       x2: line ? a.x + Math.cos(ang) * (b.line as number) * p.radiusMult : undefined,
       y2: line ? a.y + Math.sin(ang) * (b.line as number) * p.radiusMult : undefined,
-      radius: b.radius * p.radiusMult,
+      radius,
       delayT: b.delay ?? 0,
       interval: b.interval,
       pulseT: 0,
-      pulsesLeft: Math.max(1, Math.floor(b.duration / b.interval)),
+      // Duration over interval, rounded down, as the calc counts it: a support that lengthens the zone adds pulses.
+      pulsesLeft: Math.max(1, Math.floor((b.duration * p.skillDuration) / b.interval)),
       dtype: dominantType(p, act.hand),
+      spots: rain?.spots,
+      stack: rain?.stack,
     });
     return;
   }

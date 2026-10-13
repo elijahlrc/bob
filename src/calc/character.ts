@@ -16,6 +16,7 @@ import {
   STR_LIFE,
   STR_MELEE_PHYS_INC,
   spellBaseDamage,
+  SCATTER_HIT_SHARE,
 } from '../data/constants';
 import { MINIONS, MINION_ENEMY_RES } from '../data/minions';
 import { minionUptime } from './minion';
@@ -64,6 +65,7 @@ import {
   type SupportGemDef,
 } from '../data/gems';
 import { resolveSupports, typesAllow } from '../data/skillTypes';
+import { supportLive } from './reach';
 import { getTree } from '../data/tree';
 import { KEYSTONES } from '../data/tree/keystones';
 import {
@@ -205,6 +207,8 @@ export type SkillChoice = {
   gemUid: number | null;
   skill: SkillDef;
   supports: SocketedGem[];
+  /** Linked supports that could do nothing to this skill, and why: they are not in effect and cost nothing. */
+  inert?: { gem: SocketedGem; why: string }[];
   /** Skill tags the supports add (a totem support adds `totem`). */
   addedTags: SkillTag[];
   costMult: number;
@@ -755,7 +759,7 @@ export class Character {
         skill.types,
         linked.map((o) => ({ ...(o.def as SupportGemDef), gem: o })),
       );
-      const supports = resolved.applied.map((r) => r.gem);
+      let supports = resolved.applied.map((r) => r.gem);
       // A support can raise the level of the skill it supports.
       const levelBonus = supports.reduce((n, s) => {
         const lb = (s.def as SupportGemDef).levelBonus;
@@ -772,6 +776,13 @@ export class Character {
         !weaponTags.has(skill.behaviour.meleeUnless)
       )
         skill.behaviour = { kind: 'melee', range: skill.behaviour.meleeRange ?? 1.5 };
+      // A support that can do nothing to this skill (no projectiles to add to, no area to widen) is not in effect and costs nothing.
+      const inert: { gem: SocketedGem; why: string }[] = [];
+      supports = supports.filter((s) => {
+        const v = supportLive(s.def as SupportGemDef, skill, resolved.types);
+        if (!v.live) inert.push({ gem: s, why: v.why });
+        return v.live;
+      });
       const addedTags = [...resolved.types].filter(
         (t): t is SkillTag =>
           (SKILL_TAGS as readonly string[]).includes(t) && !skill.tags.includes(t as SkillTag),
@@ -812,6 +823,7 @@ export class Character {
         gemUid: sg.gem.uid,
         skill,
         supports,
+        inert,
         addedTags,
         costMult,
         usable,
@@ -1508,7 +1520,8 @@ export class Character {
         ? Math.min(timeShare / p.useTime, cdRate)
         : standing
           ? deployN / p.useTime
-          : (timeShare / p.useTime) * (choice.deploy ? deployN : 1));
+          : (timeShare / p.useTime) *
+            (choice.deploy ? deployN * (p.deployScatter ? SCATTER_HIT_SHARE : 1) : 1));
     const perType = [0, 0, 0, 0, 0];
     let perUse = 0;
     let hc = 0;
@@ -2035,6 +2048,10 @@ export function volleyHits(p: SkillProfile, distance: number): number {
   if (b.kind === 'projectile' && b.returns && p.pierce > 0)
     hits *= 2 + (p.skill.returnMore ?? 0) / 100;
   if (p.skill.cone) hits += p.skill.cone.mult / 100;
+  // A rain of stacking explosions: each is a share of the use, and every one lands on the same place. (A rain of rings hits an
+  // enemy once however many arrows it has; the extra arrows only reach more ground.)
+  if (b.kind === 'ground' && b.count !== undefined && b.spread === 'stack')
+    hits *= Math.max(1, p.projectiles / b.count);
   // Pods fall in a scatter around the target: a standing target is inside the burst of some of them.
   const pods = p.skill.pods;
   if (pods) {

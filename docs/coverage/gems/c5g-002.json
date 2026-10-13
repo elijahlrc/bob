@@ -36,7 +36,7 @@
   { "ref": "Enlighten Support", "note": "Lowers the mana cost multiplier of the supported gem group (modelled as a cost multiplier below one).",
     "def": { "kind": "support", "id": "deepInsight", "name": "Deep Insight", "attr": "int", "supports": [], "costMult": 0.75, "mods": [],
       "description": "Makes the supported skill cheaper to cast." } },
-  {"ref":"Immolate Support","note":"Spells deal added fire damage against burning enemies only; it has no ignite chance of its own.","def":{"kind":"support","id":"cindering","name":"Cindering","attr":"str","supports":[],"costMult":1.3,"mods":[{"stat":"damage.min","kind":"base","value":[42,205],"damageTypes":["fire"],"condition":{"id":"targetIgnited"}},{"stat":"damage.max","kind":"base","value":[63,308],"damageTypes":["fire"],"condition":{"id":"targetIgnited"}}],"description":"Adds fire damage to the spell against enemies that burn."}},
+  {"ref":"Immolate Support","note":"Spells deal added fire damage against burning enemies only; it has no ignite chance of its own.","def":{"kind":"support","id":"cindering","name":"Cindering","attr":"str","supports":["spell"],"costMult":1.3,"mods":[{"stat":"damage.min","kind":"base","value":[42,205],"damageTypes":["fire"],"condition":{"id":"targetIgnited"}},{"stat":"damage.max","kind":"base","value":[63,308],"damageTypes":["fire"],"condition":{"id":"targetIgnited"}}],"description":"Adds fire damage to the spell against enemies that burn."}},
   { "ref": "Ignite Proliferation Support", "note": "Ignites spread to the enemies near the one that burns, while it burns and as it dies, and ignite damage rises.",
     "def": { "kind": "support", "id": "wildfireSeed", "name": "Wildfire Seed", "attr": "int", "supports": [], "costMult": 1.3, "mods": [
       { "stat": "damage", "kind": "more", "value": [20, 39], "tags": ["ignite"] },
@@ -94,11 +94,17 @@
       { "stat": "shockwave.cooldown", "kind": "base", "value": 1 } ],
       "description": "Blunt hits send a shockwave through the enemies around." } },
   { "ref": "Spell Cascade Support", "note": "The spell also lands on the ground before and behind its target, with less area and less damage.",
-    "def": { "kind": "support", "id": "flankingCast", "name": "Flanking Cast", "attr": "int", "supports": ["cascadable"], "excludes": ["totem", "trap", "mine"], "costMult": 1.4, "mods": [
+    "def": { "kind": "support", "id": "flankingCast", "name": "Flanking Cast", "attr": "int", "supports": ["cascadable"], "needs": ["spell"], "excludes": ["totem", "trap", "mine"], "costMult": 1.4, "mods": [
       { "stat": "cascade", "kind": "flag", "value": 1 },
       { "stat": "damage", "kind": "more", "value": [-40, -21] },
       { "stat": "aoe", "kind": "inc", "value": [-25, -16] } ],
       "description": "The spell lands before and behind its target as well." } },
+  { "ref": "Spell Cascade Support", "note": "The attack analog of Flanking Cast, for the attacks that land on the ground: a rain or a slam also comes down before and behind its target, with less area and less damage, the same terms as the spell version. The reference game's Spell Cascade is for spells only; there is no reference gem for attacks, and a rain of arrows is the case that has no way to be in more than one place.",
+    "def": { "kind": "support", "id": "flankingVolley", "name": "Flanking Volley", "attr": "dex", "supports": ["cascadable"], "needs": ["attack"], "excludes": ["totem", "trap", "mine"], "costMult": 1.4, "mods": [
+      { "stat": "cascade", "kind": "flag", "value": 1 },
+      { "stat": "damage", "kind": "more", "value": [-40, -21] },
+      { "stat": "aoe", "kind": "inc", "value": [-25, -16] } ],
+      "description": "The attack comes down before and behind its target as well." } },
   { "ref": "Unleash Support", "note": "The spell gains a Seal every so often while it is not cast (three at most); the next cast spends them all as repeats in quick succession, each at less damage.",
     "def": { "kind": "support", "id": "doubleRelease", "name": "Double Release", "attr": "int", "supports": ["repeatable"], "needs": ["spell"], "excludes": ["totem", "trap", "mine", "triggered", "channelling"], "costMult": 1.4, "mods": [
       { "stat": "unleash.every", "kind": "base", "value": [0.9, 0.71] },

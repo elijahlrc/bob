@@ -1864,6 +1864,29 @@
         "check": "Mostly holds, but the wiki says the extra areas land in front of and behind the target along the cast direction, not beside it, so the audit's 'both sides' is corrected for the repair; also the area penalty is 25 to 16% less, not Bob's flat -20% increased, and triggered spells are allowed."
       }
     },
+    "flankingVolley": {
+      "ref": "Spell Cascade Support",
+      "name": "Flanking Volley",
+      "kind": "support",
+      "verdict": "faithful",
+      "confidence": "medium",
+      "milestone": null,
+      "missing": [],
+      "audit": {
+        "poe": "Spell Cascade is for spells only: the area spell also lands in front of and behind the target, with less area and less damage.",
+        "bob": "The attack version of Flanking Cast, for the attacks that land on the ground (Arrow Shower, Ember Downpour, slams): the same two extra landings along the line to the target, the same terms (25 to 16% less area, 40 to 21% less damage, 1.4x cost). A deliberate addition: a rain of arrows has no other way to be in more than one place.",
+        "repair": "None."
+      },
+      "verified": true,
+      "spec": {
+        "page": "Spell Cascade Support",
+        "status": "corrected",
+        "lines": [
+          "Spell Cascade is spell-only and takes its extra areas in front of and behind the target along the cast line [wiki][pob]; this gem applies the same rule to attacks, which the reference game does not have [Bob's own addition]"
+        ],
+        "check": "Not a reference gem: the terms are the spell gem's own, so it cannot be stronger than the spell version."
+      }
+    },
     "fleshSurgeRite": {
       "ref": "Flesh Offering",
       "name": "Flesh Surge Rite",

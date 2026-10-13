@@ -118,6 +118,13 @@ export type SkillBehaviour =
       delay?: number;
       reach?: number;
       line?: number;
+      /**
+       * A rain of this many arrows (the skill's number of projectiles). The default shower has `count` of them, and supports that
+       * add projectiles add more. 'rings': the extra arrows land on outer rings and widen the shower, each enemy hit once (Rain of
+       * Arrows). 'stack': they land on the same place, and every one hits (Blast Rain).
+       */
+      count?: number;
+      spread?: 'rings' | 'stack';
     };
 
 /**
@@ -946,6 +953,9 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
     name: 'Echoing Cast',
     attr: 'int',
     supports: ['spell'],
+    // A totem or a brand that "repeats" is put in the same place again: it gains nothing, and the sheet would count a repeat of every shot.
+    // A repeated trap or mine is another set laid, which does add shots.
+    excludes: ['totem', 'brand'],
     costMult: 1.4,
     mods: [
       { stat: 'repeats', kind: 'base', value: 1 },
@@ -1047,7 +1057,8 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
     id: 'kindle',
     name: 'Kindle',
     attr: 'str',
-    supports: [],
+    // For attacks; Cindering is the same for spells. They were the same gem at two prices.
+    supports: ['attack'],
     costMult: 1.2,
     mods: [
       {
@@ -1065,7 +1076,7 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
         condition: { id: 'targetIgnited' },
       },
     ],
-    description: 'Adds fire damage to the skill against enemies that burn.',
+    description: 'Adds fire damage to the attack against enemies that burn.',
   },
   {
     kind: 'support',

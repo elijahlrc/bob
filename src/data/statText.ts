@@ -402,6 +402,7 @@ STAT_TEXT.projectilesSequential = {
 };
 STAT_TEXT.projectilesShotgun = { flag: 'Projectiles can hit the same Enemy several times' };
 STAT_TEXT.projectilesParallel = { flag: 'Projectiles are fired side by side' };
+STAT_TEXT.deployScatter = { flag: 'Traps land at random over a wide place' };
 STAT_TEXT.arrowNova = { flag: 'Arrows land at the target and fly out from there in a ring' };
 STAT_TEXT.tornadoShot = {
   flag: 'The Arrow flies to the target and scatters Arrows when it arrives',

@@ -28,11 +28,12 @@
       { "stat": "mine.double", "kind": "base", "value": 2 },
       { "stat": "deploySeconds", "kind": "base", "value": 5 } ],
       "description": "The skill is laid as a mine whose aura makes the hits near it land doubly now and then." } },
-  { "ref": "Cluster Traps Support", "note": "Three traps are thrown at once, each weaker.",
+  { "ref": "Cluster Traps Support", "note": "Five traps are thrown at once and land at random over a wide place, each much weaker (the reference game throws three at random within a short way of the target, with more traps allowed to stand). Where Triple Snare puts its traps in a tight ring that goes off together, these cover ground, so some of them miss a lone enemy and all of them are in the way of a crowd. It was Triple Snare at a higher price, which no one would choose.",
     "def": { "kind": "support", "id": "snareCluster", "name": "Snare Cluster", "attr": "dex", "supports": ["trap"], "costMult": 1.5, "mods": [
-      { "stat": "deployCount", "kind": "base", "value": 2 },
-      { "stat": "damage", "kind": "more", "value": [-55, -36] } ],
-      "description": "Throws three traps at once." } },
+      { "stat": "deployCount", "kind": "base", "value": 4 },
+      { "stat": "deployScatter", "kind": "flag", "value": 1 },
+      { "stat": "damage", "kind": "more", "value": [-62, -48] } ],
+      "description": "Throws five traps at once, scattered over a wide place." } },
   { "ref": "Minefield Support", "note": "Five mines are laid at once, much slower and each at the usual strength.",
     "def": { "kind": "support", "id": "fieldOfCharges", "name": "Field of Charges", "attr": "int", "supports": ["mine"], "costMult": 1.2, "mods": [
       { "stat": "deployCount", "kind": "base", "value": 4 },

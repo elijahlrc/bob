@@ -186,3 +186,7 @@ export const ABANDON_SECONDS = 5;
 export const ABANDON_FROM_MAP = 5;
 /** A map that has run this long (simulated seconds) turns into an abandon on its own, on every map: the way out for a character that is stuck. */
 export const AUTO_ABANDON_AFTER = 500;
+
+/** How far from the target a scattered trap (Snare Cluster) may land, in tiles; and the share of them that a lone enemy walks into, for the sheet. */
+export const SCATTER_RADIUS = 3.2;
+export const SCATTER_HIT_SHARE = 0.6;

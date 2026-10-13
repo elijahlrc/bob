@@ -227,7 +227,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     attr: 'dex',
     skillType: 'attack',
     tags: ['attack', 'projectile', 'area', 'fire', 'bow'],
-    types: ['totemable', 'trappable', 'mineable', 'triggerable'],
+    types: ['totemable', 'trappable', 'mineable', 'triggerable', 'cascadable'],
     behaviour: {
       kind: 'ground',
       radius: 2,
@@ -235,6 +235,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       interval: 0.5,
       delay: 0.6,
       reach: 9,
+      count: 6,
+      spread: 'stack',
     },
     baseMult: [150, 180],
     cost: [5, 9],
@@ -2063,7 +2065,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     attr: 'dex',
     skillType: 'attack',
     tags: ['attack', 'projectile', 'area', 'bow'],
-    types: ['totemable', 'trappable', 'mineable', 'volleyable', 'triggerable'],
+    types: ['totemable', 'trappable', 'mineable', 'triggerable', 'cascadable'],
     behaviour: {
       kind: 'ground',
       radius: 3,
@@ -2071,6 +2073,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       interval: 0.3,
       delay: 0.5,
       reach: 9,
+      count: 6,
+      spread: 'rings',
     },
     baseMult: [180, 220],
     cost: [7, 11],
@@ -7215,7 +7219,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'attackSpeed',
         kind: 'more',
-        value: [35, 44],
+        value: [-55, -52],
       },
       {
         stat: 'damage',
@@ -7313,6 +7317,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     name: 'Wide Crush',
     attr: 'str',
     supports: ['melee'],
+    needs: ['area'],
     costMult: 1.4,
     mods: [
       {
@@ -7833,15 +7838,20 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'deployCount',
         kind: 'base',
-        value: 2,
+        value: 4,
+      },
+      {
+        stat: 'deployScatter',
+        kind: 'flag',
+        value: 1,
       },
       {
         stat: 'damage',
         kind: 'more',
-        value: [-55, -36],
+        value: [-62, -48],
       },
     ],
-    description: 'Throws three traps at once.',
+    description: 'Throws five traps at once, scattered over a wide place.',
   },
   {
     kind: 'support',
@@ -8228,7 +8238,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     id: 'cindering',
     name: 'Cindering',
     attr: 'str',
-    supports: [],
+    supports: ['spell'],
     costMult: 1.3,
     mods: [
       {
@@ -8557,6 +8567,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     name: 'Flanking Cast',
     attr: 'int',
     supports: ['cascadable'],
+    needs: ['spell'],
     excludes: ['totem', 'trap', 'mine'],
     costMult: 1.4,
     mods: [
@@ -8577,6 +8588,34 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       },
     ],
     description: 'The spell lands before and behind its target as well.',
+  },
+  {
+    kind: 'support',
+    id: 'flankingVolley',
+    name: 'Flanking Volley',
+    attr: 'dex',
+    supports: ['cascadable'],
+    needs: ['attack'],
+    excludes: ['totem', 'trap', 'mine'],
+    costMult: 1.4,
+    mods: [
+      {
+        stat: 'cascade',
+        kind: 'flag',
+        value: 1,
+      },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [-40, -21],
+      },
+      {
+        stat: 'aoe',
+        kind: 'inc',
+        value: [-25, -16],
+      },
+    ],
+    description: 'The attack comes down before and behind its target as well.',
   },
   {
     kind: 'support',

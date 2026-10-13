@@ -343,7 +343,7 @@
   "emberDownpour": {
    "ref": "Blast Rain",
    "status": "covered",
-   "note": "Arrows rain on an area as fire (all physical converted to fire, with fire penetration)."
+   "note": "Arrows rain on an area as fire (all physical converted to fire, with fire penetration). Six explosions share the damage; each extra projectile is one more explosion on the same place and hits too, as in the reference game."
   },
   "witheringBreath": {
    "ref": "Blight",
@@ -598,7 +598,7 @@
   "arrowShower": {
    "ref": "Rain of Arrows",
    "status": "covered",
-   "note": "A wide volley that falls on an area (modelled as a ground zone that pulses once)."
+   "note": "A wide volley that falls on an area (modelled as a ground zone that pulses once, landing as six arrows; the projectile supports add arrows on outer rings, which widen the shower but hit each enemy once, as in the reference game)."
   },
   "sweepingCut": {
    "ref": "Reave",
@@ -803,7 +803,7 @@
   "tripleCadence": {
    "ref": "Multistrike Support",
    "status": "covered",
-   "note": "The melee attack repeats twice more, each repeat on a random enemy in reach and harder than the one before (22% and 44% more), faster, at less damage; the strikes share one critical roll."
+   "note": "The melee attack repeats twice more, each repeat on a random enemy in reach and harder than the one before (22% and 44% more), at less damage; the strikes share one critical roll. In the reference game the three blows take three attack times, made 35-44% shorter each; here the repeats fall inside one attack, so the whole cost is written as less attack speed (the three blows take about 2.2 attack times at level 1 and 2.1 at level 20), which keeps its damage where the reference game has it, about 1.45 times the plain skill. Before this it was 4.7 times."
   },
   "galvanise": {
    "ref": "Physical to Lightning Support",
@@ -1183,7 +1183,7 @@
   "snareCluster": {
    "ref": "Cluster Traps Support",
    "status": "covered",
-   "note": "Three traps are thrown at once, each weaker."
+   "note": "Five traps are thrown at once and land at random over a wide place, each much weaker (the reference game throws three at random within a short way of the target, with more traps allowed to stand). Where Triple Snare puts its traps in a tight ring that goes off together, these cover ground, so some of them miss a lone enemy and all of them are in the way of a crowd. It was Triple Snare at a higher price, which no one would choose."
   },
   "fieldOfCharges": {
    "ref": "Minefield Support",
@@ -1599,6 +1599,11 @@
    "ref": "Infernal Legion Support",
    "status": "covered",
    "note": "The supported minions burn the enemies near them for fire damage over time (it does not stack between minions) and burn themselves for 40% of their life a second, less their fire resistance."
+  },
+  "flankingVolley": {
+   "ref": "Spell Cascade Support",
+   "status": "covered",
+   "note": "The attack analog of Flanking Cast, for the attacks that land on the ground: a rain or a slam also comes down before and behind its target, with less area and less damage, the same terms as the spell version. The reference game's Spell Cascade is for spells only; there is no reference gem for attacks, and a rain of arrows is the case that has no way to be in more than one place."
   }
  },
  "uniques": {

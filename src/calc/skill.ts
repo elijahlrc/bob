@@ -25,6 +25,7 @@ import {
 } from '../mods/types';
 import type { DotSpec } from '../data/gems';
 import { levelValue, type SkillDef } from './gems';
+import { projectileBase } from './reach';
 import {
   FLEE_CHANCE,
   STATUSES,
@@ -130,6 +131,8 @@ export type SkillProfile = {
   };
   /** How many totems or brands can stand, or traps or mines go off, at once (1 and the support mods). */
   deployCount: number;
+  /** Traps and mines land at random over a wide place instead of in a tight ring (Snare Cluster). */
+  deployScatter: boolean;
   cost: number;
   /** Ignite: `max` ignites can burn at once (the strongest count); `speed` makes them deal their damage faster. */
   ignite: AilmentSpec & { max: number; speed: number };
@@ -593,6 +596,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
         ? Math.max(1, Math.floor((beh.duration * db.mult('skillDuration', baseCtx)) / beh.interval))
         : 1,
     deployCount: Math.max(1, Math.round(1 + db.sum('base', 'deployCount', baseCtx))),
+    deployScatter: db.flag('deployScatter', baseCtx),
     deploySeconds: db.sum('base', 'deploySeconds', baseCtx),
     mineChain: db.sum('base', 'mine.chain', baseCtx),
     mineDouble: db.sum('base', 'mine.double', baseCtx),
@@ -797,10 +801,11 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     enemyStunThreshRed: clamp(db.sum('base', 'enemyStunThreshold', baseCtx) / 100, 0, 0.9),
     stunDurMult: db.mult('stunDuration', baseCtx),
     pen: perType('penetration', 1),
-    projectiles:
-      beh.kind === 'projectile'
-        ? Math.max(1, beh.count + db.sum('base', 'projectiles', baseCtx))
-        : 1,
+    // What a skill can count is reach.ts's say: a fan of arrows, a rain, the bolts after a strike; one orb or one chain, not.
+    projectiles: (() => {
+      const base = projectileBase(skill);
+      return base === null ? 1 : Math.max(1, base + db.sum('base', 'projectiles', baseCtx));
+    })(),
     pierce: (beh.kind === 'projectile' ? (beh.pierce ?? 0) : 0) + db.sum('base', 'pierce', baseCtx),
     chains: (beh.kind === 'chain' ? beh.chains : 0) + db.sum('base', 'chains', baseCtx),
     radiusMult: Math.sqrt(aoeMult),
