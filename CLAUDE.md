@@ -36,6 +36,11 @@
 - **Evasion and accuracy** (2026-10-10): a monster's evasion and accuracy by level are fitted to the reference game's monster
   tables (`monsterEvasion` / `monsterAccuracy`, `src/calc/formulas.ts`; the table is `docs/coverage/pob-monster-stats.json`;
   `npm run evasion` compares the two games; docs/EVASION.md), so the same rating gives about the same hit chance as there.
+- **Map variety** (2026-10-12): [docs/MAP-VARIETY.md](docs/MAP-VARIETY.md) (milestones W0–W8, built): every map has a biome (`src/data/biomes.ts`:
+  layout kind, tiles, light, props; rolled apart from the theme, shown on entering, pinned by the special map types), its size
+  follows the map number (`roomsForMap`, `roomsForPlan`), a pack follows its room's area, and an offer has a density style
+  (`src/data/density.ts`). Layouts are styles of `generateLabyrinth` (`src/gen/layouts.ts`); the look of a biome is `biomeLook.ts`. After
+  a change to a layout or to density run `npm run mapstats` and `npm run map:ascii`; the Debug panel forces a biome or a style.
 - **Patch notes:** [docs/PATCH-NOTES.md](docs/PATCH-NOTES.md), player-facing, newest first, shown on the Patch notes screen of the title
   menu (`src/ui/PatchNotes.tsx`): add an entry for every change a player would notice. The `/patch-notes` skill
   (`.claude/skills/patch-notes/SKILL.md`) writes them from the commits, files them, commits and pushes; a push to main is what

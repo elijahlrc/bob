@@ -986,3 +986,12 @@ back.
 Iteration 8 (the user: more paths): about half of the clusters joined to a second related cluster by a short link that costs more nodes
 than the road between them, each start joined into its two starter clusters, which are knit to the clusters near them. 2,628 nodes;
 `SAVE_VERSION` 17 hands passives back. The tree is baked at build time (`npm run tree:bake`), not laid out in the browser.
+
+## Map variety (2026-10-12)
+
+docs/MAP-VARIETY.md, W0 to W8 built in one pass: `npm run mapstats` (sizes and crowds, `--styles`, `--biome`) and `npm run map:ascii`
+(a map as text); biomes (`src/data/biomes.ts`, the look in `src/render/styles/grim/biomeLook.ts`), size by map number, density by room
+area and four styles (`src/data/density.ts`), cave, field, loops and warren layouts (`src/gen/layouts.ts`, styles in `labyrinth.ts`),
+new floor and wall kinds and eleven props, the biome banner, and a Biome and Density override in the Debug panel. Standard maps
+carry about the same monsters as before (map 100: 108 against 95; caves 20% fewer because their rooms are smaller). Found on the way
+and left: docs/BUGS.md 2 (a Spitter rare can hold the bow strider dodging its pools for a minute). Not built: carved pits and water.

@@ -12,6 +12,8 @@ export type PropSpec = {
   weight: number;
   /** Lies flat on the floor (a puddle, a crack) instead of standing. */
   flat?: boolean;
+  /** Comes in a group: up to this many more of it lie close by (pools, moss, cracks). */
+  cluster?: number;
   /** Burns or glows: a light at the prop. */
   light?: { color: number; radius: number; intensity: number };
   /** Added on top of the light, to make the glow read (additive blend with this tint). */
@@ -76,7 +78,7 @@ export const BIOME_LOOKS: Record<BiomeId, BiomeLook> = {
       { tex: 'fungus', weight: 3, light: FUNGUS, glow: 0x40e0d0 },
       { tex: 'rubble', weight: 2 },
       { tex: 'bonepile', weight: 1, flat: true },
-      { tex: 'puddle', weight: 1, flat: true },
+      { tex: 'puddle', weight: 1, flat: true, cluster: 2 },
     ],
   },
   ruins: {
@@ -108,9 +110,9 @@ export const BIOME_LOOKS: Record<BiomeId, BiomeLook> = {
     brazier: 0,
     perRoom: [5, 7],
     props: [
-      { tex: 'puddle', weight: 5, flat: true },
+      { tex: 'puddle', weight: 5, flat: true, cluster: 3 },
       { tex: 'reeds', weight: 4 },
-      { tex: 'moss', weight: 3, flat: true },
+      { tex: 'moss', weight: 3, flat: true, cluster: 3 },
       { tex: 'fungus', weight: 1, light: FUNGUS, glow: 0x80f0a0 },
       { tex: 'boulder', weight: 1 },
     ],
@@ -126,9 +128,9 @@ export const BIOME_LOOKS: Record<BiomeId, BiomeLook> = {
     brazier: 1,
     perRoom: [3, 5],
     props: [
-      { tex: 'lavacrack', weight: 4, flat: true, light: LAVA, glow: 0xff7a30 },
+      { tex: 'lavacrack', weight: 4, flat: true, cluster: 2, light: LAVA, glow: 0xff7a30 },
       { tex: 'vent', weight: 3, flat: true },
-      { tex: 'ash', weight: 3, flat: true },
+      { tex: 'ash', weight: 3, flat: true, cluster: 2 },
       { tex: 'rubble', weight: 2 },
     ],
   },
@@ -145,7 +147,7 @@ export const BIOME_LOOKS: Record<BiomeId, BiomeLook> = {
     props: [
       { tex: 'boulder', weight: 4 },
       { tex: 'rubble', weight: 3 },
-      { tex: 'roots', weight: 3, flat: true },
+      { tex: 'roots', weight: 3, flat: true, cluster: 2 },
       { tex: 'ash', weight: 2, flat: true },
       { tex: 'bonepile', weight: 1, flat: true },
     ],
@@ -178,7 +180,7 @@ export const BIOME_LOOKS: Record<BiomeId, BiomeLook> = {
     brazier: 0.1,
     perRoom: [3, 5],
     props: [
-      { tex: 'roots', weight: 5, flat: true },
+      { tex: 'roots', weight: 5, flat: true, cluster: 2 },
       { tex: 'bonepile', weight: 4, flat: true },
       { tex: 'rubble', weight: 2 },
       { tex: 'fungus', weight: 1, light: FUNGUS, glow: 0xc0a050 },

@@ -628,6 +628,20 @@ export class GrimStyle extends StyleBase {
             rng,
             spec.light !== undefined && propLights <= MAX_PROP_LIGHTS,
           );
+          // A group: more of it close by, on floor.
+          const more = spec.cluster ? rng.int(1, spec.cluster) : 0;
+          for (let k = 0; k < more; k++) {
+            const gx = x + rng.float(-2.6, 2.6);
+            const gy = y + rng.float(-2.6, 2.6);
+            if (
+              gx > 1 &&
+              gy > 1 &&
+              gx < lab.w - 1 &&
+              gy < lab.h - 1 &&
+              isFloor(Math.floor(gx), Math.floor(gy))
+            )
+              this.placeProp({ ...spec, light: undefined }, gx, gy, rng, false);
+          }
         }
       }
     }

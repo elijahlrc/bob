@@ -1,6 +1,6 @@
 # Map variety plan (milestones W0–W8)
 
-Status: **plan, nothing built** (2026-10-12). Written from a back-and-forth with the user. None of this has to be perfect:
+Status: **built** (2026-10-12; see section 7 for how it came out). Written from a back-and-forth with the user. None of this has to be perfect:
 the aim is incremental steps that make maps look and feel different from each other.
 
 ## 1. Where we are
@@ -142,3 +142,29 @@ None open. Decided with the user (2026-10-12):
 2. The biome is **revealed on entry**, not on the offer card. W1 therefore adds no card line.
 3. A mixed theme (map 30+) takes **one of its two** themes' biome, unless a mix is easy and looks good.
 4. Special map types **pin a biome** (Quarry is a Cavern, Holdout a Hollow, and so on), which makes them feel special.
+
+## 7. As built (2026-10-12)
+
+All nine milestones were built in one pass. How it differs from the plan above:
+
+- **W5 and W6 together.** Every layout is the chain of rooms of `generateLabyrinth` with another `LayoutStyle` (`src/gen/labyrinth.ts`,
+  the table in `src/gen/layouts.ts`), not five generators: a cave carves rounded blob rooms and wandering passages and smooths them;
+  a field makes every room fill its cell, with wide ways and pillars in the open; ruins add two links between neighbouring halls; a
+  warren has half as many rooms again, 5 to 8 tiles a side, joined by two-wide passages and two extra links. Rooms, waypoints,
+  packs, chests and the boss arena work as before. The generator retries when a cave pinches a passage shut, and a test walks
+  every room, the exit, the chests and every monster of every biome on foot (`src/gen/layouts.test.ts`).
+- **W7: carved pits and water were not built.** Ground features are marks on the floor (pools in groups, moss, ash, roots, glowing
+  cracks), and the obstacles are the pillars of a field. Real pits and water (the open question 1) can come later.
+- **Density styles show on the offer card** (from map 3, never on a tenth map or a type with a crowd of its own), the biome does not.
+- **The size spread** is 15% on the number of rooms, drawn from the map's own seed (`roomsForPlan`), and the smallest room side
+  grows from 6 to 7 at map 40 and 8 at map 75.
+- **Debug panel:** a Biome and a Density override (`forceBiome`, `forceDensity`), and `npm run map:ascii` prints a map as text.
+- **Numbers, standard density, plain maps, 60 seeds, crypt layout:** monsters 12 on map 1, 26 on map 10, 29 on map 25, 52 on map 50,
+  69 on map 75 and 107 on map 100 (the baseline above: 14, 23, 30, 45, 56, 95). Caves and marshes carry about 20% fewer because their
+  rooms are smaller; the density per tile is the same. Sparse is 0.6 times standard and Packed 1.5 times; Clustered and Scattered
+  keep the total.
+- **Found on the way:** docs/BUGS.md 2, a Spitter rare can hold the bow strider dodging its pools for a minute. The stall test
+  runs with the usual density until that is fixed.
+- **Not checked:** how the bot's clear times and deaths move with the new layouts and styles (only that every biome clears on
+  early maps), and the phone layout of the new banner and the density line. The look is a first pass, judged by eye in the
+  Browser pane; the ruins cobble in particular is busy.
