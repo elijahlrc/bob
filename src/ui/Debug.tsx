@@ -13,6 +13,8 @@ import {
   statLevel,
   type Difficulty,
 } from '../data/difficulty';
+import { BIOMES, forceBiome, type BiomeId } from '../data/biomes';
+import { DENSITIES, forceDensity, type DensityId } from '../data/density';
 import type { Controller } from '../run/controller';
 import { debugEnabled } from './debugFlag';
 import { loadPref, savePref } from './prefs';
@@ -60,6 +62,52 @@ function Setting(props: {
   );
 }
 
+/** Forces the biome and the density style of every map from now on (docs/MAP-VARIETY.md); remembered between visits. */
+function MapLooks() {
+  const [biome, setBiome] = useState<string>(() => loadPref<string>('debugBiome', ''));
+  const [density, setDensity] = useState<string>(() => loadPref<string>('debugDensity', ''));
+  useEffect(() => {
+    forceBiome((biome || null) as BiomeId | null);
+    forceDensity((density || null) as DensityId | null);
+  }, [biome, density]);
+  return (
+    <div class="debug-row">
+      <span class="debug-label">Biome</span>
+      <select
+        value={biome}
+        onChange={(e) => {
+          const v = (e.target as HTMLSelectElement).value;
+          setBiome(v);
+          savePref('debugBiome', v);
+        }}
+      >
+        <option value="">rolled</option>
+        {BIOMES.map((b) => (
+          <option key={b.id} value={b.id}>
+            {b.name}
+          </option>
+        ))}
+      </select>
+      <span class="debug-label">Density</span>
+      <select
+        value={density}
+        onChange={(e) => {
+          const v = (e.target as HTMLSelectElement).value;
+          setDensity(v);
+          savePref('debugDensity', v);
+        }}
+      >
+        <option value="">rolled</option>
+        {DENSITIES.map((d) => (
+          <option key={d.id} value={d.id}>
+            {d.name}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 /**
  * The difficulty controls (docs/ENEMIES.md 8.3): scaling, base difficulty and variance. At camp they edit the run in
  * progress (from the next map on); on the title screen they set the next new run. Hidden unless `debugEnabled()`.
@@ -96,7 +144,8 @@ export function DebugPanel({ c }: { c: Controller }) {
       open={open}
       onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}
     >
-      <summary>Debug: difficulty</summary>
+      <summary>Debug: difficulty and maps</summary>
+      <MapLooks />
       <div class="muted">
         {atCamp
           ? 'Changes apply from the next map you start.'

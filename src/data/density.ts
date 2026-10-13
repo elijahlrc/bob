@@ -87,6 +87,12 @@ export const DENSITY_FROM = 3;
 /** Types whose crowd is already their own (a Throng, a Quarry, a Holdout, a Crawl), and so take no style. */
 const NO_STYLE: MapTypeId[] = ['throng', 'quarry', 'holdout', 'crawl'];
 
+/** A debug override (the Debug panel): when set, every map has this style. */
+let forced: DensityId | null = null;
+export function forceDensity(id: DensityId | null): void {
+  forced = id;
+}
+
 /**
  * The style of an offered map: fixed by the run seed and the offer, and standard on the early maps, on the boss and
  * champion maps (every tenth) and on the types with a crowd of their own.
@@ -94,6 +100,7 @@ const NO_STYLE: MapTypeId[] = ['throng', 'quarry', 'holdout', 'crawl'];
 export function densityFor(seed: number, offerId: string, map: number, type: MapTypeId): DensityId {
   const r = new Rng(seed).fork(`density.${offerId}`);
   const pick = r.weighted(DENSITIES, (d) => d.weight).id;
+  if (forced) return forced;
   if (map < DENSITY_FROM || map % 10 === 0 || NO_STYLE.includes(type)) return 'standard';
   return pick;
 }

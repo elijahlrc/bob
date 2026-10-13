@@ -412,10 +412,17 @@ export function Hud({ c }: { c: Controller }) {
   const sel = c.selectedId !== null ? w.actors.find((x) => x.id === c.selectedId) : undefined;
   return (
     <div class="hud">
+      {!sc && w.t < 5 && (
+        <div class="biome-banner" key={w.plan.seed}>
+          <div class="biome-name">{w.plan.biome.name}</div>
+          <div class="biome-text">{w.plan.biome.text}</div>
+        </div>
+      )}
       <div class="hud-top">
         <span>
           {sc ? 'Showcase' : `Map ${w.plan.map}`} · {w.plan.theme.name}
         </span>
+        <span {...infoProps(w.plan.biome.text)}>{w.plan.biome.name}</span>
         <span {...infoProps(leadText(w.plan.theme))}>{leadNames(w.plan.theme)}</span>
         <span>Level {w.build.level}</span>
         <span>Kills {w.stats.kills}</span>

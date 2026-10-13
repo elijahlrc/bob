@@ -730,5 +730,157 @@ export function buildProps(): Record<string, HTMLCanvasElement> {
     }
   });
   PROPS.drip = canvas(2, 3, (c) => px(c, '#fff', 0, 0, 2, 3));
+  addBiomeProps();
   return PROPS;
+}
+
+/** Props and ground marks that belong to one biome (docs/MAP-VARIETY.md 3.4); the biome's look says where each goes. */
+function addBiomeProps(): void {
+  const blob = (
+    c: CanvasRenderingContext2D,
+    w: number,
+    h: number,
+    rng: Rng,
+    n: number,
+    spread: number,
+    colors: string[],
+  ) => {
+    for (let i = 0; i < n; i++) {
+      const a = rng.next() * Math.PI * 2;
+      const d = Math.sqrt(rng.next()) * spread;
+      px(
+        c,
+        rng.pick(colors),
+        Math.round(w / 2 + Math.cos(a) * d),
+        Math.round(h / 2 + Math.sin(a) * d * 0.55),
+        rng.int(1, 3),
+        1,
+      );
+    }
+  };
+  PROPS.rubble = canvas(16, 9, (c, w, h, rng) => {
+    for (let i = 0; i < 6; i++) {
+      const x = rng.int(0, 11);
+      const y = rng.int(1, 5);
+      const sw = rng.int(3, 5);
+      const sh = rng.int(2, 4);
+      px(c, '#0d0b0a', x - 1, y - 1, sw + 2, sh + 2);
+      px(c, '#6e6a64', x, y, sw, sh);
+      px(c, '#9a958c', x, y, sw, 1);
+      px(c, '#4a4640', x, y + sh - 1, sw, 1);
+    }
+    void w;
+    void h;
+  });
+  PROPS.boulder = canvas(18, 14, (c, w, h) => {
+    for (let y = 0; y < h; y++)
+      for (let x = 0; x < w; x++) {
+        const d = Math.hypot((x - 9) / 8, (y - 8) / 6);
+        if (d > 1) continue;
+        const lit = x + y < 14 ? 1 : 0;
+        px(c, d > 0.86 ? '#0d0b0a' : lit ? (d < 0.45 ? '#8c877e' : '#6c685f') : '#47443d', x, y);
+      }
+  });
+  PROPS.stalag = canvas(10, 18, (c) => {
+    for (let y = 0; y < 18; y++) {
+      const half = Math.max(0, Math.round(1 + (y / 18) * 4));
+      px(c, '#0d0b0a', 5 - half - 1, y, half * 2 + 2, 1);
+      px(c, y % 5 === 0 ? '#5a564e' : '#6e6a60', 5 - half, y, half, 1);
+      px(c, '#3e3b35', 5, y, half, 1);
+    }
+  });
+  PROPS.fungus = canvas(14, 12, (c, w, h, rng) => {
+    for (let i = 0; i < 4; i++) {
+      const x = rng.int(1, 9);
+      const y = rng.int(3, 8);
+      const s = rng.int(3, 5);
+      px(c, '#0d1a1a', x, y + 1, s, 3);
+      px(c, '#2a8a86', x, y, s, 2);
+      px(c, '#7af0e0', x + 1, y, Math.max(1, s - 2), 1);
+      px(c, '#143a3a', x + Math.floor(s / 2), y + 2, 1, 3);
+    }
+    void w;
+    void h;
+  });
+  PROPS.reeds = canvas(14, 18, (c, _w, h, rng) => {
+    for (let i = 0; i < 6; i++) {
+      const x = rng.int(1, 12);
+      const top = rng.int(1, 8);
+      px(c, '#1a3a14', x, top, 1, h - top);
+      px(c, '#4c8a34', x, top + 1, 1, h - top - 3);
+      if (i % 2 === 0) px(c, '#6a4a2a', x - 1, top - 1, 2, 3);
+    }
+  });
+  PROPS.candles = canvas(12, 14, (c) => {
+    for (const [x, y] of [
+      [2, 6],
+      [6, 4],
+      [9, 7],
+    ]) {
+      px(c, '#0d0b0a', x - 1, y, 4, 8);
+      px(c, '#d8d0b0', x, y + 1, 2, 6);
+      px(c, '#fff0a0', x, y - 1, 2, 2);
+    }
+  });
+  PROPS.puddle = canvas(24, 11, (c, w, h) => {
+    for (let y = 0; y < h; y++)
+      for (let x = 0; x < w; x++) {
+        const d = Math.hypot((x - w / 2 + 0.5) / (w / 2), (y - h / 2 + 0.5) / (h / 2));
+        if (d < 1) px(c, d > 0.8 ? 'rgba(20,34,40,0.8)' : 'rgba(40,70,84,0.78)', x, y);
+        if (d < 0.5 && (x + y) % 5 === 0) px(c, 'rgba(150,190,200,0.55)', x, y);
+      }
+  });
+  PROPS.lavacrack = canvas(30, 14, (c, w, h, rng) => {
+    for (let k = 0; k < 5; k++) {
+      let x = w / 2;
+      let y = h / 2;
+      const a = (k / 5) * Math.PI * 2 + rng.next();
+      for (let i = 0; i < 9; i++) {
+        px(c, 'rgb(255,120,30)', Math.round(x), Math.round(y));
+        if (i % 3 === 0) px(c, 'rgba(255,200,90,0.9)', Math.round(x), Math.round(y) - 1);
+        x += Math.cos(a + rng.next() * 0.8 - 0.4) * 1.2;
+        y += Math.sin(a + rng.next() * 0.8 - 0.4) * 0.6;
+      }
+    }
+  });
+  PROPS.roots = canvas(22, 10, (c, w, h, rng) => {
+    for (let k = 0; k < 4; k++) {
+      let x = rng.int(2, 6);
+      let y = rng.int(2, 7);
+      for (let i = 0; i < 16; i++) {
+        px(c, '#1a120c', x, y + 1);
+        px(c, i % 4 === 0 ? '#6a4a2c' : '#4a3220', x, y);
+        x += 1;
+        y += rng.int(-1, 1) * (rng.chance(0.4) ? 1 : 0);
+        y = Math.max(1, Math.min(h - 2, y));
+      }
+    }
+    void w;
+  });
+  PROPS.ash = canvas(24, 12, (c, w, h, rng) => {
+    blob(c, w, h, rng, 50, 10, [
+      'rgba(70,66,62,0.7)',
+      'rgba(40,38,36,0.8)',
+      'rgba(110,104,98,0.6)',
+    ]);
+  });
+  PROPS.moss = canvas(22, 10, (c, w, h, rng) => {
+    blob(c, w, h, rng, 44, 9, [
+      'rgba(60,110,40,0.75)',
+      'rgba(40,80,28,0.8)',
+      'rgba(110,160,60,0.6)',
+    ]);
+  });
+  PROPS.cobweb = canvas(16, 12, (c) => {
+    for (let i = 0; i < 6; i++) px(c, 'rgba(210,210,200,0.55)', i, i, 1, 1);
+    for (let i = 0; i < 6; i++) px(c, 'rgba(210,210,200,0.55)', 0, i * 2, i + 2, 1);
+    for (let i = 1; i < 12; i += 3) px(c, 'rgba(210,210,200,0.45)', i, 0, 1, 11 - i);
+  });
+  PROPS.vent = canvas(16, 9, (c, w, h) => {
+    for (let y = 0; y < h; y++)
+      for (let x = 0; x < w; x++) {
+        const d = Math.hypot((x - w / 2 + 0.5) / (w / 2), (y - h / 2 + 0.5) / (h / 2));
+        if (d < 1) px(c, d > 0.8 ? '#0d0b0a' : y % 3 === 1 ? '#ff8a2a' : '#2a2422', x, y);
+      }
+  });
 }

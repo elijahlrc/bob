@@ -118,7 +118,13 @@ export function rollBiomes(seed: number, map: number, count = 3): BiomeId[] {
   return out.map((b) => b.id);
 }
 
+/** A debug override (the Debug panel): when set, every map has this biome. */
+let forced: BiomeId | null = null;
+export function forceBiome(id: BiomeId | null): void {
+  forced = id;
+}
+
 /** The biome of the offer in a slot of a level. */
 export function biomeFor(seed: number, map: number, slot: number, type: MapTypeId): BiomeId {
-  return PINNED_BIOME[type] ?? rollBiomes(seed, map)[slot % 3];
+  return forced ?? PINNED_BIOME[type] ?? rollBiomes(seed, map)[slot % 3];
 }

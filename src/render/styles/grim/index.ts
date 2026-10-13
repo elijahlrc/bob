@@ -26,6 +26,7 @@ import {
   projectileTexture,
   sidearmStance,
 } from './encounterFx';
+import { BIOME_LOOKS, biomeColors, type PropSpec } from './biomeLook';
 import { isoFloors, isoWalls, ISO_H, ISO_W, WALL_LOW, WALL_TALL } from './isoPaint';
 import { BossFx } from './bossFx';
 import {
@@ -97,6 +98,9 @@ type View = ActorView & {
 
 type Bolt = { pts: { x: number; y: number }[]; t: number; color: number };
 type TempLight = { light: Phaser.GameObjects.Light; t: number; total: number; base: number };
+/** Lights a map's glowing props may use between them (the torches and braziers have theirs). */
+const MAX_PROP_LIGHTS = 10;
+
 type Torch = { light: Phaser.GameObjects.Light; seed: number; base: number; x: number; y: number };
 
 export class GrimStyle extends StyleBase {
@@ -202,7 +206,7 @@ export class GrimStyle extends StyleBase {
 
     // Lighting: a dark cold ambient, warm pools around torches and the player.
     s.lights.enable();
-    s.lights.setAmbientColor(0x625c7a);
+    s.lights.setAmbientColor(BIOME_LOOKS[world.plan.biome.id].ambient);
 
     const cam = s.cameras.main;
     this.zoom = pickZoom(cam.width);
@@ -280,14 +284,16 @@ export class GrimStyle extends StyleBase {
     const lab = world.plan.lab;
     const tid = world.plan.theme.id;
     const th = world.plan.theme;
-    const floors = isoFloors(th.floor);
+    const look = BIOME_LOOKS[world.plan.biome.id];
+    const col = biomeColors(look, th);
+    const floors = isoFloors(col.floor, look.floorKind);
     // One texture holds every wall variant: a lit sprite batch cannot span textures (Phaser 4 draws one texture per batch
     // when lighting is on), and walls of random variants side by side in depth order would be a draw call each.
-    const wallAtlas = `gwa_${tid}`;
+    const wallAtlas = `gwa_${tid}_${world.plan.biome.id}`;
     if (!s.textures.exists(wallAtlas)) {
       const cubes = [
-        ...isoWalls(th.wall, WALL_TALL).map((c, i) => ({ name: `gwt_${i}`, c })),
-        ...isoWalls(th.wall, WALL_LOW).map((c, i) => ({ name: `gwl_${i}`, c })),
+        ...isoWalls(col.wall, WALL_TALL, look.wallKind).map((c, i) => ({ name: `gwt_${i}`, c })),
+        ...isoWalls(col.wall, WALL_LOW, look.wallKind).map((c, i) => ({ name: `gwl_${i}`, c })),
       ];
       const cell = ISO_W + 2;
       const cv = document.createElement('canvas');
@@ -520,6 +526,8 @@ export class GrimStyle extends StyleBase {
   private placeProps(world: World, rng: Rng): void {
     const s = this.scene;
     const lab = world.plan.lab;
+    const look = BIOME_LOOKS[world.plan.biome.id];
+    let propLights = 0;
     const isFloor = (x: number, y: number) => lab.tiles[y * lab.w + x] === 1;
     const isFace = (x: number, y: number) =>
       x >= 0 &&
@@ -535,6 +543,7 @@ export class GrimStyle extends StyleBase {
       for (const tx of [r.x + 2, r.x + r.w - 3]) {
         const ty = r.y - 1;
         if (!isFace(tx, ty)) continue;
+        if (look.torches < 1 && !rng.chance(look.torches)) continue;
         const tb = this.project(tx + 1, ty + 1);
         const wx = tb.x + 5;
         const wy = tb.y - 15;
@@ -567,7 +576,7 @@ export class GrimStyle extends StyleBase {
         this.owned.push(g);
       }
       // A brazier in the corner of bigger rooms.
-      if (room.kind === 'end' || (room.kind === 'main' && rng.chance(0.5))) {
+      if (room.kind === 'end' || (room.kind === 'main' && rng.chance(look.brazier))) {
         const bp = this.project(r.x + 1.6, r.y + 1.7);
         const bx = bp.x;
         const by = bp.y;
@@ -603,17 +612,54 @@ export class GrimStyle extends StyleBase {
         sm.setDepth(89000);
         this.owned.push(sm);
       }
-      // Old bones and bloodstains on the floor.
+      // Props and marks of the biome on the floor.
       if (room.kind !== 'start') {
-        for (let i = 0; i < 3; i++)
-          this.addDecal(
-            ...this.xy(rng.float(r.x + 1, r.x + r.w - 1), rng.float(r.y + 1, r.y + r.h - 1)),
-            rng.chance(0.4) ? 'g_bonepile' : 'g_blood' + rng.int(0, 2),
-            rng.chance(0.5),
-            0.9,
-            false,
+        const n = rng.int(look.perRoom[0], look.perRoom[1]);
+        for (let i = 0; i < n; i++) {
+          const spec = rng.weighted(look.props, (q) => q.weight);
+          const x = rng.float(r.x + 1, r.x + r.w - 1);
+          const y = rng.float(r.y + 1, r.y + r.h - 1);
+          if (!isFloor(Math.floor(x), Math.floor(y))) continue;
+          if (spec.light) propLights++;
+          this.placeProp(
+            spec,
+            x,
+            y,
+            rng,
+            spec.light !== undefined && propLights <= MAX_PROP_LIGHTS,
           );
+        }
       }
+    }
+  }
+
+  /** One prop of a biome: a mark on the ground, or something standing, lit if it glows (and the map has lights to spare). */
+  private placeProp(spec: PropSpec, wx: number, wy: number, rng: Rng, lit: boolean): void {
+    const s = this.scene;
+    const [x, y] = this.xy(wx, wy);
+    const key = 'g_' + spec.tex;
+    if (spec.flat) this.addDecal(x, y, key, rng.chance(0.5), 0.9, false);
+    else {
+      const img = s.add
+        .image(x, y, key)
+        .setOrigin(0.5, 0.85)
+        .setFlipX(rng.chance(0.5))
+        .setDepth(1000 + y)
+        .setLighting(true);
+      this.owned.push(img);
+    }
+    if (!spec.light && !spec.glow) return;
+    if (lit && spec.light)
+      this.addLight(x, y - 6, spec.light.radius, spec.light.color, spec.light.intensity);
+    if (spec.glow !== undefined) {
+      const g = s.add
+        .image(x, y - (spec.flat ? 0 : 6), 'g_glow')
+        .setDepth(spec.flat ? 6 : 1000 + y + 1)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setTint(spec.glow)
+        .setScale(spec.flat ? 0.5 : 0.35)
+        .setAlpha(0.5);
+      this.owned.push(g);
     }
   }
 
