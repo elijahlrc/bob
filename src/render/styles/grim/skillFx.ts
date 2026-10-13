@@ -12,6 +12,7 @@ import {
 import { MINIONS } from '../../../data/minions';
 import { bondLinks, choiceByKey } from '../../../sim/deploy';
 import type { Actor, SimEvent, World } from '../../../sim/types';
+import { BUFF_LOOK, drawBuff } from './buffFx';
 import { drawLanded, outlineArea, shapeOfExplode, type AreaShape } from './areaFx';
 
 /**
@@ -496,6 +497,7 @@ export class SkillFx {
     air.clear();
     this.curseMarks(air, w, time);
     this.siphons(air, w, time);
+    this.buffMarks(ground, air, w, time);
     this.lasting(ground, air, w, time);
     let j = 0;
     for (const f of this.list) {
@@ -783,29 +785,18 @@ export class SkillFx {
       } else this.ticks(g, p.x, p.y, r, 10, time * 0.4 * (i % 2 ? -1 : 1), look.color, 0.85, 2);
       i++;
     }
+  }
+
+  /** Each buff that is up has a mark of its own on the character (buffFx.ts); one about to end blinks. */
+  private buffMarks(ground: Gfx, air: Gfx, w: World, time: number): void {
+    const p = w.player;
+    if (!p.alive) return;
     let n = 0;
     for (const id of BUFF_IDS) {
       const left = w.buffT[id];
-      if (left <= 0 || n >= 6) continue;
-      const util = w.char.utilities.find(
-        (u) => u.skill.utility?.kind === 'buff' && u.skill.utility.buff === id,
-      );
-      let color = UTILITY_COLOR.buff;
-      if (util) {
-        const s = util.skill;
-        const d = deliveryOf(s.behaviour, s.type, s.tags, s.utility);
-        color = UTILITY_COLOR[d === 'warcry' || d === 'guard' ? d : 'buff'];
-      }
-      // A buff about to end blinks.
+      if (left <= 0 || n >= 8) continue;
       const blink = left < 1.5 ? 0.4 + 0.6 * Math.abs(Math.sin(time * 8)) : 1;
-      const o = this.host.project(p.x, p.y);
-      const ang = time * 2 + (n / 6) * Math.PI * 2;
-      const rx = this.host.rpx(0.65);
-      g.fillStyle(color, 0.9 * blink).fillCircle(
-        o.x + Math.cos(ang) * rx,
-        o.y - 10 + Math.sin(ang) * rx * 0.5,
-        1.6,
-      );
+      drawBuff(air, ground, this.host, p, BUFF_LOOK[id], time, n, blink);
       n++;
     }
   }

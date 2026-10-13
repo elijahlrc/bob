@@ -11,6 +11,7 @@ change, and our own names only. Dash bullets under plain headings.
 - Enemies with energy shield now show it on their health bar, a blue strip above the life that drains first. The enemy card shows it too.
 - Drain Trap now draws its beams, a glowing line from each enemy it holds to you with a red and a blue mote running along it for the life and mana it gives.
 - Skills that leave something standing are now drawn: the blades of Orbiting Blades, the Tempest Mote orb, Skyfall's markers, Fuse Arrow's arrows, Blight Hail's pods, the Twin Shadow archer, Cinder Blow's charges and Slag Carapace's shell.
+- Every buff that is up now shows on your character in its own colour and style: speed buffs leave streaks behind you, guards are plates or a halo, surges of power circle your body, rages give off embers, banners fly a small flag, stances ring your feet, and so on. A buff about to end blinks.
 - Skills that deal no hit of their own, such as Drain Trap, Creeping Plague and Withering Breath, now give what a hit gives (charges, buffs, rage, life and mana) when they land, so Livewire Snares works with Drain Trap. Curses do not.
 - Every map now has a biome: Crypt, Cavern, Ruins, Marsh, Forge, Hollow, Shrine or Warren. It sets the layout and look of the map and is shown when you enter. It is separate from the theme, so any theme can turn up in any biome.
 - New layouts: Caverns and Marshes are winding caves, the Hollow is wide open ground with pillars, Ruins have more than one way round, and the Warren is a tangle of small chambers and narrow passages.
