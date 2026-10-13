@@ -43,7 +43,8 @@
     "tree:audit": "tsx scripts/tree/audit.ts",
     "tree:pic": "tsx scripts/tree/pic.ts",
     "tree:explore": "tsx scripts/tree/explore.ts",
-    "tree:charter": "tsx scripts/tree/charter.ts"
+    "tree:charter": "tsx scripts/tree/charter.ts",
+    "patch": "tsx scripts/patch/patch.ts"
   },
   "dependencies": {
     "@preact/signals": "^2.11.3",
