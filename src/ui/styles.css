@@ -347,6 +347,10 @@ button {
   background: var(--btn);
   color: var(--hi);
 }
+.tab:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 .tab-body {
   flex: 1;
   min-height: 0;

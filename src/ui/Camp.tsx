@@ -24,6 +24,7 @@ import { BOSSES, bossForMap } from '../data/bosses';
 import type { OfferPreview } from '../run/preview';
 import { Reward } from './Reward';
 import { Sheet } from './Sheet';
+import { CRAFTING_OPEN } from '../data/constants';
 import { Workbench } from './Workbench';
 import { Skills } from './Skills';
 import { Strategy } from './Strategy';
@@ -179,6 +180,7 @@ export function Camp({ c }: { c: Controller }) {
     null,
   );
   const goTo = (to: 'items' | 'workbench', uid: number) => {
+    if (to === 'workbench' && !CRAFTING_OPEN) return;
     setFocus((f) => ({ uid, n: (f?.n ?? 0) + 1, to }));
     setTab(to);
   };
@@ -432,8 +434,10 @@ export function Camp({ c }: { c: Controller }) {
           <button
             class={'tab' + (shown === 'workbench' ? ' on' : '')}
             onClick={() => setTab('workbench')}
+            disabled={!CRAFTING_OPEN}
+            title={CRAFTING_OPEN ? undefined : 'Crafting is closed for now.'}
           >
-            Workbench{run.pendingCraft ? ' (pick a result)' : ''}
+            Workbench{CRAFTING_OPEN && run.pendingCraft ? ' (pick a result)' : ''}
           </button>
           <button class={'tab' + (shown === 'next' ? ' on' : '')} onClick={() => setTab('next')}>
             Next map{run.reward ? ' (reward)' : ''}
@@ -451,7 +455,7 @@ export function Camp({ c }: { c: Controller }) {
               onCraft={(uid) => goTo('workbench', uid)}
             />
           )}
-          {shown === 'workbench' && (
+          {shown === 'workbench' && CRAFTING_OPEN && (
             <Workbench
               c={c}
               focus={focus?.to === 'workbench' ? focus : null}
@@ -464,7 +468,7 @@ export function Camp({ c }: { c: Controller }) {
           <span class="camp-bar-who">
             {classDef(run.classId).name} · Level {run.build.level}
           </span>
-          {run.pendingCraft && shown !== 'workbench' && (
+          {CRAFTING_OPEN && run.pendingCraft && shown !== 'workbench' && (
             <button
               class="btn small"
               onClick={() => goTo('workbench', run.pendingCraft!.itemUid)}

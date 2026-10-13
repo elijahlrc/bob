@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'preact/hooks';
 import type { SheetDiff } from '../calc/character';
+import { CRAFTING_OPEN } from '../data/constants';
 import { flaskBase } from '../data/flasks';
 import type { EquipSlot, FlaskItem, InventoryItem, Item } from '../data/types';
 import { salvageValue } from '../run/craft';
@@ -226,7 +227,12 @@ function ItemBody({
         <button class="btn small" onClick={() => a.onFavourite(item.uid)}>
           {favourite ? '★ Favourite' : '☆ Favourite'}
         </button>
-        <button class="btn small" onClick={() => a.onCraft(item.uid)} disabled={!!item.sealed}>
+        <button
+          class="btn small"
+          onClick={() => a.onCraft(item.uid)}
+          disabled={!!item.sealed || !CRAFTING_OPEN}
+          title={CRAFTING_OPEN ? undefined : 'Crafting is closed for now.'}
+        >
           Craft…
         </button>
         <DiscardButton it={item} a={a} />
@@ -440,7 +446,8 @@ export function ItemDetail(p: Props) {
                 <button
                   class="btn small"
                   onClick={() => a.onCraft(selected.uid)}
-                  disabled={!!selected.sealed}
+                  disabled={!!selected.sealed || !CRAFTING_OPEN}
+                  title={CRAFTING_OPEN ? undefined : 'Crafting is closed for now.'}
                 >
                   Craft…
                 </button>

@@ -1,6 +1,6 @@
 import type { MonsterTypeId } from '../data/monsters';
 import { Emitter } from '../core/events';
-import { DT } from '../data/constants';
+import { CRAFTING_OPEN, DT } from '../data/constants';
 import { clampDifficulty, DEFAULT, type Difficulty } from '../data/difficulty';
 import { worldResult, type MapResult } from '../sim/runMap';
 import type { SimEvent, World } from '../sim/types';
@@ -463,8 +463,9 @@ export class Controller {
     const pts = passivePoints(run);
     if (pts > 0) return `${pts} unspent passive point${pts === 1 ? '' : 's'}`;
     if (run.reward) return 'a reward is waiting to be picked';
-    if (run.pendingCraft) return 'a craft is waiting for you to pick a result';
-    const set = completeTabletSets(run);
+    // (With crafting closed there is no way to pick a result or redeem a set, so neither holds auto-continue up.)
+    if (CRAFTING_OPEN && run.pendingCraft) return 'a craft is waiting for you to pick a result';
+    const set = CRAFTING_OPEN ? completeTabletSets(run) : [];
     if (set.length)
       return `${set.length} tablet set${set.length === 1 ? '' : 's'} to redeem (open the Workbench)`;
     const rares = unseenRares(run).length;

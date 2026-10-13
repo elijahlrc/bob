@@ -192,3 +192,9 @@ export const AUTO_ABANDON_AFTER = 500;
 /** How far from the target a scattered trap (Snare Cluster) may land, in tiles; and the share of them that a lone enemy walks into, for the sheet. */
 export const SCATTER_RADIUS = 3.2;
 export const SCATTER_HIT_SHARE = 0.6;
+
+/**
+ * Whether the crafting tab (the Workbench) is open to the player. It is shut for now: it is not needed to do well, and it is
+ * less polished than the rest of the game. The crafting code and the bots that test it stay as they are.
+ */
+export const CRAFTING_OPEN = false;

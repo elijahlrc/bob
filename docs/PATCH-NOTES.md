@@ -6,6 +6,7 @@ change, and our own names only. Dash bullets under plain headings.
 
 ## 2026-10-12
 
+- The Workbench tab is closed for now. It is greyed out, and the Craft button on items is unavailable. It is not needed to do well, and it is less finished than the rest of the game. Embers and everything you already have are kept.
 - Twister Blade now keeps its full spin for as long as you keep fighting, and carries you toward the enemies at your walking pace as it spins. Before, it dropped back to nothing every fifth hit, losing its wide sweep and starting again with a half-strength hit, and it stood still.
 - Blaze Stream is held at its full strength for as long as there is something to burn. Its final wave now comes when you stop, instead of every second or so.
 - A support that cannot support a skill it otherwise fits now says why. Shattering Blows on Twister Blade reads "Twister Blade is a channelling skill, and Shattering Blows cannot support those" instead of claiming you have no melee skill.
