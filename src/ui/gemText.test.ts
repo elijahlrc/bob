@@ -19,4 +19,12 @@ describe('gemCardData', () => {
     const hi = gemCardData(def, 20).stats.join('|');
     expect(hi).not.toBe(lo);
   });
+
+  it('says what a guard does with the charges it spends', () => {
+    const def = ALL_GEMS.find((g) => g.id === 'deathlessCall')!;
+    const d = gemCardData(def, 1);
+    expect(d.stats.join('|')).toContain(
+      'Spends up to 5 Endurance charges: each adds 20% to how long it lasts and takes 15% off the physical damage you take',
+    );
+  });
 });
