@@ -9,7 +9,7 @@ import {
 } from '../calc/charges';
 import { affixPlayerMods } from '../data/mapAffixes';
 import { TROPHY_MODS, TROPHY_SECONDS, trophyMods } from '../data/trophy';
-import { playerConds, refreshPlayerDefence } from './combat';
+import { playerCtx, refreshPlayerDefence } from './combat';
 import type { Mod } from '../mods/types';
 import { theftBuild, theftKey, theftMods } from './theft';
 import type { World } from './types';
@@ -98,7 +98,7 @@ export function spendCharges(w: World, kind: ChargeKind, n: number): boolean {
 /** Roll the chance of gaining each kind of charge on an event (a kill, a block, a critical strike). */
 export function rollCharges(w: World, event: ChargeEvent, extra: readonly Mod[] = []): void {
   // The chance may be a buff's (Surge of Blood gives it only while it is up), so ask with the conditions that hold now.
-  const ctx = { tags: 0, ancestry: 0, conds: playerConds(w, null) };
+  const ctx = playerCtx(w);
   for (const kind of CHARGE_KINDS) {
     const chance =
       w.char.db.sum('base', chargeStat(event, kind), ctx) + sumOf(extra, chargeStat(event, kind));

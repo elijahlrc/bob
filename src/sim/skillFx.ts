@@ -5,7 +5,7 @@ import { levelValue } from '../calc/gems';
 import { launch, scaleProfile } from './shots';
 import { cloneOfPlayer, makeMinion, summonAt } from './minions';
 import { enemiesOf } from './actions';
-import { hit, playerConds, rawHit } from './combat';
+import { flaskMask, hit, playerConds, rawHit } from './combat';
 import { corpseBlast } from './triggers';
 import { MINIONS, MINION_ENEMY_RES } from '../data/minions';
 import { spellBaseDamage } from '../data/constants';
@@ -254,7 +254,7 @@ function detonate(w: World, e: Actor): void {
   delete w.charged[e.id];
   const c = w.char.actives.find((x) => x.skill.id === st.key);
   if (!c || !c.usable) return;
-  const prof = w.char.profile(c, 0);
+  const prof = w.char.profile(c, playerConds(w, e), flaskMask(w));
   const spec = prof.skill.charge!;
   const q = scaleProfile(prof, (st.n * spec.perCharge) / 100);
   const r = spec.radius * prof.radiusMult;
@@ -687,7 +687,7 @@ export function gainVirulence(w: World): void {
   w.virulence = Math.min(ag.max, w.virulence + 1);
   if (w.minions.some((m) => m.kind === 'crawler' && m.alive)) return;
   const c = w.char.primary;
-  const prof = w.char.profile(c, 0);
+  const prof = w.char.profile(c, playerConds(w, null), flaskMask(w));
   const m = makeMinion(w, c, prof, 'crawler', w.player.x, w.player.y, {
     blowLevel: ag.level,
     seconds: undefined,

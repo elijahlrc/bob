@@ -22,8 +22,8 @@ import { biomeFor } from '../data/biomes';
 import { densityFor } from '../data/density';
 import { makeMapPlan, type MapPlan } from '../gen/mapPlan';
 import { offerNoise } from '../gen/population';
-import { flaskMask } from '../sim/combat';
-import { fullVitals, type DeathRecap, type Vitals, type WorldOpts } from '../sim/types';
+import { flaskMask, playerCtx } from '../sim/combat';
+import { fullVitals, type DeathRecap, type Vitals, type World, type WorldOpts } from '../sim/types';
 import type { MapResult } from '../sim/runMap';
 import { restAtCamp } from './camp';
 import { noteFound, stampAll } from './found';
@@ -230,6 +230,14 @@ export function affixRewards(
   };
 }
 
+/** The character's item quantity and rarity multipliers, with any flask active right now. */
+export function lootMults(w: World): { quantity: number; rarity: number } {
+  const db = w.char.dbWith(flaskMask(w));
+  // A mod may hold only on low life or while a flask is active: ask with the conditions that hold now.
+  const ctx = playerCtx(w);
+  return { quantity: db.mult('itemQuantity', ctx), rarity: db.mult('itemRarity', ctx) };
+}
+
 /** World hooks that generate loot with the run's uid counter. */
 export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
   const uid = uidSource(run);
@@ -238,7 +246,7 @@ export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
     loot: (w, m): AnyItem[] => {
       if (!m.mon) return [];
       // Item quantity and rarity from gear, and from any flask active right now.
-      const db = w.char.dbWith(flaskMask(w));
+      const mults = lootMults(w);
       const affix = affixRewards(plan.affixes, plan.areaLevel);
       const { rarity, currency } = affix;
       // The map type pays too; a Crescendo kill pays more the later in the map it is made (docs/MAPS.md 9.1).
@@ -254,8 +262,8 @@ export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
         theme: plan.theme,
         faction,
         classId: run.build.classId,
-        playerQuantity: db.mult('itemQuantity') * (1 + quantity) * (m.mon.kind.bonusLoot ?? 1),
-        playerRarity: db.mult('itemRarity') * (1 + rarity),
+        playerQuantity: mults.quantity * (1 + quantity) * (m.mon.kind.bonusLoot ?? 1),
+        playerRarity: mults.rarity * (1 + rarity),
       });
       // A Quarry champion always drops a rare (sometimes a unique) and a stack of currency.
       if (plan.type === 'quarry' && m.mon.spec.rarity === 'miniboss') {
@@ -273,10 +281,7 @@ export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
           monster: m.mon.spec.rarity,
           faction,
           quantity:
-            db.mult('itemQuantity') *
-            (1 + quantity) *
-            (1 + plan.theme.itemQuantity) *
-            (1 + currency),
+            mults.quantity * (1 + quantity) * (1 + plan.theme.itemQuantity) * (1 + currency),
           essenceBonus: plan.theme.extraEssence,
           currencyBonus: plan.theme.extraCurrency,
           bonusCurrency: plan.theme.bonusCurrency,

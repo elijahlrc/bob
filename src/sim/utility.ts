@@ -9,7 +9,7 @@ import { levelValue } from '../calc/gems';
 import { gainBuff } from './buffs';
 import { applyStatus } from './statuses';
 import { spendCharges } from './charges';
-import { flaskMask, playerConds, rawHit } from './combat';
+import { flaskMask, playerConds, playerCtx, rawHit } from './combat';
 import { canPay } from './cost';
 import { applyHex } from './hexes';
 import { minionCount, raiseSpectre, summonCount, summonMinions, summonRespawn } from './minions';
@@ -292,7 +292,8 @@ export function tickAuraBurn(w: World, dt: number): void {
     return;
   }
   // The enemies burn for a share of the character's life, with the character's damage over time modifiers.
-  const amount = (b.pct / 100) * p.def.maxLife * BURN_EVERY * w.char.db.mult('damage');
+  const amount =
+    (b.pct / 100) * p.def.maxLife * BURN_EVERY * w.char.db.mult('damage', playerCtx(w));
   if (amount > 0)
     for (const e of enemiesNear(w, p.x, p.y, BURN_RADIUS)) rawHit(w, e, amount, 3, 'Burning aura');
   // The character burns too, as fire damage that its resistance and energy shield answer to; it never kills.

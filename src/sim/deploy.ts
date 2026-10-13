@@ -456,7 +456,7 @@ export function bondLinks(w: World): BondLink[] {
 /** The beams of Cinder Bond: from each of its totems to the character and to the other totems, burning what they cross. */
 function bondBeams(w: World, bonds: Deployable[], c: SkillChoice, foes: Actor[]): void {
   const spec = c.skill.bond!;
-  const prof = w.char.profile(c, w.char.configConds, flaskMask(w));
+  const prof = w.char.profile(c, playerConds(w, null), flaskMask(w));
   const segs = bondSegments(w, bonds, spec);
   for (const e of foes)
     for (const [d, x2, y2] of segs) {

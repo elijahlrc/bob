@@ -38,6 +38,7 @@ import { cannotBleed } from '../data/monsters';
 import { BANNER_SHIFT, BUFFS, BUFF_IDS, DYN_SHIFT } from '../data/buffs';
 import { MONSTER_CONDS, scaleOf } from '../calc/monster';
 import { AURA_CONDS, WIELD_CONDS } from '../calc/staticConds';
+import type { ModCtx } from '../mods/modDb';
 import { maskIntersects, maskOr, tagBit, type CondId, type Mod } from '../mods/types';
 import { bannerStage } from './banners';
 import { rollGains } from './buffs';
@@ -189,6 +190,15 @@ export function playerConds(w: World, target: Actor | null): number {
   for (const [bit, test] of t.player) if (test(w, p)) c = maskOr(c, bit);
   if (target) for (const [bit, test] of t.target) if (test(target, p)) c = maskOr(c, bit);
   return c;
+}
+
+/**
+ * The query context for a stat of the character that is not about a skill (a gain on a kill, a loot multiplier): the
+ * conditions that hold now, and the values a `per` mod counts (charges held, attributes). Asking with the empty context
+ * would miss every mod that holds only under a condition.
+ */
+export function playerCtx(w: World, tags = 0, ancestry = 0): ModCtx {
+  return { tags, ancestry, conds: playerConds(w, null), statValue: w.char.statValue };
 }
 
 /** The conditions about a target, as a mask in the character's own bits. */
@@ -1021,13 +1031,16 @@ export function killActor(w: World, a: Actor): void {
     // Killing an enemy under a hex that fills flasks (Mark of Plenty) doubles what the flasks gain.
     const cause0 = causes.get(a);
     const hexFlasks = cause0?.minion ? 0 : hexKill(w, a);
-    const gain = FLASK_CHARGES_ON_KILL[kind] * w.char.db.mult('flaskCharges') * (1 + hexFlasks);
+    // What a kill gives may hold only under a condition (while a flask is active) or per charge held: ask as the character is now.
+    const kctx = playerCtx(w);
+    const gain =
+      FLASK_CHARGES_ON_KILL[kind] * w.char.db.mult('flaskCharges', kctx) * (1 + hexFlasks);
     for (const f of w.flasks) f.charges = Math.min(f.spec.maxCharges, f.charges + gain);
     const lok =
-      w.char.db.sum('base', 'lifeOnKill') +
-      (w.char.db.sum('base', 'lifeOnKillPct') / 100) * p.def.maxLife;
+      w.char.db.sum('base', 'lifeOnKill', kctx) +
+      (w.char.db.sum('base', 'lifeOnKillPct', kctx) / 100) * p.def.maxLife;
     if (lok > 0) p.life = Math.min(lifeCap(w, p), p.life + lok);
-    const mok = w.char.db.sum('base', 'manaOnKill');
+    const mok = w.char.db.sum('base', 'manaOnKill', kctx);
     if (mok > 0) p.mana = Math.min(p.def.maxMana - reservedMana(w), p.mana + mok);
     if (w.opts.loot) {
       for (const item of w.opts.loot(w, a)) {

@@ -6,7 +6,7 @@ import { applyFlatDot } from './skillDots';
 import { fire } from './actions';
 import { registerBlast } from './factions';
 import { startStorm } from './fields';
-import { flaskMask, lifeCap, playerConds, pushDot, rawHit, wake } from './combat';
+import { flaskMask, lifeCap, playerConds, playerCtx, pushDot, rawHit, wake } from './combat';
 import type { Actor, Action, World } from './types';
 
 /**
@@ -175,12 +175,11 @@ function overkillBurn(
 ): boolean {
   const over = dead.overkill ?? 0;
   if (over <= 0) return false;
-  const ctx = {
-    tags: maskOr(tagBit('dot'), tagBit('fire')),
-    ancestry: 1 << DAMAGE_TYPES.indexOf('fire'),
-    conds: 0,
-    statValue: () => 0,
-  };
+  const ctx = playerCtx(
+    w,
+    maskOr(tagBit('dot'), tagBit('fire')),
+    1 << DAMAGE_TYPES.indexOf('fire'),
+  );
   const dps = (over * e.pct * w.char.db.mult('damage', ctx)) / 100;
   for (const o of w.actors) {
     if (o.isPlayer || !o.alive || Math.hypot(o.x - dead.x, o.y - dead.y) > e.radius + o.r) continue;
