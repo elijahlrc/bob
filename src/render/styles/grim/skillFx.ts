@@ -12,7 +12,7 @@ import {
 import { MINIONS } from '../../../data/minions';
 import { bondLinks, choiceByKey } from '../../../sim/deploy';
 import type { Actor, SimEvent, World } from '../../../sim/types';
-import { BUFF_LOOK, drawBuff } from './buffFx';
+import { drawBuffs, type BuffMark } from './buffFx';
 import { drawLanded, outlineArea, shapeOfExplode, type AreaShape } from './areaFx';
 
 /**
@@ -791,14 +791,14 @@ export class SkillFx {
   private buffMarks(ground: Gfx, air: Gfx, w: World, time: number): void {
     const p = w.player;
     if (!p.alive) return;
-    let n = 0;
+    const marks: BuffMark[] = [];
     for (const id of BUFF_IDS) {
       const left = w.buffT[id];
-      if (left <= 0 || n >= 8) continue;
-      const blink = left < 1.5 ? 0.4 + 0.6 * Math.abs(Math.sin(time * 8)) : 1;
-      drawBuff(air, ground, this.host, p, BUFF_LOOK[id], time, n, blink);
-      n++;
+      if (left <= 0) continue;
+      // A buff about to end blinks.
+      marks.push({ id, alpha: left < 1.5 ? 0.4 + 0.6 * Math.abs(Math.sin(time * 8)) : 1 });
     }
+    drawBuffs(air, ground, this.host, p, marks, time);
   }
 
   /** A curse is a violet sigil turning over the head of each enemy that carries one. */
