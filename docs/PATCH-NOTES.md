@@ -4,6 +4,16 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-13
+
+- Every map now has a biome: Crypt, Cavern, Ruins, Marsh, Forge, Hollow, Shrine or Warren. It sets the layout and look of the map and is shown when you enter. It is separate from the theme, so any theme can turn up in any biome.
+- New layouts: Caverns and Marshes are winding caves, the Hollow is wide open ground with pillars, Ruins have more than one way round, and the Warren is a tangle of small chambers and narrow passages.
+- Each biome has its own floors, walls, lighting and decorations, such as pools, moss, glowing fungus, lava cracks, candles, roots and rubble.
+- Maps now grow steadily with depth, some a little bigger or smaller than others at the same level, and packs follow the size of their room, so deeper maps hold somewhat more monsters.
+- From map 3 a map can be Sparse, Packed, Clustered or Scattered, shown on its offer. Sparse has fewer monsters but more magic and rare ones, Packed half as many again, Clustered a few large packs, and Scattered small groups everywhere.
+- Quarry is always set in a Cavern, Holdout in a Hollow, Collapse in Ruins and Crawl in a Warren.
+- The new biomes are still being balance-tested. For now Caverns and Marshes are harder than the others and the Hollow and the Warren a little easier, so runs are somewhat harder overall.
+
 ## 2026-10-12
 
 - The Workbench tab is closed for now. It is greyed out, and the Craft button on items is unavailable. It is not needed to do well, and it is less finished than the rest of the game. Embers and everything you already have are kept.
