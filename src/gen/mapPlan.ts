@@ -1,4 +1,5 @@
 import { Rng } from '../core/rng';
+import { biomeDef, type BiomeDef } from '../data/biomes';
 import { LEGACY, type Difficulty } from '../data/difficulty';
 import { affixesConflict, affixReward, MAP_AFFIXES, mapAffixDef } from '../data/mapAffixes';
 import { CRAWL_SEGMENTS, mapTypeDef, THRONG_AFFIX, type MapTypeId } from '../data/mapTypes';
@@ -16,6 +17,8 @@ export type MapPlan = {
   areaLevel: number;
   resistPenalty: number;
   theme: ThemeDef;
+  /** How the map is laid out and looks (docs/MAP-VARIETY.md), whatever its theme. */
+  biome: BiomeDef;
   /** Ids of the map affixes (EXPANSION 7.5). */
   affixes: string[];
   /** The map type (docs/MAPS.md section 9). */
@@ -94,6 +97,7 @@ export function makeMapPlan(
   /** The difficulty settings, and the map's own draw of the variance (`offerNoise`). */
   difficulty: Difficulty = LEGACY,
   mapNoise = 0,
+  biomeId = 'crypt',
 ): MapPlan {
   const root = new Rng(seed);
   const genRng = root.fork('mapgen');
@@ -133,6 +137,7 @@ export function makeMapPlan(
     areaLevel,
     resistPenalty: resistPenaltyForMap(map),
     theme,
+    biome: biomeDef(biomeId),
     affixes,
     type,
     difficulty,

@@ -1,5 +1,6 @@
 import { LEGACY } from '../data/difficulty';
 import type { Defence } from '../calc/combat';
+import { biomeDef } from '../data/biomes';
 import { themeDef } from '../data/themes';
 import type { Build } from '../data/types';
 import { FLOOR } from '../gen/labyrinth';
@@ -96,6 +97,7 @@ export function createDummyWorld(
     areaLevel: build.level,
     resistPenalty: 0,
     theme: themeDef('ashenCrypt'),
+    biome: biomeDef('crypt'),
     affixes: [],
     type: 'plain',
     difficulty: LEGACY,
