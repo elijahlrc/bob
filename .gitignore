@@ -28,6 +28,3 @@ Thumbs.db
 scripts/coverage/staging/
 scripts/coverage/_*
 scripts/tree/staging/
-
-# Patch notes queue (scripts/patch/patch.ts)
-docs/patch-pending.txt

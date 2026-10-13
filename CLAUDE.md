@@ -37,11 +37,9 @@
   tables (`monsterEvasion` / `monsterAccuracy`, `src/calc/formulas.ts`; the table is `docs/coverage/pob-monster-stats.json`;
   `npm run evasion` compares the two games; docs/EVASION.md), so the same rating gives about the same hit chance as there.
 - **Patch notes:** [docs/PATCH-NOTES.md](docs/PATCH-NOTES.md), player-facing, newest first, shown on the Patch notes screen of the title
-  menu (`src/ui/PatchNotes.tsx`): add an entry for every change a player would notice. Write them with `npm run patch`
-  (`scripts/patch/`): `add "note"` queues a note after checking it against the style rules (plain text, concise, no first person, no
-  file names or internals, nothing unchanged, our own names only), `release` files the queue under today's date, runs check and
-  build, commits only the notes file and pushes, which is what updates the game (`.github/workflows/pages.yml`). `--dry-run`,
-  `--no-push`, `--skip-checks` and `-m "note"` are the options. A test holds every filed entry to the same rules.
+  menu (`src/ui/PatchNotes.tsx`): add an entry for every change a player would notice. The `/patch-notes` skill
+  (`.claude/skills/patch-notes/SKILL.md`) writes them from the commits, files them, commits and pushes; a push to main is what
+  updates the game (`.github/workflows/pages.yml`). Its style rules are the standard for every entry.
 - **Architecture boundaries (§14.2):**
   - `core`, `data`, `mods`, `calc`, `gen`, `sim` and `run` are headless: no Phaser, Preact or DOM.
   - No `Math.random`, `Date.now` or `performance.now` outside `render` and `ui`.
