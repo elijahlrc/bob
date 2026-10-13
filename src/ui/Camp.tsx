@@ -4,6 +4,7 @@ import { Character } from '../calc/character';
 import { classDef } from '../data/classes';
 import { affixText, mapAffixDef, rewardText } from '../data/mapAffixes';
 import { flaskBase } from '../data/flasks';
+import { densityDef, densityFor, type DensityId } from '../data/density';
 import { mapTypeDef } from '../data/mapTypes';
 import { themeDef } from '../data/themes';
 import { offersFor, type Verdict } from '../run/preview';
@@ -313,6 +314,7 @@ export function Camp({ c }: { c: Controller }) {
                       <strong>{mapTypeDef(o.type).name}</strong>: {mapTypeDef(o.type).text}
                     </div>
                   )}
+                  <Density d={densityFor(run.seed, o.id, run.map, o.type)} />
                   <OfferTable o={o} />
                   <OfferInfo
                     o={o}
@@ -484,6 +486,17 @@ export function Camp({ c }: { c: Controller }) {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+/** The style of a map's monsters, when it is not the usual one (docs/MAP-VARIETY.md 3.3). */
+function Density({ d }: { d: DensityId }) {
+  if (d === 'standard') return null;
+  const def = densityDef(d);
+  return (
+    <div class="affix" title={def.text}>
+      <strong>{def.name}</strong>: {def.text}
     </div>
   );
 }

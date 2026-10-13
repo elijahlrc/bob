@@ -1,5 +1,6 @@
 import { Rng } from '../core/rng';
 import { biomeDef, type BiomeDef } from '../data/biomes';
+import { densityDef, type DensityDef, type DensityId } from '../data/density';
 import { LEGACY, type Difficulty } from '../data/difficulty';
 import { affixesConflict, affixReward, MAP_AFFIXES, mapAffixDef } from '../data/mapAffixes';
 import { CRAWL_SEGMENTS, mapTypeDef, THRONG_AFFIX, type MapTypeId } from '../data/mapTypes';
@@ -19,6 +20,8 @@ export type MapPlan = {
   theme: ThemeDef;
   /** How the map is laid out and looks (docs/MAP-VARIETY.md), whatever its theme. */
   biome: BiomeDef;
+  /** How the monsters are spread over the map. */
+  density: DensityDef;
   /** Ids of the map affixes (EXPANSION 7.5). */
   affixes: string[];
   /** The map type (docs/MAPS.md section 9). */
@@ -113,6 +116,7 @@ export function makeMapPlan(
   difficulty: Difficulty = LEGACY,
   mapNoise = 0,
   biomeId = 'crypt',
+  densityId: DensityId = 'standard',
 ): MapPlan {
   const root = new Rng(seed);
   const genRng = root.fork('mapgen');
@@ -146,6 +150,7 @@ export function makeMapPlan(
     type,
     difficulty,
     mapNoise,
+    density: densityId,
     boss: boss ? BOSSES[boss].type : undefined,
   });
   return {
@@ -155,6 +160,7 @@ export function makeMapPlan(
     resistPenalty: resistPenaltyForMap(map),
     theme,
     biome: biomeDef(biomeId),
+    density: densityDef(densityId),
     affixes,
     type,
     difficulty,

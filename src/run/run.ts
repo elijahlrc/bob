@@ -19,6 +19,7 @@ import {
 import { affixReward, mapAffixDef } from '../data/mapAffixes';
 import { CRESCENDO_LOOT_PER_STEP, mapTypeDef } from '../data/mapTypes';
 import { biomeFor } from '../data/biomes';
+import { densityFor } from '../data/density';
 import { makeMapPlan, type MapPlan } from '../gen/mapPlan';
 import { offerNoise } from '../gen/population';
 import { flaskMask } from '../sim/combat';
@@ -210,6 +211,7 @@ export function planFor(run: RunState, offer: MapOffer | string, segment = 0): M
     run.difficulty ?? LEGACY,
     offerNoise(run.seed, offer.id),
     biomeFor(run.seed, run.map, Number(offer.id.split('.')[1] ?? 0), offer.type),
+    densityFor(run.seed, offer.id, run.map, offer.type),
   );
 }
 

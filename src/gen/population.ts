@@ -19,6 +19,7 @@ import {
 import { LEGACY, packPower, statLevel, type Difficulty } from '../data/difficulty';
 import { affixRarePacks, affixStrengthOf, mapAffixDef } from '../data/mapAffixes';
 import { HOLDOUT_FIRST, HOLDOUT_INTERVAL, HOLDOUT_WAVES, type MapTypeId } from '../data/mapTypes';
+import { densityDef, type DensityId } from '../data/density';
 import type { ThemeDef } from '../data/themes';
 import { packPlan, packTypes, type PackPlan } from './packs';
 import { isFloor, type Labyrinth, type Room } from './labyrinth';
@@ -50,6 +51,11 @@ export type Population = {
 
 /** A swarm template room keeps this share of the monsters a room of its size would have. */
 const SWARM_SHARE = 0.6;
+
+/** The open floor of a room of the average size (rooms are 6 to 12 tiles a side), and how far a room's pack may stray from the average. */
+const AREA_REF = 90;
+const AREA_MIN = 0.55;
+const AREA_MAX = 1.6;
 
 /** How common each type is within its faction. */
 export const TYPE_WEIGHTS: Record<MonsterTypeId, number> = {
@@ -282,6 +288,8 @@ export type PopulateOpts = {
   mapNoise?: number;
   /** The boss's type, on a boss map (docs/BOSSES.md): it stands alone in the arena. */
   boss?: MonsterTypeId;
+  /** How the map's monsters are spread (docs/MAP-VARIETY.md 3.3): standard when absent. */
+  density?: DensityId;
 };
 
 /**
@@ -393,7 +401,23 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
       (n, id) => n + (mapAffixDef(id).magicBonus ?? 0) * affixStrengthOf(id, level),
       0,
     );
-  const sized = (n: number) => Math.max(1, Math.round(n * packMult));
+  const style = densityDef(opts.density ?? 'standard');
+  // A pack follows the size of its room (the open floor inside it), against a room of the average size.
+  const areas = new Map<number, number>();
+  const areaFactor = (room?: Room): number => {
+    if (!room) return 1;
+    let a = areas.get(room.id);
+    if (a === undefined) {
+      a = 0;
+      const r = room.rect;
+      for (let y = r.y; y < r.y + r.h; y++)
+        for (let x = r.x; x < r.x + r.w; x++) if (isFloor(lab, x, y)) a++;
+      areas.set(room.id, a);
+    }
+    return Math.min(AREA_MAX, Math.max(AREA_MIN, a / AREA_REF));
+  };
+  const sized = (n: number, room?: Room) =>
+    Math.max(1, Math.round(n * packMult * style.countMult * areaFactor(room)));
   // As the run goes on, fewer packs are plain: magic packs and rare packs take their share (docs/DESIGN.md, 2026-10-10).
   const depth = Math.min(1, opts.map / 100);
   const normalCut = 0.7 - NORMAL_FADE * depth;
@@ -432,11 +456,25 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
     }
     return { monsters: [], chests: [], waves };
   }
+  // Scattered: a room's monsters in groups of one to a few, each a pack of its own.
+  const groupsOf = <T>(ps: T[]): T[][] => {
+    if (!style.groupMax) return [ps];
+    const out: T[][] = [];
+    for (let i = 0; i < ps.length;) {
+      const n = rng.int(1, style.groupMax);
+      out.push(ps.slice(i, i + n));
+      i += n;
+    }
+    return out.length ? out : [ps];
+  };
   // A Quarry champion: the mini-boss recipe with three mods.
   const champion = (): MonsterSpec => {
     const spec = normal('miniboss');
     return { ...spec, mods: spec.mods.slice(0, 3) };
   };
+  // Clustered leaves at most half of the rooms between start and end empty.
+  const candidates = lab.rooms.filter((r) => r.kind === 'main' || r.kind === 'side').length;
+  let emptied = 0;
   for (const room of lab.rooms) {
     if (room.kind === 'start') continue;
     if (quarry && room.kind !== 'end') {
@@ -506,6 +544,16 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
       pack++;
       continue;
     }
+    // Clustered: some rooms are left empty, and the others hold the larger packs (the style doubles the count).
+    if (
+      style.emptyChance > 0 &&
+      emptied < Math.floor(candidates / 2) &&
+      rng.chance(style.emptyChance)
+    ) {
+      emptied++;
+      pack++;
+      continue;
+    }
     const drawn = rng.next();
     const roll = throng ? 0 : drawn;
     if (extraRares > 0 && room.kind === 'main') {
@@ -517,35 +565,44 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
       ps.forEach((p, i) =>
         add(room, i === 0 ? normal('rare', types[i]) : normal('normal', types[i]), p, how),
       );
-    } else if (roll < normalCut - magicShift) {
-      let ps = spots(rng, lab, room, sized(rng.int(3, 7) + extra));
+    } else if (roll < normalCut - magicShift - style.toughShift) {
       let packed = false;
-      const plan = packPlan(rng, mix, ps.length, throng);
-      // A swarm is made of small things in numbers (and a Gnawer brings more): its own count is smaller, so that a room of
-      // vermin is not twice the monsters of any other.
-      if (plan.template === 'swarm')
-        ps = ps.slice(0, Math.max(2, Math.ceil(ps.length * SWARM_SHARE)));
-      const types = plan.types;
-      const how = behave(room, plan);
-      for (const [i, p] of ps.entries()) {
-        const spec = normal('normal', types[i]);
-        add(room, spec, p, how);
-        // A Gnawer never comes alone: the first one in a room brings three to six more (a pack of a dozen, with the room's own).
-        if (spec.type === 'gnawer' && spec.rarity === 'normal' && !packed) {
-          packed = true;
-          const extraN = rng.int(3, 6);
-          for (const q of spots(rng, lab, room, extraN))
-            add(room, { ...normal(), type: 'gnawer', variant: 'none' }, q);
+      const all = spots(rng, lab, room, sized(rng.int(3, 7) + extra, room));
+      for (const [gi, group] of groupsOf(all).entries()) {
+        if (gi > 0) pack++;
+        let ps = group;
+        const plan = packPlan(rng, mix, ps.length, throng);
+        // A swarm is made of small things in numbers (and a Gnawer brings more): its own count is smaller, so that a room of
+        // vermin is not twice the monsters of any other.
+        if (plan.template === 'swarm')
+          ps = ps.slice(0, Math.max(2, Math.ceil(ps.length * SWARM_SHARE)));
+        const types = plan.types;
+        const how = behave(room, plan);
+        for (const [i, p] of ps.entries()) {
+          const spec = normal('normal', types[i]);
+          add(room, spec, p, how);
+          // A Gnawer never comes alone: the first one in a room brings three to six more (a pack of a dozen, with the room's own).
+          if (spec.type === 'gnawer' && spec.rarity === 'normal' && !packed) {
+            packed = true;
+            const extraN = rng.int(3, 6);
+            for (const q of spots(rng, lab, room, extraN))
+              add(room, { ...normal(), type: 'gnawer', variant: 'none' }, q);
+          }
         }
       }
-    } else if (roll < magicCut) {
+    } else if (roll < magicCut - style.toughShift / 2) {
       const nm = rng.int(2, 3) + magicBand;
-      const ps = spots(rng, lab, room, sized(rng.int(3, 7) + extra));
-      const plan = packPlan(rng, mix, ps.length, throng);
-      const how = behave(room, plan);
-      ps.forEach((p, i) => add(room, normal(i < nm ? 'magic' : 'normal', plan.types[i]), p, how));
+      const all = spots(rng, lab, room, sized(rng.int(3, 7) + extra, room));
+      for (const [gi, ps] of groupsOf(all).entries()) {
+        if (gi > 0) pack++;
+        const plan = packPlan(rng, mix, ps.length, throng);
+        const how = behave(room, plan);
+        ps.forEach((p, i) =>
+          add(room, normal(gi === 0 && i < nm ? 'magic' : 'normal', plan.types[i]), p, how),
+        );
+      }
     } else {
-      const ps = spots(rng, lab, room, sized(1 + rng.int(2, 4) + extra));
+      const ps = spots(rng, lab, room, sized(1 + rng.int(2, 4) + extra, room));
       const plan = packPlan(rng, mix, ps.length, throng);
       const how = behave(room, plan);
       ps.forEach((p, i) =>
