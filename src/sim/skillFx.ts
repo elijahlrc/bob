@@ -44,7 +44,15 @@ export function lineWave(w: World, a: Actor, act: Action): void {
   const len = spec.length * p.radiusMult;
   const wide = spec.width * p.radiusMult;
   const dtype = mainType(act);
-  w.events.push({ t: 'beam', x: a.x, y: a.y, x2: a.x + cos * len, y2: a.y + sin * len, dtype });
+  w.events.push({
+    t: 'beam',
+    x: a.x,
+    y: a.y,
+    x2: a.x + cos * len,
+    y2: a.y + sin * len,
+    dtype,
+    width: wide,
+  });
   const struck = new Set<number>();
   const landed: Actor[] = [];
   for (const e of enemiesOf(w, a)) {

@@ -28,9 +28,23 @@ import {
 } from './encounterFx';
 import { isoFloors, isoWalls, ISO_H, ISO_W, WALL_LOW, WALL_TALL } from './isoPaint';
 import { BossFx } from './bossFx';
+import {
+  FLIGHT_HEIGHT,
+  isLob,
+  lobHeight,
+  newProjectileState,
+  ProjectileFx,
+  type ProjectileState,
+} from './projectileFx';
 
 /** Pixel zoom: 2x on wide windows, 1.5x on small ones, 1x on a phone (smaller pixels, wider view). */
 export function pickZoom(width: number): number {
+  // Dev builds: `window.__zoom = 5` close in on an effect (the VFX audit, scripts/vfx).
+  const forced =
+    import.meta.env.DEV && typeof window !== 'undefined'
+      ? (window as unknown as { __zoom?: number }).__zoom
+      : undefined;
+  if (forced) return forced;
   return width >= 1100 ? 2 : width >= 640 ? 1.5 : 1;
 }
 const ELEMENT_LIGHT: Record<string, number> = {
@@ -94,6 +108,7 @@ export class GrimStyle extends StyleBase {
   private fx!: SkillFx;
   private enc!: EncounterFx;
   private boss!: BossFx;
+  private pfx!: ProjectileFx;
   private lastSimT = 0;
   private temps: TempLight[] = [];
   private torches: Torch[] = [];
@@ -225,6 +240,8 @@ export class GrimStyle extends StyleBase {
     this.fx = new SkillFx(host, s);
     this.enc = new EncounterFx(host);
     this.boss = new BossFx(host);
+    this.pfx = new ProjectileFx(host, s);
+    this.owned.push(...this.pfx.objects());
     this.placeProps(world, rng);
     this.collapse?.destroy();
     this.collapse =
@@ -776,6 +793,7 @@ export class GrimStyle extends StyleBase {
   protected createProjectile(p: Projectile) {
     const s = this.scene;
     const col = DTYPE_COLOR[p.dtype];
+    const state = newProjectileState(p);
     // A thrown thing of a monster's sidearm (docs/ENCOUNTERS.md 3) flies as itself, with a halo so it is seen coming.
     const look = p.profile.skill.look;
     if (look) {
@@ -790,41 +808,40 @@ export class GrimStyle extends StyleBase {
         .setAlpha(0.55);
       const light = this.addLight(0, 0, 80, p.dtype === 0 ? 0xffd8a0 : col, 0.9);
       this.owned.push(img, glow);
-      return { img, glow, light, acc: 0, spin: projectileSpins(look) };
+      return { img, glow, light, acc: 0, spin: projectileSpins(look), state, col };
     }
-    // Attacks fly as arrows, spells as orbs; the element tints either (a bigger orb bursts where it lands).
-    const arrow = p.profile.skill.type === 'attack';
-    const phys = p.dtype === 0;
-    const img = s.add.image(0, 0, arrow ? 'g_arrow' : 'g_orb').setDepth(80000);
-    const glow = s.add
-      .image(0, 0, 'g_glow')
-      .setDepth(79999)
-      .setBlendMode(Phaser.BlendModes.ADD)
-      .setScale(arrow ? (phys ? 0.25 : 0.35) : p.explodeRadius > 0 ? 0.9 : 0.6)
-      .setAlpha(arrow ? (phys ? 0.25 : 0.55) : 0.8);
-    if (arrow) {
-      if (!phys) img.setTint(col);
-    } else img.setTint(col).setBlendMode(Phaser.BlendModes.ADD);
-    if (!phys || !arrow) glow.setTint(col);
-    const light = phys && arrow ? null : this.addLight(0, 0, 110, col, 1.2);
-    this.owned.push(img, glow);
-    return { img, glow, light, acc: 0 };
+    // Everything else is drawn by ProjectileFx: an arrow for an attack, an orb for a spell, and the odd flights as themselves.
+    const light =
+      p.dtype === 0 && p.profile.skill.type === 'attack'
+        ? null
+        : this.addLight(0, 0, 110, col, 1.2);
+    return { img: null, glow: null, light, acc: 0, state, col };
   }
   protected updateProjectile(o: unknown, p: Projectile, dt: number): void {
     const q = o as {
-      img: Phaser.GameObjects.Image;
-      glow: Phaser.GameObjects.Image;
+      img: Phaser.GameObjects.Image | null;
+      glow: Phaser.GameObjects.Image | null;
       light: Phaser.GameObjects.Light | null;
       acc: number;
       spin?: boolean;
+      state: ProjectileState;
+      col: number;
     };
+    this.pfx.begin(this.time);
     const { x, y } = this.project(p.x, p.y);
-    // A boulder or a gobbet tumbles; everything else points where it flies.
-    q.img.setPosition(x, y).setRotation(q.spin ? this.time * 9 + p.id : this.ang(p.vx, p.vy));
-    q.glow.setPosition(x, y);
-    q.light?.setPosition(x, y);
+    const lift = FLIGHT_HEIGHT + (isLob(p) ? lobHeight(p) : 0);
+    if (q.img && q.glow) {
+      // A thrown thing keeps its own picture; it too rides a hand's height over a shadow, with a trail behind it.
+      q.img
+        .setPosition(x, y - lift)
+        .setRotation(q.spin ? this.time * 9 + p.id : this.ang(p.vx, p.vy));
+      q.glow.setPosition(x, y - lift);
+      this.pfx.shadow(p.x, p.y, lift - FLIGHT_HEIGHT, q.col);
+    } else this.pfx.draw(p, q.state, q.col, this.time);
+    q.light?.setPosition(x, y - lift);
+    // A few motes fall behind a spell, now and then: the trail itself is drawn, so the particles only add a little life.
     q.acc += dt;
-    if (p.dtype !== 0 && q.acc > 0.025) {
+    if (p.dtype !== 0 && q.acc > 0.09) {
       q.acc = 0;
       const e =
         p.dtype === 3
@@ -834,22 +851,22 @@ export class GrimStyle extends StyleBase {
             : p.dtype === 1
               ? this.em.bolt
               : this.em.poison;
+      const back = this.project(p.x - p.vx * 0.04, p.y - p.vy * 0.04);
       e.emitParticleAt(
-        x + (Math.random() - 0.5) * 3,
-        y + (Math.random() - 0.5) * 3,
-        p.dtype === 3 ? 2 : 1,
+        back.x + (Math.random() - 0.5) * 3,
+        back.y - lift + (Math.random() - 0.5) * 3,
+        1,
       );
-      if (p.dtype === 3 && Math.random() < 0.3) this.em.smoke.emitParticleAt(x, y, 1);
     }
   }
   protected destroyProjectile(o: unknown): void {
     const q = o as {
-      img: Phaser.GameObjects.Image;
-      glow: Phaser.GameObjects.Image;
+      img: Phaser.GameObjects.Image | null;
+      glow: Phaser.GameObjects.Image | null;
       light: Phaser.GameObjects.Light | null;
     };
-    q.img.destroy();
-    q.glow.destroy();
+    q.img?.destroy();
+    q.glow?.destroy();
     this.dropLight(q.light);
   }
 
@@ -1004,8 +1021,10 @@ export class GrimStyle extends StyleBase {
       const c = this.project(t.x, t.y);
       const r = this.rpx(t.radius);
       const sq = this.squash();
+      g.fillStyle(0x000000, 0.18).fillEllipse(c.x, c.y, r * 2, r * 2 * sq);
       g.fillStyle(col, fill).fillEllipse(c.x, c.y, r * 2, r * 2 * sq);
-      g.lineStyle(1.5, col, 0.9).strokeEllipse(c.x, c.y, r * 2, r * 2 * sq);
+      g.lineStyle(3, 0x000000, 0.45).strokeEllipse(c.x, c.y, r * 2, r * 2 * sq);
+      g.lineStyle(2, col, 1).strokeEllipse(c.x, c.y, r * 2, r * 2 * sq);
       g.lineStyle(1, 0xffffff, 0.8).strokeEllipse(
         c.x,
         c.y,
@@ -1047,8 +1066,10 @@ export class GrimStyle extends StyleBase {
         pt(t.x - nx, t.y - ny),
       );
     }
+    g.fillStyle(0x000000, 0.18).fillPoints(outline, true);
     g.fillStyle(col, fill).fillPoints(outline, true);
-    g.lineStyle(1.5, col, 0.9).strokePoints(outline, true, true);
+    g.lineStyle(3, 0x000000, 0.45).strokePoints(outline, true, true);
+    g.lineStyle(2, col, 1).strokePoints(outline, true, true);
     g.fillStyle(col, 0.1 + 0.25 * t.progress).fillPoints(inner, true);
   }
 
@@ -1085,7 +1106,8 @@ export class GrimStyle extends StyleBase {
       if (zone) {
         const fade = Math.min(1, e.t);
         g.fillStyle(zone.fill, 0.2 * fade).fillEllipse(x, y, r * 2, r * 2 * sq);
-        g.lineStyle(1, zone.edge, 0.7 * fade).strokeEllipse(x, y, r * 2, r * 2 * sq);
+        g.lineStyle(2.5, 0x000000, 0.4 * fade).strokeEllipse(x, y, r * 2, r * 2 * sq);
+        g.lineStyle(1.5, zone.edge, 0.9 * fade).strokeEllipse(x, y, r * 2, r * 2 * sq);
         for (let i = 0; i < 7; i++) {
           const a = (i / 7) * Math.PI * 2 + this.time * 0.8;
           const rr = r * (0.35 + 0.45 * ((i * 0.37 + this.time * 0.15) % 1));
@@ -1098,9 +1120,13 @@ export class GrimStyle extends StyleBase {
         continue;
       }
       const k = 1 - e.t / e.total;
-      g.fillStyle(0xa01010, 0.16 + 0.22 * k).fillEllipse(x, y, r * 2, r * 2 * sq);
-      g.lineStyle(1, 0xff4020, 0.9).strokeEllipse(x, y, r * 2, r * 2 * sq);
-      g.lineStyle(1, 0xffa040, 0.9).strokeEllipse(x, y, r * 2 * k, r * 2 * k * sq);
+      // A blast that is coming: in the colour of the damage it will do, as every other warning.
+      const warn = TELEGRAPH_COLOR[e.dtype] ?? 0xff4020;
+      g.fillStyle(0x000000, 0.2).fillEllipse(x, y, r * 2, r * 2 * sq);
+      g.fillStyle(warn, 0.16 + 0.22 * k).fillEllipse(x, y, r * 2, r * 2 * sq);
+      g.lineStyle(3, 0x000000, 0.45).strokeEllipse(x, y, r * 2, r * 2 * sq);
+      g.lineStyle(2, warn, 1).strokeEllipse(x, y, r * 2, r * 2 * sq);
+      g.lineStyle(1, 0xffffff, 0.8).strokeEllipse(x, y, r * 2 * k, r * 2 * k * sq);
       // Rune ticks rotating around the rim.
       for (let i = 0; i < 12; i++) {
         const a = (i / 12) * Math.PI * 2 + this.time * 1.4;
@@ -1292,19 +1318,19 @@ export class GrimStyle extends StyleBase {
         const { x, y } = this.project(e.x, e.y);
         if (e.dtype === 3) {
           this.flash(x, y, 0xff9a40, 2.2, 0.5);
-          em.flame.explode(24, x, y);
-          em.spark.explode(18, x, y);
-          em.smoke.explode(6, x, y);
+          em.flame.explode(10, x, y);
+          em.spark.explode(8, x, y);
+          em.smoke.explode(3, x, y);
           this.addDecal(x, y + 2, 'g_scorch', false, 0.9);
         } else if (e.dtype === 2) {
           this.flash(x, y, 0x9ad8ff, 1.8, 0.4);
-          em.ice.explode(22, x, y);
+          em.ice.explode(10, x, y);
         } else if (e.dtype === 1) {
           this.flash(x, y, 0xc8a0ff, 1.8, 0.35);
-          em.bolt.explode(22, x, y);
+          em.bolt.explode(10, x, y);
         } else {
-          em.dust.explode(14, x, y);
-          em.bone.explode(8, x, y);
+          em.dust.explode(8, x, y);
+          em.bone.explode(4, x, y);
           this.addDecal(x, y, 'g_crack', Math.random() < 0.5, 1);
           this.shake = Math.max(this.shake, 5);
         }
@@ -1415,6 +1441,7 @@ export class GrimStyle extends StyleBase {
 
   // ---- Per-frame -------------------------------------------------------------------------------
   protected frame(world: World, dt: number): void {
+    this.pfx.settle(world.projectiles.length);
     this.byId = new Map(world.actors.map((a) => [a.id, a]));
     this.collapse?.update(world, dt);
     const cam = this.scene.cameras.main;

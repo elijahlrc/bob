@@ -18,6 +18,22 @@ import type { SkillProfile } from './skill';
 
 /** Index into DAMAGE_TYPES: 0 physical, 1 lightning, 2 cold, 3 fire, 4 chaos. */
 export const ELEMENT_COLOR = [0xeadfc8, 0xc89cff, 0x9ad8ff, 0xff9a40, 0x9ae05a] as const;
+/**
+ * Skills whose description is things falling from the sky onto an area (arrows, embers, ice, steel): the sim marks their
+ * area events `fall` and the renderer draws the missiles coming down (docs/VISUAL_LANGUAGE.md, "Projectiles").
+ */
+export const FALLING_SKILLS: ReadonlySet<string> = new Set([
+  'arrowShower',
+  'emberDownpour',
+  'emberHail',
+  'rainOfSteel',
+  'venomShower',
+]);
+
+/** What falls for a skill of this type: arrows from an attack, bolts from a spell. */
+export const fallOf = (skillId: string, type: string): 'arrow' | 'bolt' | undefined =>
+  FALLING_SKILLS.has(skillId) ? (type === 'attack' ? 'arrow' : 'bolt') : undefined;
+
 export const ELEMENT_NAME = ['Physical', 'Lightning', 'Cold', 'Fire', 'Chaos'] as const;
 
 export const DELIVERIES = [

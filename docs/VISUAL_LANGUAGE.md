@@ -30,6 +30,30 @@ sparks, projectile trails, rings, zones and numbers all use it.
   flowing along it.
 - **Deployables** keep their shape (totem pillar with a glowing top, brand sigil, trap plate, mine) and glow in their element.
 
+## Areas: one clean outline
+
+Every area, the player's and the monsters', is drawn the same way (`areaFx.ts`; the audit is [VFX-AUDIT.md](VFX-AUDIT.md)): the
+**exact ground it covers**, outlined by a dark line under a colour line (so it reads on a pale floor and a dark one), held at full strength for
+about half a second, a wash that fades inside it and a bright front that runs out to the edge. The colour is the damage type. A circle is the ground
+ellipse of the view; a wedge (a melee sweep) and a lane (a beam, a strip, a wall) are drawn corner by corner.
+
+- The player's `explode` events (blasts, slams, novas, a zone's pulse) draw a circle, or the band of a strip (`strip` on the event).
+  An event under 0.6 of a tile is a spark and only rings.
+- Melee sweeps draw their wedge on the ground, under the crescent; beams their lane, to the width the beam hurts (`width` on the event).
+- Warcries and shouts draw their radius (the `cry` event).
+- Lasting zones and strips keep the same dark-and-colour edge while they last.
+- Monsters' warnings (telegraphs, the old slam rings, shaped pattern blasts) fill from the start of the blow, with the same dark line, in the colour of
+  the damage they will do.
+
+## Projectiles: a body you can name
+
+Every projectile is drawn by `projectileFx.ts`: an **attack flies as an arrow** (shaft, bright head, fletching, dark rim), a **spell as an orb**
+(coloured core, white heart, a halo that breathes); a larger slow orb throws arcs; and the odd flights are themselves: a hexagonal **shield**, a turning
+**tornado**, a **skull**, a mirrored pair of arrows. Each rides a hand's height over the floor with a **shadow where it truly is** and leaves a tapered
+**trail** (not a spray of particles). A flight the description calls a lob (a mortar shell, the arrow of a nova) **rises and falls**; only the picture
+lifts, the sim's flight is flat. What a monster sends wears a **red rim**. Things that fall (a rain of arrows, a hail of embers: `FALLING_SKILLS` in
+`skillLook.ts`) are drawn coming down and splashing where they land.
+
 ## Upkeep skills (no damage, no element)
 
 | Skill  | Look                                                                      |
@@ -50,5 +74,5 @@ fails to compile until `deliveryOf` handles it.
 
 ## Sim events the effects use
 
-`use` (a skill starts), `swing` and `thrust` (a melee blow lands), `explode`, `beam`, `chain`, `buff`, `hex`, `summon`,
-`blink`, `deploy`; zones, deployables, minions, auras, buffs and curses are drawn from world state every frame.
+`use` (a skill starts), `swing` and `thrust` (a melee blow lands), `explode` (a circle, or a strip; maybe with things falling), `beam` (with its
+width), `cry` (a shout's radius), `chain`, `buff`, `hex`, `summon`, `blink`, `deploy`; zones, deployables, minions, auras, buffs and curses are drawn from world state every frame.

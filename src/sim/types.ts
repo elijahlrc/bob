@@ -440,16 +440,32 @@ export type SimEvent =
       dtype: number;
       heavy: boolean;
     }
-  | { t: 'explode'; x: number; y: number; r: number; dtype: number }
+  /**
+   * An area went off: a circle of radius `r` at (x, y), or, with `strip`, a band along (x1, y1, x2, y2) of half-width `r` (the
+   * pulse of a wall or a stream; (x, y) is its middle). The renderer outlines exactly this ground (VISUAL_LANGUAGE.md).
+   */
+  | {
+      t: 'explode';
+      x: number;
+      y: number;
+      r: number;
+      dtype: number;
+      strip?: [number, number, number, number];
+      /** Arrows or bolts come down on the area (a rain, a hail): the renderer draws them falling. */
+      fall?: 'arrow' | 'bolt';
+    }
   /** A shaped blast of a pattern landed (docs/ENCOUNTERS.md 4); the effect carries its shape. */
   | { t: 'blast'; e: GroundEffect }
   /** A monster began the tell of its window (a Brace). */
   | { t: 'window'; id: number; kind: string }
-  | { t: 'beam'; x: number; y: number; x2: number; y2: number; dtype: number }
+  /** A beam from (x, y) to (x2, y2), `width` wide where it hurts (absent: a bolt that strikes a point). */
+  | { t: 'beam'; x: number; y: number; x2: number; y2: number; dtype: number; width?: number }
   | { t: 'blink'; id: number; x: number; y: number; end: boolean }
   | { t: 'charge'; kind: string; count: number }
   /** Charges the character spent on purpose (to skip a cooldown, or to power a skill). */
   | { t: 'spend'; kind: string; n: number }
+  /** A shout (a warcry) went out from (x, y) over everything within `r`. */
+  | { t: 'cry'; x: number; y: number; r: number }
   | { t: 'buff'; id: string }
   | { t: 'hex'; id: number; hex: string }
   /** A status was put on an enemy. */

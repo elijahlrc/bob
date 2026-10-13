@@ -1,7 +1,7 @@
 import type { SkillProfile } from '../calc/skill';
 import { spellBaseDamage } from '../data/constants';
 import type { ChargeKind } from '../calc/charges';
-import { segmentDist } from './actions';
+import { fallField, segmentDist } from './actions';
 import { tickBladestorm } from './stances';
 import { corpseNear, takeCorpse } from './factions';
 import { applySkillDot } from './skillDots';
@@ -155,7 +155,14 @@ export function placePods(w: World, a: Actor, act: Action): void {
       dtype: dominantType(p),
     });
   }
-  w.events.push({ t: 'explode', x: act.aimX, y: act.aimY, r: spread, dtype: dominantType(p) });
+  w.events.push({
+    t: 'explode',
+    x: act.aimX,
+    y: act.aimY,
+    r: spread,
+    dtype: dominantType(p),
+    ...fallField(p.skill),
+  });
 }
 
 /** A frost crystal: it stands for a moment, exposing what is near it, and bursts when its time is up. */

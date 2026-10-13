@@ -12,6 +12,7 @@ import {
 import { MINIONS } from '../../../data/minions';
 import { bondLinks, choiceByKey } from '../../../sim/deploy';
 import type { Actor, SimEvent, World } from '../../../sim/types';
+import { drawLanded, outlineArea, shapeOfExplode, type AreaShape } from './areaFx';
 
 /**
  * Skill effects for the grim style, drawn from sim events and sim state. The language (see src/calc/skillLook.ts):
@@ -50,6 +51,9 @@ const lighten = (c: number, f: number): number => {
   return (m(r) << 16) | (m(g) << 8) | m(b);
 };
 
+/** An explode event smaller than this (tiles) is a spark, not an area. */
+const COSMETIC_R = 0.6;
+
 const KIND_COLOR = { totem: 0xc8a060, brand: 0xb070ff, trap: 0xe0c040, mine: 0xff7040 } as const;
 
 export class SkillFx {
@@ -75,7 +79,7 @@ export class SkillFx {
 
   // ---- Primitives -----------------------------------------------------------------------------
   private add(total: number, air: boolean, draw: (g: Gfx, k: number) => void): void {
-    if (this.list.length > 80) this.list.shift();
+    if (this.list.length > 140) this.list.shift();
     this.list.push({ t: total, total, air, draw });
   }
 
@@ -178,6 +182,13 @@ export class SkillFx {
     });
   }
 
+  /** An area went off: its exact ground, outlined, held a moment, with the front of the blow running out to the edge. */
+  landed(shape: AreaShape, color: number, total = 0.55): void {
+    this.add(total, false, (g, k) =>
+      drawLanded(g, this.host, shape, color, lighten(color, 0.45), k),
+    );
+  }
+
   // ---- Events ---------------------------------------------------------------------------------
   onEvent(e: SimEvent, w: World): void {
     switch (e.t) {
@@ -194,10 +205,27 @@ export class SkillFx {
         break;
       case 'explode': {
         const c = ELEMENT_COLOR[e.dtype] ?? 0xffffff;
-        this.wave(e.x, e.y, e.r * 0.2, Math.max(0.5, e.r), c, 0.34);
-        if (e.dtype === 0) this.cracks(e.x, e.y, e.r);
+        // A spark or a ping (a fraction of a tile) is not an area to read: it only rings.
+        if (e.r < COSMETIC_R) this.wave(e.x, e.y, e.r * 0.2, Math.max(0.5, e.r), c, 0.34);
+        else this.landed(shapeOfExplode(e), c);
+        if (e.dtype === 0 && e.r >= COSMETIC_R) this.cracks(e.x, e.y, e.r);
+        if (e.fall) this.rain(e.x, e.y, e.r, e.fall, c);
         break;
       }
+      case 'cry':
+        // A warcry reaches everything within its radius: that ground, outlined, and a shake.
+        this.landed({ kind: 'circle', x: e.x, y: e.y, r: e.r }, UTILITY_COLOR.warcry, 0.6);
+        this.host.shake(1.5);
+        break;
+      case 'beam':
+        // The band a beam hurt, along its whole length (a bolt that strikes a point has no width).
+        if (e.width)
+          this.landed(
+            { kind: 'lane', x: e.x, y: e.y, x2: e.x2, y2: e.y2, half: e.width / 2 },
+            ELEMENT_COLOR[e.dtype] ?? 0xffffff,
+            0.45,
+          );
+        break;
       case 'buff':
         this.buffPulse(e.id, w);
         break;
@@ -286,6 +314,39 @@ export class SkillFx {
     }
   }
 
+  /**
+   * Arrows or bolts come down on an area (a rain, a hail): a handful fall one after another from above onto points scattered over
+   * it, each streaking down in the colour of the damage and splashing where it lands, so the skill is seen to fire its missiles.
+   */
+  private rain(x: number, y: number, r: number, kind: 'arrow' | 'bolt', color: number): void {
+    const n = Math.max(4, Math.min(12, Math.round(r * 3)));
+    const FALL = 0.15;
+    const SPLASH = 0.14;
+    for (let i = 0; i < n; i++) {
+      const a = i * 2.39996 + x * 7.1;
+      const d = r * Math.sqrt((i + 0.5) / n) * 0.92;
+      const tx = x + Math.cos(a) * d;
+      const ty = y + Math.sin(a) * d;
+      const wait = (i / n) * 0.2;
+      const total = wait + FALL + SPLASH;
+      this.add(total, true, (g, k) => {
+        const t = k * total - wait;
+        if (t < 0) return;
+        const ground = this.host.project(tx, ty);
+        if (t <= FALL) {
+          const u = t / FALL;
+          const head = { x: ground.x - (1 - u) * 6, y: ground.y - HAND - (1 - u) * 90 };
+          const tail = { x: head.x - 2, y: head.y - (kind === 'arrow' ? 14 : 10) };
+          this.streak(g, [tail, head], color, 0.9, kind === 'arrow' ? 0.5 : 0.7);
+          if (kind === 'bolt') g.fillStyle(0xffffff, 0.95).fillCircle(head.x, head.y, 1.8);
+        } else {
+          const v = (t - FALL) / SPLASH;
+          this.ring(g, tx, ty, 0.12 + 0.3 * v, lighten(color, 0.4), 1 - v, 1.2);
+        }
+      });
+    }
+  }
+
   private cracks(x: number, y: number, r: number): void {
     const n = 9;
     const seeds = Array.from(
@@ -319,6 +380,8 @@ export class SkillFx {
     const a0 = e.facing - half;
     const a1 = e.facing + half;
     const scale = enemy ? 0.75 : 1;
+    // The ground the sweep covers, outlined where it lies.
+    this.landed({ kind: 'wedge', x: e.x, y: e.y, r: e.radius, facing: e.facing, half }, color, 0.4);
     this.add(0.22, true, (g, k) => {
       const head = a0 + (a1 - a0) * Math.min(1, k * 2.4);
       const fade = 1 - Math.max(0, (k - 0.3) / 0.7);
@@ -471,11 +534,14 @@ export class SkillFx {
           .moveTo(q[0].x, q[0].y);
         for (let i = 1; i < 4; i++) g.lineTo(q[i].x, q[i].y);
         g.closePath().fillPath();
-        g.lineStyle(1, edge, (live ? 0.8 : 0.5) * fade)
-          .beginPath()
-          .moveTo(q[0].x, q[0].y);
-        for (let i = 1; i < 4; i++) g.lineTo(q[i].x, q[i].y);
-        g.closePath().strokePath();
+        outlineArea(
+          g,
+          this.host,
+          { kind: 'lane', x: z.x, y: z.y, x2: z.x2, y2: z.y2, half: z.radius },
+          edge,
+          (live ? 0.95 : 0.6) * fade,
+          live ? 1.5 : 1,
+        );
         if (live)
           for (let i = 0; i < 9; i++) {
             const f = (i / 9 + time * 0.6) % 1;
@@ -488,17 +554,37 @@ export class SkillFx {
           }
         continue;
       }
+      // A rain with extra arrows: the places where the extra ones burst, outlined like the shower itself.
+      if (z.spots && !z.stack)
+        for (let i = 1; i < z.spots.length; i++) {
+          const s = z.spots[i];
+          outlineArea(
+            g,
+            this.host,
+            { kind: 'circle', x: s.x, y: s.y, r: s.r },
+            edge,
+            z.delayT > 0 ? 0.6 : 0.9 * fade,
+            1,
+          );
+        }
       if (z.delayT > 0) {
         // The zone is coming: a faint disc with a ring of ticks that closes in.
         const k = 1 - z.delayT / Math.max(0.01, z.delayT + 0.3);
         void k;
-        this.disc(g, z.x, z.y, z.radius, c, 0.06);
-        this.ring(g, z.x, z.y, z.radius, edge, 0.55, 1);
+        this.disc(g, z.x, z.y, z.radius, c, 0.08);
+        outlineArea(g, this.host, { kind: 'circle', x: z.x, y: z.y, r: z.radius }, edge, 0.7, 1);
         this.ticks(g, z.x, z.y, z.radius, 16, time * 1.2, edge, 0.8, 2);
         continue;
       }
       this.disc(g, z.x, z.y, z.radius, c, (0.14 + 0.04 * Math.sin(time * 3)) * fade);
-      this.ring(g, z.x, z.y, z.radius, edge, 0.75 * fade, 1);
+      outlineArea(
+        g,
+        this.host,
+        { kind: 'circle', x: z.x, y: z.y, r: z.radius },
+        edge,
+        0.95 * fade,
+        1.5,
+      );
       this.zoneMotif(g, z.x, z.y, z.radius, z.dtype, c, time, fade);
     }
   }

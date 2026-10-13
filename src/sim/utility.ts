@@ -304,6 +304,7 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
   if (!c || !u) return;
   if (c.skill.tags.includes('warcry')) w.utilityReady[WARCRIES] = w.t + WARCRY_SECONDS;
   if (u.kind === 'shout') {
+    w.events.push({ t: 'cry', x: a.x, y: a.y, r: u.radius });
     const near = enemiesNear(w, a.x, a.y, u.radius);
     for (const e of near)
       for (const s of u.statuses) {

@@ -2,6 +2,7 @@ import { angleDiff } from '../core/math';
 import { MONSTER_TYPES } from '../data/monsters';
 import { BLOCK_WINDOW, ECHO_GAP, HIT_AT, SHOT_ALERT } from '../data/constants';
 import type { SkillProfile } from '../calc/skill';
+import { fallOf } from '../calc/skillLook';
 import { rollGains } from './buffs';
 import { CHARGE_KINDS } from '../calc/charges';
 import { rollCharges, spendCharges } from './charges';
@@ -236,6 +237,12 @@ export function segmentDist(
   return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
 }
 
+/** The `fall` field of an area event of a skill that is rain from the sky (VISUAL_LANGUAGE.md): arrows or bolts coming down. */
+export function fallField(skill: { id: string; type: string }): { fall?: 'arrow' | 'bolt' } {
+  const fall = fallOf(skill.id, skill.type);
+  return fall ? { fall } : {};
+}
+
 /** Zones a skill left on the ground pulse, and end (rain, a cloud, a wall). */
 export function tickSkillZones(w: World, dt: number): void {
   if (w.zones.length === 0) return;
@@ -264,6 +271,10 @@ export function tickSkillZones(w: World, dt: number): void {
         y: z.y2 === undefined || z.y === undefined ? z.y : (z.y + z.y2) / 2,
         r: z.radius,
         dtype: z.dtype,
+        ...(z.x2 !== undefined && z.y2 !== undefined
+          ? { strip: [z.x, z.y, z.x2, z.y2] as [number, number, number, number] }
+          : {}),
+        ...fallField(z.profile.skill),
       });
       for (const e of enemiesOf(w, owner)) {
         const d =
@@ -559,7 +570,15 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
     const ang = Math.atan2(act.aimY - a.y, act.aimX - a.x);
     const x2 = a.x + Math.cos(ang) * len;
     const y2 = a.y + Math.sin(ang) * len;
-    w.events.push({ t: 'beam', x: a.x, y: a.y, x2, y2, dtype: dominantType(p, act.hand) });
+    w.events.push({
+      t: 'beam',
+      x: a.x,
+      y: a.y,
+      x2,
+      y2,
+      dtype: dominantType(p, act.hand),
+      width: b.width * p.radiusMult,
+    });
     // A hook drags the character it catches.
     if (!a.isPlayer && p.skill.pull) {
       const t = w.player;

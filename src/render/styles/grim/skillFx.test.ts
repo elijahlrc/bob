@@ -114,6 +114,31 @@ describe('skill effects', () => {
     }
   });
 
+  it('every shape of area is outlined, drawn and gone again: circles, strips, beams, cries and rain', () => {
+    const a = actor();
+    const fx = new SkillFx(host([a]), scene);
+    const w = world(a);
+    const events: SimEvent[] = [
+      { t: 'explode', x: 5, y: 5, r: 2, dtype: 3 },
+      { t: 'explode', x: 6, y: 5, r: 1.5, dtype: 2, strip: [4, 5, 8, 5] },
+      { t: 'explode', x: 5, y: 5, r: 3, dtype: 0, fall: 'arrow' },
+      { t: 'explode', x: 5, y: 5, r: 3, dtype: 3, fall: 'bolt' },
+      { t: 'beam', x: 5, y: 5, x2: 10, y2: 5, dtype: 1, width: 1.2 },
+      { t: 'cry', x: 5, y: 5, r: 6 },
+    ];
+    for (const e of events) {
+      const before = pending(fx);
+      fx.onEvent(e, w);
+      expect(pending(fx), e.t).toBeGreaterThan(before);
+    }
+    // A spark is not an area, and a bolt that strikes a point (no width) has none either.
+    const n = pending(fx);
+    fx.onEvent({ t: 'beam', x: 5, y: 2, x2: 5, y2: 5, dtype: 1 }, w);
+    expect(pending(fx)).toBe(n);
+    for (let i = 0; i < 40; i++) fx.frame(w, 0.05, 1 + i * 0.05, gfx() as never);
+    expect(pending(fx)).toBe(0);
+  });
+
   it('areas that go off ring out in their element', () => {
     const a = actor();
     const fx = new SkillFx(host([a]), scene);

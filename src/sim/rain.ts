@@ -1,4 +1,5 @@
 import type { SkillProfile } from '../calc/skill';
+import { fallOf } from '../calc/skillLook';
 import { hit } from './combat';
 import { scaleProfile } from './shots';
 import type { Actor, RainSpot, SkillZone, World } from './types';
@@ -52,6 +53,8 @@ export function plantRain(
 /** The pulse of a zone with several spots: an explosion at each, and each enemy under one is hit (once, or once for every spot it is under). */
 export function pulseRain(w: World, owner: Actor, z: SkillZone, enemies: Actor[]): void {
   const spots = z.spots!;
+  // The renderer draws the arrows coming down on a rain (VISUAL_LANGUAGE.md).
+  const fall = fallOf(z.profile.skill.id, z.profile.skill.type);
   for (let i = 0; i < spots.length; i++) {
     const s = z.stack
       ? // The same place: show the explosions apart so that the eye counts them.
@@ -61,7 +64,14 @@ export function pulseRain(w: World, owner: Actor, z: SkillZone, enemies: Actor[]
           r: spots[i].r * 0.55,
         }
       : spots[i];
-    w.events.push({ t: 'explode', x: s.x, y: s.y, r: s.r, dtype: z.dtype });
+    w.events.push({
+      t: 'explode',
+      x: s.x,
+      y: s.y,
+      r: s.r,
+      dtype: z.dtype,
+      ...(fall ? { fall } : {}),
+    });
   }
   for (const e of enemies) {
     for (const s of spots) {
