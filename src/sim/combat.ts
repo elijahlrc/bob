@@ -20,6 +20,7 @@ import {
   LEECH_RATE_PER_INSTANCE,
   LOW_LIFE,
   RECENT,
+  FREEZE_GRACE,
   STUN_GRACE,
   WOUND_DANCE_STACKS,
 } from '../data/constants';
@@ -674,7 +675,9 @@ function applyAilments(w: World, dst: Actor, res: HitResult, p: SkillProfile): v
     ail.chill = a.chill;
     ail.chillT = p.chill.dur * d.durOnSelf.chill;
   }
-  if (a.freeze > 0 && a.freeze > ail.freezeT) {
+  // The character is not frozen again while frozen or just after (stun has the same grace).
+  const canFreeze = !dst.isPlayer || (ail.freezeT <= 0 && ail.freezeGraceT <= 0);
+  if (a.freeze > 0 && canFreeze && a.freeze > ail.freezeT) {
     ail.freezeT = a.freeze * d.durOnSelf.freeze;
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'freeze' });
   }
@@ -1116,7 +1119,10 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     a.stunT -= dt;
     if (a.stunT <= 0) a.graceT = STUN_GRACE;
   } else if (a.graceT > 0) a.graceT -= dt;
-  if (ail.freezeT > 0) ail.freezeT -= dt;
+  if (ail.freezeT > 0) {
+    ail.freezeT -= dt;
+    if (ail.freezeT <= 0 && a.isPlayer) ail.freezeGraceT = FREEZE_GRACE;
+  } else if (ail.freezeGraceT > 0) ail.freezeGraceT -= dt;
   if (ail.shockT > 0) {
     ail.shockT -= dt;
     if (ail.shockT <= 0) ail.shock = 0;

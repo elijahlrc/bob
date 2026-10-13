@@ -78,6 +78,7 @@ export function afflictPlayer(
   if (kind === 'poison' && d.immuneChaos) return false;
   if (flaskWards(w, kind === 'chill' ? 'freeze' : kind)) return false;
   if (kind === 'freeze' && fromBoss && bossLocked(w)) return false;
+  if (kind === 'freeze' && (p.ail.freezeT > 0 || p.ail.freezeGraceT > 0)) return false;
   if (d.avoid[kind] > 0 && w.rngCombat.chance(d.avoid[kind])) return false;
   const t = seconds * d.durOnSelf[kind];
   const ail = p.ail;

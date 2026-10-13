@@ -40,6 +40,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
       chill: 0,
       chillT: 0,
       freezeT: 0,
+      freezeGraceT: 0,
     },
     stunT: 0,
     graceT: 0,

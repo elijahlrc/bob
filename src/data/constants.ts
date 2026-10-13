@@ -74,6 +74,8 @@ export const MIN_SHOCK_CHILL = 5;
 export const FREEZE_MAX = 3;
 export const FREEZE_PER_R = 6;
 export const MIN_FREEZE = 0.3;
+/** After a freeze on the character ends it cannot be frozen again for this long, and a freeze is not lengthened while it lasts. */
+export const FREEZE_GRACE = 1;
 export const WOUND_DANCE_STACKS = 8;
 
 // §6.6a Stun.

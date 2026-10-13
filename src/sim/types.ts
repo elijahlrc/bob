@@ -41,6 +41,8 @@ export type Ailments = {
   chill: number;
   chillT: number;
   freezeT: number;
+  /** The character's recovery after a freeze: it cannot be frozen again until this runs out. */
+  freezeGraceT: number;
 };
 
 export type Action = {
