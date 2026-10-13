@@ -4025,7 +4025,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       ],
     },
     description:
-      'A fury fed by rage: you hit harder and faster, move faster and take less, until the rage is spent.',
+      'A fury that burns your rage: you hit harder and faster, move faster and take less, until it runs out. You gain rage from melee hits when a skill or support gives it (Fury Well, Snag Lash), up to 50, and it fades a few seconds after you stop hitting.',
   },
   {
     kind: 'active',

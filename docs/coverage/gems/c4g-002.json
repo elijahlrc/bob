@@ -24,7 +24,7 @@
       "behaviour": { "kind": "burst", "radius": 1, "origin": "self" }, "castTime": 0.25, "cost": [10, 16], "mods": [],
       "utility": { "kind": "buff", "buff": "berserk", "seconds": 4, "policy": "rally", "cooldown": 5, "rage": { "min": 5, "drain": 5, "accel": 20 },
         "mods": [{ "stat": "damage", "kind": "more", "value": [15, 20], "tags": ["attack"] }, { "stat": "attackSpeed", "kind": "more", "value": [15, 20] }, { "stat": "moveSpeed", "kind": "more", "value": [25, 30] }, { "stat": "hitTaken", "kind": "more", "value": [-15, -19] }] },
-      "description": "A fury fed by rage: you hit harder and faster, move faster and take less, until the rage is spent." } },
+      "description": "A fury that burns your rage: you hit harder and faster, move faster and take less, until it runs out. You gain rage from melee hits when a skill or support gives it (Fury Well, Snag Lash), up to 50, and it fades a few seconds after you stop hitting." } },
   { "ref": "Dash", "note": "A blink: the character jumps toward a target that is out of reach (cooldown 2 seconds).",
     "def": { "kind": "active", "id": "quickStep", "name": "Quick Step", "attr": "dex", "skillType": "spell", "tags": ["spell", "movement"], "types": ["triggerable"],
       "behaviour": { "kind": "burst", "radius": 1, "origin": "self" }, "castTime": 0.15, "cost": [4, 16], "mods": [],
