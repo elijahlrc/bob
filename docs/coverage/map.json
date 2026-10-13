@@ -1390,11 +1390,6 @@
    "status": "covered",
    "note": "Lowers the mana cost multiplier of the supported gem group (modelled as a cost multiplier below one)."
   },
-  "cindering": {
-   "ref": "Immolate Support",
-   "status": "covered",
-   "note": "Spells deal added fire damage against burning enemies only; it has no ignite chance of its own."
-  },
   "wildfireSeed": {
    "ref": "Ignite Proliferation Support",
    "status": "covered",

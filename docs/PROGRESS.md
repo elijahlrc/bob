@@ -935,8 +935,7 @@ happen. A support is now offered only where its defining effect can act (`src/ca
 which behaviours honour a stat, whether the skill makes hits), a socketed one that cannot stays greyed with the reason, and the profile
 builder asks the same file for the projectile count. Arrow Shower and Ember Downpour start with six arrows and take more (rings that
 widen the shower and hit once; stacked explosions that each hit). Strikes that send bolts take more. Triple Cadence dealt about 4.7 times
-the plain skill and now about 1.45; Snare Cluster scatters five traps; Kindle (attacks) and Cindering (spells) are no longer one gem
-twice; Wide Crush needs an area; Flanking Volley is the attack twin of Flanking Cast. `scripts/audit-supports.ts` prints the pool.
+the plain skill and now about 1.45; Snare Cluster scatters five traps; Kindle and Cindering, one gem twice, are now one (Kindle); Wide Crush needs an area; Flanking Volley is the attack twin of Flanking Cast. `scripts/audit-supports.ts` prints the pool.
 
 ### Courser pass and no out-healing (docs/BOSSES.md 20), built (2026-10-12)
 

@@ -74,7 +74,7 @@ describe('damage types and hits', () => {
     expect(offered('frostbreaker', 'emberHail')).toBe(false);
   });
   it('added damage does not need the type to start from', () => {
-    expect(offered('cindering', 'suddenFrost')).toBe(true);
+    expect(offered('kindle', 'suddenFrost')).toBe(true);
   });
   it('a damage support does nothing for a curse, a trigger or a mana cost cut does', () => {
     expect(offered('bluntIntent', 'tinderCurse')).toBe(false);
@@ -93,11 +93,12 @@ describe('spells and attacks have their own copy of a support', () => {
   it('a cascade needs somewhere to the sides: not a nova around the caster', () => {
     expect(offered('flankingCast', 'blizzardRing')).toBe(false);
   });
-  it('Kindle is for attacks and Cindering for spells', () => {
+  it('a saved Cindering is a Kindle', () => {
+    expect(gemDef('cindering').id).toBe('kindle');
+  });
+  it('Kindle adds its fire to attacks and spells alike', () => {
     expect(offered('kindle', 'crushingBlow')).toBe(true);
-    expect(offered('kindle', 'suddenFrost')).toBe(false);
-    expect(offered('cindering', 'suddenFrost')).toBe(true);
-    expect(offered('cindering', 'crushingBlow')).toBe(false);
+    expect(offered('kindle', 'suddenFrost')).toBe(true);
   });
 });
 

@@ -1590,6 +1590,6 @@ After the audit the user decided on the rest (2026-10-09): Mirror Arrow's clone 
 - **A support that cannot act on a skill is not offered**, and a socketed one stays greyed with the reason. The check reads the gem data (`src/calc/reach.ts`): a mod's `tags` and damage types, which behaviours honour a stat, and whether the skill makes hits.
 - **Triple Cadence (Multistrike)** repeats fell inside one attack, so the three blows took one attack time and the gem dealt about 4.7 times the plain skill. Its cost is now written as less attack speed (-55% to -52%), so it deals about 1.45 times, as the reference gem does.
 - **Snare Cluster (Cluster Traps)** throws five traps scattered over a wide place, where Triple Snare puts three in a tight ring; it was Triple Snare at a higher price.
-- **Kindle** (attacks) and **Cindering** (spells) were the same gem at two prices; each now has its own skill type.
+- **Kindle** and **Cindering** were the same gem at two prices; they are one gem, Kindle (a saved Cindering loads as Kindle).
 - **Flanking Cast** is for spells and refuses a nova around the caster; **Flanking Volley** is the attack version, for the rains and slams. (Flanking Cast already landed before and behind the target; the 'same point' note above is out of date.)
 - **Echoing Cast** no longer supports a totem or a brand, whose repeat was a re-placement. **Wide Crush** needs a skill with an area.

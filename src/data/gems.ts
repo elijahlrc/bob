@@ -1057,8 +1057,7 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
     id: 'kindle',
     name: 'Kindle',
     attr: 'str',
-    // For attacks; Cindering is the same for spells. They were the same gem at two prices.
-    supports: ['attack'],
+    supports: [],
     costMult: 1.2,
     mods: [
       {
@@ -1076,7 +1075,7 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
         condition: { id: 'targetIgnited' },
       },
     ],
-    description: 'Adds fire damage to the attack against enemies that burn.',
+    description: 'Adds fire damage to the skill against enemies that burn.',
   },
   {
     kind: 'support',
@@ -1349,8 +1348,11 @@ AURA_GEMS.push(...GEN_AURA_GEMS);
 export const ALL_GEMS: GemDef[] = [...ACTIVE_GEMS, ...SUPPORT_GEMS, HEXING_STRIKES, ...AURA_GEMS];
 const GEM_BY_ID = new Map<string, GemDef>([...ALL_GEMS, ...GRANTED_GEMS].map((g) => [g.id, g]));
 
+/** Gems that were folded into another: a saved run may still hold the old id. */
+const GEM_ALIASES: Record<string, string> = { cindering: 'kindle' };
+
 export function gemDef(id: string): GemDef {
-  const g = GEM_BY_ID.get(id);
+  const g = GEM_BY_ID.get(GEM_ALIASES[id] ?? id);
   if (!g) throw new Error(`unknown gem ${id}`);
   return g;
 }

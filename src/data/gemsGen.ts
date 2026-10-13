@@ -8235,35 +8235,6 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
   },
   {
     kind: 'support',
-    id: 'cindering',
-    name: 'Cindering',
-    attr: 'str',
-    supports: ['spell'],
-    costMult: 1.3,
-    mods: [
-      {
-        stat: 'damage.min',
-        kind: 'base',
-        value: [42, 205],
-        damageTypes: ['fire'],
-        condition: {
-          id: 'targetIgnited',
-        },
-      },
-      {
-        stat: 'damage.max',
-        kind: 'base',
-        value: [63, 308],
-        damageTypes: ['fire'],
-        condition: {
-          id: 'targetIgnited',
-        },
-      },
-    ],
-    description: 'Adds fire damage to the spell against enemies that burn.',
-  },
-  {
-    kind: 'support',
     id: 'wildfireSeed',
     name: 'Wildfire Seed',
     attr: 'int',

@@ -15,8 +15,8 @@ change, and our own names only. Dash bullets under plain headings.
   same place and each one hits.
 - Rime Splinter, Bolt Cleave, Slag Blow and Whirl Shot send more projectiles when a support adds them.
 - Triple Cadence was about four times as strong as the plain skill; it now attacks 55% slower and comes to about one and a half
-  times. Snare Cluster throws five traps scattered over a wide place (it was Triple Snare at a higher price). Kindle is now for
-  attacks and Cindering for spells. Wide Crush needs a skill with an area. Echoing Cast no longer works on totems and brands.
+  times. Snare Cluster throws five traps scattered over a wide place (it was Triple Snare at a higher price). Kindle and Cindering, which
+  were the same gem, are now one (Kindle; a Cindering you own becomes a Kindle). Wide Crush needs a skill with an area. Echoing Cast no longer works on totems and brands.
   Blunt Intent and the penetration supports need a skill that deals the damage they work on.
 - New support: Flanking Volley, the attack version of Flanking Cast. The attack comes down before and behind its target, with less
   area and less damage. It works with Arrow Shower, Ember Downpour and slams; Flanking Cast is for spells only.

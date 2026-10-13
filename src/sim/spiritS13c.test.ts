@@ -198,9 +198,9 @@ describe('Spell Cascade, Intensify, Unleash (flankingCast, swellingBlast, double
   });
 });
 
-describe('Immolate, Combustion (cindering, kindle, tinderbox)', () => {
-  it('Cindering and Kindle add fire damage only against burning enemies', () => {
-    const { world: w, dummy } = world(['suddenFrost', 'cindering'], 3, 'wand_3', INT);
+describe('Immolate, Combustion (kindle, tinderbox)', () => {
+  it('Kindle adds fire damage only against burning enemies', () => {
+    const { world: w, dummy } = world(['suddenFrost', 'kindle'], 3, 'wand_3', INT);
     const cold = w.char.profile(w.primary, playerConds(w, dummy));
     dummy.ail.ignites.push({ dps: 5, t: 5 });
     const hot = w.char.profile(w.primary, playerConds(w, dummy));

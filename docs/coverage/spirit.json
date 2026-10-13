@@ -1011,32 +1011,6 @@
         "check": "Audit PoE line holds, but the wiki shows 3 stored uses on a 3 s cooldown (not a single charge), so I added blink_stored_uses; Bob's single-use cd 3 is stingier than the gem. Burning ground is a trail along the path, not only at the end."
       }
     },
-    "cindering": {
-      "ref": "Immolate Support",
-      "name": "Cindering",
-      "kind": "support",
-      "verdict": "faithful",
-      "confidence": "high",
-      "milestone": null,
-      "missing": [],
-      "audit": {
-        "poe": "Adds fire damage only against burning (ignited) enemies; a payoff for ignite builds, usable on any skill that hits.",
-        "bob": "Adds fire damage unconditionally to attacks only, plus 20% ignite chance (which creates its own burning enemy). The condition on the target being ignited is gone although the targetIgnited condition exists in the engine, and the gem is restricted to attacks.",
-        "repair": "Add condition targetIgnited to the damage.min/max mods and drop the attack restriction (data-only)."
-      },
-      "verified": true,
-      "spec": {
-        "page": "Immolate Support",
-        "status": "confirmed",
-        "lines": [
-          "Supports any skill that hits enemies, attack or spell [wiki]",
-          "Supported skills deal added fire damage against Burning enemies only: 42-63 at L1 to 205-308 at L20 [wiki]",
-          "Only skills that can hit benefit, not damage over time skills such as Righteous Fire [wiki]",
-          "It has no ignite chance of its own, so it depends on ignite from another source [wiki]"
-        ],
-        "check": "Holds. The audit repair should also drop Bob's invented 20% ignite chance, which creates the burning target the gem should require, and Bob's flat 3-60 / 5-90 is much smaller than the 3.9 numbers because it is unconditional, so it should be repriced to 42-63 to 205-308."
-      }
-    },
     "cleansingBlaze": {
       "ref": "Purifying Flame",
       "name": "Cleansing Blaze",

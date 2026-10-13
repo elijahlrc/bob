@@ -214,8 +214,8 @@ counts them as the calc does.
 
 **Balance** (4.4): `scripts/audit-supports.ts` prints every support's numbers and the ones beaten outright. Changes: Triple Cadence deals
 about 1.45 times the plain skill and not 4.7 (its repeats cost no time; the cost is now written as -55% to -52% attack speed); Snare Cluster
-scatters five traps over a wide place (it was Triple Snare at a higher price); Kindle is for attacks and Cindering for spells (they were one
-gem at two prices); Blunt Intent and the penetration supports are refused where the skill deals no such damage. **Left alone on purpose:** the
+scatters five traps over a wide place (it was Triple Snare at a higher price); Kindle and Cindering, one gem at two prices, are one gem (Kindle; a
+saved Cindering loads as Kindle); Blunt Intent and the penetration supports are refused where the skill deals no such damage. **Left alone on purpose:** the
 pool as a whole follows the 3.9 numbers, which are above GGG's later bands (damage-only supports give about +35% to +59% at level 20 against 30-35%
 in the 3.15 note). Moving them is a game-wide rebalance that needs a bot run and a decision; the script shows where each stands.
 

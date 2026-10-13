@@ -36,7 +36,6 @@
   { "ref": "Enlighten Support", "note": "Lowers the mana cost multiplier of the supported gem group (modelled as a cost multiplier below one).",
     "def": { "kind": "support", "id": "deepInsight", "name": "Deep Insight", "attr": "int", "supports": [], "costMult": 0.75, "mods": [],
       "description": "Makes the supported skill cheaper to cast." } },
-  {"ref":"Immolate Support","note":"Spells deal added fire damage against burning enemies only; it has no ignite chance of its own.","def":{"kind":"support","id":"cindering","name":"Cindering","attr":"str","supports":["spell"],"costMult":1.3,"mods":[{"stat":"damage.min","kind":"base","value":[42,205],"damageTypes":["fire"],"condition":{"id":"targetIgnited"}},{"stat":"damage.max","kind":"base","value":[63,308],"damageTypes":["fire"],"condition":{"id":"targetIgnited"}}],"description":"Adds fire damage to the spell against enemies that burn."}},
   { "ref": "Ignite Proliferation Support", "note": "Ignites spread to the enemies near the one that burns, while it burns and as it dies, and ignite damage rises.",
     "def": { "kind": "support", "id": "wildfireSeed", "name": "Wildfire Seed", "attr": "int", "supports": [], "costMult": 1.3, "mods": [
       { "stat": "damage", "kind": "more", "value": [20, 39], "tags": ["ignite"] },
