@@ -1,5 +1,8 @@
 /* The map report: damage dealt by skill and damage taken, split by type (src/ui/MapReport.tsx). */
 .mreport {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
   padding: 16px;
   max-width: 920px;
   text-align: left;
@@ -88,6 +91,17 @@
 }
 @media (max-width: 600px) {
   .mreport {
-    padding: 10px;
+    padding: 10px 0;
+  }
+  .mr-table {
+    font-size: 13px;
+  }
+  .mr-barcell {
+    min-width: 56px;
+  }
+  .mr-table th,
+  .mr-table td {
+    padding-left: 5px;
+    padding-right: 5px;
   }
 }

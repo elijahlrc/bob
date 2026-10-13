@@ -1016,6 +1016,8 @@ select option {
   background: #15141c;
   text-align: left;
   max-width: 520px;
+  box-sizing: border-box;
+  width: 100%;
 }
 .recap h3 {
   margin: 0 0 6px;

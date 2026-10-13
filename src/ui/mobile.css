@@ -96,6 +96,16 @@ body {
   .screen:not(.camp) > :last-child {
     margin-bottom: auto;
   }
+  /* The run-ended screen is a column of short lines and two wide panels: close up the gaps and let the panels use the width. */
+  .summary {
+    gap: 6px;
+  }
+  .summary p {
+    margin: 0;
+  }
+  .summary .recap {
+    padding: 10px;
+  }
   :root .title h1 {
     font-size: 44px;
     letter-spacing: 0.2em;
