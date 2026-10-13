@@ -51,6 +51,15 @@ describe('gem status lines (is this gem doing anything?)', () => {
     expect(status(ch, body, 0)).toEqual({ ok: true, text: 'No supports linked' });
   });
 
+  it('a melee support barred from a channelled melee skill says why, not that it needs a melee skill', () => {
+    const { ch, body } = chOf(['twisterBlade', 'shatteringBlows']);
+    const s = status(ch, body, 1)!;
+    expect(s.ok).toBe(false);
+    expect(s.text).toBe(
+      'No effect: Twister Blade is a channelling skill, and Shattering Blows cannot support those',
+    );
+  });
+
   it('a support in a different item than its skill is flagged', () => {
     const run = newRun('mystic', 1);
     const b = run.build;

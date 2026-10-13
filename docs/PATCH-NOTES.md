@@ -6,7 +6,9 @@ change, and our own names only. Dash bullets under plain headings.
 
 ## 2026-10-12
 
-- Twister Blade now keeps its full spin for as long as you keep fighting. Before, it dropped back to nothing every fifth hit, losing its wide sweep and starting again with a half-strength hit.
+- Twister Blade now keeps its full spin for as long as you keep fighting, and carries you toward the enemies at your walking pace as it spins. Before, it dropped back to nothing every fifth hit, losing its wide sweep and starting again with a half-strength hit, and it stood still.
+- Blaze Stream is held at its full strength for as long as there is something to burn. Its final wave now comes when you stop, instead of every second or so.
+- A support that cannot support a skill it otherwise fits now says why. Shattering Blows on Twister Blade reads "Twister Blade is a channelling skill, and Shattering Blows cannot support those" instead of claiming you have no melee skill.
 - After a freeze on the character ends it cannot be frozen again for a second, and a freeze is no longer lengthened while it lasts, so a pack of cold monsters can no longer keep the character frozen until it dies. Bosses already had a longer guard.
 - The gem tooltip in the Skills tab follows the mouse again on desktop instead of sitting in the top-left corner.
 - A skill set to the Escape role on the Strategy tab has two boxes, Low health and Surrounded, so a blink can go only when life is low, only when enemies crowd in, or both. Before, it always went when three enemies were close, even at full life. The life threshold now goes from 10% to 80%.

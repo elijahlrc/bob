@@ -114,6 +114,8 @@ export type SkillDef = SkillFx & {
     tickMult?: number;
     /** The channelling character cannot be stunned (Cyclone). */
     stunImmune?: boolean;
+    /** Held at the cap instead of released there: it goes on until the fight pauses, and the release (if any) is the last thing it does (Incinerate). */
+    hold?: boolean;
     /** Percent more damage per stage built, on the hits as it goes. */
     perStage?: number;
     /** The damage of the first use, as a percentage of the others (Cyclone's first hit deals half). */

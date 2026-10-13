@@ -1,5 +1,6 @@
 import type { SkillProfile } from '../calc/skill';
-import { fireEffect } from './actions';
+import { actorById, carryToward, fireEffect } from './actions';
+import { moveMult } from './factions';
 import { orbUse, releaseGhost, releaseZaps } from './fields';
 import { scaleProfile } from './shots';
 import { scatterSpores } from './skillFx';
@@ -115,6 +116,12 @@ export function channelUse(w: World, a: Actor, act: Action): void {
   st.aimX = act.aimX;
   st.aimY = act.aimY;
   st.lastT = w.t;
+  // A spin that travels (Cyclone) closes in on its target as it goes, at the character's walking pace: it does not stop to chase.
+  const target = p.skill.travel ? actorById(w, act.targetId) : undefined;
+  if (target?.alive) {
+    const pace = a.def.moveSpeed * (1 - a.ail.chill) * moveMult(a) * p.useTime;
+    carryToward(w, a, p, act, target, Math.min(p.skill.travel!, pace), true);
+  }
   if (spec.tick) {
     // The first use of Cyclone hits for half; each stage built makes the hit of Blade Flurry and Incinerate harder.
     const base = st.stage === 0 && spec.first !== undefined ? spec.first / 100 : 1;
@@ -134,9 +141,10 @@ export function channelUse(w: World, a: Actor, act: Action): void {
   }
   st.stage = Math.min(spec.cap, st.stage + gain);
   if (p.skill.orb) orbUse(w, a, act, st.stage);
-  // An orb keeps being fed at the cap, and so does a channel with nothing to release (Cyclone just keeps its stages and spins on);
-  // the others (and an illusion at its last stage) are let go.
-  const letGo = p.skill.orb ? p.skill.orb.kind === 'illusion' : !!spec.release;
+  // An orb keeps being fed at the cap, and so does a channel with nothing to release or one that is held (Cyclone just keeps its
+  // stages and spins on; Incinerate keeps burning and sends its last wave when the fight pauses); the others (and an illusion at
+  // its last stage) are let go.
+  const letGo = p.skill.orb ? p.skill.orb.kind === 'illusion' : !!spec.release && !spec.hold;
   if (letGo && st.stage >= spec.cap) releaseChannel(w, a);
 }
 

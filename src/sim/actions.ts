@@ -328,6 +328,43 @@ export function fire(w: World, a: Actor, act: Action): void {
     }
 }
 
+/**
+ * Carry the caster up to `most` tiles toward the target, stopping short of contact (a leap, a charge, a spin that closes in). A
+ * `quiet` carry is a walk, not a blink: it leaves no blink for the renderer.
+ */
+export function carryToward(
+  w: World,
+  a: Actor,
+  p: SkillProfile,
+  act: Action,
+  target: Actor,
+  most: number,
+  quiet = false,
+): void {
+  const d = Math.hypot(target.x - a.x, target.y - a.y);
+  const step = Math.max(0, Math.min(most, d - (target.r + a.r + 0.8)));
+  w.lastTravel = 0;
+  if (step <= 0.05) return;
+  w.lastTravel = step;
+  const spot = w.grid.collide(
+    a.x + ((target.x - a.x) / d) * step,
+    a.y + ((target.y - a.y) / d) * step,
+    a.r,
+  );
+  // A dash through the target hits everything within a body of the way.
+  if (p.skill.travelThrough && a.isPlayer) {
+    const x0 = a.x;
+    const y0 = a.y;
+    for (const e of enemiesOf(w, a))
+      if (e.phaseT <= 0 && segmentDist(e.x, e.y, x0, y0, spot.x, spot.y) <= e.r + a.r + 0.3)
+        hit(w, a, e, p, act.hand, Math.hypot(e.x - x0, e.y - y0));
+  }
+  if (!quiet) w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: false });
+  a.x = spot.x;
+  a.y = spot.y;
+  if (!quiet) w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true });
+}
+
 export function fireEffect(w: World, a: Actor, act: Action): void {
   if (act.which === 'utility') {
     applyUtility(w, a, act);
@@ -410,31 +447,7 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
     return;
   }
   // A travelling skill (a leap, a charge) carries the caster toward the target before it lands.
-  if (p.skill.travel && target && target.alive) {
-    const d = Math.hypot(target.x - a.x, target.y - a.y);
-    const step = Math.max(0, Math.min(p.skill.travel, d - (target.r + a.r + 0.8)));
-    w.lastTravel = 0;
-    if (step > 0.05) {
-      w.lastTravel = step;
-      const spot = w.grid.collide(
-        a.x + ((target.x - a.x) / d) * step,
-        a.y + ((target.y - a.y) / d) * step,
-        a.r,
-      );
-      // A dash through the target hits everything within a body of the way.
-      if (p.skill.travelThrough && a.isPlayer) {
-        const x0 = a.x;
-        const y0 = a.y;
-        for (const e of enemiesOf(w, a))
-          if (e.phaseT <= 0 && segmentDist(e.x, e.y, x0, y0, spot.x, spot.y) <= e.r + a.r + 0.3)
-            hit(w, a, e, p, act.hand, Math.hypot(e.x - x0, e.y - y0));
-      }
-      w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: false });
-      a.x = spot.x;
-      a.y = spot.y;
-      w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true });
-    }
-  }
+  if (p.skill.travel && target && target.alive) carryToward(w, a, p, act, target, p.skill.travel);
   if (b.kind === 'melee') {
     const reach = b.range + p.rangeBonus;
     if (b.arc) {

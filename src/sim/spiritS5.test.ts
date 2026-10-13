@@ -119,7 +119,7 @@ describe('Divine Ire (judgementTempest): a crowd charges it faster, and the beam
 });
 
 describe('Incinerate (blazeStream): it grows as it goes and ends with a final wave', () => {
-  it('hits harder the longer it is held, and the last wave is the biggest hit', () => {
+  it('hits harder the longer it is held', () => {
     const { world, dummy } = createDummyWorld(holding('wand_3', ['blazeStream'], 'mystic'), {
       distance: 2.5,
       maxTime: 60,
@@ -128,7 +128,27 @@ describe('Incinerate (blazeStream): it grows as it goes and ends with a final wa
     const t = record(world, dummy, 5, 'blazeStream');
     const amounts = t.hits.map((h) => h.amount);
     expect(amounts.length).toBeGreaterThan(6);
-    expect(Math.max(...amounts)).toBeGreaterThan(amounts[0] * 5);
+    expect(Math.max(...amounts)).toBeGreaterThan(amounts[0] * 2);
+  });
+
+  it('is held at its cap while there is something to hit, and the final wave comes when it stops', () => {
+    const b = holding('wand_3', ['blazeStream'], 'mystic');
+    const cap = new Character(b, {}).primary.skill.channel!.cap;
+    const { world, dummy } = createDummyWorld(b, { distance: 2.5, maxTime: 60 });
+    world.opts.freeResources = true;
+    let started = false;
+    let atCap = 0;
+    for (let i = 0; i < 60 * 8; i++) {
+      stepWorld(world);
+      if (world.channel) started = true;
+      if (started) expect(world.channel).not.toBeNull();
+      if (world.channel?.stage === cap) atCap++;
+    }
+    expect(atCap).toBeGreaterThan(60 * 5);
+    // With nothing left to hit, the channel ends and sends its last wave.
+    dummy.alive = false;
+    for (let i = 0; i < 90; i++) stepWorld(world);
+    expect(world.channel).toBeNull();
   });
 });
 
@@ -226,6 +246,21 @@ describe('Cyclone (twisterBlade): the first spin hits for half, and a stun canno
       if (st && st.stage === cap) atCap++;
     }
     expect(atCap).toBeGreaterThan(60 * 5);
+  });
+
+  it('closes in on its target as it spins, at walking pace', () => {
+    const b = holding('sword_3', ['twisterBlade'], 'strider');
+    const { world, dummy } = createDummyWorld(b, { distance: 7, maxTime: 60 });
+    world.opts.freeResources = true;
+    const start = Math.hypot(world.player.x - dummy.x, world.player.y - dummy.y);
+    let dist = start;
+    for (let i = 0; i < 90; i++) {
+      stepWorld(world);
+      dist = Math.hypot(world.player.x - dummy.x, world.player.y - dummy.y);
+    }
+    expect(dist).toBeLessThan(start - 3);
+    // It moved no faster than the character walks.
+    expect(start - dist).toBeLessThan(world.player.def.moveSpeed * 1.5 + 0.5);
   });
 
   it('is worth its full hit on the sheet, not a cycle that keeps starting over', () => {

@@ -277,7 +277,12 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
       stats.push(...utilityLines(def, level).stats, ...utilityFxLines(def.utility, level));
     else stats.push(...behaviourLines(def.behaviour, level));
     stats.push(...fxLines(def, level));
-    if (def.travel) stats.push(`Carries you up to ${num(def.travel)} toward the target`);
+    if (def.travel)
+      stats.push(
+        def.channel
+          ? 'Carries you toward the target as you spin, at your movement speed'
+          : `Carries you up to ${num(def.travel)} toward the target`,
+      );
     if (def.ballista) stats.push('A ballista: its totems attack at half speed');
     if (def.mortar)
       stats.push('Arrows come down in a line toward the target and burst where they land');

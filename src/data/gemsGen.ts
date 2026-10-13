@@ -1497,6 +1497,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       tick: true,
       perStage: 25,
       tickRadiusPerStage: 12,
+      hold: true,
       release: {
         perStage: 0,
         base: 500,

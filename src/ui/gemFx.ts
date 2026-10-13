@@ -57,8 +57,10 @@ export function fxLines(def: ActiveGemDef, level: number): string[] {
     );
   const ch = def.channel;
   if (ch) {
+    // Held at the cap (it goes on while there is something to hit) or let go there.
+    const held = ch.hold || (!ch.release && def.orb?.kind !== 'illusion');
     out.push(
-      `Channelled: each use builds a stage, up to ${ch.cap}${ch.tick ? ', and hits as it goes' : ''}${ch.perStage ? `, ${num(ch.perStage)}% more damage for each stage` : ''}; let go at the cap or when nothing is left to hit`,
+      `Channelled: each use builds a stage, up to ${ch.cap}${ch.tick ? ', and hits as it goes' : ''}${ch.perStage ? `, ${num(ch.perStage)}% more damage for each stage` : ''}; ${held ? 'held at the cap while there is something to hit' : 'let go at the cap or when nothing is left to hit'}`,
     );
     if (ch.first !== undefined) out.push(`The first use deals ${num(ch.first)}% of the damage`);
     if (ch.tickMult !== undefined && ch.tickMult !== 100)

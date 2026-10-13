@@ -64,7 +64,7 @@ import {
   type GemDef,
   type SupportGemDef,
 } from '../data/gems';
-import { resolveSupports, typesAllow } from '../data/skillTypes';
+import { excludedBy, resolveSupports, typesAllow } from '../data/skillTypes';
 import { supportLive } from './reach';
 import { getTree } from '../data/tree';
 import { KEYSTONES } from '../data/tree/keystones';
@@ -778,6 +778,17 @@ export class Character {
         skill.behaviour = { kind: 'melee', range: skill.behaviour.meleeRange ?? 1.5 };
       // A support that can do nothing to this skill (no projectiles to add to, no area to widen) is not in effect and costs nothing.
       const inert: { gem: SocketedGem; why: string }[] = [];
+      // A support the skill fits but is barred from (a melee support that does not take a channelled skill) says so, rather than
+      // looking as if the item had no skill for it.
+      for (const o of linked) {
+        if (resolved.applied.some((r) => r.gem === o)) continue;
+        const bad = excludedBy(o.def as SupportGemDef, resolved.types);
+        if (bad)
+          inert.push({
+            gem: o,
+            why: `${skill.name} is a ${bad} skill, and ${o.def.name} cannot support those`,
+          });
+      }
       supports = supports.filter((s) => {
         const v = supportLive(s.def as SupportGemDef, skill, resolved.types);
         if (!v.live) inert.push({ gem: s, why: v.why });
@@ -2090,8 +2101,9 @@ export function channelMult(p: SkillProfile): number {
     return total / c.cap;
   }
   const per = (c.perStage ?? 0) / 100;
-  // A channel with nothing to release is held at its cap (Cyclone): over a fight it is the full hit, the weak first one aside.
-  if (c.tick && !c.release) return 1 + per * c.cap;
+  // A channel with nothing to release, or one that is held (Cyclone, Incinerate), stays at its cap: over a fight it is the full
+  // hit, the weak first one and the last wave aside.
+  if (c.tick && (!c.release || c.hold)) return 1 + per * c.cap;
   let total = 0;
   if (c.tick)
     for (let s = 0; s < c.cap; s++)

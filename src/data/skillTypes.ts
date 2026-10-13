@@ -58,13 +58,20 @@ export function typesAllow(rules: SupportRules, types: ReadonlySet<SkillType>): 
   return true;
 }
 
+/** The type that bars a skill from a support it otherwise fits (it has what the support asks for, but also this). */
+export function excludedBy(rules: SupportRules, types: ReadonlySet<SkillType>): SkillType | null {
+  if (rules.supports.length > 0 && !rules.supports.some((t) => types.has(t))) return null;
+  if (rules.needs?.some((t) => !types.has(t))) return null;
+  return rules.excludes?.find((t) => types.has(t)) ?? null;
+}
+
 /** Why a skill does not satisfy a support, in words (for the gem's status line). */
 export function typesWhy(rules: SupportRules, types: ReadonlySet<SkillType>): string | null {
   if (rules.supports.length > 0 && !rules.supports.some((t) => types.has(t)))
     return `needs a ${rules.supports.join(' or ')} skill`;
   const missing = rules.needs?.find((t) => !types.has(t));
   if (missing) return `needs a ${missing} skill`;
-  const bad = rules.excludes?.find((t) => types.has(t));
+  const bad = excludedBy(rules, types);
   if (bad) return `cannot support ${bad} skills`;
   return null;
 }
