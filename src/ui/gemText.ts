@@ -87,6 +87,7 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
         `Gains a stage for each ${b.stageOn === 'kill' ? 'kill' : 'impale'} while carried, up to ${b.maxStages}`,
         `Each stage: ${num(per.area)}% more area, ${num(per.effect)}% more effect (on you and on enemies), ${num(per.seconds)} s longer once put down`,
         POLICY_TEXT.banner,
+        ...(u.cooldown ? [`${num(u.cooldown)} s cooldown`] : []),
       ],
       effects: [
         ...modsText(gemMods(u.mods, level, def.id)),
@@ -199,7 +200,7 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
   return {
     stats: [
       `Jumps up to ${num(u.distance)} toward a target out of reach`,
-      `${num(u.cooldown)} s cooldown`,
+      ...(def.cooldown === undefined ? [`${num(u.cooldown)} s cooldown`] : []),
     ],
     effects: [],
   };
@@ -287,9 +288,10 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
       );
     if (def.mineAura) stats.push('Mines near an enemy add fire damage to the hits against it');
     if (def.deploySeconds) stats.push(`What it puts down stands for ${num(def.deploySeconds)} s`);
-    if (def.cooldown && def.cooldownUses && def.cooldownUses > 1)
+    // A blink's own cooldown is the stored-uses one; any other skill's line is made in fxLines or utilityLines.
+    if (def.utility?.kind === 'blink' && def.cooldown !== undefined)
       stats.push(
-        `${num(levelValue(def.cooldown, level))} s cooldown, ${def.cooldownUses} uses stored`,
+        `${num(levelValue(def.cooldown, level))} s cooldown${def.cooldownUses && def.cooldownUses > 1 ? `, ${def.cooldownUses} uses stored` : ''}`,
       );
     if (def.selfTrigger) stats.push(triggerText(def.selfTrigger));
     if (def.needsShield) stats.push('Requires a shield');
