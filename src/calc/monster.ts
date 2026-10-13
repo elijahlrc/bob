@@ -1,4 +1,11 @@
-import { BASE_CRIT_MULTI, MONSTER_CRIT_MULTI, easeDamage, easeLife } from '../data/constants';
+import {
+  BASE_CRIT_MULTI,
+  MONSTER_CRIT_MULTI,
+  easeDamage,
+  easeLife,
+  openingDamage,
+  openingLife,
+} from '../data/constants';
 import {
   FACTION_MODS,
   MONSTER_TYPES,
@@ -276,7 +283,12 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
   const boss = bossOfType(spec.type);
   const oldBoss = spec.rarity === 'boss' && !t.bossOnly;
   const life = Math.round(
-    monsterLife(sl) * easeLife(m) * (t.lifeMult / meanDurability(defProfile, m)) * r.life * share,
+    monsterLife(sl) *
+      easeLife(m) *
+      openingLife(m) *
+      (t.lifeMult / meanDurability(defProfile, m)) *
+      r.life *
+      share,
   );
   const mods: Mod[] = [
     mod('life', 'base', life),
@@ -317,7 +329,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
         ? 2
         : 1;
   const defence = defenceFromDb(db, ctx, { isPlayer: false, resistPenalty: 0, stunThreshMult });
-  const baseHit = monsterHit(sl) * easeDamage(m) * t.dmgMult * r.dmg * share;
+  const baseHit = monsterHit(sl) * easeDamage(m) * openingDamage(m) * t.dmgMult * r.dmg * share;
   const dmg = baseHit * (t.shape?.mult ?? 1);
   // The Ossuary Regent's crushing swing takes 1.6 s (§12.7).
   const time = oldBoss ? BOSS_ATTACK_TIME : t.attackTime;

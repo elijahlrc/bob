@@ -1,7 +1,7 @@
 import { Character, type SteadyMode } from '../calc/character';
 import { NO_SHIFT } from '../calc/combat';
 import { baseXp, monsterHit, monsterLife } from '../calc/formulas';
-import { easeDamage, easeLife } from '../data/constants';
+import { easeDamage, easeLife, openingDamage, openingLife } from '../data/constants';
 import { LEGACY, statLevel, type Difficulty } from '../data/difficulty';
 import { mapTypeDef, THRONG_AFFIX, type MapTypeId } from '../data/mapTypes';
 import { buildMonster } from '../calc/monster';
@@ -198,7 +198,12 @@ export type ThemeScore = {
 /** How much harder the monsters of one level are than those of another: their blows times their life (with the early easing). */
 export function levelHardness(level: number, ref: number, d: Difficulty = LEGACY): number {
   const f = (m: number) =>
-    monsterHit(statLevel(m, d)) * easeDamage(m) * monsterLife(statLevel(m, d)) * easeLife(m);
+    monsterHit(statLevel(m, d)) *
+    easeDamage(m) *
+    openingDamage(m) *
+    monsterLife(statLevel(m, d)) *
+    easeLife(m) *
+    openingLife(m);
   return f(level) / f(ref);
 }
 

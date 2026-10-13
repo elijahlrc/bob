@@ -175,6 +175,23 @@ export function easeDamage(m: number): number {
   return EASE_DAMAGE + (1 - EASE_DAMAGE) * Math.min(1, (m - 1) / (EASE_LEVEL - 1));
 }
 
+/**
+ * The opening: a character starts with almost no gear, so the first maps ask less of it. Monster life and damage are
+ * multiplied by these on top of the easing above, from this share on map 1 up to 1 (the curve as it was) on map OPENING_LEVEL.
+ * Monsters only: nothing on the character's side moves, so what the first drops add stays worth having.
+ */
+export const OPENING_LEVEL = 5;
+export const OPENING_LIFE = 0.5;
+export const OPENING_DAMAGE = 0.5;
+const opening = (from: number, m: number) =>
+  from + (1 - from) * Math.min(1, Math.max(0, (m - 1) / (OPENING_LEVEL - 1)));
+export function openingLife(m: number): number {
+  return opening(OPENING_LIFE, m);
+}
+export function openingDamage(m: number): number {
+  return opening(OPENING_DAMAGE, m);
+}
+
 // §10 Labyrinth.
 export const CELL = 14;
 export const MAP_MAX = 160;
