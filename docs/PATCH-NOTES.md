@@ -4,58 +4,31 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-12
+
+- The main menu has a Patch notes screen.
+- A support that can do nothing for a skill is no longer offered for it. One already socketed stays, greyed out with the reason, and no longer adds mana cost or lowers damage.
+- Arrow Shower and Ember Downpour now come down as six arrows and take extra arrows. Rime Splinter, Bolt Cleave, Slag Blow and Whirl Shot send more projectiles when a support adds them.
+- Triple Cadence now has about 55% less attack speed and deals about one and a half times the plain skill's damage, down from nearly five times. Snare Cluster throws five traps over a wide area, at a larger damage penalty.
+- Echoing Cast no longer works on totems or brands, Wide Crush needs a skill with an area, and Kindle and Cindering, which were the same gem, are now one (a Cindering you own becomes a Kindle).
+- New support: Flanking Volley, the attack version of Flanking Cast, for Arrow Shower and Ember Downpour.
+- Bosses can no longer be out-healed: map regeneration no longer reaches them, and a boss's own healing pauses after it is hit. The Courser has about 40% more life, hits about 80% harder and gallops further.
+- The Weakest target priority now picks the enemy with the least life left, so a boss's escort usually falls before the boss.
+- The passive tree has many more ways through: clusters link to related neighbours, roads are mostly attribute nodes, starts join straight onto their two starter clusters, and plain increased damage is gone. Passives are refunded again.
+- Areas now show the exact ground they cover, outlined in the colour of their damage. Attacks fly as arrows and spells as orbs, with a shadow and a trail, and monsters' projectiles have a red rim.
+- Every skill with a cooldown shows it once on its card. Standards did not show theirs, and blinks and Jaws Trap showed it two or three times.
+- A theme's champion now ends an ordinary map only about one time in four, and the map offers no longer announce it.
+
 ## 2026-10-11
 
-- Bosses: a boss now ends every tenth map (ten in all), each with its own mechanic.
-- A support gem that cannot do anything to a skill is no longer offered for it: more projectiles on a skill that fires none, pierce
-  on a rain of arrows, a damage bonus on a curse. One you have already socketed stays, greyed out with the reason, and no longer
-  costs mana or damage. Before, such a gem cost both and did nothing.
-- Arrow Shower and Ember Downpour now come down as six arrows and take extra projectiles. With Arrow Shower the extra arrows land on
-  rings around the shower and reach more ground; an enemy is still hit once. With Ember Downpour they are more explosions on the
-  same place and each one hits.
-- Rime Splinter, Bolt Cleave, Slag Blow and Whirl Shot send more projectiles when a support adds them.
-- Triple Cadence was about four times as strong as the plain skill; it now attacks 55% slower and comes to about one and a half
-  times. Snare Cluster throws five traps scattered over a wide place (it was Triple Snare at a higher price). Kindle and Cindering, which
-  were the same gem, are now one (Kindle; a Cindering you own becomes a Kindle). Wide Crush needs a skill with an area. Echoing Cast no longer works on totems and brands.
-  Blunt Intent and the penetration supports need a skill that deals the damage they work on.
-- New support: Flanking Volley, the attack version of Flanking Cast. The attack comes down before and behind its target, with less
-  area and less damage. It works with Arrow Shower, Ember Downpour and slams; Flanking Cast is for spells only.
+- A boss now ends every tenth map (ten in all), each with its own mechanic.
+- A theme's champion now ends ordinary maps in place of the end-of-map rare.
 - The passive tree has a new layout. Your allocated passives are refunded as unspent points.
-- Every region of the tree has its own shape and themed districts, and you can reach any region through the middle.
-- Notables are stronger relative to small nodes, and clusters make more sense.
-- Search box on the passive tree screen.
-- Neighbouring regions of the tree now connect half way out and near the edge, not only through the middle; long roads have
-  side entrances; the paths around the class starts are tidier. Your passives are refunded again.
-- New tree colours and icons for spells, energy shield and generic damage (previously shown as mana and attack).
-- Every class start now has two roads out into its region, each leading to a different group of passives, and quick ways across to
-  the neighbouring regions.
-- The passives near a start are now the basics of the class: life or energy shield, armour or evasion, attack or cast speed.
-  A few core options come next, and the narrow, unusual ideas are further out.
-- More crossings between regions (some long), a looser, less regular middle, and new shapes: clusters can be arcs or wings, two
-  notables can share a ring, and some notables sit in a line.
-- The ground around every start is fuller: basic clusters and notables (life regeneration, resistances, speeds, armour, evasion,
-  mana and the like) stand beside the roads, and near a start each stretch of road is a line of one stat, with a different stat on
-  each branch, some ending in a notable.
-- The roads between clusters are now mostly attribute nodes, with the odd stretch of life, energy shield, armour, evasion or the
-  like. There are no plain "increased damage" nodes any more: damage nodes now ask for something (a skill type, a damage type, a
-  condition).
-- Groups of related clusters (life, fire, minions and so on) are broken into smaller groups spread through each region, so they
-  are less big and less isolated.
-- Many clusters are now linked to a neighbouring cluster, so there are far more ways through the tree. A link joins clusters that
-  work together (life with armour, energy shield with mana, spells with critical strikes, and so on), and it always costs more
-  passives than the plain attribute road beside it, so it is worth taking only for the clusters on it.
-- Each class start now leads straight into its two basic clusters, which in turn link to the clusters around them, so the area
-  around a start is well connected.
-- Your passives are refunded once more.
-- Effects are easier to read. Every area (your blasts, slams, novas, sweeps, beams and warcries, and the monsters' attacks) shows the exact ground it
-  covers with a clean outline in the colour of its damage. Projectiles are clearer: an attack flies as an arrow, a spell as an orb, each
-  with a shadow on the ground and a trail, and monsters' projectiles have a red rim. Mortar shells and nova arrows now arc, and rain skills
-  show their arrows and embers coming down.
-- Every skill with a cooldown shows it on its card in the inventory and the skills tab. The standards were missing theirs, and blinks and
-  Jaws Trap showed it two or three times.
-- The special enemy at the end of an ordinary map (a theme's champion) now turns up only now and then, about one map in four, and the
-  level select no longer warns of it. Boss maps still show their boss.
-- Steady Draw is no longer neutral (35% more damage), and several keystone cards now show their numbers.
+- Every region of the tree has its own shape and themed districts, and you can reach any region through the middle and through crossings between regions.
+- Every class start has two roads out into its region, and the passives near a start are the basics of the class: life or energy shield, armour or evasion, attack or cast speed.
+- Notables are stronger relative to small nodes, clusters of a theme sit in that theme's district, and the passive tree screen has a search box.
+- New tree colours and icons for spells, energy shield and generic damage.
+- Steady Draw now gives bow attacks 35% more damage (was 25%), still with 20% less attack speed, and several keystone cards now show their numbers.
 
 ## 2026-10-10
 
