@@ -34,7 +34,15 @@ const world = (a: Actor): World =>
     zones: [],
     deployables: [],
     hexes: [],
-    char: { auras: [], utilities: [] },
+    char: { auras: [], utilities: [], actives: [] },
+    vortex: null,
+    stormOrb: null,
+    markers: [],
+    fuses: [],
+    spores: [],
+    mirage: null,
+    charged: {},
+    shell: null,
     buffT: {},
   }) as unknown as World;
 

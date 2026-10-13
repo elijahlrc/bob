@@ -495,6 +495,8 @@ export class SkillFx {
     const air = this.air;
     air.clear();
     this.curseMarks(air, w, time);
+    this.siphons(air, w, time);
+    this.lasting(ground, air, w, time);
     let j = 0;
     for (const f of this.list) {
       f.t -= dt;
@@ -809,6 +811,160 @@ export class SkillFx {
   }
 
   /** A curse is a violet sigil turning over the head of each enemy that carries one. */
+  /** The element's colour of the character's skill that has this id. */
+  private colorOfSkill(w: World, id: string): number {
+    const c = w.char.actives.find((x) => x.skill.id === id);
+    return ELEMENT_COLOR[c ? elementOfTags(c.skill.tags, c.skill.spellDamage) : 0] ?? 0xffffff;
+  }
+
+  /**
+   * What single skills leave standing that is not a zone or a deployable, drawn from the sim's state: the blades circling the
+   * character (Blade Vortex), the orb (Orb of Storms), the markers waiting to be struck (Storm Call), the arrows stuck in an
+   * enemy (Explosive Arrow) and the pods in the ground (Scourge Arrow), the mirage archer, the charges on an enemy
+   * (Infernal Blow) and the shell about the character (Molten Shell).
+   */
+  private lasting(ground: Gfx, air: Gfx, w: World, time: number): void {
+    const p = w.player;
+    const vx = w.vortex;
+    if (vx && p.alive && vx.blades.length > 0) {
+      const spec = choiceByKey(w, vx.key)?.skill.vortex;
+      const color = this.colorOfSkill(w, choiceByKey(w, vx.key)?.skill.id ?? '');
+      const o = this.host.project(p.x, p.y);
+      const rx = this.host.rpx(Math.min(1.4, spec?.radius ?? 1.4));
+      const sq = this.host.squash();
+      const n = vx.blades.length;
+      ground.lineStyle(1, color, 0.3).strokeEllipse(o.x, o.y, rx * 2, rx * 2 * sq);
+      for (let i = 0; i < n; i++) {
+        const a = time * 5 + (i / n) * Math.PI * 2;
+        const x = o.x + Math.cos(a) * rx;
+        const y = o.y - 8 + Math.sin(a) * rx * sq;
+        const fade = Math.min(1, vx.blades[i] * 2);
+        air.fillStyle(color, 0.3 * fade).fillCircle(x, y, 5);
+        air
+          .fillStyle(lighten(color, 0.5), 0.95 * fade)
+          .fillTriangle(
+            x + Math.cos(a + 1.57) * 4,
+            y + Math.sin(a + 1.57) * 2,
+            x - Math.cos(a + 1.57) * 4,
+            y - Math.sin(a + 1.57) * 2,
+            x + Math.cos(a) * 2,
+            y + Math.sin(a) * 1,
+          );
+      }
+    }
+    const orb = w.stormOrb;
+    if (orb) {
+      const o = this.lifted(orb.x, orb.y, 14);
+      const fade = Math.min(1, orb.t);
+      const color = ELEMENT_COLOR[1];
+      air.fillStyle(color, 0.18 * fade).fillCircle(o.x, o.y, 11);
+      air.fillStyle(color, 0.5 * fade).fillCircle(o.x, o.y, 6);
+      air.fillStyle(0xffffff, 0.95 * fade).fillCircle(o.x, o.y, 2.5);
+      for (let i = 0; i < 3; i++) {
+        const a = time * 7 + i * 2.1;
+        air
+          .lineStyle(1, 0xffffff, 0.8 * fade)
+          .lineBetween(o.x, o.y, o.x + Math.cos(a) * 10, o.y + Math.sin(a) * 7);
+      }
+      this.ring(ground, orb.x, orb.y, 0.5, color, 0.35 * fade, 1);
+    }
+    for (const m of w.markers) {
+      const color = this.colorOfSkill(w, m.profile.skill.id);
+      const spec = w.char.actives.find((x) => x.skill.id === m.profile.skill.id)?.skill.markers;
+      const r = (spec?.radius ?? 1.5) * m.profile.radiusMult;
+      const left = spec ? Math.min(1, Math.max(0, m.t / spec.delay)) : 0.5;
+      this.ring(ground, m.x, m.y, r, color, 0.5, 1);
+      this.ring(ground, m.x, m.y, r * (0.15 + 0.85 * left), color, 0.9, 1.5);
+      const c = this.host.project(m.x, m.y);
+      air.fillStyle(0xffffff, 0.85).fillCircle(c.x, c.y, 1.8);
+    }
+    for (const f of w.fuses) {
+      const t = this.host.actorById(f.target);
+      const x = t && t.alive ? t.x : f.x;
+      const y = t && t.alive ? t.y : f.y;
+      const o = this.lifted(x, y, 12);
+      const blink = 0.55 + 0.45 * Math.sin(time * (6 + 14 / Math.max(0.3, f.t)));
+      for (let i = 0; i < Math.min(6, f.arrows.length); i++) {
+        const a = i * 2.4;
+        air
+          .lineStyle(1.5, 0xe8d8b0, 0.9)
+          .lineBetween(
+            o.x + Math.cos(a) * 2,
+            o.y + Math.sin(a) * 2,
+            o.x + Math.cos(a) * 7,
+            o.y + Math.sin(a) * 6,
+          );
+      }
+      air.fillStyle(ELEMENT_COLOR[3], 0.45 * blink).fillCircle(o.x, o.y, 6);
+      air.fillStyle(0xffd080, 0.9 * blink).fillCircle(o.x, o.y, 2);
+    }
+    for (const s of w.spores) {
+      const o = this.host.project(s.x, s.y);
+      const pulse = 0.6 + 0.4 * Math.sin(time * 5 + s.x * 3);
+      ground.fillStyle(0x000000, 0.3).fillEllipse(o.x, o.y + 1, 10, 4);
+      ground.fillStyle(0x6a8a3a, 0.9).fillEllipse(o.x, o.y - 3, 8, 7);
+      air.fillStyle(0xa0e060, 0.4 * pulse).fillCircle(o.x, o.y - 4, 5);
+    }
+    const mi = w.mirage;
+    if (mi) {
+      const o = this.host.project(mi.x, mi.y);
+      const fade = Math.min(1, mi.t);
+      ground.fillStyle(0x000000, 0.25 * fade).fillEllipse(o.x, o.y + 1, 12, 5);
+      air.fillStyle(0x80c0ff, 0.45 * fade).fillCircle(o.x, o.y - 12, 3.5);
+      air.fillStyle(0x80c0ff, 0.35 * fade).fillTriangle(o.x - 5, o.y, o.x + 5, o.y, o.x, o.y - 10);
+      air.lineStyle(1, 0xffffff, 0.6 * fade).strokeCircle(o.x, o.y - 12, 3.5);
+    }
+    for (const id in w.charged) {
+      const e = this.host.actorById(Number(id));
+      const ch = w.charged[id];
+      if (!e || !e.alive) continue;
+      const o = this.host.project(e.x, e.y);
+      for (let i = 0; i < ch.n; i++)
+        air.fillStyle(ELEMENT_COLOR[3], 0.95).fillCircle(o.x - (ch.n - 1) * 3 + i * 6, o.y - 32, 2);
+    }
+    const sh = w.shell;
+    if (sh && p.alive) {
+      const flick = 0.7 + 0.3 * Math.sin(time * 6);
+      this.disc(ground, p.x, p.y, 0.9, ELEMENT_COLOR[3], 0.12 * flick);
+      this.ring(ground, p.x, p.y, 0.9, ELEMENT_COLOR[3], 0.7 * flick, 1.5);
+    }
+  }
+
+  /**
+   * The beams of a draining skill (Drain Trap): from each enemy it holds to the character, a band in the element's colour
+   * with a red mote (life) and a blue one (mana) running along it toward the character.
+   */
+  private siphons(g: Gfx, w: World, time: number): void {
+    const p = w.player;
+    if (!p.alive) return;
+    for (const c of w.char.actives) {
+      if (!c.usable || !c.skill.siphon) continue;
+      const glow = ELEMENT_COLOR[elementOfTags(c.skill.tags, c.skill.spellDamage)];
+      const to = this.lifted(p.x, p.y, 10);
+      for (const e of w.actors) {
+        if (e.isPlayer || !e.alive || !e.sdots.some((d) => d.src === c.skill.id && d.t > 0))
+          continue;
+        const from = this.lifted(e.x, e.y, 10);
+        const flick = 0.75 + 0.25 * Math.sin(time * 12 + e.id);
+        g.lineStyle(10, glow, 0.22 * flick).lineBetween(from.x, from.y, to.x, to.y);
+        g.lineStyle(4, glow, 0.65 * flick).lineBetween(from.x, from.y, to.x, to.y);
+        g.lineStyle(1, 0xffffff, 0.85 * flick).lineBetween(from.x, from.y, to.x, to.y);
+        for (const [color, phase] of [
+          [0xff5060, 0],
+          [0x60a0ff, 0.5],
+        ] as const)
+          for (let i = 0; i < 2; i++) {
+            const k = (time * 1.4 + phase * 0.5 + i * 0.5 + e.id * 0.13) % 1;
+            g.fillStyle(color, 0.95 * Math.sin(k * Math.PI)).fillCircle(
+              from.x + (to.x - from.x) * k,
+              from.y + (to.y - from.y) * k,
+              2.2,
+            );
+          }
+      }
+    }
+  }
+
   private curseMarks(g: Gfx, w: World, time: number): void {
     for (const a of w.actors) {
       if (!a.alive || a.isPlayer || a.hexes.length === 0) continue;

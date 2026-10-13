@@ -629,6 +629,16 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     ).toBe(true);
   });
 
+  it('Livewire Snares gives charges when a trap that deals no hit of its own goes off', () => {
+    const { world: w } = world(['drainTrap', 'livewireSnares'], 4, 'wand_3', DEX);
+    let got = 0;
+    for (let i = 0; i < 60 * 60; i++) {
+      stepWorld(w);
+      got = Math.max(got, w.char.charges.insight + w.char.charges.fervour);
+    }
+    expect(got).toBeGreaterThan(0);
+  });
+
   it('Summon Skitterbots: two motes hold mana, chill and shock the enemies near, and set off traps from afar', () => {
     const { world: w, dummy } = world(['jawsTrap', 'whirringMotes'], 6, 'wand_3', DEX);
     expect(w.char.reservedMana).toBeGreaterThan(0);
