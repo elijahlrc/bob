@@ -8,19 +8,12 @@ import edits from '../data/tree/treeEdits.json';
 import { BAKED_TREE } from '../data/tree/treeBaked';
 import type { TreeNode, TreeNodeKind } from '../data/tree/types';
 import { modsText } from '../mods/text';
-import { edgePath, NODE_RADIUS } from '../ui/treeStyle';
+import { edgePath } from '../ui/treeStyle';
+import { BG, edgeStyle, GOLD, paintBackdrop, paintLabel, paintNode, reach } from './paint';
 import { checkTree } from './check';
 
 type Tool = 'select' | 'link' | 'add' | 'stamp';
 const KINDS: TreeNodeKind[] = ['small', 'notable', 'keystone', 'travel'];
-const COLOR: Record<TreeNodeKind, string> = {
-  small: '#9aa2ac',
-  notable: '#e0b040',
-  keystone: '#e0604f',
-  travel: '#6a6e80',
-  start: '#70d090',
-  hub: '#6a6e80',
-};
 const TOOLS: { id: Tool; label: string; key: string; hint: string }[] = [
   {
     id: 'select',
@@ -154,7 +147,7 @@ function nodeAt(wx: number, wy: number): number | null {
   let bd = Infinity;
   for (const n of nodes) {
     const d = Math.hypot(n.x - wx, n.y - wy);
-    const r = Math.max(NODE_RADIUS[n.kind], 9 / view.k);
+    const r = Math.max(reach(n.kind, view.k), 9 / view.k);
     if (d <= r && d < bd) {
       best = n.id;
       bd = d;
@@ -164,91 +157,68 @@ function nodeAt(wx: number, wy: number): number | null {
 }
 
 // ---- drawing -----------------------------------------------------------------------------------------------------------------
+const maxR = Math.max(...BAKED_TREE.nodes.map((n) => Math.hypot(n.x, n.y)));
+
 function draw() {
   const dpr = window.devicePixelRatio || 1;
   const w = canvas.width;
   const h = canvas.height;
+  const k = view.k;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.fillStyle = '#0f1016';
+  ctx.fillStyle = BG;
   ctx.fillRect(0, 0, w, h);
-  ctx.setTransform(
-    view.k * dpr,
-    0,
-    0,
-    view.k * dpr,
-    w / 2 - view.x * view.k * dpr,
-    h / 2 - view.y * view.k * dpr,
-  );
+  ctx.setTransform(k * dpr, 0, 0, k * dpr, w / 2 - view.x * k * dpr, h / 2 - view.y * k * dpr);
   ctx.lineCap = 'round';
-  const px = 1 / view.k;
-  // links
-  ctx.lineWidth = Math.max(2, 3 * px);
-  ctx.strokeStyle = '#3a3d58';
-  ctx.beginPath();
-  const drawn = new Set<string>();
+  const px = 1 / k;
+  const left = view.x - w / dpr / 2 / k - 80;
+  const right = view.x + w / dpr / 2 / k + 80;
+  const top = view.y - h / dpr / 2 / k - 80;
+  const bottom = view.y + h / dpr / 2 / k + 80;
+  const seen = (n: TreeNode) => n.x >= left && n.x <= right && n.y >= top && n.y <= bottom;
+  paintBackdrop(ctx, maxR, k);
+  // links (a link is drawn when either end is on screen)
+  edgeStyle(ctx, k);
   for (const n of nodes)
     for (const m of n.links) {
       if (m < n.id) continue;
       const o = byId.get(m);
-      if (!o) continue;
-      drawn.add(`${n.id}-${m}`);
-      ctx.stroke(new Path2D(edgePath(n, o)));
+      if (o && (seen(n) || seen(o))) ctx.stroke(new Path2D(edgePath(n, o)));
     }
   // links that differ from the baked tree
   const patch = diffTree(BAKED_TREE, nodes);
-  ctx.strokeStyle = '#e0b040';
+  ctx.strokeStyle = GOLD;
+  ctx.lineWidth = 2.6 * px;
   for (const [a, b] of patch.linkAdd ?? []) {
     const na = byId.get(a);
     const nb = byId.get(b);
     if (na && nb) ctx.stroke(new Path2D(edgePath(na, nb)));
   }
-  // nodes
-  for (const n of nodes) {
-    const r = Math.max(NODE_RADIUS[n.kind] * 0.55, 3 * px);
-    ctx.fillStyle = COLOR[n.kind];
+  for (const n of nodes) if (seen(n)) paintNode(ctx, n, k);
+  // what the editor adds on top: hand edits, selection, the node a connection starts from
+  const ring = (n: TreeNode, color: string, extra: number, width: number) => {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width * px;
     ctx.beginPath();
-    ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-    ctx.fill();
-    if (changed.has(n.id)) {
-      ctx.strokeStyle = '#f0a060';
-      ctx.lineWidth = 2 * px;
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, r + 4 * px, 0, Math.PI * 2);
-      ctx.stroke();
-    }
+    ctx.arc(n.x, n.y, reach(n.kind, k) + extra * px, 0, Math.PI * 2);
+    ctx.stroke();
+  };
+  for (const id of changed) {
+    const n = byId.get(id);
+    if (n && seen(n)) ring(n, '#f0a060', 3, 2);
   }
   for (const id of sel) {
     const n = byId.get(id);
-    if (!n) continue;
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2.5 * px;
-    ctx.beginPath();
-    ctx.arc(n.x, n.y, NODE_RADIUS[n.kind] * 0.55 + 7 * px, 0, Math.PI * 2);
-    ctx.stroke();
+    if (n) ring(n, '#ffffff', 6, 2.5);
   }
   for (const id of [anchor, stampFrom, hover]) {
     const n = id === null ? null : byId.get(id);
-    if (!n) continue;
-    ctx.strokeStyle = id === hover ? '#8d8fa8' : '#70d090';
-    ctx.lineWidth = 2 * px;
-    ctx.beginPath();
-    ctx.arc(n.x, n.y, NODE_RADIUS[n.kind] * 0.55 + 11 * px, 0, Math.PI * 2);
-    ctx.stroke();
+    if (n) ring(n, id === hover ? '#8d8fa8' : '#70d090', 10, 2);
   }
-  // labels
-  ctx.fillStyle = '#d8d0b8';
-  ctx.textAlign = 'center';
-  const fs = 12 * px;
-  ctx.font = `${fs}px system-ui, sans-serif`;
-  for (const n of nodes) {
-    const show =
-      n.id === hover ||
-      sel.has(n.id) ||
-      (showLabels &&
-        ((n.kind === 'keystone' && view.k > 0.1) ||
-          (n.kind === 'notable' && view.k > 0.3) ||
-          view.k > 0.9));
-    if (show) ctx.fillText(n.name, n.x, n.y - NODE_RADIUS[n.kind] * 0.55 - 8 * px);
+  // names, as in the game; the node under the pointer and the selection always show theirs
+  if (showLabels) for (const n of nodes) if (seen(n)) paintLabel(ctx, n, k);
+  for (const id of [hover, ...sel]) {
+    const n = id === null ? null : byId.get(id);
+    if (n) paintLabel(ctx, n, k, true);
   }
   if (box) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
