@@ -20,3 +20,14 @@ Player and ranged enemies stood shooting each other without anyone dying. One or
 the player attacks nearby, the player drops a target it cannot damage for 20 s, and it closes in when
 arrows keep hitting walls. A stall report is saved to the crash log with per-arrow diagnostics if a stall
 ever recurs; the `stall-*` scripts in `scripts/` replay bot campaigns looking for them.
+
+## 2. The bow strider can be kept dodging a Spitter rare's caustic pools for a minute (open)
+
+**Symptom.** On a map with a ranged Spitter rare (found with the strider, run seed 7001, map 4, a Packed shrine), the rare keeps its
+distance and spits, and the character spends a minute stepping out of the pools it leaves (the hazard step runs before the
+attack) and never shoots back. The rare's life stays full until the stall breaker drops it; the character ended the map at 4
+life. The stall test (`src/sim/stall.test.ts`, "bow campaign regression") sees this as a stall, so it is run with the usual
+density until this is fixed.
+
+**Where to look.** `avoidHazard` and `kiteStep` in `src/sim/ai.ts` run before the attack is chosen; a hazard that is re-laid every
+1.5 s can hold them for as long as the monster lives. To reproduce: play that campaign without `forceDensity('standard')`.

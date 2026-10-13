@@ -36,11 +36,41 @@ export type Labyrinth = {
   exit: { x: number; y: number };
 };
 
+/** How a layout differs from the plain chain of rectangular rooms (docs/MAP-VARIETY.md 3.2). */
+export type LayoutStyle = {
+  /** Rooms are rectangles, or rounded blobs smoothed into caves. */
+  shape: 'rect' | 'blob';
+  /** Corridors bend once or twice, or wander. */
+  wander: boolean;
+  /** Corridor width, from and to. */
+  width: [number, number];
+  /** The largest side of a room (at most 12, a cell less two). */
+  maxSide: number;
+  /** Every room fills its whole cell and the end room is no bigger than the others. */
+  fill: boolean;
+  /** Extra corridors between rooms in neighbouring cells that the path does not join, at most this many. */
+  loops: number;
+  /** The share of open room tiles that stand as a pillar of wall instead (open ground only). */
+  pillars: number;
+};
+
+export const CHAIN_STYLE: LayoutStyle = {
+  shape: 'rect',
+  wander: false,
+  width: [2, 3],
+  maxSide: 12,
+  fill: false,
+  loops: 0,
+  pillars: 0,
+};
+
 export type LabyrinthOpts = {
   rooms: number;
   sideBranches: number;
   /** The smallest side of an ordinary room (the end room is always at least 10). */
   minSide?: number;
+  /** The style of the layout: the plain chain when absent. */
+  style?: LayoutStyle;
 };
 
 const DIRS = [
@@ -108,8 +138,13 @@ function corridor(
   w: number,
   a: { x: number; y: number },
   b: { x: number; y: number },
+  style: LayoutStyle = CHAIN_STYLE,
 ): void {
-  const width = rng.int(2, 3);
+  const width = rng.int(style.width[0], style.width[1]);
+  if (style.wander) {
+    wanderCorridor(rng, tiles, w, a, b, width);
+    return;
+  }
   const pts: { x: number; y: number }[] = [a];
   if (rng.chance(0.3)) {
     // Extra jog: three segments via a random intermediate coordinate.
@@ -134,9 +169,110 @@ function corridor(
   }
 }
 
-function placeRoom(rng: Rng, c: Cell, minSide: number, ox: number, oy: number): Rect {
-  const w = rng.int(minSide, 12);
-  const h = rng.int(minSide, 12);
+/** A corridor that wanders: it leans toward the target and strays to either side on the way. */
+function wanderCorridor(
+  rng: Rng,
+  tiles: Uint8Array,
+  w: number,
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+  width: number,
+): void {
+  const h = tiles.length / w;
+  let x = a.x;
+  let y = a.y;
+  for (let guard = 0; guard < 4000 && (x !== b.x || y !== b.y); guard++) {
+    carve(tiles, w, x, y, Math.min(w - 2, x + width - 1), Math.min(h - 2, y + width - 1));
+    const dx = Math.sign(b.x - x);
+    const dy = Math.sign(b.y - y);
+    const r = rng.next();
+    if (r < 0.4 && dx !== 0) x += dx;
+    else if (r < 0.8 && dy !== 0) y += dy;
+    else if (rng.chance(0.5)) x += rng.chance(0.5) ? 1 : -1;
+    else y += rng.chance(0.5) ? 1 : -1;
+    x = Math.max(1, Math.min(w - 1 - width, x));
+    y = Math.max(1, Math.min(h - 1 - width, y));
+  }
+  carve(tiles, w, b.x, b.y, Math.min(w - 2, b.x + width - 1), Math.min(h - 2, b.y + width - 1));
+}
+
+/** Carve a rounded blob into a room's rectangle: the radius varies around it, so no two caves have the same outline. */
+function carveBlob(rng: Rng, tiles: Uint8Array, w: number, r: Rect): void {
+  const K = 8;
+  const radii = Array.from({ length: K }, () => 0.7 + rng.next() * 0.38);
+  const cx = r.x + r.w / 2;
+  const cy = r.y + r.h / 2;
+  for (let y = r.y; y < r.y + r.h; y++)
+    for (let x = r.x; x < r.x + r.w; x++) {
+      const dx = (x + 0.5 - cx) / (r.w / 2);
+      const dy = (y + 0.5 - cy) / (r.h / 2);
+      const t = (Math.atan2(dy, dx) / (Math.PI * 2) + 0.5) * K;
+      const i = Math.floor(t) % K;
+      const f = t - Math.floor(t);
+      const rad = radii[i] * (1 - f) + radii[(i + 1) % K] * f;
+      if (Math.hypot(dx, dy) <= rad) tiles[y * w + x] = FLOOR;
+    }
+}
+
+/** One pass of cellular smoothing: fill a nook with most of its neighbours open, and drop a spur with almost none. */
+function smooth(tiles: Uint8Array, w: number, h: number): void {
+  const open = (x: number, y: number) => (tiles[y * w + x] === FLOOR ? 1 : 0);
+  const out = tiles.slice();
+  for (let y = 1; y < h - 1; y++)
+    for (let x = 1; x < w - 1; x++) {
+      let n = 0;
+      for (let dy = -1; dy <= 1; dy++)
+        for (let dx = -1; dx <= 1; dx++) if (dx || dy) n += open(x + dx, y + dy);
+      if (tiles[y * w + x] === FLOOR) {
+        if (n <= 2) out[y * w + x] = WALL;
+      } else if (n >= 5) out[y * w + x] = FLOOR;
+    }
+  tiles.set(out);
+}
+
+/** Whether every one of the points can be walked to from the first by 4-neighbour steps over floor. */
+function connected(
+  tiles: Uint8Array,
+  w: number,
+  h: number,
+  pts: { x: number; y: number }[],
+): boolean {
+  const seen = new Uint8Array(w * h);
+  const first = pts[0];
+  if (tiles[first.y * w + first.x] !== FLOOR) return false;
+  const stack = [first.y * w + first.x];
+  seen[stack[0]] = 1;
+  while (stack.length) {
+    const k = stack.pop()!;
+    const x = k % w;
+    const y = (k - x) / w;
+    for (const [dx, dy] of DIRS) {
+      const nx = x + dx;
+      const ny = y + dy;
+      if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+      const nk = ny * w + nx;
+      if (!seen[nk] && tiles[nk] === FLOOR) {
+        seen[nk] = 1;
+        stack.push(nk);
+      }
+    }
+  }
+  return pts.every((q) => seen[q.y * w + q.x]);
+}
+
+function placeRoom(
+  rng: Rng,
+  c: Cell,
+  minSide: number,
+  ox: number,
+  oy: number,
+  style: LayoutStyle = CHAIN_STYLE,
+): Rect {
+  if (style.fill)
+    return { x: ox + c.cx * CELL + 1, y: oy + c.cy * CELL + 1, w: CELL - 2, h: CELL - 2 };
+  const lo = Math.min(minSide, style.maxSide);
+  const w = rng.int(lo, style.maxSide);
+  const h = rng.int(lo, style.maxSide);
   const cellX = ox + c.cx * CELL;
   const cellY = oy + c.cy * CELL;
   const x = rng.int(cellX + 1, cellX + CELL - 1 - w);
@@ -154,6 +290,7 @@ export function generateLabyrinth(rng: Rng, opts: LabyrinthOpts): Labyrinth {
 }
 
 function tryGenerate(rng: Rng, opts: LabyrinthOpts): Labyrinth | null {
+  const style = opts.style ?? CHAIN_STYLE;
   const used = new Set<number>();
   const main = walk(rng, opts.rooms, used);
   if (!main) return null;
@@ -210,7 +347,14 @@ function tryGenerate(rng: Rng, opts: LabyrinthOpts): Labyrinth | null {
   const mainPath: number[] = [];
   main.forEach((c, i) => {
     const kind: RoomKind = i === 0 ? 'start' : i === main.length - 1 ? 'end' : 'main';
-    const rect = placeRoom(rng, c, kind === 'end' ? 10 : (opts.minSide ?? 6), ox, oy);
+    const rect = placeRoom(
+      rng,
+      c,
+      kind === 'end' && !style.fill ? 10 : (opts.minSide ?? 6),
+      ox,
+      oy,
+      style,
+    );
     const cc = center(rect);
     rooms.push({ id: rooms.length, kind, rect, cx: cc.x, cy: cc.y, pathIndex: i });
     mainPath.push(rooms.length - 1);
@@ -220,7 +364,7 @@ function tryGenerate(rng: Rng, opts: LabyrinthOpts): Labyrinth | null {
     const ids: number[] = [];
     let parent = mainPath[s.from];
     s.cells.forEach((c, k) => {
-      const rect = placeRoom(rng, c, opts.minSide ?? 6, ox, oy);
+      const rect = placeRoom(rng, c, opts.minSide ?? 6, ox, oy, style);
       const cc = center(rect);
       rooms.push({
         id: rooms.length,
@@ -238,18 +382,48 @@ function tryGenerate(rng: Rng, opts: LabyrinthOpts): Labyrinth | null {
     sideRooms.push(ids);
   }
 
-  for (const r of rooms)
-    carve(tiles, w, r.rect.x, r.rect.y, r.rect.x + r.rect.w - 1, r.rect.y + r.rect.h - 1);
+  for (const r of rooms) {
+    if (style.shape === 'blob') {
+      carveBlob(rng, tiles, w, r.rect);
+      carve(tiles, w, r.cx - 1, r.cy - 1, r.cx + 1, r.cy + 1);
+    } else carve(tiles, w, r.rect.x, r.rect.y, r.rect.x + r.rect.w - 1, r.rect.y + r.rect.h - 1);
+  }
   for (let i = 0; i + 1 < mainPath.length; i++) {
     const a = rooms[mainPath[i]];
     const b = rooms[mainPath[i + 1]];
-    corridor(rng, tiles, w, { x: a.cx, y: a.cy }, { x: b.cx, y: b.cy });
+    corridor(rng, tiles, w, { x: a.cx, y: a.cy }, { x: b.cx, y: b.cy }, style);
   }
   for (const r of rooms) {
     if (r.kind === 'side' && r.parent !== undefined) {
       const p = rooms[r.parent];
-      corridor(rng, tiles, w, { x: p.cx, y: p.cy }, { x: r.cx, y: r.cy });
+      corridor(rng, tiles, w, { x: p.cx, y: p.cy }, { x: r.cx, y: r.cy }, style);
     }
+  }
+  // Loops: rooms in neighbouring cells that the path does not join get a corridor between them.
+  if (style.loops > 0) {
+    const cellOf = (r: Room) => ({
+      cx: Math.floor((r.rect.x - ox) / CELL),
+      cy: Math.floor((r.rect.y - oy) / CELL),
+    });
+    const joined = (a: Room, b: Room) =>
+      Math.abs(a.pathIndex - b.pathIndex) <= 1 && a.kind !== 'side' && b.kind !== 'side'
+        ? true
+        : a.parent === b.id || b.parent === a.id;
+    const pairs: [Room, Room][] = [];
+    for (const a of rooms)
+      for (const b of rooms) {
+        if (a.id >= b.id || joined(a, b)) continue;
+        const ca = cellOf(a);
+        const cb = cellOf(b);
+        if (Math.abs(ca.cx - cb.cx) + Math.abs(ca.cy - cb.cy) === 1) pairs.push([a, b]);
+      }
+    rng.shuffle(pairs);
+    for (const [a, b] of pairs.slice(0, style.loops))
+      corridor(rng, tiles, w, { x: a.cx, y: a.cy }, { x: b.cx, y: b.cy }, style);
+  }
+  if (style.shape === 'blob') {
+    smooth(tiles, w, h);
+    smooth(tiles, w, h);
   }
   // Keep a solid border.
   for (let x = 0; x < w; x++) {
@@ -261,13 +435,29 @@ function tryGenerate(rng: Rng, opts: LabyrinthOpts): Labyrinth | null {
     tiles[y * w + w - 1] = WALL;
   }
 
-  // Exit: the end-room tile farthest from the previous room.
+  // Pillars: single tiles of wall standing in open ground, never on a room's middle or beside a wall.
+  if (style.pillars > 0) {
+    for (const r of rooms)
+      for (let y = r.rect.y + 2; y < r.rect.y + r.rect.h - 2; y++)
+        for (let x = r.rect.x + 2; x < r.rect.x + r.rect.w - 2; x++) {
+          if (Math.abs(x - r.cx) < 3 && Math.abs(y - r.cy) < 3) continue;
+          if (!rng.chance(style.pillars)) continue;
+          let open = true;
+          for (let dy = -1; dy <= 1; dy++)
+            for (let dx = -1; dx <= 1; dx++)
+              if (tiles[(y + dy) * w + x + dx] !== FLOOR) open = false;
+          if (open) tiles[y * w + x] = WALL;
+        }
+  }
+
+  // Exit: the end-room floor tile farthest from the previous room.
   const end = rooms[mainPath[mainPath.length - 1]];
   const prev = rooms[mainPath[mainPath.length - 2]];
   let exit = { x: end.cx, y: end.cy };
   let best = -1;
   for (let y = end.rect.y + 1; y < end.rect.y + end.rect.h - 1; y++) {
     for (let x = end.rect.x + 1; x < end.rect.x + end.rect.w - 1; x++) {
+      if (tiles[y * w + x] !== FLOOR) continue;
       const d = (x - prev.cx) ** 2 + (y - prev.cy) ** 2;
       if (d > best) {
         best = d;
@@ -275,6 +465,16 @@ function tryGenerate(rng: Rng, opts: LabyrinthOpts): Labyrinth | null {
       }
     }
   }
+
+  // Every room and the exit must be reachable from the start (a cave's smoothing can pinch a passage shut).
+  if (
+    !connected(tiles, w, h, [
+      { x: rooms[mainPath[0]].cx, y: rooms[mainPath[0]].cy },
+      ...rooms.map((r) => ({ x: r.cx, y: r.cy })),
+      { x: exit.x, y: exit.y },
+    ])
+  )
+    return null;
 
   // Waypoints: main path in order with out-and-back detours into side branches.
   const waypoints: Waypoint[] = [];

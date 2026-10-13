@@ -9,6 +9,7 @@ import { generateArena } from './arena';
 import { attachArena } from './bossArena';
 import { BOSSES, bossForMap } from '../data/bosses';
 import { generateLabyrinth, type Labyrinth } from './labyrinth';
+import { LAYOUTS } from './layouts';
 import { populate, type EndKind, type Population } from './population';
 
 /** Everything needed to play one map (§5.3). */
@@ -123,9 +124,19 @@ export function makeMapPlan(
   const crawl = type === 'crawl';
   const drawn = map <= 4 ? 0 : genRng.int(0, 2);
   // A Quarry is a short hunt and a Collapse a race: neither has side branches.
-  const sideBranches = type === 'quarry' || type === 'collapse' || crawl ? 0 : drawn;
+  const biome = biomeDef(biomeId);
+  const layout = LAYOUTS[biome.layout];
+  const sideBranches =
+    type === 'quarry' || type === 'collapse' || crawl
+      ? 0
+      : drawn + (map <= 4 ? 0 : layout.extraBranches);
   // A Crawl's maps are short: three rooms, and the last of the three ends on a mini-boss.
-  const rooms = type === 'quarry' ? 4 : crawl ? 3 : roomsForPlan(map, root.fork('size'));
+  const rooms =
+    type === 'quarry'
+      ? 4
+      : crawl
+        ? 3
+        : Math.max(3, Math.round(roomsForPlan(map, root.fork('size')) * layout.rooms));
   const theme = themeDef(themeId);
   const endKind = crawl && segment === CRAWL_SEGMENTS - 1 ? 'miniboss' : endKindForMap(map);
   // A boss is fought in an arena past the last room (docs/BOSSES.md 12).
@@ -133,7 +144,12 @@ export function makeMapPlan(
   const maze =
     type === 'holdout'
       ? generateArena()
-      : generateLabyrinth(genRng, { rooms, sideBranches, minSide: minRoomSide(map) });
+      : generateLabyrinth(genRng, {
+          rooms,
+          sideBranches,
+          minSide: layout.minSide ?? minRoomSide(map),
+          style: layout.style,
+        });
   const lab = boss ? attachArena(maze) : maze;
   const xpMult =
     theme.xpMult *
@@ -159,7 +175,7 @@ export function makeMapPlan(
     areaLevel,
     resistPenalty: resistPenaltyForMap(map),
     theme,
-    biome: biomeDef(biomeId),
+    biome,
     density: densityDef(densityId),
     affixes,
     type,

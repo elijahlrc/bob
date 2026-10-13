@@ -256,6 +256,23 @@ export function monsterName(spec: MonsterSpec, rng: Rng): string {
   return v ? `${v} ${t}` : t;
 }
 
+/** The floor tile of a room nearest its north-west corner (the corner itself is a wall in a cave), as a position. */
+function cornerFloor(lab: Labyrinth, room: Room): { x: number; y: number } {
+  const r = room.rect;
+  let best = { x: room.cx, y: room.cy };
+  let d = Infinity;
+  for (let y = r.y; y < r.y + r.h; y++)
+    for (let x = r.x; x < r.x + r.w; x++) {
+      if (!isFloor(lab, x, y)) continue;
+      const k = (x - r.x - 1) ** 2 + (y - r.y - 1) ** 2;
+      if (k < d) {
+        d = k;
+        best = { x, y };
+      }
+    }
+  return { x: best.x + 0.5, y: best.y + 0.5 };
+}
+
 /** Random floor positions inside a room, spread out a little. */
 function spots(rng: Rng, lab: Labyrinth, room: Room, n: number): { x: number; y: number }[] {
   const out: { x: number; y: number }[] = [];
@@ -624,7 +641,8 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
     const mains = lab.rooms.filter((r) => r.kind === 'main');
     if (mains.length === 0) break;
     const r = mains[rng.int(0, mains.length - 1)];
-    chests.push({ x: r.rect.x + 1.5, y: r.rect.y + 1.5, room: r.id });
+    const at = cornerFloor(lab, r);
+    chests.push({ x: at.x, y: at.y, room: r.id });
   }
   return { monsters, chests };
 }

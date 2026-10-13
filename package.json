@@ -35,6 +35,7 @@
     "coverage:emit-gems": "tsx scripts/coverage/emit-gems.ts",
     "spirit": "tsx scripts/spirit/report.ts",
     "mapstats": "tsx scripts/mapstats.ts",
+    "map:ascii": "tsx scripts/mapascii.ts",
     "tree:extract": "tsx scripts/tree/extract.ts",
     "tree:lines": "tsx scripts/tree/lines.ts",
     "tree:names": "tsx scripts/tree/names.ts",
