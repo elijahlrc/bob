@@ -95,7 +95,8 @@ describe('map offers (docs/MAPS.md section 4)', () => {
       expect(p.map).toBe(29);
       expect(p.resistPenalty).toBe(resistPenaltyForMap(29));
       expect(p.endKind).toBe('rare');
-      expect(p.lab.mainPath.length).toBe(roomsForMap(29));
+      // The size follows the number, within the spread.
+      expect(Math.abs(p.lab.mainPath.length - roomsForMap(29))).toBeLessThanOrEqual(1);
     }
     const level = (p: typeof flat) => Math.max(...p.pop.monsters.map((m) => m.spec.level));
     expect(level(up)).toBeGreaterThan(level(flat));

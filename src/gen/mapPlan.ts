@@ -35,8 +35,23 @@ export type MapPlan = {
   pop: Population;
 };
 
+/** The size of a map grows steadily with the map number: 4 rooms on the first, 9 on the hundredth (docs/MAP-VARIETY.md W2). */
 export function roomsForMap(n: number): number {
-  return 4 + Math.floor(n / 20);
+  return Math.round(4 + (5 * (Math.min(100, Math.max(1, n)) - 1)) / 99);
+}
+
+/** How far a map's size may stray from the one its number gives. */
+export const SIZE_SPREAD = 0.15;
+
+/** The rooms of one map: the steady size for its number, within the spread, drawn from the map's own seed. */
+export function roomsForPlan(n: number, rng: Rng): number {
+  const nominal = 4 + (5 * (Math.min(100, Math.max(1, n)) - 1)) / 99;
+  return Math.max(3, Math.round(nominal * (1 + rng.float(-SIZE_SPREAD, SIZE_SPREAD))));
+}
+
+/** The smallest side of an ordinary room: rooms grow a little in the late maps. */
+export function minRoomSide(n: number): number {
+  return n >= 75 ? 8 : n >= 40 ? 7 : 6;
 }
 
 export function resistPenaltyForMap(n: number): number {
@@ -106,13 +121,15 @@ export function makeMapPlan(
   // A Quarry is a short hunt and a Collapse a race: neither has side branches.
   const sideBranches = type === 'quarry' || type === 'collapse' || crawl ? 0 : drawn;
   // A Crawl's maps are short: three rooms, and the last of the three ends on a mini-boss.
-  const rooms = type === 'quarry' ? 4 : crawl ? 3 : roomsForMap(map);
+  const rooms = type === 'quarry' ? 4 : crawl ? 3 : roomsForPlan(map, root.fork('size'));
   const theme = themeDef(themeId);
   const endKind = crawl && segment === CRAWL_SEGMENTS - 1 ? 'miniboss' : endKindForMap(map);
   // A boss is fought in an arena past the last room (docs/BOSSES.md 12).
   const boss = endKind === 'boss' ? bossForMap(map) : null;
   const maze =
-    type === 'holdout' ? generateArena() : generateLabyrinth(genRng, { rooms, sideBranches });
+    type === 'holdout'
+      ? generateArena()
+      : generateLabyrinth(genRng, { rooms, sideBranches, minSide: minRoomSide(map) });
   const lab = boss ? attachArena(maze) : maze;
   const xpMult =
     theme.xpMult *

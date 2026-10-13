@@ -36,7 +36,12 @@ export type Labyrinth = {
   exit: { x: number; y: number };
 };
 
-export type LabyrinthOpts = { rooms: number; sideBranches: number };
+export type LabyrinthOpts = {
+  rooms: number;
+  sideBranches: number;
+  /** The smallest side of an ordinary room (the end room is always at least 10). */
+  minSide?: number;
+};
 
 const DIRS = [
   [1, 0],
@@ -205,7 +210,7 @@ function tryGenerate(rng: Rng, opts: LabyrinthOpts): Labyrinth | null {
   const mainPath: number[] = [];
   main.forEach((c, i) => {
     const kind: RoomKind = i === 0 ? 'start' : i === main.length - 1 ? 'end' : 'main';
-    const rect = placeRoom(rng, c, kind === 'end' ? 10 : 6, ox, oy);
+    const rect = placeRoom(rng, c, kind === 'end' ? 10 : (opts.minSide ?? 6), ox, oy);
     const cc = center(rect);
     rooms.push({ id: rooms.length, kind, rect, cx: cc.x, cy: cc.y, pathIndex: i });
     mainPath.push(rooms.length - 1);
@@ -215,7 +220,7 @@ function tryGenerate(rng: Rng, opts: LabyrinthOpts): Labyrinth | null {
     const ids: number[] = [];
     let parent = mainPath[s.from];
     s.cells.forEach((c, k) => {
-      const rect = placeRoom(rng, c, 6, ox, oy);
+      const rect = placeRoom(rng, c, opts.minSide ?? 6, ox, oy);
       const cc = center(rect);
       rooms.push({
         id: rooms.length,
