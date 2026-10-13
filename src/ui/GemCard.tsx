@@ -40,10 +40,11 @@ export function GemTip({
   x: number;
   y: number;
 }) {
-  const left = Math.min(x + 16, window.innerWidth - 300);
-  const top = Math.min(y + 12, window.innerHeight - 260);
+  // By the cursor, kept on screen. Preact 11 adds no "px" to a number, so the style says it.
+  const left = Math.max(4, Math.min(x + 16, window.innerWidth - 306));
+  const top = Math.max(4, Math.min(y + 12, window.innerHeight - 300));
   return (
-    <div class="tooltip gem-tooltip" style={{ left, top }}>
+    <div class="tooltip gem-tooltip" style={{ left: `${left}px`, top: `${top}px` }}>
       <GemCard gemId={gemId} level={level} tip />
     </div>
   );
