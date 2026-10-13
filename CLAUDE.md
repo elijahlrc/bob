@@ -25,6 +25,7 @@
   and simulated players, not by tests of numbers. `tree:explore` builds with the tree from a terminal. **The game does no layout at run time:** after any change that moves the tree (charter,
   plan, roads, shapes, clusters) run `npm run tree:bake`, which writes `src/data/tree/treeBaked.ts`; a test fails while it is stale. [docs/TREE.md](docs/TREE.md) is
   the earlier parity pass (size, clusters, vocabulary).
+- **Tree editor** (2026-10-13): `npm run tree:edit` opens `tree-editor.html` (move nodes, change type, add/remove nodes and links, copy stats; dev server only). Save writes `src/data/tree/treeEdits.json`, a patch `getTree()` applies on top of the baked tree (`edits.ts`). Bake first, edit after: a rebake renumbers nodes. See the end of docs/TREE-REDESIGN.md.
 - **Strategy tab** (2026-10-09): `Build.strategy` gives each skill a role, a condition and an order, plus target priority,
   spacing (hold, close in, kite) and flask thresholds (`src/data/strategy.ts`, `src/calc/strategy.ts`, `src/ui/Strategy.tsx`).
   `Character.mains` / `rotation` hold the resolved order; the sim's `chooseSkill` (`src/sim/ai.ts`) walks it. The sheet

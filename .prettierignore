@@ -10,3 +10,5 @@ docs/coverage/map.json
 docs/tree/pob-tree.json
 # The baked passive tree: one generated line (npm run tree:bake).
 src/data/tree/treeBaked.ts
+# Written by the tree editor (npm run tree:edit).
+src/data/tree/treeEdits.json

@@ -726,3 +726,18 @@ cost more nodes than the highway, so that it is worth it only for the clusters.
   times); it takes back exactly the edges it added now. The test of one entrance per cluster is now one to four; a start test allows
   its links. The test of plain damage was removed at the user's word (the emitter drops it).
   `SAVE_VERSION` 17 hands passives back.
+
+## Hand editing (2026-10-13)
+
+`npm run tree:edit` starts the dev server and opens the tree editor (`tree-editor.html`, `src/treeEditor/`). It moves nodes, changes their
+type (small, notable, keystone, travel), adds and removes nodes, makes and cuts connections, and copies the name and stats of one node
+onto others; it has undo, a search, and a Check button (every class can reach every node, loose nodes, nodes on top of each other, keystone count).
+Save (Ctrl+S) writes `src/data/tree/treeEdits.json`, a patch against the baked tree (`edits.ts`: moves, kinds, names, stats, added and removed
+nodes, links); `getTree()` applies it, and packs the ids so `tree.nodes[id]` stays the node. Nodes touched by hand are ringed orange.
+
+- The patch lives beside the bake: `npm run tree:bake` still writes the generated layout and the freshness test still compares that.
+  A rebake after hand edits renumbers nodes, so the patch (which names nodes by baked id) would land on the wrong ones: bake first, edit after,
+  or empty the patch (Revert all, Save) before a bake.
+- Removing a node shifts the ids after it, so characters saved with passives on later nodes get other nodes: the same as after a bake.
+- A node made a keystone has no keystone effect (those belong to the keystone names); the editor edits placement, type and links, not stat values.
+- `npm run tree:pic`, `tree:audit` and the other tools still read the generated layout, not the edits.
