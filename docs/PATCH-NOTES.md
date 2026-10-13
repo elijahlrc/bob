@@ -22,6 +22,10 @@ change, and our own names only. Dash bullets under plain headings.
 - The new biomes are still being balance-tested. For now Caverns and Marshes are harder than the others and the Hollow and the Warren a little easier, so runs are somewhat harder overall.
 - The Tollkeeper grows much deadlier as the fight goes on: each toll now raises its damage by a quarter (was a tenth), and its rings hit a third harder at the first toll and about two thirds harder by the third.
 - The Tollkeeper starts the fight much weaker: it opens at half damage, rings included, and climbs back to its old strength over its first two tolls. It tolls every 12 seconds instead of 10, and its flail between tolls is halved again, so its melee starts at a quarter of what it was.
+- Surge of Blood now gives its 25% chance of a Fervour charge on kills while it is up, as its card says; before, the chance never applied.
+- Several bonuses that only apply under a condition were being ignored in some places, and now work: flask charges gained on a kill, life gained on a kill per charge held, extra item quantity and rarity on low life, and the damage of Searing Mantle's burn, Cinder Herald, Cinder Blow's burst, Cinder Bond and the Sour Herald crawler.
+- Rampage Call's card now says what rage is: you gain it from melee hits when a skill or support gives it, such as Fury Well or Snag Lash, up to 50, and it fades a few seconds after you stop hitting.
+- The Skills tab gem list now updates at once when you socket or remove a gem, instead of only after you switch tabs.
 
 ## 2026-10-12
 
