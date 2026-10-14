@@ -44,6 +44,11 @@ export function loadRun(store: KeyValueStore, key: string = SAVE_KEY): LoadResul
  */
 export function migrate(version: number, run: RunState): RunState | null {
   if (version === SAVE_VERSION) return run;
+  // Version 18 only lacks the Wayside state (docs/WAYSIDE.md), which every reader fills in with `waysideOf`.
+  if (version === 18) {
+    run.version = SAVE_VERSION;
+    return run;
+  }
   // Versions 10 to 16 have a passive tree of before one of the iterations of docs/TREE-REDESIGN.md (10: roads and districts; 11: before
   // crossings and forks; 12: before two roads out of each start; 13: before tiers, kits and shapes; 14: before threads and basic
   // clusters round the starts; 15: before pods and attribute highways; 16: before links between clusters; 17: before the starts were joined directly to their clusters): their node ids mean other

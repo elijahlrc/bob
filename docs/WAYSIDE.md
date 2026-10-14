@@ -1,6 +1,6 @@
 # Bob — Wayside Plan: stops, a Market, provisions and reprieves
 
-Status: **draft for review, 2026-10-13; nothing is built; the open questions were settled by the author on 2026-10-13 (section 14) and are cheap to change** · Owner: the user · Author: Claude
+Status: **draft for review, 2026-10-13; nothing is built; the open questions were settled by the author on 2026-10-13 (section 14) and are cheap to change; questions met while building are in [WAYSIDE-QUESTIONS.md](WAYSIDE-QUESTIONS.md)** · Owner: the user · Author: Claude
 
 This plan extends [MAPS.md](MAPS.md) (offers, Respite, Abandon, carry-over) and [DESIGN.md](DESIGN.md). It reopens two non-goals
 of MAPS.md section 1 ("a town or shop", "map items as a consumable economy"); section 13 lists the edits that go into DESIGN.md
@@ -407,6 +407,8 @@ cannot disturb the loot of a map.
 ---
 
 ## 11. Milestones
+
+**Order change (2026-10-13):** Y0 (measure) moved to the end of the build. The user said a wrong first guess is cheap to fix, so Y1 to Y6 use the numbers in this plan and the measurements are taken in Y7, when there is something to tune.
 
 | #      | Milestone                   | Contents                                                                                                                                                                                                                               | Done when                                                                                    |
 | ------ | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |

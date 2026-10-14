@@ -28,10 +28,11 @@ import type { MapResult } from '../sim/runMap';
 import { restAtCamp } from './camp';
 import { noteFound, stampAll } from './found';
 import { makeOffer, rollOffers, type MapOffer } from './offers';
+import type { Wayside } from './wayside';
 
 export { rollThemes } from './offers';
 
-export const SAVE_VERSION = 18;
+export const SAVE_VERSION = 19;
 export const TOTAL_MAPS = 100;
 
 export type MapRecord = {
@@ -93,6 +94,8 @@ export type RunState = {
   vitals: Vitals;
   /** How hard the monsters are (docs/ENEMIES.md 8): fixed for the run unless changed from the debug panel at camp. */
   difficulty: Difficulty;
+  /** Stops, the Market, provisions and the Reprieve (docs/WAYSIDE.md); read it with `waysideOf`. */
+  wayside?: Wayside;
 };
 
 const BODY_FOR_CLASS: Record<string, string> = {
@@ -180,6 +183,12 @@ export function mapSeed(run: RunState, offer: MapOffer): number {
 export function setMap(run: RunState, map: number): void {
   run.map = map;
   run.offers = rollOffers(run.seed, map, run.vitals);
+}
+
+/** The level is over: the counter advances by one and the next level's offers are rolled (every way out of a level ends here). */
+export function advanceLevel(run: RunState): void {
+  run.map += 1;
+  run.offers = rollOffers(run.seed, run.map, run.vitals);
 }
 
 /**
@@ -343,8 +352,7 @@ export function finishMap(run: RunState, res: MapResult): void {
     else if (run.map % 5 === 0) run.reward = rollRewards(run);
     else if (run.map <= SKILL_REWARD_MAPS) run.reward = rollSkillRewards(run);
   }
-  run.map += 1;
-  run.offers = rollOffers(run.seed, run.map, run.vitals);
+  advanceLevel(run);
   run.phase = 'camp';
 }
 
@@ -364,8 +372,7 @@ export function takeRespite(run: RunState): void {
     stuck: 0,
   });
   run.vitals = fullVitals();
-  run.map += 1;
-  run.offers = rollOffers(run.seed, run.map, run.vitals);
+  advanceLevel(run);
 }
 
 /** Put picked-up currency or tablets in the pouch. */

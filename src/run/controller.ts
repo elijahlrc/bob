@@ -389,7 +389,7 @@ export class Controller {
   private snapshot(run: RunState): string {
     const { build, inventory, nextUid, bonusPoints, refundPoints, reward } = run;
     const discarded = run.discarded ?? [];
-    const { currency, dust, tablets } = run;
+    const { currency, dust, tablets, wayside } = run;
     return JSON.stringify({
       build,
       inventory,
@@ -401,6 +401,7 @@ export class Controller {
       currency,
       dust,
       tablets,
+      wayside: wayside ?? null,
     });
   }
 
