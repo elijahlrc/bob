@@ -76,9 +76,8 @@ import {
   TOLL_TELL,
   VEIL_CYCLE,
   VEIL_SECONDS,
-  WAVES,
+  SOLDIERS_MAX,
   WAVE_PUSH_SECONDS,
-  WAVE_THIN,
   WITNESSES,
   WITNESS_HEX_STEP,
   WITNESS_WEIGHT,
@@ -157,7 +156,6 @@ export type BossState = {
   dealt: number[];
   adapt: number[];
   // The Siege Marshal.
-  holding: boolean;
   wave: number;
   waveT: number;
   hornT: number;
@@ -227,7 +225,6 @@ export function initBoss(w: World, a: Actor): void {
     exposedT: 0,
     dealt: [0, 0, 0, 0, 0],
     adapt: [0, 0, 0, 0, 0],
-    holding: true,
     wave: 0,
     waveT: 0,
     hornT: 0,
@@ -338,8 +335,8 @@ export function bossAI(w: World, m: Actor, dt: number): boolean {
       }
       return st.shiftT > 0;
     case 'siegeMarshal':
-      // Until his regiments are spent he commands from where he stands.
-      if (!st.holding) return false;
+      // He commands from where he stands, and comes down to fight only while no regiment stands.
+      if (st.routedT > 0) return false;
       m.moving = false;
       m.facing = Math.atan2(p.y - m.y, p.x - m.x);
       return true;
@@ -963,7 +960,7 @@ function marchIn(w: World, m: Actor, st: BossState): void {
   const cx = room ? room.cx + 0.5 : m.x;
   const cy = room ? room.cy + 0.5 : m.y;
   const r = room ? Math.min(room.rect.w, room.rect.h) / 2 - 2.5 : 6;
-  const ranks = REGIMENTS[Math.min(st.wave, REGIMENTS.length - 1)];
+  const ranks = REGIMENTS[st.wave % REGIMENTS.length];
   const total = ranks.reduce((n, g) => n + g.n, 0);
   const start = w.rngAi.float(0, Math.PI * 2);
   st.soldiers = st.soldiers.filter((x) => x.alive);
@@ -983,24 +980,26 @@ function marchIn(w: World, m: Actor, st: BossState): void {
 }
 
 function tickSiege(w: World, m: Actor, st: BossState, dt: number): void {
-  if (st.routedT > 0) st.routedT -= dt;
-  if (!st.holding) return;
   if (st.hornT > 0) {
     st.hornT -= dt;
     if (st.hornT <= 0) marchIn(w, m, st);
     return;
   }
+  if (st.routedT > 0) {
+    // A regiment spent, he comes down himself for a moment; then the horn sounds again.
+    st.routedT -= dt;
+    if (st.routedT <= 0) callRegiment(w, m, st);
+    return;
+  }
   const alive = livingSoldiers(st);
-  if (st.wave < WAVES) {
-    // The next regiment comes when the last has thinned, or when its time is up, whichever is first.
-    st.waveT -= dt;
-    if (alive <= WAVE_THIN || st.waveT <= 0) callRegiment(w, m, st);
-  } else if (alive === 0) {
-    // All spent: he comes down himself, and for a moment he is alone.
-    st.holding = false;
+  if (alive === 0) {
     st.routedT = ROUTED_SECONDS;
     w.events.push({ t: 'window', id: m.id, kind: 'routed' });
+    return;
   }
+  // A regiment that is not cleared in time is followed by the next anyway (unless the field is full).
+  st.waveT -= dt;
+  if (st.waveT <= 0 && alive < SOLDIERS_MAX) callRegiment(w, m, st);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -1297,10 +1296,11 @@ export function bossReadout(w: World, m: Actor): string[] {
       if (st.regrowing) out.push('Regrowing');
       break;
     case 'siegeMarshal':
-      if (st.holding) {
-        out.push(`Regiment ${st.wave} of ${WAVES}: ${livingSoldiers(st)} standing`);
+      if (st.routedT > 0) out.push('Routed');
+      else {
+        out.push(`Regiment ${st.wave}: ${livingSoldiers(st)} standing`);
         if (commandLess(st) > 0) out.push(`Takes ${Math.round(commandLess(st) * 100)}% less`);
-      } else if (st.routedT > 0) out.push('Routed');
+      }
       break;
     case 'duellist':
       out.push(

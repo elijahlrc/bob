@@ -810,13 +810,15 @@ section 2.
 clock, only attrition.
 
 - He stands at the middle of the arena and **commands**. A horn sounds (a 1.6 s tell), then a regiment marches in from the
-  arena's edge: **three regiments** (shieldbearers and warriors; archers and a shieldbearer; mages and warriors). They are
-  his, not rolled: no experience, no loot, and they leave with him.
+  arena's edge: **three regiments** (shieldbearers and warriors; archers and a shieldbearer; mages and warriors), and then
+  the same three again, **for as long as the fight lasts**. They are his, not rolled: no experience, no loot, and they leave
+  with him.
 - **Command.** While his soldiers stand he takes **6% less** from every hit for each, up to 60%. It applies to every damage
-  type alike, so no build is favoured by it. When the last of the third regiment falls he **comes down himself**, and for
-  6 s he is **routed** (takes 20% more) before he fights, with a sabre.
-- The next regiment comes when the last has **thinned to two**, or **22 s** after it came, whichever is first: he cannot be
-  outlasted by standing back, and a build that clears slowly meets more of them at once.
+  type alike, so no build is favoured by it. When the last soldier of a regiment falls he **comes down himself**, and for
+  6 s he is **routed** (takes 20% more) and fights with a sabre; then the horn sounds and he goes back to his place.
+- A regiment that is not cleared is followed by the next **22 s** after it came, so he cannot be outlasted by standing back,
+  and a build that clears slowly meets more of them at once (but no more come while 10 stand). A build that clears fast gets
+  the lull, and the lull is the burst window.
 - Answers: damage (the whole fight shortens), clear speed and area (the soldiers), recovery and flasks (the attrition), and
   defences of every kind (the soldiers attack in different ways). Nothing in it is specific.
 

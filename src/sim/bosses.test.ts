@@ -26,6 +26,7 @@ import {
   HORN_TELL,
   PLATED_LESS,
   ROT_REGEN,
+  ROUTED_SECONDS,
   ROUTED_TAKEN,
   TOLL_DAMAGE,
   TOLL_EVERY,
@@ -34,6 +35,7 @@ import {
   TOLL_TELL,
   VEIL_CYCLE,
   VEIL_SECONDS,
+  SOLDIERS_MAX,
   WAVE_PUSH_SECONDS,
   bossForMap,
   bossOfType,
@@ -462,7 +464,7 @@ describe('the Unmaker (docs/BOSSES.md 9)', () => {
 });
 
 describe('the Siege Marshal (docs/BOSSES.md 5a)', () => {
-  it('commands from where he stands while three regiments march in, then comes down alone and routed', () => {
+  it('commands from where he stands while regiments march in, and comes down only between them', () => {
     const w = bossArena(22);
     w.player.stunT = 1e9;
     const m = putBoss(w, 'siegeMarshal', 5, 0, 20);
@@ -475,27 +477,35 @@ describe('the Siege Marshal (docs/BOSSES.md 5a)', () => {
     expect(st.soldiers.every((s) => s.noReward && s.alive)).toBe(true);
     // The more of them stand, the less he takes.
     expect(commandLess(st)).toBeCloseTo(5 * COMMAND_PER);
-    // Each regiment is called when the last has thinned.
+    // A regiment that is not all dead holds the next back.
     for (const s of st.soldiers.slice(0, 4)) s.alive = false;
-    run(w, HORN_TELL + 0.3);
-    expect(st.wave).toBe(2);
-    for (const s of st.soldiers) s.alive = false;
-    run(w, HORN_TELL + 0.3);
-    expect(st.wave).toBe(3);
-    expect(st.holding).toBe(true);
+    run(w, ROUTED_SECONDS + HORN_TELL + 0.3);
+    expect(st.wave).toBe(1);
     // He has not moved a step.
     expect(Math.hypot(m.x - x0, m.y - y0)).toBeLessThan(0.01);
-    // The last regiment spent, he comes down, and is routed for a while.
+    // Once the last falls he is routed for a while, then the horn sounds for the next.
     for (const s of st.soldiers) s.alive = false;
     run(w, 0.3);
-    expect(st.holding).toBe(false);
     expect(st.routedT).toBeGreaterThan(0);
     const dmg = [100, 0, 0, 0, 0];
     bossTaken(m, dmg);
     expect(dmg[0]).toBeCloseTo(100 * (1 + ROUTED_TAKEN));
+    run(w, ROUTED_SECONDS + HORN_TELL + 0.3);
+    expect(st.wave).toBe(2);
+    expect(livingSoldiers(st)).toBe(5);
+    // They keep coming past the third, round and round.
+    for (let k = 3; k <= 6; k++) {
+      for (const s of st.soldiers) s.alive = false;
+      run(w, ROUTED_SECONDS + HORN_TELL + 0.6);
+      expect(st.wave).toBe(k);
+      expect(livingSoldiers(st)).toBeGreaterThan(0);
+      // The fifth is the second again: archers.
+      if (k === 5)
+        expect(st.soldiers.some((s) => s.alive && s.mon?.spec.type === 'archer')).toBe(true);
+    }
   });
 
-  it('a regiment comes on its own if the last is not thinned in time', () => {
+  it('a regiment comes on its own if the last is not cleared in time, unless the field is full', () => {
     const w = bossArena(22);
     w.player.stunT = 1e9;
     const m = putBoss(w, 'siegeMarshal', 5, 0, 20);
@@ -504,6 +514,11 @@ describe('the Siege Marshal (docs/BOSSES.md 5a)', () => {
     expect(st.wave).toBe(1);
     for (const s of st.soldiers) s.life = 1e9;
     run(w, WAVE_PUSH_SECONDS + HORN_TELL + 0.5);
+    expect(st.wave).toBe(2);
+    // With ten standing no more come, however long it takes.
+    for (const s of st.soldiers) s.life = 1e9;
+    expect(livingSoldiers(st)).toBe(SOLDIERS_MAX);
+    run(w, WAVE_PUSH_SECONDS * 2);
     expect(st.wave).toBe(2);
   });
 

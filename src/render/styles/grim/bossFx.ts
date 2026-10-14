@@ -334,7 +334,7 @@ export class BossFx {
 
   private drawSiege(g: Gfx, a: Actor, st: BossState, time: number): void {
     // While he commands, a thread of gold runs from his baton to each soldier standing: what they take off him.
-    if (st.holding) {
+    if (st.routedT <= 0) {
       const c = this.pt(a.x, a.y);
       for (const x of st.soldiers) {
         if (!x.alive) continue;

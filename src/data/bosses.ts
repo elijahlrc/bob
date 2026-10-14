@@ -180,16 +180,21 @@ export function bossAhead(map: number): { boss: BossDef; maps: number } | null {
 export const BOSS_LOCK_SECONDS = 4;
 
 // The Siege Marshal (section 5a).
-/** The regiments that march in, the time before the next comes on its own, and the strength at which it comes sooner. */
-export const WAVES = 3;
+/**
+ * The regiments march in for as long as the fight goes on (the three below, round and round). The next comes on its own
+ * after this long, unless this many of his soldiers already stand.
+ */
 export const WAVE_PUSH_SECONDS = 22;
-export const WAVE_THIN = 2;
+export const SOLDIERS_MAX = 10;
 /** The horn sounds this long before a wave arrives. */
 export const HORN_TELL = 1.6;
 /** Each soldier standing takes this share off the damage the Marshal takes, up to the cap. */
 export const COMMAND_PER = 0.06;
 export const COMMAND_MAX = 0.6;
-/** When the last soldier falls the Marshal is routed: he takes more for a while. */
+/**
+ * When the last soldier of a regiment falls the Marshal is routed: he comes down and fights himself, and takes more, until
+ * this long has gone and the horn sounds for the next regiment.
+ */
 export const ROUTED_SECONDS = 6;
 export const ROUTED_TAKEN = 0.2;
 /** The regiments by wave: type and number. */
