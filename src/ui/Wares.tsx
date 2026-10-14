@@ -6,6 +6,7 @@ import { ensureMarket } from '../run/market';
 import type { Ware } from '../run/wayside';
 import { compareDelta, ItemCard } from './ItemCard';
 import { ProvisionCard, ReprieveCard } from './Satchel';
+import { Tip } from './Tip';
 
 /** What a ware is: its card (the item with what it would change, the provision, the reprieve, the currency bundle). */
 export function WareCard({ w, run }: { w: Ware; run: NonNullable<Controller['run']> }) {
@@ -51,6 +52,7 @@ export function Wares({ c }: { c: Controller }) {
           Bone Dust: <strong>{run.dust.toLocaleString()}</strong>
         </span>
       </div>
+      <Tip c={c} id="wares" />
       <div class="muted">
         The stock changes every level. Salvage items you do not need in the Items tab to earn Bone
         Dust.

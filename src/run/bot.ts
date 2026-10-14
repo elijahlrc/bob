@@ -520,13 +520,15 @@ export function botTidy(run: RunState, keep = 12): void {
 /** How the bot spends currency: by the sheet ('greedy'), at random, or not at all. */
 export type CraftPolicy = 'greedy' | 'random' | 'none';
 
-export function botReward(run: RunState, crafting = true): void {
+export function botReward(run: RunState, crafting = true, wayside = true): void {
   if (!run.reward) return;
   const offers = run.reward;
   let best: { uid: number; s: number } | null = null;
   for (const o of offers) {
     // A card for the Wayside: a Reprieve is worth more than a small gain, a provision about nothing (a first guess; Y7 measures it).
     if (o.kind === 'pouch') {
+      // (Without the Wayside the bot leaves these cards alone.)
+      if (!wayside) continue;
       const s = scoreOf(run, run.build) * (o.what === 'reprieve' ? 1.02 : 1.002);
       if (!best || s > best.s) best = { uid: o.uid, s };
       continue;
@@ -580,9 +582,9 @@ export function botShop(run: RunState): void {
 }
 
 /** All camp decisions between maps. */
-export function botCamp(run: RunState, policy: CraftPolicy = 'greedy'): void {
-  botReward(run, policy !== 'none');
-  botShop(run);
+export function botCamp(run: RunState, policy: CraftPolicy = 'greedy', wayside = true): void {
+  botReward(run, policy !== 'none', wayside);
+  if (wayside) botShop(run);
   botEquip(run);
   botRegem(run);
   if (policy === 'greedy') {
@@ -632,6 +634,8 @@ export type BotRunOpts = {
   themes?: ThemeRule;
   /** How the bot spends currency (default 'greedy'). */
   crafting?: CraftPolicy;
+  /** Whether the bot uses the Wayside (stops, the Market, provisions, Reprieves); false plays the game as it was before (a measuring baseline). Default true. */
+  wayside?: boolean;
   /** Leave a map when life drops below this fraction (default: never abandon). */
   abandonBelow?: number;
   /** The difficulty settings of the run (default: the new baseline). */
@@ -657,9 +661,11 @@ export function botRun(
   const route = new Rng(seed).fork('route');
   while (run.phase === 'camp' && run.map <= maxMap) {
     const crafting = opts.crafting ?? 'greedy';
-    botCamp(run, crafting);
+    botCamp(run, crafting, opts.wayside !== false);
     if (crafting === 'greedy') botChalk(run);
     let offer = chooseOffer(run, opts.themes, route);
+    // Without the Wayside a stop is never taken, and the anchor stands in for it.
+    if (opts.wayside === false && offer.kind === 'stop') offer = run.offers[0];
     // A stop the bot cannot use (the random rule can land on one) is passed over for the anchor.
     if (offer.kind === 'stop') {
       const slot = run.offers.indexOf(offer);

@@ -195,3 +195,37 @@ at half the rate (the first step still comes after the 30 s grace, then every 30
 **Q. Who arms specialists?**
 Nobody yet: the default bot arms only staples, so the four plan-level provisions are exercised by tests and by players. They are
 rarer in the Market (weights 8 to 10 against 30 for a staple).
+
+## Y7 — measuring, tips, names, docs
+
+**Q. Revive was chosen before the measurement. What did the measurement say?**
+It argues against the plan's own reason for a Revive: 0 of 29 first lethal blows came from a healthy character (median life 5% a second
+before, 19% five seconds before), so these are grind deaths, and a Revive that keeps the character in the fight mostly delays them
+(14% die again within 10 s, a median 0 maps gained). I did not change anything (the author settled the question before the number
+existed, and the numbers are cheap to change); section 16.1 of WAYSIDE.md records it as a finding, with the levers for a tuning pass:
+a cheaper Revive, a flask refill on fire, a Retreat that works on mini-boss maps (not map 100).
+
+**Q. Did the Wayside help the bot?**
+By about a map and a third on average in both difficulty settings, with a median difference of 0: noise-sized at 48 and 36 runs. A bot
+that takes every stop does no better than the default one. See 16.2 for the table and the caveat that the baseline arm still has a
+stop in a slot (so two maps to choose from on a stop level).
+
+**Q. First-use explainers.**
+Four short ones, saved in `wayside.seen` and dismissed with "Got it" (a stop is on offer, the Wares tab, the Satchel, a held
+Reprieve). Dismissing one is not an undoable change.
+
+**Q. Names.**
+All new names were compared with every unique, flask, gem, currency, affix, base, theme and boss name in the game. No clash. "Haste"
+was a deny-list hit (the Shrine's blessing is "Swiftness"). The substring matches left ("Swift" the map affix, "Shrinekeeper Mask")
+are different things.
+
+**Q. The reprieve badge on a phone.**
+It first sat where the Abandon button is on a phone; it is now a chip in the status line at the top of the map, so it overlaps nothing.
+
+**Q. Patch notes.**
+Not written: `/patch-notes` writes them from the commits and pushes, which is the user's to start. The commit subjects of Y1 to Y6
+are in player-facing words for it to read.
+
+**Q. Tools left in the repo.**
+`scripts/lethal.ts` (the lethal-hit count), the `--no-wayside` and `--strategy stopper` flags of `npm run sim`, and the
+`wayside` option of `botRun`.

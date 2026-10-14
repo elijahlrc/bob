@@ -9,6 +9,7 @@ import { mapTypeDef, type MapTypeId } from '../data/mapTypes';
 import type { Controller } from '../run/controller';
 import { pouchCount, spare } from '../run/provisions';
 import { waysideOf } from '../run/wayside';
+import { Tip } from './Tip';
 
 const FAMILY_TEXT = { retreat: 'Retreat', revive: 'Revive' } as const;
 
@@ -64,6 +65,8 @@ export function Satchel({ c }: { c: Controller }) {
           {POUCH_LIMIT}
         </span>
       </div>
+      {held.length > 0 && <Tip c={c} id="satchel" />}
+      {w.reprieve && <Tip c={c} id="reprieve" />}
       <div class="muted">
         Armed provisions are used up when the next map starts, cleared or not, and count in the
         cards below.

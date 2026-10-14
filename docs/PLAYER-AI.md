@@ -318,7 +318,24 @@ Most of how a fight goes depends on monsters. Here is what is useful to know:
 
 ---
 
-## 10. Quick strategy summary
+## 10. Provisions and the reprieve
+
+These are decided in camp, not by the character, but the character is what they act on.
+
+- **Provisions** armed before a map change the character for that one map and are used up when it starts, whether the map
+  is cleared, left or lost. Armed provisions count in the numbers on the map cards (DPS, effective HP, rewards).
+- **A reprieve** held fires by itself, the moment damage would kill the character, once. You cannot hold it back and the
+  character does not wait for a better moment.
+  - A **Retreat** (the Ferry Token) ends the map as if you had left it: you keep what you picked up, the level counts as
+    played, and you arrive in camp with a quarter of your life. It does nothing on a boss level (every tenth map).
+  - A **Revive** (Last Spark, Bargain Coin) stands the character up where it fell, at a share of its life, and nothing can
+    hurt it for a few seconds. It does not heal anything else: flasks, mana and the monsters are as they were. If the
+    character was losing the fight, it is still losing it, only later; Last Spark also throws the monsters nearby back
+    and stuns them, which is what buys the time.
+
+---
+
+## 11. Quick strategy summary
 
 - **Range is safety.** Range gives the character room to dodge and keeps it out of melee. The Kite spacing helps
   a ranged character more.

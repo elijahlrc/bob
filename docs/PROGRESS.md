@@ -995,3 +995,16 @@ area and four styles (`src/data/density.ts`), cave, field, loops and warren layo
 new floor and wall kinds and eleven props, the biome banner, and a Biome and Density override in the Debug panel. Standard maps
 carry about the same monsters as before (map 100: 108 against 95; caves 20% fewer because their rooms are smaller). Found on the way
 and left: docs/BUGS.md 2 (a Spitter rare can hold the bow strider dodging its pools for a minute). Not built: carved pits and water.
+
+## Wayside (2026-10-13)
+
+docs/WAYSIDE.md, Y1 to Y7 built in one pass (the questions met on the way are in docs/WAYSIDE-QUESTIONS.md): a third kind of offer, a
+**stop** (Awlsmith, Gem Hoard, Shrine, Quartermaster, Ferryman; one a window of eight levels from level 9; the level is spent),
+the **Wares** tab (the Market: six wares a level for Bone Dust, stock stored in `run.wayside`), **provisions** (ten, armed in the
+Satchel, used up when a map starts, carried out as hidden map affixes) and **Reprieves** (Ferry Token, Last Spark, Bargain Coin: one
+held, three a run, fired in `applyDamage`); `SAVE_VERSION` 19. Measuring tools: `npm run sim -- --no-wayside`, `--strategy stopper`,
+`scripts/lethal.ts`. Measured (WAYSIDE.md 16): the deaths are grinds, not spikes (0 of 29 first deaths from a healthy character), 45%
+of them on tenth maps where a Retreat does nothing, and a Revive gains a median 0 maps; the bot with the Wayside reaches +1.3 maps on
+average over the one without (noise-sized; median difference 0), and a bot that takes every stop does no better than the default.
+Not measured: Dust income per level, provisions by bot run, the Retreat in whole runs. Not built: the arm-best button, the "without"
+verdict line, a Reprieve policy seam. Every number is a first guess.

@@ -33,6 +33,7 @@ import { StopScreen } from './Stop';
 import { reprieveDef } from '../data/reprieves';
 import { Wares } from './Wares';
 import { Satchel } from './Satchel';
+import { Tip } from './Tip';
 import { stopDef } from '../data/stops';
 import { TreeView } from './TreeView';
 
@@ -279,6 +280,7 @@ export function Camp({ c }: { c: Controller }) {
       </div>
       <div class="muted">Next: map {run.map} of 100</div>
       <Arriving run={run} />
+      {run.offers.some((o) => o.kind === 'stop') && <Tip c={c} id="stop" />}
       <Satchel c={c} />
       <BossAhead map={run.map} />
       {last && (last.status === 'cleared' || last.status === 'abandoned') && (

@@ -66,7 +66,7 @@ recovery (no restore table, no mercy floor), abandon takes 5 s and advances the 
 6. **Determinism.** Offers are rolled from the run seed and stored in the save, so reloading cannot re-roll them.
    The headless modules stay headless (DESIGN §14.2).
 
-**Non-goals for this plan.** A town or shop; map items as a consumable economy; a map device with sockets; endgame
+**Non-goals for this plan.** A town or shop, and map items as a consumable economy (both are built in docs/WAYSIDE.md, as stops, a Market, provisions and Reprieves); a map device with sockets; endgame
 atlas; the more intricate reference-game map types (we copy none of their complexity yet); mid-map decisions by the
 player other than abandon; skipping or repeating levels.
 

@@ -13,6 +13,7 @@ import { CLASSES } from '../data/classes';
 import { botCamp } from './bot';
 import { stopName, takeStop, type StopChoice } from './stops';
 import { buyWare, ensureMarket } from './market';
+import { waysideOf } from './wayside';
 import { armProvision, disarmProvision, startProvisions } from './provisions';
 import { spendReprieve } from './reprieves';
 import type { ProvisionId } from '../data/provisions';
@@ -300,6 +301,13 @@ export class Controller {
     if (res.ok) this.undoStack = [];
     this.changed();
     return res;
+  }
+
+  /** The player has read a first-use explainer (docs/WAYSIDE.md 9.1): it is not shown again in this run. Not an undoable change. */
+  see(id: string): void {
+    if (!this.run) return;
+    waysideOf(this.run).seen[id] = true;
+    this.changed();
   }
 
   /** Arm or disarm a provision for the next map (docs/WAYSIDE.md 6.1). */

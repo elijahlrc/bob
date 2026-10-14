@@ -1,7 +1,7 @@
 /**
  * Headless bot runs (DESIGN.md §15.5).
  *
- *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|stopper|abandoner] [--craft greedy|random|none] [--report] [--scaling 1.5] [--base 1] [--variance 0.1] [--legacy] [--biome <id>] [--density <id>] [--log <batch>]
+ *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|stopper|abandoner] [--craft greedy|random|none] [--no-wayside] [--report] [--scaling 1.5] [--base 1] [--variance 0.1] [--legacy] [--biome <id>] [--density <id>] [--log <batch>]
  *
  * `--log <batch>` also sends each run that ends to the `sim_runs` table (scripts/simlog.ts, docs/TELEMETRY.md).
  */
@@ -34,6 +34,8 @@ type Args = {
   difficulty: Difficulty;
   /** Index of the first run (so runs can be split over processes), a file to write the raw results to, files to merge. */
   from: number;
+  /** Play without the Wayside (no stops, Market, provisions or Reprieves): a baseline for measuring it. */
+  noWayside: boolean;
   /** A batch label: send the runs to the sim_runs table under it. */
   log?: string;
   dump?: string;
@@ -54,6 +56,7 @@ function parseArgs(argv: string[]): Args {
     report: false,
     difficulty: { ...DEFAULT },
     from: 0,
+    noWayside: false,
     merge: [],
   };
   for (let i = 0; i < argv.length; i++) {
@@ -78,6 +81,7 @@ function parseArgs(argv: string[]): Args {
     else if (k === '--variance') a.difficulty.variance = Number(v);
     else if (k === '--biome') forceBiome(v as BiomeId);
     else if (k === '--density') forceDensity(v as DensityId);
+    else if (k === '--no-wayside') a.noWayside = true;
     else if (k === '--legacy') a.difficulty = { scaling: 1, base: 1, variance: 0 };
     else if (k === '--from') a.from = Number(v);
     else if (k === '--dump') a.dump = v;
@@ -115,6 +119,7 @@ for (const cls of args.merge.length ? [] : args.classes) {
     const res = botRun(cls, args.seed * 1000 + r, args.maxMap, {
       themes: args.themes,
       crafting: args.crafting,
+      wayside: !args.noWayside,
       abandonBelow: args.abandonBelow,
       difficulty: args.difficulty,
       onEnd: simLog ? (run, res) => simLog.add(run, res) : undefined,

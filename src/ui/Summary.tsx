@@ -105,7 +105,9 @@ export function Summary({ c }: { c: Controller }) {
       <p class="muted">
         Maps cleared: {run.history.filter((h) => h.status === 'cleared').length}
         {run.history.some((h) => h.status === 'abandoned') &&
-          ` · abandoned: ${run.history.filter((h) => h.status === 'abandoned').length}`}{' '}
+          ` · abandoned: ${run.history.filter((h) => h.status === 'abandoned').length}`}
+        {run.history.some((h) => h.status === 'stop') &&
+          ` · stops: ${run.history.filter((h) => h.status === 'stop').length}`}{' '}
         · Kills: {kills}
       </p>
       {!sameDifficulty(run.difficulty, DEFAULT) && (

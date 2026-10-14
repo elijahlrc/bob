@@ -878,10 +878,7 @@ select option {
   pointer-events: auto;
 }
 .hud-reprieve {
-  position: absolute;
-  top: 40px;
-  right: 12px;
-  padding: 2px 8px;
+  padding: 0 8px;
   border: 1px solid #e6b84a;
   border-radius: 10px;
   background: rgba(20, 17, 26, 0.8);

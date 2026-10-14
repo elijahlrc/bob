@@ -1,6 +1,6 @@
 # Bob — Wayside Plan: stops, a Market, provisions and reprieves
 
-Status: **draft for review, 2026-10-13; nothing is built; the open questions were settled by the author on 2026-10-13 (section 14) and are cheap to change; questions met while building are in [WAYSIDE-QUESTIONS.md](WAYSIDE-QUESTIONS.md)** · Owner: the user · Author: Claude
+Status: **built 2026-10-13 (Y1 to Y7); every number is a first guess, measured only in part (section 16); questions met while building are in [WAYSIDE-QUESTIONS.md](WAYSIDE-QUESTIONS.md)** · Owner: the user · Author: Claude
 
 This plan extends [MAPS.md](MAPS.md) (offers, Respite, Abandon, carry-over) and [DESIGN.md](DESIGN.md). It reopens two non-goals
 of MAPS.md section 1 ("a town or shop", "map items as a consumable economy"); section 13 lists the edits that go into DESIGN.md
@@ -408,6 +408,8 @@ cannot disturb the loot of a map.
 
 ## 11. Milestones
 
+**Built 2026-10-13, one commit each:** Y1 stops, Y2 the Market, Y3 provisions, Y4 Reprieves, Y5 the Shrine, the Quartermaster and the Ferryman, Y6 the provisions that change the map, Y7 the measuring, tips, names and docs (Y0 was done inside Y7). Section 16 says what was measured and what was not.
+
 **Order change (2026-10-13):** Y0 (measure) moved to the end of the build. The user said a wrong first guess is cheap to fix, so Y1 to Y6 use the numbers in this plan and the measurements are taken in Y7, when there is something to tune.
 
 | #      | Milestone                   | Contents                                                                                                                                                                                                                               | Done when                                                                                    |
@@ -522,3 +524,71 @@ What the review got wrong or I qualified: the plan keeps trade-off provisions (i
 a roguelike's relics, and Y3 builds only the mod-only bets first) and keeps the revive family on a measured basis rather than
 dropping it. Not verified: whether degeneration and the Collapse front all pass through the one damage routine (Y4 checks), and
 how quickly a skipped level is made up _(derived from the formulas, not measured)_.
+
+---
+
+## 16. As built, and what was measured
+
+Everything in sections 4 to 9 is built as written, with the changes listed in 14.2 and 14.3 and the ones below. Every number is a first
+guess (the user: "this is very easy to change later"). This section says what was measured, what it showed, and what was not measured.
+
+### 16.1 What the lethal-hit count showed (`scripts/lethal.ts`, 2026-10-13)
+
+30 bot runs (6 classes × 5 seeds, up to map 40) with the character held at 1 life on a lethal blow, 29 of which had one. This was the
+test section 7.6 set before choosing a Reprieve family.
+
+- **It did not look like the case for a Revive.** None of the 29 first lethal blows was a spike: the character had a median 5% of its
+  life a second before and 19% five seconds before. Deaths are grinds, a character worn down over a long fight, not one blow from
+  a healthy one. Section 7.6 said that outcome "means a Revive only delays the death and a Retreat is the right family". The
+  Revive family shipped anyway (the author's call in 14.3.2, made before this number existed), and it should be read as that.
+- **A Retreat covers only about half of the deaths that end runs.** 13 of the 29 (45%) came on a tenth map (a mini-boss or boss),
+  where a Retreat does nothing; it saves the rest, which are ordinary maps.
+- **A Revive buys little.** With Last Spark's numbers (35% life, 3 s safe), 14% of the revived characters died again within 10 s
+  on the same map, and the median number of maps gained before the next lethal blow was 0: the next one usually comes on the same map,
+  later. The pulse buys the fight a moment; it does not change who wins it.
+- What a tuning pass could do (not done): a cheaper Revive, a Revive that also refills the flasks, or letting a Retreat work on a
+  mini-boss map (not on map 100). The data says the first deaths at boss levels are the ones that matter.
+
+### 16.2 What the bot comparison showed (`npm run sim`, paired seeds)
+
+Three arms on the same 6 classes and seeds: `--no-wayside` (no stops, no Market, no provisions, no Reprieves; a stop is replaced by the
+anchor), the default bot, and `--strategy stopper` (takes every stop it can use). Maps reached, mean over the runs:
+
+| Difficulty and length                 | Runs per arm | No Wayside | Default bot | Stopper |
+| ------------------------------------- | ------------ | ---------- | ----------- | ------- |
+| The game's own (scaling 1.75), to 100 | 48           | 14.23      | 15.48       | 15.65   |
+| Easier (`--legacy`), to map 40        | 36           | 34.83      | 36.19       | 35.42   |
+
+Paired by seed, the default bot is ahead of the no-Wayside bot by 1.25 maps (7 runs better, 3 worse, of 48) and by 1.36 (9 better, 2
+worse, of 36); the median difference is 0 in every comparison, so this is noise-sized at these counts and should be read as "the Wayside
+does not break the bot in either direction", not as a gain. The stopper took 0.94 and 3.44 stops a run and did not beat the default
+bot (acceptance 12.1, the "no more than 10 points above" bound, holds trivially). Two caveats: the no-Wayside arm still has a stop in
+a slot where it plays the anchor, so on a stop level it has two maps to choose from, not three (a small bias in the Wayside's
+favour); and the bots die around map 10 at the game's own difficulty, so most runs never reach a stop (the first is at level 9).
+
+Speed: the bot's runs are about as fast with the Wayside as without (most classes within 10%); the two speed tests in `npm run check`
+(`x9`, and the bot's 150× floor) fail when the machine is busy with something else and pass when it is not.
+
+### 16.3 The acceptance criteria of section 12, scored
+
+| #   | Criterion                                                                                                 | Result                                                                                                                                                     |
+| --- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Stops: a stopper stays within 10 points of the anchor                                                     | Met (16.2).                                                                                                                                                |
+| 2   | The Market: Dust held under three levels of income, no ware in more than 60% of visits                    | **Not measured.** Dust income per level and the share of visits were not instrumented.                                                                     |
+| 3   | Provisions: staples lift maps reached by a bounded amount, bets are neither always right nor always wrong | **Not measured.** The bot arms only staples; bets and specialists were tested by unit tests (their numbers move the sheet as written) and not by bot runs. |
+| 4   | Reprieves: the paired effect of each item                                                                 | **Partly:** the Revive's effect from `lethal.ts` (16.1); the Retreat's and the items' effect in whole bot runs was not run.                                |
+| 5   | No new input, headless                                                                                    | Met: the simulation modules read no clock and no `Math.random`; `npm run check` enforces it.                                                               |
+| 6   | Determinism: stock, schedule and stop rolls from the seed                                                 | Met: tested (`market.test.ts`, `stops.test.ts`).                                                                                                           |
+| 7   | Boss rules                                                                                                | Met: tested (`reprieve.test.ts`: a Retreat on maps 10, 20 and 100, a Revive on map 10).                                                                    |
+| 8   | Phones: Wares, every stop screen and the Satchel fit 375 px                                               | Met, checked in the browser with no horizontal overflow; the real-device pass is still open (MOBILE.md).                                                   |
+
+### 16.4 Built differently from the plan, or not built
+
+- Not built: the "Arm the best for this map" button, the second "without" verdict line on an offer card, a Reprieve policy seam
+  (section 7 and WAYSIDE-QUESTIONS.md), the line on a stop card of what the skipped level would have paid, and a way for the bot to arm bets and specialists.
+- Built differently: reward picks can hold a Reprieve or a provision as a `PouchCard` (the plan said so but not how); Counterweight
+  cancels the worst affix and does not ask (14.3); Hunter's Bell is three extra rare packs; the Bargain Coin's curse starts when it
+  fires; the Ferryman's curse starts at once.
+- Names were checked against every unique, flask, gem, currency, affix, base, theme and boss name in the game: no clashes (the word
+  "haste" was a deny-list hit and the Shrine's blessing is now "Swiftness"; "Swift" and "Shrinekeeper Mask" are loose substring
+  matches only).

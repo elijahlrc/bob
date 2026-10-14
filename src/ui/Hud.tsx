@@ -470,9 +470,9 @@ export function Hud({ c }: { c: Controller }) {
           </span>
         )}
         <span>{w.exitOpen ? 'Exit open' : ''}</span>
+        {!sc && !c.gallery && <ReprieveBadge w={w} />}
       </div>
       {!sc && !c.gallery && <AbandonButton c={c} w={w} />}
-      {!sc && !c.gallery && <ReprieveBadge w={w} />}
       <BossBar w={w} />
       {sel && sel.alive && !sel.isPlayer && <Inspect a={sel} c={c} />}
       {c.gallery && (
