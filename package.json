@@ -21,7 +21,6 @@
     "lethality": "tsx scripts/theme-lethality.ts",
     "sheet": "tsx scripts/sheet.ts",
     "deaths": "tsx scripts/deaths.ts",
-    "deaths-by-map": "tsx scripts/deaths-by-map.ts",
     "matrix": "tsx scripts/matrix.ts",
     "economy": "tsx scripts/currency-economy.ts",
     "coverage": "tsx scripts/coverage/coverage.ts",
