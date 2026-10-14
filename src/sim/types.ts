@@ -170,6 +170,8 @@ export type Actor = {
   fervourT: number;
   /** Which beat of its rhythm it is on, the damage that beat carries, and whether it has enraged (docs/ROSTER.md 6.5). */
   beat: number;
+  /** Seconds a monster rests before its next area blow (counted down while it can act; see AREA_PACE). */
+  restT: number;
   patMult: number;
   enraged: boolean;
   /** The phases (by index in the type's list) that have happened. */
@@ -600,6 +602,9 @@ export type PlayerAI = {
   kiteX: number;
   kiteY: number;
   kiteCd: number;
+  /** Dodging spent (seconds, drained while the character does not dodge), and the seconds left of the rest it then takes from dodging. */
+  dodgeT: number;
+  dodgeRest: number;
 };
 
 /**

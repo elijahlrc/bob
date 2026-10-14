@@ -3,6 +3,7 @@ import { MONSTER_TYPES } from '../data/monsters';
 import { BLOCK_WINDOW, ECHO_GAP, HIT_AT, SHOT_ALERT } from '../data/constants';
 import type { SkillProfile } from '../calc/skill';
 import { fallOf } from '../calc/skillLook';
+import { areaPace } from '../calc/monster';
 import { rollGains } from './buffs';
 import { CHARGE_KINDS } from '../calc/charges';
 import { rollCharges, spendCharges } from './charges';
@@ -68,6 +69,9 @@ export function startAction(
       a.beat++;
       duration *= a.patMult;
     }
+    // An area blow is followed by a rest (AREA_PACE): the wind-up and its warning are as they were, the next blow comes later.
+    if (p.skill.id === `monster_${a.mon.spec.type}`)
+      a.restT = duration * (areaPace(a.mon.spec) - 1);
   }
   a.action = {
     profile: p,

@@ -23,6 +23,7 @@ import { TYPE_SIDEARMS, type SidearmSpec } from '../data/encounters';
 import { LEGACY, statLevel, type Difficulty } from '../data/difficulty';
 import { defenceMods, typeProfile } from '../data/defence';
 import { bossOfType } from '../data/bosses';
+import { AREA_PACE, isAreaShape } from '../data/shapes';
 import { meanDurability } from './matrix';
 import { CondIndex, ModDB } from '../mods/modDb';
 import { maskAnd, mod, type Mod } from '../mods/types';
@@ -254,6 +255,15 @@ function monsterBaseSkill(
   return base;
 }
 
+/**
+ * How many times fewer, and harder, the area blows of this monster are (AREA_PACE; a boss keeps its own rhythm): 1 for a type
+ * whose attack is not a slam, a lob or a nova.
+ */
+export function areaPace(spec: MonsterSpec): number {
+  const t = MONSTER_TYPES[spec.type];
+  return isAreaShape(t.shape) && !t.bossOnly && spec.rarity !== 'boss' ? AREA_PACE : 1;
+}
+
 const cache = new Map<string, MonsterStats>();
 
 /** How many monster builds are held (a test and the bot report read it: see docs/ENEMIES.md 14). */
@@ -330,7 +340,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
         : 1;
   const defence = defenceFromDb(db, ctx, { isPlayer: false, resistPenalty: 0, stunThreshMult });
   const baseHit = monsterHit(sl) * easeDamage(m) * openingDamage(m) * t.dmgMult * r.dmg * share;
-  const dmg = baseHit * (t.shape?.mult ?? 1);
+  const dmg = baseHit * (t.shape?.mult ?? 1) * areaPace(spec);
   // The Ossuary Regent's crushing swing takes 1.6 s (§12.7).
   const time = oldBoss ? BOSS_ATTACK_TIME : t.attackTime;
   const profile = skillProfiles(monsterSkill(spec, dmg), db, dmg, time, t.range);

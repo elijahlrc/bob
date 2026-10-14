@@ -8,6 +8,15 @@ import type { ThreatTag } from './monsterInfo';
  */
 export type ShapeId = 'strike' | 'swing' | 'slam' | 'lob' | 'salvo' | 'lance' | 'nova' | 'orb';
 
+/**
+ * A monster's area attack (a slam, a lob or a nova) is cast this much less often and hits this much harder, so a type that
+ * spams one leaves fewer overlapping warnings and pools on the ground for the same damage over time. The wind-up and its
+ * warning are as long as before; the monster rests between the blows (the rest is the blow's own length times one less).
+ */
+export const AREA_PACE = 2;
+export const isAreaShape = (s: ShapeSpec | undefined): boolean =>
+  s?.id === 'slam' || s?.id === 'lob' || s?.id === 'nova';
+
 export type ZoneKindId = 'caustic' | 'burning' | 'chilling' | 'shocking';
 
 export type ShapeSpec = {

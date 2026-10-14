@@ -103,6 +103,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     prevY: y,
     tryTick: -1,
     beat: 0,
+    restT: 0,
     patMult: 1,
     enraged: false,
     phaseMask: 0,

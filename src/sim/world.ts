@@ -281,6 +281,8 @@ export function createWorld(inp: CreateWorldInput): World {
       kiteX: 0,
       kiteY: 0,
       kiteCd: 0,
+      dodgeT: 0,
+      dodgeRest: 0,
     },
     opts: inp.opts ?? {},
     stats: {

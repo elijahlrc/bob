@@ -85,10 +85,10 @@ describe('the Emberborn in play', () => {
   it('a Slag Brute leaves burning ground behind it as it walks', () => {
     const w = arena();
     put(w, 'slagbrute', 14);
-    run(w, 4);
+    run(w, 5);
     const pools = w.effects.filter((e) => isZone(e) && e.kind === 'burning');
     expect(pools.length).toBeGreaterThanOrEqual(2);
-    expect(pools[0].radius).toBeCloseTo(0.9, 5);
+    expect(pools[0].radius).toBeCloseTo(1.3, 5);
   });
 
   it('a Cinderling burns out where it falls', () => {

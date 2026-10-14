@@ -134,7 +134,7 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
     // A quenched Slag Brute leaves nothing behind it (docs/ENCOUNTERS.md 6).
     if (m.abT[i] > 0 || !m.moving || quenched(m)) return;
     m.abT[i] = ab.interval!;
-    openZone(w, m.x, m.y, ab.range!, ab.amount!, 'burning', monsterHitOf(m) * 0.15);
+    openZone(w, m.x, m.y, ab.range!, ab.amount!, 'burning', monsterHitOf(m) * 0.3);
   },
   devour({ w, m, dt, ab }) {
     // Eats a body within reach, and is the better for it. It looks twice a second, and eats once in its interval; the first

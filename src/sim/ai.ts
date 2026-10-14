@@ -47,6 +47,9 @@ import type { RotationEntry } from '../calc/strategy';
 import {
   CLOSE_RANGE,
   FIGHT_GAP,
+  DODGE_DRAIN,
+  DODGE_MAX,
+  DODGE_REST,
   KITE_COOLDOWN,
   KITE_RANGE,
   KITE_TIME,
@@ -349,7 +352,15 @@ function bodyOnWay(w: World, x0: number, y0: number, x1: number, y1: number, r: 
  */
 function avoidHazard(w: World, dt: number): boolean {
   const p = w.player;
-  if (!hazardAt(w, p.x, p.y, p.r)) return false;
+  const ai = w.ai;
+  if (ai.dodgeRest > 0) {
+    ai.dodgeRest -= dt;
+    return false;
+  }
+  if (!hazardAt(w, p.x, p.y, p.r)) {
+    ai.dodgeT = Math.max(0, ai.dodgeT - DODGE_DRAIN * dt);
+    return false;
+  }
   const target = w.ai.targetId ? actorById(w, w.ai.targetId) : undefined;
   const prof = w.primary.usable
     ? w.char.profile(w.primary, 0)
@@ -374,6 +385,13 @@ function avoidHazard(w: World, dt: number): boolean {
     }
   }
   if (!best) return false;
+  // A dodge that has gone on too long is given up: the character stands and fights for a while.
+  ai.dodgeT += dt;
+  if (ai.dodgeT >= DODGE_MAX) {
+    ai.dodgeT = 0;
+    ai.dodgeRest = DODGE_REST;
+    return false;
+  }
   moveTo(w, p, best.x, best.y, dt);
   return true;
 }
@@ -842,6 +860,11 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
   if (withdrawing(m)) {
     const s = steer(w, m, tg, dtg, dt);
     if (s) chaseStep(w, m, s.x, s.y, dt, s.pace);
+    return;
+  }
+  // After an area blow it rests (AREA_PACE in data/shapes.ts), so it casts fewer, harder ones rather than a stream of them.
+  if (m.restT > 0) {
+    m.restT -= dt;
     return;
   }
   // Whether it fights at arm's length is the type's, not its shape's: a Sentinel's nova is still a melee blow.

@@ -87,6 +87,14 @@ export const KITE_RANGE = 3;
 /** How long a kiting step lasts and how long before the next, in seconds. */
 export const KITE_TIME = 0.6;
 export const KITE_COOLDOWN = 1.5;
+/**
+ * The most a character dodges before it holds its ground, in seconds, and how long it then stands in the warnings and fights
+ * on (so a room full of blasts cannot keep it from ever attacking). Dodging time is a budget: it drains by this share of a
+ * second for each second spent not dodging, so many short dodges count as one long one.
+ */
+export const DODGE_MAX = 10;
+export const DODGE_REST = 5;
+export const DODGE_DRAIN = 0.5;
 /** A fight is over when the character has had no target for this long (an opener is used once per fight). */
 export const FIGHT_GAP = 2;
 /** The default life threshold of an emergency skill. */

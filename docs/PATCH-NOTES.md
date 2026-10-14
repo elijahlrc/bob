@@ -4,6 +4,11 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-14
+
+- Enemies that slam, lob or burst the ground now do it half as often and twice as hard, with the same warning, so a pack leaves fewer overlapping warnings and pools. Slag Brutes leave fewer, larger pools of fire behind them.
+- Your character now dodges for at most 10 seconds at a time, then stands its ground and fights for 5 seconds, so a crowded fight can no longer keep it dodging for ever.
+
 ## 2026-10-13
 
 - The first four maps are much easier: enemies have half the life and deal half the damage on map 1, climbing back to the usual strength by map 5. Your character is unchanged.

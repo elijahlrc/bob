@@ -73,6 +73,9 @@ hold its life up for a while, and there is nothing to move on to.
 - **A blow that follows it cannot be stepped out of** (the Magistrate's Sentence): the character does not try,
   and keeps attacking. Only defences answer it.
 - **If no step works, it stays where it is and takes the hit.**
+- **It never dodges for long.** After 10 seconds of dodging it stops for 5 seconds, stands in whatever is on the ground and
+  fights. The 10 seconds is a budget: every second it does not dodge gives back half a second, so many short dodges
+  count as one long one.
 
 _Strategy:_
 
