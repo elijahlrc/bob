@@ -114,6 +114,7 @@ export class SkillFx {
   destroy(): void {
     this.air.destroy();
     this.list = [];
+    this.flights.clear();
   }
 
   // ---- Primitives -----------------------------------------------------------------------------
@@ -301,8 +302,11 @@ export class SkillFx {
         break;
       }
       case 'deploy':
-        if (e.end) this.wave(e.x, e.y, 0.15, 0.6, 0xffe0a0, 0.25, 1);
-        else this.setDown(e, w);
+        if (e.end) {
+          // It ended while still in the air (a trap sprang the moment it was thrown): it is gone, not landing.
+          this.flights.delete(e.id);
+          this.wave(e.x, e.y, 0.15, 0.6, 0xffe0a0, 0.25, 1);
+        } else this.setDown(e, w);
         break;
       case 'sprung':
         this.sprung(e, w);

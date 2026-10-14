@@ -234,7 +234,7 @@ export const DELIVERY_LOOK: Record<Delivery, string> = {
     'A rune circle, then a ring and a flash grow where the skill lands; physical blasts crack the floor.',
   field:
     'A ring of ticks marks where it will land, then a patch stays on the ground, its marks showing the element.',
-  wall: 'A band flashes where the wall will stand, then a block of ice rises on every tile it holds shut and melts away when its time is up.',
+  wall: 'A band marked on the ground along the line, with marks flowing down it; a wall of ice raises a block of ice on every tile it holds shut and melts away when its time is up.',
   buff: 'A gold ring and rising motes; a gold mote circles you while the buff lasts.',
   warcry: 'A wide orange ring and a shake of the screen.',
   guard: 'A steel hexagonal shield rises around you.',

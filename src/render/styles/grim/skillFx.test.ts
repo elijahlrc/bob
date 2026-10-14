@@ -168,6 +168,11 @@ describe('skill effects', () => {
     expect(flights().size).toBe(1);
     for (let i = 0; i < 4; i++) fx.frame(w, 0.1, 1.1 + i * 0.1, gfx() as never);
     expect(flights().size).toBe(0);
+    // One that ends while still in the air (it sprang at once) is gone, not landing.
+    fx.onEvent({ t: 'deploy', id: 8, kind: 'mine', x: 9, y: 5, end: false }, w);
+    expect(flights().size).toBe(1);
+    fx.onEvent({ t: 'deploy', id: 8, kind: 'mine', x: 9, y: 5, end: true }, w);
+    expect(flights().size).toBe(0);
     // A shot fired by a deployable is not the character casting.
     const n = pending(fx);
     fx.onEvent({ t: 'use', src: 1, skill: 'jawsTrap', via: 'deployed' }, w);
