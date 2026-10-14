@@ -110,14 +110,9 @@ export const CRESCENDO_LIMIT = 330;
 
 /** The Crescendo step at a time in the map: 0 during the grace, then one more every 15 s, up to 16. */
 export function crescendoStep(t: number): number {
-  return crescendoStepAt(t, 1);
-}
-
-/** The same, at a slower `pace` (a Slow Fuse: 0.5 stretches every step to twice as long, after the same grace). */
-export function crescendoStepAt(t: number, pace: number): number {
   return Math.min(
     CRESCENDO_MAX_STEPS,
-    Math.max(0, Math.floor(((t - CRESCENDO_GRACE) * pace) / CRESCENDO_STEP_SECONDS)),
+    Math.max(0, Math.floor((t - CRESCENDO_GRACE) / CRESCENDO_STEP_SECONDS)),
   );
 }
 

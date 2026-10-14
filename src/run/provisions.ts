@@ -1,41 +1,56 @@
+import { Rng } from '../core/rng';
 import {
+  FORAGE_CHANCE,
+  FORAGE_FROM,
+  isReprieveId,
   POUCH_LIMIT,
+  PROVISIONS,
   PROVISIONS_PER_MAP,
   provisionAffixId,
   provisionDef,
   type ProvisionId,
 } from '../data/provisions';
+import type { ReprieveId } from '../data/reprieves';
 import type { CraftResult } from './craft';
 import type { MapOffer } from './offers';
 import type { RunState } from './run';
 import { standingAffixes } from './reprieves';
-import { affixThreat } from './threat';
 import { waysideOf } from './wayside';
 
-/** How many provisions the Pouch holds in all (every kind counted). */
+/** How many provisions the pouch holds in all (a reprieve counts). */
 export function pouchCount(run: RunState): number {
   return Object.values(waysideOf(run).pouch).reduce((n, c) => n + c, 0);
 }
 
-/** Put a provision in the Pouch (bought, or found). False when the Pouch is full. */
+/** Whether the pouch has room for `n` more. */
+export function pouchRoom(run: RunState, n = 1): boolean {
+  return pouchCount(run) + n <= POUCH_LIMIT;
+}
+
+/** Put a provision in the pouch (found, picked, bought or given). False when the pouch is full. */
 export function addProvision(run: RunState, id: ProvisionId): boolean {
   provisionDef(id);
-  if (pouchCount(run) >= POUCH_LIMIT) return false;
+  if (!pouchRoom(run)) return false;
   const pouch = waysideOf(run).pouch;
   pouch[id] = (pouch[id] ?? 0) + 1;
   return true;
 }
 
-/** How many of a provision are in the Pouch and not yet armed. */
+/** How many of a provision are in the pouch and not yet armed. */
 export function spare(run: RunState, id: string): number {
   const w = waysideOf(run);
   return (w.pouch[id] ?? 0) - w.armed.filter((x) => x === id).length;
 }
 
-/** Arm a provision for the next map: up to two, each one taken from the Pouch when the map starts. */
+/**
+ * Arm a provision for the next map: any or all of the three in the pouch, each one taken from it when the map starts. A reprieve is
+ * never armed; it is always ready.
+ */
 export function armProvision(run: RunState, id: ProvisionId): CraftResult {
   const w = waysideOf(run);
   if (run.phase !== 'camp') return { ok: false, reason: 'not in camp' };
+  if (isReprieveId(id))
+    return { ok: false, reason: 'A reprieve is always ready: there is nothing to arm' };
   if (spare(run, id) <= 0) return { ok: false, reason: 'You have none to arm' };
   if (w.armed.length >= PROVISIONS_PER_MAP)
     return { ok: false, reason: `Only ${PROVISIONS_PER_MAP} can be armed for one map` };
@@ -43,7 +58,7 @@ export function armProvision(run: RunState, id: ProvisionId): CraftResult {
   return { ok: true };
 }
 
-/** Take an armed provision off again (it stays in the Pouch). */
+/** Take an armed provision off again (it stays in the pouch). */
 export function disarmProvision(run: RunState, id: ProvisionId): CraftResult {
   const w = waysideOf(run);
   const i = w.armed.indexOf(id);
@@ -53,7 +68,7 @@ export function disarmProvision(run: RunState, id: ProvisionId): CraftResult {
 }
 
 /**
- * The map starts: what is armed burns, whether or not the map is cleared (it is gone from the Pouch now), and goes on
+ * The map starts: what is armed burns, whether or not the map is cleared (it is gone from the pouch now), and goes on
  * working until the map ends. Returns what is burning.
  */
 export function startProvisions(run: RunState): string[] {
@@ -72,44 +87,53 @@ export function endProvisions(run: RunState): void {
   waysideOf(run).active = [];
 }
 
+/** The provisions a character carries that are reprieves, in the order they are used: a revive before a retreat. */
+export const REPRIEVE_ORDER: readonly ReprieveId[] = ['lastSpark', 'bargainCoin', 'ferryToken'];
+export function heldReprieveIds(run: RunState): ReprieveId[] {
+  const pouch = waysideOf(run).pouch;
+  const out: ReprieveId[] = [];
+  for (const id of REPRIEVE_ORDER) for (let i = 0; i < (pouch[id] ?? 0); i++) out.push(id);
+  return out;
+}
+
+/** The reprieves still ready after some have fired on this Crawl's earlier maps (each one fires once). */
+export function readyReprieves(run: RunState, fired: readonly string[] = []): ReprieveId[] {
+  const left = [...fired];
+  return heldReprieveIds(run).filter((id) => {
+    const at = left.indexOf(id);
+    if (at < 0) return true;
+    left.splice(at, 1);
+    return false;
+  });
+}
+
 /**
- * The hidden map affixes the given provisions add to an offer: a specialist adds its own only when the offer is the kind of map
- * it needs. They go on top of the offer's own affixes wherever a map's mods, rewards or threat are read.
+ * A cleared map may leave a provision in the pouch (docs/WAYSIDE.md 6.1): from level 3, with a fair chance, and the first time
+ * for certain, so that every run meets the idea early. Nothing when the pouch is full. Returns what was found.
  */
-export function provisionAffixes(ids: readonly string[], offer: MapOffer): string[] {
-  return ids
-    .filter((id) => {
-      const d = provisionDef(id);
-      if (d.needsType && offer.type !== d.needsType) return false;
-      return !d.needsAffix || offer.affixes.length > 0;
-    })
-    .map(provisionAffixId);
+export function forage(run: RunState): ProvisionId | null {
+  const w = waysideOf(run);
+  if (run.map < FORAGE_FROM || !pouchRoom(run)) return null;
+  const rng = new Rng(run.seed).fork(`forage${run.map}`);
+  if (w.seen.foraged && !rng.chance(FORAGE_CHANCE)) return null;
+  const open = PROVISIONS.filter((p) => p.kind !== 'reprieve' && p.from <= run.map);
+  const pick = rng.weighted(open, (p) => p.weight).id;
+  w.seen.foraged = true;
+  addProvision(run, pick);
+  return pick;
 }
 
-/** The affix a Counterweight cancels on an offer: the one that makes the map hardest (by the threat model's own reading), or null. */
-export function cancelledAffix(offer: MapOffer, ids: readonly string[]): string | null {
-  if (!ids.includes('counterweight') || !offer.affixes.length) return null;
-  let worst = offer.affixes[0];
-  let worstScore = -1;
-  for (const id of offer.affixes) {
-    const t = affixThreat([id], offer.areaLevel);
-    const score = t.pressure * t.life * t.damage * (1 + t.gain.reduce((n, g) => n + g, 0));
-    if (score > worstScore + 1e-9) {
-      worst = id;
-      worstScore = score;
-    }
-  }
-  return worst;
+/** The hidden map affixes the given provisions add to a map: one each (a reprieve has none). */
+export function provisionAffixes(ids: readonly string[]): string[] {
+  return ids.filter((id) => !isReprieveId(id)).map(provisionAffixId);
 }
 
 /**
- * Every affix a map is played with: its own (less the one a Counterweight cancels), the burning provisions' hidden ones, and the
- * standing effects the character carries (curses, a blessing). `ids` is what is burning (the map plan) or armed (the preview).
+ * Every affix a map is played with: its own, the burning provisions' hidden ones, and the standing effects the character carries
+ * (curses, a blessing). `ids` is what is burning (the map plan) or armed (the preview).
  */
 export function mapAffixList(run: RunState, offer: MapOffer, ids: readonly string[]): string[] {
-  const cut = cancelledAffix(offer, ids);
-  const own = cut ? offer.affixes.filter((a) => a !== cut) : offer.affixes;
-  return [...own, ...provisionAffixes(ids, offer), ...standingAffixes(run)];
+  return [...offer.affixes, ...provisionAffixes(ids), ...standingAffixes(run)];
 }
 
 /** The offer's affixes with the armed provisions', the curses' and the blessing's on top: what the threat preview and the bot's scoring should read. */

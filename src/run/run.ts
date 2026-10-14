@@ -30,10 +30,18 @@ import { noteFound, stampAll } from './found';
 import { makeOffer, rollOffers, type MapOffer } from './offers';
 import { waysideOf, type Wayside } from './wayside';
 import type { StopId } from '../data/stops';
-import { addProvision, endProvisions, mapAffixList, pouchCount } from './provisions';
-import { acquireReprieve, reprieveBlocker, spendReprieve } from './reprieves';
-import { REPRIEVES, type ReprieveId } from '../data/reprieves';
-import { POUCH_LIMIT, PROVISIONS, type ProvisionId } from '../data/provisions';
+import {
+  addProvision,
+  endProvisions,
+  forage,
+  heldReprieveIds,
+  mapAffixList,
+  pouchRoom,
+} from './provisions';
+import { reprieveBlocker, spendReprieve } from './reprieves';
+import { REPRIEVES } from '../data/reprieves';
+import { PROVISIONS, type ProvisionId } from '../data/provisions';
+import { CURRENCY_DROPS } from '../data/constants';
 
 export { rollThemes } from './offers';
 
@@ -48,7 +56,7 @@ export type MapRecord = {
   status: MapResult['status'] | 'respite' | 'stop';
   stop?: StopId;
   /** The Reprieve that fired on the map (docs/WAYSIDE.md 7): it saved the run, or pulled the character out. */
-  saved?: string;
+  saved?: string[];
   time: number;
   levelAfter: number;
   kills: number;
@@ -59,7 +67,7 @@ export type MapRecord = {
  * A card of a reward pick that is not an item: a provision for the Pouch, or a Reprieve (docs/WAYSIDE.md 6.1 and 7.4). Pick cards
  * are the only place these appear beside items, so they are a separate kind and not part of what monsters drop.
  */
-export type PouchCard = { kind: 'pouch'; uid: number; what: 'provision' | 'reprieve'; id: string };
+export type PouchCard = { kind: 'pouch'; uid: number; id: string };
 export type RewardCard = AnyItem | PouchCard;
 
 /** A reforge whose three alternatives have been drawn and shown, and not yet picked (EXPANSION 8.1). */
@@ -204,6 +212,7 @@ export function setMap(run: RunState, map: number): void {
 export function advanceLevel(run: RunState): void {
   run.map += 1;
   run.offers = rollOffers(run.seed, run.map, run.vitals);
+  waysideOf(run).found = null;
 }
 
 /**
@@ -269,7 +278,7 @@ export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
   const uid = uidSource(run);
   return {
     start: run.vitals,
-    reprieve: waysideOf(run).reprieve,
+    reprieves: heldReprieveIds(run),
     loot: (w, m): AnyItem[] => {
       if (!m.mon) return [];
       // Item quantity and rarity from gear, and from any flask active right now.
@@ -292,16 +301,18 @@ export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
         playerQuantity: mults.quantity * (1 + quantity) * (m.mon.kind.bonusLoot ?? 1),
         playerRarity: mults.rarity * (1 + rarity),
       });
-      // A Quarry champion always drops a rare (sometimes a unique) and a stack of currency.
+      // A Quarry champion always drops a rare (sometimes a unique) and a stack of currency (while currency drops).
       if (plan.type === 'quarry' && m.mon.spec.rarity === 'miniboss') {
         const level = m.mon.spec.level;
         const unique = w.rngLoot.chance(0.15) ? rollUniqueOf(w.rngLoot, uid, level, faction) : null;
         items.push(
           unique ??
             rollDrop(w.rngLoot, uid, { ilvl: level, monster: 'rare', theme: plan.theme }, true),
-          rollCurrencyBundle(w.rngLoot, uid, plan.map),
         );
+        if (CURRENCY_DROPS) items.push(rollCurrencyBundle(w.rngLoot, uid, plan.map));
       }
+      // Currency does not drop while CURRENCY_DROPS is off (data/constants.ts).
+      if (!CURRENCY_DROPS) return items;
       return items.concat(
         rollCurrencyDrops(w.rngLoot, uid, {
           map: plan.map,
@@ -347,9 +358,9 @@ export function finishMap(run: RunState, res: MapResult): void {
     levelAfter: res.level,
     kills: res.kills,
     stuck: res.stuck,
-    ...(res.reprieve ? { saved: res.reprieve } : {}),
+    ...(res.reprieves ? { saved: res.reprieves } : {}),
   });
-  if (res.reprieve) spendReprieve(run, res.reprieve);
+  for (const id of res.reprieves ?? []) spendReprieve(run, id);
   run.build = { ...run.build, level: res.level };
   run.xp = res.xp;
   if (res.status !== 'cleared' && res.status !== 'abandoned') {
@@ -358,10 +369,13 @@ export function finishMap(run: RunState, res: MapResult): void {
     return;
   }
   collectPicked(run, res);
+  let found: ProvisionId | null = null;
   // Camp restores part of what the map cost (10 s of sitting still).
   run.vitals = restAtCamp(run.build, run.map, res.vitals);
   if (res.status === 'cleared') {
     run.refundPoints += 1;
+    // A cleared map may leave a provision in the pouch (docs/WAYSIDE.md 6.1); camp says so after the level advances.
+    found = forage(run);
     if (run.map % 10 === 0 && run.map <= 80) run.bonusPoints += 3;
     if (run.map >= TOTAL_MAPS) {
       run.phase = 'victory';
@@ -374,6 +388,7 @@ export function finishMap(run: RunState, res: MapResult): void {
     else if (run.map <= SKILL_REWARD_MAPS) run.reward = rollSkillRewards(run);
   }
   advanceLevel(run);
+  waysideOf(run).found = found;
   run.phase = 'camp';
 }
 
@@ -439,30 +454,28 @@ export function rollRewards(run: RunState): RewardCard[] {
     return out;
   }
   for (let i = 0; i < 3; i++) {
-    const pool = rng.weighted(['item', 'gem', 'flask', 'currency'] as const, [45, 25, 15, 15]);
+    const pool = rng.weighted(['item', 'gem', 'flask', 'currency'] as const, [
+      45,
+      25,
+      15,
+      CURRENCY_DROPS ? 15 : 0,
+    ]);
     if (pool === 'currency') out.push(rollCurrencyBundle(rng, uid, run.map));
     else if (pool === 'gem') out.push(rollGem(rng, uid, { classId: run.build.classId, ilvl }));
     else if (pool === 'flask') out.push(rollFlask(rng, uid, ilvl, 1));
     else out.push(rollDrop(rng, uid, { ilvl, monster: 'rare' }, rng.chance(0.7)));
   }
-  // A pick may hold something for the Wayside in place of one of the three (docs/WAYSIDE.md 6.1 and 7.4): a Reprieve on a boss
-  // level's pick, a provision on a fifth map's. They draw from a stream of their own, so the other cards are what they always were.
+  // A pick may hold something for the Wayside in place of one of the three (docs/WAYSIDE.md 6.1 and 7.4): a reprieve (more often on a
+  // boss level's pick), or a provision. They draw from a stream of their own, so the other cards are what they always were.
   const pr = new Rng(run.seed).fork(`rewardpouch${run.map}`);
-  if (run.map % 10 === 0 && reprieveBlocker(run) === null && pr.chance(0.6)) {
-    out[2] = {
-      kind: 'pouch',
-      uid: uid(),
-      what: 'reprieve',
-      id: pr.weighted(REPRIEVES, (r) => r.weight).id,
-    };
-  } else if (pouchCount(run) < POUCH_LIMIT && pr.chance(0.3)) {
-    const open = PROVISIONS.filter((p) => p.from <= run.map);
-    out[1] = {
-      kind: 'pouch',
-      uid: uid(),
-      what: 'provision',
-      id: pr.weighted(open, (p) => p.weight).id,
-    };
+  if (pouchRoom(run)) {
+    if (pr.chance(run.map % 10 === 0 ? 0.6 : 0.3) && reprieveBlocker(run) === null) {
+      const open = REPRIEVES.filter((r) => r.from <= run.map);
+      out[2] = { kind: 'pouch', uid: uid(), id: pr.weighted(open, (r) => r.weight).id };
+    } else if (pr.chance(0.4)) {
+      const open = PROVISIONS.filter((p) => p.kind !== 'reprieve' && p.from <= run.map);
+      out[1] = { kind: 'pouch', uid: uid(), id: pr.weighted(open, (p) => p.weight).id };
+    }
   }
   return out;
 }
@@ -483,12 +496,8 @@ export function takeReward(run: RunState, uid: number | null): boolean {
   const it = run.reward.find((x) => x.uid === uid);
   if (it) {
     if (it.kind === 'pouch') {
-      // A card for the Wayside may not fit any more (the Pouch filled, or a Reprieve was bought): the pick stays open.
-      const ok =
-        it.what === 'reprieve'
-          ? acquireReprieve(run, it.id as ReprieveId).ok
-          : addProvision(run, it.id as ProvisionId);
-      if (!ok) return false;
+      // A card for the Wayside may not fit any more (the pouch filled since the pick appeared): the pick stays open.
+      if (!addProvision(run, it.id as ProvisionId)) return false;
     } else if (it.kind === 'currency') stash(run, it);
     else {
       run.inventory.push(it);

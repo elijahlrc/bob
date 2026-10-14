@@ -1008,3 +1008,8 @@ of them on tenth maps where a Retreat does nothing, and a Revive gains a median 
 average over the one without (noise-sized; median difference 0), and a bot that takes every stop does no better than the default.
 Not measured: Dust income per level, provisions by bot run, the Retreat in whole runs. Not built: the arm-best button, the "without"
 verdict line, a Reprieve policy seam. Every number is a first guess.
+
+Revised on 2026-10-14 after the user's playtest (WAYSIDE.md 17): no Market (cut), the Awlsmith charges Bone Dust and no currency but Bone Dust drops,
+Shrine blessings about 75% stronger, a pouch of three with reprieves as provisions of a third kind that refill the flasks, the specialist
+provisions dropped, and the systems start at level 5 (stops one level in five from 6, provisions left by cleared maps, cards in every reward pick).
+The measurements above predate this revision.

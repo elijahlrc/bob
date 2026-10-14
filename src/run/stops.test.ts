@@ -21,7 +21,7 @@ function atStop(seed: number, want?: string): { run: RunState; slot: number } {
 }
 
 describe('the stop schedule (docs/WAYSIDE.md 5.1)', () => {
-  it('puts one stop in each window of eight levels, never on a fifth or tenth level or before level 9', () => {
+  it('puts one stop in each window of five levels, never on a fifth or tenth level or before level 6', () => {
     for (const seed of [1, 2, 3, 77, 1234]) {
       const at: number[] = [];
       for (let map = 1; map <= 100; map++) if (stopAt(seed, map)) at.push(map);
@@ -31,7 +31,9 @@ describe('the stop schedule (docs/WAYSIDE.md 5.1)', () => {
       }
       const windows = at.map((m) => Math.floor((m - STOP_FROM) / STOP_WINDOW));
       expect(new Set(windows).size).toBe(windows.length);
-      expect(at.length).toBeGreaterThanOrEqual(10);
+      expect(at.length).toBeGreaterThanOrEqual(17);
+      // Every run meets one before level 10.
+      expect(at[0]).toBeLessThanOrEqual(9);
       for (let w = 0; w < windows.length; w++) expect(at).toContain(stopLevel(seed, w));
     }
   });
@@ -44,7 +46,7 @@ describe('the stop schedule (docs/WAYSIDE.md 5.1)', () => {
   });
 
   it('never repeats the kind of the window before while there is another to draw', () => {
-    // Only two stops are built, so they alternate.
+    // (Five kinds, and a window never draws the kind of the one before.)
     const seen: string[] = [];
     for (let map = 1; map <= 99; map++) {
       const s = stopAt(9, map);
@@ -100,22 +102,22 @@ describe('the Awlsmith', () => {
     expect(waysideOf(run).stops).toBe(1);
   });
 
-  it('charges Socket Augers for the sockets after the first, and refuses what cannot be paid', () => {
+  it('charges Bone Dust for the sockets after the first, and refuses what cannot be paid', () => {
     const { run, slot } = atStop(11, 'awlsmith');
     run.build.equipment.body = { ...run.build.equipment.body!, ilvl: 80 };
     const item = run.build.equipment.body!;
-    // Give the item two sockets, so the new one is its third (free) and one more is its fourth (one Auger).
+    // Give the item two sockets, so the new one is its third (free) and one more is its fourth (40 Bone Dust).
     run.build.equipment.body = { ...item, sockets: [null, null] };
     const uid = item.uid;
     expect(awlsmithItems(run).find((x) => x.uid === uid)).toBeDefined();
     const choice = { stop: 'awlsmith' as const, itemUid: uid, extra: 1 };
     const why = stopProblem(run, slot, choice);
-    expect(why).toMatch(/Augers/);
-    run.currency.auger = 1;
+    expect(why).toMatch(/40 Bone Dust/);
+    run.dust = 55;
     expect(stopProblem(run, slot, choice)).toBeNull();
     const map = run.map;
     expect(takeStop(run, slot, choice).ok).toBe(true);
-    expect(run.currency.auger ?? 0).toBe(0);
+    expect(run.dust).toBe(15);
     expect(run.map).toBe(map + 1);
   });
 

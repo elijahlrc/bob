@@ -152,9 +152,11 @@ describe('map offers (docs/MAPS.md section 4)', () => {
     const run = newRun('vanguard', 4);
     setMap(run, 51);
     stash(run, { kind: 'currency', uid: 1, id: 'chalk', count: 3 });
-    const opts = chalkOptions(run, 2);
-    expect(chalkAdd(run, 2, opts[0]).ok).toBe(true);
-    expect(run.offers[2].affixes).toContain(opts[0]);
+    // (A stop may hold the last slot of a level: edit the last map offer.)
+    const slot = run.offers.map((o) => o.kind).lastIndexOf('map');
+    const opts = chalkOptions(run, slot);
+    expect(chalkAdd(run, slot, opts[0]).ok).toBe(true);
+    expect(run.offers[slot].affixes).toContain(opts[0]);
     const store = new MemoryStore();
     saveRun(store, run);
     const loaded = loadRun(store);

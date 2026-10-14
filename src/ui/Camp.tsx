@@ -285,8 +285,10 @@ export function Camp({ c }: { c: Controller }) {
         <div class="muted">
           Last map{last.status === 'abandoned' ? ' (abandoned, no clear rewards)' : ''}:{' '}
           {last.time.toFixed(0)} s · {last.kills} kills
-          {last.reprieve &&
-            ` · ${reprieveDef(last.reprieve).name} ${reprieveDef(last.reprieve).family === 'retreat' ? 'pulled you out' : 'saved you'}`}
+          {(last.reprieves ?? []).map(
+            (id) =>
+              ` · ${reprieveDef(id).name} ${reprieveDef(id).family === 'retreat' ? 'pulled you out' : 'saved you'}`,
+          )}
         </div>
       )}
       {run.reward && <Reward c={c} />}
@@ -366,15 +368,7 @@ export function Camp({ c }: { c: Controller }) {
                   {o.affixes.map((id) => {
                     const a = mapAffixDef(id);
                     return (
-                      <div
-                        key={id}
-                        class={'affix' + (id === o.cancelled ? ' cancelled' : '')}
-                        title={
-                          id === o.cancelled
-                            ? 'Cancelled by the Counterweight you armed.'
-                            : undefined
-                        }
-                      >
+                      <div key={id} class="affix">
                         {affixText(a, o.areaLevel)}{' '}
                         <span class="muted">({rewardText(a, o.areaLevel)})</span>
                       </div>

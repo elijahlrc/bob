@@ -2,7 +2,7 @@ import type { InventoryItem } from '../data/types';
 import type { RunState } from './run';
 
 /**
- * The Wayside's part of a run (docs/WAYSIDE.md): the provisions carried and armed, the Reprieve held,
+ * The Wayside's part of a run (docs/WAYSIDE.md): the provisions carried and armed (reprieves among them),
  * the blessing and curses that last across levels, and a few "seen it once" flags. Every field has a default, and
  * `RunState.wayside` is optional, so an older save and a test fixture need no migration beyond `waysideOf`.
  */
@@ -33,10 +33,6 @@ export type Wayside = {
   armed: string[];
   /** The provisions burning on the map being played (set when it starts, cleared when it ends). */
   active: string[];
-  /** The Reprieve held, if any (data/reprieves.ts). */
-  reprieve: string | null;
-  /** How many Reprieves the run has taken so far (the run is capped). */
-  reprieves: number;
   /** The Shrine's blessing, until the next stop replaces it. */
   blessing: string | null;
   /** Bargains still running (the Ferryman's and the Bargain Coin's). */
@@ -45,18 +41,19 @@ export type Wayside = {
   stops: number;
   /** First-use explainers already shown. */
   seen: Record<string, boolean>;
+  /** The provision the last cleared map left in the pouch (shown in camp), if any. */
+  found: string | null;
 };
 
 export const newWayside = (): Wayside => ({
   pouch: {},
   armed: [],
   active: [],
-  reprieve: null,
-  reprieves: 0,
   blessing: null,
   curses: [],
   stops: 0,
   seen: {},
+  found: null,
 });
 
 /** The run's Wayside state, filled in with defaults the first time it is asked for (an older save has none). */
@@ -66,5 +63,12 @@ export function waysideOf(run: RunState): Wayside {
   const d = newWayside();
   for (const k of Object.keys(d) as (keyof Wayside)[])
     if (w[k] === undefined) (w as never)[k] = d[k] as never;
+  // A run saved while a reprieve had a slot of its own: it is a provision in the pouch now.
+  const old = w as unknown as { reprieve?: string | null; reprieves?: number };
+  if (old.reprieve) {
+    w.pouch[old.reprieve] = (w.pouch[old.reprieve] ?? 0) + 1;
+  }
+  delete old.reprieve;
+  delete old.reprieves;
   return w;
 }

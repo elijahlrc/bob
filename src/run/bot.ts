@@ -36,7 +36,7 @@ import { Rng } from '../core/rng';
 import { botChalk, botCraft } from './botCraft';
 import { botStopChoice, botTakeStop, botWantsStop } from './botStop';
 import { affixesWithArmed, armProvision } from './provisions';
-import { provisionDef, type ProvisionId } from '../data/provisions';
+import { isReprieveId, provisionDef, type ProvisionId } from '../data/provisions';
 import { waysideOf } from './wayside';
 import { salvage } from './craft';
 import { buildSignature, killerTracker, metTracker, RunTally } from './metrics';
@@ -527,7 +527,7 @@ export function botReward(run: RunState, crafting = true, wayside = true): void 
     if (o.kind === 'pouch') {
       // (Without the Wayside the bot leaves these cards alone.)
       if (!wayside) continue;
-      const s = scoreOf(run, run.build) * (o.what === 'reprieve' ? 1.02 : 1.002);
+      const s = scoreOf(run, run.build) * (isReprieveId(o.id) ? 1.02 : 1.002);
       if (!best || s > best.s) best = { uid: o.uid, s };
       continue;
     }

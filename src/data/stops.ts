@@ -23,9 +23,9 @@ export const STOPS: StopDef[] = [
     id: 'awlsmith',
     name: 'The Awlsmith',
     text: 'Bore a new socket into one item, free.',
-    how: 'Pick one item, worn or carried. It gets its next socket free. Sockets beyond that cost Socket Augers at the usual rates.',
+    how: 'Pick one item, worn or carried. It gets its next socket free. Sockets beyond that cost Bone Dust (the 4th 40, the 5th 120, the 6th 300).',
     weight: 30,
-    from: 9,
+    from: 6,
   },
   {
     id: 'gemHoard',
@@ -33,7 +33,7 @@ export const STOPS: StopDef[] = [
     text: 'Choose a kind of gem, then take 3 of the 8 laid out.',
     how: 'Name one of four kinds. Eight gems of that kind are laid out; take three.',
     weight: 30,
-    from: 9,
+    from: 6,
   },
   {
     id: 'shrine',
@@ -41,31 +41,36 @@ export const STOPS: StopDef[] = [
     text: 'A blessing that lasts until the next stop.',
     how: 'Pick one of three blessings. It lasts until you take another stop, and replaces the one you have.',
     weight: 25,
-    from: 9,
+    from: 6,
   },
   {
     id: 'quartermaster',
     name: 'The Quartermaster',
-    text: 'Twelve wares for sale, paid in Bone Dust.',
-    how: 'Twelve wares, paid in Bone Dust (what salvaging items pays). Choose what you want; whatever you leave is gone when you do.',
+    text: 'Eight wares for sale, paid in Bone Dust.',
+    how: 'Eight wares, paid in Bone Dust (what salvaging items pays). Choose what you want; whatever you leave is gone when you do.',
     weight: 25,
-    from: 9,
+    from: 6,
   },
   {
     id: 'ferryman',
     name: 'The Ferryman',
     text: 'A free reprieve, for a price.',
-    how: 'The Ferryman gives one reprieve for nothing, but you carry a curse for the next five levels. You may refuse.',
+    how: 'The Ferryman gives one reprieve for nothing, but you carry a curse for the next five levels. You may refuse. Your pouch needs room for it.',
     weight: 20,
-    from: 17,
+    from: 8,
   },
 ];
 
 export const stopDef = (id: StopId): StopDef => STOPS.find((s) => s.id === id)!;
 
-/** Stops are scheduled in windows of this many levels, starting at `STOP_FROM`: one stop to a window. */
-export const STOP_WINDOW = 8;
-export const STOP_FROM = 9;
+/** Stops are scheduled in windows of this many levels, starting at `STOP_FROM`: one stop to a window (a fifth of the run's levels). */
+export const STOP_WINDOW = 5;
+export const STOP_FROM = 6;
+
+/** What the Awlsmith charges, in Bone Dust, for the nth socket of an item beyond the free one (the first three sockets of an item cost nothing). */
+export function awlsmithPrice(nth: number): number {
+  return nth <= 3 ? 0 : nth === 4 ? 40 : nth === 5 ? 120 : 300;
+}
 
 /** The kinds of gem the Gem Hoard offers to name (each has at least five active gems), and what each is called. */
 export const HOARD_TAGS: { tag: string; name: string }[] = [

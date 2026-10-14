@@ -249,3 +249,53 @@ and they are dropped the next time the run is saved by a build that does not wri
 
 **Q. Where does that leave Bone Dust, provisions and Reprieves?**
 See WAYSIDE.md 16.5: one sink (the Quartermaster), fewer provisions, fewer Reprieves. Not re-measured.
+
+## 2026-10-14 (second round) — the nine points of feedback
+
+WAYSIDE.md section 17 has the table; these are the choices made inside it.
+
+**Q. "Drop all currencies other than Bone Dust": delete them, or stop them dropping?**
+Chosen: stop them dropping, behind `CURRENCY_DROPS = false` (`data/constants.ts`), checked where the game asks for currency (monster drops, a
+Quarry champion, reward picks). The generators, the Workbench, the bots that craft and their tests are untouched, as with `CRAFTING_OPEN`;
+the user said "for now". Wayfinder's Chalk is one of the currencies, so it no longer drops either; its screen still shows if a run
+saved earlier holds some. Quartermaster wares no longer include a currency bundle.
+
+**Q. Where do extra sockets come from now?**
+The Awlsmith charges Bone Dust at the Workbench's old prices (4th socket 40, 5th 120, 6th 300, flat, no level factor); the first new
+socket is free. That also gives Bone Dust a second use.
+
+**Q. What is "best of the shop's gear"?**
+The best of four rares by the sum of their affix tiers (a higher tier is rarer and stronger), rolled at the item level of an offer two
+levels up. It is a proxy: it does not know the build. Whether that reads as "as good as the best that could drop" is for the user.
+
+**Q. How strong are the blessings?**
+About 75% stronger than before (see 17). The user's yardstick was one passive node; I did not look up what a notable gives, so this is
+a guess against that yardstick. A blessing lasts until the next stop, now about five levels.
+
+**Q. Reprieves as provisions: arming, order, caps.**
+A reprieve is never armed (it needs nothing), only ever fires when damage would kill, and counts toward the pouch of three. With several
+carried, a revive is used before a retreat, and on a boss level a retreat is passed over for a revive carried with it. The per-run cap
+of three reprieves and the Ferryman's swap are gone (the pouch is the limit). Several may fire in one map, one after another.
+
+**Q. A save made with the old reprieve slot.**
+`waysideOf` moves it into the pouch the first time it is read (and drops the old fields).
+
+**Q. Making the systems common: how often, from when?**
+
+- Stops: windows of five levels from level 6 (so the first one comes before level 10; level 5 is a reward pick and never holds a stop),
+  about eighteen a run. The Ferryman from level 8 so a window can hold it. This is a lot of stops and each costs a level: I did not
+  re-measure the stopper bound, and it is the first number to look at if play feels thin.
+- Provisions: found on a cleared map from level 3 (40%, the first time for certain), and as a card in a reward pick (40%).
+- Reprieves: a card in a reward pick (30%; 60% on a boss level's), the Quartermaster, the Ferryman, from level 5.
+- The bets are found from level 5, the staples from level 1 to 3.
+
+**Q. What happens to a find when the pouch is full?**
+Nothing: it is simply not found (and the reward pick leaves the card out). The nudge is to arm and spend. A Ferryman met with a full
+pouch cannot give its reprieve (the screen says why); the schedule does not look at the pouch.
+
+**Q. The Quartermaster shrank from twelve wares to eight** (two rares, a gem, a flask, three provisions, a reprieve), because the
+currency bundles went and the user dislikes sorting through gear.
+
+**Q. Specialists.**
+Slow Fuse, Bonebreaker and Counterweight were removed with everything that existed only for them (the Crescendo pace, the cancelled
+affix on the card, their tests).

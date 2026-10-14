@@ -1,49 +1,50 @@
 import { describe, expect, it } from 'vitest';
 import { Character, sheetDps } from '../calc/character';
-import { affixPlayerMods } from '../data/mapAffixes';
+import { affixPlayerMods, affixRarePacks, mapAffixDef } from '../data/mapAffixes';
 import {
+  FORAGE_FROM,
+  isProvisionAffix,
+  isReprieveId,
   POUCH_LIMIT,
   PROVISIONS,
   PROVISIONS_PER_MAP,
-  isProvisionAffix,
   provisionAffixId,
-  provisionDef,
 } from '../data/provisions';
 import { botRun } from './bot';
-import { makeOffer } from './offers';
 import {
   addProvision,
   affixesWithArmed,
   armProvision,
   disarmProvision,
   endProvisions,
+  forage,
+  heldReprieveIds,
   pouchCount,
   provisionAffixes,
+  readyReprieves,
   spare,
   startProvisions,
 } from './provisions';
 import { offersFor } from './preview';
 import { affixRewards, finishMap, newRun, planFor, setMap } from './run';
 import { waysideOf } from './wayside';
-import { mapAffixDef } from '../data/mapAffixes';
 
-describe('the Pouch and arming (docs/WAYSIDE.md 6.1)', () => {
-  it('holds six provisions in all, and arms two for a map', () => {
+describe('the pouch and arming (docs/WAYSIDE.md 6.1)', () => {
+  it('holds three provisions in all, and any or all of them may be armed', () => {
     const run = newRun('vanguard', 1);
     for (let i = 0; i < POUCH_LIMIT; i++) expect(addProvision(run, 'whettedPowder')).toBe(true);
     expect(addProvision(run, 'wardOil')).toBe(false);
-    expect(pouchCount(run)).toBe(POUCH_LIMIT);
-    expect(armProvision(run, 'whettedPowder').ok).toBe(true);
-    expect(armProvision(run, 'whettedPowder').ok).toBe(true);
-    expect(PROVISIONS_PER_MAP).toBe(2);
+    expect(pouchCount(run)).toBe(3);
+    expect(PROVISIONS_PER_MAP).toBe(POUCH_LIMIT);
+    for (let i = 0; i < 3; i++) expect(armProvision(run, 'whettedPowder').ok).toBe(true);
     expect(armProvision(run, 'whettedPowder')).toEqual({
       ok: false,
-      reason: 'Only 2 can be armed for one map',
+      reason: 'You have none to arm',
     });
-    expect(spare(run, 'whettedPowder')).toBe(POUCH_LIMIT - 2);
+    expect(spare(run, 'whettedPowder')).toBe(0);
   });
 
-  it('arms only what the Pouch holds, and disarming puts it back', () => {
+  it('arms only what the pouch holds, and disarming puts it back', () => {
     const run = newRun('vanguard', 1);
     expect(armProvision(run, 'wardOil').ok).toBe(false);
     addProvision(run, 'wardOil');
@@ -53,10 +54,31 @@ describe('the Pouch and arming (docs/WAYSIDE.md 6.1)', () => {
     expect(disarmProvision(run, 'wardOil').ok).toBe(false);
     expect(spare(run, 'wardOil')).toBe(1);
   });
+
+  it('carries a reprieve in the same pouch, counts it, and never arms it', () => {
+    const run = newRun('vanguard', 1);
+    addProvision(run, 'lastSpark');
+    addProvision(run, 'ferryToken');
+    addProvision(run, 'wardOil');
+    expect(pouchCount(run)).toBe(3);
+    expect(addProvision(run, 'bloodsalt')).toBe(false);
+    expect(armProvision(run, 'lastSpark').ok).toBe(false);
+    expect(heldReprieveIds(run)).toEqual(['lastSpark', 'ferryToken']);
+    startProvisions(run);
+    expect(heldReprieveIds(run)).toEqual(['lastSpark', 'ferryToken']);
+  });
+
+  it('uses a revive before a retreat, and a reprieve that has fired is not ready again', () => {
+    const run = newRun('vanguard', 1);
+    for (const id of ['ferryToken', 'bargainCoin', 'lastSpark'] as const) addProvision(run, id);
+    expect(heldReprieveIds(run)).toEqual(['lastSpark', 'bargainCoin', 'ferryToken']);
+    expect(readyReprieves(run, ['lastSpark'])).toEqual(['bargainCoin', 'ferryToken']);
+    expect(readyReprieves(run, ['lastSpark', 'ferryToken'])).toEqual(['bargainCoin']);
+  });
 });
 
 describe('burning (docs/WAYSIDE.md 6.1)', () => {
-  it('takes what is armed out of the Pouch when the map starts, and keeps it working until the map ends', () => {
+  it('takes what is armed out of the pouch when the map starts, and keeps it working until the map ends', () => {
     const run = newRun('vanguard', 2);
     addProvision(run, 'whettedPowder');
     addProvision(run, 'whettedPowder');
@@ -146,13 +168,38 @@ describe('what they do (data/provisions.ts)', () => {
     expect(mapAffixDef(provisionAffixId('rushingTonic')).monsterMods?.length).toBeGreaterThan(0);
   });
 
-  it('every provision has a hidden affix that is never rolled and does not follow the level band', () => {
-    for (const p of PROVISIONS) {
+  it("Hunter's Bell adds three rare packs, experience and quantity to the map", () => {
+    expect(affixRarePacks(provisionAffixId('hunterBell'), 10)).toBe(3);
+    expect(affixRarePacks(provisionAffixId('hunterBell'), 80)).toBe(3);
+    const run = newRun('vanguard', 2);
+    setMap(run, 12);
+    run.build = { ...run.build, level: 12 };
+    const before = offersFor(run)[0];
+    addProvision(run, 'hunterBell');
+    armProvision(run, 'hunterBell');
+    const after = offersFor(run)[0];
+    expect(after.rewards!.experience).toBeGreaterThan(before.rewards!.experience + 0.2);
+    expect(after.rewards!.quantity).toBeGreaterThan(before.rewards!.quantity + 0.15);
+    expect(after.rewards!.monsters.rare).toBeGreaterThan(before.rewards!.monsters.rare);
+  });
+
+  it('every staple and bet has a hidden affix that is never rolled and does not follow the level band', () => {
+    for (const p of PROVISIONS.filter((x) => x.kind !== 'reprieve')) {
       const a = mapAffixDef(provisionAffixId(p.id));
       expect(a.chalkOnly).toBe(true);
       expect(a.fixed).toBe(true);
       expect(isProvisionAffix(a.id)).toBe(true);
     }
+  });
+
+  it('a reprieve is a provision of a third kind with no affix', () => {
+    const ids = PROVISIONS.filter((x) => x.kind === 'reprieve')
+      .map((x) => x.id)
+      .sort();
+    expect(ids).toEqual(['bargainCoin', 'ferryToken', 'lastSpark']);
+    expect(provisionAffixes(['lastSpark', 'wardOil'])).toEqual([provisionAffixId('wardOil')]);
+    expect(isReprieveId('lastSpark')).toBe(true);
+    expect(isReprieveId('wardOil')).toBe(false);
   });
 });
 
@@ -170,11 +217,62 @@ describe('the offer cards with provisions armed', () => {
     expect(after.affixes).toEqual(before.affixes);
     expect(affixesWithArmed(run, run.offers[0])).toContain(provisionAffixId('greedyLantern'));
   });
+});
 
-  it('a specialist adds its affix only to the kind of map it needs', () => {
-    const offer = makeOffer(1, 12, 0, 'sporefen', 0, 'plain');
-    expect(provisionAffixes(['whettedPowder'], offer)).toEqual([provisionAffixId('whettedPowder')]);
-    expect(provisionDef('whettedPowder').needsType).toBeUndefined();
+describe('what a cleared map leaves in the pouch (docs/WAYSIDE.md 6.1)', () => {
+  it('is nothing before level 3, and something for certain the first time after', () => {
+    const run = newRun('vanguard', 6);
+    setMap(run, FORAGE_FROM - 1);
+    expect(forage(run)).toBeNull();
+    setMap(run, FORAGE_FROM);
+    const first = forage(run);
+    expect(first).not.toBeNull();
+    expect(isReprieveId(first!)).toBe(false);
+    expect(pouchCount(run)).toBe(1);
+    expect(waysideOf(run).seen.foraged).toBe(true);
+  });
+
+  it('is sometimes something, never a reprieve, and nothing when the pouch is full', () => {
+    let found = 0;
+    for (let seed = 1; seed <= 100; seed++) {
+      const run = newRun('vanguard', seed);
+      setMap(run, 10);
+      waysideOf(run).seen.foraged = true;
+      const got = forage(run);
+      if (got) {
+        found++;
+        expect(isReprieveId(got)).toBe(false);
+      }
+      while (addProvision(run, 'wardOil'));
+      expect(forage(run)).toBeNull();
+    }
+    expect(found).toBeGreaterThan(20);
+    expect(found).toBeLessThan(60);
+  });
+
+  it('is told to the camp after the level passes, and gone after the next level', () => {
+    const run = newRun('vanguard', 7);
+    setMap(run, 6);
+    const w = waysideOf(run);
+    finishMap(run, {
+      status: 'cleared',
+      areaLevel: 6,
+      time: 1,
+      ticks: 1,
+      level: 6,
+      xp: 0,
+      xpGained: 0,
+      kills: 0,
+      stuck: 0,
+      picked: [],
+      eventHash: 0,
+      lifeFrac: 1,
+      vitals: { life: 1, mana: 1, es: 1, flasks: {} },
+    });
+    expect(run.map).toBe(7);
+    // The first find is certain.
+    expect(w.found).not.toBeNull();
+    expect(pouchCount(run)).toBeGreaterThanOrEqual(1);
   });
 });
 

@@ -13,8 +13,6 @@ export const WARE_BASE = {
   gem: 12,
   /** A magic utility flask. */
   flask: 15,
-  /** A bundle of two or three of one currency. */
-  currency: 15,
 } as const;
 
 /** What a price comes to at a level. */
@@ -23,4 +21,11 @@ export function priceAt(base: number, level: number): number {
 }
 
 /** How many wares the Quartermaster lays out. */
-export const QUARTERMASTER_SIZE = 12;
+export const QUARTERMASTER_SIZE = 8;
+
+/**
+ * The gear it sells is as good as what a map could drop (docs/WAYSIDE.md 3): the best of this many rares, rolled at the item level of
+ * an offer this many levels above the one being played.
+ */
+export const GEAR_CANDIDATES = 4;
+export const GEAR_ILVL_BONUS = 2;

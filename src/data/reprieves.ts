@@ -2,8 +2,9 @@ import { mod } from '../mods/types';
 import type { MapAffixDef } from './mapAffixes';
 
 /**
- * Reprieves (docs/WAYSIDE.md section 7): the one item that can change the end of a run. A character holds at most one; it fires by
- * itself when damage would kill the character, and is used up. Death ends the run, so these are rare, dear and visible.
+ * Reprieves (docs/WAYSIDE.md section 7): the items that can change the end of a run. They are provisions of a third kind
+ * (data/provisions.ts): carried in the pouch with the others (three of anything at most), never armed, always ready. One fires by
+ * itself when damage would kill the character, refills its flasks so that it has a chance at the next level, and is used up.
  * Every name and text here is ours.
  *
  * A Retreat pulls the character out of the map as an abandon (the level is spent, the loot so far is kept); it does nothing on
@@ -30,6 +31,8 @@ export type ReprieveDef = {
   base: number;
   /** Weight among the Reprieves a stock or a pick draws. */
   weight: number;
+  /** The first map it turns up on. */
+  from: number;
 };
 
 export const REPRIEVES: ReprieveDef[] = [
@@ -37,32 +40,35 @@ export const REPRIEVES: ReprieveDef[] = [
     id: 'ferryToken',
     name: 'Ferry Token',
     family: 'retreat',
-    text: 'If you would die, you are pulled out of the map instead: the level is spent and what you picked up is kept. Does nothing on a boss level.',
+    text: 'If you would die, you are pulled out of the map instead: the level is spent, you keep what you picked up, and all your flasks are refilled. Does nothing on a boss level.',
     life: 0.25,
     base: 125,
     weight: 40,
+    from: 5,
   },
   {
     id: 'lastSpark',
     name: 'Last Spark',
     family: 'revive',
-    text: 'If you would die, you rise at 35% life, cannot be hurt for 3 seconds, and the monsters around you are thrown back and stunned.',
+    text: 'If you would die, you rise at 35% life with all your flasks refilled, cannot be hurt for 3 seconds, and the monsters around you are thrown back and stunned.',
     life: 0.35,
     invuln: 3,
     pulse: true,
     base: 225,
     weight: 30,
+    from: 5,
   },
   {
     id: 'bargainCoin',
     name: 'Bargain Coin',
     family: 'revive',
-    text: 'If you would die, you rise at 50% life and cannot be hurt for 1.5 seconds. Afterwards you carry a curse for five levels.',
+    text: 'If you would die, you rise at 50% life with all your flasks refilled and cannot be hurt for 1.5 seconds. Afterwards you carry a curse for five levels.',
     life: 0.5,
     invuln: 1.5,
     curse: 'bargain',
     base: 150,
     weight: 30,
+    from: 5,
   },
 ];
 
@@ -72,10 +78,6 @@ export const reprieveDef = (id: string): ReprieveDef => {
   return d;
 };
 
-/** A run may take this many Reprieves in all, one held at a time. */
-export const REPRIEVE_CAP = 3;
-/** Reprieves are not for sale before this level. */
-export const REPRIEVE_FROM = 20;
 /** The curse lasts this many levels. */
 export const CURSE_LEVELS = 5;
 

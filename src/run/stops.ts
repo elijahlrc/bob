@@ -11,16 +11,15 @@ import {
 import { EQUIP_SLOTS, type Item } from '../data/types';
 import { gemWeight } from '../gen/loot';
 import { restAtCamp } from './camp';
-import { awlsmithSockets, socketCeiling, socketCost, type CraftResult } from './craft';
+import { awlsmithDust, awlsmithSockets, socketCeiling, type CraftResult } from './craft';
 import { noteFound } from './found';
 import type { MapOffer } from './offers';
 import { advanceLevel, TOTAL_MAPS, uidSource, type RunState } from './run';
 import { waysideOf, type Ware } from './wayside';
 import { BLESSINGS, SHRINE_CHOICES, type BlessingId } from '../data/blessings';
-import { POUCH_LIMIT } from '../data/provisions';
-import { REPRIEVE_CAP, REPRIEVES, type ReprieveId } from '../data/reprieves';
+import { REPRIEVES, type ReprieveId } from '../data/reprieves';
 import { grantWare, rollSale } from './sale';
-import { pouchCount } from './provisions';
+import { pouchRoom } from './provisions';
 import { acquireReprieve, addCurse, reprieveBlocker } from './reprieves';
 
 /** What the player decided at a stop. The stop's screen builds one and `takeStop` applies it all at once, so nothing is half done. */
@@ -29,7 +28,7 @@ export type StopChoice =
   | { stop: 'gemHoard'; tag: string; picks: string[] }
   | { stop: 'shrine'; blessing: string }
   | { stop: 'quartermaster'; buy: string[] }
-  | { stop: 'ferryman'; reprieve: string; swap?: boolean };
+  | { stop: 'ferryman'; reprieve: string };
 
 const fail = (reason: string): CraftResult => ({ ok: false, reason });
 
@@ -44,12 +43,12 @@ export function awlsmithItems(run: RunState): Item[] {
   );
 }
 
-/** The most sockets one visit can add to an item, and the Augers a given number costs (the first is free). */
+/** The most sockets one visit can add to an item, and the Bone Dust a given number costs (the first is free). */
 export function awlsmithRoom(it: Item): number {
   return Math.max(0, socketCeiling(it) - it.sockets.length);
 }
 export function awlsmithCost(it: Item, added: number): number {
-  return added <= 1 ? 0 : socketCost(it.sockets.length + 1, it.sockets.length + added);
+  return added <= 1 ? 0 : awlsmithDust(it.sockets.length + 1, it.sockets.length + added);
 }
 
 // ---- The Gem Hoard ---------------------------------------------------------------------------------
@@ -96,7 +95,7 @@ export function shrineBlessings(run: RunState, offer: MapOffer): BlessingId[] {
 
 // ---- The Quartermaster -----------------------------------------------------------------------------
 
-/** The Quartermaster's wares for an offer: twelve, the same every time they are looked at (run/sale.ts). */
+/** The Quartermaster's wares for an offer: eight, the same every time they are looked at (run/sale.ts). */
 export function saleStock(run: RunState, offer: MapOffer): Ware[] {
   return rollSale(run, offer.id);
 }
@@ -112,14 +111,9 @@ export function cartProblem(run: RunState, stock: Ware[], ids: string[]): string
   }
   const total = picked.reduce((n, w) => n + w.price, 0);
   if (total > run.dust) return `That costs ${total} Bone Dust`;
-  if (pouchCount(run) + picked.filter((w) => w.kind === 'provision').length > POUCH_LIMIT)
-    return 'Your pouch cannot hold that many provisions';
-  const reprieves = picked.filter((w) => w.kind === 'reprieve').length;
-  if (reprieves > 1) return 'Only one reprieve can be held';
-  if (reprieves === 1) {
-    const why = reprieveBlocker(run);
-    if (why) return why;
-  }
+  // Provisions and reprieves share the pouch of three.
+  const carried = picked.filter((w) => w.kind === 'provision' || w.kind === 'reprieve').length;
+  if (!pouchRoom(run, carried)) return 'Your pouch cannot hold that many';
   return null;
 }
 
@@ -141,7 +135,7 @@ export function stopProblem(run: RunState, slot: number, choice: StopChoice): st
       const extra = Math.max(0, Math.floor(choice.extra ?? 0));
       if (extra + 1 > awlsmithRoom(it)) return 'This item cannot have that many sockets';
       const need = awlsmithCost(it, extra + 1);
-      if ((run.currency.auger ?? 0) < need) return `That needs ${need} Socket Augers`;
+      if (run.dust < need) return `That needs ${need} Bone Dust`;
       return null;
     }
     case 'gemHoard': {
@@ -162,10 +156,7 @@ export function stopProblem(run: RunState, slot: number, choice: StopChoice): st
       return cartProblem(run, saleStock(run, offer), choice.buy);
     case 'ferryman': {
       if (!REPRIEVES.some((r) => r.id === choice.reprieve)) return 'Choose one of the reprieves';
-      const w = waysideOf(run);
-      if (w.reprieves >= REPRIEVE_CAP) return `A run allows ${REPRIEVE_CAP} reprieves in all`;
-      if (w.reprieve && !choice.swap) return 'You already hold a reprieve: swap it for this one?';
-      return null;
+      return reprieveBlocker(run);
     }
   }
 }
@@ -212,7 +203,7 @@ export function takeStop(run: RunState, slot: number, choice: StopChoice): Craft
       break;
     }
     case 'ferryman':
-      acquireReprieve(run, choice.reprieve as ReprieveId, !!way.reprieve);
+      acquireReprieve(run, choice.reprieve as ReprieveId);
       addCurse(run, 'bargain');
       break;
   }

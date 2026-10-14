@@ -6,9 +6,9 @@ import { waysideOf } from '../run/wayside';
 export const TIPS = {
   stop: 'A stop takes the place of a map. The level passes with no loot, no XP and no clear rewards, as with a Respite, and you are given a service a map cannot give. You can always take a map instead.',
   satchel:
-    'Provisions are armed before a map and used up when it starts, cleared or not. Staples are small and safe, bets are strong and cost something, and specialists pay only against the kind of map they name. The cards below count what you have armed.',
+    'Your pouch holds three provisions. Arm any or all of them before a map: they are used up when it starts, cleared or not. Staples are small and safe, bets are strong and cost something. The cards below count what you have armed. A cleared map sometimes leaves you another.',
   reprieve:
-    'A reprieve fires by itself if you would die, and is used up. A Retreat pulls you out of the map as an abandon (the level is spent and you keep what you picked up); it does nothing on a boss level. A Revive stands you up again where you fell. One is held at a time, and a run allows three.',
+    'A reprieve sits in your pouch with the other provisions and needs no arming. It fires by itself if you would die, refills your flasks, and is used up. A retreat pulls you out of the map as an abandon (the level is spent and you keep what you picked up) and does nothing on a boss level; a revive stands you up again where you fell.',
 } as const;
 
 export type TipId = keyof typeof TIPS;

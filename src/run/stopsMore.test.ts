@@ -4,8 +4,8 @@ import type { StopId } from '../data/stops';
 import { botRun } from './bot';
 import { botStopChoice } from './botStop';
 import { makeStop } from './offers';
-import { addProvision } from './provisions';
-import { acquireReprieve, standingAffixes } from './reprieves';
+import { addProvision, pouchCount } from './provisions';
+import { standingAffixes } from './reprieves';
 import { newRun, planFor, setMap, type RunState } from './run';
 import { saleStock, shrineBlessings, stopProblem, takeStop } from './stops';
 import { waysideOf } from './wayside';
@@ -53,20 +53,18 @@ describe('the Shrine', () => {
 });
 
 describe('the Quartermaster', () => {
-  it('sells twelve wares, a Reprieve among them from level 20', () => {
+  it('sells eight wares, a reprieve among them', () => {
     const { run, slot } = withStop('quartermaster', 30);
     const stock = saleStock(run, run.offers[slot]);
-    expect(stock).toHaveLength(12);
+    expect(stock).toHaveLength(8);
     expect(saleStock(run, run.offers[slot]).map((w) => w.id + w.price)).toEqual(
       stock.map((w) => w.id + w.price),
     );
     expect(stock.filter((w) => w.kind === 'reprieve')).toHaveLength(1);
     const gear = stock.find((w) => w.kind === 'gear')!;
     expect(gear.price).toBe(priceAt(30, 30));
-    const early = withStop('quartermaster', 12);
-    expect(saleStock(early.run, early.run.offers[1]).some((w) => w.kind === 'reprieve')).toBe(
-      false,
-    );
+    const early = withStop('quartermaster', 6);
+    expect(saleStock(early.run, early.run.offers[1]).some((w) => w.kind === 'reprieve')).toBe(true);
   });
 
   it('takes the cart, pays for it, and passes the level; or does nothing when the cart is wrong', () => {
@@ -91,23 +89,25 @@ describe('the Quartermaster', () => {
     expect(run.history.at(-1)).toMatchObject({ status: 'stop', stop: 'quartermaster' });
   });
 
-  it('holds one Reprieve at a time, and no more provisions than the Pouch has room for', () => {
+  it('takes a reprieve into the pouch, and holds no more than the pouch has room for', () => {
     const { run, slot } = withStop('quartermaster', 40);
     const stock = saleStock(run, run.offers[slot]);
     const rep = stock.find((w) => w.kind === 'reprieve')!;
+    const provisions = stock.filter((w) => w.kind === 'provision');
     run.dust = 100000;
-    expect(takeStop(run, slot, { stop: 'quartermaster', buy: [rep.id] }).ok).toBe(true);
-    expect(waysideOf(run).reprieve).toBe(rep.ref);
+    // Three wares for the pouch of three is fine; four is not.
+    const four = [rep, ...provisions].slice(0, 4).map((w) => w.id);
+    expect(stopProblem(run, slot, { stop: 'quartermaster', buy: four })).toBe(
+      'Your pouch cannot hold that many',
+    );
+    expect(takeStop(run, slot, { stop: 'quartermaster', buy: four.slice(0, 3) }).ok).toBe(true);
+    expect(waysideOf(run).pouch[rep.ref!]).toBe(1);
+    expect(pouchCount(run)).toBe(3);
     run.offers[1] = makeStop(run.map, 1, 'quartermaster');
     const again = saleStock(run, run.offers[1]).find((w) => w.kind === 'reprieve')!;
     expect(stopProblem(run, 1, { stop: 'quartermaster', buy: [again.id] })).toBe(
-      'You already hold a reprieve',
+      'Your pouch cannot hold that many',
     );
-    const provisions = saleStock(run, run.offers[1]).filter((w) => w.kind === 'provision');
-    for (let i = 0; i < 5; i++) addProvision(run, 'wardOil');
-    expect(
-      stopProblem(run, 1, { stop: 'quartermaster', buy: provisions.slice(0, 2).map((w) => w.id) }),
-    ).toBe('Your pouch cannot hold that many provisions');
   });
 });
 
@@ -117,27 +117,20 @@ describe('the Ferryman', () => {
     expect(takeStop(run, slot, { stop: 'ferryman', reprieve: 'nope' }).ok).toBe(false);
     expect(takeStop(run, slot, { stop: 'ferryman', reprieve: 'lastSpark' }).ok).toBe(true);
     const w = waysideOf(run);
-    expect(w.reprieve).toBe('lastSpark');
-    expect(w.reprieves).toBe(1);
+    expect(w.pouch).toEqual({ lastSpark: 1 });
     expect(w.curses).toEqual([{ id: 'bargain', until: 25 }]);
     expect(run.map).toBe(21);
     expect(planFor(run, run.offers[0]).affixes).toContain('curse.bargain');
   });
 
-  it('swaps only when told to, and not when the run has had all it may', () => {
+  it('needs room in the pouch', () => {
     const { run, slot } = withStop('ferryman', 20);
-    acquireReprieve(run, 'ferryToken');
-    expect(stopProblem(run, slot, { stop: 'ferryman', reprieve: 'lastSpark' })).toMatch(/swap/);
-    expect(takeStop(run, slot, { stop: 'ferryman', reprieve: 'lastSpark', swap: true }).ok).toBe(
-      true,
+    while (addProvision(run, 'wardOil'));
+    expect(stopProblem(run, slot, { stop: 'ferryman', reprieve: 'lastSpark' })).toBe(
+      'Your pouch is full',
     );
-    expect(waysideOf(run).reprieve).toBe('lastSpark');
-    expect(waysideOf(run).reprieves).toBe(2);
-    waysideOf(run).reprieves = 3;
-    run.offers[1] = makeStop(run.map, 1, 'ferryman');
-    expect(stopProblem(run, 1, { stop: 'ferryman', reprieve: 'bargainCoin', swap: true })).toMatch(
-      /allows 3/,
-    );
+    expect(takeStop(run, slot, { stop: 'ferryman', reprieve: 'lastSpark' }).ok).toBe(false);
+    expect(run.map).toBe(20);
   });
 });
 

@@ -215,3 +215,10 @@ export const SCATTER_HIT_SHARE = 0.6;
  * less polished than the rest of the game. The crafting code and the bots that test it stay as they are.
  */
 export const CRAFTING_OPEN = false;
+
+/**
+ * Whether crafting currency (essences, orbs, tablets, Wayfinder's Chalk, ...) drops in play, in reward picks and in shops. Off for now
+ * (the user, 2026-10-14): Bone Dust is the only currency in the game while the Workbench is closed. The currency code, its tests and
+ * the Workbench stay as they are, for when crafting returns.
+ */
+export const CURRENCY_DROPS = false;

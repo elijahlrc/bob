@@ -337,17 +337,30 @@ function Charges({ w }: { w: World }) {
   );
 }
 
-/** The Reprieve held (docs/WAYSIDE.md 7), under the Abandon button: what it will do, or that it has just been used. */
+/** The reprieves carried (docs/WAYSIDE.md 7), in the status line: what each will do, or that it has just been used. */
 function ReprieveBadge({ w }: { w: World }) {
   const r = w.reprieve;
-  const id = r.held;
-  if (!id) return null;
-  const d = reprieveDef(id);
-  const used = r.fired !== null;
+  if (!r.held.length) return null;
+  // The first of each kind in the order of use that has fired is shown as used.
+  const left = [...r.fired];
   return (
-    <div class={'hud-reprieve' + (used ? ' used' : '')} {...infoProps(`${d.name}: ${d.text}`)}>
-      {used ? `${d.name} used` : d.name}
-    </div>
+    <>
+      {r.held.map((id, i) => {
+        const at = left.indexOf(id);
+        const used = at >= 0;
+        if (used) left.splice(at, 1);
+        const d = reprieveDef(id);
+        return (
+          <span
+            key={i}
+            class={'hud-reprieve' + (used ? ' used' : '')}
+            {...infoProps(`${d.name}: ${d.text}`)}
+          >
+            {used ? `${d.name} used` : d.name}
+          </span>
+        );
+      })}
+    </>
   );
 }
 

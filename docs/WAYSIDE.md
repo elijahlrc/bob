@@ -7,6 +7,14 @@ Status: **built 2026-10-13 (Y1 to Y7); every number is a first guess, measured o
 > 6.1, 7.4, 8, 9.1, 10, 11 Y2, 12.2, 14.2) is the plan as it was, kept for the record. What is left of it is the **Quartermaster stop**, the only place wares are
 > for sale (twelve wares at their plain price, a Reprieve among them from level 20), and Bone Dust is spent only there. Provisions now come from the Quartermaster and from reward picks;
 > a Reprieve from the Quartermaster, the Ferryman or a boss level's pick. Section 16.5 says what this does to the economy.
+>
+> **Revised on 2026-10-14 (the user's second round of feedback): section 17 wins wherever it disagrees with sections 1 to 16.** In short: the old
+> principle that nothing may make the character stronger than gear and the tree can was dropped (a shop may sell what the best drops
+> are, and a buff may beat any item for a map); the Workbench is not designed around or against at all; the Awlsmith charges Bone Dust, and
+> every other currency no longer drops; Shrine blessings are about 75% stronger; the pouch holds three provisions, any or all armed, and
+> reprieves are provisions of a third kind; the specialist provisions are gone; every reprieve refills the flasks; and the systems start
+> at level 5 and are a regular part of play (stops about one level in five from level 6, provisions found on cleared maps, cards in
+> every reward pick).
 
 This plan extends [MAPS.md](MAPS.md) (offers, Respite, Abandon, carry-over) and [DESIGN.md](DESIGN.md). It reopens two non-goals
 of MAPS.md section 1 ("a town or shop", "map items as a consumable economy"); section 13 lists the edits that go into DESIGN.md
@@ -29,8 +37,9 @@ what the user decided and what is open for the deep dive. Section 15 is the revi
 
 ## 0. Premises (the user, 2026-10-13)
 
-1. **The Workbench is closed and nothing here may depend on it.** It will come back "someday". Every system below must work with
-   `CRAFTING_OPEN = false`, and must still make sense beside the Workbench when it reopens (sections 4.4 and 5.1 say how).
+1. **The Workbench is closed. Design as though it did not exist.** It will come back "someday"; nothing here is built around it, to
+   avoid it, or to stay clear of what it sells. When it returns, a stop and the Workbench may offer something alike: both are
+   limited in how they are reached, so some overlap is fine.
 2. **A reload is a free undo, and that is fine.** The camp saves on every change, a reload mid-map returns to the camp save, and
    consumables spent in that map come back with it. We do not add a save at map start, and we do not guard against it. A player who
    reloads to cheat is cheating at a single-player game. (This closes the largest blocker the review raised; section 14.1.)
@@ -46,22 +55,22 @@ what the user decided and what is open for the deep dive. Section 15 is the revi
 Today the gap between maps is a pause with two kinds of decisions (what to wear, which of three maps to take). The **Wayside**
 adds a second, quieter game in that gap, made of four parts that share one economy and one rule:
 
-| Part                 | What it is                                                                                                             | What it costs                            |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| ~~The Market~~ (cut) | A camp tab with a small, fixed stock that restocks each level, priced in **Bone Dust** (what salvaging already pays)   | Bone Dust                                |
-| **Stops**            | A new kind of offer, next to map and Respite: a non-combat place that gives something a map cannot                     | **A level** (the counter still advances) |
-| **Provisions**       | Items armed at camp that burn when the next map starts and help for that map only; some are bets, some are specialists | Bone Dust, or found as rewards           |
-| **Reprieves**        | One held item that, if the character would die, pulls it out of the map or revives it instead                          | Bone Dust (a lot), or a bargain          |
+| Part                 | What it is                                                                                                                                               | What it costs                                                 |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| ~~The Market~~ (cut) | A camp tab with a small, fixed stock that restocks each level, priced in **Bone Dust** (what salvaging already pays)                                     | Bone Dust                                                     |
+| **Stops**            | A new kind of offer, next to map and Respite: a non-combat place that gives something a map cannot                                                       | **A level** (the counter still advances)                      |
+| **Provisions**       | Three items carried in a pouch: staples and bets are armed at camp, burn when the next map starts and help for that map only; reprieves ride along ready | Found on cleared maps, picked, or bought at the Quartermaster |
+| **Reprieves**        | A provision of a third kind: if the character would die, it pulls it out of the map or revives it, and refills the flasks                                | Picked, bought, or given for a bargain                        |
 
 The rule that holds them together: **the game's price is a level.** A stop spends a level, a retreat spends a level, a bet
 spends safety. Bone Dust is the only money. Nothing here adds a clock, a second currency or a mid-map input.
 
 ```
-Camp ── arm provisions (up to 2) ── check the Market ── pick 1 of 3 offers ─▶ Map      (provisions burn at the start;
+Camp ── arm provisions (any of the three) ── pick 1 of 3 offers ─▶ Map      (provisions burn at the start;
   │                                                                  │                a Reprieve may trigger)
   │                                                                  ├─────▶ Respite  (exists: restores everything)
   │                                                                  └─────▶ Stop     (new: costs the level, gives a service)
-  └─ Pouch (provisions) · Reprieve slot (one) · Bone Dust
+  └─ Pouch (three provisions, reprieves among them) · Bone Dust
 ```
 
 ---
@@ -96,13 +105,13 @@ Workbench rather than around it.
    Reprieve are chosen against those figures, not in the dark.
 2. **The price is a level.** A stop, a retreat and a skipped boss reward cost the thing the game already counts. Money is
    secondary and only one kind.
-3. **Nothing makes the character stronger than the tree and gear can.** The Market sells decent things, not the best thing for
-   your build; stops are rare; provisions last one map; a Reprieve is one use.
+3. **Power is allowed.** A provision or a blessing may make the character stronger for a map, or for several, than any item could;
+   a shop may sell an item as good as the best that could drop. What limits a power is its price (a level, Bone Dust, a cost
+   in danger) and how often it comes, not a ceiling set below what the game already hands out.
 4. **Nothing new in a map.** Provisions are mods and population changes set before the map; a Reprieve triggers by policy, the
    same seam as flasks and Abandon.
 5. **Measurable.** Each part has a bot strategy that tries to abuse it and a bound it must stay under (section 12).
-6. **Does not fight the Workbench.** Where the Wayside and the Workbench would sell the same thing, the Wayside charges more or
-   gives less (section 4.4).
+6. **No design around the Workbench** (premise 1). Overlap with it is not a problem.
 
 **Non-goals.** A town screen with walking around; trade between players; a new currency; selling items one by one (salvage already
 does it); retrying a map; rewinding time (section 7.5); mid-map decisions; anything that makes the 100-map run longer or shorter.
@@ -139,10 +148,8 @@ Six slots, fixed by role so that the shop reads at a glance:
 
 Design notes:
 
-- **Decent, not best.** Gear is an ordinary generated rare at the level of the map just played, not tuned to the build. It is a
-  fair swap for a player who is short of a slot, never a build-defining find. Hidden-affix gambling is deliberately absent:
-  `compareSlots` and the Items tab need the whole item, and a gamble is a different feature.
-- **A currency bundle** gives idle currency a second life: Augers go to the Awlsmith (section 5.1) and Chalk to the offer card.
+- **~~Decent, not best~~ (dropped, 2026-10-14).** The shop should be able to sell something as good as the best that could drop:
+  the Quartermaster's gear is the best of four rares rolled two item levels up (section 17).
 - **The Reprieve ware** appears at most once per five levels and never twice in a row, and costs about 30 times a staple
   (section 7.4).
 - **Phones.** One column of cards with the price in the corner; no table.
@@ -155,11 +162,10 @@ protect against (this is why the pitch's sale cap and Reroll Man are gone). The 
 levels buys a Reprieve early. That is the intended use, and the price (section 7.4) is set so a saver pays for it in levels of
 other things not bought.
 
-### 4.4 Beside the Workbench
+### 4.4 ~~Beside the Workbench~~ (dropped, 2026-10-14)
 
-When crafting reopens the Bench's Bone Dust recipes come back with it, priced as before (affix 15 to 40, sockets 40 / 120 / 300).
-The Market never sells what the Bench sells (an affix or a socket); it sells whole things. The Awlsmith stop (5.1) is the
-overlap, and is built to stay worth it: the first socket is free and a stop is not a currency drain.
+The plan once priced the shop and the Awlsmith so as not to compete with the Workbench. The user: the Workbench is closed and nothing is
+designed around it; both are limited in how they are reached, so overlap is fine.
 
 ---
 
@@ -182,12 +188,12 @@ type MapOffer = { /* as today */ kind: OfferKind; stop?: StopId };
 - **A stop is risk-free.** The review's point: a skipped level is a level without the chance of dying in it, and the bot dies
   around maps 5 to 15. A bot that always takes stops could beat the anchor for a weak build. The `stopper` strategy (section 12)
   holds this to the same "no more than 10 points above the anchor" rule MAPS uses for the other exploits.
-- **Frequency.** At most one stop per set. Never on levels 1 to 4, on a tenth level (the boss gate), or on a level where a reward
+- **Frequency.** At most one stop per set. Never on levels 1 to 5, on a tenth level (the boss gate), or on a level where a reward
   pick is due (every fifth: a stop would delete the pick, and the pick is the pay-off the game keeps promising). Never in the slot
   a forced Respite takes (life under 0.4). Never the anchor: the anchor stays a map at the level's own number, so auto-continue,
   which takes the first offer, never picks one.
-- **A schedule, not a roll.** The run is cut into windows of eight levels starting at level 9 (9 to 16, 17 to 24, and so on). For
-  each window the seed picks one eligible level for a stop and one kind. That gives about eleven stops in a run, predictable enough
+- **A schedule, not a roll.** The run is cut into windows of five levels starting at level 6 (6 to 10, 11 to 15, and so on; the fifth level of each is a pick or a gate, so the stop falls on one of the other four). For
+  each window the seed picks one eligible level for a stop and one kind. That gives about eighteen stops in a run, the first before level 10, predictable enough
   to plan around ("a stop is coming before 24"), with no pity counter in the save. Kinds are drawn by weight and the same kind
   does not repeat in consecutive windows.
 - The card says what the stop gives, what it costs (the level, and what that level would have paid, from the same `offerRewards`
@@ -195,17 +201,15 @@ type MapOffer = { /* as today */ kind: OfferKind; stop?: StopId };
 
 ### 5.2 The stops
 
-| Stop                  | What the player does                                                                                                                                                                                               | Why take it                                                                                    |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
-| **The Awlsmith**      | Pick one item (worn or carried): **its next socket is free**, up to its ceiling. Further sockets in the same visit cost Socket Augers at the usual rates (the 4th to 6th cost 1, 2, 3).                            | Socket count, and the only use Augers have while crafting is closed                            |
-| **The Gem Hoard**     | The stop names four tags (fire, projectile, aura, minion...). Pick one; it offers **8 gems of that tag** at the level their drops would have, and you take **3**.                                                  | A targeted pile of gems, without waiting for drops. Gems are plentiful; a specific kind is not |
-| **The Shrine**        | Pick one of three **blessings** (for example +8% damage, +12% maximum life, +15% all resistances, +10% movement speed). It lasts until the next stop and **replaces** the previous blessing.                       | A modest standing edge; the choice matters because only one is active                          |
-| **The Quartermaster** | A big Market: 12 wares at 25% off, including at least one Reprieve from map 20 and at least two provisions. Anything you do not buy is gone.                                                                       | A better shop for a level, when you are rich in Dust                                           |
-| **The Ferryman**      | Offers a **Reprieve for free**, but with a **bargain**: a curse for the next five levels (for example −15% maximum life, or monsters +10% damage). You may refuse. If you already hold a Reprieve you may swap it. | A second path to insurance that costs risk instead of Dust                                     |
+| Stop                  | What the player does                                                                                                                                                                          | Why take it                                                                                    |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **The Awlsmith**      | Pick one item (worn or carried): **its next socket is free**, up to its ceiling. Further sockets in the same visit cost **Bone Dust** (the 4th 40, the 5th 120, the 6th 300).                 | Socket count                                                                                   |
+| **The Gem Hoard**     | The stop names four tags (fire, projectile, aura, minion...). Pick one; it offers **8 gems of that tag** at the level their drops would have, and you take **3**.                             | A targeted pile of gems, without waiting for drops. Gems are plentiful; a specific kind is not |
+| **The Shrine**        | Pick one of three **blessings** (for example +22% maximum life, +15% damage, +26% all resistances, +18% movement speed). It lasts until the next stop and **replaces** the previous blessing. | A real standing edge for about five levels; only one is active                                 |
+| **The Quartermaster** | Eight wares for Bone Dust: two rares (the best of four, rolled two levels up), a gem, a utility flask, three provisions and a reprieve. Anything you do not buy is gone.                      | A shop, when you are rich in Dust                                                              |
+| **The Ferryman**      | Offers a **reprieve for free** (your pouch needs room), but with a **bargain**: a curse for the next five levels (−15% maximum life). You may refuse.                                         | A second path to insurance that costs risk instead of Dust                                     |
 
-The first three come from the user's list (sockets, "lots of gems") and the rest from the second-chance and shop asks. The
-Awlsmith's rules are the one place where the Workbench could eventually make a stop redundant; section 4.4 and the free first
-socket are the answer, and section 14.3 keeps it when the Workbench returns.
+The first three come from the user's list (sockets, "lots of gems") and the rest from the second-chance and shop asks.
 
 ### 5.3 Rejected or cut stops (and why)
 
@@ -222,55 +226,55 @@ socket are the answer, and section 14.3 keeps it when the Workbench returns.
 
 ## 6. Provisions
 
-A provision is an item that is **armed** at camp and **burns when the next map starts**, helping for that map only.
+A provision is an item carried in the **pouch**. A **staple** or a **bet** is **armed** at camp and **burns when the next map starts**,
+helping for that map only. A **reprieve** (section 7) is the third kind: it needs no arming and is used up only when it saves the
+character.
 
 ### 6.1 Rules
 
-- **Pouch.** Holds up to 6 provisions. They are not inventory items: they stack by kind in `run.wayside.pouch`.
-- **Armed.** Up to **2** provisions may be armed at once (`PROVISIONS_PER_MAP`). Arming is explicit and shown on the camp screen
-  before the offers; the offers' threat verdicts include the armed set (section 9.1).
+- **Pouch.** Holds **three** provisions in all, of any kind (a reprieve counts). They are not inventory items: they stack by kind in
+  `run.wayside.pouch`.
+- **Armed.** Any or all of the three may be armed (`PROVISIONS_PER_MAP` is the pouch's size). Arming is explicit and shown on the camp
+  screen before the offers; the offers' threat verdicts include the armed set (section 9.1). A reprieve is never armed: it is always ready.
 - **Burn.** A provision burns when the map starts and is spent whether the map is cleared, abandoned or lost. A Respite or a stop
   does not burn them.
 - **Reload.** A reload during a map restores the camp save, so the provision is back (premise 2). Accepted.
-- **Sources.** The Market and Quartermaster; reward picks (a pick may be a provision); Ferryman and Shrine do not give them. They
-  are not a random drop table; keeping the supply small is the guard against a shopping chore.
+- **Sources** (they are meant to be a regular part of play, not a rarity; section 17):
+  - **A cleared map may leave one in the pouch**: from level 3, with a 40% chance, and the first time for certain (`forage`). Camp says
+    so ("The last map left you Whetted Powder"). Nothing when the pouch is full.
+  - **Reward picks**: every fifth map's pick may hold a provision card (40%) or a reprieve card (30%; 60% on a boss level's pick).
+  - **The Quartermaster** sells three provisions and a reprieve.
+  - The Ferryman gives a reprieve.
 
 ### 6.2 What a provision may do (and may not)
 
 The review's challenge: most buffs are utility flasks or Chalk under another name, and the preview that scores them would pick the
-best one for you. The answer is to make provisions do things flasks and Chalk cannot, and to make most of them _bets_ whose value
-depends on the offers you can see.
+best one for you. The answer is to make provisions do things flasks and Chalk cannot, and to make some of them _bets_ whose value
+depends on the offers you can see. A provision may well make the character stronger for a map than any item it could find: that is
+what it is for (principle 3).
 
-- **Staples** are small, flat buffs. They are the floor: cheap, always right, never interesting. At most one third of the stock.
+- **Staples** are small, flat buffs. They are the floor: cheap, always right, never interesting.
 - **Bets** are strong buffs with a cost. They are a decision only when the preview shows the trade honestly.
-- **Specialists** pay only against a specific map type or affix, so the decision is "does one of my three offers match".
 
-| Kind       | Provision      | Effect for one map                                                 | Catch                                   | Base price (RE) |
-| ---------- | -------------- | ------------------------------------------------------------------ | --------------------------------------- | --------------- |
-| Staple     | Whetted Powder | +12% damage                                                        | none                                    | 1               |
-| Staple     | Ward-oil       | +12% to all resistances                                            | none                                    | 1               |
-| Staple     | Bloodsalt      | 3% of damage dealt is leeched as life                              | none                                    | 1               |
-| Bet        | Glass Draught  | +60% damage                                                        | +40% damage taken                       | 2               |
-| Bet        | Greedy Lantern | +30% item quantity                                                 | −15% maximum life                       | 2               |
-| Bet        | Rushing Tonic  | +15% movement speed, +10% attack and cast speed                    | monsters move 10% faster                | 2               |
-| Bet        | Hunter's Bell  | Every pack gains a champion; +25% experience and +20% quantity     | harder map (the threat model prices it) | 2               |
-| Specialist | Slow Fuse      | A Crescendo map grows stronger half as fast                        | only on a Crescendo map                 | 1.5             |
-| Specialist | Bonebreaker    | +30% area of effect and a Throng map's monsters have 20% less life | only on a Throng map                    | 1.5             |
-| Specialist | Counterweight  | Cancels one affix of the map, your choice                          | only on a map with an affix             | 2               |
+| Kind   | Provision      | Effect for one map                                            | Catch                                   |
+| ------ | -------------- | ------------------------------------------------------------- | --------------------------------------- |
+| Staple | Whetted Powder | +12% damage                                                   | none                                    |
+| Staple | Ward-oil       | +12% to all resistances                                       | none                                    |
+| Staple | Bloodsalt      | 2% of damage dealt is leeched as life                         | none                                    |
+| Bet    | Glass Draught  | +60% damage                                                   | +40% damage taken                       |
+| Bet    | Greedy Lantern | +30% item quantity                                            | −15% maximum life                       |
+| Bet    | Rushing Tonic  | +15% movement speed, +10% attack and cast speed               | monsters move 10% faster                |
+| Bet    | Hunter's Bell  | Three more rare packs; +25% experience and +20% item quantity | harder map (the threat model prices it) |
 
-Notes:
-
-- **Counterweight overlaps Chalk's "remove one affix"** (which costs 2 Chalk). It stays because it is bought with Dust, while Chalk
-  is a drop, so one is a plan and the other a windfall. Section 14.3 keeps it.
-- **Staples set the baseline, not the ceiling.** If playtests show players armed with three staples out-scale a bet, the staples
-  shrink; the bot comparison in section 12 measures it.
-- **Hunter's Bell and Counterweight touch the map plan**, not the player's mods: they need a `plan.provisions` hook in
-  `planFor`. Slow Fuse and Bonebreaker touch the map type's rules. Section 10 lists the plumbing.
+~~Specialists~~ (Slow Fuse, Bonebreaker, Counterweight) were **dropped on 2026-10-14**: they paid only against one map type or an affix, so
+they were mostly dead weight in the pouch.
 
 ### 6.3 What is deliberately not a provision
 
-Anything that restores life, mana or flasks (a flask's job, and the attrition system's), anything that rerolls the offers, and
-anything that lasts more than one map (the Shrine's blessing is a stop, section 5).
+Anything that rerolls the offers, and anything that lasts more than one map (the Shrine's blessing is a stop, section 5). Restoring life,
+mana and flasks is a reprieve's job (it refills the flasks).
+
+---
 
 ---
 
@@ -278,14 +282,15 @@ anything that lasts more than one map (the Shrine's blessing is a stop, section 
 
 Death ends the run. A Reprieve is the one thing that can change that, so it is the strongest and the most guarded item in this plan.
 
-### 7.1 The slot and the rules
+### 7.1 Where they live and the rules
 
-- **One Reprieve slot**, separate from the Pouch. A character holds at most one.
-- It triggers by **policy**, never by input: the same seam as `FlaskPolicy` and `AbandonPolicy` (a `ReprievePolicy` the bot and a
-  future manual mode share).
-- It is used up when it fires. The HUD shows the held item as an icon; the death screen, the map record and the report say "Saved
-  by <name>" or "Pulled out by <name>".
-- **A run may acquire at most three** (a cap in `run.wayside`), so a rich saver cannot buy a new one after every near-death.
+- **A reprieve is a provision of a third kind** (2026-10-14): it sits in the pouch with the others (three of anything at most), needs no
+  arming, and is always ready. There is no slot of its own, no run cap, and the character may carry up to three.
+- It triggers by **policy**, never by input (a `ReprievePolicy` was planned; the only trigger is "damage would kill", so there is none).
+  Several carried are used in order: a revive before a retreat (a retreat is passed over on a boss level for a revive carried with it).
+- Every reprieve **refills all the character's flasks** when it fires, so that it has a chance at what follows.
+- It is used up when it fires. The HUD shows the reprieves carried as chips in the status line; the camp says "Last Spark saved you" or
+  "Ferry Token pulled you out".
 
 ### 7.2 Two families
 
@@ -299,11 +304,11 @@ pulse that pushes nearby monsters away. It is the larger swing and the more dang
 character goes back into the fight that just killed it. It ships anyway: the first strength is a guess (35% and 50% life), and the
 measurement in Y0 (7.6) re-sizes it. A wrong first number is a one-line change.
 
-| Item             | Family  | Effect                                                                                           | Cost / catch                                                                | Base price (RE) |
-| ---------------- | ------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- | --------------- |
-| **Ferry Token**  | Retreat | On lethal damage, leave the map as an abandon; life set to 25%.                                  | The level's clear rewards (7.3).                                            | 25              |
-| **Last Spark**   | Revive  | On lethal damage: revive at 35% life, 3 s of invulnerability, a pulse that pushes monsters back. | One use; the pulse can wake rooms next to you.                              | 45              |
-| **Bargain Coin** | Revive  | Revive at 50% life.                                                                              | A curse for the next five levels (as the Ferryman's); free at the Ferryman. | 30 (or free)    |
+| Item             | Family  | Effect                                                                                                            | Cost / catch                                          | Base price (RE) |
+| ---------------- | ------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | --------------- |
+| **Ferry Token**  | Retreat | On lethal damage, leave the map as an abandon; life set to 25%; flasks refilled.                                  | The level's clear rewards (7.3).                      | 25              |
+| **Last Spark**   | Revive  | On lethal damage: revive at 35% life, flasks refilled, 3 s of invulnerability, a pulse that pushes monsters back. | One use; the pulse can wake rooms next to you.        | 45              |
+| **Bargain Coin** | Revive  | Revive at 50% life, flasks refilled, 1.5 s of invulnerability.                                                    | A curse for the next five levels (as the Ferryman's). | 30              |
 
 _(Placeholder names. Cut after the review: the Recall Cord, which shortened the 5 s escape timer that makes Abandon a decision, and the Scorched Feather, a worse Last Spark with extra rules.)_
 
@@ -320,15 +325,10 @@ MAPS 5.2 intact:
 The cost is that a Retreat cannot save a character from the deaths that happen at bosses; those are the Revive family's job, which
 is the reason to ship both.
 
-### 7.4 Where they come from, and what they cost
+### 7.4 Where they come from
 
-Never a random drop. Four routes, so a run sees one or two and rarely three:
-
-1. **The Market's Wildcard slot** from map 20, at most once per five levels (section 4.2). The price is about 6 levels of full
-   salvage _(estimate, Y0)_, so it is a goal you save for and not an impulse.
-2. **The Quartermaster stop**, guaranteed from map 20.
-3. **The Ferryman stop**, free but with a curse.
-4. **A boss-level reward pick** (every tenth map): the pick of three may include a Reprieve when the slot is empty.
+A regular part of play, from level 5 (section 17): about one reward pick in three holds a reprieve card (more often on a boss
+level's pick); the Quartermaster sells one every time it is met; the Ferryman gives one free. The pouch of three is the limit.
 
 ### 7.5 Cut: Retry, Hourglass and Checkpoint Lantern
 
@@ -354,12 +354,11 @@ routine.
 
 ## 8. How the pieces feed each other
 
-- Salvage → Bone Dust → the Market. Cleaning up the bag pays for provisions, a flask or, after saving, a Reprieve.
+- Salvage → Bone Dust → the Awlsmith's further sockets and the Quartermaster's wares. Cleaning up the bag pays for them.
 - A stop trades a level for a service, so a rich player takes a Gem Hoard over a hard map and a poor one a Ferryman's bargain.
 - A bet provision is a wager against the offers: the preview shows the trade, the map is chosen, the provision burns.
 - A Reprieve changes how deep the player dares to push (+2 offsets, bets, Crescendo) because it prices a death in a level.
-- Chalk, Augers and idle currency find a use again at the card and the Awlsmith.
-- The Workbench, when it returns, adds depth to the same Dust and does not replace any of this (section 4.4).
+- A cleared map leaves a provision; arming it is the choice before the offers; a reprieve is the cushion that lets the player take the harder one.
 
 ---
 
@@ -370,11 +369,11 @@ routine.
 - **The offer card** shows, for a map, the existing threat and pay figures _with the armed provisions applied_, and a second line
   "without" when something is armed. A stop's card shows what it gives and the level it costs ("skips this level's about 7 items and
   1 character level").
-- **The camp screen** gains a strip above the offers: the armed provisions (2 slots), the Reprieve slot and Bone Dust. On a phone it
+- **The camp screen** gains a strip above the offers: the pouch of three (what is armed, what is ready) and any curse carried. On a phone it
   is one row that wraps.
 - **Arm helper.** A button "Arm the best for this map" per offer, which uses `scoreTheme`. It is only a convenience; the player can
   arm by hand.
-- **First use teaches.** The first stop, the first Market visit and the first Reprieve each show a short explanation once
+- **First use teaches.** The first stop, the first provision and the first reprieve each show a short explanation once
   (a flag in the save).
 
 ### 9.2 Auto-continue
@@ -385,9 +384,9 @@ slot is free (a soft pause, once); a bought Reprieve is unseen. These are reason
 
 ### 9.3 The bot
 
-`chooseOffer` gains a stop valuation (a table, measured, not hand-tuned in the bot), the bot salvages with `botTidy` as now, buys
-by a fixed priority (Reprieve if Dust allows, then staples, then bets), arms staples, and uses retreat items by policy. Bot behaviour
-is the spine of section 12: every part has a strategy that abuses it.
+`chooseOffer` gains a stop valuation (a table, measured, not hand-tuned in the bot), the bot salvages with `botTidy` as now, arms the
+staples it carries, and takes the stops it can use (the Awlsmith, the Ferryman, a Quartermaster with a reprieve in it). It never shops at camp
+(there is nothing to shop at). Bot behaviour is the spine of section 12: every part has a strategy that abuses it.
 
 ---
 
@@ -398,7 +397,7 @@ is the spine of section 12: every part has a strategy that abuses it.
 | `run/run.ts`                                                                                        | `RunState.wayside`: `market`, `pouch`, `armed`, `reprieve`, `blessing`, `curses[]` (id, until), `acquired`, `seen` flags. `SAVE_VERSION` 18 → 19 with a migration (`saveMigrate.test.ts` style).                                                        |
 | `run/offers.ts`                                                                                     | `OfferKind` gains `'stop'`; `MapOffer.stop`; the window schedule (5.1); stops in `makeOffer`/`rollOffers` that never take the anchor or a forced Respite slot.                                                                                          |
 | `run/stops.ts` (new)                                                                                | The five stops as operations on the run (`doAwlsmith`, `doGemHoard`, ...) with their rolls from `Rng(seed).fork('stop' + map)`; `finishStop` advances the counter and writes the record.                                                                |
-| `run/market.ts` (new)                                                                               | Stock rolling, prices (`base × (1 + level/50)`), `buy(run, slot)`, the Quartermaster variant.                                                                                                                                                           |
+| `run/sale.ts` (new; first `market.ts`)                                                              | The Quartermaster's stock, prices (`base × (1 + level/50)`), `grantWare`; the Market itself was cut.                                                                                                                                                    |
 | `data/provisions.ts`                                                                                | The provision table (mods, plan hooks, price, kind). Mods use ordinary `Mod` values with a new `ModSourceKind` (`src/mods/types.ts`) so the sheet can name them.                                                                                        |
 | `calc/character.ts`, `sim/world.ts`, `run/run.ts` `worldOptsFor`, `run/threat.ts`, `run/preview.ts` | Carry armed provisions as `extraMods` into the world, the sheet and the threat preview; bot `buildKey` includes the armed set or it returns stale scores.                                                                                               |
 | `gen/mapPlan.ts` `planFor`                                                                          | `plan.provisions` hook for the population and affix provisions (Hunter's Bell, Counterweight); `data/mapTypes.ts` rules for Slow Fuse and Bonebreaker.                                                                                                  |
@@ -445,7 +444,7 @@ death and lethal hits absorbed, because win rate (2 in 96) is too noisy to measu
    three levels of income on average (so the sink works and nothing is hoarded); no single ware is bought in more than 60% of
    visits.
 3. **Provisions.** Armed staples lift maps reached by a small bounded amount; a bet that is unbounded in either direction
-   (always right or always wrong) is re-priced; a specialist pays only on its own map type or affix.
+   (always right or always wrong) is re-priced.
 4. **Reprieves.** For each item: the paired-seed effect on maps reached and on the distribution of death maps, the number of
    lethal hits it absorbs per run, and the price in levels it implies. If a Revive lifts maps reached by more than the price it
    costs in Dust and levels, the effect or the price changes. The Retreat family is checked against the abandon rules (7.2, 7.3).
@@ -480,12 +479,12 @@ death and lethal hits absorbed, because win rate (2 in 96) is too noisy to measu
 
 1. **Boss levels and map 100** (7.3): a Retreat item does nothing on any tenth map; a Revive item works everywhere. No MAPS
    decision is reversed.
-2. **Bone Dust is the only money**, and the Market sells whole things only, never an affix or a socket.
+2. **Bone Dust is the only money** (and, from 2026-10-14, the only currency that drops at all).
 3. **A stop costs the level and heals nothing**, unlike a Respite; never on a fifth or tenth level.
 4. **Provisions burn when the map starts**, abandoned or not.
-5. **At most three Reprieves per run, one held.**
+5. ~~At most three reprieves per run, one held.~~ Reprieves are provisions of a third kind: up to three carried (section 17).
 6. **Retry and rewind are out** (7.5).
-7. **UI shape:** a Wares tab, and a strip for armed provisions and the Reprieve in the offers panel (not a bottom bar); stop
+7. **UI shape:** a strip for the pouch in the offers panel (the Wares tab was cut) (not a bottom bar); stop
    screens replace the camp view for one visit. Checked on the real-device pass.
 
 ### 14.3 The open questions, answered
@@ -493,12 +492,11 @@ death and lethal hits absorbed, because win rate (2 in 96) is too noisy to measu
 1. **Recall Cord:** cut. It shortens the escape timer that makes Abandon a decision. The Ferry Token stays.
 2. **Revive:** ship it, with Last Spark (35% life) and Bargain Coin (50% life, with a curse). The strength is a guess that Y0
    (7.6) corrects; Scorched Feather is cut.
-3. **The Awlsmith when the Workbench returns:** keep it. A free first socket is a different thing from a paid recipe, and a stop
-   is already costly (a level).
-4. **Counterweight versus Chalk's remove:** keep Counterweight, priced above a Chalk. One is bought, the other found.
+3. ~~The Awlsmith when the Workbench returns~~ (not a question: nothing is designed around the Workbench).
+4. ~~Counterweight versus Chalk's remove~~ (Counterweight dropped with the other specialists, 2026-10-14).
 5. **Blessings:** one at a time, and the next stop's replaces it. Stacking them is power creep.
 6. **The Ferryman's curse:** −15% maximum life for five levels as the first guess; Y0 sets it.
-7. **Market gear:** no lean toward the build in the first pass; a "weakest slot" lean can come later.
+7. ~~Market gear~~ (the Quartermaster's gear is the best of four, rolled two levels up).
 8. **Naming:** everything is placeholder, and the pass with the IP scan is in Y7. Taken already: Tithe, Cinderfeather, Martyr's,
    Hourglass, Locket and Hearthstone.
 9. **Mobile layout:** the offers panel (see 14.2.7), tested on the real-device pass.
@@ -620,3 +618,33 @@ What this changes, plainly:
   about eight, it costs the level, and it is the player's choice to enter. Dropping gear from its stock is one line in `sale.ts`
   if that is still too much.
 - The measurements in 16.2 were taken with the Market in place and were not repeated.
+
+---
+
+## 17. The second round of feedback (2026-10-14): what changed
+
+The user played the first ten levels, saw none of these systems, and sent nine points. Where this section disagrees with sections 1 to 16,
+it wins; the sections above are corrected where it was cheap and otherwise kept as the plan as it was.
+
+| #   | The user said                                                                                                                                                                                                                          | What was done                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | "Nothing makes the character stronger than the tree and gear can" is not a good principle: temporary power beyond an item is fine, and a shop should be able to sell something as good as the best drops. "Decent, not best" is silly. | Principle 3 is rewritten (3, above). The Quartermaster's gear is the best of four rares rolled at the item level of an offer two levels up (`GEAR_CANDIDATES`, `GEAR_ILVL_BONUS`; "best" by the sum of the affix tiers).                                                                                                                                                                                                                                                                                                |
+| 2   | "Does not fight the Workbench" is flawed: both have limited access, so overlap is fine.                                                                                                                                                | Principle 6 and section 4.4 are dropped.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| 3   | The user said the Workbench is closed and not to design around it; the design seemed to design around it.                                                                                                                              | Premise 1 is reworded: design as though it did not exist, and overlap is fine.                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| 4   | A special currency (Socket Augers) just for the Awlsmith makes no sense. Drop all currencies but Bone Dust for now, and make sure they do not drop.                                                                                    | The Awlsmith's further sockets cost Bone Dust (4th 40, 5th 120, 6th 300; the first is free). `CURRENCY_DROPS = false` (`data/constants.ts`): no currency drops from monsters, from a Quarry champion or in reward picks, and the Quartermaster sells none. The currency code, the Workbench and their tests are untouched, for when crafting returns. Currency already in a save stays there.                                                                                                                           |
+| 5   | Shrine blessings should be 50 to 100% stronger: below one passive node there is no reason to visit.                                                                                                                                    | About 75% stronger: +22% maximum life, +15% damage, +26% all resistances, +18% movement speed, +36% armour and evasion, +18% item quantity, +15% attack and cast speed.                                                                                                                                                                                                                                                                                                                                                 |
+| 6   | The pouch of six is generous: three, any or all armed. Reprieves should be a special type of provision, so the player may hold up to three.                                                                                            | `POUCH_LIMIT` and `PROVISIONS_PER_MAP` are 3. A reprieve is a provision of kind `reprieve`: in the pouch, never armed, always ready, used up when it fires. The slot, the run cap and the swap at the Ferryman are gone; a save made with a reprieve in its old slot carries it in the pouch. Several carried are used in order (a revive before a retreat).                                                                                                                                                            |
+| 7   | The specialist provisions are too specialist: drop them.                                                                                                                                                                               | Slow Fuse, Bonebreaker and Counterweight are gone, with their hooks (the Crescendo pace, the cancelled affix on the card).                                                                                                                                                                                                                                                                                                                                                                                              |
+| 8   | Ferry Token, Last Spark and Bargain Coin should all refill the potions.                                                                                                                                                                | Every reprieve refills all flasks when it fires (a retreat arrives in camp with full flasks).                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| 9   | No sign of any of these systems in the first ten levels: they should start around level 5 and be a standard part of the game.                                                                                                          | Stops come from level 6, one in every window of five levels (about eighteen a run; the first before level 10; never on a fifth or tenth level, where a pick or a gate is due). A cleared map may leave a provision in the pouch from level 3 (40%; the first time for certain). Every reward pick may hold a provision card (40%) or a reprieve card (30%; 60% on a boss level's pick), from the pick at level 5. Reprieves are for sale and given from level 5 or 6, and provisions turn up from level 1 to 5 by kind. |
+
+### 17.1 Consequences worth knowing
+
+- **Stops are common now, and each costs a level.** At about one level in five, a player who takes every one gives up a fifth of the run's
+  XP and loot. They are offers, never forced, and the `stopper` bot comparison of 16.2 was made at one in eight; it has not been repeated.
+- **The first stop can be a Ferryman with a full pouch.** The schedule does not look at the pouch, so a Ferryman met with three provisions
+  carried cannot give its reprieve (the screen says why). Arming and using provisions first makes room.
+- **Dust has two sinks:** the Awlsmith's further sockets and the Quartermaster.
+- **Provisions are common enough that the pouch will usually be full.** With three held, a find is lost (nothing is dropped, the pouch is
+  simply full), so the player is nudged to arm and spend them. Not measured.
+- **The measurements of section 16 are stale** (they were taken with the old rates, the Market, a single reprieve slot and the specialists).

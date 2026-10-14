@@ -18,6 +18,7 @@ import {
   type Item,
   type Rarity,
 } from '../data/types';
+import { awlsmithPrice } from '../data/stops';
 import { UNIQUE_FLASKS } from '../data/uniqueFlasks';
 import { UNIQUES, uniqueDef } from '../data/uniques';
 import {
@@ -293,8 +294,15 @@ export function useAuger(run: RunState, itemUid: number, count: number): CraftRe
   return OK;
 }
 
+/** The Bone Dust the Awlsmith charges to take an item from `from` sockets to `to` (the first three sockets of an item cost nothing). */
+export function awlsmithDust(from: number, to: number): number {
+  let n = 0;
+  for (let k = from + 1; k <= to; k++) n += awlsmithPrice(k);
+  return n;
+}
+
 /**
- * The Awlsmith stop (docs/WAYSIDE.md 5.2): the item's next socket is free, and `extra` more are bored at the Auger rates.
+ * The Awlsmith stop (docs/WAYSIDE.md 5.2): the item's next socket is free, and `extra` more are bored for Bone Dust.
  * Works with crafting closed: it is a stop's service, not the Workbench.
  */
 export function awlsmithSockets(run: RunState, itemUid: number, extra = 0): CraftResult {
@@ -306,10 +314,10 @@ export function awlsmithSockets(run: RunState, itemUid: number, extra = 0): Craf
   const have = loc.item.sockets.length;
   const to = have + 1 + Math.max(0, Math.floor(extra));
   if (to > socketCeiling(loc.item)) return fail('This item cannot have that many sockets');
-  // The first new socket is free; the rest cost what they would have.
-  const cost = socketCost(have + 1, to);
-  if (owned(run, 'auger') < cost) return fail(`That needs ${cost} Socket Augers`);
-  if (cost > 0) pay(run, 'auger', cost);
+  // The first new socket is free; the rest cost Bone Dust.
+  const cost = awlsmithDust(have + 1, to);
+  if (run.dust < cost) return fail(`That needs ${cost} Bone Dust`);
+  run.dust -= cost;
   run.craftSeq++;
   replace(run, loc, resocket(run, loc, to));
   return OK;

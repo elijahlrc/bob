@@ -38,8 +38,18 @@ describe('the Wayside state (docs/WAYSIDE.md)', () => {
     expect(out!.version).toBe(SAVE_VERSION);
     const w = waysideOf(out!);
     expect(w.armed).toEqual([]);
-    expect(w.reprieve).toBeNull();
+    expect(w.pouch).toEqual({});
     expect(out!.wayside).toBe(w);
+  });
+
+  it('a run saved while a reprieve had a slot of its own carries it in the pouch now', () => {
+    const run = newRun('vanguard', 1);
+    run.wayside = { pouch: { wardOil: 1 }, reprieve: 'lastSpark', reprieves: 2 } as never;
+    const w = waysideOf(run);
+    expect(w.pouch).toEqual({ wardOil: 1, lastSpark: 1 });
+    expect('reprieve' in w).toBe(false);
+    // Reading it again changes nothing.
+    expect(waysideOf(run).pouch).toEqual({ wardOil: 1, lastSpark: 1 });
   });
 
   it('a state missing a field gets that field filled in without losing the others', () => {

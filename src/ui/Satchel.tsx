@@ -1,80 +1,69 @@
 import {
+  isReprieveId,
   PROVISIONS_PER_MAP,
   POUCH_LIMIT,
   provisionDef,
   type ProvisionId,
 } from '../data/provisions';
 import { curseDef, reprieveDef } from '../data/reprieves';
-import { mapTypeDef, type MapTypeId } from '../data/mapTypes';
 import type { Controller } from '../run/controller';
 import { pouchCount, spare } from '../run/provisions';
 import { waysideOf } from '../run/wayside';
 import { Tip } from './Tip';
 
-const FAMILY_TEXT = { retreat: 'Retreat', revive: 'Revive' } as const;
+const KIND_TEXT = { staple: 'Staple', bet: 'Bet', reprieve: 'Reprieve' } as const;
+const FAMILY_TEXT = { retreat: 'retreat', revive: 'revive' } as const;
 
-/** A Reprieve: what it is and what it does when it fires. */
-export function ReprieveCard({ id }: { id: string }) {
-  const d = reprieveDef(id);
-  return (
-    <div class={`provision reprieve ${d.family}`}>
-      <div class="provision-name">
-        {d.name} <span class="muted">· {FAMILY_TEXT[d.family]}</span>
-      </div>
-      <div class="provision-text">{d.text}</div>
-    </div>
-  );
-}
-
-const KIND_TEXT = { staple: 'Staple', bet: 'Bet', specialist: 'Specialist' } as const;
-
-/** One provision: what it is, and (when a button is given) how to arm it. */
+/** One provision (a reprieve too): what it is, and (when something is given) how to use it. */
 export function ProvisionCard({ id, extra }: { id: string; extra?: preact.ComponentChildren }) {
   const d = provisionDef(id);
+  const family = isReprieveId(id) ? reprieveDef(id).family : null;
   return (
-    <div class={`provision ${d.kind}`}>
+    <div class={`provision ${d.kind}${family ? ` ${family}` : ''}`}>
       <div class="provision-name">
-        {d.name} <span class="muted">· {KIND_TEXT[d.kind]}</span>
+        {d.name}{' '}
+        <span class="muted">
+          · {KIND_TEXT[d.kind]}
+          {family ? ` (${FAMILY_TEXT[family]})` : ''}
+        </span>
       </div>
       <div class="provision-text">{d.text}</div>
-      {d.needsType && (
-        <div class="muted">Pays only on a {mapTypeDef(d.needsType as MapTypeId).name} map.</div>
-      )}
-      {d.needsAffix && <div class="muted">Pays only on a map with an affix of its own.</div>}
+      {family && <div class="muted">Always ready; used up when it saves you.</div>}
       {extra}
     </div>
   );
 }
 
+/** A reprieve: a provision of the third kind. */
+export function ReprieveCard({ id }: { id: string }) {
+  return <ProvisionCard id={id} />;
+}
+
 /**
- * What the character carries into the next map (docs/WAYSIDE.md sections 6 and 9.1): the provisions in the Pouch and up to two armed.
- * What is armed counts in everything the offer cards say, and burns when a map starts.
+ * What the character carries into the next map (docs/WAYSIDE.md sections 6 and 9.1): the pouch of three provisions, any or all of
+ * them armed. What is armed counts in everything the offer cards say, and burns when a map starts; a reprieve needs no arming.
  */
 export function Satchel({ c }: { c: Controller }) {
   const run = c.run!;
   const w = waysideOf(run);
   const held = Object.keys(w.pouch).filter((id) => (w.pouch[id] ?? 0) > 0) as ProvisionId[];
   const curses = w.curses.filter((k) => k.until >= run.map);
-  if (!held.length && !w.armed.length && !w.reprieve && !curses.length) return null;
+  if (!held.length && !w.armed.length && !curses.length && !w.found) return null;
   return (
     <div class="satchel">
       <div class="satchel-head">
         <strong>Satchel</strong>
         <span class="muted">
-          armed {w.armed.length} of {PROVISIONS_PER_MAP} · carrying {pouchCount(run)} of{' '}
-          {POUCH_LIMIT}
+          armed {w.armed.length} · carrying {pouchCount(run)} of {POUCH_LIMIT}
         </span>
       </div>
-      {held.length > 0 && <Tip c={c} id="satchel" />}
-      {w.reprieve && <Tip c={c} id="reprieve" />}
-      <div class="muted">
-        Armed provisions are used up when the next map starts, cleared or not, and count in the
-        cards below.
-      </div>
-      {w.reprieve && (
-        <div>
-          <div class="muted">Reprieve held (it fires by itself if you would die):</div>
-          <ReprieveCard id={w.reprieve} />
+      {w.found && <div class="notice">The last map left you {provisionDef(w.found).name}.</div>}
+      {held.some((id) => !isReprieveId(id)) && <Tip c={c} id="satchel" />}
+      {held.some((id) => isReprieveId(id)) && <Tip c={c} id="reprieve" />}
+      {held.length > 0 && (
+        <div class="muted">
+          Armed provisions are used up when the next map starts, cleared or not, and count in the
+          cards below.
         </div>
       )}
       {curses.map((k) => (
@@ -85,6 +74,7 @@ export function Satchel({ c }: { c: Controller }) {
       <div class="satchel-list">
         {held.map((id) => {
           const armed = w.armed.filter((x) => x === id).length;
+          const ready = isReprieveId(id);
           return (
             <ProvisionCard
               key={id}
@@ -95,14 +85,16 @@ export function Satchel({ c }: { c: Controller }) {
                     × {w.pouch[id]}
                     {armed ? ` (${armed} armed)` : ''}
                   </span>
-                  <button
-                    class="btn small"
-                    disabled={spare(run, id) <= 0 || w.armed.length >= PROVISIONS_PER_MAP}
-                    onClick={() => c.arm(id, true)}
-                  >
-                    Arm
-                  </button>
-                  {armed > 0 && (
+                  {!ready && (
+                    <button
+                      class="btn small"
+                      disabled={spare(run, id) <= 0 || w.armed.length >= PROVISIONS_PER_MAP}
+                      onClick={() => c.arm(id, true)}
+                    >
+                      Arm
+                    </button>
+                  )}
+                  {!ready && armed > 0 && (
                     <button class="btn small" onClick={() => c.arm(id, false)}>
                       Disarm
                     </button>

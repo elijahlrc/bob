@@ -47,7 +47,6 @@ export function StopScreen({
   const [blessing, setBlessing] = useState<string | null>(null);
   const [cart, setCart] = useState<string[]>([]);
   const [reprieve, setReprieve] = useState<string | null>(null);
-  const [swap, setSwap] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   let choice: StopChoice | null = null;
@@ -55,7 +54,7 @@ export function StopScreen({
   if (offer.stop === 'gemHoard' && tag) choice = { stop: 'gemHoard', tag, picks };
   if (offer.stop === 'shrine' && blessing) choice = { stop: 'shrine', blessing };
   if (offer.stop === 'quartermaster') choice = { stop: 'quartermaster', buy: cart };
-  if (offer.stop === 'ferryman' && reprieve) choice = { stop: 'ferryman', reprieve, swap };
+  if (offer.stop === 'ferryman' && reprieve) choice = { stop: 'ferryman', reprieve };
   const problem = choice ? stopProblem(run, slot, choice) : 'Choose first';
 
   const take = () => {
@@ -101,9 +100,7 @@ export function StopScreen({
       {offer.stop === 'quartermaster' && (
         <Quartermaster run={run} slot={slot} cart={cart} onCart={setCart} />
       )}
-      {offer.stop === 'ferryman' && (
-        <Ferryman run={run} reprieve={reprieve} swap={swap} onPick={setReprieve} onSwap={setSwap} />
-      )}
+      {offer.stop === 'ferryman' && <Ferryman run={run} reprieve={reprieve} onPick={setReprieve} />}
       <div class="stop-price muted">{STOP_PRICE}</div>
       {error && <div class="warn">{error}</div>}
       <div class="stop-buttons">
@@ -139,7 +136,7 @@ function Awlsmith({
   const items = awlsmithItems(run);
   const worn = new Set(Object.values(run.build.equipment).map((i) => i?.uid));
   const chosen = items.find((i) => i.uid === itemUid);
-  const augers = run.currency.auger ?? 0;
+  const dust = run.dust;
   if (!items.length)
     return <div class="muted">None of your items has room for another socket.</div>;
   const row = (it: Item) => (
@@ -167,14 +164,13 @@ function Awlsmith({
           <strong>{extra}</strong>
           <button
             class="btn small"
-            disabled={extra + 1 >= awlsmithRoom(chosen) || awlsmithCost(chosen, extra + 2) > augers}
+            disabled={extra + 1 >= awlsmithRoom(chosen) || awlsmithCost(chosen, extra + 2) > dust}
             onClick={() => onExtra(extra + 1)}
           >
             +
           </button>
           <span class="muted">
-            {awlsmithCost(chosen, extra + 1)} Socket Auger
-            {awlsmithCost(chosen, extra + 1) === 1 ? '' : 's'} of {augers}
+            {awlsmithCost(chosen, extra + 1)} Bone Dust of {dust}
           </span>
         </div>
       )}
@@ -327,17 +323,12 @@ function Quartermaster({
 function Ferryman({
   run,
   reprieve,
-  swap,
   onPick,
-  onSwap,
 }: {
   run: NonNullable<Controller['run']>;
   reprieve: string | null;
-  swap: boolean;
   onPick: (id: string) => void;
-  onSwap: (on: boolean) => void;
 }) {
-  const w = waysideOf(run);
   const blocked = reprieveBlocker(run);
   return (
     <div class="stop-body">
@@ -345,17 +336,7 @@ function Ferryman({
         The price: a curse for the next five levels (15% less maximum life), starting when you take
         it.
       </div>
-      {w.reprieve && (
-        <label class="muted">
-          <input
-            type="checkbox"
-            checked={swap}
-            onChange={(e) => onSwap((e.target as HTMLInputElement).checked)}
-          />{' '}
-          Swap the reprieve you hold for the one you choose
-        </label>
-      )}
-      {blocked && !w.reprieve && <div class="warn">{blocked}</div>}
+      {blocked && <div class="warn">{blocked}</div>}
       <div class="stop-list">
         {REPRIEVES.map((r) => (
           <button

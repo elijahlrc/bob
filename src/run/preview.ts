@@ -4,8 +4,7 @@ import { themeDef } from '../data/themes';
 import { offerCharacter } from './bot';
 import type { MapOffer } from './offers';
 import { offerRewards, type OfferRewards } from './rewards';
-import { affixesWithArmed, cancelledAffix } from './provisions';
-import { waysideOf } from './wayside';
+import { affixesWithArmed } from './provisions';
 import type { RunState } from './run';
 import { survivalRatio, threatPreview } from './threat';
 import { themeInfo, weakestAxis, type ThemeInfo } from './themeInfo';
@@ -41,8 +40,6 @@ export type OfferPreview = MapOffer & {
   weak?: string;
   /** What the map pays and how many monsters it holds, for comparing the offers (a map offer only). */
   rewards?: OfferRewards;
-  /** The affix an armed Counterweight cancels on this map (it is still listed, struck through). */
-  cancelled?: string;
 };
 
 export function offersFor(run: RunState): OfferPreview[] {
@@ -82,7 +79,6 @@ export function offersFor(run: RunState): OfferPreview[] {
       info,
       weak,
       rewards,
-      cancelled: cancelledAffix(offer, waysideOf(run).armed) ?? undefined,
     };
   });
 }

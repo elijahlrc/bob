@@ -33,8 +33,8 @@ export type MapResult = {
   recap?: DeathRecap;
   /** What was dealt and taken on the map, by source and damage type (the map report screen). */
   report?: MapReport;
-  /** The Reprieve that fired on this map (docs/WAYSIDE.md 7), if one did. */
-  reprieve?: string;
+  /** The reprieves that fired on this map (docs/WAYSIDE.md 7), in order. */
+  reprieves?: string[];
 };
 
 export function hashEvents(h: Hasher, w: World): void {
@@ -82,7 +82,7 @@ export function worldResult(w: World, eventHash = 0): MapResult {
     lifeFrac: w.player.life / Math.max(1, w.player.def.maxLife),
     vitals: vitalsOf(w),
     ...(w.status === 'dead' ? { recap: buildRecap(w) } : {}),
-    ...(w.reprieve.fired ? { reprieve: w.reprieve.fired } : {}),
+    ...(w.reprieve.fired.length ? { reprieves: [...w.reprieve.fired] } : {}),
     report: buildReport(w),
   };
 }

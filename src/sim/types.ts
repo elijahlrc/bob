@@ -640,8 +640,8 @@ export type WorldOpts = {
   freeResources?: boolean;
   /** Balance probes: the player cannot die (life is restored at 1). */
   godMode?: boolean;
-  /** The Reprieve the character holds (data/reprieves.ts): it fires when damage would kill (docs/WAYSIDE.md 7). */
-  reprieve?: string | null;
+  /** The reprieves the character carries, in the order they are used (data/reprieves.ts): one fires when damage would kill (docs/WAYSIDE.md 7). */
+  reprieves?: string[];
 };
 
 /** Runtime state of the triggers (EXPANSION 5.5), keyed by trigger source. */
@@ -817,7 +817,7 @@ export type World = {
   flasks: FlaskState[];
   xp: number;
   status: MapStatus;
-  /** The Reprieve held, the one that fired, and the seconds of safety left after a Revive. */
+  /** The reprieves carried, the ones that fired, and the seconds of safety left after a Revive. */
   reprieve: ReprieveState;
   /** Seconds until the player leaves after pressing Abandon, or null when not leaving. */
   abandonT: number | null;

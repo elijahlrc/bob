@@ -325,16 +325,18 @@ Most of how a fight goes depends on monsters. Here is what is useful to know:
 
 These are decided in camp, not by the character, but the character is what they act on.
 
-- **Provisions** armed before a map change the character for that one map and are used up when it starts, whether the map
+- **Provisions** (a pouch of three; a cleared map sometimes leaves one) armed before a map change the character for that one map and are used up when it starts, whether the map
   is cleared, left or lost. Armed provisions count in the numbers on the map cards (DPS, effective HP, rewards).
-- **A reprieve** held fires by itself, the moment damage would kill the character, once. You cannot hold it back and the
-  character does not wait for a better moment.
+- **A reprieve** in the pouch is always ready (nothing to arm). It fires by itself, the moment damage would kill the character, once.
+  You cannot hold it back and the character does not wait for a better moment. With several carried they go in order, a revive
+  before a retreat. Every one refills all your flasks, so the character has something to drink at what comes next.
   - A **Retreat** (the Ferry Token) ends the map as if you had left it: you keep what you picked up, the level counts as
-    played, and you arrive in camp with a quarter of your life. It does nothing on a boss level (every tenth map).
+    played, and you arrive in camp with a quarter of your life and full flasks. It does nothing on a boss level (every tenth
+    map), where a revive carried with it is used instead.
   - A **Revive** (Last Spark, Bargain Coin) stands the character up where it fell, at a share of its life, and nothing can
-    hurt it for a few seconds. It does not heal anything else: flasks, mana and the monsters are as they were. If the
-    character was losing the fight, it is still losing it, only later; Last Spark also throws the monsters nearby back
-    and stuns them, which is what buys the time.
+    hurt it for a few seconds. Mana and the monsters are as they were. If the character was losing the fight, it is still
+    losing it, only later and with full flasks; Last Spark also throws the monsters nearby back and stuns them, which is what
+    buys the time.
 
 ---
 

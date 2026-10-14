@@ -201,12 +201,6 @@
   color: #8d8fa8;
 }
 
-/* An affix a Counterweight cancels. */
-.affix.cancelled {
-  text-decoration: line-through;
-  opacity: 0.55;
-}
-
 /* One-time explainers */
 .tip {
   display: flex;

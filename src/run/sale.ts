@@ -1,34 +1,41 @@
 import { Rng } from '../core/rng';
 import { flaskBase } from '../data/flasks';
-import { priceAt, QUARTERMASTER_SIZE, WARE_BASE } from '../data/sale';
+import {
+  GEAR_CANDIDATES,
+  GEAR_ILVL_BONUS,
+  priceAt,
+  QUARTERMASTER_SIZE,
+  WARE_BASE,
+} from '../data/sale';
 import { PROVISIONS, type ProvisionId } from '../data/provisions';
-import { REPRIEVE_FROM, REPRIEVES, type ReprieveId } from '../data/reprieves';
-import { rollCurrencyBundle } from '../gen/currencyDrops';
+import { REPRIEVES, type ReprieveId } from '../data/reprieves';
 import { rollDrop, rollFlask, rollGem } from '../gen/loot';
+import type { Item } from '../data/types';
 import { noteFound } from './found';
 import { addProvision } from './provisions';
 import { acquireReprieve } from './reprieves';
 import type { RunState } from './run';
-import { stash, uidSource } from './run';
+import { uidSource } from './run';
 import type { Ware } from './wayside';
 
-/** The Quartermaster's: twelve wares, a Reprieve among them from level 20 (docs/WAYSIDE.md 5.2). */
+/** The Quartermaster's: eight wares, a reprieve among them (docs/WAYSIDE.md 5.2). */
 const SALE_SLOTS = [
   'gear',
   'gear',
-  'gear',
-  'gem',
   'gem',
   'flask',
   'provision',
   'provision',
   'provision',
-  'bundle',
-  'bundle',
   'reprieve',
 ] as const;
 
 type Slot = (typeof SALE_SLOTS)[number];
+
+/** How strong a rare is, roughly: the tiers of its affixes (a higher tier is a rarer, stronger roll). */
+function itemPower(it: Item): number {
+  return it.affixes.reduce((n, a) => n + a.tier, 0);
+}
 
 /** Stock items carry a negative uid until they are bought (a real uid comes from the run's counter, so the roll never moves it). */
 function tempUid(): () => number {
@@ -64,41 +71,44 @@ function ware(run: RunState, slot: Slot, index: number, rng: Rng): Ware {
       return { id: String(index), kind: 'flask', price: price(WARE_BASE.flask), item: flask };
     }
     case 'provision': {
-      const open = PROVISIONS.filter((p) => p.from <= level);
+      const open = PROVISIONS.filter((p) => p.kind !== 'reprieve' && p.from <= level);
       const p = rng.weighted(open, (x) => x.weight);
       return { id: String(index), kind: 'provision', price: price(p.base), ref: p.id };
     }
     case 'reprieve': {
-      const r = rng.weighted(REPRIEVES, (x) => x.weight);
+      const r = rng.weighted(
+        REPRIEVES.filter((x) => x.from <= level),
+        (x) => x.weight,
+      );
       return { id: String(index), kind: 'reprieve', price: price(r.base), ref: r.id };
     }
-    case 'bundle': {
-      const bundle = rollCurrencyBundle(rng, uid, level);
-      return {
-        id: String(index),
-        kind: 'currency',
-        price: price(WARE_BASE.currency),
-        ref: bundle.id,
-        count: bundle.count,
-      };
-    }
     default: {
-      const ctx = { ilvl: level, monster: 'rare' as const, classId: run.build.classId };
-      let item = rollDrop(rng, uid, ctx, true);
-      for (let i = 0; i < 5 && item.kind !== 'item'; i++) item = rollDrop(rng, uid, ctx, true);
+      // As good as the best a map of the level could drop (docs/WAYSIDE.md 3): the best of a few rares rolled at the item level of an
+      // offer two levels up, by the tiers of their affixes.
+      const ctx = {
+        ilvl: Math.min(100, level + GEAR_ILVL_BONUS),
+        monster: 'rare' as const,
+        classId: run.build.classId,
+      };
+      let best: Item | null = null;
+      for (let i = 0; i < GEAR_CANDIDATES; i++) {
+        const it = rollDrop(rng, uid, ctx, true);
+        if (it.kind === 'item' && (!best || itemPower(it) > itemPower(best))) best = it;
+      }
+      const item = best ?? (rollDrop(rng, uid, ctx, true) as Item);
       return { id: String(index), kind: 'gear', price: price(WARE_BASE.gear), item };
     }
   }
 }
 
 /**
- * The Quartermaster's stock for the offer at hand (docs/WAYSIDE.md 5.2): twelve wares, a Reprieve among them from level 20.
+ * The Quartermaster's stock for the offer at hand (docs/WAYSIDE.md 5.2): eight wares, a reprieve among them.
  * Drawn from the run seed, the level and the offer, so it is the same every time it is looked at.
  */
 export function rollSale(run: RunState, offerId: string): Ware[] {
   const rng = new Rng(run.seed).fork(`sale${offerId}`);
   const slots = SALE_SLOTS.slice(0, QUARTERMASTER_SIZE).map((s) =>
-    s === 'reprieve' && run.map < REPRIEVE_FROM ? 'gear' : s,
+    s === 'reprieve' && !REPRIEVES.some((r) => r.from <= run.map) ? 'gear' : s,
   );
   return slots.map((slot, i) => ware(run, slot, i, rng));
 }
@@ -113,7 +123,5 @@ export function grantWare(run: RunState, ware: Ware): void {
     acquireReprieve(run, ware.ref as ReprieveId);
   } else if (ware.kind === 'provision' && ware.ref) {
     addProvision(run, ware.ref as ProvisionId);
-  } else if (ware.kind === 'currency' && ware.ref) {
-    stash(run, { kind: 'currency', uid: uidSource(run)(), id: ware.ref, count: ware.count ?? 1 });
   }
 }

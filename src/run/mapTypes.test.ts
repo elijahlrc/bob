@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CURRENCY_DROPS } from '../data/constants';
 import { buildMonster } from '../calc/monster';
 import {
   CRESCENDO_LIMIT,
@@ -202,7 +203,8 @@ describe('Quarry (docs/MAPS.md 9.2)', () => {
       expect(
         items.some((it) => it.kind === 'item' && (it.rarity === 'rare' || it.rarity === 'unique')),
       ).toBe(true);
-      expect(items.some((it) => it.kind === 'currency')).toBe(true);
+      // (Currency drops only while CURRENCY_DROPS is on.)
+      expect(items.some((it) => it.kind === 'currency')).toBe(CURRENCY_DROPS);
     }
     champs[0].noReward = true;
     killActor(w, champs[0]);

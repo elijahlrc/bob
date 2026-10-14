@@ -13,8 +13,7 @@ import { CLASSES } from '../data/classes';
 import { botCamp } from './bot';
 import { stopName, takeStop, type StopChoice } from './stops';
 import { waysideOf } from './wayside';
-import { armProvision, disarmProvision, startProvisions } from './provisions';
-import { spendReprieve } from './reprieves';
+import { armProvision, disarmProvision, readyReprieves, startProvisions } from './provisions';
 import type { ProvisionId } from '../data/provisions';
 import type { CraftResult } from './craft';
 import type { MapOffer } from './offers';
@@ -279,7 +278,15 @@ export class Controller {
     // A Crawl is three maps in a row: this remembers where it is and what the character carries between them.
     this.crawl =
       offer.type === 'crawl'
-        ? { offer, segment: 0, parts: [], build: run.build, xp: run.xp, start: run.vitals }
+        ? {
+            offer,
+            segment: 0,
+            parts: [],
+            fired: [],
+            build: run.build,
+            xp: run.xp,
+            start: run.vitals,
+          }
         : null;
     const plan = planFor(run, offer);
     this.world = createWorld({ plan, build: run.build, xp: run.xp, opts: worldOptsFor(run, plan) });
@@ -372,8 +379,8 @@ export class Controller {
     const crawl = this.crawl;
     if (crawl) {
       crawl.parts.push(res);
-      // A Reprieve that fired in one map of a Crawl is gone before the next begins.
-      if (res.reprieve) spendReprieve(run, res.reprieve);
+      // A reprieve that fired in one map of a Crawl does not fire again on the next (the run spends it when the Crawl ends).
+      crawl.fired.push(...(res.reprieves ?? []));
       if (res.status === 'cleared' && crawl.segment < CRAWL_SEGMENTS - 1) {
         // The next map of the Crawl, at once: no camp, and the character is as the last map left it.
         crawl.segment++;
@@ -386,7 +393,11 @@ export class Controller {
           plan,
           build: crawl.build,
           xp: crawl.xp,
-          opts: { ...worldOptsFor(run, plan), start: crawl.start },
+          opts: {
+            ...worldOptsFor(run, plan),
+            start: crawl.start,
+            reprieves: readyReprieves(run, crawl.fired),
+          },
         });
         this.acc = 0;
         this.bus.emit('select', { id: null });
@@ -416,6 +427,8 @@ export class Controller {
     offer: MapOffer;
     segment: number;
     parts: MapResult[];
+    /** The reprieves that have fired on its maps so far. */
+    fired: string[];
     build: Build;
     xp: number;
     start: Vitals;
@@ -509,9 +522,11 @@ export class Controller {
       return `${set.length} tablet set${set.length === 1 ? '' : 's'} to redeem (open the Workbench)`;
     const rares = unseenRares(run).length;
     if (rares > 0) return `${rares} new rare/unique item${rares === 1 ? '' : 's'} (open Items)`;
-    // Auto-continue always takes the first offer, which is a map and never a stop, so a stop would pass unseen: pause for it.
+    // Auto-continue always takes the first offer, which is a map and never a stop, so a stop would pass unseen. Stops come every few levels, so
+    // it pauses for the first one only, until the player has read what a stop is (the explainer's "Got it"); after that a stop is passed over.
     const stop = run.offers.find((o) => o.kind === 'stop');
-    if (stop) return `${stopName(stop.stop!)} is on offer`;
+    if (stop && !waysideOf(run).seen.stop)
+      return `${stopName(stop.stop!)} is on offer (read what a stop is)`;
     // The next map is the anchor: stop if it is not the plain map auto-continue is meant for, or the character is worn down.
     if (run.offers[0].type !== 'plain')
       return `the first map is a ${mapTypeDef(run.offers[0].type).name} map`;

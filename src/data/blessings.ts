@@ -2,7 +2,8 @@ import { mod } from '../mods/types';
 import type { MapAffixDef } from './mapAffixes';
 
 /**
- * The Shrine's blessings (docs/WAYSIDE.md 5.2): a modest standing edge that lasts until the next stop is taken. One at a time; a
+ * The Shrine's blessings (docs/WAYSIDE.md 5.2): a real standing edge (the size of a node or two of the passive tree, so that the
+ * Shrine is worth a level) that lasts until the next stop is taken. One at a time; a
  * Shrine's blessing replaces the one held. Each is a hidden map affix, like a provision (data/provisions.ts). Every name and text
  * here is ours.
  */
@@ -19,47 +20,47 @@ export const BLESSINGS: BlessingDef[] = [
   {
     id: 'vigour',
     name: 'Blessing of Vigour',
-    text: '+12% maximum life',
-    affix: { playerMods: [mod('life', 'more', 12)], reward: {} },
+    text: '+22% maximum life',
+    affix: { playerMods: [mod('life', 'more', 22)], reward: {} },
   },
   {
     id: 'fury',
     name: 'Blessing of Fury',
-    text: '+8% damage',
-    affix: { playerMods: [mod('damage', 'more', 8)], reward: {} },
+    text: '+15% damage',
+    affix: { playerMods: [mod('damage', 'more', 15)], reward: {} },
   },
   {
     id: 'ward',
     name: 'Blessing of Warding',
-    text: '+15% to all resistances',
+    text: '+26% to all resistances',
     affix: {
-      playerMods: [mod('resist.allEle', 'base', 15), mod('resist.chaos', 'base', 15)],
+      playerMods: [mod('resist.allEle', 'base', 26), mod('resist.chaos', 'base', 26)],
       reward: {},
     },
   },
   {
     id: 'swift',
     name: 'Blessing of Swiftness',
-    text: '+10% movement speed',
-    affix: { playerMods: [mod('moveSpeed', 'inc', 10)], reward: {} },
+    text: '+18% movement speed',
+    affix: { playerMods: [mod('moveSpeed', 'inc', 18)], reward: {} },
   },
   {
     id: 'grit',
     name: 'Blessing of Grit',
-    text: '+20% armour and evasion',
-    affix: { playerMods: [mod('armour', 'more', 20), mod('evasion', 'more', 20)], reward: {} },
+    text: '+36% armour and evasion',
+    affix: { playerMods: [mod('armour', 'more', 36), mod('evasion', 'more', 36)], reward: {} },
   },
   {
     id: 'fortune',
     name: 'Blessing of Fortune',
-    text: '+10% item quantity',
-    affix: { reward: { quantity: 0.1 } },
+    text: '+18% item quantity',
+    affix: { reward: { quantity: 0.18 } },
   },
   {
     id: 'cadence',
     name: 'Blessing of Cadence',
-    text: '+8% attack and cast speed',
-    affix: { playerMods: [mod('attackSpeed', 'inc', 8), mod('castSpeed', 'inc', 8)], reward: {} },
+    text: '+15% attack and cast speed',
+    affix: { playerMods: [mod('attackSpeed', 'inc', 15), mod('castSpeed', 'inc', 15)], reward: {} },
   },
 ];
 
