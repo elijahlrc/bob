@@ -159,6 +159,8 @@ export type SkillDef = SkillFx & {
   mineRain?: { count: number; perPrior: number; radius: number; spread: number };
   mineAura?: ActiveGemDef['mineAura'];
   travelThrough?: boolean;
+  spin?: ActiveGemDef['spin'];
+  run?: ActiveGemDef['run'];
   detonation?: number;
 
   form?: { after: number; speed: number; critMore: number; critMulti: LevelValue };
@@ -329,6 +331,8 @@ export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
     geyser: def.geyser,
     deploySeconds: def.deploySeconds,
     travelThrough: def.travelThrough,
+    spin: def.spin,
+    run: def.run,
     ballista: def.ballista,
     mortar: def.mortar,
     ancestral: def.ancestral,

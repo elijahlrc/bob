@@ -74,6 +74,13 @@ export type Action = {
   targetId: number;
   aimX: number;
   aimY: number;
+  /** A spin: the hits of it already dealt (Whirling Blades). */
+  spinN?: number;
+  /** A skill that runs at its target over the wind-up: the distance run so far, and who it has hit on the way. */
+  ran?: number;
+  hitIds?: number[];
+  /** The area of this use is shown by a ring that stays on the character (a channelled spin), not by a burst each time. */
+  ringed?: boolean;
 };
 
 export type MonsterState = 'idle' | 'chase' | 'leash';

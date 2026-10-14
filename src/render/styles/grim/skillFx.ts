@@ -9,6 +9,7 @@ import {
   UTILITY_COLOR,
   type Delivery,
 } from '../../../calc/skillLook';
+import { HIT_AT } from '../../../data/constants';
 import { MINIONS } from '../../../data/minions';
 import { bondLinks, choiceByKey } from '../../../sim/deploy';
 import type { Actor, SimEvent, World } from '../../../sim/types';
@@ -814,8 +815,92 @@ export class SkillFx {
    * enemy (Explosive Arrow) and the pods in the ground (Scourge Arrow), the mirage archer, the charges on an enemy
    * (Infernal Blow) and the shell about the character (Molten Shell).
    */
+  /**
+   * What stays on the character while a skill carries it or spins it: one ring with two blades going round it (a spin, or a channel
+   * that pulses around the character), speed lines behind a run or a charge, and the chain of a hook.
+   */
+  private spinning(ground: Gfx, air: Gfx, w: World, time: number): void {
+    const p = w.player;
+    if (!p.alive) return;
+    const act = p.action;
+    const spin = act?.profile.skill.spin;
+    if (act && spin) {
+      const k = Math.min(1, act.elapsed / act.duration);
+      this.whirl(
+        ground,
+        air,
+        p,
+        this.colorOfSkill(w, act.profile.skill.id),
+        spin.radius * act.profile.radiusMult + p.r,
+        Math.min(1, k * 10, (1 - k) * 10 + 0.25),
+        time * 18,
+      );
+    }
+    const ch = w.channel;
+    const spec = ch?.profile.skill.channel;
+    const beh = ch?.profile.skill.behaviour;
+    if (ch && spec?.tick && beh?.kind === 'burst' && beh.origin === 'self') {
+      const r =
+        beh.radius *
+          ch.profile.radiusMult *
+          (1 + ((spec.tickRadiusPerStage ?? 0) * ch.stage) / 100) +
+        p.r;
+      const fade = Math.min(1, (w.t - ch.startT) * 6);
+      this.whirl(ground, air, p, this.colorOfSkill(w, ch.key), r, fade, time * (10 + 2 * ch.stage));
+    }
+    const run = act?.profile.skill.run;
+    if (act && run && !act.fired) {
+      const color = this.colorOfSkill(w, act.profile.skill.id);
+      const k = Math.min(1, act.elapsed / (HIT_AT * act.duration));
+      if (run.style === 'hook') {
+        const t = this.host.actorById(act.targetId);
+        if (t) {
+          const a = this.lifted(p.x, p.y);
+          const b = this.lifted(t.x, t.y);
+          this.streak(air, [a, b], 0xc8c8d0, 0.9, 0.8);
+          air.fillStyle(0xe8e8f0, 1).fillCircle(b.x, b.y, 3);
+        }
+      } else if (run.style !== 'leap' && p.moving) {
+        // Lines trailing from the character, back along the way it came.
+        const bx = Math.cos(p.facing);
+        const by = Math.sin(p.facing);
+        for (const off of [-0.35, 0, 0.35]) {
+          const x = p.x - by * off;
+          const y = p.y + bx * off;
+          const a = this.lifted(x - bx * 0.3, y - by * 0.3);
+          const b = this.lifted(x - bx * (1.2 + 0.6 * k), y - by * (1.2 + 0.6 * k));
+          this.streak(air, [a, b], run.style === 'charge' ? 0xdfe6ee : color, 0.7, 0.8);
+        }
+      }
+    }
+  }
+
+  /** One ring on the ground round an actor, with two blades going round it; `fade` is how bright. */
+  private whirl(
+    ground: Gfx,
+    air: Gfx,
+    p: Actor,
+    color: number,
+    r: number,
+    fade: number,
+    head0: number,
+  ): void {
+    this.disc(ground, p.x, p.y, r, color, 0.1 * fade);
+    this.ring(ground, p.x, p.y, r, color, 0.55 * fade, 1);
+    for (let blade = 0; blade < 2; blade++) {
+      const head = head0 + blade * Math.PI;
+      const pts: Pt[] = [];
+      for (let i = 0; i <= 10; i++) {
+        const a = head - i * 0.14;
+        pts.push(this.lifted(p.x + Math.cos(a) * r, p.y + Math.sin(a) * r));
+      }
+      this.streak(air, pts, color, fade, 1.2);
+    }
+  }
+
   private lasting(ground: Gfx, air: Gfx, w: World, time: number): void {
     const p = w.player;
+    this.spinning(ground, air, w, time);
     const vx = w.vortex;
     if (vx && p.alive && vx.blades.length > 0) {
       const spec = choiceByKey(w, vx.key)?.skill.vortex;

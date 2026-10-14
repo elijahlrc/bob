@@ -1447,7 +1447,7 @@ The reviewers judged these to keep the reason to use them. Low-confidence ones a
 - **Iron Hide** (Steelskin) · active: Guard utility (policy guard, life<60%, 3 s, cd 8): hitTaken more -35..-50 (real, defence.ts hitTakenMult). Absorb pool becomes a flat reduction; no shared guard cooldown.
 - **Quick Step** (Dash) · active: Utility blink (distance 7, cd 2): when the target is out of reach, the player jumps toward it (utility.ts). Gap-closer only; no free aiming, which is the legitimate autobattler adaptation.
 - **Skyfall Leap** (Leap Slam) · active: Attack with travel 7 (actions.ts moves the player toward the target) and a slam burst r2 140..170% damage, stun duration inc. 'Stuns full-life enemies' is not implemented and there is no knockback; both are minor.
-- **Spinning Dash** (Whirling Blades) · active: Melee attack with travel 7 and a 200-degree arc, weapon restricted. Hits once at the destination rather than along the path, a minor loss.
+- **Spinning Dash** (Whirling Blades) · active: Melee attack with travel 7 and a 200-degree arc, weapon restricted. Was a blink with one hit on the way and one sweep at the end; since 2026-10-14 it is a spin that takes the whole use (data field `spin`): the character runs at the target and hits everything within 1.7 tiles of itself six times as it goes, then spins on the spot. `baseMult` is one hit (25 to 33%, so about 1.5 times the old single hit per use).
 - **Pyre Totem** (Holy Flame Totem) · active: Totem type: deploy.ts places a totem that shoots 3 projectiles half-converted to fire at enemies in reach, for the totem duration. Consecrated ground and channel are dropped.
 - **Quake Totem** (Shockwave Totem) · active: Totem that fires a self-centred burst r3 of physical spell damage on its own. No knockback, which is minor.
 - **Lance Bow** (Siege Ballista) · active: Three ballistas (deployCount 2 extra) each fire a single arrow with pierce 9 at range 11 using your bow; totems shoot on their own while the character fights.
@@ -1593,3 +1593,19 @@ After the audit the user decided on the rest (2026-10-09): Mirror Arrow's clone 
 - **Kindle** and **Cindering** were the same gem at two prices; they are one gem, Kindle (a saved Cindering loads as Kindle).
 - **Flanking Cast** is for spells and refuses a nova around the caster; **Flanking Volley** is the attack version, for the rains and slams. (Flanking Cast already landed before and behind the target; the 'same point' note above is out of date.)
 - **Echoing Cast** no longer supports a totem or a brand, whose repeat was a re-placement. **Wide Crush** needs a skill with an area.
+
+## Travel that takes time (2026-10-14)
+
+Skills that carried the character at once (a blink in the renderer) and hit once now run over their wind-up. The data field is `run`
+(`style`: `leap`, `charge`, `hook` or `run`) beside `travel`, and the sim moves the character in `runStep` (`src/sim/actions.ts`):
+it covers the travel in the 60% of the use before the blow, stops at contact, and the blow lands on arrival.
+
+- **Skyfall Leap** (`leap`): the character is drawn in the air over the leap and the slam lands on arrival.
+- **Bulwark Rush** (`charge`): hits each enemy it runs into once on the way (the damage grows with the distance run so far), then the
+  strike at the end as before.
+- **Blessed Trail** (`run`): speed lines behind the character; the slam and the consecrated ground are at the end.
+- **Snag Lash** (`hook`): a chain is drawn from the character to the enemy it is dragged to.
+- **Whirlwind Cleave** (`spin`, no travel): a spin on the spot, five hits across the use (a fifth of the old single hit each, so the
+  damage per use is the same), with the storm of blades left once, at the first hit, at the old strength.
+- **Twister Blade and Judgement Tempest** (channels that pulse round the character): each pulse still hurts, but no ring is drawn for
+  each; one ring stays on the character while the channel lasts.

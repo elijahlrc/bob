@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { Rng } from '../../../core/rng';
+import { HIT_AT } from '../../../data/constants';
 import { factionOfSpec, leavesBody } from '../../../data/monsters';
 import { revealed } from '../../../sim/movement';
 import { telegraphs, type Telegraph } from '../../../sim/telegraph';
@@ -772,6 +773,10 @@ export class GrimStyle extends StyleBase {
       ox = Math.cos(ha) * k;
       oy = Math.sin(ha) * k;
     }
+    // A leap carries the character up and over: it is in the air until the slam lands.
+    const leap = a.isPlayer ? a.action : null;
+    if (leap && !leap.fired && leap.profile.skill.run?.style === 'leap')
+      oy -= Math.sin(Math.PI * Math.min(1, leap.elapsed / (HIT_AT * leap.duration))) * 26;
     d.sprite.setPosition(Math.round(px + ox), Math.round(py + oy));
     d.sprite.setFlipX(t.face < 0);
     d.sprite.setDepth(1000 + py);

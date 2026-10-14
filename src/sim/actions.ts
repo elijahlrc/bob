@@ -165,8 +165,12 @@ export function updateAction(w: World, a: Actor, dt: number): void {
     act.aimY = t.y;
     a.facing = Math.atan2(t.y - a.y, t.x - a.x);
   }
-  act.elapsed += dt * (1 - a.ail.chill) * speedMult(a);
-  if (!act.fired && act.elapsed >= HIT_AT * act.duration) {
+  const adt = dt * (1 - a.ail.chill) * speedMult(a);
+  act.elapsed += adt;
+  if (act.profile.skill.run && a.isPlayer && !act.fired) runStep(w, a, act, t, adt);
+  if (act.profile.skill.spin && a.isPlayer && act.which !== 'deployed') {
+    spinStep(w, a, act, t, adt);
+  } else if (!act.fired && act.elapsed >= HIT_AT * act.duration) {
     act.fired = true;
     w.critSeen = false;
     fire(w, a, act);
@@ -199,6 +203,102 @@ export function updateAction(w: World, a: Actor, dt: number): void {
     a.action = null;
     a.handIdx++;
   }
+}
+
+/**
+ * Advance a skill that runs at its target over its wind-up (a leap, a charge, a hook, a run): the character covers its travel in the
+ * time before the blow, stopping at contact, and the blow lands on arrival. A charge hits what it runs into, once each, as it goes.
+ */
+function runStep(w: World, a: Actor, act: Action, target: Actor | undefined, dt: number): void {
+  const p = act.profile;
+  const run = p.skill.run!;
+  if (act.ran === undefined) act.ran = 0;
+  if (!target || !target.alive) return;
+  const dx = target.x - a.x;
+  const dy = target.y - a.y;
+  const d = Math.hypot(dx, dy);
+  a.facing = Math.atan2(dy, dx);
+  const speed = (p.skill.travel ?? 0) / (HIT_AT * act.duration);
+  const step = Math.min(speed * dt, Math.max(0, d - (target.r + a.r + 0.8)));
+  if (step <= 1e-4) return;
+  const spot = w.grid.collide(a.x + (dx / d) * step, a.y + (dy / d) * step, a.r);
+  act.ran += Math.hypot(spot.x - a.x, spot.y - a.y);
+  a.x = spot.x;
+  a.y = spot.y;
+  a.moving = true;
+  if (run.style !== 'charge') return;
+  // The charge so far is its distance: a longer run hits harder (Shield Charge).
+  const ids = (act.hitIds ??= []);
+  for (const e of enemiesOf(w, a)) {
+    if (ids.includes(e.id) || e.phaseT > 0) continue;
+    if (Math.hypot(e.x - a.x, e.y - a.y) > e.r + a.r + 0.3) continue;
+    ids.push(e.id);
+    w.lastTravel = act.ran;
+    hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
+  }
+}
+
+/** How close to its target a spin stops, beyond the two bodies. */
+const SPIN_GAP = 0.6;
+/** The share of a spin in which it covers its dash: the rest it spends on the spot. */
+const SPIN_DASH_SHARE = 0.8;
+
+/**
+ * One hit of a spin: the weapon sweeps all the way round the character. (A spin used another way, as an echo or from a trigger,
+ * is one such hit, without moving.)
+ */
+function spinHit(p: SkillProfile): SkillProfile {
+  const sp = p.skill.spin!;
+  return {
+    ...p,
+    skill: {
+      ...p.skill,
+      spin: undefined,
+      travel: undefined,
+      travelThrough: undefined,
+      behaviour: { kind: 'melee', range: sp.radius, arc: 360, radius: sp.radius },
+    },
+  };
+}
+
+/**
+ * Advance a spin (Whirling Blades): the character runs at its target, fast enough to arrive in most of the spin, and stops at
+ * contact (it spins on the spot from there). The hits are spread over the whole use, so everything the character passes, and
+ * the target when it arrives, is hit again and again.
+ */
+function spinStep(w: World, a: Actor, act: Action, target: Actor | undefined, dt: number): void {
+  const sp = act.profile.skill.spin!;
+  if (!act.fired) {
+    act.fired = true;
+    act.spinN = 0;
+  }
+  if (target && target.alive) {
+    a.facing = Math.atan2(target.y - a.y, target.x - a.x);
+    const d = Math.hypot(target.x - a.x, target.y - a.y);
+    const speed = (act.profile.skill.travel ?? 0) / (SPIN_DASH_SHARE * act.duration);
+    const step = Math.min(speed * dt, Math.max(0, d - (target.r + a.r + SPIN_GAP)));
+    if (step > 1e-4) {
+      const spot = w.grid.collide(
+        a.x + ((target.x - a.x) / d) * step,
+        a.y + ((target.y - a.y) / d) * step,
+        a.r,
+      );
+      a.x = spot.x;
+      a.y = spot.y;
+      a.moving = true;
+    }
+  }
+  const due = Math.min(sp.hits, Math.floor((act.elapsed / act.duration) * sp.hits + 0.5));
+  // Each hit's sweep starts a turn further round, so the blade seems to go round and round.
+  const face = a.facing;
+  while ((act.spinN ?? 0) < due) {
+    a.facing = face + ((act.spinN ?? 0) * 2 * Math.PI) / sp.hits;
+    act.spinN = (act.spinN ?? 0) + 1;
+    w.critSeen = false;
+    fire(w, a, { ...act, aimX: a.x, aimY: a.y });
+    act.crit = act.crit || w.critSeen;
+  }
+  a.facing = face;
 }
 
 export function enemiesOf(w: World, a: Actor): Actor[] {
@@ -299,6 +399,8 @@ export function fire(w: World, a: Actor, act: Action): void {
   // Whirling Blades sends out what a Venom Gyre has caught.
   if (a.isPlayer && act.profile.skill.releasesCaught) releaseCaught(w, a);
   fireEffect(w, a, act);
+  // The later hits of a spin are only hits: what a use leaves behind (ground, blades, charges spent) is left once.
+  if (act.spinN !== undefined && act.spinN > 1) return;
   leaveGround(w, a, act);
   bounceOrbs(w, a, act);
   cascadeCast(w, a, act);
@@ -381,6 +483,10 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
       return;
     }
   }
+  if (act.profile.skill.spin && a.isPlayer) {
+    fireEffect(w, a, { ...act, profile: spinHit(act.profile) });
+    return;
+  }
   const p = act.profile;
   const b = p.skill.behaviour;
   const target = actorById(w, act.targetId);
@@ -451,23 +557,28 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
     return;
   }
   // A travelling skill (a leap, a charge) carries the caster toward the target before it lands.
-  if (p.skill.travel && target && target.alive) carryToward(w, a, p, act, target, p.skill.travel);
+  // (One that runs over its wind-up has already arrived.)
+  if (p.skill.run && a.isPlayer && act.ran !== undefined) w.lastTravel = act.ran;
+  else if (p.skill.travel && target && target.alive)
+    carryToward(w, a, p, act, target, p.skill.travel);
   if (b.kind === 'melee') {
     const reach = b.range + p.rangeBonus;
     if (b.arc) {
       const radius = (b.radius ?? reach) * p.radiusMult;
       const half = ((b.arc / 2) * Math.PI) / 180;
-      w.events.push({
-        t: 'swing',
-        src: a.id,
-        x: a.x,
-        y: a.y,
-        facing: a.facing,
-        radius: radius + a.r,
-        arc: b.arc,
-        dtype: dominantType(p, act.hand),
-        heavy: isHeavy(a, p),
-      });
+      // (The hits of a spin show as one ring that stays on the character, not a sweep each.)
+      if (act.spinN === undefined)
+        w.events.push({
+          t: 'swing',
+          src: a.id,
+          x: a.x,
+          y: a.y,
+          facing: a.facing,
+          radius: radius + a.r,
+          arc: b.arc,
+          dtype: dominantType(p, act.hand),
+          heavy: isHeavy(a, p),
+        });
       for (const e of enemiesOf(w, a)) {
         const d = Math.hypot(e.x - a.x, e.y - a.y);
         if (d > radius + e.r + a.r + 0.4) continue;
@@ -568,7 +679,7 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
         best = c.max;
         dominant = c.type;
       }
-    w.events.push({ t: 'explode', x: cx, y: cy, r: radius, dtype: dominant });
+    if (!act.ringed) w.events.push({ t: 'explode', x: cx, y: cy, r: radius, dtype: dominant });
     const inside = enemiesOf(w, a).filter((e) => Math.hypot(e.x - cx, e.y - cy) <= radius + e.r);
     // A debuff that holds only so many enemies takes the nearest.
     const cap = p.skillDot?.spec.maxTargets;

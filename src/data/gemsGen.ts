@@ -198,7 +198,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       radius: 2.2,
       origin: 'self',
     },
-    baseMult: [105, 120],
+    baseMult: [21, 24],
+    spin: {
+      hits: 5,
+      radius: 2.2,
+    },
     cost: [8, 8],
     requiresWeapon: ['sword', 'axe'],
     bladestorm: {
@@ -4316,6 +4320,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     tags: ['attack', 'melee', 'area', 'slam', 'movement'],
     types: ['repeatable'],
     travel: 7,
+    run: {
+      style: 'leap',
+    },
     behaviour: {
       kind: 'burst',
       radius: 2,
@@ -4352,6 +4359,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     types: ['repeatable'],
     needsShield: true,
     travel: 6,
+    run: {
+      style: 'charge',
+    },
     behaviour: {
       kind: 'melee',
       range: 1.6,
@@ -4432,18 +4442,22 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     types: ['repeatable'],
     travel: 7,
     releasesCaught: true,
+    spin: {
+      hits: 6,
+      radius: 1.7,
+    },
     behaviour: {
       kind: 'melee',
       range: 1.4,
       arc: 200,
       radius: 1.6,
     },
-    baseMult: [100, 130],
+    baseMult: [25, 33],
     cost: [10, 10],
     requiresWeapon: ['dagger', 'claw', 'sword', 'axe'],
     mods: [],
-    description: 'Spin through your target with your weapon out.',
-    travelThrough: true,
+    description:
+      'Spin through your target with your weapon out, hitting everything around you as you go.',
   },
   {
     kind: 'active',
@@ -4580,6 +4594,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     tags: ['attack', 'melee', 'movement', 'area', 'fire'],
     types: ['repeatable'],
     travel: 7,
+    run: {
+      style: 'run',
+    },
     behaviour: {
       kind: 'burst',
       radius: 2,
@@ -4648,6 +4665,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     description:
       'A hook that pulls you to an enemy and strikes around it; every hit feeds your rage, and rage widens it.',
     travel: 5,
+    run: {
+      style: 'hook',
+    },
   },
   {
     kind: 'active',

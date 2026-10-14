@@ -338,7 +338,7 @@
   "whirlwindCleave": {
    "ref": "Bladestorm",
    "status": "covered",
-   "note": "A spinning attack around the character that leaves a storm of blades for three seconds, half as hard as the spin, in the stance the character is in: a still one that makes you attack faster while you stand in it, or a drifting one that makes you move faster. Three storms at most."
+   "note": "A spin on the spot that takes the whole attack, hitting everything around the character five times (a hit is a fifth of the old single hit), and that leaves a storm of blades for three seconds, half as hard as the spin, in the stance the character is in: a still one that makes you attack faster while you stand in it, or a drifting one that makes you move faster. Three storms at most."
   },
   "emberDownpour": {
    "ref": "Blast Rain",
@@ -1033,7 +1033,7 @@
   "spinningDash": {
    "ref": "Whirling Blades",
    "status": "covered",
-   "note": "A dash through the target that hits everything on the way, then a sweep of the weapon at the end."
+   "note": "A spin that carries the character through the target: it takes the length of an attack, moves fast toward the target, and hits everything around the character six times as it goes, and keeps spinning on the spot once it arrives."
   },
   "twisterBlade": {
    "ref": "Cyclone",

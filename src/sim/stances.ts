@@ -108,7 +108,7 @@ export function placeBladestorm(w: World, a: Actor, act: Action): void {
     radius: r,
     t: spec.seconds * p.skillDuration,
     total: spec.seconds * p.skillDuration,
-    profile: scaleProfile(p, 1 + spec.more / 100),
+    profile: scaleProfile(p, (1 + spec.more / 100) * (p.skill.spin?.hits ?? 1)),
     hand: act.hand,
     pulseT: spec.interval,
     interval: spec.interval,

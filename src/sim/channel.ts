@@ -128,7 +128,9 @@ export function channelUse(w: World, a: Actor, act: Action): void {
     const f = base * ((spec.tickMult ?? 100) / 100) * (1 + ((spec.perStage ?? 0) * st.stage) / 100);
     let q = scaleProfile(p, f);
     q = grown(q, (spec.tickRadiusPerStage ?? 0) * st.stage);
-    fireEffect(w, a, { ...act, profile: q, which: 'channelled' });
+    const b = p.skill.behaviour;
+    const ringed = b.kind === 'burst' && b.origin === 'self';
+    fireEffect(w, a, { ...act, profile: q, which: 'channelled', ringed });
   }
   // Stages also come from hits: a crowd charges the skill faster (Divine Ire).
   let gain = 1;

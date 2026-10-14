@@ -542,8 +542,18 @@ export type ActiveGemDef = SkillFx & {
   };
   /** Seconds between a mine being set off and its going (0.25 by default). */
   detonation?: number;
-  /** The character dashes through its target: everything within a body of the way is hit once on the way (Whirling Blades). */
+  /** The character dashes through its target: everything within a body of the way is hit once on the way. */
   travelThrough?: boolean;
+  /**
+   * A spin that takes the whole of a use: the character moves toward the target (up to `travel` tiles) and hits everything within
+   * `radius` of itself `hits` times as it goes, then spins on where it stands (Whirling Blades). `baseMult` is one hit.
+   */
+  spin?: { hits: number; radius: number };
+  /**
+   * The skill's travel takes time: over the wind-up the character runs at the target (a `leap` hops, a `charge` hits what it runs
+   * into, a `hook` is dragged along a chain, a `run` just runs), and the blow lands on arrival.
+   */
+  run?: { style: 'run' | 'leap' | 'charge' | 'hook' };
   /** The skill cannot be used without a corpse (Pyre Burst). */
   needsCorpse?: boolean;
   /** A corpse made into a geyser that fires projectiles for a while, after exploding for a share of the corpse's life (Pyre Burst). */

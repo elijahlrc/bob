@@ -594,7 +594,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     pulses:
       beh.kind === 'ground'
         ? Math.max(1, Math.floor((beh.duration * db.mult('skillDuration', baseCtx)) / beh.interval))
-        : 1,
+        : (skill.spin?.hits ?? 1),
     deployCount: Math.max(1, Math.round(1 + db.sum('base', 'deployCount', baseCtx))),
     deployScatter: db.flag('deployScatter', baseCtx),
     deploySeconds: db.sum('base', 'deploySeconds', baseCtx),

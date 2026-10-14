@@ -277,7 +277,11 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
       stats.push(...utilityLines(def, level).stats, ...utilityFxLines(def.utility, level));
     else stats.push(...behaviourLines(def.behaviour, level));
     stats.push(...fxLines(def, level));
-    if (def.travel)
+    if (def.spin)
+      stats.push(
+        `Spins as you run up to ${num(def.travel ?? 0)} toward the target, hitting everything within ${num(def.spin.radius)} of you ${def.spin.hits} times in one use, and spinning on where you stop`,
+      );
+    else if (def.travel)
       stats.push(
         def.channel
           ? 'Carries you toward the target as you spin, at your movement speed'
