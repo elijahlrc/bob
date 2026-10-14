@@ -28,6 +28,7 @@ change, and our own names only. Dash bullets under plain headings.
 - The Skills tab gem list now updates at once when you socket or remove a gem, instead of only after you switch tabs.
 - Fixed stray lines running to the corner of the screen from the outlines of area attacks and warnings on some phones.
 - The outlines of enemy area warnings and lasting ground zones are thinner and fainter, so they clutter the screen less.
+- Through the first 20 maps, gems of your class's main attribute drop much more often, so your early gems fit your class: about 60 to 70 percent of gem drops, up from about 40 to 55 percent.
 
 ## 2026-10-12
 
