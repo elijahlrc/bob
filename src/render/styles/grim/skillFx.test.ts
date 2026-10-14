@@ -33,6 +33,8 @@ const world = (a: Actor): World =>
     minions: [],
     zones: [],
     deployables: [],
+    fields: [],
+    grid: { w: 20 },
     hexes: [],
     char: { auras: [], utilities: [], actives: [] },
     vortex: null,
@@ -152,5 +154,82 @@ describe('skill effects', () => {
     const fx = new SkillFx(host([a]), scene);
     for (let d = 0; d < 5; d++) fx.onEvent({ t: 'explode', x: 5, y: 5, r: 2, dtype: d }, world(a));
     expect(pending(fx)).toBeGreaterThanOrEqual(5);
+  });
+
+  it('a trap or a mine is thrown and lands; a totem comes down; neither is a cast', () => {
+    const a = actor();
+    const fx = new SkillFx(host([a]), scene);
+    const w = world(a);
+    fx.onEvent({ t: 'deploy', id: 7, kind: 'trap', x: 9, y: 5, end: false }, w);
+    const flights = () => (fx as unknown as { flights: Map<number, unknown> }).flights;
+    expect(flights().size).toBe(1);
+    // The thing is in the air for a moment, then lands and the flight is over.
+    fx.frame(w, 0.1, 1, gfx() as never);
+    expect(flights().size).toBe(1);
+    for (let i = 0; i < 4; i++) fx.frame(w, 0.1, 1.1 + i * 0.1, gfx() as never);
+    expect(flights().size).toBe(0);
+    // A shot fired by a deployable is not the character casting.
+    const n = pending(fx);
+    fx.onEvent({ t: 'use', src: 1, skill: 'jawsTrap', via: 'deployed' }, w);
+    expect(pending(fx)).toBe(n);
+  });
+
+  it('a trap that springs bursts and runs a line to its target', () => {
+    const a = actor();
+    const fx = new SkillFx(host([a]), scene);
+    const w = world(a);
+    fx.onEvent({ t: 'sprung', id: 7, kind: 'trap', x: 9, y: 5, tx: 11, ty: 5 }, w);
+    expect(pending(fx)).toBeGreaterThanOrEqual(3);
+    for (let i = 0; i < 20; i++) fx.frame(w, 0.05, 1 + i * 0.05, gfx() as never);
+    expect(pending(fx)).toBe(0);
+  });
+
+  it('every kind of lasting field is drawn without error, and a wall is drawn tile by tile', () => {
+    const a = actor();
+    const fx = new SkillFx(host([a]), scene);
+    const w = world(a);
+    const kinds = [
+      'consecrated',
+      'chilling',
+      'caustic',
+      'pod',
+      'crystal',
+      'storm',
+      'wall',
+      'orb',
+      'zap',
+      'trail',
+      'ghost',
+      'bladestorm',
+      'geyser',
+      'smoke',
+    ];
+    w.fields = kinds.map((kind, i) => ({
+      id: i,
+      owner: 1,
+      kind,
+      x: 6 + i,
+      y: 5,
+      x2: 8 + i,
+      y2: 6,
+      r0: 1.5,
+      grow: 1,
+      radius: 1.5,
+      t: 2,
+      total: 4,
+      hand: 0,
+      pulseT: 0,
+      interval: 1,
+      dps: 0,
+      dtype: i % 5,
+      tiles: [45, 46, 66],
+      stages: 3,
+    })) as never;
+    fx.frame(w, 0.05, 1, gfx() as never);
+    // A field that is nearly gone (fading) and one just made (rising) draw too.
+    for (const f of w.fields) f.t = 0.1;
+    fx.frame(w, 0.05, 1.05, gfx() as never);
+    for (const f of w.fields) f.t = 3.95;
+    fx.frame(w, 0.05, 1.1, gfx() as never);
   });
 });

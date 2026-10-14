@@ -703,7 +703,17 @@ export function raiseWall(w: World, a: Actor, act: Action): void {
     tiles,
   };
   w.fields.push(f);
-  w.events.push({ t: 'explode', x: act.aimX, y: act.aimY, r: len / 2, dtype: f.dtype });
+  // The band the wall stands on (the renderer draws the wall itself, tile by tile, from the field).
+  const ex = Math.cos(ang) * (len / 2);
+  const ey = Math.sin(ang) * (len / 2);
+  w.events.push({
+    t: 'explode',
+    x: act.aimX,
+    y: act.aimY,
+    r: 0.5,
+    dtype: f.dtype,
+    strip: [act.aimX - ex, act.aimY - ey, act.aimX + ex, act.aimY + ey],
+  });
   // What stood under the wall takes the hit, and is thrown back from the line.
   for (const e of enemiesIn(w, act.aimX, act.aimY, len / 2 + 0.4)) {
     hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));

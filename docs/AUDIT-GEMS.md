@@ -1609,3 +1609,22 @@ it covers the travel in the 60% of the use before the blow, stops at contact, an
   damage per use is the same), with the storm of blades left once, at the first hit, at the old strength.
 - **Twister Blade and Judgement Tempest** (channels that pulse round the character): each pulse still hurts, but no ring is drawn for
   each; one ring stays on the character while the channel lasts.
+
+## What a skill leaves standing, and what a deployable does (2026-10-14)
+
+Found by looking at the screen, then at the renderer: **nothing in `src/render` read `w.fields`**, the sim's list of what a skill leaves
+standing. Every one of these was drawn only by the single ring of the `explode` event that made it, and then was invisible: consecrated,
+chilling and caustic ground, spore pods, frost crystals, the storm of Herald of Thunder, the frost orb, storm-orb zaps, trails, the Illusion's
+figure, bladestorms, geysers, smoke, and the wall of ice (which also holds tiles shut that the map never showed). They are now drawn
+(`fieldMarks` in `src/render/styles/grim/skillFx.ts`; the look of each is in [VISUAL_LANGUAGE.md](VISUAL_LANGUAGE.md)).
+
+- **Glacier Wall**: the raise event is the band the wall stands on (a `strip`), not a circle of the wall's length, and each tile it holds is
+  drawn as a block of ice that rises, glints, and sinks as it melts. Tiles skipped because something stood on them are skipped in the
+  picture too. The hit when it goes up is still a circle (length / 2 + 0.4 tiles) round the middle, wider than the band at the ends; that
+  is the sim's rule and was left as it was.
+- **Traps and mines** looked like an area cast for three reasons, all fixed: the cast rune opened round the character for a skill that only
+  puts something down (now none); every shot of a trap or a totem pushed a `use` event, so the rune also opened round the character when a trap
+  went off across the room (the event now says `via: 'deployed'` and draws nothing); and the placement was a small ring where the thing already
+  stood (now a throw in an arc for a trap or a mine, a drop for a totem or a brand, with a ring closing while it arms and a ring of ticks on
+  the ground that sets it off). A trap that springs or a mine that goes has its own burst and a line to its target (`sprung` event).
+- Not changed: monsters' own skills, projectile bodies, and the upkeep skills; their looks were already distinct.

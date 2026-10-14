@@ -429,7 +429,8 @@ export type SimEvent =
   | { t: 'chest'; id: number }
   | { t: 'flaskUsed'; idx: number }
   | { t: 'projectileSpawned'; id: number }
-  | { t: 'use'; src: number; skill: string }
+  /** A skill use began. `via` marks a shot fired by something the character put down (a totem, a trap), not by the character. */
+  | { t: 'use'; src: number; skill: string; via?: 'deployed' }
   | { t: 'echo'; src: number; skill: string }
   | { t: 'trigger'; skill: string; kind: string }
   | { t: 'chain'; from: number; to: number; dtype?: number }
@@ -485,7 +486,10 @@ export type SimEvent =
   | { t: 'hex'; id: number; hex: string }
   /** A status was put on an enemy. */
   | { t: 'status'; dst: number; id: string }
-  | { t: 'deploy'; kind: string; x: number; y: number; end: boolean }
+  /** A totem, brand, trap or mine was put down at (x, y) (`end` false) or ended there (`end` true). */
+  | { t: 'deploy'; id: number; kind: string; x: number; y: number; end: boolean }
+  /** A trap or a mine went off at (x, y), at an enemy standing at (tx, ty). */
+  | { t: 'sprung'; id: number; kind: string; x: number; y: number; tx: number; ty: number }
   | { t: 'stuck' }
   | { t: 'stall'; id: number }
   | {

@@ -60,9 +60,9 @@ export const DEPLOY_SECONDS: Record<DeployKind, number> = {
   mine: 14,
 };
 /** Distance at which an enemy sets off a trap, and at which a mine is set off. */
-const TRAP_RADIUS = 1.6;
-const MINE_RADIUS = 3.5;
-const MINE_ARM = 0.6;
+export const TRAP_RADIUS = 1.6;
+export const MINE_RADIUS = 3.5;
+export const MINE_ARM = 0.6;
 /** Seconds between a mine being set off and going, unless the skill says otherwise; and between the mines of a chain. */
 const DETONATION = 0.25;
 const CHAIN_GAP = 0.25;
@@ -193,8 +193,9 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
       : undefined;
   const put = (x: number, y: number) => {
     const spot = w.grid.collide(x, y, 0.3);
+    const id = ++w.deploySeq;
     w.deployables.push({
-      id: ++w.deploySeq,
+      id,
       kind: c.deploy!,
       key: c.key,
       x: spot.x,
@@ -203,7 +204,7 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
       fireT: c.deploy === 'mine' ? MINE_ARM : c.deploy === 'trap' ? 0.3 : 0.4,
       aura,
     });
-    w.events.push({ t: 'deploy', kind: c.deploy!, x: spot.x, y: spot.y, end: false });
+    w.events.push({ t: 'deploy', id, kind: c.deploy!, x: spot.x, y: spot.y, end: false });
   };
   if (c.deploy === 'totem') {
     // Only as many as the skill allows stand: the one furthest from the character (the one left behind) gives way.
@@ -269,7 +270,7 @@ function shoot(
     aimX: ax,
     aimY: ay,
   };
-  w.events.push({ t: 'use', src: w.player.id, skill: prof.skill.id });
+  w.events.push({ t: 'use', src: w.player.id, skill: prof.skill.id, via: 'deployed' });
   fire(w, from, act);
 }
 
@@ -326,12 +327,26 @@ function freeBot(w: World): Minion | null {
   return null;
 }
 
+/** A trap or a mine goes off at an enemy (for the renderer: the trap springs, a line runs to what it fires at). */
+function sprung(w: World, d: Deployable, target: Actor): void {
+  w.events.push({
+    t: 'sprung',
+    id: d.id,
+    kind: d.kind,
+    x: d.x,
+    y: d.y,
+    tx: target.x,
+    ty: target.y,
+  });
+}
+
 /** A mine goes: its skill's burst at the nearest enemy, harder for the mines that went before it, and the rain that follows. */
 function detonate(w: World, d: Deployable, c: SkillChoice, foes: Actor[]): void {
   const target =
     nearestFoe(foes, d.x, d.y, MINE_SEEK) ??
     nearestFoe(foes, d.aimX ?? d.x, d.aimY ?? d.y, MINE_SEEK);
   if (!target) return;
+  sprung(w, d, target);
   const prof = w.char.profile(c, playerConds(w, target), flaskMask(w));
   const seq = d.seq ?? 0;
   shoot(w, d, c, target, 1 + (prof.mineChain * seq) / 100);
@@ -544,6 +559,7 @@ export function tickDeployables(w: World, dt: number): void {
       } else {
         const best = nearestFoe(foes, d.x, d.y, TRAP_RADIUS);
         if (best) {
+          sprung(w, d, best);
           shoot(w, d, c, best);
           keep = false;
         } else {
@@ -552,6 +568,7 @@ export function tickDeployables(w: World, dt: number): void {
           const bot = far ? freeBot(w) : null;
           if (far && bot) {
             bot.botCd = 3;
+            sprung(w, d, far);
             shoot(w, d, c, far);
             keep = false;
           } else d.fireT = 0.05;
@@ -559,7 +576,7 @@ export function tickDeployables(w: World, dt: number): void {
       }
     }
     if (keep) w.deployables[j++] = d;
-    else w.events.push({ t: 'deploy', kind: d.kind, x: d.x, y: d.y, end: true });
+    else w.events.push({ t: 'deploy', id: d.id, kind: d.kind, x: d.x, y: d.y, end: true });
   }
   w.deployables.length = j;
   // Beams are cast four times a second.

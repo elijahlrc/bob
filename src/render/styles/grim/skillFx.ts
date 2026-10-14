@@ -11,10 +11,11 @@ import {
 } from '../../../calc/skillLook';
 import { HIT_AT } from '../../../data/constants';
 import { MINIONS } from '../../../data/minions';
-import { bondLinks, choiceByKey } from '../../../sim/deploy';
+import { bondLinks, choiceByKey, MINE_ARM, MINE_RADIUS, TRAP_RADIUS } from '../../../sim/deploy';
+import type { Field } from '../../../sim/fields';
 import type { Actor, SimEvent, World } from '../../../sim/types';
 import { drawBuffs, type BuffMark } from './buffFx';
-import { drawLanded, outlineArea, shapeOfExplode, type AreaShape } from './areaFx';
+import { drawLanded, fillArea, outlineArea, shapeOfExplode, type AreaShape } from './areaFx';
 
 /**
  * Skill effects for the grim style, drawn from sim events and sim state. The language (see src/calc/skillLook.ts):
@@ -58,8 +59,44 @@ const COSMETIC_R = 0.6;
 
 const KIND_COLOR = { totem: 0xc8a060, brand: 0xb070ff, trap: 0xe0c040, mine: 0xff7040 } as const;
 
+/** Seconds a trap or a mine takes to fly from the hand to the ground, and a totem or a brand to drop onto it. */
+const LOB_SECONDS = 0.3;
+const DROP_SECONDS = 0.18;
+
+/** What a deployable still in the air needs to be drawn, and to land. */
+type Flight = {
+  t: number;
+  total: number;
+  kind: string;
+  /** Where it comes down, and where it was thrown from (tiles). */
+  x: number;
+  y: number;
+  fromX: number;
+  fromY: number;
+  glow: number;
+};
+
+/** The colour of the ground that skills leave (the element does not say it: consecrated ground is physical but gold). */
+const GROUND_COLOR = { consecrated: 0xffe39a, chilling: 0x9ad8ff, caustic: 0x9ae05a } as const;
+
+const shade = (c: number, f: number): number =>
+  (Math.round(((c >> 16) & 255) * f) << 16) |
+  (Math.round(((c >> 8) & 255) * f) << 8) |
+  Math.round((c & 255) * f);
+
+/** A fixed pseudo-random number from 0 to 1 for a pair of numbers (a tile's height of ice). */
+const hash2 = (a: number, b: number): number => {
+  const v = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453;
+  return v - Math.floor(v);
+};
+
+type DeployKindName = keyof typeof KIND_COLOR;
+
 export class SkillFx {
   private list: Fx[] = [];
+  /** The width of the map in tiles (the tiles of a wall are indices into it). */
+  private gridW = 0;
+  private flights = new Map<number, Flight>();
   private air: Gfx;
   private blinkFrom = new Map<number, Pt>();
   private lastBuff = new Map<string, number>();
@@ -195,8 +232,10 @@ export class SkillFx {
   onEvent(e: SimEvent, w: World): void {
     switch (e.t) {
       case 'use': {
+        // A trap that goes off or a totem that shoots is not the character casting: no cue round the character.
+        if (e.via) break;
         const a = this.host.actorById(e.src);
-        if (a) this.cast(a);
+        if (a) this.cast(a, w);
         break;
       }
       case 'swing':
@@ -261,22 +300,92 @@ export class SkillFx {
         this.wave(e.x, e.y, 0.2, 1.0, UTILITY_COLOR.blink, 0.3, 1.5);
         break;
       }
-      case 'deploy': {
-        const c = 0xffe0a0;
-        this.wave(e.x, e.y, 0.2, e.end ? 1.4 : 0.9, c, e.end ? 0.35 : 0.3, 1.5);
+      case 'deploy':
+        if (e.end) this.wave(e.x, e.y, 0.15, 0.6, 0xffe0a0, 0.25, 1);
+        else this.setDown(e, w);
         break;
-      }
+      case 'sprung':
+        this.sprung(e, w);
+        break;
       default:
         break;
     }
   }
 
+  /** The colour of the element a deployable's skill deals. */
+  private glowOf(w: World, id: number): number {
+    const d = w.deployables.find((x) => x.id === id);
+    const choice = d ? choiceByKey(w, d.key) : undefined;
+    return ELEMENT_COLOR[choice ? elementOfTags(choice.skill.tags, choice.skill.spellDamage) : 0];
+  }
+
+  /**
+   * A totem, brand, trap or mine is put down: a trap or a mine is thrown from the hand in an arc, a totem or a brand
+   * comes down from above. The thing is drawn in the air until it lands (`flying`), then it lands with dust and a small ring.
+   */
+  private setDown(e: Extract<SimEvent, { t: 'deploy' }>, w: World): void {
+    const thrown = e.kind === 'trap' || e.kind === 'mine';
+    const total = thrown ? LOB_SECONDS : DROP_SECONDS;
+    this.flights.set(e.id, {
+      t: total,
+      total,
+      kind: e.kind,
+      x: e.x,
+      y: e.y,
+      fromX: w.player.x,
+      fromY: w.player.y,
+      glow: this.glowOf(w, e.id),
+    });
+  }
+
+  private landFlight(f: Flight): void {
+    const p = this.host.project(f.x, f.y);
+    const thrown = f.kind === 'trap' || f.kind === 'mine';
+    this.host.em.dust.explode(thrown ? 4 : 7, p.x, p.y - 1);
+    this.wave(f.x, f.y, 0.15, thrown ? 0.7 : 1.0, lighten(f.glow, 0.3), 0.3, 1.5);
+    if (!thrown) this.host.shake(1.5);
+  }
+
+  /** A trap springs or a mine goes: the casing bursts into spikes and a line runs to what it fires at. */
+  private sprung(e: Extract<SimEvent, { t: 'sprung' }>, w: World): void {
+    const glow = this.glowOf(w, e.id);
+    const mine = e.kind === 'mine';
+    const reach = mine ? 1.7 : 1.2;
+    const o = this.lifted(e.x, e.y, 3);
+    const t = this.lifted(e.tx, e.ty, 6);
+    this.add(0.34, true, (g, k) => {
+      const a = 1 - k;
+      const run = Math.min(1, k * 3);
+      for (let i = 0; i < 8; i++) {
+        const ang = (i / 8) * Math.PI * 2 + e.x * 3;
+        const p0 = this.lifted(
+          e.x + Math.cos(ang) * reach * 0.12 * (1 + run),
+          e.y + Math.sin(ang) * reach * 0.12 * (1 + run),
+          3,
+        );
+        const p1 = this.lifted(
+          e.x + Math.cos(ang) * reach * (0.2 + 0.8 * run),
+          e.y + Math.sin(ang) * reach * (0.2 + 0.8 * run),
+          3,
+        );
+        g.lineStyle(mine ? 2.5 : 2, lighten(glow, 0.45), a).lineBetween(p0.x, p0.y, p1.x, p1.y);
+      }
+    });
+    this.add(0.22, true, (g, k) => this.streak(g, [o, t], glow, 1 - k, 0.9));
+    this.wave(e.x, e.y, 0.15, mine ? 1.1 : 0.8, lighten(glow, 0.35), 0.3, 1.5);
+    this.host.flash(o.x, o.y, glow, mine ? 1.4 : 1, 0.25);
+    this.host.em.spark.explode(mine ? 8 : 5, o.x, o.y);
+  }
+
   /** What a skill use shows while it winds up: the cue of its kind. */
-  private cast(a: Actor): void {
+  private cast(a: Actor, w: World): void {
     const act = a.action;
     if (!act) return;
     // A skill of beams puts its totems down: no blast shows around the caster.
     if (act.profile.skill.bond) return;
+    // A skill that puts something down shows the thing going down, not a spell going off.
+    if (a.isPlayer && w.char.actives.find((c) => c.skill.id === act.profile.skill.id)?.deploy)
+      return;
     const look = profileLook(act.profile);
     const c = look.color;
     switch (look.delivery) {
@@ -489,6 +598,7 @@ export class SkillFx {
    */
   frame(w: World, dt: number, time: number, ground: Gfx): void {
     this.now = time;
+    this.gridW = w.grid.w;
     this.zones(ground, w, time);
     this.bonds(ground, w, time);
     this.deployables(ground, w, time);
@@ -496,6 +606,8 @@ export class SkillFx {
     this.upkeep(ground, w, time);
     const air = this.air;
     air.clear();
+    this.flying(ground, air, dt, time);
+    this.fieldMarks(ground, air, w, time);
     this.curseMarks(air, w, time);
     this.siphons(air, w, time);
     this.buffMarks(ground, air, w, time);
@@ -682,51 +794,422 @@ export class SkillFx {
   /** Totems, brands, traps and mines: the shape says which, the glow says the element. */
   private deployables(g: Gfx, w: World, time: number): void {
     for (const d of w.deployables) {
+      // Still in the air: drawn by `flying` until it lands.
+      if (this.flights.has(d.id)) continue;
       const { x, y } = this.host.project(d.x, d.y);
       const choice = choiceByKey(w, d.key);
       const element = choice ? elementOfTags(choice.skill.tags, choice.skill.spellDamage) : 0;
       const glow = ELEMENT_COLOR[element];
-      const base = KIND_COLOR[d.kind];
       const fade = Math.min(1, d.t);
       const armed = d.fireT <= 0.05;
-      g.fillStyle(0x000000, 0.3 * fade).fillEllipse(x, y + 1, 12, 5);
-      if (d.kind === 'totem') {
-        g.fillStyle(0x6a5030, 0.95 * fade).fillRect(x - 3, y - 13, 6, 13);
-        g.fillStyle(base, 0.95 * fade).fillRect(x - 4, y - 15, 8, 3);
-        const pulse = 0.6 + 0.4 * Math.sin(time * 6 + d.id);
-        g.fillStyle(glow, 0.35 * fade * pulse).fillCircle(x, y - 19, 5);
-        g.fillStyle(lighten(glow, 0.4), 0.95 * fade).fillCircle(x, y - 19, 2.4);
-      } else if (d.kind === 'brand') {
-        const spin = time * 1.5 + d.id;
-        g.fillStyle(glow, 0.12 * fade).fillEllipse(x, y, 20, 10);
-        g.lineStyle(1, glow, 0.9 * fade).strokeEllipse(x, y - 6, 12, 6);
-        for (let i = 0; i < 3; i++) {
-          const a = spin + (i / 3) * Math.PI * 2;
-          g.lineStyle(1, lighten(glow, 0.3), 0.8 * fade).lineBetween(
-            x,
-            y - 6,
-            x + Math.cos(a) * 6,
-            y - 6 + Math.sin(a) * 3,
-          );
-        }
-        g.fillStyle(0xffffff, 0.9 * fade).fillCircle(x, y - 6, 1.5);
-      } else if (d.kind === 'trap') {
-        g.fillStyle(0x3a3020, 0.9 * fade).fillRect(x - 5, y - 2, 10, 4);
-        g.lineStyle(1, base, 0.9 * fade).strokeRect(x - 5, y - 2, 10, 4);
-        g.fillStyle(glow, (armed ? 0.9 : 0.4) * fade).fillTriangle(
-          x,
-          y - 3,
-          x - 3,
-          y + 1,
-          x + 3,
-          y + 1,
-        );
+      const going = d.goAt !== undefined;
+      this.deployable(g, d.kind, x, y, glow, fade, armed, going, time, d.id, 0);
+      if (d.kind !== 'trap' && d.kind !== 'mine') continue;
+      if (going) {
+        // Set off: a ring closes on the mine until it goes.
+        const k = Math.min(1, Math.max(0, d.goAt! - w.t) / 0.25);
+        this.ring(g, d.x, d.y, 0.3 + 1.1 * k, 0xffffff, 0.9 * fade, 1.5);
+      } else if (!armed) {
+        // Arming: a ring of its colour closes on it, and then it is ready.
+        const full = d.kind === 'mine' ? MINE_ARM : 0.3;
+        const k = Math.min(1, Math.max(0, d.fireT / full));
+        this.ring(g, d.x, d.y, 0.25 + 0.85 * k, glow, 0.85 * fade, 1.2);
       } else {
-        const blink = armed ? 0.55 + 0.45 * Math.sin(time * 10 + d.id) : 0.3;
-        g.fillStyle(0x2a2018, 0.9 * fade).fillEllipse(x, y, 10, 5);
-        g.fillStyle(glow, blink * fade).fillCircle(x, y - 1, 2.2);
-        g.lineStyle(1, base, 0.7 * fade).strokeEllipse(x, y, 10, 5);
+        // Ready: the ground that sets it off, marked (how close an enemy has to come).
+        const trap = d.kind === 'trap';
+        const reach = trap ? TRAP_RADIUS : MINE_RADIUS;
+        this.ring(g, d.x, d.y, reach, glow, (trap ? 0.28 : 0.2) * fade, 1);
+        this.ticks(g, d.x, d.y, reach, trap ? 12 : 22, 0, glow, (trap ? 0.7 : 0.5) * fade, 3);
       }
+    }
+  }
+
+  /**
+   * One totem, brand, trap or mine at a screen point (a spot on the ground, `lift` pixels above it while it is in the air).
+   * `armed` is a trap or a mine that is ready, `going` a mine that has been set off.
+   */
+  private deployable(
+    g: Gfx,
+    kind: DeployKindName,
+    x: number,
+    y: number,
+    glow: number,
+    fade: number,
+    armed: boolean,
+    going: boolean,
+    time: number,
+    id: number,
+    lift: number,
+  ): void {
+    const base = KIND_COLOR[kind];
+    const sy = y - lift;
+    g.fillStyle(0x000000, 0.3 * fade).fillEllipse(x, y + 1, 12, 5);
+    if (kind === 'totem') {
+      g.fillStyle(0x6a5030, 0.95 * fade).fillRect(x - 3, sy - 13, 6, 13);
+      g.fillStyle(base, 0.95 * fade).fillRect(x - 4, sy - 15, 8, 3);
+      const pulse = 0.6 + 0.4 * Math.sin(time * 6 + id);
+      g.fillStyle(glow, 0.35 * fade * pulse).fillCircle(x, sy - 19, 5);
+      g.fillStyle(lighten(glow, 0.4), 0.95 * fade).fillCircle(x, sy - 19, 2.4);
+    } else if (kind === 'brand') {
+      const spin = time * 1.5 + id;
+      g.fillStyle(glow, 0.12 * fade).fillEllipse(x, y, 20, 10);
+      g.lineStyle(1, glow, 0.9 * fade).strokeEllipse(x, sy - 6, 12, 6);
+      for (let i = 0; i < 3; i++) {
+        const a = spin + (i / 3) * Math.PI * 2;
+        g.lineStyle(1, lighten(glow, 0.3), 0.8 * fade).lineBetween(
+          x,
+          sy - 6,
+          x + Math.cos(a) * 6,
+          sy - 6 + Math.sin(a) * 3,
+        );
+      }
+      g.fillStyle(0xffffff, 0.9 * fade).fillCircle(x, sy - 6, 1.5);
+    } else if (kind === 'trap') {
+      // A plate set with teeth, lit in the element's colour when it is ready.
+      g.fillStyle(0x3a3020, 0.95 * fade).fillRect(x - 9, sy - 2, 18, 6);
+      g.lineStyle(1, base, 0.95 * fade).strokeRect(x - 9, sy - 2, 18, 6);
+      const lit = (armed ? 0.95 : 0.45) * fade;
+      for (const dx of [-6.5, -2.2, 2.2, 6.5])
+        g.fillStyle(glow, lit).fillTriangle(x + dx - 2, sy - 2, x + dx + 2, sy - 2, x + dx, sy - 9);
+    } else {
+      const blink = going
+        ? 0.5 + 0.5 * Math.sin(time * 40)
+        : armed
+          ? 0.55 + 0.45 * Math.sin(time * 10 + id)
+          : 0.3;
+      g.fillStyle(0x2a2018, 0.95 * fade).fillEllipse(x, sy, 13, 7);
+      g.fillStyle(glow, blink * fade * 0.35).fillCircle(x, sy - 1, 5);
+      g.fillStyle(lighten(glow, 0.3), blink * fade).fillCircle(x, sy - 1, 2.4);
+      g.lineStyle(1, base, 0.85 * fade).strokeEllipse(x, sy, 13, 7);
+    }
+  }
+
+  /** Totems and brands coming down from above, and traps and mines thrown from the hand in an arc, until they land. */
+  private flying(ground: Gfx, air: Gfx, dt: number, time: number): void {
+    for (const [id, f] of this.flights) {
+      f.t -= dt;
+      if (f.t <= 0) {
+        this.flights.delete(id);
+        this.landFlight(f);
+        continue;
+      }
+      const u = 1 - f.t / f.total;
+      const thrown = f.kind === 'trap' || f.kind === 'mine';
+      const to = this.host.project(f.x, f.y);
+      const from = this.host.project(f.fromX, f.fromY);
+      // Where it is at `s` of the way: along the ground, and how far up.
+      const at = (s: number): { x: number; y: number; lift: number } => {
+        if (!thrown) return { x: to.x, y: to.y, lift: (1 - s) * (1 - s) * 70 };
+        const span = Math.hypot(to.x - from.x, to.y - from.y);
+        return {
+          x: from.x + (to.x - from.x) * s,
+          y: from.y + (to.y - from.y) * s,
+          lift: 14 * (1 - s) + Math.sin(Math.PI * s) * (22 + span * 0.12),
+        };
+      };
+      if (thrown && u > 0.15)
+        this.streak(
+          air,
+          [0.15, 0.07, 0].map((back) => {
+            const p = at(u - back);
+            return { x: p.x, y: p.y - p.lift };
+          }),
+          f.glow,
+          0.7,
+          0.6,
+        );
+      const p = at(u);
+      air.fillStyle(f.glow, 0.3).fillCircle(p.x, p.y - p.lift - 4, 7);
+      this.deployable(
+        ground,
+        f.kind as DeployKindName,
+        p.x,
+        p.y,
+        f.glow,
+        1,
+        false,
+        false,
+        time,
+        id,
+        p.lift,
+      );
+    }
+  }
+
+  /**
+   * What the sim keeps in `w.fields` (ground a skill leaves, a wall of ice, a crystal, an orb, a trail, an illusion, a
+   * geyser, smoke, a storm), drawn from its state each frame. Each says what it is by its shape; the colour is the element.
+   */
+  private fieldMarks(ground: Gfx, air: Gfx, w: World, time: number): void {
+    for (const f of w.fields) {
+      const fade = Math.min(1, Math.max(0, f.t) / 0.6);
+      const born = Math.min(1, (f.total - f.t) * 4);
+      const el = ELEMENT_COLOR[f.dtype] ?? 0xffffff;
+      switch (f.kind) {
+        case 'consecrated':
+        case 'chilling':
+        case 'caustic': {
+          const c = GROUND_COLOR[f.kind];
+          const motif = f.kind === 'consecrated' ? 3 : f.kind === 'chilling' ? 2 : 4;
+          this.disc(
+            ground,
+            f.x,
+            f.y,
+            f.radius,
+            c,
+            (0.13 + 0.03 * Math.sin(time * 3 + f.id)) * fade * born,
+          );
+          outlineArea(
+            ground,
+            this.host,
+            { kind: 'circle', x: f.x, y: f.y, r: f.radius },
+            c,
+            0.9 * fade * born,
+            1.5,
+          );
+          this.zoneMotif(ground, f.x, f.y, f.radius, motif, c, time, fade * born);
+          break;
+        }
+        case 'pod': {
+          // A spore pod in the ground: it bursts when its time is up.
+          const o = this.host.project(f.x, f.y);
+          const pulse = 0.6 + 0.4 * Math.sin(time * 5 + f.id);
+          this.ring(ground, f.x, f.y, f.radius, GROUND_COLOR.caustic, 0.22 * fade, 1);
+          ground.fillStyle(0x000000, 0.3 * fade).fillEllipse(o.x, o.y + 1, 10, 4);
+          ground.fillStyle(0x6a8a3a, 0.9 * fade).fillEllipse(o.x, o.y - 3, 8, 7);
+          air.fillStyle(0xa0e060, 0.4 * pulse * fade).fillCircle(o.x, o.y - 4, 5);
+          break;
+        }
+        case 'crystal': {
+          // A shard of ice standing where it will burst; it flickers as the burst comes.
+          const o = this.host.project(f.x, f.y);
+          const h = 22 * born;
+          const soon = f.t < 0.5 ? 0.5 + 0.5 * Math.sin(time * 30) : 1;
+          this.disc(ground, f.x, f.y, f.radius, el, 0.08 * fade);
+          outlineArea(
+            ground,
+            this.host,
+            { kind: 'circle', x: f.x, y: f.y, r: f.radius },
+            el,
+            0.6 * fade,
+            1,
+          );
+          ground.fillStyle(0x000000, 0.3).fillEllipse(o.x, o.y + 1, 12, 5);
+          ground
+            .fillStyle(shade(el, 0.55), 0.95 * fade)
+            .fillTriangle(o.x - 5, o.y, o.x + 5, o.y, o.x, o.y + 3);
+          ground
+            .fillStyle(shade(el, 0.8), 0.95 * fade)
+            .fillTriangle(o.x - 5, o.y, o.x + 5, o.y, o.x, o.y - h);
+          air
+            .fillStyle(0xffffff, 0.55 * soon * fade)
+            .fillTriangle(o.x - 1, o.y - 2, o.x + 5, o.y, o.x, o.y - h);
+          break;
+        }
+        case 'storm': {
+          // A storm that follows the character: a ring of crackling ticks about it.
+          this.disc(ground, f.x, f.y, f.radius, el, 0.06 * fade);
+          this.ring(ground, f.x, f.y, f.radius, el, 0.5 * fade, 1.5);
+          this.ticks(ground, f.x, f.y, f.radius, 14, time * 1.5, lighten(el, 0.5), 0.9 * fade, 2);
+          break;
+        }
+        case 'wall':
+          this.iceWall(ground, air, f, fade, time);
+          break;
+        case 'orb': {
+          // A frost orb that hangs over the character: it grows with its stages and sheds motes.
+          const stages = Math.max(0, f.stages ?? 0);
+          const r = Math.min(12, 6 + stages * 0.6);
+          const o = this.lifted(f.x, f.y, 26 + Math.sin(time * 3) * 2);
+          const spec = f.profile?.skill.orb;
+          if (spec?.kind === 'frost') this.ring(ground, f.x, f.y, spec.range, el, 0.1 * fade, 1);
+          air.fillStyle(el, 0.18 * fade).fillCircle(o.x, o.y, r + 5);
+          air.fillStyle(el, 0.5 * fade).fillCircle(o.x, o.y, r);
+          air.fillStyle(0xffffff, 0.95 * fade).fillCircle(o.x, o.y, r * 0.4);
+          for (let i = 0; i < 5; i++) {
+            const a = time * 3 + (i / 5) * Math.PI * 2;
+            air
+              .fillStyle(lighten(el, 0.5), 0.9 * fade)
+              .fillCircle(o.x + Math.cos(a) * (r + 6), o.y + Math.sin(a) * (r + 6) * 0.5, 1.5);
+          }
+          break;
+        }
+        case 'zap': {
+          // A bead of lightning that jumps from spot to spot.
+          const o = this.lifted(f.x, f.y, 10);
+          this.ring(ground, f.x, f.y, f.radius, el, 0.3 * fade, 1);
+          air.fillStyle(el, 0.3 * fade).fillCircle(o.x, o.y, 6);
+          air.fillStyle(0xffffff, 0.95 * fade).fillCircle(o.x, o.y, 2.5);
+          for (let i = 0; i < 3; i++) {
+            const a = time * 9 + i * 2.1;
+            air
+              .lineStyle(1, 0xffffff, 0.8 * fade)
+              .lineBetween(o.x, o.y, o.x + Math.cos(a) * 8, o.y + Math.sin(a) * 6);
+          }
+          break;
+        }
+        case 'trail': {
+          // Ground a dash left along its way: a band with motes drifting up it.
+          const shape = {
+            kind: 'lane',
+            x: f.x,
+            y: f.y,
+            x2: f.x2!,
+            y2: f.y2!,
+            half: f.radius,
+          } as const;
+          fillArea(ground, this.host, shape, el, 0.14 * fade);
+          outlineArea(ground, this.host, shape, el, 0.8 * fade, 1.2);
+          for (let i = 0; i < 8; i++) {
+            const s = (i / 8 + time * 0.5) % 1;
+            const side = Math.sin(i * 12.9898) * 0.6 * f.radius;
+            const len = Math.hypot(f.x2! - f.x, f.y2! - f.y) || 1;
+            const nx = (-(f.y2! - f.y) / len) * side;
+            const ny = ((f.x2! - f.x) / len) * side;
+            const p = this.host.project(f.x + (f.x2! - f.x) * s + nx, f.y + (f.y2! - f.y) * s + ny);
+            ground.fillStyle(lighten(el, 0.4), 0.7 * fade).fillRect(p.x - 1, p.y - 1, 2, 2);
+          }
+          break;
+        }
+        case 'ghost': {
+          // The illusion that runs ahead of the character: a pale figure in a ring.
+          const o = this.host.project(f.x, f.y);
+          this.ring(ground, f.x, f.y, f.radius, el, 0.3 * fade, 1);
+          ground.fillStyle(0x000000, 0.25).fillEllipse(o.x, o.y + 1, 10, 4);
+          air.fillStyle(el, 0.4).fillTriangle(o.x - 5, o.y, o.x + 5, o.y, o.x, o.y - 16);
+          air.fillStyle(el, 0.55).fillCircle(o.x, o.y - 19, 3.5);
+          air.lineStyle(1, 0xffffff, 0.6).strokeCircle(o.x, o.y - 19, 3.5);
+          break;
+        }
+        case 'bladestorm':
+          // Blades that drift over the ground, one ring with two blades going round it, as the spin of a character.
+          this.whirl(
+            ground,
+            air,
+            { x: f.x, y: f.y } as Actor,
+            this.colorOfSkill(w, f.profile?.skill.id ?? ''),
+            f.radius,
+            fade * born,
+            time * 9,
+          );
+          break;
+        case 'geyser': {
+          // A pit in the ground that throws embers up while it sends its blasts down about it.
+          const o = this.host.project(f.x, f.y);
+          this.ring(ground, f.x, f.y, f.radius, el, 0.3 * fade, 1);
+          ground.fillStyle(0x1a0c06, 0.8 * fade).fillEllipse(o.x, o.y, 22, 10);
+          ground.lineStyle(1, el, 0.9 * fade).strokeEllipse(o.x, o.y, 22, 10);
+          for (let i = 0; i < 6; i++) {
+            const rise = ((time * 1.2 + i * 0.17) % 1) * 24;
+            air
+              .fillStyle(lighten(el, 0.3), 0.9 * (1 - rise / 24) * fade)
+              .fillRect(o.x + Math.sin(i * 5.1) * 6 - 1, o.y - rise - 1, 2, 2);
+          }
+          break;
+        }
+        case 'smoke': {
+          // A cloud that blinds what stands in it.
+          this.disc(ground, f.x, f.y, f.radius, 0x9a9aa0, 0.16 * fade * born);
+          const o = this.host.project(f.x, f.y);
+          const rx = this.host.rpx(f.radius);
+          const sq = this.host.squash();
+          for (let i = 0; i < 6; i++) {
+            const a = (i / 6) * Math.PI * 2 + time * 0.3;
+            air
+              .fillStyle(0xc8c8d0, 0.08 * fade * born)
+              .fillCircle(
+                o.x + Math.cos(a) * rx * 0.5,
+                o.y - 6 + Math.sin(a) * rx * 0.5 * sq,
+                rx * 0.32,
+              );
+          }
+          this.ring(ground, f.x, f.y, f.radius, 0xc8c8d0, 0.3 * fade, 1);
+          break;
+        }
+        default:
+          break;
+      }
+    }
+  }
+
+  /**
+   * A wall of ice: a block of ice on each tile the wall holds shut, rising out of the ground when it is raised and sinking into
+   * it as it melts. Drawn tile by tile, so it is exactly the ground that is blocked.
+   */
+  private iceWall(ground: Gfx, air: Gfx, f: Field, fade: number, time: number): void {
+    const w = this.gridW;
+    if (!f.tiles || w <= 0) return;
+    const rise = 1 - (1 - Math.min(1, (f.total - f.t) * 5)) ** 2;
+    const up = rise * fade;
+    const ice = ELEMENT_COLOR[2];
+    // Back to front, so a block in front covers the one behind it.
+    const tiles = f.tiles
+      .map((idx) => ({ tx: idx % w, ty: Math.floor(idx / w) }))
+      .sort(
+        (a, b) =>
+          this.host.project(a.tx + 0.5, a.ty + 0.5).y - this.host.project(b.tx + 0.5, b.ty + 0.5).y,
+      );
+    for (const { tx, ty } of tiles) {
+      const h = (20 + 12 * hash2(tx, ty)) * up;
+      const at = (dx: number, dy: number, lift: number): Pt => {
+        const p = this.host.project(tx + dx, ty + dy);
+        return { x: p.x, y: p.y - lift };
+      };
+      const foot = [at(0, 0, 0), at(1, 0, 0), at(1, 1, 0), at(0, 1, 0)];
+      const top = [at(0, 0, h), at(1, 0, h), at(1, 1, h), at(0, 1, h)];
+      const mid = at(0.5, 0.5, 0);
+      const V = (p: Pt[]) => p as Phaser.Math.Vector2[];
+      const mix = (p: Pt, q: Pt, k: number): Pt => ({
+        x: p.x + (q.x - p.x) * k,
+        y: p.y + (q.y - p.y) * k,
+      });
+      // The frost on the ground under it.
+      ground.fillStyle(ice, 0.22 * fade).fillPoints(V(foot), true);
+      ground.lineStyle(1, ice, 0.5 * fade).strokePoints(V(foot), true, true);
+      // The sides that face the viewer (the lower edges on the screen): a lighter upper band over a darker lower one, a slanting
+      // facet of light, and a bright edge; the left side darker than the right.
+      for (let i = 0; i < 4; i++) {
+        const j = (i + 1) % 4;
+        if ((foot[i].y + foot[j].y) / 2 <= mid.y + 0.5) continue;
+        const k = (foot[i].x + foot[j].x) / 2 < mid.x ? 0.5 : 0.68;
+        const lo = [foot[i], foot[j], mix(foot[j], top[j], 0.5), mix(foot[i], top[i], 0.5)];
+        const hi = [lo[3], lo[2], top[j], top[i]];
+        ground.fillStyle(shade(ice, k * 0.85), 0.96 * fade).fillPoints(V(lo), true);
+        ground.fillStyle(shade(ice, Math.min(1, k * 1.15)), 0.96 * fade).fillPoints(V(hi), true);
+        const f0 = mix(top[i], top[j], 0.15);
+        const f1 = mix(top[i], top[j], 0.5);
+        const f2 = mix(mix(foot[i], foot[j], 0.3), mix(top[i], top[j], 0.3), 0.35);
+        ground
+          .fillStyle(lighten(ice, 0.6), 0.32 * fade)
+          .fillTriangle(f0.x, f0.y, f1.x, f1.y, f2.x, f2.y);
+        ground
+          .lineStyle(1, lighten(ice, 0.6), 0.6 * fade)
+          .lineBetween(foot[i].x, foot[i].y, top[i].x, top[i].y);
+        ground
+          .lineStyle(1, 0x10243a, 0.5 * fade)
+          .lineBetween(foot[i].x, foot[i].y, foot[j].x, foot[j].y);
+      }
+      ground.fillStyle(lighten(ice, 0.2), 0.96 * fade).fillPoints(V(top), true);
+      ground.lineStyle(1, 0x1a3a5a, 0.6 * fade).strokePoints(V(top), true, true);
+      // A cluster of shards standing on the top.
+      for (const [sx, sy, sh] of [
+        [0.3, 0.35, 0],
+        [0.65, 0.55, 1],
+        [0.42, 0.75, 2],
+      ] as const) {
+        const c = at(sx, sy, h);
+        const spike = (6 + 12 * hash2(tx + sh * 3.1, ty - sh * 1.7)) * up;
+        ground
+          .fillStyle(lighten(ice, 0.6), 0.95 * fade)
+          .fillTriangle(c.x - 3, c.y, c.x + 3, c.y, c.x + 0.5, c.y - spike);
+        ground
+          .fillStyle(0xffffff, 0.5 * fade)
+          .fillTriangle(c.x - 3, c.y, c.x, c.y, c.x + 0.5, c.y - spike);
+      }
+      const glint = 0.5 + 0.5 * Math.sin(time * 4 + tx * 1.7 + ty);
+      air
+        .lineStyle(1, 0xffffff, 0.5 * glint * fade)
+        .lineBetween(top[3].x, top[3].y, top[2].x, top[2].y);
     }
   }
 

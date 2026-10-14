@@ -28,7 +28,19 @@ sparks, projectile trails, rings, zones and numbers all use it.
 - **Lasting zones stay.** A ring of ticks shows where a zone will land, then a patch stays on the ground with marks that
   show the element (embers rise, crystals glint, lightning crackles, chaos swirls, dust ticks). A strip is a band with marks
   flowing along it.
-- **Deployables** keep their shape (totem pillar with a glowing top, brand sigil, trap plate, mine) and glow in their element.
+- **Deployables** keep their shape (totem pillar with a glowing top, brand sigil, trap plate set with teeth, mine) and glow in their element.
+  Putting one down is shown, not cast: a trap or a mine is thrown from the hand in an arc, with a trail and a glow, and lands in a puff of
+  dust; a totem or a brand comes down from above. A ring closes on a trap or a mine while it arms, and a ready one marks the ground that sets
+  it off (a ring of ticks). A mine that has been set off flickers with a white ring closing on it until it goes. When a trap springs or a
+  mine goes, its casing bursts into spikes and a line runs to the enemy it fires at. A shot from a deployable never draws the cast rune
+  round the character (the `use` event carries `via: 'deployed'`).
+- **Lasting fields** (what a skill leaves standing: `w.fields` in the sim, drawn by `fieldMarks` in `skillFx.ts`) each have a shape that
+  says what they are: ground (consecrated gold, chilling ice, caustic green) is a patch with its marks; a spore pod is a green bulb; a
+  frost crystal is a standing shard that flickers before it bursts; a storm is a ring of crackling ticks about the character; a frost orb
+  hangs over the character and sheds motes; a zap is a bead of lightning; a trail is a band with motes drifting up it; an illusion is a pale
+  figure in a ring; a bladestorm is a ring with two blades going round it; a geyser is a pit throwing embers; smoke is a grey cloud.
+- **A wall of ice** is a block of ice on each tile it holds shut (the exact ground it blocks, drawn tile by tile): it rises out of the ground
+  when raised, glints while it stands and sinks as it melts. The band it stands on flashes when it goes up.
 
 ## Areas: one clean outline
 
@@ -75,4 +87,4 @@ fails to compile until `deliveryOf` handles it.
 ## Sim events the effects use
 
 `use` (a skill starts), `swing` and `thrust` (a melee blow lands), `explode` (a circle, or a strip; maybe with things falling), `beam` (with its
-width), `cry` (a shout's radius), `chain`, `buff`, `hex`, `summon`, `blink`, `deploy`; zones, deployables, minions, auras, buffs and curses are drawn from world state every frame.
+width), `cry` (a shout's radius), `chain`, `buff`, `hex`, `summon`, `blink`, `deploy` (put down, or ended), `sprung` (a trap or a mine goes off); zones, lasting fields, deployables, minions, auras, buffs and curses are drawn from world state every frame.
