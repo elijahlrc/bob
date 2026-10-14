@@ -34,6 +34,7 @@ Read them loosely from what the user typed after the command.
    For another grouping, group by that column instead (`class_id`, `coalesce(killer,'(none)')`, ...) and order by count descending.
    Also fetch the totals you will quote (total deaths, deaths on maps 1 to 10, median map) with SQL
    (`percentile_cont(0.5) within group (order by map)`), never by adding up in your head.
+
 3. Chart it with the visualize tools (`read_me` with the `chart` module, then `show_widget`): a bar chart, one bar per map from 1 to the last
    map worth showing (zeros included so gaps are visible; fold the long tail into one "N+" bar), one hue, with the boss maps (every tenth)
    in the accent colour. For class, killer and version, a horizontal bar chart sorted by count. Keep the chart free of prose.
