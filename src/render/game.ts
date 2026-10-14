@@ -2,9 +2,11 @@ import Phaser from 'phaser';
 import type { Emitter } from '../core/events';
 import type { BusEvents } from '../run/controller';
 import { MapScene } from './MapScene';
+import { fixStrokes } from './strokeFix';
 
 /** Create the Phaser game that renders maps. DOM screens are drawn over it by `ui`. */
 export function createGame(parent: string, bus: Emitter<BusEvents>): Phaser.Game {
+  fixStrokes();
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent,
