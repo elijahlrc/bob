@@ -26,6 +26,7 @@ import type { Deployable } from './deploy';
 import type { Minion } from './minions';
 import type { Grid } from './grid';
 import type { Ledger } from './ledger';
+import type { ReprieveState } from './reprieve';
 
 export type Dot = { dps: number; t: number; stack?: boolean; spread?: number };
 
@@ -402,6 +403,8 @@ export type FlaskState = {
 };
 
 export type SimEvent =
+  /** A Reprieve fired (docs/WAYSIDE.md 7): the character was pulled out of the map, or stood up again. */
+  | { t: 'reprieve'; how: 'retreat' | 'revive'; id: string }
   | { t: 'hit'; src: number; dst: number; amount: number; crit: boolean; dtype: number }
   | { t: 'dot'; dst: number; amount: number }
   | { t: 'miss'; src: number; dst: number }
@@ -632,6 +635,8 @@ export type WorldOpts = {
   freeResources?: boolean;
   /** Balance probes: the player cannot die (life is restored at 1). */
   godMode?: boolean;
+  /** The Reprieve the character holds (data/reprieves.ts): it fires when damage would kill (docs/WAYSIDE.md 7). */
+  reprieve?: string | null;
 };
 
 /** Runtime state of the triggers (EXPANSION 5.5), keyed by trigger source. */
@@ -807,6 +812,8 @@ export type World = {
   flasks: FlaskState[];
   xp: number;
   status: MapStatus;
+  /** The Reprieve held, the one that fired, and the seconds of safety left after a Revive. */
+  reprieve: ReprieveState;
   /** Seconds until the player leaves after pressing Abandon, or null when not leaving. */
   abandonT: number | null;
   /** The escape timer was started by the map running too long, not by the player: it cannot be cancelled. */

@@ -48,6 +48,7 @@ import { Grid } from './grid';
 import { newActor } from './actor';
 import { newLedger } from './ledger';
 import { tickAbandon } from './abandon';
+import { newReprieveState, tickReprieve } from './reprieve';
 import { tickCollapse } from './collapse';
 import { tickHoldout } from './holdout';
 import { tickStranded } from './strand';
@@ -244,6 +245,7 @@ export function createWorld(inp: CreateWorldInput): World {
     })),
     xp: inp.xp,
     status: 'running',
+    reprieve: newReprieveState(inp.opts?.reprieve),
     abandonT: null,
     abandonAuto: false,
     surge: 0,
@@ -668,6 +670,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   }
   if (!p.alive && w.status === 'running') w.status = 'dead';
   tickCollapse(w);
+  tickReprieve(w, dt);
   tickAbandon(w, dt);
   if (w.t >= (w.opts.maxTime ?? 900) && w.status === 'running') w.status = 'timeout';
 }

@@ -103,3 +103,48 @@ scoring includes them). It never buys or arms a bet. Specialists do not exist ye
 **Q. Does the Character sheet show armed provisions?**
 Chosen: no. Only the offer cards (and the bot's scoring of offers) count them; the sheet shows the build alone, so comparing gear is
 not clouded by a buff that burns at the next map.
+
+## Y4 — Reprieves
+
+**Q. Do all the ways to die go through the one hook?**
+Checked in the code: the player's life falls only in `applyDamage` (hits, ailments and ground effects all call it); the one other
+place that lowers it, paying a life cost for a skill, cannot kill (`canPay` leaves 1 life). The Reprieve fires at the end of
+`applyDamage`, before `killActor`, so the renderer's `death` and `playerDied` events never fire for a saved character. The plan's
+"not verified: degeneration and the Collapse front" is now verified for the first two; the Collapse front uses the same damage call.
+
+**Q. Boss levels?**
+Chosen (the plan's 14.2 default): a Retreat item does nothing on any tenth map (a mini-boss, a boss, and map 100) and the character
+dies as before; a Revive works everywhere, including map 100. Nothing in MAPS.md is reversed.
+
+**Q. The `ReprievePolicy` seam?**
+Not built. The plan named a policy "like `FlaskPolicy` and `AbandonPolicy`", but with the Recall Cord cut the only trigger is
+"damage would kill", so a policy would have one possible answer. The hook is `reprieveFires(w)` in `sim/reprieve.ts`; a policy can
+wrap it later if a second trigger appears.
+
+**Q. How long is the safety after a Revive?**
+Chosen: Last Spark 3 s (and throws back and stuns the monsters within 6 tiles for 1.5 s), Bargain Coin 1.5 s with no pulse. The plan
+said the Coin had no invulnerability at all, but a Revive without a moment of safety is usually the same death again; 1.5 s is the
+smallest grace. Both are guesses for Y7.
+
+**Q. When does the Bargain Coin's curse start?**
+Chosen: when it fires (the plan's table), for the next five levels, as the hidden affix `curse.bargain` (15% less maximum life) on
+every map after it. A Ferryman's curse (Y5) is the same affix started when that stop is taken. Curses show in the Satchel strip and
+count in the offer cards like an armed provision.
+
+**Q. What happens in a Crawl?**
+A Reprieve that fires in one of its three maps is spent at once (before the next map is built), so a Revive cannot save the
+character twice; a Retreat ends the Crawl as an abandon and `combineCrawl` carries the Reprieve's id to the result.
+
+**Q. How do Reprieves come to the player?**
+The Market's last slot sells one on about one level in five from level 20 (never two in a row); a boss level's reward pick holds
+one as one of its three cards 60% of the time (not on the picks of uniques after maps 25, 50 and 75); the Ferryman (Y5) gives one.
+Provisions are also a possible card on a fifth map's pick (30%, never when the Pouch is full). To keep the old picks unchanged the
+cards for the Wayside are decided with a stream of their own and replace one card.
+
+**Q. What if a card no longer fits when it is taken?**
+`takeReward` now returns whether it took: a card for the Wayside that does not fit (the Pouch filled, or a Reprieve was bought
+since the pick appeared) leaves the pick open and says why. The bot passes on it.
+
+**Q. The reward-pick type.**
+`run.reward` is now `RewardCard[]` (an item, a gem, a flask, currency or a `PouchCard`), a new type in `run.ts`. Drops and `AnyItem`
+are unchanged, so nothing else in the game sees a Pouch card.

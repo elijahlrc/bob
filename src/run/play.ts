@@ -4,6 +4,7 @@ import { runMap, type MapResult } from '../sim/runMap';
 import type { World, WorldOpts } from '../sim/types';
 import type { MapOffer } from './offers';
 import { startProvisions } from './provisions';
+import { spendReprieve } from './reprieves';
 import { planFor, worldOptsFor, type RunState } from './run';
 
 /** One result for a whole Crawl: the maps' time, kills and loot added up, and where the last of them left things. */
@@ -19,6 +20,7 @@ export function combineCrawl(parts: MapResult[]): MapResult {
     kills: sum((r) => r.kills),
     stuck: sum((r) => r.stuck),
     picked: parts.flatMap((r) => r.picked),
+    ...(parts.some((r) => r.reprieve) ? { reprieve: parts.find((r) => r.reprieve)!.reprieve } : {}),
     report: combineReports(parts.flatMap((r) => (r.report ? [r.report] : []))),
   };
 }
@@ -47,6 +49,8 @@ export function playOffer(
     tweak?.(opts);
     const res = runMap(plan, build, xp, opts, undefined, onTick);
     parts.push(res);
+    // A Reprieve that fired in one map of a Crawl is gone before the next begins.
+    if (res.reprieve) spendReprieve(run, res.reprieve);
     if (res.status !== 'cleared') break;
     build = { ...build, level: res.level };
     xp = res.xp;

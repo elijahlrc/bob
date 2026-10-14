@@ -30,6 +30,7 @@ import { Workbench } from './Workbench';
 import { Skills } from './Skills';
 import { Strategy } from './Strategy';
 import { StopScreen } from './Stop';
+import { reprieveDef } from '../data/reprieves';
 import { Wares } from './Wares';
 import { Satchel } from './Satchel';
 import { stopDef } from '../data/stops';
@@ -284,6 +285,8 @@ export function Camp({ c }: { c: Controller }) {
         <div class="muted">
           Last map{last.status === 'abandoned' ? ' (abandoned, no clear rewards)' : ''}:{' '}
           {last.time.toFixed(0)} s · {last.kills} kills
+          {last.reprieve &&
+            ` · ${reprieveDef(last.reprieve).name} ${reprieveDef(last.reprieve).family === 'retreat' ? 'pulled you out' : 'saved you'}`}
         </div>
       )}
       {run.reward && <Reward c={c} />}

@@ -37,6 +37,7 @@ import { botChalk, botCraft } from './botCraft';
 import { botStopChoice, botTakeStop, botWantsStop } from './botStop';
 import { buyWare, ensureMarket } from './market';
 import { affixesWithArmed, armProvision } from './provisions';
+import { reprieveBlocker } from './reprieves';
 import { provisionDef, type ProvisionId } from '../data/provisions';
 import { waysideOf } from './wayside';
 import { salvage } from './craft';
@@ -524,6 +525,12 @@ export function botReward(run: RunState, crafting = true): void {
   const offers = run.reward;
   let best: { uid: number; s: number } | null = null;
   for (const o of offers) {
+    // A card for the Wayside: a Reprieve is worth more than a small gain, a provision about nothing (a first guess; Y7 measures it).
+    if (o.kind === 'pouch') {
+      const s = scoreOf(run, run.build) * (o.what === 'reprieve' ? 1.02 : 1.002);
+      if (!best || s > best.s) best = { uid: o.uid, s };
+      continue;
+    }
     const trial: RunState = JSON.parse(JSON.stringify(run));
     takeReward(trial, o.uid);
     if (o.kind === 'gem') botRegem(trial);
@@ -538,7 +545,8 @@ export function botReward(run: RunState, crafting = true): void {
         : scoreOf(trial, trial.build) + (o.kind === 'flask' ? 1 : 0);
     if (!best || s > best.s) best = { uid: o.uid, s };
   }
-  takeReward(run, best?.uid ?? null);
+  // (A card for the Wayside that no longer fits leaves the pick open: the bot passes on it.)
+  if (!takeReward(run, best?.uid ?? null)) takeReward(run, null);
 }
 
 /**
@@ -546,6 +554,9 @@ export function botReward(run: RunState, crafting = true): void {
  * valuation; milestone Y7 measures it. The purchase joins the bag, and `botEquip` then wears it.
  */
 export function botShop(run: RunState): void {
+  // A Reprieve is the one thing worth saving Dust for: it is bought as soon as it is on sale and affordable.
+  const rep = ensureMarket(run).find((w) => w.kind === 'reprieve' && !w.sold);
+  if (rep && rep.price <= run.dust && reprieveBlocker(run) === null) buyWare(run, rep.id);
   const base = scoreOf(run, run.build);
   for (const w of ensureMarket(run)) {
     if (w.sold || w.kind !== 'gear' || w.item?.kind !== 'item' || w.price > run.dust) continue;

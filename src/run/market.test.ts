@@ -3,6 +3,7 @@ import { MARKET_SIZE, priceAt, WARE_BASE } from '../data/market';
 import { provisionDef } from '../data/provisions';
 import { botShop } from './bot';
 import { buyWare, ensureMarket, rollMarket } from './market';
+import { reprieveOnSale } from './reprieves';
 import { loadRun, MemoryStore, saveRun } from './save';
 import { newRun, setMap } from './run';
 
@@ -23,7 +24,14 @@ describe('the Market stock (docs/WAYSIDE.md 4.2)', () => {
     const stock = rollMarket(run);
     expect(stock).toHaveLength(MARKET_SIZE);
     expect(stock.map((w) => w.kind).sort()).toEqual(
-      ['currency', 'flask', 'gear', 'gear', 'gem', 'provision'].sort(),
+      [
+        reprieveOnSale(9, 25) ? 'reprieve' : 'currency',
+        'flask',
+        'gear',
+        'gear',
+        'gem',
+        'provision',
+      ].sort(),
     );
     for (const w of stock) {
       const base =

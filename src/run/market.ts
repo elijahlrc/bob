@@ -3,6 +3,8 @@ import { flaskBase } from '../data/flasks';
 import { MARKET_SIZE, priceAt, WARE_BASE } from '../data/market';
 import { PROVISIONS, type ProvisionId } from '../data/provisions';
 import { addProvision, pouchCount } from './provisions';
+import { acquireReprieve, reprieveBlocker, reprieveOnSale } from './reprieves';
+import { reprieveDef, type ReprieveId } from '../data/reprieves';
 import { POUCH_LIMIT } from '../data/provisions';
 import type { Item } from '../data/types';
 import { rollCurrencyBundle } from '../gen/currencyDrops';
@@ -62,6 +64,15 @@ function ware(run: RunState, slot: Slot, index: number, rng: Rng, off = 0): Ware
       };
     }
     case 'currency': {
+      // Some levels the last slot holds a Reprieve instead (docs/WAYSIDE.md 7.4).
+      const sale = reprieveOnSale(run.seed, level);
+      if (sale)
+        return {
+          id: String(index),
+          kind: 'reprieve',
+          price: price(reprieveDef(sale).base),
+          ref: sale,
+        };
       const bundle = rollCurrencyBundle(rng, uid, level);
       return {
         id: String(index),
@@ -121,12 +132,18 @@ export function buyWare(run: RunState, id: string): CraftResult {
   if (run.dust < ware.price) return { ok: false, reason: 'Not enough Bone Dust' };
   if (ware.kind === 'provision' && pouchCount(run) >= POUCH_LIMIT)
     return { ok: false, reason: 'Your pouch is full' };
+  if (ware.kind === 'reprieve') {
+    const why = reprieveBlocker(run);
+    if (why) return { ok: false, reason: why };
+  }
   run.dust -= ware.price;
   ware.sold = true;
   if (ware.item) {
     const bought = { ...ware.item, uid: uidSource(run)() };
     run.inventory.push(bought);
     noteFound(run, bought);
+  } else if (ware.kind === 'reprieve' && ware.ref) {
+    acquireReprieve(run, ware.ref as ReprieveId);
   } else if (ware.kind === 'provision' && ware.ref) {
     addProvision(run, ware.ref as ProvisionId);
   } else if (ware.kind === 'currency' && ware.ref) {

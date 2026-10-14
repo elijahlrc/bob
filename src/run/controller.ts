@@ -14,6 +14,7 @@ import { botCamp } from './bot';
 import { stopName, takeStop, type StopChoice } from './stops';
 import { buyWare, ensureMarket } from './market';
 import { armProvision, disarmProvision, startProvisions } from './provisions';
+import { spendReprieve } from './reprieves';
 import type { ProvisionId } from '../data/provisions';
 import type { CraftResult } from './craft';
 import type { MapOffer } from './offers';
@@ -375,6 +376,8 @@ export class Controller {
     const crawl = this.crawl;
     if (crawl) {
       crawl.parts.push(res);
+      // A Reprieve that fired in one map of a Crawl is gone before the next begins.
+      if (res.reprieve) spendReprieve(run, res.reprieve);
       if (res.status === 'cleared' && crawl.segment < CRAWL_SEGMENTS - 1) {
         // The next map of the Crawl, at once: no camp, and the character is as the last map left it.
         crawl.segment++;

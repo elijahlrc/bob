@@ -4,6 +4,21 @@ import type { Controller } from '../run/controller';
 import { takeReward } from '../run/run';
 import { useViewport } from './device';
 import { ItemCard, itemTitle, rarityClass } from './ItemCard';
+import { ProvisionCard, ReprieveCard } from './Satchel';
+import { provisionDef } from '../data/provisions';
+import { reprieveDef } from '../data/reprieves';
+import type { RewardCard } from '../run/run';
+
+/** What a card of the pick is called on its button. */
+function cardTitle(o: RewardCard): string {
+  if (o.kind === 'pouch')
+    return o.what === 'reprieve' ? reprieveDef(o.id).name : provisionDef(o.id).name;
+  return o.kind === 'currency' ? `${o.count} × ${currencyLabel(o.id)}` : itemTitle(o);
+}
+
+function cardClass(o: RewardCard): string {
+  return o.kind === 'pouch' ? 'flaskitem' : o.kind === 'currency' ? 'flaskitem' : rarityClass(o);
+}
 
 /**
  * The 1-of-3 reward pick (§5.3). With a mouse, hovering previews an offer and a click takes it. On a coarse pointer
@@ -17,7 +32,15 @@ export function Reward({ c }: { c: Controller }) {
   const [picked, setPicked] = useState<number | null>(null);
   const offers = run.reward ?? [];
   const shown = offers.find((o) => o.uid === (coarse ? (picked ?? hover) : hover));
-  const take = (uid: number | null) => c.act((r) => takeReward(r, uid));
+  const [note, setNote] = useState<string | null>(null);
+  const take = (uid: number | null) => {
+    const ok = c.act((r) => takeReward(r, uid));
+    setNote(
+      ok === false
+        ? 'That does not fit now: your Pouch is full, or you already hold a Reprieve (or have had all a run allows).'
+        : null,
+    );
+  };
   // With a mouse the preview floats by the pointer (it would push the page down in the flow), kept inside the window.
   const tip = useRef<HTMLDivElement>(null);
   const mouse = useRef({ x: 0, y: 0 });
@@ -44,9 +67,7 @@ export function Reward({ c }: { c: Controller }) {
       {offers.map((o) => (
         <button
           key={o.uid}
-          class={`inv-item ${o.kind === 'currency' ? 'flaskitem' : rarityClass(o)}${
-            coarse && picked === o.uid ? ' sel' : ''
-          }`}
+          class={`inv-item ${cardClass(o)}${coarse && picked === o.uid ? ' sel' : ''}`}
           onMouseEnter={(e) => {
             mouse.current = { x: e.clientX, y: e.clientY };
             setHover(o.uid);
@@ -58,9 +79,10 @@ export function Reward({ c }: { c: Controller }) {
           onMouseLeave={() => setHover(null)}
           onClick={() => (coarse ? setPicked(o.uid) : take(o.uid))}
         >
-          {o.kind === 'currency' ? `${o.count} × ${currencyLabel(o.id)}` : itemTitle(o)}
+          {cardTitle(o)}
         </button>
       ))}
+      {note && <div class="warn">{note}</div>}
       {coarse && (
         <button class="btn small primary" disabled={picked === null} onClick={() => take(picked)}>
           Take
@@ -71,7 +93,13 @@ export function Reward({ c }: { c: Controller }) {
       </button>
       {shown && (
         <div class={coarse ? 'reward-preview' : 'reward-preview float'} ref={tip}>
-          {shown.kind === 'currency' ? (
+          {shown.kind === 'pouch' ? (
+            shown.what === 'reprieve' ? (
+              <ReprieveCard id={shown.id} />
+            ) : (
+              <ProvisionCard id={shown.id} />
+            )
+          ) : shown.kind === 'currency' ? (
             <div class="item-card flaskitem">
               <div class="ic-name">
                 {shown.count} × {currencyLabel(shown.id)}

@@ -1,6 +1,7 @@
 import { mod, type Mod } from '../mods/types';
 import { THRONG_AFFIX } from './mapTypes';
 import { PROVISION_AFFIXES } from './provisions';
+import { CURSE_AFFIXES } from './reprieves';
 
 /**
  * Map affixes (EXPANSION 7.5, docs/MAPS.md section 6): from map 5 an offered map can carry modifiers that
@@ -291,6 +292,8 @@ export const MAP_AFFIXES: MapAffixDef[] = [
   },
   // The hidden affixes that carry the provisions (data/provisions.ts): never rolled, never offered by Chalk.
   ...PROVISION_AFFIXES,
+  // ... and the curses of the Wayside's bargains (data/reprieves.ts).
+  ...CURSE_AFFIXES,
 ];
 
 export function mapAffixDef(id: string): MapAffixDef {

@@ -193,3 +193,10 @@
   align-items: center;
   gap: 6px;
 }
+
+.provision.reprieve.retreat {
+  border-left-color: #8fb8e6;
+}
+.provision.reprieve.revive {
+  border-left-color: #e68f8f;
+}

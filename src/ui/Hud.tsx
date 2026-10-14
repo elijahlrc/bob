@@ -27,6 +27,7 @@ import { useState } from 'preact/hooks';
 import { autoAbandonAt, canAbandon } from '../sim/abandon';
 import { COLLAPSE_START, CRESCENDO_STEP_BONUS, HOLDOUT_WAVES, mapTypeDef } from '../data/mapTypes';
 import { infoProps } from './info';
+import { reprieveDef } from '../data/reprieves';
 import { SkillBar } from './SkillBar';
 
 /** A resource orb: the fill height shows the amount; the skin comes from CSS. */
@@ -336,6 +337,20 @@ function Charges({ w }: { w: World }) {
   );
 }
 
+/** The Reprieve held (docs/WAYSIDE.md 7), under the Abandon button: what it will do, or that it has just been used. */
+function ReprieveBadge({ w }: { w: World }) {
+  const r = w.reprieve;
+  const id = r.held;
+  if (!id) return null;
+  const d = reprieveDef(id);
+  const used = r.fired !== null;
+  return (
+    <div class={'hud-reprieve' + (used ? ' used' : '')} {...infoProps(`${d.name}: ${d.text}`)}>
+      {used ? `${d.name} used` : d.name}
+    </div>
+  );
+}
+
 /** Leave the map early (docs/MAPS.md section 7): a confirm click, then a timer during which the character keeps fighting. */
 function AbandonButton({ c, w }: { c: Controller; w: World }) {
   const [asking, setAsking] = useState(false);
@@ -457,6 +472,7 @@ export function Hud({ c }: { c: Controller }) {
         <span>{w.exitOpen ? 'Exit open' : ''}</span>
       </div>
       {!sc && !c.gallery && <AbandonButton c={c} w={w} />}
+      {!sc && !c.gallery && <ReprieveBadge w={w} />}
       <BossBar w={w} />
       {sel && sel.alive && !sel.isPlayer && <Inspect a={sel} c={c} />}
       {c.gallery && (

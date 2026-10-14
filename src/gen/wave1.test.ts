@@ -7,7 +7,7 @@ import { flaskBase } from '../data/flasks';
 import { UNIQUE_FLASKS } from '../data/uniqueFlasks';
 import { UNIQUES, uniqueDef } from '../data/uniques';
 import { WAVE1_UNIQUES } from '../data/uniquesWave1';
-import type { Build, EquipSlot, Item } from '../data/types';
+import type { AnyItem, Build, EquipSlot, Item } from '../data/types';
 import { modsText } from '../mods/text';
 import { makeGem, makeItem } from './items';
 import { CONDITIONS } from '../mods/types';
@@ -394,7 +394,8 @@ describe('acquisition (EXPANSION 6.2 items 1–4)', () => {
 
   it('the reward picks after maps 25, 50 and 75 offer three different uniques the character can wear', () => {
     for (const map of [25, 50, 75]) {
-      const offers = rollRewards(atMap(map));
+      // (The unique picks hold no card for the Wayside.)
+      const offers = rollRewards(atMap(map)).filter((o): o is AnyItem => o.kind !== 'pouch');
       expect(offers).toHaveLength(3);
       const ids = offers.map(uniqueIdOf);
       expect(ids.every(Boolean), `map ${map}`).toBe(true);
@@ -408,7 +409,9 @@ describe('acquisition (EXPANSION 6.2 items 1–4)', () => {
   });
 
   it('other reward picks are not all uniques', () => {
-    const offers = [5, 10, 15, 20, 30, 35, 40].flatMap((m) => rollRewards(atMap(m)));
+    const offers = [5, 10, 15, 20, 30, 35, 40]
+      .flatMap((m) => rollRewards(atMap(m)))
+      .filter((o): o is AnyItem => o.kind !== 'pouch');
     expect(offers.some((o) => !uniqueIdOf(o))).toBe(true);
   });
 

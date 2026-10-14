@@ -4,9 +4,25 @@ import {
   provisionDef,
   type ProvisionId,
 } from '../data/provisions';
+import { curseDef, reprieveDef } from '../data/reprieves';
 import type { Controller } from '../run/controller';
 import { pouchCount, spare } from '../run/provisions';
 import { waysideOf } from '../run/wayside';
+
+const FAMILY_TEXT = { retreat: 'Retreat', revive: 'Revive' } as const;
+
+/** A Reprieve: what it is and what it does when it fires. */
+export function ReprieveCard({ id }: { id: string }) {
+  const d = reprieveDef(id);
+  return (
+    <div class={`provision reprieve ${d.family}`}>
+      <div class="provision-name">
+        {d.name} <span class="muted">· {FAMILY_TEXT[d.family]}</span>
+      </div>
+      <div class="provision-text">{d.text}</div>
+    </div>
+  );
+}
 
 const KIND_TEXT = { staple: 'Staple', bet: 'Bet', specialist: 'Specialist' } as const;
 
@@ -33,7 +49,8 @@ export function Satchel({ c }: { c: Controller }) {
   const run = c.run!;
   const w = waysideOf(run);
   const held = Object.keys(w.pouch).filter((id) => (w.pouch[id] ?? 0) > 0) as ProvisionId[];
-  if (!held.length && !w.armed.length) return null;
+  const curses = w.curses.filter((k) => k.until >= run.map);
+  if (!held.length && !w.armed.length && !w.reprieve && !curses.length) return null;
   return (
     <div class="satchel">
       <div class="satchel-head">
@@ -47,6 +64,17 @@ export function Satchel({ c }: { c: Controller }) {
         Armed provisions are used up when the next map starts, cleared or not, and count in the
         cards below.
       </div>
+      {w.reprieve && (
+        <div>
+          <div class="muted">Reprieve held (it fires by itself if you would die):</div>
+          <ReprieveCard id={w.reprieve} />
+        </div>
+      )}
+      {curses.map((k) => (
+        <div key={k.id} class="warn">
+          Cursed: {curseDef(k.id).name} — {curseDef(k.id).text}, through level {k.until}.
+        </div>
+      ))}
       <div class="satchel-list">
         {held.map((id) => {
           const armed = w.armed.filter((x) => x === id).length;

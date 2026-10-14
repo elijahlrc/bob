@@ -30,7 +30,10 @@ import { noteFound, stampAll } from './found';
 import { makeOffer, rollOffers, type MapOffer } from './offers';
 import { waysideOf, type Wayside } from './wayside';
 import type { StopId } from '../data/stops';
-import { endProvisions, provisionAffixes } from './provisions';
+import { addProvision, endProvisions, pouchCount, provisionAffixes } from './provisions';
+import { acquireReprieve, curseAffixes, reprieveBlocker, spendReprieve } from './reprieves';
+import { REPRIEVES, type ReprieveId } from '../data/reprieves';
+import { POUCH_LIMIT, PROVISIONS, type ProvisionId } from '../data/provisions';
 
 export { rollThemes } from './offers';
 
@@ -44,11 +47,20 @@ export type MapRecord = {
   /** 'respite' is a level passed by resting, with no map; 'stop' a level spent at a stop (`stop` says which). */
   status: MapResult['status'] | 'respite' | 'stop';
   stop?: StopId;
+  /** The Reprieve that fired on the map (docs/WAYSIDE.md 7): it saved the run, or pulled the character out. */
+  saved?: string;
   time: number;
   levelAfter: number;
   kills: number;
   stuck: number;
 };
+
+/**
+ * A card of a reward pick that is not an item: a provision for the Pouch, or a Reprieve (docs/WAYSIDE.md 6.1 and 7.4). Pick cards
+ * are the only place these appear beside items, so they are a separate kind and not part of what monsters drop.
+ */
+export type PouchCard = { kind: 'pouch'; uid: number; what: 'provision' | 'reprieve'; id: string };
+export type RewardCard = AnyItem | PouchCard;
 
 /** A reforge whose three alternatives have been drawn and shown, and not yet picked (EXPANSION 8.1). */
 export type PendingCraft = { itemUid: number; pinned: string[]; options: Item[] };
@@ -73,7 +85,7 @@ export type RunState = {
   phase: 'camp' | 'dead' | 'victory';
   history: MapRecord[];
   /** Pending reward offers (1 of 3), if earned. */
-  reward: AnyItem[] | null;
+  reward: RewardCard[] | null;
   /** Uids of the items, gems and flasks picked up that the player has not looked at yet (found.ts). */
   unseen: number[];
   /** The level (`run.map`) each item was found on, by uid: what "old" means for the clean-up. */
@@ -218,7 +230,7 @@ export function planFor(run: RunState, offer: MapOffer | string, segment = 0): M
     run.map,
     offer.themeId,
     // The provisions burning on the map are hidden affixes on top of the offer's own (docs/WAYSIDE.md 6).
-    [...offer.affixes, ...provisionAffixes(waysideOf(run).active, offer)],
+    [...offer.affixes, ...provisionAffixes(waysideOf(run).active, offer), ...curseAffixes(run)],
     offer.areaLevel,
     offer.type,
     segment,
@@ -257,6 +269,7 @@ export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
   const uid = uidSource(run);
   return {
     start: run.vitals,
+    reprieve: waysideOf(run).reprieve,
     loot: (w, m): AnyItem[] => {
       if (!m.mon) return [];
       // Item quantity and rarity from gear, and from any flask active right now.
@@ -334,7 +347,9 @@ export function finishMap(run: RunState, res: MapResult): void {
     levelAfter: res.level,
     kills: res.kills,
     stuck: res.stuck,
+    ...(res.reprieve ? { saved: res.reprieve } : {}),
   });
+  if (res.reprieve) spendReprieve(run, res.reprieve);
   run.build = { ...run.build, level: res.level };
   run.xp = res.xp;
   if (res.status !== 'cleared' && res.status !== 'abandoned') {
@@ -406,11 +421,11 @@ export function rollSkillRewards(run: RunState): AnyItem[] {
 }
 
 /** Three reward offers drawn from the item, gem and flask pools. */
-export function rollRewards(run: RunState): AnyItem[] {
+export function rollRewards(run: RunState): RewardCard[] {
   const rng = new Rng(run.seed).fork(`reward${run.map}`);
   const uid = uidSource(run);
   const ilvl = run.map;
-  const out: AnyItem[] = [];
+  const out: RewardCard[] = [];
   // After maps 25, 50 and 75 the three offers are uniques the character can wear at its level.
   if (run.map % 25 === 0 && run.map < TOTAL_MAPS) {
     const seen = new Set<string>();
@@ -430,30 +445,58 @@ export function rollRewards(run: RunState): AnyItem[] {
     else if (pool === 'flask') out.push(rollFlask(rng, uid, ilvl, 1));
     else out.push(rollDrop(rng, uid, { ilvl, monster: 'rare' }, rng.chance(0.7)));
   }
+  // A pick may hold something for the Wayside in place of one of the three (docs/WAYSIDE.md 6.1 and 7.4): a Reprieve on a boss
+  // level's pick, a provision on a fifth map's. They draw from a stream of their own, so the other cards are what they always were.
+  const pr = new Rng(run.seed).fork(`rewardpouch${run.map}`);
+  if (run.map % 10 === 0 && reprieveBlocker(run) === null && pr.chance(0.6)) {
+    out[2] = {
+      kind: 'pouch',
+      uid: uid(),
+      what: 'reprieve',
+      id: pr.weighted(REPRIEVES, (r) => r.weight).id,
+    };
+  } else if (pouchCount(run) < POUCH_LIMIT && pr.chance(0.3)) {
+    const open = PROVISIONS.filter((p) => p.from <= run.map);
+    out[1] = {
+      kind: 'pouch',
+      uid: uid(),
+      what: 'provision',
+      id: pr.weighted(open, (p) => p.weight).id,
+    };
+  }
   return out;
 }
 
 /** The pick at the end of a Crawl: three offers, the first a unique the character could wear. */
-export function rollCrawlReward(run: RunState): AnyItem[] {
+export function rollCrawlReward(run: RunState): RewardCard[] {
   const offers = rollRewards(run);
   const rng = new Rng(run.seed).fork(`crawlreward${run.map}`);
   const unique = rollUniqueOf(rng, uidSource(run), Math.min(run.map, run.build.level));
-  if (unique && !offers.some((o) => uniqueIdOf(o) !== undefined)) offers[0] = unique;
+  if (unique && !offers.some((o) => o.kind !== 'pouch' && uniqueIdOf(o) !== undefined))
+    offers[0] = unique;
   return offers;
 }
 
 /** Take one reward offer (or none) into the inventory. */
-export function takeReward(run: RunState, uid: number | null): void {
-  if (!run.reward) return;
+export function takeReward(run: RunState, uid: number | null): boolean {
+  if (!run.reward) return false;
   const it = run.reward.find((x) => x.uid === uid);
   if (it) {
-    if (it.kind === 'currency') stash(run, it);
+    if (it.kind === 'pouch') {
+      // A card for the Wayside may not fit any more (the Pouch filled, or a Reprieve was bought): the pick stays open.
+      const ok =
+        it.what === 'reprieve'
+          ? acquireReprieve(run, it.id as ReprieveId).ok
+          : addProvision(run, it.id as ProvisionId);
+      if (!ok) return false;
+    } else if (it.kind === 'currency') stash(run, it);
     else {
       run.inventory.push(it);
       noteFound(run, it);
     }
   }
   run.reward = null;
+  return true;
 }
 
 /** Passive points available to spend (§5.3). */

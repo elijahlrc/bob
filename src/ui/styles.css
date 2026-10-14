@@ -877,6 +877,22 @@ select option {
   text-shadow: 0 1px 2px #000;
   pointer-events: auto;
 }
+.hud-reprieve {
+  position: absolute;
+  top: 40px;
+  right: 12px;
+  padding: 2px 8px;
+  border: 1px solid #e6b84a;
+  border-radius: 10px;
+  background: rgba(20, 17, 26, 0.8);
+  color: #e6c07a;
+  font-size: 13px;
+  pointer-events: auto;
+}
+.hud-reprieve.used {
+  border-color: #5a5a68;
+  color: #8d8fa8;
+}
 .hud-showcase {
   position: absolute;
   top: 40px;

@@ -140,7 +140,8 @@ describe('run progression (§5.3)', () => {
     const run = newRun('shade', 3);
     setMap(run, 5);
     run.reward = rollRewards(run);
-    const pick = run.reward[1];
+    // (A pick may hold a card for the Wayside, which goes to the Pouch and not the inventory.)
+    const pick = run.reward.find((o) => o.kind !== 'pouch' && o.kind !== 'currency')!;
     takeReward(run, pick.uid);
     expect(run.inventory.map((x) => x.uid)).toContain(pick.uid);
     expect(run.reward).toBeNull();

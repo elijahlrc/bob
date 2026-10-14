@@ -41,6 +41,7 @@ import { AURA_CONDS, WIELD_CONDS } from '../calc/staticConds';
 import type { ModCtx } from '../mods/modDb';
 import { maskIntersects, maskOr, tagBit, type CondId, type Mod } from '../mods/types';
 import { bannerStage } from './banners';
+import { invulnerable, reprieveFires } from './reprieve';
 import { rollGains } from './buffs';
 import { gainTrophy, rollCharges } from './charges';
 import { ALL_HEX_IDS, HEXES } from '../data/hexes';
@@ -259,6 +260,8 @@ export function targetState(a: Actor): TargetState {
  */
 export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): number {
   if (!dst.alive || dst.phaseT > 0 || dst.burrowT > 0) return 0;
+  // Just after a Revive the character cannot be hurt (docs/WAYSIDE.md 7).
+  if (dst.isPlayer && invulnerable(w)) return 0;
   // A veiled monster that is hit is seen for a moment.
   if (!dst.isPlayer && dst.revealT < 1) dst.revealT = 1;
   if (!dst.isPlayer && dst.mon) {
@@ -319,6 +322,8 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
   if (dst.isPlayer && w.opts.godMode && dst.life <= 0) dst.life = 1;
   if (dst.isPlayer) w.stats.damageTaken += total;
   else if (dst.faction === 1) w.stats.damageDealt += total;
+  // A Reprieve held fires when this would be the end (docs/WAYSIDE.md 7); the damage still counts as taken.
+  if (dst.isPlayer && dst.life <= 0 && reprieveFires(w)) return total;
   if (dst.life <= 0) killActor(w, dst);
   return total;
 }
