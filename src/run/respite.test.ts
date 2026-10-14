@@ -14,10 +14,10 @@ describe('the Respite offer (docs/MAPS.md 4.2 and 9.3)', () => {
     for (let seed = 1; seed <= 200; seed++) {
       for (const map of [5, 13, 47]) {
         const well = rollOffers(seed, map, { ...fullVitals(), flasks: { 1: 0.95 } });
-        expect(well.every((o) => o.kind === 'map')).toBe(true);
+        expect(well.every((o) => o.kind !== 'respite')).toBe(true);
       }
       for (const map of [1, 2, 3, 4, 10, 20, 100])
-        expect(rollOffers(seed, map, hurt(0.1)).every((o) => o.kind === 'map')).toBe(true);
+        expect(rollOffers(seed, map, hurt(0.1)).every((o) => o.kind !== 'respite')).toBe(true);
     }
   });
 
@@ -64,7 +64,9 @@ describe('the Respite offer (docs/MAPS.md 4.2 and 9.3)', () => {
       const withRest = rollOffers(seed, 23, hurt(0.1));
       const without = rollOffers(seed, 23, fullVitals());
       expect(withRest[0]).toEqual(without[0]);
-      expect(withRest[1].themeId).toBe(without[1].themeId);
+      // (A stop may sit in the second slot of either set: the maps are compared where both sets have one.)
+      if (withRest[1].kind === 'map' && without[1].kind === 'map')
+        expect(withRest[1].themeId).toBe(without[1].themeId);
     }
   });
 });

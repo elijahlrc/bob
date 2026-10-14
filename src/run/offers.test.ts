@@ -27,16 +27,18 @@ const cleared = (level: number): MapResult => ({
 
 describe('map offers (docs/MAPS.md section 4)', () => {
   it('a level offers three maps with three different themes that exist at that level', () => {
-    // (A boss map has a single offer: docs/BOSSES.md 10.)
+    // (A boss map has a single offer: docs/BOSSES.md 10. A stop takes a map's place on the levels the schedule gives one.)
     for (const map of [1, 4, 8, 15, 25, 41, 61, 99]) {
       for (let seed = 1; seed <= 10; seed++) {
         const offers = rollOffers(seed, map);
         expect(offers).toHaveLength(OFFERS_PER_SET);
-        const themes = offers.map((o) => o.themeId);
-        expect(new Set(themes).size, `${seed}/${map}`).toBe(OFFERS_PER_SET);
+        const themes = offers.filter((o) => o.kind === 'map').map((o) => o.themeId);
+        const stops = offers.filter((o) => o.kind === 'stop').length;
+        expect(new Set(themes).size, `${seed}/${map}`).toBe(OFFERS_PER_SET - stops);
         const allowed = new Set(themesFor(map).map((t) => t.id));
         for (const id of themes) expect(allowed.has(id), id).toBe(true);
-        for (const o of offers) expect(themeDef(o.themeId)).toBeDefined();
+        for (const o of offers.filter((x) => x.kind === 'map'))
+          expect(themeDef(o.themeId)).toBeDefined();
       }
     }
   });

@@ -29,6 +29,7 @@ import { restAtCamp } from './camp';
 import { noteFound, stampAll } from './found';
 import { makeOffer, rollOffers, type MapOffer } from './offers';
 import type { Wayside } from './wayside';
+import type { StopId } from '../data/stops';
 
 export { rollThemes } from './offers';
 
@@ -39,8 +40,9 @@ export type MapRecord = {
   map: number;
   /** The level of the map that was played (differs from `map` once offers carry level offsets). */
   areaLevel: number;
-  /** 'respite' is a level passed by resting, with no map. */
-  status: MapResult['status'] | 'respite';
+  /** 'respite' is a level passed by resting, with no map; 'stop' a level spent at a stop (`stop` says which). */
+  status: MapResult['status'] | 'respite' | 'stop';
+  stop?: StopId;
   time: number;
   levelAfter: number;
   kills: number;
@@ -196,7 +198,8 @@ export function advanceLevel(run: RunState): void {
  * the first slot) would roll at the current map number; tests and tools use it to try a theme.
  */
 export function planFor(run: RunState, offer: MapOffer | string, segment = 0): MapPlan {
-  if (typeof offer !== 'string' && offer.kind !== 'map') throw new Error('a Respite has no map');
+  if (typeof offer !== 'string' && offer.kind !== 'map')
+    throw new Error('a Respite or a stop has no map');
   if (typeof offer === 'string') {
     const slot = Math.max(
       0,

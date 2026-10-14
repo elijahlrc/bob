@@ -1,7 +1,7 @@
 /**
  * Headless bot runs (DESIGN.md §15.5).
  *
- *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|abandoner] [--craft greedy|random|none] [--report] [--scaling 1.5] [--base 1] [--variance 0.1] [--legacy] [--biome <id>] [--density <id>] [--log <batch>]
+ *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|stopper|abandoner] [--craft greedy|random|none] [--report] [--scaling 1.5] [--base 1] [--variance 0.1] [--legacy] [--biome <id>] [--density <id>] [--log <batch>]
  *
  * `--log <batch>` also sends each run that ends to the `sim_runs` table (scripts/simlog.ts, docs/TELEMETRY.md).
  */
@@ -70,7 +70,8 @@ function parseArgs(argv: string[]): Args {
     // Route strategies (docs/MAPS.md 10.3): anchor, greedy (the default), random, lowball, resting, abandoner.
     else if (k === '--strategy') {
       if (v === 'anchor') a.themes = 'first';
-      else if (v === 'random' || v === 'lowball' || v === 'resting') a.themes = v;
+      else if (v === 'random' || v === 'lowball' || v === 'resting' || v === 'stopper')
+        a.themes = v;
       else if (v === 'abandoner') a.abandonBelow = 0.3;
     } else if (k === '--scaling') a.difficulty.scaling = Number(v);
     else if (k === '--base') a.difficulty.base = Number(v);

@@ -29,6 +29,8 @@ import { CRAFTING_OPEN } from '../data/constants';
 import { Workbench } from './Workbench';
 import { Skills } from './Skills';
 import { Strategy } from './Strategy';
+import { StopScreen } from './Stop';
+import { stopDef } from '../data/stops';
 import { TreeView } from './TreeView';
 
 const COUNTDOWN = 2;
@@ -200,6 +202,8 @@ export function Camp({ c }: { c: Controller }) {
   // On a narrow screen the types, rules and gate line of an offer card stay folded until asked for.
   const [opened, setOpened] = useState<Record<string, boolean>>({});
   const [left, setLeft] = useState<number | null>(null);
+  // The stop whose screen is open in the Next map tab (docs/WAYSIDE.md 5); nothing of it is saved until it is taken.
+  const [stopSlot, setStopSlot] = useState<number | null>(null);
   const blocker = run ? c.autoBlocker() : null;
   const auto = !!run && run.autoContinue && blocker === null;
   useEffect(() => {
@@ -306,6 +310,23 @@ export function Camp({ c }: { c: Controller }) {
                   </button>
                 </div>
               );
+            if (o.kind === 'stop') {
+              const d = stopDef(o.stop!);
+              return (
+                <div key={o.id} class="theme-wrap">
+                  <button
+                    class="btn theme stop-card"
+                    title="A stop is no map: the level passes, and you are given a service."
+                    onClick={() => setStopSlot(i)}
+                  >
+                    <div class="theme-name">{d.name}</div>
+                    <div class="muted">Level {o.areaLevel} passes</div>
+                    <div class="affix">{d.text}</div>
+                    <div class="threat">No loot, no XP, no clear rewards.</div>
+                  </button>
+                </div>
+              );
+            }
             const t = themeDef(o.themeId);
             return (
               <div key={o.id} class="theme-wrap">
@@ -481,7 +502,15 @@ export function Camp({ c }: { c: Controller }) {
               title={`Map ${run.history[run.history.length - 1]?.map ?? ''} · ${last.status}`}
             />
           )}
-          {shown === 'next' && <div class="camp-next camp-side-body">{side}</div>}
+          {shown === 'next' && (
+            <div class="camp-next camp-side-body">
+              {stopSlot !== null && run.offers[stopSlot]?.kind === 'stop' ? (
+                <StopScreen c={c} slot={stopSlot} onBack={() => setStopSlot(null)} />
+              ) : (
+                side
+              )}
+            </div>
+          )}
         </div>
         <div class="camp-bar">
           <span class="camp-bar-who">

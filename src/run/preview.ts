@@ -44,8 +44,8 @@ export type OfferPreview = MapOffer & {
 export function offersFor(run: RunState): OfferPreview[] {
   const mode = run.map % 10 === 0 ? 'boss' : 'clearing';
   return run.offers.map((offer) => {
-    // A Respite has no monsters: nothing to preview.
-    if (offer.kind === 'respite') return { ...offer, dps: 1, ehp: 1 };
+    // A Respite or a stop has no monsters: nothing to preview.
+    if (offer.kind !== 'map') return { ...offer, dps: 1, ehp: 1 };
     const p = threatPreview(
       offerCharacter(run, offer),
       themeDef(offer.themeId),

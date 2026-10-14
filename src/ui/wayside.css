@@ -1,0 +1,89 @@
+/* The Wayside (docs/WAYSIDE.md): stops, the Market, provisions and the Reprieve. */
+
+.theme.stop-card {
+  border-style: dotted;
+}
+
+.stop {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+.stop-name {
+  margin: 0;
+}
+.stop p {
+  margin: 0;
+}
+.stop-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.stop-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.stop-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+  padding: 6px 10px;
+  min-width: 0;
+}
+.stop-item-name {
+  font-weight: bold;
+  overflow-wrap: anywhere;
+}
+.stop-extra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.stop-kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.stop-gems {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+.stop-gem {
+  padding: 4px;
+  text-align: left;
+  min-width: 0;
+}
+.stop-gem .item-card {
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+.stop-gem.on {
+  outline: 2px solid var(--accent);
+  background: var(--panel2);
+  color: inherit;
+}
+.stop-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .stop-gems {
+    grid-template-columns: 1fr;
+  }
+  .stop-buttons .btn {
+    flex: 1 1 100%;
+  }
+}

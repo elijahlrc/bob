@@ -11,12 +11,13 @@ import {
 import { rollMapAffixes } from '../gen/mapPlan';
 import { BOSS_MAP_NO_AFFIX, bossForMap } from '../data/bosses';
 import { fullVitals, type Vitals } from '../sim/types';
+import { STOP_FROM, STOP_WINDOW, STOPS, type StopId } from '../data/stops';
 
 /**
  * What the camp offers for the next level (docs/MAPS.md section 4): a map, or a Respite, which is no map at all but
  * a rest that restores everything and still passes the level.
  */
-export type OfferKind = 'map' | 'respite';
+export type OfferKind = 'map' | 'respite' | 'stop';
 export type { MapTypeId };
 
 export type MapOffer = {
@@ -28,10 +29,12 @@ export type MapOffer = {
   areaLevel: number;
   /** Offset from the map number: 0, −2 or +2 (clamped to levels 1 to 100). */
   offset: number;
-  /** Empty for a Respite. */
+  /** Empty for a Respite or a stop. */
   themeId: string;
-  /** Chalk edits this list in place. Empty for a Respite. */
+  /** Chalk edits this list in place. Empty for a Respite or a stop. */
   affixes: string[];
+  /** Which stop this is, when `kind` is 'stop' (docs/WAYSIDE.md section 5). */
+  stop?: StopId;
 };
 
 /** Offers per level. */
@@ -123,6 +126,56 @@ export function makeRespite(map: number, slot: number): MapOffer {
   };
 }
 
+/** A stop takes the place of a map in a slot (docs/WAYSIDE.md 5.1): the level passes, as with a Respite, and a service is given. */
+export function makeStop(map: number, slot: number, stop: StopId): MapOffer {
+  return {
+    id: `${map}.${slot}`,
+    kind: 'stop',
+    type: 'plain',
+    areaLevel: map,
+    offset: 0,
+    themeId: '',
+    affixes: [],
+    stop,
+  };
+}
+
+/**
+ * The level of window `w` that holds its stop: one of the window's levels, drawn from the run seed alone. Never a fifth or tenth
+ * level (a reward pick or a gate is due there), and never past level 99.
+ */
+export function stopLevel(seed: number, w: number): number | null {
+  const first = STOP_FROM + w * STOP_WINDOW;
+  const levels: number[] = [];
+  for (let l = first; l < first + STOP_WINDOW; l++) if (l % 5 !== 0 && l < 100) levels.push(l);
+  return levels.length ? new Rng(seed).fork(`stopat${w}`).pick(levels) : null;
+}
+
+/** Which stop window `w` holds: drawn by weight among the stops open at its level, never the kind of the window before. */
+export function stopKind(seed: number, w: number): StopId | null {
+  let prev: StopId | null = null;
+  let kind: StopId | null = null;
+  for (let j = 0; j <= w; j++) {
+    const at = stopLevel(seed, j);
+    if (at === null) return null;
+    const open = STOPS.filter((s) => s.from <= at);
+    const pool = open.filter((s) => s.id !== prev);
+    const from = pool.length ? pool : open;
+    kind = from.length
+      ? new Rng(seed).fork(`stopkind${j}`).weighted(from, (s) => s.weight).id
+      : null;
+    prev = kind;
+  }
+  return kind;
+}
+
+/** The stop on offer at a level, if the schedule puts one there (about one in eight levels from level 9). */
+export function stopAt(seed: number, map: number): StopId | null {
+  if (map < STOP_FROM || map % 5 === 0) return null;
+  const w = Math.floor((map - STOP_FROM) / STOP_WINDOW);
+  return stopLevel(seed, w) === map ? stopKind(seed, w) : null;
+}
+
 /**
  * The set of offers for a level. Rolled once when the previous level ends, then stored in the save. A boss map has one.
  * The first offer (the anchor) is always a map at the map's own level; the others may sit two levels above or
@@ -141,6 +194,10 @@ export function rollOffers(seed: number, map: number, vitals: Vitals = fullVital
   const r1 = restRng.chance(RESPITE_CHANCE);
   const r2 = restRng.chance(RESPITE_CHANCE);
   const restSlot = !mayRest ? -1 : vitals.life < RESPITE_ALWAYS_BELOW ? 2 : r1 ? 1 : r2 ? 2 : -1;
+  // A stop takes a slot that is neither the anchor nor the Respite's; its streams are its own, so the maps are the same with or without it.
+  const stop = stopAt(seed, map);
+  const free = [1, 2].filter((s) => s !== restSlot);
+  const stopSlot = stop && free.length ? new Rng(seed).fork(`stopslot${map}`).pick(free) : -1;
   let typed = 0;
   return rollThemes(seed, map).map((themeId, slot) => {
     const offset = slot === 0 || map < OFFSETS_FROM_MAP ? 0 : rng.weighted([...OFFSETS], weights);
@@ -148,6 +205,7 @@ export function rollOffers(seed: number, map: number, vitals: Vitals = fullVital
     const hit = typeRng.chance(TYPE_CHANCE);
     const pick = unlocked.length ? typeRng.pick(unlocked).id : 'plain';
     if (slot === restSlot) return makeRespite(map, slot);
+    if (slot === stopSlot) return makeStop(map, slot, stop!);
     const room = typed < (map >= TWO_TYPES_FROM ? 2 : 1);
     const type: MapTypeId = hit && room && unlocked.length ? pick : 'plain';
     if (type !== 'plain') typed++;

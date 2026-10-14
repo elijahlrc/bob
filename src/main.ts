@@ -13,6 +13,7 @@ import './ui/items.css';
 import './ui/workbench.css';
 import './ui/strategy.css';
 import './ui/report.css';
+import './ui/wayside.css';
 
 function storage(): Storage | null {
   try {

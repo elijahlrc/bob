@@ -293,6 +293,28 @@ export function useAuger(run: RunState, itemUid: number, count: number): CraftRe
   return OK;
 }
 
+/**
+ * The Awlsmith stop (docs/WAYSIDE.md 5.2): the item's next socket is free, and `extra` more are bored at the Auger rates.
+ * Works with crafting closed: it is a stop's service, not the Workbench.
+ */
+export function awlsmithSockets(run: RunState, itemUid: number, extra = 0): CraftResult {
+  const loc = locate(run, itemUid);
+  if (!loc) return fail('No such item');
+  const sealed = changeable(loc.item);
+  if (!sealed.ok) return sealed;
+  if (loc.item.fixedSockets) return fail('This unique keeps the sockets it has');
+  const have = loc.item.sockets.length;
+  const to = have + 1 + Math.max(0, Math.floor(extra));
+  if (to > socketCeiling(loc.item)) return fail('This item cannot have that many sockets');
+  // The first new socket is free; the rest cost what they would have.
+  const cost = socketCost(have + 1, to);
+  if (owned(run, 'auger') < cost) return fail(`That needs ${cost} Socket Augers`);
+  if (cost > 0) pay(run, 'auger', cost);
+  run.craftSeq++;
+  replace(run, loc, resocket(run, loc, to));
+  return OK;
+}
+
 // ---- Reforging Ember: pin, draw, pick ---------------------------------------------------------
 
 /** 1 Ember, plus 1 for each affix pinned: the price of control. */

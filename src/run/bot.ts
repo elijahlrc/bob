@@ -34,6 +34,7 @@ import {
 } from './run';
 import { Rng } from '../core/rng';
 import { botChalk, botCraft } from './botCraft';
+import { botStopChoice, botTakeStop, botWantsStop } from './botStop';
 import { salvage } from './craft';
 import { buildSignature, killerTracker, metTracker, RunTally } from './metrics';
 import { randomCraft } from './randomBot';
@@ -145,12 +146,16 @@ export function offerCharacter(run: RunState, offer: MapOffer): Character {
 const REST_BELOW = 0.35;
 
 /** Which of the offered maps the bot takes. */
-export type ThemeRule = 'first' | 'best' | 'random' | 'lowball' | 'resting';
+export type ThemeRule = 'first' | 'best' | 'random' | 'lowball' | 'resting' | 'stopper';
 
 /** The offered map the build is best placed to beat (the first one when the rule is 'first'). */
 export function chooseOffer(run: RunState, rule: ThemeRule = 'best', rng?: Rng): MapOffer {
   const maps = run.offers.filter((o) => o.kind === 'map');
   const [first, ...rest] = maps;
+  const stopSlot = run.offers.findIndex((o) => o.kind === 'stop');
+  // The exploit bot of docs/WAYSIDE.md 12: takes a stop whenever one is offered and has something to do there.
+  if (rule === 'stopper' && stopSlot >= 0 && botStopChoice(run, stopSlot))
+    return run.offers[stopSlot];
   if (rule === 'first') return first;
   // The route strategies the plan measures the bot against (docs/MAPS.md 10.3).
   if (rule === 'random') return rng ? rng.pick(run.offers) : first;
@@ -177,6 +182,7 @@ export function chooseOffer(run: RunState, rule: ThemeRule = 'best', rng?: Rng):
   // Worn down, the bot takes a Respite if one is offered: it costs the level, but it is the only full recovery.
   const respite = run.offers.find((o) => o.kind === 'respite');
   if (respite && run.vitals.life < REST_BELOW) return respite;
+  if (stopSlot >= 0 && botWantsStop(run, stopSlot)) return run.offers[stopSlot];
   return best;
 }
 
@@ -549,7 +555,7 @@ export function botCamp(run: RunState, policy: CraftPolicy = 'greedy'): void {
 
 export type BotMapRecord = {
   map: number;
-  status: MapResult['status'] | 'respite';
+  status: MapResult['status'] | 'respite' | 'stop';
   time: number;
   level: number;
   xp: number;
@@ -603,7 +609,27 @@ export function botRun(
     const crafting = opts.crafting ?? 'greedy';
     botCamp(run, crafting);
     if (crafting === 'greedy') botChalk(run);
-    const offer = chooseOffer(run, opts.themes, route);
+    let offer = chooseOffer(run, opts.themes, route);
+    // A stop the bot cannot use (the random rule can land on one) is passed over for the anchor.
+    if (offer.kind === 'stop') {
+      const slot = run.offers.indexOf(offer);
+      if (botTakeStop(run, slot)) {
+        maps.push({
+          map: run.map - 1,
+          status: 'stop',
+          time: 0,
+          level: run.build.level,
+          xp: 0,
+          stuck: 0,
+          startLife: run.vitals.life,
+          startFlask: Math.min(1, ...Object.values(run.vitals.flasks)),
+          met: {},
+          themeId: '',
+        });
+        continue;
+      }
+      offer = run.offers[0];
+    }
     const startLife = run.vitals.life;
     const startFlask = Math.min(1, ...Object.values(run.vitals.flasks));
     if (offer.kind === 'respite') {

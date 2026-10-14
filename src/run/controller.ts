@@ -11,6 +11,8 @@ import type { Build } from '../data/types';
 import type { Vitals } from '../sim/types';
 import { CLASSES } from '../data/classes';
 import { botCamp } from './bot';
+import { stopName, takeStop, type StopChoice } from './stops';
+import type { CraftResult } from './craft';
 import type { MapOffer } from './offers';
 import { combineCrawl } from './play';
 import { galleryEntries, galleryRun, galleryWorld, type GalleryEntry } from './gallery';
@@ -264,6 +266,8 @@ export class Controller {
       this.changed();
       return;
     }
+    // A stop is taken with `takeStop`, which needs the choice made on its screen.
+    if (offer.kind === 'stop') return;
     pruneFound(run);
     this.undoStack = [];
     // A Crawl is three maps in a row: this remembers where it is and what the character carries between them.
@@ -278,6 +282,16 @@ export class Controller {
     this.bus.emit('select', { id: null });
     this.bus.emit('mapStart', { world: this.world });
     this.changed();
+  }
+
+  /** Take the stop in a slot with the choice made on its screen: the level passes (docs/WAYSIDE.md 5.1). Final, like a map. */
+  takeStop(slot: number, choice: StopChoice): CraftResult {
+    const run = this.run;
+    if (!run) return { ok: false, reason: 'no run' };
+    const res = takeStop(run, slot, choice);
+    if (res.ok) this.undoStack = [];
+    this.changed();
+    return res;
   }
 
   /** The Abandon button: start the escape timer (the map ends when it runs out). */
@@ -471,6 +485,9 @@ export class Controller {
       return `${set.length} tablet set${set.length === 1 ? '' : 's'} to redeem (open the Workbench)`;
     const rares = unseenRares(run).length;
     if (rares > 0) return `${rares} new rare/unique item${rares === 1 ? '' : 's'} (open Items)`;
+    // Auto-continue always takes the first offer, which is a map and never a stop, so a stop would pass unseen: pause for it.
+    const stop = run.offers.find((o) => o.kind === 'stop');
+    if (stop) return `${stopName(stop.stop!)} is on offer`;
     // The next map is the anchor: stop if it is not the plain map auto-continue is meant for, or the character is worn down.
     if (run.offers[0].type !== 'plain')
       return `the first map is a ${mapTypeDef(run.offers[0].type).name} map`;
