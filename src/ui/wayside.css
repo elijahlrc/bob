@@ -1,4 +1,4 @@
-/* The Wayside (docs/WAYSIDE.md): stops, the Market, provisions and the Reprieve. */
+/* The Wayside (docs/WAYSIDE.md): stops, provisions and the Reprieve. */
 
 .theme.stop-card {
   border-style: dotted;
@@ -88,24 +88,13 @@
   }
 }
 
-/* The Market */
-.wares {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  box-sizing: border-box;
-  width: 100%;
-  min-width: 0;
-}
+/* The Quartermaster's wares */
 .wares-head {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
-}
-.wares-head h3 {
-  margin: 0;
 }
 .ware-grid {
   display: grid;
@@ -117,9 +106,6 @@
   flex-direction: column;
   gap: 6px;
   min-width: 0;
-}
-.ware.sold {
-  opacity: 0.45;
 }
 .ware-buy {
   display: flex;

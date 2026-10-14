@@ -27,9 +27,8 @@
   the earlier parity pass (size, clusters, vocabulary).
 - **Tree editor** (2026-10-13): `npm run tree:edit` opens `tree-editor.html` (move nodes, change type, add/remove nodes and links, copy stats; dev server only). Save writes `src/data/tree/treeEdits.json`, a patch `getTree()` applies on top of the baked tree (`edits.ts`). The launcher rebakes a stale bake first (not when edits are saved: a rebake renumbers nodes). See the end of docs/TREE-REDESIGN.md.
 - **Wayside** (2026-10-13): [docs/WAYSIDE.md](docs/WAYSIDE.md) (milestones Y1 to Y7, built; questions met on the way in [docs/WAYSIDE-QUESTIONS.md](docs/WAYSIDE-QUESTIONS.md)):
-  Bone Dust is the money. A **stop** is a third kind of offer (`OfferKind` `stop`, `src/data/stops.ts`, `src/run/stops.ts`: Awlsmith, Gem Hoard,
-  Shrine, Quartermaster, Ferryman; it costs the level; the schedule is stateless, `stopAt` in `offers.ts`); the **Market** is the Wares tab
-  (`src/run/market.ts`, stock stored in `run.wayside`); **provisions** (`src/data/provisions.ts`, `src/run/provisions.ts`) are armed at camp and
+  Bone Dust is the money (spent only at the Quartermaster: a camp **Market**/Wares tab was built and cut on 2026-10-14). A **stop** is a third kind of offer (`OfferKind` `stop`, `src/data/stops.ts`, `src/run/stops.ts`: Awlsmith, Gem Hoard,
+  Shrine, Quartermaster, Ferryman; it costs the level; the schedule is stateless, `stopAt` in `offers.ts`); the Quartermaster's stock is `src/run/sale.ts`; **provisions** (`src/data/provisions.ts`, `src/run/provisions.ts`) are armed at camp and
   burn when a map starts; a **Reprieve** (`src/data/reprieves.ts`, `src/sim/reprieve.ts`) is held and fires when damage would kill. Provisions,
   curses and blessings are hidden map affixes (`fixed`, `chalkOnly`), so the world, the threat preview and the rewards read them with no new
   machinery. `RunState.wayside` is optional: read it with `waysideOf(run)`. `npm run sim -- --no-wayside` and `--strategy stopper` are the

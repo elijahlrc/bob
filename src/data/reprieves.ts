@@ -26,7 +26,7 @@ export type ReprieveDef = {
   pulse?: boolean;
   /** The curse that starts when it fires (data below). */
   curse?: CurseId;
-  /** Base price in Bone Dust before the level factor (data/market.ts). */
+  /** Base price in Bone Dust before the level factor (data/sale.ts). */
   base: number;
   /** Weight among the Reprieves a stock or a pick draws. */
   weight: number;

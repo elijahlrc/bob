@@ -2,6 +2,12 @@
 
 Status: **built 2026-10-13 (Y1 to Y7); every number is a first guess, measured only in part (section 16); questions met while building are in [WAYSIDE-QUESTIONS.md](WAYSIDE-QUESTIONS.md)** · Owner: the user · Author: Claude
 
+> **Cut on 2026-10-14 (the user): the Market, the Wares tab.** Sorting through more gear after every short level is too much overhead for the play loop, so the per-level
+> stock, the tab, buying at camp, the Market's Reprieve sale and the bot's shopping were removed from the code. Everything below that speaks of the Market (sections 1, 4.2 to 4.4,
+> 6.1, 7.4, 8, 9.1, 10, 11 Y2, 12.2, 14.2) is the plan as it was, kept for the record. What is left of it is the **Quartermaster stop**, the only place wares are
+> for sale (twelve wares at their plain price, a Reprieve among them from level 20), and Bone Dust is spent only there. Provisions now come from the Quartermaster and from reward picks;
+> a Reprieve from the Quartermaster, the Ferryman or a boss level's pick. Section 16.5 says what this does to the economy.
+
 This plan extends [MAPS.md](MAPS.md) (offers, Respite, Abandon, carry-over) and [DESIGN.md](DESIGN.md). It reopens two non-goals
 of MAPS.md section 1 ("a town or shop", "map items as a consumable economy"); section 13 lists the edits that go into DESIGN.md
 on approval. It began as a pitch (`PITCH-WAYSIDE.md`, since folded in), was attacked by an independent Opus review that read the
@@ -40,12 +46,12 @@ what the user decided and what is open for the deep dive. Section 15 is the revi
 Today the gap between maps is a pause with two kinds of decisions (what to wear, which of three maps to take). The **Wayside**
 adds a second, quieter game in that gap, made of four parts that share one economy and one rule:
 
-| Part           | What it is                                                                                                             | What it costs                            |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| **The Market** | A camp tab with a small, fixed stock that restocks each level, priced in **Bone Dust** (what salvaging already pays)   | Bone Dust                                |
-| **Stops**      | A new kind of offer, next to map and Respite: a non-combat place that gives something a map cannot                     | **A level** (the counter still advances) |
-| **Provisions** | Items armed at camp that burn when the next map starts and help for that map only; some are bets, some are specialists | Bone Dust, or found as rewards           |
-| **Reprieves**  | One held item that, if the character would die, pulls it out of the map or revives it instead                          | Bone Dust (a lot), or a bargain          |
+| Part                 | What it is                                                                                                             | What it costs                            |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| ~~The Market~~ (cut) | A camp tab with a small, fixed stock that restocks each level, priced in **Bone Dust** (what salvaging already pays)   | Bone Dust                                |
+| **Stops**            | A new kind of offer, next to map and Respite: a non-combat place that gives something a map cannot                     | **A level** (the counter still advances) |
+| **Provisions**       | Items armed at camp that burn when the next map starts and help for that map only; some are bets, some are specialists | Bone Dust, or found as rewards           |
+| **Reprieves**        | One held item that, if the character would die, pulls it out of the map or revives it instead                          | Bone Dust (a lot), or a bargain          |
 
 The rule that holds them together: **the game's price is a level.** A stop spends a level, a retreat spends a level, a bet
 spends safety. Bone Dust is the only money. Nothing here adds a clock, a second currency or a mid-map input.
@@ -103,7 +109,7 @@ does it); retrying a map; rewinding time (section 7.5); mid-map decisions; anyth
 
 ---
 
-## 4. Bone Dust and the Market
+## 4. Bone Dust and the Market (the Market was cut on 2026-10-14; see the note at the top)
 
 ### 4.1 Bone Dust is the money
 
@@ -574,13 +580,13 @@ Speed: the bot's runs are about as fast with the Wayside as without (most classe
 | #   | Criterion                                                                                                 | Result                                                                                                                                                     |
 | --- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1   | Stops: a stopper stays within 10 points of the anchor                                                     | Met (16.2).                                                                                                                                                |
-| 2   | The Market: Dust held under three levels of income, no ware in more than 60% of visits                    | **Not measured.** Dust income per level and the share of visits were not instrumented.                                                                     |
+| 2   | The Market: Dust held under three levels of income, no ware in more than 60% of visits                    | **Cut with the Market** (2026-10-14).                                                                                                                      |
 | 3   | Provisions: staples lift maps reached by a bounded amount, bets are neither always right nor always wrong | **Not measured.** The bot arms only staples; bets and specialists were tested by unit tests (their numbers move the sheet as written) and not by bot runs. |
 | 4   | Reprieves: the paired effect of each item                                                                 | **Partly:** the Revive's effect from `lethal.ts` (16.1); the Retreat's and the items' effect in whole bot runs was not run.                                |
 | 5   | No new input, headless                                                                                    | Met: the simulation modules read no clock and no `Math.random`; `npm run check` enforces it.                                                               |
-| 6   | Determinism: stock, schedule and stop rolls from the seed                                                 | Met: tested (`market.test.ts`, `stops.test.ts`).                                                                                                           |
+| 6   | Determinism: stock, schedule and stop rolls from the seed                                                 | Met: tested (`sale.test.ts`, `stops.test.ts`).                                                                                                             |
 | 7   | Boss rules                                                                                                | Met: tested (`reprieve.test.ts`: a Retreat on maps 10, 20 and 100, a Revive on map 10).                                                                    |
-| 8   | Phones: Wares, every stop screen and the Satchel fit 375 px                                               | Met, checked in the browser with no horizontal overflow; the real-device pass is still open (MOBILE.md).                                                   |
+| 8   | Phones: every stop screen and the Satchel fit 375 px                                                      | Met, checked in the browser with no horizontal overflow; the real-device pass is still open (MOBILE.md).                                                   |
 
 ### 16.4 Built differently from the plan, or not built
 
@@ -592,3 +598,25 @@ Speed: the bot's runs are about as fast with the Wayside as without (most classe
 - Names were checked against every unique, flask, gem, currency, affix, base, theme and boss name in the game: no clashes (the word
   "haste" was a deny-list hit and the Shrine's blessing is now "Swiftness"; "Swift" and "Shrinekeeper Mask" are loose substring
   matches only).
+
+### 16.5 The Market was cut (2026-10-14)
+
+The user, after trying the build: the Wares tab "adds too much overhead to the overall play loop. Nobody wants to sort through more
+gear to see if they want it after every short level." It was removed: `src/ui/Wares.tsx`, the Wares tab and its tip, the per-level
+stock (`rollMarket`, `ensureMarket`, `wayside.market`, `wayside.marketLevel`), buying at camp (`buyWare`, `Controller.buy`), the
+Market's Reprieve sale (`reprieveOnSale`) and the bot's shopping (`botShop`, now `botArm`, which only arms staples). The Quartermaster's
+stock generator, which shared that code, lives on as `src/data/sale.ts` and `src/run/sale.ts` (the files were renamed from
+`market`), and the stop's price is now the plain price (there is no Market to be a quarter under).
+
+What this changes, plainly:
+
+- **Bone Dust has one sink again: the Quartermaster**, a stop about once in two dozen levels. Salvaging still pays Dust and Clean up still
+  says so, so most Dust will pile up unspent until the Workbench returns or a Quartermaster comes. If that feels empty, the options are
+  a cheaper, more frequent Quartermaster, or letting the Awlsmith take Dust for sockets instead of Augers.
+- **Provisions are scarcer:** only the Quartermaster (three of its twelve wares) and a fifth map's reward pick (30%) give them, so the
+  Satchel will often be empty. The default bot, which only armed staples it had bought, now arms what a pick gave it.
+- **A Reprieve now comes only from** the Quartermaster, the Ferryman, or a boss level's pick.
+- The Quartermaster still lays out three rares, which is the sorting the user did not want after every level; it is one stop in
+  about eight, it costs the level, and it is the player's choice to enter. Dropping gear from its stock is one line in `sale.ts`
+  if that is still too much.
+- The measurements in 16.2 were taken with the Market in place and were not repeated.

@@ -34,7 +34,7 @@ type Args = {
   difficulty: Difficulty;
   /** Index of the first run (so runs can be split over processes), a file to write the raw results to, files to merge. */
   from: number;
-  /** Play without the Wayside (no stops, Market, provisions or Reprieves): a baseline for measuring it. */
+  /** Play without the Wayside (no stops, provisions or Reprieves): a baseline for measuring it. */
   noWayside: boolean;
   /** A batch label: send the runs to the sim_runs table under it. */
   log?: string;

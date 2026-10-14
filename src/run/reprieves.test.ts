@@ -1,67 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { POUCH_LIMIT } from '../data/provisions';
-import { REPRIEVE_FROM } from '../data/reprieves';
-import { buyWare, ensureMarket } from './market';
 import { addProvision, pouchCount } from './provisions';
-import { acquireReprieve, reprieveBlocker, reprieveOnSale } from './reprieves';
+import { acquireReprieve, reprieveBlocker } from './reprieves';
 import { newRun, rollRewards, setMap, takeReward } from './run';
 import { waysideOf } from './wayside';
-
-describe('Reprieves for sale (docs/WAYSIDE.md 7.4)', () => {
-  it('are not sold before level 20, never on two levels in a row, and sometimes after', () => {
-    for (const seed of [1, 2, 3, 4, 5, 6, 7, 8]) {
-      let n = 0;
-      for (let map = 1; map <= 99; map++) {
-        const sale = reprieveOnSale(seed, map);
-        if (map < REPRIEVE_FROM) expect(sale).toBeNull();
-        if (sale) {
-          n++;
-          expect(reprieveOnSale(seed, map - 1)).toBeNull();
-        }
-      }
-      expect(n, `seed ${seed}`).toBeGreaterThan(5);
-    }
-  });
-
-  it('take the last slot of the stock on those levels, at a price that follows the level', () => {
-    let found = 0;
-    for (let seed = 1; seed <= 30 && !found; seed++) {
-      for (let map = REPRIEVE_FROM; map < 60 && !found; map++) {
-        if (!reprieveOnSale(seed, map)) continue;
-        const run = newRun('vanguard', seed);
-        setMap(run, map);
-        const ware = ensureMarket(run).find((w) => w.kind === 'reprieve')!;
-        expect(ware).toBeDefined();
-        expect(ware.ref).toBe(reprieveOnSale(seed, map));
-        expect(ensureMarket(run).some((w) => w.kind === 'currency')).toBe(false);
-        run.dust = ware.price + 3;
-        expect(buyWare(run, ware.id)).toEqual({ ok: true });
-        expect(waysideOf(run).reprieve).toBe(ware.ref);
-        expect(waysideOf(run).reprieves).toBe(1);
-        expect(run.dust).toBe(3);
-        found++;
-      }
-    }
-    expect(found).toBe(1);
-  });
-
-  it('cannot be bought while one is held, and the Dust is kept', () => {
-    for (let seed = 1; seed <= 30; seed++) {
-      for (let map = REPRIEVE_FROM; map < 60; map++) {
-        if (!reprieveOnSale(seed, map)) continue;
-        const run = newRun('vanguard', seed);
-        setMap(run, map);
-        acquireReprieve(run, 'ferryToken');
-        const ware = ensureMarket(run).find((w) => w.kind === 'reprieve')!;
-        run.dust = 5000;
-        expect(buyWare(run, ware.id)).toEqual({ ok: false, reason: 'You already hold a reprieve' });
-        expect(run.dust).toBe(5000);
-        return;
-      }
-    }
-    throw new Error('no sale found');
-  });
-});
 
 describe('cards of a reward pick that are for the Wayside (docs/WAYSIDE.md 6.1 and 7.4)', () => {
   const pickAt = (seed: number, map: number) => {

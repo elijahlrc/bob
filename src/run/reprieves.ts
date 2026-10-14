@@ -1,9 +1,6 @@
-import { Rng } from '../core/rng';
 import {
   CURSE_LEVELS,
   REPRIEVE_CAP,
-  REPRIEVE_FROM,
-  REPRIEVES,
   curseAffixId,
   reprieveDef,
   type CurseId,
@@ -74,15 +71,4 @@ export function spendReprieve(run: RunState, id: string): void {
   w.reprieve = null;
   const def = reprieveDef(id);
   if (def.curse) addCurse(run, def.curse);
-}
-
-/**
- * The Reprieve a Market sells on a level, if any: from level 20, about one level in five, never two in a row, drawn from the run
- * seed alone (so the same on every visit and in every reload).
- */
-export function reprieveOnSale(seed: number, map: number): ReprieveId | null {
-  const hit = (m: number) =>
-    m >= REPRIEVE_FROM && new Rng(seed).fork(`reprievesale${m}`).chance(0.2);
-  if (!hit(map) || hit(map - 1)) return null;
-  return new Rng(seed).fork(`reprievekind${map}`).weighted(REPRIEVES, (r) => r.weight).id;
 }

@@ -19,7 +19,7 @@ import { cartCost, cartProblem, saleStock, shrineBlessings } from '../run/stops'
 import { reprieveBlocker } from '../run/reprieves';
 import { waysideOf } from '../run/wayside';
 import { ReprieveCard } from './Satchel';
-import { WareCard } from './Wares';
+import { WareCard } from './WareCard';
 import { itemTitle, rarityClass } from './ItemCard';
 
 /** What the level costs, in words the stop's screen and its card share. */

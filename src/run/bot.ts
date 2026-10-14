@@ -35,9 +35,7 @@ import {
 import { Rng } from '../core/rng';
 import { botChalk, botCraft } from './botCraft';
 import { botStopChoice, botTakeStop, botWantsStop } from './botStop';
-import { buyWare, ensureMarket } from './market';
 import { affixesWithArmed, armProvision } from './provisions';
-import { reprieveBlocker } from './reprieves';
 import { provisionDef, type ProvisionId } from '../data/provisions';
 import { waysideOf } from './wayside';
 import { salvage } from './craft';
@@ -552,29 +550,10 @@ export function botReward(run: RunState, crafting = true, wayside = true): void 
 }
 
 /**
- * Spend Bone Dust at the Market (docs/WAYSIDE.md 9.3): buy a piece of gear that would raise the character's score a little. A first
- * valuation; milestone Y7 measures it. The purchase joins the bag, and `botEquip` then wears it.
+ * Arm the staples the character holds (docs/WAYSIDE.md 9.3): they are small and always right, so the bot arms what it has before it
+ * scores the offers. The bets and specialists are a wager the bot cannot value yet and are never armed.
  */
-export function botShop(run: RunState): void {
-  // A Reprieve is the one thing worth saving Dust for: it is bought as soon as it is on sale and affordable.
-  const rep = ensureMarket(run).find((w) => w.kind === 'reprieve' && !w.sold);
-  if (rep && rep.price <= run.dust && reprieveBlocker(run) === null) buyWare(run, rep.id);
-  const base = scoreOf(run, run.build);
-  for (const w of ensureMarket(run)) {
-    if (w.sold || w.kind !== 'gear' || w.item?.kind !== 'item' || w.price > run.dust) continue;
-    const it = w.item;
-    let best = 0;
-    for (const slot of slotsFor(it))
-      if (canEquip(run, it, slot).ok)
-        best = Math.max(best, scoreOf(run, withEquipped(run.build, it, slot)));
-    if (best > base * 1.03) buyWare(run, w.id);
-  }
-  // Provisions: the cheap staples are small and always right, so the bot buys one when it costs under 40% of its Dust,
-  // then arms what it holds (staples only; the bets are a wager the bot cannot value yet).
-  for (const w of ensureMarket(run)) {
-    if (w.sold || w.kind !== 'provision' || provisionDef(w.ref!).kind !== 'staple') continue;
-    if (w.price <= run.dust * 0.4) buyWare(run, w.id);
-  }
+export function botArm(run: RunState): void {
   const way = waysideOf(run);
   way.armed = [];
   for (const id of Object.keys(way.pouch) as ProvisionId[])
@@ -584,7 +563,7 @@ export function botShop(run: RunState): void {
 /** All camp decisions between maps. */
 export function botCamp(run: RunState, policy: CraftPolicy = 'greedy', wayside = true): void {
   botReward(run, policy !== 'none', wayside);
-  if (wayside) botShop(run);
+  if (wayside) botArm(run);
   botEquip(run);
   botRegem(run);
   if (policy === 'greedy') {
@@ -634,7 +613,7 @@ export type BotRunOpts = {
   themes?: ThemeRule;
   /** How the bot spends currency (default 'greedy'). */
   crafting?: CraftPolicy;
-  /** Whether the bot uses the Wayside (stops, the Market, provisions, Reprieves); false plays the game as it was before (a measuring baseline). Default true. */
+  /** Whether the bot uses the Wayside (stops, provisions, Reprieves); false plays the game as it was before (a measuring baseline). Default true. */
   wayside?: boolean;
   /** Leave a map when life drops below this fraction (default: never abandon). */
   abandonBelow?: number;

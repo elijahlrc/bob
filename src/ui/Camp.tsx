@@ -31,7 +31,6 @@ import { Skills } from './Skills';
 import { Strategy } from './Strategy';
 import { StopScreen } from './Stop';
 import { reprieveDef } from '../data/reprieves';
-import { Wares } from './Wares';
 import { Satchel } from './Satchel';
 import { Tip } from './Tip';
 import { stopDef } from '../data/stops';
@@ -44,8 +43,7 @@ const VERDICT_TEXT: Record<Verdict, string> = {
   close: 'Close',
   dangerous: 'Dangerous',
 };
-type Tab =
-  'tree' | 'sheet' | 'skills' | 'strategy' | 'items' | 'workbench' | 'wares' | 'report' | 'next';
+type Tab = 'tree' | 'sheet' | 'skills' | 'strategy' | 'items' | 'workbench' | 'report' | 'next';
 
 /**
  * A boss map's offer (docs/BOSSES.md 10): the one way on, presented as a level apart from all the others. The boss's
@@ -481,9 +479,6 @@ export function Camp({ c }: { c: Controller }) {
           >
             Workbench{CRAFTING_OPEN && run.pendingCraft ? ' (pick a result)' : ''}
           </button>
-          <button class={'tab' + (shown === 'wares' ? ' on' : '')} onClick={() => setTab('wares')}>
-            Wares
-          </button>
           {last?.report && (
             <button
               class={'tab' + (shown === 'report' ? ' on' : '')}
@@ -516,7 +511,6 @@ export function Camp({ c }: { c: Controller }) {
               onShowInItems={(uid) => goTo('items', uid)}
             />
           )}
-          {shown === 'wares' && <Wares c={c} />}
           {shown === 'report' && last?.report && (
             <MapReportView
               r={last.report}

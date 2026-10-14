@@ -109,7 +109,7 @@ export type RunState = {
   vitals: Vitals;
   /** How hard the monsters are (docs/ENEMIES.md 8): fixed for the run unless changed from the debug panel at camp. */
   difficulty: Difficulty;
-  /** Stops, the Market, provisions and the Reprieve (docs/WAYSIDE.md); read it with `waysideOf`. */
+  /** Stops, provisions and the Reprieve (docs/WAYSIDE.md); read it with `waysideOf`. */
   wayside?: Wayside;
 };
 

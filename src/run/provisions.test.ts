@@ -10,7 +10,6 @@ import {
   provisionDef,
 } from '../data/provisions';
 import { botRun } from './bot';
-import { ensureMarket, buyWare } from './market';
 import { makeOffer } from './offers';
 import {
   addProvision,
@@ -179,25 +178,8 @@ describe('the offer cards with provisions armed', () => {
   });
 });
 
-describe('buying provisions at the Market', () => {
-  it('puts the provision in the Pouch, and refuses before taking the Dust when the Pouch is full', () => {
-    const run = newRun('vanguard', 6);
-    setMap(run, 14);
-    const ware = ensureMarket(run).find((w) => w.kind === 'provision')!;
-    run.dust = 500;
-    expect(buyWare(run, ware.id).ok).toBe(true);
-    expect(waysideOf(run).pouch[ware.ref!]).toBe(1);
-    setMap(run, 15);
-    const next = ensureMarket(run).find((w) => w.kind === 'provision')!;
-    for (let i = 0; i < POUCH_LIMIT; i++) addProvision(run, 'wardOil');
-    const dust = run.dust;
-    expect(buyWare(run, next.id)).toEqual({ ok: false, reason: 'Your pouch is full' });
-    expect(run.dust).toBe(dust);
-  });
-});
-
 describe('the bot with provisions', () => {
-  it('plays a run in which it buys and arms staples', () => {
+  it('plays a run in which it arms staples', () => {
     const r = botRun('vanguard', 8, 14);
     expect(r.maps.length).toBeGreaterThan(0);
   });

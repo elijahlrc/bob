@@ -29,7 +29,7 @@ export type ProvisionDef = {
   kind: ProvisionKind;
   /** What it does for the one map, in a line (the card, the Satchel and the map's own list). */
   text: string;
-  /** Base price in Bone Dust before the level factor (data/market.ts). */
+  /** Base price in Bone Dust before the level factor (data/sale.ts). */
   base: number;
   /** Weight among the provisions a stock draws. */
   weight: number;

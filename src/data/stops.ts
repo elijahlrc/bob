@@ -46,8 +46,8 @@ export const STOPS: StopDef[] = [
   {
     id: 'quartermaster',
     name: 'The Quartermaster',
-    text: 'A big sale: twelve wares, a quarter off.',
-    how: 'Twelve wares at a quarter off, paid in Bone Dust. Choose what you want; whatever you leave is gone when you do.',
+    text: 'Twelve wares for sale, paid in Bone Dust.',
+    how: 'Twelve wares, paid in Bone Dust (what salvaging items pays). Choose what you want; whatever you leave is gone when you do.',
     weight: 25,
     from: 9,
   },

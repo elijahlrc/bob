@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { priceAt } from '../data/market';
+import { priceAt } from '../data/sale';
 import type { StopId } from '../data/stops';
 import { botRun } from './bot';
 import { botStopChoice } from './botStop';
@@ -53,7 +53,7 @@ describe('the Shrine', () => {
 });
 
 describe('the Quartermaster', () => {
-  it("sells twelve wares a quarter under the Market's price, a Reprieve among them from level 20", () => {
+  it('sells twelve wares, a Reprieve among them from level 20', () => {
     const { run, slot } = withStop('quartermaster', 30);
     const stock = saleStock(run, run.offers[slot]);
     expect(stock).toHaveLength(12);
@@ -62,7 +62,7 @@ describe('the Quartermaster', () => {
     );
     expect(stock.filter((w) => w.kind === 'reprieve')).toHaveLength(1);
     const gear = stock.find((w) => w.kind === 'gear')!;
-    expect(gear.price).toBe(Math.round(priceAt(30, 30) * 0.75));
+    expect(gear.price).toBe(priceAt(30, 30));
     const early = withStop('quartermaster', 12);
     expect(saleStock(early.run, early.run.offers[1]).some((w) => w.kind === 'reprieve')).toBe(
       false,

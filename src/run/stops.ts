@@ -19,7 +19,7 @@ import { waysideOf, type Ware } from './wayside';
 import { BLESSINGS, SHRINE_CHOICES, type BlessingId } from '../data/blessings';
 import { POUCH_LIMIT } from '../data/provisions';
 import { REPRIEVE_CAP, REPRIEVES, type ReprieveId } from '../data/reprieves';
-import { grantWare, rollSale } from './market';
+import { grantWare, rollSale } from './sale';
 import { pouchCount } from './provisions';
 import { acquireReprieve, addCurse, reprieveBlocker } from './reprieves';
 
@@ -96,7 +96,7 @@ export function shrineBlessings(run: RunState, offer: MapOffer): BlessingId[] {
 
 // ---- The Quartermaster -----------------------------------------------------------------------------
 
-/** The Quartermaster's wares for an offer: twelve, a quarter off (data/market.ts), the same every time they are looked at. */
+/** The Quartermaster's wares for an offer: twelve, the same every time they are looked at (run/sale.ts). */
 export function saleStock(run: RunState, offer: MapOffer): Ware[] {
   return rollSale(run, offer.id);
 }

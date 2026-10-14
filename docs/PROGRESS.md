@@ -1000,7 +1000,7 @@ and left: docs/BUGS.md 2 (a Spitter rare can hold the bow strider dodging its po
 
 docs/WAYSIDE.md, Y1 to Y7 built in one pass (the questions met on the way are in docs/WAYSIDE-QUESTIONS.md): a third kind of offer, a
 **stop** (Awlsmith, Gem Hoard, Shrine, Quartermaster, Ferryman; one a window of eight levels from level 9; the level is spent),
-the **Wares** tab (the Market: six wares a level for Bone Dust, stock stored in `run.wayside`), **provisions** (ten, armed in the
+~~the **Wares** tab (the Market)~~ (built, then cut on 2026-10-14 as too much sorting after every level), **provisions** (ten, armed in the
 Satchel, used up when a map starts, carried out as hidden map affixes) and **Reprieves** (Ferry Token, Last Spark, Bargain Coin: one
 held, three a run, fired in `applyDamage`); `SAVE_VERSION` 19. Measuring tools: `npm run sim -- --no-wayside`, `--strategy stopper`,
 `scripts/lethal.ts`. Measured (WAYSIDE.md 16): the deaths are grinds, not spikes (0 of 29 first deaths from a healthy character), 45%

@@ -2,7 +2,7 @@ import type { InventoryItem } from '../data/types';
 import type { RunState } from './run';
 
 /**
- * The Wayside's part of a run (docs/WAYSIDE.md): the Market's stock, the provisions carried and armed, the Reprieve held,
+ * The Wayside's part of a run (docs/WAYSIDE.md): the provisions carried and armed, the Reprieve held,
  * the blessing and curses that last across levels, and a few "seen it once" flags. Every field has a default, and
  * `RunState.wayside` is optional, so an older save and a test fixture need no migration beyond `waysideOf`.
  */
@@ -27,9 +27,6 @@ export type Curse = {
 };
 
 export type Wayside = {
-  /** The Market's stock for the level being prepared, and the level it was rolled for (`ensureMarket`). */
-  market: Ware[];
-  marketLevel: number;
   /** Provisions held, by id. */
   pouch: Record<string, number>;
   /** Provisions armed for the next map (they burn when it starts). */
@@ -51,8 +48,6 @@ export type Wayside = {
 };
 
 export const newWayside = (): Wayside => ({
-  market: [],
-  marketLevel: 0,
   pouch: {},
   armed: [],
   active: [],

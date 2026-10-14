@@ -37,7 +37,6 @@ describe('the Wayside state (docs/WAYSIDE.md)', () => {
     const out = migrate(18, run);
     expect(out!.version).toBe(SAVE_VERSION);
     const w = waysideOf(out!);
-    expect(w.market).toEqual([]);
     expect(w.armed).toEqual([]);
     expect(w.reprieve).toBeNull();
     expect(out!.wayside).toBe(w);

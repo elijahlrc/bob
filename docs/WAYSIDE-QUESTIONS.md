@@ -51,7 +51,7 @@ who is not looking would never see it. The pause ends when the player takes the 
 Chosen: it takes the Awlsmith when a worn item has room (a socket on the item that holds its gems), and never the Gem Hoard; a
 `stopper` strategy takes every stop it can use. Both are first guesses; Y7 measures them.
 
-## Y2 — the Market
+## Y2 — the Market (cut on 2026-10-14, see the last entry)
 
 **Q. When is the stock rolled?**
 Chosen: the first time the camp shows a level (`ensureMarket`, called from the controller's `changed()`), then stored in the save with
@@ -229,3 +229,23 @@ are in player-facing words for it to read.
 **Q. Tools left in the repo.**
 `scripts/lethal.ts` (the lethal-hit count), the `--no-wayside` and `--strategy stopper` flags of `npm run sim`, and the
 `wayside` option of `botRun`.
+
+## 2026-10-14 — the Market was cut
+
+**Q. What was cut, and what was kept?**
+The user asked for the Wares tab to be removed "from the code base": it adds too much sorting after every short level. Gone: the
+tab, the per-level stock and its save fields, buying at camp, the Market's Reprieve sale, the bot's shopping, the "wares" tip, and the
+tests for them. Kept: the **Quartermaster stop**, which needed the same stock generator (renamed `data/sale.ts`, `run/sale.ts`;
+`Wares.tsx`'s card moved to `WareCard.tsx`). I kept it because the user's complaint was about every level, and a stop is rare, costs the
+level and is entered on purpose; whether it is still too much sorting (it holds three rares) is the user's to say.
+
+**Q. The Quartermaster's price.**
+It was "a quarter under the Market's price". With no Market the discount means nothing, so the stop charges the plain price (a third
+more than before). Dust has few other uses now, so the price matters little.
+
+**Q. Saves.**
+`SAVE_VERSION` is unchanged. A run saved while the Market existed has `wayside.market` and `wayside.marketLevel` in it; nothing reads them
+and they are dropped the next time the run is saved by a build that does not write them (`waysideOf` only fills missing fields).
+
+**Q. Where does that leave Bone Dust, provisions and Reprieves?**
+See WAYSIDE.md 16.5: one sink (the Quartermaster), fewer provisions, fewer Reprieves. Not re-measured.
