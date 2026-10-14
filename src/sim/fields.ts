@@ -661,6 +661,9 @@ export function tickFields(w: World, dt: number): void {
 
 // ---- walls
 
+/** Half the width of the band a wall hurts when it goes up: the blocks stand a tile wide, and the line wanders across a tile. */
+export const WALL_HALF = 0.75;
+
 /** Raise a wall of ice: the tiles across the way become wall, and what stands there is pushed back. */
 export function raiseWall(w: World, a: Actor, act: Action): void {
   const p = act.profile;
@@ -703,19 +706,26 @@ export function raiseWall(w: World, a: Actor, act: Action): void {
     tiles,
   };
   w.fields.push(f);
-  // The band the wall stands on (the renderer draws the wall itself, tile by tile, from the field).
+  // The band the wall hurts, outlined (the renderer draws the wall itself, tile by tile, from the field).
   const ex = Math.cos(ang) * (len / 2);
   const ey = Math.sin(ang) * (len / 2);
   w.events.push({
     t: 'explode',
     x: act.aimX,
     y: act.aimY,
-    r: 0.5,
+    r: WALL_HALF,
     dtype: f.dtype,
     strip: [act.aimX - ex, act.aimY - ey, act.aimX + ex, act.aimY + ey],
   });
-  // What stood under the wall takes the hit, and is thrown back from the line.
-  for (const e of enemiesIn(w, act.aimX, act.aimY, len / 2 + 0.4)) {
+  // What stood on the line of blocks takes the hit (a band the width of the blocks, along the whole wall), and is thrown back from it.
+  const p1x = act.aimX - ex;
+  const p1y = act.aimY - ey;
+  const p2x = act.aimX + ex;
+  const p2y = act.aimY + ey;
+  const onWall = enemiesIn(w, act.aimX, act.aimY, len / 2 + WALL_HALF + 1).filter(
+    (e) => segmentDist(e.x, e.y, p1x, p1y, p2x, p2y) <= WALL_HALF + e.r,
+  );
+  for (const e of onWall) {
     hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
     const dx = e.x - act.aimX;
     const dy = e.y - act.aimY;

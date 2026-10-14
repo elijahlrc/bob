@@ -29,7 +29,7 @@ sparks, projectile trails, rings, zones and numbers all use it.
   show the element (embers rise, crystals glint, lightning crackles, chaos swirls, dust ticks). A strip is a band with marks
   flowing along it.
 - **Deployables** keep their shape (totem pillar with a glowing top, brand sigil, trap plate set with teeth, mine) and glow in their element.
-  Putting one down is shown, not cast: a trap or a mine is thrown from the hand in an arc, with a trail and a glow, and lands in a puff of
+  Putting one down is shown, not cast: while the skill winds up the thing is held up in the hand, glowing brighter, with a ring closing on the target where it will go; then a trap or a mine is thrown from the hand in an arc, with a trail and a glow, and lands in a puff of
   dust; a totem or a brand comes down from above. A ring closes on a trap or a mine while it arms, and a ready one marks the ground that sets
   it off (a ring of ticks). A mine that has been set off flickers with a white ring closing on it until it goes. When a trap springs or a
   mine goes, its casing bursts into spikes and a line runs to the enemy it fires at. A shot from a deployable never draws the cast rune

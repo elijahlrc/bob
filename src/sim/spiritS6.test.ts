@@ -6,7 +6,7 @@ import { gainCharge } from './charges';
 import { flaskMask, killActor, playerConds } from './combat';
 import { createDummyWorld, dummyDefence } from './dummy';
 import { bannerStage } from './banners';
-import { consecratedAt } from './fields';
+import { consecratedAt, raiseWall, WALL_HALF } from './fields';
 import { reservedMana } from './reserve';
 import type { Actor, World } from './types';
 import { spawnMonster, stepWorld } from './world';
@@ -178,6 +178,48 @@ describe('Frost Wall (glacierWall)', () => {
     expect(walled).toBeGreaterThan(1);
     for (let i = 0; i < 8 * 60; i++) stepWorld(world);
     expect(Array.from(world.grid.tiles).filter((t) => t === 1).length).toBe(before);
+  });
+});
+
+describe('Frost Wall: what the raising hits', () => {
+  it('hurts what stands along the blocks, and not what stands beside them', () => {
+    const { world, dummy } = createDummyWorld(holding('wand_3', ['glacierWall'], 'mystic'), {
+      distance: 3,
+      maxTime: 60,
+    });
+    world.opts.freeResources = true;
+    const c = world.char.actives.find((x) => x.skill.id === 'glacierWall')!;
+    const prof = world.char.profile(c, world.char.configConds, 0);
+    const p = world.player;
+    p.x = 10.5;
+    p.y = 15.5;
+    // The wall stands across the way, east of the character: its line runs north to south through (14.5, 15.5).
+    const aim = { x: 14.5, y: 15.5 };
+    const raise = (dx: number, dy: number): boolean => {
+      dummy.x = aim.x + dx;
+      dummy.y = aim.y + dy;
+      world.events.length = 0;
+      world.fields.length = 0;
+      raiseWall(world, p, {
+        profile: prof,
+        which: 'primary',
+        hand: 0,
+        duration: 1,
+        elapsed: 1,
+        fired: true,
+        echoes: 0,
+        targetId: dummy.id,
+        aimX: aim.x,
+        aimY: aim.y,
+      });
+      return world.events.some((e) => e.t === 'hit' && e.dst === dummy.id);
+    };
+    const half = 4 * prof.radiusMult * 0.5;
+    expect(raise(0, 0)).toBe(true);
+    expect(raise(0, half - 0.2)).toBe(true);
+    // Beside the middle of the wall, and past either end: the old circle took these, the band does not.
+    expect(raise(WALL_HALF + 0.9, 0)).toBe(false);
+    expect(raise(0, half + WALL_HALF + 0.5)).toBe(false);
   });
 });
 

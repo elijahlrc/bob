@@ -381,15 +381,64 @@ export class SkillFx {
     this.host.em.spark.explode(mine ? 8 : 5, o.x, o.y);
   }
 
+  /**
+   * The wind-up of a skill that puts something down: the thing itself is held up in the hand, glowing brighter as the throw comes,
+   * and where a trap, a mine or a brand will go (at the target) a ring closes on the spot.
+   */
+  private readying(a: Actor, act: NonNullable<Actor['action']>, kind: DeployKindName): void {
+    const glow = ELEMENT_COLOR[profileLook(act.profile).element] ?? 0xffffff;
+    const total = Math.max(0.15, act.duration * HIT_AT);
+    this.add(total, true, (g, k) => {
+      if (!a.alive) return;
+      const hx = a.x + Math.cos(a.facing) * 0.3;
+      const hy = a.y + Math.sin(a.facing) * 0.3;
+      const hand = this.host.project(hx, hy);
+      g.fillStyle(glow, 0.12 + 0.28 * k).fillCircle(hand.x, hand.y - 14, 4 + 5 * k);
+      this.deployable(
+        g,
+        kind,
+        hand.x,
+        hand.y,
+        glow,
+        Math.min(1, k * 5),
+        false,
+        false,
+        this.now,
+        0,
+        14,
+      );
+    });
+    if (kind === 'totem') return;
+    // Where it will go: a dark-edged ring on the ground closes on the target as the throw comes.
+    this.add(total, false, (g, k) => {
+      const t = this.host.actorById(act.targetId);
+      if (!t) return;
+      outlineArea(
+        g,
+        this.host,
+        { kind: 'circle', x: t.x, y: t.y, r: 0.3 + 0.9 * (1 - k) },
+        lighten(glow, 0.2),
+        0.5 + 0.5 * k,
+        1.5,
+      );
+      this.disc(g, t.x, t.y, 0.3 + 0.9 * (1 - k), glow, 0.1 + 0.15 * k);
+    });
+  }
+
   /** What a skill use shows while it winds up: the cue of its kind. */
   private cast(a: Actor, w: World): void {
     const act = a.action;
     if (!act) return;
+    // A skill that puts something down shows the thing being readied, not a spell going off.
+    const deploy = a.isPlayer
+      ? w.char.actives.find((c) => c.skill.id === act.profile.skill.id)?.deploy
+      : undefined;
+    if (deploy) {
+      this.readying(a, act, deploy);
+      return;
+    }
     // A skill of beams puts its totems down: no blast shows around the caster.
     if (act.profile.skill.bond) return;
-    // A skill that puts something down shows the thing going down, not a spell going off.
-    if (a.isPlayer && w.char.actives.find((c) => c.skill.id === act.profile.skill.id)?.deploy)
-      return;
     const look = profileLook(act.profile);
     const c = look.color;
     switch (look.delivery) {

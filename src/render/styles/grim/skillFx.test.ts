@@ -237,4 +237,32 @@ describe('skill effects', () => {
     for (const f of w.fields) f.t = 3.95;
     fx.frame(w, 0.05, 1.1, gfx() as never);
   });
+
+  it('a skill that puts something down shows it readied in the hand, not a cast rune', () => {
+    const target = actor({ id: 2, isPlayer: false, x: 9, y: 5 });
+    const skill = {
+      id: 'jawsTrap',
+      name: 'Jaws Trap',
+      type: 'spell',
+      tags: [],
+      behaviour: { kind: 'burst', radius: 2 },
+    };
+    const a = actor({
+      action: {
+        profile: { skill, hands: [{ chunks: [{ max: 5, type: 2 }] }] },
+        targetId: 2,
+        duration: 1,
+      },
+    } as never);
+    const w = world(a);
+    (w.char as unknown as { actives: unknown[] }).actives = [{ skill, deploy: 'trap' }];
+    const fx = new SkillFx(host([a, target]), scene);
+    fx.onEvent({ t: 'use', src: 1, skill: 'jawsTrap' }, w);
+    // Two effects that last the wind-up (the thing in the hand, the ring on the target) and draw until the throw.
+    expect(pending(fx)).toBe(2);
+    fx.frame(w, 0.3, 1, gfx() as never);
+    expect(pending(fx)).toBe(2);
+    for (let i = 0; i < 4; i++) fx.frame(w, 0.1, 1.3 + i * 0.1, gfx() as never);
+    expect(pending(fx)).toBe(0);
+  });
 });

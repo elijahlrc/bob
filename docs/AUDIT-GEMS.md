@@ -1620,11 +1620,14 @@ figure, bladestorms, geysers, smoke, and the wall of ice (which also holds tiles
 
 - **Glacier Wall**: the raise event is the band the wall stands on (a `strip`), not a circle of the wall's length, and each tile it holds is
   drawn as a block of ice that rises, glints, and sinks as it melts. Tiles skipped because something stood on them are skipped in the
-  picture too. The hit when it goes up is still a circle (length / 2 + 0.4 tiles) round the middle, wider than the band at the ends; that
-  is the sim's rule and was left as it was.
+  picture too. The hit when it goes up is now the band the blocks stand on (the whole length of the wall, 0.75 of a tile either side of the line,
+  `WALL_HALF` in `src/sim/fields.ts`), the same ground the flash outlines, not a circle round the middle; enemies on it are thrown back
+  from the line as before.
 - **Traps and mines** looked like an area cast for three reasons, all fixed: the cast rune opened round the character for a skill that only
   puts something down (now none); every shot of a trap or a totem pushed a `use` event, so the rune also opened round the character when a trap
   went off across the room (the event now says `via: 'deployed'` and draws nothing); and the placement was a small ring where the thing already
   stood (now a throw in an arc for a trap or a mine, a drop for a totem or a brand, with a ring closing while it arms and a ring of ticks on
   the ground that sets it off). A trap that springs or a mine that goes has its own burst and a line to its target (`sprung` event).
+- The wind-up of a trap, a mine, a totem or a brand shows the thing held up in the hand, glowing brighter as the throw comes, and a ring
+  closing on the target where a trap, a mine or a brand will go.
 - Not changed: monsters' own skills, projectile bodies, and the upkeep skills; their looks were already distinct.
