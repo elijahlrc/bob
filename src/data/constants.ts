@@ -180,7 +180,7 @@ export function easeDamage(m: number): number {
  * multiplied by these on top of the easing above, from this share on map 1 up to 1 (the curve as it was) on map OPENING_LEVEL.
  * Monsters only: nothing on the character's side moves, so what the first drops add stays worth having.
  */
-export const OPENING_LEVEL = 5;
+export const OPENING_LEVEL = 20;
 export const OPENING_LIFE = 0.5;
 export const OPENING_DAMAGE = 0.5;
 const opening = (from: number, m: number) =>
