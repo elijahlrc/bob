@@ -36,6 +36,9 @@ import { Rng } from '../core/rng';
 import { botChalk, botCraft } from './botCraft';
 import { botStopChoice, botTakeStop, botWantsStop } from './botStop';
 import { buyWare, ensureMarket } from './market';
+import { affixesWithArmed, armProvision } from './provisions';
+import { provisionDef, type ProvisionId } from '../data/provisions';
+import { waysideOf } from './wayside';
 import { salvage } from './craft';
 import { buildSignature, killerTracker, metTracker, RunTally } from './metrics';
 import { randomCraft } from './randomBot';
@@ -169,7 +172,14 @@ export function chooseOffer(run: RunState, rule: ThemeRule = 'best', rng?: Rng):
   const boss = run.map % 10 === 0 ? 'boss' : 'clearing';
   // An offer's monsters are at its own level, so each is scored by a character facing that level.
   const valueOf = (o: MapOffer) =>
-    scoreTheme(offerCharacter(run, o), themeDef(o.themeId), boss, o.affixes, o.type, run.map).value;
+    scoreTheme(
+      offerCharacter(run, o),
+      themeDef(o.themeId),
+      boss,
+      affixesWithArmed(run, o),
+      o.type,
+      run.map,
+    ).value;
   let best = first;
   let bestValue = valueOf(first);
   // A later offer must beat the best so far by 0.1%, so ties keep the earlier one.
@@ -546,6 +556,16 @@ export function botShop(run: RunState): void {
         best = Math.max(best, scoreOf(run, withEquipped(run.build, it, slot)));
     if (best > base * 1.03) buyWare(run, w.id);
   }
+  // Provisions: the cheap staples are small and always right, so the bot buys one when it costs under 40% of its Dust,
+  // then arms what it holds (staples only; the bets are a wager the bot cannot value yet).
+  for (const w of ensureMarket(run)) {
+    if (w.sold || w.kind !== 'provision' || provisionDef(w.ref!).kind !== 'staple') continue;
+    if (w.price <= run.dust * 0.4) buyWare(run, w.id);
+  }
+  const way = waysideOf(run);
+  way.armed = [];
+  for (const id of Object.keys(way.pouch) as ProvisionId[])
+    if (provisionDef(id).kind === 'staple') while (armProvision(run, id).ok);
 }
 
 /** All camp decisions between maps. */

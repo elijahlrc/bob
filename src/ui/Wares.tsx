@@ -5,6 +5,7 @@ import type { Controller } from '../run/controller';
 import { ensureMarket } from '../run/market';
 import type { Ware } from '../run/wayside';
 import { compareDelta, ItemCard } from './ItemCard';
+import { ProvisionCard } from './Satchel';
 
 /** The Market (docs/WAYSIDE.md section 4): a few wares for Bone Dust, restocked every level. */
 export function Wares({ c }: { c: Controller }) {
@@ -42,6 +43,8 @@ export function Wares({ c }: { c: Controller }) {
                 build={run.build}
                 diff={w.item.kind === 'item' ? compareDelta(run.build, w.item, cfg) : null}
               />
+            ) : w.kind === 'provision' ? (
+              <ProvisionCard id={w.ref!} />
             ) : (
               <div class="item-card flaskitem">
                 <div class="ic-name">

@@ -207,7 +207,8 @@ describe('every affix has a threat entry (docs/MAPS.md 10.3)', () => {
 
   it('adding the affix changes what the model says, except where it cannot (leech)', () => {
     const silent = MAP_AFFIXES.filter((a) => {
-      if (a.id === 'noLeech') return false;
+      // Leech is the one thing the threat model cannot see: Bloodless (monsters cannot be leeched from) and the Bloodsalt provision.
+      if (a.id === 'noLeech' || a.id === 'provision.bloodsalt') return false;
       const t = affixThreat([a.id], 60);
       return chars.every((ch, i) => {
         const s = scoreTheme(ch, theme, 'clearing', [a.id]);

@@ -4,6 +4,7 @@ import { themeDef } from '../data/themes';
 import { offerCharacter } from './bot';
 import type { MapOffer } from './offers';
 import { offerRewards, type OfferRewards } from './rewards';
+import { affixesWithArmed } from './provisions';
 import type { RunState } from './run';
 import { survivalRatio, threatPreview } from './threat';
 import { themeInfo, weakestAxis, type ThemeInfo } from './themeInfo';
@@ -46,26 +47,28 @@ export function offersFor(run: RunState): OfferPreview[] {
   return run.offers.map((offer) => {
     // A Respite or a stop has no monsters: nothing to preview.
     if (offer.kind !== 'map') return { ...offer, dps: 1, ehp: 1 };
+    // What is armed for the next map counts in everything the card says about it (docs/WAYSIDE.md 9.1).
+    const affixes = affixesWithArmed(run, offer);
     const p = threatPreview(
       offerCharacter(run, offer),
       themeDef(offer.themeId),
       mode,
-      offer.affixes,
+      affixes,
       offer.type,
     );
     const ratio = survivalRatio(
       offerCharacter(run, offer),
       themeDef(offer.themeId),
       mode,
-      offer.affixes,
+      affixes,
       offer.type,
       run.vitals.life,
       run.map,
     );
-    const info = themeInfo(themeDef(offer.themeId), offer.affixes, offer.type, offer.areaLevel);
+    const info = themeInfo(themeDef(offer.themeId), affixes, offer.type, offer.areaLevel);
     const weak = weakestAxis(offerCharacter(run, offer), info.mix) ?? undefined;
     const tier = mapTier(run.difficulty, offerNoise(run.seed, offer.id)) ?? undefined;
-    const rewards = offerRewards(run, offer);
+    const rewards = offerRewards(run, { ...offer, affixes });
     return {
       ...offer,
       dps: p.dps,

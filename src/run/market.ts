@@ -1,6 +1,9 @@
 import { Rng } from '../core/rng';
 import { flaskBase } from '../data/flasks';
 import { MARKET_SIZE, priceAt, WARE_BASE } from '../data/market';
+import { PROVISIONS, type ProvisionId } from '../data/provisions';
+import { addProvision, pouchCount } from './provisions';
+import { POUCH_LIMIT } from '../data/provisions';
 import type { Item } from '../data/types';
 import { rollCurrencyBundle } from '../gen/currencyDrops';
 import { rollDrop, rollFlask, rollGem } from '../gen/loot';
@@ -11,7 +14,7 @@ import { stash, uidSource } from './run';
 import { waysideOf, type Ware } from './wayside';
 
 /** How a stock is laid out: a ware for each slot, in this order. A slot the build cannot fill yet is filled by the next kind. */
-const MARKET_SLOTS = ['gear', 'gear', 'gem', 'flask', 'currency', 'gear'] as const;
+const MARKET_SLOTS = ['gear', 'gear', 'gem', 'flask', 'provision', 'currency'] as const;
 
 type Slot = (typeof MARKET_SLOTS)[number];
 
@@ -47,6 +50,16 @@ function ware(run: RunState, slot: Slot, index: number, rng: Rng, off = 0): Ware
       for (let i = 0; i < 10 && flaskBase(flask.baseId).kind !== 'utility'; i++)
         flask = rollFlask(rng, uid, level, 1);
       return { id: String(index), kind: 'flask', price: price(WARE_BASE.flask), item: flask };
+    }
+    case 'provision': {
+      const open = PROVISIONS.filter((p) => p.from <= level);
+      const p = rng.weighted(open, (x) => x.weight);
+      return {
+        id: String(index),
+        kind: 'provision',
+        price: price(p.base),
+        ref: p.id,
+      };
     }
     case 'currency': {
       const bundle = rollCurrencyBundle(rng, uid, level);
@@ -106,12 +119,16 @@ export function buyWare(run: RunState, id: string): CraftResult {
   if (!ware) return { ok: false, reason: 'No such ware' };
   if (ware.sold) return { ok: false, reason: 'Already bought' };
   if (run.dust < ware.price) return { ok: false, reason: 'Not enough Bone Dust' };
+  if (ware.kind === 'provision' && pouchCount(run) >= POUCH_LIMIT)
+    return { ok: false, reason: 'Your pouch is full' };
   run.dust -= ware.price;
   ware.sold = true;
   if (ware.item) {
     const bought = { ...ware.item, uid: uidSource(run)() };
     run.inventory.push(bought);
     noteFound(run, bought);
+  } else if (ware.kind === 'provision' && ware.ref) {
+    addProvision(run, ware.ref as ProvisionId);
   } else if (ware.kind === 'currency' && ware.ref) {
     stash(run, { kind: 'currency', uid: uidSource(run)(), id: ware.ref, count: ware.count ?? 1 });
   }

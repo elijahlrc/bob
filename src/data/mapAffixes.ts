@@ -1,5 +1,6 @@
 import { mod, type Mod } from '../mods/types';
 import { THRONG_AFFIX } from './mapTypes';
+import { PROVISION_AFFIXES } from './provisions';
 
 /**
  * Map affixes (EXPANSION 7.5, docs/MAPS.md section 6): from map 5 an offered map can carry modifiers that
@@ -288,6 +289,8 @@ export const MAP_AFFIXES: MapAffixDef[] = [
     playerMods: [mod('blockAttack', 'base', -20), mod('blockSpell', 'base', -20)],
     reward: { quantity: 0.15 },
   },
+  // The hidden affixes that carry the provisions (data/provisions.ts): never rolled, never offered by Chalk.
+  ...PROVISION_AFFIXES,
 ];
 
 export function mapAffixDef(id: string): MapAffixDef {

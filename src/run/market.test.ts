@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { MARKET_SIZE, priceAt, WARE_BASE } from '../data/market';
+import { provisionDef } from '../data/provisions';
 import { botShop } from './bot';
 import { buyWare, ensureMarket, rollMarket } from './market';
 import { loadRun, MemoryStore, saveRun } from './save';
@@ -22,10 +23,14 @@ describe('the Market stock (docs/WAYSIDE.md 4.2)', () => {
     const stock = rollMarket(run);
     expect(stock).toHaveLength(MARKET_SIZE);
     expect(stock.map((w) => w.kind).sort()).toEqual(
-      ['currency', 'flask', 'gear', 'gear', 'gear', 'gem'].sort(),
+      ['currency', 'flask', 'gear', 'gear', 'gem', 'provision'].sort(),
     );
     for (const w of stock) {
-      expect(w.price).toBe(priceAt(WARE_BASE[w.kind as keyof typeof WARE_BASE], 25));
+      const base =
+        w.kind === 'provision'
+          ? provisionDef(w.ref!).base
+          : WARE_BASE[w.kind as keyof typeof WARE_BASE];
+      expect(w.price).toBe(priceAt(base, 25));
       expect(w.sold).toBeUndefined();
     }
     expect(priceAt(30, 50)).toBe(60);

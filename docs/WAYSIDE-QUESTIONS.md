@@ -69,3 +69,37 @@ Chosen: it buys a rare if wearing it would raise its score by more than 3%, and 
 
 **Q. Where is the Market in the UI?**
 Chosen: its own "Wares" tab, after the Workbench (which is still closed). The offers panel keeps the Satchel strip for Y3.
+
+## Y3 — provisions
+
+**Q. How is a provision carried out in the map without new machinery?**
+Chosen: each provision is a hidden map affix (`provision.<id>`, `fixed` so it does not follow the level band, `chalkOnly` so it is
+never rolled or offered by Chalk), registered in `MAP_AFFIXES` from `data/provisions.ts`. The affix system already gives a player's
+mods, the monsters' mods (Rushing Tonic), pack and rare-pack changes, the reward fractions (Greedy Lantern's +30% quantity) and the
+threat model's reading of all of them. `planFor` adds the burning provisions' affixes after the offer's own; the offer cards and the
+bot's scoring add the armed ones (`affixesWithArmed`) to what they compute but never to the list of affixes the card shows.
+
+**Q. Where is the burn?**
+Chosen: `startProvisions(run)` in `controller.startMap` and at the top of `playOffer` (the bot and tests): armed goes to
+`wayside.active`, the Pouch loses them, and `finishMap` clears `active` (also on death). A Respite or a stop burns nothing.
+A reload mid-map restores the camp save, so they come back (the user accepted this).
+
+**Q. Crawl?**
+Chosen: the burning provisions apply to all three maps of a Crawl (they stay `active` until the whole Crawl is finished).
+
+**Q. Reward picks and provisions?**
+The plan lists reward picks as a source. Not done: a pick is a list of items, gems, flasks or currency, and a provision is none of
+them; adding a fifth kind touches the pick screen, the bot's pick and the save. Provisions come from the Market and (Y5) the
+Quartermaster only for now. If wanted, a pick could hand out currency-like "pouch items".
+
+**Q. A damage provision does a little more than its number.**
+Whetted Powder (+12% more damage) lifts the early sheet's DPS by about 16%, and Glass Draught (+60%) by about 85%, because hits are
+rounded to whole numbers at low damage. The numbers are first guesses and Y7 tunes the bonus down if the bot shows it matters.
+
+**Q. What does the bot do with provisions?**
+Chosen: it buys a staple when it costs under 40% of its Dust, then arms the staples it holds before choosing a map (so the map
+scoring includes them). It never buys or arms a bet. Specialists do not exist yet (Y6).
+
+**Q. Does the Character sheet show armed provisions?**
+Chosen: no. Only the offer cards (and the bot's scoring of offers) count them; the sheet shows the build alone, so comparing gear is
+not clouded by a buff that burns at the next map.

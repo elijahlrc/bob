@@ -28,8 +28,9 @@ import type { MapResult } from '../sim/runMap';
 import { restAtCamp } from './camp';
 import { noteFound, stampAll } from './found';
 import { makeOffer, rollOffers, type MapOffer } from './offers';
-import type { Wayside } from './wayside';
+import { waysideOf, type Wayside } from './wayside';
 import type { StopId } from '../data/stops';
+import { endProvisions, provisionAffixes } from './provisions';
 
 export { rollThemes } from './offers';
 
@@ -216,7 +217,8 @@ export function planFor(run: RunState, offer: MapOffer | string, segment = 0): M
     seed,
     run.map,
     offer.themeId,
-    offer.affixes,
+    // The provisions burning on the map are hidden affixes on top of the offer's own (docs/WAYSIDE.md 6).
+    [...offer.affixes, ...provisionAffixes(waysideOf(run).active, offer)],
     offer.areaLevel,
     offer.type,
     segment,
@@ -323,6 +325,7 @@ function collectPicked(run: RunState, res: MapResult): void {
  * loot and XP already taken but earns no clear rewards, and the level counts as passed (docs/MAPS.md 7.2).
  */
 export function finishMap(run: RunState, res: MapResult): void {
+  endProvisions(run);
   run.history.push({
     map: run.map,
     areaLevel: res.areaLevel,

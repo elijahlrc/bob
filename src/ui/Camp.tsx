@@ -31,6 +31,7 @@ import { Skills } from './Skills';
 import { Strategy } from './Strategy';
 import { StopScreen } from './Stop';
 import { Wares } from './Wares';
+import { Satchel } from './Satchel';
 import { stopDef } from '../data/stops';
 import { TreeView } from './TreeView';
 
@@ -277,6 +278,7 @@ export function Camp({ c }: { c: Controller }) {
       </div>
       <div class="muted">Next: map {run.map} of 100</div>
       <Arriving run={run} />
+      <Satchel c={c} />
       <BossAhead map={run.map} />
       {last && (last.status === 'cleared' || last.status === 'abandoned') && (
         <div class="muted">

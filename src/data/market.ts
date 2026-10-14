@@ -14,6 +14,8 @@ export const WARE_BASE = {
   flask: 15,
   /** A bundle of two or three of one currency. */
   currency: 15,
+  /** A provision: its own base price is used (data/provisions.ts); this key keeps the kinds of ware complete. */
+  provision: 5,
 } as const;
 
 /** What a price comes to at a level. */

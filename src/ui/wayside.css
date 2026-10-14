@@ -135,3 +135,61 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Provisions and the Satchel */
+.satchel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid #3a3a48;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.satchel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+.satchel-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 6px;
+}
+.provision {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 8px;
+  border: 1px solid #3a3a48;
+  border-left-width: 3px;
+  border-radius: 4px;
+  background: #14131a;
+  min-width: 0;
+}
+.provision.staple {
+  border-left-color: #8d8fa8;
+}
+.provision.bet {
+  border-left-color: #e6b84a;
+}
+.provision.specialist {
+  border-left-color: #70d090;
+}
+.provision-name {
+  font-weight: bold;
+}
+.provision-text {
+  overflow-wrap: anywhere;
+}
+.provision-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}

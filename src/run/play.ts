@@ -3,6 +3,7 @@ import { combineReports } from '../sim/ledger';
 import { runMap, type MapResult } from '../sim/runMap';
 import type { World, WorldOpts } from '../sim/types';
 import type { MapOffer } from './offers';
+import { startProvisions } from './provisions';
 import { planFor, worldOptsFor, type RunState } from './run';
 
 /** One result for a whole Crawl: the maps' time, kills and loot added up, and where the last of them left things. */
@@ -33,6 +34,8 @@ export function playOffer(
   tweak?: (opts: WorldOpts) => void,
   onTick?: (w: World) => void,
 ): MapResult {
+  // What is armed burns as the map starts (docs/WAYSIDE.md 6.1); the game does the same in the controller.
+  startProvisions(run);
   let build = run.build;
   let xp = run.xp;
   let start = run.vitals;

@@ -13,6 +13,8 @@ import { CLASSES } from '../data/classes';
 import { botCamp } from './bot';
 import { stopName, takeStop, type StopChoice } from './stops';
 import { buyWare, ensureMarket } from './market';
+import { armProvision, disarmProvision, startProvisions } from './provisions';
+import type { ProvisionId } from '../data/provisions';
 import type { CraftResult } from './craft';
 import type { MapOffer } from './offers';
 import { combineCrawl } from './play';
@@ -273,6 +275,8 @@ export class Controller {
     if (offer.kind === 'stop') return;
     pruneFound(run);
     this.undoStack = [];
+    // What is armed burns now and works until the map ends (docs/WAYSIDE.md 6.1).
+    startProvisions(run);
     // A Crawl is three maps in a row: this remembers where it is and what the character carries between them.
     this.crawl =
       offer.type === 'crawl'
@@ -293,6 +297,15 @@ export class Controller {
     if (!run) return { ok: false, reason: 'no run' };
     const res = takeStop(run, slot, choice);
     if (res.ok) this.undoStack = [];
+    this.changed();
+    return res;
+  }
+
+  /** Arm or disarm a provision for the next map (docs/WAYSIDE.md 6.1). */
+  arm(id: ProvisionId, on: boolean): CraftResult {
+    const run = this.run;
+    if (!run) return { ok: false, reason: 'no run' };
+    const res = on ? armProvision(run, id) : disarmProvision(run, id);
     this.changed();
     return res;
   }

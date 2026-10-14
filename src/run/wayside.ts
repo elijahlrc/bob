@@ -34,6 +34,8 @@ export type Wayside = {
   pouch: Record<string, number>;
   /** Provisions armed for the next map (they burn when it starts). */
   armed: string[];
+  /** The provisions burning on the map being played (set when it starts, cleared when it ends). */
+  active: string[];
   /** The Reprieve held, if any (data/reprieves.ts). */
   reprieve: string | null;
   /** How many Reprieves the run has taken so far (the run is capped). */
@@ -53,6 +55,7 @@ export const newWayside = (): Wayside => ({
   marketLevel: 0,
   pouch: {},
   armed: [],
+  active: [],
   reprieve: null,
   reprieves: 0,
   blessing: null,
