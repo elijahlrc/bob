@@ -9,6 +9,7 @@ import type { CraftResult } from './craft';
 import type { MapOffer } from './offers';
 import type { RunState } from './run';
 import { standingAffixes } from './reprieves';
+import { affixThreat } from './threat';
 import { waysideOf } from './wayside';
 
 /** How many provisions the Pouch holds in all (every kind counted). */
@@ -78,17 +79,40 @@ export function endProvisions(run: RunState): void {
 export function provisionAffixes(ids: readonly string[], offer: MapOffer): string[] {
   return ids
     .filter((id) => {
-      const need = provisionDef(id).needsType;
-      return !need || offer.type === need;
+      const d = provisionDef(id);
+      if (d.needsType && offer.type !== d.needsType) return false;
+      return !d.needsAffix || offer.affixes.length > 0;
     })
     .map(provisionAffixId);
 }
 
-/** The offer's affixes with the armed provisions' and the curses carried on top: what the threat preview and the bot's scoring should read. */
+/** The affix a Counterweight cancels on an offer: the one that makes the map hardest (by the threat model's own reading), or null. */
+export function cancelledAffix(offer: MapOffer, ids: readonly string[]): string | null {
+  if (!ids.includes('counterweight') || !offer.affixes.length) return null;
+  let worst = offer.affixes[0];
+  let worstScore = -1;
+  for (const id of offer.affixes) {
+    const t = affixThreat([id], offer.areaLevel);
+    const score = t.pressure * t.life * t.damage * (1 + t.gain.reduce((n, g) => n + g, 0));
+    if (score > worstScore + 1e-9) {
+      worst = id;
+      worstScore = score;
+    }
+  }
+  return worst;
+}
+
+/**
+ * Every affix a map is played with: its own (less the one a Counterweight cancels), the burning provisions' hidden ones, and the
+ * standing effects the character carries (curses, a blessing). `ids` is what is burning (the map plan) or armed (the preview).
+ */
+export function mapAffixList(run: RunState, offer: MapOffer, ids: readonly string[]): string[] {
+  const cut = cancelledAffix(offer, ids);
+  const own = cut ? offer.affixes.filter((a) => a !== cut) : offer.affixes;
+  return [...own, ...provisionAffixes(ids, offer), ...standingAffixes(run)];
+}
+
+/** The offer's affixes with the armed provisions', the curses' and the blessing's on top: what the threat preview and the bot's scoring should read. */
 export function affixesWithArmed(run: RunState, offer: MapOffer): string[] {
-  return [
-    ...offer.affixes,
-    ...provisionAffixes(waysideOf(run).armed, offer),
-    ...standingAffixes(run),
-  ];
+  return mapAffixList(run, offer, waysideOf(run).armed);
 }

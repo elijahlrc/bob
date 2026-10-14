@@ -5,6 +5,7 @@ import {
   type ProvisionId,
 } from '../data/provisions';
 import { curseDef, reprieveDef } from '../data/reprieves';
+import { mapTypeDef, type MapTypeId } from '../data/mapTypes';
 import type { Controller } from '../run/controller';
 import { pouchCount, spare } from '../run/provisions';
 import { waysideOf } from '../run/wayside';
@@ -35,7 +36,10 @@ export function ProvisionCard({ id, extra }: { id: string; extra?: preact.Compon
         {d.name} <span class="muted">· {KIND_TEXT[d.kind]}</span>
       </div>
       <div class="provision-text">{d.text}</div>
-      {d.needsType && <div class="muted">Pays only on a {d.needsType} map.</div>}
+      {d.needsType && (
+        <div class="muted">Pays only on a {mapTypeDef(d.needsType as MapTypeId).name} map.</div>
+      )}
+      {d.needsAffix && <div class="muted">Pays only on a map with an affix of its own.</div>}
       {extra}
     </div>
   );

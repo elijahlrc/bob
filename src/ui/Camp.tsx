@@ -366,7 +366,15 @@ export function Camp({ c }: { c: Controller }) {
                   {o.affixes.map((id) => {
                     const a = mapAffixDef(id);
                     return (
-                      <div key={id} class="affix">
+                      <div
+                        key={id}
+                        class={'affix' + (id === o.cancelled ? ' cancelled' : '')}
+                        title={
+                          id === o.cancelled
+                            ? 'Cancelled by the Counterweight you armed.'
+                            : undefined
+                        }
+                      >
                         {affixText(a, o.areaLevel)}{' '}
                         <span class="muted">({rewardText(a, o.areaLevel)})</span>
                       </div>

@@ -12,7 +12,16 @@ import type { MapAffixDef } from './mapAffixes';
 export type ProvisionKind = 'staple' | 'bet' | 'specialist';
 
 export type ProvisionId =
-  'whettedPowder' | 'wardOil' | 'bloodsalt' | 'glassDraught' | 'greedyLantern' | 'rushingTonic';
+  | 'whettedPowder'
+  | 'wardOil'
+  | 'bloodsalt'
+  | 'glassDraught'
+  | 'greedyLantern'
+  | 'rushingTonic'
+  | 'hunterBell'
+  | 'slowFuse'
+  | 'bonebreaker'
+  | 'counterweight';
 
 export type ProvisionDef = {
   id: ProvisionId;
@@ -28,6 +37,8 @@ export type ProvisionDef = {
   from: number;
   /** A specialist: the map type it needs. */
   needsType?: string;
+  /** A specialist: the map must carry an affix of its own. */
+  needsAffix?: boolean;
   /** The hidden affix that carries the effect. */
   affix: Omit<MapAffixDef, 'id' | 'name' | 'text' | 'fixed' | 'chalkOnly'>;
 };
@@ -106,6 +117,55 @@ export const PROVISIONS: ProvisionDef[] = [
       monsterMods: [mod('moveSpeed', 'inc', 10)],
       reward: {},
     },
+  },
+  {
+    id: 'hunterBell',
+    name: "Hunter's Bell",
+    kind: 'bet',
+    text: 'Three more rare packs, each with its champion; +25% experience and +20% item quantity',
+    base: 10,
+    weight: 10,
+    from: 10,
+    affix: { extraRarePacks: 3, reward: { experience: 0.25, quantity: 0.2 }, pressure: 1.15 },
+  },
+  {
+    id: 'slowFuse',
+    name: 'Slow Fuse',
+    kind: 'specialist',
+    text: 'A Crescendo map grows stronger half as fast',
+    base: 8,
+    weight: 8,
+    from: 10,
+    needsType: 'crescendo',
+    // The sim reads this affix's id to slow the map's growth (sim/world.ts).
+    affix: { reward: {} },
+  },
+  {
+    id: 'bonebreaker',
+    name: 'Bonebreaker',
+    kind: 'specialist',
+    text: "+30% area of effect, and a Throng map's monsters have 20% less life",
+    base: 8,
+    weight: 8,
+    from: 12,
+    needsType: 'throng',
+    affix: {
+      playerMods: [mod('aoe', 'inc', 30)],
+      monsterMods: [mod('life', 'more', -20)],
+      reward: {},
+    },
+  },
+  {
+    id: 'counterweight',
+    name: 'Counterweight',
+    kind: 'specialist',
+    text: "Cancels the most dangerous of the map's own affixes",
+    base: 10,
+    weight: 10,
+    from: 10,
+    needsAffix: true,
+    // The affix itself does nothing; the map's list loses its worst entry (run/provisions.ts).
+    affix: { reward: {} },
   },
 ];
 

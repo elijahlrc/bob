@@ -30,8 +30,8 @@ import { noteFound, stampAll } from './found';
 import { makeOffer, rollOffers, type MapOffer } from './offers';
 import { waysideOf, type Wayside } from './wayside';
 import type { StopId } from '../data/stops';
-import { addProvision, endProvisions, pouchCount, provisionAffixes } from './provisions';
-import { acquireReprieve, reprieveBlocker, spendReprieve, standingAffixes } from './reprieves';
+import { addProvision, endProvisions, mapAffixList, pouchCount } from './provisions';
+import { acquireReprieve, reprieveBlocker, spendReprieve } from './reprieves';
 import { REPRIEVES, type ReprieveId } from '../data/reprieves';
 import { POUCH_LIMIT, PROVISIONS, type ProvisionId } from '../data/provisions';
 
@@ -230,7 +230,7 @@ export function planFor(run: RunState, offer: MapOffer | string, segment = 0): M
     run.map,
     offer.themeId,
     // The provisions burning on the map are hidden affixes on top of the offer's own (docs/WAYSIDE.md 6).
-    [...offer.affixes, ...provisionAffixes(waysideOf(run).active, offer), ...standingAffixes(run)],
+    mapAffixList(run, offer, waysideOf(run).active),
     offer.areaLevel,
     offer.type,
     segment,

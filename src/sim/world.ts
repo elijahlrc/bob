@@ -57,7 +57,7 @@ import { tickPackPlays } from './packPlays';
 import { inBlast, pending } from './blasts';
 import { afflictPlayer, stunPlayer } from './afflict';
 import { flasksSealed } from './theft';
-import { crescendoStep, HOLDOUT_WAVES } from '../data/mapTypes';
+import { crescendoStepAt, HOLDOUT_WAVES } from '../data/mapTypes';
 import type { Actor, GroundEffect, World, WorldOpts } from './types';
 
 export function spawnMonster(
@@ -602,7 +602,8 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   const dt = DT;
   w.t += dt;
   w.tick++;
-  if (w.plan.type === 'crescendo') w.surge = crescendoStep(w.t);
+  if (w.plan.type === 'crescendo')
+    w.surge = crescendoStepAt(w.t, w.plan.affixes.includes('provision.slowFuse') ? 0.5 : 1);
   const p = w.player;
   refreshPlayerDefence(w);
   tickHoldout(w);

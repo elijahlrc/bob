@@ -174,3 +174,24 @@ Reprieve taken does.
 **Q. What does the default bot do?**
 It takes the Ferryman (when it holds no Reprieve) and the Quartermaster when its cart holds a Reprieve; the Shrine and the Gem Hoard
 only under the `stopper` strategy; the Awlsmith as before. Y7 measures all of it.
+
+## Y6 — provisions that change the map
+
+**Q. Counterweight says "your choice" of affix. How is it chosen?**
+Chosen: it cancels the affix that makes the map hardest by the threat model's own reading (pressure × monster life × monster damage ×
+extra damage gained), the earliest on a tie. A choice would need the map to be chosen first, and a provision is armed before the
+offers are looked at. The card shows the cancelled affix struck through ("Cancelled by the Counterweight you armed"). Open: whether
+the player should pick it (the plan's words) in a prompt at map start.
+
+**Q. Hunter's Bell: "every pack gains a champion".**
+Built as three more rare packs (the affix's `extraRarePacks`, which does not follow the level band) plus +25% experience and +20%
+item quantity and a pressure of 1.15 in the threat model. A true "champion in every pack" would need a population rule; three extra
+rare packs is the same kind of risk and reward with no new code.
+
+**Q. Slow Fuse.**
+The Crescendo step is `crescendoStep(t, pace)`; with the provision's affix on the plan the world uses pace 0.5, so the monsters grow
+at half the rate (the first step still comes after the 30 s grace, then every 30 s). The pull-out time (330 s) is unchanged.
+
+**Q. Who arms specialists?**
+Nobody yet: the default bot arms only staples, so the four plan-level provisions are exercised by tests and by players. They are
+rarer in the Market (weights 8 to 10 against 30 for a staple).
