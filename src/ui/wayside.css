@@ -87,3 +87,51 @@
     flex: 1 1 100%;
   }
 }
+
+/* The Market */
+.wares {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+.wares-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.wares-head h3 {
+  margin: 0;
+}
+.ware-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.ware {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.ware.sold {
+  opacity: 0.45;
+}
+.ware-buy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ware-price {
+  color: #e6c07a;
+}
+@media (max-width: 600px) {
+  .ware-grid {
+    grid-template-columns: 1fr;
+  }
+}

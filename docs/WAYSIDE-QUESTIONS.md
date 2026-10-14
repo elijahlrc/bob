@@ -50,3 +50,22 @@ who is not looking would never see it. The pause ends when the player takes the 
 **Q. What does the default bot do at a stop?**
 Chosen: it takes the Awlsmith when a worn item has room (a socket on the item that holds its gems), and never the Gem Hoard; a
 `stopper` strategy takes every stop it can use. Both are first guesses; Y7 measures them.
+
+## Y2 — the Market
+
+**Q. When is the stock rolled?**
+Chosen: the first time the camp shows a level (`ensureMarket`, called from the controller's `changed()`), then stored in the save with
+the level it is for. Rolling it from `advanceLevel` would have made `run.ts` import the Market (a cycle), and the bot never needs a
+stock it does not look at. The roll itself uses its own RNG fork of the run seed and the level, and negative uids for the items in it,
+so it never moves the run's `nextUid` and a reload shows the same wares. One consequence: "a gem you have not found yet" is judged
+by what the run holds when the camp first shows the level.
+
+**Q. Which wares does a stock hold?**
+Chosen: three rares of the level just played, one gem, one magic utility flask and one currency bundle (six). The plan's Provision
+and Reprieve slots arrive in Y3 and Y4 and take the place of one gear slot and the bundle. Gear is not tuned to the build.
+
+**Q. How does the bot shop?**
+Chosen: it buys a rare if wearing it would raise its score by more than 3%, and nothing else. A first guess for Y7.
+
+**Q. Where is the Market in the UI?**
+Chosen: its own "Wares" tab, after the Workbench (which is still closed). The offers panel keeps the Satchel strip for Y3.

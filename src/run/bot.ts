@@ -35,6 +35,7 @@ import {
 import { Rng } from '../core/rng';
 import { botChalk, botCraft } from './botCraft';
 import { botStopChoice, botTakeStop, botWantsStop } from './botStop';
+import { buyWare, ensureMarket } from './market';
 import { salvage } from './craft';
 import { buildSignature, killerTracker, metTracker, RunTally } from './metrics';
 import { randomCraft } from './randomBot';
@@ -530,9 +531,27 @@ export function botReward(run: RunState, crafting = true): void {
   takeReward(run, best?.uid ?? null);
 }
 
+/**
+ * Spend Bone Dust at the Market (docs/WAYSIDE.md 9.3): buy a piece of gear that would raise the character's score a little. A first
+ * valuation; milestone Y7 measures it. The purchase joins the bag, and `botEquip` then wears it.
+ */
+export function botShop(run: RunState): void {
+  const base = scoreOf(run, run.build);
+  for (const w of ensureMarket(run)) {
+    if (w.sold || w.kind !== 'gear' || w.item?.kind !== 'item' || w.price > run.dust) continue;
+    const it = w.item;
+    let best = 0;
+    for (const slot of slotsFor(it))
+      if (canEquip(run, it, slot).ok)
+        best = Math.max(best, scoreOf(run, withEquipped(run.build, it, slot)));
+    if (best > base * 1.03) buyWare(run, w.id);
+  }
+}
+
 /** All camp decisions between maps. */
 export function botCamp(run: RunState, policy: CraftPolicy = 'greedy'): void {
   botReward(run, policy !== 'none');
+  botShop(run);
   botEquip(run);
   botRegem(run);
   if (policy === 'greedy') {

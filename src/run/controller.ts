@@ -12,6 +12,7 @@ import type { Vitals } from '../sim/types';
 import { CLASSES } from '../data/classes';
 import { botCamp } from './bot';
 import { stopName, takeStop, type StopChoice } from './stops';
+import { buyWare, ensureMarket } from './market';
 import type { CraftResult } from './craft';
 import type { MapOffer } from './offers';
 import { combineCrawl } from './play';
@@ -111,6 +112,8 @@ export class Controller {
   }
 
   private changed(): void {
+    // The Market's stock for the level is rolled once, when the camp first shows it, and saved with the run.
+    if (this.run && this.screen === 'camp') ensureMarket(this.run);
     // The game saves on entering camp and on any camp change (§5.5), into the run's own slot.
     if (this.store && this.run && this.screen === 'camp' && this.slot !== null) {
       try {
@@ -290,6 +293,15 @@ export class Controller {
     if (!run) return { ok: false, reason: 'no run' };
     const res = takeStop(run, slot, choice);
     if (res.ok) this.undoStack = [];
+    this.changed();
+    return res;
+  }
+
+  /** Buy a ware of the Market (docs/WAYSIDE.md 4.2). Final: the Dust is spent. */
+  buy(id: string): CraftResult {
+    const run = this.run;
+    if (!run) return { ok: false, reason: 'no run' };
+    const res = buyWare(run, id);
     this.changed();
     return res;
   }

@@ -1,4 +1,4 @@
-import type { AnyItem } from '../data/types';
+import type { InventoryItem } from '../data/types';
 import type { RunState } from './run';
 
 /**
@@ -13,7 +13,7 @@ export type Ware = {
   /** Bone Dust, after the level factor. */
   price: number;
   /** The item itself, for gear, a gem and a flask (it joins the inventory when bought). */
-  item?: AnyItem;
+  item?: InventoryItem;
   /** A provision's id (data/provisions.ts), a Reprieve's id (data/reprieves.ts) or a currency's id. */
   ref?: string;
   /** A currency bundle's size. */
@@ -27,8 +27,9 @@ export type Curse = {
 };
 
 export type Wayside = {
-  /** The Market's stock for the level being prepared, rolled when the previous level ended. */
+  /** The Market's stock for the level being prepared, and the level it was rolled for (`ensureMarket`). */
   market: Ware[];
+  marketLevel: number;
   /** Provisions held, by id. */
   pouch: Record<string, number>;
   /** Provisions armed for the next map (they burn when it starts). */
@@ -49,6 +50,7 @@ export type Wayside = {
 
 export const newWayside = (): Wayside => ({
   market: [],
+  marketLevel: 0,
   pouch: {},
   armed: [],
   reprieve: null,
