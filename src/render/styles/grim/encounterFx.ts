@@ -180,7 +180,7 @@ export class EncounterFx {
     const col = WARN[e.dtype] ?? WARN[0];
     if (e.delay !== undefined && e.delay > 0) {
       const a = 0.35 + 0.15 * Math.sin(time * 10 + e.id);
-      g.lineStyle(1.5, col, a);
+      g.lineStyle(0.5, col, a * 0.6);
       this.edge(g, e);
       return;
     }
@@ -192,9 +192,9 @@ export class EncounterFx {
     this.area(g, e);
     g.fillStyle(lighten(col, 0.25), 0.25 + 0.4 * k);
     this.area(g, e, Math.max(0.05, k));
-    g.lineStyle(3, 0x000000, 0.45);
+    g.lineStyle(2, 0x000000, 0.27);
     this.edge(g, e);
-    g.lineStyle(2, col, 1);
+    g.lineStyle(1, col, 0.6);
     this.edge(g, e);
     // Runes that turn round the rim of a circle or a ring: the mark of a blast that is coming, as the slams have.
     if (e.shape === 'circle' || e.shape === 'donut') {
@@ -209,7 +209,7 @@ export class EncounterFx {
     }
     if (e.shape === 'donut') {
       // Where it is safe: a calm white rim and a pulse inside it.
-      g.lineStyle(1.5, 0xffffff, 0.75 + 0.25 * Math.sin(time * 12));
+      g.lineStyle(0.5, 0xffffff, 0.6 * (0.75 + 0.25 * Math.sin(time * 12)));
       this.circleLine(g, e.x, e.y, e.inner! - 0.08);
     }
     if (e.pull) {

@@ -1083,9 +1083,9 @@ export class GrimStyle extends StyleBase {
       const sq = this.squash();
       g.fillStyle(0x000000, 0.18).fillEllipse(c.x, c.y, r * 2, r * 2 * sq);
       g.fillStyle(col, fill).fillEllipse(c.x, c.y, r * 2, r * 2 * sq);
-      g.lineStyle(3, 0x000000, 0.45).strokeEllipse(c.x, c.y, r * 2, r * 2 * sq);
-      g.lineStyle(2, col, 1).strokeEllipse(c.x, c.y, r * 2, r * 2 * sq);
-      g.lineStyle(1, 0xffffff, 0.8).strokeEllipse(
+      g.lineStyle(2, 0x000000, 0.27).strokeEllipse(c.x, c.y, r * 2, r * 2 * sq);
+      g.lineStyle(1, col, 0.6).strokeEllipse(c.x, c.y, r * 2, r * 2 * sq);
+      g.lineStyle(0.5, 0xffffff, 0.48).strokeEllipse(
         c.x,
         c.y,
         r * 2 * t.progress,
@@ -1128,8 +1128,8 @@ export class GrimStyle extends StyleBase {
     }
     g.fillStyle(0x000000, 0.18).fillPoints(outline, true);
     g.fillStyle(col, fill).fillPoints(outline, true);
-    g.lineStyle(3, 0x000000, 0.45).strokePoints(outline, true, true);
-    g.lineStyle(2, col, 1).strokePoints(outline, true, true);
+    g.lineStyle(2, 0x000000, 0.27).strokePoints(outline, true, true);
+    g.lineStyle(1, col, 0.6).strokePoints(outline, true, true);
     g.fillStyle(col, 0.1 + 0.25 * t.progress).fillPoints(inner, true);
   }
 
@@ -1166,8 +1166,8 @@ export class GrimStyle extends StyleBase {
       if (zone) {
         const fade = Math.min(1, e.t);
         g.fillStyle(zone.fill, 0.2 * fade).fillEllipse(x, y, r * 2, r * 2 * sq);
-        g.lineStyle(2.5, 0x000000, 0.4 * fade).strokeEllipse(x, y, r * 2, r * 2 * sq);
-        g.lineStyle(1.5, zone.edge, 0.9 * fade).strokeEllipse(x, y, r * 2, r * 2 * sq);
+        g.lineStyle(1.5, 0x000000, 0.24 * fade).strokeEllipse(x, y, r * 2, r * 2 * sq);
+        g.lineStyle(0.5, zone.edge, 0.54 * fade).strokeEllipse(x, y, r * 2, r * 2 * sq);
         for (let i = 0; i < 7; i++) {
           const a = (i / 7) * Math.PI * 2 + this.time * 0.8;
           const rr = r * (0.35 + 0.45 * ((i * 0.37 + this.time * 0.15) % 1));
@@ -1184,9 +1184,9 @@ export class GrimStyle extends StyleBase {
       const warn = TELEGRAPH_COLOR[e.dtype] ?? 0xff4020;
       g.fillStyle(0x000000, 0.2).fillEllipse(x, y, r * 2, r * 2 * sq);
       g.fillStyle(warn, 0.16 + 0.22 * k).fillEllipse(x, y, r * 2, r * 2 * sq);
-      g.lineStyle(3, 0x000000, 0.45).strokeEllipse(x, y, r * 2, r * 2 * sq);
-      g.lineStyle(2, warn, 1).strokeEllipse(x, y, r * 2, r * 2 * sq);
-      g.lineStyle(1, 0xffffff, 0.8).strokeEllipse(x, y, r * 2 * k, r * 2 * k * sq);
+      g.lineStyle(2, 0x000000, 0.27).strokeEllipse(x, y, r * 2, r * 2 * sq);
+      g.lineStyle(1, warn, 0.6).strokeEllipse(x, y, r * 2, r * 2 * sq);
+      g.lineStyle(0.5, 0xffffff, 0.48).strokeEllipse(x, y, r * 2 * k, r * 2 * k * sq);
       // Rune ticks rotating around the rim.
       for (let i = 0; i < 12; i++) {
         const a = (i / 12) * Math.PI * 2 + this.time * 1.4;

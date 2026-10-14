@@ -27,6 +27,7 @@ change, and our own names only. Dash bullets under plain headings.
 - Rampage Call's card now says what rage is: you gain it from melee hits when a skill or support gives it, such as Fury Well or Snag Lash, up to 50, and it fades a few seconds after you stop hitting.
 - The Skills tab gem list now updates at once when you socket or remove a gem, instead of only after you switch tabs.
 - Fixed stray lines running to the corner of the screen from the outlines of area attacks and warnings on some phones.
+- The outlines of enemy area warnings and lasting ground zones are thinner and fainter, so they clutter the screen less.
 
 ## 2026-10-12
 
