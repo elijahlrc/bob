@@ -537,7 +537,7 @@ revert if they would rather not.
   (38%) after them, 8 of 24 (33%) after the gem drop change; a 10-run Mystic check gave 2 wins (20%), so the casters are the
   weakest class. The 25% to 50% band holds overall.
 - **Drops.** Gem drops are weighted: plain damage skills most, supports and auras less, special kinds (curses, minions,
-  deployables, channels, hexes) least, and the character's own attribute twice as often; maps 1 to 4 drop no special gem.
+  deployables, channels, hexes) least, and the character's own attribute twice as often (four times through area level 20, 2026-10-13); maps 1 to 4 drop no special gem.
 - **UI.** A Codex on the title screen lists every gem and unique with the ones found in this browser marked (kept through the
   store the controller was given); the gem inventory in Skills groups by role (skills, utility skills, supports, hexes, auras) and
   has a search; gem cards describe curses, buffs, summons, blinks, travel, shield and two-weapon needs, herald triggers and

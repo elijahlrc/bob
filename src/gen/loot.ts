@@ -374,7 +374,8 @@ function isSpecial(g: GemDef): boolean {
 
 /**
  * How likely a gem is to drop: plain damage skills most, supports and auras a little less, the special kinds least, and the
- * character's own attribute twice as much. The first four maps hold nothing special at all.
+ * character's own attribute twice as much, and four times as much through area level 20. The first four maps hold nothing
+ * special at all.
  */
 export function gemWeight(g: GemDef, classId?: string, ilvl = 99): number {
   const special = isSpecial(g);
@@ -383,12 +384,15 @@ export function gemWeight(g: GemDef, classId?: string, ilvl = 99): number {
   if (classId) {
     const a = classDef(classId).attrs;
     const main = a.str >= a.dex && a.str >= a.int ? 'str' : a.dex >= a.int ? 'dex' : 'int';
-    if (g.attr.includes(main)) w *= 2;
+    if (g.attr.includes(main)) w *= ilvl <= EARLY_ATTR_LEVELS ? EARLY_ATTR_MULT : 2;
   }
   return w;
 }
 
 export const EARLY_MAPS = 4;
+/** Through this area level the class's own attribute is favoured this much (twice as much after), so the first gems fit the class. */
+export const EARLY_ATTR_LEVELS = 20;
+export const EARLY_ATTR_MULT = 4;
 
 export function rollGem(
   rng: Rng,
