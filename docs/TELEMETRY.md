@@ -93,6 +93,15 @@ select map_type, a as affix, count(*) from runs, unnest(affixes) a where outcome
 select * from runs where game_version = '<short commit hash>';
 ```
 
+One command for the usual question, where players die, as a bar chart in the terminal (`scripts/deaths-by-map.ts`):
+
+```
+npm run deaths-by-map                              # deaths by map, last 24 hours
+npm run deaths-by-map -- --hours 72 --by class     # also --by killer|version; --class, --version, --outcome won|all
+```
+
+It reads with the secret key, which goes in `.env.local` at the repo root (git-ignored) as `SUPABASE_SECRET_KEY=...`, or in the environment.
+
 ## Limits
 
 - Anyone can read the public key from the page and insert rows, so the data can be spammed or faked. The table limits what a row
