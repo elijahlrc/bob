@@ -15,12 +15,21 @@ import { awlsmithSockets, socketCeiling, socketCost, type CraftResult } from './
 import { noteFound } from './found';
 import type { MapOffer } from './offers';
 import { advanceLevel, TOTAL_MAPS, uidSource, type RunState } from './run';
-import { waysideOf } from './wayside';
+import { waysideOf, type Ware } from './wayside';
+import { BLESSINGS, SHRINE_CHOICES, type BlessingId } from '../data/blessings';
+import { POUCH_LIMIT } from '../data/provisions';
+import { REPRIEVE_CAP, REPRIEVES, type ReprieveId } from '../data/reprieves';
+import { grantWare, rollSale } from './market';
+import { pouchCount } from './provisions';
+import { acquireReprieve, addCurse, reprieveBlocker } from './reprieves';
 
 /** What the player decided at a stop. The stop's screen builds one and `takeStop` applies it all at once, so nothing is half done. */
 export type StopChoice =
   | { stop: 'awlsmith'; itemUid: number; extra?: number }
-  | { stop: 'gemHoard'; tag: string; picks: string[] };
+  | { stop: 'gemHoard'; tag: string; picks: string[] }
+  | { stop: 'shrine'; blessing: string }
+  | { stop: 'quartermaster'; buy: string[] }
+  | { stop: 'ferryman'; reprieve: string; swap?: boolean };
 
 const fail = (reason: string): CraftResult => ({ ok: false, reason });
 
@@ -75,50 +84,137 @@ export function hoardGems(run: RunState, offer: MapOffer, tag: string): string[]
 
 // ---- Taking a stop ---------------------------------------------------------------------------------
 
+// ---- The Shrine ------------------------------------------------------------------------------------
+
+/** The blessings a Shrine offers: three, drawn from the offer's own seed. */
+export function shrineBlessings(run: RunState, offer: MapOffer): BlessingId[] {
+  const rng = new Rng(run.seed).fork(`shrine${offer.id}`);
+  const pool = BLESSINGS.map((b) => b.id);
+  rng.shuffle(pool);
+  return pool.slice(0, SHRINE_CHOICES);
+}
+
+// ---- The Quartermaster -----------------------------------------------------------------------------
+
+/** The Quartermaster's wares for an offer: twelve, a quarter off (data/market.ts), the same every time they are looked at. */
+export function saleStock(run: RunState, offer: MapOffer): Ware[] {
+  return rollSale(run, offer.id);
+}
+
+/** Why a cart of the Quartermaster's wares cannot be bought (null: it can). */
+export function cartProblem(run: RunState, stock: Ware[], ids: string[]): string | null {
+  if (new Set(ids).size !== ids.length) return 'Take each ware once';
+  const picked: Ware[] = [];
+  for (const id of ids) {
+    const w = stock.find((x) => x.id === id);
+    if (!w) return 'No such ware';
+    picked.push(w);
+  }
+  const total = picked.reduce((n, w) => n + w.price, 0);
+  if (total > run.dust) return `That costs ${total} Bone Dust`;
+  if (pouchCount(run) + picked.filter((w) => w.kind === 'provision').length > POUCH_LIMIT)
+    return 'Your pouch cannot hold that many provisions';
+  const reprieves = picked.filter((w) => w.kind === 'reprieve').length;
+  if (reprieves > 1) return 'Only one reprieve can be held';
+  if (reprieves === 1) {
+    const why = reprieveBlocker(run);
+    if (why) return why;
+  }
+  return null;
+}
+
+/** The Dust a cart costs. */
+export const cartCost = (stock: Ware[], ids: string[]): number =>
+  ids.reduce((n, id) => n + (stock.find((w) => w.id === id)?.price ?? 0), 0);
+
+// ---- Taking a stop ---------------------------------------------------------------------------------
+
 /** Whether the stop in a slot can be taken with this choice: null when it can, else why not. */
 export function stopProblem(run: RunState, slot: number, choice: StopChoice): string | null {
   const offer = run.offers[slot];
   if (run.phase !== 'camp') return 'not in camp';
   if (!offer || offer.kind !== 'stop' || offer.stop !== choice.stop) return 'no such stop';
-  if (choice.stop === 'awlsmith') {
-    const it = awlsmithItems(run).find((x) => x.uid === choice.itemUid);
-    if (!it) return 'That item has no room for a socket';
-    const extra = Math.max(0, Math.floor(choice.extra ?? 0));
-    if (extra + 1 > awlsmithRoom(it)) return 'This item cannot have that many sockets';
-    const need = awlsmithCost(it, extra + 1);
-    if ((run.currency.auger ?? 0) < need) return `That needs ${need} Socket Augers`;
-    return null;
+  switch (choice.stop) {
+    case 'awlsmith': {
+      const it = awlsmithItems(run).find((x) => x.uid === choice.itemUid);
+      if (!it) return 'That item has no room for a socket';
+      const extra = Math.max(0, Math.floor(choice.extra ?? 0));
+      if (extra + 1 > awlsmithRoom(it)) return 'This item cannot have that many sockets';
+      const need = awlsmithCost(it, extra + 1);
+      if ((run.currency.auger ?? 0) < need) return `That needs ${need} Socket Augers`;
+      return null;
+    }
+    case 'gemHoard': {
+      const kinds = hoardKinds(run, offer).map((k) => k.tag);
+      if (!kinds.includes(choice.tag)) return 'Name one of the four kinds';
+      const laid = hoardGems(run, offer, choice.tag);
+      const want = Math.min(HOARD_TAKE, laid.length);
+      if (new Set(choice.picks).size !== choice.picks.length) return 'Take each gem once';
+      if (choice.picks.length !== want) return `Take ${want} gems`;
+      if (!choice.picks.every((g) => laid.includes(g))) return 'That gem is not laid out';
+      return null;
+    }
+    case 'shrine':
+      return shrineBlessings(run, offer).includes(choice.blessing as BlessingId)
+        ? null
+        : 'Choose one of the three blessings';
+    case 'quartermaster':
+      return cartProblem(run, saleStock(run, offer), choice.buy);
+    case 'ferryman': {
+      if (!REPRIEVES.some((r) => r.id === choice.reprieve)) return 'Choose one of the reprieves';
+      const w = waysideOf(run);
+      if (w.reprieves >= REPRIEVE_CAP) return `A run allows ${REPRIEVE_CAP} reprieves in all`;
+      if (w.reprieve && !choice.swap) return 'You already hold a reprieve: swap it for this one?';
+      return null;
+    }
   }
-  const kinds = hoardKinds(run, offer).map((k) => k.tag);
-  if (!kinds.includes(choice.tag)) return 'Name one of the four kinds';
-  const laid = hoardGems(run, offer, choice.tag);
-  const want = Math.min(HOARD_TAKE, laid.length);
-  if (new Set(choice.picks).size !== choice.picks.length) return 'Take each gem once';
-  if (choice.picks.length !== want) return `Take ${want} gems`;
-  if (!choice.picks.every((g) => laid.includes(g))) return 'That gem is not laid out';
-  return null;
 }
 
 /**
  * Take the stop in a slot with the choice made there. The level passes exactly as a Respite's does (the counter advances, no XP,
  * no clear rewards, no reward pick, no refund point), the character gets the usual few seconds of rest, and the next level's
- * offers are rolled. Nothing is applied unless the whole choice is valid.
+ * offers are rolled. Nothing is applied unless the whole choice is valid. Any stop ends the blessing held (a Shrine then gives
+ * its own).
  */
 export function takeStop(run: RunState, slot: number, choice: StopChoice): CraftResult {
   const why = stopProblem(run, slot, choice);
   if (why) return fail(why);
   if (run.map >= TOTAL_MAPS) return fail('The last level has no stop');
   const offer = run.offers[slot];
-  if (choice.stop === 'awlsmith') {
-    const res = awlsmithSockets(run, choice.itemUid, choice.extra ?? 0);
-    if (!res.ok) return res;
-  } else {
-    const uid = uidSource(run);
-    for (const gemId of choice.picks) {
-      const g = { kind: 'gem' as const, uid: uid(), gemId };
-      run.inventory.push(g);
-      noteFound(run, g);
+  const way = waysideOf(run);
+  way.blessing = null;
+  switch (choice.stop) {
+    case 'awlsmith': {
+      const res = awlsmithSockets(run, choice.itemUid, choice.extra ?? 0);
+      if (!res.ok) return res;
+      break;
     }
+    case 'gemHoard': {
+      const uid = uidSource(run);
+      for (const gemId of choice.picks) {
+        const g = { kind: 'gem' as const, uid: uid(), gemId };
+        run.inventory.push(g);
+        noteFound(run, g);
+      }
+      break;
+    }
+    case 'shrine':
+      way.blessing = choice.blessing;
+      break;
+    case 'quartermaster': {
+      const stock = saleStock(run, offer);
+      run.dust -= cartCost(stock, choice.buy);
+      for (const id of choice.buy)
+        grantWare(
+          run,
+          stock.find((w) => w.id === id)!,
+        );
+      break;
+    }
+    case 'ferryman':
+      acquireReprieve(run, choice.reprieve as ReprieveId, !!way.reprieve);
+      addCurse(run, 'bargain');
+      break;
   }
   run.history.push({
     map: run.map,
@@ -130,7 +226,7 @@ export function takeStop(run: RunState, slot: number, choice: StopChoice): Craft
     kills: 0,
     stuck: 0,
   });
-  waysideOf(run).stops++;
+  way.stops++;
   run.vitals = restAtCamp(run.build, run.map, run.vitals);
   advanceLevel(run);
   return { ok: true };

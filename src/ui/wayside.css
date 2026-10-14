@@ -200,3 +200,17 @@
 .provision.reprieve.revive {
   border-left-color: #e68f8f;
 }
+
+.ware.chosen {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* A card inside a selected button keeps its own colours (a button that is on has dark text). */
+.btn.on .provision {
+  color: #d8d4c8;
+}
+.btn.on .provision .muted {
+  color: #8d8fa8;
+}

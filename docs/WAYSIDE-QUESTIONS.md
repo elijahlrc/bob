@@ -148,3 +148,29 @@ since the pick appeared) leaves the pick open and says why. The bot passes on it
 **Q. The reward-pick type.**
 `run.reward` is now `RewardCard[]` (an item, a gem, a flask, currency or a `PouchCard`), a new type in `run.ts`. Drops and `AnyItem`
 are unchanged, so nothing else in the game sees a Pouch card.
+
+## Y5 — the Shrine, the Quartermaster and the Ferryman
+
+**Q. How long does a blessing last?**
+Chosen: until any stop is taken (the plan's "until the next stop"); a Shrine then gives its own. So a blessing lasts about eight
+levels. Seven blessings (life, damage, resistances, movement, armour and evasion, item quantity, attack and cast speed), three
+offered per Shrine from the offer's own seed. Each is a hidden affix like a provision; the Shrine's "haste" had to be renamed
+"swift" because the reference-game deny list matches the word.
+
+**Q. The Quartermaster is bought in one go.**
+The stop screen builds a cart and "Take the Quartermaster" pays for all of it, passes the level and rolls the next offers. Leaving
+the screen buys nothing, so there is no free shopping trip. The stock is rolled from the offer's id (not stored), so it is the same
+every time it is looked at; a cart is checked as a whole (Dust, Pouch room, one Reprieve) and refused whole.
+
+**Q. What does the Ferryman take?**
+Chosen: the Bargain curse (15% less maximum life) for five levels from the moment the stop is taken, whichever Reprieve is chosen.
+The Bargain Coin also curses when it fires, so taking it free from the Ferryman and spending it can curse twice in a row (one
+curse at a time: a second replaces the first's end date).
+
+**Q. Swapping?**
+The Ferryman may swap the Reprieve held for another (a checkbox on his screen); a swap counts toward the cap of three, as every
+Reprieve taken does.
+
+**Q. What does the default bot do?**
+It takes the Ferryman (when it holds no Reprieve) and the Quartermaster when its cart holds a Reprieve; the Shrine and the Gem Hoard
+only under the `stopper` strategy; the Awlsmith as before. Y7 measures all of it.

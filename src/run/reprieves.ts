@@ -10,6 +10,7 @@ import {
   type ReprieveDef,
   type ReprieveId,
 } from '../data/reprieves';
+import { blessingAffixId } from '../data/blessings';
 import type { CraftResult } from './craft';
 import type { RunState } from './run';
 import { waysideOf } from './wayside';
@@ -48,6 +49,12 @@ export function addCurse(run: RunState, id: CurseId): void {
   const w = waysideOf(run);
   w.curses = w.curses.filter((c) => c.until >= run.map && c.id !== id);
   w.curses.push({ id, until: run.map + CURSE_LEVELS });
+}
+
+/** The hidden affixes of the standing effects: the curses carried, and the Shrine's blessing held (docs/WAYSIDE.md 5.2). */
+export function standingAffixes(run: RunState): string[] {
+  const w = waysideOf(run);
+  return [...curseAffixes(run), ...(w.blessing ? [blessingAffixId(w.blessing)] : [])];
 }
 
 /** The hidden affixes of the curses the character carries on the level about to be played. */

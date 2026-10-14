@@ -8,7 +8,7 @@ import {
 import type { CraftResult } from './craft';
 import type { MapOffer } from './offers';
 import type { RunState } from './run';
-import { curseAffixes } from './reprieves';
+import { standingAffixes } from './reprieves';
 import { waysideOf } from './wayside';
 
 /** How many provisions the Pouch holds in all (every kind counted). */
@@ -86,5 +86,9 @@ export function provisionAffixes(ids: readonly string[], offer: MapOffer): strin
 
 /** The offer's affixes with the armed provisions' and the curses carried on top: what the threat preview and the bot's scoring should read. */
 export function affixesWithArmed(run: RunState, offer: MapOffer): string[] {
-  return [...offer.affixes, ...provisionAffixes(waysideOf(run).armed, offer), ...curseAffixes(run)];
+  return [
+    ...offer.affixes,
+    ...provisionAffixes(waysideOf(run).armed, offer),
+    ...standingAffixes(run),
+  ];
 }

@@ -17,7 +17,7 @@ export type StopDef = {
   from: number;
 };
 
-/** The stops that are built (the others of StopId come in later milestones; a stop is only scheduled if it is listed here). */
+/** The stops that are built (a stop is only scheduled if it is listed here). */
 export const STOPS: StopDef[] = [
   {
     id: 'awlsmith',
@@ -34,6 +34,30 @@ export const STOPS: StopDef[] = [
     how: 'Name one of four kinds. Eight gems of that kind are laid out; take three.',
     weight: 30,
     from: 9,
+  },
+  {
+    id: 'shrine',
+    name: 'The Shrine',
+    text: 'A blessing that lasts until the next stop.',
+    how: 'Pick one of three blessings. It lasts until you take another stop, and replaces the one you have.',
+    weight: 25,
+    from: 9,
+  },
+  {
+    id: 'quartermaster',
+    name: 'The Quartermaster',
+    text: 'A big sale: twelve wares, a quarter off.',
+    how: 'Twelve wares at a quarter off, paid in Bone Dust. Choose what you want; whatever you leave is gone when you do.',
+    weight: 25,
+    from: 9,
+  },
+  {
+    id: 'ferryman',
+    name: 'The Ferryman',
+    text: 'A free reprieve, for a price.',
+    how: 'The Ferryman gives one reprieve for nothing, but you carry a curse for the next five levels. You may refuse.',
+    weight: 20,
+    from: 17,
   },
 ];
 

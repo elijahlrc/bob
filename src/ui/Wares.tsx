@@ -7,16 +7,38 @@ import type { Ware } from '../run/wayside';
 import { compareDelta, ItemCard } from './ItemCard';
 import { ProvisionCard, ReprieveCard } from './Satchel';
 
-/** The Market (docs/WAYSIDE.md section 4): a few wares for Bone Dust, restocked every level. */
-export function Wares({ c }: { c: Controller }) {
-  const run = c.run!;
-  const stock = ensureMarket(run);
-  const [error, setError] = useState<string | null>(null);
+/** What a ware is: its card (the item with what it would change, the provision, the reprieve, the currency bundle). */
+export function WareCard({ w, run }: { w: Ware; run: NonNullable<Controller['run']> }) {
   const cfg = {
     areaLevel: run.map,
     difficulty: run.difficulty,
     resistPenalty: resistPenaltyForMap(run.map),
   };
+  if (w.item)
+    return (
+      <ItemCard
+        it={w.item}
+        build={run.build}
+        diff={w.item.kind === 'item' ? compareDelta(run.build, w.item, cfg) : null}
+      />
+    );
+  if (w.kind === 'provision') return <ProvisionCard id={w.ref!} />;
+  if (w.kind === 'reprieve') return <ReprieveCard id={w.ref!} />;
+  return (
+    <div class="item-card flaskitem">
+      <div class="ic-name">
+        {w.count} × {currencyLabel(w.ref!)}
+      </div>
+      <div class="muted">{currencyText(w.ref!)}</div>
+    </div>
+  );
+}
+
+/** The Market (docs/WAYSIDE.md section 4): a few wares for Bone Dust, restocked every level. */
+export function Wares({ c }: { c: Controller }) {
+  const run = c.run!;
+  const stock = ensureMarket(run);
+  const [error, setError] = useState<string | null>(null);
   const buy = (w: Ware) => {
     const res = c.buy(w.id);
     setError(res.ok ? null : res.reason);
@@ -37,24 +59,7 @@ export function Wares({ c }: { c: Controller }) {
       <div class="ware-grid">
         {stock.map((w) => (
           <div key={w.id} class={'ware' + (w.sold ? ' sold' : '')}>
-            {w.item ? (
-              <ItemCard
-                it={w.item}
-                build={run.build}
-                diff={w.item.kind === 'item' ? compareDelta(run.build, w.item, cfg) : null}
-              />
-            ) : w.kind === 'provision' ? (
-              <ProvisionCard id={w.ref!} />
-            ) : w.kind === 'reprieve' ? (
-              <ReprieveCard id={w.ref!} />
-            ) : (
-              <div class="item-card flaskitem">
-                <div class="ic-name">
-                  {w.count} × {currencyLabel(w.ref!)}
-                </div>
-                <div class="muted">{currencyText(w.ref!)}</div>
-              </div>
-            )}
+            <WareCard w={w} run={run} />
             <div class="ware-buy">
               <span class="ware-price">{w.price} Bone Dust</span>
               <button

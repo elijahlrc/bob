@@ -2,6 +2,7 @@ import { mod, type Mod } from '../mods/types';
 import { THRONG_AFFIX } from './mapTypes';
 import { PROVISION_AFFIXES } from './provisions';
 import { CURSE_AFFIXES } from './reprieves';
+import { BLESSING_AFFIXES } from './blessings';
 
 /**
  * Map affixes (EXPANSION 7.5, docs/MAPS.md section 6): from map 5 an offered map can carry modifiers that
@@ -294,6 +295,8 @@ export const MAP_AFFIXES: MapAffixDef[] = [
   ...PROVISION_AFFIXES,
   // ... and the curses of the Wayside's bargains (data/reprieves.ts).
   ...CURSE_AFFIXES,
+  // ... and the Shrine's blessings (data/blessings.ts).
+  ...BLESSING_AFFIXES,
 ];
 
 export function mapAffixDef(id: string): MapAffixDef {
