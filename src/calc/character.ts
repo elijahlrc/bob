@@ -142,7 +142,7 @@ import {
 import { referenceMonster } from './monster';
 import { LEGACY, statLevel, type Difficulty } from '../data/difficulty';
 import { buildProfile, formedProfile, type HandStats, type SkillProfile } from './skill';
-import { TOTEM_FIRST_SHOT, deploySecondsOf, totemInterval } from './deploy';
+import { TOTEM_FIRST_SHOT, deploySecondsOf, shotDistance, totemInterval } from './deploy';
 import { carriedSeconds, renewalGap } from './dot';
 import { geyserHits } from './geyser';
 import { exposureShift, sporeMult, standingHits, zapMult } from './channelFx';
@@ -1579,7 +1579,8 @@ export class Character {
     // instead (src/calc/channelFx.ts); a channel adds the thorns its release leaves, and ground that hurts adds its pulses.
     const setGoing = standingHits(p, usesPerSec);
     if (setGoing) p = setGoing.profile;
-    const distance = this.config.targetDistance ?? 3;
+    // A totem's shots start a little toward the target, a trap's, a mine's and a brand's on it.
+    const distance = shotDistance(choice.deploy, this.config.targetDistance ?? 3);
     // What a strike sends out after it has to hit too (src/calc/afterHit.ts).
     const followed = p.skill.afterHit ? expectedHit(p, p.hands[0], t, d) : null;
     const patches = usesPerSec * (choice.triggered ? 1 : 1 + p.repeats);

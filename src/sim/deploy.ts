@@ -2,6 +2,7 @@ import { skillRange, type DeployKind, type SkillChoice } from '../calc/character
 import {
   DEPLOY_SECONDS,
   TOTEM_FIRST_SHOT,
+  TOTEM_OFFSET,
   deployCap,
   deploySecondsOf,
   totemInterval,
@@ -69,8 +70,6 @@ export const MINE_ARM = 0.6;
 /** Seconds between a mine being set off and going, unless the skill says otherwise; and between the mines of a chain. */
 const DETONATION = 0.25;
 const CHAIN_GAP = 0.25;
-/** Where a placed totem stands, toward the target, in tiles from the character. */
-const TOTEM_OFFSET = 1.5;
 /** A mine looks for something to hit this far from itself, in tiles. */
 const MINE_SEEK = 8;
 /** A set of traps or mines thrown together lies in a ring this far from the target, in tiles. */

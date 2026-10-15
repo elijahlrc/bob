@@ -153,12 +153,13 @@ export function createDummyWorld(
   };
   const dummy = stand(opts.distance, 0, 'Training Dummy');
   if (opts.rarity) dummy.rarity = opts.rarity;
-  // The others stand a little farther from the character and to the sides, so the first is always the nearest.
+  // The others stand behind the first and well to the sides (still within a pack's reach of the character), so that the first is
+  // the nearest to the character and to what it puts down, wherever those stand.
   for (let i = 0; i < (opts.bystanders ?? 0); i++) {
     const side = i % 2 === 0 ? 1 : -1;
     const by = stand(
-      opts.distance + 0.6 + Math.floor(i / 2) * 0.4,
-      side * (1.2 + Math.floor(i / 2)),
+      opts.distance + 1.5 + Math.floor(i / 2) * 0.6,
+      side * (3.2 + Math.floor(i / 2) * 0.8),
       'Bystander',
     );
     // They take nothing, so that what is measured is the damage to the one the character fights.

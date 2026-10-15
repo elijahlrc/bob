@@ -42,3 +42,17 @@ export const TOTEM_MIN_INTERVAL = 0.2;
 export function totemInterval(c: SkillChoice, prof: SkillProfile): number {
   return Math.max(TOTEM_MIN_INTERVAL, prof.useTime * (c.skill.ballista ? 2 : 1));
 }
+
+/** Where a placed totem stands, toward the target, in tiles from the character. */
+export const TOTEM_OFFSET = 1.5;
+
+/**
+ * How far from its target the shots of a skill start, where the character stands `distance` tiles from it: from the character
+ * itself, from a totem a little way toward the target, and from a trap, mine or brand put down on it (a ring of them a step off).
+ * What a fan of arrows or a ring of blasts does to one target depends on it.
+ */
+export function shotDistance(deploy: DeployKind | undefined, distance: number): number {
+  if (deploy === 'totem') return Math.max(0.5, distance - TOTEM_OFFSET);
+  if (deploy === 'trap' || deploy === 'mine' || deploy === 'brand') return 0.5;
+  return distance;
+}
