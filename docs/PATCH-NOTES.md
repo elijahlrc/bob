@@ -11,6 +11,7 @@ change, and our own names only. Dash bullets under plain headings.
 - The Awlsmith lists your worn items first, with Worn, Carried and All filters and a search box, so it is usable on a phone.
 - Stops are twice as common: about two levels in every five from level 6 offer one.
 - Spire Trap's burst is now a thin spire of lightning that tapers to a point, with a smaller flash and fewer sparks and arcs, so many traps going off at once are easier to read.
+- When many blasts go off at once, such as one skill cast many times over or a set of traps, their flashes are now dimmed so they no longer wash the floor and everything on it out to white.
 - Moving gems about in the Skills tab no longer freezes the page, even with a large collection of gems. The DPS and EHP changes shown beside the gems in the list now appear a moment after the tab opens and update a moment after you stop moving things.
 
 ## 2026-10-14
