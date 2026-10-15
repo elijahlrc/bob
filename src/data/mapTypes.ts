@@ -32,7 +32,7 @@ export const MAP_TYPES: MapTypeDef[] = [
   {
     id: 'crescendo',
     name: 'Crescendo',
-    text: 'After 30 s the monsters grow stronger every 15 s (+5% damage and life each time, up to +80%); kills made later drop more. You are pulled out after 330 s.',
+    text: 'After 30 s monsters grow stronger every 15 s (+5% damage and life, up to +80%), and later kills drop more. Ends at 330 s.',
     from: 10,
     reward: { quantity: 0.25 },
     loot: 'Later kills drop up to 48% more',
@@ -41,16 +41,16 @@ export const MAP_TYPES: MapTypeDef[] = [
   {
     id: 'quarry',
     name: 'Quarry',
-    text: 'A short hunt: three champions and few others. Each champion drops a rare (sometimes a unique) and a stack of currency.',
+    text: 'Three champions and few others. Each drops a rare, sometimes a unique.',
     from: 10,
     reward: {},
-    loot: 'Each champion drops a rare (or a unique) and currency',
+    loot: 'Each champion drops a rare or a unique',
     pressure: 1.2,
   },
   {
     id: 'throng',
     name: 'Throng',
-    text: 'A throng two and a half times the usual crowd, of weaker monsters with less life and damage.',
+    text: 'Two and a half times the usual crowd, each monster weaker.',
     from: 12,
     reward: { quantity: 0.4, experience: 0.25 },
     // The hidden affix makes each monster 0.6 times the life and 0.8 times the damage (0.48 together), and the crowd is
@@ -60,7 +60,7 @@ export const MAP_TYPES: MapTypeDef[] = [
   {
     id: 'holdout',
     name: 'Holdout',
-    text: 'A single arena. Hold the beacon while eight waves come, twelve seconds apart; each wave you survive opens a chest, and the last has a rare leading it.',
+    text: 'One arena. Hold the beacon through eight waves, 12 s apart; each wave opens a chest, and a rare leads the last.',
     from: 25,
     reward: { quantity: 0.2 },
     loot: 'A chest for every wave survived',
@@ -69,7 +69,7 @@ export const MAP_TYPES: MapTypeDef[] = [
   {
     id: 'collapse',
     name: 'Collapse',
-    text: 'After one minute the way behind you starts to fall in, from the entrance onward, faster than you can ignore. Reach the exit before it reaches you.',
+    text: 'After one minute the way behind you starts falling in. Reach the exit first.',
     from: 30,
     reward: { quantity: 0.3, experience: 0.1 },
     pressure: 1.35,
@@ -77,7 +77,7 @@ export const MAP_TYPES: MapTypeDef[] = [
   {
     id: 'crawl',
     name: 'Crawl',
-    text: 'Three short maps in a row with no camp between them. At the end you pick one of three rewards, and one of them is a unique.',
+    text: 'Three short maps without a camp between; then choose one of three rewards, one a unique.',
     from: 40,
     reward: {},
     loot: 'Choice of three rewards, one a unique',

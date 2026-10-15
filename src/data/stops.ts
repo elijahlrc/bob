@@ -1,6 +1,6 @@
 /**
  * Stops (docs/WAYSIDE.md section 5): a non-combat offer that takes a map's place in a set. Taking one spends the level (the
- * counter advances, no XP, no clear rewards, no reward pick) and gives a service a map cannot. Every name and text is ours.
+ * counter advances) and gives a service a map cannot. Every name and text is ours.
  */
 export type StopId = 'awlsmith' | 'gemHoard' | 'shrine' | 'quartermaster' | 'ferryman';
 
@@ -22,40 +22,40 @@ export const STOPS: StopDef[] = [
   {
     id: 'awlsmith',
     name: 'The Awlsmith',
-    text: 'Bore a new socket into one item, free.',
-    how: 'Pick one item, worn or carried. It gets its next socket free. Sockets beyond that cost Bone Dust (the 4th 40, the 5th 120, the 6th 300).',
+    text: 'A free socket in one item.',
+    how: 'Choose an item. More sockets cost Bone Dust.',
     weight: 30,
     from: 6,
   },
   {
     id: 'gemHoard',
     name: 'The Gem Hoard',
-    text: 'Choose a kind of gem, then take 3 of the 8 laid out.',
-    how: 'Name one of four kinds. Eight gems of that kind are laid out; take three.',
+    text: 'Choose a kind, take 3 of 8 gems.',
+    how: 'Choose a kind of gem, then take three.',
     weight: 30,
     from: 6,
   },
   {
     id: 'shrine',
     name: 'The Shrine',
-    text: 'A blessing that lasts until the next stop.',
-    how: 'Pick one of three blessings. It lasts until you take another stop, and replaces the one you have.',
+    text: 'A blessing until your next stop.',
+    how: 'Choose a blessing.',
     weight: 25,
     from: 6,
   },
   {
     id: 'quartermaster',
     name: 'The Quartermaster',
-    text: 'Eight wares for sale, paid in Bone Dust.',
-    how: 'Eight wares, paid in Bone Dust (what salvaging items pays). Choose what you want; whatever you leave is gone when you do.',
+    text: 'Eight wares for Bone Dust.',
+    how: 'Buy what you want with Bone Dust.',
     weight: 25,
     from: 6,
   },
   {
     id: 'ferryman',
     name: 'The Ferryman',
-    text: 'A free reprieve, for a price.',
-    how: 'The Ferryman gives one reprieve for nothing, but you carry a curse for the next five levels. You may refuse. Your pouch needs room for it.',
+    text: 'A reprieve, at a price.',
+    how: 'Choose a reprieve.',
     weight: 20,
     from: 8,
   },

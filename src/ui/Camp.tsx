@@ -74,7 +74,7 @@ function BossOffer({ c, o }: { c: Controller; o: OfferPreview }) {
       <div class="boss-offer-map-info">
         <div class="boss-offer-way">
           The way there: <strong>{t.name}</strong>, level {o.areaLevel}. {name} waits alone in an
-          arena past its last room. There is no other map this time, and no leaving early.
+          arena past its last room.
         </div>
         <OfferTable o={o} />
         {o.affixes.map((aid) => {
@@ -283,8 +283,8 @@ export function Camp({ c }: { c: Controller }) {
       <BossAhead map={run.map} />
       {last && (last.status === 'cleared' || last.status === 'abandoned') && (
         <div class="muted">
-          Last map{last.status === 'abandoned' ? ' (abandoned, no clear rewards)' : ''}:{' '}
-          {last.time.toFixed(0)} s · {last.kills} kills
+          Last map{last.status === 'abandoned' ? ' (abandoned)' : ''}: {last.time.toFixed(0)} s ·{' '}
+          {last.kills} kills
           {(last.reprieves ?? []).map(
             (id) =>
               ` · ${reprieveDef(id).name} ${reprieveDef(id).family === 'retreat' ? 'pulled you out' : 'saved you'}`,
@@ -305,17 +305,10 @@ export function Camp({ c }: { c: Controller }) {
             if (o.kind === 'respite')
               return (
                 <div key={o.id} class="theme-wrap">
-                  <button
-                    class="btn theme respite"
-                    title="No map is played: the level passes with no loot, XP or clear rewards."
-                    onClick={() => c.startMap(i)}
-                  >
+                  <button class="btn theme respite" onClick={() => c.startMap(i)}>
                     <div class="theme-name">Respite</div>
-                    <div class="muted">Level {o.areaLevel} passes</div>
-                    <div class="affix">
-                      Life, mana, energy shield and flasks are made full again.
-                    </div>
-                    <div class="threat">No loot, no XP, no clear rewards.</div>
+                    <div class="muted">Level {o.areaLevel}</div>
+                    <div class="affix">Life, mana, shield and flasks refilled.</div>
                   </button>
                 </div>
               );
@@ -323,15 +316,10 @@ export function Camp({ c }: { c: Controller }) {
               const d = stopDef(o.stop!);
               return (
                 <div key={o.id} class="theme-wrap">
-                  <button
-                    class="btn theme stop-card"
-                    title="A stop is no map: the level passes, and you are given a service."
-                    onClick={() => setStopSlot(i)}
-                  >
+                  <button class="btn theme stop-card" onClick={() => setStopSlot(i)}>
                     <div class="theme-name">{d.name}</div>
-                    <div class="muted">Level {o.areaLevel} passes</div>
+                    <div class="muted">Level {o.areaLevel}</div>
                     <div class="affix">{d.text}</div>
-                    <div class="threat">No loot, no XP, no clear rewards.</div>
                   </button>
                 </div>
               );

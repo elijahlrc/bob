@@ -22,10 +22,6 @@ import { ReprieveCard } from './Satchel';
 import { WareCard } from './WareCard';
 import { itemTitle, rarityClass } from './ItemCard';
 
-/** What the level costs, in words the stop's screen and its card share. */
-export const STOP_PRICE =
-  'The level passes with no loot, no XP and no clear rewards, as with a Respite; you get ten seconds of rest.';
-
 /** The screen of a stop the player has chosen (docs/WAYSIDE.md section 5): nothing is done until it is confirmed. */
 export function StopScreen({
   c,
@@ -67,7 +63,7 @@ export function StopScreen({
   return (
     <div class="stop">
       <h3 class="stop-name">{def.name}</h3>
-      <div class="muted">Level {offer.areaLevel} passes here.</div>
+      <div class="muted">Level {offer.areaLevel}</div>
       <p>{def.how}</p>
       {offer.stop === 'awlsmith' && (
         <Awlsmith
@@ -101,7 +97,6 @@ export function StopScreen({
         <Quartermaster run={run} slot={slot} cart={cart} onCart={setCart} />
       )}
       {offer.stop === 'ferryman' && <Ferryman run={run} reprieve={reprieve} onPick={setReprieve} />}
-      <div class="stop-price muted">{STOP_PRICE}</div>
       {error && <div class="warn">{error}</div>}
       <div class="stop-buttons">
         <button
@@ -113,7 +108,7 @@ export function StopScreen({
           Take {def.name}
         </button>
         <button class="btn" onClick={onBack}>
-          Back to the offers
+          Back
         </button>
       </div>
     </div>
@@ -157,7 +152,7 @@ function Awlsmith({
       <div class="stop-list">{items.map(row)}</div>
       {chosen && awlsmithRoom(chosen) > 1 && (
         <div class="stop-extra">
-          <span>Sockets beyond the first:</span>
+          <span>Extra sockets:</span>
           <button class="btn small" disabled={extra <= 0} onClick={() => onExtra(extra - 1)}>
             −
           </button>
@@ -253,7 +248,7 @@ function Shrine({
     <div class="stop-body">
       {held && (
         <div class="muted">
-          You hold {blessingDef(held).name} ({blessingDef(held).text}). Any stop ends it.
+          Current: {blessingDef(held).name} ({blessingDef(held).text})
         </div>
       )}
       <div class="stop-list">
@@ -297,9 +292,6 @@ function Quartermaster({
         </span>
       </div>
       {why && cart.length > 0 && <div class="warn">{why}</div>}
-      {cart.length === 0 && (
-        <div class="muted">Nothing chosen: taking the stop would spend the level for nothing.</div>
-      )}
       <div class="ware-grid">
         {stock.map((w) => (
           <div key={w.id} class={'ware' + (cart.includes(w.id) ? ' chosen' : '')}>
@@ -332,10 +324,7 @@ function Ferryman({
   const blocked = reprieveBlocker(run);
   return (
     <div class="stop-body">
-      <div class="warn">
-        The price: a curse for the next five levels (15% less maximum life), starting when you take
-        it.
-      </div>
+      <div class="warn">Price: 15% less maximum life for five levels.</div>
       {blocked && <div class="warn">{blocked}</div>}
       <div class="stop-list">
         {REPRIEVES.map((r) => (

@@ -6,6 +6,7 @@ change, and our own names only. Dash bullets under plain headings.
 
 ## 2026-10-14
 
+- The stop screens, Respite and map-type cards, and the boss map card now use fewer words: they say what you get and what you choose, and no longer list what the level does not give.
 - New enemy affix, Blinking: the monster marks the spot where you stand and, a moment later, teleports onto it with a travel spell of its element. Cinder Step bursts in fire and leaves burning ground, Rime Step bursts in cold and leaves chilling ground, Bolt Step flashes at both ends, and a plain one just lands hard. Stun it while it gathers to stop it.
 - Wisps, Lantern Wights and Bone Crawlers can now teleport onto you from a distance too, after a warning on the ground, with Bolt Step, Rime Step and Quick Step.
 - The Siege Marshal keeps calling regiments for as long as the fight lasts, the same three over again, instead of coming down alone after the third. Each time you clear a regiment he comes down for six seconds, fights you himself and takes extra damage, and then the horn sounds for the next. If a regiment is still standing 22 seconds after it came, the next arrives anyway, but no more come while ten soldiers stand.
