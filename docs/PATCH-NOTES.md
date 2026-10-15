@@ -4,6 +4,11 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-15
+
+- The game is now called Battle of Builds on the title screen.
+- The title screen now has a link to the game's Discord server, with an invitation to join and give feedback.
+
 ## 2026-10-14
 
 - Skills that set something down now show it. Traps and mines are thrown in an arc and a closing ring shows them arming, totems and brands drop into place, and lasting ground, pods, ice crystals, storms, orbs, trails, illusions, geysers and smoke stay visible while they last. Glacier Wall raises blocks of ice, and the burst as it goes up now hurts enemies along the whole wall instead of a circle at its middle.
