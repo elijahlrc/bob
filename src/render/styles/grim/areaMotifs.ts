@@ -833,30 +833,39 @@ function strike(m: MotifHost, a: MotifArea, bolts: number): void {
 function pillar(m: MotifHost, a: MotifArea): void {
   const f = frameOf(m.host, a);
   const seed = a.x * 9.1 + a.y * 2.2;
-  m.host.em.bolt.explode(a.light ? 3 : 10, f.p.x, f.p.y);
-  if (!a.light) flash(m, a, 0xc8a0ff, 2.2, 0.55);
-  m.add(0.8, true, (g, k) => {
+  // Traps go off many times at once, so this is small and faint: a thin spire that tapers to a point (no flat top to cut off
+  // against the sky), a small flash and a few arcs. Three nested layers, each shorter than the last, so it fades out upward.
+  m.host.em.bolt.explode(a.light ? 2 : 5, f.p.x, f.p.y);
+  if (!a.light) flash(m, a, 0xc8a0ff, 1.4, 0.3);
+  m.add(0.65, true, (g, k) => {
     const rise = out(k / 0.12);
-    const fall = 1 - clamp01((k - 0.5) / 0.5);
-    const h = 120 * f.s * rise * fall;
-    const w = 11 * f.s * (0.7 + 0.3 * Math.sin(k * 40));
-    g.fillStyle(0xc89cff, 0.25 * fall).fillRect(f.p.x - w, f.p.y - h, w * 2, h);
-    g.fillStyle(0xe6d0ff, 0.55 * fall).fillRect(f.p.x - w * 0.5, f.p.y - h, w, h);
-    g.fillStyle(0xffffff, 0.9 * fall).fillRect(f.p.x - 1.5, f.p.y - h, 3, h);
+    const fall = 1 - clamp01((k - 0.4) / 0.6);
+    const h = 118 * f.s * rise * fall;
+    const w = 9 * f.s * (0.8 + 0.2 * Math.sin(k * 40));
+    const spire = (hh: number, ww: number): Pt[] => [
+      { x: f.p.x - ww, y: f.p.y },
+      { x: f.p.x - ww * 0.45, y: f.p.y - hh * 0.55 },
+      { x: f.p.x + 2, y: f.p.y - hh },
+      { x: f.p.x + ww * 0.45, y: f.p.y - hh * 0.55 },
+      { x: f.p.x + ww, y: f.p.y },
+    ];
+    poly(g, spire(h, w), 0xc89cff, 0.2 * fall);
+    poly(g, spire(h * 0.85, w * 0.6), 0xe6d0ff, 0.4 * fall);
+    poly(g, spire(h * 0.66, w * 0.25), 0xffffff, 0.6 * fall);
     glow(
       g,
       jagged(
         { x: f.p.x, y: f.p.y },
-        { x: f.p.x + 3, y: f.p.y - h },
-        7,
-        5,
+        { x: f.p.x + 2, y: f.p.y - h * 0.9 },
+        6,
+        3,
         seed + Math.floor(k * 25),
       ),
       0xc89cff,
-      0.9 * fall,
-      0.8,
+      0.55 * fall,
+      0.7,
     );
-    groundArcs(g, f, a.light ? 3 : 7, 0.85, k, seed, 0.8 * fall);
+    groundArcs(g, f, a.light ? 2 : 4, 0.8, k, seed, 0.5 * fall);
   });
 }
 

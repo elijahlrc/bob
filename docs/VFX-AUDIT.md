@@ -96,3 +96,82 @@ and streams are drawn as what they are (fire, rot, force, rock); lightning alone
 
 Not changed: the monsters' own areas (they keep the pass-1 telegraphs and the old landing), the heralds (no skill on their explosions) and the
 upkeep skills.
+
+## Pass 4: many at once (2026-10-15)
+
+Why: a build casts one skill over and over (multicast, echo, a belt of traps, a pack of mines), so what matters is how an effect looks
+when six of them overlap, not one. The user's first report was Spire Trap: large parts of the screen went white when it was multicast.
+
+### Method
+
+`scripts/vfx/stack-probe.js` (paste it into the console of a dev build, or `await import('/scripts/vfx/stack-probe.js')`, then
+`await stackProbe({ skill: 'spireTrap', dtype: 1 })`): in the gallery it fires N synthetic `explode` events a few tiles from the character, steps frame by
+frame, reads the canvas back and reports the peak share of the screen that is **visibly brighter than before** (`lit`) and the share that is **near white**
+(`white`). Median of three runs, with the noise of an empty run (torch flicker, about 0.3%) taken off. It can also strip the `flash()` lights from the run
+(`noLights: true`) to see what they add. Every skill's `explode` goes through the motif of its kind, so one skill per motif stands for all that share it.
+
+### Spire Trap (done)
+
+It was a flat-topped rectangle of near-white 120 px tall, with a big flash, ten bolt sparks and seven arcs. It is now a thin spire that tapers to a point and fades
+out upward (three nested layers, each shorter than the last), with a smaller flash, fewer sparks and fainter arcs.
+
+| Spire Trap, at once | before: lit / white | after: lit / white |
+| ------------------- | ------------------- | ------------------ |
+| 1                   | about 1.1 / 0.07    | 0.5 / 0.02         |
+| 6                   | about 9.9 / 0.75    | 4.3 / 0.28         |
+
+About 55 to 60% less, as asked. The trap's own spring (`sprung`: a flash, sparks, eight spike lines) is drawn on top of this and is not touched; it is a shared
+item below.
+
+### What stacks badly (6 at once, share of the screen lit at peak; one alone in brackets)
+
+| Motif (skill measured)                                                    | Six at once     | One   | Near white (6) |
+| ------------------------------------------------------------------------- | --------------- | ----- | -------------- |
+| geyser (Pyre Burst)                                                       | 9.3             | (1.1) | 0.1            |
+| fire nova (Furnace Roar)                                                  | 9.2             | (1.1) | 0.1            |
+| storm (Stormcharge)                                                       | 9.0             | (1.4) | 0.6            |
+| strike (Skyfall)                                                          | 8.9             | (1.2) | 0.6            |
+| flames (Blaze Trap)                                                       | 7.6             | (0.9) | 0.1            |
+| shrapnel (Shrapnel Trap)                                                  | 7.4             | (1.0) | 0.2            |
+| frost bloom (Sudden Frost)                                                | 7.3             | (1.0) | 0.5            |
+| freeze (Frost Trap)                                                       | 7.3             | (1.0) | 0.5            |
+| fireball (Flame Bolt)                                                     | 6.5             | (1.0) | 0.1            |
+| holy (Cleansing Blaze)                                                    | 6.1             | (0.8) | 0.2            |
+| ice shatter (Hoarfrost Mote)                                              | 5.9             | (0.9) | 0.4            |
+| lava (Magma Crack)                                                        | 5.9             | (0.7) | 0.1            |
+| splat (Slag Lob)                                                          | 5.2             | (0.8) | 0.1            |
+| Spire Trap (after)                                                        | 4.3             | (0.8) | 0.3            |
+| a mine going off                                                          | 5.0             | (0.8) | 0.3            |
+| an area with no skill, fire / cold / lightning (monsters' landings, etc.) | 8.0 / 7.3 / 7.2 | (0.9) | up to 0.5      |
+| a trap going off                                                          | 2.8             | (0.6) | 0.2            |
+| a chain, six at once                                                      | 2.6             | (0.4) | 0.1            |
+| a beam, six at once                                                       | 2.3             | (0.5) | 0.1            |
+
+Quiet (1.2 or less with six at once, close to the noise): quake, quake wave, bone, stone and ice spikes, ice waves, ice nova, whirling frost, flame
+line, plague cloud, ruin ritual, jaws, drain, steel blades, sweep, whirling blades, falling missiles, the lightning crackles (nova and line), and the
+hit sparks and melee sweeps measured (0.4 to 1.3).
+
+### Findings
+
+| #   | Finding                                                                                                                                                                                                                                                                                                                                                                                                           | Effect on the reader                                                                |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| 1   | **The loud ones are loud because of `flash()`**, the point light every flashy motif adds (about 100 to 190 px across, intensity 1.6, fading in 0.2 to 0.6 s). Lights add and nothing caps them. Taking just those lights out of six stacked blasts takes the lit share from 9.0 to 0.8 (geyser), 8.9 to 1.5 (strike), 6.9 to 0.9 (frost bloom), 7.1 to 0.9 (shrapnel). One alone is fine; six wash the floor out. | Multicast turns the floor into a pale sheet: the effects themselves cannot be seen. |
+| 2   | Every motif without a flash stays at 1.2 or less however many there are (rows above). The skill-less landings (`index.ts`, an `explode` with no skill) have their own flash, 1.8 to 2.2 wide, and behave like the loud motifs.                                                                                                                                                                                    | The damage is in one shared call, not in the drawing of each motif.                 |
+| 3   | Lightning is the whitest: Skyfall and Stormcharge also fill a white ground ellipse at 0.6 alpha under every bolt, and every `glow()` has a 0.95 white core. Near-white is 0.6% of the screen with six, against 0.1% for fire.                                                                                                                                                                                     | White blocks hide the enemies standing in them.                                     |
+| 4   | A mine (spring burst: 8 spikes, 8 sparks, a 1.4 flash) is nearly as loud as the loud motifs, and a trap's own flash and spikes in `sprung()` add to whatever its area draws.                                                                                                                                                                                                                                      | Traps and mines are the likeliest things to be stacked in play, and they go on top. |
+| 5   | Particle counts, shakes and the monsters' own areas (`encounterFx.ts`, `bossFx.ts`) were not measured. The shake keeps the largest of several, so it does not add up.                                                                                                                                                                                                                                             | Open.                                                                               |
+
+### What is left (each needs a decision)
+
+1. **Cap the flash lights in one place (recommended).** In `flash()` in `index.ts`: count the flash lights alive; each new one is scaled down by how many are
+   already there (intensity and radius times about `1 / (1 + 0.5 n)`), and past four a flash keeps only its particle and no light. One cast looks exactly as now;
+   six overlapping would be a little over twice one. It fixes thirteen motifs, the skill-less landings, mines, traps and chains at once. The probe can check it:
+   the loud rows above should fall to 2 or 3.
+2. **A crowding rule for the motifs.** `MotifArea.light` already means "draw the weaker version". When more than about four areas of one skill are
+   alive within half a second, draw the extras as `light`. It cuts particles and arcs as well, which the cap above leaves alone. Needs a count kept in
+   `SkillFx`.
+3. **Strike and storm: lose the white ellipse** under each bolt, or cut it to a quarter. A visible change to those two.
+4. **Mines and traps:** shrink the spring burst of a mine (flash 1.4 to about 1, sparks 8 to 4) so it matches a trap. A visible change.
+5. **Measure the rest:** the monsters' own areas and the bosses stacked (a pack of casters), particle counts, and the minion and totem hits.
+
+Nothing in 1 to 4 changes the sim.

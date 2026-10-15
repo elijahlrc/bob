@@ -59,7 +59,7 @@ ellipse of the view; a wedge (a melee sweep) and a lane (a beam, a strip, a wall
   stands up in tongues round the edge and a column in the middle (Blaze Trap, Ember Burst), a bolt of fire is a ball that swells and bursts (Flame Bolt),
   a nova of fire is a ring of tongues (Furnace Roar), a splitting slam is rivers of molten rock in dark cracks (Magma Crack), molten metal is flung out as blobs
   (Slag Lob, Molten Strike), a corpse bursts into a column (Cremation); **lightning is only for lightning skills**: a bolt comes down from the sky onto the
-  spot (Storm Call), several bolts (Stormcharge), a column (Spire Trap), arcs run along the ground (Static Ring and the other rings); rot rises as a green
+  spot (Storm Call), several bolts (Stormcharge), a thin spire (Spire Trap), arcs run along the ground (Static Ring and the other rings); rot rises as a green
   cloud (Contagion; Ruin Ritual lights a rune circle under it); consecrated ground is a column of golden light with rays; shrapnel flies out in
   trailing fragments; a Jaws Trap closes two rows of iron teeth; Rain of Steel's blades come down and stand in the ground; a spin or sweep draws a
   crescent right round the caster. Falling missiles (Arrow Shower, Ember Hail, Ember Downpour, Venom Shower) are the motif: arrows with a puff of dust,

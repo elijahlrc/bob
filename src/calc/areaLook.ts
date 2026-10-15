@@ -78,7 +78,7 @@ export const MOTIF_LOOK: Record<Motif, string> = {
   splat: 'Blobs of molten metal are flung out, land, spread glowing and cool.',
   strike: 'A jagged bolt comes down from the sky onto the spot and arcs run out over the ground.',
   storm: 'Several bolts come down on the area one after another, with arcs between them.',
-  pillar: 'A column of lightning stands up from the spot and the ground about it crackles.',
+  pillar: 'A thin spire of lightning stands up from the spot and the ground about it crackles.',
   crackleNova: 'Arcs of lightning run out along the ground from the caster to the edge.',
   crackleLine: 'Arcs of lightning jump along the band.',
   cloud: 'A cloud of sickly green billows out over the area and drifts up.',
