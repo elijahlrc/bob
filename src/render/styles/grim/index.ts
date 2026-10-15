@@ -103,6 +103,10 @@ type Bolt = { pts: { x: number; y: number }[]; t: number; color: number };
 type TempLight = { light: Phaser.GameObjects.Light; t: number; total: number; base: number };
 /** Lights a map's glowing props may use between them (the torches and braziers have theirs). */
 const MAX_PROP_LIGHTS = 10;
+/** Flash lights alive at once: past this a flash is only its particle (see `flash`). */
+const FLASH_LIGHTS = 4;
+/** How much each flash light already alive dims a new one: 1 / (1 + this * alive). */
+const FLASH_CROWDING = 0.5;
 
 type Torch = { light: Phaser.GameObjects.Light; seed: number; base: number; x: number; y: number };
 
@@ -1251,8 +1255,13 @@ export class GrimStyle extends StyleBase {
     e.explode(1, x, y);
     void scale;
     if (intensity > 0) {
-      const l = this.addLight(x, y, 130 * scale, color, 1.6);
-      this.temps.push({ light: l, t: intensity, total: intensity, base: 1.6 });
+      // Lights add up, so a build that casts one skill many times at once would wash the floor and everyone on it out to white.
+      // Each flash is dimmed by the flashes still alive and past FLASH_LIGHTS there are no more (the pop above still shows).
+      const alive = this.temps.length;
+      if (alive >= FLASH_LIGHTS) return;
+      const k = 1 / (1 + FLASH_CROWDING * alive);
+      const l = this.addLight(x, y, 130 * scale * Math.sqrt(k), color, 1.6 * k);
+      this.temps.push({ light: l, t: intensity, total: intensity, base: 1.6 * k });
     }
   }
 

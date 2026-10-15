@@ -161,17 +161,37 @@ hit sparks and melee sweeps measured (0.4 to 1.3).
 | 4   | A mine (spring burst: 8 spikes, 8 sparks, a 1.4 flash) is nearly as loud as the loud motifs, and a trap's own flash and spikes in `sprung()` add to whatever its area draws.                                                                                                                                                                                                                                      | Traps and mines are the likeliest things to be stacked in play, and they go on top. |
 | 5   | Particle counts, shakes and the monsters' own areas (`encounterFx.ts`, `bossFx.ts`) were not measured. The shake keeps the largest of several, so it does not add up.                                                                                                                                                                                                                                             | Open.                                                                               |
 
+### The light cap (done)
+
+`flash()` in `index.ts` now dims each new flash light by the ones still alive (`1 / (1 + 0.5 n)` on intensity, its square root on radius) and gives no light
+at all once four are alive (the pop particle still shows). One cast is exactly as before. Six at once, measured in the same view with the cap on and off
+(`FLASH_LIGHTS`, `FLASH_CROWDING`):
+
+| Six at once       | Before | After |
+| ----------------- | ------ | ----- |
+| Pyre Burst        | 10.5   | 2.9   |
+| Furnace Roar      | 10.5   | 2.9   |
+| Stormcharge       | 11.4   | 5.1   |
+| Skyfall           | 11.3   | 4.0   |
+| Blaze Trap        | 8.8    | 2.6   |
+| Shrapnel Trap     | 9.1    | 2.7   |
+| Sudden Frost      | 9.0    | 2.6   |
+| Flame Bolt        | 7.6    | 2.4   |
+| Cleansing Blaze   | 7.4    | 2.2   |
+| Magma Crack       | 6.1    | 1.8   |
+| Spire Trap        | 5.7    | 2.2   |
+| Frost Ring (calm) | 1.1    | 1.1   |
+
+The floor and the figures on it stay readable and each effect's own drawing shows. Still bright with six at once: Stormcharge and Skyfall (the white ellipse and
+the white-cored bolts themselves) and a mine's spike burst (below).
+
 ### What is left (each needs a decision)
 
-1. **Cap the flash lights in one place (recommended).** In `flash()` in `index.ts`: count the flash lights alive; each new one is scaled down by how many are
-   already there (intensity and radius times about `1 / (1 + 0.5 n)`), and past four a flash keeps only its particle and no light. One cast looks exactly as now;
-   six overlapping would be a little over twice one. It fixes thirteen motifs, the skill-less landings, mines, traps and chains at once. The probe can check it:
-   the loud rows above should fall to 2 or 3.
-2. **A crowding rule for the motifs.** `MotifArea.light` already means "draw the weaker version". When more than about four areas of one skill are
+1. **A crowding rule for the motifs.** `MotifArea.light` already means "draw the weaker version". When more than about four areas of one skill are
    alive within half a second, draw the extras as `light`. It cuts particles and arcs as well, which the cap above leaves alone. Needs a count kept in
    `SkillFx`.
-3. **Strike and storm: lose the white ellipse** under each bolt, or cut it to a quarter. A visible change to those two.
-4. **Mines and traps:** shrink the spring burst of a mine (flash 1.4 to about 1, sparks 8 to 4) so it matches a trap. A visible change.
-5. **Measure the rest:** the monsters' own areas and the bosses stacked (a pack of casters), particle counts, and the minion and totem hits.
+2. **Strike and storm: lose the white ellipse** under each bolt, or cut it to a quarter. A visible change to those two.
+3. **Mines and traps:** shrink the spring burst of a mine (flash 1.4 to about 1, sparks 8 to 4) so it matches a trap. A visible change.
+4. **Measure the rest:** the monsters' own areas and the bosses stacked (a pack of casters), particle counts, and the minion and totem hits.
 
-Nothing in 1 to 4 changes the sim.
+Nothing here changes the sim.

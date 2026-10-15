@@ -69,6 +69,8 @@ ellipse of the view; a wedge (a melee sweep) and a lane (a beam, a strip, a wall
 - Melee sweeps draw their wedge on the ground, under the crescent; beams their lane, to the width the beam hurts (`width` on the event).
 - Warcries and shouts draw their radius (the `cry` event).
 - Lasting zones and strips keep the same dark-and-colour edge while they last.
+- Effects are drawn to be stacked: a build casts one skill many times at once. The flash lights that blasts add are dimmed by how many are alive and
+  stop at four (`flash` in `index.ts`), and a motif is thin and faint rather than large and white (Spire Trap).
 - Monsters' warnings (telegraphs, the old slam rings, shaped pattern blasts) fill from the start of the blow, with the same dark line, in the colour of
   the damage they will do.
 
