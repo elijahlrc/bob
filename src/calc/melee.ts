@@ -27,17 +27,25 @@ export type LandsInput = {
  */
 export function landsPerUse(p: SkillProfile, o: LandsInput): number {
   const s = p.skill;
-  const fires = o.triggered ? 1 : 1 + p.repeats;
+  const repeats = o.triggered ? 0 : p.repeats;
+  // Each repeat of a Multistrike is harder than the one before; the first blow is a blow.
+  const ramp = p.multistrike && !o.triggered ? p.multistrike.ramp / 100 : 0;
+  const echoes = repeats + (ramp * repeats * (repeats + 1)) / 2;
   // A spin sweeps `hits` times; an echo or a trigger of it is one sweep. What a use leaves behind (the quake, the storm) is left once.
-  const own = s.spin ? (o.triggered ? 1 : s.spin.hits + p.repeats) : fires * p.pulses;
+  const own = s.spin ? (o.triggered ? 1 : s.spin.hits + echoes) : (1 + echoes) * p.pulses;
   const lands = own * o.volley;
+  // The hits themselves, whatever their weight: each puts a charge or a stack on the enemy.
+  const count =
+    (s.spin ? (o.triggered ? 1 : s.spin.hits + repeats) : (1 + repeats) * p.pulses) * o.volley;
   const rate = o.usesPerSec;
   if (!(rate > 0)) return lands;
-  const placed = s.spin ? 1 : fires;
+  // What each fire leaves behind: once for a spin, and for every fire (the repeats too) for anything else.
+  const placed = s.spin ? 1 : 1 + repeats;
+  const placedBlows = s.spin ? 1 : 1 + echoes;
   let extra = 0;
 
   // A slam cracks the ground, and the ground erupts a moment later, harder.
-  if (s.aftershock) extra += placed * (1 + s.aftershock.more / 100);
+  if (s.aftershock) extra += placedBlows * (1 + s.aftershock.more / 100);
 
   // A storm of blades stays where the spin was made and hits every interval: as many storms as the uses keep up, and no more than
   // the most (the oldest goes when another is made).
@@ -47,19 +55,19 @@ export function landsPerUse(p: SkillProfile, o: LandsInput): number {
     const life = st.seconds * p.skillDuration;
     const each = Math.min(life, st.max / made);
     const pulses = Math.floor(each / st.interval + 1e-6);
-    extra += placed * pulses * (1 + st.more / 100) * (s.spin?.hits ?? 1);
+    extra += placedBlows * pulses * (1 + st.more / 100) * (s.spin?.hits ?? 1);
   }
 
   // Each hit that lands puts a charge on the enemy, and a charge is worth its share of a blow whenever it goes off (at the most, at
   // the end of its time, or at death), so a hit is worth one blow more by that share.
   const ch = s.charge;
-  if (ch) extra += lands * o.land * (ch.perCharge / 100);
+  if (ch) extra += count * o.land * (ch.perCharge / 100);
 
   // Each hit that lands gives a stack of a buff, and while it lasts beams strike the enemy near: faster for each stack. The
   // character stands to strike, so the beams are the weaker ones.
   const bm = s.beams;
   if (bm) {
-    const stackRate = rate * lands * o.land;
+    const stackRate = rate * count * o.land;
     const held = stackRate * bm.seconds;
     const up = Math.min(1, held);
     const stacks = Math.min(bm.max, Math.max(1, held));

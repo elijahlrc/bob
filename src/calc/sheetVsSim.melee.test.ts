@@ -60,8 +60,16 @@ describe('the sheet counts the extra hits of a melee skill the way the sim plays
     expectClose(['whirlwindCleave', 'tripleCadence']);
   });
 
+  it('Spinning Dash with repeats: the same, for a spin that runs', () => {
+    expectClose(['spinningDash', 'tripleCadence']);
+  });
+
   it('Faultline: the ground erupts again, harder, a moment after the slam', () => {
     expectClose(['faultline']);
+  });
+
+  it('Faultline with repeats: every repeat quakes, and each is harder than the last', () => {
+    expectClose(['faultline', 'tripleCadence']);
   });
 
   it('Charged Blow: each hit calls beams while the stacks last', () => {
@@ -74,6 +82,10 @@ describe('the sheet counts the extra hits of a melee skill the way the sim plays
 
   it('Cinder Blow with repeats: every landing hit still charges once', () => {
     expectClose(['cinderBlow', 'tripleCadence']);
+  });
+
+  it('Charged Blow with repeats: the stacks count the hits, not their weight', () => {
+    expectClose(['chargedBlow', 'tripleCadence']);
   });
 
   it('Thunder Rebuke: the lightning aura of its own hit is on its next hits', () => {
@@ -108,6 +120,20 @@ describe('landsPerUse', () => {
     expect(landsPerUse(p, ctx(1))).toBe((1 + p.repeats) * p.pulses);
     expect(landsPerUse({ ...p, repeats: 2 }, ctx(1, { volley: 2 }))).toBe(6);
     expect(landsPerUse({ ...p, repeats: 2 }, ctx(1, { triggered: true }))).toBe(1);
+  });
+
+  it('each repeat of a Multistrike is harder than the one before, the first blow is not', () => {
+    const p = profileOf('crushingBlow');
+    const m = { ...p, repeats: 2, multistrike: { ramp: 22 } };
+    expect(landsPerUse(m, ctx(1))).toBeCloseTo(1 + 1.22 + 1.44, 9);
+    expect(landsPerUse(m, ctx(1, { triggered: true }))).toBe(1);
+    // The quake of a slam repeats with it, as hard as the repeat is.
+    const q = profileOf('faultline');
+    const more = 1 + q.skill.aftershock!.more / 100;
+    expect(landsPerUse({ ...q, repeats: 2, multistrike: { ramp: 22 } }, ctx(1))).toBeCloseTo(
+      (1 + more) * (1 + 1.22 + 1.44),
+      9,
+    );
   });
 
   it('an aftershock is one more hit, harder by the share the gem says, for each time the slam lands', () => {
