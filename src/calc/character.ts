@@ -2003,7 +2003,7 @@ export class Character {
       if (u.relic && def.nova && distance <= u.relic.radius * p.radiusMult + RELIC_BESIDE)
         novas =
           relicNova(def, c.skill.level, p) *
-          relicNovasPerSec(this.attackHitsPerSec(conds, scenario), u.relic.cooldown);
+          relicNovasPerSec(this.attackUsesPerSec(conds, scenario), u.relic.cooldown);
       dps += (count * blow * def.rate * p.minionSpeed + novas) * stand;
     }
     return dps;
@@ -2026,8 +2026,11 @@ export class Character {
     return dps;
   }
 
-  /** How many times a second the character's attacks land (the skills of the rotation that are attacks, and the weapon). */
-  private attackHitsPerSec(conds: number, scenario: Scenario): number {
+  /**
+   * How many times a second the character makes an attack (the skills of the rotation that are attacks, and the weapon). Each is
+   * taken to land: the relic answers a hit, so against an enemy that is often missed this reads a little high.
+   */
+  private attackUsesPerSec(conds: number, scenario: Scenario): number {
     const plan = this.plan(conds, scenario);
     let n = 0;
     for (const c of [...this.actives, this.defaultAttack]) {
