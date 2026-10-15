@@ -89,7 +89,7 @@ describe('projectile patterns: the gems with supports', () => {
     expectClose(withSupports('rainOfSteel', 'denseBlast')));
   // Two patches a use, and more of them than the ground allows at once: the oldest gives way.
   it('Rime Drift with Echoing Cast (the cap on patches)', () =>
-    expectClose(withSupports('rimeDrift', 'echoingCast'), 0.88, 1.1));
+    expectClose(withSupports('rimeDrift', 'echoingCast')));
   it('Splinter Volley with Volley Split (seven shards in the same fan)', () =>
     expectClose(withSupports('splinterVolley', 'volleySplit')));
   it('Snare Shot with Piercing Shot', () => expectClose(withSupports('snareShot', 'piercingShot')));

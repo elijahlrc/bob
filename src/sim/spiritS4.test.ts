@@ -113,8 +113,9 @@ describe('the once-per-target rule, and its exceptions', () => {
     expect(t.hits / t.uses).toBeGreaterThan(1.5);
     const c = new Character(holding('sword_3', ['splinterVolley']), {});
     const p = c.profile(c.primary, 0);
-    expect(volleyHits(p, 1)).toBeGreaterThan(1.5);
-    expect(volleyHits(p, 6)).toBeLessThan(volleyHits(p, 1));
+    // (At the distance of the sim above: the shards of the fan pass within the target's width only this close.)
+    expect(volleyHits(p, 0.9)).toBeGreaterThan(1.5);
+    expect(volleyHits(p, 6)).toBeLessThan(volleyHits(p, 0.9));
   });
 });
 
