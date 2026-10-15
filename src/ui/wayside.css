@@ -216,3 +216,6 @@
   background: rgba(120, 140, 200, 0.07);
   font-size: 14px;
 }
+.stop-body .ix-search {
+  width: 100%;
+}

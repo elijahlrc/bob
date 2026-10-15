@@ -17,6 +17,7 @@ import { blessingDef } from '../data/blessings';
 import { REPRIEVES } from '../data/reprieves';
 import { cartCost, cartProblem, saleStock, shrineBlessings } from '../run/stops';
 import { reprieveBlocker } from '../run/reprieves';
+import { searchText } from '../run/inventoryOps';
 import { waysideOf } from '../run/wayside';
 import { ReprieveCard } from './Satchel';
 import { WareCard } from './WareCard';
@@ -130,10 +131,24 @@ function Awlsmith({
 }) {
   const items = awlsmithItems(run);
   const worn = new Set(Object.values(run.build.equipment).map((i) => i?.uid));
+  const nWorn = items.filter((i) => worn.has(i.uid)).length;
+  const [show, setShow] = useState<'worn' | 'carried' | 'all'>(nWorn ? 'worn' : 'all');
+  const [search, setSearch] = useState('');
   const chosen = items.find((i) => i.uid === itemUid);
   const dust = run.dust;
   if (!items.length)
     return <div class="muted">None of your items has room for another socket.</div>;
+  const q = search.trim().toLowerCase();
+  const shown = items.filter(
+    (i) =>
+      (show === 'all' || worn.has(i.uid) === (show === 'worn')) &&
+      (!q || searchText(i).includes(q)),
+  );
+  const chips: [typeof show, string, number][] = [
+    ['worn', 'Worn', nWorn],
+    ['carried', 'Carried', items.length - nWorn],
+    ['all', 'All', items.length],
+  ];
   const row = (it: Item) => (
     <button
       key={it.uid}
@@ -149,7 +164,30 @@ function Awlsmith({
   );
   return (
     <div class="stop-body">
-      <div class="stop-list">{items.map(row)}</div>
+      <div class="stop-kinds">
+        {chips.map(([id, name, n]) => (
+          <button
+            key={id}
+            class={'btn small' + (id === show ? ' on' : '')}
+            onClick={() => setShow(id)}
+          >
+            {name} ({n})
+          </button>
+        ))}
+      </div>
+      <input
+        class="ix-search"
+        type="search"
+        placeholder="Search items"
+        aria-label="Search items"
+        value={search}
+        onInput={(e) => setSearch((e.target as HTMLInputElement).value)}
+      />
+      <div class="stop-list">
+        {shown.map(row)}
+        {!shown.length && <div class="muted">Nothing here. Try another filter.</div>}
+      </div>
+      {chosen && !shown.includes(chosen) && <div class="muted">Chosen: {itemTitle(chosen)}</div>}
       {chosen && awlsmithRoom(chosen) > 1 && (
         <div class="stop-extra">
           <span>Extra sockets:</span>

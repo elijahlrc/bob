@@ -8,6 +8,7 @@ change, and our own names only. Dash bullets under plain headings.
 
 - The game is now called Battle of Builds on the title screen.
 - The title screen now has a link to the game's Discord server, with an invitation to join and give feedback.
+- The Awlsmith lists your worn items first, with Worn, Carried and All filters and a search box, so it is usable on a phone.
 
 ## 2026-10-14
 
