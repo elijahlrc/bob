@@ -1,4 +1,11 @@
 import { skillRange, type DeployKind, type SkillChoice } from '../calc/character';
+import {
+  DEPLOY_SECONDS,
+  TOTEM_FIRST_SHOT,
+  deployCap,
+  deploySecondsOf,
+  totemInterval,
+} from '../calc/deploy';
 import { levelValue } from '../calc/gems';
 import type { SkillProfile } from '../calc/skill';
 import { actorById, fire, segmentDist } from './actions';
@@ -52,13 +59,8 @@ export type Deployable = {
   };
 };
 
-/** How long each kind of deployable stands, in seconds (the skill bar counts down over this). */
-export const DEPLOY_SECONDS: Record<DeployKind, number> = {
-  totem: 10,
-  brand: 12,
-  trap: 8,
-  mine: 14,
-};
+// The numbers the calc sheet plans with too live in calc/deploy.ts.
+export { DEPLOY_SECONDS, deployCap, deploySecondsOf };
 /** Distance at which an enemy sets off a trap, and at which a mine is set off. */
 export const TRAP_RADIUS = 1.6;
 export const MINE_RADIUS = 3.5;
@@ -66,8 +68,6 @@ export const MINE_ARM = 0.6;
 /** Seconds between a mine being set off and going, unless the skill says otherwise; and between the mines of a chain. */
 const DETONATION = 0.25;
 const CHAIN_GAP = 0.25;
-/** How many sets of traps or mines can lie about at once (a set is as many as the skill puts down together). */
-const SETS = 3;
 /** Where a placed totem stands, toward the target, in tiles from the character. */
 const TOTEM_OFFSET = 1.5;
 /** A mine looks for something to hit this far from itself, in tiles. */
@@ -92,24 +92,10 @@ export function deployedCount(w: World, key: string, nearOnly = false): number {
   return n;
 }
 
-/** How many of a deploying skill's totems, brands, traps or mines may stand at once. */
-export function deployCap(c: SkillChoice, prof: SkillProfile): number {
-  return c.deploy === 'totem' || c.deploy === 'brand' ? prof.deployCount : prof.deployCount * SETS;
-}
-
 /** Whether the skill has all it can have down already, near the character: the AI uses another skill meanwhile. */
 export function deployFull(w: World, c: SkillChoice, prof: SkillProfile): boolean {
   if (!c.deploy) return false;
   return deployedCount(w, c.key, true) >= deployCap(c, prof);
-}
-
-/** How long what a skill puts down stands: its own length, or a support's, or the kind's usual. */
-export function deploySecondsOf(c: SkillChoice, prof: SkillProfile): number {
-  const base =
-    prof.deploySeconds > 0
-      ? prof.deploySeconds
-      : (c.skill.deploySeconds ?? DEPLOY_SECONDS[c.deploy!]);
-  return c.deploy === 'trap' || c.deploy === 'mine' ? base : base * prof.skillDuration;
 }
 
 const enemies = (w: World): Actor[] =>
@@ -201,7 +187,7 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
       x: spot.x,
       y: spot.y,
       t: seconds,
-      fireT: c.deploy === 'mine' ? MINE_ARM : c.deploy === 'trap' ? 0.3 : 0.4,
+      fireT: c.deploy === 'mine' ? MINE_ARM : c.deploy === 'trap' ? 0.3 : TOTEM_FIRST_SHOT,
       aura,
     });
     w.events.push({ t: 'deploy', id, kind: c.deploy!, x: spot.x, y: spot.y, end: false });
@@ -553,7 +539,7 @@ export function tickDeployables(w: World, dt: number): void {
           if (best) {
             shoot(w, d, c, best);
             // A ballista attacks at half speed.
-            d.fireT = Math.max(0.2, prof.useTime * (c.skill.ballista ? 2 : 1));
+            d.fireT = totemInterval(c, prof);
           } else d.fireT = 0.1;
         }
       } else {

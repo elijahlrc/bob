@@ -123,6 +123,8 @@ import {
 import { referenceMonster } from './monster';
 import { LEGACY, statLevel, type Difficulty } from '../data/difficulty';
 import { buildProfile, formedProfile, type HandStats, type SkillProfile } from './skill';
+import { TOTEM_FIRST_SHOT, deploySecondsOf, totemInterval } from './deploy';
+import { planRotation, type Plan, type PlanSkill } from './rotation';
 
 export type CalcConfig = {
   /** Conditions assumed true (calc engine toggles). */
@@ -428,6 +430,8 @@ export class Character {
   /** The skills the strategy has switched off. */
   readonly unused: RotationEntry<SkillChoice>[];
   readonly defaultAttack: SkillChoice;
+  /** The rotation plans made so far, by conditions and kind of fight. */
+  private readonly plans = new Map<string, Plan>();
   readonly hands: HandStats[];
   readonly dualWielding: boolean;
   /** Tags of the weapons held (staff, bow, twoHand, ...). */
@@ -1498,6 +1502,8 @@ export class Character {
     resourceTaken = 0,
     /** The share of the character's time the skill has: secondary casts take the rest. */
     timeShare = 1,
+    /** What the rotation plan gives the skill (Character.plan): the times it fires a second, and the uses a second that are paid for. */
+    planned?: { fires: number; acts: number },
   ): SkillSheet {
     // A projectile that changes form with distance has changed by the time it reaches a target that far (Frost Lance).
     const p0 = this.profile(choice, conds);
@@ -1522,10 +1528,11 @@ export class Character {
       p = { ...p, doubleChance: Math.min(1, p.doubleChance + (p.mineDouble * deployN) / 100) };
     // A skill with a cooldown of its own is used as often as the cooldown (and the charges that skip it) allow; the weapon fills the rest.
     const cdRate =
-      usesOverride === undefined && !choice.deploy && choice.gemUid !== null
+      usesOverride === undefined && !planned && !choice.deploy && choice.gemUid !== null
         ? this.cooldownRate(choice, conds)
         : undefined;
     const usesPerSec =
+      planned?.fires ??
       usesOverride ??
       (cdRate !== undefined
         ? Math.min(timeShare / p.useTime, cdRate)
@@ -1577,7 +1584,7 @@ export class Character {
         (timeShare - usesPerSec * p.useTime) *
         0.9;
     // While its totems and brands stand and shoot, the character itself fights with its weapon.
-    if (standing && usesOverride === undefined && choice.gemUid !== null)
+    if (standing && usesOverride === undefined && !planned && choice.gemUid !== null)
       hitDps += this.skillSheet(this.defaultAttack, target, conds).hitDps * 0.9;
     const dotDps = this.skillDotDps(choice, p, t, usesPerSec, ign);
     const ailmentDps = ign + bl + po + dotDps;
@@ -1585,11 +1592,11 @@ export class Character {
     // Sustain: the share of uses the resource regeneration alone can pay for. It is information only: the DPS above is
     // the skill at full rate, since flasks, uniques and the tree all change mana in ways a sheet cannot foresee.
     let sustain = 1;
-    if (p.cost > 0 && choice.gemUid !== null && usesOverride === undefined) {
+    if (p.cost > 0 && choice.gemUid !== null && (usesOverride === undefined || planned)) {
       const d = this.defence(conds);
       const regen = Math.max(0, (choice.costsLife ? d.lifeRegen : d.manaRegen) - resourceTaken);
       // A deployed skill is paid for when it is put down, not at each of its shots.
-      const paid = choice.deploy ? timeShare / p.useTime : usesPerSec;
+      const paid = planned ? planned.acts : choice.deploy ? timeShare / p.useTime : usesPerSec;
       sustain = Math.min(1, regen / (p.cost * paid));
     }
     return {
@@ -1767,7 +1774,11 @@ export class Character {
    * Uses a second that a skill's own cooldown allows, counting the charges that skip it: each use gains charges at the skill's
    * chance, and each charge spent buys one more use. Undefined for a skill with no cooldown.
    */
-  cooldownRate(choice: SkillChoice, conds: number = this.configConds): number | undefined {
+  cooldownRate(
+    choice: SkillChoice,
+    conds: number = this.configConds,
+    capped = true,
+  ): number | undefined {
     const cd0 = choice.skill.cooldown;
     if (cd0 === undefined) return undefined;
     const p = this.profile(choice, conds);
@@ -1783,7 +1794,7 @@ export class Character {
       const gain = (chance / 100) * (1 + p.repeats);
       rate /= Math.max(0.05, 1 - gain / b.n);
     }
-    return Math.min(rate, 1 / p.useTime);
+    return capped ? Math.min(rate, 1 / p.useTime) : rate;
   }
 
   /** Seconds before a secondary skill can be cast again (EXPANSION 5.5a). */
@@ -1801,41 +1812,82 @@ export class Character {
     );
   }
 
+  /** What the rotation plan needs of a skill (docs/SHEET-AUDIT.md). */
+  private planSkill(choice: SkillChoice, conds: number, pause: number): PlanSkill {
+    const p = this.profile(choice, conds);
+    const rate = this.cooldownRate(choice, conds, false);
+    const stands = choice.deploy === 'totem' || choice.deploy === 'brand';
+    return {
+      key: choice.key,
+      useTime: p.useTime,
+      pause,
+      cooldown:
+        rate === undefined
+          ? undefined
+          : { seconds: 1 / Math.max(1e-3, rate), uses: choice.skill.cooldownUses ?? 1 },
+      standing: stands
+        ? {
+            count: p.deployCount,
+            seconds: deploySecondsOf(choice, p),
+            firstShot: TOTEM_FIRST_SHOT,
+            interval: totemInterval(choice, p),
+          }
+        : undefined,
+    };
+  }
+
   /**
-   * How the character's time divides. A secondary is cast, then the primary is used until the cooldown has
-   * run out (whole uses: an action in progress is never cut short), and then it is cast again. Its cast takes
-   * its use time out of the primary's.
+   * What the character does with its time in a kind of fight (docs/SHEET-AUDIT.md): how many times a second it uses each skill and
+   * the weapon, played out the way the sim chooses (`planRotation`). The utility skills come in their order at their own
+   * intervals; the periodic damage skills with the reach of the main skill, by their pauses or cooldowns; the main skills that hold in
+   * this fight; and the weapon where nothing else can be used.
    */
-  private secondaryLoad(
-    conds: number,
-    scenario: Scenario = 'pack',
-  ): { choice: SkillChoice; cd: number; rate: number; busy: number }[] {
-    const main = this.mainFor(scenario);
-    const p0 = this.profile(main, conds);
-    const reach = skillRange(p0);
-    // The character stands where the main skill reaches: a periodic skill with less reach is counted as never cast.
-    const list = this.rotation
-      .filter(
-        (e) =>
-          e.role === 'periodic' &&
-          !e.choice.skill.utility &&
-          whenFits(e.when, scenario) &&
-          skillRange(this.profile(e.choice, conds)) >= reach - 0.05,
-      )
-      .map((e) => e.choice);
-    if (!list.length) return [];
-    const u = p0.useTime;
-    const rows = list.map((choice) => {
-      const p = this.profile(choice, conds);
-      const cd = Math.max(this.cooldownOf(choice, conds), p.useTime);
-      const cycle = p.useTime + Math.ceil((cd - p.useTime) / u - 1e-9) * u;
-      const rate = 1 / cycle;
-      return { choice, cd, rate, busy: rate * p.useTime };
+  plan(conds: number = this.configConds, scenario: Scenario = 'pack'): Plan {
+    const k = `${conds}|${scenario}`;
+    let plan = this.plans.get(k);
+    if (plan) return plan;
+    const reach = skillRange(this.profile(this.mainFor(scenario), conds));
+    const gap = new Map(this.utilityLoad(conds, scenario).map((u) => [u.choice.key, 1 / u.rate]));
+    const rotation: (PlanSkill & { utility: boolean })[] = [];
+    for (const e of this.rotation) {
+      if (!whenFits(e.when, scenario)) continue;
+      const c = e.choice;
+      if (c.skill.utility) {
+        const every = gap.get(c.key);
+        // A utility skill is cast at its own interval (a blink's cooldown is shorter than the pause the character keeps).
+        if (every !== undefined)
+          rotation.push({ ...this.planSkill(c, conds, every), cooldown: undefined, utility: true });
+      } else if (e.role === 'periodic' && skillRange(this.profile(c, conds)) >= reach - 0.05)
+        rotation.push({ ...this.planSkill(c, conds, this.cooldownOf(c, conds)), utility: false });
+    }
+    const mains = this.mains
+      .filter((e) => whenFits(e.when, scenario))
+      .map((e) => this.planSkill(e.choice, conds, 0));
+    plan = planRotation({
+      rotation,
+      mains,
+      weapon: this.profile(this.defaultAttack, conds).useTime,
     });
-    // Never starve the primary entirely.
-    const total = rows.reduce((a, r) => a + r.busy, 0);
-    if (total <= 0.9) return rows;
-    return rows.map((r) => ({ ...r, rate: (r.rate * 0.9) / total, busy: (r.busy * 0.9) / total }));
+    this.plans.set(k, plan);
+    return plan;
+  }
+
+  /** What the plan gives a skill, as `skillSheet` takes it: the times it fires a second, and the uses a second the character pays for. */
+  planned(
+    choice: SkillChoice,
+    conds: number = this.configConds,
+    scenario: Scenario = 'pack',
+  ): { fires: number; acts: number } {
+    const plan = this.plan(conds, scenario);
+    if (choice.gemUid === null) return { fires: plan.weapon, acts: plan.weapon };
+    const acts = plan.acts[choice.key] ?? 0;
+    const p = this.profile(choice, conds);
+    // A totem or a brand fires on its own for as long as it stands; a trap or a mine goes off as many times as it was set.
+    if (choice.deploy === 'totem' || choice.deploy === 'brand')
+      return { fires: plan.shots[choice.key] ?? 0, acts };
+    if (choice.deploy)
+      return { fires: acts * p.deployCount * (p.deployScatter ? SCATTER_HIT_SHARE : 1), acts };
+    return { fires: acts, acts };
   }
 
   /** Damage a second of the minions the character's summon skills keep standing, less the time they spend fallen (they are assumed in reach). */
@@ -1895,31 +1947,75 @@ export class Character {
     });
   }
 
-  /** The share of time the primary skill has left after the secondary casts and the utility skills. */
+  /** The share of time the main skill of a kind of fight has, after the other skills and the weapon. */
   primaryShare(conds: number = this.configConds, scenario: Scenario = 'pack'): number {
-    const u = this.utilityLoad(conds, scenario).reduce((a, r) => a + r.busy, 0);
-    return Math.max(
-      0.1,
-      1 - this.secondaryLoad(conds, scenario).reduce((a, r) => a + r.busy, 0) - u,
+    const main = this.mainFor(scenario);
+    const plan = this.plan(conds, scenario);
+    return Math.max(0.1, main.gemUid === null ? plan.busy.weapon : (plan.busy[main.key] ?? 0));
+  }
+
+  /** The mana (or life) a second that the rotation's other skills and the triggered ones take from the main skill's pool. */
+  private resourceTaken(conds: number, scenario: Scenario, target?: TargetState): number {
+    const main = this.mainFor(scenario);
+    let taken = 0;
+    for (const t of this.triggerSheets(conds, target, scenario)) taken += t.manaPerSec;
+    for (const t of this.secondarySheets(conds, target, scenario)) taken += t.manaPerSec;
+    for (const r of this.utilityLoad(conds, scenario))
+      if (r.choice !== main) taken += this.profile(r.choice, conds).cost * r.rate;
+    return taken;
+  }
+
+  /** The main skill of a kind of fight, at the rate the rotation gives it. */
+  mainSheet(
+    conds: number = this.configConds,
+    scenario: Scenario = 'pack',
+    target?: TargetState,
+  ): SkillSheet {
+    const main = this.mainFor(scenario);
+    return this.skillSheet(
+      main,
+      target,
+      conds,
+      undefined,
+      this.resourceTaken(conds, scenario, target),
+      1,
+      this.planned(main, conds, scenario),
     );
   }
 
+  /**
+   * The other skills the rotation uses in a kind of fight: the periodic damage skills, a second main skill that stands in while the
+   * first waits, and the weapon where nothing else can be used.
+   */
   secondarySheets(
     conds: number = this.configConds,
     target?: TargetState,
     scenario: Scenario = 'pack',
   ): SecondarySheet[] {
-    return this.secondaryLoad(conds, scenario).map(({ choice, cd, rate }) => {
-      const sheet = this.skillSheet(choice, target, conds, rate);
-      return {
+    const main = this.mainFor(scenario);
+    const plan = this.plan(conds, scenario);
+    const out: SecondarySheet[] = [];
+    const add = (choice: SkillChoice, pause: number) => {
+      const planned = this.planned(choice, conds, scenario);
+      if (planned.acts < 1e-4 && planned.fires < 1e-4) return;
+      const sheet = this.skillSheet(choice, target, conds, undefined, 0, 1, planned);
+      out.push({
         key: choice.key,
         skill: sheet,
-        cooldown: cd,
-        usesPerSec: rate,
+        cooldown: pause,
+        usesPerSec: planned.acts,
         dps: sheet.totalDps,
-        manaPerSec: this.profile(choice, conds).cost * rate,
-      };
-    });
+        manaPerSec: this.profile(choice, conds).cost * planned.acts,
+      });
+    };
+    for (const e of this.mains)
+      if (e.choice !== main && whenFits(e.when, scenario))
+        add(e.choice, 1 / Math.max(1e-3, plan.acts[e.choice.key] ?? 0));
+    for (const e of this.rotation)
+      if (e.role === 'periodic' && !e.choice.skill.utility && whenFits(e.when, scenario))
+        add(e.choice, this.cooldownOf(e.choice, conds));
+    if (main.gemUid !== null && plan.weapon > 0.01) add(this.defaultAttack, 1 / plan.weapon);
+    return out;
   }
 
   /**
@@ -1941,7 +2037,8 @@ export class Character {
       conds,
       undefined,
       0,
-      this.primaryShare(conds, scenario),
+      1,
+      this.planned(main, conds, scenario),
     );
     for (const src of this.triggers) {
       const d = src.def;
@@ -1979,19 +2076,25 @@ export class Character {
    * The character sheet. The damage is that of the rotation against a pack; when some skill waits for a kind of fight, the
    * rotation against a boss is worked out too, and `scenarios` holds both totals (comparisons weigh them, see `sheetDps`).
    */
-  sheet(conds: number = this.configConds, scenario?: Scenario): CharacterSheet {
-    if (scenario) return this.sheetFor(conds, scenario);
-    const pack = this.sheetFor(conds, 'pack');
+  sheet(
+    conds: number = this.configConds,
+    scenario?: Scenario,
+    target?: TargetState,
+  ): CharacterSheet {
+    if (scenario) return this.sheetFor(conds, scenario, target);
+    const pack = this.sheetFor(conds, 'pack', target);
     const packDps = scenarioDps(pack);
-    const bossDps = this.splitsByFight ? scenarioDps(this.sheetFor(conds, 'boss')) : packDps;
+    const bossDps = this.splitsByFight
+      ? scenarioDps(this.sheetFor(conds, 'boss', target))
+      : packDps;
     return { ...pack, scenarios: { pack: packDps, boss: bossDps } };
   }
 
-  private sheetFor(conds: number, scenario: Scenario): CharacterSheet {
+  private sheetFor(conds: number, scenario: Scenario, target?: TargetState): CharacterSheet {
     const d = this.defence(conds);
     const main = this.mainFor(scenario);
-    const triggered = this.triggerSheets(conds, undefined, scenario);
-    const secondary = this.secondarySheets(conds, undefined, scenario);
+    const triggered = this.triggerSheets(conds, target, scenario);
+    const secondary = this.secondarySheets(conds, target, scenario);
     const triggeredMana =
       triggered.reduce((a, t) => a + t.manaPerSec, 0) +
       secondary.reduce((a, t) => a + t.manaPerSec, 0) +
@@ -1999,6 +2102,7 @@ export class Character {
         (a, r) => a + this.profile(r.choice, conds).cost * r.rate,
         0,
       );
+    const planned = this.planned(main, conds, scenario);
     return {
       level: this.build.level,
       attrs: this.attrs,
@@ -2018,14 +2122,7 @@ export class Character {
       moveSpeed: d.moveSpeed,
       lifeRegen: d.lifeRegen,
       manaRegen: d.manaRegen,
-      skill: this.skillSheet(
-        main,
-        undefined,
-        conds,
-        undefined,
-        triggeredMana,
-        this.primaryShare(conds, scenario),
-      ),
+      skill: this.skillSheet(main, target, conds, undefined, triggeredMana, 1, planned),
       triggered,
       triggeredDps: triggered.reduce((a, t) => a + t.dps, 0),
       hexes: this.sheetHexes,

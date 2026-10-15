@@ -591,8 +591,10 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     hands,
     useTime,
     repeats: Math.max(0, Math.round(db.sum('base', 'repeats', baseCtx))),
-    pulses:
-      beh.kind === 'ground'
+    // A crystal stands, then bursts once: it is a single hit, not a pulse of the ground each interval.
+    pulses: skill.crystal
+      ? 1
+      : beh.kind === 'ground'
         ? Math.max(1, Math.floor((beh.duration * db.mult('skillDuration', baseCtx)) / beh.interval))
         : (skill.spin?.hits ?? 1),
     deployCount: Math.max(1, Math.round(1 + db.sum('base', 'deployCount', baseCtx))),

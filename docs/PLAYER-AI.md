@@ -165,6 +165,12 @@ _Strategy:_
 The Character sheet and the Strategy tab show the DPS of your rotation **against a pack** and **against a boss**.
 Item, gem and craft comparisons weigh the two 70% to 30%.
 
+The sheet gets there by playing out the same choices as above (section 4.1) over a few minutes: which skill is used, how often, and
+what fills the gaps a main skill with a cooldown leaves (another main skill, then a periodic skill that is ready, then the
+weapon). So the **weapon appears on the sheet as its own line, Default Attack, only when something leaves it time**: a main skill
+on a cooldown, totems that stand while you wait. A character whose main skill is always ready never swings it, and its weapon's
+damage does not move the figure. It counts one target, with free mana (docs/SHEET-AUDIT.md).
+
 ### 4.3 Where it stands
 
 - **Melee:** walks up until the target is within the skill's reach plus both body sizes.

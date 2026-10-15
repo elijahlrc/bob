@@ -1,4 +1,4 @@
-import type { CharacterSheet } from '../calc/character';
+import { scenarioDps, type CharacterSheet } from '../calc/character';
 import { HEXES, hexText } from '../data/hexes';
 
 const f0 = (v: number) => Math.round(v).toLocaleString();
@@ -94,7 +94,10 @@ export function Sheet({ s }: { s: CharacterSheet }) {
           <tbody>
             <tr>
               <td colSpan={2}>
-                <b>Periodic skills</b> <span class="muted">(used every so often)</span>
+                <b>Other skills in the rotation</b>{' '}
+                <span class="muted">
+                  (periodic skills, a second main skill, the weapon where nothing else can be used)
+                </span>
               </td>
             </tr>
             {s.secondary.map((t) => (
@@ -106,8 +109,8 @@ export function Sheet({ s }: { s: CharacterSheet }) {
               </tr>
             ))}
             <tr>
-              <td>Total DPS with periodic skills</td>
-              <td>{f1(k.totalDps + s.secondaryDps + s.triggeredDps)}</td>
+              <td>Total DPS of the rotation</td>
+              <td>{f1(scenarioDps(s))}</td>
             </tr>
           </tbody>
         </table>
@@ -149,7 +152,7 @@ export function Sheet({ s }: { s: CharacterSheet }) {
             ))}
             <tr>
               <td>Total DPS with triggered skills</td>
-              <td>{f1(k.totalDps + s.triggeredDps + s.secondaryDps)}</td>
+              <td>{f1(scenarioDps(s))}</td>
             </tr>
           </tbody>
         </table>

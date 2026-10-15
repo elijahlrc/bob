@@ -86,7 +86,8 @@ export function gemStatus(
         ch.configConds,
         undefined,
         0,
-        ch.primaryShare(),
+        1,
+        ch.planned(a),
       ).sustain;
       if (sustain < 0.9)
         return {
@@ -210,14 +211,7 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
     const g = run.build.equipment[sel.slot]?.sockets[sel.socket];
     return g ? { gemId: g.gemId, level: levelOf(g.uid), uid: g.uid } : null;
   })();
-  const summary = ch.skillSheet(
-    ch.primary,
-    undefined,
-    ch.configConds,
-    undefined,
-    0,
-    ch.primaryShare(),
-  );
+  const summary = ch.mainSheet();
   const secondary = ch.secondarySheets();
   return (
     <div class="skills-wrap">

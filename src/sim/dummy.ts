@@ -78,6 +78,12 @@ export function createDummyWorld(
     maxTime?: number;
     /** The arena's width and height in tiles (30 by default). */
     size?: number;
+    /** What the dummy counts as (a boss makes the conditions of the rare and boss skills hold). */
+    rarity?: Actor['rarity'];
+    /** Other dummies standing just behind the first, so that a pack is near the character; the character still fights the first. */
+    bystanders?: number;
+    /** The dummies cannot be moved (pushed by the character, knocked back): the measuring tools set it. */
+    fixed?: boolean;
   },
 ): { world: World; dummy: Actor } {
   const size = opts.size ?? 30;
@@ -125,18 +131,35 @@ export function createDummyWorld(
     xp: 0,
     opts: { maxTime: opts.maxTime ?? 600, freeResources: true, autoAbandonAt: Infinity },
   });
-  const dummy = spawnMonster(
-    world,
-    { type: 'warrior', variant: 'none', rarity: 'normal', level: 1, mods: [] },
-    start.x + opts.distance,
-    start.y,
-    0,
-    0,
-    'Training Dummy',
-  );
-  dummy.dummy = true;
-  dummy.def = dummyDefence(opts.defence);
-  dummy.life = dummy.def.maxLife;
-  dummy.r = 0.5;
+  const stand = (dx: number, dy: number, name: string): Actor => {
+    const d = spawnMonster(
+      world,
+      { type: 'warrior', variant: 'none', rarity: 'normal', level: 1, mods: [] },
+      start.x + dx,
+      start.y + dy,
+      0,
+      0,
+      name,
+    );
+    d.dummy = true;
+    d.def = dummyDefence(opts.defence);
+    d.life = d.def.maxLife;
+    d.r = 0.5;
+    if (opts.fixed) d.stationary = true;
+    return d;
+  };
+  const dummy = stand(opts.distance, 0, 'Training Dummy');
+  if (opts.rarity) dummy.rarity = opts.rarity;
+  // The others stand a little farther from the character and to the sides, so the first is always the nearest.
+  for (let i = 0; i < (opts.bystanders ?? 0); i++) {
+    const side = i % 2 === 0 ? 1 : -1;
+    const by = stand(
+      opts.distance + 0.6 + Math.floor(i / 2) * 0.4,
+      side * (1.2 + Math.floor(i / 2)),
+      'Bystander',
+    );
+    // They take nothing, so that what is measured is the damage to the one the character fights.
+    by.def = dummyDefence({ immune: [true, true, true, true, true], immuneChaos: true });
+  }
   return { world, dummy };
 }

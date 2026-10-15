@@ -354,9 +354,9 @@ function addLeech(
   if (arr.length < 40) arr.push(amount);
 }
 
-/** An enemy struck is thrown back, away from the attacker, up to the distance or the first wall; bosses stand fast. */
+/** An enemy struck is thrown back, away from the attacker, up to the distance or the first wall; bosses stand fast, and so do training dummies that are fixed (src/sim/dummy.ts). */
 export function knockBack(w: World, src: Actor, dst: Actor, dist: number): void {
-  if (!dst.alive || dst.isPlayer || dst.rarity === 'boss') return;
+  if (!dst.alive || dst.isPlayer || dst.rarity === 'boss' || (dst.dummy && dst.stationary)) return;
   const ang = Math.atan2(dst.y - src.y, dst.x - src.x);
   const step = 0.25;
   let x = dst.x;

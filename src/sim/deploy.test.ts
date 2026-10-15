@@ -49,7 +49,9 @@ describe('deployables', () => {
     const three = new Character(build(['flameBolt', 'standingCast', 'totemChoir']), {
       areaLevel: 50,
     }).sheet();
-    expect(three.skill.usesPerSec).toBeCloseTo(3 * one.skill.usesPerSec, 5);
+    // Three times the shots, less the moments a new totem takes to go up as an old one ends.
+    expect(three.skill.usesPerSec / one.skill.usesPerSec).toBeGreaterThan(2.85);
+    expect(three.skill.usesPerSec / one.skill.usesPerSec).toBeLessThan(3.01);
   });
 
   it('a trap lies until an enemy steps close, then goes off once', () => {
