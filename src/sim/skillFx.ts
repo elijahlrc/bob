@@ -52,6 +52,7 @@ export function lineWave(w: World, a: Actor, act: Action): void {
     y2: a.y + sin * len,
     dtype,
     width: wide,
+    skill: p.skill.id,
   });
   const struck = new Set<number>();
   const landed: Actor[] = [];
@@ -69,7 +70,7 @@ export function lineWave(w: World, a: Actor, act: Action): void {
   }
   if (spec.burst) {
     const r = spec.burst * p.radiusMult;
-    w.events.push({ t: 'explode', x: act.aimX, y: act.aimY, r, dtype });
+    w.events.push({ t: 'explode', x: act.aimX, y: act.aimY, r, dtype, skill: p.skill.id });
     for (const e of enemiesOf(w, a))
       if (!struck.has(e.id) && Math.hypot(e.x - act.aimX, e.y - act.aimY) <= r + e.r) {
         struck.add(e.id);
@@ -80,7 +81,7 @@ export function lineWave(w: World, a: Actor, act: Action): void {
   const centres = spec.shockAt === 'target' ? [{ x: act.aimX, y: act.aimY }] : landed;
   const r = spec.shockRadius * p.radiusMult;
   for (const c of centres) {
-    w.events.push({ t: 'explode', x: c.x, y: c.y, r, dtype });
+    w.events.push({ t: 'explode', x: c.x, y: c.y, r, dtype, skill: p.skill.id });
     for (const e of enemiesOf(w, a))
       if (!struck.has(e.id) && Math.hypot(e.x - c.x, e.y - c.y) <= r + e.r) {
         struck.add(e.id);
@@ -126,7 +127,7 @@ export function projectileFx(w: World, pr: Projectile, dt: number): void {
     if (pr.pulseT <= 0) {
       pr.pulseT += sk.pulse.interval;
       const r = sk.pulse.radius * pr.profile.radiusMult;
-      w.events.push({ t: 'explode', x: pr.x, y: pr.y, r, dtype: 1 });
+      w.events.push({ t: 'explode', x: pr.x, y: pr.y, r, dtype: 1, skill: pr.profile.skill.id });
       for (const e of w.actors)
         if (
           !e.isPlayer &&
@@ -258,7 +259,7 @@ function detonate(w: World, e: Actor): void {
   const spec = prof.skill.charge!;
   const q = scaleProfile(prof, (st.n * spec.perCharge) / 100);
   const r = spec.radius * prof.radiusMult;
-  w.events.push({ t: 'explode', x: e.x, y: e.y, r, dtype: mainTypeOf(prof) });
+  w.events.push({ t: 'explode', x: e.x, y: e.y, r, dtype: mainTypeOf(prof), skill: prof.skill.id });
   w.inFx = true;
   if (e.alive) hit(w, w.player, e, q, 0, Math.hypot(e.x - w.player.x, e.y - w.player.y));
   for (const o of w.actors)
@@ -377,7 +378,14 @@ function tickVortex(w: World, dt: number): void {
       })),
     };
     const r = spec.radius * base.radiusMult;
-    w.events.push({ t: 'explode', x: p.x, y: p.y, r, dtype: mainTypeOf(base) });
+    w.events.push({
+      t: 'explode',
+      x: p.x,
+      y: p.y,
+      r,
+      dtype: mainTypeOf(base),
+      skill: base.skill.id,
+    });
     for (const e of w.actors)
       if (!e.isPlayer && e.alive && e.phaseT <= 0 && Math.hypot(e.x - p.x, e.y - p.y) <= r + e.r)
         hit(w, p, e, q, 0, Math.hypot(e.x - p.x, e.y - p.y));
@@ -406,7 +414,14 @@ function tickMarkers(w: World, dt: number): void {
   w.markers = [];
   for (const m of list) {
     const r = m.profile.skill.markers!.radius * m.profile.radiusMult;
-    w.events.push({ t: 'explode', x: m.x, y: m.y, r, dtype: mainTypeOf(m.profile) });
+    w.events.push({
+      t: 'explode',
+      x: m.x,
+      y: m.y,
+      r,
+      dtype: mainTypeOf(m.profile),
+      skill: m.profile.skill.id,
+    });
     for (const e of w.actors)
       if (!e.isPlayer && e.alive && e.phaseT <= 0 && Math.hypot(e.x - m.x, e.y - m.y) <= r + e.r)
         hit(w, w.player, e, m.profile, m.hand, Math.hypot(e.x - w.player.x, e.y - w.player.y));
@@ -567,7 +582,7 @@ function tickFuses(w: World, dt: number): void {
     // Each arrow in widens the blast and, for the ignite, makes it hit harder.
     const extra = Math.min(levelValue(spec.maxExtra, p0.skill.level), spec.radiusPer * (n - 1));
     const r = (spec.radius + extra) * p0.radiusMult;
-    w.events.push({ t: 'explode', x: f.x, y: f.y, r, dtype: 3 });
+    w.events.push({ t: 'explode', x: f.x, y: f.y, r, dtype: 3, skill: p0.skill.id });
     const grow = 1 + (spec.ignitePer / 100) * (n - 1);
     const hands = new Map<SkillProfile, SkillProfile>();
     for (const a of f.arrows) {
@@ -873,7 +888,14 @@ export function novaOnBolts(w: World, a: Actor, act: Action): boolean {
   const r = (b.kind === 'burst' ? b.radius : 2) * p.radiusMult * (1 - spec.areaLess / 100);
   const struck = new Set<number>();
   for (const pr of bolts) {
-    w.events.push({ t: 'explode', x: pr.x, y: pr.y, r, dtype: mainType(act) });
+    w.events.push({
+      t: 'explode',
+      x: pr.x,
+      y: pr.y,
+      r,
+      dtype: mainType(act),
+      skill: p.skill.id,
+    });
     for (const e of enemiesOf(w, a))
       if (!struck.has(e.id) && e.phaseT <= 0 && Math.hypot(e.x - pr.x, e.y - pr.y) <= r + e.r) {
         struck.add(e.id);

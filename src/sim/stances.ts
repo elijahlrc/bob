@@ -116,7 +116,7 @@ export function placeBladestorm(w: World, a: Actor, act: Action): void {
     dtype: 0,
     stance: s,
   });
-  w.events.push({ t: 'explode', x: a.x, y: a.y, r, dtype: 0 });
+  w.events.push({ t: 'explode', x: a.x, y: a.y, r, dtype: 0, skill: p.skill.id });
 }
 
 export function tickBladestorm(w: World, f: import('./fields').Field, dt: number): void {

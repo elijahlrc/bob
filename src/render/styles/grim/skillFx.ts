@@ -21,6 +21,8 @@ import {
 } from '../../../sim/deploy';
 import type { Field } from '../../../sim/fields';
 import type { Actor, SimEvent, World } from '../../../sim/types';
+import { beamMotifOf, motifOf } from '../../../calc/areaLook';
+import { playMotif, tongue } from './areaMotifs';
 import { drawBuffs, type BuffMark } from './buffFx';
 import { drawLanded, fillArea, outlineArea, shapeOfExplode, type AreaShape } from './areaFx';
 
@@ -257,8 +259,25 @@ export class SkillFx {
         // A spark or a ping (a fraction of a tile) is not an area to read: it only rings.
         if (e.r < COSMETIC_R) this.wave(e.x, e.y, e.r * 0.2, Math.max(0.5, e.r), c, 0.34);
         else this.landed(shapeOfExplode(e), c);
-        if (e.dtype === 0 && e.r >= COSMETIC_R) this.cracks(e.x, e.y, e.r);
-        if (e.fall) this.rain(e.x, e.y, e.r, e.fall, c);
+        if (e.r >= COSMETIC_R) {
+          if (e.skill) {
+            // What the skill is, inside the ground it covers.
+            const motif = motifOf(e.skill, e.dtype, !!e.strip);
+            playMotif({ host: this.host, add: (t, air, draw) => this.add(t, air, draw) }, motif, {
+              x: e.x,
+              y: e.y,
+              r: e.r,
+              color: c,
+              strip: e.strip,
+              light: e.pulse,
+            });
+            if (e.fall && motif !== 'blades')
+              this.rain(e.x, e.y, e.r, e.fall === 'bolt' && e.dtype === 3 ? 'rock' : e.fall, c);
+          } else {
+            if (e.dtype === 0) this.cracks(e.x, e.y, e.r);
+            if (e.fall) this.rain(e.x, e.y, e.r, e.fall, c);
+          }
+        }
         break;
       }
       case 'cry':
@@ -274,6 +293,22 @@ export class SkillFx {
             ELEMENT_COLOR[e.dtype] ?? 0xffffff,
             0.45,
           );
+        if (e.skill && e.width) {
+          // What the band is made of (a bolt of lightning is the host's).
+          const motif = beamMotifOf(e.skill, e.dtype);
+          if (motif) {
+            const mx = (e.x + e.x2) / 2;
+            const my = (e.y + e.y2) / 2;
+            playMotif({ host: this.host, add: (t, air, draw) => this.add(t, air, draw) }, motif, {
+              x: mx,
+              y: my,
+              r: e.width / 2,
+              color: ELEMENT_COLOR[e.dtype] ?? 0xffffff,
+              strip: [e.x, e.y, e.x2, e.y2],
+              light: false,
+            });
+          }
+        }
         break;
       case 'buff':
         this.buffPulse(e.id, w);
@@ -499,13 +534,21 @@ export class SkillFx {
   }
 
   /**
-   * Arrows or bolts come down on an area (a rain, a hail): a handful fall one after another from above onto points scattered over
-   * it, each streaking down in the colour of the damage and splashing where it lands, so the skill is seen to fire its missiles.
+   * Missiles come down on an area (a rain, a hail): a handful fall one after another from above onto points scattered over it,
+   * each streaking down in the colour of the damage and splashing where it lands, so the skill is seen to fire its missiles. An
+   * arrow is a thin streak and a puff of dust; a burning rock is a ball of fire with a tail that bursts into a small flame; a
+   * bolt (a spell of lightning) is a streak with a white head.
    */
-  private rain(x: number, y: number, r: number, kind: 'arrow' | 'bolt', color: number): void {
+  private rain(
+    x: number,
+    y: number,
+    r: number,
+    look: 'arrow' | 'bolt' | 'rock',
+    color: number,
+  ): void {
     const n = Math.max(4, Math.min(12, Math.round(r * 3)));
     const FALL = 0.15;
-    const SPLASH = 0.14;
+    const SPLASH = look === 'rock' ? 0.22 : 0.14;
     for (let i = 0; i < n; i++) {
       const a = i * 2.39996 + x * 7.1;
       const d = r * Math.sqrt((i + 0.5) / n) * 0.92;
@@ -520,12 +563,33 @@ export class SkillFx {
         if (t <= FALL) {
           const u = t / FALL;
           const head = { x: ground.x - (1 - u) * 6, y: ground.y - HAND - (1 - u) * 90 };
-          const tail = { x: head.x - 2, y: head.y - (kind === 'arrow' ? 14 : 10) };
-          this.streak(g, [tail, head], color, 0.9, kind === 'arrow' ? 0.5 : 0.7);
-          if (kind === 'bolt') g.fillStyle(0xffffff, 0.95).fillCircle(head.x, head.y, 1.8);
+          if (look === 'rock') {
+            const tail = { x: head.x - 5, y: head.y - 26 };
+            this.streak(g, [tail, head], 0xff7a20, 0.8, 0.55);
+            g.fillStyle(0xff5a18, 0.9).fillCircle(head.x, head.y, 3);
+            g.fillStyle(0xffd060, 0.95).fillCircle(head.x, head.y, 1.6);
+          } else {
+            const tail = { x: head.x - 2, y: head.y - (look === 'arrow' ? 14 : 10) };
+            this.streak(g, [tail, head], color, 0.9, look === 'arrow' ? 0.5 : 0.7);
+            if (look === 'bolt') g.fillStyle(0xffffff, 0.95).fillCircle(head.x, head.y, 1.8);
+          }
         } else {
           const v = (t - FALL) / SPLASH;
-          this.ring(g, tx, ty, 0.12 + 0.3 * v, lighten(color, 0.4), 1 - v, 1.2);
+          if (look === 'rock') {
+            // A small flame stands up where it landed and gutters out.
+            const h = 11 * Math.sin(Math.PI * Math.min(1, v * 1.1));
+            tongue(g, ground.x, ground.y, 3.2, h, Math.sin(v * 14 + i) * 1.5, 1 - v * 0.6);
+            this.ring(g, tx, ty, 0.1 + 0.25 * v, 0xffa040, 0.8 * (1 - v), 1.2);
+          } else {
+            this.ring(g, tx, ty, 0.12 + 0.3 * v, lighten(color, 0.4), 1 - v, 1.2);
+            if (look === 'arrow' && v < 0.6)
+              g.fillStyle(0x8a7a68, 0.4 * (1 - v)).fillEllipse(
+                ground.x,
+                ground.y,
+                8 * v + 3,
+                3 * v + 1.5,
+              );
+          }
         }
       });
     }

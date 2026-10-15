@@ -78,3 +78,21 @@ Ranked by how much it matters to the reader.
 - Dev builds: `window.__zoom` (set it, then resize) closes the camera in on an effect; `window.__bob` is the controller; `window.__dev.step(n)` advances frames.
 - Tests: `src/sim/vfxEvents.test.ts` (the sim says what an area is), `src/render/styles/grim/areaFx.test.ts` (shapes, bodies, lobs), and `skillFx.test.ts`
   (every shape of area is outlined, drawn and gone again).
+
+## Pass 3: what an area is made of (2026-10-14)
+
+Finding: after pass 1 every area was the same outline, and the only thing that told one from another was its colour. Lightning-dtype areas
+also threw the same violet bolt sparks, and every beam, whatever it was made of, was drawn as a jagged bolt of lightning in its colour. So a plague, a
+slam and a frost burst were the same ring, and a stream of fire was a recoloured lightning bolt.
+
+Fix: each area's `explode` carries the skill that made it (`skill`; `pulse` on a later pulse of a zone) and each skill has a **motif** that plays inside
+the outline (`src/calc/areaLook.ts` names them and says in words what each looks like; `src/render/styles/grim/areaMotifs.ts` draws them; the
+table and the list of motifs are in [VISUAL_LANGUAGE.md](VISUAL_LANGUAGE.md)). 33 motifs, among them: quake, spikes (bone, stone, ice), frost bloom, ice
+nova, ice waves, flames, geyser, fireball, lava fissures, molten splat, lightning strike and storm and pillar and crackle, plague cloud, holy column,
+shrapnel, jaws, steel blades, a sweep of the caster. A skill with no motif of its own takes one by its delivery and element. Beams
+and streams are drawn as what they are (fire, rot, force, rock); lightning alone keeps the bolt. The coverage tests are `src/calc/areaLook.test.ts`
+(every skill that lands an area has its own motif; lightning motifs only for lightning skills, frost for cold, and so on) and
+`areaMotifs.test.ts` (every motif draws at every moment of its life, as a circle, a strip and a light pulse).
+
+Not changed: the monsters' own areas (they keep the pass-1 telegraphs and the old landing), the heralds (no skill on their explosions) and the
+upkeep skills.

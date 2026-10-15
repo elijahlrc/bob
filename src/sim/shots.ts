@@ -485,6 +485,7 @@ export function afterStrike(w: World, a: Actor, act: Action, struck: Actor | nul
       y: struck.y,
       r,
       dtype: dominantType(act.profile, act.hand),
+      skill: act.profile.skill.id,
     });
     for (const e of enemiesOfOwner(w, a))
       if (e.id !== struck.id && Math.hypot(e.x - struck.x, e.y - struck.y) <= r + e.r)

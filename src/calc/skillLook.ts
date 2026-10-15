@@ -229,11 +229,11 @@ export const DELIVERY_LOOK: Record<Delivery, string> = {
   orb: 'A rune circle opens at the caster, then a glowing orb leaves it, trailing sparks of its element.',
   chain: 'A rune circle, then forked arcs jump from enemy to enemy.',
   beam: 'A rune circle, then a bright jagged line from the caster through everything it hits.',
-  nova: 'A rune circle, then a ring grows outward from the caster.',
+  nova: 'A rune circle, then the ground about the caster is outlined and what the skill is runs out over it: a ring of ice shards, flame, arcs of lightning, a sweep of steel, a wave of dust.',
   blast:
-    'A rune circle, then a ring and a flash grow where the skill lands; physical blasts crack the floor.',
+    'A rune circle, then the ground it covers is outlined and what the skill is happens inside it: a slam cracks the floor and throws rubble, frost grows crystals, fire stands up in tongues, a bolt comes down, rot rises as a cloud, spears burst from the ground, steel falls.',
   field:
-    'A ring of ticks marks where it will land, then a patch stays on the ground, its marks showing the element.',
+    'A ring of ticks marks where it will land, then a patch stays on the ground, its marks showing what it is made of (embers rise, crystals glint, lightning crackles, chaos swirls).',
   wall: 'A band marked on the ground along the line, with marks flowing down it; a wall of ice raises a block of ice on every tile it holds shut and melts away when its time is up.',
   buff: 'A gold ring and rising motes; a gold mote circles you while the buff lasts.',
   warcry: 'A wide orange ring and a shake of the screen.',

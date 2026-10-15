@@ -383,6 +383,8 @@ export type SkillZone = {
   pulseT: number;
   /** Pulses still to come: duration over interval, rounded down (the calc counts the same). */
   pulsesLeft: number;
+  /** Pulses so far (the first is the blow, the rest are the zone going on). */
+  pulsed?: number;
   dtype: number;
   /** A rain with more arrows than its skill starts with: where they burst (src/sim/rain.ts); `stack`: every spot hits an enemy under it. */
   spots?: RainSpot[];
@@ -469,13 +471,26 @@ export type SimEvent =
       strip?: [number, number, number, number];
       /** Arrows or bolts come down on the area (a rain, a hail): the renderer draws them falling. */
       fall?: 'arrow' | 'bolt';
+      /** The skill that made the area: the renderer draws what that skill is (src/render/styles/grim/areaMotifs.ts). */
+      skill?: string;
+      /** A later pulse of an area that pulses (a zone, a stream): the renderer draws it lighter than the first. */
+      pulse?: boolean;
     }
   /** A shaped blast of a pattern landed (docs/ENCOUNTERS.md 4); the effect carries its shape. */
   | { t: 'blast'; e: GroundEffect }
   /** A monster began the tell of its window (a Brace). */
   | { t: 'window'; id: number; kind: string }
   /** A beam from (x, y) to (x2, y2), `width` wide where it hurts (absent: a bolt that strikes a point). */
-  | { t: 'beam'; x: number; y: number; x2: number; y2: number; dtype: number; width?: number }
+  | {
+      t: 'beam';
+      x: number;
+      y: number;
+      x2: number;
+      y2: number;
+      dtype: number;
+      width?: number;
+      skill?: string;
+    }
   | { t: 'blink'; id: number; x: number; y: number; end: boolean; dtype?: number }
   | { t: 'charge'; kind: string; count: number }
   /** Charges the character spent on purpose (to skip a cooldown, or to power a skill). */

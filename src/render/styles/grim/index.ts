@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { Rng } from '../../../core/rng';
 import { HIT_AT } from '../../../data/constants';
+import { beamMotifOf, motifOf } from '../../../calc/areaLook';
 import { factionOfSpec, leavesBody } from '../../../data/monsters';
 import { revealed } from '../../../sim/movement';
 import { telegraphs, type Telegraph } from '../../../sim/telegraph';
@@ -19,6 +20,7 @@ import { isHero, type AnimName, type FigureKind } from '../../style/figure';
 import { buildProps, FIG_PX, FRAMES, rasterFigure, type MonsterLook } from './paint';
 import { DROP_COLOR, dropLabel, dropRarity } from '../../dropLabel';
 import { CollapseFx } from './collapseFx';
+import { MOTIF_DECAL } from './areaMotifs';
 import { SkillFx, type FxHost } from './skillFx';
 import {
   EncounterFx,
@@ -1381,6 +1383,15 @@ export class GrimStyle extends StyleBase {
       }
       case 'explode': {
         const { x, y } = this.project(e.x, e.y);
+        if (e.skill) {
+          // A skill's own area: what it does there is drawn by its motif (skillFx.ts); the ground keeps its mark.
+          const decal = MOTIF_DECAL[motifOf(e.skill, e.dtype, !!e.strip)];
+          if (decal && !e.pulse && e.r >= 0.6) {
+            if (decal === 'scorch') this.addDecal(x, y + 2, 'g_scorch', false, 0.9);
+            else this.addDecal(x, y, 'g_crack', Math.random() < 0.5, 1);
+          }
+          break;
+        }
         if (e.dtype === 3) {
           this.flash(x, y, 0xff9a40, 2.2, 0.5);
           em.flame.explode(10, x, y);
@@ -1406,6 +1417,11 @@ export class GrimStyle extends StyleBase {
         const from = this.project(e.x, e.y);
         const to = this.project(e.x2, e.y2);
         const color = [0xd8d0c0, 0xc8a0ff, 0x9ad8ff, 0xff9a40, 0x9be07a][e.dtype] ?? 0xffffff;
+        // A stream of fire, of frost, of rot or of force is drawn as what it is (skillFx.ts), not as a bolt of lightning.
+        if (e.skill && e.width && beamMotifOf(e.skill, e.dtype)) {
+          this.flash(to.x, to.y - 8, color, 1, 0.12);
+          break;
+        }
         const pts: { x: number; y: number }[] = [];
         const n = 8;
         for (let i = 0; i <= n; i++)

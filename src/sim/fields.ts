@@ -125,7 +125,7 @@ export function leaveGround(w: World, a: Actor, act: Action): void {
   const marked = w.events.some(
     (e) => e.t === 'explode' && Math.hypot(e.x - x, e.y - y) < 0.2 && Math.abs(e.r - r) < 0.05,
   );
-  if (!marked) w.events.push({ t: 'explode', x, y, r, dtype: dominantType(p) });
+  if (!marked) w.events.push({ t: 'explode', x, y, r, dtype: dominantType(p), skill: p.skill.id });
 }
 
 /** Arrows fall around the target and each leaves a spore pod (Toxic Rain). */
@@ -165,6 +165,7 @@ export function placePods(w: World, a: Actor, act: Action): void {
     y: act.aimY,
     r: spread,
     dtype: dominantType(p),
+    skill: p.skill.id,
     ...fallField(p.skill),
   });
 }
@@ -346,7 +347,7 @@ export function releaseZaps(w: World, skill: string): void {
     const left = Math.max(0, Math.floor(f.t / spec.jump + 1e-6));
     const q = scaleProfile(f.profile, 1 + (spec.releaseMore * left) / 100);
     const r = spec.releaseRadius * f.profile.radiusMult;
-    w.events.push({ t: 'explode', x: f.x, y: f.y, r, dtype: f.dtype });
+    w.events.push({ t: 'explode', x: f.x, y: f.y, r, dtype: f.dtype, skill: f.profile.skill.id });
     for (const e of enemiesIn(w, f.x, f.y, r))
       hit(w, p, e, q, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
   }
@@ -386,7 +387,7 @@ export function placeGeyser(w: World, a: Actor, act: Action): void {
   if (!corpse) return;
   takeCorpse(w, corpse);
   const r = spec.explodeRadius * p.radiusMult;
-  w.events.push({ t: 'explode', x: corpse.x, y: corpse.y, r, dtype: 3 });
+  w.events.push({ t: 'explode', x: corpse.x, y: corpse.y, r, dtype: 3, skill: p.skill.id });
   for (const e of enemiesIn(w, corpse.x, corpse.y, r))
     rawHit(w, e, (corpse.life * spec.explodePct) / 100, 3, 'Corpse');
   const mine = w.fields.filter((f) => f.kind === 'geyser');
@@ -418,7 +419,7 @@ export function placeGeyser(w: World, a: Actor, act: Action): void {
 /** Blasts at a spot: the enemies in its radius are hit. */
 function blast(w: World, f: Field, x: number, y: number, r: number): void {
   const p = w.player;
-  w.events.push({ t: 'explode', x, y, r, dtype: f.dtype });
+  w.events.push({ t: 'explode', x, y, r, dtype: f.dtype, skill: f.profile?.skill.id });
   for (const e of enemiesIn(w, x, y, r))
     hit(w, p, e, f.profile!, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
 }
@@ -611,7 +612,14 @@ export function tickFields(w: World, dt: number): void {
         }
       if (f.t <= 0) {
         const r = spec.burstRadius * f.profile.radiusMult;
-        w.events.push({ t: 'explode', x: f.x, y: f.y, r, dtype: f.dtype });
+        w.events.push({
+          t: 'explode',
+          x: f.x,
+          y: f.y,
+          r,
+          dtype: f.dtype,
+          skill: f.profile.skill.id,
+        });
         for (const e of enemiesIn(w, f.x, f.y, r))
           hit(w, p, e, f.profile, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
       }
@@ -642,7 +650,14 @@ export function tickFields(w: World, dt: number): void {
           applyStatus(w, e, 'regenLess', { seconds: spec.debuffSeconds, v: spec.regenLess });
         }
       if (f.t <= 0) {
-        w.events.push({ t: 'explode', x: f.x, y: f.y, r: f.radius, dtype: f.dtype });
+        w.events.push({
+          t: 'explode',
+          x: f.x,
+          y: f.y,
+          r: f.radius,
+          dtype: f.dtype,
+          skill: f.profile.skill.id,
+        });
         for (const e of enemiesIn(w, f.x, f.y, f.radius))
           hit(w, p, e, f.profile, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
       }
@@ -653,7 +668,15 @@ export function tickFields(w: World, dt: number): void {
       if (near.length) {
         const e = near[w.rngTrig.int(0, near.length - 1)];
         f.recent.set(e.id, w.t);
-        w.events.push({ t: 'beam', x: e.x, y: e.y - 3, x2: e.x, y2: e.y, dtype: f.dtype });
+        w.events.push({
+          t: 'beam',
+          x: e.x,
+          y: e.y - 3,
+          x2: e.x,
+          y2: e.y,
+          dtype: f.dtype,
+          skill: f.profile?.skill.id,
+        });
         rawHit(w, e, f.dps * (0.5 + w.rngTrig.float(0, 1)), f.dtype, 'Herald');
       }
     }

@@ -83,7 +83,14 @@ function burstRadius(p: SkillProfile): number {
 function burstAt(w: World, a: Actor, p: SkillProfile, x: number, y: number, u?: BlinkSpec): void {
   if (p.hands[0].chunks.length === 0) return;
   const r = burstRadius(p);
-  w.events.push({ t: 'explode', x, y, r, dtype: p.hands[0].chunks[0].type });
+  w.events.push({
+    t: 'explode',
+    x,
+    y,
+    r,
+    dtype: p.hands[0].chunks[0].type,
+    skill: p.skill.id,
+  });
   const own = u?.corpse && u.corpse.lifePct > 0 ? (a.def.maxLife * u.corpse.lifePct) / 100 : 0;
   for (const e of enemiesAt(w, x, y, r)) {
     hit(w, a, e, p, 0, Math.hypot(e.x - a.x, e.y - a.y));
@@ -140,7 +147,7 @@ export function blinkCast(
     const big = { ...p, radiusMult: p.radiusMult * Math.sqrt(1 + u.corpse.areaMore / 100) };
     takeCorpse(w, corpse);
     const r = burstRadius(big);
-    w.events.push({ t: 'explode', x: corpse.x, y: corpse.y, r, dtype: 3 });
+    w.events.push({ t: 'explode', x: corpse.x, y: corpse.y, r, dtype: 3, skill: p.skill.id });
     for (const e of enemiesAt(w, corpse.x, corpse.y, r))
       rawHit(w, e, (corpse.life * u.corpse.explodePct) / 100, 3, 'Corpse');
     noteBlinkUsed(w, c);

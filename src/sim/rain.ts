@@ -70,6 +70,8 @@ export function pulseRain(w: World, owner: Actor, z: SkillZone, enemies: Actor[]
       y: s.y,
       r: s.r,
       dtype: z.dtype,
+      skill: z.profile.skill.id,
+      ...(z.pulsed && z.pulsed > 1 ? { pulse: true } : {}),
       ...(fall ? { fall } : {}),
     });
   }

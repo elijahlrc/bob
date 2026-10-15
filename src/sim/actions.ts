@@ -372,6 +372,7 @@ export function tickSkillZones(w: World, dt: number): void {
     if (z.pulseT <= 0) {
       z.pulseT += z.interval;
       z.pulsesLeft--;
+      z.pulsed = (z.pulsed ?? 0) + 1;
       if (z.spots) {
         // A rain with extra arrows bursts in several places (src/sim/rain.ts).
         pulseRain(w, owner, z, enemiesOf(w, owner));
@@ -384,6 +385,8 @@ export function tickSkillZones(w: World, dt: number): void {
         y: z.y2 === undefined || z.y === undefined ? z.y : (z.y + z.y2) / 2,
         r: z.radius,
         dtype: z.dtype,
+        ...(owner.isPlayer ? { skill: z.profile.skill.id } : {}),
+        ...(z.pulsed && z.pulsed > 1 ? { pulse: true } : {}),
         ...(z.x2 !== undefined && z.y2 !== undefined
           ? { strip: [z.x, z.y, z.x2, z.y2] as [number, number, number, number] }
           : {}),
@@ -688,7 +691,15 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
         best = c.max;
         dominant = c.type;
       }
-    if (!act.ringed) w.events.push({ t: 'explode', x: cx, y: cy, r: radius, dtype: dominant });
+    if (!act.ringed)
+      w.events.push({
+        t: 'explode',
+        x: cx,
+        y: cy,
+        r: radius,
+        dtype: dominant,
+        ...(a.isPlayer ? { skill: p.skill.id } : {}),
+      });
     const inside = enemiesOf(w, a).filter((e) => Math.hypot(e.x - cx, e.y - cy) <= radius + e.r);
     // A debuff that holds only so many enemies takes the nearest.
     const cap = p.skillDot?.spec.maxTargets;
@@ -715,6 +726,7 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
       y2,
       dtype: dominantType(p, act.hand),
       width: b.width * p.radiusMult,
+      ...(a.isPlayer ? { skill: p.skill.id } : {}),
     });
     // A hook drags the character it catches.
     if (!a.isPlayer && p.skill.pull) {
@@ -767,7 +779,14 @@ function explode(
   x: number,
   y: number,
 ): void {
-  w.events.push({ t: 'explode', x, y, r: pr.explodeRadius, dtype: pr.dtype });
+  w.events.push({
+    t: 'explode',
+    x,
+    y,
+    r: pr.explodeRadius,
+    dtype: pr.dtype,
+    ...(owner?.isPlayer ? { skill: pr.profile.skill.id } : {}),
+  });
   registerBlast(w, x, y, pr.explodeRadius);
   if (!owner) return;
   for (const e of w.actors) {
