@@ -306,6 +306,12 @@ export const MOD_MARKS: Record<MonsterModId, ModMark> = {
     aura: false,
     desc: 'Splits into three Gnawers when it dies.',
   },
+  blinking: {
+    color: 0x70b0ff,
+    shape: 'triUp',
+    aura: false,
+    desc: 'Every 8 seconds it marks the spot where you stand and teleports onto it with a travel spell of its element: Cinder Step burns the ground, Rime Step chills it, Bolt Step flashes at both ends, and a plain one just lands hard.',
+  },
   wardingPulse: {
     color: 0x90c0e8,
     shape: 'ring',

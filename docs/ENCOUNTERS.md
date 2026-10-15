@@ -94,6 +94,10 @@ How it is built:
   distance and sight tests run only when it is ready.
 - **The warning, the dodge, the zones and the hits are unchanged.** `telegraph.ts` reads the action's behaviour.
 - **The pose.** The sidearm's skill id (`monster_<type>_side`) picks a throw or cast pose in the renderer.
+- **A step** (`step: StepId` instead of a shape): the sidearm is a teleport. The spot where the character stands is marked, the monster holds
+  still for the warning, then it is on the spot with the spell's burst and ground (`data/steps.ts`, `sim/steps.ts`). The Blinking affix
+  (`MonsterModId` `blinking`) does the same on a clock of its own, the spell chosen by the monster's element. Wisp, Lantern Wight and Bone
+  Crawler have one.
 
 | Type (faction)     | Sidearm                            | Shape and numbers (start)                                     | Asks of the build                   |
 | ------------------ | ---------------------------------- | ------------------------------------------------------------- | ----------------------------------- |

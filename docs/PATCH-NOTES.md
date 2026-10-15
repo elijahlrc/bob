@@ -6,6 +6,8 @@ change, and our own names only. Dash bullets under plain headings.
 
 ## 2026-10-14
 
+- New enemy affix, Blinking: the monster marks the spot where you stand and, a moment later, teleports onto it with a travel spell of its element. Cinder Step bursts in fire and leaves burning ground, Rime Step bursts in cold and leaves chilling ground, Bolt Step flashes at both ends, and a plain one just lands hard. Stun it while it gathers to stop it.
+- Wisps, Lantern Wights and Bone Crawlers can now teleport onto you from a distance too, after a warning on the ground, with Bolt Step, Rime Step and Quick Step.
 - The Siege Marshal keeps calling regiments for as long as the fight lasts, the same three over again, instead of coming down alone after the third. Each time you clear a regiment he comes down for six seconds, fights you himself and takes extra damage, and then the horn sounds for the next. If a regiment is still standing 22 seconds after it came, the next arrives anyway, but no more come while ten soldiers stand.
 - The early game is much easier. Enemies still have half the life and deal half the damage on map 1, but they now climb back to the usual strength gradually, reaching it on map 20 instead of map 5. Bosses and mini-bosses on the way are softer too: the Tollkeeper on map 10 has about three quarters of its old life and hits about a quarter softer. Your character is unchanged.
 - Enemies that slam, lob or burst the ground now do it half as often and twice as hard, with the same warning, so a pack leaves fewer overlapping warnings and pools. Slag Brutes leave fewer, larger pools of fire behind them.

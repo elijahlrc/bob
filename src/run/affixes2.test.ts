@@ -66,10 +66,16 @@ describe('affix strength follows the level band (docs/MAPS.md 6.1)', () => {
   });
 
   it('rare packs scale to at least one', () => {
+    // Summed over a few seeds: one seed's pack can come out the same size at both levels.
     const pack = (lvl: number) =>
-      makeMapPlan(9, lvl, 'ashenCrypt', ['extraRares']).pop.monsters.filter(
-        (m) => m.spec.rarity === 'rare',
-      ).length;
+      [1, 2, 3, 4, 5, 6, 7, 8, 9].reduce(
+        (n, seed) =>
+          n +
+          makeMapPlan(seed, lvl, 'ashenCrypt', ['extraRares']).pop.monsters.filter(
+            (m) => m.spec.rarity === 'rare',
+          ).length,
+        0,
+      );
     expect(pack(10)).toBeGreaterThan(0);
     expect(pack(70)).toBeGreaterThan(pack(10));
   });

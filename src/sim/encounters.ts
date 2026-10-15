@@ -16,6 +16,7 @@ import { startAction } from './actions';
 import { castPattern } from './blasts';
 import { startCharge } from './abilities';
 import { blinkBehind, openZone } from './factions';
+import { beginStep, cancelStep } from './steps';
 import { monsterConds, monsterHitOf, rawHit } from './combat';
 import {
   bossBlowMult,
@@ -100,6 +101,12 @@ export function trySidearm(w: World, m: Actor, dt: number, d: number, los: boole
   if (zone && w.effects.some((z) => z.kind === zone && Math.hypot(z.x - p.x, z.y - p.y) < 3)) {
     e.sideT = 1;
     return false;
+  }
+  if (s.step) {
+    // A teleport has no blow to start: the spot is marked, and the monster is on it a moment later.
+    const began = beginStep(w, m, s.step);
+    e.sideT = began ? s.every : 1;
+    return began;
   }
   e.sideT = s.every;
   startAction(w, m, 'monster', side.profile(monsterConds(m)), p);
@@ -475,6 +482,7 @@ export const quenched = (m: Actor): boolean => !!m.enc && (m.enc.done & DONE_QUE
 /** A monster with encounter state dies: a swollen Gorger bursts, a chant stops, a Wailer near grieves. */
 export function onEncounterDeath(w: World, a: Actor): void {
   const e = a.enc;
+  cancelStep(w, a);
   if (a.mon?.kind.bossOnly) bossDeath(w, a);
   if (e?.gorgedT && e.gorgedT > 0) openZone(w, a.x, a.y, 2.2, 4, 'caustic', monsterHitOf(a) * 0.4);
   if (e && e.ritesT > 0) cancelRites(w, a);

@@ -1481,7 +1481,10 @@ export class GrimStyle extends StyleBase {
       }
       case 'blink': {
         const p = this.project(e.x, e.y);
-        this.flash(p.x, p.y - 6, e.end ? 0xb0e0ff : 0x6a8cff, 1.4, 0.3);
+        // A monster's travel spell flashes in its element (fire, cold, lightning); a plain blink keeps the blue.
+        const tint =
+          e.dtype === 3 ? 0xff8a40 : e.dtype === 2 ? 0x8ad8ff : e.dtype === 1 ? 0xfff070 : 0;
+        this.flash(p.x, p.y - 6, tint || (e.end ? 0xb0e0ff : 0x6a8cff), 1.4, 0.3);
         em.smoke.explode(e.end ? 6 : 4, p.x, p.y);
         break;
       }

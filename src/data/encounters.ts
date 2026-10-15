@@ -1,6 +1,7 @@
 import type { MonsterTypeId, Stance } from './monsters';
 import { SHAPE_INFO, type ShapeSpec, type ZoneKindId } from './shapes';
 import type { ThreatTag } from './monsterInfo';
+import { stepText, type StepId } from './steps';
 
 /**
  * Encounters (docs/ENCOUNTERS.md): what a monster does besides walk up and hit. Three kinds of data, by type, in the manner of
@@ -199,6 +200,8 @@ export type SidearmSpec = {
   pattern?: PatternId;
   /** A ring of slow projectiles: how many, leaving out one gap. */
   ring?: number;
+  /** A teleport onto the spot where the character stands, marked first (data/steps.ts); it has no shape of its own. */
+  step?: StepId;
   every: number;
   from: number;
   to: number;
@@ -386,6 +389,18 @@ export const TYPE_SIDEARMS: Partial<Record<MonsterTypeId, SidearmSpec>> = {
     from: 3,
     to: 9,
     time: 1.4,
+  },
+  // The travel spells (data/steps.ts), on types that would rather be on you than near you.
+  wisp: { name: 'Bolt Step', step: 'bolt', every: 9, from: 5, to: 13, time: 0.9, minLevel: 10 },
+  wight: { name: 'Rime Step', step: 'rime', every: 11, from: 5, to: 12, time: 0.7, minLevel: 10 },
+  crawler: {
+    name: 'Quick Step',
+    step: 'quick',
+    every: 10,
+    from: 4.5,
+    to: 11,
+    time: 0.6,
+    minLevel: 10,
   },
   nest: {
     name: 'Spore burst',
@@ -644,6 +659,7 @@ export function encounterTexts(type: MonsterTypeId): string[] {
 
 function sidearmText(s: SidearmSpec): string {
   const range = `from ${s.from} to ${s.to} tiles`;
+  if (s.step) return stepText(s.step, range);
   if (s.ring) return `Every ${s.every} s, a ring of ${s.ring} slow shots with one gap.`;
   switch (s.shape?.id) {
     case 'orb':
@@ -666,6 +682,7 @@ export function encounterTags(type: MonsterTypeId): ThreatTag[] {
   const out: ThreatTag[] = [];
   const s = TYPE_SIDEARMS[type];
   if (s?.pattern) out.push('patterns');
+  else if (s?.step) out.push('blinkers');
   else if (s?.shape && SHAPE_INFO[s.shape.id].tag) out.push(SHAPE_INFO[s.shape.id].tag!);
   const guarded =
     TYPE_WINDOWS[type]?.id === 'brace' ||

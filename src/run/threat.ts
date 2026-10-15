@@ -15,6 +15,7 @@ import {
 import { MONSTER_TYPES, type FactionId, type MonsterTypeId, type Variant } from '../data/monsters';
 import type { ThemeDef } from '../data/themes';
 import { TYPE_SIDEARMS } from '../data/encounters';
+import { STEPS } from '../data/steps';
 import { ELEMENT_WEIGHTS, neverPlain, typeShares } from '../gen/population';
 
 /**
@@ -64,7 +65,11 @@ const ALL_VARIANTS = Object.keys(ELEMENT_WEIGHTS) as Variant[];
 function sidearmRate(id: MonsterTypeId): number {
   const s = TYPE_SIDEARMS[id];
   if (!s) return 0;
-  const mult = s.pattern ? 1.5 : (s.shape?.mult ?? 1) * (s.ring ? 2 : 1);
+  const mult = s.pattern
+    ? 1.5
+    : s.step
+      ? STEPS[s.step].mult
+      : (s.shape?.mult ?? 1) * (s.ring ? 2 : 1);
   return mult / s.every;
 }
 

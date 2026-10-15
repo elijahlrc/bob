@@ -53,6 +53,7 @@ import { tickCollapse } from './collapse';
 import { tickHoldout } from './holdout';
 import { tickStranded } from './strand';
 import { initEncounter, tickEncounter } from './encounters';
+import { tickBlinking, tickStep } from './steps';
 import { tickPackPlays } from './packPlays';
 import { inBlast, pending } from './blasts';
 import { afflictPlayer, stunPlayer } from './afflict';
@@ -488,6 +489,7 @@ function tickEffects(w: World, dt: number): void {
 
 /** Behaviours driven by monster mods (§12.5). The bosses are `sim/bosses.ts` (docs/BOSSES.md). */
 function tickMonsterMods(w: World, m: Actor, dt: number): void {
+  tickStep(w, m, dt);
   if (m.state !== 'chase') return;
   const p = w.player;
   if (
@@ -501,6 +503,7 @@ function tickMonsterMods(w: World, m: Actor, dt: number): void {
     }
   }
   if (m.modIds.includes('charging')) tickChargingMod(w, m, dt);
+  if (m.modIds.includes('blinking')) tickBlinking(w, m, dt);
   if (m.modIds.includes('wardingPulse')) {
     m.pulseT -= dt;
     if (m.pulseT <= 0) {

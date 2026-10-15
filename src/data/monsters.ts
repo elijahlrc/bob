@@ -1587,7 +1587,9 @@ export type MonsterModId =
   | 'zealous'
   | 'hexWarded'
   | 'adaptive'
-  | 'hexcaller';
+  | 'hexcaller'
+  // A teleport spell of its element, onto the spot where the character stands (data/steps.ts).
+  | 'blinking';
 
 export type MonsterModDef = {
   id: MonsterModId;
@@ -1794,6 +1796,8 @@ MONSTER_MODS.push(
   { id: 'hexcaller', name: 'Hexcaller', magic: false, minLevel: 25, mods: [] },
   // docs/ENCOUNTERS.md 6: it resists the element that hurts it most, for a while.
   { id: 'adaptive', name: 'Adaptive', magic: false, minLevel: 30, mods: [] },
+  // It marks the spot where the character stands and teleports onto it, with the travel spell of its element.
+  { id: 'blinking', name: 'Blinking', magic: true, minLevel: 12, mods: [] },
 );
 
 export function monsterModDef(id: MonsterModId): MonsterModDef {

@@ -476,7 +476,7 @@ export type SimEvent =
   | { t: 'window'; id: number; kind: string }
   /** A beam from (x, y) to (x2, y2), `width` wide where it hurts (absent: a bolt that strikes a point). */
   | { t: 'beam'; x: number; y: number; x2: number; y2: number; dtype: number; width?: number }
-  | { t: 'blink'; id: number; x: number; y: number; end: boolean }
+  | { t: 'blink'; id: number; x: number; y: number; end: boolean; dtype?: number }
   | { t: 'charge'; kind: string; count: number }
   /** Charges the character spent on purpose (to skip a cooldown, or to power a skill). */
   | { t: 'spend'; kind: string; n: number }

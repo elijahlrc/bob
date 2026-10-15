@@ -42,6 +42,7 @@ import {
   withdrawing,
 } from './movement';
 import { running } from './blinks';
+import { stepping } from './steps';
 import { contactRange, enemiesNear, markOpened, openerDue, utilityPick } from './utility';
 import type { RotationEntry } from '../calc/strategy';
 import {
@@ -781,7 +782,8 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
   whileStunned(m);
   if (!canAct(m)) return;
   // A Gloomstalker stands still while its blink gathers.
-  if (m.blinkT > 0 || m.phaseT > 0 || m.channelT > 0 || m.windT > 0 || m.dashT > 0) return;
+  if (m.blinkT > 0 || m.phaseT > 0 || m.channelT > 0 || m.windT > 0 || m.dashT > 0 || stepping(m))
+    return;
   // A monster in a window (a Brace) holds its ground until it ends.
   if (m.enc && (inWindow(m) || tryWindow(w, m))) return;
   const p = w.player;
