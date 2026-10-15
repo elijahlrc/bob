@@ -113,4 +113,18 @@ describe('the rotation plan (docs/SHEET-AUDIT.md)', () => {
     expect(one.acts.a).toBeCloseTo(0.25, 1);
     expect(two.acts.a).toBeCloseTo(0.25, 1);
   });
+
+  it('a plan asked for twice, with the same input, is the one made the first time', () => {
+    const input = {
+      rotation: [periodic(skill('p', 0.5, { pause: 3 }))],
+      mains: [skill('a', 0.5, { cooldown: { seconds: 2.5, uses: 1 } })],
+      weapon: 1,
+    };
+    const first = planRotation(input);
+    expect(planRotation({ ...input, rotation: [periodic(skill('p', 0.5, { pause: 3 }))] })).toBe(
+      first,
+    );
+    // ... and a different one is not.
+    expect(planRotation({ ...input, weapon: 0.8 })).not.toBe(first);
+  });
 });

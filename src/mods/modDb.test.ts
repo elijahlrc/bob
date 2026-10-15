@@ -88,6 +88,67 @@ describe('ModDB', () => {
   });
 });
 
+describe('ModDB.extend (docs/PERFORMANCE.md)', () => {
+  const base = [
+    mod('damage', 'inc', 20),
+    mod('damage', 'inc', 15, { tags: ['spell'] }),
+    mod('damage', 'more', 10, { condition: { id: 'onLowLife' } }),
+    mod('critMulti', 'override', 100),
+    mod('neverCrit', 'flag', 1),
+  ];
+  const extra = [
+    mod('damage', 'inc', 5),
+    mod('damage', 'more', 30),
+    mod('critMulti', 'override', 150),
+    mod('alwaysHit', 'flag', 1),
+    mod('life', 'base', 40, { condition: { id: 'onFullLife', not: true } }),
+  ];
+
+  it('answers as one database built from all the mods, in order', () => {
+    const flat = new ModDB([...base, ...extra]);
+    const parent = new ModDB(base, flat.cond);
+    const child = parent.extend(extra);
+    const ctxs = [
+      makeCtx({}),
+      makeCtx({ tags: ['spell'] }),
+      makeCtx({ cond: child.cond, conds: ['onLowLife'] }),
+      makeCtx({ cond: child.cond, conds: ['onFullLife'] }),
+    ];
+    for (const ctx of ctxs) {
+      expect(child.sum('inc', 'damage', ctx)).toBe(flat.sum('inc', 'damage', ctx));
+      expect(child.more('damage', ctx)).toBe(flat.more('damage', ctx));
+      expect(child.calc('damage', ctx)).toBe(flat.calc('damage', ctx));
+      expect(child.calc('critMulti', ctx)).toBe(150);
+      expect(child.sum('base', 'life', ctx)).toBe(flat.sum('base', 'life', ctx));
+      expect(child.flag('neverCrit', ctx)).toBe(true);
+      expect(child.flag('alwaysHit', ctx)).toBe(true);
+    }
+    expect(child.has('neverCrit')).toBe(true);
+    expect(child.has('alwaysHit')).toBe(true);
+    expect(child.has('nothing')).toBe(false);
+    expect(child.mods()).toEqual(flat.mods());
+    expect(child.isConditional('damage')).toBe(true);
+    expect(child.isConditional('life')).toBe(true);
+    expect(child.condsUsed()).toBe(flat.condsUsed());
+  });
+
+  it('leaves the database it extends as it was', () => {
+    const parent = new ModDB(base);
+    parent.extend(extra);
+    expect(parent.mods()).toEqual(base);
+    expect(parent.sum('inc', 'damage')).toBe(20);
+    expect(parent.flag('alwaysHit')).toBe(false);
+    expect(parent.calc('critMulti')).toBe(100);
+  });
+
+  it('can be extended again', () => {
+    const parent = new ModDB(base);
+    const grandchild = parent.extend(extra).extend([mod('damage', 'inc', 1)]);
+    expect(grandchild.sum('inc', 'damage')).toBe(26);
+    expect(grandchild.mods()).toHaveLength(base.length + extra.length + 1);
+  });
+});
+
 describe('mod text', () => {
   it('renders common phrasings', () => {
     expect(modText(mod('life', 'base', 40))).toBe('+40 to maximum Life');

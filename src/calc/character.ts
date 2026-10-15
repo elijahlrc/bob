@@ -458,6 +458,15 @@ export class Character {
   readonly defaultAttack: SkillChoice;
   /** The rotation plans made so far, by conditions and kind of fight. */
   private readonly plans = new Map<string, Plan>();
+  /** What the utility skills, the other skills and the triggered skills come to against the reference monster, by conditions and fight. */
+  private readonly utilityLoads = new Map<
+    string,
+    { choice: SkillChoice; rate: number; busy: number }[]
+  >();
+  private readonly secondaryMemo = new Map<string, SecondarySheet[]>();
+  private readonly minionMemo = new Map<string, number>();
+  private readonly cloneMemo = new Map<string, number>();
+  private readonly triggerMemo = new Map<string, TriggeredSheet[]>();
   readonly hands: HandStats[];
   readonly dualWielding: boolean;
   /** Tags of the weapons held (staff, bow, twoHand, ...). */
@@ -798,14 +807,17 @@ export class Character {
       if (levelBonus > 0)
         skill = resolveActive(sg.def, Math.min(MAX_GEM_LEVEL, sg.level + levelBonus));
       if (skill.behaviour.kind === 'melee' && skill.behaviour.range2h && weaponTags.has('twoHand'))
-        skill.behaviour = { ...skill.behaviour, range: skill.behaviour.range2h };
+        skill = { ...skill, behaviour: { ...skill.behaviour, range: skill.behaviour.range2h } };
       // A shot with a bow, a stab with a blade.
       if (
         skill.behaviour.kind === 'projectile' &&
         skill.behaviour.meleeUnless &&
         !weaponTags.has(skill.behaviour.meleeUnless)
       )
-        skill.behaviour = { kind: 'melee', range: skill.behaviour.meleeRange ?? 1.5 };
+        skill = {
+          ...skill,
+          behaviour: { kind: 'melee', range: skill.behaviour.meleeRange ?? 1.5 },
+        };
       // A support that can do nothing to this skill (no projectiles to add to, no area to widen) is not in effect and costs nothing.
       const inert: { gem: SocketedGem; why: string }[] = [];
       // A support the skill fits but is barred from (a melee support that does not take a channelled skill) says so, rather than
@@ -1449,11 +1461,7 @@ export class Character {
       // One database per skill and flask state, shared by every condition mask.
       const dk = `${choice.key}|${flaskMask}`;
       let sdb = this.skillDbs.get(dk);
-      if (!sdb)
-        this.skillDbs.set(
-          dk,
-          (sdb = new ModDB([...base.mods(), ...choice.skill.mods, ...supportMods], this.cond)),
-        );
+      if (!sdb) this.skillDbs.set(dk, (sdb = base.extend([...choice.skill.mods, ...supportMods])));
       db = sdb;
     }
     p = buildProfile({
@@ -1505,7 +1513,7 @@ export class Character {
       this.flasks.forEach((f, i) => {
         if (flasks & (1 << i)) extra.push(...f.buff);
       });
-      db = new ModDB([...this.db.mods(), ...extra], this.cond);
+      db = this.db.extend(extra);
       this.flaskDbs.set(dyn, db);
     }
     return db;
@@ -2015,6 +2023,14 @@ export class Character {
    * nova when the character's attacks hit, so it needs the rotation of the kind of fight; a golem adds to the other minions.
    */
   minionDps(conds: number = this.configConds, scenario: Scenario = 'pack', falls = true): number {
+    // What the minions deal does not depend on the target, and the map cards ask for it once for each monster.
+    const k = `${conds}|${scenario}|${falls}`;
+    let v = this.minionMemo.get(k);
+    if (v === undefined) this.minionMemo.set(k, (v = this.minionDpsFor(conds, scenario, falls)));
+    return v;
+  }
+
+  private minionDpsFor(conds: number, scenario: Scenario, falls: boolean): number {
     const distance = this.config.targetDistance ?? 3;
     const mainUse = this.profile(this.mainFor(scenario), conds).useTime;
     const rows = [];
@@ -2055,6 +2071,13 @@ export class Character {
    * leaves one, and every clone shoots at the target for as long as it stands.
    */
   cloneDps(conds: number = this.configConds, scenario: Scenario = 'pack'): number {
+    const k = `${conds}|${scenario}`;
+    let v = this.cloneMemo.get(k);
+    if (v === undefined) this.cloneMemo.set(k, (v = this.cloneDpsFor(conds, scenario)));
+    return v;
+  }
+
+  private cloneDpsFor(conds: number, scenario: Scenario): number {
     let dps = 0;
     for (const c of this.actives) {
       const spec = c.skill.mirror;
@@ -2086,6 +2109,16 @@ export class Character {
   utilityLoad(
     conds: number = this.configConds,
     scenario: Scenario = 'pack',
+  ): { choice: SkillChoice; rate: number; busy: number }[] {
+    const k = `${conds}|${scenario}`;
+    let r = this.utilityLoads.get(k);
+    if (!r) this.utilityLoads.set(k, (r = this.utilityLoadFor(conds, scenario)));
+    return r;
+  }
+
+  private utilityLoadFor(
+    conds: number,
+    scenario: Scenario,
   ): { choice: SkillChoice; rate: number; busy: number }[] {
     // A utility skill kept for emergencies is not counted: a fight that goes well never calls for it.
     const cast = this.rotation
@@ -2193,6 +2226,19 @@ export class Character {
     target?: TargetState,
     scenario: Scenario = 'pack',
   ): SecondarySheet[] {
+    // Against the reference monster (no target given) the sheet, the Skills tab and the main skill's mana all ask for the same thing.
+    if (target) return this.secondarySheetsFor(conds, target, scenario);
+    const k = `${conds}|${scenario}`;
+    let r = this.secondaryMemo.get(k);
+    if (!r) this.secondaryMemo.set(k, (r = this.secondarySheetsFor(conds, undefined, scenario)));
+    return r;
+  }
+
+  private secondarySheetsFor(
+    conds: number,
+    target: TargetState | undefined,
+    scenario: Scenario,
+  ): SecondarySheet[] {
     const main = this.mainFor(scenario);
     const plan = this.plan(conds, scenario);
     const out: SecondarySheet[] = [];
@@ -2227,6 +2273,18 @@ export class Character {
     conds: number = this.configConds,
     target?: TargetState,
     scenario: Scenario = 'pack',
+  ): TriggeredSheet[] {
+    if (target) return this.triggerSheetsFor(conds, target, scenario);
+    const k = `${conds}|${scenario}`;
+    let r = this.triggerMemo.get(k);
+    if (!r) this.triggerMemo.set(k, (r = this.triggerSheetsFor(conds, undefined, scenario)));
+    return r;
+  }
+
+  private triggerSheetsFor(
+    conds: number,
+    target: TargetState | undefined,
+    scenario: Scenario,
   ): TriggeredSheet[] {
     const out: TriggeredSheet[] = [];
     if (this.triggers.length === 0) return out;

@@ -60,9 +60,27 @@ export function cfgFor(run: RunState) {
   };
 }
 
-/** The character sheet under the clearing conditions. */
+/**
+ * The character sheet under the clearing conditions. It is remembered by build: the Skills and Items tabs try a gem or an item in
+ * every place it could go, and putting things back where they were (or looking again) asks for sheets already worked out.
+ */
 export function sheetOf(run: RunState, build: Build = run.build): CharacterSheet {
-  return new Character(build, cfgFor(run)).sheet();
+  const d = run.difficulty;
+  const key = `${buildKey(run, build)}|${d.scaling}|${d.base}|${d.variance}`;
+  let sheet = sheetCache.get(key);
+  if (!sheet) {
+    if (sheetCache.size >= SHEET_CACHE_LIMIT) sheetCache.clear();
+    sheetCache.set(key, (sheet = new Character(build, cfgFor(run)).sheet()));
+  }
+  return sheet;
+}
+
+const sheetCache = new Map<string, CharacterSheet>();
+const SHEET_CACHE_LIMIT = 1500;
+
+/** Forget the sheets remembered (a measurement that wants them worked out again). */
+export function clearSheetCache(): void {
+  sheetCache.clear();
 }
 
 const skillCache = new Map<string, { dps: number; isDefault: boolean }>();

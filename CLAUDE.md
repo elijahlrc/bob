@@ -59,6 +59,9 @@
   `dpsgems` (every gem alone), `dpssupports`, `dpsminions` and `dpsinspect <gem>`, and held to it by `src/calc/sheetVsSim.*.test.ts` and
   `rotationVsSim.test.ts`. **When a skill's behaviour changes in the sim, run `npm run dpsgems -- --only <gem>` and change the count in the calc to
   match.** The sheet counts one target and free mana (docs/MANA.md); the audit's open items are in its section 6.
+- **Performance** (2026-10-15): [docs/PERFORMANCE.md](docs/PERFORMANCE.md). A sheet is about 1 ms, and the Skills tab tries every gem in every socket, so what is asked of it is
+  counted before what it costs: `npm run perf` times it on a late run. `sheetOf` remembers sheets by build, `ModDB.extend` layers a skill's mods on the character's,
+  and `planRotation` remembers its plans; none changes a number, and a change to the calc should keep it so (hash the sheets before and after).
 - **Patch notes:** [docs/PATCH-NOTES.md](docs/PATCH-NOTES.md), player-facing, newest first, shown on the Patch notes screen of the title
   menu (`src/ui/PatchNotes.tsx`): add an entry for every change a player would notice. The `/patch-notes` skill
   (`.claude/skills/patch-notes/SKILL.md`) writes them from the commits, files them, commits and pushes; a push to main is what

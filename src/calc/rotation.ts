@@ -70,7 +70,25 @@ type State = {
   ends: number[];
 };
 
+/**
+ * Plans already made, by their input: the sheet is worked out again and again for builds that differ in one gem (the Skills tab
+ * tries each gem in each socket), and most of them leave the rotation as it was.
+ */
+const MADE = new Map<string, Plan>();
+const MADE_LIMIT = 2000;
+
 export function planRotation(input: PlanInput): Plan {
+  const key = JSON.stringify(input);
+  let plan = MADE.get(key);
+  if (!plan) {
+    plan = playRotation(input);
+    if (MADE.size >= MADE_LIMIT) MADE.clear();
+    MADE.set(key, plan);
+  }
+  return plan;
+}
+
+function playRotation(input: PlanInput): Plan {
   const horizon = input.horizon ?? 300;
   const make = (s: PlanSkill): State => ({
     s: { ...s, useTime: Math.max(0.05, s.useTime) },

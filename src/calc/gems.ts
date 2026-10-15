@@ -273,7 +273,20 @@ function fxOf(def: SkillFx): SkillFx {
   return o as SkillFx;
 }
 
+/**
+ * A gem at a level is the same skill every time, and the sheet asks for it again for every build it works out (the Skills tab tries
+ * each gem in each socket). What comes back is shared: copy it before changing it.
+ */
+const resolved = new Map<string, SkillDef>();
+
 export function resolveActive(def: ActiveGemDef, level: number): SkillDef {
+  const key = `${def.id}|${level}`;
+  let skill = resolved.get(key);
+  if (!skill) resolved.set(key, (skill = resolveActiveUncached(def, level)));
+  return skill;
+}
+
+function resolveActiveUncached(def: ActiveGemDef, level: number): SkillDef {
   const b = def.behaviour;
   const per5 = Math.floor(level / 5);
   const behaviour: SkillBehaviour =

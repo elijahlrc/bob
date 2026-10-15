@@ -130,6 +130,9 @@ export class ModDB {
   /** The mods of each stat, in order, and again split by kind (a query only looks at the kind it asks for). */
   private byStat = new Map<StatId, Bucket>();
   private all: Mod[] = [];
+  /** The database this one extends: its mods come first, and are neither copied nor compiled again (`extend`). */
+  private parent?: ModDB;
+  private merged?: readonly Mod[];
 
   readonly cond: CondIndex;
 
@@ -138,7 +141,20 @@ export class ModDB {
     this.addAll(mods);
   }
 
+  /**
+   * A database with these mods after the ones of this. A character has a database of everything and one for each of its skills
+   * (the mods the skill brings) and flask states; building them by copying and compiling every mod again dominated the cost of
+   * a sheet, so the extension shares the compiled mods of this one and holds only the new.
+   */
+  extend(mods: readonly Mod[]): ModDB {
+    const d = new ModDB([], this.cond);
+    d.parent = this;
+    d.addAll(mods);
+    return d;
+  }
+
   add(m: Mod): void {
+    this.merged = undefined;
     this.all.push(m);
     let b = this.byStat.get(m.stat);
     if (!b)
@@ -156,11 +172,12 @@ export class ModDB {
   }
 
   mods(): readonly Mod[] {
-    return this.all;
+    if (!this.parent) return this.all;
+    return (this.merged ??= [...this.parent.mods(), ...this.all]);
   }
 
   has(stat: StatId): boolean {
-    return this.byStat.has(stat);
+    return this.byStat.has(stat) || !!this.parent?.has(stat);
   }
 
   /**
@@ -168,24 +185,25 @@ export class ModDB {
    * carries at least one of those tags (used for ailment-only scaling).
    */
   sum(kind: ModKind, stat: StatId, ctx: ModCtx = EMPTY_CTX, require = 0): number {
+    let s = this.parent ? this.parent.sum(kind, stat, ctx, require) : 0;
     const b = this.byStat.get(stat);
-    if (!b) return 0;
-    let s = 0;
+    if (!b) return s;
     for (const c of b[kind]) if (matches(c, ctx, require)) s += valueOf(c, ctx);
     return s;
   }
 
   /** Product of (1 + more/100) over matching `more` mods. */
   more(stat: StatId, ctx: ModCtx = EMPTY_CTX, require = 0): number {
+    let p = this.parent ? this.parent.more(stat, ctx, require) : 1;
     const b = this.byStat.get(stat);
-    if (!b) return 1;
-    let p = 1;
+    if (!b) return p;
     for (const c of b.more) if (matches(c, ctx, require)) p *= 1 + valueOf(c, ctx) / 100;
     return p;
   }
 
   /** True if any matching flag mod is present. */
   flag(stat: StatId, ctx: ModCtx = EMPTY_CTX): boolean {
+    if (this.parent?.flag(stat, ctx)) return true;
     const b = this.byStat.get(stat);
     if (!b) return false;
     for (const c of b.flag) if (matches(c, ctx)) return true;
@@ -194,9 +212,9 @@ export class ModDB {
 
   /** The last matching override, if any. */
   override(stat: StatId, ctx: ModCtx = EMPTY_CTX): number | undefined {
+    let v = this.parent?.override(stat, ctx);
     const b = this.byStat.get(stat);
-    if (!b) return undefined;
-    let v: number | undefined;
+    if (!b) return v;
     for (const c of b.override) if (matches(c, ctx)) v = valueOf(c, ctx);
     return v;
   }
@@ -221,13 +239,14 @@ export class ModDB {
 
   /** Bitmask of every condition used by any mod (to keep condition-keyed caches small). */
   condsUsed(): number {
-    let m = 0;
+    let m = this.parent ? this.parent.condsUsed() : 0;
     for (const b of this.byStat.values()) for (const c of b.all) m = maskOr(m, c.condMask);
     return m;
   }
 
   /** True if any mod for this stat depends on a condition. */
   isConditional(stat: StatId): boolean {
+    if (this.parent?.isConditional(stat)) return true;
     const b = this.byStat.get(stat);
     return !!b && b.all.some((c) => c.condMask !== 0);
   }

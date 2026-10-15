@@ -4,7 +4,10 @@ import { mod } from '../mods/types';
 import { Controller } from './controller';
 import { affixSummary } from './affixText';
 import { dryEquip, equip } from './inventory';
+import { sheetDps } from '../calc/character';
+import { score, sheetOf } from './bot';
 import {
+  bestPlacement,
   compareFlasks,
   compareSlots,
   filterItems,
@@ -148,6 +151,84 @@ describe('gem placement', () => {
     const ps = placementsFor(run, g.uid);
     expect(ps.length).toBeGreaterThanOrEqual(3);
     expect(ps.some((p) => p.replaces === 'Reaping Arc')).toBe(true);
+  });
+
+  describe('the badges of the Skills tab leave out what cannot matter', () => {
+    /** The effect of the gem in a socket worked out the long way: the whole sheet of the build with it there. */
+    const brute = (run: RunState, gemUid: number, slot: 'body' | 'mainHand', socket: number) => {
+      const gem = run.inventory.find((x) => x.uid === gemUid) as ReturnType<typeof makeGem>;
+      const it = run.build.equipment[slot]!;
+      const sockets = [...it.sockets];
+      sockets[socket] = gem;
+      const base = sheetOf(run);
+      const s = sheetOf(run, {
+        ...run.build,
+        equipment: { ...run.build.equipment, [slot]: { ...it, sockets } },
+      });
+      return { dps: sheetDps(s) / sheetDps(base), score: score(s) / score(base) };
+    };
+
+    it('with an empty socket, only the empty sockets are tried', () => {
+      const { run, uid } = setup();
+      run.build.equipment.body = { ...run.build.equipment.body!, sockets: [null, null, null] };
+      const g = makeGem(uid, 'kindle');
+      run.inventory.push(g);
+      // One socket of the weapon is full, so that the whole list has more than the empty ones.
+      const weapon = run.build.equipment.mainHand!;
+      run.build.equipment.mainHand = { ...weapon, sockets: [makeGem(uid, 'swiftAssault')] };
+      const quick = placementsFor(run, g.uid, { emptiesFirst: true });
+      const all = placementsFor(run, g.uid);
+      expect(quick.length).toBeGreaterThan(0);
+      expect(quick.every((p) => !p.replaces)).toBe(true);
+      expect(all.length).toBeGreaterThan(quick.length);
+      // ... and each is what the whole list says of it.
+      for (const p of quick)
+        expect(all.find((q) => q.slot === p.slot && q.socket === p.socket)).toEqual(p);
+    });
+
+    it('with every socket full, all of them are tried', () => {
+      const { run, uid } = setup();
+      const g = makeGem(uid, 'kindle');
+      run.inventory.push(g);
+      for (const it of Object.values(run.build.equipment))
+        if (it) it.sockets.forEach((_, i) => (it.sockets[i] ??= makeGem(uid, 'swiftAssault')));
+      const quick = placementsFor(run, g.uid, { emptiesFirst: true });
+      expect(quick).toEqual(placementsFor(run, g.uid));
+    });
+
+    it('a support in an item with no skill to support is zero, as the whole sheet says', () => {
+      const { run, uid } = setup();
+      // The body armour keeps its sockets but no skill; the weapon keeps its skills.
+      run.build.equipment.body = { ...run.build.equipment.body!, sockets: [null, null, null] };
+      const g = makeGem(uid, 'swiftAssault');
+      run.inventory.push(g);
+      const ps = placementsFor(run, g.uid, { emptiesFirst: true });
+      const inBody = ps.filter((p) => p.slot === 'body');
+      expect(inBody.length).toBeGreaterThan(0);
+      for (const p of inBody) {
+        const b = brute(run, g.uid, 'body', p.socket);
+        expect(p.dpsPct).toBe(0);
+        expect(b.dps).toBeCloseTo(1, 12);
+        expect(b.score).toBeCloseTo(1, 12);
+      }
+    });
+
+    it('the best place is the same whether every socket or only the empty ones are tried', () => {
+      const { run, uid } = setup();
+      run.build.equipment.body = {
+        ...run.build.equipment.body!,
+        sockets: [run.build.equipment.body!.sockets[0], null, null],
+      };
+      for (const id of ['kindle', 'swiftAssault', 'rimeCore']) {
+        const g = makeGem(uid, id);
+        run.inventory.push(g);
+        const all = placementsFor(run, g.uid);
+        const empties = all.filter((p) => !p.replaces);
+        const pool = empties.length ? empties : all;
+        const want = [...pool].sort((a, b) => b.scorePct - a.scorePct)[0];
+        expect(bestPlacement(run, g.uid)).toEqual(want);
+      }
+    });
   });
 
   it('moveGem swaps gems between sockets', () => {

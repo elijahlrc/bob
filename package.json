@@ -21,6 +21,7 @@
     "dpsgems": "tsx scripts/dps-gems.ts",
     "dpsinspect": "tsx scripts/dps-inspect.ts",
     "dpsminions": "tsx scripts/dps-minions.ts",
+    "perf": "tsx scripts/perf-calc.ts",
     "dpssupports": "tsx scripts/dps-supports.ts",
     "random": "tsx scripts/random-play.ts",
     "lethality": "tsx scripts/theme-lethality.ts",

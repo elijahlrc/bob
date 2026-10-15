@@ -1,4 +1,5 @@
-import { diffSheets, sheetDps, type SheetDiff } from '../calc/character';
+import { diffSheets, sheetDps, type CharacterSheet, type SheetDiff } from '../calc/character';
+import { itemMods } from '../calc/items';
 import { itemBase, isWeaponClass } from '../data/bases';
 import { flaskBase } from '../data/flasks';
 import { modsText } from '../mods/text';
@@ -289,38 +290,97 @@ export type Placement = SocketRef & {
   replaces?: string;
 };
 
+/**
+ * Whether an item has a skill that supports can link to: an active gem in one of its sockets, or one the item grants. Supports
+ * link within an item (`Character`, "linked"), so a support put in an item with none does nothing.
+ */
+function hasActiveSkill(it: Item): boolean {
+  if (it.sockets.some((g) => g && gemDef(g.gemId).kind === 'active')) return true;
+  return itemMods(it).some(
+    (m) =>
+      m.stat.startsWith('grantSkill.') &&
+      gemDef(m.stat.slice(m.stat.indexOf('.') + 1)).kind === 'active',
+  );
+}
+
+export type PlacementOpts = {
+  /** The sheet of the character as it is, when the caller has it (a list of gems shares one). */
+  base?: CharacterSheet;
+  /**
+   * Only the empty sockets, when there are any (a gem put in a full one pushes another out, which no list of badges leans on). The
+   * Skills tab's badges and `quickSocket` want this; the sockets a selected gem could go into want all of them.
+   */
+  emptiesFirst?: boolean;
+};
+
 /** Every socket the gem could go into, with the effect of putting it there. */
-export function placementsFor(run: RunState, gemUid: number): Placement[] {
+export function placementsFor(
+  run: RunState,
+  gemUid: number,
+  opts: PlacementOpts = {},
+): Placement[] {
   const gem = run.inventory.find((x) => x.uid === gemUid);
   if (!gem || gem.kind !== 'gem') return [];
-  const base = sheetOf(run);
-  const out: Placement[] = [];
+  const kind = gemDef(gem.gemId).kind;
+  const base = opts.base ?? sheetOf(run);
+  const baseDps = sheetDps(base);
+  const baseScore = score(base);
+  const spots: { slot: EquipSlot; it: Item; socket: number; cur: Item['sockets'][number] }[] = [];
   for (const slot of EQUIP_SLOTS) {
     const it = run.build.equipment[slot];
-    if (!it) continue;
-    it.sockets.forEach((cur, socket) => {
-      const sockets = [...it.sockets];
-      sockets[socket] = gem;
-      const s = sheetOf(run, {
-        ...run.build,
-        equipment: { ...run.build.equipment, [slot]: { ...it, sockets } },
-      });
-      out.push({
-        slot,
-        socket,
-        dpsPct: pct(sheetDps(base), sheetDps(s)),
-        ehpPct: pct(base.ehp, s.ehp),
-        scorePct: pct(score(base), score(s)),
-        replaces: cur ? gemDef(cur.gemId).name : undefined,
-      });
+    if (it) it.sockets.forEach((cur, socket) => spots.push({ slot, it, socket, cur }));
+  }
+  const empties = spots.filter((p) => !p.cur);
+  const wanted = opts.emptiesFirst && empties.length ? empties : spots;
+  const out: Placement[] = [];
+  for (const { slot, it, socket, cur } of wanted) {
+    const replaces = cur ? gemDef(cur.gemId).name : undefined;
+    // A support in an empty socket of an item with no skill to support changes nothing: no need to work the sheet out.
+    if (kind === 'support' && !cur && !hasActiveSkill(it)) {
+      out.push({ slot, socket, dpsPct: 0, ehpPct: 0, scorePct: 0, replaces });
+      continue;
+    }
+    const sockets = [...it.sockets];
+    sockets[socket] = gem;
+    const s = sheetOf(run, {
+      ...run.build,
+      equipment: { ...run.build.equipment, [slot]: { ...it, sockets } },
+    });
+    out.push({
+      slot,
+      socket,
+      dpsPct: pct(baseDps, sheetDps(s)),
+      ehpPct: pct(base.ehp, s.ehp),
+      scorePct: pct(baseScore, score(s)),
+      replaces,
     });
   }
   return out;
 }
 
+/** The best socket for each of the gems, as the Skills tab's list badges show it (empty sockets first). */
+export function bestPlacements(run: RunState, gemUids: number[]): Map<number, Placement | null> {
+  const base = sheetOf(run);
+  const m = new Map<number, Placement | null>();
+  for (const uid of gemUids) m.set(uid, bestPlacement(run, uid, base));
+  return m;
+}
+
+/** The best socket for one gem (the empty sockets, or all of them when none is empty), by the bot's score. */
+export function bestPlacement(
+  run: RunState,
+  gemUid: number,
+  base?: CharacterSheet,
+): Placement | null {
+  const ps = placementsFor(run, gemUid, { base, emptiesFirst: true });
+  const empties = ps.filter((p) => !p.replaces);
+  const pool = empties.length ? empties : ps;
+  return pool.sort((a, b) => b.scorePct - a.scorePct)[0] ?? null;
+}
+
 /** Put a gem in the empty socket where it helps most (ties: the item with the most sockets). */
 export function quickSocket(run: RunState, gemUid: number): boolean {
-  const empties = placementsFor(run, gemUid).filter((p) => !p.replaces);
+  const empties = placementsFor(run, gemUid, { emptiesFirst: true }).filter((p) => !p.replaces);
   if (empties.length === 0) return false;
   empties.sort(
     (a, b) =>

@@ -1,11 +1,13 @@
-import { useMemo, useState } from 'preact/hooks';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 import type { Character } from '../calc/character';
 import { naturalGemLevel } from '../calc/gems';
 import { gemDef, type GemDef } from '../data/gems';
 import { EQUIP_SLOTS, type GemItem } from '../data/types';
 import type { Controller } from '../run/controller';
 import { setPrimary, socketGem, unsocketGem } from '../run/inventory';
+import { sheetOf } from '../run/bot';
 import {
+  bestPlacement,
   moveGem,
   placementsFor,
   quickSocket,
@@ -106,6 +108,11 @@ export function gemStatus(
   return null;
 }
 
+/** How long the badges are worked on at a time before the screen gets its turn, in milliseconds. */
+const BADGE_SLICE_MS = 8;
+/** How long after the last change they wait before they start, in milliseconds. */
+const BADGE_DELAY_MS = 250;
+
 const sameSocket = (a: SocketRef, b: SocketRef) => a.slot === b.slot && a.socket === b.socket;
 
 export function Skills({ c, ch }: { c: Controller; ch: Character }) {
@@ -161,16 +168,37 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
       for (const p of placementsFor(run, placing)) m.set(`${p.slot}:${p.socket}`, p);
     return m;
   }, [placing, run.build, gemKey]);
-  // Best placement per inventory gem, for the list badges.
-  const best = useMemo(() => {
-    const m = new Map<number, Placement | null>();
-    for (const g of gems) {
-      const ps = placementsFor(run, g.uid);
-      const empties = ps.filter((p) => !p.replaces);
-      const pool = empties.length ? empties : ps;
-      m.set(g.uid, pool.sort((a, b) => b.scorePct - a.scorePct)[0] ?? null);
-    }
-    return m;
+  // Best placement per inventory gem, for the list badges. Each gem is tried in each socket, which is a lot of sheets, so it is
+  // worked out a little at a time after the screen has been drawn, and the badges already shown stay until their gem is redone.
+  const [best, setBest] = useState<Map<number, Placement | null>>(() => new Map());
+  useEffect(() => {
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const uids = gems.map((g) => g.uid);
+    const alive = new Set(uids);
+    let base: ReturnType<typeof sheetOf> | undefined;
+    let at = 0;
+    const step = () => {
+      if (stopped) return;
+      base ??= sheetOf(run);
+      const done = new Map<number, Placement | null>();
+      const t0 = performance.now();
+      while (at < uids.length && performance.now() - t0 < BADGE_SLICE_MS)
+        done.set(uids[at], bestPlacement(run, uids[at++], base));
+      setBest((prev) => {
+        const m = new Map<number, Placement | null>();
+        for (const [uid, p] of prev) if (alive.has(uid)) m.set(uid, p);
+        for (const [uid, p] of done) m.set(uid, p);
+        return m;
+      });
+      if (at < uids.length) timer = setTimeout(step, 0);
+    };
+    // (After a pause: a run of moves does not start the work again with every one.)
+    timer = setTimeout(step, BADGE_DELAY_MS);
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+    };
   }, [gems, run.build]);
 
   const place = (to: SocketRef, from: Drag | Sel) => {
