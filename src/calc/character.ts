@@ -1846,7 +1846,12 @@ export class Character {
     const k = `${conds}|${scenario}`;
     let plan = this.plans.get(k);
     if (plan) return plan;
-    const reach = skillRange(this.profile(this.mainFor(scenario), conds));
+    // The character stands where the main skill reaches, and the target stands where the sheet puts it: a periodic skill that
+    // reaches as far as either is in reach (one that reaches less than both is counted as never cast).
+    const reach = Math.min(
+      skillRange(this.profile(this.mainFor(scenario), conds)),
+      this.config.targetDistance ?? 3,
+    );
     const gap = new Map(this.utilityLoad(conds, scenario).map((u) => [u.choice.key, 1 / u.rate]));
     const rotation: (PlanSkill & { utility: boolean })[] = [];
     for (const e of this.rotation) {
@@ -1963,6 +1968,32 @@ export class Character {
     for (const r of this.utilityLoad(conds, scenario))
       if (r.choice !== main) taken += this.profile(r.choice, conds).cost * r.rate;
     return taken;
+  }
+
+  /**
+   * The damage a second of the whole rotation against a target in a kind of fight (what `scenarioDps` gives for `sheet`, without
+   * the defences): the main skill, the other skills it uses, the triggered skills and the minions. For the map cards, which price
+   * the character against many monsters.
+   */
+  rotationDps(
+    conds: number = this.configConds,
+    scenario: Scenario = 'pack',
+    target?: TargetState,
+  ): number {
+    const main = this.mainFor(scenario);
+    const sheet = this.skillSheet(
+      main,
+      target,
+      conds,
+      undefined,
+      0,
+      1,
+      this.planned(main, conds, scenario),
+    );
+    let dps = sheet.totalDps + this.minionDps(conds);
+    for (const t of this.secondarySheets(conds, target, scenario)) dps += t.dps;
+    for (const t of this.triggerSheets(conds, target, scenario)) dps += t.dps;
+    return dps;
   }
 
   /** The main skill of a kind of fight, at the rate the rotation gives it. */

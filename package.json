@@ -20,6 +20,7 @@
     "dpsaudit": "tsx scripts/dps-audit.ts",
     "dpsgems": "tsx scripts/dps-gems.ts",
     "dpsinspect": "tsx scripts/dps-inspect.ts",
+    "dpsminions": "tsx scripts/dps-minions.ts",
     "random": "tsx scripts/random-play.ts",
     "lethality": "tsx scripts/theme-lethality.ts",
     "sheet": "tsx scripts/sheet.ts",

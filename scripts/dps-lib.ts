@@ -89,6 +89,7 @@ export function measure(build0: Build, fight: Fight, o: MeasureOpts): Result {
       rarity: fight === 'boss' ? 'boss' : 'normal',
       bystanders: fight === 'pack' ? 3 : 0,
       fixed: true,
+      angle: 0.6,
     });
     if (o.freeResources === false) world.opts.freeResources = false;
     while (world.status === 'running') {

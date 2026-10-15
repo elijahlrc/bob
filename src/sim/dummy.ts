@@ -84,6 +84,8 @@ export function createDummyWorld(
     bystanders?: number;
     /** The dummies cannot be moved (pushed by the character, knocked back): the measuring tools set it. */
     fixed?: boolean;
+    /** Turns the dummies about the character by this many radians, so that its minions are not stuck behind it in a line. */
+    angle?: number;
   },
 ): { world: World; dummy: Actor } {
   const size = opts.size ?? 30;
@@ -131,12 +133,13 @@ export function createDummyWorld(
     xp: 0,
     opts: { maxTime: opts.maxTime ?? 600, freeResources: true, autoAbandonAt: Infinity },
   });
+  const turn = opts.angle ?? 0;
   const stand = (dx: number, dy: number, name: string): Actor => {
     const d = spawnMonster(
       world,
       { type: 'warrior', variant: 'none', rarity: 'normal', level: 1, mods: [] },
-      start.x + dx,
-      start.y + dy,
+      start.x + dx * Math.cos(turn) - dy * Math.sin(turn),
+      start.y + dx * Math.sin(turn) + dy * Math.cos(turn),
       0,
       0,
       name,

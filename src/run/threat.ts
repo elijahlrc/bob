@@ -249,8 +249,10 @@ export function scoreTheme(
       mods: [],
       affix: onMonsters,
     }).defence;
-    const s = me.skillSheet(me.primary, { def, shock: 0, resShift: [...NO_SHIFT] }, conds);
-    dps += threat.variants[v] * s.totalDps;
+    // The whole rotation against a pack of them (docs/SHEET-AUDIT.md), not the main skill alone.
+    dps +=
+      threat.variants[v] *
+      me.rotationDps(conds, 'pack', { def, shock: 0, resShift: [...NO_SHIFT] });
   }
   // The Hollow are ethereal (half physical damage taken) and evasive: a build is slower to kill them.
   const hollow = typeShares(theme)
@@ -258,22 +260,18 @@ export function scoreTheme(
     .reduce((n, [, share]) => n + share, 0);
   if (hollow > 0) {
     const against = (type: MonsterTypeId) =>
-      me.skillSheet(
-        me.primary,
-        {
-          def: buildMonster({
-            type,
-            variant: 'none',
-            rarity: 'normal',
-            level,
-            mods: [],
-            affix: affixes,
-          }).defence,
-          shock: 0,
-          resShift: [...NO_SHIFT],
-        },
-        conds,
-      ).totalDps;
+      me.rotationDps(conds, 'pack', {
+        def: buildMonster({
+          type,
+          variant: 'none',
+          rarity: 'normal',
+          level,
+          mods: [],
+          affix: affixes,
+        }).defence,
+        shock: 0,
+        resShift: [...NO_SHIFT],
+      });
     const ratio = against('gloomstalker') / Math.max(1e-9, against('warrior'));
     dps *= 1 - hollow + hollow * ratio;
   }
