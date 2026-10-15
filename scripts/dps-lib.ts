@@ -8,6 +8,7 @@ import type { TargetState } from '../src/calc/combat';
 import { referenceMonster } from '../src/calc/monster';
 import type { Build } from '../src/data/types';
 import { createDummyWorld, dummyDefence } from '../src/sim/dummy';
+import { layCorpses } from '../src/sim/gemKit';
 import { stepWorld } from '../src/sim/world';
 
 export type Fight = 'pack' | 'boss';
@@ -22,6 +23,8 @@ export type MeasureOpts = {
   reference: boolean;
   /** Mana and life are free (the sheet's DPS does not consider them). */
   freeResources?: boolean;
+  /** A corpse is laid beside the dummy every few tenths of a second (for the skills that raise or burst corpses). */
+  corpses?: boolean;
 };
 
 export type Row = {
@@ -81,7 +84,7 @@ export function measure(build0: Build, fight: Fight, o: MeasureOpts): Result {
   let secs = 0;
   let total = 0;
   for (let seed = 1; seed <= o.sims; seed++) {
-    const { world } = createDummyWorld(build, {
+    const { world, dummy } = createDummyWorld(build, {
       distance: o.distance,
       maxTime: o.time,
       seed,
@@ -92,8 +95,13 @@ export function measure(build0: Build, fight: Fight, o: MeasureOpts): Result {
       angle: 0.6,
     });
     if (o.freeResources === false) world.opts.freeResources = false;
+    let nextCorpse = 0;
     while (world.status === 'running') {
       stepWorld(world);
+      if (o.corpses && world.t >= nextCorpse) {
+        layCorpses(world, dummy.x, dummy.y, 1);
+        nextCorpse = world.t + 0.4;
+      }
       for (const e of world.events) {
         if (e.t === 'use' && e.src === world.player.id) {
           const nm = [...nameOf].find(([, id]) => id === e.skill);

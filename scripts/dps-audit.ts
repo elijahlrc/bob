@@ -1,7 +1,7 @@
 /**
  * The damage preview against the damage the sim deals (docs/SHEET-AUDIT.md).
  *
- *   npm run dpsaudit -- [--class all|id,id] [--maps 12,24,40] [--seeds 1] [--time 240] [--sims 1] [--target reference] [--mana]
+ *   npm run dpsaudit -- [--class all|id,id] [--maps 12,24,40] [--seeds 1] [--time 240] [--sims 1] [--target reference] [--mana] [--legacy]
  *                       [--builds file.json] [--save file.json] [--brief]
  *
  * Builds come from the bot (a run played to the given maps; its build at the start of each), or from a file saved by an earlier
@@ -22,6 +22,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { CLASSES } from '../src/data/classes';
 import type { Build } from '../src/data/types';
 import { botRun } from '../src/run/bot';
+import { LEGACY } from '../src/data/difficulty';
 import { f1, measure, type Fight, type MeasureOpts } from './dps-lib';
 
 const argv = process.argv.slice(2);
@@ -34,6 +35,7 @@ const time = Number(opt('--time', '240'));
 const sims = Number(opt('--sims', '1'));
 const reference = opt('--target', 'dummy') === 'reference';
 const brief = argv.includes('--brief');
+const legacy = argv.includes('--legacy');
 const mana = argv.includes('--mana');
 const DIST = 4;
 
@@ -43,6 +45,8 @@ export type Captured = { label: string; build: Build };
 function capture(classId: string, seed: number): Captured[] {
   const got = new Map<number, Build>();
   botRun(classId, seed, Math.max(...maps), {
+    // The old difficulty curve, so that the bot lives long enough to be measured at the later maps.
+    difficulty: legacy ? LEGACY : undefined,
     onTick: (_w, run) => {
       if (maps.includes(run.map) && !got.has(run.map)) got.set(run.map, structuredClone(run.build));
     },

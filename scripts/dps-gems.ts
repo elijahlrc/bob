@@ -25,7 +25,13 @@ for (const def of ACTIVE_GEMS) {
   let line: Line;
   try {
     const build = buildForActive(def);
-    const r = measure(build, 'boss', { distance, time, sims: 1, reference });
+    const r = measure(build, 'boss', {
+      distance,
+      time,
+      sims: 1,
+      reference,
+      corpses: !!def.needsCorpse,
+    });
     const mine = r.rows.find((x) => x.id === def.id);
     const note = mine
       ? `uses ${f1(mine.simUses)}/${f1(mine.sheetUses)}${mine.simShots > 0 ? ` +${f1(mine.simShots)}` : ''}`
