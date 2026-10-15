@@ -66,6 +66,17 @@ import {
 } from '../data/gems';
 import { excludedBy, resolveSupports, typesAllow } from '../data/skillTypes';
 import { supportLive } from './reach';
+import {
+  cloneDamage,
+  ELEMENT_SHARE,
+  elementAfterHits,
+  groundHits,
+  orbHits,
+  ownDebuffMore,
+  podHits,
+  shotgunHits,
+  volleysHits,
+} from './patterns';
 import { getTree } from '../data/tree';
 import { KEYSTONES } from '../data/tree/keystones';
 import {
@@ -126,7 +137,7 @@ import { buildProfile, formedProfile, type HandStats, type SkillProfile } from '
 import { TOTEM_FIRST_SHOT, deploySecondsOf, totemInterval } from './deploy';
 import { carriedSeconds, renewalGap } from './dot';
 import { geyserHits } from './geyser';
-import { exposureShift, groundHits, sporeMult, standingHits, zapMult } from './channelFx';
+import { exposureShift, sporeMult, standingHits, zapMult } from './channelFx';
 import { afterHitTargetHits, tornadoHits } from './afterHit';
 import { strongestOf } from './ailmentMax';
 import { planRotation, type Plan, type PlanSkill } from './rotation';
@@ -1563,17 +1574,18 @@ export class Character {
     const distance = this.config.targetDistance ?? 3;
     // What a strike sends out after it has to hit too (src/calc/afterHit.ts).
     const followed = p.skill.afterHit ? expectedHit(p, p.hands[0], t, d) : null;
+    const patches = usesPerSec * (choice.triggered ? 1 : 1 + p.repeats);
     // Otherwise a barrage lands every projectile on one target; a shotgun some of them; a cone is a second hit with each shot;
-    // a geyser blasts again and again while it stands.
+    // a geyser blasts again and again while it stands; ground that hurts adds its pulses.
     const volley = setGoing
       ? setGoing.hitsPerSec /
         Math.max(1e-9, usesPerSec) /
         ((choice.triggered ? 1 : 1 + p.repeats) * p.pulses)
-      : volleyHits(p, distance, followed ? followed.hitChance * (1 - followed.blockChance) : 1) *
+      : (volleyHits(p, distance, followed ? followed.hitChance * (1 - followed.blockChance) : 1) +
+          groundHits(p, patches, distance)) *
           channelMult(p) *
           geyserHits(p, usesPerSec) +
-        sporeMult(p, distance) +
-        groundHits(p);
+        sporeMult(p, distance);
     for (const h of p.hands) {
       const ex = expectedHit(p, h, t, d);
       const w = p.bothHands ? 1 : 1 / n;
@@ -1589,10 +1601,12 @@ export class Character {
         (choice.triggered ? 1 : 1 + p.repeats) *
         p.pulses *
         volley;
-      const ail = expectedAilments(p, h, t, d, handUses, land);
+      // (A skill that picks its element for each use burns, and so ignites, in one use of three: the figures are for fire.)
+      const ailUses = handUses * (p.skill.element ? ELEMENT_SHARE : 1);
+      const ail = expectedAilments(p, h, t, d, ailUses, land);
       // Of the ignites (or bleeds) alive at once only the strongest burns (src/calc/ailmentMax.ts); a skill's burning debuffs
       // add up and go by the average ignite.
-      const top = strongestOf(p, h, t, d, handUses * land, ex.critGivenHit);
+      const top = strongestOf(p, h, t, d, ailUses * land, ex.critGivenHit);
       ign = Math.max(ign, ail.igniteDps);
       igs = Math.max(igs, ail.igniteDps * top.ignite);
       bl = Math.max(bl, ail.bleedDps * top.bleed);
@@ -1603,6 +1617,8 @@ export class Character {
     // A chain of mines: each deals more than the one before it, so a set deals more on average.
     if (choice.deploy === 'mine' && p.mineChain > 0)
       perUse *= 1 + ((p.mineChain / 100) * (deployN - 1)) / 2;
+    // The debuffs a skill leaves on its target make its own later hits hit harder (Snare Shot).
+    perUse *= 1 + ownDebuffMore(p, usesPerSec * lands);
     let hitDps = perUse * usesPerSec * lands;
     if (cdRate !== undefined && timeShare - usesPerSec * p.useTime > 1e-6)
       hitDps +=
@@ -1960,6 +1976,23 @@ export class Character {
     return dps;
   }
 
+  /**
+   * Damage a second of the clones the character's skills leave where their arrows land (Mirror Quiver): each use of the skill
+   * leaves one, and every clone shoots at the target for as long as it stands.
+   */
+  cloneDps(conds: number = this.configConds, scenario: Scenario = 'pack'): number {
+    let dps = 0;
+    for (const c of this.actives) {
+      const spec = c.skill.mirror;
+      if (!spec) continue;
+      const fires = this.planned(c, conds, scenario).fires;
+      if (fires <= 0) continue;
+      const p = this.profile(c, conds);
+      dps += fires * (1 + p.repeats) * cloneDamage(this.hands[0], spec, p);
+    }
+    return dps;
+  }
+
   /** How the utility skills take the character's time: each is cast once per cooldown (or per buff or curse duration). */
   utilityLoad(
     conds: number = this.configConds,
@@ -2207,7 +2240,7 @@ export class Character {
       hexes: this.sheetHexes,
       secondary,
       secondaryDps: secondary.reduce((a, t) => a + t.dps, 0),
-      minionDps: this.minionDps(conds),
+      minionDps: this.minionDps(conds) + this.cloneDps(conds, scenario),
       ehp: this.ehp(d),
       auras: this.auras.map((a) => ({ name: a.def.name, reserved: a.reserved, active: a.active })),
       warnings: this.warnings,
@@ -2228,11 +2261,7 @@ export function volleyHits(p: SkillProfile, distance: number, hitChance = 1): nu
   let hits = 1;
   if (b.kind === 'projectile') {
     if (p.projMode.sequential) hits = p.projectiles;
-    else if (p.projMode.shotgun && p.projectiles > 1) {
-      const step = ((b.count > 1 && b.spread > 0 ? b.spread / (b.count - 1) : 10) * Math.PI) / 180;
-      const within = Math.atan(0.5 / Math.max(0.5, distance)) / step;
-      hits = Math.max(1, Math.min(p.projectiles, 1 + 2 * within));
-    }
+    else if (p.projMode.shotgun && p.projectiles > 1) hits = shotgunHits(p, distance);
   }
   // A projectile that pierces and comes back hits a target in its path on both legs.
   if (b.kind === 'projectile' && b.returns && p.pierce > 0)
@@ -2243,15 +2272,14 @@ export function volleyHits(p: SkillProfile, distance: number, hitChance = 1): nu
   if (b.kind === 'ground' && b.count !== undefined && b.spread === 'stack')
     hits *= Math.max(1, p.projectiles / b.count);
   // Pods fall in a scatter around the target: a standing target is inside the burst of some of them.
-  const pods = p.skill.pods;
-  if (pods) {
-    const spread = pods.spread * Math.sqrt(p.projectiles / 5);
-    hits = Math.max(
-      1,
-      p.projectiles * Math.min(1, (pods.burstRadius / Math.max(0.5, spread)) ** 2),
-    );
-  }
-  return hits + afterHitTargetHits(p, distance, hitChance);
+  if (p.skill.pods) hits = podHits(p);
+  if (p.skill.volleys) hits *= volleysHits(p);
+  if (p.skill.pulse) hits = orbHits(p, distance);
+  return (
+    hits +
+    afterHitTargetHits(p, distance, hitChance) +
+    (p.skill.afterHit ? elementAfterHits(p, distance) : 0)
+  );
 }
 
 /**
