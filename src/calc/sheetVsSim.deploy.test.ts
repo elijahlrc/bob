@@ -165,6 +165,11 @@ describe('mines (Mortar Charge)', () => {
 describe('mines (Storm Charge)', () => {
   it('the enemies near the mines take more from every hit, and the sheet counts it', () => {
     const r = play(['stormCharge']);
+    const p = r.c.profile(r.c.primary);
+    // The mines near the target make it take more from every hit, and add no damage of their own.
+    const aura = mineAura(r.c.primary, p, r.target, (r.shots.stormCharge ?? 0) / r.secs);
+    expect(aura.more).toBeGreaterThan(1.02);
+    expect(aura.add).toBe(0);
     expect(ratio(r)).toBeGreaterThan(0.9);
     expect(ratio(r)).toBeLessThan(1.1);
   });
