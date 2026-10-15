@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { Character, scenarioDps } from './character';
 import { carriedSeconds, renewalGap } from './dot';
 import { planRotation } from './rotation';
-import { activeGem, buildFor, buildForActive, weaponFor } from '../sim/gemKit';
+import { activeGem, buildFor, buildForActive, layCorpses, weaponFor } from '../sim/gemKit';
 import { createDummyWorld, dummyDefence } from '../sim/dummy';
 import { stepWorld } from '../sim/world';
 import type { Build } from '../data/types';
@@ -129,6 +129,26 @@ describe('Spirit Saw: the saw carries its debuff along', () => {
     const b = buildForActive(activeGem('creepingPlague'));
     const c = sheetOf(b).c;
     expect(carriedSeconds(c.profile(c.primary), DISTANCE)).toBe(0);
+  });
+});
+
+describe('Pyre Burst: a corpse becomes a geyser that blasts for a while', () => {
+  it('with corpses to burn, the sheet counts the geyser, not one blast a use', () => {
+    const def = activeGem('pyreBurst');
+    const build = buildForActive(def);
+    const { dps, sheet } = sheetOf(build);
+    // A corpse lies by the target every so often (the skill cannot be used without one, and the sheet is for a character that has them).
+    let next = 0;
+    const feed = (world: World, dummy: Actor) => {
+      if (world.t < next) return;
+      layCorpses(world, dummy.x - 1, dummy.y, 1);
+      next += 0.4;
+    };
+    const sim = play(build, def.id, 30, feed);
+    // The skill is used as often as the sheet says; the damage is the geyser's.
+    expect(sim.uses / sheet.skill.usesPerSec).toBeGreaterThan(0.9);
+    expect(sim.perSec / dps).toBeGreaterThan(0.9);
+    expect(sim.perSec / dps).toBeLessThan(1.1);
   });
 });
 

@@ -125,6 +125,7 @@ import { LEGACY, statLevel, type Difficulty } from '../data/difficulty';
 import { buildProfile, formedProfile, type HandStats, type SkillProfile } from './skill';
 import { TOTEM_FIRST_SHOT, deploySecondsOf, totemInterval } from './deploy';
 import { carriedSeconds } from './dot';
+import { geyserHits } from './geyser';
 import { planRotation, type Plan, type PlanSkill } from './rotation';
 
 export type CalcConfig = {
@@ -1552,7 +1553,8 @@ export class Character {
     let po = 0;
     const n = p.hands.length;
     // A barrage lands every projectile on one target; a shotgun some of them; a cone is a second hit with each shot.
-    const volley = volleyHits(p, this.config.targetDistance ?? 3) * channelMult(p);
+    const volley =
+      volleyHits(p, this.config.targetDistance ?? 3) * channelMult(p) * geyserHits(p, usesPerSec);
     for (const h of p.hands) {
       const ex = expectedHit(p, h, t, d);
       const w = p.bothHands ? 1 : 1 / n;
