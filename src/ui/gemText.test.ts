@@ -13,6 +13,20 @@ describe('gemCardData', () => {
       }
   });
 
+  it('a support says which skills it will not take, so "any skill" is true', () => {
+    for (const def of ALL_GEMS) {
+      if (def.kind !== 'support' || !def.excludes?.length) continue;
+      const line = gemCardData(def, 1).stats.find((l) => l.startsWith('Not '));
+      expect(line, def.id).toBeDefined();
+    }
+    const innervate = gemCardData(
+      ALL_GEMS.find((g) => g.id === 'livewire')!,
+      1,
+    ).stats;
+    expect(innervate).toContain('Supports any skill');
+    expect(innervate.some((l) => l.startsWith('Not '))).toBe(false);
+  });
+
   it('scales values with level', () => {
     const def = ALL_GEMS.find((g) => g.kind === 'active')!;
     const lo = gemCardData(def, 1).stats.join('|');

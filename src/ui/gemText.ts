@@ -330,6 +330,8 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
         ? `Supports ${def.supports.map(tagLabel).join(' or ')} skills`
         : 'Supports any skill',
     );
+    if (def.needs?.length) stats.push(`Needs ${def.needs.map(tagLabel).join(' and ')} skills`);
+    if (def.excludes?.length) stats.push(`Not ${def.excludes.map(tagLabel).join(' or ')} skills`);
     if (def.trigger)
       stats.push(
         `Linked spells are cast ${triggerCause(def.trigger)} (${def.trigger.cooldown} s cooldown)`,

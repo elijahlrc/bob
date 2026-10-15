@@ -6,6 +6,7 @@ change, and our own names only. Dash bullets under plain headings.
 
 ## 2026-10-14
 
+- Support gem cards now list the skills they will not take, such as Triple Cadence and channelled skills, so "Supports any skill" is no longer misleading.
 - Livewire can now support traps, mines and totems, not only attacks and spells you cast yourself.
 - The stop screens, Respite and map-type cards, and the boss map card now use fewer words: they say what you get and what you choose, and no longer list what the level does not give.
 - New enemy affix, Blinking: the monster marks the spot where you stand and, a moment later, teleports onto it with a travel spell of its element. Cinder Step bursts in fire and leaves burning ground, Rime Step bursts in cold and leaves chilling ground, Bolt Step flashes at both ends, and a plain one just lands hard. Stun it while it gathers to stop it.
