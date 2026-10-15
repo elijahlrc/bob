@@ -186,5 +186,6 @@ describe('the bot at a stop', () => {
       expect(r.maps.map((m) => m.map)).toEqual([...r.maps.map((m) => m.map)].sort((a, b) => a - b));
     }
     expect(stops).toBeGreaterThan(0);
-  });
+    // Six whole bot runs: about 20 s here, and a shared CI runner takes three times that.
+  }, 180000);
 });

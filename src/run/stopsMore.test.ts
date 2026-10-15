@@ -155,5 +155,6 @@ describe('the bot at every stop', () => {
       taken += r.maps.filter((m) => m.status === 'stop').length;
     }
     expect(taken).toBeGreaterThan(0);
-  });
+    // Six whole bot runs: slow on a shared CI runner.
+  }, 180000);
 });
