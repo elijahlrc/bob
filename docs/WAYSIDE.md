@@ -648,3 +648,7 @@ it wins; the sections above are corrected where it was cheap and otherwise kept 
 - **Provisions are common enough that the pouch will usually be full.** With three held, a find is lost (nothing is dropped, the pouch is
   simply full), so the player is nudged to arm and spend them. Not measured.
 - **The measurements of section 16 are stale** (they were taken with the old rates, the Market, a single reprieve slot and the specialists).
+
+### 17.2 Twice as many stops (2026-10-15)
+
+Players found stops rare. Each window of five levels now holds two stops (`STOPS_PER_WINDOW`, `stopLevels` in `offers.ts`), on levels that are not fifths or tenths and never next to each other, so about two levels in five. A player who takes every one gives up two fifths of the run's XP and loot; the `stopper` bot comparison has not been repeated at this density.

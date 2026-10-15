@@ -63,7 +63,7 @@ export const STOPS: StopDef[] = [
 
 export const stopDef = (id: StopId): StopDef => STOPS.find((s) => s.id === id)!;
 
-/** Stops are scheduled in windows of this many levels, starting at `STOP_FROM`: one stop to a window (a fifth of the run's levels). */
+/** Stops are scheduled in windows of this many levels, starting at `STOP_FROM`: `STOPS_PER_WINDOW` (offers.ts) stops to a window. */
 export const STOP_WINDOW = 5;
 export const STOP_FROM = 6;
 

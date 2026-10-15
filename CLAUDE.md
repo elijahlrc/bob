@@ -29,7 +29,7 @@
 - **Wayside** (2026-10-13, revised 2026-10-14): [docs/WAYSIDE.md](docs/WAYSIDE.md) (milestones Y1 to Y7, built; section 17 is the latest revision; questions met on the way in
   [docs/WAYSIDE-QUESTIONS.md](docs/WAYSIDE-QUESTIONS.md)): Bone Dust is the money, and the only currency that drops (`CURRENCY_DROPS = false` in `data/constants.ts`;
   the Workbench and the currency code stay). A **stop** is a third kind of offer (`OfferKind` `stop`, `src/data/stops.ts`, `src/run/stops.ts`: Awlsmith, Gem Hoard,
-  Shrine, Quartermaster, Ferryman; it costs the level; one in every five levels from level 6, a stateless schedule, `stopAt` in `offers.ts`); the Quartermaster's wares are
+  Shrine, Quartermaster, Ferryman; it costs the level; two in every five levels from level 6 (doubled 2026-10-15), a stateless schedule, `stopAt` in `offers.ts`); the Quartermaster's wares are
   `src/run/sale.ts` (a camp Market was built and cut on 2026-10-14). **Provisions** (`src/data/provisions.ts`, `src/run/provisions.ts`) fill a pouch of three: staples and
   bets are armed at camp and burn when a map starts; **reprieves** (`src/data/reprieves.ts`, `src/sim/reprieve.ts`) are provisions of a third kind, always ready, fired
   in `applyDamage` when damage would kill, and they refill the flasks. A cleared map may leave a provision (`forage`); reward picks may hold provision and reprieve cards

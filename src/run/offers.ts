@@ -140,24 +140,33 @@ export function makeStop(map: number, slot: number, stop: StopId): MapOffer {
   };
 }
 
+/** How many stops each window of levels holds. */
+export const STOPS_PER_WINDOW = 2;
+
 /**
- * The level of window `w` that holds its stop: one of the window's levels, drawn from the run seed alone. Never a fifth or tenth
- * level (a reward pick or a gate is due there), and never past level 99.
+ * The levels of window `w` that hold its stops, in order: drawn from the run seed alone. Never a fifth or tenth level (a reward
+ * pick or a gate is due there), never past level 99, and never two levels in a row.
  */
-export function stopLevel(seed: number, w: number): number | null {
+export function stopLevels(seed: number, w: number): number[] {
   const first = STOP_FROM + w * STOP_WINDOW;
   const levels: number[] = [];
   for (let l = first; l < first + STOP_WINDOW; l++) if (l % 5 !== 0 && l < 100) levels.push(l);
-  return levels.length ? new Rng(seed).fork(`stopat${w}`).pick(levels) : null;
+  const rng = new Rng(seed).fork(`stopat${w}`);
+  const pairs: number[][] = [];
+  for (let i = 0; i < levels.length; i++)
+    for (let j = i + 1; j < levels.length; j++)
+      if (levels[j] - levels[i] > 1) pairs.push([levels[i], levels[j]]);
+  if (pairs.length) return rng.pick(pairs);
+  return levels.length ? [rng.pick(levels)] : [];
 }
 
-/** Which stop window `w` holds: drawn by weight among the stops open at its level, never the kind of the window before. */
-export function stopKind(seed: number, w: number): StopId | null {
+/** Which stop the run's `n`th is: drawn by weight among the stops open at its level, never the kind of the one before. */
+export function stopKind(seed: number, n: number): StopId | null {
   let prev: StopId | null = null;
   let kind: StopId | null = null;
-  for (let j = 0; j <= w; j++) {
-    const at = stopLevel(seed, j);
-    if (at === null) return null;
+  for (let j = 0; j <= n; j++) {
+    const at = stopLevels(seed, Math.floor(j / STOPS_PER_WINDOW))[j % STOPS_PER_WINDOW];
+    if (at === undefined) return null;
     const open = STOPS.filter((s) => s.from <= at);
     const pool = open.filter((s) => s.id !== prev);
     const from = pool.length ? pool : open;
@@ -169,11 +178,12 @@ export function stopKind(seed: number, w: number): StopId | null {
   return kind;
 }
 
-/** The stop on offer at a level, if the schedule puts one there (about one in eight levels from level 9). */
+/** The stop on offer at a level, if the schedule puts one there (two in every five levels from level 6). */
 export function stopAt(seed: number, map: number): StopId | null {
   if (map < STOP_FROM || map % 5 === 0) return null;
   const w = Math.floor((map - STOP_FROM) / STOP_WINDOW);
-  return stopLevel(seed, w) === map ? stopKind(seed, w) : null;
+  const k = stopLevels(seed, w).indexOf(map);
+  return k < 0 ? null : stopKind(seed, w * STOPS_PER_WINDOW + k);
 }
 
 /**

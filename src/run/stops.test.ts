@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { STOP_FROM, STOP_WINDOW } from '../data/stops';
+import { STOP_FROM } from '../data/stops';
 import type { Item } from '../data/types';
 import { botRun } from './bot';
 import { botStopChoice } from './botStop';
-import { rollOffers, stopAt, stopLevel } from './offers';
+import { rollOffers, stopAt, stopLevels, STOPS_PER_WINDOW } from './offers';
 import { newRun, setMap, type RunState } from './run';
 import { awlsmithItems, hoardGems, hoardKinds, stopProblem, takeStop } from './stops';
 import { waysideOf } from './wayside';
@@ -21,7 +21,7 @@ function atStop(seed: number, want?: string): { run: RunState; slot: number } {
 }
 
 describe('the stop schedule (docs/WAYSIDE.md 5.1)', () => {
-  it('puts one stop in each window of five levels, never on a fifth or tenth level or before level 6', () => {
+  it('puts two stops in each window of five levels, never on a fifth or tenth level, before level 6 or on two levels in a row', () => {
     for (const seed of [1, 2, 3, 77, 1234]) {
       const at: number[] = [];
       for (let map = 1; map <= 100; map++) if (stopAt(seed, map)) at.push(map);
@@ -29,12 +29,15 @@ describe('the stop schedule (docs/WAYSIDE.md 5.1)', () => {
         expect(m).toBeGreaterThanOrEqual(STOP_FROM);
         expect(m % 5).not.toBe(0);
       }
-      const windows = at.map((m) => Math.floor((m - STOP_FROM) / STOP_WINDOW));
-      expect(new Set(windows).size).toBe(windows.length);
-      expect(at.length).toBeGreaterThanOrEqual(17);
+      for (let i = 1; i < at.length; i++) expect(at[i] - at[i - 1]).toBeGreaterThan(1);
+      expect(at.length).toBeGreaterThanOrEqual(34);
       // Every run meets one before level 10.
       expect(at[0]).toBeLessThanOrEqual(9);
-      for (let w = 0; w < windows.length; w++) expect(at).toContain(stopLevel(seed, w));
+      for (let w = 0; w < 18; w++) {
+        const here = stopLevels(seed, w);
+        expect(here).toHaveLength(STOPS_PER_WINDOW);
+        for (const l of here) expect(at).toContain(l);
+      }
     }
   });
 

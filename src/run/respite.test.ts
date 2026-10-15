@@ -158,9 +158,9 @@ describe('auto-continue and the bot', () => {
 
   it('the bot rests when it is worn down and a Respite is offered, and takes a map otherwise', () => {
     const run = newRun('vanguard', 6);
-    setMap(run, 12);
+    setMap(run, 13);
     run.vitals = hurt(0.2);
-    run.offers = rollOffers(run.seed, 12, run.vitals);
+    run.offers = rollOffers(run.seed, 13, run.vitals);
     expect(chooseOffer(run, 'best').kind).toBe('respite');
     run.vitals = hurt(0.6);
     expect(chooseOffer(run, 'best').kind).toBe('map');
@@ -178,11 +178,11 @@ describe('the verdict on an offer', () => {
 
   it('every map offer has one, a Respite has none, and a worn-down character gets worse ones', () => {
     const run = newRun('vanguard', 6);
-    setMap(run, 12);
+    setMap(run, 13);
     const well = offersFor(run);
     expect(well.every((o) => o.verdict !== undefined && o.ratio! > 0)).toBe(true);
     run.vitals = hurt(0.3);
-    run.offers = rollOffers(run.seed, 12, run.vitals);
+    run.offers = rollOffers(run.seed, 13, run.vitals);
     const worn = offersFor(run);
     expect(worn.find((o) => o.kind === 'respite')!.verdict).toBeUndefined();
     const m = worn.find((o) => o.kind === 'map')!;
