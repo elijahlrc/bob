@@ -96,7 +96,7 @@ export function Title({ c }: { c: Controller }) {
   const anyOk = saves.some((s) => s.result.status === 'ok');
   return (
     <div class="screen title">
-      <h1>Bob</h1>
+      <h1>Battle of Builds</h1>
       <p class="subtitle">An auto-battler of bones and numbers.</p>
       {saves.length > 0 && (
         <div class="saves">
