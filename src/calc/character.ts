@@ -143,6 +143,7 @@ import { referenceMonster } from './monster';
 import { LEGACY, statLevel, type Difficulty } from '../data/difficulty';
 import { buildProfile, formedProfile, type HandStats, type SkillProfile } from './skill';
 import { TOTEM_FIRST_SHOT, deploySecondsOf, shotDistance, totemInterval } from './deploy';
+import { deployedEffects, setStanding } from './deployed';
 import { carriedSeconds, renewalGap } from './dot';
 import { geyserHits } from './geyser';
 import { exposureShift, sporeMult, standingHits, zapMult } from './channelFx';
@@ -1581,6 +1582,8 @@ export class Character {
     if (setGoing) p = setGoing.profile;
     // A totem's shots start a little toward the target, a trap's, a mine's and a brand's on it.
     const distance = shotDistance(choice.deploy, this.config.targetDistance ?? 3);
+    // What one shot, trap or mine of a deployed skill lands on the target, and what its mines add (src/calc/deployed.ts).
+    const dep = deployedEffects(choice, p, t, this.config.targetDistance ?? 3, usesPerSec);
     // What a strike sends out after it has to hit too (src/calc/afterHit.ts).
     const followed = p.skill.afterHit ? expectedHit(p, p.hands[0], t, d) : null;
     const patches = usesPerSec * (choice.triggered ? 1 : 1 + p.repeats);
@@ -1593,7 +1596,8 @@ export class Character {
       : (volleyHits(p, distance, followed ? followed.hitChance * (1 - followed.blockChance) : 1) +
           groundHits(p, patches, distance)) *
           channelMult(p) *
-          geyserHits(p, usesPerSec) +
+          geyserHits(p, usesPerSec) *
+          dep.hits +
         sporeMult(p, distance);
     for (const h of p.hands) {
       const ex = expectedHit(p, h, t, d);
@@ -1628,7 +1632,7 @@ export class Character {
       perUse *= 1 + ((p.mineChain / 100) * (deployN - 1)) / 2;
     // The debuffs a skill leaves on its target make its own later hits hit harder (Snare Shot).
     perUse *= 1 + ownDebuffMore(p, usesPerSec * lands);
-    let hitDps = perUse * usesPerSec * lands;
+    let hitDps = perUse * usesPerSec * lands * dep.more + dep.add * usesPerSec * lands;
     if (cdRate !== undefined && timeShare - usesPerSec * p.useTime > 1e-6)
       hitDps +=
         this.skillSheet(this.defaultAttack, target, conds).hitDps *
@@ -1905,7 +1909,9 @@ export class Character {
             firstShot: TOTEM_FIRST_SHOT,
             interval: totemInterval(choice, p),
           }
-        : undefined,
+        : choice.deploy
+          ? setStanding(choice, p)
+          : undefined,
     };
   }
 

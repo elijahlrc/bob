@@ -66,6 +66,14 @@ a use is, as before.
 - a totem stands a while and is put down again when it ends, so it takes a use to put one down and shoots meanwhile: the plan
   counts the placements (uses) and the shots (fires) apart. `usesPerSec` on the skill's line is the shots a second;
 - a trap or mine set by a periodic skill counted one per use, not one per trap in the set.
+- **one shot, trap or mine** (`src/calc/deployed.ts`, tests in `sheetVsSim.deploy.test.ts`): a mortar totem (Mortar Bow) lands
+  every arrow whose burst reaches the target (6 a shot, not 1); a mine's rain of small bursts is counted by the chance each lands
+  on the target (Mortar Charge: about 2 hits a mine, not 1); the aura of the mines near the target adds raw fire damage to every
+  hit (the sim's `Mine` ledger row) and, for Storm Charge, more damage taken; a wall (Glacier Wall) hurts once as it goes up, not
+  every half second. Traps and mines stand in the rotation plan now (`setStanding`): the character lays no more once as many as
+  may stand do (3 sets), and uses its weapon until they go off, as the sim does (Mortar Charge 4.0 to 2.05 sets a second, with
+  0.68 weapon uses a second; Shrapnel Trap 1.0 to 0.58). Fire Breath Trap stays 15% low: its "more damage against the ignited"
+  holds in the sim (the dummy burns) and the sheet takes no condition of the target for granted (section 6).
 
 ### 3.3 One skill's own model
 

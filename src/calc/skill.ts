@@ -573,6 +573,8 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     DAMAGE_TYPES.map((_, t) => db.sum('base', stat, { ...baseCtx, ancestry: 1 << t }) / div);
 
   const beh = skill.behaviour;
+  // A crystal bursts once, and a wall hurts what stands under it only as it goes up: one hit, whatever the ground behaviour says.
+  const singleHit = !!(skill.crystal || skill.wall);
   const aoeMult = db.mult('aoe', baseCtx);
   const ailEffect = db.inc('ailmentEffect', baseCtx);
   const cannotInflictEle = db.flag('cannotInflictEle', baseCtx);
@@ -592,7 +594,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     useTime,
     repeats: Math.max(0, Math.round(db.sum('base', 'repeats', baseCtx))),
     // A crystal stands, then bursts once: it is a single hit, not a pulse of the ground each interval.
-    pulses: skill.crystal
+    pulses: singleHit
       ? 1
       : beh.kind === 'ground'
         ? Math.max(1, Math.floor((beh.duration * db.mult('skillDuration', baseCtx)) / beh.interval))
