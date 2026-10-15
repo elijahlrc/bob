@@ -92,7 +92,7 @@ function TelemetryNotice() {
 }
 
 /** The invite to the game's Discord server (a permanent one). Empty hides the invitation. */
-export const DISCORD_URL = '';
+export const DISCORD_URL = 'https://discord.gg/JJJgK9Prj3';
 
 /** Asks players to come and say what they think of the game. */
 function DiscordInvite() {
