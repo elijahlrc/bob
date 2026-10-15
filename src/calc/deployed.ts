@@ -19,6 +19,8 @@ export const TARGET_RADIUS = 0.5;
 export const TOTEM_AHEAD = 1.5;
 /** Tiles from the target of a mine that lies in a ring of several (`placeDeployable`, src/sim/deploy.ts). */
 export const MINE_RING = 1.2;
+/** Arrows of a mortar that come down along a line land at least this far apart, in tiles (`MORTAR_APART`, src/sim/shots.ts). */
+export const MORTAR_APART = 0.45;
 /** Seconds from a mine landing to its being armed (`MINE_ARM`), and from its being set off to its going (`DETONATION`). */
 export const MINE_ARM = 0.6;
 export const MINE_DETONATION = 0.25;
@@ -41,9 +43,11 @@ export function mortarHits(p: SkillProfile, aim: number): number {
   const n = Math.max(1, Math.round(p.projectiles));
   const reach = m.radius * p.radiusMult + TARGET_RADIUS;
   let hits = 0;
+  let lands = 0;
   for (let i = 0; i < n; i++) {
     const frac = n > 1 ? m.from + ((1 - m.from) * i) / (n - 1) : 1;
-    const lands = Math.max(1, aim * frac);
+    // Each lands further on than the one before, by at least a little, so that no two burst on one spot.
+    lands = Math.max(1, aim * frac, i > 0 ? lands + MORTAR_APART : 0);
     if (Math.abs(aim - lands) <= reach) hits++;
   }
   return Math.max(1, hits);

@@ -1581,7 +1581,10 @@ export class Character {
     const setGoing = standingHits(p, usesPerSec);
     if (setGoing) p = setGoing.profile;
     // A totem's shots start a little toward the target, a trap's, a mine's and a brand's on it.
-    const distance = shotDistance(choice.deploy, this.config.targetDistance ?? 3);
+    // (A mortar's arrows are counted from the totem's place by `deployedEffects`.)
+    const distance = p.skill.mortar
+      ? (this.config.targetDistance ?? 3)
+      : shotDistance(choice.deploy, this.config.targetDistance ?? 3);
     // What one shot, trap or mine of a deployed skill lands on the target, and what its mines add (src/calc/deployed.ts).
     const dep = deployedEffects(choice, p, t, this.config.targetDistance ?? 3, usesPerSec);
     // What a strike sends out after it has to hit too (src/calc/afterHit.ts).
@@ -1593,7 +1596,13 @@ export class Character {
       ? setGoing.hitsPerSec /
         Math.max(1e-9, usesPerSec) /
         ((choice.triggered ? 1 : 1 + p.repeats) * p.pulses)
-      : (volleyHits(p, distance, followed ? followed.hitChance * (1 - followed.blockChance) : 1) +
+      : ((p.skill.mortar
+          ? 1
+          : volleyHits(
+              p,
+              distance,
+              followed ? followed.hitChance * (1 - followed.blockChance) : 1,
+            )) +
           groundHits(p, patches, distance)) *
           channelMult(p) *
           geyserHits(p, usesPerSec) *
