@@ -95,9 +95,12 @@ function edge(g: Gfx, h: AreaHost, s: AreaShape): void {
   g.strokePoints(outlinePoints(h, s) as Phaser.Math.Vector2[], true, true);
 }
 
+/** How thick an outline is drawn, as a share of the widths callers ask for: the lines are fine so that the motif inside is what is seen. */
+const LINE = 0.4;
+
 /**
  * The clean outline: a dark line under a colour line, so it reads on a pale floor and a dark one, at `alpha` (the width is the
- * colour line's; the dark line is a pixel and a half wider).
+ * colour line's; the dark line is a pixel and a half wider), drawn fine (LINE of the width asked for).
  */
 export function outlineArea(
   g: Gfx,
@@ -107,15 +110,15 @@ export function outlineArea(
   alpha: number,
   width = 1.5,
 ): void {
-  g.lineStyle(width + 1.5, 0x000000, 0.5 * alpha);
+  g.lineStyle((width + 1.5) * LINE, 0x000000, 0.5 * alpha);
   edge(g, h, s);
-  g.lineStyle(width, color, alpha);
+  g.lineStyle(width * LINE, color, alpha);
   edge(g, h, s);
 }
 
 /**
- * An area that has just gone off: it holds its full outline, a wash fills it and fades, and a bright front sweeps out to the
- * edge (a ring for a circle, the far edge for a wedge or a lane). `k` runs 0 to 1 over the effect.
+ * An area that has just gone off: it holds its full outline and a bright front sweeps out to the edge (a ring for a circle, the
+ * far edge for a wedge or a lane). There is no fill: what the skill is plays inside (areaMotifs.ts). `k` runs 0 to 1.
  */
 export function drawLanded(
   g: Gfx,
@@ -127,14 +130,16 @@ export function drawLanded(
 ): void {
   const hold = k < 0.5 ? 1 : 1 - (k - 0.5) / 0.5;
   const front = Math.min(1, k / 0.35);
-  fillArea(g, h, s, color, 0.2 * hold);
-  if (front < 1) fillArea(g, h, s, light, 0.25 * (1 - front), front);
   outlineArea(g, h, s, color, hold, 1.5 + (1 - k));
   // The bright front of the blow, a thin line that runs out to the edge.
   if (s.kind === 'circle') {
     if (front < 1) outlineArea(g, h, { ...s, r: s.r * front }, light, 0.8 * (1 - front), 1);
   } else if (front < 1) {
     const f = outlinePoints(h, s, front);
-    g.lineStyle(1, light, 0.8 * (1 - front)).strokePoints(f as Phaser.Math.Vector2[], true, true);
+    g.lineStyle(LINE, light, 0.8 * (1 - front)).strokePoints(
+      f as Phaser.Math.Vector2[],
+      true,
+      true,
+    );
   }
 }

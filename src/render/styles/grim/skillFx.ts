@@ -24,7 +24,7 @@ import type { Actor, SimEvent, World } from '../../../sim/types';
 import { beamMotifOf, fallbackMotif, motifOf } from '../../../calc/areaLook';
 import { playMotif, tongue } from './areaMotifs';
 import { drawBuffs, type BuffMark } from './buffFx';
-import { drawLanded, fillArea, outlineArea, shapeOfExplode, type AreaShape } from './areaFx';
+import { drawLanded, outlineArea, shapeOfExplode, type AreaShape } from './areaFx';
 
 /**
  * Skill effects for the grim style, drawn from sim events and sim state. The language (see src/calc/skillLook.ts):
@@ -477,7 +477,6 @@ export class SkillFx {
           0.5 + 0.5 * k,
           1.5,
         );
-        this.disc(g, t.x + s.dx, t.y + s.dy, r, glow, 0.1 + 0.15 * k);
       }
     });
   }
@@ -778,18 +777,7 @@ export class SkillFx {
         const len = Math.hypot(dx, dy) || 1;
         const nx = (-dy / len) * z.radius;
         const ny = (dx / len) * z.radius;
-        const q = [
-          this.host.project(z.x + nx, z.y + ny),
-          this.host.project(z.x2 + nx, z.y2 + ny),
-          this.host.project(z.x2 - nx, z.y2 - ny),
-          this.host.project(z.x - nx, z.y - ny),
-        ];
         const live = z.delayT <= 0;
-        g.fillStyle(c, (live ? 0.16 : 0.07) * fade)
-          .beginPath()
-          .moveTo(q[0].x, q[0].y);
-        for (let i = 1; i < 4; i++) g.lineTo(q[i].x, q[i].y);
-        g.closePath().fillPath();
         outlineArea(
           g,
           this.host,
@@ -827,12 +815,10 @@ export class SkillFx {
         // The zone is coming: a faint disc with a ring of ticks that closes in.
         const k = 1 - z.delayT / Math.max(0.01, z.delayT + 0.3);
         void k;
-        this.disc(g, z.x, z.y, z.radius, c, 0.08);
         outlineArea(g, this.host, { kind: 'circle', x: z.x, y: z.y, r: z.radius }, edge, 0.7, 1);
         this.ticks(g, z.x, z.y, z.radius, 16, time * 1.2, edge, 0.8, 2);
         continue;
       }
-      this.disc(g, z.x, z.y, z.radius, c, (0.14 + 0.04 * Math.sin(time * 3)) * fade);
       outlineArea(
         g,
         this.host,
@@ -1090,14 +1076,6 @@ export class SkillFx {
         case 'caustic': {
           const c = GROUND_COLOR[f.kind];
           const motif = f.kind === 'consecrated' ? 3 : f.kind === 'chilling' ? 2 : 4;
-          this.disc(
-            ground,
-            f.x,
-            f.y,
-            f.radius,
-            c,
-            (0.13 + 0.03 * Math.sin(time * 3 + f.id)) * fade * born,
-          );
           outlineArea(
             ground,
             this.host,
@@ -1124,7 +1102,6 @@ export class SkillFx {
           const o = this.host.project(f.x, f.y);
           const h = 22 * born;
           const soon = f.t < 0.5 ? 0.5 + 0.5 * Math.sin(time * 30) : 1;
-          this.disc(ground, f.x, f.y, f.radius, el, 0.08 * fade);
           outlineArea(
             ground,
             this.host,
@@ -1197,7 +1174,6 @@ export class SkillFx {
             y2: f.y2!,
             half: f.radius,
           } as const;
-          fillArea(ground, this.host, shape, el, 0.14 * fade);
           outlineArea(ground, this.host, shape, el, 0.8 * fade, 1.2);
           for (let i = 0; i < 8; i++) {
             const s = (i / 8 + time * 0.5) % 1;

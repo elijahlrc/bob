@@ -46,7 +46,7 @@ sparks, projectile trails, rings, zones and numbers all use it.
 
 Every area, the player's and the monsters', is drawn the same way (`areaFx.ts`; the audit is [VFX-AUDIT.md](VFX-AUDIT.md)): the
 **exact ground it covers**, outlined by a dark line under a colour line (so it reads on a pale floor and a dark one), held at full strength for
-about half a second, a wash that fades inside it and a bright front that runs out to the edge. The colour is the damage type. A circle is the ground
+about half a second, and a bright front that runs out to the edge. The line is fine (40% of its old width) and there is **no fill**: the skill's motif, below, is what is seen inside it. The colour is the damage type. A circle is the ground
 ellipse of the view; a wedge (a melee sweep) and a lane (a beam, a strip, a wall) are drawn corner by corner.
 
 - The player's `explode` events (blasts, slams, novas, a zone's pulse) draw a circle, or the band of a strip (`strip` on the event).
