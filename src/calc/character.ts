@@ -126,6 +126,7 @@ import { buildProfile, formedProfile, type HandStats, type SkillProfile } from '
 import { TOTEM_FIRST_SHOT, deploySecondsOf, totemInterval } from './deploy';
 import { carriedSeconds, renewalGap } from './dot';
 import { geyserHits } from './geyser';
+import { exposureShift, groundHits, sporeMult, standingHits, zapMult } from './channelFx';
 import { planRotation, type Plan, type PlanSkill } from './rotation';
 
 export type CalcConfig = {
@@ -1552,9 +1553,20 @@ export class Character {
     let bl = 0;
     let po = 0;
     const n = p.hands.length;
-    // A barrage lands every projectile on one target; a shotgun some of them; a cone is a second hit with each shot.
-    const volley =
-      volleyHits(p, this.config.targetDistance ?? 3) * channelMult(p) * geyserHits(p, usesPerSec);
+    // A skill whose use sets something going that deals the damage (circling blades, a mote that strikes) is worth those hits
+    // instead (src/calc/channelFx.ts); a channel adds the thorns its release leaves, and ground that hurts adds its pulses.
+    const setGoing = standingHits(p, usesPerSec);
+    if (setGoing) p = setGoing.profile;
+    const distance = this.config.targetDistance ?? 3;
+    // Otherwise a barrage lands every projectile on one target; a shotgun some of them; a cone is a second hit with each shot;
+    // a geyser blasts again and again while it stands.
+    const volley = setGoing
+      ? setGoing.hitsPerSec /
+        Math.max(1e-9, usesPerSec) /
+        ((choice.triggered ? 1 : 1 + p.repeats) * p.pulses)
+      : volleyHits(p, distance) * channelMult(p) * geyserHits(p, usesPerSec) +
+        sporeMult(p, distance) +
+        groundHits(p);
     for (const h of p.hands) {
       const ex = expectedHit(p, h, t, d);
       const w = p.bothHands ? 1 : 1 / n;
@@ -1641,10 +1653,12 @@ export class Character {
     igniteDps: number,
   ): number {
     const def = t.def;
-    const taken = (type: number): number => {
+    const taken = (type: number, shift = 0): number => {
       if (def.immune[type] || (type === 4 && def.immuneChaos)) return 0;
       const res =
-        type === 0 ? 0 : effectiveRes(def.res[type] + (t.resShift[type] ?? 0), def.maxRes[type]);
+        type === 0
+          ? 0
+          : effectiveRes(def.res[type] + (t.resShift[type] ?? 0) + shift, def.maxRes[type]);
       return (
         (1 - res / 100) * def.damageTakenMult * shockTaken(def, t.shock) * def.damageTakenType[type]
       );
@@ -1663,6 +1677,7 @@ export class Character {
       // A projectile that carries its debuff renews it all the time it is near the target, on top of the debuff's own length.
       if (spec.stack === 'refresh') seconds += carriedSeconds(p, this.config.targetDistance ?? 3);
       const uptime = Math.min(1, seconds * usesPerSec);
+      let exposed = 0;
       if (spec.stack === 'refresh') {
         // Ground that lingers holds the debuff for as long as it lasts; a patch is renewed as the arrows come.
         const ground = choice.skill.leaves ? choice.skill.leaves.seconds * usesPerSec : uptime;
@@ -1672,8 +1687,10 @@ export class Character {
       } else {
         const stages = uptime >= 1 ? (spec.cap ?? 8) : 1;
         dps = per * (1 + ((spec.stagePct ?? 0) / 100) * (stages - 1)) * uptime;
+        // At the top stage the debuff exposes the enemy, which lowers the resistance its own damage is taken after.
+        if (uptime >= 1) exposed = exposureShift(spec, sd.type);
       }
-      dps *= taken(sd.type);
+      dps *= taken(sd.type, exposed);
     }
     if (p.decay) dps += p.decay.dps * taken(4) * Math.min(1, p.decay.seconds * usesPerSec);
     // A Torch Arrow's ignite also leaves burning debuffs, each worth a share of it, a few at once.
@@ -2237,7 +2254,7 @@ export function channelMult(p: SkillProfile): number {
         (p.skill.castTime ?? 0.5)) /
       o.interval
     );
-  if (o?.kind === 'zap') return Math.max(1, Math.floor(o.seconds / o.jump + 1e-6));
+  if (o?.kind === 'zap') return zapMult(p);
   // An illusion's waves are a hit each (the later ones, once it has stopped, are bigger), and the last wave grows with the stages.
   if (o?.kind === 'illusion') {
     let total = (o.finalPerStage * c.cap) / 100;
@@ -2246,13 +2263,15 @@ export function channelMult(p: SkillProfile): number {
     return total / c.cap;
   }
   const per = (c.perStage ?? 0) / 100;
+  // A use may hit for a share of the skill's hit (Divine Ire's zaps while it builds).
+  const tick = (c.tickMult ?? 100) / 100;
   // A channel with nothing to release, or one that is held (Cyclone, Incinerate), stays at its cap: over a fight it is the full
   // hit, the weak first one and the last wave aside.
-  if (c.tick && (!c.release || c.hold)) return 1 + per * c.cap;
+  if (c.tick && (!c.release || c.hold)) return tick * (1 + per * c.cap);
   let total = 0;
   if (c.tick)
     for (let s = 0; s < c.cap; s++)
-      total += (s === 0 && c.first !== undefined ? c.first / 100 : 1) * (1 + per * s);
+      total += tick * (s === 0 && c.first !== undefined ? c.first / 100 : 1) * (1 + per * s);
   if (c.release) {
     const r = c.release;
     total += r.repeat
