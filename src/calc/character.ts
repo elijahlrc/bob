@@ -124,6 +124,7 @@ import { referenceMonster } from './monster';
 import { LEGACY, statLevel, type Difficulty } from '../data/difficulty';
 import { buildProfile, formedProfile, type HandStats, type SkillProfile } from './skill';
 import { TOTEM_FIRST_SHOT, deploySecondsOf, totemInterval } from './deploy';
+import { carriedSeconds } from './dot';
 import { planRotation, type Plan, type PlanSkill } from './rotation';
 
 export type CalcConfig = {
@@ -1657,6 +1658,8 @@ export class Character {
         per *= 1 + (levelValue(spec.perCurse.more, choice.skill.level) * n) / 100;
         seconds *= 1 + (spec.perCurse.longer * n) / 100;
       }
+      // A projectile that carries its debuff renews it all the time it is near the target, on top of the debuff's own length.
+      if (spec.stack === 'refresh') seconds += carriedSeconds(p, this.config.targetDistance ?? 3);
       const uptime = Math.min(1, seconds * usesPerSec);
       if (spec.stack === 'refresh') {
         // Ground that lingers holds the debuff for as long as it lasts; a patch is renewed as the arrows come.
