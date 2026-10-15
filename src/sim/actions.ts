@@ -26,6 +26,7 @@ import {
 } from './shots';
 import { catchProjectile, skillUsed } from './blinks';
 import { placeBladestorm } from './stances';
+import { areaRadiusOf, repeatSpot } from './spread';
 import { cascadeCast, extraStrikes, repeatTarget, startUse } from './supportFx';
 import {
   addBlade,
@@ -190,6 +191,14 @@ export function updateAction(w: World, a: Actor, dt: number): void {
       act.aimX = t2.x;
       act.aimY = t2.y;
       if (act.profile.multistrike) act.targetId = t2.id;
+    }
+    // A repeat of an area lands a little off the one before, so a use never puts two areas on one spot.
+    const reach = areaRadiusOf(act.profile);
+    if (reach !== null && t2 && t2.alive) {
+      const spot = repeatSpot(t2.x, t2.y, reach, act.echoes, a.id);
+      const near = w.grid.collide(spot.x, spot.y, 0.3);
+      act.aimX = near.x;
+      act.aimY = near.y;
     }
     const mult = act.echoMult?.[act.echoes - 1] ?? 1;
     const prof = mult === 1 ? act.profile : scaleProfile(act.profile, mult);

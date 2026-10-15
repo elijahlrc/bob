@@ -121,7 +121,11 @@ export function leaveGround(w: World, a: Actor, act: Action): void {
     killCharge: spec.killCharge,
     dtype: dominantType(p),
   });
-  w.events.push({ t: 'explode', x, y, r, dtype: dominantType(p) });
+  // (The burst the use made, and the shockwave, may already have marked this very ground.)
+  const marked = w.events.some(
+    (e) => e.t === 'explode' && Math.hypot(e.x - x, e.y - y) < 0.2 && Math.abs(e.r - r) < 0.05,
+  );
+  if (!marked) w.events.push({ t: 'explode', x, y, r, dtype: dominantType(p) });
 }
 
 /** Arrows fall around the target and each leaves a spore pod (Toxic Rain). */

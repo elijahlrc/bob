@@ -265,4 +265,31 @@ describe('skill effects', () => {
     for (let i = 0; i < 4; i++) fx.frame(w, 0.1, 1.3 + i * 0.1, gfx() as never);
     expect(pending(fx)).toBe(0);
   });
+
+  it('a set of traps shows a ring for each, and traps that scatter one wide place', () => {
+    const target = actor({ id: 2, isPlayer: false, x: 9, y: 5 });
+    const skill = {
+      id: 'jawsTrap',
+      name: 'Jaws Trap',
+      type: 'spell',
+      tags: [],
+      behaviour: { kind: 'burst', radius: 2 },
+    };
+    for (const extra of [{ deployCount: 3 }, { deployCount: 5, deployScatter: true }]) {
+      const a = actor({
+        action: {
+          profile: { skill, ...extra, hands: [{ chunks: [{ max: 5, type: 2 }] }] },
+          targetId: 2,
+          duration: 1,
+        },
+      } as never);
+      const w = world(a);
+      (w.char as unknown as { actives: unknown[] }).actives = [{ skill, deploy: 'trap' }];
+      const fx = new SkillFx(host([a, target]), scene);
+      fx.onEvent({ t: 'use', src: 1, skill: 'jawsTrap' }, w);
+      expect(pending(fx)).toBe(2);
+      fx.frame(w, 0.3, 1, gfx() as never);
+      expect(pending(fx)).toBe(2);
+    }
+  });
 });

@@ -14,6 +14,7 @@ import { flaskMask, playerConds, rawHit } from './combat';
 import type { Minion } from './minions';
 import { scaleProfile } from './shots';
 import { applySkillDot } from './skillDots';
+import { GOLDEN, areaRadiusOf } from './spread';
 import type { Action, Actor, World } from './types';
 
 /**
@@ -72,6 +73,58 @@ const CHAIN_GAP = 0.25;
 const TOTEM_OFFSET = 1.5;
 /** A mine looks for something to hit this far from itself, in tiles. */
 const MINE_SEEK = 8;
+/** A set of traps or mines thrown together lies in a ring this far from the target, in tiles. */
+const RING_APART = 1.2;
+/** An area shot from a deployable is leaned off its enemy toward the deployable by up to this share of its radius. */
+const LEAN = 0.5;
+/** Two areas of one skill that go off together land at least this share of their radius apart. */
+const APART = 0.35;
+
+/** Where the deployables of a set of `n` go, from the target: the ring they lie in (none for one). */
+export function ringSpots(n: number): { dx: number; dy: number }[] {
+  const out: { dx: number; dy: number }[] = [];
+  for (let i = 0; i < n; i++) {
+    const ang = (i / n) * Math.PI * 2;
+    out.push(
+      n > 1 ? { dx: Math.cos(ang) * RING_APART, dy: Math.sin(ang) * RING_APART } : { dx: 0, dy: 0 },
+    );
+  }
+  return out;
+}
+
+/** What one tick of deployables knows: the skills that have several standing, and where their areas have gone off. */
+type Crowd = { many: Set<string>; landed: { key: string; x: number; y: number }[] };
+
+/**
+ * Where an area shot from a deployable is centred, when its skill has several standing. Each one leans off the enemy toward
+ * itself, so a ring of traps or a field of mines makes a ring of areas about the enemy and not one area many times over; the
+ * enemy stays inside every one. An area that would land on another's spot is turned round the enemy to a free one.
+ */
+function areaAim(
+  w: World,
+  d: Deployable,
+  prof: SkillProfile,
+  target: Actor,
+  crowd: Crowd | undefined,
+): { x: number; y: number } | undefined {
+  const r = areaRadiusOf(prof);
+  if (r === null || !crowd?.many.has(d.key)) return undefined;
+  const dx = d.x - target.x;
+  const dy = d.y - target.y;
+  const dist = Math.hypot(dx, dy);
+  let ang = dist > 0.05 ? Math.atan2(dy, dx) : d.id * GOLDEN;
+  const lean = dist > 0.05 ? Math.min(dist, LEAN * r) : LEAN * r;
+  let spot = { x: target.x + Math.cos(ang) * lean, y: target.y + Math.sin(ang) * lean };
+  const taken = (p: { x: number; y: number }) =>
+    crowd.landed.some((l) => l.key === d.key && Math.hypot(l.x - p.x, l.y - p.y) < APART * r);
+  for (let i = 0; i < 5 && taken(spot); i++) {
+    ang += GOLDEN;
+    spot = { x: target.x + Math.cos(ang) * LEAN * r, y: target.y + Math.sin(ang) * LEAN * r };
+  }
+  spot = w.grid.collide(spot.x, spot.y, 0.3);
+  crowd.landed.push({ key: d.key, x: spot.x, y: spot.y });
+  return spot;
+}
 
 export function choiceByKey(w: World, key: string): SkillChoice | undefined {
   return w.char.actives.find((c) => c.key === key) ?? w.char.secondaries.find((c) => c.key === key);
@@ -214,6 +267,7 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
     put(tx, ty);
     return;
   }
+  const ring = ringSpots(n);
   for (let i = 0; i < n; i++) {
     if (act.profile.deployScatter) {
       // Scattered: at random over a wide place round the target, some of them far from it.
@@ -222,8 +276,7 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
       put(tx + Math.cos(ang) * d, ty + Math.sin(ang) * d);
       continue;
     }
-    const ang = (i / n) * Math.PI * 2;
-    put(tx + (n > 1 ? Math.cos(ang) * 1.2 : 0), ty + (n > 1 ? Math.sin(ang) * 1.2 : 0));
+    put(tx + ring[i].dx, ty + ring[i].dy);
   }
 }
 
@@ -234,10 +287,11 @@ function shoot(
   c: SkillChoice,
   target: Actor,
   scale = 1,
-  aim?: { x: number; y: number },
+  crowd?: Crowd,
 ): void {
   let prof = w.char.profile(c, playerConds(w, target), flaskMask(w));
   if (scale !== 1) prof = scaleProfile(prof, scale);
+  const aim = areaAim(w, d, prof, target, crowd);
   const from: Actor = Object.create(w.player) as Actor;
   from.x = d.x;
   from.y = d.y;
@@ -327,7 +381,7 @@ function sprung(w: World, d: Deployable, target: Actor): void {
 }
 
 /** A mine goes: its skill's burst at the nearest enemy, harder for the mines that went before it, and the rain that follows. */
-function detonate(w: World, d: Deployable, c: SkillChoice, foes: Actor[]): void {
+function detonate(w: World, d: Deployable, c: SkillChoice, foes: Actor[], crowd: Crowd): void {
   const target =
     nearestFoe(foes, d.x, d.y, MINE_SEEK) ??
     nearestFoe(foes, d.aimX ?? d.x, d.aimY ?? d.y, MINE_SEEK);
@@ -335,7 +389,7 @@ function detonate(w: World, d: Deployable, c: SkillChoice, foes: Actor[]): void 
   sprung(w, d, target);
   const prof = w.char.profile(c, playerConds(w, target), flaskMask(w));
   const seq = d.seq ?? 0;
-  shoot(w, d, c, target, 1 + (prof.mineChain * seq) / 100);
+  shoot(w, d, c, target, 1 + (prof.mineChain * seq) / 100, crowd);
   // Projectiles rain down around it, a smaller burst each, more of them the further along in the sequence.
   const rain = c.skill.mineRain;
   if (rain) {
@@ -479,6 +533,9 @@ export function tickDeployables(w: World, dt: number): void {
   const foes = enemies(w);
   const p = w.player;
   const bonds = new Map<string, Deployable[]>();
+  const crowd: Crowd = { many: new Set(), landed: [] };
+  const seen = new Set<string>();
+  for (const d of w.deployables) (seen.has(d.key) ? crowd.many : seen).add(d.key);
   let j = 0;
   for (const d of w.deployables) {
     d.t -= dt;
@@ -498,7 +555,7 @@ export function tickDeployables(w: World, dt: number): void {
     } else if (keep && c && d.kind === 'mine') {
       if (d.goAt !== undefined) {
         if (w.t >= d.goAt) {
-          detonate(w, d, c, foes);
+          detonate(w, d, c, foes, crowd);
           if (d.rearm) {
             d.goAt = undefined;
             d.seq = undefined;
@@ -537,7 +594,7 @@ export function tickDeployables(w: World, dt: number): void {
             }
           }
           if (best) {
-            shoot(w, d, c, best);
+            shoot(w, d, c, best, 1, crowd);
             // A ballista attacks at half speed.
             d.fireT = totemInterval(c, prof);
           } else d.fireT = 0.1;
@@ -546,7 +603,7 @@ export function tickDeployables(w: World, dt: number): void {
         const best = nearestFoe(foes, d.x, d.y, TRAP_RADIUS);
         if (best) {
           sprung(w, d, best);
-          shoot(w, d, c, best);
+          shoot(w, d, c, best, 1, crowd);
           keep = false;
         } else {
           // A skitterbot sets off a trap with enemies about.
@@ -555,7 +612,7 @@ export function tickDeployables(w: World, dt: number): void {
           if (far && bot) {
             bot.botCd = 3;
             sprung(w, d, far);
-            shoot(w, d, c, far);
+            shoot(w, d, c, far, 1, crowd);
             keep = false;
           } else d.fireT = 0.05;
         }

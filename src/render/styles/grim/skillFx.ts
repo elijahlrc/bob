@@ -9,9 +9,16 @@ import {
   UTILITY_COLOR,
   type Delivery,
 } from '../../../calc/skillLook';
-import { HIT_AT } from '../../../data/constants';
+import { HIT_AT, SCATTER_RADIUS } from '../../../data/constants';
 import { MINIONS } from '../../../data/minions';
-import { bondLinks, choiceByKey, MINE_ARM, MINE_RADIUS, TRAP_RADIUS } from '../../../sim/deploy';
+import {
+  bondLinks,
+  choiceByKey,
+  MINE_ARM,
+  MINE_RADIUS,
+  ringSpots,
+  TRAP_RADIUS,
+} from '../../../sim/deploy';
 import type { Field } from '../../../sim/fields';
 import type { Actor, SimEvent, World } from '../../../sim/types';
 import { drawBuffs, type BuffMark } from './buffFx';
@@ -409,19 +416,32 @@ export class SkillFx {
       );
     });
     if (kind === 'totem') return;
-    // Where it will go: a dark-edged ring on the ground closes on the target as the throw comes.
+    // Where it will go: a dark-edged ring on the ground closes on each place as the throw comes (a ring of them for a set, one
+    // wide place for traps that scatter).
+    const prof = act.profile;
+    const scatter = kind === 'trap' && prof.deployScatter;
+    const spots =
+      kind === 'brand'
+        ? [{ dx: 0, dy: 0 }]
+        : scatter
+          ? [{ dx: 0, dy: 0 }]
+          : ringSpots(prof.deployCount);
     this.add(total, false, (g, k) => {
       const t = this.host.actorById(act.targetId);
       if (!t) return;
-      outlineArea(
-        g,
-        this.host,
-        { kind: 'circle', x: t.x, y: t.y, r: 0.3 + 0.9 * (1 - k) },
-        lighten(glow, 0.2),
-        0.5 + 0.5 * k,
-        1.5,
-      );
-      this.disc(g, t.x, t.y, 0.3 + 0.9 * (1 - k), glow, 0.1 + 0.15 * k);
+      const to = scatter ? SCATTER_RADIUS : 0.3 + 0.9 * (1 - k);
+      for (const s of spots) {
+        const r = scatter ? to : spots.length > 1 ? 0.25 + 0.6 * (1 - k) : to;
+        outlineArea(
+          g,
+          this.host,
+          { kind: 'circle', x: t.x + s.dx, y: t.y + s.dy, r },
+          lighten(glow, 0.2),
+          0.5 + 0.5 * k,
+          1.5,
+        );
+        this.disc(g, t.x + s.dx, t.y + s.dy, r, glow, 0.1 + 0.15 * k);
+      }
     });
   }
 

@@ -1631,3 +1631,36 @@ figure, bladestorms, geysers, smoke, and the wall of ice (which also holds tiles
 - The wind-up of a trap, a mine, a totem or a brand shows the thing held up in the hand, glowing brighter as the throw comes, and a ring
   closing on the target where a trap, a mine or a brand will go.
 - Not changed: monsters' own skills, projectile bodies, and the upkeep skills; their looks were already distinct.
+
+## One use, one spot per area (2026-10-14)
+
+The rule: no skill and no support puts two areas of the same use on the same spot. Found by Double Set: its two traps were thrown to
+opposite sides of the target (a ring, 1.2 tiles out), but each one fired the skill *at the enemy*, so both bursts went off on the very same
+point. Every set had it: Triple Snare, Snare Cluster, Field of Charges (five mines, five bursts on one enemy), Totem Choir, and Double Set
+on a mine. The audit ran every active skill against every support that multiplies something (`deployCount`, repeats, cascade, extra
+projectiles, Unleash, Arrow Nova, mine chain, mirage) and looked for two areas of one radius on one spot in one tick; the ones that
+were real are fixed and tested in `src/sim/areaSpots.test.ts`.
+
+- **Sets of traps, mines and totems** (`areaAim` in `src/sim/deploy.ts`): when a skill has several standing, each one leans its area off
+  the enemy toward itself (by up to half the area's radius, never past the deployable), so a set makes a ring of areas about the enemy.
+  The enemy is inside every one. If two would still land together (mines on a line with the enemy) the later is turned round the enemy to a
+  free spot. A lone trap, mine or totem aims as before. It covers a burst, a ground area that is not a line, a skull that bursts where it
+  ends and a slow orb.
+- **Repeats** (Echoing Cast, Unleash, Triple Cadence's repeats of a slam): a repeat of an area lands a little off the one before
+  (`repeatSpot` in `src/sim/spread.ts`, 0.45 of the radius, turned by the golden angle each time); the target stays inside.
+- **Artillery Ballista**: its six arrows come down along a line from 40% to 100% of the way to the target, but the least range held a short
+  throw to one tile, so a close target got three bursts on one spot. Each now lands at least 0.45 of a tile beyond the one before.
+- **Molten Strike**: the four balls thrown round the enemy chose their places at random and could land on one another; each now keeps 0.7
+  of a tile from the others (six tries, then it lands where it falls).
+- **A burst that leaves ground behind** (Cold Snap, Vortex, Purifying Flame): the leaving of the ground marked the same spot at the same
+  size a second time with an `explode` that did nothing but draw. It is not drawn when the burst or the shockwave has just marked it.
+
+Not changed, and why:
+
+- **A nova at the caster, repeated**: the area is the caster; a repeat is a second ring from the same place, in time.
+- **Separate uses**: a rain, a trap or a marker thrown again at a target that has not moved lies on the one before. They are different
+  uses, and a zone that pulses is meant to pulse on its spot. (Storm Call's markers all go off together at one place when they were set
+  at one place.)
+- **A strike with an area about the enemy struck** (Elemental Hit set in a trap or a mine): the area is the enemy's own, so two traps that
+  both strike it have two areas on it. Those skills are not meant for traps; no change.
+- **A staged skill whose stages are different sizes about one point** (Purifying Flame's burst and its larger shockwave): by design.

@@ -33,6 +33,10 @@ const FORK_ANGLE = (60 * Math.PI) / 180;
 const CHAIN_RANGE = 3.5;
 /** The seconds between the projectiles of a barrage. */
 const BARRAGE_GAP = 0.07;
+/** Arrows of a mortar that come down along a line land at least this far apart, in tiles. */
+const MORTAR_APART = 0.45;
+/** Molten balls thrown together land at least this far apart, in tiles. */
+const BALL_APART = 0.7;
 /** Lane spacing of parallel projectiles, in tiles. */
 const LANE = 0.6;
 /** The randomised spread of a barrage, in radians (about twenty degrees across). */
@@ -202,12 +206,17 @@ export function fireProjectiles(w: World, a: Actor, act: Action): void {
   if (p.skill.mortar) {
     // Arrows fired into the air that come down in a line toward the target, each bursting where it lands.
     const m = p.skill.mortar;
+    // Each lands further on than the one before, by at least a little, so that a short throw (the arrows are held to a
+    // least range) runs on past the target and no two arrows burst on one spot.
+    const gap = MORTAR_APART;
+    let at = 0;
     for (let i = 0; i < n; i++) {
       const frac = n > 1 ? m.from + ((1 - m.from) * i) / (n - 1) : 1;
+      at = Math.max(1, aimDist * frac, i > 0 ? at + gap : 0);
       launch(w, a, p, act.hand, a.x, a.y, base, {
         hitIds: [],
         aimId: act.targetId,
-        range: Math.max(1, aimDist * frac),
+        range: at,
         explode: m.radius * p.radiusMult,
         pierce: 999,
         kind: 'mortar',
@@ -538,10 +547,17 @@ export function afterStrike(w: World, a: Actor, act: Action, struck: Actor | nul
     }
   } else {
     // Balls: thrown to the ground around the struck enemy, and burst where they land.
+    const landed: { x: number; y: number }[] = [];
     for (let i = 0; i < count; i++) {
-      const ang = toward + (w.rngCombat.float(0, 1) - 0.5) * ((270 * Math.PI) / 180) + Math.PI * 0;
-      const d = 0.6 + w.rngCombat.float(0, 1) * 1.6;
-      const spot = w.grid.collide(struck.x + Math.cos(ang) * d, struck.y + Math.sin(ang) * d, 0.2);
+      // Each ball keeps its distance from the others thrown with it (a few tries, then it lands where it falls).
+      let spot = { x: 0, y: 0 };
+      for (let tries = 0; tries < 6; tries++) {
+        const ang = toward + (w.rngCombat.float(0, 1) - 0.5) * ((270 * Math.PI) / 180);
+        const d = 0.6 + w.rngCombat.float(0, 1) * 1.6;
+        spot = w.grid.collide(struck.x + Math.cos(ang) * d, struck.y + Math.sin(ang) * d, 0.2);
+        if (landed.every((l) => Math.hypot(l.x - spot.x, l.y - spot.y) >= BALL_APART)) break;
+      }
+      landed.push(spot);
       w.zones.push({
         id: w.nextId++,
         owner: a.id,
