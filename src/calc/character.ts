@@ -150,6 +150,7 @@ import { exposureShift, sporeMult, standingHits, zapMult } from './channelFx';
 import { afterHitTargetHits, tornadoHits } from './afterHit';
 import { strongestOf } from './ailmentMax';
 import { planRotation, type Plan, type PlanSkill } from './rotation';
+import { illusionStill, landsPerUse, ownBuffs } from './melee';
 
 export type CalcConfig = {
   /** Conditions assumed true (calc engine toggles). */
@@ -1407,8 +1408,23 @@ export class Character {
     choice: SkillChoice,
     conds: number = this.configConds,
     flaskMask: number = this.defaultDyn,
+    /** Without the buffs the skill's own blows keep up (the profile they are worked out from). */
+    plain = false,
   ): SkillProfile {
-    const c = maskAnd(conds, this.cond.all);
+    let c = maskAnd(conds, this.cond.all);
+    // A skill whose hit gives a buff (Smite), or that stands in its own storm (Bladestorm), has the buff while it is used again and
+    // again. That is the sheet's assumption, as it is for charges: the sim passes the charges it holds, and keeps its own buffs.
+    if (
+      !plain &&
+      !this.config.charges &&
+      !choice.triggered &&
+      (choice.skill.hitBuff || choice.skill.bladestorm)
+    )
+      for (const id of ownBuffs(
+        this.profile(choice, c, flaskMask, true),
+        this.db.mult('buffDuration'),
+      ))
+        c = maskOr(c, this.cond.peek(BUFFS[id].cond));
     const k = `${choice.key}|${c}|${flaskMask}`;
     let p = this.profiles.get(k);
     if (p) return p;
@@ -1545,6 +1561,8 @@ export class Character {
       vulnAll: hexed.vulnAll,
     };
     const d = this.config.targetDistance;
+    // A charge's bonus is for the run it makes; the sheet's fight is at the target, in reach, where nothing is left to run.
+    if (p.distMore?.travel) p = { ...p, distMore: null };
     // A totem or brand shoots on its own, whatever the character does; traps and mines go off several at a time.
     const deployN = choice.deploy ? p.deployCount : 1;
     const standing = choice.deploy === 'totem' || choice.deploy === 'brand';
@@ -1590,6 +1608,10 @@ export class Character {
     // What a strike sends out after it has to hit too (src/calc/afterHit.ts).
     const followed = p.skill.afterHit ? expectedHit(p, p.hands[0], t, d) : null;
     const patches = usesPerSec * (choice.triggered ? 1 : 1 + p.repeats);
+    const illusion =
+      p.skill.orb?.kind === 'illusion'
+        ? { distance: d ?? 3, speed: this.defence(conds).moveSpeed }
+        : undefined;
     // Otherwise a barrage lands every projectile on one target; a shotgun some of them; a cone is a second hit with each shot;
     // a geyser blasts again and again while it stands; ground that hurts adds its pulses.
     const volley = setGoing
@@ -1604,25 +1626,30 @@ export class Character {
               followed ? followed.hitChance * (1 - followed.blockChance) : 1,
             )) +
           groundHits(p, patches, distance)) *
-          channelMult(p) *
+          channelMult(p, illusion) *
           geyserHits(p, usesPerSec) *
           dep.hits +
         sporeMult(p, distance);
-    for (const h of p.hands) {
-      const ex = expectedHit(p, h, t, d);
+    const exs = p.hands.map((h) => expectedHit(p, h, t, d));
+    // A repeating skill (Echoing Cast) lands several times per use; a triggered one does not repeat. A spin sweeps, a slam quakes,
+    // a strike calls beams or puts charges on the enemy: the hits a use lands, in blows of the skill (src/calc/melee.ts).
+    const lands = landsPerUse(p, {
+      usesPerSec,
+      triggered: !!choice.triggered,
+      volley,
+      land: exs.reduce((s, ex) => s + ex.hitChance * (1 - ex.blockChance), 0) / Math.max(1, n),
+    });
+    p.hands.forEach((h, i) => {
+      const ex = exs[i];
       const w = p.bothHands ? 1 : 1 / n;
-      for (let i = 0; i < 5; i++) perType[i] += ex.perType[i] / n;
+      for (let k = 0; k < 5; k++) perType[k] += ex.perType[k] / n;
       perUse += ex.perUse * w;
       hc += ex.hitChance / n;
       stun += ex.stunChance / n;
       cc += h.critChance / n;
       cm += h.critMulti / n;
       const land = ex.hitChance * (1 - ex.blockChance);
-      const handUses =
-        (p.bothHands ? usesPerSec : usesPerSec / n) *
-        (choice.triggered ? 1 : 1 + p.repeats) *
-        p.pulses *
-        volley;
+      const handUses = (p.bothHands ? usesPerSec : usesPerSec / n) * lands;
       // (A skill that picks its element for each use burns, and so ignites, in one use of three: the figures are for fire.)
       const ailUses = handUses * (p.skill.element ? ELEMENT_SHARE : 1);
       const ail = expectedAilments(p, h, t, d, ailUses, land);
@@ -1633,9 +1660,7 @@ export class Character {
       igs = Math.max(igs, ail.igniteDps * top.ignite);
       bl = Math.max(bl, ail.bleedDps * top.bleed);
       po += ail.poisonDps;
-    }
-    // A repeating skill (Echoing Cast) lands several times per use; a triggered one does not repeat.
-    const lands = (choice.triggered ? 1 : 1 + p.repeats) * p.pulses * volley;
+    });
     // A chain of mines: each deals more than the one before it, so a set deals more on average.
     if (choice.deploy === 'mine' && p.mineChain > 0)
       perUse *= 1 + ((p.mineChain / 100) * (deployN - 1)) / 2;
@@ -2350,7 +2375,11 @@ export function volleyHits(p: SkillProfile, distance: number, hitChance = 1): nu
  * What a use of a channelled skill is worth on average over a whole channel: the hits as it builds its stages, and the release
  * at the end, shared out over the uses that built them (docs/SPIRIT.md S5).
  */
-export function channelMult(p: SkillProfile): number {
+export function channelMult(
+  p: SkillProfile,
+  /** How far the target is and how fast the character runs (an illusion runs ahead of it): which waves come once the illusion has stopped. */
+  run?: { distance: number; speed: number },
+): number {
   const c = p.skill.channel;
   if (!c) return 1;
   // An orb's hits come from its own volleys and jumps, at the rate they have once the stages are built and while channelling.
@@ -2368,7 +2397,8 @@ export function channelMult(p: SkillProfile): number {
   if (o?.kind === 'illusion') {
     let total = (o.finalPerStage * c.cap) / 100;
     const waves = Math.floor(c.cap / o.waveStages);
-    for (let i = 1; i <= waves; i++) total += i > waves / 2 ? 1 + o.stillMore / 100 : 1;
+    for (let i = 1; i <= waves; i++)
+      total += illusionStill(o, p.useTime, i, waves, run) ? 1 + o.stillMore / 100 : 1;
     return total / c.cap;
   }
   const per = (c.perStage ?? 0) / 100;
