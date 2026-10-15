@@ -124,7 +124,7 @@ import { referenceMonster } from './monster';
 import { LEGACY, statLevel, type Difficulty } from '../data/difficulty';
 import { buildProfile, formedProfile, type HandStats, type SkillProfile } from './skill';
 import { TOTEM_FIRST_SHOT, deploySecondsOf, totemInterval } from './deploy';
-import { carriedSeconds } from './dot';
+import { carriedSeconds, renewalGap } from './dot';
 import { geyserHits } from './geyser';
 import { planRotation, type Plan, type PlanSkill } from './rotation';
 
@@ -1822,14 +1822,26 @@ export class Character {
     const p = this.profile(choice, conds);
     const rate = this.cooldownRate(choice, conds, false);
     const stands = choice.deploy === 'totem' || choice.deploy === 'brand';
+    // A debuff that is renewed, not stacked, is not cast again while it holds: it is used again as it runs low (src/calc/dot.ts).
+    // Curses linked to the skill lengthen it (see skillDotDps).
+    const spec = p.skillDot?.spec;
+    const linked = Math.min(choice.linked?.length ?? 0, this.hexLimit);
+    const renew = renewalGap(
+      p,
+      spec?.perCurse && p.skillDot
+        ? p.skillDot.seconds * (1 + (spec.perCurse.longer * linked) / 100)
+        : undefined,
+    );
     return {
       key: choice.key,
       useTime: p.useTime,
       pause,
       cooldown:
-        rate === undefined
-          ? undefined
-          : { seconds: 1 / Math.max(1e-3, rate), uses: choice.skill.cooldownUses ?? 1 },
+        rate !== undefined
+          ? { seconds: 1 / Math.max(1e-3, rate), uses: choice.skill.cooldownUses ?? 1 }
+          : renew !== undefined
+            ? { seconds: renew, uses: 1 }
+            : undefined,
       standing: stands
         ? {
             count: p.deployCount,
