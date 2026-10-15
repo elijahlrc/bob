@@ -7115,7 +7115,6 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     name: 'Livewire',
     attr: 'int',
     supports: [],
-    excludes: ['trap', 'mine', 'totem'],
     costMult: 1.3,
     mods: [
       {
