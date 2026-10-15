@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { strongestOf } from './ailmentMax';
 import { Character, scenarioDps, volleyHits } from './character';
 import { dummyDefence, createDummyWorld } from '../sim/dummy';
 import { activeGem, buildFor, buildForActive } from '../sim/gemKit';
@@ -31,7 +32,8 @@ function compare(build: Build, distance = 3, seconds = 60) {
   return { c, sheet, sim, ratio: sim / sheet };
 }
 
-const alone = (id: string, distance?: number) => compare(buildForActive(activeGem(id)), distance);
+const alone = (id: string, distance?: number, seconds?: number) =>
+  compare(buildForActive(activeGem(id)), distance, seconds);
 
 describe('the bolts, balls and scatter after a hit are counted on the sheet', () => {
   it('Bolt Cleave: the one bolt of the arc that reaches the target is a hit of 75%', () => {
@@ -120,5 +122,43 @@ describe('the bolts, balls and scatter after a hit are counted on the sheet', ()
     // src/sim/shots.ts, and the sim reads 1.0 here too.)
     const { c } = alone('rimeSplinter');
     expect(volleyHits(c.profile(c.primary), 3)).toBe(1);
+  });
+});
+
+describe('only the strongest bleed or ignite burns, and the sheet counts the best of those alive', () => {
+  const target = { def: dummyDefence(), shock: 0, resShift: [0, 0, 0, 0, 0] };
+  // About one hit in eighteen crits.
+  const CC = 0.055;
+
+  it('Gouge Shot: eleven bleeds are alive at once, and the best of them is well above the average one', () => {
+    const { c, ratio } = alone('gougeShot');
+    const p = c.profile(c.primary);
+    const top = strongestOf(p, p.hands[0], target, 3, 1.4, CC);
+    expect(top.bleed).toBeGreaterThan(1.25);
+    expect(top.bleed).toBeLessThan(1.6);
+    expect(top.ignite).toBe(1);
+    expect(ratio).toBeGreaterThan(0.9);
+    expect(ratio).toBeLessThan(1.1);
+  });
+
+  it('a bleed that comes once in a long while is the only one alive, so it stays at its average', () => {
+    const { c } = alone('gougeShot');
+    const p = c.profile(c.primary);
+    expect(strongestOf(p, p.hands[0], target, 3, 0.05, CC).bleed).toBe(1);
+    expect(strongestOf(p, p.hands[0], target, 3, 0, CC).bleed).toBe(1);
+    // The more hits, the better the best of them.
+    const some = strongestOf(p, p.hands[0], target, 3, 0.5, CC).bleed;
+    const many = strongestOf(p, p.hands[0], target, 3, 3, CC).bleed;
+    expect(some).toBeGreaterThan(1);
+    expect(many).toBeGreaterThan(some);
+  });
+
+  it('Torch Arrow: the ignite is the best of those alive, and its burning goes by the average ignite', () => {
+    // Over a longer fight: a minute is too short for the share of crits, which all ignite, to settle.
+    const { c, ratio } = alone('torchArrow', 3, 200);
+    const p = c.profile(c.primary);
+    expect(strongestOf(p, p.hands[0], target, 3, 1.4, CC).ignite).toBeGreaterThan(1.1);
+    expect(ratio).toBeGreaterThan(0.9);
+    expect(ratio).toBeLessThan(1.1);
   });
 });

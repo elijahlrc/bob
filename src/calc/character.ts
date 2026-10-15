@@ -128,6 +128,7 @@ import { carriedSeconds, renewalGap } from './dot';
 import { geyserHits } from './geyser';
 import { exposureShift, groundHits, sporeMult, standingHits, zapMult } from './channelFx';
 import { afterHitTargetHits, tornadoHits } from './afterHit';
+import { strongestOf } from './ailmentMax';
 import { planRotation, type Plan, type PlanSkill } from './rotation';
 
 export type CalcConfig = {
@@ -1551,6 +1552,7 @@ export class Character {
     let cc = 0;
     let cm = 0;
     let ign = 0;
+    let igs = 0;
     let bl = 0;
     let po = 0;
     const n = p.hands.length;
@@ -1588,8 +1590,12 @@ export class Character {
         p.pulses *
         volley;
       const ail = expectedAilments(p, h, t, d, handUses, land);
+      // Of the ignites (or bleeds) alive at once only the strongest burns (src/calc/ailmentMax.ts); a skill's burning debuffs
+      // add up and go by the average ignite.
+      const top = strongestOf(p, h, t, d, handUses * land, ex.critGivenHit);
       ign = Math.max(ign, ail.igniteDps);
-      bl = Math.max(bl, ail.bleedDps);
+      igs = Math.max(igs, ail.igniteDps * top.ignite);
+      bl = Math.max(bl, ail.bleedDps * top.bleed);
       po += ail.poisonDps;
     }
     // A repeating skill (Echoing Cast) lands several times per use; a triggered one does not repeat.
@@ -1607,7 +1613,7 @@ export class Character {
     if (standing && usesOverride === undefined && !planned && choice.gemUid !== null)
       hitDps += this.skillSheet(this.defaultAttack, target, conds).hitDps * 0.9;
     const dotDps = this.skillDotDps(choice, p, t, usesPerSec, ign);
-    const ailmentDps = ign + bl + po + dotDps;
+    const ailmentDps = igs + bl + po + dotDps;
     const totalDps = hitDps + ailmentDps;
     // Sustain: the share of uses the resource regeneration alone can pay for. It is information only: the DPS above is
     // the skill at full rate, since flasks, uniques and the tree all change mana in ways a sheet cannot foresee.
@@ -1634,7 +1640,7 @@ export class Character {
       usesPerSec,
       stunChance: stun,
       hitDps,
-      igniteDps: ign,
+      igniteDps: igs,
       bleedDps: bl,
       poisonDps: po,
       dotDps,
@@ -1701,7 +1707,10 @@ export class Character {
     // A Torch Arrow's ignite also leaves burning debuffs, each worth a share of it, a few at once.
     const bn = choice.skill.burning;
     if (bn && igniteDps > 0) {
-      const stacks = Math.min(bn.cap, Math.max(1, p.ignite.chance * usesPerSec * bn.seconds));
+      // (A critical strike always ignites, so the share of hits that ignite is higher than the skill's chance.)
+      const crit = p.hands[0]?.critChance ?? 0;
+      const per = crit + (1 - crit) * p.ignite.chance;
+      const stacks = Math.min(bn.cap, Math.max(1, per * usesPerSec * bn.seconds));
       dps += (igniteDps * levelValue(bn.pct, choice.skill.level) * stacks) / 100;
     }
     return dps;
