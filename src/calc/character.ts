@@ -127,6 +127,7 @@ import { TOTEM_FIRST_SHOT, deploySecondsOf, totemInterval } from './deploy';
 import { carriedSeconds, renewalGap } from './dot';
 import { geyserHits } from './geyser';
 import { exposureShift, groundHits, sporeMult, standingHits, zapMult } from './channelFx';
+import { afterHitTargetHits, tornadoHits } from './afterHit';
 import { planRotation, type Plan, type PlanSkill } from './rotation';
 
 export type CalcConfig = {
@@ -1558,13 +1559,17 @@ export class Character {
     const setGoing = standingHits(p, usesPerSec);
     if (setGoing) p = setGoing.profile;
     const distance = this.config.targetDistance ?? 3;
+    // What a strike sends out after it has to hit too (src/calc/afterHit.ts).
+    const followed = p.skill.afterHit ? expectedHit(p, p.hands[0], t, d) : null;
     // Otherwise a barrage lands every projectile on one target; a shotgun some of them; a cone is a second hit with each shot;
     // a geyser blasts again and again while it stands.
     const volley = setGoing
       ? setGoing.hitsPerSec /
         Math.max(1e-9, usesPerSec) /
         ((choice.triggered ? 1 : 1 + p.repeats) * p.pulses)
-      : volleyHits(p, distance) * channelMult(p) * geyserHits(p, usesPerSec) +
+      : volleyHits(p, distance, followed ? followed.hitChance * (1 - followed.blockChance) : 1) *
+          channelMult(p) *
+          geyserHits(p, usesPerSec) +
         sporeMult(p, distance) +
         groundHits(p);
     for (const h of p.hands) {
@@ -2204,9 +2209,12 @@ export class Character {
 /**
  * How many hits of a projectile skill's one use land on a single target. The projectiles of a use cannot hit the same enemy
  * twice (3.9), so it is one, unless they are fired in sequence (all of them), or the skill is flagged to shotgun (those that
- * fly within the target's width at its distance); a cone burst with each shot is one more.
+ * fly within the target's width at its distance); a cone burst with each shot is one more. What a strike sends out after it, a
+ * Tornado Shot's scatter and an orb's bounces are counted in `afterHit.ts`; `hitChance` is the chance a hit lands (for the first).
  */
-export function volleyHits(p: SkillProfile, distance: number): number {
+export function volleyHits(p: SkillProfile, distance: number, hitChance = 1): number {
+  const scatter = tornadoHits(p);
+  if (scatter !== null) return scatter;
   const b = p.skill.behaviour;
   let hits = 1;
   if (b.kind === 'projectile') {
@@ -2234,7 +2242,7 @@ export function volleyHits(p: SkillProfile, distance: number): number {
       p.projectiles * Math.min(1, (pods.burstRadius / Math.max(0.5, spread)) ** 2),
     );
   }
-  return hits;
+  return hits + afterHitTargetHits(p, distance, hitChance);
 }
 
 /**
