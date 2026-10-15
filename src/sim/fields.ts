@@ -731,6 +731,8 @@ export function raiseWall(w: World, a: Actor, act: Action): void {
   );
   for (const e of onWall) {
     hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
+    // A training dummy that is fixed (src/sim/dummy.ts) stands fast, as it does against a knockback.
+    if (e.dummy && e.stationary) continue;
     const dx = e.x - act.aimX;
     const dy = e.y - act.aimY;
     const side =

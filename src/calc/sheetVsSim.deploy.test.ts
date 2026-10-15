@@ -225,10 +225,11 @@ describe('walls (Glacier Wall)', () => {
     const casts = r.uses.glacierWall ?? 0;
     expect(casts).toBeGreaterThan(5);
     const row = r.rows['Glacier Wall'];
-    // One hit a cast in the sim, as the sheet counts.
-    expect(row.hits / casts).toBeCloseTo(1, 1);
+    // One hit for a wall raised, as the sheet counts. (A cast that finds its place still walled raises nothing: with the dummy
+    // fixed that is about every other cast, where an enemy that walks off would be walled again.)
+    expect(row.hits).toBeGreaterThan(casts * 0.3);
     const sheet = r.c.sheet(r.c.configConds, 'boss', r.target).skill;
-    const simPerCast = row.dmg / casts;
+    const simPerCast = row.dmg / row.hits;
     const sheetPerCast = sheet.hitDps / sheet.usesPerSec;
     expect(simPerCast / sheetPerCast).toBeGreaterThan(0.9);
     expect(simPerCast / sheetPerCast).toBeLessThan(1.1);

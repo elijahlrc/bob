@@ -52,6 +52,13 @@
   follows the map number (`roomsForMap`, `roomsForPlan`), a pack follows its room's area, and an offer has a density style
   (`src/data/density.ts`). Layouts are styles of `generateLabyrinth` (`src/gen/layouts.ts`); the look of a biome is `biomeLook.ts`. After
   a change to a layout or to density run `npm run mapstats` and `npm run map:ascii`; the Debug panel forces a biome or a style.
+- **Damage preview** (2026-10-14): [docs/SHEET-AUDIT.md](docs/SHEET-AUDIT.md). The sheet's DPS (`Character.sheet`, `sheetDps`) plays out the sim's
+  skill choice over a few minutes (`planRotation`, `src/calc/rotation.ts`; `Character.plan` / `planned`) and prices each skill by the uses it gets;
+  what one use lands on one target is counted by small modules beside the sheet (`afterHit`, `channelFx`, `patterns`, `melee`, `deployed`,
+  `minionDps`, `dot`, ...), from the gem's own fields, never a gem id. It is measured against the sim by `npm run dpsaudit` (bot builds),
+  `dpsgems` (every gem alone), `dpssupports`, `dpsminions` and `dpsinspect <gem>`, and held to it by `src/calc/sheetVsSim.*.test.ts` and
+  `rotationVsSim.test.ts`. **When a skill's behaviour changes in the sim, run `npm run dpsgems -- --only <gem>` and change the count in the calc to
+  match.** The sheet counts one target and free mana (docs/MANA.md); the audit's open items are in its section 6.
 - **Patch notes:** [docs/PATCH-NOTES.md](docs/PATCH-NOTES.md), player-facing, newest first, shown on the Patch notes screen of the title
   menu (`src/ui/PatchNotes.tsx`): add an entry for every change a player would notice. The `/patch-notes` skill
   (`.claude/skills/patch-notes/SKILL.md`) writes them from the commits, files them, commits and pushes; a push to main is what

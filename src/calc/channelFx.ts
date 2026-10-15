@@ -130,18 +130,6 @@ export function standingHits(p: SkillProfile, usesPerSec: number): StandingHits 
   return null;
 }
 
-// ---- Sudden Frost: the ground that goes on hurting
-
-/**
- * Extra hits of the skill that the ground it leaves deals to a target standing on it, for each use: ground that hurts deals a
- * share of the hit each second for as long as it lasts (the target stays on it, and the patch is wide enough for the target).
- */
-export function groundHits(p: SkillProfile): number {
-  const g = p.skill.leaves;
-  if (!g || g.kind !== 'chilling' || !g.dps) return 0;
-  return g.dps * g.seconds * p.skillDuration;
-}
-
 // ---- Scorching Ray: the exposure at the top stage
 
 /**

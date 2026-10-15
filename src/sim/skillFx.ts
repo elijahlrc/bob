@@ -754,7 +754,8 @@ function tickBots(w: World, dt: number): void {
         e.ail.chill = Math.max(e.ail.chill, sk.v / 100);
         e.ail.chillT = Math.max(e.ail.chillT, 0.5);
       } else if (sk.kind === 'shock') {
-        e.ail.shock = Math.max(e.ail.shock, sk.v);
+        // (`sk.v` is a percent, `ail.shock` a fraction: the chill above divides too.)
+        e.ail.shock = Math.max(e.ail.shock, sk.v / 100);
         e.ail.shockT = Math.max(e.ail.shockT, 0.5);
       }
     }

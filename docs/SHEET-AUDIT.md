@@ -29,6 +29,8 @@ in the yardstick; the mana part is measured below (section 4) and left as a deci
 | `npm run dpsaudit -- --class all --maps 6,11,16,21` | Bot builds at the start of those maps, each in both fights: sheet DPS, sim DPS, ratio, and per skill the uses a second and the damage a second on both sides. `--save f.json` keeps the builds, `--builds f.json` reuses them, `--mana` plays with real mana, `--target reference` gives the dummy the reference monster's defence. |
 | `npm run dpsgems`                                   | Every damage gem alone (level 50, a fitting weapon, one boss dummy): sheet against sim, worst first.                                                                                                                                                                                                                                |
 | `npm run dpsinspect -- <gemId>`                     | One gem: the sheet's uses, hit, crit and DPS beside the sim's observed uses, hits a use, damage a hit and ledger. The first thing to run on a gem that disagrees.                                                                                                                                                                   |
+| `npm run dpssupports`                               | Each support on three plain skills: what it does to the sheet's DPS against what it does in the sim.                                                                                                                                                                                                                                |
+| `npm run dpsminions`                                | Each summoning gem: the sheet's minion damage (with the minions standing) against the ledger's.                                                                                                                                                                                                                                     |
 
 `scripts/dps-lib.ts` holds the measuring; `createDummyWorld` (`src/sim/dummy.ts`) gained `rarity`, `bystanders` and `fixed`.
 `Character.sheet(conds, scenario, target)` takes the target the sim uses.
@@ -59,6 +61,13 @@ periodic + the weapon where it is used + triggered + minions. The weapon appears
 from. `secondaryLoad` and the weapon top-ups are gone. Skills with the periodic role and a cooldown of their own are ready when
 a use is, as before.
 
+A periodic skill counts when it reaches as far as the main skill or as far as the sheet puts the target (`targetDistance`, 3 tiles
+by default): a spell of 8 tiles beside a bow of 9 is in reach of an enemy that has come close, a melee skill beside a bow is not.
+The map cards (`scoreTheme`, `src/run/threat.ts`) priced only the primary skill; they now price the whole rotation against a pack
+(`Character.rotationDps`). A renewed debuff (Creeping Plague, Ruin Ritual) is not recast while it holds, so the plan treats it as
+ready a gap after its last use (`renewalGap`, `src/calc/dot.ts`) and the weapon fills the rest. The Skills tab and the Character
+sheet read the plan (`mainSheet`, the "Other skills in the rotation" table).
+
 ### 3.2 Totems, brands, traps and mines
 
 - a ballista (Scatter Bow) shoots at half speed in the sim; the sheet ignored it (the shared numbers now live in
@@ -75,49 +84,108 @@ a use is, as before.
   0.68 weapon uses a second; Shrapnel Trap 1.0 to 0.58). Fire Breath Trap stays 15% low: its "more damage against the ignited"
   holds in the sim (the dummy burns) and the sheet takes no condition of the target for granted (section 6).
 
-### 3.3 One skill's own model
+### 3.3 What one use of a skill lands on a target
 
-- **Rime Core (and every crystal):** the sheet counted a pulse of the ground every half second (four hits a use); the sim stands
-  the crystal and bursts it once. It was five times too high, and it is the first spell most characters are given. Fixed in
-  `buildProfile` (`pulses` is 1 for a crystal).
-- **A utility skill with a cooldown of its own** (a blink) was cast on that cooldown in the plan; it is cast at the interval the
-  character keeps (`utilityLoad`). Verified against the sim with Wither beside a spell: 31.7 on the sheet, 32.0 in the sim.
+The rotation says how often a skill is used; these say what a use is worth. Each is a small module in `src/calc/` that counts what
+the sim does with the gem's own fields (never a gem id), with a test that plays the gem against the sim
+(`src/calc/sheetVsSim.<family>.test.ts`, held to 0.9 to 1.1; the supports named below are checked too).
 
-### 3.4 Results on the bot's builds (35 builds at maps 6, 11, 16, level 5 to 17, all eight classes)
+| Module                | What it counts                                                                                                                                                                                                                      |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `afterHit.ts`         | the bolts, balls, bounces and scattered arrows that follow a hit (Bolt Cleave, Slag Blow, Slag Lob, Whirl Shot)                                                                                                                     |
+| `ailmentMax.ts`       | only the strongest bleed or ignite burns, not the average (Gouge Shot, Torch Arrow)                                                                                                                                                 |
+| `patterns.ts`         | pods, volleys, the pulses of a drifting orb, the ground a skull leaves, the true shotgun, the clones of Mirror Quiver, the cold wave of Prime Splash, the debuff that makes a skill's own later hits harder (Snare Shot)            |
+| `channelFx.ts`        | the thorns a channel scatters (Blight Hail), blades that circle (Orbiting Blades), a mote's own beat (Tempest Mote), half-hit builds (Judgement Tempest), an exposure at the top stage (Searing Lance)                              |
+| `dot.ts`, `geyser.ts` | how long a carried debuff stays on (Spirit Saw); how often the character recasts a renewed debuff (`renewalGap`: Creeping Plague, Ruin Ritual, the weapon fills the rest); the blasts of a geyser (Pyre Burst)                      |
+| `melee.ts`            | a spin's sweeps, the bladestorm, the aftershock, charges, beams, the Multistrike ramp, the buffs a skill keeps up by its own use (Whirlwind Cleave, Faultline, Charged Blow, Cinder Blow, Thunder Rebuke, Bulwark Rush, Storm Rush) |
+| `deployed.ts`         | every arrow of a mortar totem, a mine's rain and aura, the traps and mines that stand (Mortar Bow, Mortar Charge, Shrapnel Trap, Storm Charge, Glacier Wall)                                                                        |
+| `minionDps.ts`        | a golem or colossus counts one target, a relic its nova, a band its gaps between lots, the minion supports (all the summoning gems except Bind Shade)                                                                               |
 
-|                                                | before  | after   |
-| ---------------------------------------------- | ------- | ------- |
-| typical error (mean of \|ln sim/sheet\|), pack | 30%     | 21%     |
-| typical error, boss                            | 29%     | 19%     |
-| within 10%, pack / boss                        | 8 / 7   | 14 / 14 |
-| within 25%, pack / boss                        | 20 / 20 | 24 / 25 |
-| sheet more than 25% too high, pack / boss      | 9 / 8   | 2 / 0   |
-| sheet more than 25% too low, pack / boss       | 6 / 7   | 9 / 10  |
+Also fixed in `skill.ts`: a crystal (Rime Core) and a wall are one hit, not a pulse each interval (Rime Core was five times too high,
+and it is the first spell most characters are given).
 
-The sheet no longer overstates; what is left is mostly skills whose sim deals extra hits the sheet does not count (section 5).
+### 3.4 What came out of the sim, and was put right there
 
-## 4. The mana gap (left as a decision)
+- Whirring Motes put 15 to 18 on a shock the sim reads as a fraction (shock of 1500%): one line, `sk.v / 100` (`src/sim/skillFx.ts`);
+- a wall of ice pushed a fixed training dummy along (`src/sim/fields.ts`). Test: `src/sim/auditFixes.test.ts`.
 
-The sheet counts every skill at full rate; the sim's character falls back to the free weapon attack when it cannot pay. With real
-mana, the same 35 builds deal on average 17% less than with free mana, and 17 of them more than 20% less (early characters, with
-little mana and a cost on every cast). docs/MANA.md decided that the sheet would not count mana (flasks, uniques and the tree
-change mana in ways a sheet cannot foresee) and that the bot would weigh it itself (`manaFactor`). The Skills tab already says
-"Mana-starved". Whether the sheet should show a second, **sustained** DPS is open.
+### 3.5 Results
 
-## 5. Per-gem mismatches (`npm run dpsgems`)
+On the bot's builds, free mana (`npm run dpsaudit -- --builds <saved> --time 150`), typical error = mean of |ln sim/sheet|:
 
-121 damage gems, each alone, level 50, boss dummy. After the fixes above: **75 within 10%, 88 within 25%**, 7 where the sheet is
-more than 33% too high and 26 where the sim deals more than a quarter more. Most of the second kind are skills whose behaviour
-has extra hits that the sheet does not count (`dpsinspect` shows hits a use above 1 in the sim where the sheet has 1): a blade
-volley after a hit (Rime Splinter), scattered arrows (Whirl Shot), ... The list and the reasons are kept in
-`docs/coverage/` terms by the gem; this file keeps the open ones below as they are worked.
+|                                                                                                                                                                                | before    | after     |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- | --------- |
+| 35 builds, maps 6 to 16 (level 5 to 17, all classes): typical error, pack / boss                                                                                               | 30% / 29% | 16% / 17% |
+| within 10%, pack / boss                                                                                                                                                        | 9 / 8     | 15 / 14   |
+| within 25%, pack / boss                                                                                                                                                        | 20 / 20   | 30 / 27   |
+| sheet more than 25% too high, pack / boss                                                                                                                                      | 9 / 8     | 2 / 3     |
+| 31 builds, maps 20 to 44 (level 19 to 49), boss, leaving out 3 that cannot pay for their main skill: typical error (before = with the rotation plan, without the per-gem work) | 21%       | 20%       |
+| ... within 10%                                                                                                                                                                 | 9         | 13        |
+
+Every damage gem alone (`npm run dpsgems`, 121 gems, level 50, boss dummy): **within 10% 75 to 113, within 25% 88 to 118.**
+Every support on three plain skills (`npm run dpssupports`, 344 pairs): 324 within 10%, 329 within 25%. Summoning gems
+(`npm run dpsminions`): all within 3% of the sim except Bind Shade (below).
+
+The later-map builds improve less: what is left there is mostly mana (below), and skills that act on their own (totems, motes, mines)
+in the pack fight, where the dummies standing around take the shots the sheet counts on the one target. The boss fight is the
+cleaner yardstick for damage; the pack fight is for which skills the rotation uses.
+
+The bot's depth did not move (18 runs, median map reached 19 before, 20 after); the bot's score reads the same sheet and was not
+retuned.
+
+## 4. Mana (left as a decision)
+
+The sheet counts every skill at full rate (docs/MANA.md). What the sim does with real mana:
+
+- in a **continuous** 150 s fight the 35 low-level builds deal on average 17% less than with free mana (17 of them more than 20% less);
+- in a **30 s** fight from a full pool (about the length of a pack) they deal 1% less: the pool and the flasks last;
+- a build whose reservations leave **less mana than its main skill costs** can never cast it, whatever the sheet says: three of the
+  31 later-map builds (sim 250 against a sheet of 2500) dealt only what their weapon does. The Skills tab says "Mana-starved" but the
+  sheet's DPS does not change.
+
+A model of the pool (regeneration, cost, mana on hit, the weapon as the free fallback) was built into the rotation plan and tried
+as a second, sustained figure: with the regeneration alone it undershot the sim by 46% over a long fight (flasks, leech and the
+mana a kill gives are not in it), and spread over a 30 s fight it still read 13 points under the sim. It was taken out again. A
+cheap and honest change would be to make the sheet say, in red, when the main skill cannot be paid for at all.
+
+## 5. Things the audit found that are not the sheet's to fix
+
+Sim behaviour that contradicts what the gem says; **not changed**, because each changes how a gem plays:
+
+- **Rime Splinter** (`afterStrike`, `src/sim/shots.ts`, the blades branch): the blades start from the struck enemy with an empty
+  hit list, so the first one hits it again: two hits a use on a lone enemy, against the gem's text ("from behind the enemy at the
+  others near it") and its siblings (the shield shards seed the struck enemy's id). The fix is `hitIds: [struck.id]`; the sheet
+  already counts no second hit (sim/sheet is 1.98 until then).
+- **Bind Shade**: the spectre's blow reads `spellBaseDamage(corpse level)` (`raiseSpectre`, `src/sim/minions.ts`; `minionStrike`,
+  `src/sim/minionFx.ts`), which is the gem-level curve and reaches 40 thousand at level 41: 24 thousand damage a second in the dummy
+  against a character's own 190. Either read the blow at the gem level or use a monster damage curve.
+- **Hallowed Relic** stays where it is put (reach 6); the text says it follows the character.
+- **Mirror Quiver** clones are not capped (about four stand at once at 1.4 uses a second); the clone data has `respawn: 4`, which
+  `summonAt` ignores.
+- **Swelling Blast** (Intensify) shrinks area spells by 12% a stage; the text says they swell.
+- **Slow channels:** `LULL = 0.9 s` ends a channel whenever two uses are more than 0.9 s apart, so a channelling skill with a slow
+  use time (Blight Hail on a ballista, or with little attack speed) can never build its stages.
+- `docs/coverage/spirit.json` still says Hallowed Relic's "nova trigger not modelled"; the sim models it.
 
 ## 6. Open
 
-- the gems above, one by one (each a change in the calc to count what the sim does, with a test that compares the two);
-- charges that skip a cooldown (Blinking Cut) are credited at the skill's own chance per hit; the sim also rolls them on the hits
-  of the other skills, so the skill comes up more often (0.85 a second against 0.47 on one build);
-- an opener, an emergency and a keep-up damage skill are not in the plan (the opener is once a fight);
-- the triggered skills are priced on the main skill's hits only;
-- a periodic skill with less reach than the main skill is still counted as never cast (PLAYER-AI.md 4.2);
-- conditions: the sheet assumes those the `steady` mode names; the sim has the ones that are true then.
+- **Self-applied debuffs.** A skill that makes the target take more damage from the rest of the rotation is not counted for the
+  rest: Rime Core's cold exposure (Frost Lance beside it hits 23% harder in the sim), Whirring Motes' shock, Snare Shot beyond its
+  own hits. It wants the plan's uses and a target with a resistance.
+- **Charges that skip a cooldown** (Blinking Cut, Guarded Strike): credited at the skill's own chance per hit; the sim also rolls
+  them on the hits of the other skills (0.85 uses a second against 0.47 on one build).
+- **Rage** is assumed at 20; a skill that gains rage on every melee hit (Snag Lash) sits near 39 in the sim (1.24 of the sheet).
+- **Opener, emergency and keep-up damage skills** are not in the plan (the opener is once a fight).
+- **Triggered skills** are priced on the main skill's hits only.
+- **A periodic skill with less reach** than the main skill and than where the target stands is counted as never cast
+  (PLAYER-AI.md 4.2).
+- **Conditions.** The sheet assumes what `steady` names (and the camp, none); the sim has what is true. Fire Breath Trap's "more
+  against the ignited" is true in the sim, where the dummy burns. A support like Fresh Vigour ("at full life") reads 1.0 on the sheet
+  and 1.3 in a dummy fight that never hurts the character.
+- **Elements.** A skill that picks fire, cold or lightning for each use is priced as fire (the ignite share is corrected, not the
+  shock and chill).
+- **Charge Release** needs charges; with no source the sheet says 0 and the sim swings the weapon (about 100 a second).
+- **Corpses.** Skills that raise or burst corpses are priced as if there were always one, as before (Pyre Burst now reads 0.92 of
+  the sim with a corpse laid every 0.4 s).
+- **Burning Pack**, Offerings and the Hallowed Relic's hit chance are not modelled.
+- The pack fight of the audit is a yardstick for the rotation, not for damage (see 3.5).
