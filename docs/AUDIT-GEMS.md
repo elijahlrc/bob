@@ -1635,7 +1635,7 @@ figure, bladestorms, geysers, smoke, and the wall of ice (which also holds tiles
 ## One use, one spot per area (2026-10-14)
 
 The rule: no skill and no support puts two areas of the same use on the same spot. Found by Double Set: its two traps were thrown to
-opposite sides of the target (a ring, 1.2 tiles out), but each one fired the skill *at the enemy*, so both bursts went off on the very same
+opposite sides of the target (a ring, 1.2 tiles out), but each one fired the skill _at the enemy_, so both bursts went off on the very same
 point. Every set had it: Triple Snare, Snare Cluster, Field of Charges (five mines, five bursts on one enemy), Totem Choir, and Double Set
 on a mine. The audit ran every active skill against every support that multiplies something (`deployCount`, repeats, cascade, extra
 projectiles, Unleash, Arrow Nova, mine chain, mirage) and looked for two areas of one radius on one spot in one tick; the ones that
