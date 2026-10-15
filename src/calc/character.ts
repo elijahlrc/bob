@@ -15,11 +15,19 @@ import {
   INT_MANA,
   STR_LIFE,
   STR_MELEE_PHYS_INC,
-  spellBaseDamage,
   SCATTER_HIT_SHARE,
 } from '../data/constants';
-import { MINIONS, MINION_ENEMY_RES } from '../data/minions';
+import { MINIONS } from '../data/minions';
 import { minionUptime } from './minion';
+import {
+  golemAdded,
+  minionBlow,
+  relicNova,
+  relicNovasPerSec,
+  RELIC_BESIDE,
+  summonCountOf,
+  timedDuty,
+} from './minionDps';
 import {
   CHARGE_KINDS,
   chargeMods,
@@ -1959,19 +1967,44 @@ export class Character {
     return { fires: acts, acts };
   }
 
-  /** Damage a second of the minions the character's summon skills keep standing, less the time they spend fallen (they are assumed in reach). */
-  minionDps(conds: number = this.configConds): number {
-    let dps = 0;
+  /**
+   * Damage a second one target takes from the minions the character's summon skills keep standing, less the time they spend gone
+   * (between one lot and the next, and fallen: `falls` is false for a training dummy that does not hit back). They are assumed in
+   * reach. A single target: what a blow does to the enemies standing near its target is not counted. A relic (`nova`) deals its
+   * nova when the character's attacks hit, so it needs the rotation of the kind of fight; a golem adds to the other minions.
+   */
+  minionDps(conds: number = this.configConds, scenario: Scenario = 'pack', falls = true): number {
+    const distance = this.config.targetDistance ?? 3;
+    const mainUse = this.profile(this.mainFor(scenario), conds).useTime;
+    const rows = [];
     for (const c of this.utilities) {
       const u = c.skill.utility;
       if (u?.kind !== 'summon') continue;
-      const def = MINIONS[u.minion];
       const p = this.profile(c, conds);
-      const count = Math.max(1, Math.round(levelValue(u.count, c.skill.level)) + p.minionCount);
-      const hit = spellBaseDamage(c.skill.level) * def.dmg * p.minionDamage;
-      const up = minionUptime(u.minion, this.config.areaLevel, p.minionLife, p.minionTaken);
-      dps +=
-        count * hit * def.rate * p.minionSpeed * MINION_ENEMY_RES * (1 + def.splash * 0.5) * up;
+      const count = summonCountOf(u, c.skill.level, p.minionCount);
+      // Minions that last a while are gone between the end of one lot and the landing of the next.
+      const duty =
+        u.seconds === undefined ? 1 : timedDuty(u.seconds * p.skillDuration, p.useTime, mainUse);
+      const fallen = falls
+        ? minionUptime(u.minion, this.config.areaLevel, p.minionLife, p.minionTaken)
+        : 1;
+      rows.push({ c, u, p, def: MINIONS[u.minion], count, stand: duty * fallen });
+    }
+    // A golem that stands gives the other minions flat physical damage, and hits harder for each of them near.
+    const golem = rows.find((r) => r.u.golem);
+    const others = rows.reduce((n, r) => (r.u.golem ? n : n + r.count * r.stand), 0);
+    let dps = 0;
+    for (const { c, u, p, def, count, stand } of rows) {
+      let blow = minionBlow(def, c.skill.level, p, distance);
+      if (u.golem) blow *= 1 + Math.min(u.golem.cap, others * u.golem.perNearby) / 100;
+      else if (golem?.u.golem)
+        blow += golemAdded(golem.u.golem, golem.c.skill.level, p) * golem.stand;
+      let novas = 0;
+      if (u.relic && def.nova && distance <= u.relic.radius * p.radiusMult + RELIC_BESIDE)
+        novas =
+          relicNova(def, c.skill.level, p) *
+          relicNovasPerSec(this.attackHitsPerSec(conds, scenario), u.relic.cooldown);
+      dps += (count * blow * def.rate * p.minionSpeed + novas) * stand;
     }
     return dps;
   }
@@ -1991,6 +2024,18 @@ export class Character {
       dps += fires * (1 + p.repeats) * cloneDamage(this.hands[0], spec, p);
     }
     return dps;
+  }
+
+  /** How many times a second the character's attacks land (the skills of the rotation that are attacks, and the weapon). */
+  private attackHitsPerSec(conds: number, scenario: Scenario): number {
+    const plan = this.plan(conds, scenario);
+    let n = 0;
+    for (const c of [...this.actives, this.defaultAttack]) {
+      if (c.skill.utility || c.deploy || c.skill.tags.includes('triggered')) continue;
+      if (!this.profile(c, conds).isAttack) continue;
+      n += c.gemUid === null ? plan.weapon : (plan.acts[c.key] ?? 0);
+    }
+    return n;
   }
 
   /** How the utility skills take the character's time: each is cast once per cooldown (or per buff or curse duration). */
@@ -2071,7 +2116,7 @@ export class Character {
       1,
       this.planned(main, conds, scenario),
     );
-    let dps = sheet.totalDps + this.minionDps(conds);
+    let dps = sheet.totalDps + this.minionDps(conds, scenario) + this.cloneDps(conds, scenario);
     for (const t of this.secondarySheets(conds, target, scenario)) dps += t.dps;
     for (const t of this.triggerSheets(conds, target, scenario)) dps += t.dps;
     return dps;
@@ -2240,7 +2285,7 @@ export class Character {
       hexes: this.sheetHexes,
       secondary,
       secondaryDps: secondary.reduce((a, t) => a + t.dps, 0),
-      minionDps: this.minionDps(conds) + this.cloneDps(conds, scenario),
+      minionDps: this.minionDps(conds, scenario) + this.cloneDps(conds, scenario),
       ehp: this.ehp(d),
       auras: this.auras.map((a) => ({ name: a.def.name, reserved: a.reserved, active: a.active })),
       warnings: this.warnings,
