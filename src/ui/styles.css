@@ -590,6 +590,12 @@ svg.tree {
 .discord a:hover {
   text-decoration: underline;
 }
+.discord-mark {
+  width: 1.25em;
+  height: 1.25em;
+  margin-right: 0.35em;
+  vertical-align: -0.25em;
+}
 .saves {
   display: flex;
   flex-direction: column;
