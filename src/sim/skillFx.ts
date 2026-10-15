@@ -127,7 +127,15 @@ export function projectileFx(w: World, pr: Projectile, dt: number): void {
     if (pr.pulseT <= 0) {
       pr.pulseT += sk.pulse.interval;
       const r = sk.pulse.radius * pr.profile.radiusMult;
-      w.events.push({ t: 'explode', x: pr.x, y: pr.y, r, dtype: 1, skill: pr.profile.skill.id });
+      w.events.push({
+        t: 'explode',
+        x: pr.x,
+        y: pr.y,
+        r,
+        dtype: 1,
+        skill: pr.profile.skill.id,
+        pulse: true,
+      });
       for (const e of w.actors)
         if (
           !e.isPlayer &&

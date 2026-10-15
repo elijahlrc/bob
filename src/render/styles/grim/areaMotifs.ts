@@ -548,6 +548,8 @@ function flames(m: MotifHost, a: MotifArea, column: boolean, big = 1): void {
 
 /** A tall column of fire erupts from the spot and throws embers down about it. */
 function geyser(m: MotifHost, a: MotifArea): void {
+  // What the geyser sends down about itself afterwards, one after another, is a small burst of fire each.
+  if (a.light) return fireball(m, a);
   const f = frameOf(m.host, a);
   m.host.em.flame.explode(10, f.p.x, f.p.y);
   m.host.em.spark.explode(12, f.p.x, f.p.y - 20);

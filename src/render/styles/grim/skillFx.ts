@@ -21,7 +21,7 @@ import {
 } from '../../../sim/deploy';
 import type { Field } from '../../../sim/fields';
 import type { Actor, SimEvent, World } from '../../../sim/types';
-import { beamMotifOf, motifOf } from '../../../calc/areaLook';
+import { beamMotifOf, fallbackMotif, motifOf } from '../../../calc/areaLook';
 import { playMotif, tongue } from './areaMotifs';
 import { drawBuffs, type BuffMark } from './buffFx';
 import { drawLanded, fillArea, outlineArea, shapeOfExplode, type AreaShape } from './areaFx';
@@ -262,7 +262,9 @@ export class SkillFx {
         if (e.r >= COSMETIC_R) {
           if (e.skill) {
             // What the skill is, inside the ground it covers.
-            const motif = motifOf(e.skill, e.dtype, !!e.strip);
+            let motif = motifOf(e.skill, e.dtype, !!e.strip);
+            // A rain that is the motif has nothing inside but its missiles; what its pods or clouds burst into is an area of its element.
+            if (motif === 'rain' && !e.fall) motif = fallbackMotif('blast', e.dtype);
             playMotif({ host: this.host, add: (t, air, draw) => this.add(t, air, draw) }, motif, {
               x: e.x,
               y: e.y,

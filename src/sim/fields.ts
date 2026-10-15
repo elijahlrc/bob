@@ -417,9 +417,17 @@ export function placeGeyser(w: World, a: Actor, act: Action): void {
 }
 
 /** Blasts at a spot: the enemies in its radius are hit. */
-function blast(w: World, f: Field, x: number, y: number, r: number): void {
+function blast(w: World, f: Field, x: number, y: number, r: number, pulse = false): void {
   const p = w.player;
-  w.events.push({ t: 'explode', x, y, r, dtype: f.dtype, skill: f.profile?.skill.id });
+  w.events.push({
+    t: 'explode',
+    x,
+    y,
+    r,
+    dtype: f.dtype,
+    skill: f.profile?.skill.id,
+    ...(pulse ? { pulse: true } : {}),
+  });
   for (const e of enemiesIn(w, x, y, r))
     hit(w, p, e, f.profile!, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
 }
@@ -443,7 +451,7 @@ function volley(w: World, f: Field): void {
       x = p.x + Math.cos(ang) * d;
       y = p.y + Math.sin(ang) * d;
     }
-    blast(w, f, x, y, f.radius);
+    blast(w, f, x, y, f.radius, true);
   }
 }
 
@@ -546,6 +554,7 @@ export function tickFields(w: World, dt: number): void {
           f.x + Math.cos(ang) * d,
           f.y + Math.sin(ang) * d,
           spec.blast * f.profile!.radiusMult,
+          true,
         );
       }
       if (f.t > 0) w.fields[j++] = f;
@@ -584,7 +593,7 @@ export function tickFields(w: World, dt: number): void {
           const spot = w.grid.collide(f.tx! + Math.cos(ang) * d, f.ty! + Math.sin(ang) * d, 0.3);
           f.x = spot.x;
           f.y = spot.y;
-          blast(w, f, f.x, f.y, f.radius);
+          blast(w, f, f.x, f.y, f.radius, true);
         }
       }
       if (f.t > 0) w.fields[j++] = f;
