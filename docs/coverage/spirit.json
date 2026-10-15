@@ -3031,7 +3031,7 @@
     },
     "livewireCharges": {
       "ref": "Charged Mines Support",
-      "name": "Livewire Charges",
+      "name": "Static Mines",
       "kind": "support",
       "verdict": "faithful",
       "confidence": "medium",
@@ -3039,14 +3039,14 @@
       "missing": [],
       "audit": {
         "poe": "Detonating a mine may grant Power or Frenzy charges; power charges add mine crit chance, frenzy charges speed mine laying.",
-        "bob": "Same mechanism as Livewire Snares with critChance per Insight charge. Charges roll on each hit by a mine; works through p.gains.",
+        "bob": "Same mechanism as Static Snares with critChance per Insight charge. Charges roll on each hit by a mine; works through p.gains.",
         "repair": ""
       },
       "verified": false
     },
     "livewireSnares": {
       "ref": "Charged Traps Support",
-      "name": "Livewire Snares",
+      "name": "Static Snares",
       "kind": "support",
       "verdict": "faithful",
       "confidence": "medium",

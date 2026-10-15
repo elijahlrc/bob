@@ -629,7 +629,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     ).toBe(true);
   });
 
-  it('Livewire Snares gives charges when a trap that deals no hit of its own goes off', () => {
+  it('Static Snares gives charges when a trap that deals no hit of its own goes off', () => {
     const { world: w } = world(['drainTrap', 'livewireSnares'], 4, 'wand_3', DEX);
     let got = 0;
     for (let i = 0; i < 60 * 60; i++) {

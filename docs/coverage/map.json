@@ -778,7 +778,7 @@
   "livewire": {
    "ref": "Innervate Support",
    "status": "covered",
-   "note": "Adds lightning damage and a chance to shock; killing a shocked enemy gives Innervation for eight seconds, which adds lightning damage to every hit. Unlike the reference game it also supports traps, mines and totems (decided 2026-10-14: its text promises it for any skill)."
+   "note": "Adds lightning damage and a chance to shock; killing a shocked enemy gives Innervation for eight seconds, which adds lightning damage to every hit."
   },
   "firmHold": {
    "ref": "Iron Grip Support",

@@ -746,7 +746,7 @@ export function hit(
         seconds: p.skillDot.seconds * (1 + (bane.longer * n) / 100),
       });
     } else applySkillDot(w, dst, p);
-    // Where it lands counts as a hit for what a hit gives (Drain Trap with Livewire Snares), but a curse is not an attack.
+    // Where it lands counts as a hit for what a hit gives (Drain Trap with Static Snares), but a curse is not an attack.
     if (!p.skill.tags.includes('curse')) {
       rollGains(w, 'hit', p.gains);
       rollCharges(w, 'hit', p.gains);

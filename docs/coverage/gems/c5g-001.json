@@ -69,13 +69,13 @@
       { "stat": "damage", "kind": "more", "value": -15 } ],
       "description": "Traps and mines come in pairs." } },
   { "ref": "Charged Traps Support", "note": "Traps that go off may grant Insight or Fervour charges; Insight raises their critical multiplier.",
-    "def": { "kind": "support", "id": "livewireSnares", "name": "Livewire Snares", "attr": "dex", "supports": ["trap"], "costMult": 1.3, "mods": [
+    "def": { "kind": "support", "id": "livewireSnares", "name": "Static Snares", "attr": "dex", "supports": ["trap"], "costMult": 1.3, "mods": [
       { "stat": "chargeOn.hit.insight", "kind": "base", "value": [20, 30] },
       { "stat": "chargeOn.hit.fervour", "kind": "base", "value": [20, 30] },
       { "stat": "critMulti", "kind": "base", "value": 15, "per": { "stat": "charges.insight", "div": 1 } } ],
       "description": "Traps that go off may grant charges." } },
   { "ref": "Charged Mines Support", "note": "Mines that go off may grant Insight or Fervour charges; Insight raises their critical chance.",
-    "def": { "kind": "support", "id": "livewireCharges", "name": "Livewire Charges", "attr": "int", "supports": ["mine"], "costMult": 1.3, "mods": [
+    "def": { "kind": "support", "id": "livewireCharges", "name": "Static Mines", "attr": "int", "supports": ["mine"], "costMult": 1.3, "mods": [
       { "stat": "chargeOn.hit.insight", "kind": "base", "value": [20, 30] },
       { "stat": "chargeOn.hit.fervour", "kind": "base", "value": [20, 30] },
       { "stat": "critChance", "kind": "inc", "value": 25, "per": { "stat": "charges.insight", "div": 1 } } ],

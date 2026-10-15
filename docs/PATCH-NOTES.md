@@ -7,7 +7,7 @@ change, and our own names only. Dash bullets under plain headings.
 ## 2026-10-14
 
 - Support gem cards now list the skills they will not take, such as Triple Cadence and channelled skills, so "Supports any skill" is no longer misleading.
-- Livewire can now support traps, mines and totems, not only attacks and spells you cast yourself.
+- Livewire Snares and Livewire Charges are renamed Static Snares and Static Mines.
 - The stop screens, Respite and map-type cards, and the boss map card now use fewer words: they say what you get and what you choose, and no longer list what the level does not give.
 - New enemy affix, Blinking: the monster marks the spot where you stand and, a moment later, teleports onto it with a travel spell of its element. Cinder Step bursts in fire and leaves burning ground, Rime Step bursts in cold and leaves chilling ground, Bolt Step flashes at both ends, and a plain one just lands hard. Stun it while it gathers to stop it.
 - Wisps, Lantern Wights and Bone Crawlers can now teleport onto you from a distance too, after a warning on the ground, with Bolt Step, Rime Step and Quick Step.
@@ -31,7 +31,7 @@ change, and our own names only. Dash bullets under plain headings.
 - Drain Trap now draws its beams, a glowing line from each enemy it holds to you with a red and a blue mote running along it for the life and mana it gives.
 - Skills that leave something standing are now drawn: the blades of Orbiting Blades, the Tempest Mote orb, Skyfall's markers, Fuse Arrow's arrows, Blight Hail's pods, the Twin Shadow archer, Cinder Blow's charges and Slag Carapace's shell.
 - Every buff that is up now shows on your character in its own colour and style: speed buffs leave streaks behind you, guards are plates or a halo, surges of power circle your body, rages give off embers, banners fly a small flag, stances ring your feet, and so on. Buffs of the same kind have different colours, and several at once share one place on the body (three guards make one ring of plates in three colours) instead of drawing over each other. A buff about to end blinks.
-- Skills that deal no hit of their own, such as Drain Trap, Creeping Plague and Withering Breath, now give what a hit gives (charges, buffs, rage, life and mana) when they land, so Livewire Snares works with Drain Trap. Curses do not.
+- Skills that deal no hit of their own, such as Drain Trap, Creeping Plague and Withering Breath, now give what a hit gives (charges, buffs, rage, life and mana) when they land, so Static Snares works with Drain Trap. Curses do not.
 - Every map now has a biome: Crypt, Cavern, Ruins, Marsh, Forge, Hollow, Shrine or Warren. It sets the layout and look of the map and is shown when you enter. It is separate from the theme, so any theme can turn up in any biome.
 - New layouts: Caverns and Marshes are winding caves, the Hollow is wide open ground with pillars, Ruins have more than one way round, and the Warren is a tangle of small chambers and narrow passages.
 - Each biome has its own floors, walls, lighting and decorations, such as pools, moss, glowing fungus, lava cracks, candles, roots and rubble.

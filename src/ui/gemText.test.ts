@@ -24,7 +24,7 @@ describe('gemCardData', () => {
       1,
     ).stats;
     expect(innervate).toContain('Supports any skill');
-    expect(innervate.some((l) => l.startsWith('Not '))).toBe(false);
+    expect(innervate.find((l) => l.startsWith('Not '))).toMatch(/trap.*mine.*totem/i);
   });
 
   it('scales values with level', () => {

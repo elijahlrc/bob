@@ -7115,6 +7115,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     name: 'Livewire',
     attr: 'int',
     supports: [],
+    excludes: ['trap', 'mine', 'totem'],
     costMult: 1.3,
     mods: [
       {
@@ -8022,7 +8023,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
   {
     kind: 'support',
     id: 'livewireSnares',
-    name: 'Livewire Snares',
+    name: 'Static Snares',
     attr: 'dex',
     supports: ['trap'],
     costMult: 1.3,
@@ -8052,7 +8053,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
   {
     kind: 'support',
     id: 'livewireCharges',
-    name: 'Livewire Charges',
+    name: 'Static Mines',
     attr: 'int',
     supports: ['mine'],
     costMult: 1.3,

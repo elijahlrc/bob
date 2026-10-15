@@ -6,7 +6,7 @@ import { stepWorld } from './world';
 
 /**
  * A skill that deals no hit of its own (a debuff of damage over time) still lands on the enemies it reaches, and what a hit
- * gives the character has to follow it: charges (Livewire Snares), buffs and rage. Checked for every such skill.
+ * gives the character has to follow it: charges (Static Snares), buffs and rage. Checked for every such skill.
  */
 
 const HITLESS = ACTIVE_GEMS.filter((g) => g.dot?.hitless && !g.tags.includes('curse'));
