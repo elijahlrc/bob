@@ -91,6 +91,23 @@ function TelemetryNotice() {
   );
 }
 
+/** The invite to the game's Discord server (a permanent one). Empty hides the invitation. */
+export const DISCORD_URL = '';
+
+/** Asks players to come and say what they think of the game. */
+function DiscordInvite() {
+  if (!DISCORD_URL) return null;
+  return (
+    <p class="discord">
+      Your feedback shapes this game. Found a bug, or something that feels off?{' '}
+      <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer">
+        Join the Discord
+      </a>{' '}
+      and tell us.
+    </p>
+  );
+}
+
 export function Title({ c }: { c: Controller }) {
   const saves = c.saves.filter((s) => s.result.status !== 'none');
   const anyOk = saves.some((s) => s.result.status === 'ok');
@@ -116,6 +133,7 @@ export function Title({ c }: { c: Controller }) {
           Patch notes
         </button>
       </div>
+      <DiscordInvite />
       {anyOk && (
         <p class="muted">Each run keeps its own save; a new run leaves the others alone.</p>
       )}

@@ -576,6 +576,20 @@ svg.tree {
   gap: 8px;
   align-items: center;
 }
+.discord {
+  max-width: 420px;
+  margin: 4px 0 0;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--muted);
+}
+.discord a {
+  color: var(--accent);
+  font-weight: bold;
+}
+.discord a:hover {
+  text-decoration: underline;
+}
 .saves {
   display: flex;
   flex-direction: column;
