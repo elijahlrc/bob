@@ -6,6 +6,11 @@ change, and our own names only. Dash bullets under plain headings.
 
 ## 2026-10-14
 
+- Skills that set something down now show it. Traps and mines are thrown in an arc and a closing ring shows them arming, totems and brands drop into place, and lasting ground, pods, ice crystals, storms, orbs, trails, illusions, geysers and smoke stay visible while they last. Glacier Wall raises blocks of ice, and the burst as it goes up now hurts enemies along the whole wall instead of a circle at its middle.
+- The area a skill lands now shows what the skill is inside a fine outline: slam cracks, spikes, frost crystals, flames, lava, lightning bolts, plague cloud, holy light, shrapnel, jaws and blades.
+- Sets of traps, mines and totems, such as Double Set, Triple Snare, Snare Cluster, Field of Charges and Totem Choir, no longer burst all on one spot: their areas fan out round the target, so they cover more of a pack. Repeated areas, Mortar Bow's arrows and Slag Blow's balls also land apart from each other.
+- Whirring Motes now shock nearby enemies by the amount their card says. A fault had made those enemies take many times normal damage, so builds that use the motes will deal much less.
+- The damage figures on the Character sheet and the map cards are closer to what the game deals. They now follow the skills your character actually uses in turn, and count the extra blasts, bolts, projectiles, repeats and standing traps and mines that skills add.
 - Support gem cards now list the skills they will not take, such as Triple Cadence and channelled skills, so "Supports any skill" is no longer misleading.
 - Livewire Snares and Livewire Charges are renamed Static Snares and Static Mines.
 - The stop screens, Respite and map-type cards, and the boss map card now use fewer words: they say what you get and what you choose, and no longer list what the level does not give.
