@@ -61,14 +61,6 @@ export function packPower(d: Difficulty, mapNoise: number, packNoise: number): n
   return Math.round((1 + d.variance * noise) * 20) / 20;
 }
 
-/** The tier a map's own draw falls in, for the offer card; null when there is no variance to show. */
-export type MapTier = 'gentle' | 'even' | 'fierce';
-export function mapTier(d: Difficulty, mapNoise: number): MapTier | null {
-  if (d.variance <= 0) return null;
-  const x = MAP_NOISE_SHARE * mapNoise * d.variance;
-  return x < -0.04 ? 'gentle' : x > 0.04 ? 'fierce' : 'even';
-}
-
 /** How much harder than the legacy curve a normal monster is at this area level (life times damage; the ease cancels). */
 export function relativeHardness(
   area: number,

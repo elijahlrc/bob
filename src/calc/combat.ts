@@ -54,6 +54,16 @@ export type Defence = {
   /** Fractions 0..1 (already capped). */
   blockAttack: number;
   blockSpell: number;
+  /** The most block can be (fraction), and the extra chance to block projectile attacks (fraction, up to that cap). */
+  blockCap: number;
+  blockProjectile: number;
+  /** Life and mana gained for each hit blocked. */
+  lifeOnBlock: number;
+  manaOnBlock: number;
+  /** Seconds a block staggers the character: 0 when it cannot be stunned. */
+  blockStagger: number;
+  /** Energy shield regenerated per second, apart from its recharge. */
+  esRegen: number;
   /** Raw resistance per type (percent) before the cap. */
   res: number[];
   maxRes: number[];
@@ -210,7 +220,12 @@ export function attackHitChance(
 
 /** The chance to block a hit of this skill: less for a skill that wears blocking down, and for each Overpowered stack. */
 export function blockChance(p: SkillProfile, def: Defence, less = 0): number {
-  const base = p.isAttack ? def.blockAttack : def.blockSpell;
+  const projectile = p.isAttack && p.skill.behaviour.kind === 'projectile';
+  const base = !p.isAttack
+    ? def.blockSpell
+    : projectile && def.blockProjectile > 0
+      ? Math.min(def.blockCap, def.blockAttack + def.blockProjectile)
+      : def.blockAttack;
   return Math.max(0, base * (1 - p.enemyBlockLess) - less);
 }
 

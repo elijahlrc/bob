@@ -88,6 +88,8 @@ export const STUN_NON_MELEE_NON_PHYS = 0.75;
 /** While energy shield is up, a stun is ignored with this chance (3.9). */
 export const STUN_ES_IGNORE = 0.5;
 export const STUN_GRACE = 0.5;
+/** Blocking a hit staggers the character for this long (3.9: block recovery), before faster recovery shortens it. */
+export const BLOCK_STAGGER = STUN_BASE_DURATION;
 
 // Impale (3.9): a hit that impales records 10% of its physical damage; the next 5 hits each deal it again as reflected
 // physical damage. A target holds at most 5 impales.

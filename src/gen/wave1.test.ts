@@ -258,6 +258,9 @@ describe('wave 1 flasks', () => {
           mult() {
             return 1;
           }
+          sum() {
+            return 0;
+          }
         })() as never,
       );
       // Mods named `flask.…` change the flask itself and are not part of the buff.

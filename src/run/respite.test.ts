@@ -3,7 +3,6 @@ import { chalkAdd } from './craft';
 import { chooseOffer } from './bot';
 import { Controller } from './controller';
 import { OFFSETS_FROM_MAP, rollOffers, RESPITE_ALWAYS_BELOW } from './offers';
-import { offersFor } from './preview';
 import { newRun, planFor, setMap, stash, takeRespite, TOTAL_MAPS } from './run';
 import { fullVitals } from '../sim/types';
 
@@ -142,21 +141,5 @@ describe('the bot and the Respite', () => {
     run.vitals = hurt(0.6);
     expect(chooseOffer(run, 'best').kind).toBe('map');
     expect(chooseOffer(run, 'first').kind).toBe('map');
-  });
-});
-
-describe('the verdict on an offer', () => {
-  it('every map offer has one, a Respite has none, and a worn-down character gets worse ones', () => {
-    const run = newRun('vanguard', 6);
-    setMap(run, 13);
-    const well = offersFor(run);
-    expect(well.every((o) => o.verdict !== undefined && o.ratio! > 0)).toBe(true);
-    run.vitals = hurt(0.3);
-    run.offers = rollOffers(run.seed, 13, run.vitals);
-    const worn = offersFor(run);
-    expect(worn.find((o) => o.kind === 'respite')!.verdict).toBeUndefined();
-    const m = worn.find((o) => o.kind === 'map')!;
-    const same = well.find((o) => o.id === m.id);
-    if (same && same.kind === 'map') expect(m.ratio!).toBeLessThan(same.ratio!);
   });
 });

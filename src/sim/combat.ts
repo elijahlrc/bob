@@ -470,8 +470,28 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       rollCharges(w, dst.side!, 'block');
       rollGains(w, dst.side!, 'block');
     }
-    if (dst.def.lifeOnBlockPct > 0)
-      dst.life = Math.min(lifeCap(dst), dst.life + dst.def.maxLife * dst.def.lifeOnBlockPct);
+    if (dst.def.lifeOnBlockPct > 0 || dst.def.lifeOnBlock > 0)
+      dst.life = Math.min(
+        lifeCap(dst),
+        dst.life + dst.def.maxLife * dst.def.lifeOnBlockPct + dst.def.lifeOnBlock,
+      );
+    if (dst.isPlayer && dst.def.manaOnBlock > 0)
+      dst.mana = Math.min(
+        Math.max(0, dst.def.maxMana - reservedMana(dst.side!)),
+        dst.mana + dst.def.manaOnBlock,
+      );
+    // Blocking staggers the character for a moment (3.9 block recovery), once it has recovered from the last stagger.
+    if (
+      dst.isPlayer &&
+      dst.def.blockStagger > 0 &&
+      dst.stunT <= 0 &&
+      dst.graceT <= 0 &&
+      !dst.side!.channel?.profile.skill.channel?.stunImmune
+    ) {
+      dst.stunT = dst.def.blockStagger;
+      dst.action = null;
+      w.events.push({ t: 'stun', dst: dst.id, dur: dst.def.blockStagger });
+    }
     wake(w, dst);
     if (dst.isPlayer) fireTriggers(w, dst.side!, { on: 'block' });
     // A skill that wears blocking down leaves a blocking enemy Overpowered.
@@ -1343,6 +1363,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       a.es >= def.maxEs,
       def.leechRate,
     );
+  if (def.esRegen > 0 && a.es < def.maxEs) a.es = Math.min(def.maxEs, a.es + def.esRegen * dt);
   // ES recharge.
   if (def.maxEs > 0 && a.es < def.maxEs && a.sinceDamaged >= def.esDelay)
     a.es = Math.min(def.maxEs, a.es + def.esRecharge * dt);
