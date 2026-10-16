@@ -458,7 +458,7 @@ const SHIELD_NAMES: Record<DefenceType, [string, string, string, string]> = {
   ar: ['Plank Shield', 'Iron Kite', 'Bastion Shield', 'Rampart Shield'],
   ev: ['Hide Buckler', 'Ringed Buckler', 'Thornwood Buckler', 'Shadowmesh Buckler'],
   es: ['Bone Ward', 'Spirit Ward', 'Lantern Ward', 'Aurora Ward'],
-  arev: ['Rawhide Roundel', 'Studded Roundel', 'Marauder Roundel', 'Warden Roundel'],
+  arev: ['Rawhide Roundel', 'Studded Roundel', 'Raider Roundel', 'Warden Roundel'],
   ares: ['Votive Plate', 'Reliquary Plate', 'Cathedral Plate', 'Halo Plate'],
   eves: ['Barbed Targe', 'Spiked Targe', 'Thorned Targe', 'Briar Targe'],
 };
@@ -570,7 +570,7 @@ function jewelleryBases(): ItemBase[] {
     b('belt_stun', 'Sturdy Wrap', 'belt', 16, [mod('stunDurationOnSelf', 'base', 20)]),
     b('belt_stunner', 'Hammerhand Belt', 'belt', 16, [mod('stunDuration', 'inc', 25)]),
     b('belt_es', 'Silk Cord', 'belt', 20, [mod('es', 'base', 20)]),
-    b('belt_duelist', 'Duelist Girdle', 'belt', 78, [
+    b('belt_duelist', 'Fencer Girdle', 'belt', 78, [
       mod('armour', 'base', 290),
       mod('evasion', 'base', 290),
     ]),
@@ -581,7 +581,7 @@ function jewelleryBases(): ItemBase[] {
     b('quiver_light', 'Storm Quiver', 'quiver', 1, flatAtk('lightning', 1, 5)),
     b('quiver_accpct', 'Hawk Quiver', 'quiver', 4, [mod('accuracy', 'inc', 25)]),
     b('quiver_attack', 'Thorned Quiver', 'quiver', 5, flatAtk('physical', 1, 4)),
-    b('quiver_hit', "Hunter's Quiver", 'quiver', 10, [
+    b('quiver_hit', "Stalker's Quiver", 'quiver', 10, [
       mod('lifeOnHit', 'base', 3, { tags: ['attack'] }),
     ]),
     b('quiver_dex', 'Falconer Quiver', 'quiver', 12, [mod('dex', 'base', 35)]),

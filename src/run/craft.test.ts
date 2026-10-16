@@ -296,9 +296,9 @@ describe('essences', () => {
   it('add the family you choose from the essence list, and nothing else changes', () => {
     const { run, item } = setup({ base: 'sword_3' });
     item.affixes = item.affixes.slice(0, 2); // leave room
-    // Chitin offers attack speed, life on hit or area of effect.
+    // Chitin offers attack speed or life on hit.
     run.currency.chitin = 2;
-    const free = ['aspdGlobal', 'aspdLocal', 'lifeOnHit', 'areaEffect'].filter((f) =>
+    const free = ['aspdGlobal', 'aspdLocal', 'lifeOnHit'].filter((f) =>
       addableFamilies(item).some((x) => x.id === f),
     );
     expect(free.length).toBeGreaterThan(0);

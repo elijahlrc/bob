@@ -221,11 +221,24 @@ describe('what an item shows about its affixes', () => {
     expect(r.prefix.cap).toBe(3);
   });
 
+  it('offers a mod with several ladders once, in the version the item takes', () => {
+    const { item } = setup({ base: 'body_es_3' });
+    item.affixes = [];
+    const opts = essenceOptions(item, 'ectoplasm');
+    const ids = opts.map((o) => o.family.id);
+    expect(ids).toContain('esLocalBody');
+    expect(ids.filter((i) => i.startsWith('esLocal'))).toEqual(['esLocalBody']);
+    expect(ids).toContain('manaGearArmour');
+    expect(opts.find((o) => o.family.id === 'esLocalBody')!.free).toBe(true);
+  });
+
   it('says whether an essence needs a slot given up, and which', () => {
     const { run, item } = setup();
     const ess = CURRENCIES.find((d) => d.families && d.families.length > 1)!;
     const opts = essenceOptions(item, ess.id);
-    expect(opts).toHaveLength(ess.families!.length);
+    // A mod with a ladder for each set of slots is one offer.
+    const kinds = new Set(ess.families!.map((f) => family(f).group ?? f));
+    expect(opts).toHaveLength(kinds.size);
     for (const o of opts) {
       if (o.free) expect(o.replace).toEqual([]);
       else if (!o.blocked) {

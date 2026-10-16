@@ -1552,7 +1552,7 @@ export const ARMOUR_FAMILY_DEFS: FamilyDef[] = [
       ],
       [{ stat: 'damage', kind: 'inc', tags: ATTACK }],
     ),
-    names: ['Martial', 'Warrior', 'Vanguard'],
+    names: ['Martial', 'Warrior', 'Spearhead'],
   },
   {
     id: 'eleDamageShield',

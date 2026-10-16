@@ -11,7 +11,7 @@ The author asked for parity with 3.9 and took every recommendation of section 10
 - **A family for each ladder.** The armour and jewellery mods are `src/data/armourAffixes.ts` (157 families, generated once from the 3.9 tables and
   then hand-edited source, like `weaponTables.ts`). A mod whose ladder differs by slot is several families of one `group` (life has five), and an
   item rolls only one of them. Tier levels, ranges and relative weights are the reference's; the top tier is still a quarter as likely as the lowest.
-  The pool sizes now match 3.9 less the omitted mods (the regression test lists them), and weights follow the reference per tier (resistances lost
+  The pool sizes now match 3.9 less the omitted mods (the regression test lists them), and the relative weights are the reference's (resistances lost
   their old 1.4 and life its 1.5, which had made up for the smaller pools).
 - **Hybrids and defence types.** A pure piece rolls only its own set of defences; an armour-and-evasion piece rolls the pair mods (with the
   armour-and-life style hybrids at half weight). Attributes follow the type (`hybrid`, `arShield`, `evShield` and `esShield` are new item tags).
@@ -24,7 +24,7 @@ The author asked for parity with 3.9 and took every recommendation of section 10
   defences, belt armour and flask mods, ring evasion, enemy stun threshold on belts, stun duration on belts and quivers. Movement speed is the
   boots prefix `bootsMoveSpeed`.
 - **Numbers** are the 3.9 numbers per slot. Flat armour and evasion against Bob's own bases now: body 400 on 480 (0.8, was 0.67), helmet 138 on
-  240 (0.6), gloves and boots 60 on 168 (0.36); the reference has 0.5, 0.4 and 0.25. Bob's bases are lighter than the reference's, so a flat roll is
+  240 (0.6), gloves and boots 60 on 168 (0.36), a shield 400 on 288 (1.4); the reference has 0.5, 0.4, 0.25 and about 0.8 (a shield base of 522 at level 64). Bob's bases are lighter than the reference's, so a flat roll is
   a bigger part of the piece; lowering the bases is the lever if it proves too strong.
 - **Retired, not deleted** (items that have them keep them, they roll nowhere): the five ailment chances on gloves, added chaos damage to
   attacks, socketed gem level on armour, area of effect, aura effect, reduced mana reserved, the wearer's stun threshold and the old movement
