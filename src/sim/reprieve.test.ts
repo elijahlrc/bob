@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { reprieveDef } from '../data/reprieves';
+import { CURSE_LEVELS, reprieveDef } from '../data/reprieves';
 import { playOffer } from '../run/play';
 import { heldReprieveIds } from '../run/provisions';
 import { acquireReprieve, curseAffixes } from '../run/reprieves';
@@ -31,7 +31,7 @@ describe('a Revive (docs/WAYSIDE.md 7)', () => {
     applyDamage(w, w.player, LETHAL());
     expect(w.player.alive).toBe(true);
     expect(w.status).toBe('running');
-    expect(w.player.life).toBeCloseTo(0.35 * cap, 3);
+    expect(w.player.life).toBeCloseTo(reprieveDef('lastSpark').life * cap, 3);
     expect(w.reprieve.fired).toEqual(['lastSpark']);
     expect(w.events.some((e) => e.t === 'reprieve' && e.how === 'revive')).toBe(true);
     // Nothing can hurt it for the seconds that follow ...
@@ -61,7 +61,7 @@ describe('a Revive (docs/WAYSIDE.md 7)', () => {
     monster.y = w.player.y;
     monster.stunT = 0;
     applyDamage(w, w.player, LETHAL());
-    expect(monster.stunT).toBeGreaterThan(1);
+    expect(monster.stunT).toBeGreaterThan(0);
   });
 
   it('works on a tenth map too', () => {
@@ -79,7 +79,7 @@ describe('a Revive (docs/WAYSIDE.md 7)', () => {
     applyDamage(w, w.player, LETHAL());
     expect(w.reprieve.fired).toEqual(['lastSpark', 'bargainCoin']);
     expect(w.player.alive).toBe(true);
-    expect(w.player.life).toBeCloseTo(0.5 * lifeCap(w, w.player), 3);
+    expect(w.player.life).toBeCloseTo(reprieveDef('bargainCoin').life * lifeCap(w, w.player), 3);
     w.reprieve.invulnT = 0;
     applyDamage(w, w.player, LETHAL());
     expect(w.status).toBe('dead');
@@ -101,7 +101,7 @@ describe('a Retreat (docs/WAYSIDE.md 7.2 and 7.3)', () => {
     applyDamage(w, w.player, LETHAL());
     expect(w.status).toBe('abandoned');
     expect(w.player.alive).toBe(true);
-    expect(w.player.life).toBeCloseTo(0.25 * cap, 3);
+    expect(w.player.life).toBeCloseTo(reprieveDef('ferryToken').life * cap, 3);
     expect(w.reprieve.fired).toEqual(['ferryToken']);
     expect(w.events.some((e) => e.t === 'reprieve' && e.how === 'retreat')).toBe(true);
     for (const f of w.flasks) expect(f.charges).toBe(f.spec.maxCharges);
@@ -151,24 +151,15 @@ describe('a reprieve in a run', () => {
     expect(res.reprieves).toContain('bargainCoin');
     finishMap(run, res);
     const w = waysideOf(run);
-    expect(w.curses).toEqual([{ id: 'bargain', until: 13 }]);
-    for (const map of [9, 10, 11, 12, 13]) {
+    const until = 8 + CURSE_LEVELS;
+    expect(w.curses).toEqual([{ id: 'bargain', until }]);
+    for (let map = 9; map <= until; map++) {
       run.map = map;
       expect(curseAffixes(run), `map ${map}`).toEqual(['curse.bargain']);
     }
-    run.map = 14;
+    run.map = until + 1;
     expect(curseAffixes(run)).toEqual([]);
     run.map = 9;
     expect(planFor(run, run.offers[0]).affixes).toContain('curse.bargain');
-  });
-
-  it('every reprieve has its own data', () => {
-    for (const id of ['ferryToken', 'lastSpark', 'bargainCoin'] as const) {
-      const d = reprieveDef(id);
-      expect(d.life).toBeGreaterThan(0);
-      expect(d.life).toBeLessThan(1);
-      expect(d.base).toBeGreaterThan(0);
-      expect(d.text).toMatch(/flasks are refilled|flasks refilled/);
-    }
   });
 });

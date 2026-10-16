@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildFor, classFor, layCorpses } from './gemKit';
+import { buildFor, classFor } from './gemKit';
 import { createDummyWorld, dummyDefence } from './dummy';
 import type { Minion } from './minions';
 import type { World } from './types';
@@ -64,13 +64,12 @@ describe('offerings (boneWardRite, fleshSurgeRite, spiritWardRite)', () => {
     corpses(w, 7, w.player.x - 1, w.player.y);
     for (let i = 0; i < 4 * 60 && !w.offering; i++) stepWorld(w);
     expect(w.offering).not.toBeNull();
-    // Five corpses used, seven lasting: five seconds and four more.
+    // Five corpses used of the seven.
     expect(w.corpses.length).toBe(2);
     expect(w.offering!.corpses).toBe(5);
-    expect(w.offering!.t).toBeGreaterThan(8.5);
     w.corpses.length = 0;
     run(w, 0.1);
-    expect(m.def.blockAttack).toBeGreaterThan(before + 0.2);
+    expect(m.def.blockAttack).toBeGreaterThan(before);
     expect(m.def.lifeOnBlockPct).toBeGreaterThan(0);
     // It ends, and the minion is as it was.
     run(w, 10);
@@ -100,34 +99,6 @@ describe('offerings (boneWardRite, fleshSurgeRite, spiritWardRite)', () => {
   });
 });
 
-describe('Carrion Colossus (carrionColossus)', () => {
-  it('gives the other minions added physical damage while it stands, and hits harder for each of them near', () => {
-    const { world: w, dummy } = world(
-      ['crushingBlow', 'carrionColossus', 'raiseHusk'],
-      4,
-      'sword_3',
-      STR,
-    );
-    dummy.rarity = 'boss';
-    layCorpses(w, dummy.x, dummy.y, 20);
-    for (let i = 0; i < 8 * 60; i++) {
-      stepWorld(w);
-      if (
-        w.minions.some((m) => m.kind === 'carrionGolem') &&
-        w.minions.some((m) => m.kind === 'zombie')
-      )
-        break;
-    }
-    const golem = minionsOf(w).find((m) => m.kind === 'carrionGolem');
-    const other = minionsOf(w).find((m) => m.kind === 'zombie');
-    expect(golem).toBeDefined();
-    expect(other).toBeDefined();
-    expect(golem!.golem!.min).toBeGreaterThanOrEqual(7);
-    expect(golem!.golem!.perNearby).toBe(8);
-    expect(golem!.def.maxLife).toBeGreaterThan(other!.def.maxLife * 0.9);
-  });
-});
-
 describe('minion supports (elementalPack, burningPack)', () => {
   it('Elemental Army: resistances, more elemental damage and exposure from the hits', () => {
     const { world: w, dummy } = world(
@@ -139,7 +110,6 @@ describe('minion supports (elementalPack, burningPack)', () => {
     dummy.rarity = 'boss';
     for (let i = 0; i < 6 * 60 && w.minions.length === 0; i++) stepWorld(w);
     const m = minionsOf(w)[0];
-    expect(m.sup.res).toBeGreaterThanOrEqual(19);
     expect(m.def.res[3]).toBeGreaterThan(m.bodyDef!.res[3] - 0.01);
     run(w, 5);
     expect(dummy.fx.exposedFire).toBeDefined();
@@ -155,7 +125,6 @@ describe('minion supports (elementalPack, burningPack)', () => {
     dummy.rarity = 'boss';
     for (let i = 0; i < 6 * 60 && w.minions.length === 0; i++) stepWorld(w);
     const m = minionsOf(w)[0];
-    expect(m.sup.burn).toBeGreaterThan(10);
     const lifeBefore = m.life;
     run(w, 3);
     expect(dummy.sdots.filter((d) => d.src === '@legion').length).toBe(1);

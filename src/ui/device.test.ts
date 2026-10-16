@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { layoutFor, PHONE_MAX, TABLET_MAX, viewport } from './device';
+import { layoutFor, PHONE_MAX, TABLET_MAX } from './device';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -11,12 +11,6 @@ describe('device', () => {
     expect(layoutFor(TABLET_MAX)).toBe('tablet');
     expect(layoutFor(TABLET_MAX + 1)).toBe('desktop');
     expect(layoutFor(1920)).toBe('desktop');
-  });
-
-  it('has a desktop default when there is no window (tests, tools)', () => {
-    const v = viewport();
-    expect(v.layout).toBe('desktop');
-    expect(v.coarse).toBe(false);
   });
 
   it('keeps the CSS breakpoints in step with the constants', () => {

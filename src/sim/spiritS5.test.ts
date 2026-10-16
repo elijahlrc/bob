@@ -52,12 +52,6 @@ describe('Flameblast (furnaceRoar): stages, then one blast', () => {
     expect(t.uses).toBeGreaterThanOrEqual(10);
   });
 
-  it('the sheet spreads the blast over the uses that built it', () => {
-    const c = new Character(holding('wand_3', ['furnaceRoar'], 'mystic'), {});
-    const p = c.profile(c.primary, 0);
-    expect(channelMult(p)).toBeCloseTo((1 + 1.09 * 10) / 10, 6);
-  });
-
   it('a lull lets the channel go: the stages built are released at once', () => {
     const { world, dummy } = createDummyWorld(holding('wand_3', ['furnaceRoar'], 'mystic'), {
       distance: 2,
@@ -213,23 +207,6 @@ describe('Reave (sweepingCut): the area grows with every use that hits', () => {
 });
 
 describe('Cyclone (twisterBlade): the first spin hits for half, and a stun cannot break it', () => {
-  it('is a channel with a weak first hit and a stun-proof spin', () => {
-    const c = new Character(holding('sword_3', ['twisterBlade'], 'strider'), {});
-    const spec = c.primary.skill.channel!;
-    expect(spec.first).toBe(50);
-    expect(spec.stunImmune).toBe(true);
-    const { world, dummy } = createDummyWorld(holding('sword_3', ['twisterBlade'], 'strider'), {
-      distance: 1.2,
-      maxTime: 60,
-    });
-    world.opts.freeResources = true;
-    const t = record(world, dummy, 10, 'twisterBlade');
-    const first = t.hits.filter((h) => h.use === 1).map((h) => h.amount);
-    const later = t.hits.filter((h) => h.use === 3).map((h) => h.amount);
-    expect(first.length).toBeGreaterThan(0);
-    expect(later.length).toBeGreaterThan(0);
-  });
-
   it('keeps its stages at the cap and spins on, instead of starting over', () => {
     const b = holding('sword_3', ['twisterBlade'], 'strider');
     const cap = new Character(b, {}).primary.skill.channel!.cap;

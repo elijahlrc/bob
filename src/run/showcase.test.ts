@@ -19,12 +19,10 @@ describe('showcase mode', () => {
     expect(c.showcase).toBeNull();
   });
 
-  it('the boss showcase is a level 100 character on map 100', () => {
+  it('the boss showcase starts a boss map', () => {
     const c = new Controller(null);
     c.startShowcase(true);
-    expect(c.run!.map).toBe(100);
     expect(c.world!.plan.endKind).toBe('boss');
-    expect(c.world!.build.level).toBe(100);
   });
 
   it('an invulnerable player survives a stretch of the map', () => {

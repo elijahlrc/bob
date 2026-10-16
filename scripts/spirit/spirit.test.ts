@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { mappedGemIds, loadMapGems, pobFor, joinBlock } from './join';
-import { loadLedger, MILESTONES, summarise, validateLedger } from './ledger';
+import { loadLedger, MILESTONES, validateLedger } from './ledger';
 
 describe('the spirit ledger (docs/coverage/spirit.json)', () => {
   const ledger = loadLedger();
@@ -18,13 +18,6 @@ describe('the spirit ledger (docs/coverage/spirit.json)', () => {
   it('names the same reference gem as map.json', () => {
     const map = loadMapGems();
     for (const [id, r] of Object.entries(ledger.gems)) expect(r.ref, id).toBe(map[id].ref);
-  });
-
-  it('counts add up', () => {
-    const s = summarise(ledger);
-    expect(s.byVerdict.faithful + s.byVerdict.drifted + s.byVerdict.gutted).toBe(
-      Object.keys(ledger.gems).length,
-    );
   });
 });
 

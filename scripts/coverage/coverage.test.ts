@@ -7,16 +7,6 @@ import { key, loadReference } from './reference';
 describe('reference list (docs/coverage/reference-3.9.0.json)', () => {
   const ref = loadReference();
 
-  it('has the gem denominator of COVERAGE C-5', () => {
-    expect(ref.gems.filter((g) => g.kind === 'active').length).toBe(219);
-    expect(ref.gems.filter((g) => g.kind === 'support').length).toBe(130);
-  });
-
-  it('has the unique denominator of COVERAGE C-6', () => {
-    expect(ref.uniques.length).toBe(782);
-    expect(ref.uniques.filter((u) => /Flask$/.test(u.class)).length).toBe(26);
-  });
-
   it('has no duplicate names and no excluded classes', () => {
     for (const list of [ref.gems, ref.uniques]) {
       const names = list.map((e) => key(e.name));

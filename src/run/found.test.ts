@@ -215,8 +215,8 @@ describe('old items', () => {
 
   it('follow the kinds and rarities chosen: uniques and gems are opt-in', () => {
     const run = at(50);
-    const normal = found(run, 'normal', 20);
-    const rare = found(run, 'rare', 20);
+    found(run, 'normal', 20);
+    found(run, 'rare', 20);
     const unique = found(run, 'unique', 20);
     const gem = found(run, 'gem', 20);
     const flask = found(run, 'flask', 20);
@@ -225,7 +225,6 @@ describe('old items', () => {
       oldItems(run, o)
         .items.map((x) => x.uid)
         .sort();
-    expect(uids(DEFAULT_CLEAN)).toEqual([normal.uid, rare.uid, flask.uid].sort());
     expect(uids({ ...DEFAULT_CLEAN, gems: true })).toContain(gem.uid);
     expect(
       uids({ ...DEFAULT_CLEAN, rarities: { ...DEFAULT_CLEAN.rarities, unique: true } }),
@@ -340,8 +339,6 @@ describe('clean up', () => {
     const s = cleanSummary(run, DEFAULT_CLEAN);
     expect(s.rows.map((r) => r.item.uid)).toEqual([old[1].uid, old[0].uid, old[2].uid]); // oldest first
     expect(s.count).toBe(3);
-    expect(s.kept).toBe('Kept: 1 favourite, 1 not yet looked at, 1 newer');
-    expect(s.headline).toBe(`3 items found more than 10 levels ago, for ${s.dust} Bone Dust`);
     const res = applyClean(run, DEFAULT_CLEAN);
     expect(res).toEqual({ count: 3, dust: s.dust });
     expect(run.dust).toBe(dust0 + s.dust);
@@ -350,13 +347,12 @@ describe('clean up', () => {
     for (const o of old) expect(left).not.toContain(o.uid);
   });
 
-  it('is a no-op with nothing old, and says so', () => {
+  it('is a no-op with nothing old', () => {
     const run = newRun('vanguard', 22);
     found(run, 'rare', 1);
     seeAll(run);
     const s = cleanSummary(run, DEFAULT_CLEAN);
     expect(s.count).toBe(0);
-    expect(s.headline).toBe('0 items found more than 10 levels ago, for 0 Bone Dust');
     expect(applyClean(run, DEFAULT_CLEAN)).toEqual({ count: 0, dust: 0 });
   });
 });

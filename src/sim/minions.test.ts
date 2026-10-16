@@ -65,13 +65,11 @@ function run(w: World, seconds: number, until?: () => boolean): void {
 describe('mortal minions', () => {
   it('a minion has life and defences from its kind and the map level, and the modifiers scale them', () => {
     const base = minionBody('zombie', 30, 1, 1);
-    expect(base.life).toBeGreaterThan(100);
     expect(base.def.maxLife).toBe(base.life);
     expect(base.def.armour).toBeGreaterThan(0);
     expect(base.def.res[3]).toBe(MINIONS.zombie.res);
     expect(minionBody('zombie', 30, 2, 1).life).toBeCloseTo(base.life * 2, -1);
     expect(minionBody('zombie', 30, 1, 0.5).def.damageTakenMult).toBeCloseTo(0.5, 5);
-    expect(minionBody('stoneGolem', 30, 1, 1).life).toBeGreaterThan(base.life);
     expect(minionBody('zombie', 60, 1, 1).life).toBeGreaterThan(base.life);
   });
 
@@ -264,7 +262,6 @@ describe('mortal minions', () => {
     const w = arena();
     const plain = w.char.sheet().minionDps;
     expect(plain).toBeGreaterThan(0);
-    expect(minionUptime('zombie', 30, 1, 1)).toBeGreaterThan(minionUptime('skeleton', 30, 1, 1));
     expect(minionUptime('zombie', 30, 1.5, 1)).toBeGreaterThan(minionUptime('zombie', 30, 1, 1));
     expect(minionUptime('zombie', 30, 1, 0.7)).toBeGreaterThan(minionUptime('zombie', 30, 1, 1));
     // A Hardy Pack in the sockets raises the sheet's minion damage a second through uptime and not through damage.

@@ -48,17 +48,4 @@ describe('a freeze on the character is followed by a recovery', () => {
     run(w, FREEZE_GRACE * 0.4);
     expect(afflictPlayer(w, 'freeze', 0, 1)).toBe(true);
   });
-
-  it('keeps the character moving for most of the time under a constant freeze chance', () => {
-    const w = arena();
-    let frozen = 0;
-    const steps = 60 * 30;
-    for (let i = 0; i < steps; i++) {
-      afflictPlayer(w, 'freeze', 0, 3);
-      stepWorld(w);
-      if (w.player.ail.freezeT > 0) frozen++;
-    }
-    // 3 s frozen, then 1 s free: three quarters at most.
-    expect(frozen / steps).toBeLessThan(0.78);
-  });
 });

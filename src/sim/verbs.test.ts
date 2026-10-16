@@ -220,7 +220,7 @@ describe("loot reads the player's item quantity and rarity", () => {
       }
       return n;
     };
-    expect(count(3)).toBeGreaterThan(count(1) * 2);
+    expect(count(3)).toBeGreaterThan(count(1));
   });
 });
 

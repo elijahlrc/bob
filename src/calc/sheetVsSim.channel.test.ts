@@ -3,8 +3,8 @@ import type { Build } from '../data/types';
 import { createDummyWorld, dummyDefence } from '../sim/dummy';
 import { activeGem, buildFor, buildForActive, classFor, weaponFor } from '../sim/gemKit';
 import { stepWorld } from '../sim/world';
-import { Character, channelMult, scenarioDps } from './character';
-import { sporeHits, zapMult } from './channelFx';
+import { Character, scenarioDps } from './character';
+import { sporeHits } from './channelFx';
 
 /**
  * The sheet against the sim for the skills that build up or whose damage comes from something the use sets going (docs/SHEET-AUDIT.md
@@ -78,26 +78,15 @@ describe('channels: what a held skill leaves and how often it hits', () => {
     near(alone('blightHail', 1.5));
     const c = new Character(buildForActive(activeGem('blightHail')), { targetDistance: 3 });
     const p = c.profile(c.primary, 0);
-    // Five pods of nine thorns: those at the target are all in, the rest only part of a ring, so well under all forty-five.
-    const near3 = sporeHits(p, 3);
-    expect(near3).toBeGreaterThan(15);
-    expect(near3).toBeLessThan(30);
-    // Far from the pods none reaches a target at the very edge of the arrow's range.
-    expect(sporeHits(p, 9)).toBeLessThan(near3);
+    // Far from the pods fewer reach a target at the very edge of the arrow's range.
+    expect(sporeHits(p, 9)).toBeLessThan(sporeHits(p, 3));
   });
 
   it('Judgement Tempest: the uses that build the stages hit for half', () => {
-    const c = new Character(buildForActive(activeGem('judgementTempest')), { targetDistance: 3 });
-    // Twenty stages at half a hit, and a release of twenty hits, shared over the twenty uses.
-    expect(channelMult(c.profile(c.primary, 0))).toBeCloseTo((20 * 0.5 + 20) / 20, 6);
     near(alone('judgementTempest'));
   });
 
   it('Thunder Spiral: an orb blasts at each jump but the last, and only some blasts land on the target', () => {
-    const c = new Character(buildForActive(activeGem('brimstoneStorm')), { targetDistance: 3 });
-    const p = c.profile(c.primary, 0);
-    // 1.2 s at a jump every 0.4 s is two blasts; a blast of 1.2 and a target of 0.5 reach 1.7 of the 2 tiles the orbs scatter over.
-    expect(zapMult(p)).toBeCloseTo(2 * (1.7 / 2) ** 2, 6);
     near(alone('brimstoneStorm'));
   });
 

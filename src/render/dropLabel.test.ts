@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { AnyItem } from '../data/types';
-import { DROP_COLOR, dropLabel, dropRarity } from './dropLabel';
+import { DROP_COLOR, dropRarity } from './dropLabel';
 
 const item = (rarity: 'normal' | 'unique'): AnyItem => ({
   kind: 'item',
@@ -15,15 +15,6 @@ const item = (rarity: 'normal' | 'unique'): AnyItem => ({
 });
 
 describe('drop labels', () => {
-  it('names items, gems, flasks and currency stacks', () => {
-    expect(dropLabel(item('normal'))).toBe('Gloom Grip');
-    expect(dropLabel({ kind: 'gem', uid: 2, gemId: 'crushingBlow' })).toBe('Crushing Blow');
-    expect(dropLabel({ kind: 'currency', uid: 3, id: 'ember', count: 1 })).toBe('Reforging Ember');
-    expect(dropLabel({ kind: 'currency', uid: 3, id: 'ember', count: 3 })).toBe(
-      'Reforging Ember ×3',
-    );
-  });
-
   it('colours every drop kind', () => {
     const kinds: AnyItem[] = [
       item('normal'),

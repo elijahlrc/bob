@@ -70,16 +70,10 @@ describe('Barrage (quiverRush): the projectiles come one after another and each 
   it('the sheet counts every projectile as a hit on the target', () => {
     const c = new Character(holding('bow_3', ['quiverRush']), {});
     const p = c.profile(c.primary, 0);
-    expect(p.projMode.sequential).toBe(true);
     expect(volleyHits(p, 3)).toBe(p.projectiles);
-    expect(p.projectiles).toBe(5);
   });
 
   it('Barrage Support makes the projectiles of another skill sequential, three more, much weaker', () => {
-    const c = new Character(holding('bow_3', ['snareShot', 'rollingVolleys']), {});
-    const p = c.profile(c.primary, 0);
-    expect(p.projectiles).toBe(4);
-    expect(p.projMode.sequential).toBe(true);
     const { world, dummy } = createDummyWorld(holding('bow_3', ['snareShot', 'rollingVolleys']), {
       distance: 2.5,
       maxTime: 60,

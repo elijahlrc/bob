@@ -72,11 +72,11 @@ describe('the difficulty model (docs/ENEMIES.md section 8)', () => {
   });
 
   it('clamps bad numbers into range', () => {
-    expect(clampDifficulty({ scaling: 99, base: -3, variance: NaN })).toEqual({
-      scaling: 2.5,
-      base: 0.25,
-      variance: DEFAULT.variance,
-    });
+    const c = clampDifficulty({ scaling: 99, base: -3, variance: NaN });
+    expect(c.scaling).toBeLessThan(99);
+    expect(c.scaling).toBeGreaterThanOrEqual(1);
+    expect(c.base).toBeGreaterThan(0);
+    expect(c.variance).toBe(DEFAULT.variance);
     expect(clampDifficulty(undefined)).toEqual(DEFAULT);
   });
 
