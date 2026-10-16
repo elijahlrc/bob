@@ -27,6 +27,7 @@ import type { Minion } from './minions';
 import type { Grid } from './grid';
 import type { Ledger } from './ledger';
 import type { ReprieveState } from './reprieve';
+import type { Side } from './side';
 
 export type Dot = { dps: number; t: number; stack?: boolean; spread?: number };
 
@@ -89,6 +90,8 @@ export type Actor = {
   id: number;
   isPlayer: boolean;
   faction: 0 | 1;
+  /** The side this actor fights for (a character and its minions); null for a monster (docs/DUEL.md section 3). */
+  side: Side | null;
   x: number;
   y: number;
   r: number;
@@ -690,6 +693,8 @@ export type TriggerRuntime = {
 export type World = {
   plan: MapPlan;
   grid: Grid;
+  /** The sides of the map, each a character and what is theirs; side 0 is the local player's (docs/DUEL.md section 3). */
+  sides: Side[];
   t: number;
   tick: number;
   rngCombat: Rng;

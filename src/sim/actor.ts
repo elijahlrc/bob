@@ -13,7 +13,7 @@ import { newMoveState } from './movement';
  * in every new map.
  */
 export function newActor(id: number, isPlayer: boolean, x: number, y: number, r: number): Actor {
-  const a: Minion = {
+  const a: Omit<Minion, 'side'> = {
     id,
     isPlayer,
     faction: isPlayer ? 0 : 1,
@@ -154,5 +154,10 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     bodyDef: undefined,
     defKey: undefined,
   };
-  return a;
+  // `side` is set after the literal, not in it: this literal has 127 properties, and V8 makes one of 128 or more much slower to
+  // build (the sim ran about 15% slower with `side` among them; the same property added afterwards costs nothing). Do not add a
+  // 128th field above; set it here, or group fields into a sub-object.
+  const actor = a as Minion;
+  actor.side = null;
+  return actor;
 }

@@ -46,6 +46,7 @@ import { rebuildCharacter, seedCharacters, tickCharges } from './charges';
 import { tickTriggers } from './triggers';
 import { Grid } from './grid';
 import { newActor } from './actor';
+import type { Side } from './side';
 import { newLedger } from './ledger';
 import { tickAbandon } from './abandon';
 import { newReprieveState, tickReprieve } from './reprieve';
@@ -133,9 +134,12 @@ export function createWorld(inp: CreateWorldInput): World {
   const grid = new Grid(plan.lab.w, plan.lab.h, plan.lab.tiles);
   grid.markReach(plan.lab.start.x, plan.lab.start.y);
   const player = newActor(1, true, plan.lab.start.x, plan.lab.start.y, 0.4);
+  const side: Side = { id: 0, team: 0 };
+  player.side = side;
   const w: World = {
     plan,
     grid,
+    sides: [side],
     t: 0,
     tick: 0,
     rngCombat: root.fork('combat'),

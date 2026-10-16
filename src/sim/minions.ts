@@ -132,6 +132,8 @@ export function makeMinion(
   const spot = w.grid.collide(x, y, r);
   const m = newActor(w.nextId++, false, spot.x, spot.y, r) as Minion;
   m.faction = 0;
+  // The summoner's side (the one character of the world until `minions` moves to its side, DUEL.md 3.3 G3).
+  m.side = w.player.side;
   m.def = body.def;
   m.bodyDef = body.def;
   m.life = body.life;
