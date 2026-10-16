@@ -276,7 +276,6 @@ function PhoneCompare({
   against,
   rows,
   full,
-  setFull,
   build,
   extra,
   sockets,
@@ -285,7 +284,6 @@ function PhoneCompare({
   against: Item | FlaskItem | undefined;
   rows: DiffRow[];
   full: boolean;
-  setFull: (f: boolean) => void;
   build: Build;
   /** The calculated changes, shown in the full view only. */
   extra?: ComponentChildren;
@@ -295,7 +293,7 @@ function PhoneCompare({
   if (!full)
     return (
       <>
-        <DiffLines rows={rows} limit={PEEK_LINES} onMore={() => setFull(true)} />
+        <DiffLines rows={rows} />
         {sockets}
       </>
     );
@@ -311,9 +309,6 @@ function PhoneCompare({
     </>
   );
 }
-
-/** Changed lines the peek shows before it says how many more there are. */
-const PEEK_LINES = 4;
 
 function ItemBody({
   run,
@@ -378,7 +373,6 @@ function ItemBody({
           against={active.equipped}
           rows={diffRows(item, active.equipped)}
           full={full}
-          setFull={setFull}
           build={run.build}
           extra={chips}
           sockets={sockets}
@@ -463,7 +457,6 @@ function FlaskBody({
           against={active.equipped ?? undefined}
           rows={diffRows(flask, active.equipped ?? undefined)}
           full={full}
-          setFull={setFull}
           build={run.build}
         />
       ) : (

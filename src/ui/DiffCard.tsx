@@ -13,22 +13,16 @@ export function DiffLines({
   rows,
   noun = 'line',
   open = false,
-  limit,
-  onMore,
 }: {
   rows: DiffRow[];
   /** What the folded lines are called ("unchanged lines"). */
   noun?: string;
   open?: boolean;
-  /** Show at most this many changed lines, then a button that says how many more (`onMore` is what it does). */
-  limit?: number;
-  onMore?: () => void;
 }) {
   const [all, setAll] = useState(open);
   const changed = rows.filter((r) => r.mark !== 'same');
   const same = rows.length - changed.length;
-  const more = !all && limit !== undefined ? Math.max(0, changed.length - limit) : 0;
-  const shown = all ? rows : more ? changed.slice(0, limit) : changed;
+  const shown = all ? rows : changed;
   return (
     <div class="ix-dls">
       {shown.map((r, i) => (
@@ -38,12 +32,7 @@ export function DiffLines({
         </div>
       ))}
       {changed.length === 0 && <div class="muted ix-dl-none">Nothing changes.</div>}
-      {more > 0 && (
-        <button class="link ix-fold" onClick={onMore}>
-          + {more} more change{more === 1 ? '' : 's'} ▾
-        </button>
-      )}
-      {more === 0 && same > 0 && (
+      {same > 0 && (
         <button class="link ix-fold" aria-expanded={all} onClick={() => setAll(!all)}>
           {all ? 'Hide' : '+'} {same} unchanged {noun}
           {same === 1 ? '' : 's'} {all ? '▴' : '▾'}

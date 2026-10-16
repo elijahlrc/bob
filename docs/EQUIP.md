@@ -158,7 +158,7 @@ A first-class row at the top of the diff and under the slot tab, drawn from `Soc
 ### 3.4 The phone sheet (Q3)
 
 - **Open by default**, and it opens on **the affixes that change**, not on calculated numbers: the changed lines of the item against
-  the one worn (gained green, lost red and struck, changed amber with `was …`), then the sockets row and its one-line warning, then
+  the one worn (every one of them, never cut off behind a "show more": a long list scrolls inside the peek, which stops at 52 vh with the actions pinned; gained green, lost red and struck, changed amber with `was …`), then the sockets row and its one-line warning, then
   the actions. The calculated chips (damage, effective HP, resistances) move to the full view, under the header. No toggle between
   you and the comparison.
 - **Two heights**: _peek_ (header, "vs Dented Plate · worn in Body", the changed lines with the unchanged ones folded, sockets row,
