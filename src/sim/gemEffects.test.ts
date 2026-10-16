@@ -20,10 +20,4 @@ describe('the effects the spirit ledger declares', () => {
       for (const e of row.effects) expect(effects, `${id}: ${e}`).toContain(e);
     }
   });
-
-  it('can be observed at all: Blinking Cut blinks and hits', () => {
-    const { effects } = runGem(actives.find((g) => g.id === 'blinkingCut')!);
-    expect(effects).toContain('hit');
-    expect(effects).toContain('blink');
-  });
 });

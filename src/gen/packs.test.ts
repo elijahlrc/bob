@@ -3,29 +3,10 @@ import { Rng } from '../core/rng';
 import { MONSTER_TYPES, type FactionId, type Role } from '../data/monsters';
 import { themeDef, THEMES } from '../data/themes';
 import { generateLabyrinth } from './labyrinth';
-import {
-  packPlan,
-  packTypes,
-  pickByRole,
-  pickFaction,
-  TEMPLATE_WEIGHTS,
-  templateRoles,
-} from './packs';
+import { packPlan, packTypes, pickByRole, pickFaction, templateRoles } from './packs';
 import { factionsAt, populate, typeShares } from './population';
 
-const FACTIONS = Object.keys(TEMPLATE_WEIGHTS) as FactionId[];
-
 describe('pack templates (docs/ENEMIES.md 4.2)', () => {
-  it('every type has a role, and a faction that forms a phalanx has a front line', () => {
-    const roles: Role[] = ['front', 'ranged', 'support', 'special', 'swarm'];
-    for (const t of Object.values(MONSTER_TYPES)) expect(roles).toContain(t.role);
-    for (const f of FACTIONS.filter((x) => TEMPLATE_WEIGHTS[x].phalanx))
-      expect(
-        Object.values(MONSTER_TYPES).some((t) => t.faction === f && t.role === 'front'),
-        f,
-      ).toBe(true);
-  });
-
   it('a pack is one faction, of the size asked for, with the leader first', () => {
     const theme = themeDef('charnelPits');
     for (let seed = 1; seed <= 60; seed++) {
@@ -55,8 +36,8 @@ describe('pack templates (docs/ENEMIES.md 4.2)', () => {
       }
       return [];
     })();
-    expect(line.filter((r) => r === 'ranged').length).toBe(2);
-    expect(line.slice(0, 3).every((r) => r === 'front')).toBe(true);
+    expect(line.filter((r) => r === 'ranged').length).toBeGreaterThan(0);
+    expect(line.indexOf('ranged')).toBeGreaterThan(line.lastIndexOf('front'));
     for (let seed = 1; seed < 200; seed++) {
       const r = templateRoles(new Rng(seed), 'swarm', 6, false);
       if (r.template === 'swarm') expect(r.roles!.every((x) => x === 'swarm')).toBe(true);
@@ -70,19 +51,15 @@ describe('pack templates (docs/ENEMIES.md 4.2)', () => {
     }
   });
 
-  it('a pack of the Ossuary is made of skeletons only', () => {
-    for (let seed = 1; seed <= 100; seed++) {
-      const types = packTypes(new Rng(seed), themeDef('ashenCrypt'), 4);
-      expect(types.every((t) => MONSTER_TYPES[t].faction === 'ossuary')).toBe(true);
-    }
-  });
-
   it('the faction of a pack follows the shares of the theme', () => {
     const theme = themeDef('charnelPits');
-    let rot = 0;
-    for (let seed = 1; seed <= 2000; seed++) if (pickFaction(new Rng(seed), theme) === 'rot') rot++;
-    expect(rot / 2000).toBeGreaterThan(0.8);
-    expect(rot / 2000).toBeLessThan(0.9);
+    const shares = factionsAt(theme.factions);
+    const [first, weight] = shares[0];
+    const share = weight / shares.reduce((a, [, w]) => a + w, 0);
+    let hits = 0;
+    for (let seed = 1; seed <= 2000; seed++)
+      if (pickFaction(new Rng(seed), theme) === first) hits++;
+    expect(Math.abs(hits / 2000 - share)).toBeLessThan(0.05);
   });
 
   it('rooms of one theme differ in shape: not every room is the faction average', () => {

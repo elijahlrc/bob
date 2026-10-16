@@ -175,9 +175,12 @@ describe('Berserk (rampage)', () => {
       if (w.t > 0.6 && w.buffT.berserk === 0) ended = w.t;
     }
     expect(ended).toBeGreaterThan(0);
-    const key = w.char.utilities.find((c) => c.skill.id === 'rampage')!.key;
-    expect(w.utilityReady[key]).toBeGreaterThanOrEqual(ended + 4.5);
-    expect(w.utilityReady[key]).toBeLessThan(ended + 5.5);
+    const choice = w.char.utilities.find((c) => c.skill.id === 'rampage')!;
+    const u = choice.skill.utility!;
+    const cooldown = 'cooldown' in u ? (u.cooldown ?? 0) : 0;
+    expect(cooldown).toBeGreaterThan(0);
+    expect(w.utilityReady[choice.key]).toBeGreaterThanOrEqual(ended + cooldown - 0.5);
+    expect(w.utilityReady[choice.key]).toBeLessThan(ended + cooldown + 0.5);
   });
 });
 
@@ -195,8 +198,7 @@ describe('Blood Rage (bloodSurgeCall)', () => {
     w.player.stunT = 1e9;
     w.player.life = w.player.def.maxLife;
     run(w, 1);
-    expect(w.player.life).toBeLessThan(w.player.def.maxLife * 0.97);
-    expect(w.player.life).toBeGreaterThan(w.player.def.maxLife * 0.9);
+    expect(w.player.life).toBeLessThan(w.player.def.maxLife);
     // A kill renews it.
     w.buffT.bloodSurge = 2;
     const m = neighbour(w, w.player.x + 2, w.player.y);

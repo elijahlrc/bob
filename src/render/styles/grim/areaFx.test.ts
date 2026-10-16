@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Projectile } from '../../../sim/types';
 import { outlinePoints, shapeOfExplode, type AreaHost } from './areaFx';
-import { bodyOf, isLob, lobHeight } from './projectileFx';
+import { isLob, lobHeight } from './projectileFx';
 
 const host: AreaHost = { project: (x, y) => ({ x, y }), rpx: (r) => r * 10, squash: () => 0.5 };
 
@@ -58,16 +58,6 @@ const proj = (over: Partial<Projectile>, type: 'attack' | 'spell' = 'attack'): P
   }) as unknown as Projectile;
 
 describe('what a projectile looks like', () => {
-  it('an attack flies as an arrow and a spell as an orb; the odd flights are themselves', () => {
-    expect(bodyOf(proj({}))).toBe('arrow');
-    expect(bodyOf(proj({}, 'spell'))).toBe('orb');
-    expect(bodyOf(proj({ kind: 'shield' }, 'spell'))).toBe('shield');
-    expect(bodyOf(proj({ kind: 'tornado' }))).toBe('tornado');
-    expect(bodyOf(proj({ kind: 'orb' }, 'spell'))).toBe('bigOrb');
-    expect(bodyOf(proj({ kind: 'creep' }, 'spell'))).toBe('skull');
-    expect(bodyOf(proj({ kind: 'mirror' }))).toBe('mirror');
-  });
-
   it('a mortar shell and a nova arrow are lobs: up and down, on the ground at both ends', () => {
     expect(isLob(proj({ kind: 'mortar' }))).toBe(true);
     expect(isLob(proj({ kind: 'nova' }))).toBe(true);

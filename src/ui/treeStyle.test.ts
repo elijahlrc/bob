@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { mod } from '../mods/types';
-import { edgePath, NODE_RADIUS, shapeScale, toneOf } from './treeStyle';
+import { edgePath, MIN_SCREEN_R, NODE_RADIUS, shapeScale, toneOf } from './treeStyle';
 
 describe('how the passive tree is drawn', () => {
   it('draws a road across rings as a line, a stretch of ring and a loop as arcs', () => {
@@ -33,20 +33,10 @@ describe('how the passive tree is drawn', () => {
     ).toBe('cold');
   });
 
-  it('tells mana, spells and energy shield apart, and damage for every build from an attack’s', () => {
-    const tone = (m: ReturnType<typeof mod>) => toneOf({ kind: 'small', mods: [m] });
-    expect(tone(mod('mana', 'inc', 8))).toBe('mana');
-    expect(tone(mod('damage', 'inc', 10, { tags: ['spell'] }))).toBe('spell');
-    expect(tone(mod('castSpeed', 'inc', 4))).toBe('spell');
-    expect(tone(mod('es', 'inc', 6))).toBe('es');
-    expect(tone(mod('damage', 'inc', 10))).toBe('damage');
-    expect(tone(mod('damage', 'inc', 10, { tags: ['bow'] }))).toBe('attack');
-    expect(tone(mod('damage', 'inc', 10, { tags: ['mine'] }))).toBe('minion');
-    expect(tone(mod('dotMulti', 'more', 10, { tags: ['poison'] }))).toBe('chaos');
-  });
-
   it('keeps a floor on the size of a node on screen, and grows nothing that is already large enough', () => {
-    expect(shapeScale('small', 0.22) * NODE_RADIUS.small * 0.22).toBeGreaterThanOrEqual(2.99);
+    expect(shapeScale('small', 0.22) * NODE_RADIUS.small * 0.22).toBeGreaterThanOrEqual(
+      MIN_SCREEN_R.small - 0.01,
+    );
     expect(shapeScale('notable', 1)).toBe(1);
     expect(shapeScale('keystone', 0.1) * NODE_RADIUS.keystone * 0.1).toBeGreaterThan(
       shapeScale('notable', 0.1) * NODE_RADIUS.notable * 0.1,

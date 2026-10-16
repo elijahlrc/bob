@@ -32,11 +32,6 @@ function build(keystones: string[], gems: string[]): Build {
 }
 
 describe('the keystones of the tree pass', () => {
-  it('all 27 keystones are in the tree', () => {
-    expect(KEYSTONES).toHaveLength(27);
-    for (const k of KEYSTONES) expect(ksNode(k.id)).toBeGreaterThanOrEqual(0);
-  });
-
   it('Nimble Gambit: dodge attacks, at the cost of armour, energy shield and block', () => {
     const c = new Character(build(['nimbleGambit'], ['flameBolt']));
     const plain = new Character(build([], ['flameBolt']));

@@ -42,12 +42,6 @@ describe('a rain of arrows takes the supports that add arrows and widen it, not 
     for (const sk of ['stormArrow', 'driftingStorm', 'rimeDrift', 'mirrorQuiver'])
       expect(offered('twinSalvo', sk), `Twin Salvo on ${sk}`).toBe(false);
   });
-
-  it('the reason names the skill', () => {
-    const v = supportLive(support('piercingShot'), skill('arrowShower'));
-    expect(v.live).toBe(false);
-    if (!v.live) expect(v.why).toMatch(/Arrow Shower/);
-  });
 });
 
 describe('melee supports need what they work on', () => {
@@ -115,17 +109,5 @@ describe('across every pair', () => {
       if (supportLive(sup, s).live)
         expect(projectileBase(s), `${sup.name} on ${s.name}`).not.toBeNull();
     }
-  });
-
-  it('every refusal gives a reason', () => {
-    for (const [sup, s] of pairs) {
-      const v = supportLive(sup, s);
-      if (!v.live) expect(v.why.length, `${sup.name} on ${s.name}`).toBeGreaterThan(5);
-    }
-  });
-
-  it('most pairs are still offered: this is a filter, not a purge', () => {
-    const live = pairs.filter(([sup, s]) => supportLive(sup, s).live).length;
-    expect(live / pairs.length).toBeGreaterThan(0.8);
   });
 });

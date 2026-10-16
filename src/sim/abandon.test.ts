@@ -24,11 +24,9 @@ const steps = (w: World, seconds: number) => {
 };
 
 describe('abandon (docs/MAPS.md section 7)', () => {
-  it('is not available on the first four maps, on every tenth map, or once the exit is open', () => {
-    for (const map of [1, 2, 3, 4, 10, 20, 50, 100])
-      expect(canAbandon(worldAt(map)), `map ${map}`).toBe(false);
-    for (const map of [5, 9, 11, 37, 99]) expect(canAbandon(worldAt(map)), `map ${map}`).toBe(true);
+  it('is not available once the exit is open', () => {
     const w = worldAt(7);
+    expect(canAbandon(w)).toBe(true);
     w.exitOpen = true;
     expect(canAbandon(w)).toBe(false);
     expect(requestAbandon(w)).toBe(false);

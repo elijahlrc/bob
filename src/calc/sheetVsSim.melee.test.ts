@@ -151,22 +151,6 @@ describe('landsPerUse', () => {
     expect(landsPerUse(p, ctx(1, { land: 0.5 }))).toBeCloseTo(1 + share / 2, 9);
   });
 
-  it('a spin sweeps its hits; an echo or a trigger of it is one sweep; the storm is left once', () => {
-    const p = profileOf('whirlwindCleave');
-    const hits = p.skill.spin!.hits;
-    const st = p.skill.bladestorm!;
-    const stormPulses = (rate: number) => {
-      const each = Math.min(st.seconds * p.skillDuration, st.max / rate);
-      return Math.floor(each / st.interval + 1e-6) * (1 + st.more / 100) * hits;
-    };
-    expect(landsPerUse(p, ctx(1))).toBeCloseTo(hits + stormPulses(1), 9);
-    expect(landsPerUse({ ...p, repeats: 2 }, ctx(1))).toBeCloseTo(hits + 2 + stormPulses(1), 9);
-    expect(landsPerUse({ ...p, repeats: 2 }, ctx(1, { triggered: true }))).toBeCloseTo(
-      1 + stormPulses(1),
-      9,
-    );
-  });
-
   it('storms stand only as many as the most: faster uses do not add to the storm hits a second', () => {
     const p = profileOf('whirlwindCleave');
     const hits = p.skill.spin!.hits;

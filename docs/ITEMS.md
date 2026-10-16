@@ -97,7 +97,8 @@ they are. This plan changes presentation, ordering, wording and a few pure helpe
 - `previewAdd`, `previewRemove`, `previewPolish`, `expectedRoll`, `addableFamilies`, `reforgeCost`, `socketCost`,
   `benchSocketCost`, `salvageValue`, `locate`. Craft is deterministic (`craftRng` forks `seed + craftSeq`), so a preview
   can promise "the tier and value are rolled" honestly and a reload cannot re-roll.
-- The tiers of a family are numbered upward (`tier: i + 1`, higher is stronger and rarer), so "tier 3 of 8" is available
+- The tiers of a family are stored numbered upward (`tier: i + 1`, higher is stronger and rarer); since 2026-10-16 the screens show them
+  the other way (`shownTier`: tier 1 is the strongest), so "tier 3 of 8" is available
   without new data.
 - `c.act` (undoable) and `c.craft` (final, clears undo): the line between the two screens is already the line between
   "reversible" and "final", and the UI should say so.

@@ -138,8 +138,8 @@ function AffixList({
             <span class="wx-affix-kind muted">{info.type === 'prefix' ? 'Prefix' : 'Suffix'}</span>
             <span class="wx-affix-text">{modsText(a.mods).join(' and ')}</span>
             <span class="wx-affix-meta">
-              <span class="muted" title="Higher tiers are stronger and rarer.">
-                tier {info.tier}/{info.tiers}
+              <span class="muted" title="Tier 1 is the strongest and rarest.">
+                tier {info.rank}/{info.tiers}
               </span>
               <span
                 class="wx-bar"

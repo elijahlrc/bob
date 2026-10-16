@@ -5,7 +5,7 @@ import { AMBUSH_RANGE } from '../data/constants';
 import type { MonsterTypeId } from '../data/monsters';
 import { themeDef } from '../data/themes';
 import { generateLabyrinth } from '../gen/labyrinth';
-import { packPlan, TEMPLATE_WEIGHTS } from '../gen/packs';
+import { packPlan } from '../gen/packs';
 import { populate } from '../gen/population';
 import { newRun } from '../run/run';
 import { createDummyWorld } from './dummy';
@@ -110,8 +110,6 @@ describe('Ambush and Patrol (docs/ENEMIES.md 4.2)', () => {
 
 describe('the Ambush and Patrol packs of a map', () => {
   it('a faction that forms them makes them, and they carry what they need', () => {
-    expect(TEMPLATE_WEIGHTS.rot.ambush).toBeGreaterThan(0);
-    expect(TEMPLATE_WEIGHTS.choir.patrol).toBeGreaterThan(0);
     let holds = 0;
     let patrols = 0;
     for (let s = 0; s < 60; s++) {

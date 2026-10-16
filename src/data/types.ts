@@ -66,6 +66,8 @@ export type ItemBase = {
   /** Weapon tags contributed to skill uses ('mace', 'twoHand', ...). */
   tags: SkillTag[];
   hands?: 1 | 2;
+  /** A weapon built for spells: it rolls the spell affixes (a wand, a sceptre, a staff, a rune dagger), and an attack weapon never does. */
+  spellWeapon?: boolean;
 };
 
 export type Rarity = 'normal' | 'magic' | 'rare' | 'unique';

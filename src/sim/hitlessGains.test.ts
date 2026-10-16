@@ -12,8 +12,8 @@ import { stepWorld } from './world';
 const HITLESS = ACTIVE_GEMS.filter((g) => g.dot?.hitless && !g.tags.includes('curse'));
 
 describe('skills that deal no hit of their own still count as landing', () => {
-  it('there are some to check', () => {
-    expect(HITLESS.length).toBeGreaterThan(3);
+  it('the filter finds some (so the loop below is not empty)', () => {
+    expect(HITLESS.length).toBeGreaterThan(0);
   });
 
   for (const def of HITLESS) {

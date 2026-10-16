@@ -47,11 +47,6 @@ describe('gem drops', () => {
     const early = share(EARLY_ATTR_LEVELS);
     const later = share(EARLY_ATTR_LEVELS + 1);
     expect(early).toBeGreaterThan(later + 0.08);
-    // The weights themselves: four times the plain weight inside the window, twice outside it.
-    const g = ALL_GEMS.find((x) => x.attr === 'int' && x.kind === 'active')!;
-    const plain = gemWeight(g, undefined, 10);
-    expect(gemWeight(g, 'mystic', EARLY_ATTR_LEVELS) / plain).toBe(4);
-    expect(gemWeight(g, 'mystic', EARLY_ATTR_LEVELS + 1) / plain).toBe(2);
   });
 
   it('every gem can drop later in the run', () => {

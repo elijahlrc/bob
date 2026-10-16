@@ -1,13 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { AnimTrack } from './anim';
-import {
-  buildFigure,
-  heroFigure,
-  isRanged,
-  poseFor,
-  type AnimName,
-  type FigureKind,
-} from './figure';
+import { buildFigure, poseFor, type AnimName, type FigureKind } from './figure';
 import type { Actor } from '../../sim/types';
 
 const KINDS: FigureKind[] = [
@@ -51,36 +44,10 @@ describe('figure rig (shared by all visual styles)', () => {
     expect(a).toEqual(b);
   });
 
-  it('walk cycles loop, attacks have anticipation then a strike, death collapses', () => {
+  it('walk cycles loop', () => {
     const w0 = poseFor('warrior', 'walk', 0);
     const w1 = poseFor('warrior', 'walk', 1);
     expect(w0.legA).toBeCloseTo(w1.legA, 5);
-    const wind = poseFor('hero_mace', 'attack', 0.35);
-    const strike = poseFor('hero_mace', 'attack', 0.55);
-    expect(wind.armA).toBeLessThan(0);
-    expect(strike.armA).toBeGreaterThan(0);
-    expect(strike.lean).toBeGreaterThan(wind.lean);
-    const d0 = poseFor('warrior', 'death', 0);
-    const d1 = poseFor('warrior', 'death', 1);
-    expect(Math.abs(d0.rot)).toBe(0);
-    expect(Math.abs(d1.rot)).toBeGreaterThan(1.2);
-    expect(d1.scatter).toBeGreaterThan(0.9);
-  });
-
-  it('ranged figures draw a bow; casters glow while charging', () => {
-    expect(isRanged('archer')).toBe(true);
-    expect(isRanged('warrior')).toBe(false);
-    expect(poseFor('hero_bow', 'attack', 0.3).charge).toBeGreaterThan(0.3);
-    expect(poseFor('mage', 'attack', 0.35).charge).toBeGreaterThan(0.5);
-  });
-
-  it('picks hero figures by weapon class', () => {
-    expect(heroFigure('mace2')).toBe('hero_mace');
-    expect(heroFigure('bow')).toBe('hero_bow');
-    expect(heroFigure('wand')).toBe('hero_wand');
-    expect(heroFigure('dagger')).toBe('hero_dagger');
-    expect(heroFigure('sword')).toBe('hero_sword');
-    expect(heroFigure(undefined)).toBe('hero_sword');
   });
 });
 

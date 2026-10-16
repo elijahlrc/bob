@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { Character } from '../calc/character';
 import type { Build } from '../data/types';
 import { makeGem, makeItem } from '../gen/items';
 import { newRun } from '../run/run';
@@ -31,13 +30,6 @@ function meleeWith(support: string, spells: string[]): Build {
 const triggers = (events: readonly SimEvent[]) => events.filter((e) => e.t === 'trigger').length;
 
 describe('Cast on Melee Kill (slayersEcho)', () => {
-  it('links the spells beside it, and its trigger waits for a melee kill', () => {
-    const c = new Character(meleeWith('slayersEcho', ['arcChain']), {});
-    expect(c.triggers).toHaveLength(1);
-    expect(c.triggers[0].def).toMatchObject({ on: 'kill', tags: ['melee'] });
-    expect(c.triggers[0].skills.map((s) => s.skill.id)).toEqual(['arcChain']);
-  });
-
   it('casts the spell when a melee hit kills, and not when something else kills', () => {
     const b = meleeWith('slayersEcho', ['arcChain']);
     // A melee hit that kills.

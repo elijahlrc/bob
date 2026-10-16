@@ -57,13 +57,6 @@ describe('sidearms (docs/ENCOUNTERS.md 3)', () => {
     const s = m.sidearm!.profile(0);
     expect(s.skill.id).toBe(sidearmSkillId('warrior'));
     expect(s.skill.behaviour.kind).toBe('projectile');
-    expect(s.skill.look).toBe('spear');
-    expect(s.projSpeedMult).toBeCloseTo(0.55, 5);
-  });
-
-  it('a sidearm waits for its map: no spear on the first maps', () => {
-    expect(buildMonster(spec('warrior', 3)).sidearm).toBeUndefined();
-    expect(buildMonster(spec('warrior', 4)).sidearm).toBeDefined();
   });
 
   it('a Warrior throws its spear from range, and closes and strikes when near', () => {

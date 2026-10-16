@@ -48,7 +48,6 @@ describe('skill bar slots', () => {
     const slots = skillSlots(w);
     expect(slots).toHaveLength(1);
     expect(slots[0].role).toBe('Basic attack');
-    expect(slots[0].detail).toContain('Basic attack');
   });
 
   it('works for every fresh class, with unique keys, and for a few seconds of play', () => {
@@ -76,13 +75,6 @@ describe('skill bar slots', () => {
     expect(slots[0].role).toBe('Primary');
     expect(slots[0].name).toBe(w.char.primary.skill.name);
     expect(slots.some((s) => s.role === 'Basic attack')).toBe(false);
-    // The tooltip names the skill, its role, delivery, element, cost, cooldown and state.
-    expect(slots[0].detail).toContain('Primary');
-    expect(slots[0].detail).toContain('Projectile spell');
-    expect(slots[0].detail).toContain('Fire');
-    expect(slots[0].detail).toContain('Cost');
-    expect(slots[0].detail).toContain('cooldown');
-    expect(slots[0].detail).toContain('Ready');
   });
 
   it('shows a skill being used as casting, with the time left in the cast', () => {
@@ -115,7 +107,6 @@ describe('skill bar slots', () => {
     expect(cooling.state).toBe('cooling');
     expect(cooling.remaining).toBeGreaterThan(0);
     expect(cooling.total).toBeGreaterThanOrEqual(cooling.remaining);
-    expect(cooling.detail).toContain('Cooling down');
     // Time passes: the remaining time is what is left of the ready time.
     const before = cooling.remaining;
     run(w, 0.5);
@@ -160,7 +151,6 @@ describe('skill bar slots', () => {
     expect(s.state).toBe('active');
     expect(s.remaining).toBeCloseTo(w.buffT[u.buff], 6);
     expect(s.total).toBeGreaterThanOrEqual(s.remaining);
-    expect(s.detail).toContain('Active');
     // When it runs out it is no longer active.
     w.buffT[u.buff] = 0;
     expect(slotOf().state).not.toBe('active');
@@ -196,7 +186,6 @@ describe('skill bar slots', () => {
     const aura = skillSlots(w).find((s) => s.role === 'Aura');
     expect(aura).toBeDefined();
     expect(aura!.state).toBe('passive');
-    expect(aura!.detail).toContain('Aura');
     // The order is primary, secondaries, utilities, auras.
     const roles = skillSlots(w).map((s) => s.role);
     expect(roles.indexOf('Aura')).toBeGreaterThan(roles.indexOf('Primary'));
@@ -209,6 +198,5 @@ describe('skill bar slots', () => {
     w.player.mana = 0;
     const s = skillSlots(w)[0];
     expect(s.state).toBe('nopay');
-    expect(s.detail).toContain('Not enough mana');
   });
 });

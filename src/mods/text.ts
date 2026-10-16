@@ -88,6 +88,14 @@ export function modText(m: Mod): string {
         : `${sign}${v} to ${statName(m)}${sfx}`;
     }
     case 'inc':
+      // Plain spell damage reads as its own stat, not as damage "with Spells".
+      if (
+        m.stat === 'damage' &&
+        !m.damageTypes?.length &&
+        m.tags?.length === 1 &&
+        m.tags[0] === 'spell'
+      )
+        return `${v}% ${m.value < 0 ? 'reduced' : 'increased'} Spell Damage${suffix({ ...m, tags: [] })}`;
       return `${v}% ${m.value < 0 ? 'reduced' : 'increased'} ${statName(m)}${sfx}`;
     case 'more':
       return `${v}% ${m.value < 0 ? 'less' : 'more'} ${statName(m)}${sfx}`;

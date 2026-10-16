@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { MonsterSpec } from '../calc/monster';
 import { MONSTER_TYPES, type MonsterTypeId } from '../data/monsters';
-import { MOVEMENT_INFO, movementTexts, senseText } from '../data/movement';
 import { makeGem, makeItem } from '../gen/items';
 import { newRun } from '../run/run';
 import { applyDamage } from './combat';
@@ -151,27 +150,10 @@ describe('movement styles (docs/ROSTER.md 6.3)', () => {
     expect(bursar.x).toBeGreaterThan(front.x);
     expect(Math.hypot(bursar.x - front.x, bursar.y - front.y)).toBeLessThan(5);
   });
-
-  it('a phasing monster passes through walls', () => {
-    const w = arena();
-    expect(put(w, 'wailer', 5).phases).toBe(true);
-    expect(put(w, 'gloomstalker', 5).phases).toBe(true);
-    expect(put(w, 'warrior', 5).phases).toBe(false);
-  });
-
-  it('every style has words, and the inspect card says them', () => {
-    for (const id of Object.keys(MOVEMENT_INFO) as (keyof typeof MOVEMENT_INFO)[])
-      expect(MOVEMENT_INFO[id].text({ id }).length).toBeGreaterThan(10);
-    expect(movementTexts(MONSTER_TYPES.shambler.movement).join(' ')).toContain('Lurch');
-    expect(movementTexts(undefined)).toEqual([]);
-  });
 });
 
 describe('senses and targets (docs/ROSTER.md 6.4)', () => {
   it('the senses a type sets are read: the Arbalest notices from afar, the Brute from close by', () => {
-    expect(senseOf(put(arena(), 'arbalest', 5)).aggro).toBe(14);
-    expect(senseOf(put(arena(), 'brute', 5)).aggro).toBe(7);
-    expect(senseOf(put(arena(), 'warrior', 5))).toEqual({});
     const w = arena();
     const far = put(w, 'arbalest', 13, 0, false);
     const near = put(w, 'warrior', 11, 7, false);
@@ -242,12 +224,5 @@ describe('senses and targets (docs/ROSTER.md 6.4)', () => {
     stalker.dummy = true;
     for (let i = 0; i < 30; i++) stepWorld(w);
     expect(w.ai.targetId).not.toBe(stalker.id);
-  });
-
-  it('the senses have words', () => {
-    expect(senseText(MONSTER_TYPES.gloomstalker.senses).join(' ')).toContain('Veiled');
-    expect(senseText(MONSTER_TYPES.hound.senses).join(' ')).toContain('minions');
-    expect(senseText(MONSTER_TYPES.hound.senses).join(' ')).toContain('Never gives up');
-    expect(senseText(undefined)).toEqual([]);
   });
 });

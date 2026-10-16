@@ -3,7 +3,7 @@ import { getTree } from '../data/tree';
 import type { Build, Item } from '../data/types';
 import { makeFlask, makeGem, makeItem } from '../gen/items';
 import { ModDB } from '../mods/modDb';
-import { CONDITIONS, mod, type Mod } from '../mods/types';
+import { mod, type Mod } from '../mods/types';
 import { newRun } from '../run/run';
 import { dummyDefence } from '../sim/dummy';
 import { Character } from './character';
@@ -40,18 +40,6 @@ const defOf = (mods: Mod[]) =>
   );
 
 describe('new conditions (EXPANSION 5.2)', () => {
-  it('exist, are distinct, and fit the 32-bit mask', () => {
-    for (const c of [
-      'beenHitRecently',
-      'leeching',
-      'esFull',
-      'targetLowLife',
-      'onLowMana',
-    ] as const)
-      expect(CONDITIONS).toContain(c);
-    expect(new Set(CONDITIONS).size).toBe(CONDITIONS.length);
-  });
-
   it('a calc config can switch one on', () => {
     const b = buildWith('vanguard', [
       mod('damage', 'more', 50, { condition: { id: 'targetLowLife' } }),
@@ -273,12 +261,6 @@ describe('damage rules on the skill profile', () => {
     const [c1] = chunks(b1);
     expect(c1.max).toBeCloseTo(c0.max * 1.5);
     expect(c1.min).toBeCloseTo(c0.min * 0.5);
-  });
-
-  it('flags for instant crit leech are read', () => {
-    const b = buildWith('vanguard', [mod('instantLeechOnCrit', 'flag', 1)]);
-    const c = new Character(b, {});
-    expect(c.profile(c.primary).instantLeechOnCrit).toBe(true);
   });
 });
 

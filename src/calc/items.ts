@@ -105,11 +105,10 @@ export function socketedGemBonus(
 export function itemReq(item: Item): Attrs {
   const b = itemBase(item.baseId).req;
   const u = item.uniqueReq;
-  return {
-    str: Math.max(b.str, u?.str ?? 0),
-    dex: Math.max(b.dex, u?.dex ?? 0),
-    int: Math.max(b.int, u?.int ?? 0),
-  };
+  const cut = 1 - Math.min(90, localSum(itemMods(item), 'reqReduction', 'base')) / 100;
+  const need = (base: number, own: number | undefined) =>
+    Math.round(Math.max(base, own ?? 0) * cut);
+  return { str: need(b.str, u?.str), dex: need(b.dex, u?.dex), int: need(b.int, u?.int) };
 }
 
 /** Percent less mana (or life) reserved by the aura gems socketed in this item. */

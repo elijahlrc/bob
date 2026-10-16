@@ -111,6 +111,12 @@ export function applyCraft(run: RunState, uid: number, a: CraftAction): CraftRes
 
 // ---- Rolls ------------------------------------------------------------------------------------------------
 
+/**
+ * The tier a player sees: the first is the strongest and rarest, as in the reference game. A roll stores its tier the other way
+ * round (`AffixRoll.tier`, higher is stronger), which is what saves and the roll code keep.
+ */
+export const shownTier = (tier: number, count: number): number => count - tier + 1;
+
 /** The tiers a family can roll on an item of this level, and the lowest and highest value of each of its mods. */
 export function rollRange(
   f: Family,
@@ -129,16 +135,21 @@ export function rangeText(f: Family, ilvl: number): string | undefined {
   if (!r) return undefined;
   const lo = modsText(familyMods(f, r.low)).join(' and ');
   const hi = modsText(familyMods(f, r.high)).join(' and ');
-  const tiers =
-    r.tiers[0] === r.tiers[1] ? `tier ${r.tiers[0]}` : `tiers ${r.tiers[0]} to ${r.tiers[1]}`;
+  const [best, worst] = [
+    shownTier(r.tiers[1], f.tiers.length),
+    shownTier(r.tiers[0], f.tiers.length),
+  ];
+  const tiers = best === worst ? `tier ${best}` : `tiers ${best} to ${worst}`;
   return lo === hi ? `${lo} (${tiers})` : `from ${lo} to ${hi} (${tiers})`;
 }
 
 export type AffixInfo = {
   type: 'prefix' | 'suffix';
   tier: number;
-  /** How many tiers the family has, so "tier 3 of 8" is available (higher numbers are stronger). */
+  /** How many tiers the family has. */
   tiers: number;
+  /** The tier as shown: 1 is the strongest (`shownTier`). */
+  rank: number;
   /** Where the value sits in its tier's range: 0 is the lowest roll, 1 is the maximum (what a Whetstone sets). */
   at: number;
   polished: boolean;
@@ -157,6 +168,7 @@ export function affixInfo(it: Item, a: AffixRoll): AffixInfo {
     type: f.type,
     tier: a.tier,
     tiers: f.tiers.length,
+    rank: shownTier(a.tier, f.tiers.length),
     at: parts.length ? parts.reduce((s, x) => s + x, 0) / parts.length : 1,
     polished: (it.polished ?? []).includes(a.family),
     bench: !!a.bench,
@@ -396,7 +408,8 @@ export function describeChange(before: Item, after: Item): string[] {
   const now = new Map(after.affixes.map((a) => [a.family, a]));
   for (const a of after.affixes) {
     const b = was.get(a.family);
-    if (!b) out.push(`Gained ${text(a)} (tier ${a.tier})`);
+    if (!b)
+      out.push(`Gained ${text(a)} (tier ${shownTier(a.tier, family(a.family).tiers.length)})`);
     else if (JSON.stringify(b.mods) !== JSON.stringify(a.mods) || b.tier !== a.tier)
       out.push(`${text(b)} became ${text(a)}`);
   }

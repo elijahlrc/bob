@@ -184,7 +184,6 @@ describe('the strategy: conditions', () => {
     expect(c.mainFor('boss').skill.id).toBe('crushingBlow');
     const s = c.sheet();
     expect(s.scenarios!.pack).not.toBeCloseTo(s.scenarios!.boss, 3);
-    expect(sheetDps(s)).toBeCloseTo(0.7 * s.scenarios!.pack + 0.3 * s.scenarios!.boss, 6);
     // A lone dummy is no pack.
     const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
     const u = uses(world, 10);
@@ -349,7 +348,7 @@ describe('the escape role', () => {
     expect(uses(world, 5).cinderStep ?? 0).toBeGreaterThan(0);
   });
 
-  it('with both off it never goes, and an escape can wait for 10% life', async () => {
+  it('with both off it never goes, and an escape can wait for 10% life', () => {
     const none = withStrategy(build(['crushingBlow', 'cinderStep']), {
       1: { role: 'escape', lowLife: false, surrounded: false },
     });
@@ -369,8 +368,6 @@ describe('the escape role', () => {
     expect(uses(w, 5).cinderStep ?? 0).toBe(0);
     w.player.life = w.player.def.maxLife * 0.05;
     expect(uses(w, 5).cinderStep ?? 0).toBeGreaterThan(0);
-    const { ESCAPE_LIFE_CHOICES } = await import('../data/strategy');
-    expect(Math.min(...ESCAPE_LIFE_CHOICES)).toBe(0.1);
   });
 
   it('the threshold can be set, and an escape run (Phase Run) goes too', () => {

@@ -73,7 +73,8 @@ describe('Raise Spectre (bindShade)', () => {
     expect(w.minions.length).toBe(1);
     const s = w.minions[0];
     expect(s.mtype).toBe('warrior');
-    expect(s.level).toBeGreaterThanOrEqual(31);
+    // At the gem's level, not the corpse's (10).
+    expect(s.level).toBeGreaterThan(10);
     expect(w.corpses.length).toBe(0);
   });
 

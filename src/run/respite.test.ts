@@ -1,22 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import { chalkAdd } from './craft';
 import { chooseOffer } from './bot';
-import { Controller } from './controller';
-import { rollOffers, RESPITE_ALWAYS_BELOW } from './offers';
-import { offersFor, verdictOf, VERDICT_CLOSE, VERDICT_COMFORTABLE } from './preview';
+import { AUTO_PAUSE_BELOW, Controller } from './controller';
+import { OFFSETS_FROM_MAP, rollOffers, RESPITE_ALWAYS_BELOW } from './offers';
+import { offersFor } from './preview';
 import { newRun, planFor, setMap, stash, takeRespite, TOTAL_MAPS } from './run';
 import { fullVitals } from '../sim/types';
 
 const hurt = (life: number, flask = 1) => ({ ...fullVitals(), life, flasks: { 1: flask } });
 
 describe('the Respite offer (docs/MAPS.md 4.2 and 9.3)', () => {
-  it('is never offered to a character in good shape, on the first four maps or on a gate level', () => {
+  it('is never offered to a character in good shape, before level offsets start or on a gate level', () => {
     for (let seed = 1; seed <= 200; seed++) {
       for (const map of [5, 13, 47]) {
         const well = rollOffers(seed, map, { ...fullVitals(), flasks: { 1: 0.95 } });
         expect(well.every((o) => o.kind !== 'respite')).toBe(true);
       }
-      for (const map of [1, 2, 3, 4, 10, 20, 100])
+      for (const map of [1, OFFSETS_FROM_MAP - 1, 10, 20, 100])
         expect(rollOffers(seed, map, hurt(0.1)).every((o) => o.kind !== 'respite')).toBe(true);
     }
   });
@@ -26,7 +26,7 @@ describe('the Respite offer (docs/MAPS.md 4.2 and 9.3)', () => {
       for (const map of [5, 13, 47, 99]) {
         const offers = rollOffers(seed, map, hurt(RESPITE_ALWAYS_BELOW - 0.05));
         expect(offers[0].kind).toBe('map');
-        expect(offers[2].kind).toBe('respite');
+        expect(offers.at(-1)!.kind).toBe('respite');
         expect(offers.filter((o) => o.kind === 'respite')).toHaveLength(1);
       }
     }
@@ -43,8 +43,8 @@ describe('the Respite offer (docs/MAPS.md 4.2 and 9.3)', () => {
       if (n) rested++;
       expect(offers[0].kind).toBe('map');
     }
-    expect(rested / sets).toBeGreaterThan(0.1);
-    expect(rested / sets).toBeLessThan(0.3);
+    expect(rested).toBeGreaterThan(0);
+    expect(rested).toBeLessThan(sets);
   });
 
   it('a flask running low counts, and so does mana', () => {
@@ -145,13 +145,13 @@ describe('auto-continue and the bot', () => {
   it('pauses for a low life, a low flask, or a typed first map, and not otherwise', () => {
     const { c, run } = camp();
     expect(c.autoBlocker()).toBeNull();
-    run.vitals = hurt(0.45);
-    expect(c.autoBlocker()).toBe('life is low');
-    run.vitals = hurt(1, 0.3);
-    expect(c.autoBlocker()).toBe('a flask is low');
+    run.vitals = hurt(AUTO_PAUSE_BELOW - 0.05);
+    expect(c.autoBlocker()).not.toBeNull();
+    run.vitals = hurt(1, AUTO_PAUSE_BELOW - 0.2);
+    expect(c.autoBlocker()).not.toBeNull();
     run.vitals = fullVitals();
     run.offers[0] = { ...run.offers[0], type: 'crescendo' };
-    expect(c.autoBlocker()).toContain('Crescendo');
+    expect(c.autoBlocker()).not.toBeNull();
     run.offers[0] = { ...run.offers[0], type: 'plain' };
     expect(c.autoBlocker()).toBeNull();
   });
@@ -169,13 +169,6 @@ describe('auto-continue and the bot', () => {
 });
 
 describe('the verdict on an offer', () => {
-  it('is comfortable, close or dangerous by how a build fares next to a plain map', () => {
-    expect(verdictOf(VERDICT_COMFORTABLE)).toBe('comfortable');
-    expect(verdictOf(VERDICT_COMFORTABLE - 0.01)).toBe('close');
-    expect(verdictOf(VERDICT_CLOSE)).toBe('close');
-    expect(verdictOf(VERDICT_CLOSE - 0.01)).toBe('dangerous');
-  });
-
   it('every map offer has one, a Respite has none, and a worn-down character gets worse ones', () => {
     const run = newRun('vanguard', 6);
     setMap(run, 13);

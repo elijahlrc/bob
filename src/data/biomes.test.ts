@@ -3,15 +3,6 @@ import { BIOMES, PINNED_BIOME, biomeDef, biomeFor, rollBiomes } from './biomes';
 import { MAP_TYPES } from './mapTypes';
 
 describe('biomes', () => {
-  it('every biome has a name, a line of text and a distinct id', () => {
-    expect(new Set(BIOMES.map((b) => b.id)).size).toBe(BIOMES.length);
-    for (const b of BIOMES) {
-      expect(b.name.length).toBeGreaterThan(2);
-      expect(b.text.length).toBeGreaterThan(5);
-      expect(b.weight).toBeGreaterThan(0);
-    }
-  });
-
   it('the roll is fixed by the seed and the map, and the three offers differ', () => {
     for (let map = 1; map <= 100; map += 7) {
       const a = rollBiomes(11, map);

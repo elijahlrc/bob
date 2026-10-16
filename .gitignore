@@ -14,8 +14,9 @@ npm-debug.log*
 .env
 .env.*
 
-# Claude Code per-user settings (launch.json is shared and committed)
+# Claude Code per-user settings (launch.json is shared and committed), and the worktrees its agents work in
 .claude/settings.local.json
+.claude/worktrees/
 
 # Editors and OS
 .vscode/*

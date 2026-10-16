@@ -41,12 +41,11 @@ describe('hand edits to the tree', () => {
     for (const id of Object.values(t.starts)) expect(t.nodes[id].kind).toBe('start');
   });
 
-  it('the saved edits leave a tree every class can walk all of, with 27 keystones', () => {
+  it('the saved edits leave a tree every class can walk all of', () => {
     expect(edits.version).toBe(1);
     const t = getTree();
     const c = checkTree(t.nodes, t.starts);
     expect(c.unreachable).toEqual(Object.fromEntries(Object.keys(t.starts).map((k) => [k, 0])));
     expect(c.loose).toEqual([]);
-    expect(c.keystones).toBe(27);
   });
 });

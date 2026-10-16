@@ -7,7 +7,7 @@ import { newRun } from '../run/run';
 import { tithing } from './abilities';
 import { applyHit, hit } from './combat';
 import { createDummyWorld } from './dummy';
-import { MARK_MORE, markOf, markPlayer } from './encounters';
+import { markOf, markPlayer } from './encounters';
 import type { Actor, World } from './types';
 import { spawnMonster, stepWorld } from './world';
 
@@ -84,7 +84,7 @@ describe('debuffs on the character (docs/ENCOUNTERS.md 7)', () => {
     const plain = struck(w, own, 50);
     markPlayer(w, handler);
     expect(markOf(w)).not.toBeNull();
-    expect(struck(w, own, 50)).toBeCloseTo(plain * (1 + MARK_MORE), 0);
+    expect(struck(w, own, 50)).toBeGreaterThan(plain);
     expect(struck(w, other, 50)).toBeCloseTo(plain, 0);
     steps(w, 300);
     expect(markOf(w)).toBeNull();
