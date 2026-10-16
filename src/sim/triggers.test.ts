@@ -206,13 +206,13 @@ describe('triggers: effects on kills, blocks and damage taken', () => {
     };
     const { world, dummy, others } = pack(trig, 60, 0.9);
     killActor(world, dummy);
-    expect(world.trig.explosions).toBe(MAX_EXPLOSIONS_PER_TICK);
+    expect(world.sides[0].trig.explosions).toBe(MAX_EXPLOSIONS_PER_TICK);
     expect(others.filter((o) => !o.alive)).toHaveLength(MAX_EXPLOSIONS_PER_TICK);
     // Each later tick detonates up to the cap again (only the trigger upkeep runs here, so the
     // monsters stay where they are).
     for (let i = 0; i < 3; i++) {
-      tickTriggers(world, 1 / 60);
-      expect(world.trig.explosions).toBeLessThanOrEqual(MAX_EXPLOSIONS_PER_TICK);
+      tickTriggers(world, world.sides[0], 1 / 60);
+      expect(world.sides[0].trig.explosions).toBeLessThanOrEqual(MAX_EXPLOSIONS_PER_TICK);
     }
     expect(others.every((o) => !o.alive)).toBe(true);
   });

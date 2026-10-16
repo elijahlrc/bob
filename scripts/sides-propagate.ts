@@ -12,7 +12,7 @@
  * (`hunted`) are rewritten by hand first, so that the compiler no longer reports them. Anything that cannot be done
  * mechanically (a function value, a callback type, a world held in a field) is listed at the end, not edited.
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
 
@@ -105,14 +105,23 @@ const preferred = opt('--name', 's');
  * `name:param`: the function acts on the actor `param` (any actor: a character, a minion, a monster), so its side is
  * `param.side!` and it takes no side of its own (pattern 2 of DUEL.md 3.2).
  */
-const byActor = new Map(
-  opt('--by-actor', '')
+const decisions: { byActor?: Record<string, string>; byPlayer?: string[]; except?: string[] } =
+  existsSync('scripts/sides-decisions.json')
+    ? JSON.parse(readFileSync('scripts/sides-decisions.json', 'utf8'))
+    : {};
+const byActor = new Map<string, string>([
+  ...Object.entries(decisions.byActor ?? {}),
+  ...opt('--by-actor', '')
     .split(',')
     .filter(Boolean)
     .map((x) => x.split(':') as [string, string]),
-);
+]);
 /** The monsters' functions (and the world's): their side is that of the character they fight, `w.player.side!` until G5's `hunted`. */
-const byPlayer = new Set(opt('--by-player', '').split(',').filter(Boolean));
+const byPlayer = new Set([
+  ...(decisions.byPlayer ?? []),
+  ...opt('--by-player', '').split(',').filter(Boolean),
+]);
+for (const e of decisions.except ?? []) except.add(e);
 
 const root = process.cwd().replace(/\\/g, '/');
 const rel = (f: string) => path.relative(root, f).replace(/\\/g, '/');
@@ -259,6 +268,15 @@ for (const d of diags) {
   readSites.push({ id: root, fn, field });
 }
 
+if (argv.includes('--reads')) {
+  const by = new Map<FnLike, string[]>();
+  for (const r of readSites) by.set(r.fn, [...(by.get(r.fn) ?? []), r.field]);
+  for (const [f, list] of [...by].sort((a, b) => where(a[0]).localeCompare(where(b[0]))))
+    console.log(
+      `${where(f)} ${fnName(f)}(${f.parameters.map((p) => p.getText()).join(', ')}): ${[...new Set(list)].join(' ')} x${list.length}`,
+    );
+  process.exit(0);
+}
 for (const r of readSites) {
   const name = sideName(r.fn);
   edits.push({

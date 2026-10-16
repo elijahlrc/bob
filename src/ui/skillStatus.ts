@@ -120,8 +120,8 @@ function damageSlot(w: World, c: SkillChoice, role: SkillRole): SkillSlot {
       total: deploySecondsOf(c, prof),
       words: `All ${dep.cap} ${plural(c.deploy!, dep.cap)} standing, the first ends in ${secs(dep.soonest)}`,
     };
-  } else if (secondary && (w.secondaryReady[c.key] ?? 0) > w.t) {
-    const left = (w.secondaryReady[c.key] ?? 0) - w.t;
+  } else if (secondary && (w.sides[0].secondaryReady[c.key] ?? 0) > w.t) {
+    const left = (w.sides[0].secondaryReady[c.key] ?? 0) - w.t;
     b = {
       state: 'cooling',
       remaining: left,
@@ -163,14 +163,14 @@ function utilitySlot(w: World, c: SkillChoice): SkillSlot {
   const prof = w.char.profile(c, 0, 0);
   const look = profileLook(prof);
   const u = c.skill.utility!;
-  const readyAt = w.utilityReady[c.key] ?? 0;
+  const readyAt = w.sides[0].utilityReady[c.key] ?? 0;
   const cast = castOf(w, c);
   let badge: string | undefined;
   let cooldown: number;
   let up: Built | null = null;
   if (u.kind === 'buff') {
     cooldown = u.cooldown ?? 0.5;
-    const left = w.buffT[u.buff];
+    const left = w.sides[0].buffT[u.buff];
     if (left > 0)
       up = {
         state: 'active',
@@ -316,7 +316,7 @@ export function skillSlots(w: World): SkillSlot[] {
     if (e !== 'castSocketed' && e !== 'castGranted') continue;
     for (const c of src.skills) {
       const cdKey = `${src.key}:${c.key}`;
-      const left = w.trig.cooldown[cdKey] ?? 0;
+      const left = w.sides[0].trig.cooldown[cdKey] ?? 0;
       const look = profileLook(ch.profile(c, 0, 0));
       const cooling = left > 0;
       out.push({

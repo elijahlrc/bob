@@ -12,6 +12,7 @@ import type { MinionSup } from './minionSup';
 import { applyFlatDot } from './skillDots';
 import { applyStatus } from './statuses';
 import type { Actor, World } from './types';
+import type { Side } from './side';
 
 /**
  * What acts on minions besides their own numbers (docs/SPIRIT.md S12): an Offering that uses corpses and gives all the minions its
@@ -127,7 +128,7 @@ export function offeringWanted(w: World, reach: number): boolean {
 }
 
 /** The offering is cast: a corpse and up to four more about it are used, and the minions gain its effects for a time. */
-export function castOffering(w: World, c: SkillChoice): void {
+export function castOffering(w: World, s: Side, c: SkillChoice): void {
   const u = c.skill.utility;
   if (u?.kind !== 'offering') return;
   const p = w.player;
@@ -156,7 +157,7 @@ export function castOffering(w: World, c: SkillChoice): void {
     chaos: v(u.physAsChaos),
     res: v(u.res),
   };
-  w.buffT[u.buff] = w.offering.t;
+  s.buffT[u.buff] = w.offering.t;
   w.events.push({ t: 'buff', id: u.buff });
 }
 

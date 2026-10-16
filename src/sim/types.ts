@@ -696,29 +696,6 @@ export type World = {
   rngLoot: Rng;
   /** Chance rolls and spell choices of triggers (separate, so triggers never disturb other streams). */
   rngTrig: Rng;
-  /** Seconds left on the charges of each kind (EXPANSION 5.6), and the characters built for each count held. */
-  chargeT: Record<'grit' | 'fervour' | 'insight', number>;
-  /** Seconds left of each buff (src/data/buffs.ts), the rage held, seconds since rage was fed, and the drain timer. */
-  buffT: Record<BuffId, number>;
-  rage: number;
-  rageT: number;
-  rageDrain: number;
-  chars: Map<string, Character>;
-  /** The Trophy Cord: monster mods held, by mod id, and the seconds left of each. */
-  trophy: Record<string, number>;
-  trig: TriggerRuntime;
-  /** When each secondary skill (by choice key) can next be cast (EXPANSION 5.5a). */
-  secondaryReady: Record<string, number>;
-  /** A guard that cut the physical damage taken for as long as its buff runs (spent charges made it stronger). */
-  guard: { buff: BuffId; physMult: number } | null;
-  /** Skills with a cooldown of their own (by choice key): the uses held and the seconds until the next one is regained. */
-  cooldowns: Record<string, { uses: number; t: number }>;
-  /** When each utility skill (by choice key) can next be cast. */
-  utilityReady: Record<string, number>;
-  /** The openers used (by choice key): in which fight, and on which rare or boss targets. */
-  openers: Record<string, { fight: number; ids: number[] }>;
-  /** Time since the burning aura last struck. */
-  auraBurnT: number;
   /** The totems, brands, traps and mines on the ground. */
   deployables: Deployable[];
   deploySeq: number;
@@ -736,8 +713,6 @@ export type World = {
   warp: WarpState | null;
   wither: WitherState | null;
   caught: CaughtState | null;
-  /** Seconds a Berserk has lasted (its drain of rage rises with it). */
-  berserkT: number;
   /** The offering that stands, if one does (src/sim/minionFx.ts). */
   offering: OfferingState | null;
   /** Counters the supports keep (src/sim/supportFx.ts): uses of a skill, Intensity, Seals, a mirage archer, Inspiration's mana. */
@@ -776,8 +751,6 @@ export type World = {
   /** The relic's regeneration: seconds left, and the life a second for the character and for the minions; and its nova's cooldown. */
   relicRegen: { t: number; me: number; minions: number };
   relicT: number;
-  /** When rage was last gained from a melee hit. */
-  rageGainT: number;
   trailT: number;
   /** The blades of Blade Vortex: seconds left of each, and the time toward the next round. */
   vortex: { key: string; blades: number[]; acc: number } | null;

@@ -95,8 +95,8 @@ describe('skill bar slots', () => {
     const slotOf = () => skillSlots(w).find((s) => s.key === second.key)!;
     expect(slotOf().role).toBe('Secondary');
     expect(slotOf().state).toBe('ready');
-    run(w, 5, () => (w.secondaryReady[second.key] ?? 0) > w.t);
-    expect((w.secondaryReady[second.key] ?? 0) > w.t).toBe(true);
+    run(w, 5, () => (w.sides[0].secondaryReady[second.key] ?? 0) > w.t);
+    expect((w.sides[0].secondaryReady[second.key] ?? 0) > w.t).toBe(true);
     // Let the cast itself finish, so the cooldown is what shows.
     run(
       w,
@@ -112,7 +112,7 @@ describe('skill bar slots', () => {
     run(w, 0.5);
     const later = slotOf();
     if (later.state === 'cooling') expect(later.remaining).toBeLessThan(before);
-    w.secondaryReady[second.key] = w.t;
+    w.sides[0].secondaryReady[second.key] = w.t;
     w.player.action = null;
     expect(slotOf().state).toBe('ready');
     expect(slotOf().remaining).toBe(0);
@@ -143,16 +143,16 @@ describe('skill bar slots', () => {
     expect(u.kind).toBe('buff');
     if (u.kind !== 'buff') return;
     const slotOf = () => skillSlots(w).find((s) => s.key === c.key)!;
-    run(w, 20, () => w.buffT[u.buff] > 0);
-    expect(w.buffT[u.buff]).toBeGreaterThan(0);
+    run(w, 20, () => w.sides[0].buffT[u.buff] > 0);
+    expect(w.sides[0].buffT[u.buff]).toBeGreaterThan(0);
     // Past the cast itself.
     run(w, 1);
     const s = slotOf();
     expect(s.state).toBe('active');
-    expect(s.remaining).toBeCloseTo(w.buffT[u.buff], 6);
+    expect(s.remaining).toBeCloseTo(w.sides[0].buffT[u.buff], 6);
     expect(s.total).toBeGreaterThanOrEqual(s.remaining);
     // When it runs out it is no longer active.
-    w.buffT[u.buff] = 0;
+    w.sides[0].buffT[u.buff] = 0;
     expect(slotOf().state).not.toBe('active');
   });
 

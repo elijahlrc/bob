@@ -295,7 +295,7 @@ export function chargedDeath(w: World, dead: Actor): void {
   const c = w.char.actives.find((x) => x.skill.id === st.key);
   const spec = c?.usable ? w.char.profile(c, 0).skill.charge : undefined;
   detonate(w, w.player.side!, dead);
-  if (spec) corpseBlast(w, dead, spec.deathPct, 'fire', spec.radius);
+  if (spec) corpseBlast(w, w.player.side!, dead, spec.deathPct, 'fire', spec.radius);
 }
 
 function tickCharged(w: World, s: Side, dt: number): void {
@@ -313,7 +313,7 @@ function tickCharged(w: World, s: Side, dt: number): void {
 /** Every step: the buffs and debuffs the single skills keep. */
 export function tickSkillFx(w: World, s: Side, dt: number): void {
   if (w.relicRegen.t > 0) tickRelicRegen(w, dt);
-  if (w.shell) tickShell(w);
+  if (w.shell) tickShell(w, s);
   if (w.staticFx) tickBeams(w, dt);
   if (w.char.frostSpec) tickFrostTrail(w, dt);
   if (w.virulence > 0) tickAgony(w, dt);
@@ -823,10 +823,10 @@ export function shellTakes(w: World, total: number): number {
 }
 
 /** When the buff ends or the pool is spent, what the shell took goes out as fire to the enemies about. */
-function tickShell(w: World): void {
+function tickShell(w: World, side: Side): void {
   const s = w.shell;
   if (!s) return;
-  if (s.left > 0 && w.buffT[s.buff] > 0) return;
+  if (s.left > 0 && side.buffT[s.buff] > 0) return;
   w.shell = null;
   const dmg = (s.taken * s.reflect) / 100;
   if (dmg <= 0) return;

@@ -55,25 +55,25 @@ function matches(d: TriggerDef, ev: TriggerEvent, tagMask: number): boolean {
 /** Offer an event to every trigger the player has. Cheap when there are none. */
 export function fireTriggers(w: World, s: Side, ev: TriggerEvent): void {
   const triggers = w.char.triggers;
-  if (triggers.length === 0 || w.trig.busy || !w.player.alive) return;
+  if (triggers.length === 0 || s.trig.busy || !w.player.alive) return;
   if ('tags' in ev && (ev.tags & TRIGGERED) !== 0) return;
   for (const src of triggers) {
     const d = src.def;
     if (!matches(d, ev, src.tagMask)) continue;
     if (d.on === 'hitTaken' && ev.on === 'hitTaken') {
-      w.trig.taken[src.key] = (w.trig.taken[src.key] ?? 0) + ev.damage;
-      if (w.trig.taken[src.key] < ((d.threshold ?? 0) / 100) * w.player.def.maxLife) continue;
+      s.trig.taken[src.key] = (s.trig.taken[src.key] ?? 0) + ev.damage;
+      if (s.trig.taken[src.key] < ((d.threshold ?? 0) / 100) * w.player.def.maxLife) continue;
     }
     // The next spell in socket order; its own cooldown, not the source's (3.9).
-    const turn = w.trig.next[src.key] ?? 0;
+    const turn = s.trig.next[src.key] ?? 0;
     const skill = src.skills.length ? src.skills[turn % src.skills.length] : undefined;
     const cdKey = skill ? `${src.key}:${skill.key}` : src.key;
-    if ((w.trig.cooldown[cdKey] ?? 0) > 0) continue;
+    if ((s.trig.cooldown[cdKey] ?? 0) > 0) continue;
     if (d.chance < 100 && !w.rngTrig.chance(d.chance / 100)) continue;
     if (!perform(w, s, d.effect, ev, skill)) continue;
-    w.trig.cooldown[cdKey] = d.cooldown;
-    w.trig.next[src.key] = turn + 1;
-    if (d.on === 'hitTaken') w.trig.taken[src.key] = 0;
+    s.trig.cooldown[cdKey] = d.cooldown;
+    s.trig.next[src.key] = turn + 1;
+    if (d.on === 'hitTaken') s.trig.taken[src.key] = 0;
   }
 }
 
@@ -90,7 +90,7 @@ function perform(
     case 'castGranted':
       return skill ? castTriggered(w, s, skill, ev) : false;
     case 'explode':
-      return ev.on === 'kill' && explode(w, e, ev.target);
+      return ev.on === 'kill' && explode(w, s, e, ev.target);
     case 'spread':
       return ev.on === 'kill' && spread(w, e, ev.target);
     case 'overkillBurn':
@@ -149,11 +149,11 @@ function castTriggered(w: World, s: Side, choice: SkillChoice, ev: TriggerEvent)
     aimY: target.y,
   };
   w.events.push({ t: 'trigger', skill: prof.skill.id, kind: ev.on });
-  w.trig.busy = true;
+  s.trig.busy = true;
   try {
     fire(w, w.player, act);
   } finally {
-    w.trig.busy = false;
+    s.trig.busy = false;
   }
   return true;
 }
@@ -161,12 +161,13 @@ function castTriggered(w: World, s: Side, choice: SkillChoice, ev: TriggerEvent)
 /** An enemy that dies under a status that makes it explode (Abyssal Cry): a blast of a share of its own life. */
 export function corpseBlast(
   w: World,
+  s: Side,
   dead: Actor,
   pctOfMaxLife: number,
   dtype: DamageType,
   radius: number,
 ): void {
-  explode(w, { kind: 'explode', pctOfMaxLife, dtype, radius }, dead);
+  explode(w, s, { kind: 'explode', pctOfMaxLife, dtype, radius }, dead);
 }
 
 /** A kill that went past the enemy's life sets the enemies near it burning, by the damage it had to spare. */
@@ -190,8 +191,13 @@ function overkillBurn(
   return true;
 }
 
-function explode(w: World, e: Extract<TriggerEffect, { kind: 'explode' }>, dead: Actor): boolean {
-  w.trig.queue.push({
+function explode(
+  w: World,
+  s: Side,
+  e: Extract<TriggerEffect, { kind: 'explode' }>,
+  dead: Actor,
+): boolean {
+  s.trig.queue.push({
     x: dead.x,
     y: dead.y,
     r: e.radius,
@@ -199,7 +205,7 @@ function explode(w: World, e: Extract<TriggerEffect, { kind: 'explode' }>, dead:
     amount: (dead.def.maxLife * e.pctOfMaxLife) / 100,
     from: dead.id,
   });
-  drainExplosions(w);
+  drainExplosions(w, s);
   return true;
 }
 
@@ -207,8 +213,8 @@ function explode(w: World, e: Extract<TriggerEffect, { kind: 'explode' }>, dead:
  * Detonate queued explosions, at most MAX_EXPLOSIONS_PER_TICK a tick. A kill inside an explosion
  * queues the next one, so a chain runs on from tick to tick instead of recursing.
  */
-function drainExplosions(w: World): void {
-  const t = w.trig;
+function drainExplosions(w: World, s: Side): void {
+  const t = s.trig;
   if (t.draining) return;
   t.draining = true;
   try {
@@ -273,9 +279,9 @@ function recover(w: World, e: Extract<TriggerEffect, { kind: 'recover' }>): bool
 }
 
 /** Per-tick upkeep: cooldowns run down, and the explosion budget refills. */
-export function tickTriggers(w: World, dt: number): void {
-  w.trig.explosions = 0;
-  const cd = w.trig.cooldown;
+export function tickTriggers(w: World, s: Side, dt: number): void {
+  s.trig.explosions = 0;
+  const cd = s.trig.cooldown;
   for (const k of Object.keys(cd)) if (cd[k] > 0) cd[k] = Math.max(0, cd[k] - dt);
-  drainExplosions(w);
+  drainExplosions(w, s);
 }

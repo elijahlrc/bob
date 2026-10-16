@@ -75,9 +75,9 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
   if (!p.skill.utility)
     for (const c of w.char.utilities) {
       const u = c.skill.utility;
-      if (u?.kind === 'buff' && u.second && w.buffT[u.buff] > 0) {
-        w.buffT[u.buff] = 0;
-        w.buffT[u.second.buff] = Math.min(w.buffT[u.second.buff], u.second.keep);
+      if (u?.kind === 'buff' && u.second && a.side!.buffT[u.buff] > 0) {
+        a.side!.buffT[u.buff] = 0;
+        a.side!.buffT[u.second.buff] = Math.min(a.side!.buffT[u.second.buff], u.second.keep);
       }
     }
   if (p.freezeThird > 0) {
@@ -113,7 +113,7 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
     w.surgeMana += p.cost;
     if (w.surgeMana >= p.surgeThreshold) {
       w.surgeMana -= p.surgeThreshold;
-      rollGains(w, 'surge', p.gains);
+      rollGains(w, a.side!, 'surge', p.gains);
     }
   }
   // Inspiration: the mana a supported skill spends is counted, and the charges are lost when it passes the limit.
@@ -193,7 +193,7 @@ function mirageShoots(w: World, s: Side, m: Mirage): void {
 /** After a hit of the player's lands: a mirage archer is called, a shockwave goes off. */
 export function afterPlayerHit(w: World, s: Side, dst: Actor, p: SkillProfile): void {
   // A skill whose hit gives the character a buff (Smite).
-  if (p.skill.hitBuff && !p.skill.tags.includes('triggered')) gainBuff(w, p.skill.hitBuff.buff);
+  if (p.skill.hitBuff && !p.skill.tags.includes('triggered')) gainBuff(w, s, p.skill.hitBuff.buff);
   if (p.isAttack && !p.skill.tags.includes('triggered')) relicNova(w);
   if (!w.inFx) {
     if (p.skill.beams) gainBeamStack(w, p);

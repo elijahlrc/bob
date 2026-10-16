@@ -29,11 +29,11 @@ describe('gem-granted gains in the sim', () => {
       },
     );
     const prof = w.char.profile(w.primary, playerConds(w, dummy), flaskMask(w, w.sides[0]));
-    expect(w.buffT.fortify).toBe(0);
+    expect(w.sides[0].buffT.fortify).toBe(0);
     const res = resolveHit(new Rng(1), prof, prof.hands[0], targetState(dummy), 1, false);
     res.outcome = 'hit';
     applyHit(w, w.player, dummy, prof, res);
-    expect(w.buffT.fortify).toBeGreaterThan(0);
+    expect(w.sides[0].buffT.fortify).toBeGreaterThan(0);
   });
 
   it('Stagger Resolve: a melee stun grants a Grit charge', () => {

@@ -120,7 +120,7 @@ describe('trigger supports and Ember Burst', () => {
     const prof = world.char.profile(world.char.primary);
     let fired = false;
     for (let i = 0; i < 80 && !fired; i++) {
-      world.trig.cooldown = {};
+      world.sides[0].trig.cooldown = {};
       applyHit(world, world.player, dummy, prof, okHit(1));
       fired = world.events.some((e) => e.t === 'trigger');
       if (!fired) world.events.length = 0;

@@ -5,6 +5,7 @@ import type { UtilityDef } from '../data/gems';
 import { reservedMana } from './reserve';
 import { applyStatus } from './statuses';
 import type { Actor, World } from './types';
+import type { Side } from './side';
 
 /**
  * Banners (docs/SPIRIT.md S6): an aura you carry, then put down. Carried, it holds some of the character's mana, gains a stage
@@ -72,7 +73,7 @@ export function bannerAction(w: World, c: SkillChoice, target: Actor): 'carry' |
 }
 
 /** Cast the banner skill: carry a new banner, or put the carried one down where the character stands. */
-export function useBanner(w: World, c: SkillChoice, prof: SkillProfile): void {
+export function useBanner(w: World, side: Side, c: SkillChoice, prof: SkillProfile): void {
   const s = specOf(c);
   if (!s) return;
   const p = w.player;
@@ -91,7 +92,7 @@ export function useBanner(w: World, c: SkillChoice, prof: SkillProfile): void {
       (c.skill.tags.includes('duration') ? prof.skillDuration : 1);
     const granted = s.spec.place.secondsPerStage * b.stages;
     if (granted > 0) {
-      w.buffT[s.spec.place.buff] = Math.max(w.buffT[s.spec.place.buff], granted);
+      side.buffT[s.spec.place.buff] = Math.max(side.buffT[s.spec.place.buff], granted);
       w.events.push({ t: 'buff', id: s.spec.place.buff });
     }
     return;
@@ -134,7 +135,7 @@ export function bannerStage(w: World, on: 'kill' | 'impale'): void {
 }
 
 /** Run the banner: its time, and its aura on the character and the enemies in it. */
-export function tickBanner(w: World, dt: number): void {
+export function tickBanner(w: World, side: Side, dt: number): void {
   const b = w.banner;
   if (!b) return;
   const c = w.char.utilities.find((x) => x.key === b.key);
@@ -155,7 +156,7 @@ export function tickBanner(w: World, dt: number): void {
   const cy = b.placed ? b.y : p.y;
   // The aura works on the character while it is carried or stands within the banner's radius.
   if (!b.placed || Math.hypot(p.x - cx, p.y - cy) <= b.radius + p.r)
-    w.buffT[s.u.buff] = Math.max(w.buffT[s.u.buff], PULSE + dt);
+    side.buffT[s.u.buff] = Math.max(side.buffT[s.u.buff], PULSE + dt);
   b.pulseT -= dt;
   if (b.pulseT > 0) return;
   b.pulseT += PULSE;

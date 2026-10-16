@@ -35,7 +35,7 @@ describe('skills that deal no hit of their own still count as landing', () => {
       for (let i = 0; i < 60 * 30; i++) {
         stepWorld(w);
         charged = Math.max(charged, w.char.charges.fervour);
-        buffed = Math.max(buffed, w.buffT.onslaught);
+        buffed = Math.max(buffed, w.sides[0].buffT.onslaught);
       }
       // Something was inflicted at all (the scenario works)...
       expect(run.dummy.sdots.length > 0 || charged > 0).toBe(true);

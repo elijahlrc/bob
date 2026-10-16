@@ -139,7 +139,7 @@ for (const [id, gem] of AURA_CONDS)
   PLAYER_TESTS[id] = (w) => w.char.auras.some((a) => a.active && a.def.id === gem);
 for (const id of BUFF_IDS) {
   const cond = BUFFS[id].cond;
-  PLAYER_TESTS[cond] = (w) => w.buffT[id] > 0;
+  PLAYER_TESTS[cond] = (_w, p) => p.side!.buffT[id] > 0;
 }
 
 type TargetTest = (t: Actor, from: Actor) => boolean;
@@ -215,7 +215,7 @@ export function monsterConds(a: Actor): number {
 }
 
 export function flaskMask(w: World, s: Side): number {
-  let m = w.rage << DYN_SHIFT;
+  let m = s.rage << DYN_SHIFT;
   // A banner that stands gives the character more of its buff for each stage it was put down with.
   if (w.banner?.placed) m |= w.banner.stages << BANNER_SHIFT;
   s.flasks.forEach((f, i) => {
@@ -422,16 +422,17 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (dst.isPlayer && !src.isPlayer && res.outcome === 'hit' && w.char.frostSpec) frostBite(w, src);
   // Flesh and Stone in the Sand stance: attacks by enemies that are not near do less.
   if (dst.isPlayer && !src.isPlayer && res.outcome !== 'block' && p.isAttack) {
-    const far = stanceFarLess(w);
+    const far = stanceFarLess(w, dst.side!);
     if (far && Math.hypot(src.x - dst.x, src.y - dst.y) > far.radius + src.r) {
       for (let i = 0; i < res.dmg.length; i++) res.dmg[i] *= 1 - far.less;
       res.total *= 1 - far.less;
     }
   }
   // Immortal Call: the endurance spent makes the physical part of a hit smaller while the guard stands.
-  if (dst.isPlayer && w.guard && w.buffT[w.guard.buff] > 0 && res.outcome !== 'block') {
-    res.total -= res.dmg[0] * (1 - w.guard.physMult);
-    res.dmg[0] *= w.guard.physMult;
+  const guard = dst.isPlayer ? dst.side!.guard : null;
+  if (guard && dst.side!.buffT[guard.buff] > 0 && res.outcome !== 'block') {
+    res.total -= res.dmg[0] * (1 - guard.physMult);
+    res.dmg[0] *= guard.physMult;
   }
   // Traps and mines hit a shackled enemy harder; a snared one takes more from projectile attacks.
   if (src.isPlayer && !dst.isPlayer && res.outcome !== 'block') {
@@ -464,7 +465,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     dst.tBlock = 0;
     if (dst.isPlayer) {
       rollCharges(w, dst.side!, 'block');
-      rollGains(w, 'block');
+      rollGains(w, dst.side!, 'block');
     }
     if (dst.def.lifeOnBlockPct > 0)
       dst.life = Math.min(lifeCap(w, dst), dst.life + dst.def.maxLife * dst.def.lifeOnBlockPct);
@@ -482,22 +483,22 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   src.tHit = 0;
   dst.tBeenHit = 0;
   if (src.isPlayer) {
-    rollGains(w, 'hit', p.gains);
+    rollGains(w, src.side!, 'hit', p.gains);
     rollCharges(w, src.side!, 'hit', p.gains);
     if (p.skill.behaviour.kind === 'melee') {
-      rollGains(w, 'meleeHit', p.gains);
+      rollGains(w, src.side!, 'meleeHit', p.gains);
       rollCharges(w, src.side!, 'meleeHit', p.gains);
     }
   }
   if (dst.isPlayer) {
-    rollGains(w, 'hitTaken');
+    rollGains(w, dst.side!, 'hitTaken');
     rollCharges(w, dst.side!, 'hitTaken');
   }
   if (res.crit) {
     src.tCrit = 0;
     if (src.isPlayer) {
       rollCharges(w, src.side!, 'crit', p.gains);
-      rollGains(w, 'crit', p.gains);
+      rollGains(w, src.side!, 'crit', p.gains);
     }
     if (p.overload) src.tOverload = 0;
   }
@@ -536,7 +537,8 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (src.isPlayer) noteCause(dst, p.tagMask, false, p.gains);
   applyDamage(w, dst, res.dmg, how);
   // A mark gives life and mana back on each attack hit.
-  if (src.isPlayer && p.isAttack) hexHit(w, dst, maskIntersects(p.tagMask, tagBit('melee')));
+  if (src.isPlayer && p.isAttack)
+    hexHit(w, src.side!, dst, maskIntersects(p.tagMask, tagBit('melee')));
   if (wasAlive && dst.alive) {
     if (src.isPlayer) {
       rollStatuses(w, dst, p, false, res);
@@ -642,7 +644,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     w.events.push({ t: 'stun', dst: dst.id, dur: res.stun });
     if (dst.isPlayer) fireTriggers(w, dst.side!, { on: 'stunned' });
     if (src.isPlayer) {
-      rollGains(w, 'stun', p.gains);
+      rollGains(w, src.side!, 'stun', p.gains);
       rollCharges(w, src.side!, 'stun', p.gains);
     }
   }
@@ -750,7 +752,7 @@ export function hit(
     } else applySkillDot(w, dst, p);
     // Where it lands counts as a hit for what a hit gives (Drain Trap with Static Snares), but a curse is not an attack.
     if (!p.skill.tags.includes('curse')) {
-      rollGains(w, 'hit', p.gains);
+      rollGains(w, src.side!, 'hit', p.gains);
       rollCharges(w, src.side!, 'hit', p.gains);
     }
     wake(w, dst);
@@ -1011,10 +1013,10 @@ export function killActor(w: World, a: Actor): void {
     const gains = causes.get(a)?.gains ?? [];
     rollCharges(w, fs, 'kill', gains);
     if (a.ail.freezeT > 0) rollCharges(w, fs, 'killFrozen', gains);
-    if (a.ail.shock > 0) rollGains(w, 'killShocked', gains);
-    rollGains(w, 'kill', gains);
+    if (a.ail.shock > 0) rollGains(w, fs, 'killShocked', gains);
+    rollGains(w, fs, 'kill', gains);
     bannerStage(w, 'kill');
-    refreshOnKill(w);
+    refreshOnKill(w, fs);
   }
   if (!a.isPlayer && a.rarity === 'rare') gainTrophy(w, fs, a.modIds);
   if (a.isPlayer) {
@@ -1096,7 +1098,7 @@ export function killActor(w: World, a: Actor): void {
   // A Venomed enemy that dies poisoned passes the rest of its poison on to those around it.
   if (a.fx.venomed && a.ail.poisons.length > 0) venomBurst(w, a, a.fx.venomed.v);
   // A Doomed enemy blows up for a share of its own life.
-  if (a.fx.doomed) corpseBlast(w, a, a.fx.doomed.v, 'chaos', 3);
+  if (a.fx.doomed) corpseBlast(w, fs, a, a.fx.doomed.v, 'chaos', 3);
 }
 
 /** The poison an enemy still carried, dealt to the enemies about it as chaos damage over a second. */

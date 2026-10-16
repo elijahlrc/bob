@@ -562,7 +562,7 @@ export function tickDeployables(w: World, s: Side, dt: number): void {
       // An Ancestral totem is active while the character is near and in sight of it, and gives the character its buff.
       const an = c.skill.ancestral;
       d.active = Math.hypot(d.x - p.x, d.y - p.y) <= an.range && w.grid.los(d.x, d.y, p.x, p.y);
-      if (d.active) w.buffT[an.buff] = Math.max(w.buffT[an.buff], 0.3);
+      if (d.active) s.buffT[an.buff] = Math.max(s.buffT[an.buff], 0.3);
     }
     if (keep && c && d.kind === 'totem' && c.skill.bond) {
       const list = bonds.get(d.key) ?? [];

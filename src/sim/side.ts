@@ -1,7 +1,9 @@
+import type { Character } from '../calc/character';
+import type { BuffId } from '../data/buffs';
 import type { AnyItem } from '../data/types';
 import type { Ledger } from './ledger';
 import type { ReprieveState } from './reprieve';
-import type { DamageRecord, FlaskState, PlayerAI, Vitals } from './types';
+import type { DamageRecord, FlaskState, PlayerAI, TriggerRuntime, Vitals } from './types';
 
 /** What a side counts as it plays: the kills and the time lost, and the damage it took and dealt. */
 export type SideStats = {
@@ -53,4 +55,32 @@ export type Side = {
   xp: number;
   picked: AnyItem[];
   opts: SideOpts;
+  // G2: charges, buffs and rage, the triggers, cooldowns and openers
+  /** Seconds left on the charges of each kind (EXPANSION 5.6), and the characters built for each count held. */
+  chargeT: Record<'grit' | 'fervour' | 'insight', number>;
+  /** Seconds left of each buff (src/data/buffs.ts), the rage held, seconds since rage was fed, and the drain timer. */
+  buffT: Record<BuffId, number>;
+  rage: number;
+  rageT: number;
+  rageDrain: number;
+  /** When rage was last gained from a melee hit. */
+  rageGainT: number;
+  /** The Trophy Cord: monster mods held, by mod id, and the seconds left of each. */
+  trophy: Record<string, number>;
+  trig: TriggerRuntime;
+  /** When each secondary skill (by choice key) can next be cast (EXPANSION 5.5a). */
+  secondaryReady: Record<string, number>;
+  /** A guard that cut the physical damage taken for as long as its buff runs (spent charges made it stronger). */
+  guard: { buff: BuffId; physMult: number } | null;
+  /** Skills with a cooldown of their own (by choice key): the uses held and the seconds until the next one is regained. */
+  cooldowns: Record<string, { uses: number; t: number }>;
+  /** When each utility skill (by choice key) can next be cast. */
+  utilityReady: Record<string, number>;
+  /** The openers used (by choice key): in which fight, and on which rare or boss targets. */
+  openers: Record<string, { fight: number; ids: number[] }>;
+  /** Time since the burning aura last struck. */
+  auraBurnT: number;
+  /** Seconds a Berserk has lasted (its drain of rage rises with it). */
+  berserkT: number;
+  chars: Map<string, Character>;
 };

@@ -16,6 +16,7 @@ import type { Mod } from '../mods/types';
 import { sumOf } from './charges';
 import { lifeCap } from './combat';
 import type { World } from './types';
+import type { Side } from './side';
 
 /**
  * The buff layer in the sim (src/data/buffs.ts). A buff is a timer: while it runs, its condition is true and the calc
@@ -25,37 +26,37 @@ import type { World } from './types';
 const RAGE_GAIN_COOLDOWN = 0.4;
 
 /** Gain a buff, or refresh it to its full time. */
-export function gainBuff(w: World, id: BuffId): void {
+export function gainBuff(w: World, s: Side, id: BuffId): void {
   if (!w.char.buffSource[id]) return;
   // Elusive cannot be renewed until it has run out.
-  if (id === 'elusive' && w.buffT.elusive > 0) return;
+  if (id === 'elusive' && s.buffT.elusive > 0) return;
   const seconds = BUFFS[id].seconds * w.char.db.mult('buffDuration');
-  w.buffT[id] = Math.max(w.buffT[id], seconds);
+  s.buffT[id] = Math.max(s.buffT[id], seconds);
   w.events.push({ t: 'buff', id });
 }
 
 /** Gain points of rage, up to the character's maximum. */
-export function gainRage(w: World, points: number): void {
+export function gainRage(w: World, s: Side, points: number): void {
   if (!w.char.rageSource || points <= 0) return;
-  w.rage = Math.min(w.char.rageMax, w.rage + points);
-  w.rageT = 0;
+  s.rage = Math.min(w.char.rageMax, s.rage + points);
+  s.rageT = 0;
 }
 
 /** Roll the buffs and rage that an event can give (a kill, a hit landed or taken, a critical strike, a flask). */
-export function rollGains(w: World, event: BuffEvent, extra: readonly Mod[] = []): void {
+export function rollGains(w: World, s: Side, event: BuffEvent, extra: readonly Mod[] = []): void {
   const ch = w.char;
   if (!ch.anyGain) return;
   for (const id of BUFF_IDS) {
     if (!ch.buffSource[id]) continue;
     const chance = ch.db.sum('base', buffStat(event, id)) + sumOf(extra, buffStat(event, id));
-    if (chance > 0 && w.rngTrig.chance(Math.min(1, chance / 100))) gainBuff(w, id);
+    if (chance > 0 && w.rngTrig.chance(Math.min(1, chance / 100))) gainBuff(w, s, id);
   }
   if (ch.rageSource) {
     // Rage from melee hits comes once in 0.4 s, however many enemies the swing hit.
-    if (event !== 'meleeHit' || w.t - w.rageGainT >= RAGE_GAIN_COOLDOWN) {
+    if (event !== 'meleeHit' || w.t - s.rageGainT >= RAGE_GAIN_COOLDOWN) {
       const pts = ch.db.sum('base', rageStat(event)) + sumOf(extra, rageStat(event));
-      if (pts > 0 && event === 'meleeHit') w.rageGainT = w.t;
-      gainRage(w, pts);
+      if (pts > 0 && event === 'meleeHit') s.rageGainT = w.t;
+      gainRage(w, s, pts);
     }
   }
   for (const pool of RECOVER_POOLS) {
@@ -73,20 +74,20 @@ export function rollGains(w: World, event: BuffEvent, extra: readonly Mod[] = []
     else p.es = Math.min(p.def.maxEs, p.es + amount);
   }
   // Being hit holds the rage you have, as gaining it does.
-  if (event === 'hitTaken') w.rageT = 0;
+  if (event === 'hitTaken') s.rageT = 0;
 }
 
 /** Run down the timers, and drain rage once it has not been fed for a while. */
-export function tickBuffs(w: World, dt: number): void {
-  for (const id of BUFF_IDS) if (w.buffT[id] > 0) w.buffT[id] = Math.max(0, w.buffT[id] - dt);
-  if (w.rage > 0) {
-    w.rageT += dt;
-    if (w.rageT >= RAGE_HOLD) {
-      w.rageDrain += dt;
-      while (w.rageDrain >= RAGE_DECAY_EVERY && w.rage > 0) {
-        w.rageDrain -= RAGE_DECAY_EVERY;
-        w.rage--;
+export function tickBuffs(s: Side, dt: number): void {
+  for (const id of BUFF_IDS) if (s.buffT[id] > 0) s.buffT[id] = Math.max(0, s.buffT[id] - dt);
+  if (s.rage > 0) {
+    s.rageT += dt;
+    if (s.rageT >= RAGE_HOLD) {
+      s.rageDrain += dt;
+      while (s.rageDrain >= RAGE_DECAY_EVERY && s.rage > 0) {
+        s.rageDrain -= RAGE_DECAY_EVERY;
+        s.rage--;
       }
     }
-  } else w.rageDrain = 0;
+  } else s.rageDrain = 0;
 }

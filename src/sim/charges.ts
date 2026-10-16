@@ -31,14 +31,14 @@ export function sumOf(mods: readonly Mod[], stat: string): number {
 const key = (c: ChargeCounts, trophy: readonly string[] = []) =>
   `${c.grit}.${c.fervour}.${c.insight}|${trophy.join(',')}`;
 
-const trophyIds = (w: World) => Object.keys(w.trophy).sort();
+const trophyIds = (s: Side) => Object.keys(s.trophy).sort();
 
 /** The character for the world's build with these charges (built once, then kept). */
-export function characterWith(w: World, counts: ChargeCounts): Character {
-  const trophy = trophyIds(w);
+export function characterWith(w: World, s: Side, counts: ChargeCounts): Character {
+  const trophy = trophyIds(s);
   // What the Unmaker holds of the build is part of it too (docs/BOSSES.md 9).
   const k = key(counts, trophy) + theftKey(w);
-  let ch = w.chars.get(k);
+  let ch = s.chars.get(k);
   if (!ch) {
     ch = new Character(theftBuild(w, w.build), {
       areaLevel: w.plan.areaLevel,
@@ -50,14 +50,14 @@ export function characterWith(w: World, counts: ChargeCounts): Character {
       ],
       charges: counts,
     });
-    w.chars.set(k, ch);
+    s.chars.set(k, ch);
   }
   return ch;
 }
 
 /** Make the character match the charges now held. */
 function swap(w: World, s: Side, counts: ChargeCounts): void {
-  const next = characterWith(w, counts);
+  const next = characterWith(w, s, counts);
   if (next === w.char) return;
   w.char = next;
   w.primary = next.primary;
@@ -70,8 +70,8 @@ export function gainTrophy(w: World, s: Side, modIds: readonly string[]): void {
   let changed = false;
   for (const id of modIds) {
     if (!TROPHY_MODS[id as keyof typeof TROPHY_MODS]) continue;
-    if (!(id in w.trophy)) changed = true;
-    w.trophy[id] = TROPHY_SECONDS;
+    if (!(id in s.trophy)) changed = true;
+    s.trophy[id] = TROPHY_SECONDS;
   }
   if (changed) swap(w, s, { ...w.char.charges });
 }
@@ -80,7 +80,7 @@ export function gainTrophy(w: World, s: Side, modIds: readonly string[]): void {
 export function gainCharge(w: World, s: Side, kind: ChargeKind): void {
   const have = w.char.charges;
   const max = w.char.chargeMax[kind];
-  w.chargeT[kind] = CHARGE_SECONDS * w.char.db.mult(`chargeDuration.${kind}`);
+  s.chargeT[kind] = CHARGE_SECONDS * w.char.db.mult(`chargeDuration.${kind}`);
   if (have[kind] >= max) return;
   swap(w, s, { ...have, [kind]: have[kind] + 1 });
   w.events.push({ t: 'charge', kind, count: w.char.charges[kind] });
@@ -91,7 +91,7 @@ export function spendCharges(w: World, s: Side, kind: ChargeKind, n: number): bo
   const have = w.char.charges;
   if (have[kind] < n) return false;
   swap(w, s, { ...have, [kind]: have[kind] - n });
-  if (w.char.charges[kind] === 0) w.chargeT[kind] = 0;
+  if (w.char.charges[kind] === 0) s.chargeT[kind] = 0;
   w.events.push({ t: 'spend', kind, n });
   return true;
 }
@@ -115,17 +115,17 @@ export function rollCharges(
 /** Run down the timers; a kind whose timer ends loses every charge. */
 export function tickCharges(w: World, s: Side, dt: number): void {
   let counts: ChargeCounts | null = null;
-  for (const id of Object.keys(w.trophy)) {
-    w.trophy[id] -= dt;
-    if (w.trophy[id] <= 0) {
-      delete w.trophy[id];
+  for (const id of Object.keys(s.trophy)) {
+    s.trophy[id] -= dt;
+    if (s.trophy[id] <= 0) {
+      delete s.trophy[id];
       counts = counts ?? { ...w.char.charges };
     }
   }
   for (const kind of CHARGE_KINDS) {
-    if (w.chargeT[kind] <= 0) continue;
-    w.chargeT[kind] -= dt;
-    if (w.chargeT[kind] <= 0) {
+    if (s.chargeT[kind] <= 0) continue;
+    s.chargeT[kind] -= dt;
+    if (s.chargeT[kind] <= 0) {
       counts = counts ?? { ...w.char.charges };
       counts[kind] = 0;
     }
@@ -134,8 +134,8 @@ export function tickCharges(w: World, s: Side, dt: number): void {
 }
 
 /** Register the world's starting character, so returning to no charges does not rebuild it. */
-export function seedCharacters(w: World): void {
-  w.chars.set(key(w.char.charges, trophyIds(w)), w.char);
+export function seedCharacters(w: World, s: Side): void {
+  s.chars.set(key(w.char.charges, trophyIds(s)), w.char);
 }
 
 /** What the Unmaker holds changed: the character as it now is (its charges kept). */
@@ -144,9 +144,9 @@ export function rebuildForTheft(w: World, s: Side): void {
 }
 
 /** After the build changes (a level up): rebuild for the charges now held. */
-export function rebuildCharacter(w: World): void {
+export function rebuildCharacter(w: World, s: Side): void {
   const counts = { ...w.char.charges };
-  w.chars.clear();
-  w.char = characterWith(w, counts);
+  s.chars.clear();
+  w.char = characterWith(w, s, counts);
   w.primary = w.char.primary;
 }

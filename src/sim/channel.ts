@@ -5,6 +5,7 @@ import { orbUse, releaseGhost, releaseZaps } from './fields';
 import { scaleProfile } from './shots';
 import { scatterSpores } from './skillFx';
 import type { Action, Actor, World } from './types';
+import type { Side } from './side';
 
 /**
  * Channelling (docs/SPIRIT.md S5). A channelled skill is used again and again while there is something to hit; each use pays its
@@ -170,7 +171,7 @@ export function stackedUse(w: World, a: Actor, act: Action): void {
 }
 
 /** Every step: a channel that has gone quiet is released; a stun breaks it. */
-export function tickChannel(w: World): void {
+export function tickChannel(w: World, s: Side): void {
   const sk = w.stacks;
   if (sk && sk.n > 0) {
     // With nothing hit for a while the stages go, one at a time.
@@ -187,15 +188,15 @@ export function tickChannel(w: World): void {
   // Infusion: after channelling a while it is held; it stays six seconds after the channel is over.
   if (w.infusing) {
     if (!st || st.key !== w.infusing) {
-      w.buffT.infusion = 6;
+      s.buffT.infusion = 6;
       w.infusing = null;
-    } else w.buffT.infusion = 6;
+    } else s.buffT.infusion = 6;
   }
   if (!st) return;
   const p = w.player;
   if (st.profile.infuse && !w.infusing && w.t - st.startT >= st.profile.infuse.after) {
     w.infusing = st.key;
-    w.buffT.infusion = 6;
+    s.buffT.infusion = 6;
   }
   if (p.stunT > 0 || p.ail.freezeT > 0) {
     // Stunned or frozen, the stages are lost, and the orbs of a storm are let go.

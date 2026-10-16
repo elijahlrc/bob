@@ -62,24 +62,24 @@ export function utilityPick(
   const ch = w.char;
   const c = e.choice;
   const p = w.player;
-  if ((w.utilityReady[c.key] ?? 0) > w.t) return null;
+  if ((s.utilityReady[c.key] ?? 0) > w.t) return null;
   const u = c.skill.utility!;
   // The warcries wait on one another (3.9: a shared four seconds).
-  if (c.skill.tags.includes('warcry') && (w.utilityReady[WARCRIES] ?? 0) > w.t) return null;
+  if (c.skill.tags.includes('warcry') && (s.utilityReady[WARCRIES] ?? 0) > w.t) return null;
   // The guard skills wait on one another (3.9).
-  if (u.kind === 'buff' && u.policy === 'guard' && (w.utilityReady[GUARDS] ?? 0) > w.t) return null;
+  if (u.kind === 'buff' && u.policy === 'guard' && (s.utilityReady[GUARDS] ?? 0) > w.t) return null;
   const d = Math.hypot(target.x - p.x, target.y - p.y);
   const prof = ch.profile(c, playerConds(w, target), flaskMask(w, s));
   if (!canPay(w, c.costsLife, prof.cost)) return null;
   if (e.role === 'auto') return autoPick(w, s, c, prof, target, d);
-  if (e.role === 'opener' && !openerDue(w, s, c.key, target)) return null;
+  if (e.role === 'opener' && !openerDue(s, c.key, target)) return null;
   if (e.role === 'emergency' && p.life >= p.def.maxLife * e.life) return null;
   if (e.role === 'escape' && !wantsOut(w, e)) return null;
   const near = (r: number) => enemiesNear(w, p.x, p.y, r).length >= 1;
   if (u.kind === 'buff') {
     if (d > CAST_RANGE + 1 || !near(PACK_RADIUS)) return null;
-    if (u.rage && w.rage < u.rage.min) return null;
-    if (w.buffT[u.buff] > prof.useTime + 0.3) return null;
+    if (u.rage && s.rage < u.rage.min) return null;
+    if (s.buffT[u.buff] > prof.useTime + 0.3) return null;
     return { choice: c, prof, cd: u.cooldown ?? 0.5 };
   }
   if (u.kind === 'shout') {
@@ -94,13 +94,13 @@ export function utilityPick(
     return { choice: c, prof, cd: 0.5 };
   }
   if (u.kind === 'summon') {
-    if (c.skill.cooldown !== undefined && !skillReady(w, c)) return null;
+    if (c.skill.cooldown !== undefined && !skillReady(w, s, c)) return null;
     if (d > CAST_RANGE + 6 || minionCount(w, c.key) >= summonCount(c, prof)) return null;
     return { choice: c, prof, cd: summonRespawn(c) };
   }
   if (u.kind === 'blink') {
-    if (c.skill.cooldown !== undefined && !skillReady(w, c)) return null;
-    if (blinkGroupBusy(w, c) || !near(5)) return null;
+    if (c.skill.cooldown !== undefined && !skillReady(w, s, c)) return null;
+    if (blinkGroupBusy(w, s, c) || !near(5)) return null;
     return { choice: c, prof, cd: u.cooldown };
   }
   return null;
@@ -125,17 +125,17 @@ export function wantsOut(
 }
 
 /** An opener is due on its first use of a fight, and on a rare or boss target it has not yet been used on. */
-export function openerDue(w: World, s: Side, key: string, target: Actor): boolean {
-  const o = w.openers[key];
+export function openerDue(s: Side, key: string, target: Actor): boolean {
+  const o = s.openers[key];
   if (!o || o.fight !== s.ai.fight) return true;
   return isBig(target) && !o.ids.includes(target.id);
 }
 
 /** An opener has been used against this target. */
-export function markOpened(w: World, s: Side, key: string, target: Actor): void {
-  const o = w.openers[key];
+export function markOpened(s: Side, key: string, target: Actor): void {
+  const o = s.openers[key];
   const ids = o && o.fight === s.ai.fight ? o.ids : [];
-  w.openers[key] = { fight: s.ai.fight, ids: [...ids.slice(-15), target.id] };
+  s.openers[key] = { fight: s.ai.fight, ids: [...ids.slice(-15), target.id] };
 }
 
 /** A utility skill's own judgement (the `auto` role), ahead of the damage skills by default (COVERAGE 5.1). */
@@ -157,9 +157,9 @@ function autoPick(
   if (u.kind === 'buff') {
     if (d > CAST_RANGE + 1) return null;
     // Berserk needs rage to start; Blood Rage is not begun on low life.
-    if (u.rage && w.rage < u.rage.min) return null;
+    if (u.rage && s.rage < u.rage.min) return null;
     if (u.degen && p.life < p.def.maxLife * 0.6) return null;
-    const left = w.buffT[u.buff];
+    const left = s.buffT[u.buff];
     if (left > prof.useTime + 0.3) return null;
     if (u.policy === 'guard') {
       const hit = p.life / Math.max(1, p.def.maxLife) < GUARD_LIFE;
@@ -199,7 +199,7 @@ function autoPick(
     return { choice: c, prof, cd: 0.5 };
   }
   if (u.kind === 'summon') {
-    if (c.skill.cooldown !== undefined && !skillReady(w, c)) return null;
+    if (c.skill.cooldown !== undefined && !skillReady(w, s, c)) return null;
     // A spectre needs a corpse to raise.
     if ((u.corpse || u.corpseCost) && !corpseNear(w, p.x, p.y, CAST_RANGE)) return null;
     // A decoy goes up when a pack closes in, or life runs low.
@@ -217,8 +217,8 @@ function autoPick(
   // A blink closes the gap to a target the primary skill cannot reach yet; one with an effect where it leaves or lands is also
   // used when that would fall on a pack, and Withering Step to run through a pack (the character then makes no attack while it lasts).
   if (u.kind !== 'blink') return null;
-  if (c.skill.cooldown !== undefined && !skillReady(w, c)) return null;
-  if (blinkGroupBusy(w, c)) return null;
+  if (c.skill.cooldown !== undefined && !skillReady(w, s, c)) return null;
+  if (blinkGroupBusy(w, s, c)) return null;
   // A blink to get away is used when hurt with enemies about, or when a pack has closed in.
   if (u.escape) {
     const hurt = p.life < p.def.maxLife * 0.7 && enemiesNear(w, p.x, p.y, 5).length >= 1;
@@ -245,7 +245,7 @@ function autoPick(
     u.burst === 'arrive' && gap && enemiesNear(w, target.x, target.y, radius * 1.3).length >= 2;
   const fight =
     !!u.elusive &&
-    w.buffT.elusive <= 0 &&
+    s.buffT.elusive <= 0 &&
     d <= CAST_RANGE &&
     enemiesNear(w, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE;
   if (u.warp && w.warp) return null;
@@ -281,9 +281,9 @@ const burnOff = new WeakSet<World>();
 export function tickAuraBurn(w: World, s: Side, dt: number): void {
   const b = w.char.burn;
   if (b.pct <= 0 && b.self <= 0) return;
-  w.auraBurnT += dt;
-  if (w.auraBurnT < BURN_EVERY) return;
-  w.auraBurnT -= BURN_EVERY;
+  s.auraBurnT += dt;
+  if (s.auraBurnT < BURN_EVERY) return;
+  s.auraBurnT -= BURN_EVERY;
   const p = w.player;
   if (!p.alive) return;
   const frac = p.life / Math.max(1, p.def.maxLife);
@@ -314,7 +314,7 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
   const c = w.char.utilities.find((x) => x.skill.id === act.profile.skill.id);
   const u = c?.skill.utility;
   if (!c || !u) return;
-  if (c.skill.tags.includes('warcry')) w.utilityReady[WARCRIES] = w.t + WARCRY_SECONDS;
+  if (c.skill.tags.includes('warcry')) a.side!.utilityReady[WARCRIES] = w.t + WARCRY_SECONDS;
   if (u.kind === 'shout') {
     w.events.push({ t: 'cry', x: a.x, y: a.y, r: u.radius });
     const near = enemiesNear(w, a.x, a.y, u.radius);
@@ -332,49 +332,49 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     return;
   }
   if (u.kind === 'buff' && u.banner) {
-    useBanner(w, c, act.profile);
+    useBanner(w, a.side!, c, act.profile);
     return;
   }
   if (u.kind === 'buff') {
-    const before = w.buffT[u.buff];
+    const before = a.side!.buffT[u.buff];
     // Berserk lasts as long as the rage does, and its cooldown waits for the end.
     if (u.rage) {
-      w.berserkT = 0.001;
-      w.buffT[u.buff] = 1e9;
-      w.utilityReady[c.key] = 1e9;
+      a.side!.berserkT = 0.001;
+      a.side!.buffT[u.buff] = 1e9;
+      a.side!.utilityReady[c.key] = 1e9;
       w.events.push({ t: 'buff', id: u.buff });
       return;
     }
-    gainBuff(w, u.buff);
-    if (u.second) gainBuff(w, u.second.buff);
+    gainBuff(w, a.side!, u.buff);
+    if (u.second) gainBuff(w, a.side!, u.second.buff);
     if (u.shell) startShell(w, u.buff, u.shell, c.skill.level, act.profile);
     // The charges a guard spends make it last longer and take more of the physical damage away.
     let spent = 0;
     if (u.consume) {
       spent = Math.min(u.consume.max, w.char.charges[u.consume.charge]);
       if (spent > 0) spendCharges(w, a.side!, u.consume.charge, spent);
-      w.guard = {
+      a.side!.guard = {
         buff: u.buff,
         physMult: Math.pow(1 - u.consume.physLess / 100, spent),
       };
     }
     // The buff's own length is the gem's: a utility buff lasts as long as its gem says.
     const length = u.seconds * (1 + ((u.consume?.durationPct ?? 0) / 100) * spent);
-    w.buffT[u.buff] = Math.max(
+    a.side!.buffT[u.buff] = Math.max(
       before,
       length * w.char.db.mult('buffDuration') * act.profile.skillDuration,
     );
-    if (u.second) w.buffT[u.second.buff] = Math.max(0, w.buffT[u.buff]);
+    if (u.second) a.side!.buffT[u.second.buff] = Math.max(0, a.side!.buffT[u.buff]);
     // A guard's cooldown does not run while it lasts, and the other guards wait out the same time.
     if (u.policy === 'guard') {
-      const until = w.t + w.buffT[u.buff] + (u.cooldown ?? 0);
-      w.utilityReady[GUARDS] = until;
-      w.utilityReady[c.key] = until;
+      const until = w.t + a.side!.buffT[u.buff] + (u.cooldown ?? 0);
+      a.side!.utilityReady[GUARDS] = until;
+      a.side!.utilityReady[c.key] = until;
     }
     return;
   }
   if (u.kind === 'offering') {
-    castOffering(w, c);
+    castOffering(w, a.side!, c);
     return;
   }
   if (u.kind === 'summon') {

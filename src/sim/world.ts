@@ -200,6 +200,34 @@ export function createWorld(inp: CreateWorldInput): World {
       godMode: inp.opts?.godMode,
       reprieves: inp.opts?.reprieves,
     },
+    chargeT: { grit: 0, fervour: 0, insight: 0 },
+    buffT: {
+      ...Object.fromEntries(BUFF_IDS.map((id) => [id, 0])),
+      // Everyone starts in the Blood stance.
+      bloodStance: 1e9,
+    } as Record<BuffId, number>,
+    rage: 0,
+    rageT: 0,
+    rageDrain: 0,
+    rageGainT: -1,
+    trophy: {},
+    trig: {
+      cooldown: {},
+      taken: {},
+      next: {},
+      busy: false,
+      explosions: 0,
+      queue: [],
+      draining: false,
+    },
+    secondaryReady: {},
+    guard: null,
+    cooldowns: {},
+    utilityReady: {},
+    openers: {},
+    auraBurnT: 0,
+    berserkT: 0,
+    chars: new Map(),
   };
   player.side = side;
   const w: World = {
@@ -212,35 +240,9 @@ export function createWorld(inp: CreateWorldInput): World {
     rngAi: root.fork('ai'),
     rngLoot: root.fork('loot'),
     rngTrig: root.fork('trigger'),
-    chargeT: { grit: 0, fervour: 0, insight: 0 },
-    buffT: {
-      ...Object.fromEntries(BUFF_IDS.map((id) => [id, 0])),
-      // Everyone starts in the Blood stance.
-      bloodStance: 1e9,
-    } as Record<BuffId, number>,
-    rage: 0,
-    rageT: 0,
-    rageDrain: 0,
-    chars: new Map(),
-    trophy: {},
-    secondaryReady: {},
-    cooldowns: {},
-    guard: null,
-    utilityReady: {},
-    openers: {},
-    auraBurnT: 0,
     deployables: [],
     deploySeq: 0,
     minions: [],
-    trig: {
-      cooldown: {},
-      taken: {},
-      next: {},
-      busy: false,
-      explosions: 0,
-      queue: [],
-      draining: false,
-    },
     actors: [player],
     player,
     nextId: 2,
@@ -251,7 +253,6 @@ export function createWorld(inp: CreateWorldInput): World {
     warp: null,
     wither: null,
     caught: null,
-    berserkT: 0,
     offering: null,
     uses: {},
     intensity: {},
@@ -272,7 +273,6 @@ export function createWorld(inp: CreateWorldInput): World {
     surgeMana: 0,
     relicRegen: { t: 0, me: 0, minions: 0 },
     relicT: -1,
-    rageGainT: -1,
     trailT: 0,
     vortex: null,
     markers: [],
@@ -329,7 +329,7 @@ export function createWorld(inp: CreateWorldInput): World {
     if (s.hold || abilitiesOf(s.spec.type).some((x) => x.id === 'ambush')) a.hold = true;
     if (s.patrol) a.patrol = s.patrol.map((p) => ({ ...p }));
   }
-  seedCharacters(w);
+  seedCharacters(w, side);
   return w;
 }
 
@@ -340,7 +340,7 @@ function levelUp(w: World, s: Side): void {
   const mf = p.def.maxMana > 0 ? p.mana / p.def.maxMana : 1;
   const ef = p.def.maxEs > 0 ? p.es / p.def.maxEs : 1;
   w.build = { ...w.build, level: w.build.level + 1 };
-  rebuildCharacter(w);
+  rebuildCharacter(w, s);
   s.flasks.forEach((f, i) => {
     if (w.char.flasks[i]) f.spec = w.char.flasks[i];
   });
@@ -401,7 +401,7 @@ function useFlask(w: World, side: Side, i: number): void {
     recompute(p);
   }
   w.events.push({ t: 'flaskUsed', idx: i });
-  rollGains(w, 'flask');
+  rollGains(w, side, 'flask');
 }
 
 function tickFlasks(w: World, s: Side, dt: number, policy: FlaskPolicy): void {
@@ -624,10 +624,10 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   const p = w.player;
   for (const s of w.sides) refreshPlayerDefence(w, s);
   tickHoldout(w);
-  tickTriggers(w, dt);
+  for (const s of w.sides) tickTriggers(w, s, dt);
   for (const s of w.sides) tickCharges(w, s, dt);
-  tickCooldowns(w, dt);
-  tickBuffs(w, dt);
+  for (const s of w.sides) tickCooldowns(w, s, dt);
+  for (const s of w.sides) tickBuffs(s, dt);
   for (const s of w.sides) tickAuraBurn(w, s, dt);
   for (const s of w.sides) tickDeployables(w, s, dt);
   tickMinions(w, dt);
@@ -655,15 +655,15 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   }
   tickPackPlays(w, dt);
   tickShots(w);
-  tickChannel(w);
-  tickFields(w, dt);
-  tickBanner(w, dt);
+  for (const s of w.sides) tickChannel(w, s);
+  for (const s of w.sides) tickFields(w, s, dt);
+  for (const s of w.sides) tickBanner(w, s, dt);
   tickWarp(w, dt);
-  tickWither(w);
+  for (const s of w.sides) tickWither(w, s);
   tickCaught(w, dt);
-  tickStance(w);
-  tickBerserk(w, dt);
-  tickDegen(w, dt);
+  for (const s of w.sides) tickStance(w, s);
+  for (const s of w.sides) tickBerserk(w, s, dt);
+  for (const s of w.sides) tickDegen(w, s, dt);
   tickOffering(w, dt);
   tickLegion(w, dt);
   for (const s of w.sides) tickSupports(w, s, dt);

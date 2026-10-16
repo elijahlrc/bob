@@ -79,7 +79,7 @@ describe('strength and weapons (firmHold, steelResolve, knifeRange, veilCut, sha
   it('a hit with Close Combat gives Combat Rush', () => {
     const { world: w } = world(['crushingBlow', 'knifeRange'], 1.4, 'sword_3', STR);
     run(w, 3);
-    expect(w.buffT.combatRush).toBeGreaterThan(0);
+    expect(w.sides[0].buffT.combatRush).toBeGreaterThan(0);
   });
 
   it('Shockwave: a melee hit sets off a shockwave on the others around, one a second', () => {
@@ -102,13 +102,13 @@ describe('strength and weapons (firmHold, steelResolve, knifeRange, veilCut, sha
     let got = false;
     for (let i = 0; i < 30 * 60 && !got; i++) {
       stepWorld(w);
-      got = w.buffT.elusive > 0;
+      got = w.sides[0].buffT.elusive > 0;
     }
     expect(got).toBe(true);
-    const left = w.buffT.elusive;
+    const left = w.sides[0].buffT.elusive;
     run(w, 1);
     // Not renewed to full by the crits that follow.
-    expect(w.buffT.elusive).toBeLessThanOrEqual(left);
+    expect(w.sides[0].buffT.elusive).toBeLessThanOrEqual(left);
   });
 });
 
@@ -274,7 +274,7 @@ describe('Energy Leech, Mirage Archer, Inspiration, Infused Channelling', () => 
   it('Infused Channelling: after a while of channelling you are Infused', () => {
     const { world: w } = world(['flurryOfEdges', 'chargedBreath'], 1.4, 'sword_3', DEX);
     run(w, 3);
-    expect(w.buffT.infusion).toBeGreaterThan(0);
+    expect(w.sides[0].buffT.infusion).toBeGreaterThan(0);
   });
 });
 

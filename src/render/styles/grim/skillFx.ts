@@ -1392,7 +1392,7 @@ export class SkillFx {
     if (!p.alive) return;
     const marks: BuffMark[] = [];
     for (const id of BUFF_IDS) {
-      const left = w.buffT[id];
+      const left = w.sides[0].buffT[id];
       if (left <= 0) continue;
       // A buff about to end blinks.
       marks.push({ id, alpha: left < 1.5 ? 0.4 + 0.6 * Math.abs(Math.sin(time * 8)) : 1 });

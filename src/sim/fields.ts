@@ -11,6 +11,7 @@ import { hit, lifeCap, rawHit } from './combat';
 import { creepToward } from './skillFx';
 import { scaleProfile } from './shots';
 import type { Action, Actor, World } from './types';
+import type { Side } from './side';
 
 /**
  * Lasting ground the player's skills leave, and the things that stand in the world and do their work from there
@@ -480,7 +481,7 @@ export function fieldKill(w: World, dead: Actor): void {
 }
 
 /** Run the fields: they pulse, they grow, they end. */
-export function tickFields(w: World, dt: number): void {
+export function tickFields(w: World, s: Side, dt: number): void {
   if (w.fields.length === 0) return;
   const p = w.player;
   let j = 0;
@@ -561,7 +562,7 @@ export function tickFields(w: World, dt: number): void {
       continue;
     }
     if (f.kind === 'bladestorm') {
-      tickBladestorm(w, f, dt);
+      tickBladestorm(w, s, f, dt);
       if (f.t > 0) w.fields[j++] = f;
       continue;
     }

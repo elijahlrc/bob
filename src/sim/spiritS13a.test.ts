@@ -197,7 +197,7 @@ describe('strikes with a second effect (thunderRebuke, primalStrike, primeSplash
     }
     expect(near.life).toBeLessThan(1e9);
     expect(far.life).toBe(1e9);
-    expect(w.buffT.smiteAura).toBeGreaterThan(0);
+    expect(w.sides[0].buffT.smiteAura).toBeGreaterThan(0);
     const lit = w.char.profile(w.primary, playerConds(w, dummy));
     expect(
       lit.hands[0].chunks.filter((c) => c.type === 1).reduce((s, c) => s + c.max, 0),
@@ -370,7 +370,7 @@ describe('shield and charge skills (snagLash, bulwarkRush, ghostShard)', () => {
       nearest = Math.min(nearest, Math.hypot(dummy.x - w.player.x, dummy.y - w.player.y));
     }
     expect(nearest).toBeLessThan(2.6);
-    expect(w.rage).toBeGreaterThan(0);
+    expect(w.sides[0].rage).toBeGreaterThan(0);
     const calm = w.char.profile(w.primary, 0, 0);
     const raging = w.char.profile(w.primary, 0, 20 << DYN_SHIFT);
     expect(raging.radiusMult).toBeGreaterThan(calm.radiusMult);
@@ -641,7 +641,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     for (let i = 0; i < 60 && w.fields.length === 0; i++) stepWorld(w);
     expect(Math.hypot(w.player.x - start.x, w.player.y - start.y)).toBeGreaterThan(2.5);
     expect(w.fields.filter((f) => f.kind === 'smoke')).toHaveLength(2);
-    expect(w.buffT.smokeScreen).toBeGreaterThan(0);
+    expect(w.sides[0].buffT.smokeScreen).toBeGreaterThan(0);
     // Enemies in the smoke are blinded.
     const smoke = w.fields.find((f) => f.kind === 'smoke')!;
     dummy.x = smoke.x;
@@ -683,7 +683,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     expect(w.shell!.taken).toBeGreaterThan(1);
     dummy.life = 1e9;
     const before = dummy.life;
-    w.buffT.moltenGuard = 0;
+    w.sides[0].buffT.moltenGuard = 0;
     stepWorld(w);
     expect(w.shell).toBeNull();
     expect(dummy.life).toBeLessThan(before);
@@ -694,16 +694,16 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     // A crowd is what it is used for.
     neighbour(w, dummy.x + 0.5, dummy.y + 1);
     neighbour(w, dummy.x + 0.5, dummy.y - 1);
-    for (let i = 0; i < 60 && w.buffT.phaseRun <= 0; i++) stepWorld(w);
-    expect(w.buffT.phaseRun).toBeGreaterThan(0);
-    expect(w.buffT.phaseStrike).toBeGreaterThan(0);
+    for (let i = 0; i < 60 && w.sides[0].buffT.phaseRun <= 0; i++) stepWorld(w);
+    expect(w.sides[0].buffT.phaseRun).toBeGreaterThan(0);
+    expect(w.sides[0].buffT.phaseStrike).toBeGreaterThan(0);
     // The character runs on without an attack until the speed is over; then it strikes, and the damage lingers a moment.
     const before = dummy.life;
     let ended = false;
     for (let i = 0; i < 60 * 4 && !ended; i++) {
       stepWorld(w);
-      if (w.buffT.phaseRun > 0) expect(dummy.life).toBe(before);
-      if (w.buffT.phaseRun === 0) ended = true;
+      if (w.sides[0].buffT.phaseRun > 0) expect(dummy.life).toBe(before);
+      if (w.sides[0].buffT.phaseRun === 0) ended = true;
     }
     expect(ended).toBe(true);
   });
@@ -799,7 +799,7 @@ describe('repairs from the fresh audit (S14)', () => {
     const { world: w, dummy } = world(['twinSlash'], 1.2, 'sword_3', DEX);
     const blood = w.char.profile(w.primary, 0);
     expect(blood.bleed.chance).toBeGreaterThan(0);
-    w.buffT.sandStance = 5;
+    w.sides[0].buffT.sandStance = 5;
     const sand = w.char.profile(w.primary, playerConds(w, dummy));
     expect(sand.bleed.chance).toBe(0);
     expect(sand.radiusMult).toBeGreaterThan(blood.radiusMult);
@@ -811,7 +811,7 @@ describe('repairs from the fresh audit (S14)', () => {
     w.surgeMana = 300;
     for (let i = 0; i < 60 * 10; i++) {
       stepWorld(w);
-      surge = Math.max(surge, w.buffT.arcaneSurge);
+      surge = Math.max(surge, w.sides[0].buffT.arcaneSurge);
     }
     expect(surge).toBeGreaterThan(0);
     const z = world(['crushingBlow', 'raiseHusk'], 3, 'sword_3', STR);
@@ -840,8 +840,8 @@ describe('repairs from the fresh audit (S14)', () => {
     void near;
     run(fy.world, 2);
     // At most one point per 0.4 s: five in two seconds.
-    expect(fy.world.rage).toBeLessThanOrEqual(6);
-    expect(fy.world.rage).toBeGreaterThan(0);
+    expect(fy.world.sides[0].rage).toBeLessThanOrEqual(6);
+    expect(fy.world.sides[0].rage).toBeGreaterThan(0);
   });
 });
 

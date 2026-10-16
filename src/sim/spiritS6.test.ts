@@ -293,7 +293,7 @@ describe('banners (standardOfValour, standardOfDread)', () => {
     expect(world.banner!.placed).toBe(false);
     expect(reservedMana(world)).toBeGreaterThan(world.char.reservedMana);
     for (let i = 0; i < 30; i++) stepWorld(world);
-    expect(world.buffT.warBanner).toBeGreaterThan(0);
+    expect(world.sides[0].buffT.warBanner).toBeGreaterThan(0);
     expect(dummy.fx.scarred).toBeDefined();
   });
 
@@ -314,7 +314,7 @@ describe('banners (standardOfValour, standardOfDread)', () => {
     while (!b.placed && guard++ < 10 * 60) stepWorld(world);
     expect(b.placed).toBe(true);
     expect(b.radius).toBeGreaterThan(r0);
-    expect(world.buffT.adrenaline).toBeGreaterThan(0);
+    expect(world.sides[0].buffT.adrenaline).toBeGreaterThan(0);
     // Mana is free again, and the banner ends in time.
     expect(reservedMana(world)).toBe(world.char.reservedMana);
     const left = Math.ceil((b.t + 1) * 60);
@@ -362,7 +362,7 @@ describe('banners (standardOfValour, standardOfDread)', () => {
     for (let i = 0; i < 30; i++) stepWorld(world);
     expect(near.fx.scarred).toBeDefined();
     expect(far.fx.scarred).toBeUndefined();
-    expect(world.buffT.warBanner).toBe(0);
+    expect(world.sides[0].buffT.warBanner).toBe(0);
   });
 
   it('the dread banner takes its stages from impales, five a second at most, and unnerves enemies', () => {

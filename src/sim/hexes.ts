@@ -16,6 +16,7 @@ import { lifeCap } from './combat';
 import { bossOfType } from '../data/bosses';
 import { flaskWards } from './afflict';
 import type { Actor, World } from './types';
+import type { Side } from './side';
 
 /**
  * Hexes in the sim (EXPANSION 5.7). A hex is a debuff on an actor with an effect value, lasting 6 seconds and
@@ -96,12 +97,12 @@ export function monsterHexesPlayer(w: World, id: HexId, effect: number): void {
 }
 
 /** The player's attack hits an enemy under a hex that gives something back on each hit (Mark of Plenty: life and mana). */
-export function hexHit(w: World, dst: Actor, melee = false): void {
+export function hexHit(w: World, s: Side, dst: Actor, melee = false): void {
   if (dst.hexes.length === 0 || dst.isPlayer) return;
   const p = w.player;
   for (const h of dst.hexes) {
     const def = HEXES[h.id];
-    if (melee && def.meleeBuff) gainBuff(w, def.meleeBuff);
+    if (melee && def.meleeBuff) gainBuff(w, s, def.meleeBuff);
     const give = def.onHit;
     if (!give) continue;
     if (give.life) p.life = Math.min(lifeCap(w, p), p.life + atLevel(give.life, h.level));

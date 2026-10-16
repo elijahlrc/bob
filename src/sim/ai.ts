@@ -250,7 +250,7 @@ function chooseSkill(w: World, s: Side, target: Actor): Pick {
   const conds = playerConds(w, target);
   const p = w.player;
   const usable = (c: SkillChoice, prof: SkillProfile): boolean =>
-    skillReady(w, c) &&
+    skillReady(w, s, c) &&
     canHurt(prof, target.def) &&
     canPay(w, c.costsLife, prof.cost) &&
     !deployFull(w, c, prof) &&
@@ -274,10 +274,10 @@ function chooseSkill(w: World, s: Side, target: Actor): Pick {
     if (
       e.role === 'periodic' &&
       c.skill.cooldown === undefined &&
-      (w.secondaryReady[c.key] ?? 0) > w.t
+      (s.secondaryReady[c.key] ?? 0) > w.t
     )
       continue;
-    if (e.role === 'opener' && !openerDue(w, s, c.key, target)) continue;
+    if (e.role === 'opener' && !openerDue(s, c.key, target)) continue;
     if (e.role === 'emergency' && p.life >= p.def.maxLife * e.life) continue;
     const prof = w.char.profile(c, conds, flaskMask(w, s));
     if (e.role === 'keepUp' && debuffHolds(prof, target)) continue;
@@ -477,7 +477,7 @@ export function playerAI(w: World, s: Side, dt: number): void {
   }
   if (target && target.id === ai.skipId && w.t < ai.skipUntil) target = undefined;
   // Withering Step and Phase Run are run in: no attack until they are over (a skill used would end them).
-  if (target && running(w)) target = undefined;
+  if (target && running(w, s)) target = undefined;
   if (target) {
     // Stall breaker: a target that takes no damage for a long time is dropped for a while, so the
     // run moves on (and the monster, if it is chasing, comes to the player instead).
@@ -505,9 +505,9 @@ export function playerAI(w: World, s: Side, dt: number): void {
     const { which, prof, costsLife, choice, entry } = pick;
     if (which === 'utility') {
       payCost(w, costsLife, prof.cost);
-      w.utilityReady[choice.key] = w.t + pick.cd;
+      s.utilityReady[choice.key] = w.t + pick.cd;
       useSkill(w, s, choice);
-      if (entry?.role === 'opener') markOpened(w, s, choice.key, target);
+      if (entry?.role === 'opener') markOpened(s, choice.key, target);
       startAction(w, p, 'utility', prof, target);
       return;
     }
@@ -535,9 +535,9 @@ export function playerAI(w: World, s: Side, dt: number): void {
     if (inRange) {
       if (which === 'primary' || which === 'secondary') payCost(w, costsLife, prof.cost);
       if (entry?.role === 'periodic' && choice.skill.cooldown === undefined)
-        w.secondaryReady[choice.key] = w.t + w.char.cooldownOf(choice, playerConds(w, target));
+        s.secondaryReady[choice.key] = w.t + w.char.cooldownOf(choice, playerConds(w, target));
       if (which === 'primary' || which === 'secondary') useSkill(w, s, choice);
-      if (entry?.role === 'opener') markOpened(w, s, choice.key, target);
+      if (entry?.role === 'opener') markOpened(s, choice.key, target);
       startAction(w, p, which, prof, target);
       return;
     }
@@ -805,7 +805,8 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     if (m.noticeT <= 0) {
       m.noticeT = 0.25;
       // Phase Run halves how far the character is noticed from.
-      const seen = (senseOf(m).aggro ?? MONSTER_AGGRO) * (w.buffT.phaseRun > 0 ? 0.5 : 1);
+      const seen =
+        (senseOf(m).aggro ?? MONSTER_AGGRO) * (w.player.side!.buffT.phaseRun > 0 ? 0.5 : 1);
       if (d <= seen && w.grid.los(m.x, m.y, p.x, p.y)) {
         m.state = 'chase';
         m.lostT = 0;
@@ -985,7 +986,7 @@ export function separate(w: World): void {
       }
     }
     // Player vs monster: the monster yields most of the overlap; under Phase Run the character passes through.
-    if (w.buffT.phaseRun > 0) continue;
+    if (w.player.side!.buffT.phaseRun > 0) continue;
     const dx = a.x - p.x;
     const dy = a.y - p.y;
     const rr = a.r + p.r;

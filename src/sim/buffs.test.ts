@@ -33,14 +33,14 @@ function arena(extra: Mod[] = [], gems?: string[]) {
 
 const SECOND = 60;
 function run(w: ReturnType<typeof arena>['w'], seconds: number) {
-  for (let i = 0; i < seconds * SECOND; i++) tickBuffs(w, 1 / SECOND);
+  for (let i = 0; i < seconds * SECOND; i++) tickBuffs(w.sides[0], 1 / SECOND);
 }
 
 describe('buffs: conditions with timers (C2)', () => {
   it('cannot be gained without a source, and their mods are not in the database', () => {
     const { w } = arena();
-    gainBuff(w, 'fortify');
-    expect(w.buffT.fortify).toBe(0);
+    gainBuff(w, w.sides[0], 'fortify');
+    expect(w.sides[0].buffT.fortify).toBe(0);
     expect(w.char.buffSource.fortify).toBe(false);
   });
 
@@ -49,15 +49,15 @@ describe('buffs: conditions with timers (C2)', () => {
     expect(w.char.buffSource.fortify).toBe(true);
     const plain = p.def.hitTakenMult;
     expect(plain).toBe(1);
-    rollGains(w, 'hit');
-    expect(w.buffT.fortify).toBeCloseTo(4);
+    rollGains(w, w.sides[0], 'hit');
+    expect(w.sides[0].buffT.fortify).toBeCloseTo(4);
     expect(playerConds(w, null) & w.char.cond.peek('fortified')).toBeGreaterThan(0);
     refreshPlayerDefence(w, w.sides[0]);
     expect(p.def.hitTakenMult).toBeCloseTo(0.8);
     expect(p.def.damageTakenMult).toBe(1); // damage over time uses this one
     run(w, 4.1);
     refreshPlayerDefence(w, w.sides[0]);
-    expect(w.buffT.fortify).toBe(0);
+    expect(w.sides[0].buffT.fortify).toBe(0);
     expect(p.def.hitTakenMult).toBe(1);
   });
 
@@ -65,15 +65,15 @@ describe('buffs: conditions with timers (C2)', () => {
     const { w } = arena([mod('buffOn.kill.onslaught', 'base', 50)]);
     let got = 0;
     for (let i = 0; i < 400; i++) {
-      w.buffT.onslaught = 0;
-      rollGains(w, 'kill');
-      if (w.buffT.onslaught > 0) got++;
+      w.sides[0].buffT.onslaught = 0;
+      rollGains(w, w.sides[0], 'kill');
+      if (w.sides[0].buffT.onslaught > 0) got++;
     }
     expect(got).toBeGreaterThan(140);
     expect(got).toBeLessThan(260);
-    w.buffT.onslaught = 1;
-    gainBuff(w, 'onslaught');
-    expect(w.buffT.onslaught).toBeCloseTo(4);
+    w.sides[0].buffT.onslaught = 1;
+    gainBuff(w, w.sides[0], 'onslaught');
+    expect(w.sides[0].buffT.onslaught).toBeCloseTo(4);
   });
 
   it('Quickened: 20% increased attack, cast and movement speed', () => {
@@ -84,7 +84,7 @@ describe('buffs: conditions with timers (C2)', () => {
       flaskMask(w, w.sides[0]),
     ).useTime;
     const speed = p.def.moveSpeed;
-    gainBuff(w, 'onslaught');
+    gainBuff(w, w.sides[0], 'onslaught');
     const conds = playerConds(w, null);
     const after = w.char.profile(w.primary, conds, flaskMask(w, w.sides[0])).useTime;
     expect(after).toBeCloseTo(before / 1.2);
@@ -100,7 +100,7 @@ describe('buffs: conditions with timers (C2)', () => {
         .hands[0].chunks.filter((c) => c.type === 4)
         .reduce((s, c) => s + c.max, 0);
     expect(chaos(playerConds(w, null))).toBe(0);
-    gainBuff(w, 'unholyMight');
+    gainBuff(w, w.sides[0], 'unholyMight');
     expect(chaos(playerConds(w, null))).toBeGreaterThan(0);
   });
 
@@ -108,7 +108,7 @@ describe('buffs: conditions with timers (C2)', () => {
     const { w } = arena([mod('buffOn.hit.arcaneSurge', 'base', 100)], ['flameBolt']);
     const prof = () => w.char.profile(w.primary, playerConds(w, null), flaskMask(w, w.sides[0]));
     const before = prof();
-    gainBuff(w, 'arcaneSurge');
+    gainBuff(w, w.sides[0], 'arcaneSurge');
     const after = prof();
     expect(after.useTime).toBeCloseTo(before.useTime / 1.1);
     expect(after.hands[0].chunks[0].max / before.hands[0].chunks[0].max).toBeCloseTo(1.1);
@@ -120,8 +120,8 @@ describe('rage', () => {
     const { w, p } = arena([mod('rageOn.hit', 'base', 1)]);
     expect(w.char.rageSource).toBe(true);
     const base = w.char.profile(w.primary, 0, flaskMask(w, w.sides[0]));
-    gainRage(w, 20);
-    expect(w.rage).toBe(20);
+    gainRage(w, w.sides[0], 20);
+    expect(w.sides[0].rage).toBe(20);
     const raging = w.char.profile(w.primary, 0, flaskMask(w, w.sides[0]));
     expect(raging.useTime).toBeCloseTo(base.useTime / 1.1);
     const dmg = (x: typeof base) => x.hands[0].chunks.reduce((s, c) => s + c.max, 0);
@@ -132,15 +132,15 @@ describe('rage', () => {
 
   it('is capped at 50, drains one every half second once it has not been fed, and is held by hits', () => {
     const { w } = arena([mod('rageOn.hit', 'base', 1)]);
-    gainRage(w, 80);
-    expect(w.rage).toBe(50);
+    gainRage(w, w.sides[0], 80);
+    expect(w.sides[0].rage).toBe(50);
     run(w, RAGE_HOLD - 0.5);
-    expect(w.rage).toBe(50);
+    expect(w.sides[0].rage).toBe(50);
     run(w, 0.5 + 2.1);
-    expect(w.rage).toBe(46);
-    rollGains(w, 'hitTaken');
+    expect(w.sides[0].rage).toBe(46);
+    rollGains(w, w.sides[0], 'hitTaken');
     run(w, RAGE_HOLD - 0.5);
-    expect(w.rage).toBe(46);
+    expect(w.sides[0].rage).toBe(46);
   });
 
   it('a hit landed feeds it', () => {
@@ -149,7 +149,7 @@ describe('rage', () => {
     const res = resolveHit(new Rng(1), prof, prof.hands[0], targetState(dummy), 1, false);
     if (res.outcome !== 'hit') res.outcome = 'hit';
     applyHit(w, p, dummy, prof, res);
-    expect(w.rage).toBe(3);
+    expect(w.sides[0].rage).toBe(3);
   });
 });
 

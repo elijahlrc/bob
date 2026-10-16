@@ -1,0 +1,48 @@
+{
+  "byActor": {
+    "updateAction": "a",
+    "spinStep": "a",
+    "fire": "a",
+    "startAction": "a",
+    "fireEffect": "a",
+    "stackedUse": "a",
+    "releaseChannel": "a",
+    "channelUse": "a",
+    "cascadeCast": "a",
+    "startUse": "a",
+    "applyUtility": "a",
+    "arrive": "a",
+    "blinkCast": "a",
+    "escapeCast": "a",
+    "placeBladestorm": "a"
+  },
+  "byPlayer": [
+    "steal",
+    "giveBack",
+    "tickUnmaker",
+    "tickBoss",
+    "bossDeath",
+    "tickEncounter",
+    "onEncounterDeath",
+    "trySidearm",
+    "fieldKill",
+    "hexKill",
+    "chargedDeath",
+    "monsterAI",
+    "separate"
+  ],
+  "except": [
+    "applyDamage",
+    "applyHit",
+    "applyAilments",
+    "rawHit",
+    "hit",
+    "killActor",
+    "tickActor",
+    "logDamage",
+    "noteDamage",
+    "noteHit",
+    "noteMiss",
+    "onMonsterDeath"
+  ]
+}

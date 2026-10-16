@@ -113,9 +113,9 @@ describe('charges in the sim (EXPANSION 5.6)', () => {
     const w = arena(b);
     for (let i = 0; i < 30; i++) killActor(w, put(w, 'warrior', 8 + i * 0.1));
     expect(w.char.charges.fervour).toBeGreaterThan(0);
-    const built = w.chars.size;
+    const built = w.sides[0].chars.size;
     tickCharges(w, w.sides[0], 0.01);
-    expect(w.chars.size).toBe(built);
+    expect(w.sides[0].chars.size).toBe(built);
   });
 
   it('charges survive a level up with their counts', () => {

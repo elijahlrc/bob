@@ -98,7 +98,7 @@ describe('Cairns (fatherTotem, warchiefTotem)', () => {
     for (let i = 0; i < 5 * 60; i++) {
       stepWorld(w);
       for (const e of w.events) if (e.t === 'use') uses++;
-      if (w.buffT.guardianCairn > 0) buff = true;
+      if (w.sides[0].buffT.guardianCairn > 0) buff = true;
     }
     expect(buff).toBe(true);
     expect(w.deployables.length).toBeGreaterThan(0);
@@ -113,7 +113,7 @@ describe('Cairns (fatherTotem, warchiefTotem)', () => {
       for (const e of w.events) if (e.t === 'use') uses++;
     }
     expect(uses).toBe(0);
-    expect(w.buffT.guardianCairn).toBe(0);
+    expect(w.sides[0].buffT.guardianCairn).toBe(0);
     expect(before).toBeGreaterThan(0);
     void dummy;
   });

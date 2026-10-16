@@ -19,9 +19,9 @@ export function cooldownSeconds(w: World, c: SkillChoice): number {
 const maxUses = (c: SkillChoice) => c.skill.cooldownUses ?? 1;
 
 /** The uses a skill with a cooldown holds now (a skill without one always holds one). */
-export function usesHeld(w: World, c: SkillChoice): number {
+export function usesHeld(s: Side, c: SkillChoice): number {
   if (c.skill.cooldown === undefined) return 1;
-  return w.cooldowns[c.key]?.uses ?? maxUses(c);
+  return s.cooldowns[c.key]?.uses ?? maxUses(c);
 }
 
 /** Whether the character holds the charges that skip the cooldown. */
@@ -31,8 +31,8 @@ export function canBypass(w: World, c: SkillChoice): boolean {
 }
 
 /** Whether the skill can be used now: a use is held, or charges can pay for one. */
-export function offCooldown(w: World, c: SkillChoice): boolean {
-  return c.skill.cooldown === undefined || usesHeld(w, c) > 0 || canBypass(w, c);
+export function offCooldown(w: World, s: Side, c: SkillChoice): boolean {
+  return c.skill.cooldown === undefined || usesHeld(s, c) > 0 || canBypass(w, c);
 }
 
 /** Whether the character holds what a charge-spending skill waits for (it is no use with nothing to spend). */
@@ -44,20 +44,20 @@ export function hasChargesToSpend(w: World, c: SkillChoice): boolean {
 }
 
 /** Whether the character can use the skill now: off cooldown, and holding what it spends. */
-export function skillReady(w: World, c: SkillChoice): boolean {
-  return offCooldown(w, c) && hasChargesToSpend(w, c);
+export function skillReady(w: World, s: Side, c: SkillChoice): boolean {
+  return offCooldown(w, s, c) && hasChargesToSpend(w, c);
 }
 
 /** The skill is used: take a use, or spend the charges that stand in for one. */
 export function useSkill(w: World, s: Side, c: SkillChoice): void {
   if (c.skill.cooldown === undefined) return;
-  const st = (w.cooldowns[c.key] ??= { uses: maxUses(c), t: 0 });
+  const st = (s.cooldowns[c.key] ??= { uses: maxUses(c), t: 0 });
   if (st.uses > 0) {
     st.uses--;
     if (st.t <= 0) st.t = cooldownSeconds(w, c);
   } else if (c.skill.bypass) spendCharges(w, s, c.skill.bypass.charge, c.skill.bypass.n);
   // The skill bar counts a skill that waits down the way it counts a secondary.
-  w.secondaryReady[c.key] = st.uses > 0 ? 0 : w.t + st.t;
+  s.secondaryReady[c.key] = st.uses > 0 ? 0 : w.t + st.t;
 }
 
 /** How much faster a cooldown runs for the enemies near the character (Frostblink: a little for each, a lot for a rare one). */
@@ -75,19 +75,19 @@ function recoverRate(w: World, c: SkillChoice): number {
 }
 
 /** Run the cooldowns down: a use comes back when its timer ends. */
-export function tickCooldowns(w: World, dt: number): void {
-  for (const key in w.cooldowns) {
-    const st = w.cooldowns[key];
+export function tickCooldowns(w: World, s: Side, dt: number): void {
+  for (const key in s.cooldowns) {
+    const st = s.cooldowns[key];
     if (st.t <= 0) continue;
     const c0 = w.char.actives.find((x) => x.key === key);
     // A cooldown that waits out a buff (Withering Step) does not run while it lasts.
-    if (c0?.skill.pausedBy && w.buffT[c0.skill.pausedBy] > 0) continue;
+    if (c0?.skill.pausedBy && s.buffT[c0.skill.pausedBy] > 0) continue;
     st.t -= dt * (c0 ? recoverRate(w, c0) : 1);
     if (st.t > 0) continue;
     const c = w.char.actives.find((x) => x.key === key);
     const max = c ? maxUses(c) : 1;
     st.uses = Math.min(max, st.uses + 1);
     st.t = st.uses < max && c ? cooldownSeconds(w, c) : 0;
-    w.secondaryReady[key] = st.uses > 0 ? 0 : w.t + st.t;
+    s.secondaryReady[key] = st.uses > 0 ? 0 : w.t + st.t;
   }
 }

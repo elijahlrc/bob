@@ -40,23 +40,23 @@ const run = (w: World, seconds: number) => {
 describe('stances (Blood and Sand, Flesh and Stone)', () => {
   it('start in the Blood stance, hold mana, and swap to the Sand stance when a crowd is near', () => {
     const { world: w, dummy } = world(['whirlwindCleave', 'duneStance']);
-    expect(stanceOf(w)).toBe('blood');
+    expect(stanceOf(w.sides[0])).toBe('blood');
     expect(w.char.reservedMana).toBeGreaterThan(0);
     run(w, 0.5);
-    expect(stanceOf(w)).toBe('blood');
+    expect(stanceOf(w.sides[0])).toBe('blood');
     neighbour(w, dummy.x + 1, dummy.y + 1);
     neighbour(w, dummy.x + 1, dummy.y - 1);
     neighbour(w, dummy.x + 2, dummy.y);
     run(w, 2.5);
-    expect(stanceOf(w)).toBe('sand');
+    expect(stanceOf(w.sides[0])).toBe('sand');
   });
 
   it('Blood and Sand: more area damage over less area, or more area and less damage', () => {
     const { world: w, dummy } = world(['whirlwindCleave', 'duneStance']);
     const prof = () => w.char.profile(w.primary, playerConds(w, dummy));
     const blood = prof();
-    w.buffT.bloodStance = 0;
-    w.buffT.sandStance = 1e9;
+    w.sides[0].buffT.bloodStance = 0;
+    w.sides[0].buffT.sandStance = 1e9;
     const sand = prof();
     expect(blood.hands[0].chunks[0].max).toBeGreaterThan(sand.hands[0].chunks[0].max);
     expect(sand.radiusMult).toBeGreaterThan(blood.radiusMult);
@@ -68,22 +68,22 @@ describe('stances (Blood and Sand, Flesh and Stone)', () => {
     expect(dummy.fx.maim).toBeDefined();
     expect(dummy.fx.maim!.x).toBeGreaterThan(10);
     expect(dummy.fx.blind).toBeUndefined();
-    w.buffT.bloodStance = 0;
-    w.buffT.sandStance = 1e9;
-    w.utilityReady['@stance'] = w.t + 100; // hold the stance
+    w.sides[0].buffT.bloodStance = 0;
+    w.sides[0].buffT.sandStance = 1e9;
+    w.sides[0].utilityReady['@stance'] = w.t + 100; // hold the stance
     run(w, 1);
     expect(dummy.fx.blind).toBeDefined();
     // The far attacks do less: a hit from beyond the aura's reach, against one from inside.
-    expect(stanceFarLess(w)).not.toBeNull();
-    expect(stanceFarLess(w)!.less).toBeGreaterThan(0.08);
+    expect(stanceFarLess(w, w.sides[0])).not.toBeNull();
+    expect(stanceFarLess(w, w.sides[0])!.less).toBeGreaterThan(0.08);
   });
 
   it('the stance is shared: a second stance gem does not make a second stance', () => {
     const { world: w } = world(['crushingBlow', 'duneStance', 'stoneStance']);
-    w.buffT.sandStance = 1e9;
-    w.buffT.bloodStance = 0;
+    w.sides[0].buffT.sandStance = 1e9;
+    w.sides[0].buffT.bloodStance = 0;
     run(w, 0.2);
-    expect(w.buffT.sandStance > 0 && w.buffT.bloodStance > 0).toBe(false);
+    expect(w.sides[0].buffT.sandStance > 0 && w.sides[0].buffT.bloodStance > 0).toBe(false);
   });
 });
 
@@ -95,11 +95,11 @@ describe('Bladestorm (whirlwindCleave)', () => {
     for (let i = 0; i < 5 * 60; i++) {
       stepWorld(w);
       if (w.fields.some((f) => f.kind === 'bladestorm')) storm = true;
-      if (w.buffT.bladestormBlood > 0) buff = true;
+      if (w.sides[0].buffT.bladestormBlood > 0) buff = true;
     }
     expect(storm).toBe(true);
     expect(buff).toBe(true);
-    expect(w.buffT.bladestormSand).toBe(0);
+    expect(w.sides[0].buffT.bladestormSand).toBe(0);
     // It ends by itself.
     w.player.stunT = 1e9;
     run(w, 4);
@@ -108,8 +108,8 @@ describe('Bladestorm (whirlwindCleave)', () => {
 
   it('in the Sand stance the storm drifts and quickens the character instead', () => {
     const { world: w } = world(['whirlwindCleave']);
-    w.buffT.bloodStance = 0;
-    w.buffT.sandStance = 1e9;
+    w.sides[0].buffT.bloodStance = 0;
+    w.sides[0].buffT.sandStance = 1e9;
     let moved = 0;
     let first: { x: number; y: number } | null = null;
     let sandBuff = false;
@@ -120,7 +120,7 @@ describe('Bladestorm (whirlwindCleave)', () => {
         first ??= { x: f.x, y: f.y };
         moved = Math.hypot(f.x - first.x, f.y - first.y);
       }
-      if (w.buffT.bladestormSand > 0) sandBuff = true;
+      if (w.sides[0].buffT.bladestormSand > 0) sandBuff = true;
     }
     expect(moved).toBeGreaterThan(0.3);
     expect(sandBuff).toBe(true);
@@ -142,45 +142,45 @@ describe('Berserk (rampage)', () => {
   it('waits for rage, lasts as long as the rage does and spends it faster each second', () => {
     const { world: w, dummy } = world(['crushingBlow', 'rampage']);
     dummy.rarity = 'boss';
-    w.rage = 0;
+    w.sides[0].rage = 0;
     run(w, 3);
-    expect(w.buffT.berserk).toBe(0);
-    w.rage = 30;
-    for (let i = 0; i < 4 * 60 && w.buffT.berserk <= 0; i++) stepWorld(w);
-    expect(w.buffT.berserk).toBeGreaterThan(0);
-    const r1 = w.rage;
+    expect(w.sides[0].buffT.berserk).toBe(0);
+    w.sides[0].rage = 30;
+    for (let i = 0; i < 4 * 60 && w.sides[0].buffT.berserk <= 0; i++) stepWorld(w);
+    expect(w.sides[0].buffT.berserk).toBeGreaterThan(0);
+    const r1 = w.sides[0].rage;
     run(w, 1);
-    const r2 = w.rage;
+    const r2 = w.sides[0].rage;
     run(w, 1);
-    const r3 = w.rage;
+    const r3 = w.sides[0].rage;
     expect(r1 - r2).toBeGreaterThan(0);
     // Each second it spends more than the one before.
     expect(r2 - r3).toBeGreaterThan(r1 - r2);
     let ended = -1;
     for (let i = 0; i < 20 * 60 && ended < 0; i++) {
       stepWorld(w);
-      if (w.buffT.berserk === 0) ended = w.t;
+      if (w.sides[0].buffT.berserk === 0) ended = w.t;
     }
     expect(ended).toBeGreaterThan(0);
-    expect(w.rage).toBe(0);
+    expect(w.sides[0].rage).toBe(0);
   });
 
   it('its cooldown starts when it ends', () => {
     const { world: w, dummy } = world(['crushingBlow', 'rampage']);
     dummy.rarity = 'boss';
-    w.rage = 12;
+    w.sides[0].rage = 12;
     let ended = -1;
     for (let i = 0; i < 20 * 60 && ended < 0; i++) {
       stepWorld(w);
-      if (w.t > 0.6 && w.buffT.berserk === 0) ended = w.t;
+      if (w.t > 0.6 && w.sides[0].buffT.berserk === 0) ended = w.t;
     }
     expect(ended).toBeGreaterThan(0);
     const choice = w.char.utilities.find((c) => c.skill.id === 'rampage')!;
     const u = choice.skill.utility!;
     const cooldown = 'cooldown' in u ? (u.cooldown ?? 0) : 0;
     expect(cooldown).toBeGreaterThan(0);
-    expect(w.utilityReady[choice.key]).toBeGreaterThanOrEqual(ended + cooldown - 0.5);
-    expect(w.utilityReady[choice.key]).toBeLessThan(ended + cooldown + 0.5);
+    expect(w.sides[0].utilityReady[choice.key]).toBeGreaterThanOrEqual(ended + cooldown - 0.5);
+    expect(w.sides[0].utilityReady[choice.key]).toBeLessThan(ended + cooldown + 0.5);
   });
 });
 
@@ -191,28 +191,28 @@ describe('Blood Rage (bloodSurgeCall)', () => {
     w.sides[0].opts.freeResources = false;
     w.sides[0].opts.godMode = false;
     // Let a cast happen.
-    for (let i = 0; i < 3 * 60 && w.buffT.bloodSurge <= 0; i++) stepWorld(w);
-    expect(w.buffT.bloodSurge).toBeGreaterThan(0);
+    for (let i = 0; i < 3 * 60 && w.sides[0].buffT.bloodSurge <= 0; i++) stepWorld(w);
+    expect(w.sides[0].buffT.bloodSurge).toBeGreaterThan(0);
     const before = w.player.life;
-    const seconds = w.buffT.bloodSurge;
+    const seconds = w.sides[0].buffT.bloodSurge;
     w.player.stunT = 1e9;
     w.player.life = w.player.def.maxLife;
     run(w, 1);
     expect(w.player.life).toBeLessThan(w.player.def.maxLife);
     // A kill renews it.
-    w.buffT.bloodSurge = 2;
+    w.sides[0].buffT.bloodSurge = 2;
     const m = neighbour(w, w.player.x + 2, w.player.y);
     m.def = dummyDefence({ maxLife: 10 });
     m.life = 1;
     killActor(w, m);
-    expect(w.buffT.bloodSurge).toBeGreaterThan(seconds - 0.5);
+    expect(w.sides[0].buffT.bloodSurge).toBeGreaterThan(seconds - 0.5);
     void before;
   });
 
   it('gives a Fervour charge on a kill while it is up', () => {
     const { world: w } = world(['crushingBlow', 'bloodSurgeCall'], 1.5, 'sword_3', DEX);
-    for (let i = 0; i < 3 * 60 && w.buffT.bloodSurge <= 0; i++) stepWorld(w);
-    expect(w.buffT.bloodSurge).toBeGreaterThan(0);
+    for (let i = 0; i < 3 * 60 && w.sides[0].buffT.bloodSurge <= 0; i++) stepWorld(w);
+    expect(w.sides[0].buffT.bloodSurge).toBeGreaterThan(0);
     const kills = (n: number) => {
       for (let i = 0; i < n; i++) {
         const m = neighbour(w, w.player.x + 2, w.player.y);
@@ -228,11 +228,11 @@ describe('Blood Rage (bloodSurgeCall)', () => {
   it('is let go when life runs low', () => {
     const { world: w } = world(['crushingBlow', 'bloodSurgeCall'], 1.5, 'sword_3', DEX);
     w.sides[0].opts.freeResources = false;
-    for (let i = 0; i < 3 * 60 && w.buffT.bloodSurge <= 0; i++) stepWorld(w);
-    expect(w.buffT.bloodSurge).toBeGreaterThan(0);
+    for (let i = 0; i < 3 * 60 && w.sides[0].buffT.bloodSurge <= 0; i++) stepWorld(w);
+    expect(w.sides[0].buffT.bloodSurge).toBeGreaterThan(0);
     w.player.stunT = 1e9;
     w.player.life = w.player.def.maxLife * 0.2;
     run(w, 0.2);
-    expect(w.buffT.bloodSurge).toBe(0);
+    expect(w.sides[0].buffT.bloodSurge).toBe(0);
   });
 });

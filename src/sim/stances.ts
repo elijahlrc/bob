@@ -3,6 +3,7 @@ import { applyDamage, hit } from './combat';
 import { scaleProfile } from './shots';
 import { applyStatus } from './statuses';
 import type { Action, Actor, World } from './types';
+import type { Side } from './side';
 
 /**
  * Stances, rage-fed buffs and the storms of a stance (docs/SPIRIT.md S9).
@@ -23,21 +24,21 @@ const PACK_SIZE = 3;
 /** Blood Rage is let go below this share of life. */
 const BLOOD_RAGE_FLOOR = 0.25;
 
-export function stanceOf(w: World): Stance {
-  return w.buffT.sandStance > 0 ? 'sand' : 'blood';
+export function stanceOf(s: Side): Stance {
+  return s.buffT.sandStance > 0 ? 'sand' : 'blood';
 }
 
-export function setStance(w: World, s: Stance): void {
-  w.buffT.bloodStance = s === 'blood' ? 1e9 : 0;
-  w.buffT.sandStance = s === 'sand' ? 1e9 : 0;
+export function setStance(w: World, side: Side, s: Stance): void {
+  side.buffT.bloodStance = s === 'blood' ? 1e9 : 0;
+  side.buffT.sandStance = s === 'sand' ? 1e9 : 0;
   w.events.push({ t: 'buff', id: s === 'blood' ? 'bloodStance' : 'sandStance' });
 }
 
 const stanceAuras = (w: World) => w.char.auras.filter((a) => a.active && a.def.stance);
 
 /** Percent less damage the character takes from attacks by enemies that are not near, in the stance it is in (Flesh and Stone). */
-export function stanceFarLess(w: World): { less: number; radius: number } | null {
-  const s = stanceOf(w);
+export function stanceFarLess(w: World, sd: Side): { less: number; radius: number } | null {
+  const s = stanceOf(sd);
   for (const a of stanceAuras(w)) {
     const side = a.def.stance![s];
     if (side.farLess)
@@ -47,20 +48,20 @@ export function stanceFarLess(w: World): { less: number; radius: number } | null
 }
 
 /** The stance swaps by policy, and the stance's effects on the enemies near the character are renewed. */
-export function tickStance(w: World): void {
+export function tickStance(w: World, sd: Side): void {
   const auras = stanceAuras(w);
   if (auras.length === 0) return;
   const p = w.player;
-  if ((w.utilityReady['@stance'] ?? 0) <= w.t) {
+  if ((sd.utilityReady['@stance'] ?? 0) <= w.t) {
     let near = 0;
     for (const e of w.actors)
       if (!e.isPlayer && e.alive && Math.hypot(e.x - p.x, e.y - p.y) <= PACK_RADIUS) near++;
     const want: Stance = near >= PACK_SIZE ? 'sand' : 'blood';
-    if (want !== stanceOf(w)) setStance(w, want);
-    w.utilityReady['@stance'] = w.t + SWAP_EVERY;
+    if (want !== stanceOf(sd)) setStance(w, sd, want);
+    sd.utilityReady['@stance'] = w.t + SWAP_EVERY;
   }
   if (Math.floor(w.t / AURA_EVERY) === Math.floor((w.t - 1 / 60) / AURA_EVERY)) return;
-  const s = stanceOf(w);
+  const s = stanceOf(sd);
   for (const a of auras) {
     const side = a.def.stance![s];
     if (!side.enemies) continue;
@@ -87,7 +88,7 @@ export function placeBladestorm(w: World, a: Actor, act: Action): void {
   const p = act.profile;
   const spec = p.skill.bladestorm as Blades | undefined;
   if (!spec || !a.isPlayer) return;
-  const s = stanceOf(w);
+  const s = stanceOf(a.side!);
   const mine = w.fields.filter((f) => f.kind === 'bladestorm');
   if (mine.length >= spec.max) {
     const oldest = mine.reduce((x, y) => (x.t < y.t ? x : y));
@@ -119,7 +120,7 @@ export function placeBladestorm(w: World, a: Actor, act: Action): void {
   w.events.push({ t: 'explode', x: a.x, y: a.y, r, dtype: 0, skill: p.skill.id });
 }
 
-export function tickBladestorm(w: World, f: import('./fields').Field, dt: number): void {
+export function tickBladestorm(w: World, s: Side, f: import('./fields').Field, dt: number): void {
   const p = w.player;
   const spec = f.profile!.skill.bladestorm as Blades;
   if (f.vx || f.vy) {
@@ -130,7 +131,7 @@ export function tickBladestorm(w: World, f: import('./fields').Field, dt: number
   // The character in the storm gains what the stance it was made in gives.
   if (p.alive && Math.hypot(p.x - f.x, p.y - f.y) <= f.radius + p.r) {
     const id = f.stance === 'sand' ? spec.sand : spec.blood;
-    w.buffT[id] = Math.max(w.buffT[id], 0.3);
+    s.buffT[id] = Math.max(s.buffT[id], 0.3);
   }
   f.pulseT -= dt;
   if (f.pulseT > 0) return;
@@ -148,30 +149,30 @@ export function tickBladestorm(w: World, f: import('./fields').Field, dt: number
 // ---- Berserk, Blood Rage
 
 /** The rage a Berserk spends, faster each second, and the end when none is left. */
-export function tickBerserk(w: World, dt: number): void {
+export function tickBerserk(w: World, s: Side, dt: number): void {
   for (const c of w.char.utilities) {
     const u = c.skill.utility;
-    if (u?.kind !== 'buff' || !u.rage || w.buffT[u.buff] <= 0) continue;
-    w.berserkT += dt;
-    w.rageT = 0;
-    w.rage -= u.rage.drain * Math.pow(1 + u.rage.accel / 100, w.berserkT) * dt;
-    if (w.rage > 0) continue;
-    w.rage = 0;
-    w.berserkT = 0;
-    w.buffT[u.buff] = 0;
+    if (u?.kind !== 'buff' || !u.rage || s.buffT[u.buff] <= 0) continue;
+    s.berserkT += dt;
+    s.rageT = 0;
+    s.rage -= u.rage.drain * Math.pow(1 + u.rage.accel / 100, s.berserkT) * dt;
+    if (s.rage > 0) continue;
+    s.rage = 0;
+    s.berserkT = 0;
+    s.buffT[u.buff] = 0;
     // The skill's own cooldown starts when it ends.
-    w.utilityReady[c.key] = w.t + (u.cooldown ?? 0);
+    s.utilityReady[c.key] = w.t + (u.cooldown ?? 0);
   }
 }
 
 /** Blood Rage: the life and energy shield it costs each second, and the character lets it go when life runs low. */
-export function tickDegen(w: World, dt: number): void {
+export function tickDegen(w: World, s: Side, dt: number): void {
   const p = w.player;
   for (const c of w.char.utilities) {
     const u = c.skill.utility;
-    if (u?.kind !== 'buff' || !u.degen || w.buffT[u.buff] <= 0) continue;
+    if (u?.kind !== 'buff' || !u.degen || s.buffT[u.buff] <= 0) continue;
     if (p.life < p.def.maxLife * BLOOD_RAGE_FLOOR) {
-      w.buffT[u.buff] = 0;
+      s.buffT[u.buff] = 0;
       continue;
     }
     // Physical damage over time: physical damage reduction answers to it, armour does not.
@@ -182,10 +183,10 @@ export function tickDegen(w: World, dt: number): void {
 }
 
 /** A kill renews the buffs that a kill renews (Blood Rage). */
-export function refreshOnKill(w: World): void {
+export function refreshOnKill(w: World, s: Side): void {
   for (const c of w.char.utilities) {
     const u = c.skill.utility;
-    if (u?.kind === 'buff' && u.refreshOnKill && w.buffT[u.buff] > 0)
-      w.buffT[u.buff] = Math.max(w.buffT[u.buff], u.seconds * w.char.db.mult('buffDuration'));
+    if (u?.kind === 'buff' && u.refreshOnKill && s.buffT[u.buff] > 0)
+      s.buffT[u.buff] = Math.max(s.buffT[u.buff], u.seconds * w.char.db.mult('buffDuration'));
   }
 }

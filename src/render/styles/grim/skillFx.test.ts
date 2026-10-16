@@ -45,7 +45,7 @@ const world = (a: Actor): World =>
     mirage: null,
     charged: {},
     shell: null,
-    buffT: {},
+    sides: [{ buffT: {} }],
   }) as unknown as World;
 
 function actor(over: Partial<Actor> = {}): Actor {

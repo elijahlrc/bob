@@ -96,16 +96,16 @@ export function startAction(
     a.revealT = 1.5;
   }
   w.events.push({ t: 'use', src: a.id, skill: p.skill.id });
-  if (a.isPlayer) skillUsed(w, p.skill.id);
+  if (a.isPlayer) skillUsed(w, a.side!, p.skill.id);
   if (a.isPlayer && p.isAttack) fireTriggers(w, a.side!, { on: 'attack', target, tags: p.tagMask });
   // Using a skill can grant a buff of its own (Flicker Strike's burst of speed).
   if (a.isPlayer) {
-    rollGains(w, 'use', p.gains);
+    rollGains(w, a.side!, 'use', p.gains);
     rollCharges(w, a.side!, 'use', p.gains);
   }
   if (a.isPlayer && !p.isAttack) {
     fireTriggers(w, a.side!, { on: 'cast', target, tags: p.tagMask });
-    rollGains(w, 'cast', p.gains);
+    rollGains(w, a.side!, 'cast', p.gains);
     rollCharges(w, a.side!, 'cast', p.gains);
   }
   // Fighting is noisy: idle monsters nearby come running even if they have not seen the player.

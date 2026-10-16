@@ -142,7 +142,7 @@ describe('Immortal Call (deathlessCall)', () => {
     let used = 0;
     for (let i = 0; i < 3 * 60; i++) {
       stepWorld(world);
-      longest = Math.max(longest, world.buffT.deathless);
+      longest = Math.max(longest, world.sides[0].buffT.deathless);
       for (const e of world.events) if (e.t === 'spend') used += e.n;
     }
     return { world, longest, used };

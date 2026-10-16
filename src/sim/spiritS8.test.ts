@@ -101,7 +101,7 @@ describe('Frostblink (rimeStep)', () => {
     const crowded = blinkWorld(['rimeStep'], 30, 'sword_3', DEX);
     for (const w of [lonely.world, crowded.world]) {
       const c = w.char.utilities.find((x) => x.skill.id === 'rimeStep')!;
-      w.cooldowns[c.key] = { uses: 0, t: 3 };
+      w.sides[0].cooldowns[c.key] = { uses: 0, t: 3 };
     }
     for (let i = 0; i < 5; i++)
       neighbour(crowded.world, crowded.world.player.x + 1 + i * 0.2, crowded.world.player.y + 1);
@@ -110,8 +110,8 @@ describe('Frostblink (rimeStep)', () => {
     run(lonely.world, 1);
     run(crowded.world, 1);
     const key = (w: World) => w.char.utilities.find((x) => x.skill.id === 'rimeStep')!.key;
-    expect(crowded.world.cooldowns[key(crowded.world)].t).toBeLessThan(
-      lonely.world.cooldowns[key(lonely.world)].t - 0.5,
+    expect(crowded.world.sides[0].cooldowns[key(crowded.world)].t).toBeLessThan(
+      lonely.world.sides[0].cooldowns[key(lonely.world)].t - 0.5,
     );
   });
 });
@@ -158,7 +158,7 @@ describe('Withering Step (rotStride)', () => {
     let elusive = false;
     for (let i = 0; i < 2 * 60 && !elusive; i++) {
       stepWorld(w);
-      elusive = w.buffT.elusive > 0;
+      elusive = w.sides[0].buffT.elusive > 0;
     }
     expect(elusive).toBe(true);
     // The enemies near the landing are withered at once; one far away is not.
@@ -172,14 +172,14 @@ describe('Withering Step (rotStride)', () => {
     let elusive = false;
     for (let i = 0; i < 2 * 60 && !elusive; i++) {
       stepWorld(w);
-      elusive = w.buffT.elusive > 0;
+      elusive = w.sides[0].buffT.elusive > 0;
     }
     expect(elusive).toBe(true);
     // The crushing blow is used next, or has been: either way the buff goes.
     let ended = false;
     for (let i = 0; i < 8 * 60 && !ended; i++) {
       stepWorld(w);
-      ended = w.buffT.elusive === 0 && w.wither === null;
+      ended = w.sides[0].buffT.elusive === 0 && w.wither === null;
     }
     expect(ended).toBe(true);
   });
@@ -190,16 +190,16 @@ describe('Withering Step (rotStride)', () => {
     let elusive = false;
     for (let i = 0; i < 2 * 60 && !elusive; i++) {
       stepWorld(w);
-      elusive = w.buffT.elusive > 0;
+      elusive = w.sides[0].buffT.elusive > 0;
     }
     expect(elusive).toBe(true);
     const before = dummy.life;
     let ran = 0;
-    while (w.buffT.elusive > 0 && ran++ < 8 * 60) {
+    while (w.sides[0].buffT.elusive > 0 && ran++ < 8 * 60) {
       stepWorld(w);
-      if (w.buffT.elusive > 0) expect(dummy.life).toBe(before);
+      if (w.sides[0].buffT.elusive > 0) expect(dummy.life).toBe(before);
     }
-    expect(w.buffT.elusive).toBe(0);
+    expect(w.sides[0].buffT.elusive).toBe(0);
     run(w, 3);
     expect(dummy.life).toBeLessThan(before);
   });
@@ -207,20 +207,20 @@ describe('Withering Step (rotStride)', () => {
   it('is not begun for a lone enemy', () => {
     const { world: w } = blinkWorld(['rotStride'], 5);
     run(w, 3);
-    expect(w.buffT.elusive).toBe(0);
+    expect(w.sides[0].buffT.elusive).toBe(0);
   });
 
   it('its cooldown does not run while Elusive lasts', () => {
     const { world: w } = blinkWorld(['rotStride'], 12);
     const c = w.char.utilities.find((x) => x.skill.id === 'rotStride')!;
-    w.cooldowns[c.key] = { uses: 0, t: 3 };
-    w.buffT.elusive = 5;
+    w.sides[0].cooldowns[c.key] = { uses: 0, t: 3 };
+    w.sides[0].buffT.elusive = 5;
     w.player.stunT = 1e9;
     run(w, 2);
-    expect(w.cooldowns[c.key].t).toBeCloseTo(3, 1);
-    w.buffT.elusive = 0;
+    expect(w.sides[0].cooldowns[c.key].t).toBeCloseTo(3, 1);
+    w.sides[0].buffT.elusive = 0;
     run(w, 1);
-    expect(w.cooldowns[c.key].t).toBeLessThan(2.2);
+    expect(w.sides[0].cooldowns[c.key].t).toBeLessThan(2.2);
   });
 });
 

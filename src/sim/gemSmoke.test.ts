@@ -50,10 +50,10 @@ describe('every active gem', () => {
         if (u.kind === 'buff' && (u.policy === 'guard' || u.second))
           world.player.life = world.player.def.maxLife * 0.4;
         // A skill fed by rage starts with some.
-        if (u.kind === 'buff' && u.rage) world.rage = 30;
+        if (u.kind === 'buff' && u.rage) world.sides[0].rage = 30;
         for (let i = 0; i < 20 * 60 && !seen; i++) {
           stepWorld(world);
-          if (u.kind === 'buff') seen = world.buffT[u.buff] > 0;
+          if (u.kind === 'buff') seen = world.sides[0].buffT[u.buff] > 0;
           else if (u.kind === 'curse') seen = dummy.hexes.some((h) => h.id === u.hex);
           else if (u.kind === 'summon') seen = world.minions.length > 0;
           else if (u.kind === 'shout') seen = Object.keys(dummy.fx).length > 0;

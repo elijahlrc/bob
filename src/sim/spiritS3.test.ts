@@ -223,7 +223,7 @@ describe('the curses and marks with their reference effects', () => {
     const { world, dummy } = createDummyWorld(holding(['crushingBlow']), { distance: 3 });
     world.player.life = 1;
     applyHex(world, dummy, 'flaskMark', 40, 1, 10);
-    hexHit(world, dummy);
+    hexHit(world, world.sides[0], dummy);
     expect(world.player.life).toBeGreaterThan(5);
   });
 
