@@ -2,6 +2,7 @@ import { clamp } from '../core/math';
 import {
   BASE_MANA_REGEN_PCT,
   BLOCK_CAP,
+  BLOCK_STAGGER,
   DEFAULT_MAX_RES,
   ES_RECHARGE_DELAY,
   ES_RECHARGE_RATE,
@@ -103,6 +104,19 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
     evasion: Math.round(evasion),
     blockAttack,
     blockSpell,
+    blockCap: blockCap / 100,
+    blockProjectile: Math.max(0, db.sum('base', 'blockProjectile', ctx)) / 100,
+    lifeOnBlock: db.sum('base', 'lifeOnBlock', ctx),
+    manaOnBlock: db.sum('base', 'manaOnBlock', ctx),
+    blockStagger: flag('cannotBeStunned')
+      ? 0
+      : BLOCK_STAGGER /
+        Math.max(
+          0.1,
+          1 +
+            (db.sum('base', 'stunBlockRecovery', ctx) + db.sum('base', 'blockRecovery', ctx)) / 100,
+        ),
+    esRegen: (db.sum('base', 'esRegenPct', ctx) / 100) * maxEs,
     res,
     maxRes,
     physReduction: clamp(db.sum('base', 'physReduction', ctx) / 100, 0, 0.9),
@@ -113,7 +127,10 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
     // Chaos Inoculation: the stun threshold uses the life the character would have without it (3.9).
     stunThreshold: fullLife * db.mult('stunThreshold', ctx) * (opts.stunThreshMult ?? 1),
     stunAvoid: clamp(db.sum('base', 'stunAvoid', ctx) / 100, 0, 1),
-    stunDurOnSelf: Math.max(0, 1 - db.sum('base', 'stunDurationOnSelf', ctx) / 100),
+    // Faster recovery from stuns shortens them: 100% increased recovery halves the time.
+    stunDurOnSelf:
+      Math.max(0, 1 - db.sum('base', 'stunDurationOnSelf', ctx) / 100) /
+      Math.max(0.1, 1 + db.sum('base', 'stunBlockRecovery', ctx) / 100),
     cannotBeStunned: flag('cannotBeStunned'),
     cannotEvade: flag('cannotEvade'),
     evadeProj: db.sum('base', 'evadeBonus.projectile', ctx) / 100,

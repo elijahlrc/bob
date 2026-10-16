@@ -70,7 +70,7 @@ export const ARMOUR_FAMILY_DEFS: FamilyDef[] = [
       ],
       [
         { stat: 'armour', kind: 'inc', local: true },
-        { stat: 'stunDurationOnSelf', kind: 'base' },
+        { stat: 'stunBlockRecovery', kind: 'base' },
       ],
     ),
     names: ['Anchored', 'Unshaken', 'Steadfast'],
@@ -176,7 +176,7 @@ export const ARMOUR_FAMILY_DEFS: FamilyDef[] = [
       ],
       [
         { stat: 'evasion', kind: 'inc', local: true },
-        { stat: 'stunDurationOnSelf', kind: 'base' },
+        { stat: 'stunBlockRecovery', kind: 'base' },
       ],
     ),
     names: ['Sure-footed', 'Poised', 'Balanced'],
@@ -300,7 +300,7 @@ export const ARMOUR_FAMILY_DEFS: FamilyDef[] = [
       ],
       [
         { stat: 'es', kind: 'inc', local: true },
-        { stat: 'stunDurationOnSelf', kind: 'base' },
+        { stat: 'stunBlockRecovery', kind: 'base' },
       ],
     ),
     names: ['Calming', 'Stilling', 'Tranquil'],
@@ -385,7 +385,7 @@ export const ARMOUR_FAMILY_DEFS: FamilyDef[] = [
       [
         { stat: 'armour', kind: 'inc', local: true },
         { stat: 'evasion', kind: 'inc', local: true, same: true },
-        { stat: 'stunDurationOnSelf', kind: 'base' },
+        { stat: 'stunBlockRecovery', kind: 'base' },
       ],
     ),
     names: ['Grounded', 'Rooted', 'Bedrock'],
@@ -450,7 +450,7 @@ export const ARMOUR_FAMILY_DEFS: FamilyDef[] = [
       [
         { stat: 'armour', kind: 'inc', local: true },
         { stat: 'es', kind: 'inc', local: true, same: true },
-        { stat: 'stunDurationOnSelf', kind: 'base' },
+        { stat: 'stunBlockRecovery', kind: 'base' },
       ],
     ),
     names: ['Vowed', 'Resolute', 'Unbowed'],
@@ -515,7 +515,7 @@ export const ARMOUR_FAMILY_DEFS: FamilyDef[] = [
       [
         { stat: 'evasion', kind: 'inc', local: true },
         { stat: 'es', kind: 'inc', local: true, same: true },
-        { stat: 'stunDurationOnSelf', kind: 'base' },
+        { stat: 'stunBlockRecovery', kind: 'base' },
       ],
     ),
     names: ['Hushed', 'Lulled', 'Veiled'],
@@ -2091,7 +2091,7 @@ export const ARMOUR_FAMILY_DEFS: FamilyDef[] = [
         [56, [23, 25]],
         [79, [26, 28]],
       ],
-      [{ stat: 'stunDurationOnSelf', kind: 'base' }],
+      [{ stat: 'stunBlockRecovery', kind: 'base' }],
     ),
     names: ['of Resilience', 'of Recovery', 'of the Unbroken'],
   },
@@ -2297,6 +2297,22 @@ export const ARMOUR_FAMILY_DEFS: FamilyDef[] = [
     weights: { hybrid: 0.5 },
   },
   {
+    id: 'esRegenBody',
+    type: 'suffix',
+    slots: ['body'],
+    requires: ['es'],
+    ...tabled(
+      [
+        [25, [0.6, 0.6]],
+        [85, [1, 1]],
+      ],
+      [{ stat: 'esRegenPct', kind: 'base', dec: 1 }],
+    ),
+    names: ['of Rekindling', 'of Reweaving', 'of the Loom'],
+    weight: 1.5,
+    weights: { hybrid: 0.5 },
+  },
+  {
     id: 'lifeRegenPct',
     type: 'suffix',
     slots: ['arShield'],
@@ -2342,6 +2358,41 @@ export const ARMOUR_FAMILY_DEFS: FamilyDef[] = [
       [{ stat: 'blockAttack', kind: 'base', local: true }],
     ),
     names: ['of the Wall', 'of the Rampart', 'of the Citadel'],
+  },
+  {
+    id: 'blockProjectileShield',
+    type: 'suffix',
+    slots: ['arShield'],
+    ...tabled(
+      [
+        [8, [1, 2]],
+        [19, [3, 4]],
+        [30, [5, 6]],
+        [55, [7, 8]],
+        [70, [9, 10]],
+        [81, [11, 12]],
+      ],
+      [{ stat: 'blockProjectile', kind: 'base' }],
+    ),
+    names: ['of Deflecting', 'of Parrying', 'of the Palisade'],
+  },
+  {
+    id: 'lifeOnBlockShield',
+    type: 'suffix',
+    slots: ['shield'],
+    not: ['ev', 'es'],
+    ...tabled(
+      [
+        [11, [5, 15]],
+        [22, [16, 25]],
+        [36, [26, 40]],
+        [48, [41, 60]],
+        [60, [61, 85]],
+        [75, [86, 100]],
+      ],
+      [{ stat: 'lifeOnBlock', kind: 'base' }],
+    ),
+    names: ['of Respite', 'of Rallying', 'of the Redoubt'],
   },
   {
     id: 'stunAvoid',
@@ -2487,6 +2538,21 @@ export const ARMOUR_FAMILY_DEFS: FamilyDef[] = [
       [{ stat: 'critChance', kind: 'inc', tags: ['spell'] }],
     ),
     names: ['of Insight', 'of Clarity', 'of the Seer'],
+  },
+  {
+    id: 'manaOnBlockShield',
+    type: 'suffix',
+    slots: ['esShield'],
+    ...tabled(
+      [
+        [15, [4, 12]],
+        [32, [13, 21]],
+        [58, [22, 30]],
+        [75, [31, 39]],
+      ],
+      [{ stat: 'manaOnBlock', kind: 'base' }],
+    ),
+    names: ['of Absorption', 'of Soaking', 'of the Sponge'],
   },
   {
     id: 'blockSpellShield',
@@ -2814,6 +2880,13 @@ export const ARMOUR_FAMILY_DEFS: FamilyDef[] = [
       [{ stat: 'flaskCharges', kind: 'inc' }],
     ),
     names: ['of Replenishing', 'of Refilling', 'of the Wellspring'],
+  },
+  {
+    id: 'flaskChargesUsed',
+    type: 'suffix',
+    slots: ['belt'],
+    ...tabled([[3, [10, 20]]], [{ stat: 'flaskChargesUsed', kind: 'base' }]),
+    names: ['of Thrift', 'of Frugality', 'of the Miser'],
   },
   {
     id: 'flaskDuration',

@@ -66,7 +66,7 @@ export function flaskSpec(f: FlaskItem, charDb: ModDB): FlaskSpec {
             : 1),
     ),
     maxCharges: Math.round(base.maxCharges * local.mult('flask.maxCharges')),
-    perUse: base.perUse,
+    perUse: base.perUse * Math.max(0.1, 1 - charDb.sum('base', 'flaskChargesUsed') / 100),
     instant: local.flag('flask.instant'),
     buff,
     removeIgnite: local.flag('removeIgnite'),

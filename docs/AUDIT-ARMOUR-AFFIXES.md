@@ -30,10 +30,16 @@ The author asked for parity with 3.9 and took every recommendation of section 10
   attacks, socketed gem level on armour, area of effect, aura effect, reduced mana reserved, the wearer's stun threshold and the old movement
   speed suffix. Avoid being stunned is an armour-shield mod, the weapon-shared families (mana, elemental damage with attacks, critical
   multiplier, life on hit, stun duration, mana regeneration, the attributes) are weapon-only and their armour versions are new families.
-- **Omitted** for want of an engine stat: block of projectile attacks, life and mana gained when you block, percent energy shield regeneration,
-  reduced flask charges used, block recovery (the stun half of the hybrids is reduced stun duration on you). Item rarity and the light radius half of
-  the accuracy hybrid do not apply.
-- **Bases.** Shields come in all six defence types (a round shield has no implicit: block recovery has no stat), every shield type has its 3.9
+- **The missing engine stats, built the same day.** Block of projectile attacks (`blockProjectile`: adds to the block chance against projectile attacks, up
+  to the cap), life and mana gained when you block (`lifeOnBlock`, `manaOnBlock`), percent energy shield regeneration (`esRegenPct`, on top of the
+  recharge), reduced flask charges used (`flaskChargesUsed`, on the flask's cost per use) and block recovery. Blocking a hit now staggers the
+  character for `BLOCK_STAGGER` (0.35 s, the base stun time), as the reference's block recovery does: the actor loses its action, a stagger is not
+  lengthened while it lasts and not repeated during the grace after one, and a character that cannot be stunned, or is channelling a skill that
+  cannot be interrupted, is not staggered. "Increased Stun and Block Recovery" (`stunBlockRecovery`) shortens both the stagger and stuns on you
+  (100% halves them); "increased Block Recovery" (`blockRecovery`, the round shield's implicit) shortens the stagger only. The stun hybrids and the
+  suffix use `stunBlockRecovery` now (the old reduced stun duration stat stays for the uniques and old items). Item rarity and the light radius half
+  of the accuracy hybrid do not apply; with them left out the pools equal the reference's.
+- **Bases.** Shields come in all six defence types (a round shield's implicit is block recovery), every shield type has its 3.9
   implicit scaled to four tiers (the first tower shield has none, as in the reference), and rings, amulets, belts and quivers have a base for each
   kind of implicit the reference has (55 jewellery bases, from 14). A jewellery base is a kind and not a tier: any one the item level allows is
   as likely as another.

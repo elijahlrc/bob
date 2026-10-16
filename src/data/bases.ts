@@ -444,12 +444,12 @@ function armourBases(): ItemBase[] {
   return out;
 }
 
-/** The implicit of each tier of a shield type, as the reference shields have it (a round shield's block recovery has no stat here). */
+/** The implicit of each tier of a shield type, as the reference shields have it. */
 const SHIELD_IMPLICIT: Record<DefenceType, (tier: number) => Mod[]> = {
   ar: (k) => (k === 0 ? [] : [mod('life', 'base', [0, 20, 30, 35][k])]),
   ev: (k) => [mod('moveSpeed', 'inc', [3, 6, 6, 9][k])],
   es: (k) => [mod('damage', 'inc', [8, 12, 15, 18][k], { tags: ['spell'] })],
-  arev: () => [],
+  arev: (k) => [mod('blockRecovery', 'base', [60, 60, 120, 180][k])],
   ares: (k) => [mod('resist.allEle', 'base', [4, 4, 8, 12][k])],
   eves: (k) => [mod(k % 2 === 0 ? 'dodgeAttack' : 'dodgeSpell', 'base', k < 2 ? 2 : 4)],
 };
@@ -567,7 +567,7 @@ function jewelleryBases(): ItemBase[] {
     b('belt_life', 'Rope Sash', 'belt', 1, [mod('life', 'base', 25)]),
     b('belt_str', 'Ironbound Belt', 'belt', 8, [mod('str', 'base', 30)]),
     b('belt_armour', 'Plated Girdle', 'belt', 10, [mod('armour', 'base', 120)]),
-    b('belt_stun', 'Sturdy Wrap', 'belt', 16, [mod('stunDurationOnSelf', 'base', 20)]),
+    b('belt_stun', 'Sturdy Wrap', 'belt', 16, [mod('stunBlockRecovery', 'base', 20)]),
     b('belt_stunner', 'Hammerhand Belt', 'belt', 16, [mod('stunDuration', 'inc', 25)]),
     b('belt_es', 'Silk Cord', 'belt', 20, [mod('es', 'base', 20)]),
     b('belt_duelist', 'Fencer Girdle', 'belt', 78, [

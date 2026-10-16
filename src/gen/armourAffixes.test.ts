@@ -135,8 +135,7 @@ describe('hybrid pieces and defence types', () => {
 
 describe('the pools against the reference tables', () => {
   // Prefixes and suffixes that can roll at item level 84. The reference game has one prefix and one suffix more on most
-  // classes (item rarity), and a few the engine has no stat for (block of projectiles, life or mana when blocking,
-  // energy shield regeneration, flask charges used).
+  // classes (item rarity), and its accuracy hybrid has a light radius Bob does not.
   const count = (id: string) => {
     const tags = itemTags(itemBase(id));
     const fams = FAMILIES.filter(
@@ -147,7 +146,7 @@ describe('the pools against the reference tables', () => {
       fams.filter((f) => f.type === 'suffix').length,
     ];
   };
-  it('match the counts of the 3.9 pools less the omitted mods', () => {
+  it('match the counts of the 3.9 pools less item rarity', () => {
     const want: Record<string, [number, number]> = {
       helmet_ar_4: [7, 11],
       helmet_es_4: [9, 10],
@@ -155,17 +154,17 @@ describe('the pools against the reference tables', () => {
       gloves_ev_4: [11, 12],
       boots_es_4: [8, 8],
       body_ar_4: [6, 9],
-      body_es_4: [8, 8],
-      body_eves_4: [9, 10],
-      shield_ar_4: [9, 12],
+      body_es_4: [8, 9],
+      body_eves_4: [9, 11],
+      shield_ar_4: [9, 14],
       shield_ev_4: [7, 15],
-      shield_es_4: [21, 14],
-      shield_arev_4: [10, 17],
-      shield_ares_4: [16, 16],
-      shield_eves_4: [15, 19],
+      shield_es_4: [21, 15],
+      shield_arev_4: [10, 18],
+      shield_ares_4: [16, 18],
+      shield_eves_4: [15, 20],
       ring_fire: [11, 21],
       amulet_str: [14, 21],
-      belt_life: [8, 11],
+      belt_life: [8, 12],
       quiver_acc: [8, 14],
     };
     for (const [id, c] of Object.entries(want)) expect(count(id), id).toEqual(c);
