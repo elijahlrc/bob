@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import type { EquipSlot, InventoryItem } from '../data/types';
 import type { Controller } from '../run/controller';
 import { discardedValue, salvageDiscarded, salvage, salvageValue } from '../run/craft';
@@ -59,12 +59,18 @@ export function Items({
   c,
   focus,
   onCraft,
+  startView,
 }: {
   c: Controller;
   /** Select this item when it changes (set by the Workbench's "Show in Items"). */
   focus?: { uid: number; n: number } | null;
   /** Open the Workbench with this item. */
   onCraft?: (uid: number) => void;
+  /**
+   * Open on this view with every kind of item shown, for this visit only: the player's own filters are not overwritten
+   * (the camp opens on the last map's drops after a map, docs/STREAMLINE.md S2).
+   */
+  startView?: View;
 }) {
   const run = c.run!;
   const { layout, coarse } = useViewport();
@@ -76,16 +82,25 @@ export function Items({
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<SortKey>(() => loadPref<SortKey>('inv.sort', 'newest'));
   const [desc, setDesc] = useState<boolean>(() => loadPref<boolean>('inv.desc', false));
-  const [what, setWhat] = useState<What>(loadWhat);
-  const [view, setView] = useState<View>(loadView);
+  const [what, setWhat] = useState<What>(() => (startView ? 'all' : loadWhat()));
+  const [view, setView] = useState<View>(() => startView ?? loadView());
+  // A visit opened on `startView` saves the filters only once the player changes them.
+  const keepWhat = useRef(startView !== undefined);
+  const keepView = useRef(startView !== undefined);
   const [pinFav, setPinFav] = useState<boolean>(() => loadPref<boolean>('inv.pinFav', true));
   const [cleaning, setCleaning] = useState(false);
   const [gearOpen, setGearOpen] = useState(false);
   useEffect(() => savePref('inv.pinFav', pinFav), [pinFav]);
   useEffect(() => savePref('inv.sort', sort), [sort]);
   useEffect(() => savePref('inv.desc', desc), [desc]);
-  useEffect(() => savePref('inv.what', what), [what]);
-  useEffect(() => savePref('inv.view', view), [view]);
+  useEffect(() => {
+    if (keepWhat.current) keepWhat.current = false;
+    else savePref('inv.what', what);
+  }, [what]);
+  useEffect(() => {
+    if (keepView.current) keepView.current = false;
+    else savePref('inv.view', view);
+  }, [view]);
 
   // An item stays NEW until the player looks at it (selects it) or marks everything seen.
   const unseen = useMemo(() => new Set(run.unseen), [run.unseen]);

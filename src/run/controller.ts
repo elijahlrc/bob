@@ -1,17 +1,17 @@
 import type { MonsterTypeId } from '../data/monsters';
 import { Emitter } from '../core/events';
-import { CRAFTING_OPEN, DT } from '../data/constants';
+import { DT } from '../data/constants';
 import { clampDifficulty, DEFAULT, type Difficulty } from '../data/difficulty';
 import { worldResult, type MapResult } from '../sim/runMap';
 import type { SimEvent, World } from '../sim/types';
 import { cancelAbandon, requestAbandon } from '../sim/abandon';
 import { createWorld, stepWorld } from '../sim/world';
-import { CRAWL_SEGMENTS, mapTypeDef } from '../data/mapTypes';
+import { CRAWL_SEGMENTS } from '../data/mapTypes';
 import type { Build } from '../data/types';
 import type { Vitals } from '../sim/types';
 import { CLASSES } from '../data/classes';
 import { botCamp } from './bot';
-import { stopName, takeStop, type StopChoice } from './stops';
+import { takeStop, type StopChoice } from './stops';
 import { waysideOf } from './wayside';
 import { armProvision, disarmProvision, readyReprieves, startProvisions } from './provisions';
 import type { ProvisionId } from '../data/provisions';
@@ -19,13 +19,11 @@ import type { CraftResult } from './craft';
 import type { MapOffer } from './offers';
 import { combineCrawl } from './play';
 import { galleryEntries, galleryRun, galleryWorld, type GalleryEntry } from './gallery';
-import { completeTabletSets } from './craft';
-import { pruneFound, unseenRares } from './found';
+import { pruneFound } from './found';
 import { loadFound, recordFound } from './codex';
 import {
   finishMap,
   newRun,
-  passivePoints,
   planFor,
   setMap,
   takeRespite,
@@ -42,9 +40,6 @@ import {
   type SlotId,
   type SlotSummary,
 } from './save';
-
-/** Auto-continue pauses when life or any flask is below this fraction (docs/MAPS.md 10.2). */
-export const AUTO_PAUSE_BELOW = 0.5;
 
 export type Screen =
   'title' | 'classSelect' | 'camp' | 'map' | 'summary' | 'victory' | 'codex' | 'patchNotes';
@@ -240,6 +235,17 @@ export class Controller {
     this.undoStack = [];
     this.lastResult = null;
     this.goTo('camp');
+  }
+
+  /**
+   * Start a run from the menus: straight into its first map (docs/STREAMLINE.md S1). At map 1 the offers differ in
+   * nothing a new character can weigh, so the first plain map is taken; the choice of map starts at map 2.
+   */
+  beginRun(classId: string, seed: number): void {
+    this.startRun(classId, seed);
+    const offers = this.run!.offers;
+    const plain = offers.findIndex((o) => o.kind === 'map' && o.type === 'plain');
+    this.startMap(Math.max(0, plain));
   }
 
   /** The difficulty of the next new run. */
@@ -492,47 +498,6 @@ export class Controller {
     Object.assign(this.run, JSON.parse(prev));
     this.changed();
     return true;
-  }
-
-  setAutoContinue(on: boolean): void {
-    if (!this.run) return;
-    this.run.autoContinue = on;
-    this.changed();
-  }
-
-  /**
-   * Auto-continue applies only when nothing needs the player's attention (§5.3): no unspent
-   * passive points, no pending reward and no new unique or rare item.
-   */
-  canAutoContinue(): boolean {
-    return this.autoBlocker() === null;
-  }
-
-  /** Why auto-continue is paused (shown in the camp), or null when nothing needs attention. */
-  autoBlocker(): string | null {
-    const run = this.run;
-    if (!run || run.phase !== 'camp') return 'not in camp';
-    const pts = passivePoints(run);
-    if (pts > 0) return `${pts} unspent passive point${pts === 1 ? '' : 's'}`;
-    if (run.reward) return 'a reward is waiting to be picked';
-    // (With crafting closed there is no way to pick a result or redeem a set, so neither holds auto-continue up.)
-    if (CRAFTING_OPEN && run.pendingCraft) return 'a craft is waiting for you to pick a result';
-    const set = CRAFTING_OPEN ? completeTabletSets(run) : [];
-    if (set.length)
-      return `${set.length} tablet set${set.length === 1 ? '' : 's'} to redeem (open the Workbench)`;
-    const rares = unseenRares(run).length;
-    if (rares > 0) return `${rares} new rare/unique item${rares === 1 ? '' : 's'} (open Items)`;
-    // Auto-continue always takes the first offer, which is a map and never a stop, so a stop would pass unseen. Stops come every few levels, so
-    // it pauses for the first one only, until the player has read what a stop is (the explainer's "Got it"); after that a stop is passed over.
-    const stop = run.offers.find((o) => o.kind === 'stop');
-    if (stop && !waysideOf(run).seen.stop)
-      return `${stopName(stop.stop!)} is on offer (read what a stop is)`;
-    // The next map is the anchor: stop if it is not the plain map auto-continue is meant for, or the character is worn down.
-    if (run.offers[0].type !== 'plain')
-      return `the first map is a ${mapTypeDef(run.offers[0].type).name} map`;
-    if (run.vitals.life < AUTO_PAUSE_BELOW) return 'life is low';
-    if (Object.values(run.vitals.flasks).some((f) => f < AUTO_PAUSE_BELOW)) return 'a flask is low';
-    return null;
   }
 
   /** The raw saved run of a slot (for bug reports), or null. */

@@ -1,5 +1,5 @@
 import { BOSSES, type BossId } from '../data/bosses';
-import { FACTION_COLOR, FACTION_GLYPH, TAG_INFO } from '../data/monsterInfo';
+import { FACTION_COLOR, FACTION_GLYPH } from '../data/monsterInfo';
 import type { OfferPreview } from '../run/preview';
 import { hoverInfo } from './info';
 
@@ -15,8 +15,8 @@ const bonus = (f: number) =>
 const count = (n: number) => (n > 0 ? n : <span class="muted">—</span>);
 
 /**
- * What the map pays and how many monsters it has, with the same rows on every offer card so that the cards can be read
- * across. The percentages are over a plain map of the same level and leave out the character's own gear.
+ * What the map pays and how many monsters it has, with the same cells on every offer card so that the cards can be read
+ * across, two to a row. The percentages are over a plain map of the same level and leave out the character's own gear.
  */
 export function OfferTable({ o }: { o: OfferPreview }) {
   const r = o.rewards;
@@ -25,38 +25,40 @@ export function OfferTable({ o }: { o: OfferPreview }) {
   return (
     <table class="offer-table">
       <tbody>
-        <tr
-          {...hoverInfo(
-            'Items dropped, over a plain map of this level (your own gear not counted).',
-          )}
-        >
-          <th>Item quantity</th>
+        <tr>
+          <th
+            {...hoverInfo(
+              'Items dropped, over a plain map of this level (your own gear not counted).',
+            )}
+          >
+            Quantity
+          </th>
           <td>{bonus(r.quantity)}</td>
-        </tr>
-        <tr
-          {...hoverInfo(
-            'Chance of magic, rare and unique items, over a plain map of this level (your own gear not counted).',
-          )}
-        >
-          <th>Item rarity</th>
+          <th
+            {...hoverInfo(
+              'Chance of magic, rare and unique items, over a plain map of this level (your own gear not counted).',
+            )}
+          >
+            Rarity
+          </th>
           <td>{bonus(r.rarity)}</td>
         </tr>
-        <tr {...hoverInfo('Experience from kills, over a plain map of this level.')}>
-          <th>Experience</th>
+        <tr>
+          <th {...hoverInfo('Experience from kills, over a plain map of this level.')}>
+            Experience
+          </th>
           <td>{bonus(r.experience)}</td>
-        </tr>
-        <tr {...hoverInfo('How many monsters this map holds.')}>
-          <th>Monsters</th>
+          <th {...hoverInfo('How many monsters this map holds.')}>Monsters</th>
           <td>{m.total}</td>
         </tr>
-        <tr {...hoverInfo('Magic monsters, rare monsters, and bosses or champions on this map.')}>
-          <th>Magic · Rare · Boss</th>
+        <tr>
+          <th {...hoverInfo('Magic monsters, rare monsters, and bosses or champions on this map.')}>
+            Magic · Rare · Boss
+          </th>
           <td>
             {count(m.magic)} · {count(m.rare)} · {count(m.boss)}
           </td>
-        </tr>
-        <tr>
-          <th>Bonus loot</th>
+          <th>Bonus</th>
           <td>
             {r.bonus.length ? (
               r.bonus.map((b) => (
@@ -102,11 +104,6 @@ export function OfferInfo({
           </span>
         ))}
       </div>
-      {info.asks.map((a) => (
-        <div key={a.id} class="asks">
-          Asks: {a.text}
-        </div>
-      ))}
       {(info.leans.hard.length > 0 || info.leans.soft.length > 0) && (
         <div class="leans">
           {info.leans.hard.length > 0 && <>Hard to {info.leans.hard.join(', ')}. </>}
@@ -129,15 +126,6 @@ export function OfferInfo({
           ) : null,
         )}
       </div>
-      {info.tags.length > 0 && (
-        <div class="chips">
-          {info.tags.map((t) => (
-            <span key={t} class="chip tag" {...hoverInfo(TAG_INFO[t].text)}>
-              {TAG_INFO[t].name}
-            </span>
-          ))}
-        </div>
-      )}
       {more && (
         <>
           <div class="chips">

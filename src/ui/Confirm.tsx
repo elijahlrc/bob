@@ -25,7 +25,7 @@ const set = (o: Open | null) => {
   listeners.forEach((l) => l(o));
 };
 
-/** Whether a question is waiting for an answer (auto-continue holds off while one is). */
+/** Whether a question is waiting for an answer. */
 export const confirmOpen = (): boolean => current !== null;
 
 /** Answer the open question with no, when what it was about has gone (the map began, the screen changed). */

@@ -16,11 +16,12 @@ export function ClassSelect({ c }: { c: Controller }) {
             key={cls.id}
             class="class-card"
             style={{ borderColor: hex(cls.color) }}
-            onClick={() => c.startRun(cls.id, Math.floor(Math.random() * 0x7fffffff))}
+            onClick={() => c.beginRun(cls.id, Math.floor(Math.random() * 0x7fffffff))}
           >
             <div class="class-name" style={{ color: hex(cls.color) }}>
               {cls.name}
             </div>
+            <div class="class-style">{cls.style}</div>
             <div class="class-attrs">
               Str {cls.attrs.str} · Dex {cls.attrs.dex} · Int {cls.attrs.int}
             </div>

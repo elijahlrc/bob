@@ -15,6 +15,13 @@ change, and our own names only. Dash bullets under plain headings.
 - Affix tiers count down from the best: tier 1 is the strongest. On every item the best tier of an affix is now a quarter as likely as the lowest, where it was about half, so top rolls come less often.
 - Items you already have keep their affixes and built-in bonuses; the changes apply to items found from now on.
 - Uniques whose life or mana leech rolls between two values with decimals now roll within that range. A fault had made them roll either the lowest value or one point above it, so Last Sprint could have 1.6% life leech instead of 0.6–0.8%. This affected Last Sprint, Slaughter Pendant, Drake Hide Plate, Ember Halo Mail, Many-Eyed Circlet, Hollow Regent Mask, Wraith Razor and Marksman's Pendant. Copies you already own keep their rolls.
+- A new run starts straight in its first map.
+- After a map, the camp opens on your items, showing what the map dropped, with any reward to pick at the top. A Next button at the bottom right steps through Items, Skills, the passive tree when you have points to spend, and the choice of the next map, so you can review everything by clicking in one place.
+- The Skills tab shows how many new gems you have.
+- Auto-continue is gone: you choose every map.
+- Map cards are shorter. The "Asks" line, the tags, the Gentle, Even and Fierce label, the DPS and effective life line and the Comfortable, Close and Dangerous verdict are gone, and the rewards table takes two columns.
+- Each class on the class screen says how it fights.
+- When a run ends, you can start a new run of the same class straight away.
 
 ## 2026-10-15
 

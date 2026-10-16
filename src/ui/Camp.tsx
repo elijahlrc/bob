@@ -7,14 +7,14 @@ import { flaskBase } from '../data/flasks';
 import { densityDef, densityFor, type DensityId } from '../data/density';
 import { mapTypeDef } from '../data/mapTypes';
 import { themeDef } from '../data/themes';
-import { offersFor, type Verdict } from '../run/preview';
+import { offersFor } from '../run/preview';
 import { xpToNext } from '../data/xpTable';
 import { resistPenaltyForMap } from '../gen/mapPlan';
 import type { Controller } from '../run/controller';
 import { chalkAdd, chalkOptions, chalkRemove } from '../run/craft';
 import { passivePoints, type RunState } from '../run/run';
-import { unseenItems } from '../run/found';
-import { ask, confirmOpen } from './Confirm';
+import { markSeen, unseenItems } from '../run/found';
+import { ask } from './Confirm';
 import { useViewport } from './device';
 import { infoProps } from './info';
 import { Items } from './Items';
@@ -36,14 +36,26 @@ import { Tip } from './Tip';
 import { stopDef } from '../data/stops';
 import { TreeView } from './TreeView';
 
-const COUNTDOWN = 2;
-const TIER_TEXT = { gentle: 'Gentle', even: 'Even', fierce: 'Fierce' } as const;
-const VERDICT_TEXT: Record<Verdict, string> = {
-  comfortable: 'Comfortable',
-  close: 'Close',
-  dangerous: 'Dangerous',
-};
 type Tab = 'tree' | 'sheet' | 'skills' | 'strategy' | 'items' | 'workbench' | 'report' | 'next';
+
+/**
+ * The walk through the camp after a map (docs/STREAMLINE.md S3): the Next button steps through these, so a player who
+ * changes nothing can review the new items, the skills and any passive points, and reach the map choice, by clicking in
+ * one place. A tab off the walk goes straight to the map choice.
+ */
+const WALK: Tab[] = ['items', 'skills', 'tree', 'next'];
+const WALK_NAME: Partial<Record<Tab, string>> = {
+  items: 'Items',
+  skills: 'Skills',
+  tree: 'Passive tree',
+};
+
+/** The step after `tab` on the walk. The passive tree is a step only while there are points to spend. */
+function nextStep(tab: Tab, points: number): Tab {
+  const at = WALK.indexOf(tab);
+  if (at < 0) return 'next';
+  return WALK.slice(at + 1).find((t) => t !== 'tree' || points > 0) ?? 'next';
+}
 
 /**
  * A boss map's offer (docs/BOSSES.md 10): the one way on, presented as a level apart from all the others. The boss's
@@ -85,9 +97,6 @@ function BossOffer({ c, o }: { c: Controller; o: OfferPreview }) {
             </div>
           );
         })}
-        <div class="threat">
-          For you: DPS ×{o.dps.toFixed(2)} · effective HP ×{o.ehp.toFixed(2)}
-        </div>
       </div>
       <button class="btn boss-go" onClick={() => c.startMap(0)}>
         Face {boss.name}
@@ -180,10 +189,21 @@ function Arriving({ run }: { run: RunState }) {
 
 export function Camp({ c }: { c: Controller }) {
   const run = c.run;
-  const [tab, setTab] = useState<Tab>('sheet');
-  // The countdown to the next map waits while the report of the last one is on screen.
-  const tabRef = useRef(tab);
-  tabRef.current = tab;
+  // Back from a map, the camp opens on what the map dropped (with the reward pick on top), or on the next step of the
+  // walk when it dropped nothing. A camp entered from the title opens on the map choice (docs/STREAMLINE.md S2).
+  const fromMap = !!run && c.lastResult !== null;
+  const [tab, setTabState] = useState<Tab>(() => {
+    if (!run || !fromMap) return 'next';
+    const drops = new Set(run.lastDrops ?? []);
+    if (run.reward || run.inventory.some((x) => drops.has(x.uid))) return 'items';
+    return nextStep('items', passivePoints(run));
+  });
+  // The Items tab shows the last map's drops the first time it is opened after a map, then the player's own view again.
+  const [showDrops, setShowDrops] = useState(fromMap);
+  const setTab = (t: Tab) => {
+    if (tab === 'items' && t !== 'items') setShowDrops(false);
+    setTabState(t);
+  };
   // An item the Items tab sends to the Workbench ("Craft…") and back ("Show in Items"); `n` makes a repeat count.
   const [focus, setFocus] = useState<{ uid: number; n: number; to: 'items' | 'workbench' } | null>(
     null,
@@ -204,33 +224,8 @@ export function Camp({ c }: { c: Controller }) {
   }, [tab]);
   // On a narrow screen the types, rules and gate line of an offer card stay folded until asked for.
   const [opened, setOpened] = useState<Record<string, boolean>>({});
-  const [left, setLeft] = useState<number | null>(null);
   // The stop whose screen is open in the Next map tab (docs/WAYSIDE.md 5); nothing of it is saved until it is taken.
   const [stopSlot, setStopSlot] = useState<number | null>(null);
-  const blocker = run ? c.autoBlocker() : null;
-  const auto = !!run && run.autoContinue && blocker === null;
-  useEffect(() => {
-    if (!auto) {
-      setLeft(null);
-      return;
-    }
-    setLeft(COUNTDOWN);
-    let start = performance.now();
-    const id = setInterval(() => {
-      // A question to answer holds the countdown: the map must not begin under it.
-      if (confirmOpen() || tabRef.current === 'report') {
-        start = performance.now();
-        setLeft(COUNTDOWN);
-        return;
-      }
-      const remain = COUNTDOWN - (performance.now() - start) / 1000;
-      if (remain <= 0) {
-        clearInterval(id);
-        c.startMap(0);
-      } else setLeft(remain);
-    }, 100);
-    return () => clearInterval(id);
-  }, [auto, run?.map]);
   // Ctrl+Z undoes the last camp change (equip, socket, passive point, reward pick ...).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -248,6 +243,17 @@ export function Camp({ c }: { c: Controller }) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [c]);
+  // New gems are counted on the Skills tab until it has been opened (docs/STREAMLINE.md S4).
+  const newGems = run ? unseenItems(run).filter((x) => x.kind === 'gem') : [];
+  useEffect(() => {
+    if (tab === 'skills' && newGems.length)
+      c.act((r) =>
+        markSeen(
+          r,
+          newGems.map((x) => x.uid),
+        ),
+      );
+  }, [tab, newGems.length]);
   const ch = useMemo(
     () =>
       run
@@ -345,14 +351,6 @@ export function Camp({ c }: { c: Controller }) {
                     boss={bossForMap(run.map) ?? undefined}
                     more={!narrow || !!opened[o.id]}
                   />
-                  {o.tier && (
-                    <div
-                      class={`tier ${o.tier}`}
-                      title="This map is drawn harder or easier than the average for its level (the variance setting). It is fixed for the run."
-                    >
-                      {TIER_TEXT[o.tier]}
-                    </div>
-                  )}
                   {o.affixes.map((id) => {
                     const a = mapAffixDef(id);
                     return (
@@ -362,17 +360,6 @@ export function Camp({ c }: { c: Controller }) {
                       </div>
                     );
                   })}
-                  <div class="threat">
-                    For you: DPS ×{o.dps.toFixed(2)} · effective HP ×{o.ehp.toFixed(2)}
-                  </div>
-                  {o.verdict && (
-                    <div
-                      class={`verdict ${o.verdict}`}
-                      title={`How you would fare here next to a plain map at its level, counting the life you arrive with (${Math.round((o.ratio ?? 0) * 100)}%). A rough guide, not a promise.`}
-                    >
-                      {VERDICT_TEXT[o.verdict]}
-                    </div>
-                  )}
                 </button>
                 {narrow && (
                   <button
@@ -390,17 +377,6 @@ export function Camp({ c }: { c: Controller }) {
       )}
       <div class="camp-foot">
         <DebugPanel c={c} />
-        <label class="muted">
-          <input
-            type="checkbox"
-            checked={run.autoContinue}
-            onChange={(e) => c.setAutoContinue((e.target as HTMLInputElement).checked)}
-          />{' '}
-          Auto-continue
-          {left !== null &&
-            ` — ${bossForMap(run.map) ? BOSSES[bossForMap(run.map)!].name : themeDef(run.offers[0].themeId).name} in ${left.toFixed(1)} s`}
-          {run.autoContinue && blocker && <div class="warn">Paused: {blocker}</div>}
-        </label>
         {c.saveFailed && (
           <div class="warn">
             The browser has no room to save this run. Delete an old save on the title screen to make
@@ -428,6 +404,7 @@ export function Camp({ c }: { c: Controller }) {
     </>
   );
   const shown: Tab = tab;
+  const after = nextStep(shown, pts);
   return (
     <div class="screen camp tabbed">
       <div class="camp-main">
@@ -445,7 +422,7 @@ export function Camp({ c }: { c: Controller }) {
             class={'tab' + (shown === 'skills' ? ' on' : '')}
             onClick={() => setTab('skills')}
           >
-            Skills
+            Skills{newGems.length ? ` (${newGems.length} new)` : ''}
           </button>
           <button
             class={'tab' + (shown === 'strategy' ? ' on' : '')}
@@ -479,11 +456,17 @@ export function Camp({ c }: { c: Controller }) {
           {shown === 'sheet' && <Sheet s={sheet} />}
           {shown === 'skills' && <Skills c={c} ch={ch} />}
           {shown === 'strategy' && <Strategy c={c} ch={ch} />}
+          {shown === 'items' && run.reward && (
+            <div class="items-reward">
+              <Reward c={c} />
+            </div>
+          )}
           {shown === 'items' && (
             <Items
               c={c}
               focus={focus?.to === 'items' ? focus : null}
               onCraft={(uid) => goTo('workbench', uid)}
+              startView={showDrops ? 'last' : undefined}
             />
           )}
           {shown === 'workbench' && CRAFTING_OPEN && (
@@ -522,19 +505,12 @@ export function Camp({ c }: { c: Controller }) {
               Pick the reforge
             </button>
           )}
-          {left !== null && shown !== 'next' && (
-            <span class="muted">
-              {shown === 'report'
-                ? 'Auto-continue waits while you read the report'
-                : `Auto-continue: next map in ${left.toFixed(1)} s`}
-            </span>
-          )}
           <button class="btn small" disabled={!c.canUndo} onClick={() => c.undo()}>
             ↶ Undo
           </button>
           {shown !== 'next' && (
-            <button class="btn small primary" onClick={() => setTab('next')}>
-              Next map ▸
+            <button class="btn small primary" onClick={() => setTab(after)}>
+              {after === 'next' ? 'Next map' : `Next: ${WALK_NAME[after]}`} ▸
             </button>
           )}
         </div>

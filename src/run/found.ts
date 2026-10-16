@@ -37,14 +37,6 @@ export function itemRarity(it: InventoryItem): Rarity {
   return 'normal';
 }
 
-/** Unseen rares and uniques: what pauses Auto-continue (the player should look at them first). */
-export function unseenRares(run: RunState): InventoryItem[] {
-  return unseenItems(run).filter((x) => {
-    const r = itemRarity(x);
-    return x.kind !== 'gem' && (r === 'rare' || r === 'unique');
-  });
-}
-
 export const isFavourite = (run: RunState, uid: number): boolean => run.favourites.includes(uid);
 
 /** Star or unstar an item. */

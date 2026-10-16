@@ -89,7 +89,6 @@ export type RunState = {
   refundPoints: number;
   /** The maps offered for the next level, rolled when the previous level ended (docs/MAPS.md 4.1). */
   offers: MapOffer[];
-  autoContinue: boolean;
   phase: 'camp' | 'dead' | 'victory';
   history: MapRecord[];
   /** Pending reward offers (1 of 3), if earned. */
@@ -155,7 +154,6 @@ export function newRun(classId: string, seed: number, difficulty: Difficulty = D
     bonusPoints: 0,
     refundPoints: 0,
     offers: rollOffers(seed, 1),
-    autoContinue: false,
     phase: 'camp',
     history: [],
     reward: null,
