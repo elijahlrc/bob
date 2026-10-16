@@ -25,7 +25,10 @@ export const affixLabel = (id: string): string => familyLabel(family(id));
 /** The words of a family without its number or its "+N to" / "N% increased" lead: "maximum Life". */
 export function affixName(familyId: string): string {
   return familyText(family(familyId))
-    .replace(/^((adds|[+-]?N%?|to|increased|reduced|more|less|additional|of)\s+)+/i, '')
+    .replace(
+      /^((adds|regenerate|reflects|gain|[+-]?N%?|to|increased|reduced|more|less|additional|of)\s+)+/i,
+      '',
+    )
     .replace(/\s+/g, ' ')
     .trim();
 }

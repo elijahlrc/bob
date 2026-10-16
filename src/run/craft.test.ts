@@ -348,12 +348,15 @@ describe('the Workbench: Bone Dust', () => {
     const { run, item } = setup({ map: 30, base: 'helmet_ar_3' });
     // A rare with room, and none of the families the recipes add.
     item.affixes = item.affixes
-      .filter((x) => !['life', 'fireRes', 'coldRes', 'lightRes', 'chaosRes'].includes(x.family))
+      .filter(
+        (x) =>
+          !['lifeHelmBeltQuiver', 'fireRes', 'coldRes', 'lightRes', 'chaosRes'].includes(x.family),
+      )
       .slice(0, 2);
-    expect(benchAdd(run, item.uid, 'life').ok).toBe(true);
+    expect(benchAdd(run, item.uid, 'lifeHelmBeltQuiver').ok).toBe(true);
     const now = get(run, item);
     const bench = now.affixes.find((a) => a.bench)!;
-    expect(bench.family).toBe('life');
+    expect(bench.family).toBe('lifeHelmBeltQuiver');
     expect(benchAdd(run, item.uid, 'fireRes').ok).toBe(false); // one per item
     expect(benchRemoveBench(run, item.uid).ok).toBe(true);
     expect(get(run, item).affixes.some((a) => a.bench)).toBe(false);

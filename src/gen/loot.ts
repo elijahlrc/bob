@@ -56,9 +56,12 @@ export function itemTags(base: ItemBase): Set<SlotTag> {
     t.add(c);
     t.add('armourPiece');
     const d = base.defenceType ?? 'ar';
-    if (d.includes('ar')) t.add('ar');
-    if (d.includes('ev')) t.add('ev');
-    if (d.includes('es')) t.add('es');
+    for (const k of ['ar', 'ev', 'es'] as const)
+      if (d.includes(k)) {
+        t.add(k);
+        if (c === 'shield') t.add(`${k}Shield`);
+      }
+    if (d.length > 2) t.add('hybrid');
   } else t.add(c as SlotTag);
   return t;
 }
@@ -191,6 +194,8 @@ export function rollBase(rng: Rng, ilvl: number): ItemBase {
     }
     pool = pool.filter((b) => b.level <= ilvl);
     if (pool.length === 0) continue;
+    // Jewellery has no tiers: a base is a kind, and any kind the item level allows is as likely as another.
+    if (!pool[0].defenceType && !isWeaponClass(pool[0].itemClass)) return rng.pick(pool);
     pool.sort((a, b) => a.level - b.level);
     return rng.chance(0.6) ? pool[pool.length - 1] : rng.pick(pool);
   }

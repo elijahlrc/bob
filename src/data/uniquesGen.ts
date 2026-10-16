@@ -1657,7 +1657,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'saplingKite',
     name: 'Sapling Kite',
-    baseId: 'shield_ar_1',
+    baseId: 'shield_ares_1',
     level: 7,
     mods: [
       m('resist.allEle', 'base', 4),
@@ -1708,7 +1708,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'heartwoodKite',
     name: 'Heartwood Kite',
-    baseId: 'shield_ar_1',
+    baseId: 'shield_ares_1',
     level: 40,
     mods: [
       m('armour', 'inc', 80, 120, { local: true }),
@@ -5303,7 +5303,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'dawnbreakWard',
     name: 'Dawnbreak Ward',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_ares_4',
     level: 62,
     mods: [
       m('damage', 'inc', 10, 20, { damageTypes: ['fire', 'cold', 'lightning'], tags: ['attack'] }),
@@ -5342,7 +5342,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'shatteredCreed',
     name: 'Shattered Creed',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_ares_4',
     level: 68,
     mods: [
       m('leech.life', 'base', 0.4, 0.4, { damageTypes: ['chaos'] }),
@@ -5355,7 +5355,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'parryDisc',
     name: 'Parry Disc',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_arev_4',
     level: 60,
     mods: [
       m('damage', 'inc', 20, 20, { damageTypes: ['physical'] }),
@@ -5387,7 +5387,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sparkgiltShield',
     name: 'Sparkgilt Shield',
-    baseId: 'shield_ar_2',
+    baseId: 'shield_eves_2',
     level: 27,
     mods: [
       m('dodgeAttack', 'base', 4),
@@ -5493,7 +5493,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'brazenFacet',
     name: 'Brazen Facet',
-    baseId: 'shield_ar_3',
+    baseId: 'shield_eves_3',
     level: 45,
     mods: [
       m('dodgeSpell', 'base', 2),
@@ -5507,7 +5507,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'emberwakeKite',
     name: 'Emberwake Kite',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_ares_4',
     level: 65,
     mods: [
       m('resist.allEle', 'base', 8),
@@ -5526,7 +5526,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'prismwardHeater',
     name: 'Prismward Heater',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_ares_4',
     level: 60,
     mods: [
       m('resist.allEle', 'base', 4),
@@ -5598,7 +5598,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pyrewatchBulwark',
     name: 'Pyrewatch Bulwark',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_ares_4',
     level: 68,
     mods: [
       m('critChance', 'inc', 50, 70),
@@ -5620,7 +5620,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'echoingSpikeguard',
     name: 'Echoing Spikeguard',
-    baseId: 'shield_ar_3',
+    baseId: 'shield_eves_3',
     level: 49,
     mods: [
       m('damage', 'inc', 40, 50, { tags: ['spell'] }),
@@ -8017,7 +8017,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'dawnforgedBulwark',
     name: 'Dawnforged Bulwark',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_ares_4',
     level: 68,
     mods: [
       m('resist.allEle', 'base', 12),
@@ -8064,7 +8064,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'swiftwardBulwark',
     name: 'Swiftward Bulwark',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_eves_4',
     level: 62,
     mods: [
       m('socketedGemLevel', 'base', 1, 3, { tags: ['lightning'] }),
@@ -8090,7 +8090,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wintermoonTarge',
     name: 'Wintermoon Targe',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_arev_4',
     level: 66,
     mods: [
       m('socketedGemLevel', 'base', 2),
@@ -8113,7 +8113,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'mendicantSpike',
     name: 'Mendicant Spike',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_eves_4',
     level: 66,
     mods: [
       m('dodgeAttack', 'base', 4),
@@ -8133,7 +8133,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'crimsonPrism',
     name: 'Crimson Prism',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_ares_4',
     level: 68,
     mods: [
       m('resist.allEle', 'base', 12),
@@ -8187,7 +8187,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'drownedHide',
     name: 'Drowned Hide',
-    baseId: 'shield_ar_2',
+    baseId: 'shield_arev_2',
     level: 20,
     mods: [
       m('damage.min', 'base', 4, 4, { damageTypes: ['physical'], tags: ['attack'] }),
@@ -8211,7 +8211,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stillpointKite',
     name: 'Stillpoint Kite',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_ares_4',
     level: 68,
     mods: [
       m('life', 'base', 60, 80),
@@ -10121,7 +10121,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'snapjawBulwark',
     name: 'Snapjaw Bulwark',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_eves_4',
     level: 70,
     mods: [
       m('dodgeSpell', 'base', 4),
@@ -10195,7 +10195,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'almsgiverKite',
     name: 'Almsgiver Kite',
-    baseId: 'shield_ar_3',
+    baseId: 'shield_ares_3',
     level: 50,
     mods: [
       m('life', 'base', 50, 70),
@@ -10225,7 +10225,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hexholdRoundel',
     name: 'Hexhold Roundel',
-    baseId: 'shield_ar_1',
+    baseId: 'shield_arev_1',
     level: 5,
     mods: [
       m('armour', 'base', 3, 6, { local: true }),

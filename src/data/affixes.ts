@@ -1,6 +1,8 @@
 import type { DamageType, Mod, ModKind, SkillTag } from '../mods/types';
+import { ARMOUR_FAMILY_DEFS } from './armourAffixes';
+import { tabled } from './tierTables';
+import type { TierTable } from './tierTables';
 import * as W from './weaponTables';
-import type { TierTable } from './weaponTables';
 
 /**
  * Item affix families (DESIGN.md §11.3). Each family is authored compactly — a stat template,
@@ -36,7 +38,13 @@ export type SlotTag =
   | 'armourPiece'
   | 'ar'
   | 'ev'
-  | 'es';
+  | 'es'
+  /** An armour piece or shield that gives two defences. */
+  | 'hybrid'
+  /** A shield that gives armour, evasion or energy shield (alone or with another). */
+  | 'arShield'
+  | 'evShield'
+  | 'esShield';
 
 export type ModTemplate = {
   stat: string;
@@ -49,6 +57,8 @@ export type ModTemplate = {
   local?: boolean;
   /** Decimal places for rolled values (default 0). */
   dec?: number;
+  /** Takes the value rolled for the mod before it (one roll that feeds two stats). */
+  same?: boolean;
 };
 
 export type FamilyDef = {
@@ -68,6 +78,8 @@ export type FamilyDef = {
   /** Magic-item names from weakest to strongest tier group. */
   names: [string, string, string];
   rareOnly?: boolean;
+  /** The family a variant belongs to when one mod has a ladder for each set of slots (the bench and essences name the group). */
+  group?: string;
   /** Base weight multiplier (default 1). */
   weight?: number;
   /** Weight multiplier on items with a tag (the first tag the item has): a family rarer on weapons than on armour. */
@@ -78,12 +90,9 @@ export type Tier = { tier: number; minIlvl: number; weight: number; ranges: [num
 export type Family = FamilyDef & { tiers: Tier[] };
 
 const ARMOUR: SlotTag[] = ['armourPiece'];
-const JEWEL: SlotTag[] = ['ring', 'amulet'];
-const ATTACK_JEWEL: SlotTag[] = ['ring', 'amulet', 'gloves', 'quiver'];
 const CASTER: SlotTag[] = ['casterWeapon'];
 const ELE: DamageType[] = ['fire', 'cold', 'lightning'];
 
-const T9 = [1, 8, 16, 25, 34, 44, 54, 66, 80];
 const T8 = [1, 10, 20, 30, 42, 54, 68, 82];
 const T7 = [1, 11, 23, 35, 48, 62, 76];
 const T6 = [2, 14, 28, 42, 58, 74];
@@ -118,20 +127,6 @@ const g = (
   ...extra,
 });
 
-/** A family whose tiers are written out: its item levels and the first and last values of each mod come from the table. */
-const tabled = (
-  table: TierTable,
-  mods: Omit<ModTemplate, 'first' | 'last'>[],
-): Pick<FamilyDef, 'ilvls' | 'mods' | 'table'> => {
-  const first = table[0].slice(1) as [number, number][];
-  const last = table[table.length - 1].slice(1) as [number, number][];
-  return {
-    ilvls: table.map((r) => r[0]),
-    table,
-    mods: mods.map((m, i) => ({ ...m, first: first[i], last: last[i] })),
-  };
-};
-
 /** The minimum and maximum of flat damage of one type. */
 const flat = (
   type: DamageType,
@@ -165,113 +160,15 @@ const added = (
   },
 ];
 
-export const FAMILY_DEFS: FamilyDef[] = [
+const HAND_DEFS: FamilyDef[] = [
   // ---- Prefixes --------------------------------------------------------------------------
-  {
-    id: 'life',
-    type: 'prefix',
-    slots: [...ARMOUR, ...JEWEL, 'belt'],
-    ilvls: T9,
-    mods: [g('life', 'base', [5, 12], [95, 110])],
-    names: ['Sinewed', 'Marrowed', 'Gravehale'],
-    weight: 1.5,
-  },
   {
     id: 'mana',
     type: 'prefix',
-    slots: [...JEWEL, 'belt', 'helmet', 'gloves', 'boots', 'casterWeapon', 'claw', 'dagger'],
+    slots: ['casterWeapon', 'claw', 'dagger'],
     ilvls: T8,
     mods: [g('mana', 'base', [8, 15], [70, 80])],
     names: ['Inked', 'Wellspring', 'Deepwell'],
-  },
-  {
-    id: 'esGlobal',
-    type: 'prefix',
-    slots: [...JEWEL, 'belt'],
-    ilvls: T6,
-    mods: [g('es', 'base', [3, 6], [38, 46])],
-    names: ['Shimmering', 'Haloed', 'Aureate'],
-  },
-  {
-    id: 'esLocal',
-    type: 'prefix',
-    slots: ARMOUR,
-    requires: ['es'],
-    ilvls: T8,
-    mods: [local('es', 'base', [3, 6], [60, 75])],
-    names: ['Glimmering', 'Warded', 'Radiant'],
-  },
-  {
-    id: 'armourLocal',
-    type: 'prefix',
-    slots: ARMOUR,
-    requires: ['ar'],
-    ilvls: T8,
-    mods: [local('armour', 'base', [6, 12], [260, 320])],
-    names: ['Riveted', 'Bolted', 'Bastioned'],
-  },
-  {
-    id: 'evasionLocal',
-    type: 'prefix',
-    slots: ARMOUR,
-    requires: ['ev'],
-    ilvls: T8,
-    mods: [local('evasion', 'base', [6, 12], [260, 320])],
-    names: ['Supple', 'Fleeting', 'Wraithlike'],
-  },
-  {
-    id: 'incArmour',
-    type: 'prefix',
-    slots: ARMOUR,
-    requires: ['ar'],
-    ilvls: T7,
-    mods: [local('armour', 'inc', [10, 18], [92, 110])],
-    names: ['Plated', 'Ironclad', 'Immovable'],
-  },
-  {
-    id: 'incEvasion',
-    type: 'prefix',
-    slots: ARMOUR,
-    requires: ['ev'],
-    ilvls: T7,
-    mods: [local('evasion', 'inc', [10, 18], [92, 110])],
-    names: ['Lithe', 'Mistborne', 'Phantom'],
-  },
-  {
-    id: 'incEs',
-    type: 'prefix',
-    slots: ARMOUR,
-    requires: ['es'],
-    ilvls: T7,
-    mods: [local('es', 'inc', [10, 18], [92, 110])],
-    names: ['Humming', 'Thrumming', 'Resonant'],
-  },
-  {
-    id: 'incArEv',
-    type: 'prefix',
-    slots: ARMOUR,
-    requires: ['ar', 'ev'],
-    ilvls: T6,
-    mods: [local('armour', 'inc', [10, 16], [80, 95]), local('evasion', 'inc', [10, 16], [80, 95])],
-    names: ['Scaled', 'Brigand', 'Warlord'],
-  },
-  {
-    id: 'incArEs',
-    type: 'prefix',
-    slots: ARMOUR,
-    requires: ['ar', 'es'],
-    ilvls: T6,
-    mods: [local('armour', 'inc', [10, 16], [80, 95]), local('es', 'inc', [10, 16], [80, 95])],
-    names: ['Blessed', 'Consecrated', 'Hallowed'],
-  },
-  {
-    id: 'incEvEs',
-    type: 'prefix',
-    slots: ARMOUR,
-    requires: ['ev', 'es'],
-    ilvls: T6,
-    mods: [local('evasion', 'inc', [10, 16], [80, 95]), local('es', 'inc', [10, 16], [80, 95])],
-    names: ['Dusky', 'Gloaming', 'Eclipsed'],
   },
   {
     id: 'physLocal',
@@ -378,38 +275,6 @@ export const FAMILY_DEFS: FamilyDef[] = [
     weight: 1.4,
   },
   {
-    id: 'addPhysAttacks',
-    type: 'prefix',
-    slots: ATTACK_JEWEL,
-    ilvls: T6,
-    mods: added('physical', [1, 8], [2, 14], { tags: ['attack'] }),
-    names: ['Gritty', 'Jagged', 'Rending'],
-  },
-  {
-    id: 'addFireAttacks',
-    type: 'prefix',
-    slots: ATTACK_JEWEL,
-    ilvls: T6,
-    mods: added('fire', [1, 16], [3, 30], { tags: ['attack'] }),
-    names: ['Warm', 'Scorching', 'Cindered'],
-  },
-  {
-    id: 'addColdAttacks',
-    type: 'prefix',
-    slots: ATTACK_JEWEL,
-    ilvls: T6,
-    mods: added('cold', [1, 14], [3, 26], { tags: ['attack'] }),
-    names: ['Nippy', 'Bitter', 'Hoarfrost'],
-  },
-  {
-    id: 'addLightAttacks',
-    type: 'prefix',
-    slots: ATTACK_JEWEL,
-    ilvls: T6,
-    mods: added('lightning', [1, 3], [5, 55], { tags: ['attack'] }),
-    names: ['Static', 'Sparking', 'Thundering'],
-  },
-  {
     id: 'addFireSpells',
     type: 'prefix',
     slots: CASTER,
@@ -464,14 +329,6 @@ export const FAMILY_DEFS: FamilyDef[] = [
     weight: 1.4,
   },
   {
-    id: 'spellDamage',
-    type: 'prefix',
-    slots: ['amulet'],
-    ilvls: T8,
-    mods: [g('damage', 'inc', [8, 12], [75, 89], { tags: ['spell'] })],
-    names: ['Chanting', 'Incanting', 'Archmage'],
-  },
-  {
     id: 'spellDamageWeapon',
     type: 'prefix',
     slots: CASTER,
@@ -490,24 +347,16 @@ export const FAMILY_DEFS: FamilyDef[] = [
   {
     id: 'eleAttacks',
     type: 'prefix',
-    slots: [...ATTACK_JEWEL, 'weapon'],
+    slots: ['weapon'],
     ilvls: T6,
     mods: [g('damage', 'inc', [5, 10], [35, 42], { damageTypes: ELE, tags: ['attack'] })],
     names: ['Charged', 'Elemental', 'Prismatic'],
-    weights: { weapon: 0.3 },
-  },
-  {
-    id: 'lifeLeech',
-    type: 'prefix',
-    slots: ATTACK_JEWEL,
-    ilvls: T4,
-    mods: [g('leech.life', 'base', [0.2, 0.4], [0.8, 1.0], { tags: ['attack'], dec: 1 })],
-    names: ['Thirsting', 'Vampiric', 'Exsanguinating'],
+    weight: 0.3,
   },
   {
     id: 'gemLevel',
     type: 'prefix',
-    slots: ['helmet', 'body'],
+    slots: [], // retired: not a reference mod; items that have it keep it
     ilvls: [60, 75],
     mods: [local('socketedGemLevel', 'base', [1, 1], [2, 2])],
     names: ['Resonating', 'Resonating', 'Choral'],
@@ -527,55 +376,44 @@ export const FAMILY_DEFS: FamilyDef[] = [
   {
     id: 'fireRes',
     type: 'suffix',
-    slots: [...ARMOUR, ...JEWEL, 'belt', 'weapon'],
+    slots: [...ARMOUR, 'ring', 'amulet', 'belt', 'quiver', 'weapon'],
     ilvls: T8,
     mods: [g('resist.fire', 'base', [6, 11], [44, 48])],
     names: ['of Embers', 'of the Kiln', 'of the Pyre'],
-    weight: 1.4,
-    weights: { weapon: 0.35 },
+    weights: { weapon: 0.49 },
   },
   {
     id: 'coldRes',
     type: 'suffix',
-    slots: [...ARMOUR, ...JEWEL, 'belt', 'weapon'],
+    slots: [...ARMOUR, 'ring', 'amulet', 'belt', 'quiver', 'weapon'],
     ilvls: T8,
     mods: [g('resist.cold', 'base', [6, 11], [44, 48])],
     names: ['of Wool', 'of the Thaw', 'of the Hearth'],
-    weight: 1.4,
-    weights: { weapon: 0.35 },
+    weights: { weapon: 0.49 },
   },
   {
     id: 'lightRes',
     type: 'suffix',
-    slots: [...ARMOUR, ...JEWEL, 'belt', 'weapon'],
+    slots: [...ARMOUR, 'ring', 'amulet', 'belt', 'quiver', 'weapon'],
     ilvls: T8,
     mods: [g('resist.lightning', 'base', [6, 11], [44, 48])],
     names: ['of Grounding', 'of the Rod', 'of the Lodestone'],
-    weight: 1.4,
-    weights: { weapon: 0.35 },
-  },
-  {
-    id: 'allRes',
-    type: 'suffix',
-    slots: [...JEWEL, 'shield'],
-    ilvls: T5,
-    mods: [g('resist.allEle', 'base', [3, 5], [15, 18])],
-    names: ['of Balance', 'of the Prism', 'of the Spectrum'],
+    weights: { weapon: 0.49 },
   },
   {
     id: 'chaosRes',
     type: 'suffix',
-    slots: [...ARMOUR, ...JEWEL, 'belt', 'weapon'],
+    slots: [...ARMOUR, 'ring', 'amulet', 'belt', 'quiver', 'weapon'],
     ilvls: T6,
     mods: [g('resist.chaos', 'base', [5, 10], [31, 35])],
     names: ['of Antidotes', 'of Purging', 'of the Clean Grave'],
-    weight: 0.6,
-    weights: { weapon: 0.5 },
+    weight: 0.25,
+    weights: { weapon: 1.2 },
   },
   {
     id: 'str',
     type: 'suffix',
-    slots: ['sword', 'axe', 'mace', 'sceptre', 'staff', ...ARMOUR, ...JEWEL, 'belt'],
+    slots: ['sword', 'axe', 'mace', 'sceptre', 'staff'],
     ilvls: T8,
     mods: [g('str', 'base', [8, 12], [51, 55])],
     names: ['of the Ox', 'of the Boulder', 'of the Mountain'],
@@ -583,7 +421,7 @@ export const FAMILY_DEFS: FamilyDef[] = [
   {
     id: 'dex',
     type: 'suffix',
-    slots: ['sword', 'axe', 'claw', 'dagger', 'bow', ...ARMOUR, ...JEWEL, 'quiver'],
+    slots: ['sword', 'axe', 'claw', 'dagger', 'bow'],
     ilvls: T8,
     mods: [g('dex', 'base', [8, 12], [51, 55])],
     names: ['of the Hare', 'of the Lynx', 'of the Falcon'],
@@ -591,18 +429,10 @@ export const FAMILY_DEFS: FamilyDef[] = [
   {
     id: 'int',
     type: 'suffix',
-    slots: ['wand', 'dagger', 'claw', 'staff', 'sceptre', ...ARMOUR, ...JEWEL],
+    slots: ['wand', 'dagger', 'claw', 'staff', 'sceptre'],
     ilvls: T8,
     mods: [g('int', 'base', [8, 12], [51, 55])],
     names: ['of the Owl', 'of the Archive', 'of the Oracle'],
-  },
-  {
-    id: 'allAttr',
-    type: 'suffix',
-    slots: JEWEL,
-    ilvls: T5,
-    mods: [g('allAttr', 'base', [1, 4], [21, 24])],
-    names: ['of the Wanderer', 'of the Pilgrim', 'of the Saint'],
   },
   {
     id: 'aspdLocal',
@@ -618,22 +448,6 @@ export const FAMILY_DEFS: FamilyDef[] = [
     slots: ['wand', 'bow'],
     ...tabled(W.ATTACK_SPEED_RANGED, [{ stat: 'attackSpeed', kind: 'inc', local: true }]),
     names: ['of Quickness', 'of Fervour', 'of the Whirlwind'],
-  },
-  {
-    id: 'aspdGlobal',
-    type: 'suffix',
-    slots: ['gloves', 'quiver', 'ring'],
-    ilvls: T4,
-    mods: [g('attackSpeed', 'inc', [5, 7], [14, 16])],
-    names: ['of Haste', 'of Alacrity', 'of the Gale'],
-  },
-  {
-    id: 'castSpeed',
-    type: 'suffix',
-    slots: ['amulet', 'ring'],
-    ilvls: T6,
-    mods: [g('castSpeed', 'inc', [5, 8], [26, 29])],
-    names: ['of Talent', 'of Mastery', 'of Sorcery'],
   },
   {
     id: 'castSpeedWeapon',
@@ -660,41 +474,17 @@ export const FAMILY_DEFS: FamilyDef[] = [
     names: ['of Needling', 'of Precision', 'of the Surgeon'],
   },
   {
-    id: 'critGlobal',
-    type: 'suffix',
-    slots: ['amulet', 'quiver', 'helmet', 'ring'],
-    ilvls: T6,
-    mods: [g('critChance', 'inc', [10, 14], [35, 38])],
-    names: ['of Menace', 'of Malice', 'of Cruelty'],
-  },
-  {
     id: 'critMulti',
     type: 'suffix',
-    slots: ['weapon', 'amulet', 'quiver'],
+    slots: ['weapon'],
     ilvls: T6,
     mods: [g('critMulti', 'base', [8, 12], [35, 38])],
     names: ['of Ire', 'of Fury', 'of Butchery'],
   },
   {
-    id: 'accuracy',
-    type: 'suffix',
-    slots: ['helmet', 'gloves', 'ring', 'quiver'],
-    ilvls: T8,
-    mods: [g('accuracy', 'base', [10, 30], [380, 450])],
-    names: ['of Calm', 'of Focus', 'of the Hawkeye'],
-  },
-  {
-    id: 'lifeRegen',
-    type: 'suffix',
-    slots: [...ARMOUR, ...JEWEL, 'belt'],
-    ilvls: T7,
-    mods: [g('lifeRegen', 'base', [1, 2], [26, 32], { dec: 1 })],
-    names: ['of Mending', 'of Renewal', 'of the Phoenix'],
-  },
-  {
     id: 'manaRegen',
     type: 'suffix',
-    slots: [...JEWEL, ...CASTER, 'claw', 'dagger', 'shield'],
+    slots: [...CASTER, 'claw', 'dagger'],
     ilvls: T6,
     mods: [g('manaRegen', 'inc', [10, 19], [60, 69])],
     names: ['of Excitement', 'of Zeal', 'of Euphoria'],
@@ -702,7 +492,7 @@ export const FAMILY_DEFS: FamilyDef[] = [
   {
     id: 'lifeOnHit',
     type: 'suffix',
-    slots: ['gloves', 'ring', 'weapon', 'quiver'],
+    slots: ['weapon'],
     ilvls: T5,
     mods: [g('lifeOnHit', 'base', [1, 2], [8, 10], { tags: ['attack'] })],
     names: ['of Feeding', 'of Gorging', 'of the Glutton'],
@@ -710,24 +500,16 @@ export const FAMILY_DEFS: FamilyDef[] = [
   {
     id: 'moveSpeed',
     type: 'suffix',
-    slots: ['boots'],
+    slots: [], // retired: now a prefix, bootsMoveSpeed; items that have it keep it
     ilvls: [1, 15, 30, 45, 60],
     mods: [g('moveSpeed', 'inc', [8, 10], [28, 30])],
     names: ['of the Courier', 'of the Hare', 'of the Comet'],
     weight: 1.5,
   },
   {
-    id: 'block',
-    type: 'suffix',
-    slots: ['shield'],
-    ilvls: T5,
-    mods: [g('blockAttack', 'base', [1, 2], [8, 9])],
-    names: ['of the Wall', 'of the Rampart', 'of the Citadel'],
-  },
-  {
     id: 'igniteChance',
     type: 'suffix',
-    slots: ['gloves'],
+    slots: [], // retired: weapons only now; items that have it keep it
     ilvls: T4,
     mods: [g('chance.ignite', 'base', [5, 8], [20, 25])],
     names: ['of Kindling', 'of Arson', 'of the Inferno'],
@@ -750,7 +532,7 @@ export const FAMILY_DEFS: FamilyDef[] = [
   {
     id: 'bleedChance',
     type: 'suffix',
-    slots: ['gloves'],
+    slots: [], // retired: weapons only now; items that have it keep it
     ilvls: T4,
     mods: [g('chance.bleed', 'base', [5, 8], [20, 25])],
     names: ['of Nicking', 'of Lacerations', 'of the Abattoir'],
@@ -769,7 +551,7 @@ export const FAMILY_DEFS: FamilyDef[] = [
   {
     id: 'poisonChance',
     type: 'suffix',
-    slots: ['gloves'],
+    slots: [], // retired: weapons only now; items that have it keep it
     ilvls: T4,
     mods: [g('chance.poison', 'base', [5, 8], [20, 25])],
     names: ['of Venom', 'of Blight', 'of the Viper'],
@@ -788,7 +570,7 @@ export const FAMILY_DEFS: FamilyDef[] = [
   {
     id: 'shockChance',
     type: 'suffix',
-    slots: ['gloves'],
+    slots: [], // retired: weapons only now; items that have it keep it
     ilvls: T4,
     mods: [g('chance.shock', 'base', [5, 8], [20, 25])],
     names: ['of Static', 'of Thunderheads', 'of the Tempest'],
@@ -811,7 +593,7 @@ export const FAMILY_DEFS: FamilyDef[] = [
   {
     id: 'freezeChance',
     type: 'suffix',
-    slots: ['gloves'],
+    slots: [], // retired: weapons only now; items that have it keep it
     ilvls: T4,
     mods: [g('chance.freeze', 'base', [5, 8], [20, 25])],
     names: ['of Rime', 'of Whiteout', 'of the Glacier'],
@@ -834,7 +616,7 @@ export const FAMILY_DEFS: FamilyDef[] = [
   {
     id: 'reservation',
     type: 'suffix',
-    slots: ['amulet'],
+    slots: [], // retired: no reference counterpart on these items; items that have it keep it
     ilvls: [30, 55, 78],
     mods: [g('reducedReservation', 'base', [4, 6], [10, 12])],
     names: ['of Restraint', 'of Restraint', 'of Serenity'],
@@ -844,7 +626,7 @@ export const FAMILY_DEFS: FamilyDef[] = [
   {
     id: 'addChaosAttacks',
     type: 'prefix',
-    slots: ATTACK_JEWEL,
+    slots: [], // retired: no reference counterpart on these items; items that have it keep it
     ilvls: T6,
     mods: added('chaos', [1, 12], [3, 22], { tags: ['attack'] }),
     names: ['Tainted', 'Befouled', 'Rotted'],
@@ -853,7 +635,7 @@ export const FAMILY_DEFS: FamilyDef[] = [
   {
     id: 'auraEffect',
     type: 'suffix',
-    slots: ['amulet', 'belt'],
+    slots: [], // retired: no reference counterpart on these items; items that have it keep it
     ilvls: [30, 55, 78],
     mods: [g('auraEffect', 'inc', [4, 6], [10, 14])],
     names: ['of Radiance', 'of Radiance', 'of the Beacon'],
@@ -863,7 +645,7 @@ export const FAMILY_DEFS: FamilyDef[] = [
   {
     id: 'areaEffect',
     type: 'suffix',
-    slots: ['gloves', 'amulet', 'belt'],
+    slots: [], // retired: no reference counterpart on these items; items that have it keep it
     ilvls: T5,
     mods: [g('aoe', 'inc', [5, 8], [16, 22])],
     names: ['of Reach', 'of Sweep', 'of Breadth'],
@@ -872,7 +654,7 @@ export const FAMILY_DEFS: FamilyDef[] = [
   {
     id: 'stunDuration',
     type: 'suffix',
-    slots: ['weapon', 'gloves'],
+    slots: ['weapon'],
     ilvls: T5,
     mods: [g('stunDuration', 'inc', [10, 15], [35, 40])],
     names: ['of Dazing', 'of Stupor', 'of the Concussion'],
@@ -887,18 +669,9 @@ export const FAMILY_DEFS: FamilyDef[] = [
     weight: 0.6,
   },
   {
-    id: 'stunAvoid',
-    type: 'suffix',
-    slots: ['body', 'boots', 'belt'],
-    ilvls: T5,
-    mods: [g('stunAvoid', 'base', [8, 12], [30, 35])],
-    names: ['of Footing', 'of Steadiness', 'of the Anchor'],
-    weight: 0.7,
-  },
-  {
     id: 'stunThreshold',
     type: 'suffix',
-    slots: ['belt', 'body'],
+    slots: [], // retired: no reference counterpart on these items; items that have it keep it
     ilvls: T5,
     mods: [g('stunThreshold', 'inc', [10, 15], [36, 40])],
     names: ['of Grit', 'of Fortitude', 'of the Bulwark'],
@@ -1260,6 +1033,8 @@ export const FAMILY_DEFS: FamilyDef[] = [
   },
 ];
 
+export const FAMILY_DEFS: FamilyDef[] = [...HAND_DEFS, ...ARMOUR_FAMILY_DEFS];
+
 function round(v: number, dec = 0): number {
   const f = Math.pow(10, dec);
   return Math.round(v * f) / f;
@@ -1316,7 +1091,7 @@ export function familyMods(f: Family, values: number[]): Mod[] {
   return f.mods.map((m, i) => ({
     stat: m.stat,
     kind: m.kind,
-    value: values[i],
+    value: m.same ? values[i - 1] : values[i],
     ...(m.damageTypes ? { damageTypes: m.damageTypes } : {}),
     ...(m.tags ? { tags: m.tags } : {}),
     ...(m.local ? { local: true } : {}),

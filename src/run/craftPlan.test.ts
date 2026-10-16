@@ -139,14 +139,14 @@ describe('a plan promises what the craft does', () => {
 
 describe('a rolled craft shows a typical result and the range, never the roll', () => {
   it('lists the tiers and values an item level allows, and the real roll falls inside', () => {
-    const r = rollRange(family('life'), 70)!;
+    const r = rollRange(family('lifeBody'), 70)!;
     let rolled = 0;
     for (let seed = 1; seed <= 60; seed++) {
       const { run, item } = setup({ seed });
       const prefixes = item.affixes.filter((x) => family(x.family).type === 'prefix').length;
-      if (item.affixes.some((x) => x.family === 'life') || prefixes >= 3) continue;
-      expect(usePearl(run, item.uid, 'life').ok).toBe(true);
-      const roll = get(run, item).affixes.find((x) => x.family === 'life')!;
+      if (item.affixes.some((x) => x.family === 'lifeBody') || prefixes >= 3) continue;
+      expect(usePearl(run, item.uid, 'lifeBody').ok).toBe(true);
+      const roll = get(run, item).affixes.find((x) => x.family === 'lifeBody')!;
       expect(roll.tier).toBeGreaterThanOrEqual(r.tiers[0]);
       expect(roll.tier).toBeLessThanOrEqual(r.tiers[1]);
       expect(roll.mods[0].value).toBeGreaterThanOrEqual(r.low[0]);
@@ -158,11 +158,11 @@ describe('a rolled craft shows a typical result and the range, never the roll', 
 
   it('shows the typical item with the new affix, the range in words, and does not use up the roll', () => {
     const { run, item } = setup({ rarity: 'magic' });
-    const a = addRoutes(run, 'life')[0];
+    const a = addRoutes(run, 'lifeBody')[0];
     const p = planCraft(run, item.uid, a);
     expect(p.ok).toBe(true);
     expect(p.exact).toBe(false);
-    expect(p.after!.affixes.some((x) => x.family === 'life')).toBe(true);
+    expect(p.after!.affixes.some((x) => x.family === 'lifeBody')).toBe(true);
     expect(p.range).toMatch(/tier/);
     const seq = run.craftSeq;
     planCraft(run, item.uid, a);

@@ -3,7 +3,8 @@ import { family, familyMods } from '../data/affixes';
 import { itemBase } from '../data/bases';
 import type { AffixRoll, Item } from '../data/types';
 import { makeItem } from '../gen/items';
-import { lineMarks, weaponLine } from './ItemCard';
+import { armourStats } from '../calc/items';
+import { armourLine, lineMarks, weaponLine } from './ItemCard';
 
 let n = 92000;
 const uid = () => n++;
@@ -39,6 +40,18 @@ describe('the item card', () => {
     const fire = weaponLine(withAffix('sword_5', 'addFireLocal'))!;
     expect(fire.extra[0]).toMatch(/fire$/);
     expect(weaponLine(makeItem(uid, 'body_ar_1', 1))).toBeNull();
+  });
+
+  it('the card line of an armour piece is the piece after its mods, with what changed marked', () => {
+    const plain = armourLine(makeItem(uid, 'body_ar_4', 84))!;
+    expect(plain.map((p) => p.aug)).toEqual([false]);
+    const lit = withAffix('body_ar_4', 'armourLocalBodyShield');
+    const line = armourLine(lit)!;
+    expect(line[0]).toEqual({ text: `${armourStats(lit).armour} armour`, aug: true });
+    expect(armourLine(makeItem(uid, 'ring_fire', 84))).toBeNull();
+    const shield = armourLine(withAffix('shield_ar_4', 'block'))!;
+    expect(shield.find((p) => p.text.endsWith('% block'))!.aug).toBe(true);
+    expect(shield[0].aug).toBe(false);
   });
 
   it('a stat that keeps its text and changes its number is marked as changed, not as lost and gained', () => {

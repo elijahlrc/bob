@@ -642,7 +642,7 @@
   }
 }
 
-/* A weapon's numbers after its own mods, set apart from the base's. */
+/* A weapon's or armour piece's numbers after its own mods, set apart from the base's. */
 .ic-aug {
   color: #9ab8ff;
 }

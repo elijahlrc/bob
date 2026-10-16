@@ -1,3 +1,4 @@
+import { FAMILY_DEFS } from './affixes';
 import { FACTION_NAMES, type FactionId } from './monsters';
 import { UNIQUE_FLASKS } from './uniqueFlasks';
 import { UNIQUES } from './uniques';
@@ -6,6 +7,12 @@ import { UNIQUES } from './uniques';
  * player agency over items: each one names a verb, and the player chooses what it is pointed at.
  * Every name and text here is ours.
  */
+/** Every family of the named mods (a mod with a ladder for each set of slots has one family for each). */
+const grp = (...ids: string[]): string[] =>
+  FAMILY_DEFS.filter(
+    (f) => ids.includes(f.id) || (f.group !== undefined && ids.includes(f.group)),
+  ).map((f) => f.id);
+
 export type CurrencyId =
   | 'ember'
   | 'pearl'
@@ -103,14 +110,7 @@ export const CURRENCIES: CurrencyDef[] = [
     text: 'Add a chaos affix of your choice: chaos resistance, poison chance or added chaos damage.',
     minMap: 8,
     weight: 0,
-    families: [
-      'chaosRes',
-      'poisonChance',
-      'addChaosAttacks',
-      'addChaosLocal',
-      'addChaosLocal2h',
-      'poisonWeapon',
-    ],
+    families: ['chaosRes', 'addChaosLocal', 'addChaosLocal2h', 'poisonWeapon'],
     faction: 'rot',
   },
   {
@@ -119,34 +119,34 @@ export const CURRENCIES: CurrencyDef[] = [
     text: 'Add an affix of your choice: energy shield, evasion or maximum mana.',
     minMap: 15,
     weight: 0,
-    families: ['esGlobal', 'esLocal', 'evasionLocal', 'mana'],
+    families: grp('esGlobal', 'esLocal', 'evasionLocal', 'mana', 'manaGear'),
     faction: 'hollow',
   },
   {
     id: 'censerAsh',
     name: 'Censer Ash',
-    text: 'Add an affix of your choice: reduced mana reserved, or aura effect.',
+    text: 'Add an affix of your choice: flask charges gained, flask effect duration or flask recovery rate.',
     minMap: 25,
     weight: 0,
-    families: ['reservation', 'auraEffect'],
+    families: ['flaskCharges', 'flaskDuration', 'flaskLifeRate', 'flaskManaRate'],
     faction: 'choir',
   },
   {
     id: 'chitin',
     name: 'Chitin',
-    text: 'Add an affix of your choice: attack speed, life on hit, or area of effect.',
+    text: 'Add an affix of your choice: attack speed or life on hit.',
     minMap: 12,
     weight: 0,
-    families: ['aspdGlobal', 'aspdLocal', 'aspdLocalRanged', 'lifeOnHit', 'areaEffect'],
+    families: [...grp('aspdGlobal', 'lifeOnHitGear'), 'aspdLocal', 'aspdLocalRanged', 'lifeOnHit'],
     faction: 'swarm',
   },
   {
     id: 'reliquarySlag',
     name: 'Reliquary Slag',
-    text: 'Add an affix of your choice: armour, physical damage or stun threshold.',
+    text: 'Add an affix of your choice: armour, physical damage or reduced enemy stun threshold.',
     minMap: 35,
     weight: 0,
-    families: ['armourLocal', 'physLocal', 'stunThreshold'],
+    families: [...grp('armourLocal'), 'physLocal', 'enemyStunThresholdBelt'],
     faction: 'reliquary',
   },
   {
@@ -155,7 +155,7 @@ export const CURRENCIES: CurrencyDef[] = [
     text: 'Add an affix of your choice: movement speed, accuracy or stun avoidance.',
     minMap: 11,
     weight: 0,
-    families: ['moveSpeed', 'accuracy', 'accuracyLocal', 'stunAvoid'],
+    families: [...grp('accuracy'), 'bootsMoveSpeed', 'accuracyLocal', 'stunAvoid'],
     faction: 'kennel',
   },
   {
@@ -164,7 +164,7 @@ export const CURRENCIES: CurrencyDef[] = [
     text: 'Add an affix of your choice: life regeneration, mana regeneration or life leech.',
     minMap: 18,
     weight: 0,
-    families: ['lifeRegen', 'manaRegen', 'lifeLeech', 'lifeLeechPhys'],
+    families: [...grp('lifeRegen', 'manaRegenGear', 'lifeLeech'), 'manaRegen', 'lifeLeechPhys'],
     faction: 'gilded',
   },
   {
@@ -182,13 +182,7 @@ export const CURRENCIES: CurrencyDef[] = [
     text: 'Add an affix of your choice: fire resistance, added fire damage to attacks or chance to ignite.',
     minMap: 26,
     weight: 0,
-    families: [
-      'fireRes',
-      'addFireAttacks',
-      'igniteChance',
-      'igniteChanceWeapon',
-      'igniteChanceWeapon2h',
-    ],
+    families: ['fireRes', ...grp('addFireAttacks'), 'igniteChanceWeapon', 'igniteChanceWeapon2h'],
     faction: 'emberborn',
   },
 ];
@@ -283,16 +277,19 @@ export type BenchRecipe =
   | { kind: 'remove'; label: string; dust: number; minMap: number }
   | { kind: 'socket'; nth: number; label: string; dust: number; minMap: number };
 
+const addRecipes = (group: string, label: string, dust: number, minMap: number): BenchRecipe[] =>
+  grp(group).map((family) => ({ kind: 'add', family, label, dust, minMap }));
+
 export const BENCH_RECIPES: BenchRecipe[] = [
-  { kind: 'add', family: 'life', label: 'Maximum life', dust: 20, minMap: 10 },
+  ...addRecipes('life', 'Maximum life', 20, 10),
   { kind: 'add', family: 'fireRes', label: 'Fire resistance', dust: 15, minMap: 10 },
   { kind: 'add', family: 'coldRes', label: 'Cold resistance', dust: 15, minMap: 10 },
   { kind: 'add', family: 'lightRes', label: 'Lightning resistance', dust: 15, minMap: 10 },
   { kind: 'remove', label: 'Remove one chosen affix', dust: 25, minMap: 10 },
   { kind: 'add', family: 'chaosRes', label: 'Chaos resistance', dust: 40, minMap: 25 },
   { kind: 'socket', nth: 4, label: 'Fourth socket', dust: 40, minMap: 25 },
-  { kind: 'add', family: 'aspdGlobal', label: 'Attack speed', dust: 30, minMap: 40 },
-  { kind: 'add', family: 'castSpeed', label: 'Cast speed', dust: 30, minMap: 40 },
+  ...addRecipes('aspdGlobal', 'Attack speed', 30, 40),
+  ...addRecipes('castSpeed', 'Cast speed', 30, 40),
   { kind: 'socket', nth: 5, label: 'Fifth socket', dust: 120, minMap: 40 },
   { kind: 'socket', nth: 6, label: 'Sixth socket', dust: 300, minMap: 60 },
 ];
