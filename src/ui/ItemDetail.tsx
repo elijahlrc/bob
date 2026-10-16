@@ -1,8 +1,9 @@
+import type { ComponentChildren } from 'preact';
 import { useMemo, useState } from 'preact/hooks';
 import type { SheetDiff } from '../calc/character';
 import { CRAFTING_OPEN } from '../data/constants';
 import { flaskBase } from '../data/flasks';
-import type { EquipSlot, FlaskItem, InventoryItem, Item } from '../data/types';
+import type { Build, EquipSlot, FlaskItem, InventoryItem, Item } from '../data/types';
 import { salvageValue } from '../run/craft';
 import {
   compareFlasks,
@@ -12,9 +13,11 @@ import {
   type ItemInfo,
   type SlotCompare,
 } from '../run/inventoryOps';
-import type { EquipCheck } from '../run/inventory';
+import type { EquipCheck, SocketOutcome } from '../run/inventory';
 import type { RunState } from '../run/run';
 import { ItemCard, itemTitle, lineMarks, rarityClass } from './ItemCard';
+import { DiffCard, DiffLines } from './DiffCard';
+import { diffRows, type DiffRow } from './itemDiff';
 import { SocketsRow } from './SocketPips';
 
 export type Sel =
@@ -116,12 +119,22 @@ function DiscardButton({ it, a }: { it: InventoryItem; a: Actions }) {
 }
 
 /** The card of the item and the one it would replace, side by side, with what differs marked. */
-function Pair({ item, against, empty }: { item: Item; against?: Item; empty: string }) {
+function Pair({
+  item,
+  against,
+  empty,
+  build,
+}: {
+  item: Item | FlaskItem;
+  against?: Item | FlaskItem;
+  empty: string;
+  build?: Build;
+}) {
   return (
     <div class="ix-pair">
       <div>
         <div class="muted cmp-title">New</div>
-        <ItemCard it={item} marks={lineMarks(item, against, 'new')} />
+        <ItemCard it={item} build={build} marks={lineMarks(item, against, 'new')} />
       </div>
       <div>
         <div class="muted cmp-title">{empty}</div>
@@ -133,6 +146,14 @@ function Pair({ item, against, empty }: { item: Item; against?: Item; empty: str
       </div>
     </div>
   );
+}
+
+/** What a tab says about the gems of its swap, in a few words. */
+function tabGems(o: SocketOutcome): string {
+  if (o.out.length) return `⚠ ${o.out.length} gem${o.out.length > 1 ? 's' : ''} out`;
+  if (o.idle.length) return '⚠ a gem idles';
+  if (o.before.filled || o.after.filled) return 'gems stay';
+  return 'no gems';
 }
 
 function SlotTabs({
@@ -158,11 +179,22 @@ function SlotTabs({
           <b>{s.label}</b>
           <span class="muted">{s.equipped ? s.equipped.name : 'empty'}</span>
           {s.check.ok ? (
-            <span class={'ix-tab-d ' + (s.scorePct > 0.5 ? 'up' : s.scorePct < -0.5 ? 'down' : '')}>
-              {s.scorePct > 0.05 ? '▲' : s.scorePct < -0.05 ? '▼' : '='}{' '}
-              {Math.abs(Math.round(s.dpsPct))}% dmg · {Math.abs(Math.round(s.ehpPct))}% HP
-              {s.best ? ' · best' : ''}
-            </span>
+            <>
+              <span
+                class={'ix-tab-d ' + (s.scorePct > 0.5 ? 'up' : s.scorePct < -0.5 ? 'down' : '')}
+              >
+                {s.scorePct > 0.05 ? '▲' : s.scorePct < -0.05 ? '▼' : '='}{' '}
+                {Math.abs(Math.round(s.dpsPct))}% dmg · {Math.abs(Math.round(s.ehpPct))}% HP
+                {s.best ? ' · best' : ''}
+              </span>
+              <span
+                class={
+                  'ix-tab-d ' + (s.sockets.out.length || s.sockets.idle.length ? 'warn' : 'muted')
+                }
+              >
+                {tabGems(s.sockets)}
+              </span>
+            </>
           ) : (
             <span class="ix-tab-d down">can't</span>
           )}
@@ -172,25 +204,157 @@ function SlotTabs({
   );
 }
 
+/** The actions of a selected bag item. On a phone they are one compact row, with the peek/full switch at its end. */
+function ActionRow({
+  swap,
+  title,
+  disabled,
+  onSwap,
+  a,
+  it,
+  favourite,
+  craft,
+  phone,
+  full,
+  setFull,
+}: {
+  swap: string;
+  title?: string;
+  disabled: boolean;
+  onSwap: () => void;
+  a: Actions;
+  it: InventoryItem;
+  favourite: boolean;
+  craft?: Item;
+  phone: boolean;
+  full: boolean;
+  setFull: (f: boolean) => void;
+}) {
+  return (
+    <div class="item-actions ix-actions">
+      <button class="btn primary" disabled={disabled} title={title} onClick={onSwap}>
+        {swap}
+      </button>
+      <button
+        class="btn small"
+        aria-label={favourite ? 'Remove from favourites' : 'Add to favourites'}
+        onClick={() => a.onFavourite(it.uid)}
+      >
+        {phone ? (favourite ? '★' : '☆') : favourite ? '★ Favourite' : '☆ Favourite'}
+      </button>
+      {craft && (
+        <button
+          class="btn small"
+          onClick={() => a.onCraft(craft.uid)}
+          disabled={!!craft.sealed || !CRAFTING_OPEN}
+          title={CRAFTING_OPEN ? undefined : 'Crafting is closed for now.'}
+        >
+          Craft…
+        </button>
+      )}
+      <DiscardButton it={it} a={a} />
+      {phone && (
+        <button
+          class="btn small ix-expand"
+          aria-label={full ? 'Show less' : 'Show everything'}
+          aria-expanded={full}
+          onClick={() => setFull(!full)}
+        >
+          {full ? '▾' : '▴'}
+        </button>
+      )}
+    </div>
+  );
+}
+
+/**
+ * The phone's compare (docs/EQUIP.md 3.4). The peek opens on the lines that change and what happens to the gems; the full view adds
+ * the calculated changes, the gems by name and the whole card, one merged card with the old values beside the new ones.
+ */
+function PhoneCompare({
+  it,
+  against,
+  rows,
+  full,
+  setFull,
+  build,
+  extra,
+  sockets,
+}: {
+  it: Item | FlaskItem;
+  against: Item | FlaskItem | undefined;
+  rows: DiffRow[];
+  full: boolean;
+  setFull: (f: boolean) => void;
+  build: Build;
+  /** The calculated changes, shown in the full view only. */
+  extra?: ComponentChildren;
+  sockets?: ComponentChildren;
+}) {
+  const [both, setBoth] = useState(false);
+  if (!full)
+    return (
+      <>
+        <DiffLines rows={rows} limit={PEEK_LINES} onMore={() => setFull(true)} />
+        {sockets}
+      </>
+    );
+  return (
+    <>
+      {extra}
+      {sockets}
+      {against ? <DiffCard it={it} rows={rows} /> : <ItemCard it={it} build={build} />}
+      <button class="btn small ix-cards-toggle" onClick={() => setBoth(!both)}>
+        {both ? 'Hide both cards ▴' : 'Show both cards ▾'}
+      </button>
+      {both && <Pair item={it} against={against} empty="Worn" build={build} />}
+    </>
+  );
+}
+
+/** Changed lines the peek shows before it says how many more there are. */
+const PEEK_LINES = 4;
+
 function ItemBody({
   run,
   item,
   a,
   favourite,
   phone,
+  full,
+  setFull,
 }: {
   run: RunState;
   item: Item;
   a: Actions;
   favourite: boolean;
   phone: boolean;
+  full: boolean;
+  setFull: (f: boolean) => void;
 }) {
   const slots = useMemo(() => compareSlots(run, item.uid), [run.build, run.inventory, item.uid]);
   const [pick, setPick] = useState<{ uid: number; slot: EquipSlot } | null>(null);
-  const [cards, setCards] = useState(!phone);
   const best = slots.find((s) => s.best) ?? slots[0];
   const active = (pick?.uid === item.uid && slots.find((s) => s.slot === pick.slot)) || best;
   if (!active) return null;
+  const ok = active.check.ok;
+  const chips =
+    ok && active.delta ? (
+      <Delta d={active.delta} dpsPct={active.dpsPct} ehpPct={active.ehpPct} />
+    ) : null;
+  const sockets = ok ? (
+    <SocketsRow
+      was={active.equipped}
+      o={active.sockets}
+      primary={run.build.primaryGem}
+      names={!phone || full}
+    />
+  ) : null;
+  const also = active.alsoMoves.length > 0 && (
+    <div class="ix-note">
+      Also sends back to the bag: {active.alsoMoves.map((x) => x.name).join(', ')}.
+    </div>
+  );
   return (
     <>
       <SlotTabs
@@ -207,54 +371,39 @@ function ItemBody({
           <>{active.label} is empty</>
         )}
       </div>
-      {active.check.ok && (
-        <SocketsRow
-          was={active.equipped}
-          o={active.sockets}
-          primary={run.build.primaryGem}
-          names={!phone}
+      {!ok && <div class="warn">{whyNot(active.check)}</div>}
+      {phone ? (
+        <PhoneCompare
+          it={item}
+          against={active.equipped}
+          rows={diffRows(item, active.equipped)}
+          full={full}
+          setFull={setFull}
+          build={run.build}
+          extra={chips}
+          sockets={sockets}
         />
-      )}
-      {phone && (
-        <button class="btn small ix-cards-toggle" onClick={() => setCards(!cards)}>
-          {cards ? 'Hide the cards ▴' : 'Show the cards ▾'}
-        </button>
-      )}
-      {(cards || !phone) && (
-        <Pair item={item} against={active.equipped} empty={`Worn: ${active.label}`} />
-      )}
-      {active.check.ok && active.delta ? (
-        <Delta d={active.delta} dpsPct={active.dpsPct} ehpPct={active.ehpPct} />
       ) : (
-        <div class="warn">{whyNot(active.check)}</div>
+        <>
+          {sockets}
+          <Pair item={item} against={active.equipped} empty={`Worn: ${active.label}`} />
+          {chips}
+        </>
       )}
-      {active.alsoMoves.length > 0 && (
-        <div class="ix-note">
-          Also sends back to the bag: {active.alsoMoves.map((x) => x.name).join(', ')}.
-        </div>
-      )}
-      <div class="item-actions ix-actions">
-        <button
-          class="btn primary"
-          disabled={!active.check.ok}
-          title={active.check.ok ? `Into ${active.label}` : whyNot(active.check)}
-          onClick={() => a.onEquip(item.uid, active.slot)}
-        >
-          {active.equipped ? 'Swap' : 'Equip'}
-        </button>
-        <button class="btn small" onClick={() => a.onFavourite(item.uid)}>
-          {favourite ? '★ Favourite' : '☆ Favourite'}
-        </button>
-        <button
-          class="btn small"
-          onClick={() => a.onCraft(item.uid)}
-          disabled={!!item.sealed || !CRAFTING_OPEN}
-          title={CRAFTING_OPEN ? undefined : 'Crafting is closed for now.'}
-        >
-          Craft…
-        </button>
-        <DiscardButton it={item} a={a} />
-      </div>
+      {also}
+      <ActionRow
+        swap={active.equipped ? 'Swap' : 'Equip'}
+        title={ok ? `Into ${active.label}` : whyNot(active.check)}
+        disabled={!ok}
+        onSwap={() => a.onEquip(item.uid, active.slot)}
+        a={a}
+        it={item}
+        favourite={favourite}
+        craft={item}
+        phone={phone}
+        full={full}
+        setFull={setFull}
+      />
     </>
   );
 }
@@ -264,11 +413,17 @@ function FlaskBody({
   flask,
   a,
   favourite,
+  phone,
+  full,
+  setFull,
 }: {
   run: RunState;
   flask: FlaskItem;
   a: Actions;
   favourite: boolean;
+  phone: boolean;
+  full: boolean;
+  setFull: (f: boolean) => void;
 }) {
   const slots = useMemo(() => compareFlasks(run, flask.uid), [run.build, run.inventory, flask.uid]);
   const [pick, setPick] = useState<{ uid: number; idx: number } | null>(null);
@@ -293,41 +448,50 @@ function FlaskBody({
           </button>
         ))}
       </div>
-      <div class="ix-pair">
-        <div>
-          <div class="muted cmp-title">New</div>
-          <ItemCard it={flask} build={run.build} />
-        </div>
-        <div>
-          <div class="muted cmp-title">Worn: Flask {active.idx + 1}</div>
-          {active.equipped ? (
-            <ItemCard it={active.equipped} />
-          ) : (
-            <div class="item-card empty-card muted">Empty slot</div>
-          )}
-        </div>
+      <div class="ix-vs">
+        {active.equipped ? (
+          <>
+            vs <b>{active.equipped.name}</b> · worn in Flask {active.idx + 1}
+          </>
+        ) : (
+          <>Flask {active.idx + 1} is empty</>
+        )}
       </div>
+      {phone ? (
+        <PhoneCompare
+          it={flask}
+          against={active.equipped ?? undefined}
+          rows={diffRows(flask, active.equipped ?? undefined)}
+          full={full}
+          setFull={setFull}
+          build={run.build}
+        />
+      ) : (
+        <Pair
+          item={flask}
+          against={active.equipped ?? undefined}
+          empty={`Worn: Flask ${active.idx + 1}`}
+          build={run.build}
+        />
+      )}
       {!active.ok && <div class="warn">{active.reason}.</div>}
       {active.ok && active.equipped && flaskBase(active.equipped.baseId).kind !== kind && (
         <div class="ix-note">
           This replaces a {flaskBase(active.equipped.baseId).kind} flask with a {kind} one.
         </div>
       )}
-      <div class="item-actions ix-actions">
-        <button
-          class="btn primary"
-          disabled={!active.ok}
-          onClick={() => a.onEquipFlask(flask.uid, active.idx)}
-        >
-          {active.equipped
-            ? `Swap with Flask ${active.idx + 1}`
-            : `Equip → Flask ${active.idx + 1}`}
-        </button>
-        <button class="btn small" onClick={() => a.onFavourite(flask.uid)}>
-          {favourite ? '★ Favourite' : '☆ Favourite'}
-        </button>
-        <DiscardButton it={flask} a={a} />
-      </div>
+      <ActionRow
+        swap={active.equipped ? 'Swap' : 'Equip'}
+        title={`Into Flask ${active.idx + 1}`}
+        disabled={!active.ok}
+        onSwap={() => a.onEquipFlask(flask.uid, active.idx)}
+        a={a}
+        it={flask}
+        favourite={favourite}
+        phone={phone}
+        full={full}
+        setFull={setFull}
+      />
     </>
   );
 }
@@ -335,9 +499,18 @@ function FlaskBody({
 /** The panel for what is selected: a carried item with its comparison per slot, a worn item, a flask, a gem, or a guide. */
 export function ItemDetail(p: Props) {
   const { run, sel, selected } = p;
+  // The phone sheet opens on a peek of the answer; the full view is one tap (or the grab bar) away.
+  const [full, setFull] = useState(false);
   const a: Actions = p;
   const head = (title: string, cls: string, star?: number) => (
     <div class="ix-head">
+      {p.phone && (
+        <button
+          class="ix-grab"
+          aria-label={full ? 'Show less' : 'Show everything'}
+          onClick={() => setFull(!full)}
+        />
+      )}
       <span class={'ix-title ' + cls}>{title}</span>
       {p.phone && (
         <>
@@ -423,15 +596,31 @@ export function ItemDetail(p: Props) {
 
   const inBag = sel.from === 'inv';
   return (
-    <div class="ix-detail">
+    <div class={'ix-detail' + (p.phone ? (full ? ' full' : ' peek') : '')}>
       {head(itemTitle(selected), rarityClass(selected), inBag ? selected.uid : undefined)}
       {status}
       <div class="ix-body">
         {inBag && selected.kind === 'item' && (
-          <ItemBody run={run} item={selected} a={a} favourite={p.favourite} phone={p.phone} />
+          <ItemBody
+            run={run}
+            item={selected}
+            a={a}
+            favourite={p.favourite}
+            phone={p.phone}
+            full={full}
+            setFull={setFull}
+          />
         )}
         {inBag && selected.kind === 'flask' && (
-          <FlaskBody run={run} flask={selected} a={a} favourite={p.favourite} />
+          <FlaskBody
+            run={run}
+            flask={selected}
+            a={a}
+            favourite={p.favourite}
+            phone={p.phone}
+            full={full}
+            setFull={setFull}
+          />
         )}
         {inBag && selected.kind === 'gem' && (
           <>

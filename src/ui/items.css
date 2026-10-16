@@ -497,6 +497,66 @@
   gap: 6px;
 }
 
+/* ---- The compare as one list: changed lines marked, the old value beside the new one (docs/EQUIP.md 3.2) ---- */
+.ix-dls {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.ix-dl {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+.ix-dl .t {
+  flex: 1;
+  min-width: 0;
+}
+.ix-dl .was {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.ix-dl.mark-lost .t {
+  text-decoration: line-through;
+  color: #ffb0b0;
+}
+.ix-dl.mark-gain {
+  background: #17301c;
+  box-shadow: inset 3px 0 0 #60e070;
+}
+.ix-dl.mark-lost {
+  background: #351818;
+  box-shadow: inset 3px 0 0 #ff6060;
+}
+.ix-dl.mark-diff {
+  background: #332a14;
+  box-shadow: inset 3px 0 0 #e0b040;
+}
+.ix-fold {
+  align-self: flex-start;
+  padding: 4px 2px;
+  font-size: 12px;
+}
+.ix-dcard {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 13px;
+}
+.ix-grab {
+  display: none;
+}
+.ix-tab-d.warn {
+  color: #f3d896;
+}
+.ix-tab-d.muted {
+  color: var(--muted);
+}
+
 /* ---- The bag ---- */
 .ix-tools {
   display: flex;
@@ -706,7 +766,7 @@
     padding: 10px;
   }
   .ix:has(.ix-detailcol.has-sel) {
-    padding-bottom: 54vh;
+    padding-bottom: 46vh;
   }
   .ix-detailcol {
     display: none;
@@ -720,14 +780,58 @@
     right: 0;
     bottom: calc(var(--camp-bar, 52px) + var(--safe-bottom, 0px));
     top: auto;
-    max-height: 52vh;
+    max-height: 44vh;
     overflow: auto;
     padding: 0;
     background: var(--panel);
     border-top: 2px solid var(--hi);
     box-shadow: 0 -6px 18px #000a;
   }
+  .ix-detailcol.has-sel:has(.ix-detail.full) {
+    max-height: 85vh;
+  }
+  .ix-head {
+    position: relative;
+    gap: 0;
+  }
+  .ix-detail .ix-head .btn.small {
+    min-width: 34px;
+    min-height: 40px;
+    padding: 0;
+    font-size: 18px;
+    color: var(--muted);
+    background: none;
+    border: none;
+  }
+  .ix-detail .ix-head .ix-star,
+  .ix-detail .ix-head .ix-close {
+    width: 36px;
+  }
+  .ix-grab {
+    display: block;
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    width: 80px;
+    height: 20px;
+    padding: 0;
+    transform: translateX(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .ix-grab::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 21px;
+    width: 38px;
+    height: 4px;
+    border-radius: 2px;
+    background: #5a566a;
+  }
   .ix-detail {
+    padding-top: 14px;
     border: none;
     border-radius: 0;
     padding: 8px calc(12px + var(--safe-right, 0px)) 8px calc(12px + var(--safe-left, 0px));
@@ -736,7 +840,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
   .ix-row {
-    scroll-margin-bottom: 54vh;
+    scroll-margin-bottom: 46vh;
     scroll-margin-top: 8px;
   }
   .ix-chips.kinds {
@@ -750,10 +854,27 @@
   .ix-actions {
     position: sticky;
     bottom: -8px;
+    flex-wrap: nowrap;
+    gap: 6px;
     margin: 4px -4px -8px;
-    padding: 8px 4px;
+    padding: 6px 4px 8px;
     background: var(--panel);
     border-top: 1px solid var(--border2);
+  }
+  .ix-detail .ix-actions .btn {
+    min-width: 0;
+    min-height: 34px;
+    padding: 0 10px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .ix-detail .ix-actions .btn.primary {
+    padding: 0 14px;
+  }
+  .ix-detail .ix-actions .ix-expand {
+    margin-left: auto;
+    width: 34px;
+    padding: 0;
   }
   .ix-menu-pop {
     top: auto;

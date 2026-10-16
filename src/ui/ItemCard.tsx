@@ -6,7 +6,7 @@ import { triggerText } from '../data/triggers';
 import { flaskBase } from '../data/flasks';
 import { naturalGemLevel } from '../calc/gems';
 import { gemDef } from '../data/gems';
-import type { InventoryItem, Build, EquipSlot, Item } from '../data/types';
+import type { InventoryItem, Build, EquipSlot, FlaskItem, Item } from '../data/types';
 import type { Mod } from '../mods/types';
 import { modsText } from '../mods/text';
 import { slotsFor, withEquipped } from '../run/inventory';
@@ -43,7 +43,7 @@ export function compareDelta(
 }
 
 /** A line with its numbers taken out: the same stat with another value has the same key. */
-const lineKey = (l: string): string => l.replace(/\d+(\.\d+)?/g, 'N');
+export const lineKey = (l: string): string => l.replace(/\d+(\.\d+)?/g, 'N');
 
 const ELEMENT_LABELS = ['', 'lightning', 'cold', 'fire', 'chaos'] as const;
 const round2 = (v: number): number => Math.round(v * 100) / 100;
@@ -103,19 +103,44 @@ export function itemLines(it: Item): string[] {
   return [...modsText(it.implicits), ...modsText(all)];
 }
 
+/** "level 12, 28 Dex": what wearing the item takes. */
+export function reqText(it: Item): string {
+  const req = [`level ${itemBase(it.baseId).level}`];
+  const need = itemReq(it);
+  if (need.str) req.push(`${need.str} Str`);
+  if (need.dex) req.push(`${need.dex} Dex`);
+  if (need.int) req.push(`${need.int} Int`);
+  return req.join(', ');
+}
+
+/** Every line a flask shows: what it recovers, its buff, and its affixes. */
+export function flaskLines(f: FlaskItem): string[] {
+  const b = flaskBase(f.baseId);
+  return [
+    ...(b.life > 0 ? [`Recovers ${b.life} life`] : []),
+    ...(b.mana > 0 ? [`Recovers ${b.mana} mana`] : []),
+    ...modsText(b.buff),
+    ...f.affixes.flatMap((a) => modsText(a.mods)),
+  ];
+}
+
+const linesOf = (x: Item | FlaskItem): string[] =>
+  x.kind === 'flask' ? flaskLines(x) : itemLines(x);
+
 /**
  * How the lines of `it` differ from those of `other`, for a side-by-side compare: a stat `other` lacks is a 'gain' on
- * the new item and a 'lost' on the old one; the same stat with another number is a 'diff' on both.
+ * the new item and a 'lost' on the old one; the same stat with another number is a 'diff' on both. Flasks are compared
+ * the same way, by the lines their card shows.
  */
 export function lineMarks(
-  it: Item,
-  other: Item | undefined,
+  it: Item | FlaskItem,
+  other: Item | FlaskItem | undefined,
   side: 'new' | 'old',
 ): Map<string, 'gain' | 'lost' | 'diff'> {
   const marks = new Map<string, 'gain' | 'lost' | 'diff'>();
   if (!other) return marks;
-  const theirs = new Map(itemLines(other).map((l) => [lineKey(l), l]));
-  for (const l of itemLines(it)) {
+  const theirs = new Map(linesOf(other).map((l) => [lineKey(l), l]));
+  for (const l of linesOf(it)) {
     const t = theirs.get(lineKey(l));
     if (t === undefined) marks.set(l, side === 'new' ? 'gain' : 'lost');
     else if (t !== l) marks.set(l, 'diff');
@@ -164,17 +189,25 @@ export function ItemCard({
         <div class="muted">
           Requires level {b.level} · {b.perUse}/{b.maxCharges} charges · {b.duration} s
         </div>
-        {b.life > 0 && <div class="ic-mod">Recovers {b.life} life</div>}
-        {b.mana > 0 && <div class="ic-mod">Recovers {b.mana} mana</div>}
+        {b.life > 0 && (
+          <div class={'ic-mod' + markClass(marks, `Recovers ${b.life} life`)}>
+            Recovers {b.life} life
+          </div>
+        )}
+        {b.mana > 0 && (
+          <div class={'ic-mod' + markClass(marks, `Recovers ${b.mana} mana`)}>
+            Recovers {b.mana} mana
+          </div>
+        )}
         {modsText(b.buff).map((l, i) => (
-          <div key={i} class="ic-mod">
+          <div key={i} class={'ic-mod' + markClass(marks, l)}>
             {l}
           </div>
         ))}
         {it.affixes
           .flatMap((a) => modsText(a.mods))
           .map((l, i) => (
-            <div key={`a${i}`} class="ic-mod explicit">
+            <div key={`a${i}`} class={'ic-mod explicit' + markClass(marks, l)}>
               {l}
             </div>
           ))}
@@ -184,11 +217,7 @@ export function ItemCard({
   const b = itemBase(it.baseId);
   const wl = weaponLine(it);
   const al = armourLine(it);
-  const req = [`level ${b.level}`];
-  const need = itemReq(it);
-  if (need.str) req.push(`${need.str} Str`);
-  if (need.dex) req.push(`${need.dex} Dex`);
-  if (need.int) req.push(`${need.int} Int`);
+  const req = reqText(it);
   const all = [...it.affixes.flatMap((a) => a.mods), ...(it.uniqueMods ?? [])];
   // Rules (flags, granted keystones, triggers) are set apart from the stat lines.
   const isRule = (m: Mod) => m.kind === 'flag';
@@ -218,7 +247,7 @@ export function ItemCard({
         </div>
       )}
       <div class="muted">
-        Requires {req.join(', ')} · ilvl {it.ilvl}
+        Requires {req} · ilvl {it.ilvl}
       </div>
       {it.sockets.length > 0 && (
         <div class="muted ic-sockets">
