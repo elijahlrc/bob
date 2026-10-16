@@ -136,6 +136,6 @@ describe('a channel that pulses round the character (Twister Blade)', () => {
     }
     expect(hitSteps).toBeGreaterThanOrEqual(5);
     expect(explodes).toBe(0);
-    expect(w.channel?.key).toBe('twisterBlade');
+    expect(w.sides[0].channel?.key).toBe('twisterBlade');
   });
 });

@@ -53,9 +53,9 @@ function grown(p: SkillProfile, share: number): SkillProfile {
 
 /** Let go: fire what the stages built, once, and start again from nothing. */
 export function releaseChannel(w: World, a: Actor): void {
-  const st = w.channel;
+  const st = a.side!.channel;
   if (!st) return;
-  w.channel = null;
+  a.side!.channel = null;
   const spec = st.profile.skill.channel;
   if (st.profile.skill.orb?.kind === 'zap') releaseZaps(w, a.side!, st.profile.skill.id);
   if (st.profile.skill.orb?.kind === 'illusion')
@@ -94,7 +94,7 @@ export function releaseChannel(w: World, a: Actor): void {
 export function channelUse(w: World, a: Actor, act: Action): void {
   const p = act.profile;
   const spec = p.skill.channel!;
-  let st = w.channel;
+  let st = a.side!.channel;
   if (st && (st.key !== p.skill.id || w.t - st.lastT > LULL)) {
     releaseChannel(w, a);
     st = null;
@@ -111,7 +111,7 @@ export function channelUse(w: World, a: Actor, act: Action): void {
       aimX: act.aimX,
       aimY: act.aimY,
     };
-    w.channel = st;
+    a.side!.channel = st;
   }
   st.profile = p;
   st.targetId = act.targetId;
@@ -158,13 +158,13 @@ export type StackState = { key: string; n: number; lastHit: number; fadeT: numbe
 export function stackedUse(w: World, a: Actor, act: Action): void {
   const p = act.profile;
   const spec = p.skill.stacks!;
-  let st = w.stacks;
+  let st = a.side!.stacks;
   if (!st || st.key !== p.skill.id)
-    st = w.stacks = { key: p.skill.id, n: 0, lastHit: w.t, fadeT: 0 };
-  const before = w.hitsLanded;
+    st = a.side!.stacks = { key: p.skill.id, n: 0, lastHit: w.t, fadeT: 0 };
+  const before = a.side!.hitsLanded;
   const q = grown(p, spec.areaPer * st.n);
   fireEffect(w, a, { ...act, profile: q, which: 'channelled' });
-  if (w.hitsLanded > before) {
+  if (a.side!.hitsLanded > before) {
     st.n = Math.min(spec.cap, st.n + 1);
     st.lastHit = w.t;
     st.fadeT = 0;
@@ -173,7 +173,7 @@ export function stackedUse(w: World, a: Actor, act: Action): void {
 
 /** Every step: a channel that has gone quiet is released; a stun breaks it. */
 export function tickChannel(w: World, s: Side): void {
-  const sk = w.stacks;
+  const sk = s.stacks;
   if (sk && sk.n > 0) {
     // With nothing hit for a while the stages go, one at a time.
     const fade = w.char.primary.skill.stacks?.fadeAfter ?? 3;
@@ -185,25 +185,25 @@ export function tickChannel(w: World, s: Side): void {
       }
     }
   }
-  const st = w.channel;
+  const st = s.channel;
   // Infusion: after channelling a while it is held; it stays six seconds after the channel is over.
-  if (w.infusing) {
-    if (!st || st.key !== w.infusing) {
+  if (s.infusing) {
+    if (!st || st.key !== s.infusing) {
       s.buffT.infusion = 6;
-      w.infusing = null;
+      s.infusing = null;
     } else s.buffT.infusion = 6;
   }
   if (!st) return;
   const p = w.player;
-  if (st.profile.infuse && !w.infusing && w.t - st.startT >= st.profile.infuse.after) {
-    w.infusing = st.key;
+  if (st.profile.infuse && !s.infusing && w.t - st.startT >= st.profile.infuse.after) {
+    s.infusing = st.key;
     s.buffT.infusion = 6;
   }
   if (p.stunT > 0 || p.ail.freezeT > 0) {
     // Stunned or frozen, the stages are lost, and the orbs of a storm are let go.
     if (st.profile.skill.orb?.kind === 'zap') releaseZaps(w, s, st.profile.skill.id);
     if (st.profile.skill.orb?.kind === 'illusion') releaseGhost(w, s, st.profile.skill.id, true);
-    w.channel = null;
+    s.channel = null;
     return;
   }
   if (w.t - st.lastT > LULL) releaseChannel(w, p);

@@ -117,7 +117,7 @@ export function stunPlayer(w: World, seconds: number, fromBoss = true): boolean 
   const p = w.player;
   const d = p.def;
   if (!p.alive || d.cannotBeStunned) return false;
-  if (w.channel?.profile.skill.channel?.stunImmune) return false;
+  if (w.player.side!.channel?.profile.skill.channel?.stunImmune) return false;
   if (fromBoss && bossLocked(w)) return false;
   if (d.stunAvoid > 0 && w.rngCombat.chance(d.stunAvoid)) return false;
   if (p.es > 0 && !d.esProtectsMana && w.rngCombat.chance(STUN_ES_IGNORE)) return false;

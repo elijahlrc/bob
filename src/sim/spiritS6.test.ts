@@ -415,7 +415,7 @@ describe('Winter Orb (hoarfrostMote)', () => {
       stepWorld(world);
       for (const e of world.events) if (e.t === 'hit' && e.dst === dummy.id) hits++;
     }
-    expect(world.channel).toBeNull();
+    expect(world.sides[0].channel).toBeNull();
     expect(hits).toBeGreaterThan(0);
     expect(orb.stages!).toBeLessThan(held);
     for (let i = 0; i < 8 * 60; i++) stepWorld(world);

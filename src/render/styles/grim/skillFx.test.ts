@@ -33,15 +33,24 @@ const world = (a: Actor): World =>
     grid: { w: 20 },
     hexes: [],
     char: { auras: [], utilities: [], actives: [] },
-    vortex: null,
-    stormOrb: null,
-    markers: [],
-    fuses: [],
-    spores: [],
-    mirage: null,
-    charged: {},
-    shell: null,
-    sides: [{ buffT: {}, minions: [], zones: [], deployables: [], fields: [] }],
+    sides: [
+      {
+        buffT: {},
+        minions: [],
+        zones: [],
+        deployables: [],
+        fields: [],
+        vortex: null,
+        stormOrb: null,
+        markers: [],
+        fuses: [],
+        spores: [],
+        mirage: null,
+        charged: {},
+        shell: null,
+        channel: null,
+      },
+    ],
   }) as unknown as World;
 
 function actor(over: Partial<Actor> = {}): Actor {

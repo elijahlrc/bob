@@ -262,7 +262,7 @@ describe('Storm Rush (stormRush)', () => {
     for (let i = 0; i < 6 * 60; i++) {
       if (!channelling) from = { x: w2.player.x, y: w2.player.y };
       stepWorld(w2);
-      channelling = !!w2.channel;
+      channelling = !!w2.sides[0].channel;
       const g = w2.sides[0].fields.find((f) => f.kind === 'ghost');
       if (g) {
         ghost = Math.max(ghost, Math.hypot(g.x - w2.player.x, g.y - w2.player.y));
@@ -328,11 +328,11 @@ describe('Venom Gyre (toxinCircle) and Whirling Blades (spinningDash)', () => {
     expect(caught).toBeGreaterThanOrEqual(1);
     // Whirling Blades is the skill that lets them go: a spiral, none of it returning.
     w.sides[0].caught = { profile: w.char.profile(w.primary, 0), hand: 0, n: 5, t: 12 };
-    const before = w.shots.length;
+    const before = w.sides[0].shots.length;
     releaseCaught(w, w.player);
     expect(w.sides[0].caught).toBeNull();
-    expect(w.shots.length).toBe(before + 5);
-    const sent = w.shots.slice(before);
+    expect(w.sides[0].shots.length).toBe(before + 5);
+    const sent = w.sides[0].shots.slice(before);
     for (const s of sent) {
       const beh = s.profile.skill.behaviour;
       expect(beh.kind === 'projectile' && beh.returns).toBe(false);

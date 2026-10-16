@@ -498,8 +498,8 @@ export function tickFields(w: World, s: Side, dt: number): void {
       f.x = p.x;
       f.y = p.y;
       // Stages hold while the channel goes on and then fade over what is left of the orb's time.
-      const live = w.channel?.key === f.skill;
-      if (live) f.stages = w.channel!.stage;
+      const live = s.channel?.key === f.skill;
+      if (live) f.stages = s.channel!.stage;
       else {
         f.decay ??= (f.stages ?? 0) / Math.max(0.5, f.t);
         f.stages = Math.max(0, (f.stages ?? 0) - f.decay * dt);
@@ -523,7 +523,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
     }
     if (f.kind === 'ghost') {
       const spec = f.profile!.skill.orb;
-      if (spec?.kind !== 'illusion' || w.channel?.key !== f.skill) continue;
+      if (spec?.kind !== 'illusion' || s.channel?.key !== f.skill) continue;
       // It runs ahead toward the target place, faster than the character, and stops where it has run far enough.
       const dx = (f.tx ?? f.x) - f.x;
       const dy = (f.ty ?? f.y) - f.y;

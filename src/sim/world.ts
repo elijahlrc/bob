@@ -238,23 +238,6 @@ export function createWorld(inp: CreateWorldInput): World {
     warp: null,
     wither: null,
     caught: null,
-  };
-  player.side = side;
-  const w: World = {
-    plan,
-    grid,
-    sides: [side],
-    t: 0,
-    tick: 0,
-    rngCombat: root.fork('combat'),
-    rngAi: root.fork('ai'),
-    rngLoot: root.fork('loot'),
-    rngTrig: root.fork('trigger'),
-    actors: [player],
-    player,
-    nextId: 2,
-    projectiles: [],
-    shots: [],
     uses: {},
     intensity: {},
     intensityT: {},
@@ -286,7 +269,24 @@ export function createWorld(inp: CreateWorldInput): World {
     channel: null,
     stacks: null,
     hitsLanded: 0,
+    shots: [],
     lastOutcome: null,
+  };
+  player.side = side;
+  const w: World = {
+    plan,
+    grid,
+    sides: [side],
+    t: 0,
+    tick: 0,
+    rngCombat: root.fork('combat'),
+    rngAi: root.fork('ai'),
+    rngLoot: root.fork('loot'),
+    rngTrig: root.fork('trigger'),
+    actors: [player],
+    player,
+    nextId: 2,
+    projectiles: [],
     effects: [],
     corpses: [],
     hasPylons: false,
@@ -655,7 +655,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     if (!a.action) a.carry = 0;
   }
   tickPackPlays(w, dt);
-  tickShots(w);
+  for (const s of w.sides) tickShots(w, s);
   for (const s of w.sides) tickChannel(w, s);
   for (const s of w.sides) tickFields(w, s, dt);
   for (const s of w.sides) tickBanner(w, s, dt);

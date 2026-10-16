@@ -150,7 +150,7 @@ describe('conditional mods are seen by the sim', () => {
       const near = neighbour(w, dummy.x + 1.0, dummy.y);
       dummy.def = dummyDefence({ maxLife: 1e9 });
       const prof = w.char.profile(w.primary, 0);
-      w.charged[dummy.id] = { n: prof.skill.charge!.max - 1, t: 5, key: 'cinderBlow' };
+      w.sides[0].charged[dummy.id] = { n: prof.skill.charge!.max - 1, t: 5, key: 'cinderBlow' };
       w.player.tHit = hit ? 0 : 99;
       chargeEnemy(w, w.sides[0], dummy, prof);
       return 1e9 - near.life;

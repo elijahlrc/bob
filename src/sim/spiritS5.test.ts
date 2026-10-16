@@ -60,8 +60,8 @@ describe('Flameblast (furnaceRoar): stages, then one blast', () => {
     world.sides[0].opts.freeResources = true;
     // Let it build a few stages, then take the enemy away.
     for (let i = 0; i < 70; i++) stepWorld(world);
-    expect(world.channel?.stage).toBeGreaterThan(2);
-    const stages = world.channel!.stage;
+    expect(world.sides[0].channel?.stage).toBeGreaterThan(2);
+    const stages = world.sides[0].channel!.stage;
     dummy.alive = false;
     let hit = false;
     const other = spawnMonster(
@@ -134,15 +134,15 @@ describe('Incinerate (blazeStream): it grows as it goes and ends with a final wa
     let atCap = 0;
     for (let i = 0; i < 60 * 8; i++) {
       stepWorld(world);
-      if (world.channel) started = true;
-      if (started) expect(world.channel).not.toBeNull();
-      if (world.channel?.stage === cap) atCap++;
+      if (world.sides[0].channel) started = true;
+      if (started) expect(world.sides[0].channel).not.toBeNull();
+      if (world.sides[0].channel?.stage === cap) atCap++;
     }
     expect(atCap).toBeGreaterThan(60 * 5);
     // With nothing left to hit, the channel ends and sends its last wave.
     dummy.alive = false;
     for (let i = 0; i < 90; i++) stepWorld(world);
-    expect(world.channel).toBeNull();
+    expect(world.sides[0].channel).toBeNull();
   });
 });
 
@@ -200,7 +200,7 @@ describe('Reave (sweepingCut): the area grows with every use that hits', () => {
         if (e.t === 'hit' && e.dst === far.id && firstFarHit === 0) firstFarHit = uses;
       }
     }
-    expect(world.stacks?.n).toBeGreaterThan(0);
+    expect(world.sides[0].stacks?.n).toBeGreaterThan(0);
     expect(firstFarHit).toBeGreaterThan(1);
     void dummy;
   });
@@ -216,7 +216,7 @@ describe('Cyclone (twisterBlade): the first spin hits for half, and a stun canno
     let started = false;
     for (let i = 0; i < 60 * 8; i++) {
       stepWorld(world);
-      const st = world.channel;
+      const st = world.sides[0].channel;
       if (st) started = true;
       // Once it is going the channel is never let go while there is something to hit.
       if (started) expect(st).not.toBeNull();

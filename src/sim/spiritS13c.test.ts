@@ -172,27 +172,27 @@ describe('Spell Cascade, Intensify, Unleash (flankingCast, swellingBlast, double
   it('Intensify: each cast builds a stack, and moving loses it', () => {
     const { world: w } = world(['suddenFrost', 'swellingBlast'], 4, 'wand_3', INT);
     run(w, 14);
-    const n = w.intensity.suddenFrost ?? 0;
+    const n = w.sides[0].intensity.suddenFrost ?? 0;
     expect(n).toBeGreaterThanOrEqual(2);
     expect(n).toBeLessThanOrEqual(4);
     w.player.action = null;
     w.player.moving = true;
     for (let i = 0; i < 30; i++) tickSupports(w, w.sides[0], 1 / 60);
-    const after = w.intensity.suddenFrost ?? 0;
+    const after = w.sides[0].intensity.suddenFrost ?? 0;
     expect(after).toBeLessThan(n);
     w.player.moving = false;
     for (let i = 0; i < 60; i++) tickSupports(w, w.sides[0], 1 / 60);
-    expect(w.intensity.suddenFrost ?? 0).toBe(after);
+    expect(w.sides[0].intensity.suddenFrost ?? 0).toBe(after);
   });
 
   it('Unleash: seals gather while the spell rests, up to three, and the next cast spends them as repeats', () => {
     const { world: w } = world(['frostLance', 'doubleRelease'], 6, 'wand_3', INT);
     w.player.action = null;
     for (let i = 0; i < 4 * 60; i++) tickSupports(w, w.sides[0], 1 / 60);
-    const had = w.seals.frostLance.n;
+    const had = w.sides[0].seals.frostLance.n;
     expect(had).toBe(3);
     run(w, 1);
-    expect(w.seals.frostLance.n).toBeLessThan(had);
+    expect(w.sides[0].seals.frostLance.n).toBeLessThan(had);
   });
 });
 
@@ -251,7 +251,7 @@ describe('Energy Leech, Mirage Archer, Inspiration, Infused Channelling', () => 
     let shots = 0;
     for (let i = 0; i < 8 * 60; i++) {
       stepWorld(w);
-      if (w.mirage) called = true;
+      if (w.sides[0].mirage) called = true;
       for (const e of w.events) if (e.t === 'use') shots++;
     }
     expect(called).toBe(true);
@@ -265,10 +265,10 @@ describe('Energy Leech, Mirage Archer, Inspiration, Infused Channelling', () => 
     expect(p.inspire).toBeGreaterThan(100);
     run(w, 3);
     expect(w.char.charges.insight).toBeGreaterThan(0);
-    w.inspireMana = p.inspire + 1;
+    w.sides[0].inspireMana = p.inspire + 1;
     run(w, 2);
     // The counter reset when the next use came.
-    expect(w.inspireMana).toBeLessThan(p.inspire);
+    expect(w.sides[0].inspireMana).toBeLessThan(p.inspire);
   });
 
   it('Infused Channelling: after a while of channelling you are Infused', () => {

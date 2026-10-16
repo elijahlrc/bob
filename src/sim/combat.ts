@@ -124,9 +124,9 @@ const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
   onLowMana: (w, p) => p.mana <= Math.max(1, p.def.maxMana - reservedMana(w, p.side!)) * LOW_LIFE,
   cursed: (_w, p) => p.hexes.length > 0,
   stationary: (_w, p) => !p.moving,
-  elemFire: (w) => w.elem === 3,
-  elemCold: (w) => w.elem === 2,
-  elemLightning: (w) => w.elem === 1,
+  elemFire: (_w, p) => p.side!.elem === 3,
+  elemCold: (_w, p) => p.side!.elem === 2,
+  elemLightning: (_w, p) => p.side!.elem === 1,
   ignited: (_w, p) => p.ail.ignites.length > 0,
   shocked: (_w, p) => p.ail.shock > 0,
   chilled: (_w, p) => p.ail.chill > 0,
@@ -281,8 +281,8 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
   for (let i = 0; i < 5; i++) total += dmg[i];
   if (total <= 0) return 0;
   // A shell takes most of what hits the character, up to its pool.
-  if (dst.isPlayer && w.shell) {
-    const taken = shellTakes(w, total);
+  if (dst.isPlayer && dst.side!.shell) {
+    const taken = shellTakes(dst.side!, total);
     if (taken > 0) {
       const f = 1 - taken / total;
       for (let i = 0; i < 5; i++) dmg[i] *= f;
@@ -376,10 +376,11 @@ export function knockBack(w: World, src: Actor, dst: Actor, dist: number): void 
 /** Apply a resolved hit from `src` to `dst`, including leech, ailments, stun and kill effects. */
 export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res: HitResult): void {
   if (src.isPlayer) {
-    w.lastOutcome = res.outcome === 'hit' ? 'hit' : res.outcome === 'block' ? 'block' : 'miss';
+    const mine = src.side!;
+    mine.lastOutcome = res.outcome === 'hit' ? 'hit' : res.outcome === 'block' ? 'block' : 'miss';
     if (res.outcome === 'hit') {
-      w.hitsLanded++;
-      if (w.critLock === null) w.critSeen = res.crit;
+      mine.hitsLanded++;
+      if (mine.critLock === null) mine.critSeen = res.crit;
     }
   }
   // An Aegis counts the time since it was last attacked, whatever came of the attack.
@@ -396,7 +397,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   // Damage over time goes on (docs/ENCOUNTERS.md 5).
   if (!dst.isPlayer && dst.mon && turnsAside(w, dst, src)) {
     if (how) noteMiss(w, dst, how, true);
-    if (src.isPlayer) w.lastOutcome = 'block';
+    if (src.isPlayer) src.side!.lastOutcome = 'block';
     w.events.push({ t: 'block', src: src.id, dst: dst.id });
     wake(w, dst);
     return;
@@ -408,8 +409,8 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     res.total *= dealt;
   }
   // Infused Channelling: while channelling, hits of the types the skill is made of do less.
-  if (dst.isPlayer && res.outcome !== 'block' && w.channel?.profile.infuse) {
-    const ch = w.channel.profile;
+  if (dst.isPlayer && res.outcome !== 'block' && dst.side!.channel?.profile.infuse) {
+    const ch = dst.side!.channel.profile;
     const less = ch.infuse!.barrier / 100;
     const types = ['physical', 'lightning', 'cold', 'fire', 'chaos'];
     for (let i = 0; i < 5; i++)
@@ -640,7 +641,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
             applySkillDot(w, e, p);
     }
   }
-  if (res.stun > 0 && !(dst.isPlayer && w.channel?.profile.skill.channel?.stunImmune)) {
+  if (res.stun > 0 && !(dst.isPlayer && dst.side!.channel?.profile.skill.channel?.stunImmune)) {
     dst.stunT = res.stun;
     dst.action = null;
     src.tStunEnemy = 0;
@@ -792,7 +793,7 @@ export function hit(
   if (aura && aura.double > 0)
     p = { ...p, doubleChance: Math.min(1, p.doubleChance + aura.double / 100) };
   // A charge counts the distance it ran, not the distance to the enemy.
-  if (p.distMore?.travel && src.isPlayer) dist = w.lastTravel;
+  if (p.distMore?.travel && src.isPlayer) dist = src.side!.lastTravel;
   const wasFull = dst.life >= dst.def.maxLife - 0.5;
   const res = resolveHit(
     w.rngCombat,
@@ -802,7 +803,7 @@ export function hit(
     dist,
     canStun,
     undefined,
-    veiled ? false : (w.critLock ?? undefined),
+    veiled ? false : (src.side?.critLock ?? undefined),
   );
   // A hit of Leap Slam always stuns an enemy that was on full life.
   if (p.stunFull > 0 && wasFull && canStun && res.outcome === 'hit' && res.stun < p.stunFull)
@@ -1103,7 +1104,7 @@ export function killActor(w: World, a: Actor): void {
   // A kill on chilling ground may give a charge.
   if (!a.isPlayer && fs.fields.length > 0) fieldKill(w, a);
   // A charged enemy (Infernal Blow) goes off.
-  if (w.charged[a.id]) chargedDeath(w, a);
+  if (fs.charged[a.id]) chargedDeath(w, a);
   // A Venomed enemy that dies poisoned passes the rest of its poison on to those around it.
   if (a.fx.venomed && a.ail.poisons.length > 0) venomBurst(w, a, a.fx.venomed.v);
   // A Doomed enemy blows up for a share of its own life.

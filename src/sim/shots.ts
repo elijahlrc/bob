@@ -6,6 +6,7 @@ import { actorById } from './actions';
 import { mirrorLanded } from './skillFx';
 import { hit } from './combat';
 import type { Action, Actor, Projectile, World } from './types';
+import type { Side } from './side';
 
 /**
  * How projectiles come about and what they do after a hit (docs/SPIRIT.md S4). A fan, a barrage fired one after another,
@@ -260,7 +261,7 @@ export function fireProjectiles(w: World, a: Actor, act: Action): void {
         dtype: 0,
       };
       if (i === 0) launchShot(w, shot, range, explode, fork, chain);
-      else w.shots.push(shot);
+      else a.side!.shots.push(shot);
     }
     return;
   }
@@ -310,12 +311,12 @@ function launchShot(
 }
 
 /** Fire the projectiles of a barrage whose turn has come. */
-export function tickShots(w: World): void {
-  if (w.shots.length === 0) return;
+export function tickShots(w: World, side: Side): void {
+  if (side.shots.length === 0) return;
   let j = 0;
-  for (const s of w.shots) {
+  for (const s of side.shots) {
     if (s.at > w.t) {
-      w.shots[j++] = s;
+      side.shots[j++] = s;
       continue;
     }
     const b = s.profile.skill.behaviour;
@@ -332,7 +333,7 @@ export function tickShots(w: World): void {
       chain,
     );
   }
-  w.shots.length = j;
+  side.shots.length = j;
 }
 
 /** A projectile that has gone far enough changes form: faster, through everything, with a far better chance to crit. */
@@ -359,7 +360,7 @@ export function releaseCaught(w: World, a: Actor): void {
     skill: { ...c.profile.skill, behaviour: { ...b, returns: false } },
   };
   for (let i = 0; i < c.n; i++)
-    w.shots.push({
+    a.side!.shots.push({
       at: w.t + i * 0.04,
       owner: a.id,
       profile,

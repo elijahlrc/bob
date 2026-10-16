@@ -513,7 +513,7 @@ export function playerAI(w: World, s: Side, dt: number): void {
     }
     const melee = prof.skill.behaviour.kind === 'melee';
     // A burning aura or circling blades only reach what is close: walk in among the enemies, whatever the attack's range.
-    const contact = contactRange(w);
+    const contact = contactRange(w, s);
     const reach0 = skillRange(prof) + target.r + (melee ? p.r : 0);
     // The `close` spacing (Strategy tab): a ranged character stands nearer than its skill's range.
     const close = !melee && strategy?.spacing === 'close' ? CLOSE_RANGE + target.r : Infinity;

@@ -64,10 +64,10 @@ export function lineWave(w: World, a: Actor, act: Action): void {
     const along = dx * cos + dy * sin;
     const side = Math.abs(-dx * sin + dy * cos);
     if (along < -e.r || along > len + e.r || side > wide / 2 + e.r) continue;
-    w.lastOutcome = null;
+    if (a.side) a.side.lastOutcome = null;
     hit(w, a, e, p, act.hand, Math.hypot(dx, dy));
     struck.add(e.id);
-    if (w.lastOutcome === 'hit') landed.push(e);
+    if (a.side?.lastOutcome === 'hit') landed.push(e);
   }
   if (spec.burst) {
     const r = spec.burst * p.radiusMult;
@@ -168,11 +168,11 @@ export function projectileFx(w: World, pr: Projectile, dt: number): void {
 // ---- Static Strike: a buff that stacks with hits, and beams while it lasts
 
 /** A hit of the skill gives a stack of the buff: up to the most, each with its own time; at the most, the oldest is renewed. */
-export function gainBeamStack(w: World, p: SkillProfile): void {
+export function gainBeamStack(s: Side, p: SkillProfile): void {
   const spec = p.skill.beams;
   if (!spec) return;
-  let st = w.staticFx;
-  if (!st || st.key !== p.skill.id) st = w.staticFx = { key: p.skill.id, stacks: [], acc: 0 };
+  let st = s.staticFx;
+  if (!st || st.key !== p.skill.id) st = s.staticFx = { key: p.skill.id, stacks: [], acc: 0 };
   if (st.stacks.length < spec.max) st.stacks.push(spec.seconds);
   else {
     let k = 0;
@@ -182,14 +182,14 @@ export function gainBeamStack(w: World, p: SkillProfile): void {
 }
 
 /** While the buff lasts, beams of lightning strike the enemies near the character, faster for each stack. */
-function tickBeams(w: World, dt: number): void {
-  const st = w.staticFx;
+function tickBeams(w: World, s: Side, dt: number): void {
+  const st = s.staticFx;
   if (!st) return;
   let j = 0;
   for (const t of st.stacks) if (t - dt > 0) st.stacks[j++] = t - dt;
   st.stacks.length = j;
   if (j === 0) {
-    w.staticFx = null;
+    s.staticFx = null;
     return;
   }
   const c = w.char.actives.find((x) => x.skill.id === st.key);
@@ -200,13 +200,13 @@ function tickBeams(w: World, dt: number): void {
   st.acc += dt;
   while (st.acc >= interval) {
     st.acc -= interval;
-    pulseBeams(w, c, spec);
+    pulseBeams(w, s, c, spec);
   }
 }
 
 type BeamSpec = NonNullable<SkillProfile['skill']['beams']>;
 
-function pulseBeams(w: World, c: SkillChoice, spec: BeamSpec): void {
+function pulseBeams(w: World, s: Side, c: SkillChoice, spec: BeamSpec): void {
   const p = w.player;
   const level = c.skill.level;
   const near = w.actors
@@ -220,7 +220,7 @@ function pulseBeams(w: World, c: SkillChoice, spec: BeamSpec): void {
   const q = scaleProfile(prof, 1 - less / 100);
   const count = Math.round(levelValue(spec.count, level));
   const picked = near.filter((n) => n.d <= reach + n.e.r).slice(0, count);
-  w.inFx = true;
+  s.inFx = true;
   const done = new Set(picked.map((n) => n.e.id));
   for (const n of picked) {
     w.events.push({ t: 'chain', from: p.id, to: n.e.id, dtype: 1 });
@@ -242,7 +242,7 @@ function pulseBeams(w: World, c: SkillChoice, spec: BeamSpec): void {
       hit(w, p, best, q, 0, Math.hypot(best.x - p.x, best.y - p.y));
     }
   }
-  w.inFx = false;
+  s.inFx = false;
 }
 
 // ---- Infernal Blow: a debuff that charges with hits and bursts
@@ -251,7 +251,7 @@ function pulseBeams(w: World, c: SkillChoice, spec: BeamSpec): void {
 export function chargeEnemy(w: World, s: Side, dst: Actor, p: SkillProfile): void {
   const spec = p.skill.charge;
   if (!spec || !dst.alive) return;
-  const st = (w.charged[dst.id] ??= { n: 0, t: 0, key: p.skill.id });
+  const st = (s.charged[dst.id] ??= { n: 0, t: 0, key: p.skill.id });
   st.n = Math.min(spec.max, st.n + 1);
   st.t = spec.seconds * p.skillDuration;
   if (st.n >= spec.max) detonate(w, s, dst);
@@ -259,9 +259,9 @@ export function chargeEnemy(w: World, s: Side, dst: Actor, p: SkillProfile): voi
 
 /** The charged debuff goes off: an area about the enemy, hard for each charge it had. */
 function detonate(w: World, s: Side, e: Actor): void {
-  const st = w.charged[e.id];
+  const st = s.charged[e.id];
   if (!st) return;
-  delete w.charged[e.id];
+  delete s.charged[e.id];
   const c = w.char.actives.find((x) => x.skill.id === st.key);
   if (!c || !c.usable) return;
   const prof = w.char.profile(c, playerConds(w, e), flaskMask(s));
@@ -269,12 +269,12 @@ function detonate(w: World, s: Side, e: Actor): void {
   const q = scaleProfile(prof, (st.n * spec.perCharge) / 100);
   const r = spec.radius * prof.radiusMult;
   w.events.push({ t: 'explode', x: e.x, y: e.y, r, dtype: mainTypeOf(prof), skill: prof.skill.id });
-  w.inFx = true;
+  s.inFx = true;
   if (e.alive) hit(w, w.player, e, q, 0, Math.hypot(e.x - w.player.x, e.y - w.player.y));
   for (const o of w.actors)
     if (!o.isPlayer && o.alive && o !== e && Math.hypot(o.x - e.x, o.y - e.y) <= r + o.r)
       hit(w, w.player, o, q, 0, Math.hypot(o.x - w.player.x, o.y - w.player.y));
-  w.inFx = false;
+  s.inFx = false;
 }
 
 function mainTypeOf(p: SkillProfile): number {
@@ -290,7 +290,7 @@ function mainTypeOf(p: SkillProfile): number {
 
 /** An enemy with the debuff dies: it goes off, and the body bursts for a share of its life as fire. */
 export function chargedDeath(w: World, dead: Actor): void {
-  const st = w.charged[dead.id];
+  const st = w.player.side!.charged[dead.id];
   if (!st) return;
   const c = w.char.actives.find((x) => x.skill.id === st.key);
   const spec = c?.usable ? w.char.profile(c, 0).skill.charge : undefined;
@@ -299,32 +299,32 @@ export function chargedDeath(w: World, dead: Actor): void {
 }
 
 function tickCharged(w: World, s: Side, dt: number): void {
-  for (const key in w.charged) {
+  for (const key in s.charged) {
     const id = Number(key);
-    const st = w.charged[id];
+    const st = s.charged[id];
     st.t -= dt;
     if (st.t > 0) continue;
     const e = w.actors.find((x) => x.id === id);
     if (e && e.alive) detonate(w, s, e);
-    else delete w.charged[id];
+    else delete s.charged[id];
   }
 }
 
 /** Every step: the buffs and debuffs the single skills keep. */
 export function tickSkillFx(w: World, s: Side, dt: number): void {
-  if (w.relicRegen.t > 0) tickRelicRegen(w, s, dt);
-  if (w.shell) tickShell(w, s);
-  if (w.staticFx) tickBeams(w, dt);
+  if (s.relicRegen.t > 0) tickRelicRegen(w, s, dt);
+  if (s.shell) tickShell(w, s);
+  if (s.staticFx) tickBeams(w, s, dt);
   if (w.char.frostSpec) tickFrostTrail(w, s, dt);
-  if (w.virulence > 0) tickAgony(w, s, dt);
+  if (s.virulence > 0) tickAgony(w, s, dt);
   tickSiphon(w, dt);
   if (s.minions.length > 0) tickBots(w, s, dt);
-  if (w.vortex) tickVortex(w, dt);
-  if (w.markers.length > 0) tickMarkers(w, dt);
-  if (w.stormOrb) tickOrb(w, dt);
-  if (w.fuses.length > 0) tickFuses(w, dt);
-  if (w.spores.length > 0) tickSpores(w, dt);
-  for (const _ in w.charged) {
+  if (s.vortex) tickVortex(w, s, dt);
+  if (s.markers.length > 0) tickMarkers(w, s, dt);
+  if (s.stormOrb) tickOrb(w, s, dt);
+  if (s.fuses.length > 0) tickFuses(w, s, dt);
+  if (s.spores.length > 0) tickSpores(w, s, dt);
+  for (const _ in s.charged) {
     tickCharged(w, s, dt);
     break;
   }
@@ -333,11 +333,11 @@ export function tickSkillFx(w: World, s: Side, dt: number): void {
 // ---- Blade Vortex: blades that orbit the caster and hit everything about it together
 
 /** A cast adds a blade (up to the most; at the most the oldest is replaced). */
-export function addBlade(w: World, p: SkillProfile): void {
+export function addBlade(s: Side, p: SkillProfile): void {
   const spec = p.skill.vortex;
   if (!spec) return;
-  let v = w.vortex;
-  if (!v || v.key !== p.skill.id) v = w.vortex = { key: p.skill.id, blades: [], acc: 0 };
+  let v = s.vortex;
+  if (!v || v.key !== p.skill.id) v = s.vortex = { key: p.skill.id, blades: [], acc: 0 };
   const t = spec.seconds * p.skillDuration;
   if (v.blades.length < spec.max) v.blades.push(t);
   else {
@@ -347,14 +347,14 @@ export function addBlade(w: World, p: SkillProfile): void {
   }
 }
 
-function tickVortex(w: World, dt: number): void {
-  const v = w.vortex;
+function tickVortex(w: World, s: Side, dt: number): void {
+  const v = s.vortex;
   if (!v) return;
   let j = 0;
   for (const t of v.blades) if (t - dt > 0) v.blades[j++] = t - dt;
   v.blades.length = j;
   if (j === 0) {
-    w.vortex = null;
+    s.vortex = null;
     return;
   }
   const c = w.char.actives.find((x) => x.skill.id === v.key);
@@ -404,23 +404,23 @@ function tickVortex(w: World, dt: number): void {
 // ---- Storm Call: markers that all go off together
 
 /** A cast sets a marker where it is aimed. */
-export function placeMarker(w: World, act: Action): void {
+export function placeMarker(w: World, s: Side, act: Action): void {
   const p = act.profile;
   const spec = p.skill.markers!;
-  w.markers.push({ x: act.aimX, y: act.aimY, t: spec.delay, profile: p, hand: act.hand });
+  s.markers.push({ x: act.aimX, y: act.aimY, t: spec.delay, profile: p, hand: act.hand });
   w.events.push({ t: 'explode', x: act.aimX, y: act.aimY, r: 0.35, dtype: 1 });
 }
 
-function tickMarkers(w: World, dt: number): void {
+function tickMarkers(w: World, s: Side, dt: number): void {
   let due = false;
-  for (const m of w.markers) {
+  for (const m of s.markers) {
     m.t -= dt;
     if (m.t <= 0) due = true;
   }
   if (!due) return;
   // When one is struck, every marker is.
-  const list = w.markers;
-  w.markers = [];
+  const list = s.markers;
+  s.markers = [];
   for (const m of list) {
     const r = m.profile.skill.markers!.radius * m.profile.radiusMult;
     w.events.push({
@@ -446,11 +446,11 @@ export function placeOrb(w: World, a: Actor, act: Action): void {
   const ang = Math.atan2(act.aimY - a.y, act.aimX - a.x);
   const spot = w.grid.collide(a.x + Math.cos(ang) * 0.9, a.y + Math.sin(ang) * 0.9, 0.3);
   // The new orb takes up where the old one was in its count to the next bolt.
-  w.stormOrb = {
+  a.side!.stormOrb = {
     x: spot.x,
     y: spot.y,
     t: spec.seconds * p.skillDuration,
-    acc: w.stormOrb?.acc ?? 0,
+    acc: a.side!.stormOrb?.acc ?? 0,
     profile: p,
     hand: act.hand,
   };
@@ -458,12 +458,7 @@ export function placeOrb(w: World, a: Actor, act: Action): void {
 }
 
 /** A bolt from the orb, or from the character who cast a lightning skill inside it: the nearest enemy, and others it splits to. */
-function orbBolt(
-  w: World,
-  fromX: number,
-  fromY: number,
-  orb: NonNullable<World['stormOrb']>,
-): void {
+function orbBolt(w: World, fromX: number, fromY: number, orb: NonNullable<Side['stormOrb']>): void {
   const p = orb.profile;
   const spec = p.skill.stormOrb!;
   const level = p.skill.level;
@@ -487,12 +482,12 @@ function orbBolt(
   }
 }
 
-function tickOrb(w: World, dt: number): void {
-  const o = w.stormOrb;
+function tickOrb(w: World, s: Side, dt: number): void {
+  const o = s.stormOrb;
   if (!o) return;
   o.t -= dt;
   if (o.t <= 0) {
-    w.stormOrb = null;
+    s.stormOrb = null;
     return;
   }
   const spec = o.profile.skill.stormOrb!;
@@ -508,8 +503,8 @@ function tickOrb(w: World, dt: number): void {
 }
 
 /** A lightning skill cast inside the orb makes it strike once more, from where the character stands. */
-export function orbAnswers(w: World, p: SkillProfile): void {
-  const o = w.stormOrb;
+export function orbAnswers(w: World, s: Side, p: SkillProfile): void {
+  const o = s.stormOrb;
   if (!o || p.skill.id === o.profile.skill.id || !p.skill.tags.includes('lightning')) return;
   const r = o.profile.skill.stormOrb!.radius * o.profile.radiusMult;
   if (Math.hypot(w.player.x - o.x, w.player.y - o.y) > r) return;
@@ -554,11 +549,11 @@ export function bounceOrbs(w: World, a: Actor, act: Action): void {
 // ---- Explosive Arrow: arrows that stick, and the first to explode takes the rest with it
 
 /** An arrow has struck an enemy (or a wall, with `target` null): it sticks, and the fuse starts if none is burning there. */
-export function stickArrow(w: World, pr: Projectile, target: Actor | null): void {
+export function stickArrow(s: Side, pr: Projectile, target: Actor | null): void {
   const p = pr.profile;
   const spec = p.skill.fuse!;
   const key = target ? target.id : 0;
-  let f = key ? w.fuses.find((x) => x.target === key) : undefined;
+  let f = key ? s.fuses.find((x) => x.target === key) : undefined;
   if (!f) {
     f = {
       target: key,
@@ -567,17 +562,17 @@ export function stickArrow(w: World, pr: Projectile, target: Actor | null): void
       t: spec.seconds * p.skillDuration,
       arrows: [],
     };
-    w.fuses.push(f);
+    s.fuses.push(f);
   }
   f.arrows.push({ profile: p, hand: pr.hand });
 }
 
-function tickFuses(w: World, dt: number): void {
+function tickFuses(w: World, s: Side, dt: number): void {
   let j = 0;
-  for (const f of w.fuses) {
+  for (const f of s.fuses) {
     f.t -= dt;
     if (f.t > 0) {
-      w.fuses[j++] = f;
+      s.fuses[j++] = f;
       continue;
     }
     const tgt = f.target ? w.actors.find((e) => e.id === f.target) : undefined;
@@ -614,7 +609,7 @@ function tickFuses(w: World, dt: number): void {
           hit(w, w.player, e, q, a.hand, Math.hypot(e.x - w.player.x, e.y - w.player.y));
     }
   }
-  w.fuses.length = j;
+  s.fuses.length = j;
 }
 
 // ---- Scourge Arrow: pods along the arrow's way that bloom into thorns
@@ -630,7 +625,7 @@ export function scatterSpores(w: World, a: Actor, act: Action, stages: number): 
   for (let i = 1; i <= stages; i++) {
     const d = (far * i) / (stages + 1);
     const spot = w.grid.collide(a.x + Math.cos(ang) * d, a.y + Math.sin(ang) * d, 0.2);
-    w.spores.push({
+    a.side!.spores.push({
       x: spot.x,
       y: spot.y,
       t: spec.delay,
@@ -643,12 +638,12 @@ export function scatterSpores(w: World, a: Actor, act: Action, stages: number): 
   }
 }
 
-function tickSpores(w: World, dt: number): void {
+function tickSpores(w: World, side: Side, dt: number): void {
   let j = 0;
-  for (const s of w.spores) {
+  for (const s of side.spores) {
     s.t -= dt;
     if (s.t > 0) {
-      w.spores[j++] = s;
+      side.spores[j++] = s;
       continue;
     }
     const phase = w.rngCombat.float(0, Math.PI * 2);
@@ -660,7 +655,7 @@ function tickSpores(w: World, dt: number): void {
         pierce: 0,
       });
   }
-  w.spores.length = j;
+  side.spores.length = j;
 }
 
 // ---- Rimeplate: the trail of chilled ground the character leaves while it moves
@@ -669,9 +664,9 @@ function tickFrostTrail(w: World, s: Side, dt: number): void {
   const fr = w.char.frostSpec;
   const p = w.player;
   if (!fr || !p.alive || !p.moving) return;
-  w.trailT -= dt;
-  if (w.trailT > 0) return;
-  w.trailT = 0.4;
+  s.trailT -= dt;
+  if (s.trailT > 0) return;
+  s.trailT = 0.4;
   const prof = w.char.profile(w.primary, 0);
   const q = { ...prof, chill: { ...prof.chill, effect: fr.slow / 100 } };
   s.fields.push({
@@ -708,7 +703,7 @@ export function frostBite(w: World, attacker: Actor): void {
 export function gainVirulence(w: World, s: Side): void {
   const ag = w.char.agonySpec;
   if (!ag || !w.player.alive) return;
-  w.virulence = Math.min(ag.max, w.virulence + 1);
+  s.virulence = Math.min(ag.max, s.virulence + 1);
   if (s.minions.some((m) => m.kind === 'crawler' && m.alive)) return;
   const c = w.char.primary;
   const prof = w.char.profile(c, playerConds(w, null), flaskMask(s));
@@ -721,14 +716,14 @@ export function gainVirulence(w: World, s: Side): void {
 
 function tickAgony(w: World, s: Side, dt: number): void {
   const ag = w.char.agonySpec;
-  if (w.virulence <= 0) return;
+  if (s.virulence <= 0) return;
   if (!ag) {
-    w.virulence = 0;
+    s.virulence = 0;
   } else {
     // The more it holds, the faster it goes.
-    w.virulence = Math.max(0, w.virulence - (0.4 + 0.12 * w.virulence) * dt);
+    s.virulence = Math.max(0, s.virulence - (0.4 + 0.12 * s.virulence) * dt);
   }
-  const n = Math.ceil(w.virulence);
+  const n = Math.ceil(s.virulence);
   for (const m of s.minions)
     if (m.kind === 'crawler' && m.alive) {
       if (n <= 0) {
@@ -795,13 +790,14 @@ type ShellSpec = NonNullable<
 /** The shell goes up: its pool is a share of the armour (the gem's armour counted), and it has not yet taken anything. */
 export function startShell(
   w: World,
+  s: Side,
   buff: BuffId,
   spec: ShellSpec,
   level: number,
   profile: SkillProfile,
 ): void {
   const pool = Math.min(spec.capMax, (w.player.def.armour * spec.capPct) / 100);
-  w.shell = {
+  s.shell = {
     left: pool,
     taken: 0,
     absorb: spec.absorb / 100,
@@ -813,8 +809,8 @@ export function startShell(
 }
 
 /** Part of a hit goes into the shell: the share it takes, up to what is left of it. */
-export function shellTakes(w: World, total: number): number {
-  const s = w.shell;
+export function shellTakes(side: Side, total: number): number {
+  const s = side.shell;
   if (!s || s.left <= 0) return 0;
   const taken = Math.min(s.left, total * s.absorb);
   s.left -= taken;
@@ -824,10 +820,10 @@ export function shellTakes(w: World, total: number): number {
 
 /** When the buff ends or the pool is spent, what the shell took goes out as fire to the enemies about. */
 function tickShell(w: World, side: Side): void {
-  const s = w.shell;
+  const s = side.shell;
   if (!s) return;
   if (s.left > 0 && side.buffT[s.buff] > 0) return;
-  w.shell = null;
+  side.shell = null;
   const dmg = (s.taken * s.reflect) / 100;
   if (dmg <= 0) return;
   const p = w.player;
@@ -851,8 +847,8 @@ export function relicNova(w: World, s: Side): void {
   const c = w.char.utilities.find((x) => x.key === relic.key);
   const u = c?.skill.utility;
   if (!c || u?.kind !== 'summon' || !u.relic) return;
-  if (w.t - w.relicT < u.relic.cooldown) return;
-  w.relicT = w.t;
+  if (w.t - s.relicT < u.relic.cooldown) return;
+  s.relicT = w.t;
   const spec = u.relic;
   const level = c.skill.level;
   const r = spec.radius * w.char.profile(c, 0).radiusMult;
@@ -867,7 +863,7 @@ export function relicNova(w: World, s: Side): void {
       Math.hypot(e.x - relic.x, e.y - relic.y) <= r + e.r
     )
       rawHit(w, e, amount, 0, 'Relic', 'minion');
-  w.relicRegen = {
+  s.relicRegen = {
     t: spec.seconds,
     me: levelValue(spec.regen, level),
     minions: levelValue(spec.minionRegen, level),
@@ -875,7 +871,7 @@ export function relicNova(w: World, s: Side): void {
 }
 
 function tickRelicRegen(w: World, s: Side, dt: number): void {
-  const g = w.relicRegen;
+  const g = s.relicRegen;
   g.t -= dt;
   const p = w.player;
   if (p.alive)

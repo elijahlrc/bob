@@ -60,17 +60,17 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
   // A skill that picks an element for each use has the one chosen before; the next one is chosen now.
   let elem: number | undefined;
   if (p.skill.element) {
-    elem = w.elem;
+    elem = a.side!.elem;
     const choices = [1, 2, 3].filter((x) => !(p.skill.element!.noRepeat && x === elem));
-    w.elemLast = elem;
-    w.elem = choices[w.rngCombat.int(0, choices.length - 1)];
+    a.side!.elemLast = elem;
+    a.side!.elem = choices[w.rngCombat.int(0, choices.length - 1)];
   }
   if (p.ruthless) {
-    const n = (w.uses[id] = (w.uses[id] ?? 0) + 1);
+    const n = (a.side!.uses[id] = (a.side!.uses[id] ?? 0) + 1);
     if (n % 3 === 0) p = ruthlessProfile(p);
   }
   // Every third use freezes as though it dealt much more.
-  orbAnswers(w, p);
+  orbAnswers(w, a.side!, p);
   // The first skill used after a Phase Run ends its speed; the damage stays a moment.
   if (!p.skill.utility)
     for (const c of w.char.utilities) {
@@ -81,14 +81,14 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
       }
     }
   if (p.freezeThird > 0) {
-    const n = (w.uses[id] = (w.uses[id] ?? 0) + 1);
+    const n = (a.side!.uses[id] = (a.side!.uses[id] ?? 0) + 1);
     if (n % 3 === 0)
       p = { ...p, freeze: { ...p.freeze, dur: p.freeze.dur * (1 + p.freezeThird / 100) } };
   }
   if (p.intensify) {
-    const st = (w.intensity[id] ??= 0);
-    w.intensity[id] = Math.min(p.intensify.max, st + 1);
-    const n = w.intensity[id];
+    const st = (a.side!.intensity[id] ??= 0);
+    a.side!.intensity[id] = Math.min(p.intensify.max, st + 1);
+    const n = a.side!.intensity[id];
     const q = scaleProfile(p, Math.pow(1 + p.intensify.more / 100, n));
     p = { ...q, radiusMult: q.radiusMult * Math.pow(1 - p.intensify.area / 100, n) };
   }
@@ -98,7 +98,7 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
   }
   if (p.unleash) {
     // The spell spends the seals it gained while idle: each is a repeat, at less damage.
-    const s = w.seals[id];
+    const s = a.side!.seals[id];
     const n = s ? s.n : 0;
     if (n > 0) {
       s!.n = 0;
@@ -110,17 +110,17 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
   }
   // Arcane Surge: after the supported skills have spent enough mana the character gains it.
   if (p.surgeThreshold > 0) {
-    w.surgeMana += p.cost;
-    if (w.surgeMana >= p.surgeThreshold) {
-      w.surgeMana -= p.surgeThreshold;
+    a.side!.surgeMana += p.cost;
+    if (a.side!.surgeMana >= p.surgeThreshold) {
+      a.side!.surgeMana -= p.surgeThreshold;
       rollGains(w, a.side!, 'surge', p.gains);
     }
   }
   // Inspiration: the mana a supported skill spends is counted, and the charges are lost when it passes the limit.
   if (p.inspire > 0) {
-    w.inspireMana += p.cost;
-    if (w.inspireMana > p.inspire) {
-      w.inspireMana = 0;
+    a.side!.inspireMana += p.cost;
+    if (a.side!.inspireMana > p.inspire) {
+      a.side!.inspireMana = 0;
       for (const k of CHARGE_KINDS) {
         const n = w.char.charges[k];
         if (n > 0 && k === 'insight') spendCharges(w, a.side!, k, n);
@@ -137,7 +137,7 @@ export function tickSupports(w: World, side: Side, dt: number): void {
   for (const c of w.char.actives) {
     const u = c.usable ? w.char.profile(c, 0).unleash : null;
     if (!u) continue;
-    const s = (w.seals[c.skill.id] ??= { n: 0, t: 0 });
+    const s = (side.seals[c.skill.id] ??= { n: 0, t: 0 });
     if (casting === c.skill.id || s.n >= SEAL_MAX) continue;
     s.t += dt;
     if (s.t >= u.every) {
@@ -145,22 +145,22 @@ export function tickSupports(w: World, side: Side, dt: number): void {
       s.n++;
     }
   }
-  for (const id in w.intensity) {
-    if (w.intensity[id] <= 0) continue;
+  for (const id in side.intensity) {
+    if (side.intensity[id] <= 0) continue;
     if (p.moving) {
-      w.intensityT[id] = (w.intensityT[id] ?? 0) + dt;
-      if (w.intensityT[id] >= INTENSITY_LOSS) {
-        w.intensityT[id] -= INTENSITY_LOSS;
-        w.intensity[id]--;
+      side.intensityT[id] = (side.intensityT[id] ?? 0) + dt;
+      if (side.intensityT[id] >= INTENSITY_LOSS) {
+        side.intensityT[id] -= INTENSITY_LOSS;
+        side.intensity[id]--;
       }
     }
   }
-  for (const id in w.shockCd) if (w.shockCd[id] > 0) w.shockCd[id] -= dt;
-  const m = w.mirage;
+  for (const id in side.shockCd) if (side.shockCd[id] > 0) side.shockCd[id] -= dt;
+  const m = side.mirage;
   if (m) {
     m.t -= dt;
     m.fireT -= dt;
-    if (m.t <= 0) w.mirage = null;
+    if (m.t <= 0) side.mirage = null;
     else if (m.fireT <= 0) mirageShoots(w, side, m);
   }
 }
@@ -195,14 +195,14 @@ export function afterPlayerHit(w: World, s: Side, dst: Actor, p: SkillProfile): 
   // A skill whose hit gives the character a buff (Smite).
   if (p.skill.hitBuff && !p.skill.tags.includes('triggered')) gainBuff(w, s, p.skill.hitBuff.buff);
   if (p.isAttack && !p.skill.tags.includes('triggered')) relicNova(w, s);
-  if (!w.inFx) {
-    if (p.skill.beams) gainBeamStack(w, p);
+  if (!s.inFx) {
+    if (p.skill.beams) gainBeamStack(s, p);
     if (p.skill.charge) chargeEnemy(w, s, dst, p);
   }
-  if (p.mirage && !w.mirage && p.isAttack && dst.alive) {
+  if (p.mirage && !s.mirage && p.isAttack && dst.alive) {
     const c = w.char.actives.find((x) => x.skill.id === p.skill.id);
     if (c)
-      w.mirage = {
+      s.mirage = {
         key: c.key,
         x: w.player.x,
         y: w.player.y,
@@ -210,16 +210,16 @@ export function afterPlayerHit(w: World, s: Side, dst: Actor, p: SkillProfile): 
         fireT: 0.2,
       };
   }
-  if (p.shockwave && !w.inShock && p.skill.behaviour.kind === 'melee') {
+  if (p.shockwave && !s.inShock && p.skill.behaviour.kind === 'melee') {
     const id = p.skill.id;
-    if ((w.shockCd[id] ?? 0) > 0) return;
+    if ((s.shockCd[id] ?? 0) > 0) return;
     const c = w.char.actives.find((x) => x.skill.id === id);
     if (!c) return;
-    w.shockCd[id] = p.shockwave.cooldown;
+    s.shockCd[id] = p.shockwave.cooldown;
     // An attack of its own around the enemy that was hit: a share of the base attack damage, whatever the hit was.
     const base = Math.max(1, p.skill.baseMult);
     const q = scaleProfile(p, p.shockwave.mult / base);
-    w.inShock = true;
+    s.inShock = true;
     w.events.push({ t: 'explode', x: dst.x, y: dst.y, r: SHOCK_RADIUS * p.radiusMult, dtype: 0 });
     for (const e of w.actors)
       if (
@@ -229,7 +229,7 @@ export function afterPlayerHit(w: World, s: Side, dst: Actor, p: SkillProfile): 
         Math.hypot(e.x - dst.x, e.y - dst.y) <= SHOCK_RADIUS * p.radiusMult + e.r
       )
         hit(w, w.player, e, q, 0, Math.hypot(e.x - w.player.x, e.y - w.player.y));
-    w.inShock = false;
+    s.inShock = false;
   }
 }
 
@@ -249,10 +249,10 @@ export function extraStrikes(w: World, a: Actor, act: Action, target: Actor): vo
         Math.hypot(e.x - a.x, e.y - a.y) <= reach + e.r,
     )
     .sort((x, y) => Math.hypot(x.x - a.x, x.y - a.y) - Math.hypot(y.x - a.x, y.y - a.y));
-  w.critLock = w.critSeen;
+  a.side!.critLock = a.side!.critSeen;
   for (const e of others.slice(0, p.extraTargets))
     hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
-  w.critLock = null;
+  a.side!.critLock = null;
 }
 
 /** The areas before and behind the target of a spell that cascades: the effect is fired again at each. */

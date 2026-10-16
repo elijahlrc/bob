@@ -208,7 +208,7 @@ describe('strikes with a second effect (thunderRebuke, primalStrike, primeSplash
     const { world: w, dummy } = world(['primalStrike'], 1.4, 'sword_3', DEX);
     const seen: number[] = [];
     for (let i = 0; i < 60 * 14; i++) {
-      const before = w.elem;
+      const before = w.sides[0].elem;
       stepWorld(w);
       for (const e of w.events) if (e.t === 'use') seen.push(before);
     }
@@ -216,7 +216,7 @@ describe('strikes with a second effect (thunderRebuke, primalStrike, primeSplash
     for (let i = 1; i < seen.length; i++) expect(seen[i]).not.toBe(seen[i - 1]);
     expect(new Set(seen).size).toBe(3);
     for (const el of [1, 2, 3]) {
-      w.elem = el;
+      w.sides[0].elem = el;
       const p = w.char.profile(w.primary, playerConds(w, dummy));
       const types = new Set(p.hands[0].chunks.filter((c) => c.max > 0).map((c) => c.type));
       expect([...types]).toEqual([el]);
@@ -225,7 +225,7 @@ describe('strikes with a second effect (thunderRebuke, primalStrike, primeSplash
 
   it('Elemental Hit has more area against an enemy with the ailment of its element', () => {
     const { world: w, dummy } = world(['primalStrike'], 1.4, 'sword_3', DEX);
-    w.elem = 3;
+    w.sides[0].elem = 3;
     const prof = w.char.profile(w.primary, playerConds(w, dummy));
     const act: Action = {
       profile: prof,
@@ -263,7 +263,7 @@ describe('strikes with a second effect (thunderRebuke, primalStrike, primeSplash
       expect(p0.hands[0].chunks.every((c) => c.type !== 0 || c.max === 0)).toBe(true);
       let hurt = false;
       for (let i = 0; i < 100 && !hurt; i++) {
-        w.elem = el;
+        w.sides[0].elem = el;
         stepWorld(w);
         hurt = near.life < 1e9;
       }
@@ -302,7 +302,7 @@ describe('strikes that leave something behind (chargedBlow, cinderBlow, rimeMall
     let stacks = 0;
     for (let i = 0; i < 60 * 8; i++) {
       stepWorld(w);
-      stacks = Math.max(stacks, w.staticFx?.stacks.length ?? 0);
+      stacks = Math.max(stacks, w.sides[0].staticFx?.stacks.length ?? 0);
     }
     expect(stacks).toBeGreaterThanOrEqual(2);
     expect(stacks).toBeLessThanOrEqual(3);
@@ -311,7 +311,7 @@ describe('strikes that leave something behind (chargedBlow, cinderBlow, rimeMall
     // The buff ends once the hitting stops.
     w.player.stunT = 100;
     run(w, 6);
-    expect(w.staticFx).toBeNull();
+    expect(w.sides[0].staticFx).toBeNull();
   });
 
   it('Infernal Blow: charges build on the enemy, then burst on those about it; one that dies bursts as fire', () => {
@@ -321,7 +321,7 @@ describe('strikes that leave something behind (chargedBlow, cinderBlow, rimeMall
     let bursts = 0;
     for (let i = 0; i < 60 * 8; i++) {
       stepWorld(w);
-      maxN = Math.max(maxN, w.charged[dummy.id]?.n ?? 0);
+      maxN = Math.max(maxN, w.sides[0].charged[dummy.id]?.n ?? 0);
       for (const e of w.events) if (e.t === 'explode') bursts++;
     }
     expect(maxN).toBeGreaterThanOrEqual(2);
@@ -333,11 +333,11 @@ describe('strikes that leave something behind (chargedBlow, cinderBlow, rimeMall
     const { world: w, dummy } = world(['cinderBlow'], 1.4, 'sword_3', STR);
     const near = neighbour(w, dummy.x + 1.0, dummy.y, 1e6);
     w.player.stunT = 100;
-    w.charged[dummy.id] = { n: 1, t: 5, key: 'cinderBlow' };
+    w.sides[0].charged[dummy.id] = { n: 1, t: 5, key: 'cinderBlow' };
     dummy.def = dummyDefence({ maxLife: 100000 });
     dummy.life = 100000;
     killActor(w, dummy);
-    expect(w.charged[dummy.id]).toBeUndefined();
+    expect(w.sides[0].charged[dummy.id]).toBeUndefined();
     // 6% of its life, as fire, less its resistance.
     expect(1e6 - near.life).toBeGreaterThan(1000);
   });
@@ -390,7 +390,7 @@ describe('shield and charge skills (snagLash, bulwarkRush, ghostShard)', () => {
     };
     const hn = hits(near);
     const hf = hits(far);
-    expect(far.world.lastTravel).toBeGreaterThan(3);
+    expect(far.world.sides[0].lastTravel).toBeGreaterThan(3);
     expect(hn).toBeGreaterThan(0);
     expect(hf).toBeGreaterThan(hn * 1.2);
     // The weapon's damage does not count: the same with a better sword.
@@ -439,7 +439,7 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     const near = neighbour(w, w.player.x - 1.0, w.player.y);
     for (let i = 0; i < 60 * 6; i++) {
       stepWorld(w);
-      most = Math.max(most, w.vortex?.blades.length ?? 0);
+      most = Math.max(most, w.sides[0].vortex?.blades.length ?? 0);
     }
     expect(most).toBeGreaterThanOrEqual(5);
     expect(most).toBeLessThanOrEqual(10);
@@ -447,14 +447,18 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     expect(near.life).toBeLessThan(1e9);
     w.player.stunT = 100;
     run(w, 6);
-    expect(w.vortex).toBeNull();
+    expect(w.sides[0].vortex).toBeNull();
   });
 
   it('Blade Vortex: more blades make a round come sooner and hit harder', () => {
     const { world: w, dummy } = world(['orbitingBlades'], 1.2, 'wand_3', DEX);
     w.player.stunT = 100;
     const dmg = (n: number) => {
-      w.vortex = { key: 'orbitingBlades', blades: Array.from({ length: n }, () => 5), acc: 0 };
+      w.sides[0].vortex = {
+        key: 'orbitingBlades',
+        blades: Array.from({ length: n }, () => 5),
+        acc: 0,
+      };
       dummy.life = 1e9;
       run(w, 2);
       return 1e9 - dummy.life;
@@ -467,10 +471,10 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     let most = 0;
     let struck = false;
     for (let i = 0; i < 60 * 3; i++) {
-      const before = w.markers.length;
+      const before = w.sides[0].markers.length;
       stepWorld(w);
-      most = Math.max(most, w.markers.length);
-      if (before >= 2 && w.markers.length === 0) struck = true;
+      most = Math.max(most, w.sides[0].markers.length);
+      if (before >= 2 && w.sides[0].markers.length === 0) struck = true;
     }
     expect(most).toBeGreaterThanOrEqual(2);
     expect(struck).toBe(true);
@@ -483,7 +487,7 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     let orbs = 0;
     for (let i = 0; i < 60 * 4; i++) {
       stepWorld(w);
-      if (w.stormOrb) orbs = 1;
+      if (w.sides[0].stormOrb) orbs = 1;
     }
     expect(orbs).toBe(1);
     expect(dummy.life).toBeLessThan(1e9);
@@ -491,11 +495,11 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     const sky = w.char.actives.find((c) => c.skill.id === 'skyfall')!;
     const prof = w.char.profile(sky, 0);
     w.player.stunT = 100;
-    w.stormOrb!.x = w.player.x;
-    w.stormOrb!.y = w.player.y;
-    w.stormOrb!.acc = -100;
+    w.sides[0].stormOrb!.x = w.player.x;
+    w.sides[0].stormOrb!.y = w.player.y;
+    w.sides[0].stormOrb!.acc = -100;
     const before = dummy.life;
-    orbAnswers(w, prof);
+    orbAnswers(w, w.sides[0], prof);
     expect(dummy.life).toBeLessThan(before);
   });
 
@@ -520,7 +524,7 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
       stepWorld(w);
       most = Math.max(
         most,
-        w.fuses.reduce((n, f) => Math.max(n, f.arrows.length), 0),
+        w.sides[0].fuses.reduce((n, f) => Math.max(n, f.arrows.length), 0),
       );
       for (const e of w.events) if (e.t === 'explode') bursts++;
     }
@@ -535,7 +539,7 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     let arrows = 0;
     for (let i = 0; i < 60 * 8; i++) {
       stepWorld(w);
-      pods = Math.max(pods, w.spores.length);
+      pods = Math.max(pods, w.sides[0].spores.length);
       arrows = Math.max(arrows, w.projectiles.length);
     }
     expect(pods).toBeGreaterThanOrEqual(2);
@@ -571,15 +575,15 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     let v = 0;
     for (let i = 0; i < 60 * 12; i++) {
       stepWorld(w);
-      v = Math.max(v, w.virulence);
+      v = Math.max(v, w.sides[0].virulence);
     }
     expect(v).toBeGreaterThan(2);
     const crawler = w.sides[0].minions.find((m) => m.kind === 'crawler');
     expect(crawler?.alive).toBe(true);
     w.player.stunT = 100;
-    w.virulence = 5;
+    w.sides[0].virulence = 5;
     run(w, 12);
-    expect(w.virulence).toBe(0);
+    expect(w.sides[0].virulence).toBe(0);
     expect(w.sides[0].minions.some((m) => m.kind === 'crawler' && m.alive)).toBe(false);
   });
 
@@ -672,20 +676,20 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     const { world: w, dummy } = world(['crushingBlow', 'slagCarapace'], 1.2, 'sword_3', STR);
     w.sides[0].opts.godMode = true;
     w.player.life = w.player.def.maxLife * 0.4;
-    for (let i = 0; i < 90 && !w.shell; i++) stepWorld(w);
-    expect(w.shell).not.toBeNull();
+    for (let i = 0; i < 90 && !w.sides[0].shell; i++) stepWorld(w);
+    expect(w.sides[0].shell).not.toBeNull();
     w.player.stunT = 100;
-    const pool = w.shell!.left;
+    const pool = w.sides[0].shell!.left;
     expect(pool).toBeGreaterThan(0);
     const life = w.player.life;
     rawHit(w, w.player, 100, 0, 'Test');
     expect(life - w.player.life).toBeLessThan(100);
-    expect(w.shell!.taken).toBeGreaterThan(1);
+    expect(w.sides[0].shell!.taken).toBeGreaterThan(1);
     dummy.life = 1e9;
     const before = dummy.life;
     w.sides[0].buffT.moltenGuard = 0;
     stepWorld(w);
-    expect(w.shell).toBeNull();
+    expect(w.sides[0].shell).toBeNull();
     expect(dummy.life).toBeLessThan(before);
   });
 
@@ -730,18 +734,18 @@ describe('carrying damage about oneself (searingMantle, orbitingBlades)', () => 
     // Hurt below the threshold: the fire goes out and the enemy is left alone by it, and the character stops closing in for it.
     p.life = p.def.maxLife * 0.2;
     run(w, 0.6);
-    expect(contactRange(w)).toBe(0);
+    expect(contactRange(w, w.sides[0])).toBe(0);
     run(w, 1);
-    expect(contactRange(w)).toBe(0);
+    expect(contactRange(w, w.sides[0])).toBe(0);
     // Healed past the second threshold: it is lit again.
     p.life = p.def.maxLife;
     run(w, 1);
-    expect(contactRange(w)).toBeGreaterThan(0);
+    expect(contactRange(w, w.sides[0])).toBeGreaterThan(0);
   });
 
   it('with blades circling it closes in on the enemies too', () => {
     const { world: w, dummy } = world(['arcChain', 'orbitingBlades'], 7, 'wand_3', INT);
-    w.vortex = { key: 'orbitingBlades', blades: [20, 20, 20], acc: 0 };
+    w.sides[0].vortex = { key: 'orbitingBlades', blades: [20, 20, 20], acc: 0 };
     run(w, 4);
     expect(Math.hypot(w.player.x - dummy.x, w.player.y - dummy.y)).toBeLessThan(1.6 + dummy.r);
   });
@@ -808,7 +812,7 @@ describe('repairs from the fresh audit (S14)', () => {
   it('Arcane Surge comes after enough mana is spent, and Raise Zombie uses up a corpse', () => {
     const { world: w } = world(['suddenFrost', 'tideGathering'], 4, 'wand_3', INT);
     let surge = 0;
-    w.surgeMana = 300;
+    w.sides[0].surgeMana = 300;
     for (let i = 0; i < 60 * 10; i++) {
       stepWorld(w);
       surge = Math.max(surge, w.sides[0].buffT.arcaneSurge);
@@ -831,7 +835,7 @@ describe('repairs from the fresh audit (S14)', () => {
     run(w, 6);
     expect(w.sides[0].minions.some((m) => m.kind === 'relic')).toBe(true);
     expect(near.life).toBeLessThan(1e9);
-    expect(w.relicRegen.me).toBeGreaterThan(0);
+    expect(w.sides[0].relicRegen.me).toBeGreaterThan(0);
   });
 
   it('rage comes once in 0.4 s', () => {

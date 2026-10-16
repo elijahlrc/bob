@@ -1,3 +1,7 @@
+import type { PendingShot } from './shots';
+import type { ChannelState, StackState } from './channel';
+import type { SkillProfile } from '../calc/skill';
+import type { Mirage } from './supportFx';
 import type { CaughtState, WarpState, WitherState } from './blinks';
 import type { OfferingState } from './minionFx';
 import type { BannerState } from './banners';
@@ -114,4 +118,88 @@ export type Side = {
   warp: WarpState | null;
   wither: WitherState | null;
   caught: CaughtState | null;
+  // G4: the skills' running state
+  /** Counters the supports keep (src/sim/supportFx.ts): uses of a skill, Intensity, Seals, a mirage archer, Inspiration's mana. */
+  uses: Record<string, number>;
+  intensity: Record<string, number>;
+  intensityT: Record<string, number>;
+  seals: Record<string, { n: number; t: number }>;
+  mirage: Mirage | null;
+  inspireMana: number;
+  /** The channelling skill whose Infusion is held, if one is. */
+  infusing: string | null;
+  shockCd: Record<string, number>;
+  inShock: boolean;
+  /** The critical roll the strikes of one use share: set while the extra strikes of a use are made. */
+  critLock: boolean | null;
+  critSeen: boolean;
+  /** The element of the next use of a skill that picks one (1 lightning, 2 cold, 3 fire), and the last one used. */
+  elem: number;
+  elemLast: number;
+  /** The buff of Static Strike: its stacks (seconds left) and the time toward the next beams. */
+  staticFx: { key: string; stacks: number[]; acc: number } | null;
+  /** Molten Shell: the pool left, the damage it has taken, and what comes of it. */
+  shell: {
+    left: number;
+    taken: number;
+    absorb: number;
+    reflect: number;
+    radius: number;
+    buff: BuffId;
+    profile: SkillProfile;
+  } | null;
+  /** Herald of Agony: the Virulence held (it runs out), and the time to the next patch of Rimeplate's trail. */
+  virulence: number;
+  /** The mana the supported skills have spent toward Arcane Surge. */
+  surgeMana: number;
+  /** The relic's regeneration: seconds left, and the life a second for the character and for the minions; and its nova's cooldown. */
+  relicRegen: { t: number; me: number; minions: number };
+  relicT: number;
+  trailT: number;
+  /** The blades of Blade Vortex: seconds left of each, and the time toward the next round. */
+  vortex: { key: string; blades: number[]; acc: number } | null;
+  /** The markers of Storm Call. */
+  markers: { x: number; y: number; t: number; profile: SkillProfile; hand: number }[];
+  /** The orb of Orb of Storms. */
+  stormOrb: {
+    x: number;
+    y: number;
+    t: number;
+    acc: number;
+    profile: SkillProfile;
+    hand: number;
+  } | null;
+  /** The arrows stuck in an enemy (or the ground) awaiting their fuse. */
+  fuses: {
+    target: number;
+    x: number;
+    y: number;
+    t: number;
+    arrows: { profile: SkillProfile; hand: number }[];
+  }[];
+  /** The pods of Scourge Arrow waiting to bloom. */
+  spores: {
+    x: number;
+    y: number;
+    t: number;
+    profile: SkillProfile;
+    hand: number;
+    arrows: number;
+    range: number;
+  }[];
+  /** The enemies carrying a charged debuff (Infernal Blow), by id. */
+  charged: Record<number, { n: number; t: number; key: string }>;
+  /** Set while a skill's own secondary hits are made, so they do not feed the skill again. */
+  inFx: boolean;
+  /** How far the last travelling skill carried the character, in tiles. */
+  lastTravel: number;
+  /** The channelled skill being held: its stages so far. */
+  channel: ChannelState | null;
+  /** The stages of a skill that grows with use, and how many hits the player has landed (a use that hits builds a stage). */
+  stacks: StackState | null;
+  hitsLanded: number;
+  /** The projectiles of a barrage still to be fired, one after another. */
+  shots: PendingShot[];
+  /** How the last hit of the player's resolved (a strike that sends more out waits to see it land). */
+  lastOutcome: 'hit' | 'miss' | 'block' | null;
 };

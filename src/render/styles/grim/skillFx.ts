@@ -1434,7 +1434,7 @@ export class SkillFx {
         time * 18,
       );
     }
-    const ch = w.channel;
+    const ch = w.sides[0].channel;
     const spec = ch?.profile.skill.channel;
     const beh = ch?.profile.skill.behaviour;
     if (ch && spec?.tick && beh?.kind === 'burst' && beh.origin === 'self') {
@@ -1499,7 +1499,7 @@ export class SkillFx {
   private lasting(ground: Gfx, air: Gfx, w: World, time: number): void {
     const p = w.player;
     this.spinning(ground, air, w, time);
-    const vx = w.vortex;
+    const vx = w.sides[0].vortex;
     if (vx && p.alive && vx.blades.length > 0) {
       const spec = choiceByKey(w, vx.key)?.skill.vortex;
       const color = this.colorOfSkill(w, choiceByKey(w, vx.key)?.skill.id ?? '');
@@ -1526,7 +1526,7 @@ export class SkillFx {
           );
       }
     }
-    const orb = w.stormOrb;
+    const orb = w.sides[0].stormOrb;
     if (orb) {
       const o = this.lifted(orb.x, orb.y, 14);
       const fade = Math.min(1, orb.t);
@@ -1542,7 +1542,7 @@ export class SkillFx {
       }
       this.ring(ground, orb.x, orb.y, 0.5, color, 0.35 * fade, 1);
     }
-    for (const m of w.markers) {
+    for (const m of w.sides[0].markers) {
       const color = this.colorOfSkill(w, m.profile.skill.id);
       const spec = w.char.actives.find((x) => x.skill.id === m.profile.skill.id)?.skill.markers;
       const r = (spec?.radius ?? 1.5) * m.profile.radiusMult;
@@ -1552,7 +1552,7 @@ export class SkillFx {
       const c = this.host.project(m.x, m.y);
       air.fillStyle(0xffffff, 0.85).fillCircle(c.x, c.y, 1.8);
     }
-    for (const f of w.fuses) {
+    for (const f of w.sides[0].fuses) {
       const t = this.host.actorById(f.target);
       const x = t && t.alive ? t.x : f.x;
       const y = t && t.alive ? t.y : f.y;
@@ -1572,14 +1572,14 @@ export class SkillFx {
       air.fillStyle(ELEMENT_COLOR[3], 0.45 * blink).fillCircle(o.x, o.y, 6);
       air.fillStyle(0xffd080, 0.9 * blink).fillCircle(o.x, o.y, 2);
     }
-    for (const s of w.spores) {
+    for (const s of w.sides[0].spores) {
       const o = this.host.project(s.x, s.y);
       const pulse = 0.6 + 0.4 * Math.sin(time * 5 + s.x * 3);
       ground.fillStyle(0x000000, 0.3).fillEllipse(o.x, o.y + 1, 10, 4);
       ground.fillStyle(0x6a8a3a, 0.9).fillEllipse(o.x, o.y - 3, 8, 7);
       air.fillStyle(0xa0e060, 0.4 * pulse).fillCircle(o.x, o.y - 4, 5);
     }
-    const mi = w.mirage;
+    const mi = w.sides[0].mirage;
     if (mi) {
       const o = this.host.project(mi.x, mi.y);
       const fade = Math.min(1, mi.t);
@@ -1588,15 +1588,15 @@ export class SkillFx {
       air.fillStyle(0x80c0ff, 0.35 * fade).fillTriangle(o.x - 5, o.y, o.x + 5, o.y, o.x, o.y - 10);
       air.lineStyle(1, 0xffffff, 0.6 * fade).strokeCircle(o.x, o.y - 12, 3.5);
     }
-    for (const id in w.charged) {
+    for (const id in w.sides[0].charged) {
       const e = this.host.actorById(Number(id));
-      const ch = w.charged[id];
+      const ch = w.sides[0].charged[id];
       if (!e || !e.alive) continue;
       const o = this.host.project(e.x, e.y);
       for (let i = 0; i < ch.n; i++)
         air.fillStyle(ELEMENT_COLOR[3], 0.95).fillCircle(o.x - (ch.n - 1) * 3 + i * 6, o.y - 32, 2);
     }
-    const sh = w.shell;
+    const sh = w.sides[0].shell;
     if (sh && p.alive) {
       const flick = 0.7 + 0.3 * Math.sin(time * 6);
       this.disc(ground, p.x, p.y, 0.9, ELEMENT_COLOR[3], 0.12 * flick);

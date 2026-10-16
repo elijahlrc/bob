@@ -174,9 +174,11 @@ export function updateAction(w: World, a: Actor, dt: number): void {
     spinStep(w, a, act, t, adt);
   } else if (!act.fired && act.elapsed >= HIT_AT * act.duration) {
     act.fired = true;
-    w.critSeen = false;
+    // A monster has no side, and no critical roll for its strikes to share.
+    const sd = a.side;
+    if (sd) sd.critSeen = false;
     fire(w, a, act);
-    act.crit = w.critSeen;
+    act.crit = sd ? sd.critSeen : false;
   }
   // Echoes: the same use lands again a moment after the first, without a new wind-up or a new cost.
   if (
@@ -203,9 +205,10 @@ export function updateAction(w: World, a: Actor, dt: number): void {
     }
     const mult = act.echoMult?.[act.echoes - 1] ?? 1;
     const prof = mult === 1 ? act.profile : scaleProfile(act.profile, mult);
-    if (act.profile.multistrike) w.critLock = act.crit ?? null;
+    const sd = a.side;
+    if (sd && act.profile.multistrike) sd.critLock = act.crit ?? null;
     fire(w, a, { ...act, profile: prof });
-    w.critLock = null;
+    if (sd) sd.critLock = null;
     w.events.push({ t: 'echo', src: a.id, skill: act.profile.skill.id });
   }
   if (act.elapsed >= act.duration) {
@@ -243,7 +246,7 @@ function runStep(w: World, a: Actor, act: Action, target: Actor | undefined, dt:
     if (ids.includes(e.id) || e.phaseT > 0) continue;
     if (Math.hypot(e.x - a.x, e.y - a.y) > e.r + a.r + 0.3) continue;
     ids.push(e.id);
-    w.lastTravel = act.ran;
+    a.side!.lastTravel = act.ran;
     hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
   }
 }
@@ -304,9 +307,9 @@ function spinStep(w: World, a: Actor, act: Action, target: Actor | undefined, dt
   while ((act.spinN ?? 0) < due) {
     a.facing = face + ((act.spinN ?? 0) * 2 * Math.PI) / sp.hits;
     act.spinN = (act.spinN ?? 0) + 1;
-    w.critSeen = false;
+    a.side!.critSeen = false;
     fire(w, a, { ...act, aimX: a.x, aimY: a.y });
-    act.crit = act.crit || w.critSeen;
+    act.crit = act.crit || a.side!.critSeen;
   }
   a.facing = face;
 }
@@ -463,9 +466,11 @@ export function carryToward(
 ): void {
   const d = Math.hypot(target.x - a.x, target.y - a.y);
   const step = Math.max(0, Math.min(most, d - (target.r + a.r + 0.8)));
-  w.lastTravel = 0;
+  // (A monster has no side, and nothing that reads how far it was carried.)
+  const sd = a.side;
+  if (sd) sd.lastTravel = 0;
   if (step <= 0.05) return;
-  w.lastTravel = step;
+  if (sd) sd.lastTravel = step;
   const spot = w.grid.collide(
     a.x + ((target.x - a.x) / d) * step,
     a.y + ((target.y - a.y) / d) * step,
@@ -519,11 +524,11 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
     return;
   }
   if (p.skill.vortex && a.isPlayer) {
-    addBlade(w, p);
+    addBlade(a.side!, p);
     return;
   }
   if (p.skill.markers && a.isPlayer) {
-    placeMarker(w, act);
+    placeMarker(w, a.side!, act);
     return;
   }
   if (p.skill.stormOrb && a.isPlayer) {
@@ -572,7 +577,7 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
   }
   // A travelling skill (a leap, a charge) carries the caster toward the target before it lands.
   // (One that runs over its wind-up has already arrived.)
-  if (p.skill.run && a.isPlayer && act.ran !== undefined) w.lastTravel = act.ran;
+  if (p.skill.run && a.isPlayer && act.ran !== undefined) a.side!.lastTravel = act.ran;
   else if (p.skill.travel && target && target.alive)
     carryToward(w, a, p, act, target, p.skill.travel);
   if (b.kind === 'melee') {
@@ -617,13 +622,14 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
       heavy: isHeavy(a, p),
     });
     // A skill that strikes with both weapons at once (Dual Strike) lands both blows.
-    w.lastOutcome = null;
+    // (A monster has no side, so no outcome to follow.)
+    if (a.side) a.side.lastOutcome = null;
     if (p.bothHands) for (let h = 0; h < p.hands.length; h++) hit(w, a, target, p, h, d);
     else hit(w, a, target, p, act.hand, d);
     // A strike that hits more enemies at once (Ancestral Call).
     extraStrikes(w, a, act, target);
     // A strike that sends more out after it (bolts, blades, balls) does so only if it landed.
-    if (w.lastOutcome === 'hit') afterStrike(w, a, act, target);
+    if (a.side?.lastOutcome === 'hit') afterStrike(w, a, act, target);
     return;
   }
   if (b.kind === 'chain') {
@@ -859,7 +865,7 @@ export function updateProjectiles(w: World, dt: number): void {
           pr.vy = Math.sin(ang) * sp;
           continue;
         }
-        if (pr.profile.skill.fuse && owner?.isPlayer) stickArrow(w, pr, null);
+        if (pr.profile.skill.fuse && owner?.isPlayer) stickArrow(owner.side!, pr, null);
         if (pr.explodeRadius > 0)
           explode(w, owner, pr, pr.x - (pr.vx * dt) / steps, pr.y - (pr.vy * dt) / steps);
         projectileLanded(w, pr, owner);
@@ -929,7 +935,7 @@ export function updateProjectiles(w: World, dt: number): void {
         }
         // An arrow of Explosive Arrow sticks in the enemy, to explode.
         if (pr.profile.skill.fuse && owner?.isPlayer) {
-          stickArrow(w, pr, e);
+          stickArrow(owner.side!, pr, e);
           endProjectile(w, pr, 2);
           alive = false;
           break;

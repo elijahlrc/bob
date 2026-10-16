@@ -30,7 +30,13 @@
     "minionStrike": "m",
     "projectileLanded": "owner",
     "leaveCreeping": "owner",
-    "fireProjectiles": "a"
+    "fireProjectiles": "a",
+    "runStep": "a",
+    "carryToward": "a",
+    "lineWave": "a",
+    "placeOrb": "a",
+    "scatterSpores": "a",
+    "extraStrikes": "a"
   },
   "bySide0": ["vitalsOf", "worldResult"],
   "byPlayer": [
@@ -56,7 +62,8 @@
     "minionAhead",
     "tickEffects",
     "tickZones",
-    "targetOf"
+    "targetOf",
+    "stunPlayer"
   ],
   "except": [
     "applyDamage",

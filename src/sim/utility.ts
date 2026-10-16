@@ -261,9 +261,9 @@ const BURN_RADIUS = 2.8;
  * circling blades (Orbiting Blades). Zero when it carries nothing of the kind. The character walks in among the enemies, as a player
  * of such a build does, instead of standing off at the range of its attack.
  */
-export function contactRange(w: World): number {
+export function contactRange(w: World, s: Side): number {
   let r = w.char.burn.pct > 0 && !burnOff.has(w) ? BURN_RADIUS * 0.8 : 0;
-  const v = w.vortex;
+  const v = s.vortex;
   if (v && v.blades.length > 0) {
     const c = w.char.actives.find((x) => x.skill.id === v.key);
     if (c?.skill.vortex) r = Math.max(r, c.skill.vortex.radius * 0.8);
@@ -347,7 +347,7 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     }
     gainBuff(w, a.side!, u.buff);
     if (u.second) gainBuff(w, a.side!, u.second.buff);
-    if (u.shell) startShell(w, u.buff, u.shell, c.skill.level, act.profile);
+    if (u.shell) startShell(w, a.side!, u.buff, u.shell, c.skill.level, act.profile);
     // The charges a guard spends make it last longer and take more of the physical damage away.
     let spent = 0;
     if (u.consume) {
