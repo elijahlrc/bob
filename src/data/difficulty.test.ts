@@ -10,7 +10,6 @@ import {
   clampDifficulty,
   DEFAULT,
   LEGACY,
-  mapTier,
   packPower,
   relativeHardness,
   statLevel,
@@ -85,10 +84,6 @@ describe('the difficulty model (docs/ENEMIES.md section 8)', () => {
     expect(packPower(LEGACY, 1, 1)).toBe(1);
     expect(packPower(d, 1, 1)).toBe(1.5);
     expect(packPower(d, -1, -1)).toBe(0.5);
-    expect(mapTier(LEGACY, 1)).toBeNull();
-    expect(mapTier(d, 1)).toBe('fierce');
-    expect(mapTier(d, -1)).toBe('gentle');
-    expect(mapTier(d, 0)).toBe('even');
   });
 });
 

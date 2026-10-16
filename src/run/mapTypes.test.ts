@@ -17,7 +17,7 @@ import type { World } from '../sim/types';
 import { createWorld, stepWorld } from '../sim/world';
 import { makeOffer, rollOffers, TWO_TYPES_FROM } from './offers';
 import { newRun, planFor, setMap, worldOptsFor, type RunState } from './run';
-import { levelHardness, scoreTheme, survivalRatio, themeReward, threatPreview } from './threat';
+import { levelHardness, scoreTheme, themeReward } from './threat';
 import { Character } from '../calc/character';
 import { cfgFor } from './bot';
 import { withStarterGems } from './starterGems';
@@ -200,13 +200,6 @@ describe('the threat model knows the types', () => {
       expect(themeReward(theme, [], 30, type), type).toBeGreaterThan(themeReward(theme, [], 30));
     }
   });
-
-  it('the preview shows a Throng as quicker to kill but harder to survive', () => {
-    const p = threatPreview(ch, theme, 'clearing', [], 'throng');
-    const base = threatPreview(ch, theme, 'clearing', [], 'plain');
-    expect(p.dps).toBeGreaterThan(base.dps);
-    expect(p.ehp).toBeLessThan(base.ehp);
-  });
 });
 
 describe('a higher offer is judged harder (docs/MAPS.md 5.1)', () => {
@@ -226,10 +219,6 @@ describe('a higher offer is judged harder (docs/MAPS.md 5.1)', () => {
     const v = (lvl: number) => scoreTheme(at(lvl), theme, 'clearing', [], 'plain', 40).value;
     expect(v(42)).toBeLessThan(v(40));
     expect(v(38)).toBeGreaterThan(v(40));
-    // The verdict counts it too: the same plain map is a worse bet two levels up.
-    const ratio = (lvl: number) => survivalRatio(at(lvl), theme, 'clearing', [], 'plain', 1, 40);
-    expect(ratio(42)).toBeLessThan(ratio(40));
-    expect(ratio(40)).toBeCloseTo(1, 1);
   });
 
   it('a Crescendo map does not pull the character out while the exit is open', () => {

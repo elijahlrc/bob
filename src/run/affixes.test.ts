@@ -1,18 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { Character } from '../calc/character';
 import { buildMonster, type MonsterSpec } from '../calc/monster';
 import { affixesConflict, affixText, MAP_AFFIXES } from '../data/mapAffixes';
-import { themeDef } from '../data/themes';
-import { makeItem } from '../gen/items';
-import { mod } from '../mods/types';
 import { makeMapPlan, rollMapAffixes } from '../gen/mapPlan';
 import { runMap } from '../sim/runMap';
 import { makeCharacter } from '../sim/world';
-import { cfgFor } from './bot';
 import { offersFor } from './preview';
-import { withStarterGems } from './starterGems';
 import { finishMap, newRun, planFor, worldOptsFor, setMap } from './run';
-import { threatPreview } from './threat';
 
 describe('map affixes (EXPANSION 7.5)', () => {
   it('every affix has an effect, and no placeholder is left in its text', () => {
@@ -97,62 +90,13 @@ describe('map affixes (EXPANSION 7.5)', () => {
   });
 });
 
-describe('threat preview (EXPANSION section 9)', () => {
-  const run = withStarterGems(newRun('vanguard', 1));
-  run.build.level = 60;
-  setMap(run, 60);
-  const ch = new Character(run.build, cfgFor(run));
-  const theme = themeDef('ashenCrypt');
-
-  it('a plain map is the reference: DPS ×1 and EHP ×1', () => {
-    const p = threatPreview(ch, { ...theme, elementWeights: {}, typeWeights: {} }, 'clearing', []);
-    expect(p.dps).toBeCloseTo(1);
-    expect(p.ehp).toBeCloseTo(1);
-  });
-
-  it('tougher monsters cut your DPS, harder ones your effective HP', () => {
-    const plain = threatPreview(ch, theme, 'clearing', []);
-    expect(threatPreview(ch, theme, 'clearing', ['moreLife']).dps).toBeLessThan(plain.dps);
-    expect(threatPreview(ch, theme, 'clearing', ['moreDamage']).ehp).toBeLessThan(plain.ehp);
-  });
-
-  it('lower maximum resistances, extra chaos and unevadeable hits cut your effective HP', () => {
-    // Resistances well above the lowered cap, so the cap is what limits them.
-    const capped = newRun('vanguard', 1);
-    capped.build.level = 50;
-    setMap(capped, 50);
-    const ring = makeItem(() => 900, 'ring_all', 50, 0, 'unique');
-    ring.uniqueMods = [mod('resist.allEle', 'base', 100), mod('resist.chaos', 'base', 100)];
-    capped.build.equipment.ring1 = ring;
-    const c = new Character(capped.build, cfgFor(capped));
-    const plain = threatPreview(c, theme, 'clearing', []).ehp;
-    expect(threatPreview(c, theme, 'clearing', ['lessMaxRes']).ehp).toBeLessThan(plain);
-    expect(threatPreview(c, theme, 'clearing', ['extraChaos']).ehp).toBeLessThan(plain);
-    expect(threatPreview(ch, theme, 'clearing', ['noEvade']).ehp).toBeLessThanOrEqual(
-      threatPreview(ch, theme, 'clearing', []).ehp,
-    );
-  });
-
-  it('a resistant monster cuts the DPS of an element it resists, not of physical', () => {
-    const fireRun = withStarterGems(newRun('mystic', 1));
-    fireRun.build.level = 50;
-    setMap(fireRun, 50);
-    const c = new Character(fireRun.build, cfgFor(fireRun));
-    const plain = threatPreview(c, theme, 'clearing', []).dps;
-    expect(threatPreview(c, theme, 'clearing', ['fireproof']).dps).toBeLessThan(plain);
-    expect(threatPreview(c, theme, 'clearing', ['coldproof']).dps).toBeCloseTo(plain, 0);
-  });
-
-  it('the camp offers three maps, each with its affixes and numbers', () => {
+describe('the offer cards', () => {
+  it('the camp offers three maps, each with its own affixes', () => {
     const r = newRun('reaver', 3);
     setMap(r, 45);
     r.build.level = 45;
     const offers = offersFor(r);
-    for (const o of offers) {
-      expect(o.affixes).toEqual(r.offers.find((x) => x.id === o.id)!.affixes);
-      expect(o.dps).toBeGreaterThan(0);
-      expect(o.ehp).toBeGreaterThan(0);
-    }
+    for (const o of offers) expect(o.affixes).toEqual(r.offers.find((x) => x.id === o.id)!.affixes);
     expect(offers.some((o) => o.affixes.length > 0)).toBe(true);
   });
 });

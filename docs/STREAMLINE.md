@@ -141,3 +141,9 @@ All of S1 to S8 and section 3 are built. Where the build differs from the plan a
 - **Section 3:** the reward table's labels are shorter ("Quantity", "Rarity", "Bonus") so two pairs fit a card's width.
   The boss card loses its DPS/EHP line too.
 - **The reward pick on Items** is laid out in one row there, so the drops stay in view.
+- **The unused preview is gone:** with the DPS/EHP line, verdict and tier label off the cards, `offersFor`
+  (`src/run/preview.ts`) no longer works out the threat preview, the survival ratio or the tier, and `threatPreview`,
+  `survivalRatio` and `mapTier` are removed with the tests that only covered them. The map tier as a mechanic (each
+  map's own draw of the variance) is unchanged. `offersFor` builds one character per offer instead of three, for the
+  resistance warning: about 5.3 ms a call fell to about 1.5 ms on a level 45 camp, and the camp calls it on every
+  render.
