@@ -79,7 +79,7 @@ describe('§6.4 recovery', () => {
     p.def = { ...p.def, lifeRegen: 10, maxEs: 100, esRecharge: 33.3, esDelay: 2 };
     p.life = 10;
     p.es = 0;
-    p.sinceDamaged = 0;
+    p.since.damaged = 0;
     tickActor(w, p, 1);
     expect(p.life).toBeCloseTo(20);
     expect(p.es).toBe(0);

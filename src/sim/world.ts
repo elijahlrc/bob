@@ -385,7 +385,7 @@ function useFlask(w: World, side: Side, i: number): void {
   }
   f.charges -= s.perUse;
   f.uses++;
-  p.tFlask = 0;
+  p.since.flask = 0;
   if (s.removeIgnite) p.ail.ignites.length = 0;
   if (s.removeBleed) p.ail.bleeds.length = 0;
   if (s.removeFreeze) {

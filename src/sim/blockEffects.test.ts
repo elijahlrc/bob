@@ -99,7 +99,7 @@ describe('block, in the engine', () => {
     const p = world.sides[0].player;
     expect(p.def.esRegen).toBeCloseTo(p.def.maxEs * 0.1);
     p.es = 0;
-    p.sinceDamaged = 0; // the recharge has not started
+    p.since.damaged = 0; // the recharge has not started
     for (let i = 0; i < 30; i++) stepWorld(world);
     expect(p.es).toBeGreaterThan(p.def.maxEs * 0.02);
     expect(p.es).toBeLessThan(p.def.maxEs * 0.1);

@@ -108,17 +108,17 @@ type PlayerTest = (w: World, p: Actor) => boolean;
 const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
   onFullLife: (_w, p) => p.life >= lifeCap(p) - 0.5,
   onLowLife: (_w, p) => p.life <= p.def.maxLife * LOW_LIFE,
-  killedRecently: (_w, p) => p.tKill < RECENT,
-  critRecently: (_w, p) => p.tCrit < RECENT,
-  hitRecently: (_w, p) => p.tHit < RECENT,
-  usedFlaskRecently: (_w, p) => p.tFlask < RECENT,
+  killedRecently: (_w, p) => p.since.kill < RECENT,
+  critRecently: (_w, p) => p.since.crit < RECENT,
+  hitRecently: (_w, p) => p.since.hit < RECENT,
+  usedFlaskRecently: (_w, p) => p.since.flask < RECENT,
   flaskActive: (_w, p) => p.side!.flasks.some((f) => f.activeT > 0),
   dualWielding: (_w, p) => p.side!.char.dualWielding,
   holdingShield: (_w, p) => p.side!.char.holdingShield,
-  stunnedRecently: (_w, p) => p.tStunEnemy < RECENT,
-  overloadActive: (_w, p) => p.tOverload < OVERLOAD_TIME,
-  blockedRecently: (_w, p) => p.tBlock < RECENT,
-  beenHitRecently: (_w, p) => p.tBeenHit < RECENT,
+  stunnedRecently: (_w, p) => p.since.stunEnemy < RECENT,
+  overloadActive: (_w, p) => p.since.overload < OVERLOAD_TIME,
+  blockedRecently: (_w, p) => p.since.block < RECENT,
+  beenHitRecently: (_w, p) => p.since.beenHit < RECENT,
   leeching: (_w, p) => p.leechLife.length > 0,
   leechingEs: (_w, p) => p.leechEs.length > 0,
   esFull: (_w, p) => p.def.maxEs > 0 && p.es >= p.def.maxEs - 0.5,
@@ -320,7 +320,7 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
   if (dst.isPlayer) notePools(dst.side!, esTaken, manaTaken, lifeDmg);
   dst.life -= lifeDmg;
   if (dst.life <= 0) dst.overkill = -dst.life;
-  dst.sinceDamaged = 0;
+  dst.since.damaged = 0;
   if (dst.isPlayer && dst.side!.opts.godMode && dst.life <= 0) dst.life = 1;
   if (dst.isPlayer) dst.side!.stats.damageTaken += total;
   else if (dst.team === 1) hunted(w, dst).side!.stats.damageDealt += total;
@@ -465,7 +465,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (res.outcome === 'block') {
     w.events.push({ t: 'block', src: src.id, dst: dst.id });
     if (how) noteMiss(w, dst, how, true);
-    dst.tBlock = 0;
+    dst.since.block = 0;
     if (dst.isPlayer) {
       rollCharges(w, dst.side!, 'block');
       rollGains(w, dst.side!, 'block');
@@ -503,8 +503,8 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   w.events.push({ t: 'hit', src: src.id, dst: dst.id, amount: res.total, crit: res.crit, dtype });
   if (how) noteHit(w, dst, how, res.total, res.crit);
   if (dst.isPlayer) logDamage(w, dst, src, src.name, dtype, res.total);
-  src.tHit = 0;
-  dst.tBeenHit = 0;
+  src.since.hit = 0;
+  dst.since.beenHit = 0;
   if (src.isPlayer) {
     rollGains(w, src.side!, 'hit', p.gains);
     rollCharges(w, src.side!, 'hit', p.gains);
@@ -518,12 +518,12 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     rollCharges(w, dst.side!, 'hitTaken');
   }
   if (res.crit) {
-    src.tCrit = 0;
+    src.since.crit = 0;
     if (src.isPlayer) {
       rollCharges(w, src.side!, 'crit', p.gains);
       rollGains(w, src.side!, 'crit', p.gains);
     }
-    if (p.overload) src.tOverload = 0;
+    if (p.overload) src.since.overload = 0;
   }
   // A carapace: no single hit takes more than a share of the monster's life (docs/ROSTER.md 6.2).
   const cap = dst.isPlayer ? undefined : dst.mon?.hitCap;
@@ -666,7 +666,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (res.stun > 0 && !(dst.isPlayer && dst.side!.channel?.profile.skill.channel?.stunImmune)) {
     dst.stunT = res.stun;
     dst.action = null;
-    src.tStunEnemy = 0;
+    src.since.stunEnemy = 0;
     w.events.push({ t: 'stun', dst: dst.id, dur: res.stun });
     if (dst.isPlayer) fireTriggers(w, dst.side!, { on: 'stunned' });
     if (src.isPlayer) {
@@ -1065,7 +1065,7 @@ export function killActor(w: World, a: Actor): void {
   const p = fs.player;
   if (!a.noReward) {
     fs.stats.kills++;
-    p.tKill = 0;
+    p.since.kill = 0;
     const xp =
       (a.mon?.xp ?? 0) * levelPenalty(fs.build.level, a.mon?.spec.level ?? 1) * w.plan.xpMult;
     fs.xp += xp;
@@ -1190,15 +1190,15 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   const ail = a.ail;
   const def = a.def;
   // Timers.
-  a.tKill += dt;
-  a.tCrit += dt;
-  a.tHit += dt;
-  a.tFlask += dt;
-  a.tStunEnemy += dt;
-  a.tBlock += dt;
-  a.tBeenHit += dt;
-  a.tOverload += dt;
-  a.sinceDamaged += dt;
+  a.since.kill += dt;
+  a.since.crit += dt;
+  a.since.hit += dt;
+  a.since.flask += dt;
+  a.since.stunEnemy += dt;
+  a.since.block += dt;
+  a.since.beenHit += dt;
+  a.since.overload += dt;
+  a.since.damaged += dt;
   tickHexes(a, dt);
   tickStatuses(a, dt);
   // A stun opens a curled beetle.
@@ -1366,7 +1366,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     );
   if (def.esRegen > 0 && a.es < def.maxEs) a.es = Math.min(def.maxEs, a.es + def.esRegen * dt);
   // ES recharge.
-  if (def.maxEs > 0 && a.es < def.maxEs && a.sinceDamaged >= def.esDelay)
+  if (def.maxEs > 0 && a.es < def.maxEs && a.since.damaged >= def.esDelay)
     a.es = Math.min(def.maxEs, a.es + def.esRecharge * dt);
 }
 

@@ -98,16 +98,18 @@ export type Actor = {
   leechLife: number[];
   leechEs: number[];
   leechMana: number[];
-  sinceDamaged: number;
-  tKill: number;
-  tCrit: number;
-  tHit: number;
-  tFlask: number;
-  tStunEnemy: number;
-  tBlock: number;
-  /** Seconds since this actor was last hit (for "been hit recently"). */
-  tBeenHit: number;
-  tOverload: number;
+  since: {
+    damaged: number;
+    kill: number;
+    crit: number;
+    hit: number;
+    flask: number;
+    stunEnemy: number;
+    block: number;
+    /** Seconds since this actor was last hit (for "been hit recently"). */
+    beenHit: number;
+    overload: number;
+  };
   resShift: number[];
   resShiftT: number;
   moving: boolean;
