@@ -65,9 +65,11 @@
   counted before what it costs: `npm run perf` times it on a late run. `sheetOf` remembers sheets by build, `ModDB.extend` layers a skill's mods on the character's,
   and `planRotation` remembers its plans; none changes a number, and a change to the calc should keep it so (hash the sheets before and after).
 - **Patch notes:** [docs/PATCH-NOTES.md](docs/PATCH-NOTES.md), player-facing, newest first, shown on the Patch notes screen of the title
-  menu (`src/ui/PatchNotes.tsx`): add an entry for every change a player would notice. The `/patch-notes` skill
-  (`.claude/skills/patch-notes/SKILL.md`) writes them from the commits, files them, commits and pushes; a push to main is what
-  updates the game (`.github/workflows/pages.yml`). Its style rules are the standard for every entry.
+  menu (`src/ui/PatchNotes.tsx`): every change a player would notice gets an entry. **Never write or edit patch notes while doing
+  the work** (not in the same commit, not as a finishing touch): only the `/patch-notes` skill
+  (`.claude/skills/patch-notes/SKILL.md`) writes them, from the commits, then files them, commits and pushes; a push to main is what
+  updates the game (`.github/workflows/pages.yml`). Its style rules are the standard for every entry. Record decisions in
+  DESIGN.md Appendix A and the plan docs, and leave the notes to the skill.
 - **In-game text is concise** (2026-10-14): a screen, card or tooltip says what the player gets and what they choose, in as few
   words as it takes. Never say what a level, stop or feature does _not_ do ("no loot, no XP"), restate what the UI already
   shows, or explain the obvious. One short line beats a paragraph. Check new text against this before adding it.
