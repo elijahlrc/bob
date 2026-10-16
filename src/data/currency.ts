@@ -103,7 +103,14 @@ export const CURRENCIES: CurrencyDef[] = [
     text: 'Add a chaos affix of your choice: chaos resistance, poison chance or added chaos damage.',
     minMap: 8,
     weight: 0,
-    families: ['chaosRes', 'poisonChance', 'addChaosAttacks'],
+    families: [
+      'chaosRes',
+      'poisonChance',
+      'addChaosAttacks',
+      'addChaosLocal',
+      'addChaosLocal2h',
+      'poisonWeapon',
+    ],
     faction: 'rot',
   },
   {
@@ -130,7 +137,7 @@ export const CURRENCIES: CurrencyDef[] = [
     text: 'Add an affix of your choice: attack speed, life on hit, or area of effect.',
     minMap: 12,
     weight: 0,
-    families: ['aspdGlobal', 'aspdLocal', 'lifeOnHit', 'areaEffect'],
+    families: ['aspdGlobal', 'aspdLocal', 'aspdLocalRanged', 'lifeOnHit', 'areaEffect'],
     faction: 'swarm',
   },
   {
@@ -148,7 +155,7 @@ export const CURRENCIES: CurrencyDef[] = [
     text: 'Add an affix of your choice: movement speed, accuracy or stun avoidance.',
     minMap: 11,
     weight: 0,
-    families: ['moveSpeed', 'accuracy', 'stunAvoid'],
+    families: ['moveSpeed', 'accuracy', 'accuracyLocal', 'stunAvoid'],
     faction: 'kennel',
   },
   {
@@ -157,7 +164,7 @@ export const CURRENCIES: CurrencyDef[] = [
     text: 'Add an affix of your choice: life regeneration, mana regeneration or life leech.',
     minMap: 18,
     weight: 0,
-    families: ['lifeRegen', 'manaRegen', 'lifeLeech'],
+    families: ['lifeRegen', 'manaRegen', 'lifeLeech', 'lifeLeechPhys'],
     faction: 'gilded',
   },
   {
@@ -175,7 +182,13 @@ export const CURRENCIES: CurrencyDef[] = [
     text: 'Add an affix of your choice: fire resistance, added fire damage to attacks or chance to ignite.',
     minMap: 26,
     weight: 0,
-    families: ['fireRes', 'addFireAttacks', 'igniteChance'],
+    families: [
+      'fireRes',
+      'addFireAttacks',
+      'igniteChance',
+      'igniteChanceWeapon',
+      'igniteChanceWeapon2h',
+    ],
     faction: 'emberborn',
   },
 ];

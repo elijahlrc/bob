@@ -1,6 +1,6 @@
 import type { Difficulty } from '../data/difficulty';
 import { Character, diffSheets, type SheetDiff } from '../calc/character';
-import { itemReq } from '../calc/items';
+import { itemReq, weaponStats } from '../calc/items';
 import { isWeaponClass, itemBase, WEAPON_TYPE_NAME } from '../data/bases';
 import { triggerText } from '../data/triggers';
 import { flaskBase } from '../data/flasks';
@@ -42,7 +42,43 @@ export function compareDelta(
 }
 
 /** A line with its numbers taken out: the same stat with another value has the same key. */
-const lineKey = (l: string): string => l.replace(/d+(.d+)?/g, 'N');
+const lineKey = (l: string): string => l.replace(/\d+(\.\d+)?/g, 'N');
+
+const ELEMENT_LABELS = ['', 'lightning', 'cold', 'fire', 'chaos'] as const;
+const round2 = (v: number): number => Math.round(v * 100) / 100;
+
+/** A weapon's numbers after its own mods: the base's physical range, speed and crit, plus any other damage it adds. */
+export type WeaponLine = {
+  phys: string;
+  speed: string;
+  crit: string;
+  extra: string[];
+  aug: boolean[];
+};
+
+export function weaponLine(it: Item): WeaponLine | null {
+  const b = itemBase(it.baseId);
+  if (!b.weapon) return null;
+  const s = weaponStats(it);
+  const [lo, hi] = [Math.round(s.flats[0][0]), Math.round(s.flats[0][1])];
+  const extra: string[] = [];
+  for (let t = 1; t < s.flats.length; t++) {
+    const [min, max] = s.flats[t].map(Math.round);
+    if (max > 0) extra.push(`${min}–${max} ${ELEMENT_LABELS[t]}`);
+  }
+  return {
+    phys: `${lo}–${hi} physical`,
+    speed: `${round2(s.aps)} APS`,
+    crit: `${round2(s.crit)}% crit`,
+    extra,
+    // Which of physical, speed and crit differ from the base (the card colours them).
+    aug: [
+      lo !== b.weapon.min || hi !== b.weapon.max,
+      round2(s.aps) !== round2(b.weapon.aps),
+      round2(s.crit) !== round2(b.weapon.crit),
+    ],
+  };
+}
 
 /** Every stat line an item shows, implicit, explicit and rule lines alike. */
 export function itemLines(it: Item): string[] {
@@ -129,6 +165,7 @@ export function ItemCard({
     );
   }
   const b = itemBase(it.baseId);
+  const wl = weaponLine(it);
   const req = [`level ${b.level}`];
   const need = itemReq(it);
   if (need.str) req.push(`${need.str} Str`);
@@ -144,11 +181,14 @@ export function ItemCard({
       <div class="ic-name">{it.name}</div>
       {it.name !== b.name && <div class="ic-base">{b.name}</div>}
       {isWeaponClass(b.itemClass) && <div class="ic-type">{WEAPON_TYPE_NAME[b.itemClass]}</div>}
-      {b.weapon && (
+      {wl && (
         <div class="muted">
-          {b.weapon.min}–{b.weapon.max} physical · {b.weapon.aps} APS · {b.weapon.crit}% crit
+          <span class={wl.aug[0] ? 'ic-aug' : ''}>{wl.phys}</span> ·{' '}
+          <span class={wl.aug[1] ? 'ic-aug' : ''}>{wl.speed}</span> ·{' '}
+          <span class={wl.aug[2] ? 'ic-aug' : ''}>{wl.crit}</span>
         </div>
       )}
+      {wl && wl.extra.length > 0 && <div class="ic-aug">Adds {wl.extra.join(', ')}</div>}
       {b.defence && (
         <div class="muted">
           {[

@@ -2,6 +2,7 @@ import type { Rng } from '../core/rng';
 import {
   FAMILIES,
   familyMods,
+  slotWeight,
   RARE_FIRST,
   RARE_SECOND,
   type Family,
@@ -28,6 +29,18 @@ import { UNIQUES, type UniqueDef } from '../data/uniques';
 import type { Mod } from '../mods/types';
 import type { UidSource } from './items';
 
+const WEAPON_KIND_TAGS = new Set<string>([
+  'sword',
+  'axe',
+  'mace',
+  'sceptre',
+  'dagger',
+  'claw',
+  'wand',
+  'staff',
+  'bow',
+]);
+
 /** Affix-eligibility tags of a base. */
 export function itemTags(base: ItemBase): Set<SlotTag> {
   const t = new Set<SlotTag>();
@@ -35,9 +48,10 @@ export function itemTags(base: ItemBase): Set<SlotTag> {
   if (isWeaponClass(c)) {
     t.add('weapon');
     t.add(base.hands === 2 ? 'twoHand' : 'oneHand');
-    if (c === 'wand' || c === 'sceptre' || c === 'staff') t.add('casterWeapon');
-    if (c === 'bow') t.add('bow');
-    if (c === 'staff') t.add('staff');
+    if (base.spellWeapon) t.add('casterWeapon');
+    else t.add('attackWeapon');
+    // The kind of weapon (sword, axe, ..., two-handed or not): some affixes roll only on some kinds.
+    for (const k of base.tags) if (WEAPON_KIND_TAGS.has(k)) t.add(k as SlotTag);
   } else if (c === 'helmet' || c === 'gloves' || c === 'boots' || c === 'body' || c === 'shield') {
     t.add(c);
     t.add('armourPiece');
@@ -53,6 +67,7 @@ export function eligible(f: Family, tags: Set<SlotTag>, rarity: Rarity): boolean
   if (f.rareOnly && rarity !== 'rare') return false;
   if (!f.slots.some((s) => tags.has(s))) return false;
   if (f.requires && !f.requires.every((s) => tags.has(s))) return false;
+  if (f.not && f.not.some((s) => tags.has(s))) return false;
   return true;
 }
 
@@ -92,7 +107,7 @@ export function rollAffix(
     for (const t of f.tiers) if (t.minIlvl <= ilvl) w += t.weight;
     if (w > 0) {
       fams.push(f);
-      weights.push(w);
+      weights.push(w * slotWeight(f, tags));
     }
   }
   if (fams.length === 0) return null;

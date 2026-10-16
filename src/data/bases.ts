@@ -18,6 +18,8 @@ type WeaponClassDef = {
   range: number;
   attrs: (keyof Attrs)[];
   tags: SkillTag[];
+  /** Built for spells (default: wands, sceptres and staves). Decides whether the weapon rolls spell affixes. */
+  spell?: boolean;
   implicit: (tier: number) => Mod[];
   names: [string, string, string, string, string];
 };
@@ -30,6 +32,11 @@ export const ONE_HAND_DAMAGE = 1.6;
 
 const t = (tier: number, a: number, b: number) => Math.round(a + ((b - a) * tier) / 4);
 
+/** The implicit of each of the five tiers of a type, as the 3.9 base of that level has it (mid-range for rolled values). */
+const ELEMENTAL = ['fire', 'cold', 'lightning'] as const;
+const accuracyPct = (v: number) => mod('accuracy', 'inc', v);
+const accuracyFlat = (v: number) => mod('accuracy', 'base', v, { local: true });
+
 export const WEAPON_CLASS_DEFS: WeaponClassDef[] = [
   {
     cls: 'sword',
@@ -41,7 +48,9 @@ export const WEAPON_CLASS_DEFS: WeaponClassDef[] = [
     range: 1.3,
     attrs: ['str', 'dex'],
     tags: ['sword', 'oneHand'],
-    implicit: (k) => [mod('accuracy', 'base', t(k, 20, 330), { local: true })],
+    implicit: (k) => [
+      [accuracyPct(40), accuracyPct(40), accuracyFlat(190), accuracyPct(40), accuracyPct(40)][k],
+    ],
     names: [
       'Notched Shortsword',
       'Bone-hilt Sword',
@@ -79,7 +88,7 @@ export const WEAPON_CLASS_DEFS: WeaponClassDef[] = [
     range: 1.3,
     attrs: ['str'],
     tags: ['mace', 'oneHand'],
-    implicit: () => [mod('enemyStunThreshold', 'base', 15)],
+    implicit: (k) => [mod('enemyStunThreshold', 'base', [10, 15, 15, 10, 15][k])],
     names: ['Knobbed Club', 'Flanged Mace', 'Bonecrusher Mace', 'Cinder Mace', 'Monolith Mace'],
   },
   {
@@ -93,7 +102,7 @@ export const WEAPON_CLASS_DEFS: WeaponClassDef[] = [
     attrs: ['str', 'int'],
     tags: ['sceptre', 'oneHand'],
     implicit: (k) => [
-      mod('damage', 'inc', t(k, 10, 22), { damageTypes: ['fire', 'cold', 'lightning'] }),
+      mod('damage', 'inc', [10, 20, 16, 22, 40][k], { damageTypes: [...ELEMENTAL] }),
     ],
     names: [
       'Carved Rod',
@@ -113,7 +122,7 @@ export const WEAPON_CLASS_DEFS: WeaponClassDef[] = [
     range: 1.2,
     attrs: ['dex', 'int'],
     tags: ['dagger', 'oneHand'],
-    implicit: (k) => [mod('critChance', 'inc', t(k, 20, 40))],
+    implicit: () => [mod('critChance', 'inc', 30)],
     names: ['Bone Shiv', 'Skinning Knife', 'Wavy Kris', 'Needle Dirk', 'Nightglass Dagger'],
   },
   {
@@ -126,7 +135,7 @@ export const WEAPON_CLASS_DEFS: WeaponClassDef[] = [
     range: 1.2,
     attrs: ['dex', 'int'],
     tags: ['claw', 'oneHand'],
-    implicit: (k) => [mod('lifeOnHit', 'base', t(k, 2, 40))],
+    implicit: (k) => [mod('lifeOnHit', 'base', [3, 8, 15, 44, 40][k], { tags: ['attack'] })],
     names: ['Bent Talon', 'Hooked Claw', 'Ghoul Claw', 'Raptor Gauntlet', 'Wyrmtooth Claw'],
   },
   {
@@ -139,7 +148,7 @@ export const WEAPON_CLASS_DEFS: WeaponClassDef[] = [
     range: 1.2,
     attrs: ['int'],
     tags: ['wand', 'oneHand'],
-    implicit: (k) => [mod('damage', 'inc', t(k, 10, 30), { tags: ['spell'] })],
+    implicit: (k) => [mod('damage', 'inc', [10, 13, 19, 31, 35][k], { tags: ['spell'] })],
     names: ['Willow Twig', 'Knuckle Wand', 'Ember Reed', 'Glyph Wand', 'Lodestar Wand'],
   },
   {
@@ -152,7 +161,9 @@ export const WEAPON_CLASS_DEFS: WeaponClassDef[] = [
     range: 1.5,
     attrs: ['str', 'dex'],
     tags: ['sword', 'twoHand'],
-    implicit: (k) => [mod('accuracy', 'base', t(k, 40, 500), { local: true })],
+    implicit: (k) => [
+      [accuracyPct(40), accuracyFlat(120), accuracyPct(30), accuracyFlat(305), accuracyPct(40)][k],
+    ],
     names: [
       'Rusted Greatsword',
       "Executioner's Blade",
@@ -190,7 +201,7 @@ export const WEAPON_CLASS_DEFS: WeaponClassDef[] = [
     range: 1.5,
     attrs: ['str'],
     tags: ['mace', 'twoHand'],
-    implicit: () => [mod('enemyStunThreshold', 'base', 25)],
+    implicit: (k) => [mod('stunDuration', 'inc', [30, 45, 30, 45, 30][k])],
     names: ['Oak Maul', 'Iron Sledge', 'Barrow Hammer', 'Grave Maul', 'Colossus Maul'],
   },
   {
@@ -203,10 +214,7 @@ export const WEAPON_CLASS_DEFS: WeaponClassDef[] = [
     range: 1.5,
     attrs: ['str', 'int'],
     tags: ['staff', 'twoHand'],
-    implicit: (k) => [
-      mod('blockAttack', 'base', t(k, 12, 18)),
-      mod('damage', 'inc', t(k, 15, 40), { tags: ['spell'] }),
-    ],
+    implicit: () => [mod('blockAttack', 'base', 18)],
     names: [
       'Walking Stick',
       'Bound Staff',
@@ -227,6 +235,7 @@ export const WEAPON_CLASS_DEFS: WeaponClassDef[] = [
     range: 1.2,
     attrs: ['dex', 'int'],
     tags: ['dagger', 'oneHand'],
+    spell: true,
     implicit: (k) => [mod('damage', 'inc', t(k, 18, 38), { tags: ['spell'] })],
     names: [
       'Etched Bone Knife',
@@ -247,7 +256,7 @@ export const WEAPON_CLASS_DEFS: WeaponClassDef[] = [
     range: 1.6,
     attrs: ['dex'],
     tags: ['sword', 'oneHand'],
-    implicit: (k) => [mod('accuracy', 'base', t(k, 30, 400), { local: true })],
+    implicit: () => [mod('critMulti', 'base', 25)],
     names: ['Splinter Foil', 'Needle Rapier', 'Bone Estoc', 'Wardsteel Rapier', 'Starmetal Foil'],
   },
   {
@@ -261,6 +270,7 @@ export const WEAPON_CLASS_DEFS: WeaponClassDef[] = [
     range: 1.6,
     attrs: ['str', 'dex'],
     tags: ['staff', 'twoHand'],
+    spell: false,
     implicit: (k) => [
       mod('blockAttack', 'base', t(k, 12, 18)),
       mod('damage', 'inc', t(k, 12, 30), { tags: ['melee'] }),
@@ -283,7 +293,14 @@ export const WEAPON_CLASS_DEFS: WeaponClassDef[] = [
     range: 9,
     attrs: ['dex'],
     tags: ['bow', 'twoHand'],
-    implicit: () => [],
+    implicit: (k) =>
+      [
+        [],
+        [mod('critMulti', 'base', 20)],
+        [mod('damage', 'inc', 22, { damageTypes: [...ELEMENTAL], tags: ['attack'] })],
+        [mod('critMulti', 'base', 20)],
+        [],
+      ][k],
     names: ['Sapling Bow', "Hunter's Stave Bow", 'Sinew Bow', 'Gravewood Bow', 'Skyline Longbow'],
   },
 ];
@@ -320,6 +337,7 @@ function weaponBases(): ItemBase[] {
         },
         tags: d.tags,
         hands: d.hands,
+        spellWeapon: d.spell ?? (d.cls === 'wand' || d.cls === 'sceptre' || d.cls === 'staff'),
       });
     });
   }
