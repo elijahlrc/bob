@@ -139,14 +139,14 @@ describe('a plan promises what the craft does', () => {
 
 describe('a rolled craft shows a typical result and the range, never the roll', () => {
   it('lists the tiers and values an item level allows, and the real roll falls inside', () => {
-    const r = rollRange(family('life'), 70)!;
+    const r = rollRange(family('lifeBody'), 70)!;
     let rolled = 0;
     for (let seed = 1; seed <= 60; seed++) {
       const { run, item } = setup({ seed });
       const prefixes = item.affixes.filter((x) => family(x.family).type === 'prefix').length;
-      if (item.affixes.some((x) => x.family === 'life') || prefixes >= 3) continue;
-      expect(usePearl(run, item.uid, 'life').ok).toBe(true);
-      const roll = get(run, item).affixes.find((x) => x.family === 'life')!;
+      if (item.affixes.some((x) => x.family === 'lifeBody') || prefixes >= 3) continue;
+      expect(usePearl(run, item.uid, 'lifeBody').ok).toBe(true);
+      const roll = get(run, item).affixes.find((x) => x.family === 'lifeBody')!;
       expect(roll.tier).toBeGreaterThanOrEqual(r.tiers[0]);
       expect(roll.tier).toBeLessThanOrEqual(r.tiers[1]);
       expect(roll.mods[0].value).toBeGreaterThanOrEqual(r.low[0]);
@@ -158,11 +158,11 @@ describe('a rolled craft shows a typical result and the range, never the roll', 
 
   it('shows the typical item with the new affix, the range in words, and does not use up the roll', () => {
     const { run, item } = setup({ rarity: 'magic' });
-    const a = addRoutes(run, 'life')[0];
+    const a = addRoutes(run, 'lifeBody')[0];
     const p = planCraft(run, item.uid, a);
     expect(p.ok).toBe(true);
     expect(p.exact).toBe(false);
-    expect(p.after!.affixes.some((x) => x.family === 'life')).toBe(true);
+    expect(p.after!.affixes.some((x) => x.family === 'lifeBody')).toBe(true);
     expect(p.range).toMatch(/tier/);
     const seq = run.craftSeq;
     planCraft(run, item.uid, a);
@@ -221,11 +221,24 @@ describe('what an item shows about its affixes', () => {
     expect(r.prefix.cap).toBe(3);
   });
 
+  it('offers a mod with several ladders once, in the version the item takes', () => {
+    const { item } = setup({ base: 'body_es_3' });
+    item.affixes = [];
+    const opts = essenceOptions(item, 'ectoplasm');
+    const ids = opts.map((o) => o.family.id);
+    expect(ids).toContain('esLocalBody');
+    expect(ids.filter((i) => i.startsWith('esLocal'))).toEqual(['esLocalBody']);
+    expect(ids).toContain('manaGearArmour');
+    expect(opts.find((o) => o.family.id === 'esLocalBody')!.free).toBe(true);
+  });
+
   it('says whether an essence needs a slot given up, and which', () => {
     const { run, item } = setup();
     const ess = CURRENCIES.find((d) => d.families && d.families.length > 1)!;
     const opts = essenceOptions(item, ess.id);
-    expect(opts).toHaveLength(ess.families!.length);
+    // A mod with a ladder for each set of slots is one offer.
+    const kinds = new Set(ess.families!.map((f) => family(f).group ?? f));
+    expect(opts).toHaveLength(kinds.size);
     for (const o of opts) {
       if (o.free) expect(o.replace).toEqual([]);
       else if (!o.blocked) {

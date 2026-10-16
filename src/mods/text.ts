@@ -60,6 +60,12 @@ export function modText(m: Mod): string {
   }
   const sfx = suffix(m);
   const v = fmt(m.value);
+  // "of Physical Attack Damage Leeched as Life": leech from attacks names the attacks before the damage.
+  if ((m.stat === 'leech.life' || m.stat === 'leech.mana') && m.tags?.includes('attack')) {
+    const tp = typesPhrase(m.damageTypes);
+    const rest = suffix({ ...m, tags: m.tags.filter((t) => t !== 'attack') });
+    return `${v}% of ${tp ? tp + ' ' : ''}Attack Damage Leeched as ${m.stat === 'leech.life' ? 'Life' : 'Mana'}${rest}`;
+  }
   const conv = /^(convert|convertSkill|gain)\.(\w+)\.(\w+)$/.exec(m.stat);
   if (conv) {
     const from = TYPE_NAME[conv[2] as DamageType];
@@ -88,6 +94,14 @@ export function modText(m: Mod): string {
         : `${sign}${v} to ${statName(m)}${sfx}`;
     }
     case 'inc':
+      // Damage from attacks: "increased Attack Damage", "increased Elemental Damage with Attack Skills".
+      if (m.stat === 'damage' && m.tags?.length === 1 && m.tags[0] === 'attack') {
+        const tp = typesPhrase(m.damageTypes);
+        const word = m.value < 0 ? 'reduced' : 'increased';
+        return tp
+          ? `${v}% ${word} ${tp} Damage with Attack Skills${suffix({ ...m, tags: [] })}`
+          : `${v}% ${word} Attack Damage${suffix({ ...m, tags: [] })}`;
+      }
       // Plain spell damage reads as its own stat, not as damage "with Spells".
       if (
         m.stat === 'damage' &&
@@ -100,6 +114,23 @@ export function modText(m: Mod): string {
     case 'more':
       return `${v}% ${m.value < 0 ? 'less' : 'more'} ${statName(m)}${sfx}`;
   }
+}
+
+const DEFENCE_NAME: Record<string, string> = {
+  armour: 'Armour',
+  evasion: 'Evasion',
+  es: 'Energy Shield',
+};
+
+/** Two increases rolled as one ("Armour and Evasion", "Attack and Cast Speed") are one line. */
+function mergedPair(a: Mod, b: Mod): string | null {
+  if (a.kind !== 'inc' || b.kind !== 'inc' || a.value !== b.value || a.condition || b.condition)
+    return null;
+  if (a.stat in DEFENCE_NAME && b.stat in DEFENCE_NAME && a.stat !== b.stat && a.local && b.local)
+    return `${fmt(a.value)}% ${a.value < 0 ? 'reduced' : 'increased'} ${DEFENCE_NAME[a.stat]} and ${DEFENCE_NAME[b.stat]}`;
+  if (a.stat === 'attackSpeed' && b.stat === 'castSpeed' && !a.tags?.length && !b.tags?.length)
+    return `${fmt(a.value)}% ${a.value < 0 ? 'reduced' : 'increased'} Attack and Cast Speed`;
+  return null;
 }
 
 /**
@@ -134,6 +165,13 @@ export function modsText(mods: readonly Mod[]): string[] {
         );
         continue;
       }
+    }
+    const next = mods[i + 1];
+    const both = next && !used.has(i + 1) ? mergedPair(m, next) : null;
+    if (both) {
+      used.add(i + 1);
+      out.push(both);
+      continue;
     }
     out.push(modText(m));
   }

@@ -11,6 +11,7 @@ export const CLASSES: ClassDef[] = [
     name: 'Vanguard',
     attrs: { str: 32, dex: 14, int: 14 },
     color: 0xc0503a,
+    style: 'Fights up close with a two-handed mace.',
     startWeapons: ['mace2_1'],
   },
   {
@@ -18,6 +19,7 @@ export const CLASSES: ClassDef[] = [
     name: 'Strider',
     attrs: { str: 14, dex: 32, int: 14 },
     color: 0x5aa04a,
+    style: 'Shoots from range with a bow.',
     startWeapons: ['bow_1'],
     startOffHand: 'quiver_acc',
   },
@@ -26,6 +28,7 @@ export const CLASSES: ClassDef[] = [
     name: 'Mystic',
     attrs: { str: 14, dex: 14, int: 32 },
     color: 0x5a78d0,
+    style: 'Carries a wand; a caster at heart.',
     startWeapons: ['wand_1'],
     // The wand attacks for a long while before the first spell gem arrives, and Willow Twig and a
     // Threadbare Vestment alone could not clear map 1 (about 9 in 10 died there).
@@ -42,6 +45,7 @@ export const CLASSES: ClassDef[] = [
     name: 'Reaver',
     attrs: { str: 23, dex: 23, int: 14 },
     color: 0xd09a3a,
+    style: 'Sword and shield, up close.',
     startWeapons: ['sword_1'],
     startOffHand: 'shield_ar_1',
   },
@@ -50,6 +54,7 @@ export const CLASSES: ClassDef[] = [
     name: 'Zealot',
     attrs: { str: 23, dex: 14, int: 23 },
     color: 0xd0c070,
+    style: 'Sceptre and shield: melee or spells.',
     startWeapons: ['sceptre_1'],
     startOffHand: 'shield_es_1',
   },
@@ -58,6 +63,7 @@ export const CLASSES: ClassDef[] = [
     name: 'Shade',
     attrs: { str: 14, dex: 23, int: 23 },
     color: 0x9a5ac0,
+    style: 'Two daggers, quick and close.',
     startWeapons: ['dagger_1', 'dagger_1'],
   },
 ];

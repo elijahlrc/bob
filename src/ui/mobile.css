@@ -236,7 +236,7 @@ body {
   }
 }
 
-/* The debug panel, auto-continue, save and abandon at the foot of the Next map tab. */
+/* The debug panel, save and abandon at the foot of the Next map tab. */
 .camp-foot {
   display: flex;
   flex-direction: column;
@@ -480,8 +480,6 @@ body {
   .cmp-title,
   .gem-group-title,
   .count,
-  .threat,
-  .verdict,
   .chip,
   .gem-tags {
     font-size: 13px;

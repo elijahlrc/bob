@@ -151,6 +151,8 @@ export type ClassDef = {
   name: string;
   attrs: Attrs;
   color: number;
+  /** How the class fights, in a few words, for its card on the class select. */
+  style: string;
   startWeapons: string[];
   startOffHand?: string;
   /** Extra mods on the starting weapon and body armour only (the bases are shared with drops). */

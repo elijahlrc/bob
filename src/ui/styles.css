@@ -93,6 +93,10 @@ button {
   font-size: 20px;
   font-weight: bold;
 }
+.class-style {
+  font-size: 14px;
+  margin-top: 4px;
+}
 .class-attrs,
 .class-skill {
   font-size: 13px;
@@ -645,6 +649,24 @@ span.save-name {
 .reward-preview {
   margin-top: 4px;
 }
+/* The pick above the Items tab after a map (docs/STREAMLINE.md S2): one row, so the drops stay in view. */
+.items-reward {
+  margin-bottom: 8px;
+}
+.items-reward .reward {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.items-reward .reward .notice {
+  flex-basis: 100%;
+}
+.items-reward .reward .inv-item {
+  flex: 1 1 140px;
+}
+.items-reward .reward .reward-preview {
+  flex-basis: 100%;
+}
 .hint {
   font-size: 12px;
 }
@@ -1059,26 +1081,9 @@ select option {
 .recap table td {
   padding: 1px 10px 1px 0;
 }
-.theme .threat {
-  font-size: 12px;
-  color: #9ab8ff;
-}
 .theme .affix {
   font-size: 12px;
   color: #e0b070;
-}
-.theme .verdict {
-  font-size: 12px;
-  font-weight: bold;
-}
-.verdict.comfortable {
-  color: #8fd28f;
-}
-.verdict.close {
-  color: #e8d070;
-}
-.verdict.dangerous {
-  color: #ff8a6a;
 }
 .theme.respite {
   border-style: dashed;
@@ -1481,21 +1486,7 @@ select option {
 .debug-table td:first-child {
   text-align: left;
 }
-.theme .tier {
-  font-size: 12px;
-  margin-top: 2px;
-}
-.tier.gentle {
-  color: #8fc98f;
-}
-.tier.fierce {
-  color: #e0907a;
-}
-.tier.even {
-  color: var(--muted);
-}
-
-/* What an offered map pays: the same rows on every card, to read across. */
+/* What an offered map pays: the same cells on every card, to read across, two to a row. */
 .offer-table {
   width: 100%;
   margin: 4px 0;
@@ -1517,6 +1508,9 @@ select option {
 .offer-table td {
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+.offer-table td + th {
+  padding-left: 10px;
 }
 .offer-table .gain {
   color: #8fd48a;
@@ -1544,10 +1538,6 @@ select option {
 .offer-info .chip.type {
   border-style: dotted;
 }
-.offer-info .chip.tag {
-  color: var(--muted);
-}
-.offer-info .asks,
 .offer-info .leans,
 .offer-info .rule {
   color: var(--muted);

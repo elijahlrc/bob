@@ -212,11 +212,13 @@ export type EssenceOption = {
   blocked?: string;
 };
 
-/** For an essence: each affix it offers, and what the item needs to give up to take it. */
+/**
+ * For an essence: each affix it offers, and what the item needs to give up to take it. A mod with a ladder for each set of
+ * slots is one offer, in the version this item can take.
+ */
 export function essenceOptions(it: Item, essenceId: string): EssenceOption[] {
-  const ids = currencyDef(essenceId).families ?? [];
   const room = addableFamilies(it);
-  return ids.map((id) => {
+  const option = (id: string): EssenceOption => {
     const f = family(id);
     if (room.some((x) => x.id === id)) return { family: f, free: true, replace: [] };
     const replace = it.affixes
@@ -229,6 +231,15 @@ export function essenceOptions(it: Item, essenceId: string): EssenceOption[] {
       replace,
       blocked: replace.length ? undefined : 'This item cannot take that affix.',
     };
+  };
+  const groups = new Map<string, string[]>();
+  for (const id of currencyDef(essenceId).families ?? []) {
+    const g = family(id).group ?? id;
+    groups.set(g, [...(groups.get(g) ?? []), id]);
+  }
+  return [...groups.values()].map((ids) => {
+    const options = ids.map(option);
+    return options.find((o) => o.free) ?? options.find((o) => !o.blocked) ?? options[0];
   });
 }
 

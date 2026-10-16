@@ -191,7 +191,6 @@ describe('Crawl (docs/MAPS.md 9.2)', () => {
     run.build.level = 45;
     botCamp(run);
     run.offers[0] = makeOffer(run.seed, 22, 0, 'ashenCrypt', 0, 'crawl');
-    c.setAutoContinue(false);
     let starts = 0;
     c.bus.on('mapStart', ({ world }) => {
       starts++;

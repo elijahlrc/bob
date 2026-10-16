@@ -181,11 +181,11 @@ describe('the 3.9 rules for a weapon kind', () => {
     expect(has('claw_5', 'bleedWeapon')).toBe(false);
     expect(has('claw_5', 'poisonWeapon')).toBe(true);
     expect(has('mace_5', 'poisonWeapon')).toBe(false);
-    // Gloves keep the plain chances; no weapon rolls them.
+    // No weapon rolls the plain chances, and gloves no longer do.
     for (const b of WEAPONS)
       for (const f of ['igniteChance', 'bleedChance', 'poisonChance'])
         expect(has(b.id, f), b.id + ' ' + f).toBe(false);
-    expect(eligible(family('bleedChance'), itemTags(itemBase('gloves_ar_1')), 'rare')).toBe(true);
+    expect(eligible(family('bleedChance'), itemTags(itemBase('gloves_ar_1')), 'rare')).toBe(false);
   });
 
   it('the bleed and poison hybrids carry damage with the ailment', () => {
@@ -258,7 +258,7 @@ describe('the 3.9 rules for a weapon kind', () => {
         .implicits.map((m) => modText(m))
         .join(' / ');
     expect(imp('mace2_1')).toBe('30% increased Stun Duration on Enemies');
-    expect(imp('staff_3')).toBe('+18% to Chance to Block Attack Damage');
+    expect(imp('staff_3')).toBe('+18% Chance to Block');
     expect(imp('thrust_3')).toBe('+25% to Critical Strike Multiplier');
     expect(imp('dagger_3')).toBe('30% increased Critical Strike Chance');
     expect(imp('axe_3')).toBe('');

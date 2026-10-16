@@ -15,7 +15,6 @@ import {
   pruneFound,
   toggleFavourite,
   unseenItems,
-  unseenRares,
   type CleanOpts,
 } from './found';
 import { equip, unequip } from './inventory';
@@ -106,19 +105,10 @@ describe('finding things', () => {
     c.startRun('vanguard', 5);
     const run = c.run!;
     const it = found(run, 'rare', 0);
-    expect(unseenRares(run).map((x) => x.uid)).toEqual([it.uid]);
-    expect(c.autoBlocker()).toMatch(/new rare/);
     c.startMap(0);
     expect(run.unseen).toContain(it.uid);
     c.act((r) => markSeen(r, [it.uid]));
     expect(run.unseen).not.toContain(it.uid);
-  });
-
-  it('does not pause Auto-continue for unseen normal items or gems', () => {
-    const run = newRun('vanguard', 6);
-    found(run, 'normal', 0);
-    found(run, 'gem', 0);
-    expect(unseenRares(run)).toEqual([]);
   });
 
   it('every item of the starting kit has a level, so nothing is unknown', () => {

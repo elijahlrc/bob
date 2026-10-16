@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { chalkAdd } from './craft';
 import { chooseOffer } from './bot';
-import { AUTO_PAUSE_BELOW, Controller } from './controller';
+import { Controller } from './controller';
 import { OFFSETS_FROM_MAP, rollOffers, RESPITE_ALWAYS_BELOW } from './offers';
 import { offersFor } from './preview';
 import { newRun, planFor, setMap, stash, takeRespite, TOTAL_MAPS } from './run';
@@ -132,30 +132,7 @@ describe('taking a Respite', () => {
   });
 });
 
-describe('auto-continue and the bot', () => {
-  const camp = () => {
-    const c = new Controller(null);
-    c.startRun('vanguard', 9);
-    const run = c.run!;
-    // Nothing else needs attention: no points to spend, no reward, no new gear.
-    run.build.level = 1;
-    return { c, run };
-  };
-
-  it('pauses for a low life, a low flask, or a typed first map, and not otherwise', () => {
-    const { c, run } = camp();
-    expect(c.autoBlocker()).toBeNull();
-    run.vitals = hurt(AUTO_PAUSE_BELOW - 0.05);
-    expect(c.autoBlocker()).not.toBeNull();
-    run.vitals = hurt(1, AUTO_PAUSE_BELOW - 0.2);
-    expect(c.autoBlocker()).not.toBeNull();
-    run.vitals = fullVitals();
-    run.offers[0] = { ...run.offers[0], type: 'crescendo' };
-    expect(c.autoBlocker()).not.toBeNull();
-    run.offers[0] = { ...run.offers[0], type: 'plain' };
-    expect(c.autoBlocker()).toBeNull();
-  });
-
+describe('the bot and the Respite', () => {
   it('the bot rests when it is worn down and a Respite is offered, and takes a map otherwise', () => {
     const run = newRun('vanguard', 6);
     setMap(run, 13);

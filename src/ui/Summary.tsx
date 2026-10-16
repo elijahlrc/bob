@@ -115,9 +115,17 @@ export function Summary({ c }: { c: Controller }) {
       )}
       {!won && run.lastRecap && <Recap r={run.lastRecap} />}
       {c.lastResult?.report && <MapReportView r={c.lastResult.report} title="The last map" />}
-      <button class="btn primary" onClick={() => c.quit()}>
-        Back to title
-      </button>
+      <div class="menu">
+        <button
+          class="btn primary"
+          onClick={() => c.beginRun(run.classId, Math.floor(Math.random() * 0x7fffffff))}
+        >
+          New run as {classDef(run.classId).name}
+        </button>
+        <button class="btn" onClick={() => c.quit()}>
+          Back to title
+        </button>
+      </div>
     </div>
   );
 }

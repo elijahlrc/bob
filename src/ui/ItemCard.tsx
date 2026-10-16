@@ -1,6 +1,6 @@
 import type { Difficulty } from '../data/difficulty';
 import { Character, diffSheets, type SheetDiff } from '../calc/character';
-import { itemReq, weaponStats } from '../calc/items';
+import { armourStats, itemReq, weaponStats } from '../calc/items';
 import { isWeaponClass, itemBase, WEAPON_TYPE_NAME } from '../data/bases';
 import { triggerText } from '../data/triggers';
 import { flaskBase } from '../data/flasks';
@@ -78,6 +78,22 @@ export function weaponLine(it: Item): WeaponLine | null {
       round2(s.crit) !== round2(b.weapon.crit),
     ],
   };
+}
+
+/** An armour piece's defences after its own mods, each with whether it differs from the base's. */
+export type ArmourPart = { text: string; aug: boolean };
+
+export function armourLine(it: Item): ArmourPart[] | null {
+  const b = itemBase(it.baseId);
+  if (!b.defence) return null;
+  const a = armourStats(it, b);
+  const d = b.defence;
+  const parts: ArmourPart[] = [];
+  if (a.armour) parts.push({ text: `${a.armour} armour`, aug: a.armour !== (d.armour ?? 0) });
+  if (a.evasion) parts.push({ text: `${a.evasion} evasion`, aug: a.evasion !== (d.evasion ?? 0) });
+  if (a.es) parts.push({ text: `${a.es} energy shield`, aug: a.es !== (d.es ?? 0) });
+  if (a.block) parts.push({ text: `${a.block}% block`, aug: a.block !== (d.block ?? 0) });
+  return parts;
 }
 
 /** Every stat line an item shows, implicit, explicit and rule lines alike. */
@@ -166,6 +182,7 @@ export function ItemCard({
   }
   const b = itemBase(it.baseId);
   const wl = weaponLine(it);
+  const al = armourLine(it);
   const req = [`level ${b.level}`];
   const need = itemReq(it);
   if (need.str) req.push(`${need.str} Str`);
@@ -189,16 +206,14 @@ export function ItemCard({
         </div>
       )}
       {wl && wl.extra.length > 0 && <div class="ic-aug">Adds {wl.extra.join(', ')}</div>}
-      {b.defence && (
+      {al && al.length > 0 && (
         <div class="muted">
-          {[
-            b.defence.armour && `${b.defence.armour} armour`,
-            b.defence.evasion && `${b.defence.evasion} evasion`,
-            b.defence.es && `${b.defence.es} energy shield`,
-            b.defence.block && `${b.defence.block}% block`,
-          ]
-            .filter(Boolean)
-            .join(' · ')}
+          {al.map((p, i) => (
+            <span key={i}>
+              {i > 0 && ' · '}
+              <span class={p.aug ? 'ic-aug' : ''}>{p.text}</span>
+            </span>
+          ))}
         </div>
       )}
       <div class="muted">

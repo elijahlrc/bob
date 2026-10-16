@@ -29,9 +29,12 @@ function physTakenAs(db: ModDB, ctx: ModCtx): number[] {
   return total > 1 ? shares.map((s) => s / total) : shares;
 }
 
-/** The chance to avoid an ailment: "cannot be X" is 100%. */
+const ELEMENTAL_AILMENTS = new Set(['ignite', 'shock', 'chill', 'freeze']);
+
+/** The chance to avoid an ailment: "cannot be X" is 100%; avoiding elemental ailments counts for each of the four. */
 function avoidOf(db: ModDB, ctx: ModCtx, name: string): number {
-  return clamp(db.sum('base', `avoid.${name}`, ctx) / 100, 0, 1);
+  const all = ELEMENTAL_AILMENTS.has(name) ? db.sum('base', 'avoid.elemental', ctx) : 0;
+  return clamp((db.sum('base', `avoid.${name}`, ctx) + all) / 100, 0, 1);
 }
 
 /** Resolve defensive stats from a mod database (§6.1–6.4). Shared by players and monsters. */

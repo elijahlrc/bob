@@ -19,7 +19,7 @@ export const STAT_TEXT: Record<string, StatText> = {
   life: { name: 'maximum Life' },
   mana: { name: 'maximum Mana' },
   es: { name: 'maximum Energy Shield' },
-  lifeRegen: { base: '{v} Life Regenerated per second', name: 'Life Regeneration rate' },
+  lifeRegen: { base: 'Regenerate {v} Life per second', name: 'Life Regeneration rate' },
   lifeRegenPct: { base: 'Regenerate {v}% of Life per second' },
   manaRegen: { name: 'Mana Regeneration Rate' },
   manaRegenFlat: { base: '{v} Mana Regenerated per second' },
@@ -28,8 +28,12 @@ export const STAT_TEXT: Record<string, StatText> = {
   armour: { name: 'Armour' },
   evasion: { name: 'Evasion Rating' },
   accuracy: { name: 'Accuracy Rating' },
-  blockAttack: { name: 'Chance to Block Attack Damage', pct: true },
-  blockSpell: { name: 'Chance to Block Spell Damage', pct: true },
+  blockAttack: { name: 'Chance to Block Attack Damage', pct: true, base: '+{v}% Chance to Block' },
+  blockSpell: {
+    name: 'Chance to Block Spell Damage',
+    pct: true,
+    base: '{v}% Chance to Block Spell Damage',
+  },
   blockCap: { name: 'maximum Chance to Block', pct: true },
   'resist.fire': { name: 'Fire Resistance', pct: true },
   'resist.cold': { name: 'Cold Resistance', pct: true },
@@ -88,7 +92,11 @@ export const STAT_TEXT: Record<string, StatText> = {
   stunThreshold: { name: 'Stun Threshold' },
   stunDuration: { name: 'Stun Duration on Enemies' },
   enemyStunThreshold: { base: '{v}% reduced Enemy Stun Threshold' },
-  stunAvoid: { name: 'chance to Avoid being Stunned', pct: true },
+  stunAvoid: {
+    name: 'chance to Avoid being Stunned',
+    pct: true,
+    base: '{v}% chance to Avoid being Stunned',
+  },
   stunDurationOnSelf: { base: '{v}% reduced Stun Duration on you' },
   stunDamage: { name: 'Stun Damage' },
   projectiles: { base: '{v} additional Projectiles' },
@@ -500,6 +508,7 @@ for (const t of ['physical', 'lightning', 'cold', 'fire', 'chaos']) {
   STAT_TEXT[`reflect.${t}`] = { base: `Reflects {v} ${TYPE_LABEL[t]} Damage to Melee Attackers` };
 }
 Object.assign(STAT_TEXT, {
+  'avoid.elemental': { base: '{v}% chance to Avoid Elemental Ailments' },
   reflectPhysPct: { base: '{v}% of Melee Physical Damage taken is reflected to the Attacker' },
   noMovingBleed: { flag: "Moving while Bleeding doesn't cause you to take extra Damage" },
   dodgeAttack: { base: '{v}% chance to Dodge Attack Hits' },
