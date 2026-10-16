@@ -1021,8 +1021,9 @@ docs/DUEL.md F0 and F1 built. `World` is the arena and `World.sides` holds the c
 rage, triggers, cooldowns, openers; G3 minions, deployables, fields, zones, banner, offering, warp, wither, caught; G4 the skills' running
 state; G5 the character, build and primary skill), each a commit with the hash fence unchanged. `faction` is `team`, monsters hunt a character
 through `hunted(w, m)`, the enemies of a character are the actors of other teams, and `isPlayer` means only "a character". The fence
-(`npm run fence`, `--deep`) hashes the events of the bot's runs; the tools of the extraction are `scripts/codemod-sides.ts` (tests and code
-outside the sim, driven by the compiler), `scripts/sides-move.ts` and `scripts/sides-propagate.ts` (the sim). Everything still makes one side:
+(`npm run fence`, `--deep`) hashes the events of the bot's runs; the tools of the extraction were `scripts/codemod-sides.ts` (tests and code
+outside the sim, driven by the compiler; kept, for merging test edits that still read `w.player`), `scripts/sides-move.ts` and
+`scripts/sides-propagate.ts` (the sim; one-shot, removed once F1 was merged). Everything still makes one side:
 two characters are F2. Measured by the wall time of the fence (12 bot runs, same machine, alternating): main 21.2 to 21.7 s, this
 branch 21.4 to 23.0 s, so the sim is about 3% slower, spread thin over the per-side loops of `stepWorld` and the reads of `a.side`
 (the profile shows no single function; `hunted` is 0.1%). The one real cost found, 15% from one more field in `newActor`'s object
