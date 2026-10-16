@@ -265,7 +265,8 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
     },
     /**
      * Give the character what the equip screens need to show a swap that costs gems: a 4-socket body with the class's skill and
-     * support (the skill primary) and two more, and a 2-socket helmet with a support and a free socket (docs/EQUIP.md 7).
+     * support (the skill primary) and two more, and a 2-socket helmet with a support and a free socket (docs/EQUIP.md 7). The bag
+     * gets a 2-socket body and a 6-socket helmet of the same bases, so a swap that costs gems and one that gains sockets are a tap away.
      */
     gearUp(): number {
       const run = controller.run;
@@ -281,6 +282,10 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
         helmet: { ...helmet, sockets: [makeGem(uid, support), null] },
       };
       run.build = { ...run.build, equipment, primaryGem: gems[0].uid };
+      run.inventory = run.inventory.concat(
+        { ...body, uid: uid(), name: 'Spare Body', sockets: [null, null] },
+        { ...helmet, uid: uid(), name: 'Spare Helm', sockets: new Array(6).fill(null) },
+      );
       controller.bus.emit('state', null);
       return gems.length + 1;
     },

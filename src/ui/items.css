@@ -350,6 +350,153 @@
   padding-left: 5px;
 }
 
+/* ---- Sockets: pips and the row that says what a swap does to the gems (docs/EQUIP.md 3.3) ---- */
+.ix-pips {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  vertical-align: middle;
+  flex: none;
+}
+.ix-pip {
+  position: relative;
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 1.5px solid #6a6678;
+}
+.ix-pips.sm .ix-pip {
+  width: 8px;
+  height: 8px;
+  border-width: 1px;
+}
+.ix-pip.active {
+  background: #e0903a;
+  border-color: #e0903a;
+}
+.ix-pip.support {
+  background: #5aa0ff;
+  border-color: #5aa0ff;
+}
+.ix-pip.aura {
+  background: #40c080;
+  border-color: #40c080;
+}
+.ix-pip.hex {
+  background: #c07ae0;
+  border-color: #c07ae0;
+}
+.ix-pip.empty {
+  background: transparent;
+}
+.ix-pip.out {
+  border: 2px solid #ff7070;
+  background: linear-gradient(135deg, transparent 40%, #ff7070 40% 60%, transparent 60%), #3a1818;
+}
+.ix-pip.pr::after {
+  content: '★';
+  position: absolute;
+  inset: -3px 0 0 0;
+  font-size: 8px;
+  line-height: 14px;
+  text-align: center;
+  color: #111;
+}
+.ix-pips.sm .ix-pip.pr::after {
+  display: none;
+}
+.ix-sockets {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.ix-sk {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.ix-sk-lab {
+  color: var(--muted);
+}
+.ix-arrow {
+  color: var(--muted);
+  font-size: 13px;
+}
+.ix-sk-cnt {
+  margin-left: auto;
+  font-weight: bold;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.ix-sk-note {
+  font-size: 12px;
+  padding: 3px 8px;
+  line-height: 1.35;
+  border-left: 3px solid;
+  border-radius: 0 4px 4px 0;
+}
+.ix-sk-note.warn {
+  background: #33260f;
+  border-color: #e0b040;
+  color: #f3d896;
+}
+.ix-sk-note.bad {
+  background: #351818;
+  border-color: #ff6060;
+  color: #ffb0b0;
+}
+.ix-sk-note.good {
+  background: #17301c;
+  border-color: #60e070;
+  color: #b4eebe;
+}
+.ix-gemchips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.ix-gc {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 9px;
+  border: 1px solid #6a6678;
+  background: #15131a;
+}
+.ix-gc.active {
+  border-color: #e0903a;
+  color: #f0b070;
+}
+.ix-gc.support {
+  border-color: #5aa0ff;
+  color: #9cc4ff;
+}
+.ix-gc.aura {
+  border-color: #40c080;
+  color: #8fe0b8;
+}
+.ix-gc.out {
+  text-decoration: line-through;
+  border-color: #ff7070;
+  color: #ff9a9a;
+}
+.ix-vs {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: -4px;
+}
+.ix-vs b {
+  color: #c8c0a8;
+  font-weight: normal;
+}
+.ic-sockets {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 /* ---- The bag ---- */
 .ix-tools {
   display: flex;

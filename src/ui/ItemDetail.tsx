@@ -15,6 +15,7 @@ import {
 import type { EquipCheck } from '../run/inventory';
 import type { RunState } from '../run/run';
 import { ItemCard, itemTitle, lineMarks, rarityClass } from './ItemCard';
+import { SocketsRow } from './SocketPips';
 
 export type Sel =
   | { from: 'inv'; uid: number }
@@ -197,6 +198,23 @@ function ItemBody({
         active={active.slot}
         pick={(s) => setPick({ uid: item.uid, slot: s })}
       />
+      <div class="ix-vs">
+        {active.equipped ? (
+          <>
+            vs <b>{active.equipped.name}</b> · worn in {active.label}
+          </>
+        ) : (
+          <>{active.label} is empty</>
+        )}
+      </div>
+      {active.check.ok && (
+        <SocketsRow
+          was={active.equipped}
+          o={active.sockets}
+          primary={run.build.primaryGem}
+          names={!phone}
+        />
+      )}
       {phone && (
         <button class="btn small ix-cards-toggle" onClick={() => setCards(!cards)}>
           {cards ? 'Hide the cards ▴' : 'Show the cards ▾'}
@@ -219,10 +237,10 @@ function ItemBody({
         <button
           class="btn primary"
           disabled={!active.check.ok}
-          title={active.check.ok ? undefined : whyNot(active.check)}
+          title={active.check.ok ? `Into ${active.label}` : whyNot(active.check)}
           onClick={() => a.onEquip(item.uid, active.slot)}
         >
-          {active.equipped ? `Swap with ${active.label}` : `Equip → ${active.label}`}
+          {active.equipped ? 'Swap' : 'Equip'}
         </button>
         <button class="btn small" onClick={() => a.onFavourite(item.uid)}>
           {favourite ? '★ Favourite' : '☆ Favourite'}

@@ -11,6 +11,7 @@ import type { Mod } from '../mods/types';
 import { modsText } from '../mods/text';
 import { slotsFor, withEquipped } from '../run/inventory';
 import { GemCard } from './GemCard';
+import { SocketPips } from './SocketPips';
 
 export function rarityClass(it: InventoryItem): string {
   return it.kind === 'item'
@@ -219,7 +220,11 @@ export function ItemCard({
       <div class="muted">
         Requires {req.join(', ')} · ilvl {it.ilvl}
       </div>
-      {it.sockets.length > 0 && <div class="muted">Sockets: {it.sockets.length} (linked)</div>}
+      {it.sockets.length > 0 && (
+        <div class="muted ic-sockets">
+          <SocketPips sockets={it.sockets} size="sm" /> {it.sockets.length} linked
+        </div>
+      )}
       {modsText(it.implicits).map((l, i) => (
         <div key={`i${i}`} class={'ic-mod implicit' + markClass(marks, l)}>
           {l}

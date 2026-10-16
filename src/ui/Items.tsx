@@ -26,6 +26,8 @@ import {
   type SortKey,
 } from '../run/inventoryOps';
 import { isFavourite, markSeen, toggleFavourite } from '../run/found';
+import { joinNames } from '../run/socketText';
+import { gemDef } from '../data/gems';
 import { ask } from './Confirm';
 import { CleanUp } from './CleanUp';
 import { useViewport } from './device';
@@ -208,9 +210,11 @@ export function Items({
     const r = c.act((rn) => equip(rn, uid, slot));
     after(r, () => {
       const back = dry.toBag;
+      const gems = dry.sockets.out.map((g) => gemDef(g.gemId).name);
       say(
         `Equipped ${itemTitle(item)} in ${slotName(slot)}.` +
-          (back.length ? ` ${back.map((x) => x.name).join(' and ')} went to the bag.` : ''),
+          (back.length ? ` ${joinNames(back.map((x) => x.name))} went to the bag.` : '') +
+          (gems.length ? ` ${joinNames(gems)} ${gems.length > 1 ? 'are' : 'is'} in the bag.` : ''),
       );
       // Next you want to know whether the old one was worth keeping: select it.
       setSel(back.length ? { from: 'inv', uid: back[0].uid } : { from: 'slot', slot });

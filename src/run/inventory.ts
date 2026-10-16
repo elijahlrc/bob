@@ -205,6 +205,8 @@ export type SocketOutcome = {
   before: SocketCount;
   /** The new item once the gems have moved. */
   after: SocketCount;
+  /** The new item's sockets once the gems have moved, in socket order (null for a free one). */
+  placed: (GemItem | null)[];
   /** Gems of the old item that go into the new one. */
   moved: GemItem[];
   /** Gems that go to the bag: those with no socket left, and a cleared off hand's. */
@@ -254,6 +256,7 @@ export function dryEquip(
       sockets: {
         before: none,
         after: none,
+        placed: old?.sockets ?? [],
         moved: [],
         out: [],
         fromOffHand: [],
@@ -277,6 +280,7 @@ export function dryEquip(
     sockets: {
       before: countOf(old),
       after,
+      placed: now?.sockets ?? [],
       moved: gemsOf(now).filter((g) => oldUids.has(g.uid)),
       out,
       fromOffHand: out.filter((g) => offUids.has(g.uid)),
