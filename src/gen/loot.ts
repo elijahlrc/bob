@@ -62,6 +62,18 @@ function rollValue(rng: Rng, lo: number, hi: number, dec = 0): number {
   return rng.int(Math.round(lo * f), Math.round(hi * f)) / f;
 }
 
+/** Decimal places written in a number: 0.6 → 1, 12 → 0. */
+function decimals(x: number): number {
+  const s = String(x);
+  const i = s.indexOf('.');
+  return i < 0 ? 0 : s.length - i - 1;
+}
+
+/** Roll an authored [min, max] (either order) at the precision its bounds are written in. */
+function rollRange(rng: Rng, min: number, max: number): number {
+  return rollValue(rng, min, max, Math.max(decimals(min), decimals(max)));
+}
+
 /** Roll one affix of a type (§11.3 roll rule). Returns null if none is eligible. */
 export function rollAffix(
   rng: Rng,
@@ -257,7 +269,7 @@ export function rollUnique(rng: Rng, uid: UidSource, u: UniqueDef, ilvl: number)
   const mods: Mod[] = u.mods.map((m) => ({
     stat: m.stat,
     kind: m.kind,
-    value: m.min === m.max ? m.min : rng.int(m.min, m.max),
+    value: m.min === m.max ? m.min : rollRange(rng, m.min, m.max),
     ...(m.damageTypes ? { damageTypes: m.damageTypes } : {}),
     ...(m.tags ? { tags: m.tags } : {}),
     ...(m.local ? { local: true } : {}),
@@ -291,7 +303,7 @@ export function rollUniqueFlask(
   const mods: Mod[] = u.mods.map((x) => ({
     stat: x.stat,
     kind: x.kind,
-    value: x.min === x.max ? x.min : rng.int(x.min, x.max),
+    value: x.min === x.max ? x.min : rollRange(rng, x.min, x.max),
     ...(x.damageTypes ? { damageTypes: x.damageTypes } : {}),
     ...(x.tags ? { tags: x.tags } : {}),
   }));
@@ -434,7 +446,11 @@ export function rollFlask(rng: Rng, uid: UidSource, ilvl: number, magicChance = 
       affixes.push({
         family: a.id,
         tier: 1,
-        mods: a.mods.map((m) => ({ stat: m.stat, kind: m.kind, value: rng.int(m.min, m.max) })),
+        mods: a.mods.map((m) => ({
+          stat: m.stat,
+          kind: m.kind,
+          value: rollRange(rng, m.min, m.max),
+        })),
       });
       parts.push(a.name);
     }

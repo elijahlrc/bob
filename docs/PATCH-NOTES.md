@@ -4,6 +4,10 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-16
+
+- Uniques whose life or mana leech rolls between two values with decimals now roll within that range. A fault had made them roll either the lowest value or one point above it, so Last Sprint could have 1.6% life leech instead of 0.6–0.8%. This affected Last Sprint, Slaughter Pendant, Drake Hide Plate, Ember Halo Mail, Many-Eyed Circlet, Hollow Regent Mask, Wraith Razor and Marksman's Pendant. Copies you already own keep their rolls.
+
 ## 2026-10-15
 
 - The game is now called Battle of Builds on the title screen.

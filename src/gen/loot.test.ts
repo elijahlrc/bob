@@ -4,6 +4,7 @@ import { FAMILIES } from '../data/affixes';
 import { ITEM_BASES, itemBase } from '../data/bases';
 import { FLASK_BASES } from '../data/flasks';
 import type { Item } from '../data/types';
+import { UNIQUE_FLASKS } from '../data/uniqueFlasks';
 import { UNIQUES, uniqueDef } from '../data/uniques';
 import {
   GEM_RATE,
@@ -15,6 +16,7 @@ import {
   rollMonsterDrops,
   rollSockets,
   rollUnique,
+  rollUniqueFlask,
   socketCap,
 } from './loot';
 
@@ -101,15 +103,25 @@ describe('affix rolling (§11.3–11.4)', () => {
   });
 
   it('uniques roll within their authored ranges', () => {
-    const rng = new Rng(11);
-    const u = uniqueDef('gravehammer');
-    const it = rollUnique(rng, uid, u, 50);
-    expect(it.rarity).toBe('unique');
-    u.mods.forEach((m, k) => {
-      const v = it.uniqueMods![k].value;
-      expect(v, m.stat).toBeGreaterThanOrEqual(Math.min(m.min, m.max));
-      expect(v, m.stat).toBeLessThanOrEqual(Math.max(m.min, m.max));
-    });
+    for (const seed of [11, 12, 13, 14, 15])
+      for (const u of UNIQUES) {
+        const it = rollUnique(new Rng(seed), uid, u, 50);
+        expect(it.rarity).toBe('unique');
+        u.mods.forEach((m, k) => {
+          const v = it.uniqueMods![k].value;
+          expect(v, `${u.id} ${m.stat}`).toBeGreaterThanOrEqual(Math.min(m.min, m.max));
+          expect(v, `${u.id} ${m.stat}`).toBeLessThanOrEqual(Math.max(m.min, m.max));
+        });
+      }
+    for (const seed of [11, 12, 13, 14, 15])
+      for (const u of UNIQUE_FLASKS) {
+        const f = rollUniqueFlask(new Rng(seed), uid, u, 50);
+        u.mods.forEach((m, k) => {
+          const v = f.affixes[0].mods[k].value;
+          expect(v, `${u.id} ${m.stat}`).toBeGreaterThanOrEqual(Math.min(m.min, m.max));
+          expect(v, `${u.id} ${m.stat}`).toBeLessThanOrEqual(Math.max(m.min, m.max));
+        });
+      }
   });
 });
 
