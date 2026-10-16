@@ -1013,3 +1013,15 @@ Revised on 2026-10-14 after the user's playtest (WAYSIDE.md 17): no Market (cut)
 Shrine blessings about 75% stronger, a pouch of three with reprieves as provisions of a third kind that refill the flasks, the specialist
 provisions dropped, and the systems start at level 5 (stops one level in five from 6, provisions left by cleared maps, cards in every reward pick).
 The measurements above predate this revision.
+
+## Duels: the extraction of the player singleton (2026-10-16)
+
+docs/DUEL.md F0 and F1 built. `World` is the arena and `World.sides` holds the characters (`src/sim/side.ts`): seventy-two fields moved to
+`Side` in five groups (G1 flasks, AI state, counters, ledger, damage log, reprieve, xp, picked, the character's options; G2 charges, buffs,
+rage, triggers, cooldowns, openers; G3 minions, deployables, fields, zones, banner, offering, warp, wither, caught; G4 the skills' running
+state; G5 the character, build and primary skill), each a commit with the hash fence unchanged. `faction` is `team`, monsters hunt a character
+through `hunted(w, m)`, the enemies of a character are the actors of other teams, and `isPlayer` means only "a character". The fence
+(`npm run fence`, `--deep`) hashes the events of the bot's runs; the tools of the extraction are `scripts/codemod-sides.ts` (tests and code
+outside the sim, driven by the compiler), `scripts/sides-move.ts` and `scripts/sides-propagate.ts` (the sim). Everything still makes one side:
+two characters are F2. Measured: the sim runs at the same speed within noise (the one real cost found, 15% from one more field in
+`newActor`'s object literal, is avoided and written up in docs/PERFORMANCE.md).

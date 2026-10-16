@@ -1,7 +1,7 @@
 # Bob — Duels: asynchronous fights against other players' characters
 
-Status: **proposed 2026-10-16 (second draft, after the user rejected the two-world engine of the first); awaiting approval;
-nothing is built** · Owner: the user · Author: Claude
+Status: **F0 and F1 built on 2026-10-16** (the plan was the second draft of 2026-10-16, after the user rejected the two-world
+engine of the first); F2 to F7 are not built; see "Built" under section 7 · Owner: the user · Author: Claude
 
 A duel is a real fight, watched in the game, between the player's character and a **rival**: a snapshot of another player's
 character (class, level, passive tree, gems, items and Strategy settings) taken when that player's run ended. The rival is
@@ -340,6 +340,35 @@ explains the obvious.
 
 Order: F0 to F4 are the engine and are measured headlessly; F5 is independent of F6; F7 needs both. Commits at the end of
 each milestone and of each group of F1; the fence runs before every one of them.
+
+**Built: F0 and F1 (2026-10-16).** As planned, with these differences and findings:
+
+- **The fence** (`npm run fence`) hashes each map's whole `MapResult` and the run's whole `BotRunResult` as well as every tick's
+  events, and has `--deep` (maps 1 to 30, seeds 1 to 3) and `--events`; `BotRunOpts.onMap` was added so that it can read each map's
+  result. The default fence takes 20 seconds, not two minutes. Main's own hashes were re-recorded before every merge of main.
+- **`Actor.side` is set after `newActor`'s object literal**: a literal of 128 or more properties makes the sim about 15% slower
+  (PERFORMANCE.md section 5).
+- **`WorldOpts` is split in two, but callers still hand `createWorld` one bag**, `MapOpts = WorldOpts & SideOpts`, which it splits;
+  one bag per side is F2's `CreateWorldInput.sides`.
+- **Damage, and kills, with no attacker named** (a damage-over-time tick, `rawHit`, `killActor`) are credited to the side the
+  monster hunts (`hunted`): `applyDamage`'s source is a label (`DmgSrc`), not an actor, and a damage-over-time tick does not record
+  whose it is. F3's "a kill of B's minion credits A's ledger" needs the attacker's side carried by `DmgSrc` and by the debuffs.
+- **A monster has no side**, and the per-use scratch fields of a character (the crit roll its strikes share, the outcome of a blow,
+  how far a leap carried it) are only written for an actor that has one; a monster never set them.
+- **`hunted(w, m)` takes any position** (a projectile, a blast, a corpse) and, with one side, returns the character with no search
+  (a search on every call cost 5% of the sim). It is the one place in `src/sim`, beside `runMap.ts`, `vitals.ts`, `recap.ts`,
+  `createWorld` and the two test helpers `gemKit.ts` and `dummy.ts`, that reads `sides[0]`.
+- **`isPlayer` stays and means "a character".** Its negated sites were each read: the ones that meant "an enemy of this character"
+  are team tests (about eighty scans, the hit path, the helpers `enemiesNear`, `enemiesAt`, `enemiesIn` and `hazardAt`, which take
+  the team); the ones that meant "a monster" stay or became `x.mon` / `x.enc`. What was **not** done, and is F3's: the guards that
+  keep a skill's damage-over-time debuffs, statuses and knockback off a character (`applySkillDot`, `applyStatus`, `rollStatuses`,
+  `knockBack`), which need the attacker in their signatures, and the separation of two characters from each other. The 46 `.mon!`
+  are all in monster-only code.
+- **The step** loops `for (const s of w.sides)` in order at each side sub-step; the alternation by tick parity (3.3, section 11
+  decision 4) is not built, since with one side it changes nothing (F2 or F4). The map's `status` becomes `'dead'` only for side 0's
+  character (`s.id === 0`).
+- G5 is two commits (the fields and `team`, then the classification of `isPlayer`); a merge of main is a commit of its own after
+  each group.
 
 ---
 

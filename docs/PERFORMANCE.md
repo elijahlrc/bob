@@ -70,3 +70,17 @@ each hash the same before and after; 18 bot runs reach the same maps and levels)
 - The badges of the Skills tab still do the full work for a build with no empty socket (450 ms in slices on one of the three runs).
   A cheaper test of where a gem could matter (an active skill needs no supports, a support needs an active in its item) would
   prune most of those.
+
+## 5. The sim's actors: 127 properties (2026-10-16)
+
+`newActor` (`src/sim/actor.ts`) makes every actor from one object literal of **127 properties**, so that the sim's hot loops read
+one shape. A literal of 128 or more is built much more slowly by V8: adding `side` inside the literal (in any position) made the sim
+about 15% slower (twelve bot runs to map 10: 17.7 s with 127 properties, 20.5 s with 128), and a small benchmark showed the same cliff
+(creation and reads of an object of 128 properties several times slower than of 127). The same property set **after** the literal costs
+nothing (17.9 s), which is how `Actor.side` is added (with a comment in `actor.ts`). What the cliff comes from inside V8 was not
+looked into.
+
+- A new field of `Actor` goes after the literal (`actor.side = ...`), or the fields of a feature are grouped into one sub-object. Do
+  not add a 128th property to the literal.
+- The measure is the wall time of `npm run fence` (the bot's runs, which `npm run perf` does not cover: it times the calculation only).
+  `World` and `Side` are far below the limit (`Side` has 74).
