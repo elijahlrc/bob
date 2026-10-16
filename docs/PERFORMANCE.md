@@ -82,5 +82,8 @@ looked into.
 
 - A new field of `Actor` goes after the literal (`actor.side = ...`), or the fields of a feature are grouped into one sub-object. Do
   not add a 128th property to the literal.
+- After the whole extraction (F1) the fence takes about 3% longer than before it (21.2 to 21.7 s on main, 21.4 to 23.0 s on the
+  branch). The profile has no one cause: the per-side loops of `stepWorld` and the `a.side` reads are spread thin. Indexed loops in
+  place of `for...of` were inside the noise.
 - The measure is the wall time of `npm run fence` (the bot's runs, which `npm run perf` does not cover: it times the calculation only).
   `World` and `Side` are far below the limit (`Side` has 74).

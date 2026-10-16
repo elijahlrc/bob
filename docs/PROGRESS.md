@@ -1023,5 +1023,8 @@ state; G5 the character, build and primary skill), each a commit with the hash f
 through `hunted(w, m)`, the enemies of a character are the actors of other teams, and `isPlayer` means only "a character". The fence
 (`npm run fence`, `--deep`) hashes the events of the bot's runs; the tools of the extraction are `scripts/codemod-sides.ts` (tests and code
 outside the sim, driven by the compiler), `scripts/sides-move.ts` and `scripts/sides-propagate.ts` (the sim). Everything still makes one side:
-two characters are F2. Measured: the sim runs at the same speed within noise (the one real cost found, 15% from one more field in
-`newActor`'s object literal, is avoided and written up in docs/PERFORMANCE.md).
+two characters are F2. Measured by the wall time of the fence (12 bot runs, same machine, alternating): main 21.2 to 21.7 s, this
+branch 21.4 to 23.0 s, so the sim is about 3% slower, spread thin over the per-side loops of `stepWorld` and the reads of `a.side`
+(the profile shows no single function; `hunted` is 0.1%). The one real cost found, 15% from one more field in `newActor`'s object
+literal, is avoided and written up in docs/PERFORMANCE.md. Looping `stepWorld`'s sides by index instead of `for...of` was tried and
+was inside the noise, so it was not kept.

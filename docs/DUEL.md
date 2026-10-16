@@ -369,6 +369,10 @@ each milestone and of each group of F1; the fence runs before every one of them.
   character (`s.id === 0`).
 - G5 is two commits (the fields and `team`, then the classification of `isPlayer`); a merge of main is a commit of its own after
   each group.
+- **Speed: about 3% slower, not "unchanged".** The fence's wall time (12 bot runs, alternating with main on the same machine) went
+  from 21.2 to 21.7 s to 21.4 to 23.0 s. The profile spreads it over `stepWorld` (its thirty per-side loops and what they inline),
+  `runMap`, `tickBuffs`, `buildFlow` and the like; no one function is to blame, and the first 5% (a search in `hunted`) was
+  removed by its one-side fast path. A real two-character sim will cost more than this, per side.
 
 ---
 
