@@ -192,14 +192,18 @@ export function Camp({ c }: { c: Controller }) {
   // Back from a map, the camp opens on what the map dropped (with the reward pick on top), or on the next step of the
   // walk when it dropped nothing. A camp entered from the title opens on the map choice (docs/STREAMLINE.md S2).
   const fromMap = !!run && c.lastResult !== null;
+  const [hasDrops] = useState(() => {
+    const drops = new Set(run?.lastDrops ?? []);
+    return fromMap && run!.inventory.some((x) => drops.has(x.uid));
+  });
   const [tab, setTabState] = useState<Tab>(() => {
     if (!run || !fromMap) return 'next';
-    const drops = new Set(run.lastDrops ?? []);
-    if (run.reward || run.inventory.some((x) => drops.has(x.uid))) return 'items';
+    if (run.reward || hasDrops) return 'items';
     return nextStep('items', passivePoints(run));
   });
-  // The Items tab shows the last map's drops the first time it is opened after a map, then the player's own view again.
-  const [showDrops, setShowDrops] = useState(fromMap);
+  // The Items tab shows the last map's drops the first time it is opened after a map (when it dropped anything), then
+  // the player's own view again.
+  const [showDrops, setShowDrops] = useState(hasDrops);
   const setTab = (t: Tab) => {
     if (tab === 'items' && t !== 'items') setShowDrops(false);
     setTabState(t);
