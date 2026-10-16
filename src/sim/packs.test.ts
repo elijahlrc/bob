@@ -197,8 +197,8 @@ describe('mods that apply to every faction (docs/ROSTER.md 7.5)', () => {
     const w = arena();
     const m = put(w, 'warrior', 14, 0, rare(['mirrored']));
     stepWorld(w);
-    expect(m.mirrorId).not.toBe(0);
-    const twin = w.actors.find((a) => a.id === m.mirrorId)!;
+    expect(m.mirror.id).not.toBe(0);
+    const twin = w.actors.find((a) => a.id === m.mirror.id)!;
     expect(twin.mon!.spec.mods).not.toContain('mirrored');
     twin.life = twin.def.maxLife * 0.5;
     killActor(w, m);
@@ -208,7 +208,7 @@ describe('mods that apply to every faction (docs/ROSTER.md 7.5)', () => {
     const w2 = arena();
     const a = put(w2, 'warrior', 14, 0, rare(['mirrored']));
     stepWorld(w2);
-    const b = w2.actors.find((x) => x.id === a.mirrorId)!;
+    const b = w2.actors.find((x) => x.id === a.mirror.id)!;
     killActor(w2, a);
     run(w2, 1);
     killActor(w2, b);

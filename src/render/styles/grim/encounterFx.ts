@@ -432,10 +432,10 @@ export class EncounterFx {
       this.circleLine(g, a.x, a.y, a.r + 0.4 + 0.15 * Math.sin(time * 8));
     }
     if (e.done & 4 && Math.random() < 0.05) this.host.em.smoke.emitParticleAt(p.x, p.y - 10, 1);
-    if (a.modIds.includes('adaptive') && a.resShiftT > 0) {
+    if (a.modIds.includes('adaptive') && a.resShift.t > 0) {
       // Adapted: a ring in the colour of the element it now resists.
       let t = 1;
-      for (let i = 2; i < 5; i++) if (a.resShift[i] > a.resShift[t]) t = i;
+      for (let i = 2; i < 5; i++) if (a.resShift.v[i] > a.resShift.v[t]) t = i;
       g.lineStyle(2, WARN[t], 0.8);
       this.circleLine(g, a.x, a.y, a.r + 0.45);
       g.lineStyle(1, WARN[t], 0.5);

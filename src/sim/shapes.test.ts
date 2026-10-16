@@ -50,9 +50,14 @@ function enemyAt(w: World, like: Actor, x: number, y: number): Actor {
     ail: { ...like.ail, ignites: [], bleeds: [], poisons: [] },
     hexes: [],
     impales: [],
-    resShift: [0, 0, 0, 0, 0],
-    leechLife: [],
-    leechMana: [],
+    resShift: { ...like.resShift, v: [0, 0, 0, 0, 0] },
+    leech: { ...like.leech, life: [], mana: [] },
+    // The groups of timers and numbers are copied, not shared with `like`, as the flat fields they were.
+    since: { ...like.since },
+    home: { ...like.home },
+    retreat: { ...like.retreat },
+    mirror: { ...like.mirror },
+    mark: { ...like.mark },
   };
   a.id = w.nextId++;
   a.x = x;

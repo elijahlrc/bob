@@ -119,8 +119,8 @@ const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
   overloadActive: (_w, p) => p.since.overload < OVERLOAD_TIME,
   blockedRecently: (_w, p) => p.since.block < RECENT,
   beenHitRecently: (_w, p) => p.since.beenHit < RECENT,
-  leeching: (_w, p) => p.leechLife.length > 0,
-  leechingEs: (_w, p) => p.leechEs.length > 0,
+  leeching: (_w, p) => p.leech.life.length > 0,
+  leechingEs: (_w, p) => p.leech.es.length > 0,
   esFull: (_w, p) => p.def.maxEs > 0 && p.es >= p.def.maxEs - 0.5,
   onLowMana: (_w, p) => p.mana <= Math.max(1, p.def.maxMana - reservedMana(p.side!)) * LOW_LIFE,
   cursed: (_w, p) => p.hexes.length > 0,
@@ -239,7 +239,7 @@ export function refreshPlayerDefence(w: World, s: Side): void {
 export function targetState(a: Actor): TargetState {
   // Brittle Doom lowers the three elemental resistances; Open Wounds adds physical vulnerability; exposure and the like add to them.
   const st = statusTaken(a);
-  const resShift = a.resShift.map((r, i) => r - a.hexRes[i] - st.res[i]);
+  const resShift = a.resShift.v.map((r, i) => r - a.hexRes[i] - st.res[i]);
   return {
     def: a.def,
     shock: a.ail.shock,
@@ -332,7 +332,7 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
 
 function addLeech(
   src: Actor,
-  list: 'leechLife' | 'leechMana' | 'leechEs',
+  list: 'life' | 'mana' | 'es',
   amount: number,
   instant: boolean,
 ): void {
@@ -340,19 +340,15 @@ function addLeech(
   amount = Math.min(
     amount,
     LEECH_INSTANCE_MAX *
-      (list === 'leechLife'
-        ? src.def.maxLife
-        : list === 'leechEs'
-          ? src.def.maxEs
-          : src.def.maxMana),
+      (list === 'life' ? src.def.maxLife : list === 'es' ? src.def.maxEs : src.def.maxMana),
   );
   if (instant) {
-    if (list === 'leechLife') src.life += amount;
-    else if (list === 'leechEs') src.es = Math.min(src.def.maxEs, src.es + amount);
+    if (list === 'life') src.life += amount;
+    else if (list === 'es') src.es = Math.min(src.def.maxEs, src.es + amount);
     else src.mana += amount;
     return;
   }
-  const arr = src[list];
+  const arr = src.leech[list];
   if (arr.length < 40) arr.push(amount);
 }
 
@@ -543,13 +539,13 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       lm += res.dmg[i] * p.leechMana[i];
     }
   if (src.def.leechToEs && instant) src.es = Math.min(src.def.maxEs, src.es + ll);
-  else addLeech(src, 'leechLife', ll, instant);
-  addLeech(src, 'leechMana', lm, instant);
+  else addLeech(src, 'life', ll, instant);
+  addLeech(src, 'mana', lm, instant);
   // Energy shield leeched from the damage (Energy Leech).
   let le = 0;
   if (!dst.def.cannotBeLeechedFrom)
     for (let i = 0; i < 5; i++) le += res.dmg[i] * (p.leechEs[i] ?? 0);
-  if (le > 0) addLeech(src, 'leechEs', le, instant);
+  if (le > 0) addLeech(src, 'es', le, instant);
   if (p.lifeOnHit > 0) src.life = Math.min(lifeCap(src), src.life + p.lifeOnHit);
   if (p.esOnHit > 0 && src.isPlayer) src.es = Math.min(src.def.maxEs, src.es + p.esOnHit);
   if (p.manaOnHit > 0 && src.isPlayer)
@@ -609,8 +605,8 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   };
   // Prismatic Balance: shift the target's elemental resistances.
   if (p.prismaticBalance) {
-    for (let i = 1; i <= 3; i++) dst.resShift[i] = res.dmg[i] > 0 ? 25 : -50;
-    dst.resShiftT = 5;
+    for (let i = 1; i <= 3; i++) dst.resShift.v[i] = res.dmg[i] > 0 ? 25 : -50;
+    dst.resShift.t = 5;
   }
   if (!wasAlive || !dst.alive) {
     afterHit();
@@ -967,7 +963,7 @@ export function rawHit(
       const red = Math.min(0.9, def.armour / (def.armour + 10 * dmg[0]) + def.physReduction);
       dmg[0] *= 1 - red;
     } else {
-      const shift = dst.resShift[i] - dst.hexRes[i] - st.res[i];
+      const shift = dst.resShift.v[i] - dst.hexRes[i] - st.res[i];
       const r = Math.max(-200, Math.min(def.res[i] + shift, def.maxRes[i]));
       dmg[i] *= 1 - r / 100;
     }
@@ -1213,9 +1209,9 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     a.fervourT -= dt;
     if (a.fervourT <= 0) a.fervour = 0;
   }
-  if (a.resShiftT > 0) {
-    a.resShiftT -= dt;
-    if (a.resShiftT <= 0) a.resShift.fill(0);
+  if (a.resShift.t > 0) {
+    a.resShift.t -= dt;
+    if (a.resShift.t <= 0) a.resShift.v.fill(0);
   }
   if (a.stunT > 0) {
     a.stunT -= dt;
@@ -1328,7 +1324,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     const manaCap = Math.max(0, def.maxMana - reservedMana(a.side!));
     a.mana = Math.min(manaCap, a.mana + def.manaRegen * dt);
     leechTick(
-      a.leechMana,
+      a.leech.mana,
       (x) => (a.mana = Math.min(manaCap, a.mana + x)),
       def.maxMana,
       dt,
@@ -1339,7 +1335,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   if (suppressed) return;
   if (def.leechToEs)
     leechTick(
-      a.leechLife,
+      a.leech.life,
       (x) => (a.es = Math.min(def.maxEs, a.es + x)),
       def.maxLife,
       dt,
@@ -1348,16 +1344,16 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     );
   else
     leechTick(
-      a.leechLife,
+      a.leech.life,
       (x) => (a.life = Math.min(cap, a.life + x)),
       def.maxLife,
       dt,
       a.life >= cap,
       def.leechRate,
     );
-  if (a.leechEs.length > 0)
+  if (a.leech.es.length > 0)
     leechTick(
-      a.leechEs,
+      a.leech.es,
       (x) => (a.es = Math.min(def.maxEs, a.es + x)),
       def.maxEs,
       dt,

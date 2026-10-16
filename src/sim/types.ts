@@ -95,9 +95,7 @@ export type Actor = {
   ail: Ailments;
   stunT: number;
   graceT: number;
-  leechLife: number[];
-  leechEs: number[];
-  leechMana: number[];
+  leech: { life: number[]; es: number[]; mana: number[] };
   since: {
     damaged: number;
     kill: number;
@@ -110,8 +108,7 @@ export type Actor = {
     beenHit: number;
     overload: number;
   };
-  resShift: number[];
-  resShiftT: number;
+  resShift: { v: number[]; t: number };
   moving: boolean;
   // Monster-only.
   mon?: MonsterStats;
@@ -132,8 +129,7 @@ export type Actor = {
   /** Training dummy: never acts (convergence tests). */
   dummy: boolean;
   /** Ranged monsters: remaining retreat time and its cooldown. */
-  retreatT: number;
-  retreatCd: number;
+  retreat: { t: number; cd: number };
   /** A monster raised from a corpse: no rewards, leaves no corpse, and a Shambler does not rise twice. */
   risen: boolean;
   /** A faction ability timer (raise, blink), and the time left of a blink telegraph. */
@@ -175,8 +171,7 @@ export type Actor = {
   /** The phases (by index in the type's list) that have happened. */
   phaseMask: number;
   /** A Mirrored monster's twin, and the seconds the survivor has to follow it before it is made whole again. */
-  mirrorId: number;
-  mirrorT: number;
+  mirror: { id: number; t: number };
   /** Seconds this monster has stood where the character cannot reach it (see strand.ts). */
   strandT: number;
   /** Seconds to a Warding Pulse. */
@@ -220,8 +215,7 @@ export type Actor = {
   dashX: number;
   dashY: number;
   /** Where a burrowed Gnawing Queen will come up. */
-  markX: number;
-  markY: number;
+  mark: { x: number; y: number };
   /** Seconds before a Hexcaller can hex again, and the time left of a Choirmaster channel. */
   hexCd: number;
   channelT: number;

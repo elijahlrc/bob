@@ -301,9 +301,9 @@ export function onMonsterDeath(w: World, a: Actor): void {
   onEncounterDeath(w, a);
   // The pack reacts to the fall of its leader (docs/ROSTER.md 6.7), and a Mirrored twin's survivor has three seconds.
   rally(w, a);
-  if (a.mirrorId) {
-    const twin = w.actors.find((o) => o.id === a.mirrorId && o.alive);
-    if (twin) twin.mirrorT = 3;
+  if (a.mirror.id) {
+    const twin = w.actors.find((o) => o.id === a.mirror.id && o.alive);
+    if (twin) twin.mirror.t = 3;
   }
   // A thief that dies gives back what it took.
   if (a.stolen > 0) {
@@ -492,7 +492,7 @@ function tickChampion(w: World, m: Actor, dt: number): void {
       m.phaseT -= dt;
       if (m.phaseT <= 0) {
         // She comes up where you were: the warning circle lands now.
-        const pos = w.grid.collide(m.markX, m.markY, m.r);
+        const pos = w.grid.collide(m.mark.x, m.mark.y, m.r);
         m.x = pos.x;
         m.y = pos.y;
         w.events.push({ t: 'blink', id: m.id, x: m.x, y: m.y, end: true });
@@ -509,8 +509,8 @@ function tickChampion(w: World, m: Actor, dt: number): void {
         m.raiserT = QUEEN_BURROW_INTERVAL;
         m.phaseT = QUEEN_BURROW_TIME;
         m.action = null;
-        m.markX = p.x;
-        m.markY = p.y;
+        m.mark.x = p.x;
+        m.mark.y = p.y;
         w.events.push({ t: 'blink', id: m.id, x: m.x, y: m.y, end: false });
         w.effects.push({
           id: w.nextId++,

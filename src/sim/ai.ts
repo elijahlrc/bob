@@ -887,13 +887,13 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     // Retreat when crowded: short half-speed bursts with a cooldown, so they don't kite forever. A kiter (a Slinger, a
     // Handler) backs off sooner, faster and more often.
     const kites = abilitiesOf(m.mon!.spec.type).some((a) => a.id === 'kite');
-    m.retreatCd -= dt;
-    if (d < (kites ? 4.5 : 2) && m.retreatT <= 0 && m.retreatCd <= 0) {
-      m.retreatT = kites ? RETREAT_TIME * 1.5 : RETREAT_TIME;
-      m.retreatCd = kites ? 1.2 : RETREAT_COOLDOWN;
+    m.retreat.cd -= dt;
+    if (d < (kites ? 4.5 : 2) && m.retreat.t <= 0 && m.retreat.cd <= 0) {
+      m.retreat.t = kites ? RETREAT_TIME * 1.5 : RETREAT_TIME;
+      m.retreat.cd = kites ? 1.2 : RETREAT_COOLDOWN;
     }
-    if (m.retreatT > 0) {
-      m.retreatT -= dt;
+    if (m.retreat.t > 0) {
+      m.retreat.t -= dt;
       const away = w.grid.collide(m.x - (p.x - m.x), m.y - (p.y - m.y), m.r);
       step(w, m, away.x - m.x, away.y - m.y, dt * (kites ? 0.8 : 0.5));
       return;

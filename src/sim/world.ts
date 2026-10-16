@@ -549,7 +549,7 @@ function tickMonsterMods(w: World, m: Actor, dt: number): void {
       });
     }
   }
-  if (m.modIds.includes('mirrored') && m.mirrorId === 0) {
+  if (m.modIds.includes('mirrored') && m.mirror.id === 0) {
     // The twin stands some way off, with everything but the mirror.
     const spec = m.mon!.spec;
     // Six tiles off at the first angle that is open floor in sight of it (six tiles can be a wall or another room).
@@ -574,15 +574,15 @@ function tickMonsterMods(w: World, m: Actor, dt: number): void {
       m.name,
     );
     twin.state = 'chase';
-    twin.mirrorId = m.id;
-    m.mirrorId = twin.id;
+    twin.mirror.id = m.id;
+    m.mirror.id = twin.id;
   }
-  if (m.mirrorT > 0) {
-    m.mirrorT -= dt;
+  if (m.mirror.t > 0) {
+    m.mirror.t -= dt;
     // The twin did not follow in time: the survivor is made whole, and the pair is no more.
-    if (m.mirrorT <= 0) {
+    if (m.mirror.t <= 0) {
       m.life = m.def.maxLife;
-      m.mirrorId = 0;
+      m.mirror.id = 0;
     }
   }
   if (m.modIds.includes('raiser')) {

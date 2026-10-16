@@ -132,9 +132,9 @@ describe('keystones (§9.4) — every one has an effect', () => {
   it('Prismatic Balance: hits shift the target resistances', () => {
     const b = build('zealot', ['prismaticBalance']);
     const { world, dummy } = createDummyWorld(b, { distance: 4 });
-    for (let i = 0; i < 180 && dummy.resShiftT <= 0; i++) stepWorld(world);
-    expect(dummy.resShift[1]).toBe(25);
-    expect(dummy.resShift[3]).toBe(-50);
+    for (let i = 0; i < 180 && dummy.resShift.t <= 0; i++) stepWorld(world);
+    expect(dummy.resShift.v[1]).toBe(25);
+    expect(dummy.resShift.v[3]).toBe(-50);
   });
 
   it('Living Ward: life is 1 and life regeneration feeds ES', () => {

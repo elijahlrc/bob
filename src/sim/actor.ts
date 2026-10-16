@@ -5,6 +5,17 @@ import type { Actor } from './types';
 import { newMoveState } from './movement';
 
 /**
+ * A stand-in for an actor that acts from somewhere else (a deployable fires as the character from its own spot). It reads
+ * whatever the actor has; what it sets on itself stays on it. The groups of timers are the exception that has to be made by
+ * hand: a group is one object, so setting `since.hit` on the stand-in would set it on the actor.
+ */
+export function standIn(p: Actor): Actor {
+  const a = Object.create(p) as Actor;
+  a.since = { ...p.since };
+  return a;
+}
+
+/**
  * A fresh actor with every field at its neutral value; callers fill in what makes it a player, monster or minion.
  *
  * Every actor, whatever it is, is made with the same fields in the same order (the monster's `mon` and the minion's own
@@ -44,9 +55,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     },
     stunT: 0,
     graceT: 0,
-    leechLife: [],
-    leechEs: [],
-    leechMana: [],
+    leech: { life: [], es: [], mana: [] },
     since: {
       damaged: 99,
       kill: 99,
@@ -58,8 +67,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
       beenHit: 99,
       overload: 99,
     },
-    resShift: [0, 0, 0, 0, 0],
-    resShiftT: 0,
+    resShift: { v: [0, 0, 0, 0, 0], t: 0 },
     moving: false,
     name: '',
     rarity: 'player',
@@ -76,8 +84,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     bossPhase: 0,
     summonedBy: 0,
     dummy: false,
-    retreatT: 0,
-    retreatCd: 0,
+    retreat: { t: 0, cd: 0 },
     risen: false,
     skillT: 5,
     blinkT: 0,
@@ -108,8 +115,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     patMult: 1,
     enraged: false,
     phaseMask: 0,
-    mirrorId: 0,
-    mirrorT: 0,
+    mirror: { id: 0, t: 0 },
     strandT: 0,
     pulseT: 8,
     phases: false,
@@ -136,8 +142,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
     suppressT: 0,
     dashX: 0,
     dashY: 0,
-    markX: 0,
-    markY: 0,
+    mark: { x: 0, y: 0 },
     mon: undefined,
     key: '',
     kind: undefined as never,

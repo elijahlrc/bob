@@ -91,8 +91,8 @@ describe('sim rules for the new verbs', () => {
     player.def = { ...player.def, instantLeech: false, maxLife: 5000 };
     applyHit(world, player, dummy, prof, res(false));
     expect(player.life).toBe(100); // normal leech is gradual
-    expect(player.leechLife.length).toBe(1);
-    player.leechLife.length = 0;
+    expect(player.leech.life.length).toBe(1);
+    player.leech.life.length = 0;
     applyHit(world, player, dummy, prof, res(true));
     expect(player.life).toBeCloseTo(200); // 10% of 1000, instantly
     dummy.def = dummyDefence({ cannotBeLeechedFrom: true });
@@ -143,7 +143,7 @@ describe('player and target conditions in the sim', () => {
     expect(has(world, 'esFull')).toBe(true);
     expect(has(world, 'onLowMana')).toBe(false);
     player.since.beenHit = 1;
-    player.leechLife.push(10);
+    player.leech.life.push(10);
     player.es = 50;
     player.mana = 20;
     expect(has(world, 'beenHitRecently')).toBe(true);

@@ -255,7 +255,7 @@ describe('windows and modes (docs/ENCOUNTERS.md 5 and 6)', () => {
       'a',
     );
     strike(w, m, [0, 0, 0, m.def.maxLife * 0.3, 0]);
-    expect(m.resShift[3]).toBeGreaterThan(0);
-    expect(m.resShiftT).toBeGreaterThan(0);
+    expect(m.resShift.v[3]).toBeGreaterThan(0);
+    expect(m.resShift.t).toBeGreaterThan(0);
   });
 });
