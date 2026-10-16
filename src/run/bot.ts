@@ -641,6 +641,8 @@ export type BotRunOpts = {
   onEnd?: (run: RunState, res: MapResult) => void;
   /** Called every tick of every map (a measurement watches the fights: scripts/boss-gauntlet.ts). */
   onTick?: (w: World, run: RunState) => void;
+  /** Called once after every map that is played, with its result (the hash fence reads each map's `eventHash`). */
+  onMap?: (res: MapResult, run: RunState) => void;
 };
 
 /** Play a full run headlessly (§15.5). `maxMap` stops after that map. */
@@ -713,6 +715,7 @@ export function botRun(
         opts.onTick?.(w, run);
       },
     );
+    opts.onMap?.(res, run);
     maps.push({
       map: run.map,
       status: res.status,

@@ -25,6 +25,9 @@ npm-debug.log*
 Thumbs.db
 *.sw?
 
+# The recorded hashes of the hash fence (scripts/hash-fence.ts; docs/DUEL.md 8.1): recorded per tree, not shared
+scripts/hash-fence.json
+
 # Draft entries awaiting review (scripts/coverage/draft.ts)
 scripts/coverage/staging/
 scripts/coverage/_*
