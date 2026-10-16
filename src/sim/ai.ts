@@ -820,15 +820,15 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     return;
   }
   if (m.state === 'leash') {
-    if (Math.hypot(m.homeX - m.x, m.homeY - m.y) < 0.5) {
+    if (Math.hypot(m.home.x - m.x, m.home.y - m.y) < 0.5) {
       m.state = 'idle';
       m.life = m.def.maxLife;
       return;
     }
-    const path = w.grid.astar(m.x, m.y, m.homeX, m.homeY);
+    const path = w.grid.astar(m.x, m.y, m.home.x, m.home.y);
     const n = path?.[0];
     if (n) step(w, m, n.x - m.x, n.y - m.y, dt);
-    else step(w, m, m.homeX - m.x, m.homeY - m.y, dt);
+    else step(w, m, m.home.x - m.x, m.home.y - m.y, dt);
     return;
   }
   // A boss of its own kind moves and strikes its own way for a while, or always (docs/BOSSES.md).

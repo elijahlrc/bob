@@ -118,8 +118,7 @@ export type Actor = {
   modIds: MonsterModId[];
   room: number;
   pack: number;
-  homeX: number;
-  homeY: number;
+  home: { x: number; y: number };
   state: MonsterState;
   lostT: number;
   noticeT: number;
