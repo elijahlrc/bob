@@ -73,7 +73,7 @@ describe('trigger supports and Ember Burst', () => {
   it('Wounded Retort casts the linked spell after enough damage is taken', () => {
     const b = withSupport('woundedRetort');
     const { world, dummy } = createDummyWorld(b, { distance: 3 });
-    world.opts.freeResources = false;
+    world.sides[0].opts.freeResources = false;
     const p = world.player;
     const max = p.def.maxLife;
     const prof = world.char.profile(world.char.primary);
@@ -270,7 +270,7 @@ describe("Martyr's Draught", () => {
       x.equipment.body!.uniqueMods = [mod('es', 'base', 6000)];
     });
     const { world, dummy } = createDummyWorld(b, { distance: 12 });
-    world.opts.freeResources = false;
+    world.sides[0].opts.freeResources = false;
     return { world, dummy, p: world.player };
   };
 
@@ -288,9 +288,9 @@ describe("Martyr's Draught", () => {
     p.life = p.def.maxLife;
     p.es = 0;
     const life = p.life;
-    world.flasks[0].charges = 100;
+    world.sides[0].flasks[0].charges = 100;
     // A fight is coming (an enemy 12 tiles away) and none is close: the policy drinks it.
-    expect(autoFlaskPolicy(world)).toEqual([0]);
+    expect(autoFlaskPolicy(world, world.sides[0])).toEqual([0]);
     stepWorld(world); // the world uses the flask
     expect(world.player.life).toBeLessThan(life * 0.1);
     for (let i = 0; i < 130; i++) stepWorld(world);
@@ -299,11 +299,11 @@ describe("Martyr's Draught", () => {
 
   it('is not drunk while an enemy is close, or at low life', () => {
     const { world, dummy, p } = arena();
-    world.flasks[0].charges = 100;
+    world.sides[0].flasks[0].charges = 100;
     dummy.x = p.x + 3;
-    expect(autoFlaskPolicy(world)).toEqual([]);
+    expect(autoFlaskPolicy(world, world.sides[0])).toEqual([]);
     dummy.x = p.x + 10;
     p.life = p.def.maxLife * 0.5;
-    expect(autoFlaskPolicy(world)).toEqual([]);
+    expect(autoFlaskPolicy(world, world.sides[0])).toEqual([]);
   });
 });

@@ -48,7 +48,7 @@ describe('Flicker Strike (blinkingCut)', () => {
 
   it('waits out its cooldown when it holds no charges, and the weapon fills the gaps', () => {
     const { world } = createDummyWorld(build(), { distance: 1.2 });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = watch(world, 20, 'blinkingCut');
     // A use at the start, then at most one more every two seconds, plus one for every charge spent.
     expect(t.uses.length).toBeLessThanOrEqual(1 + Math.ceil(20 / 2) + t.spends.length);
@@ -58,9 +58,9 @@ describe('Flicker Strike (blinkingCut)', () => {
 
   it('spends a charge to use it again at once, and the use grants the buff', () => {
     const { world } = createDummyWorld(build(), { distance: 1.2 });
-    world.opts.freeResources = true;
-    gainCharge(world, 'fervour');
-    gainCharge(world, 'fervour');
+    world.sides[0].opts.freeResources = true;
+    gainCharge(world, world.sides[0], 'fervour');
+    gainCharge(world, world.sides[0], 'fervour');
     expect(world.char.charges.fervour).toBe(2);
     const t = watch(world, 1.2, 'blinkingCut');
     // The first use takes the stored use; the next ones are paid for with the charges held.
@@ -71,7 +71,7 @@ describe('Flicker Strike (blinkingCut)', () => {
 
   it('is not skipped without charges: a second use inside two seconds needs one', () => {
     const { world } = createDummyWorld(build(), { distance: 1.2 });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = watch(world, 1.4, 'blinkingCut');
     // One hit may have gained a charge (15%), which a second use then spends; never more uses than the cooldown plus spends allow.
     expect(t.uses.length).toBeLessThanOrEqual(1 + t.spends.length);
@@ -92,8 +92,8 @@ describe('Flicker Strike (blinkingCut)', () => {
 describe('Vigilant Strike (guardedStrike)', () => {
   it('waits four seconds between uses unless a Grit charge is spent', () => {
     const { world } = createDummyWorld(holding('sword_3', ['guardedStrike']), { distance: 1.2 });
-    world.opts.freeResources = true;
-    gainCharge(world, 'grit');
+    world.sides[0].opts.freeResources = true;
+    gainCharge(world, world.sides[0], 'grit');
     const t = watch(world, 2.5, 'guardedStrike');
     expect(t.uses.length).toBe(2);
     expect(t.spends).toHaveLength(1);
@@ -106,13 +106,13 @@ describe('Discharge (chargeRelease)', () => {
 
   it('is cast once three charges are held, and spends every charge it uses', () => {
     const { world } = createDummyWorld(build(), { distance: 1.2 });
-    world.opts.freeResources = true;
-    gainCharge(world, 'grit');
-    gainCharge(world, 'fervour');
+    world.sides[0].opts.freeResources = true;
+    gainCharge(world, world.sides[0], 'grit');
+    gainCharge(world, world.sides[0], 'fervour');
     // Two charges are not enough to be worth it.
     const early = watch(world, 1.5, 'chargeRelease');
     expect(early.uses).toHaveLength(0);
-    gainCharge(world, 'insight');
+    gainCharge(world, world.sides[0], 'insight');
     expect(world.char.charges).toMatchObject({ grit: 1, fervour: 1, insight: 1 });
     const t = watch(world, 2, 'chargeRelease');
     expect(t.uses.length).toBeGreaterThanOrEqual(1);
@@ -134,9 +134,9 @@ describe('Immortal Call (deathlessCall)', () => {
 
   function cast(charges: number) {
     const { world } = createDummyWorld(build(), { distance: 1.2 });
-    world.opts.freeResources = true;
-    world.opts.godMode = true;
-    for (let i = 0; i < charges; i++) gainCharge(world, 'grit');
+    world.sides[0].opts.freeResources = true;
+    world.sides[0].opts.godMode = true;
+    for (let i = 0; i < charges; i++) gainCharge(world, world.sides[0], 'grit');
     world.player.life = world.player.def.maxLife * 0.4;
     let longest = 0;
     let used = 0;
@@ -161,8 +161,8 @@ describe('Immortal Call (deathlessCall)', () => {
       holding('sword_3', ['crushingBlow', 'deathlessCall', 'ironHide']),
       { distance: 1.2 },
     );
-    world.opts.freeResources = true;
-    world.opts.godMode = true;
+    world.sides[0].opts.freeResources = true;
+    world.sides[0].opts.godMode = true;
     world.player.life = world.player.def.maxLife * 0.4;
     const buffs: string[] = [];
     for (let i = 0; i < 2.5 * 60; i++) {
@@ -185,12 +185,12 @@ describe('Vengeance (anvilDrop)', () => {
     expect(c.secondaries.map((s) => s.skill.id)).not.toContain('anvilDrop');
     // Hit it many times: the counter-attack fires on some of the hits, never faster than its cooldown allows.
     const { world, dummy } = createDummyWorld(b, { distance: 1.2 });
-    world.opts.godMode = true;
-    world.opts.freeResources = true;
+    world.sides[0].opts.godMode = true;
+    world.sides[0].opts.freeResources = true;
     let counters = 0;
     for (let i = 0; i < 20 * 60; i++) {
       if (i % 20 === 0) {
-        fireTriggers(world, { on: 'hitTaken', damage: 5 });
+        fireTriggers(world, world.sides[0], { on: 'hitTaken', damage: 5 });
         for (const e of world.events) if (e.t === 'trigger' && e.skill === 'anvilDrop') counters++;
       }
       stepWorld(world);
@@ -231,7 +231,7 @@ describe('Lightheart (lightheart)', () => {
     const { world } = createDummyWorld(holding('sword_3', ['crushingBlow', 'lightheart']), {
       distance: 1.2,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     watch(world, 3, 'crushingBlow');
     expect(world.char.charges.insight).toBeGreaterThan(0);
   });

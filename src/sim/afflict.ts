@@ -3,6 +3,7 @@ import type { FlaskSpec } from '../calc/flasks';
 import { BOSS_LOCK_SECONDS } from '../data/bosses';
 import { STUN_ES_IGNORE } from '../data/constants';
 import type { Actor, Dot, World } from './types';
+import type { Side } from './side';
 
 /**
  * Ailments and stuns put on the character outside a hit's own rolls (docs/BOSSES.md 11.2): a boss's blow that carries an
@@ -31,8 +32,8 @@ export function flaskCleanses(s: FlaskSpec, kind: Cleansed): boolean {
 }
 
 /** Whether a running flask makes the character immune to this. */
-export function flaskWards(w: World, kind: Cleansed): boolean {
-  for (const f of w.flasks) if (f.activeT > 0 && flaskCleanses(f.spec, kind)) return true;
+export function flaskWards(s: Side, kind: Cleansed): boolean {
+  for (const f of s.flasks) if (f.activeT > 0 && flaskCleanses(f.spec, kind)) return true;
   return false;
 }
 
@@ -76,7 +77,7 @@ export function afflictPlayer(
   if (kind === 'shock' && (d.immune[1] || d.unaffectedByShock)) return false;
   if (kind === 'ignite' && d.immune[3]) return false;
   if (kind === 'poison' && d.immuneChaos) return false;
-  if (flaskWards(w, kind === 'chill' ? 'freeze' : kind)) return false;
+  if (flaskWards(p.side!, kind === 'chill' ? 'freeze' : kind)) return false;
   if (kind === 'freeze' && fromBoss && bossLocked(w)) return false;
   if (kind === 'freeze' && (p.ail.freezeT > 0 || p.ail.freezeGraceT > 0)) return false;
   if (d.avoid[kind] > 0 && w.rngCombat.chance(d.avoid[kind])) return false;

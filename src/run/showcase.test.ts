@@ -7,7 +7,7 @@ describe('showcase mode', () => {
     const c = new Controller(null);
     c.startShowcase(false);
     expect(c.screen).toBe('map');
-    expect(c.world?.opts.godMode).toBe(true);
+    expect(c.world?.sides[0].opts.godMode).toBe(true);
     const seen = new Set([c.run!.classId]);
     for (let i = 0; i < CLASSES.length - 1; i++) {
       c.nextShowcaseClass();

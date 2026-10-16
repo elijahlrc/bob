@@ -5,7 +5,7 @@ import type { MapPlan } from '../gen/mapPlan';
 import type { FlaskPolicy } from './flaskPolicy';
 import { buildReport, type MapReport } from './ledger';
 import { buildRecap } from './recap';
-import type { DeathRecap, MapStatus, Vitals, World, WorldOpts } from './types';
+import type { DeathRecap, MapOpts, MapStatus, Vitals, World } from './types';
 import { vitalsOf } from './vitals';
 import { createWorld, stepWorld } from './world';
 
@@ -49,7 +49,7 @@ export function runMap(
   plan: MapPlan,
   build: Build,
   xp: number,
-  opts: WorldOpts = {},
+  opts: MapOpts = {},
   policy?: FlaskPolicy,
   onTick?: (w: World) => void,
 ): MapResult {
@@ -73,16 +73,16 @@ export function worldResult(w: World, eventHash = 0): MapResult {
     time: w.t,
     ticks: w.tick,
     level: w.build.level,
-    xp: w.xp,
-    xpGained: w.stats.xpGained,
-    kills: w.stats.kills,
-    stuck: w.stats.stuck,
-    picked: w.picked,
+    xp: w.sides[0].xp,
+    xpGained: w.sides[0].stats.xpGained,
+    kills: w.sides[0].stats.kills,
+    stuck: w.sides[0].stats.stuck,
+    picked: w.sides[0].picked,
     eventHash,
     lifeFrac: w.player.life / Math.max(1, w.player.def.maxLife),
     vitals: vitalsOf(w),
     ...(w.status === 'dead' ? { recap: buildRecap(w) } : {}),
-    ...(w.reprieve.fired.length ? { reprieves: [...w.reprieve.fired] } : {}),
-    report: buildReport(w),
+    ...(w.sides[0].reprieve.fired.length ? { reprieves: [...w.sides[0].reprieve.fired] } : {}),
+    report: buildReport(w, w.sides[0]),
   };
 }

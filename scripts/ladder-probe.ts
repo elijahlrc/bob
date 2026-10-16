@@ -90,7 +90,7 @@ function ttk(a: Build, b: Build, seed: number): { t: number; ms: number } {
     defence: { ...defB, damageTakenMult: defB.damageTakenMult * scale },
     fixed: true,
   });
-  world.opts.freeResources = false;
+  world.sides[0].opts.freeResources = false;
   const start = performance.now();
   while (world.status === 'running' && dummy.alive) stepWorld(world);
   return { t: dummy.alive ? Infinity : world.t, ms: performance.now() - start };

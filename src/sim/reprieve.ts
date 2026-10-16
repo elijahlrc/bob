@@ -1,6 +1,7 @@
 import { reprieveDef } from '../data/reprieves';
 import { knockBack, lifeCap } from './combat';
 import type { World } from './types';
+import type { Side } from './side';
 
 /** Monsters within this many tiles of a Revive are thrown back and stunned. */
 const PULSE_RADIUS = 6;
@@ -20,17 +21,17 @@ export const newReprieveState = (held: readonly string[] | null | undefined): Re
 });
 
 /** Whether the character cannot be hurt right now (just after a Revive). */
-export const invulnerable = (w: World): boolean => w.reprieve.invulnT > 0;
+export const invulnerable = (s: Side): boolean => s.reprieve.invulnT > 0;
 
 /** The seconds pass. */
-export function tickReprieve(w: World, dt: number): void {
-  if (w.reprieve.invulnT > 0) w.reprieve.invulnT = Math.max(0, w.reprieve.invulnT - dt);
+export function tickReprieve(s: Side, dt: number): void {
+  if (s.reprieve.invulnT > 0) s.reprieve.invulnT = Math.max(0, s.reprieve.invulnT - dt);
 }
 
 /** The next reprieve that could fire now: a Retreat does nothing on a tenth map, so on one it is passed over for a Revive. */
-function nextReprieve(w: World): string | null {
-  const used = [...w.reprieve.fired];
-  for (const id of w.reprieve.held) {
+function nextReprieve(w: World, s: Side): string | null {
+  const used = [...s.reprieve.fired];
+  for (const id of s.reprieve.held) {
     const at = used.indexOf(id);
     if (at >= 0) {
       used.splice(at, 1);
@@ -47,22 +48,22 @@ function nextReprieve(w: World): string | null {
  * flasks, so that the character has a chance at what follows. A Retreat ends the map as an abandon and does nothing on a tenth
  * map; a Revive stands the character up again. Returns true when the character lives.
  */
-export function reprieveFires(w: World): boolean {
-  const id = nextReprieve(w);
+export function reprieveFires(w: World, s: Side): boolean {
+  const id = nextReprieve(w, s);
   if (!id) return false;
   const def = reprieveDef(id);
   const p = w.player;
-  w.reprieve.fired.push(id);
+  s.reprieve.fired.push(id);
   p.life = Math.max(1, def.life * lifeCap(w, p));
   p.overkill = 0;
-  for (const f of w.flasks) f.charges = f.spec.maxCharges;
+  for (const f of s.flasks) f.charges = f.spec.maxCharges;
   if (def.family === 'retreat') {
     w.status = 'abandoned';
     w.events.push({ t: 'reprieve', how: 'retreat', id: def.id });
     w.events.push({ t: 'abandoned' });
     return true;
   }
-  w.reprieve.invulnT = def.invuln ?? 0;
+  s.reprieve.invulnT = def.invuln ?? 0;
   w.events.push({ t: 'reprieve', how: 'revive', id: def.id });
   if (def.pulse) {
     for (const m of w.actors) {

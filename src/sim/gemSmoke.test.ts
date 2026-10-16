@@ -40,8 +40,8 @@ describe('every active gem', () => {
         expect(c.utilities.map((u) => u.skill.id)).toContain(def.id);
         expect(c.primary.skill.id).toBe('crushingBlow');
         const { world, dummy } = createDummyWorld(b, { distance: 2 });
-        world.opts.freeResources = true;
-        world.opts.godMode = true;
+        world.sides[0].opts.freeResources = true;
+        world.sides[0].opts.godMode = true;
         dummy.rarity = 'boss'; // rallying skills wait for a pack or a big enemy
         seedFor(def, world, dummy);
         let seen = false;
@@ -72,8 +72,8 @@ describe('every active gem', () => {
       // Ten seconds against the dummy, within the skill's reach.
       const reach = Math.min(sheet.skill.range, 5);
       const { world, dummy } = createDummyWorld(b, { distance: Math.max(1.2, reach - 0.3) });
-      world.opts.freeResources = true;
-      world.opts.godMode = true;
+      world.sides[0].opts.freeResources = true;
+      world.sides[0].opts.godMode = true;
       for (let i = 0; i < 10 * 60; i++) stepWorld(world);
       expect(finite(dummy.life)).toBe(true);
       if (dealsDamage) expect(dummy.life).toBeLessThan(dummy.def.maxLife);

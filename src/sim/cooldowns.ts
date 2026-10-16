@@ -2,6 +2,7 @@ import type { SkillChoice } from '../calc/character';
 import { levelValue } from '../calc/gems';
 import { spendCharges } from './charges';
 import type { World } from './types';
+import type { Side } from './side';
 
 /**
  * Skills with a cooldown of their own (docs/SPIRIT.md S2). A skill holds up to `cooldownUses` uses (one by default); using
@@ -48,13 +49,13 @@ export function skillReady(w: World, c: SkillChoice): boolean {
 }
 
 /** The skill is used: take a use, or spend the charges that stand in for one. */
-export function useSkill(w: World, c: SkillChoice): void {
+export function useSkill(w: World, s: Side, c: SkillChoice): void {
   if (c.skill.cooldown === undefined) return;
   const st = (w.cooldowns[c.key] ??= { uses: maxUses(c), t: 0 });
   if (st.uses > 0) {
     st.uses--;
     if (st.t <= 0) st.t = cooldownSeconds(w, c);
-  } else if (c.skill.bypass) spendCharges(w, c.skill.bypass.charge, c.skill.bypass.n);
+  } else if (c.skill.bypass) spendCharges(w, s, c.skill.bypass.charge, c.skill.bypass.n);
   // The skill bar counts a skill that waits down the way it counts a secondary.
   w.secondaryReady[c.key] = st.uses > 0 ? 0 : w.t + st.t;
 }

@@ -61,7 +61,7 @@ describe('Barrage (quiverRush): the projectiles come one after another and each 
       distance: 2.5,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = tally(world, dummy, 10, 'quiverRush');
     expect(t.uses).toBeGreaterThan(3);
     expect(t.hits / t.uses).toBeGreaterThan(3);
@@ -78,7 +78,7 @@ describe('Barrage (quiverRush): the projectiles come one after another and each 
       distance: 2.5,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = tally(world, dummy, 10, 'snareShot');
     expect(t.hits / t.uses).toBeGreaterThan(2.5);
   });
@@ -90,7 +90,7 @@ describe('the once-per-target rule, and its exceptions', () => {
       distance: 2.5,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = tally(world, dummy, 10, 'snareShot');
     expect(t.uses).toBeGreaterThan(3);
     expect(t.hits / t.uses).toBeLessThanOrEqual(1.05);
@@ -102,7 +102,7 @@ describe('the once-per-target rule, and its exceptions', () => {
       distance: 0.9,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = tally(world, dummy, 10, 'splinterVolley');
     expect(t.hits / t.uses).toBeGreaterThan(1.5);
     const c = new Character(holding('sword_3', ['splinterVolley']), {});
@@ -119,7 +119,7 @@ describe('Fork, Chain, Arrow Nova and Tornado Shot', () => {
       distance: 3,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = tally(world, dummy, 8, 'snareShot');
     // The arrow, and the two it forks into when it hits.
     expect(t.spawned / t.uses).toBeGreaterThan(2);
@@ -130,7 +130,7 @@ describe('Fork, Chain, Arrow Nova and Tornado Shot', () => {
       distance: 3,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const other = neighbour(world, dummy.x + 1.5, dummy.y + 2);
     tally(world, dummy, 8, 'snareShot');
     expect(other.life).toBeLessThan(1e9);
@@ -141,7 +141,7 @@ describe('Fork, Chain, Arrow Nova and Tornado Shot', () => {
       distance: 4,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const other = neighbour(world, dummy.x + 1.8, dummy.y);
     const behind = neighbour(world, dummy.x, dummy.y - 2.2);
     tally(world, dummy, 8, 'snareShot');
@@ -154,7 +154,7 @@ describe('Fork, Chain, Arrow Nova and Tornado Shot', () => {
       distance: 4,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const others = [
       neighbour(world, dummy.x + 1.8, dummy.y),
       neighbour(world, dummy.x, dummy.y + 1.8),
@@ -172,7 +172,7 @@ describe('the strikes that send more out, and the cone', () => {
       distance: 1.4,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     // Twenty degrees off the line to the target, where one of the five bolts of the arc flies.
     const aside = neighbour(world, world.player.x + 3.7, world.player.y + 1.43);
     const t = tally(world, dummy, 6, 'boltCleave');
@@ -185,7 +185,7 @@ describe('the strikes that send more out, and the cone', () => {
       distance: 1.4,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const near = neighbour(world, dummy.x + 1.5, dummy.y + 1.5);
     tally(world, dummy, 6, 'rimeSplinter');
     expect(near.life).toBeLessThan(1e9);
@@ -196,7 +196,7 @@ describe('the strikes that send more out, and the cone', () => {
       distance: 1.4,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const near = neighbour(world, dummy.x + 1.2, dummy.y + 0.5);
     let bursts = 0;
     for (let i = 0; i < 6 * 60; i++) {
@@ -212,7 +212,7 @@ describe('the strikes that send more out, and the cone', () => {
       distance: 5,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const beside = neighbour(world, world.player.x + 2.5, world.player.y + 0.5);
     let both = false;
     for (let i = 0; i < 3 * 60 && !both; i++) {

@@ -31,8 +31,8 @@ describe('the map report (the damage ledger)', () => {
       const { w, res } = playMap(cls, map, seed);
       const r = res.report!;
       expect(r).toBeDefined();
-      expect(total(r.dealt)).toBeCloseTo(w.stats.damageDealt, 3);
-      expect(total(r.taken)).toBeCloseTo(w.stats.damageTaken, 3);
+      expect(total(r.dealt)).toBeCloseTo(w.sides[0].stats.damageDealt, 3);
+      expect(total(r.taken)).toBeCloseTo(w.sides[0].stats.damageTaken, 3);
       // What was taken came out of energy shield, mana and life.
       const pools = r.pools.es + r.pools.mana + r.pools.life;
       expect(pools).toBeGreaterThan(0);

@@ -22,7 +22,7 @@ function arena(): World {
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
   world.player.stunT = 1e9;
-  world.opts.godMode = true;
+  world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
 }
@@ -76,7 +76,7 @@ describe('the Blinking affix', () => {
     // And after it, it is beside the character.
     expect(until(w, 2, () => dist(m, w.player) < 1.6)).toBe(true);
     // The burst that came with it hurt: the recap names the spell.
-    expect(until(w, 1, () => w.dmgLog.some((d) => d.name === 'Cinder Step'))).toBe(true);
+    expect(until(w, 1, () => w.sides[0].dmgLog.some((d) => d.name === 'Cinder Step'))).toBe(true);
   });
 
   it('the spell is the monster’s element: Quick Step, Cinder Step, Rime Step, Bolt Step', () => {

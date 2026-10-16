@@ -72,7 +72,7 @@ describe('Holdout (docs/MAPS.md 9.2)', () => {
   it('sends each wave at its time, chasing, and opens the exit only after the last is dead', () => {
     const run = newRun('vanguard', 3);
     const w = worldOf(run, 'holdout', 27);
-    w.opts.godMode = true;
+    w.sides[0].opts.godMode = true;
     const monsters = () => w.actors.filter((a) => !a.isPlayer && a.alive);
     expect(monsters()).toHaveLength(0);
     stepWorld(w);
@@ -109,10 +109,10 @@ describe('Holdout (docs/MAPS.md 9.2)', () => {
         killActor(w, a);
       }
     // The character picks the loot up almost at once, so count what is on the ground and what was taken.
-    const before = w.drops.length + w.picked.length;
+    const before = w.drops.length + w.sides[0].picked.length;
     for (let i = 0; i < 0.5 / DT; i++) stepWorld(w);
     expect(w.holdout.cleared).toBe(1);
-    expect(w.drops.length + w.picked.length).toBeGreaterThan(before);
+    expect(w.drops.length + w.sides[0].picked.length).toBeGreaterThan(before);
   });
 });
 
@@ -195,8 +195,8 @@ describe('Crawl (docs/MAPS.md 9.2)', () => {
     let starts = 0;
     c.bus.on('mapStart', ({ world }) => {
       starts++;
-      world.opts.godMode = true;
-      world.opts.freeResources = true;
+      world.sides[0].opts.godMode = true;
+      world.sides[0].opts.freeResources = true;
     });
     let ends = 0;
     c.bus.on('mapEnd', () => ends++);

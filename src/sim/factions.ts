@@ -305,7 +305,7 @@ export function onMonsterDeath(w: World, a: Actor): void {
   }
   // A thief that dies gives back what it took.
   if (a.stolen > 0) {
-    const f = w.flasks.find((x) => x.spec.uid === a.stolenFlask);
+    const f = w.player.side!.flasks.find((x) => x.spec.uid === a.stolenFlask);
     if (f) f.charges = Math.min(f.spec.maxCharges, f.charges + a.stolen);
     a.stolen = 0;
   }
@@ -371,12 +371,12 @@ export function tickCorpses(w: World, dt: number): void {
 }
 
 /** Whether a chilling or shocking zone leaves this actor alone (docs/BOSSES.md 11.2). */
-function zoneWarded(w: World, a: Actor, kind: 'chill' | 'shock'): boolean {
+function zoneWarded(a: Actor, kind: 'chill' | 'shock'): boolean {
   const d = a.def;
   if (d.immuneAilments || d.avoid[kind] >= 1) return true;
   if (kind === 'chill')
-    return d.cannotBeChilled || d.immune[2] || (a.isPlayer && flaskWards(w, 'freeze'));
-  return d.immune[1] || d.unaffectedByShock || (a.isPlayer && flaskWards(w, 'shock'));
+    return d.cannotBeChilled || d.immune[2] || (a.isPlayer && flaskWards(a.side!, 'freeze'));
+  return d.immune[1] || d.unaffectedByShock || (a.isPlayer && flaskWards(a.side!, 'shock'));
 }
 
 /** Lasting zones hurt the player and the player's minions standing in them, in pulses. */
@@ -401,10 +401,10 @@ export function tickZones(w: World, dt: number): void {
     if (caught.length === 0) continue;
     for (const a of caught) {
       // Ground that chills or shocks does nothing to what cannot be (an immunity, a cleansing flask running).
-      if (e.kind === 'chilling' && !zoneWarded(w, a, 'chill')) {
+      if (e.kind === 'chilling' && !zoneWarded(a, 'chill')) {
         a.ail.chill = Math.max(a.ail.chill, 0.3);
         a.ail.chillT = Math.max(a.ail.chillT, 0.5);
-      } else if (e.kind === 'shocking' && !zoneWarded(w, a, 'shock')) {
+      } else if (e.kind === 'shocking' && !zoneWarded(a, 'shock')) {
         a.ail.shock = Math.max(a.ail.shock, 0.2);
         a.ail.shockT = Math.max(a.ail.shockT, 0.5);
       }

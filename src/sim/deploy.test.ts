@@ -26,8 +26,8 @@ function run(gems: string[], seconds: number, main?: string) {
   const b = build(gems, main);
   const c = new Character(b, { areaLevel: 50 });
   const { world, dummy } = createDummyWorld(b, { distance: 3 });
-  world.opts.freeResources = true;
-  world.opts.godMode = true;
+  world.sides[0].opts.freeResources = true;
+  world.sides[0].opts.godMode = true;
   let most = 0;
   for (let i = 0; i < seconds * 60; i++) {
     stepWorld(world);

@@ -49,7 +49,7 @@ function inSim(b: Build, fight: Scenario): Seen {
         uses[e.skill] = (uses[e.skill] ?? 0) + 1;
   }
   let dealt = 0;
-  for (const side of Object.values(world.ledger.dealt))
+  for (const side of Object.values(world.sides[0].ledger.dealt))
     for (const r of side.values()) dealt += r.dmg.reduce((a, x) => a + x, 0);
   for (const k of Object.keys(uses)) uses[k] /= world.t;
   return { dps: dealt / world.t, uses };

@@ -23,7 +23,7 @@ function arena(): World {
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
   world.player.stunT = 1e9;
-  world.opts.godMode = true;
+  world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
 }
@@ -148,10 +148,10 @@ describe('patterns (docs/ENCOUNTERS.md 4)', () => {
     // The first one is up at once.
     expect(hazardAt(w, laid[0].x, laid[0].y)).not.toBeNull();
     // They land, and the recap names them.
-    const before = w.dmgLog.length;
+    const before = w.sides[0].dmgLog.length;
     steps(w, 150);
     expect(w.effects.some((e) => e.label === 'March')).toBe(false);
-    expect(w.dmgLog.slice(before).some((l) => l.name === 'March')).toBe(true);
+    expect(w.sides[0].dmgLog.slice(before).some((l) => l.name === 'March')).toBe(true);
   });
 });
 

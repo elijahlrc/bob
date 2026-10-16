@@ -91,11 +91,11 @@ export function galleryWorld(run: RunState, entry?: GalleryEntry): World {
   // A blink is cast to close a gap the main skill cannot, so its dummies stand as far as the player will go for them.
   const far = entry?.look.delivery === 'blink';
   const { world } = createDummyWorld(run.build, { distance: far ? 8 : 4, maxTime: 3600 });
-  world.opts.godMode = true;
-  world.opts.freeResources = true;
+  world.sides[0].opts.godMode = true;
+  world.sides[0].opts.freeResources = true;
   if (entry?.look.delivery === 'guard') {
     // A guard skill is cast when life runs low.
-    world.opts.freeResources = false;
+    world.sides[0].opts.freeResources = false;
     world.player.life = world.player.def.maxLife * 0.3;
   }
   const start = world.plan.lab.start;

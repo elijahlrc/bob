@@ -19,6 +19,7 @@ import { startShell } from './skillFx';
 import type { Action, Actor, World } from './types';
 import { ESCAPE_CROWD_RADIUS, ESCAPE_NEAR, PACK_RADIUS, PACK_SIZE } from '../data/strategy';
 import type { RotationEntry } from '../calc/strategy';
+import type { Side } from './side';
 
 /**
  * Utility skills in the sim (COVERAGE 5.1): curses, buffs, guards, warcries and blinks have no damage of their own,
@@ -54,6 +55,7 @@ const isBig = (a: Actor) => a.rarity === 'boss' || a.rarity === 'miniboss' || a.
  */
 export function utilityPick(
   w: World,
+  s: Side,
   e: RotationEntry<SkillChoice>,
   target: Actor,
 ): UtilityPick | null {
@@ -67,10 +69,10 @@ export function utilityPick(
   // The guard skills wait on one another (3.9).
   if (u.kind === 'buff' && u.policy === 'guard' && (w.utilityReady[GUARDS] ?? 0) > w.t) return null;
   const d = Math.hypot(target.x - p.x, target.y - p.y);
-  const prof = ch.profile(c, playerConds(w, target), flaskMask(w));
+  const prof = ch.profile(c, playerConds(w, target), flaskMask(w, s));
   if (!canPay(w, c.costsLife, prof.cost)) return null;
-  if (e.role === 'auto') return autoPick(w, c, prof, target, d);
-  if (e.role === 'opener' && !openerDue(w, c.key, target)) return null;
+  if (e.role === 'auto') return autoPick(w, s, c, prof, target, d);
+  if (e.role === 'opener' && !openerDue(w, s, c.key, target)) return null;
   if (e.role === 'emergency' && p.life >= p.def.maxLife * e.life) return null;
   if (e.role === 'escape' && !wantsOut(w, e)) return null;
   const near = (r: number) => enemiesNear(w, p.x, p.y, r).length >= 1;
@@ -123,22 +125,23 @@ export function wantsOut(
 }
 
 /** An opener is due on its first use of a fight, and on a rare or boss target it has not yet been used on. */
-export function openerDue(w: World, key: string, target: Actor): boolean {
+export function openerDue(w: World, s: Side, key: string, target: Actor): boolean {
   const o = w.openers[key];
-  if (!o || o.fight !== w.ai.fight) return true;
+  if (!o || o.fight !== s.ai.fight) return true;
   return isBig(target) && !o.ids.includes(target.id);
 }
 
 /** An opener has been used against this target. */
-export function markOpened(w: World, key: string, target: Actor): void {
+export function markOpened(w: World, s: Side, key: string, target: Actor): void {
   const o = w.openers[key];
-  const ids = o && o.fight === w.ai.fight ? o.ids : [];
-  w.openers[key] = { fight: w.ai.fight, ids: [...ids.slice(-15), target.id] };
+  const ids = o && o.fight === s.ai.fight ? o.ids : [];
+  w.openers[key] = { fight: s.ai.fight, ids: [...ids.slice(-15), target.id] };
 }
 
 /** A utility skill's own judgement (the `auto` role), ahead of the damage skills by default (COVERAGE 5.1). */
 function autoPick(
   w: World,
+  s: Side,
   c: SkillChoice,
   prof: SkillProfile,
   target: Actor,
@@ -223,7 +226,7 @@ function autoPick(
     return hurt || crowded ? { choice: c, prof, cd: u.cooldown } : null;
   }
   const conds = playerConds(w, target);
-  const reach = skillRange(ch.profile(w.primary, conds, flaskMask(w))) + target.r;
+  const reach = skillRange(ch.profile(w.primary, conds, flaskMask(w, s))) + target.r;
   const gap = d > reach + 2 && d <= u.distance + reach && w.grid.los(p.x, p.y, target.x, target.y);
   const radius =
     (prof.skill.behaviour.kind === 'burst' ? prof.skill.behaviour.radius : 2) * prof.radiusMult;
@@ -275,7 +278,7 @@ export const BURN_ON_FROM = 0.75;
 const burnOff = new WeakSet<World>();
 
 /** A burning aura damages the enemies near the player (and the player, without killing it) twice a second. */
-export function tickAuraBurn(w: World, dt: number): void {
+export function tickAuraBurn(w: World, s: Side, dt: number): void {
   const b = w.char.burn;
   if (b.pct <= 0 && b.self <= 0) return;
   w.auraBurnT += dt;
@@ -298,10 +301,10 @@ export function tickAuraBurn(w: World, dt: number): void {
     for (const e of enemiesNear(w, p.x, p.y, BURN_RADIUS)) rawHit(w, e, amount, 3, 'Burning aura');
   // The character burns too, as fire damage that its resistance and energy shield answer to; it never kills.
   if (b.self > 0) {
-    const was = w.opts.godMode;
-    w.opts.godMode = true;
+    const was = s.opts.godMode;
+    s.opts.godMode = true;
     rawHit(w, p, (b.self / 100) * p.def.maxLife * BURN_EVERY, 3, 'Righteous Fire');
-    w.opts.godMode = was;
+    s.opts.godMode = was;
     p.life = Math.max(1, p.life);
   }
 }
@@ -349,7 +352,7 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     let spent = 0;
     if (u.consume) {
       spent = Math.min(u.consume.max, w.char.charges[u.consume.charge]);
-      if (spent > 0) spendCharges(w, u.consume.charge, spent);
+      if (spent > 0) spendCharges(w, a.side!, u.consume.charge, spent);
       w.guard = {
         buff: u.buff,
         physMult: Math.pow(1 - u.consume.physLess / 100, spent),

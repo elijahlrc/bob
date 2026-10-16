@@ -33,7 +33,7 @@ function measure(build: Build): { sheet: number; sim: number; hits: number } {
   while (world.status === 'running') stepWorld(world);
   let total = 0;
   for (const kind of ['skill', 'minion', 'ailment', 'monster', 'effect'] as const)
-    for (const row of world.ledger.dealt[kind].values())
+    for (const row of world.sides[0].ledger.dealt[kind].values())
       total += row.dmg.reduce((a, b) => a + b, 0);
   return { sheet: scenarioDps(sheet), sim: total / world.t, hits: sheet.skill.hitDps };
 }

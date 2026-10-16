@@ -194,8 +194,8 @@ export function noteEffects(w: World, into: Set<string>): void {
 export function runGem(def: ActiveGemDef, seconds = 10): GemRun {
   const b = buildForActive(def);
   const { world, dummy } = createDummyWorld(b, { distance: def.utility ? 2 : 2.5 });
-  world.opts.freeResources = true;
-  world.opts.godMode = true;
+  world.sides[0].opts.freeResources = true;
+  world.sides[0].opts.godMode = true;
   seedFor(def, world, dummy);
   if (def.utility) {
     dummy.rarity = 'boss';

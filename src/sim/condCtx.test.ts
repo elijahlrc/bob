@@ -47,8 +47,8 @@ function worldWith(
   b.equipment.body!.uniqueMods = mods;
   tweak?.(b);
   const run = createDummyWorld(b, { distance, maxTime: 120 });
-  run.world.opts.freeResources = true;
-  run.world.opts.godMode = true;
+  run.world.sides[0].opts.freeResources = true;
+  run.world.sides[0].opts.godMode = true;
   return run;
 }
 
@@ -66,7 +66,7 @@ describe('conditional mods are seen by the sim', () => {
     const { world: w } = worldWith(['crushingBlow'], 9, 'sword_3', STR, mods, (b) => {
       b.flasks = [makeFlask(() => u++, 'flask_haste', 50), null, null, null, null];
     });
-    const f = w.flasks[0];
+    const f = w.sides[0].flasks[0];
     f.spec = { ...f.spec, maxCharges: 100 };
     f.charges = 0;
     f.activeT = 0;
@@ -152,7 +152,7 @@ describe('conditional mods are seen by the sim', () => {
       const prof = w.char.profile(w.primary, 0);
       w.charged[dummy.id] = { n: prof.skill.charge!.max - 1, t: 5, key: 'cinderBlow' };
       w.player.tHit = hit ? 0 : 99;
-      chargeEnemy(w, dummy, prof);
+      chargeEnemy(w, w.sides[0], dummy, prof);
       return 1e9 - near.life;
     };
     const off = burst(false);
@@ -192,7 +192,7 @@ describe('conditional mods are seen by the sim', () => {
       ];
       const { world: w } = worldWith(['venomStrike', 'sourHerald'], 9, 'dagger_3', DEX, mods);
       w.player.tHit = hit ? 0 : 99;
-      gainVirulence(w);
+      gainVirulence(w, w.sides[0]);
       return w.minions.find((m) => m.kind === 'crawler')!.dmg;
     };
     expect(crawler(true)).toBeCloseTo(crawler(false) * 2, 5);

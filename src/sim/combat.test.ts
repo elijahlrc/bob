@@ -12,7 +12,7 @@ function world(classId = 'vanguard') {
   const run = newRun(classId, 3);
   run.build.level = 20;
   const { world: w, dummy } = createDummyWorld(run.build, { distance: 20 });
-  w.opts.freeResources = false;
+  w.sides[0].opts.freeResources = false;
   return { w, dummy, run };
 }
 
@@ -137,7 +137,7 @@ describe('§6.9 flask policy', () => {
     const uid = () => run.nextUid++;
     w.build.flasks = [makeFlask(uid, 'flask_life_1', 1), null, null, null, null];
     // Rebuild flask state from the character.
-    w.flasks = [
+    w.sides[0].flasks = [
       {
         spec: {
           ...w.char.flasks[0],
@@ -160,15 +160,15 @@ describe('§6.9 flask policy', () => {
     ];
     const p = w.player;
     p.life = lifeCap(w, p) * 0.3;
-    expect(autoFlaskPolicy(w)).toEqual([0]);
+    expect(autoFlaskPolicy(w, w.sides[0])).toEqual([0]);
     const l0 = p.life;
     stepWorld(w);
-    expect(w.flasks[0].activeT).toBeGreaterThan(0);
-    expect(w.flasks[0].charges).toBe(14);
+    expect(w.sides[0].flasks[0].activeT).toBeGreaterThan(0);
+    expect(w.sides[0].flasks[0].charges).toBe(14);
     for (let i = 0; i < 60; i++) stepWorld(w);
     expect(p.life - l0).toBeGreaterThan(10);
     // While recovering, the policy does not use another life flask.
-    expect(autoFlaskPolicy(w)).toEqual([]);
+    expect(autoFlaskPolicy(w, w.sides[0])).toEqual([]);
   });
 });
 
@@ -179,10 +179,10 @@ describe('hybrid flasks refill mana as well as life (flask policy)', () => {
     const uid = () => run.nextUid++;
     run.build.flasks = [makeFlask(uid, 'flask_hybrid_1', 1), null, null, null, null];
     const { world: w } = createDummyWorld(run.build, { distance: 20 });
-    w.opts.freeResources = false;
+    w.sides[0].opts.freeResources = false;
     const spec = w.char.flasks[0];
     expect(spec.kind).toBe('hybrid');
-    w.flasks[0].charges = spec.maxCharges;
+    w.sides[0].flasks[0].charges = spec.maxCharges;
     return w;
   }
 
@@ -193,7 +193,7 @@ describe('hybrid flasks refill mana as well as life (flask policy)', () => {
     expect(cost).toBeGreaterThan(0);
     p.life = lifeCap(w, p);
     p.mana = cost; // below twice the cost of the main skill
-    expect(autoFlaskPolicy(w)).toEqual([0]);
+    expect(autoFlaskPolicy(w, w.sides[0])).toEqual([0]);
   });
 
   it('is left alone with healthy life and mana, and while it is already active', () => {
@@ -201,10 +201,10 @@ describe('hybrid flasks refill mana as well as life (flask policy)', () => {
     const p = w.player;
     p.life = lifeCap(w, p);
     p.mana = p.def.maxMana;
-    expect(autoFlaskPolicy(w)).toEqual([]);
+    expect(autoFlaskPolicy(w, w.sides[0])).toEqual([]);
     p.mana = 0;
-    w.flasks[0].activeT = 3;
-    expect(autoFlaskPolicy(w)).toEqual([]);
+    w.sides[0].flasks[0].activeT = 3;
+    expect(autoFlaskPolicy(w, w.sides[0])).toEqual([]);
   });
 
   it('still answers low life', () => {
@@ -212,6 +212,6 @@ describe('hybrid flasks refill mana as well as life (flask policy)', () => {
     const p = w.player;
     p.mana = p.def.maxMana;
     p.life = lifeCap(w, p) * 0.2;
-    expect(autoFlaskPolicy(w)).toEqual([0]);
+    expect(autoFlaskPolicy(w, w.sides[0])).toEqual([0]);
   });
 });

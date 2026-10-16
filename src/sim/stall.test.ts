@@ -16,10 +16,10 @@ describe('stall breaker', () => {
     for (let i = 0; i < 60 * 120 && w.status === 'running'; i++) {
       for (const m of w.actors) if (!m.isPlayer && m.alive) m.life = m.def.maxLife;
       stepWorld(w);
-      if (w.ai.mode === 'engage') sawEngage = true;
+      if (w.sides[0].ai.mode === 'engage') sawEngage = true;
     }
     expect(sawEngage).toBe(true);
-    expect(w.stats.stalls).toBeGreaterThan(0);
+    expect(w.sides[0].stats.stalls).toBeGreaterThan(0);
   });
 });
 

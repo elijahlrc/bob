@@ -26,7 +26,7 @@ function compare(build: Build, distance = 3, seconds = 60) {
   while (world.status === 'running') stepWorld(world);
   let dealt = 0;
   for (const kind of ['skill', 'minion', 'ailment', 'monster', 'effect'] as const)
-    for (const row of world.ledger.dealt[kind].values())
+    for (const row of world.sides[0].ledger.dealt[kind].values())
       dealt += row.dmg.reduce((a, b) => a + b, 0);
   const sim = dealt / world.t;
   return { c, sheet, sim, ratio: sim / sheet };

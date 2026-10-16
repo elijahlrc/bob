@@ -1,7 +1,7 @@
 import { CRAWL_SEGMENTS } from '../data/mapTypes';
 import { combineReports } from '../sim/ledger';
 import { runMap, type MapResult } from '../sim/runMap';
-import type { World, WorldOpts } from '../sim/types';
+import type { MapOpts, World } from '../sim/types';
 import type { MapOffer } from './offers';
 import { readyReprieves, startProvisions } from './provisions';
 import { planFor, worldOptsFor, type RunState } from './run';
@@ -34,7 +34,7 @@ export function combineCrawl(parts: MapResult[]): MapResult {
 export function playOffer(
   run: RunState,
   offer: MapOffer,
-  tweak?: (opts: WorldOpts) => void,
+  tweak?: (opts: MapOpts) => void,
   onTick?: (w: World) => void,
 ): MapResult {
   // What is armed burns as the map starts (docs/WAYSIDE.md 6.1); the game does the same in the controller.

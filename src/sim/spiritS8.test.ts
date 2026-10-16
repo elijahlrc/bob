@@ -32,8 +32,8 @@ function blinkWorld(gems: string[], distance = 6.5, main = 'sword_3', cls = STR)
     distance,
     maxTime: 120,
   });
-  run.world.opts.freeResources = true;
-  run.world.opts.godMode = true;
+  run.world.sides[0].opts.freeResources = true;
+  run.world.sides[0].opts.godMode = true;
   return run;
 }
 
@@ -252,8 +252,8 @@ describe('Storm Rush (stormRush)', () => {
       maxTime: 60,
     });
     const w2 = run2.world;
-    w2.opts.freeResources = true;
-    w2.opts.godMode = true;
+    w2.sides[0].opts.freeResources = true;
+    w2.sides[0].opts.godMode = true;
     const start = { x: w2.player.x, y: w2.player.y };
     let from = { x: w2.player.x, y: w2.player.y };
     let ghost = 0;
@@ -289,7 +289,7 @@ describe('Frost Lance (frostLance)', () => {
       maxTime: 60,
     });
     const w2 = run2.world;
-    w2.opts.freeResources = true;
+    w2.sides[0].opts.freeResources = true;
     let formedSeen = false;
     let slowSeen = false;
     let most = 0;
@@ -318,8 +318,8 @@ describe('Venom Gyre (toxinCircle) and Whirling Blades (spinningDash)', () => {
       maxTime: 60,
     });
     const w = run2.world;
-    w.opts.freeResources = true;
-    w.opts.godMode = true;
+    w.sides[0].opts.freeResources = true;
+    w.sides[0].opts.godMode = true;
     let caught = 0;
     for (let i = 0; i < 8 * 60; i++) {
       stepWorld(w);

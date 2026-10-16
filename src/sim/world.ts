@@ -46,7 +46,6 @@ import { rebuildCharacter, seedCharacters, tickCharges } from './charges';
 import { tickTriggers } from './triggers';
 import { Grid } from './grid';
 import { newActor } from './actor';
-import type { Side } from './side';
 import { newLedger } from './ledger';
 import { tickAbandon } from './abandon';
 import { newReprieveState, tickReprieve } from './reprieve';
@@ -60,7 +59,8 @@ import { inBlast, pending } from './blasts';
 import { afflictPlayer, stunPlayer } from './afflict';
 import { flasksSealed } from './theft';
 import { crescendoStep, HOLDOUT_WAVES } from '../data/mapTypes';
-import type { Actor, GroundEffect, World, WorldOpts } from './types';
+import type { Actor, GroundEffect, MapOpts, World } from './types';
+import type { Side } from './side';
 
 export function spawnMonster(
   w: World,
@@ -110,7 +110,7 @@ export type CreateWorldInput = {
   build: Build;
   /** Carried-over resources from camp (fractions); default full. */
   xp: number;
-  opts?: WorldOpts;
+  opts?: MapOpts;
 };
 
 export function makeCharacter(
@@ -134,7 +134,73 @@ export function createWorld(inp: CreateWorldInput): World {
   const grid = new Grid(plan.lab.w, plan.lab.h, plan.lab.tiles);
   grid.markReach(plan.lab.start.x, plan.lab.start.y);
   const player = newActor(1, true, plan.lab.start.x, plan.lab.start.y, 0.4);
-  const side: Side = { id: 0, team: 0 };
+  const side: Side = {
+    id: 0,
+    team: 0,
+    flasks: char.flasks.map((spec) => ({
+      spec,
+      charges: spec.maxCharges,
+      activeT: 0,
+      queued: false,
+      lifeRate: 0,
+      manaRate: 0,
+      esRate: 0,
+      esT: 0,
+      uses: 0,
+    })),
+    ai: {
+      mode: 'advance',
+      wp: 0,
+      path: [],
+      pathKey: '',
+      pathT: 0,
+      targetId: 0,
+      scanT: 0,
+      blocked: 0,
+      blockedT: 0,
+      repoT: 0,
+      watchId: 0,
+      watchLife: 0,
+      watchT: 0,
+      skipId: 0,
+      skipUntil: 0,
+      stuckT: 0,
+      stuckX: plan.lab.start.x,
+      stuckY: plan.lab.start.y,
+      lootId: 0,
+      lootSince: 0,
+      fight: 0,
+      lastEngaged: -1e9,
+      kiteT: 0,
+      kiteX: 0,
+      kiteY: 0,
+      kiteCd: 0,
+      dodgeT: 0,
+      dodgeRest: 0,
+    },
+    stats: {
+      kills: 0,
+      xpGained: 0,
+      stuck: 0,
+      stalls: 0,
+      kites: 0,
+      wallBlocked: 0,
+      picked: 0,
+      damageTaken: 0,
+      damageDealt: 0,
+    },
+    ledger: newLedger(),
+    dmgLog: [],
+    reprieve: newReprieveState(inp.opts?.reprieves),
+    xp: inp.xp,
+    picked: [],
+    opts: {
+      start: inp.opts?.start,
+      freeResources: inp.opts?.freeResources,
+      godMode: inp.opts?.godMode,
+      reprieves: inp.opts?.reprieves,
+    },
+  };
   player.side = side;
   const w: World = {
     plan,
@@ -237,20 +303,7 @@ export function createWorld(inp: CreateWorldInput): World {
     build,
     char,
     primary: char.primary,
-    flasks: char.flasks.map((spec) => ({
-      spec,
-      charges: spec.maxCharges,
-      activeT: 0,
-      queued: false,
-      lifeRate: 0,
-      manaRate: 0,
-      esRate: 0,
-      esT: 0,
-      uses: 0,
-    })),
-    xp: inp.xp,
     status: 'running',
-    reprieve: newReprieveState(inp.opts?.reprieves),
     abandonT: null,
     abandonAuto: false,
     surge: 0,
@@ -259,51 +312,7 @@ export function createWorld(inp: CreateWorldInput): World {
     holdout: { spawned: 0, cleared: 0, done: [], ids: [] },
     exitOpen: false,
     endRoom: plan.lab.mainPath[plan.lab.mainPath.length - 1],
-    ai: {
-      mode: 'advance',
-      wp: 0,
-      path: [],
-      pathKey: '',
-      pathT: 0,
-      targetId: 0,
-      scanT: 0,
-      blocked: 0,
-      blockedT: 0,
-      repoT: 0,
-      watchId: 0,
-      watchLife: 0,
-      watchT: 0,
-      skipId: 0,
-      skipUntil: 0,
-      stuckT: 0,
-      stuckX: plan.lab.start.x,
-      stuckY: plan.lab.start.y,
-      lootId: 0,
-      lootSince: 0,
-      fight: 0,
-      lastEngaged: -1e9,
-      kiteT: 0,
-      kiteX: 0,
-      kiteY: 0,
-      kiteCd: 0,
-      dodgeT: 0,
-      dodgeRest: 0,
-    },
     opts: inp.opts ?? {},
-    stats: {
-      kills: 0,
-      xpGained: 0,
-      stuck: 0,
-      stalls: 0,
-      kites: 0,
-      wallBlocked: 0,
-      picked: 0,
-      damageTaken: 0,
-      damageDealt: 0,
-    },
-    picked: [],
-    dmgLog: [],
-    ledger: newLedger(),
   };
   player.def = char.defence();
   // The player starts with what the last map left (full on a new run), as fractions of the maximum.
@@ -312,7 +321,7 @@ export function createWorld(inp: CreateWorldInput): World {
   player.life = Math.max(1, lifeCap(w, player) * frac(start?.life));
   player.es = player.def.maxEs * frac(start?.es);
   player.mana = Math.max(0, player.def.maxMana - char.reservedMana) * frac(start?.mana);
-  for (const f of w.flasks) f.charges = f.spec.maxCharges * frac(start?.flasks[f.spec.uid]);
+  for (const f of side.flasks) f.charges = f.spec.maxCharges * frac(start?.flasks[f.spec.uid]);
   player.name = 'You';
   for (const s of plan.pop.monsters) {
     const a = spawnMonster(w, s.spec, s.x, s.y, s.room, s.pack, s.name);
@@ -325,17 +334,17 @@ export function createWorld(inp: CreateWorldInput): World {
 }
 
 /** Rebuild the character after a level-up, keeping resource fractions. */
-function levelUp(w: World): void {
+function levelUp(w: World, s: Side): void {
   const p = w.player;
   const lf = p.life / Math.max(1, lifeCap(w, p));
   const mf = p.def.maxMana > 0 ? p.mana / p.def.maxMana : 1;
   const ef = p.def.maxEs > 0 ? p.es / p.def.maxEs : 1;
   w.build = { ...w.build, level: w.build.level + 1 };
   rebuildCharacter(w);
-  w.flasks.forEach((f, i) => {
+  s.flasks.forEach((f, i) => {
     if (w.char.flasks[i]) f.spec = w.char.flasks[i];
   });
-  refreshPlayerDefence(w);
+  refreshPlayerDefence(w, s);
   p.life = lf * lifeCap(w, p);
   p.mana = mf * p.def.maxMana;
   p.es = ef * p.def.maxEs;
@@ -345,8 +354,8 @@ function levelUp(w: World): void {
 /** Seconds over which a life-to-ES flask returns the life it took. */
 const LIFE_TO_ES_TIME = 2;
 
-function useFlask(w: World, i: number): void {
-  const f = w.flasks[i];
+function useFlask(w: World, side: Side, i: number): void {
+  const f = side.flasks[i];
   const p = w.player;
   // The Unmaker holds the flasks (docs/BOSSES.md 9).
   if (f.charges < f.spec.perUse || flasksSealed(w)) return;
@@ -395,10 +404,10 @@ function useFlask(w: World, i: number): void {
   rollGains(w, 'flask');
 }
 
-function tickFlasks(w: World, dt: number, policy: FlaskPolicy): void {
+function tickFlasks(w: World, s: Side, dt: number, policy: FlaskPolicy): void {
   const p = w.player;
-  for (const i of policy(w)) useFlask(w, i);
-  for (const f of w.flasks) {
+  for (const i of policy(w, s)) useFlask(w, s, i);
+  for (const f of s.flasks) {
     if (f.esT > 0) {
       p.es = Math.min(p.def.maxEs, p.es + f.esRate * Math.min(dt, f.esT));
       f.esT -= dt;
@@ -613,17 +622,17 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   w.tick++;
   if (w.plan.type === 'crescendo') w.surge = crescendoStep(w.t);
   const p = w.player;
-  refreshPlayerDefence(w);
+  for (const s of w.sides) refreshPlayerDefence(w, s);
   tickHoldout(w);
   tickTriggers(w, dt);
-  tickCharges(w, dt);
+  for (const s of w.sides) tickCharges(w, s, dt);
   tickCooldowns(w, dt);
   tickBuffs(w, dt);
-  tickAuraBurn(w, dt);
-  tickDeployables(w, dt);
+  for (const s of w.sides) tickAuraBurn(w, s, dt);
+  for (const s of w.sides) tickDeployables(w, s, dt);
   tickMinions(w, dt);
   tickSkillZones(w, dt);
-  tickFlasks(w, dt, policy);
+  for (const s of w.sides) tickFlasks(w, s, dt, policy);
   // Flow field for monsters follows the player tile.
   w.grid.buildFlow(p.x, p.y);
   for (const a of w.actors) {
@@ -631,7 +640,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     tickActor(w, a, dt);
     if (!a.alive) continue;
     updateAction(w, a, dt);
-    if (a.isPlayer) playerAI(w, dt);
+    if (a.isPlayer) playerAI(w, a.side!, dt);
     else {
       monsterAI(w, a, dt);
       tickPhases(w, a);
@@ -657,8 +666,8 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickDegen(w, dt);
   tickOffering(w, dt);
   tickLegion(w, dt);
-  tickSupports(w, dt);
-  tickSkillFx(w, dt);
+  for (const s of w.sides) tickSupports(w, s, dt);
+  for (const s of w.sides) tickSkillFx(w, s, dt);
   tickBlasphemy(w, dt);
   tickProliferation(w, dt);
   updateProjectiles(w, dt);
@@ -668,18 +677,20 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   separate(w);
   tickStranded(w, dt);
   checkExit(w);
-  while (w.build.level < MAX_LEVEL && w.xp >= xpToNext(w.build.level)) {
-    w.xp -= xpToNext(w.build.level);
-    levelUp(w);
-  }
-  if (w.build.level >= MAX_LEVEL) w.xp = 0;
-  if (w.opts.freeResources && p.alive) {
-    p.life = lifeCap(w, p);
-    p.mana = Math.max(0, p.def.maxMana - reservedMana(w));
+  for (const s of w.sides) {
+    while (w.build.level < MAX_LEVEL && s.xp >= xpToNext(w.build.level)) {
+      s.xp -= xpToNext(w.build.level);
+      levelUp(w, s);
+    }
+    if (w.build.level >= MAX_LEVEL) s.xp = 0;
+    if (s.opts.freeResources && p.alive) {
+      p.life = lifeCap(w, p);
+      p.mana = Math.max(0, p.def.maxMana - reservedMana(w));
+    }
   }
   if (!p.alive && w.status === 'running') w.status = 'dead';
   tickCollapse(w);
-  tickReprieve(w, dt);
+  for (const s of w.sides) tickReprieve(s, dt);
   tickAbandon(w, dt);
   if (w.t >= (w.opts.maxTime ?? 900) && w.status === 'running') w.status = 'timeout';
 }

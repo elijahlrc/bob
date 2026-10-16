@@ -11,8 +11,8 @@ function explodes(id: string, seconds: number) {
   const b = buildFor([id], weaponFor(def), classFor(def.attr));
   void new Character(b, { areaLevel: 50 });
   const { world } = createDummyWorld(b, { distance: 2.5 });
-  world.opts.freeResources = true;
-  world.opts.godMode = true;
+  world.sides[0].opts.freeResources = true;
+  world.sides[0].opts.godMode = true;
   const out: { skill?: string; pulse?: boolean; r: number }[] = [];
   for (let i = 0; i < seconds * 60; i++) {
     stepWorld(world);

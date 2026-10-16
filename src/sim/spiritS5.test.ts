@@ -44,7 +44,7 @@ describe('Flameblast (furnaceRoar): stages, then one blast', () => {
       distance: 2,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = record(world, dummy, 4, 'furnaceRoar');
     // Nothing is hit before the tenth use.
     expect(t.hits.length).toBeGreaterThan(0);
@@ -57,7 +57,7 @@ describe('Flameblast (furnaceRoar): stages, then one blast', () => {
       distance: 2,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     // Let it build a few stages, then take the enemy away.
     for (let i = 0; i < 70; i++) stepWorld(world);
     expect(world.channel?.stage).toBeGreaterThan(2);
@@ -90,7 +90,7 @@ describe('Blade Flurry (flurryOfEdges): a strike a stage, then a strike for each
       distance: 1.2,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = record(world, dummy, 6, 'flurryOfEdges');
     // Six strikes build the stages, six more are the release: two hits a use over a whole channel.
     expect(t.hits.length / t.uses).toBeGreaterThan(1.6);
@@ -104,7 +104,7 @@ describe('Divine Ire (judgementTempest): a crowd charges it faster, and the beam
       distance: 2,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = record(world, dummy, 8, 'judgementTempest');
     const amounts = t.hits.map((h) => h.amount);
     const zap = amounts.slice(0, 5).reduce((a, b) => a + b, 0) / 5;
@@ -118,7 +118,7 @@ describe('Incinerate (blazeStream): it grows as it goes and ends with a final wa
       distance: 2.5,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = record(world, dummy, 5, 'blazeStream');
     const amounts = t.hits.map((h) => h.amount);
     expect(amounts.length).toBeGreaterThan(6);
@@ -129,7 +129,7 @@ describe('Incinerate (blazeStream): it grows as it goes and ends with a final wa
     const b = holding('wand_3', ['blazeStream'], 'mystic');
     const cap = new Character(b, {}).primary.skill.channel!.cap;
     const { world, dummy } = createDummyWorld(b, { distance: 2.5, maxTime: 60 });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     let started = false;
     let atCap = 0;
     for (let i = 0; i < 60 * 8; i++) {
@@ -152,7 +152,7 @@ describe('Scourge Arrow (blightHail): hold to charge, let go for one arrow', () 
       distance: 3,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     let spawned = 0;
     let firstSpawnUse = 0;
     let uses = 0;
@@ -178,7 +178,7 @@ describe('Reave (sweepingCut): the area grows with every use that hits', () => {
       distance: 1.2,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     // Out of the first sweeps' reach, in reach of the grown one.
     const far = spawnMonster(
       world,
@@ -211,7 +211,7 @@ describe('Cyclone (twisterBlade): the first spin hits for half, and a stun canno
     const b = holding('sword_3', ['twisterBlade'], 'strider');
     const cap = new Character(b, {}).primary.skill.channel!.cap;
     const { world } = createDummyWorld(b, { distance: 1.2, maxTime: 60 });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     let atCap = 0;
     let started = false;
     for (let i = 0; i < 60 * 8; i++) {
@@ -228,7 +228,7 @@ describe('Cyclone (twisterBlade): the first spin hits for half, and a stun canno
   it('closes in on its target as it spins, at walking pace', () => {
     const b = holding('sword_3', ['twisterBlade'], 'strider');
     const { world, dummy } = createDummyWorld(b, { distance: 7, maxTime: 60 });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const start = Math.hypot(world.player.x - dummy.x, world.player.y - dummy.y);
     let dist = start;
     for (let i = 0; i < 90; i++) {

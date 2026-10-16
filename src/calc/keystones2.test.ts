@@ -88,7 +88,7 @@ describe('the keystones of the tree pass', () => {
     dummy.def = { ...dummy.def, maxLife: 1e6 };
     dummy.life = 1e6;
     dummy.dummy = true;
-    world.opts.godMode = true;
+    world.sides[0].opts.godMode = true;
     const c = world.char.utilities[0];
     summonMinions(world, c, world.char.profile(c, 0, 0));
     const m = world.minions[0];

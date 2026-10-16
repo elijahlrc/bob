@@ -19,7 +19,7 @@ const WARM = 10;
 function dealtSoFar(world: ReturnType<typeof createDummyWorld>['world']): number {
   let total = 0;
   for (const kind of ['skill', 'minion', 'ailment', 'monster', 'effect'] as const)
-    for (const row of world.ledger.dealt[kind].values())
+    for (const row of world.sides[0].ledger.dealt[kind].values())
       total += row.dmg.reduce((a, b) => a + b, 0);
   return total;
 }

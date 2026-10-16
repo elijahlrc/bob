@@ -1496,7 +1496,7 @@ export class GrimStyle extends StyleBase {
         break;
       }
       case 'flaskUsed': {
-        const f = world.flasks[e.idx];
+        const f = world.sides[0].flasks[e.idx];
         const p = this.project(world.player.x, world.player.y);
         const col =
           f?.spec.kind === 'mana' ? 0x4a78ff : f?.spec.kind === 'utility' ? 0xffd070 : 0xd03030;

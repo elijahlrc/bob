@@ -81,13 +81,13 @@ describe('charges in the sim (EXPANSION 5.6)', () => {
     // The sim starts with none, whatever the sheet assumes.
     expect(w.char.charges).toEqual(noCharges());
     const speedBefore = w.player.def.moveSpeed;
-    gainCharge(w, 'fervour');
-    gainCharge(w, 'fervour');
+    gainCharge(w, w.sides[0], 'fervour');
+    gainCharge(w, w.sides[0], 'fervour');
     expect(w.char.charges.fervour).toBe(2);
     expect(w.player.def.moveSpeed).toBeCloseTo(speedBefore, 6); // no movement speed from Fervour (3.9)
     run(w, 5);
-    gainCharge(w, 'fervour');
-    gainCharge(w, 'fervour');
+    gainCharge(w, w.sides[0], 'fervour');
+    gainCharge(w, w.sides[0], 'fervour');
     expect(w.char.charges.fervour).toBe(3);
     // Gaining refreshed the timer of all three.
     run(w, CHARGE_SECONDS - 1);
@@ -100,8 +100,8 @@ describe('charges in the sim (EXPANSION 5.6)', () => {
   it('the effect follows the count: Grit raises resistances and physical reduction', () => {
     const w = arena(buildOf(['crushingBlow'], withMod(mod('chargeOn.block.grit', 'base', 100))));
     const res0 = w.player.def.res[3];
-    gainCharge(w, 'grit');
-    gainCharge(w, 'grit');
+    gainCharge(w, w.sides[0], 'grit');
+    gainCharge(w, w.sides[0], 'grit');
     expect(w.player.def.res[3]).toBeGreaterThan(res0);
     expect(w.player.def.physReduction).toBeGreaterThan(0);
   });
@@ -114,14 +114,14 @@ describe('charges in the sim (EXPANSION 5.6)', () => {
     for (let i = 0; i < 30; i++) killActor(w, put(w, 'warrior', 8 + i * 0.1));
     expect(w.char.charges.fervour).toBeGreaterThan(0);
     const built = w.chars.size;
-    tickCharges(w, 0.01);
+    tickCharges(w, w.sides[0], 0.01);
     expect(w.chars.size).toBe(built);
   });
 
   it('charges survive a level up with their counts', () => {
     const w = arena(buildOf(['crushingBlow'], withMod(mod('chargeOn.kill.insight', 'base', 100))));
-    gainCharge(w, 'insight');
-    w.xp = 1e9;
+    gainCharge(w, w.sides[0], 'insight');
+    w.sides[0].xp = 1e9;
     stepWorld(w);
     expect(w.build.level).toBeGreaterThan(40);
     expect(w.char.charges.insight).toBe(1);
@@ -164,7 +164,7 @@ describe('hexes in the sim (EXPANSION 5.7)', () => {
     const lostA = before[0] - a.life;
     const lostB = before[1] - b.life;
     expect(lostB / lostA).toBeCloseTo(1, 6); // applyDamage is raw: the hex acts in the hit code
-    const raw = (x: Actor) => (w.opts.godMode, x.hexVuln);
+    const raw = (x: Actor) => (w.sides[0].opts.godMode, x.hexVuln);
     expect(raw(b)).toBeCloseTo(0.5, 6);
     const c = put(w, 'warrior', 10);
     applyHex(w, c, 'brittleDoom', 30, 1);

@@ -19,9 +19,9 @@ for (const cls of CLASSES) {
       let shots = 0;
       while (w.status === 'running' && w.t < 300) {
         stepWorld(w);
-        const t = w.ai.targetId;
+        const t = w.sides[0].ai.targetId;
         const a = t ? w.actors.find((x) => x.id === t) : undefined;
-        if (a && a.alive && w.ai.mode === 'engage') {
+        if (a && a.alive && w.sides[0].ai.mode === 'engage') {
           if (t !== target) {
             target = t;
             since = w.t;

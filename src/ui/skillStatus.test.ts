@@ -28,8 +28,8 @@ function build(gems: string[], classId = 'mystic', main = 'wand_3'): Build {
 
 function arena(gems: string[], classId?: string, main?: string): World {
   const { world, dummy } = createDummyWorld(build(gems, classId, main), { distance: 3 });
-  world.opts.freeResources = true;
-  world.opts.godMode = true;
+  world.sides[0].opts.freeResources = true;
+  world.sides[0].opts.godMode = true;
   // A big enemy, so that rallying skills want to be cast.
   dummy.rarity = 'boss';
   return world;
@@ -54,7 +54,7 @@ describe('skill bar slots', () => {
     for (const c of CLASSES) {
       const b = newRun(c.id, 1).build;
       const { world } = createDummyWorld(b, { distance: 3 });
-      world.opts.godMode = true;
+      world.sides[0].opts.godMode = true;
       for (let i = 0; i < 4; i++) {
         run(world, 1);
         const slots = skillSlots(world);
@@ -193,7 +193,7 @@ describe('skill bar slots', () => {
 
   it('marks a skill the character cannot pay for', () => {
     const w = arena(['flameBolt']);
-    w.opts.freeResources = false;
+    w.sides[0].opts.freeResources = false;
     expect(w.char.profile(w.char.primary, 0, 0).cost).toBeGreaterThan(0);
     w.player.mana = 0;
     const s = skillSlots(w)[0];

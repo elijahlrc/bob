@@ -20,7 +20,7 @@ function arena(): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.opts.godMode = true;
+  world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
 }
@@ -47,10 +47,10 @@ describe('the death recap (the record a death sends)', () => {
     p.life = 500;
     p.es = 40;
     w.t = 10;
-    logDamage(w, m, m.name, 0, 100);
+    logDamage(w, w.player, m, m.name, 0, 100);
     w.t = 12;
     p.life = 400;
-    logDamage(w, null, 'Reflect', 3, 50);
+    logDamage(w, w.player, null, 'Reflect', 3, 50);
     w.t = 15;
     const r = buildRecap(w);
     expect(r.hits!.map((h) => h.name)).toEqual([m.name, 'Reflect']);
@@ -61,8 +61,8 @@ describe('the death recap (the record a death sends)', () => {
   it('keeps damage over time as a total in the lines, not as a hit each tick', () => {
     const w = arena();
     w.t = 3;
-    for (let i = 0; i < 20; i++) logDamage(w, null, 'Burning', 3, 5);
-    logDamage(w, null, 'Crush', 0, 70);
+    for (let i = 0; i < 20; i++) logDamage(w, w.player, null, 'Burning', 3, 5);
+    logDamage(w, w.player, null, 'Crush', 0, 70);
     const r = buildRecap(w);
     expect(r.hits!.map((h) => h.name)).toEqual(['Crush']);
     expect(r.lines.find((l) => l.name === 'Burning')?.amount).toBe(100);
@@ -72,7 +72,7 @@ describe('the death recap (the record a death sends)', () => {
     const w = arena();
     for (let i = 0; i < 30; i++) {
       w.t = 20 + i * 0.1;
-      logDamage(w, null, `h${i}`, 0, 10);
+      logDamage(w, w.player, null, `h${i}`, 0, 10);
     }
     w.t = 25;
     const r = buildRecap(w);
@@ -114,7 +114,7 @@ describe('the death recap (the record a death sends)', () => {
     expect(r.near).toEqual({ all: 3, magic: 1, rare: 1, boss: 0 });
     expect(r.defence!.armour).toBe(w.player.def.armour);
     expect(r.vitals!.life).toBe(w.player.life);
-    expect(r.flasks).toHaveLength(w.flasks.length);
+    expect(r.flasks).toHaveLength(w.sides[0].flasks.length);
     for (const f of r.flasks!) expect(f.uses).toBe(0);
   });
 });

@@ -476,7 +476,7 @@ export function fieldKill(w: World, dead: Actor): void {
       Math.hypot(dead.x - f.x, dead.y - f.y) <= f.radius + dead.r &&
       w.rngTrig.chance(f.killCharge.chance / 100)
     )
-      gainCharge(w, f.killCharge.kind);
+      gainCharge(w, w.player.side!, f.killCharge.kind);
 }
 
 /** Run the fields: they pulse, they grow, they end. */

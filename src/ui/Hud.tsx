@@ -339,7 +339,7 @@ function Charges({ w }: { w: World }) {
 
 /** The reprieves carried (docs/WAYSIDE.md 7), in the status line: what each will do, or that it has just been used. */
 function ReprieveBadge({ w }: { w: World }) {
-  const r = w.reprieve;
+  const r = w.sides[0].reprieve;
   if (!r.held.length) return null;
   // The first of each kind in the order of use that has fired is shown as used.
   const left = [...r.fired];
@@ -464,7 +464,7 @@ export function Hud({ c }: { c: Controller }) {
         <span {...infoProps(w.plan.biome.text)}>{w.plan.biome.name}</span>
         <span {...infoProps(leadText(w.plan.theme))}>{leadNames(w.plan.theme)}</span>
         <span>Level {w.build.level}</span>
-        <span>Kills {w.stats.kills}</span>
+        <span>Kills {w.sides[0].stats.kills}</span>
         <span {...infoProps('Time spent on this level. It stops while the game is paused.')}>
           {formatLevelTime(w.t)}
         </span>
@@ -550,7 +550,7 @@ export function Hud({ c }: { c: Controller }) {
           <Charges w={w} />
           <SkillBar w={w} />
           <div class="flasks">
-            {w.flasks.map((f, i) => {
+            {w.sides[0].flasks.map((f, i) => {
               const pct = f.spec.maxCharges > 0 ? (f.charges / f.spec.maxCharges) * 100 : 0;
               const ready = f.charges >= f.spec.perUse;
               const kindLabel =

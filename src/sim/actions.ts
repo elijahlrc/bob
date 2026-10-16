@@ -97,16 +97,16 @@ export function startAction(
   }
   w.events.push({ t: 'use', src: a.id, skill: p.skill.id });
   if (a.isPlayer) skillUsed(w, p.skill.id);
-  if (a.isPlayer && p.isAttack) fireTriggers(w, { on: 'attack', target, tags: p.tagMask });
+  if (a.isPlayer && p.isAttack) fireTriggers(w, a.side!, { on: 'attack', target, tags: p.tagMask });
   // Using a skill can grant a buff of its own (Flicker Strike's burst of speed).
   if (a.isPlayer) {
     rollGains(w, 'use', p.gains);
-    rollCharges(w, 'use', p.gains);
+    rollCharges(w, a.side!, 'use', p.gains);
   }
   if (a.isPlayer && !p.isAttack) {
-    fireTriggers(w, { on: 'cast', target, tags: p.tagMask });
+    fireTriggers(w, a.side!, { on: 'cast', target, tags: p.tagMask });
     rollGains(w, 'cast', p.gains);
-    rollCharges(w, 'cast', p.gains);
+    rollCharges(w, a.side!, 'cast', p.gains);
   }
   // Fighting is noisy: idle monsters nearby come running even if they have not seen the player.
   if (a.isPlayer)
@@ -442,7 +442,7 @@ export function fire(w: World, a: Actor, act: Action): void {
   if (a.isPlayer && act.profile.skill.consumeCharges)
     for (const kind of CHARGE_KINDS) {
       const n = w.char.charges[kind];
-      if (n > 0) spendCharges(w, kind, n);
+      if (n > 0) spendCharges(w, a.side!, kind, n);
     }
 }
 
@@ -549,7 +549,7 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
   if (p.skill.chargedSlam && a.isPlayer && act.which !== 'channelled') {
     const cs = p.skill.chargedSlam;
     if (w.char.charges[cs.charge] > 0 && w.rngTrig.chance(cs.chance / 100)) {
-      spendCharges(w, cs.charge, 1);
+      spendCharges(w, a.side!, cs.charge, 1);
       const q = scaleProfile(p, 1 + cs.more / 100);
       fireEffect(w, a, {
         ...act,
@@ -841,10 +841,11 @@ export function updateProjectiles(w: World, dt: number): void {
       if (!w.grid.isFloor(Math.floor(pr.x), Math.floor(pr.y))) {
         // A shot that struck something before it reached the wall was not blocked by it.
         if (owner?.isPlayer && pr.hitIds.length === 0) {
-          w.stats.wallBlocked++;
-          if (w.t - w.ai.blockedT > BLOCK_WINDOW) w.ai.blocked = 0;
-          if (w.ai.blocked === 0) w.ai.blockedT = w.t;
-          w.ai.blocked++;
+          const os = owner.side!;
+          os.stats.wallBlocked++;
+          if (w.t - os.ai.blockedT > BLOCK_WINDOW) os.ai.blocked = 0;
+          if (os.ai.blocked === 0) os.ai.blockedT = w.t;
+          os.ai.blocked++;
         }
         if (pr.profile.skill.wander && pr.travelled < pr.maxRange) {
           // A wandering spark turns about at a wall and goes on.

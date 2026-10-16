@@ -150,7 +150,7 @@ describe('monster behaviours in the sim (§12.5, §12.7)', () => {
     const run = newRun('vanguard', 5);
     run.build.level = 30;
     const { world } = createDummyWorld(run.build, { distance: 25 });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     return world;
   }
 

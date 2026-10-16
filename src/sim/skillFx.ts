@@ -12,6 +12,7 @@ import { spellBaseDamage } from '../data/constants';
 import { applySkillDot } from './skillDots';
 import type { Field } from './fields';
 import type { Action, Actor, Projectile, World } from './types';
+import type { Side } from './side';
 
 /**
  * What single skills do beyond the common machinery (docs/SPIRIT.md S13): a line wave that sets off shockwaves, and the like.
@@ -247,23 +248,23 @@ function pulseBeams(w: World, c: SkillChoice, spec: BeamSpec): void {
 // ---- Infernal Blow: a debuff that charges with hits and bursts
 
 /** A hit of the skill puts a charge on the enemy (renewing the time); the most charges set it off at once. */
-export function chargeEnemy(w: World, dst: Actor, p: SkillProfile): void {
+export function chargeEnemy(w: World, s: Side, dst: Actor, p: SkillProfile): void {
   const spec = p.skill.charge;
   if (!spec || !dst.alive) return;
   const st = (w.charged[dst.id] ??= { n: 0, t: 0, key: p.skill.id });
   st.n = Math.min(spec.max, st.n + 1);
   st.t = spec.seconds * p.skillDuration;
-  if (st.n >= spec.max) detonate(w, dst);
+  if (st.n >= spec.max) detonate(w, s, dst);
 }
 
 /** The charged debuff goes off: an area about the enemy, hard for each charge it had. */
-function detonate(w: World, e: Actor): void {
+function detonate(w: World, s: Side, e: Actor): void {
   const st = w.charged[e.id];
   if (!st) return;
   delete w.charged[e.id];
   const c = w.char.actives.find((x) => x.skill.id === st.key);
   if (!c || !c.usable) return;
-  const prof = w.char.profile(c, playerConds(w, e), flaskMask(w));
+  const prof = w.char.profile(c, playerConds(w, e), flaskMask(w, s));
   const spec = prof.skill.charge!;
   const q = scaleProfile(prof, (st.n * spec.perCharge) / 100);
   const r = spec.radius * prof.radiusMult;
@@ -293,24 +294,24 @@ export function chargedDeath(w: World, dead: Actor): void {
   if (!st) return;
   const c = w.char.actives.find((x) => x.skill.id === st.key);
   const spec = c?.usable ? w.char.profile(c, 0).skill.charge : undefined;
-  detonate(w, dead);
+  detonate(w, w.player.side!, dead);
   if (spec) corpseBlast(w, dead, spec.deathPct, 'fire', spec.radius);
 }
 
-function tickCharged(w: World, dt: number): void {
+function tickCharged(w: World, s: Side, dt: number): void {
   for (const key in w.charged) {
     const id = Number(key);
     const st = w.charged[id];
     st.t -= dt;
     if (st.t > 0) continue;
     const e = w.actors.find((x) => x.id === id);
-    if (e && e.alive) detonate(w, e);
+    if (e && e.alive) detonate(w, s, e);
     else delete w.charged[id];
   }
 }
 
 /** Every step: the buffs and debuffs the single skills keep. */
-export function tickSkillFx(w: World, dt: number): void {
+export function tickSkillFx(w: World, s: Side, dt: number): void {
   if (w.relicRegen.t > 0) tickRelicRegen(w, dt);
   if (w.shell) tickShell(w);
   if (w.staticFx) tickBeams(w, dt);
@@ -324,7 +325,7 @@ export function tickSkillFx(w: World, dt: number): void {
   if (w.fuses.length > 0) tickFuses(w, dt);
   if (w.spores.length > 0) tickSpores(w, dt);
   for (const _ in w.charged) {
-    tickCharged(w, dt);
+    tickCharged(w, s, dt);
     break;
   }
 }
@@ -704,13 +705,13 @@ export function frostBite(w: World, attacker: Actor): void {
 // ---- Herald of Agony: Virulence, and the crawler that follows it
 
 /** A poison the character's hit put on an enemy while the herald stands: a point of Virulence, and the crawler if none lives. */
-export function gainVirulence(w: World): void {
+export function gainVirulence(w: World, s: Side): void {
   const ag = w.char.agonySpec;
   if (!ag || !w.player.alive) return;
   w.virulence = Math.min(ag.max, w.virulence + 1);
   if (w.minions.some((m) => m.kind === 'crawler' && m.alive)) return;
   const c = w.char.primary;
-  const prof = w.char.profile(c, playerConds(w, null), flaskMask(w));
+  const prof = w.char.profile(c, playerConds(w, null), flaskMask(w, s));
   const m = makeMinion(w, c, prof, 'crawler', w.player.x, w.player.y, {
     blowLevel: ag.level,
     seconds: undefined,

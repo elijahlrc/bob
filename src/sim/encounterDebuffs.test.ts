@@ -70,7 +70,7 @@ describe('debuffs on the character (docs/ENCOUNTERS.md 7)', () => {
     steps(w, 70);
     expect(tithing(m)).toBe(true);
     expect(m.life).toBeGreaterThan(m.def.maxLife * 0.5);
-    const drawn = w.dmgLog.filter((l) => l.name === 'Tithe');
+    const drawn = w.sides[0].dmgLog.filter((l) => l.name === 'Tithe');
     expect(drawn.length).toBeGreaterThan(1);
     // About its hit a second.
     expect(drawn[0].amount).toBeGreaterThan(3);
@@ -106,7 +106,7 @@ describe('debuffs on the character (docs/ENCOUNTERS.md 7)', () => {
     const w = arena();
     const m = put(w, 'gloomstalker', 6);
     const prof = m.mon!.sidearm!.profile(0);
-    w.opts.godMode = true;
+    w.sides[0].opts.godMode = true;
     for (let i = 0; i < 20 && !w.player.fx.blind; i++) hit(w, m, w.player, prof, 0, 6);
     expect(w.player.fx.blind).toBeDefined();
     expect(w.player.fx.blind!.v).toBe(50);

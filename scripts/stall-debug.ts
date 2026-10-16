@@ -66,10 +66,10 @@ while (run.phase === 'camp' && run.map <= 40 && !done) {
         const t = w.actors.find((a) => a.id === stallId)!;
         const prof = w.char.profile(w.primary);
         console.log(
-          `t=${w.t.toFixed(2)} mode=${w.ai.mode} p=(${p.x.toFixed(2)},${p.y.toFixed(2)}) moving=${p.moving} act=${p.action?.which ?? '-'} ` +
+          `t=${w.t.toFixed(2)} mode=${w.sides[0].ai.mode} p=(${p.x.toFixed(2)},${p.y.toFixed(2)}) moving=${p.moving} act=${p.action?.which ?? '-'} ` +
             `stun=${p.stunT.toFixed(2)} frz=${p.ail.freezeT.toFixed(2)} | tgt=${t.name} (${t.x.toFixed(2)},${t.y.toFixed(2)}) ` +
             `d=${Math.hypot(t.x - p.x, t.y - p.y).toFixed(2)} state=${t.state} tact=${t.action?.which ?? '-'} reach=${(skillRange(prof) + t.r).toFixed(2)} ` +
-            `usable=${w.primary.usable} mana=${p.mana.toFixed(0)}/${prof.cost.toFixed(0)} proj=${w.projectiles.length} id=${w.ai.targetId}`,
+            `usable=${w.primary.usable} mana=${p.mana.toFixed(0)}/${prof.cost.toFixed(0)} proj=${w.projectiles.length} id=${w.sides[0].ai.targetId}`,
         );
       }
     });

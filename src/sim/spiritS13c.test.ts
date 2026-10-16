@@ -30,8 +30,8 @@ function neighbour(w: World, x: number, y: number): Actor {
 
 function world(gems: string[], distance: number, main: string, cls: string) {
   const run = createDummyWorld(buildFor(gems, main, cls), { distance, maxTime: 120 });
-  run.world.opts.freeResources = true;
-  run.world.opts.godMode = true;
+  run.world.sides[0].opts.freeResources = true;
+  run.world.sides[0].opts.godMode = true;
   run.dummy.def = dummyDefence({ maxLife: 1e9 });
   run.dummy.life = 1e9;
   return run;
@@ -177,18 +177,18 @@ describe('Spell Cascade, Intensify, Unleash (flankingCast, swellingBlast, double
     expect(n).toBeLessThanOrEqual(4);
     w.player.action = null;
     w.player.moving = true;
-    for (let i = 0; i < 30; i++) tickSupports(w, 1 / 60);
+    for (let i = 0; i < 30; i++) tickSupports(w, w.sides[0], 1 / 60);
     const after = w.intensity.suddenFrost ?? 0;
     expect(after).toBeLessThan(n);
     w.player.moving = false;
-    for (let i = 0; i < 60; i++) tickSupports(w, 1 / 60);
+    for (let i = 0; i < 60; i++) tickSupports(w, w.sides[0], 1 / 60);
     expect(w.intensity.suddenFrost ?? 0).toBe(after);
   });
 
   it('Unleash: seals gather while the spell rests, up to three, and the next cast spends them as repeats', () => {
     const { world: w } = world(['frostLance', 'doubleRelease'], 6, 'wand_3', INT);
     w.player.action = null;
-    for (let i = 0; i < 4 * 60; i++) tickSupports(w, 1 / 60);
+    for (let i = 0; i < 4 * 60; i++) tickSupports(w, w.sides[0], 1 / 60);
     const had = w.seals.frostLance.n;
     expect(had).toBe(3);
     run(w, 1);
@@ -232,7 +232,7 @@ describe('Energy Leech, Mirage Archer, Inspiration, Infused Channelling', () => 
     build.equipment.body!.uniqueMods = [{ stat: 'es', kind: 'base', value: 300 }];
     const r0 = createDummyWorld(build, { distance: 1.4, maxTime: 120 });
     const w = r0.world;
-    w.opts.godMode = true;
+    w.sides[0].opts.godMode = true;
     r0.dummy.def = dummyDefence({ maxLife: 1e9 });
     r0.dummy.life = 1e9;
     expect(w.player.def.maxEs).toBeGreaterThan(200);

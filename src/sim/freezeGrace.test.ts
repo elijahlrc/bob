@@ -18,7 +18,7 @@ function arena(): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.opts.godMode = true;
+  world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
 }

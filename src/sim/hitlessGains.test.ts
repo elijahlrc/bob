@@ -26,8 +26,8 @@ describe('skills that deal no hit of their own still count as landing', () => {
       ];
       const run = createDummyWorld(b, { distance: 3, maxTime: 60 });
       const w = run.world;
-      w.opts.freeResources = true;
-      w.opts.godMode = true;
+      w.sides[0].opts.freeResources = true;
+      w.sides[0].opts.godMode = true;
       run.dummy.def = dummyDefence({ maxLife: 1e9 });
       run.dummy.life = 1e9;
       let charged = 0;

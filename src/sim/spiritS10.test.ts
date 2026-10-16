@@ -28,8 +28,8 @@ function neighbour(w: World, x: number, y: number): Actor {
 
 function world(gems: string[], distance: number, main: string, cls: string, maxTime = 120) {
   const run = createDummyWorld(buildFor(gems, main, cls), { distance, maxTime });
-  run.world.opts.freeResources = true;
-  run.world.opts.godMode = true;
+  run.world.sides[0].opts.freeResources = true;
+  run.world.sides[0].opts.godMode = true;
   return run;
 }
 

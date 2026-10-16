@@ -23,7 +23,7 @@ import { densityFor } from '../data/density';
 import { makeMapPlan, type MapPlan } from '../gen/mapPlan';
 import { offerNoise } from '../gen/population';
 import { flaskMask, playerCtx } from '../sim/combat';
-import { fullVitals, type DeathRecap, type Vitals, type World, type WorldOpts } from '../sim/types';
+import { fullVitals, type DeathRecap, type Vitals, type MapOpts, type World } from '../sim/types';
 import type { MapResult } from '../sim/runMap';
 import { restAtCamp } from './camp';
 import { noteFound, stampAll } from './found';
@@ -267,14 +267,14 @@ export function affixRewards(
 
 /** The character's item quantity and rarity multipliers, with any flask active right now. */
 export function lootMults(w: World): { quantity: number; rarity: number } {
-  const db = w.char.dbWith(flaskMask(w));
+  const db = w.char.dbWith(flaskMask(w, w.sides[0]));
   // A mod may hold only on low life or while a flask is active: ask with the conditions that hold now.
   const ctx = playerCtx(w);
   return { quantity: db.mult('itemQuantity', ctx), rarity: db.mult('itemRarity', ctx) };
 }
 
 /** World hooks that generate loot with the run's uid counter. */
-export function worldOptsFor(run: RunState, plan: MapPlan): WorldOpts {
+export function worldOptsFor(run: RunState, plan: MapPlan): MapOpts {
   const uid = uidSource(run);
   return {
     start: run.vitals,

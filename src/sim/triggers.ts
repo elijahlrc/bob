@@ -8,6 +8,7 @@ import { registerBlast } from './factions';
 import { startStorm } from './fields';
 import { flaskMask, lifeCap, playerConds, playerCtx, pushDot, rawHit, wake } from './combat';
 import type { Actor, Action, World } from './types';
+import type { Side } from './side';
 
 /**
  * Triggers (EXPANSION 5.5). Rules, as in the reference game (AUDIT-3.9):
@@ -52,7 +53,7 @@ function matches(d: TriggerDef, ev: TriggerEvent, tagMask: number): boolean {
 }
 
 /** Offer an event to every trigger the player has. Cheap when there are none. */
-export function fireTriggers(w: World, ev: TriggerEvent): void {
+export function fireTriggers(w: World, s: Side, ev: TriggerEvent): void {
   const triggers = w.char.triggers;
   if (triggers.length === 0 || w.trig.busy || !w.player.alive) return;
   if ('tags' in ev && (ev.tags & TRIGGERED) !== 0) return;
@@ -69,7 +70,7 @@ export function fireTriggers(w: World, ev: TriggerEvent): void {
     const cdKey = skill ? `${src.key}:${skill.key}` : src.key;
     if ((w.trig.cooldown[cdKey] ?? 0) > 0) continue;
     if (d.chance < 100 && !w.rngTrig.chance(d.chance / 100)) continue;
-    if (!perform(w, d.effect, ev, skill)) continue;
+    if (!perform(w, s, d.effect, ev, skill)) continue;
     w.trig.cooldown[cdKey] = d.cooldown;
     w.trig.next[src.key] = turn + 1;
     if (d.on === 'hitTaken') w.trig.taken[src.key] = 0;
@@ -79,6 +80,7 @@ export function fireTriggers(w: World, ev: TriggerEvent): void {
 /** Run a trigger's effect. Returns whether it happened (so the cooldown starts). */
 function perform(
   w: World,
+  s: Side,
   e: TriggerEffect,
   ev: TriggerEvent,
   skill: SkillChoice | undefined,
@@ -86,7 +88,7 @@ function perform(
   switch (e.kind) {
     case 'castSocketed':
     case 'castGranted':
-      return skill ? castTriggered(w, skill, ev) : false;
+      return skill ? castTriggered(w, s, skill, ev) : false;
     case 'explode':
       return ev.on === 'kill' && explode(w, e, ev.target);
     case 'spread':
@@ -126,14 +128,14 @@ function nearestEnemy(w: World): Actor | null {
   return best;
 }
 
-function castTriggered(w: World, choice: SkillChoice, ev: TriggerEvent): boolean {
+function castTriggered(w: World, s: Side, choice: SkillChoice, ev: TriggerEvent): boolean {
   // A spell cast on a kill goes to the next enemy, or lands where the dead one fell.
   const target =
     ('target' in ev && ev.target.alive ? ev.target : null) ??
     nearestEnemy(w) ??
     (ev.on === 'kill' ? ev.target : null);
   if (!target) return false;
-  const prof = w.char.profile(choice, playerConds(w, target), flaskMask(w));
+  const prof = w.char.profile(choice, playerConds(w, target), flaskMask(w, s));
   const act: Action = {
     profile: prof,
     which: 'triggered',

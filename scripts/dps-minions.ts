@@ -38,7 +38,8 @@ for (const def of ACTIVE_GEMS) {
     seedFor(def, world, dummy);
     while (world.status === 'running') stepWorld(world);
     let sim = 0;
-    for (const row of world.ledger.dealt.minion.values()) sim += row.dmg.reduce((a, b) => a + b, 0);
+    for (const row of world.sides[0].ledger.dealt.minion.values())
+      sim += row.dmg.reduce((a, b) => a + b, 0);
     sim /= world.t;
     console.log(
       `${def.id.padEnd(20)} minions sheet ${f1(sheet).padStart(6)}  standing ${f1(standing).padStart(6)}  sim ${f1(sim).padStart(6)}  sim/standing ${(sim / Math.max(1e-9, standing)).toFixed(2)}`,

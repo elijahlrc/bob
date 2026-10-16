@@ -64,7 +64,7 @@ function play(ids: string[], o: { distance?: number; time?: number } = {}): Run 
   const rows: Run['rows'] = {};
   let total = 0;
   for (const kind of ['skill', 'minion', 'ailment', 'monster', 'effect'] as const)
-    for (const r of world.ledger.dealt[kind].values()) {
+    for (const r of world.sides[0].ledger.dealt[kind].values()) {
       const dmg = r.dmg.reduce((a, b) => a + b, 0);
       total += dmg;
       const row = (rows[r.name] ??= { dmg: 0, hits: 0 });

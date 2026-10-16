@@ -28,8 +28,8 @@ function neighbour(w: World, x: number, y: number): Actor {
 
 function world(gems: string[], distance = 1.5, main = 'sword_3', cls = STR) {
   const run = createDummyWorld(buildFor(gems, main, cls), { distance, maxTime: 120 });
-  run.world.opts.freeResources = true;
-  run.world.opts.godMode = true;
+  run.world.sides[0].opts.freeResources = true;
+  run.world.sides[0].opts.godMode = true;
   return run;
 }
 
@@ -188,8 +188,8 @@ describe('Blood Rage (bloodSurgeCall)', () => {
   it('costs life each second, a kill renews it, and it may give a charge', () => {
     const { world: w, dummy } = world(['crushingBlow', 'bloodSurgeCall'], 1.5, 'sword_3', DEX);
     dummy.rarity = 'boss';
-    w.opts.freeResources = false;
-    w.opts.godMode = false;
+    w.sides[0].opts.freeResources = false;
+    w.sides[0].opts.godMode = false;
     // Let a cast happen.
     for (let i = 0; i < 3 * 60 && w.buffT.bloodSurge <= 0; i++) stepWorld(w);
     expect(w.buffT.bloodSurge).toBeGreaterThan(0);
@@ -227,7 +227,7 @@ describe('Blood Rage (bloodSurgeCall)', () => {
 
   it('is let go when life runs low', () => {
     const { world: w } = world(['crushingBlow', 'bloodSurgeCall'], 1.5, 'sword_3', DEX);
-    w.opts.freeResources = false;
+    w.sides[0].opts.freeResources = false;
     for (let i = 0; i < 3 * 60 && w.buffT.bloodSurge <= 0; i++) stepWorld(w);
     expect(w.buffT.bloodSurge).toBeGreaterThan(0);
     w.player.stunT = 1e9;

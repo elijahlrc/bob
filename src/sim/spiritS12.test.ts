@@ -12,8 +12,8 @@ const STR = classFor('str');
 
 function world(gems: string[], distance = 4, main = 'wand_3', cls = INT) {
   const run = createDummyWorld(buildFor(gems, main, cls), { distance, maxTime: 120 });
-  run.world.opts.freeResources = true;
-  run.world.opts.godMode = true;
+  run.world.sides[0].opts.freeResources = true;
+  run.world.sides[0].opts.godMode = true;
   run.dummy.def = dummyDefence({ maxLife: 1e9 });
   run.dummy.life = 1e9;
   return run;

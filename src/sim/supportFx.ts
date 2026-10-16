@@ -9,6 +9,7 @@ import { spendCharges } from './charges';
 import { hit } from './combat';
 import { scaleProfile } from './shots';
 import type { Action, Actor, World } from './types';
+import type { Side } from './side';
 
 /**
  * What supports do around a use of a skill (docs/SPIRIT.md S13c): a Ruthless Blow every third use, Intensity built by casting, Seals
@@ -122,7 +123,7 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
       w.inspireMana = 0;
       for (const k of CHARGE_KINDS) {
         const n = w.char.charges[k];
-        if (n > 0 && k === 'insight') spendCharges(w, k, n);
+        if (n > 0 && k === 'insight') spendCharges(w, a.side!, k, n);
       }
     }
   }
@@ -130,7 +131,7 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
 }
 
 /** The Seals gained while the spell is not cast, the Intensity lost while the character moves, the mirage and the cooldowns. */
-export function tickSupports(w: World, dt: number): void {
+export function tickSupports(w: World, side: Side, dt: number): void {
   const p = w.player;
   const casting = p.action?.profile.skill.id;
   for (const c of w.char.actives) {
@@ -160,12 +161,12 @@ export function tickSupports(w: World, dt: number): void {
     m.t -= dt;
     m.fireT -= dt;
     if (m.t <= 0) w.mirage = null;
-    else if (m.fireT <= 0) mirageShoots(w, m);
+    else if (m.fireT <= 0) mirageShoots(w, side, m);
   }
 }
 
 /** The mirage archer shoots the nearest enemy in reach, with the skill it was called by. */
-function mirageShoots(w: World, m: Mirage): void {
+function mirageShoots(w: World, s: Side, m: Mirage): void {
   const c = w.char.actives.find((x) => x.key === m.key);
   if (!c) return;
   const prof = w.char.profile(c, 0);
@@ -185,18 +186,18 @@ function mirageShoots(w: World, m: Mirage): void {
     m.fireT = 0.2;
     return;
   }
-  shootFrom(w, m.x, m.y, c, best, 1 - spec.less / 100);
+  shootFrom(w, s, m.x, m.y, c, best, 1 - spec.less / 100);
   m.fireT = prof.useTime / Math.max(0.05, 1 - spec.slow / 100);
 }
 
 /** After a hit of the player's lands: a mirage archer is called, a shockwave goes off. */
-export function afterPlayerHit(w: World, dst: Actor, p: SkillProfile): void {
+export function afterPlayerHit(w: World, s: Side, dst: Actor, p: SkillProfile): void {
   // A skill whose hit gives the character a buff (Smite).
   if (p.skill.hitBuff && !p.skill.tags.includes('triggered')) gainBuff(w, p.skill.hitBuff.buff);
   if (p.isAttack && !p.skill.tags.includes('triggered')) relicNova(w);
   if (!w.inFx) {
     if (p.skill.beams) gainBeamStack(w, p);
-    if (p.skill.charge) chargeEnemy(w, dst, p);
+    if (p.skill.charge) chargeEnemy(w, s, dst, p);
   }
   if (p.mirage && !w.mirage && p.isAttack && dst.alive) {
     const c = w.char.actives.find((x) => x.skill.id === p.skill.id);

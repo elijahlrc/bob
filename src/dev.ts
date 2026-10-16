@@ -82,7 +82,7 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
       await dev.step(5);
       const w = controller.world;
       if (!w) return 0;
-      w.opts.godMode = true;
+      w.sides[0].opts.godMode = true;
       w.player.stunT = 1e9;
       for (const a of w.actors) if (!a.isPlayer) a.alive = false;
       const cols = opts.cols ?? 4;
@@ -168,7 +168,7 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
       await dev.step(5);
       const w = controller.world;
       if (!w) return -1;
-      w.opts.godMode = !opts.mortal;
+      w.sides[0].opts.godMode = !opts.mortal;
       for (const a of w.actors) if (!a.isPlayer) a.alive = false;
       const p = w.player;
       const ang = Math.atan2(w.plan.lab.exit.y - p.y, w.plan.lab.exit.x - p.x);

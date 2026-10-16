@@ -3,6 +3,7 @@ import { armourReduction } from '../calc/formulas';
 import type { FlaskSpec } from '../calc/flasks';
 import { flasksSealed } from './theft';
 import type { World } from './types';
+import type { Side } from './side';
 
 /** Whether a cleansing flask would clear something on the character now (docs/BOSSES.md 11.2). */
 function cleansNow(w: World, s: FlaskSpec): boolean {
@@ -40,9 +41,9 @@ function braceFor(w: World): boolean {
  * Automatic flask use (§6.9). Replaceable later by manual input: the sim asks the policy which
  * flask indices to use this tick.
  */
-export type FlaskPolicy = (w: World) => number[];
+export type FlaskPolicy = (w: World, s: Side) => number[];
 
-export const autoFlaskPolicy: FlaskPolicy = (w) => {
+export const autoFlaskPolicy: FlaskPolicy = (w, s) => {
   const p = w.player;
   const out: number[] = [];
   // The Unmaker holds them (docs/BOSSES.md 9).
@@ -58,7 +59,7 @@ export const autoFlaskPolicy: FlaskPolicy = (w) => {
   let nearby = 0;
   let nearest = Infinity;
   // The surroundings only matter to a utility flask that could be drunk now: most ticks there is none.
-  const wantsSurroundings = w.flasks.some(
+  const wantsSurroundings = s.flasks.some(
     (f) => f.spec.kind === 'utility' && f.activeT <= 0 && f.charges >= f.spec.perUse,
   );
   if (wantsSurroundings) {
@@ -75,11 +76,11 @@ export const autoFlaskPolicy: FlaskPolicy = (w) => {
     }
     nearest = Math.sqrt(nearest2);
   }
-  const lifeActive = w.flasks.some(
+  const lifeActive = s.flasks.some(
     (f) => (f.spec.kind === 'life' || f.spec.kind === 'hybrid') && (f.activeT > 0 || f.queued),
   );
   let usedLife = false;
-  w.flasks.forEach((f, i) => {
+  s.flasks.forEach((f, i) => {
     if (f.charges < f.spec.perUse) return;
     const k = f.spec.kind;
     // A flask that cleanses is drunk for what it cleanses, as a player would (3.9 cleansing suffixes).

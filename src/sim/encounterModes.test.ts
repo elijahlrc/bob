@@ -23,7 +23,7 @@ function arena(): World {
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
   world.player.stunT = 1e9;
-  world.opts.godMode = true;
+  world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
 }
@@ -211,9 +211,9 @@ describe('windows and modes (docs/ENCOUNTERS.md 5 and 6)', () => {
     const w = arena();
     const m = put(w, 'guard', 1.6);
     m.enc!.openT = 1;
-    const before = w.dmgLog.length;
+    const before = w.sides[0].dmgLog.length;
     strike(w, m, [1, 0, 0, 0, 0]);
-    expect(w.dmgLog.slice(before).some((l) => l.name === 'Counter-stance')).toBe(true);
+    expect(w.sides[0].dmgLog.slice(before).some((l) => l.name === 'Counter-stance')).toBe(true);
   });
 
   it("a Sanctuary shelters the Choirmaster's allies, not the Choirmaster, until a stun silences it", () => {

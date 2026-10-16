@@ -28,12 +28,12 @@ describe('carry-over: the start of a map (docs/MAPS.md section 8.1)', () => {
     expect(run.vitals).toEqual(fullVitals());
     const w = createWorld({ plan: planFor(run, run.offers[0]), build: run.build, xp: 0 });
     expect(w.player.life).toBeCloseTo(lifeCap(w, w.player));
-    expect(w.flasks.every((f) => f.charges === f.spec.maxCharges)).toBe(true);
+    expect(w.sides[0].flasks.every((f) => f.charges === f.spec.maxCharges)).toBe(true);
     expect(vitalsOf(w)).toEqual({
       life: 1,
       mana: 1,
       es: 1,
-      flasks: Object.fromEntries(w.flasks.map((f) => [f.spec.uid, 1])),
+      flasks: Object.fromEntries(w.sides[0].flasks.map((f) => [f.spec.uid, 1])),
     });
   });
 
@@ -45,8 +45,8 @@ describe('carry-over: the start of a map (docs/MAPS.md section 8.1)', () => {
     const w = createWorld({ plan, build: run.build, xp: 0, opts: { start } });
     expect(w.player.life).toBeCloseTo(lifeCap(w, w.player) * 0.5);
     expect(w.player.mana).toBeCloseTo((w.player.def.maxMana - w.char.reservedMana) * 0.25);
-    const a = w.flasks.find((f) => f.spec.uid === first!.uid)!;
-    const b = w.flasks.find((f) => f.spec.uid === second!.uid)!;
+    const a = w.sides[0].flasks.find((f) => f.spec.uid === first!.uid)!;
+    const b = w.sides[0].flasks.find((f) => f.spec.uid === second!.uid)!;
     expect(a.charges).toBeCloseTo(a.spec.maxCharges * 0.4);
     expect(b.charges).toBe(b.spec.maxCharges);
   });

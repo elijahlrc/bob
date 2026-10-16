@@ -64,7 +64,7 @@ export function bossArena(level = 40): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.opts.godMode = true;
+  world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
 }
@@ -280,7 +280,7 @@ describe('the Magistrate (docs/BOSSES.md 6)', () => {
     // Put one Witness a little farther than the Magistrate: it still comes first.
     st.witnesses[0].x = w.player.x - 5;
     st.witnesses[0].y = w.player.y;
-    expect(findTargetForTest(w)?.mon?.spec.type).toBe('witness');
+    expect(findTargetForTest(w, w.sides[0])?.mon?.spec.type).toBe('witness');
   });
 
   it('the dodge does not try to step out of a Sentence', async () => {
@@ -506,9 +506,9 @@ describe('the Siege Marshal (docs/BOSSES.md 5a)', () => {
       s.x = w.player.x + 2;
       s.y = w.player.y;
     }
-    expect(findTargetForTest(w)?.mon?.spec.type).not.toBe('siegeMarshal');
+    expect(findTargetForTest(w, w.sides[0])?.mon?.spec.type).not.toBe('siegeMarshal');
     for (const s of st.soldiers) s.alive = false;
-    expect(findTargetForTest(w)).toBe(m);
+    expect(findTargetForTest(w, w.sides[0])).toBe(m);
   });
 
   it('the soldiers go with him when he falls', async () => {
@@ -637,7 +637,7 @@ describe('the Bulwark Engine (docs/BOSSES.md 5c)', () => {
 
   it('its blows stun the character, once in the boss lock', () => {
     const w = bossArena(62);
-    w.opts.godMode = true;
+    w.sides[0].opts.godMode = true;
     putBoss(w, 'bulwarkEngine', 1.8, 0, 60);
     let stuns = 0;
     for (let i = 0; i < 60 * 12; i++) {

@@ -42,8 +42,8 @@ function world(
   off: 'none' | 'dual' | 'shield' = 'none',
 ) {
   const run = createDummyWorld(buildFor(gems, main, cls, off), { distance, maxTime: 120 });
-  run.world.opts.freeResources = true;
-  run.world.opts.godMode = true;
+  run.world.sides[0].opts.freeResources = true;
+  run.world.sides[0].opts.godMode = true;
   run.dummy.def = dummyDefence({ maxLife: 1e9 });
   run.dummy.life = 1e9;
   return run;
@@ -126,7 +126,7 @@ describe('counter-attacks (bladeWind, rimeRebuke)', () => {
     const near = neighbour(w, dummy.x, dummy.y + 0.4);
     let n = 0;
     for (let i = 0; i < 3; i++) {
-      fireTriggers(w, { on: 'block' });
+      fireTriggers(w, w.sides[0], { on: 'block' });
       for (const e of w.events) if (e.t === 'trigger') n++;
       w.events.length = 0;
     }
@@ -139,13 +139,13 @@ describe('counter-attacks (bladeWind, rimeRebuke)', () => {
     const { world: w, dummy } = world(['crushingBlow', 'rimeRebuke'], 1.2, 'sword_3', STR);
     w.player.stunT = 100;
     w.player.mana = 0;
-    fireTriggers(w, { on: 'block' });
+    fireTriggers(w, w.sides[0], { on: 'block' });
     expect(dummy.life).toBeLessThan(1e9);
     const left = dummy.life;
-    fireTriggers(w, { on: 'block' });
+    fireTriggers(w, w.sides[0], { on: 'block' });
     expect(dummy.life).toBe(left);
     run(w, 1);
-    fireTriggers(w, { on: 'block' });
+    fireTriggers(w, w.sides[0], { on: 'block' });
     expect(dummy.life).toBeLessThan(left);
   });
 });
@@ -561,7 +561,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     w.fields.length = 0;
     for (let i = 0; i < 90; i++) {
       w.player.moving = true;
-      tickSkillFx(w, 1 / 60);
+      tickSkillFx(w, w.sides[0], 1 / 60);
     }
     expect(w.fields.filter((f) => f.kind === 'chilling').length).toBeGreaterThanOrEqual(2);
   });
@@ -588,8 +588,8 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     const others = Array.from({ length: 3 }, (_, i) =>
       neighbour(w, dummy.x + 0.5 * i, dummy.y + 0.8),
     );
-    w.opts.godMode = false;
-    w.opts.freeResources = false;
+    w.sides[0].opts.godMode = false;
+    w.sides[0].opts.freeResources = false;
     w.player.life = 10;
     let got = 0;
     for (let i = 0; i < 60 * 8; i++) {
@@ -628,7 +628,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     // Beside them, an enemy is chilled and shocked.
     const bot = w.minions.find((m) => m.bot)!;
     const foe = neighbour(w, bot.x + 0.5, bot.y);
-    tickSkillFx(w, 1 / 60);
+    tickSkillFx(w, w.sides[0], 1 / 60);
     expect(foe.ail.chill + foe.ail.shock).toBeGreaterThan(0);
     void dummy;
   });
@@ -636,7 +636,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
   it('Smoke Mine: the character gets away when hurt, with smoke at both ends that blinds, and a speed buff', () => {
     const { world: w, dummy } = world(['crushingBlow', 'smokeCharge'], 1.5, 'sword_3', DEX);
     const start = { x: w.player.x, y: w.player.y };
-    w.opts.godMode = true;
+    w.sides[0].opts.godMode = true;
     w.player.life = w.player.def.maxLife * 0.4;
     for (let i = 0; i < 60 && w.fields.length === 0; i++) stepWorld(w);
     expect(Math.hypot(w.player.x - start.x, w.player.y - start.y)).toBeGreaterThan(2.5);
@@ -670,7 +670,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
 
   it('Molten Shell: most of the damage goes into a pool, and when the shell ends what it took goes out as fire', () => {
     const { world: w, dummy } = world(['crushingBlow', 'slagCarapace'], 1.2, 'sword_3', STR);
-    w.opts.godMode = true;
+    w.sides[0].opts.godMode = true;
     w.player.life = w.player.def.maxLife * 0.4;
     for (let i = 0; i < 90 && !w.shell; i++) stepWorld(w);
     expect(w.shell).not.toBeNull();
@@ -722,8 +722,8 @@ describe('carrying damage about oneself (searingMantle, orbitingBlades)', () => 
 
   it('the burning aura switches off at low life and on again once the life is back', () => {
     const { world: w, dummy } = world(['arcChain', 'searingMantle'], 1.5, 'wand_3', INT);
-    w.opts.godMode = false;
-    w.opts.freeResources = false;
+    w.sides[0].opts.godMode = false;
+    w.sides[0].opts.freeResources = false;
     const p = w.player;
     run(w, 1.5);
     expect(dummy.life).toBeLessThan(1e9);
@@ -825,8 +825,8 @@ describe('repairs from the fresh audit (S14)', () => {
 
   it('Holy Relic answers an attack hit with a nova and mends the character', () => {
     const { world: w, dummy } = world(['crushingBlow', 'hallowedRelic'], 1.4, 'sword_3', STR);
-    w.opts.godMode = true;
-    w.opts.freeResources = false;
+    w.sides[0].opts.godMode = true;
+    w.sides[0].opts.freeResources = false;
     const near = neighbour(w, dummy.x + 0.5, dummy.y + 0.5);
     run(w, 6);
     expect(w.minions.some((m) => m.kind === 'relic')).toBe(true);

@@ -152,7 +152,7 @@ describe('the status layer', () => {
 describe('the skills that inflict statuses', () => {
   const effectsOf = (gems: string[], seconds = 15) => {
     const { world, dummy } = createDummyWorld(holding(gems), { distance: 1.2 });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const seen = new Set<string>();
     for (let i = 0; i < seconds * 60; i++) {
       stepWorld(world);
@@ -170,7 +170,7 @@ describe('the skills that inflict statuses', () => {
 
   it('Rout sends a normal monster running', () => {
     const { world, dummy } = createDummyWorld(holding(['crushingBlow', 'rout']), { distance: 1.2 });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     dummy.rarity = 'normal';
     let fled = false;
     for (let i = 0; i < 20 * 60 && !fled; i++) {
@@ -193,7 +193,7 @@ describe('the curses and marks with their reference effects', () => {
 
   it('effects on a cursed enemy run out more slowly under Temporal Chains', () => {
     const { world, dummy } = createDummyWorld(holding(['crushingBlow']), { distance: 3 });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     world.player.stunT = 1e9;
     dummy.ail.ignites.push({ dps: 1, t: 2 });
     applyHex(world, dummy, 'leadenLimbs', 25, 1, 10);
@@ -231,7 +231,7 @@ describe('the curses and marks with their reference effects', () => {
     const { world, dummy } = createDummyWorld(holding(['crushingBlow', 'penance']), {
       distance: 1.2,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     // The curse is cast by the character; against the first enemy it hits it is a melee attack that counts.
     applyHex(world, dummy, 'hardTimes', 20, 1, 10);
     let seen = false;
@@ -260,7 +260,7 @@ describe('the skills that lean on statuses', () => {
 
   it('Ensnaring Arrow snares what it hits, and the snared take more from projectile attacks', () => {
     const { world, dummy } = createDummyWorld(bow(['snareShot']), { distance: 4 });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     for (let i = 0; i < 6 * 60 && !dummy.fx.ensnared; i++) stepWorld(world);
     expect(dummy.fx.ensnared).toBeDefined();
     expect(dummy.fx.ensnared!.x).toBeGreaterThan(0);
@@ -292,8 +292,8 @@ describe('the skills that lean on statuses', () => {
     const { world, dummy } = createDummyWorld(holding(['crushingBlow', 'kindledBellow']), {
       distance: 2,
     });
-    world.opts.freeResources = true;
-    world.opts.godMode = true;
+    world.sides[0].opts.freeResources = true;
+    world.sides[0].opts.godMode = true;
     dummy.rarity = 'boss';
     const near = [0, 1, 2].map((i) =>
       spawnMonster(
@@ -316,7 +316,7 @@ describe('the skills that lean on statuses', () => {
 
   it('Wave of Conviction exposes the enemy to the element it took the most damage from', () => {
     const { world, dummy } = createDummyWorld(holding(['tideOfJudgement']), { distance: 2 });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const seen = new Set<string>();
     for (let i = 0; i < 12 * 60; i++) {
       stepWorld(world);
@@ -333,8 +333,8 @@ describe('Wither (rotTouch)', () => {
       distance: 1.5,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
-    world.opts.godMode = true;
+    world.sides[0].opts.freeResources = true;
+    world.sides[0].opts.godMode = true;
     for (let i = 0; i < 5 * 60; i++) stepWorld(world);
     expect(dummy.fx.withered).toBeDefined();
     expect(dummy.fx.withered!.n).toBeGreaterThan(3);

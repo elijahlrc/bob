@@ -60,6 +60,7 @@ import {
   type SkillWhen,
 } from '../data/strategy';
 import type { Actor, World } from './types';
+import type { Side } from './side';
 
 function canAct(a: Actor): boolean {
   return a.alive && !a.action && a.stunT <= 0 && a.ail.freezeT <= 0;
@@ -87,8 +88,8 @@ export function step(w: World, a: Actor, dx: number, dy: number, dt: number): vo
 }
 
 /** Walk toward a point using direct movement when visible, otherwise A*. */
-function moveTo(w: World, a: Actor, tx: number, ty: number, dt: number): void {
-  const ai = w.ai;
+function moveTo(w: World, s: Side, a: Actor, tx: number, ty: number, dt: number): void {
+  const ai = s.ai;
   if (w.grid.los(a.x, a.y, tx, ty) && clearPath(w, a.x, a.y, tx, ty, a.r)) {
     ai.path = [];
     step(w, a, tx - a.x, ty - a.y, dt);
@@ -144,14 +145,14 @@ const SUPPORT_PRIORITY = 4;
 /** How much nearer a rare, champion or boss enemy counts with the `rares` target priority, in tiles. */
 const RARE_PRIORITY = 4;
 
-function findTarget(w: World): Actor | null {
+function findTarget(w: World, s: Side): Actor | null {
   const p = w.player;
   const prio = w.char.build.strategy?.target ?? STRATEGY_DEFAULTS.target;
   let best: Actor | null = null;
   let bd = Infinity;
   for (const m of w.actors) {
     if (m.isPlayer || !m.alive || m.phaseT > 0) continue;
-    if (m.id === w.ai.skipId && w.t < w.ai.skipUntil) continue;
+    if (m.id === s.ai.skipId && w.t < s.ai.skipUntil) continue;
     const real = Math.hypot(m.x - p.x, m.y - p.y);
     if (real > ENGAGE_RANGE) continue;
     // Spawners and shield-givers come first: a nest feeds the pack and a pylon makes it untouchable.
@@ -178,7 +179,7 @@ function findTarget(w: World): Actor | null {
 }
 
 /** The character's choice of target now (for tests). */
-export const findTargetForTest = (w: World): Actor | null => findTarget(w);
+export const findTargetForTest = (w: World, s: Side): Actor | null => findTarget(w, s);
 
 /** A debuff that is renewed, not stacked, is cast again when it is about to end, not while it holds (Contagion). */
 function alreadyAfflicted(p: SkillProfile, target: Actor): boolean {
@@ -245,7 +246,7 @@ function debuffHolds(prof: SkillProfile, target: Actor): boolean {
  * strategy gives, whose role and condition call for it and that it can use from where it stands; then the first main skill it can
  * use (it walks into reach for it); then, with no main skill to use, a periodic one that is ready early; and last the weapon.
  */
-function chooseSkill(w: World, target: Actor): Pick {
+function chooseSkill(w: World, s: Side, target: Actor): Pick {
   const conds = playerConds(w, target);
   const p = w.player;
   const usable = (c: SkillChoice, prof: SkillProfile): boolean =>
@@ -258,7 +259,7 @@ function chooseSkill(w: World, target: Actor): Pick {
     if (!whenHolds(w, e.when, target)) continue;
     const c = e.choice;
     if (c.skill.utility) {
-      const u = utilityPick(w, e, target);
+      const u = utilityPick(w, s, e, target);
       if (u)
         return {
           which: 'utility',
@@ -276,9 +277,9 @@ function chooseSkill(w: World, target: Actor): Pick {
       (w.secondaryReady[c.key] ?? 0) > w.t
     )
       continue;
-    if (e.role === 'opener' && !openerDue(w, c.key, target)) continue;
+    if (e.role === 'opener' && !openerDue(w, s, c.key, target)) continue;
     if (e.role === 'emergency' && p.life >= p.def.maxLife * e.life) continue;
-    const prof = w.char.profile(c, conds, flaskMask(w));
+    const prof = w.char.profile(c, conds, flaskMask(w, s));
     if (e.role === 'keepUp' && debuffHolds(prof, target)) continue;
     if (!usable(c, prof) || !inReach(w, prof, target)) continue;
     return { which: 'secondary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
@@ -287,7 +288,7 @@ function chooseSkill(w: World, target: Actor): Pick {
   for (const e of w.char.mains) {
     if (!whenHolds(w, e.when, target)) continue;
     const c = e.choice;
-    const prof = w.char.profile(c, conds, flaskMask(w));
+    const prof = w.char.profile(c, conds, flaskMask(w, s));
     if (!canPay(w, c.costsLife, prof.cost)) starved = true;
     // Against a target immune to everything the skill deals, the next skill (or the weapon) is used.
     if (!usable(c, prof) || alreadyAfflicted(prof, target)) continue;
@@ -299,13 +300,13 @@ function chooseSkill(w: World, target: Actor): Pick {
     for (const e of w.char.rotation) {
       const c = e.choice;
       if (c.skill.utility || e.role !== 'periodic' || !whenHolds(w, e.when, target)) continue;
-      const prof = w.char.profile(c, conds, flaskMask(w));
+      const prof = w.char.profile(c, conds, flaskMask(w, s));
       if (!usable(c, prof) || !inReach(w, prof, target)) continue;
       return { which: 'secondary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
     }
   return {
     which: 'default',
-    prof: w.char.profile(w.char.defaultAttack, conds, flaskMask(w)),
+    prof: w.char.profile(w.char.defaultAttack, conds, flaskMask(w, s)),
     costsLife: false,
     choice: w.char.defaultAttack,
     cd: 0,
@@ -351,9 +352,9 @@ function bodyOnWay(w: World, x0: number, y0: number, x1: number, y1: number, r: 
  * Step out of a hazard (EXPANSION 5.8): the nearest clear spot, but only one from which the target is still in
  * reach, so the player never walks out of the fight. Returns whether it moved.
  */
-function avoidHazard(w: World, dt: number): boolean {
+function avoidHazard(w: World, s: Side, dt: number): boolean {
   const p = w.player;
-  const ai = w.ai;
+  const ai = s.ai;
   if (ai.dodgeRest > 0) {
     ai.dodgeRest -= dt;
     return false;
@@ -362,7 +363,7 @@ function avoidHazard(w: World, dt: number): boolean {
     ai.dodgeT = Math.max(0, ai.dodgeT - DODGE_DRAIN * dt);
     return false;
   }
-  const target = w.ai.targetId ? actorById(w, w.ai.targetId) : undefined;
+  const target = s.ai.targetId ? actorById(w, s.ai.targetId) : undefined;
   const prof = w.primary.usable
     ? w.char.profile(w.primary, 0)
     : w.char.profile(w.char.defaultAttack, 0);
@@ -393,7 +394,7 @@ function avoidHazard(w: World, dt: number): boolean {
     ai.dodgeRest = DODGE_REST;
     return false;
   }
-  moveTo(w, p, best.x, best.y, dt);
+  moveTo(w, s, p, best.x, best.y, dt);
   return true;
 }
 
@@ -401,14 +402,14 @@ function avoidHazard(w: World, dt: number): boolean {
  * The `kite` spacing (Strategy tab): a ranged character steps back when an enemy comes within `KITE_RANGE`, to a spot from which
  * its target is still in reach and in sight, for a moment, and then fights on. Returns whether it moved.
  */
-function kiteStep(w: World, target: Actor, dt: number): boolean {
+function kiteStep(w: World, s: Side, target: Actor, dt: number): boolean {
   const p = w.player;
-  const ai = w.ai;
+  const ai = s.ai;
   ai.kiteCd -= dt;
   if (ai.kiteT > 0) {
     ai.kiteT -= dt;
     if (Math.hypot(ai.kiteX - p.x, ai.kiteY - p.y) > 0.2) {
-      moveTo(w, p, ai.kiteX, ai.kiteY, dt);
+      moveTo(w, s, p, ai.kiteX, ai.kiteY, dt);
       return true;
     }
     ai.kiteT = 0;
@@ -450,17 +451,17 @@ function kiteStep(w: World, target: Actor, dt: number): boolean {
   ai.kiteCd = KITE_COOLDOWN;
   ai.kiteX = best.x;
   ai.kiteY = best.y;
-  w.stats.kites++;
-  moveTo(w, p, best.x, best.y, dt);
+  s.stats.kites++;
+  moveTo(w, s, p, best.x, best.y, dt);
   return true;
 }
 
-export function playerAI(w: World, dt: number): void {
+export function playerAI(w: World, s: Side, dt: number): void {
   const p = w.player;
-  const ai = w.ai;
+  const ai = s.ai;
   p.moving = false;
   if (!canAct(p)) return;
-  if (avoidHazard(w, dt)) return;
+  if (avoidHazard(w, s, dt)) return;
 
   // Engage.
   let target = ai.targetId ? actorById(w, ai.targetId) : undefined;
@@ -472,7 +473,7 @@ export function playerAI(w: World, dt: number): void {
   const stick = strategy?.target === 'stick' && !!target;
   if (!target || (ai.scanT <= 0 && !stick)) {
     ai.scanT = 0.1;
-    target = findTarget(w) ?? undefined;
+    target = findTarget(w, s) ?? undefined;
   }
   if (target && target.id === ai.skipId && w.t < ai.skipUntil) target = undefined;
   // Withering Step and Phase Run are run in: no attack until they are over (a skill used would end them).
@@ -490,7 +491,7 @@ export function playerAI(w: World, dt: number): void {
       ai.skipUntil = w.t + SKIP_TIME;
       ai.watchId = 0;
       ai.targetId = 0;
-      w.stats.stalls++;
+      s.stats.stalls++;
       w.events.push({ t: 'stall', id: target.id });
       return;
     }
@@ -499,14 +500,14 @@ export function playerAI(w: World, dt: number): void {
     // A new fight begins after a quiet spell (an opener is used once a fight).
     if (w.t - ai.lastEngaged > FIGHT_GAP) ai.fight++;
     ai.lastEngaged = w.t;
-    if (kiteStep(w, target, dt)) return;
-    const pick = chooseSkill(w, target);
+    if (kiteStep(w, s, target, dt)) return;
+    const pick = chooseSkill(w, s, target);
     const { which, prof, costsLife, choice, entry } = pick;
     if (which === 'utility') {
       payCost(w, costsLife, prof.cost);
       w.utilityReady[choice.key] = w.t + pick.cd;
-      useSkill(w, choice);
-      if (entry?.role === 'opener') markOpened(w, choice.key, target);
+      useSkill(w, s, choice);
+      if (entry?.role === 'opener') markOpened(w, s, choice.key, target);
       startAction(w, p, 'utility', prof, target);
       return;
     }
@@ -527,7 +528,7 @@ export function playerAI(w: World, dt: number): void {
     if (ai.repoT > 0) {
       ai.repoT -= dt;
       if (d > REPOSITION_DIST) {
-        moveTo(w, p, target.x, target.y, dt);
+        moveTo(w, s, p, target.x, target.y, dt);
         return;
       }
     }
@@ -535,12 +536,12 @@ export function playerAI(w: World, dt: number): void {
       if (which === 'primary' || which === 'secondary') payCost(w, costsLife, prof.cost);
       if (entry?.role === 'periodic' && choice.skill.cooldown === undefined)
         w.secondaryReady[choice.key] = w.t + w.char.cooldownOf(choice, playerConds(w, target));
-      if (which === 'primary' || which === 'secondary') useSkill(w, choice);
-      if (entry?.role === 'opener') markOpened(w, choice.key, target);
+      if (which === 'primary' || which === 'secondary') useSkill(w, s, choice);
+      if (entry?.role === 'opener') markOpened(w, s, choice.key, target);
       startAction(w, p, which, prof, target);
       return;
     }
-    moveTo(w, p, target.x, target.y, dt);
+    moveTo(w, s, p, target.x, target.y, dt);
     return;
   }
   ai.targetId = 0;
@@ -591,8 +592,8 @@ export function playerAI(w: World, dt: number): void {
       if (lootKind === 'drop') {
         const d = w.drops[lootIdx];
         w.drops.splice(lootIdx, 1);
-        w.picked.push(d.item);
-        w.stats.picked++;
+        s.picked.push(d.item);
+        s.stats.picked++;
         w.events.push({ t: 'pickup', id: d.id });
       } else {
         const c = w.chests[lootIdx];
@@ -611,7 +612,7 @@ export function playerAI(w: World, dt: number): void {
       }
       return;
     }
-    moveTo(w, p, lootX, lootY, dt);
+    moveTo(w, s, p, lootX, lootY, dt);
     return;
   }
 
@@ -626,7 +627,7 @@ export function playerAI(w: World, dt: number): void {
         w.events.push({ t: 'cleared' });
         return;
       }
-      moveTo(w, p, ex.x, ex.y, dt);
+      moveTo(w, s, p, ex.x, ex.y, dt);
       return;
     }
     // End room not yet clear: hunt the nearest remaining end-room monster.
@@ -644,7 +645,7 @@ export function playerAI(w: World, dt: number): void {
     }
     if (best) {
       if (best.state === 'idle') best.state = 'chase';
-      moveTo(w, p, best.x, best.y, dt);
+      moveTo(w, s, p, best.x, best.y, dt);
     }
     return;
   }
@@ -663,14 +664,14 @@ export function playerAI(w: World, dt: number): void {
       p.x = wp.x;
       p.y = wp.y;
       ai.wp++;
-      w.stats.stuck++;
+      s.stats.stuck++;
       w.events.push({ t: 'stuck' });
     }
     ai.stuckT = 0;
     ai.stuckX = p.x;
     ai.stuckY = p.y;
   }
-  moveTo(w, p, wp.x, wp.y, dt);
+  moveTo(w, s, p, wp.x, wp.y, dt);
 }
 
 function monsterMove(w: World, m: Actor, tx: number, ty: number, dt: number): void {

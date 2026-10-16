@@ -59,7 +59,7 @@ if (mergeAt >= 0) {
         cur.died = w.status === 'dead';
         cur.time = w.t - start;
         if (cur.died) {
-          const last = w.dmgLog[w.dmgLog.length - 1];
+          const last = w.sides[0].dmgLog[w.sides[0].dmgLog.length - 1];
           cur.killer = last ? `${last.name} (${last.via ?? last.name})` : 'unknown';
         }
         fights.push(cur);

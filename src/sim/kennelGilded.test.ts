@@ -129,7 +129,7 @@ describe('the Handler and the pack', () => {
 describe('the Gilded', () => {
   it('a cutpurse takes flask charges when it hits and runs; killing it gives them back', () => {
     const w = arena();
-    const flask = w.flasks[0];
+    const flask = w.sides[0].flasks[0];
     const before = flask.charges;
     expect(before).toBeGreaterThan(0);
     const thief = put(w, 'cutpurse', 1);
@@ -185,7 +185,7 @@ describe('the Gilded', () => {
 
   it('the Flask-taker and Hobbling mods act on a hit', () => {
     const w = arena();
-    const flask = w.flasks[0];
+    const flask = w.sides[0].flasks[0];
     const before = flask.charges;
     const m = put(w, 'warrior', 1, 0, {
       rarity: 'magic',

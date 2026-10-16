@@ -25,9 +25,7 @@ import type { HexTotals } from '../data/hexes';
 import type { Deployable } from './deploy';
 import type { Minion } from './minions';
 import type { Grid } from './grid';
-import type { Ledger } from './ledger';
-import type { ReprieveState } from './reprieve';
-import type { Side } from './side';
+import type { Side, SideOpts } from './side';
 
 export type Dot = { dps: number; t: number; stack?: boolean; spread?: number };
 
@@ -652,11 +650,10 @@ export const fullVitals = (): Vitals => ({ life: 1, mana: 1, es: 1, flasks: {} }
 /** Decides each tick whether the player leaves the map (docs/MAPS.md section 7); the Abandon button is the manual one. */
 export type AbandonPolicy = (w: World) => boolean;
 
+/** What the map decides (what a character brings is `SideOpts`, in side.ts). */
 export type WorldOpts = {
   /** Asked every tick while the map runs; true starts the escape timer (if abandoning is allowed). */
   abandonPolicy?: AbandonPolicy;
-  /** Life, mana, energy shield and flask charges the player starts with (default: all full). */
-  start?: Vitals;
   /** Called when a monster dies; returns dropped items. */
   loot?: (w: World, m: Actor) => AnyItem[];
   /** Called when a chest opens; returns its contents. */
@@ -665,13 +662,10 @@ export type WorldOpts = {
   autoAbandonAt?: number;
   /** Hard cap on simulated seconds. */
   maxTime?: number;
-  /** Refill the player's life and mana every tick (training-dummy tests). */
-  freeResources?: boolean;
-  /** Balance probes: the player cannot die (life is restored at 1). */
-  godMode?: boolean;
-  /** The reprieves the character carries, in the order they are used (data/reprieves.ts): one fires when damage would kill (docs/WAYSIDE.md 7). */
-  reprieves?: string[];
 };
+
+/** What a caller asks of a map: the map's own options and the character's, in one bag that `createWorld` splits (until F2 gives it one bag a side). */
+export type MapOpts = WorldOpts & SideOpts;
 
 /** Runtime state of the triggers (EXPANSION 5.5), keyed by trigger source. */
 export type TriggerRuntime = {
@@ -845,11 +839,7 @@ export type World = {
   build: Build;
   char: Character;
   primary: SkillChoice;
-  flasks: FlaskState[];
-  xp: number;
   status: MapStatus;
-  /** The reprieves carried, the ones that fired, and the seconds of safety left after a Revive. */
-  reprieve: ReprieveState;
   /** Seconds until the player leaves after pressing Abandon, or null when not leaving. */
   abandonT: number | null;
   /** The escape timer was started by the map running too long, not by the player: it cannot be cancelled. */
@@ -863,24 +853,5 @@ export type World = {
   holdout: { spawned: number; cleared: number; done: boolean[]; ids: number[][] };
   exitOpen: boolean;
   endRoom: number;
-  ai: PlayerAI;
   opts: WorldOpts;
-  stats: {
-    kills: number;
-    xpGained: number;
-    stuck: number;
-    stalls: number;
-    /** Kiting steps taken (the `kite` spacing). */
-    kites: number;
-    /** Player projectiles stopped by walls. */
-    wallBlocked: number;
-    picked: number;
-    damageTaken: number;
-    damageDealt: number;
-  };
-  picked: AnyItem[];
-  /** Damage the player took in the last few seconds. */
-  dmgLog: DamageRecord[];
-  /** Everything dealt and taken on the map, by source and type (the map report). */
-  ledger: Ledger;
 };

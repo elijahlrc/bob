@@ -30,7 +30,7 @@ function neighbour(w: World, x: number, y: number): Actor {
 
 function world(build: Build, distance = 3, maxTime = 60) {
   const run = createDummyWorld(build, { distance, maxTime });
-  run.world.opts.freeResources = true;
+  run.world.sides[0].opts.freeResources = true;
   return run;
 }
 
@@ -135,7 +135,7 @@ describe('Essence Drain (sapBolt)', () => {
     run(w, 1.5);
     expect(dummy.sdots.some((d) => d.src === 'sapBolt')).toBe(true);
     expect(next.sdots.some((d) => d.src === 'sapBolt')).toBe(true);
-    w.opts.freeResources = false;
+    w.sides[0].opts.freeResources = false;
     w.player.life = 1;
     const l0 = w.player.life;
     run(w, 1);

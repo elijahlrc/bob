@@ -48,7 +48,7 @@ function play(
   let total = 0;
   const byName = new Map<string, number>();
   for (const kind of ['skill', 'minion', 'ailment', 'monster', 'effect'] as const)
-    for (const r of world.ledger.dealt[kind].values()) {
+    for (const r of world.sides[0].ledger.dealt[kind].values()) {
       const dmg = r.dmg.reduce((a, b) => a + b, 0);
       total += dmg;
       byName.set(r.name, (byName.get(r.name) ?? 0) + dmg / world.t);

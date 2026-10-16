@@ -23,7 +23,7 @@ function arena(): World {
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
   world.player.stunT = 1e9;
-  world.opts.godMode = true;
+  world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
 }

@@ -92,10 +92,10 @@ console.log(
     .join(' ')} …`,
 );
 const led = [
-  ...world.ledger.dealt.skill.values(),
-  ...world.ledger.dealt.ailment.values(),
-  ...world.ledger.dealt.minion.values(),
-  ...world.ledger.dealt.effect.values(),
+  ...world.sides[0].ledger.dealt.skill.values(),
+  ...world.sides[0].ledger.dealt.ailment.values(),
+  ...world.sides[0].ledger.dealt.minion.values(),
+  ...world.sides[0].ledger.dealt.effect.values(),
 ];
 console.log(
   `ledger: ${led.map((r) => `${r.name} ${f1(r.dmg.reduce((a, b) => a + b, 0) / secs)}/s (${r.hits} hits)`).join(' · ')}`,

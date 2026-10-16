@@ -26,8 +26,8 @@ function monster(w: World, x: number, y: number, type = 'warrior'): Actor {
 
 function world(gems: string[], distance: number, main: string, cls: string) {
   const run = createDummyWorld(buildFor(gems, main, cls), { distance, maxTime: 120 });
-  run.world.opts.freeResources = true;
-  run.world.opts.godMode = true;
+  run.world.sides[0].opts.freeResources = true;
+  run.world.sides[0].opts.godMode = true;
   return run;
 }
 

@@ -148,10 +148,10 @@ describe('counterplay monster mods (EXPANSION 7.2)', () => {
       expect(c.rarity).toBe('normal');
       expect(c.mon!.defence.maxLife).toBeLessThan(mon.mon!.defence.maxLife);
     }
-    const kills = world.stats.kills;
+    const kills = world.sides[0].stats.kills;
     killActor(world, copies[0]);
     expect(world.actors.length).toBe(before + copies.length); // no further split
-    expect(world.stats.kills).toBe(kills);
+    expect(world.sides[0].stats.kills).toBe(kills);
   });
 });
 

@@ -35,7 +35,7 @@ function arena(): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.opts.godMode = true;
+  world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
 }
@@ -102,7 +102,9 @@ describe('the character stops dodging after a while', () => {
   it(`dodges for ${DODGE_MAX} s, then holds its ground for ${DODGE_REST} s, then dodges again`, () => {
     const w = arena();
     const seen: { t: number; rest: number; spent: number }[] = [];
-    spam(w, 17, (t) => seen.push({ t, rest: w.ai.dodgeRest, spent: w.ai.dodgeT }));
+    spam(w, 17, (t) =>
+      seen.push({ t, rest: w.sides[0].ai.dodgeRest, spent: w.sides[0].ai.dodgeT }),
+    );
     const at = (t: number) => seen.find((s) => s.t >= t)!;
     expect(at(5).rest).toBe(0);
     expect(at(DODGE_MAX - 0.5).rest).toBe(0);

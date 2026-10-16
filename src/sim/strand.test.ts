@@ -10,7 +10,7 @@ function mapWorld(seed: number, offer = 0): World {
   const run = newRun('vanguard', seed);
   const plan = planFor(run, run.offers[offer]);
   const w = createWorld({ plan, build: run.build, xp: 0, opts: worldOptsFor(run, plan) });
-  w.opts.godMode = true;
+  w.sides[0].opts.godMode = true;
   return w;
 }
 

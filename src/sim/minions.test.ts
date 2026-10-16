@@ -28,7 +28,7 @@ function arena() {
   b.flasks = [null, null, null, null, null];
   const { world, dummy } = createDummyWorld(b, { distance: 3 });
   dummy.alive = false;
-  world.opts.freeResources = false;
+  world.sides[0].opts.freeResources = false;
   // Raise Husk uses up a corpse for each cast.
   layCorpses(world, world.player.x, world.player.y, 30);
   return world;

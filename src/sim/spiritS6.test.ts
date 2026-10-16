@@ -53,12 +53,12 @@ describe('consecrated ground (blessedTrail)', () => {
       distance: 3,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     for (let i = 0; i < 3 * 60 && world.fields.length === 0; i++) stepWorld(world);
     expect(world.fields.some((f) => f.kind === 'consecrated')).toBe(true);
     expect(consecratedAt(world, dummy.x, dummy.y)).toBe(true);
     // The character regenerates on it.
-    world.opts.godMode = true;
+    world.sides[0].opts.godMode = true;
     const f = world.fields.find((x) => x.kind === 'consecrated')!;
     world.player.x = f.x;
     world.player.y = f.y;
@@ -78,7 +78,7 @@ describe('Cold Snap (suddenFrost): chilled ground', () => {
       distance: 3,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     let hits = 0;
     let start = 0;
     for (let i = 0; i < 4 * 60; i++) {
@@ -102,7 +102,7 @@ describe('Cold Snap (suddenFrost): chilled ground', () => {
         maxTime: 60,
         seed,
       });
-      world.opts.freeResources = true;
+      world.sides[0].opts.freeResources = true;
       for (let i = 0; i < 3 * 60 && !world.fields.some((x) => x.kind === 'chilling'); i++)
         stepWorld(world);
       dummy.noReward = false;
@@ -122,7 +122,7 @@ describe('Earthquake (faultline): the aftershock', () => {
       distance: 1.4,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const hits: { t: number; amount: number }[] = [];
     for (let i = 0; i < 3 * 60; i++) {
       stepWorld(world);
@@ -141,11 +141,11 @@ describe('Tectonic Slam (magmaCrack): a charge now and then', () => {
       distance: 1.4,
       maxTime: 400,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     let spent = 0;
     let uses = 0;
     for (let i = 0; i < 300 * 60; i++) {
-      if (world.char.charges.grit === 0) gainCharge(world, 'grit');
+      if (world.char.charges.grit === 0) gainCharge(world, world.sides[0], 'grit');
       stepWorld(world);
       for (const e of world.events) {
         if (e.t === 'spend') spent++;
@@ -164,7 +164,7 @@ describe('Frost Wall (glacierWall)', () => {
       distance: 3,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const before = Array.from(world.grid.tiles).filter((t) => t === 1).length;
     let walled = 0;
     for (let i = 0; i < 2 * 60; i++) {
@@ -187,7 +187,7 @@ describe('Frost Wall: what the raising hits', () => {
       distance: 3,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const c = world.char.actives.find((x) => x.skill.id === 'glacierWall')!;
     const prof = world.char.profile(c, world.char.configConds, 0);
     const p = world.player;
@@ -229,7 +229,7 @@ describe('Frost Bomb (rimeCore)', () => {
       distance: 3,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     let exposedAt = -1;
     let burstAt = -1;
     let castAt = -1;
@@ -250,7 +250,7 @@ describe('Righteous Fire (searingMantle)', () => {
   it('burns the character through its fire resistance and never to death', () => {
     const b = holding('sword_3', ['crushingBlow'], 'vanguard', ['searingMantle']);
     const { world } = createDummyWorld(b, { distance: 9, maxTime: 60 });
-    world.opts.freeResources = false;
+    world.sides[0].opts.freeResources = false;
     world.player.stunT = 1e9;
     const max = world.player.def.maxLife;
     for (let i = 0; i < 10 * 60; i++) stepWorld(world);
@@ -264,7 +264,7 @@ describe('Herald of Thunder (stormHerald)', () => {
   it('calls bolts down on the enemies around when a shocked enemy is killed', () => {
     const b = holding('sword_3', ['crushingBlow'], 'vanguard', ['stormHerald']);
     const { world, dummy } = createDummyWorld(b, { distance: 1.4, maxTime: 60 });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const other = neighbour(world, world.player.x + 2, world.player.y + 0.5);
     world.player.stunT = 1e9;
     dummy.ail.shock = 0.2;
@@ -282,7 +282,7 @@ describe('banners (standardOfValour, standardOfDread)', () => {
   const carried = (gem: string) => {
     const b = holding('sword_3', ['crushingBlow'], 'vanguard', [gem]);
     const run = createDummyWorld(b, { distance: 4, maxTime: 120 });
-    run.world.opts.freeResources = true;
+    run.world.sides[0].opts.freeResources = true;
     for (let i = 0; i < 3 * 60 && !run.world.banner; i++) stepWorld(run.world);
     return run;
   };
@@ -332,10 +332,12 @@ describe('banners (standardOfValour, standardOfDread)', () => {
     neighbour(world, world.player.x + 2, world.player.y + 1);
     neighbour(world, world.player.x + 2, world.player.y - 1);
     const conds = playerConds(world, null);
-    const carriedAcc = world.char.profile(world.primary, conds, flaskMask(world)).hands[0].accuracy;
+    const carriedAcc = world.char.profile(world.primary, conds, flaskMask(world, world.sides[0]))
+      .hands[0].accuracy;
     let guard = 0;
     while (!world.banner!.placed && guard++ < 10 * 60) stepWorld(world);
-    const placedAcc = world.char.profile(world.primary, conds, flaskMask(world)).hands[0].accuracy;
+    const placedAcc = world.char.profile(world.primary, conds, flaskMask(world, world.sides[0]))
+      .hands[0].accuracy;
     const none = world.char.profile(world.primary, conds, 0).hands[0].accuracy;
     expect(carriedAcc).toBeCloseTo(none, 5);
     expect(placedAcc).toBeGreaterThan(carriedAcc);
@@ -384,7 +386,7 @@ describe('Winter Orb (hoarfrostMote)', () => {
       distance: 4,
       maxTime: 60,
     });
-    run.world.opts.freeResources = true;
+    run.world.sides[0].opts.freeResources = true;
     return run;
   };
 
@@ -427,7 +429,7 @@ describe('Storm Burst (brimstoneStorm)', () => {
       distance: 4,
       maxTime: 60,
     });
-    run.world.opts.freeResources = true;
+    run.world.sides[0].opts.freeResources = true;
     return run;
   };
 

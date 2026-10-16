@@ -18,8 +18,8 @@ function arena(id: string, distance: number, lowest = false) {
   if (lowest) build.strategy = { target: 'lowest' };
   const run = createDummyWorld(build, { distance, maxTime: 120 });
   const w = run.world;
-  w.opts.freeResources = true;
-  w.opts.godMode = true;
+  w.sides[0].opts.freeResources = true;
+  w.sides[0].opts.godMode = true;
   run.dummy.def = dummyDefence({ maxLife: 1e9 });
   run.dummy.life = 1e9;
   return { w, dummy: run.dummy };

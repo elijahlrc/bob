@@ -72,7 +72,7 @@ function holding(main: string, gems: string[], off: 'none' | 'dual' = 'none'): B
 /** Uses and hits of the player's skill over `seconds` against the dummy. */
 function tally(b: Build, seconds: number) {
   const { world } = createDummyWorld(b, { distance: 1.4 });
-  world.opts.freeResources = true;
+  world.sides[0].opts.freeResources = true;
   let uses = 0;
   let hits = 0;
   for (let i = 0; i < seconds * 60; i++) {

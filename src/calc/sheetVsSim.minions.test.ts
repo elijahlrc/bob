@@ -26,7 +26,8 @@ function simMinionDps(build: Build, id: string, distance = 3, seconds = 30): num
   seedFor(activeGem(id), world, dummy);
   while (world.status === 'running') stepWorld(world);
   let total = 0;
-  for (const row of world.ledger.dealt.minion.values()) total += row.dmg.reduce((a, b) => a + b, 0);
+  for (const row of world.sides[0].ledger.dealt.minion.values())
+    total += row.dmg.reduce((a, b) => a + b, 0);
   return total / world.t;
 }
 

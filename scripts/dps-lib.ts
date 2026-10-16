@@ -94,7 +94,7 @@ export function measure(build0: Build, fight: Fight, o: MeasureOpts): Result {
       fixed: true,
       angle: 0.6,
     });
-    if (o.freeResources === false) world.opts.freeResources = false;
+    if (o.freeResources === false) world.sides[0].opts.freeResources = false;
     let nextCorpse = 0;
     while (world.status === 'running') {
       stepWorld(world);
@@ -114,7 +114,7 @@ export function measure(build0: Build, fight: Fight, o: MeasureOpts): Result {
     secs += world.t;
     // Everything dealt, by the sim's own ledger (the dummy is the only thing that takes damage).
     for (const kind of ['skill', 'minion', 'ailment', 'monster', 'effect'] as const)
-      for (const lr of world.ledger.dealt[kind].values()) {
+      for (const lr of world.sides[0].ledger.dealt[kind].values()) {
         const dmg = lr.dmg.reduce((a, b) => a + b, 0);
         total += dmg;
         const id =

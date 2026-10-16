@@ -21,7 +21,7 @@ function arena(): World {
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
   world.player.stunT = 1e9;
-  world.opts.godMode = true;
+  world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
 }
@@ -217,12 +217,12 @@ describe('senses and targets (docs/ROSTER.md 6.4)', () => {
     b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
     delete b.equipment.offHand;
     const { world: w } = createDummyWorld(b, { distance: 30 });
-    w.opts.godMode = true;
+    w.sides[0].opts.godMode = true;
     for (const a of w.actors) if (a.dummy) a.alive = false;
     const stalker = spawnMonster(w, spec('gloomstalker'), w.player.x + 6, w.player.y, 0, 0, 's');
     stalker.state = 'idle';
     stalker.dummy = true;
     for (let i = 0; i < 30; i++) stepWorld(w);
-    expect(w.ai.targetId).not.toBe(stalker.id);
+    expect(w.sides[0].ai.targetId).not.toBe(stalker.id);
   });
 });

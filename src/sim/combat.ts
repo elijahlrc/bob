@@ -89,6 +89,7 @@ import { spawnMonster } from './world';
 import { afflictPlayer, bossLocked, flaskWards, isBossSide, lockBoss } from './afflict';
 import { bossHitPlayer, bossVeiled } from './bosses';
 import type { Actor, Dot, World } from './types';
+import type { Side } from './side';
 
 const CHAOS = 4;
 /** Seconds of damage kept for the death recap. */
@@ -110,7 +111,7 @@ const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
   critRecently: (_w, p) => p.tCrit < RECENT,
   hitRecently: (_w, p) => p.tHit < RECENT,
   usedFlaskRecently: (_w, p) => p.tFlask < RECENT,
-  flaskActive: (w) => w.flasks.some((f) => f.activeT > 0),
+  flaskActive: (_w, p) => p.side!.flasks.some((f) => f.activeT > 0),
   dualWielding: (w) => w.char.dualWielding,
   holdingShield: (w) => w.char.holdingShield,
   stunnedRecently: (_w, p) => p.tStunEnemy < RECENT,
@@ -213,20 +214,20 @@ export function monsterConds(a: Actor): number {
   return a.life <= a.def.maxLife * LOW_LIFE ? MONSTER_CONDS.peek('onLowLife') : 0;
 }
 
-export function flaskMask(w: World): number {
+export function flaskMask(w: World, s: Side): number {
   let m = w.rage << DYN_SHIFT;
   // A banner that stands gives the character more of its buff for each stage it was put down with.
   if (w.banner?.placed) m |= w.banner.stages << BANNER_SHIFT;
-  w.flasks.forEach((f, i) => {
+  s.flasks.forEach((f, i) => {
     if (f.activeT > 0 && f.spec.buff.length) m |= 1 << i;
   });
   return m;
 }
 
 /** Refresh the player's cached defence for the current conditions and flasks. */
-export function refreshPlayerDefence(w: World): void {
+export function refreshPlayerDefence(w: World, s: Side): void {
   const p = w.player;
-  p.def = w.char.defence(playerConds(w, null), flaskMask(w));
+  p.def = w.char.defence(playerConds(w, null), flaskMask(w, s));
   const cap = lifeCap(w, p);
   if (p.life > cap) p.life = cap;
   if (p.es > p.def.maxEs) p.es = p.def.maxEs;
@@ -261,7 +262,7 @@ export function targetState(a: Actor): TargetState {
 export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): number {
   if (!dst.alive || dst.phaseT > 0 || dst.burrowT > 0) return 0;
   // Just after a Revive the character cannot be hurt (docs/WAYSIDE.md 7).
-  if (dst.isPlayer && invulnerable(w)) return 0;
+  if (dst.isPlayer && invulnerable(dst.side!)) return 0;
   // A veiled monster that is hit is seen for a moment.
   if (!dst.isPlayer && dst.revealT < 1) dst.revealT = 1;
   if (!dst.isPlayer && dst.mon) {
@@ -315,15 +316,15 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
     lifeDmg -= m;
     manaTaken = m;
   }
-  if (dst.isPlayer) notePools(w, esTaken, manaTaken, lifeDmg);
+  if (dst.isPlayer) notePools(dst.side!, esTaken, manaTaken, lifeDmg);
   dst.life -= lifeDmg;
   if (dst.life <= 0) dst.overkill = -dst.life;
   dst.sinceDamaged = 0;
-  if (dst.isPlayer && w.opts.godMode && dst.life <= 0) dst.life = 1;
-  if (dst.isPlayer) w.stats.damageTaken += total;
-  else if (dst.faction === 1) w.stats.damageDealt += total;
+  if (dst.isPlayer && dst.side!.opts.godMode && dst.life <= 0) dst.life = 1;
+  if (dst.isPlayer) dst.side!.stats.damageTaken += total;
+  else if (dst.faction === 1) w.player.side!.stats.damageDealt += total;
   // A Reprieve held fires when this would be the end (docs/WAYSIDE.md 7); the damage still counts as taken.
-  if (dst.isPlayer && dst.life <= 0 && reprieveFires(w)) return total;
+  if (dst.isPlayer && dst.life <= 0 && reprieveFires(w, dst.side!)) return total;
   if (dst.life <= 0) killActor(w, dst);
   return total;
 }
@@ -462,13 +463,13 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     if (how) noteMiss(w, dst, how, true);
     dst.tBlock = 0;
     if (dst.isPlayer) {
-      rollCharges(w, 'block');
+      rollCharges(w, dst.side!, 'block');
       rollGains(w, 'block');
     }
     if (dst.def.lifeOnBlockPct > 0)
       dst.life = Math.min(lifeCap(w, dst), dst.life + dst.def.maxLife * dst.def.lifeOnBlockPct);
     wake(w, dst);
-    if (dst.isPlayer) fireTriggers(w, { on: 'block' });
+    if (dst.isPlayer) fireTriggers(w, dst.side!, { on: 'block' });
     // A skill that wears blocking down leaves a blocking enemy Overpowered.
     if (src.isPlayer && !dst.isPlayer) rollStatuses(w, dst, p, true);
     return;
@@ -477,25 +478,25 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   for (let i = 1; i < 5; i++) if (res.dmg[i] > res.dmg[dtype]) dtype = i;
   w.events.push({ t: 'hit', src: src.id, dst: dst.id, amount: res.total, crit: res.crit, dtype });
   if (how) noteHit(w, dst, how, res.total, res.crit);
-  if (dst.isPlayer) logDamage(w, src, src.name, dtype, res.total);
+  if (dst.isPlayer) logDamage(w, dst, src, src.name, dtype, res.total);
   src.tHit = 0;
   dst.tBeenHit = 0;
   if (src.isPlayer) {
     rollGains(w, 'hit', p.gains);
-    rollCharges(w, 'hit', p.gains);
+    rollCharges(w, src.side!, 'hit', p.gains);
     if (p.skill.behaviour.kind === 'melee') {
       rollGains(w, 'meleeHit', p.gains);
-      rollCharges(w, 'meleeHit', p.gains);
+      rollCharges(w, src.side!, 'meleeHit', p.gains);
     }
   }
   if (dst.isPlayer) {
     rollGains(w, 'hitTaken');
-    rollCharges(w, 'hitTaken');
+    rollCharges(w, dst.side!, 'hitTaken');
   }
   if (res.crit) {
     src.tCrit = 0;
     if (src.isPlayer) {
-      rollCharges(w, 'crit', p.gains);
+      rollCharges(w, src.side!, 'crit', p.gains);
       rollGains(w, 'crit', p.gains);
     }
     if (p.overload) src.tOverload = 0;
@@ -564,7 +565,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     counterBlow(w, dst, src, p);
   }
   wake(w, dst);
-  if (src.isPlayer && res.outcome === 'hit') afterPlayerHit(w, dst, p);
+  if (src.isPlayer && res.outcome === 'hit') afterPlayerHit(w, src.side!, dst, p);
   // Siphoning monsters drain the player's mana; Thorned monsters reflect part of a melee hit.
   if (p.manaDrain > 0 && dst.isPlayer)
     dst.mana = Math.max(0, dst.mana - (dst.def.maxMana * p.manaDrain) / 100);
@@ -572,10 +573,11 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     const share = thornsShare(dst);
     if (share > 0) rawHit(w, src, res.total * share, 0);
   }
-  if (dst.isPlayer && !src.isPlayer && src.mon) onMonsterHitPlayer(w, src, p);
+  if (dst.isPlayer && !src.isPlayer && src.mon) onMonsterHitPlayer(w, src, dst, p);
   const afterHit = () => {
-    if (src.isPlayer) fireTriggers(w, { on: 'hit', target: dst, tags: p.tagMask, crit: res.crit });
-    if (dst.isPlayer) fireTriggers(w, { on: 'hitTaken', damage: res.total });
+    if (src.isPlayer)
+      fireTriggers(w, src.side!, { on: 'hit', target: dst, tags: p.tagMask, crit: res.crit });
+    if (dst.isPlayer) fireTriggers(w, dst.side!, { on: 'hitTaken', damage: res.total });
   };
   // Prismatic Balance: shift the target's elemental resistances.
   if (p.prismaticBalance) {
@@ -593,7 +595,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     res.stun = 0;
   }
   const frozeBefore = dst.ail.freezeT;
-  applyAilments(w, dst, res, p);
+  applyAilments(w, src, dst, res, p);
   if (bossLock && (dst.ail.freezeT > frozeBefore || res.stun > 0)) lockBoss(w);
   if (src.isPlayer && !dst.isPlayer) {
     // Damage over time the skill (or a support) puts on what it hits.
@@ -638,10 +640,10 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     dst.action = null;
     src.tStunEnemy = 0;
     w.events.push({ t: 'stun', dst: dst.id, dur: res.stun });
-    if (dst.isPlayer) fireTriggers(w, { on: 'stunned' });
+    if (dst.isPlayer) fireTriggers(w, dst.side!, { on: 'stunned' });
     if (src.isPlayer) {
       rollGains(w, 'stun', p.gains);
-      rollCharges(w, 'stun', p.gains);
+      rollCharges(w, src.side!, 'stun', p.gains);
     }
   }
   afterHit();
@@ -656,7 +658,7 @@ export function pushDot(list: Dot[], d: Dot, cap = 30): void {
   }
 }
 
-function applyAilments(w: World, dst: Actor, res: HitResult, p: SkillProfile): void {
+function applyAilments(w: World, src: Actor, dst: Actor, res: HitResult, p: SkillProfile): void {
   const a = res.ailments;
   const ail = dst.ail;
   const d = dst.def;
@@ -664,9 +666,9 @@ function applyAilments(w: World, dst: Actor, res: HitResult, p: SkillProfile): v
   for (const name of AILMENT_NAMES)
     if (a[name] > 0 && d.avoid[name] > 0 && w.rngCombat.chance(d.avoid[name])) a[name] = 0;
   // A cleansing flask that is running keeps its ailment off the character (3.9; docs/BOSSES.md 11.2).
-  if (dst.isPlayer && w.flasks.some((f) => f.activeT > 0))
+  if (dst.isPlayer && dst.side!.flasks.some((f) => f.activeT > 0))
     for (const name of AILMENT_NAMES)
-      if (a[name] > 0 && flaskWards(w, name === 'chill' ? 'freeze' : name)) a[name] = 0;
+      if (a[name] > 0 && flaskWards(dst.side!, name === 'chill' ? 'freeze' : name)) a[name] = 0;
   if (a.ignite > 0) {
     const spreadR = Math.max(p.spreadAil.ignite, p.spreadAil.ele) * p.radiusMult;
     pushDot(ail.ignites, {
@@ -701,7 +703,7 @@ function applyAilments(w: World, dst: Actor, res: HitResult, p: SkillProfile): v
     pushDot(ail.poisons, { dps: a.poison, t: p.poison.dur * d.durOnSelf.poison }, 400);
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'poison' });
     // Herald of Agony: a poison the character's hit put on gives a point of Virulence.
-    if (!dst.isPlayer && w.char.agonySpec) gainVirulence(w);
+    if (!dst.isPlayer && w.char.agonySpec) gainVirulence(w, src.side!);
   }
   if (a.shock > 0 && a.shock >= ail.shock) {
     ail.shock = a.shock;
@@ -749,7 +751,7 @@ export function hit(
     // Where it lands counts as a hit for what a hit gives (Drain Trap with Static Snares), but a curse is not an attack.
     if (!p.skill.tags.includes('curse')) {
       rollGains(w, 'hit', p.gains);
-      rollCharges(w, 'hit', p.gains);
+      rollCharges(w, src.side!, 'hit', p.gains);
     }
     wake(w, dst);
     return;
@@ -808,9 +810,9 @@ export function thornsShare(m: Actor): number {
 }
 
 /** A flask loses charges to a thief: the one that is fullest, by the share of its maximum. */
-function takeFlaskCharges(w: World, m: Actor, share: number): number {
-  let best: (typeof w.flasks)[number] | null = null;
-  for (const f of w.flasks)
+function takeFlaskCharges(victim: Side, m: Actor, share: number): number {
+  let best: Side['flasks'][number] | null = null;
+  for (const f of victim.flasks)
     if (
       f.charges > 0 &&
       (!best || f.charges / f.spec.maxCharges > best.charges / best.spec.maxCharges)
@@ -825,10 +827,10 @@ function takeFlaskCharges(w: World, m: Actor, share: number): number {
 }
 
 /** What a monster's hit does to the player besides damage: steal charges (a Cutpurse, the Flask-taker mod), hobble. */
-function onMonsterHitPlayer(w: World, src: Actor, prof: SkillProfile): void {
+function onMonsterHitPlayer(w: World, src: Actor, dst: Actor, prof: SkillProfile): void {
   const steal = abilitiesOf(src.mon!.spec.type).find((a) => a.id === 'steal');
   if (steal || src.modIds.includes('flaskTaker') || src.modIds.includes('treasurer')) {
-    const got = takeFlaskCharges(w, src, steal?.amount ?? 0.2);
+    const got = takeFlaskCharges(dst.side!, src, steal?.amount ?? 0.2);
     // A thief runs with what it took.
     if (steal && got > 0) src.fleeT = 5;
   }
@@ -844,6 +846,7 @@ function onMonsterHitPlayer(w: World, src: Actor, prof: SkillProfile): void {
 /** Remember damage the player took, for the death recap. */
 export function logDamage(
   w: World,
+  dst: Actor,
   src: Pick<Actor, 'name' | 'rarity' | 'modIds' | 'mon'> | null,
   label: string,
   dtype: number,
@@ -851,7 +854,7 @@ export function logDamage(
   via?: string,
 ): void {
   if (amount <= 0) return;
-  const log = w.dmgLog;
+  const log = dst.side!.dmgLog;
   log.push({
     t: w.t,
     name: src ? src.name : label,
@@ -861,7 +864,7 @@ export function logDamage(
     via,
     dtype,
     amount,
-    hp: w.player.life + w.player.es,
+    hp: dst.life + dst.es,
   });
   while (log.length > 0 && w.t - log[0].t > DAMAGE_LOG_TIME) log.shift();
 }
@@ -935,7 +938,7 @@ export function rawHit(
   }
   const total = dmg[0] + dmg[1] + dmg[2] + dmg[3] + dmg[4];
   w.events.push({ t: 'hit', src: 0, dst: dst.id, amount: total, crit: false, dtype: type });
-  if (dst.isPlayer) logDamage(w, null, label, type, total, via);
+  if (dst.isPlayer) logDamage(w, dst, null, label, type, total, via);
   // The map report: an effect on the character is its own row (a blast counts as a hit), one on a monster is the skill's or the minion's.
   const how: DmgSrc = dst.isPlayer
     ? { name: label, kind: 'effect' }
@@ -995,6 +998,8 @@ function noteCause(a: Actor, tags: number, minion: boolean, gains: readonly Mod[
 
 export function killActor(w: World, a: Actor): void {
   if (!a.alive) return;
+  // What a kill gives is the side's that fights the monster (the one character of a map).
+  const fs = w.player.side!;
   a.alive = false;
   a.life = 0;
   a.action = null;
@@ -1004,14 +1009,14 @@ export function killActor(w: World, a: Actor): void {
   if (!a.isPlayer && !a.noReward) {
     // What the skill that made the kill gives on a kill (its own chances, and its supports').
     const gains = causes.get(a)?.gains ?? [];
-    rollCharges(w, 'kill', gains);
-    if (a.ail.freezeT > 0) rollCharges(w, 'killFrozen', gains);
+    rollCharges(w, fs, 'kill', gains);
+    if (a.ail.freezeT > 0) rollCharges(w, fs, 'killFrozen', gains);
     if (a.ail.shock > 0) rollGains(w, 'killShocked', gains);
     rollGains(w, 'kill', gains);
     bannerStage(w, 'kill');
     refreshOnKill(w);
   }
-  if (!a.isPlayer && a.rarity === 'rare') gainTrophy(w, a.modIds);
+  if (!a.isPlayer && a.rarity === 'rare') gainTrophy(w, fs, a.modIds);
   if (a.isPlayer) {
     w.status = 'dead';
     w.events.push({ t: 'playerDied' });
@@ -1019,12 +1024,12 @@ export function killActor(w: World, a: Actor): void {
   }
   const p = w.player;
   if (!a.noReward) {
-    w.stats.kills++;
+    fs.stats.kills++;
     p.tKill = 0;
     const xp =
       (a.mon?.xp ?? 0) * levelPenalty(w.build.level, a.mon?.spec.level ?? 1) * w.plan.xpMult;
-    w.xp += xp;
-    w.stats.xpGained += xp;
+    fs.xp += xp;
+    fs.stats.xpGained += xp;
     const kind =
       a.rarity === 'boss' || a.rarity === 'miniboss'
         ? 'unique'
@@ -1040,7 +1045,7 @@ export function killActor(w: World, a: Actor): void {
     const kctx = playerCtx(w);
     const gain =
       FLASK_CHARGES_ON_KILL[kind] * w.char.db.mult('flaskCharges', kctx) * (1 + hexFlasks);
-    for (const f of w.flasks) f.charges = Math.min(f.spec.maxCharges, f.charges + gain);
+    for (const f of fs.flasks) f.charges = Math.min(f.spec.maxCharges, f.charges + gain);
     const lok =
       w.char.db.sum('base', 'lifeOnKill', kctx) +
       (w.char.db.sum('base', 'lifeOnKillPct', kctx) / 100) * p.def.maxLife;
@@ -1078,7 +1083,7 @@ export function killActor(w: World, a: Actor): void {
   if (a.modIds.includes('splitting') && a.mon) splitInTwo(w, a);
   onMonsterDeath(w, a);
   const cause = causes.get(a);
-  if (!cause?.minion) fireTriggers(w, { on: 'kill', target: a, tags: cause?.tags ?? 0 });
+  if (!cause?.minion) fireTriggers(w, fs, { on: 'kill', target: a, tags: cause?.tags ?? 0 });
   // Ailments that spread go once more from the corpse.
   if (!a.isPlayer && (a.ail.spreadEle > 0 || a.ail.ignites.some((d) => d.spread)))
     spreadAilments(w, a);
@@ -1258,9 +1263,9 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       dotChaos * taken * tt[4] * dt,
     ];
     if (a.isPlayer) {
-      logDamage(w, null, 'Burning', 3, dmg[3]);
-      logDamage(w, null, 'Bleeding', 0, dmg[0]);
-      logDamage(w, null, 'Poison', 4, dmg[4]);
+      logDamage(w, a, null, 'Burning', 3, dmg[3]);
+      logDamage(w, a, null, 'Bleeding', 0, dmg[0]);
+      logDamage(w, a, null, 'Poison', 4, dmg[4]);
     }
     noteCause(a, 0, false);
     applyDamage(w, a, dmg, {

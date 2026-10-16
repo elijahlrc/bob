@@ -17,6 +17,7 @@ import { scaleProfile } from './shots';
 import { applySkillDot } from './skillDots';
 import { GOLDEN, areaRadiusOf } from './spread';
 import type { Action, Actor, World } from './types';
+import type { Side } from './side';
 
 /**
  * Deployables in the sim (COVERAGE 5.3, docs/SPIRIT.md S10): totems and brands stand and shoot on their own, traps go off when an
@@ -282,13 +283,14 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
 /** The character's skill, fired from where a deployable stands at an enemy. */
 function shoot(
   w: World,
+  s: Side,
   d: Deployable,
   c: SkillChoice,
   target: Actor,
   scale = 1,
   crowd?: Crowd,
 ): void {
-  let prof = w.char.profile(c, playerConds(w, target), flaskMask(w));
+  let prof = w.char.profile(c, playerConds(w, target), flaskMask(w, s));
   if (scale !== 1) prof = scaleProfile(prof, scale);
   const aim = areaAim(w, d, prof, target, crowd);
   const from: Actor = Object.create(w.player) as Actor;
@@ -316,6 +318,7 @@ function shoot(
 /** The character's skill fired from a spot at an enemy, at a share of its damage (the mirage archer). */
 export function shootFrom(
   w: World,
+  s: Side,
   x: number,
   y: number,
   c: SkillChoice,
@@ -323,7 +326,7 @@ export function shootFrom(
   scale: number,
 ): void {
   const d: Deployable = { id: 0, kind: 'totem', key: c.key, x, y, t: 1, fireT: 0 };
-  shoot(w, d, c, target, scale);
+  shoot(w, s, d, c, target, scale);
 }
 
 /** The enemy nearest to a point within reach, if any. */
@@ -344,8 +347,15 @@ function nearestFoe(foes: Actor[], x: number, y: number, reach: number): Actor |
  * A mine is set off: every armed mine of its skill goes, in order of nearness to the enemy that did it. They go together after
  * the detonation time, or one after another when the skill chains them.
  */
-function setOffMines(w: World, key: string, c: SkillChoice, by: Actor, rearm = false): void {
-  const prof = w.char.profile(c, w.char.configConds, flaskMask(w));
+function setOffMines(
+  w: World,
+  s: Side,
+  key: string,
+  c: SkillChoice,
+  by: Actor,
+  rearm = false,
+): void {
+  const prof = w.char.profile(c, w.char.configConds, flaskMask(w, s));
   const det = c.skill.detonation ?? DETONATION;
   const chained = prof.mineChain > 0;
   const set = w.deployables
@@ -380,15 +390,22 @@ function sprung(w: World, d: Deployable, target: Actor): void {
 }
 
 /** A mine goes: its skill's burst at the nearest enemy, harder for the mines that went before it, and the rain that follows. */
-function detonate(w: World, d: Deployable, c: SkillChoice, foes: Actor[], crowd: Crowd): void {
+function detonate(
+  w: World,
+  s: Side,
+  d: Deployable,
+  c: SkillChoice,
+  foes: Actor[],
+  crowd: Crowd,
+): void {
   const target =
     nearestFoe(foes, d.x, d.y, MINE_SEEK) ??
     nearestFoe(foes, d.aimX ?? d.x, d.aimY ?? d.y, MINE_SEEK);
   if (!target) return;
   sprung(w, d, target);
-  const prof = w.char.profile(c, playerConds(w, target), flaskMask(w));
+  const prof = w.char.profile(c, playerConds(w, target), flaskMask(w, s));
   const seq = d.seq ?? 0;
-  shoot(w, d, c, target, 1 + (prof.mineChain * seq) / 100, crowd);
+  shoot(w, s, d, c, target, 1 + (prof.mineChain * seq) / 100, crowd);
   // Projectiles rain down around it, a smaller burst each, more of them the further along in the sequence.
   const rain = c.skill.mineRain;
   if (rain) {
@@ -508,9 +525,9 @@ export function bondLinks(w: World): BondLink[] {
 }
 
 /** The beams of Cinder Bond: from each of its totems to the character and to the other totems, burning what they cross. */
-function bondBeams(w: World, bonds: Deployable[], c: SkillChoice, foes: Actor[]): void {
+function bondBeams(w: World, s: Side, bonds: Deployable[], c: SkillChoice, foes: Actor[]): void {
   const spec = c.skill.bond!;
-  const prof = w.char.profile(c, playerConds(w, null), flaskMask(w));
+  const prof = w.char.profile(c, playerConds(w, null), flaskMask(w, s));
   const segs = bondSegments(w, bonds, spec);
   for (const e of foes)
     for (const [d, x2, y2] of segs) {
@@ -527,7 +544,7 @@ function bondBeams(w: World, bonds: Deployable[], c: SkillChoice, foes: Actor[])
 }
 
 /** Totems and brands shoot when an enemy is in reach; traps and mines go off; everything ends when its time is up. */
-export function tickDeployables(w: World, dt: number): void {
+export function tickDeployables(w: World, s: Side, dt: number): void {
   if (w.deployables.length === 0) return;
   const foes = enemies(w);
   const p = w.player;
@@ -554,7 +571,7 @@ export function tickDeployables(w: World, dt: number): void {
     } else if (keep && c && d.kind === 'mine') {
       if (d.goAt !== undefined) {
         if (w.t >= d.goAt) {
-          detonate(w, d, c, foes, crowd);
+          detonate(w, s, d, c, foes, crowd);
           if (d.rearm) {
             d.goAt = undefined;
             d.seq = undefined;
@@ -565,14 +582,14 @@ export function tickDeployables(w: World, dt: number): void {
       } else if (d.fireT <= 0) {
         // An armed mine with an enemy near sets the whole set off.
         const by = nearestFoe(foes, d.x, d.y, MINE_RADIUS);
-        if (by) setOffMines(w, d.key, c, by);
+        if (by) setOffMines(w, s, d.key, c, by);
         else {
           // A skitterbot finds the mine and sets it off when enemies are about, then waits three seconds; the mines arm again.
           const far = nearestFoe(foes, d.x, d.y, MINE_SEEK - 2);
           const bot = far ? freeBot(w) : null;
           if (far && bot) {
             bot.botCd = 3;
-            setOffMines(w, d.key, c, far, true);
+            setOffMines(w, s, d.key, c, far, true);
           } else d.fireT = 0.05;
         }
       }
@@ -581,7 +598,7 @@ export function tickDeployables(w: World, dt: number): void {
         if (d.active === false) {
           d.fireT = 0.1;
         } else {
-          const prof = w.char.profile(c, w.char.configConds, flaskMask(w));
+          const prof = w.char.profile(c, w.char.configConds, flaskMask(w, s));
           const reach = skillRange(prof);
           let best: Actor | null = null;
           let bd = Infinity;
@@ -593,7 +610,7 @@ export function tickDeployables(w: World, dt: number): void {
             }
           }
           if (best) {
-            shoot(w, d, c, best, 1, crowd);
+            shoot(w, s, d, c, best, 1, crowd);
             // A ballista attacks at half speed.
             d.fireT = totemInterval(c, prof);
           } else d.fireT = 0.1;
@@ -602,7 +619,7 @@ export function tickDeployables(w: World, dt: number): void {
         const best = nearestFoe(foes, d.x, d.y, TRAP_RADIUS);
         if (best) {
           sprung(w, d, best);
-          shoot(w, d, c, best, 1, crowd);
+          shoot(w, s, d, c, best, 1, crowd);
           keep = false;
         } else {
           // A skitterbot sets off a trap with enemies about.
@@ -611,7 +628,7 @@ export function tickDeployables(w: World, dt: number): void {
           if (far && bot) {
             bot.botCd = 3;
             sprung(w, d, far);
-            shoot(w, d, c, far, 1, crowd);
+            shoot(w, s, d, c, far, 1, crowd);
             keep = false;
           } else d.fireT = 0.05;
         }
@@ -625,6 +642,6 @@ export function tickDeployables(w: World, dt: number): void {
   if (bonds.size > 0 && Math.floor(w.t * 4) !== Math.floor((w.t - dt) * 4))
     for (const [key, list] of bonds) {
       const c = choiceByKey(w, key);
-      if (c) bondBeams(w, list, c, foes);
+      if (c) bondBeams(w, s, list, c, foes);
     }
 }

@@ -155,7 +155,7 @@ describe('the strategy: roles and order', () => {
     const boltCost = c.profile(c.secondaries[0]).cost;
     expect(mainCost).toBeGreaterThan(boltCost);
     const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
-    world.opts.freeResources = false;
+    world.sides[0].opts.freeResources = false;
     const out: Record<string, number> = {};
     // Mana held between the two costs: the periodic skill could be paid for, the main one not.
     for (let i = 0; i < 60 * 10; i++) {
@@ -197,7 +197,7 @@ describe('the strategy: conditions', () => {
     });
     const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
     // The dummy arena keeps life full: life is set by hand here.
-    world.opts.freeResources = false;
+    world.sides[0].opts.freeResources = false;
     expect(uses(world, 5).ironHide ?? 0).toBe(0);
     world.player.life = world.player.def.maxLife * 0.3;
     expect(uses(world, 1).ironHide).toBe(1);
@@ -215,7 +215,7 @@ describe('the strategy: target and spacing', () => {
       const near = put(world, 0, 4);
       const rare = put(world, 0, -7, { rarity: 'rare' });
       stepWorld(world);
-      expect(world.ai.targetId).toBe(want === 'rare' ? rare.id : near.id);
+      expect(world.sides[0].ai.targetId).toBe(want === 'rare' ? rare.id : near.id);
     }
   });
 
@@ -226,7 +226,7 @@ describe('the strategy: target and spacing', () => {
     const hurt = put(world, 0, -6);
     hurt.life = hurt.def.maxLife * 0.2;
     stepWorld(world);
-    expect(world.ai.targetId).toBe(hurt.id);
+    expect(world.sides[0].ai.targetId).toBe(hurt.id);
   });
 
   it('stick to target: the target is kept when another enemy comes nearer', () => {
@@ -236,10 +236,10 @@ describe('the strategy: target and spacing', () => {
       const { world } = createDummyWorld(b, { distance: 8.5, maxTime: 60 });
       const first = put(world, 0, 5);
       stepWorld(world);
-      expect(world.ai.targetId).toBe(first.id);
+      expect(world.sides[0].ai.targetId).toBe(first.id);
       put(world, 1.5, 0);
       for (let i = 0; i < 12; i++) stepWorld(world);
-      results[target] = world.ai.targetId === first.id;
+      results[target] = world.sides[0].ai.targetId === first.id;
     }
     expect(results).toEqual({ nearest: false, stick: true });
   });
@@ -259,7 +259,7 @@ describe('the strategy: target and spacing', () => {
       const { world } = createDummyWorld(b, { distance: 6, maxTime: 60 });
       put(world, 2, 0, { level: 1 });
       uses(world, 3);
-      kites[spacing] = world.stats.kites;
+      kites[spacing] = world.sides[0].stats.kites;
     }
     expect(kites.kite).toBeGreaterThan(0);
     expect(kites.hold).toBe(0);
@@ -289,8 +289,8 @@ describe('the escape role', () => {
   it('goes when life is low with an enemy near, to a spot away from the enemies', () => {
     const b = withStrategy(build(['crushingBlow', 'cinderStep']), { 1: { role: 'escape' } });
     const { world, dummy } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
-    world.opts.freeResources = false;
-    world.opts.godMode = true;
+    world.sides[0].opts.freeResources = false;
+    world.sides[0].opts.godMode = true;
     world.player.life = world.player.def.maxLife * 0.5;
     const before = dist(world, dummy.x, dummy.y);
     let blinked = false;
@@ -305,7 +305,7 @@ describe('the escape role', () => {
   it('goes when three enemies crowd the character, however healthy', () => {
     const b = withStrategy(build(['crushingBlow', 'cinderStep']), { 1: { role: 'escape' } });
     const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
-    world.opts.godMode = true;
+    world.sides[0].opts.godMode = true;
     for (const [dx, dy] of [
       [1.5, 1],
       [1.5, -1],
@@ -319,7 +319,7 @@ describe('the escape role', () => {
       1: { role: 'escape', surrounded: false },
     });
     const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
-    world.opts.godMode = true;
+    world.sides[0].opts.godMode = true;
     for (const [dx, dy] of [
       [1.5, 1],
       [1.5, -1],
@@ -333,13 +333,13 @@ describe('the escape role', () => {
       1: { role: 'escape', lowLife: false },
     });
     const low = createDummyWorld(b, { distance: 1.6, maxTime: 60 }).world;
-    low.opts.freeResources = false;
-    low.opts.godMode = true;
+    low.sides[0].opts.freeResources = false;
+    low.sides[0].opts.godMode = true;
     low.player.life = low.player.def.maxLife * 0.1;
     expect(uses(low, 5).cinderStep ?? 0).toBe(0);
 
     const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
-    world.opts.godMode = true;
+    world.sides[0].opts.godMode = true;
     for (const [dx, dy] of [
       [1.5, 1],
       [1.5, -1],
@@ -353,8 +353,8 @@ describe('the escape role', () => {
       1: { role: 'escape', lowLife: false, surrounded: false },
     });
     const a = createDummyWorld(none, { distance: 1.6, maxTime: 60 }).world;
-    a.opts.freeResources = false;
-    a.opts.godMode = true;
+    a.sides[0].opts.freeResources = false;
+    a.sides[0].opts.godMode = true;
     a.player.life = a.player.def.maxLife * 0.05;
     expect(uses(a, 5).cinderStep ?? 0).toBe(0);
 
@@ -362,8 +362,8 @@ describe('the escape role', () => {
       1: { role: 'escape', surrounded: false, life: 0.1 },
     });
     const w = createDummyWorld(late, { distance: 1.6, maxTime: 60 }).world;
-    w.opts.freeResources = false;
-    w.opts.godMode = true;
+    w.sides[0].opts.freeResources = false;
+    w.sides[0].opts.godMode = true;
     w.player.life = w.player.def.maxLife * 0.2;
     expect(uses(w, 5).cinderStep ?? 0).toBe(0);
     w.player.life = w.player.def.maxLife * 0.05;
@@ -375,8 +375,8 @@ describe('the escape role', () => {
       1: { role: 'escape', life: 0.3 },
     });
     const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
-    world.opts.freeResources = false;
-    world.opts.godMode = true;
+    world.sides[0].opts.freeResources = false;
+    world.sides[0].opts.godMode = true;
     world.player.life = world.player.def.maxLife * 0.5;
     expect(uses(world, 5).slipstream ?? 0).toBe(0);
     world.player.life = world.player.def.maxLife * 0.25;

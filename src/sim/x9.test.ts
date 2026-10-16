@@ -25,7 +25,7 @@ function arena(godMode = false): World {
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30, maxTime: 600 });
   world.player.stunT = 1e9;
-  if (godMode) world.opts.godMode = true;
+  if (godMode) world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
 }
@@ -312,6 +312,6 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
     expect(w.drops).toHaveLength(1);
     run(w, 20);
     expect(w.drops).toHaveLength(0);
-    expect(w.ai.mode).not.toBe('loot');
+    expect(w.sides[0].ai.mode).not.toBe('loot');
   });
 });

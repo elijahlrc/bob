@@ -262,9 +262,9 @@ describe('the factions (EXPANSION 7.3)', () => {
   it('bursting a Bloater by hand gives no experience or loot', () => {
     const w = arena();
     const m = put(w, 'bloater', 1);
-    const kills = w.stats.kills;
+    const kills = w.sides[0].stats.kills;
     bloaterBurst(w, m);
-    expect(w.stats.kills).toBe(kills);
+    expect(w.sides[0].stats.kills).toBe(kills);
   });
 
   it('the Carrion Mother raises every corpse in her room, and bursts into pools at half life', () => {

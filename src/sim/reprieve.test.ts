@@ -21,7 +21,7 @@ function worldOn(map: number, reprieves: string[]): { run: RunState; w: World } 
 
 /** Drink the flasks down, so that a refill is something to see. */
 function emptyFlasks(w: World): void {
-  for (const f of w.flasks) f.charges = 0;
+  for (const f of w.sides[0].flasks) f.charges = 0;
 }
 
 describe('a Revive (docs/WAYSIDE.md 7)', () => {
@@ -32,7 +32,7 @@ describe('a Revive (docs/WAYSIDE.md 7)', () => {
     expect(w.player.alive).toBe(true);
     expect(w.status).toBe('running');
     expect(w.player.life).toBeCloseTo(reprieveDef('lastSpark').life * cap, 3);
-    expect(w.reprieve.fired).toEqual(['lastSpark']);
+    expect(w.sides[0].reprieve.fired).toEqual(['lastSpark']);
     expect(w.events.some((e) => e.t === 'reprieve' && e.how === 'revive')).toBe(true);
     // Nothing can hurt it for the seconds that follow ...
     const life = w.player.life;
@@ -40,7 +40,7 @@ describe('a Revive (docs/WAYSIDE.md 7)', () => {
     expect(w.player.life).toBe(life);
     expect(w.player.alive).toBe(true);
     // ... and when they are over the next blow kills: the item is gone.
-    w.reprieve.invulnT = 0;
+    w.sides[0].reprieve.invulnT = 0;
     applyDamage(w, w.player, LETHAL());
     expect(w.player.alive).toBe(false);
     expect(w.status).toBe('dead');
@@ -48,10 +48,10 @@ describe('a Revive (docs/WAYSIDE.md 7)', () => {
 
   it('refills every flask, so that the character has something to drink', () => {
     const { w } = worldOn(7, ['lastSpark']);
-    expect(w.flasks.length).toBeGreaterThan(0);
+    expect(w.sides[0].flasks.length).toBeGreaterThan(0);
     emptyFlasks(w);
     applyDamage(w, w.player, LETHAL());
-    for (const f of w.flasks) expect(f.charges).toBe(f.spec.maxCharges);
+    for (const f of w.sides[0].flasks) expect(f.charges).toBe(f.spec.maxCharges);
   });
 
   it('throws back and stuns the monsters around it', () => {
@@ -68,19 +68,19 @@ describe('a Revive (docs/WAYSIDE.md 7)', () => {
     const { w } = worldOn(10, ['lastSpark']);
     applyDamage(w, w.player, LETHAL());
     expect(w.player.alive).toBe(true);
-    expect(w.reprieve.fired).toEqual(['lastSpark']);
+    expect(w.sides[0].reprieve.fired).toEqual(['lastSpark']);
   });
 
   it('with several carried, the next one fires after the first has run out', () => {
     const { w } = worldOn(7, ['lastSpark', 'bargainCoin']);
     applyDamage(w, w.player, LETHAL());
-    expect(w.reprieve.fired).toEqual(['lastSpark']);
-    w.reprieve.invulnT = 0;
+    expect(w.sides[0].reprieve.fired).toEqual(['lastSpark']);
+    w.sides[0].reprieve.invulnT = 0;
     applyDamage(w, w.player, LETHAL());
-    expect(w.reprieve.fired).toEqual(['lastSpark', 'bargainCoin']);
+    expect(w.sides[0].reprieve.fired).toEqual(['lastSpark', 'bargainCoin']);
     expect(w.player.alive).toBe(true);
     expect(w.player.life).toBeCloseTo(reprieveDef('bargainCoin').life * lifeCap(w, w.player), 3);
-    w.reprieve.invulnT = 0;
+    w.sides[0].reprieve.invulnT = 0;
     applyDamage(w, w.player, LETHAL());
     expect(w.status).toBe('dead');
   });
@@ -89,7 +89,7 @@ describe('a Revive (docs/WAYSIDE.md 7)', () => {
     const { w } = worldOn(7, []);
     applyDamage(w, w.player, LETHAL());
     expect(w.status).toBe('dead');
-    expect(w.reprieve.fired).toEqual([]);
+    expect(w.sides[0].reprieve.fired).toEqual([]);
   });
 });
 
@@ -102,9 +102,9 @@ describe('a Retreat (docs/WAYSIDE.md 7.2 and 7.3)', () => {
     expect(w.status).toBe('abandoned');
     expect(w.player.alive).toBe(true);
     expect(w.player.life).toBeCloseTo(reprieveDef('ferryToken').life * cap, 3);
-    expect(w.reprieve.fired).toEqual(['ferryToken']);
+    expect(w.sides[0].reprieve.fired).toEqual(['ferryToken']);
     expect(w.events.some((e) => e.t === 'reprieve' && e.how === 'retreat')).toBe(true);
-    for (const f of w.flasks) expect(f.charges).toBe(f.spec.maxCharges);
+    for (const f of w.sides[0].flasks) expect(f.charges).toBe(f.spec.maxCharges);
   });
 
   it('does nothing on a tenth map: the character dies', () => {
@@ -112,7 +112,7 @@ describe('a Retreat (docs/WAYSIDE.md 7.2 and 7.3)', () => {
       const { w } = worldOn(map, ['ferryToken']);
       applyDamage(w, w.player, LETHAL());
       expect(w.status, `map ${map}`).toBe('dead');
-      expect(w.reprieve.fired).toEqual([]);
+      expect(w.sides[0].reprieve.fired).toEqual([]);
     }
   });
 
@@ -120,7 +120,7 @@ describe('a Retreat (docs/WAYSIDE.md 7.2 and 7.3)', () => {
     const { w } = worldOn(10, ['ferryToken', 'lastSpark']);
     applyDamage(w, w.player, LETHAL());
     expect(w.status).toBe('running');
-    expect(w.reprieve.fired).toEqual(['lastSpark']);
+    expect(w.sides[0].reprieve.fired).toEqual(['lastSpark']);
   });
 });
 

@@ -66,10 +66,10 @@ for (const classId of classes) {
     botRun(classId, seed, maxMap, {
       onTick: (w) => {
         if (done) {
-          w.opts.godMode = true;
+          w.sides[0].opts.godMode = true;
           return;
         }
-        w.opts.godMode = true;
+        w.sides[0].opts.godMode = true;
         const p = w.player;
         const cap = Math.max(1, lifeCap(w, p));
         let h = hist.get(w);
@@ -78,7 +78,7 @@ for (const classId of classes) {
         const lethal =
           p.life <= 1.0001 &&
           p.alive &&
-          w.reprieve.invulnT <= 0 &&
+          w.sides[0].reprieve.invulnT <= 0 &&
           h.length > 0 &&
           h[h.length - 1].f > 1.5 / cap;
         h.push({ t: w.t, f });
@@ -103,7 +103,7 @@ for (const classId of classes) {
           first = ev;
           // The Revive: stand up at a share of the life, safe for three seconds.
           p.life = share * cap;
-          w.reprieve.invulnT = 3;
+          w.sides[0].reprieve.invulnT = 3;
           revivedAt = w.t;
           revivedMap = w.plan.map;
         } else if (n === 2) {

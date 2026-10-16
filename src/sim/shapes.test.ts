@@ -39,7 +39,7 @@ function profileOf(skill: SkillDef): SkillProfile {
 function arena() {
   const run = newRun('mystic', 1);
   const { world, dummy } = createDummyWorld(run.build, { distance: 3 });
-  world.opts.godMode = true;
+  world.sides[0].opts.godMode = true;
   return { w: world, player: world.player, first: dummy };
 }
 

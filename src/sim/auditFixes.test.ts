@@ -17,7 +17,7 @@ describe('the sim, after the sheet audit', () => {
       fixed: true,
       maxTime: 15,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const x = dummy.x;
     const y = dummy.y;
     while (world.status === 'running' && world.t < 12) stepWorld(world);

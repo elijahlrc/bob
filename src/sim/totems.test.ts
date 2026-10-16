@@ -11,8 +11,8 @@ const INT = classFor('int');
 
 function world(gems: string[], distance: number) {
   const run = createDummyWorld(buildFor(gems, 'wand_3', INT), { distance, maxTime: 120 });
-  run.world.opts.freeResources = true;
-  run.world.opts.godMode = true;
+  run.world.sides[0].opts.freeResources = true;
+  run.world.sides[0].opts.godMode = true;
   return run;
 }
 

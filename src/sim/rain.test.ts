@@ -58,7 +58,7 @@ describe('Arrow Shower: extra arrows widen the shower (Rain of Arrows)', () => {
       distance: 3,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = tally(world, dummy.id, 6, 'arrowShower');
     expect(t.uses).toBeGreaterThan(1);
     expect(t.spots).toBe(1);
@@ -69,7 +69,7 @@ describe('Arrow Shower: extra arrows widen the shower (Rain of Arrows)', () => {
       distance: 3,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = tally(world, dummy.id, 8, 'arrowShower');
     expect(t.uses).toBeGreaterThan(1);
     // Four more arrows than the shower starts with: the shower and four bursts round it.
@@ -89,7 +89,7 @@ describe('Ember Downpour: extra arrows are more explosions on the same place (Bl
       distance: 3,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = tally(world, dummy.id, 8, 'emberDownpour');
     expect(t.uses).toBeGreaterThan(1);
     expect(t.hits / t.uses).toBeLessThanOrEqual(1.05);
@@ -100,7 +100,7 @@ describe('Ember Downpour: extra arrows are more explosions on the same place (Bl
       distance: 3,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = tally(world, dummy.id, 8, 'emberDownpour');
     expect(t.uses).toBeGreaterThan(1);
     // Eight explosions at 6 + 2 arrows, every one hitting.
@@ -148,7 +148,7 @@ describe('what the new and changed supports do', () => {
     cls = 'strider',
   ) {
     const { world, dummy } = createDummyWorld(holding(main, gems, cls), { distance, maxTime: 60 });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     let total = 0;
     for (let i = 0; i < seconds * 60; i++) {
       stepWorld(world);
@@ -170,7 +170,7 @@ describe('what the new and changed supports do', () => {
       distance: 3,
       maxTime: 60,
     });
-    world.opts.freeResources = true;
+    world.sides[0].opts.freeResources = true;
     const t = tally(world, dummy.id, 8, 'arrowShower');
     expect(t.uses).toBeGreaterThan(1);
     // The shower and one before and one behind it, each a burst of its own.

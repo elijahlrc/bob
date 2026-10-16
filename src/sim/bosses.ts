@@ -466,7 +466,7 @@ export function bossDeath(w: World, a: Actor): void {
     if (st.id === 'twins') grieve(w, a);
     if (st.id === 'unmaker' && hasTheft(w)) {
       setTheft(w, {});
-      rebuildForTheft(w);
+      rebuildForTheft(w, w.player.side!);
     }
     w.effects = w.effects.filter((e) => e.owner !== a.id || isZoneKind(e));
     return;
@@ -1198,8 +1198,8 @@ function steal(w: World, m: Actor, st: BossState, kind: TheftKind): void {
   else if (kind === 'supports') t.supports = strongestSupports(w);
   else t.flasks = true;
   setTheft(w, t);
-  rebuildForTheft(w);
-  refreshPlayerDefence(w);
+  rebuildForTheft(w, w.player.side!);
+  refreshPlayerDefence(w, w.player.side!);
   const angle = (st.shards.length / 4) * Math.PI * 2;
   const shard = bring(w, m, 'shard', m.x, m.y);
   const life = m.def.maxLife * SHARD_LIFE;
@@ -1225,8 +1225,8 @@ function giveBack(w: World, kind: TheftKind): void {
   else if (kind === 'supports') delete t.supports;
   else delete t.flasks;
   setTheft(w, t);
-  rebuildForTheft(w);
-  refreshPlayerDefence(w);
+  rebuildForTheft(w, w.player.side!);
+  refreshPlayerDefence(w, w.player.side!);
 }
 
 function tickUnmaker(w: World, m: Actor, st: BossState, dt: number): void {

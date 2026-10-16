@@ -10,7 +10,7 @@ export function vitalsOf(w: World): Vitals {
     max > 0 ? Math.min(1, Math.max(0, value / max)) : 1;
   const flasks: Record<number, number> = {};
   // Flask activity (a recovery under way, a buff running) ends with the map; charges are what carries.
-  for (const f of w.flasks) flasks[f.spec.uid] = frac(f.charges, f.spec.maxCharges);
+  for (const f of w.sides[0].flasks) flasks[f.spec.uid] = frac(f.charges, f.spec.maxCharges);
   return {
     life: frac(p.life, lifeCap(w, p)),
     mana: frac(p.mana, manaCap),

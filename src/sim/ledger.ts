@@ -2,6 +2,7 @@ import { ACTIVE_GEMS } from '../data/gems';
 import { MONSTER_TYPES } from '../data/monsters';
 import type { SkillDot } from './skillDots';
 import type { Actor, World } from './types';
+import type { Side } from './side';
 
 /** What dealt (or took) the damage of a row: a skill, a minion, an ailment, a monster or some other effect. */
 export type RowKind = 'skill' | 'minion' | 'ailment' | 'monster' | 'effect';
@@ -27,11 +28,11 @@ export type DmgSrc = {
 };
 
 /** The rows of one side, a map for each kind of source (so a hit finds its row without building a key). */
-type Side = Record<RowKind, Map<string, LedgerRow>>;
+type Rows = Record<RowKind, Map<string, LedgerRow>>;
 
 export type Ledger = {
-  dealt: Side;
-  taken: Side;
+  dealt: Rows;
+  taken: Rows;
   /** What the damage the character took came out of. */
   pools: { es: number; life: number; mana: number };
   /** Hits aimed at the character that missed it (evaded) or that it blocked. */
@@ -51,15 +52,15 @@ export type MapReport = {
 
 export function newLedger(): Ledger {
   return {
-    dealt: newSide(),
-    taken: newSide(),
+    dealt: newRows(),
+    taken: newRows(),
     pools: { es: 0, life: 0, mana: 0 },
     evaded: 0,
     blocked: 0,
   };
 }
 
-const newSide = (): Side => ({
+const newRows = (): Rows => ({
   skill: new Map(),
   minion: new Map(),
   ailment: new Map(),
@@ -69,7 +70,7 @@ const newSide = (): Side => ({
 
 const sum = (d: number[]) => d[0] + d[1] + d[2] + d[3] + d[4];
 
-function row(side: Side, name: string, kind: RowKind): LedgerRow {
+function row(side: Rows, name: string, kind: RowKind): LedgerRow {
   const m = side[kind];
   let r = m.get(name);
   if (!r) {
@@ -81,11 +82,11 @@ function row(side: Side, name: string, kind: RowKind): LedgerRow {
 
 /** Damage that has been dealt, by type: to the character (taken) or to a monster (dealt). Called by `applyDamage`. */
 export function noteDamage(w: World, dst: Actor, dmg: number[], src: DmgSrc | undefined): void {
-  const side = dst.isPlayer ? w.ledger.taken : dst.faction === 1 ? w.ledger.dealt : null;
-  if (!side) return;
+  const rows = rowsFor(w, dst);
+  if (!rows) return;
   const s: DmgSrc = src ?? { name: 'Other', kind: 'effect' };
   if (!s.split) {
-    const r = row(side, s.name, s.kind);
+    const r = row(rows, s.name, s.kind);
     for (let i = 0; i < 5; i++) r.dmg[i] += dmg[i];
     return;
   }
@@ -95,19 +96,28 @@ export function noteDamage(w: World, dst: Actor, dmg: number[], src: DmgSrc | un
     let wt = 0;
     for (const p of s.split) wt += p.wt[i];
     if (wt <= 0) {
-      row(side, s.name, s.kind).dmg[i] += dmg[i];
+      row(rows, s.name, s.kind).dmg[i] += dmg[i];
       continue;
     }
     for (const p of s.split)
-      if (p.wt[i] > 0) row(side, p.name, p.kind).dmg[i] += (dmg[i] * p.wt[i]) / wt;
+      if (p.wt[i] > 0) row(rows, p.name, p.kind).dmg[i] += (dmg[i] * p.wt[i]) / wt;
   }
+}
+
+/**
+ * The rows a hit on `dst` is entered in: the damage a character takes is entered in its own side's ledger; the damage dealt to a
+ * monster in the ledger of the side that fights it (the character the monster hunts), none for anything else.
+ */
+function rowsFor(w: World, dst: Actor): Rows | null {
+  if (dst.isPlayer) return dst.side!.ledger.taken;
+  return dst.faction === 1 ? w.player.side!.ledger.dealt : null;
 }
 
 /** A hit that landed (`total` is what it dealt), by what dealt it. */
 export function noteHit(w: World, dst: Actor, src: DmgSrc, total: number, crit: boolean): void {
-  const side = dst.isPlayer ? w.ledger.taken : dst.faction === 1 ? w.ledger.dealt : null;
-  if (!side) return;
-  const r = row(side, src.name, src.kind);
+  const rows = rowsFor(w, dst);
+  if (!rows) return;
+  const r = row(rows, src.name, src.kind);
   r.hits++;
   if (crit) r.crits++;
   if (total > r.max) r.max = total;
@@ -116,19 +126,20 @@ export function noteHit(w: World, dst: Actor, src: DmgSrc, total: number, crit: 
 /** An attack that did nothing: it missed, or was blocked or turned aside. */
 export function noteMiss(w: World, dst: Actor, src: DmgSrc, blocked: boolean): void {
   if (dst.isPlayer) {
-    if (blocked) w.ledger.blocked++;
-    else w.ledger.evaded++;
+    const l = dst.side!.ledger;
+    if (blocked) l.blocked++;
+    else l.evaded++;
     return;
   }
   if (dst.faction !== 1) return;
-  row(w.ledger.dealt, src.name, src.kind).misses++;
+  row(w.player.side!.ledger.dealt, src.name, src.kind).misses++;
 }
 
 /** Where the character's damage went: energy shield, then (maybe) mana, then life. */
-export function notePools(w: World, es: number, mana: number, life: number): void {
-  w.ledger.pools.es += es;
-  w.ledger.pools.mana += mana;
-  w.ledger.pools.life += life;
+export function notePools(s: Side, es: number, mana: number, life: number): void {
+  s.ledger.pools.es += es;
+  s.ledger.pools.mana += mana;
+  s.ledger.pools.life += life;
 }
 
 /** The monster that hit, named by its kind (a pack of the same kind is one row); a boss by its own name. */
@@ -170,10 +181,10 @@ export function skillName(id: string): string {
 
 const byTotal = (a: LedgerRow, b: LedgerRow) => sum(b.dmg) - sum(a.dmg);
 
-/** The report of the map the world has played so far. */
-export function buildReport(w: World): MapReport {
-  const l = w.ledger;
-  const copy = (side: Side) =>
+/** The report of the map a side has played so far. */
+export function buildReport(w: World, s: Side): MapReport {
+  const l = s.ledger;
+  const copy = (side: Rows) =>
     Object.values(side)
       .flatMap((m) => [...m.values()])
       .filter((r) => sum(r.dmg) > 0 || r.hits > 0 || r.misses > 0)
@@ -192,7 +203,7 @@ export function buildReport(w: World): MapReport {
 /** One report for several maps (a Crawl): rows of the same source added together. */
 export function combineReports(parts: MapReport[]): MapReport {
   const merge = (pick: (r: MapReport) => LedgerRow[]) => {
-    const m = newSide();
+    const m = newRows();
     for (const part of parts)
       for (const r of pick(part)) {
         const t = row(m, r.name, r.kind);

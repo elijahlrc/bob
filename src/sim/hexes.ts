@@ -90,7 +90,7 @@ export function tickBlasphemy(w: World, dt: number): void {
 export function monsterHexesPlayer(w: World, id: HexId, effect: number): void {
   const p = w.player;
   // A flask of Unbinding keeps curses off while it runs (docs/BOSSES.md 11.2).
-  if (flaskWards(w, 'curse')) return;
+  if (flaskWards(p.side!, 'curse')) return;
   const mult = Math.max(0, w.char.db.mult('curseEffectOnSelf'));
   applyHex(w, p, id, effect * mult, BASE_HEX_LIMIT, 10, HEX_SECONDS);
 }
@@ -130,7 +130,7 @@ export function hexKill(w: World, dead: Actor): number {
         p.mana + atLevel(give.mana, h.level),
       );
     if (give.charge && w.rngTrig.chance(atLevel(give.charge.chance, h.level) / 100))
-      gainCharge(w, give.charge.kind);
+      gainCharge(w, w.player.side!, give.charge.kind);
     if (give.flasks) flasks += give.flasks;
   }
   return flasks;

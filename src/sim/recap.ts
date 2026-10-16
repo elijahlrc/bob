@@ -14,7 +14,7 @@ const OVER_TIME = new Set(['Burning', 'Bleeding', 'Poison']);
 
 /** Build the death recap for a player who has just died (EXPANSION section 9). */
 export function buildRecap(w: World): DeathRecap {
-  const log = w.dmgLog.filter((d) => w.t - d.t <= RECAP_SECONDS);
+  const log = w.sides[0].dmgLog.filter((d) => w.t - d.t <= RECAP_SECONDS);
   const byKey = new Map<string, { name: string; dtype: number; amount: number }>();
   for (const d of log) {
     const k = `${d.name}|${d.dtype}`;
@@ -35,7 +35,7 @@ export function buildRecap(w: World): DeathRecap {
   if (ail.chill > 0) ailments.push('chilled');
   if (ail.freezeT > 0) ailments.push('frozen');
   // The hits of the last seconds, oldest first, and no more than the record has room for (the latest are kept).
-  const hits: RecapHit[] = w.dmgLog
+  const hits: RecapHit[] = w.sides[0].dmgLog
     .filter((d) => w.t - d.t <= RECAP_HIT_SECONDS && !OVER_TIME.has(d.name))
     .slice(-RECAP_HITS)
     .map((d) => ({
@@ -80,7 +80,7 @@ export function buildRecap(w: World): DeathRecap {
       lifeRegen: def.lifeRegen,
       movement: def.moveSpeed,
     },
-    flasks: w.flasks.map((f) => ({
+    flasks: w.sides[0].flasks.map((f) => ({
       kind: f.spec.kind,
       charges: f.charges,
       max: f.spec.maxCharges,
