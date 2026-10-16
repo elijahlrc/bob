@@ -69,9 +69,9 @@ export function noteBlinkUsed(w: World, s: Side, c: SkillChoice): void {
 }
 
 /** The enemies near a point. */
-function enemiesAt(w: World, x: number, y: number, r: number): Actor[] {
+function enemiesAt(w: World, team: number, x: number, y: number, r: number): Actor[] {
   return w.actors.filter(
-    (e) => !e.isPlayer && e.alive && e.phaseT <= 0 && Math.hypot(e.x - x, e.y - y) <= r + e.r,
+    (e) => e.team !== team && e.alive && e.phaseT <= 0 && Math.hypot(e.x - x, e.y - y) <= r + e.r,
   );
 }
 
@@ -93,7 +93,7 @@ function burstAt(w: World, a: Actor, p: SkillProfile, x: number, y: number, u?: 
     skill: p.skill.id,
   });
   const own = u?.corpse && u.corpse.lifePct > 0 ? (a.def.maxLife * u.corpse.lifePct) / 100 : 0;
-  for (const e of enemiesAt(w, x, y, r)) {
+  for (const e of enemiesAt(w, a.team, x, y, r)) {
     hit(w, a, e, p, 0, Math.hypot(e.x - a.x, e.y - a.y));
     // Bodyswap adds a share of the character's own life to what it deals.
     if (own > 0 && e.alive) rawHit(w, e, own, p.hands[0].chunks[0].type, 'Bodyswap');
@@ -123,7 +123,7 @@ export function blinkCast(
     let best = 0;
     for (const c0 of w.corpses) {
       if (Math.hypot(c0.x - a.x, c0.y - a.y) > u.distance + 1) continue;
-      const n = enemiesAt(w, c0.x, c0.y, 2.5).length;
+      const n = enemiesAt(w, a.team, c0.x, c0.y, 2.5).length;
       if (n > best) {
         best = n;
         corpse = c0;
@@ -149,7 +149,7 @@ export function blinkCast(
     takeCorpse(w, corpse);
     const r = burstRadius(big);
     w.events.push({ t: 'explode', x: corpse.x, y: corpse.y, r, dtype: 3, skill: p.skill.id });
-    for (const e of enemiesAt(w, corpse.x, corpse.y, r))
+    for (const e of enemiesAt(w, a.team, corpse.x, corpse.y, r))
       rawHit(w, e, (corpse.life * u.corpse.explodePct) / 100, 3, 'Corpse');
     noteBlinkUsed(w, a.side!, c);
     arrive(w, a, big, c, u, spot.x, spot.y);
@@ -177,7 +177,7 @@ export function blinkCast(
 
 /** The spot within reach of a blink that is furthest from every enemy near, in sight and at least 2.5 tiles away (none if there is none). */
 function safestSpot(w: World, a: Actor, distance: number): { x: number; y: number } | null {
-  const foes = enemiesAt(w, a.x, a.y, 12);
+  const foes = enemiesAt(w, a.team, a.x, a.y, 12);
   let best: { x: number; y: number } | null = null;
   let bd = -1;
   for (let i = 0; i < 16; i++) {
@@ -268,7 +268,7 @@ function arrive(
       stacks: Math.round(levelValue(u.elusive.stacks, c.skill.level)),
       seconds: u.elusive.seconds,
       seen: [],
-      run: enemiesAt(w, x, y, RUN_PACK_RADIUS).length >= RUN_PACK_SIZE,
+      run: enemiesAt(w, a.team, x, y, RUN_PACK_RADIUS).length >= RUN_PACK_SIZE,
     };
     // Those already near the landing are withered at once, not only the ones that come after.
     tickWither(w, a.side!);
@@ -360,7 +360,7 @@ export function tickWither(w: World, side: Side): void {
     return;
   }
   const p = side.player;
-  for (const e of enemiesAt(w, p.x, p.y, s.radius)) {
+  for (const e of enemiesAt(w, side.team, p.x, p.y, s.radius)) {
     if (s.seen.includes(e.id)) continue;
     s.seen.push(e.id);
     applyStatus(w, e, 'withered', { seconds: s.seconds, stacks: s.stacks });

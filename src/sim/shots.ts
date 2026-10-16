@@ -376,7 +376,9 @@ export function releaseCaught(w: World, a: Actor): void {
 }
 
 function enemiesOfOwner(w: World, owner: Actor): Actor[] {
-  return owner.isPlayer ? w.actors.filter((e) => !e.isPlayer && e.alive) : [hunted(w, owner)];
+  return owner.isPlayer
+    ? w.actors.filter((e) => e.team !== owner.team && e.alive)
+    : [hunted(w, owner)];
 }
 
 /**

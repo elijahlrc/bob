@@ -266,7 +266,7 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
   if (dst.isPlayer && invulnerable(dst.side!)) return 0;
   // A veiled monster that is hit is seen for a moment.
   if (!dst.isPlayer && dst.revealT < 1) dst.revealT = 1;
-  if (!dst.isPlayer && dst.mon) {
+  if (dst.mon) {
     // A Bone Beetle curled up takes 80% less physical damage; a Warden Pylon makes its allies untouchable.
     if (dst.curlT > 0) dmg[0] *= 1 - CURL_LESS;
     if (w.hasPylons && shieldedByPylon(w, dst)) return 0;
@@ -275,7 +275,7 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
   // same step (so they have more life), without rebuilding them (docs/MAPS.md 9.1).
   if (w.surge > 0) {
     const f = 1 + CRESCENDO_STEP_BONUS * w.surge;
-    const m = dst.team === 1 && !dst.isPlayer ? 1 / f : f;
+    const m = dst.team === 1 ? 1 / f : f;
     for (let i = 0; i < 5; i++) dmg[i] *= m;
   }
   let total = 0;
@@ -385,7 +385,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     }
   }
   // An Aegis counts the time since it was last attacked, whatever came of the attack.
-  if (dst.enc && !dst.isPlayer) noteAttacked(dst);
+  if (dst.enc) noteAttacked(dst);
   // The map report names what dealt the hit (only for hits on the character or on a monster).
   const how = dst.isPlayer || dst.team === 1 ? sourceOf(src, dst, p) : undefined;
   if (res.outcome === 'miss') {
@@ -396,7 +396,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   }
   // A monster's guard (a Brace, an Aegis, a stone skin, a Sanctuary) turns the hit aside: no damage, no ailment, no leech.
   // Damage over time goes on (docs/ENCOUNTERS.md 5).
-  if (!dst.isPlayer && dst.mon && turnsAside(w, dst, src)) {
+  if (dst.mon && turnsAside(w, dst, src)) {
     if (how) noteMiss(w, dst, how, true);
     if (src.isPlayer) src.side!.lastOutcome = 'block';
     w.events.push({ t: 'block', src: src.id, dst: dst.id });
@@ -421,10 +421,10 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       }
   }
   // Rimeplate: what hits the character is chilled a moment.
-  if (dst.isPlayer && !src.isPlayer && res.outcome === 'hit' && dst.side!.char.frostSpec)
+  if (dst.isPlayer && src.team !== dst.team && res.outcome === 'hit' && dst.side!.char.frostSpec)
     frostBite(dst.side!, src);
   // Flesh and Stone in the Sand stance: attacks by enemies that are not near do less.
-  if (dst.isPlayer && !src.isPlayer && res.outcome !== 'block' && p.isAttack) {
+  if (dst.isPlayer && src.team !== dst.team && res.outcome !== 'block' && p.isAttack) {
     const far = stanceFarLess(dst.side!);
     if (far && Math.hypot(src.x - dst.x, src.y - dst.y) > far.radius + src.r) {
       for (let i = 0; i < res.dmg.length; i++) res.dmg[i] *= 1 - far.less;
@@ -438,7 +438,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     res.dmg[0] *= guard.physMult;
   }
   // Traps and mines hit a shackled enemy harder; a snared one takes more from projectile attacks.
-  if (src.isPlayer && !dst.isPlayer && res.outcome !== 'block') {
+  if (src.isPlayer && dst.team !== src.team && res.outcome !== 'block') {
     const extra = hitTakenExtra(dst, p);
     if (extra > 0) {
       for (let i = 0; i < res.dmg.length; i++) res.dmg[i] *= 1 + extra;
@@ -446,7 +446,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     }
   }
   // Marked by a Handler: its pack hits the character harder (docs/ENCOUNTERS.md 7).
-  if (dst.isPlayer && !src.isPlayer && src.mon && res.outcome !== 'block') {
+  if (dst.isPlayer && src.mon && res.outcome !== 'block') {
     const k = markedMult(w, src);
     if (k !== 1) {
       for (let i = 0; i < 5; i++) res.dmg[i] *= k;
@@ -458,7 +458,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     hexPlayerAtRandom(w, dst.side!);
   }
   // A monster's modes change what the hit does to it: exposed, quenched, swollen, fed by fire (docs/ENCOUNTERS.md 6).
-  if (!dst.isPlayer && dst.enc && res.outcome !== 'block') {
+  if (dst.enc && res.outcome !== 'block') {
     modeTaken(w, dst, res.dmg);
     res.total = res.dmg[0] + res.dmg[1] + res.dmg[2] + res.dmg[3] + res.dmg[4];
   }
@@ -495,7 +495,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     wake(w, dst);
     if (dst.isPlayer) fireTriggers(w, dst.side!, { on: 'block' });
     // A skill that wears blocking down leaves a blocking enemy Overpowered.
-    if (src.isPlayer && !dst.isPlayer) rollStatuses(w, dst, p, true);
+    if (src.isPlayer && dst.team !== src.team) rollStatuses(w, dst, p, true);
     return;
   }
   let dtype = 0;
@@ -576,7 +576,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     recordImpale(w, src.side!, dst, p, res);
     reflectBack(w, src, dst, p, res);
     // Culling strike: a hit that leaves the target at 10% life or less finishes it.
-    if (p.culling && !dst.isPlayer && dst.life <= dst.def.maxLife * CULLING_SHARE)
+    if (p.culling && dst.team !== src.team && dst.life <= dst.def.maxLife * CULLING_SHARE)
       killActor(w, dst);
   }
   // A beetle that is hit curls up for a moment (then cannot again for three seconds); fire opens it again.
@@ -588,7 +588,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     }
   }
   // What a monster has taken feeds its modes (a Fade, a Core vent, a Quench), and a Counter-stance answers a blow.
-  if (!dst.isPlayer && dst.enc && wasAlive) {
+  if (dst.enc && wasAlive) {
     noteTaken(w, dst, res.dmg);
     counterBlow(w, dst, src, p);
   }
@@ -601,7 +601,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     const share = thornsShare(dst);
     if (share > 0) rawHit(w, src, res.total * share, 0);
   }
-  if (dst.isPlayer && !src.isPlayer && src.mon) onMonsterHitPlayer(w, src, dst, p);
+  if (dst.isPlayer && src.mon) onMonsterHitPlayer(w, src, dst, p);
   const afterHit = () => {
     if (src.isPlayer)
       fireTriggers(w, src.side!, { on: 'hit', target: dst, tags: p.tagMask, crit: res.crit });
@@ -625,7 +625,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   const frozeBefore = dst.ail.freezeT;
   applyAilments(w, src, dst, res, p);
   if (bossLock && (dst.ail.freezeT > frozeBefore || res.stun > 0)) lockBoss(w);
-  if (src.isPlayer && !dst.isPlayer) {
+  if (src.isPlayer && dst.team !== src.team) {
     // Damage over time the skill (or a support) puts on what it hits.
     if (p.decay) applyDecay(w, dst, p.decay);
     // A Ruthless Blow stuns.
@@ -656,7 +656,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
         for (const e of w.actors)
           if (
             e !== dst &&
-            !e.isPlayer &&
+            e.team !== src.team &&
             e.alive &&
             Math.hypot(e.x - dst.x, e.y - dst.y) <= splash * p.radiusMult + e.r
           )
@@ -797,13 +797,13 @@ export function hit(
   // Consecrated ground makes hits against what stands on it crit twice as often.
   if (
     src.isPlayer &&
-    !dst.isPlayer &&
+    dst.team !== src.team &&
     src.side!.fields.length > 0 &&
     consecratedAt(src.side!, dst.x, dst.y)
   )
     h = { ...h, critChance: h.critChance * CRIT_ON_CONSECRATED };
   // The Veiled Duellist's veil: nothing crits it while it is up (docs/BOSSES.md 5b).
-  const veiled = !dst.isPlayer && dst.enc !== undefined && bossVeiled(dst);
+  const veiled = dst.enc !== undefined && bossVeiled(dst);
   if (veiled) h = { ...h, critChance: 0 };
   if (hm.critChance > 0 || hm.critMulti > 0)
     h = {
@@ -910,7 +910,8 @@ export function logDamage(
 /** Raw damage of one type that ignores evasion and block (explosions, slams). */
 /** A player hit by a monster's melee attack deals damage back to it (reflect). */
 function reflectBack(w: World, src: Actor, dst: Actor, p: SkillProfile, res: HitResult): void {
-  if (!dst.isPlayer || src.isPlayer || !src.alive || p.skill.behaviour.kind !== 'melee') return;
+  if (!dst.isPlayer || src.team === dst.team || !src.alive || p.skill.behaviour.kind !== 'melee')
+    return;
   const d = dst.def;
   for (let t = 0; t < 5; t++) if (d.reflect[t] > 0) rawHit(w, src, d.reflect[t], t, 'Reflect');
   if (d.reflectPhysPct > 0 && res.dmg[0] > 0 && src.alive)
@@ -988,7 +989,7 @@ export function rawHit(
 /** Who a hit is credited to in the map report. */
 function sourceOf(src: Actor, dst: Actor, p: SkillProfile): DmgSrc {
   if (src.isPlayer) return { name: p.skill.name, kind: 'skill' };
-  if (src.team === 0) return { name: src.name || 'Minion', kind: 'minion' };
+  if (src.side) return { name: src.name || 'Minion', kind: 'minion' };
   return dst.isPlayer ? monsterSrc(src) : { name: 'Other', kind: 'effect' };
 }
 
@@ -1043,7 +1044,7 @@ export function killActor(w: World, a: Actor): void {
   a.action = null;
   w.events.push({ t: 'death', id: a.id });
   // A minion that falls is just gone (tickMinions clears it): nothing is earned, dropped or raised.
-  if (!a.isPlayer && a.team === 0) return;
+  if (!a.isPlayer && a.side) return;
   if (!a.isPlayer && !a.noReward) {
     // What the skill that made the kill gives on a kill (its own chances, and its supports').
     const gains = causes.get(a)?.gains ?? [];

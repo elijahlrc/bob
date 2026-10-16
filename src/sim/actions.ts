@@ -65,7 +65,7 @@ export function startAction(
   let duration = p.isAttack && n > 1 && !p.bothHands ? p.hands[hand].time : p.useTime;
   // A monster that strikes in a rhythm: each blow takes a share of the usual time and carries the same share of the damage.
   a.patMult = 1;
-  if (!a.isPlayer && a.mon) {
+  if (a.mon) {
     const pat = MONSTER_TYPES[a.mon.spec.type].pattern;
     if (pat) {
       a.patMult = pat[a.beat % pat.length];
@@ -319,11 +319,15 @@ function spinStep(w: World, a: Actor, act: Action, target: Actor | undefined, dt
 }
 
 export function enemiesOf(w: World, a: Actor): Actor[] {
-  if (a.isPlayer) return w.actors.filter((o) => !o.isPlayer && o.alive);
-  if (!hunted(w, a).alive) return [];
-  // A monster's area attack catches the player's minions too.
-  const ms = hunted(w, a).side!.minions;
-  return ms.length === 0 ? [hunted(w, a)] : [hunted(w, a), ...ms.filter((m) => m.alive)];
+  if (a.isPlayer) return w.actors.filter((o) => o.team !== a.team && o.alive);
+  // A monster's area attack catches the characters, and their minions too.
+  const out: Actor[] = [];
+  for (const s of w.sides) {
+    if (s.team === a.team || !s.player.alive) continue;
+    out.push(s.player);
+    for (const m of s.minions) if (m.alive) out.push(m);
+  }
+  return out;
 }
 
 /** The damage type of a skill's biggest chunk (what an effect looks like). */

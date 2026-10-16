@@ -65,7 +65,7 @@ export const autoFlaskPolicy: FlaskPolicy = (w, s) => {
   if (wantsSurroundings) {
     let nearest2 = Infinity;
     for (const m of w.actors) {
-      if (m.isPlayer || !m.alive) continue;
+      if (m.team === p.team || !m.alive) continue;
       const dx = m.x - p.x;
       const dy = m.y - p.y;
       const d2 = dx * dx + dy * dy;

@@ -47,7 +47,13 @@ export function buildRecap(w: World): DeathRecap {
       amount: d.amount,
       hp: d.hp,
     }));
-  const near = enemiesNear(w, w.sides[0].player.x, w.sides[0].player.y, RECAP_NEAR);
+  const near = enemiesNear(
+    w,
+    w.sides[0].player.team,
+    w.sides[0].player.x,
+    w.sides[0].player.y,
+    RECAP_NEAR,
+  );
   return {
     time: w.t,
     killer: last?.name ?? 'Unknown',

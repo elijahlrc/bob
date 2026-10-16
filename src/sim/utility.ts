@@ -40,9 +40,9 @@ const WARCRY_SECONDS = 4;
 
 export type UtilityPick = { choice: SkillChoice; prof: SkillProfile; cd: number };
 
-export function enemiesNear(w: World, x: number, y: number, r: number): Actor[] {
+export function enemiesNear(w: World, team: number, x: number, y: number, r: number): Actor[] {
   return w.actors.filter(
-    (e) => !e.isPlayer && e.alive && e.phaseT <= 0 && Math.hypot(e.x - x, e.y - y) <= r,
+    (e) => e.team !== team && e.alive && e.phaseT <= 0 && Math.hypot(e.x - x, e.y - y) <= r,
   );
 }
 
@@ -75,7 +75,7 @@ export function utilityPick(
   if (e.role === 'opener' && !openerDue(s, c.key, target)) return null;
   if (e.role === 'emergency' && p.life >= p.def.maxLife * e.life) return null;
   if (e.role === 'escape' && !wantsOut(w, s, e)) return null;
-  const near = (r: number) => enemiesNear(w, p.x, p.y, r).length >= 1;
+  const near = (r: number) => enemiesNear(w, p.team, p.x, p.y, r).length >= 1;
   if (u.kind === 'buff') {
     if (d > CAST_RANGE + 1 || !near(PACK_RADIUS)) return null;
     if (u.rage && s.rage < u.rage.min) return null;
@@ -119,9 +119,10 @@ export function wantsOut(
   const hurt =
     e.lowLife &&
     p.life < p.def.maxLife * e.life &&
-    enemiesNear(w, p.x, p.y, ESCAPE_NEAR).length >= 1;
+    enemiesNear(w, p.team, p.x, p.y, ESCAPE_NEAR).length >= 1;
   return (
-    hurt || (e.surrounded && enemiesNear(w, p.x, p.y, ESCAPE_CROWD_RADIUS).length >= PACK_SIZE)
+    hurt ||
+    (e.surrounded && enemiesNear(w, p.team, p.x, p.y, ESCAPE_CROWD_RADIUS).length >= PACK_SIZE)
   );
 }
 
@@ -166,23 +167,23 @@ function autoPick(
       const hit = p.life / Math.max(1, p.def.maxLife) < GUARD_LIFE;
       if (!hit || left > 0) return null;
     } else if (u.policy === 'rally') {
-      const pack = enemiesNear(w, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE;
+      const pack = enemiesNear(w, p.team, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE;
       if (!pack && !isBig(target)) return null;
     } else if (u.second) {
       // A buff the first skill ends is a run: begun to get through a crowd or away when hurt, not at every fight.
-      const hurt = p.life < p.def.maxLife * 0.7 && enemiesNear(w, p.x, p.y, 5).length >= 1;
-      const crowded = enemiesNear(w, p.x, p.y, 4).length >= PACK_SIZE;
+      const hurt = p.life < p.def.maxLife * 0.7 && enemiesNear(w, p.team, p.x, p.y, 5).length >= 1;
+      const crowded = enemiesNear(w, p.team, p.x, p.y, 4).length >= PACK_SIZE;
       if (!hurt && !crowded) return null;
-    } else if (enemiesNear(w, p.x, p.y, PACK_RADIUS).length < 1) return null;
+    } else if (enemiesNear(w, p.team, p.x, p.y, PACK_RADIUS).length < 1) return null;
     return { choice: c, prof, cd: u.cooldown ?? 0.5 };
   }
   if (u.kind === 'shout') {
     // Cast when a pack or a rare enemy is near, like a rallying cry; a standing channel (Wither) goes on while any enemy is near.
     if (u.policy === 'upkeep') {
-      if (enemiesNear(w, p.x, p.y, u.radius).length < 1) return null;
+      if (enemiesNear(w, p.team, p.x, p.y, u.radius).length < 1) return null;
       return { choice: c, prof, cd: u.cooldown };
     }
-    const pack = enemiesNear(w, p.x, p.y, u.radius + 2).length >= PACK_SIZE;
+    const pack = enemiesNear(w, p.team, p.x, p.y, u.radius + 2).length >= PACK_SIZE;
     if (d > u.radius + 2 || (!pack && !isBig(target))) return null;
     return { choice: c, prof, cd: u.cooldown };
   }
@@ -191,7 +192,7 @@ function autoPick(
     const have = target.hexes.find((h) => h.id === u.hex);
     if (have && have.t > prof.useTime + 0.5) return null;
     if (!have && target.hexes.length >= Math.max(1, ch.hexLimit)) return null;
-    const pack = enemiesNear(w, target.x, target.y, u.radius).length >= PACK_SIZE;
+    const pack = enemiesNear(w, p.team, target.x, target.y, u.radius).length >= PACK_SIZE;
     if (!pack && !isBig(target) && target.life < 0.5 * target.def.maxLife) return null;
     return { choice: c, prof, cd: 0.5 };
   }
@@ -206,7 +207,7 @@ function autoPick(
     // A decoy goes up when a pack closes in, or life runs low.
     if (
       u.taunt &&
-      enemiesNear(w, p.x, p.y, PACK_RADIUS).length < PACK_SIZE &&
+      enemiesNear(w, p.team, p.x, p.y, PACK_RADIUS).length < PACK_SIZE &&
       !isBig(target) &&
       p.life >= p.def.maxLife * 0.7
     )
@@ -222,8 +223,8 @@ function autoPick(
   if (blinkGroupBusy(w, s, c)) return null;
   // A blink to get away is used when hurt with enemies about, or when a pack has closed in.
   if (u.escape) {
-    const hurt = p.life < p.def.maxLife * 0.7 && enemiesNear(w, p.x, p.y, 5).length >= 1;
-    const crowded = enemiesNear(w, p.x, p.y, 4).length >= PACK_SIZE;
+    const hurt = p.life < p.def.maxLife * 0.7 && enemiesNear(w, p.team, p.x, p.y, 5).length >= 1;
+    const crowded = enemiesNear(w, p.team, p.x, p.y, 4).length >= PACK_SIZE;
     return hurt || crowded ? { choice: c, prof, cd: u.cooldown } : null;
   }
   const conds = playerConds(w, s, target);
@@ -233,22 +234,24 @@ function autoPick(
     (prof.skill.behaviour.kind === 'burst' ? prof.skill.behaviour.radius : 2) * prof.radiusMult;
   const packHere =
     (u.burst === 'depart' || u.burst === 'both') &&
-    enemiesNear(w, p.x, p.y, radius * 1.3).length >= PACK_SIZE;
+    enemiesNear(w, p.team, p.x, p.y, radius * 1.3).length >= PACK_SIZE;
   // Bodyswap goes to a corpse with enemies about it.
   const corpseGo =
     !!u.corpse &&
     w.corpses.some(
       (c0) =>
         Math.hypot(c0.x - p.x, c0.y - p.y) <= u.distance + 1 &&
-        enemiesNear(w, c0.x, c0.y, 2.5).length >= 2,
+        enemiesNear(w, p.team, c0.x, c0.y, 2.5).length >= 2,
     );
   const packThere =
-    u.burst === 'arrive' && gap && enemiesNear(w, target.x, target.y, radius * 1.3).length >= 2;
+    u.burst === 'arrive' &&
+    gap &&
+    enemiesNear(w, p.team, target.x, target.y, radius * 1.3).length >= 2;
   const fight =
     !!u.elusive &&
     s.buffT.elusive <= 0 &&
     d <= CAST_RANGE &&
-    enemiesNear(w, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE;
+    enemiesNear(w, p.team, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE;
   if (u.warp && s.warp) return null;
   if (gap || packHere || packThere || fight || corpseGo) return { choice: c, prof, cd: u.cooldown };
   return null;
@@ -299,7 +302,8 @@ export function tickAuraBurn(w: World, s: Side, dt: number): void {
   const amount =
     (b.pct / 100) * p.def.maxLife * BURN_EVERY * s.char.db.mult('damage', playerCtx(w, s));
   if (amount > 0)
-    for (const e of enemiesNear(w, p.x, p.y, BURN_RADIUS)) rawHit(w, e, amount, 3, 'Burning aura');
+    for (const e of enemiesNear(w, p.team, p.x, p.y, BURN_RADIUS))
+      rawHit(w, e, amount, 3, 'Burning aura');
   // The character burns too, as fire damage that its resistance and energy shield answer to; it never kills.
   if (b.self > 0) {
     const was = s.opts.godMode;
@@ -318,7 +322,7 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
   if (c.skill.tags.includes('warcry')) a.side!.utilityReady[WARCRIES] = w.t + WARCRY_SECONDS;
   if (u.kind === 'shout') {
     w.events.push({ t: 'cry', x: a.x, y: a.y, r: u.radius });
-    const near = enemiesNear(w, a.x, a.y, u.radius);
+    const near = enemiesNear(w, a.team, a.x, a.y, u.radius);
     for (const e of near)
       for (const s of u.statuses) {
         const v =
@@ -396,7 +400,7 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
   if (!target || !target.alive) return;
   if (u.kind === 'curse') {
     const effect = hexEffect(u.hex, c.skill.level) * a.side!.char.db.mult('curseEffect');
-    for (const e of enemiesNear(w, target.x, target.y, u.radius))
+    for (const e of enemiesNear(w, a.team, target.x, target.y, u.radius))
       applyHex(
         w,
         e,

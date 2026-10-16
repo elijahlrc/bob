@@ -152,7 +152,7 @@ function findTarget(w: World, s: Side): Actor | null {
   let best: Actor | null = null;
   let bd = Infinity;
   for (const m of w.actors) {
-    if (m.isPlayer || !m.alive || m.phaseT > 0) continue;
+    if (m.team === s.team || !m.alive || m.phaseT > 0) continue;
     if (m.id === s.ai.skipId && w.t < s.ai.skipUntil) continue;
     const real = Math.hypot(m.x - p.x, m.y - p.y);
     if (real > ENGAGE_RANGE) continue;
@@ -233,7 +233,7 @@ function whenHolds(w: World, s: Side, when: SkillWhen, target: Actor): boolean {
   if (when === 'rare') return isBig(target);
   if (when === 'boss') return target.rarity === 'boss' || target.rarity === 'miniboss';
   const p = s.player;
-  const pack = enemiesNear(w, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE;
+  const pack = enemiesNear(w, p.team, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE;
   return when === 'pack' ? pack : !pack;
 }
 
@@ -320,6 +320,7 @@ function chooseSkill(w: World, s: Side, target: Actor): Pick {
  */
 export function hazardAt(
   w: World,
+  team: number,
   x: number,
   y: number,
   margin = 0,
@@ -331,7 +332,7 @@ export function hazardAt(
     }
     // A blast is a hazard once its warning shows (a later step of a pattern is not yet), by its shape. A blow that follows
     // the character (a Sentence) cannot be stepped out of, so the character does not try.
-    if (e.team === 1 && e.t > 0 && !e.unavoidable && !pending(e) && inBlast(e, x, y, margin))
+    if (e.team !== team && e.t > 0 && !e.unavoidable && !pending(e) && inBlast(e, x, y, margin))
       return e;
   }
   for (const t of telegraphs(w))
@@ -360,7 +361,7 @@ function avoidHazard(w: World, s: Side, dt: number): boolean {
     ai.dodgeRest -= dt;
     return false;
   }
-  if (!hazardAt(w, p.x, p.y, p.r)) {
+  if (!hazardAt(w, s.team, p.x, p.y, p.r)) {
     ai.dodgeT = Math.max(0, ai.dodgeT - DODGE_DRAIN * dt);
     return false;
   }
@@ -376,7 +377,7 @@ function avoidHazard(w: World, s: Side, dt: number): boolean {
     for (const len of [1.5, 2.5, 3.5]) {
       const c = w.grid.collide(p.x + Math.cos(ang) * len, p.y + Math.sin(ang) * len, p.r);
       if (Math.hypot(c.x - p.x, c.y - p.y) < len - 0.2) continue;
-      if (hazardAt(w, c.x, c.y, p.r + 0.3) || !w.grid.los(p.x, p.y, c.x, c.y)) continue;
+      if (hazardAt(w, s.team, c.x, c.y, p.r + 0.3) || !w.grid.los(p.x, p.y, c.x, c.y)) continue;
       // A way out through a monster is none: the body shoves it along and its warning goes with it.
       if (bodyOnWay(w, p.x, p.y, c.x, c.y, p.r)) continue;
       if (target && target.alive) {
@@ -424,7 +425,7 @@ function kiteStep(w: World, s: Side, target: Actor, dt: number): boolean {
   let near: Actor | null = null;
   let nd = KITE_RANGE;
   for (const m of w.actors) {
-    if (m.isPlayer || !m.alive || m.phaseT > 0 || m.stationary) continue;
+    if (m.team === s.team || !m.alive || m.phaseT > 0 || m.stationary) continue;
     const d = Math.hypot(m.x - p.x, m.y - p.y);
     if (d < nd) {
       nd = d;
@@ -438,7 +439,7 @@ function kiteStep(w: World, s: Side, target: Actor, dt: number): boolean {
     for (const len of [2.5, 3.5]) {
       const c = w.grid.collide(p.x + Math.cos(ang) * len, p.y + Math.sin(ang) * len, p.r);
       if (Math.hypot(c.x - p.x, c.y - p.y) < len - 0.2) continue;
-      if (hazardAt(w, c.x, c.y, p.r + 0.3) || !w.grid.los(p.x, p.y, c.x, c.y)) continue;
+      if (hazardAt(w, s.team, c.x, c.y, p.r + 0.3) || !w.grid.los(p.x, p.y, c.x, c.y)) continue;
       if (bodyOnWay(w, p.x, p.y, c.x, c.y, p.r)) continue;
       if (Math.hypot(target.x - c.x, target.y - c.y) > range) continue;
       if (!w.grid.los(c.x, c.y, target.x, target.y)) continue;
@@ -637,7 +638,7 @@ export function playerAI(w: World, s: Side, dt: number): void {
     for (const m of w.actors) {
       // A Quarry's champions count wherever they stand.
       const hunted = m.room === w.endRoom || (w.plan.type === 'quarry' && m.rarity === 'miniboss');
-      if (m.isPlayer || !m.alive || !hunted) continue;
+      if (m.team === s.team || !m.alive || !hunted) continue;
       const d = Math.hypot(m.x - p.x, m.y - p.y);
       if (d < bd) {
         bd = d;

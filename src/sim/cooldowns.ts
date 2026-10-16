@@ -67,7 +67,8 @@ function recoverRate(w: World, s: Side, c: SkillChoice): number {
   const p = s.player;
   let more = 0;
   for (const e of w.actors) {
-    if (e.isPlayer || !e.alive || Math.hypot(e.x - p.x, e.y - p.y) > r.radius + e.r) continue;
+    if (e.team === s.team || !e.alive || Math.hypot(e.x - p.x, e.y - p.y) > r.radius + e.r)
+      continue;
     const big = e.rarity === 'rare' || e.rarity === 'miniboss' || e.rarity === 'boss';
     more += levelValue(big ? r.rare : r.normal, c.skill.level);
   }

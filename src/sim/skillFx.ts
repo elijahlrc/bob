@@ -102,7 +102,7 @@ export function projectileFx(w: World, s: Side, pr: Projectile, dt: number): voi
     let best: Actor | null = null;
     let bd = sk.homing.radius;
     for (const e of w.actors) {
-      if (e.isPlayer || !e.alive || e.phaseT > 0 || pr.hitIds.includes(e.id)) continue;
+      if (e.team === s.team || !e.alive || e.phaseT > 0 || pr.hitIds.includes(e.id)) continue;
       const d = Math.hypot(e.x - pr.x, e.y - pr.y);
       if (d >= bd) continue;
       // Only what lies ahead of it, within a quarter turn either side.
@@ -140,7 +140,7 @@ export function projectileFx(w: World, s: Side, pr: Projectile, dt: number): voi
       });
       for (const e of w.actors)
         if (
-          !e.isPlayer &&
+          e.team !== s.team &&
           e.alive &&
           e.phaseT <= 0 &&
           Math.hypot(e.x - pr.x, e.y - pr.y) <= r + e.r
@@ -159,7 +159,7 @@ export function projectileFx(w: World, s: Side, pr: Projectile, dt: number): voi
   if (carried)
     for (const e of w.actors)
       if (
-        !e.isPlayer &&
+        e.team !== s.team &&
         e.alive &&
         Math.hypot(e.x - pr.x, e.y - pr.y) <= carried * pr.profile.radiusMult + e.r
       )
@@ -211,7 +211,7 @@ function pulseBeams(w: World, s: Side, c: SkillChoice, spec: BeamSpec): void {
   const p = s.player;
   const level = c.skill.level;
   const near = w.actors
-    .filter((e) => !e.isPlayer && e.alive && e.phaseT <= 0)
+    .filter((e) => e.team !== s.team && e.alive && e.phaseT <= 0)
     .map((e) => ({ e, d: Math.hypot(e.x - p.x, e.y - p.y) }))
     .sort((a, b) => a.d - b.d);
   if (near.length === 0) return;
@@ -273,7 +273,7 @@ function detonate(w: World, s: Side, e: Actor): void {
   s.inFx = true;
   if (e.alive) hit(w, s.player, e, q, 0, Math.hypot(e.x - s.player.x, e.y - s.player.y));
   for (const o of w.actors)
-    if (!o.isPlayer && o.alive && o !== e && Math.hypot(o.x - e.x, o.y - e.y) <= r + o.r)
+    if (o.team !== s.team && o.alive && o !== e && Math.hypot(o.x - e.x, o.y - e.y) <= r + o.r)
       hit(w, s.player, o, q, 0, Math.hypot(o.x - s.player.x, o.y - s.player.y));
   s.inFx = false;
 }
@@ -370,7 +370,7 @@ function tickVortex(w: World, s: Side, dt: number): void {
     let near: Actor | null = null;
     let bd = Infinity;
     for (const e of w.actors)
-      if (!e.isPlayer && e.alive) {
+      if (e.team !== s.team && e.alive) {
         const d = Math.hypot(e.x - p.x, e.y - p.y);
         if (d < bd) {
           bd = d;
@@ -397,7 +397,12 @@ function tickVortex(w: World, s: Side, dt: number): void {
       skill: base.skill.id,
     });
     for (const e of w.actors)
-      if (!e.isPlayer && e.alive && e.phaseT <= 0 && Math.hypot(e.x - p.x, e.y - p.y) <= r + e.r)
+      if (
+        e.team !== s.team &&
+        e.alive &&
+        e.phaseT <= 0 &&
+        Math.hypot(e.x - p.x, e.y - p.y) <= r + e.r
+      )
         hit(w, p, e, q, 0, Math.hypot(e.x - p.x, e.y - p.y));
   }
 }
@@ -433,7 +438,12 @@ function tickMarkers(w: World, s: Side, dt: number): void {
       skill: m.profile.skill.id,
     });
     for (const e of w.actors)
-      if (!e.isPlayer && e.alive && e.phaseT <= 0 && Math.hypot(e.x - m.x, e.y - m.y) <= r + e.r)
+      if (
+        e.team !== s.team &&
+        e.alive &&
+        e.phaseT <= 0 &&
+        Math.hypot(e.x - m.x, e.y - m.y) <= r + e.r
+      )
         hit(w, s.player, e, m.profile, m.hand, Math.hypot(e.x - s.player.x, e.y - s.player.y));
   }
 }
@@ -470,7 +480,7 @@ function orbBolt(
   const spec = p.skill.stormOrb!;
   const level = p.skill.level;
   const reach = spec.radius * p.radiusMult;
-  const alive = w.actors.filter((e) => !e.isPlayer && e.alive && e.phaseT <= 0);
+  const alive = w.actors.filter((e) => e.team !== s.team && e.alive && e.phaseT <= 0);
   const first = alive
     .map((e) => ({ e, d: Math.hypot(e.x - fromX, e.y - fromY) }))
     .filter((n) => n.d <= reach + n.e.r)
@@ -612,7 +622,12 @@ function tickFuses(w: World, s: Side, dt: number): void {
         hands.set(a.profile, q);
       }
       for (const e of w.actors)
-        if (!e.isPlayer && e.alive && e.phaseT <= 0 && Math.hypot(e.x - f.x, e.y - f.y) <= r + e.r)
+        if (
+          e.team !== s.team &&
+          e.alive &&
+          e.phaseT <= 0 &&
+          Math.hypot(e.x - f.x, e.y - f.y) <= r + e.r
+        )
           hit(w, s.player, e, q, a.hand, Math.hypot(e.x - s.player.x, e.y - s.player.y));
     }
   }
@@ -756,7 +771,7 @@ function tickSiphon(w: World, s: Side, dt: number): void {
     if (!sp) continue;
     let n = 0;
     for (const e of w.actors)
-      if (!e.isPlayer && e.alive && e.sdots.some((d) => d.src === c.skill.id)) n++;
+      if (e.team !== s.team && e.alive && e.sdots.some((d) => d.src === c.skill.id)) n++;
     if (n === 0) continue;
     const lv = c.skill.level;
     const life = levelValue(sp.life, lv) + n * levelValue(sp.lifeEach, lv);
@@ -774,7 +789,7 @@ function tickBots(w: World, s: Side, dt: number): void {
     if ((m.botCd ?? 0) > 0) m.botCd = m.botCd! - dt;
     const sk = m.bot;
     for (const e of w.actors) {
-      if (e.isPlayer || !e.alive || e.phaseT > 0) continue;
+      if (e.team === s.team || !e.alive || e.phaseT > 0) continue;
       if (Math.hypot(e.x - m.x, e.y - m.y) > sk.radius + e.r) continue;
       if (sk.kind === 'chill' && !e.def.cannotBeChilled) {
         e.ail.chill = Math.max(e.ail.chill, sk.v / 100);
@@ -836,7 +851,7 @@ function tickShell(w: World, side: Side): void {
   w.events.push({ t: 'explode', x: p.x, y: p.y, r: s.radius, dtype: 3 });
   for (const e of w.actors)
     if (
-      !e.isPlayer &&
+      e.team !== side.team &&
       e.alive &&
       e.phaseT <= 0 &&
       Math.hypot(e.x - p.x, e.y - p.y) <= s.radius + e.r
@@ -863,7 +878,7 @@ export function relicNova(w: World, s: Side): void {
     spellBaseDamage(relic.level) * (MINIONS.relic.nova ?? 0) * relic.dmg * MINION_ENEMY_RES;
   for (const e of w.actors)
     if (
-      !e.isPlayer &&
+      e.team !== s.team &&
       e.alive &&
       e.phaseT <= 0 &&
       Math.hypot(e.x - relic.x, e.y - relic.y) <= r + e.r

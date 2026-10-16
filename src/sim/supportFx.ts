@@ -175,7 +175,7 @@ function mirageShoots(w: World, s: Side, m: Mirage): void {
   let best: Actor | null = null;
   let bd = MIRAGE_RANGE;
   for (const e of w.actors) {
-    if (e.isPlayer || !e.alive || e.phaseT > 0) continue;
+    if (e.team === s.team || !e.alive || e.phaseT > 0) continue;
     const d = Math.hypot(e.x - m.x, e.y - m.y);
     if (d < bd) {
       bd = d;
@@ -223,7 +223,7 @@ export function afterPlayerHit(w: World, s: Side, dst: Actor, p: SkillProfile): 
     w.events.push({ t: 'explode', x: dst.x, y: dst.y, r: SHOCK_RADIUS * p.radiusMult, dtype: 0 });
     for (const e of w.actors)
       if (
-        !e.isPlayer &&
+        e.team !== s.team &&
         e.alive &&
         e !== dst &&
         Math.hypot(e.x - dst.x, e.y - dst.y) <= SHOCK_RADIUS * p.radiusMult + e.r
@@ -242,7 +242,7 @@ export function extraStrikes(w: World, a: Actor, act: Action, target: Actor): vo
   const others = w.actors
     .filter(
       (e) =>
-        !e.isPlayer &&
+        e.team !== a.team &&
         e.alive &&
         e !== target &&
         e.phaseT <= 0 &&
@@ -278,7 +278,10 @@ export function repeatTarget(w: World, a: Actor, act: Action): Actor | undefined
   const reach = (b.kind === 'melee' ? b.range : 1.6) + p.rangeBonus + 1.2;
   const near = w.actors.filter(
     (e) =>
-      !e.isPlayer && e.alive && e.phaseT <= 0 && Math.hypot(e.x - a.x, e.y - a.y) <= reach + e.r,
+      e.team !== a.team &&
+      e.alive &&
+      e.phaseT <= 0 &&
+      Math.hypot(e.x - a.x, e.y - a.y) <= reach + e.r,
   );
   return near.length ? near[w.rngCombat.int(0, near.length - 1)] : undefined;
 }

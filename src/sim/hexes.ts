@@ -68,7 +68,7 @@ export function applyHex(
 /** The player's hexes on a struck enemy: every hex the character applies on hit. */
 export function applyPlayerHexes(w: World, s: Side, dst: Actor): void {
   const ch = s.char;
-  if (!ch.hexes.length || dst.isPlayer) return;
+  if (!ch.hexes.length || dst.team === s.team) return;
   for (const h of ch.hexes) applyHex(w, dst, h.id, h.effect, ch.hexLimit, h.level);
 }
 
@@ -83,7 +83,7 @@ export function tickBlasphemy(w: World, s: Side, dt: number): void {
     if (!h) continue;
     const radius = Math.max(u.radius, 3) * s.char.profile(c, 0).radiusMult * 1.5;
     for (const e of w.actors)
-      if (!e.isPlayer && e.alive && Math.hypot(e.x - p.x, e.y - p.y) <= radius + e.r)
+      if (e.team !== s.team && e.alive && Math.hypot(e.x - p.x, e.y - p.y) <= radius + e.r)
         applyHex(w, e, h.id, h.effect, s.char.hexLimit, h.level);
   }
 }
@@ -99,7 +99,7 @@ export function monsterHexesPlayer(w: World, s: Side, id: HexId, effect: number)
 
 /** The player's attack hits an enemy under a hex that gives something back on each hit (Mark of Plenty: life and mana). */
 export function hexHit(w: World, s: Side, dst: Actor, melee = false): void {
-  if (dst.hexes.length === 0 || dst.isPlayer) return;
+  if (dst.hexes.length === 0 || dst.team === s.team) return;
   const p = s.player;
   for (const h of dst.hexes) {
     const def = HEXES[h.id];

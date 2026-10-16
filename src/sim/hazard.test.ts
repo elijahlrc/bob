@@ -25,11 +25,11 @@ describe('the hazard-aware player AI (EXPANSION 5.8)', () => {
   it('knows what is a hazard: a zone covers its circle, a telegraphed blast about to land does too', () => {
     const w = arena(5);
     const { x, y } = w.sides[0].player;
-    expect(hazardAt(w, x, y)).toBeNull();
+    expect(hazardAt(w, w.sides[0].team, x, y)).toBeNull();
     openZone(w, x, y, 2, 4, 'caustic', 10);
-    expect(hazardAt(w, x + 1.5, y)).not.toBeNull();
-    expect(hazardAt(w, x + 2.5, y)).toBeNull();
-    expect(hazardAt(w, x + 2.3, y, 0.5)).not.toBeNull();
+    expect(hazardAt(w, w.sides[0].team, x + 1.5, y)).not.toBeNull();
+    expect(hazardAt(w, w.sides[0].team, x + 2.5, y)).toBeNull();
+    expect(hazardAt(w, w.sides[0].team, x + 2.3, y, 0.5)).not.toBeNull();
     w.effects.length = 0;
     w.effects.push({
       id: 999,
@@ -43,7 +43,7 @@ describe('the hazard-aware player AI (EXPANSION 5.8)', () => {
       dtype: 0,
       team: 1,
     });
-    expect(hazardAt(w, x, y)).not.toBeNull();
+    expect(hazardAt(w, w.sides[0].team, x, y)).not.toBeNull();
   });
 
   it('steps out of a caustic cloud while the target stays in reach', () => {
@@ -55,7 +55,7 @@ describe('the hazard-aware player AI (EXPANSION 5.8)', () => {
       for (const e of w.events)
         if (e.t === 'hit' && e.dst === w.sides[0].player.id && e.dtype === 4) hits++;
     }
-    expect(hazardAt(w, w.sides[0].player.x, w.sides[0].player.y)).toBeNull();
+    expect(hazardAt(w, w.sides[0].team, w.sides[0].player.x, w.sides[0].player.y)).toBeNull();
     // Standing in it for the whole three seconds would be twelve pulses; it left after the first few.
     expect(hits).toBeLessThanOrEqual(3);
   });

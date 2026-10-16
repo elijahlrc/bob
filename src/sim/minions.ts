@@ -133,7 +133,7 @@ export function makeMinion(
   const r = o.r ?? def.r;
   const spot = w.grid.collide(x, y, r);
   const m = newActor(w.nextId++, false, spot.x, spot.y, r) as Minion;
-  m.team = 0;
+  m.team = s.team;
   m.side = s;
   m.def = body.def;
   m.bodyDef = body.def;
@@ -266,7 +266,7 @@ export function tickMinions(w: World, s: Side, dt: number): void {
   if (s.minions.length === 0) return;
   const p = s.player;
   const foes = w.actors.filter(
-    (e) => !e.isPlayer && e.alive && e.phaseT <= 0 && e.state !== 'idle',
+    (e) => e.team !== s.team && e.alive && e.phaseT <= 0 && e.state !== 'idle',
   );
   const unstable = s.char.db.flag('minionInstability');
   const aura = auraNow(s);

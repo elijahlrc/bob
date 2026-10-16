@@ -351,7 +351,7 @@ export function releaseZaps(w: World, s: Side, skill: string): void {
     const q = scaleProfile(f.profile, 1 + (spec.releaseMore * left) / 100);
     const r = spec.releaseRadius * f.profile.radiusMult;
     w.events.push({ t: 'explode', x: f.x, y: f.y, r, dtype: f.dtype, skill: f.profile.skill.id });
-    for (const e of enemiesIn(w, f.x, f.y, r))
+    for (const e of enemiesIn(w, s.team, f.x, f.y, r))
       hit(w, p, e, q, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
   }
   s.fields.length = j;
@@ -391,7 +391,7 @@ export function placeGeyser(w: World, a: Actor, act: Action): void {
   takeCorpse(w, corpse);
   const r = spec.explodeRadius * p.radiusMult;
   w.events.push({ t: 'explode', x: corpse.x, y: corpse.y, r, dtype: 3, skill: p.skill.id });
-  for (const e of enemiesIn(w, corpse.x, corpse.y, r))
+  for (const e of enemiesIn(w, a.team, corpse.x, corpse.y, r))
     rawHit(w, e, (corpse.life * spec.explodePct) / 100, 3, 'Corpse');
   const mine = a.side!.fields.filter((f) => f.kind === 'geyser');
   if (mine.length >= spec.max) {
@@ -431,7 +431,7 @@ function blast(w: World, s: Side, f: Field, x: number, y: number, r: number, pul
     skill: f.profile?.skill.id,
     ...(pulse ? { pulse: true } : {}),
   });
-  for (const e of enemiesIn(w, x, y, r))
+  for (const e of enemiesIn(w, s.team, x, y, r))
     hit(w, p, e, f.profile!, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
 }
 
@@ -440,7 +440,7 @@ function volley(w: World, s: Side, f: Field): void {
   const spec = f.profile!.skill.orb;
   if (spec?.kind !== 'frost') return;
   const p = s.player;
-  const near = enemiesIn(w, p.x, p.y, spec.range);
+  const near = enemiesIn(w, s.team, p.x, p.y, spec.range);
   for (let i = 0; i < spec.count; i++) {
     let x: number;
     let y: number;
@@ -458,9 +458,9 @@ function volley(w: World, s: Side, f: Field): void {
   }
 }
 
-function enemiesIn(w: World, x: number, y: number, r: number): Actor[] {
+function enemiesIn(w: World, team: number, x: number, y: number, r: number): Actor[] {
   return w.actors.filter(
-    (e) => !e.isPlayer && e.alive && e.phaseT <= 0 && Math.hypot(e.x - x, e.y - y) <= r + e.r,
+    (e) => e.team !== team && e.alive && e.phaseT <= 0 && Math.hypot(e.x - x, e.y - y) <= r + e.r,
   );
 }
 
@@ -575,7 +575,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
         f.pulseT += f.interval;
         for (const e of w.actors)
           if (
-            !e.isPlayer &&
+            e.team !== s.team &&
             e.alive &&
             e.phaseT <= 0 &&
             segmentDist(e.x, e.y, f.x, f.y, f.x2!, f.y2!) <= f.radius + e.r
@@ -612,7 +612,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
     } else if (f.kind === 'pod' && f.profile) {
       const spec = f.profile.skill.pods!;
       if (pulse)
-        for (const e of enemiesIn(w, f.x, f.y, f.radius)) {
+        for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius)) {
           applySkillDot(w, e, f.profile, { seconds: 0.5 });
           // Each pod that reaches it slows it a little, up to a limit.
           const reached = s.fields.filter(
@@ -633,32 +633,32 @@ export function tickFields(w: World, s: Side, dt: number): void {
           dtype: f.dtype,
           skill: f.profile.skill.id,
         });
-        for (const e of enemiesIn(w, f.x, f.y, r))
+        for (const e of enemiesIn(w, s.team, f.x, f.y, r))
           hit(w, p, e, f.profile, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
       }
     } else if (f.kind === 'caustic' && pulse && f.profile) {
       // Caustic ground renews the debuff of whoever stands in it, in short spans: patches do not add up.
-      for (const e of enemiesIn(w, f.x, f.y, f.radius))
+      for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius))
         applySkillDot(w, e, f.profile, { seconds: 0.5 });
     } else if (f.kind === 'chilling' && pulse && f.profile && f.dps <= 0) {
       // Chilled ground that deals no damage (Frostblink) only chills what stands on it.
-      for (const e of enemiesIn(w, f.x, f.y, f.radius)) {
+      for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius)) {
         if (e.def.cannotBeChilled) continue;
         e.ail.chill = Math.max(e.ail.chill, f.profile.chill.effect);
         e.ail.chillT = Math.max(e.ail.chillT, f.interval * 2);
       }
     } else if (f.kind === 'chilling' && pulse && f.profile) {
       const q = scaleProfile(f.profile, f.dps * f.interval);
-      for (const e of enemiesIn(w, f.x, f.y, f.radius))
+      for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius))
         hit(w, p, e, q, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
     } else if (f.kind === 'smoke' && pulse) {
       // Smoke blinds what stands in it.
-      for (const e of enemiesIn(w, f.x, f.y, f.radius))
+      for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius))
         applyStatus(w, e, 'blind', { seconds: f.interval * 2, v: f.dps });
     } else if (f.kind === 'crystal' && f.profile) {
       const spec = f.profile.skill.crystal!;
       if (pulse)
-        for (const e of enemiesIn(w, f.x, f.y, f.radius)) {
+        for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius)) {
           applyStatus(w, e, 'exposedCold', { seconds: spec.debuffSeconds, v: spec.exposure });
           applyStatus(w, e, 'regenLess', { seconds: spec.debuffSeconds, v: spec.regenLess });
         }
@@ -671,11 +671,11 @@ export function tickFields(w: World, s: Side, dt: number): void {
           dtype: f.dtype,
           skill: f.profile.skill.id,
         });
-        for (const e of enemiesIn(w, f.x, f.y, f.radius))
+        for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius))
           hit(w, p, e, f.profile, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
       }
     } else if (f.kind === 'storm' && pulse && f.recent) {
-      const near = enemiesIn(w, p.x, p.y, f.radius).filter(
+      const near = enemiesIn(w, s.team, p.x, p.y, f.radius).filter(
         (e) => (f.recent!.get(e.id) ?? -1) < w.t - 0.4,
       );
       if (near.length) {
@@ -762,7 +762,7 @@ export function raiseWall(w: World, a: Actor, act: Action): void {
   const p1y = act.aimY - ey;
   const p2x = act.aimX + ex;
   const p2y = act.aimY + ey;
-  const onWall = enemiesIn(w, act.aimX, act.aimY, len / 2 + WALL_HALF + 1).filter(
+  const onWall = enemiesIn(w, a.team, act.aimX, act.aimY, len / 2 + WALL_HALF + 1).filter(
     (e) => segmentDist(e.x, e.y, p1x, p1y, p2x, p2y) <= WALL_HALF + e.r,
   );
   for (const e of onWall) {

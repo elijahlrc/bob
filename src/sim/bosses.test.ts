@@ -298,7 +298,7 @@ describe('the Magistrate (docs/BOSSES.md 6)', () => {
     const m = putBoss(w, 'magistrate', 5, 0, 50);
     const st = bossState(m)!;
     for (let i = 0; i < 60 * 20 && st.countT <= 0; i++) stepWorld(w);
-    expect(hazardAt(w, w.sides[0].player.x, w.sides[0].player.y)).toBe(null);
+    expect(hazardAt(w, w.sides[0].team, w.sides[0].player.x, w.sides[0].player.y)).toBe(null);
   });
 
   it('is immune to curses and the Rotwife takes them in full', async () => {

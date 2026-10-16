@@ -90,17 +90,17 @@ describe('attack shapes (docs/ROSTER.md section 5)', () => {
     const brute = put(w, 'brute', 1.8);
     windUp(w, brute, 20);
     expect(
-      hazardAt(w, w.sides[0].player.x, w.sides[0].player.y, w.sides[0].player.r),
+      hazardAt(w, w.sides[0].team, w.sides[0].player.x, w.sides[0].player.y, w.sides[0].player.r),
     ).not.toBeNull();
-    expect(hazardAt(w, brute.x + 3, brute.y)).toBeNull();
+    expect(hazardAt(w, w.sides[0].team, brute.x + 3, brute.y)).toBeNull();
     brute.alive = false;
     w.actors = w.actors.filter((a) => a.alive || a.isPlayer);
     const sentinel = put(w, 'sentinel', 1.6);
     windUp(w, sentinel, 20);
     const ring = telegraphs(w)[0];
     expect(ring.kind).toBe('ring');
-    expect(hazardAt(w, sentinel.x + 1, sentinel.y)).not.toBeNull();
-    expect(hazardAt(w, sentinel.x + 6, sentinel.y)).toBeNull();
+    expect(hazardAt(w, w.sides[0].team, sentinel.x + 1, sentinel.y)).not.toBeNull();
+    expect(hazardAt(w, w.sides[0].team, sentinel.x + 6, sentinel.y)).toBeNull();
     sentinel.alive = false;
     const arb = put(w, 'arbalest', 8);
     windUp(w, arb, 20);
@@ -119,7 +119,7 @@ describe('attack shapes (docs/ROSTER.md section 5)', () => {
     windUp(w, m, 90);
     const zone = w.effects.find((e) => e.kind === 'caustic');
     expect(zone).toBeDefined();
-    expect(hazardAt(w, zone!.x, zone!.y)).not.toBeNull();
+    expect(hazardAt(w, w.sides[0].team, zone!.x, zone!.y)).not.toBeNull();
   });
 
   it('a nova round a monster does not follow anything: it is centred on the monster', () => {

@@ -151,8 +151,8 @@ export function deployFull(s: Side, c: SkillChoice, prof: SkillProfile): boolean
   return deployedCount(s, c.key, true) >= deployCap(c, prof);
 }
 
-const enemies = (w: World): Actor[] =>
-  w.actors.filter((e) => !e.isPlayer && e.alive && e.phaseT <= 0);
+const enemies = (w: World, team: number): Actor[] =>
+  w.actors.filter((e) => e.team !== team && e.alive && e.phaseT <= 0);
 
 /** A new totem stands at least this far from the totems of its own skill, in tiles, when there is room. */
 const TOTEM_APART = 2.5;
@@ -176,7 +176,7 @@ function totemSpot(
   const base = Math.atan2(dy, dx);
   const bond = c.skill.bond;
   const mine = a.side!.deployables.filter((d) => d.key === c.key);
-  const foes = bond ? enemies(w) : [];
+  const foes = bond ? enemies(w, a.team) : [];
   let best = { x: a.x + (dx / len) * TOTEM_OFFSET, y: a.y + (dy / len) * TOTEM_OFFSET };
   let bestScore = -Infinity;
   for (let i = 0; i < TOTEM_TRIES; i++) {
@@ -547,7 +547,7 @@ function bondBeams(w: World, s: Side, bonds: Deployable[], c: SkillChoice, foes:
 /** Totems and brands shoot when an enemy is in reach; traps and mines go off; everything ends when its time is up. */
 export function tickDeployables(w: World, s: Side, dt: number): void {
   if (s.deployables.length === 0) return;
-  const foes = enemies(w);
+  const foes = enemies(w, s.team);
   const p = s.player;
   const bonds = new Map<string, Deployable[]>();
   const crowd: Crowd = { many: new Set(), landed: [] };

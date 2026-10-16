@@ -152,9 +152,9 @@ describe('patterns (docs/ENCOUNTERS.md 4)', () => {
     for (let i = 1; i < d.length; i++) expect(d[i]).toBeGreaterThan(d[i - 1]);
     const last = laid[laid.length - 1];
     expect(last.delay).toBeGreaterThan(0);
-    expect(hazardAt(w, last.x, last.y)).toBeNull();
+    expect(hazardAt(w, w.sides[0].team, last.x, last.y)).toBeNull();
     // The first one is up at once.
-    expect(hazardAt(w, laid[0].x, laid[0].y)).not.toBeNull();
+    expect(hazardAt(w, w.sides[0].team, laid[0].x, laid[0].y)).not.toBeNull();
     // They land, and the recap names them.
     const before = w.sides[0].dmgLog.length;
     steps(w, 150);

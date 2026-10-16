@@ -139,7 +139,11 @@ export function channelUse(w: World, a: Actor, act: Action): void {
   if (spec.crowdStage) {
     let near = 0;
     for (const e of w.actors)
-      if (!e.isPlayer && e.alive && Math.hypot(e.x - a.x, e.y - a.y) <= spec.crowdStage.radius)
+      if (
+        e.team !== a.team &&
+        e.alive &&
+        Math.hypot(e.x - a.x, e.y - a.y) <= spec.crowdStage.radius
+      )
         near++;
     if (near >= spec.crowdStage.min) gain += 1;
   }

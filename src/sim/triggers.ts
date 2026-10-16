@@ -119,7 +119,7 @@ function nearestEnemy(w: World, s: Side): Actor | null {
   let best: Actor | null = null;
   let bd = 12;
   for (const a of w.actors) {
-    if (a.isPlayer || !a.alive) continue;
+    if (a.team === s.team || !a.alive) continue;
     const d = Math.hypot(a.x - p.x, a.y - p.y);
     if (d < bd) {
       bd = d;
@@ -188,7 +188,8 @@ function overkillBurn(
   );
   const dps = (over * e.pct * s.char.db.mult('damage', ctx)) / 100;
   for (const o of w.actors) {
-    if (o.isPlayer || !o.alive || Math.hypot(o.x - dead.x, o.y - dead.y) > e.radius + o.r) continue;
+    if (o.team === s.team || !o.alive || Math.hypot(o.x - dead.x, o.y - dead.y) > e.radius + o.r)
+      continue;
     applyFlatDot(w, o, '@herald', 3, dps, e.seconds);
   }
   return true;
@@ -227,7 +228,7 @@ function drainExplosions(w: World, s: Side): void {
       w.events.push({ t: 'explode', x: q.x, y: q.y, r: q.r, dtype: q.type });
       registerBlast(w, q.x, q.y, q.r);
       for (const o of w.actors) {
-        if (o.isPlayer || !o.alive || o.id === q.from) continue;
+        if (o.team === s.team || !o.alive || o.id === q.from) continue;
         if (Math.hypot(o.x - q.x, o.y - q.y) > q.r + o.r) continue;
         wake(w, o);
         rawHit(w, o, q.amount, q.type);

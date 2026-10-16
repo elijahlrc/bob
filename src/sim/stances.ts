@@ -55,7 +55,7 @@ export function tickStance(w: World, sd: Side): void {
   if ((sd.utilityReady['@stance'] ?? 0) <= w.t) {
     let near = 0;
     for (const e of w.actors)
-      if (!e.isPlayer && e.alive && Math.hypot(e.x - p.x, e.y - p.y) <= PACK_RADIUS) near++;
+      if (e.team !== sd.team && e.alive && Math.hypot(e.x - p.x, e.y - p.y) <= PACK_RADIUS) near++;
     const want: Stance = near >= PACK_SIZE ? 'sand' : 'blood';
     if (want !== stanceOf(sd)) setStance(w, sd, want);
     sd.utilityReady['@stance'] = w.t + SWAP_EVERY;
@@ -70,7 +70,7 @@ export function tickStance(w: World, sd: Side): void {
     const x = e0.x === undefined ? 0 : levelValue(e0.x, a.gem.level);
     for (const e of w.actors)
       if (
-        !e.isPlayer &&
+        e.team !== sd.team &&
         e.alive &&
         e.phaseT <= 0 &&
         Math.hypot(e.x - p.x, e.y - p.y) <= a.def.stance!.radius + e.r
@@ -138,7 +138,7 @@ export function tickBladestorm(w: World, s: Side, f: import('./fields').Field, d
   f.pulseT += f.interval;
   for (const e of w.actors)
     if (
-      !e.isPlayer &&
+      e.team !== s.team &&
       e.alive &&
       e.phaseT <= 0 &&
       Math.hypot(e.x - f.x, e.y - f.y) <= f.radius + e.r
