@@ -184,7 +184,7 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
 
 /** The boss of the fight, across the top of the screen: its name, its life and shield, and what it is doing (two, for the Twins). */
 function BossBar({ w }: { w: World }) {
-  const p = w.player;
+  const p = w.sides[0].player;
   const bosses = w.actors.filter(
     (a) =>
       a.alive &&
@@ -223,16 +223,24 @@ function BossBar({ w }: { w: World }) {
 
 /** The ailments on the character, as chips with their stacks (docs/BOSSES.md 11.2). */
 const AIL_CHIPS: [string, (w: World) => number, string][] = [
-  ['Bleeding', (w) => w.player.ail.bleeds.length, 'Bleeding: damage over time, more while moving.'],
-  ['Poisoned', (w) => w.player.ail.poisons.length, 'Poisoned: chaos damage over time; it stacks.'],
-  ['Burning', (w) => w.player.ail.ignites.length, 'Ignited: fire damage over time.'],
-  ['Frozen', (w) => (w.player.ail.freezeT > 0 ? 1 : 0), 'Frozen: you cannot act.'],
+  [
+    'Bleeding',
+    (w) => w.sides[0].player.ail.bleeds.length,
+    'Bleeding: damage over time, more while moving.',
+  ],
+  [
+    'Poisoned',
+    (w) => w.sides[0].player.ail.poisons.length,
+    'Poisoned: chaos damage over time; it stacks.',
+  ],
+  ['Burning', (w) => w.sides[0].player.ail.ignites.length, 'Ignited: fire damage over time.'],
+  ['Frozen', (w) => (w.sides[0].player.ail.freezeT > 0 ? 1 : 0), 'Frozen: you cannot act.'],
   [
     'Chilled',
-    (w) => (w.player.ail.freezeT <= 0 && w.player.ail.chill > 0 ? 1 : 0),
+    (w) => (w.sides[0].player.ail.freezeT <= 0 && w.sides[0].player.ail.chill > 0 ? 1 : 0),
     'Chilled: you act and move more slowly.',
   ],
-  ['Shocked', (w) => (w.player.ail.shock > 0 ? 1 : 0), 'Shocked: you take more damage.'],
+  ['Shocked', (w) => (w.sides[0].player.ail.shock > 0 ? 1 : 0), 'Shocked: you take more damage.'],
 ];
 
 /** What the Unmaker holds of the character (docs/BOSSES.md 9), as chips. */
@@ -266,7 +274,7 @@ function theftChips(w: World): { name: string; text: string }[] {
 /** What monsters have left on the character besides hexes (docs/ENCOUNTERS.md 7): a blinding, a mark, a draining beam. */
 function playerDebuffs(w: World): { name: string; text: string }[] {
   const out: { name: string; text: string }[] = [];
-  const p = w.player;
+  const p = w.sides[0].player;
   for (const [name, n, text] of AIL_CHIPS) {
     const k = n(w);
     if (k > 0)
@@ -297,9 +305,9 @@ function playerDebuffs(w: World): { name: string; text: string }[] {
 
 /** Pips for each kind of charge the character can gain (EXPANSION 5.6). */
 function Charges({ w }: { w: World }) {
-  const ch = w.char;
+  const ch = w.sides[0].char;
   const kinds = CHARGE_KINDS.filter((k) => ch.chargeSource[k] || ch.charges[k] > 0);
-  const hexes = w.player.hexes;
+  const hexes = w.sides[0].player.hexes;
   const debuffs = playerDebuffs(w);
   if (!kinds.length && !hexes.length && !debuffs.length) return null;
   return (
@@ -444,7 +452,7 @@ export function Hud({ c }: { c: Controller }) {
   useTicks(c);
   const w = c.world;
   if (!w) return null;
-  const p = w.player;
+  const p = w.sides[0].player;
   const lifeMax = Math.max(1, p.def.maxLife);
   const manaMax = Math.max(1, p.def.maxMana);
   const sc = c.showcase;
@@ -463,7 +471,7 @@ export function Hud({ c }: { c: Controller }) {
         </span>
         <span {...infoProps(w.plan.biome.text)}>{w.plan.biome.name}</span>
         <span {...infoProps(leadText(w.plan.theme))}>{leadNames(w.plan.theme)}</span>
-        <span>Level {w.build.level}</span>
+        <span>Level {w.sides[0].build.level}</span>
         <span>Kills {w.sides[0].stats.kills}</span>
         <span {...infoProps('Time spent on this level. It stops while the game is paused.')}>
           {formatLevelTime(w.t)}
@@ -540,7 +548,7 @@ export function Hud({ c }: { c: Controller }) {
         <Orb
           value={p.life}
           max={lifeMax}
-          reserved={w.char.reservedLife}
+          reserved={w.sides[0].char.reservedLife}
           kind="life"
           label="Life"
           es={p.es}
@@ -599,7 +607,13 @@ export function Hud({ c }: { c: Controller }) {
             ))}
           </div>
         </div>
-        <Orb value={p.mana} max={manaMax} reserved={w.char.reservedMana} kind="mana" label="Mana" />
+        <Orb
+          value={p.mana}
+          max={manaMax}
+          reserved={w.sides[0].char.reservedMana}
+          kind="mana"
+          label="Mana"
+        />
       </div>
     </div>
   );

@@ -52,7 +52,7 @@ function hitsOn(w: World, actors: Actor[], seconds: number): number[] {
 describe('Spinning Dash (Whirling Blades)', () => {
   it('is a spin that takes time: the character runs, it does not blink', () => {
     const { w } = arena(['spinningDash'], 8);
-    const x0 = w.player.x;
+    const x0 = w.sides[0].player.x;
     let blinks = 0;
     let moved = 0;
     let lastX = x0;
@@ -60,15 +60,15 @@ describe('Spinning Dash (Whirling Blades)', () => {
     for (let i = 0; i < 60 * 1.2; i++) {
       stepWorld(w);
       blinks += w.events.filter((e) => e.t === 'blink').length;
-      const dx = Math.abs(w.player.x - lastX);
+      const dx = Math.abs(w.sides[0].player.x - lastX);
       if (dx > 1e-6) moved++;
       // No step carries it more than a fast run's reach.
       expect(dx).toBeLessThan(0.5);
-      lastX = w.player.x;
+      lastX = w.sides[0].player.x;
       steps++;
     }
     expect(blinks).toBe(0);
-    expect(w.player.x - x0).toBeGreaterThan(5);
+    expect(w.sides[0].player.x - x0).toBeGreaterThan(5);
     // The dash is spread over a good many steps, not one jump.
     expect(moved).toBeGreaterThan(15);
     expect(steps).toBeGreaterThan(0);
@@ -76,7 +76,7 @@ describe('Spinning Dash (Whirling Blades)', () => {
 
   it('hits again and again as it goes: everything on the way, and the target when it arrives', () => {
     const { w, dummy } = arena(['spinningDash'], 9, true);
-    const mid = neighbour(w, w.player.x + 4, w.player.y + 0.4);
+    const mid = neighbour(w, w.sides[0].player.x + 4, w.sides[0].player.y + 0.4);
     mid.life = 1e10;
     const [onWay, atEnd] = hitsOn(w, [mid, dummy], 1.4);
     expect(onWay).toBeGreaterThanOrEqual(2);

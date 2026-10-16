@@ -46,7 +46,7 @@ const dist = (a: Actor, b: Actor) => Math.hypot(a.x - b.x, a.y - b.y);
 describe('Flame Dash (cinderStep)', () => {
   it('blinks toward a target out of reach, burns the ground it crossed and the enemies where it lands', () => {
     const { world: w, dummy } = blinkWorld(['cinderStep'], 7);
-    const start = { x: w.player.x, y: w.player.y };
+    const start = { x: w.sides[0].player.x, y: w.sides[0].player.y };
     let trail = false;
     let blinked = false;
     for (let i = 0; i < 3 * 60; i++) {
@@ -56,8 +56,10 @@ describe('Flame Dash (cinderStep)', () => {
     }
     expect(blinked).toBe(true);
     expect(trail).toBe(true);
-    expect(dist(w.player, dummy)).toBeLessThan(5);
-    expect(Math.hypot(w.player.x - start.x, w.player.y - start.y)).toBeGreaterThan(2);
+    expect(dist(w.sides[0].player, dummy)).toBeLessThan(5);
+    expect(
+      Math.hypot(w.sides[0].player.x - start.x, w.sides[0].player.y - start.y),
+    ).toBeGreaterThan(2);
   });
 
   it('what stands on the burning trail takes fire damage over time', () => {
@@ -77,10 +79,10 @@ describe('Flame Dash (cinderStep)', () => {
 describe('Frostblink (rimeStep)', () => {
   it('hurts and chills where the character left', () => {
     const { world: w } = blinkWorld(['rimeStep'], 30, 'sword_3', DEX);
-    const here = neighbour(w, w.player.x + 1, w.player.y + 0.5);
-    neighbour(w, w.player.x + 1.2, w.player.y - 0.5);
-    neighbour(w, w.player.x + 0.5, w.player.y + 1);
-    const start = { x: w.player.x, y: w.player.y };
+    const here = neighbour(w, w.sides[0].player.x + 1, w.sides[0].player.y + 0.5);
+    neighbour(w, w.sides[0].player.x + 1.2, w.sides[0].player.y - 0.5);
+    neighbour(w, w.sides[0].player.x + 0.5, w.sides[0].player.y + 1);
+    const start = { x: w.sides[0].player.x, y: w.sides[0].player.y };
     let chilling = false;
     let hurt = false;
     for (let i = 0; i < 4 * 60; i++) {
@@ -100,16 +102,20 @@ describe('Frostblink (rimeStep)', () => {
     const lonely = blinkWorld(['rimeStep'], 30, 'sword_3', DEX);
     const crowded = blinkWorld(['rimeStep'], 30, 'sword_3', DEX);
     for (const w of [lonely.world, crowded.world]) {
-      const c = w.char.utilities.find((x) => x.skill.id === 'rimeStep')!;
+      const c = w.sides[0].char.utilities.find((x) => x.skill.id === 'rimeStep')!;
       w.sides[0].cooldowns[c.key] = { uses: 0, t: 3 };
     }
     for (let i = 0; i < 5; i++)
-      neighbour(crowded.world, crowded.world.player.x + 1 + i * 0.2, crowded.world.player.y + 1);
+      neighbour(
+        crowded.world,
+        crowded.world.sides[0].player.x + 1 + i * 0.2,
+        crowded.world.sides[0].player.y + 1,
+      );
     // The dummy far away is not a neighbour; the world is kept still.
-    for (const w of [lonely.world, crowded.world]) w.player.stunT = 1e9;
+    for (const w of [lonely.world, crowded.world]) w.sides[0].player.stunT = 1e9;
     run(lonely.world, 1);
     run(crowded.world, 1);
-    const key = (w: World) => w.char.utilities.find((x) => x.skill.id === 'rimeStep')!.key;
+    const key = (w: World) => w.sides[0].char.utilities.find((x) => x.skill.id === 'rimeStep')!.key;
     expect(crowded.world.sides[0].cooldowns[key(crowded.world)].t).toBeLessThan(
       lonely.world.sides[0].cooldowns[key(lonely.world)].t - 0.5,
     );
@@ -119,7 +125,7 @@ describe('Frostblink (rimeStep)', () => {
 describe('Lightning Warp (boltStep)', () => {
   it('the teleport waits for the run, the character can act meanwhile, and lightning bursts at both ends', () => {
     const { world: w, dummy } = blinkWorld(['boltStep'], 7.5, 'wand_3', INT);
-    const start = { x: w.player.x, y: w.player.y };
+    const start = { x: w.sides[0].player.x, y: w.sides[0].player.y };
     let waiting = false;
     let arrivedAt = -1;
     let castAt = -1;
@@ -139,8 +145,10 @@ describe('Lightning Warp (boltStep)', () => {
     expect(Math.hypot(bursts[0].x - bursts[1].x, bursts[0].y - bursts[1].y)).toBeGreaterThan(2);
     expect(waiting).toBe(true);
     expect(arrivedAt).toBeGreaterThan(castAt + 0.3);
-    expect(Math.hypot(w.player.x - start.x, w.player.y - start.y)).toBeGreaterThan(2);
-    expect(dist(w.player, dummy)).toBeLessThan(6);
+    expect(
+      Math.hypot(w.sides[0].player.x - start.x, w.sides[0].player.y - start.y),
+    ).toBeGreaterThan(2);
+    expect(dist(w.sides[0].player, dummy)).toBeLessThan(6);
   });
 });
 
@@ -154,7 +162,7 @@ describe('Withering Step (rotStride)', () => {
   it('grants Elusive, withers the enemies that come near once each, and ends with the next skill used', () => {
     const { world: w, dummy } = blinkWorld(['rotStride'], 5);
     pack(w, dummy);
-    const far = neighbour(w, w.player.x - 20, w.player.y);
+    const far = neighbour(w, w.sides[0].player.x - 20, w.sides[0].player.y);
     let elusive = false;
     for (let i = 0; i < 2 * 60 && !elusive; i++) {
       stepWorld(w);
@@ -212,10 +220,10 @@ describe('Withering Step (rotStride)', () => {
 
   it('its cooldown does not run while Elusive lasts', () => {
     const { world: w } = blinkWorld(['rotStride'], 12);
-    const c = w.char.utilities.find((x) => x.skill.id === 'rotStride')!;
+    const c = w.sides[0].char.utilities.find((x) => x.skill.id === 'rotStride')!;
     w.sides[0].cooldowns[c.key] = { uses: 0, t: 3 };
     w.sides[0].buffT.elusive = 5;
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     run(w, 2);
     expect(w.sides[0].cooldowns[c.key].t).toBeCloseTo(3, 1);
     w.sides[0].buffT.elusive = 0;
@@ -227,7 +235,7 @@ describe('Withering Step (rotStride)', () => {
 describe('Blink Arrow (shadowQuiver)', () => {
   it('the arrow flies first, then the character is carried to it and a clone is left where it stood', () => {
     const { world: w } = blinkWorld(['shadowQuiver'], 7, 'bow_3', DEX);
-    const start = { x: w.player.x, y: w.player.y };
+    const start = { x: w.sides[0].player.x, y: w.sides[0].player.y };
     let waiting = false;
     let clone: { x: number; y: number } | undefined;
     for (let i = 0; i < 4 * 60; i++) {
@@ -237,7 +245,9 @@ describe('Blink Arrow (shadowQuiver)', () => {
       if (m && !clone) clone = { x: m.x, y: m.y };
     }
     expect(waiting).toBe(true);
-    expect(Math.hypot(w.player.x - start.x, w.player.y - start.y)).toBeGreaterThan(2);
+    expect(
+      Math.hypot(w.sides[0].player.x - start.x, w.sides[0].player.y - start.y),
+    ).toBeGreaterThan(2);
     expect(clone).toBeDefined();
     expect(Math.hypot(clone!.x - start.x, clone!.y - start.y)).toBeLessThan(1.5);
   });
@@ -254,27 +264,31 @@ describe('Storm Rush (stormRush)', () => {
     const w2 = run2.world;
     w2.sides[0].opts.freeResources = true;
     w2.sides[0].opts.godMode = true;
-    const start = { x: w2.player.x, y: w2.player.y };
-    let from = { x: w2.player.x, y: w2.player.y };
+    const start = { x: w2.sides[0].player.x, y: w2.sides[0].player.y };
+    let from = { x: w2.sides[0].player.x, y: w2.sides[0].player.y };
     let ghost = 0;
     let waves = 0;
     let channelling = false;
     for (let i = 0; i < 6 * 60; i++) {
-      if (!channelling) from = { x: w2.player.x, y: w2.player.y };
+      if (!channelling) from = { x: w2.sides[0].player.x, y: w2.sides[0].player.y };
       stepWorld(w2);
       channelling = !!w2.sides[0].channel;
       const g = w2.sides[0].fields.find((f) => f.kind === 'ghost');
       if (g) {
-        ghost = Math.max(ghost, Math.hypot(g.x - w2.player.x, g.y - w2.player.y));
+        ghost = Math.max(ghost, Math.hypot(g.x - w2.sides[0].player.x, g.y - w2.sides[0].player.y));
         // The character itself stays where it was while the illusion runs.
-        expect(Math.hypot(w2.player.x - from.x, w2.player.y - from.y)).toBeLessThan(0.5);
+        expect(
+          Math.hypot(w2.sides[0].player.x - from.x, w2.sides[0].player.y - from.y),
+        ).toBeLessThan(0.5);
       }
       for (const e of w2.events) if (e.t === 'explode') waves++;
     }
     expect(ghost).toBeGreaterThan(3);
     expect(waves).toBeGreaterThan(2);
     // Over the six seconds it was let go at least once and the character joined it.
-    expect(Math.hypot(w2.player.x - start.x, w2.player.y - start.y)).toBeGreaterThan(2);
+    expect(
+      Math.hypot(w2.sides[0].player.x - start.x, w2.sides[0].player.y - start.y),
+    ).toBeGreaterThan(2);
     expect(run2.dummy.life).toBeLessThan(run2.dummy.def.maxLife);
     void w;
     void dummy;
@@ -327,9 +341,14 @@ describe('Venom Gyre (toxinCircle) and Whirling Blades (spinningDash)', () => {
     }
     expect(caught).toBeGreaterThanOrEqual(1);
     // Whirling Blades is the skill that lets them go: a spiral, none of it returning.
-    w.sides[0].caught = { profile: w.char.profile(w.primary, 0), hand: 0, n: 5, t: 12 };
+    w.sides[0].caught = {
+      profile: w.sides[0].char.profile(w.sides[0].primary, 0),
+      hand: 0,
+      n: 5,
+      t: 12,
+    };
     const before = w.sides[0].shots.length;
-    releaseCaught(w, w.player);
+    releaseCaught(w, w.sides[0].player);
     expect(w.sides[0].caught).toBeNull();
     expect(w.sides[0].shots.length).toBe(before + 5);
     const sent = w.sides[0].shots.slice(before);
@@ -348,7 +367,7 @@ describe('Point Blank (closeQuarters)', () => {
       distance: 4,
       maxTime: 10,
     });
-    const p = run2.world.char.profile(run2.world.primary, 0);
+    const p = run2.world.sides[0].char.profile(run2.world.sides[0].primary, 0);
     expect(distanceMult(p, 1)).toBeGreaterThan(1);
     expect(distanceMult(p, 8)).toBeLessThan(1);
     void w;

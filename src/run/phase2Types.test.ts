@@ -45,16 +45,16 @@ describe('Collapse (docs/MAPS.md 9.2)', () => {
     const m = measurePath(w.plan.lab);
     // Well ahead of the front: nothing happens.
     w.t = COLLAPSE_START + 5;
-    w.player.x = m.pts[m.pts.length - 1].x;
-    w.player.y = m.pts[m.pts.length - 1].y;
-    tickCollapse(w);
+    w.sides[0].player.x = m.pts[m.pts.length - 1].x;
+    w.sides[0].player.y = m.pts[m.pts.length - 1].y;
+    tickCollapse(w, w.sides[0]);
     expect(w.status).toBe('running');
     expect(w.collapseGap).toBeGreaterThan(0);
     // Back at the entrance when the front has passed it.
     w.t = COLLAPSE_START + 20;
-    w.player.x = w.plan.lab.start.x;
-    w.player.y = w.plan.lab.start.y;
-    tickCollapse(w);
+    w.sides[0].player.x = w.plan.lab.start.x;
+    w.sides[0].player.y = w.plan.lab.start.y;
+    tickCollapse(w, w.sides[0]);
     expect(w.status).toBe('dead');
   });
 
@@ -62,7 +62,7 @@ describe('Collapse (docs/MAPS.md 9.2)', () => {
     const run = newRun('vanguard', 3);
     const w = worldOf(run, 'collapse', 35);
     w.t = COLLAPSE_START - 1;
-    tickCollapse(w);
+    tickCollapse(w, w.sides[0]);
     expect(w.collapseFront).toBe(0);
     expect(w.status).toBe('running');
   });

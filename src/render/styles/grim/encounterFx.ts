@@ -462,7 +462,7 @@ export class EncounterFx {
 
   /** A Bursar's Tithe: a gold beam from the character to it, with motes of life flowing along it to the Bursar. */
   private drawTithe(g: Gfx, a: Actor, w: World, time: number): void {
-    const p = w.player;
+    const p = w.sides[0].player;
     const s = this.pt(p.x, p.y);
     const t = this.pt(a.x, a.y);
     const sy = s.y - 10;
@@ -481,7 +481,7 @@ export class EncounterFx {
    * leap comes.
    */
   private drawRing(g: Gfx, w: World, left: number, time: number): void {
-    const p = w.player;
+    const p = w.sides[0].player;
     const n = 28;
     g.lineStyle(2, EXPOSED, 0.75);
     for (let i = 0; i < n; i += 2) {
@@ -506,7 +506,7 @@ export class EncounterFx {
 
   /** What is on the character: a red reticle over its head while it is marked, a dark veil while it is blinded. */
   private drawOnPlayer(g: Gfx, w: World, time: number): void {
-    const p = w.player;
+    const p = w.sides[0].player;
     if (!p.alive) return;
     const c = this.pt(p.x, p.y);
     if (markOf(w)) {

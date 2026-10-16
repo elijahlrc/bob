@@ -87,7 +87,7 @@ export function castPattern(w: World, a: Actor, act: Action, id: PatternId): voi
       kind: 'slam',
       damage: hit * (s.mult ?? 1),
       dtype,
-      faction: 1,
+      team: 1,
       shape: s.shape,
       delay: s.at > 0 ? s.at : undefined,
       label: spec.name,

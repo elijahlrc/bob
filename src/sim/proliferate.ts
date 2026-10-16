@@ -18,7 +18,7 @@ export function spreadAilments(w: World, from: Actor): void {
   if (!ignite && !ele) return;
   const radius = Math.max(ignite?.spread ?? 0, ail.spreadEle);
   for (const e of w.actors) {
-    if (e === from || e.isPlayer || !e.alive || e.faction !== from.faction) continue;
+    if (e === from || e.isPlayer || !e.alive || e.team !== from.team) continue;
     if (e.def.immuneAilments || Math.hypot(e.x - from.x, e.y - from.y) > radius + e.r) continue;
     if (ignite && !e.ail.ignites.some((d) => d.dps >= ignite!.dps * 0.99)) {
       pushDot(e.ail.ignites, { dps: ignite.dps, t: ignite.t });

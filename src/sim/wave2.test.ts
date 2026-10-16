@@ -74,9 +74,9 @@ describe('trigger supports and Ember Burst', () => {
     const b = withSupport('woundedRetort');
     const { world, dummy } = createDummyWorld(b, { distance: 3 });
     world.sides[0].opts.freeResources = false;
-    const p = world.player;
+    const p = world.sides[0].player;
     const max = p.def.maxLife;
-    const prof = world.char.profile(world.char.primary);
+    const prof = world.sides[0].char.profile(world.sides[0].char.primary);
     let casts = 0;
     for (let i = 0; i < 4; i++) {
       applyHit(world, dummy, p, prof, okHit(max * 0.1));
@@ -117,11 +117,11 @@ describe('trigger supports and Ember Burst', () => {
     far.life = 1e9;
     world.rngTrig = new Rng(1);
     // The trigger has a 20% chance: land hits until it fires.
-    const prof = world.char.profile(world.char.primary);
+    const prof = world.sides[0].char.profile(world.sides[0].char.primary);
     let fired = false;
     for (let i = 0; i < 80 && !fired; i++) {
       world.sides[0].trig.cooldown = {};
-      applyHit(world, world.player, dummy, prof, okHit(1));
+      applyHit(world, world.sides[0].player, dummy, prof, okHit(1));
       fired = world.events.some((e) => e.t === 'trigger');
       if (!fired) world.events.length = 0;
     }
@@ -252,11 +252,11 @@ describe('wave 2 uniques', () => {
   it("Pickpocket's Lament: one ring only, gain life and mana per attack hit", () => {
     const b = build('vanguard', 'pickpocketsLament');
     const { world, dummy } = createDummyWorld(b, { distance: 2 });
-    const pl = world.player;
+    const pl = world.sides[0].player;
     pl.mana = 0;
     pl.life = 1;
     world.events.length = 0;
-    applyHit(world, pl, dummy, world.char.profile(world.char.primary), okHit(1));
+    applyHit(world, pl, dummy, world.sides[0].char.profile(world.sides[0].char.primary), okHit(1));
     expect(pl.mana).toBeGreaterThan(0);
     expect(pl.life).toBeGreaterThan(1);
   });
@@ -271,7 +271,7 @@ describe("Martyr's Draught", () => {
     });
     const { world, dummy } = createDummyWorld(b, { distance: 12 });
     world.sides[0].opts.freeResources = false;
-    return { world, dummy, p: world.player };
+    return { world, dummy, p: world.sides[0].player };
   };
 
   it('its buff stops chaos bypassing energy shield', () => {
@@ -292,9 +292,9 @@ describe("Martyr's Draught", () => {
     // A fight is coming (an enemy 12 tiles away) and none is close: the policy drinks it.
     expect(autoFlaskPolicy(world, world.sides[0])).toEqual([0]);
     stepWorld(world); // the world uses the flask
-    expect(world.player.life).toBeLessThan(life * 0.1);
+    expect(world.sides[0].player.life).toBeLessThan(life * 0.1);
     for (let i = 0; i < 130; i++) stepWorld(world);
-    expect(world.player.es).toBeGreaterThan(life * 0.5);
+    expect(world.sides[0].player.es).toBeGreaterThan(life * 0.5);
   });
 
   it('is not drunk while an enemy is close, or at low life', () => {

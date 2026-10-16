@@ -60,6 +60,7 @@ import { afflictPlayer, stunPlayer } from './afflict';
 import { flasksSealed } from './theft';
 import { crescendoStep, HOLDOUT_WAVES } from '../data/mapTypes';
 import type { Actor, GroundEffect, MapOpts, World } from './types';
+import { hunted } from './side';
 import type { Side } from './side';
 
 export function spawnMonster(
@@ -271,6 +272,10 @@ export function createWorld(inp: CreateWorldInput): World {
     hitsLanded: 0,
     shots: [],
     lastOutcome: null,
+    player,
+    char,
+    build,
+    primary: char.primary,
   };
   player.side = side;
   const w: World = {
@@ -284,7 +289,6 @@ export function createWorld(inp: CreateWorldInput): World {
     rngLoot: root.fork('loot'),
     rngTrig: root.fork('trigger'),
     actors: [player],
-    player,
     nextId: 2,
     projectiles: [],
     effects: [],
@@ -300,9 +304,6 @@ export function createWorld(inp: CreateWorldInput): World {
       opened: false,
     })),
     events: [],
-    build,
-    char,
-    primary: char.primary,
     status: 'running',
     abandonT: null,
     abandonAuto: false,
@@ -318,7 +319,7 @@ export function createWorld(inp: CreateWorldInput): World {
   // The player starts with what the last map left (full on a new run), as fractions of the maximum.
   const start = inp.opts?.start;
   const frac = (f: number | undefined) => Math.min(1, Math.max(0, f ?? 1));
-  player.life = Math.max(1, lifeCap(w, player) * frac(start?.life));
+  player.life = Math.max(1, lifeCap(player) * frac(start?.life));
   player.es = player.def.maxEs * frac(start?.es);
   player.mana = Math.max(0, player.def.maxMana - char.reservedMana) * frac(start?.mana);
   for (const f of side.flasks) f.charges = f.spec.maxCharges * frac(start?.flasks[f.spec.uid]);
@@ -329,26 +330,26 @@ export function createWorld(inp: CreateWorldInput): World {
     if (s.hold || abilitiesOf(s.spec.type).some((x) => x.id === 'ambush')) a.hold = true;
     if (s.patrol) a.patrol = s.patrol.map((p) => ({ ...p }));
   }
-  seedCharacters(w, side);
+  seedCharacters(side);
   return w;
 }
 
 /** Rebuild the character after a level-up, keeping resource fractions. */
 function levelUp(w: World, s: Side): void {
-  const p = w.player;
-  const lf = p.life / Math.max(1, lifeCap(w, p));
+  const p = s.player;
+  const lf = p.life / Math.max(1, lifeCap(p));
   const mf = p.def.maxMana > 0 ? p.mana / p.def.maxMana : 1;
   const ef = p.def.maxEs > 0 ? p.es / p.def.maxEs : 1;
-  w.build = { ...w.build, level: w.build.level + 1 };
+  s.build = { ...s.build, level: s.build.level + 1 };
   rebuildCharacter(w, s);
   s.flasks.forEach((f, i) => {
-    if (w.char.flasks[i]) f.spec = w.char.flasks[i];
+    if (s.char.flasks[i]) f.spec = s.char.flasks[i];
   });
   refreshPlayerDefence(w, s);
-  p.life = lf * lifeCap(w, p);
+  p.life = lf * lifeCap(p);
   p.mana = mf * p.def.maxMana;
   p.es = ef * p.def.maxEs;
-  w.events.push({ t: 'levelUp', level: w.build.level });
+  w.events.push({ t: 'levelUp', level: s.build.level });
 }
 
 /** Seconds over which a life-to-ES flask returns the life it took. */
@@ -356,7 +357,7 @@ const LIFE_TO_ES_TIME = 2;
 
 function useFlask(w: World, side: Side, i: number): void {
   const f = side.flasks[i];
-  const p = w.player;
+  const p = side.player;
   // The Unmaker holds the flasks (docs/BOSSES.md 9).
   if (f.charges < f.spec.perUse || flasksSealed(w)) return;
   const s = f.spec;
@@ -365,7 +366,7 @@ function useFlask(w: World, side: Side, i: number): void {
       if (f.queued) return;
       f.queued = true;
     } else if (s.instant) {
-      p.life = Math.min(lifeCap(w, p), p.life + s.life);
+      p.life = Math.min(lifeCap(p), p.life + s.life);
     } else {
       f.activeT = s.duration;
       f.lifeRate = s.life / s.duration;
@@ -405,7 +406,7 @@ function useFlask(w: World, side: Side, i: number): void {
 }
 
 function tickFlasks(w: World, s: Side, dt: number, policy: FlaskPolicy): void {
-  const p = w.player;
+  const p = s.player;
   for (const i of policy(w, s)) useFlask(w, s, i);
   for (const f of s.flasks) {
     if (f.esT > 0) {
@@ -419,9 +420,8 @@ function tickFlasks(w: World, s: Side, dt: number, policy: FlaskPolicy): void {
     if (f.activeT <= 0) continue;
     const step = Math.min(dt, f.activeT);
     f.activeT -= dt;
-    if (f.lifeRate) p.life = Math.min(lifeCap(w, p), p.life + f.lifeRate * step);
-    if (f.manaRate)
-      p.mana = Math.min(p.def.maxMana - reservedMana(w, s), p.mana + f.manaRate * step);
+    if (f.lifeRate) p.life = Math.min(lifeCap(p), p.life + f.lifeRate * step);
+    if (f.manaRate) p.mana = Math.min(p.def.maxMana - reservedMana(s), p.mana + f.manaRate * step);
     if (f.activeT <= 0) {
       f.activeT = 0;
       if (f.queued) {
@@ -441,7 +441,6 @@ function viaOf(w: World, e: GroundEffect): string | undefined {
 }
 
 function tickEffects(w: World, dt: number): void {
-  const p = w.player;
   let j = 0;
   for (const e of w.effects) {
     // A later step of a pattern waits before its warning shows.
@@ -451,9 +450,12 @@ function tickEffects(w: World, dt: number): void {
       continue;
     }
     // A blow that follows the character until it lands (a Sentence).
-    if (e.follow && p.alive) {
-      e.x = p.x;
-      e.y = p.y;
+    if (e.follow) {
+      const p = hunted(w, e);
+      if (p.alive) {
+        e.x = p.x;
+        e.y = p.y;
+      }
     }
     e.t -= dt;
     if (e.t > 0) {
@@ -462,41 +464,50 @@ function tickEffects(w: World, dt: number): void {
     }
     // A lasting zone just fades.
     if (isZone(e)) continue;
+    // What an effect strikes: the characters of the other teams, and their minions.
     if (e.shape) {
       // A shaped blast (docs/ENCOUNTERS.md 4): it strikes what its shape covers, drags what a hook catches, and may leave
       // ground behind.
       w.events.push({ t: 'blast', e });
-      const caught = p.alive && inBlast(e, p.x, p.y, p.r);
-      if (caught && e.damage > 0)
-        rawHit(w, p, e.damage, e.dtype, e.label ?? 'Blast', 'player', viaOf(w, e));
-      // What a boss's blast does besides damage (docs/BOSSES.md): a Sentence stuns, a toll shocks.
-      if (caught && p.alive && e.stun) stunPlayer(w, e.stun);
-      if (caught && p.alive && e.afflict)
-        afflictPlayer(w, e.afflict.kind, e.afflict.value, e.afflict.seconds, true);
-      const owner = e.pull && caught ? actorById(w, e.owner ?? 0) : undefined;
-      if (owner?.alive) pullPlayer(w, owner, e.pull!);
-      for (const m of w.player.side!.minions)
-        if (m.alive && inBlast(e, m.x, m.y, m.r))
-          rawHit(w, m, e.damage, e.dtype, e.label ?? 'Blast');
+      for (const s of w.sides) {
+        if (s.team === e.team) continue;
+        const p = s.player;
+        const caught = p.alive && inBlast(e, p.x, p.y, p.r);
+        if (caught && e.damage > 0)
+          rawHit(w, p, e.damage, e.dtype, e.label ?? 'Blast', 'player', viaOf(w, e));
+        // What a boss's blast does besides damage (docs/BOSSES.md): a Sentence stuns, a toll shocks.
+        if (caught && p.alive && e.stun) stunPlayer(w, s, e.stun);
+        if (caught && p.alive && e.afflict)
+          afflictPlayer(w, s, e.afflict.kind, e.afflict.value, e.afflict.seconds, true);
+        const owner = e.pull && caught ? actorById(w, e.owner ?? 0) : undefined;
+        if (owner?.alive) pullPlayer(w, s, owner, e.pull!);
+        for (const m of s.minions)
+          if (m.alive && inBlast(e, m.x, m.y, m.r))
+            rawHit(w, m, e.damage, e.dtype, e.label ?? 'Blast');
+      }
       if (e.leaves) openZone(w, e.x, e.y, e.radius, e.leaves.seconds, e.leaves.kind, e.leaves.dps);
       continue;
     }
     w.events.push({ t: 'explode', x: e.x, y: e.y, r: e.radius, dtype: e.dtype });
-    // A warding pulse throws the character back, away from where it went off.
-    if (e.push && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r) {
-      const ang = Math.atan2(p.y - e.y, p.x - e.x);
-      const to = w.grid.collide(p.x + Math.cos(ang) * e.push, p.y + Math.sin(ang) * e.push, p.r);
-      p.x = to.x;
-      p.y = to.y;
-    }
     const label = e.label ?? (e.kind === 'slam' ? 'Crushing slam' : 'Volatile explosion');
-    if (e.damage > 0 && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r)
-      rawHit(w, p, e.damage, e.dtype, label, 'player', viaOf(w, e));
-    // The player's minions standing in a monster's blast are hurt too.
-    if (e.faction === 1)
-      for (const m of w.player.side!.minions)
-        if (m.alive && Math.hypot(m.x - e.x, m.y - e.y) <= e.radius + m.r)
-          rawHit(w, m, e.damage, e.dtype, label);
+    for (const s of w.sides) {
+      if (s.team === e.team) continue;
+      const p = s.player;
+      // A warding pulse throws the character back, away from where it went off.
+      if (e.push && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r) {
+        const ang = Math.atan2(p.y - e.y, p.x - e.x);
+        const to = w.grid.collide(p.x + Math.cos(ang) * e.push, p.y + Math.sin(ang) * e.push, p.r);
+        p.x = to.x;
+        p.y = to.y;
+      }
+      if (e.damage > 0 && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r)
+        rawHit(w, p, e.damage, e.dtype, label, 'player', viaOf(w, e));
+      // The character's minions standing in a monster's blast are hurt too.
+      if (e.team === 1)
+        for (const m of s.minions)
+          if (m.alive && Math.hypot(m.x - e.x, m.y - e.y) <= e.radius + m.r)
+            rawHit(w, m, e.damage, e.dtype, label);
+    }
   }
   w.effects.length = j;
 }
@@ -505,7 +516,7 @@ function tickEffects(w: World, dt: number): void {
 function tickMonsterMods(w: World, m: Actor, dt: number): void {
   tickStep(w, m, dt);
   if (m.state !== 'chase') return;
-  const p = w.player;
+  const p = hunted(w, m);
   if (
     m.modIds.includes('rimeAura') &&
     Math.hypot(p.x - m.x, p.y - m.y) <= 3 &&
@@ -532,7 +543,7 @@ function tickMonsterMods(w: World, m: Actor, dt: number): void {
         kind: 'slam',
         damage: 0.6 * monsterHitOf(m),
         dtype: 0,
-        faction: 1,
+        team: 1,
         owner: m.id,
         push: 3,
       });
@@ -622,9 +633,8 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   w.t += dt;
   w.tick++;
   if (w.plan.type === 'crescendo') w.surge = crescendoStep(w.t);
-  const p = w.player;
   for (const s of w.sides) refreshPlayerDefence(w, s);
-  tickHoldout(w);
+  for (const s of w.sides) tickHoldout(w, s);
   for (const s of w.sides) tickTriggers(w, s, dt);
   for (const s of w.sides) tickCharges(w, s, dt);
   for (const s of w.sides) tickCooldowns(w, s, dt);
@@ -634,8 +644,8 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   for (const s of w.sides) tickMinions(w, s, dt);
   for (const s of w.sides) tickSkillZones(w, s, dt);
   for (const s of w.sides) tickFlasks(w, s, dt, policy);
-  // Flow field for monsters follows the player tile.
-  w.grid.buildFlow(p.x, p.y);
+  // Flow field for monsters follows the character's tile.
+  for (const s of w.sides) w.grid.buildFlow(s.player.x, s.player.y);
   for (const a of w.actors) {
     if (!a.alive) continue;
     tickActor(w, a, dt);
@@ -654,7 +664,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     }
     if (!a.action) a.carry = 0;
   }
-  tickPackPlays(w, dt);
+  for (const s of w.sides) tickPackPlays(w, s, dt);
   for (const s of w.sides) tickShots(w, s);
   for (const s of w.sides) tickChannel(w, s);
   for (const s of w.sides) tickFields(w, s, dt);
@@ -669,7 +679,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   for (const s of w.sides) tickLegion(w, s, dt);
   for (const s of w.sides) tickSupports(w, s, dt);
   for (const s of w.sides) tickSkillFx(w, s, dt);
-  tickBlasphemy(w, dt);
+  for (const s of w.sides) tickBlasphemy(w, s, dt);
   tickProliferation(w, dt);
   updateProjectiles(w, dt);
   tickEffects(w, dt);
@@ -679,18 +689,20 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   tickStranded(w, dt);
   checkExit(w);
   for (const s of w.sides) {
-    while (w.build.level < MAX_LEVEL && s.xp >= xpToNext(w.build.level)) {
-      s.xp -= xpToNext(w.build.level);
+    while (s.build.level < MAX_LEVEL && s.xp >= xpToNext(s.build.level)) {
+      s.xp -= xpToNext(s.build.level);
       levelUp(w, s);
     }
-    if (w.build.level >= MAX_LEVEL) s.xp = 0;
-    if (s.opts.freeResources && p.alive) {
-      p.life = lifeCap(w, p);
-      p.mana = Math.max(0, p.def.maxMana - reservedMana(w, s));
+    if (s.build.level >= MAX_LEVEL) s.xp = 0;
+    if (s.opts.freeResources && s.player.alive) {
+      s.player.life = lifeCap(s.player);
+      s.player.mana = Math.max(0, s.player.def.maxMana - reservedMana(s));
     }
   }
-  if (!p.alive && w.status === 'running') w.status = 'dead';
-  tickCollapse(w);
+  // The map is over when the local player's character is dead (a duel reads its own sides' deaths).
+  for (const s of w.sides)
+    if (s.id === 0 && !s.player.alive && w.status === 'running') w.status = 'dead';
+  for (const s of w.sides) tickCollapse(w, s);
   for (const s of w.sides) tickReprieve(s, dt);
   tickAbandon(w, dt);
   if (w.t >= (w.opts.maxTime ?? 900) && w.status === 'running') w.status = 'timeout';

@@ -201,7 +201,7 @@ export function runGem(def: ActiveGemDef, seconds = 10): GemRun {
     dummy.rarity = 'boss';
     const u = def.utility;
     if (u.kind === 'buff' && u.policy === 'guard')
-      world.player.life = world.player.def.maxLife * 0.4;
+      world.sides[0].player.life = world.sides[0].player.def.maxLife * 0.4;
     if (u.kind === 'buff' && u.rage) world.sides[0].rage = 30;
   }
   const effects = new Set<string>();

@@ -28,7 +28,7 @@ function buildWith(extra: Mod[], gems = ['crushingBlow', 'kindlingHalo']): Build
 
 function arena(extra: Mod[] = [], gems?: string[]) {
   const { world, dummy } = createDummyWorld(buildWith(extra, gems), { distance: 2 });
-  return { world, dummy, player: world.player };
+  return { world, dummy, player: world.sides[0].player };
 }
 
 describe('sim rules for the new verbs', () => {
@@ -74,7 +74,7 @@ describe('sim rules for the new verbs', () => {
       mod('instantLeechOnCrit', 'flag', 1),
       mod('leech.life', 'base', 10, { damageTypes: ['physical'] }),
     ]);
-    const prof = world.char.profile(world.char.primary);
+    const prof = world.sides[0].char.profile(world.sides[0].char.primary);
     expect(prof.instantLeechOnCrit).toBe(true);
     const hand = prof.hands[0];
     const res = (crit: boolean) => ({
@@ -104,7 +104,7 @@ describe('sim rules for the new verbs', () => {
 
   it('resolved hits against an immune target do nothing', () => {
     const { world, player, dummy } = arena();
-    const prof = world.char.profile(world.char.primary);
+    const prof = world.sides[0].char.profile(world.sides[0].char.primary);
     dummy.def = dummyDefence({ immune: [true, true, true, true, true] });
     const rng = new Rng(1);
     const r = resolveHit(
@@ -124,12 +124,12 @@ describe('sim rules for the new verbs', () => {
 describe('player and target conditions in the sim', () => {
   // Condition bits belong to the character and only exist for conditions its mods use: register, then ask.
   const has = (world: World, id: CondId, target: Actor | null = null) => {
-    const bit = world.char.cond.bit(id);
-    return (playerConds(world, target) & bit) !== 0;
+    const bit = world.sides[0].char.cond.bit(id);
+    return (playerConds(world, world.sides[0], target) & bit) !== 0;
   };
   const targetHas = (world: World, t: Actor, from: Actor, id: CondId) => {
-    const bit = world.char.cond.bit(id);
-    return (targetConds(world, t, from) & bit) !== 0;
+    const bit = world.sides[0].char.cond.bit(id);
+    return (targetConds(world.sides[0], t, from) & bit) !== 0;
   };
 
   it('been hit recently, leeching, ES full, low mana', () => {
@@ -154,7 +154,7 @@ describe('player and target conditions in the sim', () => {
 
   it('a hit marks its victim as recently hit', () => {
     const { world, player, dummy } = arena();
-    const prof = world.char.profile(world.char.primary);
+    const prof = world.sides[0].char.profile(world.sides[0].char.primary);
     const ok = {
       outcome: 'hit' as const,
       crit: false,
@@ -184,9 +184,9 @@ describe('player and target conditions in the sim', () => {
       [mod('skillsCostLife', 'flag', 1), mod('reducedReservation', 'base', -0)],
       ['crushingBlow', 'kindlingHalo'],
     );
-    expect(world.char.reservedLife).toBeGreaterThan(0);
+    expect(world.sides[0].char.reservedLife).toBeGreaterThan(0);
     const max = player.def.maxLife;
-    const cap = max - world.char.reservedLife;
+    const cap = max - world.sides[0].char.reservedLife;
     expect(cap / max).toBeLessThan(0.6);
     // 30% of maximum life: low life by the rule, though above 35% of what the cap allows.
     player.life = 0.3 * max;

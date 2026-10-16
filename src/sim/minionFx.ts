@@ -123,7 +123,7 @@ function eligibleOffering(s: Side): boolean {
 export function offeringWanted(w: World, s: Side, reach: number): boolean {
   if (!eligibleOffering(s)) return false;
   if (s.offering && s.offering.t > 1.5) return false;
-  const p = w.player;
+  const p = s.player;
   return !!corpseNear(w, p.x, p.y, reach);
 }
 
@@ -131,7 +131,7 @@ export function offeringWanted(w: World, s: Side, reach: number): boolean {
 export function castOffering(w: World, s: Side, c: SkillChoice): void {
   const u = c.skill.utility;
   if (u?.kind !== 'offering') return;
-  const p = w.player;
+  const p = s.player;
   const first = corpseNear(w, p.x, p.y, 12);
   if (!first) return;
   takeCorpse(w, first);
@@ -145,7 +145,7 @@ export function castOffering(w: World, s: Side, c: SkillChoice): void {
   const lv = c.skill.level;
   const v = (x: typeof u.atkInc) => (x === undefined ? 0 : levelValue(x, lv));
   s.offering = {
-    t: (u.seconds + u.perCorpse * (used - 1)) * w.char.db.mult('buffDuration'),
+    t: (u.seconds + u.perCorpse * (used - 1)) * s.char.db.mult('buffDuration'),
     corpses: used,
     atk: v(u.atkInc),
     move: v(u.moveInc),
@@ -187,7 +187,7 @@ export function minionStrike(
       : spellBaseDamage(m.level) * st.dmg * m.dmg * MINION_ENEMY_RES;
   if (elemental && m.sup.eleMore > 0) base *= 1 + m.sup.eleMore / 100;
   // A defensive minion hits harder what is near its owner.
-  if (m.nearMore && Math.hypot(target.x - w.player.x, target.y - w.player.y) <= 3.5)
+  if (m.nearMore && Math.hypot(target.x - m.side!.player.x, target.y - m.side!.player.y) <= 3.5)
     base *= 1 + m.nearMore / 100;
   // A golem hits harder for each of the other minions near it.
   if (m.golem) {

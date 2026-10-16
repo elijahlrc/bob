@@ -73,24 +73,24 @@ describe('skill bar slots', () => {
     const w = arena(['flameBolt', 'frostLance']);
     const slots = skillSlots(w);
     expect(slots[0].role).toBe('Primary');
-    expect(slots[0].name).toBe(w.char.primary.skill.name);
+    expect(slots[0].name).toBe(w.sides[0].char.primary.skill.name);
     expect(slots.some((s) => s.role === 'Basic attack')).toBe(false);
   });
 
   it('shows a skill being used as casting, with the time left in the cast', () => {
     const w = arena(['flameBolt']);
-    run(w, 3, () => w.player.action?.which === 'primary');
-    expect(w.player.action?.which).toBe('primary');
+    run(w, 3, () => w.sides[0].player.action?.which === 'primary');
+    expect(w.sides[0].player.action?.which).toBe('primary');
     const s = skillSlots(w)[0];
     expect(s.state).toBe('casting');
-    expect(s.total).toBeCloseTo(w.player.action!.duration, 6);
+    expect(s.total).toBeCloseTo(w.sides[0].player.action!.duration, 6);
     expect(s.remaining).toBeGreaterThan(0);
     expect(s.remaining).toBeLessThanOrEqual(s.total);
   });
 
   it('a secondary cools down right after it is cast, and is ready again later', () => {
     const w = arena(['flameBolt', 'frostLance']);
-    const second = w.char.secondaries[0];
+    const second = w.sides[0].char.secondaries[0];
     expect(second).toBeDefined();
     const slotOf = () => skillSlots(w).find((s) => s.key === second.key)!;
     expect(slotOf().role).toBe('Secondary');
@@ -101,7 +101,9 @@ describe('skill bar slots', () => {
     run(
       w,
       2,
-      () => w.player.action === null || w.player.action.profile.skill.id !== second.skill.id,
+      () =>
+        w.sides[0].player.action === null ||
+        w.sides[0].player.action.profile.skill.id !== second.skill.id,
     );
     const cooling = slotOf();
     expect(cooling.state).toBe('cooling');
@@ -113,20 +115,20 @@ describe('skill bar slots', () => {
     const later = slotOf();
     if (later.state === 'cooling') expect(later.remaining).toBeLessThan(before);
     w.sides[0].secondaryReady[second.key] = w.t;
-    w.player.action = null;
+    w.sides[0].player.action = null;
     expect(slotOf().state).toBe('ready');
     expect(slotOf().remaining).toBe(0);
   });
 
   it('a summon shows how many minions stand against how many it keeps', () => {
     const w = arena(['flameBolt', 'raiseHusk']);
-    const c = w.char.utilities[0];
+    const c = w.sides[0].char.utilities[0];
     const slotOf = () => skillSlots(w).find((s) => s.key === c.key)!;
     const want = slotOf().badge!;
     expect(slotOf().role).toBe('Utility');
     expect(want).toMatch(/^0\/\d+$/);
     const keep = Number(want.split('/')[1]);
-    summonMinions(w, w.sides[0], c, w.char.profile(c, 0, 0));
+    summonMinions(w, w.sides[0], c, w.sides[0].char.profile(c, 0, 0));
     expect(slotOf().badge).toBe(`${keep}/${keep}`);
     expect(slotOf().state).toBe('active');
     // One falls: the skill wants to cast again.
@@ -138,7 +140,7 @@ describe('skill bar slots', () => {
 
   it('a buff that is up shows as active with its seconds left', () => {
     const w = arena(['crushingBlow', 'steadfastBellow'], 'vanguard', 'sword_3');
-    const c = w.char.utilities[0];
+    const c = w.sides[0].char.utilities[0];
     const u = c.skill.utility!;
     expect(u.kind).toBe('buff');
     if (u.kind !== 'buff') return;
@@ -158,13 +160,15 @@ describe('skill bar slots', () => {
 
   it('counts standing totems and traps in the badge', () => {
     const t = arena(['flameBolt', 'standingCast']);
-    expect(t.char.primary.deploy).toBe('totem');
+    expect(t.sides[0].char.primary.deploy).toBe('totem');
     expect(skillSlots(t)[0].badge).toMatch(/^0\/\d+$/);
     run(t, 6, () => t.sides[0].deployables.length > 0);
     expect(t.sides[0].deployables.length).toBeGreaterThan(0);
     run(t, 1);
     const [cur, cap] = skillSlots(t)[0].badge!.split('/').map(Number);
-    expect(cur).toBe(t.sides[0].deployables.filter((d) => d.key === t.char.primary.key).length);
+    expect(cur).toBe(
+      t.sides[0].deployables.filter((d) => d.key === t.sides[0].char.primary.key).length,
+    );
     expect(cap).toBeGreaterThanOrEqual(cur);
     if (cur >= cap) {
       const s = skillSlots(t)[0];
@@ -174,7 +178,7 @@ describe('skill bar slots', () => {
     }
 
     const r = arena(['frostTrap']);
-    expect(r.char.primary.deploy).toBe('trap');
+    expect(r.sides[0].char.primary.deploy).toBe('trap');
     run(r, 10, () => r.sides[0].deployables.length > 0);
     expect(r.sides[0].deployables.length).toBeGreaterThan(0);
     const trap = skillSlots(r)[0];
@@ -194,8 +198,8 @@ describe('skill bar slots', () => {
   it('marks a skill the character cannot pay for', () => {
     const w = arena(['flameBolt']);
     w.sides[0].opts.freeResources = false;
-    expect(w.char.profile(w.char.primary, 0, 0).cost).toBeGreaterThan(0);
-    w.player.mana = 0;
+    expect(w.sides[0].char.profile(w.sides[0].char.primary, 0, 0).cost).toBeGreaterThan(0);
+    w.sides[0].player.mana = 0;
     const s = skillSlots(w)[0];
     expect(s.state).toBe('nopay');
   });

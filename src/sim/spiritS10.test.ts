@@ -67,8 +67,8 @@ describe('ballistas (mortarBow, scatterBow)', () => {
       stepWorld(w);
       for (const e of w.events) if (e.t === 'use' && e.skill === 'scatterBow') uses++;
     }
-    const prof = w.char.profile(
-      w.char.actives.find((c) => c.skill.id === 'scatterBow')!,
+    const prof = w.sides[0].char.profile(
+      w.sides[0].char.actives.find((c) => c.skill.id === 'scatterBow')!,
       0,
     );
     // The character places new ballistas as old ones end; shots come from the totems, at half the character's speed.
@@ -104,9 +104,9 @@ describe('Cairns (fatherTotem, warchiefTotem)', () => {
     expect(w.sides[0].deployables.length).toBeGreaterThan(0);
     // Take the character far from the totem: it falls silent and the bonus goes.
     const before = uses;
-    w.player.x -= 20;
-    w.player.y = Math.max(1, w.player.y);
-    w.player.stunT = 1e9;
+    w.sides[0].player.x -= 20;
+    w.sides[0].player.y = Math.max(1, w.sides[0].player.y);
+    w.sides[0].player.stunT = 1e9;
     uses = 0;
     for (let i = 0; i < 2 * 60; i++) {
       stepWorld(w);
@@ -120,10 +120,10 @@ describe('Cairns (fatherTotem, warchiefTotem)', () => {
 
   it('the Warchief gives more melee damage while it is active, and the bonuses of the two do not interfere', () => {
     const { world: w } = world(['warchiefTotem'], 2.5, 'mace_3', STR);
-    const key = w.char.actives.find((c) => c.skill.id === 'warchiefTotem')!;
-    const plain = w.char.profile(key, 0);
-    const cond = w.char.cond.peek('warchiefCairn');
-    const buffed = w.char.profile(key, cond);
+    const key = w.sides[0].char.actives.find((c) => c.skill.id === 'warchiefTotem')!;
+    const plain = w.sides[0].char.profile(key, 0);
+    const cond = w.sides[0].char.cond.peek('warchiefCairn');
+    const buffed = w.sides[0].char.profile(key, cond);
     expect(buffed.hands[0].chunks[0].max).toBeGreaterThan(plain.hands[0].chunks[0].max);
   });
 });
@@ -131,10 +131,10 @@ describe('Cairns (fatherTotem, warchiefTotem)', () => {
 describe('Cinder Bond (cinderBond)', () => {
   it('totems cast beams at the character and at each other that burn what they cross, once', () => {
     const { world: w } = world(['cinderBond'], 5, 'wand_3', INT);
-    const c = w.char.actives.find((x) => x.skill.id === 'cinderBond')!;
+    const c = w.sides[0].char.actives.find((x) => x.skill.id === 'cinderBond')!;
     // Two totems of the skill, the character between them and an enemy on each side of the line.
-    const a = { x: w.player.x + 4, y: w.player.y };
-    const b = { x: w.player.x - 4, y: w.player.y };
+    const a = { x: w.sides[0].player.x + 4, y: w.sides[0].player.y };
+    const b = { x: w.sides[0].player.x - 4, y: w.sides[0].player.y };
     for (const s of [a, b])
       w.sides[0].deployables.push({
         id: ++w.sides[0].deploySeq,
@@ -145,8 +145,8 @@ describe('Cinder Bond (cinderBond)', () => {
         t: 8,
         fireT: 0,
       });
-    const onBeam = neighbour(w, w.player.x + 2, w.player.y);
-    const offBeam = neighbour(w, w.player.x + 2, w.player.y + 6);
+    const onBeam = neighbour(w, w.sides[0].player.x + 2, w.sides[0].player.y);
+    const offBeam = neighbour(w, w.sides[0].player.x + 2, w.sides[0].player.y + 6);
     run(w, 1);
     expect(onBeam.sdots.filter((d) => d.src === 'cinderBond').length).toBe(1);
     expect(offBeam.sdots.length).toBe(0);
@@ -156,10 +156,10 @@ describe('Cinder Bond (cinderBond)', () => {
 describe('mines (chainedCharges, heavyCharge, mortarCharge)', () => {
   it('a set of mines goes together when one is set off; Chained Charges makes them go one after another, each harder', () => {
     const { world: w, dummy } = world(['suddenFrost', 'chainedCharges'], 6, 'wand_3', INT);
-    const c = w.char.actives.find((x) => x.skill.id === 'suddenFrost')!;
+    const c = w.sides[0].char.actives.find((x) => x.skill.id === 'suddenFrost')!;
     // Clear what the AI already laid.
     w.sides[0].deployables.length = 0;
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m: Deployable[] = [];
     for (let i = 0; i < 4; i++) m.push(mine(w, c.key, dummy.x + i * 0.7 - 1, dummy.y + 1));
     const seen: number[] = [];
@@ -175,9 +175,9 @@ describe('mines (chainedCharges, heavyCharge, mortarCharge)', () => {
 
   it('without a chain the set goes at once', () => {
     const { world: w, dummy } = world(['mortarCharge'], 6, 'wand_3', INT);
-    const c = w.char.actives.find((x) => x.skill.id === 'mortarCharge')!;
+    const c = w.sides[0].char.actives.find((x) => x.skill.id === 'mortarCharge')!;
     w.sides[0].deployables.length = 0;
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = [0, 1, 2].map((i) => mine(w, c.key, dummy.x + i * 0.7 - 1, dummy.y + 1));
     for (let i = 0; i < 4 * 60 && m.some((d) => d.goAt === undefined); i++) stepWorld(w);
     const times = m.map((d) => d.goAt!);
@@ -186,9 +186,9 @@ describe('mines (chainedCharges, heavyCharge, mortarCharge)', () => {
 
   it('Pyroclast: a mine bursts and then rains more bursts, more the further along the sequence it is', () => {
     const { world: w, dummy } = world(['mortarCharge'], 6, 'wand_3', INT);
-    const c = w.char.actives.find((x) => x.skill.id === 'mortarCharge')!;
+    const c = w.sides[0].char.actives.find((x) => x.skill.id === 'mortarCharge')!;
     w.sides[0].deployables.length = 0;
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     mine(w, c.key, dummy.x, dummy.y + 1, { goAt: w.t + 0.1, seq: 0 });
     let bursts = 0;
     for (let i = 0; i < 60; i++) {
@@ -210,7 +210,7 @@ describe('mines (chainedCharges, heavyCharge, mortarCharge)', () => {
   it('the aura of mines: double damage for High-Impact, fire for Pyroclast, adding up and capped', () => {
     const heavy = world(['heavyCharge', 'suddenFrost'], 6, 'wand_3', INT);
     const hw = heavy.world;
-    const hc = hw.char.actives.find((x) => x.skill.id === 'suddenFrost')!;
+    const hc = hw.sides[0].char.actives.find((x) => x.skill.id === 'suddenFrost')!;
     hw.sides[0].deployables.length = 0;
     const aura = { double: 2, min: 0, max: 0, cap: 0, radius: 3.5 };
     for (let i = 0; i < 3; i++)

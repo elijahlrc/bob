@@ -14,7 +14,7 @@ import { spawnMonster, stepWorld } from './world';
 /** A world with a passive player (stunned for good) to watch the monsters on their own. */
 function arena(): World {
   const { world } = createDummyWorld(newRun('vanguard', 1).build, { distance: 30 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
 }
@@ -29,7 +29,15 @@ const spec = (type: MonsterTypeId, over: Partial<MonsterSpec> = {}): MonsterSpec
 });
 
 function put(w: World, type: MonsterTypeId, dx: number, dy = 0, over: Partial<MonsterSpec> = {}) {
-  const m = spawnMonster(w, spec(type, over), w.player.x + dx, w.player.y + dy, 0, 0, type);
+  const m = spawnMonster(
+    w,
+    spec(type, over),
+    w.sides[0].player.x + dx,
+    w.sides[0].player.y + dy,
+    0,
+    0,
+    type,
+  );
   m.state = 'chase';
   return m;
 }
@@ -69,7 +77,7 @@ describe('leaps and charges', () => {
     run(w, 0.3);
     expect(h.x).toBe(x0);
     run(w, 0.6);
-    expect(dist(h, w.player)).toBeLessThan(2);
+    expect(dist(h, w.sides[0].player)).toBeLessThan(2);
   });
 
   it('a hound too close, or too far, does not leap', () => {
@@ -91,7 +99,7 @@ describe('leaps and charges', () => {
     run(w, 0.15);
     expect(m.windT).toBeGreaterThan(0);
     run(w, 1.2);
-    expect(dist(m, w.player)).toBeLessThan(2.5);
+    expect(dist(m, w.sides[0].player)).toBeLessThan(2.5);
   });
 });
 
@@ -137,9 +145,9 @@ describe('the Gilded', () => {
     expect(thief.stolen).toBeGreaterThan(0);
     expect(flask.charges).toBeLessThan(before);
     expect(thief.fleeT).toBeGreaterThan(0);
-    const away = dist(thief, w.player);
+    const away = dist(thief, w.sides[0].player);
     run(w, 1);
-    expect(dist(thief, w.player)).toBeGreaterThan(away - 0.5);
+    expect(dist(thief, w.sides[0].player)).toBeGreaterThan(away - 0.5);
     killActor(w, thief);
     expect(flask.charges).toBeCloseTo(before, 6);
   });
@@ -149,18 +157,18 @@ describe('the Gilded', () => {
     const bursar = put(w, 'bursar', 4);
     bursar.stunT = 1e9;
     run(w, 0.3);
-    expect(w.player.suppressT).toBeGreaterThan(0);
+    expect(w.sides[0].player.suppressT).toBeGreaterThan(0);
     // Nothing recovers while it is set, and mana does once it has gone.
-    w.player.mana = 0;
-    w.player.suppressT = 1;
-    tickActor(w, w.player, 0.5);
-    expect(w.player.mana).toBe(0);
+    w.sides[0].player.mana = 0;
+    w.sides[0].player.suppressT = 1;
+    tickActor(w, w.sides[0].player, 0.5);
+    expect(w.sides[0].player.mana).toBe(0);
     killActor(w, bursar);
-    w.player.suppressT = 0;
-    tickActor(w, w.player, 0.5);
-    expect(w.player.mana).toBeGreaterThan(0);
+    w.sides[0].player.suppressT = 0;
+    tickActor(w, w.sides[0].player, 0.5);
+    expect(w.sides[0].player.mana).toBeGreaterThan(0);
     run(w, 1);
-    expect(w.player.suppressT).toBeLessThanOrEqual(0);
+    expect(w.sides[0].player.suppressT).toBeLessThanOrEqual(0);
   });
 
   it('a guard throws back part of a melee hit, as the Thorned mod does', () => {
@@ -176,7 +184,7 @@ describe('the Gilded', () => {
     const w = arena();
     const t = put(w, 'guard', 5, 0, { rarity: 'miniboss', mods: ['treasurer'] });
     run(w, 0.2);
-    expect(w.player.suppressT).toBeGreaterThan(0);
+    expect(w.sides[0].player.suppressT).toBeGreaterThan(0);
     t.life = t.def.maxLife * 0.4;
     run(w, 0.2);
     const kids = w.actors.filter((a) => a.alive && a.summonedBy === t.id);
@@ -194,7 +202,7 @@ describe('the Gilded', () => {
     run(w, 4);
     expect(m.stolen).toBeGreaterThan(0);
     expect(flask.charges).toBeLessThan(before);
-    expect(w.player.ail.chill).toBeGreaterThan(0);
+    expect(w.sides[0].player.ail.chill).toBeGreaterThan(0);
     // It does not run.
     expect(m.fleeT).toBe(0);
   });

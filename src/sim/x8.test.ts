@@ -46,7 +46,7 @@ function buildOf(
 /** A world with a passive player (stunned for good) to watch the monsters on their own. */
 function arena(build: Build = buildOf(['crushingBlow'])): World {
   const { world } = createDummyWorld(build, { distance: 30 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
 }
@@ -61,7 +61,15 @@ const spec = (type: MonsterTypeId, over: Partial<MonsterSpec> = {}): MonsterSpec
 });
 
 function put(w: World, type: MonsterTypeId, dx: number, dy = 0, over: Partial<MonsterSpec> = {}) {
-  const m = spawnMonster(w, spec(type, over), w.player.x + dx, w.player.y + dy, 0, 0, type);
+  const m = spawnMonster(
+    w,
+    spec(type, over),
+    w.sides[0].player.x + dx,
+    w.sides[0].player.y + dy,
+    0,
+    0,
+    type,
+  );
   m.state = 'chase';
   return m;
 }
@@ -79,31 +87,31 @@ describe('charges in the sim (EXPANSION 5.6)', () => {
   it('gain up to the maximum, refresh together, and expire together after ten seconds', () => {
     const w = arena(buildOf(['crushingBlow'], withMod(mod('chargeOn.kill.fervour', 'base', 100))));
     // The sim starts with none, whatever the sheet assumes.
-    expect(w.char.charges).toEqual(noCharges());
-    const speedBefore = w.player.def.moveSpeed;
+    expect(w.sides[0].char.charges).toEqual(noCharges());
+    const speedBefore = w.sides[0].player.def.moveSpeed;
     gainCharge(w, w.sides[0], 'fervour');
     gainCharge(w, w.sides[0], 'fervour');
-    expect(w.char.charges.fervour).toBe(2);
-    expect(w.player.def.moveSpeed).toBeCloseTo(speedBefore, 6); // no movement speed from Fervour (3.9)
+    expect(w.sides[0].char.charges.fervour).toBe(2);
+    expect(w.sides[0].player.def.moveSpeed).toBeCloseTo(speedBefore, 6); // no movement speed from Fervour (3.9)
     run(w, 5);
     gainCharge(w, w.sides[0], 'fervour');
     gainCharge(w, w.sides[0], 'fervour');
-    expect(w.char.charges.fervour).toBe(3);
+    expect(w.sides[0].char.charges.fervour).toBe(3);
     // Gaining refreshed the timer of all three.
     run(w, CHARGE_SECONDS - 1);
-    expect(w.char.charges.fervour).toBe(3);
+    expect(w.sides[0].char.charges.fervour).toBe(3);
     run(w, 1.5);
-    expect(w.char.charges.fervour).toBe(0);
-    expect(w.player.def.moveSpeed).toBeCloseTo(speedBefore, 6);
+    expect(w.sides[0].char.charges.fervour).toBe(0);
+    expect(w.sides[0].player.def.moveSpeed).toBeCloseTo(speedBefore, 6);
   });
 
   it('the effect follows the count: Grit raises resistances and physical reduction', () => {
     const w = arena(buildOf(['crushingBlow'], withMod(mod('chargeOn.block.grit', 'base', 100))));
-    const res0 = w.player.def.res[3];
+    const res0 = w.sides[0].player.def.res[3];
     gainCharge(w, w.sides[0], 'grit');
     gainCharge(w, w.sides[0], 'grit');
-    expect(w.player.def.res[3]).toBeGreaterThan(res0);
-    expect(w.player.def.physReduction).toBeGreaterThan(0);
+    expect(w.sides[0].player.def.res[3]).toBeGreaterThan(res0);
+    expect(w.sides[0].player.def.physReduction).toBeGreaterThan(0);
   });
 
   it('kills roll their chance (Fervent Stride) and the world keeps one character per count', () => {
@@ -112,7 +120,7 @@ describe('charges in the sim (EXPANSION 5.6)', () => {
     });
     const w = arena(b);
     for (let i = 0; i < 30; i++) killActor(w, put(w, 'warrior', 8 + i * 0.1));
-    expect(w.char.charges.fervour).toBeGreaterThan(0);
+    expect(w.sides[0].char.charges.fervour).toBeGreaterThan(0);
     const built = w.sides[0].chars.size;
     tickCharges(w, w.sides[0], 0.01);
     expect(w.sides[0].chars.size).toBe(built);
@@ -123,8 +131,8 @@ describe('charges in the sim (EXPANSION 5.6)', () => {
     gainCharge(w, w.sides[0], 'insight');
     w.sides[0].xp = 1e9;
     stepWorld(w);
-    expect(w.build.level).toBeGreaterThan(40);
-    expect(w.char.charges.insight).toBe(1);
+    expect(w.sides[0].build.level).toBeGreaterThan(40);
+    expect(w.sides[0].char.charges.insight).toBe(1);
   });
 });
 
@@ -190,17 +198,17 @@ describe('hexes in the sim (EXPANSION 5.7)', () => {
 
   it('a monster hex on the player is one at a time, and curse resistance weakens it', () => {
     const w = arena();
-    hexPlayer(w, 'feebleGrip');
-    hexPlayer(w, 'openWounds');
-    expect(w.player.hexes).toHaveLength(1);
-    expect(w.player.hexes[0].id).toBe('openWounds');
+    hexPlayer(w, w.sides[0], 'feebleGrip');
+    hexPlayer(w, w.sides[0], 'openWounds');
+    expect(w.sides[0].player.hexes).toHaveLength(1);
+    expect(w.sides[0].player.hexes[0].id).toBe('openWounds');
     const ward = arena(
       buildOf(['crushingBlow'], (b) => {
         b.equipment.ring1 = rollUnique(new Rng(1), uid, uniqueDef('pickpocketsLament'), 40);
       }),
     );
-    hexPlayer(ward, 'openWounds');
-    expect(ward.player.hexes[0].effect).toBeLessThan(w.player.hexes[0].effect);
+    hexPlayer(ward, ward.sides[0], 'openWounds');
+    expect(ward.sides[0].player.hexes[0].effect).toBeLessThan(w.sides[0].player.hexes[0].effect);
   });
 
   it('a hit by a character with Hexing Strikes hexes the enemy', () => {
@@ -228,7 +236,7 @@ describe('hexes in the sim (EXPANSION 5.7)', () => {
       while (world.status === 'running') {
         stepWorld(world);
         for (const e of world.events)
-          if (e.t === 'hit' && e.src === world.player.id) dmg += e.amount;
+          if (e.t === 'hit' && e.src === world.sides[0].player.id) dmg += e.amount;
       }
       time += world.t;
     }
@@ -291,7 +299,7 @@ describe('the Ashen Choir (EXPANSION 7.3)', () => {
     h.skillT = 0;
     // The sigil (docs/ENCOUNTERS.md 7) bites after half a second's grace; the character here cannot step out.
     run(w, 1);
-    expect(w.player.hexes).toHaveLength(1);
+    expect(w.sides[0].player.hexes).toHaveLength(1);
     const z = put(w, 'warrior', 10, 0, { rarity: 'magic', mods: ['zealous'] });
     const ally = put(w, 'warrior', 12);
     killActor(w, z);
@@ -300,14 +308,14 @@ describe('the Ashen Choir (EXPANSION 7.3)', () => {
 
   it('a Hexcaller hexes the player when it hits, with a four second cooldown', () => {
     const w = arena();
-    w.player.stunT = 0;
-    w.player.def.maxLife = 1e9;
+    w.sides[0].player.stunT = 0;
+    w.sides[0].player.def.maxLife = 1e9;
     const m = put(w, 'warrior', 1, 0, { rarity: 'rare', mods: ['hexcaller'] });
     let hexes = 0;
     for (let i = 0; i < 60 * 6; i++) {
       stepWorld(w);
-      w.player.life = 1e9;
-      hexes += w.events.filter((e) => e.t === 'hex' && e.id === w.player.id).length;
+      w.sides[0].player.life = 1e9;
+      hexes += w.events.filter((e) => e.t === 'hex' && e.id === w.sides[0].player.id).length;
     }
     expect(hexes).toBeGreaterThanOrEqual(1);
     expect(hexes).toBeLessThanOrEqual(3);
@@ -321,7 +329,7 @@ describe('the Ashen Choir (EXPANSION 7.3)', () => {
     const seen = new Set<string>();
     for (let i = 0; i < 60 * 22; i++) {
       stepWorld(w);
-      for (const h of w.player.hexes) seen.add(h.id);
+      for (const h of w.sides[0].player.hexes) seen.add(h.id);
     }
     expect(seen.size).toBeGreaterThan(1);
     p.life = p.def.maxLife * 0.49;
@@ -357,29 +365,29 @@ describe('The Trophy Cord (EXPANSION 6.4)', () => {
       x.equipment.belt = rollUnique(new Rng(1), uid, uniqueDef('trophyCord'), 40);
     });
     const w = arena(b);
-    const armourBefore = w.player.def.armour;
+    const armourBefore = w.sides[0].player.def.armour;
     const m = put(w, 'warrior', 8, 0, { rarity: 'rare', mods: ['armoured', 'raiser'] });
     killActor(w, m);
-    expect(w.player.def.armour).toBeGreaterThan(armourBefore);
+    expect(w.sides[0].player.def.armour).toBeGreaterThan(armourBefore);
     run(w, 19);
-    expect(w.player.def.armour).toBeGreaterThan(armourBefore);
+    expect(w.sides[0].player.def.armour).toBeGreaterThan(armourBefore);
     run(w, 2);
-    expect(w.player.def.armour).toBeCloseTo(armourBefore, 6);
+    expect(w.sides[0].player.def.armour).toBeCloseTo(armourBefore, 6);
   });
 
   it('does nothing without the belt, and for non-rare kills', () => {
     const w = arena();
-    const armourBefore = w.player.def.armour;
+    const armourBefore = w.sides[0].player.def.armour;
     killActor(w, put(w, 'warrior', 8, 0, { rarity: 'rare', mods: ['armoured'] }));
-    expect(w.player.def.armour).toBe(armourBefore);
+    expect(w.sides[0].player.def.armour).toBe(armourBefore);
     const belt = arena(
       buildOf(['crushingBlow'], (x) => {
         x.equipment.belt = rollUnique(new Rng(1), uid, uniqueDef('trophyCord'), 40);
       }),
     );
-    const a0 = belt.player.def.armour;
+    const a0 = belt.sides[0].player.def.armour;
     killActor(belt, put(belt, 'warrior', 8, 0, { rarity: 'magic', mods: ['armoured'] }));
-    expect(belt.player.def.armour).toBe(a0);
+    expect(belt.sides[0].player.def.armour).toBe(a0);
   });
 });
 

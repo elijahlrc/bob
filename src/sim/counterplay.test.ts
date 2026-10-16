@@ -40,8 +40,16 @@ function arena(mods: MonsterModId[]): { world: World; mon: Actor; player: Actor 
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 20 });
-  const mon = spawnMonster(world, spec(mods), world.player.x + 1, world.player.y, 0, 0, 'Test');
-  return { world, mon, player: world.player };
+  const mon = spawnMonster(
+    world,
+    spec(mods),
+    world.sides[0].player.x + 1,
+    world.sides[0].player.y,
+    0,
+    0,
+    'Test',
+  );
+  return { world, mon, player: world.sides[0].player };
 }
 
 describe('counterplay monster mods (EXPANSION 7.2)', () => {
@@ -63,15 +71,15 @@ describe('counterplay monster mods (EXPANSION 7.2)', () => {
     // A projectile attack against a Deflecting monster hits less often.
     const { world } = arena([]);
     const prof = {
-      ...world.char.profile(world.char.primary),
+      ...world.sides[0].char.profile(world.sides[0].char.primary),
       alwaysHit: false,
       isAttack: true,
       skill: {
-        ...world.char.primary.skill,
+        ...world.sides[0].char.primary.skill,
         behaviour: { kind: 'projectile', count: 1, spread: 0 },
       },
     } as never;
-    const hand = world.char.profile(world.char.primary).hands[0];
+    const hand = world.sides[0].char.profile(world.sides[0].char.primary).hands[0];
     const plain = buildMonster(spec([])).defence;
     expect(attackHitChance(prof, hand, d)).toBeLessThan(attackHitChance(prof, hand, plain));
   });
@@ -122,7 +130,7 @@ describe('counterplay monster mods (EXPANSION 7.2)', () => {
     const { world, mon, player } = arena(['thorned']);
     player.life = player.def.maxLife = 100000;
     player.def = { ...player.def, armour: 0, physReduction: 0, damageTakenMult: 1 };
-    const melee = world.char.profile(world.char.primary);
+    const melee = world.sides[0].char.profile(world.sides[0].char.primary);
     expect(melee.skill.behaviour.kind).toBe('melee');
     applyHit(world, player, mon, melee, ok(1000));
     expect(player.life).toBeLessThan(100000);

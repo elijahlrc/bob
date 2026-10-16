@@ -54,15 +54,15 @@ function matches(d: TriggerDef, ev: TriggerEvent, tagMask: number): boolean {
 
 /** Offer an event to every trigger the player has. Cheap when there are none. */
 export function fireTriggers(w: World, s: Side, ev: TriggerEvent): void {
-  const triggers = w.char.triggers;
-  if (triggers.length === 0 || s.trig.busy || !w.player.alive) return;
+  const triggers = s.char.triggers;
+  if (triggers.length === 0 || s.trig.busy || !s.player.alive) return;
   if ('tags' in ev && (ev.tags & TRIGGERED) !== 0) return;
   for (const src of triggers) {
     const d = src.def;
     if (!matches(d, ev, src.tagMask)) continue;
     if (d.on === 'hitTaken' && ev.on === 'hitTaken') {
       s.trig.taken[src.key] = (s.trig.taken[src.key] ?? 0) + ev.damage;
-      if (s.trig.taken[src.key] < ((d.threshold ?? 0) / 100) * w.player.def.maxLife) continue;
+      if (s.trig.taken[src.key] < ((d.threshold ?? 0) / 100) * s.player.def.maxLife) continue;
     }
     // The next spell in socket order; its own cooldown, not the source's (3.9).
     const turn = s.trig.next[src.key] ?? 0;
@@ -94,7 +94,7 @@ function perform(
     case 'spread':
       return ev.on === 'kill' && spread(w, e, ev.target);
     case 'overkillBurn':
-      return ev.on === 'kill' && overkillBurn(w, e, ev.target);
+      return ev.on === 'kill' && overkillBurn(w, s, e, ev.target);
     case 'storm':
       if (ev.on !== 'kill') return false;
       startStorm(
@@ -108,14 +108,14 @@ function perform(
       );
       return true;
     case 'recover':
-      return recover(w, s, e);
+      return recover(s, e);
     case 'sacrifice':
-      return sacrifice(w, s, e);
+      return sacrifice(s, e);
   }
 }
 
-function nearestEnemy(w: World): Actor | null {
-  const p = w.player;
+function nearestEnemy(w: World, s: Side): Actor | null {
+  const p = s.player;
   let best: Actor | null = null;
   let bd = 12;
   for (const a of w.actors) {
@@ -133,10 +133,10 @@ function castTriggered(w: World, s: Side, choice: SkillChoice, ev: TriggerEvent)
   // A spell cast on a kill goes to the next enemy, or lands where the dead one fell.
   const target =
     ('target' in ev && ev.target.alive ? ev.target : null) ??
-    nearestEnemy(w) ??
+    nearestEnemy(w, s) ??
     (ev.on === 'kill' ? ev.target : null);
   if (!target) return false;
-  const prof = w.char.profile(choice, playerConds(w, target), flaskMask(s));
+  const prof = s.char.profile(choice, playerConds(w, s, target), flaskMask(s));
   const act: Action = {
     profile: prof,
     which: 'triggered',
@@ -152,7 +152,7 @@ function castTriggered(w: World, s: Side, choice: SkillChoice, ev: TriggerEvent)
   w.events.push({ t: 'trigger', skill: prof.skill.id, kind: ev.on });
   s.trig.busy = true;
   try {
-    fire(w, w.player, act);
+    fire(w, s.player, act);
   } finally {
     s.trig.busy = false;
   }
@@ -174,6 +174,7 @@ export function corpseBlast(
 /** A kill that went past the enemy's life sets the enemies near it burning, by the damage it had to spare. */
 function overkillBurn(
   w: World,
+  s: Side,
   e: Extract<TriggerEffect, { kind: 'overkillBurn' }>,
   dead: Actor,
 ): boolean {
@@ -181,10 +182,11 @@ function overkillBurn(
   if (over <= 0) return false;
   const ctx = playerCtx(
     w,
+    s,
     maskOr(tagBit('dot'), tagBit('fire')),
     1 << DAMAGE_TYPES.indexOf('fire'),
   );
-  const dps = (over * e.pct * w.char.db.mult('damage', ctx)) / 100;
+  const dps = (over * e.pct * s.char.db.mult('damage', ctx)) / 100;
   for (const o of w.actors) {
     if (o.isPlayer || !o.alive || Math.hypot(o.x - dead.x, o.y - dead.y) > e.radius + o.r) continue;
     applyFlatDot(w, o, '@herald', 3, dps, e.seconds);
@@ -259,23 +261,23 @@ function spread(w: World, e: Extract<TriggerEffect, { kind: 'spread' }>, dead: A
   return any;
 }
 
-function sacrifice(w: World, s: Side, e: Extract<TriggerEffect, { kind: 'sacrifice' }>): boolean {
-  const p = w.player;
+function sacrifice(s: Side, e: Extract<TriggerEffect, { kind: 'sacrifice' }>): boolean {
+  const p = s.player;
   const amount = Math.min(Math.max(0, p.life - 1), (e.pctOfLife / 100) * p.def.maxLife);
   if (amount <= 0) return false;
   p.life -= amount;
   if (e.pool === 'es') p.es = Math.min(p.def.maxEs, p.es + amount);
-  else p.mana = Math.min(p.def.maxMana - reservedMana(w, s), p.mana + amount);
+  else p.mana = Math.min(p.def.maxMana - reservedMana(s), p.mana + amount);
   return true;
 }
 
-function recover(w: World, s: Side, e: Extract<TriggerEffect, { kind: 'recover' }>): boolean {
-  const p = w.player;
+function recover(s: Side, e: Extract<TriggerEffect, { kind: 'recover' }>): boolean {
+  const p = s.player;
   const amount = (e.value / 100) * (e.pctOf === 'armour' ? p.def.armour : p.def.maxLife);
   if (amount <= 0) return false;
-  if (e.pool === 'life') p.life = Math.min(lifeCap(w, p), p.life + amount);
+  if (e.pool === 'life') p.life = Math.min(lifeCap(p), p.life + amount);
   else if (e.pool === 'es') p.es = Math.min(p.def.maxEs, p.es + amount);
-  else p.mana = Math.min(p.def.maxMana - reservedMana(w, s), p.mana + amount);
+  else p.mana = Math.min(p.def.maxMana - reservedMana(s), p.mana + amount);
   return true;
 }
 

@@ -45,7 +45,7 @@ function inSim(b: Build, fight: Scenario): Seen {
   while (world.status === 'running') {
     stepWorld(world);
     for (const e of world.events)
-      if (e.t === 'use' && e.src === world.player.id && !e.via)
+      if (e.t === 'use' && e.src === world.sides[0].player.id && !e.via)
         uses[e.skill] = (uses[e.skill] ?? 0) + 1;
   }
   let dealt = 0;

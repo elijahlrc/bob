@@ -11,6 +11,8 @@ import { encDamageMult, encMoveMult, onEncounterDeath } from './encounters';
 import { flaskWards } from './afflict';
 import type { Actor, GroundEffect, World } from './types';
 import { spawnMonster } from './world';
+import { hunted } from './side';
+import type { Side } from './side';
 
 /**
  * Behaviours of the Rot and the Hollow (EXPANSION 5.8, 5.9 and 7.3): corpses and what uses them, ground zones,
@@ -108,12 +110,12 @@ export function monsterHexEffect(w: World, id: HexId): number {
 }
 
 /** A monster hexes the player with one of the four hexes. */
-export function hexPlayer(w: World, id: HexId): void {
-  monsterHexesPlayer(w, id, monsterHexEffect(w, id));
+export function hexPlayer(w: World, s: Side, id: HexId): void {
+  monsterHexesPlayer(w, s, id, monsterHexEffect(w, id));
 }
 
-export function hexPlayerAtRandom(w: World): void {
-  hexPlayer(w, HEX_IDS[w.rngAi.int(0, HEX_IDS.length - 1)]);
+export function hexPlayerAtRandom(w: World, s: Side): void {
+  hexPlayer(w, s, HEX_IDS[w.rngAi.int(0, HEX_IDS.length - 1)]);
 }
 
 /** Whether a Warden Pylon within range keeps this monster from taking damage. */
@@ -174,8 +176,8 @@ export const SIGIL_EVERY = 1.5;
  * Drag the character toward a monster (a Tidecaller's hook): up to `tiles`, never into it, and the character is staggered
  * for a moment (a pulled character does not walk back into the pack the instant it lands).
  */
-export function pullPlayer(w: World, from: Actor, tiles: number): void {
-  const p = w.player;
+export function pullPlayer(w: World, s: Side, from: Actor, tiles: number): void {
+  const p = s.player;
   if (!p.alive) return;
   const d = Math.hypot(from.x - p.x, from.y - p.y);
   const k = Math.min(tiles, Math.max(0, d - (from.r + p.r + 0.6)));
@@ -219,7 +221,7 @@ export function openZone(
           : kind === 'chilling'
             ? 2
             : 1,
-    faction: 1,
+    team: 1,
     acc: 0,
   });
 }
@@ -305,7 +307,7 @@ export function onMonsterDeath(w: World, a: Actor): void {
   }
   // A thief that dies gives back what it took.
   if (a.stolen > 0) {
-    const f = w.player.side!.flasks.find((x) => x.spec.uid === a.stolenFlask);
+    const f = hunted(w, a).side!.flasks.find((x) => x.spec.uid === a.stolenFlask);
     if (f) f.charges = Math.min(f.spec.maxCharges, f.charges + a.stolen);
     a.stolen = 0;
   }
@@ -333,9 +335,11 @@ export function onMonsterDeath(w: World, a: Actor): void {
   if (type === 'wisp') {
     // A nova that drains a fifth of the mana of the player.
     w.events.push({ t: 'explode', x: a.x, y: a.y, r: 2.5, dtype: 2 });
-    const p = w.player;
-    if (Math.hypot(p.x - a.x, p.y - a.y) <= 2.5 + p.r)
-      p.mana = Math.max(0, p.mana - p.def.maxMana * 0.2);
+    for (const s of w.sides) {
+      const p = s.player;
+      if (s.team !== a.team && Math.hypot(p.x - a.x, p.y - a.y) <= 2.5 + p.r)
+        p.mana = Math.max(0, p.mana - p.def.maxMana * 0.2);
+    }
   }
   // The Choir: a death feeds Flagellants and, with Zealous, spurs the allies around it.
   for (const o of w.actors) {
@@ -361,7 +365,7 @@ export function tickCorpses(w: World, dt: number): void {
   let j = 0;
   for (const c of w.corpses) {
     c.age += dt;
-    if (c.spec.type === 'shambler' && c.age >= SHAMBLER_RISE_TIME && w.player.alive) {
+    if (c.spec.type === 'shambler' && c.age >= SHAMBLER_RISE_TIME && hunted(w, c).alive) {
       raise(w, c);
       continue;
     }
@@ -381,23 +385,26 @@ function zoneWarded(a: Actor, kind: 'chill' | 'shock'): boolean {
 
 /** Lasting zones hurt the player and the player's minions standing in them, in pulses. */
 export function tickZones(w: World, dt: number): void {
-  const p = w.player;
   for (const e of w.effects) {
     if (!isZone(e)) continue;
     const inside = (a: Actor) => a.alive && Math.hypot(a.x - e.x, a.y - e.y) <= e.radius + a.r;
     // A Hexer's sigil hexes the character who stands in it, once in a while (docs/ENCOUNTERS.md 7).
     if (e.kind === 'sigil') {
       e.acc = (e.acc ?? 0) + dt;
-      if (inside(p) && e.acc >= SIGIL_EVERY) {
-        e.acc = 0;
-        hexPlayerAtRandom(w);
-      }
+      for (const s of w.sides)
+        if (s.team !== e.team && inside(s.player) && e.acc >= SIGIL_EVERY) {
+          e.acc = 0;
+          hexPlayerAtRandom(w, s);
+        }
       continue;
     }
-    // The player and the player's minions are caught by a monster's zone alike.
+    // A character and its minions are caught by a monster's zone alike.
     const caught: Actor[] = [];
-    if (inside(p)) caught.push(p);
-    for (const m of w.player.side!.minions) if (inside(m)) caught.push(m);
+    for (const s of w.sides) {
+      if (s.team === e.team) continue;
+      if (inside(s.player)) caught.push(s.player);
+      for (const m of s.minions) if (inside(m)) caught.push(m);
+    }
     if (caught.length === 0) continue;
     for (const a of caught) {
       // Ground that chills or shocks does nothing to what cannot be (an immunity, a cleansing flask running).
@@ -431,7 +438,7 @@ export function tickZones(w: World, dt: number): void {
  */
 export function shieldBlocks(w: World, m: Actor, px: number, py: number): boolean {
   if (m.mon?.spec.type !== 'shieldbearer' || m.action || m.stunT > 0) return false;
-  const p = w.player;
+  const p = hunted(w, m);
   const toPlayer = Math.atan2(p.y - m.y, p.x - m.x);
   const toShot = Math.atan2(py - m.y, px - m.x);
   let d = Math.abs(toPlayer - toShot);
@@ -441,7 +448,7 @@ export function shieldBlocks(w: World, m: Actor, px: number, py: number): boolea
 
 /** The Gloomstalker reappears on the far side of the player. */
 export function blinkBehind(w: World, m: Actor): void {
-  const p = w.player;
+  const p = hunted(w, m);
   const away = Math.atan2(p.y - m.y, p.x - m.x);
   const pos = w.grid.collide(p.x + Math.cos(away) * 1.2, p.y + Math.sin(away) * 1.2, m.r);
   m.x = pos.x;
@@ -454,7 +461,7 @@ export function blinkBehind(w: World, m: Actor): void {
 /** The two champions (EXPANSION 7.3). */
 function tickChampion(w: World, m: Actor, dt: number): void {
   const frac = m.life / m.def.maxLife;
-  const p = w.player;
+  const p = hunted(w, m);
   const d = Math.hypot(p.x - m.x, p.y - m.y);
   if (m.modIds.includes('carrionMother')) {
     m.raiserT -= dt;
@@ -515,7 +522,7 @@ function tickChampion(w: World, m: Actor, dt: number): void {
           kind: 'slam',
           damage: 3 * monsterHitOf(m),
           dtype: 0,
-          faction: 1,
+          team: 1,
           owner: m.id,
         });
       }
@@ -556,7 +563,7 @@ function tickChampion(w: World, m: Actor, dt: number): void {
         kind: 'slam',
         damage: 3 * monsterHitOf(m),
         dtype: 3,
-        faction: 1,
+        team: 1,
         owner: m.id,
       });
     }
@@ -570,7 +577,7 @@ function tickChampion(w: World, m: Actor, dt: number): void {
     m.raiserT -= dt;
     if (m.raiserT <= 0 && d > 3 && d < 14) {
       m.raiserT = 10;
-      pullPlayer(w, m, 4);
+      pullPlayer(w, hunted(w, m).side!, m, 4);
     }
     if (m.bossPhase === 0 && frac <= 0.5) {
       m.bossPhase = 1;
@@ -621,7 +628,7 @@ function tickChampion(w: World, m: Actor, dt: number): void {
     m.raiserT -= dt;
     if (m.raiserT <= 0) {
       m.raiserT = PRECENTOR_HEX_INTERVAL;
-      hexPlayer(w, HEX_IDS[m.slamT++ % HEX_IDS.length]);
+      hexPlayer(w, hunted(w, m).side!, HEX_IDS[m.slamT++ % HEX_IDS.length]);
       if (Math.floor(m.slamT) % 2 === 0)
         m.life = Math.min(m.def.maxLife, m.life + m.def.maxLife * 0.05);
     }

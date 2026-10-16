@@ -22,7 +22,7 @@ function arena(): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
 }
@@ -36,7 +36,15 @@ const spec = (type: MonsterTypeId): MonsterSpec => ({
 });
 
 function put(w: World, type: MonsterTypeId, dx: number, dy = 0, pack = 0): Actor {
-  const m = spawnMonster(w, spec(type), w.player.x + dx, w.player.y + dy, 0, pack, type);
+  const m = spawnMonster(
+    w,
+    spec(type),
+    w.sides[0].player.x + dx,
+    w.sides[0].player.y + dy,
+    0,
+    pack,
+    type,
+  );
   m.state = 'chase';
   return m;
 }
@@ -47,7 +55,7 @@ const steps = (w: World, n: number) => {
 
 /** A hit of exactly this physical damage, from a monster on the character. */
 function struck(w: World, src: Actor, amount: number): number {
-  const p = w.player;
+  const p = w.sides[0].player;
   const before = p.life + p.es;
   const res: HitResult = {
     outcome: 'hit',
@@ -97,9 +105,9 @@ describe('debuffs on the character (docs/ENCOUNTERS.md 7)', () => {
     // It draws between bolts.
     for (let i = 0; i < 200 && !w.effects.some((e) => e.kind === 'sigil'); i++) stepWorld(w);
     expect(w.effects.some((e) => e.kind === 'sigil')).toBe(true);
-    expect(w.player.hexes.length).toBe(0);
+    expect(w.sides[0].player.hexes.length).toBe(0);
     steps(w, 40);
-    expect(w.player.hexes.length).toBeGreaterThan(0);
+    expect(w.sides[0].player.hexes.length).toBeGreaterThan(0);
   });
 
   it("a Gloomstalker's shade blinds: the character's attacks miss more", () => {
@@ -107,8 +115,9 @@ describe('debuffs on the character (docs/ENCOUNTERS.md 7)', () => {
     const m = put(w, 'gloomstalker', 6);
     const prof = m.mon!.sidearm!.profile(0);
     w.sides[0].opts.godMode = true;
-    for (let i = 0; i < 20 && !w.player.fx.blind; i++) hit(w, m, w.player, prof, 0, 6);
-    expect(w.player.fx.blind).toBeDefined();
-    expect(w.player.fx.blind!.v).toBe(50);
+    for (let i = 0; i < 20 && !w.sides[0].player.fx.blind; i++)
+      hit(w, m, w.sides[0].player, prof, 0, 6);
+    expect(w.sides[0].player.fx.blind).toBeDefined();
+    expect(w.sides[0].player.fx.blind!.v).toBe(50);
   });
 });

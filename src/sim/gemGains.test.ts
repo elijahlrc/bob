@@ -28,11 +28,15 @@ describe('gem-granted gains in the sim', () => {
         distance: 1.5,
       },
     );
-    const prof = w.char.profile(w.primary, playerConds(w, dummy), flaskMask(w.sides[0]));
+    const prof = w.sides[0].char.profile(
+      w.sides[0].primary,
+      playerConds(w, w.sides[0], dummy),
+      flaskMask(w.sides[0]),
+    );
     expect(w.sides[0].buffT.fortify).toBe(0);
     const res = resolveHit(new Rng(1), prof, prof.hands[0], targetState(dummy), 1, false);
     res.outcome = 'hit';
-    applyHit(w, w.player, dummy, prof, res);
+    applyHit(w, w.sides[0].player, dummy, prof, res);
     expect(w.sides[0].buffT.fortify).toBeGreaterThan(0);
   });
 
@@ -43,12 +47,16 @@ describe('gem-granted gains in the sim', () => {
         distance: 1.5,
       },
     );
-    const prof = w.char.profile(w.primary, playerConds(w, dummy), flaskMask(w.sides[0]));
+    const prof = w.sides[0].char.profile(
+      w.sides[0].primary,
+      playerConds(w, w.sides[0], dummy),
+      flaskMask(w.sides[0]),
+    );
     const res = resolveHit(new Rng(2), prof, prof.hands[0], targetState(dummy), 1, false);
     res.outcome = 'hit';
     res.stun = 0.35;
-    expect(w.char.charges.grit).toBe(0);
-    applyHit(w, w.player, dummy, prof, res);
-    expect(w.char.charges.grit).toBe(1);
+    expect(w.sides[0].char.charges.grit).toBe(0);
+    applyHit(w, w.sides[0].player, dummy, prof, res);
+    expect(w.sides[0].char.charges.grit).toBe(1);
   });
 });

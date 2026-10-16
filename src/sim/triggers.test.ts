@@ -54,17 +54,17 @@ function run(build: Build, seconds: number, seed = 1, distance = 1.6, mana?: num
   const { world, dummy } = createDummyWorld(build, { distance, maxTime: seconds, seed });
   const t: Tally = { uses: 0, triggers: 0, hits: 0, trigHits: 0, time: 0 };
   while (world.status === 'running') {
-    if (mana !== undefined) world.player.mana = mana;
+    if (mana !== undefined) world.sides[0].player.mana = mana;
     stepWorld(world);
     let after = false;
     for (const e of world.events as SimEvent[]) {
-      if (e.t === 'use' && e.src === world.player.id) {
+      if (e.t === 'use' && e.src === world.sides[0].player.id) {
         t.uses++;
         after = false;
       } else if (e.t === 'trigger') {
         t.triggers++;
         after = true;
-      } else if (e.t === 'hit' && e.src === world.player.id) {
+      } else if (e.t === 'hit' && e.src === world.sides[0].player.id) {
         if (after) t.trigHits++;
         else t.hits++;
       }
@@ -257,7 +257,7 @@ describe('triggers: effects on kills, blocks and damage taken', () => {
       effect: { kind: 'recover', pool: 'es', pctOf: 'armour', value: 10 },
     };
     const { world, dummy } = createDummyWorld(buildFor([trig], []), { distance: 2 });
-    const p = world.player;
+    const p = world.sides[0].player;
     p.def = { ...p.def, armour: 2000, maxEs: 1000 };
     p.es = 0;
     const blocked = {
@@ -269,7 +269,7 @@ describe('triggers: effects on kills, blocks and damage taken', () => {
       ailments: { ignite: 0, bleed: 0, poison: 0, shock: 0, chill: 0, freeze: 0 },
       stun: 0,
     };
-    const prof = world.char.profile(world.char.primary);
+    const prof = world.sides[0].char.profile(world.sides[0].char.primary);
     applyHit(world, dummy, p, prof, blocked);
     expect(p.es).toBeCloseTo(200);
     applyHit(world, dummy, p, prof, blocked); // still cooling down
@@ -291,7 +291,7 @@ describe('triggers: effects on kills, blocks and damage taken', () => {
       effect: { kind: 'recover', pool: 'life', pctOf: 'maxLife', value: 5 },
     };
     const { world, dummy } = createDummyWorld(buildFor([trig], []), { distance: 2 });
-    const p = world.player;
+    const p = world.sides[0].player;
     const max = p.def.maxLife;
     p.life = max * 0.5;
     const hit = (amount: number) => ({
@@ -303,7 +303,7 @@ describe('triggers: effects on kills, blocks and damage taken', () => {
       ailments: { ignite: 0, bleed: 0, poison: 0, shock: 0, chill: 0, freeze: 0 },
       stun: 0,
     });
-    const prof = world.char.profile(world.char.primary);
+    const prof = world.sides[0].char.profile(world.sides[0].char.primary);
     p.def = { ...p.def, maxLife: max };
     const before = p.life;
     applyHit(world, dummy, p, prof, hit(max * 0.1));
@@ -357,7 +357,7 @@ describe('calc ↔ sim convergence for triggers (EXPANSION 5.5)', () => {
         for (const e of world.events) {
           if (e.t === 'use') after = false;
           else if (e.t === 'trigger') after = true;
-          else if (e.t === 'hit' && e.src === world.player.id && after) dmg += e.amount;
+          else if (e.t === 'hit' && e.src === world.sides[0].player.id && after) dmg += e.amount;
         }
       }
       time += world.t;

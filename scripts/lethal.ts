@@ -70,8 +70,8 @@ for (const classId of classes) {
           return;
         }
         w.sides[0].opts.godMode = true;
-        const p = w.player;
-        const cap = Math.max(1, lifeCap(w, p));
+        const p = w.sides[0].player;
+        const cap = Math.max(1, lifeCap(p));
         let h = hist.get(w);
         if (!h) hist.set(w, (h = []));
         const f = p.life / cap;

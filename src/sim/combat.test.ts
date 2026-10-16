@@ -19,7 +19,7 @@ function world(classId = 'vanguard') {
 describe('§6.3 damage routing', () => {
   it('ES absorbs non-chaos damage first; chaos bypasses ES', () => {
     const { w } = world();
-    const p = w.player;
+    const p = w.sides[0].player;
     p.def = { ...p.def, maxEs: 100 };
     p.es = 100;
     const life0 = p.life;
@@ -33,7 +33,7 @@ describe('§6.3 damage routing', () => {
 
   it('Mind Bulwark takes 30% from mana before life', () => {
     const { w } = world();
-    const p = w.player;
+    const p = w.sides[0].player;
     p.def = { ...p.def, manaBeforeLife: 0.3 };
     p.mana = 100;
     const life0 = p.life;
@@ -44,8 +44,8 @@ describe('§6.3 damage routing', () => {
 
   it('death ends the map', () => {
     const { w } = world();
-    applyDamage(w, w.player, [1e6, 0, 0, 0, 0]);
-    expect(w.player.alive).toBe(false);
+    applyDamage(w, w.sides[0].player, [1e6, 0, 0, 0, 0]);
+    expect(w.sides[0].player.alive).toBe(false);
     expect(w.status).toBe('dead');
   });
 });
@@ -53,7 +53,7 @@ describe('§6.3 damage routing', () => {
 describe('§6.4 recovery', () => {
   it('leech recovers 2% of max life per second per instance, capped at 20%', () => {
     const { w } = world();
-    const p = w.player;
+    const p = w.sides[0].player;
     p.def = { ...p.def, lifeRegen: 0, maxLife: 1000 };
     p.life = 100;
     p.leechLife = [1000];
@@ -66,8 +66,8 @@ describe('§6.4 recovery', () => {
 
   it('leech instances end at full life', () => {
     const { w } = world();
-    const p = w.player;
-    p.life = lifeCap(w, p);
+    const p = w.sides[0].player;
+    p.life = lifeCap(p);
     p.leechLife = [50];
     tickActor(w, p, DT);
     expect(p.leechLife).toHaveLength(0);
@@ -75,7 +75,7 @@ describe('§6.4 recovery', () => {
 
   it('life regeneration and ES recharge after the delay', () => {
     const { w } = world();
-    const p = w.player;
+    const p = w.sides[0].player;
     p.def = { ...p.def, lifeRegen: 10, maxEs: 100, esRecharge: 33.3, esDelay: 2 };
     p.life = 10;
     p.es = 0;
@@ -122,7 +122,7 @@ describe('§6.6 damage over time in the sim', () => {
 describe('§6.6a stun in the sim', () => {
   it('stun cancels the action and grants a grace period afterwards', () => {
     const { w } = world();
-    const p = w.player;
+    const p = w.sides[0].player;
     p.stunT = 0.35;
     p.action = null;
     tickActor(w, p, 0.4);
@@ -135,12 +135,12 @@ describe('§6.9 flask policy', () => {
   it('uses a life flask below 50% life and queues recovery over its duration', () => {
     const { w, run } = world();
     const uid = () => run.nextUid++;
-    w.build.flasks = [makeFlask(uid, 'flask_life_1', 1), null, null, null, null];
+    w.sides[0].build.flasks = [makeFlask(uid, 'flask_life_1', 1), null, null, null, null];
     // Rebuild flask state from the character.
     w.sides[0].flasks = [
       {
         spec: {
-          ...w.char.flasks[0],
+          ...w.sides[0].char.flasks[0],
           uid: 1,
           kind: 'life',
           life: 70,
@@ -158,8 +158,8 @@ describe('§6.9 flask policy', () => {
         uses: 0,
       },
     ];
-    const p = w.player;
-    p.life = lifeCap(w, p) * 0.3;
+    const p = w.sides[0].player;
+    p.life = lifeCap(p) * 0.3;
     expect(autoFlaskPolicy(w, w.sides[0])).toEqual([0]);
     const l0 = p.life;
     stepWorld(w);
@@ -180,7 +180,7 @@ describe('hybrid flasks refill mana as well as life (flask policy)', () => {
     run.build.flasks = [makeFlask(uid, 'flask_hybrid_1', 1), null, null, null, null];
     const { world: w } = createDummyWorld(run.build, { distance: 20 });
     w.sides[0].opts.freeResources = false;
-    const spec = w.char.flasks[0];
+    const spec = w.sides[0].char.flasks[0];
     expect(spec.kind).toBe('hybrid');
     w.sides[0].flasks[0].charges = spec.maxCharges;
     return w;
@@ -188,18 +188,18 @@ describe('hybrid flasks refill mana as well as life (flask policy)', () => {
 
   it('is drunk when mana runs low, even at full life', () => {
     const w = hybridWorld();
-    const p = w.player;
-    const cost = w.char.profile(w.primary).cost;
+    const p = w.sides[0].player;
+    const cost = w.sides[0].char.profile(w.sides[0].primary).cost;
     expect(cost).toBeGreaterThan(0);
-    p.life = lifeCap(w, p);
+    p.life = lifeCap(p);
     p.mana = cost; // below twice the cost of the main skill
     expect(autoFlaskPolicy(w, w.sides[0])).toEqual([0]);
   });
 
   it('is left alone with healthy life and mana, and while it is already active', () => {
     const w = hybridWorld();
-    const p = w.player;
-    p.life = lifeCap(w, p);
+    const p = w.sides[0].player;
+    p.life = lifeCap(p);
     p.mana = p.def.maxMana;
     expect(autoFlaskPolicy(w, w.sides[0])).toEqual([]);
     p.mana = 0;
@@ -209,9 +209,9 @@ describe('hybrid flasks refill mana as well as life (flask policy)', () => {
 
   it('still answers low life', () => {
     const w = hybridWorld();
-    const p = w.player;
+    const p = w.sides[0].player;
     p.mana = p.def.maxMana;
-    p.life = lifeCap(w, p) * 0.2;
+    p.life = lifeCap(p) * 0.2;
     expect(autoFlaskPolicy(w, w.sides[0])).toEqual([0]);
   });
 });

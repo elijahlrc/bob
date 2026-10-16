@@ -24,7 +24,7 @@ function arena(godMode = false): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30, maxTime: 600 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   if (godMode) world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
@@ -40,7 +40,15 @@ const spec = (type: MonsterTypeId, over: Partial<MonsterSpec> = {}): MonsterSpec
 });
 
 function put(w: World, type: MonsterTypeId, dx: number, dy = 0, over: Partial<MonsterSpec> = {}) {
-  const m = spawnMonster(w, spec(type, over), w.player.x + dx, w.player.y + dy, 0, 0, type);
+  const m = spawnMonster(
+    w,
+    spec(type, over),
+    w.sides[0].player.x + dx,
+    w.sides[0].player.y + dy,
+    0,
+    0,
+    type,
+  );
   m.state = 'chase';
   return m;
 }
@@ -76,7 +84,9 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
     expect(kids().length).toBeGreaterThan(first);
     expect(kids().length).toBeLessThanOrEqual(NEST_MAX_ALIVE);
     // It stays where it is.
-    expect(Math.hypot(nest.x - (w.player.x + 12), nest.y - w.player.y)).toBeLessThan(0.5);
+    expect(
+      Math.hypot(nest.x - (w.sides[0].player.x + 12), nest.y - w.sides[0].player.y),
+    ).toBeLessThan(0.5);
     killActor(w, nest);
     expect(nest.alive).toBe(false);
   });
@@ -84,16 +94,16 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
   it('a Carrion Bat flies over walls to reach you; a Gnawer cannot', () => {
     const w = arena(true);
     // A wall of tiles two tiles to the right of the player, taller than anyone can step around quickly.
-    const px = Math.floor(w.player.x);
-    const py = Math.floor(w.player.y);
+    const px = Math.floor(w.sides[0].player.x);
+    const py = Math.floor(w.sides[0].player.y);
     for (let y = py - 14; y <= py + 14; y++) w.grid.tiles[y * w.grid.w + px + 4] = 0;
     w.grid.refreshOpen();
     const bat = put(w, 'bat', 6);
     const rat = put(w, 'gnawer', 6, 1);
-    const d0 = Math.hypot(bat.x - w.player.x, bat.y - w.player.y);
+    const d0 = Math.hypot(bat.x - w.sides[0].player.x, bat.y - w.sides[0].player.y);
     run(w, 1.2);
-    const dBat = Math.hypot(bat.x - w.player.x, bat.y - w.player.y);
-    const dRat = Math.hypot(rat.x - w.player.x, rat.y - w.player.y);
+    const dBat = Math.hypot(bat.x - w.sides[0].player.x, bat.y - w.sides[0].player.y);
+    const dRat = Math.hypot(rat.x - w.sides[0].player.x, rat.y - w.sides[0].player.y);
     expect(dBat).toBeLessThan(d0 - 2.5);
     expect(dRat).toBeGreaterThan(dBat + 1.5);
   });
@@ -214,7 +224,7 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
     expect(before).toBe(0);
     run(w, 2.2);
     expect(q.phaseT).toBeLessThanOrEqual(0);
-    expect(Math.hypot(q.x - w.player.x, q.y - w.player.y)).toBeLessThan(3);
+    expect(Math.hypot(q.x - w.sides[0].player.x, q.y - w.sides[0].player.y)).toBeLessThan(3);
     expect(w.actors.some((a) => a.alive && a.mon?.spec.type === 'nest')).toBe(true);
   });
 
@@ -278,8 +288,8 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
 
   it('a flier that dies over a wall drops its loot where it can be picked up', () => {
     const w = arena(true);
-    const px = Math.floor(w.player.x);
-    const py = Math.floor(w.player.y);
+    const px = Math.floor(w.sides[0].player.x);
+    const py = Math.floor(w.sides[0].player.y);
     for (let y = py - 3; y <= py + 3; y++)
       for (let x = px + 5; x <= px + 7; x++) w.grid.tiles[y * w.grid.w + x] = 0;
     w.grid.refreshOpen();
@@ -294,9 +304,9 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
 
   it('the player gives up on a drop it cannot reach instead of hunting it for ever', () => {
     const w = arena(true);
-    w.player.stunT = 0;
-    const px = Math.floor(w.player.x);
-    const py = Math.floor(w.player.y);
+    w.sides[0].player.stunT = 0;
+    const px = Math.floor(w.sides[0].player.x);
+    const py = Math.floor(w.sides[0].player.y);
     // A sealed pocket of floor in a block of wall, four tiles away.
     for (let y = py - 2; y <= py + 2; y++)
       for (let x = px + 3; x <= px + 7; x++) w.grid.tiles[y * w.grid.w + x] = 0;

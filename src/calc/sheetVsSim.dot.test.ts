@@ -43,7 +43,7 @@ function play(
     feed?.(world, dummy);
     stepWorld(world);
     for (const e of world.events)
-      if (e.t === 'use' && e.src === world.player.id && e.skill === skillId) uses++;
+      if (e.t === 'use' && e.src === world.sides[0].player.id && e.skill === skillId) uses++;
   }
   let total = 0;
   const byName = new Map<string, number>();
@@ -97,7 +97,7 @@ describe('Spirit Saw: the saw carries its debuff along', () => {
       last = world.t;
       const now = world.projectiles.some(
         (pr) =>
-          pr.owner === world.player.id &&
+          pr.owner === world.sides[0].player.id &&
           Math.hypot(pr.x - dummy.x, pr.y - dummy.y) <= zone + dummy.r,
       );
       if (now) near += dt;

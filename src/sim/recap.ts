@@ -24,9 +24,9 @@ export function buildRecap(w: World): DeathRecap {
   }
   // The killer is the last monster to hit (an effect such as burning is not a killer).
   const last = [...log].reverse().find((d) => d.rarity !== 'effect') ?? log[log.length - 1];
-  const def = w.player.def;
+  const def = w.sides[0].player.def;
   const cap = (i: number) => Math.min(def.res[i], def.maxRes[i]);
-  const ail = w.player.ail;
+  const ail = w.sides[0].player.ail;
   const ailments: string[] = [];
   if (ail.ignites.length) ailments.push('ignited');
   if (ail.bleeds.length) ailments.push('bleeding');
@@ -47,7 +47,7 @@ export function buildRecap(w: World): DeathRecap {
       amount: d.amount,
       hp: d.hp,
     }));
-  const near = enemiesNear(w, w.player.x, w.player.y, RECAP_NEAR);
+  const near = enemiesNear(w, w.sides[0].player.x, w.sides[0].player.y, RECAP_NEAR);
   return {
     time: w.t,
     killer: last?.name ?? 'Unknown',
@@ -70,7 +70,11 @@ export function buildRecap(w: World): DeathRecap {
     maxLife: def.maxLife,
     maxEs: def.maxEs,
     hits,
-    vitals: { life: w.player.life, es: w.player.es, mana: w.player.mana },
+    vitals: {
+      life: w.sides[0].player.life,
+      es: w.sides[0].player.es,
+      mana: w.sides[0].player.mana,
+    },
     defence: {
       armour: def.armour,
       evasion: def.evasion,

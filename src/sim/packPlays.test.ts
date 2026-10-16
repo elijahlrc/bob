@@ -19,7 +19,7 @@ function arena(): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
@@ -34,7 +34,15 @@ const spec = (type: MonsterTypeId): MonsterSpec => ({
 });
 
 function put(w: World, type: MonsterTypeId, dx: number, dy: number, pack: number): Actor {
-  const m = spawnMonster(w, spec(type), w.player.x + dx, w.player.y + dy, 0, pack, type);
+  const m = spawnMonster(
+    w,
+    spec(type),
+    w.sides[0].player.x + dx,
+    w.sides[0].player.y + dy,
+    0,
+    pack,
+    type,
+  );
   m.state = 'chase';
   return m;
 }
@@ -75,7 +83,7 @@ describe('pack plays (docs/ENCOUNTERS.md 8)', () => {
     expect(ring).toBe(true);
     for (let i = 0; i < 100; i++) stepWorld(w);
     // On the ring, more or less.
-    const p = w.player;
+    const p = w.sides[0].player;
     for (const m of h)
       expect(Math.abs(Math.hypot(m.x - p.x, m.y - p.y) - RING_RADIUS)).toBeLessThan(2);
     let leapt = 0;

@@ -68,7 +68,7 @@ function tip(
 
 /** The cast in progress, if it is this skill: time left and the length of the cast. */
 function castOf(w: World, c: SkillChoice): { remaining: number; total: number } | null {
-  const act = w.player.action;
+  const act = w.sides[0].player.action;
   if (!act || act.which === 'monster' || act.which === 'triggered' || act.which === 'deployed')
     return null;
   if (act.profile.skill.id !== c.skill.id) return null;
@@ -99,10 +99,10 @@ const nopayWords = (c: SkillChoice) => `Not enough ${c.costsLife ? 'life' : 'man
 
 /** A skill that deals damage: the primary, a secondary, or the basic attack. */
 function damageSlot(w: World, c: SkillChoice, role: SkillRole): SkillSlot {
-  const prof = w.char.profile(c, 0, 0);
+  const prof = w.sides[0].char.profile(c, 0, 0);
   const look = profileLook(prof);
   const secondary = role === 'Secondary';
-  const cooldown = secondary ? w.char.cooldownOf(c, 0) : 0;
+  const cooldown = secondary ? w.sides[0].char.cooldownOf(c, 0) : 0;
   const cast = castOf(w, c);
   const dep = c.deploy ? deployed(w, c, prof) : null;
   let b: Built;
@@ -128,7 +128,7 @@ function damageSlot(w: World, c: SkillChoice, role: SkillRole): SkillSlot {
       total: Math.max(cooldown, left),
       words: `Cooling down, ${secs(left)} left`,
     };
-  } else if (!canPay(w, c.costsLife, prof.cost)) {
+  } else if (!canPay(w.sides[0], c.costsLife, prof.cost)) {
     b = { state: 'nopay', remaining: 0, total: 0, words: nopayWords(c) };
   } else {
     b = { state: 'ready', remaining: 0, total: 0, words: 'Ready' };
@@ -160,7 +160,7 @@ function damageSlot(w: World, c: SkillChoice, role: SkillRole): SkillSlot {
 
 /** A utility skill: a buff, curse, blink or summon, cast by the character's policy. */
 function utilitySlot(w: World, c: SkillChoice): SkillSlot {
-  const prof = w.char.profile(c, 0, 0);
+  const prof = w.sides[0].char.profile(c, 0, 0);
   const look = profileLook(prof);
   const u = c.skill.utility!;
   const readyAt = w.sides[0].utilityReady[c.key] ?? 0;
@@ -175,7 +175,7 @@ function utilitySlot(w: World, c: SkillChoice): SkillSlot {
       up = {
         state: 'active',
         remaining: left,
-        total: Math.max(left, u.seconds * w.char.db.mult('buffDuration')),
+        total: Math.max(left, u.seconds * w.sides[0].char.db.mult('buffDuration')),
         words: `Active, ${secs(left)} left`,
       };
   } else if (u.kind === 'summon') {
@@ -226,7 +226,7 @@ function utilitySlot(w: World, c: SkillChoice): SkillSlot {
       total: Math.max(cooldown, left),
       words: `Cooling down, ${secs(left)} left`,
     };
-  } else if (!canPay(w, c.costsLife, prof.cost)) {
+  } else if (!canPay(w.sides[0], c.costsLife, prof.cost)) {
     b = { state: 'nopay', remaining: 0, total: 0, words: nopayWords(c) };
   } else
     b = {
@@ -260,7 +260,7 @@ function utilitySlot(w: World, c: SkillChoice): SkillSlot {
  * utilities, the auras, then skills cast by triggers. The basic attack stands in only when there is no primary skill.
  */
 export function skillSlots(w: World): SkillSlot[] {
-  const ch = w.char;
+  const ch = w.sides[0].char;
   const out: SkillSlot[] = [];
   out.push(damageSlot(w, ch.primary, ch.primary.gemUid === null ? 'Basic attack' : 'Primary'));
   // The other main skills (the Strategy tab), then the other damage skills in the order the character considers them.

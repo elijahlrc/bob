@@ -2,6 +2,7 @@ import { COLLAPSE_SPEED, COLLAPSE_START } from '../data/mapTypes';
 import type { Labyrinth } from '../gen/labyrinth';
 import { rawHit } from './combat';
 import type { World } from './types';
+import type { Side } from './side';
 
 /**
  * Collapse (docs/MAPS.md 9.2): after a minute the way behind the character starts to fall in, from the entrance
@@ -60,11 +61,11 @@ export function collapseFront(t: number): number {
 }
 
 /** Each tick on a Collapse map: move the front, and crush a character that is behind it. */
-export function tickCollapse(w: World): void {
+export function tickCollapse(w: World, s: Side): void {
   if (w.plan.type !== 'collapse' || w.status !== 'running') return;
   w.collapseFront = collapseFront(w.t);
   if (w.collapseFront <= 0) return;
-  const p = w.player;
+  const p = s.player;
   const m = measurePath(w.plan.lab);
   w.collapseGap = pathProgress(m, p.x, p.y) - w.collapseFront;
   if (w.collapseGap < 0 && p.alive) rawHit(w, p, 1e9, 0, 'The Collapse');

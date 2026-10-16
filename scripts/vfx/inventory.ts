@@ -79,7 +79,7 @@ function run(id: string, seconds = 8): Row {
   for (let i = 0; i < steps && w.status === 'running'; i++) {
     stepWorld(w);
     for (const e of w.events as SimEvent[]) {
-      if (e.t === 'use' && e.src === w.player.id) row.uses++;
+      if (e.t === 'use' && e.src === w.sides[0].player.id) row.uses++;
       else if (e.t === 'explode') {
         const k = `${e.r.toFixed(2)}/${e.dtype}`;
         const cur = ex.get(k) ?? { r: e.r, n: 0, dtype: e.dtype };
@@ -97,7 +97,7 @@ function run(id: string, seconds = 8): Row {
       if (!t) {
         t = { id: p.id, pts: [], speed: 0, kind: p.kind, er: p.explodeRadius, dtype: p.dtype };
         tracks.set(p.id, t);
-        row.spawnOffset.push(Math.hypot(p.x - w.player.x, p.y - w.player.y));
+        row.spawnOffset.push(Math.hypot(p.x - w.sides[0].player.x, p.y - w.sides[0].player.y));
       }
       t.pts.push([p.x, p.y]);
       t.speed = Math.max(t.speed, Math.hypot(p.vx, p.vy));

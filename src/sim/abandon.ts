@@ -54,7 +54,7 @@ export function tickAbandon(w: World, dt: number): void {
       w.events.push({ t: 'abandonStarted' });
       return;
     }
-    if (w.opts.abandonPolicy?.(w)) requestAbandon(w);
+    if (w.sides.some((s) => w.opts.abandonPolicy?.(w, s))) requestAbandon(w);
     return;
   }
   // An open exit means the map is as good as cleared: stop leaving.
@@ -74,5 +74,5 @@ export function tickAbandon(w: World, dt: number): void {
 /** An automatic player that leaves when its life is low: the bot's abandon policy. */
 export const woundedAbandonPolicy =
   (below = 0.3): AbandonPolicy =>
-  (w) =>
-    w.player.life < below * lifeCap(w, w.player);
+  (_w, s) =>
+    s.player.life < below * lifeCap(s.player);

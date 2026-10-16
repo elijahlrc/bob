@@ -62,7 +62,7 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
         const w = controller.world;
         if (!w) break;
         const b = w.actors.find((a) => a.rarity === 'boss' && a.alive);
-        if (b && Math.hypot(b.x - w.player.x, b.y - w.player.y) < 7) break;
+        if (b && Math.hypot(b.x - w.sides[0].player.x, b.y - w.sides[0].player.y) < 7) break;
         if (n % 40 === 0) await sleep(0);
       }
       controller.setSpeed(1);
@@ -83,7 +83,7 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
       const w = controller.world;
       if (!w) return 0;
       w.sides[0].opts.godMode = true;
-      w.player.stunT = 1e9;
+      w.sides[0].player.stunT = 1e9;
       for (const a of w.actors) if (!a.isPlayer) a.alive = false;
       const cols = opts.cols ?? 4;
       ids.forEach((id, i) => {
@@ -91,8 +91,8 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
         const ang = (i / ids.length) * Math.PI * 2;
         const ring = (opts.ring ?? 2.5) + (i % cols) * 0.5;
         const spot = w.grid.collide(
-          w.player.x + Math.cos(ang) * ring,
-          w.player.y + Math.sin(ang) * ring,
+          w.sides[0].player.x + Math.cos(ang) * ring,
+          w.sides[0].player.y + Math.sin(ang) * ring,
           0.5,
         );
         const x = spot.x;
@@ -170,7 +170,7 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
       if (!w) return -1;
       w.sides[0].opts.godMode = !opts.mortal;
       for (const a of w.actors) if (!a.isPlayer) a.alive = false;
-      const p = w.player;
+      const p = w.sides[0].player;
       const ang = Math.atan2(w.plan.lab.exit.y - p.y, w.plan.lab.exit.x - p.x);
       const spot = w.grid.collide(
         p.x + Math.cos(ang) * (opts.dist ?? 6),

@@ -172,7 +172,7 @@ export class BossFx {
     }
     if (st.gait === 'canter') {
       g.lineStyle(1, DTYPE[3], 0.18 + 0.06 * Math.sin(time * 6));
-      this.ring(g, w.player.x, w.player.y, CANTER_RADIUS);
+      this.ring(g, w.sides[0].player.x, w.sides[0].player.y, CANTER_RADIUS);
     }
   }
 
@@ -428,7 +428,7 @@ export class BossFx {
 
   /** Every ailment on the character, as a row of icons over its head (docs/BOSSES.md 11.2), whatever gave it. */
   private drawAilments(g: Gfx, w: World): void {
-    const p = w.player;
+    const p = w.sides[0].player;
     if (!p.alive) return;
     const a = p.ail;
     const on: [number, number][] = [];
@@ -558,7 +558,7 @@ export class BossFx {
       this.say(a.x, a.y, 'Blocked', 0xffffff);
       this.host.em.dust.explode(10, p.x, p.y);
     } else if (k === 'sentence') {
-      this.say(w.player.x, w.player.y, 'Sentenced', EXPOSED, true);
+      this.say(w.sides[0].player.x, w.sides[0].player.y, 'Sentenced', EXPOSED, true);
     } else if (k === 'witnesses') {
       const st = bossState(a);
       for (const x of st?.witnesses ?? []) if (x.alive) this.pulse(x.x, x.y, CHAIN, 1.2);
@@ -570,13 +570,24 @@ export class BossFx {
     } else if (k === 'shift') this.say(a.x, a.y, 'Shifting', 0xffffff);
     else if (k.startsWith('stolen.')) {
       const what = k.slice(7);
-      this.beam(w.player, a, PALE);
-      this.say(w.player.x, w.player.y, `It takes ${THEFT_TEXT[what] ?? what}`, PALE, true);
+      this.beam(w.sides[0].player, a, PALE);
+      this.say(
+        w.sides[0].player.x,
+        w.sides[0].player.y,
+        `It takes ${THEFT_TEXT[what] ?? what}`,
+        PALE,
+        true,
+      );
       this.host.shake(4);
     } else if (k.startsWith('returned.')) {
       const what = k.slice(9);
-      this.beam(a, w.player, GOLD);
-      this.say(w.player.x, w.player.y, `${THEFT_TEXT[what] ?? what} returned`, GOLD);
+      this.beam(a, w.sides[0].player, GOLD);
+      this.say(
+        w.sides[0].player.x,
+        w.sides[0].player.y,
+        `${THEFT_TEXT[what] ?? what} returned`,
+        GOLD,
+      );
       this.pulse(a.x, a.y, EXPOSED, 2);
     } else if (k === 'horn') this.say(a.x, a.y, 'The horn sounds', GOLD);
     else if (k === 'march') {

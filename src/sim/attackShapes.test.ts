@@ -22,7 +22,7 @@ function arena(): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
@@ -37,14 +37,22 @@ const spec = (type: MonsterTypeId): MonsterSpec => ({
 });
 
 function put(w: World, type: MonsterTypeId, dx: number, dy = 0): Actor {
-  const m = spawnMonster(w, spec(type), w.player.x + dx, w.player.y + dy, 0, 0, type);
+  const m = spawnMonster(
+    w,
+    spec(type),
+    w.sides[0].player.x + dx,
+    w.sides[0].player.y + dy,
+    0,
+    0,
+    type,
+  );
   m.state = 'chase';
   return m;
 }
 
 /** Start the monster's own attack at the character and step until its warning is up. */
 function windUp(w: World, m: Actor, ticks = 12): void {
-  startAction(w, m, 'monster', m.mon!.profile(0), w.player);
+  startAction(w, m, 'monster', m.mon!.profile(0), w.sides[0].player);
   for (let i = 0; i < ticks; i++) stepWorld(w);
 }
 
@@ -57,7 +65,9 @@ describe('attack shapes (docs/ROSTER.md section 5)', () => {
     expect(t.kind).toBe('arc');
     if (t.kind !== 'arc') return;
     // The character is in the wedge, a point behind the monster is not.
-    expect(inTelegraph(t, w.player.x, w.player.y, w.player.r)).toBe(true);
+    expect(inTelegraph(t, w.sides[0].player.x, w.sides[0].player.y, w.sides[0].player.r)).toBe(
+      true,
+    );
     expect(inTelegraph(t, m.x + 2, m.y, 0.3)).toBe(false);
     // The aim is still following the character 0.3 s in, and fixed by 0.7 s (a lock at 0.3 of a 1.14 s wind-up).
     for (let i = 0; i < 24; i++) stepWorld(w);
@@ -65,19 +75,23 @@ describe('attack shapes (docs/ROSTER.md section 5)', () => {
     expect(locked.kind).toBe('arc');
     if (locked.kind !== 'arc') return;
     // The character is somewhere else now: the wedge does not turn to it.
-    w.player.y -= 3;
+    w.sides[0].player.y -= 3;
     for (let i = 0; i < 6; i++) stepWorld(w);
     const after = telegraphs(w)[0];
     expect(after.kind).toBe('arc');
     if (after.kind === 'arc') expect(after.facing).toBeCloseTo(locked.facing, 5);
-    expect(inTelegraph(after, w.player.x, w.player.y, w.player.r)).toBe(false);
+    expect(inTelegraph(after, w.sides[0].player.x, w.sides[0].player.y, w.sides[0].player.r)).toBe(
+      false,
+    );
   });
 
   it('the warning is a hazard to the character: hazardAt sees a wedge, a ring and a lane', () => {
     const w = arena();
     const brute = put(w, 'brute', 1.8);
     windUp(w, brute, 20);
-    expect(hazardAt(w, w.player.x, w.player.y, w.player.r)).not.toBeNull();
+    expect(
+      hazardAt(w, w.sides[0].player.x, w.sides[0].player.y, w.sides[0].player.r),
+    ).not.toBeNull();
     expect(hazardAt(w, brute.x + 3, brute.y)).toBeNull();
     brute.alive = false;
     w.actors = w.actors.filter((a) => a.alive || a.isPlayer);
@@ -93,8 +107,10 @@ describe('attack shapes (docs/ROSTER.md section 5)', () => {
     const lane = telegraphs(w).find((t) => t.kind === 'lane');
     expect(lane).toBeDefined();
     if (lane?.kind !== 'lane') return;
-    expect(inTelegraph(lane, w.player.x, w.player.y, w.player.r)).toBe(true);
-    expect(inTelegraph(lane, w.player.x, w.player.y + 4, 0.3)).toBe(false);
+    expect(inTelegraph(lane, w.sides[0].player.x, w.sides[0].player.y, w.sides[0].player.r)).toBe(
+      true,
+    );
+    expect(inTelegraph(lane, w.sides[0].player.x, w.sides[0].player.y + 4, 0.3)).toBe(false);
   });
 
   it('a lob opens a zone where it lands, and the character can see it', () => {
@@ -121,9 +137,9 @@ describe('attack shapes (docs/ROSTER.md section 5)', () => {
   it('a melee type stays a melee type whatever its shape: a Sentinel walks up, it does not hold off', () => {
     const w = arena();
     const m = put(w, 'sentinel', 8);
-    const d0 = Math.hypot(m.x - w.player.x, m.y - w.player.y);
+    const d0 = Math.hypot(m.x - w.sides[0].player.x, m.y - w.sides[0].player.y);
     for (let i = 0; i < 120; i++) stepWorld(w);
-    expect(Math.hypot(m.x - w.player.x, m.y - w.player.y)).toBeLessThan(d0 - 2);
+    expect(Math.hypot(m.x - w.sides[0].player.x, m.y - w.sides[0].player.y)).toBeLessThan(d0 - 2);
   });
 });
 
@@ -136,8 +152,8 @@ describe('a carapace (docs/ROSTER.md 6.2)', () => {
     const strong = spawnMonster(
       w,
       { ...spec('warrior'), level: 100, rarity: 'boss' },
-      w.player.x + 16,
-      w.player.y,
+      w.sides[0].player.x + 16,
+      w.sides[0].player.y,
       0,
       0,
       'big',

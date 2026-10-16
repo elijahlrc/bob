@@ -22,7 +22,7 @@ function arena(): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
@@ -37,7 +37,15 @@ const spec = (type: MonsterTypeId, level = 30): MonsterSpec => ({
 });
 
 function put(w: World, type: MonsterTypeId, dx: number, dy = 0): Actor {
-  const m = spawnMonster(w, spec(type), w.player.x + dx, w.player.y + dy, 0, 0, type);
+  const m = spawnMonster(
+    w,
+    spec(type),
+    w.sides[0].player.x + dx,
+    w.sides[0].player.y + dy,
+    0,
+    0,
+    type,
+  );
   m.state = 'chase';
   return m;
 }
@@ -111,7 +119,7 @@ describe('patterns (docs/ENCOUNTERS.md 4)', () => {
     kind: 'slam',
     damage: 1,
     dtype: 0,
-    faction: 1,
+    team: 1,
     ...o,
   });
 
@@ -170,8 +178,8 @@ describe('windows (docs/ENCOUNTERS.md 5)', () => {
 
   it('a Brace turns aside hits from the front, not from behind', () => {
     const { w, m } = braced();
-    const p = w.player;
-    const prof = w.char.profile(w.primary, 0);
+    const p = w.sides[0].player;
+    const prof = w.sides[0].char.profile(w.sides[0].primary, 0);
     const life = m.life;
     for (let i = 0; i < 5; i++) hit(w, p, m, prof, 0, 1);
     expect(m.life).toBe(life);

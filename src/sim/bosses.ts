@@ -98,6 +98,8 @@ import { setTheft, theftBuild, theftOf, type Theft } from './theft';
 import { armourReduction, hitChance } from '../calc/formulas';
 import type { Action, Actor, GroundEffect, World } from './types';
 import { spawnMonster } from './world';
+import { hunted } from './side';
+import type { Side } from './side';
 
 /**
  * The fights of the six bosses (docs/BOSSES.md 4 to 9). A boss carries encounter state (`Actor.enc`), so the encounter hooks
@@ -306,7 +308,7 @@ export function tickBoss(w: World, m: Actor, dt: number): void {
 export function bossAI(w: World, m: Actor, dt: number): boolean {
   const st = states.get(m);
   if (!st) return false;
-  const p = w.player;
+  const p = hunted(w, m);
   switch (st.id) {
     case 'courser':
       courserAI(w, m, st, dt);
@@ -419,31 +421,31 @@ export function bossNoteTaken(m: Actor, dmg: number[]): void {
 }
 
 /** A boss's blow lands on the character (from `onMonsterHitPlayer`): the Rotwife's ailment of the moment. */
-export function bossHitPlayer(w: World, src: Actor): void {
+export function bossHitPlayer(w: World, s: Side, src: Actor): void {
   const st = states.get(src);
   // The Engine's blows knock the character senseless for a moment (once in the boss lock).
-  if (st?.id === 'bulwarkEngine') stunPlayer(w, ENGINE_STUN);
+  if (st?.id === 'bulwarkEngine') stunPlayer(w, s, ENGINE_STUN);
   if (st?.id !== 'rotwife') return;
   const kind = ROT_ROTATION[st.rot % ROT_ROTATION.length];
   st.rot++;
   const hit = monsterHitOf(src);
   switch (kind) {
     case 'bleed':
-      afflictPlayer(w, 'bleed', hit * 0.18, 5, true);
+      afflictPlayer(w, s, 'bleed', hit * 0.18, 5, true);
       break;
     case 'poison':
-      afflictPlayer(w, 'poison', hit * 0.12, 4, true);
+      afflictPlayer(w, s, 'poison', hit * 0.12, 4, true);
       break;
     case 'ignite':
-      afflictPlayer(w, 'ignite', hit * 0.3, 4, true);
+      afflictPlayer(w, s, 'ignite', hit * 0.3, 4, true);
       break;
     case 'freeze':
       // A chill first; the freeze itself is short, and kept from coming back by the lock.
-      afflictPlayer(w, 'chill', 0.3, 3, true);
-      afflictPlayer(w, 'freeze', 0, 0.6, true);
+      afflictPlayer(w, s, 'chill', 0.3, 3, true);
+      afflictPlayer(w, s, 'freeze', 0, 0.6, true);
       break;
     case 'shock':
-      afflictPlayer(w, 'shock', 0.25, 4, true);
+      afflictPlayer(w, s, 'shock', 0.25, 4, true);
       break;
   }
   w.events.push({
@@ -466,7 +468,7 @@ export function bossDeath(w: World, a: Actor): void {
     if (st.id === 'twins') grieve(w, a);
     if (st.id === 'unmaker' && hasTheft(w)) {
       setTheft(w, {});
-      rebuildForTheft(w, w.player.side!);
+      rebuildForTheft(w, hunted(w, a).side!);
     }
     w.effects = w.effects.filter((e) => e.owner !== a.id || isZoneKind(e));
     return;
@@ -480,7 +482,7 @@ export function bossDeath(w: World, a: Actor): void {
       if (i < 0) continue;
       const kind = os.shards[i].kind;
       os.shards.splice(i, 1);
-      giveBack(w, kind);
+      giveBack(w, hunted(w, a).side!, kind);
       o.stunT = Math.max(o.stunT, STAGGER_SECONDS);
       o.action = null;
       os.exposedT = EXPOSED_SECONDS;
@@ -555,7 +557,7 @@ function toll(w: World, m: Actor, st: BossState): void {
       kind: 'slam',
       damage: dmg,
       dtype: 1,
-      faction: 1,
+      team: 1,
       shape: 'donut',
       delay: i > 0 ? i * TOLL_RING_DELAY : undefined,
       label: 'Toll',
@@ -585,7 +587,7 @@ function ride(w: World, m: Actor, tx: number, ty: number, speed: number, dt: num
 
 /** A minion stands in the Courser's way: a minion build's answer to a gallop. */
 function minionAhead(w: World, m: Actor): boolean {
-  for (const n of w.player.side!.minions)
+  for (const n of hunted(w, m).side!.minions)
     if (n.alive && Math.hypot(n.x - m.x, n.y - m.y) <= n.r + m.r + 0.1) return true;
   return false;
 }
@@ -633,7 +635,7 @@ function showLane(
     kind: 'slam',
     damage,
     dtype: 3,
-    faction: 1,
+    team: 1,
     shape: 'lane',
     label: 'Gallop',
     owner: m.id,
@@ -664,7 +666,7 @@ function burnLane(w: World, m: Actor, st: BossState): void {
 }
 
 function courserAI(w: World, m: Actor, st: BossState, dt: number): void {
-  const p = w.player;
+  const p = hunted(w, m);
   if (!p.alive) return;
   const rate = clockRate(m, COURSER_CHILL) * speedMult(m);
   const blow = monsterHitOf(m);
@@ -794,7 +796,7 @@ export function sentenceDamage(m: Actor, st: BossState): number {
 }
 
 function tickCourt(w: World, m: Actor, st: BossState, dt: number): void {
-  const p = w.player;
+  const p = hunted(w, m);
   // The Witnesses keep a hex on the character, one after another; each Witness past the first makes it stronger.
   const alive = livingWitnesses(st);
   st.hexT -= dt;
@@ -805,7 +807,12 @@ function tickCourt(w: World, m: Actor, st: BossState, dt: number): void {
       if (!st.witnesses[i]?.alive) continue;
       const id = HEX_IDS[i % HEX_IDS.length];
       if (!p.hexes.some((h) => h.id === id && h.t > 1))
-        monsterHexesPlayer(w, id, monsterHexEffect(w, id) * (1 + WITNESS_HEX_STEP * (alive - 1)));
+        monsterHexesPlayer(
+          w,
+          hunted(w, m).side!,
+          id,
+          monsterHexEffect(w, id) * (1 + WITNESS_HEX_STEP * (alive - 1)),
+        );
       st.hexNext = i + 1;
       break;
     }
@@ -828,7 +835,7 @@ function tickCourt(w: World, m: Actor, st: BossState, dt: number): void {
 
 /** The Magistrate points the axe: the Sentence follows the character for its countdown, then lands. */
 function pronounce(w: World, m: Actor, st: BossState): void {
-  const p = w.player;
+  const p = hunted(w, m);
   st.countT = SENTENCE_TELL;
   w.events.push({ t: 'window', id: m.id, kind: 'sentence' });
   w.effects.push({
@@ -841,7 +848,7 @@ function pronounce(w: World, m: Actor, st: BossState): void {
     kind: 'slam',
     damage: sentenceDamage(m, st),
     dtype: 0,
-    faction: 1,
+    team: 1,
     shape: 'circle',
     label: 'Sentence',
     owner: m.id,
@@ -1038,7 +1045,7 @@ function tickDuel(w: World, m: Actor, st: BossState, dt: number): void {
 
 /** The lunge: lanes of steel fan out toward the character, shown first, each a critical blow. */
 function flurry(w: World, m: Actor, st: BossState): void {
-  const p = w.player;
+  const p = hunted(w, m);
   st.flurryT = FLURRY_TELL;
   const base = Math.atan2(p.y - m.y, p.x - m.x);
   const dmg = monsterHitOf(m) * FLURRY_MULT;
@@ -1058,7 +1065,7 @@ function flurry(w: World, m: Actor, st: BossState): void {
       kind: 'slam',
       damage: dmg,
       dtype: 0,
-      faction: 1,
+      team: 1,
       shape: 'lane',
       label: 'Flurry',
       owner: m.id,
@@ -1124,7 +1131,7 @@ function grieve(w: World, dead: Actor): void {
 
 /** The survivor casts the other's kind of blow: Ash sends Cinder's fire, Cinder sends Ash's steel. */
 function echo(w: World, m: Actor, st: BossState): void {
-  const p = w.player;
+  const p = hunted(w, m);
   const act = { profile: m.mon!.profile(0), aimX: p.x, aimY: p.y } as Action;
   const from = w.effects.length;
   castPattern(w, m, act, st.twin === 'ash' ? 'closingRing' : 'cross');
@@ -1143,7 +1150,7 @@ function hasTheft(w: World): boolean {
 
 /** The character's best defence, by what it does against this boss: armour, evasion, energy shield or block. */
 function bestDefence(w: World, m: Actor): NonNullable<Theft['defence']> {
-  const d = w.player.def;
+  const d = hunted(w, m).def;
   const hit = Math.max(1, monsterHitOf(m));
   const accuracy = m.mon!.profile(0).hands[0]?.accuracy ?? 0;
   // Each as the share of a blow it takes away: armour against its hit, evasion against its accuracy, the shield's share of
@@ -1159,8 +1166,8 @@ function bestDefence(w: World, m: Actor): NonNullable<Theft['defence']> {
 }
 
 /** The two supports of the main skill whose loss costs the most damage. */
-function strongestSupports(w: World): number[] {
-  const ch = w.char;
+function strongestSupports(w: World, side: Side): number[] {
+  const ch = side.char;
   const sups = ch.primary?.supports ?? [];
   if (sups.length === 0) return [];
   const opts = {
@@ -1173,7 +1180,7 @@ function strongestSupports(w: World): number[] {
   const loss = sups.map((s) => {
     const prior = theftOf(w);
     setTheft(w, { supports: [s.gem.uid] });
-    const without = new Character(theftBuild(w, w.build), opts);
+    const without = new Character(theftBuild(w, side.build), opts);
     setTheft(w, prior);
     return { uid: s.gem.uid, loss: base - scenarioDps(without.sheet(undefined, 'boss')) };
   });
@@ -1184,7 +1191,7 @@ function strongestSupports(w: World): number[] {
 /** Take the next piece: it leaves the character and orbits the Unmaker as a shard. */
 function steal(w: World, m: Actor, st: BossState, kind: TheftKind): void {
   const t: Theft = { ...theftOf(w) };
-  const p = w.player;
+  const p = hunted(w, m);
   if (kind === 'resistance') {
     const res = p.def.res;
     const el = ([1, 2, 3] as const).reduce((a, b) => (res[b] > res[a] ? b : a));
@@ -1195,11 +1202,11 @@ function steal(w: World, m: Actor, st: BossState, kind: TheftKind): void {
     m.def = m.mon.defence;
     m.life = share * m.def.maxLife;
   } else if (kind === 'defence') t.defence = bestDefence(w, m);
-  else if (kind === 'supports') t.supports = strongestSupports(w);
+  else if (kind === 'supports') t.supports = strongestSupports(w, hunted(w, m).side!);
   else t.flasks = true;
   setTheft(w, t);
-  rebuildForTheft(w, w.player.side!);
-  refreshPlayerDefence(w, w.player.side!);
+  rebuildForTheft(w, hunted(w, m).side!);
+  refreshPlayerDefence(w, hunted(w, m).side!);
   const angle = (st.shards.length / 4) * Math.PI * 2;
   const shard = bring(w, m, 'shard', m.x, m.y);
   const life = m.def.maxLife * SHARD_LIFE;
@@ -1218,15 +1225,15 @@ const SHARD_NAMES: Record<TheftKind, string> = {
 };
 
 /** A piece comes back to the character. */
-function giveBack(w: World, kind: TheftKind): void {
+function giveBack(w: World, s: Side, kind: TheftKind): void {
   const t: Theft = { ...theftOf(w) };
   if (kind === 'resistance') delete t.res;
   else if (kind === 'defence') delete t.defence;
   else if (kind === 'supports') delete t.supports;
   else delete t.flasks;
   setTheft(w, t);
-  rebuildForTheft(w, w.player.side!);
-  refreshPlayerDefence(w, w.player.side!);
+  rebuildForTheft(w, s.player.side!);
+  refreshPlayerDefence(w, s.player.side!);
 }
 
 function tickUnmaker(w: World, m: Actor, st: BossState, dt: number): void {

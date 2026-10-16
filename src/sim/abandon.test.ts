@@ -62,7 +62,7 @@ describe('abandon (docs/MAPS.md section 7)', () => {
     const w = worldAt(7);
     requestAbandon(w);
     steps(w, 2);
-    killActor(w, w.player);
+    killActor(w, w.sides[0].player);
     expect(w.status).toBe('dead');
     steps(w, 6);
     expect(w.status).toBe('dead');
@@ -97,9 +97,9 @@ describe('abandon (docs/MAPS.md section 7)', () => {
   it('the wounded policy fires only below its life threshold', () => {
     const w = worldAt(7);
     const policy = woundedAbandonPolicy(0.3);
-    expect(policy(w)).toBe(false);
-    w.player.life = w.player.def.maxLife * 0.2;
-    expect(policy(w)).toBe(true);
+    expect(policy(w, w.sides[0])).toBe(false);
+    w.sides[0].player.life = w.sides[0].player.def.maxLife * 0.2;
+    expect(policy(w, w.sides[0])).toBe(true);
   });
 });
 

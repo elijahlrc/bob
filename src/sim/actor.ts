@@ -16,7 +16,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
   const a: Omit<Minion, 'side'> = {
     id,
     isPlayer,
-    faction: isPlayer ? 0 : 1,
+    team: isPlayer ? 0 : 1,
     x,
     y,
     r,

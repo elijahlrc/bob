@@ -19,8 +19,8 @@ for (const mapNo of maps) {
       while (w.status === 'running' && w.t < 200) {
         stepWorld(w);
         for (const e of w.events) {
-          if (e.t === 'hit' && e.src === w.player.id) hits[elusive.has(e.dst) ? 1 : 0]++;
-          if (e.t === 'miss' && e.src === w.player.id) miss[elusive.has(e.dst) ? 1 : 0]++;
+          if (e.t === 'hit' && e.src === w.sides[0].player.id) hits[elusive.has(e.dst) ? 1 : 0]++;
+          if (e.t === 'miss' && e.src === w.sides[0].player.id) miss[elusive.has(e.dst) ? 1 : 0]++;
         }
       }
       chance.push(0);

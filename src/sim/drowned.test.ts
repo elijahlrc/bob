@@ -22,7 +22,7 @@ function arena(): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
@@ -43,7 +43,7 @@ function put(
     mods: [],
     ...over,
   };
-  const m = spawnMonster(w, spec, w.player.x + dx, w.player.y + dy, 0, 0, type);
+  const m = spawnMonster(w, spec, w.sides[0].player.x + dx, w.sides[0].player.y + dy, 0, 0, type);
   m.state = 'chase';
   return m;
 }
@@ -57,33 +57,37 @@ describe('the Drowned in play', () => {
     const w = arena();
     const tc = put(w, 'tidecaller', 8);
     let lane = false;
-    const d0 = Math.hypot(tc.x - w.player.x, tc.y - w.player.y);
+    const d0 = Math.hypot(tc.x - w.sides[0].player.x, tc.y - w.sides[0].player.y);
     for (let i = 0; i < 6 * 60; i++) {
       stepWorld(w);
       if (telegraphs(w).some((t) => t.kind === 'lane')) lane = true;
     }
     expect(lane).toBe(true);
     // The hook landed: the character is nearer, and was staggered.
-    expect(Math.hypot(tc.x - w.player.x, tc.y - w.player.y)).toBeLessThan(d0 - 1.5);
+    expect(Math.hypot(tc.x - w.sides[0].player.x, tc.y - w.sides[0].player.y)).toBeLessThan(
+      d0 - 1.5,
+    );
   });
 
   it('a pull never takes the character into the thing that pulls', () => {
     const w = arena();
     const tc = put(w, 'tidecaller', 2);
-    pullPlayer(w, tc, 10);
-    expect(Math.hypot(tc.x - w.player.x, tc.y - w.player.y)).toBeGreaterThan(tc.r + w.player.r);
-    expect(w.player.stunT).toBeGreaterThan(0);
+    pullPlayer(w, w.sides[0], tc, 10);
+    expect(Math.hypot(tc.x - w.sides[0].player.x, tc.y - w.sides[0].player.y)).toBeGreaterThan(
+      tc.r + w.sides[0].player.r,
+    );
+    expect(w.sides[0].player.stunT).toBeGreaterThan(0);
   });
 
   it("a Wrack's blows slow, and a Brine Leech drains what it bites", () => {
     const w = arena();
     const wrack = put(w, 'wrack', 1.2);
-    hit(w, wrack, w.player, wrack.mon!.profile(0), 0, 1);
-    expect(w.player.ail.chill).toBeGreaterThan(0);
+    hit(w, wrack, w.sides[0].player, wrack.mon!.profile(0), 0, 1);
+    expect(w.sides[0].player.ail.chill).toBeGreaterThan(0);
     const leech = put(w, 'leech', 1.2);
     leech.life = leech.def.maxLife * 0.5;
     const before = leech.life;
-    hit(w, leech, w.player, leech.mon!.profile(0), 0, 1);
+    hit(w, leech, w.sides[0].player, leech.mon!.profile(0), 0, 1);
     run(w, 0.5);
     expect(leech.life).toBeGreaterThan(before);
   });
@@ -102,7 +106,7 @@ describe('the Drowned in play', () => {
     run(w, 3);
     expect(d.burrowT).toBe(0);
     expect(d.phases).toBe(false);
-    expect(Math.hypot(d.x - w.player.x, d.y - w.player.y)).toBeLessThan(3);
+    expect(Math.hypot(d.x - w.sides[0].player.x, d.y - w.sides[0].player.y)).toBeLessThan(3);
     // Up again, it can be hurt.
     applyDamage(w, d, [50, 0, 0, 0, 0]);
     expect(d.life).toBeLessThan(life);
@@ -111,10 +115,12 @@ describe('the Drowned in play', () => {
   it('the Tidewarden hooks the character in every ten seconds, and calls Brine Leeches at half life', () => {
     const w = arena();
     const chief = put(w, 'wrack', 9, 0, { rarity: 'miniboss', mods: ['tidewarden'] });
-    const d0 = Math.hypot(chief.x - w.player.x, chief.y - w.player.y);
+    const d0 = Math.hypot(chief.x - w.sides[0].player.x, chief.y - w.sides[0].player.y);
     chief.raiserT = 0.05;
     run(w, 1);
-    expect(Math.hypot(chief.x - w.player.x, chief.y - w.player.y)).toBeLessThan(d0 - 2);
+    expect(Math.hypot(chief.x - w.sides[0].player.x, chief.y - w.sides[0].player.y)).toBeLessThan(
+      d0 - 2,
+    );
     const leeches = () => w.actors.filter((a) => a.alive && a.mon?.spec.type === 'leech').length;
     expect(leeches()).toBe(0);
     chief.life = chief.def.maxLife * 0.4;

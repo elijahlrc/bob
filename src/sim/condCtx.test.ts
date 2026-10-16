@@ -70,11 +70,11 @@ describe('conditional mods are seen by the sim', () => {
     f.spec = { ...f.spec, maxCharges: 100 };
     f.charges = 0;
     f.activeT = 0;
-    kill(w, w.player.x + 3, w.player.y);
+    kill(w, w.sides[0].player.x + 3, w.sides[0].player.y);
     const plain = f.charges;
     f.charges = 0;
     f.activeT = 10;
-    kill(w, w.player.x + 3, w.player.y);
+    kill(w, w.sides[0].player.x + 3, w.sides[0].player.y);
     expect(f.charges).toBeCloseTo(plain * 2, 5);
   });
 
@@ -84,11 +84,11 @@ describe('conditional mods are seen by the sim', () => {
       { stat: 'lifeOnKill', kind: 'base', value: 20, per: { stat: 'charges.fervour', div: 1 } },
     ];
     const { world: w } = worldWith(['crushingBlow'], 9, 'sword_3', STR, mods);
-    kill(w, w.player.x + 3, w.player.y);
-    expect(w.char.charges.fervour).toBeGreaterThan(0);
-    w.player.life = 100;
-    kill(w, w.player.x + 3, w.player.y);
-    expect(w.player.life).toBeGreaterThanOrEqual(100 + 20);
+    kill(w, w.sides[0].player.x + 3, w.sides[0].player.y);
+    expect(w.sides[0].char.charges.fervour).toBeGreaterThan(0);
+    w.sides[0].player.life = 100;
+    kill(w, w.sides[0].player.x + 3, w.sides[0].player.y);
+    expect(w.sides[0].player.life).toBeGreaterThanOrEqual(100 + 20);
   });
 
   it('item quantity and rarity count a mod that holds on low life', () => {
@@ -98,7 +98,7 @@ describe('conditional mods are seen by the sim', () => {
     ];
     const { world: w } = worldWith(['crushingBlow'], 9, 'sword_3', STR, mods);
     expect(lootMults(w).rarity).toBeCloseTo(1, 5);
-    w.player.life = 1;
+    w.sides[0].player.life = 1;
     expect(lootMults(w).rarity).toBeCloseTo(2, 5);
     expect(lootMults(w).quantity).toBeCloseTo(1.5, 5);
   });
@@ -114,11 +114,11 @@ describe('conditional mods are seen by the sim', () => {
         mods,
       );
       const near = neighbour(w, dummy.x + 1.5, dummy.y);
-      w.player.stunT = 1e9;
-      w.player.tHit = hit ? 0 : 99;
+      w.sides[0].player.stunT = 1e9;
+      w.sides[0].player.tHit = hit ? 0 : 99;
       dummy.def = dummyDefence({ maxLife: 100 });
       dummy.life = 100;
-      w.player.tHit = hit ? 0 : 99;
+      w.sides[0].player.tHit = hit ? 0 : 99;
       rawHit(w, dummy, 1100, 0);
       return near.sdots.find((d) => d.src === '@herald')!.raw;
     };
@@ -129,10 +129,10 @@ describe('conditional mods are seen by the sim', () => {
     const hurt = (hit: boolean): number => {
       const mods: Mod[] = [{ stat: 'damage', kind: 'more', value: 100, ...when('hitRecently') }];
       const { world: w } = worldWith(['arcChain', 'searingMantle'], 9, 'wand_3', INT, mods);
-      w.player.stunT = 1e9;
-      const near = neighbour(w, w.player.x + 1, w.player.y);
+      w.sides[0].player.stunT = 1e9;
+      const near = neighbour(w, w.sides[0].player.x + 1, w.sides[0].player.y);
       for (let i = 0; i < 90; i++) {
-        w.player.tHit = hit ? 0 : 99;
+        w.sides[0].player.tHit = hit ? 0 : 99;
         stepWorld(w);
       }
       return 1e9 - near.life;
@@ -146,12 +146,12 @@ describe('conditional mods are seen by the sim', () => {
     const burst = (hit: boolean): number => {
       const mods: Mod[] = [{ stat: 'damage', kind: 'more', value: 100, ...when('hitRecently') }];
       const { world: w, dummy } = worldWith(['cinderBlow'], 1.4, 'sword_3', STR, mods);
-      w.player.stunT = 1e9;
+      w.sides[0].player.stunT = 1e9;
       const near = neighbour(w, dummy.x + 1.0, dummy.y);
       dummy.def = dummyDefence({ maxLife: 1e9 });
-      const prof = w.char.profile(w.primary, 0);
+      const prof = w.sides[0].char.profile(w.sides[0].primary, 0);
       w.sides[0].charged[dummy.id] = { n: prof.skill.charge!.max - 1, t: 5, key: 'cinderBlow' };
-      w.player.tHit = hit ? 0 : 99;
+      w.sides[0].player.tHit = hit ? 0 : 99;
       chargeEnemy(w, w.sides[0], dummy, prof);
       return 1e9 - near.life;
     };
@@ -164,20 +164,20 @@ describe('conditional mods are seen by the sim', () => {
     const beam = (hit: boolean): number => {
       const mods: Mod[] = [{ stat: 'damage', kind: 'more', value: 100, ...when('hitRecently') }];
       const { world: w } = worldWith(['cinderBond'], 5, 'wand_3', INT, mods);
-      const c = w.char.actives.find((x) => x.skill.id === 'cinderBond')!;
+      const c = w.sides[0].char.actives.find((x) => x.skill.id === 'cinderBond')!;
       for (const s of [4, -4])
         w.sides[0].deployables.push({
           id: ++w.sides[0].deploySeq,
           kind: 'totem',
           key: c.key,
-          x: w.player.x + s,
-          y: w.player.y,
+          x: w.sides[0].player.x + s,
+          y: w.sides[0].player.y,
           t: 8,
           fireT: 0,
         });
-      const onBeam = neighbour(w, w.player.x + 2, w.player.y);
+      const onBeam = neighbour(w, w.sides[0].player.x + 2, w.sides[0].player.y);
       for (let i = 0; i < 60; i++) {
-        w.player.tHit = hit ? 0 : 99;
+        w.sides[0].player.tHit = hit ? 0 : 99;
         stepWorld(w);
       }
       return onBeam.sdots.find((d) => d.src === 'cinderBond')!.raw;
@@ -191,7 +191,7 @@ describe('conditional mods are seen by the sim', () => {
         { stat: 'minionDamage', kind: 'more', value: 100, ...when('hitRecently') },
       ];
       const { world: w } = worldWith(['venomStrike', 'sourHerald'], 9, 'dagger_3', DEX, mods);
-      w.player.tHit = hit ? 0 : 99;
+      w.sides[0].player.tHit = hit ? 0 : 99;
       gainVirulence(w, w.sides[0]);
       return w.sides[0].minions.find((m) => m.kind === 'crawler')!.dmg;
     };

@@ -29,6 +29,7 @@ import {
   tickBoss,
 } from './bosses';
 import type { Action, Actor, EncState, World } from './types';
+import { hunted } from './side';
 
 /**
  * Sidearms, windows and modes (docs/ENCOUNTERS.md 3, 5 and 6): the second attack a monster uses on its way in, the spells in
@@ -95,7 +96,7 @@ export function trySidearm(w: World, m: Actor, dt: number, d: number, los: boole
   if (e.sideT > 0 || m.action || !los) return false;
   const s = side.spec;
   if (d < s.from || d > s.to) return false;
-  const p = w.player;
+  const p = hunted(w, m);
   // A pack does not carpet the floor: no lob where a pool of the same kind lies already.
   const zone = s.shape?.id === 'lob' ? (s.shape.zone ?? 'caustic') : null;
   if (zone && w.effects.some((z) => z.kind === zone && Math.hypot(z.x - p.x, z.y - p.y) < 3)) {
@@ -128,7 +129,7 @@ export function tryWindow(w: World, m: Actor): boolean {
   const spec = m.mon && TYPE_WINDOWS[m.mon.spec.type];
   if (!e || !spec || e.winT > 0 || e.vulnT > 0 || m.action || m.stunT > 0 || m.state !== 'chase')
     return false;
-  const p = w.player;
+  const p = hunted(w, m);
   if (Math.hypot(p.x - m.x, p.y - m.y) > spec.near) return false;
   // A Sanctuary is sung for others: with nobody near to shelter, it waits.
   if (spec.id === 'sanctuary' && !w.actors.some((o) => sheltered(m, o))) {
@@ -167,7 +168,7 @@ export function tickEncounter(w: World, m: Actor, dt: number): void {
   const e = m.enc;
   if (!e || !m.mon) return;
   const type = m.mon.spec.type;
-  const p = w.player;
+  const p = hunted(w, m);
   if (m.mon.kind.bossOnly) tickBoss(w, m, dt);
   e.burst *= Math.exp(-dt / BURST_TAU);
   e.hits *= Math.exp(-dt / HITS_TAU);
@@ -246,7 +247,7 @@ export function tickEncounter(w: World, m: Actor, dt: number): void {
       kind: 'slam',
       damage: monsterHitOf(m) * 1.2,
       dtype: 0,
-      faction: 1,
+      team: 1,
       shape: 'circle',
       delay: Math.max(0, secs - 0.8),
       label: 'Shatter',
@@ -292,7 +293,7 @@ export function tickEncounter(w: World, m: Actor, dt: number): void {
         kind: 'slam',
         damage: hit,
         dtype: 4,
-        faction: 1,
+        team: 1,
         shape: 'circle',
         label: 'Last rites',
         owner: m.id,
@@ -318,7 +319,7 @@ function cancelRites(w: World, m: Actor): void {
 
 /** Cast one of the patterns from a monster at the character, outside an action (a Core vent's Cross). */
 function castAt(w: World, m: Actor, id: 'cross'): void {
-  const p = w.player;
+  const p = hunted(w, m);
   const act = { profile: m.mon!.profile(0), aimX: p.x, aimY: p.y } as Action;
   castPattern(w, m, act, id);
 }

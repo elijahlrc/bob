@@ -1,11 +1,12 @@
 import type { World } from './types';
 import { spawnMonster } from './world';
+import type { Side } from './side';
 
 /**
  * Holdout (docs/MAPS.md 9.2): the monsters come in waves. Each wave appears at its time, already chasing; when every
  * monster of a wave is dead it pays out a chest beside the character.
  */
-export function tickHoldout(w: World): void {
+export function tickHoldout(w: World, side: Side): void {
   const waves = w.plan.pop.waves;
   if (w.plan.type !== 'holdout' || !waves) return;
   const h = w.holdout;
@@ -29,7 +30,7 @@ export function tickHoldout(w: World): void {
     h.done[i] = true;
     h.cleared++;
     // The wave is survived: a chest's worth of loot drops by the character.
-    const p = w.player;
+    const p = side.player;
     const chest = { id: -1 - i, x: p.x, y: p.y, room: 0, opened: true };
     for (const item of w.opts.chestLoot?.(w, chest) ?? []) {
       const id = w.nextId++;

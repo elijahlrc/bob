@@ -33,8 +33,8 @@ function tally(w: World, targetId: number, seconds: number, skill: string) {
     stepWorld(w);
     for (const z of w.sides[0].zones) spots = Math.max(spots, z.spots?.length ?? 1);
     for (const e of w.events) {
-      if (e.t === 'use' && e.src === w.player.id && e.skill === skill) uses++;
-      if (e.t === 'hit' && e.src === w.player.id && e.dst === targetId) hits++;
+      if (e.t === 'use' && e.src === w.sides[0].player.id && e.skill === skill) uses++;
+      if (e.t === 'hit' && e.src === w.sides[0].player.id && e.dst === targetId) hits++;
       if (e.t === 'explode') explosions++;
     }
   }
@@ -153,7 +153,8 @@ describe('what the new and changed supports do', () => {
     for (let i = 0; i < seconds * 60; i++) {
       stepWorld(world);
       for (const e of world.events)
-        if (e.t === 'hit' && e.src === world.player.id && e.dst === dummy.id) total += e.amount;
+        if (e.t === 'hit' && e.src === world.sides[0].player.id && e.dst === dummy.id)
+          total += e.amount;
     }
     return total;
   }

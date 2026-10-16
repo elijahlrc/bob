@@ -11,6 +11,7 @@ import { hit, lifeCap, rawHit } from './combat';
 import { creepToward } from './skillFx';
 import { scaleProfile } from './shots';
 import type { Action, Actor, World } from './types';
+import { hunted } from './side';
 import type { Side } from './side';
 
 /**
@@ -209,10 +210,10 @@ export function startStorm(
   const level = Math.max(1, Math.min(20, 1 + Math.floor(w.plan.areaLevel / 5)));
   s.fields.push({
     id: w.nextId++,
-    owner: w.player.id,
+    owner: s.player.id,
     kind: 'storm',
-    x: w.player.x,
-    y: w.player.y,
+    x: s.player.x,
+    y: s.player.y,
     r0: radius,
     grow: 1,
     radius,
@@ -232,7 +233,7 @@ export function orbUse(w: World, a: Actor, act: Action, stage: number): void {
   const p = act.profile;
   const spec = p.skill.orb;
   if (!spec || !a.isPlayer) return;
-  const dur = w.char.db.mult('skillDuration');
+  const dur = a.side!.char.db.mult('skillDuration');
   if (spec.kind === 'frost') {
     const total = spec.seconds * dur * (1 + (spec.secondsPerStage * stage) / 100);
     const have = a.side!.fields.find((f) => f.kind === 'orb' && f.skill === p.skill.id);
@@ -304,7 +305,7 @@ export function orbUse(w: World, a: Actor, act: Action, stage: number): void {
         (g.moved ?? 0) >= spec.distance || Math.hypot((g.tx ?? 0) - g.x, (g.ty ?? 0) - g.y) < 0.3;
       // A wave is one hit of the skill (3.9: only the final wave grows with the stages), more once the illusion has stopped.
       const q = scaleProfile(p, still ? 1 + spec.stillMore / 100 : 1);
-      blast(w, { ...g, profile: q }, g.x, g.y, g.radius);
+      blast(w, a.side!, { ...g, profile: q }, g.x, g.y, g.radius);
     }
     return;
   }
@@ -337,7 +338,7 @@ export function orbUse(w: World, a: Actor, act: Action, stage: number): void {
 
 /** The channel of a storm-orb skill ends: every orb that is left explodes, harder for each jump it still had. */
 export function releaseZaps(w: World, s: Side, skill: string): void {
-  const p = w.player;
+  const p = s.player;
   let j = 0;
   for (const f of s.fields) {
     if (f.kind !== 'zap' || f.skill !== skill || !f.profile) {
@@ -367,14 +368,14 @@ export function releaseGhost(w: World, s: Side, skill: string, interrupted: bool
   s.fields.splice(i, 1);
   const spec = g.profile?.skill.orb;
   if (interrupted || spec?.kind !== 'illusion' || !g.profile) return;
-  const a = w.player;
+  const a = s.player;
   const spot = w.grid.collide(g.x, g.y, a.r);
   w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: false });
   a.x = spot.x;
   a.y = spot.y;
   w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true });
   const f = (spec.finalPerStage * (g.stages ?? 0)) / 100;
-  blast(w, { ...g, profile: scaleProfile(g.profile, f) }, a.x, a.y, g.radius * 1.3);
+  blast(w, s, { ...g, profile: scaleProfile(g.profile, f) }, a.x, a.y, g.radius * 1.3);
 }
 
 /**
@@ -419,8 +420,8 @@ export function placeGeyser(w: World, a: Actor, act: Action): void {
 }
 
 /** Blasts at a spot: the enemies in its radius are hit. */
-function blast(w: World, f: Field, x: number, y: number, r: number, pulse = false): void {
-  const p = w.player;
+function blast(w: World, s: Side, f: Field, x: number, y: number, r: number, pulse = false): void {
+  const p = s.player;
   w.events.push({
     t: 'explode',
     x,
@@ -435,10 +436,10 @@ function blast(w: World, f: Field, x: number, y: number, r: number, pulse = fals
 }
 
 /** One run of a frost orb: a volley of explosions on the ground near the character, where the enemies are. */
-function volley(w: World, f: Field): void {
+function volley(w: World, s: Side, f: Field): void {
   const spec = f.profile!.skill.orb;
   if (spec?.kind !== 'frost') return;
-  const p = w.player;
+  const p = s.player;
   const near = enemiesIn(w, p.x, p.y, spec.range);
   for (let i = 0; i < spec.count; i++) {
     let x: number;
@@ -453,7 +454,7 @@ function volley(w: World, f: Field): void {
       x = p.x + Math.cos(ang) * d;
       y = p.y + Math.sin(ang) * d;
     }
-    blast(w, f, x, y, f.radius, true);
+    blast(w, s, f, x, y, f.radius, true);
   }
 }
 
@@ -472,19 +473,19 @@ export function consecratedAt(s: Side, x: number, y: number): boolean {
 
 /** An enemy dies on chilling ground that gives charges: roll the chance. */
 export function fieldKill(w: World, dead: Actor): void {
-  for (const f of w.player.side!.fields)
+  for (const f of hunted(w, dead).side!.fields)
     if (
       f.killCharge &&
       Math.hypot(dead.x - f.x, dead.y - f.y) <= f.radius + dead.r &&
       w.rngTrig.chance(f.killCharge.chance / 100)
     )
-      gainCharge(w, w.player.side!, f.killCharge.kind);
+      gainCharge(w, hunted(w, dead).side!, f.killCharge.kind);
 }
 
 /** Run the fields: they pulse, they grow, they end. */
 export function tickFields(w: World, s: Side, dt: number): void {
   if (s.fields.length === 0) return;
-  const p = w.player;
+  const p = s.player;
   let j = 0;
   for (const f of s.fields) {
     f.t -= dt;
@@ -515,7 +516,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
         f.pulseT -= dt * rate;
         if (f.pulseT <= 0) {
           f.pulseT += spec.interval;
-          volley(w, f);
+          volley(w, s, f);
         }
       }
       if (f.t > 0) s.fields[j++] = f;
@@ -552,6 +553,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
         const d = f.radius * Math.sqrt(w.rngTrig.float(0, 1));
         blast(
           w,
+          s,
           f,
           f.x + Math.cos(ang) * d,
           f.y + Math.sin(ang) * d,
@@ -595,7 +597,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
           const spot = w.grid.collide(f.tx! + Math.cos(ang) * d, f.ty! + Math.sin(ang) * d, 0.3);
           f.x = spot.x;
           f.y = spot.y;
-          blast(w, f, f.x, f.y, f.radius, true);
+          blast(w, s, f, f.x, f.y, f.radius, true);
         }
       }
       if (f.t > 0) s.fields[j++] = f;
@@ -606,7 +608,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
     if (pulse) f.pulseT += f.interval;
     if (f.kind === 'consecrated') {
       if (p.alive && Math.hypot(p.x - f.x, p.y - f.y) <= f.radius + p.r)
-        p.life = Math.min(lifeCap(w, p), p.life + p.def.maxLife * REGEN_CONSECRATED * dt);
+        p.life = Math.min(lifeCap(p), p.life + p.def.maxLife * REGEN_CONSECRATED * dt);
     } else if (f.kind === 'pod' && f.profile) {
       const spec = f.profile.skill.pods!;
       if (pulse)

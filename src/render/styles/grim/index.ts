@@ -260,7 +260,7 @@ export class GrimStyle extends StyleBase {
         ? new CollapseFx(this.scene, (x, y) => this.project(x, y), world)
         : null;
 
-    const pl0 = this.project(world.player.x, world.player.y);
+    const pl0 = this.project(world.sides[0].player.x, world.sides[0].player.y);
     this.playerLight = this.addLight(pl0.x, pl0.y, 320, 0xffb060, 1.5);
     const ex = this.project(lab.exit.x, lab.exit.y);
     const pa = s.add
@@ -1474,7 +1474,7 @@ export class GrimStyle extends StyleBase {
         break;
       }
       case 'levelUp': {
-        const p = this.project(world.player.x, world.player.y);
+        const p = this.project(world.sides[0].player.x, world.sides[0].player.y);
         em.mote.explode(30, p.x, p.y - 8);
         em.spark.explode(20, p.x, p.y - 8);
         this.flash(p.x, p.y - 10, 0xffe070, 2.2, 0.8);
@@ -1497,7 +1497,7 @@ export class GrimStyle extends StyleBase {
       }
       case 'flaskUsed': {
         const f = world.sides[0].flasks[e.idx];
-        const p = this.project(world.player.x, world.player.y);
+        const p = this.project(world.sides[0].player.x, world.sides[0].player.y);
         const col =
           f?.spec.kind === 'mana' ? 0x4a78ff : f?.spec.kind === 'utility' ? 0xffd070 : 0xd03030;
         this.flash(p.x, p.y - 8, col, 1.4, 0.3);

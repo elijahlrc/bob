@@ -27,22 +27,22 @@ function emptyFlasks(w: World): void {
 describe('a Revive (docs/WAYSIDE.md 7)', () => {
   it("stands the character up at the item's share of life, makes it safe for a while, and is used up", () => {
     const { w } = worldOn(7, ['lastSpark']);
-    const cap = lifeCap(w, w.player);
-    applyDamage(w, w.player, LETHAL());
-    expect(w.player.alive).toBe(true);
+    const cap = lifeCap(w.sides[0].player);
+    applyDamage(w, w.sides[0].player, LETHAL());
+    expect(w.sides[0].player.alive).toBe(true);
     expect(w.status).toBe('running');
-    expect(w.player.life).toBeCloseTo(reprieveDef('lastSpark').life * cap, 3);
+    expect(w.sides[0].player.life).toBeCloseTo(reprieveDef('lastSpark').life * cap, 3);
     expect(w.sides[0].reprieve.fired).toEqual(['lastSpark']);
     expect(w.events.some((e) => e.t === 'reprieve' && e.how === 'revive')).toBe(true);
     // Nothing can hurt it for the seconds that follow ...
-    const life = w.player.life;
-    applyDamage(w, w.player, LETHAL());
-    expect(w.player.life).toBe(life);
-    expect(w.player.alive).toBe(true);
+    const life = w.sides[0].player.life;
+    applyDamage(w, w.sides[0].player, LETHAL());
+    expect(w.sides[0].player.life).toBe(life);
+    expect(w.sides[0].player.alive).toBe(true);
     // ... and when they are over the next blow kills: the item is gone.
     w.sides[0].reprieve.invulnT = 0;
-    applyDamage(w, w.player, LETHAL());
-    expect(w.player.alive).toBe(false);
+    applyDamage(w, w.sides[0].player, LETHAL());
+    expect(w.sides[0].player.alive).toBe(false);
     expect(w.status).toBe('dead');
   });
 
@@ -50,44 +50,47 @@ describe('a Revive (docs/WAYSIDE.md 7)', () => {
     const { w } = worldOn(7, ['lastSpark']);
     expect(w.sides[0].flasks.length).toBeGreaterThan(0);
     emptyFlasks(w);
-    applyDamage(w, w.player, LETHAL());
+    applyDamage(w, w.sides[0].player, LETHAL());
     for (const f of w.sides[0].flasks) expect(f.charges).toBe(f.spec.maxCharges);
   });
 
   it('throws back and stuns the monsters around it', () => {
     const { w } = worldOn(7, ['lastSpark']);
-    const monster = w.actors.find((a) => !a.isPlayer && a.faction === 1 && a.alive)!;
-    monster.x = w.player.x + 2;
-    monster.y = w.player.y;
+    const monster = w.actors.find((a) => !a.isPlayer && a.team === 1 && a.alive)!;
+    monster.x = w.sides[0].player.x + 2;
+    monster.y = w.sides[0].player.y;
     monster.stunT = 0;
-    applyDamage(w, w.player, LETHAL());
+    applyDamage(w, w.sides[0].player, LETHAL());
     expect(monster.stunT).toBeGreaterThan(0);
   });
 
   it('works on a tenth map too', () => {
     const { w } = worldOn(10, ['lastSpark']);
-    applyDamage(w, w.player, LETHAL());
-    expect(w.player.alive).toBe(true);
+    applyDamage(w, w.sides[0].player, LETHAL());
+    expect(w.sides[0].player.alive).toBe(true);
     expect(w.sides[0].reprieve.fired).toEqual(['lastSpark']);
   });
 
   it('with several carried, the next one fires after the first has run out', () => {
     const { w } = worldOn(7, ['lastSpark', 'bargainCoin']);
-    applyDamage(w, w.player, LETHAL());
+    applyDamage(w, w.sides[0].player, LETHAL());
     expect(w.sides[0].reprieve.fired).toEqual(['lastSpark']);
     w.sides[0].reprieve.invulnT = 0;
-    applyDamage(w, w.player, LETHAL());
+    applyDamage(w, w.sides[0].player, LETHAL());
     expect(w.sides[0].reprieve.fired).toEqual(['lastSpark', 'bargainCoin']);
-    expect(w.player.alive).toBe(true);
-    expect(w.player.life).toBeCloseTo(reprieveDef('bargainCoin').life * lifeCap(w, w.player), 3);
+    expect(w.sides[0].player.alive).toBe(true);
+    expect(w.sides[0].player.life).toBeCloseTo(
+      reprieveDef('bargainCoin').life * lifeCap(w.sides[0].player),
+      3,
+    );
     w.sides[0].reprieve.invulnT = 0;
-    applyDamage(w, w.player, LETHAL());
+    applyDamage(w, w.sides[0].player, LETHAL());
     expect(w.status).toBe('dead');
   });
 
   it("is gone from the map's world when none is held, and the character dies as before", () => {
     const { w } = worldOn(7, []);
-    applyDamage(w, w.player, LETHAL());
+    applyDamage(w, w.sides[0].player, LETHAL());
     expect(w.status).toBe('dead');
     expect(w.sides[0].reprieve.fired).toEqual([]);
   });
@@ -96,12 +99,12 @@ describe('a Revive (docs/WAYSIDE.md 7)', () => {
 describe('a Retreat (docs/WAYSIDE.md 7.2 and 7.3)', () => {
   it('ends the map as an abandon with a quarter of the life and the flasks full, and is used up', () => {
     const { w } = worldOn(7, ['ferryToken']);
-    const cap = lifeCap(w, w.player);
+    const cap = lifeCap(w.sides[0].player);
     emptyFlasks(w);
-    applyDamage(w, w.player, LETHAL());
+    applyDamage(w, w.sides[0].player, LETHAL());
     expect(w.status).toBe('abandoned');
-    expect(w.player.alive).toBe(true);
-    expect(w.player.life).toBeCloseTo(reprieveDef('ferryToken').life * cap, 3);
+    expect(w.sides[0].player.alive).toBe(true);
+    expect(w.sides[0].player.life).toBeCloseTo(reprieveDef('ferryToken').life * cap, 3);
     expect(w.sides[0].reprieve.fired).toEqual(['ferryToken']);
     expect(w.events.some((e) => e.t === 'reprieve' && e.how === 'retreat')).toBe(true);
     for (const f of w.sides[0].flasks) expect(f.charges).toBe(f.spec.maxCharges);
@@ -110,7 +113,7 @@ describe('a Retreat (docs/WAYSIDE.md 7.2 and 7.3)', () => {
   it('does nothing on a tenth map: the character dies', () => {
     for (const map of [10, 20, 100]) {
       const { w } = worldOn(map, ['ferryToken']);
-      applyDamage(w, w.player, LETHAL());
+      applyDamage(w, w.sides[0].player, LETHAL());
       expect(w.status, `map ${map}`).toBe('dead');
       expect(w.sides[0].reprieve.fired).toEqual([]);
     }
@@ -118,7 +121,7 @@ describe('a Retreat (docs/WAYSIDE.md 7.2 and 7.3)', () => {
 
   it('is passed over on a tenth map for a revive that is carried with it', () => {
     const { w } = worldOn(10, ['ferryToken', 'lastSpark']);
-    applyDamage(w, w.player, LETHAL());
+    applyDamage(w, w.sides[0].player, LETHAL());
     expect(w.status).toBe('running');
     expect(w.sides[0].reprieve.fired).toEqual(['lastSpark']);
   });

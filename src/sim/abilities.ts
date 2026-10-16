@@ -11,6 +11,7 @@ import {
 import { markPlayer, noteDevoured, quenched } from './encounters';
 import { awaitsEncircle } from './packPlays';
 import type { Actor, World } from './types';
+import { hunted } from './side';
 
 /**
  * The active abilities of the monster types (docs/ENEMIES.md 7.3), run every tick for a chasing monster. A type lists its
@@ -25,7 +26,8 @@ type Ctx = {
   w: World;
   m: Actor;
   dt: number;
-  /** Distance to the player. */
+  /** The character it hunts, and the distance to it. */
+  p: Actor;
   d: number;
   ab: AbilityDef;
   /** The index of the ability in the type's list (its timer in `abT`). */
@@ -45,8 +47,7 @@ const tithers = new WeakSet<Actor>();
 export const tithing = (a: Actor): boolean => tithers.has(a);
 
 /** Run a leap or a charge: cooldown, then a warning on the ground, then the rush itself. */
-function dashing({ w, m, dt, d, ab, i }: Ctx, kind: 'leap' | 'charge'): void {
-  const p = w.player;
+function dashing({ w, m, p, dt, d, ab, i }: Ctx, kind: 'leap' | 'charge'): void {
   if (m.dashT > 0) {
     advanceDash(w, m, dt);
     return;
@@ -68,7 +69,7 @@ function dashing({ w, m, dt, d, ab, i }: Ctx, kind: 'leap' | 'charge'): void {
 
 /** Wind up a leap or a charge at where the character stands now: the place is marked on the ground for the whole warning. */
 function aimDash(w: World, m: Actor, kind: 'leap' | 'charge', telegraph: number): void {
-  const p = w.player;
+  const p = hunted(w, m);
   m.windT = telegraph;
   m.dashX = p.x;
   m.dashY = p.y;
@@ -82,7 +83,7 @@ function aimDash(w: World, m: Actor, kind: 'leap' | 'charge', telegraph: number)
     kind: 'slam',
     damage: 0,
     dtype: 0,
-    faction: 1,
+    team: 1,
   });
   // A charge is not abandoned by a blow it was in the middle of.
   m.action = null;
@@ -121,7 +122,7 @@ function advanceDash(w: World, m: Actor, dt: number): void {
   m.moving = true;
   m.dashT -= dt;
   // It stops at a wall, when it has run its length, or when it has reached the character.
-  const p = w.player;
+  const p = hunted(w, m);
   const reach = (m.mon?.range ?? 1) + p.r + m.r;
   if (moved < move * 0.3 || len - move < 0.05 || Math.hypot(p.x - m.x, p.y - m.y) <= reach)
     m.dashT = 0;
@@ -166,7 +167,7 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
       w.corpses.splice(w.corpses.indexOf(c), 1);
     }
   },
-  blink({ w, m, dt, d, ab }) {
+  blink({ w, m, p, dt, d, ab }) {
     if (m.modIds.includes('unremembered')) return;
     if (m.blinkT > 0) {
       m.blinkT -= dt;
@@ -174,13 +175,7 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
       return;
     }
     m.skillT -= dt;
-    if (
-      m.skillT <= 0 &&
-      d > 3 &&
-      d < 14 &&
-      w.grid.los(m.x, m.y, w.player.x, w.player.y) &&
-      !m.action
-    ) {
+    if (m.skillT <= 0 && d > 3 && d < 14 && w.grid.los(m.x, m.y, p.x, p.y) && !m.action) {
       m.skillT = ab.interval!;
       m.blinkT = ab.telegraph!;
       w.events.push({ t: 'blink', id: m.id, x: m.x, y: m.y, end: false });
@@ -195,22 +190,22 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
     for (let i = 0; i < ab.amount! && alive < ab.max!; i++, alive++)
       spawnBeside(w, m, 'gnawer', 1.2);
   },
-  slam({ w, m, dt, d, ab }) {
+  slam({ w, m, p, dt, d, ab }) {
     m.skillT -= dt;
-    if (m.skillT <= 0 && d <= 3 && !m.action && w.grid.los(m.x, m.y, w.player.x, w.player.y)) {
+    if (m.skillT <= 0 && d <= 3 && !m.action && w.grid.los(m.x, m.y, p.x, p.y)) {
       m.skillT = ab.interval!;
       // A telegraphed slam on the spot where you stand.
       w.effects.push({
         id: w.nextId++,
-        x: w.player.x,
-        y: w.player.y,
+        x: p.x,
+        y: p.y,
         radius: ab.range!,
         t: 1,
         total: 1,
         kind: 'slam',
         damage: ab.amount! * monsterHitOf(m),
         dtype: 0,
-        faction: 1,
+        team: 1,
         owner: m.id,
       });
     }
@@ -219,11 +214,11 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
     for (const o of w.actors)
       if (!o.isPlayer && o.alive && Math.hypot(o.x - m.x, o.y - m.y) <= ab.range!) o.buffT = 0.3;
   },
-  hex({ w, m, dt, d, ab }) {
+  hex({ w, m, p, dt, d, ab }) {
     m.skillT -= dt;
-    if (m.skillT <= 0 && d < 12 && w.grid.los(m.x, m.y, w.player.x, w.player.y)) {
+    if (m.skillT <= 0 && d < 12 && w.grid.los(m.x, m.y, p.x, p.y)) {
       m.skillT = ab.interval!;
-      hexPlayerAtRandom(w);
+      hexPlayerAtRandom(w, p.side!);
     }
   },
   healChannel({ w, m, dt, ab }) {
@@ -265,12 +260,11 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
     // And marks the quarry: the pack hits the character harder for a while (docs/ENCOUNTERS.md 7).
     if (d <= 10) markPlayer(w, m);
   },
-  suppress({ w, d, ab }) {
-    if (d <= ab.range!) w.player.suppressT = 0.25;
+  suppress({ p, d, ab }) {
+    if (d <= ab.range!) p.suppressT = 0.25;
   },
-  tithe({ w, m, dt, d, ab, i }) {
+  tithe({ w, m, p, dt, d, ab, i }) {
     // A beam that drains the character's life into the Bursar while it can see the character (docs/ENCOUNTERS.md 7).
-    const p = w.player;
     const on = d <= ab.range! && w.grid.los(m.x, m.y, p.x, p.y);
     if (!on) {
       tithers.delete(m);
@@ -284,10 +278,9 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
     rawHit(w, p, amount, 4, 'Tithe');
     m.life = Math.min(m.def.maxLife, m.life + amount);
   },
-  sigil({ w, m, dt, d, ab }) {
+  sigil({ w, m, p, dt, d, ab }) {
     // The Hexer draws its hex on the ground under the character: standing in it hexes (docs/ENCOUNTERS.md 7).
     m.skillT -= dt;
-    const p = w.player;
     if (m.skillT > 0 || d > 9 || !w.grid.los(m.x, m.y, p.x, p.y)) return;
     m.skillT = ab.interval!;
     openZone(w, p.x, p.y, ab.range!, ab.amount!, 'sigil', 0);
@@ -311,10 +304,11 @@ export const IMPLEMENTED_ABILITIES = Object.keys(ACTIVE);
 /** The Charging mod (docs/ENEMIES.md 7.2): any monster that has it rushes like a boar. */
 export const CHARGING_MOD: AbilityDef = { id: 'charge', interval: 8, range: 9, telegraph: 0.6 };
 export function tickChargingMod(w: World, m: Actor, dt: number): void {
-  const p = w.player;
+  const p = hunted(w, m);
   ACTIVE.charge?.({
     w,
     m,
+    p,
     dt,
     d: Math.hypot(p.x - m.x, p.y - m.y),
     ab: CHARGING_MOD,
@@ -328,7 +322,7 @@ export function tickAbilities(w: World, m: Actor, dt: number): void {
   if (!m.mon) return;
   const abilities = abilitiesOf(m.mon.spec.type);
   if (abilities.length === 0) return;
-  const p = w.player;
+  const p = hunted(w, m);
   const d = Math.hypot(p.x - m.x, p.y - m.y);
-  for (const [i, ab] of abilities.entries()) ACTIVE[ab.id]?.({ w, m, dt, d, ab, i });
+  for (const [i, ab] of abilities.entries()) ACTIVE[ab.id]?.({ w, m, p, dt, d, ab, i });
 }

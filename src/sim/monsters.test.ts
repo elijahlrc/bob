@@ -184,8 +184,8 @@ describe('monster behaviours in the sim (§12.5, §12.7)', () => {
     const m = spawnMonster(
       w,
       spec({ rarity: 'rare', mods: ['rimeAura'] }),
-      w.player.x + 2,
-      w.player.y,
+      w.sides[0].player.x + 2,
+      w.sides[0].player.y,
       0,
       9,
       'rime',
@@ -193,6 +193,6 @@ describe('monster behaviours in the sim (§12.5, §12.7)', () => {
     m.state = 'chase';
     m.dummy = true;
     stepWorld(w);
-    expect(w.player.ail.chill).toBeGreaterThan(0);
+    expect(w.sides[0].player.ail.chill).toBeGreaterThan(0);
   });
 });

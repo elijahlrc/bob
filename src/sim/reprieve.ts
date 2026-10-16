@@ -52,9 +52,9 @@ export function reprieveFires(w: World, s: Side): boolean {
   const id = nextReprieve(w, s);
   if (!id) return false;
   const def = reprieveDef(id);
-  const p = w.player;
+  const p = s.player;
   s.reprieve.fired.push(id);
-  p.life = Math.max(1, def.life * lifeCap(w, p));
+  p.life = Math.max(1, def.life * lifeCap(p));
   p.overkill = 0;
   for (const f of s.flasks) f.charges = f.spec.maxCharges;
   if (def.family === 'retreat') {
@@ -67,7 +67,7 @@ export function reprieveFires(w: World, s: Side): boolean {
   w.events.push({ t: 'reprieve', how: 'revive', id: def.id });
   if (def.pulse) {
     for (const m of w.actors) {
-      if (m.isPlayer || m.faction !== 1 || !m.alive) continue;
+      if (m.isPlayer || m.team !== 1 || !m.alive) continue;
       if (Math.hypot(m.x - p.x, m.y - p.y) > PULSE_RADIUS) continue;
       knockBack(w, p, m, PULSE_KNOCK);
       m.stunT = Math.max(m.stunT, PULSE_STUN);

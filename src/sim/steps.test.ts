@@ -21,7 +21,7 @@ function arena(): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
@@ -34,7 +34,7 @@ function put(
   o: Partial<MonsterSpec> & { variant?: Variant } = {},
 ): Actor {
   const spec: MonsterSpec = { type, variant: 'none', rarity: 'normal', level: 30, mods: [], ...o };
-  const m = spawnMonster(w, spec, w.player.x + dx, w.player.y, 0, 0, type);
+  const m = spawnMonster(w, spec, w.sides[0].player.x + dx, w.sides[0].player.y, 0, 0, type);
   m.state = 'chase';
   return m;
 }
@@ -67,14 +67,14 @@ describe('the Blinking affix', () => {
     const home = { x: m.x, y: m.y };
     expect(until(w, STEP_INTERVAL + 1, () => marks(w, 'Cinder Step').length > 0)).toBe(true);
     const mark = marks(w, 'Cinder Step')[0];
-    expect(mark.x).toBeCloseTo(w.player.x, 5);
-    expect(mark.y).toBeCloseTo(w.player.y, 5);
+    expect(mark.x).toBeCloseTo(w.sides[0].player.x, 5);
+    expect(mark.y).toBeCloseTo(w.sides[0].player.y, 5);
     expect(mark.leaves?.kind).toBe('burning');
     // It has not moved while the warning lasts.
     for (let i = 0; i < 20; i++) stepWorld(w);
     expect(m.x).toBeCloseTo(home.x, 1);
     // And after it, it is beside the character.
-    expect(until(w, 2, () => dist(m, w.player) < 1.6)).toBe(true);
+    expect(until(w, 2, () => dist(m, w.sides[0].player) < 1.6)).toBe(true);
     // The burst that came with it hurt: the recap names the spell.
     expect(until(w, 1, () => w.sides[0].dmgLog.some((d) => d.name === 'Cinder Step'))).toBe(true);
   });
@@ -103,7 +103,9 @@ describe('the Blinking affix', () => {
     const ms = marks(w, 'Bolt Step');
     expect(ms.length).toBe(2);
     expect(ms.some((e) => Math.hypot(e.x - from.x, e.y - from.y) < 0.01)).toBe(true);
-    expect(ms.some((e) => Math.hypot(e.x - w.player.x, e.y - w.player.y) < 0.01)).toBe(true);
+    expect(
+      ms.some((e) => Math.hypot(e.x - w.sides[0].player.x, e.y - w.sides[0].player.y) < 0.01),
+    ).toBe(true);
   });
 
   it('a stun while it gathers breaks the step and wipes the marks off the ground', () => {
@@ -161,7 +163,7 @@ describe('teleports as a sidearm', () => {
     const m = put(w, 'wisp', 9);
     m.enc!.sideT = 0;
     expect(until(w, 2, () => marks(w, 'Bolt Step').length > 0)).toBe(true);
-    expect(until(w, 2, () => dist(m, w.player) < 1.6)).toBe(true);
+    expect(until(w, 2, () => dist(m, w.sides[0].player) < 1.6)).toBe(true);
     // Then it waits its time again.
     expect(m.enc!.sideT).toBeGreaterThan(0);
   });

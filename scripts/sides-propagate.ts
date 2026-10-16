@@ -108,6 +108,8 @@ const preferred = opt('--name', 's');
 const decisions: {
   byActor?: Record<string, string>;
   byPlayer?: string[];
+  /** G5: a monster's function, `name: param`: the character it hunts is `hunted(w, param)`. */
+  byHunted?: Record<string, string>;
   bySide0?: string[];
   except?: string[];
 } = existsSync('scripts/sides-decisions.json')
@@ -127,6 +129,14 @@ const byPlayer = new Set([
 ]);
 /** The functions that build the map's own result (runMap, vitals, recap): the side is `w.sides[0]`. */
 const bySide0 = new Set(decisions.bySide0 ?? []);
+const byHunted = new Map<string, string>([
+  ...Object.entries(decisions.byHunted ?? {}),
+  ...opt('--by-hunted', '')
+    .split(',')
+    .filter(Boolean)
+    .map((x) => x.split(':') as [string, string]),
+]);
+const needsHunted = new Set<string>();
 for (const e of decisions.except ?? []) except.add(e);
 
 const root = process.cwd().replace(/\\/g, '/');
@@ -184,6 +194,7 @@ const allowed = (f: FnLike): boolean => {
     barriers.has(n) ||
     byActor.has(n) ||
     byPlayer.has(n) ||
+    byHunted.has(n) ||
     bySide0.has(n) ||
     (!except.has(n) && (only.size === 0 || only.has(n)))
   );
@@ -213,6 +224,11 @@ function sideName(f: FnLike): string {
   const actor = byActor.get(n);
   if (actor) return `${actor}.side!`;
   if (byPlayer.has(n)) return `${f.parameters[worldParamIndex(f)].name.getText()}.player.side!`;
+  const hunter = byHunted.get(n);
+  if (hunter) {
+    needsHunted.add(f.getSourceFile().fileName);
+    return `hunted(${f.parameters[worldParamIndex(f)].name.getText()}, ${hunter}).side!`;
+  }
   if (bySide0.has(n)) return `${f.parameters[worldParamIndex(f)].name.getText()}.sides[0]`;
   const have = sideParamOf(f);
   if (have) return have.name.getText();
@@ -226,7 +242,12 @@ function sideName(f: FnLike): string {
 }
 
 // Step 1: the reads the compiler reports.
-const readSites: { id: ts.Identifier; fn: FnLike; field: string }[] = [];
+const readSites: {
+  id: ts.Identifier;
+  fn: FnLike;
+  field: string;
+  hit: ts.PropertyAccessExpression;
+}[] = [];
 for (const d of diags) {
   if ((d.code !== 2339 && d.code !== 2551) || !d.file || d.start === undefined) continue;
   if (!isSim(d.file.fileName)) continue;
@@ -273,7 +294,7 @@ for (const d of diags) {
     blocked.push(`${where(hit)}: ${fnName(fn)} would need a side (reads ${field})`);
     continue;
   }
-  readSites.push({ id: root, fn, field });
+  readSites.push({ id: root, fn, field, hit });
 }
 
 if (argv.includes('--reads')) {
@@ -287,6 +308,18 @@ if (argv.includes('--reads')) {
 }
 for (const r of readSites) {
   const name = sideName(r.fn);
+  const hunter = byHunted.get(fnName(r.fn));
+  if (hunter && r.field === 'player') {
+    // The character itself: `w.player` is `hunted(w, m)`.
+    needsHunted.add(r.id.getSourceFile().fileName);
+    edits.push({
+      file: r.id.getSourceFile().fileName,
+      pos: r.hit.getStart(),
+      end: r.hit.getEnd(),
+      text: `hunted(${r.id.getText()}, ${hunter})`,
+    });
+    continue;
+  }
   edits.push({
     file: r.id.getSourceFile().fileName,
     pos: r.id.getStart(),
@@ -503,6 +536,15 @@ if (apply) {
       if (seen.has(key)) continue;
       seen.add(key);
       text = text.slice(0, e.pos) + e.text + text.slice(e.end);
+    }
+    if (needsHunted.has(file) && !/import \{[^}]*\bhunted\b[^}]*\} from/.test(text)) {
+      const dir = path.dirname(file);
+      let r = path.relative(dir, path.join(root, 'src/sim/side')).replace(/\\/g, '/');
+      if (!r.startsWith('.')) r = './' + r;
+      const imports = [...text.matchAll(/^import [^;]*;[ \t]*$/gm)];
+      const last = imports[imports.length - 1];
+      const at = last ? last.index! + last[0].length : 0;
+      text = text.slice(0, at) + `\nimport { hunted } from '${r}';` + text.slice(at);
     }
     if (importFiles.has(file) && !/\bSide\b[^;]*from '[^']*\/side'/.test(text)) {
       const dir = path.dirname(file);

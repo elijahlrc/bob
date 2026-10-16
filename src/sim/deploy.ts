@@ -126,8 +126,8 @@ function areaAim(
   return spot;
 }
 
-export function choiceByKey(w: World, key: string): SkillChoice | undefined {
-  return w.char.actives.find((c) => c.key === key) ?? w.char.secondaries.find((c) => c.key === key);
+export function choiceByKey(s: Side, key: string): SkillChoice | undefined {
+  return s.char.actives.find((c) => c.key === key) ?? s.char.secondaries.find((c) => c.key === key);
 }
 
 /**
@@ -137,8 +137,8 @@ export function choiceByKey(w: World, key: string): SkillChoice | undefined {
 export const DEPLOY_NEAR = 12;
 
 /** How many of a skill's deployables stand (all of them, or only those near the character). */
-export function deployedCount(w: World, s: Side, key: string, nearOnly = false): number {
-  const p = w.player;
+export function deployedCount(s: Side, key: string, nearOnly = false): number {
+  const p = s.player;
   let n = 0;
   for (const d of s.deployables)
     if (d.key === key && (!nearOnly || Math.hypot(d.x - p.x, d.y - p.y) <= DEPLOY_NEAR)) n++;
@@ -146,9 +146,9 @@ export function deployedCount(w: World, s: Side, key: string, nearOnly = false):
 }
 
 /** Whether the skill has all it can have down already, near the character: the AI uses another skill meanwhile. */
-export function deployFull(w: World, s: Side, c: SkillChoice, prof: SkillProfile): boolean {
+export function deployFull(s: Side, c: SkillChoice, prof: SkillProfile): boolean {
   if (!c.deploy) return false;
-  return deployedCount(w, s, c.key, true) >= deployCap(c, prof);
+  return deployedCount(s, c.key, true) >= deployCap(c, prof);
 }
 
 const enemies = (w: World): Actor[] =>
@@ -211,7 +211,7 @@ function totemSpot(
 
 /** The use of a deploying skill lands: put its totem, brand, traps or mines down. */
 export function placeDeployable(w: World, a: Actor, act: Action): void {
-  const c = w.char.actives.find((x) => x.skill.id === act.profile.skill.id);
+  const c = a.side!.char.actives.find((x) => x.skill.id === act.profile.skill.id);
   if (!c?.deploy) return;
   const target = actorById(w, act.targetId);
   const n = act.profile.deployCount;
@@ -290,10 +290,10 @@ function shoot(
   scale = 1,
   crowd?: Crowd,
 ): void {
-  let prof = w.char.profile(c, playerConds(w, target), flaskMask(s));
+  let prof = s.char.profile(c, playerConds(w, s, target), flaskMask(s));
   if (scale !== 1) prof = scaleProfile(prof, scale);
   const aim = areaAim(w, d, prof, target, crowd);
-  const from: Actor = Object.create(w.player) as Actor;
+  const from: Actor = Object.create(s.player) as Actor;
   from.x = d.x;
   from.y = d.y;
   const ax = aim?.x ?? target.x;
@@ -311,7 +311,7 @@ function shoot(
     aimX: ax,
     aimY: ay,
   };
-  w.events.push({ t: 'use', src: w.player.id, skill: prof.skill.id, via: 'deployed' });
+  w.events.push({ t: 'use', src: s.player.id, skill: prof.skill.id, via: 'deployed' });
   fire(w, from, act);
 }
 
@@ -355,7 +355,7 @@ function setOffMines(
   by: Actor,
   rearm = false,
 ): void {
-  const prof = w.char.profile(c, w.char.configConds, flaskMask(s));
+  const prof = s.char.profile(c, s.char.configConds, flaskMask(s));
   const det = c.skill.detonation ?? DETONATION;
   const chained = prof.mineChain > 0;
   const set = s.deployables
@@ -403,7 +403,7 @@ function detonate(
     nearestFoe(foes, d.aimX ?? d.x, d.aimY ?? d.y, MINE_SEEK);
   if (!target) return;
   sprung(w, d, target);
-  const prof = w.char.profile(c, playerConds(w, target), flaskMask(s));
+  const prof = s.char.profile(c, playerConds(w, s, target), flaskMask(s));
   const seq = d.seq ?? 0;
   shoot(w, s, d, c, target, 1 + (prof.mineChain * seq) / 100, crowd);
   // Projectiles rain down around it, a smaller burst each, more of them the further along in the sequence.
@@ -415,7 +415,7 @@ function detonate(
       const ang = w.rngTrig.float(0, Math.PI * 2);
       const r = rain.spread * Math.sqrt(w.rngTrig.float(0, 1));
       const spot = { x: d.x + Math.cos(ang) * r, y: d.y + Math.sin(ang) * r };
-      const from: Actor = Object.create(w.player) as Actor;
+      const from: Actor = Object.create(s.player) as Actor;
       from.x = d.x;
       from.y = d.y;
       const act: Action = {
@@ -476,10 +476,11 @@ export function mineAuraHit(w: World, s: Side, dst: Actor): void {
 /** The beams of a skill's totems: from each to the character and to the other totems, when in range and in sight. */
 function bondSegments(
   w: World,
+  s: Side,
   bonds: Deployable[],
   spec: { range: number },
 ): [Deployable, number, number][] {
-  const p = w.player;
+  const p = s.player;
   const segs: [Deployable, number, number][] = [];
   for (const d of bonds) {
     if (Math.hypot(d.x - p.x, d.y - p.y) <= spec.range && w.grid.los(d.x, d.y, p.x, p.y))
@@ -516,9 +517,9 @@ export function bondLinks(w: World, s: Side): BondLink[] {
   }
   const out: BondLink[] = [];
   for (const [key, list] of byKey) {
-    const spec = choiceByKey(w, key)?.skill.bond;
+    const spec = choiceByKey(s, key)?.skill.bond;
     if (!spec) continue;
-    for (const [d, x2, y2] of bondSegments(w, list, spec))
+    for (const [d, x2, y2] of bondSegments(w, s, list, spec))
       out.push({ x1: d.x, y1: d.y, x2, y2, width: spec.width, key });
   }
   return out;
@@ -527,8 +528,8 @@ export function bondLinks(w: World, s: Side): BondLink[] {
 /** The beams of Cinder Bond: from each of its totems to the character and to the other totems, burning what they cross. */
 function bondBeams(w: World, s: Side, bonds: Deployable[], c: SkillChoice, foes: Actor[]): void {
   const spec = c.skill.bond!;
-  const prof = w.char.profile(c, playerConds(w, null), flaskMask(s));
-  const segs = bondSegments(w, bonds, spec);
+  const prof = s.char.profile(c, playerConds(w, s, null), flaskMask(s));
+  const segs = bondSegments(w, s, bonds, spec);
   for (const e of foes)
     for (const [d, x2, y2] of segs) {
       const near =
@@ -547,7 +548,7 @@ function bondBeams(w: World, s: Side, bonds: Deployable[], c: SkillChoice, foes:
 export function tickDeployables(w: World, s: Side, dt: number): void {
   if (s.deployables.length === 0) return;
   const foes = enemies(w);
-  const p = w.player;
+  const p = s.player;
   const bonds = new Map<string, Deployable[]>();
   const crowd: Crowd = { many: new Set(), landed: [] };
   const seen = new Set<string>();
@@ -556,7 +557,7 @@ export function tickDeployables(w: World, s: Side, dt: number): void {
   for (const d of s.deployables) {
     d.t -= dt;
     d.fireT -= dt;
-    const c = choiceByKey(w, d.key);
+    const c = choiceByKey(s, d.key);
     let keep = d.t > 0 && !!c;
     if (keep && c && d.kind === 'totem' && c.skill.ancestral) {
       // An Ancestral totem is active while the character is near and in sight of it, and gives the character its buff.
@@ -598,7 +599,7 @@ export function tickDeployables(w: World, s: Side, dt: number): void {
         if (d.active === false) {
           d.fireT = 0.1;
         } else {
-          const prof = w.char.profile(c, w.char.configConds, flaskMask(s));
+          const prof = s.char.profile(c, s.char.configConds, flaskMask(s));
           const reach = skillRange(prof);
           let best: Actor | null = null;
           let bd = Infinity;
@@ -641,7 +642,7 @@ export function tickDeployables(w: World, s: Side, dt: number): void {
   // Beams are cast four times a second.
   if (bonds.size > 0 && Math.floor(w.t * 4) !== Math.floor((w.t - dt) * 4))
     for (const [key, list] of bonds) {
-      const c = choiceByKey(w, key);
+      const c = choiceByKey(s, key);
       if (c) bondBeams(w, s, list, c, foes);
     }
 }

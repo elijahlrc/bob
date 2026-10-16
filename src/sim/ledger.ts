@@ -2,6 +2,7 @@ import { ACTIVE_GEMS } from '../data/gems';
 import { MONSTER_TYPES } from '../data/monsters';
 import type { SkillDot } from './skillDots';
 import type { Actor, World } from './types';
+import { hunted } from './side';
 import type { Side } from './side';
 
 /** What dealt (or took) the damage of a row: a skill, a minion, an ailment, a monster or some other effect. */
@@ -110,7 +111,7 @@ export function noteDamage(w: World, dst: Actor, dmg: number[], src: DmgSrc | un
  */
 function rowsFor(w: World, dst: Actor): Rows | null {
   if (dst.isPlayer) return dst.side!.ledger.taken;
-  return dst.faction === 1 ? w.player.side!.ledger.dealt : null;
+  return dst.team === 1 ? hunted(w, dst).side!.ledger.dealt : null;
 }
 
 /** A hit that landed (`total` is what it dealt), by what dealt it. */
@@ -131,8 +132,8 @@ export function noteMiss(w: World, dst: Actor, src: DmgSrc, blocked: boolean): v
     else l.evaded++;
     return;
   }
-  if (dst.faction !== 1) return;
-  row(w.player.side!.ledger.dealt, src.name, src.kind).misses++;
+  if (dst.team !== 1) return;
+  row(hunted(w, dst).side!.ledger.dealt, src.name, src.kind).misses++;
 }
 
 /** Where the character's damage went: energy shield, then (maybe) mana, then life. */

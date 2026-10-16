@@ -68,7 +68,8 @@ describe('secondary casts (EXPANSION 5.5a)', () => {
     while (world.status === 'running') {
       stepWorld(world);
       for (const e of world.events)
-        if (e.t === 'use' && e.src === world.player.id && e.skill === 'crushingBlow') melee++;
+        if (e.t === 'use' && e.src === world.sides[0].player.id && e.skill === 'crushingBlow')
+          melee++;
     }
     expect(melee).toBe(0);
   });
@@ -102,8 +103,8 @@ describe('secondary casts (EXPANSION 5.5a)', () => {
       while (world.status === 'running') {
         stepWorld(world);
         for (const e of world.events) {
-          if (e.t === 'hit' && e.src === world.player.id) dmg += e.amount;
-          if (e.t === 'use' && e.src === world.player.id) {
+          if (e.t === 'hit' && e.src === world.sides[0].player.id) dmg += e.amount;
+          if (e.t === 'use' && e.src === world.sides[0].player.id) {
             if (e.skill === 'flameBolt') secUses++;
             else if (e.skill === 'crushingBlow') primUses++;
           }
@@ -166,8 +167,8 @@ describe('Echoing Cast repeats the spell (visible and in the numbers)', () => {
       while (world.status === 'running') {
         stepWorld(world);
         for (const e of world.events) {
-          if (e.t === 'hit' && e.src === world.player.id) dmg += e.amount;
-          if (e.t === 'use' && e.src === world.player.id) uses++;
+          if (e.t === 'hit' && e.src === world.sides[0].player.id) dmg += e.amount;
+          if (e.t === 'use' && e.src === world.sides[0].player.id) uses++;
           if (e.t === 'echo') echoes++;
           if (e.t === 'projectileSpawned') projectiles++;
         }

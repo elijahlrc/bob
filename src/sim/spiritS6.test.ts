@@ -60,12 +60,12 @@ describe('consecrated ground (blessedTrail)', () => {
     // The character regenerates on it.
     world.sides[0].opts.godMode = true;
     const f = world.sides[0].fields.find((x) => x.kind === 'consecrated')!;
-    world.player.x = f.x;
-    world.player.y = f.y;
-    world.player.life = 1;
-    world.player.stunT = 1e9;
+    world.sides[0].player.x = f.x;
+    world.sides[0].player.y = f.y;
+    world.sides[0].player.life = 1;
+    world.sides[0].player.stunT = 1e9;
     for (let i = 0; i < 60; i++) stepWorld(world);
-    expect(world.player.life).toBeGreaterThan(world.player.def.maxLife * 0.04);
+    expect(world.sides[0].player.life).toBeGreaterThan(world.sides[0].player.def.maxLife * 0.04);
     // It ends.
     for (let i = 0; i < 5 * 60; i++) stepWorld(world);
     expect(world.sides[0].fields.some((x) => x.kind === 'consecrated')).toBe(false);
@@ -110,7 +110,7 @@ describe('Cold Snap (suddenFrost): chilled ground', () => {
       dummy.x = f.x;
       dummy.y = f.y;
       killActor(world, dummy);
-      got += world.char.charges.fervour;
+      got += world.sides[0].char.charges.fervour;
     }
     expect(got).toBeGreaterThan(0);
   });
@@ -145,7 +145,7 @@ describe('Tectonic Slam (magmaCrack): a charge now and then', () => {
     let spent = 0;
     let uses = 0;
     for (let i = 0; i < 300 * 60; i++) {
-      if (world.char.charges.grit === 0) gainCharge(world, world.sides[0], 'grit');
+      if (world.sides[0].char.charges.grit === 0) gainCharge(world, world.sides[0], 'grit');
       stepWorld(world);
       for (const e of world.events) {
         if (e.t === 'spend') spent++;
@@ -173,7 +173,7 @@ describe('Frost Wall (glacierWall)', () => {
         walled,
         before - Array.from(world.grid.tiles).filter((t) => t === 1).length,
       );
-      if (walled > 0) world.player.stunT = 1e9; // one wall only
+      if (walled > 0) world.sides[0].player.stunT = 1e9; // one wall only
     }
     expect(walled).toBeGreaterThan(1);
     for (let i = 0; i < 8 * 60; i++) stepWorld(world);
@@ -188,9 +188,9 @@ describe('Frost Wall: what the raising hits', () => {
       maxTime: 60,
     });
     world.sides[0].opts.freeResources = true;
-    const c = world.char.actives.find((x) => x.skill.id === 'glacierWall')!;
-    const prof = world.char.profile(c, world.char.configConds, 0);
-    const p = world.player;
+    const c = world.sides[0].char.actives.find((x) => x.skill.id === 'glacierWall')!;
+    const prof = world.sides[0].char.profile(c, world.sides[0].char.configConds, 0);
+    const p = world.sides[0].player;
     p.x = 10.5;
     p.y = 15.5;
     // The wall stands across the way, east of the character: its line runs north to south through (14.5, 15.5).
@@ -251,12 +251,12 @@ describe('Righteous Fire (searingMantle)', () => {
     const b = holding('sword_3', ['crushingBlow'], 'vanguard', ['searingMantle']);
     const { world } = createDummyWorld(b, { distance: 9, maxTime: 60 });
     world.sides[0].opts.freeResources = false;
-    world.player.stunT = 1e9;
-    const max = world.player.def.maxLife;
+    world.sides[0].player.stunT = 1e9;
+    const max = world.sides[0].player.def.maxLife;
     for (let i = 0; i < 10 * 60; i++) stepWorld(world);
-    expect(world.player.life).toBeLessThan(max * 0.9);
-    expect(world.player.life).toBeGreaterThanOrEqual(1);
-    expect(world.player.alive).toBe(true);
+    expect(world.sides[0].player.life).toBeLessThan(max * 0.9);
+    expect(world.sides[0].player.life).toBeGreaterThanOrEqual(1);
+    expect(world.sides[0].player.alive).toBe(true);
   });
 });
 
@@ -265,8 +265,8 @@ describe('Herald of Thunder (stormHerald)', () => {
     const b = holding('sword_3', ['crushingBlow'], 'vanguard', ['stormHerald']);
     const { world, dummy } = createDummyWorld(b, { distance: 1.4, maxTime: 60 });
     world.sides[0].opts.freeResources = true;
-    const other = neighbour(world, world.player.x + 2, world.player.y + 0.5);
-    world.player.stunT = 1e9;
+    const other = neighbour(world, world.sides[0].player.x + 2, world.sides[0].player.y + 0.5);
+    world.sides[0].player.stunT = 1e9;
     dummy.ail.shock = 0.2;
     dummy.ail.shockT = 5;
     dummy.def = dummyDefence({ maxLife: 10 });
@@ -291,7 +291,7 @@ describe('banners (standardOfValour, standardOfDread)', () => {
     const { world, dummy } = carried('standardOfValour');
     expect(world.sides[0].banner).not.toBeNull();
     expect(world.sides[0].banner!.placed).toBe(false);
-    expect(reservedMana(world, world.sides[0])).toBeGreaterThan(world.char.reservedMana);
+    expect(reservedMana(world.sides[0])).toBeGreaterThan(world.sides[0].char.reservedMana);
     for (let i = 0; i < 30; i++) stepWorld(world);
     expect(world.sides[0].buffT.warBanner).toBeGreaterThan(0);
     expect(dummy.fx.scarred).toBeDefined();
@@ -301,13 +301,13 @@ describe('banners (standardOfValour, standardOfDread)', () => {
     const { world } = carried('standardOfValour');
     const b = world.sides[0].banner!;
     for (let i = 0; i < 12; i++) {
-      const m = neighbour(world, world.player.x + 3, world.player.y);
+      const m = neighbour(world, world.sides[0].player.x + 3, world.sides[0].player.y);
       m.life = 1;
       killActor(world, m);
     }
     // Two more stand about, so it is a fight.
-    neighbour(world, world.player.x + 2, world.player.y + 1);
-    neighbour(world, world.player.x + 2, world.player.y - 1);
+    neighbour(world, world.sides[0].player.x + 2, world.sides[0].player.y + 1);
+    neighbour(world, world.sides[0].player.x + 2, world.sides[0].player.y - 1);
     expect(b.stages).toBe(12);
     const r0 = b.r0;
     let guard = 0;
@@ -316,7 +316,7 @@ describe('banners (standardOfValour, standardOfDread)', () => {
     expect(b.radius).toBeGreaterThan(r0);
     expect(world.sides[0].buffT.adrenaline).toBeGreaterThan(0);
     // Mana is free again, and the banner ends in time.
-    expect(reservedMana(world, world.sides[0])).toBe(world.char.reservedMana);
+    expect(reservedMana(world.sides[0])).toBe(world.sides[0].char.reservedMana);
     const left = Math.ceil((b.t + 1) * 60);
     for (let i = 0; i < left; i++) stepWorld(world);
     expect(world.sides[0].banner === null || world.sides[0].banner !== b).toBe(true);
@@ -325,20 +325,26 @@ describe('banners (standardOfValour, standardOfDread)', () => {
   it('its stages strengthen what it gives the character as much as what it does to enemies', () => {
     const { world } = carried('standardOfValour');
     for (let i = 0; i < 12; i++) {
-      const m = neighbour(world, world.player.x + 3, world.player.y);
+      const m = neighbour(world, world.sides[0].player.x + 3, world.sides[0].player.y);
       m.life = 1;
       killActor(world, m);
     }
-    neighbour(world, world.player.x + 2, world.player.y + 1);
-    neighbour(world, world.player.x + 2, world.player.y - 1);
-    const conds = playerConds(world, null);
-    const carriedAcc = world.char.profile(world.primary, conds, flaskMask(world.sides[0])).hands[0]
-      .accuracy;
+    neighbour(world, world.sides[0].player.x + 2, world.sides[0].player.y + 1);
+    neighbour(world, world.sides[0].player.x + 2, world.sides[0].player.y - 1);
+    const conds = playerConds(world, world.sides[0], null);
+    const carriedAcc = world.sides[0].char.profile(
+      world.sides[0].primary,
+      conds,
+      flaskMask(world.sides[0]),
+    ).hands[0].accuracy;
     let guard = 0;
     while (!world.sides[0].banner!.placed && guard++ < 10 * 60) stepWorld(world);
-    const placedAcc = world.char.profile(world.primary, conds, flaskMask(world.sides[0])).hands[0]
-      .accuracy;
-    const none = world.char.profile(world.primary, conds, 0).hands[0].accuracy;
+    const placedAcc = world.sides[0].char.profile(
+      world.sides[0].primary,
+      conds,
+      flaskMask(world.sides[0]),
+    ).hands[0].accuracy;
+    const none = world.sides[0].char.profile(world.sides[0].primary, conds, 0).hands[0].accuracy;
     expect(carriedAcc).toBeCloseTo(none, 5);
     expect(placedAcc).toBeGreaterThan(carriedAcc);
   });
@@ -346,17 +352,17 @@ describe('banners (standardOfValour, standardOfDread)', () => {
   it('works only where it stands once it is down', () => {
     const { world } = carried('standardOfValour');
     for (let i = 0; i < 12; i++) {
-      const m = neighbour(world, world.player.x + 3, world.player.y);
+      const m = neighbour(world, world.sides[0].player.x + 3, world.sides[0].player.y);
       m.life = 1;
       killActor(world, m);
     }
-    neighbour(world, world.player.x + 2, world.player.y + 1);
-    neighbour(world, world.player.x + 2, world.player.y - 1);
+    neighbour(world, world.sides[0].player.x + 2, world.sides[0].player.y + 1);
+    neighbour(world, world.sides[0].player.x + 2, world.sides[0].player.y - 1);
     let guard = 0;
     while (!world.sides[0].banner!.placed && guard++ < 10 * 60) stepWorld(world);
     const b = world.sides[0].banner!;
-    world.player.x = b.x + b.radius + 3;
-    world.player.stunT = 1e9;
+    world.sides[0].player.x = b.x + b.radius + 3;
+    world.sides[0].player.stunT = 1e9;
     const far = neighbour(world, b.x + b.radius + 6, b.y);
     const near = neighbour(world, b.x + 1, b.y);
     for (let i = 0; i < 30; i++) stepWorld(world);
@@ -373,7 +379,7 @@ describe('banners (standardOfValour, standardOfDread)', () => {
     for (let i = 0; i < 30; i++) stepWorld(world);
     expect(dummy.fx.unnerved).toBeDefined();
     // Kills give nothing to this one.
-    const m = neighbour(world, world.player.x + 3, world.player.y);
+    const m = neighbour(world, world.sides[0].player.x + 3, world.sides[0].player.y);
     m.life = 1;
     killActor(world, m);
     expect(b.stages).toBe(5);
@@ -401,7 +407,7 @@ describe('Winter Orb (hoarfrostMote)', () => {
     expect(orb).toBeDefined();
     expect(orb!.stages).toBeGreaterThanOrEqual(5);
     expect(hits).toBeGreaterThan(8);
-    expect(orb!.x).toBeCloseTo(world.player.x, 5);
+    expect(orb!.x).toBeCloseTo(world.sides[0].player.x, 5);
   });
 
   it('keeps going after the channel ends, and its stages fade with its time', () => {
@@ -409,7 +415,7 @@ describe('Winter Orb (hoarfrostMote)', () => {
     for (let i = 0; i < 4 * 60; i++) stepWorld(world);
     const orb = world.sides[0].fields.find((f) => f.kind === 'orb')!;
     const held = orb.stages!;
-    world.player.stunT = 1e9;
+    world.sides[0].player.stunT = 1e9;
     let hits = 0;
     for (let i = 0; i < 60; i++) {
       stepWorld(world);
@@ -452,7 +458,7 @@ describe('Storm Burst (brimstoneStorm)', () => {
     const zaps = world.sides[0].fields.filter((f) => f.kind === 'zap');
     expect(zaps.length).toBeGreaterThan(0);
     const spec = zaps[0].profile!.skill.orb!;
-    world.player.stunT = 1e9;
+    world.sides[0].player.stunT = 1e9;
     let widest = 0;
     stepWorld(world);
     for (const e of world.events) if (e.t === 'explode') widest = Math.max(widest, e.r);

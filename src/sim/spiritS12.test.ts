@@ -43,7 +43,7 @@ const minionsOf = (w: World) => w.sides[0].minions as Minion[];
 describe('offerings (boneWardRite, fleshSurgeRite, spiritWardRite)', () => {
   it('uses a corpse and up to four more, lasts longer for each, and does nothing without a minion', () => {
     const { world: w } = world(['crushingBlow', 'boneWardRite'], 4, 'sword_3', STR);
-    corpses(w, 7, w.player.x - 1, w.player.y);
+    corpses(w, 7, w.sides[0].player.x - 1, w.sides[0].player.y);
     run(w, 2);
     // No minion, no offering.
     expect(w.sides[0].offering).toBeNull();
@@ -61,7 +61,7 @@ describe('offerings (boneWardRite, fleshSurgeRite, spiritWardRite)', () => {
     expect(w.sides[0].minions.length).toBeGreaterThan(0);
     const m = minionsOf(w)[0];
     const before = m.def.blockAttack;
-    corpses(w, 7, w.player.x - 1, w.player.y);
+    corpses(w, 7, w.sides[0].player.x - 1, w.sides[0].player.y);
     for (let i = 0; i < 4 * 60 && !w.sides[0].offering; i++) stepWorld(w);
     expect(w.sides[0].offering).not.toBeNull();
     // Five corpses used of the seven.
@@ -85,7 +85,7 @@ describe('offerings (boneWardRite, fleshSurgeRite, spiritWardRite)', () => {
       STR,
     );
     for (let i = 0; i < 4 * 60 && w.sides[0].minions.length === 0; i++) stepWorld(w);
-    corpses(w, 12, w.player.x - 1, w.player.y);
+    corpses(w, 12, w.sides[0].player.x - 1, w.sides[0].player.y);
     run(w, 6);
     // Only one stands at a time; both gems cast, the later replaces.
     expect(w.sides[0].offering).not.toBeNull();

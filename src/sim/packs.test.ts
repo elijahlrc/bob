@@ -22,7 +22,7 @@ function arena(): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
@@ -44,7 +44,15 @@ function put(
     mods: [],
     ...over,
   };
-  const m = spawnMonster(w, spec, w.player.x + dx, w.player.y + dy, 0, pack, type);
+  const m = spawnMonster(
+    w,
+    spec,
+    w.sides[0].player.x + dx,
+    w.sides[0].player.y + dy,
+    0,
+    pack,
+    type,
+  );
   m.state = 'chase';
   return m;
 }
@@ -61,7 +69,7 @@ describe('rhythms (docs/ROSTER.md 6.5)', () => {
     const durations: number[] = [];
     const mults: number[] = [];
     for (let i = 0; i < 6; i++) {
-      startAction(w, m, 'monster', m.mon!.profile(0), w.player);
+      startAction(w, m, 'monster', m.mon!.profile(0), w.sides[0].player);
       durations.push(m.action!.duration / base);
       mults.push(m.patMult);
       m.action = null;
@@ -96,9 +104,11 @@ describe('phases (docs/ROSTER.md 6.5)', () => {
     hag.life = hag.def.maxLife * 0.29;
     tickPhases(w, hag);
     expect(hag.fleeT).toBeGreaterThan(3);
-    const d0 = Math.hypot(hag.x - w.player.x, hag.y - w.player.y);
+    const d0 = Math.hypot(hag.x - w.sides[0].player.x, hag.y - w.sides[0].player.y);
     run(w, 2);
-    expect(Math.hypot(hag.x - w.player.x, hag.y - w.player.y)).toBeGreaterThan(d0 + 1);
+    expect(Math.hypot(hag.x - w.sides[0].player.x, hag.y - w.sides[0].player.y)).toBeGreaterThan(
+      d0 + 1,
+    );
     run(w, 5);
     expect(hag.fleeT).toBeLessThanOrEqual(0);
   });
@@ -177,10 +187,10 @@ describe('mods that apply to every faction (docs/ROSTER.md 7.5)', () => {
     const ring = w.effects.find((e) => e.push);
     expect(ring).toBeDefined();
     m.alive = false;
-    const x0 = w.player.x;
+    const x0 = w.sides[0].player.x;
     run(w, 1.2);
     // It lands where it went off, a few tiles on the character's side of it, and the character is thrown clear.
-    expect(Math.abs(w.player.x - x0)).toBeGreaterThan(1.5);
+    expect(Math.abs(w.sides[0].player.x - x0)).toBeGreaterThan(1.5);
   });
 
   it('a Mirrored monster has a twin, and the survivor is made whole unless it follows within three seconds', () => {

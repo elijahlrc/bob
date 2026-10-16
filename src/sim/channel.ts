@@ -176,7 +176,7 @@ export function tickChannel(w: World, s: Side): void {
   const sk = s.stacks;
   if (sk && sk.n > 0) {
     // With nothing hit for a while the stages go, one at a time.
-    const fade = w.char.primary.skill.stacks?.fadeAfter ?? 3;
+    const fade = s.char.primary.skill.stacks?.fadeAfter ?? 3;
     if (w.t - sk.lastHit > fade) {
       sk.fadeT += 1 / 60;
       if (sk.fadeT >= 1) {
@@ -194,7 +194,7 @@ export function tickChannel(w: World, s: Side): void {
     } else s.buffT.infusion = 6;
   }
   if (!st) return;
-  const p = w.player;
+  const p = s.player;
   if (st.profile.infuse && !s.infusing && w.t - st.startT >= st.profile.infuse.after) {
     s.infusing = st.key;
     s.buffT.infusion = 6;

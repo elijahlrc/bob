@@ -60,7 +60,7 @@ export function runMap(
     hashEvents(h, w);
     onTick?.(w);
   }
-  h.num(w.player.x).num(w.player.y).num(w.player.life);
+  h.num(w.sides[0].player.x).num(w.sides[0].player.y).num(w.sides[0].player.life);
   return worldResult(w, h.digest());
 }
 
@@ -72,14 +72,14 @@ export function worldResult(w: World, eventHash = 0): MapResult {
     areaLevel: w.plan.areaLevel,
     time: w.t,
     ticks: w.tick,
-    level: w.build.level,
+    level: w.sides[0].build.level,
     xp: w.sides[0].xp,
     xpGained: w.sides[0].stats.xpGained,
     kills: w.sides[0].stats.kills,
     stuck: w.sides[0].stats.stuck,
     picked: w.sides[0].picked,
     eventHash,
-    lifeFrac: w.player.life / Math.max(1, w.player.def.maxLife),
+    lifeFrac: w.sides[0].player.life / Math.max(1, w.sides[0].player.def.maxLife),
     vitals: vitalsOf(w),
     ...(w.status === 'dead' ? { recap: buildRecap(w) } : {}),
     ...(w.sides[0].reprieve.fired.length ? { reprieves: [...w.sides[0].reprieve.fired] } : {}),

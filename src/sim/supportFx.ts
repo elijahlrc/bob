@@ -73,7 +73,7 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
   orbAnswers(w, a.side!, p);
   // The first skill used after a Phase Run ends its speed; the damage stays a moment.
   if (!p.skill.utility)
-    for (const c of w.char.utilities) {
+    for (const c of a.side!.char.utilities) {
       const u = c.skill.utility;
       if (u?.kind === 'buff' && u.second && a.side!.buffT[u.buff] > 0) {
         a.side!.buffT[u.buff] = 0;
@@ -122,7 +122,7 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
     if (a.side!.inspireMana > p.inspire) {
       a.side!.inspireMana = 0;
       for (const k of CHARGE_KINDS) {
-        const n = w.char.charges[k];
+        const n = a.side!.char.charges[k];
         if (n > 0 && k === 'insight') spendCharges(w, a.side!, k, n);
       }
     }
@@ -132,10 +132,10 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
 
 /** The Seals gained while the spell is not cast, the Intensity lost while the character moves, the mirage and the cooldowns. */
 export function tickSupports(w: World, side: Side, dt: number): void {
-  const p = w.player;
+  const p = side.player;
   const casting = p.action?.profile.skill.id;
-  for (const c of w.char.actives) {
-    const u = c.usable ? w.char.profile(c, 0).unleash : null;
+  for (const c of side.char.actives) {
+    const u = c.usable ? side.char.profile(c, 0).unleash : null;
     if (!u) continue;
     const s = (side.seals[c.skill.id] ??= { n: 0, t: 0 });
     if (casting === c.skill.id || s.n >= SEAL_MAX) continue;
@@ -167,9 +167,9 @@ export function tickSupports(w: World, side: Side, dt: number): void {
 
 /** The mirage archer shoots the nearest enemy in reach, with the skill it was called by. */
 function mirageShoots(w: World, s: Side, m: Mirage): void {
-  const c = w.char.actives.find((x) => x.key === m.key);
+  const c = s.char.actives.find((x) => x.key === m.key);
   if (!c) return;
-  const prof = w.char.profile(c, 0);
+  const prof = s.char.profile(c, 0);
   const spec = prof.mirage;
   if (!spec) return;
   let best: Actor | null = null;
@@ -200,12 +200,12 @@ export function afterPlayerHit(w: World, s: Side, dst: Actor, p: SkillProfile): 
     if (p.skill.charge) chargeEnemy(w, s, dst, p);
   }
   if (p.mirage && !s.mirage && p.isAttack && dst.alive) {
-    const c = w.char.actives.find((x) => x.skill.id === p.skill.id);
+    const c = s.char.actives.find((x) => x.skill.id === p.skill.id);
     if (c)
       s.mirage = {
         key: c.key,
-        x: w.player.x,
-        y: w.player.y,
+        x: s.player.x,
+        y: s.player.y,
         t: p.mirage.seconds,
         fireT: 0.2,
       };
@@ -213,7 +213,7 @@ export function afterPlayerHit(w: World, s: Side, dst: Actor, p: SkillProfile): 
   if (p.shockwave && !s.inShock && p.skill.behaviour.kind === 'melee') {
     const id = p.skill.id;
     if ((s.shockCd[id] ?? 0) > 0) return;
-    const c = w.char.actives.find((x) => x.skill.id === id);
+    const c = s.char.actives.find((x) => x.skill.id === id);
     if (!c) return;
     s.shockCd[id] = p.shockwave.cooldown;
     // An attack of its own around the enemy that was hit: a share of the base attack damage, whatever the hit was.
@@ -228,7 +228,7 @@ export function afterPlayerHit(w: World, s: Side, dst: Actor, p: SkillProfile): 
         e !== dst &&
         Math.hypot(e.x - dst.x, e.y - dst.y) <= SHOCK_RADIUS * p.radiusMult + e.r
       )
-        hit(w, w.player, e, q, 0, Math.hypot(e.x - w.player.x, e.y - w.player.y));
+        hit(w, s.player, e, q, 0, Math.hypot(e.x - s.player.x, e.y - s.player.y));
     s.inShock = false;
   }
 }

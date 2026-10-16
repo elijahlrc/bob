@@ -20,7 +20,7 @@ function arena(): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
@@ -35,7 +35,15 @@ const spec = (type: MonsterTypeId): MonsterSpec => ({
 });
 
 function put(w: World, type: MonsterTypeId, dx: number, dy = 0, chase = true): Actor {
-  const m = spawnMonster(w, spec(type), w.player.x + dx, w.player.y + dy, 0, 0, type);
+  const m = spawnMonster(
+    w,
+    spec(type),
+    w.sides[0].player.x + dx,
+    w.sides[0].player.y + dy,
+    0,
+    0,
+    type,
+  );
   m.state = chase ? 'chase' : 'idle';
   return m;
 }
@@ -66,7 +74,7 @@ describe('movement styles (docs/ROSTER.md 6.3)', () => {
     // A lunge is faster than the walk.
     expect(Math.max(...s) * 60).toBeGreaterThan(MONSTER_TYPES.shambler.speed * 1.2);
     run(w, 10);
-    expect(Math.hypot(m.x - w.player.x, m.y - w.player.y)).toBeLessThan(3);
+    expect(Math.hypot(m.x - w.sides[0].player.x, m.y - w.sides[0].player.y)).toBeLessThan(3);
   });
 
   it('momentum gathers speed, and a stun brings it to a halt', () => {
@@ -88,11 +96,11 @@ describe('movement styles (docs/ROSTER.md 6.3)', () => {
     let off = 0;
     for (let i = 0; i < 180; i++) {
       stepWorld(w);
-      off = Math.max(off, Math.abs(m.y - w.player.y));
+      off = Math.max(off, Math.abs(m.y - w.sides[0].player.y));
     }
     expect(off).toBeGreaterThan(0.6);
     run(w, 6);
-    expect(Math.hypot(m.x - w.player.x, m.y - w.player.y)).toBeLessThan(2);
+    expect(Math.hypot(m.x - w.sides[0].player.x, m.y - w.sides[0].player.y)).toBeLessThan(2);
   });
 
   it('a swoop strikes and withdraws before it comes in again', () => {
@@ -103,7 +111,8 @@ describe('movement styles (docs/ROSTER.md 6.3)', () => {
     for (let i = 0; i < 360; i++) {
       stepWorld(w);
       if (m.mv.attacked || m.action) struck = true;
-      if (struck) far = Math.max(far, Math.hypot(m.x - w.player.x, m.y - w.player.y));
+      if (struck)
+        far = Math.max(far, Math.hypot(m.x - w.sides[0].player.x, m.y - w.sides[0].player.y));
     }
     expect(struck).toBe(true);
     expect(far).toBeGreaterThan(2.5);
@@ -112,12 +121,12 @@ describe('movement styles (docs/ROSTER.md 6.3)', () => {
   it('a circle goes round before it closes in', () => {
     const w = arena();
     const m = put(w, 'wisp', 8);
-    const a0 = Math.atan2(m.y - w.player.y, m.x - w.player.x);
+    const a0 = Math.atan2(m.y - w.sides[0].player.y, m.x - w.sides[0].player.x);
     let turned = 0;
     let last = a0;
     for (let i = 0; i < 150; i++) {
       stepWorld(w);
-      const a = Math.atan2(m.y - w.player.y, m.x - w.player.x);
+      const a = Math.atan2(m.y - w.sides[0].player.y, m.x - w.sides[0].player.x);
       let da = a - last;
       while (da > Math.PI) da -= 2 * Math.PI;
       while (da < -Math.PI) da += 2 * Math.PI;
@@ -178,12 +187,12 @@ describe('senses and targets (docs/ROSTER.md 6.4)', () => {
     const w = arena();
     const hound = put(w, 'hound', 8);
     expect(senseOf(hound).leash).toBe(0);
-    expect(targetOf(w, hound)).toBe(w.player);
+    expect(targetOf(w, hound)).toBe(w.sides[0].player);
     const minion = put(w, 'warrior', 5, 1);
     w.sides[0].minions.push(minion as never);
     expect(targetOf(w, hound)).toBe(minion);
     // A monster that is not a hunter goes for the character, minions or not.
-    expect(targetOf(w, put(w, 'warrior', 7))).toBe(w.player);
+    expect(targetOf(w, put(w, 'warrior', 7))).toBe(w.sides[0].player);
     // Out of sight for a minute, it still chases.
     w.sides[0].minions.length = 0;
     hound.lostT = 60;
@@ -196,10 +205,10 @@ describe('senses and targets (docs/ROSTER.md 6.4)', () => {
     const stalker = put(w, 'gloomstalker', 8);
     expect(revealed(w, stalker)).toBe(false);
     expect(revealed(w, put(w, 'warrior', 8))).toBe(true);
-    stalker.x = w.player.x + 2;
-    stalker.y = w.player.y;
+    stalker.x = w.sides[0].player.x + 2;
+    stalker.y = w.sides[0].player.y;
     expect(revealed(w, stalker)).toBe(true);
-    stalker.x = w.player.x + 8;
+    stalker.x = w.sides[0].player.x + 8;
     expect(revealed(w, stalker)).toBe(false);
     applyDamage(w, stalker, [1, 0, 0, 0, 0]);
     expect(revealed(w, stalker)).toBe(true);
@@ -219,7 +228,15 @@ describe('senses and targets (docs/ROSTER.md 6.4)', () => {
     const { world: w } = createDummyWorld(b, { distance: 30 });
     w.sides[0].opts.godMode = true;
     for (const a of w.actors) if (a.dummy) a.alive = false;
-    const stalker = spawnMonster(w, spec('gloomstalker'), w.player.x + 6, w.player.y, 0, 0, 's');
+    const stalker = spawnMonster(
+      w,
+      spec('gloomstalker'),
+      w.sides[0].player.x + 6,
+      w.sides[0].player.y,
+      0,
+      0,
+      's',
+    );
     stalker.state = 'idle';
     stalker.dummy = true;
     for (let i = 0; i < 30; i++) stepWorld(w);

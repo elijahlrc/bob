@@ -40,7 +40,7 @@ export function characterWith(w: World, s: Side, counts: ChargeCounts): Characte
   const k = key(counts, trophy) + theftKey(w);
   let ch = s.chars.get(k);
   if (!ch) {
-    ch = new Character(theftBuild(w, w.build), {
+    ch = new Character(theftBuild(w, s.build), {
       areaLevel: w.plan.areaLevel,
       resistPenalty: w.plan.resistPenalty,
       extraMods: [
@@ -58,40 +58,40 @@ export function characterWith(w: World, s: Side, counts: ChargeCounts): Characte
 /** Make the character match the charges now held. */
 function swap(w: World, s: Side, counts: ChargeCounts): void {
   const next = characterWith(w, s, counts);
-  if (next === w.char) return;
-  w.char = next;
-  w.primary = next.primary;
+  if (next === s.char) return;
+  s.char = next;
+  s.primary = next.primary;
   refreshPlayerDefence(w, s);
 }
 
 /** The Trophy Cord: a rare monster has died; hold its mods for a while. */
 export function gainTrophy(w: World, s: Side, modIds: readonly string[]): void {
-  if (!w.char.db.flag('trophyMods')) return;
+  if (!s.char.db.flag('trophyMods')) return;
   let changed = false;
   for (const id of modIds) {
     if (!TROPHY_MODS[id as keyof typeof TROPHY_MODS]) continue;
     if (!(id in s.trophy)) changed = true;
     s.trophy[id] = TROPHY_SECONDS;
   }
-  if (changed) swap(w, s, { ...w.char.charges });
+  if (changed) swap(w, s, { ...s.char.charges });
 }
 
 /** Gain one charge of a kind: up to the maximum, refreshing every charge of that kind. */
 export function gainCharge(w: World, s: Side, kind: ChargeKind): void {
-  const have = w.char.charges;
-  const max = w.char.chargeMax[kind];
-  s.chargeT[kind] = CHARGE_SECONDS * w.char.db.mult(`chargeDuration.${kind}`);
+  const have = s.char.charges;
+  const max = s.char.chargeMax[kind];
+  s.chargeT[kind] = CHARGE_SECONDS * s.char.db.mult(`chargeDuration.${kind}`);
   if (have[kind] >= max) return;
   swap(w, s, { ...have, [kind]: have[kind] + 1 });
-  w.events.push({ t: 'charge', kind, count: w.char.charges[kind] });
+  w.events.push({ t: 'charge', kind, count: s.char.charges[kind] });
 }
 
 /** Spend charges of a kind on purpose; returns whether the character held that many. */
 export function spendCharges(w: World, s: Side, kind: ChargeKind, n: number): boolean {
-  const have = w.char.charges;
+  const have = s.char.charges;
   if (have[kind] < n) return false;
   swap(w, s, { ...have, [kind]: have[kind] - n });
-  if (w.char.charges[kind] === 0) s.chargeT[kind] = 0;
+  if (s.char.charges[kind] === 0) s.chargeT[kind] = 0;
   w.events.push({ t: 'spend', kind, n });
   return true;
 }
@@ -104,10 +104,10 @@ export function rollCharges(
   extra: readonly Mod[] = [],
 ): void {
   // The chance may be a buff's (Surge of Blood gives it only while it is up), so ask with the conditions that hold now.
-  const ctx = playerCtx(w);
+  const ctx = playerCtx(w, s);
   for (const kind of CHARGE_KINDS) {
     const chance =
-      w.char.db.sum('base', chargeStat(event, kind), ctx) + sumOf(extra, chargeStat(event, kind));
+      s.char.db.sum('base', chargeStat(event, kind), ctx) + sumOf(extra, chargeStat(event, kind));
     if (chance > 0 && w.rngTrig.chance(Math.min(1, chance / 100))) gainCharge(w, s, kind);
   }
 }
@@ -119,14 +119,14 @@ export function tickCharges(w: World, s: Side, dt: number): void {
     s.trophy[id] -= dt;
     if (s.trophy[id] <= 0) {
       delete s.trophy[id];
-      counts = counts ?? { ...w.char.charges };
+      counts = counts ?? { ...s.char.charges };
     }
   }
   for (const kind of CHARGE_KINDS) {
     if (s.chargeT[kind] <= 0) continue;
     s.chargeT[kind] -= dt;
     if (s.chargeT[kind] <= 0) {
-      counts = counts ?? { ...w.char.charges };
+      counts = counts ?? { ...s.char.charges };
       counts[kind] = 0;
     }
   }
@@ -134,19 +134,19 @@ export function tickCharges(w: World, s: Side, dt: number): void {
 }
 
 /** Register the world's starting character, so returning to no charges does not rebuild it. */
-export function seedCharacters(w: World, s: Side): void {
-  s.chars.set(key(w.char.charges, trophyIds(s)), w.char);
+export function seedCharacters(s: Side): void {
+  s.chars.set(key(s.char.charges, trophyIds(s)), s.char);
 }
 
 /** What the Unmaker holds changed: the character as it now is (its charges kept). */
 export function rebuildForTheft(w: World, s: Side): void {
-  swap(w, s, { ...w.char.charges });
+  swap(w, s, { ...s.char.charges });
 }
 
 /** After the build changes (a level up): rebuild for the charges now held. */
 export function rebuildCharacter(w: World, s: Side): void {
-  const counts = { ...w.char.charges };
+  const counts = { ...s.char.charges };
   s.chars.clear();
-  w.char = characterWith(w, s, counts);
-  w.primary = w.char.primary;
+  s.char = characterWith(w, s, counts);
+  s.primary = s.char.primary;
 }

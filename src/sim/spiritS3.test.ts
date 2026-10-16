@@ -194,13 +194,13 @@ describe('the curses and marks with their reference effects', () => {
   it('effects on a cursed enemy run out more slowly under Temporal Chains', () => {
     const { world, dummy } = createDummyWorld(holding(['crushingBlow']), { distance: 3 });
     world.sides[0].opts.freeResources = true;
-    world.player.stunT = 1e9;
+    world.sides[0].player.stunT = 1e9;
     dummy.ail.ignites.push({ dps: 1, t: 2 });
     applyHex(world, dummy, 'leadenLimbs', 25, 1, 10);
     for (let i = 0; i < 2.5 * 60; i++) stepWorld(world);
     expect(dummy.ail.ignites.length).toBe(1);
     const plain = createDummyWorld(holding(['crushingBlow']), { distance: 3 });
-    plain.world.player.stunT = 1e9;
+    plain.world.sides[0].player.stunT = 1e9;
     plain.dummy.ail.ignites.push({ dps: 1, t: 2 });
     for (let i = 0; i < 2.5 * 60; i++) stepWorld(plain.world);
     expect(plain.dummy.ail.ignites.length).toBe(0);
@@ -208,12 +208,12 @@ describe('the curses and marks with their reference effects', () => {
 
   it('the marks give back when their enemy is killed, and Mark of Plenty fills flasks', () => {
     const { world, dummy } = createDummyWorld(holding(['crushingBlow']), { distance: 3 });
-    world.player.life = 1;
-    world.player.mana = 0;
+    world.sides[0].player.life = 1;
+    world.sides[0].player.mana = 0;
     applyHex(world, dummy, 'critMark', 2, 1, 20);
     expect(hexKill(world, dummy)).toBe(0);
-    expect(world.player.life).toBeGreaterThan(20);
-    expect(world.player.mana).toBeGreaterThan(20);
+    expect(world.sides[0].player.life).toBeGreaterThan(20);
+    expect(world.sides[0].player.mana).toBeGreaterThan(20);
     const again = createDummyWorld(holding(['crushingBlow']), { distance: 3 });
     applyHex(again.world, again.dummy, 'flaskMark', 30, 1, 5);
     expect(hexKill(again.world, again.dummy)).toBe(1);
@@ -221,10 +221,10 @@ describe('the curses and marks with their reference effects', () => {
 
   it('a hit on Mark of Plenty gives life and mana, and its evasion is lower', () => {
     const { world, dummy } = createDummyWorld(holding(['crushingBlow']), { distance: 3 });
-    world.player.life = 1;
+    world.sides[0].player.life = 1;
     applyHex(world, dummy, 'flaskMark', 40, 1, 10);
     hexHit(world, world.sides[0], dummy);
-    expect(world.player.life).toBeGreaterThan(5);
+    expect(world.sides[0].player.life).toBeGreaterThan(5);
   });
 
   it('Punishment makes a melee hit on the cursed enemy grant the Punisher buff', () => {
@@ -275,7 +275,7 @@ describe('the skills that lean on statuses', () => {
     const p = c.profile(c.primary, 0);
     dummy.def = dummyDefence({ maxLife: 1000 });
     dummy.life = 1000;
-    world.player.stunT = 1e9;
+    world.sides[0].player.stunT = 1e9;
     // A hit of a tenth of its life: a hold of 1.5 s.
     rollStatuses(world, dummy, p, false, { dmg: [100, 0, 0, 0, 0], total: 100 });
     expect(dummy.fx.immobilised!.t).toBeCloseTo(1.5, 6);

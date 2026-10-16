@@ -43,6 +43,7 @@ import {
 import { applyUtility } from './utility';
 import { castPattern } from './blasts';
 import type { Action, Actor, World } from './types';
+import { hunted, MONSTERS } from './side';
 import type { Side } from './side';
 
 /** Begin an action (attack or cast). The previous action's overflow time carries over. */
@@ -251,6 +252,9 @@ function runStep(w: World, a: Actor, act: Action, target: Actor | undefined, dt:
   }
 }
 
+/** No actors: what a projectile that is not the monsters' has to stop at besides the actors of the world. */
+const NO_ACTORS: readonly Actor[] = [];
+
 /** How close to its target a spin stops, beyond the two bodies. */
 const SPIN_GAP = 0.6;
 /** The share of a spin in which it covers its dash: the rest it spends on the spot. */
@@ -316,10 +320,10 @@ function spinStep(w: World, a: Actor, act: Action, target: Actor | undefined, dt
 
 export function enemiesOf(w: World, a: Actor): Actor[] {
   if (a.isPlayer) return w.actors.filter((o) => !o.isPlayer && o.alive);
-  if (!w.player.alive) return [];
+  if (!hunted(w, a).alive) return [];
   // A monster's area attack catches the player's minions too.
-  const ms = w.player.side!.minions;
-  return ms.length === 0 ? [w.player] : [w.player, ...ms.filter((m) => m.alive)];
+  const ms = hunted(w, a).side!.minions;
+  return ms.length === 0 ? [hunted(w, a)] : [hunted(w, a), ...ms.filter((m) => m.alive)];
 }
 
 /** The damage type of a skill's biggest chunk (what an effect looks like). */
@@ -446,7 +450,7 @@ export function fire(w: World, a: Actor, act: Action): void {
   // A skill that discharges the charges held (its damage grew with them) spends them once it has landed.
   if (a.isPlayer && act.profile.skill.consumeCharges)
     for (const kind of CHARGE_KINDS) {
-      const n = w.char.charges[kind];
+      const n = a.side!.char.charges[kind];
       if (n > 0) spendCharges(w, a.side!, kind, n);
     }
 }
@@ -496,7 +500,7 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
     return;
   }
   if (a.isPlayer && act.which !== 'deployed' && act.which !== 'default') {
-    const c = w.char.actives.find((x) => x.skill.id === act.profile.skill.id);
+    const c = a.side!.char.actives.find((x) => x.skill.id === act.profile.skill.id);
     if (c?.deploy) {
       placeDeployable(w, a, act);
       return;
@@ -555,7 +559,7 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
   // A slam that may spend a charge to hit harder over more ground.
   if (p.skill.chargedSlam && a.isPlayer && act.which !== 'channelled') {
     const cs = p.skill.chargedSlam;
-    if (w.char.charges[cs.charge] > 0 && w.rngTrig.chance(cs.chance / 100)) {
+    if (a.side!.char.charges[cs.charge] > 0 && w.rngTrig.chance(cs.chance / 100)) {
       spendCharges(w, a.side!, cs.charge, 1);
       const q = scaleProfile(p, 1 + cs.more / 100);
       fireEffect(w, a, {
@@ -738,9 +742,9 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
     });
     // A hook drags the character it catches.
     if (!a.isPlayer && p.skill.pull) {
-      const t = w.player;
+      const t = hunted(w, a);
       if (t.alive && segmentDist(t.x, t.y, a.x, a.y, x2, y2) <= (b.width * p.radiusMult) / 2 + t.r)
-        pullPlayer(w, a, p.skill.pull);
+        pullPlayer(w, t.side!, a, p.skill.pull);
     }
     for (const e of enemiesOf(w, a)) {
       if (segmentDist(e.x, e.y, a.x, a.y, x2, y2) > (b.width * p.radiusMult) / 2 + e.r) continue;
@@ -798,13 +802,13 @@ function explode(
   registerBlast(w, x, y, pr.explodeRadius);
   if (!owner) return;
   for (const e of w.actors) {
-    if (!e.alive || e.faction === pr.faction) continue;
+    if (!e.alive || e.team === pr.team) continue;
     if (Math.hypot(e.x - x, e.y - y) <= pr.explodeRadius + e.r)
       hit(w, owner, e, pr.profile, pr.hand, Math.hypot(e.x - pr.startX, e.y - pr.startY));
   }
   if (pr.kind === 'creep') leaveCreeping(w, owner, pr, x, y);
-  if (pr.faction === 1)
-    for (const e of w.player.side!.minions)
+  if (pr.team === 1)
+    for (const e of hunted(w, owner).side!.minions)
       if (e.alive && Math.hypot(e.x - x, e.y - y) <= pr.explodeRadius + e.r)
         hit(w, owner, e, pr.profile, pr.hand, Math.hypot(e.x - pr.startX, e.y - pr.startY));
 }
@@ -843,7 +847,7 @@ export function updateProjectiles(w: World, dt: number): void {
           pr.profile.skill.pulse ||
           pr.profile.skillDot?.spec.carried)
       )
-        projectileFx(w, pr, dt / steps);
+        projectileFx(w, owner.side!, pr, dt / steps);
       const aim = pr.aimId ? actorById(w, pr.aimId) : undefined;
       if (aim) pr.minDist = Math.min(pr.minDist, Math.hypot(aim.x - pr.x, aim.y - pr.y));
       if (!w.grid.isFloor(Math.floor(pr.x), Math.floor(pr.y))) {
@@ -906,12 +910,13 @@ export function updateProjectiles(w: World, dt: number): void {
         alive = false;
         break;
       }
-      // Monster projectiles stop at the player's minions as well.
+      // Monster projectiles stop at the minions of the character they hunt as well.
       const na = w.actors.length;
-      const nm = pr.faction === 1 ? w.player.side!.minions.length : 0;
+      const foes: readonly Actor[] = pr.team === MONSTERS ? hunted(w, pr).side!.minions : NO_ACTORS;
+      const nm = foes.length;
       for (let k = 0; k < na + nm; k++) {
-        const e = k < na ? w.actors[k] : w.player.side!.minions[k - na];
-        if (!e.alive || e.faction === pr.faction || pr.hitIds.includes(e.id)) continue;
+        const e = k < na ? w.actors[k] : foes[k - na];
+        if (!e.alive || e.team === pr.team || pr.hitIds.includes(e.id)) continue;
         // The payload of an Arrow Nova passes through everything on its way down.
         if (pr.kind === 'nova' || pr.kind === 'mortar' || pr.kind === 'orb') continue;
         const rr = e.r + pr.r;

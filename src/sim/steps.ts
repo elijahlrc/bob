@@ -8,6 +8,7 @@ import {
 } from '../data/steps';
 import { monsterHitOf } from './combat';
 import type { Actor, GroundEffect, World } from './types';
+import { hunted } from './side';
 
 /**
  * A monster's teleport (data/steps.ts): the spot where the character stands is marked on the ground, the monster holds still
@@ -47,7 +48,7 @@ function mark(
     shape: 'circle',
     damage: mult * hit,
     dtype: s.dtype,
-    faction: 1,
+    team: 1,
     label: s.name,
     owner: m.id,
   };
@@ -64,7 +65,7 @@ export function beginStep(w: World, m: Actor, id: StepId): boolean {
   if (winds.has(m) || m.action || m.stunT > 0 || m.phaseT > 0 || m.blinkT > 0 || m.dashT > 0) {
     return false;
   }
-  const p = w.player;
+  const p = hunted(w, m);
   const s = STEPS[id];
   const marks = [mark(w, m, p.x, p.y, s.radius, s.mult, id, true)];
   if (s.departs) marks.push(mark(w, m, m.x, m.y, s.departs.radius, s.departs.mult, id, false));
@@ -109,7 +110,7 @@ export function tickBlinking(w: World, m: Actor, dt: number): void {
   if (winds.has(m)) return;
   m.abT[SLOT] = (m.abT[SLOT] ?? w.rngAi.float(0.5, 3)) - dt;
   if (m.abT[SLOT] > 0) return;
-  const p = w.player;
+  const p = hunted(w, m);
   const d = Math.hypot(p.x - m.x, p.y - m.y);
   if (d < STEP_FROM || d > STEP_TO || !w.grid.los(m.x, m.y, p.x, p.y)) return;
   // Not now (it is in the middle of a blow, or stunned): ask again soon.

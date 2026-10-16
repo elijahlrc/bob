@@ -50,7 +50,7 @@ function play(ids: string[], o: { distance?: number; time?: number } = {}): Run 
     rarity: 'boss',
     fixed: true,
   });
-  const me = world.player.id;
+  const me = world.sides[0].player.id;
   const uses: Record<string, number> = {};
   const shots: Record<string, number> = {};
   while (world.status === 'running') {

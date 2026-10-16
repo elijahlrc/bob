@@ -28,13 +28,13 @@ function host(actors: Actor[]): FxHost {
 
 const world = (a: Actor): World =>
   ({
-    player: a,
     actors: [a],
     grid: { w: 20 },
     hexes: [],
-    char: { auras: [], utilities: [], actives: [] },
     sides: [
       {
+        player: a,
+        char: { auras: [], utilities: [], actives: [] },
         buffT: {},
         minions: [],
         zones: [],
@@ -253,7 +253,7 @@ describe('skill effects', () => {
       },
     } as never);
     const w = world(a);
-    (w.char as unknown as { actives: unknown[] }).actives = [{ skill, deploy: 'trap' }];
+    (w.sides[0].char as unknown as { actives: unknown[] }).actives = [{ skill, deploy: 'trap' }];
     const fx = new SkillFx(host([a, target]), scene);
     fx.onEvent({ t: 'use', src: 1, skill: 'jawsTrap' }, w);
     // Two effects that last the wind-up (the thing in the hand, the ring on the target) and draw until the throw.

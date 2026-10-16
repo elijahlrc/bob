@@ -103,7 +103,7 @@ export function measure(build0: Build, fight: Fight, o: MeasureOpts): Result {
         nextCorpse = world.t + 0.4;
       }
       for (const e of world.events) {
-        if (e.t === 'use' && e.src === world.player.id) {
+        if (e.t === 'use' && e.src === world.sides[0].player.id) {
           const nm = [...nameOf].find(([, id]) => id === e.skill);
           const r = row(e.skill, nm?.[0] ?? e.skill);
           if (e.via) r.simShots++;

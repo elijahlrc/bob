@@ -29,15 +29,15 @@ const totem = (w: World, key: string, x: number, y: number): Deployable => {
 describe('totem placement', () => {
   it('Cinder Bond stands its totems apart, in sight of the character, and its beams are there to draw', () => {
     const { world: w } = world(['cinderBond'], 5);
-    const c = w.char.actives.find((x) => x.skill.id === 'cinderBond')!;
+    const c = w.sides[0].char.actives.find((x) => x.skill.id === 'cinderBond')!;
     run(w, 6);
     const mine = w.sides[0].deployables.filter((d) => d.key === c.key);
     expect(mine.length).toBeGreaterThan(1);
     for (const d of mine) {
-      expect(Math.hypot(d.x - w.player.x, d.y - w.player.y)).toBeLessThanOrEqual(
+      expect(Math.hypot(d.x - w.sides[0].player.x, d.y - w.sides[0].player.y)).toBeLessThanOrEqual(
         c.skill.bond!.range,
       );
-      expect(w.grid.los(d.x, d.y, w.player.x, w.player.y)).toBe(true);
+      expect(w.grid.los(d.x, d.y, w.sides[0].player.x, w.sides[0].player.y)).toBe(true);
     }
     for (let i = 0; i < mine.length; i++)
       for (let j = i + 1; j < mine.length; j++)
@@ -61,27 +61,28 @@ describe('totem placement', () => {
 describe('a set of deployables that is full', () => {
   it('counts only what stands near the character: a set left behind in an old room does not stop a new one', () => {
     const { world: w } = world(['cinderBond'], 5);
-    const c = w.char.actives.find((x) => x.skill.id === 'cinderBond')!;
-    const prof = w.char.profile(c, w.char.configConds);
+    const c = w.sides[0].char.actives.find((x) => x.skill.id === 'cinderBond')!;
+    const prof = w.sides[0].char.profile(c, w.sides[0].char.configConds);
     w.sides[0].deployables.length = 0;
     const n = prof.deployCount;
-    for (let i = 0; i < n; i++) totem(w, c.key, w.player.x + 3, w.player.y + i);
-    expect(deployFull(w, w.sides[0], c, prof)).toBe(true);
-    for (const d of w.sides[0].deployables) d.x = w.player.x + DEPLOY_NEAR + 5;
-    expect(deployFull(w, w.sides[0], c, prof)).toBe(false);
+    for (let i = 0; i < n; i++) totem(w, c.key, w.sides[0].player.x + 3, w.sides[0].player.y + i);
+    expect(deployFull(w.sides[0], c, prof)).toBe(true);
+    for (const d of w.sides[0].deployables) d.x = w.sides[0].player.x + DEPLOY_NEAR + 5;
+    expect(deployFull(w.sides[0], c, prof)).toBe(false);
   });
 
   it('when a new totem goes down on a full set, the one furthest from the character gives way', () => {
     const { world: w } = world(['cinderBond'], 5);
-    const c = w.char.actives.find((x) => x.skill.id === 'cinderBond')!;
-    const prof = w.char.profile(c, w.char.configConds);
+    const c = w.sides[0].char.actives.find((x) => x.skill.id === 'cinderBond')!;
+    const prof = w.sides[0].char.profile(c, w.sides[0].char.configConds);
     w.sides[0].deployables.length = 0;
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const n = prof.deployCount;
-    const far = totem(w, c.key, w.player.x + 30, w.player.y);
-    for (let i = 1; i < n; i++) totem(w, c.key, w.player.x + 2 + i, w.player.y + 2);
+    const far = totem(w, c.key, w.sides[0].player.x + 30, w.sides[0].player.y);
+    for (let i = 1; i < n; i++)
+      totem(w, c.key, w.sides[0].player.x + 2 + i, w.sides[0].player.y + 2);
     // The AI is held still above, so cast through the controller's own path.
-    w.player.stunT = 0;
+    w.sides[0].player.stunT = 0;
     run(w, 5, () => !w.sides[0].deployables.includes(far));
     expect(w.sides[0].deployables.includes(far)).toBe(false);
   });
@@ -93,8 +94,8 @@ describe('a set of deployables that is full', () => {
       stepWorld(w);
       for (const e of w.events) if (e.t === 'use') uses[e.skill] = (uses[e.skill] ?? 0) + 1;
     }
-    const c = w.char.actives.find((x) => x.skill.id === 'cinderBond')!;
-    const cap = w.char.profile(c, w.char.configConds).deployCount;
+    const c = w.sides[0].char.actives.find((x) => x.skill.id === 'cinderBond')!;
+    const cap = w.sides[0].char.profile(c, w.sides[0].char.configConds).deployCount;
     // Never more totems than the set allows, and the weapon attack is used meanwhile.
     expect(w.sides[0].deployables.filter((d) => d.key === c.key).length).toBeLessThanOrEqual(cap);
     expect(uses.defaultAttack ?? 0).toBeGreaterThan(0);

@@ -19,7 +19,7 @@ for (const cls of CLASSES.filter((c) => !only || c.id === only)) {
       const res = runMap(plan, run.build, run.xp, worldOptsFor(run, plan), undefined, (w) => {
         for (const e of w.events) {
           if (e.t === 'hit' || e.t === 'miss')
-            recent.push({ t: w.t, k: e.t, mine: e.src === w.player.id });
+            recent.push({ t: w.t, k: e.t, mine: e.src === w.sides[0].player.id });
           if (e.t === 'stall') {
             total++;
             const a = w.actors.find((x) => x.id === e.id)!;
@@ -27,8 +27,8 @@ for (const cls of CLASSES.filter((c) => !only || c.id === only)) {
             console.log(
               `STALL ${cls.id} run${r} map${run.map} lvl${run.build.level} t=${w.t.toFixed(0)} ` +
                 `${a.name}[${a.rarity}/${a.state}] mods=${a.modIds.join(',') || '-'} life=${a.life.toFixed(0)}/${a.def.maxLife.toFixed(0)} ` +
-                `eva=${a.def.evasion.toFixed(0)} arm=${a.def.armour.toFixed(0)} dist=${Math.hypot(a.x - w.player.x, a.y - w.player.y).toFixed(1)} ` +
-                `los=${w.grid.los(w.player.x, w.player.y, a.x, a.y)} action=${w.player.action?.which ?? '-'} ` +
+                `eva=${a.def.evasion.toFixed(0)} arm=${a.def.armour.toFixed(0)} dist=${Math.hypot(a.x - w.sides[0].player.x, a.y - w.sides[0].player.y).toFixed(1)} ` +
+                `los=${w.grid.los(w.sides[0].player.x, w.sides[0].player.y, a.x, a.y)} action=${w.sides[0].player.action?.which ?? '-'} ` +
                 `hits=${win.filter((x) => x.k === 'hit').length} misses=${win.filter((x) => x.k === 'miss').length} ` +
                 `stunned=${a.stunT.toFixed(1)} frozen=${a.ail.freezeT.toFixed(1)} dummy=${a.dummy}`,
             );

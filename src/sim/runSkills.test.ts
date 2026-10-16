@@ -43,7 +43,7 @@ function neighbour(w: World, x: number, y: number): Actor {
 
 /** The first use of the skill: how it moved, whether it blinked, and when the target was first hurt. */
 function firstUse(w: World, dummy: Actor, seconds = 1.5) {
-  const x0 = w.player.x;
+  const x0 = w.sides[0].player.x;
   const target0 = dummy.x;
   let lastX = x0;
   let moved = 0;
@@ -54,16 +54,16 @@ function firstUse(w: World, dummy: Actor, seconds = 1.5) {
   for (let i = 0; i < 60 * seconds; i++) {
     stepWorld(w);
     blinks += w.events.filter((e) => e.t === 'blink').length;
-    const dx = Math.abs(w.player.x - lastX);
+    const dx = Math.abs(w.sides[0].player.x - lastX);
     if (dx > 1e-6) moved++;
     maxStep = Math.max(maxStep, dx);
-    lastX = w.player.x;
+    lastX = w.sides[0].player.x;
     if (hurtAt < 0 && dummy.life < 1e9 - 1e-6) {
       hurtAt = i / 60;
-      gapAtHit = target0 - w.player.x;
+      gapAtHit = target0 - w.sides[0].player.x;
     }
   }
-  return { travelled: w.player.x - x0, moved, maxStep, blinks, hurtAt, gapAtHit };
+  return { travelled: w.sides[0].player.x - x0, moved, maxStep, blinks, hurtAt, gapAtHit };
 }
 
 describe.each(['skyfallLeap', 'bulwarkRush', 'blessedTrail', 'snagLash'])(
@@ -86,7 +86,7 @@ describe.each(['skyfallLeap', 'bulwarkRush', 'blessedTrail', 'snagLash'])(
 describe('Bulwark Rush', () => {
   it('hits what it runs into on the way, once, and the target when it arrives', () => {
     const { w, dummy } = arena('bulwarkRush', 9, true);
-    const mid = neighbour(w, w.player.x + 4, w.player.y + 0.2);
+    const mid = neighbour(w, w.sides[0].player.x + 4, w.sides[0].player.y + 0.2);
     let hitsOnWay = 0;
     let last = mid.life;
     for (let i = 0; i < 60 * 0.45; i++) {
@@ -103,7 +103,7 @@ describe('Bulwark Rush', () => {
 describe('Whirlwind Cleave', () => {
   it('is a spin on the spot: several hits in a use, and one storm of blades', () => {
     const { w, dummy } = arena('whirlwindCleave', 1.6);
-    const pulses = w.char.profile(w.primary, 0).pulses;
+    const pulses = w.sides[0].char.profile(w.sides[0].primary, 0).pulses;
     expect(pulses).toBeGreaterThan(1);
     let hitSteps = 0;
     let last = dummy.life;
@@ -111,7 +111,7 @@ describe('Whirlwind Cleave', () => {
     let uses = 0;
     for (let i = 0; i < 60 * 0.95; i++) {
       stepWorld(w);
-      uses += w.events.filter((e) => e.t === 'use' && e.src === w.player.id).length;
+      uses += w.events.filter((e) => e.t === 'use' && e.src === w.sides[0].player.id).length;
       storms = Math.max(storms, w.sides[0].fields.filter((f) => f.kind === 'bladestorm').length);
       if (dummy.life < last - 1e-6) hitSteps++;
       last = dummy.life;

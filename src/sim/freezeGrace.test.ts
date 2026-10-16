@@ -30,22 +30,22 @@ const run = (w: World, seconds: number) => {
 describe('a freeze on the character is followed by a recovery', () => {
   it('is not lengthened while it lasts', () => {
     const w = arena();
-    expect(afflictPlayer(w, 'freeze', 0, 1)).toBe(true);
+    expect(afflictPlayer(w, w.sides[0], 'freeze', 0, 1)).toBe(true);
     run(w, 0.5);
-    const left = w.player.ail.freezeT;
-    expect(afflictPlayer(w, 'freeze', 0, 3)).toBe(false);
-    expect(w.player.ail.freezeT).toBe(left);
+    const left = w.sides[0].player.ail.freezeT;
+    expect(afflictPlayer(w, w.sides[0], 'freeze', 0, 3)).toBe(false);
+    expect(w.sides[0].player.ail.freezeT).toBe(left);
   });
 
   it('cannot be frozen again for a second after it ends, and then can', () => {
     const w = arena();
-    afflictPlayer(w, 'freeze', 0, 1);
+    afflictPlayer(w, w.sides[0], 'freeze', 0, 1);
     run(w, 1.1);
-    expect(w.player.ail.freezeT).toBeLessThanOrEqual(0);
-    expect(afflictPlayer(w, 'freeze', 0, 1)).toBe(false);
+    expect(w.sides[0].player.ail.freezeT).toBeLessThanOrEqual(0);
+    expect(afflictPlayer(w, w.sides[0], 'freeze', 0, 1)).toBe(false);
     run(w, FREEZE_GRACE * 0.8);
-    expect(afflictPlayer(w, 'freeze', 0, 1)).toBe(false);
+    expect(afflictPlayer(w, w.sides[0], 'freeze', 0, 1)).toBe(false);
     run(w, FREEZE_GRACE * 0.4);
-    expect(afflictPlayer(w, 'freeze', 0, 1)).toBe(true);
+    expect(afflictPlayer(w, w.sides[0], 'freeze', 0, 1)).toBe(true);
   });
 });

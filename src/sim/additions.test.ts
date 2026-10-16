@@ -22,7 +22,7 @@ function arena(): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
@@ -43,7 +43,7 @@ function put(
     mods: [],
     ...over,
   };
-  const m = spawnMonster(w, spec, w.player.x + dx, w.player.y + dy, 0, 0, type);
+  const m = spawnMonster(w, spec, w.sides[0].player.x + dx, w.sides[0].player.y + dy, 0, 0, type);
   m.state = 'chase';
   return m;
 }
@@ -81,14 +81,14 @@ describe('the additions to the factions (docs/ROSTER.md 7.1)', () => {
   it("a Bone Crawler's grip slows the character", () => {
     const w = arena();
     const c = put(w, 'crawler', 1.2);
-    expect(w.player.ail.chill).toBe(0);
-    hit(w, c, w.player, c.mon!.profile(0), 0, 1);
-    expect(w.player.ail.chill).toBeGreaterThan(0);
+    expect(w.sides[0].player.ail.chill).toBe(0);
+    hit(w, c, w.sides[0].player, c.mon!.profile(0), 0, 1);
+    expect(w.sides[0].player.ail.chill).toBeGreaterThan(0);
     // A warrior's blow does not.
     const w2 = arena();
     const warrior = put(w2, 'warrior', 1.2);
-    hit(w2, warrior, w2.player, warrior.mon!.profile(0), 0, 1);
-    expect(w2.player.ail.chill).toBe(0);
+    hit(w2, warrior, w2.sides[0].player, warrior.mon!.profile(0), 0, 1);
+    expect(w2.sides[0].player.ail.chill).toBe(0);
   });
 
   it('a Lurking Coffer lies still as a chest until the character comes close, then bites', () => {
@@ -100,8 +100,8 @@ describe('the additions to the factions (docs/ROSTER.md 7.1)', () => {
     c.state = 'idle';
     run(w, 2);
     expect(c.state).toBe('idle');
-    c.x = w.player.x + 3;
-    c.y = w.player.y;
+    c.x = w.sides[0].player.x + 3;
+    c.y = w.sides[0].player.y;
     run(w, 0.3);
     expect(c.state).toBe('chase');
   });
@@ -160,7 +160,7 @@ describe('the additions to the factions (docs/ROSTER.md 7.1)', () => {
     let hexed = false;
     for (let i = 0; i < 12 * 60; i++) {
       stepWorld(w);
-      if (w.player.hexes.length > 0) hexed = true;
+      if (w.sides[0].player.hexes.length > 0) hexed = true;
     }
     expect(hexed).toBe(true);
   });

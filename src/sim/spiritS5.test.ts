@@ -30,8 +30,8 @@ function record(w: World, target: Actor, seconds: number, skill: string) {
   for (let i = 0; i < seconds * 60; i++) {
     stepWorld(w);
     for (const e of w.events) {
-      if (e.t === 'use' && e.src === w.player.id && e.skill === skill) uses++;
-      if (e.t === 'hit' && e.src === w.player.id && e.dst === target.id)
+      if (e.t === 'use' && e.src === w.sides[0].player.id && e.skill === skill) uses++;
+      if (e.t === 'hit' && e.src === w.sides[0].player.id && e.dst === target.id)
         hits.push({ use: uses, amount: e.amount });
     }
   }
@@ -67,8 +67,8 @@ describe('Flameblast (furnaceRoar): stages, then one blast', () => {
     const other = spawnMonster(
       world,
       { type: 'warrior', variant: 'none', rarity: 'normal', level: 1, mods: [] },
-      world.player.x + 1,
-      world.player.y,
+      world.sides[0].player.x + 1,
+      world.sides[0].player.y,
       0,
       0,
       'Other',
@@ -159,7 +159,7 @@ describe('Scourge Arrow (blightHail): hold to charge, let go for one arrow', () 
     for (let i = 0; i < 8 * 60; i++) {
       stepWorld(world);
       for (const e of world.events) {
-        if (e.t === 'use' && e.src === world.player.id) uses++;
+        if (e.t === 'use' && e.src === world.sides[0].player.id) uses++;
         if (e.t === 'projectileSpawned') {
           spawned++;
           if (spawned === 1) firstSpawnUse = uses;
@@ -183,8 +183,8 @@ describe('Reave (sweepingCut): the area grows with every use that hits', () => {
     const far = spawnMonster(
       world,
       { type: 'warrior', variant: 'none', rarity: 'normal', level: 1, mods: [] },
-      world.player.x + 3.4,
-      world.player.y - 0.6,
+      world.sides[0].player.x + 3.4,
+      world.sides[0].player.y - 0.6,
       0,
       0,
       'Far',
@@ -196,7 +196,7 @@ describe('Reave (sweepingCut): the area grows with every use that hits', () => {
     for (let i = 0; i < 12 * 60 && firstFarHit === 0; i++) {
       stepWorld(world);
       for (const e of world.events) {
-        if (e.t === 'use' && e.src === world.player.id) uses++;
+        if (e.t === 'use' && e.src === world.sides[0].player.id) uses++;
         if (e.t === 'hit' && e.dst === far.id && firstFarHit === 0) firstFarHit = uses;
       }
     }
@@ -229,15 +229,15 @@ describe('Cyclone (twisterBlade): the first spin hits for half, and a stun canno
     const b = holding('sword_3', ['twisterBlade'], 'strider');
     const { world, dummy } = createDummyWorld(b, { distance: 7, maxTime: 60 });
     world.sides[0].opts.freeResources = true;
-    const start = Math.hypot(world.player.x - dummy.x, world.player.y - dummy.y);
+    const start = Math.hypot(world.sides[0].player.x - dummy.x, world.sides[0].player.y - dummy.y);
     let dist = start;
     for (let i = 0; i < 90; i++) {
       stepWorld(world);
-      dist = Math.hypot(world.player.x - dummy.x, world.player.y - dummy.y);
+      dist = Math.hypot(world.sides[0].player.x - dummy.x, world.sides[0].player.y - dummy.y);
     }
     expect(dist).toBeLessThan(start - 3);
     // It moved no faster than the character walks.
-    expect(start - dist).toBeLessThan(world.player.def.moveSpeed * 1.5 + 0.5);
+    expect(start - dist).toBeLessThan(world.sides[0].player.def.moveSpeed * 1.5 + 0.5);
   });
 
   it('is worth its full hit on the sheet, not a cycle that keeps starting over', () => {

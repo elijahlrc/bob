@@ -49,7 +49,7 @@ function uses(w: World, seconds: number): Record<string, number> {
   while (w.t < end && w.status === 'running') {
     stepWorld(w);
     for (const e of w.events)
-      if (e.t === 'use' && e.src === w.player.id) out[e.skill] = (out[e.skill] ?? 0) + 1;
+      if (e.t === 'use' && e.src === w.sides[0].player.id) out[e.skill] = (out[e.skill] ?? 0) + 1;
   }
   return out;
 }
@@ -63,7 +63,15 @@ function put(w: World, dx: number, dy: number, over: Partial<MonsterSpec> = {}) 
     mods: [],
     ...over,
   };
-  const m = spawnMonster(w, spec, w.player.x + dx, w.player.y + dy, 0, 0, 'warrior');
+  const m = spawnMonster(
+    w,
+    spec,
+    w.sides[0].player.x + dx,
+    w.sides[0].player.y + dy,
+    0,
+    0,
+    'warrior',
+  );
   m.state = 'chase';
   return m;
 }
@@ -159,10 +167,11 @@ describe('the strategy: roles and order', () => {
     const out: Record<string, number> = {};
     // Mana held between the two costs: the periodic skill could be paid for, the main one not.
     for (let i = 0; i < 60 * 10; i++) {
-      world.player.mana = (mainCost + boltCost) / 2;
+      world.sides[0].player.mana = (mainCost + boltCost) / 2;
       stepWorld(world);
       for (const e of world.events)
-        if (e.t === 'use' && e.src === world.player.id) out[e.skill] = (out[e.skill] ?? 0) + 1;
+        if (e.t === 'use' && e.src === world.sides[0].player.id)
+          out[e.skill] = (out[e.skill] ?? 0) + 1;
     }
     expect(out.flameBolt ?? 0).toBe(0);
     expect(out.defaultAttack).toBeGreaterThan(3);
@@ -199,7 +208,7 @@ describe('the strategy: conditions', () => {
     // The dummy arena keeps life full: life is set by hand here.
     world.sides[0].opts.freeResources = false;
     expect(uses(world, 5).ironHide ?? 0).toBe(0);
-    world.player.life = world.player.def.maxLife * 0.3;
+    world.sides[0].player.life = world.sides[0].player.def.maxLife * 0.3;
     expect(uses(world, 1).ironHide).toBe(1);
   });
 });
@@ -267,7 +276,8 @@ describe('the strategy: target and spacing', () => {
 });
 
 describe('the escape role', () => {
-  const dist = (w: World, x: number, y: number) => Math.hypot(w.player.x - x, w.player.y - y);
+  const dist = (w: World, x: number, y: number) =>
+    Math.hypot(w.sides[0].player.x - x, w.sides[0].player.y - y);
 
   it('is offered to blinks and runs, not to damage skills', async () => {
     const { rolesFor } = await import('../calc/strategy');
@@ -291,7 +301,7 @@ describe('the escape role', () => {
     const { world, dummy } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
     world.sides[0].opts.freeResources = false;
     world.sides[0].opts.godMode = true;
-    world.player.life = world.player.def.maxLife * 0.5;
+    world.sides[0].player.life = world.sides[0].player.def.maxLife * 0.5;
     const before = dist(world, dummy.x, dummy.y);
     let blinked = false;
     for (let i = 0; i < 300 && !blinked; i++) {
@@ -335,7 +345,7 @@ describe('the escape role', () => {
     const low = createDummyWorld(b, { distance: 1.6, maxTime: 60 }).world;
     low.sides[0].opts.freeResources = false;
     low.sides[0].opts.godMode = true;
-    low.player.life = low.player.def.maxLife * 0.1;
+    low.sides[0].player.life = low.sides[0].player.def.maxLife * 0.1;
     expect(uses(low, 5).cinderStep ?? 0).toBe(0);
 
     const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
@@ -355,7 +365,7 @@ describe('the escape role', () => {
     const a = createDummyWorld(none, { distance: 1.6, maxTime: 60 }).world;
     a.sides[0].opts.freeResources = false;
     a.sides[0].opts.godMode = true;
-    a.player.life = a.player.def.maxLife * 0.05;
+    a.sides[0].player.life = a.sides[0].player.def.maxLife * 0.05;
     expect(uses(a, 5).cinderStep ?? 0).toBe(0);
 
     const late = withStrategy(build(['crushingBlow', 'cinderStep']), {
@@ -364,9 +374,9 @@ describe('the escape role', () => {
     const w = createDummyWorld(late, { distance: 1.6, maxTime: 60 }).world;
     w.sides[0].opts.freeResources = false;
     w.sides[0].opts.godMode = true;
-    w.player.life = w.player.def.maxLife * 0.2;
+    w.sides[0].player.life = w.sides[0].player.def.maxLife * 0.2;
     expect(uses(w, 5).cinderStep ?? 0).toBe(0);
-    w.player.life = w.player.def.maxLife * 0.05;
+    w.sides[0].player.life = w.sides[0].player.def.maxLife * 0.05;
     expect(uses(w, 5).cinderStep ?? 0).toBeGreaterThan(0);
   });
 
@@ -377,9 +387,9 @@ describe('the escape role', () => {
     const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });
     world.sides[0].opts.freeResources = false;
     world.sides[0].opts.godMode = true;
-    world.player.life = world.player.def.maxLife * 0.5;
+    world.sides[0].player.life = world.sides[0].player.def.maxLife * 0.5;
     expect(uses(world, 5).slipstream ?? 0).toBe(0);
-    world.player.life = world.player.def.maxLife * 0.25;
+    world.sides[0].player.life = world.sides[0].player.def.maxLife * 0.25;
     expect(uses(world, 5).slipstream ?? 0).toBeGreaterThan(0);
   });
 });

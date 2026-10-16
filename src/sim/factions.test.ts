@@ -33,7 +33,7 @@ function arena(): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
 }
@@ -48,7 +48,15 @@ const spec = (type: MonsterTypeId, over: Partial<MonsterSpec> = {}): MonsterSpec
 });
 
 function put(w: World, type: MonsterTypeId, dx: number, dy = 0, over: Partial<MonsterSpec> = {}) {
-  const m = spawnMonster(w, spec(type, over), w.player.x + dx, w.player.y + dy, 0, 0, type);
+  const m = spawnMonster(
+    w,
+    spec(type, over),
+    w.sides[0].player.x + dx,
+    w.sides[0].player.y + dy,
+    0,
+    0,
+    type,
+  );
   m.state = 'chase';
   return m;
 }
@@ -154,7 +162,7 @@ describe('the factions (EXPANSION 7.3)', () => {
     for (let k = 0; k < 60; k++) {
       stepWorld(w);
       pulses += w.events.filter(
-        (e) => e.t === 'hit' && e.dst === w.player.id && e.dtype === 4,
+        (e) => e.t === 'hit' && e.dst === w.sides[0].player.id && e.dtype === 4,
       ).length;
     }
     expect(pulses).toBeGreaterThanOrEqual(3);
@@ -216,13 +224,15 @@ describe('the factions (EXPANSION 7.3)', () => {
         }
     }
     expect(events).toEqual(['start', 'land']);
-    expect(Math.hypot(landed!.x - w.player.x, landed!.y - w.player.y)).toBeLessThan(2);
+    expect(
+      Math.hypot(landed!.x - w.sides[0].player.x, landed!.y - w.sides[0].player.y),
+    ).toBeLessThan(2);
   });
 
   it('a Mana Wisp drains mana on hit and in its death nova', () => {
     const w = arena();
-    w.player.stunT = 0;
-    const p = w.player;
+    w.sides[0].player.stunT = 0;
+    const p = w.sides[0].player;
     p.def.maxMana = 100;
     p.mana = 100;
     const m = put(w, 'wisp', 1);
@@ -298,7 +308,7 @@ describe('the factions (EXPANSION 7.3)', () => {
     expect(m.life).toBe(before);
     run(w, 2.2);
     expect(m.phaseT).toBeLessThanOrEqual(0);
-    expect(Math.hypot(m.x - w.player.x, m.y - w.player.y)).toBeLessThan(2.5);
+    expect(Math.hypot(m.x - w.sides[0].player.x, m.y - w.sides[0].player.y)).toBeLessThan(2.5);
     applyDamage(w, m, [10, 0, 0, 0, 0]);
     expect(m.life).toBeLessThan(before);
   });

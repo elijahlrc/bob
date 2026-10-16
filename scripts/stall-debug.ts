@@ -62,14 +62,14 @@ while (run.phase === 'camp' && run.map <= 40 && !done) {
           });
       }
       if (w.t >= stallT - 6 && w.t < stallT - 5.4 && w.tick % 6 === 0) {
-        const p = w.player;
+        const p = w.sides[0].player;
         const t = w.actors.find((a) => a.id === stallId)!;
-        const prof = w.char.profile(w.primary);
+        const prof = w.sides[0].char.profile(w.sides[0].primary);
         console.log(
           `t=${w.t.toFixed(2)} mode=${w.sides[0].ai.mode} p=(${p.x.toFixed(2)},${p.y.toFixed(2)}) moving=${p.moving} act=${p.action?.which ?? '-'} ` +
             `stun=${p.stunT.toFixed(2)} frz=${p.ail.freezeT.toFixed(2)} | tgt=${t.name} (${t.x.toFixed(2)},${t.y.toFixed(2)}) ` +
             `d=${Math.hypot(t.x - p.x, t.y - p.y).toFixed(2)} state=${t.state} tact=${t.action?.which ?? '-'} reach=${(skillRange(prof) + t.r).toFixed(2)} ` +
-            `usable=${w.primary.usable} mana=${p.mana.toFixed(0)}/${prof.cost.toFixed(0)} proj=${w.projectiles.length} id=${w.sides[0].ai.targetId}`,
+            `usable=${w.sides[0].primary.usable} mana=${p.mana.toFixed(0)}/${prof.cost.toFixed(0)} proj=${w.projectiles.length} id=${w.sides[0].ai.targetId}`,
         );
       }
     });

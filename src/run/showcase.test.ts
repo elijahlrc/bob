@@ -29,6 +29,6 @@ describe('showcase mode', () => {
     const c = new Controller(null);
     c.startShowcase(false);
     for (let i = 0; i < 300; i++) c.bus.emit('frame', { dtMs: 100 });
-    expect(c.world?.player.alive ?? true).toBe(true);
+    expect(c.world?.sides[0].player.alive ?? true).toBe(true);
   });
 });

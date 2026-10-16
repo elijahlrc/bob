@@ -43,7 +43,7 @@ const run = (w: World, seconds: number) => {
 
 const profile = (gems: string[], main: string, cls: string, conds = 0) => {
   const { world: w } = world(gems, 3, main, cls);
-  return w.char.profile(w.primary, conds);
+  return w.sides[0].char.profile(w.sides[0].primary, conds);
 };
 
 const maxHit = (p: ReturnType<typeof profile>) => p.hands[0].chunks.reduce((s, c) => s + c.max, 0);
@@ -60,10 +60,10 @@ describe('strength and weapons (firmHold, steelResolve, knifeRange, veilCut, sha
 
   it('a support that limits the weapon makes the skill unusable with another', () => {
     const { world: ok } = world(['crushingBlow', 'knifeRange'], 3, 'sword_3', STR);
-    expect(ok.char.primary.usable).toBe(true);
+    expect(ok.sides[0].char.primary.usable).toBe(true);
     const { world: bad } = world(['crushingBlow', 'knifeRange'], 3, 'mace_3', STR);
-    expect(bad.char.warnings.some((x) => x.includes('limits'))).toBe(true);
-    expect(bad.char.primary.skill.id).not.toBe('crushingBlow');
+    expect(bad.sides[0].char.warnings.some((x) => x.includes('limits'))).toBe(true);
+    expect(bad.sides[0].char.primary.skill.id).not.toBe('crushingBlow');
   });
 
   it('Close Combat: more melee damage near, none at five tiles', () => {
@@ -98,7 +98,7 @@ describe('strength and weapons (firmHold, steelResolve, knifeRange, veilCut, sha
 
   it('Nightblade: a critical strike makes the character Elusive, which cannot be renewed while it lasts', () => {
     const { world: w } = world(['viperLash', 'veilCut'], 4, 'dagger_3', DEX);
-    expect(w.char.primary.usable).toBe(true);
+    expect(w.sides[0].char.primary.usable).toBe(true);
     let got = false;
     for (let i = 0; i < 30 * 60 && !got; i++) {
       stepWorld(w);
@@ -175,19 +175,19 @@ describe('Spell Cascade, Intensify, Unleash (flankingCast, swellingBlast, double
     const n = w.sides[0].intensity.suddenFrost ?? 0;
     expect(n).toBeGreaterThanOrEqual(2);
     expect(n).toBeLessThanOrEqual(4);
-    w.player.action = null;
-    w.player.moving = true;
+    w.sides[0].player.action = null;
+    w.sides[0].player.moving = true;
     for (let i = 0; i < 30; i++) tickSupports(w, w.sides[0], 1 / 60);
     const after = w.sides[0].intensity.suddenFrost ?? 0;
     expect(after).toBeLessThan(n);
-    w.player.moving = false;
+    w.sides[0].player.moving = false;
     for (let i = 0; i < 60; i++) tickSupports(w, w.sides[0], 1 / 60);
     expect(w.sides[0].intensity.suddenFrost ?? 0).toBe(after);
   });
 
   it('Unleash: seals gather while the spell rests, up to three, and the next cast spends them as repeats', () => {
     const { world: w } = world(['frostLance', 'doubleRelease'], 6, 'wand_3', INT);
-    w.player.action = null;
+    w.sides[0].player.action = null;
     for (let i = 0; i < 4 * 60; i++) tickSupports(w, w.sides[0], 1 / 60);
     const had = w.sides[0].seals.frostLance.n;
     expect(had).toBe(3);
@@ -199,17 +199,23 @@ describe('Spell Cascade, Intensify, Unleash (flankingCast, swellingBlast, double
 describe('Immolate, Combustion (kindle, tinderbox)', () => {
   it('Kindle adds fire damage only against burning enemies', () => {
     const { world: w, dummy } = world(['suddenFrost', 'kindle'], 3, 'wand_3', INT);
-    const cold = w.char.profile(w.primary, playerConds(w, dummy));
+    const cold = w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
     dummy.ail.ignites.push({ dps: 5, t: 5 });
-    const hot = w.char.profile(w.primary, playerConds(w, dummy));
+    const hot = w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
     const fire = (p: typeof cold) =>
       p.hands[0].chunks.filter((c) => c.type === 3).reduce((s, c) => s + c.max, 0);
     expect(fire(cold)).toBe(0);
     expect(fire(hot)).toBeGreaterThan(0);
     const k = world(['crushingBlow', 'kindle'], 1.4, 'sword_3', STR);
-    const k0 = k.world.char.profile(k.world.primary, playerConds(k.world, k.dummy));
+    const k0 = k.world.sides[0].char.profile(
+      k.world.sides[0].primary,
+      playerConds(k.world, k.world.sides[0], k.dummy),
+    );
     k.dummy.ail.ignites.push({ dps: 5, t: 5 });
-    const k1 = k.world.char.profile(k.world.primary, playerConds(k.world, k.dummy));
+    const k1 = k.world.sides[0].char.profile(
+      k.world.sides[0].primary,
+      playerConds(k.world, k.world.sides[0], k.dummy),
+    );
     expect(fire(k0)).toBe(0);
     expect(fire(k1)).toBeGreaterThan(0);
   });
@@ -235,12 +241,12 @@ describe('Energy Leech, Mirage Archer, Inspiration, Infused Channelling', () => 
     w.sides[0].opts.godMode = true;
     r0.dummy.def = dummyDefence({ maxLife: 1e9 });
     r0.dummy.life = 1e9;
-    expect(w.player.def.maxEs).toBeGreaterThan(200);
-    w.player.es = 0;
+    expect(w.sides[0].player.def.maxEs).toBeGreaterThan(200);
+    w.sides[0].player.es = 0;
     let max = 0;
     for (let i = 0; i < 6 * 60; i++) {
       stepWorld(w);
-      max = Math.max(max, w.player.es);
+      max = Math.max(max, w.sides[0].player.es);
     }
     expect(max).toBeGreaterThan(0);
   });
@@ -261,10 +267,10 @@ describe('Energy Leech, Mirage Archer, Inspiration, Infused Channelling', () => 
 
   it('Inspiration: the charges are all lost once the supported skills have spent too much mana', () => {
     const { world: w } = world(['suddenFrost', 'lightheart'], 4, 'wand_3', INT);
-    const p = w.char.profile(w.primary, 0);
+    const p = w.sides[0].char.profile(w.sides[0].primary, 0);
     expect(p.inspire).toBeGreaterThan(100);
     run(w, 3);
-    expect(w.char.charges.insight).toBeGreaterThan(0);
+    expect(w.sides[0].char.charges.insight).toBeGreaterThan(0);
     w.sides[0].inspireMana = p.inspire + 1;
     run(w, 2);
     // The counter reset when the next use came.
@@ -311,7 +317,7 @@ describe('Blasphemy and Meat Shield (standingCurse, wardingPack)', () => {
       'sword_3',
       STR,
     );
-    const near = neighbour(w, w.player.x + 2, w.player.y + 1);
+    const near = neighbour(w, w.sides[0].player.x + 2, w.sides[0].player.y + 1);
     run(w, 2);
     expect(near.hexes.length).toBeGreaterThan(0);
     void dummy;

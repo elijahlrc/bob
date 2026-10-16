@@ -26,18 +26,23 @@ function snapshot(c: Controller): Record<string, unknown> {
   if (w) {
     out.tick = w.tick;
     out.status = w.status;
-    out.player = { x: w.player.x, y: w.player.y, life: w.player.life, mana: w.player.mana };
-    out.action = w.player.action
+    out.player = {
+      x: w.sides[0].player.x,
+      y: w.sides[0].player.y,
+      life: w.sides[0].player.life,
+      mana: w.sides[0].player.mana,
+    };
+    out.action = w.sides[0].player.action
       ? {
-          which: w.player.action.which,
-          target: w.player.action.targetId,
-          t: w.player.action.elapsed,
+          which: w.sides[0].player.action.which,
+          target: w.sides[0].player.action.targetId,
+          t: w.sides[0].player.action.elapsed,
         }
       : null;
     out.projectiles = w.projectiles.length;
     out.actorsAlive = w.actors.filter((a) => a.alive).length;
-    const t = w.player.action
-      ? w.actors.find((a) => a.id === w.player.action!.targetId)
+    const t = w.sides[0].player.action
+      ? w.actors.find((a) => a.id === w.sides[0].player.action!.targetId)
       : undefined;
     if (t)
       out.target = {
@@ -158,12 +163,12 @@ export function installStallWatch(
         recent.push({
           t: w.t,
           kind: e.t,
-          mine: e.t !== 'hit' ? e.src === w.player.id : e.src === w.player.id,
-          theirs: e.dst === w.player.id,
+          mine: e.t !== 'hit' ? e.src === w.sides[0].player.id : e.src === w.sides[0].player.id,
+          theirs: e.dst === w.sides[0].player.id,
         });
-      if (e.t === 'projectileEnd' && e.owner === w.player.id)
+      if (e.t === 'projectileEnd' && e.owner === w.sides[0].player.id)
         arrows.push({ t: w.t, aim: e.aim, fate: e.fate, closest: e.closest, lastHit: e.lastHit });
-      if ((e.t === 'hit' || e.t === 'miss') && e.src === w.player.id) {
+      if ((e.t === 'hit' || e.t === 'miss') && e.src === w.sides[0].player.id) {
         const o = (onTarget[e.dst] ??= { hit: 0, miss: 0 });
         if (e.t === 'hit') o.hit++;
         else o.miss++;
@@ -189,8 +194,8 @@ export function installStallWatch(
                 armour: a.def.armour,
                 x: a.x,
                 y: a.y,
-                dist: Math.hypot(a.x - w.player.x, a.y - w.player.y),
-                los: w.grid.los(w.player.x, w.player.y, a.x, a.y),
+                dist: Math.hypot(a.x - w.sides[0].player.x, a.y - w.sides[0].player.y),
+                los: w.grid.los(w.sides[0].player.x, w.sides[0].player.y, a.x, a.y),
               },
               last25s: {
                 playerHits: count('hit', (r) => r.mine),
@@ -222,8 +227,8 @@ export function installStallWatch(
               })(),
               hitsAndMissesOnTarget: onTarget[e.id],
               targetSpeedHint: a && { moving: a.moving, action: a.action?.which ?? null },
-              projectileCountPerUse: w.player.action?.profile.hands.length,
-              skill: w.primary.gemUid,
+              projectileCountPerUse: w.sides[0].player.action?.profile.hands.length,
+              skill: w.sides[0].primary.gemUid,
               time: w.t,
             },
           },

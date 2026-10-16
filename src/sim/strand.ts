@@ -12,7 +12,7 @@ export const STRAND_GRACE = 1.5;
  */
 export function tickStranded(w: World, dt: number): void {
   for (const a of w.actors) {
-    if (a.isPlayer || !a.alive || a.faction === 0) continue;
+    if (a.isPlayer || !a.alive || a.team === 0) continue;
     const hovers = a.flies || a.phases;
     const out = a.x < 0 || a.y < 0 || a.x >= w.grid.w || a.y >= w.grid.h;
     if (hovers ? !out : w.grid.reachable(a.x, a.y)) {

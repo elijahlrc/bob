@@ -39,7 +39,7 @@ export function killerTracker(): { tick: (w: World) => void; get: () => KillerIn
   return {
     tick(w) {
       for (const e of w.events) {
-        if (e.t !== 'hit' || e.dst !== w.player.id) continue;
+        if (e.t !== 'hit' || e.dst !== w.sides[0].player.id) continue;
         const a = w.actors.find((x) => x.id === e.src);
         if (!a?.mon) continue;
         killer = {

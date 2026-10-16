@@ -65,7 +65,7 @@ export function blinkGroupBusy(w: World, s: Side, c: SkillChoice): boolean {
 }
 
 export function noteBlinkUsed(w: World, s: Side, c: SkillChoice): void {
-  s.utilityReady[GROUP + c.key] = w.t + (c.skill.cooldown ? cooldownSeconds(w, c) : 0);
+  s.utilityReady[GROUP + c.key] = w.t + (c.skill.cooldown ? cooldownSeconds(s, c) : 0);
 }
 
 /** The enemies near a point. */
@@ -116,7 +116,7 @@ export function blinkCast(
     return;
   }
   // An escape skill (the Strategy tab) takes the character away from the enemies, with the skill's own effects at both ends.
-  const away = w.char.rotation.some((e) => e.choice === c && e.role === 'escape');
+  const away = a.side!.char.rotation.some((e) => e.choice === c && e.role === 'escape');
   // A blink that prefers a corpse goes to the one with the most enemies about it, if there is one within reach.
   let corpse: Corpse | null = null;
   if (u.corpse && !away) {
@@ -257,10 +257,10 @@ function arrive(
   w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true });
   if (u.burst === 'arrive' || u.burst === 'both' || u.warp) burstAt(w, a, p, x, y, u);
   if (u.clone)
-    cloneOfPlayer(w, summonAt(w, a.side!, c, p, u.clone.minion, u.clone.seconds, fx, fy), 75);
+    cloneOfPlayer(summonAt(w, a.side!, c, p, u.clone.minion, u.clone.seconds, fx, fy), 75);
   if (u.elusive) {
     // Elusive is renewed in full, and enemies that come near are withered until the character does something else.
-    a.side!.buffT.elusive = Math.max(0, 5 * w.char.db.mult('buffDuration'));
+    a.side!.buffT.elusive = Math.max(0, 5 * a.side!.char.db.mult('buffDuration'));
     w.events.push({ t: 'buff', id: 'elusive' });
     a.side!.wither = {
       skill: c.skill.id,
@@ -344,8 +344,8 @@ export function tickWarp(w: World, side: Side, dt: number): void {
   s.t -= dt;
   if (s.t > 0) return;
   side.warp = null;
-  const a = w.player;
-  const c = w.char.utilities.find((x) => x.key === s.key);
+  const a = side.player;
+  const c = side.char.utilities.find((x) => x.key === s.key);
   const u = c && blinkOf(c)?.u;
   if (!a.alive || !c || !u) return;
   arrive(w, a, s.profile, c, u, s.toX, s.toY);
@@ -359,7 +359,7 @@ export function tickWither(w: World, side: Side): void {
     side.wither = null;
     return;
   }
-  const p = w.player;
+  const p = side.player;
   for (const e of enemiesAt(w, p.x, p.y, s.radius)) {
     if (s.seen.includes(e.id)) continue;
     s.seen.push(e.id);
@@ -371,10 +371,10 @@ export function tickWither(w: World, side: Side): void {
  * Whether the character is running: Withering Step or Phase Run was used and its effect, which the first skill used would end, is
  * still on. The character then runs on along its way, past the enemies, and makes no attack until it is over.
  */
-export function running(w: World, s: Side): boolean {
+export function running(s: Side): boolean {
   if (s.wither?.run && s.buffT.elusive > 0) return true;
   if (s.buffT.phaseRun <= 0) return false;
-  for (const c of w.char.utilities) {
+  for (const c of s.char.utilities) {
     const u = c.skill.utility;
     if (u?.kind === 'buff' && u.second && s.buffT[u.buff] > 0 && s.buffT[u.second.buff] > 0)
       return true;

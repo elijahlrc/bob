@@ -59,9 +59,9 @@ export function utilityPick(
   e: RotationEntry<SkillChoice>,
   target: Actor,
 ): UtilityPick | null {
-  const ch = w.char;
+  const ch = s.char;
   const c = e.choice;
-  const p = w.player;
+  const p = s.player;
   if ((s.utilityReady[c.key] ?? 0) > w.t) return null;
   const u = c.skill.utility!;
   // The warcries wait on one another (3.9: a shared four seconds).
@@ -69,12 +69,12 @@ export function utilityPick(
   // The guard skills wait on one another (3.9).
   if (u.kind === 'buff' && u.policy === 'guard' && (s.utilityReady[GUARDS] ?? 0) > w.t) return null;
   const d = Math.hypot(target.x - p.x, target.y - p.y);
-  const prof = ch.profile(c, playerConds(w, target), flaskMask(s));
-  if (!canPay(w, c.costsLife, prof.cost)) return null;
+  const prof = ch.profile(c, playerConds(w, s, target), flaskMask(s));
+  if (!canPay(s, c.costsLife, prof.cost)) return null;
   if (e.role === 'auto') return autoPick(w, s, c, prof, target, d);
   if (e.role === 'opener' && !openerDue(s, c.key, target)) return null;
   if (e.role === 'emergency' && p.life >= p.def.maxLife * e.life) return null;
-  if (e.role === 'escape' && !wantsOut(w, e)) return null;
+  if (e.role === 'escape' && !wantsOut(w, s, e)) return null;
   const near = (r: number) => enemiesNear(w, p.x, p.y, r).length >= 1;
   if (u.kind === 'buff') {
     if (d > CAST_RANGE + 1 || !near(PACK_RADIUS)) return null;
@@ -94,12 +94,12 @@ export function utilityPick(
     return { choice: c, prof, cd: 0.5 };
   }
   if (u.kind === 'summon') {
-    if (c.skill.cooldown !== undefined && !skillReady(w, s, c)) return null;
+    if (c.skill.cooldown !== undefined && !skillReady(s, c)) return null;
     if (d > CAST_RANGE + 6 || minionCount(s, c.key) >= summonCount(c, prof)) return null;
     return { choice: c, prof, cd: summonRespawn(c) };
   }
   if (u.kind === 'blink') {
-    if (c.skill.cooldown !== undefined && !skillReady(w, s, c)) return null;
+    if (c.skill.cooldown !== undefined && !skillReady(s, c)) return null;
     if (blinkGroupBusy(w, s, c) || !near(5)) return null;
     return { choice: c, prof, cd: u.cooldown };
   }
@@ -112,9 +112,10 @@ export function utilityPick(
  */
 export function wantsOut(
   w: World,
+  s: Side,
   e: Pick<RotationEntry<SkillChoice>, 'life' | 'lowLife' | 'surrounded'>,
 ): boolean {
-  const p = w.player;
+  const p = s.player;
   const hurt =
     e.lowLife &&
     p.life < p.def.maxLife * e.life &&
@@ -147,8 +148,8 @@ function autoPick(
   target: Actor,
   d: number,
 ): UtilityPick | null {
-  const ch = w.char;
-  const p = w.player;
+  const ch = s.char;
+  const p = s.player;
   const u = c.skill.utility!;
   if (u.kind === 'buff' && u.banner) {
     if (!bannerAction(w, s, c, target)) return null;
@@ -199,7 +200,7 @@ function autoPick(
     return { choice: c, prof, cd: 0.5 };
   }
   if (u.kind === 'summon') {
-    if (c.skill.cooldown !== undefined && !skillReady(w, s, c)) return null;
+    if (c.skill.cooldown !== undefined && !skillReady(s, c)) return null;
     // A spectre needs a corpse to raise.
     if ((u.corpse || u.corpseCost) && !corpseNear(w, p.x, p.y, CAST_RANGE)) return null;
     // A decoy goes up when a pack closes in, or life runs low.
@@ -217,7 +218,7 @@ function autoPick(
   // A blink closes the gap to a target the primary skill cannot reach yet; one with an effect where it leaves or lands is also
   // used when that would fall on a pack, and Withering Step to run through a pack (the character then makes no attack while it lasts).
   if (u.kind !== 'blink') return null;
-  if (c.skill.cooldown !== undefined && !skillReady(w, s, c)) return null;
+  if (c.skill.cooldown !== undefined && !skillReady(s, c)) return null;
   if (blinkGroupBusy(w, s, c)) return null;
   // A blink to get away is used when hurt with enemies about, or when a pack has closed in.
   if (u.escape) {
@@ -225,8 +226,8 @@ function autoPick(
     const crowded = enemiesNear(w, p.x, p.y, 4).length >= PACK_SIZE;
     return hurt || crowded ? { choice: c, prof, cd: u.cooldown } : null;
   }
-  const conds = playerConds(w, target);
-  const reach = skillRange(ch.profile(w.primary, conds, flaskMask(s))) + target.r;
+  const conds = playerConds(w, s, target);
+  const reach = skillRange(ch.profile(s.primary, conds, flaskMask(s))) + target.r;
   const gap = d > reach + 2 && d <= u.distance + reach && w.grid.los(p.x, p.y, target.x, target.y);
   const radius =
     (prof.skill.behaviour.kind === 'burst' ? prof.skill.behaviour.radius : 2) * prof.radiusMult;
@@ -262,10 +263,10 @@ const BURN_RADIUS = 2.8;
  * of such a build does, instead of standing off at the range of its attack.
  */
 export function contactRange(w: World, s: Side): number {
-  let r = w.char.burn.pct > 0 && !burnOff.has(w) ? BURN_RADIUS * 0.8 : 0;
+  let r = s.char.burn.pct > 0 && !burnOff.has(w) ? BURN_RADIUS * 0.8 : 0;
   const v = s.vortex;
   if (v && v.blades.length > 0) {
-    const c = w.char.actives.find((x) => x.skill.id === v.key);
+    const c = s.char.actives.find((x) => x.skill.id === v.key);
     if (c?.skill.vortex) r = Math.max(r, c.skill.vortex.radius * 0.8);
   }
   return r;
@@ -279,12 +280,12 @@ const burnOff = new WeakSet<World>();
 
 /** A burning aura damages the enemies near the player (and the player, without killing it) twice a second. */
 export function tickAuraBurn(w: World, s: Side, dt: number): void {
-  const b = w.char.burn;
+  const b = s.char.burn;
   if (b.pct <= 0 && b.self <= 0) return;
   s.auraBurnT += dt;
   if (s.auraBurnT < BURN_EVERY) return;
   s.auraBurnT -= BURN_EVERY;
-  const p = w.player;
+  const p = s.player;
   if (!p.alive) return;
   const frac = p.life / Math.max(1, p.def.maxLife);
   if (burnOff.has(w)) {
@@ -296,7 +297,7 @@ export function tickAuraBurn(w: World, s: Side, dt: number): void {
   }
   // The enemies burn for a share of the character's life, with the character's damage over time modifiers.
   const amount =
-    (b.pct / 100) * p.def.maxLife * BURN_EVERY * w.char.db.mult('damage', playerCtx(w));
+    (b.pct / 100) * p.def.maxLife * BURN_EVERY * s.char.db.mult('damage', playerCtx(w, s));
   if (amount > 0)
     for (const e of enemiesNear(w, p.x, p.y, BURN_RADIUS)) rawHit(w, e, amount, 3, 'Burning aura');
   // The character burns too, as fire damage that its resistance and energy shield answer to; it never kills.
@@ -311,7 +312,7 @@ export function tickAuraBurn(w: World, s: Side, dt: number): void {
 
 /** What a utility cast does when it lands: the buff starts, the curse falls on the target and the pack around it, the player blinks. */
 export function applyUtility(w: World, a: Actor, act: Action): void {
-  const c = w.char.utilities.find((x) => x.skill.id === act.profile.skill.id);
+  const c = a.side!.char.utilities.find((x) => x.skill.id === act.profile.skill.id);
   const u = c?.skill.utility;
   if (!c || !u) return;
   if (c.skill.tags.includes('warcry')) a.side!.utilityReady[WARCRIES] = w.t + WARCRY_SECONDS;
@@ -324,7 +325,7 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
           levelValue(s.v, c.skill.level) +
           levelValue(s.perNearby ?? 0, c.skill.level) * (near.length - 1);
         applyStatus(w, e, s.id, {
-          seconds: s.seconds * w.char.db.mult('buffDuration') * act.profile.skillDuration,
+          seconds: s.seconds * a.side!.char.db.mult('buffDuration') * act.profile.skillDuration,
           v,
           x: s.x,
         });
@@ -347,11 +348,11 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     }
     gainBuff(w, a.side!, u.buff);
     if (u.second) gainBuff(w, a.side!, u.second.buff);
-    if (u.shell) startShell(w, a.side!, u.buff, u.shell, c.skill.level, act.profile);
+    if (u.shell) startShell(a.side!, u.buff, u.shell, c.skill.level, act.profile);
     // The charges a guard spends make it last longer and take more of the physical damage away.
     let spent = 0;
     if (u.consume) {
-      spent = Math.min(u.consume.max, w.char.charges[u.consume.charge]);
+      spent = Math.min(u.consume.max, a.side!.char.charges[u.consume.charge]);
       if (spent > 0) spendCharges(w, a.side!, u.consume.charge, spent);
       a.side!.guard = {
         buff: u.buff,
@@ -362,7 +363,7 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     const length = u.seconds * (1 + ((u.consume?.durationPct ?? 0) / 100) * spent);
     a.side!.buffT[u.buff] = Math.max(
       before,
-      length * w.char.db.mult('buffDuration') * act.profile.skillDuration,
+      length * a.side!.char.db.mult('buffDuration') * act.profile.skillDuration,
     );
     if (u.second) a.side!.buffT[u.second.buff] = Math.max(0, a.side!.buffT[u.buff]);
     // A guard's cooldown does not run while it lasts, and the other guards wait out the same time.
@@ -394,14 +395,14 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
   const target = actorById(w, act.targetId);
   if (!target || !target.alive) return;
   if (u.kind === 'curse') {
-    const effect = hexEffect(u.hex, c.skill.level) * w.char.db.mult('curseEffect');
+    const effect = hexEffect(u.hex, c.skill.level) * a.side!.char.db.mult('curseEffect');
     for (const e of enemiesNear(w, target.x, target.y, u.radius))
       applyHex(
         w,
         e,
         u.hex,
         Math.round(effect * 10) / 10,
-        w.char.hexLimit,
+        a.side!.char.hexLimit,
         c.skill.level,
         hexSeconds(u.hex, c.skill.level) * act.profile.skillDuration,
       );

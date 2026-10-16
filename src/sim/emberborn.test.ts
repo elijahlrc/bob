@@ -21,7 +21,7 @@ function arena(): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
@@ -42,7 +42,7 @@ function put(
     mods: [],
     ...over,
   };
-  const m = spawnMonster(w, spec, w.player.x + dx, w.player.y + dy, 0, 0, type);
+  const m = spawnMonster(w, spec, w.sides[0].player.x + dx, w.sides[0].player.y + dy, 0, 0, type);
   m.state = 'chase';
   return m;
 }
@@ -89,7 +89,9 @@ describe('the Emberborn in play', () => {
     expect(worm.burrowT).toBeGreaterThan(0);
     run(w, 3.2);
     expect(worm.burrowT).toBe(0);
-    expect(Math.hypot(worm.x - w.player.x, worm.y - w.player.y)).toBeLessThan(3.5);
+    expect(Math.hypot(worm.x - w.sides[0].player.x, worm.y - w.sides[0].player.y)).toBeLessThan(
+      3.5,
+    );
   });
 
   it('the Cinder Tyrant sends a ring of fire out every ten seconds and lights Cinderlings at half life', () => {

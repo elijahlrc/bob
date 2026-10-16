@@ -30,14 +30,14 @@ function arena() {
   dummy.alive = false;
   world.sides[0].opts.freeResources = false;
   // Raise Husk uses up a corpse for each cast.
-  layCorpses(world, world.player.x, world.player.y, 30);
+  layCorpses(world, world.sides[0].player.x, world.sides[0].player.y, 30);
   return world;
 }
 
 function summon(w: World): Minion[] {
-  const c = w.char.utilities[0];
+  const c = w.sides[0].char.utilities[0];
   expect(c.skill.utility?.kind).toBe('summon');
-  summonMinions(w, w.sides[0], c, w.char.profile(c, 0, 0));
+  summonMinions(w, w.sides[0], c, w.sides[0].char.profile(c, 0, 0));
   return w.sides[0].minions;
 }
 
@@ -79,7 +79,7 @@ describe('mortal minions', () => {
     expect(ms.length).toBeGreaterThan(1);
     for (const m of ms) {
       expect(m.life).toBe(m.def.maxLife);
-      expect(m.faction).toBe(0);
+      expect(m.team).toBe(0);
       expect(w.actors.includes(m)).toBe(false);
     }
   });
@@ -88,8 +88,8 @@ describe('mortal minions', () => {
     const w = arena();
     const [a, b] = summon(w);
     const far = w.sides[0].minions[w.sides[0].minions.length - 1];
-    far.x = w.player.x + 12;
-    w.player.life = w.player.def.maxLife;
+    far.x = w.sides[0].player.x + 12;
+    w.sides[0].player.life = w.sides[0].player.def.maxLife;
     const half = a.def.maxLife / 2;
     for (const [m, dmg] of [
       [a, half],
@@ -105,7 +105,7 @@ describe('mortal minions', () => {
         kind: 'volatile',
         damage: dmg,
         dtype: 0,
-        faction: 1,
+        team: 1,
       });
     }
     const before = w.sides[0].minions.length;
@@ -131,7 +131,7 @@ describe('mortal minions', () => {
       kind: 'burning',
       damage: a.def.maxLife * 0.2,
       dtype: 3,
-      faction: 1,
+      team: 1,
       acc: 0,
     });
     run(w, 2);
@@ -141,14 +141,14 @@ describe('mortal minions', () => {
   it('a monster goes for the player, not the minions beside it', () => {
     const w = arena();
     summon(w);
-    const m = monsterAt(w, 'warrior', w.player.x + 1.4, w.player.y);
+    const m = monsterAt(w, 'warrior', w.sides[0].player.x + 1.4, w.sides[0].player.y);
     for (const v of w.sides[0].minions) {
       v.x = m.x + 0.2;
       v.y = m.y + 0.8;
       v.speed = 0;
     }
-    run(w, 3, () => w.player.life < w.player.def.maxLife);
-    expect(w.player.life).toBeLessThan(w.player.def.maxLife);
+    run(w, 3, () => w.sides[0].player.life < w.sides[0].player.def.maxLife);
+    expect(w.sides[0].player.life).toBeLessThan(w.sides[0].player.def.maxLife);
     expect(w.sides[0].minions.every((v) => v.life === v.def.maxLife)).toBe(true);
   });
 
@@ -168,13 +168,13 @@ describe('mortal minions', () => {
     keep.x = 11.5;
     keep.y = 15.5;
     keep.speed = 0;
-    w.player.x = 8.5;
-    w.player.y = 15.5;
+    w.sides[0].player.x = 8.5;
+    w.sides[0].player.y = 15.5;
     monsterAt(w, 'warrior', 14.5, 15.5);
-    w.player.life = w.player.def.maxLife;
+    w.sides[0].player.life = w.sides[0].player.def.maxLife;
     run(w, 6, () => keep.life < keep.def.maxLife || !keep.alive);
     expect(keep.life < keep.def.maxLife || !keep.alive).toBe(true);
-    expect(w.player.life).toBe(w.player.def.maxLife);
+    expect(w.sides[0].player.life).toBe(w.sides[0].player.def.maxLife);
   });
 
   it('a ranged monster that cannot see the player walks on toward the player, not shooting the minion it can see', () => {
@@ -189,8 +189,8 @@ describe('mortal minions', () => {
     keep.speed = 0;
     keep.x = 16.5;
     keep.y = 15.5;
-    w.player.x = 8.5;
-    w.player.y = 15.5;
+    w.sides[0].player.x = 8.5;
+    w.sides[0].player.y = 15.5;
     const archer = monsterAt(w, 'archer', 20.5, 15.5);
     archer.state = 'chase';
     run(w, 1.2);
@@ -210,13 +210,13 @@ describe('mortal minions', () => {
     keep.speed = 0;
     keep.x = 16.5;
     keep.y = 15.5;
-    w.player.x = 8.5;
-    w.player.y = 15.5;
+    w.sides[0].player.x = 8.5;
+    w.sides[0].player.y = 15.5;
     const archer = monsterAt(w, 'archer', 20.5, 15.5);
     archer.state = 'chase';
     run(w, 10, () => keep.life < keep.def.maxLife || !keep.alive);
     expect(keep.life < keep.def.maxLife || !keep.alive).toBe(true);
-    expect(w.player.life).toBe(w.player.def.maxLife);
+    expect(w.sides[0].player.life).toBe(w.sides[0].player.def.maxLife);
   });
 
   it('casting the summon again fills the places of the fallen and does not heal the rest', () => {
@@ -260,7 +260,7 @@ describe('mortal minions', () => {
 
   it('minion life and damage taken count in the calc: sturdier minions are worth more', () => {
     const w = arena();
-    const plain = w.char.sheet().minionDps;
+    const plain = w.sides[0].char.sheet().minionDps;
     expect(plain).toBeGreaterThan(0);
     expect(minionUptime('zombie', 30, 1.5, 1)).toBeGreaterThan(minionUptime('zombie', 30, 1, 1));
     expect(minionUptime('zombie', 30, 1, 0.7)).toBeGreaterThan(minionUptime('zombie', 30, 1, 1));

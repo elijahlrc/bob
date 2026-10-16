@@ -89,6 +89,7 @@ import { spawnMonster } from './world';
 import { afflictPlayer, bossLocked, flaskWards, isBossSide, lockBoss } from './afflict';
 import { bossHitPlayer, bossVeiled } from './bosses';
 import type { Actor, Dot, World } from './types';
+import { hunted } from './side';
 import type { Side } from './side';
 
 const CHAOS = 4;
@@ -98,22 +99,22 @@ const DAMAGE_LOG_TIME = 10;
 const THORNS_SHARE = 0.1;
 const OVERLOAD_TIME = 8;
 
-export function lifeCap(w: World, a: Actor): number {
-  return a.isPlayer ? Math.max(1, a.def.maxLife - w.char.reservedLife) : a.def.maxLife;
+export function lifeCap(a: Actor): number {
+  return a.isPlayer ? Math.max(1, a.def.maxLife - a.side!.char.reservedLife) : a.def.maxLife;
 }
 
 /** What makes each condition true for the player; a condition is only evaluated when this character's mods use it. */
 type PlayerTest = (w: World, p: Actor) => boolean;
 const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
-  onFullLife: (w, p) => p.life >= lifeCap(w, p) - 0.5,
+  onFullLife: (_w, p) => p.life >= lifeCap(p) - 0.5,
   onLowLife: (_w, p) => p.life <= p.def.maxLife * LOW_LIFE,
   killedRecently: (_w, p) => p.tKill < RECENT,
   critRecently: (_w, p) => p.tCrit < RECENT,
   hitRecently: (_w, p) => p.tHit < RECENT,
   usedFlaskRecently: (_w, p) => p.tFlask < RECENT,
   flaskActive: (_w, p) => p.side!.flasks.some((f) => f.activeT > 0),
-  dualWielding: (w) => w.char.dualWielding,
-  holdingShield: (w) => w.char.holdingShield,
+  dualWielding: (_w, p) => p.side!.char.dualWielding,
+  holdingShield: (_w, p) => p.side!.char.holdingShield,
   stunnedRecently: (_w, p) => p.tStunEnemy < RECENT,
   overloadActive: (_w, p) => p.tOverload < OVERLOAD_TIME,
   blockedRecently: (_w, p) => p.tBlock < RECENT,
@@ -121,7 +122,7 @@ const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
   leeching: (_w, p) => p.leechLife.length > 0,
   leechingEs: (_w, p) => p.leechEs.length > 0,
   esFull: (_w, p) => p.def.maxEs > 0 && p.es >= p.def.maxEs - 0.5,
-  onLowMana: (w, p) => p.mana <= Math.max(1, p.def.maxMana - reservedMana(w, p.side!)) * LOW_LIFE,
+  onLowMana: (_w, p) => p.mana <= Math.max(1, p.def.maxMana - reservedMana(p.side!)) * LOW_LIFE,
   cursed: (_w, p) => p.hexes.length > 0,
   stationary: (_w, p) => !p.moving,
   elemFire: (_w, p) => p.side!.elem === 3,
@@ -134,9 +135,9 @@ const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
   bleeding: (_w, p) => p.ail.bleeds.length > 0,
   poisoned: (_w, p) => p.ail.poisons.length > 0,
 };
-for (const [id, tag] of WIELD_CONDS) PLAYER_TESTS[id] = (w) => w.char.weaponTags.has(tag);
+for (const [id, tag] of WIELD_CONDS) PLAYER_TESTS[id] = (_w, p) => p.side!.char.weaponTags.has(tag);
 for (const [id, gem] of AURA_CONDS)
-  PLAYER_TESTS[id] = (w) => w.char.auras.some((a) => a.active && a.def.id === gem);
+  PLAYER_TESTS[id] = (_w, p) => p.side!.char.auras.some((a) => a.active && a.def.id === gem);
 for (const id of BUFF_IDS) {
   const cond = BUFFS[id].cond;
   PLAYER_TESTS[cond] = (_w, p) => p.side!.buffT[id] > 0;
@@ -168,8 +169,8 @@ type Compiled = { n: number; player: [number, PlayerTest][]; target: [number, Ta
 const compiled = new WeakMap<object, Compiled>();
 
 /** The tests of the conditions a character's mods use, with their bits (rebuilt if it registers more). */
-function condTests(w: World): Compiled {
-  const idx = w.char.cond;
+function condTests(s: Side): Compiled {
+  const idx = s.char.cond;
   let c = compiled.get(idx);
   if (!c || c.n !== idx.ids.length) {
     c = { n: idx.ids.length, player: [], target: [] };
@@ -185,9 +186,9 @@ function condTests(w: World): Compiled {
 }
 
 /** Bitmask of the player's active conditions (§7.3), optionally against a target. Bits are the character's own. */
-export function playerConds(w: World, target: Actor | null): number {
-  const p = w.player;
-  const t = condTests(w);
+export function playerConds(w: World, s: Side, target: Actor | null): number {
+  const p = s.player;
+  const t = condTests(s);
   let c = 0;
   for (const [bit, test] of t.player) if (test(w, p)) c = maskOr(c, bit);
   if (target) for (const [bit, test] of t.target) if (test(target, p)) c = maskOr(c, bit);
@@ -199,14 +200,14 @@ export function playerConds(w: World, target: Actor | null): number {
  * conditions that hold now, and the values a `per` mod counts (charges held, attributes). Asking with the empty context
  * would miss every mod that holds only under a condition.
  */
-export function playerCtx(w: World, tags = 0, ancestry = 0): ModCtx {
-  return { tags, ancestry, conds: playerConds(w, null), statValue: w.char.statValue };
+export function playerCtx(w: World, s: Side, tags = 0, ancestry = 0): ModCtx {
+  return { tags, ancestry, conds: playerConds(w, s, null), statValue: s.char.statValue };
 }
 
 /** The conditions about a target, as a mask in the character's own bits. */
-export function targetConds(w: World, t: Actor, from: Actor): number {
+export function targetConds(s: Side, t: Actor, from: Actor): number {
   let c = 0;
-  for (const [bit, test] of condTests(w).target) if (test(t, from)) c = maskOr(c, bit);
+  for (const [bit, test] of condTests(s).target) if (test(t, from)) c = maskOr(c, bit);
   return c;
 }
 
@@ -226,13 +227,13 @@ export function flaskMask(s: Side): number {
 
 /** Refresh the player's cached defence for the current conditions and flasks. */
 export function refreshPlayerDefence(w: World, s: Side): void {
-  const p = w.player;
-  p.def = w.char.defence(playerConds(w, null), flaskMask(s));
-  const cap = lifeCap(w, p);
+  const p = s.player;
+  p.def = s.char.defence(playerConds(w, s, null), flaskMask(s));
+  const cap = lifeCap(p);
   if (p.life > cap) p.life = cap;
   if (p.es > p.def.maxEs) p.es = p.def.maxEs;
-  if (p.mana > p.def.maxMana - reservedMana(w, s))
-    p.mana = Math.max(0, p.def.maxMana - reservedMana(w, s));
+  if (p.mana > p.def.maxMana - reservedMana(s))
+    p.mana = Math.max(0, p.def.maxMana - reservedMana(s));
 }
 
 export function targetState(a: Actor): TargetState {
@@ -274,7 +275,7 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
   // same step (so they have more life), without rebuilding them (docs/MAPS.md 9.1).
   if (w.surge > 0) {
     const f = 1 + CRESCENDO_STEP_BONUS * w.surge;
-    const m = dst.faction === 1 && !dst.isPlayer ? 1 / f : f;
+    const m = dst.team === 1 && !dst.isPlayer ? 1 / f : f;
     for (let i = 0; i < 5; i++) dmg[i] *= m;
   }
   let total = 0;
@@ -322,7 +323,7 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
   dst.sinceDamaged = 0;
   if (dst.isPlayer && dst.side!.opts.godMode && dst.life <= 0) dst.life = 1;
   if (dst.isPlayer) dst.side!.stats.damageTaken += total;
-  else if (dst.faction === 1) w.player.side!.stats.damageDealt += total;
+  else if (dst.team === 1) hunted(w, dst).side!.stats.damageDealt += total;
   // A Reprieve held fires when this would be the end (docs/WAYSIDE.md 7); the damage still counts as taken.
   if (dst.isPlayer && dst.life <= 0 && reprieveFires(w, dst.side!)) return total;
   if (dst.life <= 0) killActor(w, dst);
@@ -386,7 +387,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   // An Aegis counts the time since it was last attacked, whatever came of the attack.
   if (dst.enc && !dst.isPlayer) noteAttacked(dst);
   // The map report names what dealt the hit (only for hits on the character or on a monster).
-  const how = dst.isPlayer || dst.faction === 1 ? sourceOf(src, dst, p) : undefined;
+  const how = dst.isPlayer || dst.team === 1 ? sourceOf(src, dst, p) : undefined;
   if (res.outcome === 'miss') {
     w.events.push({ t: 'miss', src: src.id, dst: dst.id });
     if (how) noteMiss(w, dst, how, false);
@@ -420,10 +421,11 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       }
   }
   // Rimeplate: what hits the character is chilled a moment.
-  if (dst.isPlayer && !src.isPlayer && res.outcome === 'hit' && w.char.frostSpec) frostBite(w, src);
+  if (dst.isPlayer && !src.isPlayer && res.outcome === 'hit' && dst.side!.char.frostSpec)
+    frostBite(dst.side!, src);
   // Flesh and Stone in the Sand stance: attacks by enemies that are not near do less.
   if (dst.isPlayer && !src.isPlayer && res.outcome !== 'block' && p.isAttack) {
-    const far = stanceFarLess(w, dst.side!);
+    const far = stanceFarLess(dst.side!);
     if (far && Math.hypot(src.x - dst.x, src.y - dst.y) > far.radius + src.r) {
       for (let i = 0; i < res.dmg.length; i++) res.dmg[i] *= 1 - far.less;
       res.total *= 1 - far.less;
@@ -453,7 +455,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   }
   if (src.modIds.includes('hexcaller') && dst.isPlayer && res.outcome === 'hit' && src.hexCd <= 0) {
     src.hexCd = 4;
-    hexPlayerAtRandom(w);
+    hexPlayerAtRandom(w, dst.side!);
   }
   // A monster's modes change what the hit does to it: exposed, quenched, swollen, fed by fire (docs/ENCOUNTERS.md 6).
   if (!dst.isPlayer && dst.enc && res.outcome !== 'block') {
@@ -469,7 +471,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       rollGains(w, dst.side!, 'block');
     }
     if (dst.def.lifeOnBlockPct > 0)
-      dst.life = Math.min(lifeCap(w, dst), dst.life + dst.def.maxLife * dst.def.lifeOnBlockPct);
+      dst.life = Math.min(lifeCap(dst), dst.life + dst.def.maxLife * dst.def.lifeOnBlockPct);
     wake(w, dst);
     if (dst.isPlayer) fireTriggers(w, dst.side!, { on: 'block' });
     // A skill that wears blocking down leaves a blocking enemy Overpowered.
@@ -528,16 +530,16 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (!dst.def.cannotBeLeechedFrom)
     for (let i = 0; i < 5; i++) le += res.dmg[i] * (p.leechEs[i] ?? 0);
   if (le > 0) addLeech(src, 'leechEs', le, instant);
-  if (p.lifeOnHit > 0) src.life = Math.min(lifeCap(w, src), src.life + p.lifeOnHit);
+  if (p.lifeOnHit > 0) src.life = Math.min(lifeCap(src), src.life + p.lifeOnHit);
   if (p.esOnHit > 0 && src.isPlayer) src.es = Math.min(src.def.maxEs, src.es + p.esOnHit);
   if (p.manaOnHit > 0 && src.isPlayer)
     src.mana = Math.min(
-      Math.max(0, src.def.maxMana - reservedMana(w, src.side!)),
+      Math.max(0, src.def.maxMana - reservedMana(src.side!)),
       src.mana + p.manaOnHit,
     );
 
   const wasAlive = dst.alive;
-  if (src.isPlayer) applyPlayerHexes(w, dst);
+  if (src.isPlayer) applyPlayerHexes(w, src.side!, dst);
   if (src.isPlayer) noteCause(dst, p.tagMask, false, p.gains);
   applyDamage(w, dst, res.dmg, how);
   // A mark gives life and mana back on each attack hit.
@@ -709,7 +711,11 @@ function applyAilments(w: World, src: Actor, dst: Actor, res: HitResult, p: Skil
     pushDot(ail.poisons, { dps: a.poison, t: p.poison.dur * d.durOnSelf.poison }, 400);
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'poison' });
     // Herald of Agony: a poison the character's hit put on gives a point of Virulence.
-    if (!dst.isPlayer && w.char.agonySpec) gainVirulence(w, src.side!);
+    // (A monster's poison on a minion feeds the side it hunts, as it always has.)
+    if (!dst.isPlayer) {
+      const owner = src.side ?? hunted(w, src).side!;
+      if (owner.char.agonySpec) gainVirulence(w, owner);
+    }
   }
   if (a.shock > 0 && a.shock >= ail.shock) {
     ail.shock = a.shock;
@@ -745,10 +751,10 @@ export function hit(
     // Bane also puts the curses linked to it on the enemy, and grows with each.
     const bane = p.skillDot.spec.perCurse;
     if (bane) {
-      const linked = w.char.actives.find((x) => x.skill.id === p.skill.id)?.linked ?? [];
-      const n = Math.min(linked.length, w.char.hexLimit);
+      const linked = src.side!.char.actives.find((x) => x.skill.id === p.skill.id)?.linked ?? [];
+      const n = Math.min(linked.length, src.side!.char.hexLimit);
       for (const h of linked.slice(0, n))
-        applyHex(w, dst, h.id, h.effect, w.char.hexLimit, h.level);
+        applyHex(w, dst, h.id, h.effect, src.side!.char.hexLimit, h.level);
       applySkillDot(w, dst, p, {
         more: levelValue(bane.more, p.skill.level) * n,
         seconds: p.skillDot.seconds * (1 + (bane.longer * n) / 100),
@@ -849,10 +855,10 @@ function onMonsterHitPlayer(w: World, src: Actor, dst: Actor, prof: SkillProfile
   const debuff = prof.skill.debuff;
   const hobbles = src.modIds.includes('hobbling') || src.mon?.kind.hobbles || debuff === 'hobble';
   // A hobble is a chill: whatever keeps a chill off keeps it off (docs/BOSSES.md 11.2).
-  if (hobbles) afflictPlayer(w, 'chill', 0.3, 2);
-  if (src.mon?.kind.bossOnly) bossHitPlayer(w, src);
+  if (hobbles) afflictPlayer(w, dst.side!, 'chill', 0.3, 2);
+  if (src.mon?.kind.bossOnly) bossHitPlayer(w, dst.side!, src);
   // A sidearm that blinds (docs/ENCOUNTERS.md 7): the character's attacks miss more for a while.
-  if (debuff === 'blind') blindPlayer(w, BLIND_SECONDS);
+  if (debuff === 'blind') blindPlayer(dst.side!, BLIND_SECONDS);
 }
 
 /** Remember damage the player took, for the death recap. */
@@ -962,7 +968,7 @@ export function rawHit(
 /** Who a hit is credited to in the map report. */
 function sourceOf(src: Actor, dst: Actor, p: SkillProfile): DmgSrc {
   if (src.isPlayer) return { name: p.skill.name, kind: 'skill' };
-  if (src.faction === 0) return { name: src.name || 'Minion', kind: 'minion' };
+  if (src.team === 0) return { name: src.name || 'Minion', kind: 'minion' };
   return dst.isPlayer ? monsterSrc(src) : { name: 'Other', kind: 'effect' };
 }
 
@@ -982,7 +988,7 @@ export function wake(w: World, a: Actor): void {
 /** A drop must land on floor: a flier that dies over a wall drops its loot where it can be reached. */
 function dropSpot(w: World, a: Actor, pos: { x: number; y: number }): { x: number; y: number } {
   if (!(a.flies || a.phases) || w.grid.isFloor(Math.floor(pos.x), Math.floor(pos.y))) return pos;
-  const p = w.player;
+  const p = hunted(w, a);
   let best = { x: p.x, y: p.y };
   let bd = Infinity;
   for (let dy = -4; dy <= 4; dy++)
@@ -1010,14 +1016,14 @@ function noteCause(a: Actor, tags: number, minion: boolean, gains: readonly Mod[
 
 export function killActor(w: World, a: Actor): void {
   if (!a.alive) return;
-  // What a kill gives is the side's that fights the monster (the one character of a map).
-  const fs = w.player.side!;
+  // What a kill gives is the side's that fights the monster (the character it hunts).
+  const fs = hunted(w, a).side!;
   a.alive = false;
   a.life = 0;
   a.action = null;
   w.events.push({ t: 'death', id: a.id });
   // A minion that falls is just gone (tickMinions clears it): nothing is earned, dropped or raised.
-  if (!a.isPlayer && a.faction === 0) return;
+  if (!a.isPlayer && a.team === 0) return;
   if (!a.isPlayer && !a.noReward) {
     // What the skill that made the kill gives on a kill (its own chances, and its supports').
     const gains = causes.get(a)?.gains ?? [];
@@ -1026,20 +1032,21 @@ export function killActor(w: World, a: Actor): void {
     if (a.ail.shock > 0) rollGains(w, fs, 'killShocked', gains);
     rollGains(w, fs, 'kill', gains);
     bannerStage(w, fs, 'kill');
-    refreshOnKill(w, fs);
+    refreshOnKill(fs);
   }
   if (!a.isPlayer && a.rarity === 'rare') gainTrophy(w, fs, a.modIds);
   if (a.isPlayer) {
-    w.status = 'dead';
+    // The map is over when the local player's character falls (a duel reads the deaths of its sides).
+    if (a.side!.id === 0) w.status = 'dead';
     w.events.push({ t: 'playerDied' });
     return;
   }
-  const p = w.player;
+  const p = fs.player;
   if (!a.noReward) {
     fs.stats.kills++;
     p.tKill = 0;
     const xp =
-      (a.mon?.xp ?? 0) * levelPenalty(w.build.level, a.mon?.spec.level ?? 1) * w.plan.xpMult;
+      (a.mon?.xp ?? 0) * levelPenalty(fs.build.level, a.mon?.spec.level ?? 1) * w.plan.xpMult;
     fs.xp += xp;
     fs.stats.xpGained += xp;
     const kind =
@@ -1054,16 +1061,16 @@ export function killActor(w: World, a: Actor): void {
     const cause0 = causes.get(a);
     const hexFlasks = cause0?.minion ? 0 : hexKill(w, a);
     // What a kill gives may hold only under a condition (while a flask is active) or per charge held: ask as the character is now.
-    const kctx = playerCtx(w);
+    const kctx = playerCtx(w, fs);
     const gain =
-      FLASK_CHARGES_ON_KILL[kind] * w.char.db.mult('flaskCharges', kctx) * (1 + hexFlasks);
+      FLASK_CHARGES_ON_KILL[kind] * fs.char.db.mult('flaskCharges', kctx) * (1 + hexFlasks);
     for (const f of fs.flasks) f.charges = Math.min(f.spec.maxCharges, f.charges + gain);
     const lok =
-      w.char.db.sum('base', 'lifeOnKill', kctx) +
-      (w.char.db.sum('base', 'lifeOnKillPct', kctx) / 100) * p.def.maxLife;
-    if (lok > 0) p.life = Math.min(lifeCap(w, p), p.life + lok);
-    const mok = w.char.db.sum('base', 'manaOnKill', kctx);
-    if (mok > 0) p.mana = Math.min(p.def.maxMana - reservedMana(w, fs), p.mana + mok);
+      fs.char.db.sum('base', 'lifeOnKill', kctx) +
+      (fs.char.db.sum('base', 'lifeOnKillPct', kctx) / 100) * p.def.maxLife;
+    if (lok > 0) p.life = Math.min(lifeCap(p), p.life + lok);
+    const mok = fs.char.db.sum('base', 'manaOnKill', kctx);
+    if (mok > 0) p.mana = Math.min(p.def.maxMana - reservedMana(fs), p.mana + mok);
     if (w.opts.loot) {
       for (const item of w.opts.loot(w, a)) {
         const id = w.nextId++;
@@ -1089,7 +1096,7 @@ export function killActor(w: World, a: Actor): void {
       kind: 'volatile',
       damage: 3 * monsterHitOf(a),
       dtype: 3,
-      faction: 1,
+      team: 1,
     });
   }
   if (a.modIds.includes('splitting') && a.mon) splitInTwo(w, a);
@@ -1288,7 +1295,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     if (!a.alive) return;
   }
   // Regeneration (a Bursar or the Treasurer near the player stops it, with leech and the recharge of energy shield).
-  const cap = lifeCap(w, a);
+  const cap = lifeCap(a);
   const suppressed = a.suppressT > 0;
   // A Frost Bomb leaves an enemy regenerating very little.
   const regen = def.lifeRegen * (a.fx.regenLess ? 1 - a.fx.regenLess.v / 100 : 1);
@@ -1297,7 +1304,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     else a.life = Math.min(cap, a.life + regen * dt);
   }
   if (a.isPlayer && !suppressed) {
-    const manaCap = Math.max(0, def.maxMana - reservedMana(w, a.side!));
+    const manaCap = Math.max(0, def.maxMana - reservedMana(a.side!));
     a.mana = Math.min(manaCap, a.mana + def.manaRegen * dt);
     leechTick(
       a.leechMana,

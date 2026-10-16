@@ -184,7 +184,7 @@ function simulate(rb: RefBuild, defence: Partial<Defence>) {
     while (world.status === 'running') {
       stepWorld(world);
       for (const e of world.events)
-        if (e.t === 'hit' && e.src === world.player.id) hitDmg += e.amount;
+        if (e.t === 'hit' && e.src === world.sides[0].player.id) hitDmg += e.amount;
       let pd = 0;
       for (const d of dummy.ail.poisons) pd += d.dps;
       poisonDmg += pd / 60;

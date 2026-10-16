@@ -61,7 +61,7 @@ export function bannerAction(
   const s = specOf(c);
   if (!s) return null;
   const b = side.banner;
-  const p = w.player;
+  const p = side.player;
   if (b && b.key === c.key && !b.placed) {
     if (b.stages >= s.spec.maxStages) return 'place';
     if (b.stages < PLACE_AT_STAGES) return null;
@@ -74,14 +74,14 @@ export function bannerAction(
   }
   if (b && !(b.placed && b.t < 1.5)) return null;
   const reserve = Math.ceil((s.spec.reservePct / 100) * p.def.maxMana);
-  return p.def.maxMana - reservedMana(w, side) >= reserve ? 'carry' : null;
+  return p.def.maxMana - reservedMana(side) >= reserve ? 'carry' : null;
 }
 
 /** Cast the banner skill: carry a new banner, or put the carried one down where the character stands. */
 export function useBanner(w: World, side: Side, c: SkillChoice, prof: SkillProfile): void {
   const s = specOf(c);
   if (!s) return;
-  const p = w.player;
+  const p = side.player;
   const action = bannerAction(w, side, c, p);
   const b = side.banner;
   if (action === 'place' && b) {
@@ -93,7 +93,7 @@ export function useBanner(w: World, side: Side, c: SkillChoice, prof: SkillProfi
     b.effect = 1 + (g.effect / 100) * b.stages;
     b.t =
       (s.spec.placedSeconds + g.seconds * b.stages) *
-      w.char.db.mult('buffDuration') *
+      side.char.db.mult('buffDuration') *
       (c.skill.tags.includes('duration') ? prof.skillDuration : 1);
     const granted = s.spec.place.secondsPerStage * b.stages;
     if (granted > 0) {
@@ -125,7 +125,7 @@ export function useBanner(w: World, side: Side, c: SkillChoice, prof: SkillProfi
 export function bannerStage(w: World, side: Side, on: 'kill' | 'impale'): void {
   const b = side.banner;
   if (!b || b.placed) return;
-  const c = w.char.utilities.find((x) => x.key === b.key);
+  const c = side.char.utilities.find((x) => x.key === b.key);
   const s = c && specOf(c);
   if (!s || s.spec.stageOn !== on) return;
   if (on === 'impale') {
@@ -143,13 +143,13 @@ export function bannerStage(w: World, side: Side, on: 'kill' | 'impale'): void {
 export function tickBanner(w: World, side: Side, dt: number): void {
   const b = side.banner;
   if (!b) return;
-  const c = w.char.utilities.find((x) => x.key === b.key);
+  const c = side.char.utilities.find((x) => x.key === b.key);
   const s = c && specOf(c);
   if (!c || !s) {
     side.banner = null;
     return;
   }
-  const p = w.player;
+  const p = side.player;
   if (b.placed) {
     b.t -= dt;
     if (b.t <= 0) {

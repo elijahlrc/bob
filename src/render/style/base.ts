@@ -27,14 +27,14 @@ export type ActorView = {
 
 export function figureOf(w: World, a: Actor): FigureKind {
   if (a.isPlayer) {
-    const mh = w.build.equipment.mainHand;
+    const mh = w.sides[0].build.equipment.mainHand;
     return heroFigure(mh ? itemBase(mh.baseId).itemClass : undefined);
   }
   return monsterFigure(a.mon!.spec.type, a.mon!.spec.rarity);
 }
 
 export function heroColor(w: World): number {
-  return classDef(w.build.classId).color;
+  return classDef(w.sides[0].build.classId).color;
 }
 
 /**
@@ -96,7 +96,7 @@ export abstract class StyleBase implements MapStyle {
     this.marks?.destroy();
     this.marks = new MonsterMarks(this.scene, this.markTheme());
     const cam = this.scene.cameras.main;
-    const p = this.project(world.player.x, world.player.y);
+    const p = this.project(world.sides[0].player.x, world.sides[0].player.y);
     cam.centerOn(p.x, p.y);
   }
 
@@ -222,8 +222,8 @@ export abstract class StyleBase implements MapStyle {
   /** Camera follows the player with a little smoothing and the shake applied. */
   /** The player's smoothed render position in tiles (falls back to the sim position). */
   protected playerPos(world: World): { x: number; y: number } {
-    const t = this.views.get(world.player.id)?.track;
-    return t && !Number.isNaN(t.rx) ? { x: t.rx, y: t.ry } : world.player;
+    const t = this.views.get(world.sides[0].player.id)?.track;
+    return t && !Number.isNaN(t.rx) ? { x: t.rx, y: t.ry } : world.sides[0].player;
   }
 
   protected followCamera(world: World, dt: number): void {

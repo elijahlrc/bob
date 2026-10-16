@@ -34,7 +34,7 @@ function watch(world: World, seconds: number, skill: string) {
   for (let i = 0; i < seconds * 60; i++) {
     stepWorld(world);
     for (const e of world.events) {
-      if (e.t === 'use' && e.src === world.player.id)
+      if (e.t === 'use' && e.src === world.sides[0].player.id)
         (e.skill === skill ? uses : others).push(world.t);
       if (e.t === 'spend') spends.push(world.t);
       if (e.t === 'buff') buffs.push(e.id);
@@ -61,7 +61,7 @@ describe('Flicker Strike (blinkingCut)', () => {
     world.sides[0].opts.freeResources = true;
     gainCharge(world, world.sides[0], 'fervour');
     gainCharge(world, world.sides[0], 'fervour');
-    expect(world.char.charges.fervour).toBe(2);
+    expect(world.sides[0].char.charges.fervour).toBe(2);
     const t = watch(world, 1.2, 'blinkingCut');
     // The first use takes the stored use; the next ones are paid for with the charges held.
     expect(t.uses.length).toBeGreaterThanOrEqual(2);
@@ -97,7 +97,7 @@ describe('Vigilant Strike (guardedStrike)', () => {
     const t = watch(world, 2.5, 'guardedStrike');
     expect(t.uses.length).toBe(2);
     expect(t.spends).toHaveLength(1);
-    expect(world.char.charges.grit).toBe(0);
+    expect(world.sides[0].char.charges.grit).toBe(0);
   });
 });
 
@@ -113,7 +113,7 @@ describe('Discharge (chargeRelease)', () => {
     const early = watch(world, 1.5, 'chargeRelease');
     expect(early.uses).toHaveLength(0);
     gainCharge(world, world.sides[0], 'insight');
-    expect(world.char.charges).toMatchObject({ grit: 1, fervour: 1, insight: 1 });
+    expect(world.sides[0].char.charges).toMatchObject({ grit: 1, fervour: 1, insight: 1 });
     const t = watch(world, 2, 'chargeRelease');
     expect(t.uses.length).toBeGreaterThanOrEqual(1);
     expect(t.spends.length).toBeGreaterThanOrEqual(3);
@@ -137,7 +137,7 @@ describe('Immortal Call (deathlessCall)', () => {
     world.sides[0].opts.freeResources = true;
     world.sides[0].opts.godMode = true;
     for (let i = 0; i < charges; i++) gainCharge(world, world.sides[0], 'grit');
-    world.player.life = world.player.def.maxLife * 0.4;
+    world.sides[0].player.life = world.sides[0].player.def.maxLife * 0.4;
     let longest = 0;
     let used = 0;
     for (let i = 0; i < 3 * 60; i++) {
@@ -163,7 +163,7 @@ describe('Immortal Call (deathlessCall)', () => {
     );
     world.sides[0].opts.freeResources = true;
     world.sides[0].opts.godMode = true;
-    world.player.life = world.player.def.maxLife * 0.4;
+    world.sides[0].player.life = world.sides[0].player.def.maxLife * 0.4;
     const buffs: string[] = [];
     for (let i = 0; i < 2.5 * 60; i++) {
       stepWorld(world);
@@ -213,7 +213,7 @@ describe('Frost Fang (frostFang)', () => {
       if (frozen) dummy.ail.freezeT = 30;
       for (let i = 0; i < 3 * 60 && dummy.alive; i++) stepWorld(world);
       expect(dummy.alive).toBe(false);
-      return world.char.charges.fervour;
+      return world.sides[0].char.charges.fervour;
     };
     let frozenGot = 0;
     let plainGot = 0;
@@ -233,6 +233,6 @@ describe('Lightheart (lightheart)', () => {
     });
     world.sides[0].opts.freeResources = true;
     watch(world, 3, 'crushingBlow');
-    expect(world.char.charges.insight).toBeGreaterThan(0);
+    expect(world.sides[0].char.charges.insight).toBeGreaterThan(0);
   });
 });

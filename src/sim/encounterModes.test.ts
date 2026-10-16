@@ -22,7 +22,7 @@ function arena(): World {
   b.primaryGem = b.equipment.mainHand.sockets[0]!.uid;
   delete b.equipment.offHand;
   const { world } = createDummyWorld(b, { distance: 30 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   world.sides[0].opts.godMode = true;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
@@ -37,7 +37,15 @@ const spec = (type: MonsterTypeId, level = 40): MonsterSpec => ({
 });
 
 function put(w: World, type: MonsterTypeId, dx: number, dy = 0): Actor {
-  const m = spawnMonster(w, spec(type), w.player.x + dx, w.player.y + dy, 0, 0, type);
+  const m = spawnMonster(
+    w,
+    spec(type),
+    w.sides[0].player.x + dx,
+    w.sides[0].player.y + dy,
+    0,
+    0,
+    type,
+  );
   m.state = 'chase';
   return m;
 }
@@ -47,7 +55,7 @@ const steps = (w: World, n: number) => {
 };
 
 /** Land a hit of exactly these damages (physical, lightning, cold, fire, chaos) from the character. */
-function strike(w: World, dst: Actor, dmg: number[], src: Actor = w.player): void {
+function strike(w: World, dst: Actor, dmg: number[], src: Actor = w.sides[0].player): void {
   const res: HitResult = {
     outcome: 'hit',
     crit: false,
@@ -57,7 +65,7 @@ function strike(w: World, dst: Actor, dmg: number[], src: Actor = w.player): voi
     ailments: emptyAilments(),
     stun: 0,
   };
-  applyHit(w, src, dst, w.char.profile(w.primary, 0), res);
+  applyHit(w, src, dst, w.sides[0].char.profile(w.sides[0].primary, 0), res);
 }
 
 /** A share of a monster's life, as physical damage. */
@@ -106,7 +114,7 @@ describe('windows and modes (docs/ENCOUNTERS.md 5 and 6)', () => {
     expect(m.life).toBe(life);
     steps(w, 100);
     expect(m.phaseT).toBe(0);
-    expect(Math.hypot(m.x - w.player.x, m.y - w.player.y)).toBeLessThan(2.5);
+    expect(Math.hypot(m.x - w.sides[0].player.x, m.y - w.sides[0].player.y)).toBeLessThan(2.5);
   });
 
   it('a Charnel Heap at 40% fuses to stone: hits do nothing, it mends, and a ring bursts when it ends', () => {
@@ -240,8 +248,8 @@ describe('windows and modes (docs/ENCOUNTERS.md 5 and 6)', () => {
     const m = spawnMonster(
       w,
       { ...spec('warrior'), rarity: 'rare', mods: ['adaptive'] },
-      w.player.x + 8,
-      w.player.y,
+      w.sides[0].player.x + 8,
+      w.sides[0].player.y,
       0,
       0,
       'a',

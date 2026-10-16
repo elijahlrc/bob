@@ -65,8 +65,16 @@ describe('area blows come fewer and harder (AREA_PACE)', () => {
 
   it('a monster rests after an area blow: the same wind-up, then a pause as long as the blow', () => {
     const w = arena();
-    w.player.stunT = 1e9;
-    const m: Actor = spawnMonster(w, spec('sentinel'), w.player.x + 1.6, w.player.y, 0, 0, 'S');
+    w.sides[0].player.stunT = 1e9;
+    const m: Actor = spawnMonster(
+      w,
+      spec('sentinel'),
+      w.sides[0].player.x + 1.6,
+      w.sides[0].player.y,
+      0,
+      0,
+      'S',
+    );
     m.state = 'chase';
     const starts: number[] = [];
     for (let i = 0; i < 60 * 14; i++) {
@@ -88,11 +96,11 @@ describe('the character stops dodging after a while', () => {
   function spam(w: World, seconds: number, check: (t: number) => void): void {
     for (let i = 0; i < Math.round(seconds / DT); i++) {
       const hasZone = w.effects.some((e) => e.kind === 'caustic' && e.t > 1);
-      if (!hasZone) openZone(w, w.player.x, w.player.y, 1.2, 30, 'caustic', 0);
+      if (!hasZone) openZone(w, w.sides[0].player.x, w.sides[0].player.y, 1.2, 30, 'caustic', 0);
       for (const e of w.effects)
         if (e.kind === 'caustic') {
-          e.x = w.player.x;
-          e.y = w.player.y;
+          e.x = w.sides[0].player.x;
+          e.y = w.sides[0].player.y;
         }
       stepWorld(w);
       check(i * DT);

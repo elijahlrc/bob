@@ -3,6 +3,7 @@ import { MONSTER_TYPES } from '../data/monsters';
 import { flankPoint, frontOf } from './packs';
 import { ringSlot } from './packPlays';
 import type { Actor, World } from './types';
+import { hunted } from './side';
 
 /**
  * How a monster moves and whom it goes for (docs/ROSTER.md 6.3 and 6.4). The pathing and the stepping stay in `ai.ts`; a
@@ -90,7 +91,7 @@ export function revealed(w: World, m: Actor): boolean {
   if (m.burrowT > 0) return false;
   const veil = m.mon ? senseOf(m).veil : undefined;
   if (!veil || m.revealT > 0) return true;
-  return Math.hypot(m.x - w.player.x, m.y - w.player.y) <= veil;
+  return Math.hypot(m.x - hunted(w, m).x, m.y - hunted(w, m).y) <= veil;
 }
 
 /** The nearest living monster of the given types (or, with none given, a front-line one) near `m`. */
@@ -399,15 +400,15 @@ export function steer(w: World, m: Actor, tgt: Actor, d: number, dt: number): St
 
 /** Whom a monster goes for: the character, or (for a hunter) the nearest of the character's minions first. */
 export function targetOf(w: World, m: Actor): Actor {
-  const s = w.player.side!;
+  const s = hunted(w, m).side!;
   // A decoy totem draws what is within its reach.
   for (const v of s.minions) {
     if (!v.alive || v.kind !== 'decoy') continue;
-    const taunt = w.char.utilities.find((c) => c.key === v.key)?.skill.utility;
+    const taunt = hunted(w, m).side!.char.utilities.find((c) => c.key === v.key)?.skill.utility;
     const reach = taunt?.kind === 'summon' ? (taunt.taunt ?? 0) : 0;
     if (reach > 0 && Math.hypot(v.x - m.x, v.y - m.y) <= reach) return v;
   }
-  if (senseOf(m).target !== 'minions' || s.minions.length === 0) return w.player;
+  if (senseOf(m).target !== 'minions' || s.minions.length === 0) return hunted(w, m);
   let best: Actor | null = null;
   let bd = 12;
   for (const v of s.minions) {
@@ -418,5 +419,5 @@ export function targetOf(w: World, m: Actor): Actor {
       best = v;
     }
   }
-  return best ?? w.player;
+  return best ?? hunted(w, m);
 }

@@ -94,7 +94,7 @@ describe('Crescendo (docs/MAPS.md 9.1)', () => {
       return dealt;
     };
     expect(takeAt(8)).toBeLessThan(takeAt(0));
-    const player = w.player;
+    const player = w.sides[0].player;
     const hurtAt = (surge: number) => {
       w.surge = surge;
       const before = player.life;

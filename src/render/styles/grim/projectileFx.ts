@@ -164,7 +164,7 @@ export class ProjectileFx {
     dy /= dl;
     this.ribbon(st, color, body);
     // What a monster sends at the character wears a red rim, so a threat is told from the character's own at a glance.
-    this.hostile = p.faction === 1;
+    this.hostile = p.team === 1;
     const light = lighten(color, 0.45);
     switch (body) {
       case 'arrow':

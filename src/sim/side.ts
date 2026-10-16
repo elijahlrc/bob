@@ -8,18 +8,20 @@ import type { BannerState } from './banners';
 import type { Field } from './fields';
 import type { Minion } from './minions';
 import type { Deployable } from './deploy';
-import type { Character } from '../calc/character';
+import type { Character, SkillChoice } from '../calc/character';
 import type { BuffId } from '../data/buffs';
-import type { AnyItem } from '../data/types';
+import type { AnyItem, Build } from '../data/types';
 import type { Ledger } from './ledger';
 import type { ReprieveState } from './reprieve';
 import type {
+  Actor,
   DamageRecord,
   FlaskState,
   PlayerAI,
   SkillZone,
   TriggerRuntime,
   Vitals,
+  World,
 } from './types';
 
 /** What a side counts as it plays: the kills and the time lost, and the damage it took and dealt. */
@@ -202,4 +204,34 @@ export type Side = {
   shots: PendingShot[];
   /** How the last hit of the player's resolved (a strike that sends more out waits to see it land). */
   lastOutcome: 'hit' | 'miss' | 'block' | null;
+  // G5: the character
+  player: Actor;
+  char: Character;
+  build: Build;
+  primary: SkillChoice;
 };
+
+/** The team of the monsters (docs/DUEL.md 3.1): side 0 is team 0, a second side is team 2. */
+export const MONSTERS = 1;
+
+/**
+ * The character a monster hunts: that of the nearest living side (on a map, the only one; docs/DUEL.md 3.2). With none alive the
+ * first side's character stands in, as the one character of a map did when it was dead.
+ */
+export function hunted(w: World, m: Pick<Actor, 'x' | 'y'>): Actor {
+  const sides = w.sides;
+  // One side (a map): the character, with no search (monsters ask every tick).
+  if (sides.length === 1) return sides[0].player;
+  let best: Actor | null = null;
+  let bd = Infinity;
+  for (let i = 0; i < sides.length; i++) {
+    const p = sides[i].player;
+    if (!p.alive) continue;
+    const d = (p.x - m.x) * (p.x - m.x) + (p.y - m.y) * (p.y - m.y);
+    if (d < bd) {
+      bd = d;
+      best = p;
+    }
+  }
+  return best ?? sides[0].player;
+}

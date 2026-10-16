@@ -133,7 +133,7 @@ export function makeMinion(
   const r = o.r ?? def.r;
   const spot = w.grid.collide(x, y, r);
   const m = newActor(w.nextId++, false, spot.x, spot.y, r) as Minion;
-  m.faction = 0;
+  m.team = 0;
   m.side = s;
   m.def = body.def;
   m.bodyDef = body.def;
@@ -169,7 +169,7 @@ export function summonMinions(w: World, s: Side, c: SkillChoice, prof: SkillProf
   const have = minionCount(s, c.key);
   const seconds = u.seconds === undefined ? Infinity : u.seconds * prof.skillDuration;
   for (const m of s.minions) if (m.key === c.key && m.alive) m.t = seconds;
-  const p = w.player;
+  const p = s.player;
   for (let i = have; i < n; i++) {
     const ang = (i / n) * Math.PI * 2;
     const g = u.golem;
@@ -243,8 +243,8 @@ export function summonAt(
  * A clone of the character fights with the character's weapon: its blows are the weapon's damage (flat parts and all), at the
  * weapon's speed, and a share more (Mirror Arrow, Blink Arrow: 75% more).
  */
-export function cloneOfPlayer(w: World, m: Minion, morePct: number): void {
-  const hand = w.char.hands[0];
+export function cloneOfPlayer(m: Minion, morePct: number): void {
+  const hand = m.side!.char.hands[0];
   if (!hand) return;
   let sum = 0;
   for (const [a, b] of hand.flats) sum += (a + b) / 2;
@@ -264,11 +264,11 @@ function step(w: World, m: Minion, tx: number, ty: number, dt: number, speed: nu
 
 export function tickMinions(w: World, s: Side, dt: number): void {
   if (s.minions.length === 0) return;
-  const p = w.player;
+  const p = s.player;
   const foes = w.actors.filter(
     (e) => !e.isPlayer && e.alive && e.phaseT <= 0 && e.state !== 'idle',
   );
-  const unstable = w.char.db.flag('minionInstability');
+  const unstable = s.char.db.flag('minionInstability');
   const aura = auraNow(s);
   let j = 0;
   for (const m of s.minions) {

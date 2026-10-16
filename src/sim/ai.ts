@@ -60,6 +60,7 @@ import {
   type SkillWhen,
 } from '../data/strategy';
 import type { Actor, World } from './types';
+import { hunted } from './side';
 import type { Side } from './side';
 
 function canAct(a: Actor): boolean {
@@ -146,8 +147,8 @@ const SUPPORT_PRIORITY = 4;
 const RARE_PRIORITY = 4;
 
 function findTarget(w: World, s: Side): Actor | null {
-  const p = w.player;
-  const prio = w.char.build.strategy?.target ?? STRATEGY_DEFAULTS.target;
+  const p = s.player;
+  const prio = s.char.build.strategy?.target ?? STRATEGY_DEFAULTS.target;
   let best: Actor | null = null;
   let bd = Infinity;
   for (const m of w.actors) {
@@ -189,9 +190,9 @@ function alreadyAfflicted(p: SkillProfile, target: Actor): boolean {
 }
 
 /** A skill that needs a corpse waits for one near the target, in reach of the character. */
-function corpseReady(w: World, p: SkillProfile, target: Actor): boolean {
+function corpseReady(w: World, s: Side, p: SkillProfile, target: Actor): boolean {
   if (!p.skill.needsCorpse) return true;
-  const pl = w.player;
+  const pl = s.player;
   const c = corpseNear(w, target.x, target.y, 6);
   return !!c && Math.hypot(c.x - pl.x, c.y - pl.y) <= skillRange(p) + 2;
 }
@@ -206,8 +207,8 @@ export function canHurt(p: SkillProfile, def: Defence): boolean {
 }
 
 /** Whether the player, from where it stands, can use a skill on the target. */
-function inReach(w: World, prof: SkillProfile, target: Actor): boolean {
-  const p = w.player;
+function inReach(w: World, s: Side, prof: SkillProfile, target: Actor): boolean {
+  const p = s.player;
   const melee = prof.skill.behaviour.kind === 'melee';
   const reach = skillRange(prof) + target.r + (melee ? p.r : 0);
   const d = Math.hypot(target.x - p.x, target.y - p.y);
@@ -227,11 +228,11 @@ type Pick = {
 const isBig = (a: Actor) => a.rarity === 'boss' || a.rarity === 'miniboss' || a.rarity === 'rare';
 
 /** Whether a skill's condition (Strategy tab) holds in the fight as it is now. */
-function whenHolds(w: World, when: SkillWhen, target: Actor): boolean {
+function whenHolds(w: World, s: Side, when: SkillWhen, target: Actor): boolean {
   if (when === 'any') return true;
   if (when === 'rare') return isBig(target);
   if (when === 'boss') return target.rarity === 'boss' || target.rarity === 'miniboss';
-  const p = w.player;
+  const p = s.player;
   const pack = enemiesNear(w, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE;
   return when === 'pack' ? pack : !pack;
 }
@@ -247,16 +248,16 @@ function debuffHolds(prof: SkillProfile, target: Actor): boolean {
  * use (it walks into reach for it); then, with no main skill to use, a periodic one that is ready early; and last the weapon.
  */
 function chooseSkill(w: World, s: Side, target: Actor): Pick {
-  const conds = playerConds(w, target);
-  const p = w.player;
+  const conds = playerConds(w, s, target);
+  const p = s.player;
   const usable = (c: SkillChoice, prof: SkillProfile): boolean =>
-    skillReady(w, s, c) &&
+    skillReady(s, c) &&
     canHurt(prof, target.def) &&
-    canPay(w, c.costsLife, prof.cost) &&
-    !deployFull(w, s, c, prof) &&
-    corpseReady(w, prof, target);
-  for (const e of w.char.rotation) {
-    if (!whenHolds(w, e.when, target)) continue;
+    canPay(s, c.costsLife, prof.cost) &&
+    !deployFull(s, c, prof) &&
+    corpseReady(w, s, prof, target);
+  for (const e of s.char.rotation) {
+    if (!whenHolds(w, s, e.when, target)) continue;
     const c = e.choice;
     if (c.skill.utility) {
       const u = utilityPick(w, s, e, target);
@@ -279,17 +280,17 @@ function chooseSkill(w: World, s: Side, target: Actor): Pick {
       continue;
     if (e.role === 'opener' && !openerDue(s, c.key, target)) continue;
     if (e.role === 'emergency' && p.life >= p.def.maxLife * e.life) continue;
-    const prof = w.char.profile(c, conds, flaskMask(s));
+    const prof = s.char.profile(c, conds, flaskMask(s));
     if (e.role === 'keepUp' && debuffHolds(prof, target)) continue;
-    if (!usable(c, prof) || !inReach(w, prof, target)) continue;
+    if (!usable(c, prof) || !inReach(w, s, prof, target)) continue;
     return { which: 'secondary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
   }
   let starved = false;
-  for (const e of w.char.mains) {
-    if (!whenHolds(w, e.when, target)) continue;
+  for (const e of s.char.mains) {
+    if (!whenHolds(w, s, e.when, target)) continue;
     const c = e.choice;
-    const prof = w.char.profile(c, conds, flaskMask(s));
-    if (!canPay(w, c.costsLife, prof.cost)) starved = true;
+    const prof = s.char.profile(c, conds, flaskMask(s));
+    if (!canPay(s, c.costsLife, prof.cost)) starved = true;
     // Against a target immune to everything the skill deals, the next skill (or the weapon) is used.
     if (!usable(c, prof) || alreadyAfflicted(prof, target)) continue;
     return { which: 'primary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
@@ -297,18 +298,18 @@ function chooseSkill(w: World, s: Side, target: Actor): Pick {
   // No main skill can be used (its cooldown, an immune target): a periodic skill that is ready is better than the weapon. Not when
   // the main skill waits for mana: the free weapon lets the mana come back, where another skill would keep it low.
   if (!starved)
-    for (const e of w.char.rotation) {
+    for (const e of s.char.rotation) {
       const c = e.choice;
-      if (c.skill.utility || e.role !== 'periodic' || !whenHolds(w, e.when, target)) continue;
-      const prof = w.char.profile(c, conds, flaskMask(s));
-      if (!usable(c, prof) || !inReach(w, prof, target)) continue;
+      if (c.skill.utility || e.role !== 'periodic' || !whenHolds(w, s, e.when, target)) continue;
+      const prof = s.char.profile(c, conds, flaskMask(s));
+      if (!usable(c, prof) || !inReach(w, s, prof, target)) continue;
       return { which: 'secondary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
     }
   return {
     which: 'default',
-    prof: w.char.profile(w.char.defaultAttack, conds, flaskMask(s)),
+    prof: s.char.profile(s.char.defaultAttack, conds, flaskMask(s)),
     costsLife: false,
-    choice: w.char.defaultAttack,
+    choice: s.char.defaultAttack,
     cd: 0,
   };
 }
@@ -330,7 +331,7 @@ export function hazardAt(
     }
     // A blast is a hazard once its warning shows (a later step of a pattern is not yet), by its shape. A blow that follows
     // the character (a Sentence) cannot be stepped out of, so the character does not try.
-    if (e.faction === 1 && e.t > 0 && !e.unavoidable && !pending(e) && inBlast(e, x, y, margin))
+    if (e.team === 1 && e.t > 0 && !e.unavoidable && !pending(e) && inBlast(e, x, y, margin))
       return e;
   }
   for (const t of telegraphs(w))
@@ -353,7 +354,7 @@ function bodyOnWay(w: World, x0: number, y0: number, x1: number, y1: number, r: 
  * reach, so the player never walks out of the fight. Returns whether it moved.
  */
 function avoidHazard(w: World, s: Side, dt: number): boolean {
-  const p = w.player;
+  const p = s.player;
   const ai = s.ai;
   if (ai.dodgeRest > 0) {
     ai.dodgeRest -= dt;
@@ -364,9 +365,9 @@ function avoidHazard(w: World, s: Side, dt: number): boolean {
     return false;
   }
   const target = s.ai.targetId ? actorById(w, s.ai.targetId) : undefined;
-  const prof = w.primary.usable
-    ? w.char.profile(w.primary, 0)
-    : w.char.profile(w.char.defaultAttack, 0);
+  const prof = s.primary.usable
+    ? s.char.profile(s.primary, 0)
+    : s.char.profile(s.char.defaultAttack, 0);
   const melee = prof.skill.behaviour.kind === 'melee';
   const reach = skillRange(prof) + (target ? target.r : 0) + (melee ? p.r : 0);
   let best: { x: number; y: number; d: number } | null = null;
@@ -403,7 +404,7 @@ function avoidHazard(w: World, s: Side, dt: number): boolean {
  * its target is still in reach and in sight, for a moment, and then fights on. Returns whether it moved.
  */
 function kiteStep(w: World, s: Side, target: Actor, dt: number): boolean {
-  const p = w.player;
+  const p = s.player;
   const ai = s.ai;
   ai.kiteCd -= dt;
   if (ai.kiteT > 0) {
@@ -414,8 +415,8 @@ function kiteStep(w: World, s: Side, target: Actor, dt: number): boolean {
     }
     ai.kiteT = 0;
   }
-  if (w.char.build.strategy?.spacing !== 'kite' || ai.kiteCd > 0) return false;
-  const prof = w.char.profile(w.primary, 0);
+  if (s.char.build.strategy?.spacing !== 'kite' || ai.kiteCd > 0) return false;
+  const prof = s.char.profile(s.primary, 0);
   if (prof.skill.behaviour.kind === 'melee') return false;
   const range = skillRange(prof) + target.r;
   // A skill of short reach gains nothing by backing off.
@@ -457,7 +458,7 @@ function kiteStep(w: World, s: Side, target: Actor, dt: number): boolean {
 }
 
 export function playerAI(w: World, s: Side, dt: number): void {
-  const p = w.player;
+  const p = s.player;
   const ai = s.ai;
   p.moving = false;
   if (!canAct(p)) return;
@@ -468,7 +469,7 @@ export function playerAI(w: World, s: Side, dt: number): void {
   if (target && (!target.alive || Math.hypot(target.x - p.x, target.y - p.y) > ENGAGE_RANGE + 3))
     target = undefined;
   ai.scanT -= dt;
-  const strategy = w.char.build.strategy;
+  const strategy = s.char.build.strategy;
   // With the `stick` priority, a target is kept until it falls or gets away.
   const stick = strategy?.target === 'stick' && !!target;
   if (!target || (ai.scanT <= 0 && !stick)) {
@@ -477,7 +478,7 @@ export function playerAI(w: World, s: Side, dt: number): void {
   }
   if (target && target.id === ai.skipId && w.t < ai.skipUntil) target = undefined;
   // Withering Step and Phase Run are run in: no attack until they are over (a skill used would end them).
-  if (target && running(w, s)) target = undefined;
+  if (target && running(s)) target = undefined;
   if (target) {
     // Stall breaker: a target that takes no damage for a long time is dropped for a while, so the
     // run moves on (and the monster, if it is chasing, comes to the player instead).
@@ -504,7 +505,7 @@ export function playerAI(w: World, s: Side, dt: number): void {
     const pick = chooseSkill(w, s, target);
     const { which, prof, costsLife, choice, entry } = pick;
     if (which === 'utility') {
-      payCost(w, costsLife, prof.cost);
+      payCost(s, costsLife, prof.cost);
       s.utilityReady[choice.key] = w.t + pick.cd;
       useSkill(w, s, choice);
       if (entry?.role === 'opener') markOpened(s, choice.key, target);
@@ -533,9 +534,9 @@ export function playerAI(w: World, s: Side, dt: number): void {
       }
     }
     if (inRange) {
-      if (which === 'primary' || which === 'secondary') payCost(w, costsLife, prof.cost);
+      if (which === 'primary' || which === 'secondary') payCost(s, costsLife, prof.cost);
       if (entry?.role === 'periodic' && choice.skill.cooldown === undefined)
-        s.secondaryReady[choice.key] = w.t + w.char.cooldownOf(choice, playerConds(w, target));
+        s.secondaryReady[choice.key] = w.t + s.char.cooldownOf(choice, playerConds(w, s, target));
       if (which === 'primary' || which === 'secondary') useSkill(w, s, choice);
       if (entry?.role === 'opener') markOpened(s, choice.key, target);
       startAction(w, p, which, prof, target);
@@ -716,7 +717,7 @@ const RANGED_BLOCKED_TIME = 1.5;
 function minionInReach(w: World, m: Actor, range: number): Actor | null {
   let best: Actor | null = null;
   let bd = Infinity;
-  for (const v of w.player.side!.minions) {
+  for (const v of hunted(w, m).side!.minions) {
     if (!v.alive) continue;
     const d = Math.hypot(v.x - m.x, v.y - m.y);
     if (d <= range + v.r + m.r && d < bd) {
@@ -731,7 +732,7 @@ function minionInReach(w: World, m: Actor, range: number): Actor | null {
 function minionInSight(w: World, m: Actor, range: number): Actor | null {
   let best: Actor | null = null;
   let bd = Infinity;
-  for (const v of w.player.side!.minions) {
+  for (const v of hunted(w, m).side!.minions) {
     if (!v.alive) continue;
     const d = Math.hypot(v.x - m.x, v.y - m.y);
     if (d <= range && d < bd && w.grid.los(m.x, m.y, v.x, v.y)) {
@@ -787,7 +788,7 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     return;
   // A monster in a window (a Brace) holds its ground until it ends.
   if (m.enc && (inWindow(m) || tryWindow(w, m))) return;
-  const p = w.player;
+  const p = hunted(w, m);
   if (!p.alive) return;
   const d = Math.hypot(p.x - m.x, p.y - m.y);
   if (m.state === 'idle') {
@@ -806,7 +807,7 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
       m.noticeT = 0.25;
       // Phase Run halves how far the character is noticed from.
       const seen =
-        (senseOf(m).aggro ?? MONSTER_AGGRO) * (w.player.side!.buffT.phaseRun > 0 ? 0.5 : 1);
+        (senseOf(m).aggro ?? MONSTER_AGGRO) * (hunted(w, m).side!.buffT.phaseRun > 0 ? 0.5 : 1);
       if (d <= seen && w.grid.los(m.x, m.y, p.x, p.y)) {
         m.state = 'chase';
         m.lostT = 0;
@@ -877,7 +878,7 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
       if (d <= range && los) startAction(w, m, 'monster', prof, p);
       else {
         // It cannot reach the player: a minion in sight will do.
-        const v = w.player.side!.minions.length > 0 ? minionInSight(w, m, range) : null;
+        const v = hunted(w, m).side!.minions.length > 0 ? minionInSight(w, m, range) : null;
         if (v) startAction(w, m, 'monster', prof, v);
       }
       return;
@@ -903,7 +904,7 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     // It cannot hit the player from here: it walks on toward the player, and shoots a minion in range and in sight only
     // once it is held up (a ranged monster goes for the character, not for what stands about it).
     const v =
-      w.player.side!.minions.length > 0 && m.blockT >= RANGED_BLOCKED_TIME && tg === p
+      hunted(w, m).side!.minions.length > 0 && m.blockT >= RANGED_BLOCKED_TIME && tg === p
         ? minionInSight(w, m, range)
         : null;
     if (v) {
@@ -922,7 +923,7 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     return;
   }
   // Held up on the way to the player (by minions, say): whatever minion is in reach gets hit instead.
-  if (m.blockT >= BLOCKED_TIME && w.player.side!.minions.length > 0) {
+  if (m.blockT >= BLOCKED_TIME && hunted(w, m).side!.minions.length > 0) {
     const v = minionInReach(w, m, range);
     if (v) {
       startAction(w, m, 'monster', prof, v);
@@ -938,7 +939,6 @@ const MAX_ACTOR_REACH = 2;
 
 /** Soft separation between nearby actors. */
 export function separate(w: World): void {
-  const p = w.player;
   // Dead actors stay in the world's list, so look only at the living (a big map has hundreds of the dead).
   const list: Actor[] = [];
   for (const m of w.actors) if (m.alive && !m.isPlayer) list.push(m);
@@ -985,24 +985,27 @@ export function separate(w: World): void {
         }
       }
     }
-    // Player vs monster: the monster yields most of the overlap; under Phase Run the character passes through.
-    if (w.player.side!.buffT.phaseRun > 0) continue;
-    const dx = a.x - p.x;
-    const dy = a.y - p.y;
-    const rr = a.r + p.r;
-    const d2 = dx * dx + dy * dy;
-    if (d2 < rr * rr && d2 > 1e-9) {
-      const d = Math.sqrt(d2);
-      const push = rr - d;
-      const ca = w.grid.collide(a.x + (dx / d) * push * 0.8, a.y + (dy / d) * push * 0.8, a.r);
-      a.x = ca.x;
-      a.y = ca.y;
-      const cp = w.grid.collide(p.x - (dx / d) * push * 0.2, p.y - (dy / d) * push * 0.2, p.r);
-      p.x = cp.x;
-      p.y = cp.y;
+    // Character vs monster: the monster yields most of the overlap; under Phase Run the character passes through.
+    for (const s of w.sides) {
+      if (s.buffT.phaseRun > 0) continue;
+      const p = s.player;
+      const dx = a.x - p.x;
+      const dy = a.y - p.y;
+      const rr = a.r + p.r;
+      const d2 = dx * dx + dy * dy;
+      if (d2 < rr * rr && d2 > 1e-9) {
+        const d = Math.sqrt(d2);
+        const push = rr - d;
+        const ca = w.grid.collide(a.x + (dx / d) * push * 0.8, a.y + (dy / d) * push * 0.8, a.r);
+        a.x = ca.x;
+        a.y = ca.y;
+        const cp = w.grid.collide(p.x - (dx / d) * push * 0.2, p.y - (dy / d) * push * 0.2, p.r);
+        p.x = cp.x;
+        p.y = cp.y;
+      }
     }
   }
-  if (w.player.side!.minions.length > 0) separateMinions(w, list);
+  for (const s of w.sides) if (s.minions.length > 0) separateMinions(w, s, list);
 }
 
 /**
@@ -1010,9 +1013,9 @@ export function separate(w: World): void {
  * monster that is awake and free to move gives way half; one that sleeps or never moves gives none, and the minion
  * yields instead. The player pushes minions aside.
  */
-function separateMinions(w: World, list: Actor[]): void {
-  const p = w.player;
-  const ms = w.player.side!.minions;
+function separateMinions(w: World, s: Side, list: Actor[]): void {
+  const p = s.player;
+  const ms = s.minions;
   const nudge = (a: Actor, dx: number, dy: number): void => {
     const x = a.x + dx;
     const y = a.y + dy;

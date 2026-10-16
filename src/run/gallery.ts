@@ -96,7 +96,7 @@ export function galleryWorld(run: RunState, entry?: GalleryEntry): World {
   if (entry?.look.delivery === 'guard') {
     // A guard skill is cast when life runs low.
     world.sides[0].opts.freeResources = false;
-    world.player.life = world.player.def.maxLife * 0.3;
+    world.sides[0].player.life = world.sides[0].player.def.maxLife * 0.3;
   }
   const start = world.plan.lab.start;
   for (const [dx, dy] of [

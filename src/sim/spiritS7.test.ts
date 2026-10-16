@@ -45,7 +45,7 @@ describe('Contagion (creepingPlague)', () => {
     let hits = 0;
     for (let i = 0; i < 2 * 60 && !dummy.sdots.length; i++) {
       stepWorld(w);
-      for (const e of w.events) if (e.t === 'hit' && e.src === w.player.id) hits++;
+      for (const e of w.events) if (e.t === 'hit' && e.src === w.sides[0].player.id) hits++;
     }
     expect(dummy.sdots.some((d) => d.src === 'creepingPlague')).toBe(true);
     expect(other.sdots.some((d) => d.src === 'creepingPlague')).toBe(true);
@@ -119,7 +119,7 @@ describe('Scorching Ray (searingLance)', () => {
   it('keeps burning for a moment after the ray leaves', () => {
     const { world: w, dummy } = world(buildFor(['searingLance'], 'wand_3', INT), 3);
     run(w, 2);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const before = dummy.life;
     run(w, 1);
     expect(dummy.life).toBeLessThan(before);
@@ -136,10 +136,10 @@ describe('Essence Drain (sapBolt)', () => {
     expect(dummy.sdots.some((d) => d.src === 'sapBolt')).toBe(true);
     expect(next.sdots.some((d) => d.src === 'sapBolt')).toBe(true);
     w.sides[0].opts.freeResources = false;
-    w.player.life = 1;
-    const l0 = w.player.life;
+    w.sides[0].player.life = 1;
+    const l0 = w.sides[0].player.life;
     run(w, 1);
-    expect(w.player.life).toBeGreaterThan(l0 + 1);
+    expect(w.sides[0].player.life).toBeGreaterThan(l0 + 1);
   });
 
   it('goes along with Contagion to the enemies near a corpse, but not without it', () => {
@@ -182,7 +182,7 @@ describe('Caustic Arrow (acidArrow)', () => {
     expect(far.sdots.length).toBe(0);
     // Patches do not add up: still one debuff, and it ends soon after the ground.
     expect(dummy.sdots.filter((d) => d.src === 'acidArrow').length).toBe(1);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     run(w, 4);
     expect(dummy.sdots.length).toBe(0);
   });
@@ -213,7 +213,7 @@ describe('Decay (slowRot) and Vile Toxins (foulBrew)', () => {
 
   it('Vile Toxins: a hit deals more for each poison on the target, up to a limit', () => {
     const { world: w, dummy } = world(buildFor(['sapBolt', 'foulBrew'], 'wand_3', INT));
-    const prof = w.char.profile(w.primary, 0);
+    const prof = w.sides[0].char.profile(w.sides[0].primary, 0);
     expect(prof.perPoison).not.toBeNull();
     const dmg = () => {
       const t = targetState(dummy);
@@ -305,7 +305,7 @@ describe('Herald of Ash (cinderHerald)', () => {
     );
     const near = neighbour(w, dummy.x + 1.5, dummy.y);
     const far = neighbour(w, dummy.x + 9, dummy.y);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     dummy.def = dummyDefence({ maxLife: 100 });
     dummy.life = 100;
     rawHit(w, dummy, 1100, 0);

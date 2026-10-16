@@ -34,7 +34,15 @@ const spec = (type: MonsterTypeId, rarity: MonsterSpec['rarity'] = 'normal'): Mo
 });
 
 function put(w: World, type: MonsterTypeId, dx: number, rarity?: MonsterSpec['rarity']): Actor {
-  const m = spawnMonster(w, spec(type, rarity), w.player.x + dx, w.player.y, 0, 0, type);
+  const m = spawnMonster(
+    w,
+    spec(type, rarity),
+    w.sides[0].player.x + dx,
+    w.sides[0].player.y,
+    0,
+    0,
+    type,
+  );
   m.state = 'chase';
   return m;
 }
@@ -43,14 +51,14 @@ describe('the death recap (the record a death sends)', () => {
   it('lists the hits in order with how long before, and the life and shield the player had before each', () => {
     const w = arena();
     const m = put(w, 'warrior', 30);
-    const p = w.player;
+    const p = w.sides[0].player;
     p.life = 500;
     p.es = 40;
     w.t = 10;
-    logDamage(w, w.player, m, m.name, 0, 100);
+    logDamage(w, w.sides[0].player, m, m.name, 0, 100);
     w.t = 12;
     p.life = 400;
-    logDamage(w, w.player, null, 'Reflect', 3, 50);
+    logDamage(w, w.sides[0].player, null, 'Reflect', 3, 50);
     w.t = 15;
     const r = buildRecap(w);
     expect(r.hits!.map((h) => h.name)).toEqual([m.name, 'Reflect']);
@@ -61,8 +69,8 @@ describe('the death recap (the record a death sends)', () => {
   it('keeps damage over time as a total in the lines, not as a hit each tick', () => {
     const w = arena();
     w.t = 3;
-    for (let i = 0; i < 20; i++) logDamage(w, w.player, null, 'Burning', 3, 5);
-    logDamage(w, w.player, null, 'Crush', 0, 70);
+    for (let i = 0; i < 20; i++) logDamage(w, w.sides[0].player, null, 'Burning', 3, 5);
+    logDamage(w, w.sides[0].player, null, 'Crush', 0, 70);
     const r = buildRecap(w);
     expect(r.hits!.map((h) => h.name)).toEqual(['Crush']);
     expect(r.lines.find((l) => l.name === 'Burning')?.amount).toBe(100);
@@ -72,7 +80,7 @@ describe('the death recap (the record a death sends)', () => {
     const w = arena();
     for (let i = 0; i < 30; i++) {
       w.t = 20 + i * 0.1;
-      logDamage(w, w.player, null, `h${i}`, 0, 10);
+      logDamage(w, w.sides[0].player, null, `h${i}`, 0, 10);
     }
     w.t = 25;
     const r = buildRecap(w);
@@ -87,15 +95,15 @@ describe('the death recap (the record a death sends)', () => {
     const m = put(w, 'warrior', 25, 'rare');
     w.effects.push({
       id: w.nextId++,
-      x: w.player.x,
-      y: w.player.y,
+      x: w.sides[0].player.x,
+      y: w.sides[0].player.y,
       radius: 2,
       t: 0.1,
       total: 0.1,
       kind: 'slam',
       damage: 300,
       dtype: 0,
-      faction: 1,
+      team: 1,
       owner: m.id,
     });
     for (let i = 0; i < 20; i++) stepWorld(w);
@@ -109,11 +117,11 @@ describe('the death recap (the record a death sends)', () => {
     put(w, 'warrior', 4, 'rare');
     put(w, 'warrior', 5, 'magic');
     put(w, 'warrior', 30);
-    rawHit(w, w.player, 10, 0, 'Test');
+    rawHit(w, w.sides[0].player, 10, 0, 'Test');
     const r = buildRecap(w);
     expect(r.near).toEqual({ all: 3, magic: 1, rare: 1, boss: 0 });
-    expect(r.defence!.armour).toBe(w.player.def.armour);
-    expect(r.vitals!.life).toBe(w.player.life);
+    expect(r.defence!.armour).toBe(w.sides[0].player.def.armour);
+    expect(r.vitals!.life).toBe(w.sides[0].player.life);
     expect(r.flasks).toHaveLength(w.sides[0].flasks.length);
     for (const f of r.flasks!) expect(f.uses).toBe(0);
   });

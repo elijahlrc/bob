@@ -30,7 +30,7 @@ describe('aggro', () => {
     const w = createWorld({ plan, build: run.build, xp: 0, opts: worldOptsFor(run, plan) });
     const idle = () => w.actors.filter((a) => !a.isPlayer && a.alive && a.state === 'idle').length;
     const before = idle();
-    for (let i = 0; i < 60 * 60 && w.player.action === null; i++) stepWorld(w);
+    for (let i = 0; i < 60 * 60 && w.sides[0].player.action === null; i++) stepWorld(w);
     expect(before).toBeGreaterThan(0);
     expect(idle()).toBeLessThan(before);
   });

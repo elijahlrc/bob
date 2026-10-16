@@ -77,7 +77,15 @@ export function putBoss(w: World, id: BossId, dx = 6, dy = 0, level = 40): Actor
     level,
     mods: id === 'magistrate' ? ['hexWarded'] : [],
   };
-  const m = spawnMonster(w, spec, w.player.x + dx, w.player.y + dy, 0, 900, BOSSES[id].name);
+  const m = spawnMonster(
+    w,
+    spec,
+    w.sides[0].player.x + dx,
+    w.sides[0].player.y + dy,
+    0,
+    900,
+    BOSSES[id].name,
+  );
   m.state = 'chase';
   return m;
 }
@@ -138,7 +146,7 @@ describe('the Tollkeeper (docs/BOSSES.md 4)', () => {
   it('tolls on its clock, with rings that shock, and grows stronger with each', () => {
     const w = bossArena(12);
     // Held still, so its blows do not stun the bell (that is the other test).
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'tollkeeper', 5, 0, 10);
     const fresh = bossDamageMult(m);
     run(w, TOLL_EVERY + TOLL_TELL + 2);
@@ -166,7 +174,7 @@ describe('the Tollkeeper (docs/BOSSES.md 4)', () => {
 
   it('chill slows its clock', () => {
     const w = bossArena(12);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'tollkeeper', 5, 0, 10);
     const st = bossState(m)!;
     run(w, 1);
@@ -200,7 +208,7 @@ describe('the Courser (docs/BOSSES.md 5)', () => {
       lastY = m.y;
       if (st.gait === 'canter' && i > 60) {
         canter++;
-        if (Math.hypot(m.x - w.player.x, m.y - w.player.y) <= 2.6) near++;
+        if (Math.hypot(m.x - w.sides[0].player.x, m.y - w.sides[0].player.y) <= 2.6) near++;
       }
     }
     expect([...gaits].sort()).toEqual(['canter', 'charge', 'gallop', 'tell', 'turn'].sort());
@@ -214,7 +222,7 @@ describe('the Courser (docs/BOSSES.md 5)', () => {
     const w = bossArena(32);
     const m = putBoss(w, 'courser', 3, 0, 30);
     const st = bossState(m)!;
-    const p = w.player;
+    const p = w.sides[0].player;
     let swings = 0;
     let reached = 0;
     let hits = 0;
@@ -237,7 +245,7 @@ describe('the Courser (docs/BOSSES.md 5)', () => {
 
   it('chill slows it, and it cannot be stunned at a gallop', () => {
     const w = bossArena(32);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'courser', 4, 0, 30);
     const st = bossState(m)!;
     for (let i = 0; i < 60 * 12 && st.gait !== 'gallop'; i++) stepWorld(w);
@@ -251,7 +259,7 @@ describe('the Courser (docs/BOSSES.md 5)', () => {
 describe('the Magistrate (docs/BOSSES.md 6)', () => {
   it('raises four Witnesses, and its Sentence follows the character and grows with each Witness', () => {
     const w = bossArena(52);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'magistrate', 5, 0, 50);
     const st = bossState(m)!;
     run(w, 1);
@@ -266,9 +274,9 @@ describe('the Magistrate (docs/BOSSES.md 6)', () => {
     stepWorld(w);
     expect(e.damage).toBeLessThan(full);
     // It follows the character.
-    w.player.x += 1;
+    w.sides[0].player.x += 1;
     stepWorld(w);
-    expect(e.x).toBeCloseTo(w.player.x);
+    expect(e.x).toBeCloseTo(w.sides[0].player.x);
   });
 
   it('the character goes for a Witness before the Magistrate', async () => {
@@ -278,19 +286,19 @@ describe('the Magistrate (docs/BOSSES.md 6)', () => {
     run(w, 0.5);
     const st = bossState(m)!;
     // Put one Witness a little farther than the Magistrate: it still comes first.
-    st.witnesses[0].x = w.player.x - 5;
-    st.witnesses[0].y = w.player.y;
+    st.witnesses[0].x = w.sides[0].player.x - 5;
+    st.witnesses[0].y = w.sides[0].player.y;
     expect(findTargetForTest(w, w.sides[0])?.mon?.spec.type).toBe('witness');
   });
 
   it('the dodge does not try to step out of a Sentence', async () => {
     const { hazardAt } = await import('./ai');
     const w = bossArena(52);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'magistrate', 5, 0, 50);
     const st = bossState(m)!;
     for (let i = 0; i < 60 * 20 && st.countT <= 0; i++) stepWorld(w);
-    expect(hazardAt(w, w.player.x, w.player.y)).toBe(null);
+    expect(hazardAt(w, w.sides[0].player.x, w.sides[0].player.y)).toBe(null);
   });
 
   it('is immune to curses and the Rotwife takes them in full', async () => {
@@ -312,7 +320,7 @@ describe('the Magistrate (docs/BOSSES.md 6)', () => {
 describe('the Prism Warden (docs/BOSSES.md 7)', () => {
   it('attunes in turn, is immune to its element, and is Fractured to the one it left', () => {
     const w = bossArena(72);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'prismWarden', 6, 0, 70);
     const st = bossState(m)!;
     run(w, 0.5);
@@ -329,7 +337,7 @@ describe('the Prism Warden (docs/BOSSES.md 7)', () => {
 
   it('casts the pattern of its element', () => {
     const w = bossArena(72);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     putBoss(w, 'prismWarden', 6, 0, 70);
     let seen = false;
     for (let i = 0; i < 60 * 8 && !seen; i++) {
@@ -343,7 +351,7 @@ describe('the Prism Warden (docs/BOSSES.md 7)', () => {
 describe('the Rotwife (docs/BOSSES.md 8)', () => {
   it('regrows, but not while something eats at her', () => {
     const w = bossArena(92);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'rotwife', 4, 0, 90);
     run(w, 0.2);
     m.life = m.def.maxLife * 0.5;
@@ -366,17 +374,17 @@ describe('the Unmaker (docs/BOSSES.md 9)', () => {
   it('steals at its marks, a shard each; breaking a shard gives the piece back and staggers it', async () => {
     const { theftOf } = await import('./theft');
     const w = bossArena(100);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'unmaker', 5, 0, 100);
     const st = bossState(m)!;
     run(w, 0.2);
-    const before = w.player.def.res.slice();
+    const before = w.sides[0].player.def.res.slice();
     m.life = m.def.maxLife * 0.79;
     run(w, 0.1);
     expect(st.thefts).toBe(1);
     expect(theftOf(w).res).toBeDefined();
     const el = theftOf(w).res!;
-    expect(w.player.def.res[el]).toBeLessThan(before[el]);
+    expect(w.sides[0].player.def.res[el]).toBeLessThan(before[el]);
     expect(st.shards).toHaveLength(1);
     // It hits in the element it took.
     expect(m.mon!.spec.variant).not.toBe('none');
@@ -385,7 +393,7 @@ describe('the Unmaker (docs/BOSSES.md 9)', () => {
     const { rawHit } = await import('./combat');
     rawHit(w, shard, 1e6, 0);
     expect(theftOf(w).res).toBeUndefined();
-    expect(w.player.def.res[el]).toBeCloseTo(before[el]);
+    expect(w.sides[0].player.def.res[el]).toBeCloseTo(before[el]);
     expect(m.stunT).toBeGreaterThan(1);
     expect(st.exposedT).toBeGreaterThan(0);
   });
@@ -393,7 +401,7 @@ describe('the Unmaker (docs/BOSSES.md 9)', () => {
   it('seals the flasks at its last mark, and drinks them', async () => {
     const { flasksSealed } = await import('./theft');
     const w = bossArena(100);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'unmaker', 5, 0, 100);
     run(w, 0.2);
     m.life = m.def.maxLife * 0.19;
@@ -409,7 +417,7 @@ describe('the Unmaker (docs/BOSSES.md 9)', () => {
 
   it('hardens against the damage it is dealt most', () => {
     const w = bossArena(100);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'unmaker', 5, 0, 100);
     const st = bossState(m)!;
     run(w, 0.2);
@@ -422,7 +430,7 @@ describe('the Unmaker (docs/BOSSES.md 9)', () => {
   it('gives everything back when it dies', async () => {
     const { theftOf } = await import('./theft');
     const w = bossArena(100);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'unmaker', 5, 0, 100);
     run(w, 0.2);
     m.life = m.def.maxLife * 0.19;
@@ -439,7 +447,7 @@ describe('the Unmaker (docs/BOSSES.md 9)', () => {
 describe('the Siege Marshal (docs/BOSSES.md 5a)', () => {
   it('commands from where he stands while regiments march in, and comes down only between them', () => {
     const w = bossArena(22);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'siegeMarshal', 5, 0, 20);
     const st = bossState(m)!;
     const x0 = m.x;
@@ -479,7 +487,7 @@ describe('the Siege Marshal (docs/BOSSES.md 5a)', () => {
 
   it('a regiment comes on its own if the last is not cleared in time, unless the field is full', () => {
     const w = bossArena(22);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'siegeMarshal', 5, 0, 20);
     const st = bossState(m)!;
     run(w, HORN_TELL + 0.3);
@@ -497,14 +505,14 @@ describe('the Siege Marshal (docs/BOSSES.md 5a)', () => {
   it('"weakest" takes his soldiers before him, even once he has a scratch on him', async () => {
     const { findTargetForTest } = await import('./ai');
     const w = bossArena(22);
-    w.char.build.strategy = { target: 'lowest' };
+    w.sides[0].char.build.strategy = { target: 'lowest' };
     const m = putBoss(w, 'siegeMarshal', 5, 0, 20);
     const st = bossState(m)!;
     run(w, HORN_TELL + 0.3);
     m.life = m.def.maxLife * 0.99;
     for (const s of st.soldiers) {
-      s.x = w.player.x + 2;
-      s.y = w.player.y;
+      s.x = w.sides[0].player.x + 2;
+      s.y = w.sides[0].player.y;
     }
     expect(findTargetForTest(w, w.sides[0])?.mon?.spec.type).not.toBe('siegeMarshal');
     for (const s of st.soldiers) s.alive = false;
@@ -514,7 +522,7 @@ describe('the Siege Marshal (docs/BOSSES.md 5a)', () => {
   it('the soldiers go with him when he falls', async () => {
     const { rawHit } = await import('./combat');
     const w = bossArena(22);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'siegeMarshal', 5, 0, 20);
     const st = bossState(m)!;
     run(w, HORN_TELL + 0.3);
@@ -529,12 +537,12 @@ describe('the Veiled Duellist (docs/BOSSES.md 5b)', () => {
   const crits = async (veiled: boolean) => {
     const { hit } = await import('./combat');
     const w = bossArena(42);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'duellist', 5, 0, 40);
     const st = bossState(m)!;
     st.veiled = veiled;
     st.phaseT = 1e9;
-    const prof = w.char.profile(w.char.primary);
+    const prof = w.sides[0].char.profile(w.sides[0].char.primary);
     const sure = {
       ...prof,
       hands: prof.hands.map((h) => ({ ...h, critChance: 1, accuracy: 1e9 })),
@@ -543,7 +551,7 @@ describe('the Veiled Duellist (docs/BOSSES.md 5b)', () => {
     for (let i = 0; i < 30; i++) {
       m.life = m.def.maxLife;
       w.events.length = 0;
-      hit(w, w.player, m, sure, 0, 1);
+      hit(w, w.sides[0].player, m, sure, 0, 1);
       for (const e of w.events) if (e.t === 'hit' && e.dst === m.id && e.crit) n++;
     }
     return n;
@@ -579,7 +587,7 @@ describe('the Veiled Duellist (docs/BOSSES.md 5b)', () => {
 describe('the Bulwark Engine (docs/BOSSES.md 5c)', () => {
   it('takes less from hits while its plates stand, and a big hit wears them down faster than a small one', () => {
     const w = bossArena(62);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'bulwarkEngine', 6, 0, 60);
     const st = bossState(m)!;
     const max = m.def.maxLife;
@@ -599,7 +607,7 @@ describe('the Bulwark Engine (docs/BOSSES.md 5c)', () => {
 
   it('small hits eventually break it (rule 3: never a wall for many small hits)', () => {
     const w = bossArena(62);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'bulwarkEngine', 6, 0, 60);
     const st = bossState(m)!;
     const tiny = m.def.maxLife * 0.0002;
@@ -624,7 +632,7 @@ describe('the Bulwark Engine (docs/BOSSES.md 5c)', () => {
 
   it('damage over time wears the plates too, and is not itself reduced', () => {
     const w = bossArena(62);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'bulwarkEngine', 12, 0, 60);
     const st = bossState(m)!;
     run(w, 0.1);
@@ -642,7 +650,7 @@ describe('the Bulwark Engine (docs/BOSSES.md 5c)', () => {
     let stuns = 0;
     for (let i = 0; i < 60 * 12; i++) {
       stepWorld(w);
-      for (const e of w.events) if (e.t === 'stun' && e.dst === w.player.id) stuns++;
+      for (const e of w.events) if (e.t === 'stun' && e.dst === w.sides[0].player.id) stuns++;
     }
     expect(stuns).toBeGreaterThan(0);
     expect(stuns).toBeLessThan(12 / BOSS_LOCK_SECONDS + 2);
@@ -659,7 +667,15 @@ describe('the Sundered Twins (docs/BOSSES.md 5d)', () => {
       level: 80,
       mods: [],
     };
-    const cinder = spawnMonster(w, spec, w.player.x + 6, w.player.y + 1.5, 0, 900, 'Cinder');
+    const cinder = spawnMonster(
+      w,
+      spec,
+      w.sides[0].player.x + 6,
+      w.sides[0].player.y + 1.5,
+      0,
+      900,
+      'Cinder',
+    );
     cinder.state = 'chase';
     return [ash, cinder];
   }
@@ -671,7 +687,7 @@ describe('the Sundered Twins (docs/BOSSES.md 5d)', () => {
       ['cinder', 'fire', 3],
     ] as const) {
       const w = bossArena(82);
-      w.player.stunT = 1e9;
+      w.sides[0].player.stunT = 1e9;
       const twins = putTwins(w);
       const dead = twins[first === 'ash' ? 0 : 1];
       const live = twins[first === 'ash' ? 1 : 0];
@@ -708,8 +724,8 @@ describe('on a real boss map', () => {
     });
     // Stand the character in the arena, a little off its middle.
     const end = plan.lab.rooms[plan.lab.mainPath[plan.lab.mainPath.length - 1]];
-    w.player.x = end.cx + 0.5 - 5;
-    w.player.y = end.cy + 0.5;
+    w.sides[0].player.x = end.cx + 0.5 - 5;
+    w.sides[0].player.y = end.cy + 0.5;
     return w;
   }
 
@@ -780,7 +796,7 @@ describe('no boss can out-heal a build (docs/BOSSES.md 2, rule 10)', () => {
 
   it('the Rotwife does not mend while she is being hurt, nor for a moment after', () => {
     const w = bossArena(92);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'rotwife', 4, 0, 90);
     run(w, 0.2);
     m.life = m.def.maxLife * 0.5;
@@ -800,7 +816,7 @@ describe('no boss can out-heal a build (docs/BOSSES.md 2, rule 10)', () => {
 
   it('the Unmaker does not drink the flasks while it is being hurt', () => {
     const w = bossArena(100);
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'unmaker', 5, 0, 100);
     run(w, 0.2);
     m.life = m.def.maxLife * 0.19;

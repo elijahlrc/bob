@@ -6,8 +6,8 @@ import type { World } from './types';
 import type { Side } from './side';
 
 /** Whether a cleansing flask would clear something on the character now (docs/BOSSES.md 11.2). */
-function cleansNow(w: World, s: FlaskSpec): boolean {
-  const p = w.player;
+function cleansNow(side: Side, s: FlaskSpec): boolean {
+  const p = side.player;
   const a = p.ail;
   return (
     (s.removeBleed && a.bleeds.length > 0) ||
@@ -23,8 +23,8 @@ function cleansNow(w: World, s: FlaskSpec): boolean {
  * A blow that cannot be dodged is about to land (a Sentence, docs/BOSSES.md 11.1), and it would take more than the character
  * has: a life flask now, whatever the threshold.
  */
-function braceFor(w: World): boolean {
-  const p = w.player;
+function braceFor(w: World, s: Side): boolean {
+  const p = s.player;
   for (const e of w.effects) {
     if (!e.unavoidable || e.t > 0.6 || e.damage <= 0) continue;
     const taken =
@@ -44,15 +44,15 @@ function braceFor(w: World): boolean {
 export type FlaskPolicy = (w: World, s: Side) => number[];
 
 export const autoFlaskPolicy: FlaskPolicy = (w, s) => {
-  const p = w.player;
+  const p = s.player;
   const out: number[] = [];
   // The Unmaker holds them (docs/BOSSES.md 9).
   if (flasksSealed(w)) return out;
-  const brace = w.effects.length > 0 && braceFor(w);
-  const cap = Math.max(1, p.def.maxLife - w.char.reservedLife);
-  const cost = w.primary.usable ? w.char.profile(w.primary).cost : 0;
+  const brace = w.effects.length > 0 && braceFor(w, s);
+  const cap = Math.max(1, p.def.maxLife - s.char.reservedLife);
+  const cost = s.primary.usable ? s.char.profile(s.primary).cost : 0;
   // The thresholds the Strategy tab sets.
-  const strategy = w.char.build.strategy;
+  const strategy = s.char.build.strategy;
   const lifeAt = strategy?.lifeFlask ?? STRATEGY_DEFAULTS.lifeFlask;
   const utilityUse = strategy?.utilityFlask ?? STRATEGY_DEFAULTS.utilityFlask;
   let nearbyRare = false;
@@ -84,7 +84,7 @@ export const autoFlaskPolicy: FlaskPolicy = (w, s) => {
     if (f.charges < f.spec.perUse) return;
     const k = f.spec.kind;
     // A flask that cleanses is drunk for what it cleanses, as a player would (3.9 cleansing suffixes).
-    const cleanse = f.activeT <= 0 && cleansNow(w, f.spec);
+    const cleanse = f.activeT <= 0 && cleansNow(s, f.spec);
     if (
       (k === 'life' || k === 'hybrid') &&
       !usedLife &&

@@ -6,6 +6,7 @@ import { actorById } from './actions';
 import { mirrorLanded } from './skillFx';
 import { hit } from './combat';
 import type { Action, Actor, Projectile, World } from './types';
+import { hunted } from './side';
 import type { Side } from './side';
 
 /**
@@ -93,7 +94,7 @@ export function launch(
   const pr: Projectile = {
     id: w.nextId++,
     owner: owner.id,
-    faction: owner.faction,
+    team: owner.team,
     x,
     y,
     vx: Math.cos(angle) * speed,
@@ -375,7 +376,7 @@ export function releaseCaught(w: World, a: Actor): void {
 }
 
 function enemiesOfOwner(w: World, owner: Actor): Actor[] {
-  return owner.isPlayer ? w.actors.filter((e) => !e.isPlayer && e.alive) : [w.player];
+  return owner.isPlayer ? w.actors.filter((e) => !e.isPlayer && e.alive) : [hunted(w, owner)];
 }
 
 /**

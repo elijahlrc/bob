@@ -32,16 +32,16 @@ for (const cls of CLASSES) {
             lastLife = a.life;
             shots = 0;
           }
-          if (w.player.action && w.player.action.elapsed < 0.02) shots++;
+          if (w.sides[0].player.action && w.sides[0].player.action.elapsed < 0.02) shots++;
           if (w.t - since > 25) {
             found++;
-            const dx = a.x - w.player.x;
-            const dy = a.y - w.player.y;
+            const dx = a.x - w.sides[0].player.x;
+            const dy = a.y - w.sides[0].player.y;
             console.log(
               `STALL ${cls.id} seed=${seed} map=${mapNo} t=${w.t.toFixed(1)} target=${a.name}(${a.rarity},${a.state}) ` +
                 `dist=${Math.hypot(dx, dy).toFixed(2)} shots=${shots} life=${a.life.toFixed(0)}/${a.def.maxLife.toFixed(0)} ` +
-                `mods=${a.modIds.join(',')} player=(${w.player.x.toFixed(2)},${w.player.y.toFixed(2)}) tgt=(${a.x.toFixed(2)},${a.y.toFixed(2)}) ` +
-                `los=${w.grid.los(w.player.x, w.player.y, a.x, a.y)}`,
+                `mods=${a.modIds.join(',')} player=(${w.sides[0].player.x.toFixed(2)},${w.sides[0].player.y.toFixed(2)}) tgt=(${a.x.toFixed(2)},${a.y.toFixed(2)}) ` +
+                `los=${w.grid.los(w.sides[0].player.x, w.sides[0].player.y, a.x, a.y)}`,
             );
             break;
           }

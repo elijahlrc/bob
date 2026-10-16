@@ -363,7 +363,7 @@ export class SkillFx {
   /** The colour of the element a deployable's skill deals. */
   private glowOf(w: World, id: number): number {
     const d = w.sides[0].deployables.find((x) => x.id === id);
-    const choice = d ? choiceByKey(w, d.key) : undefined;
+    const choice = d ? choiceByKey(w.sides[0], d.key) : undefined;
     return ELEMENT_COLOR[choice ? elementOfTags(choice.skill.tags, choice.skill.spellDamage) : 0];
   }
 
@@ -380,8 +380,8 @@ export class SkillFx {
       kind: e.kind,
       x: e.x,
       y: e.y,
-      fromX: w.player.x,
-      fromY: w.player.y,
+      fromX: w.sides[0].player.x,
+      fromY: w.sides[0].player.y,
       glow: this.glowOf(w, e.id),
     });
   }
@@ -487,7 +487,7 @@ export class SkillFx {
     if (!act) return;
     // A skill that puts something down shows the thing being readied, not a spell going off.
     const deploy = a.isPlayer
-      ? w.char.actives.find((c) => c.skill.id === act.profile.skill.id)?.deploy
+      ? w.sides[0].char.actives.find((c) => c.skill.id === act.profile.skill.id)?.deploy
       : undefined;
     if (deploy) {
       this.readying(a, act, deploy);
@@ -694,14 +694,14 @@ export class SkillFx {
   /** A buff or warcry begins: a pulse around the player, in the colour of its kind. */
   private buffPulse(id: string, w: World): void {
     if (this.now - (this.lastBuff.get(id) ?? -9) < 1.2) return;
-    const c = w.char.utilities.find(
+    const c = w.sides[0].char.utilities.find(
       (u) => u.skill.utility?.kind === 'buff' && u.skill.utility.buff === id,
     );
     if (!c) return;
     this.lastBuff.set(id, this.now);
     const s = c.skill;
     const delivery: Delivery = deliveryOf(s.behaviour, s.type, s.tags, s.utility);
-    const p = w.player;
+    const p = w.sides[0].player;
     const color = UTILITY_COLOR[delivery === 'warcry' || delivery === 'guard' ? delivery : 'buff'];
     if (delivery === 'warcry') {
       this.wave(p.x, p.y, 0.5, 5, color, 0.55, 3);
@@ -896,7 +896,7 @@ export class SkillFx {
   /** The beams between a skill's totems and the character (Cinder Bond): a glowing band on the ground, flickering. */
   private bonds(g: Gfx, w: World, time: number): void {
     for (const l of bondLinks(w, w.sides[0])) {
-      const choice = choiceByKey(w, l.key);
+      const choice = choiceByKey(w.sides[0], l.key);
       const element = choice ? elementOfTags(choice.skill.tags, choice.skill.spellDamage) : 0;
       const glow = ELEMENT_COLOR[element];
       const a = this.host.project(l.x1, l.y1);
@@ -922,7 +922,7 @@ export class SkillFx {
       // Still in the air: drawn by `flying` until it lands.
       if (this.flights.has(d.id)) continue;
       const { x, y } = this.host.project(d.x, d.y);
-      const choice = choiceByKey(w, d.key);
+      const choice = choiceByKey(w.sides[0], d.key);
       const element = choice ? elementOfTags(choice.skill.tags, choice.skill.spellDamage) : 0;
       const glow = ELEMENT_COLOR[element];
       const fade = Math.min(1, d.t);
@@ -1353,10 +1353,10 @@ export class SkillFx {
 
   /** Auras are slow rings at the player's feet (heralds are spiked), and each buff running is a mote circling the body. */
   private upkeep(g: Gfx, w: World, time: number): void {
-    const p = w.player;
+    const p = w.sides[0].player;
     if (!p.alive) return;
     let i = 0;
-    for (const a of w.char.auras) {
+    for (const a of w.sides[0].char.auras) {
       if (!a.active || i >= 4) continue;
       const look = auraLook(a.def);
       const r = 1.0 + i * 0.28;
@@ -1388,7 +1388,7 @@ export class SkillFx {
 
   /** Each buff that is up has a mark of its own on the character (buffFx.ts); one about to end blinks. */
   private buffMarks(ground: Gfx, air: Gfx, w: World, time: number): void {
-    const p = w.player;
+    const p = w.sides[0].player;
     if (!p.alive) return;
     const marks: BuffMark[] = [];
     for (const id of BUFF_IDS) {
@@ -1403,7 +1403,7 @@ export class SkillFx {
   /** A curse is a violet sigil turning over the head of each enemy that carries one. */
   /** The element's colour of the character's skill that has this id. */
   private colorOfSkill(w: World, id: string): number {
-    const c = w.char.actives.find((x) => x.skill.id === id);
+    const c = w.sides[0].char.actives.find((x) => x.skill.id === id);
     return ELEMENT_COLOR[c ? elementOfTags(c.skill.tags, c.skill.spellDamage) : 0] ?? 0xffffff;
   }
 
@@ -1418,7 +1418,7 @@ export class SkillFx {
    * that pulses around the character), speed lines behind a run or a charge, and the chain of a hook.
    */
   private spinning(ground: Gfx, air: Gfx, w: World, time: number): void {
-    const p = w.player;
+    const p = w.sides[0].player;
     if (!p.alive) return;
     const act = p.action;
     const spin = act?.profile.skill.spin;
@@ -1497,12 +1497,12 @@ export class SkillFx {
   }
 
   private lasting(ground: Gfx, air: Gfx, w: World, time: number): void {
-    const p = w.player;
+    const p = w.sides[0].player;
     this.spinning(ground, air, w, time);
     const vx = w.sides[0].vortex;
     if (vx && p.alive && vx.blades.length > 0) {
-      const spec = choiceByKey(w, vx.key)?.skill.vortex;
-      const color = this.colorOfSkill(w, choiceByKey(w, vx.key)?.skill.id ?? '');
+      const spec = choiceByKey(w.sides[0], vx.key)?.skill.vortex;
+      const color = this.colorOfSkill(w, choiceByKey(w.sides[0], vx.key)?.skill.id ?? '');
       const o = this.host.project(p.x, p.y);
       const rx = this.host.rpx(Math.min(1.4, spec?.radius ?? 1.4));
       const sq = this.host.squash();
@@ -1544,7 +1544,8 @@ export class SkillFx {
     }
     for (const m of w.sides[0].markers) {
       const color = this.colorOfSkill(w, m.profile.skill.id);
-      const spec = w.char.actives.find((x) => x.skill.id === m.profile.skill.id)?.skill.markers;
+      const spec = w.sides[0].char.actives.find((x) => x.skill.id === m.profile.skill.id)?.skill
+        .markers;
       const r = (spec?.radius ?? 1.5) * m.profile.radiusMult;
       const left = spec ? Math.min(1, Math.max(0, m.t / spec.delay)) : 0.5;
       this.ring(ground, m.x, m.y, r, color, 0.5, 1);
@@ -1609,9 +1610,9 @@ export class SkillFx {
    * with a red mote (life) and a blue one (mana) running along it toward the character.
    */
   private siphons(g: Gfx, w: World, time: number): void {
-    const p = w.player;
+    const p = w.sides[0].player;
     if (!p.alive) return;
-    for (const c of w.char.actives) {
+    for (const c of w.sides[0].char.actives) {
       if (!c.usable || !c.skill.siphon) continue;
       const glow = ELEMENT_COLOR[elementOfTags(c.skill.tags, c.skill.spellDamage)];
       const to = this.lifted(p.x, p.y, 10);

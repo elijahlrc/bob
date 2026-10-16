@@ -41,7 +41,7 @@ describe('stances (Blood and Sand, Flesh and Stone)', () => {
   it('start in the Blood stance, hold mana, and swap to the Sand stance when a crowd is near', () => {
     const { world: w, dummy } = world(['whirlwindCleave', 'duneStance']);
     expect(stanceOf(w.sides[0])).toBe('blood');
-    expect(w.char.reservedMana).toBeGreaterThan(0);
+    expect(w.sides[0].char.reservedMana).toBeGreaterThan(0);
     run(w, 0.5);
     expect(stanceOf(w.sides[0])).toBe('blood');
     neighbour(w, dummy.x + 1, dummy.y + 1);
@@ -53,7 +53,8 @@ describe('stances (Blood and Sand, Flesh and Stone)', () => {
 
   it('Blood and Sand: more area damage over less area, or more area and less damage', () => {
     const { world: w, dummy } = world(['whirlwindCleave', 'duneStance']);
-    const prof = () => w.char.profile(w.primary, playerConds(w, dummy));
+    const prof = () =>
+      w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
     const blood = prof();
     w.sides[0].buffT.bloodStance = 0;
     w.sides[0].buffT.sandStance = 1e9;
@@ -74,8 +75,8 @@ describe('stances (Blood and Sand, Flesh and Stone)', () => {
     run(w, 1);
     expect(dummy.fx.blind).toBeDefined();
     // The far attacks do less: a hit from beyond the aura's reach, against one from inside.
-    expect(stanceFarLess(w, w.sides[0])).not.toBeNull();
-    expect(stanceFarLess(w, w.sides[0])!.less).toBeGreaterThan(0.08);
+    expect(stanceFarLess(w.sides[0])).not.toBeNull();
+    expect(stanceFarLess(w.sides[0])!.less).toBeGreaterThan(0.08);
   });
 
   it('the stance is shared: a second stance gem does not make a second stance', () => {
@@ -101,7 +102,7 @@ describe('Bladestorm (whirlwindCleave)', () => {
     expect(buff).toBe(true);
     expect(w.sides[0].buffT.bladestormSand).toBe(0);
     // It ends by itself.
-    w.player.stunT = 1e9;
+    w.sides[0].player.stunT = 1e9;
     run(w, 4);
     expect(w.sides[0].fields.some((f) => f.kind === 'bladestorm')).toBe(false);
   });
@@ -175,7 +176,7 @@ describe('Berserk (rampage)', () => {
       if (w.t > 0.6 && w.sides[0].buffT.berserk === 0) ended = w.t;
     }
     expect(ended).toBeGreaterThan(0);
-    const choice = w.char.utilities.find((c) => c.skill.id === 'rampage')!;
+    const choice = w.sides[0].char.utilities.find((c) => c.skill.id === 'rampage')!;
     const u = choice.skill.utility!;
     const cooldown = 'cooldown' in u ? (u.cooldown ?? 0) : 0;
     expect(cooldown).toBeGreaterThan(0);
@@ -193,15 +194,15 @@ describe('Blood Rage (bloodSurgeCall)', () => {
     // Let a cast happen.
     for (let i = 0; i < 3 * 60 && w.sides[0].buffT.bloodSurge <= 0; i++) stepWorld(w);
     expect(w.sides[0].buffT.bloodSurge).toBeGreaterThan(0);
-    const before = w.player.life;
+    const before = w.sides[0].player.life;
     const seconds = w.sides[0].buffT.bloodSurge;
-    w.player.stunT = 1e9;
-    w.player.life = w.player.def.maxLife;
+    w.sides[0].player.stunT = 1e9;
+    w.sides[0].player.life = w.sides[0].player.def.maxLife;
     run(w, 1);
-    expect(w.player.life).toBeLessThan(w.player.def.maxLife);
+    expect(w.sides[0].player.life).toBeLessThan(w.sides[0].player.def.maxLife);
     // A kill renews it.
     w.sides[0].buffT.bloodSurge = 2;
-    const m = neighbour(w, w.player.x + 2, w.player.y);
+    const m = neighbour(w, w.sides[0].player.x + 2, w.sides[0].player.y);
     m.def = dummyDefence({ maxLife: 10 });
     m.life = 1;
     killActor(w, m);
@@ -215,14 +216,14 @@ describe('Blood Rage (bloodSurgeCall)', () => {
     expect(w.sides[0].buffT.bloodSurge).toBeGreaterThan(0);
     const kills = (n: number) => {
       for (let i = 0; i < n; i++) {
-        const m = neighbour(w, w.player.x + 2, w.player.y);
+        const m = neighbour(w, w.sides[0].player.x + 2, w.sides[0].player.y);
         m.def = dummyDefence({ maxLife: 10 });
         m.life = 1;
         killActor(w, m);
       }
     };
     kills(100);
-    expect(w.char.charges.fervour).toBeGreaterThan(0);
+    expect(w.sides[0].char.charges.fervour).toBeGreaterThan(0);
   });
 
   it('is let go when life runs low', () => {
@@ -230,8 +231,8 @@ describe('Blood Rage (bloodSurgeCall)', () => {
     w.sides[0].opts.freeResources = false;
     for (let i = 0; i < 3 * 60 && w.sides[0].buffT.bloodSurge <= 0; i++) stepWorld(w);
     expect(w.sides[0].buffT.bloodSurge).toBeGreaterThan(0);
-    w.player.stunT = 1e9;
-    w.player.life = w.player.def.maxLife * 0.2;
+    w.sides[0].player.stunT = 1e9;
+    w.sides[0].player.life = w.sides[0].player.def.maxLife * 0.2;
     run(w, 0.2);
     expect(w.sides[0].buffT.bloodSurge).toBe(0);
   });

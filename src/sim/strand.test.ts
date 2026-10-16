@@ -74,7 +74,15 @@ describe('a monster out of reach', () => {
   it('dies where the character can reach it, after a short grace, if it ends up in a wall anyway', () => {
     const w = mapWorld(5);
     const rock = deepRock(w);
-    const m = spawnMonster(w, rare('warrior'), w.player.x + 2, w.player.y, 0, 0, 'Stray');
+    const m = spawnMonster(
+      w,
+      rare('warrior'),
+      w.sides[0].player.x + 2,
+      w.sides[0].player.y,
+      0,
+      0,
+      'Stray',
+    );
     m.life = 1e12;
     m.def.maxLife = 1e12;
     m.x = rock.x;
@@ -89,7 +97,15 @@ describe('a monster out of reach', () => {
 
   it('does not touch a monster that stands on reachable floor', () => {
     const w = mapWorld(5);
-    const m = spawnMonster(w, rare('warrior'), w.player.x + 2, w.player.y, 0, 0, 'Fine');
+    const m = spawnMonster(
+      w,
+      rare('warrior'),
+      w.sides[0].player.x + 2,
+      w.sides[0].player.y,
+      0,
+      0,
+      'Fine',
+    );
     m.life = 1e12;
     m.def.maxLife = 1e12;
     for (let i = 0; i < STRAND_GRACE * 60 * 3; i++) stepWorld(w);

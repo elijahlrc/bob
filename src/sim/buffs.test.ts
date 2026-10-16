@@ -28,7 +28,7 @@ function buildWith(extra: Mod[], gems = ['crushingBlow']): Build {
 
 function arena(extra: Mod[] = [], gems?: string[]) {
   const { world, dummy } = createDummyWorld(buildWith(extra, gems), { distance: 2 });
-  return { w: world, dummy, p: world.player };
+  return { w: world, dummy, p: world.sides[0].player };
 }
 
 const SECOND = 60;
@@ -41,17 +41,19 @@ describe('buffs: conditions with timers (C2)', () => {
     const { w } = arena();
     gainBuff(w, w.sides[0], 'fortify');
     expect(w.sides[0].buffT.fortify).toBe(0);
-    expect(w.char.buffSource.fortify).toBe(false);
+    expect(w.sides[0].char.buffSource.fortify).toBe(false);
   });
 
   it('Fortify: 20% less damage from hits for 4 seconds, and none from damage over time', () => {
     const { w, p } = arena([mod('buffOn.hit.fortify', 'base', 100)]);
-    expect(w.char.buffSource.fortify).toBe(true);
+    expect(w.sides[0].char.buffSource.fortify).toBe(true);
     const plain = p.def.hitTakenMult;
     expect(plain).toBe(1);
     rollGains(w, w.sides[0], 'hit');
     expect(w.sides[0].buffT.fortify).toBeCloseTo(4);
-    expect(playerConds(w, null) & w.char.cond.peek('fortified')).toBeGreaterThan(0);
+    expect(
+      playerConds(w, w.sides[0], null) & w.sides[0].char.cond.peek('fortified'),
+    ).toBeGreaterThan(0);
     refreshPlayerDefence(w, w.sides[0]);
     expect(p.def.hitTakenMult).toBeCloseTo(0.8);
     expect(p.def.damageTakenMult).toBe(1); // damage over time uses this one
@@ -78,11 +80,15 @@ describe('buffs: conditions with timers (C2)', () => {
 
   it('Quickened: 20% increased attack, cast and movement speed', () => {
     const { w, p } = arena([mod('buffOn.kill.onslaught', 'base', 100)]);
-    const before = w.char.profile(w.primary, playerConds(w, null), flaskMask(w.sides[0])).useTime;
+    const before = w.sides[0].char.profile(
+      w.sides[0].primary,
+      playerConds(w, w.sides[0], null),
+      flaskMask(w.sides[0]),
+    ).useTime;
     const speed = p.def.moveSpeed;
     gainBuff(w, w.sides[0], 'onslaught');
-    const conds = playerConds(w, null);
-    const after = w.char.profile(w.primary, conds, flaskMask(w.sides[0])).useTime;
+    const conds = playerConds(w, w.sides[0], null);
+    const after = w.sides[0].char.profile(w.sides[0].primary, conds, flaskMask(w.sides[0])).useTime;
     expect(after).toBeCloseTo(before / 1.2);
     refreshPlayerDefence(w, w.sides[0]);
     expect(p.def.moveSpeed).toBeCloseTo(speed * 1.2);
@@ -91,18 +97,23 @@ describe('buffs: conditions with timers (C2)', () => {
   it('Dread Might: 30% of physical damage as extra chaos', () => {
     const { w } = arena([mod('buffOn.hit.unholyMight', 'base', 100)]);
     const chaos = (conds: number) =>
-      w.char
-        .profile(w.primary, conds, flaskMask(w.sides[0]))
+      w.sides[0].char
+        .profile(w.sides[0].primary, conds, flaskMask(w.sides[0]))
         .hands[0].chunks.filter((c) => c.type === 4)
         .reduce((s, c) => s + c.max, 0);
-    expect(chaos(playerConds(w, null))).toBe(0);
+    expect(chaos(playerConds(w, w.sides[0], null))).toBe(0);
     gainBuff(w, w.sides[0], 'unholyMight');
-    expect(chaos(playerConds(w, null))).toBeGreaterThan(0);
+    expect(chaos(playerConds(w, w.sides[0], null))).toBeGreaterThan(0);
   });
 
   it('Arcane Tide: 10% more spell damage and cast speed', () => {
     const { w } = arena([mod('buffOn.hit.arcaneSurge', 'base', 100)], ['flameBolt']);
-    const prof = () => w.char.profile(w.primary, playerConds(w, null), flaskMask(w.sides[0]));
+    const prof = () =>
+      w.sides[0].char.profile(
+        w.sides[0].primary,
+        playerConds(w, w.sides[0], null),
+        flaskMask(w.sides[0]),
+      );
     const before = prof();
     gainBuff(w, w.sides[0], 'arcaneSurge');
     const after = prof();
@@ -114,21 +125,21 @@ describe('buffs: conditions with timers (C2)', () => {
 describe('rage', () => {
   it('each point is 1% increased attack damage, 0.5% attack speed and 0.2% movement speed', () => {
     const { w, p } = arena([mod('rageOn.hit', 'base', 1)]);
-    expect(w.char.rageSource).toBe(true);
-    const base = w.char.profile(w.primary, 0, flaskMask(w.sides[0]));
-    gainRage(w, w.sides[0], 20);
+    expect(w.sides[0].char.rageSource).toBe(true);
+    const base = w.sides[0].char.profile(w.sides[0].primary, 0, flaskMask(w.sides[0]));
+    gainRage(w.sides[0], 20);
     expect(w.sides[0].rage).toBe(20);
-    const raging = w.char.profile(w.primary, 0, flaskMask(w.sides[0]));
+    const raging = w.sides[0].char.profile(w.sides[0].primary, 0, flaskMask(w.sides[0]));
     expect(raging.useTime).toBeCloseTo(base.useTime / 1.1);
     const dmg = (x: typeof base) => x.hands[0].chunks.reduce((s, c) => s + c.max, 0);
     expect(dmg(raging) / dmg(base)).toBeGreaterThan(1.15);
     refreshPlayerDefence(w, w.sides[0]);
-    expect(p.def.moveSpeed).toBeCloseTo(w.char.defence(0, 0).moveSpeed * 1.04);
+    expect(p.def.moveSpeed).toBeCloseTo(w.sides[0].char.defence(0, 0).moveSpeed * 1.04);
   });
 
   it('is capped at 50, drains one every half second once it has not been fed, and is held by hits', () => {
     const { w } = arena([mod('rageOn.hit', 'base', 1)]);
-    gainRage(w, w.sides[0], 80);
+    gainRage(w.sides[0], 80);
     expect(w.sides[0].rage).toBe(50);
     run(w, RAGE_HOLD - 0.5);
     expect(w.sides[0].rage).toBe(50);
@@ -141,7 +152,7 @@ describe('rage', () => {
 
   it('a hit landed feeds it', () => {
     const { w, dummy, p } = arena([mod('rageOn.hit', 'base', 3)]);
-    const prof = w.char.profile(w.primary, 0, 0);
+    const prof = w.sides[0].char.profile(w.sides[0].primary, 0, 0);
     const res = resolveHit(new Rng(1), prof, prof.hands[0], targetState(dummy), 1, false);
     if (res.outcome !== 'hit') res.outcome = 'hit';
     applyHit(w, p, dummy, prof, res);
@@ -156,7 +167,7 @@ describe('impale and culling strike', () => {
     const { w, dummy, p } = arena(impaler);
     dummy.def = { ...dummy.def, maxLife: 1e9, armour: 0 };
     dummy.life = 1e9;
-    const prof = w.char.profile(w.primary, 0, 0);
+    const prof = w.sides[0].char.profile(w.sides[0].primary, 0, 0);
     expect(prof.impale.chance).toBe(1);
     const hit = () => {
       const r = resolveHit(new Rng(3), prof, prof.hands[0], targetState(dummy), 1, false);
@@ -177,7 +188,7 @@ describe('impale and culling strike', () => {
     const { w, dummy, p } = arena(impaler);
     dummy.def = { ...dummy.def, maxLife: 1e9 };
     dummy.life = 1e9;
-    const prof = w.char.profile(w.primary, 0, 0);
+    const prof = w.sides[0].char.profile(w.sides[0].primary, 0, 0);
     const r = () => {
       const x = resolveHit(new Rng(4), prof, prof.hands[0], targetState(dummy), 1, false);
       x.outcome = 'hit';
@@ -194,7 +205,7 @@ describe('impale and culling strike', () => {
     const plain = arena();
     const imp = arena(impaler);
     const dmg = (a: ReturnType<typeof arena>) => {
-      const ch = a.w.char;
+      const ch = a.w.sides[0].char;
       return ch.skillSheet(ch.primary, undefined, 0).avgHit;
     };
     expect(dmg(imp) / dmg(plain)).toBeGreaterThan(1.3);
@@ -203,7 +214,7 @@ describe('impale and culling strike', () => {
 
   it('culling strike finishes a target left at 10% life or less', () => {
     const { w, dummy, p } = arena([mod('cullingStrike', 'flag', 1)]);
-    const prof = w.char.profile(w.primary, 0, 0);
+    const prof = w.sides[0].char.profile(w.sides[0].primary, 0, 0);
     expect(prof.culling).toBe(true);
     dummy.def = { ...dummy.def, maxLife: 1000 };
     dummy.life = 104;
@@ -217,7 +228,7 @@ describe('impale and culling strike', () => {
     const { w: w2, dummy: d2, p: p2 } = arena([mod('cullingStrike', 'flag', 1)]);
     d2.def = { ...d2.def, maxLife: 1000 };
     d2.life = 500;
-    const prof2 = w2.char.profile(w2.primary, 0, 0);
+    const prof2 = w2.sides[0].char.profile(w2.sides[0].primary, 0, 0);
     const r2 = resolveHit(new Rng(5), prof2, prof2.hands[0], targetState(d2), 1, false);
     r2.outcome = 'hit';
     r2.dmg = [5, 0, 0, 0, 0];

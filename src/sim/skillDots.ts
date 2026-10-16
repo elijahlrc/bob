@@ -3,6 +3,7 @@ import { effectiveRes } from '../calc/formulas';
 import { statusTaken } from './statuses';
 import { applyStatus } from './statuses';
 import type { Actor, World } from './types';
+import { hunted } from './side';
 
 /**
  * Damage over time that a skill inflicts as a debuff of its own (docs/SPIRIT.md S7): Contagion, Blight, Essence Drain, Scorching
@@ -179,7 +180,7 @@ export function applyBurning(
 
 /** The damage a second, by type, of the enemy's skill debuffs; and the life the character mends from them. */
 export function sumSkillDots(w: World, a: Actor, out: number[], dt: number): void {
-  const p = w.player;
+  const p = hunted(w, a);
   for (const d of a.sdots) {
     out[d.type] += d.dps;
     if (d.regen > 0 && p.alive && !a.isPlayer)
@@ -206,7 +207,7 @@ export function spreadSkillDots(w: World, dead: Actor): void {
   const radius = dead.sdots.reduce((r, d) => Math.max(r, d.spreadR), 0);
   if (radius <= 0) return;
   for (const e of w.actors) {
-    if (e === dead || e.isPlayer || !e.alive || e.faction !== dead.faction) continue;
+    if (e === dead || e.isPlayer || !e.alive || e.team !== dead.team) continue;
     if (Math.hypot(e.x - dead.x, e.y - dead.y) > radius + e.r) continue;
     for (const d of dead.sdots) {
       if (d.spreadR <= 0 && !d.carry) continue;

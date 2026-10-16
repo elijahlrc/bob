@@ -47,8 +47,8 @@ function tally(w: World, target: Actor, seconds: number, skill: string) {
   for (let i = 0; i < seconds * 60; i++) {
     stepWorld(w);
     for (const e of w.events) {
-      if (e.t === 'use' && e.src === w.player.id && e.skill === skill) uses++;
-      if (e.t === 'hit' && e.src === w.player.id && e.dst === target.id) hits++;
+      if (e.t === 'use' && e.src === w.sides[0].player.id && e.skill === skill) uses++;
+      if (e.t === 'hit' && e.src === w.sides[0].player.id && e.dst === target.id) hits++;
       if (e.t === 'projectileSpawned') spawned++;
     }
   }
@@ -174,7 +174,7 @@ describe('the strikes that send more out, and the cone', () => {
     });
     world.sides[0].opts.freeResources = true;
     // Twenty degrees off the line to the target, where one of the five bolts of the arc flies.
-    const aside = neighbour(world, world.player.x + 3.7, world.player.y + 1.43);
+    const aside = neighbour(world, world.sides[0].player.x + 3.7, world.sides[0].player.y + 1.43);
     const t = tally(world, dummy, 6, 'boltCleave');
     expect(t.uses).toBeGreaterThan(2);
     expect(aside.life).toBeLessThan(1e9);
@@ -213,7 +213,7 @@ describe('the strikes that send more out, and the cone', () => {
       maxTime: 60,
     });
     world.sides[0].opts.freeResources = true;
-    const beside = neighbour(world, world.player.x + 2.5, world.player.y + 0.5);
+    const beside = neighbour(world, world.sides[0].player.x + 2.5, world.sides[0].player.y + 0.5);
     let both = false;
     for (let i = 0; i < 3 * 60 && !both; i++) {
       stepWorld(world);

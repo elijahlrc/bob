@@ -75,7 +75,7 @@ if (mergeAt >= 0) {
           if (!b) return;
           const st = bossState(b);
           if (!st) return;
-          const p = w.player;
+          const p = w.sides[0].player;
           if (!cur && b.alive && b.state === 'chase' && !seen.has(b)) {
             seen.add(b);
             start = w.t;
@@ -83,7 +83,7 @@ if (mergeAt >= 0) {
               boss: st.id,
               classId,
               seed,
-              level: w.build.level,
+              level: w.sides[0].build.level,
               won: false,
               died: false,
               time: 0,

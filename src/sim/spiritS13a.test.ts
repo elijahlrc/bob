@@ -60,14 +60,14 @@ describe('auras (stormHalo, frostHalo, arcaneWard)', () => {
   it('Wrath adds lightning to attacks, and gives spells more lightning damage instead', () => {
     const atk = world(['crushingBlow', 'stormHalo'], 1.4, 'sword_3', STR).world;
     const atkPlain = world(['crushingBlow'], 1.4, 'sword_3', STR).world;
-    const a1 = atk.char.profile(atk.primary, 0);
-    const a0 = atkPlain.char.profile(atkPlain.primary, 0);
+    const a1 = atk.sides[0].char.profile(atk.sides[0].primary, 0);
+    const a0 = atkPlain.sides[0].char.profile(atkPlain.sides[0].primary, 0);
     expect(a1.hands[0].chunks.some((c) => c.type === 1 && c.max > 0)).toBe(true);
     expect(maxHit(a1)).toBeGreaterThan(maxHit(a0));
     const sp = world(['frostLance', 'stormHalo'], 4, 'wand_3', INT).world;
     const spPlain = world(['frostLance'], 4, 'wand_3', INT).world;
-    const s1 = sp.char.profile(sp.primary, 0);
-    const s0 = spPlain.char.profile(spPlain.primary, 0);
+    const s1 = sp.sides[0].char.profile(sp.sides[0].primary, 0);
+    const s0 = spPlain.sides[0].char.profile(spPlain.sides[0].primary, 0);
     // No flat lightning on the spell's hit.
     expect(s1.hands[0].chunks.some((c) => c.type === 1)).toBe(
       s0.hands[0].chunks.some((c) => c.type === 1),
@@ -78,8 +78,8 @@ describe('auras (stormHalo, frostHalo, arcaneWard)', () => {
     const plain = world(['crushingBlow'], 1.4, 'sword_3', STR).world;
     const hat = world(['crushingBlow', 'frostHalo'], 1.4, 'sword_3', STR).world;
     const c = (w: World) =>
-      w.char
-        .profile(w.primary, 0)
+      w.sides[0].char
+        .profile(w.sides[0].primary, 0)
         .hands[0].chunks.filter((x) => x.type === 2)
         .reduce((s, x) => s + x.max, 0);
     expect(c(plain)).toBe(0);
@@ -89,40 +89,40 @@ describe('auras (stormHalo, frostHalo, arcaneWard)', () => {
   it('Discipline adds energy shield', () => {
     const plain = world(['crushingBlow'], 1.4, 'sword_3', STR).world;
     const dis = world(['crushingBlow', 'arcaneWard'], 1.4, 'sword_3', STR).world;
-    expect(dis.char.defence().maxEs).toBeGreaterThan(plain.char.defence().maxEs);
+    expect(dis.sides[0].char.defence().maxEs).toBeGreaterThan(plain.sides[0].char.defence().maxEs);
   });
 });
 
 describe('Dual Strike, Lightning Trap, Puncture', () => {
   it('Dual Strike crits more and hits harder against an enemy on full life only', () => {
     const { world: w, dummy } = world(['twinBlades'], 1.4, 'sword_3', DEX, 'dual');
-    const full = w.char.profile(w.primary, playerConds(w, dummy));
+    const full = w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
     dummy.life = dummy.def.maxLife * 0.5;
-    const half = w.char.profile(w.primary, playerConds(w, dummy));
+    const half = w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
     expect(full.hands[0].critChance).toBeGreaterThan(half.hands[0].critChance);
     expect(maxHit(full)).toBeGreaterThan(maxHit(half));
   });
 
   it('Lightning Trap crits more against a shocked enemy', () => {
     const { world: w, dummy } = world(['boltTrap'], 4, 'wand_3', DEX);
-    const cold = w.char.profile(w.primary, playerConds(w, dummy));
+    const cold = w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
     dummy.ail.shock = 15;
-    const shocked = w.char.profile(w.primary, playerConds(w, dummy));
+    const shocked = w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
     expect(shocked.hands[0].critChance).toBeGreaterThan(cold.hands[0].critChance);
   });
 
   it('Puncture is a shot with a bow and a stab with a dagger', () => {
     const bow = world(['gougeShot'], 4, 'bow_3', DEX).world;
-    expect(bow.char.primary.skill.behaviour.kind).toBe('projectile');
+    expect(bow.sides[0].char.primary.skill.behaviour.kind).toBe('projectile');
     const dag = world(['gougeShot'], 1.2, 'dagger_3', DEX).world;
-    expect(dag.char.primary.skill.behaviour.kind).toBe('melee');
+    expect(dag.sides[0].char.primary.skill.behaviour.kind).toBe('melee');
   });
 });
 
 describe('counter-attacks (bladeWind, rimeRebuke)', () => {
   it('Reckoning answers a block with a cone of blades, at most once in 0.4 seconds', () => {
     const { world: w, dummy } = world(['crushingBlow', 'bladeWind'], 1.5, 'sword_3', STR, 'shield');
-    w.player.stunT = 100;
+    w.sides[0].player.stunT = 100;
     const near = neighbour(w, dummy.x, dummy.y + 0.4);
     let n = 0;
     for (let i = 0; i < 3; i++) {
@@ -137,8 +137,8 @@ describe('counter-attacks (bladeWind, rimeRebuke)', () => {
 
   it('Riposte answers a block with one strike, once in 0.8 seconds, and costs nothing', () => {
     const { world: w, dummy } = world(['crushingBlow', 'rimeRebuke'], 1.2, 'sword_3', STR);
-    w.player.stunT = 100;
-    w.player.mana = 0;
+    w.sides[0].player.stunT = 100;
+    w.sides[0].player.mana = 0;
     fireTriggers(w, w.sides[0], { on: 'block' });
     expect(dummy.life).toBeLessThan(1e9);
     const left = dummy.life;
@@ -153,14 +153,14 @@ describe('counter-attacks (bladeWind, rimeRebuke)', () => {
 describe('Sweep (haloSweep)', () => {
   it('needs a two-handed weapon, and throws enemies back', () => {
     const one = world(['haloSweep'], 1.5, 'sword_3', STR).world;
-    expect(one.char.primary.skill.id).not.toBe('haloSweep');
+    expect(one.sides[0].char.primary.skill.id).not.toBe('haloSweep');
     const { world: w, dummy } = world(['haloSweep'], 1.5, 'sword2_3', STR);
-    expect(w.char.primary.skill.id).toBe('haloSweep');
-    const x0 = Math.hypot(dummy.x - w.player.x, dummy.y - w.player.y);
+    expect(w.sides[0].char.primary.skill.id).toBe('haloSweep');
+    const x0 = Math.hypot(dummy.x - w.sides[0].player.x, dummy.y - w.sides[0].player.y);
     let far = 0;
     for (let i = 0; i < 90; i++) {
       stepWorld(w);
-      far = Math.max(far, Math.hypot(dummy.x - w.player.x, dummy.y - w.player.y));
+      far = Math.max(far, Math.hypot(dummy.x - w.sides[0].player.x, dummy.y - w.sides[0].player.y));
     }
     expect(far).toBeGreaterThan(x0 + 1);
   });
@@ -169,7 +169,7 @@ describe('Sweep (haloSweep)', () => {
 describe('Pestilent Strike (venomStrike)', () => {
   it('an enemy that dies poisoned sets its poison on those around it', () => {
     const { world: w, dummy } = world(['venomStrike'], 1.2, 'dagger_3', DEX);
-    expect(w.char.primary.skill.id).toBe('venomStrike');
+    expect(w.sides[0].char.primary.skill.id).toBe('venomStrike');
     const near = neighbour(w, dummy.x + 1.2, dummy.y);
     let done = false;
     for (let i = 0; i < 20 * 60 && !done; i++) {
@@ -198,7 +198,7 @@ describe('strikes with a second effect (thunderRebuke, primalStrike, primeSplash
     expect(near.life).toBeLessThan(1e9);
     expect(far.life).toBe(1e9);
     expect(w.sides[0].buffT.smiteAura).toBeGreaterThan(0);
-    const lit = w.char.profile(w.primary, playerConds(w, dummy));
+    const lit = w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
     expect(
       lit.hands[0].chunks.filter((c) => c.type === 1).reduce((s, c) => s + c.max, 0),
     ).toBeGreaterThan(0);
@@ -217,7 +217,7 @@ describe('strikes with a second effect (thunderRebuke, primalStrike, primeSplash
     expect(new Set(seen).size).toBe(3);
     for (const el of [1, 2, 3]) {
       w.sides[0].elem = el;
-      const p = w.char.profile(w.primary, playerConds(w, dummy));
+      const p = w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
       const types = new Set(p.hands[0].chunks.filter((c) => c.max > 0).map((c) => c.type));
       expect([...types]).toEqual([el]);
     }
@@ -226,7 +226,7 @@ describe('strikes with a second effect (thunderRebuke, primalStrike, primeSplash
   it('Elemental Hit has more area against an enemy with the ailment of its element', () => {
     const { world: w, dummy } = world(['primalStrike'], 1.4, 'sword_3', DEX);
     w.sides[0].elem = 3;
-    const prof = w.char.profile(w.primary, playerConds(w, dummy));
+    const prof = w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
     const act: Action = {
       profile: prof,
       which: 'primary',
@@ -242,7 +242,7 @@ describe('strikes with a second effect (thunderRebuke, primalStrike, primeSplash
     };
     const radius = () => {
       w.events.length = 0;
-      afterStrike(w, w.player, act, dummy);
+      afterStrike(w, w.sides[0].player, act, dummy);
       return (
         Math.round(
           w.events.filter((e) => e.t === 'explode').map((e) => (e as { r: number }).r)[0] * 100,
@@ -259,7 +259,7 @@ describe('strikes with a second effect (thunderRebuke, primalStrike, primeSplash
     for (const el of [3, 2, 1]) {
       const { world: w, dummy } = world(['primeSplash'], 1.4, 'sword_3', DEX);
       const near = neighbour(w, dummy.x + 1.0, dummy.y + 0.5);
-      const p0 = w.char.profile(w.primary, playerConds(w, dummy));
+      const p0 = w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
       expect(p0.hands[0].chunks.every((c) => c.type !== 0 || c.max === 0)).toBe(true);
       let hurt = false;
       for (let i = 0; i < 100 && !hurt; i++) {
@@ -298,7 +298,7 @@ describe('waves (ruptureLine, cleansingBlaze)', () => {
 describe('strikes that leave something behind (chargedBlow, cinderBlow, rimeMallet)', () => {
   it('Static Strike: hits build a stack of a buff, and beams strike the enemies near while it lasts', () => {
     const { world: w, dummy } = world(['chargedBlow'], 1.4, 'sword_3', STR);
-    const near = neighbour(w, w.player.x - 2.2, w.player.y);
+    const near = neighbour(w, w.sides[0].player.x - 2.2, w.sides[0].player.y);
     let stacks = 0;
     for (let i = 0; i < 60 * 8; i++) {
       stepWorld(w);
@@ -309,7 +309,7 @@ describe('strikes that leave something behind (chargedBlow, cinderBlow, rimeMall
     expect(near.life).toBeLessThan(1e9);
     expect(dummy.life).toBeLessThan(1e9);
     // The buff ends once the hitting stops.
-    w.player.stunT = 100;
+    w.sides[0].player.stunT = 100;
     run(w, 6);
     expect(w.sides[0].staticFx).toBeNull();
   });
@@ -332,7 +332,7 @@ describe('strikes that leave something behind (chargedBlow, cinderBlow, rimeMall
   it('Infernal Blow: an enemy that dies carrying the debuff explodes as fire for a share of its life', () => {
     const { world: w, dummy } = world(['cinderBlow'], 1.4, 'sword_3', STR);
     const near = neighbour(w, dummy.x + 1.0, dummy.y, 1e6);
-    w.player.stunT = 100;
+    w.sides[0].player.stunT = 100;
     w.sides[0].charged[dummy.id] = { n: 1, t: 5, key: 'cinderBlow' };
     dummy.def = dummyDefence({ maxLife: 100000 });
     dummy.life = 100000;
@@ -350,7 +350,7 @@ describe('strikes that leave something behind (chargedBlow, cinderBlow, rimeMall
     for (let i = 0; i < 90 && dummy.alive; i++) stepWorld(w);
     expect(dummy.alive).toBe(false);
     // Not a unique one.
-    const boss = neighbour(w, w.player.x + 1.2, w.player.y + 0.3, 100000);
+    const boss = neighbour(w, w.sides[0].player.x + 1.2, w.sides[0].player.y + 0.3, 100000);
     boss.rarity = 'boss';
     boss.life = 20000;
     boss.ail.freezeT = 5;
@@ -363,23 +363,28 @@ describe('strikes that leave something behind (chargedBlow, cinderBlow, rimeMall
 describe('shield and charge skills (snagLash, bulwarkRush, ghostShard)', () => {
   it('Chain Hook pulls the character to a distant enemy, gives rage, and is wider with rage', () => {
     const { world: w, dummy } = world(['snagLash'], 5, 'sword_3', STR);
-    expect(Math.hypot(dummy.x - w.player.x, dummy.y - w.player.y)).toBeGreaterThan(4.5);
+    expect(
+      Math.hypot(dummy.x - w.sides[0].player.x, dummy.y - w.sides[0].player.y),
+    ).toBeGreaterThan(4.5);
     let nearest = 99;
     for (let i = 0; i < 90; i++) {
       stepWorld(w);
-      nearest = Math.min(nearest, Math.hypot(dummy.x - w.player.x, dummy.y - w.player.y));
+      nearest = Math.min(
+        nearest,
+        Math.hypot(dummy.x - w.sides[0].player.x, dummy.y - w.sides[0].player.y),
+      );
     }
     expect(nearest).toBeLessThan(2.6);
     expect(w.sides[0].rage).toBeGreaterThan(0);
-    const calm = w.char.profile(w.primary, 0, 0);
-    const raging = w.char.profile(w.primary, 0, 20 << DYN_SHIFT);
+    const calm = w.sides[0].char.profile(w.sides[0].primary, 0, 0);
+    const raging = w.sides[0].char.profile(w.sides[0].primary, 0, 20 << DYN_SHIFT);
     expect(raging.radiusMult).toBeGreaterThan(calm.radiusMult);
   });
 
   it('Shield Charge: the damage is the shield\u2019s, and a longer run hits harder', () => {
     const near = world(['bulwarkRush'], 1.6, 'sword_3', STR, 'shield');
     const far = world(['bulwarkRush'], 6.5, 'sword_3', STR, 'shield');
-    expect(far.world.char.primary.skill.id).toBe('bulwarkRush');
+    expect(far.world.sides[0].char.primary.skill.id).toBe('bulwarkRush');
     const hits = (r: ReturnType<typeof world>) => {
       let h = 0;
       for (let i = 0; i < 60 && h === 0; i++) {
@@ -394,7 +399,7 @@ describe('shield and charge skills (snagLash, bulwarkRush, ghostShard)', () => {
     expect(hn).toBeGreaterThan(0);
     expect(hf).toBeGreaterThan(hn * 1.2);
     // The weapon's damage does not count: the same with a better sword.
-    const plain = near.world.char.profile(near.world.primary, 0);
+    const plain = near.world.sides[0].char.profile(near.world.sides[0].primary, 0);
     expect(plain.hands[0].chunks.every((c) => c.type === 0)).toBe(true);
   });
 
@@ -415,7 +420,7 @@ describe('shield and charge skills (snagLash, bulwarkRush, ghostShard)', () => {
 describe('Shattering Steel and Soulrend (splinterVolley, spiritSaw)', () => {
   it('shards hit harder the farther they have flown', () => {
     const { world: w } = world(['splinterVolley'], 3, 'sword_3', DEX);
-    const p = w.char.profile(w.primary, 0);
+    const p = w.sides[0].char.profile(w.sides[0].primary, 0);
     expect(distanceMult(p, 4.5)).toBeGreaterThan(distanceMult(p, 0.5));
   });
 
@@ -436,7 +441,7 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
   it('Blade Vortex: each cast adds a blade to a ring that hits everything about together, and the blades run out', () => {
     const { world: w, dummy } = world(['orbitingBlades'], 1.2, 'wand_3', DEX);
     let most = 0;
-    const near = neighbour(w, w.player.x - 1.0, w.player.y);
+    const near = neighbour(w, w.sides[0].player.x - 1.0, w.sides[0].player.y);
     for (let i = 0; i < 60 * 6; i++) {
       stepWorld(w);
       most = Math.max(most, w.sides[0].vortex?.blades.length ?? 0);
@@ -445,14 +450,14 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     expect(most).toBeLessThanOrEqual(10);
     expect(dummy.life).toBeLessThan(1e9);
     expect(near.life).toBeLessThan(1e9);
-    w.player.stunT = 100;
+    w.sides[0].player.stunT = 100;
     run(w, 6);
     expect(w.sides[0].vortex).toBeNull();
   });
 
   it('Blade Vortex: more blades make a round come sooner and hit harder', () => {
     const { world: w, dummy } = world(['orbitingBlades'], 1.2, 'wand_3', DEX);
-    w.player.stunT = 100;
+    w.sides[0].player.stunT = 100;
     const dmg = (n: number) => {
       w.sides[0].vortex = {
         key: 'orbitingBlades',
@@ -492,11 +497,11 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     expect(orbs).toBe(1);
     expect(dummy.life).toBeLessThan(1e9);
     expect(other.life).toBeLessThan(1e9);
-    const sky = w.char.actives.find((c) => c.skill.id === 'skyfall')!;
-    const prof = w.char.profile(sky, 0);
-    w.player.stunT = 100;
-    w.sides[0].stormOrb!.x = w.player.x;
-    w.sides[0].stormOrb!.y = w.player.y;
+    const sky = w.sides[0].char.actives.find((c) => c.skill.id === 'skyfall')!;
+    const prof = w.sides[0].char.profile(sky, 0);
+    w.sides[0].player.stunT = 100;
+    w.sides[0].stormOrb!.x = w.sides[0].player.x;
+    w.sides[0].stormOrb!.y = w.sides[0].player.y;
     w.sides[0].stormOrb!.acc = -100;
     const before = dummy.life;
     orbAnswers(w, w.sides[0], prof);
@@ -550,21 +555,21 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
 describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMotes, smokeCharge, lureTotem, slagCarapace, slipstream)', () => {
   it('Arctic Armour: less physical and fire damage from hits while standing still, a chill on what hits you, a chilled trail when moving', () => {
     const { world: w, dummy } = world(['crushingBlow', 'rimePlate'], 8, 'sword_3', STR);
-    w.player.moving = false;
-    const still = w.char.defence(playerConds(w, null));
+    w.sides[0].player.moving = false;
+    const still = w.sides[0].char.defence(playerConds(w, w.sides[0], null));
     expect(still.hitTakenType![0]).toBeLessThan(1);
     expect(still.hitTakenType![3]).toBeLessThan(1);
     expect(still.hitTakenType![2]).toBe(1);
     expect(still.hitTakenType![1]).toBe(1);
-    w.player.moving = true;
-    const moving = w.char.defence(playerConds(w, null));
+    w.sides[0].player.moving = true;
+    const moving = w.sides[0].char.defence(playerConds(w, w.sides[0], null));
     expect(moving.hitTakenType![0]).toBe(1);
-    frostBite(w, dummy);
+    frostBite(w.sides[0], dummy);
     expect(dummy.ail.chill).toBeGreaterThan(0);
-    w.player.stunT = 0;
+    w.sides[0].player.stunT = 0;
     w.sides[0].fields.length = 0;
     for (let i = 0; i < 90; i++) {
-      w.player.moving = true;
+      w.sides[0].player.moving = true;
       tickSkillFx(w, w.sides[0], 1 / 60);
     }
     expect(w.sides[0].fields.filter((f) => f.kind === 'chilling').length).toBeGreaterThanOrEqual(2);
@@ -580,7 +585,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     expect(v).toBeGreaterThan(2);
     const crawler = w.sides[0].minions.find((m) => m.kind === 'crawler');
     expect(crawler?.alive).toBe(true);
-    w.player.stunT = 100;
+    w.sides[0].player.stunT = 100;
     w.sides[0].virulence = 5;
     run(w, 12);
     expect(w.sides[0].virulence).toBe(0);
@@ -594,12 +599,12 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     );
     w.sides[0].opts.godMode = false;
     w.sides[0].opts.freeResources = false;
-    w.player.life = 10;
+    w.sides[0].player.life = 10;
     let got = 0;
     for (let i = 0; i < 60 * 8; i++) {
       stepWorld(w);
-      got = Math.max(got, w.player.life);
-      if (i % 60 === 0) w.player.life = Math.min(w.player.life, 10);
+      got = Math.max(got, w.sides[0].player.life);
+      if (i % 60 === 0) w.sides[0].player.life = Math.min(w.sides[0].player.life, 10);
     }
     expect(got).toBeGreaterThan(10);
     expect(
@@ -612,14 +617,14 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     let got = 0;
     for (let i = 0; i < 60 * 60; i++) {
       stepWorld(w);
-      got = Math.max(got, w.char.charges.insight + w.char.charges.fervour);
+      got = Math.max(got, w.sides[0].char.charges.insight + w.sides[0].char.charges.fervour);
     }
     expect(got).toBeGreaterThan(0);
   });
 
   it('Summon Skitterbots: two motes hold mana, chill and shock the enemies near, and set off traps from afar', () => {
     const { world: w, dummy } = world(['jawsTrap', 'whirringMotes'], 6, 'wand_3', DEX);
-    expect(w.char.reservedMana).toBeGreaterThan(0);
+    expect(w.sides[0].char.reservedMana).toBeGreaterThan(0);
     let bots = 0;
     for (let i = 0; i < 60 * 14; i++) {
       stepWorld(w);
@@ -639,11 +644,13 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
 
   it('Smoke Mine: the character gets away when hurt, with smoke at both ends that blinds, and a speed buff', () => {
     const { world: w, dummy } = world(['crushingBlow', 'smokeCharge'], 1.5, 'sword_3', DEX);
-    const start = { x: w.player.x, y: w.player.y };
+    const start = { x: w.sides[0].player.x, y: w.sides[0].player.y };
     w.sides[0].opts.godMode = true;
-    w.player.life = w.player.def.maxLife * 0.4;
+    w.sides[0].player.life = w.sides[0].player.def.maxLife * 0.4;
     for (let i = 0; i < 60 && w.sides[0].fields.length === 0; i++) stepWorld(w);
-    expect(Math.hypot(w.player.x - start.x, w.player.y - start.y)).toBeGreaterThan(2.5);
+    expect(
+      Math.hypot(w.sides[0].player.x - start.x, w.sides[0].player.y - start.y),
+    ).toBeGreaterThan(2.5);
     expect(w.sides[0].fields.filter((f) => f.kind === 'smoke')).toHaveLength(2);
     expect(w.sides[0].buffT.smokeScreen).toBeGreaterThan(0);
     // Enemies in the smoke are blinded.
@@ -664,10 +671,10 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     }
     expect(decoy).toBeDefined();
     expect(targetOf(w, dummy)).toBe(decoy);
-    const far = neighbour(w, w.player.x + 20, w.player.y);
-    expect(targetOf(w, far)).toBe(w.player);
+    const far = neighbour(w, w.sides[0].player.x + 20, w.sides[0].player.y);
+    expect(targetOf(w, far)).toBe(w.sides[0].player);
     // It ends.
-    w.player.stunT = 100;
+    w.sides[0].player.stunT = 100;
     run(w, 9);
     expect(w.sides[0].minions.some((m) => m.kind === 'decoy' && m.alive)).toBe(false);
   });
@@ -675,15 +682,15 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
   it('Molten Shell: most of the damage goes into a pool, and when the shell ends what it took goes out as fire', () => {
     const { world: w, dummy } = world(['crushingBlow', 'slagCarapace'], 1.2, 'sword_3', STR);
     w.sides[0].opts.godMode = true;
-    w.player.life = w.player.def.maxLife * 0.4;
+    w.sides[0].player.life = w.sides[0].player.def.maxLife * 0.4;
     for (let i = 0; i < 90 && !w.sides[0].shell; i++) stepWorld(w);
     expect(w.sides[0].shell).not.toBeNull();
-    w.player.stunT = 100;
+    w.sides[0].player.stunT = 100;
     const pool = w.sides[0].shell!.left;
     expect(pool).toBeGreaterThan(0);
-    const life = w.player.life;
-    rawHit(w, w.player, 100, 0, 'Test');
-    expect(life - w.player.life).toBeLessThan(100);
+    const life = w.sides[0].player.life;
+    rawHit(w, w.sides[0].player, 100, 0, 'Test');
+    expect(life - w.sides[0].player.life).toBeLessThan(100);
     expect(w.sides[0].shell!.taken).toBeGreaterThan(1);
     dummy.life = 1e9;
     const before = dummy.life;
@@ -720,7 +727,7 @@ describe('carrying damage about oneself (searingMantle, orbitingBlades)', () => 
     const burning = world(['arcChain', 'searingMantle'], 7, 'wand_3', INT);
     run(burning.world, 4);
     const d = (r: typeof plain) =>
-      Math.hypot(r.world.player.x - r.dummy.x, r.world.player.y - r.dummy.y);
+      Math.hypot(r.world.sides[0].player.x - r.dummy.x, r.world.sides[0].player.y - r.dummy.y);
     expect(d(burning)).toBeLessThan(d(plain));
   });
 
@@ -728,7 +735,7 @@ describe('carrying damage about oneself (searingMantle, orbitingBlades)', () => 
     const { world: w, dummy } = world(['arcChain', 'searingMantle'], 1.5, 'wand_3', INT);
     w.sides[0].opts.godMode = false;
     w.sides[0].opts.freeResources = false;
-    const p = w.player;
+    const p = w.sides[0].player;
     run(w, 1.5);
     expect(dummy.life).toBeLessThan(1e9);
     // Hurt below the threshold: the fire goes out and the enemy is left alone by it, and the character stops closing in for it.
@@ -747,7 +754,9 @@ describe('carrying damage about oneself (searingMantle, orbitingBlades)', () => 
     const { world: w, dummy } = world(['arcChain', 'orbitingBlades'], 7, 'wand_3', INT);
     w.sides[0].vortex = { key: 'orbitingBlades', blades: [20, 20, 20], acc: 0 };
     run(w, 4);
-    expect(Math.hypot(w.player.x - dummy.x, w.player.y - dummy.y)).toBeLessThan(1.6 + dummy.r);
+    expect(Math.hypot(w.sides[0].player.x - dummy.x, w.sides[0].player.y - dummy.y)).toBeLessThan(
+      1.6 + dummy.r,
+    );
   });
 });
 
@@ -763,10 +772,10 @@ describe('repairs from the fresh audit (S14)', () => {
 
   it('Viper Strike converts to chaos, and strikes with both weapons when dual wielding', () => {
     const one = world(['venomCut'], 1.2, 'dagger_3', DEX).world;
-    const p = one.char.profile(one.primary, 0);
+    const p = one.sides[0].char.profile(one.sides[0].primary, 0);
     expect(p.hands[0].chunks.some((c) => c.type === 4 && c.max > 0)).toBe(true);
     const two = world(['venomCut'], 1.2, 'dagger_3', DEX, 'dual').world;
-    expect(two.char.profile(two.primary, 0).bothHands).toBe(true);
+    expect(two.sides[0].char.profile(two.sides[0].primary, 0).bothHands).toBe(true);
   });
 
   it('Leap Slam always stuns an enemy on full life and throws it back', () => {
@@ -783,7 +792,7 @@ describe('repairs from the fresh audit (S14)', () => {
 
   it('Whirling Blades hits everything on the way through', () => {
     const { world: w } = world(['spinningDash'], 6, 'dagger_3', DEX);
-    const mid = neighbour(w, w.player.x + 3, w.player.y + 0.2);
+    const mid = neighbour(w, w.sides[0].player.x + 3, w.sides[0].player.y + 0.2);
     mid.def = dummyDefence({ maxLife: 1e9 });
     run(w, 4);
     expect(mid.life).toBeLessThan(1e9);
@@ -801,10 +810,10 @@ describe('repairs from the fresh audit (S14)', () => {
 
   it('Lacerate bleeds in Blood Stance and sweeps wider in Sand Stance', () => {
     const { world: w, dummy } = world(['twinSlash'], 1.2, 'sword_3', DEX);
-    const blood = w.char.profile(w.primary, 0);
+    const blood = w.sides[0].char.profile(w.sides[0].primary, 0);
     expect(blood.bleed.chance).toBeGreaterThan(0);
     w.sides[0].buffT.sandStance = 5;
-    const sand = w.char.profile(w.primary, playerConds(w, dummy));
+    const sand = w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
     expect(sand.bleed.chance).toBe(0);
     expect(sand.radiusMult).toBeGreaterThan(blood.radiusMult);
   });
@@ -821,7 +830,7 @@ describe('repairs from the fresh audit (S14)', () => {
     const z = world(['crushingBlow', 'raiseHusk'], 3, 'sword_3', STR);
     run(z.world, 3);
     expect(z.world.sides[0].minions.length).toBe(0);
-    layCorpses(z.world, z.world.player.x, z.world.player.y, 2);
+    layCorpses(z.world, z.world.sides[0].player.x, z.world.sides[0].player.y, 2);
     run(z.world, 3);
     expect(z.world.sides[0].minions.length).toBeGreaterThan(0);
     expect(z.world.corpses.length).toBeLessThan(2);
@@ -852,7 +861,7 @@ describe('repairs from the fresh audit (S14)', () => {
 describe('Cobra Lash (viperLash)', () => {
   it('is a chaos projectile that flies on from enemy to enemy, not a bolt of lightning', () => {
     const { world: w, dummy } = world(['viperLash'], 4, 'dagger_3', DEX);
-    const p = w.char.profile(w.primary, 0);
+    const p = w.sides[0].char.profile(w.sides[0].primary, 0);
     expect(p.hands[0].chunks.every((c) => c.type === 0 || c.type === 4)).toBe(true);
     const second = neighbour(w, dummy.x + 1.5, dummy.y + 1.0);
     let spawned = 0;
@@ -880,7 +889,7 @@ describe('Mirror Arrow and Blink Arrow clones', () => {
       clone = w.sides[0].minions.find((m) => m.kind === 'clone' && m.alive);
     }
     expect(clone).toBeDefined();
-    expect(clone!.fixedRate).toBeCloseTo(w.char.hands[0].aps, 5);
+    expect(clone!.fixedRate).toBeCloseTo(w.sides[0].char.hands[0].aps, 5);
     run(w, 3);
     expect(dummy.life).toBeLessThan(1e9);
   });
@@ -926,8 +935,8 @@ describe('Bladefall, Creeping Frost and Melee Physical Damage', () => {
   it('Melee Physical Damage also makes the bleed and poison of melee hits stronger', () => {
     const plain = world(['venomCut'], 1.2, 'dagger_3', DEX).world;
     const sup = world(['venomCut', 'bruteForce'], 1.2, 'dagger_3', DEX).world;
-    const a = plain.char.profile(plain.primary, 0).hands[0].ailChunks[0].k[2];
-    const b = sup.char.profile(sup.primary, 0).hands[0].ailChunks[0].k[2];
+    const a = plain.sides[0].char.profile(plain.sides[0].primary, 0).hands[0].ailChunks[0].k[2];
+    const b = sup.sides[0].char.profile(sup.sides[0].primary, 0).hands[0].ailChunks[0].k[2];
     expect(b).toBeGreaterThan(a);
   });
 });

@@ -1,6 +1,7 @@
 import type { MonsterTypeId } from '../data/monsters';
 import { castPattern } from './blasts';
 import type { Action, Actor, World } from './types';
+import type { Side } from './side';
 
 /**
  * Pack plays (docs/ENCOUNTERS.md 8): a pack acts together on a cue.
@@ -55,7 +56,7 @@ function hold(m: Actor, seconds: number): void {
 }
 
 /** Advance the plays in progress, and four times a second look for packs that can start one. */
-export function tickPackPlays(w: World, dt: number): void {
+export function tickPackPlays(w: World, side: Side, dt: number): void {
   const s = stateOf(w);
   for (const pl of s.packs.values()) {
     if (pl.cd > 0) pl.cd -= dt;
@@ -72,7 +73,7 @@ export function tickPackPlays(w: World, dt: number): void {
   }
   if (w.t < s.next) return;
   s.next = w.t + 0.25;
-  const p = w.player;
+  const p = side.player;
   if (!p.alive) return;
   // The members of each pack that could take part, by play.
   const loosers = new Map<number, Actor[]>();

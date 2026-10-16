@@ -8,7 +8,7 @@ describe('skill gallery', () => {
     expect(entries.length).toBeGreaterThan(150);
     for (const e of entries) {
       const world = galleryWorld(galleryRun(e, 1), e);
-      const ch = world.char;
+      const ch = world.sides[0].char;
       const has =
         ch.primary.skill.id === e.id ||
         ch.utilities.some((c) => c.skill.id === e.id) ||

@@ -265,9 +265,9 @@ export function affixRewards(
 
 /** The character's item quantity and rarity multipliers, with any flask active right now. */
 export function lootMults(w: World): { quantity: number; rarity: number } {
-  const db = w.char.dbWith(flaskMask(w.sides[0]));
+  const db = w.sides[0].char.dbWith(flaskMask(w.sides[0]));
   // A mod may hold only on low life or while a flask is active: ask with the conditions that hold now.
-  const ctx = playerCtx(w);
+  const ctx = playerCtx(w, w.sides[0]);
   return { quantity: db.mult('itemQuantity', ctx), rarity: db.mult('itemRarity', ctx) };
 }
 

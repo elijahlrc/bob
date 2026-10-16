@@ -1,4 +1,3 @@
-import type { Character, SkillChoice } from '../calc/character';
 import type { MoveState } from './movement';
 import type { Defence } from '../calc/combat';
 import type { FlaskSpec } from '../calc/flasks';
@@ -6,7 +5,7 @@ import type { MonsterStats } from '../calc/monster';
 import type { SkillProfile } from '../calc/skill';
 import type { Rng } from '../core/rng';
 import type { MonsterModId, MonsterRarity } from '../data/monsters';
-import type { AnyItem, Build } from '../data/types';
+import type { AnyItem } from '../data/types';
 import type { MapPlan } from '../gen/mapPlan';
 import type { BlastShape } from '../data/encounters';
 import type { Corpse } from './factions';
@@ -77,7 +76,7 @@ export type MonsterState = 'idle' | 'chase' | 'leash';
 export type Actor = {
   id: number;
   isPlayer: boolean;
-  faction: 0 | 1;
+  team: number;
   /** The side this actor fights for (a character and its minions); null for a monster (docs/DUEL.md section 3). */
   side: Side | null;
   x: number;
@@ -235,7 +234,7 @@ export type Actor = {
 export type Projectile = {
   id: number;
   owner: number;
-  faction: 0 | 1;
+  team: number;
   x: number;
   y: number;
   vx: number;
@@ -284,7 +283,7 @@ export type GroundEffect = {
   /** Zones: time since the last damage pulse. */
   acc?: number;
   dtype: number;
-  faction: 0 | 1;
+  team: number;
   /** A pulse: how many tiles it throws the character back when it lands. */
   push?: number;
   /**
@@ -638,7 +637,7 @@ export type Vitals = {
 export const fullVitals = (): Vitals => ({ life: 1, mana: 1, es: 1, flasks: {} });
 
 /** Decides each tick whether the player leaves the map (docs/MAPS.md section 7); the Abandon button is the manual one. */
-export type AbandonPolicy = (w: World) => boolean;
+export type AbandonPolicy = (w: World, s: Side) => boolean;
 
 /** What the map decides (what a character brings is `SideOpts`, in side.ts). */
 export type WorldOpts = {
@@ -687,7 +686,6 @@ export type World = {
   /** Chance rolls and spell choices of triggers (separate, so triggers never disturb other streams). */
   rngTrig: Rng;
   actors: Actor[];
-  player: Actor;
   nextId: number;
   projectiles: Projectile[];
   effects: GroundEffect[];
@@ -699,9 +697,6 @@ export type World = {
   drops: Drop[];
   chests: Chest[];
   events: SimEvent[];
-  build: Build;
-  char: Character;
-  primary: SkillChoice;
   status: MapStatus;
   /** Seconds until the player leaves after pressing Abandon, or null when not leaving. */
   abandonT: number | null;

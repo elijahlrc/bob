@@ -45,7 +45,7 @@ describe('Cast on Melee Kill (slayersEcho)', () => {
     // The same kill by a minion, or by damage over time, casts nothing.
     for (const by of ['minion', 'player'] as const) {
       const x = createDummyWorld(b, { distance: 1.6 });
-      x.world.player.stunT = 1e9; // it does not strike
+      x.world.sides[0].player.stunT = 1e9; // it does not strike
       rawHit(x.world, x.dummy, 1e13, 0, 'Test', by);
       expect(x.dummy.alive).toBe(false);
       expect(triggers(x.world.events)).toBe(0);
@@ -78,8 +78,8 @@ function tally(b: Build, seconds: number) {
   for (let i = 0; i < seconds * 60; i++) {
     stepWorld(world);
     for (const e of world.events) {
-      if (e.t === 'use' && e.src === world.player.id) uses++;
-      if (e.t === 'hit' && e.src === world.player.id) hits++;
+      if (e.t === 'use' && e.src === world.sides[0].player.id) uses++;
+      if (e.t === 'hit' && e.src === world.sides[0].player.id) hits++;
     }
   }
   return { uses, hits };

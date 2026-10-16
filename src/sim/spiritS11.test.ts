@@ -53,7 +53,7 @@ const run = (w: World, seconds: number) => {
 describe('corpses', () => {
   it('a monster that dies leaves a corpse with the life it had', () => {
     const { world: w } = world(['crushingBlow'], 8, 'sword_3', STR);
-    const m = monster(w, w.player.x + 3, w.player.y);
+    const m = monster(w, w.sides[0].player.x + 3, w.sides[0].player.y);
     const max = m.def.maxLife;
     killActor(w, m);
     const c = w.corpses.find((x) => x.id === m.id);
@@ -68,7 +68,7 @@ describe('Raise Spectre (bindShade)', () => {
     dummy.rarity = 'boss';
     run(w, 3);
     expect(w.sides[0].minions.length).toBe(0);
-    corpseAt(w, w.player.x - 1, w.player.y);
+    corpseAt(w, w.sides[0].player.x - 1, w.sides[0].player.y);
     run(w, 3);
     expect(w.sides[0].minions.length).toBe(1);
     const s = w.sides[0].minions[0];
@@ -81,8 +81,8 @@ describe('Raise Spectre (bindShade)', () => {
   it('keeps one at the first level of the gem', () => {
     const { world: w, dummy } = world(['crushingBlow', 'bindShade'], 3, 'sword_3', INT);
     dummy.rarity = 'boss';
-    corpseAt(w, w.player.x - 1, w.player.y);
-    corpseAt(w, w.player.x - 1.5, w.player.y);
+    corpseAt(w, w.sides[0].player.x - 1, w.sides[0].player.y);
+    corpseAt(w, w.sides[0].player.x - 1.5, w.sides[0].player.y);
     run(w, 6);
     expect(w.sides[0].minions.length).toBe(1);
   });
@@ -90,7 +90,7 @@ describe('Raise Spectre (bindShade)', () => {
   it('a spectre strikes as the monster did', () => {
     const { world: w, dummy } = world(['crushingBlow', 'bindShade'], 3, 'sword_3', INT);
     dummy.rarity = 'boss';
-    corpseAt(w, w.player.x - 1, w.player.y);
+    corpseAt(w, w.sides[0].player.x - 1, w.sides[0].player.y);
     run(w, 3);
     const before = dummy.life;
     run(w, 4);
@@ -101,8 +101,8 @@ describe('Raise Spectre (bindShade)', () => {
 describe('Bodyswap (shadowSwap)', () => {
   it('goes to a corpse with enemies about it: fire bursts at both ends, the corpse bursts and is used up', () => {
     const { world: w } = world(['crushingBlow', 'shadowSwap'], 20, 'sword_3', DEX);
-    const start = { x: w.player.x, y: w.player.y };
-    const c = corpseAt(w, w.player.x + 6, w.player.y, 1000);
+    const start = { x: w.sides[0].player.x, y: w.sides[0].player.y };
+    const c = corpseAt(w, w.sides[0].player.x + 6, w.sides[0].player.y, 1000);
     const near = monster(w, c.x + 1, c.y);
     near.def = dummyDefence({ maxLife: 1e9 });
     near.life = 1e9;
@@ -119,7 +119,9 @@ describe('Bodyswap (shadowSwap)', () => {
           wide = Math.max(wide, e.r);
         }
     }
-    expect(Math.hypot(w.player.x - start.x, w.player.y - start.y)).toBeGreaterThan(4);
+    expect(
+      Math.hypot(w.sides[0].player.x - start.x, w.sides[0].player.y - start.y),
+    ).toBeGreaterThan(4);
     expect(w.corpses.includes(c)).toBe(false);
     expect(bursts).toBeGreaterThanOrEqual(3);
     // 300% more area: twice the radius of the plain burst.
@@ -130,10 +132,14 @@ describe('Bodyswap (shadowSwap)', () => {
 
   it('with no corpse it is a blink toward the target, with a burst where it left', () => {
     const { world: w, dummy } = world(['crushingBlow', 'shadowSwap'], 7, 'sword_3', DEX);
-    const start = { x: w.player.x, y: w.player.y };
+    const start = { x: w.sides[0].player.x, y: w.sides[0].player.y };
     run(w, 2);
-    expect(Math.hypot(w.player.x - start.x, w.player.y - start.y)).toBeGreaterThan(2);
-    expect(Math.hypot(w.player.x - dummy.x, w.player.y - dummy.y)).toBeLessThan(5);
+    expect(
+      Math.hypot(w.sides[0].player.x - start.x, w.sides[0].player.y - start.y),
+    ).toBeGreaterThan(2);
+    expect(Math.hypot(w.sides[0].player.x - dummy.x, w.sides[0].player.y - dummy.y)).toBeLessThan(
+      5,
+    );
   });
 });
 
@@ -150,7 +156,7 @@ describe('Pyre Burst (pyreBurst)', () => {
 
   it('a corpse bursts and becomes a geyser that fires projectiles one after another for eight seconds', () => {
     const { world: w, dummy } = world(['pyreBurst'], 4, 'wand_3', DEX);
-    const c = corpseAt(w, w.player.x + 3.5, w.player.y, 500);
+    const c = corpseAt(w, w.sides[0].player.x + 3.5, w.sides[0].player.y, 500);
     let geyser = false;
     let bursts = 0;
     let hits = 0;
@@ -173,7 +179,7 @@ describe('Pyre Burst (pyreBurst)', () => {
     const { world: w } = world(['pyreBurst'], 4, 'wand_3', DEX);
     let most = 0;
     for (let i = 0; i < 20 * 60; i++) {
-      if (i % 120 === 0) corpseAt(w, w.player.x + 3.5, w.player.y);
+      if (i % 120 === 0) corpseAt(w, w.sides[0].player.x + 3.5, w.sides[0].player.y);
       stepWorld(w);
       most = Math.max(most, w.sides[0].fields.filter((f) => f.kind === 'geyser').length);
     }

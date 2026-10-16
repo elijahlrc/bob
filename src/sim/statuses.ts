@@ -1,6 +1,7 @@
 import type { SkillProfile } from '../calc/skill';
 import { EXPOSURE_TYPE, STATUSES, STATUS_IDS, type StatusId } from '../data/statuses';
 import type { Actor, World } from './types';
+import type { Side } from './side';
 
 /**
  * Statuses on enemies (docs/SPIRIT.md S3): the debuffs that are neither curses nor ailments. A status has a time left, a main
@@ -43,8 +44,8 @@ export function applyStatus(w: World, a: Actor, id: StatusId, o: StatusOpts = {}
 export const BLIND_SECONDS = 3;
 
 /** A monster blinds the character: its attacks miss more (the same Blinded as the character's skills inflict). */
-export function blindPlayer(w: World, seconds: number): void {
-  const p = w.player;
+export function blindPlayer(s: Side, seconds: number): void {
+  const p = s.player;
   if (!p.alive) return;
   const v = STATUSES.blind.v;
   const have = p.fx.blind;

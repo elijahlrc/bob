@@ -17,7 +17,7 @@ import { createWorld, spawnMonster, stepWorld } from './world';
 /** A world with a passive player (stunned for good) to watch the monsters on their own. */
 function arena(): World {
   const { world } = createDummyWorld(newRun('vanguard', 1).build, { distance: 30 });
-  world.player.stunT = 1e9;
+  world.sides[0].player.stunT = 1e9;
   for (const a of world.actors) if (a.dummy) a.alive = false;
   return world;
 }
@@ -31,7 +31,15 @@ const spec = (type: MonsterTypeId): MonsterSpec => ({
 });
 
 function put(w: World, type: MonsterTypeId, dx: number, dy = 0): Actor {
-  return spawnMonster(w, spec(type), w.player.x + dx, w.player.y + dy, 0, 0, type);
+  return spawnMonster(
+    w,
+    spec(type),
+    w.sides[0].player.x + dx,
+    w.sides[0].player.y + dy,
+    0,
+    0,
+    type,
+  );
 }
 
 const run = (w: World, seconds: number) => {

@@ -40,7 +40,7 @@ function arena() {
   const run = newRun('mystic', 1);
   const { world, dummy } = createDummyWorld(run.build, { distance: 3 });
   world.sides[0].opts.godMode = true;
-  return { w: world, player: world.player, first: dummy };
+  return { w: world, player: world.sides[0].player, first: dummy };
 }
 
 /** Another target-like actor at a spot, copied from the first. */
@@ -75,7 +75,7 @@ function cast(w: World, p: SkillProfile, aim: Actor): void {
     aimX: aim.x,
     aimY: aim.y,
   };
-  fire(w, w.player, act);
+  fire(w, w.sides[0].player, act);
 }
 
 const damaged = (a: Actor) => a.life < a.def.maxLife;

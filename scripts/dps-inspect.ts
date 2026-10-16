@@ -51,7 +51,7 @@ const { world, dummy } = createDummyWorld(build, {
   rarity: 'boss',
   fixed: true,
 });
-const me = world.player.id;
+const me = world.sides[0].player.id;
 let uses = 0;
 let hits = 0;
 let dmg = 0;
