@@ -39,7 +39,7 @@ weight tags the item has gives a weight above zero. The tag sets for the classes
 
 1. **Bob's armour and jewellery pools are smaller, and life is a bigger share of them.** A body armour rolls 4 prefixes and 10 suffixes in Bob,
    6 and 9 in 3.9 (hybrids 7 and 11); a shield 3 and 11 against 7 to 21 and 14 to 15; a belt 3 and 10 against 8 and 12; an amulet 11 and 17
-   against 15 and 22. Of the 103 distinct mod texts that can roll on these items in 3.9, 39 have a Bob counterpart on at least one slot; 61 have
+   against 15 and 22. Of the 103 distinct mod texts that can roll on these items in 3.9, 39 have a Bob family with the same stat (not always on the same slot); 61 have
    none, and 3 do not apply (item rarity twice, and the light radius half of one accuracy hybrid). Section 3.
 2. **Hybrid defence pieces roll the wrong set.** In 3.9 a piece that gives armour and evasion rolls only the "armour and evasion" mods. In Bob
    it rolls those and also the pure armour and the pure evasion mods, so five of its seven prefix families are defence, and one item can carry
@@ -55,12 +55,12 @@ weight tags the item has gives a weight above zero. The tag sets for the classes
    area of effect, aura effect, reduced mana reserved, all five ailment chances on gloves and added chaos damage to attacks; nine more roll
    on slots where 3.9 does not roll them. Section 4.
 7. **The engine already has most of what is missing.** Block of spells, additional physical damage reduction, dodge, reflect, avoid ailments,
-   life on block, damage over time multiplier, projectile speed, kill gains and the gem level stats are all calculated. Only block of
+   life on block (as a percent), damage over time multiplier, projectile speed, kill gains and the gem level stats are all calculated. Only block of
    projectiles, mana on block, percent energy shield regeneration and block recovery are not. Section 3.
 8. **The item card shows an armour piece's base defences, not the piece.** A helmet with +300 armour and 90% increased armour prints its white
    base's number. The weapon card was fixed on the same day. Section 8.
-9. **The base inventory is much thinner.** Bob has 4 armour tiers per defence type where 3.9 has 9 to 17, no hybrid shields, no shield
-   implicits (every 3.9 shield has one) and 5 rings, 4 amulets, 3 belts and 2 quivers against 25, 14, 10 and 14. Section 9.
+9. **The base inventory is much thinner.** Bob has 4 armour tiers per defence type where 3.9 has 8 to 17, no hybrid shields, no shield
+   implicits (nearly every 3.9 shield has one) and 5 rings, 4 amulets, 3 belts and 2 quivers against 25, 14, 10 and 14. Section 9.
 10. **Tier odds are not a problem here.** 3.9 weights nearly every armour and jewellery tier alike (1000 each; a few top tiers 500), so the top
     three tiers are 48% of the rolls at item level 84, against 34% in Bob with the quarter rule. This is information only, the rule stands.
 
@@ -314,12 +314,12 @@ exceptions are five body armours, four boots, four gloves and two helmets, most 
 
 **Jewellery.** Bob's bases and the 3.9 bases that have no Bob equivalent (talismans left out):
 
-| Kind   | Bob (5, 4, 3, 2)                                                                          | 3.9 (about 25, 14, 10, 14); what Bob lacks                                                                                                                                                                                                     |
-| ------ | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ring   | mana 20; fire, cold, lightning resistance 20; all elemental resistance 10 (item level 40) | life, mana, energy shield, added physical damage to attacks, chaos resistance, global critical strike chance, all attributes, global defences, two-resistance pairs, increased elemental damage, life and mana percent (item level 80), rarity |
-| Amulet | strength, dexterity, intelligence 20; all attributes 12 (item level 30)                   | mana and life regeneration, the three two-attribute pairs, fire resistance, all elemental resistance, rarity, mana regeneration at item level 77, life regeneration percent at 74                                                              |
-| Belt   | life 25; armour 120; energy shield 20                                                     | physical damage, strength, stun and block recovery, stun duration, armour and evasion (item level 78), rarity                                                                                                                                  |
-| Quiver | accuracy 60; physical 1-4 to bow attacks                                                  | added fire, cold, lightning and physical damage (4 beginner quivers), dexterity, accuracy percent, life per hit, stun duration, added damage to bow attacks (3 tiers), pierce, critical strike chance                                          |
+| Kind   | Bob (5, 4, 3, 2)                                                                          | 3.9 (about 25, 14, 10, 14); what Bob lacks                                                                                                                                                                                               |
+| ------ | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ring   | mana 20; fire, cold, lightning resistance 20; all elemental resistance 10 (item level 40) | life, energy shield, added physical damage to attacks, chaos resistance, global critical strike chance, all attributes, global defences, two-resistance pairs, increased elemental damage, life and mana percent (item level 80), rarity |
+| Amulet | strength, dexterity, intelligence 20; all attributes 12 (item level 30)                   | mana and life regeneration, the three two-attribute pairs, fire resistance, all elemental resistance, rarity, mana regeneration at item level 77, life regeneration percent at 74                                                        |
+| Belt   | life 25; armour 120; energy shield 20                                                     | physical damage, strength, stun and block recovery, stun duration, armour and evasion (item level 78), rarity                                                                                                                            |
+| Quiver | accuracy 60; physical 1-4 to bow attacks                                                  | added fire, cold, lightning and physical damage (4 beginner quivers), dexterity, accuracy percent, life per hit, stun duration, added damage to bow attacks (3 tiers), pierce, critical strike chance                                    |
 
 The base's implicit is what tells two otherwise equal rings apart. With five ring, four amulet, three belt and two quiver bases there are
 few reasons to prefer one find over another before the affixes are read.
