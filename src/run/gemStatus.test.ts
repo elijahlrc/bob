@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { Character } from '../calc/character';
 import { gemDef } from '../data/gems';
 import { makeGem, makeItem } from '../gen/items';
-import { newRun } from '../run/run';
-import { gemStatus } from './Skills';
+import { newRun } from './run';
+import { gemStatus } from './gemStatus';
 
 let n = 100;
 const uid = () => n++;

@@ -6,6 +6,7 @@ import { EQUIP_SLOTS, type GemItem } from '../data/types';
 import type { Controller } from '../run/controller';
 import { setPrimary, socketGem, unsocketGem } from '../run/inventory';
 import { sheetOf } from '../run/bot';
+import { gemStatus } from '../run/gemStatus';
 import {
   bestPlacement,
   moveGem,
@@ -50,62 +51,6 @@ function Badge({ p }: { p: Pick<Placement, 'dpsPct' | 'ehpPct' | 'scorePct'> }) 
       ))}
     </>
   );
-}
-
-/**
- * Whether a socketed gem is doing anything, in a line: which skills a support is on, what supports a skill, whether an aura
- * is active, and why not when it is not (a support needs a matching skill in the same item).
- */
-export function gemStatus(
-  ch: Character,
-  uid: number,
-  def: ReturnType<typeof gemDef>,
-): { ok: boolean; text: string; hint?: string } | null {
-  if (def.kind === 'support') {
-    const on = ch.actives.filter((a) => a.supports.some((x) => x.gem.uid === uid));
-    if (on.length)
-      return { ok: true, text: `Supporting: ${on.map((a) => a.skill.name).join(', ')}` };
-    // Linked to a skill it fits by type but cannot act on: say what it cannot do.
-    const idle = ch.actives.flatMap((a) => (a.inert ?? []).filter((x) => x.gem.gem.uid === uid));
-    if (idle.length) return { ok: false, text: `No effect: ${idle[0].why}` };
-    const needs = def.supports.length ? def.supports.join(' or ') : 'an active skill';
-    return {
-      ok: false,
-      text: `Not supporting anything: needs a ${needs} skill in the same item`,
-    };
-  }
-  if (def.kind === 'active') {
-    if (ch.isHexTouched(uid)) return { ok: true, text: 'Hexes the enemies you hit' };
-    const a = ch.actives.find((x) => x.gemUid === uid);
-    if (!a || !a.usable) return null;
-    const names = a.supports.map((x) => x.def.name);
-    const linked = names.length ? `Supported by: ${names.join(', ')}` : 'No supports linked';
-    // A skill the mana cannot pay for is mostly replaced by the weapon attack: say so.
-    if (ch.primary.gemUid === uid) {
-      const sustain = ch.skillSheet(
-        a,
-        undefined,
-        ch.configConds,
-        undefined,
-        0,
-        1,
-        ch.planned(a),
-      ).sustain;
-      if (sustain < 0.9)
-        return {
-          ok: false,
-          text: `${linked} · Mana-starved (${Math.round(sustain * 100)}%)`,
-          hint: `Your mana regeneration can pay for about ${Math.round(sustain * 100)}% of this skill's casts. The rest are weapon attacks. Add mana regeneration, reduce the cost, or use fewer supports.`,
-        };
-    }
-    return { ok: true, text: linked };
-  }
-  if (def.kind === 'aura') {
-    const au = ch.auras.find((x) => x.def.id === def.id);
-    if (au && !au.active) return { ok: false, text: 'Inactive: not enough mana to reserve it' };
-    return au ? { ok: true, text: `Active, reserving ${Math.round(au.reserved)} mana` } : null;
-  }
-  return null;
 }
 
 /** How long the badges are worked on at a time before the screen gets its turn, in milliseconds. */

@@ -193,30 +193,97 @@ export function equip(run: RunState, uid: number, slot: EquipSlot): EquipCheck {
   return { ok: true };
 }
 
+/** How many sockets an item has and how many hold a gem (0 and 0 for an empty slot). */
+export type SocketCount = { sockets: number; filled: number };
+
+/**
+ * What a swap does to the gems (docs/EQUIP.md 3.1), with names. `idle` is the part that needs a `Character`, so `dryEquip`
+ * leaves it empty and `compareSlots` fills it in for the item being looked at.
+ */
+export type SocketOutcome = {
+  /** The slot's item now. */
+  before: SocketCount;
+  /** The new item once the gems have moved. */
+  after: SocketCount;
+  /** Gems of the old item that go into the new one. */
+  moved: GemItem[];
+  /** Gems that go to the bag: those with no socket left, and a cleared off hand's. */
+  out: GemItem[];
+  /** The part of `out` that belonged to the off hand a two-hander clears. */
+  fromOffHand: GemItem[];
+  /** The primary skill's gem is among `out`. */
+  lostPrimary: boolean;
+  /** Worn gems that did their job before and do nothing after: a support with no skill left in its item, a skill the new weapon cannot use. */
+  idle: { gem: GemItem; why: string }[];
+  /** Empty sockets in the new item once the gems are placed. */
+  freeAfter: number;
+};
+
+const countOf = (it: Item | undefined): SocketCount => ({
+  sockets: it?.sockets.length ?? 0,
+  filled: it?.sockets.filter(Boolean).length ?? 0,
+});
+
+const gemsOf = (it: Item | undefined): GemItem[] =>
+  it?.sockets.filter((g): g is GemItem => g !== null) ?? [];
+
 /**
  * What `equip` would do, without doing it: the check, the build afterwards (a two-hander's cleared off hand and the
- * gems that move included, so a compare cannot disagree with the real thing) and what returns to the bag. It runs the
- * real `equip` on a copy of the parts of the run it touches.
+ * gems that move included, so a compare cannot disagree with the real thing), what returns to the bag and what happens to
+ * the gems. It runs the real `equip` on a copy of the parts of the run it touches.
  */
 export function dryEquip(
   run: RunState,
   uid: number,
   slot: EquipSlot,
-): { check: EquipCheck; build: Build; toBag: Item[]; gemsToBag: number } {
+): { check: EquipCheck; build: Build; toBag: Item[]; sockets: SocketOutcome } {
   const copy: RunState = {
     ...run,
     inventory: [...run.inventory],
     build: { ...run.build, equipment: { ...run.build.equipment } },
   };
   const had = new Set(run.inventory.map((x) => x.uid));
+  const old = run.build.equipment[slot];
   const check = equip(copy, uid, slot);
-  if (!check.ok) return { check, build: run.build, toBag: [], gemsToBag: 0 };
+  if (!check.ok) {
+    const none = countOf(old);
+    return {
+      check,
+      build: run.build,
+      toBag: [],
+      sockets: {
+        before: none,
+        after: none,
+        moved: [],
+        out: [],
+        fromOffHand: [],
+        lostPrimary: false,
+        idle: [],
+        freeAfter: none.sockets - none.filled,
+      },
+    };
+  }
   const added = copy.inventory.filter((x) => !had.has(x.uid));
+  const out = added.filter((x): x is GemItem => x.kind === 'gem');
+  const now = copy.build.equipment[slot];
+  const oldUids = new Set(gemsOf(old).map((g) => g.uid));
+  const offHand = run.build.equipment.offHand;
+  const offUids = new Set(slot === 'offHand' ? [] : gemsOf(offHand).map((g) => g.uid));
+  const after = countOf(now);
   return {
     check,
     build: copy.build,
     toBag: added.filter((x): x is Item => x.kind === 'item'),
-    gemsToBag: added.filter((x) => x.kind === 'gem').length,
+    sockets: {
+      before: countOf(old),
+      after,
+      moved: gemsOf(now).filter((g) => oldUids.has(g.uid)),
+      out,
+      fromOffHand: out.filter((g) => offUids.has(g.uid)),
+      lostPrimary: run.build.primaryGem !== undefined && copy.build.primaryGem === undefined,
+      idle: [],
+      freeAfter: after.sockets - after.filled,
+    },
   };
 }
 

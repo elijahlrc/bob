@@ -6,6 +6,8 @@ import { spawnMonster } from './sim/world';
 import { ITEM_BASES } from './data/bases';
 import type { InventoryItem } from './data/types';
 import { rollFlask, rollGem, rollItemOf } from './gen/loot';
+import { makeGem, makeItem } from './gen/items';
+import { STARTER_GEMS } from './run/starterGems';
 import { noteFound } from './run/found';
 import type { Controller } from './run/controller';
 import { uidSource } from './run/run';
@@ -260,6 +262,27 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
       run.inventory = run.inventory.concat(added);
       controller.bus.emit('state', null);
       return run.inventory.length;
+    },
+    /**
+     * Give the character what the equip screens need to show a swap that costs gems: a 4-socket body with the class's skill and
+     * support (the skill primary) and two more, and a 2-socket helmet with a support and a free socket (docs/EQUIP.md 7).
+     */
+    gearUp(): number {
+      const run = controller.run;
+      if (!run) return 0;
+      const uid = uidSource(run);
+      const [skill, support] = STARTER_GEMS[run.classId];
+      const body = run.build.equipment.body ?? makeItem(uid, 'body_ar_1', 20, 4);
+      const gems = [skill, support, 'kindle', 'bruteForce'].map((g) => makeGem(uid, g));
+      const helmet = run.build.equipment.helmet ?? makeItem(uid, 'helmet_ar_1', 20, 2);
+      const equipment = {
+        ...run.build.equipment,
+        body: { ...body, sockets: gems },
+        helmet: { ...helmet, sockets: [makeGem(uid, support), null] },
+      };
+      run.build = { ...run.build, equipment, primaryGem: gems[0].uid };
+      controller.bus.emit('state', null);
+      return gems.length + 1;
     },
     sleep,
   };

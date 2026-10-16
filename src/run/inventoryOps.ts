@@ -1,4 +1,10 @@
-import { diffSheets, sheetDps, type CharacterSheet, type SheetDiff } from '../calc/character';
+import {
+  Character,
+  diffSheets,
+  sheetDps,
+  type CharacterSheet,
+  type SheetDiff,
+} from '../calc/character';
 import { itemMods } from '../calc/items';
 import { itemBase, isWeaponClass } from '../data/bases';
 import { flaskBase } from '../data/flasks';
@@ -9,11 +15,22 @@ import {
   type InventoryItem,
   type EquipSlot,
   type FlaskItem,
+  type GemItem,
   type Item,
   type Rarity,
+  type Build,
 } from '../data/types';
-import { dryEquip, equip, equipFlask, slotsFor, socketGem, type EquipCheck } from './inventory';
-import { score, sheetOf } from './bot';
+import {
+  dryEquip,
+  equip,
+  equipFlask,
+  slotsFor,
+  socketGem,
+  type EquipCheck,
+  type SocketOutcome,
+} from './inventory';
+import { cfgFor, score, sheetOf } from './bot';
+import { gemIdle } from './gemStatus';
 import { isFavourite } from './found';
 import type { RunState } from './run';
 
@@ -36,6 +53,8 @@ export type ItemInfo = {
   ehpPct: number;
   scorePct: number;
   replaces?: Item;
+  /** The gems the best-slot swap sends to the bag (a row's warning; no sheet is worked out for it). */
+  gemsOut: GemItem[];
 };
 
 const SLOT_LABEL: Record<EquipSlot, string> = {
@@ -107,6 +126,7 @@ export function itemInfos(run: RunState): Map<number, ItemInfo> {
       dpsPct: 0,
       ehpPct: 0,
       scorePct: 0,
+      gemsOut: [],
     };
     if (it.kind === 'flask') {
       info.equippable = flaskBase(it.baseId).level <= run.build.level;
@@ -132,6 +152,7 @@ export function itemInfos(run: RunState): Map<number, ItemInfo> {
           info.ehpPct = pct(base.ehp, s.ehp);
           info.scorePct = pct(baseScore, sc);
           info.replaces = run.build.equipment[slot];
+          info.gemsOut = dry.sockets.out;
         }
       }
     }
@@ -445,9 +466,28 @@ export type SlotCompare = {
   toBag: Item[];
   /** What goes back besides the item worn there: a two-hander's off hand. */
   alsoMoves: Item[];
+  /** What happens to the gems (docs/EQUIP.md 3.1). */
+  sockets: SocketOutcome;
   /** The slot the bot's score likes best (what `itemInfos` calls the item's slot). */
   best: boolean;
 };
+
+/**
+ * Worn gems that do something now and nothing after the swap: a support whose skill left its item, a skill the new weapon
+ * cannot use. Compared with the character as it is, so a gem that was idle already is not blamed on the swap.
+ */
+function idleAfter(run: RunState, now: Character, build: Build): SocketOutcome['idle'] {
+  const then = new Character(build, cfgFor(run));
+  const idle: SocketOutcome['idle'] = [];
+  for (const slot of EQUIP_SLOTS)
+    for (const g of build.equipment[slot]?.sockets ?? []) {
+      if (!g) continue;
+      const def = gemDef(g.gemId);
+      const why = gemIdle(then, g.uid, def);
+      if (why && !gemIdle(now, g.uid, def)) idle.push({ gem: g, why });
+    }
+  return idle;
+}
 
 /** One entry for every slot the item may go into: rings give two, one-handers two, a two-hander its own. */
 export function compareSlots(run: RunState, uid: number): SlotCompare[] {
@@ -455,6 +495,8 @@ export function compareSlots(run: RunState, uid: number): SlotCompare[] {
   if (!it || it.kind !== 'item') return [];
   const base = sheetOf(run);
   const baseScore = score(base);
+  let ch: Character | undefined;
+  const before = () => (ch ??= new Character(run.build, cfgFor(run)));
   const out: SlotCompare[] = slotsFor(it).map((slot) => {
     const dry = dryEquip(run, uid, slot);
     const equipped = run.build.equipment[slot];
@@ -469,9 +511,11 @@ export function compareSlots(run: RunState, uid: number): SlotCompare[] {
       scorePct: 0,
       toBag: dry.toBag,
       alsoMoves: dry.toBag.filter((x) => x.uid !== equipped?.uid),
+      sockets: dry.sockets,
       best: false,
     };
     if (dry.check.ok) {
+      c.sockets = { ...dry.sockets, idle: idleAfter(run, before(), dry.build) };
       const s = sheetOf(run, dry.build);
       c.delta = diffSheets(base, s);
       c.dpsPct = pct(sheetDps(base), sheetDps(s));
