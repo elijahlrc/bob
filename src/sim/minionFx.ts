@@ -67,10 +67,10 @@ const NONE: Aura = {
 const BURN_RADIUS = 1.8;
 
 /** The aura now: the standing offering's effects, and the added damage of the golem that stands. */
-export function auraNow(w: World): Aura {
-  const o = w.offering;
+export function auraNow(s: Side): Aura {
+  const o = s.offering;
   let golem: Minion | undefined;
-  for (const m of w.minions) if (m.golem && m.alive) golem = m;
+  for (const m of s.minions) if (m.golem && m.alive) golem = m;
   if (!o && !golem) return NONE;
   return {
     atk: o?.atk ?? 0,
@@ -115,14 +115,14 @@ export function refreshMinionDef(m: Minion, a: Aura): void {
 
 // ---- offerings
 
-function eligibleOffering(w: World): boolean {
-  return w.minions.some((m) => m.alive);
+function eligibleOffering(s: Side): boolean {
+  return s.minions.some((m) => m.alive);
 }
 
 /** Whether the character would cast an offering now: minions to help, a corpse to use, and none standing (or one nearly over). */
-export function offeringWanted(w: World, reach: number): boolean {
-  if (!eligibleOffering(w)) return false;
-  if (w.offering && w.offering.t > 1.5) return false;
+export function offeringWanted(w: World, s: Side, reach: number): boolean {
+  if (!eligibleOffering(s)) return false;
+  if (s.offering && s.offering.t > 1.5) return false;
   const p = w.player;
   return !!corpseNear(w, p.x, p.y, reach);
 }
@@ -144,7 +144,7 @@ export function castOffering(w: World, s: Side, c: SkillChoice): void {
   }
   const lv = c.skill.level;
   const v = (x: typeof u.atkInc) => (x === undefined ? 0 : levelValue(x, lv));
-  w.offering = {
+  s.offering = {
     t: (u.seconds + u.perCorpse * (used - 1)) * w.char.db.mult('buffDuration'),
     corpses: used,
     atk: v(u.atkInc),
@@ -157,15 +157,15 @@ export function castOffering(w: World, s: Side, c: SkillChoice): void {
     chaos: v(u.physAsChaos),
     res: v(u.res),
   };
-  s.buffT[u.buff] = w.offering.t;
+  s.buffT[u.buff] = s.offering.t;
   w.events.push({ t: 'buff', id: u.buff });
 }
 
 /** The time of an offering runs down. */
-export function tickOffering(w: World, dt: number): void {
-  if (!w.offering) return;
-  w.offering.t -= dt;
-  if (w.offering.t <= 0) w.offering = null;
+export function tickOffering(s: Side, dt: number): void {
+  if (!s.offering) return;
+  s.offering.t -= dt;
+  if (s.offering.t <= 0) s.offering = null;
 }
 
 // ---- the minions' blows
@@ -192,7 +192,7 @@ export function minionStrike(
   // A golem hits harder for each of the other minions near it.
   if (m.golem) {
     let near = 0;
-    for (const o of w.minions)
+    for (const o of m.side!.minions)
       if (o !== m && o.alive && !o.golem && Math.hypot(o.x - m.x, o.y - m.y) <= 5) near++;
     base *= 1 + Math.min(m.golem.cap, near * m.golem.perNearby) / 100;
   }
@@ -234,8 +234,8 @@ export function minionStrike(
 }
 
 /** Infernal Legion: the minions burn the enemies near them and themselves. */
-export function tickLegion(w: World, dt: number): void {
-  for (const m of w.minions) {
+export function tickLegion(w: World, s: Side, dt: number): void {
+  for (const m of s.minions) {
     if (!m.alive || m.sup.burn <= 0) continue;
     if (Math.floor(w.t * 4) !== Math.floor((w.t - dt) * 4))
       for (const e of w.actors)

@@ -397,7 +397,7 @@ export function tickZones(w: World, dt: number): void {
     // The player and the player's minions are caught by a monster's zone alike.
     const caught: Actor[] = [];
     if (inside(p)) caught.push(p);
-    for (const m of w.minions) if (inside(m)) caught.push(m);
+    for (const m of w.player.side!.minions) if (inside(m)) caught.push(m);
     if (caught.length === 0) continue;
     for (const a of caught) {
       // Ground that chills or shocks does nothing to what cannot be (an immunity, a cleansing flask running).

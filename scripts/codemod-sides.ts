@@ -115,7 +115,7 @@ const inScope = (f: string): boolean => {
     r.startsWith('src/ui/') ||
     r.startsWith('src/run/') ||
     /^src\/[^/]+\.tsx?$/.test(r) ||
-    /^scripts\/[^/]+\.ts$/.test(r)
+    /^scripts\/.+\.ts$/.test(r)
   );
 };
 

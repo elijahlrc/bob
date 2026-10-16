@@ -183,8 +183,8 @@ export function noteEffects(w: World, into: Set<string>): void {
         break;
     }
   }
-  if (w.minions.length > 0) into.add('minion');
-  if (w.zones.length > 0) into.add('zone');
+  if (w.sides[0].minions.length > 0) into.add('minion');
+  if (w.sides[0].zones.length > 0) into.add('zone');
 }
 
 /**

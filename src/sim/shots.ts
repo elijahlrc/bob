@@ -349,9 +349,9 @@ export function changeForm(pr: Projectile): void {
 
 /** A skill that releases what a Venom Gyre caught sends it outward in a spiral, none of it returning. */
 export function releaseCaught(w: World, a: Actor): void {
-  const c = w.caught;
+  const c = a.side!.caught;
   if (!c) return;
-  w.caught = null;
+  a.side!.caught = null;
   const b = c.profile.skill.behaviour;
   if (b.kind !== 'projectile') return;
   const profile: SkillProfile = {
@@ -430,7 +430,7 @@ export function afterProjectileHit(w: World, pr: Projectile, owner: Actor | unde
 
 /** A projectile that lands (Arrow Nova) or reaches the end of its way (Tornado Shot) sends its arrows out all round. */
 export function projectileLanded(w: World, pr: Projectile, owner: Actor | undefined): void {
-  if (pr.kind === 'mirror' && owner) mirrorLanded(w, pr);
+  if (pr.kind === 'mirror' && owner) mirrorLanded(w, owner.side!, pr);
   if (!pr.ring || !owner) return;
   const shield = pr.kind === 'shield' ? pr.profile.skill.shield : undefined;
   const p = shield ? scaleProfile(pr.profile, 1 - shield.less / 100) : pr.profile;
@@ -559,7 +559,7 @@ export function afterStrike(w: World, a: Actor, act: Action, struck: Actor | nul
         if (landed.every((l) => Math.hypot(l.x - spot.x, l.y - spot.y) >= BALL_APART)) break;
       }
       landed.push(spot);
-      w.zones.push({
+      a.side!.zones.push({
         id: w.nextId++,
         owner: a.id,
         profile: p,

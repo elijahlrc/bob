@@ -105,10 +105,14 @@ const preferred = opt('--name', 's');
  * `name:param`: the function acts on the actor `param` (any actor: a character, a minion, a monster), so its side is
  * `param.side!` and it takes no side of its own (pattern 2 of DUEL.md 3.2).
  */
-const decisions: { byActor?: Record<string, string>; byPlayer?: string[]; except?: string[] } =
-  existsSync('scripts/sides-decisions.json')
-    ? JSON.parse(readFileSync('scripts/sides-decisions.json', 'utf8'))
-    : {};
+const decisions: {
+  byActor?: Record<string, string>;
+  byPlayer?: string[];
+  bySide0?: string[];
+  except?: string[];
+} = existsSync('scripts/sides-decisions.json')
+  ? JSON.parse(readFileSync('scripts/sides-decisions.json', 'utf8'))
+  : {};
 const byActor = new Map<string, string>([
   ...Object.entries(decisions.byActor ?? {}),
   ...opt('--by-actor', '')
@@ -121,6 +125,8 @@ const byPlayer = new Set([
   ...(decisions.byPlayer ?? []),
   ...opt('--by-player', '').split(',').filter(Boolean),
 ]);
+/** The functions that build the map's own result (runMap, vitals, recap): the side is `w.sides[0]`. */
+const bySide0 = new Set(decisions.bySide0 ?? []);
 for (const e of decisions.except ?? []) except.add(e);
 
 const root = process.cwd().replace(/\\/g, '/');
@@ -178,6 +184,7 @@ const allowed = (f: FnLike): boolean => {
     barriers.has(n) ||
     byActor.has(n) ||
     byPlayer.has(n) ||
+    bySide0.has(n) ||
     (!except.has(n) && (only.size === 0 || only.has(n)))
   );
 };
@@ -206,6 +213,7 @@ function sideName(f: FnLike): string {
   const actor = byActor.get(n);
   if (actor) return `${actor}.side!`;
   if (byPlayer.has(n)) return `${f.parameters[worldParamIndex(f)].name.getText()}.player.side!`;
+  if (bySide0.has(n)) return `${f.parameters[worldParamIndex(f)].name.getText()}.sides[0]`;
   const have = sideParamOf(f);
   if (have) return have.name.getText();
   const known = needs.get(f);
@@ -332,6 +340,65 @@ function symbolOfFn(f: FnLike): ts.Symbol | undefined {
   if (ts.isVariableDeclaration(p)) return resolve(p.name);
   if (ts.isPropertyAssignment(p)) return resolve(p.name);
   return undefined;
+}
+
+// `--drop-unused`: a function that now only needs its side no longer needs the world it took beside it (the compiler says the
+// parameter `w` is never read): the parameter goes, and the first argument of every call with it.
+if (argv.includes('--drop-unused')) {
+  const drops: Edit[] = [];
+  for (const d of diags) {
+    if (d.code !== 6133 || !d.file || d.start === undefined || !isSim(d.file.fileName)) continue;
+    let id: ts.Identifier | undefined;
+    const visit = (n: ts.Node): void => {
+      if (id || d.start! < n.getFullStart() || d.start! >= n.getEnd()) return;
+      if (ts.isIdentifier(n) && n.getStart() === d.start && ts.isParameter(n.parent)) {
+        id = n;
+        return;
+      }
+      ts.forEachChild(n, visit);
+    };
+    visit(d.file);
+    if (!id) continue;
+    const p = id.parent as ts.ParameterDeclaration;
+    if (p.type?.getText() !== 'World' || !isFnLike(p.parent)) continue;
+    const f = p.parent;
+    const wi = f.parameters.indexOf(p);
+    const remove = (list: readonly ts.Node[], i: number, file: string) => {
+      const n = list[i];
+      const next = list[i + 1];
+      const prev = list[i - 1];
+      if (next) drops.push({ file, pos: n.getStart(), end: next.getStart(), text: '' });
+      else if (prev) drops.push({ file, pos: prev.getEnd(), end: n.getEnd(), text: '' });
+      else drops.push({ file, pos: n.getStart(), end: n.getEnd(), text: '' });
+    };
+    remove(f.parameters, wi, f.getSourceFile().fileName);
+    const sym = symbolOfFn(f);
+    if (!sym) {
+      manual.push(`${where(f)}: ${fnName(f)} cannot be followed to its callers`);
+      continue;
+    }
+    for (const r of refs.get(sym) ?? [])
+      manual.push(`${where(r)}: ${fnName(f)} is used as a value`);
+    for (const c of calls.get(sym) ?? []) remove(c.arguments, wi, c.getSourceFile().fileName);
+    console.log(`  ${where(f)} ${fnName(f)}: world parameter dropped`);
+  }
+  for (const m of [...new Set(manual)]) console.log('  by hand: ' + m);
+  if (apply) {
+    const by = new Map<string, Edit[]>();
+    for (const e of drops) by.set(e.file, [...(by.get(e.file) ?? []), e]);
+    for (const [file, list] of by) {
+      let text = readFileSync(file, 'utf8');
+      const seen = new Set<string>();
+      for (const e of list.sort((a, b) => b.pos - a.pos)) {
+        const key = `${e.pos}:${e.end}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        text = text.slice(0, e.pos) + text.slice(e.end);
+      }
+      writeFileSync(file, text);
+    }
+  }
+  process.exit(0);
 }
 
 // Step 3: each function that gained a side takes the parameter, and its callers pass theirs.

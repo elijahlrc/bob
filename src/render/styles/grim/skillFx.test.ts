@@ -30,10 +30,6 @@ const world = (a: Actor): World =>
   ({
     player: a,
     actors: [a],
-    minions: [],
-    zones: [],
-    deployables: [],
-    fields: [],
     grid: { w: 20 },
     hexes: [],
     char: { auras: [], utilities: [], actives: [] },
@@ -45,7 +41,7 @@ const world = (a: Actor): World =>
     mirage: null,
     charged: {},
     shell: null,
-    sides: [{ buffT: {} }],
+    sides: [{ buffT: {}, minions: [], zones: [], deployables: [], fields: [] }],
   }) as unknown as World;
 
 function actor(over: Partial<Actor> = {}): Actor {
@@ -202,7 +198,7 @@ describe('skill effects', () => {
       'geyser',
       'smoke',
     ];
-    w.fields = kinds.map((kind, i) => ({
+    w.sides[0].fields = kinds.map((kind, i) => ({
       id: i,
       owner: 1,
       kind,
@@ -225,9 +221,9 @@ describe('skill effects', () => {
     })) as never;
     fx.frame(w, 0.05, 1, gfx() as never);
     // A field that is nearly gone (fading) and one just made (rising) draw too.
-    for (const f of w.fields) f.t = 0.1;
+    for (const f of w.sides[0].fields) f.t = 0.1;
     fx.frame(w, 0.05, 1.05, gfx() as never);
-    for (const f of w.fields) f.t = 3.95;
+    for (const f of w.sides[0].fields) f.t = 3.95;
     fx.frame(w, 0.05, 1.1, gfx() as never);
   });
 

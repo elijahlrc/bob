@@ -31,7 +31,7 @@ function tally(w: World, targetId: number, seconds: number, skill: string) {
   let explosions = 0;
   for (let i = 0; i < seconds * 60; i++) {
     stepWorld(w);
-    for (const z of w.zones) spots = Math.max(spots, z.spots?.length ?? 1);
+    for (const z of w.sides[0].zones) spots = Math.max(spots, z.spots?.length ?? 1);
     for (const e of w.events) {
       if (e.t === 'use' && e.src === w.player.id && e.skill === skill) uses++;
       if (e.t === 'hit' && e.src === w.player.id && e.dst === targetId) hits++;

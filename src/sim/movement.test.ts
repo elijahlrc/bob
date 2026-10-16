@@ -180,12 +180,12 @@ describe('senses and targets (docs/ROSTER.md 6.4)', () => {
     expect(senseOf(hound).leash).toBe(0);
     expect(targetOf(w, hound)).toBe(w.player);
     const minion = put(w, 'warrior', 5, 1);
-    w.minions.push(minion as never);
+    w.sides[0].minions.push(minion as never);
     expect(targetOf(w, hound)).toBe(minion);
     // A monster that is not a hunter goes for the character, minions or not.
     expect(targetOf(w, put(w, 'warrior', 7))).toBe(w.player);
     // Out of sight for a minute, it still chases.
-    w.minions.length = 0;
+    w.sides[0].minions.length = 0;
     hound.lostT = 60;
     run(w, 0.1);
     expect(hound.state).toBe('chase');

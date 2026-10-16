@@ -83,7 +83,7 @@ function deployed(
 ): { n: number; soonest: number; cap: number } {
   let n = 0;
   let soonest = Infinity;
-  for (const d of w.deployables)
+  for (const d of w.sides[0].deployables)
     if (d.key === c.key) {
       n++;
       soonest = Math.min(soonest, Math.max(0, d.t));
@@ -183,7 +183,7 @@ function utilitySlot(w: World, c: SkillChoice): SkillSlot {
     const want = summonCount(c, prof);
     let n = 0;
     let soonest = Infinity;
-    for (const m of w.minions)
+    for (const m of w.sides[0].minions)
       if (m.key === c.key && m.alive) {
         n++;
         soonest = Math.min(soonest, m.t);

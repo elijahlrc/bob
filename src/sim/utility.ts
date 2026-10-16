@@ -69,7 +69,7 @@ export function utilityPick(
   // The guard skills wait on one another (3.9).
   if (u.kind === 'buff' && u.policy === 'guard' && (s.utilityReady[GUARDS] ?? 0) > w.t) return null;
   const d = Math.hypot(target.x - p.x, target.y - p.y);
-  const prof = ch.profile(c, playerConds(w, target), flaskMask(w, s));
+  const prof = ch.profile(c, playerConds(w, target), flaskMask(s));
   if (!canPay(w, c.costsLife, prof.cost)) return null;
   if (e.role === 'auto') return autoPick(w, s, c, prof, target, d);
   if (e.role === 'opener' && !openerDue(s, c.key, target)) return null;
@@ -95,7 +95,7 @@ export function utilityPick(
   }
   if (u.kind === 'summon') {
     if (c.skill.cooldown !== undefined && !skillReady(w, s, c)) return null;
-    if (d > CAST_RANGE + 6 || minionCount(w, c.key) >= summonCount(c, prof)) return null;
+    if (d > CAST_RANGE + 6 || minionCount(s, c.key) >= summonCount(c, prof)) return null;
     return { choice: c, prof, cd: summonRespawn(c) };
   }
   if (u.kind === 'blink') {
@@ -151,7 +151,7 @@ function autoPick(
   const p = w.player;
   const u = c.skill.utility!;
   if (u.kind === 'buff' && u.banner) {
-    if (!bannerAction(w, c, target)) return null;
+    if (!bannerAction(w, s, c, target)) return null;
     return { choice: c, prof, cd: u.cooldown ?? 1 };
   }
   if (u.kind === 'buff') {
@@ -195,7 +195,7 @@ function autoPick(
     return { choice: c, prof, cd: 0.5 };
   }
   if (u.kind === 'offering') {
-    if (!offeringWanted(w, CAST_RANGE + 2)) return null;
+    if (!offeringWanted(w, s, CAST_RANGE + 2)) return null;
     return { choice: c, prof, cd: 0.5 };
   }
   if (u.kind === 'summon') {
@@ -211,7 +211,7 @@ function autoPick(
     )
       return null;
     // Minions are summoned in the first fight and again when they are gone or have run out.
-    if (d > CAST_RANGE + 6 || minionCount(w, c.key) >= summonCount(c, prof)) return null;
+    if (d > CAST_RANGE + 6 || minionCount(s, c.key) >= summonCount(c, prof)) return null;
     return { choice: c, prof, cd: summonRespawn(c) };
   }
   // A blink closes the gap to a target the primary skill cannot reach yet; one with an effect where it leaves or lands is also
@@ -226,7 +226,7 @@ function autoPick(
     return hurt || crowded ? { choice: c, prof, cd: u.cooldown } : null;
   }
   const conds = playerConds(w, target);
-  const reach = skillRange(ch.profile(w.primary, conds, flaskMask(w, s))) + target.r;
+  const reach = skillRange(ch.profile(w.primary, conds, flaskMask(s))) + target.r;
   const gap = d > reach + 2 && d <= u.distance + reach && w.grid.los(p.x, p.y, target.x, target.y);
   const radius =
     (prof.skill.behaviour.kind === 'burst' ? prof.skill.behaviour.radius : 2) * prof.radiusMult;
@@ -248,7 +248,7 @@ function autoPick(
     s.buffT.elusive <= 0 &&
     d <= CAST_RANGE &&
     enemiesNear(w, p.x, p.y, PACK_RADIUS).length >= PACK_SIZE;
-  if (u.warp && w.warp) return null;
+  if (u.warp && s.warp) return null;
   if (gap || packHere || packThere || fight || corpseGo) return { choice: c, prof, cd: u.cooldown };
   return null;
 }
@@ -380,14 +380,14 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
   if (u.kind === 'summon') {
     if (u.corpse) {
       const corpse = corpseNear(w, a.x, a.y, CAST_RANGE);
-      if (corpse) raiseSpectre(w, c, act.profile, corpse);
+      if (corpse) raiseSpectre(w, a.side!, c, act.profile, corpse);
     } else {
       if (u.corpseCost) {
         const corpse = corpseNear(w, a.x, a.y, CAST_RANGE);
         if (!corpse) return;
         takeCorpse(w, corpse);
       }
-      summonMinions(w, c, act.profile);
+      summonMinions(w, a.side!, c, act.profile);
     }
     return;
   }

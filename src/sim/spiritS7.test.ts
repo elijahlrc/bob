@@ -175,7 +175,7 @@ describe('Caustic Arrow (acidArrow)', () => {
     let ground = false;
     for (let i = 0; i < 3 * 60; i++) {
       stepWorld(w);
-      if (w.fields.some((f) => f.kind === 'caustic')) ground = true;
+      if (w.sides[0].fields.some((f) => f.kind === 'caustic')) ground = true;
     }
     expect(ground).toBe(true);
     expect(dummy.sdots.some((d) => d.src === 'acidArrow')).toBe(true);
@@ -286,7 +286,7 @@ describe('Toxic Rain (venomShower)', () => {
     let bursts = 0;
     for (let i = 0; i < 4 * 60; i++) {
       stepWorld(w);
-      pods = Math.max(pods, w.fields.filter((f) => f.kind === 'pod').length);
+      pods = Math.max(pods, w.sides[0].fields.filter((f) => f.kind === 'pod').length);
       if (dummy.fx.hinder) slowed = true;
       for (const e of w.events) if (e.t === 'hit' && e.dst === dummy.id) bursts++;
     }

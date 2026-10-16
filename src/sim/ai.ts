@@ -253,7 +253,7 @@ function chooseSkill(w: World, s: Side, target: Actor): Pick {
     skillReady(w, s, c) &&
     canHurt(prof, target.def) &&
     canPay(w, c.costsLife, prof.cost) &&
-    !deployFull(w, c, prof) &&
+    !deployFull(w, s, c, prof) &&
     corpseReady(w, prof, target);
   for (const e of w.char.rotation) {
     if (!whenHolds(w, e.when, target)) continue;
@@ -279,7 +279,7 @@ function chooseSkill(w: World, s: Side, target: Actor): Pick {
       continue;
     if (e.role === 'opener' && !openerDue(s, c.key, target)) continue;
     if (e.role === 'emergency' && p.life >= p.def.maxLife * e.life) continue;
-    const prof = w.char.profile(c, conds, flaskMask(w, s));
+    const prof = w.char.profile(c, conds, flaskMask(s));
     if (e.role === 'keepUp' && debuffHolds(prof, target)) continue;
     if (!usable(c, prof) || !inReach(w, prof, target)) continue;
     return { which: 'secondary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
@@ -288,7 +288,7 @@ function chooseSkill(w: World, s: Side, target: Actor): Pick {
   for (const e of w.char.mains) {
     if (!whenHolds(w, e.when, target)) continue;
     const c = e.choice;
-    const prof = w.char.profile(c, conds, flaskMask(w, s));
+    const prof = w.char.profile(c, conds, flaskMask(s));
     if (!canPay(w, c.costsLife, prof.cost)) starved = true;
     // Against a target immune to everything the skill deals, the next skill (or the weapon) is used.
     if (!usable(c, prof) || alreadyAfflicted(prof, target)) continue;
@@ -300,13 +300,13 @@ function chooseSkill(w: World, s: Side, target: Actor): Pick {
     for (const e of w.char.rotation) {
       const c = e.choice;
       if (c.skill.utility || e.role !== 'periodic' || !whenHolds(w, e.when, target)) continue;
-      const prof = w.char.profile(c, conds, flaskMask(w, s));
+      const prof = w.char.profile(c, conds, flaskMask(s));
       if (!usable(c, prof) || !inReach(w, prof, target)) continue;
       return { which: 'secondary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
     }
   return {
     which: 'default',
-    prof: w.char.profile(w.char.defaultAttack, conds, flaskMask(w, s)),
+    prof: w.char.profile(w.char.defaultAttack, conds, flaskMask(s)),
     costsLife: false,
     choice: w.char.defaultAttack,
     cd: 0,
@@ -716,7 +716,7 @@ const RANGED_BLOCKED_TIME = 1.5;
 function minionInReach(w: World, m: Actor, range: number): Actor | null {
   let best: Actor | null = null;
   let bd = Infinity;
-  for (const v of w.minions) {
+  for (const v of w.player.side!.minions) {
     if (!v.alive) continue;
     const d = Math.hypot(v.x - m.x, v.y - m.y);
     if (d <= range + v.r + m.r && d < bd) {
@@ -731,7 +731,7 @@ function minionInReach(w: World, m: Actor, range: number): Actor | null {
 function minionInSight(w: World, m: Actor, range: number): Actor | null {
   let best: Actor | null = null;
   let bd = Infinity;
-  for (const v of w.minions) {
+  for (const v of w.player.side!.minions) {
     if (!v.alive) continue;
     const d = Math.hypot(v.x - m.x, v.y - m.y);
     if (d <= range && d < bd && w.grid.los(m.x, m.y, v.x, v.y)) {
@@ -877,7 +877,7 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
       if (d <= range && los) startAction(w, m, 'monster', prof, p);
       else {
         // It cannot reach the player: a minion in sight will do.
-        const v = w.minions.length > 0 ? minionInSight(w, m, range) : null;
+        const v = w.player.side!.minions.length > 0 ? minionInSight(w, m, range) : null;
         if (v) startAction(w, m, 'monster', prof, v);
       }
       return;
@@ -903,7 +903,7 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     // It cannot hit the player from here: it walks on toward the player, and shoots a minion in range and in sight only
     // once it is held up (a ranged monster goes for the character, not for what stands about it).
     const v =
-      w.minions.length > 0 && m.blockT >= RANGED_BLOCKED_TIME && tg === p
+      w.player.side!.minions.length > 0 && m.blockT >= RANGED_BLOCKED_TIME && tg === p
         ? minionInSight(w, m, range)
         : null;
     if (v) {
@@ -922,7 +922,7 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     return;
   }
   // Held up on the way to the player (by minions, say): whatever minion is in reach gets hit instead.
-  if (m.blockT >= BLOCKED_TIME && w.minions.length > 0) {
+  if (m.blockT >= BLOCKED_TIME && w.player.side!.minions.length > 0) {
     const v = minionInReach(w, m, range);
     if (v) {
       startAction(w, m, 'monster', prof, v);
@@ -1002,7 +1002,7 @@ export function separate(w: World): void {
       p.y = cp.y;
     }
   }
-  if (w.minions.length > 0) separateMinions(w, list);
+  if (w.player.side!.minions.length > 0) separateMinions(w, list);
 }
 
 /**
@@ -1012,7 +1012,7 @@ export function separate(w: World): void {
  */
 function separateMinions(w: World, list: Actor[]): void {
   const p = w.player;
-  const ms = w.minions;
+  const ms = w.player.side!.minions;
   const nudge = (a: Actor, dx: number, dy: number): void => {
     const x = a.x + dx;
     const y = a.y + dy;

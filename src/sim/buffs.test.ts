@@ -78,15 +78,11 @@ describe('buffs: conditions with timers (C2)', () => {
 
   it('Quickened: 20% increased attack, cast and movement speed', () => {
     const { w, p } = arena([mod('buffOn.kill.onslaught', 'base', 100)]);
-    const before = w.char.profile(
-      w.primary,
-      playerConds(w, null),
-      flaskMask(w, w.sides[0]),
-    ).useTime;
+    const before = w.char.profile(w.primary, playerConds(w, null), flaskMask(w.sides[0])).useTime;
     const speed = p.def.moveSpeed;
     gainBuff(w, w.sides[0], 'onslaught');
     const conds = playerConds(w, null);
-    const after = w.char.profile(w.primary, conds, flaskMask(w, w.sides[0])).useTime;
+    const after = w.char.profile(w.primary, conds, flaskMask(w.sides[0])).useTime;
     expect(after).toBeCloseTo(before / 1.2);
     refreshPlayerDefence(w, w.sides[0]);
     expect(p.def.moveSpeed).toBeCloseTo(speed * 1.2);
@@ -96,7 +92,7 @@ describe('buffs: conditions with timers (C2)', () => {
     const { w } = arena([mod('buffOn.hit.unholyMight', 'base', 100)]);
     const chaos = (conds: number) =>
       w.char
-        .profile(w.primary, conds, flaskMask(w, w.sides[0]))
+        .profile(w.primary, conds, flaskMask(w.sides[0]))
         .hands[0].chunks.filter((c) => c.type === 4)
         .reduce((s, c) => s + c.max, 0);
     expect(chaos(playerConds(w, null))).toBe(0);
@@ -106,7 +102,7 @@ describe('buffs: conditions with timers (C2)', () => {
 
   it('Arcane Tide: 10% more spell damage and cast speed', () => {
     const { w } = arena([mod('buffOn.hit.arcaneSurge', 'base', 100)], ['flameBolt']);
-    const prof = () => w.char.profile(w.primary, playerConds(w, null), flaskMask(w, w.sides[0]));
+    const prof = () => w.char.profile(w.primary, playerConds(w, null), flaskMask(w.sides[0]));
     const before = prof();
     gainBuff(w, w.sides[0], 'arcaneSurge');
     const after = prof();
@@ -119,10 +115,10 @@ describe('rage', () => {
   it('each point is 1% increased attack damage, 0.5% attack speed and 0.2% movement speed', () => {
     const { w, p } = arena([mod('rageOn.hit', 'base', 1)]);
     expect(w.char.rageSource).toBe(true);
-    const base = w.char.profile(w.primary, 0, flaskMask(w, w.sides[0]));
+    const base = w.char.profile(w.primary, 0, flaskMask(w.sides[0]));
     gainRage(w, w.sides[0], 20);
     expect(w.sides[0].rage).toBe(20);
-    const raging = w.char.profile(w.primary, 0, flaskMask(w, w.sides[0]));
+    const raging = w.char.profile(w.primary, 0, flaskMask(w.sides[0]));
     expect(raging.useTime).toBeCloseTo(base.useTime / 1.1);
     const dmg = (x: typeof base) => x.hands[0].chunks.reduce((s, c) => s + c.max, 0);
     expect(dmg(raging) / dmg(base)).toBeGreaterThan(1.15);

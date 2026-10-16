@@ -31,7 +31,7 @@ function run(gems: string[], seconds: number, distance = 2.5) {
       if (e.t === 'explode') bursts.push({ t: world.t, x: e.x, y: e.y, r: e.r });
       if (e.t === 'sprung') sprung.push({ t: world.t, x: e.x, y: e.y });
     }
-    for (const z of (world as World).zones)
+    for (const z of (world as World).sides[0].zones)
       if (!seen.has(z.id)) {
         seen.add(z.id);
         zones.push({ t: world.t, x: z.x, y: z.y, r: z.radius });

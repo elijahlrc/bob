@@ -243,7 +243,7 @@ export class GrimStyle extends StyleBase {
       },
       actorById: (id) =>
         this.byId.get(id) ??
-        this.world.minions.find((m) => m.id === id) ??
+        this.world.sides[0].minions.find((m) => m.id === id) ??
         this.world.actors.find((a) => a.id === id) ??
         null,
       floater: (x, y, text, color, big) => this.floater(x, y, text, color, big),
@@ -1370,7 +1370,7 @@ export class GrimStyle extends StyleBase {
         const a = this.byId.get(e.id) ?? world.actors.find((x) => x.id === e.id);
         if (!a) {
           // A minion falls: a puff of dust where it stood.
-          const f = world.minions.find((x) => x.id === e.id);
+          const f = world.sides[0].minions.find((x) => x.id === e.id);
           if (f) {
             const q = this.project(f.x, f.y);
             em.dust.explode(3, q.x, q.y - 2);

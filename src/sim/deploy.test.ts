@@ -31,7 +31,7 @@ function run(gems: string[], seconds: number, main?: string) {
   let most = 0;
   for (let i = 0; i < seconds * 60; i++) {
     stepWorld(world);
-    most = Math.max(most, world.deployables.length);
+    most = Math.max(most, world.sides[0].deployables.length);
   }
   return { c, world, dummy, most };
 }

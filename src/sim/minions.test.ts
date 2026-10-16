@@ -37,8 +37,8 @@ function arena() {
 function summon(w: World): Minion[] {
   const c = w.char.utilities[0];
   expect(c.skill.utility?.kind).toBe('summon');
-  summonMinions(w, c, w.char.profile(c, 0, 0));
-  return w.minions;
+  summonMinions(w, w.sides[0], c, w.char.profile(c, 0, 0));
+  return w.sides[0].minions;
 }
 
 function monsterAt(w: World, type: 'warrior' | 'archer', x: number, y: number): Actor {
@@ -87,7 +87,7 @@ describe('mortal minions', () => {
   it('a monster blast catches minions and can kill them', () => {
     const w = arena();
     const [a, b] = summon(w);
-    const far = w.minions[w.minions.length - 1];
+    const far = w.sides[0].minions[w.sides[0].minions.length - 1];
     far.x = w.player.x + 12;
     w.player.life = w.player.def.maxLife;
     const half = a.def.maxLife / 2;
@@ -108,13 +108,13 @@ describe('mortal minions', () => {
         faction: 1,
       });
     }
-    const before = w.minions.length;
+    const before = w.sides[0].minions.length;
     run(w, 0.5);
     expect(a.alive).toBe(true);
     expect(a.life).toBeLessThan(a.def.maxLife);
     expect(b.alive).toBe(false);
-    expect(w.minions.includes(b)).toBe(false);
-    expect(w.minions.length).toBe(before - 1);
+    expect(w.sides[0].minions.includes(b)).toBe(false);
+    expect(w.sides[0].minions.length).toBe(before - 1);
     expect(far.life).toBe(far.def.maxLife);
   });
 
@@ -142,14 +142,14 @@ describe('mortal minions', () => {
     const w = arena();
     summon(w);
     const m = monsterAt(w, 'warrior', w.player.x + 1.4, w.player.y);
-    for (const v of w.minions) {
+    for (const v of w.sides[0].minions) {
       v.x = m.x + 0.2;
       v.y = m.y + 0.8;
       v.speed = 0;
     }
     run(w, 3, () => w.player.life < w.player.def.maxLife);
     expect(w.player.life).toBeLessThan(w.player.def.maxLife);
-    expect(w.minions.every((v) => v.life === v.def.maxLife)).toBe(true);
+    expect(w.sides[0].minions.every((v) => v.life === v.def.maxLife)).toBe(true);
   });
 
   it('a monster held up behind a minion in a corridor hits the minion', () => {
@@ -228,9 +228,9 @@ describe('mortal minions', () => {
     const hurt = ms[1].life;
     // The fallen are cleared by the next tick.
     stepWorld(w);
-    expect(w.minions.length).toBe(count - 1);
+    expect(w.sides[0].minions.length).toBe(count - 1);
     summon(w);
-    expect(w.minions.length).toBe(count);
+    expect(w.sides[0].minions.length).toBe(count);
     expect(ms[1].life).toBeGreaterThanOrEqual(hurt);
     expect(ms[1].life).toBeLessThan(ms[1].def.maxLife);
   });

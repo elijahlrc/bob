@@ -164,11 +164,11 @@ export function blinkCast(
         ? run / (PROJECTILE_SPEED * u.warp.speed * p.projSpeedMult)
         : (run / Math.max(0.5, a.def.moveSpeed)) *
           (1 - levelValue(u.warp.lessDuration, c.skill.level) / 100);
-    if (w.warp) w.warp.t += t;
-    else w.warp = { key: c.key, toX: spot.x, toY: spot.y, t, profile: p };
-    if (w.warp.key === c.key) {
-      w.warp.toX = spot.x;
-      w.warp.toY = spot.y;
+    if (a.side!.warp) a.side!.warp.t += t;
+    else a.side!.warp = { key: c.key, toX: spot.x, toY: spot.y, t, profile: p };
+    if (a.side!.warp.key === c.key) {
+      a.side!.warp.toX = spot.x;
+      a.side!.warp.toY = spot.y;
     }
     return;
   }
@@ -211,7 +211,7 @@ function escapeCast(w: World, a: Actor, p: SkillProfile, c: SkillChoice, u: Blin
     [best.x, best.y],
   ]) {
     const r = sm.radius * p.radiusMult;
-    w.fields.push({
+    a.side!.fields.push({
       id: w.nextId++,
       owner: a.id,
       kind: 'smoke',
@@ -249,19 +249,20 @@ function arrive(
   const fx = a.x;
   const fy = a.y;
   if (u.burst === 'depart' || u.burst === 'both' || u.warp) burstAt(w, a, p, fx, fy, u);
-  if (u.chill) w.fields.push(chillGround(w, a, p, fx, fy, u.chill));
-  if (u.trail) w.fields.push(trailGround(w, a, p, fx, fy, x, y, u.trail));
+  if (u.chill) a.side!.fields.push(chillGround(w, a, p, fx, fy, u.chill));
+  if (u.trail) a.side!.fields.push(trailGround(w, a, p, fx, fy, x, y, u.trail));
   w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: false });
   a.x = x;
   a.y = y;
   w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true });
   if (u.burst === 'arrive' || u.burst === 'both' || u.warp) burstAt(w, a, p, x, y, u);
-  if (u.clone) cloneOfPlayer(w, summonAt(w, c, p, u.clone.minion, u.clone.seconds, fx, fy), 75);
+  if (u.clone)
+    cloneOfPlayer(w, summonAt(w, a.side!, c, p, u.clone.minion, u.clone.seconds, fx, fy), 75);
   if (u.elusive) {
     // Elusive is renewed in full, and enemies that come near are withered until the character does something else.
     a.side!.buffT.elusive = Math.max(0, 5 * w.char.db.mult('buffDuration'));
     w.events.push({ t: 'buff', id: 'elusive' });
-    w.wither = {
+    a.side!.wither = {
       skill: c.skill.id,
       radius: levelValue(u.elusive.radius, c.skill.level) * p.radiusMult,
       stacks: Math.round(levelValue(u.elusive.stacks, c.skill.level)),
@@ -337,12 +338,12 @@ function trailGround(
 }
 
 /** A warp in the air: when the run is over, the character goes. */
-export function tickWarp(w: World, dt: number): void {
-  const s = w.warp;
+export function tickWarp(w: World, side: Side, dt: number): void {
+  const s = side.warp;
   if (!s) return;
   s.t -= dt;
   if (s.t > 0) return;
-  w.warp = null;
+  side.warp = null;
   const a = w.player;
   const c = w.char.utilities.find((x) => x.key === s.key);
   const u = c && blinkOf(c)?.u;
@@ -352,10 +353,10 @@ export function tickWarp(w: World, dt: number): void {
 
 /** Withering Step: enemies that come within the radius are withered, the first time each does. Ends with the Elusive buff. */
 export function tickWither(w: World, side: Side): void {
-  const s = w.wither;
+  const s = side.wither;
   if (!s) return;
   if (side.buffT.elusive <= 0) {
-    w.wither = null;
+    side.wither = null;
     return;
   }
   const p = w.player;
@@ -371,7 +372,7 @@ export function tickWither(w: World, side: Side): void {
  * still on. The character then runs on along its way, past the enemies, and makes no attack until it is over.
  */
 export function running(w: World, s: Side): boolean {
-  if (w.wither?.run && s.buffT.elusive > 0) return true;
+  if (s.wither?.run && s.buffT.elusive > 0) return true;
   if (s.buffT.phaseRun <= 0) return false;
   for (const c of w.char.utilities) {
     const u = c.skill.utility;
@@ -382,28 +383,28 @@ export function running(w: World, s: Side): boolean {
 }
 
 /** The character uses a skill: Withering Step ends (the buff and its aura), unless the skill is the blink itself. */
-export function skillUsed(w: World, s: Side, skillId: string): void {
-  if (!w.wither || w.wither.skill === skillId) return;
+export function skillUsed(s: Side, skillId: string): void {
+  if (!s.wither || s.wither.skill === skillId) return;
   s.buffT.elusive = 0;
-  w.wither = null;
+  s.wither = null;
 }
 
 /** A returning projectile that reaches its owner is caught, up to a limit, and kept for a while. */
-export function catchProjectile(w: World, p: SkillProfile, hand: number): void {
+export function catchProjectile(s: Side, p: SkillProfile, hand: number): void {
   const limit = p.skill.catches ?? 0;
   if (limit <= 0) return;
-  const c = w.caught;
+  const c = s.caught;
   if (c && c.profile.skill.id === p.skill.id) {
     c.n = Math.min(limit, c.n + 1);
     c.t = CAUGHT_SECONDS;
-  } else w.caught = { profile: p, hand, n: 1, t: CAUGHT_SECONDS };
+  } else s.caught = { profile: p, hand, n: 1, t: CAUGHT_SECONDS };
 }
 
 export const CAUGHT_SECONDS = 12;
 
-export function tickCaught(w: World, dt: number): void {
-  const c = w.caught;
+export function tickCaught(s: Side, dt: number): void {
+  const c = s.caught;
   if (!c) return;
   c.t -= dt;
-  if (c.t <= 0) w.caught = null;
+  if (c.t <= 0) s.caught = null;
 }

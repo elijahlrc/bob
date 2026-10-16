@@ -121,7 +121,7 @@ const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
   leeching: (_w, p) => p.leechLife.length > 0,
   leechingEs: (_w, p) => p.leechEs.length > 0,
   esFull: (_w, p) => p.def.maxEs > 0 && p.es >= p.def.maxEs - 0.5,
-  onLowMana: (w, p) => p.mana <= Math.max(1, p.def.maxMana - reservedMana(w)) * LOW_LIFE,
+  onLowMana: (w, p) => p.mana <= Math.max(1, p.def.maxMana - reservedMana(w, p.side!)) * LOW_LIFE,
   cursed: (_w, p) => p.hexes.length > 0,
   stationary: (_w, p) => !p.moving,
   elemFire: (w) => w.elem === 3,
@@ -214,10 +214,10 @@ export function monsterConds(a: Actor): number {
   return a.life <= a.def.maxLife * LOW_LIFE ? MONSTER_CONDS.peek('onLowLife') : 0;
 }
 
-export function flaskMask(w: World, s: Side): number {
+export function flaskMask(s: Side): number {
   let m = s.rage << DYN_SHIFT;
   // A banner that stands gives the character more of its buff for each stage it was put down with.
-  if (w.banner?.placed) m |= w.banner.stages << BANNER_SHIFT;
+  if (s.banner?.placed) m |= s.banner.stages << BANNER_SHIFT;
   s.flasks.forEach((f, i) => {
     if (f.activeT > 0 && f.spec.buff.length) m |= 1 << i;
   });
@@ -227,12 +227,12 @@ export function flaskMask(w: World, s: Side): number {
 /** Refresh the player's cached defence for the current conditions and flasks. */
 export function refreshPlayerDefence(w: World, s: Side): void {
   const p = w.player;
-  p.def = w.char.defence(playerConds(w, null), flaskMask(w, s));
+  p.def = w.char.defence(playerConds(w, null), flaskMask(s));
   const cap = lifeCap(w, p);
   if (p.life > cap) p.life = cap;
   if (p.es > p.def.maxEs) p.es = p.def.maxEs;
-  if (p.mana > p.def.maxMana - reservedMana(w))
-    p.mana = Math.max(0, p.def.maxMana - reservedMana(w));
+  if (p.mana > p.def.maxMana - reservedMana(w, s))
+    p.mana = Math.max(0, p.def.maxMana - reservedMana(w, s));
 }
 
 export function targetState(a: Actor): TargetState {
@@ -530,7 +530,10 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (p.lifeOnHit > 0) src.life = Math.min(lifeCap(w, src), src.life + p.lifeOnHit);
   if (p.esOnHit > 0 && src.isPlayer) src.es = Math.min(src.def.maxEs, src.es + p.esOnHit);
   if (p.manaOnHit > 0 && src.isPlayer)
-    src.mana = Math.min(Math.max(0, src.def.maxMana - reservedMana(w)), src.mana + p.manaOnHit);
+    src.mana = Math.min(
+      Math.max(0, src.def.maxMana - reservedMana(w, src.side!)),
+      src.mana + p.manaOnHit,
+    );
 
   const wasAlive = dst.alive;
   if (src.isPlayer) applyPlayerHexes(w, dst);
@@ -547,7 +550,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
         applyStatus(w, dst, 'maim', { seconds: 4 });
     }
     payImpales(w, dst);
-    recordImpale(w, dst, p, res);
+    recordImpale(w, src.side!, dst, p, res);
     reflectBack(w, src, dst, p, res);
     // Culling strike: a hit that leaves the target at 10% life or less finishes it.
     if (p.culling && !dst.isPlayer && dst.life <= dst.def.maxLife * CULLING_SHARE)
@@ -765,7 +768,12 @@ export function hit(
   const hm = src.hexMore;
   ts.hitChanceMult = hitChanceFactor(src) * (1 - hm.acc * 0.5);
   // Consecrated ground makes hits against what stands on it crit twice as often.
-  if (src.isPlayer && !dst.isPlayer && w.fields.length > 0 && consecratedAt(w, dst.x, dst.y))
+  if (
+    src.isPlayer &&
+    !dst.isPlayer &&
+    src.side!.fields.length > 0 &&
+    consecratedAt(src.side!, dst.x, dst.y)
+  )
     h = { ...h, critChance: h.critChance * CRIT_ON_CONSECRATED };
   // The Veiled Duellist's veil: nothing crits it while it is up (docs/BOSSES.md 5b).
   const veiled = !dst.isPlayer && dst.enc !== undefined && bossVeiled(dst);
@@ -777,7 +785,8 @@ export function hit(
       critMulti: Math.max(1, h.critMulti - hm.critMulti),
     };
   // The mines near an enemy give the hits against it a chance to deal double damage, and some fire damage.
-  const aura = src.isPlayer && w.deployables.length > 0 ? mineAuraAt(w, dst.x, dst.y) : null;
+  const aura =
+    src.isPlayer && src.side!.deployables.length > 0 ? mineAuraAt(src.side!, dst.x, dst.y) : null;
   // Enemies near mines of Stormblast type take more from every hit.
   if (aura && aura.taken > 0) p = scaleProfile(p, 1 + aura.taken / 100);
   if (aura && aura.double > 0)
@@ -799,7 +808,7 @@ export function hit(
   if (p.stunFull > 0 && wasFull && canStun && res.outcome === 'hit' && res.stun < p.stunFull)
     res.stun = p.stunFull;
   applyHit(w, src, dst, p, res);
-  if (aura && aura.max > 0 && dst.alive) mineAuraHit(w, dst);
+  if (aura && aura.max > 0 && dst.alive) mineAuraHit(w, src.side!, dst);
 }
 
 /** The share of a melee hit that a monster throws back: the Thorned mod, or the reflection of a Gilded Guard. */
@@ -895,12 +904,12 @@ function payImpales(w: World, dst: Actor): void {
 }
 
 /** A hit that impales records a share of its physical damage on the target. */
-function recordImpale(w: World, dst: Actor, p: SkillProfile, res: HitResult): void {
+function recordImpale(w: World, s: Side, dst: Actor, p: SkillProfile, res: HitResult): void {
   const imp = p.impale;
   if (imp.chance <= 0 || !dst.alive || (res.rawPhys ?? 0) <= 0) return;
   if (!w.rngCombat.chance(imp.chance)) return;
   dst.impales.push({ dmg: (res.rawPhys ?? 0) * imp.share, hits: imp.hits });
-  bannerStage(w, 'impale');
+  bannerStage(w, s, 'impale');
   while (dst.impales.length > imp.max) dst.impales.shift();
 }
 
@@ -1015,7 +1024,7 @@ export function killActor(w: World, a: Actor): void {
     if (a.ail.freezeT > 0) rollCharges(w, fs, 'killFrozen', gains);
     if (a.ail.shock > 0) rollGains(w, fs, 'killShocked', gains);
     rollGains(w, fs, 'kill', gains);
-    bannerStage(w, 'kill');
+    bannerStage(w, fs, 'kill');
     refreshOnKill(w, fs);
   }
   if (!a.isPlayer && a.rarity === 'rare') gainTrophy(w, fs, a.modIds);
@@ -1053,7 +1062,7 @@ export function killActor(w: World, a: Actor): void {
       (w.char.db.sum('base', 'lifeOnKillPct', kctx) / 100) * p.def.maxLife;
     if (lok > 0) p.life = Math.min(lifeCap(w, p), p.life + lok);
     const mok = w.char.db.sum('base', 'manaOnKill', kctx);
-    if (mok > 0) p.mana = Math.min(p.def.maxMana - reservedMana(w), p.mana + mok);
+    if (mok > 0) p.mana = Math.min(p.def.maxMana - reservedMana(w, fs), p.mana + mok);
     if (w.opts.loot) {
       for (const item of w.opts.loot(w, a)) {
         const id = w.nextId++;
@@ -1092,7 +1101,7 @@ export function killActor(w: World, a: Actor): void {
   // A debuff of damage over time passes on to those near the corpse.
   if (!a.isPlayer && a.sdots.length > 0) spreadSkillDots(w, a);
   // A kill on chilling ground may give a charge.
-  if (!a.isPlayer && w.fields.length > 0) fieldKill(w, a);
+  if (!a.isPlayer && fs.fields.length > 0) fieldKill(w, a);
   // A charged enemy (Infernal Blow) goes off.
   if (w.charged[a.id]) chargedDeath(w, a);
   // A Venomed enemy that dies poisoned passes the rest of its poison on to those around it.
@@ -1287,7 +1296,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     else a.life = Math.min(cap, a.life + regen * dt);
   }
   if (a.isPlayer && !suppressed) {
-    const manaCap = Math.max(0, def.maxMana - reservedMana(w));
+    const manaCap = Math.max(0, def.maxMana - reservedMana(w, a.side!));
     a.mana = Math.min(manaCap, a.mana + def.manaRegen * dt);
     leechTick(
       a.leechMana,

@@ -11,6 +11,7 @@ import { takeCorpse, type Corpse } from './factions';
 import { auraNow, minionStrike, refreshMinionDef } from './minionFx';
 import type { MinionSup } from './minionSup';
 import type { Actor, World } from './types';
+import type { Side } from './side';
 
 /**
  * Minions in the sim (COVERAGE C6, made mortal afterwards): see src/data/minions.ts. A minion is an actor of the
@@ -76,9 +77,9 @@ function statsOf(m: Minion): MinionDef {
   };
 }
 
-export function minionCount(w: World, key: string): number {
+export function minionCount(s: Side, key: string): number {
   let n = 0;
-  for (const m of w.minions) if (m.key === key && m.alive) n++;
+  for (const m of s.minions) if (m.key === key && m.alive) n++;
   return n;
 }
 
@@ -111,6 +112,7 @@ type Make = {
 /** A minion of a skill, put down at a spot with the numbers of the skill's modifiers and supports. */
 export function makeMinion(
   w: World,
+  s: Side,
   c: SkillChoice,
   prof: SkillProfile,
   kind: MinionId,
@@ -132,8 +134,7 @@ export function makeMinion(
   const spot = w.grid.collide(x, y, r);
   const m = newActor(w.nextId++, false, spot.x, spot.y, r) as Minion;
   m.faction = 0;
-  // The summoner's side (the one character of the world until `minions` moves to its side, DUEL.md 3.3 G3).
-  m.side = w.player.side;
+  m.side = s;
   m.def = body.def;
   m.bodyDef = body.def;
   m.life = body.life;
@@ -154,26 +155,27 @@ export function makeMinion(
   m.botCd = 0;
   m.defensive = prof.minionDefensive;
   m.nearMore = prof.minionNearMore;
-  w.minions.push(m);
+  s.minions.push(m);
   w.events.push({ t: 'summon', id: m.id });
-  refreshMinionDef(m, auraNow(w));
+  refreshMinionDef(m, auraNow(s));
   return m;
 }
 
 /** The summon lands: the skill's minions that stand are renewed, and new ones fill the places of those that fell. */
-export function summonMinions(w: World, c: SkillChoice, prof: SkillProfile): void {
+export function summonMinions(w: World, s: Side, c: SkillChoice, prof: SkillProfile): void {
   const u = c.skill.utility;
   if (u?.kind !== 'summon') return;
   const n = summonCount(c, prof);
-  const have = minionCount(w, c.key);
+  const have = minionCount(s, c.key);
   const seconds = u.seconds === undefined ? Infinity : u.seconds * prof.skillDuration;
-  for (const m of w.minions) if (m.key === c.key && m.alive) m.t = seconds;
+  for (const m of s.minions) if (m.key === c.key && m.alive) m.t = seconds;
   const p = w.player;
   for (let i = have; i < n; i++) {
     const ang = (i / n) * Math.PI * 2;
     const g = u.golem;
     const m = makeMinion(
       w,
+      s,
       c,
       prof,
       u.minion,
@@ -201,13 +203,19 @@ export function summonMinions(w: World, c: SkillChoice, prof: SkillProfile): voi
 }
 
 /** Raise the corpse as a spectre: the monster it was, at the gem's level, with the minion modifiers of the skill. */
-export function raiseSpectre(w: World, c: SkillChoice, prof: SkillProfile, corpse: Corpse): void {
+export function raiseSpectre(
+  w: World,
+  s: Side,
+  c: SkillChoice,
+  prof: SkillProfile,
+  corpse: Corpse,
+): void {
   const u = c.skill.utility;
   if (u?.kind !== 'summon' || !u.corpse) return;
   takeCorpse(w, corpse);
   const t = MONSTER_TYPES[corpse.spec.type];
   const level = Math.round(levelValue(u.corpse.level, c.skill.level));
-  makeMinion(w, c, prof, u.minion, corpse.x, corpse.y, {
+  makeMinion(w, s, c, prof, u.minion, corpse.x, corpse.y, {
     bodyLevel: level,
     blowLevel: level,
     lifeMult: t.lifeMult,
@@ -220,6 +228,7 @@ export function raiseSpectre(w: World, c: SkillChoice, prof: SkillProfile, corps
 /** One minion put down at a spot (the clone a Blink Arrow leaves where the character stood). */
 export function summonAt(
   w: World,
+  s: Side,
   c: SkillChoice,
   prof: SkillProfile,
   kind: MinionId,
@@ -227,7 +236,7 @@ export function summonAt(
   x: number,
   y: number,
 ): Minion {
-  return makeMinion(w, c, prof, kind, x, y, { seconds });
+  return makeMinion(w, s, c, prof, kind, x, y, { seconds });
 }
 
 /**
@@ -253,16 +262,16 @@ function step(w: World, m: Minion, tx: number, ty: number, dt: number, speed: nu
   m.moving = true;
 }
 
-export function tickMinions(w: World, dt: number): void {
-  if (w.minions.length === 0) return;
+export function tickMinions(w: World, s: Side, dt: number): void {
+  if (s.minions.length === 0) return;
   const p = w.player;
   const foes = w.actors.filter(
     (e) => !e.isPlayer && e.alive && e.phaseT <= 0 && e.state !== 'idle',
   );
   const unstable = w.char.db.flag('minionInstability');
-  const aura = auraNow(w);
+  const aura = auraNow(s);
   let j = 0;
-  for (const m of w.minions) {
+  for (const m of s.minions) {
     m.t -= dt;
     if (!m.alive || m.t <= 0) continue;
     // The offering, the golem and the supports show in its defence.
@@ -278,7 +287,7 @@ export function tickMinions(w: World, dt: number): void {
           rawHit(w, e, m.def.maxLife / 3, 3, 'Minion burst', 'minion');
       w.events.push({ t: 'explode', x: m.x, y: m.y, r: BURST_RADIUS, dtype: 3 });
     }
-    w.minions[j++] = m;
+    s.minions[j++] = m;
     const def = statsOf(m);
     m.moving = false;
     m.atkT -= dt;
@@ -314,5 +323,5 @@ export function tickMinions(w: World, dt: number): void {
     m.atkT = 1 / ((m.fixedRate ?? def.rate) * m.speed * (1 + aura.atk / 100) * (1 - m.ail.chill));
     minionStrike(w, m, def, best, foes, aura);
   }
-  w.minions.length = j;
+  s.minions.length = j;
 }

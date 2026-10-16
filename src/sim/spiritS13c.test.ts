@@ -284,8 +284,8 @@ describe('durations, ailments and traps (briefBurst, lingeringEffect, freedRot, 
     const long = world(['suddenFrost', 'lingeringEffect'], 3, 'wand_3', INT);
     const short = world(['suddenFrost', 'briefBurst'], 3, 'wand_3', INT);
     const life = (r: ReturnType<typeof world>) => {
-      for (let i = 0; i < 300 && r.world.fields.length === 0; i++) stepWorld(r.world);
-      return r.world.fields[0].total;
+      for (let i = 0; i < 300 && r.world.sides[0].fields.length === 0; i++) stepWorld(r.world);
+      return r.world.sides[0].fields[0].total;
     };
     const b = life(base);
     expect(life(long)).toBeGreaterThan(b * 1.3);

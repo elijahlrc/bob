@@ -99,6 +99,7 @@ function perform(
       if (ev.on !== 'kill') return false;
       startStorm(
         w,
+        s,
         e.seconds,
         e.interval,
         e.radius,
@@ -107,9 +108,9 @@ function perform(
       );
       return true;
     case 'recover':
-      return recover(w, e);
+      return recover(w, s, e);
     case 'sacrifice':
-      return sacrifice(w, e);
+      return sacrifice(w, s, e);
   }
 }
 
@@ -135,7 +136,7 @@ function castTriggered(w: World, s: Side, choice: SkillChoice, ev: TriggerEvent)
     nearestEnemy(w) ??
     (ev.on === 'kill' ? ev.target : null);
   if (!target) return false;
-  const prof = w.char.profile(choice, playerConds(w, target), flaskMask(w, s));
+  const prof = w.char.profile(choice, playerConds(w, target), flaskMask(s));
   const act: Action = {
     profile: prof,
     which: 'triggered',
@@ -258,23 +259,23 @@ function spread(w: World, e: Extract<TriggerEffect, { kind: 'spread' }>, dead: A
   return any;
 }
 
-function sacrifice(w: World, e: Extract<TriggerEffect, { kind: 'sacrifice' }>): boolean {
+function sacrifice(w: World, s: Side, e: Extract<TriggerEffect, { kind: 'sacrifice' }>): boolean {
   const p = w.player;
   const amount = Math.min(Math.max(0, p.life - 1), (e.pctOfLife / 100) * p.def.maxLife);
   if (amount <= 0) return false;
   p.life -= amount;
   if (e.pool === 'es') p.es = Math.min(p.def.maxEs, p.es + amount);
-  else p.mana = Math.min(p.def.maxMana - reservedMana(w), p.mana + amount);
+  else p.mana = Math.min(p.def.maxMana - reservedMana(w, s), p.mana + amount);
   return true;
 }
 
-function recover(w: World, e: Extract<TriggerEffect, { kind: 'recover' }>): boolean {
+function recover(w: World, s: Side, e: Extract<TriggerEffect, { kind: 'recover' }>): boolean {
   const p = w.player;
   const amount = (e.value / 100) * (e.pctOf === 'armour' ? p.def.armour : p.def.maxLife);
   if (amount <= 0) return false;
   if (e.pool === 'life') p.life = Math.min(lifeCap(w, p), p.life + amount);
   else if (e.pool === 'es') p.es = Math.min(p.def.maxEs, p.es + amount);
-  else p.mana = Math.min(p.def.maxMana - reservedMana(w), p.mana + amount);
+  else p.mana = Math.min(p.def.maxMana - reservedMana(w, s), p.mana + amount);
   return true;
 }
 

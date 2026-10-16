@@ -52,10 +52,15 @@ function specOf(
 }
 
 /** What the character does with a banner skill now: carry it, put it down, or nothing. */
-export function bannerAction(w: World, c: SkillChoice, target: Actor): 'carry' | 'place' | null {
+export function bannerAction(
+  w: World,
+  side: Side,
+  c: SkillChoice,
+  target: Actor,
+): 'carry' | 'place' | null {
   const s = specOf(c);
   if (!s) return null;
-  const b = w.banner;
+  const b = side.banner;
   const p = w.player;
   if (b && b.key === c.key && !b.placed) {
     if (b.stages >= s.spec.maxStages) return 'place';
@@ -69,7 +74,7 @@ export function bannerAction(w: World, c: SkillChoice, target: Actor): 'carry' |
   }
   if (b && !(b.placed && b.t < 1.5)) return null;
   const reserve = Math.ceil((s.spec.reservePct / 100) * p.def.maxMana);
-  return p.def.maxMana - reservedMana(w) >= reserve ? 'carry' : null;
+  return p.def.maxMana - reservedMana(w, side) >= reserve ? 'carry' : null;
 }
 
 /** Cast the banner skill: carry a new banner, or put the carried one down where the character stands. */
@@ -77,8 +82,8 @@ export function useBanner(w: World, side: Side, c: SkillChoice, prof: SkillProfi
   const s = specOf(c);
   if (!s) return;
   const p = w.player;
-  const action = bannerAction(w, c, p);
-  const b = w.banner;
+  const action = bannerAction(w, side, c, p);
+  const b = side.banner;
   if (action === 'place' && b) {
     const g = s.spec.perStage;
     b.placed = true;
@@ -98,7 +103,7 @@ export function useBanner(w: World, side: Side, c: SkillChoice, prof: SkillProfi
     return;
   }
   const r0 = s.spec.radius * prof.radiusMult;
-  w.banner = {
+  side.banner = {
     key: c.key,
     placed: false,
     x: p.x,
@@ -117,8 +122,8 @@ export function useBanner(w: World, side: Side, c: SkillChoice, prof: SkillProfi
 }
 
 /** A kill, or an impale, while a banner is carried gives it a stage. */
-export function bannerStage(w: World, on: 'kill' | 'impale'): void {
-  const b = w.banner;
+export function bannerStage(w: World, side: Side, on: 'kill' | 'impale'): void {
+  const b = side.banner;
   if (!b || b.placed) return;
   const c = w.char.utilities.find((x) => x.key === b.key);
   const s = c && specOf(c);
@@ -136,19 +141,19 @@ export function bannerStage(w: World, on: 'kill' | 'impale'): void {
 
 /** Run the banner: its time, and its aura on the character and the enemies in it. */
 export function tickBanner(w: World, side: Side, dt: number): void {
-  const b = w.banner;
+  const b = side.banner;
   if (!b) return;
   const c = w.char.utilities.find((x) => x.key === b.key);
   const s = c && specOf(c);
   if (!c || !s) {
-    w.banner = null;
+    side.banner = null;
     return;
   }
   const p = w.player;
   if (b.placed) {
     b.t -= dt;
     if (b.t <= 0) {
-      w.banner = null;
+      side.banner = null;
       return;
     }
   }

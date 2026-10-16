@@ -28,7 +28,7 @@ describe('gem-granted gains in the sim', () => {
         distance: 1.5,
       },
     );
-    const prof = w.char.profile(w.primary, playerConds(w, dummy), flaskMask(w, w.sides[0]));
+    const prof = w.char.profile(w.primary, playerConds(w, dummy), flaskMask(w.sides[0]));
     expect(w.sides[0].buffT.fortify).toBe(0);
     const res = resolveHit(new Rng(1), prof, prof.hands[0], targetState(dummy), 1, false);
     res.outcome = 'hit';
@@ -43,7 +43,7 @@ describe('gem-granted gains in the sim', () => {
         distance: 1.5,
       },
     );
-    const prof = w.char.profile(w.primary, playerConds(w, dummy), flaskMask(w, w.sides[0]));
+    const prof = w.char.profile(w.primary, playerConds(w, dummy), flaskMask(w.sides[0]));
     const res = resolveHit(new Rng(2), prof, prof.hands[0], targetState(dummy), 1, false);
     res.outcome = 'hit';
     res.stun = 0.35;

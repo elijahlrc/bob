@@ -15,15 +15,9 @@ import type { HexState } from './hexes';
 import type { Fx } from './statuses';
 import type { PendingShot } from './shots';
 import type { ChannelState, StackState } from './channel';
-import type { BannerState } from './banners';
-import type { CaughtState, WarpState, WitherState } from './blinks';
-import type { Field } from './fields';
 import type { SkillDot } from './skillDots';
-import type { OfferingState } from './minionFx';
 import type { Mirage } from './supportFx';
 import type { HexTotals } from '../data/hexes';
-import type { Deployable } from './deploy';
-import type { Minion } from './minions';
 import type { Grid } from './grid';
 import type { Side, SideOpts } from './side';
 
@@ -696,25 +690,10 @@ export type World = {
   rngLoot: Rng;
   /** Chance rolls and spell choices of triggers (separate, so triggers never disturb other streams). */
   rngTrig: Rng;
-  /** The totems, brands, traps and mines on the ground. */
-  deployables: Deployable[];
-  deploySeq: number;
-  /** The minions standing. */
-  minions: Minion[];
   actors: Actor[];
   player: Actor;
   nextId: number;
   projectiles: Projectile[];
-  /** Ground and standing things the player's skills made: consecrated and chilling ground, crystals, storms, walls. */
-  fields: Field[];
-  /** The banner the character carries or has put down (src/sim/banners.ts). */
-  banner: BannerState | null;
-  /** A teleport on its way, Withering Step's aura, and the projectiles a Venom Gyre has caught (src/sim/blinks.ts). */
-  warp: WarpState | null;
-  wither: WitherState | null;
-  caught: CaughtState | null;
-  /** The offering that stands, if one does (src/sim/minionFx.ts). */
-  offering: OfferingState | null;
   /** Counters the supports keep (src/sim/supportFx.ts): uses of a skill, Intensity, Seals, a mirage archer, Inspiration's mana. */
   uses: Record<string, number>;
   intensity: Record<string, number>;
@@ -799,8 +778,6 @@ export type World = {
   /** How the last hit of the player's resolved (a strike that sends more out waits to see it land). */
   lastOutcome: 'hit' | 'miss' | 'block' | null;
   effects: GroundEffect[];
-  /** Zones the player's skills left on the ground. */
-  zones: SkillZone[];
   /** Bodies of dead monsters (EXPANSION 5.8), and recent explosions that destroy fresh ones. */
   corpses: Corpse[];
   /** Whether any Warden Pylon has been spawned (so damage need not look for one on most maps). */

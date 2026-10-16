@@ -132,18 +132,18 @@ describe('shapes: beam', () => {
 describe('shapes: ground zones', () => {
   const rain = spell({ kind: 'ground', radius: 2, duration: 2, interval: 0.5 });
   const run = (w: World, seconds: number) => {
-    for (let i = 0; i < Math.round(seconds * 60); i++) tickSkillZones(w, 1 / 60);
+    for (let i = 0; i < Math.round(seconds * 60); i++) tickSkillZones(w, w.sides[0], 1 / 60);
   };
 
   it('pulses at its interval for its duration, on what stands in it', () => {
     const { w, first } = arena();
     cast(w, profileOf(rain), first);
-    expect(w.zones).toHaveLength(1);
+    expect(w.sides[0].zones).toHaveLength(1);
     const before = first.life;
     run(w, 3);
     const pulses = Math.round((before - first.life) / 10);
     expect(pulses).toBe(4); // 2 s at one pulse every 0.5 s
-    expect(w.zones).toHaveLength(0);
+    expect(w.sides[0].zones).toHaveLength(0);
   });
 
   it('waits out its delay, then lands once when it is a blast', () => {

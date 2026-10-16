@@ -38,7 +38,7 @@ const corpses = (w: World, n: number, x: number, y: number) => {
     });
 };
 
-const minionsOf = (w: World) => w.minions as Minion[];
+const minionsOf = (w: World) => w.sides[0].minions as Minion[];
 
 describe('offerings (boneWardRite, fleshSurgeRite, spiritWardRite)', () => {
   it('uses a corpse and up to four more, lasts longer for each, and does nothing without a minion', () => {
@@ -46,7 +46,7 @@ describe('offerings (boneWardRite, fleshSurgeRite, spiritWardRite)', () => {
     corpses(w, 7, w.player.x - 1, w.player.y);
     run(w, 2);
     // No minion, no offering.
-    expect(w.offering).toBeNull();
+    expect(w.sides[0].offering).toBeNull();
     expect(w.corpses.length).toBe(7);
   });
 
@@ -57,23 +57,23 @@ describe('offerings (boneWardRite, fleshSurgeRite, spiritWardRite)', () => {
       'sword_3',
       STR,
     );
-    for (let i = 0; i < 4 * 60 && w.minions.length === 0; i++) stepWorld(w);
-    expect(w.minions.length).toBeGreaterThan(0);
+    for (let i = 0; i < 4 * 60 && w.sides[0].minions.length === 0; i++) stepWorld(w);
+    expect(w.sides[0].minions.length).toBeGreaterThan(0);
     const m = minionsOf(w)[0];
     const before = m.def.blockAttack;
     corpses(w, 7, w.player.x - 1, w.player.y);
-    for (let i = 0; i < 4 * 60 && !w.offering; i++) stepWorld(w);
-    expect(w.offering).not.toBeNull();
+    for (let i = 0; i < 4 * 60 && !w.sides[0].offering; i++) stepWorld(w);
+    expect(w.sides[0].offering).not.toBeNull();
     // Five corpses used of the seven.
     expect(w.corpses.length).toBe(2);
-    expect(w.offering!.corpses).toBe(5);
+    expect(w.sides[0].offering!.corpses).toBe(5);
     w.corpses.length = 0;
     run(w, 0.1);
     expect(m.def.blockAttack).toBeGreaterThan(before);
     expect(m.def.lifeOnBlockPct).toBeGreaterThan(0);
     // It ends, and the minion is as it was.
     run(w, 10);
-    expect(w.offering).toBeNull();
+    expect(w.sides[0].offering).toBeNull();
     expect(m.def.blockAttack).toBeCloseTo(before, 5);
   });
 
@@ -84,15 +84,15 @@ describe('offerings (boneWardRite, fleshSurgeRite, spiritWardRite)', () => {
       'sword_3',
       STR,
     );
-    for (let i = 0; i < 4 * 60 && w.minions.length === 0; i++) stepWorld(w);
+    for (let i = 0; i < 4 * 60 && w.sides[0].minions.length === 0; i++) stepWorld(w);
     corpses(w, 12, w.player.x - 1, w.player.y);
     run(w, 6);
     // Only one stands at a time; both gems cast, the later replaces.
-    expect(w.offering).not.toBeNull();
+    expect(w.sides[0].offering).not.toBeNull();
     const m = minionsOf(w)[0];
-    if (w.offering!.atk > 0) expect(w.offering!.chaos).toBe(0);
+    if (w.sides[0].offering!.atk > 0) expect(w.sides[0].offering!.chaos).toBe(0);
     else {
-      expect(w.offering!.chaos).toBeGreaterThan(0);
+      expect(w.sides[0].offering!.chaos).toBeGreaterThan(0);
       expect(m.def.maxEs).toBeGreaterThan(0);
       expect(m.def.res[2]).toBeGreaterThan(20);
     }
@@ -108,7 +108,7 @@ describe('minion supports (elementalPack, burningPack)', () => {
       STR,
     );
     dummy.rarity = 'boss';
-    for (let i = 0; i < 6 * 60 && w.minions.length === 0; i++) stepWorld(w);
+    for (let i = 0; i < 6 * 60 && w.sides[0].minions.length === 0; i++) stepWorld(w);
     const m = minionsOf(w)[0];
     expect(m.def.res[3]).toBeGreaterThan(m.bodyDef!.res[3] - 0.01);
     run(w, 5);
@@ -123,7 +123,7 @@ describe('minion supports (elementalPack, burningPack)', () => {
       STR,
     );
     dummy.rarity = 'boss';
-    for (let i = 0; i < 6 * 60 && w.minions.length === 0; i++) stepWorld(w);
+    for (let i = 0; i < 6 * 60 && w.sides[0].minions.length === 0; i++) stepWorld(w);
     const m = minionsOf(w)[0];
     const lifeBefore = m.life;
     run(w, 3);

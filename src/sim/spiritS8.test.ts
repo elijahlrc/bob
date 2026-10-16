@@ -51,7 +51,7 @@ describe('Flame Dash (cinderStep)', () => {
     let blinked = false;
     for (let i = 0; i < 3 * 60; i++) {
       stepWorld(w);
-      if (w.fields.some((f) => f.kind === 'trail')) trail = true;
+      if (w.sides[0].fields.some((f) => f.kind === 'trail')) trail = true;
       if (w.events.some((e) => e.t === 'blink' && e.end)) blinked = true;
     }
     expect(blinked).toBe(true);
@@ -62,10 +62,10 @@ describe('Flame Dash (cinderStep)', () => {
 
   it('what stands on the burning trail takes fire damage over time', () => {
     const { world: w } = blinkWorld(['cinderStep'], 7);
-    let f = w.fields.find((x) => x.kind === 'trail');
+    let f = w.sides[0].fields.find((x) => x.kind === 'trail');
     for (let i = 0; i < 2 * 60 && !f; i++) {
       stepWorld(w);
-      f = w.fields.find((x) => x.kind === 'trail');
+      f = w.sides[0].fields.find((x) => x.kind === 'trail');
     }
     expect(f).toBeDefined();
     const mid = neighbour(w, (f!.x + f!.x2!) / 2, (f!.y + f!.y2!) / 2);
@@ -85,7 +85,7 @@ describe('Frostblink (rimeStep)', () => {
     let hurt = false;
     for (let i = 0; i < 4 * 60; i++) {
       stepWorld(w);
-      const f = w.fields.find((x) => x.kind === 'chilling');
+      const f = w.sides[0].fields.find((x) => x.kind === 'chilling');
       if (f) {
         chilling = true;
         expect(Math.hypot(f.x - start.x, f.y - start.y)).toBeLessThan(0.5);
@@ -128,8 +128,8 @@ describe('Lightning Warp (boltStep)', () => {
       stepWorld(w);
       for (const e of w.events)
         if (e.t === 'use' && e.skill === 'boltStep' && castAt < 0) castAt = w.t;
-      if (w.warp) waiting = true;
-      if (waiting && !w.warp && arrivedAt < 0) {
+      if (w.sides[0].warp) waiting = true;
+      if (waiting && !w.sides[0].warp && arrivedAt < 0) {
         arrivedAt = w.t;
         for (const e of w.events) if (e.t === 'explode') bursts.push({ x: e.x, y: e.y });
       }
@@ -179,7 +179,7 @@ describe('Withering Step (rotStride)', () => {
     let ended = false;
     for (let i = 0; i < 8 * 60 && !ended; i++) {
       stepWorld(w);
-      ended = w.sides[0].buffT.elusive === 0 && w.wither === null;
+      ended = w.sides[0].buffT.elusive === 0 && w.sides[0].wither === null;
     }
     expect(ended).toBe(true);
   });
@@ -232,8 +232,8 @@ describe('Blink Arrow (shadowQuiver)', () => {
     let clone: { x: number; y: number } | undefined;
     for (let i = 0; i < 4 * 60; i++) {
       stepWorld(w);
-      if (w.warp) waiting = true;
-      const m = w.minions.find((x) => x.kind === 'clone');
+      if (w.sides[0].warp) waiting = true;
+      const m = w.sides[0].minions.find((x) => x.kind === 'clone');
       if (m && !clone) clone = { x: m.x, y: m.y };
     }
     expect(waiting).toBe(true);
@@ -263,7 +263,7 @@ describe('Storm Rush (stormRush)', () => {
       if (!channelling) from = { x: w2.player.x, y: w2.player.y };
       stepWorld(w2);
       channelling = !!w2.channel;
-      const g = w2.fields.find((f) => f.kind === 'ghost');
+      const g = w2.sides[0].fields.find((f) => f.kind === 'ghost');
       if (g) {
         ghost = Math.max(ghost, Math.hypot(g.x - w2.player.x, g.y - w2.player.y));
         // The character itself stays where it was while the illusion runs.
@@ -323,14 +323,14 @@ describe('Venom Gyre (toxinCircle) and Whirling Blades (spinningDash)', () => {
     let caught = 0;
     for (let i = 0; i < 8 * 60; i++) {
       stepWorld(w);
-      caught = Math.max(caught, w.caught?.n ?? 0);
+      caught = Math.max(caught, w.sides[0].caught?.n ?? 0);
     }
     expect(caught).toBeGreaterThanOrEqual(1);
     // Whirling Blades is the skill that lets them go: a spiral, none of it returning.
-    w.caught = { profile: w.char.profile(w.primary, 0), hand: 0, n: 5, t: 12 };
+    w.sides[0].caught = { profile: w.char.profile(w.primary, 0), hand: 0, n: 5, t: 12 };
     const before = w.shots.length;
     releaseCaught(w, w.player);
-    expect(w.caught).toBeNull();
+    expect(w.sides[0].caught).toBeNull();
     expect(w.shots.length).toBe(before + 5);
     const sent = w.shots.slice(before);
     for (const s of sent) {

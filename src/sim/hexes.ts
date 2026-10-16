@@ -108,7 +108,7 @@ export function hexHit(w: World, s: Side, dst: Actor, melee = false): void {
     if (give.life) p.life = Math.min(lifeCap(w, p), p.life + atLevel(give.life, h.level));
     if (give.mana)
       p.mana = Math.min(
-        Math.max(0, p.def.maxMana - reservedMana(w)),
+        Math.max(0, p.def.maxMana - reservedMana(w, s)),
         p.mana + atLevel(give.mana, h.level),
       );
   }
@@ -127,7 +127,7 @@ export function hexKill(w: World, dead: Actor): number {
     if (give.life) p.life = Math.min(lifeCap(w, p), p.life + atLevel(give.life, h.level));
     if (give.mana)
       p.mana = Math.min(
-        Math.max(0, p.def.maxMana - reservedMana(w)),
+        Math.max(0, p.def.maxMana - reservedMana(w, w.player.side!)),
         p.mana + atLevel(give.mana, h.level),
       );
     if (give.charge && w.rngTrig.chance(atLevel(give.charge.chance, h.level) / 100))

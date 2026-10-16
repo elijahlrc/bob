@@ -1,9 +1,22 @@
+import type { CaughtState, WarpState, WitherState } from './blinks';
+import type { OfferingState } from './minionFx';
+import type { BannerState } from './banners';
+import type { Field } from './fields';
+import type { Minion } from './minions';
+import type { Deployable } from './deploy';
 import type { Character } from '../calc/character';
 import type { BuffId } from '../data/buffs';
 import type { AnyItem } from '../data/types';
 import type { Ledger } from './ledger';
 import type { ReprieveState } from './reprieve';
-import type { DamageRecord, FlaskState, PlayerAI, TriggerRuntime, Vitals } from './types';
+import type {
+  DamageRecord,
+  FlaskState,
+  PlayerAI,
+  SkillZone,
+  TriggerRuntime,
+  Vitals,
+} from './types';
 
 /** What a side counts as it plays: the kills and the time lost, and the damage it took and dealt. */
 export type SideStats = {
@@ -83,4 +96,22 @@ export type Side = {
   /** Seconds a Berserk has lasted (its drain of rage rises with it). */
   berserkT: number;
   chars: Map<string, Character>;
+  // G3: summons and ground (deployables, minions, fields, zones, banner, offering, warp, wither, caught)
+  /** The totems, brands, traps and mines on the ground. */
+  deployables: Deployable[];
+  deploySeq: number;
+  /** The minions standing. */
+  minions: Minion[];
+  /** Ground and standing things the player's skills made: consecrated and chilling ground, crystals, storms, walls. */
+  fields: Field[];
+  /** Zones the player's skills left on the ground. */
+  zones: SkillZone[];
+  /** The banner the character carries or has put down (src/sim/banners.ts). */
+  banner: BannerState | null;
+  /** The offering that stands, if one does (src/sim/minionFx.ts). */
+  offering: OfferingState | null;
+  /** A teleport on its way, Withering Step's aura, and the projectiles a Venom Gyre has caught (src/sim/blinks.ts). */
+  warp: WarpState | null;
+  wither: WitherState | null;
+  caught: CaughtState | null;
 };

@@ -228,6 +228,16 @@ export function createWorld(inp: CreateWorldInput): World {
     auraBurnT: 0,
     berserkT: 0,
     chars: new Map(),
+    deployables: [],
+    deploySeq: 0,
+    minions: [],
+    fields: [],
+    zones: [],
+    banner: null,
+    offering: null,
+    warp: null,
+    wither: null,
+    caught: null,
   };
   player.side = side;
   const w: World = {
@@ -240,20 +250,11 @@ export function createWorld(inp: CreateWorldInput): World {
     rngAi: root.fork('ai'),
     rngLoot: root.fork('loot'),
     rngTrig: root.fork('trigger'),
-    deployables: [],
-    deploySeq: 0,
-    minions: [],
     actors: [player],
     player,
     nextId: 2,
     projectiles: [],
     shots: [],
-    fields: [],
-    banner: null,
-    warp: null,
-    wither: null,
-    caught: null,
-    offering: null,
     uses: {},
     intensity: {},
     intensityT: {},
@@ -287,7 +288,6 @@ export function createWorld(inp: CreateWorldInput): World {
     hitsLanded: 0,
     lastOutcome: null,
     effects: [],
-    zones: [],
     corpses: [],
     hasPylons: false,
     blasts: [],
@@ -420,7 +420,8 @@ function tickFlasks(w: World, s: Side, dt: number, policy: FlaskPolicy): void {
     const step = Math.min(dt, f.activeT);
     f.activeT -= dt;
     if (f.lifeRate) p.life = Math.min(lifeCap(w, p), p.life + f.lifeRate * step);
-    if (f.manaRate) p.mana = Math.min(p.def.maxMana - reservedMana(w), p.mana + f.manaRate * step);
+    if (f.manaRate)
+      p.mana = Math.min(p.def.maxMana - reservedMana(w, s), p.mana + f.manaRate * step);
     if (f.activeT <= 0) {
       f.activeT = 0;
       if (f.queued) {
@@ -474,7 +475,7 @@ function tickEffects(w: World, dt: number): void {
         afflictPlayer(w, e.afflict.kind, e.afflict.value, e.afflict.seconds, true);
       const owner = e.pull && caught ? actorById(w, e.owner ?? 0) : undefined;
       if (owner?.alive) pullPlayer(w, owner, e.pull!);
-      for (const m of w.minions)
+      for (const m of w.player.side!.minions)
         if (m.alive && inBlast(e, m.x, m.y, m.r))
           rawHit(w, m, e.damage, e.dtype, e.label ?? 'Blast');
       if (e.leaves) openZone(w, e.x, e.y, e.radius, e.leaves.seconds, e.leaves.kind, e.leaves.dps);
@@ -493,7 +494,7 @@ function tickEffects(w: World, dt: number): void {
       rawHit(w, p, e.damage, e.dtype, label, 'player', viaOf(w, e));
     // The player's minions standing in a monster's blast are hurt too.
     if (e.faction === 1)
-      for (const m of w.minions)
+      for (const m of w.player.side!.minions)
         if (m.alive && Math.hypot(m.x - e.x, m.y - e.y) <= e.radius + m.r)
           rawHit(w, m, e.damage, e.dtype, label);
   }
@@ -630,8 +631,8 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   for (const s of w.sides) tickBuffs(s, dt);
   for (const s of w.sides) tickAuraBurn(w, s, dt);
   for (const s of w.sides) tickDeployables(w, s, dt);
-  tickMinions(w, dt);
-  tickSkillZones(w, dt);
+  for (const s of w.sides) tickMinions(w, s, dt);
+  for (const s of w.sides) tickSkillZones(w, s, dt);
   for (const s of w.sides) tickFlasks(w, s, dt, policy);
   // Flow field for monsters follows the player tile.
   w.grid.buildFlow(p.x, p.y);
@@ -658,14 +659,14 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   for (const s of w.sides) tickChannel(w, s);
   for (const s of w.sides) tickFields(w, s, dt);
   for (const s of w.sides) tickBanner(w, s, dt);
-  tickWarp(w, dt);
+  for (const s of w.sides) tickWarp(w, s, dt);
   for (const s of w.sides) tickWither(w, s);
-  tickCaught(w, dt);
+  for (const s of w.sides) tickCaught(s, dt);
   for (const s of w.sides) tickStance(w, s);
   for (const s of w.sides) tickBerserk(w, s, dt);
   for (const s of w.sides) tickDegen(w, s, dt);
-  tickOffering(w, dt);
-  tickLegion(w, dt);
+  for (const s of w.sides) tickOffering(s, dt);
+  for (const s of w.sides) tickLegion(w, s, dt);
   for (const s of w.sides) tickSupports(w, s, dt);
   for (const s of w.sides) tickSkillFx(w, s, dt);
   tickBlasphemy(w, dt);
@@ -685,7 +686,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     if (w.build.level >= MAX_LEVEL) s.xp = 0;
     if (s.opts.freeResources && p.alive) {
       p.life = lifeCap(w, p);
-      p.mana = Math.max(0, p.def.maxMana - reservedMana(w));
+      p.mana = Math.max(0, p.def.maxMana - reservedMana(w, s));
     }
   }
   if (!p.alive && w.status === 'running') w.status = 'dead';

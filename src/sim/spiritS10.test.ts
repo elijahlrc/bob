@@ -45,7 +45,7 @@ const mine = (
   extra: Partial<Deployable> = {},
 ): Deployable => {
   const d: Deployable = {
-    id: ++w.deploySeq,
+    id: ++w.sides[0].deploySeq,
     kind: 'mine',
     key,
     x,
@@ -54,7 +54,7 @@ const mine = (
     fireT: 0,
     ...extra,
   };
-  w.deployables.push(d);
+  w.sides[0].deployables.push(d);
   return d;
 };
 
@@ -101,7 +101,7 @@ describe('Cairns (fatherTotem, warchiefTotem)', () => {
       if (w.sides[0].buffT.guardianCairn > 0) buff = true;
     }
     expect(buff).toBe(true);
-    expect(w.deployables.length).toBeGreaterThan(0);
+    expect(w.sides[0].deployables.length).toBeGreaterThan(0);
     // Take the character far from the totem: it falls silent and the bonus goes.
     const before = uses;
     w.player.x -= 20;
@@ -136,8 +136,8 @@ describe('Cinder Bond (cinderBond)', () => {
     const a = { x: w.player.x + 4, y: w.player.y };
     const b = { x: w.player.x - 4, y: w.player.y };
     for (const s of [a, b])
-      w.deployables.push({
-        id: ++w.deploySeq,
+      w.sides[0].deployables.push({
+        id: ++w.sides[0].deploySeq,
         kind: 'totem',
         key: c.key,
         x: s.x,
@@ -158,7 +158,7 @@ describe('mines (chainedCharges, heavyCharge, mortarCharge)', () => {
     const { world: w, dummy } = world(['suddenFrost', 'chainedCharges'], 6, 'wand_3', INT);
     const c = w.char.actives.find((x) => x.skill.id === 'suddenFrost')!;
     // Clear what the AI already laid.
-    w.deployables.length = 0;
+    w.sides[0].deployables.length = 0;
     w.player.stunT = 1e9;
     const m: Deployable[] = [];
     for (let i = 0; i < 4; i++) m.push(mine(w, c.key, dummy.x + i * 0.7 - 1, dummy.y + 1));
@@ -176,7 +176,7 @@ describe('mines (chainedCharges, heavyCharge, mortarCharge)', () => {
   it('without a chain the set goes at once', () => {
     const { world: w, dummy } = world(['mortarCharge'], 6, 'wand_3', INT);
     const c = w.char.actives.find((x) => x.skill.id === 'mortarCharge')!;
-    w.deployables.length = 0;
+    w.sides[0].deployables.length = 0;
     w.player.stunT = 1e9;
     const m = [0, 1, 2].map((i) => mine(w, c.key, dummy.x + i * 0.7 - 1, dummy.y + 1));
     for (let i = 0; i < 4 * 60 && m.some((d) => d.goAt === undefined); i++) stepWorld(w);
@@ -187,7 +187,7 @@ describe('mines (chainedCharges, heavyCharge, mortarCharge)', () => {
   it('Pyroclast: a mine bursts and then rains more bursts, more the further along the sequence it is', () => {
     const { world: w, dummy } = world(['mortarCharge'], 6, 'wand_3', INT);
     const c = w.char.actives.find((x) => x.skill.id === 'mortarCharge')!;
-    w.deployables.length = 0;
+    w.sides[0].deployables.length = 0;
     w.player.stunT = 1e9;
     mine(w, c.key, dummy.x, dummy.y + 1, { goAt: w.t + 0.1, seq: 0 });
     let bursts = 0;
@@ -211,16 +211,16 @@ describe('mines (chainedCharges, heavyCharge, mortarCharge)', () => {
     const heavy = world(['heavyCharge', 'suddenFrost'], 6, 'wand_3', INT);
     const hw = heavy.world;
     const hc = hw.char.actives.find((x) => x.skill.id === 'suddenFrost')!;
-    hw.deployables.length = 0;
+    hw.sides[0].deployables.length = 0;
     const aura = { double: 2, min: 0, max: 0, cap: 0, radius: 3.5 };
     for (let i = 0; i < 3; i++)
       mine(hw, hc.key, heavy.dummy.x + 0.3 * i, heavy.dummy.y + 1, { aura });
-    expect(mineAuraAt(hw, heavy.dummy.x, heavy.dummy.y)!.double).toBe(6);
-    expect(mineAuraAt(hw, heavy.dummy.x + 30, heavy.dummy.y)).toBeNull();
+    expect(mineAuraAt(hw.sides[0], heavy.dummy.x, heavy.dummy.y)!.double).toBe(6);
+    expect(mineAuraAt(hw.sides[0], heavy.dummy.x + 30, heavy.dummy.y)).toBeNull();
     const fire = { double: 0, min: 5, max: 10, cap: 12, radius: 3.5 };
-    hw.deployables.length = 0;
+    hw.sides[0].deployables.length = 0;
     for (let i = 0; i < 3; i++) mine(hw, hc.key, heavy.dummy.x, heavy.dummy.y + 1, { aura: fire });
-    const got = mineAuraAt(hw, heavy.dummy.x, heavy.dummy.y)!;
+    const got = mineAuraAt(hw.sides[0], heavy.dummy.x, heavy.dummy.y)!;
     expect(got.max).toBeCloseTo(12);
     expect(got.min).toBeCloseTo(6);
   });

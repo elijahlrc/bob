@@ -43,6 +43,7 @@ import {
 import { applyUtility } from './utility';
 import { castPattern } from './blasts';
 import type { Action, Actor, World } from './types';
+import type { Side } from './side';
 
 /** Begin an action (attack or cast). The previous action's overflow time carries over. */
 export function startAction(
@@ -96,7 +97,7 @@ export function startAction(
     a.revealT = 1.5;
   }
   w.events.push({ t: 'use', src: a.id, skill: p.skill.id });
-  if (a.isPlayer) skillUsed(w, a.side!, p.skill.id);
+  if (a.isPlayer) skillUsed(a.side!, p.skill.id);
   if (a.isPlayer && p.isAttack) fireTriggers(w, a.side!, { on: 'attack', target, tags: p.tagMask });
   // Using a skill can grant a buff of its own (Flicker Strike's burst of speed).
   if (a.isPlayer) {
@@ -135,7 +136,7 @@ export function fanAngle(base: number, i: number, n: number, step: number, tick:
 export function actorById(w: World, id: number): Actor | undefined {
   // Actors are stored in id order for monsters spawned at map start; summons append.
   for (const a of w.actors) if (a.id === id) return a;
-  for (const m of w.minions) if (m.id === id) return m;
+  for (const s of w.sides) for (const m of s.minions) if (m.id === id) return m;
   return undefined;
 }
 
@@ -314,7 +315,8 @@ export function enemiesOf(w: World, a: Actor): Actor[] {
   if (a.isPlayer) return w.actors.filter((o) => !o.isPlayer && o.alive);
   if (!w.player.alive) return [];
   // A monster's area attack catches the player's minions too.
-  return w.minions.length === 0 ? [w.player] : [w.player, ...w.minions.filter((m) => m.alive)];
+  const ms = w.player.side!.minions;
+  return ms.length === 0 ? [w.player] : [w.player, ...ms.filter((m) => m.alive)];
 }
 
 /** The damage type of a skill's biggest chunk (what an effect looks like). */
@@ -357,15 +359,15 @@ export function fallField(skill: { id: string; type: string }): { fall?: 'arrow'
 }
 
 /** Zones a skill left on the ground pulse, and end (rain, a cloud, a wall). */
-export function tickSkillZones(w: World, dt: number): void {
-  if (w.zones.length === 0) return;
+export function tickSkillZones(w: World, s: Side, dt: number): void {
+  if (s.zones.length === 0) return;
   let j = 0;
-  for (const z of w.zones) {
+  for (const z of s.zones) {
     const owner = actorById(w, z.owner);
     if (!owner || !owner.alive) continue;
     if (z.delayT > 0) {
       z.delayT -= dt;
-      w.zones[j++] = z;
+      s.zones[j++] = z;
       continue;
     }
     z.pulseT -= dt;
@@ -376,7 +378,7 @@ export function tickSkillZones(w: World, dt: number): void {
       if (z.spots) {
         // A rain with extra arrows bursts in several places (src/sim/rain.ts).
         pulseRain(w, owner, z, enemiesOf(w, owner));
-        if (z.pulsesLeft > 0) w.zones[j++] = z;
+        if (z.pulsesLeft > 0) s.zones[j++] = z;
         continue;
       }
       w.events.push({
@@ -401,9 +403,9 @@ export function tickSkillZones(w: World, dt: number): void {
         hit(w, owner, e, z.profile, z.hand, Math.hypot(e.x - owner.x, e.y - owner.y));
       }
     }
-    if (z.pulsesLeft > 0) w.zones[j++] = z;
+    if (z.pulsesLeft > 0) s.zones[j++] = z;
   }
-  w.zones.length = j;
+  s.zones.length = j;
 }
 
 /** Resolve an action's effect: strikes, chains or projectiles. Triggers call it with no wind-up. */
@@ -423,7 +425,7 @@ export function fire(w: World, a: Actor, act: Action): void {
     const b = act.profile.skill.behaviour;
     const atSelf = b.kind === 'burst' && b.origin === 'self';
     const q = scaleProfile(act.profile, 1 + aft.more / 100);
-    w.zones.push({
+    a.side!.zones.push({
       id: w.nextId++,
       owner: a.id,
       profile: q,
@@ -746,7 +748,7 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
     const radius = b.radius * p.radiusMult;
     // More arrows than the skill starts with: a rain of several bursts (rings or a stack, by the skill).
     const rain = line ? null : plantRain(w, p, act.aimX, act.aimY, radius);
-    w.zones.push({
+    a.side!.zones.push({
       id: w.nextId++,
       owner: a.id,
       profile: rain ? rain.profile : p,
@@ -796,7 +798,7 @@ function explode(
   }
   if (pr.kind === 'creep') leaveCreeping(w, owner, pr, x, y);
   if (pr.faction === 1)
-    for (const e of w.minions)
+    for (const e of w.player.side!.minions)
       if (e.alive && Math.hypot(e.x - x, e.y - y) <= pr.explodeRadius + e.r)
         hit(w, owner, e, pr.profile, pr.hand, Math.hypot(e.x - pr.startX, e.y - pr.startY));
 }
@@ -893,16 +895,16 @@ export function updateProjectiles(w: World, dt: number): void {
       }
       if (pr.back && owner && Math.hypot(owner.x - pr.x, owner.y - pr.y) < 0.8) {
         // A returning projectile that reaches its owner is caught, if the skill catches.
-        if (owner.isPlayer) catchProjectile(w, pr.profile, pr.hand);
+        if (owner.isPlayer) catchProjectile(owner.side!, pr.profile, pr.hand);
         endProjectile(w, pr, 1);
         alive = false;
         break;
       }
       // Monster projectiles stop at the player's minions as well.
       const na = w.actors.length;
-      const nm = pr.faction === 1 ? w.minions.length : 0;
+      const nm = pr.faction === 1 ? w.player.side!.minions.length : 0;
       for (let k = 0; k < na + nm; k++) {
-        const e = k < na ? w.actors[k] : w.minions[k - na];
+        const e = k < na ? w.actors[k] : w.player.side!.minions[k - na];
         if (!e.alive || e.faction === pr.faction || pr.hitIds.includes(e.id)) continue;
         // The payload of an Arrow Nova passes through everything on its way down.
         if (pr.kind === 'nova' || pr.kind === 'mortar' || pr.kind === 'orb') continue;

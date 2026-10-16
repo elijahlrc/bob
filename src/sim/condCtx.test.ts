@@ -166,8 +166,8 @@ describe('conditional mods are seen by the sim', () => {
       const { world: w } = worldWith(['cinderBond'], 5, 'wand_3', INT, mods);
       const c = w.char.actives.find((x) => x.skill.id === 'cinderBond')!;
       for (const s of [4, -4])
-        w.deployables.push({
-          id: ++w.deploySeq,
+        w.sides[0].deployables.push({
+          id: ++w.sides[0].deploySeq,
           kind: 'totem',
           key: c.key,
           x: w.player.x + s,
@@ -193,7 +193,7 @@ describe('conditional mods are seen by the sim', () => {
       const { world: w } = worldWith(['venomStrike', 'sourHerald'], 9, 'dagger_3', DEX, mods);
       w.player.tHit = hit ? 0 : 99;
       gainVirulence(w, w.sides[0]);
-      return w.minions.find((m) => m.kind === 'crawler')!.dmg;
+      return w.sides[0].minions.find((m) => m.kind === 'crawler')!.dmg;
     };
     expect(crawler(true)).toBeCloseTo(crawler(false) * 2, 5);
   });

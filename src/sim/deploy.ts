@@ -137,18 +137,18 @@ export function choiceByKey(w: World, key: string): SkillChoice | undefined {
 export const DEPLOY_NEAR = 12;
 
 /** How many of a skill's deployables stand (all of them, or only those near the character). */
-export function deployedCount(w: World, key: string, nearOnly = false): number {
+export function deployedCount(w: World, s: Side, key: string, nearOnly = false): number {
   const p = w.player;
   let n = 0;
-  for (const d of w.deployables)
+  for (const d of s.deployables)
     if (d.key === key && (!nearOnly || Math.hypot(d.x - p.x, d.y - p.y) <= DEPLOY_NEAR)) n++;
   return n;
 }
 
 /** Whether the skill has all it can have down already, near the character: the AI uses another skill meanwhile. */
-export function deployFull(w: World, c: SkillChoice, prof: SkillProfile): boolean {
+export function deployFull(w: World, s: Side, c: SkillChoice, prof: SkillProfile): boolean {
   if (!c.deploy) return false;
-  return deployedCount(w, c.key, true) >= deployCap(c, prof);
+  return deployedCount(w, s, c.key, true) >= deployCap(c, prof);
 }
 
 const enemies = (w: World): Actor[] =>
@@ -175,7 +175,7 @@ function totemSpot(
   const len = Math.hypot(dx, dy) || 1;
   const base = Math.atan2(dy, dx);
   const bond = c.skill.bond;
-  const mine = w.deployables.filter((d) => d.key === c.key);
+  const mine = a.side!.deployables.filter((d) => d.key === c.key);
   const foes = bond ? enemies(w) : [];
   let best = { x: a.x + (dx / len) * TOTEM_OFFSET, y: a.y + (dy / len) * TOTEM_OFFSET };
   let bestScore = -Infinity;
@@ -232,8 +232,8 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
       : undefined;
   const put = (x: number, y: number) => {
     const spot = w.grid.collide(x, y, 0.3);
-    const id = ++w.deploySeq;
-    w.deployables.push({
+    const id = ++a.side!.deploySeq;
+    a.side!.deployables.push({
       id,
       kind: c.deploy!,
       key: c.key,
@@ -247,10 +247,10 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
   };
   if (c.deploy === 'totem') {
     // Only as many as the skill allows stand: the one furthest from the character (the one left behind) gives way.
-    const mine = w.deployables.filter((d) => d.key === c.key);
+    const mine = a.side!.deployables.filter((d) => d.key === c.key);
     if (mine.length >= n) {
       mine.sort((u, v) => Math.hypot(v.x - a.x, v.y - a.y) - Math.hypot(u.x - a.x, u.y - a.y));
-      w.deployables.splice(w.deployables.indexOf(mine[0]), 1);
+      a.side!.deployables.splice(a.side!.deployables.indexOf(mine[0]), 1);
     }
     const spot = totemSpot(w, a, target, c);
     put(spot.x, spot.y);
@@ -259,10 +259,10 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
   const tx = target ? target.x : a.x;
   const ty = target ? target.y : a.y;
   if (c.deploy === 'brand') {
-    const mine = w.deployables.filter((d) => d.key === c.key);
+    const mine = a.side!.deployables.filter((d) => d.key === c.key);
     if (mine.length >= n) {
       mine.sort((u, v) => Math.hypot(v.x - a.x, v.y - a.y) - Math.hypot(u.x - a.x, u.y - a.y));
-      w.deployables.splice(w.deployables.indexOf(mine[0]), 1);
+      a.side!.deployables.splice(a.side!.deployables.indexOf(mine[0]), 1);
     }
     put(tx, ty);
     return;
@@ -290,7 +290,7 @@ function shoot(
   scale = 1,
   crowd?: Crowd,
 ): void {
-  let prof = w.char.profile(c, playerConds(w, target), flaskMask(w, s));
+  let prof = w.char.profile(c, playerConds(w, target), flaskMask(s));
   if (scale !== 1) prof = scaleProfile(prof, scale);
   const aim = areaAim(w, d, prof, target, crowd);
   const from: Actor = Object.create(w.player) as Actor;
@@ -355,10 +355,10 @@ function setOffMines(
   by: Actor,
   rearm = false,
 ): void {
-  const prof = w.char.profile(c, w.char.configConds, flaskMask(w, s));
+  const prof = w.char.profile(c, w.char.configConds, flaskMask(s));
   const det = c.skill.detonation ?? DETONATION;
   const chained = prof.mineChain > 0;
-  const set = w.deployables
+  const set = s.deployables
     .filter((d) => d.key === key && d.kind === 'mine' && d.fireT <= 0 && d.goAt === undefined)
     .sort((a, b) => Math.hypot(a.x - by.x, a.y - by.y) - Math.hypot(b.x - by.x, b.y - by.y));
   set.forEach((d, i) => {
@@ -371,8 +371,8 @@ function setOffMines(
 }
 
 /** A skitterbot that is free to set off a trap or a mine, with enemies about. */
-function freeBot(w: World): Minion | null {
-  for (const m of w.minions) if (m.alive && m.bot && (m.botCd ?? 0) <= 0) return m;
+function freeBot(s: Side): Minion | null {
+  for (const m of s.minions) if (m.alive && m.bot && (m.botCd ?? 0) <= 0) return m;
   return null;
 }
 
@@ -403,7 +403,7 @@ function detonate(
     nearestFoe(foes, d.aimX ?? d.x, d.aimY ?? d.y, MINE_SEEK);
   if (!target) return;
   sprung(w, d, target);
-  const prof = w.char.profile(c, playerConds(w, target), flaskMask(w, s));
+  const prof = w.char.profile(c, playerConds(w, target), flaskMask(s));
   const seq = d.seq ?? 0;
   shoot(w, s, d, c, target, 1 + (prof.mineChain * seq) / 100, crowd);
   // Projectiles rain down around it, a smaller burst each, more of them the further along in the sequence.
@@ -437,7 +437,7 @@ function detonate(
 
 /** What the mines near an enemy add to the hits against it: a chance to deal double damage, and some fire damage. */
 export function mineAuraAt(
-  w: World,
+  s: Side,
   x: number,
   y: number,
 ): { double: number; min: number; max: number; taken: number } | null {
@@ -447,7 +447,7 @@ export function mineAuraAt(
   let min = 0;
   let max = 0;
   let cap = 0;
-  for (const d of w.deployables) {
+  for (const d of s.deployables) {
     const a = d.aura;
     if (!a || d.kind !== 'mine' || Math.hypot(d.x - x, d.y - y) > a.radius) continue;
     double += a.double;
@@ -468,8 +468,8 @@ export function mineAuraAt(
 }
 
 /** The extra damage the aura of a mine adds to a hit that landed (fire, from Pyroclast). */
-export function mineAuraHit(w: World, dst: Actor): void {
-  const a = mineAuraAt(w, dst.x, dst.y);
+export function mineAuraHit(w: World, s: Side, dst: Actor): void {
+  const a = mineAuraAt(s, dst.x, dst.y);
   if (a && a.max > 0) rawHit(w, dst, a.min + w.rngCombat.float(0, 1) * (a.max - a.min), 3, 'Mine');
 }
 
@@ -505,10 +505,10 @@ export type BondLink = {
 };
 
 /** Every beam standing now (for the renderer): its two ends, its width and the skill that makes it. */
-export function bondLinks(w: World): BondLink[] {
-  if (w.deployables.length === 0) return [];
+export function bondLinks(w: World, s: Side): BondLink[] {
+  if (s.deployables.length === 0) return [];
   const byKey = new Map<string, Deployable[]>();
-  for (const d of w.deployables) {
+  for (const d of s.deployables) {
     if (d.kind !== 'totem') continue;
     const list = byKey.get(d.key) ?? [];
     list.push(d);
@@ -527,7 +527,7 @@ export function bondLinks(w: World): BondLink[] {
 /** The beams of Cinder Bond: from each of its totems to the character and to the other totems, burning what they cross. */
 function bondBeams(w: World, s: Side, bonds: Deployable[], c: SkillChoice, foes: Actor[]): void {
   const spec = c.skill.bond!;
-  const prof = w.char.profile(c, playerConds(w, null), flaskMask(w, s));
+  const prof = w.char.profile(c, playerConds(w, null), flaskMask(s));
   const segs = bondSegments(w, bonds, spec);
   for (const e of foes)
     for (const [d, x2, y2] of segs) {
@@ -545,15 +545,15 @@ function bondBeams(w: World, s: Side, bonds: Deployable[], c: SkillChoice, foes:
 
 /** Totems and brands shoot when an enemy is in reach; traps and mines go off; everything ends when its time is up. */
 export function tickDeployables(w: World, s: Side, dt: number): void {
-  if (w.deployables.length === 0) return;
+  if (s.deployables.length === 0) return;
   const foes = enemies(w);
   const p = w.player;
   const bonds = new Map<string, Deployable[]>();
   const crowd: Crowd = { many: new Set(), landed: [] };
   const seen = new Set<string>();
-  for (const d of w.deployables) (seen.has(d.key) ? crowd.many : seen).add(d.key);
+  for (const d of s.deployables) (seen.has(d.key) ? crowd.many : seen).add(d.key);
   let j = 0;
-  for (const d of w.deployables) {
+  for (const d of s.deployables) {
     d.t -= dt;
     d.fireT -= dt;
     const c = choiceByKey(w, d.key);
@@ -586,7 +586,7 @@ export function tickDeployables(w: World, s: Side, dt: number): void {
         else {
           // A skitterbot finds the mine and sets it off when enemies are about, then waits three seconds; the mines arm again.
           const far = nearestFoe(foes, d.x, d.y, MINE_SEEK - 2);
-          const bot = far ? freeBot(w) : null;
+          const bot = far ? freeBot(s) : null;
           if (far && bot) {
             bot.botCd = 3;
             setOffMines(w, s, d.key, c, far, true);
@@ -598,7 +598,7 @@ export function tickDeployables(w: World, s: Side, dt: number): void {
         if (d.active === false) {
           d.fireT = 0.1;
         } else {
-          const prof = w.char.profile(c, w.char.configConds, flaskMask(w, s));
+          const prof = w.char.profile(c, w.char.configConds, flaskMask(s));
           const reach = skillRange(prof);
           let best: Actor | null = null;
           let bd = Infinity;
@@ -624,7 +624,7 @@ export function tickDeployables(w: World, s: Side, dt: number): void {
         } else {
           // A skitterbot sets off a trap with enemies about.
           const far = nearestFoe(foes, d.x, d.y, TRAP_RADIUS * 4);
-          const bot = far ? freeBot(w) : null;
+          const bot = far ? freeBot(s) : null;
           if (far && bot) {
             bot.botCd = 3;
             sprung(w, d, far);
@@ -634,10 +634,10 @@ export function tickDeployables(w: World, s: Side, dt: number): void {
         }
       }
     }
-    if (keep) w.deployables[j++] = d;
+    if (keep) s.deployables[j++] = d;
     else w.events.push({ t: 'deploy', id: d.id, kind: d.kind, x: d.x, y: d.y, end: true });
   }
-  w.deployables.length = j;
+  s.deployables.length = j;
   // Beams are cast four times a second.
   if (bonds.size > 0 && Math.floor(w.t * 4) !== Math.floor((w.t - dt) * 4))
     for (const [key, list] of bonds) {

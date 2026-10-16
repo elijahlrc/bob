@@ -105,7 +105,8 @@ for (const cls of classes) {
     );
   }
 }
-const total = ((performance.now() - t0) / 1000).toFixed(1);
+const cpuUsed = process.cpuUsage();
+const total = `${((performance.now() - t0) / 1000).toFixed(1)}s wall, ${((cpuUsed.user + cpuUsed.system) / 1e6).toFixed(1)}s cpu`;
 if (argv.includes('--events')) {
   const kinds = Object.entries(seen).sort((a, b) => b[1] - a[1]);
   console.log(
@@ -117,8 +118,8 @@ if (write) {
     Object.entries(stored.runs).sort(([a], [b]) => (a < b ? -1 : 1)),
   );
   writeFileSync(FILE, JSON.stringify({ runs: sorted }, null, 2) + '\n');
-  console.log(`recorded ${played} runs to scripts/hash-fence.json (${total}s)`);
+  console.log(`recorded ${played} runs to scripts/hash-fence.json (${total})`);
 } else if (bad.length) {
-  console.error(`\nFENCE BROKEN (${total}s):\n  ${bad.join('\n  ')}`);
+  console.error(`\nFENCE BROKEN (${total}):\n  ${bad.join('\n  ')}`);
   process.exit(1);
-} else console.log(`fence holds: ${played} runs identical (${total}s)`);
+} else console.log(`fence holds: ${played} runs identical (${total})`);

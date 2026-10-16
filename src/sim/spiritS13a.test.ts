@@ -291,7 +291,7 @@ describe('waves (ruptureLine, cleansingBlaze)', () => {
     run(w, 1.5);
     expect(dummy.life).toBeLessThan(1e9);
     expect(off.life).toBeLessThan(1e9);
-    expect(w.fields.some((f) => f.kind === 'consecrated')).toBe(true);
+    expect(w.sides[0].fields.some((f) => f.kind === 'consecrated')).toBe(true);
   });
 });
 
@@ -558,12 +558,12 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     frostBite(w, dummy);
     expect(dummy.ail.chill).toBeGreaterThan(0);
     w.player.stunT = 0;
-    w.fields.length = 0;
+    w.sides[0].fields.length = 0;
     for (let i = 0; i < 90; i++) {
       w.player.moving = true;
       tickSkillFx(w, w.sides[0], 1 / 60);
     }
-    expect(w.fields.filter((f) => f.kind === 'chilling').length).toBeGreaterThanOrEqual(2);
+    expect(w.sides[0].fields.filter((f) => f.kind === 'chilling').length).toBeGreaterThanOrEqual(2);
   });
 
   it('Herald of Agony: poisons build Virulence and call a crawler that cannot be hurt, and with no Virulence it is gone', () => {
@@ -574,13 +574,13 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
       v = Math.max(v, w.virulence);
     }
     expect(v).toBeGreaterThan(2);
-    const crawler = w.minions.find((m) => m.kind === 'crawler');
+    const crawler = w.sides[0].minions.find((m) => m.kind === 'crawler');
     expect(crawler?.alive).toBe(true);
     w.player.stunT = 100;
     w.virulence = 5;
     run(w, 12);
     expect(w.virulence).toBe(0);
-    expect(w.minions.some((m) => m.kind === 'crawler' && m.alive)).toBe(false);
+    expect(w.sides[0].minions.some((m) => m.kind === 'crawler' && m.alive)).toBe(false);
   });
 
   it('Siphoning Trap: beams on up to ten enemies drain life and mana to the character, more for each', () => {
@@ -619,14 +619,14 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     let bots = 0;
     for (let i = 0; i < 60 * 14; i++) {
       stepWorld(w);
-      bots = Math.max(bots, w.minions.filter((m) => m.bot).length);
+      bots = Math.max(bots, w.sides[0].minions.filter((m) => m.bot).length);
     }
     expect(bots).toBe(2);
-    const kinds = new Set(w.minions.map((m) => m.bot?.kind));
+    const kinds = new Set(w.sides[0].minions.map((m) => m.bot?.kind));
     expect(kinds.has('chill')).toBe(true);
     expect(kinds.has('shock')).toBe(true);
     // Beside them, an enemy is chilled and shocked.
-    const bot = w.minions.find((m) => m.bot)!;
+    const bot = w.sides[0].minions.find((m) => m.bot)!;
     const foe = neighbour(w, bot.x + 0.5, bot.y);
     tickSkillFx(w, w.sides[0], 1 / 60);
     expect(foe.ail.chill + foe.ail.shock).toBeGreaterThan(0);
@@ -638,12 +638,12 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     const start = { x: w.player.x, y: w.player.y };
     w.sides[0].opts.godMode = true;
     w.player.life = w.player.def.maxLife * 0.4;
-    for (let i = 0; i < 60 && w.fields.length === 0; i++) stepWorld(w);
+    for (let i = 0; i < 60 && w.sides[0].fields.length === 0; i++) stepWorld(w);
     expect(Math.hypot(w.player.x - start.x, w.player.y - start.y)).toBeGreaterThan(2.5);
-    expect(w.fields.filter((f) => f.kind === 'smoke')).toHaveLength(2);
+    expect(w.sides[0].fields.filter((f) => f.kind === 'smoke')).toHaveLength(2);
     expect(w.sides[0].buffT.smokeScreen).toBeGreaterThan(0);
     // Enemies in the smoke are blinded.
-    const smoke = w.fields.find((f) => f.kind === 'smoke')!;
+    const smoke = w.sides[0].fields.find((f) => f.kind === 'smoke')!;
     dummy.x = smoke.x;
     dummy.y = smoke.y;
     run(w, 1);
@@ -656,7 +656,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     let decoy;
     for (let i = 0; i < 60 * 3 && !decoy; i++) {
       stepWorld(w);
-      decoy = w.minions.find((m) => m.kind === 'decoy' && m.alive);
+      decoy = w.sides[0].minions.find((m) => m.kind === 'decoy' && m.alive);
     }
     expect(decoy).toBeDefined();
     expect(targetOf(w, dummy)).toBe(decoy);
@@ -665,7 +665,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     // It ends.
     w.player.stunT = 100;
     run(w, 9);
-    expect(w.minions.some((m) => m.kind === 'decoy' && m.alive)).toBe(false);
+    expect(w.sides[0].minions.some((m) => m.kind === 'decoy' && m.alive)).toBe(false);
   });
 
   it('Molten Shell: most of the damage goes into a pool, and when the shell ends what it took goes out as fire', () => {
@@ -790,7 +790,7 @@ describe('repairs from the fresh audit (S14)', () => {
     let more = 0;
     for (let i = 0; i < 60 * 12 && more === 0; i++) {
       stepWorld(w);
-      more = mineAuraAt(w, dummy.x, dummy.y)?.taken ?? 0;
+      more = mineAuraAt(w.sides[0], dummy.x, dummy.y)?.taken ?? 0;
     }
     expect(more).toBeGreaterThan(0);
   });
@@ -816,10 +816,10 @@ describe('repairs from the fresh audit (S14)', () => {
     expect(surge).toBeGreaterThan(0);
     const z = world(['crushingBlow', 'raiseHusk'], 3, 'sword_3', STR);
     run(z.world, 3);
-    expect(z.world.minions.length).toBe(0);
+    expect(z.world.sides[0].minions.length).toBe(0);
     layCorpses(z.world, z.world.player.x, z.world.player.y, 2);
     run(z.world, 3);
-    expect(z.world.minions.length).toBeGreaterThan(0);
+    expect(z.world.sides[0].minions.length).toBeGreaterThan(0);
     expect(z.world.corpses.length).toBeLessThan(2);
   });
 
@@ -829,7 +829,7 @@ describe('repairs from the fresh audit (S14)', () => {
     w.sides[0].opts.freeResources = false;
     const near = neighbour(w, dummy.x + 0.5, dummy.y + 0.5);
     run(w, 6);
-    expect(w.minions.some((m) => m.kind === 'relic')).toBe(true);
+    expect(w.sides[0].minions.some((m) => m.kind === 'relic')).toBe(true);
     expect(near.life).toBeLessThan(1e9);
     expect(w.relicRegen.me).toBeGreaterThan(0);
   });
@@ -873,7 +873,7 @@ describe('Mirror Arrow and Blink Arrow clones', () => {
     let clone;
     for (let i = 0; i < 60 * 4 && !clone; i++) {
       stepWorld(w);
-      clone = w.minions.find((m) => m.kind === 'clone' && m.alive);
+      clone = w.sides[0].minions.find((m) => m.kind === 'clone' && m.alive);
     }
     expect(clone).toBeDefined();
     expect(clone!.fixedRate).toBeCloseTo(w.char.hands[0].aps, 5);
@@ -888,8 +888,9 @@ describe('Bladefall, Creeping Frost and Melee Physical Damage', () => {
     const seen: { r: number; hitMult: number }[] = [];
     for (let i = 0; i < 60 * 3; i++) {
       stepWorld(w);
-      if (seen.length === 0 && w.zones.length >= 6)
-        for (const z of w.zones) seen.push({ r: z.radius, hitMult: z.profile.hands[0].hitMult });
+      if (seen.length === 0 && w.sides[0].zones.length >= 6)
+        for (const z of w.sides[0].zones)
+          seen.push({ r: z.radius, hitMult: z.profile.hands[0].hitMult });
     }
     expect(seen).toHaveLength(6);
     for (let k = 1; k < 6; k++) {
@@ -906,13 +907,13 @@ describe('Bladefall, Creeping Frost and Melee Physical Damage', () => {
     let moved = 0;
     for (let i = 0; i < 60 * 8; i++) {
       stepWorld(w);
-      const f = w.fields.find((x) => x.kind === 'chilling' && x.creep);
+      const f = w.sides[0].fields.find((x) => x.kind === 'chilling' && x.creep);
       if (f && !patch) {
         patch = f;
         start = Math.hypot(f.x - dummy.x, f.y - dummy.y);
       }
       if (f && patch) moved = Math.max(moved, start - Math.hypot(f.x - dummy.x, f.y - dummy.y));
-      expect(w.fields.filter((x) => x.creep).length).toBeLessThanOrEqual(10);
+      expect(w.sides[0].fields.filter((x) => x.creep).length).toBeLessThanOrEqual(10);
     }
     expect(patch).toBeDefined();
     expect(dummy.life).toBeLessThan(1e9);

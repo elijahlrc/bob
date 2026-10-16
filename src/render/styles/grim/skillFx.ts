@@ -323,7 +323,7 @@ export class SkillFx {
         break;
       }
       case 'summon': {
-        const m = w.minions.find((x) => x.id === e.id);
+        const m = w.sides[0].minions.find((x) => x.id === e.id);
         if (m) {
           this.rune(m.x, m.y, 0.9, UTILITY_COLOR.summon, 0.6);
           const p = this.lifted(m.x, m.y, 4);
@@ -362,7 +362,7 @@ export class SkillFx {
 
   /** The colour of the element a deployable's skill deals. */
   private glowOf(w: World, id: number): number {
-    const d = w.deployables.find((x) => x.id === id);
+    const d = w.sides[0].deployables.find((x) => x.id === id);
     const choice = d ? choiceByKey(w, d.key) : undefined;
     return ELEMENT_COLOR[choice ? elementOfTags(choice.skill.tags, choice.skill.spellDamage) : 0];
   }
@@ -762,7 +762,7 @@ export class SkillFx {
 
   /** Zones the player's skills left on the ground: a telegraph before the first pulse, then a patch in the element's colour. */
   private zones(g: Gfx, w: World, time: number): void {
-    for (const z of w.zones) {
+    for (const z of w.sides[0].zones) {
       const c = ELEMENT_COLOR[z.dtype] ?? 0xffffff;
       const owner = this.host.actorById(z.owner);
       const hostile = !!owner && !owner.isPlayer;
@@ -895,7 +895,7 @@ export class SkillFx {
 
   /** The beams between a skill's totems and the character (Cinder Bond): a glowing band on the ground, flickering. */
   private bonds(g: Gfx, w: World, time: number): void {
-    for (const l of bondLinks(w)) {
+    for (const l of bondLinks(w, w.sides[0])) {
       const choice = choiceByKey(w, l.key);
       const element = choice ? elementOfTags(choice.skill.tags, choice.skill.spellDamage) : 0;
       const glow = ELEMENT_COLOR[element];
@@ -918,7 +918,7 @@ export class SkillFx {
 
   /** Totems, brands, traps and mines: the shape says which, the glow says the element. */
   private deployables(g: Gfx, w: World, time: number): void {
-    for (const d of w.deployables) {
+    for (const d of w.sides[0].deployables) {
       // Still in the air: drawn by `flying` until it lands.
       if (this.flights.has(d.id)) continue;
       const { x, y } = this.host.project(d.x, d.y);
@@ -1066,7 +1066,7 @@ export class SkillFx {
    * geyser, smoke, a storm), drawn from its state each frame. Each says what it is by its shape; the colour is the element.
    */
   private fieldMarks(ground: Gfx, air: Gfx, w: World, time: number): void {
-    for (const f of w.fields) {
+    for (const f of w.sides[0].fields) {
       const fade = Math.min(1, Math.max(0, f.t) / 0.6);
       const born = Math.min(1, (f.total - f.t) * 4);
       const el = ELEMENT_COLOR[f.dtype] ?? 0xffffff;
@@ -1330,7 +1330,7 @@ export class SkillFx {
 
   /** Minions: a teal ring at their feet, their body, and what is left of their life. */
   private minions(g: Gfx, w: World, time: number): void {
-    for (const m of w.minions) {
+    for (const m of w.sides[0].minions) {
       if (!m.alive) continue;
       const { x, y } = this.host.project(m.x, m.y);
       const col = MINIONS[m.kind].color;

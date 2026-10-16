@@ -102,9 +102,9 @@ function run(id: string, seconds = 8): Row {
       t.pts.push([p.x, p.y]);
       t.speed = Math.max(t.speed, Math.hypot(p.vx, p.vy));
     }
-    for (const z of w.zones)
+    for (const z of w.sides[0].zones)
       if (!zoneSeen.has(z.id)) zoneSeen.set(z.id, { radius: z.radius, strip: z.x2 !== undefined });
-    row.deployables = Math.max(row.deployables, w.deployables.length);
+    row.deployables = Math.max(row.deployables, w.sides[0].deployables.length);
   }
   row.explodes = [...ex.values()].sort((a, b) => b.n - a.n).slice(0, 4);
   row.projectiles = tracks.size;

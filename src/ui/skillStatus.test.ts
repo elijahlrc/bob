@@ -126,11 +126,11 @@ describe('skill bar slots', () => {
     expect(slotOf().role).toBe('Utility');
     expect(want).toMatch(/^0\/\d+$/);
     const keep = Number(want.split('/')[1]);
-    summonMinions(w, c, w.char.profile(c, 0, 0));
+    summonMinions(w, w.sides[0], c, w.char.profile(c, 0, 0));
     expect(slotOf().badge).toBe(`${keep}/${keep}`);
     expect(slotOf().state).toBe('active');
     // One falls: the skill wants to cast again.
-    const m = w.minions.find((x) => x.key === c.key)!;
+    const m = w.sides[0].minions.find((x) => x.key === c.key)!;
     m.alive = false;
     expect(slotOf().badge).toBe(`${keep - 1}/${keep}`);
     expect(slotOf().state).toBe('ready');
@@ -160,11 +160,11 @@ describe('skill bar slots', () => {
     const t = arena(['flameBolt', 'standingCast']);
     expect(t.char.primary.deploy).toBe('totem');
     expect(skillSlots(t)[0].badge).toMatch(/^0\/\d+$/);
-    run(t, 6, () => t.deployables.length > 0);
-    expect(t.deployables.length).toBeGreaterThan(0);
+    run(t, 6, () => t.sides[0].deployables.length > 0);
+    expect(t.sides[0].deployables.length).toBeGreaterThan(0);
     run(t, 1);
     const [cur, cap] = skillSlots(t)[0].badge!.split('/').map(Number);
-    expect(cur).toBe(t.deployables.filter((d) => d.key === t.char.primary.key).length);
+    expect(cur).toBe(t.sides[0].deployables.filter((d) => d.key === t.char.primary.key).length);
     expect(cap).toBeGreaterThanOrEqual(cur);
     if (cur >= cap) {
       const s = skillSlots(t)[0];
@@ -175,10 +175,10 @@ describe('skill bar slots', () => {
 
     const r = arena(['frostTrap']);
     expect(r.char.primary.deploy).toBe('trap');
-    run(r, 10, () => r.deployables.length > 0);
-    expect(r.deployables.length).toBeGreaterThan(0);
+    run(r, 10, () => r.sides[0].deployables.length > 0);
+    expect(r.sides[0].deployables.length).toBeGreaterThan(0);
     const trap = skillSlots(r)[0];
-    expect(trap.badge).toBe(`${r.deployables.length}/${trap.badge!.split('/')[1]}`);
+    expect(trap.badge).toBe(`${r.sides[0].deployables.length}/${trap.badge!.split('/')[1]}`);
   });
 
   it('shows an aura as always on', () => {

@@ -94,7 +94,7 @@ describe('Bladestorm (whirlwindCleave)', () => {
     let buff = false;
     for (let i = 0; i < 5 * 60; i++) {
       stepWorld(w);
-      if (w.fields.some((f) => f.kind === 'bladestorm')) storm = true;
+      if (w.sides[0].fields.some((f) => f.kind === 'bladestorm')) storm = true;
       if (w.sides[0].buffT.bladestormBlood > 0) buff = true;
     }
     expect(storm).toBe(true);
@@ -103,7 +103,7 @@ describe('Bladestorm (whirlwindCleave)', () => {
     // It ends by itself.
     w.player.stunT = 1e9;
     run(w, 4);
-    expect(w.fields.some((f) => f.kind === 'bladestorm')).toBe(false);
+    expect(w.sides[0].fields.some((f) => f.kind === 'bladestorm')).toBe(false);
   });
 
   it('in the Sand stance the storm drifts and quickens the character instead', () => {
@@ -115,7 +115,7 @@ describe('Bladestorm (whirlwindCleave)', () => {
     let sandBuff = false;
     for (let i = 0; i < 2 * 60; i++) {
       stepWorld(w);
-      const f = w.fields.find((x) => x.kind === 'bladestorm');
+      const f = w.sides[0].fields.find((x) => x.kind === 'bladestorm');
       if (f) {
         first ??= { x: f.x, y: f.y };
         moved = Math.hypot(f.x - first.x, f.y - first.y);
@@ -131,7 +131,7 @@ describe('Bladestorm (whirlwindCleave)', () => {
     let most = 0;
     for (let i = 0; i < 6 * 60; i++) {
       stepWorld(w);
-      most = Math.max(most, w.fields.filter((f) => f.kind === 'bladestorm').length);
+      most = Math.max(most, w.sides[0].fields.filter((f) => f.kind === 'bladestorm').length);
     }
     expect(most).toBeLessThanOrEqual(3);
     expect(most).toBeGreaterThanOrEqual(2);

@@ -194,7 +194,7 @@ function mirageShoots(w: World, s: Side, m: Mirage): void {
 export function afterPlayerHit(w: World, s: Side, dst: Actor, p: SkillProfile): void {
   // A skill whose hit gives the character a buff (Smite).
   if (p.skill.hitBuff && !p.skill.tags.includes('triggered')) gainBuff(w, s, p.skill.hitBuff.buff);
-  if (p.isAttack && !p.skill.tags.includes('triggered')) relicNova(w);
+  if (p.isAttack && !p.skill.tags.includes('triggered')) relicNova(w, s);
   if (!w.inFx) {
     if (p.skill.beams) gainBeamStack(w, p);
     if (p.skill.charge) chargeEnemy(w, s, dst, p);

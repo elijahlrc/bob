@@ -585,7 +585,7 @@ function ride(w: World, m: Actor, tx: number, ty: number, speed: number, dt: num
 
 /** A minion stands in the Courser's way: a minion build's answer to a gallop. */
 function minionAhead(w: World, m: Actor): boolean {
-  for (const n of w.minions)
+  for (const n of w.player.side!.minions)
     if (n.alive && Math.hypot(n.x - m.x, n.y - m.y) <= n.r + m.r + 0.1) return true;
   return false;
 }

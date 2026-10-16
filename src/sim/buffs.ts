@@ -70,7 +70,7 @@ export function rollGains(w: World, s: Side, event: BuffEvent, extra: readonly M
     const amount = flat + (pct / 100) * max;
     if (pool === 'life') p.life = Math.min(lifeCap(w, p), p.life + amount);
     else if (pool === 'mana')
-      p.mana = Math.min(Math.max(0, p.def.maxMana - reservedMana(w)), p.mana + amount);
+      p.mana = Math.min(Math.max(0, p.def.maxMana - reservedMana(w, s)), p.mana + amount);
     else p.es = Math.min(p.def.maxEs, p.es + amount);
   }
   // Being hit holds the rage you have, as gaining it does.

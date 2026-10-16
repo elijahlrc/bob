@@ -67,11 +67,11 @@ describe('Raise Spectre (bindShade)', () => {
     const { world: w, dummy } = world(['crushingBlow', 'bindShade'], 3, 'sword_3', INT);
     dummy.rarity = 'boss';
     run(w, 3);
-    expect(w.minions.length).toBe(0);
+    expect(w.sides[0].minions.length).toBe(0);
     corpseAt(w, w.player.x - 1, w.player.y);
     run(w, 3);
-    expect(w.minions.length).toBe(1);
-    const s = w.minions[0];
+    expect(w.sides[0].minions.length).toBe(1);
+    const s = w.sides[0].minions[0];
     expect(s.mtype).toBe('warrior');
     // At the gem's level, not the corpse's (10).
     expect(s.level).toBeGreaterThan(10);
@@ -84,7 +84,7 @@ describe('Raise Spectre (bindShade)', () => {
     corpseAt(w, w.player.x - 1, w.player.y);
     corpseAt(w, w.player.x - 1.5, w.player.y);
     run(w, 6);
-    expect(w.minions.length).toBe(1);
+    expect(w.sides[0].minions.length).toBe(1);
   });
 
   it('a spectre strikes as the monster did', () => {
@@ -156,7 +156,7 @@ describe('Pyre Burst (pyreBurst)', () => {
     let hits = 0;
     for (let i = 0; i < 6 * 60; i++) {
       stepWorld(w);
-      if (w.fields.some((f) => f.kind === 'geyser')) geyser = true;
+      if (w.sides[0].fields.some((f) => f.kind === 'geyser')) geyser = true;
       for (const e of w.events) {
         if (e.t === 'explode') bursts++;
         if (e.t === 'hit' && e.dst === dummy.id) hits++;
@@ -175,7 +175,7 @@ describe('Pyre Burst (pyreBurst)', () => {
     for (let i = 0; i < 20 * 60; i++) {
       if (i % 120 === 0) corpseAt(w, w.player.x + 3.5, w.player.y);
       stepWorld(w);
-      most = Math.max(most, w.fields.filter((f) => f.kind === 'geyser').length);
+      most = Math.max(most, w.sides[0].fields.filter((f) => f.kind === 'geyser').length);
     }
     expect(most).toBeLessThanOrEqual(3);
     expect(most).toBeGreaterThanOrEqual(1);

@@ -264,7 +264,7 @@ function detonate(w: World, s: Side, e: Actor): void {
   delete w.charged[e.id];
   const c = w.char.actives.find((x) => x.skill.id === st.key);
   if (!c || !c.usable) return;
-  const prof = w.char.profile(c, playerConds(w, e), flaskMask(w, s));
+  const prof = w.char.profile(c, playerConds(w, e), flaskMask(s));
   const spec = prof.skill.charge!;
   const q = scaleProfile(prof, (st.n * spec.perCharge) / 100);
   const r = spec.radius * prof.radiusMult;
@@ -312,13 +312,13 @@ function tickCharged(w: World, s: Side, dt: number): void {
 
 /** Every step: the buffs and debuffs the single skills keep. */
 export function tickSkillFx(w: World, s: Side, dt: number): void {
-  if (w.relicRegen.t > 0) tickRelicRegen(w, dt);
+  if (w.relicRegen.t > 0) tickRelicRegen(w, s, dt);
   if (w.shell) tickShell(w, s);
   if (w.staticFx) tickBeams(w, dt);
-  if (w.char.frostSpec) tickFrostTrail(w, dt);
-  if (w.virulence > 0) tickAgony(w, dt);
+  if (w.char.frostSpec) tickFrostTrail(w, s, dt);
+  if (w.virulence > 0) tickAgony(w, s, dt);
   tickSiphon(w, dt);
-  if (w.minions.length > 0) tickBots(w, dt);
+  if (s.minions.length > 0) tickBots(w, s, dt);
   if (w.vortex) tickVortex(w, dt);
   if (w.markers.length > 0) tickMarkers(w, dt);
   if (w.stormOrb) tickOrb(w, dt);
@@ -532,7 +532,7 @@ export function bounceOrbs(w: World, a: Actor, act: Action): void {
       act.aimY + Math.sin(ang) * spec.spacing * i,
       0.3,
     );
-    w.zones.push({
+    a.side!.zones.push({
       id: w.nextId++,
       owner: a.id,
       profile: p,
@@ -665,7 +665,7 @@ function tickSpores(w: World, dt: number): void {
 
 // ---- Rimeplate: the trail of chilled ground the character leaves while it moves
 
-function tickFrostTrail(w: World, dt: number): void {
+function tickFrostTrail(w: World, s: Side, dt: number): void {
   const fr = w.char.frostSpec;
   const p = w.player;
   if (!fr || !p.alive || !p.moving) return;
@@ -674,7 +674,7 @@ function tickFrostTrail(w: World, dt: number): void {
   w.trailT = 0.4;
   const prof = w.char.profile(w.primary, 0);
   const q = { ...prof, chill: { ...prof.chill, effect: fr.slow / 100 } };
-  w.fields.push({
+  s.fields.push({
     id: w.nextId++,
     owner: p.id,
     kind: 'chilling',
@@ -709,17 +709,17 @@ export function gainVirulence(w: World, s: Side): void {
   const ag = w.char.agonySpec;
   if (!ag || !w.player.alive) return;
   w.virulence = Math.min(ag.max, w.virulence + 1);
-  if (w.minions.some((m) => m.kind === 'crawler' && m.alive)) return;
+  if (s.minions.some((m) => m.kind === 'crawler' && m.alive)) return;
   const c = w.char.primary;
-  const prof = w.char.profile(c, playerConds(w, null), flaskMask(w, s));
-  const m = makeMinion(w, c, prof, 'crawler', w.player.x, w.player.y, {
+  const prof = w.char.profile(c, playerConds(w, null), flaskMask(s));
+  const m = makeMinion(w, s, c, prof, 'crawler', w.player.x, w.player.y, {
     blowLevel: ag.level,
     seconds: undefined,
   });
   m.key = 'agony';
 }
 
-function tickAgony(w: World, dt: number): void {
+function tickAgony(w: World, s: Side, dt: number): void {
   const ag = w.char.agonySpec;
   if (w.virulence <= 0) return;
   if (!ag) {
@@ -729,7 +729,7 @@ function tickAgony(w: World, dt: number): void {
     w.virulence = Math.max(0, w.virulence - (0.4 + 0.12 * w.virulence) * dt);
   }
   const n = Math.ceil(w.virulence);
-  for (const m of w.minions)
+  for (const m of s.minions)
     if (m.kind === 'crawler' && m.alive) {
       if (n <= 0) {
         // With no Virulence left, it is gone.
@@ -766,8 +766,8 @@ function tickSiphon(w: World, dt: number): void {
 
 // ---- Skitterbots: their auras chill and shock the enemies near them
 
-function tickBots(w: World, dt: number): void {
-  for (const m of w.minions) {
+function tickBots(w: World, s: Side, dt: number): void {
+  for (const m of s.minions) {
     if (!m.alive || !m.bot) continue;
     if ((m.botCd ?? 0) > 0) m.botCd = m.botCd! - dt;
     const sk = m.bot;
@@ -845,8 +845,8 @@ function tickShell(w: World, side: Side): void {
 // ---- Holy Relic: a nova when the character hits with an attack, and regeneration for those it helps
 
 /** The character hit with an attack: a relic that stands sets off its nova (not more than once in its cooldown). */
-export function relicNova(w: World): void {
-  const relic = w.minions.find((m) => m.kind === 'relic' && m.alive);
+export function relicNova(w: World, s: Side): void {
+  const relic = s.minions.find((m) => m.kind === 'relic' && m.alive);
   if (!relic) return;
   const c = w.char.utilities.find((x) => x.key === relic.key);
   const u = c?.skill.utility;
@@ -874,13 +874,13 @@ export function relicNova(w: World): void {
   };
 }
 
-function tickRelicRegen(w: World, dt: number): void {
+function tickRelicRegen(w: World, s: Side, dt: number): void {
   const g = w.relicRegen;
   g.t -= dt;
   const p = w.player;
   if (p.alive)
     p.life = Math.min(Math.max(1, p.def.maxLife - w.char.reservedLife), p.life + g.me * dt);
-  for (const m of w.minions) if (m.alive) m.life = Math.min(m.def.maxLife, m.life + g.minions * dt);
+  for (const m of s.minions) if (m.alive) m.life = Math.min(m.def.maxLife, m.life + g.minions * dt);
 }
 
 // ---- Ice Nova: cast on the character's Frostbolt projectiles
@@ -917,12 +917,13 @@ export function novaOnBolts(w: World, a: Actor, act: Action): boolean {
 // ---- Mirror Arrow: a clone where the arrow ends
 
 /** The arrow has ended: the character's clone stands there for a few seconds and fires with the character's bow. */
-export function mirrorLanded(w: World, pr: Projectile): void {
+export function mirrorLanded(w: World, s: Side, pr: Projectile): void {
   const spec = pr.profile.skill.mirror;
   const c = w.char.actives.find((x) => x.skill.id === pr.profile.skill.id);
   if (!spec || !c) return;
   const m = summonAt(
     w,
+    s,
     c,
     pr.profile,
     'clone',
@@ -959,7 +960,7 @@ export function fireVolleys(w: World, a: Actor, act: Action): void {
       })),
     };
     const spot = w.grid.collide(cx, cy, 0.3);
-    w.zones.push({
+    a.side!.zones.push({
       id: w.nextId++,
       owner: a.id,
       profile: q,
@@ -990,14 +991,16 @@ export function leaveCreeping(
 ): void {
   const spec = pr.profile.skill.leaves;
   if (!spec || !owner || spec.creep === undefined) return;
-  const mine = w.fields.filter((f) => f.kind === 'chilling' && f.skill === pr.profile.skill.id);
+  const mine = owner.side!.fields.filter(
+    (f) => f.kind === 'chilling' && f.skill === pr.profile.skill.id,
+  );
   if (spec.max && mine.length >= spec.max) {
     const oldest = mine.reduce((m, f) => (f.t < m.t ? f : m));
-    w.fields.splice(w.fields.indexOf(oldest), 1);
+    owner.side!.fields.splice(owner.side!.fields.indexOf(oldest), 1);
   }
   const r = spec.radius * pr.profile.radiusMult;
   const t = spec.seconds * pr.profile.skillDuration;
-  w.fields.push({
+  owner.side!.fields.push({
     id: w.nextId++,
     owner: owner.id,
     kind: 'chilling',

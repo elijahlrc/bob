@@ -103,7 +103,7 @@ export function leaveGround(w: World, a: Actor, act: Action): void {
   const x = atSelf ? a.x : act.aimX;
   const y = atSelf ? a.y : act.aimY;
   const r = spec.radius * p.radiusMult;
-  w.fields.push({
+  a.side!.fields.push({
     id: w.nextId++,
     owner: a.id,
     kind: spec.kind,
@@ -141,7 +141,7 @@ export function placePods(w: World, a: Actor, act: Action): void {
     const d = spread * Math.sqrt(w.rngTrig.float(0, 1));
     const spot = w.grid.collide(act.aimX + Math.cos(ang) * d, act.aimY + Math.sin(ang) * d, 0.3);
     const r = spec.radius * p.radiusMult;
-    w.fields.push({
+    a.side!.fields.push({
       id: w.nextId++,
       owner: a.id,
       kind: 'pod',
@@ -176,7 +176,7 @@ export function placeCrystal(w: World, a: Actor, act: Action): void {
   const p = act.profile;
   const spec = p.skill.crystal!;
   const r = spec.radius * p.radiusMult;
-  w.fields.push({
+  a.side!.fields.push({
     id: w.nextId++,
     owner: a.id,
     kind: 'crystal',
@@ -199,6 +199,7 @@ export function placeCrystal(w: World, a: Actor, act: Action): void {
 /** A storm of bolts that follows the character (Herald of Thunder after a kill). */
 export function startStorm(
   w: World,
+  s: Side,
   seconds: number,
   interval: number,
   radius: number,
@@ -206,7 +207,7 @@ export function startStorm(
   dtype: number,
 ): void {
   const level = Math.max(1, Math.min(20, 1 + Math.floor(w.plan.areaLevel / 5)));
-  w.fields.push({
+  s.fields.push({
     id: w.nextId++,
     owner: w.player.id,
     kind: 'storm',
@@ -234,7 +235,7 @@ export function orbUse(w: World, a: Actor, act: Action, stage: number): void {
   const dur = w.char.db.mult('skillDuration');
   if (spec.kind === 'frost') {
     const total = spec.seconds * dur * (1 + (spec.secondsPerStage * stage) / 100);
-    const have = w.fields.find((f) => f.kind === 'orb' && f.skill === p.skill.id);
+    const have = a.side!.fields.find((f) => f.kind === 'orb' && f.skill === p.skill.id);
     if (have) {
       have.stages = stage;
       have.t = have.total = total;
@@ -242,7 +243,7 @@ export function orbUse(w: World, a: Actor, act: Action, stage: number): void {
       have.decay = undefined;
       return;
     }
-    w.fields.push({
+    a.side!.fields.push({
       id: w.nextId++,
       owner: a.id,
       kind: 'orb',
@@ -265,7 +266,7 @@ export function orbUse(w: World, a: Actor, act: Action, stage: number): void {
     return;
   }
   if (spec.kind === 'illusion') {
-    let g = w.fields.find((f) => f.kind === 'ghost' && f.skill === p.skill.id);
+    let g = a.side!.fields.find((f) => f.kind === 'ghost' && f.skill === p.skill.id);
     if (!g) {
       const r = spec.radius * p.radiusMult;
       g = {
@@ -291,7 +292,7 @@ export function orbUse(w: World, a: Actor, act: Action, stage: number): void {
         moved: 0,
         stages: 0,
       };
-      w.fields.push(g);
+      a.side!.fields.push(g);
     }
     g.tx = act.aimX;
     g.ty = act.aimY;
@@ -311,7 +312,7 @@ export function orbUse(w: World, a: Actor, act: Action, stage: number): void {
   const d = spec.spread * Math.sqrt(w.rngTrig.float(0, 1));
   const spot = w.grid.collide(act.aimX + Math.cos(ang) * d, act.aimY + Math.sin(ang) * d, 0.3);
   const total = spec.seconds * dur;
-  w.fields.push({
+  a.side!.fields.push({
     id: w.nextId++,
     owner: a.id,
     kind: 'zap',
@@ -335,12 +336,12 @@ export function orbUse(w: World, a: Actor, act: Action, stage: number): void {
 }
 
 /** The channel of a storm-orb skill ends: every orb that is left explodes, harder for each jump it still had. */
-export function releaseZaps(w: World, skill: string): void {
+export function releaseZaps(w: World, s: Side, skill: string): void {
   const p = w.player;
   let j = 0;
-  for (const f of w.fields) {
+  for (const f of s.fields) {
     if (f.kind !== 'zap' || f.skill !== skill || !f.profile) {
-      w.fields[j++] = f;
+      s.fields[j++] = f;
       continue;
     }
     const spec = f.profile.skill.orb;
@@ -352,18 +353,18 @@ export function releaseZaps(w: World, skill: string): void {
     for (const e of enemiesIn(w, f.x, f.y, r))
       hit(w, p, e, q, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
   }
-  w.fields.length = j;
+  s.fields.length = j;
 }
 
 /**
  * The channel of an illusion skill ends. Let go, the character joins the illusion and a last wave breaks there, harder for each
  * stage built; stunned or frozen, the illusion is just gone.
  */
-export function releaseGhost(w: World, skill: string, interrupted: boolean): void {
-  const i = w.fields.findIndex((f) => f.kind === 'ghost' && f.skill === skill);
+export function releaseGhost(w: World, s: Side, skill: string, interrupted: boolean): void {
+  const i = s.fields.findIndex((f) => f.kind === 'ghost' && f.skill === skill);
   if (i < 0) return;
-  const g = w.fields[i];
-  w.fields.splice(i, 1);
+  const g = s.fields[i];
+  s.fields.splice(i, 1);
   const spec = g.profile?.skill.orb;
   if (interrupted || spec?.kind !== 'illusion' || !g.profile) return;
   const a = w.player;
@@ -391,13 +392,13 @@ export function placeGeyser(w: World, a: Actor, act: Action): void {
   w.events.push({ t: 'explode', x: corpse.x, y: corpse.y, r, dtype: 3, skill: p.skill.id });
   for (const e of enemiesIn(w, corpse.x, corpse.y, r))
     rawHit(w, e, (corpse.life * spec.explodePct) / 100, 3, 'Corpse');
-  const mine = w.fields.filter((f) => f.kind === 'geyser');
+  const mine = a.side!.fields.filter((f) => f.kind === 'geyser');
   if (mine.length >= spec.max) {
     const oldest = mine.reduce((x, y) => (x.t < y.t ? x : y));
-    w.fields.splice(w.fields.indexOf(oldest), 1);
+    a.side!.fields.splice(a.side!.fields.indexOf(oldest), 1);
   }
   const reach = spec.radius * p.radiusMult;
-  w.fields.push({
+  a.side!.fields.push({
     id: w.nextId++,
     owner: a.id,
     kind: 'geyser',
@@ -463,15 +464,15 @@ function enemiesIn(w: World, x: number, y: number, r: number): Actor[] {
 }
 
 /** Whether a point is on consecrated ground of the player's. */
-export function consecratedAt(w: World, x: number, y: number): boolean {
-  for (const f of w.fields)
+export function consecratedAt(s: Side, x: number, y: number): boolean {
+  for (const f of s.fields)
     if (f.kind === 'consecrated' && Math.hypot(x - f.x, y - f.y) <= f.radius) return true;
   return false;
 }
 
 /** An enemy dies on chilling ground that gives charges: roll the chance. */
 export function fieldKill(w: World, dead: Actor): void {
-  for (const f of w.fields)
+  for (const f of w.player.side!.fields)
     if (
       f.killCharge &&
       Math.hypot(dead.x - f.x, dead.y - f.y) <= f.radius + dead.r &&
@@ -482,10 +483,10 @@ export function fieldKill(w: World, dead: Actor): void {
 
 /** Run the fields: they pulse, they grow, they end. */
 export function tickFields(w: World, s: Side, dt: number): void {
-  if (w.fields.length === 0) return;
+  if (s.fields.length === 0) return;
   const p = w.player;
   let j = 0;
-  for (const f of w.fields) {
+  for (const f of s.fields) {
     f.t -= dt;
     f.radius = f.r0 * (1 + (f.grow - 1) * (1 - Math.max(0, f.t) / f.total));
     if (f.kind === 'storm') {
@@ -517,7 +518,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
           volley(w, f);
         }
       }
-      if (f.t > 0) w.fields[j++] = f;
+      if (f.t > 0) s.fields[j++] = f;
       continue;
     }
     if (f.kind === 'ghost') {
@@ -538,7 +539,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
         f.x = spot.x;
         f.y = spot.y;
       }
-      w.fields[j++] = f;
+      s.fields[j++] = f;
       continue;
     }
     if (f.kind === 'geyser') {
@@ -558,12 +559,12 @@ export function tickFields(w: World, s: Side, dt: number): void {
           true,
         );
       }
-      if (f.t > 0) w.fields[j++] = f;
+      if (f.t > 0) s.fields[j++] = f;
       continue;
     }
     if (f.kind === 'bladestorm') {
       tickBladestorm(w, s, f, dt);
-      if (f.t > 0) w.fields[j++] = f;
+      if (f.t > 0) s.fields[j++] = f;
       continue;
     }
     if (f.kind === 'trail') {
@@ -579,7 +580,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
           )
             applySkillDot(w, e, f.profile!, { seconds: 0.5 });
       }
-      if (f.t > 0) w.fields[j++] = f;
+      if (f.t > 0) s.fields[j++] = f;
       continue;
     }
     if (f.kind === 'zap') {
@@ -597,7 +598,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
           blast(w, f, f.x, f.y, f.radius, true);
         }
       }
-      if (f.t > 0) w.fields[j++] = f;
+      if (f.t > 0) s.fields[j++] = f;
       continue;
     }
     f.pulseT -= dt;
@@ -612,7 +613,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
         for (const e of enemiesIn(w, f.x, f.y, f.radius)) {
           applySkillDot(w, e, f.profile, { seconds: 0.5 });
           // Each pod that reaches it slows it a little, up to a limit.
-          const reached = w.fields.filter(
+          const reached = s.fields.filter(
             (o) => o.kind === 'pod' && Math.hypot(e.x - o.x, e.y - o.y) <= o.radius + e.r,
           ).length;
           applyStatus(w, e, 'hinder', {
@@ -690,10 +691,10 @@ export function tickFields(w: World, s: Side, dt: number): void {
         rawHit(w, e, f.dps * (0.5 + w.rngTrig.float(0, 1)), f.dtype, 'Herald');
       }
     }
-    if (f.t > 0) w.fields[j++] = f;
+    if (f.t > 0) s.fields[j++] = f;
     else if (f.kind === 'wall') endWall(w, f);
   }
-  w.fields.length = j;
+  s.fields.length = j;
 }
 
 // ---- walls
@@ -742,7 +743,7 @@ export function raiseWall(w: World, a: Actor, act: Action): void {
     dtype: dominantType(p),
     tiles,
   };
-  w.fields.push(f);
+  a.side!.fields.push(f);
   // The band the wall hurts, outlined (the renderer draws the wall itself, tile by tile, from the field).
   const ex = Math.cos(ang) * (len / 2);
   const ey = Math.sin(ang) * (len / 2);

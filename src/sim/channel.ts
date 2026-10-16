@@ -57,8 +57,9 @@ export function releaseChannel(w: World, a: Actor): void {
   if (!st) return;
   w.channel = null;
   const spec = st.profile.skill.channel;
-  if (st.profile.skill.orb?.kind === 'zap') releaseZaps(w, st.profile.skill.id);
-  if (st.profile.skill.orb?.kind === 'illusion') releaseGhost(w, st.profile.skill.id, false);
+  if (st.profile.skill.orb?.kind === 'zap') releaseZaps(w, a.side!, st.profile.skill.id);
+  if (st.profile.skill.orb?.kind === 'illusion')
+    releaseGhost(w, a.side!, st.profile.skill.id, false);
   if (!spec?.release || st.stage <= 0) return;
   const r = spec.release;
   const f = Math.max(0, 1 + (r.base ?? 0) / 100 + (r.perStage * st.stage) / 100);
@@ -200,8 +201,8 @@ export function tickChannel(w: World, s: Side): void {
   }
   if (p.stunT > 0 || p.ail.freezeT > 0) {
     // Stunned or frozen, the stages are lost, and the orbs of a storm are let go.
-    if (st.profile.skill.orb?.kind === 'zap') releaseZaps(w, st.profile.skill.id);
-    if (st.profile.skill.orb?.kind === 'illusion') releaseGhost(w, st.profile.skill.id, true);
+    if (st.profile.skill.orb?.kind === 'zap') releaseZaps(w, s, st.profile.skill.id);
+    if (st.profile.skill.orb?.kind === 'illusion') releaseGhost(w, s, st.profile.skill.id, true);
     w.channel = null;
     return;
   }

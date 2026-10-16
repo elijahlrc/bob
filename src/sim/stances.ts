@@ -89,14 +89,14 @@ export function placeBladestorm(w: World, a: Actor, act: Action): void {
   const spec = p.skill.bladestorm as Blades | undefined;
   if (!spec || !a.isPlayer) return;
   const s = stanceOf(a.side!);
-  const mine = w.fields.filter((f) => f.kind === 'bladestorm');
+  const mine = a.side!.fields.filter((f) => f.kind === 'bladestorm');
   if (mine.length >= spec.max) {
     const oldest = mine.reduce((x, y) => (x.t < y.t ? x : y));
-    w.fields.splice(w.fields.indexOf(oldest), 1);
+    a.side!.fields.splice(a.side!.fields.indexOf(oldest), 1);
   }
   const r = spec.radius * p.radiusMult;
   const drift = s === 'sand' ? spec.drift : 0;
-  w.fields.push({
+  a.side!.fields.push({
     id: w.nextId++,
     owner: a.id,
     kind: 'bladestorm',
