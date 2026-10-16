@@ -3,6 +3,7 @@ import type { EquipSlot, FlaskItem, Item } from '../data/types';
 import type { RunState } from '../run/run';
 import { slotName } from '../run/inventoryOps';
 import { rarityClass } from './ItemCard';
+import { SocketPips } from './SocketPips';
 
 /** Where each slot sits, drawn roughly as a body (docs/ITEMS.md 3.3). Empty strings are gaps. */
 const LAYOUT: (EquipSlot | '')[][] = [
@@ -78,6 +79,11 @@ export function Gear(p: Props) {
         >
           <span class="ix-slot-label">{slotName(id)}</span>
           <span class="ix-slot-name">{it ? it.name : '—'}</span>
+          {it && it.sockets.length > 0 && (
+            <span class="ix-slot-pips">
+              <SocketPips sockets={it.sockets} primary={run.build.primaryGem} />
+            </span>
+          )}
         </button>
         {it && !t && (
           <button
@@ -135,9 +141,15 @@ export function Gear(p: Props) {
   );
 }
 
-/** One line for the folded gear on a phone: "Gear · 6 of 10 worn · flasks 2 of 5". */
+/** One line for the folded gear on a phone: "Gear · 6 of 10 worn · 7 gems · 3 free sockets". */
 export function gearSummary(run: RunState): string {
-  const worn = Object.values(run.build.equipment).filter(Boolean).length;
-  const flasks = run.build.flasks.filter(Boolean).length;
-  return `Gear · ${worn} of 10 worn · flasks ${flasks} of ${run.build.flasks.length}`;
+  const worn = Object.values(run.build.equipment).filter((it): it is Item => !!it);
+  const sockets = worn.reduce((n, it) => n + it.sockets.length, 0);
+  const gems = worn.reduce((n, it) => n + it.sockets.filter(Boolean).length, 0);
+  const free = sockets - gems;
+  return (
+    `Gear · ${worn.length} of 10 worn` +
+    (gems ? ` · ${gems} gem${gems === 1 ? '' : 's'}` : '') +
+    (free ? ` · ${free} free socket${free === 1 ? '' : 's'}` : '')
+  );
 }

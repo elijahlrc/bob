@@ -3,7 +3,9 @@ import { useMemo, useState } from 'preact/hooks';
 import type { SheetDiff } from '../calc/character';
 import { CRAFTING_OPEN } from '../data/constants';
 import { flaskBase } from '../data/flasks';
-import type { Build, EquipSlot, FlaskItem, InventoryItem, Item } from '../data/types';
+import type { Build, EquipSlot, FlaskItem, GemItem, InventoryItem, Item } from '../data/types';
+import { gemDef } from '../data/gems';
+import { joinNames } from '../run/socketText';
 import { salvageValue } from '../run/craft';
 import {
   compareFlasks,
@@ -18,7 +20,7 @@ import type { RunState } from '../run/run';
 import { ItemCard, itemTitle, lineMarks, rarityClass } from './ItemCard';
 import { DiffCard, DiffLines } from './DiffCard';
 import { diffRows, type DiffRow } from './itemDiff';
-import { SocketsRow } from './SocketPips';
+import { SocketPips, SocketsRow } from './SocketPips';
 
 export type Sel =
   | { from: 'inv'; uid: number }
@@ -86,6 +88,8 @@ type Actions = {
   onPutBack: (uid: number) => void;
   onSocket: (uid: number) => void;
   onCraft: (uid: number) => void;
+  /** Open the Skills tab at this slot's sockets. */
+  onEditGems?: (slot: EquipSlot) => void;
   onClose: () => void;
   /** Move the selection to the previous (-1) or next (+1) row of the list. */
   onStep: (dir: -1 | 1) => void;
@@ -489,6 +493,35 @@ function FlaskBody({
   );
 }
 
+/** The gems a worn item holds, by name, and the way to the Skills tab to change them. */
+function WornGems({
+  it,
+  primary,
+  onEdit,
+}: {
+  it: Item;
+  primary: number | undefined;
+  onEdit: () => void;
+}) {
+  if (it.sockets.length === 0) return null;
+  const gems = it.sockets.filter((g): g is GemItem => g !== null);
+  const free = it.sockets.length - gems.length;
+  return (
+    <div class="ix-worngems">
+      <SocketPips sockets={it.sockets} primary={primary} />
+      <span class="ix-note">
+        {gems.length
+          ? joinNames(gems.map((g) => (g.uid === primary ? '★ ' : '') + gemDef(g.gemId).name))
+          : 'No gems'}
+        {free > 0 ? ` · ${free} free socket${free === 1 ? '' : 's'}` : ''}
+      </span>
+      <button class="btn small" onClick={onEdit}>
+        Edit gems →
+      </button>
+    </div>
+  );
+}
+
 /** The panel for what is selected: a carried item with its comparison per slot, a worn item, a flask, a gem, or a guide. */
 export function ItemDetail(p: Props) {
   const { run, sel, selected } = p;
@@ -653,6 +686,13 @@ export function ItemDetail(p: Props) {
                 </button>
               )}
             </div>
+            {sel.from === 'slot' && selected.kind === 'item' && (
+              <WornGems
+                it={selected}
+                primary={run.build.primaryGem}
+                onEdit={() => a.onEditGems?.(sel.slot)}
+              />
+            )}
             {sel.from === 'slot' && <div class="ix-note">Worn in {slotName(sel.slot)}.</div>}
           </>
         )}

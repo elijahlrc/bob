@@ -2,6 +2,7 @@ import { DebugPanel } from './Debug';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { Character } from '../calc/character';
 import { classDef } from '../data/classes';
+import type { EquipSlot } from '../data/types';
 import { affixText, mapAffixDef, rewardText } from '../data/mapAffixes';
 import { flaskBase } from '../data/flasks';
 import { densityDef, densityFor, type DensityId } from '../data/density';
@@ -209,6 +210,8 @@ export function Camp({ c }: { c: Controller }) {
     setTabState(t);
   };
   // An item the Items tab sends to the Workbench ("Craft…") and back ("Show in Items"); `n` makes a repeat count.
+  // The slot whose sockets the Skills tab scrolls to (the Items tab's "Edit gems").
+  const [gemSlot, setGemSlot] = useState<EquipSlot | null>(null);
   const [focus, setFocus] = useState<{ uid: number; n: number; to: 'items' | 'workbench' } | null>(
     null,
   );
@@ -458,7 +461,7 @@ export function Camp({ c }: { c: Controller }) {
         <div class="tab-body">
           {shown === 'tree' && <TreeView c={c} />}
           {shown === 'sheet' && <Sheet s={sheet} />}
-          {shown === 'skills' && <Skills c={c} ch={ch} />}
+          {shown === 'skills' && <Skills c={c} ch={ch} focusSlot={gemSlot} />}
           {shown === 'strategy' && <Strategy c={c} ch={ch} />}
           {shown === 'items' && run.reward && (
             <div class="items-reward">
@@ -470,6 +473,10 @@ export function Camp({ c }: { c: Controller }) {
               c={c}
               focus={focus?.to === 'items' ? focus : null}
               onCraft={(uid) => goTo('workbench', uid)}
+              onEditGems={(slot) => {
+                setGemSlot(slot);
+                setTab('skills');
+              }}
               startView={showDrops ? 'last' : undefined}
             />
           )}

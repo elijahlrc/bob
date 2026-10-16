@@ -61,6 +61,7 @@ export function Items({
   c,
   focus,
   onCraft,
+  onEditGems,
   startView,
 }: {
   c: Controller;
@@ -68,6 +69,8 @@ export function Items({
   focus?: { uid: number; n: number } | null;
   /** Open the Workbench with this item. */
   onCraft?: (uid: number) => void;
+  /** Open the Skills tab at the sockets of this slot. */
+  onEditGems?: (slot: EquipSlot) => void;
   /**
    * Open on this view with every kind of item shown, for this visit only: the player's own filters are not overwritten
    * (the camp opens on the last map's drops after a map, docs/STREAMLINE.md S2).
@@ -451,6 +454,7 @@ export function Items({
           onDiscard={(uid) => void doDiscard(uid)}
           onSocket={doQuick}
           onCraft={(uid) => onCraft?.(uid)}
+          onEditGems={onEditGems}
           onClose={() => setSel(null)}
           onStep={step}
           onUndo={() => {

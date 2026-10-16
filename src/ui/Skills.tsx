@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 import type { Character } from '../calc/character';
 import { naturalGemLevel } from '../calc/gems';
 import { gemDef, type GemDef } from '../data/gems';
-import { EQUIP_SLOTS, type GemItem } from '../data/types';
+import { EQUIP_SLOTS, type EquipSlot, type GemItem } from '../data/types';
 import type { Controller } from '../run/controller';
 import { setPrimary, socketGem, unsocketGem } from '../run/inventory';
 import { sheetOf } from '../run/bot';
@@ -60,13 +60,26 @@ const BADGE_DELAY_MS = 250;
 
 const sameSocket = (a: SocketRef, b: SocketRef) => a.slot === b.slot && a.socket === b.socket;
 
-export function Skills({ c, ch }: { c: Controller; ch: Character }) {
+export function Skills({
+  c,
+  ch,
+  focusSlot,
+}: {
+  c: Controller;
+  ch: Character;
+  /** Scroll to the sockets of this slot when the tab opens. */
+  focusSlot?: EquipSlot | null;
+}) {
   const run = c.run!;
   const { coarse } = useViewport();
   const [sel, setSel] = useState<Sel | null>(null);
   const [drag, setDrag] = useState<Drag | null>(null);
   const [over, setOver] = useState<string | null>(null);
   const [msg, setMsg] = useState('');
+  useEffect(() => {
+    if (focusSlot)
+      document.querySelector(`[data-slot="${focusSlot}"]`)?.scrollIntoView({ block: 'center' });
+  }, [focusSlot]);
   const [q, setQ] = useState(() => loadPref('gemSearch', ''));
   const [tip, setTip] = useState<{ gemId: string; level: number; x: number; y: number } | null>(
     null,
@@ -224,7 +237,11 @@ export function Skills({ c, ch }: { c: Controller; ch: Character }) {
           const it = run.build.equipment[slot];
           if (!it || it.sockets.length === 0) return null;
           return (
-            <div key={slot} class="socket-row">
+            <div
+              key={slot}
+              class={'socket-row' + (focusSlot === slot ? ' focus' : '')}
+              data-slot={slot}
+            >
               <div class="socket-item">
                 <div class="muted">{slotLabel(slot)}</div>
                 <div>{it.name}</div>

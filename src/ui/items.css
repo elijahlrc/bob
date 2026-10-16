@@ -74,6 +74,10 @@
   overflow-wrap: anywhere;
   padding-right: 14px;
 }
+.ix-slot-pips {
+  margin-top: auto;
+  padding-top: 2px;
+}
 .ix-slot.empty {
   opacity: 0.7;
 }
@@ -490,6 +494,17 @@
 .ix-vs b {
   color: #c8c0a8;
   font-weight: normal;
+}
+.ix-worngems {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+.socket-row.focus {
+  outline: 2px solid var(--hi);
+  outline-offset: 3px;
+  border-radius: var(--radius);
 }
 .ic-sockets {
   display: flex;
