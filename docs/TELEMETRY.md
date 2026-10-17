@@ -106,17 +106,22 @@ select * from runs where game_version = '<short commit hash>';
 
 A player may add their characters to the **rivals** other players fight (docs/DUEL.md section 6). This is a **separate opt-in from
 the run statistics above**, off until the player turns it on: its own checkbox on the title screen ("Add my characters to the
-rivals and high scores other players see") and its own preference (`bob.pref.rivals`). The statistics' promise of no name and no
-identity stays true of `runs`; this table holds both, and says so here.
+rivals and high scores other players see"), the same one on the run summary until the character is sent, and its own preference
+(`bob.pref.rivals`). **A name is needed to duel:** nothing of a player is sent without a valid typed name. The statistics' promise
+of no name and no identity stays true of `runs`; this table holds both, and says so here.
 
 ### What is sent
 
-When a run ends, by a death or a win, and only when the box is ticked, one row goes to the `rivals` table
-(`src/run/rivals.ts`, `rivalRecord`; tested in `rivals.test.ts`):
+When a run ends, by a death or a win, and only when the box is ticked and a valid name is typed, one row goes to the `rivals` table
+(`src/run/rivals.ts`, `rivalRecord`; tested in `rivals.test.ts`). A player who ticks the box (or types the name) on the run summary
+instead sends the run that has just ended then: when the box is ticked with a valid name already there, or when the "Duel for your
+damned soul's fate" button is pressed. The game keeps that post (`postRun`, `src/rivals.ts`), so a run is never sent twice, and it
+remembers beside the preferences the last run it sent (`bob.pref.rivalPosted`: the class, the seed and the number of maps played; no
+more than that).
 
 | Column                                 | What                                                                                                                                                                      |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`                                 | the name the player typed (3 to 16 ASCII letters, digits, spaces and hyphens), or one the game makes up ("The Ashen Sentinel of the Low Road") when the field is blank    |
+| `name`                                 | the name the player typed (3 to 16 ASCII letters, digits, spaces and hyphens); the bot's characters carry one the game makes up ("The Ashen Sentinel of the Low Road")    |
 | `class_id`, `level`, `map`, `outcome`  | the class, the character's level, the map the run ended on, `died` or `won`                                                                                               |
 | `difficulty`                           | the run's three difficulty settings                                                                                                                                       |
 | `build`                                | the character as the game holds it: class, level, passive tree, gear with its gems, flasks, the main skill and the Strategy settings (3 to 9 KB; nothing else of the run) |
@@ -151,7 +156,12 @@ carriers put many people behind one, and a VPN changes it in seconds; it is the 
 ### The duel log
 
 After a duel, the game posts one row to `duels`: its own snapshot's id, the rival's id, who won (0 for the player, 1 for the
-rival, empty for a draw), how it ended and after how many seconds, the game version and the token hash. The database forces
+rival, empty for a draw), how it ended and after how many seconds, the game version and the token hash. **When:** once, when the
+first fight against a rival ends (the "rated" fight: its seed is the pair's, `duelSeedFor` in `src/run/rivals.ts`, the same rule as
+`duel_seed`); the fights after it ("Again", and any later fight against that rival) are practice and send nothing. The game knows
+its own snapshot's id from `my_snapshots` (below), asked when the Rivals screen opens and again after a rated fight, to show the
+rating before and after. If the report is refused or the rivals cannot be reached, the result screen says so ("Unrated: ...") and
+the next fight against that rival is the rated one again. The database forces
 the time, the address hash and **the seed**, which it derives from the two ids (`duel_seed`; the game uses the same rule to
 fight), so nobody can try seeds until they win one. It refuses a report whose token hash is not the snapshot's, whose snapshot
 is a bot's, whose rival does not exist or is of another save version, and a second report of the same ordered pair (one rated
@@ -163,8 +173,8 @@ from the verified reports alone, is a later plan (docs/DUEL.md section 13). Unti
 ### How it is read
 
 The public key may insert into `rivals` and `duels` and may not select, update or delete a row of either, and may do nothing
-to `blocked_words` or `blocked`. It reads the pool through two functions (`docs/rivals.sql`), neither of which returns a token
-hash or an address hash:
+to `blocked_words` or `blocked`. It reads through three functions (`docs/rivals.sql`), none of which returns a token hash or an
+address hash:
 
 - `rivals_for(save_version, map, k, exclude_token_hash)`: up to 20 rivals of that save version within 10 maps of `map` (25 if there
   are fewer than `k`), not the caller's own, players before bots, newest first. The game checks every row before it offers it
@@ -173,7 +183,12 @@ hash or an address hash:
 - `high_scores(k)`: the top rated rival snapshots, at most 100, one row per snapshot, never a bot, and only a snapshot that has
   fought. The ratings move with every reported fight ("The duel log"); the list is empty until fights are reported. A trigger
   sets `rating` (ten times the level), `fights`, `wins` and `rated_at` on every insert, so a client cannot post itself with a
-  rating.
+  rating. The high scores screen (a button on the title screen) reads it.
+- `my_snapshots(token_hash)`: the caller's own snapshots, newest first (at most 50): `id, created_at, name, class_id, level, map,
+outcome, save_version, rating, fights, wins`. The browser sends the hash of its own token; a hash nobody knows matches nothing,
+  so it is the same proof of ownership as a report's. The game reads it when the Rivals screen opens (the id is the `a` of the
+  rated pair's seed and of the report), after a rated fight (the rating's move), and on the high scores screen (to mark the
+  player's own rows); the summary's "Your rating" is the last row it read.
 
 ### Setup (once)
 
@@ -251,9 +266,12 @@ curl -s "$URL/rest/v1/rivals?select=*" -H "apikey: $KEY"
 - Anyone can read the public key from the page and insert rows, so a snapshot can be faked. The table limits what a row may hold
   and the game skips a build with an id it does not know, but nothing checks that a build is legal (docs/LADDER.md section 8); a
   fake rival is only a rival nobody enjoys fighting, and a row can be deleted.
-- A name the deny-list stops loses its row, silently to the player (the title screen says the rule of a name, not the list).
-- A blocker on the Supabase domain, or being offline, drops a snapshot silently (the game never waits for it). Only runs that end
-  are captured.
+- A name the deny-list stops loses its row; the run summary shows the name field again with "That name is not allowed" (the
+  game tells a check violation that names the name from a cap or a block, which read "Could not reach the rivals"). The title
+  screen says the rule of a name, not the list.
+- A blocker on the Supabase domain, or being offline, drops a snapshot (the end of a run never waits for it; the run summary
+  says "Could not reach the rivals" and offers "Try again", and the Rivals screen says the character could not be sent). Only runs
+  that end are captured.
 - The address hash is only as good as the gateway's header: if Supabase ever stops passing `cf-connecting-ip`, new rows carry no
   hash, the address caps and address blocks silently stop applying, and the token rules still hold. Check a recent row now and then.
 - A reported fight is trusted until the nightly job replays it (docs/DUEL.md section 13); until that job exists, a false report

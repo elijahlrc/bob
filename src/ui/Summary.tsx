@@ -1,7 +1,10 @@
+import { useEffect, useState } from 'preact/hooks';
 import { classDef } from '../data/classes';
 import { DEFAULT, difficultyText, sameDifficulty } from '../data/difficulty';
 import { DAMAGE_TYPES } from '../mods/types';
 import type { Controller } from '../run/controller';
+import type { RunState } from '../run/run';
+import { postRun, postStatus, rivalsConfigured, rivalsOn, sendName, watchPost } from '../rivals';
 import type { DeathRecap } from '../sim/types';
 import { FACTION_NAMES, MONSTER_TYPES, type MonsterTypeId } from '../data/monsters';
 import { TYPE_BLURBS } from '../data/monsterInfo';
@@ -9,6 +12,8 @@ import { themeDef } from '../data/themes';
 import { themeInfo } from '../run/themeInfo';
 import type { MapTypeId } from '../data/mapTypes';
 import { MapReportView } from './MapReport';
+import { DUEL_TITLE } from './Rivals';
+import { RivalsOptIn } from './RivalsOptIn';
 
 const f0 = (v: number) => Math.round(v).toLocaleString();
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -88,6 +93,68 @@ function Recap({ r }: { r: DeathRecap }) {
   );
 }
 
+/**
+ * What the player does with the character that just ended (docs/DUEL.md 6.5): add it to the rivals (the opt-in, until it is sent,
+ * and a name is needed), then duel. The character is posted when the box is ticked with a valid name already there, or when the
+ * button is pressed with the name just typed (a name typed letter by letter is never posted half-typed); a post that failed says
+ * why (a name the table refused shows the field again) and can be tried again. After a set, the tally and the player's rating.
+ */
+function RivalsBlock({ c, run }: { c: Controller; run: RunState }) {
+  const [, setTick] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const refresh = () => setTick((v) => v + 1);
+  useEffect(() => watchPost(refresh), []);
+  if (!rivalsConfigured()) return null;
+  const post = postStatus(run);
+  const sent = post.status === 'posted' || post.status === 'sending';
+  const failed = post.status === 'failed' ? post : null;
+  const refused = failed?.reason === 'name' ? (failed.name ?? null) : null;
+  const ready = rivalsOn() && sendName() !== null;
+  const mine = c.rivals?.mine ?? null;
+  const set = mine ? c.book.tally(mine.id) : null;
+  const send = () => void postRun(run, c.lastResult);
+  const duel = async () => {
+    setBusy(true);
+    const st = await postRun(run, c.lastResult);
+    setBusy(false);
+    if (st.status === 'posted') c.openRivals();
+  };
+  return (
+    <div class="rivals-block">
+      {!sent && (
+        <RivalsOptIn
+          refused={refused}
+          onChange={(what) => {
+            if (what === 'box' && rivalsOn() && sendName() !== null) send();
+            refresh();
+          }}
+        />
+      )}
+      {failed?.reason === 'unreachable' && <p class="warn">Could not reach the rivals</p>}
+      {ready && failed?.reason === 'unreachable' && (
+        <button class="btn" disabled={busy} onClick={send}>
+          Try again
+        </button>
+      )}
+      {ready && failed?.reason !== 'unreachable' && (
+        <button
+          class="btn primary"
+          disabled={busy || (refused !== null && refused === sendName())}
+          onClick={() => void duel()}
+        >
+          {DUEL_TITLE}
+        </button>
+      )}
+      {set && set.fought > 0 && (
+        <p class="muted">
+          You beat {set.beaten} of {set.fought} rival{set.fought === 1 ? '' : 's'}
+          {mine && ` · Your rating ${mine.rating}`}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function Summary({ c }: { c: Controller }) {
   const run = c.run;
   if (!run) return null;
@@ -115,6 +182,7 @@ export function Summary({ c }: { c: Controller }) {
       )}
       {!won && run.lastRecap && <Recap r={run.lastRecap} />}
       {c.lastResult?.report && <MapReportView r={c.lastResult.report} title="The last map" />}
+      <RivalsBlock c={c} run={run} />
       <div class="menu">
         <button
           class="btn primary"

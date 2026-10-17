@@ -1,3 +1,4 @@
+import { Rng } from '../core/rng';
 import { family } from '../data/affixes';
 import { itemBase } from '../data/bases';
 import { Character } from '../calc/character';
@@ -18,9 +19,10 @@ import { uniqueFlaskDef } from '../data/uniqueFlasks';
 import { uniqueDef } from '../data/uniques';
 import { EQUIP_SLOTS, type Build } from '../data/types';
 import type { MapResult } from '../sim/runMap';
+import { wornUniques } from './metrics';
 import type { RunState } from './run';
 import { SAVE_VERSION } from './run';
-import { postRecords, type Fetch, type Sink } from './telemetry';
+import type { Sink } from './telemetry';
 
 export { generateName };
 
@@ -49,6 +51,10 @@ export type Rival = {
   gameVersion: string;
   /** A character the bot built, to fill the pool. */
   bot: boolean;
+  /** Its standing on the ladder (docs/DUEL.md 6.3): a card shows them; a rival is fightable whatever they are. */
+  rating: number;
+  fights: number;
+  wins: number;
   build: Build;
 };
 
@@ -132,7 +138,7 @@ export type RivalOpts = {
  * outcome, the difficulty, and who sent it. `build` is `run.build` as it is; nothing else of the run goes. `res` is the result
  * of the last map, which the hook that calls this is given and this does not need.
  */
-export function rivalRecord(run: RunState, _res: MapResult, opts: RivalOpts): RivalRecord {
+export function rivalRecord(run: RunState, _res: MapResult | null, opts: RivalOpts): RivalRecord {
   const d = run.difficulty;
   return {
     name: opts.name !== null && validName(opts.name) ? opts.name : generateName(opts.seed),
@@ -164,23 +170,139 @@ export async function botRivalRecord(
   });
 }
 
-/** Post a snapshot. Resolves to whether the table took it; never throws. */
-export function postRival(fetchFn: Fetch, sink: Sink, record: RivalRecord): Promise<boolean> {
-  return postRecords(fetchFn, sink, 'rivals', [record]);
-}
-
 // ---------------------------------------------------------------------------------------------------------------------------
-// Reading: the table is read through two functions only (docs/rivals.sql)
+// Writing: a snapshot and the report of a fight
 
-/** A `fetch` that can read the body: what the two read functions need. */
+/** A `fetch` that can read the body: what the read functions need. */
 export type FetchJson = (
   url: string,
   init: Record<string, unknown>,
-) => Promise<{ ok: boolean; json(): Promise<unknown> }>;
+) => Promise<{ ok: boolean; status?: number; json(): Promise<unknown> }>;
+
+/**
+ * Any `fetch` the writes may be given: `ok` is all a plain one has, and the status and the body (where PostgREST puts the error's
+ * code and message) are read only if it has them. The real `fetch` and the test doubles are all of this type.
+ */
+export type FetchAny = (
+  url: string,
+  init: Record<string, unknown>,
+) => Promise<{ ok: boolean; status?: number; json?: () => Promise<unknown> }>;
+
+/** What a write came to: whether the table took it, and when it did not, what the server said (the HTTP status, the Postgres code and message). */
+export type PostResult = { ok: boolean; status?: number; code?: string; message?: string };
+
+const isObj = (x: unknown): x is Record<string, unknown> =>
+  typeof x === 'object' && x !== null && !Array.isArray(x);
+
+/** The code and message of a PostgREST error body; nothing when there is none to read. */
+async function errorOf(res: { json?: () => Promise<unknown> }): Promise<Partial<PostResult>> {
+  try {
+    if (typeof res.json !== 'function') return {};
+    const body = await res.json();
+    if (!isObj(body)) return {};
+    return {
+      ...(typeof body.code === 'string' ? { code: body.code } : {}),
+      ...(typeof body.message === 'string' ? { message: body.message.slice(0, 200) } : {}),
+    };
+  } catch {
+    return {};
+  }
+}
+
+/** Insert one row into a table with the public key (`Prefer: return=minimal`: the table may not be read back); never throws. */
+async function insertRow(
+  fetchFn: FetchAny,
+  sink: Sink,
+  table: 'rivals' | 'duels',
+  row: object,
+): Promise<PostResult> {
+  try {
+    const res = await fetchFn(`${sink.url.replace(/\/+$/, '')}/rest/v1/${table}`, {
+      method: 'POST',
+      headers: {
+        apikey: sink.key,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify([row]),
+      keepalive: true,
+    });
+    if (res.ok) return { ok: true, status: res.status };
+    return { ok: false, status: res.status, ...(await errorOf(res)) };
+  } catch {
+    return { ok: false };
+  }
+}
+
+/**
+ * Post a snapshot. Resolves to whether the table took it and, when it did not, why: PostgREST's code and message come with the
+ * answer, so a screen can tell a name the deny-list refused (`nameRefused`) from a sink that is out of reach. Never throws.
+ */
+export function postRival(fetchFn: FetchAny, sink: Sink, record: RivalRecord): Promise<PostResult> {
+  return insertRow(fetchFn, sink, 'rivals', record);
+}
+
+/**
+ * Whether the table refused the snapshot for its name: the deny-list's check violation ("that name is not allowed") or the
+ * column's own rule. A cap and a block are check violations too and are not this.
+ */
+export function nameRefused(r: PostResult): boolean {
+  return !r.ok && r.code === '23514' && /name/i.test(r.message ?? '');
+}
+
+/** The report of a rated fight, as the `duels` table takes it (docs/rivals.sql 9): the server sets the seed, the time and the address. */
+export type DuelReport = {
+  /** The reporter's own snapshot (side 0, "you"). */
+  a_id: number;
+  /** The rival it fought. */
+  b_id: number;
+  /** 0 when `a` won, 1 when `b` did, null for a draw. */
+  winner: 0 | 1 | null;
+  how: 'death' | 'time' | 'stall';
+  seconds: number;
+  game_version: string;
+  /** The hash of the token that posted snapshot `a_id`: the proof that it is the reporter's. */
+  token_hash: string;
+};
+
+/**
+ * How the server took a report: `rated` (both ratings moved), `already` (this pair was rated before: HTTP 409, Postgres 23505),
+ * `refused` (a check violation: a bot's snapshot, a blocked writer, a cap; `message` is the server's reason) or `failed` (offline,
+ * or an answer that says nothing of the report).
+ */
+export type DuelPost = { outcome: 'rated' | 'already' | 'refused' | 'failed'; message?: string };
+
+/** Post the report of a rated fight; never throws. */
+export async function postDuel(
+  fetchFn: FetchAny,
+  sink: Sink,
+  report: DuelReport,
+): Promise<DuelPost> {
+  const r = await insertRow(fetchFn, sink, 'duels', report);
+  if (r.ok) return { outcome: 'rated' };
+  if (r.status === 409 || r.code === '23505') return { outcome: 'already' };
+  if (r.code === '23514')
+    return { outcome: 'refused', ...(r.message ? { message: r.message } : {}) };
+  return { outcome: 'failed' };
+}
+
+/**
+ * The seed of the rated fight between two snapshots, `a` the player's own and `b` the rival: the database's `duel_seed(a, b)`
+ * (`((a * 1000003) + (b * 7919)) % 2147483647`, docs/rivals.sql 11), which forces the same seed on a report, so that nobody can
+ * shop for a seed they win and a replay fights the very same duel. Exact in big integers, as the database is.
+ */
+export function duelSeedFor(a: string | number, b: string | number): number {
+  for (const id of [a, b])
+    if (!/^\d+$/.test(String(id))) throw new Error(`not a snapshot id: ${id}`);
+  return Number((BigInt(a) * 1000003n + BigInt(b) * 7919n) % 2147483647n);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------
+// Reading: the table is read through three functions only (docs/rivals.sql)
 
 /** Call a database function through PostgREST (`POST rpc/<name>`); null on any failure. */
 async function rpc(
-  fetchFn: FetchJson,
+  fetchFn: FetchAny,
   sink: Sink,
   name: string,
   args: Record<string, unknown>,
@@ -191,7 +313,7 @@ async function rpc(
       headers: { apikey: sink.key, 'Content-Type': 'application/json' },
       body: JSON.stringify(args),
     });
-    if (!res.ok) return null;
+    if (!res.ok || typeof res.json !== 'function') return null;
     const body = await res.json();
     return Array.isArray(body) ? body : null;
   } catch {
@@ -214,18 +336,23 @@ export type RivalsQuery = {
  * Up to `k` rivals of `saveVersion` near `map`, none of this browser's own (`rivals_for`), each checked by `validateRival`:
  * a row that does not hold up is left out. Empty when offline or when the table is not there.
  */
-export async function fetchRivals(
-  fetchFn: FetchJson,
+export async function fetchRivals(fetchFn: FetchAny, sink: Sink, q: RivalsQuery): Promise<Rival[]> {
+  return (await fetchRivalsOrNull(fetchFn, sink, q)) ?? [];
+}
+
+/** `fetchRivals`, but null when the sink could not be asked (offline, refused, no such function), so that "none near" and "no sink" can be told apart. */
+export async function fetchRivalsOrNull(
+  fetchFn: FetchAny,
   sink: Sink,
   q: RivalsQuery,
-): Promise<Rival[]> {
+): Promise<Rival[] | null> {
   const rows = await rpc(fetchFn, sink, 'rivals_for', {
     save_version: q.saveVersion,
     map: q.map,
     k: q.k,
     exclude_token_hash: q.excludeTokenHash,
   });
-  if (!rows) return [];
+  if (!rows) return null;
   const out: Rival[] = [];
   for (const row of rows) {
     const r = validateRival(row, q.saveVersion);
@@ -236,12 +363,21 @@ export async function fetchRivals(
 
 /** The top of the rating list (`high_scores`, at most 100); empty when offline, when nothing is rated yet, or when the table is not there. */
 export async function fetchHighScores(
-  fetchFn: FetchJson,
+  fetchFn: FetchAny,
   sink: Sink,
   k: number,
 ): Promise<HighScore[]> {
+  return (await fetchHighScoresOrNull(fetchFn, sink, k)) ?? [];
+}
+
+/** `fetchHighScores`, but null when the sink could not be asked. */
+export async function fetchHighScoresOrNull(
+  fetchFn: FetchAny,
+  sink: Sink,
+  k: number,
+): Promise<HighScore[] | null> {
   const rows = await rpc(fetchFn, sink, 'high_scores', { k });
-  if (!rows) return [];
+  if (!rows) return null;
   const out: HighScore[] = [];
   for (const row of rows) {
     const s = highScoreOf(row);
@@ -250,11 +386,113 @@ export async function fetchHighScores(
   return out;
 }
 
+/** One of the caller's own snapshots, as `my_snapshots` gives it (docs/rivals.sql 15b): what the game may show of its own character. */
+export type MySnapshot = {
+  id: string;
+  /** When it was posted, as the database writes a timestamp. */
+  createdAt: string;
+  name: string;
+  classId: string;
+  level: number;
+  map: number;
+  outcome: 'died' | 'won';
+  saveVersion: number;
+  rating: number;
+  fights: number;
+  wins: number;
+};
+
+/**
+ * The caller's own snapshots, newest first (`my_snapshots`, at most 50), found by the hash of the token only its browser knows: the
+ * ids the seed of a rated fight and the report need, and the rating. Null when the sink could not be asked, so that "nothing of
+ * mine is there" and "offline" can be told apart; a row that is not the function's shape is left out.
+ */
+export async function fetchMySnapshots(
+  fetchFn: FetchAny,
+  sink: Sink,
+  tokenHash: string,
+): Promise<MySnapshot[] | null> {
+  const rows = await rpc(fetchFn, sink, 'my_snapshots', { token_hash: tokenHash });
+  if (!rows) return null;
+  const out: MySnapshot[] = [];
+  for (const row of rows) {
+    const s = mySnapshotOf(row);
+    if (s) out.push(s);
+  }
+  return out;
+}
+
+/**
+ * Whether a snapshot of the caller's is the character of this run (the same save version, class, level and map, as `rivalRecord`
+ * writes them): the sanity check that the newest snapshot is the run that just ended and not an older one.
+ */
+export function matchesRun(s: MySnapshot, run: RunState): boolean {
+  return (
+    s.saveVersion === SAVE_VERSION &&
+    s.classId === run.classId.slice(0, 32) &&
+    s.level === clampInt(run.build.level, 1, 100) &&
+    s.map === clampInt(run.map, 1, 100)
+  );
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------
+// What a rival card shows
+
+/**
+ * What a card says a build is, short: the main skill's name, the keystones taken and the uniques worn, by name (a few of each).
+ * Not `metrics.buildSignature`, which is the telemetry's line of ids.
+ */
+export function buildSignature(build: Build): string[] {
+  const gems = EQUIP_SLOTS.flatMap((s) => build.equipment[s]?.sockets ?? []).filter(
+    (g) => g !== null,
+  );
+  const name = (look: () => string): string | null => {
+    try {
+      return look();
+    } catch {
+      return null;
+    }
+  };
+  const main =
+    gems.find((g) => g.uid === build.primaryGem) ??
+    gems.find((g) => name(() => gemDef(g.gemId).kind) === 'active');
+  const tree = getTree();
+  const keystones = build.allocated
+    .filter((id) => tree.nodes[id]?.kind === 'keystone')
+    .map((id) => tree.nodes[id].name)
+    .sort();
+  const uniques = wornUniques(build).map(
+    (id) => name(() => uniqueDef(id).name) ?? name(() => uniqueFlaskDef(id).name) ?? id,
+  );
+  const mainName = main ? name(() => gemDef(main.gemId).name) : null;
+  return [...(mainName ? [mainName] : []), ...keystones.slice(0, 3), ...uniques.slice(0, 4)];
+}
+
+/** How many rivals are asked for at once (the most `rivals_for` gives), and how many of them a screen shows. */
+export const RIVALS_POOL = 20;
+export const RIVALS_SHOWN = 5;
+
+/**
+ * The `k` rivals a screen shows out of the pool (`rivals_for` is newest first, so it gives the same ones until new rows arrive):
+ * a seeded shuffle of the run's seed and a counter, so that the same draw is the same five, no rival is there twice, and a later
+ * draw (`counter + 1`, "Show others") puts the ones not just shown first. A pool with fewer than `k` others fills up from them.
+ */
+export function drawRivals(
+  pool: readonly Rival[],
+  runSeed: number,
+  counter: number,
+  k: number,
+  avoid: readonly string[] = [],
+): Rival[] {
+  const order = new Rng(`rivals:${runSeed}:${counter}`).shuffle([...pool]);
+  const fresh = order.filter((r) => !avoid.includes(r.id));
+  const again = order.filter((r) => avoid.includes(r.id));
+  return [...fresh, ...again].slice(0, k);
+}
+
 // ---------------------------------------------------------------------------------------------------------------------------
 // Validation
 
-const isObj = (x: unknown): x is Record<string, unknown> =>
-  typeof x === 'object' && x !== null && !Array.isArray(x);
 const isInt = (x: unknown, lo: number, hi: number): x is number =>
   typeof x === 'number' && Number.isInteger(x) && x >= lo && x <= hi;
 const isStr = (x: unknown, max = 200): x is string => typeof x === 'string' && x.length <= max;
@@ -433,8 +671,9 @@ function buildOk(b: unknown, classId: string, level: number): b is Build {
 /**
  * A row of `rivals_for` as a `Rival`, or null when it should not be offered: the wrong shape, another save version, a name the
  * table's rule would not take, a build that refers to an id this version does not have (a node, a base, an affix, a gem, a
- * unique, a flask), a primary gem that is not socketed, or one that will not even make a `Character`. The rating columns of the
- * ranking are not read: a rival is fightable whatever its standing.
+ * unique, a flask), a primary gem that is not socketed, or one that will not even make a `Character`. The ranking's columns
+ * (rating, fights, wins) are read for the card and are not checked: a row without them (or with junk in them) is a rival at ten
+ * times its level that has not fought, and is as fightable as any.
  */
 export function validateRival(row: unknown, saveVersion: number): Rival | null {
   if (!isObj(row)) return null;
@@ -466,7 +705,50 @@ export function validateRival(row: unknown, saveVersion: number): Rival | null {
     saveVersion,
     gameVersion,
     bot: row.bot,
+    rating:
+      typeof row.rating === 'number' && Number.isFinite(row.rating)
+        ? Math.round(row.rating)
+        : level * 10,
+    fights: isInt(row.fights, 0, 1e9) ? row.fights : 0,
+    wins: isInt(row.wins, 0, 1e9) ? row.wins : 0,
     build,
+  };
+}
+
+/** A row of `my_snapshots` as a `MySnapshot`, or null when it is not the shape the function returns. */
+function mySnapshotOf(row: unknown): MySnapshot | null {
+  if (!isObj(row)) return null;
+  const {
+    id,
+    created_at,
+    name,
+    class_id: classId,
+    level,
+    map,
+    outcome,
+    rating,
+    fights,
+    wins,
+  } = row;
+  if (typeof id !== 'number' && !isStr(id, 32)) return null;
+  if (!isStr(created_at, 64) || !isStr(name, 48) || !isStr(classId, 32)) return null;
+  if (!isInt(level, 1, 100) || !isInt(map, 1, 100)) return null;
+  if (outcome !== 'died' && outcome !== 'won') return null;
+  if (!isInt(row.save_version, 1, 100000)) return null;
+  if (typeof rating !== 'number' || !Number.isFinite(rating)) return null;
+  if (!isInt(fights, 0, 1e9) || !isInt(wins, 0, 1e9)) return null;
+  return {
+    id: String(id),
+    createdAt: created_at,
+    name,
+    classId,
+    level,
+    map,
+    outcome,
+    saveVersion: row.save_version,
+    rating,
+    fights,
+    wins,
   };
 }
 

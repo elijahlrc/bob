@@ -3,11 +3,11 @@ import { copyText } from '../clipboard';
 import { classDef } from '../data/classes';
 import type { Controller } from '../run/controller';
 import type { SlotId, SlotSummary } from '../run/save';
-import { rivalName, rivalsConfigured, rivalsOn, setRivalName, setRivals } from '../rivals';
-import { validName } from '../run/rivals';
+import { rivalsConfigured } from '../rivals';
 import { setTelemetry, telemetryConfigured, telemetryOn } from '../telemetry';
 import { ask } from './Confirm';
 import { DebugPanel } from './Debug';
+import { RivalsOptIn } from './RivalsOptIn';
 
 /** Copies the saved run so it can be attached to a bug report, and says whether that worked. */
 function CopySave({ c, id }: { c: Controller; id: SlotId }) {
@@ -93,53 +93,6 @@ function TelemetryNotice() {
   );
 }
 
-/** Lets the player add their characters to the rivals and high scores other players see, with a name of their choosing (off until they do). */
-function RivalsNotice() {
-  const [on, setOn] = useState(rivalsOn());
-  const [name, setName] = useState(rivalName());
-  if (!rivalsConfigured()) return null;
-  const bad = name.trim() !== '' && !validName(name.trim());
-  return (
-    <div class="rivals-opt muted">
-      <label title="Sent when a run ends, a death or a win: the character (class, level, passive tree, gear, gems and Strategy), the map reached and your name, with a random id kept in this browser. Separate from the run statistics.">
-        <input
-          type="checkbox"
-          checked={on}
-          onChange={(e) => {
-            const v = (e.currentTarget as HTMLInputElement).checked;
-            setRivals(v);
-            setOn(v);
-          }}
-        />{' '}
-        Add my characters to the rivals and high scores other players see
-      </label>
-      {on && (
-        <div class="rival-name">
-          <input
-            type="text"
-            maxLength={16}
-            value={name}
-            placeholder="Your name"
-            aria-label="Your name"
-            aria-invalid={bad}
-            onInput={(e) => {
-              const v = (e.currentTarget as HTMLInputElement).value;
-              setRivalName(v);
-              setName(v);
-            }}
-          />
-          <span class={bad ? 'warn' : ''}>
-            {bad
-              ? '3 to 16 letters, digits, spaces or hyphens; a letter or digit at each end.'
-              : 'Leave blank for a name the game makes up'}
-          </span>
-          <span>Your address is kept, hashed, to block abuse.</span>
-        </div>
-      )}
-    </div>
-  );
-}
-
 /** The invite to the game's Discord server (a permanent one). Empty hides the invitation. */
 export const DISCORD_URL = 'https://discord.gg/JJJgK9Prj3';
 
@@ -194,13 +147,18 @@ export function Title({ c }: { c: Controller }) {
         <button class="btn" onClick={() => c.goTo('patchNotes')}>
           Patch notes
         </button>
+        {rivalsConfigured() && (
+          <button class="btn" onClick={() => c.goTo('highScores')}>
+            High scores
+          </button>
+        )}
       </div>
       <DiscordInvite />
       {anyOk && (
         <p class="muted">Each run keeps its own save; a new run leaves the others alone.</p>
       )}
       <TelemetryNotice />
-      <RivalsNotice />
+      <RivalsOptIn />
       <DebugPanel c={c} />
     </div>
   );

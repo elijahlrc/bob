@@ -40,7 +40,7 @@ export class RivalLog {
   async flush(): Promise<string> {
     let sent = 0;
     for (const pending of this.records)
-      if (await postRival(this.fetchFn, this.sink, await pending)) sent++;
+      if ((await postRival(this.fetchFn, this.sink, await pending)).ok) sent++;
     const of = this.records.length;
     this.records = [];
     const hint = of > 0 && sent === 0 ? ' (is the table made? docs/rivals.sql)' : '';
