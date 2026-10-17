@@ -1111,3 +1111,16 @@ against the original on ten seeds with identical results and hashes) and applied
 the public key, direct reads were refused, and the pool was seeded with bot characters (`npm run sim -- --rivals`). The title screen says
 in one line that the address is kept hashed. Left for later plans: the nightly verifier that replays reported duels and recomputes the
 ratings, and the legality checks on snapshots (DUEL.md 13).
+
+## Duels: the screens (2026-10-17)
+
+docs/DUEL.md F7 built. From the run summary a player who has opted in with a typed name (a name is needed to duel; the made-up names are the
+bot's) presses "Duel for your damned soul's fate", sees five rivals drawn from the twenty near the map they reached (name, class, level, map,
+rating and record, build, a bot mark; never the difficulty), picks one and watches the duel. The first fight against a rival is rated: its seed
+is the pair's, the result is reported to `duels` when it ends, the server moves both ratings, and the result screen reads "Rated · 240 → 318"
+(a fight after it is "Practice"); "Again" fights on, "Another rival" comes back to the same five with the player's record on the cards, "Back"
+is the summary, which says "You beat 3 of 5 rivals · Your rating 318". A title screen button opens the high scores (the top hundred by rating,
+the player's own rows marked). The character is posted once per run through one keeper (never twice, a refused name shows the field again, an
+unreachable sink offers a retry); the player's own snapshot id comes from `my_snapshots`. Tested with an injected `fetch` and a text renderer
+for the screens (3,289 tests); **not seen in a browser and nothing posted to the project**: the owner walks the flow end to end (the list under
+"Built: F7" in DUEL.md section 7). Not built: the nightly verifier and the Elo recompute, legality checks, sparring from camp.

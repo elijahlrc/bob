@@ -1,8 +1,9 @@
 # Bob — Duels: asynchronous fights against other players' characters
 
-Status: **F0 to F5 built on 2026-10-16, F6 on 2026-10-17** (the plan was the second draft of 2026-10-16, after the user rejected the
-two-world engine of the first); F7 is not built, and `docs/rivals.sql` of F6 has not been run on the project; see "Built" under
-section 7 · Owner: the user · Author: Claude
+Status: **F0 to F5 built on 2026-10-16, F6 and F7 on 2026-10-17** (the plan was the second draft of 2026-10-16, after the user rejected the
+two-world engine of the first); the plan is complete but for section 13 (the nightly verifier and what else was left out), and
+`docs/rivals.sql` is applied to the project; the screens of F7 have not been seen in a browser, see "Built: F7" under section 7 ·
+Owner: the user · Author: Claude
 
 A duel is a real fight, watched in the game, between the player's character and a **rival**: a snapshot of another player's
 character (class, level, passive tree, gems, items and Strategy settings) taken when that player's run ended. The rival is
@@ -26,7 +27,7 @@ DESIGN.md Appendix A on approval (section 11).
 | **The rules of a duel**    | How a duel starts and ends, what each side brings, the damage scale, fairness of the step order.                                                                                                                       | F4         |
 | **The watchable duel**     | A round arena in a biome's look, both characters and their kits drawn, the player's HUD and the rival as a boss bar, the speed controls, a result screen.                                                              | F5         |
 | **Rivals** (the snapshots) | A character captured at the end of a run (opt-in), named, sent to a small table; fetched by version and depth; bot characters fill the pool while it is small.                                                         | F6         |
-| **The screens**            | "Fight a rival" from the run summary: a pick of rivals, the duel, the result, "Again"; a local record of results.                                                                                                      | F7         |
+| **The screens**            | "Duel for your damned soul's fate" from the run summary: a pick of rivals, the duel, the result (rated or practice), "Again", "Another rival"; a local record; the high scores.                                        | F7         |
 
 Ten to seventeen working days (section 10), of which the extraction of the singleton is three to five. Ranking, seasons and
 identity beyond a storage token are **not** in this plan (section 13).
@@ -273,7 +274,7 @@ not what they watch.
   back to `from`.
 - **Result screen** (`src/ui/DuelResult.tsx`): who won and how ("You won", "You fell", "A draw: time ran out", "A draw: nobody landed a
   blow for 15 s"), the time, each side's damage dealt by skill and taken by source (`MapReportView`, the numbers are what landed), and
-  **Again** (the next seed) and **Back**. "Another rival" is F7's.
+  **Again** (the next seed) and **Back**. A fight against a rival (F7, 6.5) adds a line ("Rated" or "Practice") and **Another rival**.
 - **Debug panel** (`src/ui/Debug.tsx`, at camp): a Duel row with a class, a map, a seed, **Mirror** (the character against a copy of
   itself) and **Bot** (a bot build of that class played to that map on the legacy curve; `botBuild`, `src/run/duelBot.ts`).
 
@@ -286,15 +287,18 @@ not what they watch.
 ```ts
 type Rival = {
   id: string; // the row id
-  name: string; // typed by the player, or made up when left blank (6.4)
+  name: string; // typed by the player (a player is posted only with one); made up for a bot (6.4)
   classId: string;
   level: number;
   map: number; // the map the run ended on
   outcome: 'died' | 'won';
-  difficulty: Difficulty; // shown on the card; not used in the fight
+  difficulty: Difficulty; // a dev setting: kept as a record, never shown on a card, not used in the fight
   saveVersion: number; // SAVE_VERSION at capture: the format of `build`
   gameVersion: string; // the commit, as telemetry sends it
   bot: boolean; // a character the bot built, to fill the pool
+  rating: number; // the ladder's, with fights and wins: a card shows them (6.3)
+  fights: number;
+  wins: number;
   build: Build; // class, level, allocated, equipment with gems, flasks, primaryGem, strategy
 };
 ```
@@ -306,11 +310,13 @@ this version decide whether it is offered; one that fails is skipped, not shown.
 
 ### 6.2 Capture
 
-When a run ends (`Controller.onRunEnd`, where telemetry hooks in), if the player has opted in, the snapshot is posted to the
-`rivals` table. **Opt-in, separate from telemetry:** the first time the summary screen offers a duel, one line and a checkbox
-("Add this character to the rivals other players fight"), remembered as a preference; a second checkbox on the title screen
-beside telemetry's (F6 built the title screen's, with the name field; the summary's line is F7's). The character of a run that
-ended in a death and one that won are both worth fighting.
+When a run ends (`Controller.onRunEnd`, where telemetry hooks in), if the player has opted in **and typed a valid name** (the owner,
+2026-10-17: a player is posted only with a typed name), the snapshot is posted to the `rivals` table. **Opt-in, separate from
+telemetry:** a checkbox on the title screen beside telemetry's, with the name field ("Add my characters to the rivals and high scores
+other players see"; F6), and the same component on the run summary until the character is sent (F7), remembered as a preference.
+The character of a run that ended in a death and one that won are both worth fighting. The post is kept (`postRun`, `src/rivals.ts`):
+the hook, the summary and the Rivals screen share it, so one run is never posted twice, and it says why when it failed (a name the
+table refused, or the rivals out of reach).
 
 ### 6.3 The pool
 
@@ -385,31 +391,65 @@ section 7). The reads keep the project from pausing.
 
 ### 6.4 Names
 
-A rival's name is **typed, or made up when left blank** (the owner, 2026-10-17; the plan had generated names only). The title
-screen's field takes 3 to 16 ASCII letters, digits, spaces and hyphens, starting and ending with a letter or digit (`validName`),
-remembered in the browser and stamped on every snapshot posted. Blank, or not valid, the game makes one up (`generateName(seed)`):
-two word lists in `src/data/rivalNames.ts` (an epithet and a place or a trait, "The Ashen Sentinel of the Low Road"), drawn with
-the seeded RNG from the run's seed, at most 46 characters; every word is ours and passes `src/data/ip.test.ts`. No accounts and no
-uniqueness: two players may both be "Bob", and the hashed token tells them apart. The rules are the database's: the character set,
-a cap of 48, and the deny-list table `blocked_words` that the owner fills in the table editor (no list of words in the
-repository). A name the table refuses loses its row, so the title screen says the rule.
+A player's name is **typed, and needed** (the owner, 2026-10-17; F6 had the typed name with a made-up fallback, and the plan generated
+names only). The title screen's field and the summary's take 3 to 16 ASCII letters, digits, spaces and hyphens, starting and ending
+with a letter or digit (`validName`), remembered in the browser and stamped on every snapshot posted; with none, nothing is posted
+and nobody duels ("A name is needed to duel"). The made-up names (`generateName(seed)`) are **the bot's alone**: two word lists in
+`src/data/rivalNames.ts` (an epithet and a place or a trait, "The Ashen Sentinel of the Low Road"), drawn with the seeded RNG from the
+run's seed, at most 46 characters; every word is ours and passes `src/data/ip.test.ts`. No accounts and no uniqueness: two players may
+both be "Bob", and the hashed token tells them apart. The rules are the database's: the character set, a cap of 48, and the deny-list
+table `blocked_words` that the owner fills in the table editor (no list of words in the repository). A name the table refuses loses
+its row; the summary shows the field again with "That name is not allowed" (`nameRefused`: a check violation whose message names the
+name, told from a cap or a block, which read "Could not reach the rivals").
 
 ### 6.5 The screens (F7)
 
-- **Summary** (`src/ui/Summary.tsx`): under the recap, a button "Fight a rival" (and the opt-in line the first time). The run
-  stays loaded until Quit, so `run.build` and `run.map` are there.
-- **Rivals** (`src/ui/Rivals.tsx`): K = 5 cards from `rivals_for`: name, class, level, map reached and outcome, the build
-  signature (`buildSignature`: main gem, keystones, uniques), a bot mark; pick one. While the pool is empty or offline, a
-  line says so and offers the player's own saved runs (`listSlots`: their characters as they stand at camp, no network and
-  no wait; a bot build would cost 5 to 45 s to play out and is kept for the Debug panel).
-- **Duel**: the map screen in duel mode (section 5), then **Duel result** (5), then back to Rivals or the summary.
-- **Record**: `localStorage` `bob.rivals.record`: per rival id the fights, wins and the last seed; the Rivals screen shows
-  "won 2 of 3" on a card, and the summary's line "You beat 3 of 5 rivals" after a set. No upload of results in this plan
-  (section 13).
+The feature is called **"Duel for your damned soul's fate"** (the owner, 2026-10-17): the summary's button and the heading of the
+rivals screen say exactly that. Elsewhere a duel is "a duel", an opponent "a rival" and the list "High scores". **A player duels only
+with the opt-in on and a typed name** (6.4); fighting one's own saved runs offline, which this section had as the fallback for an
+empty or unreachable pool, is dropped (an empty pool is a line and Back). Difficulty is a dev setting: a card never shows it.
+
+- **Summary** (`src/ui/Summary.tsx`, `RivalsBlock`): under the recap, the opt-in (`RivalsOptIn`, the title screen's component)
+  until the character is sent, and the button once the box is on and the name valid. The run stays loaded until Quit, so
+  `run.build` and `run.map` are there. The character is posted by the hook at the end of the run when the box was on with a valid
+  name; otherwise here: ticking the box with a valid name already typed posts the run that has just ended, and pressing the button
+  posts it first when it is not in (a name typed letter by letter is never posted half typed), then goes to the Rivals screen. Both
+  go through the keeper (6.2), so a run is never posted twice. A refused name shows the field again with "That name is not allowed"
+  and the button waits for another; an unreachable sink shows "Could not reach the rivals" and "Try again". After a set, one line:
+  "You beat 3 of 5 rivals · Your rating 318" (the tally of this run's snapshot, and its rating from `my_snapshots`: the one place a
+  player sees their own standing when they are not in the top 100).
+- **Rivals** (`src/ui/Rivals.tsx`; its state, `Controller.rivals`, lives beside the duel because a duel comes and goes): on entry
+  it waits for the post in hand, finds the player's own snapshot (`my_snapshots(token_hash)`, newest first: the newest row of this
+  save version, which must be the run's class, level and map; none, or another run's, means the character was not sent, and the
+  screen says so with Back and, only when the post failed, one retry through the keeper), asks `rivals_for` for twenty near
+  `run.map` (none of the player's own) and draws five with the seeded RNG (the run's seed and a counter). "Show others" draws five of
+  the twenty that are not on the cards. A card is a button that starts the duel: name, class, level, "map N, died" or "map N, won",
+  "rating 540 · 7 of 12 won", the build (`buildSignature`: the main skill, up to three keystones and four uniques, by name), a bot
+  mark, and "you: 2 of 3" from the record; never the difficulty. A rival whose snapshot will not start is dropped from the cards with
+  no message. None near, or offline: one line and Back. "Looking for rivals…" while the fetches run.
+- **Duel**: `startRivalDuel(rival, myId, myName)` → the map screen in duel mode (section 5; the rival's name is on the boss bar).
+  The first fight of a **pair** (the player's snapshot and the rival) is **rated**: its seed is the pair's, `duelSeedFor(myId, rivalId)`
+  = ((myId × 1000003) + (rivalId × 7919)) mod 2147483647 (the database's `duel_seed`; ids 1 and 2 give 1015841), and
+  when it ends the game posts the result to `duels` (`postDuel`: the two ids, the winner, how, the seconds, the game version, the
+  token hash); the server checks the ownership and moves both ratings at once. "Again" and every later fight against that rival are
+  **practice**, on the next seed. A duel is refused while a map of a run is being played.
+- **Result** (section 5): one line says what the fight counted for: "Rated · 240 → 318" (the player's rating before and after, read
+  again from `my_snapshots` once the report is in), "Rated" (the server had it already, or the rating could not be read), "Practice",
+  "Unrated: offline" or "Unrated: <the server's reason>" for a refused report. Buttons: **Again** (practice, next seed), **Another
+  rival** (the same five cards, their records updated; the rivals' own ratings on them are as they were fetched) and **Back** (the
+  run's summary). Leave, mid-fight, goes back to the cards and counts for nothing.
+- **Record**: `localStorage` `bob.rivals.record` (`src/run/rivalRecord.ts`), per **pair**: the fights, wins, last seed and whether the
+  rated fight is done. A pair and not a rival alone, because the rated fight is the pair's and every run posts a new snapshot: the
+  rival a character rated is a rated fight again for the next one. A pair rated before fights on practice, on the seed after its
+  last; a rated fight that was not reported (offline, refused) is rated again next time. The summary's tally is the pairs of this
+  run's snapshot. 300 pairs are kept.
+- **High scores** (`src/ui/HighScores.tsx`): a button on the title screen beside Codex and Patch notes. `high_scores(100)`: rank,
+  name, class, level, rating, fights, wins and the day posted; the player's own rows (the ids from `my_snapshots`) highlighted; "No
+  duels yet." when empty, one line when offline, Back. On a phone only the rank, name, class and rating stay.
 - **Camp** (later, out of this plan): the same screens from a "Spar" button, with the character as it stands.
 
-In-game text: a card says who the rival is and what they reached; the result says who won, how, and the two ledgers. Nothing
-explains the obvious.
+In-game text: a card says who the rival is and what they reached; the result says what the fight counted for, who won, how, and the
+two ledgers. Nothing explains the obvious.
 
 ---
 
@@ -424,7 +464,7 @@ explains the obvious.
 | **F4** | The rules          | `SideOpts.duel`: engage anywhere, no advance, loot or exit; the ends of 4.3; order alternation; `damageScale`; the measurement of fight lengths and the default (4.4); the symmetry test.                                                                                                                                                                                      | The same build on both sides wins about half over 100 seeds; fight lengths measured and the default recorded in Appendix A; `docs/PLAYER-AI.md` gains a section on duels; the fence still matches.                                                                                                             | 0.5 to 1 |
 | **F5** | The watchable duel | The round arena in a biome's look; the scene draws every side; effects by actor; the figure rig by side; the camera; the rival as the boss bar (no second HUD); `startDuel` and the controller's duel mode; `DuelResult.tsx`; "Again"; a Debug panel entry that starts a duel against a bot build.                                                                             | A duel between the current character and a bot build can be watched from the Debug panel at every speed, on a phone layout too; no console errors; the boss bar follows the rival.                                                                                                                             | 2 to 3   |
 | **F6** | Rivals             | `Rival`, `src/run/rivals.ts` (post, fetch, validate, token, names), `docs/rivals.sql` run on the project, the opt-in preference and checkboxes, capture in `onRunEnd`, `npm run sim -- --rivals`, TELEMETRY.md's new section.                                                                                                                                                  | A death with the opt-in posts a row the table accepts; `rivals_for` returns K rows of the version near the map, none of the caller's; a row with an unknown gem id is skipped by the client; the bot has seeded the pool at the current version.                                                               | 1 to 2   |
-| **F7** | The screens        | "Fight a rival" on the summary, `Rivals.tsx`, the local record, the summary line, the offline fallback; patch notes.                                                                                                                                                                                                                                                           | From a death: pick a rival, watch the duel, see the result, fight again, fight another; the record persists across reloads; works offline against one of the player's own saved runs; `npm run check` and `npm run build` green; the patch notes entry filed.                                                  | 1 to 2   |
+| **F7** | The screens        | "Duel for your damned soul's fate" on the summary, `Rivals.tsx`, the rated fight and its report, the record, the high scores.                                                                                                                                                                                                                                                  | From a death: opt in with a name, pick a rival, watch the duel, see the result (rated or practice), fight again, fight another; the record persists across reloads; the high scores; `npm run check` and `npm run build` green.                                                                                | 1 to 2   |
 
 Order: F0 to F4 are the engine and are measured headlessly; F5 is independent of F6; F7 needs both. Commits at the end of
 each milestone and of each group of F1; the fence runs before every one of them.
@@ -903,6 +943,68 @@ fallback; the high scores are the duel ratings of snapshots, written by a later 
     rival that throws is dropped from the list.
   - _The map to look near_ is `run.map`; the rivals the player fights are compared by `Rival.map`, `level`, `outcome`, and `buildSignature(build)`.
 
+**Built: F7 (2026-10-17).** Every screen between a death and a fight: the opt-in and the duel button on the run summary, the Rivals
+screen, the rated fight with its report and the rating's move on the result screen, the record, and the high scores. Built headlessly
+and tested with an injected `fetch` and, for the screens, a small text renderer (Preact's function components called with the hooks
+stood in for, `src/ui/rivalScreens.test.ts`: it is how the text of each screen was read); **no browser was opened and nothing was
+posted to the project**, so what the screens look like and how they feel is for the owner (the list under "Unverified"). As planned,
+with the owner's decisions of 2026-10-17 (6.5; Appendix A: a typed name is needed to duel, the feature's name, the fallback dropped,
+difficulty never shown, the rated fight and its report, `my_snapshots`, the high scores' button) and these differences and findings:
+
+- **The post is an act, and kept** (`src/rivals.ts`: `postRun`, `postStatus`, `pendingPost`, `watchPost`). One keeper serves the hook at
+  the end of a run, the summary and the Rivals screen; it holds the run's post as `sending`, `posted` or `failed` (a name the table refused,
+  or the rivals out of reach: `nameRefused` reads the check violation's message, so that a cap and a block are "Could not reach the
+  rivals"), posts a run once, and lets a run that failed be posted again. It remembers the last run it posted in `bob.pref.rivalPosted`,
+  keyed by **class, seed and maps played** rather than the seed alone (a seed played twice is two runs). The hook posts only with the box
+  on and a valid typed name. The summary posts when the box is ticked with a valid name already typed, or when the duel button is pressed
+  (it awaits the post and goes on only when the character is in); **it never posts on the keystrokes of a name**, which the brief's
+  "ticking it with a valid name" would have done at the third letter. For the same reason the opt-in stays on the summary until the
+  character is sent (the brief's "when the box is off or the name is not valid" would have unmounted the field at the third letter).
+- **`postRival` returns `{ ok, status?, code?, message? }`** and `postDuel` `{ outcome: 'rated' | 'already' | 'refused' | 'failed',
+message? }` (the brief had the bare outcome; the result screen needs the server's reason). Both read the PostgREST body only when the
+  fetch has one, so a plain `{ ok }` double still works; `scripts/rivallog.ts` counts `.ok`. `Rival` gains `rating`, `fights` and `wins`
+  (the card shows them), read leniently. `fetchRivalsOrNull`, `fetchHighScoresOrNull` and `fetchMySnapshots` return null when the sink
+  could not be asked, to tell "offline" from "none" (the plain `fetchRivals` and `fetchHighScores` still give `[]`).
+- **The record is per pair, not per rival** (`src/run/rivalRecord.ts`, 300 pairs kept): the database allows one rated report for each
+  ordered pair (the player's snapshot, the rival), and every run posts a new snapshot, so a record keyed by the rival alone would call a
+  new character's first fight against a rival "practice" and never report it. A pair rated before fights on the seed after its last; a
+  rated fight that was not reported (offline, refused) is rated again. The summary's tally is the pairs of this run's snapshot.
+- **The controller** (`src/run/controller.ts`): `startDuel` returns a boolean and is transactional (the world is made first, so a build
+  that will not make one throws with nothing changed) and refuses while a map of a run is being played; `startRivalDuel(rival, myId,
+myName)` runs it in a `try` and drops a rival that throws; `leaveDuel(to?)` (Back is the summary, Another rival and Leave the cards);
+  `DuelMode.rival` is `{ rivalId, myId, rated, home }`; the end of a fight against a rival updates the record and calls `onDuelEnd`
+  (`reportDuel` in `src/rivals.ts` posts the report of the rated one: one report, once, before the screen says "Rated"). The cards and
+  the draw's counter live on `Controller.rivals`, a sibling of `duel` because `leaveDuel` clears `duel`, and go with the run (a quit, a
+  new run, a continue). "Show others" draws five of the twenty that are not on the cards (a pool of five or fewer has no such button).
+- **Fights counted, and not**: Leave, mid-fight, counts for nothing (a player who watches a fight and leaves it when it goes badly
+  reports nothing; cheating by omission is tolerated at this scale, section 9). The rivals' own ratings on the cards are as they were
+  fetched; only the player's rating is read again.
+- **`buildSignature`** (`src/run/rivals.ts`) is the card's: the main skill, up to three keystones and four uniques, by name. It is not
+  `metrics.buildSignature`, the telemetry's line of ids, which keeps its name.
+- **Tests:** 3,289 in 190 files (88 new). `src/run/rivalScreens.test.ts` (22: `duelSeedFor` against the SQL's own constants,
+  `postRival`'s reasons, `postDuel`'s request and four outcomes, `fetchMySnapshots`, `buildSignature` on a real bot build, the draw),
+  `rivalRecord.test.ts` (8), `rivalDuel.test.ts` (15: the controller), `src/rivals.test.ts` (16: the hook posts nothing without a name,
+  a run is never posted twice, a refused name is reported), `src/rivalsScreens.test.ts` (16: the Rivals screen's fetches in order, the
+  report and the rating's move, the high scores) and `src/ui/rivalScreens.test.ts` (18: each screen's text and buttons).
+- **Unverified in a browser** (read twice, not seen; in the order of the flow): the title screen's hint "A name is needed to duel" and the
+  new High scores button beside Codex and Patch notes; the summary's block under the recap (the opt-in with the field, then the button
+  "Duel for your damned soul's fate", "That name is not allowed", "Could not reach the rivals" with "Try again", and the line "You beat
+  3 of 5 rivals · Your rating 318") on a phone too; the Rivals screen: the five cards (`rivals.css`: how a card's lines fit, the bot
+  mark, the build line wrapping, a card as a button on touch), "Show others", the "Looking for rivals…" wait, the lines for none near,
+  offline and a character that was not sent; a card pressed from the summary starting the duel (the map screen coming up from a summary
+  screen, the rival's name on the boss bar, Leave going back to the cards); the result screen's line ("Rated · 240 → 318", "Rated",
+  "Practice", "Unrated: offline") and its three buttons; Another rival coming back to the same five with "you: 2 of 3"; the high scores
+  table (the highlighted rows, the phone layout that keeps rank, name, class and rating). And the whole flow against the live project,
+  which nothing here has done: a death, the opt-in, the row in `rivals`, `my_snapshots` finding it, a rated fight, the row in `duels`,
+  both ratings moving, the list.
+- **What the nightly verifier will need from the client** (section 13): a `duels` row has `a_id`, `b_id`, `winner` (0 is `a`, the player's
+  snapshot; 1 is `b`; null a draw), `how`, `seconds` (the fight's time rounded to hundredths, so compare with a tolerance of 0.01),
+  the server's `seed` (`duel_seed(a, b)`) and `game_version` (the commit; `local` for a dev server, which cannot be replayed). The fight
+  is `runDuel(a.build, b.build, seed)` of **the two snapshots' `build` columns as posted** with the default options (the client passes
+  only the names, which change nothing in a fight): the duel's damage scale, end rules and arena are the defaults of that game version,
+  so the job must run the code of `game_version`. The client plays copies of both builds (a snapshot is `run.build` as the run ended,
+  `rivalRecord`), at each character's own level.
+
 ---
 
 ## 8. Verification
@@ -936,12 +1038,15 @@ matrix (LADDER.md 4.3 was the crossfire); the fight-length measurement of F4.
 - **A faked snapshot** only makes a rival nobody enjoys fighting; it is visible on its card and can be deleted in the table
   editor. The legality checks of LADDER.md section 8.2 (points for the level, a connected tree, affixes within their tiers,
   gem levels) are a later milestone if ever needed.
-- **Results are never uploaded** in this plan, so there is nothing to fake about them.
-- **Privacy.** A rival row holds a character, a hashed random token and a name (the one the player typed, if they typed one, else
-  a made-up one), no run history, no id that links to a person; it is a separate opt-in, with its own checkbox and its own
+- **A rated fight is reported by the browser that played it** (6.3, 6.5), and the report can lie: the database forces the seed (the
+  pair's), refuses a report whose token hash is not the snapshot's and a bot's, and allows one rated fight per pair, so a liar can
+  only claim a result for a fight that has that seed, against a rival that exists; the nightly job (13) replays each report and
+  recomputes the ratings, so a false one moves the ladder for a day at most. "Again" is practice and is never uploaded.
+- **Privacy.** A rival row holds a character, a hashed random token and the name the player typed (a made-up one only for a bot), no
+  run history, no id that links to a person; it is a separate opt-in, with its own checkbox and its own
   preference, so TELEMETRY.md's promise of no identity stays true of `runs`. TELEMETRY.md has a section ("Rivals and high scores")
   that says exactly what is sent. A player who turns the opt-in off stops new rows; rows already sent stay until the retention
-  rule removes them (the summary says so in one line).
+  rule removes them.
 
 ---
 
@@ -987,10 +1092,10 @@ Ten to seventeen working days (section 7). Risks, each with its fence:
 | 5   | Resist penalty and level  | None; each character at its own level                                                                        | Each at its own map tier's penalty                                                          |
 | 6   | Damage scale              | ×0.3 (F4 measured: median fights of 16 s and 25 s, 3% and 6% on the cap)                                     | ×1 always (the first hit decides); a scale that falls with the level                        |
 | 7   | Arena and distance        | The boss arena's round room, a biome look, 10 tiles apart                                                    | The dummy's open floor; a labyrinth room                                                    |
-| 8   | Who is offered            | K = 5 of the same save version within ±10 maps, players before bots, never one's own                         | Same class only; any depth                                                                  |
-| 9   | Names                     | Typed (3 to 16 characters) under the database's rules and deny-list table, made up when blank (owner, F6)    | Generated only, rerollable (the plan)                                                       |
+| 8   | Who is offered            | Five drawn from twenty of the same save version within ±10 maps, players before bots, never one's own (F7)   | Same class only; any depth                                                                  |
+| 9   | Names                     | Typed (3 to 16 characters) and needed to duel, under the database's rules and deny-list; made up for bots    | Generated only, rerollable (the plan); made up when blank (F6)                              |
 | 10  | Identity                  | A random storage token, hashed                                                                               | Supabase anonymous sign-in (LADDER.md 8.3)                                                  |
-| 11  | What is uploaded          | The snapshot only; results stay local                                                                        | Results too (the ladder, section 13)                                                        |
+| 11  | What is uploaded          | The snapshot, and the report of each rated fight (the first of a pair); practice stays local                 | The snapshot only; results stay local (the plan)                                            |
 | 12  | The rival's HUD           | None: the player's HUD, and the rival as a boss bar (name, life, energy shield), on a phone too (owner, F5)  | A second HUD on the right, a bar on a phone (the plan); two full HUDs stacked               |
 | 13  | Who a character goes for  | The other character and its minions, by the strategy's priority; the other counts as a boss for `rares` (F4) | The other character only (a summoner draws every fight against melee)                       |
 | 14  | Who acts first            | Reversed or not on each tick by a mix of the tick and the seed: each fight is fair in itself (F4)            | The tick parity (does not alternate who is first); the seed's parity (fair over seeds only) |
@@ -1011,5 +1116,7 @@ Ten to seventeen working days (section 7). Risks, each with its fence:
 - **Sparring from camp** with the character as it stands, and entering mid-run snapshots (a pool of characters captured at
   every tenth map cleared, not only at the end of a run).
 - **Legality checks** on snapshots.
+- **Fighting one's own saved runs** offline, which section 6.5 had as the fallback for an empty or unreachable pool: dropped by the
+  owner on 2026-10-17 (an empty pool is a line and Back).
 - **Totems and other deployables with life**, and **monsters together with two characters** (co-operative or three-way).
 - **Replays**: a duel is deterministic from two builds and a seed, so a replay is a seed; a share link is a later screen.

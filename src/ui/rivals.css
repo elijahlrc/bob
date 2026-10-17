@@ -27,7 +27,7 @@
 .rivals,
 .highscores {
   justify-content: flex-start;
-  padding: 24px 12px;
+  padding: 24px calc(12px + var(--safe-right, 0px)) 24px calc(12px + var(--safe-left, 0px));
   box-sizing: border-box;
 }
 .rivals h2,
