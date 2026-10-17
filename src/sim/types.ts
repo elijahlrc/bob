@@ -158,7 +158,7 @@ export type Actor = {
     speed: number;
     /** The rest of what the hexes on this actor do (damage over time taken, accuracy, evasion, chances to be bled or maimed...). */
     more: HexTotals;
-    /** Seconds before a Hexcaller can hex again, and the time left of a Choirmaster channel. */
+    /** Seconds before a Hexcaller can hex again. */
     cd: number;
   };
   /** The Choir (EXPANSION 7.3): the censer aura time left, a Zealous boost, and Fervour stacks with their time left. */
@@ -223,7 +223,7 @@ export type Actor = {
   suppressT: number;
   /** Where a burrowed Gnawing Queen will come up. */
   mark: { x: number; y: number };
-  /** Seconds before a Hexcaller can hex again, and the time left of a Choirmaster channel. */
+  /** The time left of a Choirmaster channel. */
   channelT: number;
   chase: {
     /** A chasing monster: seconds it has spent held up (it walks but gets nowhere), and where it was and when it last tried to walk. */

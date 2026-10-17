@@ -346,8 +346,9 @@ each milestone and of each group of F1; the fence runs before every one of them.
 - **The fence** (`npm run fence`) hashes each map's whole `MapResult` and the run's whole `BotRunResult` as well as every tick's
   events, and has `--deep` (maps 1 to 30, seeds 1 to 3) and `--events`; `BotRunOpts.onMap` was added so that it can read each map's
   result. The default fence takes 20 seconds, not two minutes. Main's own hashes were re-recorded before every merge of main.
-- **`Actor.side` is set after `newActor`'s object literal**: a literal of 128 or more properties makes the sim about 15% slower
-  (PERFORMANCE.md section 5).
+- **`Actor` was one field from V8's cliff**: a literal of 128 or more properties makes the sim about 15% slower, so `Actor.side`
+  was first assigned after `newActor`'s literal. The compound fields were then grouped into sub-objects (`since`, `leech`, `chase`,
+  `dash`, `hex`, ... : 88 properties, a test holds it under 100) and `side` is in the literal again (PERFORMANCE.md section 5).
 - **`WorldOpts` is split in two, but callers still hand `createWorld` one bag**, `MapOpts = WorldOpts & SideOpts`, which it splits;
   one bag per side is F2's `CreateWorldInput.sides`.
 - **Damage, and kills, with no attacker named** (a damage-over-time tick, `rawHit`, `killActor`) are credited to the side the
