@@ -59,10 +59,12 @@ performance work with no visible effect, balance of unreleased content.
 
 ## 3. Write the notes (the style rules)
 
-- **Major changes only, as a short list.** Roughly 3 to 10 bullets for a release. That is a guide, not a hard limit: a big
-  release may have more, and the audit must not fail a list for its length alone. One bullet is one line of at most 600
-  characters; split a longer one or cut it. Merge related commits into one bullet (five tree iterations are one bullet
-  about the tree). Name the effect, with a number only when it helps ("about three times the damage").
+- **Short, high-level, few.** A bullet is one plain sentence saying what changed, two at most when the player must know how
+  to use it: about 150 characters, never more than 250. Say what is new or different at a high level, never how it works:
+  no lists of screens, fields, options, rules or numbers, no walkthroughs, no second sentence that merely elaborates. A big
+  feature is one bullet, two if it has a rule the player must follow (an opt-in, a name). Roughly 3 to 8 bullets for a
+  release; merge related commits into one (five tree iterations are one bullet about the tree). A number only when the
+  player must know it ("about a third of the damage").
 - **Plain text.** No bold, no backticks, no links, no tables. A dash bullet per note.
 - **Public-facing, impersonal.** No "I", no "we", no "you asked", no mention of the developer, the user or a session. "Your
   character" and "you" for the player are fine.
@@ -77,10 +79,11 @@ performance work with no visible effect, balance of unreleased content.
   stronger".
 - Group under a `### Heading` (Skills, Monsters and combat, Items, Interface, Known issues) only when a release has more than a
   handful of bullets; otherwise a flat list under the date is better.
-- Match the voice and density of the newest entries already in the file.
+- Match the voice of the newest entries in the file, not their length: the entries before 2026-10-17 are longer than wanted.
 
-Earlier drafts were rewritten by the user for being dev-facing, for listing unchanged items, and for being too detailed. A short
-list of major changes is what they want; when in doubt, cut.
+Earlier drafts were rewritten by the user for being dev-facing, for listing unchanged items, and for being too detailed, and on
+2026-10-17 the user called the notes "always bloated and excessively verbose": simple short descriptions of what changed at a
+high level are all they want. When in doubt, cut; then cut again.
 
 ## 4. File them
 
@@ -101,6 +104,8 @@ commits and code to confirm a claim). Tell it to change nothing and to answer wi
 
 - **PASS**, or **FIX** with the specific rule it breaks and a replacement wording;
 - **CUT** for a bullet a player would not notice, that duplicates another, or that is not true of the commits;
+- **FIX** for a bullet over the length rule or that explains how a thing works rather than what changed, with the shorter
+  wording;
 - anything that makes the list unfit for public consumption as a whole: dev or process language, anything that reads as
   internal, spoilers of unreleased content, tone that blames or apologises, unclear wording a player could not follow, a list
   that is padded with minor changes (its length alone is not a fault), an unexplained balance move (direction and who is
