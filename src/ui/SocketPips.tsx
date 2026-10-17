@@ -90,14 +90,6 @@ export function SocketsRow({
 }) {
   if (!socketsMatter(o)) return null;
   const note = socketNote(o, primary);
-  const count =
-    o.before.sockets === o.after.sockets ? (
-      <span class="ix-sk-cnt">{o.after.sockets} linked</span>
-    ) : (
-      <span class="ix-sk-cnt">
-        {o.before.sockets} → {o.after.sockets}
-      </span>
-    );
   return (
     <div class="ix-sockets">
       <div class="ix-sk">
@@ -111,7 +103,6 @@ export function SocketsRow({
           →
         </span>
         <SocketPips sockets={o.placed} primary={primary} out={o.out} />
-        {count}
       </div>
       {names && <GemChips placed={o.placed} out={o.out} primary={primary} />}
       {note.text && (

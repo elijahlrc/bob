@@ -57,7 +57,8 @@ function Chip({
   if (Math.abs(v) < 0.05) return null;
   return (
     <span class={'ix-chip ' + (v > 0 ? 'up' : 'down')}>
-      {v > 0 ? '▲' : '▼'} {pct(v, digits)}
+      <span class="ix-arr">{v > 0 ? '▲' : '▼'} </span>
+      {pct(v, digits)}
       {unit} {label}
     </span>
   );
@@ -225,6 +226,8 @@ function ActionRow({
   phone,
   full,
   setFull,
+  both,
+  setBoth,
 }: {
   swap: string;
   title?: string;
@@ -237,6 +240,9 @@ function ActionRow({
   phone: boolean;
   full: boolean;
   setFull: (f: boolean) => void;
+  /** The phone's "show both cards" switch (the full view only). */
+  both?: boolean;
+  setBoth?: (b: boolean) => void;
 }) {
   return (
     <div class="item-actions ix-actions">
@@ -261,6 +267,16 @@ function ActionRow({
         </button>
       )}
       <DiscardButton it={it} a={a} />
+      {phone && full && both !== undefined && setBoth && (
+        <button
+          class={'btn small ix-both' + (both ? ' on' : '')}
+          aria-label="Show both cards"
+          aria-pressed={both}
+          onClick={() => setBoth(!both)}
+        >
+          Both
+        </button>
+      )}
       {phone && (
         <button
           class="btn small ix-expand"
@@ -284,6 +300,7 @@ function PhoneCompare({
   against,
   rows,
   full,
+  both,
   build,
   extra,
   sockets,
@@ -292,12 +309,13 @@ function PhoneCompare({
   against: Item | FlaskItem | undefined;
   rows: DiffRow[];
   full: boolean;
+  /** Both cards shown under the merged one. */
+  both: boolean;
   build: Build;
   /** The calculated changes, shown in the full view only. */
   extra?: ComponentChildren;
   sockets?: ComponentChildren;
 }) {
-  const [both, setBoth] = useState(false);
   if (!full)
     return (
       <>
@@ -310,9 +328,6 @@ function PhoneCompare({
       {extra}
       {sockets}
       {against ? <DiffCard it={it} rows={rows} /> : <ItemCard it={it} build={build} />}
-      <button class="btn small ix-cards-toggle" onClick={() => setBoth(!both)}>
-        {both ? 'Hide both cards ▴' : 'Show both cards ▾'}
-      </button>
       {both && <Pair item={it} against={against} empty="Worn" build={build} />}
     </>
   );
@@ -337,6 +352,7 @@ function ItemBody({
 }) {
   const slots = useMemo(() => compareSlots(run, item.uid), [run.build, run.inventory, item.uid]);
   const [pick, setPick] = useState<{ uid: number; slot: EquipSlot } | null>(null);
+  const [both, setBoth] = useState(false);
   const best = slots.find((s) => s.best) ?? slots[0];
   const active = (pick?.uid === item.uid && slots.find((s) => s.slot === pick.slot)) || best;
   if (!active) return null;
@@ -381,6 +397,7 @@ function ItemBody({
           against={active.equipped}
           rows={diffRows(item, active.equipped)}
           full={full}
+          both={both}
           build={run.build}
           extra={chips}
           sockets={sockets}
@@ -405,6 +422,8 @@ function ItemBody({
         phone={phone}
         full={full}
         setFull={setFull}
+        both={both}
+        setBoth={setBoth}
       />
     </>
   );
@@ -429,6 +448,7 @@ function FlaskBody({
 }) {
   const slots = useMemo(() => compareFlasks(run, flask.uid), [run.build, run.inventory, flask.uid]);
   const [pick, setPick] = useState<{ uid: number; idx: number } | null>(null);
+  const [both, setBoth] = useState(false);
   const chosen = slots.find((s) => s.chosen) ?? slots[0];
   const active: FlaskCompare =
     (pick?.uid === flask.uid && slots.find((s) => s.idx === pick.idx)) || chosen;
@@ -465,6 +485,7 @@ function FlaskBody({
           against={active.equipped ?? undefined}
           rows={diffRows(flask, active.equipped ?? undefined)}
           full={full}
+          both={both}
           build={run.build}
         />
       ) : (
@@ -492,6 +513,8 @@ function FlaskBody({
         phone={phone}
         full={full}
         setFull={setFull}
+        both={both}
+        setBoth={setBoth}
       />
     </>
   );
