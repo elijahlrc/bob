@@ -23,6 +23,11 @@ Run with no draft waiting, `/patch-notes` does both passes in one go. Which case
 is, a push to `main` builds and deploys the game (`.github/workflows/pages.yml`), and the itch.io page is updated by the
 upload in step 9. Nothing else needs editing.
 
+The itch.io page has exactly one upload: the butler `html5` channel, ticked "This file will be played in the browser". Each
+run replaces that upload's build in place, so the page always plays the latest. A file added through the itch.io web uploader
+is a separate upload that butler never sees or updates (`butler status` lists only channels); if one appears, the user deletes
+it on the page's Uploads list.
+
 ## 1. Find what changed
 
 - `git fetch origin`, then `git status -sb` to see where `main` stands against `origin/main`.
