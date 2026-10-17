@@ -31,15 +31,15 @@ function arena() {
 const props = (o: object) => Object.keys(o).length;
 
 /**
- * Why a limit: V8 builds an object from a literal of up to 128 properties in its fast, struct-like layout, and from one of 129
- * or more as a dictionary, which was measured at about 15% on the whole sim (docs/PERFORMANCE.md section 5). `newActor` made
- * every actor from a literal of 127 properties, so that one field more was a trap. Fields that are one thing are grouped into
- * one sub-object each (`since`, `hex`, `dash`...), which leaves a wide margin (88 properties for an actor). If this fails,
- * group the new field with the ones it belongs with, or make a group of its own, rather than raising the limit.
+ * Why a limit: V8 builds an object from a literal of 128 or more properties much more slowly than one of 127 (the fast,
+ * struct-like layout is kept below that size); one field more in `newActor`'s literal made the whole sim about 15% slower
+ * (docs/PERFORMANCE.md section 5). The literal had 127 properties, so a single new field was a trap. Fields that are one thing
+ * are now grouped into one sub-object each (`since`, `hex`, `dash`...), which leaves a wide margin (88 properties for an actor).
+ * If this fails, group the new field with the ones it belongs with, or make a group of its own, rather than raising the limit.
  */
 const LIMIT = 100;
 
-describe('the size of an actor (V8 keeps an object of up to 128 properties fast)', () => {
+describe('the size of an actor (a literal of 128 properties is slow in V8)', () => {
   it('an actor from newActor has at most 100 properties', () => {
     expect(props(newActor(1, true, 0, 0, 0.4))).toBeLessThanOrEqual(LIMIT);
   });
