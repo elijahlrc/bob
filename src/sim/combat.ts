@@ -1166,7 +1166,7 @@ export function killActor(w: World, a: Actor): void {
   if (a.isPlayer) {
     // The map is over when the local player's character falls (a duel reads the deaths of its sides).
     if (a.side!.id === 0) w.status = 'dead';
-    w.events.push({ t: 'playerDied' });
+    w.events.push({ t: 'playerDied', src: a.id });
     return;
   }
   const p = fs.player;

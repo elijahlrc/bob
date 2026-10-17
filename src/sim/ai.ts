@@ -712,7 +712,7 @@ export function playerAI(w: World, s: Side, dt: number): void {
       p.y = wp.y;
       ai.wp++;
       s.stats.stuck++;
-      w.events.push({ t: 'stuck' });
+      w.events.push({ t: 'stuck', src: p.id });
     }
     ai.stuckT = 0;
     ai.stuckX = p.x;
