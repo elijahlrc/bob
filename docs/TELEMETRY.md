@@ -155,7 +155,7 @@ The public key may insert into `rivals` and may not select, update or delete a r
 1. In the SQL editor of the Supabase project, run `docs/rivals.sql`. It can be run again without harm. It makes `rivals`,
    `blocked_words` (empty), the triggers, the two functions and the policy that lets the public key **insert and nothing else**.
 2. Fill the deny-list (below).
-3. Seed the pool with the bot: `npm run sim -- --runs 10 --class all --seed 1 --rivals` posts the character each run ends with
+3. Check one insert and the reads ("Checking it works", below), then seed the pool with the bot: `npm run sim -- --runs 10 --class all --seed 1 --rivals` posts the character each run ends with
    as `bot: true` with a made-up name (one request each; a name the deny-list stops loses only its own row). Run it again with
    `--legacy` for deeper characters, and with other `--seed` values for more; the pool needs rivals at the current save version,
    and it is replaced by players' own as they come.
@@ -188,12 +188,20 @@ A player who turns the box off stops new rows; the rows already sent stay until 
 
 ### Checking it works
 
-After step 3, with the project's URL and the publishable key from `SINK`:
+After step 2, one row through the client's own path (the bot's character from one run; at the default difficulty the Vanguard of
+seed 1 dies on map 20 in about 4 s; a bot that is still alive at the map cap posts nothing, so do not shorten it with `--maps`):
 
 ```sh
-# the pool at the current save version near map 10 (rows, no token_hash); the id and build of each
+# expect: "rivals: sent 1 of 1 bot characters (version <hash>)"
+npm run sim -- --runs 1 --class vanguard --seed 1 --rivals
+```
+
+Then, with the project's URL (`SINK.url`) and the publishable key (`SINK.key`) in `$URL` and `$KEY`:
+
+```sh
+# the pool at this save version (19 in src/run/run.ts today) near map 20: one row, "bot": true, a made-up name, a build, no token_hash
 curl -s "$URL/rest/v1/rpc/rivals_for" -H "apikey: $KEY" -H "Content-Type: application/json" \
-  -d '{"save_version": 19, "map": 10, "k": 5, "exclude_token_hash": null}'
+  -d '{"save_version": 19, "map": 20, "k": 5, "exclude_token_hash": null}'
 # the high scores: [] until a ranking job has written ratings
 curl -s "$URL/rest/v1/rpc/high_scores" -H "apikey: $KEY" -H "Content-Type: application/json" -d '{"k": 10}'
 # the table itself must refuse the public key: a permission error, never rows

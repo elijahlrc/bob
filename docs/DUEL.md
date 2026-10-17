@@ -852,9 +852,10 @@ fallback; the high scores are the duel ratings of snapshots, written by a later 
   check violation on `build`, raise the number in `docs/rivals.sql`.
 - **Tests:** `src/run/rivals.test.ts` (24), `src/rivals.test.ts` (7), `scripts/rivallog.test.ts` (3). `npm run check` and `npm run build` are green.
 - **What the owner runs, in this order:** (1) read and run `docs/rivals.sql` in the SQL editor; (2) fill `blocked_words` in the table editor;
-  (3) seed: `npm run sim -- --runs 10 --class all --seed 1 --rivals` (about 60 bot characters; more seeds, and `--legacy`, for more and deeper
-  ones); (4) the three `curl` checks of TELEMETRY.md "Rivals and high scores" ("Checking it works"). A game version that has this code posts
-  characters when a player ticks the box, so deploy it after step 1.
+  (3) one insert by the client's path, `npm run sim -- --runs 1 --class vanguard --seed 1 --rivals` (the bot dies on map 20 in about 4 s; expect
+  `rivals: sent 1 of 1 bot characters`), then the three `curl` checks of TELEMETRY.md "Rivals and high scores" ("Checking it works"); (4) seed:
+  `npm run sim -- --runs 10 --class all --seed 1 --rivals` (about 60 bot characters; more seeds, and `--legacy`, for more and deeper ones). A game
+  version that has this code posts characters when a player ticks the box, so deploy it after step 1.
 - **For F7:**
   - _The rows._ `fetchRivals(fetchFn, SINK, { saveVersion: SAVE_VERSION, map, k, excludeTokenHash })` gives validated `Rival`s (6.1);
     `excludeTokenHash` is `await hashToken(rivalToken())` (`src/rivals.ts`). `fetchHighScores(fetchFn, SINK, k)` gives
