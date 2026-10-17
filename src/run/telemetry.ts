@@ -161,7 +161,7 @@ export function simRecord(r: RunRecord, source: string, batch: string): SimRecor
   return { ...r, source: source.slice(0, MAX_TEXT), batch: batch.slice(0, MAX_TEXT) };
 }
 
-type Fetch = (url: string, init: Record<string, unknown>) => Promise<{ ok: boolean }>;
+export type Fetch = (url: string, init: Record<string, unknown>) => Promise<{ ok: boolean }>;
 
 /**
  * Post records to a table in one request. Fire and forget: it resolves to whether the server took them and never throws, so
@@ -171,7 +171,7 @@ type Fetch = (url: string, init: Record<string, unknown>) => Promise<{ ok: boole
 export async function postRecords(
   fetchFn: Fetch,
   sink: Sink,
-  table: 'runs' | 'sim_runs',
+  table: 'runs' | 'sim_runs' | 'rivals',
   records: readonly object[],
 ): Promise<boolean> {
   if (!records.length) return true;

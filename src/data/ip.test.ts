@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { bare, loadPobNames, loadReference } from '../../scripts/coverage/reference';
-import { IP_DENY_LIST } from './ipDenyList';
+import { ipViolations } from './ipScan';
 
 const modules = import.meta.glob<Record<string, unknown>>(
   ['./**/*.ts', '!./**/*.test.ts', '!./ipDenyList.ts'],
@@ -39,30 +39,6 @@ function collectNameValues(v: unknown, out: string[], seen: Set<unknown>): void 
     if (k === 'name' && typeof x === 'string') out.push(x);
     else collectNameValues(x, out, seen);
   }
-}
-
-function escape(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-/**
- * Multi-word entries match anywhere as whole words. Single words match only when they are the
- * entire string (a gem or class *named* exactly like the reference) so ordinary words in our own
- * names ("Veil of Grace", "Haste flask") don't trip the scan. Entries prefixed with `=` are
- * descriptive phrases that only count as a slip when used as a whole name.
- */
-export function ipViolations(strings: readonly string[]): string[] {
-  const bad: string[] = [];
-  for (const entry of IP_DENY_LIST) {
-    const exact = entry.startsWith('=');
-    const phrase = exact ? entry.slice(1) : entry;
-    const multi = !exact && /\s/.test(phrase.trim());
-    const re = multi
-      ? new RegExp(`(^|[^a-z])${escape(phrase)}($|[^a-z])`, 'i')
-      : new RegExp(`^\\s*${escape(phrase)}\\s*$`, 'i');
-    for (const s of strings) if (re.test(s)) bad.push(`"${s}" matches "${entry}"`);
-  }
-  return bad;
 }
 
 describe('IP deny-list scan (DESIGN.md §3)', () => {
