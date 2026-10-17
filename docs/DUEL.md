@@ -444,8 +444,8 @@ re-recorded). As planned, with these differences and findings:
   how a map's events could have moved. The loops that only count, afflict (a status, a debuff, a hex) or choose use the lists.
   The minions of a side whose character has fallen are left out (as `enemiesOf` for a monster always did), the projectiles' list
   (`foeMinions`) does not look at that (nor did the old one).
-- **`tickMinions`' `foes`** are the awake monsters and the other side's characters and minions: a character's `state` is never
-  `chase` (it is a monster's sleep), so the filter is `e.isPlayer || e.state !== 'idle'`. `bodyOnWay` (the dodge and the kite) and
+- **`tickMinions`' `foes`** are the awake monsters and the other side's characters and minions: a character's `state` stays
+  `'idle'` (never set: it is a monster's sleep), so the filter is `e.isPlayer || e.state !== 'idle'`. `bodyOnWay` (the dodge and the kite) and
   `creepToward` take the team and skip it, not every character; a creeping patch drifts toward the nearest monster, character or
   minion of another team; the kite steps away from the other side's minions too. **Nobody calls `enemiesOf` with a minion**:
   minions strike with `rawHit`, a zone's owner is the character, and a deployable fires through `standIn` (which keeps `isPlayer`),
