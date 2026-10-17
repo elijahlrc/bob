@@ -186,8 +186,10 @@ rolled-back transaction. For a new project, or after a change to the file:
 2. Fill the deny-list (below).
 3. Check one insert and the reads ("Checking it works", below), then seed the pool with the bot: `npm run sim -- --runs 10 --class all --seed 1 --rivals` posts the character each run ends with
    as `bot: true` with a made-up name (one request each; a name the deny-list stops loses only its own row). Run it again with
-   `--legacy` for deeper characters, and with other `--seed` values for more; the pool needs rivals at the current save version,
-   and it is replaced by players' own as they come.
+   other `--seed` values for more; the pool needs rivals at the current save version, and it is replaced by players' own as they
+   come. **Seed on the default difficulty only** (never `--legacy`): difficulty is a dev setting that players never see, the
+   rival's card never shows it, and a character levelled under the easier dev curve would carry a map it did not earn. The bot
+   dies by map 20 on the default curve, so the deep end of the pool is the players' to fill.
 4. The same project and key as the run statistics (`SINK`, `src/run/telemetry.ts`). No new secret anywhere.
 
 ### The deny-list
