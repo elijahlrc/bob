@@ -4,7 +4,15 @@ import { DEFAULT, difficultyText, sameDifficulty } from '../data/difficulty';
 import { DAMAGE_TYPES } from '../mods/types';
 import type { Controller } from '../run/controller';
 import type { RunState } from '../run/run';
-import { postRun, postStatus, rivalsConfigured, rivalsOn, sendName, watchPost } from '../rivals';
+import {
+  postRun,
+  postStatus,
+  rivalsConfigured,
+  rivalsOn,
+  sendName,
+  setRivals,
+  watchPost,
+} from '../rivals';
 import type { DeathRecap } from '../sim/types';
 import { FACTION_NAMES, MONSTER_TYPES, type MonsterTypeId } from '../data/monsters';
 import { TYPE_BLURBS } from '../data/monsterInfo';
@@ -102,6 +110,8 @@ function Recap({ r }: { r: DeathRecap }) {
 function RivalsBlock({ c, run }: { c: Controller; run: RunState }) {
   const [, setTick] = useState(0);
   const [busy, setBusy] = useState(false);
+  // The duel button was pressed before the box was on or a name typed: the opt-in says what is missing and takes focus.
+  const [nudged, setNudged] = useState(false);
   const refresh = () => setTick((v) => v + 1);
   useEffect(() => watchPost(refresh), []);
   if (!rivalsConfigured()) return null;
@@ -114,6 +124,13 @@ function RivalsBlock({ c, run }: { c: Controller; run: RunState }) {
   const set = mine ? c.book.tally(mine.id) : null;
   const send = () => void postRun(run, c.lastResult);
   const duel = async () => {
+    if (!ready) {
+      // The box is on by default, so what is missing is almost always the name.
+      if (!rivalsOn()) setRivals(true);
+      setNudged(true);
+      refresh();
+      return;
+    }
     setBusy(true);
     const st = await postRun(run, c.lastResult);
     setBusy(false);
@@ -121,29 +138,25 @@ function RivalsBlock({ c, run }: { c: Controller; run: RunState }) {
   };
   return (
     <div class="rivals-block">
+      <button
+        class="btn primary duel-cta"
+        disabled={busy || (refused !== null && refused === sendName())}
+        onClick={() => void duel()}
+      >
+        {DUEL_TITLE}
+      </button>
       {!sent && (
         <RivalsOptIn
           refused={refused}
+          nudged={nudged && !ready}
           onChange={(what) => {
             if (what === 'box' && rivalsOn() && sendName() !== null) send();
             refresh();
           }}
         />
       )}
-      {failed?.reason === 'unreachable' && <p class="warn">Could not reach the rivals</p>}
-      {ready && failed?.reason === 'unreachable' && (
-        <button class="btn" disabled={busy} onClick={send}>
-          Try again
-        </button>
-      )}
-      {ready && failed?.reason !== 'unreachable' && (
-        <button
-          class="btn primary"
-          disabled={busy || (refused !== null && refused === sendName())}
-          onClick={() => void duel()}
-        >
-          {DUEL_TITLE}
-        </button>
+      {failed?.reason === 'unreachable' && (
+        <p class="warn">Could not reach the rivals. Press the button to try again.</p>
       )}
       {set && set.fought > 0 && (
         <p class="muted">
@@ -180,9 +193,9 @@ export function Summary({ c }: { c: Controller }) {
       {!sameDifficulty(run.difficulty, DEFAULT) && (
         <p class="muted">Difficulty: {difficultyText(run.difficulty)}</p>
       )}
+      <RivalsBlock c={c} run={run} />
       {!won && run.lastRecap && <Recap r={run.lastRecap} />}
       {c.lastResult?.report && <MapReportView r={c.lastResult.report} title="The last map" />}
-      <RivalsBlock c={c} run={run} />
       <div class="menu">
         <button
           class="btn primary"

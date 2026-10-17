@@ -410,7 +410,9 @@ with the opt-in on and a typed name** (6.4); fighting one's own saved runs offli
 empty or unreachable pool, is dropped (an empty pool is a line and Back). Difficulty is a dev setting: a card never shows it.
 
 - **Summary** (`src/ui/Summary.tsx`, `RivalsBlock`): under the recap, the opt-in (`RivalsOptIn`, the title screen's component)
-  until the character is sent, and the button once the box is on and the name valid. The run stays loaded until Quit, so
+  until the character is sent, and the button always, at the top of the screen and styled as the one thing to press; pressed
+  with the box off or no valid name, it turns the box on, asks for the name and goes nowhere (the user, 2026-10-17; the box is on
+  by default and the screens no longer mention the hashed address). The run stays loaded until Quit, so
   `run.build` and `run.map` are there. The character is posted by the hook at the end of the run when the box was on with a valid
   name; otherwise here: ticking the box with a valid name already typed posts the run that has just ended, and pressing the button
   posts it first when it is not in (a name typed letter by letter is never posted half typed), then goes to the Rivals screen. Both

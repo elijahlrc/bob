@@ -350,8 +350,8 @@ describe('the run summary’s rivals block', () => {
       json: async () => ({ code: '23514', message: 'that name is not allowed' }),
     }));
 
-  it('is the opt-in with a hint that a name is needed, and no button, while the box is off or the name is not valid', () => {
-    browser({});
+  it('is always the button, with the opt-in under it; pressed with the box off or no valid name it asks and goes nowhere', () => {
+    const { store, posted } = browser({ rivals: false });
     const c = onSummary();
     let view = Summary({ c });
     expect(all(view)).toContain(
@@ -359,18 +359,28 @@ describe('the run summary’s rivals block', () => {
     );
     expect(checkbox(view)).toBeDefined();
     expect(nameField(view)).toBeUndefined();
-    expect(duelButton(view)).toBeUndefined();
+    expect(duelButton(view)).toBeDefined();
+    // Pressed with the box off: the box goes on, a name is asked for, nothing is posted and the screen stays.
+    click(duelButton(view)!);
+    expect(c.screen).toBe('summary');
+    expect(store.get('bob.pref.rivals')).toBe('true');
+    expect(posted).toHaveLength(0);
     vi.unstubAllGlobals();
-    browser({ rivals: true });
+    browser({});
     view = Summary({ c });
+    // On by default: the name field is there with its hint, and so is the button.
+    expect(nameField(view)).toBeDefined();
     expect(all(view)).toContain('A name is needed to duel');
     expect(all(view)).not.toContain('Leave blank');
-    expect(duelButton(view)).toBeUndefined();
+    expect(duelButton(view)).toBeDefined();
     vi.unstubAllGlobals();
-    browser({ rivals: true, rivalName: 'x' });
+    const typo = browser({ rivals: true, rivalName: 'x' });
     view = Summary({ c });
     expect(all(view)).toContain('3 to 16 letters');
-    expect(duelButton(view)).toBeUndefined();
+    expect(duelButton(view)).toBeDefined();
+    click(duelButton(view)!);
+    expect(c.screen).toBe('summary');
+    expect(typo.posted).toHaveLength(0);
   });
 
   it('shows the button, with the field still there, once the box is on and the name is valid and nothing is sent yet', () => {
@@ -462,18 +472,21 @@ describe('the run summary’s rivals block', () => {
     click(duelButton(Summary({ c }))!);
     await vi.waitFor(() => expect(all(Summary({ c }))).toContain('Could not reach the rivals'));
     const view = Summary({ c });
-    expect(duelButton(view)).toBeUndefined();
-    expect(labels(view)).toContain('Try again');
+    // The button stays and is the retry.
+    expect(duelButton(view)).toBeDefined();
+    expect(duelButton(view)!.props.disabled).toBe(false);
+    expect(labels(view)).not.toContain('Try again');
     expect(all(view)).not.toContain('not allowed');
     vi.stubGlobal('fetch', async (url: string, init: { body: string }) => {
       posted.push({ url, body: JSON.parse(init.body) });
       return { ok: true, status: 201 };
     });
-    click(button(view, 'Try again'));
+    click(duelButton(view)!);
     await vi.waitFor(() => expect(posted).toHaveLength(1));
-    await vi.waitFor(() => expect(checkbox(Summary({ c }))).toBeUndefined());
-    expect(duelButton(Summary({ c }))).toBeDefined();
-    expect(labels(Summary({ c }))).not.toContain('Try again');
+    await vi.waitFor(() => expect(c.screen).toBe('rivals'));
+    c.goTo('summary');
+    expect(checkbox(Summary({ c }))).toBeUndefined();
+    expect(all(Summary({ c }))).not.toContain('Could not reach');
   });
 
   it('has no opt-in block at all for a character that is sent, and says after a set how many rivals were beaten, with the rating', async () => {

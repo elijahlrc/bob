@@ -36,8 +36,9 @@ export function rivalsConfigured(): boolean {
 }
 
 /** Whether the player has added their characters to the rivals (off until they do). */
+/** On by default (the user, 2026-10-17): a character is still sent only once a name is typed (`sendName`). */
 export function rivalsOn(): boolean {
-  return loadPref<boolean>(PREF_ON, false);
+  return loadPref<boolean>(PREF_ON, true);
 }
 
 export function setRivals(on: boolean): void {

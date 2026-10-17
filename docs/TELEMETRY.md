@@ -105,7 +105,7 @@ select * from runs where game_version = '<short commit hash>';
 ## Rivals and high scores
 
 A player may add their characters to the **rivals** other players fight (docs/DUEL.md section 6). This is a **separate opt-in from
-the run statistics above**, off until the player turns it on: its own checkbox on the title screen ("Add my characters to the
+the run statistics above**, on by default and off whenever the player unticks it (nothing is sent until a name is typed): its own checkbox on the title screen ("Add my characters to the
 rivals and high scores other players see"), the same one on the run summary until the character is sent, and its own preference
 (`bob.pref.rivals`). **A name is needed to duel:** nothing of a player is sent without a valid typed name. The statistics' promise
 of no name and no identity stays true of `runs`; this table holds both, and says so here.
@@ -150,7 +150,7 @@ For that, every write is stamped by the database with a **keyed hash of the addr
 header (`cf-connecting-ip`), which a client cannot forge, hashed with a random secret that lives in a schema the public key
 cannot see (`private.keys`, made once by the SQL and never changed by a second run). The hash cannot be turned back into an
 address, but the same address always gives the same hash, so it can be counted (at most 60 snapshots and 150 reports a day per
-address) and blocked. The title screen says so in one line under the opt-in. An address is a weak identity both ways: phone
+address) and blocked. The game's screens do not say so (the user, 2026-10-17: the line under the opt-in was removed); this document and the patch notes of 2026-10-17 do. An address is a weak identity both ways: phone
 carriers put many people behind one, and a VPN changes it in seconds; it is the right tool for "stop this spammer", not a wall.
 
 ### The duel log

@@ -3,17 +3,21 @@ import { rivalName, rivalsConfigured, rivalsOn, setRivalName, setRivals } from '
 import { validName } from '../run/rivals';
 
 /**
- * The opt-in to the rivals and high scores other players see, with the name that goes with it (docs/DUEL.md 6.2, 6.4): off until the
- * player turns it on, and a typed name is needed to duel. The title screen shows it always; the run summary shows it until the
- * character is sent. `onChange` says what the player touched, so that the summary can post the run that has just ended when the box
- * is ticked with a name already there. `refused` is a name the table did not take: the field says so while it still holds it.
+ * The opt-in to the rivals and high scores other players see, with the name that goes with it (docs/DUEL.md 6.2, 6.4): on by
+ * default (the player may untick it), and a typed name is needed to duel, so nothing is sent until one is typed. The title screen
+ * shows it always; the run summary shows it until the character is sent. `onChange` says what the player touched, so that the
+ * summary can post the run that has just ended when the box is ticked with a name already there. `refused` is a name the table
+ * did not take: the field says so while it still holds it. `nudged` is the summary saying the duel button was pressed without a
+ * name: the hint is shown as a warning and the field takes focus.
  */
 export function RivalsOptIn({
   onChange,
   refused = null,
+  nudged = false,
 }: {
   onChange?: (what: 'box' | 'name') => void;
   refused?: string | null;
+  nudged?: boolean;
 }) {
   const [on, setOn] = useState(rivalsOn());
   const [name, setName] = useState(rivalName());
@@ -52,6 +56,7 @@ export function RivalsOptIn({
             placeholder="Your name"
             aria-label="Your name"
             aria-invalid={bad || denied}
+            autoFocus={nudged}
             onInput={(e) => {
               const v = (e.currentTarget as HTMLInputElement).value;
               setRivalName(v);
@@ -59,8 +64,7 @@ export function RivalsOptIn({
               onChange?.('name');
             }}
           />
-          {hint !== '' && <span class={bad || denied ? 'warn' : ''}>{hint}</span>}
-          <span>Your address is kept, hashed, to block abuse.</span>
+          {hint !== '' && <span class={bad || denied || nudged ? 'warn' : ''}>{hint}</span>}
         </div>
       )}
     </div>

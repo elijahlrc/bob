@@ -61,10 +61,12 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('the rivals preference', () => {
-  it('is off until the player turns it on, and the name is theirs as typed', () => {
+  it('is on by default and can be turned off, and the name is theirs as typed', () => {
     browser();
-    expect(rivalsOn()).toBe(false);
+    expect(rivalsOn()).toBe(true);
     expect(rivalName()).toBe('');
+    setRivals(false);
+    expect(rivalsOn()).toBe(false);
     setRivals(true);
     setRivalName(' Wren ');
     expect(rivalsOn()).toBe(true);
