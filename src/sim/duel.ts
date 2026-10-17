@@ -39,6 +39,8 @@ export type DuelOpts = {
   stallTime?: number;
   /** What the damage each character takes is multiplied by (default `DUEL_DAMAGE_SCALE`). */
   damageScale?: number;
+  /** What the two characters are called on the screen (default: their classes). It changes nothing in the fight. */
+  names?: [string, string];
 };
 
 /** What one side has to show of the fight: the life it has left, what it dealt and took, and how it died if it did. */
@@ -131,7 +133,7 @@ export function createDuelWorld(a: Build, b: Build, seed: number, opts: DuelOpts
         x: midX - DUEL_GAP / 2,
         y: midY,
         areaLevel: a.level,
-        name: classDef(a.classId).name,
+        name: opts.names?.[0] ?? classDef(a.classId).name,
         opts: { duel },
       },
       {
@@ -139,7 +141,7 @@ export function createDuelWorld(a: Build, b: Build, seed: number, opts: DuelOpts
         x: midX + DUEL_GAP / 2,
         y: midY,
         areaLevel: b.level,
-        name: classDef(b.classId).name,
+        name: opts.names?.[1] ?? classDef(b.classId).name,
         opts: { duel },
       },
     ],
@@ -151,11 +153,50 @@ export function createDuelWorld(a: Build, b: Build, seed: number, opts: DuelOpts
   return w;
 }
 
+/** How a fight ended (`DuelResult.how`): a character fell, the time cap, or a stall. */
+export type DuelEnd = DuelResult['how'];
+
+/** What the end of a duel remembers from tick to tick: its two limits, and when the characters last took damage. */
+export type DuelWatch = {
+  maxTime: number;
+  stallTime: number;
+  /** What the two characters had taken between them at the last tick that they took any, and when that was. */
+  taken: number;
+  hurtAt: number;
+};
+
+/** A fresh watch for a duel with these options. */
+export function duelWatch(opts: DuelOpts = {}): DuelWatch {
+  return {
+    maxTime: opts.maxTime ?? DUEL_MAX_TIME,
+    stallTime: opts.stallTime ?? DUEL_STALL_TIME,
+    taken: 0,
+    hurtAt: 0,
+  };
+}
+
+/**
+ * How the fight has ended by now, or null while it goes on: a character has fallen (both in one tick is a draw, `duelResult`), a
+ * stall (neither character has taken damage for `stallTime` seconds) or the time cap. Called after every tick, in this order, by the
+ * headless runner (`playDuel`) and by the controller, so that they stop at the same tick. The map's own end reads side 0 alone
+ * (`status` goes 'dead' when its character falls): a duel reads both.
+ */
+export function duelEnd(w: World, watch: DuelWatch): DuelEnd | null {
+  const [a, b] = w.sides;
+  if (!a.player.alive || !b.player.alive) return 'death';
+  const now = a.stats.damageTaken + b.stats.damageTaken;
+  if (now !== watch.taken) {
+    watch.taken = now;
+    watch.hurtAt = w.t;
+  } else if (w.t - watch.hurtAt >= watch.stallTime) return 'stall';
+  return w.t >= watch.maxTime ? 'time' : null;
+}
+
 /**
  * What a duel came to, read off its world: who is alive, how much life they have left, and their ledgers and recaps. `end` is how
  * a fight with both alive ended (the time cap, or a stall).
  */
-export function duelResult(w: World, end: 'time' | 'stall' = 'time'): DuelResult {
+export function duelResult(w: World, end: DuelEnd = 'time'): DuelResult {
   const [a, b] = w.sides;
   const dead = [!a.player.alive, !b.player.alive];
   const side = (i: 0 | 1): DuelSide => {
@@ -178,7 +219,7 @@ export function duelResult(w: World, end: 'time' | 'stall' = 'time'): DuelResult
 /**
  * Fight a duel to its end and return the result, the hash of every event of every tick (the proof that a duel is a pure function
  * of the two builds and the seed) and the world it was fought in. The end is watched here, not in `stepWorld` (a map knows
- * nothing of it): a death, the time cap, or a stall of `stallTime` seconds in which neither character took damage.
+ * nothing of it), by `duelEnd`: a death, the time cap, or a stall of `stallTime` seconds in which neither character took damage.
  */
 export function playDuel(
   a: Build,
@@ -186,27 +227,14 @@ export function playDuel(
   seed: number,
   opts: DuelOpts = {},
 ): { result: DuelResult; hash: number; world: World } {
-  const maxTime = opts.maxTime ?? DUEL_MAX_TIME;
-  const stallTime = opts.stallTime ?? DUEL_STALL_TIME;
   const w = createDuelWorld(a, b, seed, opts);
   const h = new Hasher();
-  const [sa, sb] = w.sides;
-  let end: 'time' | 'stall' = 'time';
-  // What the characters had taken between them at the last tick that they took any.
-  let taken = 0;
-  let hurtAt = 0;
-  // The map's own end reads side 0 alone (`status` goes 'dead' when its character falls): a duel reads both.
-  while (w.t < maxTime && sa.player.alive && sb.player.alive) {
+  const watch = duelWatch(opts);
+  let end = duelEnd(w, watch);
+  while (!end) {
     stepWorld(w);
     hashEvents(h, w);
-    const now = sa.stats.damageTaken + sb.stats.damageTaken;
-    if (now !== taken) {
-      taken = now;
-      hurtAt = w.t;
-    } else if (w.t - hurtAt >= stallTime) {
-      end = 'stall';
-      break;
-    }
+    end = duelEnd(w, watch);
   }
   for (const s of w.sides) h.num(s.player.x).num(s.player.y).num(s.player.life);
   return { result: duelResult(w, end), hash: h.digest(), world: w };

@@ -6,40 +6,12 @@ import { readFileSync } from 'node:fs';
 import { classDef } from '../src/data/classes';
 import { gemDef } from '../src/data/gems';
 import type { Build } from '../src/data/types';
-import { botRun } from '../src/run/bot';
+import { snapshotBuild, type Snap } from '../src/run/duelBot';
 import { buildSignature } from '../src/run/metrics';
 import { loadRun, MemoryStore } from '../src/run/save';
 
-/** A character taken from a bot run: the class and seed it was played from, the map it was taken at and its level there. */
-export type Snap = { cls: string; seed: number; map: number; level: number; build: Build };
-
-/** The seed the bot is played with for a run that is named by `seed` (as `scripts/ladder-probe.ts` has always made it). */
-export const botSeed = (seed: number): number => seed * 1000 + 7;
-
-/** The difficulty the probe's `--legacy` plays (the default one kills the bot on maps 10 to 20). */
-export const LEGACY_PLAY = { scaling: 1, base: 1, variance: 0 };
-
-/**
- * Play the bot from `cls` and `seed` until it starts map `map`, and take the character as it stands there. The run goes on to the
- * end of that map. Null when the bot died on an earlier map.
- */
-export function snapshotBuild(cls: string, seed: number, map: number, legacy = false): Snap | null {
-  let snap: Snap | null = null;
-  botRun(cls, botSeed(seed), map, {
-    ...(legacy ? { difficulty: LEGACY_PLAY } : {}),
-    onTick: (_w, run) => {
-      if (!snap && run.map >= map)
-        snap = {
-          cls,
-          seed,
-          map: run.map,
-          level: run.build.level,
-          build: structuredClone(run.build),
-        };
-    },
-  });
-  return snap;
-}
+// The bot builds are made in src/run/duelBot.ts (the Debug panel plays them too).
+export { botSeed, LEGACY_PLAY, snapshotBuild, type Snap } from '../src/run/duelBot';
 
 /** A build from a file: a save (`localStorage['bob.save.<id>']`), a run's JSON, or a build's. */
 export function buildFromFile(path: string): Build {
