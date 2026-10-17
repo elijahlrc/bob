@@ -1066,6 +1066,18 @@ ring starts where the character faces. `scripts/ladder-probe.ts --real` sweeps t
 is in the Built note under DUEL.md section 7; the open question is a scale that falls with the level (the medians of maps 5 and 20 differ
 by a factor of four to five at one scale).
 
+## Duels: the watchable duel (2026-10-16)
+
+docs/DUEL.md F5 built. A duel between the current character and a copy of itself or a bot build is started from the Debug panel at camp
+(`Controller.startDuel`), fought on the map screen in a round arena (the boss arena's room alone, in a biome and a theme drawn from the
+seed) and ended by the rules the headless runner has (`duelEnd`, read after every tick), then a result screen (who won and how, the time,
+each side's damage dealt and taken) with Again and Back. The run is not touched by it. **One HUD**: the player's, with the rival as the boss bar
+(the owner's change from the plan's second HUD). The scene draws every side (the figure and colour from the actor's side, a ring and marks
+on the rival, a light on each character, the camera on the middle of the two, the per-side kits of `skillFx.ts`). `levelUp`, `flaskUsed`,
+`stuck` and `playerDied` carry `src`, which moved the hash fence (re-recorded in a commit of its own after checking that the sequence of
+events is the same); the default fence holds since. The median fight on the round arena is 15.5 s (the square's was 15.7 s). Not seen in a
+browser: the Built note under DUEL.md section 7 lists what to look at. F6 (rivals) and F7 (the screens) are next.
+
 ## Equipping: sockets, compare and the phone (2026-10-16)
 
 docs/EQUIP.md Q0 to Q7 built; Q8 is this entry and the docs. A swap now says what happens to the gems (`SocketOutcome`, `dryEquip`,
