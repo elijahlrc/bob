@@ -317,36 +317,66 @@ ended in a death and one that won are both worth fighting.
 `docs/rivals.sql`, run once like `docs/telemetry.sql` (by the owner; it can be run again without harm):
 
 - table `rivals` (id, created_at, name, class_id, level, map, outcome, difficulty jsonb, save_version, game_version, bot,
-  token_hash, build jsonb with `pg_column_size(build) < 32768`, length and range checks as `runs` has), **and four columns that
-  are the ranking's, never the client's**: `rating int` (default 1000), `fights int` (0), `wins int` (0), `rated_at timestamptz`
-  (null). A `before insert` trigger resets them, and `created_at`, to their defaults whatever the row sent, and the public key
-  has no update, so a client cannot post itself with a rating or back-date a row. A **ranking job with the service role** will
-  write them later (LADDER.md section 10, fork 2: it fights the pool with `runDuel` and updates the ratings; section 13): the
-  columns are its contract;
-- the public key may **insert**, with the checks, and may **not select** the table: it reads through two functions, each
-  `security definer` and returning a declared row type **without** `token_hash` (a `setof rivals` would hand every caller the
-  tokens that exclude rows and count inserts):
+  token_hash, `ip_hash`, build jsonb with `pg_column_size(build) < 32768`, length and range checks as `runs` has), **and four
+  columns that are the ranking's, never the client's**: `rating int`, `fights int`, `wins int`, `rated_at timestamptz`. A
+  `before insert` trigger sets them to the server's values whatever the row sent: `created_at` to now, `ip_hash` to the keyed
+  hash of the caller's address, **`rating` to ten times the level** (the owner, 2026-10-17: a level 100 starts at 1000, a level
+  50 at 500), no fights and no wins. The public key has no update, so a client can neither post itself with a rating nor
+  back-date a row;
+- **the address** (the owner, 2026-10-17): every write is stamped with a keyed hash of the address the gateway reports
+  (Cloudflare's `cf-connecting-ip`, which a client cannot forge; `x-forwarded-for` is not read, since a client can put anything
+  first in it). The key is one random row of `private.keys`, a schema the public key cannot see, made once by the SQL and never
+  changed by a second run, so the hash cannot be turned back into an address and is still the same for the same address. The
+  first real insert showed the header arrives;
+- **the block list**, `blocked (hash, kind 'token' | 'ip', note)`: a writer whose token hash or address hash is in it is
+  refused, snapshots and reports alike. Filled by hand from the hashes on a spammer's rows (the nightly job may add to it);
+- **the duel log**, `duels` (a_id, b_id, seed, winner 0 | 1 | null, how, seconds, game_version, token_hash, ip_hash,
+  verified): one row per rated fight, posted by the browser that played it, with `a_id` its own snapshot. The `before insert`
+  trigger forces the server's values (time, address, `verified` null, **the seed from the pair**: `duel_seed(a, b)`, which the
+  game computes the same, so a reporter cannot shop for a seed it won and a replay fights the very same duel), and refuses a
+  report whose `token_hash` is not the snapshot `a_id`'s (**the token hash is the proof of ownership**: no function returns it,
+  so nobody knows another's), whose `a_id` is a bot's (a bot's token comes from a script anyone can read), whose rival does not
+  exist or is of another save version, and a second report of the same ordered pair (`unique (a_id, b_id)`: "Again" is
+  unrated). An `after insert` trigger applies **Elo to both snapshots at once**: expected score 1 / (1 + 10^((rb − ra) / 400)),
+  a win 1, a draw 0.5, a loss 0, each side by its own K from `elo_k(fights)`, **128 for a snapshot's first fight falling in a
+  straight line to 32 by its tenth** (the owner, 2026-10-17), ratings rounded to whole numbers. The log is the source of truth;
+  the nightly job (section 13) replays each unverified duel at its game version, sets `verified`, recomputes every rating from
+  the verified rows alone (from ten times the level, the same K schedule) and writes them back, so a false report moves the
+  ladder for a day at most and its reporter's hashes can be blocked;
+- the public key may **insert** into `rivals` and `duels`, with the checks, and may **not select** either: it reads through two
+  functions, each `security definer` and returning a declared row type **without** `token_hash` or `ip_hash` (a
+  `setof rivals` would hand every caller the tokens that prove ownership):
   - `rivals_for(save_version int, map int, k int, exclude_token_hash text)` returns up to K (at most 20) rows of that version
     within ±10 maps of `map` (widening to ±25 if fewer than K are found), not the caller's own, players before bots, newest
-    first with a random tiebreak: `id, name, class_id, level, map, outcome, difficulty, save_version, game_version, bot, build`;
+    first with a random tiebreak: `id, name, class_id, level, map, outcome, difficulty, save_version, game_version, bot, build,
+rating, fights, wins`;
   - `high_scores(k int)` returns the **top rated rival snapshots, one row per snapshot, not per player**: those with
     `fights > 0` that are not a bot, by `rating desc, wins desc, created_at asc`, at most 100:
-    `id, name, class_id, level, map, outcome, rating, fights, wins, game_version, posted_on` (the day it was posted). With no
-    ranking job run yet it returns no rows, which is correct. F7 draws the screen;
+    `id, name, class_id, level, map, outcome, rating, fights, wins, game_version, posted_on` (the day it was posted). Empty
+    until fights are reported. F7 draws the screen;
 - names (6.4): the table checks the character set and a length cap, and a trigger refuses a name that contains a word of
   `blocked_words`, a table the SQL creates **empty** and the owner fills in the Supabase table editor;
-- a trigger caps inserts at 20 in 24 hours per `token_hash`;
-- the two trigger functions that read a table (the deny-list, the cap) are `security definer`: a trigger runs with the
-  privileges of the inserting role, `anon` may read neither table, and without it the deny-list would fail every insert with
-  "permission denied" and the cap would count nothing;
+- the caps: 20 snapshots in 24 hours per token hash, 60 per address hash (several people can share an address), 300 an hour
+  from everyone together; for reports 50, 150 and 1,000. The table-wide cap bounds a flood from many addresses to what the
+  owner would notice and delete;
+- every trigger function is `security definer` with a fixed `search_path`: a trigger runs with the privileges of the inserting
+  role, `anon` may read none of the tables they consult, and without it the deny-list would fail every insert with "permission
+  denied" and the caps would count nothing;
 - rows of a save version older than the three most recent, or older than 90 days, are deleted by hand (a commented statement
-  in the file; no `pg_cron`).
+  in the file; no `pg_cron`); a snapshot's duels go with it.
+
+The file was applied to the project on 2026-10-17 as the migration `rivals_duels_and_high_scores`, after a dry run of the
+whole file in a rolled-back transaction (every entry, a reported duel and its Elo, both functions) and a second one that
+posted a real map-100 build and fought the loaded copy against the original on ten seeds with identical results and event
+hashes. The first real insert through the client path carried an address hash; the pool was then seeded with bot characters.
 
 `src/run/rivals.ts` (headless; `fetch` injected like `postRecords` in `telemetry.ts`): `rivalRecord`, `postRival`,
 `fetchRivals`, `fetchHighScores`, `validateRival` (6.1), `validName`, `generateName` (6.4) and `hashToken`; the browser side is
 `src/rivals.ts` (the preferences, the token and the `onRunEnd` hook beside telemetry's). The token is a random id made in the
-browser and kept in `localStorage` (`bob.rival.token`), hashed (SHA-256) before sending, used only to exclude the player's own
-rivals and to count inserts; the raw token never leaves the browser. **Bots fill the pool:** `npm run sim -- --rivals` posts
+browser and kept in `localStorage` (`bob.rival.token`), hashed (SHA-256) before sending, used to exclude the player's own
+rivals, to count inserts, and as the proof that a reported fight is the reporter's own snapshot's; the raw token never leaves
+the browser. (A client can send any hash it likes, so the token is no identity: the caps it carries stop accidents, not a
+person who means it, which is what the address hash, the table-wide caps and the block list are for.) **Bots fill the pool:** `npm run sim -- --rivals` posts
 the bot's character at the end of each run as `bot: true`, so the pool has rivals at every version from day one; the function
 offers them only after the players.
 
@@ -969,12 +999,15 @@ Ten to seventeen working days (section 7). Risks, each with its fence:
 
 ## 13. Out of scope (later plans)
 
-- **The ranking job and the Elo computation** (the owner, 2026-10-17: the high score list is the duel ratings of rival
-  snapshots, not the deepest run of each player): a job with the service role that fights the pool with `runDuel` and writes
-  `rating`, `fights`, `wins` and `rated_at` of `rivals` (LADDER.md sections 6 and 10, fork 2). Who fights whom and when, and how
-  the ratings are computed, are that plan's. F6 built what it can read and write (the four columns, the trigger that keeps
-  clients from writing them, and `high_scores(k)`, which lists the top rated snapshots and returns nothing until the job has
-  run). Seasons and the other forks (LADDER.md section 10, forks 3 to 5) stay out of scope.
+- **The nightly verifier** (the owner, 2026-10-17: the high score list is the duel ratings of rival snapshots, moved live by
+  the fights players report, 6.3): a job with the service role (GitHub Actions, the key a repository secret) that replays every
+  unverified row of `duels` at its game version with `runDuel` and the pair's seed, sets `verified`, recomputes every rating
+  from the verified rows alone (from ten times the level, the same K schedule as the trigger) and writes `rating`, `fights`,
+  `wins` and `rated_at` back; a report that does not replay is unrated, and a reporter with several such goes on the block
+  list by the owner's hand. Open there: whether a fight played in one browser engine replays bit for bit in Node (a
+  transcendental function may differ in the last bit; measure with the determinism hash across Chrome, Firefox and Node before
+  trusting a mismatch), and the legality checks on snapshots (LADDER.md section 8.2), which the job is the place for. Seasons
+  and the other forks (LADDER.md section 10, forks 3 to 5) stay out of scope.
 - **Sparring from camp** with the character as it stands, and entering mid-run snapshots (a pool of characters captured at
   every tenth map cleared, not only at the end of a run).
 - **Legality checks** on snapshots.

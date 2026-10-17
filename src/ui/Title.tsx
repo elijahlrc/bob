@@ -133,6 +133,7 @@ function RivalsNotice() {
               ? '3 to 16 letters, digits, spaces or hyphens; a letter or digit at each end.'
               : 'Leave blank for a name the game makes up'}
           </span>
+          <span>Your address is kept, hashed, to block abuse.</span>
         </div>
       )}
     </div>

@@ -123,37 +123,66 @@ When a run ends, by a death or a win, and only when the box is ticked, one row g
 | `save_version`, `game_version`         | the save format of `build` (a rival can be fought only by a game of the same version) and the commit of the build                                                         |
 | `bot`                                  | true for the characters the bot sim posts to fill the pool                                                                                                                |
 | `token_hash`                           | SHA-256 of a random token (below)                                                                                                                                         |
-| `rating`, `fights`, `wins`, `rated_at` | the ranking's: set by the database (1000, 0, 0, null) and by nothing else; see "High scores"                                                                              |
+| `ip_hash`                              | set by the database, not sent: a keyed hash of the address the request came from (below)                                                                                  |
+| `rating`, `fights`, `wins`, `rated_at` | the ranking's: set by the database (ten times the level, 0, 0, null) and moved by reported fights; see "The duel log" and "How it is read"                                |
 
 The name is the one thing a player types. It is shown to other players beside the character, so it is checked by the database
-(below). No account, no e-mail, no address, no run history, no killer, no seed.
+(below). No account, no e-mail, no run history, no killer, no seed. The address is not stored; a keyed hash of it is (below).
 
 ### The token
 
 The first time it is needed, the browser makes a random 128-bit token and keeps it in `localStorage` under `bob.rival.token`. Only its
-SHA-256 hash is sent. It has two jobs: to leave a player's own characters out of the rivals they are shown, and to count a day's
-inserts (at most 20 rows per token hash in 24 hours; the table refuses more). It is not shown to anyone and no function returns it.
-Clearing the browser's storage makes a new token, which is fine at this scale. Two players with the same name are two players: the
-token tells them apart, not the name.
+SHA-256 hash is sent. It has three jobs: to leave a player's own characters out of the rivals they are shown, to count a day's
+inserts (at most 20 snapshots and 50 fight reports per token hash in 24 hours; the table refuses more), and to prove that a
+reported fight is the reporter's own character's (a report is refused unless its token hash is the one on that snapshot). It is
+not shown to anyone and no function returns it, which is what makes the proof work. Clearing the browser's storage makes a new
+token, which is fine at this scale. Two players with the same name are two players: the token tells them apart, not the name.
+
+### The address
+
+A client can send any token hash it likes, so the token is no identity and its caps stop accidents, not a person who means it.
+For that, every write is stamped by the database with a **keyed hash of the address** the request came from: Cloudflare's own
+header (`cf-connecting-ip`), which a client cannot forge, hashed with a random secret that lives in a schema the public key
+cannot see (`private.keys`, made once by the SQL and never changed by a second run). The hash cannot be turned back into an
+address, but the same address always gives the same hash, so it can be counted (at most 60 snapshots and 150 reports a day per
+address) and blocked. The title screen says so in one line under the opt-in. An address is a weak identity both ways: phone
+carriers put many people behind one, and a VPN changes it in seconds; it is the right tool for "stop this spammer", not a wall.
+
+### The duel log
+
+After a duel, the game posts one row to `duels`: its own snapshot's id, the rival's id, who won (0 for the player, 1 for the
+rival, empty for a draw), how it ended and after how many seconds, the game version and the token hash. The database forces
+the time, the address hash and **the seed**, which it derives from the two ids (`duel_seed`; the game uses the same rule to
+fight), so nobody can try seeds until they win one. It refuses a report whose token hash is not the snapshot's, whose snapshot
+is a bot's, whose rival does not exist or is of another save version, and a second report of the same ordered pair (one rated
+fight per pair, ever; "Again" is unrated). Then it moves both ratings at once: Elo, with each side's K starting at 128 for its
+first fight and falling to 32 by its tenth, and a snapshot starting at ten times its level. A duel is a pure function of the two
+builds and the seed, so every report can be checked by replaying it; the nightly job that does so, and recomputes every rating
+from the verified reports alone, is a later plan (docs/DUEL.md section 13). Until it runs, a false report moves the ladder.
 
 ### How it is read
 
-The public key may insert into `rivals` and may not select, update or delete a row. It reads the pool through two functions
-(`docs/rivals.sql`), neither of which returns the token hash:
+The public key may insert into `rivals` and `duels` and may not select, update or delete a row of either, and may do nothing
+to `blocked_words` or `blocked`. It reads the pool through two functions (`docs/rivals.sql`), neither of which returns a token
+hash or an address hash:
 
 - `rivals_for(save_version, map, k, exclude_token_hash)`: up to 20 rivals of that save version within 10 maps of `map` (25 if there
   are fewer than `k`), not the caller's own, players before bots, newest first. The game checks every row before it offers it
   (`validateRival`: the save version, and that every passive node, item base, affix, gem, unique and flask the build names exists in
   this version) and skips one that fails.
 - `high_scores(k)`: the top rated rival snapshots, at most 100, one row per snapshot, never a bot, and only a snapshot that has
-  fought. Their ratings are written by a ranking job with the service role, which is a later plan (docs/DUEL.md section 13); until
-  it has run the list is empty. A trigger resets `rating`, `fights`, `wins` and `rated_at` on every insert, so a client cannot post
-  itself with a rating.
+  fought. The ratings move with every reported fight ("The duel log"); the list is empty until fights are reported. A trigger
+  sets `rating` (ten times the level), `fights`, `wins` and `rated_at` on every insert, so a client cannot post itself with a
+  rating.
 
 ### Setup (once)
 
+It was done on 2026-10-17 (the migration `rivals_duels_and_high_scores` on the project), after a dry run of the whole file in a
+rolled-back transaction. For a new project, or after a change to the file:
+
 1. In the SQL editor of the Supabase project, run `docs/rivals.sql`. It can be run again without harm. It makes `rivals`,
-   `blocked_words` (empty), the triggers, the two functions and the policy that lets the public key **insert and nothing else**.
+   `duels`, `blocked_words` (empty), `blocked` (empty), the private key, the triggers, the two functions and the policies that let
+   the public key **insert and nothing else**.
 2. Fill the deny-list (below).
 3. Check one insert and the reads ("Checking it works", below), then seed the pool with the bot: `npm run sim -- --runs 10 --class all --seed 1 --rivals` posts the character each run ends with
    as `bot: true` with a made-up name (one request each; a name the deny-list stops loses only its own row). Run it again with
@@ -184,7 +213,14 @@ delete from rivals
     or save_version not in (select distinct save_version from rivals order by save_version desc limit 3);
 ```
 
-A player who turns the box off stops new rows; the rows already sent stay until they are deleted or cleaned up.
+A player who turns the box off stops new rows; the rows already sent stay until they are deleted or cleaned up. Deleting a
+snapshot deletes its duels with it.
+
+### Blocking
+
+To refuse a writer, copy the `token_hash` or the `ip_hash` from their rows into `blocked` (table editor: Insert row; `kind` is
+`token` or `ip`, `note` is for you). Their snapshots and reports are refused from the next write on; delete the rows they
+already made by hand. Block both hashes of a spammer: a new token costs them nothing, a new address costs them a VPN.
 
 ### Checking it works
 
@@ -216,3 +252,7 @@ curl -s "$URL/rest/v1/rivals?select=*" -H "apikey: $KEY"
 - A name the deny-list stops loses its row, silently to the player (the title screen says the rule of a name, not the list).
 - A blocker on the Supabase domain, or being offline, drops a snapshot silently (the game never waits for it). Only runs that end
   are captured.
+- The address hash is only as good as the gateway's header: if Supabase ever stops passing `cf-connecting-ip`, new rows carry no
+  hash, the address caps and address blocks silently stop applying, and the token rules still hold. Check a recent row now and then.
+- A reported fight is trusted until the nightly job replays it (docs/DUEL.md section 13); until that job exists, a false report
+  moves the ladder and is undone by hand (delete the row of `duels`; the ratings are recomputed when the job comes).

@@ -1097,3 +1097,17 @@ and `high_scores` (the top rated snapshots; the ratings are a later ranking job'
 fetches and checks a rival before it is offered (every id its build names must exist at this version); `npm run sim -- --rivals` seeds the pool
 with the bot's characters. Tested with an injected `fetch` only: the SQL has **not been run**, and the title screen was seen on a desktop only. The owner's
 steps and what F7 needs are in the Built note under DUEL.md section 7.
+
+## Duels: the rivals table is live (2026-10-17)
+
+The schema was reworked with the owner before it ran (DUEL.md 6.3, TELEMETRY.md "Rivals and high scores"): every write carries a keyed hash
+of the caller's address (Cloudflare's header, the key in a private schema) and a `blocked` table refuses a token or an address; a `duels`
+table takes the fights a browser reports for its own snapshot (the token hash is the proof of ownership, the seed is the pair's, one rated
+fight per pair) and a trigger moves both ratings at once (Elo, each side's K from 128 to 32 over its first ten fights; a snapshot starts at
+ten times its level); `high_scores` lists snapshots by rating and `rivals_for` returns a rival's rating with its build. `docs/rivals.sql`
+was dry-run twice in rolled-back transactions (the entries, a duel and its Elo; then a real map-100 build posted, read back and fought
+against the original on ten seeds with identical results and hashes) and applied to the project as the migration
+`rivals_duels_and_high_scores`. The first insert through the client path carried an address hash, `rivals_for` and `high_scores` answered
+the public key, direct reads were refused, and the pool was seeded with bot characters (`npm run sim -- --rivals`). The title screen says
+in one line that the address is kept hashed. Left for later plans: the nightly verifier that replays reported duels and recomputes the
+ratings, and the legality checks on snapshots (DUEL.md 13).
