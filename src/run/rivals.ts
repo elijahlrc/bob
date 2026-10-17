@@ -90,11 +90,11 @@ export type RivalRecord = {
 export const NAME_MIN = 3;
 export const NAME_MAX = 16;
 /** The table's rule for a name, as it is in `docs/rivals.sql`: it starts and ends with a letter or digit. */
-const NAME_SHAPE = /^[A-Za-z0-9][A-Za-z0-9 -]*[A-Za-z0-9]$/;
+export const NAME_PATTERN = /^[A-Za-z0-9][A-Za-z0-9 -]*[A-Za-z0-9]$/;
 
 /** A name the player may type: 3 to 16 ASCII letters, digits, spaces and hyphens, starting and ending with a letter or digit. */
 export function validName(s: string): boolean {
-  return s.length >= NAME_MIN && s.length <= NAME_MAX && NAME_SHAPE.test(s);
+  return s.length >= NAME_MIN && s.length <= NAME_MAX && NAME_PATTERN.test(s);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------------
@@ -441,7 +441,7 @@ export function validateRival(row: unknown, saveVersion: number): Rival | null {
   const { id, name, class_id: classId, level, map, outcome, difficulty, build } = row;
   if (typeof id !== 'number' && !isStr(id, 32)) return null;
   if (row.save_version !== saveVersion || saveVersion !== SAVE_VERSION) return null;
-  if (!isStr(name, 48) || name.length < NAME_MIN || !NAME_SHAPE.test(name)) return null;
+  if (!isStr(name, 48) || name.length < NAME_MIN || !NAME_PATTERN.test(name)) return null;
   if (!isStr(classId, 32) || !known(() => classDef(classId))) return null;
   if (!isInt(level, 1, 100) || !isInt(map, 1, 100)) return null;
   if (outcome !== 'died' && outcome !== 'won') return null;
