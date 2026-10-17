@@ -24,9 +24,10 @@
 -- posted a snapshot can report that snapshot's fights. Either hash can be put on the block list to refuse a writer.
 --
 -- Rating. A snapshot starts at ten times its level (a level 100 character at 1000). A reported duel moves both ratings at once
--- (Elo, K = 32) so the ladder follows what players play; the duel log is the source of truth, and a nightly job with the service
--- role (a later plan, docs/DUEL.md 13) replays every duel at its game version, recomputes every rating from the verified ones
--- alone, starting again from ten times the level, and writes the result back. A duel is a pure function of the two builds and
+-- (Elo; each side's K starts at 128 for its first fight and falls to 32 by its tenth) so the ladder follows what players play;
+-- the duel log is the source of truth, and a nightly job with the service role (a later plan, docs/DUEL.md 13) replays every
+-- duel at its game version, recomputes every rating from the verified ones alone, starting again from ten times the level with
+-- the same K schedule, and writes the result back. A duel is a pure function of the two builds and
 -- the seed, and the seed is fixed by the pair, so a report can be checked exactly.
 
 -- 1. A captured character: the snapshot of a run that ended, as docs/DUEL.md 6.1 describes it. `build` is the character as the
@@ -371,9 +372,19 @@ create trigger duels_1_check
   before insert on public.duels
   for each row execute function public.duels_check();
 
---     12b. After insert: Elo, K = 32, on both snapshots at once. The expected score of a is 1 / (1 + 10^((rb - ra) / 400)); a
---     win scores 1, a draw 0.5, a loss 0. Ratings are whole numbers. The nightly job recomputes all of this from the verified
---     log, so a lie moves the ladder for a day at most.
+--     12b. After insert: Elo on both snapshots at once. The expected score of a is 1 / (1 + 10^((rb - ra) / 400)); a win scores
+--     1, a draw 0.5, a loss 0. Each side moves by its own K, which starts at 128 for a snapshot's first fight and falls in a
+--     straight line to 32 by its tenth (`elo_k`), so a new character finds its place fast and a settled one is not thrown about.
+--     Ratings are whole numbers. The nightly job recomputes all of this from the verified log, so a lie moves the ladder for a
+--     day at most.
+create or replace function public.elo_k(fights int) returns double precision
+language sql
+immutable
+as $$
+  select 32.0 + 96.0 * greatest(0, 10 - fights) / 10.0;
+$$;
+revoke all on function public.elo_k(int) from public, anon, authenticated;
+
 create or replace function public.duels_elo() returns trigger
 language plpgsql
 security definer
@@ -382,21 +393,23 @@ as $$
 declare
   ra int;
   rb int;
+  fa int;
+  fb int;
   ea double precision;
   sa double precision;
 begin
-  select r.rating into ra from public.rivals r where r.id = new.a_id;
-  select r.rating into rb from public.rivals r where r.id = new.b_id;
+  select r.rating, r.fights into ra, fa from public.rivals r where r.id = new.a_id;
+  select r.rating, r.fights into rb, fb from public.rivals r where r.id = new.b_id;
   ea := 1.0 / (1.0 + power(10.0, (rb - ra) / 400.0));
   sa := case when new.winner = 0 then 1.0 when new.winner = 1 then 0.0 else 0.5 end;
   update public.rivals set
-    rating = round(ra + 32 * (sa - ea))::int,
+    rating = round(ra + public.elo_k(fa) * (sa - ea))::int,
     fights = fights + 1,
     wins = wins + case when new.winner = 0 then 1 else 0 end,
     rated_at = now()
   where id = new.a_id;
   update public.rivals set
-    rating = round(rb + 32 * ((1.0 - sa) - (1.0 - ea)))::int,
+    rating = round(rb + public.elo_k(fb) * ((1.0 - sa) - (1.0 - ea)))::int,
     fights = fights + 1,
     wins = wins + case when new.winner = 1 then 1 else 0 end,
     rated_at = now()
