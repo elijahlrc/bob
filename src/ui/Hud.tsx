@@ -1,4 +1,4 @@
-import { CLASSES } from '../data/classes';
+import { CLASSES, classDef } from '../data/classes';
 import { hex, MOD_MARKS, RARITY_COLOR } from '../data/monsterMarks';
 import { monsterModDef, MONSTER_TYPES, BOSS_NAME, FACTION_NAMES } from '../data/monsters';
 import { abilitiesOf, abilityTexts } from '../data/abilities';
@@ -86,13 +86,17 @@ function leadText(theme: ThemeDef): string {
     .join(' ');
 }
 
-/** Details of the enemy the player clicked: every affix with its effect. */
+/** A character that is not side 0's: the rival of a duel (a map has none). */
+const isRival = (a: Actor): boolean => a.isPlayer && (a.side?.id ?? 0) !== 0;
+
+/** Details of the enemy the player clicked: every affix with its effect. For the rival of a duel: its name, class and level. */
 function Inspect({ a, c }: { a: Actor; c: Controller }) {
   const spec = a.mon?.spec;
   const rarity = a.rarity === 'player' ? 'normal' : a.rarity;
   const maxLife = Math.max(1, a.def.maxLife);
   const type = spec ? MONSTER_TYPES[spec.type].name : '';
   const boss = spec && bossOfType(spec.type);
+  const rival = a.isPlayer && a.side ? a.side : null;
   return (
     <div class="inspect" style={{ '--rar': hex(RARITY_COLOR[rarity]) }}>
       <button class="inspect-x" title="Close" onClick={() => c.bus.emit('select', { id: null })}>
@@ -100,10 +104,16 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
       </button>
       <div class="inspect-name">{a.name || (rarity === 'boss' ? BOSS_NAME : type)}</div>
       <div class="muted inspect-sub">
-        {RARITY_LABEL[rarity]} {type}
-        {spec
-          ? ` · ${ARCHETYPES[MONSTER_TYPES[spec.type].archetype].name} · Level ${spec.level}`
-          : ''}
+        {rival ? (
+          `${classDef(rival.build.classId).name} · Level ${rival.build.level}`
+        ) : (
+          <>
+            {RARITY_LABEL[rarity]} {type}
+            {spec
+              ? ` · ${ARCHETYPES[MONSTER_TYPES[spec.type].archetype].name} · Level ${spec.level}`
+              : ''}
+          </>
+        )}
       </div>
       {spec && boss && (
         <>
@@ -162,43 +172,45 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
           </div>
         </div>
       ))}
-      {a.modIds.length === 0 ? (
-        <div class="muted">No affixes.</div>
-      ) : (
-        a.modIds.map((id) => (
-          <div key={id} class="inspect-mod">
-            <span
-              class={`mchip ${MOD_MARKS[id].shape}`}
-              style={{ '--c': hex(MOD_MARKS[id].color) }}
-            />
-            <div>
-              <div class="inspect-mod-name">{monsterModDef(id).name}</div>
-              <div class="muted">{MOD_MARKS[id].desc}</div>
+      {a.modIds.length === 0
+        ? !rival && <div class="muted">No affixes.</div>
+        : a.modIds.map((id) => (
+            <div key={id} class="inspect-mod">
+              <span
+                class={`mchip ${MOD_MARKS[id].shape}`}
+                style={{ '--c': hex(MOD_MARKS[id].color) }}
+              />
+              <div>
+                <div class="inspect-mod-name">{monsterModDef(id).name}</div>
+                <div class="muted">{MOD_MARKS[id].desc}</div>
+              </div>
             </div>
-          </div>
-        ))
-      )}
+          ))}
     </div>
   );
 }
 
-/** The boss of the fight, across the top of the screen: its name, its life and shield, and what it is doing (two, for the Twins). */
+/**
+ * The boss of the fight, across the top of the screen: its name, its life and shield, and what it is doing (two, for the Twins).
+ * The rival of a duel is shown the same way, by its name, with no readout.
+ */
 function BossBar({ w }: { w: World }) {
   const p = w.sides[0].player;
   const bosses = w.actors.filter(
     (a) =>
       a.alive &&
-      a.rarity === 'boss' &&
-      a.mon?.kind.bossOnly &&
-      a.state === 'chase' &&
-      Math.hypot(a.x - p.x, a.y - p.y) < 22,
+      (isRival(a) ||
+        (a.rarity === 'boss' &&
+          a.mon?.kind.bossOnly &&
+          a.state === 'chase' &&
+          Math.hypot(a.x - p.x, a.y - p.y) < 22)),
   );
   if (bosses.length === 0) return null;
   return (
     <div class="boss-bars">
       {bosses.map((b) => {
         const max = Math.max(1, b.def.maxLife);
-        const lines = bossReadout(w, b);
+        const lines = b.isPlayer ? [] : bossReadout(w, b);
         return (
           <div class="boss-bar" key={b.id}>
             <div class="boss-bar-name">{b.name}</div>
@@ -456,6 +468,8 @@ export function Hud({ c }: { c: Controller }) {
   const lifeMax = Math.max(1, p.def.maxLife);
   const manaMax = Math.max(1, p.def.maxMana);
   const sc = c.showcase;
+  // A duel (docs/DUEL.md 5) is the player's HUD with the map's chrome that does not apply left out: the rival is the boss bar.
+  const duel = c.duel;
   const sel = c.selectedId !== null ? w.actors.find((x) => x.id === c.selectedId) : undefined;
   return (
     <div class="hud">
@@ -467,12 +481,13 @@ export function Hud({ c }: { c: Controller }) {
       )}
       <div class="hud-top">
         <span>
-          {sc ? 'Showcase' : `Map ${w.plan.map}`} · {w.plan.theme.name}
+          {sc ? 'Showcase' : duel ? 'Duel' : `Map ${w.plan.map}`}
+          {!duel && ` · ${w.plan.theme.name}`}
         </span>
         <span {...infoProps(w.plan.biome.text)}>{w.plan.biome.name}</span>
-        <span {...infoProps(leadText(w.plan.theme))}>{leadNames(w.plan.theme)}</span>
+        {!duel && <span {...infoProps(leadText(w.plan.theme))}>{leadNames(w.plan.theme)}</span>}
         <span>Level {w.sides[0].build.level}</span>
-        <span>Kills {w.sides[0].stats.kills}</span>
+        {!duel && <span>Kills {w.sides[0].stats.kills}</span>}
         <span {...infoProps('Time spent on this level. It stops while the game is paused.')}>
           {formatLevelTime(w.t)}
         </span>
@@ -490,12 +505,21 @@ export function Hud({ c }: { c: Controller }) {
               ` wave ${w.holdout.spawned}/${HOLDOUT_WAVES} (${w.holdout.cleared} survived)`}
           </span>
         )}
-        <span>{w.exitOpen ? 'Exit open' : ''}</span>
-        {!sc && !c.gallery && <ReprieveBadge w={w} />}
+        {!duel && <span>{w.exitOpen ? 'Exit open' : ''}</span>}
+        {!sc && !c.gallery && !duel && <ReprieveBadge w={w} />}
       </div>
-      {!sc && !c.gallery && <AbandonButton c={c} w={w} />}
+      {!sc && !c.gallery && !duel && <AbandonButton c={c} w={w} />}
       <BossBar w={w} />
-      {sel && sel.alive && !sel.isPlayer && <Inspect a={sel} c={c} />}
+      {sel && sel.alive && (!sel.isPlayer || isRival(sel)) && <Inspect a={sel} c={c} />}
+      {duel && (
+        <div class="hud-showcase">
+          <div class="showcase-row">
+            <button class="btn small" onClick={() => c.leaveDuel()}>
+              Leave
+            </button>
+          </div>
+        </div>
+      )}
       {c.gallery && (
         <div class="hud-showcase hud-gallery">
           <div>
