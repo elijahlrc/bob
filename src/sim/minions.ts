@@ -287,7 +287,7 @@ export function tickMinions(w: World, s: Side, dt: number): void {
       m.boomed = true;
       for (const e of foes)
         if (e.alive && Math.hypot(e.x - m.x, e.y - m.y) <= BURST_RADIUS + e.r)
-          rawHit(w, e, m.def.maxLife / 3, 3, 'Minion burst', 'minion');
+          rawHit(w, e, m.def.maxLife / 3, 3, s, 'Minion burst', 'minion');
       w.events.push({ t: 'explode', x: m.x, y: m.y, r: BURST_RADIUS, dtype: 3 });
     }
     s.minions[j++] = m;

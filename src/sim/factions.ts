@@ -426,6 +426,7 @@ export function tickZones(w: World, dt: number): void {
             a,
             e.damage * ZONE_PULSE,
             e.dtype,
+            null,
             e.kind === 'caustic' ? 'Caustic cloud' : 'Burning ground',
           );
     }

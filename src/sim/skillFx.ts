@@ -155,7 +155,7 @@ export function projectileFx(w: World, s: Side, pr: Projectile, dt: number): voi
   if (carried)
     for (const e of livingEnemiesOf(w, s.team))
       if (Math.hypot(e.x - pr.x, e.y - pr.y) <= carried * pr.profile.radiusMult + e.r)
-        applySkillDot(w, e, pr.profile);
+        applySkillDot(w, e, pr.profile, { by: s });
 }
 
 // ---- Static Strike: a buff that stacks with hits, and beams while it lasts
@@ -829,7 +829,7 @@ function tickShell(w: World, side: Side): void {
   w.events.push({ t: 'explode', x: p.x, y: p.y, r: s.radius, dtype: 3 });
   eachEnemy(w, side.team, (e) => {
     if (e.phaseT <= 0 && Math.hypot(e.x - p.x, e.y - p.y) <= s.radius + e.r)
-      rawHit(w, e, dmg, 3, 'Molten Shell');
+      rawHit(w, e, dmg, 3, side, 'Molten Shell');
   });
 }
 
@@ -852,7 +852,7 @@ export function relicNova(w: World, s: Side): void {
     spellBaseDamage(relic.level) * (MINIONS.relic.nova ?? 0) * relic.dmg * MINION_ENEMY_RES;
   eachEnemy(w, s.team, (e) => {
     if (e.phaseT <= 0 && Math.hypot(e.x - relic.x, e.y - relic.y) <= r + e.r)
-      rawHit(w, e, amount, 0, 'Relic', 'minion');
+      rawHit(w, e, amount, 0, s, 'Relic', 'minion');
   });
   s.relicRegen = {
     t: spec.seconds,

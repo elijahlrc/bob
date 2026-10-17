@@ -119,7 +119,7 @@ describe('conditional mods are seen by the sim', () => {
       dummy.def = dummyDefence({ maxLife: 100 });
       dummy.life = 100;
       w.sides[0].player.since.hit = hit ? 0 : 99;
-      rawHit(w, dummy, 1100, 0);
+      rawHit(w, dummy, 1100, 0, null);
       return near.sdots.find((d) => d.src === '@herald')!.raw;
     };
     expect(burn(true)).toBeCloseTo(burn(false) * 2, 3);

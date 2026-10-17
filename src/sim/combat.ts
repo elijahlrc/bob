@@ -91,7 +91,7 @@ import { spawnMonster } from './world';
 import { afflictPlayer, bossLocked, flaskWards, isBossSide, lockBoss } from './afflict';
 import { bossHitPlayer, bossVeiled } from './bosses';
 import type { Actor, Dot, World } from './types';
-import { hunted, livingEnemiesOf } from './side';
+import { hunted, livingEnemiesOf, MONSTERS } from './side';
 import type { Side } from './side';
 
 const CHAOS = 4;
@@ -385,8 +385,11 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   }
   // An Aegis counts the time since it was last attacked, whatever came of the attack.
   if (dst.enc) noteAttacked(dst);
-  // The map report names what dealt the hit (only for hits on the character or on a monster).
-  const how = dst.isPlayer || dst.team === 1 ? sourceOf(src, dst, p) : undefined;
+  // The map report names what dealt the hit (for hits on a character or on a monster, and a side's hits on another side's minion).
+  const how =
+    dst.isPlayer || dst.team === MONSTERS || (src.side && dst.team !== src.team)
+      ? sourceOf(src, dst, p)
+      : undefined;
   if (res.outcome === 'miss') {
     w.events.push({ t: 'miss', src: src.id, dst: dst.id });
     if (how) noteMiss(w, dst, how, false);
@@ -603,7 +606,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     dst.mana = Math.max(0, dst.mana - (dst.def.maxMana * p.manaDrain) / 100);
   if (src.isPlayer && wasAlive && p.skill.behaviour.kind === 'melee' && res.total > 0) {
     const share = thornsShare(dst);
-    if (share > 0) rawHit(w, src, res.total * share, 0);
+    if (share > 0) rawHit(w, src, res.total * share, 0, null);
   }
   if (dst.isPlayer && src.mon) onMonsterHitPlayer(w, src, dst, p);
   const afterHit = () => {
@@ -740,9 +743,9 @@ function applyAilments(w: World, src: Actor, dst: Actor, res: HitResult, p: Skil
       400,
     );
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'poison' });
-    // Herald of Agony: a poison the character's hit put on gives a point of Virulence.
-    // (A monster's poison on a minion feeds the side it hunts, as it always has.)
-    if (!dst.isPlayer) {
+    // Herald of Agony: a poison a side's hit put on an enemy (a monster, or the other side's character or minion) gives its side a
+    // point of Virulence. (A monster's poison on a minion feeds the side it hunts, as it always has; on a character, nobody.)
+    if (src.side ? dst.team !== src.side.team : !dst.isPlayer) {
       const owner = src.side ?? hunted(w, src).side!;
       if (owner.char.agonySpec) gainVirulence(w, owner);
     }
@@ -918,17 +921,15 @@ export function logDamage(
   while (log.length > 0 && w.t - log[0].t > DAMAGE_LOG_TIME) log.shift();
 }
 
-/** Raw damage of one type that ignores evasion and block (explosions, slams). */
-/** A player hit by a monster's melee attack deals damage back to it (reflect). */
+/** A player hit by a melee attack deals damage back to the attacker (reflect). */
 function reflectBack(w: World, src: Actor, dst: Actor, p: SkillProfile, res: HitResult): void {
   if (!dst.isPlayer || src.team === dst.team || !src.alive || p.skill.behaviour.kind !== 'melee')
     return;
   const d = dst.def;
   for (let t = 0; t < 5; t++)
-    if (d.reflect[t] > 0)
-      rawHit(w, src, d.reflect[t], t, 'Reflect', 'player', undefined, dst.side!);
+    if (d.reflect[t] > 0) rawHit(w, src, d.reflect[t], t, dst.side!, 'Reflect');
   if (d.reflectPhysPct > 0 && res.dmg[0] > 0 && src.alive)
-    rawHit(w, src, res.dmg[0] * d.reflectPhysPct, 0, 'Reflect', 'player', undefined, dst.side!);
+    rawHit(w, src, res.dmg[0] * d.reflectPhysPct, 0, dst.side!, 'Reflect');
 }
 
 /** Every impale on the target deals what it recorded as reflected physical damage, and uses up one of its hits. */
@@ -941,7 +942,7 @@ function payImpales(w: World, dst: Actor, by?: Side): void {
     if (--imp.hits > 0) dst.impales[j++] = imp;
   }
   dst.impales.length = j;
-  rawHit(w, dst, stored, 0, 'Impale', 'player', undefined, by);
+  rawHit(w, dst, stored, 0, by ?? null, 'Impale');
 }
 
 /** A hit that impales records a share of its physical damage on the target. */
@@ -954,18 +955,23 @@ function recordImpale(w: World, s: Side, dst: Actor, p: SkillProfile, res: HitRe
   while (dst.impales.length > imp.max) dst.impales.shift();
 }
 
+/**
+ * Damage of one type that ignores evasion and block (explosions, slams, auras, a minion's blow). `owner` is the side whose damage it
+ * is, and is credited with it (its ledger, its `damageDealt`, the kill); it is `null` on purpose for what is nobody's or a
+ * monster's (the ground, a drain, a monster's blast) and for damage a side deals to itself (Righteous Fire, a minion's own burn,
+ * the share of a hit that a Thorned monster throws back), which no side deals to an enemy.
+ */
 export function rawHit(
   w: World,
   dst: Actor,
   amount: number,
   type: number,
+  owner: Side | null,
   label = 'Explosion',
   by: 'player' | 'minion' = 'player',
   via?: string,
-  /** The side whose damage it is, when it is a character's (a reflect, an impale): the credit is that side's. */
-  owner?: Side,
 ): void {
-  noteCause(dst, 0, by === 'minion', [], owner);
+  noteCause(dst, 0, by === 'minion', [], owner ?? undefined);
   const dmg = [0, 0, 0, 0, 0];
   dmg[type] = amount;
   const def = dst.def;
@@ -993,10 +999,12 @@ export function rawHit(
   const total = dmg[0] + dmg[1] + dmg[2] + dmg[3] + dmg[4];
   w.events.push({ t: 'hit', src: 0, dst: dst.id, amount: total, crit: false, dtype: type });
   if (dst.isPlayer) logDamage(w, dst, null, label, type, total, via);
-  // The map report: an effect on the character is its own row (a blast counts as a hit), one on a monster is the skill's or the minion's.
+  // The map report: an effect on the character is its own row (a blast counts as a hit), one on a monster is the skill's or the
+  // minion's; a minion's blow is the minion's wherever it lands.
+  const side = owner ?? undefined;
   const how: DmgSrc = dst.isPlayer
-    ? { name: label, kind: 'effect', side: owner }
-    : { name: label, kind: by === 'minion' ? 'minion' : 'skill', side: owner };
+    ? { name: label, kind: by === 'minion' ? 'minion' : 'effect', side }
+    : { name: label, kind: by === 'minion' ? 'minion' : 'skill', side };
   if (dst.isPlayer) noteHit(w, dst, how, total, false);
   applyDamage(w, dst, dmg, how);
 }
@@ -1059,6 +1067,23 @@ function noteCause(
   if (!a.isPlayer) causes.set(a, { tags, minion, gains, side });
 }
 
+/** A side's damage killed a minion of another side: the effects of a kill that need no loot or experience (docs/DUEL.md F3). */
+function minionKilledBy(
+  w: World,
+  killer: Side,
+  a: Actor,
+  cause: { tags: number; minion: boolean; gains: readonly Mod[] },
+): void {
+  killer.player.since.kill = 0;
+  rollCharges(w, killer, 'kill', cause.gains);
+  if (a.ail.freezeT > 0) rollCharges(w, killer, 'killFrozen', cause.gains);
+  if (a.ail.shock > 0) rollGains(w, killer, 'killShocked', cause.gains);
+  rollGains(w, killer, 'kill', cause.gains);
+  bannerStage(w, killer, 'kill');
+  refreshOnKill(killer);
+  if (!cause.minion) fireTriggers(w, killer, { on: 'kill', target: a, tags: cause.tags });
+}
+
 export function killActor(w: World, a: Actor): void {
   if (!a.alive) return;
   // What a kill gives is the side's whose damage last struck it, and with none named, the one that fights the monster (the
@@ -1068,8 +1093,14 @@ export function killActor(w: World, a: Actor): void {
   a.life = 0;
   a.action = null;
   w.events.push({ t: 'death', id: a.id });
-  // A minion that falls is just gone (tickMinions clears it): nothing is earned, dropped or raised.
-  if (!a.isPlayer && a.side) return;
+  // A minion that falls is just gone (tickMinions clears it): nothing is dropped or raised, and it counts as no kill, no experience
+  // and no flask charges. What the other side's damage that killed it gives (the charges, gains and banner stages of a kill) it
+  // gives; a minion that dies of its own side's or of nobody's damage gives nothing.
+  if (!a.isPlayer && a.side) {
+    const cause = causes.get(a);
+    if (cause?.side && cause.side.team !== a.team) minionKilledBy(w, cause.side, a, cause);
+    return;
+  }
   if (!a.isPlayer && !a.noReward) {
     // What the skill that made the kill gives on a kill (its own chances, and its supports').
     const gains = causes.get(a)?.gains ?? [];
@@ -1159,19 +1190,19 @@ export function killActor(w: World, a: Actor): void {
   // A charged enemy (Infernal Blow) goes off.
   if (fs.charged[a.id]) chargedDeath(w, a);
   // A Venomed enemy that dies poisoned passes the rest of its poison on to those around it.
-  if (a.fx.venomed && a.ail.poisons.length > 0) venomBurst(w, a, a.fx.venomed.v);
+  if (a.fx.venomed && a.ail.poisons.length > 0) venomBurst(w, a, a.fx.venomed.v, fs);
   // A Doomed enemy blows up for a share of its own life.
   if (a.fx.doomed) corpseBlast(w, fs, a, a.fx.doomed.v, 'chaos', 3);
 }
 
 /** The poison an enemy still carried, dealt to the enemies about it as chaos damage over a second. */
-function venomBurst(w: World, dead: Actor, pct: number): void {
+function venomBurst(w: World, dead: Actor, pct: number, by: Side): void {
   let rest = 0;
   for (const d of dead.ail.poisons) rest += d.dps * Math.max(0, d.t);
   if (rest <= 0) return;
   for (const e of w.actors)
     if (!e.isPlayer && e.alive && e !== dead && Math.hypot(e.x - dead.x, e.y - dead.y) <= 2.7 + e.r)
-      applyFlatDot(w, e, 'venom', 4, (rest * pct) / 100, 1);
+      applyFlatDot(w, e, 'venom', 4, (rest * pct) / 100, 1, by);
 }
 
 /** A Splitting monster leaves two weaker copies behind (no XP or loot, and they do not split). */

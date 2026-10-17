@@ -46,7 +46,7 @@ describe('Cast on Melee Kill (slayersEcho)', () => {
     for (const by of ['minion', 'player'] as const) {
       const x = createDummyWorld(b, { distance: 1.6 });
       x.world.sides[0].player.stunT = 1e9; // it does not strike
-      rawHit(x.world, x.dummy, 1e13, 0, 'Test', by);
+      rawHit(x.world, x.dummy, 1e13, 0, null, 'Test', by);
       expect(x.dummy.alive).toBe(false);
       expect(triggers(x.world.events)).toBe(0);
     }

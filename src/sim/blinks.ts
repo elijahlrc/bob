@@ -95,7 +95,7 @@ function burstAt(w: World, a: Actor, p: SkillProfile, x: number, y: number, u?: 
   for (const e of enemiesAt(w, a.team, x, y, r)) {
     hit(w, a, e, p, 0, Math.hypot(e.x - a.x, e.y - a.y));
     // Bodyswap adds a share of the character's own life to what it deals.
-    if (own > 0 && e.alive) rawHit(w, e, own, p.hands[0].chunks[0].type, 'Bodyswap');
+    if (own > 0 && e.alive) rawHit(w, e, own, p.hands[0].chunks[0].type, a.side!, 'Bodyswap');
   }
 }
 
@@ -149,7 +149,7 @@ export function blinkCast(
     const r = burstRadius(big);
     w.events.push({ t: 'explode', x: corpse.x, y: corpse.y, r, dtype: 3, skill: p.skill.id });
     for (const e of enemiesAt(w, a.team, corpse.x, corpse.y, r))
-      rawHit(w, e, (corpse.life * u.corpse.explodePct) / 100, 3, 'Corpse');
+      rawHit(w, e, (corpse.life * u.corpse.explodePct) / 100, 3, a.side!, 'Corpse');
     noteBlinkUsed(w, a.side!, c);
     arrive(w, a, big, c, u, spot.x, spot.y);
     return;

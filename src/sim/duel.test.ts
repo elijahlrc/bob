@@ -331,7 +331,7 @@ describe('credit for what has no attacker named', () => {
       0,
       'Warrior',
     );
-    rawHit(w, m, 1e9, 0, 'Test', 'player', undefined, sa);
+    rawHit(w, m, 1e9, 0, sa, 'Test');
     expect(m.alive).toBe(false);
     expect(rowTotal(sa.ledger.dealt, 'Test')).toBeGreaterThan(0);
     expect(total(sb.ledger.dealt)).toBe(0);
@@ -387,7 +387,7 @@ describe('credit for what has no attacker named', () => {
       0,
       'Warrior',
     );
-    rawHit(w, m, 10, 0, 'Ground');
+    rawHit(w, m, 10, 0, null, 'Ground');
     expect(rowTotal(sb.ledger.dealt, 'Ground')).toBeGreaterThan(0);
     expect(total(sa.ledger.dealt)).toBe(0);
   });

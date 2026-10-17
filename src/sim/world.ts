@@ -533,7 +533,7 @@ function tickEffects(w: World, dt: number): void {
         const p = s.player;
         const caught = p.alive && inBlast(e, p.x, p.y, p.r);
         if (caught && e.damage > 0)
-          rawHit(w, p, e.damage, e.dtype, e.label ?? 'Blast', 'player', viaOf(w, e));
+          rawHit(w, p, e.damage, e.dtype, null, e.label ?? 'Blast', 'player', viaOf(w, e));
         // What a boss's blast does besides damage (docs/BOSSES.md): a Sentence stuns, a toll shocks.
         if (caught && p.alive && e.stun) stunPlayer(w, s, e.stun);
         if (caught && p.alive && e.afflict)
@@ -542,7 +542,7 @@ function tickEffects(w: World, dt: number): void {
         if (owner?.alive) pullPlayer(w, s, owner, e.pull!);
         for (const m of s.minions)
           if (m.alive && inBlast(e, m.x, m.y, m.r))
-            rawHit(w, m, e.damage, e.dtype, e.label ?? 'Blast');
+            rawHit(w, m, e.damage, e.dtype, null, e.label ?? 'Blast');
       }
       if (e.leaves) openZone(w, e.x, e.y, e.radius, e.leaves.seconds, e.leaves.kind, e.leaves.dps);
       continue;
@@ -560,12 +560,12 @@ function tickEffects(w: World, dt: number): void {
         p.y = to.y;
       }
       if (e.damage > 0 && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r)
-        rawHit(w, p, e.damage, e.dtype, label, 'player', viaOf(w, e));
+        rawHit(w, p, e.damage, e.dtype, null, label, 'player', viaOf(w, e));
       // The character's minions standing in a monster's blast are hurt too.
       if (e.team === 1)
         for (const m of s.minions)
           if (m.alive && Math.hypot(m.x - e.x, m.y - e.y) <= e.radius + m.r)
-            rawHit(w, m, e.damage, e.dtype, label);
+            rawHit(w, m, e.damage, e.dtype, null, label);
     }
   }
   w.effects.length = j;

@@ -189,7 +189,7 @@ function overkillBurn(
   const dps = (over * e.pct * s.char.db.mult('damage', ctx)) / 100;
   for (const o of livingEnemiesOf(w, s.team)) {
     if (Math.hypot(o.x - dead.x, o.y - dead.y) > e.radius + o.r) continue;
-    applyFlatDot(w, o, '@herald', 3, dps, e.seconds);
+    applyFlatDot(w, o, '@herald', 3, dps, e.seconds, s);
   }
   return true;
 }
@@ -230,7 +230,7 @@ function drainExplosions(w: World, s: Side): void {
         if (o.id === q.from) return;
         if (Math.hypot(o.x - q.x, o.y - q.y) > q.r + o.r) return;
         wake(w, o);
-        rawHit(w, o, q.amount, q.type);
+        rawHit(w, o, q.amount, q.type, s);
       });
     }
   } finally {

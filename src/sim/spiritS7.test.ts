@@ -308,7 +308,7 @@ describe('Herald of Ash (cinderHerald)', () => {
     w.sides[0].player.stunT = 1e9;
     dummy.def = dummyDefence({ maxLife: 100 });
     dummy.life = 100;
-    rawHit(w, dummy, 1100, 0);
+    rawHit(w, dummy, 1100, 0, null);
     expect(dummy.alive).toBe(false);
     const burn = near.sdots.find((d) => d.src === '@herald');
     expect(burn).toBeDefined();
