@@ -239,25 +239,29 @@ export async function loadRivals(c: Controller, deps: () => RivalDeps = realDeps
   const s = c.rivals;
   if (!run || !s || s.started) return;
   s.started = true;
+  // The answer is for this session only: a screen that was left and made again (or a quit) is not written to by a load still in the air.
+  const fail: Controller['failRivals'] = (status, why) => {
+    if (c.rivals === s) c.failRivals(status, why);
+  };
   try {
     const d = deps();
     const post = await (pendingPost(run) ?? Promise.resolve(postStatus(run)));
     const tokenHash = await hashToken(rivalToken());
     const rows = await fetchMySnapshots(d.fetch, d.sink, tokenHash);
-    if (rows === null) return c.failRivals('offline');
+    if (rows === null) return fail('offline');
     const newest = rows.find((r) => r.saveVersion === SAVE_VERSION);
     if (!newest || !matchesRun(newest, run))
-      return c.failRivals('unsent', post.status === 'failed' ? post.reason : 'unreachable');
+      return fail('unsent', post.status === 'failed' ? post.reason : 'unreachable');
     const pool = await fetchRivalsOrNull(d.fetch, d.sink, {
       saveVersion: SAVE_VERSION,
       map: run.map,
       k: RIVALS_POOL,
       excludeTokenHash: tokenHash,
     });
-    if (pool === null) return c.failRivals('offline');
-    c.fillRivals(newest, pool);
+    if (pool === null) return fail('offline');
+    if (c.rivals === s) c.fillRivals(newest, pool);
   } catch {
-    c.failRivals('offline');
+    fail('offline');
   }
 }
 

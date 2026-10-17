@@ -167,6 +167,40 @@ describe('loading the Rivals screen', () => {
     expect(c.rivals!.shown.map((r: Rival) => r.id)).toEqual(['100']);
   });
 
+  it('does not write its answer into a screen that was made again or left while it was asking', async () => {
+    browser();
+    const { c, run } = opened();
+    let release: (a: Answer) => void = () => undefined;
+    let asked = 0;
+    // The first question (my_snapshots) waits to be answered; the rest are answered at once.
+    const slow: () => RivalDeps = () => ({
+      ...server({}).deps(),
+      fetch: () =>
+        ++asked === 1 ? new Promise<Answer>((r) => (release = r)) : Promise.resolve(ok([])),
+    });
+    const old = c.rivals!;
+    const loading = loadRivals(c, slow);
+    await vi.waitFor(() => expect(old.started).toBe(true));
+    // The player goes back and opens the screen again: a new session, which the old load must not touch.
+    c.goTo('summary');
+    c.openRivals();
+    const fresh = c.rivals!;
+    expect(fresh).not.toBe(old);
+    await vi.waitFor(() => expect(asked).toBe(1));
+    release(ok([snapshotRow(run)]));
+    await loading;
+    expect(c.rivals).toBe(fresh);
+    expect(fresh.status).toBe('loading');
+    expect(fresh.pool).toEqual([]);
+    expect(fresh.mine).toBeNull();
+    // A quit while it asks leaves nothing behind either.
+    const q = opened();
+    const quitting = loadRivals(q.c, server({}).deps);
+    q.c.quit();
+    await quitting;
+    expect(q.c.rivals).toBeNull();
+  });
+
   it('leaves out a rival whose snapshot does not hold up, and says so when none are near', async () => {
     browser();
     const { c, run } = opened();

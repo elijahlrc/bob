@@ -981,10 +981,10 @@ myName)` runs it in a `try` and drops a rival that throws; `leaveDuel(to?)` (Bac
   fetched; only the player's rating is read again.
 - **`buildSignature`** (`src/run/rivals.ts`) is the card's: the main skill, up to three keystones and four uniques, by name. It is not
   `metrics.buildSignature`, the telemetry's line of ids, which keeps its name.
-- **Tests:** 3,289 in 190 files (88 new). `src/run/rivalScreens.test.ts` (22: `duelSeedFor` against the SQL's own constants,
+- **Tests:** 3,290 in 190 files (89 new). `src/run/rivalScreens.test.ts` (22: `duelSeedFor` against the SQL's own constants,
   `postRival`'s reasons, `postDuel`'s request and four outcomes, `fetchMySnapshots`, `buildSignature` on a real bot build, the draw),
   `rivalRecord.test.ts` (8), `rivalDuel.test.ts` (15: the controller), `src/rivals.test.ts` (16: the hook posts nothing without a name,
-  a run is never posted twice, a refused name is reported), `src/rivalsScreens.test.ts` (16: the Rivals screen's fetches in order, the
+  a run is never posted twice, a refused name is reported), `src/rivalsScreens.test.ts` (17: the Rivals screen's fetches in order, the
   report and the rating's move, the high scores) and `src/ui/rivalScreens.test.ts` (18: each screen's text and buttons).
 - **Unverified in a browser** (read twice, not seen; in the order of the flow): the title screen's hint "A name is needed to duel" and the
   new High scores button beside Codex and Patch notes; the summary's block under the recap (the opt-in with the field, then the button
