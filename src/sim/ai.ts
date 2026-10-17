@@ -149,24 +149,29 @@ const RARE_PRIORITY = 4;
 function findTarget(w: World, s: Side): Actor | null {
   const p = s.player;
   const prio = s.char.build.strategy?.target ?? STRATEGY_DEFAULTS.target;
+  // In a duel the character engages the nearest enemy at any distance (docs/DUEL.md 3.4), and its enemies are the other side's
+  // character and its minions. On a map the one side's enemies are the monsters of `w.actors`, as ever.
+  const duel = !!s.opts.duel;
+  const foes = w.sides.length === 1 ? w.actors : livingEnemiesOf(w, s.team);
   let best: Actor | null = null;
   let bd = Infinity;
-  for (const m of w.actors) {
+  for (const m of foes) {
     if (m.team === s.team || !m.alive || m.phaseT > 0) continue;
     if (m.id === s.ai.skipId && w.t < s.ai.skipUntil) continue;
     const real = Math.hypot(m.x - p.x, m.y - p.y);
-    if (real > ENGAGE_RANGE) continue;
+    if (!duel && real > ENGAGE_RANGE) continue;
     // Spawners and shield-givers come first: a nest feeds the pack and a pylon makes it untouchable.
     if (!revealed(w, m)) continue;
     const support = !!m.mon && SUPPORT_TYPES.has(m.mon.spec.type);
     // The target priority (Strategy tab): rares count as nearer, or the weakest goes first (distance breaks a tie). Weakest is
     // the least life left in points, not as a share: by share a boss with a scratch on it outranks its whole fresh escort.
+    // (The other character counts as a boss: the one a `rares` priority goes for first, and never one to give up on.)
     const d =
       prio === 'lowest'
         ? (support ? -1e9 : 0) + m.life + real * 1e-6
         : real -
           (support ? SUPPORT_PRIORITY : 0) -
-          (prio === 'rares' && isBig(m) ? RARE_PRIORITY : 0);
+          (prio === 'rares' && (m.isPlayer || isBig(m)) ? RARE_PRIORITY : 0);
     if (d > bd + 1e-9) continue;
     if (Math.abs(d - bd) <= 1e-9 && best && m.life >= best.life) continue;
     // Out of sight is no reason to ignore a pylon: everything around it is untouchable until it falls.
@@ -480,9 +485,13 @@ export function playerAI(w: World, s: Side, dt: number): void {
   if (!canAct(p)) return;
   if (avoidHazard(w, s, dt)) return;
 
-  // Engage.
+  // Engage. (A duel has no range to engage within, and no target to give up on: docs/DUEL.md 3.4.)
+  const duel = !!s.opts.duel;
   let target = ai.targetId ? actorById(w, ai.targetId) : undefined;
-  if (target && (!target.alive || Math.hypot(target.x - p.x, target.y - p.y) > ENGAGE_RANGE + 3))
+  if (
+    target &&
+    (!target.alive || (!duel && Math.hypot(target.x - p.x, target.y - p.y) > ENGAGE_RANGE + 3))
+  )
     target = undefined;
   ai.scanT -= dt;
   const strategy = s.char.build.strategy;
@@ -497,20 +506,23 @@ export function playerAI(w: World, s: Side, dt: number): void {
   if (target && running(s)) target = undefined;
   if (target) {
     // Stall breaker: a target that takes no damage for a long time is dropped for a while, so the
-    // run moves on (and the monster, if it is chasing, comes to the player instead).
-    if (ai.watchId !== target.id || target.life < ai.watchLife - 1e-6) {
-      ai.watchId = target.id;
-      ai.watchLife = target.life;
-      ai.watchT = w.t;
-    } else if (w.t - ai.watchT > STALL_TIME && target.rarity !== 'boss') {
-      // (A boss is never given up on: its shield or its regrowth may hold its life up for a while, docs/BOSSES.md 11.1.)
-      ai.skipId = target.id;
-      ai.skipUntil = w.t + SKIP_TIME;
-      ai.watchId = 0;
-      ai.targetId = 0;
-      s.stats.stalls++;
-      w.events.push({ t: 'stall', id: target.id });
-      return;
+    // run moves on (and the monster, if it is chasing, comes to the player instead). A duel has none: a stall ends it instead
+    // (docs/DUEL.md 4.3).
+    if (!duel) {
+      if (ai.watchId !== target.id || target.life < ai.watchLife - 1e-6) {
+        ai.watchId = target.id;
+        ai.watchLife = target.life;
+        ai.watchT = w.t;
+      } else if (w.t - ai.watchT > STALL_TIME && target.rarity !== 'boss') {
+        // (A boss is never given up on: its shield or its regrowth may hold its life up for a while, docs/BOSSES.md 11.1.)
+        ai.skipId = target.id;
+        ai.skipUntil = w.t + SKIP_TIME;
+        ai.watchId = 0;
+        ai.targetId = 0;
+        s.stats.stalls++;
+        w.events.push({ t: 'stall', id: target.id });
+        return;
+      }
     }
     ai.targetId = target.id;
     ai.mode = 'engage';
@@ -562,6 +574,24 @@ export function playerAI(w: World, s: Side, dt: number): void {
     return;
   }
   ai.targetId = 0;
+
+  // A duel is for the other character: with nothing to hit (it is phased out, or out of sight, or this character is running in
+  // Phase Run) walk toward it, so that the distance closes rather than stands; no loot, no exit, no waypoints (docs/DUEL.md 3.4).
+  if (duel) {
+    ai.mode = 'engage';
+    let foe: Actor | null = null;
+    let fd = Infinity;
+    for (const o of w.sides) {
+      if (o.team === s.team || !o.player.alive) continue;
+      const d = Math.hypot(o.player.x - p.x, o.player.y - p.y);
+      if (d < fd) {
+        fd = d;
+        foe = o.player;
+      }
+    }
+    if (foe) moveTo(w, s, p, foe.x, foe.y, dt);
+    return;
+  }
 
   // Loot.
   let lootX = 0;

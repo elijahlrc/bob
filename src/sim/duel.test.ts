@@ -6,7 +6,15 @@ import { newRun } from '../run/run';
 import { newActor } from './actor';
 import { separate } from './ai';
 import { applyHit, rawHit } from './combat';
-import { createDuelWorld, DUEL_GAP, duelHash, playDuel, runDuel } from './duel';
+import {
+  createDuelWorld,
+  DUEL_ARENA_SIZE,
+  DUEL_GAP,
+  DUEL_MAX_TIME,
+  duelHash,
+  playDuel,
+  runDuel,
+} from './duel';
 import { buildFor } from './gemKit';
 import type { Ledger } from './ledger';
 import type { Side } from './side';
@@ -46,7 +54,7 @@ describe('a duel of two starters', () => {
     expect(r.how).toBe('death');
     expect(r.winner === 0 || r.winner === 1).toBe(true);
     expect(r.time).toBeGreaterThan(1);
-    expect(r.time).toBeLessThan(120);
+    expect(r.time).toBeLessThan(DUEL_MAX_TIME);
     const [won, lost] = r.winner === 0 ? [r.sides[0], r.sides[1]] : [r.sides[1], r.sides[0]];
     expect(won.lifeLeft).toBeGreaterThan(0);
     expect(won.recap).toBeUndefined();
@@ -68,7 +76,7 @@ describe('a duel of two starters', () => {
     expect(duelHash(vanguard(1), vanguard(2), 2)).not.toBe(a.hash);
   });
 
-  it('stands the characters 8 tiles apart on one row, facing each other, each at its own level', () => {
+  it('stands the characters 10 tiles apart on the middle row, mirrored, facing each other, each at its own level', () => {
     const b = vanguard(2);
     b.level = 5;
     const w = createDuelWorld(vanguard(1), b, 1);
@@ -79,8 +87,12 @@ describe('a duel of two starters', () => {
     expect([sa.player.team, sb.player.team]).toEqual([0, 2]);
     expect([sa.player.side, sb.player.side]).toEqual([sa, sb]);
     expect(w.actors.filter((a) => a.isPlayer)).toEqual([sa.player, sb.player]);
+    expect(DUEL_GAP).toBe(10);
     expect(sb.player.x - sa.player.x).toBeCloseTo(DUEL_GAP, 9);
     expect(sb.player.y).toBe(sa.player.y);
+    // Mirror images about the arena's middle: the same distance from the walls on both sides.
+    expect(sa.player.x + sb.player.x).toBe(DUEL_ARENA_SIZE);
+    expect(sa.player.y).toBe(DUEL_ARENA_SIZE / 2);
     expect(sa.player.facing).toBeCloseTo(0, 9);
     expect(sb.player.facing).toBeCloseTo(Math.PI, 9);
     // Each character is built at its own level, with no map to take its resistances: the world is not a map's.
@@ -132,7 +144,8 @@ describe('what is one side’s stays its side’s', () => {
     expect(sa.shell).toBeNull();
     expect(sa.stats.damageTaken).toBeGreaterThan(0);
     // Half of each of A's hits went into the shell, and the other half is what B took.
-    expect(sb.shell!.taken).toBeCloseTo(sb.stats.damageTaken, 6);
+    // (The shell keeps what it took as it was before the duel's scale, which its burst is given when it lands.)
+    expect(sb.shell!.taken * sb.damageScale).toBeCloseTo(sb.stats.damageTaken, 6);
     expect(sb.stats.damageTaken).toBeCloseTo(total(sa.ledger.dealt), 6);
   });
 
@@ -229,7 +242,8 @@ describe('what a hit does to a character, as it does to a monster', () => {
 
   /** A hit by A on B that lands with every ailment and the effects a skill can carry, and one more to see them apply. */
   function strike(setup?: (w: World, sa: Side, sb: Side) => void, tweak?: Partial<SkillProfile>) {
-    const w = createDuelWorld(vanguard(1), vanguard(2), 1);
+    // (At the scale of 1: what a hit does is not what the duel's damage scale is about.)
+    const w = createDuelWorld(vanguard(1), vanguard(2), 1, { damageScale: 1 });
     const [sa, sb] = w.sides;
     sb.player.life = 1e6;
     sa.char.hexes.push({ id: 'brittleDoom', level: 10, effect: 1 });
@@ -397,7 +411,8 @@ describe('bodies', () => {
   it('two characters on one spot are pushed apart, to the width of the two', () => {
     const w = createDuelWorld(vanguard(1), vanguard(2), 1);
     const [sa, sb] = w.sides;
-    sb.player.x = sa.player.x + 0.1;
+    const x0 = sa.player.x;
+    sb.player.x = x0 + 0.1;
     sb.player.y = sa.player.y;
     // Both stunned, so that nothing but the separation moves them.
     sa.player.stunT = 1e6;
@@ -406,8 +421,8 @@ describe('bodies', () => {
     const d = Math.hypot(sb.player.x - sa.player.x, sb.player.y - sa.player.y);
     expect(d).toBeCloseTo(sa.player.r + sb.player.r, 6);
     // Each gave way half.
-    expect(sa.player.x).toBeLessThan(w.plan.lab.start.x);
-    expect(sb.player.x).toBeGreaterThan(w.plan.lab.start.x + 0.1);
+    expect(sa.player.x).toBeLessThan(x0);
+    expect(sb.player.x).toBeGreaterThan(x0 + 0.1);
   });
 
   it('two characters exactly on one spot are still told apart', () => {

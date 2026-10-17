@@ -694,6 +694,18 @@ export type World = {
   grid: Grid;
   /** The sides of the map, each a character and what is theirs; side 0 is the local player's (docs/DUEL.md section 3). */
   sides: Side[];
+  /**
+   * The sides in the order they act in this tick (docs/DUEL.md 3.3, 4.4): `sides` itself or the same sides reversed, by a mix of
+   * the tick and `orderSeed`, so that neither is first in every tie of a fight. With one side it is always `sides`. Set at the top
+   * of `stepWorld`.
+   */
+  order: Side[];
+  /**
+   * What the order of the sides is drawn from, with the tick: a duel's seed (0 on a map). Two characters whose actions fall on the
+   * same tick every time (the same rhythm, or two builds of one speed) would have the same one of them first at every exchange
+   * of the fight if the order followed the parity of the tick, or of the tick and the seed (docs/DUEL.md 4.4).
+   */
+  orderSeed: number;
   t: number;
   tick: number;
   rngCombat: Rng;

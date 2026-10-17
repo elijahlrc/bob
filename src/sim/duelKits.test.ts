@@ -327,7 +327,7 @@ describe('fields across sides', () => {
       id: w.nextId++,
       owner: sa.player.id,
       kind: 'chilling',
-      x: sa.player.x + 2,
+      x: sb.player.x - 6,
       y: sa.player.y,
       r0: 1,
       grow: 1,
@@ -345,7 +345,7 @@ describe('fields across sides', () => {
     sa.fields.push(f);
     const x0 = f.x;
     run(w, 2);
-    // B is 6 tiles beyond it, A 2 tiles behind: it went toward B.
+    // B is 6 tiles beyond it, A 4 tiles behind: it went toward B.
     expect(f.x).toBeGreaterThan(x0 + 2);
     expect(f.x).toBeLessThan(sb.player.x);
   });

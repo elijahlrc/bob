@@ -346,7 +346,35 @@ These are decided in camp, not by the character, but the character is what they 
 
 ---
 
-## 11. Quick strategy summary
+## 11. Duels
+
+A duel (docs/DUEL.md) is a fight against another character in an arena with nothing else in it. The same character plays it,
+from the same Strategy tab, so everything above holds except this:
+
+- **It engages from anywhere.** The 9 tiles of section 2 do not apply: it goes for the nearest enemy at any distance. The two
+  characters start 10 tiles apart.
+- **Its enemies are the other character and its minions.** It picks among them as the Target setting says, and the other character
+  counts as a boss: **Rares first** goes for it before a screen of minions that stands up to 4 tiles nearer. A melee character
+  kills the minions in its way to reach it.
+- **It never gives up on a target.** There is no stall breaker (section 2).
+- **It never loots, leaves or walks the route.** With nothing it can hit (the other character is out of reach, or it is itself
+  running in Phase Run) it walks toward the other character.
+- **Nothing of the run comes along.** No provisions, no reprieves and no map penalty to the resistances; each character is at its own
+  level with full life, mana, energy shield and flasks.
+- **A duel ends** when a character dies (the other wins; both in one moment is a draw), after **90 seconds**, or when **15 seconds**
+  pass in which neither character took damage (a stall). The last two are draws.
+- **Who acts first is a coin toss every tick.** When both characters act in the same moment, one goes first, and which one is drawn
+  anew each tick (the same for the same seed), so neither has the first blow by where it stands or by its speed.
+- **Damage is scaled to ×0.3** for both characters: hits, bursts, damage over time and what a self-damaging buff (a Blood Rage analog)
+  costs. A minion takes full damage;
+  ailments and stuns are as strong as on a map (their damage is scaled like any other). Regeneration, leech and flasks work as on a
+  map, so a duel is long, and it favours builds that recover well.
+- **A kill of a minion by the other character** fills the flasks and gives life and mana on kill, as a monster's kill does. The
+  other character's death ends the fight.
+
+---
+
+## 12. Quick strategy summary
 
 - **Range is safety.** Range gives the character room to dodge and keeps it out of melee. The Kite spacing helps
   a ranged character more.

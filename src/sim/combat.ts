@@ -505,6 +505,13 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     if (src.isPlayer && dst.team !== src.team) rollStatuses(w, dst, p, true);
     return;
   }
+  // A duel scales what a character takes (docs/DUEL.md 4.4), and the map report, the recap and the leech of the hit read the
+  // scaled damage. The ailments and the stun were worked out from the hit as it was before this, so they stay as they were.
+  if (dst.isPlayer && dst.side!.damageScale !== 1) {
+    const k = dst.side!.damageScale;
+    for (let i = 0; i < 5; i++) res.dmg[i] *= k;
+    res.total *= k;
+  }
   let dtype = 0;
   for (let i = 1; i < 5; i++) if (res.dmg[i] > res.dmg[dtype]) dtype = i;
   w.events.push({ t: 'hit', src: src.id, dst: dst.id, amount: res.total, crit: res.crit, dtype });
@@ -928,8 +935,17 @@ function reflectBack(w: World, src: Actor, dst: Actor, p: SkillProfile, res: Hit
   const d = dst.def;
   for (let t = 0; t < 5; t++)
     if (d.reflect[t] > 0) rawHit(w, src, d.reflect[t], t, dst.side!, 'Reflect');
+  // (The share is of the hit as it was before a duel's scale, which the reflection is given when it lands. `res.dmg[0] > 0` says the
+  // scale is not 0.)
   if (d.reflectPhysPct > 0 && res.dmg[0] > 0 && src.alive)
-    rawHit(w, src, res.dmg[0] * d.reflectPhysPct, 0, dst.side!, 'Reflect');
+    rawHit(
+      w,
+      src,
+      (res.dmg[0] / dst.side!.damageScale) * d.reflectPhysPct,
+      0,
+      dst.side!,
+      'Reflect',
+    );
 }
 
 /** Every impale on the target deals what it recorded as reflected physical damage, and uses up one of its hits. */
@@ -977,7 +993,12 @@ export function rawHit(
   const def = dst.def;
   const st = statusTaken(dst);
   takenAs(def, dmg);
-  const taken = def.damageTakenMult * def.hitTakenMult * shockTaken(def, dst.ail.shock);
+  // (A character's damage taken is scaled in a duel, docs/DUEL.md 4.4; a minion's is not.)
+  const taken =
+    def.damageTakenMult *
+    def.hitTakenMult *
+    shockTaken(def, dst.ail.shock) *
+    (dst.isPlayer ? dst.side!.damageScale : 1);
   for (let i = 0; i < 5; i++) {
     if (dmg[i] <= 0) continue;
     if (def.immune[i] || (i === CHAOS && def.immuneChaos)) {
@@ -1067,7 +1088,35 @@ function noteCause(
   if (!a.isPlayer) causes.set(a, { tags, minion, gains, side });
 }
 
-/** A side's damage killed a minion of another side: the effects of a kill that need no loot or experience (docs/DUEL.md F3). */
+/**
+ * What a kill gives a side besides experience and loot: the charges every flask gets (by the rarity of what fell; `hexFlasks` is how
+ * many marks on it double that), and life and mana on kill. What a kill may give holds only under a condition (while a flask is
+ * active) or per charge held: asked as the character is now.
+ */
+function killGains(
+  w: World,
+  fs: Side,
+  kind: keyof typeof FLASK_CHARGES_ON_KILL,
+  hexFlasks: number,
+): void {
+  const p = fs.player;
+  const kctx = playerCtx(w, fs);
+  const gain =
+    FLASK_CHARGES_ON_KILL[kind] * fs.char.db.mult('flaskCharges', kctx) * (1 + hexFlasks);
+  for (const f of fs.flasks) f.charges = Math.min(f.spec.maxCharges, f.charges + gain);
+  const lok =
+    fs.char.db.sum('base', 'lifeOnKill', kctx) +
+    (fs.char.db.sum('base', 'lifeOnKillPct', kctx) / 100) * p.def.maxLife;
+  if (lok > 0) p.life = Math.min(lifeCap(p), p.life + lok);
+  const mok = fs.char.db.sum('base', 'manaOnKill', kctx);
+  if (mok > 0) p.mana = Math.min(p.def.maxMana - reservedMana(fs), p.mana + mok);
+}
+
+/**
+ * A side's damage killed a minion of another side: what a kill gives that needs no loot or experience (docs/DUEL.md F3 and F4): the
+ * charges, the gains, a banner stage, the flasks' charges, life and mana on kill and the kill triggers. It counts as no kill, and
+ * gives no experience and drops nothing.
+ */
 function minionKilledBy(
   w: World,
   killer: Side,
@@ -1081,6 +1130,8 @@ function minionKilledBy(
   rollGains(w, killer, 'kill', cause.gains);
   bannerStage(w, killer, 'kill');
   refreshOnKill(killer);
+  // (A minion is of normal rarity, and a mark on it gives nothing: `hexKill` asks `hunted` whose kill it is.)
+  killGains(w, killer, 'normal', 0);
   if (!cause.minion) fireTriggers(w, killer, { on: 'kill', target: a, tags: cause.tags });
 }
 
@@ -1093,9 +1144,9 @@ export function killActor(w: World, a: Actor): void {
   a.life = 0;
   a.action = null;
   w.events.push({ t: 'death', id: a.id });
-  // A minion that falls is just gone (tickMinions clears it): nothing is dropped or raised, and it counts as no kill, no experience
-  // and no flask charges. What the other side's damage that killed it gives (the charges, gains and banner stages of a kill) it
-  // gives; a minion that dies of its own side's or of nobody's damage gives nothing.
+  // A minion that falls is just gone (tickMinions clears it): nothing is dropped or raised, and it counts as no kill and gives no
+  // experience. What the other side's damage that killed it gives (the charges, gains and banner stages of a kill, the flasks'
+  // charges, life and mana on kill) it gives; a minion that dies of its own side's or of nobody's damage gives nothing.
   if (!a.isPlayer && a.side) {
     const cause = causes.get(a);
     if (cause?.side && cause.side.team !== a.team) minionKilledBy(w, cause.side, a, cause);
@@ -1137,17 +1188,7 @@ export function killActor(w: World, a: Actor): void {
     // Killing an enemy under a hex that fills flasks (Mark of Plenty) doubles what the flasks gain.
     const cause0 = causes.get(a);
     const hexFlasks = cause0?.minion ? 0 : hexKill(w, a);
-    // What a kill gives may hold only under a condition (while a flask is active) or per charge held: ask as the character is now.
-    const kctx = playerCtx(w, fs);
-    const gain =
-      FLASK_CHARGES_ON_KILL[kind] * fs.char.db.mult('flaskCharges', kctx) * (1 + hexFlasks);
-    for (const f of fs.flasks) f.charges = Math.min(f.spec.maxCharges, f.charges + gain);
-    const lok =
-      fs.char.db.sum('base', 'lifeOnKill', kctx) +
-      (fs.char.db.sum('base', 'lifeOnKillPct', kctx) / 100) * p.def.maxLife;
-    if (lok > 0) p.life = Math.min(lifeCap(p), p.life + lok);
-    const mok = fs.char.db.sum('base', 'manaOnKill', kctx);
-    if (mok > 0) p.mana = Math.min(p.def.maxMana - reservedMana(fs), p.mana + mok);
+    killGains(w, fs, kind, hexFlasks);
     if (w.opts.loot) {
       for (const item of w.opts.loot(w, a)) {
         const id = w.nextId++;
@@ -1290,7 +1331,8 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     if (ail.chillT <= 0) ail.chill = 0;
   }
   // Damage over time. Temporal Chains lets effects on a cursed enemy run out more slowly; Vulnerability and Despair raise what they deal.
-  const taken = def.damageTakenMult * shockTaken(def, ail.shock);
+  const taken =
+    def.damageTakenMult * shockTaken(def, ail.shock) * (a.isPlayer ? a.side!.damageScale : 1);
   const hm = a.hex.more;
   const dtDot = dt * (1 - hm.expireSlow);
   let dotPhys = 0;

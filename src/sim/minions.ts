@@ -171,8 +171,12 @@ export function summonMinions(w: World, s: Side, c: SkillChoice, prof: SkillProf
   const seconds = u.seconds === undefined ? Infinity : u.seconds * prof.skillDuration;
   for (const m of s.minions) if (m.key === c.key && m.alive) m.t = seconds;
   const p = s.player;
+  // The ring starts east on a map, as it always has. Where there are several sides it starts where the character faces (toward
+  // the other one), so that two mirror characters get mirror minions: with a fixed east the one standing east had its first minion
+  // behind it, where its own body held it (docs/DUEL.md 8.2, the symmetry test).
+  const ang0 = w.sides.length > 1 ? p.facing : 0;
   for (let i = have; i < n; i++) {
-    const ang = (i / n) * Math.PI * 2;
+    const ang = ang0 + (i / n) * Math.PI * 2;
     const g = u.golem;
     const m = makeMinion(
       w,

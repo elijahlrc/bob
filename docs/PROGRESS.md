@@ -1052,6 +1052,20 @@ fights two builds and prints both ledgers; `ladder-probe.ts --real` fights the b
 2 to 40 seconds, median 4 to 6). The fence (default and `--deep`) is identical; what F4 must know is in the Built note under
 DUEL.md section 7.
 
+## Duels: the rules (2026-10-16)
+
+docs/DUEL.md F4 built. A duel's characters start 10 tiles apart on the arena's middle row and engage at any distance (`SideOpts.duel`:
+no loot, no exit, no waypoints, no stall breaker); a duel ends by a death, the 90 s cap or a stall (15 s with neither character taking damage);
+the sides act in alternating order (`World.order`, drawn tick by tick from the tick and the duel's seed: the parity of the tick left the
+same side first at every exchange of a mirror fight); what a character takes is scaled by `DUEL_DAMAGE_SCALE` 0.3 (a hit, a burst, damage over time; not a
+minion's damage, not the ailments or the stun); a character goes for the other side's minions and counts the other character as a boss
+for Rares first; a kill of a minion fills the flasks. Measured with the bot's builds (legacy pool at maps 20 and 40, default pool at maps 5
+to 20): the median fight is 16 s and 25 s at ×0.3 (6 s at ×1) with 3% and 6% on the cap, and the west side wins 50%. The symmetry test
+found a real bug (a summon's ring started due east, so the character standing east had its first minion behind it): with several sides the
+ring starts where the character faces. `scripts/ladder-probe.ts --real` sweeps the scale. The fence (default) is identical. What F5 must know
+is in the Built note under DUEL.md section 7; the open question is a scale that falls with the level (the medians of maps 5 and 20 differ
+by a factor of four to five at one scale).
+
 ## Equipping: sockets, compare and the phone (2026-10-16)
 
 docs/EQUIP.md Q0 to Q7 built; Q8 is this entry and the docs. A swap now says what happens to the gems (`SocketOutcome`, `dryEquip`,
