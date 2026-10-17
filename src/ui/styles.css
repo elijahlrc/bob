@@ -1570,6 +1570,38 @@ select option {
   accent-color: var(--accent-d);
   color-scheme: dark;
 }
+.rivals-opt {
+  display: block;
+  max-width: 420px;
+  margin: 8px auto 0;
+  font-size: 12px;
+}
+.rivals-opt label {
+  display: block;
+  cursor: pointer;
+}
+.rivals-opt input[type='checkbox'] {
+  accent-color: var(--accent-d);
+  color-scheme: dark;
+}
+.rivals-opt .rival-name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+.rivals-opt .rival-name input {
+  width: 14em;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 4px 8px;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color-scheme: dark;
+}
 
 /* An offer card is a button: pressing its text takes the map, it never selects the words. */
 .btn.theme {
