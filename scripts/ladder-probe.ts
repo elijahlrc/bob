@@ -48,7 +48,7 @@ const fightSeeds = arg('--fight-seeds', '1').split(',').map(Number);
 const SNAPS = [...new Set([5, 10, 15, 20, 40, 60, 80, 100, ...duelMaps])];
 
 type Snap = { cls: string; seed: number; map: number; level: number; build: Build };
-let snaps: Snap[] = [];
+const snaps: Snap[] = [];
 
 const t0 = performance.now();
 if (loadFile)

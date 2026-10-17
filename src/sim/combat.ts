@@ -935,7 +935,8 @@ function reflectBack(w: World, src: Actor, dst: Actor, p: SkillProfile, res: Hit
   const d = dst.def;
   for (let t = 0; t < 5; t++)
     if (d.reflect[t] > 0) rawHit(w, src, d.reflect[t], t, dst.side!, 'Reflect');
-  // (The share is of the hit as it was before a duel's scale, which the reflection is given when it lands.)
+  // (The share is of the hit as it was before a duel's scale, which the reflection is given when it lands. `res.dmg[0] > 0` says the
+  // scale is not 0.)
   if (d.reflectPhysPct > 0 && res.dmg[0] > 0 && src.alive)
     rawHit(
       w,
