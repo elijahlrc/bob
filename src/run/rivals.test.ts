@@ -194,7 +194,7 @@ describe('sending and fetching', () => {
       sink,
       record,
     );
-    expect(ok).toBe(true);
+    expect(ok).toEqual({ ok: true });
     expect(calls).toHaveLength(1);
     expect(calls[0].url).toBe('https://abc.supabase.co/rest/v1/rivals');
     expect(calls[0].init.method).toBe('POST');
@@ -323,8 +323,8 @@ describe('sending and fetching', () => {
     const offline = async () => {
       throw new Error('offline');
     };
-    expect(await postRival(offline, sink, record)).toBe(false);
-    expect(await postRival(async () => ({ ok: false }), sink, record)).toBe(false);
+    expect(await postRival(offline, sink, record)).toEqual({ ok: false });
+    expect(await postRival(async () => ({ ok: false }), sink, record)).toEqual({ ok: false });
     expect(await fetchRivals(offline, sink, q)).toEqual([]);
     expect(await fetchHighScores(offline, sink, 10)).toEqual([]);
     const refused: FetchJson = async () => ({ ok: false, json: async () => [] });
