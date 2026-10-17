@@ -51,6 +51,10 @@ export type Rival = {
   gameVersion: string;
   /** A character the bot built, to fill the pool. */
   bot: boolean;
+  /** Its standing on the ladder (docs/DUEL.md 6.3): a card shows them; a rival is fightable whatever they are. */
+  rating: number;
+  fights: number;
+  wins: number;
   build: Build;
 };
 
@@ -667,8 +671,9 @@ function buildOk(b: unknown, classId: string, level: number): b is Build {
 /**
  * A row of `rivals_for` as a `Rival`, or null when it should not be offered: the wrong shape, another save version, a name the
  * table's rule would not take, a build that refers to an id this version does not have (a node, a base, an affix, a gem, a
- * unique, a flask), a primary gem that is not socketed, or one that will not even make a `Character`. The rating columns of the
- * ranking are not read: a rival is fightable whatever its standing.
+ * unique, a flask), a primary gem that is not socketed, or one that will not even make a `Character`. The ranking's columns
+ * (rating, fights, wins) are read for the card and are not checked: a row without them (or with junk in them) is a rival at ten
+ * times its level that has not fought, and is as fightable as any.
  */
 export function validateRival(row: unknown, saveVersion: number): Rival | null {
   if (!isObj(row)) return null;
@@ -700,6 +705,12 @@ export function validateRival(row: unknown, saveVersion: number): Rival | null {
     saveVersion,
     gameVersion,
     bot: row.bot,
+    rating:
+      typeof row.rating === 'number' && Number.isFinite(row.rating)
+        ? Math.round(row.rating)
+        : level * 10,
+    fights: isInt(row.fights, 0, 1e9) ? row.fights : 0,
+    wins: isInt(row.wins, 0, 1e9) ? row.wins : 0,
     build,
   };
 }

@@ -28,6 +28,9 @@ function rivalOf(id: number, over: Partial<Rival> = {}): Rival {
     saveVersion: SAVE_VERSION,
     gameVersion: 'abc1234',
     bot: false,
+    rating: 10,
+    fights: 0,
+    wins: 0,
     build,
     ...over,
   };

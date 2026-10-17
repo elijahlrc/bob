@@ -1,0 +1,152 @@
+/* The rivals: the run summary's block, the Rivals screen (src/ui/Rivals.tsx) and the high scores (src/ui/HighScores.tsx). */
+
+/* The summary's block under the recap: the opt-in while the character is not sent, the button, the tally. */
+.rivals-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: 440px;
+  margin: 4px auto 0;
+  text-align: center;
+}
+.rivals-block p {
+  margin: 0;
+}
+.rivals-block .rivals-opt {
+  margin-top: 0;
+}
+
+/* What the fight counted for, on the duel's result screen. */
+.duel-result .duel-standing {
+  font-weight: bold;
+  color: var(--accent);
+}
+
+/* The Rivals screen: five cards, each a button that starts the duel. */
+.rivals,
+.highscores {
+  justify-content: flex-start;
+  padding: 24px 12px;
+  box-sizing: border-box;
+}
+.rivals h2,
+.highscores h2,
+.rivals p {
+  margin: 0;
+}
+.rivals .menu.row,
+.highscores .menu.row {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.rival-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 1120px;
+}
+.rival-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1 1 200px;
+  max-width: 260px;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  text-align: left;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.rival-card:hover {
+  background: var(--panel2);
+  border-color: var(--accent);
+}
+.rc-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+.rc-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--accent);
+}
+.rc-bot {
+  flex: none;
+  padding: 0 5px;
+  font-size: 11px;
+  color: var(--muted);
+  border: 1px solid var(--border2);
+  border-radius: 3px;
+}
+.rc-sig {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.rc-you {
+  font-size: 12px;
+  color: var(--hi);
+}
+
+/* The high scores: a table that scrolls; on a phone only the rank, name, class and rating stay. */
+.hs-scroll {
+  width: min(760px, 100%);
+  max-height: 70vh;
+  overflow: auto;
+}
+.hs-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+  text-align: left;
+}
+.hs-table th {
+  position: sticky;
+  top: 0;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: normal;
+  color: var(--muted);
+  white-space: nowrap;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.hs-table td {
+  padding: 3px 8px;
+  white-space: nowrap;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.hs-table .num {
+  text-align: right;
+}
+.hs-table .hs-name {
+  max-width: 14em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hs-table tr.hs-me td {
+  color: var(--hi);
+  background: rgba(255, 216, 74, 0.08);
+}
+@media (max-width: 600px) {
+  .hs-x {
+    display: none;
+  }
+  .rival-card {
+    flex-basis: 100%;
+    max-width: none;
+  }
+}

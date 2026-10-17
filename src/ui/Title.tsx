@@ -3,6 +3,7 @@ import { copyText } from '../clipboard';
 import { classDef } from '../data/classes';
 import type { Controller } from '../run/controller';
 import type { SlotId, SlotSummary } from '../run/save';
+import { rivalsConfigured } from '../rivals';
 import { setTelemetry, telemetryConfigured, telemetryOn } from '../telemetry';
 import { ask } from './Confirm';
 import { DebugPanel } from './Debug';
@@ -146,6 +147,11 @@ export function Title({ c }: { c: Controller }) {
         <button class="btn" onClick={() => c.goTo('patchNotes')}>
           Patch notes
         </button>
+        {rivalsConfigured() && (
+          <button class="btn" onClick={() => c.goTo('highScores')}>
+            High scores
+          </button>
+        )}
       </div>
       <DiscordInvite />
       {anyOk && (

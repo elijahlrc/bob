@@ -5,10 +5,12 @@ import { ClassSelect } from './ClassSelect';
 import { Codex } from './Codex';
 import { ConfirmHost, dismissAsk } from './Confirm';
 import { DuelResultView } from './DuelResult';
+import { HighScores } from './HighScores';
 import { Hud } from './Hud';
 import { InfoLayer } from './info';
 import { useControllerState } from './hooks';
 import { PatchNotes } from './PatchNotes';
+import { Rivals } from './Rivals';
 import { Summary } from './Summary';
 import { Title } from './Title';
 
@@ -56,8 +58,9 @@ function Screen({ c }: { c: Controller }) {
     case 'duelResult':
       return <DuelResultView c={c} />;
     case 'rivals':
+      return <Rivals c={c} />;
     case 'highScores':
-      return null;
+      return <HighScores c={c} />;
     case 'summary':
     case 'victory':
       return <Summary c={c} />;

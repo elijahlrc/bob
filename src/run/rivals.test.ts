@@ -422,14 +422,22 @@ describe('checking a rival before it is shown', () => {
     expect(rival!.build.allocated).toEqual(rec.build.allocated);
   });
 
-  it('accepts a player’s record, and does not read the rating columns', () => {
+  it('accepts a player’s record, and reads the ranking’s columns for the card without being held by them', () => {
     const rec = rivalRecord(deadRun(), res, { ...opts, name: 'Wren' });
     const rival = validateRival(
       rowOf(rec, { rating: 1500, fights: 4, wins: 3, rated_at: 'x' }),
       SAVE_VERSION,
     );
-    expect(rival).toMatchObject({ name: 'Wren', bot: false });
-    expect(Object.keys(rival!)).not.toContain('rating');
+    expect(rival).toMatchObject({ name: 'Wren', bot: false, rating: 1500, fights: 4, wins: 3 });
+    // A row without them, or with junk in them, is a rival that has not fought, at ten times its level.
+    for (const over of [{}, { rating: 'high', fights: -2, wins: 1.5 }, { rating: null }]) {
+      const bare = JSON.parse(JSON.stringify(rowOf(rec))) as Record<string, unknown>;
+      delete bare.rating;
+      delete bare.fights;
+      delete bare.wins;
+      const r = validateRival({ ...bare, ...over }, SAVE_VERSION);
+      expect(r, JSON.stringify(over)).toMatchObject({ rating: 410, fights: 0, wins: 0 });
+    }
   });
 
   it('accepts a primary gem that is socketed, and the old name of a gem that was folded into another', () => {
