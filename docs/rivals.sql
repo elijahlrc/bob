@@ -38,7 +38,9 @@ create table if not exists public.rivals (
   -- SHA-256 of a random token that stays in the player's browser: 64 hex characters. It counts a device's inserts and leaves a
   -- player's own characters out of what they are shown. It is never returned by a function.
   token_hash    text    not null check (token_hash ~ '^[0-9a-f]{64}$'),
-  build         jsonb   not null check (pg_column_size(build) < 16384),
+  -- (A bot's map-100 build is 9.8 KB of JSON; jsonb is about 1.45 times that, so 16 KB was too near. The client sends nothing
+  -- but `run.build`, so the cap is a guard against junk, not a budget.)
+  build         jsonb   not null check (pg_column_size(build) < 32768),
   -- The ranking's, never the client's. A ranking job with the service role will fight the pool and write these (docs/DUEL.md
   -- section 13); the trigger in 4 resets them to these defaults on every insert, whatever the row sent, and the public key has
   -- no update.

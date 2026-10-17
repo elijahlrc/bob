@@ -317,7 +317,7 @@ ended in a death and one that won are both worth fighting.
 `docs/rivals.sql`, run once like `docs/telemetry.sql` (by the owner; it can be run again without harm):
 
 - table `rivals` (id, created_at, name, class_id, level, map, outcome, difficulty jsonb, save_version, game_version, bot,
-  token_hash, build jsonb with `pg_column_size(build) < 16384`, length and range checks as `runs` has), **and four columns that
+  token_hash, build jsonb with `pg_column_size(build) < 32768`, length and range checks as `runs` has), **and four columns that
   are the ranking's, never the client's**: `rating int` (default 1000), `fights int` (0), `wins int` (0), `rated_at timestamptz`
   (null). A `before insert` trigger resets them, and `created_at`, to their defaults whatever the row sent, and the public key
   has no update, so a client cannot post itself with a rating or back-date a row. A **ranking job with the service role** will
