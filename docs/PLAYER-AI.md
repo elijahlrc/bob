@@ -363,8 +363,8 @@ from the same Strategy tab, so everything above holds except this:
   level with full life, mana, energy shield and flasks.
 - **A duel ends** when a character dies (the other wins; both in one moment is a draw), after **90 seconds**, or when **15 seconds**
   pass in which neither character took damage (a stall). The last two are draws.
-- **Who acts first alternates.** When both characters act in the same moment, one goes first, and which one changes every tick.
-  Which of them starts is set by the fight's seed, so neither has the first blow by where it stands.
+- **Who acts first is a coin toss every tick.** When both characters act in the same moment, one goes first, and which one is drawn
+  anew each tick (the same for the same seed), so neither has the first blow by where it stands or by its speed.
 - **Damage is scaled to ×0.3** for both characters: hits, bursts, damage over time and what a self-damaging buff (a Blood Rage analog)
   costs. A minion takes full damage;
   ailments and stuns are as strong as on a map (their damage is scaled like any other). Regeneration, leech and flasks work as on a
