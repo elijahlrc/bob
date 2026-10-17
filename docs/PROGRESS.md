@@ -1086,3 +1086,14 @@ that opens to a merged card (every changed line shows; it scrolls rather than cu
 toolbar is a search, a Filter sheet and Clear filters, a bag gem has a socket picker, and the Skills tab names what it replaces and asks
 before replacing a gem. No mechanics changed (the transfer order is as it was; `dryEquip`'s `gemsToBag` count became the `sockets` outcome).
 Not built: swipe, the drag of the grab bar. Not looked at: a real device, a ring's two tabs on a phone screen.
+
+## Duels: rivals (2026-10-17)
+
+docs/DUEL.md F6 built. A character can be captured when a run ends and sent to a `rivals` table, with the player's opt-in (its own checkbox
+on the title screen, separate from the run statistics) and a name they type (3 to 16 characters) or one the game makes up. `docs/rivals.sql`
+makes the table, a deny-list table the owner fills by hand, the triggers (the ranking's columns and the time reset, the deny-list, a cap of 20
+a day per token hash) and two functions the public key reads through: `rivals_for` (rivals of this save version near a map, never one's own)
+and `high_scores` (the top rated snapshots; the ratings are a later ranking job's, so it is empty until then). `src/run/rivals.ts` posts,
+fetches and checks a rival before it is offered (every id its build names must exist at this version); `npm run sim -- --rivals` seeds the pool
+with the bot's characters. Tested with an injected `fetch` only: the SQL has **not been run** and the title screen not opened. The owner's
+steps and what F7 needs are in the Built note under DUEL.md section 7.
