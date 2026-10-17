@@ -18,6 +18,11 @@
 --     never a bot: id, name, class_id, level, map, outcome, rating, fights, wins, game_version, posted_on (the day it was
 --     posted).
 --
+--   my_snapshots(token_hash)
+--     the caller's own snapshots, newest first (at most 50), by the token hash that only its browser knows: id, created_at,
+--     name, class_id, level, map, outcome, save_version, rating, fights, wins. The game needs its own snapshot's id to compute
+--     the seed of a rated fight and to report it, and an insert cannot return it (the public key may not read the table).
+--
 -- Identity and abuse. Each write is stamped with a keyed hash of the address it came from (the key lives in a private table
 -- nobody but these functions can read, so the hash cannot be turned back into an address) and with the hash of a token the
 -- player's browser made. The token hash is never returned, so it also serves as proof of ownership: only the browser that
@@ -514,6 +519,43 @@ $$;
 
 revoke all on function public.high_scores(int) from public;
 grant execute on function public.high_scores(int) to anon, authenticated;
+
+-- 15b. A browser's own snapshots, by the token hash that only it knows (the same proof of ownership as a report's): the ids the
+--      game needs for the seed of a rated fight and for the report, and what it may show the player of their own characters.
+--      Never another's: a hash nobody knows matches nothing.
+drop function if exists public.my_snapshots(text);
+drop type if exists public.my_snapshot_row;
+
+create type public.my_snapshot_row as (
+  id            bigint,
+  created_at    timestamptz,
+  name          text,
+  class_id      text,
+  level         int,
+  map           int,
+  outcome       text,
+  save_version  int,
+  rating        int,
+  fights        int,
+  wins          int
+);
+
+create function public.my_snapshots(token_hash text)
+returns setof public.my_snapshot_row
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select r.id, r.created_at, r.name, r.class_id, r.level, r.map, r.outcome, r.save_version, r.rating, r.fights, r.wins
+  from public.rivals r
+  where r.token_hash = my_snapshots.token_hash
+  order by r.created_at desc
+  limit 50;
+$$;
+
+revoke all on function public.my_snapshots(text) from public;
+grant execute on function public.my_snapshots(text) to anon, authenticated;
 
 -- 16. Cleanup, by hand when the tables have grown (nothing runs it): snapshots older than 90 days, and snapshots of a save
 --     version older than the three most recent (nobody can fight those). A snapshot's duels go with it (`on delete cascade`).
