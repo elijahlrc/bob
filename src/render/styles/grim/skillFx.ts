@@ -20,8 +20,10 @@ import {
   TRAP_RADIUS,
 } from '../../../sim/deploy';
 import type { Field } from '../../../sim/fields';
+import type { Side } from '../../../sim/side';
 import type { Actor, SimEvent, World } from '../../../sim/types';
 import { beamMotifOf, fallbackMotif, motifOf } from '../../../calc/areaLook';
+import { isViewer } from '../../style/who';
 import { playMotif, tongue } from './areaMotifs';
 import { drawBuffs, type BuffMark } from './buffFx';
 import { drawLanded, outlineArea, shapeOfExplode, type AreaShape } from './areaFx';
@@ -323,7 +325,8 @@ export class SkillFx {
         break;
       }
       case 'summon': {
-        const m = w.sides[0].minions.find((x) => x.id === e.id);
+        let m: Actor | undefined;
+        for (const s of w.sides) m ??= s.minions.find((x) => x.id === e.id);
         if (m) {
           this.rune(m.x, m.y, 0.9, UTILITY_COLOR.summon, 0.6);
           const p = this.lifted(m.x, m.y, 4);
@@ -360,10 +363,16 @@ export class SkillFx {
     }
   }
 
+  /** The side that put a deployable down (side 0 when it is none that is still standing). */
+  private deployerOf(w: World, id: number): Side {
+    return w.sides.find((s) => s.deployables.some((x) => x.id === id)) ?? w.sides[0];
+  }
+
   /** The colour of the element a deployable's skill deals. */
   private glowOf(w: World, id: number): number {
-    const d = w.sides[0].deployables.find((x) => x.id === id);
-    const choice = d ? choiceByKey(w.sides[0], d.key) : undefined;
+    const s = this.deployerOf(w, id);
+    const d = s.deployables.find((x) => x.id === id);
+    const choice = d ? choiceByKey(s, d.key) : undefined;
     return ELEMENT_COLOR[choice ? elementOfTags(choice.skill.tags, choice.skill.spellDamage) : 0];
   }
 
@@ -374,14 +383,15 @@ export class SkillFx {
   private setDown(e: Extract<SimEvent, { t: 'deploy' }>, w: World): void {
     const thrown = e.kind === 'trap' || e.kind === 'mine';
     const total = thrown ? LOB_SECONDS : DROP_SECONDS;
+    const from = this.deployerOf(w, e.id).player;
     this.flights.set(e.id, {
       t: total,
       total,
       kind: e.kind,
       x: e.x,
       y: e.y,
-      fromX: w.sides[0].player.x,
-      fromY: w.sides[0].player.y,
+      fromX: from.x,
+      fromY: from.y,
       glow: this.glowOf(w, e.id),
     });
   }
@@ -487,7 +497,7 @@ export class SkillFx {
     if (!act) return;
     // A skill that puts something down shows the thing being readied, not a spell going off.
     const deploy = a.isPlayer
-      ? w.sides[0].char.actives.find((c) => c.skill.id === act.profile.skill.id)?.deploy
+      ? (a.side ?? w.sides[0]).char.actives.find((c) => c.skill.id === act.profile.skill.id)?.deploy
       : undefined;
     if (deploy) {
       this.readying(a, act, deploy);
@@ -691,17 +701,28 @@ export class SkillFx {
     }
   }
 
-  /** A buff or warcry begins: a pulse around the player, in the colour of its kind. */
+  /**
+   * A buff or warcry begins: a pulse around the character, in the colour of its kind. The event names the buff and not whose it
+   * is, so with several sides it is every side that has the skill and has the buff running (a mirror's two pulse together).
+   */
   private buffPulse(id: string, w: World): void {
-    if (this.now - (this.lastBuff.get(id) ?? -9) < 1.2) return;
-    const c = w.sides[0].char.utilities.find(
+    for (const side of w.sides) {
+      if (w.sides.length > 1 && !(side.buffT[id as keyof Side['buffT']] > 0)) continue;
+      this.buffPulseOf(id, side);
+    }
+  }
+
+  private buffPulseOf(id: string, side: Side): void {
+    const key = `${side.id}:${id}`;
+    if (this.now - (this.lastBuff.get(key) ?? -9) < 1.2) return;
+    const c = side.char.utilities.find(
       (u) => u.skill.utility?.kind === 'buff' && u.skill.utility.buff === id,
     );
     if (!c) return;
-    this.lastBuff.set(id, this.now);
+    this.lastBuff.set(key, this.now);
     const s = c.skill;
     const delivery: Delivery = deliveryOf(s.behaviour, s.type, s.tags, s.utility);
-    const p = w.sides[0].player;
+    const p = side.player;
     const color = UTILITY_COLOR[delivery === 'warcry' || delivery === 'guard' ? delivery : 'buff'];
     if (delivery === 'warcry') {
       this.wave(p.x, p.y, 0.5, 5, color, 0.55, 3);
@@ -737,19 +758,20 @@ export class SkillFx {
   frame(w: World, dt: number, time: number, ground: Gfx): void {
     this.now = time;
     this.gridW = w.grid.w;
-    this.zones(ground, w, time);
-    this.bonds(ground, w, time);
-    this.deployables(ground, w, time);
-    this.minions(ground, w, time);
-    this.upkeep(ground, w, time);
+    // What a character keeps up is drawn for each side (one on a map).
+    for (const s of w.sides) this.zones(ground, s, time);
+    for (const s of w.sides) this.bonds(ground, w, s, time);
+    for (const s of w.sides) this.deployables(ground, w, s, time);
+    for (const s of w.sides) this.minions(ground, s, time);
+    for (const s of w.sides) this.upkeep(ground, s, time);
     const air = this.air;
     air.clear();
     this.flying(ground, air, dt, time);
-    this.fieldMarks(ground, air, w, time);
+    for (const s of w.sides) this.fieldMarks(ground, air, s, time);
     this.curseMarks(air, w, time);
-    this.siphons(air, w, time);
-    this.buffMarks(ground, air, w, time);
-    this.lasting(ground, air, w, time);
+    for (const s of w.sides) this.siphons(air, w, s, time);
+    for (const s of w.sides) this.buffMarks(ground, air, s, time);
+    for (const s of w.sides) this.lasting(ground, air, w, s, time);
     let j = 0;
     for (const f of this.list) {
       f.t -= dt;
@@ -761,8 +783,8 @@ export class SkillFx {
   }
 
   /** Zones the player's skills left on the ground: a telegraph before the first pulse, then a patch in the element's colour. */
-  private zones(g: Gfx, w: World, time: number): void {
-    for (const z of w.sides[0].zones) {
+  private zones(g: Gfx, side: Side, time: number): void {
+    for (const z of side.zones) {
       const c = ELEMENT_COLOR[z.dtype] ?? 0xffffff;
       const owner = this.host.actorById(z.owner);
       const hostile = !!owner && !owner.isPlayer;
@@ -894,9 +916,9 @@ export class SkillFx {
   }
 
   /** The beams between a skill's totems and the character (Cinder Bond): a glowing band on the ground, flickering. */
-  private bonds(g: Gfx, w: World, time: number): void {
-    for (const l of bondLinks(w, w.sides[0])) {
-      const choice = choiceByKey(w.sides[0], l.key);
+  private bonds(g: Gfx, w: World, side: Side, time: number): void {
+    for (const l of bondLinks(w, side)) {
+      const choice = choiceByKey(side, l.key);
       const element = choice ? elementOfTags(choice.skill.tags, choice.skill.spellDamage) : 0;
       const glow = ELEMENT_COLOR[element];
       const a = this.host.project(l.x1, l.y1);
@@ -917,12 +939,12 @@ export class SkillFx {
   }
 
   /** Totems, brands, traps and mines: the shape says which, the glow says the element. */
-  private deployables(g: Gfx, w: World, time: number): void {
-    for (const d of w.sides[0].deployables) {
+  private deployables(g: Gfx, w: World, side: Side, time: number): void {
+    for (const d of side.deployables) {
       // Still in the air: drawn by `flying` until it lands.
       if (this.flights.has(d.id)) continue;
       const { x, y } = this.host.project(d.x, d.y);
-      const choice = choiceByKey(w.sides[0], d.key);
+      const choice = choiceByKey(side, d.key);
       const element = choice ? elementOfTags(choice.skill.tags, choice.skill.spellDamage) : 0;
       const glow = ELEMENT_COLOR[element];
       const fade = Math.min(1, d.t);
@@ -1065,8 +1087,8 @@ export class SkillFx {
    * What the sim keeps in `w.fields` (ground a skill leaves, a wall of ice, a crystal, an orb, a trail, an illusion, a
    * geyser, smoke, a storm), drawn from its state each frame. Each says what it is by its shape; the colour is the element.
    */
-  private fieldMarks(ground: Gfx, air: Gfx, w: World, time: number): void {
-    for (const f of w.sides[0].fields) {
+  private fieldMarks(ground: Gfx, air: Gfx, side: Side, time: number): void {
+    for (const f of side.fields) {
       const fade = Math.min(1, Math.max(0, f.t) / 0.6);
       const born = Math.min(1, (f.total - f.t) * 4);
       const el = ELEMENT_COLOR[f.dtype] ?? 0xffffff;
@@ -1202,7 +1224,7 @@ export class SkillFx {
             ground,
             air,
             { x: f.x, y: f.y } as Actor,
-            this.colorOfSkill(w, f.profile?.skill.id ?? ''),
+            this.colorOfSkill(side, f.profile?.skill.id ?? ''),
             f.radius,
             fade * born,
             time * 9,
@@ -1329,8 +1351,8 @@ export class SkillFx {
   }
 
   /** Minions: a teal ring at their feet, their body, and what is left of their life. */
-  private minions(g: Gfx, w: World, time: number): void {
-    for (const m of w.sides[0].minions) {
+  private minions(g: Gfx, side: Side, time: number): void {
+    for (const m of side.minions) {
       if (!m.alive) continue;
       const { x, y } = this.host.project(m.x, m.y);
       const col = MINIONS[m.kind].color;
@@ -1352,11 +1374,11 @@ export class SkillFx {
   }
 
   /** Auras are slow rings at the player's feet (heralds are spiked), and each buff running is a mote circling the body. */
-  private upkeep(g: Gfx, w: World, time: number): void {
-    const p = w.sides[0].player;
+  private upkeep(g: Gfx, side: Side, time: number): void {
+    const p = side.player;
     if (!p.alive) return;
     let i = 0;
-    for (const a of w.sides[0].char.auras) {
+    for (const a of side.char.auras) {
       if (!a.active || i >= 4) continue;
       const look = auraLook(a.def);
       const r = 1.0 + i * 0.28;
@@ -1387,12 +1409,12 @@ export class SkillFx {
   }
 
   /** Each buff that is up has a mark of its own on the character (buffFx.ts); one about to end blinks. */
-  private buffMarks(ground: Gfx, air: Gfx, w: World, time: number): void {
-    const p = w.sides[0].player;
+  private buffMarks(ground: Gfx, air: Gfx, side: Side, time: number): void {
+    const p = side.player;
     if (!p.alive) return;
     const marks: BuffMark[] = [];
     for (const id of BUFF_IDS) {
-      const left = w.sides[0].buffT[id];
+      const left = side.buffT[id];
       if (left <= 0) continue;
       // A buff about to end blinks.
       marks.push({ id, alpha: left < 1.5 ? 0.4 + 0.6 * Math.abs(Math.sin(time * 8)) : 1 });
@@ -1402,8 +1424,8 @@ export class SkillFx {
 
   /** A curse is a violet sigil turning over the head of each enemy that carries one. */
   /** The element's colour of the character's skill that has this id. */
-  private colorOfSkill(w: World, id: string): number {
-    const c = w.sides[0].char.actives.find((x) => x.skill.id === id);
+  private colorOfSkill(side: Side, id: string): number {
+    const c = side.char.actives.find((x) => x.skill.id === id);
     return ELEMENT_COLOR[c ? elementOfTags(c.skill.tags, c.skill.spellDamage) : 0] ?? 0xffffff;
   }
 
@@ -1417,8 +1439,8 @@ export class SkillFx {
    * What stays on the character while a skill carries it or spins it: one ring with two blades going round it (a spin, or a channel
    * that pulses around the character), speed lines behind a run or a charge, and the chain of a hook.
    */
-  private spinning(ground: Gfx, air: Gfx, w: World, time: number): void {
-    const p = w.sides[0].player;
+  private spinning(ground: Gfx, air: Gfx, w: World, side: Side, time: number): void {
+    const p = side.player;
     if (!p.alive) return;
     const act = p.action;
     const spin = act?.profile.skill.spin;
@@ -1428,13 +1450,13 @@ export class SkillFx {
         ground,
         air,
         p,
-        this.colorOfSkill(w, act.profile.skill.id),
+        this.colorOfSkill(side, act.profile.skill.id),
         spin.radius * act.profile.radiusMult + p.r,
         Math.min(1, k * 10, (1 - k) * 10 + 0.25),
         time * 18,
       );
     }
-    const ch = w.sides[0].channel;
+    const ch = side.channel;
     const spec = ch?.profile.skill.channel;
     const beh = ch?.profile.skill.behaviour;
     if (ch && spec?.tick && beh?.kind === 'burst' && beh.origin === 'self') {
@@ -1444,11 +1466,19 @@ export class SkillFx {
           (1 + ((spec.tickRadiusPerStage ?? 0) * ch.stage) / 100) +
         p.r;
       const fade = Math.min(1, (w.t - ch.startT) * 6);
-      this.whirl(ground, air, p, this.colorOfSkill(w, ch.key), r, fade, time * (10 + 2 * ch.stage));
+      this.whirl(
+        ground,
+        air,
+        p,
+        this.colorOfSkill(side, ch.key),
+        r,
+        fade,
+        time * (10 + 2 * ch.stage),
+      );
     }
     const run = act?.profile.skill.run;
     if (act && run && !act.fired) {
-      const color = this.colorOfSkill(w, act.profile.skill.id);
+      const color = this.colorOfSkill(side, act.profile.skill.id);
       const k = Math.min(1, act.elapsed / (HIT_AT * act.duration));
       if (run.style === 'hook') {
         const t = this.host.actorById(act.targetId);
@@ -1496,13 +1526,13 @@ export class SkillFx {
     }
   }
 
-  private lasting(ground: Gfx, air: Gfx, w: World, time: number): void {
-    const p = w.sides[0].player;
-    this.spinning(ground, air, w, time);
-    const vx = w.sides[0].vortex;
+  private lasting(ground: Gfx, air: Gfx, w: World, side: Side, time: number): void {
+    const p = side.player;
+    this.spinning(ground, air, w, side, time);
+    const vx = side.vortex;
     if (vx && p.alive && vx.blades.length > 0) {
-      const spec = choiceByKey(w.sides[0], vx.key)?.skill.vortex;
-      const color = this.colorOfSkill(w, choiceByKey(w.sides[0], vx.key)?.skill.id ?? '');
+      const spec = choiceByKey(side, vx.key)?.skill.vortex;
+      const color = this.colorOfSkill(side, choiceByKey(side, vx.key)?.skill.id ?? '');
       const o = this.host.project(p.x, p.y);
       const rx = this.host.rpx(Math.min(1.4, spec?.radius ?? 1.4));
       const sq = this.host.squash();
@@ -1526,7 +1556,7 @@ export class SkillFx {
           );
       }
     }
-    const orb = w.sides[0].stormOrb;
+    const orb = side.stormOrb;
     if (orb) {
       const o = this.lifted(orb.x, orb.y, 14);
       const fade = Math.min(1, orb.t);
@@ -1542,10 +1572,9 @@ export class SkillFx {
       }
       this.ring(ground, orb.x, orb.y, 0.5, color, 0.35 * fade, 1);
     }
-    for (const m of w.sides[0].markers) {
-      const color = this.colorOfSkill(w, m.profile.skill.id);
-      const spec = w.sides[0].char.actives.find((x) => x.skill.id === m.profile.skill.id)?.skill
-        .markers;
+    for (const m of side.markers) {
+      const color = this.colorOfSkill(side, m.profile.skill.id);
+      const spec = side.char.actives.find((x) => x.skill.id === m.profile.skill.id)?.skill.markers;
       const r = (spec?.radius ?? 1.5) * m.profile.radiusMult;
       const left = spec ? Math.min(1, Math.max(0, m.t / spec.delay)) : 0.5;
       this.ring(ground, m.x, m.y, r, color, 0.5, 1);
@@ -1553,7 +1582,7 @@ export class SkillFx {
       const c = this.host.project(m.x, m.y);
       air.fillStyle(0xffffff, 0.85).fillCircle(c.x, c.y, 1.8);
     }
-    for (const f of w.sides[0].fuses) {
+    for (const f of side.fuses) {
       const t = this.host.actorById(f.target);
       const x = t && t.alive ? t.x : f.x;
       const y = t && t.alive ? t.y : f.y;
@@ -1573,14 +1602,14 @@ export class SkillFx {
       air.fillStyle(ELEMENT_COLOR[3], 0.45 * blink).fillCircle(o.x, o.y, 6);
       air.fillStyle(0xffd080, 0.9 * blink).fillCircle(o.x, o.y, 2);
     }
-    for (const s of w.sides[0].spores) {
+    for (const s of side.spores) {
       const o = this.host.project(s.x, s.y);
       const pulse = 0.6 + 0.4 * Math.sin(time * 5 + s.x * 3);
       ground.fillStyle(0x000000, 0.3).fillEllipse(o.x, o.y + 1, 10, 4);
       ground.fillStyle(0x6a8a3a, 0.9).fillEllipse(o.x, o.y - 3, 8, 7);
       air.fillStyle(0xa0e060, 0.4 * pulse).fillCircle(o.x, o.y - 4, 5);
     }
-    const mi = w.sides[0].mirage;
+    const mi = side.mirage;
     if (mi) {
       const o = this.host.project(mi.x, mi.y);
       const fade = Math.min(1, mi.t);
@@ -1589,15 +1618,15 @@ export class SkillFx {
       air.fillStyle(0x80c0ff, 0.35 * fade).fillTriangle(o.x - 5, o.y, o.x + 5, o.y, o.x, o.y - 10);
       air.lineStyle(1, 0xffffff, 0.6 * fade).strokeCircle(o.x, o.y - 12, 3.5);
     }
-    for (const id in w.sides[0].charged) {
+    for (const id in side.charged) {
       const e = this.host.actorById(Number(id));
-      const ch = w.sides[0].charged[id];
+      const ch = side.charged[id];
       if (!e || !e.alive) continue;
       const o = this.host.project(e.x, e.y);
       for (let i = 0; i < ch.n; i++)
         air.fillStyle(ELEMENT_COLOR[3], 0.95).fillCircle(o.x - (ch.n - 1) * 3 + i * 6, o.y - 32, 2);
     }
-    const sh = w.sides[0].shell;
+    const sh = side.shell;
     if (sh && p.alive) {
       const flick = 0.7 + 0.3 * Math.sin(time * 6);
       this.disc(ground, p.x, p.y, 0.9, ELEMENT_COLOR[3], 0.12 * flick);
@@ -1609,15 +1638,20 @@ export class SkillFx {
    * The beams of a draining skill (Drain Trap): from each enemy it holds to the character, a band in the element's colour
    * with a red mote (life) and a blue one (mana) running along it toward the character.
    */
-  private siphons(g: Gfx, w: World, time: number): void {
-    const p = w.sides[0].player;
+  private siphons(g: Gfx, w: World, side: Side, time: number): void {
+    const p = side.player;
     if (!p.alive) return;
-    for (const c of w.sides[0].char.actives) {
+    for (const c of side.char.actives) {
       if (!c.usable || !c.skill.siphon) continue;
       const glow = ELEMENT_COLOR[elementOfTags(c.skill.tags, c.skill.spellDamage)];
       const to = this.lifted(p.x, p.y, 10);
       for (const e of w.actors) {
-        if (e.isPlayer || !e.alive || !e.sdots.some((d) => d.src === c.skill.id && d.t > 0))
+        // What it holds: an enemy of this character (the other character too) that carries the skill's debuff of this side.
+        if (
+          e === p ||
+          !e.alive ||
+          !e.sdots.some((d) => d.src === c.skill.id && d.t > 0 && (d.by ?? side) === side)
+        )
           continue;
         const from = this.lifted(e.x, e.y, 10);
         const flick = 0.75 + 0.25 * Math.sin(time * 12 + e.id);
@@ -1642,7 +1676,8 @@ export class SkillFx {
 
   private curseMarks(g: Gfx, w: World, time: number): void {
     for (const a of w.actors) {
-      if (!a.alive || a.isPlayer || a.hexes.length === 0) continue;
+      // Not the viewer's own character (its hexes are chips on the HUD); the rival's show as an enemy's do.
+      if (!a.alive || isViewer(a) || a.hexes.length === 0) continue;
       const o = this.host.project(a.x, a.y);
       for (let h = 0; h < a.hexes.length; h++) {
         const cy = o.y - 28 - h * 6;
