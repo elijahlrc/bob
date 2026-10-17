@@ -29,6 +29,10 @@ change, and our own names only. Dash bullets under plain headings.
 - Map cards are shorter. The "Asks" line, the tags, the Gentle, Even and Fierce label, the DPS and effective life line and the Comfortable, Close and Dangerous verdict are gone, and the rewards table takes two columns.
 - Each class on the class screen says how it fights.
 - When a run ends, you can start a new run of the same class straight away.
+- Swapping gear says what happens to your gems: a row of sockets before and after, and a line such as "No socket for Twin Cut, it will be unequipped" when a gem loses its place.
+- On a phone, selecting an item lists every stat that changes against what you wear, with the old values. One tap opens the full card, and Both adds the two cards and the changes to damage, effective HP, life and resistances.
+- Worn gear shows its sockets and names its gems, with a link to edit them on the Skills tab. Bag rows show their sockets and the item's first stats, and warn when a swap would send gems to the bag. On a phone the bag filters sit behind a Filter button, with Clear filters beside it.
+- Putting a gem from the bag into a filled socket names the gem it replaces and asks first, on the Skills tab and now on the Items tab, where a bag gem can go in any socket you choose, each showing what it gains. The Skills tab says which slot a gem helps most and why a support would do nothing there.
 
 ## 2026-10-15
 
