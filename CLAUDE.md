@@ -68,8 +68,8 @@
 - **Patch notes:** [docs/PATCH-NOTES.md](docs/PATCH-NOTES.md), player-facing, newest first, shown on the Patch notes screen of the title
   menu (`src/ui/PatchNotes.tsx`): every change a player would notice gets an entry. **Never write or edit patch notes while doing
   the work** (not in the same commit, not as a finishing touch): only the `/patch-notes` skill
-  (`.claude/skills/patch-notes/SKILL.md`) writes them, from the commits, then files them, commits and pushes; a push to main is what
-  updates the game (`.github/workflows/pages.yml`). Its style rules are the standard for every entry. Record decisions in
+  (`.claude/skills/patch-notes/SKILL.md`) writes them, from the commits, then files them and commits; after a confirmation it pushes (a push to main is what
+  updates the game, `.github/workflows/pages.yml`) and uploads the same commit's build to itch.io with butler. It is the "publish" command. Its style rules are the standard for every entry. Record decisions in
   DESIGN.md Appendix A and the plan docs, and leave the notes to the skill.
 - **In-game text is concise** (2026-10-14): a screen, card or tooltip says what the player gets and what they choose, in as few
   words as it takes. Never say what a level, stop or feature does _not_ do ("no loot, no XP"), restate what the UI already
