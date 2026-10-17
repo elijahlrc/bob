@@ -2,7 +2,7 @@ import { ACTIVE_GEMS } from '../data/gems';
 import { MONSTER_TYPES } from '../data/monsters';
 import type { SkillDot } from './skillDots';
 import type { Actor, World } from './types';
-import { hunted } from './side';
+import { hunted, MONSTERS } from './side';
 import type { Side } from './side';
 
 /** What dealt (or took) the damage of a row: a skill, a minion, an ailment, a monster or some other effect. */
@@ -25,8 +25,13 @@ export type LedgerRow = {
 export type DmgSrc = {
   name: string;
   kind: RowKind;
-  split?: { name: string; kind: RowKind; wt: number[] }[];
+  /** The side whose damage it is, when it is a character's (or a minion's): what it deals is credited to that side. */
+  side?: Side;
+  split?: { name: string; kind: RowKind; wt: number[]; side?: Side }[];
 };
+
+/** Damage over time of one kind of ailment that one side's hits put on an actor: the side (none for no owner) and its dps. */
+export type DotShare = { side: Side | undefined; dps: number };
 
 /** The rows of one side, a map for each kind of source (so a hit finds its row without building a key). */
 type Rows = Record<RowKind, Map<string, LedgerRow>>;
@@ -81,43 +86,93 @@ function row(side: Rows, name: string, kind: RowKind): LedgerRow {
   return r;
 }
 
-/** Damage that has been dealt, by type: to the character (taken) or to a monster (dealt). Called by `applyDamage`. */
+/**
+ * The side credited with damage to `dst`: the one the source names (unless it is on `dst`'s own team), and, for what no side owns
+ * (the ground, a drain), on a monster, the side that fights it (the character it hunts). A character's damage taken from
+ * monsters or the ground is only taken: no side dealt it.
+ */
+function ownerOf(w: World, dst: Actor, by: Side | undefined): Side | null {
+  if (by) return by.team === dst.team ? null : by;
+  return dst.team === MONSTERS ? hunted(w, dst).side : null;
+}
+
+function addDamage(rows: Rows, name: string, kind: RowKind, dmg: number[]): void {
+  const r = row(rows, name, kind);
+  for (let i = 0; i < 5; i++) r.dmg[i] += dmg[i];
+}
+
+/**
+ * Damage that has been dealt, by type: what a character takes is entered in its own ledger (taken), and what a side deals in its
+ * ledger (dealt): the character's hits on a monster, or one character's on another. Called by `applyDamage`.
+ */
 export function noteDamage(w: World, dst: Actor, dmg: number[], src: DmgSrc | undefined): void {
-  const rows = rowsFor(w, dst);
-  if (!rows) return;
+  const taken = dst.isPlayer ? dst.side!.ledger.taken : null;
+  const owner = ownerOf(w, dst, src?.side);
+  if (!taken && !owner) return;
   const s: DmgSrc = src ?? { name: 'Other', kind: 'effect' };
   if (!s.split) {
-    const r = row(rows, s.name, s.kind);
-    for (let i = 0; i < 5; i++) r.dmg[i] += dmg[i];
+    if (taken) addDamage(taken, s.name, s.kind, dmg);
+    if (owner) addDamage(owner.ledger.dealt, s.name, s.kind, dmg);
     return;
   }
-  // A tick of damage over time shares each type over the sources that made it, by their weight.
+  // A tick of damage over time shares each type over the sources that made it, by their weight, each credited to its own side.
+  const give = (name: string, kind: RowKind, i: number, amount: number, by: Side | undefined) => {
+    if (taken) row(taken, name, kind).dmg[i] += amount;
+    const o = by ? ownerOf(w, dst, by) : owner;
+    if (o) row(o.ledger.dealt, name, kind).dmg[i] += amount;
+  };
   for (let i = 0; i < 5; i++) {
     if (dmg[i] <= 0) continue;
     let wt = 0;
     for (const p of s.split) wt += p.wt[i];
     if (wt <= 0) {
-      row(rows, s.name, s.kind).dmg[i] += dmg[i];
+      give(s.name, s.kind, i, dmg[i], undefined);
       continue;
     }
     for (const p of s.split)
-      if (p.wt[i] > 0) row(rows, p.name, p.kind).dmg[i] += (dmg[i] * p.wt[i]) / wt;
+      if (p.wt[i] > 0) give(p.name, p.kind, i, (dmg[i] * p.wt[i]) / wt, p.side);
   }
 }
 
-/**
- * The rows a hit on `dst` is entered in: the damage a character takes is entered in its own side's ledger; the damage dealt to a
- * monster in the ledger of the side that fights it (the character the monster hunts), none for anything else.
- */
-function rowsFor(w: World, dst: Actor): Rows | null {
-  if (dst.isPlayer) return dst.side!.ledger.taken;
-  return dst.team === 1 ? hunted(w, dst).side!.ledger.dealt : null;
+/** What a side has dealt, for its stats: `total` of the damage that reached `dst`, shared over the owners of a tick of damage over time. */
+export function noteDealt(
+  w: World,
+  dst: Actor,
+  dmg: number[],
+  total: number,
+  src: DmgSrc | undefined,
+): void {
+  const owner = ownerOf(w, dst, src?.side);
+  const split = src?.split;
+  let owned = false;
+  if (split) for (const p of split) if (p.side) owned = true;
+  if (!split || !owned) {
+    if (owner) owner.stats.damageDealt += total;
+    return;
+  }
+  for (let i = 0; i < 5; i++) {
+    if (dmg[i] <= 0) continue;
+    let wt = 0;
+    for (const p of split) wt += p.wt[i];
+    if (wt <= 0) {
+      if (owner) owner.stats.damageDealt += dmg[i];
+      continue;
+    }
+    for (const p of split) {
+      const o = p.side ? ownerOf(w, dst, p.side) : owner;
+      if (o && p.wt[i] > 0) o.stats.damageDealt += (dmg[i] * p.wt[i]) / wt;
+    }
+  }
 }
 
 /** A hit that landed (`total` is what it dealt), by what dealt it. */
 export function noteHit(w: World, dst: Actor, src: DmgSrc, total: number, crit: boolean): void {
-  const rows = rowsFor(w, dst);
-  if (!rows) return;
+  if (dst.isPlayer) bumpHit(dst.side!.ledger.taken, src, total, crit);
+  const owner = ownerOf(w, dst, src.side);
+  if (owner) bumpHit(owner.ledger.dealt, src, total, crit);
+}
+
+function bumpHit(rows: Rows, src: DmgSrc, total: number, crit: boolean): void {
   const r = row(rows, src.name, src.kind);
   r.hits++;
   if (crit) r.crits++;
@@ -130,10 +185,9 @@ export function noteMiss(w: World, dst: Actor, src: DmgSrc, blocked: boolean): v
     const l = dst.side!.ledger;
     if (blocked) l.blocked++;
     else l.evaded++;
-    return;
   }
-  if (dst.team !== 1) return;
-  row(hunted(w, dst).side!.ledger.dealt, src.name, src.kind).misses++;
+  const owner = ownerOf(w, dst, src.side);
+  if (owner) row(owner.ledger.dealt, src.name, src.kind).misses++;
 }
 
 /** Where the character's damage went: energy shield, then (maybe) mana, then life. */
@@ -151,24 +205,43 @@ export function monsterSrc(a: Actor): DmgSrc {
   return { name: name || 'Unknown', kind: 'monster' };
 }
 
-/** The sources of one tick of damage over time, with how much of each type each gave (the weights `noteDamage` shares by). */
+/**
+ * The sources of one tick of damage over time, with how much of each type each gave (the weights `noteDamage` shares by). With
+ * several sides in the world, `owners` says whose hits each ailment came from, and each part is credited to its own side.
+ */
 export function dotSources(
   player: boolean,
   ignite: number,
   bleed: number,
   poison: number,
   skills: SkillDot[] | null,
+  owners?: { ignite?: DotShare[]; bleed?: DotShare[]; poison?: DotShare[] },
 ): NonNullable<DmgSrc['split']> {
   const split: NonNullable<DmgSrc['split']> = [];
-  if (ignite > 0)
-    split.push({ name: player ? 'Burning' : 'Ignite', kind: 'ailment', wt: [0, 0, 0, ignite, 0] });
-  if (bleed > 0)
-    split.push({ name: player ? 'Bleeding' : 'Bleed', kind: 'ailment', wt: [bleed, 0, 0, 0, 0] });
-  if (poison > 0) split.push({ name: 'Poison', kind: 'ailment', wt: [0, 0, 0, 0, poison] });
+  const add = (name: string, type: number, total: number, shares: DotShare[] | undefined) => {
+    if (total <= 0) return;
+    if (!shares || shares.length === 0) {
+      const wt = [0, 0, 0, 0, 0];
+      wt[type] = total;
+      split.push({ name, kind: 'ailment', wt });
+      return;
+    }
+    // Several owners share the tick by their share of the dps.
+    let sum = 0;
+    for (const x of shares) sum += x.dps;
+    for (const x of shares) {
+      const wt = [0, 0, 0, 0, 0];
+      wt[type] = sum > 0 ? (total * x.dps) / sum : total / shares.length;
+      split.push({ name, kind: 'ailment', wt, side: x.side });
+    }
+  };
+  add(player ? 'Burning' : 'Ignite', 3, ignite, owners?.ignite);
+  add(player ? 'Bleeding' : 'Bleed', 0, bleed, owners?.bleed);
+  add('Poison', 4, poison, owners?.poison);
   for (const d of skills ?? []) {
     const wt = [0, 0, 0, 0, 0];
     wt[d.type] = d.dps;
-    split.push({ name: skillName(d.src), kind: 'skill', wt });
+    split.push({ name: skillName(d.src), kind: 'skill', wt, side: d.by });
   }
   return split;
 }

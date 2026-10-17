@@ -1171,9 +1171,9 @@ function strongestSupports(w: World, side: Side): number[] {
   const sups = ch.primary?.supports ?? [];
   if (sups.length === 0) return [];
   const opts = {
-    areaLevel: w.plan.areaLevel,
+    areaLevel: side.areaLevel,
     resistPenalty: w.plan.resistPenalty,
-    extraMods: w.plan.affixes.flatMap((id) => affixPlayerMods(id, w.plan.areaLevel)),
+    extraMods: w.plan.affixes.flatMap((id) => affixPlayerMods(id, side.areaLevel)),
     charges: ch.charges,
   };
   const base = scenarioDps(ch.sheet(undefined, 'boss'));

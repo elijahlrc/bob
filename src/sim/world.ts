@@ -59,9 +59,9 @@ import { inBlast, pending } from './blasts';
 import { afflictPlayer, stunPlayer } from './afflict';
 import { flasksSealed } from './theft';
 import { crescendoStep, HOLDOUT_WAVES } from '../data/mapTypes';
-import type { Actor, GroundEffect, MapOpts, World } from './types';
+import type { Actor, GroundEffect, MapOpts, World, WorldOpts } from './types';
 import { hunted } from './side';
-import type { Side } from './side';
+import type { Side, SideOpts } from './side';
 
 export function spawnMonster(
   w: World,
@@ -106,10 +106,37 @@ export function spawnMonster(
   return a;
 }
 
+/** One character of a world (docs/DUEL.md 4.1): what it brings, and where it stands. */
+export type SideInput = {
+  build: Build;
+  x: number;
+  y: number;
+  /** Experience carried in (a map passes the run's); default 0. */
+  xp?: number;
+  /** What the character brings: its starting vitals, and whether it can die or runs out of life and mana. */
+  opts?: SideOpts;
+  /** The level of the area the character is built for (the plan's when absent; a duel builds each at its own level). */
+  areaLevel?: number;
+  /** What the recap calls the character (`You` for the first side, `Rival` for the rest by default). */
+  name?: string;
+};
+
+/**
+ * A world with any number of characters. Side `i` is made with the actor id `i + 1`; its team is 0 for the first, then 2, 3, ...
+ * (the monsters are team 1), and the characters face one another.
+ */
 export type CreateWorldInput = {
   plan: MapPlan;
+  sides: SideInput[];
+  /** What the map decides; what each character brings is in its own `opts`. */
+  opts?: WorldOpts;
+};
+
+/** The call a map makes: the run's one character, at the plan's start, and one bag of options that `createWorld` splits. */
+export type MapWorldInput = {
+  plan: MapPlan;
   build: Build;
-  /** Carried-over resources from camp (fractions); default full. */
+  /** Carried-over experience from camp. */
   xp: number;
   opts?: MapOpts;
 };
@@ -118,26 +145,29 @@ export function makeCharacter(
   build: Build,
   plan: MapPlan,
   charges: ChargeCounts = noCharges(),
+  areaLevel: number = plan.areaLevel,
 ): Character {
   return new Character(build, {
-    areaLevel: plan.areaLevel,
+    areaLevel,
     resistPenalty: plan.resistPenalty,
-    extraMods: plan.affixes.flatMap((id) => affixPlayerMods(id, plan.areaLevel)),
+    extraMods: plan.affixes.flatMap((id) => affixPlayerMods(id, areaLevel)),
     charges,
   });
 }
 
-export function createWorld(inp: CreateWorldInput): World {
-  const { plan } = inp;
-  const root = new Rng(plan.seed);
+/** The team of a side: 0 for the first, then 2, 3, ... (the monsters are `MONSTERS`, 1). */
+export const teamOfSide = (id: number): number => (id === 0 ? 0 : id + 1);
+
+/** A side and its character's actor, with every field at its start (the vitals as the input says, or full). */
+function makeSide(plan: MapPlan, id: number, inp: SideInput): Side {
   const build = { ...inp.build };
-  const char = makeCharacter(build, plan);
-  const grid = new Grid(plan.lab.w, plan.lab.h, plan.lab.tiles);
-  grid.markReach(plan.lab.start.x, plan.lab.start.y);
-  const player = newActor(1, true, plan.lab.start.x, plan.lab.start.y, 0.4);
+  const areaLevel = inp.areaLevel ?? plan.areaLevel;
+  const char = makeCharacter(build, plan, noCharges(), areaLevel);
+  const player = newActor(id + 1, true, inp.x, inp.y, 0.4);
+  const o = inp.opts;
   const side: Side = {
-    id: 0,
-    team: 0,
+    id,
+    team: teamOfSide(id),
     flasks: char.flasks.map((spec) => ({
       spec,
       charges: spec.maxCharges,
@@ -166,8 +196,8 @@ export function createWorld(inp: CreateWorldInput): World {
       skipId: 0,
       skipUntil: 0,
       stuckT: 0,
-      stuckX: plan.lab.start.x,
-      stuckY: plan.lab.start.y,
+      stuckX: inp.x,
+      stuckY: inp.y,
       lootId: 0,
       lootSince: 0,
       fight: 0,
@@ -192,18 +222,18 @@ export function createWorld(inp: CreateWorldInput): World {
     },
     ledger: newLedger(),
     dmgLog: [],
-    reprieve: newReprieveState(inp.opts?.reprieves),
-    xp: inp.xp,
+    reprieve: newReprieveState(o?.reprieves),
+    xp: inp.xp ?? 0,
     picked: [],
     opts: {
-      start: inp.opts?.start,
-      freeResources: inp.opts?.freeResources,
-      godMode: inp.opts?.godMode,
-      reprieves: inp.opts?.reprieves,
+      start: o?.start,
+      freeResources: o?.freeResources,
+      godMode: o?.godMode,
+      reprieves: o?.reprieves,
     },
     chargeT: { grit: 0, fervour: 0, insight: 0 },
     buffT: {
-      ...Object.fromEntries(BUFF_IDS.map((id) => [id, 0])),
+      ...Object.fromEntries(BUFF_IDS.map((b) => [b, 0])),
       // Everyone starts in the Blood stance.
       bloodStance: 1e9,
     } as Record<BuffId, number>,
@@ -276,20 +306,59 @@ export function createWorld(inp: CreateWorldInput): World {
     char,
     build,
     primary: char.primary,
+    areaLevel,
   };
   player.side = side;
+  player.team = side.team;
+  player.def = char.defence();
+  // The character starts with what the last map left (full on a new run), as fractions of the maximum.
+  const frac = (f: number | undefined) => Math.min(1, Math.max(0, f ?? 1));
+  player.life = Math.max(1, lifeCap(player) * frac(o?.start?.life));
+  player.es = player.def.maxEs * frac(o?.start?.es);
+  player.mana = Math.max(0, player.def.maxMana - char.reservedMana) * frac(o?.start?.mana);
+  for (const f of side.flasks) f.charges = f.spec.maxCharges * frac(o?.start?.flasks[f.spec.uid]);
+  player.name = inp.name ?? (id === 0 ? 'You' : 'Rival');
+  seedCharacters(side);
+  return side;
+}
+
+export function createWorld(inp: CreateWorldInput | MapWorldInput): World {
+  const { plan } = inp;
+  const root = new Rng(plan.seed);
+  const grid = new Grid(plan.lab.w, plan.lab.h, plan.lab.tiles);
+  grid.markReach(plan.lab.start.x, plan.lab.start.y);
+  // A map brings its one character, to the plan's start; the bag of options is split between the world and that character.
+  const inputs: SideInput[] =
+    'sides' in inp
+      ? inp.sides
+      : [
+          {
+            build: inp.build,
+            x: plan.lab.start.x,
+            y: plan.lab.start.y,
+            xp: inp.xp,
+            opts: inp.opts,
+          },
+        ];
+  const sides = inputs.map((si, i) => makeSide(plan, i, si));
+  // The characters face one another (the first of the others, when there are more than two).
+  if (sides.length > 1)
+    for (const s of sides) {
+      const o = sides[s.id === 0 ? 1 : 0].player;
+      s.player.facing = Math.atan2(o.y - s.player.y, o.x - s.player.x);
+    }
   const w: World = {
     plan,
     grid,
-    sides: [side],
+    sides,
     t: 0,
     tick: 0,
     rngCombat: root.fork('combat'),
     rngAi: root.fork('ai'),
     rngLoot: root.fork('loot'),
     rngTrig: root.fork('trigger'),
-    actors: [player],
-    nextId: 2,
+    actors: sides.map((s) => s.player),
+    nextId: sides.length + 1,
     projectiles: [],
     effects: [],
     corpses: [],
@@ -315,22 +384,12 @@ export function createWorld(inp: CreateWorldInput): World {
     endRoom: plan.lab.mainPath[plan.lab.mainPath.length - 1],
     opts: inp.opts ?? {},
   };
-  player.def = char.defence();
-  // The player starts with what the last map left (full on a new run), as fractions of the maximum.
-  const start = inp.opts?.start;
-  const frac = (f: number | undefined) => Math.min(1, Math.max(0, f ?? 1));
-  player.life = Math.max(1, lifeCap(player) * frac(start?.life));
-  player.es = player.def.maxEs * frac(start?.es);
-  player.mana = Math.max(0, player.def.maxMana - char.reservedMana) * frac(start?.mana);
-  for (const f of side.flasks) f.charges = f.spec.maxCharges * frac(start?.flasks[f.spec.uid]);
-  player.name = 'You';
   for (const s of plan.pop.monsters) {
     const a = spawnMonster(w, s.spec, s.x, s.y, s.room, s.pack, s.name);
     // A Stalker Cat lies in wait wherever it is; a pack that is an Ambush does so as a whole.
     if (s.hold || abilitiesOf(s.spec.type).some((x) => x.id === 'ambush')) a.hold = true;
     if (s.patrol) a.patrol = { points: s.patrol.map((p) => ({ ...p })), i: 1 };
   }
-  seedCharacters(side);
   return w;
 }
 
@@ -614,7 +673,7 @@ function summon(w: World, m: Actor, type: 'warrior', variant: MonsterSpec['varia
 }
 
 function checkExit(w: World): void {
-  if (w.exitOpen) return;
+  if (w.exitOpen || w.opts.noExit) return;
   // A Holdout is over when the last wave has come and gone.
   if (w.plan.type === 'holdout' && w.holdout.spawned < HOLDOUT_WAVES) return;
   for (const a of w.actors)

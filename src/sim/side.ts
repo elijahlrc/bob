@@ -209,6 +209,8 @@ export type Side = {
   char: Character;
   build: Build;
   primary: SkillChoice;
+  /** The level of the area the character is built for: the map's, or in a duel the character's own (docs/DUEL.md 4.1). */
+  areaLevel: number;
 };
 
 /** The team of the monsters (docs/DUEL.md 3.1): side 0 is team 0, a second side is team 2. */

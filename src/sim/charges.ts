@@ -41,10 +41,10 @@ export function characterWith(w: World, s: Side, counts: ChargeCounts): Characte
   let ch = s.chars.get(k);
   if (!ch) {
     ch = new Character(theftBuild(w, s.build), {
-      areaLevel: w.plan.areaLevel,
+      areaLevel: s.areaLevel,
       resistPenalty: w.plan.resistPenalty,
       extraMods: [
-        ...w.plan.affixes.flatMap((id) => affixPlayerMods(id, w.plan.areaLevel)),
+        ...w.plan.affixes.flatMap((id) => affixPlayerMods(id, s.areaLevel)),
         ...trophyMods(trophy),
         ...theftMods(w),
       ],

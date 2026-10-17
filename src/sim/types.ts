@@ -16,7 +16,14 @@ import type { HexTotals } from '../data/hexes';
 import type { Grid } from './grid';
 import type { Side, SideOpts } from './side';
 
-export type Dot = { dps: number; t: number; stack?: boolean; spread?: number };
+export type Dot = {
+  dps: number;
+  t: number;
+  stack?: boolean;
+  spread?: number;
+  /** The side whose character's hit put it on (what it deals is credited to that side); none for a monster's or the ground's. */
+  by?: Side;
+};
 
 export type Ailments = {
   ignites: Dot[];
@@ -658,6 +665,8 @@ export type WorldOpts = {
   autoAbandonAt?: number;
   /** Hard cap on simulated seconds. */
   maxTime?: number;
+  /** The exit never opens (an arena with nothing to clear, where a duel is fought: docs/DUEL.md 4.3). */
+  noExit?: boolean;
 };
 
 /** What a caller asks of a map: the map's own options and the character's, in one bag that `createWorld` splits (until F2 gives it one bag a side). */

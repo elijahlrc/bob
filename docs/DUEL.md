@@ -1,7 +1,7 @@
 # Bob — Duels: asynchronous fights against other players' characters
 
-Status: **F0 and F1 built on 2026-10-16** (the plan was the second draft of 2026-10-16, after the user rejected the two-world
-engine of the first); F2 to F7 are not built; see "Built" under section 7 · Owner: the user · Author: Claude
+Status: **F0 to F2 built on 2026-10-16** (the plan was the second draft of 2026-10-16, after the user rejected the two-world
+engine of the first); F3 to F7 are not built; see "Built" under section 7 · Owner: the user · Author: Claude
 
 A duel is a real fight, watched in the game, between the player's character and a **rival**: a snapshot of another player's
 character (class, level, passive tree, gems, items and Strategy settings) taken when that player's run ended. The rival is
@@ -374,6 +374,59 @@ each milestone and of each group of F1; the fence runs before every one of them.
   from 21.2 to 21.7 s to 21.4 to 23.0 s. The profile spreads it over `stepWorld` (its thirty per-side loops and what they inline),
   `runMap`, `tickBuffs`, `buildFlow` and the like; no one function is to blame, and the first 5% (a search in `hunted`) was
   removed by its one-side fast path. A real two-character sim will cost more than this, per side.
+
+**Built: F2 (2026-10-16).** Two characters fight headlessly in one world: `runDuel(a, b, seed)` of two class starters ends with one
+dead after about 18 to 25 simulated seconds (two Vanguards, seed 1: 24.1 s, A winning with 8% of its life; 80 to 120 ms of wall
+time). As planned, with these differences and findings:
+
+- **`createWorld`** takes `CreateWorldInput { plan, sides: SideInput[], opts? }`, a `SideInput` being `{ build, x, y, xp?, opts?, areaLevel?, name? }`.
+  A map still calls it with one build and one bag of options (`MapWorldInput`; `createWorld` takes either, so no caller changed),
+  which becomes one side at the plan's start, and `World.opts` is that bag as before. Side `i` is the actor with id `i + 1` and
+  team 0, 2, 3, ... (`teamOfSide`), and faces the next. **`Side.areaLevel`** is new (a map's, or a duel's own, DUEL.md 4.1): the
+  rebuilds in `charges.ts` and `bosses.ts` read it where they read the plan's.
+- **`src/sim/duel.ts`**: `createDuelWorld`, `playDuel` (the result, the hash of every tick's events, the world), `runDuel`, `duelHash`
+  and `duelResult`. `DuelSide.lifeLeft` is a share of the life cap. Both dead in one tick is a draw by `how: 'death'`. The cap is
+  `DUEL_MAX_TIME` 120 s (the 90 s of 4.3 and the stall are F4's); the two characters start `DUEL_GAP` 8 tiles apart.
+- **The arena** is `arenaPlan(seed, size, areaLevel)`, factored out of `createDummyWorld` (`dummy.ts`). **The map's own end** had to
+  be shut off: `checkExit` opens the exit as soon as no monster stands in the end room, which with no monsters is tick 0, after which
+  a character with no target walks to it. `WorldOpts.noExit` keeps it shut (F4's duel option subsumes it); the duel also passes
+  `autoAbandonAt: Infinity` and a world `maxTime` one second past its own.
+- **The hit path.** The guards that kept a damage over time, a status or a knockback off a character are team tests now:
+  `applyStatus`, `rollStatuses`, `applySkillDot`, `applyFlatDot`, `applyDecay` and `applyBurning` no longer test `isPlayer` (their
+  callers pass the enemies of a team, and on a map none can reach the character), `knockBack` tests `dst.team === src.team`, and
+  `frostBite` the attacker's team. Hexes, impales, culling and the ailments needed nothing: monsters already put them on characters.
+  `revealed(w, m)` is true for a character (it reads `m.mon`, which a character has not). What a monster does to a character
+  did not change (the fence).
+- **Credit.** The side whose damage it is travels with it: `DmgSrc.side`, `Dot.by`, `SkillDot.by`, `rawHit`'s `owner` (a reflect and
+  an impale pass one) and the cause of a kill (`causes`). The ledger's dealt rows, `stats.damageDealt` (`noteDealt`), the mend of a
+  debuff and the kill go to that side; the fallback to `hunted` is now only for what no side owns on a monster (the ground, a
+  drain). A tick of damage over time is shared by owner (`dotShares`) only when the world has several sides: with one, the code is
+  the old code (the fence). What F1's note feared, B's on-kill effects firing on an ignite kill of B, does not happen: `killActor`
+  returns for a character before any of them, for either side. A kill of a character counts for nothing yet (F4 decides).
+- **Collision**: `separateSides` (the characters of different sides give way half each; Phase Run passes through) and
+  `separateMinions` also pushes a minion and a foreign character apart (half each). A side's own minions still yield to its
+  character, as ever.
+- **Tests** (`duel.test.ts`): a duel of starters; determinism (the same builds and seed give the same result and event hash);
+  B's Molten Shell absorbs A's hits and A has none; B's life flask fires for B's damage and A's does not (and the other way); A's
+  ignite sets `ignites` (by A) on B, burns it less when B resists fire, and is in A's `ledger.dealt` and `damageDealt` and none
+  of B's; every on-hit effect of a skill on a character; a kill by A's damage over time and by an owned hit is A's; bodies. One
+  side of a map: `side.test.ts`. The deep fence (maps 1 to 30, three seeds) was recorded on the base and holds too.
+- **For F3 and F4:**
+  - _Not credited yet._ Only a reflect and an impale name their owner. The other twenty-odd `rawHit` callers (Molten Shell's burst,
+    mines, fields, auras, minions, triggers) deal damage to a character that it takes and nobody deals, and `applyFlatDot`,
+    `applySkillDot` (from fields, deployables, `skillFx`) and `applyStatus` (banners, stances, utility, minions, triggers) now apply
+    to a character but carry no `by`. The Herald of Agony's Virulence is still gated `!dst.isPlayer`.
+  - _Targeting leftovers._ `bodyOnWay` (the dodge and the kite) and `creepToward` skip characters; `enemiesOf` for a minion lists
+    the other sides' characters and minions, never monsters; `stepWorld` builds the flow field for every side's character but the
+    grid keeps one (the last), which nothing reads without monsters.
+  - _Order._ The actors step in id order, so A swings first in every tick: F4's alternation. The sides' sub-steps loop in order too.
+  - _Numbers._ A bleed on a character is worked out at the monsters' rate (`MONSTER_BLEED_DPS_FRAC` 0.1 of the hit, against 0.7 on a
+    monster) because `Defence.isPlayer` picks it, and a character's ailment threshold is life plus energy shield: F4's damage-scale
+    work should look at both.
+  - _Stall._ With one target and `noExit`, a pair that deals no damage for `STALL_TIME` (20 s) has the character drop its target
+    for 30 s and stand at the waypoint; starters never reach it, a tanky pair would: the stall rule of 4.3 is F4's.
+  - _Events carry no side._ `playerDied`, `levelUp`, `flaskUsed` and `stuck` name no actor; F5 must say whose they are.
+  - A side's actor is named `You` (side 0) or `Rival` unless the input names it; `createDuelWorld` names them by class.
 
 ---
 

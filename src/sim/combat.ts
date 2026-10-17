@@ -11,10 +11,12 @@ import {
   dotSources,
   monsterSrc,
   noteDamage,
+  noteDealt,
   noteHit,
   noteMiss,
   notePools,
   type DmgSrc,
+  type DotShare,
 } from './ledger';
 import { levelPenalty } from '../calc/formulas';
 import { levelValue } from '../calc/gems';
@@ -323,7 +325,7 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
   dst.since.damaged = 0;
   if (dst.isPlayer && dst.side!.opts.godMode && dst.life <= 0) dst.life = 1;
   if (dst.isPlayer) dst.side!.stats.damageTaken += total;
-  else if (dst.team === 1) hunted(w, dst).side!.stats.damageDealt += total;
+  noteDealt(w, dst, dmg, total, src);
   // A Reprieve held fires when this would be the end (docs/WAYSIDE.md 7); the damage still counts as taken.
   if (dst.isPlayer && dst.life <= 0 && reprieveFires(w, dst.side!)) return total;
   if (dst.life <= 0) killActor(w, dst);
@@ -354,7 +356,8 @@ function addLeech(
 
 /** An enemy struck is thrown back, away from the attacker, up to the distance or the first wall; bosses stand fast, and so do training dummies that are fixed (src/sim/dummy.ts). */
 export function knockBack(w: World, src: Actor, dst: Actor, dist: number): void {
-  if (!dst.alive || dst.isPlayer || dst.rarity === 'boss' || (dst.dummy && dst.stationary)) return;
+  if (!dst.alive || dst.team === src.team || dst.rarity === 'boss' || (dst.dummy && dst.stationary))
+    return;
   const ang = Math.atan2(dst.y - src.y, dst.x - src.x);
   const step = 0.25;
   let x = dst.x;
@@ -561,7 +564,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
 
   const wasAlive = dst.alive;
   if (src.isPlayer) applyPlayerHexes(w, src.side!, dst);
-  if (src.isPlayer) noteCause(dst, p.tagMask, false, p.gains);
+  if (src.isPlayer) noteCause(dst, p.tagMask, false, p.gains, src.side!);
   applyDamage(w, dst, res.dmg, how);
   // A mark gives life and mana back on each attack hit.
   if (src.isPlayer && p.isAttack)
@@ -573,7 +576,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       if (p.isAttack && dst.hex.more.maimHit > 0 && w.rngTrig.chance(dst.hex.more.maimHit))
         applyStatus(w, dst, 'maim', { seconds: 4 });
     }
-    payImpales(w, dst);
+    payImpales(w, dst, src.side ?? undefined);
     recordImpale(w, src.side!, dst, p, res);
     reflectBack(w, src, dst, p, res);
     // Culling strike: a hit that leaves the target at 10% life or less finishes it.
@@ -628,7 +631,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (bossLock && (dst.ail.freezeT > frozeBefore || res.stun > 0)) lockBoss(w);
   if (src.isPlayer && dst.team !== src.team) {
     // Damage over time the skill (or a support) puts on what it hits.
-    if (p.decay) applyDecay(w, dst, p.decay);
+    if (p.decay) applyDecay(w, dst, p.decay, src.side!);
     // A Ruthless Blow stuns.
     if (p.stunFixed && dst.stunT <= 0 && dst.graceT <= 0 && res.outcome === 'hit') {
       dst.stunT = p.stunFixed;
@@ -651,7 +654,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       return;
     }
     if (p.skillDot && !p.skillDot.spec.hitless && !p.skillDot.spec.ground) {
-      applySkillDot(w, dst, p);
+      applySkillDot(w, dst, p, { by: src.side! });
       const splash = p.skillDot.spec.splash;
       if (splash)
         for (const e of w.actors)
@@ -661,7 +664,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
             e.alive &&
             Math.hypot(e.x - dst.x, e.y - dst.y) <= splash * p.radiusMult + e.r
           )
-            applySkillDot(w, e, p);
+            applySkillDot(w, e, p, { by: src.side! });
     }
   }
   if (res.stun > 0 && !(dst.isPlayer && dst.side!.channel?.profile.skill.channel?.stunImmune)) {
@@ -704,6 +707,7 @@ function applyAilments(w: World, src: Actor, dst: Actor, res: HitResult, p: Skil
       dps: a.ignite,
       t: p.ignite.dur * d.durOnSelf.ignite,
       spread: spreadR > 0 ? spreadR : undefined,
+      by: src.side ?? undefined,
     });
     ail.igniteMax = p.ignite.max;
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'ignite' });
@@ -722,14 +726,24 @@ function applyAilments(w: World, src: Actor, dst: Actor, res: HitResult, p: Skil
         (a.ignite * levelValue(bn.pct, p.skill.level)) / 100,
         bn.seconds,
         bn.cap,
+        src.side ?? undefined,
       );
   }
   if (a.bleed > 0 && !(dst.mon && cannotBleed(dst.mon.spec.type))) {
-    pushDot(ail.bleeds, { dps: a.bleed, t: p.bleed.dur * d.durOnSelf.bleed, stack: p.woundDance });
+    pushDot(ail.bleeds, {
+      dps: a.bleed,
+      t: p.bleed.dur * d.durOnSelf.bleed,
+      stack: p.woundDance,
+      by: src.side ?? undefined,
+    });
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'bleed' });
   }
   if (a.poison > 0) {
-    pushDot(ail.poisons, { dps: a.poison, t: p.poison.dur * d.durOnSelf.poison }, 400);
+    pushDot(
+      ail.poisons,
+      { dps: a.poison, t: p.poison.dur * d.durOnSelf.poison, by: src.side ?? undefined },
+      400,
+    );
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'poison' });
     // Herald of Agony: a poison the character's hit put on gives a point of Virulence.
     // (A monster's poison on a minion feeds the side it hunts, as it always has.)
@@ -779,8 +793,9 @@ export function hit(
       applySkillDot(w, dst, p, {
         more: levelValue(bane.more, p.skill.level) * n,
         seconds: p.skillDot.seconds * (1 + (bane.longer * n) / 100),
+        by: src.side!,
       });
-    } else applySkillDot(w, dst, p);
+    } else applySkillDot(w, dst, p, { by: src.side! });
     // Where it lands counts as a hit for what a hit gives (Drain Trap with Static Snares), but a curse is not an attack.
     if (!p.skill.tags.includes('curse')) {
       rollGains(w, src.side!, 'hit', p.gains);
@@ -914,13 +929,15 @@ function reflectBack(w: World, src: Actor, dst: Actor, p: SkillProfile, res: Hit
   if (!dst.isPlayer || src.team === dst.team || !src.alive || p.skill.behaviour.kind !== 'melee')
     return;
   const d = dst.def;
-  for (let t = 0; t < 5; t++) if (d.reflect[t] > 0) rawHit(w, src, d.reflect[t], t, 'Reflect');
+  for (let t = 0; t < 5; t++)
+    if (d.reflect[t] > 0)
+      rawHit(w, src, d.reflect[t], t, 'Reflect', 'player', undefined, dst.side!);
   if (d.reflectPhysPct > 0 && res.dmg[0] > 0 && src.alive)
-    rawHit(w, src, res.dmg[0] * d.reflectPhysPct, 0, 'Reflect');
+    rawHit(w, src, res.dmg[0] * d.reflectPhysPct, 0, 'Reflect', 'player', undefined, dst.side!);
 }
 
 /** Every impale on the target deals what it recorded as reflected physical damage, and uses up one of its hits. */
-function payImpales(w: World, dst: Actor): void {
+function payImpales(w: World, dst: Actor, by?: Side): void {
   if (dst.impales.length === 0) return;
   let stored = 0;
   let j = 0;
@@ -929,7 +946,7 @@ function payImpales(w: World, dst: Actor): void {
     if (--imp.hits > 0) dst.impales[j++] = imp;
   }
   dst.impales.length = j;
-  rawHit(w, dst, stored, 0, 'Impale');
+  rawHit(w, dst, stored, 0, 'Impale', 'player', undefined, by);
 }
 
 /** A hit that impales records a share of its physical damage on the target. */
@@ -950,8 +967,10 @@ export function rawHit(
   label = 'Explosion',
   by: 'player' | 'minion' = 'player',
   via?: string,
+  /** The side whose damage it is, when it is a character's (a reflect, an impale): the credit is that side's. */
+  owner?: Side,
 ): void {
-  noteCause(dst, 0, by === 'minion');
+  noteCause(dst, 0, by === 'minion', [], owner);
   const dmg = [0, 0, 0, 0, 0];
   dmg[type] = amount;
   const def = dst.def;
@@ -981,16 +1000,16 @@ export function rawHit(
   if (dst.isPlayer) logDamage(w, dst, null, label, type, total, via);
   // The map report: an effect on the character is its own row (a blast counts as a hit), one on a monster is the skill's or the minion's.
   const how: DmgSrc = dst.isPlayer
-    ? { name: label, kind: 'effect' }
-    : { name: label, kind: by === 'minion' ? 'minion' : 'skill' };
+    ? { name: label, kind: 'effect', side: owner }
+    : { name: label, kind: by === 'minion' ? 'minion' : 'skill', side: owner };
   if (dst.isPlayer) noteHit(w, dst, how, total, false);
   applyDamage(w, dst, dmg, how);
 }
 
 /** Who a hit is credited to in the map report. */
 function sourceOf(src: Actor, dst: Actor, p: SkillProfile): DmgSrc {
-  if (src.isPlayer) return { name: p.skill.name, kind: 'skill' };
-  if (src.side) return { name: src.name || 'Minion', kind: 'minion' };
+  if (src.isPlayer) return { name: p.skill.name, kind: 'skill', side: src.side! };
+  if (src.side) return { name: src.name || 'Minion', kind: 'minion', side: src.side };
   return dst.isPlayer ? monsterSrc(src) : { name: 'Other', kind: 'effect' };
 }
 
@@ -1031,15 +1050,25 @@ function dropSpot(w: World, a: Actor, pos: { x: number; y: number }): { x: numbe
  * What last hurt an actor, for kill effects: the tags of the skill whose hit it was (none for damage over time and the like),
  * and whether it was a minion. A kill trigger counts the player's kills, with the tags of the skill that made them.
  */
-const causes = new WeakMap<Actor, { tags: number; minion: boolean; gains: readonly Mod[] }>();
-function noteCause(a: Actor, tags: number, minion: boolean, gains: readonly Mod[] = []): void {
-  if (!a.isPlayer) causes.set(a, { tags, minion, gains });
+const causes = new WeakMap<
+  Actor,
+  { tags: number; minion: boolean; gains: readonly Mod[]; side?: Side }
+>();
+function noteCause(
+  a: Actor,
+  tags: number,
+  minion: boolean,
+  gains: readonly Mod[] = [],
+  side?: Side,
+): void {
+  if (!a.isPlayer) causes.set(a, { tags, minion, gains, side });
 }
 
 export function killActor(w: World, a: Actor): void {
   if (!a.alive) return;
-  // What a kill gives is the side's that fights the monster (the character it hunts).
-  const fs = hunted(w, a).side!;
+  // What a kill gives is the side's whose damage last struck it, and with none named, the one that fights the monster (the
+  // character it hunts).
+  const fs = (causes.get(a)?.side ?? hunted(w, a).side)!;
   a.alive = false;
   a.life = 0;
   a.action = null;
@@ -1241,6 +1270,11 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   let dotPhys = 0;
   let dotFire = 0;
   let dotChaos = 0;
+  // Whose hits the ailments came from, to credit what they deal (only with several sides: on a map it is the one side's).
+  const multi = w.sides.length > 1;
+  let igniteBy: DotShare[] | undefined;
+  let bleedBy: DotShare[] | undefined;
+  let poisonBy: DotShare[] | undefined;
   if (ail.ignites.length) {
     // The strongest `igniteMax` ignites burn.
     if (ail.igniteMax <= 1) {
@@ -1251,6 +1285,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       const top = ail.ignites.map((d) => d.dps).sort((x, y) => y - x);
       for (let i = 0; i < Math.min(ail.igniteMax, top.length); i++) dotFire += top[i];
     }
+    if (multi) igniteBy = dotShares(ail.ignites, Math.max(1, ail.igniteMax));
     decay(ail.ignites, dtDot);
   }
   if (ail.bleeds.length) {
@@ -1264,10 +1299,12 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       if (a.moving && !def.noMovingBleed) b *= BLEED_MOVING_MULT;
     }
     dotPhys += b;
+    if (multi) bleedBy = dotShares(ail.bleeds, stacking ? WOUND_DANCE_STACKS : 1);
     decay(ail.bleeds, dtDot);
   }
   if (ail.poisons.length) {
     for (const d of ail.poisons) dotChaos += d.dps;
+    if (multi) poisonBy = dotShares(ail.poisons, ail.poisons.length);
     decay(ail.poisons, dtDot);
   }
   // What ignite, bleed and poison give of this tick: the map report shares the tick between them and the skills' debuffs.
@@ -1308,11 +1345,24 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       logDamage(w, a, null, 'Bleeding', 0, dmg[0]);
       logDamage(w, a, null, 'Poison', 4, dmg[4]);
     }
-    noteCause(a, 0, false);
+    noteCause(
+      a,
+      0,
+      false,
+      [],
+      multi ? dotOwner([igniteBy, bleedBy, poisonBy], fromSkills) : undefined,
+    );
     applyDamage(w, a, dmg, {
       name: 'Damage over time',
       kind: 'ailment',
-      split: dotSources(a.isPlayer, fromIgnite, fromBleed, fromPoison, fromSkills),
+      split: dotSources(
+        a.isPlayer,
+        fromIgnite,
+        fromBleed,
+        fromPoison,
+        fromSkills,
+        multi ? { ignite: igniteBy, bleed: bleedBy, poison: poisonBy } : undefined,
+      ),
     });
     if (!a.alive) return;
   }
@@ -1369,6 +1419,36 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   // ES recharge.
   if (def.maxEs > 0 && a.es < def.maxEs && a.since.damaged >= def.esDelay)
     a.es = Math.min(def.maxEs, a.es + def.esRecharge * dt);
+}
+
+/** The side that put most of the damage over time on an actor, whose the kill is if it dies of it (none when no side's). */
+function dotOwner(shares: (DotShare[] | undefined)[], skills: SkillDot[] | null): Side | undefined {
+  let best: Side | undefined;
+  let most = 0;
+  for (const list of shares)
+    for (const x of list ?? [])
+      if (x.side && x.dps > most) {
+        best = x.side;
+        most = x.dps;
+      }
+  for (const d of skills ?? [])
+    if (d.by && d.dps > most) {
+      best = d.by;
+      most = d.dps;
+    }
+  return best;
+}
+
+/** The dps of the `top` strongest entries of an ailment, added up by the side that put each on. */
+function dotShares(list: Dot[], top: number): DotShare[] {
+  const dealing = list.length > top ? [...list].sort((a, b) => b.dps - a.dps).slice(0, top) : list;
+  const out: DotShare[] = [];
+  for (const d of dealing) {
+    const have = out.find((x) => x.side === d.by);
+    if (have) have.dps += d.dps;
+    else out.push({ side: d.by, dps: d.dps });
+  }
+  return out;
 }
 
 function decay(list: Dot[], dt: number): void {

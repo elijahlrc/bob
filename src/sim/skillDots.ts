@@ -4,6 +4,7 @@ import { statusTaken } from './statuses';
 import { applyStatus } from './statuses';
 import type { Actor, World } from './types';
 import { hunted } from './side';
+import type { Side } from './side';
 
 /**
  * Damage over time that a skill inflicts as a debuff of its own (docs/SPIRIT.md S7): Contagion, Blight, Essence Drain, Scorching
@@ -28,6 +29,8 @@ export type SkillDot = {
   carry: boolean;
   /** Percent of `raw` the caster mends a second. */
   regen: number;
+  /** The side whose skill inflicted it: what it deals is credited to that side, and it is that side's character that it mends. */
+  by?: Side;
 };
 
 /** A hit's worth of damage over time lands on an enemy: after its resistance. */
@@ -54,10 +57,10 @@ export function applySkillDot(
   w: World,
   dst: Actor,
   p: SkillProfile,
-  over: { seconds?: number; more?: number } = {},
+  over: { seconds?: number; more?: number; by?: Side } = {},
 ): boolean {
   const sd = p.skillDot;
-  if (!sd || !dst.alive || dst.isPlayer) return false;
+  if (!sd || !dst.alive) return false;
   const spec = sd.spec;
   const raw = sd.dps * (1 + (over.more ?? 0) / 100);
   const dps = afterResist(dst, sd.type, raw);
@@ -75,6 +78,7 @@ export function applySkillDot(
     spreadR: spec.spread === true ? radiusOf(p) : 0,
     carry: spec.spread === 'carry',
     regen: spec.regen ?? 0,
+    by: over.by,
   };
   if (spec.hinder && mine.length === 0)
     applyStatus(w, dst, 'hinder', { seconds: spec.hinder.seconds, v: spec.hinder.v });
@@ -84,6 +88,7 @@ export function applySkillDot(
       have.dps = dps;
       have.raw = raw;
       have.t = Math.max(have.t, seconds);
+      if (over.by) have.by = over.by;
     } else dst.sdots.push(fresh);
   } else if (spec.stack === 'layers') {
     const cap = spec.cap ?? 20;
@@ -103,6 +108,7 @@ export function applySkillDot(
       have.raw = raw * (1 + pct * (have.n - 1));
       have.dps = afterResist(dst, sd.type, have.raw);
       have.t = Math.max(have.t, seconds);
+      if (over.by) have.by = over.by;
       if (have.n >= cap && spec.exposure) applyStatus(w, dst, spec.exposure, {});
     } else dst.sdots.push(fresh);
   }
@@ -118,14 +124,16 @@ export function applyFlatDot(
   type: number,
   amount: number,
   seconds: number,
+  by?: Side,
 ): void {
-  if (!dst.alive || dst.isPlayer) return;
+  if (!dst.alive) return;
   const dps = afterResist(dst, type, amount);
   const have = dst.sdots.find((d) => d.src === src);
   if (have) {
     have.dps = dps;
     have.raw = amount;
     have.t = Math.max(have.t, seconds);
+    if (by) have.by = by;
     return;
   }
   dst.sdots.push({
@@ -139,13 +147,19 @@ export function applyFlatDot(
     spreadR: 0,
     carry: false,
     regen: 0,
+    by,
   });
   w.events.push({ t: 'dot', dst: dst.id, id: src });
 }
 
 /** Decay: a flat chaos damage over time on a hit. */
-export function applyDecay(w: World, dst: Actor, decay: { dps: number; seconds: number }): void {
-  applyFlatDot(w, dst, '@decay', 4, decay.dps, decay.seconds);
+export function applyDecay(
+  w: World,
+  dst: Actor,
+  decay: { dps: number; seconds: number },
+  by?: Side,
+): void {
+  applyFlatDot(w, dst, '@decay', 4, decay.dps, decay.seconds, by);
 }
 
 /** A burning debuff from an ignite (Torch Arrow): a share of the ignite's damage a second, for a time, several at once. */
@@ -155,8 +169,9 @@ export function applyBurning(
   dps: number,
   seconds: number,
   cap: number,
+  by?: Side,
 ): void {
-  if (!dst.alive || dst.isPlayer || dps <= 0) return;
+  if (!dst.alive || dps <= 0) return;
   const mine = dst.sdots.filter((d) => d.src === '@burning');
   const fresh: SkillDot = {
     src: '@burning',
@@ -169,6 +184,7 @@ export function applyBurning(
     spreadR: 0,
     carry: false,
     regen: 0,
+    by,
   };
   if (mine.length >= cap) {
     let oldest = mine[0];
@@ -180,10 +196,12 @@ export function applyBurning(
 
 /** The damage a second, by type, of the enemy's skill debuffs; and the life the character mends from them. */
 export function sumSkillDots(w: World, a: Actor, out: number[], dt: number): void {
-  const p = hunted(w, a);
   for (const d of a.sdots) {
     out[d.type] += d.dps;
-    if (d.regen > 0 && p.alive && !a.isPlayer)
+    if (d.regen <= 0) continue;
+    // It mends the character whose skill inflicted it (with no owner named, the one that fights the enemy).
+    const p = d.by?.player ?? hunted(w, a);
+    if (p.alive && p.team !== a.team)
       p.life = Math.min(p.def.maxLife, p.life + (d.raw * d.regen * dt) / 100);
   }
 }

@@ -1,5 +1,6 @@
 import { enemiesNear } from './utility';
 import type { DeathRecap, RecapHit, World } from './types';
+import type { Side } from './side';
 
 /** Seconds of damage the recap's lines cover. */
 export const RECAP_SECONDS = 5;
@@ -12,9 +13,9 @@ export const RECAP_NEAR = 8;
 /** Damage over time is logged every tick: it is a total in the recap, not a list of hits. */
 const OVER_TIME = new Set(['Burning', 'Bleeding', 'Poison']);
 
-/** Build the death recap for a player who has just died (EXPANSION section 9). */
-export function buildRecap(w: World): DeathRecap {
-  const log = w.sides[0].dmgLog.filter((d) => w.t - d.t <= RECAP_SECONDS);
+/** Build the death recap for a character who has just died (EXPANSION section 9): the local player's, or a side's of a duel. */
+export function buildRecap(w: World, s: Side = w.sides[0]): DeathRecap {
+  const log = s.dmgLog.filter((d) => w.t - d.t <= RECAP_SECONDS);
   const byKey = new Map<string, { name: string; dtype: number; amount: number }>();
   for (const d of log) {
     const k = `${d.name}|${d.dtype}`;
@@ -24,9 +25,9 @@ export function buildRecap(w: World): DeathRecap {
   }
   // The killer is the last monster to hit (an effect such as burning is not a killer).
   const last = [...log].reverse().find((d) => d.rarity !== 'effect') ?? log[log.length - 1];
-  const def = w.sides[0].player.def;
+  const def = s.player.def;
   const cap = (i: number) => Math.min(def.res[i], def.maxRes[i]);
-  const ail = w.sides[0].player.ail;
+  const ail = s.player.ail;
   const ailments: string[] = [];
   if (ail.ignites.length) ailments.push('ignited');
   if (ail.bleeds.length) ailments.push('bleeding');
@@ -35,7 +36,7 @@ export function buildRecap(w: World): DeathRecap {
   if (ail.chill > 0) ailments.push('chilled');
   if (ail.freezeT > 0) ailments.push('frozen');
   // The hits of the last seconds, oldest first, and no more than the record has room for (the latest are kept).
-  const hits: RecapHit[] = w.sides[0].dmgLog
+  const hits: RecapHit[] = s.dmgLog
     .filter((d) => w.t - d.t <= RECAP_HIT_SECONDS && !OVER_TIME.has(d.name))
     .slice(-RECAP_HITS)
     .map((d) => ({
@@ -47,13 +48,7 @@ export function buildRecap(w: World): DeathRecap {
       amount: d.amount,
       hp: d.hp,
     }));
-  const near = enemiesNear(
-    w,
-    w.sides[0].player.team,
-    w.sides[0].player.x,
-    w.sides[0].player.y,
-    RECAP_NEAR,
-  );
+  const near = enemiesNear(w, s.player.team, s.player.x, s.player.y, RECAP_NEAR);
   return {
     time: w.t,
     killer: last?.name ?? 'Unknown',
@@ -77,9 +72,9 @@ export function buildRecap(w: World): DeathRecap {
     maxEs: def.maxEs,
     hits,
     vitals: {
-      life: w.sides[0].player.life,
-      es: w.sides[0].player.es,
-      mana: w.sides[0].player.mana,
+      life: s.player.life,
+      es: s.player.es,
+      mana: s.player.mana,
     },
     defence: {
       armour: def.armour,
@@ -90,7 +85,7 @@ export function buildRecap(w: World): DeathRecap {
       lifeRegen: def.lifeRegen,
       movement: def.moveSpeed,
     },
-    flasks: w.sides[0].flasks.map((f) => ({
+    flasks: s.flasks.map((f) => ({
       kind: f.spec.kind,
       charges: f.charges,
       max: f.spec.maxCharges,

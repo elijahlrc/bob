@@ -1014,7 +1014,46 @@ export function separate(w: World): void {
       }
     }
   }
+  if (w.sides.length > 1) separateSides(w);
   for (const s of w.sides) if (s.minions.length > 0) separateMinions(w, s, list);
+}
+
+/** Two bodies that overlap each give way half of it (the ones of the other teams: the character is not pushed by its own minions). */
+function pushApart(w: World, a: Actor, b: Actor): void {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const rr = a.r + b.r;
+  const d2 = dx * dx + dy * dy;
+  if (d2 >= rr * rr) return;
+  // Exactly on top of each other there is no way to say which way is out: a is sent west and b east.
+  const d = Math.sqrt(d2);
+  const nx = d > 1e-9 ? dx / d : 1;
+  const ny = d > 1e-9 ? dy / d : 0;
+  const half = (rr - d) / 2;
+  const ca = w.grid.collide(a.x - nx * half, a.y - ny * half, a.r);
+  a.x = ca.x;
+  a.y = ca.y;
+  const cb = w.grid.collide(b.x + nx * half, b.y + ny * half, b.r);
+  b.x = cb.x;
+  b.y = cb.y;
+}
+
+/**
+ * The characters of different sides are bodies too: each gives way half of what they overlap by (a melee blow reaches its
+ * range plus both radii, so two characters standing in each other would be in reach of anything). Under Phase Run a character
+ * passes through.
+ */
+function separateSides(w: World): void {
+  const sides = w.sides;
+  for (let i = 0; i < sides.length; i++) {
+    const a = sides[i];
+    if (!a.player.alive || a.buffT.phaseRun > 0) continue;
+    for (let j = i + 1; j < sides.length; j++) {
+      const b = sides[j];
+      if (!b.player.alive || b.buffT.phaseRun > 0 || b.team === a.team) continue;
+      pushApart(w, a.player, b.player);
+    }
+  }
 }
 
 /**
@@ -1077,5 +1116,9 @@ function separateMinions(w: World, s: Side, list: Actor[]): void {
       const d = Math.sqrt(d2);
       nudge(m, (dx / d) * (rr - d), (dy / d) * (rr - d));
     }
+    // The characters of the other sides are not pushed aside as the minion's own is: each gives way half.
+    if (w.sides.length > 1)
+      for (const o of w.sides)
+        if (o.team !== s.team && o.player.alive && o.buffT.phaseRun <= 0) pushApart(w, m, o.player);
   }
 }

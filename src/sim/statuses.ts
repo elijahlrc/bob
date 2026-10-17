@@ -18,7 +18,7 @@ const ENSNARE_RARITY: Record<string, number> = { rare: 0.75, miniboss: 0.625, bo
 
 /** Put a status on an actor, or renew it; a stacking one gains `stacks`, up to its maximum. */
 export function applyStatus(w: World, a: Actor, id: StatusId, o: StatusOpts = {}): void {
-  if (!a.alive || a.isPlayer) return;
+  if (!a.alive) return;
   const d = STATUSES[id];
   const seconds = o.seconds ?? d.seconds;
   let v = o.v ?? d.v;
@@ -133,7 +133,7 @@ export function rollStatuses(
   blocked = false,
   hit?: { dmg: number[]; total: number },
 ): void {
-  if (!dst.alive || dst.isPlayer) return;
+  if (!dst.alive) return;
   const holds = p.statuses.some((s) => s.id === 'immobilised');
   for (const s of p.statuses) {
     // Overpowered is what a blocked hit does; every other status needs the hit to land.
