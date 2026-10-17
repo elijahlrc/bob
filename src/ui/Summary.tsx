@@ -125,10 +125,15 @@ function RivalsBlock({ c, run }: { c: Controller; run: RunState }) {
   const send = () => void postRun(run, c.lastResult);
   const duel = async () => {
     if (!ready) {
-      // The box is on by default, so what is missing is almost always the name.
+      // The box is on by default, so what is missing is almost always the name: ask for it and put the cursor there.
       if (!rivalsOn()) setRivals(true);
       setNudged(true);
       refresh();
+      if (typeof document !== 'undefined')
+        setTimeout(
+          () => document.querySelector<HTMLInputElement>('.rivals-opt input[type=text]')?.focus(),
+          0,
+        );
       return;
     }
     setBusy(true);

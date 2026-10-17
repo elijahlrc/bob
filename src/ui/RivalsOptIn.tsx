@@ -56,7 +56,6 @@ export function RivalsOptIn({
             placeholder="Your name"
             aria-label="Your name"
             aria-invalid={bad || denied}
-            autoFocus={nudged}
             onInput={(e) => {
               const v = (e.currentTarget as HTMLInputElement).value;
               setRivalName(v);
