@@ -1029,3 +1029,12 @@ branch 21.4 to 23.0 s, so the sim is about 3% slower, spread thin over the per-s
 (the profile shows no single function; `hunted` is 0.1%). The one real cost found, 15% from one more field in `newActor`'s object
 literal, is avoided and written up in docs/PERFORMANCE.md. Looping `stepWorld`'s sides by index instead of `for...of` was tried and
 was inside the noise, so it was not kept.
+
+## Equipping: sockets, compare and the phone (2026-10-16)
+
+docs/EQUIP.md Q0 to Q7 built; Q8 is this entry and the docs. A swap now says what happens to the gems (`SocketOutcome`, `dryEquip`,
+`compareSlots`), the Items tab draws it as a sockets row with pips and one sentence, a phone's selection is a peek of the changed lines
+that opens to a merged card (every changed line shows; it scrolls rather than cut off), gear slots and bag rows carry pips, the phone
+toolbar is a search, a Filter sheet and Clear filters, a bag gem has a socket picker, and the Skills tab names what it replaces and asks
+before replacing a gem. No mechanics changed (the transfer order is as it was; `dryEquip`'s `gemsToBag` count became the `sockets` outcome).
+Not built: swipe, the drag of the grab bar. Not looked at: a real device, a ring's two tabs on a phone screen.

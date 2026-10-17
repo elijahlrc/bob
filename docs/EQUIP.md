@@ -1,6 +1,6 @@
 # Bob — Equipping plan: comparing, sockets, and the phone
 
-Status: **proposed, not built** (2026-10-16). Milestones are **Q0–Q8** (Q for equip; the letter is unused). Sibling plans:
+Status: **built** (2026-10-16; section 8 says what shipped and what did not). Milestones are **Q0–Q8** (Q for equip; the letter is unused). Sibling plans:
 [ITEMS.md](ITEMS.md) (the Items tab, built 2026-10-09) and [MOBILE.md](MOBILE.md) (touch rules). This plan keeps their rules (every action
 reachable by thumb, never commit on a first tap you cannot read) and finishes what they left open.
 
@@ -296,3 +296,54 @@ Q4–Q7 spread the same facts around.
   at both heights and the Filter sheet. Desktop screenshots are the regression check for "desktop unchanged".
 - The one thing no emulation answers: how the peek height feels under a thumb, and whether a swipe collides with the bag's scroll. Both go
   on the real-device list.
+
+---
+
+## 8. Built (2026-10-16)
+
+Q0 to Q7 are built, each a commit (Q2 and Q3 together, Q5 and Q6 together). The section 6 defaults were taken as written: the
+transfer rule is kept and shown (a), free sockets are a fact and not a number, the tabs are not merged, peek and full, the merged
+diff on phones only, row pips always.
+
+**What the screens do now.**
+
+- `dryEquip` returns `sockets` (a `SocketOutcome`: before and after counts, `placed`, `moved`, `out`, `fromOffHand`, `lostPrimary`,
+  `idle`, `freeAfter`) in place of the old `gemsToBag` count; `SlotCompare.sockets` carries it with `idle` filled in, and `ItemInfo.gemsOut`
+  gives a bag row the cheap tier. `src/run/socketText.ts` turns an outcome into the one sentence; `gemStatus` lives in `src/run/gemStatus.ts`
+  with `gemIdle`.
+- Items tab: a "vs" line, the sockets row (`SocketPips`, `SocketsRow`), the Swap / Equip button, the status line names the gems that went
+  to the bag, the slot tabs say what happens to the gems, a worn slot shows its pips, a worn item names its gems and has **Edit gems →**
+  (opens the Skills tab scrolled to that item), a bag gem has the `SocketPicker`.
+- Phone: the sheet opens on a peek (the changed lines, the sockets row, one row of actions); the grab bar or ▴ opens the full view
+  (chips, gems by name, the merged card with old values, "Show both cards"). **The peek shows every changed line** (the user's review
+  of the first build: a "show more" in the peek made it useless); it grows to 52 vh and scrolls inside, with the actions pinned.
+- Filters: a phone's toolbar is the search, **Filter** (with a count) and **Clear filters**; the rest is in a sheet with Show N items
+  and Reset filters. Clear filters is also on desktop and tablet (beside Reverse), and an empty list offers it.
+- Rows: socket pips, a ⚠ "N gems out" badge when the best-slot swap sends gems back, the item's own lines (short forms) in place of the
+  category names. Flask compares carry the same changed-line marks.
+- Skills tab: "if you replace it" and the replaced gem named in a confirm, a first tap on a full socket with a gem from the bag asks
+  first (an empty socket still places at once; dragging onto a socket is an explicit gesture and commits), list badges say where
+  (`→ Body`) and why a support does nothing ("needs a spell skill on one of your items"), items show their sockets, "Not socketable:"
+  names the rest, the hint is a `?` and shows open once.
+
+**Checked on the code.** Replacing the primary skill's gem with `socketGem` leaves `primaryGem` pointing at a gem now in the bag, and the
+character falls back to its first usable skill; the replace confirm says "your primary skill" for that reason.
+
+**Differences from the plan.**
+
+- The warning wraps to a second line when several gems come out ("No socket for A and B, they will be unequipped") rather than
+  truncating; one gem is one line, as in the mock-up.
+- `idle` counts a support with no skill to work on and a skill the new weapons cannot use. A skill that is merely short of mana is not
+  idle (`gemStatus` still says so on the Skills tab).
+- The Skills tab keeps its own socket grid (it is also where gems are dragged and moved) and shares `Badge` and the confirm wording
+  with the `SocketPicker`; the picker itself is the Items tab's. On a phone the gem sheet leads with the picker and shows the gem card
+  in the full view.
+- A gem swap on the Skills tab shows what is replaced as text and a badge, not as two cards.
+- Placements gained `idle`; `bestPlacement` breaks ties toward a socket where the gem does something.
+
+**Not built, and not seen.**
+
+- Swipe to step through items, and dragging the grab bar (it taps).
+- Not looked at on screen: a ring's two slot tabs on a phone, and a two-hander over a shield in the browser (both are covered by the
+  headless tests). Not looked at on a real device (peek height under a thumb, scroll against the bag).
+- Screenshots: `docs/screenshots/mobile/q3-peek.jpg`, `q3-full.jpg`, `q6-gem-picker.jpg`, `q7-filter-sheet.jpg`.
