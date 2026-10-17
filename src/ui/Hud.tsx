@@ -475,8 +475,9 @@ export function Hud({ c }: { c: Controller }) {
     <div class="hud">
       {!sc && w.t < 5 && (
         <div class="biome-banner" key={w.plan.seed}>
-          <div class="biome-name">{w.plan.biome.name}</div>
-          <div class="biome-text">{w.plan.biome.text}</div>
+          {/* A duel names its place, not the biome the arena borrowed: the banner's text describes a layout the arena has not. */}
+          <div class="biome-name">{duel ? 'Duelling arena' : w.plan.biome.name}</div>
+          {!duel && <div class="biome-text">{w.plan.biome.text}</div>}
         </div>
       )}
       <div class="hud-top">
@@ -484,7 +485,7 @@ export function Hud({ c }: { c: Controller }) {
           {sc ? 'Showcase' : duel ? 'Duel' : `Map ${w.plan.map}`}
           {!duel && ` · ${w.plan.theme.name}`}
         </span>
-        <span {...infoProps(w.plan.biome.text)}>{w.plan.biome.name}</span>
+        {!duel && <span {...infoProps(w.plan.biome.text)}>{w.plan.biome.name}</span>}
         {!duel && <span {...infoProps(leadText(w.plan.theme))}>{leadNames(w.plan.theme)}</span>}
         <span>Level {w.sides[0].build.level}</span>
         {!duel && <span>Kills {w.sides[0].stats.kills}</span>}

@@ -259,7 +259,7 @@ not what they watch.
 - **Arena and camera.** `duelPlan` (4.2). The camera follows the middle of the characters still alive (all of them when none is),
   kept on the floor; side 0's character on a map as before.
 - **HUD.** The player's HUD as on a map, with the chrome that does not apply left out: "Map N · theme" is "Duel", no Kills, Exit open,
-  reprieves or Abandon; the biome banner stays. The speed controls and pause are as they are. **The rival is the boss bar** (`BossBar`, name,
+  reprieves or Abandon; the banner on entering says "Duelling arena" and the top line "Duel", with no biome name (the biome is the arena's look alone, and its text describes a layout the arena has not; the user, 2026-10-17). The speed controls and pause are as they are. **The rival is the boss bar** (`BossBar`, name,
   life, energy shield; no readout), and clicking it shows its name, class and level. **Leave** (a small button as the showcase's Exit)
   ends the duel with no result.
 - **Controller.** A duel mode beside the showcase and the gallery (`launchShowcase` is the precedent for a world outside a run):
