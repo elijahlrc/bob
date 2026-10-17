@@ -71,19 +71,61 @@ each hash the same before and after; 18 bot runs reach the same maps and levels)
   A cheaper test of where a gem could matter (an active skill needs no supports, a support needs an active in its item) would
   prune most of those.
 
-## 5. The sim's actors: 127 properties (2026-10-16)
+## 5. The sim's actors: 88 properties, and the limit of 128 (2026-10-16)
 
-`newActor` (`src/sim/actor.ts`) makes every actor from one object literal of **127 properties**, so that the sim's hot loops read
-one shape. A literal of 128 or more is built much more slowly by V8: adding `side` inside the literal (in any position) made the sim
-about 15% slower (twelve bot runs to map 10: 17.7 s with 127 properties, 20.5 s with 128), and a small benchmark showed the same cliff
-(creation and reads of an object of 128 properties several times slower than of 127). The same property set **after** the literal costs
-nothing (17.9 s), which is how `Actor.side` is added (with a comment in `actor.ts`). What the cliff comes from inside V8 was not
-looked into.
+**The limit.** An object made from a literal of 128 or more properties is built much more slowly by V8 than one of 127 (the fast,
+struct-like layout is kept below that size), and every actor was made from such a literal. `newActor` (`src/sim/actor.ts`) made every actor, so that the sim's hot
+loops read one shape, from one literal of **127 properties** (128 with `side`). Adding `side` inside the literal (in any position) made
+the sim about 15% slower (twelve bot runs to map 10: 17.7 s with 127 properties, 20.5 s with 128), and a small benchmark showed the
+same cliff (creation and reads of an object of 128 properties several times slower than of 127). The same property set **after** the
+literal cost nothing (17.9 s), which is how `Actor.side` was added, with an `Omit` and a comment. What the cliff comes from inside V8
+was not looked into. Being one field from it was a trap for everyone who touched `Actor`.
 
-- A new field of `Actor` goes after the literal (`actor.side = ...`), or the fields of a feature are grouped into one sub-object. Do
-  not add a 128th property to the literal.
-- After the whole extraction (F1) the fence takes about 3% longer than before it (21.2 to 21.7 s on main, 21.4 to 23.0 s on the
+**What was done.** `Actor` is smaller: fields that are one thing are one sub-object each, made in `newActor` by one small literal each
+and never shared between actors (`MonsterStats` in `mon` is cached and shared, so nothing mutable goes there). About 40 properties
+fewer, 128 to 88 (measured with `Object.keys`: an actor 128 to 88, a monster from `spawnMonster` 128 to 88, a minion from `makeMinion`
+131 to 91, a `Side` 74 and unchanged):
+
+| Group      | Holds                                                                                                                          |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `since`    | seconds since: `kill`, `crit`, `hit`, `flask`, `stunEnemy`, `block`, `beenHit`, `overload`, `damaged`                          |
+| `leech`    | the leech queues: `life`, `es`, `mana`                                                                                         |
+| `resShift` | `v` (resistance shift per damage type) and `t` (its time left)                                                                 |
+| `home`     | `x`, `y`                                                                                                                       |
+| `chase`    | the chase and patrol-walk bookkeeping: `blockT`, `prevX`, `prevY`, `tryTick`, `pathT`, `nextX`, `nextY`                        |
+| `patrol`   | `points` and `i`; the whole field is `null` for a monster that does not patrol                                                 |
+| `dash`     | `t`, `windT`, `v`, `x`, `y`                                                                                                    |
+| `mark`     | `x`, `y`                                                                                                                       |
+| `retreat`  | `t`, `cd`                                                                                                                      |
+| `mirror`   | `id`, `t`                                                                                                                      |
+| `theft`    | `fleeT`, `stolen`, `stolenFlask`                                                                                               |
+| `choir`    | `buffT`, `zealT`, `fervour`, `fervourT` (the Choir's aura, boost and stacks; `Side` has its own `buffT` and `chargeT.fervour`) |
+| `rhythm`   | `beat`, `restT`, `patMult`, `enraged`                                                                                          |
+| `hex`      | the totals of the hexes: `res`, `vuln`, `vulnAll`, `dmg`, `speed`, `more`, `cd` (`hexes`, the list, stays flat)                |
+
+The hot fields stay flat (`x`, `y`, `life`, `es`, `mana`, `def`, `action`, `ail`, `mv`, `fx`, the single timers). `since.damaged` is read
+for every actor every tick (`tickActor`, the energy shield recharge); one indirection cost nothing that the fence could see.
+With `Actor` at 88, `side` is now in the literal and the `Omit` is gone.
+
+**The test.** `src/sim/actor.test.ts` keeps `Object.keys` of an actor, a monster and a minion at 100 or fewer, and of a `Side` at 94
+or fewer (74 when measured), with the reason for 128 in a comment. An actor is 40 properties from the cliff and 12 from the test, so
+the test fires long before the cliff; a side has 20 to spare. When it fails, group the new field with the ones it belongs with, or start
+a group, rather than raise the limit.
+
+**What a group costs the code that copies actors.** A group is one object, so a copy that shares it shares what is in it. `standIn`
+(`actor.ts`) is the `Object.create(character)` that a deployable fires as: what it sets on itself used to stay on it, so it now owns a
+copy of `since` (the one group a hit writes on its source). A test that copies an actor with a spread (`shapes.test.ts`) copies the
+groups. New code that clones an actor does the same; the compiler cannot see it.
+
+**Measured** (the wall time of the default `npm run fence`, 12 bot runs to map 10; `npm run perf` times the calculation only). On the
+unchanged tree (after F1): 22.2, 22.3, 22.4 s (cpu 32.7 to 33.0 s). After the `since` row alone: 21.8, 22.3, 22.0 s. Moving `side`
+into the literal, three runs before and three after: 21.0, 21.7, 23.1 s and 21.7, 22.0, 23.4 s, which is noise (a 2 s spread), so the
+two forms were run alternately, four times each: old 22.6, 21.9, 27.5 (a loaded machine), 21.5 s; new 21.5, 22.1, 22.3, 21.7 s, and
+the same cpu time. The finished tree: 21.4, 21.8, 21.4 s (cpu 30.8 to 31.4 s), no slower than before and probably about 3% faster, which
+is what the extraction of the sides (F1) cost.
+
+- After the whole extraction (F1) the fence took about 3% longer than before it (21.2 to 21.7 s on main, 21.4 to 23.0 s on the
   branch). The profile has no one cause: the per-side loops of `stepWorld` and the `a.side` reads are spread thin. Indexed loops in
   place of `for...of` were inside the noise.
-- The measure is the wall time of `npm run fence` (the bot's runs, which `npm run perf` does not cover: it times the calculation only).
-  `World` and `Side` are far below the limit (`Side` has 74).
+- The measure for a change to the sim's structure is the wall time of `npm run fence`, and its hashes are the proof that no number
+  moved (docs/DUEL.md 8.1): the groups were made one commit at a time, each with the default and the `--deep` fence identical.

@@ -49,10 +49,10 @@ function playOf(w: World, pack: number): Play {
   return p;
 }
 
-/** A play's members hold still (a monster with `windT` stands; the dash code counts it down only for leapers). */
+/** A play's members hold still (a monster with `dash.windT` stands; the dash code counts it down only for leapers). */
 function hold(m: Actor, seconds: number): void {
   m.action = null;
-  m.windT = Math.max(m.windT, seconds);
+  m.dash.windT = Math.max(m.dash.windT, seconds);
 }
 
 /** Advance the plays in progress, and four times a second look for packs that can start one. */
@@ -63,7 +63,8 @@ export function tickPackPlays(w: World, side: Side, dt: number): void {
     if (pl.t <= 0) continue;
     pl.t -= dt;
     if (pl.kind === 'loose')
-      for (const m of pl.members) if (m.alive && m.windT > 0) m.windT = Math.max(0, m.windT - dt);
+      for (const m of pl.members)
+        if (m.alive && m.dash.windT > 0) m.dash.windT = Math.max(0, m.dash.windT - dt);
     if (pl.kind === 'ring') {
       // The hounds keep their leaps for the end.
       for (const m of pl.members) if (m.alive) m.abT[0] = Math.max(m.abT[0] ?? 0, 0.3);
@@ -88,7 +89,7 @@ export function tickPackPlays(w: World, side: Side, dt: number): void {
       const l = loosers.get(a.pack) ?? [];
       l.push(a);
       loosers.set(a.pack, l);
-    } else if (type === 'hound' && d <= 9 && a.dashT <= 0) {
+    } else if (type === 'hound' && d <= 9 && a.dash.t <= 0) {
       const l = hounds.get(a.pack) ?? [];
       l.push(a);
       hounds.set(a.pack, l);
@@ -126,7 +127,7 @@ export function tickPackPlays(w: World, side: Side, dt: number): void {
     }
     pl.base = Math.atan2(cy / list.length - p.y, cx / list.length - p.x);
     // A leap that was gathering is given up: they go together.
-    for (const m of list) m.windT = 0;
+    for (const m of list) m.dash.windT = 0;
     w.events.push({ t: 'window', id: list[0].id, kind: 'encircle' });
   }
   for (const nest of nests) {
@@ -141,7 +142,7 @@ export function tickPackPlays(w: World, side: Side, dt: number): void {
     pl.t = 3;
     pl.cd = CONVERGE_COOLDOWN;
     pl.members = brood;
-    for (const g of brood) g.buffT = Math.max(g.buffT, 3);
+    for (const g of brood) g.choir.buffT = Math.max(g.choir.buffT, 3);
     w.events.push({ t: 'window', id: nest.id, kind: 'converge' });
   }
 }

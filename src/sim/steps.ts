@@ -62,7 +62,7 @@ function mark(
  * or already stepping).
  */
 export function beginStep(w: World, m: Actor, id: StepId): boolean {
-  if (winds.has(m) || m.action || m.stunT > 0 || m.phaseT > 0 || m.blinkT > 0 || m.dashT > 0) {
+  if (winds.has(m) || m.action || m.stunT > 0 || m.phaseT > 0 || m.blinkT > 0 || m.dash.t > 0) {
     return false;
   }
   const p = hunted(w, m);

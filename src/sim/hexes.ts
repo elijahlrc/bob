@@ -154,10 +154,10 @@ export function tickHexes(a: Actor, dt: number): void {
 /** Refresh the numbers the damage and movement code read. */
 export function recompute(a: Actor): void {
   const t = hexTotals(a.hexes, a.rarity);
-  a.hexMore = t;
-  a.hexRes = t.res;
-  a.hexVuln = t.vulnPhys;
-  a.hexVulnAll = t.vulnAll;
-  a.hexDmg = t.damageMult;
-  a.hexSpeed = t.speedMult;
+  a.hex.more = t;
+  a.hex.res = t.res;
+  a.hex.vuln = t.vulnPhys;
+  a.hex.vulnAll = t.vulnAll;
+  a.hex.dmg = t.damageMult;
+  a.hex.speed = t.speedMult;
 }

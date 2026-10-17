@@ -58,11 +58,11 @@ describe('pack plays (docs/ENCOUNTERS.md 8)', () => {
     }
     expect(lanes).toBe(2);
     // They hold while the lanes show, and the lanes run from each of them toward the character.
-    expect(a.every((m) => m.windT > 0)).toBe(true);
+    expect(a.every((m) => m.dash.windT > 0)).toBe(true);
     for (const e of w.effects.filter((x) => x.label === 'Loosing call'))
       expect(a.some((m) => Math.hypot(m.x - e.x, m.y - e.y) < 0.1)).toBe(true);
     for (let i = 0; i < 60; i++) stepWorld(w);
-    expect(a.every((m) => m.windT === 0)).toBe(true);
+    expect(a.every((m) => m.dash.windT === 0)).toBe(true);
   });
 
   it('a lone archer does not call', () => {
@@ -89,7 +89,7 @@ describe('pack plays (docs/ENCOUNTERS.md 8)', () => {
     let leapt = 0;
     for (let i = 0; i < 40; i++) {
       stepWorld(w);
-      leapt = Math.max(leapt, h.filter((m) => m.windT > 0 || m.dashT > 0).length);
+      leapt = Math.max(leapt, h.filter((m) => m.dash.windT > 0 || m.dash.t > 0).length);
     }
     expect(leapt).toBe(3);
   });
@@ -101,7 +101,7 @@ describe('pack plays (docs/ENCOUNTERS.md 8)', () => {
     let on = false;
     for (let i = 0; i < 300 && !on; i++) {
       stepWorld(w);
-      on = brood.every((g) => !g.alive || g.buffT > 0);
+      on = brood.every((g) => !g.alive || g.choir.buffT > 0);
     }
     expect(on).toBe(true);
     expect(nest.alive).toBe(true);

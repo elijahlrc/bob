@@ -114,8 +114,8 @@ export function rally(w: World, dead: Actor): void {
   const mates = packMates(w, dead).filter((a) => a !== dead && a.alive);
   if (mates.length < 2) return;
   for (const a of mates) {
-    if (def.faction === 'kennel') a.buffT = Math.max(a.buffT, 6);
+    if (def.faction === 'kennel') a.choir.buffT = Math.max(a.choir.buffT, 6);
     else if (def.faction === 'choir') a.stunT = Math.max(a.stunT, 0.7);
-    else if (def.faction === 'swarm') a.fleeT = Math.max(a.fleeT, 2.5);
+    else if (def.faction === 'swarm') a.theft.fleeT = Math.max(a.theft.fleeT, 2.5);
   }
 }

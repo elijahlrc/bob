@@ -95,21 +95,20 @@ export type Actor = {
   ail: Ailments;
   stunT: number;
   graceT: number;
-  leechLife: number[];
-  leechEs: number[];
-  leechMana: number[];
-  sinceDamaged: number;
-  tKill: number;
-  tCrit: number;
-  tHit: number;
-  tFlask: number;
-  tStunEnemy: number;
-  tBlock: number;
-  /** Seconds since this actor was last hit (for "been hit recently"). */
-  tBeenHit: number;
-  tOverload: number;
-  resShift: number[];
-  resShiftT: number;
+  leech: { life: number[]; es: number[]; mana: number[] };
+  since: {
+    damaged: number;
+    kill: number;
+    crit: number;
+    hit: number;
+    flask: number;
+    stunEnemy: number;
+    block: number;
+    /** Seconds since this actor was last hit (for "been hit recently"). */
+    beenHit: number;
+    overload: number;
+  };
+  resShift: { v: number[]; t: number };
   moving: boolean;
   // Monster-only.
   mon?: MonsterStats;
@@ -118,8 +117,7 @@ export type Actor = {
   modIds: MonsterModId[];
   room: number;
   pack: number;
-  homeX: number;
-  homeY: number;
+  home: { x: number; y: number };
   state: MonsterState;
   lostT: number;
   noticeT: number;
@@ -131,8 +129,7 @@ export type Actor = {
   /** Training dummy: never acts (convergence tests). */
   dummy: boolean;
   /** Ranged monsters: remaining retreat time and its cooldown. */
-  retreatT: number;
-  retreatCd: number;
+  retreat: { t: number; cd: number };
   /** A monster raised from a corpse: no rewards, leaves no corpse, and a Shambler does not rise twice. */
   risen: boolean;
   /** A faction ability timer (raise, blink), and the time left of a blink telegraph. */
@@ -152,30 +149,37 @@ export type Actor = {
   sdots: SkillDot[];
   /** The life a killing blow went past (Herald of Ash burns by it). */
   overkill?: number;
-  /** Resistance lowered by hexes, per damage type (index 0 unused). */
-  hexRes: number[];
-  hexVuln: number;
-  hexVulnAll: number;
-  hexDmg: number;
-  hexSpeed: number;
-  /** The rest of what the hexes on this actor do (damage over time taken, accuracy, evasion, chances to be bled or maimed...). */
-  hexMore: HexTotals;
+  hex: {
+    /** Resistance lowered by hexes, per damage type (index 0 unused). */
+    res: number[];
+    vuln: number;
+    vulnAll: number;
+    dmg: number;
+    speed: number;
+    /** The rest of what the hexes on this actor do (damage over time taken, accuracy, evasion, chances to be bled or maimed...). */
+    more: HexTotals;
+    /** Seconds before a Hexcaller can hex again, and the time left of a Choirmaster channel. */
+    cd: number;
+  };
   /** The Choir (EXPANSION 7.3): the censer aura time left, a Zealous boost, and Fervour stacks with their time left. */
-  buffT: number;
-  zealT: number;
-  fervour: number;
-  fervourT: number;
-  /** Which beat of its rhythm it is on, the damage that beat carries, and whether it has enraged (docs/ROSTER.md 6.5). */
-  beat: number;
-  /** Seconds a monster rests before its next area blow (counted down while it can act; see AREA_PACE). */
-  restT: number;
-  patMult: number;
-  enraged: boolean;
+  choir: {
+    buffT: number;
+    zealT: number;
+    fervour: number;
+    fervourT: number;
+  };
+  rhythm: {
+    /** Which beat of its rhythm it is on, the damage that beat carries, and whether it has enraged (docs/ROSTER.md 6.5). */
+    beat: number;
+    /** Seconds a monster rests before its next area blow (counted down while it can act; see AREA_PACE). */
+    restT: number;
+    patMult: number;
+    enraged: boolean;
+  };
   /** The phases (by index in the type's list) that have happened. */
   phaseMask: number;
   /** A Mirrored monster's twin, and the seconds the survivor has to follow it before it is made whole again. */
-  mirrorId: number;
-  mirrorT: number;
+  mirror: { id: number; t: number };
   /** Seconds this monster has stood where the character cannot reach it (see strand.ts). */
   strandT: number;
   /** Seconds to a Warding Pulse. */
@@ -194,41 +198,44 @@ export type Actor = {
   /** Lies in wait (an Ambush) until the character is close or it is hit. */
   hold: boolean;
   /** A Patrol: the two points it walks between while it has not noticed the character, and which one it is heading for. */
-  patrol: { x: number; y: number }[] | null;
-  patrolI: number;
-  /** The next tile of the way to the patrol point, and when it is worked out again. */
-  pathT: number;
-  nextX: number;
-  nextY: number;
+  patrol: { points: { x: number; y: number }[]; i: number } | null;
   /** Timers of the abilities after the first eight, by index in the type's list (see sim/abilities.ts). */
   abT: number[];
   /** Sidearm, window and mode state (docs/ENCOUNTERS.md), for the types that have any. */
   enc: EncState | undefined;
-  /** Where a charge or a leap is heading, and how long is left of it (zero: not in one). */
-  dashT: number;
-  /** Seconds of wind-up left before a leap or a charge (zero: not winding up). */
-  windT: number;
-  /** Tiles a second of the dash it is in. */
-  dashV: number;
-  /** Seconds left of running away (a Cutpurse that has stolen), and what it took: the flask and the charges. */
-  fleeT: number;
-  stolen: number;
-  stolenFlask: number;
+  dash: {
+    /** Where a charge or a leap is heading, and how long is left of it (zero: not in one). */
+    t: number;
+    /** Seconds of wind-up left before a leap or a charge (zero: not winding up). */
+    windT: number;
+    /** Tiles a second of the dash it is in. */
+    v: number;
+    x: number;
+    y: number;
+  };
+  theft: {
+    /** Seconds left of running away (a Cutpurse that has stolen), and what it took: the flask and the charges. */
+    fleeT: number;
+    stolen: number;
+    stolenFlask: number;
+  };
   /** The player: seconds left in which nothing recovers (a Bursar, the Treasurer). */
   suppressT: number;
-  dashX: number;
-  dashY: number;
   /** Where a burrowed Gnawing Queen will come up. */
-  markX: number;
-  markY: number;
+  mark: { x: number; y: number };
   /** Seconds before a Hexcaller can hex again, and the time left of a Choirmaster channel. */
-  hexCd: number;
   channelT: number;
-  /** A chasing monster: seconds it has spent held up (it walks but gets nowhere), and where it was and when it last tried to walk. */
-  blockT: number;
-  prevX: number;
-  prevY: number;
-  tryTick: number;
+  chase: {
+    /** A chasing monster: seconds it has spent held up (it walks but gets nowhere), and where it was and when it last tried to walk. */
+    blockT: number;
+    prevX: number;
+    prevY: number;
+    tryTick: number;
+    /** The next tile of the way to the patrol point, and when it is worked out again. */
+    pathT: number;
+    nextX: number;
+    nextY: number;
+  };
 };
 
 export type Projectile = {

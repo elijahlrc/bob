@@ -91,8 +91,8 @@ describe('sim rules for the new verbs', () => {
     player.def = { ...player.def, instantLeech: false, maxLife: 5000 };
     applyHit(world, player, dummy, prof, res(false));
     expect(player.life).toBe(100); // normal leech is gradual
-    expect(player.leechLife.length).toBe(1);
-    player.leechLife.length = 0;
+    expect(player.leech.life.length).toBe(1);
+    player.leech.life.length = 0;
     applyHit(world, player, dummy, prof, res(true));
     expect(player.life).toBeCloseTo(200); // 10% of 1000, instantly
     dummy.def = dummyDefence({ cannotBeLeechedFrom: true });
@@ -137,13 +137,13 @@ describe('player and target conditions in the sim', () => {
     player.def = { ...player.def, maxEs: 100, maxMana: 100 };
     player.es = 100;
     player.mana = 100;
-    player.tBeenHit = 99;
+    player.since.beenHit = 99;
     expect(has(world, 'beenHitRecently')).toBe(false);
     expect(has(world, 'leeching')).toBe(false);
     expect(has(world, 'esFull')).toBe(true);
     expect(has(world, 'onLowMana')).toBe(false);
-    player.tBeenHit = 1;
-    player.leechLife.push(10);
+    player.since.beenHit = 1;
+    player.leech.life.push(10);
     player.es = 50;
     player.mana = 20;
     expect(has(world, 'beenHitRecently')).toBe(true);
@@ -164,9 +164,9 @@ describe('player and target conditions in the sim', () => {
       ailments: { ignite: 0, bleed: 0, poison: 0, shock: 0, chill: 0, freeze: 0 },
       stun: 0,
     };
-    dummy.tBeenHit = 99;
+    dummy.since.beenHit = 99;
     applyHit(world, player, dummy, prof, ok);
-    expect(dummy.tBeenHit).toBe(0);
+    expect(dummy.since.beenHit).toBe(0);
   });
 
   it('the target is on low life at 35% of its maximum', () => {

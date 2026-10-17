@@ -36,7 +36,7 @@ function afterResist(dst: Actor, type: number, dps: number): number {
   if (def.immune[type] || (type === 4 && def.immuneChaos)) return 0;
   if (type === 0) return dps;
   const st = statusTaken(dst);
-  const shift = dst.resShift[type] - dst.hexRes[type] - st.res[type];
+  const shift = dst.resShift.v[type] - dst.hex.res[type] - st.res[type];
   return dps * (1 - effectiveRes(def.res[type] + shift, def.maxRes[type]) / 100);
 }
 

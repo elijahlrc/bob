@@ -78,10 +78,10 @@ const RAISED_LIFE = 0.5;
 /** Everything that speeds an actor up or slows it down: hexes, the censer aura and Fervour. */
 export function speedMult(a: Actor): number {
   return (
-    a.hexSpeed *
-    (a.buffT > 0 ? 1 + CENSER_SPEED : 1) *
-    (1 + FERVOUR_STEP * a.fervour) *
-    (a.enraged ? ENRAGE_SPEED : 1) *
+    a.hex.speed *
+    (a.choir.buffT > 0 ? 1 + CENSER_SPEED : 1) *
+    (1 + FERVOUR_STEP * a.choir.fervour) *
+    (a.rhythm.enraged ? ENRAGE_SPEED : 1) *
     (a.enc ? encMoveMult(a) : 1)
   );
 }
@@ -94,13 +94,13 @@ export function moveMult(a: Actor): number {
 /** Everything that raises or lowers the damage an actor deals. */
 export function damageMult(a: Actor): number {
   return (
-    a.hexDmg *
-    (a.buffT > 0 ? 1 + CENSER_DAMAGE : 1) *
-    (a.zealT > 0 ? 1 + ZEAL_DAMAGE : 1) *
-    (1 + FERVOUR_STEP * a.fervour) *
-    (a.enraged ? ENRAGE_DAMAGE : 1) *
+    a.hex.dmg *
+    (a.choir.buffT > 0 ? 1 + CENSER_DAMAGE : 1) *
+    (a.choir.zealT > 0 ? 1 + ZEAL_DAMAGE : 1) *
+    (1 + FERVOUR_STEP * a.choir.fervour) *
+    (a.rhythm.enraged ? ENRAGE_DAMAGE : 1) *
     (a.enc ? encDamageMult(a) : 1) *
-    a.patMult
+    a.rhythm.patMult
   );
 }
 
@@ -301,15 +301,15 @@ export function onMonsterDeath(w: World, a: Actor): void {
   onEncounterDeath(w, a);
   // The pack reacts to the fall of its leader (docs/ROSTER.md 6.7), and a Mirrored twin's survivor has three seconds.
   rally(w, a);
-  if (a.mirrorId) {
-    const twin = w.actors.find((o) => o.id === a.mirrorId && o.alive);
-    if (twin) twin.mirrorT = 3;
+  if (a.mirror.id) {
+    const twin = w.actors.find((o) => o.id === a.mirror.id && o.alive);
+    if (twin) twin.mirror.t = 3;
   }
   // A thief that dies gives back what it took.
-  if (a.stolen > 0) {
-    const f = hunted(w, a).side!.flasks.find((x) => x.spec.uid === a.stolenFlask);
-    if (f) f.charges = Math.min(f.spec.maxCharges, f.charges + a.stolen);
-    a.stolen = 0;
+  if (a.theft.stolen > 0) {
+    const f = hunted(w, a).side!.flasks.find((x) => x.spec.uid === a.theft.stolenFlask);
+    if (f) f.charges = Math.min(f.spec.maxCharges, f.charges + a.theft.stolen);
+    a.theft.stolen = 0;
   }
   // A Core Golem leaves burning, chilled or shocked ground behind (6 s).
   if (type === 'golem' && a.mon.spec.variant !== 'none') {
@@ -346,10 +346,10 @@ export function onMonsterDeath(w: World, a: Actor): void {
     if (!o.alive || o === a || o.isPlayer || !o.mon) continue;
     const d = Math.hypot(o.x - a.x, o.y - a.y);
     if (o.mon.spec.type === 'flagellant' && d <= FLAGELLANT_RANGE) {
-      o.fervour = Math.min(FERVOUR_MAX, o.fervour + 1);
-      o.fervourT = FERVOUR_SECONDS;
+      o.choir.fervour = Math.min(FERVOUR_MAX, o.choir.fervour + 1);
+      o.choir.fervourT = FERVOUR_SECONDS;
     }
-    if (a.modIds.includes('zealous') && d <= ZEAL_RANGE) o.zealT = ZEAL_SECONDS;
+    if (a.modIds.includes('zealous') && d <= ZEAL_RANGE) o.choir.zealT = ZEAL_SECONDS;
   }
   if (type === 'wight')
     for (const o of w.actors)
@@ -492,7 +492,7 @@ function tickChampion(w: World, m: Actor, dt: number): void {
       m.phaseT -= dt;
       if (m.phaseT <= 0) {
         // She comes up where you were: the warning circle lands now.
-        const pos = w.grid.collide(m.markX, m.markY, m.r);
+        const pos = w.grid.collide(m.mark.x, m.mark.y, m.r);
         m.x = pos.x;
         m.y = pos.y;
         w.events.push({ t: 'blink', id: m.id, x: m.x, y: m.y, end: true });
@@ -509,8 +509,8 @@ function tickChampion(w: World, m: Actor, dt: number): void {
         m.raiserT = QUEEN_BURROW_INTERVAL;
         m.phaseT = QUEEN_BURROW_TIME;
         m.action = null;
-        m.markX = p.x;
-        m.markY = p.y;
+        m.mark.x = p.x;
+        m.mark.y = p.y;
         w.events.push({ t: 'blink', id: m.id, x: m.x, y: m.y, end: false });
         w.effects.push({
           id: w.nextId++,

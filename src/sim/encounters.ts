@@ -415,7 +415,7 @@ export function noteTaken(w: World, m: Actor, dmg: number[]): void {
     w.events.push({ t: 'window', id: m.id, kind: 'quench' });
   }
   const riled = modeOf(type, 'riled');
-  if (riled && e.modeCd <= 0 && e.hits >= (riled.hits ?? 6) && !m.dashT && !m.windT) {
+  if (riled && e.modeCd <= 0 && e.hits >= (riled.hits ?? 6) && !m.dash.t && !m.dash.windT) {
     e.modeCd = riled.cooldown ?? 8;
     e.hits = 0;
     w.events.push({ t: 'window', id: m.id, kind: 'riled' });
@@ -425,8 +425,8 @@ export function noteTaken(w: World, m: Actor, dmg: number[]): void {
     for (let i = 1; i < 5; i++)
       if (e.lost[i] >= ADAPT_SHARE) {
         e.lost[i] = 0;
-        m.resShift[i] = ADAPT_RESIST;
-        m.resShiftT = ADAPT_SECONDS;
+        m.resShift.v[i] = ADAPT_RESIST;
+        m.resShift.t = ADAPT_SECONDS;
         w.events.push({ t: 'window', id: m.id, kind: `adapt${i}` });
       }
 }

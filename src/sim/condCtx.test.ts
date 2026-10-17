@@ -115,10 +115,10 @@ describe('conditional mods are seen by the sim', () => {
       );
       const near = neighbour(w, dummy.x + 1.5, dummy.y);
       w.sides[0].player.stunT = 1e9;
-      w.sides[0].player.tHit = hit ? 0 : 99;
+      w.sides[0].player.since.hit = hit ? 0 : 99;
       dummy.def = dummyDefence({ maxLife: 100 });
       dummy.life = 100;
-      w.sides[0].player.tHit = hit ? 0 : 99;
+      w.sides[0].player.since.hit = hit ? 0 : 99;
       rawHit(w, dummy, 1100, 0);
       return near.sdots.find((d) => d.src === '@herald')!.raw;
     };
@@ -132,7 +132,7 @@ describe('conditional mods are seen by the sim', () => {
       w.sides[0].player.stunT = 1e9;
       const near = neighbour(w, w.sides[0].player.x + 1, w.sides[0].player.y);
       for (let i = 0; i < 90; i++) {
-        w.sides[0].player.tHit = hit ? 0 : 99;
+        w.sides[0].player.since.hit = hit ? 0 : 99;
         stepWorld(w);
       }
       return 1e9 - near.life;
@@ -151,7 +151,7 @@ describe('conditional mods are seen by the sim', () => {
       dummy.def = dummyDefence({ maxLife: 1e9 });
       const prof = w.sides[0].char.profile(w.sides[0].primary, 0);
       w.sides[0].charged[dummy.id] = { n: prof.skill.charge!.max - 1, t: 5, key: 'cinderBlow' };
-      w.sides[0].player.tHit = hit ? 0 : 99;
+      w.sides[0].player.since.hit = hit ? 0 : 99;
       chargeEnemy(w, w.sides[0], dummy, prof);
       return 1e9 - near.life;
     };
@@ -177,7 +177,7 @@ describe('conditional mods are seen by the sim', () => {
         });
       const onBeam = neighbour(w, w.sides[0].player.x + 2, w.sides[0].player.y);
       for (let i = 0; i < 60; i++) {
-        w.sides[0].player.tHit = hit ? 0 : 99;
+        w.sides[0].player.since.hit = hit ? 0 : 99;
         stepWorld(w);
       }
       return onBeam.sdots.find((d) => d.src === 'cinderBond')!.raw;
@@ -191,7 +191,7 @@ describe('conditional mods are seen by the sim', () => {
         { stat: 'minionDamage', kind: 'more', value: 100, ...when('hitRecently') },
       ];
       const { world: w } = worldWith(['venomStrike', 'sourHerald'], 9, 'dagger_3', DEX, mods);
-      w.sides[0].player.tHit = hit ? 0 : 99;
+      w.sides[0].player.since.hit = hit ? 0 : 99;
       gainVirulence(w, w.sides[0]);
       return w.sides[0].minions.find((m) => m.kind === 'crawler')!.dmg;
     };

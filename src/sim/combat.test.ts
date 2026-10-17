@@ -56,10 +56,10 @@ describe('§6.4 recovery', () => {
     const p = w.sides[0].player;
     p.def = { ...p.def, lifeRegen: 0, maxLife: 1000 };
     p.life = 100;
-    p.leechLife = [1000];
+    p.leech.life = [1000];
     tickActor(w, p, 1);
     expect(p.life).toBeCloseTo(120);
-    p.leechLife = new Array(30).fill(1000);
+    p.leech.life = new Array(30).fill(1000);
     tickActor(w, p, 1);
     expect(p.life).toBeCloseTo(320);
   });
@@ -68,9 +68,9 @@ describe('§6.4 recovery', () => {
     const { w } = world();
     const p = w.sides[0].player;
     p.life = lifeCap(p);
-    p.leechLife = [50];
+    p.leech.life = [50];
     tickActor(w, p, DT);
-    expect(p.leechLife).toHaveLength(0);
+    expect(p.leech.life).toHaveLength(0);
   });
 
   it('life regeneration and ES recharge after the delay', () => {
@@ -79,7 +79,7 @@ describe('§6.4 recovery', () => {
     p.def = { ...p.def, lifeRegen: 10, maxEs: 100, esRecharge: 33.3, esDelay: 2 };
     p.life = 10;
     p.es = 0;
-    p.sinceDamaged = 0;
+    p.since.damaged = 0;
     tickActor(w, p, 1);
     expect(p.life).toBeCloseTo(20);
     expect(p.es).toBe(0);

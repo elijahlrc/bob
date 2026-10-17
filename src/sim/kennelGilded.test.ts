@@ -71,7 +71,7 @@ describe('leaps and charges', () => {
     const h = put(w, 'hound', 6);
     h.abT[0] = 0;
     run(w, 0.1);
-    expect(h.windT).toBeGreaterThan(0);
+    expect(h.dash.windT).toBeGreaterThan(0);
     expect(w.effects.some((e) => e.damage === 0 && e.kind === 'slam')).toBe(true);
     const x0 = h.x;
     run(w, 0.3);
@@ -85,11 +85,11 @@ describe('leaps and charges', () => {
     const near = put(w, 'hound', 1.5);
     near.abT[0] = 0;
     run(w, 0.2);
-    expect(near.windT).toBe(0);
+    expect(near.dash.windT).toBe(0);
     const far = put(w, 'hound', 12, 3);
     far.abT[0] = 0;
     run(w, 0.2);
-    expect(far.windT).toBe(0);
+    expect(far.dash.windT).toBe(0);
   });
 
   it('the Charging mod makes any monster rush', () => {
@@ -97,7 +97,7 @@ describe('leaps and charges', () => {
     const m = put(w, 'warrior', 8, 0, { rarity: 'magic', mods: ['charging' as MonsterModId] });
     m.abT[9] = 0;
     run(w, 0.15);
-    expect(m.windT).toBeGreaterThan(0);
+    expect(m.dash.windT).toBeGreaterThan(0);
     run(w, 1.2);
     expect(dist(m, w.sides[0].player)).toBeLessThan(2.5);
   });
@@ -111,8 +111,8 @@ describe('the Handler and the pack', () => {
     const near = put(w, 'hound', 12);
     const far = put(w, 'hound', 12, 25);
     run(w, 0.2);
-    expect(near.buffT).toBeGreaterThan(0);
-    expect(far.buffT).toBeLessThanOrEqual(0);
+    expect(near.choir.buffT).toBeGreaterThan(0);
+    expect(far.choir.buffT).toBeLessThanOrEqual(0);
   });
 
   it('a kiter backs away when you come close; a plain archer does not as soon', () => {
@@ -142,9 +142,9 @@ describe('the Gilded', () => {
     expect(before).toBeGreaterThan(0);
     const thief = put(w, 'cutpurse', 1);
     run(w, 3);
-    expect(thief.stolen).toBeGreaterThan(0);
+    expect(thief.theft.stolen).toBeGreaterThan(0);
     expect(flask.charges).toBeLessThan(before);
-    expect(thief.fleeT).toBeGreaterThan(0);
+    expect(thief.theft.fleeT).toBeGreaterThan(0);
     const away = dist(thief, w.sides[0].player);
     run(w, 1);
     expect(dist(thief, w.sides[0].player)).toBeGreaterThan(away - 0.5);
@@ -200,10 +200,10 @@ describe('the Gilded', () => {
       mods: ['flaskTaker' as MonsterModId, 'hobbling' as MonsterModId],
     });
     run(w, 4);
-    expect(m.stolen).toBeGreaterThan(0);
+    expect(m.theft.stolen).toBeGreaterThan(0);
     expect(flask.charges).toBeLessThan(before);
     expect(w.sides[0].player.ail.chill).toBeGreaterThan(0);
     // It does not run.
-    expect(m.fleeT).toBe(0);
+    expect(m.theft.fleeT).toBe(0);
   });
 });

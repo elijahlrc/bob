@@ -9,6 +9,7 @@ import {
 } from '../calc/deploy';
 import { levelValue } from '../calc/gems';
 import type { SkillProfile } from '../calc/skill';
+import { standIn } from './actor';
 import { actorById, fire, segmentDist } from './actions';
 import { SCATTER_RADIUS } from '../data/constants';
 import { flaskMask, playerConds, rawHit } from './combat';
@@ -293,7 +294,7 @@ function shoot(
   let prof = s.char.profile(c, playerConds(w, s, target), flaskMask(s));
   if (scale !== 1) prof = scaleProfile(prof, scale);
   const aim = areaAim(w, d, prof, target, crowd);
-  const from: Actor = Object.create(s.player) as Actor;
+  const from = standIn(s.player);
   from.x = d.x;
   from.y = d.y;
   const ax = aim?.x ?? target.x;
@@ -415,7 +416,7 @@ function detonate(
       const ang = w.rngTrig.float(0, Math.PI * 2);
       const r = rain.spread * Math.sqrt(w.rngTrig.float(0, 1));
       const spot = { x: d.x + Math.cos(ang) * r, y: d.y + Math.sin(ang) * r };
-      const from: Actor = Object.create(s.player) as Actor;
+      const from = standIn(s.player);
       from.x = d.x;
       from.y = d.y;
       const act: Action = {

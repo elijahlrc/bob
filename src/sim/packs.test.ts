@@ -71,14 +71,14 @@ describe('rhythms (docs/ROSTER.md 6.5)', () => {
     for (let i = 0; i < 6; i++) {
       startAction(w, m, 'monster', m.mon!.profile(0), w.sides[0].player);
       durations.push(m.action!.duration / base);
-      mults.push(m.patMult);
+      mults.push(m.rhythm.patMult);
       m.action = null;
     }
     const pat = MONSTER_TYPES.flagellant.pattern!;
     expect(durations.map((d) => +d.toFixed(3))).toEqual([...pat, ...pat].map((d) => +d.toFixed(3)));
     expect(mults).toEqual([...pat, ...pat]);
     // The damage follows the time.
-    m.patMult = pat[2];
+    m.rhythm.patMult = pat[2];
     expect(damageMult(m)).toBeCloseTo(pat[2], 5);
   });
 });
@@ -87,12 +87,12 @@ describe('phases (docs/ROSTER.md 6.5)', () => {
   it('a type enrages at a share of its life: faster, harder-hitting, and only once', () => {
     const w = arena();
     const m = put(w, 'flagellant', 14);
-    expect(m.enraged).toBe(false);
+    expect(m.rhythm.enraged).toBe(false);
     const s0 = speedMult(m);
     const d0 = damageMult(m);
     m.life = m.def.maxLife * 0.49;
     tickPhases(w, m);
-    expect(m.enraged).toBe(true);
+    expect(m.rhythm.enraged).toBe(true);
     expect(speedMult(m)).toBeGreaterThan(s0);
     expect(damageMult(m)).toBeGreaterThan(d0);
     expect(m.phaseMask).toBe(1);
@@ -103,14 +103,14 @@ describe('phases (docs/ROSTER.md 6.5)', () => {
     const hag = put(w, 'handler', 10);
     hag.life = hag.def.maxLife * 0.29;
     tickPhases(w, hag);
-    expect(hag.fleeT).toBeGreaterThan(3);
+    expect(hag.theft.fleeT).toBeGreaterThan(3);
     const d0 = Math.hypot(hag.x - w.sides[0].player.x, hag.y - w.sides[0].player.y);
     run(w, 2);
     expect(Math.hypot(hag.x - w.sides[0].player.x, hag.y - w.sides[0].player.y)).toBeGreaterThan(
       d0 + 1,
     );
     run(w, 5);
-    expect(hag.fleeT).toBeLessThanOrEqual(0);
+    expect(hag.theft.fleeT).toBeLessThanOrEqual(0);
   });
 
   it('a type can break into others at a share of its life', () => {
@@ -159,7 +159,7 @@ describe('packs that fight as packs (docs/ROSTER.md 6.7)', () => {
     const handler = put(w, 'handler', 12, 0, {}, 1);
     const hounds = [0, 1, 2].map((i) => put(w, 'hound', 13, i, {}, 1));
     killActor(w, handler);
-    for (const h of hounds) expect(h.buffT).toBeGreaterThan(0);
+    for (const h of hounds) expect(h.choir.buffT).toBeGreaterThan(0);
     const censer = put(w, 'censer', 12, 0, {}, 2);
     const flock = [0, 1, 2].map((i) => put(w, 'flagellant', 13, i, {}, 2));
     killActor(w, censer);
@@ -167,12 +167,12 @@ describe('packs that fight as packs (docs/ROSTER.md 6.7)', () => {
     const nest = put(w, 'nest', 12, 0, {}, 4);
     const swarm = [0, 1, 2].map((i) => put(w, 'gnawer', 13, i, {}, 4));
     killActor(w, nest);
-    for (const g of swarm) expect(g.fleeT).toBeGreaterThan(0);
+    for (const g of swarm) expect(g.theft.fleeT).toBeGreaterThan(0);
     // A pack of two has no one to rally: nothing happens.
     const lone = put(w, 'handler', 12, 0, {}, 5);
     const one = put(w, 'hound', 13, 0, {}, 5);
     killActor(w, lone);
-    expect(one.buffT).toBe(0);
+    expect(one.choir.buffT).toBe(0);
   });
 });
 
@@ -197,8 +197,8 @@ describe('mods that apply to every faction (docs/ROSTER.md 7.5)', () => {
     const w = arena();
     const m = put(w, 'warrior', 14, 0, rare(['mirrored']));
     stepWorld(w);
-    expect(m.mirrorId).not.toBe(0);
-    const twin = w.actors.find((a) => a.id === m.mirrorId)!;
+    expect(m.mirror.id).not.toBe(0);
+    const twin = w.actors.find((a) => a.id === m.mirror.id)!;
     expect(twin.mon!.spec.mods).not.toContain('mirrored');
     twin.life = twin.def.maxLife * 0.5;
     killActor(w, m);
@@ -208,7 +208,7 @@ describe('mods that apply to every faction (docs/ROSTER.md 7.5)', () => {
     const w2 = arena();
     const a = put(w2, 'warrior', 14, 0, rare(['mirrored']));
     stepWorld(w2);
-    const b = w2.actors.find((x) => x.id === a.mirrorId)!;
+    const b = w2.actors.find((x) => x.id === a.mirror.id)!;
     killActor(w2, a);
     run(w2, 1);
     killActor(w2, b);

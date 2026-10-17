@@ -108,19 +108,19 @@ type PlayerTest = (w: World, p: Actor) => boolean;
 const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
   onFullLife: (_w, p) => p.life >= lifeCap(p) - 0.5,
   onLowLife: (_w, p) => p.life <= p.def.maxLife * LOW_LIFE,
-  killedRecently: (_w, p) => p.tKill < RECENT,
-  critRecently: (_w, p) => p.tCrit < RECENT,
-  hitRecently: (_w, p) => p.tHit < RECENT,
-  usedFlaskRecently: (_w, p) => p.tFlask < RECENT,
+  killedRecently: (_w, p) => p.since.kill < RECENT,
+  critRecently: (_w, p) => p.since.crit < RECENT,
+  hitRecently: (_w, p) => p.since.hit < RECENT,
+  usedFlaskRecently: (_w, p) => p.since.flask < RECENT,
   flaskActive: (_w, p) => p.side!.flasks.some((f) => f.activeT > 0),
   dualWielding: (_w, p) => p.side!.char.dualWielding,
   holdingShield: (_w, p) => p.side!.char.holdingShield,
-  stunnedRecently: (_w, p) => p.tStunEnemy < RECENT,
-  overloadActive: (_w, p) => p.tOverload < OVERLOAD_TIME,
-  blockedRecently: (_w, p) => p.tBlock < RECENT,
-  beenHitRecently: (_w, p) => p.tBeenHit < RECENT,
-  leeching: (_w, p) => p.leechLife.length > 0,
-  leechingEs: (_w, p) => p.leechEs.length > 0,
+  stunnedRecently: (_w, p) => p.since.stunEnemy < RECENT,
+  overloadActive: (_w, p) => p.since.overload < OVERLOAD_TIME,
+  blockedRecently: (_w, p) => p.since.block < RECENT,
+  beenHitRecently: (_w, p) => p.since.beenHit < RECENT,
+  leeching: (_w, p) => p.leech.life.length > 0,
+  leechingEs: (_w, p) => p.leech.es.length > 0,
   esFull: (_w, p) => p.def.maxEs > 0 && p.es >= p.def.maxEs - 0.5,
   onLowMana: (_w, p) => p.mana <= Math.max(1, p.def.maxMana - reservedMana(p.side!)) * LOW_LIFE,
   cursed: (_w, p) => p.hexes.length > 0,
@@ -239,19 +239,19 @@ export function refreshPlayerDefence(w: World, s: Side): void {
 export function targetState(a: Actor): TargetState {
   // Brittle Doom lowers the three elemental resistances; Open Wounds adds physical vulnerability; exposure and the like add to them.
   const st = statusTaken(a);
-  const resShift = a.resShift.map((r, i) => r - a.hexRes[i] - st.res[i]);
+  const resShift = a.resShift.v.map((r, i) => r - a.hex.res[i] - st.res[i]);
   return {
     def: a.def,
     shock: a.ail.shock,
     resShift,
-    vuln: a.hexVuln,
-    vulnAll: a.hexVulnAll,
+    vuln: a.hex.vuln,
+    vulnAll: a.hex.vulnAll,
     vulnType: st.vulnType,
     blockLess: blockLessOf(a),
-    evasionLess: a.hexMore.evasion,
-    physRedLess: a.hexMore.physRed,
-    bleedChance: a.hexMore.bleedHit,
-    stunBonus: a.hexMore.stun,
+    evasionLess: a.hex.more.evasion,
+    physRedLess: a.hex.more.physRed,
+    bleedChance: a.hex.more.bleedHit,
+    stunBonus: a.hex.more.stun,
     es: a.es,
     poisons: a.ail.poisons.length,
   };
@@ -320,7 +320,7 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
   if (dst.isPlayer) notePools(dst.side!, esTaken, manaTaken, lifeDmg);
   dst.life -= lifeDmg;
   if (dst.life <= 0) dst.overkill = -dst.life;
-  dst.sinceDamaged = 0;
+  dst.since.damaged = 0;
   if (dst.isPlayer && dst.side!.opts.godMode && dst.life <= 0) dst.life = 1;
   if (dst.isPlayer) dst.side!.stats.damageTaken += total;
   else if (dst.team === 1) hunted(w, dst).side!.stats.damageDealt += total;
@@ -332,7 +332,7 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
 
 function addLeech(
   src: Actor,
-  list: 'leechLife' | 'leechMana' | 'leechEs',
+  list: 'life' | 'mana' | 'es',
   amount: number,
   instant: boolean,
 ): void {
@@ -340,19 +340,15 @@ function addLeech(
   amount = Math.min(
     amount,
     LEECH_INSTANCE_MAX *
-      (list === 'leechLife'
-        ? src.def.maxLife
-        : list === 'leechEs'
-          ? src.def.maxEs
-          : src.def.maxMana),
+      (list === 'life' ? src.def.maxLife : list === 'es' ? src.def.maxEs : src.def.maxMana),
   );
   if (instant) {
-    if (list === 'leechLife') src.life += amount;
-    else if (list === 'leechEs') src.es = Math.min(src.def.maxEs, src.es + amount);
+    if (list === 'life') src.life += amount;
+    else if (list === 'es') src.es = Math.min(src.def.maxEs, src.es + amount);
     else src.mana += amount;
     return;
   }
-  const arr = src[list];
+  const arr = src.leech[list];
   if (arr.length < 40) arr.push(amount);
 }
 
@@ -453,8 +449,13 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       res.total *= k;
     }
   }
-  if (src.modIds.includes('hexcaller') && dst.isPlayer && res.outcome === 'hit' && src.hexCd <= 0) {
-    src.hexCd = 4;
+  if (
+    src.modIds.includes('hexcaller') &&
+    dst.isPlayer &&
+    res.outcome === 'hit' &&
+    src.hex.cd <= 0
+  ) {
+    src.hex.cd = 4;
     hexPlayerAtRandom(w, dst.side!);
   }
   // A monster's modes change what the hit does to it: exposed, quenched, swollen, fed by fire (docs/ENCOUNTERS.md 6).
@@ -465,7 +466,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (res.outcome === 'block') {
     w.events.push({ t: 'block', src: src.id, dst: dst.id });
     if (how) noteMiss(w, dst, how, true);
-    dst.tBlock = 0;
+    dst.since.block = 0;
     if (dst.isPlayer) {
       rollCharges(w, dst.side!, 'block');
       rollGains(w, dst.side!, 'block');
@@ -503,8 +504,8 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   w.events.push({ t: 'hit', src: src.id, dst: dst.id, amount: res.total, crit: res.crit, dtype });
   if (how) noteHit(w, dst, how, res.total, res.crit);
   if (dst.isPlayer) logDamage(w, dst, src, src.name, dtype, res.total);
-  src.tHit = 0;
-  dst.tBeenHit = 0;
+  src.since.hit = 0;
+  dst.since.beenHit = 0;
   if (src.isPlayer) {
     rollGains(w, src.side!, 'hit', p.gains);
     rollCharges(w, src.side!, 'hit', p.gains);
@@ -518,12 +519,12 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     rollCharges(w, dst.side!, 'hitTaken');
   }
   if (res.crit) {
-    src.tCrit = 0;
+    src.since.crit = 0;
     if (src.isPlayer) {
       rollCharges(w, src.side!, 'crit', p.gains);
       rollGains(w, src.side!, 'crit', p.gains);
     }
-    if (p.overload) src.tOverload = 0;
+    if (p.overload) src.since.overload = 0;
   }
   // A carapace: no single hit takes more than a share of the monster's life (docs/ROSTER.md 6.2).
   const cap = dst.isPlayer ? undefined : dst.mon?.hitCap;
@@ -543,13 +544,13 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       lm += res.dmg[i] * p.leechMana[i];
     }
   if (src.def.leechToEs && instant) src.es = Math.min(src.def.maxEs, src.es + ll);
-  else addLeech(src, 'leechLife', ll, instant);
-  addLeech(src, 'leechMana', lm, instant);
+  else addLeech(src, 'life', ll, instant);
+  addLeech(src, 'mana', lm, instant);
   // Energy shield leeched from the damage (Energy Leech).
   let le = 0;
   if (!dst.def.cannotBeLeechedFrom)
     for (let i = 0; i < 5; i++) le += res.dmg[i] * (p.leechEs[i] ?? 0);
-  if (le > 0) addLeech(src, 'leechEs', le, instant);
+  if (le > 0) addLeech(src, 'es', le, instant);
   if (p.lifeOnHit > 0) src.life = Math.min(lifeCap(src), src.life + p.lifeOnHit);
   if (p.esOnHit > 0 && src.isPlayer) src.es = Math.min(src.def.maxEs, src.es + p.esOnHit);
   if (p.manaOnHit > 0 && src.isPlayer)
@@ -569,7 +570,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     if (src.isPlayer) {
       rollStatuses(w, dst, p, false, res);
       // Vulnerability: a chance to be maimed by an attack.
-      if (p.isAttack && dst.hexMore.maimHit > 0 && w.rngTrig.chance(dst.hexMore.maimHit))
+      if (p.isAttack && dst.hex.more.maimHit > 0 && w.rngTrig.chance(dst.hex.more.maimHit))
         applyStatus(w, dst, 'maim', { seconds: 4 });
     }
     payImpales(w, dst);
@@ -609,8 +610,8 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   };
   // Prismatic Balance: shift the target's elemental resistances.
   if (p.prismaticBalance) {
-    for (let i = 1; i <= 3; i++) dst.resShift[i] = res.dmg[i] > 0 ? 25 : -50;
-    dst.resShiftT = 5;
+    for (let i = 1; i <= 3; i++) dst.resShift.v[i] = res.dmg[i] > 0 ? 25 : -50;
+    dst.resShift.t = 5;
   }
   if (!wasAlive || !dst.alive) {
     afterHit();
@@ -666,7 +667,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (res.stun > 0 && !(dst.isPlayer && dst.side!.channel?.profile.skill.channel?.stunImmune)) {
     dst.stunT = res.stun;
     dst.action = null;
-    src.tStunEnemy = 0;
+    src.since.stunEnemy = 0;
     w.events.push({ t: 'stun', dst: dst.id, dur: res.stun });
     if (dst.isPlayer) fireTriggers(w, dst.side!, { on: 'stunned' });
     if (src.isPlayer) {
@@ -792,7 +793,7 @@ export function hit(
   let h = p.hands[Math.min(hand, p.hands.length - 1)];
   const ts = targetState(dst);
   // A blinded attacker misses more, and an enfeebled one is less accurate and crits less.
-  const hm = src.hexMore;
+  const hm = src.hex.more;
   ts.hitChanceMult = hitChanceFactor(src) * (1 - hm.acc * 0.5);
   // Consecrated ground makes hits against what stands on it crit twice as often.
   if (
@@ -859,8 +860,8 @@ function takeFlaskCharges(victim: Side, m: Actor, share: number): number {
   if (!best) return 0;
   const take = Math.min(best.charges, best.spec.maxCharges * share);
   best.charges -= take;
-  m.stolen += take;
-  m.stolenFlask = best.spec.uid;
+  m.theft.stolen += take;
+  m.theft.stolenFlask = best.spec.uid;
   return take;
 }
 
@@ -870,7 +871,7 @@ function onMonsterHitPlayer(w: World, src: Actor, dst: Actor, prof: SkillProfile
   if (steal || src.modIds.includes('flaskTaker') || src.modIds.includes('treasurer')) {
     const got = takeFlaskCharges(dst.side!, src, steal?.amount ?? 0.2);
     // A thief runs with what it took.
-    if (steal && got > 0) src.fleeT = 5;
+    if (steal && got > 0) src.theft.fleeT = 5;
   }
   const debuff = prof.skill.debuff;
   const hobbles = src.modIds.includes('hobbling') || src.mon?.kind.hobbles || debuff === 'hobble';
@@ -967,13 +968,13 @@ export function rawHit(
       const red = Math.min(0.9, def.armour / (def.armour + 10 * dmg[0]) + def.physReduction);
       dmg[0] *= 1 - red;
     } else {
-      const shift = dst.resShift[i] - dst.hexRes[i] - st.res[i];
+      const shift = dst.resShift.v[i] - dst.hex.res[i] - st.res[i];
       const r = Math.max(-200, Math.min(def.res[i] + shift, def.maxRes[i]));
       dmg[i] *= 1 - r / 100;
     }
     dmg[i] *= taken * def.damageTakenType[i];
-    if (i === 0) dmg[i] *= 1 + dst.hexVuln;
-    dmg[i] *= (1 + dst.hexVulnAll) * (1 + st.vulnType[i]);
+    if (i === 0) dmg[i] *= 1 + dst.hex.vuln;
+    dmg[i] *= (1 + dst.hex.vulnAll) * (1 + st.vulnType[i]);
   }
   const total = dmg[0] + dmg[1] + dmg[2] + dmg[3] + dmg[4];
   w.events.push({ t: 'hit', src: 0, dst: dst.id, amount: total, crit: false, dtype: type });
@@ -1065,7 +1066,7 @@ export function killActor(w: World, a: Actor): void {
   const p = fs.player;
   if (!a.noReward) {
     fs.stats.kills++;
-    p.tKill = 0;
+    p.since.kill = 0;
     const xp =
       (a.mon?.xp ?? 0) * levelPenalty(fs.build.level, a.mon?.spec.level ?? 1) * w.plan.xpMult;
     fs.xp += xp;
@@ -1190,32 +1191,32 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   const ail = a.ail;
   const def = a.def;
   // Timers.
-  a.tKill += dt;
-  a.tCrit += dt;
-  a.tHit += dt;
-  a.tFlask += dt;
-  a.tStunEnemy += dt;
-  a.tBlock += dt;
-  a.tBeenHit += dt;
-  a.tOverload += dt;
-  a.sinceDamaged += dt;
+  a.since.kill += dt;
+  a.since.crit += dt;
+  a.since.hit += dt;
+  a.since.flask += dt;
+  a.since.stunEnemy += dt;
+  a.since.block += dt;
+  a.since.beenHit += dt;
+  a.since.overload += dt;
+  a.since.damaged += dt;
   tickHexes(a, dt);
   tickStatuses(a, dt);
   // A stun opens a curled beetle.
   if (a.curlT > 0) a.curlT = a.stunT > 0 ? 0 : a.curlT - dt;
-  if (a.buffT > 0) a.buffT -= dt;
+  if (a.choir.buffT > 0) a.choir.buffT -= dt;
   if (a.suppressT > 0) a.suppressT -= dt;
-  if (a.zealT > 0) a.zealT -= dt;
-  if (a.hexCd > 0) a.hexCd -= dt;
+  if (a.choir.zealT > 0) a.choir.zealT -= dt;
+  if (a.hex.cd > 0) a.hex.cd -= dt;
   // A beetle counts down the wait before it can curl up again (nothing else uses its faction timer).
   if (a.skillT > 0 && a.mon?.spec.type === 'beetle') a.skillT -= dt;
-  if (a.fervourT > 0) {
-    a.fervourT -= dt;
-    if (a.fervourT <= 0) a.fervour = 0;
+  if (a.choir.fervourT > 0) {
+    a.choir.fervourT -= dt;
+    if (a.choir.fervourT <= 0) a.choir.fervour = 0;
   }
-  if (a.resShiftT > 0) {
-    a.resShiftT -= dt;
-    if (a.resShiftT <= 0) a.resShift.fill(0);
+  if (a.resShift.t > 0) {
+    a.resShift.t -= dt;
+    if (a.resShift.t <= 0) a.resShift.v.fill(0);
   }
   if (a.stunT > 0) {
     a.stunT -= dt;
@@ -1235,7 +1236,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   }
   // Damage over time. Temporal Chains lets effects on a cursed enemy run out more slowly; Vulnerability and Despair raise what they deal.
   const taken = def.damageTakenMult * shockTaken(def, ail.shock);
-  const hm = a.hexMore;
+  const hm = a.hex.more;
   const dtDot = dt * (1 - hm.expireSlow);
   let dotPhys = 0;
   let dotFire = 0;
@@ -1328,7 +1329,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     const manaCap = Math.max(0, def.maxMana - reservedMana(a.side!));
     a.mana = Math.min(manaCap, a.mana + def.manaRegen * dt);
     leechTick(
-      a.leechMana,
+      a.leech.mana,
       (x) => (a.mana = Math.min(manaCap, a.mana + x)),
       def.maxMana,
       dt,
@@ -1339,7 +1340,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   if (suppressed) return;
   if (def.leechToEs)
     leechTick(
-      a.leechLife,
+      a.leech.life,
       (x) => (a.es = Math.min(def.maxEs, a.es + x)),
       def.maxLife,
       dt,
@@ -1348,16 +1349,16 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     );
   else
     leechTick(
-      a.leechLife,
+      a.leech.life,
       (x) => (a.life = Math.min(cap, a.life + x)),
       def.maxLife,
       dt,
       a.life >= cap,
       def.leechRate,
     );
-  if (a.leechEs.length > 0)
+  if (a.leech.es.length > 0)
     leechTick(
-      a.leechEs,
+      a.leech.es,
       (x) => (a.es = Math.min(def.maxEs, a.es + x)),
       def.maxEs,
       dt,
@@ -1366,7 +1367,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     );
   if (def.esRegen > 0 && a.es < def.maxEs) a.es = Math.min(def.maxEs, a.es + def.esRegen * dt);
   // ES recharge.
-  if (def.maxEs > 0 && a.es < def.maxEs && a.sinceDamaged >= def.esDelay)
+  if (def.maxEs > 0 && a.es < def.maxEs && a.since.damaged >= def.esDelay)
     a.es = Math.min(def.maxEs, a.es + def.esRecharge * dt);
 }
 

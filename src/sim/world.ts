@@ -328,7 +328,7 @@ export function createWorld(inp: CreateWorldInput): World {
     const a = spawnMonster(w, s.spec, s.x, s.y, s.room, s.pack, s.name);
     // A Stalker Cat lies in wait wherever it is; a pack that is an Ambush does so as a whole.
     if (s.hold || abilitiesOf(s.spec.type).some((x) => x.id === 'ambush')) a.hold = true;
-    if (s.patrol) a.patrol = s.patrol.map((p) => ({ ...p }));
+    if (s.patrol) a.patrol = { points: s.patrol.map((p) => ({ ...p })), i: 1 };
   }
   seedCharacters(side);
   return w;
@@ -385,7 +385,7 @@ function useFlask(w: World, side: Side, i: number): void {
   }
   f.charges -= s.perUse;
   f.uses++;
-  p.tFlask = 0;
+  p.since.flask = 0;
   if (s.removeIgnite) p.ail.ignites.length = 0;
   if (s.removeBleed) p.ail.bleeds.length = 0;
   if (s.removeFreeze) {
@@ -549,7 +549,7 @@ function tickMonsterMods(w: World, m: Actor, dt: number): void {
       });
     }
   }
-  if (m.modIds.includes('mirrored') && m.mirrorId === 0) {
+  if (m.modIds.includes('mirrored') && m.mirror.id === 0) {
     // The twin stands some way off, with everything but the mirror.
     const spec = m.mon!.spec;
     // Six tiles off at the first angle that is open floor in sight of it (six tiles can be a wall or another room).
@@ -574,15 +574,15 @@ function tickMonsterMods(w: World, m: Actor, dt: number): void {
       m.name,
     );
     twin.state = 'chase';
-    twin.mirrorId = m.id;
-    m.mirrorId = twin.id;
+    twin.mirror.id = m.id;
+    m.mirror.id = twin.id;
   }
-  if (m.mirrorT > 0) {
-    m.mirrorT -= dt;
+  if (m.mirror.t > 0) {
+    m.mirror.t -= dt;
     // The twin did not follow in time: the survivor is made whole, and the pair is no more.
-    if (m.mirrorT <= 0) {
+    if (m.mirror.t <= 0) {
       m.life = m.def.maxLife;
-      m.mirrorId = 0;
+      m.mirror.id = 0;
     }
   }
   if (m.modIds.includes('raiser')) {

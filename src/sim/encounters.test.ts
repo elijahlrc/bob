@@ -185,7 +185,12 @@ describe('windows (docs/ENCOUNTERS.md 5)', () => {
     expect(m.life).toBe(life);
     expect(w.events.some((e) => e.t === 'block' && e.dst === m.id)).toBe(true);
     // From behind the shield, the same blow lands.
-    const back = { ...p, x: m.x + (m.x - p.x), y: m.y + (m.y - p.y) } as Actor;
+    const back = {
+      ...p,
+      since: { ...p.since },
+      x: m.x + (m.x - p.x),
+      y: m.y + (m.y - p.y),
+    } as Actor;
     for (let i = 0; i < 5; i++) hit(w, back, m, prof, 0, 1);
     expect(m.life).toBeLessThan(life);
   });

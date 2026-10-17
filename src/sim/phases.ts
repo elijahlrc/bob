@@ -15,10 +15,10 @@ export function tickPhases(w: World, m: Actor): void {
     m.phaseMask |= 1 << i;
     switch (p.do) {
       case 'enrage':
-        m.enraged = true;
+        m.rhythm.enraged = true;
         break;
       case 'flee':
-        m.fleeT = Math.max(m.fleeT, p.seconds ?? 4);
+        m.theft.fleeT = Math.max(m.theft.fleeT, p.seconds ?? 4);
         break;
       case 'split':
         for (let k = 0; k < (p.count ?? 3); k++) if (p.into) spawnBeside(w, m, p.into, 0.9);
