@@ -576,9 +576,10 @@ differences and findings:
   `DUEL_MAX_TIME` 90 s and the stall `DUEL_STALL_TIME` 15 s without either character's `stats.damageTaken` rising (what the side
   already counts, after a shell has taken its share; damage to a minion does not count, so two summoners whose minions fight each
   other for 15 s with no blow on either character is a stall). `duelResult(w, end)` takes how a fight with both alive ended; both dead
-  in one tick is still a draw by death. **The stall rule fired in 2 of the ~6,000 fights of the sweep, the cap in all the other
-  draws.** The two were one pair at two maps (a Mystic and a Zealot of the bot's seed 5 at maps 10 and 15, both with Twin Cut and
-  summoned minions): both characters at full life, their minions fighting each other, 2.5 tiles apart.
+  in one tick is still a draw by death. **The stall rule fired in 2 of the 3,084 fights of each scale of the sweep (the same two
+  at every scale, both in the default pool), the cap in all the other draws.** The two were one pair at two maps (a Mystic and a Zealot of
+  the bot's seed 5 at maps 10 and 15, both with Twin Cut and summoned minions): both characters at full life, their minions fighting each
+  other, 2.5 tiles apart.
 - **The order** (`World.order`, `sidesInOrder` in `world.ts`): `stepWorld`'s 31 per-side loops iterate `w.order`, which is `w.sides` when
   `tick + World.orderPhase` is even and the sides reversed (one cached array) when it is odd; the actor loop takes the characters
   (the first entries of `w.actors`) through it and the monsters as before; a one-side world's `order` is always `w.sides` (a test).
@@ -628,8 +629,9 @@ differences and findings:
   The two orders of a pair agree on the winner in 66 of 66 and 44 of 45 pairs after the seed's parity and the ring (62 of 66 and 39 of 45
   in F3, 64 of 66 and 42 of 45 after items 4 and 5). **What targeting the minions did to the ×1 matrix:** the fights are longer (median
   5.2 to 6.2 s, third quartile 7.8 to 9.5 s, longest 28.1 to 32.4 s) and the west share is unchanged; a summoner's screen now holds a
-  melee character for a while instead of being walked past. The symmetric starters: side 0 won 28, 27 and 34 of 60 for the Vanguard,
-  Strider and Mystic starters and 13 of 30 for two Bonewalker summoners, with no draw (a Zealot starter pair has 4 draws of 60 at ×0.3).
+  melee character for a while instead of being walked past. The symmetric starters at ×0.3: side 0 won 28, 27, 34, 36, 31 and 23 of 60 for
+  the Vanguard, Strider, Mystic, Reaver, Zealot and Shade starters (the Zealot pair drew 4, the others none) and 13 of 30 for two Bonewalker
+  summoners, all inside the 3 standard deviations; the test keeps the first three and the summoners, for its cost.
 
 - **The sweep** (`npx tsx scripts/ladder-probe.ts --real --scale 1,0.5,0.4,0.35,0.3,0.25,0.2,0.15 --duel 20,40 --load legacy.json`
   and `--duel 5,10,15,20 --load default.json`; the snapshots are the probe's `--save` of 12 bot runs of the legacy difficulty to map 40 and
@@ -689,6 +691,9 @@ differences and findings:
   - _A side's damage numbers are what landed:_ the ledger, the recap, the damage log and `lifeLeft` carry the scaled damage, and a hit
     on a character that the sheet calls 100 reads 30 in them. The result screen can say "damage ×0.3" once.
   - _The exit_ is kept shut by `noExit`; the scene should not draw one in a duel arena.
+  - _Scaled twice:_ a Molten Shell's burst is of what the shell took, which is scaled damage, and is scaled again when it lands (×0.09
+    of the unscaled, against ×0.3 for a hit); the share a character reflects was made once (above), the shell was not. A decision for
+    the owner whether the shell should count the unscaled damage.
   - _Unscaled things:_ a minion's damage taken, stun, the magnitudes of ailments, regeneration, the rate leech is recovered at (the
     leech itself is of the scaled hit), flasks. The long fights favour builds that sustain, and a minion build whose minions die 3.3 times sooner,
     relatively; none of it was measured apart.
