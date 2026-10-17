@@ -234,7 +234,8 @@ describe('gem placement', () => {
         const all = placementsFor(run, g.uid);
         const empties = all.filter((p) => !p.replaces);
         const pool = empties.length ? empties : all;
-        const want = [...pool].sort((a, b) => b.scorePct - a.scorePct)[0];
+        // Among equal scores a socket where the gem does something comes first (one that says why it does nothing is last).
+        const want = [...pool].sort((a, b) => b.scorePct - a.scorePct || +!!a.idle - +!!b.idle)[0];
         expect(bestPlacement(run, g.uid)).toEqual(want);
       }
     });

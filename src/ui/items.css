@@ -506,6 +506,62 @@
   outline-offset: 3px;
   border-radius: var(--radius);
 }
+.ix-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ix-prow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 4px 8px;
+  box-sizing: border-box;
+  text-align: left;
+  color: inherit;
+  background: #15131a;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.ix-prow.best {
+  border-color: #60e070;
+}
+.ix-prow.on {
+  outline: 2px solid var(--hi);
+}
+.ix-prow .m {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+}
+.ix-prow .m small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+}
+.ix-prow-b {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: flex-end;
+}
+.ix-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  font-size: 13px;
+  background: #33260f;
+  border-left: 3px solid #e0b040;
+  border-radius: 0 6px 6px 0;
+}
+.ix-confirm-b {
+  display: flex;
+  gap: 4px;
+}
 .ic-sockets {
   display: flex;
   align-items: center;
@@ -1049,4 +1105,44 @@
 /* A weapon's or armour piece's numbers after its own mods, set apart from the base's. */
 .ic-aug {
   color: #9ab8ff;
+}
+
+/* ---- The Skills tab (docs/EQUIP.md 3.6) ---- */
+.socket-item-name,
+.socket-item-n {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.socket-item-n {
+  font-size: 11px;
+}
+.socket-none {
+  font-size: 12px;
+}
+.socket.pend {
+  outline: 2px solid var(--hi);
+}
+.skills-help {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+}
+.gem-chip-b {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.ix-prow .ix-pips {
+  min-width: 56px;
+}
+.gem-sheet .ix-confirm {
+  margin: 0 0 8px;
 }

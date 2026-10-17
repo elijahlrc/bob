@@ -10,6 +10,7 @@ import {
   equipFlask,
   putBack,
   slotsFor,
+  socketGem,
   unequip,
   unequipFlask,
 } from '../run/inventory';
@@ -21,6 +22,7 @@ import {
   junkItems,
   quickEquip,
   searchText,
+  type SocketRef,
   slotName,
   sortItems,
   type SortKey,
@@ -254,6 +256,19 @@ export function Items({
       setSel(null);
     });
   };
+  /** Put a bag gem in a chosen socket; a gem that was there goes to the bag, and the status line has Undo. */
+  const socketAt = (uid: number, ref: SocketRef) => {
+    const gem = run.inventory.find((x) => x.uid === uid);
+    const old = run.build.equipment[ref.slot]?.sockets[ref.socket];
+    if (gem?.kind !== 'gem') return;
+    const r = c.act((rn) => socketGem(rn, ref.slot, ref.socket, uid));
+    if (!r) return say('That did not work.', false);
+    say(
+      `Socketed ${itemTitle(gem)} in ${slotName(ref.slot)}.` +
+        (old ? ` ${gemDef(old.gemId).name} is in the bag.` : ''),
+    );
+    setSel(null);
+  };
   const unequipSlot = (slot: EquipSlot) => {
     const it = run.build.equipment[slot];
     c.act((r) => unequip(r, slot));
@@ -453,6 +468,7 @@ export function Items({
           onPutBack={doPutBack}
           onDiscard={(uid) => void doDiscard(uid)}
           onSocket={doQuick}
+          onSocketAt={socketAt}
           onCraft={(uid) => onCraft?.(uid)}
           onEditGems={onEditGems}
           onClose={() => setSel(null)}

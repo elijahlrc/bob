@@ -19,6 +19,8 @@ import {
 
 import { useViewport } from './device';
 import { GemCard, GemTip } from './GemCard';
+import { Badge } from './SocketPicker';
+import { SocketPips } from './SocketPips';
 import { gemCardData } from './gemText';
 import { loadPref, savePref } from './prefs';
 
@@ -33,25 +35,6 @@ function groupOfGem(d: GemDef): (typeof GEM_GROUPS)[number] {
 
 type Sel = { from: 'inv'; uid: number } | ({ from: 'socket' } & SocketRef);
 type Drag = { from: 'inv'; uid: number } | ({ from: 'socket' } & SocketRef);
-
-function Badge({ p }: { p: Pick<Placement, 'dpsPct' | 'ehpPct' | 'scorePct'> }) {
-  const parts: [string, number][] = [
-    ['DPS', p.dpsPct],
-    ['EHP', p.ehpPct],
-  ];
-  const shown = parts.filter(([, v]) => Math.abs(v) >= 0.5);
-  if (shown.length === 0) return <span class="badge neutral">no change</span>;
-  return (
-    <>
-      {shown.map(([l, v]) => (
-        <span key={l} class={'badge ' + (v > 0 ? 'up' : 'down')}>
-          {v > 0 ? '▲' : '▼'}
-          {Math.abs(Math.round(v))}% {l}
-        </span>
-      ))}
-    </>
-  );
-}
 
 /** How long the badges are worked on at a time before the screen gets its turn, in milliseconds. */
 const BADGE_SLICE_MS = 8;
@@ -76,6 +59,11 @@ export function Skills({
   const [drag, setDrag] = useState<Drag | null>(null);
   const [over, setOver] = useState<string | null>(null);
   const [msg, setMsg] = useState('');
+  // A gem from the bag picked, and the socket that holds a gem it would replace: read before committing (docs/EQUIP.md 3.6).
+  const [pending, setPending] = useState<SocketRef | null>(null);
+  const [hint, setHint] = useState(() => !loadPref<boolean>('skills.hintSeen', false));
+  useEffect(() => savePref('skills.hintSeen', true), []);
+  useEffect(() => setPending(null), [sel]);
   useEffect(() => {
     if (focusSlot)
       document.querySelector(`[data-slot="${focusSlot}"]`)?.scrollIntoView({ block: 'center' });
@@ -167,6 +155,7 @@ export function Skills({
       if (!ok && !sameSocket(from, to)) setMsg('Cannot move the gem there');
     }
     setSel(null);
+    setPending(null);
     setDrag(null);
     setOver(null);
   };
@@ -179,6 +168,8 @@ export function Skills({
   const onSocketClick = (ref: SocketRef) => {
     if (sel) {
       if (sel.from === 'socket' && sameSocket(sel, ref)) setSel(null);
+      else if (sel.from === 'inv' && run.build.equipment[ref.slot]!.sockets[ref.socket])
+        setPending(pending && sameSocket(pending, ref) ? null : ref);
       else place(ref, sel);
     } else {
       const g = run.build.equipment[ref.slot]!.sockets[ref.socket];
@@ -197,12 +188,56 @@ export function Skills({
     const g = run.build.equipment[sel.slot]?.sockets[sel.socket];
     return g ? { gemId: g.gemId, level: levelOf(g.uid), uid: g.uid } : null;
   })();
+  // Worn items with no socket at all: named once, so a missing row is not a mystery.
+  const notSocketable = EQUIP_SLOTS.filter((slot) => {
+    const it = run.build.equipment[slot];
+    return it && it.sockets.length === 0;
+  }).map(slotLabel);
+  // What replacing the gem in the picked socket would do, said before it is done.
+  const replaced = pending ? run.build.equipment[pending.slot]?.sockets[pending.socket] : null;
+  const confirm =
+    pending && replaced && sel?.from === 'inv' && selGem ? (
+      <div class="ix-confirm" role="status">
+        <div>
+          Replace <b>{gemDef(replaced.gemId).name}</b>
+          {ch.primary.gemUid === replaced.uid ? ', your primary skill' : ''} with{' '}
+          <b>{gemDef(selGem.gemId).name}</b>? It goes to the bag.
+        </div>
+        {placements.get(`${pending.slot}:${pending.socket}`) && (
+          <div class="ix-confirm-b">
+            <Badge p={placements.get(`${pending.slot}:${pending.socket}`)!} />
+          </div>
+        )}
+        {gemStatus(ch, replaced.uid, gemDef(replaced.gemId)) && (
+          <div class="muted">
+            {gemDef(replaced.gemId).name}:{' '}
+            {gemStatus(ch, replaced.uid, gemDef(replaced.gemId))!.text}
+          </div>
+        )}
+        <div class="item-actions">
+          <button class="btn small primary" onClick={() => place(pending, sel)}>
+            Replace {gemDef(replaced.gemId).name}
+          </button>
+          <button class="btn small" onClick={() => setPending(null)}>
+            Cancel
+          </button>
+        </div>
+      </div>
+    ) : null;
   const summary = ch.mainSheet();
   const secondary = ch.secondarySheets();
   return (
     <div class="skills-wrap">
       <div class="skills">
         <div class="skill-summary">
+          <button
+            class="link skills-help"
+            aria-label="How this works"
+            aria-expanded={hint}
+            onClick={() => setHint(!hint)}
+          >
+            ?
+          </button>{' '}
           <b>{summary.name}</b>
           {summary.isDefault ? ' (default attack)' : ''}
           <span class="muted">
@@ -225,14 +260,16 @@ export function Skills({
               .join(' · ')}
           </div>
         )}
-        <p class="muted hint">
-          Every skill you have equipped is used: the ★ primary is the main skill, used over and
-          over, and every other active skill is used every so often. The Strategy tab sets what each
-          skill is for, when it is used and in what order. Every socket on an item is linked.{' '}
-          {coarse
-            ? 'Tap a gem, then a socket. Tap a placed gem for its options. ★ sets the primary skill.'
-            : 'Click a gem, then a socket — or drag gems onto sockets (drop on the gem list to remove). Double-click a gem to auto-place or remove it. ★ sets the primary skill.'}
-        </p>
+        {hint && (
+          <p class="muted hint">
+            Every skill you have equipped is used: the ★ primary is the main skill, used over and
+            over, and every other active skill is used every so often. The Strategy tab sets what
+            each skill is for, when it is used and in what order. Every socket on an item is linked.{' '}
+            {coarse
+              ? 'Tap a gem, then a socket. Tap a placed gem for its options. ★ sets the primary skill.'
+              : 'Click a gem, then a socket — or drag gems onto sockets (drop on the gem list to remove). Double-click a gem to auto-place or remove it. ★ sets the primary skill.'}
+          </p>
+        )}
         {EQUIP_SLOTS.map((slot) => {
           const it = run.build.equipment[slot];
           if (!it || it.sockets.length === 0) return null;
@@ -244,7 +281,15 @@ export function Skills({
             >
               <div class="socket-item">
                 <div class="muted">{slotLabel(slot)}</div>
-                <div>{it.name}</div>
+                <div class="socket-item-name">{it.name}</div>
+                <div class="socket-item-n muted">
+                  <SocketPips
+                    sockets={it.sockets}
+                    primary={ch.primary.gemUid ?? undefined}
+                    size="sm"
+                  />{' '}
+                  {it.sockets.length} linked
+                </div>
               </div>
               {it.sockets.map((g, i) => {
                 const ref: SocketRef = { slot, socket: i };
@@ -285,7 +330,7 @@ export function Skills({
                     key={i}
                     class={`socket ${d.kind}${primary ? ' primary' : ''}${isSel ? ' sel' : ''}${
                       p ? ' target' : ''
-                    }${dropHere ? ' drop' : ''}`}
+                    }${pending && sameSocket(pending, ref) ? ' pend' : ''}${dropHere ? ' drop' : ''}`}
                     draggable={!coarse}
                     onDragStart={() => setDrag({ from: 'socket', ...ref })}
                     onDragEnd={() => {
@@ -303,7 +348,7 @@ export function Skills({
                       {d.name} <span class="muted">L{levelOf(g.uid)}</span>
                       {p && (
                         <div>
-                          <Badge p={p} /> <span class="muted">replaces</span>
+                          <Badge p={p} /> <span class="muted">if you replace it</span>
                         </div>
                       )}
                       {active && !active.usable && <div class="warn">{active.reason}</div>}
@@ -338,9 +383,13 @@ export function Skills({
             </div>
           );
         })}
+        {notSocketable.length > 0 && (
+          <div class="muted socket-none">Not socketable: {notSocketable.join(', ')}</div>
+        )}
         {ch.primary.gemUid === null && (
           <div class="warn">No usable active skill: using the default attack.</div>
         )}
+        {!coarse && confirm}
         {msg && <div class="warn">{msg}</div>}
       </div>
       <div
@@ -411,7 +460,19 @@ export function Skills({
                     }}
                   >
                     <span>{d.name}</span>
-                    {b && <Badge p={b} />}
+                    {b && (
+                      <span class="gem-chip-b">
+                        <Badge
+                          p={{
+                            ...b,
+                            idle: b.idle?.replace('on this item', 'on one of your items'),
+                          }}
+                        />
+                        {(Math.abs(b.dpsPct) >= 0.5 || Math.abs(b.ehpPct) >= 0.5) && (
+                          <span class="muted">→ {slotLabel(b.slot)}</span>
+                        )}
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -425,6 +486,7 @@ export function Skills({
           <button class="sheet-x" aria-label="Close" onClick={() => setSel(null)}>
             ×
           </button>
+          {confirm}
           <GemCard gemId={selGem.gemId} level={selGem.level} />
           <div class="item-actions">
             {sel.from === 'inv' ? (

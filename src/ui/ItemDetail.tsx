@@ -11,6 +11,7 @@ import {
   compareFlasks,
   compareSlots,
   slotName,
+  type SocketRef,
   type FlaskCompare,
   type ItemInfo,
   type SlotCompare,
@@ -21,6 +22,7 @@ import { ItemCard, itemTitle, lineMarks, rarityClass } from './ItemCard';
 import { DiffCard, DiffLines } from './DiffCard';
 import { diffRows, type DiffRow } from './itemDiff';
 import { SocketPips, SocketsRow } from './SocketPips';
+import { SocketPicker } from './SocketPicker';
 
 export type Sel =
   | { from: 'inv'; uid: number }
@@ -87,6 +89,8 @@ type Actions = {
   onDiscard: (uid: number) => void;
   onPutBack: (uid: number) => void;
   onSocket: (uid: number) => void;
+  /** Put this gem in that socket. */
+  onSocketAt: (uid: number, ref: SocketRef) => void;
   onCraft: (uid: number) => void;
   /** Open the Skills tab at this slot's sockets. */
   onEditGems?: (slot: EquipSlot) => void;
@@ -650,17 +654,25 @@ export function ItemDetail(p: Props) {
         )}
         {inBag && selected.kind === 'gem' && (
           <>
-            <ItemCard it={selected} build={run.build} />
-            <div class="item-actions ix-actions">
-              <button class="btn primary" onClick={() => a.onSocket(selected.uid)}>
-                Socket (best free socket)
-              </button>
-              <button class="btn small" onClick={() => a.onFavourite(selected.uid)}>
-                {p.favourite ? '★ Favourite' : '☆ Favourite'}
-              </button>
-              <DiscardButton it={selected} a={a} />
-            </div>
-            <div class="ix-note">Choose which socket on the Skills tab.</div>
+            {!p.phone && <ItemCard it={selected} build={run.build} />}
+            <SocketPicker
+              run={run}
+              gemUid={selected.uid}
+              onPlace={(ref) => a.onSocketAt(selected.uid, ref)}
+            />
+            {p.phone && full && <ItemCard it={selected} build={run.build} />}
+            <ActionRow
+              swap="Socket"
+              title="Into the place it helps most"
+              disabled={false}
+              onSwap={() => a.onSocket(selected.uid)}
+              a={a}
+              it={selected}
+              favourite={p.favourite}
+              phone={p.phone}
+              full={full}
+              setFull={setFull}
+            />
           </>
         )}
         {!inBag && (

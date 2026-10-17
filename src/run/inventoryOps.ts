@@ -309,6 +309,8 @@ export type Placement = SocketRef & {
   scorePct: number;
   /** The gem currently there (it would return to the inventory). */
   replaces?: string;
+  /** Why the gem would do nothing there, when the reason is that its item has no skill for it to support ("needs a melee skill on this item"). */
+  idle?: string;
 };
 
 /**
@@ -358,7 +360,18 @@ export function placementsFor(
     const replaces = cur ? gemDef(cur.gemId).name : undefined;
     // A support in an empty socket of an item with no skill to support changes nothing: no need to work the sheet out.
     if (kind === 'support' && !cur && !hasActiveSkill(it)) {
-      out.push({ slot, socket, dpsPct: 0, ehpPct: 0, scorePct: 0, replaces });
+      const def = gemDef(gem.gemId);
+      const needs =
+        def.kind === 'support' && def.supports.length ? def.supports.join(' or ') : 'an active';
+      out.push({
+        slot,
+        socket,
+        dpsPct: 0,
+        ehpPct: 0,
+        scorePct: 0,
+        replaces,
+        idle: `needs ${needs === 'an active' ? needs : 'a ' + needs} skill on this item`,
+      });
       continue;
     }
     const sockets = [...it.sockets];
@@ -396,7 +409,7 @@ export function bestPlacement(
   const ps = placementsFor(run, gemUid, { base, emptiesFirst: true });
   const empties = ps.filter((p) => !p.replaces);
   const pool = empties.length ? empties : ps;
-  return pool.sort((a, b) => b.scorePct - a.scorePct)[0] ?? null;
+  return pool.sort((a, b) => b.scorePct - a.scorePct || +!!a.idle - +!!b.idle)[0] ?? null;
 }
 
 /** Put a gem in the empty socket where it helps most (ties: the item with the most sockets). */

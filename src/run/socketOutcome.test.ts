@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { makeGem, makeItem } from '../gen/items';
 import type { GemItem, Item } from '../data/types';
 import { dryEquip, equip, socketGem } from './inventory';
-import { compareSlots, itemInfos } from './inventoryOps';
+import { compareSlots, itemInfos, placementsFor } from './inventoryOps';
 import { newRun } from './run';
 
 /** A run with no gems anywhere, at level 30 so most bases fit, and helpers to build gear for it. */
@@ -207,5 +207,21 @@ describe('socketing over the primary skill', () => {
     expect(run.build.primaryGem).toBe(primary.uid);
     expect(run.inventory.some((x) => x.uid === primary.uid)).toBe(true);
     expect(run.build.equipment.body!.sockets[1]!.uid).toBe(other.uid);
+  });
+});
+
+describe('placements say why a support has nowhere to work', () => {
+  it('an item with no skill gives the reason, and one with a skill does not', () => {
+    const { run, uid, wearBody, gems } = setup();
+    wearBody(3, ['flameBolt']);
+    const helmet = makeItem(uid, 'helmet_ar_1', 30, 2);
+    run.build.equipment.helmet = helmet;
+    const [support] = gems(['echoingCast']);
+    run.inventory.push(support);
+    const ps = placementsFor(run, support.uid, { emptiesFirst: true });
+    const onHelmet = ps.find((p) => p.slot === 'helmet')!;
+    const onBody = ps.find((p) => p.slot === 'body')!;
+    expect(onHelmet.idle).toMatch(/^needs an? .*skill on this item$/);
+    expect(onBody.idle).toBeUndefined();
   });
 });
