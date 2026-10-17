@@ -2,6 +2,7 @@ import type { SkillChoice } from '../calc/character';
 import { levelValue } from '../calc/gems';
 import { spendCharges } from './charges';
 import type { World } from './types';
+import { livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /**
@@ -66,9 +67,8 @@ function recoverRate(w: World, s: Side, c: SkillChoice): number {
   if (!r) return 1;
   const p = s.player;
   let more = 0;
-  for (const e of w.actors) {
-    if (e.team === s.team || !e.alive || Math.hypot(e.x - p.x, e.y - p.y) > r.radius + e.r)
-      continue;
+  for (const e of livingEnemiesOf(w, s.team)) {
+    if (Math.hypot(e.x - p.x, e.y - p.y) > r.radius + e.r) continue;
     const big = e.rarity === 'rare' || e.rarity === 'miniboss' || e.rarity === 'boss';
     more += levelValue(big ? r.rare : r.normal, c.skill.level);
   }

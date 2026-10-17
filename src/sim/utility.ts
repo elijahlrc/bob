@@ -19,6 +19,7 @@ import { startShell } from './skillFx';
 import type { Action, Actor, World } from './types';
 import { ESCAPE_CROWD_RADIUS, ESCAPE_NEAR, PACK_RADIUS, PACK_SIZE } from '../data/strategy';
 import type { RotationEntry } from '../calc/strategy';
+import { enemiesWithin } from './side';
 import type { Side } from './side';
 
 /**
@@ -41,9 +42,7 @@ const WARCRY_SECONDS = 4;
 export type UtilityPick = { choice: SkillChoice; prof: SkillProfile; cd: number };
 
 export function enemiesNear(w: World, team: number, x: number, y: number, r: number): Actor[] {
-  return w.actors.filter(
-    (e) => e.team !== team && e.alive && e.phaseT <= 0 && Math.hypot(e.x - x, e.y - y) <= r,
-  );
+  return enemiesWithin(w, team, x, y, r, false);
 }
 
 const isBig = (a: Actor) => a.rarity === 'boss' || a.rarity === 'miniboss' || a.rarity === 'rare';

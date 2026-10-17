@@ -91,7 +91,7 @@ import { spawnMonster } from './world';
 import { afflictPlayer, bossLocked, flaskWards, isBossSide, lockBoss } from './afflict';
 import { bossHitPlayer, bossVeiled } from './bosses';
 import type { Actor, Dot, World } from './types';
-import { hunted } from './side';
+import { hunted, livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 const CHAOS = 4;
@@ -657,13 +657,8 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       applySkillDot(w, dst, p, { by: src.side! });
       const splash = p.skillDot.spec.splash;
       if (splash)
-        for (const e of w.actors)
-          if (
-            e !== dst &&
-            e.team !== src.team &&
-            e.alive &&
-            Math.hypot(e.x - dst.x, e.y - dst.y) <= splash * p.radiusMult + e.r
-          )
+        for (const e of livingEnemiesOf(w, src.team))
+          if (e !== dst && Math.hypot(e.x - dst.x, e.y - dst.y) <= splash * p.radiusMult + e.r)
             applySkillDot(w, e, p, { by: src.side! });
     }
   }

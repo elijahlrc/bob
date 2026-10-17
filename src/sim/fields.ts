@@ -11,7 +11,7 @@ import { hit, lifeCap, rawHit } from './combat';
 import { creepToward } from './skillFx';
 import { scaleProfile } from './shots';
 import type { Action, Actor, World } from './types';
-import { hunted } from './side';
+import { enemiesWithin, hunted, livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /**
@@ -459,9 +459,7 @@ function volley(w: World, s: Side, f: Field): void {
 }
 
 function enemiesIn(w: World, team: number, x: number, y: number, r: number): Actor[] {
-  return w.actors.filter(
-    (e) => e.team !== team && e.alive && e.phaseT <= 0 && Math.hypot(e.x - x, e.y - y) <= r + e.r,
-  );
+  return enemiesWithin(w, team, x, y, r, true);
 }
 
 /** Whether a point is on consecrated ground of the player's. */
@@ -494,7 +492,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
       f.x = p.x;
       f.y = p.y;
     }
-    if (f.creep) creepToward(w, f, dt);
+    if (f.creep) creepToward(w, s.team, f, dt);
     if (f.kind === 'orb') {
       f.x = p.x;
       f.y = p.y;
@@ -573,13 +571,8 @@ export function tickFields(w: World, s: Side, dt: number): void {
       f.pulseT -= dt;
       if (f.pulseT <= 0 && f.t > 0) {
         f.pulseT += f.interval;
-        for (const e of w.actors)
-          if (
-            e.team !== s.team &&
-            e.alive &&
-            e.phaseT <= 0 &&
-            segmentDist(e.x, e.y, f.x, f.y, f.x2!, f.y2!) <= f.radius + e.r
-          )
+        for (const e of livingEnemiesOf(w, s.team))
+          if (e.phaseT <= 0 && segmentDist(e.x, e.y, f.x, f.y, f.x2!, f.y2!) <= f.radius + e.r)
             applySkillDot(w, e, f.profile!, { seconds: 0.5 });
       }
       if (f.t > 0) s.fields[j++] = f;

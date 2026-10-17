@@ -60,7 +60,7 @@ import {
   type SkillWhen,
 } from '../data/strategy';
 import type { Actor, World } from './types';
-import { hunted } from './side';
+import { foeMinions, hunted, livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 function canAct(a: Actor): boolean {
@@ -341,10 +341,25 @@ export function hazardAt(
   return null;
 }
 
-/** Whether a living monster stands on the straight way from one point to another, for a body of radius `r`. */
-function bodyOnWay(w: World, x0: number, y0: number, x1: number, y1: number, r: number): boolean {
+/**
+ * Whether a living body of another team stands on the straight way from one point to another, for a body of radius `r`: a monster,
+ * or the other side's character or one of its minions.
+ */
+function bodyOnWay(
+  w: World,
+  team: number,
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  r: number,
+): boolean {
   for (const m of w.actors) {
-    if (m.isPlayer || !m.alive) continue;
+    if (m.team === team || !m.alive) continue;
+    if (segmentDist(m.x, m.y, x0, y0, x1, y1) < r + m.r + 0.05) return true;
+  }
+  for (const m of foeMinions(w, team)) {
+    if (!m.alive) continue;
     if (segmentDist(m.x, m.y, x0, y0, x1, y1) < r + m.r + 0.05) return true;
   }
   return false;
@@ -379,7 +394,7 @@ function avoidHazard(w: World, s: Side, dt: number): boolean {
       if (Math.hypot(c.x - p.x, c.y - p.y) < len - 0.2) continue;
       if (hazardAt(w, s.team, c.x, c.y, p.r + 0.3) || !w.grid.los(p.x, p.y, c.x, c.y)) continue;
       // A way out through a monster is none: the body shoves it along and its warning goes with it.
-      if (bodyOnWay(w, p.x, p.y, c.x, c.y, p.r)) continue;
+      if (bodyOnWay(w, s.team, p.x, p.y, c.x, c.y, p.r)) continue;
       if (target && target.alive) {
         const d = Math.hypot(target.x - c.x, target.y - c.y);
         if (d > reach || (!melee && !w.grid.los(c.x, c.y, target.x, target.y))) continue;
@@ -424,8 +439,8 @@ function kiteStep(w: World, s: Side, target: Actor, dt: number): boolean {
   if (range < KITE_RANGE + 2) return false;
   let near: Actor | null = null;
   let nd = KITE_RANGE;
-  for (const m of w.actors) {
-    if (m.team === s.team || !m.alive || m.phaseT > 0 || m.stationary) continue;
+  for (const m of livingEnemiesOf(w, s.team)) {
+    if (m.phaseT > 0 || m.stationary) continue;
     const d = Math.hypot(m.x - p.x, m.y - p.y);
     if (d < nd) {
       nd = d;
@@ -440,7 +455,7 @@ function kiteStep(w: World, s: Side, target: Actor, dt: number): boolean {
       const c = w.grid.collide(p.x + Math.cos(ang) * len, p.y + Math.sin(ang) * len, p.r);
       if (Math.hypot(c.x - p.x, c.y - p.y) < len - 0.2) continue;
       if (hazardAt(w, s.team, c.x, c.y, p.r + 0.3) || !w.grid.los(p.x, p.y, c.x, c.y)) continue;
-      if (bodyOnWay(w, p.x, p.y, c.x, c.y, p.r)) continue;
+      if (bodyOnWay(w, s.team, p.x, p.y, c.x, c.y, p.r)) continue;
       if (Math.hypot(target.x - c.x, target.y - c.y) > range) continue;
       if (!w.grid.los(c.x, c.y, target.x, target.y)) continue;
       const score = Math.hypot(near.x - c.x, near.y - c.y);

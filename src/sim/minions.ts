@@ -11,6 +11,7 @@ import { takeCorpse, type Corpse } from './factions';
 import { auraNow, minionStrike, refreshMinionDef } from './minionFx';
 import type { MinionSup } from './minionSup';
 import type { Actor, World } from './types';
+import { livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /**
@@ -265,8 +266,10 @@ function step(w: World, m: Minion, tx: number, ty: number, dt: number, speed: nu
 export function tickMinions(w: World, s: Side, dt: number): void {
   if (s.minions.length === 0) return;
   const p = s.player;
-  const foes = w.actors.filter(
-    (e) => e.team !== s.team && e.alive && e.phaseT <= 0 && e.state !== 'idle',
+  // What the minions go for: the awake monsters, and the other sides' characters and minions (a character's `state` is never
+  // set: 'idle' is a sleeping monster's).
+  const foes = livingEnemiesOf(w, s.team).filter(
+    (e) => e.phaseT <= 0 && (e.isPlayer || e.state !== 'idle'),
   );
   const unstable = s.char.db.flag('minionInstability');
   const aura = auraNow(s);

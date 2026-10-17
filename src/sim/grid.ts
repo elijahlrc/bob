@@ -13,7 +13,8 @@ export class Grid {
   readonly flowDist: Int16Array;
   private flowStamp: Uint32Array;
   private flowGen = 1;
-  flowOrigin = -1;
+  /** The tiles the field was built from (one per character the monsters hunt), in the order they were given. */
+  private flowOrigins: number[] = [];
 
   constructor(w: number, h: number, tiles: Uint8Array) {
     this.w = w;
@@ -262,16 +263,30 @@ export class Grid {
     return out;
   }
 
-  /** Rebuild the BFS flow field from a tile, up to `maxDist` steps. */
-  buildFlow(x: number, y: number, maxDist = 30): void {
+  /**
+   * Rebuild the BFS flow field from the tiles the given points stand on, up to `maxDist` steps: each tile gets the path distance to
+   * the nearest of them (several points make one search, started from all of them at once; with one point it is the single-origin
+   * search). The field is kept while the set of tiles is the one it was built from.
+   */
+  buildFlow(from: readonly { x: number; y: number }[], maxDist = 30): void {
     const w = this.w;
-    const origin = Math.floor(y) * w + Math.floor(x);
-    if (origin === this.flowOrigin) return;
-    this.flowOrigin = origin;
+    const origins = this.flowOrigins;
+    let same = origins.length > 0 && origins.length === from.length;
+    for (let i = 0; i < from.length; i++) {
+      const o = Math.floor(from[i].y) * w + Math.floor(from[i].x);
+      if (origins[i] !== o) same = false;
+      origins[i] = o;
+    }
+    origins.length = from.length;
+    if (same) return;
     const gen = ++this.flowGen;
-    const q: number[] = [origin];
-    this.flowStamp[origin] = gen;
-    this.flowDist[origin] = 0;
+    const q: number[] = [];
+    for (const origin of origins) {
+      if (this.flowStamp[origin] === gen) continue;
+      this.flowStamp[origin] = gen;
+      this.flowDist[origin] = 0;
+      q.push(origin);
+    }
     for (let head = 0; head < q.length; head++) {
       const n = q[head];
       const d = this.flowDist[n];

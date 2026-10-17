@@ -18,6 +18,7 @@ import { scaleProfile } from './shots';
 import { applySkillDot } from './skillDots';
 import { GOLDEN, areaRadiusOf } from './spread';
 import type { Action, Actor, World } from './types';
+import { livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /**
@@ -153,7 +154,7 @@ export function deployFull(s: Side, c: SkillChoice, prof: SkillProfile): boolean
 }
 
 const enemies = (w: World, team: number): Actor[] =>
-  w.actors.filter((e) => e.team !== team && e.alive && e.phaseT <= 0);
+  livingEnemiesOf(w, team).filter((e) => e.phaseT <= 0);
 
 /** A new totem stands at least this far from the totems of its own skill, in tiles, when there is room. */
 const TOTEM_APART = 2.5;

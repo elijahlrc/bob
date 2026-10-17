@@ -3,6 +3,7 @@ import { armourReduction } from '../calc/formulas';
 import type { FlaskSpec } from '../calc/flasks';
 import { flasksSealed } from './theft';
 import type { World } from './types';
+import { livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /** Whether a cleansing flask would clear something on the character now (docs/BOSSES.md 11.2). */
@@ -64,8 +65,7 @@ export const autoFlaskPolicy: FlaskPolicy = (w, s) => {
   );
   if (wantsSurroundings) {
     let nearest2 = Infinity;
-    for (const m of w.actors) {
-      if (m.team === p.team || !m.alive) continue;
+    for (const m of livingEnemiesOf(w, p.team)) {
       const dx = m.x - p.x;
       const dy = m.y - p.y;
       const d2 = dx * dx + dy * dy;

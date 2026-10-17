@@ -10,6 +10,7 @@ import { takeCorpse, type Corpse } from './factions';
 import { cloneOfPlayer, summonAt } from './minions';
 import { applyStatus } from './statuses';
 import type { Actor, World } from './types';
+import { enemiesWithin } from './side';
 import type { Side } from './side';
 
 /**
@@ -70,9 +71,7 @@ export function noteBlinkUsed(w: World, s: Side, c: SkillChoice): void {
 
 /** The enemies near a point. */
 function enemiesAt(w: World, team: number, x: number, y: number, r: number): Actor[] {
-  return w.actors.filter(
-    (e) => e.team !== team && e.alive && e.phaseT <= 0 && Math.hypot(e.x - x, e.y - y) <= r + e.r,
-  );
+  return enemiesWithin(w, team, x, y, r, true);
 }
 
 function burstRadius(p: SkillProfile): number {
