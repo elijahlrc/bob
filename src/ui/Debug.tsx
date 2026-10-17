@@ -14,8 +14,10 @@ import {
   type Difficulty,
 } from '../data/difficulty';
 import { BIOMES, forceBiome, type BiomeId } from '../data/biomes';
+import { CLASSES, classDef } from '../data/classes';
 import { DENSITIES, forceDensity, type DensityId } from '../data/density';
 import type { Controller } from '../run/controller';
+import { botBuild } from '../run/duelBot';
 import { debugEnabled } from './debugFlag';
 import { loadPref, savePref } from './prefs';
 
@@ -109,6 +111,73 @@ function MapLooks() {
 }
 
 /**
+ * A duel from camp (docs/DUEL.md 5): the character against a copy of itself (Mirror), or against a bot build of a class that has
+ * been played to a map on the legacy curve (Bot; the run takes seconds, and the button says so while it plays).
+ */
+function DuelRow({ c }: { c: Controller }) {
+  const run = c.run;
+  const [cls, setCls] = useState<string>(run?.classId ?? CLASSES[0].id);
+  const [map, setMap] = useState<number>(run?.map ?? 10);
+  const [seed, setSeed] = useState<number>(1);
+  const [busy, setBusy] = useState(false);
+  if (!run) return null;
+  const me = classDef(run.classId).name;
+  const mirror = () => c.startDuel(run.build, run.build, seed, { names: [me, 'Mirror'] });
+  const bot = () => {
+    setBusy(true);
+    // The bot's run is synchronous: wait a moment so that the label is on the screen before the page stops to play it.
+    setTimeout(() => {
+      const snap = botBuild(cls, seed, map, true);
+      setBusy(false);
+      c.startDuel(run.build, snap.build, seed, { names: [me, `${classDef(cls).name} bot`] });
+    }, 30);
+  };
+  const num = (raw: string, lo: number, hi: number, set: (v: number) => void) => {
+    const v = Math.round(Number(raw));
+    if (Number.isFinite(v)) set(Math.max(lo, Math.min(hi, v)));
+  };
+  return (
+    <div class="debug-row">
+      <span class="debug-label">Duel</span>
+      <select
+        value={cls}
+        disabled={busy}
+        title="The class of the bot build"
+        onChange={(e) => setCls((e.target as HTMLSelectElement).value)}
+      >
+        {CLASSES.map((k) => (
+          <option key={k.id} value={k.id}>
+            {k.name}
+          </option>
+        ))}
+      </select>
+      <input
+        type="number"
+        min={1}
+        max={100}
+        value={map}
+        disabled={busy}
+        title="The map the bot is played to"
+        onChange={(e) => num((e.target as HTMLInputElement).value, 1, 100, setMap)}
+      />
+      <input
+        type="number"
+        value={seed}
+        disabled={busy}
+        title="The seed of the fight"
+        onChange={(e) => num((e.target as HTMLInputElement).value, 0, 0x7fffffff, setSeed)}
+      />
+      <button class="btn small" disabled={busy} onClick={mirror}>
+        Mirror
+      </button>
+      <button class="btn small" disabled={busy} onClick={bot}>
+        {busy ? `Playing the bot to map ${map}…` : 'Bot'}
+      </button>
+    </div>
+  );
+}
+
+/**
  * The difficulty controls (docs/ENEMIES.md 8.3): scaling, base difficulty and variance. At camp they edit the run in
  * progress (from the next map on); on the title screen they set the next new run. Hidden unless `debugEnabled()`.
  */
@@ -146,6 +215,7 @@ export function DebugPanel({ c }: { c: Controller }) {
     >
       <summary>Debug: difficulty and maps</summary>
       <MapLooks />
+      {atCamp && <DuelRow c={c} />}
       <div class="muted">
         {atCamp
           ? 'Changes apply from the next map you start.'
