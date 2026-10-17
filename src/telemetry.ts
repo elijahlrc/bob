@@ -33,10 +33,13 @@ const post = (table: 'runs' | 'sim_runs', record: object) =>
 
 /**
  * Send the result of every run that ends on `c`, when sending is configured and on: from the published game to `runs`, from
- * the dev server or a local copy to `sim_runs` (as source `dev`), so real play and development play never mix.
+ * the dev server or a local copy to `sim_runs` (as source `dev`), so real play and development play never mix. It runs beside any
+ * hook already on `c.onRunEnd` (the rivals' hook, `src/rivals.ts`) and does not replace it.
  */
 export function installTelemetry(c: Controller): void {
+  const prev = c.onRunEnd;
   c.onRunEnd = (run, res) => {
+    prev?.(run, res);
     if (!telemetryConfigured() || !telemetryOn()) return;
     const record = runRecord(run, res, buildId());
     const at = where();
