@@ -55,6 +55,9 @@ function Screen({ c }: { c: Controller }) {
       return <Hud c={c} />;
     case 'duelResult':
       return <DuelResultView c={c} />;
+    case 'rivals':
+    case 'highScores':
+      return null;
     case 'summary':
     case 'victory':
       return <Summary c={c} />;

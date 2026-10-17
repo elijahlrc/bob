@@ -451,6 +451,10 @@ export function buildSignature(build: Build): string[] {
   return [...(mainName ? [mainName] : []), ...keystones.slice(0, 3), ...uniques.slice(0, 4)];
 }
 
+/** How many rivals are asked for at once (the most `rivals_for` gives), and how many of them a screen shows. */
+export const RIVALS_POOL = 20;
+export const RIVALS_SHOWN = 5;
+
 /**
  * The `k` rivals a screen shows out of the pool (`rivals_for` is newest first, so it gives the same ones until new rows arrive):
  * a seeded shuffle of the run's seed and a counter, so that the same draw is the same five, no rival is there twice, and a later

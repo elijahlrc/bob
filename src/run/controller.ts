@@ -51,6 +51,8 @@ import {
   type SlotId,
   type SlotSummary,
 } from './save';
+import { RivalBook } from './rivalRecord';
+import { drawRivals, duelSeedFor, RIVALS_SHOWN, type MySnapshot, type Rival } from './rivals';
 
 export type Screen =
   | 'title'
@@ -61,7 +63,20 @@ export type Screen =
   | 'victory'
   | 'codex'
   | 'patchNotes'
-  | 'duelResult';
+  | 'duelResult'
+  | 'rivals'
+  | 'highScores';
+
+/** A duel against a rival the player picked on the Rivals screen (docs/DUEL.md 6.5). */
+export type RivalFight = {
+  rivalId: string;
+  /** The snapshot of the player's own character that is fighting: the `a` of the rated pair. */
+  myId: string;
+  /** The rated fight of the pair: the first, on the pair's own seed. "Again" and the fights after it are practice. */
+  rated: boolean;
+  /** Where Back from the result goes: the run's summary or victory screen. */
+  home: Screen;
+};
 
 /** A duel being fought on the map screen (docs/DUEL.md 5): the two builds, the seed of this fight and where Leave goes back to. */
 export type DuelMode = {
@@ -80,6 +95,23 @@ export type DuelMode = {
   from: Screen;
   /** The end rules' state across frames (`duelEnd`). */
   watch: DuelWatch;
+  /** Set for a fight against a rival (`startRivalDuel`); null for the Debug panel's. */
+  rival: RivalFight | null;
+};
+
+/**
+ * What came of the report of a rated fight: `sending` until the server answers, then `rated` (both ratings moved), `already` (this
+ * pair was rated before), `refused` (a check violation: `message` is the server's reason) or `failed` (offline). A practice fight
+ * has none.
+ */
+export type RivalOutcome = {
+  rivalId: string;
+  myId: string;
+  rated: boolean;
+  report: 'sending' | 'rated' | 'already' | 'refused' | 'failed' | null;
+  message?: string;
+  /** The player's rating before the rated fight and after it, once the ladder has moved. */
+  rating?: { before: number; after: number };
 };
 
 /** What a finished duel shows on the result screen: the result and what each side dealt and took (the numbers are what landed). */
@@ -89,6 +121,34 @@ export type DuelOutcome = {
   reports: [MapReport, MapReport];
   names: [string, string];
   seed: number;
+  /** Set for a fight against a rival. */
+  rival: RivalOutcome | null;
+};
+
+/**
+ * The Rivals screen's state (docs/DUEL.md 6.5), kept beside the duel because a duel comes and goes: "Another rival" returns to the same
+ * five cards. It belongs to the run that ended and goes with it. The screen fills it from the network (`src/rivals.ts`); the controller
+ * only holds it.
+ */
+export type RivalsSession = {
+  /** The run's summary or victory screen: where Back goes. */
+  home: Screen;
+  /**
+   * `loading` while the fetches run, `ready` with five cards, `empty` when no rival is near the map, `offline` when the rivals could
+   * not be reached, `unsent` when the character is not on the table (the post failed).
+   */
+  status: 'loading' | 'ready' | 'empty' | 'offline' | 'unsent';
+  /** Why a character is `unsent`: the name was refused, or the rivals could not be reached. */
+  why?: 'name' | 'unreachable';
+  /** Set once the fetches have begun, so that a screen drawn twice does not start them twice. */
+  started: boolean;
+  /** The player's own snapshot (its id is the `a` of a rated fight; its rating is what the result shows moving). */
+  mine: MySnapshot | null;
+  /** The twenty the draw is made from, and the five on the cards. */
+  pool: Rival[];
+  shown: Rival[];
+  /** How many draws have been made: "Show others" adds one. */
+  counter: number;
 };
 
 export type BusEvents = {
@@ -136,6 +196,14 @@ export class Controller {
 
   /** Called once when a run ends, by a death or a win (anonymous run statistics: docs/TELEMETRY.md). */
   onRunEnd: ((run: RunState, res: MapResult) => void) | null = null;
+  /**
+   * Called once when a fight against a rival has ended, after the record has it and the result screen is up: the report of a rated
+   * fight is posted from here (`src/rivals.ts`; the controller does no network). Nothing it does can reach the fight.
+   */
+  onDuelEnd: ((d: DuelMode, out: DuelOutcome) => void) | null = null;
+
+  /** What this browser's characters have done against the rivals they fought (docs/DUEL.md 6.5). */
+  readonly book: RivalBook;
 
   /** The saved runs found at boot, the most recently saved first (§5.5). */
   saves: SlotSummary[] = [];
@@ -146,6 +214,7 @@ export class Controller {
 
   constructor(store: KeyValueStore | null = null) {
     this.store = store;
+    this.book = new RivalBook(store);
     this.refreshSaves();
     this.bus.on('frame', ({ dtMs }) => this.onFrame(dtMs));
     this.bus.on('select', ({ id }) => (this.selectedId = id));
@@ -251,6 +320,7 @@ export class Controller {
     this.gallery = null;
     this.showcase = null;
     this.run = null;
+    this.rivals = null;
     this.goTo('title');
   }
 
@@ -264,8 +334,12 @@ export class Controller {
    * (a duel is never a map: no `finishMap`, no Crawl, no save, no telemetry). Its end is read after every tick (`duelEnd`, the rules
    * the headless `runDuel` has) and goes to the result screen. `from` is where Leave and Back return to: by default the screen the
    * duel was started from when it is camp or a run's summary, else the title.
+   *
+   * It returns false and changes nothing while a map of a run (or the showcase or the gallery) is being played: a duel replaces the
+   * world, and the run's map is not the duel's to end. A build that will not make a world throws before anything is changed.
    */
-  startDuel(a: Build, b: Build, seed: number, opts: DuelOpts = {}, from?: Screen): void {
+  startDuel(a: Build, b: Build, seed: number, opts: DuelOpts = {}, from?: Screen): boolean {
+    if (this.screen === 'map' && this.world && !this.duel) return false;
     const names = opts.names ?? [classDef(a.classId).name, classDef(b.classId).name];
     const back: Screen =
       from ??
@@ -273,7 +347,7 @@ export class Controller {
       (this.screen === 'camp' || this.screen === 'summary' || this.screen === 'victory')
         ? this.screen
         : 'title');
-    this.duel = {
+    this.launchDuel({
       a: structuredClone(a),
       b: structuredClone(b),
       opts: { ...opts, names },
@@ -283,9 +357,40 @@ export class Controller {
       names,
       from: back,
       watch: duelWatch(opts),
-    };
-    this.lastDuel = null;
-    this.launchDuel();
+      rival: null,
+    });
+    return true;
+  }
+
+  /**
+   * Fight a rival the player picked (docs/DUEL.md 6.5): the run's character (`run.build`, as the run ended) against the rival's
+   * snapshot, the sides named `myName` and the rival's name. The first fight of this pair is **rated**: its seed is the pair's
+   * (`duelSeedFor`, the database's `duel_seed`), so a report cannot shop for a seed. A pair already rated fights on another seed,
+   * the one after its last, as practice. Returns false when the duel did not start; a rival whose snapshot will not make a world is
+   * dropped from the cards, with no message, and the run, the screen and `onRunEnd` are as they were.
+   */
+  startRivalDuel(rival: Rival, myId: string, myName: string): boolean {
+    const run = this.run;
+    if (!run) return false;
+    const pair = this.book.get(myId, rival.id);
+    const rated = !pair?.rated;
+    let started: boolean;
+    try {
+      const seed = rated || !pair ? duelSeedFor(myId, rival.id) : pair.lastSeed + 1;
+      started = this.startDuel(
+        run.build,
+        rival.build,
+        seed,
+        { names: [myName, rival.name] },
+        'rivals',
+      );
+    } catch {
+      this.dropRival(rival.id);
+      return false;
+    }
+    if (!started) return false;
+    this.duel!.rival = { rivalId: rival.id, myId, rated, home: this.rivals?.home ?? 'summary' };
+    return true;
   }
 
   /** The same two characters again, on the next seed (a new fight: the arena and the order of the sides are drawn from it). */
@@ -295,26 +400,33 @@ export class Controller {
     d.fought++;
     d.seed = d.base + d.fought;
     d.watch = duelWatch(d.opts);
-    this.lastDuel = null;
-    this.launchDuel();
+    // Only the first fight of a pair is rated.
+    if (d.rival) d.rival.rated = false;
+    this.launchDuel(d);
   }
 
-  /** Leave the duel, being fought or just over, for the screen it was started from. No result is kept. */
-  leaveDuel(): void {
+  /**
+   * Leave the duel, being fought or just over, for the screen it was started from, or for `to`. No result is kept (the record has
+   * what a finished fight gave it).
+   */
+  leaveDuel(to?: Screen): void {
     const d = this.duel;
     if (!d) return;
     if (this.world) this.bus.emit('mapEnd', null);
     this.world = null;
     this.duel = null;
     this.lastDuel = null;
-    this.goTo(d.from);
+    this.goTo(to ?? d.from);
   }
 
-  private launchDuel(): void {
-    const d = this.duel!;
-    if (this.world) this.bus.emit('mapEnd', null);
+  private launchDuel(d: DuelMode): void {
+    // The world comes first: a build that will not make one throws here, with nothing of the controller changed.
     // Each fight is played on copies, so that what a fight does to a build (its level, its flasks) never reaches the next.
-    this.world = createDuelWorld(structuredClone(d.a), structuredClone(d.b), d.seed, d.opts);
+    const world = createDuelWorld(structuredClone(d.a), structuredClone(d.b), d.seed, d.opts);
+    if (this.world) this.bus.emit('mapEnd', null);
+    this.duel = d;
+    this.lastDuel = null;
+    this.world = world;
     this.acc = 0;
     this.screen = 'map';
     this.bus.emit('select', { id: null });
@@ -326,16 +438,125 @@ export class Controller {
   private endDuel(w: World, end: DuelEnd): void {
     const d = this.duel;
     if (!d) return;
-    this.lastDuel = {
-      result: duelResult(w, end),
+    const result = duelResult(w, end);
+    const rv = d.rival;
+    // The record has every fight against a rival, rated or practice; the report of a rated one is for `onDuelEnd`.
+    if (rv) this.book.noteFight(rv.myId, rv.rivalId, d.seed, result.winner === 0);
+    const out: DuelOutcome = {
+      result,
       reports: [buildReport(w, w.sides[0]), buildReport(w, w.sides[1])],
       names: d.names,
       seed: d.seed,
+      rival: rv
+        ? {
+            rivalId: rv.rivalId,
+            myId: rv.myId,
+            rated: rv.rated,
+            report: rv.rated ? (this.onDuelEnd ? 'sending' : 'failed') : null,
+          }
+        : null,
     };
+    this.lastDuel = out;
     this.world = null;
     this.bus.emit('mapEnd', null);
     this.screen = 'duelResult';
     this.changed();
+    if (rv) {
+      try {
+        this.onDuelEnd?.(d, out);
+      } catch {
+        // The report is not the fight's: nothing it does reaches the result screen.
+      }
+    }
+  }
+
+  /** The server has the rated fight of this pair (it took the report or had it already): the next fight against the rival is practice. */
+  markRated(myId: string, rivalId: string): void {
+    this.book.noteRated(myId, rivalId);
+  }
+
+  // -------------------------------------------------------------------------------------------------------------------------
+  // The Rivals screen (docs/DUEL.md 6.5)
+
+  /** The Rivals screen's state for the run that ended, if it has been opened. */
+  rivals: RivalsSession | null = null;
+
+  /**
+   * Go to the Rivals screen from the run's summary or victory screen. The cards of an earlier visit are kept while they are the
+   * cards of a ready screen ("Another rival" comes back to the same five); a visit that found nothing is made again.
+   */
+  openRivals(): void {
+    if (!this.run) return;
+    if (this.rivals?.status !== 'ready')
+      this.rivals = {
+        home: this.screen === 'victory' ? 'victory' : 'summary',
+        status: 'loading',
+        started: false,
+        mine: null,
+        pool: [],
+        shown: [],
+        counter: 0,
+      };
+    this.goTo('rivals');
+  }
+
+  /** The Rivals screen found the player's character and the pool: five of the twenty are drawn for the cards. */
+  fillRivals(mine: MySnapshot, pool: Rival[]): void {
+    const s = this.rivals;
+    const run = this.run;
+    if (!s || !run) return;
+    s.mine = mine;
+    s.pool = pool;
+    s.counter = 0;
+    s.shown = drawRivals(pool, run.seed, 0, RIVALS_SHOWN);
+    s.status = pool.length > 0 ? 'ready' : 'empty';
+    this.changed();
+  }
+
+  /** The Rivals screen could not show cards: no rival is near the map, the rivals are out of reach, or the character is not on the table. */
+  failRivals(status: 'empty' | 'offline' | 'unsent', why?: 'name' | 'unreachable'): void {
+    const s = this.rivals;
+    if (!s) return;
+    s.status = status;
+    s.why = why;
+    this.changed();
+  }
+
+  /** "Show others": five more of the pool, the ones not on the cards now first. */
+  showOthers(): void {
+    const s = this.rivals;
+    const run = this.run;
+    if (!s || !run || s.status !== 'ready') return;
+    s.counter++;
+    s.shown = drawRivals(
+      s.pool,
+      run.seed,
+      s.counter,
+      RIVALS_SHOWN,
+      s.shown.map((r) => r.id),
+    );
+    this.changed();
+  }
+
+  /** Take a rival that will not start out of the pool and off the cards, and fill the card with another of the pool. */
+  dropRival(id: string): void {
+    const s = this.rivals;
+    const run = this.run;
+    if (!s || !run) return;
+    s.pool = s.pool.filter((r) => r.id !== id);
+    const kept = s.shown.filter((r) => r.id !== id);
+    const shown = new Set(kept.map((r) => r.id));
+    const more = drawRivals(s.pool, run.seed, s.counter, s.pool.length).filter(
+      (r) => !shown.has(r.id),
+    );
+    s.shown = [...kept, ...more].slice(0, RIVALS_SHOWN);
+    if (s.pool.length === 0) s.status = 'empty';
+    this.changed();
+  }
+
+  /** The player's snapshot as the ladder last had it (after a rated fight), for the rating the screens show. */
+  setMine(mine: MySnapshot): void {
+    if (this.rivals) this.rivals.mine = mine;
   }
 
   /** Resume a saved run at camp. */
@@ -343,6 +564,7 @@ export class Controller {
     const found = this.saves.find((s) => s.id === id);
     if (!found || found.result.status !== 'ok') return;
     this.run = found.result.run;
+    this.rivals = null;
     this.slot = id;
     this.undoStack = [];
     this.lastResult = null;
@@ -363,6 +585,7 @@ export class Controller {
 
   startRun(classId: string, seed: number): void {
     this.run = newRun(classId, seed, this.startDifficulty);
+    this.rivals = null;
     // A new run gets a slot of its own: the saves of earlier runs stay as they are.
     this.slot = this.store ? newSlot(this.store) : null;
     this.undoStack = [];
@@ -661,6 +884,7 @@ export class Controller {
     this.lastDuel = null;
     this.crawl = null;
     this.run = null;
+    this.rivals = null;
     this.slot = null;
     this.refreshSaves();
     this.goTo('title');
