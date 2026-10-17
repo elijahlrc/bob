@@ -354,6 +354,8 @@ export function createWorld(inp: CreateWorldInput | MapWorldInput): World {
     plan,
     grid,
     sides,
+    order: sides,
+    orderPhase: 0,
     t: 0,
     tick: 0,
     rngCombat: root.fork('combat'),
@@ -699,6 +701,24 @@ function flowOrigins(w: World): Actor[] {
   return flowFrom;
 }
 
+/** The sides reversed, one array for each world's `sides` (an odd tick would otherwise allocate). */
+const reversedSides = new WeakMap<Side[], Side[]>();
+
+/**
+ * The sides in the order they act in the tick `w.tick` (docs/DUEL.md 3.3, 4.4): in turn when `tick + orderPhase` is even and
+ * reversed when it is odd, so that the side that strikes first in a tie is not always the same. With one side (a map) it is
+ * `w.sides` itself, always.
+ */
+function sidesInOrder(w: World): Side[] {
+  if (w.sides.length < 2 || ((w.tick + w.orderPhase) & 1) === 0) return w.sides;
+  let r = reversedSides.get(w.sides);
+  if (!r || r.length !== w.sides.length) {
+    r = [...w.sides].reverse();
+    reversedSides.set(w.sides, r);
+  }
+  return r;
+}
+
 /** Advance the world by one fixed tick (§8.2). */
 export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void {
   if (w.status !== 'running') return;
@@ -706,22 +726,28 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   const dt = DT;
   w.t += dt;
   w.tick++;
+  w.order = sidesInOrder(w);
   if (w.plan.type === 'crescendo') w.surge = crescendoStep(w.t);
-  for (const s of w.sides) refreshPlayerDefence(w, s);
-  for (const s of w.sides) tickHoldout(w, s);
-  for (const s of w.sides) tickTriggers(w, s, dt);
-  for (const s of w.sides) tickCharges(w, s, dt);
-  for (const s of w.sides) tickCooldowns(w, s, dt);
-  for (const s of w.sides) tickBuffs(s, dt);
-  for (const s of w.sides) tickAuraBurn(w, s, dt);
-  for (const s of w.sides) tickDeployables(w, s, dt);
-  for (const s of w.sides) tickMinions(w, s, dt);
-  for (const s of w.sides) tickSkillZones(w, s, dt);
-  for (const s of w.sides) tickFlasks(w, s, dt, policy);
+  for (const s of w.order) refreshPlayerDefence(w, s);
+  for (const s of w.order) tickHoldout(w, s);
+  for (const s of w.order) tickTriggers(w, s, dt);
+  for (const s of w.order) tickCharges(w, s, dt);
+  for (const s of w.order) tickCooldowns(w, s, dt);
+  for (const s of w.order) tickBuffs(s, dt);
+  for (const s of w.order) tickAuraBurn(w, s, dt);
+  for (const s of w.order) tickDeployables(w, s, dt);
+  for (const s of w.order) tickMinions(w, s, dt);
+  for (const s of w.order) tickSkillZones(w, s, dt);
+  for (const s of w.order) tickFlasks(w, s, dt, policy);
   // Flow field for monsters follows the characters' tiles: one search from every living character, so that each tile leads to
   // the nearest by path (the character a monster hunts is the nearest in a straight line: across a wall the two can differ).
   w.grid.buildFlow(flowOrigins(w));
-  for (const a of w.actors) {
+  // The actors step in id order, the characters (the first of `w.actors`, one for each side) in the order of this tick's sides and
+  // the monsters after them as they are (docs/DUEL.md 3.3). The list is read live: what is spawned in the loop is reached.
+  const actors = w.actors;
+  const characters = w.sides.length;
+  for (let i = 0; i < actors.length; i++) {
+    const a = i < characters ? w.order[i].player : actors[i];
     if (!a.alive) continue;
     tickActor(w, a, dt);
     if (!a.alive) continue;
@@ -739,22 +765,22 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     }
     if (!a.action) a.carry = 0;
   }
-  for (const s of w.sides) tickPackPlays(w, s, dt);
-  for (const s of w.sides) tickShots(w, s);
-  for (const s of w.sides) tickChannel(w, s);
-  for (const s of w.sides) tickFields(w, s, dt);
-  for (const s of w.sides) tickBanner(w, s, dt);
-  for (const s of w.sides) tickWarp(w, s, dt);
-  for (const s of w.sides) tickWither(w, s);
-  for (const s of w.sides) tickCaught(s, dt);
-  for (const s of w.sides) tickStance(w, s);
-  for (const s of w.sides) tickBerserk(w, s, dt);
-  for (const s of w.sides) tickDegen(w, s, dt);
-  for (const s of w.sides) tickOffering(s, dt);
-  for (const s of w.sides) tickLegion(w, s, dt);
-  for (const s of w.sides) tickSupports(w, s, dt);
-  for (const s of w.sides) tickSkillFx(w, s, dt);
-  for (const s of w.sides) tickBlasphemy(w, s, dt);
+  for (const s of w.order) tickPackPlays(w, s, dt);
+  for (const s of w.order) tickShots(w, s);
+  for (const s of w.order) tickChannel(w, s);
+  for (const s of w.order) tickFields(w, s, dt);
+  for (const s of w.order) tickBanner(w, s, dt);
+  for (const s of w.order) tickWarp(w, s, dt);
+  for (const s of w.order) tickWither(w, s);
+  for (const s of w.order) tickCaught(s, dt);
+  for (const s of w.order) tickStance(w, s);
+  for (const s of w.order) tickBerserk(w, s, dt);
+  for (const s of w.order) tickDegen(w, s, dt);
+  for (const s of w.order) tickOffering(s, dt);
+  for (const s of w.order) tickLegion(w, s, dt);
+  for (const s of w.order) tickSupports(w, s, dt);
+  for (const s of w.order) tickSkillFx(w, s, dt);
+  for (const s of w.order) tickBlasphemy(w, s, dt);
   tickProliferation(w, dt);
   updateProjectiles(w, dt);
   tickEffects(w, dt);
@@ -763,7 +789,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   separate(w);
   tickStranded(w, dt);
   checkExit(w);
-  for (const s of w.sides) {
+  for (const s of w.order) {
     while (s.build.level < MAX_LEVEL && s.xp >= xpToNext(s.build.level)) {
       s.xp -= xpToNext(s.build.level);
       levelUp(w, s);
@@ -775,10 +801,10 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
     }
   }
   // The map is over when the local player's character is dead (a duel reads its own sides' deaths).
-  for (const s of w.sides)
+  for (const s of w.order)
     if (s.id === 0 && !s.player.alive && w.status === 'running') w.status = 'dead';
-  for (const s of w.sides) tickCollapse(w, s);
-  for (const s of w.sides) tickReprieve(s, dt);
+  for (const s of w.order) tickCollapse(w, s);
+  for (const s of w.order) tickReprieve(s, dt);
   tickAbandon(w, dt);
   if (w.t >= (w.opts.maxTime ?? 900) && w.status === 'running') w.status = 'timeout';
 }

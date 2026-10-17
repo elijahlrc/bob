@@ -63,7 +63,7 @@ export function createDuelWorld(a: Build, b: Build, seed: number, opts: DuelOpts
   const maxTime = opts.maxTime ?? DUEL_MAX_TIME;
   const duel = { damageScale: opts.damageScale ?? DUEL_DAMAGE_SCALE };
   const mid = DUEL_ARENA_SIZE / 2;
-  return createWorld({
+  const w = createWorld({
     plan,
     sides: [
       {
@@ -86,6 +86,9 @@ export function createDuelWorld(a: Build, b: Build, seed: number, opts: DuelOpts
     // (The world's own cap is a tick beyond the duel's, so that the duel is what ends the fight.)
     opts: { maxTime: maxTime + 1, autoAbandonAt: Infinity, noExit: true },
   });
+  // Which of the two sides acts first on an even tick is the seed's to say (see `World.orderPhase`).
+  w.orderPhase = (seed | 0) & 1;
+  return w;
 }
 
 /**
