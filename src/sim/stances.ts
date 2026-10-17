@@ -167,9 +167,11 @@ export function tickDegen(w: World, s: Side, dt: number): void {
       continue;
     }
     // Physical damage over time: physical damage reduction answers to it, armour does not.
-    const share = (u.degen / 100) * dt * (1 - p.def.physReduction);
+    // (What a character takes is scaled in a duel, docs/DUEL.md 4.4: this is damage it does itself, and so is the energy shield.)
+    const k = s.damageScale;
+    const share = (u.degen / 100) * dt * (1 - p.def.physReduction) * k;
     applyDamage(w, p, [share * p.def.maxLife, 0, 0, 0, 0], { name: c.skill.name, kind: 'effect' });
-    p.es = Math.max(0, p.es - (u.degen / 100) * p.def.maxEs * dt);
+    p.es = Math.max(0, p.es - (u.degen / 100) * p.def.maxEs * dt * k);
   }
 }
 

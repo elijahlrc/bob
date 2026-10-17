@@ -1,7 +1,7 @@
 /**
  * Fight two builds against each other and read the result (docs/DUEL.md 8.3): who won, how and when, and what each dealt and took.
  *
- *   npm run duel -- --a vanguard:1:20 --b strider:1:20 [--seeds 1,2,3] [--both] [--legacy] [--rows 8]
+ *   npm run duel -- --a vanguard:1:20 --b strider:1:20 [--seeds 1,2,3] [--both] [--legacy] [--scale 0.25] [--rows 8]
  *   npm run duel -- --load snaps.json --a 0 --b 1
  *   npm run duel -- --a save-a.json --b save-b.json
  *
@@ -10,7 +10,8 @@
  * save exported as JSON (`localStorage.getItem('bob.save.1')` in the game's console, or a slot's key), a run's or a build's.
  *
  * `--seeds` fights several seeds (the winner and the time of each; the ledgers are those of the first). `--both` fights each seed
- * in both orders: the arena is asymmetric (side 0 stands west, and strikes first in a tick), so one order says less than two.
+ * in both orders: the characters stand mirrored, but they are two different builds, so one order says less than two.
+ * `--scale` is what the damage each character takes is multiplied by (docs/DUEL.md 4.4; the game's default if absent).
  * `--legacy` plays the bot on the legacy difficulty. `--rows` is how many ledger rows to show for a side (8).
  */
 import { readFileSync } from 'node:fs';
@@ -35,6 +36,8 @@ const seeds = arg('--seeds', '1').split(',').map(Number);
 const both = argv.includes('--both');
 const legacy = argv.includes('--legacy');
 const rows = Number(arg('--rows', '8'));
+const scaleArg = arg('--scale', '');
+const duelOpts = scaleArg ? { damageScale: Number(scaleArg) } : {};
 const loadFile = arg('--load', '');
 const loaded = loadFile ? (JSON.parse(readFileSync(loadFile, 'utf8')) as Snap[]) : [];
 
@@ -89,7 +92,7 @@ for (const seed of seeds) {
   for (const order of both ? (['AB', 'BA'] as const) : (['AB'] as const)) {
     const [x, y] = order === 'AB' ? [A, B] : [B, A];
     const start = performance.now();
-    const { result, world } = playDuel(x.build, y.build, seed);
+    const { result, world } = playDuel(x.build, y.build, seed, duelOpts);
     const ms = performance.now() - start;
     const who =
       result.winner === null ? null : (order === 'AB') === (result.winner === 0) ? 'A' : 'B';

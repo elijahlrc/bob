@@ -149,11 +149,13 @@ const RARE_PRIORITY = 4;
 function findTarget(w: World, s: Side): Actor | null {
   const p = s.player;
   const prio = s.char.build.strategy?.target ?? STRATEGY_DEFAULTS.target;
-  // In a duel the character engages the nearest enemy at any distance (docs/DUEL.md 3.4).
+  // In a duel the character engages the nearest enemy at any distance (docs/DUEL.md 3.4), and its enemies are the other side's
+  // character and its minions. On a map the one side's enemies are the monsters of `w.actors`, as ever.
   const duel = !!s.opts.duel;
+  const foes = w.sides.length === 1 ? w.actors : livingEnemiesOf(w, s.team);
   let best: Actor | null = null;
   let bd = Infinity;
-  for (const m of w.actors) {
+  for (const m of foes) {
     if (m.team === s.team || !m.alive || m.phaseT > 0) continue;
     if (m.id === s.ai.skipId && w.t < s.ai.skipUntil) continue;
     const real = Math.hypot(m.x - p.x, m.y - p.y);
@@ -163,12 +165,13 @@ function findTarget(w: World, s: Side): Actor | null {
     const support = !!m.mon && SUPPORT_TYPES.has(m.mon.spec.type);
     // The target priority (Strategy tab): rares count as nearer, or the weakest goes first (distance breaks a tie). Weakest is
     // the least life left in points, not as a share: by share a boss with a scratch on it outranks its whole fresh escort.
+    // (The other character counts as a boss: the one a `rares` priority goes for first, and never one to give up on.)
     const d =
       prio === 'lowest'
         ? (support ? -1e9 : 0) + m.life + real * 1e-6
         : real -
           (support ? SUPPORT_PRIORITY : 0) -
-          (prio === 'rares' && isBig(m) ? RARE_PRIORITY : 0);
+          (prio === 'rares' && (m.isPlayer || isBig(m)) ? RARE_PRIORITY : 0);
     if (d > bd + 1e-9) continue;
     if (Math.abs(d - bd) <= 1e-9 && best && m.life >= best.life) continue;
     // Out of sight is no reason to ignore a pylon: everything around it is untouchable until it falls.
