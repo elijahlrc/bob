@@ -143,9 +143,15 @@ export function installCrashLog(c: Controller): void {
   window.addEventListener('error', (ev) => {
     record(ev.message, ev.error instanceof Error ? (ev.error.stack ?? '') : '');
   });
+  // A rejected promise has not stopped the game loop, so it gets a toast, not the crash screen.
   window.addEventListener('unhandledrejection', (ev) => {
     const r = ev.reason as unknown;
-    record(r instanceof Error ? r.message : String(r), r instanceof Error ? (r.stack ?? '') : '');
+    record(
+      r instanceof Error ? r.message : String(r),
+      r instanceof Error ? (r.stack ?? '') : '',
+      undefined,
+      false,
+    );
   });
 }
 
