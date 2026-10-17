@@ -1,6 +1,7 @@
 import { h, render } from 'preact';
 import { createGame } from './render/game';
 import { installCrashLog } from './crashlog';
+import { installRivals } from './rivals';
 import { installTelemetry } from './telemetry';
 import { Controller } from './run/controller';
 import { App } from './ui/App';
@@ -27,6 +28,7 @@ const controller = new Controller(storage());
 controller.portrait = monsterPortrait;
 installCrashLog(controller);
 installTelemetry(controller);
+installRivals(controller);
 const game = createGame('app', controller.bus);
 render(h(App, { c: controller }), document.getElementById('ui')!);
 

@@ -1,9 +1,10 @@
 /**
  * Headless bot runs (DESIGN.md §15.5).
  *
- *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|stopper|abandoner] [--craft greedy|random|none] [--no-wayside] [--report] [--scaling 1.5] [--base 1] [--variance 0.1] [--legacy] [--biome <id>] [--density <id>] [--log <batch>]
+ *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|stopper|abandoner] [--craft greedy|random|none] [--no-wayside] [--report] [--scaling 1.5] [--base 1] [--variance 0.1] [--legacy] [--biome <id>] [--density <id>] [--log <batch>] [--rivals]
  *
  * `--log <batch>` also sends each run that ends to the `sim_runs` table (scripts/simlog.ts, docs/TELEMETRY.md).
+ * `--rivals` posts the character each run ends with to the `rivals` table as a bot rival (scripts/rivallog.ts, docs/TELEMETRY.md).
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { median } from '../src/core/math';
@@ -11,6 +12,7 @@ import { CLASSES } from '../src/data/classes';
 import { botRun, type BotRunResult, type CraftPolicy, type ThemeRule } from '../src/run/bot';
 import { depthReport, varietyReport } from '../src/run/report';
 import { SimLog } from './simlog';
+import { RivalLog } from './rivallog';
 import { forceBiome, type BiomeId } from '../src/data/biomes';
 import { forceDensity, type DensityId } from '../src/data/density';
 import { clampDifficulty, DEFAULT, difficultyText, type Difficulty } from '../src/data/difficulty';
@@ -38,6 +40,8 @@ type Args = {
   noWayside: boolean;
   /** A batch label: send the runs to the sim_runs table under it. */
   log?: string;
+  /** Post each run's character to the rivals table as a bot rival. */
+  rivals: boolean;
   dump?: string;
   merge: string[];
 };
@@ -57,6 +61,7 @@ function parseArgs(argv: string[]): Args {
     difficulty: { ...DEFAULT },
     from: 0,
     noWayside: false,
+    rivals: false,
     merge: [],
   };
   for (let i = 0; i < argv.length; i++) {
@@ -86,6 +91,7 @@ function parseArgs(argv: string[]): Args {
     else if (k === '--from') a.from = Number(v);
     else if (k === '--dump') a.dump = v;
     else if (k === '--log') a.log = v;
+    else if (k === '--rivals') a.rivals = true;
     else if (k === '--merge') a.merge = argv.slice(i + 1);
     else if (k === '--report') a.report = true;
     else if (k === '--craft')
@@ -105,6 +111,7 @@ const simLog =
         `bot:${args.themes}/${args.crafting}${args.abandonBelow === undefined ? '' : '/abandon'}`,
       )
     : null;
+const rivalLog = args.rivals && !args.merge.length ? new RivalLog() : null;
 if (args.merge.length) {
   // Join the raw results of runs made in other processes (--dump), then report on them as one.
   for (const file of args.merge) {
@@ -122,7 +129,13 @@ for (const cls of args.merge.length ? [] : args.classes) {
       wayside: !args.noWayside,
       abandonBelow: args.abandonBelow,
       difficulty: args.difficulty,
-      onEnd: simLog ? (run, res) => simLog.add(run, res) : undefined,
+      onEnd:
+        simLog || rivalLog
+          ? (run, res) => {
+              simLog?.add(run, res);
+              rivalLog?.add(run, res);
+            }
+          : undefined,
     });
     const wallMs = performance.now() - start;
     const simSeconds = res.maps.reduce((s, m) => s + m.time, 0);
@@ -136,6 +149,9 @@ for (const cls of args.merge.length ? [] : args.classes) {
 if (args.dump) writeFileSync(args.dump, JSON.stringify({ args, results }));
 if (simLog)
   process.stderr.write(`${await simLog.flush()}
+`);
+if (rivalLog)
+  process.stderr.write(`${await rivalLog.flush()}
 `);
 const lines: string[] = [];
 lines.push(

@@ -1,7 +1,8 @@
 # Bob — Duels: asynchronous fights against other players' characters
 
-Status: **F0 to F5 built on 2026-10-16** (the plan was the second draft of 2026-10-16, after the user rejected the two-world
-engine of the first); F6 and F7 are not built; see "Built" under section 7 · Owner: the user · Author: Claude
+Status: **F0 to F5 built on 2026-10-16, F6 on 2026-10-17** (the plan was the second draft of 2026-10-16, after the user rejected the
+two-world engine of the first); F7 is not built, and `docs/rivals.sql` of F6 has not been run on the project; see "Built" under
+section 7 · Owner: the user · Author: Claude
 
 A duel is a real fight, watched in the game, between the player's character and a **rival**: a snapshot of another player's
 character (class, level, passive tree, gems, items and Strategy settings) taken when that player's run ended. The rival is
@@ -285,7 +286,7 @@ not what they watch.
 ```ts
 type Rival = {
   id: string; // the row id
-  name: string; // generated (6.4), never typed
+  name: string; // typed by the player, or made up when left blank (6.4)
   classId: string;
   level: number;
   map: number; // the map the run ended on
@@ -308,36 +309,60 @@ this version decide whether it is offered; one that fails is skipped, not shown.
 When a run ends (`Controller.onRunEnd`, where telemetry hooks in), if the player has opted in, the snapshot is posted to the
 `rivals` table. **Opt-in, separate from telemetry:** the first time the summary screen offers a duel, one line and a checkbox
 ("Add this character to the rivals other players fight"), remembered as a preference; a second checkbox on the title screen
-beside telemetry's. The character of a run that ended in a death and one that won are both worth fighting.
+beside telemetry's (F6 built the title screen's, with the name field; the summary's line is F7's). The character of a run that
+ended in a death and one that won are both worth fighting.
 
 ### 6.3 The pool
 
-`docs/rivals.sql`, run once like `docs/telemetry.sql`:
+`docs/rivals.sql`, run once like `docs/telemetry.sql` (by the owner; it can be run again without harm):
 
 - table `rivals` (id, created_at, name, class_id, level, map, outcome, difficulty jsonb, save_version, game_version, bot,
-  token_hash, build jsonb with `pg_column_size(build) < 16384`, length and range checks as `runs` has);
-- the public key may **insert**, with the checks, and may **not select** the table: it reads through one function,
-  `rivals_for(save_version int, map int, k int, exclude_token_hash text)`, `security definer`, which returns K rows of
-  that version within ±10 maps of `map` (widening to ±25 if fewer than K), not the caller's own, newest first with a random
-  tiebreak, players before bots. It returns a declared row type **without** `token_hash` and `created_at` (a `setof rivals`
-  would hand every caller the tokens that exclude rows and count inserts);
-- a trigger caps inserts at 20 a day per `token_hash`;
-- rows of a save version older than the three most recent, or older than 90 days, are deleted by hand or by `pg_cron`.
+  token_hash, build jsonb with `pg_column_size(build) < 16384`, length and range checks as `runs` has), **and four columns that
+  are the ranking's, never the client's**: `rating int` (default 1000), `fights int` (0), `wins int` (0), `rated_at timestamptz`
+  (null). A `before insert` trigger resets them, and `created_at`, to their defaults whatever the row sent, and the public key
+  has no update, so a client cannot post itself with a rating or back-date a row. A **ranking job with the service role** will
+  write them later (LADDER.md section 10, fork 2: it fights the pool with `runDuel` and updates the ratings; section 13): the
+  columns are its contract;
+- the public key may **insert**, with the checks, and may **not select** the table: it reads through two functions, each
+  `security definer` and returning a declared row type **without** `token_hash` (a `setof rivals` would hand every caller the
+  tokens that exclude rows and count inserts):
+  - `rivals_for(save_version int, map int, k int, exclude_token_hash text)` returns up to K (at most 20) rows of that version
+    within ±10 maps of `map` (widening to ±25 if fewer than K are found), not the caller's own, players before bots, newest
+    first with a random tiebreak: `id, name, class_id, level, map, outcome, difficulty, save_version, game_version, bot, build`;
+  - `high_scores(k int)` returns the **top rated rival snapshots, one row per snapshot, not per player**: those with
+    `fights > 0` that are not a bot, by `rating desc, wins desc, created_at asc`, at most 100:
+    `id, name, class_id, level, map, outcome, rating, fights, wins, game_version, posted_on` (the day it was posted). With no
+    ranking job run yet it returns no rows, which is correct. F7 draws the screen;
+- names (6.4): the table checks the character set and a length cap, and a trigger refuses a name that contains a word of
+  `blocked_words`, a table the SQL creates **empty** and the owner fills in the Supabase table editor;
+- a trigger caps inserts at 20 in 24 hours per `token_hash`;
+- the two trigger functions that read a table (the deny-list, the cap) are `security definer`: a trigger runs with the
+  privileges of the inserting role, `anon` may read neither table, and without it the deny-list would fail every insert with
+  "permission denied" and the cap would count nothing;
+- rows of a save version older than the three most recent, or older than 90 days, are deleted by hand (a commented statement
+  in the file; no `pg_cron`).
 
-`src/run/rivals.ts` (headless; `fetch` injected like `postRecords` in `telemetry.ts`): `postRival`, `fetchRivals`, the
-validation of 6.1, and the token: a random id in `localStorage` (`bob.rival.token`), hashed before sending, used only to
-exclude the player's own rivals and to count inserts. **Bots fill the pool:** `npm run sim -- --rivals` posts the bot's
-character at the end of each run as `bot: true`, so the pool has rivals at every version from day one; the function offers
-them only when fewer than K players are there.
+`src/run/rivals.ts` (headless; `fetch` injected like `postRecords` in `telemetry.ts`): `rivalRecord`, `postRival`,
+`fetchRivals`, `fetchHighScores`, `validateRival` (6.1), `validName`, `generateName` (6.4) and `hashToken`; the browser side is
+`src/rivals.ts` (the preferences, the token and the `onRunEnd` hook beside telemetry's). The token is a random id made in the
+browser and kept in `localStorage` (`bob.rival.token`), hashed (SHA-256) before sending, used only to exclude the player's own
+rivals and to count inserts; the raw token never leaves the browser. **Bots fill the pool:** `npm run sim -- --rivals` posts
+the bot's character at the end of each run as `bot: true`, so the pool has rivals at every version from day one; the function
+offers them only after the players.
 
 Cost at 1,000 deaths a month: 10 MB of rows and 40 KB of reads per duel screen; nothing near the free plan (LADDER.md
 section 7). The reads keep the project from pausing.
 
 ### 6.4 Names
 
-A rival's name is **generated**, never typed: two word lists in `src/data/rivalNames.ts` (an epithet and a place or a trait,
-"the Ashen Sentinel of the Low Road"), chosen from the snapshot's seed; the player may reroll before sending. Every word passes
-`src/data/ip.test.ts`. No free text means no moderation.
+A rival's name is **typed, or made up when left blank** (the owner, 2026-10-17; the plan had generated names only). The title
+screen's field takes 3 to 16 ASCII letters, digits, spaces and hyphens, starting and ending with a letter or digit (`validName`),
+remembered in the browser and stamped on every snapshot posted. Blank, or not valid, the game makes one up (`generateName(seed)`):
+two word lists in `src/data/rivalNames.ts` (an epithet and a place or a trait, "The Ashen Sentinel of the Low Road"), drawn with
+the seeded RNG from the run's seed, at most 46 characters; every word is ours and passes `src/data/ip.test.ts`. No accounts and no
+uniqueness: two players may both be "Bob", and the hashed token tells them apart. The rules are the database's: the character set,
+a cap of 48, and the deny-list table `blocked_words` that the owner fills in the table editor (no list of words in the
+repository). A name the table refuses loses its row, so the title screen says the rule.
 
 ### 6.5 The screens (F7)
 
@@ -787,6 +812,67 @@ below). As planned, with these differences and findings:
   - _Not done:_ rival names, snapshots and the fetch (F6), "Fight a rival", the Rivals screen and the record (F7), a level-dependent
     damage scale (the open question of F4), monsters in a duel.
 
+**Built: F6 (2026-10-17).** The snapshot, the pool, the opt-in, the names and the high score function, built headlessly and tested with an
+injected `fetch` only: **nothing was posted to the project, `docs/rivals.sql` has not been run** (no database here, and the owner reviews and runs
+it); the title screen was looked at in a desktop browser only (the checkbox, the name field, the line for an invalid name), not on a phone. As planned, with the owner's two changes of 2026-10-17 (names are typed with a generated
+fallback; the high scores are the duel ratings of snapshots, written by a later ranking job) and these differences and findings:
+
+- **The SQL** (`docs/rivals.sql`, 12 numbered entries, each commented): the table `rivals` (with `rating`, `fights`, `wins`, `rated_at`); two
+  indexes; `blocked_words` (empty; the table refuses a word that is not lowercase); `rivals_defaults` (resets `created_at` and the four ranking
+  columns on insert; **`created_at` is an addition of mine**: without it a client could post a past time and dodge the daily cap, or a future one
+  and sit first in "newest first"); `rivals_check_name` and `rivals_rate_cap` (both `security definer`, `set search_path = public`, for the reason
+  in the file); row-level security and the grants; the two row types `rival_row` and `high_score_row`; `rivals_for` and `high_scores`; the cleanup
+  statement, commented; and a `notify pgrst` to reload the API's schema. The three triggers fire in the order of their names (`rivals_1_defaults`,
+  `rivals_2_check_name`, `rivals_3_rate_cap`). The functions are `language sql`, with the parameters of `rivals_for` written `rivals_for.map` and so
+  on where a column has the same name (the brief's parameter names are kept; the row types are declared with `create type`, so a re-run drops the
+  functions, then the types, then makes them again). The partial index a big `high_scores` would want is not made.
+- **`src/run/rivals.ts`**: as the brief says. `rivalRecord`'s `res` is not read (it is the hook's shape). `validateRival` checks, beyond the
+  brief's list: the name's rule, the class, the level and map ranges, that the build's class and level are the row's, that an equipment slot is a
+  slot, flask affixes (against `FLASK_AFFIXES`), the polished families, a unique's mods and triggers (a `castGranted` skill must exist), that a
+  mod has a stat, a kind and a number, and the Strategy's enums. **A unique's affix has the family `unique`**, which is not in `FAMILIES`
+  (`rollUnique` writes it and a unique flask has it too): it is accepted on an item that has a `uniqueId` only, and a test fights every unique
+  item and every unique flask through the check. A gem id goes through `gemDef`, so a saved `cindering` still passes as it does in `Character`.
+  It says nothing of legality (points, tiers, requirements).
+- **`validName` is the table's regex exactly** (starting and ending with a letter or digit), a little stricter than "no leading or trailing
+  space"; `NAME_PATTERN` is exported and a test reads the SQL file to hold the two the same. The record uses the typed name only if it is valid
+  at the moment of posting.
+- **Bots: one token for each run, from its class and seed** (`bot:<class>:<seed>`, hashed), not from the seed alone: the sim plays each seed for
+  every class, and one token would spend a seed's 20 daily rows on six classes. `RivalLog` (`scripts/rivallog.ts`) posts **one row to a request**,
+  so a row the deny-list stops costs only itself. `--rivals` and `--log` work together.
+- **`ipViolations` moved to `src/data/ipScan.ts`** so that the tests can use it without importing `ip.test.ts`; `ip.test.ts` imports it. The IP
+  test's glob already covers `rivalNames.ts` (the lists are exported strings). Both lists are 64 and 63 entries (about 4,000 names).
+- **`src/telemetry.ts`'s hook now chains the one already on the controller** (it replaced it before), and so does `installRivals`, which runs the
+  earlier hook first and still sends if it throws; a test installs both in each order against the real `installTelemetry`. `main.ts` installs
+  telemetry, then rivals. The rivals hook does **not** split the dev server from the published game as telemetry does (the table has no
+  such split): a developer who ticks the box posts real rows. A dead run's `build` is copied before the (async) hash is awaited.
+- **Measured:** twelve real bot characters (every class, seeds 1 and 2, legacy difficulty, played to the end of the run; 6 to 395 s each) all
+  pass `validateRival` and are 5.9 KB of JSON at map 10, 6.4 to 8.9 KB at maps 20 to 95 and **9.8 KB at map 100** (a win with 5 uniques and 123
+  passives). The table's check is 16,384 bytes **as jsonb**, which was not measured (no Postgres here): at the 1.45 times that TELEMETRY.md found
+  for `details` the limit would be about 11 KB of JSON, so the largest late builds are the ones to watch. If a seeded win is refused with a
+  check violation on `build`, raise the number in `docs/rivals.sql`.
+- **Tests:** `src/run/rivals.test.ts` (24), `src/rivals.test.ts` (7), `scripts/rivallog.test.ts` (3). `npm run check` and `npm run build` are green.
+- **What the owner runs, in this order:** (1) read and run `docs/rivals.sql` in the SQL editor; (2) fill `blocked_words` in the table editor;
+  (3) one insert by the client's path, `npm run sim -- --runs 1 --class vanguard --seed 1 --rivals` (the bot dies on map 20 in about 4 s; expect
+  `rivals: sent 1 of 1 bot characters`), then the three `curl` checks of TELEMETRY.md "Rivals and high scores" ("Checking it works"); (4) seed:
+  `npm run sim -- --runs 10 --class all --seed 1 --rivals` (about 60 bot characters; more seeds, and `--legacy`, for more and deeper ones). A game
+  version that has this code posts characters when a player ticks the box, so deploy it after step 1.
+- **For F7:**
+  - _The rows._ `fetchRivals(fetchFn, SINK, { saveVersion: SAVE_VERSION, map, k, excludeTokenHash })` gives validated `Rival`s (6.1);
+    `excludeTokenHash` is `await hashToken(rivalToken())` (`src/rivals.ts`). `fetchHighScores(fetchFn, SINK, k)` gives
+    `{ id, name, classId, level, map, outcome, rating, fights, wins, gameVersion, postedOn }` and **no build**: a "fight this one" from the
+    list needs a function that returns one snapshot by id, which is not built. Both return `[]` offline, with no table, or with no ratings yet.
+  - _The same rivals every time._ `rivals_for` is newest first, so one call returns the same K until new rows arrive: ask for `k = 20` and draw
+    5 with the seeded RNG on the client (the random tiebreak only separates rows made in one instant).
+  - _The preferences._ `rivalsOn()`, `setRivals(on)`, `rivalName()`, `setRivalName(s)`, `sendName()` (the typed name if valid, else null),
+    `rivalToken()`, `rivalsConfigured()`, all in `src/rivals.ts`; the title screen's `RivalsNotice` is the model for the summary's line.
+  - _The summary's first-time line_ ("Add this character to the rivals other players fight"): when the player ticks it, the run that just
+    ended has **already** passed through the hook with the preference off, so the line must also post that character then
+    (`rivalRecord(run, res, { name: sendName(), tokenHash: await hashToken(rivalToken()), version, seed: run.seed })` and `postRival`, with the
+    `res` of `Controller.lastResult`, `run.phase` being `'dead'` or `'victory'`).
+  - _A rival from the wire is checked against `Character`, not against the whole sim._ `startDuel` on a snapshot should be inside a `try`, and a
+    rival that throws is dropped from the list.
+  - _The map to look near_ is `run.map`; the rivals the player fights are compared by `Rival.map`, `level`, `outcome`, and `buildSignature(build)`.
+
 ---
 
 ## 8. Verification
@@ -821,9 +907,11 @@ matrix (LADDER.md 4.3 was the crossfire); the fight-length measurement of F4.
   editor. The legality checks of LADDER.md section 8.2 (points for the level, a connected tree, affixes within their tiers,
   gem levels) are a later milestone if ever needed.
 - **Results are never uploaded** in this plan, so there is nothing to fake about them.
-- **Privacy.** A rival row holds a character and a hashed random token, no name a player typed, no run history, no id that
-  links to a person; it is a separate opt-in. TELEMETRY.md gets a section that says exactly what is sent. A player who turns
-  the opt-in off stops new rows; rows already sent stay until the retention rule removes them (the summary says so in one line).
+- **Privacy.** A rival row holds a character, a hashed random token and a name (the one the player typed, if they typed one, else
+  a made-up one), no run history, no id that links to a person; it is a separate opt-in, with its own checkbox and its own
+  preference, so TELEMETRY.md's promise of no identity stays true of `runs`. TELEMETRY.md has a section ("Rivals and high scores")
+  that says exactly what is sent. A player who turns the opt-in off stops new rows; rows already sent stay until the retention
+  rule removes them (the summary says so in one line).
 
 ---
 
@@ -854,7 +942,7 @@ Ten to seventeen working days (section 7). Risks, each with its fence:
   act for a side, the hit path reads sides from actors, monsters hunt the nearest side; (2) `team` replaces `faction`, sides
   have their own and monsters one of theirs; (3) a duel brings the build and full vitals only: no provisions, reprieves, map
   mods or resist penalty; (4) the order of sides alternates from tick to tick, drawn from the tick and the seed; (5) the damage scale default, when measured; (6)
-  rivals are a separate opt-in with a hashed storage token and generated names, beside the anonymous telemetry.
+  rivals are a separate opt-in with a hashed storage token and a typed or made-up name, beside the anonymous telemetry.
 
 ---
 
@@ -870,7 +958,7 @@ Ten to seventeen working days (section 7). Risks, each with its fence:
 | 6   | Damage scale              | ×0.3 (F4 measured: median fights of 16 s and 25 s, 3% and 6% on the cap)                                     | ×1 always (the first hit decides); a scale that falls with the level                        |
 | 7   | Arena and distance        | The boss arena's round room, a biome look, 10 tiles apart                                                    | The dummy's open floor; a labyrinth room                                                    |
 | 8   | Who is offered            | K = 5 of the same save version within ±10 maps, players before bots, never one's own                         | Same class only; any depth                                                                  |
-| 9   | Names                     | Generated, rerollable                                                                                        | Typed with a deny-list (moderation)                                                         |
+| 9   | Names                     | Typed (3 to 16 characters) under the database's rules and deny-list table, made up when blank (owner, F6)    | Generated only, rerollable (the plan)                                                       |
 | 10  | Identity                  | A random storage token, hashed                                                                               | Supabase anonymous sign-in (LADDER.md 8.3)                                                  |
 | 11  | What is uploaded          | The snapshot only; results stay local                                                                        | Results too (the ladder, section 13)                                                        |
 | 12  | The rival's HUD           | None: the player's HUD, and the rival as a boss bar (name, life, energy shield), on a phone too (owner, F5)  | A second HUD on the right, a bar on a phone (the plan); two full HUDs stacked               |
@@ -881,7 +969,12 @@ Ten to seventeen working days (section 7). Risks, each with its fence:
 
 ## 13. Out of scope (later plans)
 
-- **Ranking**: a global rank, seasons, the nightly job, Elo (LADDER.md sections 6 and 10, forks 2 to 5).
+- **The ranking job and the Elo computation** (the owner, 2026-10-17: the high score list is the duel ratings of rival
+  snapshots, not the deepest run of each player): a job with the service role that fights the pool with `runDuel` and writes
+  `rating`, `fights`, `wins` and `rated_at` of `rivals` (LADDER.md sections 6 and 10, fork 2). Who fights whom and when, and how
+  the ratings are computed, are that plan's. F6 built what it can read and write (the four columns, the trigger that keeps
+  clients from writing them, and `high_scores(k)`, which lists the top rated snapshots and returns nothing until the job has
+  run). Seasons and the other forks (LADDER.md section 10, forks 3 to 5) stay out of scope.
 - **Sparring from camp** with the character as it stands, and entering mid-run snapshots (a pool of characters captured at
   every tenth map cleared, not only at the end of a run).
 - **Legality checks** on snapshots.
