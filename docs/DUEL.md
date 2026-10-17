@@ -1,7 +1,7 @@
 # Bob — Duels: asynchronous fights against other players' characters
 
-Status: **F0 to F2 built on 2026-10-16** (the plan was the second draft of 2026-10-16, after the user rejected the two-world
-engine of the first); F3 to F7 are not built; see "Built" under section 7 · Owner: the user · Author: Claude
+Status: **F0 to F3 built on 2026-10-16** (the plan was the second draft of 2026-10-16, after the user rejected the two-world
+engine of the first); F4 to F7 are not built; see "Built" under section 7 · Owner: the user · Author: Claude
 
 A duel is a real fight, watched in the game, between the player's character and a **rival**: a snapshot of another player's
 character (class, level, passive tree, gems, items and Strategy settings) taken when that player's run ended. The rival is
@@ -427,6 +427,120 @@ time). As planned, with these differences and findings:
     for 30 s and stand at the waypoint; starters never reach it, a tanky pair would: the stall rule of 4.3 is F4's.
   - _Events carry no side._ `playerDied`, `levelUp`, `flaskUsed` and `stuck` name no actor; F5 must say whose they are.
   - A side's actor is named `You` (side 0) or `Rival` unless the input names it; `createDuelWorld` names them by class.
+
+**Built: F3 (2026-10-16).** Every kit works across sides: what a side deals is credited to it whoever or whatever it hits, and what a
+kit takes for an enemy is the other side's character **and its minions**. On a map nothing moved: the default fence and the deep
+fence (maps 1 to 30, three seeds) are identical after each of the two commits that changed the sim, and **no fix found a bug on a
+map** (a minion's `enemiesOf` that returned nothing, a flow field built from the wrong tile: neither happened, so nothing was
+re-recorded). As planned, with these differences and findings:
+
+- **One list of enemies, in `side.ts`.** Minions are not in `w.actors`, so every list of "the enemies of a team" built from it saw
+  the other character and never its minions, and `enemiesOf` for a monster (or a minion) saw minions and never a monster.
+  `livingEnemiesOf(w, team)` is the actors of other teams in `w.actors`' order and then the minions of the other sides, side by side;
+  `enemiesWithin(w, team, x, y, r, pad)` is the ones within a radius (what an area, an aura or a count of enemies near reaches);
+  `eachEnemy(w, team, fn)` visits them **live**; `foeMinions(w, team)` is the minions alone, without allocating, for the projectiles.
+  **A loop that strikes must read the lists live** (`eachEnemy`): `for (e of w.actors) if (alive) hit(...)` skips what an earlier hit
+  of the same loop killed and reaches what it summoned (a Splitting monster's children), and a list built first does neither: it is
+  how a map's events could have moved. The loops that only count, afflict (a status, a debuff, a hex) or choose use the lists.
+  The minions of a side whose character has fallen are left out (as `enemiesOf` for a monster always did), the projectiles' list
+  (`foeMinions`) does not look at that (nor did the old one).
+- **`tickMinions`' `foes`** are the awake monsters and the other side's characters and minions: a character's `state` is never
+  `chase` (it is a monster's sleep), so the filter is `e.isPlayer || e.state !== 'idle'`. `bodyOnWay` (the dodge and the kite) and
+  `creepToward` take the team and skip it, not every character; a creeping patch drifts toward the nearest monster, character or
+  minion of another team; the kite steps away from the other side's minions too. **Nobody calls `enemiesOf` with a minion**:
+  minions strike with `rawHit`, a zone's owner is the character, and a deployable fires through `standIn` (which keeps `isPlayer`),
+  so the monsters' branch and the minions' were never one the map used.
+- **The flow field** is one search from every living character (`Grid.buildFlow(points)`; with one the very algorithm it was: the
+  test compares it with the old search tile for tile, and with two each tile is the path distance to the nearer). `hunted` measures
+  a straight line and the field a path, so across a wall a monster can head for the farther character; fine for F3 (monsters and
+  two characters is out of scope, section 10).
+- **`rawHit(w, dst, amount, type, owner, label, by, via)`** takes its owner (a `Side` or `null`) right after the type, so that the
+  compiler listed every caller. Owned: Molten Shell's burst, the Relic's nova, mines (`mineAuraHit`), the Herald of Thunder's bolts,
+  the corpse bursts of Pyre Burst and of the corpse blinks, Bodyswap, the burning aura, the queued explosions of triggers, a
+  minion's blows and its Volatile burst. `null` on purpose: Righteous Fire and a minion's own burn (self-damage: on a map ownerless
+  damage onto a character earns no `dealt` row, and an owner would grow the side's own), the share a Thorned monster throws back, the
+  Collapse, Tithe, the Counter-stance, the zones of the monsters, and **every blast of `world.ts`** (`tickEffects`): no side pushes
+  a ground effect, they are all monsters', and they land on characters and minions, never on monsters. A debuff of damage over time
+  (a skill's, Decay, the Herald of Ash's and Infernal Legion's burns, a venom burst) carries `by`. **Statuses carry no owner**:
+  they deal no damage, and the damage they raise is credited by whoever deals it.
+- **The ledger.** A side's hit on another side's minion earns a row (`applyHit`'s `how` gate is now "a character, a monster, or a
+  side's hit on another team"; `rawHit` on a minion already did). A minion's blows are `minion` rows wherever they land (they were
+  `effect` rows on a character). `noteHit` stays gated on a character as `dst` (a `hits` count for the monsters' sake would move
+  the report of every map). The Herald of Agony's Virulence is fed by a side's poison on an enemy of its team (a monster, the
+  other character or its minion); a monster's poison keeps today's rule.
+- **A kill of a minion** by the other side's damage gives that side what a kill gives that needs no loot or experience: the charges
+  (`kill`, `killFrozen`), the gains (`kill`, `killShocked`), a banner stage, "killed recently", the stances' refresh and the kill
+  triggers; no kill counted, no experience, no flask charges, no life or mana on kill, nothing dropped (Appendix A, 2026-10-16: F4
+  prices the rest). A minion that falls of its own side's damage or of nobody's gives nothing. A character's fall still counts for
+  nothing (F2). The kill effects read `causes` (the side that last struck it), which a monster's damage on a minion never sets.
+- **One bug of the same kind found.** The burning aura's off switch (Righteous Fire goes off below 40% life and on from 75%) was a
+  `WeakSet<World>`: two characters with an aura would have shared one switch. It is a `WeakSet<Side>` now. (The other module-level
+  state keyed by world is the monsters': locks of bosses, thefts, packs, telegraphs.)
+- **Per kit, what changed** (everything in it that picked "the enemy" by `isPlayer`, `w.actors` or `hunted`):
+  - _Minions_: what they seek (above), their blows and splash, Volatile Servants' burst, the Herald of Agony's crawler, the Relic,
+    the Skitterbots' auras, Infernal Legion's burn; a foreign minion in the way of a projectile is hit.
+  - _Deployables_ (totems, brands, traps, mines, ballistas, the mirage archer, the stand-ins): their foes include the other side's
+    minions; a mine's aura hit and the beams' debuffs are the side's.
+  - _Fields and zones_ (consecrated, chilling, caustic, pods, crystals, storms, walls, orbs, ghosts, geysers, trails, smoke, rain):
+    `enemiesIn` and `tickSkillZones` through the lists, debuffs carry `by`; a creeping patch drifts toward the other side.
+  - _Projectiles and shots_: a projectile of A hits B's character and B's minions (stops, pierces, forks, chains), never A's own;
+    the bursts of mortars, creeping skulls and the nova, the chain of lightning of a strike, a cone and the blades from behind the
+    struck one choose among the same list; Soulrend's homing, Storm Orb's bolts, the drifting orb, Blade Vortex, Storm Call's
+    markers and Explosive Arrow's fuses (the target may be a minion: `actorById`) too.
+  - _Triggers_: the counter-trigger of A fires when B hits A (it already did: `fireTriggers(dst.side)`); the target it picks is the
+    nearest enemy including minions; kill explosions and the overkill burn are the side's.
+  - _Charges_: a hit on a minion feeds them (`applyHit`); a kill of one does (above). _Buffs that count enemies near_ (stances,
+    banners' fight size, the channel's crowd stage, Frostblink's cooldown, the AI's packs, escapes and flasks, curses under
+    Blasphemy) count the minions too. _Banners_: the enemy status lands on the other character and minions in reach. _Blinks_:
+    the corpse and Bodyswap bursts, Withering Step's wither, the safest spot, the pack a blink lands in. _Supports_: Multistrike's
+    repeats, Ancestral Call, the mirage archer, the shockwave. _Offerings, hexes and the exposure_: nothing was wrong (own minions
+    only; a hex or a status goes onto any actor).
+- **Monster-only by meaning, left as it was:** `fieldKill`, `chargedDeath` and `hexKill` ask `hunted` who killed (they run for a
+  monster's death, and a character's or a minion's never reaches them); with monsters and two characters in one world they would
+  misattribute (out of scope). A character's `findTarget` never picks a minion (it chooses by distance among `w.actors`: a rival's
+  character, however many minions stand about it; the swing, the burst and the projectile hit what is in their way): an AI question
+  for F4. `raiseWall` does not keep the tiles of minions clear of its wall (it did not on a map).
+- **Tests** (`src/sim/duelKits.test.ts`, 201): asymmetric, a kit to one side and the effect and the credit looked for on the right
+  ledger. A minion of B attacks A's character and the blows are B's, both sides' minions fight each other, `enemiesOf` lists the
+  other side's character and minions and none of one's own, a hit on a minion earns a row and a charge, a kill of one gives the
+  charges and no kill (and a fall of nobody's or one's own gives nothing); A's totem and A's mines; B's caustic ground burns A and is
+  B's (and spares B), A's creeping ground drifts toward B, B's banner's status lands on A in reach and not beyond; A's counter-attack
+  answers B's blows; A's Molten Shell goes off on B; a projectile of A hits B's minion and B and never A's own minion, and stops at
+  B's minion in its way; a monster between two sides walks to the nearer by the flow field (west and east); the flow field itself
+  against the old search; the helpers. 11 of the 19 kit tests fail on F2's code. **The duel gem smoke test**: every active and
+  item-granted gem (178) on side A against a class starter on side B for ten simulated seconds: no exception, life finite, and a
+  damage gem hurts B. **Both characters cannot die** (`godMode`, `freeResources` on A as `gemSmoke.test.ts` has them): 176 of the 178
+  fights ended before the ten seconds were up when B could die (most within two), and the point is ten seconds of the kit at work. It adds about 2.5
+  seconds to the suite (all of the file, 4 s); no gem needed a skip. The suite is 3,117 tests.
+- **Tools.** `npm run duel -- --a vanguard:1:20 --b strider:1:20 [--seeds 1,2,3] [--both] [--legacy]` fights two builds and prints
+  the result of each seed and both ledgers (dealt and taken by source, the pools); a build is `class:seed:map` (the bot played to
+  that map and snapshotted, as `ladder-probe.ts` does), a number with `--load snaps.json` (the probe's `--save`), or a file: a save
+  as `localStorage.getItem('bob.save.1')` (a `{ version, run }`), a run's JSON or a build's (`scripts/duel-lib.ts`). `--both` fights
+  each seed in both orders. `ladder-probe.ts --real [--fight-seeds 1,2]` fights the matrix with `runDuel`, each pair in both orders.
+- **The matrix** (bot builds snapshotted at map 20 and 40, `--classes all --seeds 1,2 --legacy`; the default difficulty kills the bot
+  on maps 10 to 20, so with it only two builds reach map 20 and one reaches 40; one fight per cell, seed 1):
+
+  | map | builds | fights | by a death | both dead at once | by the cap | median | shortest | longest | west won | east won |
+  | --- | ------ | ------ | ---------- | ----------------- | ---------- | ------ | -------- | ------- | -------- | -------- |
+  | 20  | 12     | 132    | 130        | 2                 | 0          | 4.4 s  | 1.9 s    | 40.3 s  | 68       | 62       |
+  | 40  | 10     | 90     | 90         | 0                 | 0          | 5.6 s  | 2.5 s    | 19.8 s  | 51       | 39       |
+
+  The two orders of a pair agree on the winner (the same build wins both) in 62 of 66 at map 20 (3 disagree: the west side won
+  both, or the east side did; 1 had a draw in one order) and in 39 of 45 at map 40 (6 disagree). The west side wins a little more
+  (52% and 57%), as it strikes first. A fight takes about 10 milliseconds of wall time. The fights include totems (Mortar Bow),
+  traps, mines, creeping ground, Orbiting Blades and a Herald of Agony crawler with no error. **F4's damage scale starts here:** the
+  median fight is 4 to 6 seconds, well short of the 15 to 40 s that 4.4 asks for, and none reached the cap.
+
+- **For F4 and F5:**
+  - _The AI does not target minions_ (above): a character with a screen of minions in front is struck through it by area and
+    projectile skills only; whether `findTarget` should choose them is a decision for the rules.
+  - _What a kill of a minion gives_ is as in Appendix A; flasks, life and mana on kill, and experience are F4's.
+  - _The flow field and `hunted`_ can disagree across a wall (path against straight line); with monsters in a duel, one of them
+    should lead the other.
+  - _Rows._ A minion's blows are `minion` rows in both ledgers, a side's skill effects on a character are `effect` rows (Molten
+    Shell's burst on a character, Mine, Herald), on a monster or a minion `skill` rows: the result screen groups by `kind`.
+  - _Speed._ The fence's wall time was 22.1 s on the base and 22.4 s after F3 (12 bot runs); the owner plumbing and the
+    multi-source field cost nothing measurable.
 
 ---
 
