@@ -418,6 +418,19 @@ export async function fetchMySnapshots(
   return out;
 }
 
+/**
+ * Whether a snapshot of the caller's is the character of this run (the same save version, class, level and map, as `rivalRecord`
+ * writes them): the sanity check that the newest snapshot is the run that just ended and not an older one.
+ */
+export function matchesRun(s: MySnapshot, run: RunState): boolean {
+  return (
+    s.saveVersion === SAVE_VERSION &&
+    s.classId === run.classId.slice(0, 32) &&
+    s.level === clampInt(run.build.level, 1, 100) &&
+    s.map === clampInt(run.map, 1, 100)
+  );
+}
+
 // ---------------------------------------------------------------------------------------------------------------------------
 // What a rival card shows
 

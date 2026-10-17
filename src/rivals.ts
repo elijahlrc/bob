@@ -1,13 +1,20 @@
-import type { Controller } from './run/controller';
+import type { Controller, DuelMode, DuelOutcome } from './run/controller';
 import {
+  fetchHighScoresOrNull,
+  fetchMySnapshots,
+  fetchRivalsOrNull,
   hashToken,
+  matchesRun,
   nameRefused,
+  postDuel,
   postRival,
   rivalRecord,
+  RIVALS_POOL,
   validName,
   type FetchAny,
+  type HighScore,
 } from './run/rivals';
-import type { RunState } from './run/run';
+import { SAVE_VERSION, type RunState } from './run/run';
 import type { MapResult } from './sim/runMap';
 import { SINK, type Sink } from './run/telemetry';
 import { loadPref, savePref } from './ui/prefs';
@@ -90,7 +97,7 @@ const buildId = (): string => (typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ :
 /** What the hook sends with and where: the real ones in the game, replaced in tests. */
 export type RivalDeps = { fetch: FetchAny; sink: Sink; version: string };
 
-const realDeps = (): RivalDeps => ({
+export const realDeps = (): RivalDeps => ({
   fetch: (url, init) => fetch(url, init as RequestInit),
   sink: SINK,
   version: buildId(),
@@ -216,10 +223,134 @@ function share(run: RunState, res: MapResult, deps: () => RivalDeps): void {
   }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------------
+// The Rivals screen: whose character it is, and who is near
+
 /**
- * Send the character of every run that ends on `c`, a death and a win alike, when the player has opted in and typed a valid name.
- * It runs beside any hook already on `c.onRunEnd` (telemetry's), whichever was installed first, and nothing it does can throw
- * into the end of a run.
+ * Fill the Rivals screen of the run that ended (`c.rivals`, opened by `c.openRivals()`), once: wait for the post of the character
+ * that may still be on its way, ask the table for the player's own snapshot (`my_snapshots`: its id is what the seed of a rated
+ * fight and the report need), then for the twenty rivals near the map (`rivals_for`, none of the player's own), and hand the
+ * controller both. The newest snapshot of this save version is the player's character only if it is the run's (class, level and
+ * map); if it is not, or there is none, the character was not sent and the screen says so (`unsent`) rather than posting it
+ * again. Unreachable rivals are `offline`, none near are `empty`. Nothing here throws.
+ */
+export async function loadRivals(c: Controller, deps: () => RivalDeps = realDeps): Promise<void> {
+  const run = c.run;
+  const s = c.rivals;
+  if (!run || !s || s.started) return;
+  s.started = true;
+  try {
+    const d = deps();
+    const post = await (pendingPost(run) ?? Promise.resolve(postStatus(run)));
+    const tokenHash = await hashToken(rivalToken());
+    const rows = await fetchMySnapshots(d.fetch, d.sink, tokenHash);
+    if (rows === null) return c.failRivals('offline');
+    const newest = rows.find((r) => r.saveVersion === SAVE_VERSION);
+    if (!newest || !matchesRun(newest, run))
+      return c.failRivals('unsent', post.status === 'failed' ? post.reason : 'unreachable');
+    const pool = await fetchRivalsOrNull(d.fetch, d.sink, {
+      saveVersion: SAVE_VERSION,
+      map: run.map,
+      k: RIVALS_POOL,
+      excludeTokenHash: tokenHash,
+    });
+    if (pool === null) return c.failRivals('offline');
+    c.fillRivals(newest, pool);
+  } catch {
+    c.failRivals('offline');
+  }
+}
+
+/**
+ * The retry the Rivals screen offers when the character did not get there: the post goes again through the keeper (which refuses
+ * to post a run that is sending or posted), and the screen is made again from the start. Returns the post's status.
+ */
+export async function retryRivals(c: Controller): Promise<PostStatus> {
+  const run = c.run;
+  if (!run) return IDLE;
+  const st = await postRun(run, c.lastResult);
+  c.openRivals();
+  return st;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------
+// The report of a rated fight
+
+/**
+ * Report a rated fight to the duel log (`postDuel`): the player's snapshot, the rival's, who won, how and after how long, the game
+ * version and the token's hash (the proof the snapshot is the player's). The answer says what the result screen shows: `rated` (and
+ * then the player's rating before and after, read again from `my_snapshots`), `already`, `refused` with the server's reason, or
+ * `failed` when offline. A pair the server has (`rated` or `already`) is marked in the record, so that the next fight against that
+ * rival is practice. A practice fight is not reported. Nothing here throws.
+ */
+export async function reportDuel(
+  c: Controller,
+  out: DuelOutcome,
+  deps: () => RivalDeps = realDeps,
+): Promise<void> {
+  const rv = out.rival;
+  if (!rv || !rv.rated) return;
+  const changed = () => c.bus?.emit('state', null);
+  try {
+    const d = deps();
+    const tokenHash = await hashToken(rivalToken());
+    const { result } = out;
+    const post = await postDuel(d.fetch, d.sink, {
+      a_id: Number(rv.myId),
+      b_id: Number(rv.rivalId),
+      winner: result.winner,
+      how: result.how,
+      seconds: Math.min(120, Math.max(0, Math.round(result.time * 100) / 100)),
+      game_version: d.version,
+      token_hash: tokenHash,
+    });
+    rv.report = post.outcome;
+    if (post.message) rv.message = post.message;
+    if (post.outcome === 'rated' || post.outcome === 'already') c.markRated(rv.myId, rv.rivalId);
+    changed();
+    if (post.outcome !== 'rated') return;
+    // The ladder has moved: the player's rating before and after.
+    const before = c.rivals?.mine?.rating;
+    const rows = await fetchMySnapshots(d.fetch, d.sink, tokenHash);
+    const row = rows?.find((r) => r.id === rv.myId);
+    if (row) {
+      if (before !== undefined) rv.rating = { before, after: row.rating };
+      c.setMine(row);
+    }
+  } catch {
+    rv.report = 'failed';
+  }
+  changed();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------
+// The high scores
+
+/**
+ * The top of the list (`high_scores`, at most 100) and the ids of the caller's own snapshots in it (`my_snapshots`), so that a
+ * screen can mark the player's rows. `scores` is null when the rivals could not be reached; `mine` is empty when the player's
+ * snapshots could not be read (the list is shown without the marks).
+ */
+export async function loadHighScores(
+  deps: () => RivalDeps = realDeps,
+): Promise<{ scores: HighScore[] | null; mine: Set<string> }> {
+  try {
+    const d = deps();
+    const tokenHash = await hashToken(rivalToken());
+    const [scores, rows] = await Promise.all([
+      fetchHighScoresOrNull(d.fetch, d.sink, 100),
+      fetchMySnapshots(d.fetch, d.sink, tokenHash),
+    ]);
+    return { scores, mine: new Set((rows ?? []).map((r) => r.id)) };
+  } catch {
+    return { scores: null, mine: new Set() };
+  }
+}
+
+/**
+ * Send the character of every run that ends on `c`, a death and a win alike, when the player has opted in and typed a valid name,
+ * and report every rated fight against a rival (`reportDuel`). It runs beside any hook already on `c.onRunEnd` (telemetry's),
+ * whichever was installed first, and nothing it does can throw into the end of a run.
  */
 export function installRivals(c: Controller, deps: () => RivalDeps = realDeps): void {
   const prev = c.onRunEnd;
@@ -228,6 +359,14 @@ export function installRivals(c: Controller, deps: () => RivalDeps = realDeps): 
       prev?.(run, res);
     } finally {
       share(run, res, deps);
+    }
+  };
+  const prevDuel = c.onDuelEnd;
+  c.onDuelEnd = (d: DuelMode, out: DuelOutcome) => {
+    try {
+      prevDuel?.(d, out);
+    } finally {
+      void reportDuel(c, out, deps).catch(() => undefined);
     }
   };
 }
