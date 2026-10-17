@@ -4,6 +4,15 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-17
+
+- Duels: when a run ends, you can fight the characters other players left behind, each with its own build, in a round arena. The button is on the end screen.
+- Duelling needs a name: tick the rivals box on the title or end screen and type one. Your character is then sent for others to fight, and your IP address is kept hashed to block abuse.
+- Ratings start at ten times a character's level. The first fight against each rival is rated, later ones are practice. High scores on the title screen list the top-rated characters. Ratings are new and may be reset.
+- In a duel both sides take about a third of normal damage, and a fight ends on a death, after 90 seconds, or after 15 seconds without a hit.
+- Bosses say a line when you first meet them. The Shrine and the Ferryman have one too.
+- On iPhone and iPad the "Failed to start the audio device" crash screen is gone. Errors that do not stop the game now show a small message instead of the crash screen.
+
 ## 2026-10-16
 
 - Weapons roll many more affixes. Every weapon can roll resistances, life and mana leech from physical attack damage, life and mana on kill, added chaos damage, a damage over time multiplier, physical damage with accuracy, increased accuracy and reduced attribute requirements. Spell weapons also roll fire, cold and lightning damage, spell critical strike chance, burning damage, damage over time multipliers by type, extra chaos damage and spell gem levels. Bows roll an additional arrow, bows and wands roll projectile speed, and melee weapons and bows roll levels for their own socketed gems.
