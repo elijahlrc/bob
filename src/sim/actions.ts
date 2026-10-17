@@ -64,17 +64,17 @@ export function startAction(
   const hand = n > 1 ? a.handIdx % n : 0;
   let duration = p.isAttack && n > 1 && !p.bothHands ? p.hands[hand].time : p.useTime;
   // A monster that strikes in a rhythm: each blow takes a share of the usual time and carries the same share of the damage.
-  a.patMult = 1;
+  a.rhythm.patMult = 1;
   if (a.mon) {
     const pat = MONSTER_TYPES[a.mon.spec.type].pattern;
     if (pat) {
-      a.patMult = pat[a.beat % pat.length];
-      a.beat++;
-      duration *= a.patMult;
+      a.rhythm.patMult = pat[a.rhythm.beat % pat.length];
+      a.rhythm.beat++;
+      duration *= a.rhythm.patMult;
     }
     // An area blow is followed by a rest (AREA_PACE): the wind-up and its warning are as they were, the next blow comes later.
     if (p.skill.id === `monster_${a.mon.spec.type}`)
-      a.restT = duration * (areaPace(a.mon.spec) - 1);
+      a.rhythm.restT = duration * (areaPace(a.mon.spec) - 1);
   }
   a.action = {
     profile: p,

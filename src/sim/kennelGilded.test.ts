@@ -111,8 +111,8 @@ describe('the Handler and the pack', () => {
     const near = put(w, 'hound', 12);
     const far = put(w, 'hound', 12, 25);
     run(w, 0.2);
-    expect(near.buffT).toBeGreaterThan(0);
-    expect(far.buffT).toBeLessThanOrEqual(0);
+    expect(near.choir.buffT).toBeGreaterThan(0);
+    expect(far.choir.buffT).toBeLessThanOrEqual(0);
   });
 
   it('a kiter backs away when you come close; a plain archer does not as soon', () => {

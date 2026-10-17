@@ -140,7 +140,7 @@ describe('the additions to the factions (docs/ROSTER.md 7.1)', () => {
     let driven = false;
     for (let i = 0; i < 120; i++) {
       stepWorld(w);
-      if (ally.buffT > 0) driven = true;
+      if (ally.choir.buffT > 0) driven = true;
     }
     expect(bell.x).toBe(x0);
     expect(driven).toBe(true);

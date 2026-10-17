@@ -797,7 +797,7 @@ export class GrimStyle extends StyleBase {
       else if (a.ail.ignites.length) tint = 0xffc898;
       else if (a.ail.shock > 0) tint = 0xe4ccff;
       else if (a.ail.bleeds.length) tint = 0xffb4b4;
-      else if (a.enraged) tint = 0xff9a8a;
+      else if (a.rhythm.enraged) tint = 0xff9a8a;
       // A monster's modes show on its body: stone, quenched, swollen, molten (docs/ENCOUNTERS.md 6).
       const look = a.enc ? encounterSprite(a) : null;
       if (look?.tint !== undefined && (tint === 0xffffff || look.fill)) tint = look.tint;

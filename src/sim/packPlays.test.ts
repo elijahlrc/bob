@@ -101,7 +101,7 @@ describe('pack plays (docs/ENCOUNTERS.md 8)', () => {
     let on = false;
     for (let i = 0; i < 300 && !on; i++) {
       stepWorld(w);
-      on = brood.every((g) => !g.alive || g.buffT > 0);
+      on = brood.every((g) => !g.alive || g.choir.buffT > 0);
     }
     expect(on).toBe(true);
     expect(nest.alive).toBe(true);

@@ -149,25 +149,33 @@ export type Actor = {
   sdots: SkillDot[];
   /** The life a killing blow went past (Herald of Ash burns by it). */
   overkill?: number;
-  /** Resistance lowered by hexes, per damage type (index 0 unused). */
-  hexRes: number[];
-  hexVuln: number;
-  hexVulnAll: number;
-  hexDmg: number;
-  hexSpeed: number;
-  /** The rest of what the hexes on this actor do (damage over time taken, accuracy, evasion, chances to be bled or maimed...). */
-  hexMore: HexTotals;
+  hex: {
+    /** Resistance lowered by hexes, per damage type (index 0 unused). */
+    res: number[];
+    vuln: number;
+    vulnAll: number;
+    dmg: number;
+    speed: number;
+    /** The rest of what the hexes on this actor do (damage over time taken, accuracy, evasion, chances to be bled or maimed...). */
+    more: HexTotals;
+    /** Seconds before a Hexcaller can hex again, and the time left of a Choirmaster channel. */
+    cd: number;
+  };
   /** The Choir (EXPANSION 7.3): the censer aura time left, a Zealous boost, and Fervour stacks with their time left. */
-  buffT: number;
-  zealT: number;
-  fervour: number;
-  fervourT: number;
-  /** Which beat of its rhythm it is on, the damage that beat carries, and whether it has enraged (docs/ROSTER.md 6.5). */
-  beat: number;
-  /** Seconds a monster rests before its next area blow (counted down while it can act; see AREA_PACE). */
-  restT: number;
-  patMult: number;
-  enraged: boolean;
+  choir: {
+    buffT: number;
+    zealT: number;
+    fervour: number;
+    fervourT: number;
+  };
+  rhythm: {
+    /** Which beat of its rhythm it is on, the damage that beat carries, and whether it has enraged (docs/ROSTER.md 6.5). */
+    beat: number;
+    /** Seconds a monster rests before its next area blow (counted down while it can act; see AREA_PACE). */
+    restT: number;
+    patMult: number;
+    enraged: boolean;
+  };
   /** The phases (by index in the type's list) that have happened. */
   phaseMask: number;
   /** A Mirrored monster's twin, and the seconds the survivor has to follow it before it is made whole again. */
@@ -216,7 +224,6 @@ export type Actor = {
   /** Where a burrowed Gnawing Queen will come up. */
   mark: { x: number; y: number };
   /** Seconds before a Hexcaller can hex again, and the time left of a Choirmaster channel. */
-  hexCd: number;
   channelT: number;
   chase: {
     /** A chasing monster: seconds it has spent held up (it walks but gets nowhere), and where it was and when it last tried to walk. */

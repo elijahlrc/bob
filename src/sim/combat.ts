@@ -239,19 +239,19 @@ export function refreshPlayerDefence(w: World, s: Side): void {
 export function targetState(a: Actor): TargetState {
   // Brittle Doom lowers the three elemental resistances; Open Wounds adds physical vulnerability; exposure and the like add to them.
   const st = statusTaken(a);
-  const resShift = a.resShift.v.map((r, i) => r - a.hexRes[i] - st.res[i]);
+  const resShift = a.resShift.v.map((r, i) => r - a.hex.res[i] - st.res[i]);
   return {
     def: a.def,
     shock: a.ail.shock,
     resShift,
-    vuln: a.hexVuln,
-    vulnAll: a.hexVulnAll,
+    vuln: a.hex.vuln,
+    vulnAll: a.hex.vulnAll,
     vulnType: st.vulnType,
     blockLess: blockLessOf(a),
-    evasionLess: a.hexMore.evasion,
-    physRedLess: a.hexMore.physRed,
-    bleedChance: a.hexMore.bleedHit,
-    stunBonus: a.hexMore.stun,
+    evasionLess: a.hex.more.evasion,
+    physRedLess: a.hex.more.physRed,
+    bleedChance: a.hex.more.bleedHit,
+    stunBonus: a.hex.more.stun,
     es: a.es,
     poisons: a.ail.poisons.length,
   };
@@ -449,8 +449,13 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       res.total *= k;
     }
   }
-  if (src.modIds.includes('hexcaller') && dst.isPlayer && res.outcome === 'hit' && src.hexCd <= 0) {
-    src.hexCd = 4;
+  if (
+    src.modIds.includes('hexcaller') &&
+    dst.isPlayer &&
+    res.outcome === 'hit' &&
+    src.hex.cd <= 0
+  ) {
+    src.hex.cd = 4;
     hexPlayerAtRandom(w, dst.side!);
   }
   // A monster's modes change what the hit does to it: exposed, quenched, swollen, fed by fire (docs/ENCOUNTERS.md 6).
@@ -565,7 +570,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     if (src.isPlayer) {
       rollStatuses(w, dst, p, false, res);
       // Vulnerability: a chance to be maimed by an attack.
-      if (p.isAttack && dst.hexMore.maimHit > 0 && w.rngTrig.chance(dst.hexMore.maimHit))
+      if (p.isAttack && dst.hex.more.maimHit > 0 && w.rngTrig.chance(dst.hex.more.maimHit))
         applyStatus(w, dst, 'maim', { seconds: 4 });
     }
     payImpales(w, dst);
@@ -788,7 +793,7 @@ export function hit(
   let h = p.hands[Math.min(hand, p.hands.length - 1)];
   const ts = targetState(dst);
   // A blinded attacker misses more, and an enfeebled one is less accurate and crits less.
-  const hm = src.hexMore;
+  const hm = src.hex.more;
   ts.hitChanceMult = hitChanceFactor(src) * (1 - hm.acc * 0.5);
   // Consecrated ground makes hits against what stands on it crit twice as often.
   if (
@@ -963,13 +968,13 @@ export function rawHit(
       const red = Math.min(0.9, def.armour / (def.armour + 10 * dmg[0]) + def.physReduction);
       dmg[0] *= 1 - red;
     } else {
-      const shift = dst.resShift.v[i] - dst.hexRes[i] - st.res[i];
+      const shift = dst.resShift.v[i] - dst.hex.res[i] - st.res[i];
       const r = Math.max(-200, Math.min(def.res[i] + shift, def.maxRes[i]));
       dmg[i] *= 1 - r / 100;
     }
     dmg[i] *= taken * def.damageTakenType[i];
-    if (i === 0) dmg[i] *= 1 + dst.hexVuln;
-    dmg[i] *= (1 + dst.hexVulnAll) * (1 + st.vulnType[i]);
+    if (i === 0) dmg[i] *= 1 + dst.hex.vuln;
+    dmg[i] *= (1 + dst.hex.vulnAll) * (1 + st.vulnType[i]);
   }
   const total = dmg[0] + dmg[1] + dmg[2] + dmg[3] + dmg[4];
   w.events.push({ t: 'hit', src: 0, dst: dst.id, amount: total, crit: false, dtype: type });
@@ -1199,15 +1204,15 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   tickStatuses(a, dt);
   // A stun opens a curled beetle.
   if (a.curlT > 0) a.curlT = a.stunT > 0 ? 0 : a.curlT - dt;
-  if (a.buffT > 0) a.buffT -= dt;
+  if (a.choir.buffT > 0) a.choir.buffT -= dt;
   if (a.suppressT > 0) a.suppressT -= dt;
-  if (a.zealT > 0) a.zealT -= dt;
-  if (a.hexCd > 0) a.hexCd -= dt;
+  if (a.choir.zealT > 0) a.choir.zealT -= dt;
+  if (a.hex.cd > 0) a.hex.cd -= dt;
   // A beetle counts down the wait before it can curl up again (nothing else uses its faction timer).
   if (a.skillT > 0 && a.mon?.spec.type === 'beetle') a.skillT -= dt;
-  if (a.fervourT > 0) {
-    a.fervourT -= dt;
-    if (a.fervourT <= 0) a.fervour = 0;
+  if (a.choir.fervourT > 0) {
+    a.choir.fervourT -= dt;
+    if (a.choir.fervourT <= 0) a.choir.fervour = 0;
   }
   if (a.resShift.t > 0) {
     a.resShift.t -= dt;
@@ -1231,7 +1236,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   }
   // Damage over time. Temporal Chains lets effects on a cursed enemy run out more slowly; Vulnerability and Despair raise what they deal.
   const taken = def.damageTakenMult * shockTaken(def, ail.shock);
-  const hm = a.hexMore;
+  const hm = a.hex.more;
   const dtDot = dt * (1 - hm.expireSlow);
   let dotPhys = 0;
   let dotFire = 0;

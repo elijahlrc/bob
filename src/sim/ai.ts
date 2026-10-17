@@ -877,8 +877,8 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     return;
   }
   // After an area blow it rests (AREA_PACE in data/shapes.ts), so it casts fewer, harder ones rather than a stream of them.
-  if (m.restT > 0) {
-    m.restT -= dt;
+  if (m.rhythm.restT > 0) {
+    m.rhythm.restT -= dt;
     return;
   }
   // Whether it fights at arm's length is the type's, not its shape's: a Sentinel's nova is still a melee blow.

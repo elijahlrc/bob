@@ -142,7 +142,7 @@ export function tickPackPlays(w: World, side: Side, dt: number): void {
     pl.t = 3;
     pl.cd = CONVERGE_COOLDOWN;
     pl.members = brood;
-    for (const g of brood) g.buffT = Math.max(g.buffT, 3);
+    for (const g of brood) g.choir.buffT = Math.max(g.choir.buffT, 3);
     w.events.push({ t: 'window', id: nest.id, kind: 'converge' });
   }
 }

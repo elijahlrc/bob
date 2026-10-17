@@ -212,7 +212,8 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
   },
   aura({ w, m, ab }) {
     for (const o of w.actors)
-      if (!o.isPlayer && o.alive && Math.hypot(o.x - m.x, o.y - m.y) <= ab.range!) o.buffT = 0.3;
+      if (!o.isPlayer && o.alive && Math.hypot(o.x - m.x, o.y - m.y) <= ab.range!)
+        o.choir.buffT = 0.3;
   },
   hex({ w, m, p, dt, d, ab }) {
     m.skillT -= dt;
@@ -256,7 +257,8 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
     if (m.abT[i] > 0 || d > 14) return;
     m.abT[i] = ab.interval!;
     for (const o of w.actors)
-      if (!o.isPlayer && o.alive && Math.hypot(o.x - m.x, o.y - m.y) <= ab.range!) o.buffT = 4;
+      if (!o.isPlayer && o.alive && Math.hypot(o.x - m.x, o.y - m.y) <= ab.range!)
+        o.choir.buffT = 4;
     // And marks the quarry: the pack hits the character harder for a while (docs/ENCOUNTERS.md 7).
     if (d <= 10) markPlayer(w, m);
   },

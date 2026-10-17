@@ -78,10 +78,10 @@ const RAISED_LIFE = 0.5;
 /** Everything that speeds an actor up or slows it down: hexes, the censer aura and Fervour. */
 export function speedMult(a: Actor): number {
   return (
-    a.hexSpeed *
-    (a.buffT > 0 ? 1 + CENSER_SPEED : 1) *
-    (1 + FERVOUR_STEP * a.fervour) *
-    (a.enraged ? ENRAGE_SPEED : 1) *
+    a.hex.speed *
+    (a.choir.buffT > 0 ? 1 + CENSER_SPEED : 1) *
+    (1 + FERVOUR_STEP * a.choir.fervour) *
+    (a.rhythm.enraged ? ENRAGE_SPEED : 1) *
     (a.enc ? encMoveMult(a) : 1)
   );
 }
@@ -94,13 +94,13 @@ export function moveMult(a: Actor): number {
 /** Everything that raises or lowers the damage an actor deals. */
 export function damageMult(a: Actor): number {
   return (
-    a.hexDmg *
-    (a.buffT > 0 ? 1 + CENSER_DAMAGE : 1) *
-    (a.zealT > 0 ? 1 + ZEAL_DAMAGE : 1) *
-    (1 + FERVOUR_STEP * a.fervour) *
-    (a.enraged ? ENRAGE_DAMAGE : 1) *
+    a.hex.dmg *
+    (a.choir.buffT > 0 ? 1 + CENSER_DAMAGE : 1) *
+    (a.choir.zealT > 0 ? 1 + ZEAL_DAMAGE : 1) *
+    (1 + FERVOUR_STEP * a.choir.fervour) *
+    (a.rhythm.enraged ? ENRAGE_DAMAGE : 1) *
     (a.enc ? encDamageMult(a) : 1) *
-    a.patMult
+    a.rhythm.patMult
   );
 }
 
@@ -346,10 +346,10 @@ export function onMonsterDeath(w: World, a: Actor): void {
     if (!o.alive || o === a || o.isPlayer || !o.mon) continue;
     const d = Math.hypot(o.x - a.x, o.y - a.y);
     if (o.mon.spec.type === 'flagellant' && d <= FLAGELLANT_RANGE) {
-      o.fervour = Math.min(FERVOUR_MAX, o.fervour + 1);
-      o.fervourT = FERVOUR_SECONDS;
+      o.choir.fervour = Math.min(FERVOUR_MAX, o.choir.fervour + 1);
+      o.choir.fervourT = FERVOUR_SECONDS;
     }
-    if (a.modIds.includes('zealous') && d <= ZEAL_RANGE) o.zealT = ZEAL_SECONDS;
+    if (a.modIds.includes('zealous') && d <= ZEAL_RANGE) o.choir.zealT = ZEAL_SECONDS;
   }
   if (type === 'wight')
     for (const o of w.actors)

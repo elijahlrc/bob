@@ -61,6 +61,9 @@ function enemyAt(w: World, like: Actor, x: number, y: number): Actor {
     chase: { ...like.chase },
     dash: { ...like.dash },
     theft: { ...like.theft },
+    hex: { ...like.hex },
+    choir: { ...like.choir },
+    rhythm: { ...like.rhythm },
     patrol: like.patrol && { ...like.patrol },
   };
   a.id = w.nextId++;

@@ -15,7 +15,7 @@ export function tickPhases(w: World, m: Actor): void {
     m.phaseMask |= 1 << i;
     switch (p.do) {
       case 'enrage':
-        m.enraged = true;
+        m.rhythm.enraged = true;
         break;
       case 'flee':
         m.theft.fleeT = Math.max(m.theft.fleeT, p.seconds ?? 4);

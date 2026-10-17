@@ -141,14 +141,14 @@ describe('hexes in the sim (EXPANSION 5.7)', () => {
     const w = arena();
     const m = put(w, 'warrior', 8);
     applyHex(w, m, 'openWounds', 25, 1, 1, HEX_SECONDS);
-    expect(m.hexVuln).toBeCloseTo(0.25, 6);
+    expect(m.hex.vuln).toBeCloseTo(0.25, 6);
     run(w, HEX_SECONDS - 1);
     applyHex(w, m, 'openWounds', 25, 1, 1, HEX_SECONDS);
     run(w, HEX_SECONDS - 1);
     expect(m.hexes).toHaveLength(1);
     run(w, 1.5);
     expect(m.hexes).toHaveLength(0);
-    expect(m.hexVuln).toBe(0);
+    expect(m.hex.vuln).toBe(0);
   });
 
   it('an enemy holds only as many hexes as the limit; the one with least time left goes', () => {
@@ -172,21 +172,21 @@ describe('hexes in the sim (EXPANSION 5.7)', () => {
     const lostA = before[0] - a.life;
     const lostB = before[1] - b.life;
     expect(lostB / lostA).toBeCloseTo(1, 6); // applyDamage is raw: the hex acts in the hit code
-    const raw = (x: Actor) => (w.sides[0].opts.godMode, x.hexVuln);
+    const raw = (x: Actor) => (w.sides[0].opts.godMode, x.hex.vuln);
     expect(raw(b)).toBeCloseTo(0.5, 6);
     const c = put(w, 'warrior', 10);
     applyHex(w, c, 'brittleDoom', 30, 1);
-    expect(c.hexRes.slice(1, 4)).toEqual([30, 30, 30]);
+    expect(c.hex.res.slice(1, 4)).toEqual([30, 30, 30]);
   });
 
   it('Leaden Limbs slows movement and actions; Feeble Grip lowers damage dealt', () => {
     const w = arena();
     const m = put(w, 'warrior', 8);
     applyHex(w, m, 'leadenLimbs', 20, 1);
-    expect(m.hexSpeed).toBeCloseTo(0.8, 6);
+    expect(m.hex.speed).toBeCloseTo(0.8, 6);
     const g = put(w, 'warrior', 9);
     applyHex(w, g, 'feebleGrip', 20, 1);
-    expect(g.hexDmg).toBeCloseTo(0.8, 6);
+    expect(g.hex.dmg).toBeCloseTo(0.8, 6);
   });
 
   it('a Hex-warded monster cannot be hexed', () => {
@@ -216,7 +216,7 @@ describe('hexes in the sim (EXPANSION 5.7)', () => {
     const { world, dummy } = createDummyWorld(b, { distance: 1.6, maxTime: 30 });
     run(world, 5);
     expect(dummy.hexes.map((h) => h.id)).toEqual(['openWounds']);
-    expect(dummy.hexVuln).toBeGreaterThan(0.19);
+    expect(dummy.hex.vuln).toBeGreaterThan(0.19);
   });
 
   it('convergence: Open Wounds on the training dummy is within 3% of the calc', () => {
@@ -255,20 +255,20 @@ describe('the Ashen Choir (EXPANSION 7.3)', () => {
     const near = put(w, 'warrior', 12);
     const far = put(w, 'warrior', 20);
     run(w, 0.3);
-    expect(near.buffT).toBeGreaterThan(0);
-    expect(far.buffT).toBeLessThanOrEqual(0);
+    expect(near.choir.buffT).toBeGreaterThan(0);
+    expect(far.choir.buffT).toBeLessThanOrEqual(0);
   });
 
   it('a Flagellant gains Fervour whenever an ally within six tiles dies, and it wears off', () => {
     const w = arena();
     const f = put(w, 'flagellant', 10);
     for (let i = 0; i < 7; i++) killActor(w, put(w, 'warrior', 12 + i * 0.1));
-    expect(f.fervour).toBeGreaterThan(0);
+    expect(f.choir.fervour).toBeGreaterThan(0);
     const far = put(w, 'flagellant', 25);
     killActor(w, put(w, 'warrior', 12));
-    expect(far.fervour).toBe(0);
+    expect(far.choir.fervour).toBe(0);
     run(w, 10.5);
-    expect(f.fervour).toBe(0);
+    expect(f.choir.fervour).toBe(0);
   });
 
   it('a Choirmaster heals allies after a channel, and a stun interrupts it', () => {
@@ -303,7 +303,7 @@ describe('the Ashen Choir (EXPANSION 7.3)', () => {
     const z = put(w, 'warrior', 10, 0, { rarity: 'magic', mods: ['zealous'] });
     const ally = put(w, 'warrior', 12);
     killActor(w, z);
-    expect(ally.zealT).toBeGreaterThan(0);
+    expect(ally.choir.zealT).toBeGreaterThan(0);
   });
 
   it('a Hexcaller hexes the player when it hits, with a four second cooldown', () => {
@@ -319,7 +319,7 @@ describe('the Ashen Choir (EXPANSION 7.3)', () => {
     }
     expect(hexes).toBeGreaterThanOrEqual(1);
     expect(hexes).toBeLessThanOrEqual(3);
-    expect(m.hexCd).toBeDefined();
+    expect(m.hex.cd).toBeDefined();
   });
 
   it('the Precentor cycles its hexes and calls a Choirmaster at half life', () => {
