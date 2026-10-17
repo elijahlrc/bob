@@ -39,3 +39,18 @@ export function affixSummary(it: Item, max = 3): string {
   const shown = names.slice(0, max).join(', ');
   return names.length > max ? `${shown} +${names.length - max}` : shown;
 }
+
+/** A mod line shortened for a bag row: "+42 to maximum Life" is "+42 Life", "11% increased Evasion Rating" is "11% Evasion Rating". */
+export function shortLine(line: string): string {
+  return line
+    .replace(/^([+-]?\d[\d.]*%?) to (?:maximum )?/i, '$1 ')
+    .replace(/^(\d[\d.]*%) (?:increased|more) /i, '$1 ')
+    .replace(/\bResistance\b/g, 'Res');
+}
+
+/** What an item's own mods say, as short lines for a bag row ("+42 Life · +28% Fire Res"): the first `max` of them. */
+export function lineSummary(it: Item, max = 2): string {
+  const lines = modsText([...it.affixes.flatMap((a) => a.mods), ...(it.uniqueMods ?? [])]);
+  const shown = lines.slice(0, max).map(shortLine).join(' · ');
+  return lines.length > max ? `${shown} · +${lines.length - max}` : shown;
+}

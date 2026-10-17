@@ -471,6 +471,7 @@ export function Items({
           favs={favs}
           unseen={unseen}
           coarse={coarse}
+          phone={phone}
           total={run.inventory.length}
           counts={counts}
           discardedDust={discardedValue(run)}

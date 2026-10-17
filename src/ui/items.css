@@ -757,6 +757,123 @@
   margin-left: auto;
 }
 
+/* ---- Filters: a row on a phone with the rest in a sheet, and a way back to everything (docs/EQUIP.md 3.8) ---- */
+.badge.warn {
+  color: #f3d896;
+  background: #33260f;
+}
+.ix-cap-full {
+  color: #f0b060;
+}
+.ix-tools.phone {
+  flex-wrap: nowrap;
+}
+.ix-tools.phone .ix-search {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 34px;
+  padding: 2px 8px;
+  font-size: 16px;
+}
+.ix-fbtn {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 13px;
+  white-space: nowrap;
+  color: inherit;
+  background: var(--btn);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.ix-fbtn .n {
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #111;
+  background: var(--accent);
+  border-radius: 9px;
+}
+.ix-fbtn.clr {
+  color: var(--hi);
+  background: transparent;
+}
+.ix-rm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px 3px 10px;
+  font-size: 12px;
+  color: inherit;
+  background: var(--accent-d);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  cursor: pointer;
+}
+.ix-rm i {
+  width: 20px;
+  font-style: normal;
+  text-align: center;
+  color: #e6e1d3;
+}
+.ix-fsheet {
+  position: fixed;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--camp-bar, 52px) + var(--safe-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 80vh;
+  overflow: auto;
+  padding: 10px calc(12px + var(--safe-right, 0px)) 0 calc(12px + var(--safe-left, 0px));
+  background: var(--panel);
+  border-top: 2px solid var(--hi);
+  box-shadow: 0 -6px 18px #000a;
+}
+.ix-fhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 16px;
+}
+.ix-fsec {
+  margin-top: 6px;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.ix-fsheet .ix-chips {
+  margin: 0;
+}
+.ix-fsort,
+.ix-ftidy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.ix-ffoot {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px -12px 0;
+  padding: 8px 12px;
+  background: var(--panel);
+  border-top: 1px solid var(--border2);
+}
+.ix-fsheet .ix-close {
+  position: static;
+}
+
 /* ---- A tablet: the bag beside the selection ---- */
 @media (max-width: 1099px) {
   .ix {
@@ -923,6 +1040,9 @@
   .ix-sort select {
     font-size: 16px;
     min-height: 40px;
+  }
+  .ix-tools.phone .ix-search {
+    min-height: 34px;
   }
 }
 
