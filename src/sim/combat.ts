@@ -1345,7 +1345,13 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       logDamage(w, a, null, 'Bleeding', 0, dmg[0]);
       logDamage(w, a, null, 'Poison', 4, dmg[4]);
     }
-    noteCause(a, 0, false);
+    noteCause(
+      a,
+      0,
+      false,
+      [],
+      multi ? dotOwner([igniteBy, bleedBy, poisonBy], fromSkills) : undefined,
+    );
     applyDamage(w, a, dmg, {
       name: 'Damage over time',
       kind: 'ailment',
@@ -1413,6 +1419,24 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   // ES recharge.
   if (def.maxEs > 0 && a.es < def.maxEs && a.since.damaged >= def.esDelay)
     a.es = Math.min(def.maxEs, a.es + def.esRecharge * dt);
+}
+
+/** The side that put most of the damage over time on an actor, whose the kill is if it dies of it (none when no side's). */
+function dotOwner(shares: (DotShare[] | undefined)[], skills: SkillDot[] | null): Side | undefined {
+  let best: Side | undefined;
+  let most = 0;
+  for (const list of shares)
+    for (const x of list ?? [])
+      if (x.side && x.dps > most) {
+        best = x.side;
+        most = x.dps;
+      }
+  for (const d of skills ?? [])
+    if (d.by && d.dps > most) {
+      best = d.by;
+      most = d.dps;
+    }
+  return best;
 }
 
 /** The dps of the `top` strongest entries of an ailment, added up by the side that put each on. */

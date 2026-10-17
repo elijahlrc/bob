@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import type { SkillDotProfile, SkillProfile } from '../calc/skill';
 import { DT } from '../data/constants';
 import type { Build } from '../data/types';
 import { newRun } from '../run/run';
 import { newActor } from './actor';
 import { separate } from './ai';
-import { rawHit } from './combat';
+import { applyHit, rawHit } from './combat';
 import { createDuelWorld, DUEL_GAP, duelHash, playDuel, runDuel } from './duel';
 import { buildFor } from './gemKit';
 import type { Ledger } from './ledger';
@@ -216,6 +217,107 @@ describe('A’s ignite on B', () => {
   });
 });
 
+describe('what a hit does to a character, as it does to a monster', () => {
+  /** A skill's debuff of chaos damage over time that mends its caster by `regen` percent a second. */
+  const debuff = (regen: number) =>
+    ({
+      spec: { type: 'chaos', dps: [1, 1], seconds: 4, stack: 'refresh', regen },
+      type: 4,
+      dps: 20,
+      seconds: 4,
+    }) as unknown as SkillDotProfile;
+
+  /** A hit by A on B that lands with every ailment and the effects a skill can carry, and one more to see them apply. */
+  function strike(setup?: (w: World, sa: Side, sb: Side) => void, tweak?: Partial<SkillProfile>) {
+    const w = createDuelWorld(vanguard(1), vanguard(2), 1);
+    const [sa, sb] = w.sides;
+    sb.player.life = 1e6;
+    sa.char.hexes.push({ id: 'brittleDoom', level: 10, effect: 1 });
+    setup?.(w, sa, sb);
+    const p: SkillProfile = {
+      ...sa.char.profile(sa.primary, 0),
+      knockback: 2,
+      statuses: [{ id: 'hinder', chance: 1, seconds: 3, v: 30, x: 0 }],
+      decay: { dps: 8, seconds: 3 },
+      impale: { chance: 1, share: 0.5, hits: 3, max: 5 },
+      skillDot: debuff(10),
+      ...tweak,
+    };
+    const x0 = sb.player.x;
+    applyHit(w, sa.player, sb.player, p, {
+      outcome: 'hit',
+      crit: false,
+      dmg: [10, 0, 0, 0, 0],
+      rawPhys: 10,
+      total: 10,
+      H: [10, 0, 0, 0, 0],
+      ailments: { ignite: 5, bleed: 5, poison: 5, shock: 0.2, chill: 0.3, freeze: 1 },
+      stun: 0,
+    });
+    return { w, sa, sb, pushed: sb.player.x - x0 };
+  }
+
+  it('puts the ailments, statuses, hexes, impales and debuffs on B, each as A’s', () => {
+    const { sa, sb, pushed } = strike();
+    const b = sb.player;
+    expect(b.ail.ignites).toHaveLength(1);
+    expect(b.ail.ignites[0].by).toBe(sa);
+    expect(b.ail.bleeds[0].by).toBe(sa);
+    expect(b.ail.poisons[0].by).toBe(sa);
+    expect(b.ail.shock).toBeCloseTo(0.2, 9);
+    expect(b.ail.chill).toBeCloseTo(0.3, 9);
+    expect(b.ail.freezeT).toBeGreaterThan(0);
+    expect(b.fx.hinder).toBeDefined();
+    expect(b.hexes.map((h) => h.id)).toEqual(['brittleDoom']);
+    expect(b.impales).toHaveLength(1);
+    // A skill's debuff and Decay are damage over time A's skill inflicted.
+    expect(b.sdots.map((d) => d.src)).toContain('@decay');
+    expect(b.sdots.length).toBe(2);
+    for (const d of b.sdots) expect(d.by).toBe(sa);
+    // The blow throws B back, away from A.
+    expect(pushed).toBeCloseTo(2, 6);
+    // None of it is A's: A carries nothing.
+    expect(sa.player.ail.ignites).toHaveLength(0);
+    expect(sa.player.sdots).toHaveLength(0);
+    expect(sa.player.hexes).toHaveLength(0);
+  });
+
+  it('a hit that leaves B at a tenth of its life or less finishes it (culling)', () => {
+    const { sb } = strike(
+      (_w, _sa, b) => {
+        b.player.life = b.player.def.maxLife * 0.09 + 10;
+      },
+      { culling: true },
+    );
+    expect(sb.player.alive).toBe(false);
+  });
+
+  it('what B has done to A is B’s: A’s hit does not hurt A', () => {
+    const { sa, sb } = strike();
+    expect(sa.player.life).toBe(sa.player.def.maxLife);
+    expect(sb.stats.damageTaken).toBeGreaterThan(0);
+    expect(sa.stats.damageTaken).toBe(0);
+  });
+
+  it('a damage over time that mends its caster mends A, not B', () => {
+    const mended = (regen: number) => {
+      const { w, sa, sb } = strike(
+        (_w, a) => {
+          a.player.life = 1;
+          for (const f of a.flasks) f.charges = 0;
+        },
+        { skillDot: debuff(regen) },
+      );
+      sa.player.life = 1;
+      sb.player.stunT = 1e6;
+      sa.player.stunT = 1e6;
+      for (let i = 0; i < 30; i++) stepWorld(w);
+      return sa.player.life;
+    };
+    expect(mended(50)).toBeGreaterThan(mended(0) + 1);
+  });
+});
+
 describe('credit for what has no attacker named', () => {
   it('a hit that names A’s side is A’s even on a monster standing nearest to B', () => {
     const w = createDuelWorld(vanguard(1), vanguard(2), 1);
@@ -238,6 +340,39 @@ describe('credit for what has no attacker named', () => {
     // The kill is A's too.
     expect(sa.stats.kills).toBe(1);
     expect(sb.stats.kills).toBe(0);
+  });
+
+  it('a monster that dies of A’s damage over time is A’s kill, whoever it stands nearest', () => {
+    const w = createDuelWorld(vanguard(1), vanguard(2), 1);
+    const [sa, sb] = w.sides;
+    const m = spawnMonster(
+      w,
+      { type: 'warrior', variant: 'none', rarity: 'normal', level: 1, mods: [] },
+      sb.player.x + 1.5,
+      sb.player.y,
+      0,
+      0,
+      'Warrior',
+    );
+    m.sdots.push({
+      src: 'burn',
+      dps: 1e6,
+      raw: 1,
+      type: 3,
+      t: 2,
+      layer: false,
+      n: 1,
+      spreadR: 0,
+      carry: false,
+      regen: 0,
+      by: sa,
+    });
+    stepWorld(w);
+    expect(m.alive).toBe(false);
+    expect(sa.stats.kills).toBe(1);
+    expect(sb.stats.kills).toBe(0);
+    expect(sa.stats.damageDealt).toBeGreaterThan(0);
+    expect(sb.stats.damageDealt).toBe(0);
   });
 
   it('what no side owns on a monster is the nearest side’s, as it has always been', () => {
