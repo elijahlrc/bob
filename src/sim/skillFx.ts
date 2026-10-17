@@ -714,7 +714,7 @@ function tickFrostTrail(w: World, s: Side, dt: number): void {
 /** An enemy that hits the character under Rimeplate is chilled a moment. */
 export function frostBite(s: Side, attacker: Actor): void {
   const fr = s.char.frostSpec;
-  if (!fr || attacker.isPlayer || attacker.def.cannotBeChilled) return;
+  if (!fr || attacker.team === s.team || attacker.def.cannotBeChilled) return;
   attacker.ail.chill = Math.max(attacker.ail.chill, fr.slow / 100);
   attacker.ail.chillT = Math.max(attacker.ail.chillT, fr.seconds);
 }
