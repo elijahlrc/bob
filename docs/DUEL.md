@@ -814,7 +814,7 @@ below). As planned, with these differences and findings:
 
 **Built: F6 (2026-10-17).** The snapshot, the pool, the opt-in, the names and the high score function, built headlessly and tested with an
 injected `fetch` only: **nothing was posted to the project, `docs/rivals.sql` has not been run** (no database here, and the owner reviews and runs
-it), and the title screen was not opened in a browser. As planned, with the owner's two changes of 2026-10-17 (names are typed with a generated
+it); the title screen was looked at in a desktop browser only (the checkbox, the name field, the line for an invalid name), not on a phone. As planned, with the owner's two changes of 2026-10-17 (names are typed with a generated
 fallback; the high scores are the duel ratings of snapshots, written by a later ranking job) and these differences and findings:
 
 - **The SQL** (`docs/rivals.sql`, 12 numbered entries, each commented): the table `rivals` (with `rating`, `fights`, `wins`, `rated_at`); two

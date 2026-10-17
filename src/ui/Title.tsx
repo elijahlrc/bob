@@ -130,7 +130,7 @@ function RivalsNotice() {
           />
           <span class={bad ? 'warn' : ''}>
             {bad
-              ? '3 to 16 letters, digits, spaces or hyphens, starting and ending with a letter or digit.'
+              ? '3 to 16 letters, digits, spaces or hyphens; a letter or digit at each end.'
               : 'Leave blank for a name the game makes up'}
           </span>
         </div>

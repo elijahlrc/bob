@@ -1095,5 +1095,5 @@ makes the table, a deny-list table the owner fills by hand, the triggers (the ra
 a day per token hash) and two functions the public key reads through: `rivals_for` (rivals of this save version near a map, never one's own)
 and `high_scores` (the top rated snapshots; the ratings are a later ranking job's, so it is empty until then). `src/run/rivals.ts` posts,
 fetches and checks a rival before it is offered (every id its build names must exist at this version); `npm run sim -- --rivals` seeds the pool
-with the bot's characters. Tested with an injected `fetch` only: the SQL has **not been run** and the title screen not opened. The owner's
+with the bot's characters. Tested with an injected `fetch` only: the SQL has **not been run**, and the title screen was seen on a desktop only. The owner's
 steps and what F7 needs are in the Built note under DUEL.md section 7.
