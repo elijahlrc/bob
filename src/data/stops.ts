@@ -11,6 +11,8 @@ export type StopDef = {
   text: string;
   /** What a player does there, in a sentence or two (the stop's own screen). */
   how: string;
+  /** A line of colour over the stop's own screen, if it has one. */
+  flavour?: string;
   /** Weight among the stops of a window. */
   weight: number;
   /** The first level it can be scheduled on. */
@@ -40,6 +42,7 @@ export const STOPS: StopDef[] = [
     name: 'The Shrine',
     text: 'A blessing until your next stop.',
     how: 'Choose a blessing.',
+    flavour: 'Someone still prays down here. Not for you, but it will do.',
     weight: 25,
     from: 6,
   },
@@ -56,6 +59,7 @@ export const STOPS: StopDef[] = [
     name: 'The Ferryman',
     text: 'A reprieve, at a price.',
     how: 'Choose a reprieve.',
+    flavour: "He doesn't ask where you're going. Only what you'll give.",
     weight: 20,
     from: 8,
   },

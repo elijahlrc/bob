@@ -4,7 +4,7 @@ import { monsterModDef, MONSTER_TYPES, BOSS_NAME, FACTION_NAMES } from '../data/
 import { abilitiesOf, abilityTexts } from '../data/abilities';
 import { ARCHETYPES } from '../data/archetypes';
 import { defenceTexts, typeProfile } from '../data/defence';
-import { bossOfType } from '../data/bosses';
+import { bossOfType, type BossDef } from '../data/bosses';
 import { BossCardOf } from './BossCard';
 import { bossReadout } from '../sim/bosses';
 import { flasksSealed, theftOf } from '../sim/theft';
@@ -23,7 +23,7 @@ import type { Actor, World } from '../sim/types';
 import { SPEEDS, type Controller } from '../run/controller';
 import { DELIVERY_NAME, ELEMENT_NAME } from '../calc/skillLook';
 import { useTicks } from './hooks';
-import { useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import { autoAbandonAt, canAbandon } from '../sim/abandon';
 import { COLLAPSE_START, CRESCENDO_STEP_BONUS, HOLDOUT_WAVES, mapTypeDef } from '../data/mapTypes';
 import { infoProps } from './info';
@@ -190,21 +190,54 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
   );
 }
 
+/** A boss that has come for the character in its arena: its bar is up. */
+function engagedBoss(w: World, a: Actor): boolean {
+  const p = w.sides[0].player;
+  return (
+    a.alive &&
+    a.rarity === 'boss' &&
+    !!a.mon?.kind.bossOnly &&
+    a.state === 'chase' &&
+    Math.hypot(a.x - p.x, a.y - p.y) < 22
+  );
+}
+
+/** How long a boss's line stays up, in real milliseconds (the fight may run at eight times speed). */
+const BOSS_LINE_MS = 5000;
+
+/**
+ * What a boss says when its bar first comes up, shown under the bar for a few seconds; once a map. Kept in a ref against the
+ * world, so a new map hears it again.
+ */
+function BossLine({ w }: { w: World }) {
+  const said = useRef<{ w: World | null; boss: BossDef | null; at: number }>({
+    w: null,
+    boss: null,
+    at: 0,
+  });
+  const s = said.current;
+  if (s.w !== w) Object.assign(s, { w, boss: null, at: 0 });
+  if (!s.boss) {
+    const a = w.actors.find((x) => engagedBoss(w, x));
+    const boss = a?.mon && bossOfType(a.mon.spec.type);
+    if (boss) Object.assign(s, { boss, at: performance.now() });
+  }
+  if (!s.boss || performance.now() - s.at > BOSS_LINE_MS) return null;
+  return (
+    <div class="boss-line" key={s.boss.id}>
+      {s.boss.says.map((t) => (
+        <div key={t}>{t}</div>
+      ))}
+    </div>
+  );
+}
+
 /**
  * The boss of the fight, across the top of the screen: its name, its life and shield, and what it is doing (two, for the Twins).
  * The rival of a duel is shown the same way, by its name, with no readout.
  */
 function BossBar({ w }: { w: World }) {
-  const p = w.sides[0].player;
-  const bosses = w.actors.filter(
-    (a) =>
-      a.alive &&
-      (isRival(a) ||
-        (a.rarity === 'boss' &&
-          a.mon?.kind.bossOnly &&
-          a.state === 'chase' &&
-          Math.hypot(a.x - p.x, a.y - p.y) < 22)),
-  );
+  const bosses = w.actors.filter((a) => a.alive && (isRival(a) || engagedBoss(w, a)));
   if (bosses.length === 0) return null;
   return (
     <div class="boss-bars">
@@ -511,6 +544,7 @@ export function Hud({ c }: { c: Controller }) {
       </div>
       {!sc && !c.gallery && !duel && <AbandonButton c={c} w={w} />}
       <BossBar w={w} />
+      {!duel && <BossLine w={w} />}
       {sel && sel.alive && (!sel.isPlayer || isRival(sel)) && <Inspect a={sel} c={c} />}
       {duel && (
         <div class="hud-showcase">

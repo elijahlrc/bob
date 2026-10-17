@@ -1834,3 +1834,25 @@ select option {
     opacity: 0;
   }
 }
+
+/* What a boss says when its bar first comes up (docs/BOSSES.md), under the bars for a few seconds. */
+.boss-line {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, calc(100% - 32px));
+  text-align: center;
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.5;
+  pointer-events: none;
+  text-shadow: 0 2px 6px #000;
+  animation: biome-fade 5s ease-out forwards;
+}
+
+/* A stop's line of colour, above what to do there. */
+.stop-flavour {
+  font-style: italic;
+  opacity: 0.8;
+}

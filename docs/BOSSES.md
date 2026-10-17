@@ -542,6 +542,7 @@ Ailment play is polished for every map, not only hers; the user welcomed that. I
 | Visuals             | `src/render/styles/grim/bossFx.ts` (new), on the `EncounterFx` host: the bell and its count, gallop lanes and the dust trail, hourglass and chains, attunement colours and cracks, ailment tints, shards and what the Unmaker wears. New figures in `paint.ts`. |
 | Dev                 | `__dev.boss(id, { level, build })` stages one boss in an arena, like `__dev.stage`.                                                                                                                                                                             |
 | Text                | `Summary.tsx` names the final boss. PLAYER-AI.md gets section 11.1's rules (with its author).                                                                                                                                                                   |
+| Spoken line         | `says` in `src/data/bosses.ts`: what each boss says when its bar first comes up, shown under the bar for five seconds of real time (`BossLine` in `ui/Hud.tsx`). Flavour only.                                                                                  |
 
 The sim keeps its rules: no `Math.random`, `w.rngAi` for choices, and no new fields on `Actor` literals beyond what the
 x9 speed floor allows (a boss's state lives in its own record, as `EncState` does).

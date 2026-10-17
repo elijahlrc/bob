@@ -30,6 +30,8 @@ export type BossDef = {
   test: string;
   /** The warning at camp: one to three lines that describe the boss and say nothing of how to fight it. */
   brief: string[];
+  /** What it says to the character on first meeting it in its arena, a line each (shown over the fight for a few seconds). */
+  says: string[];
   /** Its stun threshold, as a multiple of a normal monster's (bosses are 4 times). */
   stunMult: number;
   /** How much of a curse's effect it takes (3.9 bosses take a third less). */
@@ -47,6 +49,7 @@ export const BOSSES: Record<BossId, BossDef> = {
       'Rings a bell every ten seconds, and each ring is lightning.',
       'Behind his armour, he is never quite the same after.',
     ],
+    says: ["“Every soul pays. You're only paying late.”"],
     stunMult: 1.5,
     curseEffect: 0.67,
   },
@@ -57,6 +60,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     name: 'the Siege Marshal',
     test: 'Endurance: a long fight with no single spike.',
     brief: ['A general who has no wish to fight you himself.', 'He has an army for that.'],
+    says: ["“I haven't lifted a sword in a thousand years. That's what they're for.”"],
     stunMult: 4,
     curseEffect: 0.67,
   },
@@ -67,6 +71,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     name: 'the Courser',
     test: 'Mobility and reach: it never stops moving.',
     brief: ['A rider that never stands still.', 'Fire follows its hooves.'],
+    says: ['“Run, then. They all run.”'],
     stunMult: 4,
     curseEffect: 0.67,
   },
@@ -77,6 +82,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     name: 'the Veiled Duellist',
     test: 'Critical strikes, both ways.',
     brief: ['A swordsman who fights from behind a veil,', 'and lifts it only to strike.'],
+    says: ["“You'll see my face once.”"],
     stunMult: 4,
     curseEffect: 0.67,
   },
@@ -90,6 +96,7 @@ export const BOSSES: Record<BossId, BossDef> = {
       'Court is in session.',
       'The Magistrate passes sentence, and his witnesses stand to speak.',
     ],
+    says: ['“Guilty, as before. Call the witnesses.”'],
     stunMult: 4,
     curseEffect: 0,
   },
@@ -103,6 +110,7 @@ export const BOSSES: Record<BossId, BossDef> = {
       'A machine of plates and pistons, built to outlast a siege.',
       'Its blows are slow, and they are not gentle.',
     ],
+    says: ['“Return to your cell. Return to your cell. Return to your—”'],
     stunMult: 4,
     curseEffect: 0.67,
   },
@@ -116,6 +124,7 @@ export const BOSSES: Record<BossId, BossDef> = {
       'A warden in a shell of crystal.',
       'It turns from fire to frost to lightning, and back.',
     ],
+    says: ["“Hot, cold, or quick? I'll choose for you.”"],
     stunMult: 4,
     curseEffect: 0.67,
   },
@@ -127,6 +136,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     name: 'the Sundered Twins',
     test: 'Defence and offence of two kinds at once.',
     brief: ['Two siblings, one in plate and one in flame.', "Each is changed by the other's loss."],
+    says: ['Ash: “Get behind me.”', 'Cinder: “I never have.”'],
     stunMult: 4,
     curseEffect: 0.67,
   },
@@ -137,6 +147,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     name: 'the Rotwife',
     test: 'Ailments, and chaos resistance.',
     brief: ['She carries every affliction there is,', 'and she does not keep them to herself.'],
+    says: ['“Come here, dear. Let me look at you.”'],
     stunMult: 4,
     curseEffect: 1,
   },
@@ -147,6 +158,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     name: 'the Unmaker',
     test: 'Build depth: it steals the best of your build.',
     brief: ['It unmakes what you have made.', 'And it wears what it takes.'],
+    says: ["“You made all that for me? You shouldn't have.”"],
     stunMult: 4,
     curseEffect: 0.67,
   },

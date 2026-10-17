@@ -65,6 +65,7 @@ export function StopScreen({
     <div class="stop">
       <h3 class="stop-name">{def.name}</h3>
       <div class="muted">Level {offer.areaLevel}</div>
+      {def.flavour && <p class="stop-flavour">{def.flavour}</p>}
       <p>{def.how}</p>
       {offer.stop === 'awlsmith' && (
         <Awlsmith
