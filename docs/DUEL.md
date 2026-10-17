@@ -1,7 +1,7 @@
 # Bob — Duels: asynchronous fights against other players' characters
 
-Status: **F0 to F3 built on 2026-10-16** (the plan was the second draft of 2026-10-16, after the user rejected the two-world
-engine of the first); F4 to F7 are not built; see "Built" under section 7 · Owner: the user · Author: Claude
+Status: **F0 to F4 built on 2026-10-16** (the plan was the second draft of 2026-10-16, after the user rejected the two-world
+engine of the first); F5 to F7 are not built; see "Built" under section 7 · Owner: the user · Author: Claude
 
 A duel is a real fight, watched in the game, between the player's character and a **rival**: a snapshot of another player's
 character (class, level, passive tree, gems, items and Strategy settings) taken when that player's run ended. The rival is
@@ -150,10 +150,11 @@ the single-player sim produces the very same events in the same order. Each grou
 | G5    | `player`, `char`, `build`, `primary`, `team`; `faction` becomes `team`; `hunted`; `enemiesOf`, `findTarget`, `actorById`, `separate`, the hazard dodge by team                                                                                                                                                                                                          | about 365        | The 229 `isPlayer` sites (86 negated: "has monster stats" → `a.mon`, "is an enemy" → team, "is not this character" → `a !== s.player`); the 46 `.mon!` assertions; the monsters' `w.player` → `hunted`. |
 
 The step (`stepWorld`, `world.ts:604`) keeps today's order of sub-steps as its spine. A sub-step that acts for a side runs
-once per side (the order of sides alternating by tick parity, so that with one side nothing changes); one that belongs to
-the arena runs once. The single loop over `w.actors` stays one pass in id order, dispatching each actor by `a.side`
-(`playerAI(w, a.side)` for a character, `monsterAI` for a monster). `updateProjectiles` runs once and reads each projectile's
-owner's side. `nextId`, the clock and `events` are the arena's and need nothing.
+once per side (the order of sides alternating by tick parity, so that with one side nothing changes: `World.order`, set at the
+top of `stepWorld`, and the seed's parity, `World.orderPhase`: 4.4); one that belongs to the arena runs once. The single loop
+over `w.actors` stays one pass in id order, the characters (the first entries of the list) in the order of the tick, dispatching
+each actor by `a.side` (`playerAI(w, a.side)` for a character, `monsterAI` for a monster). `updateProjectiles` runs once and
+reads each projectile's owner's side. `nextId`, the clock and `events` are the arena's and need nothing.
 
 **Tests** read the moved fields 1,306 times in 78 files, always as `w.<field>` or `world.<field>` (584 `w.player`, 140
 `world.player`, 112 `w.char`, 69 `w.buffT`...). A codemod rewrites them to `w.sides[0].<field>`, **run after each group for
@@ -173,7 +174,8 @@ Each side runs `playerAI(w, s, dt)`: its own `Strategy` (roles, order, `target`,
 own flask policy, kiting, telegraph dodging, openers and escapes. Nothing in the AI knows which side is the player's. A duel
 option on the side (`s.opts.duel`) changes only what a labyrinth assumed: the character engages the nearest enemy at any
 distance (no `advance` along waypoints), never loots, never seeks an exit, and a stall (section 4.3) ends the duel instead of
-skipping the target.
+skipping the target. Its enemies are the other character and that character's minions, and the other character counts as a
+boss for the `rares` priority (F4, Appendix A).
 
 Totems, brands, traps and mines are not actors and cannot be attacked by anyone, today as in a duel (monsters never attack
 them either); a later plan may give them life.
@@ -194,9 +196,12 @@ them either); a later plan may give them life.
 
 A round arena of the shape `gen/bossArena.ts` gives (the boss fights' room: `BOSS_ARENA_RADIUS` 11, so about 25 tiles across
 with its rim), dressed in a biome rolled from the duel's seed (`src/data/biomes.ts`: tiles, light, props) so it is drawn like
-any map. The two characters start **10 tiles apart**, facing each other, once the duel option of F4 makes them engage at any
-distance. F2 and F3 use the dummy arena of `src/sim/dummy.ts` (open floor, 30 × 30) with the characters **8 tiles apart**,
-inside the stock AI's engage range of 9, so that they fight without the option; F5 brings the round arena.
+any map. The two characters start **10 tiles apart**, facing each other, with the duel option of F4 making them engage at any
+distance. F2 and F3 used the dummy arena of `src/sim/dummy.ts` (open floor, 30 × 30) with the characters 8 tiles apart, inside the
+stock AI's engage range of 9, so that they fought without the option; F4 keeps that arena, puts them 10 tiles apart (outside the
+engage range, so the option is what makes them fight) on the middle row, mirror images about the middle column (9 tiles from the
+west and the east wall: a stand at the plan's start was 8.5 from the west wall and 11.5 from the east one, so the west
+character reached a wall sooner when it kited); F5 brings the round arena.
 
 ### 4.3 How a duel ends
 
@@ -212,15 +217,25 @@ ledger of each side (damage dealt and taken by source, `src/sim/ledger.ts`) is t
 
 ### 4.4 Fairness
 
-- **Order.** The side stepped first in a tick lands the first hit in a tie. The order alternates by tick parity, so over a
-  fight neither side is first. The RNG streams are shared; the order fixes the draws, so a duel is a pure function of the two
-  builds, the seed and the game version.
+- **Order.** The side stepped first in a tick lands the first hit in a tie. The order alternates by tick parity, with the
+  seed's parity choosing which side is first on an even tick (`World.orderPhase`, set by `createDuelWorld`). The tick parity
+  alone is not enough: two characters of one rhythm act on the same ticks every time, so the same one of them is first at every
+  exchange of a fight and the alternation only decides which one. F4 measured it with the same build on both sides, 12 builds and
+  200 seeds each: side 0's wins were 16.3 from half on average with no alternation, 15.0 with the tick parity, 3.5 with the seed's
+  parity added (a fair coin: 5.7).
+  The RNG streams are shared; the order fixes the draws, so a duel is a pure function of the two builds, the seed and the game
+  version.
 - **Seeds.** A duel's seed is drawn by the client (`Rng` from a run-independent source: the rival's id and a counter kept in
   the local record, section 6.5), so "Again" is a new fight and the same two builds can be fought as many times as wanted.
 - **Damage scale.** LADDER.md 4.3 found that at the game's numbers a fight is over in a few seconds and the first hit decides
   it, and that scaling damage down changes who wins. The engine takes `duel.damageScale` (a multiplier on damage taken by
-  characters, both sides). **F4 measures** fight lengths among bot builds with the real engine and proposes a default that
-  gives a median fight of 15 to 40 s; until then the default is ×1. The number is recorded in Appendix A when chosen.
+  characters, both sides: a hit, a burst, every tick of damage over time, a character's own degeneration; not a minion's, and
+  not what a hit does besides damage: the ailments and the stun are those of the unscaled hit). F4 measured fight lengths among
+  bot builds with the real engine (section 7, Built: F4) and **the default is ×0.3** (`DUEL_DAMAGE_SCALE`): the median fight is
+  16 s among builds of the legacy difficulty at maps 20 and 40 and 25 s among builds of the default difficulty at maps 5 to 20
+  (6 s at ×1), with 2% and 6% of the fights ending on the cap. The medians of the maps differ by a factor of four to five at
+  ×0.3 (default pool: 44 s at map 5, 22 s at map 10, 10 s at maps 15 and 20), so no one number fits every level: a scale that
+  falls with the level is the open question (Built: F4).
 
 ---
 
@@ -542,6 +557,143 @@ re-recorded). As planned, with these differences and findings:
   - _Speed._ The fence's wall time was 22.1 s on the base and 22.4 s after F3 (12 bot runs); the owner plumbing and the
     multi-source field cost nothing measurable.
 
+**Built: F4 (2026-10-16).** The rules of a duel: a character engages at any distance and never loots or leaves, a fight ends by a
+death, the cap or a stall, the sides act in alternating order, what a character takes is scaled (**×0.3**), and a character goes for
+the other side's minions. On a map nothing moved: the default fence is identical (12 runs, 22.1 s wall against 22.0 s recorded on
+the base). Fighting the same build on both sides found two things the plan did not expect: the tick parity alone does not alternate
+who is first, and a summon's first minion stood behind the character that stood east (a bug in the sim). As planned, with these
+differences and findings:
+
+- **The duel option** (`SideOpts.duel`, `src/sim/ai.ts`): `findTarget` has no engage range and `playerAI` no drop at `ENGAGE_RANGE + 3`;
+  the stall breaker is off (so a target is never given up on, the other character included); with no target (the other cannot be
+  targeted, or the character is itself running in Phase Run) it walks toward the other character in mode `engage`, and never reaches
+  the loot, the exit or the waypoints. A side with the option starts in mode `engage` (a side starts in `advance`), so no state of
+  a duel is `loot`, `exit` or `advance`. **`WorldOpts.noExit` is not made redundant:** the option keeps the characters from walking to
+  the exit, but with no monsters `checkExit` opens it at the first tick (the flag and an `exitOpen` event that F5's scene would
+  draw); `noExit` keeps it shut. `createDuelWorld` puts the characters `DUEL_GAP` 10 tiles apart on the arena's middle row,
+  mirror images about its middle column (x 10 and 20 of 30, y 15).
+- **The ends** (`playDuel`, not `stepWorld`: the map must not know): `DuelResult.how` is `'death' | 'time' | 'stall'`; the cap is
+  `DUEL_MAX_TIME` 90 s and the stall `DUEL_STALL_TIME` 15 s without either character's `stats.damageTaken` rising (what the side
+  already counts, after a shell has taken its share; damage to a minion does not count, so two summoners whose minions fight each
+  other for 15 s with no blow on either character is a stall). `duelResult(w, end)` takes how a fight with both alive ended; both dead
+  in one tick is still a draw by death. **The stall rule fired in 2 of the ~6,000 fights of the sweep, the cap in all the other
+  draws.** The two were one pair at two maps (a Mystic and a Zealot of the bot's seed 5 at maps 10 and 15, both with Twin Cut and
+  summoned minions): both characters at full life, their minions fighting each other, 2.5 tiles apart.
+- **The order** (`World.order`, `sidesInOrder` in `world.ts`): `stepWorld`'s 31 per-side loops iterate `w.order`, which is `w.sides` when
+  `tick + World.orderPhase` is even and the sides reversed (one cached array) when it is odd; the actor loop takes the characters
+  (the first entries of `w.actors`) through it and the monsters as before; a one-side world's `order` is always `w.sides` (a test).
+  `updateProjectiles` runs once in creation order, so **a same-tick tie between two projectiles still favours the earlier one**; the
+  loops that only read, `separate` and the minions' separation (moves that give way half each) are as they were. **The phase is
+  the seed's parity (`createDuelWorld` sets `orderPhase = seed & 1`), a deviation from the plan.** Measured with the same build on both
+  sides, 12 builds of the legacy pool at map 20 and 200 seeds each, the mean distance of side 0's wins from half was 16.3 with no
+  alternation, **15.0 with the tick parity** (it only turned the 67/33 of one mirror into 33/67: the two characters of a mirror act on
+  the same ticks, so the same one is first at every exchange of the fight), **3.5 with the seed's parity added**, and 6.5 with the
+  order drawn from a hash of the tick (a fair coin: 5.7). The seed's parity makes the duel fair as a distribution over seeds, not each
+  fight: one seed has one side first at every tie. A hash of the tick would make each fight fair and costs the same; it is a
+  small change in `sidesInOrder` if wanted. **F5 and F6: "Again" must draw seeds of both parities** (a counter does).
+- **A minion ring bug the symmetry test found** (`summonMinions`): the ring of a summon started due east of the character, so in a
+  mirror duel the one standing east had its first minion behind it, where its own body held it (a minion's straight walk is
+  stopped by the character's separation): a mirror of the Reaver at map 20 went 100 to 0 for the west side, its minion never
+  attacking. With several sides the ring starts where the character faces; a map keeps the east start (the fence).
+- **The damage scale** (`DuelOpts.damageScale`, default `DUEL_DAMAGE_SCALE`, carried as `Side.damageScale`, 1 on a map): in `applyHit`
+  after the ailments and the stun were worked out (**the ailments read the hit before it is mitigated, so they need no code: an
+  ignite of 40 is 40 at any scale, and so is a stun**) and before the map report, the recap, the damage log and the leech read it
+  (**the leech of the hit is of the scaled damage**); in `rawHit` and in the damage-over-time tick, one more factor beside
+  `damageTakenMult`, for a character only; and on Blood Rage's own cost (life and energy shield). **Not scaled: a minion's damage taken,**
+  which is a balance question (a minion dies 3.3 times sooner relatively); the sheet's DPS and EHP know nothing of the scale. The ledgers,
+  `damageDealt`, `damageTaken`, the recap and `DuelSide.lifeLeft` are of what landed (scaled). The share of a hit a character reflects
+  (`reflectPhysPct`) is of the unscaled hit (`reflectBack` divides by the scale: `res.dmg[0] > 0` says it is not 0), so the reflection
+  is scaled once, when it lands. Sacrifice and a skill's life cost are costs, not damage, and are not scaled.
+- **A character goes for the other side's minions** (`findTarget`): its enemies are `livingEnemiesOf` (on a map the one side's list
+  is `w.actors`, as before), the strategy's priority picks among them, and the other character counts as a boss for `rares` (4
+  tiles nearer). It is not a boss elsewhere: the Strategy tab's conditions (rares, bosses) and the mods "against rare or unique
+  enemies" still read its rarity, which is normal; whether they should count it is a question for the owner. **A kill of a minion by the
+  other side** now also gives the flasks' charges and life and mana on kill (`killGains`, shared with a monster's kill; no mark
+  on a minion gives anything: `hexKill` asks `hunted` whose it is); still no experience, loot or kill counted, and a character's
+  fall is worth nothing. There is no energy shield on kill in the game. Two findings **left as they are** (Appendix A): a bleed on a
+  character is worked out at `MONSTER_BLEED_DPS_FRAC` and a character's ailment threshold is life plus energy shield. **The
+  measurement could not test the bleed:** no build of the legacy pool deals more than 1% of its damage as a bleed (at ×0.35; a burn
+  5% at most, a poison 11% at most).
+- **The matrix, the legacy pool at ×1** (12 and 10 builds at maps 20 and 40, `--legacy`, both orders, seed 1; the west side won / the east
+  side won, median fight):
+
+  | state                                      | map 20  | map 40  | all     | median       |
+  | ------------------------------------------ | ------- | ------- | ------- | ------------ |
+  | F3 (8 tiles, stock AI, no alternation)     | 68 / 62 | 51 / 39 | 119/101 | 4.4 s, 5.6 s |
+  | items 1 and 2 (option, 10 tiles, mirrored) | 69 / 63 | 49 / 41 | 118/104 | 5.0 s        |
+  | and the order alternating by tick parity   | 70 / 62 | 50 / 40 | 120/102 | 5.0 s        |
+  | and the seed's parity and the minion ring  | 66 / 66 | 46 / 44 | 112/110 | 5.2 s        |
+  | and items 4 and 5 (targeting, kills), ×1   | 68 / 64 | 46 / 44 | 114/108 | 6.2 s        |
+
+  The two orders of a pair agree on the winner in 66 of 66 and 44 of 45 pairs after the seed's parity and the ring (62 of 66 and 39 of 45
+  in F3, 64 of 66 and 42 of 45 after items 4 and 5). **What targeting the minions did to the ×1 matrix:** the fights are longer (median
+  5.2 to 6.2 s, third quartile 7.8 to 9.5 s, longest 28.1 to 32.4 s) and the west share is unchanged; a summoner's screen now holds a
+  melee character for a while instead of being walked past. The symmetric starters: side 0 won 28, 27 and 34 of 60 for the Vanguard,
+  Strider and Mystic starters and 13 of 30 for two Bonewalker summoners, with no draw (a Zealot starter pair has 4 draws of 60 at ×0.3).
+
+- **The sweep** (`npx tsx scripts/ladder-probe.ts --real --scale 1,0.5,0.4,0.35,0.3,0.25,0.2,0.15 --duel 20,40 --load legacy.json`
+  and `--duel 5,10,15,20 --load default.json`; the snapshots are the probe's `--save` of 12 bot runs of the legacy difficulty to map 40 and
+  36 of the default difficulty, each pair in both orders, fight seed 1). **Legacy pool**, 22 builds at maps 20 and 40 (a bot of the default
+  difficulty dies at maps 10 to 20, so the legacy one reaches what a long run would); **default pool**, 103 builds at maps 5 (34), 10 (34), 15 (22) and 20 (13):
+
+  | scale    | pool    | fights | death | both dead | stall | cap  | q1     | median     | q3     | longest | west won | east won |
+  | -------- | ------- | ------ | ----- | --------- | ----- | ---- | ------ | ---------- | ------ | ------- | -------- | -------- |
+  | ×1       | legacy  | 222    | 222   | 0         | 0     | 0    | 3.9 s  | 6.2 s      | 9.5 s  | 32.4 s  | 114      | 108      |
+  | ×0.5     | legacy  | 222    | 222   | 0         | 0     | 0    | 5.6 s  | 9.5 s      | 17.9 s | 61.7 s  | 111      | 111      |
+  | ×0.4     | legacy  | 222    | 221   | 0         | 0     | 1    | 6.4 s  | 11.0 s     | 27.2 s | 90.0 s  | 109      | 112      |
+  | ×0.35    | legacy  | 222    | 220   | 0         | 0     | 2    | 7.0 s  | 12.5 s     | 31.6 s | 90.0 s  | 110      | 110      |
+  | **×0.3** | legacy  | 222    | 217   | 0         | 0     | 5    | 8.1 s  | **16.1 s** | 39.1 s | 90.0 s  | 105      | 112      |
+  | ×0.25    | legacy  | 222    | 212   | 0         | 0     | 10   | 9.6 s  | 21.6 s     | 46.1 s | 90.0 s  | 103      | 109      |
+  | ×0.2     | legacy  | 222    | 190   | 0         | 0     | 32   | 12.3 s | 29.9 s     | 59.6 s | 90.0 s  | 94       | 96       |
+  | ×0.15    | legacy  | 222    | 173   | 0         | 0     | 49   | 21.0 s | 40.7 s     | 84.9 s | 90.0 s  | 86       | 87       |
+  | ×1       | default | 2862   | 2860  | 0         | 2     | 0    | 4.0 s  | 5.5 s      | 7.1 s  | 40.0 s  | 1436     | 1424     |
+  | ×0.5     | default | 2862   | 2829  | 0         | 2     | 31   | 6.3 s  | 10.3 s     | 20.0 s | 90.0 s  | 1412     | 1417     |
+  | ×0.4     | default | 2862   | 2781  | 3         | 2     | 76   | 7.5 s  | 14.2 s     | 34.5 s | 90.0 s  | 1396     | 1385     |
+  | ×0.35    | default | 2862   | 2748  | 0         | 2     | 112  | 8.4 s  | 18.0 s     | 43.2 s | 90.0 s  | 1391     | 1357     |
+  | **×0.3** | default | 2862   | 2689  | 0         | 2     | 171  | 9.5 s  | **25.3 s** | 51.5 s | 90.0 s  | 1345     | 1344     |
+  | ×0.25    | default | 2862   | 2529  | 0         | 2     | 331  | 11.5 s | 37.2 s     | 64.5 s | 90.0 s  | 1276     | 1253     |
+  | ×0.2     | default | 2862   | 2212  | 1         | 2     | 647  | 16.4 s | 52.2 s     | 85.5 s | 90.0 s  | 1119     | 1093     |
+  | ×0.15    | default | 2862   | 1756  | 0         | 2     | 1104 | 29.5 s | 75.1 s     | 90.0 s | 90.0 s  | 864      | 892      |
+
+  The median by map (the fights that ended on the cap, of all of them), the default pool:
+
+  | scale    | map 5               | map 10              | map 15           | map 20           |
+  | -------- | ------------------- | ------------------- | ---------------- | ---------------- |
+  | ×0.5     | 15.1 s (16 of 1122) | 10.6 s (14 of 1122) | 7.2 s (0 of 462) | 6.1 s (1 of 156) |
+  | ×0.35    | 36.1 s (85)         | 17.3 s (22)         | 9.4 s (1)        | 8.0 s (4)        |
+  | **×0.3** | 44.2 s (122)        | 21.6 s (40)         | 10.5 s (5)       | 9.5 s (4)        |
+  | ×0.25    | 53.9 s (218)        | 37.7 s (88)         | 13.8 s (18)      | 11.4 s (7)       |
+  | ×0.2     | 69.0 s (383)        | 51.8 s (218)        | 20.4 s (28)      | 14.8 s (18)      |
+
+  **The choice: ×0.3** (`DUEL_DAMAGE_SCALE`), the only scale at which the median is 15 to 40 s in both pools (×0.25 is also, with twice the
+  draws: 4.5% and 12% of the fights against 2.3% and 6%, and ×0.35 is 12.5 s in the legacy pool). It does not fit every level: the default
+  pool is two thirds builds of maps 5 and 10, whose fights at ×0.3 take 44 s and 22 s (11% and 4% on the cap), while the builds of maps 15
+  and 20 fight for 10 s (a factor of four to five between map 5 and map 20 at ×0.3 to ×0.2, and 1.1 at ×1: the regeneration, the leech and
+  the flasks are not scaled, so a build that deals little is held off by them first, probably). **No constant fits all levels**; a scale that falls with the level (a fight of builds at level 10 and at level 25 each 15 to 40 s) is the open question
+  for the owner, a function of the level of the two characters' build in `createDuelWorld`. The west side wins 50% in every row.
+
+- **Tests** (`src/sim/duelRules.test.ts`, 29 tests; the older duel files changed in three places that read the plan's start, the 8
+  tiles or the default scale): the option (10 tiles and a death, the option the only reason they engage, never loot or a chest or the
+  exit, walking to a target that cannot be targeted, off on a map), the ends (death, both dead, the stall at 15 s and the option, the
+  cap), the order (a policy trace of 4 ticks, `use` events of two mirror characters in both phases, the cached array, one side), the
+  scale (hit and what is recorded of it, a burst, a tick, both sides, a minion, an ignite), what a character goes for (the nearest, the
+  `rares` priority, a screen of four minions then the character with no stall, a minion's kill gives flasks and life, not experience),
+  a summon's ring, and the symmetry. **The symmetry test** fights the same build on both sides over 60 seeds for the Vanguard, Strider and
+  Mystic starters and 30 for two summoners, and asserts side 0's wins stand within 3 standard deviations of a fair coin of the fights
+  that were decided (1.5 √n of n/2: 18 to 42 for 60 seeds); it takes 6.7 s at ×0.3 (the file 8.8 s; the suite is 3,146 tests and `npm run check` 78 s).
+- **For F5 and F7:**
+  - _The controller watches the ends itself_ (the map's `stepWorld` knows nothing of them): the cap, the stall (a side's
+    `stats.damageTaken` unchanged for 15 s) and the deaths of both sides, as `playDuel` does; `duelResult(w, end)` reads the result.
+    Factor a `DuelWatch` out of `playDuel` when the controller needs it.
+  - _The seed's parity_ chooses which side is first on an even tick: "Again" and "Another rival" must use seeds of both parities.
+  - _A side's damage numbers are what landed:_ the ledger, the recap, the damage log and `lifeLeft` carry the scaled damage, and a hit
+    on a character that the sheet calls 100 reads 30 in them. The result screen can say "damage ×0.3" once.
+  - _The exit_ is kept shut by `noExit`; the scene should not draw one in a duel arena.
+  - _Unscaled things:_ a minion's damage taken, stun, the magnitudes of ailments, regeneration, the rate leech is recovered at (the
+    leech itself is of the scaled hit), flasks. The long fights favour builds that sustain, and a minion build whose minions die 3.3 times sooner,
+    relatively; none of it was measured apart.
+  - _A stall of minions:_ two summoners can fight each other's minions to a stall (a draw); the result should say "stalled".
+
 ---
 
 ## 8. Verification
@@ -615,20 +767,22 @@ Ten to seventeen working days (section 7). Risks, each with its fence:
 
 ## 12. Decisions proposed (defaults in effect unless the user says otherwise)
 
-| #   | Decision                  | Default                                                                              | Alternatives                                                         |
-| --- | ------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
-| 1   | Where the side comes from | The three patterns of 3.2: a parameter, the actor, `hunted`                          | A side on the world's "current context" (a hidden singleton again)   |
-| 2   | Tests                     | A codemod to `w.sides[0].<field>`; no compatibility getters on `World`               | Getters that keep `w.player` working (and keep the singleton alive)  |
-| 3   | What ends a duel          | A death; a 90 s cap or a 15 s stall is a draw                                        | Decide a cap by life left; let the stall skip as in maps             |
-| 4   | Reprieves and provisions  | Neither side brings any                                                              | Bring the reprieves the run still held                               |
-| 5   | Resist penalty and level  | None; each character at its own level                                                | Each at its own map tier's penalty                                   |
-| 6   | Damage scale              | ×1 until F4 measures; then the value that gives 15 to 40 s fights                    | ×1 always (the first hit decides); a curve like the reference game's |
-| 7   | Arena and distance        | The boss arena's round room, a biome look, 10 tiles apart                            | The dummy's open floor; a labyrinth room                             |
-| 8   | Who is offered            | K = 5 of the same save version within ±10 maps, players before bots, never one's own | Same class only; any depth                                           |
-| 9   | Names                     | Generated, rerollable                                                                | Typed with a deny-list (moderation)                                  |
-| 10  | Identity                  | A random storage token, hashed                                                       | Supabase anonymous sign-in (LADDER.md 8.3)                           |
-| 11  | What is uploaded          | The snapshot only; results stay local                                                | Results too (the ladder, section 13)                                 |
-| 12  | The second HUD on a phone | A bar: name, life, energy shield                                                     | Two full HUDs stacked                                                |
+| #   | Decision                  | Default                                                                                                      | Alternatives                                                                |
+| --- | ------------------------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| 1   | Where the side comes from | The three patterns of 3.2: a parameter, the actor, `hunted`                                                  | A side on the world's "current context" (a hidden singleton again)          |
+| 2   | Tests                     | A codemod to `w.sides[0].<field>`; no compatibility getters on `World`                                       | Getters that keep `w.player` working (and keep the singleton alive)         |
+| 3   | What ends a duel          | A death; a 90 s cap or a 15 s stall is a draw                                                                | Decide a cap by life left; let the stall skip as in maps                    |
+| 4   | Reprieves and provisions  | Neither side brings any                                                                                      | Bring the reprieves the run still held                                      |
+| 5   | Resist penalty and level  | None; each character at its own level                                                                        | Each at its own map tier's penalty                                          |
+| 6   | Damage scale              | ×0.3 (F4 measured: median fights of 16 s and 25 s, 2% and 6% on the cap)                                     | ×1 always (the first hit decides); a scale that falls with the level        |
+| 7   | Arena and distance        | The boss arena's round room, a biome look, 10 tiles apart                                                    | The dummy's open floor; a labyrinth room                                    |
+| 8   | Who is offered            | K = 5 of the same save version within ±10 maps, players before bots, never one's own                         | Same class only; any depth                                                  |
+| 9   | Names                     | Generated, rerollable                                                                                        | Typed with a deny-list (moderation)                                         |
+| 10  | Identity                  | A random storage token, hashed                                                                               | Supabase anonymous sign-in (LADDER.md 8.3)                                  |
+| 11  | What is uploaded          | The snapshot only; results stay local                                                                        | Results too (the ladder, section 13)                                        |
+| 12  | The second HUD on a phone | A bar: name, life, energy shield                                                                             | Two full HUDs stacked                                                       |
+| 13  | Who a character goes for  | The other character and its minions, by the strategy's priority; the other counts as a boss for `rares` (F4) | The other character only (a summoner draws every fight against melee)       |
+| 14  | Who acts first            | Alternating by tick parity, the seed's parity choosing the side first on an even tick (F4)                   | The tick parity alone (does not alternate who is first); a hash of the tick |
 
 ---
 
