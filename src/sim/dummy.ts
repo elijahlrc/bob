@@ -74,27 +74,11 @@ export function dummyDefence(over: Partial<Defence> = {}): Defence {
   };
 }
 
-/** An open arena with the player and one stationary training dummy `distance` tiles away. */
-export function createDummyWorld(
-  build: Build,
-  opts: {
-    distance: number;
-    defence?: Partial<Defence>;
-    seed?: number;
-    maxTime?: number;
-    /** The arena's width and height in tiles (30 by default). */
-    size?: number;
-    /** What the dummy counts as (a boss makes the conditions of the rare and boss skills hold). */
-    rarity?: Actor['rarity'];
-    /** Other dummies standing just behind the first, so that a pack is near the character; the character still fights the first. */
-    bystanders?: number;
-    /** The dummies cannot be moved (pushed by the character, knocked back): the measuring tools set it. */
-    fixed?: boolean;
-    /** Turns the dummies about the character by this many radians, so that its minions are not stuck behind it in a line. */
-    angle?: number;
-  },
-): { world: World; dummy: Actor } {
-  const size = opts.size ?? 30;
+/**
+ * The open arena the training dummy stands in and a duel is fought in (docs/DUEL.md 4.2): a square of floor with one room (the
+ * end room), no monsters and no chests; `start` is where the character stands, 8.5 tiles in from the west wall.
+ */
+export function arenaPlan(seed: number, size: number, areaLevel: number): MapPlan {
   const tiles = new Uint8Array(size * size);
   for (let y = 1; y < size - 1; y++) for (let x = 1; x < size - 1; x++) tiles[y * size + x] = FLOOR;
   const room = {
@@ -106,10 +90,10 @@ export function createDummyWorld(
     pathIndex: 0,
   };
   const start = { x: 8.5, y: 15.5 };
-  const plan: MapPlan = {
-    seed: opts.seed ?? 1,
+  return {
+    seed,
     map: 1,
-    areaLevel: build.level,
+    areaLevel,
     resistPenalty: 0,
     theme: themeDef('ashenCrypt'),
     biome: biomeDef('crypt'),
@@ -133,6 +117,30 @@ export function createDummyWorld(
     },
     pop: { monsters: [], chests: [] },
   };
+}
+
+/** An open arena with the player and one stationary training dummy `distance` tiles away. */
+export function createDummyWorld(
+  build: Build,
+  opts: {
+    distance: number;
+    defence?: Partial<Defence>;
+    seed?: number;
+    maxTime?: number;
+    /** The arena's width and height in tiles (30 by default). */
+    size?: number;
+    /** What the dummy counts as (a boss makes the conditions of the rare and boss skills hold). */
+    rarity?: Actor['rarity'];
+    /** Other dummies standing just behind the first, so that a pack is near the character; the character still fights the first. */
+    bystanders?: number;
+    /** The dummies cannot be moved (pushed by the character, knocked back): the measuring tools set it. */
+    fixed?: boolean;
+    /** Turns the dummies about the character by this many radians, so that its minions are not stuck behind it in a line. */
+    angle?: number;
+  },
+): { world: World; dummy: Actor } {
+  const plan = arenaPlan(opts.seed ?? 1, opts.size ?? 30, build.level);
+  const start = plan.lab.start;
   const world = createWorld({
     plan,
     build,
