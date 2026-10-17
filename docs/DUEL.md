@@ -345,7 +345,7 @@ table refused, or the rivals out of reach).
   exist or is of another save version, and a second report of the same ordered pair (`unique (a_id, b_id)`: "Again" is
   unrated). An `after insert` trigger applies **Elo to both snapshots at once**: expected score 1 / (1 + 10^((rb − ra) / 400)),
   a win 1, a draw 0.5, a loss 0, each side by its own K from `elo_k(fights)`, **128 for a snapshot's first fight falling in a
-  straight line to 32 by its tenth** (the owner, 2026-10-17), ratings rounded to whole numbers. The log is the source of truth;
+  straight line to 32 by its tenth** (the owner, 2026-10-17), ratings rounded to whole numbers and never below 0 (a level 2 starts at 20 and a loss at K 128 can cost 31; the floor was added after the first live fight, 2026-10-17). The log is the source of truth;
   the nightly job (section 13) replays each unverified duel at its game version, sets `verified`, recomputes every rating from
   the verified rows alone (from ten times the level, the same K schedule) and writes them back, so a false report moves the
   ladder for a day at most and its reporter's hashes can be blocked;

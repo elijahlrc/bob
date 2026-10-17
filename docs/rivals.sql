@@ -407,14 +407,15 @@ begin
   select r.rating, r.fights into rb, fb from public.rivals r where r.id = new.b_id;
   ea := 1.0 / (1.0 + power(10.0, (rb - ra) / 400.0));
   sa := case when new.winner = 0 then 1.0 when new.winner = 1 then 0.0 else 0.5 end;
+  -- A rating never goes below 0: a level 2 starts at 20, and a loss at K 128 can cost 31.
   update public.rivals set
-    rating = round(ra + public.elo_k(fa) * (sa - ea))::int,
+    rating = greatest(0, round(ra + public.elo_k(fa) * (sa - ea))::int),
     fights = fights + 1,
     wins = wins + case when new.winner = 0 then 1 else 0 end,
     rated_at = now()
   where id = new.a_id;
   update public.rivals set
-    rating = round(rb + public.elo_k(fb) * ((1.0 - sa) - (1.0 - ea)))::int,
+    rating = greatest(0, round(rb + public.elo_k(fb) * ((1.0 - sa) - (1.0 - ea)))::int),
     fights = fights + 1,
     wins = wins + case when new.winner = 1 then 1 else 0 end,
     rated_at = now()
