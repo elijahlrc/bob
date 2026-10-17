@@ -119,6 +119,10 @@ export const RECENT = 4;
 /** Charges a kill grants each flask, by the monster's rarity (3.9; fractions are kept). */
 export const FLASK_CHARGES_ON_KILL = { normal: 1, magic: 3.5, rare: 6, unique: 11 } as const;
 
+// Duels (docs/DUEL.md 4.4).
+/** What the damage a character takes in a duel is multiplied by, both sides (a hit, a burst, every tick of damage over time). */
+export const DUEL_DAMAGE_SCALE = 1;
+
 // §13 AI.
 export const ENGAGE_RANGE = 9;
 export const LOOT_RANGE = 6;

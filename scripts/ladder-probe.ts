@@ -3,12 +3,16 @@
  * runs, and whether "A attacks a dummy wearing B's defence" (the crossfire of LADDER.md 5.1) tells builds apart.
  *
  *   npx tsx scripts/ladder-probe.ts [--classes all|vanguard,mystic] [--seeds 1,2] [--maps 80] [--duel 20,40,60] [--legacy]
- *                                   [--scale 0.1] [--save snaps.json] [--load snaps.json] [--real [--fight-seeds 1,2]]
+ *                                   [--scale 0.1] [--save snaps.json] [--load a.json,b.json]
+ *                                   [--real [--scale 1,0.5,0.35] [--fight-seeds 1,2] [--cells]]
  *
  * `--legacy` plays the bot on the legacy difficulty (the default kills it on maps 10 to 20). `--scale` multiplies the dummy's
- * damage taken (a PvP handicap). `--save` keeps the builds it snapshots, so `--load` can re-run the duels without the bot.
- * `--real` fights the matrix with real duels (`runDuel`, docs/DUEL.md F3) instead of the crossfire: the winner and the length of
- * each fight, with each pair in both orders (the arena is asymmetric until F4), one fight per seed of `--fight-seeds` (1).
+ * damage taken (a PvP handicap). `--save` keeps the builds it snapshots, so `--load` (one file or several) can re-run the duels
+ * without the bot. Builds are snapshotted at 5, 10, 15, 20, 40, 60, 80, 100 and the maps of `--duel`.
+ * `--real` fights the matrix with real duels (`runDuel`, docs/DUEL.md F3 and F4) instead of the crossfire, each pair in both
+ * orders, one fight per seed of `--fight-seeds` (1), at each damage scale of `--scale` (a list; 1, 0.5, 0.35, 0.25, 0.2, 0.15
+ * by default). It prints, for each scale and map, how the fights ended (death, both dead at once, stall, time cap), the quartiles
+ * and the longest fight, and how often the west side (side 0) won; `--cells` also prints who beat whom.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
@@ -31,18 +35,25 @@ const seeds = arg('--seeds', '1').split(',').map(Number);
 const maxMap = Number(arg('--maps', '80'));
 const duelMaps = arg('--duel', '40').split(',').map(Number);
 const legacy = argv.includes('--legacy');
-const scale = Number(arg('--scale', '1'));
+const real = argv.includes('--real');
+const scales = arg('--scale', real ? '1,0.5,0.35,0.25,0.2,0.15' : '1')
+  .split(',')
+  .map(Number);
+const scale = scales[0];
+const showCells = argv.includes('--cells');
 const saveFile = arg('--save', '');
 const loadFile = arg('--load', '');
-const real = argv.includes('--real');
 const fightSeeds = arg('--fight-seeds', '1').split(',').map(Number);
-const SNAPS = [10, 20, 40, 60, 80, 100];
+// The maps a build is snapshotted at: the usual ones, 5 and 15 (where the bot on the default difficulty still is), and `--duel`'s.
+const SNAPS = [...new Set([5, 10, 15, 20, 40, 60, 80, 100, ...duelMaps])];
 
 type Snap = { cls: string; seed: number; map: number; level: number; build: Build };
 let snaps: Snap[] = [];
 
 const t0 = performance.now();
-if (loadFile) snaps = JSON.parse(readFileSync(loadFile, 'utf8')) as Snap[];
+if (loadFile)
+  for (const f of loadFile.split(','))
+    snaps.push(...(JSON.parse(readFileSync(f, 'utf8')) as Snap[]));
 for (const cls of loadFile ? [] : clsIds)
   for (const seed of seeds) {
     const seen = new Set<number>();
@@ -68,13 +79,14 @@ for (const cls of loadFile ? [] : clsIds)
   }
 console.log(`bot runs: ${((performance.now() - t0) / 1000).toFixed(1)} s\n`);
 if (saveFile) writeFileSync(saveFile, JSON.stringify(snaps));
-console.log(`damage scale ${scale}`);
+if (!real) console.log(`damage scale ${scale}`);
 
 // ---- Sizes ----
-console.log(
-  'build sizes (bytes): class seed map level | json gzip | items affixes gems | allocated',
-);
-for (const s of snaps) {
+if (!real)
+  console.log(
+    'build sizes (bytes): class seed map level | json gzip | items affixes gems | allocated',
+  );
+for (const s of real ? [] : snaps) {
   const json = JSON.stringify(s.build);
   const gz = gzipSync(Buffer.from(json)).length;
   const items = Object.values(s.build.equipment).filter((it) => it !== undefined);
@@ -107,49 +119,72 @@ const f = (t: number) => (t === Infinity ? 'inf' : t.toFixed(1));
 const median = (a: Build, b: Build) =>
   [1, 2, 3].map((s) => ttk(a, b, s).t).sort((x, y) => x - y)[1];
 
-// ---- Real duels (docs/DUEL.md F3): the same matrix, fought with `runDuel` in both orders. ----
-type Real = { winner: 0 | 1 | null; how: 'death' | 'time'; time: number; ms: number };
-function fight(a: Build, b: Build, seed: number): Real {
+// ---- Real duels (docs/DUEL.md F3, F4): the same matrix, fought with `runDuel` in both orders, at each damage scale. ----
+type Real = { winner: 0 | 1 | null; how: 'death' | 'time' | 'stall'; time: number; ms: number };
+function fight(a: Build, b: Build, seed: number, damageScale: number): Real {
   const start = performance.now();
-  const r = runDuel(a, b, seed);
+  const r = runDuel(a, b, seed, { damageScale });
   return { winner: r.winner, how: r.how, time: r.time, ms: performance.now() - start };
 }
 
-function realMatrix(pool: Snap[], duelMap: number): void {
-  console.log(
-    `\nreal duels at map ${duelMap}: ${pool.length} builds (${pool.map((p) => name(p)).join(', ')}), seeds ${fightSeeds.join(',')}`,
-  );
-  console.log(
-    'row is side 0 (west, strikes first), column side 1; r = the row wins, c = the column wins, = a draw; seconds (median of the seeds)',
-  );
+/** The value at a share of a sorted list. */
+const quantile = (sorted: number[], q: number): number =>
+  sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * q))];
+
+/** One row of the length table: how the fights of a set ended and how long they lasted (docs/DUEL.md 4.4). */
+function lengthRow(label: string, scaleName: string, builds: number, all: Real[]): string {
+  const times = all.map((c) => c.time).sort((x, y) => x - y);
+  const by = (f: (c: Real) => boolean) => all.filter(f).length;
+  const west = by((c) => c.winner === 0);
+  const east = by((c) => c.winner === 1);
+  const decided = west + east;
+  return [
+    label.padEnd(10),
+    scaleName.padEnd(5),
+    String(builds).padStart(3),
+    String(all.length).padStart(5),
+    String(by((c) => c.how === 'death' && c.winner !== null)).padStart(5),
+    String(by((c) => c.how === 'death' && c.winner === null)).padStart(5),
+    String(by((c) => c.how === 'stall')).padStart(5),
+    String(by((c) => c.how === 'time')).padStart(5),
+    quantile(times, 0.25).toFixed(1).padStart(6),
+    quantile(times, 0.5).toFixed(1).padStart(6),
+    quantile(times, 0.75).toFixed(1).padStart(6),
+    times[times.length - 1].toFixed(1).padStart(6),
+    String(west).padStart(5),
+    String(east).padStart(5),
+    `${decided ? ((100 * west) / decided).toFixed(0) : '-'}%`.padStart(5),
+  ].join(' ');
+}
+const LENGTH_HEADER =
+  'pool       scale  bld fights death both  stall   cap     q1 median     q3 longest  west  east west%';
+
+function realMatrix(pool: Snap[], duelMap: number, damageScale: number): Real[] {
   // cells[i][j]: the fights of pool[i] (side 0) against pool[j] (side 1), one per seed.
   const cells: Real[][][] = pool.map(() => pool.map(() => []));
   for (let i = 0; i < pool.length; i++)
     for (let j = 0; j < pool.length; j++)
       if (i !== j)
-        for (const seed of fightSeeds) cells[i][j].push(fight(pool[i].build, pool[j].build, seed));
-  for (let i = 0; i < pool.length; i++) {
-    const out = pool.map((_, j) => {
-      if (i === j) return '    -     ';
-      const cs = cells[i][j];
-      const letters = cs.map((c) => (c.winner === 0 ? 'r' : c.winner === 1 ? 'c' : '=')).join('');
-      const ts = cs.map((c) => c.time).sort((x, y) => x - y);
-      return `${letters} ${ts[Math.floor(ts.length / 2)].toFixed(1)}`.padEnd(10);
-    });
-    console.log(`${name(pool[i]).padEnd(8)} ${out.join(' ')}`);
+        for (const seed of fightSeeds)
+          cells[i][j].push(fight(pool[i].build, pool[j].build, seed, damageScale));
+  if (showCells) {
+    console.log(
+      `\nreal duels at map ${duelMap}, damage scale ${damageScale}: ${pool.length} builds (${pool.map((p) => name(p)).join(', ')}), seeds ${fightSeeds.join(',')}`,
+    );
+    console.log(
+      'row is side 0 (west), column side 1; r = the row wins, c = the column wins, = a draw; seconds (median of the seeds)',
+    );
+    for (let i = 0; i < pool.length; i++) {
+      const out = pool.map((_, j) => {
+        if (i === j) return '    -     ';
+        const cs = cells[i][j];
+        const letters = cs.map((c) => (c.winner === 0 ? 'r' : c.winner === 1 ? 'c' : '=')).join('');
+        const ts = cs.map((c) => c.time).sort((x, y) => x - y);
+        return `${letters} ${ts[Math.floor(ts.length / 2)].toFixed(1)}`.padEnd(10);
+      });
+      console.log(`${name(pool[i]).padEnd(8)} ${out.join(' ')}`);
+    }
   }
-  const all = cells.flat(2);
-  const times = all.map((c) => c.time).sort((x, y) => x - y);
-  const by = (f: (c: Real) => boolean) => all.filter(f).length;
-  console.log(
-    `\n${all.length} fights: ${by((c) => c.how === 'death' && c.winner !== null)} won by a death, ${by((c) => c.winner === null && c.how === 'death')} both dead at once, ${by((c) => c.how === 'time')} ended by the cap`,
-  );
-  console.log(
-    `length: median ${times[Math.floor(times.length / 2)].toFixed(1)} s, shortest ${times[0].toFixed(1)}, longest ${times[times.length - 1].toFixed(1)}; ${(all.reduce((n, c) => n + c.ms, 0) / all.length).toFixed(0)} ms of wall time each`,
-  );
-  console.log(
-    `side 0 (west) won ${by((c) => c.winner === 0)}, side 1 (east) won ${by((c) => c.winner === 1)}`,
-  );
   // The two orders of a pair and a seed: the same build wins both (the fight is about the builds), or the winner is the side that stood west.
   let agree = 0;
   let disagree = 0;
@@ -167,19 +202,38 @@ function realMatrix(pool: Snap[], duelMap: number): void {
         if ((ij === 0) !== (ji === 0)) agree++;
         else disagree++;
       }
+  const all = cells.flat(2);
   console.log(
-    `the two orders of a pair and a seed: ${agree} agree on the winner, ${disagree} disagree (the west side won both, or the east side did), ${oneDraw} had a draw in one order`,
+    `${lengthRow(`map ${duelMap}`, String(damageScale), pool.length, all)}   | orders agree ${agree}, disagree ${disagree}, a draw ${oneDraw}; ${(all.reduce((n, c) => n + c.ms, 0) / all.length).toFixed(0)} ms each`,
   );
+  return all;
+}
+
+if (real) {
+  console.log(`\nreal duels, fight seeds ${fightSeeds.join(',')}, each pair in both orders`);
+  console.log(LENGTH_HEADER);
+  for (const sc of scales) {
+    const total: Real[] = [];
+    let builds = 0;
+    for (const duelMap of duelMaps) {
+      const pool = snaps.filter((s) => s.map === duelMap);
+      if (pool.length < 2) {
+        console.log(`no two builds reached map ${duelMap}; duel skipped`);
+        continue;
+      }
+      builds += pool.length;
+      total.push(...realMatrix(pool, duelMap, sc));
+    }
+    if (total.length > 0 && duelMaps.length > 1)
+      console.log(lengthRow('all maps', String(sc), builds, total));
+  }
+  process.exit(0);
 }
 
 for (const duelMap of duelMaps) {
   const pool = snaps.filter((s) => s.map === duelMap);
   if (pool.length < 2) {
     console.log(`\nno two builds reached map ${duelMap}; duel skipped`);
-    continue;
-  }
-  if (real) {
-    realMatrix(pool, duelMap);
     continue;
   }
   console.log(

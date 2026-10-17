@@ -39,6 +39,14 @@ export type SideStats = {
   damageDealt: number;
 };
 
+/**
+ * What makes a side's fight a duel (docs/DUEL.md 3.4 and 4): its AI engages the other character at any distance, never loots,
+ * never leaves and never walks the map's waypoints; and what its character takes is multiplied by `damageScale` (default 1).
+ */
+export type DuelSideOpts = {
+  damageScale?: number;
+};
+
 /** What a character brings to a map (what the map decides is `WorldOpts`). */
 export type SideOpts = {
   /** Life, mana, energy shield and flask charges the player starts with (default: all full). */
@@ -49,6 +57,8 @@ export type SideOpts = {
   godMode?: boolean;
   /** The reprieves the character carries, in the order they are used (data/reprieves.ts): one fires when damage would kill (docs/WAYSIDE.md 7). */
   reprieves?: string[];
+  /** Set for a duel (docs/DUEL.md 4): the character engages at any distance, never loots or leaves, and takes scaled damage. */
+  duel?: DuelSideOpts;
 };
 
 /**
@@ -74,6 +84,8 @@ export type Side = {
   xp: number;
   picked: AnyItem[];
   opts: SideOpts;
+  /** What the character's damage taken is multiplied by: `opts.duel.damageScale`, resolved (1 on a map; docs/DUEL.md 4.4). */
+  damageScale: number;
   // G2: charges, buffs and rage, the triggers, cooldowns and openers
   /** Seconds left on the charges of each kind (EXPANSION 5.6), and the characters built for each count held. */
   chargeT: Record<'grit' | 'fervour' | 'insight', number>;

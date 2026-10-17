@@ -180,7 +180,8 @@ function makeSide(plan: MapPlan, id: number, inp: SideInput): Side {
       uses: 0,
     })),
     ai: {
-      mode: 'advance',
+      // A duel has no waypoints to advance along: the character starts out engaging (docs/DUEL.md 3.4).
+      mode: o?.duel ? 'engage' : 'advance',
       wp: 0,
       path: [],
       pathKey: '',
@@ -230,7 +231,9 @@ function makeSide(plan: MapPlan, id: number, inp: SideInput): Side {
       freeResources: o?.freeResources,
       godMode: o?.godMode,
       reprieves: o?.reprieves,
+      duel: o?.duel,
     },
+    damageScale: o?.duel?.damageScale ?? 1,
     chargeT: { grit: 0, fervour: 0, insight: 0 },
     buffT: {
       ...Object.fromEntries(BUFF_IDS.map((b) => [b, 0])),
