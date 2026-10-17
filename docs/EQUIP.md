@@ -315,7 +315,7 @@ diff on phones only, row pips always.
   to the bag, the slot tabs say what happens to the gems, a worn slot shows its pips, a worn item names its gems and has **Edit gems →**
   (opens the Skills tab scrolled to that item), a bag gem has the `SocketPicker`.
 - Phone: the sheet opens on a peek (the changed lines, the sockets row, one row of actions); the grab bar or ▴ opens the full view
-  (chips, gems by name, the merged card with old values, "Show both cards"). **The peek shows every changed line** (the user's review
+  (gems by name and the merged card with old values; the calculated chips (damage, effective HP, resistances) appear only with "Both" cards, since they cover only some stats and repeat what the changed lines say). **The peek shows every changed line** (the user's review
   of the first build: a "show more" in the peek made it useless); it grows to 52 vh and scrolls inside, with the actions pinned.
 - Filters: a phone's toolbar is the search, **Filter** (with a count) and **Clear filters**; the rest is in a sheet with Show N items
   and Reset filters. Clear filters is also on desktop and tablet (beside Reverse), and an empty list offers it.

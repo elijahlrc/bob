@@ -312,7 +312,7 @@ function PhoneCompare({
   /** Both cards shown under the merged one. */
   both: boolean;
   build: Build;
-  /** The calculated changes, shown in the full view only. */
+  /** The calculated changes: with both cards shown, under them. */
   extra?: ComponentChildren;
   sockets?: ComponentChildren;
 }) {
@@ -325,10 +325,14 @@ function PhoneCompare({
     );
   return (
     <>
-      {extra}
       {sockets}
       {against ? <DiffCard it={it} rows={rows} /> : <ItemCard it={it} build={build} />}
-      {both && <Pair item={it} against={against} empty="Worn" build={build} />}
+      {both && (
+        <>
+          <Pair item={it} against={against} empty="Worn" build={build} />
+          {extra}
+        </>
+      )}
     </>
   );
 }
