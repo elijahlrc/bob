@@ -525,3 +525,39 @@ describe('bodies', () => {
     expect(sa.player.y).toBeCloseTo(a1.y, 9);
   });
 });
+
+describe('the events of a duel say whose they are', () => {
+  /** Fight a duel to its end and keep every event of every tick. */
+  const events = (a: Build, b: Build, seed: number) => {
+    const w = createDuelWorld(a, b, seed);
+    const all: World['events'] = [];
+    while (w.t < 60 && w.sides.every((s) => s.player.alive)) {
+      stepWorld(w);
+      all.push(...w.events);
+    }
+    return { w, all };
+  };
+
+  it('a flask drunk is the drinker’s: `src` is the character whose flask it is, and `idx` its flask', () => {
+    const { w, all } = events(vanguard(1), vanguard(2), 1);
+    const drunk = all.filter((e) => e.t === 'flaskUsed');
+    expect(drunk.length).toBeGreaterThan(0);
+    for (const s of w.sides) {
+      const mine = drunk.filter((e) => e.src === s.player.id);
+      const uses = s.flasks.reduce((n, f) => n + f.uses, 0);
+      expect(mine.length, `side ${s.id}`).toBe(uses);
+      for (const e of mine) expect(s.flasks[e.idx]).toBeDefined();
+    }
+    // Nothing is drunk for an actor that is not a character.
+    const ids = new Set(w.sides.map((s) => s.player.id));
+    for (const e of drunk) expect(ids.has(e.src)).toBe(true);
+  });
+
+  it('a fall is the faller’s: `src` of playerDied is the character that died', () => {
+    const { w, all } = events(vanguard(1), vanguard(2), 1);
+    const dead = w.sides.filter((s) => !s.player.alive);
+    expect(dead.length).toBeGreaterThan(0);
+    const fell = all.filter((e) => e.t === 'playerDied');
+    expect(fell.map((e) => e.src).sort()).toEqual(dead.map((s) => s.player.id).sort());
+  });
+});
