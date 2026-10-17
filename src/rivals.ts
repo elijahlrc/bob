@@ -1,8 +1,15 @@
 import type { Controller } from './run/controller';
-import { hashToken, postRival, rivalRecord, validName } from './run/rivals';
+import {
+  hashToken,
+  nameRefused,
+  postRival,
+  rivalRecord,
+  validName,
+  type FetchAny,
+} from './run/rivals';
 import type { RunState } from './run/run';
 import type { MapResult } from './sim/runMap';
-import { SINK, type Fetch, type Sink } from './run/telemetry';
+import { SINK, type Sink } from './run/telemetry';
 import { loadPref, savePref } from './ui/prefs';
 
 /**
@@ -13,6 +20,7 @@ import { loadPref, savePref } from './ui/prefs';
 
 const PREF_ON = 'rivals';
 const PREF_NAME = 'rivalName';
+const PREF_POSTED = 'rivalPosted';
 const TOKEN_KEY = 'bob.rival.token';
 
 /** Whether this build can send at all (the same project as the run statistics). */
@@ -39,7 +47,10 @@ export function setRivalName(name: string): void {
   savePref(PREF_NAME, name);
 }
 
-/** The name to send: the typed one when it is a valid name, else null (the game makes one up). */
+/**
+ * The name to send: the typed one when it is a valid name, else null. A player's character is posted only with a typed name
+ * (the generated names are the bot's), so null means nothing is sent.
+ */
 export function sendName(): string | null {
   const n = rivalName().trim();
   return validName(n) ? n : null;
@@ -77,7 +88,7 @@ export function rivalToken(): string {
 const buildId = (): string => (typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'local');
 
 /** What the hook sends with and where: the real ones in the game, replaced in tests. */
-export type RivalDeps = { fetch: Fetch; sink: Sink; version: string };
+export type RivalDeps = { fetch: FetchAny; sink: Sink; version: string };
 
 const realDeps = (): RivalDeps => ({
   fetch: (url, init) => fetch(url, init as RequestInit),
@@ -85,31 +96,130 @@ const realDeps = (): RivalDeps => ({
   version: buildId(),
 });
 
-/** Send the character of a run that has just ended, if the player has opted in. Nothing here can throw. */
+// ---------------------------------------------------------------------------------------------------------------------------
+// The post of the run that just ended, kept
+
+/**
+ * Where the post of a run stands. `failed` says why: the table refused the name (the deny-list), or the rivals could not be
+ * reached (offline, a cap, a block); only after `failed` may the same run be posted again.
+ */
+export type PostStatus =
+  | { status: 'idle' }
+  | { status: 'sending' }
+  | { status: 'posted' }
+  | { status: 'failed'; reason: 'name' | 'unreachable'; name?: string; message?: string };
+
+const IDLE: PostStatus = { status: 'idle' };
+
+/** The run's identity for the keeper: its seed, with the class and the maps played so that a seed played twice is two runs. */
+export function runKey(run: RunState): string {
+  return `${run.classId}:${run.seed}:${run.history.length}`;
+}
+
+type Keep = { key: string; status: PostStatus; promise: Promise<PostStatus> | null };
+/** The run that has just ended: its post, whether sending, done or failed. One run at a time is ever the player's. */
+let keep: Keep | null = null;
+const watchers = new Set<() => void>();
+
+/** Call `fn` whenever the post of a run changes (its answer arrives); returns what stops it. */
+export function watchPost(fn: () => void): () => void {
+  watchers.add(fn);
+  return () => void watchers.delete(fn);
+}
+
+/** Forget the post in hand (for tests: the keeper is module state). */
+export function resetPostKeeper(): void {
+  keep = null;
+  watchers.clear();
+}
+
+/** Where the post of `run` stands: in hand, or posted before (the seed of the last run it posted is kept beside the preferences). */
+export function postStatus(run: RunState): PostStatus {
+  const key = runKey(run);
+  if (keep?.key === key) return keep.status;
+  return loadPref<string | null>(PREF_POSTED, null) === key ? { status: 'posted' } : IDLE;
+}
+
+/** The post of `run` that is on its way, to await; null when none is. */
+export function pendingPost(run: RunState): Promise<PostStatus> | null {
+  return keep?.key === runKey(run) && keep.status.status === 'sending' ? keep.promise : null;
+}
+
+/**
+ * Post the character of a run that has ended (a death or a win), unless it is already on its way or in: the hook at the end of a
+ * run and the summary's opt-in both come here, so one run is never posted twice. Posted only with a typed name that is valid
+ * (`sendName`); with none, nothing is sent and the status stays `idle`. A run whose post failed is posted again by the next call.
+ * Never throws; the status says what came of it.
+ */
+export function postRun(
+  run: RunState,
+  res: MapResult | null,
+  deps: () => RivalDeps = realDeps,
+): Promise<PostStatus> {
+  const key = runKey(run);
+  const now = postStatus(run);
+  if (now.status === 'sending') return keep!.promise!;
+  if (now.status === 'posted') return Promise.resolve(now);
+  const name = sendName();
+  if (!rivalsConfigured() || name === null || (run.phase !== 'dead' && run.phase !== 'victory'))
+    return Promise.resolve(IDLE);
+  // The run may not change under the send: the character is copied now, before anything is awaited.
+  const kept = { ...run, build: structuredClone(run.build) };
+  const mine: Keep = { key, status: { status: 'sending' }, promise: null };
+  const attempt = async (): Promise<PostStatus> => {
+    try {
+      const d = deps();
+      const tokenHash = await hashToken(rivalToken());
+      const r = await postRival(
+        d.fetch,
+        d.sink,
+        rivalRecord(kept, res, { name, tokenHash, version: d.version, seed: run.seed }),
+      );
+      if (r.ok) {
+        savePref(PREF_POSTED, key);
+        return { status: 'posted' };
+      }
+      return nameRefused(r)
+        ? { status: 'failed', reason: 'name', name, message: r.message }
+        : { status: 'failed', reason: 'unreachable', message: r.message };
+    } catch {
+      return { status: 'failed', reason: 'unreachable' };
+    }
+  };
+  mine.promise = attempt().then((st) => {
+    if (keep === mine) {
+      mine.status = st;
+      for (const fn of [...watchers]) {
+        try {
+          fn();
+        } catch {
+          // A watcher cannot break the post.
+        }
+      }
+    }
+    return st;
+  });
+  keep = mine;
+  return mine.promise;
+}
+
+/**
+ * Send the character of a run that has just ended when the player has opted in and has a valid name. Nothing here can throw
+ * into the end of a run.
+ */
 function share(run: RunState, res: MapResult, deps: () => RivalDeps): void {
   try {
     if (!rivalsConfigured() || !rivalsOn()) return;
-    const d = deps();
-    // The run may not change under the send; the character is copied now.
-    const kept = { ...run, build: structuredClone(run.build) };
-    const name = sendName();
-    void hashToken(rivalToken())
-      .then((tokenHash) =>
-        postRival(
-          d.fetch,
-          d.sink,
-          rivalRecord(kept, res, { name, tokenHash, version: d.version, seed: run.seed }),
-        ),
-      )
-      .catch(() => undefined);
+    void postRun(run, res, deps).catch(() => undefined);
   } catch {
     // Never disturbs the end of a run.
   }
 }
 
 /**
- * Send the character of every run that ends on `c`, a death and a win alike, when the player has opted in. It runs beside any
- * hook already on `c.onRunEnd` (telemetry's), whichever was installed first, and nothing it does can throw into the end of a run.
+ * Send the character of every run that ends on `c`, a death and a win alike, when the player has opted in and typed a valid name.
+ * It runs beside any hook already on `c.onRunEnd` (telemetry's), whichever was installed first, and nothing it does can throw
+ * into the end of a run.
  */
 export function installRivals(c: Controller, deps: () => RivalDeps = realDeps): void {
   const prev = c.onRunEnd;
