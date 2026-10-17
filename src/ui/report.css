@@ -109,3 +109,30 @@
     padding-right: 5px;
   }
 }
+
+/* The duel result screen (src/ui/DuelResult.tsx): the headline and buttons, then the two sides' reports side by side. */
+.duel-result {
+  justify-content: flex-start;
+  padding: 24px 12px;
+  box-sizing: border-box;
+}
+.duel-result h2,
+.duel-result p {
+  margin: 0;
+}
+.duel-result .menu.row {
+  flex-direction: row;
+  gap: 8px;
+}
+.duel-sides {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 1880px;
+}
+.duel-sides .mreport {
+  flex: 1 1 520px;
+  width: auto;
+}

@@ -429,11 +429,13 @@ export type SimEvent =
   | { t: 'dot'; dst: number; id: string }
   | { t: 'death'; id: number }
   | { t: 'shatter'; id: number }
-  | { t: 'levelUp'; level: number }
+  /** A character gained a level: `src` is the character (a duel has two). */
+  | { t: 'levelUp'; src: number; level: number }
   | { t: 'drop'; id: number }
   | { t: 'pickup'; id: number }
   | { t: 'chest'; id: number }
-  | { t: 'flaskUsed'; idx: number }
+  /** A character drank flask `idx` of its own: `src` is the character. */
+  | { t: 'flaskUsed'; src: number; idx: number }
   | { t: 'projectileSpawned'; id: number }
   /** A skill use began. `via` marks a shot fired by something the character put down (a totem, a trap), not by the character. */
   | { t: 'use'; src: number; skill: string; via?: 'deployed' }
@@ -509,7 +511,8 @@ export type SimEvent =
   | { t: 'deploy'; id: number; kind: string; x: number; y: number; end: boolean }
   /** A trap or a mine went off at (x, y), at an enemy standing at (tx, ty). */
   | { t: 'sprung'; id: number; kind: string; x: number; y: number; tx: number; ty: number }
-  | { t: 'stuck' }
+  /** A character that could not move was put at its next waypoint: `src` is the character. */
+  | { t: 'stuck'; src: number }
   | { t: 'stall'; id: number }
   | {
       t: 'projectileEnd';
@@ -522,7 +525,8 @@ export type SimEvent =
     }
   | { t: 'exitOpen' }
   | { t: 'cleared' }
-  | { t: 'playerDied' }
+  /** A character fell: `src` is the character (the map is over when it is side 0's; a duel reads both). */
+  | { t: 'playerDied'; src: number }
   | { t: 'abandonStarted' }
   | { t: 'abandonCancelled' }
   | { t: 'abandoned' }

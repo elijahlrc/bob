@@ -4,6 +4,7 @@ import { Camp } from './Camp';
 import { ClassSelect } from './ClassSelect';
 import { Codex } from './Codex';
 import { ConfirmHost, dismissAsk } from './Confirm';
+import { DuelResultView } from './DuelResult';
 import { Hud } from './Hud';
 import { InfoLayer } from './info';
 import { useControllerState } from './hooks';
@@ -52,6 +53,8 @@ function Screen({ c }: { c: Controller }) {
       return <Camp c={c} />;
     case 'map':
       return <Hud c={c} />;
+    case 'duelResult':
+      return <DuelResultView c={c} />;
     case 'summary':
     case 'victory':
       return <Summary c={c} />;

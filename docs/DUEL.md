@@ -1,7 +1,7 @@
 # Bob — Duels: asynchronous fights against other players' characters
 
-Status: **F0 to F4 built on 2026-10-16** (the plan was the second draft of 2026-10-16, after the user rejected the two-world
-engine of the first); F5 to F7 are not built; see "Built" under section 7 · Owner: the user · Author: Claude
+Status: **F0 to F5 built on 2026-10-16** (the plan was the second draft of 2026-10-16, after the user rejected the two-world
+engine of the first); F6 and F7 are not built; see "Built" under section 7 · Owner: the user · Author: Claude
 
 A duel is a real fight, watched in the game, between the player's character and a **rival**: a snapshot of another player's
 character (class, level, passive tree, gems, items and Strategy settings) taken when that player's run ended. The rival is
@@ -23,7 +23,7 @@ DESIGN.md Appendix A on approval (section 11).
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
 | **Sides** (the engine)     | The player singleton goes: `World` is the arena, `World.sides` the characters in it, each with everything of theirs. Functions act for a side; the hit path reads a side from the actor. Every kit works across sides. | F0 to F3   |
 | **The rules of a duel**    | How a duel starts and ends, what each side brings, the damage scale, fairness of the step order.                                                                                                                       | F4         |
-| **The watchable duel**     | A round arena in a biome's look, both characters and their kits drawn, a HUD per side, the speed controls, a result screen.                                                                                            | F5         |
+| **The watchable duel**     | A round arena in a biome's look, both characters and their kits drawn, the player's HUD and the rival as a boss bar, the speed controls, a result screen.                                                              | F5         |
 | **Rivals** (the snapshots) | A character captured at the end of a run (opt-in), named, sent to a small table; fetched by version and depth; bot characters fill the pool while it is small.                                                         | F6         |
 | **The screens**            | "Fight a rival" from the run summary: a pick of rivals, the duel, the result, "Again"; a local record of results.                                                                                                      | F7         |
 
@@ -201,7 +201,8 @@ distance. F2 and F3 used the dummy arena of `src/sim/dummy.ts` (open floor, 30 �
 stock AI's engage range of 9, so that they fought without the option; F4 keeps that arena, puts them 10 tiles apart (outside the
 engage range, so the option is what makes them fight) on the middle row, mirror images about the middle column (9 tiles from the
 west and the east wall: a stand at the plan's start was 8.5 from the west wall and 11.5 from the east one, so the west
-character reached a wall sooner when it kited); F5 brings the round arena.
+character reached a wall sooner when it kited); F5 brought the round arena (`duelPlan`, `src/sim/duel.ts`: the boss arena's room on its
+own, 25 tiles across with its rim, the characters at 7.5 and 17.5 of 25 on the middle row, the biome and the theme drawn from the seed).
 
 ### 4.3 How a duel ends
 
@@ -241,24 +242,39 @@ ledger of each side (damage dealt and taken by source, `src/sim/ledger.ts`) is t
 
 ---
 
-## 5. The watchable duel (F5)
+## 5. The watchable duel (F5, built 2026-10-16)
 
-- **Scene.** `MapScene.build(world)` draws `world.actors` (both characters) and every side's `minions`, `deployables`,
-  `fields` and `zones` (`grim/index.ts` 3 sites, `grim/skillFx.ts` about 8 read one side today). Skill and buff effects
-  anchored on the character anchor on the event's actor instead (events carry `src` ids). The figure rig reads a character's
-  class from its side's `build`, so the rival is drawn as its own class.
-- **Camera.** `style/base.ts:99` follows the character; a camera target option: the midpoint of the two characters, clamped to
-  the arena.
-- **HUD.** `Hud({ c })` becomes `Hud({ c, side })`: side 0 on the left as today, the rival's mirrored on the right, each with
-  its orbs, flasks and statuses. On a phone (docs/MOBILE.md) the rival's HUD is a single bar across the top: name, life,
-  energy shield. The speed controls (1× to 8×, pause) are shared.
-- **Controller.** A duel mode beside the showcase and the gallery (`controller.ts`, `launchShowcase` is the precedent for a
-  world outside a run): `startDuel(build, rival, seed)` builds the arena plan, `createWorld` with two sides, emits `mapStart`;
-  `onFrame` steps as usual and, while `this.duel` is set, reads the duel's end from the sides **before** the map's status
-  check (`stepWorld` sets `'dead'` only for side 0's character); the end goes to the duel result screen, never to `endMap`,
-  so the run's map flow (`finishMap`, Crawls, reprieves, telemetry) is untouched.
-- **Result screen** (`src/ui/DuelResult.tsx`): who won and how, the time, each side's damage dealt by skill and taken by source
-  (the ledger), and "Again" (a new seed), "Another rival", "Back".
+The plan drew a second HUD for the rival (mirrored on the right, a bar on a phone). **The owner simplified it on 2026-10-16: one HUD,
+the player's, and the rival is shown the way a boss is.** One fight has one spectator, and the rival's own orbs and flasks are
+not what they watch.
+
+- **Scene.** The scene draws every side: a character is drawn as its own side's class (`figureOf`, `heroColor`, `isViewer` in
+  `src/render/style/who.ts` read `a.side`), the rival wears a boss's ring so that two characters of one class are told apart, and
+  each character has a light. The per-side kits (minions, deployables, fields, zones, vortex, storm orb, markers, fuses, spores, mirage,
+  charged, shell, channel, auras, buffs, bonds, siphons: `grim/skillFx.ts`) loop over the sides; the level-up and flask effects anchor on
+  the event's `src`; a minion is looked up on every side. A hit on the rival bleeds with no screen shake and its numbers take the colour of
+  the damage type (red and the shake are the viewer's own character's); the rival has the marks of an enemy (a life bar, the selection
+  bracket) and can be picked. The arena draws no exit. `bossFx.ts` and `encounterFx.ts` still read side 0: a duel has no bosses or
+  encounters.
+- **Arena and camera.** `duelPlan` (4.2). The camera follows the middle of the characters still alive (all of them when none is),
+  kept on the floor; side 0's character on a map as before.
+- **HUD.** The player's HUD as on a map, with the chrome that does not apply left out: "Map N · theme" is "Duel", no Kills, Exit open,
+  reprieves or Abandon; the biome banner stays. The speed controls and pause are as they are. **The rival is the boss bar** (`BossBar`, name,
+  life, energy shield; no readout), and clicking it shows its name, class and level. **Leave** (a small button as the showcase's Exit)
+  ends the duel with no result.
+- **Controller.** A duel mode beside the showcase and the gallery (`launchShowcase` is the precedent for a world outside a run):
+  `startDuel(a, b, seed, opts?, from?)` makes the world with `createDuelWorld` on copies of the builds, emits `mapStart`, and sets
+  `Controller.duel`. `onFrame` steps as usual and, while a duel is set, reads its end **after every tick** by `duelEnd(w, watch)`
+  (`src/sim/duel.ts`; the rules `playDuel` has: a death, a stall, the cap) and breaks out of the step loop on it (`stepWorld` sets
+  `'dead'` only for side 0's character, and a frame at 8× steps up to a second). The end is a `DuelOutcome` in `lastDuel` (the result and
+  both reports), a `mapEnd`, and the `'duelResult'` screen, never `endMap`, so the run's map flow (`finishMap`, Crawls, reprieves,
+  telemetry, the save) is untouched and `Controller.run` is whatever it was. `againDuel()` fights on the next seed; `leaveDuel()` goes
+  back to `from`.
+- **Result screen** (`src/ui/DuelResult.tsx`): who won and how ("You won", "You fell", "A draw: time ran out", "A draw: nobody landed a
+  blow for 15 s"), the time, each side's damage dealt by skill and taken by source (`MapReportView`, the numbers are what landed), and
+  **Again** (the next seed) and **Back**. "Another rival" is F7's.
+- **Debug panel** (`src/ui/Debug.tsx`, at camp): a Duel row with a class, a map, a seed, **Mirror** (the character against a copy of
+  itself) and **Bot** (a bot build of that class played to that map on the legacy curve; `botBuild`, `src/run/duelBot.ts`).
 
 ---
 
@@ -351,7 +367,7 @@ explains the obvious.
 | **F2** | Two characters     | `createWorld` takes any number of characters (`CreateWorldInput.sides: { build, x, y, opts }[]`; a map passes one at the plan's start); `runDuel(a, b, seed, opts) → DuelResult` in `src/sim/duel.ts`; two class starters with weapons alone fight headlessly on the dummy arena, 8 tiles apart; characters collide with each other and with foreign minions.                  | `runDuel` of two starters ends with **one dead** (a draw by the cap means they never engaged, and fails); `src/sim/duel.test.ts`: only B has a Molten Shell and A's hit is absorbed by B's shell while A's stays null; B's flask fires when B is hurt, not A's; A's ignite on B ticks against B's resistances. | 1 to 2   |
 | **F3** | Kits across sides  | Minions (target, are targeted, separate), deployables, fields and zones, projectiles and shots, triggers, charges, buffs, channel, blinks, banners, offerings, supports' counters; `scripts/duel.ts` (two builds from saves, bot builds or the probe's snapshots: the result and both ledgers); the bot-versus-bot matrix of `scripts/ladder-probe.ts` re-run with real duels. | A test per kit (a minion of B attacks A; A's totem shoots B; B's field burns A; A's trigger fires on B's hit); every active gem duels without an exception (a smoke test like `gemSmoke.test.ts`); the fence still matches.                                                                                    | 1 to 2   |
 | **F4** | The rules          | `SideOpts.duel`: engage anywhere, no advance, loot or exit; the ends of 4.3; order alternation; `damageScale`; the measurement of fight lengths and the default (4.4); the symmetry test.                                                                                                                                                                                      | The same build on both sides wins about half over 100 seeds; fight lengths measured and the default recorded in Appendix A; `docs/PLAYER-AI.md` gains a section on duels; the fence still matches.                                                                                                             | 0.5 to 1 |
-| **F5** | The watchable duel | The round arena in a biome's look; the scene draws every side; effects by actor; the figure rig by side; the camera; `Hud({ c, side })` and the phone bar; `startDuel` and the controller's duel mode; `DuelResult.tsx`; "Again"; a Debug panel entry that starts a duel against a bot build.                                                                                  | A duel between the current character and a bot build can be watched from the Debug panel at every speed, on a phone layout too; no console errors; the HUDs follow both sides.                                                                                                                                 | 2 to 3   |
+| **F5** | The watchable duel | The round arena in a biome's look; the scene draws every side; effects by actor; the figure rig by side; the camera; the rival as the boss bar (no second HUD); `startDuel` and the controller's duel mode; `DuelResult.tsx`; "Again"; a Debug panel entry that starts a duel against a bot build.                                                                             | A duel between the current character and a bot build can be watched from the Debug panel at every speed, on a phone layout too; no console errors; the boss bar follows the rival.                                                                                                                             | 2 to 3   |
 | **F6** | Rivals             | `Rival`, `src/run/rivals.ts` (post, fetch, validate, token, names), `docs/rivals.sql` run on the project, the opt-in preference and checkboxes, capture in `onRunEnd`, `npm run sim -- --rivals`, TELEMETRY.md's new section.                                                                                                                                                  | A death with the opt-in posts a row the table accepts; `rivals_for` returns K rows of the version near the map, none of the caller's; a row with an unknown gem id is skipped by the client; the bot has seeded the pool at the current version.                                                               | 1 to 2   |
 | **F7** | The screens        | "Fight a rival" on the summary, `Rivals.tsx`, the local record, the summary line, the offline fallback; patch notes.                                                                                                                                                                                                                                                           | From a death: pick a rival, watch the duel, see the result, fight again, fight another; the record persists across reloads; works offline against one of the player's own saved runs; `npm run check` and `npm run build` green; the patch notes entry filed.                                                  | 1 to 2   |
 
@@ -712,6 +728,65 @@ differences and findings:
     relatively; none of it was measured apart.
   - _A stall of minions:_ two summoners can fight each other's minions to a stall (a draw); the result should say "stalled".
 
+**Built: F5 (2026-10-16).** A duel between the current character and a copy of itself or a bot build can be watched from the Debug panel
+at camp (a Duel row), at every speed, on the round arena. Built headlessly and checked by `npm run build` and the tests only: **no browser was
+opened** (the dev server's port was in use), so what the scene and the HUD look like is for the owner to see (the list under "Unverified"
+below). As planned, with these differences and findings:
+
+- **One HUD, not two** (the owner, 2026-10-16; section 5, decision 12, Appendix A): the rival is the boss bar, which lists a character of
+  another side by its name with its life and energy shield (no readout) and has no distance cap. `Side` has no name: the bar reads the actor's
+  (`createDuelWorld` names it by class; `DuelOpts.names` overrides, which changes nothing in the fight).
+- **The round arena** (`duelPlan(seed, areaLevel)`, `src/sim/duel.ts`): the circle is `carveArena` in `gen/bossArena.ts`, which `attachArena`
+  calls (same inequality, same bounds: **the default fence held after this commit alone**, 12 runs identical, 21.6 s wall against 21.7 s).
+  25 by 25 tiles, `DUEL_ARENA_SIZE`; the floor is symmetric about the middle of the middle tile (12.5, 12.5), so the characters stand at
+  **7.5 and 17.5**, not at 7 and 17 (the symmetry test of F4 is still a fair test). The biome is `biomeFor(seed, 100, 0, 'plain')`
+  (every biome, none tied to a map number; the Debug panel's forced biome wins) and the theme is drawn from the seed (the theme tints
+  the floor and the walls); the exit is on the north rim and `noExit` keeps it shut, and the scene draws no portal when `noExit` is on.
+  `createDummyWorld` keeps `arenaPlan`. **The F2 to F4 duel tests passed on the round arena unchanged** (251 tests in the three files).
+- **The median fight on the round arena** (the F4 sweep's legacy pool at ×0.3, 12 bot builds to maps 20 and 40, both orders, seed 1, 222
+  fights): **15.5 s against the square's 15.7 s** (q1 8.2 s, q3 39.1 s; map 20: 13.6 s of 132 fights, all deaths; map 40: 16.4 s of 90, 87
+  deaths and 3 on the cap; no stall, no both-dead), the west side won 111 and the east side 108. `DUEL_DAMAGE_SCALE` is not touched.
+- **The events** (`levelUp`, `flaskUsed`, `stuck`, `playerDied`) carry the character's actor id as `src`. This moved the hash fence (it
+  hashes every numeric field) and nothing else: in a commit of its own, the sequence of event kinds and every `MapResult` without its
+  `eventHash` were identical over the fence's 12 runs (a scratch script that hashed the kinds), and **`scripts/hash-fence.json` was
+  re-recorded right after that commit**; the final default fence holds against that record (12 runs identical, 21.2 s). The `buff` event
+  names no actor either: the scene pulses for every side that has the skill and the buff running (`buffT[id] > 0`), so a mirror's two
+  pulse together.
+- **The scene** reads each side: `src/render/style/who.ts` (no Phaser, so a test reads it: `isViewer`, `figureOf`, `heroColor`), the
+  per-side loops of `skillFx.ts`, a light per character, the camera on the middle of the living characters, the rival's boss ring, marks
+  (a life bar and the selection bracket, in red) and picking. The siphon beam, the curse sigil and the minion lookup read the other side's
+  too. `bossFx.ts` and `encounterFx.ts` still read side 0 (a duel has no bosses or encounters). `crashlog.ts`, `dev.ts`, `skillStatus.ts` (the
+  skill bar) and the HUD's orbs, flasks and charges are side 0's.
+- **The end rules** are `duelEnd(w, watch)` and `duelWatch(opts)` (`src/sim/duel.ts`): after a tick, a death of either (both in one tick is a
+  draw), then the stall, then the cap. `playDuel` and the controller call them after every `stepWorld`, so they stop at the same tick: a
+  test plays the controller at 1×, 4× and 8× with different frame sizes and gets `runDuel`'s winner, time and life to the bit.
+- **The controller** is as section 5 says. `startDuel(a, b, seed, opts?, from?)`: the builds are copied (and each fight plays copies),
+  `from` is where Leave and Back go (by default the screen it was started from when that is camp, a summary or a victory with a run, else the
+  title); `Controller.duel` is a `DuelMode` (the builds, `opts`, the seed and its base, the names, `from`, the watch), `lastDuel` a
+  `DuelOutcome` (`result`, `reports`, `names`, `seed`). `againDuel()` is `base + n`; `leaveDuel()` serves both Leave and Back. A map,
+  the showcase, the gallery or `quit` clears `duel`.
+- **The result screen** shows `MapReportView` for each side (it gained a `who` for the headings: "Damage Reaver dealt"). The reports are
+  made before the world is torn down (`DuelResult.sides[i].ledger` is the live ledger, not a report).
+- **The Debug panel** plays the bot to the map on the legacy curve with a label while it does (the run is synchronous: it waits 30 ms so
+  that the label paints). `botBuild` (`src/run/duelBot.ts`, where `snapshotBuild`, `botSeed` and `LEGACY_PLAY` moved from
+  `scripts/duel-lib.ts`, which re-exports them) returns the build the bot fell with when it dies before the map.
+- **Tests:** 3,167 in 182 files (20 new). `src/run/duelMode.test.ts` (9), `duel.test.ts` (the arena, the events), `figure.test.ts`, `skillFx.test.ts`.
+- **Unverified in a browser** (read twice, not seen): the arena's look in each biome (the room has the boss arena's rim and its
+  corner brazier), both characters' figures and rings, a hit on the rival (blood, no shake, the number's colour), the camera on the midpoint
+  and the zoom, each side's minions and zones, the boss bar and the Leave button on a phone and under 700 px (the bar is 34 px from the top and
+  up to 560 px wide, the Leave button is in the showcase's place, top right; `mobile.css` has no boss-bar rule), the rival's marks, picking the
+  rival, the result screen's two reports side by side (`report.css`, `.duel-result`), and the label of the Bot button while it plays.
+- **For F6 and F7:**
+  - _Entry points._ `Controller.startDuel(a, b, seed, { names: [you, rival] }, from)` fights a build against a build; F7 starts it from the
+    summary (`from` defaults to the summary there) with the rival's `Rival.build`. The seed is the caller's (`againDuel` adds one for each
+    fight); "Another rival" is `startDuel` with another `Rival`, and `leaveDuel()` is Back.
+  - _What the result screen needs from a rival:_ a name (`opts.names[1]`, shown on the boss bar, the inspect card and the result), a class (from
+    `build.classId`) and a complete `Build`. Nothing else is read; the record of results (F7) is the caller's, from `lastDuel.result`
+    (`winner`, `how`, `time`).
+  - _Side 0 is "you"_ everywhere on screen. A duel from a rival's point of view would swap the builds.
+  - _Not done:_ rival names, snapshots and the fetch (F6), "Fight a rival", the Rivals screen and the record (F7), a level-dependent
+    damage scale (the open question of F4), monsters in a duel.
+
 ---
 
 ## 8. Verification
@@ -798,7 +873,7 @@ Ten to seventeen working days (section 7). Risks, each with its fence:
 | 9   | Names                     | Generated, rerollable                                                                                        | Typed with a deny-list (moderation)                                                         |
 | 10  | Identity                  | A random storage token, hashed                                                                               | Supabase anonymous sign-in (LADDER.md 8.3)                                                  |
 | 11  | What is uploaded          | The snapshot only; results stay local                                                                        | Results too (the ladder, section 13)                                                        |
-| 12  | The second HUD on a phone | A bar: name, life, energy shield                                                                             | Two full HUDs stacked                                                                       |
+| 12  | The rival's HUD           | None: the player's HUD, and the rival as a boss bar (name, life, energy shield), on a phone too (owner, F5)  | A second HUD on the right, a bar on a phone (the plan); two full HUDs stacked               |
 | 13  | Who a character goes for  | The other character and its minions, by the strategy's priority; the other counts as a boss for `rares` (F4) | The other character only (a summoner draws every fight against melee)                       |
 | 14  | Who acts first            | Reversed or not on each tick by a mix of the tick and the seed: each fight is fair in itself (F4)            | The tick parity (does not alternate who is first); the seed's parity (fair over seeds only) |
 

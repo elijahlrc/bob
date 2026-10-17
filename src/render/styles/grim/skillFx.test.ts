@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ACTIVE_GEMS, GRANTED_GEMS } from '../../../data/gems';
 import { activeLook } from '../../../calc/skillLook';
+import { MINIONS } from '../../../data/minions';
 import type { Actor, SimEvent, World } from '../../../sim/types';
 import { SkillFx, type FxHost } from './skillFx';
 
@@ -262,5 +263,130 @@ describe('skill effects', () => {
     expect(pending(fx)).toBe(2);
     for (let i = 0; i < 4; i++) fx.frame(w, 0.1, 1.3 + i * 0.1, gfx() as never);
     expect(pending(fx)).toBe(0);
+  });
+});
+
+describe('skill effects with two sides (a duel)', () => {
+  /** A graphics object that counts the ellipses it is asked to fill (a minion stands on one). */
+  const counting = (): { g: unknown; ellipses: () => number } => {
+    let n = 0;
+    const g: unknown = new Proxy(() => g, {
+      get: (_t, k) =>
+        k === 'fillEllipse'
+          ? () => {
+              n++;
+              return g;
+            }
+          : k === 'destroy'
+            ? () => undefined
+            : () => g,
+    });
+    return { g, ellipses: () => n };
+  };
+
+  /** A world of two sides, each with a character and its own stub kit. */
+  const duel = (a: Actor, b: Actor): World => {
+    const w = world(a);
+    const first = w.sides[0];
+    first.char = { auras: [], utilities: [], actives: [], secondaries: [] } as never;
+    const second = { ...first, id: 1, player: b, minions: [], deployables: [] };
+    w.sides.push(second as never);
+    w.actors.push(b);
+    return w;
+  };
+
+  const minion = (id: number, x: number): Actor =>
+    ({
+      id,
+      alive: true,
+      x,
+      y: 5,
+      life: 10,
+      def: { maxLife: 10 },
+      kind: Object.keys(MINIONS)[0],
+    }) as unknown as Actor;
+
+  it('draws the minions of every side, not the first side’s alone', () => {
+    const a = actor();
+    const b = actor({ id: 3, x: 15 });
+    const w = duel(a, b);
+    const fx = new SkillFx(host([a, b]), scene);
+    // (The other things a frame fills are the same in each frame, so the minions are the difference.)
+    const none = counting();
+    fx.frame(w, 0.05, 1, none.g as never);
+    const one = counting();
+    w.sides[0].minions = [minion(10, 6)] as never;
+    fx.frame(w, 0.05, 1.05, one.g as never);
+    expect(one.ellipses() - none.ellipses()).toBe(1);
+    const two = counting();
+    w.sides[1].minions = [minion(11, 14)] as never;
+    fx.frame(w, 0.05, 1.1, two.g as never);
+    expect(two.ellipses() - none.ellipses()).toBe(2);
+  });
+
+  it('a deployable is thrown from the character that put it down', () => {
+    const a = actor();
+    const b = actor({ id: 3, x: 15, y: 7 });
+    const w = duel(a, b);
+    const fx = new SkillFx(host([a, b]), scene);
+    w.sides[1].deployables = [
+      { id: 7, key: 'k', kind: 'trap', x: 12, y: 7, t: 5, fireT: 0 },
+    ] as never;
+    fx.onEvent({ t: 'deploy', id: 7, kind: 'trap', x: 12, y: 7, end: false }, w);
+    const flights = (fx as unknown as { flights: Map<number, { fromX: number; fromY: number }> })
+      .flights;
+    expect([flights.get(7)!.fromX, flights.get(7)!.fromY]).toEqual([15, 7]);
+    // One that no side holds any more is thrown from the first side's character, as before.
+    fx.onEvent({ t: 'deploy', id: 8, kind: 'trap', x: 12, y: 7, end: false }, w);
+    expect([flights.get(8)!.fromX, flights.get(8)!.fromY]).toEqual([5, 5]);
+  });
+
+  it('a summoned minion is found on whichever side has it', () => {
+    const a = actor();
+    const b = actor({ id: 3, x: 15 });
+    const w = duel(a, b);
+    const fx = new SkillFx(host([a, b]), scene);
+    w.sides[1].minions = [minion(11, 14)] as never;
+    fx.onEvent({ t: 'summon', id: 11 }, w);
+    expect(pending(fx)).toBeGreaterThan(0);
+    const n = pending(fx);
+    fx.onEvent({ t: 'summon', id: 99 }, w);
+    expect(pending(fx)).toBe(n);
+  });
+
+  it('the rival’s hexes show over it, the viewer’s own do not (they are chips on the HUD)', () => {
+    const a = actor();
+    const b = actor({ id: 3, x: 15 });
+    (a as { side?: unknown }).side = { id: 0 };
+    (b as { side?: unknown }).side = { id: 1 };
+    const w = duel(a, b);
+    // The sigils are drawn on the effects' own layer (`air`), which the scene stub hands out: it is the one that records.
+    const rec: number[] = [];
+    const g: unknown = new Proxy(() => g, {
+      get: (_t, k) =>
+        k === 'strokeEllipse'
+          ? (x: number) => {
+              rec.push(x);
+              return g;
+            }
+          : () => g,
+    });
+    const fx = new SkillFx(host([a, b]), {
+      add: { graphics: () => ({ setDepth: () => g }) },
+    } as never);
+    /** The x of every ellipse a frame strokes (the host projects a tile to itself). */
+    const stroked = (): number[] => {
+      rec.length = 0;
+      fx.frame(w, 0.05, 1, g as never);
+      return [...rec];
+    };
+    const base = stroked();
+    a.hexes = [{ id: 'h' }] as never;
+    b.hexes = [{ id: 'h' }] as never;
+    const hexed = stroked();
+    // One sigil, over the rival: the first side's own hex is not drawn.
+    expect(hexed.length - base.length).toBe(1);
+    expect(hexed.filter((x) => x === 15).length - base.filter((x) => x === 15).length).toBe(1);
+    expect(hexed.filter((x) => x === 5).length).toBe(base.filter((x) => x === 5).length);
   });
 });

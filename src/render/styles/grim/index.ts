@@ -15,6 +15,8 @@ import type {
   World,
 } from '../../../sim/types';
 import { StyleBase, AnimTrack, figureOf, heroColor, type ActorView } from '../../style/base';
+import { isViewer } from '../../style/who';
+import type { Side } from '../../../sim/side';
 import type { MarkTheme } from '../../style/marks';
 import { isHero, type AnimName, type FigureKind } from '../../style/figure';
 import { buildProps, FIG_PX, FRAMES, rasterFigure, type MonsterLook } from './paint';
@@ -125,7 +127,8 @@ export class GrimStyle extends StyleBase {
   private torches: Torch[] = [];
   private decals: Phaser.GameObjects.Image[] = [];
   private byId = new Map<number, Actor>();
-  private playerLight: Phaser.GameObjects.Light | null = null;
+  /** A light on each side's character, in the order of the sides. */
+  private playerLights: Phaser.GameObjects.Light[] = [];
   private portal: {
     a: Phaser.GameObjects.Image;
     b: Phaser.GameObjects.Image;
@@ -243,7 +246,7 @@ export class GrimStyle extends StyleBase {
       },
       actorById: (id) =>
         this.byId.get(id) ??
-        this.world.sides[0].minions.find((m) => m.id === id) ??
+        this.minionById(id) ??
         this.world.actors.find((a) => a.id === id) ??
         null,
       floater: (x, y, text, color, big) => this.floater(x, y, text, color, big),
@@ -260,28 +263,35 @@ export class GrimStyle extends StyleBase {
         ? new CollapseFx(this.scene, (x, y) => this.project(x, y), world)
         : null;
 
-    const pl0 = this.project(world.sides[0].player.x, world.sides[0].player.y);
-    this.playerLight = this.addLight(pl0.x, pl0.y, 320, 0xffb060, 1.5);
-    const ex = this.project(lab.exit.x, lab.exit.y);
-    const pa = s.add
-      .image(ex.x, ex.y, 'g_portal')
-      .setDepth(700)
-      .setBlendMode(Phaser.BlendModes.ADD)
-      .setTint(0x66ccff);
-    const pb = s.add
-      .image(ex.x, ex.y, 'g_portal')
-      .setDepth(700)
-      .setBlendMode(Phaser.BlendModes.ADD)
-      .setTint(0xaa88ff)
-      .setScale(0.7);
-    this.owned.push(pa, pb);
-    this.portal = {
-      a: pa,
-      b: pb,
-      light: this.addLight(ex.x, ex.y, 140, 0x66aaff, 0),
-    };
-    pa.setScale(1, 0.55);
-    pb.setScale(0.7, 0.4);
+    // Each character has a light of its own: the rival's is redder.
+    this.playerLights = world.sides.map((side, i) => {
+      const at = this.project(side.player.x, side.player.y);
+      return this.addLight(at.x, at.y, 320, i === 0 ? 0xffb060 : 0xff8060, 1.5);
+    });
+    // A duel's arena has no exit to show (its portal would stand there, faint, with the exit shut).
+    this.portal = null;
+    if (!world.opts.noExit) {
+      const ex = this.project(lab.exit.x, lab.exit.y);
+      const pa = s.add
+        .image(ex.x, ex.y, 'g_portal')
+        .setDepth(700)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setTint(0x66ccff);
+      const pb = s.add
+        .image(ex.x, ex.y, 'g_portal')
+        .setDepth(700)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setTint(0xaa88ff)
+        .setScale(0.7);
+      this.owned.push(pa, pb);
+      this.portal = {
+        a: pa,
+        b: pb,
+        light: this.addLight(ex.x, ex.y, 140, 0x66aaff, 0),
+      };
+      pa.setScale(1, 0.55);
+      pb.setScale(0.7, 0.4);
+    }
     this.scene.events.emit('gstyle-built');
   }
 
@@ -709,7 +719,7 @@ export class GrimStyle extends StyleBase {
   // ---- Actors ----------------------------------------------------------------------------------
   protected createView(a: Actor, kind: FigureKind): View {
     const s = this.scene;
-    const accent = a.isPlayer ? heroColor(this.world) : 0;
+    const accent = a.isPlayer ? heroColor(this.world, a) : 0;
     const sprite = s.add
       .image(0, 0, this.figKey(kind, accent, 'idle', 0, lookOf(a)))
       .setOrigin(0.5, 0.84)
@@ -717,7 +727,8 @@ export class GrimStyle extends StyleBase {
     const shadow = s.add.image(0, 0, 'g_shadow').setOrigin(0.5, 0.5);
     const variant = a.mon?.spec.variant ?? 'none';
     let ring: Phaser.GameObjects.Image | null = null;
-    const rc = a.isPlayer ? undefined : RARITY_RING[a.rarity];
+    // The viewer's character has no ring; the rival of a duel wears a boss's, so that two characters of one class are told apart.
+    const rc = a.isPlayer ? (isViewer(a) ? undefined : RARITY_RING.boss) : RARITY_RING[a.rarity];
     if (rc !== undefined) {
       ring = s.add
         .image(0, 0, 'g_groundring')
@@ -1265,6 +1276,20 @@ export class GrimStyle extends StyleBase {
     }
   }
 
+  /** A minion of any side (minions are not in `world.actors`). */
+  private minionById(id: number): Actor | null {
+    for (const side of this.world.sides) {
+      const m = side.minions.find((x) => x.id === id);
+      if (m) return m;
+    }
+    return null;
+  }
+
+  /** The side an event is about, from the character it names (the first side when it is none that is known). */
+  private sideOf(world: World, id: number): Side {
+    return (this.byId.get(id) ?? world.actors.find((a) => a.id === id))?.side ?? world.sides[0];
+  }
+
   private pxOf(id: number): { x: number; y: number } | null {
     const a = this.byId.get(id);
     return a ? this.project(a.x, a.y) : null;
@@ -1310,9 +1335,11 @@ export class GrimStyle extends StyleBase {
           ? (this.byId.get(e.src) ?? world.actors.find((a) => a.id === e.src))
           : undefined;
         const amt = Math.round(e.amount);
+        // The viewer's own character: red numbers and the screen shakes; the rival of a duel bleeds without the shake.
+        const own = isViewer(dst);
         if (dst.isPlayer) {
           em.blood.explode(6 + Math.min(10, Math.round(amt / 20)), p.x, p.y - 8);
-          this.shake = Math.max(this.shake, 1.2);
+          if (own) this.shake = Math.max(this.shake, 1.2);
           this.addDecal(
             p.x + (Math.random() - 0.5) * 8,
             p.y + 2,
@@ -1344,13 +1371,7 @@ export class GrimStyle extends StyleBase {
           em.pop.explode(1, p.x, p.y - 8);
         }
         if (amt > 0 && (src?.isPlayer || dst.isPlayer))
-          this.floater(
-            p.x,
-            p.y - 14,
-            String(amt),
-            dst.isPlayer ? 0xff5050 : DTYPE_COLOR[e.dtype],
-            e.crit,
-          );
+          this.floater(p.x, p.y - 14, String(amt), own ? 0xff5050 : DTYPE_COLOR[e.dtype], e.crit);
         break;
       }
       case 'miss': {
@@ -1370,7 +1391,7 @@ export class GrimStyle extends StyleBase {
         const a = this.byId.get(e.id) ?? world.actors.find((x) => x.id === e.id);
         if (!a) {
           // A minion falls: a puff of dust where it stood.
-          const f = world.sides[0].minions.find((x) => x.id === e.id);
+          const f = this.minionById(e.id);
           if (f) {
             const q = this.project(f.x, f.y);
             em.dust.explode(3, q.x, q.y - 2);
@@ -1474,7 +1495,8 @@ export class GrimStyle extends StyleBase {
         break;
       }
       case 'levelUp': {
-        const p = this.project(world.sides[0].player.x, world.sides[0].player.y);
+        const who = this.sideOf(world, e.src).player;
+        const p = this.project(who.x, who.y);
         em.mote.explode(30, p.x, p.y - 8);
         em.spark.explode(20, p.x, p.y - 8);
         this.flash(p.x, p.y - 10, 0xffe070, 2.2, 0.8);
@@ -1496,8 +1518,9 @@ export class GrimStyle extends StyleBase {
         break;
       }
       case 'flaskUsed': {
-        const f = world.sides[0].flasks[e.idx];
-        const p = this.project(world.sides[0].player.x, world.sides[0].player.y);
+        const side = this.sideOf(world, e.src);
+        const f = side.flasks[e.idx];
+        const p = this.project(side.player.x, side.player.y);
         const col =
           f?.spec.kind === 'mana' ? 0x4a78ff : f?.spec.kind === 'utility' ? 0xffd070 : 0xd03030;
         this.flash(p.x, p.y - 8, col, 1.4, 0.3);
@@ -1538,14 +1561,17 @@ export class GrimStyle extends StyleBase {
     this.byId = new Map(world.actors.map((a) => [a.id, a]));
     this.collapse?.update(world, dt);
     const cam = this.scene.cameras.main;
-    const pp = this.playerPos(world);
-    const p = this.project(pp.x, pp.y);
-    if (this.playerLight) {
-      this.playerLight.setPosition(p.x, p.y - 8);
-      this.playerLight.setIntensity(
-        1.6 + Math.sin(this.time * 11) * 0.06 + Math.sin(this.time * 4.3) * 0.05,
+    // Each character carries its light (the rival's flickers out of step with the first's).
+    world.sides.forEach((side, i) => {
+      const light = this.playerLights[i];
+      if (!light) return;
+      const pp = this.sidePos(side);
+      const p = this.project(pp.x, pp.y);
+      light.setPosition(p.x, p.y - 8);
+      light.setIntensity(
+        1.6 + Math.sin(this.time * 11 + i * 2) * 0.06 + Math.sin(this.time * 4.3 + i * 3) * 0.05,
       );
-    }
+    });
     for (const t of this.torches)
       t.light.setIntensity(
         t.base *
@@ -1622,7 +1648,7 @@ export class GrimStyle extends StyleBase {
     this.temps = [];
     this.bolts = [];
     this.portal = null;
-    this.playerLight = null;
+    this.playerLights = [];
     this.scene.lights.disable();
     const cam = this.scene.cameras.main;
     cam.setZoom(1);

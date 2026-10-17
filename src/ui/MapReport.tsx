@@ -121,8 +121,8 @@ function Dealt({ r }: { r: MapReport }) {
   );
 }
 
-/** What the character took, one row per monster kind or effect, and what it came out of. */
-function Taken({ r }: { r: MapReport }) {
+/** What the character took, one row per monster kind or effect, and what it came out of. `who` is what it is called ("you"). */
+function Taken({ r, who }: { r: MapReport; who: string }) {
   const rows = r.taken;
   const all = rows.reduce((s, x) => s + sum(x.dmg), 0);
   const top = rows.length ? sum(rows[0].dmg) : 0;
@@ -130,7 +130,7 @@ function Taken({ r }: { r: MapReport }) {
   const hitsTaken = rows.reduce((s, x) => s + x.hits, 0);
   const avoided = r.evaded + r.blocked;
   const aimed = hitsTaken + avoided;
-  if (all <= 0 && avoided <= 0) return <p class="muted">Nothing hurt you.</p>;
+  if (all <= 0 && avoided <= 0) return <p class="muted">Nothing hurt {who}.</p>;
   return (
     <>
       <TypeSplit rows={rows} />
@@ -149,8 +149,8 @@ function Taken({ r }: { r: MapReport }) {
       )}
       {aimed > 0 && (
         <p class="muted mr-line">
-          {f0(aimed)} attacks were aimed at you: {f0(hitsTaken)} landed, {f0(r.evaded)} missed you
-          and {f0(r.blocked)} were blocked ({pct((avoided / aimed) * 100)} avoided).
+          {f0(aimed)} attacks were aimed at {who}: {f0(hitsTaken)} landed, {f0(r.evaded)} missed{' '}
+          {who} and {f0(r.blocked)} were blocked ({pct((avoided / aimed) * 100)} avoided).
         </p>
       )}
       {all > 0 && (
@@ -190,8 +190,19 @@ function Taken({ r }: { r: MapReport }) {
   );
 }
 
-/** The map report: what each skill dealt, by damage type, and what hurt the character. */
-export function MapReportView({ r, title }: { r: MapReport; title?: string }) {
+/**
+ * The map report: what each skill dealt, by damage type, and what hurt the character. `who` is what the character is called
+ * (the report of a duel's rival says its name); the default is "you".
+ */
+export function MapReportView({
+  r,
+  title,
+  who = 'you',
+}: {
+  r: MapReport;
+  title?: string;
+  who?: string;
+}) {
   const dealt = r.dealt.reduce((s, x) => s + sum(x.dmg), 0);
   const taken = r.taken.reduce((s, x) => s + sum(x.dmg), 0);
   return (
@@ -201,10 +212,10 @@ export function MapReportView({ r, title }: { r: MapReport; title?: string }) {
         {r.time.toFixed(0)} s · dealt {f0(dealt)}
         {r.time > 0 && ` (${f0(dealt / r.time)} a second)`} · took {f0(taken)}
       </p>
-      <h4>Damage you dealt</h4>
+      <h4>Damage {who} dealt</h4>
       <Dealt r={r} />
-      <h4>Damage you took</h4>
-      <Taken r={r} />
+      <h4>Damage {who} took</h4>
+      <Taken r={r} who={who} />
     </div>
   );
 }

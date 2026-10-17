@@ -414,7 +414,7 @@ function levelUp(w: World, s: Side): void {
   p.life = lf * lifeCap(p);
   p.mana = mf * p.def.maxMana;
   p.es = ef * p.def.maxEs;
-  w.events.push({ t: 'levelUp', level: s.build.level });
+  w.events.push({ t: 'levelUp', src: p.id, level: s.build.level });
 }
 
 /** Seconds over which a life-to-ES flask returns the life it took. */
@@ -466,7 +466,7 @@ function useFlask(w: World, side: Side, i: number): void {
     p.hexes.length = 0;
     recompute(p);
   }
-  w.events.push({ t: 'flaskUsed', idx: i });
+  w.events.push({ t: 'flaskUsed', src: p.id, idx: i });
   rollGains(w, side, 'flask');
 }
 

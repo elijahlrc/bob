@@ -6,10 +6,21 @@ import { worldResult, type MapResult } from '../sim/runMap';
 import type { SimEvent, World } from '../sim/types';
 import { cancelAbandon, requestAbandon } from '../sim/abandon';
 import { createWorld, stepWorld } from '../sim/world';
+import {
+  createDuelWorld,
+  duelEnd,
+  duelResult,
+  duelWatch,
+  type DuelEnd,
+  type DuelOpts,
+  type DuelResult,
+  type DuelWatch,
+} from '../sim/duel';
+import { buildReport, type MapReport } from '../sim/ledger';
 import { CRAWL_SEGMENTS } from '../data/mapTypes';
 import type { Build } from '../data/types';
 import type { Vitals } from '../sim/types';
-import { CLASSES } from '../data/classes';
+import { CLASSES, classDef } from '../data/classes';
 import { botCamp } from './bot';
 import { takeStop, type StopChoice } from './stops';
 import { waysideOf } from './wayside';
@@ -42,7 +53,43 @@ import {
 } from './save';
 
 export type Screen =
-  'title' | 'classSelect' | 'camp' | 'map' | 'summary' | 'victory' | 'codex' | 'patchNotes';
+  | 'title'
+  | 'classSelect'
+  | 'camp'
+  | 'map'
+  | 'summary'
+  | 'victory'
+  | 'codex'
+  | 'patchNotes'
+  | 'duelResult';
+
+/** A duel being fought on the map screen (docs/DUEL.md 5): the two builds, the seed of this fight and where Leave goes back to. */
+export type DuelMode = {
+  /** The two characters as they were handed over (each fight is played on copies). `a` is side 0, the viewer's. */
+  a: Build;
+  b: Build;
+  opts: DuelOpts;
+  /** The seed of this fight: `base` for the first, one more for each `againDuel`. */
+  seed: number;
+  base: number;
+  /** How many fights have been fought with these two builds before this one. */
+  fought: number;
+  /** What the two characters are called. */
+  names: [string, string];
+  /** The screen Leave and Back return to. */
+  from: Screen;
+  /** The end rules' state across frames (`duelEnd`). */
+  watch: DuelWatch;
+};
+
+/** What a finished duel shows on the result screen: the result and what each side dealt and took (the numbers are what landed). */
+export type DuelOutcome = {
+  result: DuelResult;
+  /** Side 0's report and side 1's. */
+  reports: [MapReport, MapReport];
+  names: [string, string];
+  seed: number;
+};
 
 export type BusEvents = {
   /** The inspected enemy changed (click on the map; null clears). */
@@ -139,6 +186,7 @@ export class Controller {
 
   private launchShowcase(): void {
     const sc = this.showcase!;
+    this.duel = null;
     if (this.world) this.bus.emit('mapEnd', null);
     const cls = CLASSES[sc.classIdx];
     const run = newRun(cls.id, 1000 + sc.classIdx * 17 + sc.runs++ * 101);
@@ -185,6 +233,7 @@ export class Controller {
 
   private launchGallery(): void {
     const g = this.gallery!;
+    this.duel = null;
     if (this.world) this.bus.emit('mapEnd', null);
     const run = galleryRun(g.entries[g.idx], 4000 + g.runs++);
     this.run = run;
@@ -203,6 +252,90 @@ export class Controller {
     this.showcase = null;
     this.run = null;
     this.goTo('title');
+  }
+
+  /** The duel on the map screen, if one is being fought (docs/DUEL.md 5). The run, if any, is not touched by it. */
+  duel: DuelMode | null = null;
+  /** The last duel that ended, for the result screen. */
+  lastDuel: DuelOutcome | null = null;
+
+  /**
+   * Fight `a` (side 0, the viewer's) against `b` on the map screen, in a world of its own: the run, if there is one, is as it was
+   * (a duel is never a map: no `finishMap`, no Crawl, no save, no telemetry). Its end is read after every tick (`duelEnd`, the rules
+   * the headless `runDuel` has) and goes to the result screen. `from` is where Leave and Back return to: by default the screen the
+   * duel was started from when it is camp or a run's summary, else the title.
+   */
+  startDuel(a: Build, b: Build, seed: number, opts: DuelOpts = {}, from?: Screen): void {
+    const names = opts.names ?? [classDef(a.classId).name, classDef(b.classId).name];
+    const back: Screen =
+      from ??
+      (this.run &&
+      (this.screen === 'camp' || this.screen === 'summary' || this.screen === 'victory')
+        ? this.screen
+        : 'title');
+    this.duel = {
+      a: structuredClone(a),
+      b: structuredClone(b),
+      opts: { ...opts, names },
+      seed,
+      base: seed,
+      fought: 0,
+      names,
+      from: back,
+      watch: duelWatch(opts),
+    };
+    this.lastDuel = null;
+    this.launchDuel();
+  }
+
+  /** The same two characters again, on the next seed (a new fight: the arena and the order of the sides are drawn from it). */
+  againDuel(): void {
+    const d = this.duel;
+    if (!d) return;
+    d.fought++;
+    d.seed = d.base + d.fought;
+    d.watch = duelWatch(d.opts);
+    this.lastDuel = null;
+    this.launchDuel();
+  }
+
+  /** Leave the duel, being fought or just over, for the screen it was started from. No result is kept. */
+  leaveDuel(): void {
+    const d = this.duel;
+    if (!d) return;
+    if (this.world) this.bus.emit('mapEnd', null);
+    this.world = null;
+    this.duel = null;
+    this.lastDuel = null;
+    this.goTo(d.from);
+  }
+
+  private launchDuel(): void {
+    const d = this.duel!;
+    if (this.world) this.bus.emit('mapEnd', null);
+    // Each fight is played on copies, so that what a fight does to a build (its level, its flasks) never reaches the next.
+    this.world = createDuelWorld(structuredClone(d.a), structuredClone(d.b), d.seed, d.opts);
+    this.acc = 0;
+    this.screen = 'map';
+    this.bus.emit('select', { id: null });
+    this.bus.emit('mapStart', { world: this.world });
+    this.bus.emit('state', null);
+  }
+
+  /** The duel is over: the result and both reports are kept, the world is torn down and the result screen comes up. */
+  private endDuel(w: World, end: DuelEnd): void {
+    const d = this.duel;
+    if (!d) return;
+    this.lastDuel = {
+      result: duelResult(w, end),
+      reports: [buildReport(w, w.sides[0]), buildReport(w, w.sides[1])],
+      names: d.names,
+      seed: d.seed,
+    };
+    this.world = null;
+    this.bus.emit('mapEnd', null);
+    this.screen = 'duelResult';
+    this.changed();
   }
 
   /** Resume a saved run at camp. */
@@ -277,6 +410,7 @@ export class Controller {
     }
     // A stop is taken with `takeStop`, which needs the choice made on its screen.
     if (offer.kind === 'stop') return;
+    this.duel = null;
     pruneFound(run);
     this.undoStack = [];
     // What is armed burns now and works until the map ends (docs/WAYSIDE.md 6.1).
@@ -353,6 +487,8 @@ export class Controller {
     const w = this.world;
     if (!w || this.screen !== 'map') return;
     const events: SimEvent[] = [];
+    const duel = this.duel;
+    let over: DuelEnd | null = null;
     if (!this.paused && w.status === 'running') {
       // Clamp long frames (tab switches) so we never spiral.
       this.acc += Math.min(dtMs / 1000, 0.1) * this.speed;
@@ -362,9 +498,21 @@ export class Controller {
         for (const e of w.events) events.push(e);
         this.acc -= DT;
         n++;
+        // A duel's end is read after every tick, not once a frame: the map's status goes 'dead' only for side 0, and a frame at
+        // 8× steps up to a second, so the fight must stop at the very tick the headless runner stops at (`playDuel`).
+        if (duel) {
+          over = duelEnd(w, duel.watch);
+          if (over) break;
+        }
       }
     }
     this.bus.emit('ticked', { world: w, events });
+    if (duel) {
+      // A duel never reaches `endMap`: the run's map flow (rewards, Crawls, reprieves, telemetry, the save) is not its own.
+      if (!over && w.status !== 'running') over = 'time';
+      if (over) this.endDuel(w, over);
+      return;
+    }
     if (this.gallery && w.t > GALLERY_SECONDS) this.galleryGo('next');
     else if (w.status !== 'running') this.endMap();
   }
@@ -509,6 +657,8 @@ export class Controller {
   quit(): void {
     if (this.world) this.bus.emit('mapEnd', null);
     this.world = null;
+    this.duel = null;
+    this.lastDuel = null;
     this.crawl = null;
     this.run = null;
     this.slot = null;

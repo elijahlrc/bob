@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import type { SkillDotProfile, SkillProfile } from '../calc/skill';
 import { DT } from '../data/constants';
 import type { Build } from '../data/types';
+import { BOSS_ARENA_RADIUS } from '../gen/bossArena';
+import { FLOOR } from '../gen/labyrinth';
 import { newRun } from '../run/run';
 import { newActor } from './actor';
 import { separate } from './ai';
@@ -12,6 +14,7 @@ import {
   DUEL_GAP,
   DUEL_MAX_TIME,
   duelHash,
+  duelPlan,
   playDuel,
   runDuel,
 } from './duel';
@@ -47,6 +50,64 @@ const rowTotal = (rows: Ledger['dealt'], name: string): number =>
 
 const lifeFlaskUses = (s: Side): number =>
   s.flasks.filter((f) => f.spec.kind === 'life').reduce((n, f) => n + f.uses, 0);
+
+describe('the arena of a duel', () => {
+  const floorAt = (plan: ReturnType<typeof duelPlan>, x: number, y: number): boolean =>
+    plan.lab.tiles[Math.floor(y) * plan.lab.w + Math.floor(x)] === FLOOR;
+
+  it('is the boss arena: every tile of the circle is floor, and nothing outside it', () => {
+    const plan = duelPlan(1, 10);
+    const { w, h, tiles } = plan.lab;
+    expect([w, h]).toEqual([DUEL_ARENA_SIZE, DUEL_ARENA_SIZE]);
+    const mid = BOSS_ARENA_RADIUS + 1;
+    const r = BOSS_ARENA_RADIUS;
+    let floor = 0;
+    for (let y = 0; y < h; y++)
+      for (let x = 0; x < w; x++) {
+        const inside = (x - mid) ** 2 + (y - mid) ** 2 <= r * r + r;
+        expect(tiles[y * w + x] === FLOOR, `tile ${x},${y}`).toBe(inside);
+        if (inside) floor++;
+      }
+    expect(floor).toBeGreaterThan(Math.PI * r * r * 0.95);
+    // No monsters, no chests; the level is the character's.
+    expect(plan.pop.monsters).toHaveLength(0);
+    expect(plan.pop.chests).toHaveLength(0);
+    expect(plan.areaLevel).toBe(10);
+    expect(plan.resistPenalty).toBe(0);
+  });
+
+  it('stands both characters on floor, DUEL_GAP apart, about the middle of the room, with the exit shut', () => {
+    const w = createDuelWorld(vanguard(1), vanguard(2), 1);
+    const [sa, sb] = w.sides;
+    expect(floorAt(w.plan, sa.player.x, sa.player.y)).toBe(true);
+    expect(floorAt(w.plan, sb.player.x, sb.player.y)).toBe(true);
+    expect(sb.player.x - sa.player.x).toBeCloseTo(DUEL_GAP, 9);
+    const mid = w.plan.lab.rooms[0];
+    expect((sa.player.x + sb.player.x) / 2).toBe(mid.cx + 0.5);
+    expect(sa.player.y).toBe(mid.cy + 0.5);
+    // The exit is on the floor, and never opens (a duel ends by its own rules).
+    expect(floorAt(w.plan, w.plan.lab.exit.x, w.plan.lab.exit.y)).toBe(true);
+    expect(w.opts.noExit).toBe(true);
+    run(w, 5);
+    expect(w.exitOpen).toBe(false);
+  });
+
+  it('is in a biome and a theme that follow the seed, from every biome there is', () => {
+    const biomes = new Set<string>();
+    const themes = new Set<string>();
+    for (let seed = 1; seed <= 40; seed++) {
+      const a = duelPlan(seed, 5);
+      const b = duelPlan(seed, 30);
+      expect([b.biome.id, b.theme.id]).toEqual([a.biome.id, a.theme.id]);
+      biomes.add(a.biome.id);
+      themes.add(a.theme.id);
+    }
+    expect(biomes.size).toBeGreaterThanOrEqual(6);
+    expect(themes.size).toBeGreaterThanOrEqual(6);
+    // The biome does not depend on the level the duel is at (a duel is on no map number).
+    expect(duelPlan(7, 1).biome.id).toBe(duelPlan(7, 90).biome.id);
+  });
+});
 
 describe('a duel of two starters', () => {
   it('ends with one dead (a draw by the cap would mean they never met)', () => {
@@ -462,5 +523,41 @@ describe('bodies', () => {
     separate(w);
     expect(sa.player.x).toBeCloseTo(a1.x, 9);
     expect(sa.player.y).toBeCloseTo(a1.y, 9);
+  });
+});
+
+describe('the events of a duel say whose they are', () => {
+  /** Fight a duel to its end and keep every event of every tick. */
+  const events = (a: Build, b: Build, seed: number) => {
+    const w = createDuelWorld(a, b, seed);
+    const all: World['events'] = [];
+    while (w.t < 60 && w.sides.every((s) => s.player.alive)) {
+      stepWorld(w);
+      all.push(...w.events);
+    }
+    return { w, all };
+  };
+
+  it('a flask drunk is the drinker’s: `src` is the character whose flask it is, and `idx` its flask', () => {
+    const { w, all } = events(vanguard(1), vanguard(2), 1);
+    const drunk = all.filter((e) => e.t === 'flaskUsed');
+    expect(drunk.length).toBeGreaterThan(0);
+    for (const s of w.sides) {
+      const mine = drunk.filter((e) => e.src === s.player.id);
+      const uses = s.flasks.reduce((n, f) => n + f.uses, 0);
+      expect(mine.length, `side ${s.id}`).toBe(uses);
+      for (const e of mine) expect(s.flasks[e.idx]).toBeDefined();
+    }
+    // Nothing is drunk for an actor that is not a character.
+    const ids = new Set(w.sides.map((s) => s.player.id));
+    for (const e of drunk) expect(ids.has(e.src)).toBe(true);
+  });
+
+  it('a fall is the faller’s: `src` of playerDied is the character that died', () => {
+    const { w, all } = events(vanguard(1), vanguard(2), 1);
+    const dead = w.sides.filter((s) => !s.player.alive);
+    expect(dead.length).toBeGreaterThan(0);
+    const fell = all.filter((e) => e.t === 'playerDied');
+    expect(fell.map((e) => e.src).sort()).toEqual(dead.map((s) => s.player.id).sort());
   });
 });

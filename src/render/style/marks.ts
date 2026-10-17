@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { MOD_MARKS, RARITY_COLOR, type ModShape } from '../../data/monsterMarks';
 import type { Actor, World } from '../../sim/types';
+import { isViewer } from './who';
 
 export type MarkTheme = {
   /** World-pixel size of one mark unit (pips are ~2 units wide). */
@@ -36,7 +37,8 @@ export class MonsterMarks {
     const view = this.scene.cameras.main.worldView;
     const u = this.theme.unit;
     for (const a of world.actors) {
-      if (a.isPlayer || !a.alive) continue;
+      // The viewer's own character has the HUD; the rival of a duel is marked like an enemy.
+      if (isViewer(a) || !a.alive) continue;
       const sel = a.id === selectedId;
       const interesting =
         a.rarity !== 'normal' || sel || a.life < a.def.maxLife || a.es < a.def.maxEs;
@@ -45,7 +47,9 @@ export class MonsterMarks {
       if (!p) continue;
       if (p.x < view.x - 40 || p.x > view.right + 40 || p.y < view.y - 80 || p.y > view.bottom + 40)
         continue;
-      const rc = RARITY_COLOR[a.rarity as keyof typeof RARITY_COLOR] ?? 0xffffff;
+      const rc = a.isPlayer
+        ? 0xe04030
+        : (RARITY_COLOR[a.rarity as keyof typeof RARITY_COLOR] ?? 0xffffff);
       const pulse = 0.5 + 0.5 * Math.sin(time * 3 + a.id);
 
       // Ground auras for affixes that visibly change the monster.

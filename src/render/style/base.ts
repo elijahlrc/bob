@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
-import { classDef } from '../../data/classes';
-import { itemBase } from '../../data/bases';
+import type { Side } from '../../sim/side';
 import type {
   Actor,
   Chest,
@@ -12,9 +11,10 @@ import type {
 } from '../../sim/types';
 import { AnimTrack } from './anim';
 import { MonsterMarks, type MarkTheme } from './marks';
-import { heroFigure, monsterFigure, type FigureKind } from './figure';
+import { type FigureKind } from './figure';
+import { figureOf, heroColor, isViewer } from './who';
 
-export { AnimTrack };
+export { AnimTrack, figureOf, heroColor };
 import type { MapStyle } from './types';
 
 export type ActorView = {
@@ -24,18 +24,6 @@ export type ActorView = {
   /** Style-specific display objects. */
   data: Record<string, unknown>;
 };
-
-export function figureOf(w: World, a: Actor): FigureKind {
-  if (a.isPlayer) {
-    const mh = w.sides[0].build.equipment.mainHand;
-    return heroFigure(mh ? itemBase(mh.baseId).itemClass : undefined);
-  }
-  return monsterFigure(a.mon!.spec.type, a.mon!.spec.rarity);
-}
-
-export function heroColor(w: World): number {
-  return classDef(w.sides[0].build.classId).color;
-}
 
 /**
  * Shared scaffolding for a map style: owns the view maps, animation tracking and the per-frame
@@ -96,7 +84,8 @@ export abstract class StyleBase implements MapStyle {
     this.marks?.destroy();
     this.marks = new MonsterMarks(this.scene, this.markTheme());
     const cam = this.scene.cameras.main;
-    const p = this.project(world.sides[0].player.x, world.sides[0].player.y);
+    const pp = this.playerPos(world);
+    const p = this.project(pp.x, pp.y);
     cam.centerOn(p.x, p.y);
   }
 
@@ -201,7 +190,8 @@ export abstract class StyleBase implements MapStyle {
     let best: number | null = null;
     let bestD = Infinity;
     for (const a of this.world.actors) {
-      if (a.isPlayer || !a.alive) continue;
+      // Everything but the viewer's own character can be picked: a monster, or the rival of a duel.
+      if (isViewer(a) || !a.alive) continue;
       const m = this.markPos(a);
       if (!m) continue;
       // Test against the whole body: from the feet up to the head.
@@ -219,11 +209,32 @@ export abstract class StyleBase implements MapStyle {
     return best;
   }
 
-  /** Camera follows the player with a little smoothing and the shake applied. */
-  /** The player's smoothed render position in tiles (falls back to the sim position). */
+  /** A side's character at its smoothed render position in tiles (falls back to the sim position). */
+  protected sidePos(s: Side): { x: number; y: number } {
+    const t = this.views.get(s.player.id)?.track;
+    return t && !Number.isNaN(t.rx) ? { x: t.rx, y: t.ry } : s.player;
+  }
+
+  /**
+   * What the camera looks at, in tiles: the first side's character on a map; with several sides the middle of the characters still
+   * alive (all of them when none is), kept on the floor (a middle that is not on it falls back to the first living character).
+   */
   protected playerPos(world: World): { x: number; y: number } {
-    const t = this.views.get(world.sides[0].player.id)?.track;
-    return t && !Number.isNaN(t.rx) ? { x: t.rx, y: t.ry } : world.sides[0].player;
+    if (world.sides.length < 2) return this.sidePos(world.sides[0]);
+    const alive = world.sides.filter((s) => s.player.alive);
+    const watched = alive.length > 0 ? alive : world.sides;
+    let x = 0;
+    let y = 0;
+    for (const s of watched) {
+      const p = this.sidePos(s);
+      x += p.x;
+      y += p.y;
+    }
+    x /= watched.length;
+    y /= watched.length;
+    const lab = world.plan.lab;
+    const onFloor = lab.tiles[Math.floor(y) * lab.w + Math.floor(x)] === 1;
+    return onFloor ? { x, y } : this.sidePos(watched[0]);
   }
 
   protected followCamera(world: World, dt: number): void {

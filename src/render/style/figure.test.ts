@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
+import { itemBase } from '../../data/bases';
+import { classDef } from '../../data/classes';
+import { newRun } from '../../run/run';
+import { createDuelWorld } from '../../sim/duel';
 import { AnimTrack } from './anim';
-import { buildFigure, poseFor, type AnimName, type FigureKind } from './figure';
+import { buildFigure, heroFigure, poseFor, type AnimName, type FigureKind } from './figure';
 import type { Actor } from '../../sim/types';
+import { figureOf, heroColor, isViewer } from './who';
 
 const KINDS: FigureKind[] = [
   'warrior',
@@ -123,5 +128,33 @@ describe('the attack animation of a repeating skill (Echoing Cast)', () => {
     expect(at(0.95)).toBeGreaterThan(0.6);
     a.action = { elapsed: 0.3, duration: 1, profile: { repeats: 0 }, which: 'primary' } as never;
     expect(t.state(a).t).toBeCloseTo(0.3, 6);
+  });
+});
+
+describe('who a character is drawn as (a duel has two)', () => {
+  const weaponFigure = (b: ReturnType<typeof newRun>['build']): FigureKind => {
+    const mh = b.equipment.mainHand;
+    return heroFigure(mh ? itemBase(mh.baseId).itemClass : undefined);
+  };
+
+  it('each character is its own side’s class: its figure by its weapon, its colour by its class', () => {
+    const a = newRun('vanguard', 1).build;
+    const b = newRun('strider', 2).build;
+    const w = createDuelWorld(a, b, 1);
+    const [sa, sb] = w.sides;
+    expect(figureOf(w, sa.player)).toBe(weaponFigure(a));
+    expect(figureOf(w, sb.player)).toBe(weaponFigure(b));
+    expect(figureOf(w, sb.player)).not.toBe(figureOf(w, sa.player));
+    expect(heroColor(w, sa.player)).toBe(classDef('vanguard').color);
+    expect(heroColor(w, sb.player)).toBe(classDef('strider').color);
+    expect(heroColor(w, sb.player)).not.toBe(heroColor(w, sa.player));
+  });
+
+  it('only side 0’s character is the viewer’s; an actor that names no side counts as side 0’s', () => {
+    const w = createDuelWorld(newRun('vanguard', 1).build, newRun('vanguard', 2).build, 1);
+    expect(isViewer(w.sides[0].player)).toBe(true);
+    expect(isViewer(w.sides[1].player)).toBe(false);
+    expect(isViewer({ isPlayer: true } as Actor)).toBe(true);
+    expect(isViewer({ isPlayer: false, side: null } as unknown as Actor)).toBe(false);
   });
 });

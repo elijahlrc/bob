@@ -4,6 +4,31 @@ import { FLOOR, WALL, type Labyrinth, type Room } from './labyrinth';
 export const BOSS_ARENA_RADIUS = 11;
 
 /**
+ * Carve a round arena of floor into `tiles` (a `w` by `h` grid): the circle of `radius` tiles about the tile (`cx`, `cy`), never
+ * on the outer ring of the grid. The floor is symmetric about the point (`cx` + 0.5, `cy` + 0.5), the middle of that tile. A boss's
+ * arena (`attachArena`) and a duel's (`src/sim/duel.ts`) are this one room.
+ */
+export function carveArena(
+  tiles: Uint8Array,
+  w: number,
+  h: number,
+  cx: number,
+  cy: number,
+  radius: number,
+): void {
+  for (let y = cy - radius; y <= cy + radius; y++)
+    for (let x = cx - radius; x <= cx + radius; x++)
+      if (
+        (x - cx) ** 2 + (y - cy) ** 2 <= radius * radius + radius &&
+        x > 0 &&
+        y > 0 &&
+        x < w - 1 &&
+        y < h - 1
+      )
+        tiles[y * w + x] = FLOOR;
+}
+
+/**
  * A boss map (docs/BOSSES.md 12): the labyrinth as usual, then a round arena past its last room, joined by a corridor that
  * crosses no other room. The arena is the new end room; the old end room becomes a room of the path.
  */
@@ -67,16 +92,7 @@ export function attachArena(lab: Labyrinth, radius = BOSS_ARENA_RADIUS): Labyrin
       : side.dy < 0
         ? radius + 1
         : clamp(e.cy, radius + 1, h - radius - 2);
-  for (let y = cy - radius; y <= cy + radius; y++)
-    for (let x = cx - radius; x <= cx + radius; x++)
-      if (
-        (x - cx) ** 2 + (y - cy) ** 2 <= radius * radius + radius &&
-        x > 0 &&
-        y > 0 &&
-        x < w - 1 &&
-        y < h - 1
-      )
-        tiles[y * w + x] = FLOOR;
+  carveArena(tiles, w, h, cx, cy, radius);
   // The corridor: straight out of the end room along the way that was found clear, into the arena (its middle is level
   // with the end room, or near enough that the corridor still meets the circle).
   const carve = (x0: number, y0: number, x1: number, y1: number) => {
