@@ -347,3 +347,4 @@ character falls back to its first usable skill; the replace confirm says "your p
 - Not looked at on screen: a ring's two slot tabs on a phone, and a two-hander over a shield in the browser (both are covered by the
   headless tests). Not looked at on a real device (peek height under a thumb, scroll against the bag).
 - Screenshots: `docs/screenshots/mobile/q3-peek.jpg`, `q3-full.jpg`, `q6-gem-picker.jpg`, `q7-filter-sheet.jpg`.
+- `p3-360-items-sheet.jpg` and `p5-360-gem-sheet.jpg` in the same folder show the screens before this plan; the `q*.jpg` files supersede them. `npm run fence` holds (12 runs identical), so the bot is unchanged.

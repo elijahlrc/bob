@@ -205,13 +205,14 @@ export function Camp({ c }: { c: Controller }) {
   // The Items tab shows the last map's drops the first time it is opened after a map (when it dropped anything), then
   // the player's own view again.
   const [showDrops, setShowDrops] = useState(hasDrops);
+  // The slot whose sockets the Skills tab scrolls to (the Items tab's "Edit gems"), for that visit only.
+  const [gemSlot, setGemSlot] = useState<EquipSlot | null>(null);
   const setTab = (t: Tab) => {
     if (tab === 'items' && t !== 'items') setShowDrops(false);
+    if (tab === 'skills' && t !== 'skills') setGemSlot(null);
     setTabState(t);
   };
   // An item the Items tab sends to the Workbench ("Craft…") and back ("Show in Items"); `n` makes a repeat count.
-  // The slot whose sockets the Skills tab scrolls to (the Items tab's "Edit gems").
-  const [gemSlot, setGemSlot] = useState<EquipSlot | null>(null);
   const [focus, setFocus] = useState<{ uid: number; n: number; to: 'items' | 'workbench' } | null>(
     null,
   );

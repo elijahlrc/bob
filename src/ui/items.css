@@ -955,7 +955,7 @@
     padding: 10px;
   }
   .ix:has(.ix-detailcol.has-sel) {
-    padding-bottom: 46vh;
+    padding-bottom: 54vh;
   }
   .ix-detailcol {
     display: none;
@@ -1029,7 +1029,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
   .ix-row {
-    scroll-margin-bottom: 46vh;
+    scroll-margin-bottom: 54vh;
     scroll-margin-top: 8px;
   }
   .ix-chips.kinds {
