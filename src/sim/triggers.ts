@@ -8,6 +8,7 @@ import { registerBlast } from './factions';
 import { startStorm } from './fields';
 import { flaskMask, lifeCap, playerConds, playerCtx, pushDot, rawHit, wake } from './combat';
 import type { Actor, Action, World } from './types';
+import { eachEnemy, livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /**
@@ -118,8 +119,7 @@ function nearestEnemy(w: World, s: Side): Actor | null {
   const p = s.player;
   let best: Actor | null = null;
   let bd = 12;
-  for (const a of w.actors) {
-    if (a.team === s.team || !a.alive) continue;
+  for (const a of livingEnemiesOf(w, s.team)) {
     const d = Math.hypot(a.x - p.x, a.y - p.y);
     if (d < bd) {
       bd = d;
@@ -187,10 +187,9 @@ function overkillBurn(
     1 << DAMAGE_TYPES.indexOf('fire'),
   );
   const dps = (over * e.pct * s.char.db.mult('damage', ctx)) / 100;
-  for (const o of w.actors) {
-    if (o.team === s.team || !o.alive || Math.hypot(o.x - dead.x, o.y - dead.y) > e.radius + o.r)
-      continue;
-    applyFlatDot(w, o, '@herald', 3, dps, e.seconds);
+  for (const o of livingEnemiesOf(w, s.team)) {
+    if (Math.hypot(o.x - dead.x, o.y - dead.y) > e.radius + o.r) continue;
+    applyFlatDot(w, o, '@herald', 3, dps, e.seconds, s);
   }
   return true;
 }
@@ -227,12 +226,12 @@ function drainExplosions(w: World, s: Side): void {
       t.explosions++;
       w.events.push({ t: 'explode', x: q.x, y: q.y, r: q.r, dtype: q.type });
       registerBlast(w, q.x, q.y, q.r);
-      for (const o of w.actors) {
-        if (o.team === s.team || !o.alive || o.id === q.from) continue;
-        if (Math.hypot(o.x - q.x, o.y - q.y) > q.r + o.r) continue;
+      eachEnemy(w, s.team, (o) => {
+        if (o.id === q.from) return;
+        if (Math.hypot(o.x - q.x, o.y - q.y) > q.r + o.r) return;
         wake(w, o);
-        rawHit(w, o, q.amount, q.type);
-      }
+        rawHit(w, o, q.amount, q.type, s);
+      });
     }
   } finally {
     t.draining = false;

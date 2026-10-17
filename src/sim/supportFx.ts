@@ -9,6 +9,7 @@ import { spendCharges } from './charges';
 import { hit } from './combat';
 import { scaleProfile } from './shots';
 import type { Action, Actor, World } from './types';
+import { eachEnemy, livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /**
@@ -174,8 +175,8 @@ function mirageShoots(w: World, s: Side, m: Mirage): void {
   if (!spec) return;
   let best: Actor | null = null;
   let bd = MIRAGE_RANGE;
-  for (const e of w.actors) {
-    if (e.team === s.team || !e.alive || e.phaseT > 0) continue;
+  for (const e of livingEnemiesOf(w, s.team)) {
+    if (e.phaseT > 0) continue;
     const d = Math.hypot(e.x - m.x, e.y - m.y);
     if (d < bd) {
       bd = d;
@@ -221,14 +222,10 @@ export function afterPlayerHit(w: World, s: Side, dst: Actor, p: SkillProfile): 
     const q = scaleProfile(p, p.shockwave.mult / base);
     s.inShock = true;
     w.events.push({ t: 'explode', x: dst.x, y: dst.y, r: SHOCK_RADIUS * p.radiusMult, dtype: 0 });
-    for (const e of w.actors)
-      if (
-        e.team !== s.team &&
-        e.alive &&
-        e !== dst &&
-        Math.hypot(e.x - dst.x, e.y - dst.y) <= SHOCK_RADIUS * p.radiusMult + e.r
-      )
+    eachEnemy(w, s.team, (e) => {
+      if (e !== dst && Math.hypot(e.x - dst.x, e.y - dst.y) <= SHOCK_RADIUS * p.radiusMult + e.r)
         hit(w, s.player, e, q, 0, Math.hypot(e.x - s.player.x, e.y - s.player.y));
+    });
     s.inShock = false;
   }
 }
@@ -239,15 +236,8 @@ export function extraStrikes(w: World, a: Actor, act: Action, target: Actor): vo
   if (p.extraTargets <= 0 || !a.isPlayer) return;
   const b = p.skill.behaviour;
   const reach = (b.kind === 'melee' ? b.range : 1.6) + p.rangeBonus + 2.4;
-  const others = w.actors
-    .filter(
-      (e) =>
-        e.team !== a.team &&
-        e.alive &&
-        e !== target &&
-        e.phaseT <= 0 &&
-        Math.hypot(e.x - a.x, e.y - a.y) <= reach + e.r,
-    )
+  const others = livingEnemiesOf(w, a.team)
+    .filter((e) => e !== target && e.phaseT <= 0 && Math.hypot(e.x - a.x, e.y - a.y) <= reach + e.r)
     .sort((x, y) => Math.hypot(x.x - a.x, x.y - a.y) - Math.hypot(y.x - a.x, y.y - a.y));
   a.side!.critLock = a.side!.critSeen;
   for (const e of others.slice(0, p.extraTargets))
@@ -276,12 +266,8 @@ export function repeatTarget(w: World, a: Actor, act: Action): Actor | undefined
   if (!p.multistrike || !a.isPlayer) return undefined;
   const b = p.skill.behaviour;
   const reach = (b.kind === 'melee' ? b.range : 1.6) + p.rangeBonus + 1.2;
-  const near = w.actors.filter(
-    (e) =>
-      e.team !== a.team &&
-      e.alive &&
-      e.phaseT <= 0 &&
-      Math.hypot(e.x - a.x, e.y - a.y) <= reach + e.r,
+  const near = livingEnemiesOf(w, a.team).filter(
+    (e) => e.phaseT <= 0 && Math.hypot(e.x - a.x, e.y - a.y) <= reach + e.r,
   );
   return near.length ? near[w.rngCombat.int(0, near.length - 1)] : undefined;
 }

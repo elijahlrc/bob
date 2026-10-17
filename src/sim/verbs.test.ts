@@ -60,12 +60,12 @@ describe('sim rules for the new verbs', () => {
       damageTakenType: [1, 1, 1, 2, 1],
       immune: [false, false, true, false, false],
     };
-    rawHit(world, player, 100, 0); // 50 physical + 50 lightning at 50% res
+    rawHit(world, player, 100, 0, null); // 50 physical + 50 lightning at 50% res
     expect(player.life).toBeCloseTo(1000 - 50 - 25);
     player.life = 1000;
-    rawHit(world, player, 100, 2); // immune to cold
+    rawHit(world, player, 100, 2, null); // immune to cold
     expect(player.life).toBe(1000);
-    rawHit(world, player, 100, 3); // fire taken at double
+    rawHit(world, player, 100, 3, null); // fire taken at double
     expect(player.life).toBeCloseTo(800);
   });
 

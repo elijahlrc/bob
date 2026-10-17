@@ -450,7 +450,7 @@ export function counterBlow(w: World, dst: Actor, src: Actor, p: SkillProfile): 
     dtype: 0,
     heavy: true,
   });
-  rawHit(w, src, monsterHitOf(dst) * COUNTER_MULT, 0, 'Counter-stance');
+  rawHit(w, src, monsterHitOf(dst) * COUNTER_MULT, 0, null, 'Counter-stance');
 }
 
 /** A monster that has eaten swells (Gorged). */

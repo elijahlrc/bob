@@ -1040,6 +1040,18 @@ and foreign minions separate. `src/sim/duel.test.ts` gives each kit to one side 
 on the right side. The hash fence (default and `--deep`) is identical: a one-side world makes the very same events. What F3 and F4
 must know is in the Built note under DUEL.md section 7.
 
+## Duels: every kit across sides (2026-10-16)
+
+docs/DUEL.md F3 built. A side's damage is credited to it whatever deals it (`rawHit` takes its owner; debuffs carry `by`) and every
+kit's idea of "the enemy" is the other teams' actors and the other sides' minions (`livingEnemiesOf` and its relatives in
+`src/sim/side.ts`): minions seek and strike the other character and its minions, projectiles stop at them, fields, deployables,
+auras, banners and triggers reach them, and the monsters' flow field leads to the nearest character. A kill of a minion by the other
+side's damage gives a kill's charges and triggers but is no kill. `src/sim/duelKits.test.ts` (201 tests) gives each kit to one side
+and looks for the effect and the credit on the right one, and every active gem duels for ten seconds without error. `npm run duel`
+fights two builds and prints both ledgers; `ladder-probe.ts --real` fights the bot-versus-bot matrix with real duels (fights of
+2 to 40 seconds, median 4 to 6). The fence (default and `--deep`) is identical; what F4 must know is in the Built note under
+DUEL.md section 7.
+
 ## Equipping: sockets, compare and the phone (2026-10-16)
 
 docs/EQUIP.md Q0 to Q7 built; Q8 is this entry and the docs. A swap now says what happens to the gems (`SocketOutcome`, `dryEquip`,

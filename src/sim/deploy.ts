@@ -18,6 +18,7 @@ import { scaleProfile } from './shots';
 import { applySkillDot } from './skillDots';
 import { GOLDEN, areaRadiusOf } from './spread';
 import type { Action, Actor, World } from './types';
+import { livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /**
@@ -153,7 +154,7 @@ export function deployFull(s: Side, c: SkillChoice, prof: SkillProfile): boolean
 }
 
 const enemies = (w: World, team: number): Actor[] =>
-  w.actors.filter((e) => e.team !== team && e.alive && e.phaseT <= 0);
+  livingEnemiesOf(w, team).filter((e) => e.phaseT <= 0);
 
 /** A new totem stands at least this far from the totems of its own skill, in tiles, when there is room. */
 const TOTEM_APART = 2.5;
@@ -471,7 +472,8 @@ export function mineAuraAt(
 /** The extra damage the aura of a mine adds to a hit that landed (fire, from Pyroclast). */
 export function mineAuraHit(w: World, s: Side, dst: Actor): void {
   const a = mineAuraAt(s, dst.x, dst.y);
-  if (a && a.max > 0) rawHit(w, dst, a.min + w.rngCombat.float(0, 1) * (a.max - a.min), 3, 'Mine');
+  if (a && a.max > 0)
+    rawHit(w, dst, a.min + w.rngCombat.float(0, 1) * (a.max - a.min), 3, s, 'Mine');
 }
 
 /** The beams of a skill's totems: from each to the character and to the other totems, when in range and in sight. */
@@ -539,7 +541,7 @@ function bondBeams(w: World, s: Side, bonds: Deployable[], c: SkillChoice, foes:
         Math.hypot(e.x - x2, e.y - y2) <= spec.end + e.r;
       if (near) {
         // The damage of several beams does not stack: one debuff, renewed.
-        applySkillDot(w, e, prof, { seconds: 0.5 });
+        applySkillDot(w, e, prof, { seconds: 0.5, by: s });
         break;
       }
     }

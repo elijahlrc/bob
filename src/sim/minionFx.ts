@@ -12,6 +12,7 @@ import type { MinionSup } from './minionSup';
 import { applyFlatDot } from './skillDots';
 import { applyStatus } from './statuses';
 import type { Actor, World } from './types';
+import { livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /**
@@ -211,7 +212,7 @@ export function minionStrike(
   }
   for (let t = 0; t < 5; t++) {
     if (parts[t] <= 0) continue;
-    rawHit(w, target, parts[t], t, 'Minion', 'minion');
+    rawHit(w, target, parts[t], t, m.side!, 'Minion', 'minion');
     if (st.splash > 0)
       for (const e of foes)
         if (
@@ -219,7 +220,7 @@ export function minionStrike(
           e.alive &&
           Math.hypot(e.x - target.x, e.y - target.y) <= st.splash + e.r
         )
-          rawHit(w, e, parts[t] * 0.5, t, 'Minion', 'minion');
+          rawHit(w, e, parts[t] * 0.5, t, m.side!, 'Minion', 'minion');
   }
   // Elemental Army: a hit exposes the enemy to the element it dealt.
   if (m.sup.exposure > 0 && elemental && target.alive)
@@ -238,10 +239,10 @@ export function tickLegion(w: World, s: Side, dt: number): void {
   for (const m of s.minions) {
     if (!m.alive || m.sup.burn <= 0) continue;
     if (Math.floor(w.t * 4) !== Math.floor((w.t - dt) * 4))
-      for (const e of w.actors)
-        if (e.team !== s.team && e.alive && Math.hypot(e.x - m.x, e.y - m.y) <= BURN_RADIUS + e.r)
-          applyFlatDot(w, e, '@legion', 3, m.sup.burn, 0.5);
+      for (const e of livingEnemiesOf(w, s.team))
+        if (Math.hypot(e.x - m.x, e.y - m.y) <= BURN_RADIUS + e.r)
+          applyFlatDot(w, e, '@legion', 3, m.sup.burn, 0.5, s);
     if (m.sup.selfBurn > 0)
-      rawHit(w, m, (m.def.maxLife * m.sup.selfBurn * dt) / 100, 3, 'Burning', 'minion');
+      rawHit(w, m, (m.def.maxLife * m.sup.selfBurn * dt) / 100, 3, null, 'Burning', 'minion');
   }
 }

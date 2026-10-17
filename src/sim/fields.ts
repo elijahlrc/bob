@@ -11,7 +11,7 @@ import { hit, lifeCap, rawHit } from './combat';
 import { creepToward } from './skillFx';
 import { scaleProfile } from './shots';
 import type { Action, Actor, World } from './types';
-import { hunted } from './side';
+import { enemiesWithin, hunted, livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /**
@@ -392,7 +392,7 @@ export function placeGeyser(w: World, a: Actor, act: Action): void {
   const r = spec.explodeRadius * p.radiusMult;
   w.events.push({ t: 'explode', x: corpse.x, y: corpse.y, r, dtype: 3, skill: p.skill.id });
   for (const e of enemiesIn(w, a.team, corpse.x, corpse.y, r))
-    rawHit(w, e, (corpse.life * spec.explodePct) / 100, 3, 'Corpse');
+    rawHit(w, e, (corpse.life * spec.explodePct) / 100, 3, a.side!, 'Corpse');
   const mine = a.side!.fields.filter((f) => f.kind === 'geyser');
   if (mine.length >= spec.max) {
     const oldest = mine.reduce((x, y) => (x.t < y.t ? x : y));
@@ -459,9 +459,7 @@ function volley(w: World, s: Side, f: Field): void {
 }
 
 function enemiesIn(w: World, team: number, x: number, y: number, r: number): Actor[] {
-  return w.actors.filter(
-    (e) => e.team !== team && e.alive && e.phaseT <= 0 && Math.hypot(e.x - x, e.y - y) <= r + e.r,
-  );
+  return enemiesWithin(w, team, x, y, r, true);
 }
 
 /** Whether a point is on consecrated ground of the player's. */
@@ -494,7 +492,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
       f.x = p.x;
       f.y = p.y;
     }
-    if (f.creep) creepToward(w, f, dt);
+    if (f.creep) creepToward(w, s.team, f, dt);
     if (f.kind === 'orb') {
       f.x = p.x;
       f.y = p.y;
@@ -573,14 +571,9 @@ export function tickFields(w: World, s: Side, dt: number): void {
       f.pulseT -= dt;
       if (f.pulseT <= 0 && f.t > 0) {
         f.pulseT += f.interval;
-        for (const e of w.actors)
-          if (
-            e.team !== s.team &&
-            e.alive &&
-            e.phaseT <= 0 &&
-            segmentDist(e.x, e.y, f.x, f.y, f.x2!, f.y2!) <= f.radius + e.r
-          )
-            applySkillDot(w, e, f.profile!, { seconds: 0.5 });
+        for (const e of livingEnemiesOf(w, s.team))
+          if (e.phaseT <= 0 && segmentDist(e.x, e.y, f.x, f.y, f.x2!, f.y2!) <= f.radius + e.r)
+            applySkillDot(w, e, f.profile!, { seconds: 0.5, by: s });
       }
       if (f.t > 0) s.fields[j++] = f;
       continue;
@@ -613,7 +606,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
       const spec = f.profile.skill.pods!;
       if (pulse)
         for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius)) {
-          applySkillDot(w, e, f.profile, { seconds: 0.5 });
+          applySkillDot(w, e, f.profile, { seconds: 0.5, by: s });
           // Each pod that reaches it slows it a little, up to a limit.
           const reached = s.fields.filter(
             (o) => o.kind === 'pod' && Math.hypot(e.x - o.x, e.y - o.y) <= o.radius + e.r,
@@ -639,7 +632,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
     } else if (f.kind === 'caustic' && pulse && f.profile) {
       // Caustic ground renews the debuff of whoever stands in it, in short spans: patches do not add up.
       for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius))
-        applySkillDot(w, e, f.profile, { seconds: 0.5 });
+        applySkillDot(w, e, f.profile, { seconds: 0.5, by: s });
     } else if (f.kind === 'chilling' && pulse && f.profile && f.dps <= 0) {
       // Chilled ground that deals no damage (Frostblink) only chills what stands on it.
       for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius)) {
@@ -690,7 +683,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
           dtype: f.dtype,
           skill: f.profile?.skill.id,
         });
-        rawHit(w, e, f.dps * (0.5 + w.rngTrig.float(0, 1)), f.dtype, 'Herald');
+        rawHit(w, e, f.dps * (0.5 + w.rngTrig.float(0, 1)), f.dtype, s, 'Herald');
       }
     }
     if (f.t > 0) s.fields[j++] = f;

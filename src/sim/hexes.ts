@@ -16,7 +16,7 @@ import { lifeCap } from './combat';
 import { bossOfType } from '../data/bosses';
 import { flaskWards } from './afflict';
 import type { Actor, World } from './types';
-import { hunted } from './side';
+import { hunted, livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /**
@@ -82,8 +82,8 @@ export function tickBlasphemy(w: World, s: Side, dt: number): void {
     const h = s.char.hexes.find((x) => x.id === u.hex);
     if (!h) continue;
     const radius = Math.max(u.radius, 3) * s.char.profile(c, 0).radiusMult * 1.5;
-    for (const e of w.actors)
-      if (e.team !== s.team && e.alive && Math.hypot(e.x - p.x, e.y - p.y) <= radius + e.r)
+    for (const e of livingEnemiesOf(w, s.team))
+      if (Math.hypot(e.x - p.x, e.y - p.y) <= radius + e.r)
         applyHex(w, e, h.id, h.effect, s.char.hexLimit, h.level);
   }
 }

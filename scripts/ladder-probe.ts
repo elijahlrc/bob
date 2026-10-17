@@ -3,10 +3,12 @@
  * runs, and whether "A attacks a dummy wearing B's defence" (the crossfire of LADDER.md 5.1) tells builds apart.
  *
  *   npx tsx scripts/ladder-probe.ts [--classes all|vanguard,mystic] [--seeds 1,2] [--maps 80] [--duel 20,40,60] [--legacy]
- *                                   [--scale 0.1] [--save snaps.json] [--load snaps.json]
+ *                                   [--scale 0.1] [--save snaps.json] [--load snaps.json] [--real [--fight-seeds 1,2]]
  *
  * `--legacy` plays the bot on the legacy difficulty (the default kills it on maps 10 to 20). `--scale` multiplies the dummy's
  * damage taken (a PvP handicap). `--save` keeps the builds it snapshots, so `--load` can re-run the duels without the bot.
+ * `--real` fights the matrix with real duels (`runDuel`, docs/DUEL.md F3) instead of the crossfire: the winner and the length of
+ * each fight, with each pair in both orders (the arena is asymmetric until F4), one fight per seed of `--fight-seeds` (1).
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
@@ -14,6 +16,7 @@ import { Character } from '../src/calc/character';
 import { CLASSES } from '../src/data/classes';
 import type { Build } from '../src/data/types';
 import { botRun } from '../src/run/bot';
+import { runDuel } from '../src/sim/duel';
 import { createDummyWorld } from '../src/sim/dummy';
 import { stepWorld } from '../src/sim/world';
 
@@ -31,6 +34,8 @@ const legacy = argv.includes('--legacy');
 const scale = Number(arg('--scale', '1'));
 const saveFile = arg('--save', '');
 const loadFile = arg('--load', '');
+const real = argv.includes('--real');
+const fightSeeds = arg('--fight-seeds', '1').split(',').map(Number);
 const SNAPS = [10, 20, 40, 60, 80, 100];
 
 type Snap = { cls: string; seed: number; map: number; level: number; build: Build };
@@ -102,10 +107,79 @@ const f = (t: number) => (t === Infinity ? 'inf' : t.toFixed(1));
 const median = (a: Build, b: Build) =>
   [1, 2, 3].map((s) => ttk(a, b, s).t).sort((x, y) => x - y)[1];
 
+// ---- Real duels (docs/DUEL.md F3): the same matrix, fought with `runDuel` in both orders. ----
+type Real = { winner: 0 | 1 | null; how: 'death' | 'time'; time: number; ms: number };
+function fight(a: Build, b: Build, seed: number): Real {
+  const start = performance.now();
+  const r = runDuel(a, b, seed);
+  return { winner: r.winner, how: r.how, time: r.time, ms: performance.now() - start };
+}
+
+function realMatrix(pool: Snap[], duelMap: number): void {
+  console.log(
+    `\nreal duels at map ${duelMap}: ${pool.length} builds (${pool.map((p) => name(p)).join(', ')}), seeds ${fightSeeds.join(',')}`,
+  );
+  console.log(
+    'row is side 0 (west, strikes first), column side 1; r = the row wins, c = the column wins, = a draw; seconds (median of the seeds)',
+  );
+  // cells[i][j]: the fights of pool[i] (side 0) against pool[j] (side 1), one per seed.
+  const cells: Real[][][] = pool.map(() => pool.map(() => []));
+  for (let i = 0; i < pool.length; i++)
+    for (let j = 0; j < pool.length; j++)
+      if (i !== j)
+        for (const seed of fightSeeds) cells[i][j].push(fight(pool[i].build, pool[j].build, seed));
+  for (let i = 0; i < pool.length; i++) {
+    const out = pool.map((_, j) => {
+      if (i === j) return '    -     ';
+      const cs = cells[i][j];
+      const letters = cs.map((c) => (c.winner === 0 ? 'r' : c.winner === 1 ? 'c' : '=')).join('');
+      const ts = cs.map((c) => c.time).sort((x, y) => x - y);
+      return `${letters} ${ts[Math.floor(ts.length / 2)].toFixed(1)}`.padEnd(10);
+    });
+    console.log(`${name(pool[i]).padEnd(8)} ${out.join(' ')}`);
+  }
+  const all = cells.flat(2);
+  const times = all.map((c) => c.time).sort((x, y) => x - y);
+  const by = (f: (c: Real) => boolean) => all.filter(f).length;
+  console.log(
+    `\n${all.length} fights: ${by((c) => c.how === 'death' && c.winner !== null)} won by a death, ${by((c) => c.winner === null && c.how === 'death')} both dead at once, ${by((c) => c.how === 'time')} ended by the cap`,
+  );
+  console.log(
+    `length: median ${times[Math.floor(times.length / 2)].toFixed(1)} s, shortest ${times[0].toFixed(1)}, longest ${times[times.length - 1].toFixed(1)}; ${(all.reduce((n, c) => n + c.ms, 0) / all.length).toFixed(0)} ms of wall time each`,
+  );
+  console.log(
+    `side 0 (west) won ${by((c) => c.winner === 0)}, side 1 (east) won ${by((c) => c.winner === 1)}`,
+  );
+  // The two orders of a pair and a seed: the same build wins both (the fight is about the builds), or the winner is the side that stood west.
+  let agree = 0;
+  let disagree = 0;
+  let oneDraw = 0;
+  for (let i = 0; i < pool.length; i++)
+    for (let j = i + 1; j < pool.length; j++)
+      for (let k = 0; k < fightSeeds.length; k++) {
+        const ij = cells[i][j][k].winner;
+        const ji = cells[j][i][k].winner;
+        if (ij === null || ji === null) {
+          oneDraw++;
+          continue;
+        }
+        // ij: 0 means pool[i] won; ji: 0 means pool[j] won, so the same build won both when exactly one of them is 0.
+        if ((ij === 0) !== (ji === 0)) agree++;
+        else disagree++;
+      }
+  console.log(
+    `the two orders of a pair and a seed: ${agree} agree on the winner, ${disagree} disagree (the west side won both, or the east side did), ${oneDraw} had a draw in one order`,
+  );
+}
+
 for (const duelMap of duelMaps) {
   const pool = snaps.filter((s) => s.map === duelMap);
   if (pool.length < 2) {
     console.log(`\nno two builds reached map ${duelMap}; duel skipped`);
+    continue;
+  }
+  if (real) {
+    realMatrix(pool, duelMap);
     continue;
   }
   console.log(

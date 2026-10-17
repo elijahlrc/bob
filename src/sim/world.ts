@@ -533,7 +533,7 @@ function tickEffects(w: World, dt: number): void {
         const p = s.player;
         const caught = p.alive && inBlast(e, p.x, p.y, p.r);
         if (caught && e.damage > 0)
-          rawHit(w, p, e.damage, e.dtype, e.label ?? 'Blast', 'player', viaOf(w, e));
+          rawHit(w, p, e.damage, e.dtype, null, e.label ?? 'Blast', 'player', viaOf(w, e));
         // What a boss's blast does besides damage (docs/BOSSES.md): a Sentence stuns, a toll shocks.
         if (caught && p.alive && e.stun) stunPlayer(w, s, e.stun);
         if (caught && p.alive && e.afflict)
@@ -542,7 +542,7 @@ function tickEffects(w: World, dt: number): void {
         if (owner?.alive) pullPlayer(w, s, owner, e.pull!);
         for (const m of s.minions)
           if (m.alive && inBlast(e, m.x, m.y, m.r))
-            rawHit(w, m, e.damage, e.dtype, e.label ?? 'Blast');
+            rawHit(w, m, e.damage, e.dtype, null, e.label ?? 'Blast');
       }
       if (e.leaves) openZone(w, e.x, e.y, e.radius, e.leaves.seconds, e.leaves.kind, e.leaves.dps);
       continue;
@@ -560,12 +560,12 @@ function tickEffects(w: World, dt: number): void {
         p.y = to.y;
       }
       if (e.damage > 0 && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r)
-        rawHit(w, p, e.damage, e.dtype, label, 'player', viaOf(w, e));
+        rawHit(w, p, e.damage, e.dtype, null, label, 'player', viaOf(w, e));
       // The character's minions standing in a monster's blast are hurt too.
       if (e.team === 1)
         for (const m of s.minions)
           if (m.alive && Math.hypot(m.x - e.x, m.y - e.y) <= e.radius + m.r)
-            rawHit(w, m, e.damage, e.dtype, label);
+            rawHit(w, m, e.damage, e.dtype, null, label);
     }
   }
   w.effects.length = j;
@@ -684,6 +684,18 @@ function checkExit(w: World): void {
   w.events.push({ t: 'exitOpen' });
 }
 
+const flowFrom: Actor[] = [];
+/**
+ * The characters the monsters' flow field leads to: every living one (all of them when none lives, as `hunted` falls back to the
+ * first), and on a map the one character, alive or not. The list is reused: the grid copies the tiles it needs.
+ */
+function flowOrigins(w: World): Actor[] {
+  flowFrom.length = 0;
+  for (const s of w.sides) if (w.sides.length === 1 || s.player.alive) flowFrom.push(s.player);
+  if (flowFrom.length === 0) for (const s of w.sides) flowFrom.push(s.player);
+  return flowFrom;
+}
+
 /** Advance the world by one fixed tick (§8.2). */
 export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void {
   if (w.status !== 'running') return;
@@ -703,8 +715,9 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   for (const s of w.sides) tickMinions(w, s, dt);
   for (const s of w.sides) tickSkillZones(w, s, dt);
   for (const s of w.sides) tickFlasks(w, s, dt, policy);
-  // Flow field for monsters follows the character's tile.
-  for (const s of w.sides) w.grid.buildFlow(s.player.x, s.player.y);
+  // Flow field for monsters follows the characters' tiles: one search from every living character, so that each tile leads to
+  // the nearest by path (the character a monster hunts is the nearest in a straight line: across a wall the two can differ).
+  w.grid.buildFlow(flowOrigins(w));
   for (const a of w.actors) {
     if (!a.alive) continue;
     tickActor(w, a, dt);

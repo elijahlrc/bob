@@ -117,7 +117,7 @@ describe('the death recap (the record a death sends)', () => {
     put(w, 'warrior', 4, 'rare');
     put(w, 'warrior', 5, 'magic');
     put(w, 'warrior', 30);
-    rawHit(w, w.sides[0].player, 10, 0, 'Test');
+    rawHit(w, w.sides[0].player, 10, 0, null, 'Test');
     const r = buildRecap(w);
     expect(r.near).toEqual({ all: 3, magic: 1, rare: 1, boss: 0 });
     expect(r.defence!.armour).toBe(w.sides[0].player.def.armour);

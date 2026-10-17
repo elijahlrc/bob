@@ -19,6 +19,7 @@ import { startShell } from './skillFx';
 import type { Action, Actor, World } from './types';
 import { ESCAPE_CROWD_RADIUS, ESCAPE_NEAR, PACK_RADIUS, PACK_SIZE } from '../data/strategy';
 import type { RotationEntry } from '../calc/strategy';
+import { enemiesWithin } from './side';
 import type { Side } from './side';
 
 /**
@@ -41,9 +42,7 @@ const WARCRY_SECONDS = 4;
 export type UtilityPick = { choice: SkillChoice; prof: SkillProfile; cd: number };
 
 export function enemiesNear(w: World, team: number, x: number, y: number, r: number): Actor[] {
-  return w.actors.filter(
-    (e) => e.team !== team && e.alive && e.phaseT <= 0 && Math.hypot(e.x - x, e.y - y) <= r,
-  );
+  return enemiesWithin(w, team, x, y, r, false);
 }
 
 const isBig = (a: Actor) => a.rarity === 'boss' || a.rarity === 'miniboss' || a.rarity === 'rare';
@@ -265,8 +264,8 @@ const BURN_RADIUS = 2.8;
  * circling blades (Orbiting Blades). Zero when it carries nothing of the kind. The character walks in among the enemies, as a player
  * of such a build does, instead of standing off at the range of its attack.
  */
-export function contactRange(w: World, s: Side): number {
-  let r = s.char.burn.pct > 0 && !burnOff.has(w) ? BURN_RADIUS * 0.8 : 0;
+export function contactRange(_w: World, s: Side): number {
+  let r = s.char.burn.pct > 0 && !burnOff.has(s) ? BURN_RADIUS * 0.8 : 0;
   const v = s.vortex;
   if (v && v.blades.length > 0) {
     const c = s.char.actives.find((x) => x.skill.id === v.key);
@@ -278,8 +277,8 @@ const BURN_EVERY = 0.5;
 /** The character switches a burning aura off below this share of its life, as a player clicks Righteous Fire off, and on again from the second. */
 export const BURN_OFF_BELOW = 0.4;
 export const BURN_ON_FROM = 0.75;
-/** The worlds whose character has its burning aura switched off just now. */
-const burnOff = new WeakSet<World>();
+/** The sides whose character has its burning aura switched off just now (each its own: two characters of a world switch on their own life). */
+const burnOff = new WeakSet<Side>();
 
 /** A burning aura damages the enemies near the player (and the player, without killing it) twice a second. */
 export function tickAuraBurn(w: World, s: Side, dt: number): void {
@@ -291,11 +290,11 @@ export function tickAuraBurn(w: World, s: Side, dt: number): void {
   const p = s.player;
   if (!p.alive) return;
   const frac = p.life / Math.max(1, p.def.maxLife);
-  if (burnOff.has(w)) {
-    if (frac >= BURN_ON_FROM) burnOff.delete(w);
+  if (burnOff.has(s)) {
+    if (frac >= BURN_ON_FROM) burnOff.delete(s);
     else return;
   } else if (frac < BURN_OFF_BELOW) {
-    burnOff.add(w);
+    burnOff.add(s);
     return;
   }
   // The enemies burn for a share of the character's life, with the character's damage over time modifiers.
@@ -303,12 +302,12 @@ export function tickAuraBurn(w: World, s: Side, dt: number): void {
     (b.pct / 100) * p.def.maxLife * BURN_EVERY * s.char.db.mult('damage', playerCtx(w, s));
   if (amount > 0)
     for (const e of enemiesNear(w, p.team, p.x, p.y, BURN_RADIUS))
-      rawHit(w, e, amount, 3, 'Burning aura');
+      rawHit(w, e, amount, 3, s, 'Burning aura');
   // The character burns too, as fire damage that its resistance and energy shield answer to; it never kills.
   if (b.self > 0) {
     const was = s.opts.godMode;
     s.opts.godMode = true;
-    rawHit(w, p, (b.self / 100) * p.def.maxLife * BURN_EVERY, 3, 'Righteous Fire');
+    rawHit(w, p, (b.self / 100) * p.def.maxLife * BURN_EVERY, 3, null, 'Righteous Fire');
     s.opts.godMode = was;
     p.life = Math.max(1, p.life);
   }

@@ -3,6 +3,7 @@ import { applyDamage, hit } from './combat';
 import { scaleProfile } from './shots';
 import { applyStatus } from './statuses';
 import type { Action, Actor, World } from './types';
+import { eachEnemy, enemiesWithin, livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /**
@@ -54,8 +55,8 @@ export function tickStance(w: World, sd: Side): void {
   const p = sd.player;
   if ((sd.utilityReady['@stance'] ?? 0) <= w.t) {
     let near = 0;
-    for (const e of w.actors)
-      if (e.team !== sd.team && e.alive && Math.hypot(e.x - p.x, e.y - p.y) <= PACK_RADIUS) near++;
+    for (const e of livingEnemiesOf(w, sd.team))
+      if (Math.hypot(e.x - p.x, e.y - p.y) <= PACK_RADIUS) near++;
     const want: Stance = near >= PACK_SIZE ? 'sand' : 'blood';
     if (want !== stanceOf(sd)) setStance(w, sd, want);
     sd.utilityReady['@stance'] = w.t + SWAP_EVERY;
@@ -68,14 +69,8 @@ export function tickStance(w: World, sd: Side): void {
     const e0 = side.enemies;
     const v = levelValue(e0.v, a.gem.level);
     const x = e0.x === undefined ? 0 : levelValue(e0.x, a.gem.level);
-    for (const e of w.actors)
-      if (
-        e.team !== sd.team &&
-        e.alive &&
-        e.phaseT <= 0 &&
-        Math.hypot(e.x - p.x, e.y - p.y) <= a.def.stance!.radius + e.r
-      )
-        applyStatus(w, e, e0.id, { seconds: e0.seconds, v, x });
+    for (const e of enemiesWithin(w, sd.team, p.x, p.y, a.def.stance!.radius, true))
+      applyStatus(w, e, e0.id, { seconds: e0.seconds, v, x });
   }
 }
 
@@ -136,14 +131,10 @@ export function tickBladestorm(w: World, s: Side, f: import('./fields').Field, d
   f.pulseT -= dt;
   if (f.pulseT > 0) return;
   f.pulseT += f.interval;
-  for (const e of w.actors)
-    if (
-      e.team !== s.team &&
-      e.alive &&
-      e.phaseT <= 0 &&
-      Math.hypot(e.x - f.x, e.y - f.y) <= f.radius + e.r
-    )
+  eachEnemy(w, s.team, (e) => {
+    if (e.phaseT <= 0 && Math.hypot(e.x - f.x, e.y - f.y) <= f.radius + e.r)
       hit(w, p, e, f.profile!, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
+  });
 }
 
 // ---- Berserk, Blood Rage

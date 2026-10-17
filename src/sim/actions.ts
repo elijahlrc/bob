@@ -43,7 +43,7 @@ import {
 import { applyUtility } from './utility';
 import { castPattern } from './blasts';
 import type { Action, Actor, World } from './types';
-import { hunted, MONSTERS } from './side';
+import { foeMinions, hunted, livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /** Begin an action (attack or cast). The previous action's overflow time carries over. */
@@ -252,9 +252,6 @@ function runStep(w: World, a: Actor, act: Action, target: Actor | undefined, dt:
   }
 }
 
-/** No actors: what a projectile that is not the monsters' has to stop at besides the actors of the world. */
-const NO_ACTORS: readonly Actor[] = [];
-
 /** How close to its target a spin stops, beyond the two bodies. */
 const SPIN_GAP = 0.6;
 /** The share of a spin in which it covers its dash: the rest it spends on the spot. */
@@ -318,16 +315,9 @@ function spinStep(w: World, a: Actor, act: Action, target: Actor | undefined, dt
   a.facing = face;
 }
 
+/** What an actor's blow can reach: the living actors and minions of the other teams (a monster's area attack catches the characters and their minions). */
 export function enemiesOf(w: World, a: Actor): Actor[] {
-  if (a.isPlayer) return w.actors.filter((o) => o.team !== a.team && o.alive);
-  // A monster's area attack catches the characters, and their minions too.
-  const out: Actor[] = [];
-  for (const s of w.sides) {
-    if (s.team === a.team || !s.player.alive) continue;
-    out.push(s.player);
-    for (const m of s.minions) if (m.alive) out.push(m);
-  }
-  return out;
+  return livingEnemiesOf(w, a.team);
 }
 
 /** The damage type of a skill's biggest chunk (what an effect looks like). */
@@ -811,10 +801,10 @@ function explode(
       hit(w, owner, e, pr.profile, pr.hand, Math.hypot(e.x - pr.startX, e.y - pr.startY));
   }
   if (pr.kind === 'creep') leaveCreeping(w, owner, pr, x, y);
-  if (pr.team === 1)
-    for (const e of hunted(w, owner).side!.minions)
-      if (e.alive && Math.hypot(e.x - x, e.y - y) <= pr.explodeRadius + e.r)
-        hit(w, owner, e, pr.profile, pr.hand, Math.hypot(e.x - pr.startX, e.y - pr.startY));
+  // The minions of the other teams stand outside `w.actors`: a burst reaches them too.
+  for (const e of foeMinions(w, pr.team))
+    if (e.alive && Math.hypot(e.x - x, e.y - y) <= pr.explodeRadius + e.r)
+      hit(w, owner, e, pr.profile, pr.hand, Math.hypot(e.x - pr.startX, e.y - pr.startY));
 }
 
 /** Fates reported in `projectileEnd` events: 0 wall, 1 out of range, 2 spent on an enemy, 3 exploded. */
@@ -914,9 +904,9 @@ export function updateProjectiles(w: World, dt: number): void {
         alive = false;
         break;
       }
-      // Monster projectiles stop at the minions of the character they hunt as well.
+      // A projectile stops at the minions of the other teams as well (they stand outside `w.actors`).
       const na = w.actors.length;
-      const foes: readonly Actor[] = pr.team === MONSTERS ? hunted(w, pr).side!.minions : NO_ACTORS;
+      const foes = foeMinions(w, pr.team);
       const nm = foes.length;
       for (let k = 0; k < na + nm; k++) {
         const e = k < na ? w.actors[k] : foes[k - na];

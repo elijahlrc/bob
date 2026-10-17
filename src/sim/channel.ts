@@ -5,6 +5,7 @@ import { orbUse, releaseGhost, releaseZaps } from './fields';
 import { scaleProfile } from './shots';
 import { scatterSpores } from './skillFx';
 import type { Action, Actor, World } from './types';
+import { livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /**
@@ -138,13 +139,8 @@ export function channelUse(w: World, a: Actor, act: Action): void {
   let gain = 1;
   if (spec.crowdStage) {
     let near = 0;
-    for (const e of w.actors)
-      if (
-        e.team !== a.team &&
-        e.alive &&
-        Math.hypot(e.x - a.x, e.y - a.y) <= spec.crowdStage.radius
-      )
-        near++;
+    for (const e of livingEnemiesOf(w, a.team))
+      if (Math.hypot(e.x - a.x, e.y - a.y) <= spec.crowdStage.radius) near++;
     if (near >= spec.crowdStage.min) gain += 1;
   }
   st.stage = Math.min(spec.cap, st.stage + gain);

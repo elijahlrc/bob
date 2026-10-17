@@ -689,7 +689,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     const pool = w.sides[0].shell!.left;
     expect(pool).toBeGreaterThan(0);
     const life = w.sides[0].player.life;
-    rawHit(w, w.sides[0].player, 100, 0, 'Test');
+    rawHit(w, w.sides[0].player, 100, 0, null, 'Test');
     expect(life - w.sides[0].player.life).toBeLessThan(100);
     expect(w.sides[0].shell!.taken).toBeGreaterThan(1);
     dummy.life = 1e9;

@@ -217,6 +217,107 @@ export type Side = {
 export const MONSTERS = 1;
 
 /**
+ * The living enemies of a team: the actors of `w.actors` (the characters and the monsters) of another team, then the minions of
+ * every side of another team, side by side. Minions are not in `w.actors` (a side keeps its own, docs/DUEL.md 3.1), so a list
+ * built from `w.actors` alone sees the other character and never its minions. The minions of a side whose character has fallen
+ * are left out (the order is the monsters' old one: `w.actors`, then the minions). On a map the one side is the character's team,
+ * so this is the actors of the other teams and nothing more.
+ */
+export function livingEnemiesOf(w: World, team: number): Actor[] {
+  const out: Actor[] = [];
+  const actors = w.actors;
+  for (let i = 0; i < actors.length; i++) {
+    const a = actors[i];
+    if (a.team !== team && a.alive) out.push(a);
+  }
+  const sides = w.sides;
+  for (let i = 0; i < sides.length; i++) {
+    const s = sides[i];
+    if (s.team === team || !s.player.alive) continue;
+    const ms = s.minions;
+    for (let k = 0; k < ms.length; k++) if (ms[k].alive) out.push(ms[k]);
+  }
+  return out;
+}
+
+/**
+ * Calls `fn` for each living enemy of a team: the actors of `w.actors`, then the minions of the other sides. The lists are read as
+ * the loop goes (what `fn` kills is skipped, what it summons is reached), as a `for` over `w.actors` reads them, so a loop that
+ * strikes and so kills can use it in place of one. A side whose fallen character has minions left has them skipped, as in
+ * `livingEnemiesOf`.
+ */
+export function eachEnemy(w: World, team: number, fn: (e: Actor) => void): void {
+  const actors = w.actors;
+  for (let i = 0; i < actors.length; i++) {
+    const a = actors[i];
+    if (a.team !== team && a.alive) fn(a);
+  }
+  const sides = w.sides;
+  for (let i = 0; i < sides.length; i++) {
+    const s = sides[i];
+    if (s.team === team || !s.player.alive) continue;
+    const ms = s.minions;
+    for (let k = 0; k < ms.length; k++) if (ms[k].alive) fn(ms[k]);
+  }
+}
+
+/**
+ * The living enemies of a team that are not phased out and stand within `r` of a point (`pad`: within `r` of their edge), in the
+ * order of `livingEnemiesOf`: what an area or an aura of that team reaches.
+ */
+export function enemiesWithin(
+  w: World,
+  team: number,
+  x: number,
+  y: number,
+  r: number,
+  pad: boolean,
+): Actor[] {
+  const out: Actor[] = [];
+  const actors = w.actors;
+  for (let i = 0; i < actors.length; i++) {
+    const e = actors[i];
+    if (
+      e.team !== team &&
+      e.alive &&
+      e.phaseT <= 0 &&
+      Math.hypot(e.x - x, e.y - y) <= (pad ? r + e.r : r)
+    )
+      out.push(e);
+  }
+  const sides = w.sides;
+  for (let i = 0; i < sides.length; i++) {
+    const s = sides[i];
+    if (s.team === team || !s.player.alive) continue;
+    const ms = s.minions;
+    for (let k = 0; k < ms.length; k++) {
+      const e = ms[k];
+      if (e.alive && e.phaseT <= 0 && Math.hypot(e.x - x, e.y - y) <= (pad ? r + e.r : r))
+        out.push(e);
+    }
+  }
+  return out;
+}
+
+/**
+ * The minions standing for sides of another team, for the loops that must not allocate (a projectile asks every step). The list
+ * of the one side that is not `team`'s is that side's own list, not a copy.
+ */
+export function foeMinions(w: World, team: number): readonly Actor[] {
+  const sides = w.sides;
+  let one: readonly Actor[] | null = null;
+  let many: Actor[] | null = null;
+  for (let i = 0; i < sides.length; i++) {
+    const s = sides[i];
+    if (s.team === team || s.minions.length === 0) continue;
+    if (!one) one = s.minions;
+    else (many ??= [...one]).push(...s.minions);
+  }
+  return many ?? one ?? NO_MINIONS;
+}
+const NO_MINIONS: readonly Actor[] = [];
+
+/**
  * The character a monster hunts: that of the nearest living side (on a map, the only one; docs/DUEL.md 3.2). With none alive the
  * first side's character stands in, as the one character of a map did when it was dead.
  */

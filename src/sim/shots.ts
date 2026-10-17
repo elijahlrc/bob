@@ -6,7 +6,7 @@ import { actorById } from './actions';
 import { mirrorLanded } from './skillFx';
 import { hit } from './combat';
 import type { Action, Actor, Projectile, World } from './types';
-import { hunted } from './side';
+import { hunted, livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /**
@@ -376,9 +376,7 @@ export function releaseCaught(w: World, a: Actor): void {
 }
 
 function enemiesOfOwner(w: World, owner: Actor): Actor[] {
-  return owner.isPlayer
-    ? w.actors.filter((e) => e.team !== owner.team && e.alive)
-    : [hunted(w, owner)];
+  return owner.isPlayer ? livingEnemiesOf(w, owner.team) : [hunted(w, owner)];
 }
 
 /**

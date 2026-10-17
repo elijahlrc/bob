@@ -5,6 +5,7 @@ import type { UtilityDef } from '../data/gems';
 import { reservedMana } from './reserve';
 import { applyStatus } from './statuses';
 import type { Actor, World } from './types';
+import { enemiesWithin, livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /**
@@ -65,8 +66,8 @@ export function bannerAction(
   if (b && b.key === c.key && !b.placed) {
     if (b.stages >= s.spec.maxStages) return 'place';
     if (b.stages < PLACE_AT_STAGES) return null;
-    const near = w.actors.filter(
-      (e) => e.team !== p.team && e.alive && Math.hypot(e.x - p.x, e.y - p.y) <= FIGHT_RADIUS,
+    const near = livingEnemiesOf(w, p.team).filter(
+      (e) => Math.hypot(e.x - p.x, e.y - p.y) <= FIGHT_RADIUS,
     ).length;
     const big =
       target.rarity === 'boss' || target.rarity === 'miniboss' || target.rarity === 'rare';
@@ -166,12 +167,6 @@ export function tickBanner(w: World, side: Side, dt: number): void {
   if (b.pulseT > 0) return;
   b.pulseT += PULSE;
   const v = levelValue(s.spec.enemy.v, c.skill.level) * b.effect;
-  for (const e of w.actors)
-    if (
-      e.team !== side.team &&
-      e.alive &&
-      e.phaseT <= 0 &&
-      Math.hypot(e.x - cx, e.y - cy) <= b.radius + e.r
-    )
-      applyStatus(w, e, s.spec.enemy.id, { seconds: PULSE * 2.4, v });
+  for (const e of enemiesWithin(w, side.team, cx, cy, b.radius, true))
+    applyStatus(w, e, s.spec.enemy.id, { seconds: PULSE * 2.4, v });
 }

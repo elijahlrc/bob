@@ -68,5 +68,5 @@ export function tickCollapse(w: World, s: Side): void {
   const p = s.player;
   const m = measurePath(w.plan.lab);
   w.collapseGap = pathProgress(m, p.x, p.y) - w.collapseFront;
-  if (w.collapseGap < 0 && p.alive) rawHit(w, p, 1e9, 0, 'The Collapse');
+  if (w.collapseGap < 0 && p.alive) rawHit(w, p, 1e9, 0, null, 'The Collapse');
 }

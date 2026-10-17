@@ -277,7 +277,7 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
     if (m.abT[i] > 0) return;
     m.abT[i] = TITHE_PULSE;
     const amount = monsterHitOf(m) * ab.amount! * TITHE_PULSE;
-    rawHit(w, p, amount, 4, 'Tithe');
+    rawHit(w, p, amount, 4, null, 'Tithe');
     m.life = Math.min(m.def.maxLife, m.life + amount);
   },
   sigil({ w, m, p, dt, d, ab }) {

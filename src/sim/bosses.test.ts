@@ -391,7 +391,7 @@ describe('the Unmaker (docs/BOSSES.md 9)', () => {
     const shard = st.shards[0].actor;
     shard.life = 0.001;
     const { rawHit } = await import('./combat');
-    rawHit(w, shard, 1e6, 0);
+    rawHit(w, shard, 1e6, 0, null);
     expect(theftOf(w).res).toBeUndefined();
     expect(w.sides[0].player.def.res[el]).toBeCloseTo(before[el]);
     expect(m.stunT).toBeGreaterThan(1);
@@ -437,7 +437,7 @@ describe('the Unmaker (docs/BOSSES.md 9)', () => {
     run(w, 0.1);
     const { rawHit } = await import('./combat');
     m.life = 1;
-    rawHit(w, m, 1e9, 0);
+    rawHit(w, m, 1e9, 0, null);
     expect(m.alive).toBe(false);
     expect(theftOf(w)).toEqual({});
     expect(bossState(m)!.shards).toHaveLength(0);
@@ -527,7 +527,7 @@ describe('the Siege Marshal (docs/BOSSES.md 5a)', () => {
     const st = bossState(m)!;
     run(w, HORN_TELL + 0.3);
     const soldiers = [...st.soldiers];
-    rawHit(w, m, 1e12, 0);
+    rawHit(w, m, 1e12, 0, null);
     expect(m.alive).toBe(false);
     expect(soldiers.every((s) => !s.alive)).toBe(true);
   });
@@ -693,7 +693,7 @@ describe('the Sundered Twins (docs/BOSSES.md 5d)', () => {
       const live = twins[first === 'ash' ? 1 : 0];
       const st = bossState(live)!;
       expect(bossDamageMult(live)).toBe(1);
-      rawHit(w, dead, 1e12, 0);
+      rawHit(w, dead, 1e12, 0, null);
       expect(dead.alive).toBe(false);
       expect(live.alive).toBe(true);
       expect(st.grief).toBe(true);
@@ -747,10 +747,10 @@ describe('on a real boss map', () => {
     expect(Math.hypot(twins[0].x - twins[1].x, twins[0].y - twins[1].y)).toBeGreaterThan(2);
     const { rawHit } = await import('./combat');
     for (const a of w.actors) if (!a.isPlayer && !twins.includes(a)) a.alive = false;
-    rawHit(w, twins[0], 1e12, 0);
+    rawHit(w, twins[0], 1e12, 0, null);
     run(w, 0.5);
     expect(w.exitOpen).toBe(false);
-    rawHit(w, twins[1], 1e12, 0);
+    rawHit(w, twins[1], 1e12, 0, null);
     run(w, 0.5);
     expect(w.exitOpen).toBe(true);
   });
