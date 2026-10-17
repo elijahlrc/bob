@@ -4,6 +4,7 @@ import { tickPhases } from './phases';
 import { Character } from '../calc/character';
 import { noCharges, type ChargeCounts } from '../calc/charges';
 import { buildMonster, scaleOf, type MonsterSpec } from '../calc/monster';
+import { mix32 } from '../core/hash';
 import { Rng } from '../core/rng';
 import { DT } from '../data/constants';
 import { affixPlayerMods } from '../data/mapAffixes';
@@ -355,7 +356,7 @@ export function createWorld(inp: CreateWorldInput | MapWorldInput): World {
     grid,
     sides,
     order: sides,
-    orderPhase: 0,
+    orderSeed: 0,
     t: 0,
     tick: 0,
     rngCombat: root.fork('combat'),
@@ -705,12 +706,14 @@ function flowOrigins(w: World): Actor[] {
 const reversedSides = new WeakMap<Side[], Side[]>();
 
 /**
- * The sides in the order they act in the tick `w.tick` (docs/DUEL.md 3.3, 4.4): in turn when `tick + orderPhase` is even and
- * reversed when it is odd, so that the side that strikes first in a tie is not always the same. With one side (a map) it is
+ * The sides in the order they act in the tick `w.tick` (docs/DUEL.md 3.3, 4.4): in turn, or reversed when a mix of the tick and
+ * `w.orderSeed` is odd, so that the side that strikes first in a tie is not the same one at every exchange of a fight (the parity
+ * of the tick would be, for two characters of one rhythm). Deterministic from the tick and the seed. With one side (a map) it is
  * `w.sides` itself, always.
  */
 function sidesInOrder(w: World): Side[] {
-  if (w.sides.length < 2 || ((w.tick + w.orderPhase) & 1) === 0) return w.sides;
+  if (w.sides.length < 2 || (mix32(w.tick + Math.imul(w.orderSeed, 0x9e3779b1)) & 1) === 0)
+    return w.sides;
   let r = reversedSides.get(w.sides);
   if (!r || r.length !== w.sides.length) {
     r = [...w.sides].reverse();

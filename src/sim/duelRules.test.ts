@@ -195,11 +195,10 @@ describe('how a duel ends', () => {
 });
 
 describe('the order of the sides', () => {
-  it('is reversed on an odd tick: side 1 first, then side 0 on the next', () => {
-    const w = createDuelWorld(vanguard(1), vanguard(2), 1);
-    w.orderPhase = 0;
+  /** The ids of the sides in the order they were stepped, one list for each tick (the flask policy is asked once for each side). */
+  const trace = (w: World, ticks: number): number[][] => {
     const seen: number[][] = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < ticks; i++) {
       const tick: number[] = [];
       stepWorld(w, (_w, s) => {
         tick.push(s.id);
@@ -207,27 +206,43 @@ describe('the order of the sides', () => {
       });
       seen.push(tick);
     }
-    expect(seen).toEqual([
-      [1, 0],
-      [0, 1],
-      [1, 0],
-      [0, 1],
-    ]);
+    return seen;
+  };
+
+  it('changes within one fight, tick by tick, and neither side is first more often than a fair coin allows', () => {
+    const seen = trace(createDuelWorld(vanguard(1), vanguard(2), 1), 1000);
+    expect(seen.every((t) => t.length === 2 && t[0] !== t[1])).toBe(true);
+    const first0 = seen.filter((t) => t[0] === 0).length;
+    // 3 standard deviations of a fair coin over 1000 ticks: 500 plus or minus 47.
+    expect(Math.abs(first0 - 500)).toBeLessThanOrEqual(47);
+    // Not the alternation of the parity of the tick: some tick follows one of the same order.
+    expect(seen.some((t, i) => i > 0 && t[0] === seen[i - 1][0])).toBe(true);
+    // And no fixed rhythm either: the ticks that put side 1 first are not all of one parity.
+    const parities = new Set(seen.flatMap((t, i) => (t[0] === 1 ? [(i + 1) % 2] : [])));
+    expect(parities.size).toBe(2);
   });
 
-  it('is the same array object while it does not change, and `sides` itself on a tick of the plain order', () => {
+  it('is drawn from the tick and the seed: the same seed gives the same order, another seed another', () => {
+    const order = (seed: number) => trace(createDuelWorld(vanguard(1), vanguard(2), seed), 200);
+    expect(order(7)).toEqual(order(7));
+    expect(order(7)).not.toEqual(order(8));
+    expect(createDuelWorld(vanguard(1), vanguard(2), 7).orderSeed).toBe(7);
+  });
+
+  it('is `sides` itself or the same one array reversed, so a tick does not allocate', () => {
     const w = createDuelWorld(vanguard(1), vanguard(2), 1);
-    w.orderPhase = 0;
-    stepWorld(w);
-    const odd = w.order;
-    expect(odd).toEqual([w.sides[1], w.sides[0]]);
-    stepWorld(w);
-    expect(w.order).toBe(w.sides);
-    stepWorld(w);
-    expect(w.order).toBe(odd);
+    const orders = new Set<unknown>();
+    for (let i = 0; i < 40; i++) {
+      stepWorld(w);
+      orders.add(w.order);
+    }
+    expect(orders.size).toBe(2);
+    expect(orders.has(w.sides)).toBe(true);
+    const reversed = [...orders].find((o) => o !== w.sides);
+    expect(reversed).toEqual([w.sides[1], w.sides[0]]);
   });
 
-  it('puts the characters in their places in the actor loop too, and the seed says which side is first on an even tick', () => {
+  it('puts the characters in their places in the actor loop too', () => {
     // Two mirror characters start their first use on the same tick: the order of their events is the order they act in.
     const firstUses = (seed: number): { order: number[]; uses: number[] } => {
       const w = createDuelWorld(vanguard(1), vanguard(1), seed);
@@ -238,18 +253,20 @@ describe('the order of the sides', () => {
       }
       throw new Error('the two characters never began a use in the same tick');
     };
-    const odd = firstUses(1);
-    const even = firstUses(2);
-    expect(odd.uses).toEqual(odd.order);
-    expect(even.uses).toEqual(even.order);
-    expect(odd.order).not.toEqual(even.order);
-    expect(createDuelWorld(vanguard(1), vanguard(2), 1).orderPhase).toBe(1);
-    expect(createDuelWorld(vanguard(1), vanguard(2), 2).orderPhase).toBe(0);
+    const orders = new Set<string>();
+    for (let seed = 1; seed <= 12; seed++) {
+      const { order, uses } = firstUses(seed);
+      expect(uses).toEqual(order);
+      orders.add(order.join(','));
+    }
+    // Over seeds both of them are first at that exchange.
+    expect([...orders].sort()).toEqual(['1,2', '2,1']);
   });
 
   it('never changes for one side: a map’s order is its `sides`, tick after tick', () => {
     const { world } = createDummyWorld(vanguard(1), { distance: 4 });
     expect(world.sides).toHaveLength(1);
+    expect(world.orderSeed).toBe(0);
     for (let i = 0; i < 10; i++) {
       stepWorld(world);
       expect(world.order).toBe(world.sides);
@@ -322,6 +339,31 @@ describe('the damage scale', () => {
     };
     expect(burning(1)).toBeGreaterThan(0);
     expect(burning(0.5)).toBeCloseTo(burning(1) / 2, 6);
+    // A Molten Shell's burst is of what the shell took as it was before the scale, and is scaled once, as it lands on the other
+    // character: ×0.5 of the burst at ×1, not ×0.25.
+    const shellBurst = (k: number) => {
+      const w = scaled(k);
+      const [sa, sb] = w.sides;
+      sb.buffT.moltenGuard = 1e9;
+      sb.shell = {
+        left: 1e9,
+        taken: 0,
+        absorb: 0.5,
+        reflect: 100,
+        radius: 30,
+        buff: 'moltenGuard',
+        profile: sb.char.profile(sb.primary, 0),
+      };
+      rawHit(w, sb.player, 100, 0, null, 'Test');
+      expect(sb.shell!.taken).toBeGreaterThan(0);
+      // The buff ends: the shell goes out as fire on A.
+      sb.buffT.moltenGuard = 0;
+      stepWorld(w);
+      expect(sb.shell).toBeNull();
+      return sa.stats.damageTaken;
+    };
+    expect(shellBurst(1)).toBeGreaterThan(0);
+    expect(shellBurst(0.5)).toBeCloseTo(shellBurst(1) / 2, 6);
   });
 
   it('is the same for both sides', () => {

@@ -86,8 +86,8 @@ export function createDuelWorld(a: Build, b: Build, seed: number, opts: DuelOpts
     // (The world's own cap is a tick beyond the duel's, so that the duel is what ends the fight.)
     opts: { maxTime: maxTime + 1, autoAbandonAt: Infinity, noExit: true },
   });
-  // Which of the two sides acts first on an even tick is the seed's to say (see `World.orderPhase`).
-  w.orderPhase = (seed | 0) & 1;
+  // The order of the two sides is drawn tick by tick from the seed (see `World.orderSeed`).
+  w.orderSeed = seed | 0;
   return w;
 }
 

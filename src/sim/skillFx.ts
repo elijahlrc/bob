@@ -813,7 +813,9 @@ export function shellTakes(side: Side, total: number): number {
   if (!s || s.left <= 0) return 0;
   const taken = Math.min(s.left, total * s.absorb);
   s.left -= taken;
-  s.taken += taken;
+  // The pool is measured against the damage the character takes, scaled in a duel like its life (docs/DUEL.md 4.4); what the burst
+  // gives back is of the damage as it was before the scale, which the burst is given when it lands. (`total` > 0 says the scale is not 0.)
+  s.taken += taken / side.damageScale;
   return taken;
 }
 

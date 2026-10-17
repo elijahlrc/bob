@@ -144,7 +144,8 @@ describe('what is one side’s stays its side’s', () => {
     expect(sa.shell).toBeNull();
     expect(sa.stats.damageTaken).toBeGreaterThan(0);
     // Half of each of A's hits went into the shell, and the other half is what B took.
-    expect(sb.shell!.taken).toBeCloseTo(sb.stats.damageTaken, 6);
+    // (The shell keeps what it took as it was before the duel's scale, which its burst is given when it lands.)
+    expect(sb.shell!.taken * sb.damageScale).toBeCloseTo(sb.stats.damageTaken, 6);
     expect(sb.stats.damageTaken).toBeCloseTo(total(sa.ledger.dealt), 6);
   });
 

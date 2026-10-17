@@ -123,7 +123,7 @@ export const FLASK_CHARGES_ON_KILL = { normal: 1, magic: 3.5, rare: 6, unique: 1
 /**
  * What the damage a character takes in a duel is multiplied by, both sides (a hit, a burst, every tick of damage over time).
  * Measured with the bot's builds (docs/DUEL.md 4.4): at ×0.3 the median fight is 16 s among builds of the legacy difficulty at maps 20
- * and 40 and 25 s among builds of the default difficulty at maps 5 to 20, with 2% and 6% of the fights ending on the time cap
+ * and 40 and 25 s among builds of the default difficulty at maps 5 to 20, with 3% and 6% of the fights ending on the time cap
  * (at ×1 the median is 6 s).
  */
 export const DUEL_DAMAGE_SCALE = 0.3;
