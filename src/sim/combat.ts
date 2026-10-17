@@ -855,8 +855,8 @@ function takeFlaskCharges(victim: Side, m: Actor, share: number): number {
   if (!best) return 0;
   const take = Math.min(best.charges, best.spec.maxCharges * share);
   best.charges -= take;
-  m.stolen += take;
-  m.stolenFlask = best.spec.uid;
+  m.theft.stolen += take;
+  m.theft.stolenFlask = best.spec.uid;
   return take;
 }
 
@@ -866,7 +866,7 @@ function onMonsterHitPlayer(w: World, src: Actor, dst: Actor, prof: SkillProfile
   if (steal || src.modIds.includes('flaskTaker') || src.modIds.includes('treasurer')) {
     const got = takeFlaskCharges(dst.side!, src, steal?.amount ?? 0.2);
     // A thief runs with what it took.
-    if (steal && got > 0) src.fleeT = 5;
+    if (steal && got > 0) src.theft.fleeT = 5;
   }
   const debuff = prof.skill.debuff;
   const hobbles = src.modIds.includes('hobbling') || src.mon?.kind.hobbles || debuff === 'hobble';

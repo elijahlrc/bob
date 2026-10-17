@@ -190,40 +190,45 @@ export type Actor = {
   /** Lies in wait (an Ambush) until the character is close or it is hit. */
   hold: boolean;
   /** A Patrol: the two points it walks between while it has not noticed the character, and which one it is heading for. */
-  patrol: { x: number; y: number }[] | null;
-  patrolI: number;
-  /** The next tile of the way to the patrol point, and when it is worked out again. */
-  pathT: number;
-  nextX: number;
-  nextY: number;
+  patrol: { points: { x: number; y: number }[]; i: number } | null;
   /** Timers of the abilities after the first eight, by index in the type's list (see sim/abilities.ts). */
   abT: number[];
   /** Sidearm, window and mode state (docs/ENCOUNTERS.md), for the types that have any. */
   enc: EncState | undefined;
-  /** Where a charge or a leap is heading, and how long is left of it (zero: not in one). */
-  dashT: number;
-  /** Seconds of wind-up left before a leap or a charge (zero: not winding up). */
-  windT: number;
-  /** Tiles a second of the dash it is in. */
-  dashV: number;
-  /** Seconds left of running away (a Cutpurse that has stolen), and what it took: the flask and the charges. */
-  fleeT: number;
-  stolen: number;
-  stolenFlask: number;
+  dash: {
+    /** Where a charge or a leap is heading, and how long is left of it (zero: not in one). */
+    t: number;
+    /** Seconds of wind-up left before a leap or a charge (zero: not winding up). */
+    windT: number;
+    /** Tiles a second of the dash it is in. */
+    v: number;
+    x: number;
+    y: number;
+  };
+  theft: {
+    /** Seconds left of running away (a Cutpurse that has stolen), and what it took: the flask and the charges. */
+    fleeT: number;
+    stolen: number;
+    stolenFlask: number;
+  };
   /** The player: seconds left in which nothing recovers (a Bursar, the Treasurer). */
   suppressT: number;
-  dashX: number;
-  dashY: number;
   /** Where a burrowed Gnawing Queen will come up. */
   mark: { x: number; y: number };
   /** Seconds before a Hexcaller can hex again, and the time left of a Choirmaster channel. */
   hexCd: number;
   channelT: number;
-  /** A chasing monster: seconds it has spent held up (it walks but gets nowhere), and where it was and when it last tried to walk. */
-  blockT: number;
-  prevX: number;
-  prevY: number;
-  tryTick: number;
+  chase: {
+    /** A chasing monster: seconds it has spent held up (it walks but gets nowhere), and where it was and when it last tried to walk. */
+    blockT: number;
+    prevX: number;
+    prevY: number;
+    tryTick: number;
+    /** The next tile of the way to the patrol point, and when it is worked out again. */
+    pathT: number;
+    nextX: number;
+    nextY: number;
+  };
 };
 
 export type Projectile = {

@@ -415,7 +415,7 @@ export function noteTaken(w: World, m: Actor, dmg: number[]): void {
     w.events.push({ t: 'window', id: m.id, kind: 'quench' });
   }
   const riled = modeOf(type, 'riled');
-  if (riled && e.modeCd <= 0 && e.hits >= (riled.hits ?? 6) && !m.dashT && !m.windT) {
+  if (riled && e.modeCd <= 0 && e.hits >= (riled.hits ?? 6) && !m.dash.t && !m.dash.windT) {
     e.modeCd = riled.cooldown ?? 8;
     e.hits = 0;
     w.events.push({ t: 'window', id: m.id, kind: 'riled' });

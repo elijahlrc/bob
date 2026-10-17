@@ -103,14 +103,14 @@ describe('phases (docs/ROSTER.md 6.5)', () => {
     const hag = put(w, 'handler', 10);
     hag.life = hag.def.maxLife * 0.29;
     tickPhases(w, hag);
-    expect(hag.fleeT).toBeGreaterThan(3);
+    expect(hag.theft.fleeT).toBeGreaterThan(3);
     const d0 = Math.hypot(hag.x - w.sides[0].player.x, hag.y - w.sides[0].player.y);
     run(w, 2);
     expect(Math.hypot(hag.x - w.sides[0].player.x, hag.y - w.sides[0].player.y)).toBeGreaterThan(
       d0 + 1,
     );
     run(w, 5);
-    expect(hag.fleeT).toBeLessThanOrEqual(0);
+    expect(hag.theft.fleeT).toBeLessThanOrEqual(0);
   });
 
   it('a type can break into others at a share of its life', () => {
@@ -167,7 +167,7 @@ describe('packs that fight as packs (docs/ROSTER.md 6.7)', () => {
     const nest = put(w, 'nest', 12, 0, {}, 4);
     const swarm = [0, 1, 2].map((i) => put(w, 'gnawer', 13, i, {}, 4));
     killActor(w, nest);
-    for (const g of swarm) expect(g.fleeT).toBeGreaterThan(0);
+    for (const g of swarm) expect(g.theft.fleeT).toBeGreaterThan(0);
     // A pack of two has no one to rally: nothing happens.
     const lone = put(w, 'handler', 12, 0, {}, 5);
     const one = put(w, 'hound', 13, 0, {}, 5);

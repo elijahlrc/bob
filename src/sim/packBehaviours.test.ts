@@ -101,10 +101,13 @@ describe('Ambush and Patrol (docs/ENEMIES.md 4.2)', () => {
   it('a patrol walks to its far point and back, slowly, until it notices the character', () => {
     const w = arena();
     const m = put(w, 'warrior', 25);
-    m.patrol = [
-      { x: m.x, y: m.y },
-      { x: m.x, y: m.y - 6 },
-    ];
+    m.patrol = {
+      points: [
+        { x: m.x, y: m.y },
+        { x: m.x, y: m.y - 6 },
+      ],
+      i: 1,
+    };
     // Out of the character\'s sight, so that it keeps walking.
     const start = { x: m.x, y: m.y };
     run(w, 2);

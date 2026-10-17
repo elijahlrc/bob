@@ -116,6 +116,6 @@ export function rally(w: World, dead: Actor): void {
   for (const a of mates) {
     if (def.faction === 'kennel') a.buffT = Math.max(a.buffT, 6);
     else if (def.faction === 'choir') a.stunT = Math.max(a.stunT, 0.7);
-    else if (def.faction === 'swarm') a.fleeT = Math.max(a.fleeT, 2.5);
+    else if (def.faction === 'swarm') a.theft.fleeT = Math.max(a.theft.fleeT, 2.5);
   }
 }

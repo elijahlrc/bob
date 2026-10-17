@@ -168,6 +168,6 @@ export function rollStatuses(
   if (!blocked && p.fleeChance > 0 && w.rngTrig.chance(p.fleeChance)) {
     // Rare monsters do not flee, and magic ones shrug it off half the time.
     if (dst.rarity === 'normal' || (dst.rarity === 'magic' && w.rngTrig.chance(0.5)))
-      dst.fleeT = Math.max(dst.fleeT, 3);
+      dst.theft.fleeT = Math.max(dst.theft.fleeT, 3);
   }
 }

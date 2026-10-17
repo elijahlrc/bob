@@ -328,7 +328,7 @@ export function createWorld(inp: CreateWorldInput): World {
     const a = spawnMonster(w, s.spec, s.x, s.y, s.room, s.pack, s.name);
     // A Stalker Cat lies in wait wherever it is; a pack that is an Ambush does so as a whole.
     if (s.hold || abilitiesOf(s.spec.type).some((x) => x.id === 'ambush')) a.hold = true;
-    if (s.patrol) a.patrol = s.patrol.map((p) => ({ ...p }));
+    if (s.patrol) a.patrol = { points: s.patrol.map((p) => ({ ...p })), i: 1 };
   }
   seedCharacters(side);
   return w;

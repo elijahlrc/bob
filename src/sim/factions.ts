@@ -306,10 +306,10 @@ export function onMonsterDeath(w: World, a: Actor): void {
     if (twin) twin.mirror.t = 3;
   }
   // A thief that dies gives back what it took.
-  if (a.stolen > 0) {
-    const f = hunted(w, a).side!.flasks.find((x) => x.spec.uid === a.stolenFlask);
-    if (f) f.charges = Math.min(f.spec.maxCharges, f.charges + a.stolen);
-    a.stolen = 0;
+  if (a.theft.stolen > 0) {
+    const f = hunted(w, a).side!.flasks.find((x) => x.spec.uid === a.theft.stolenFlask);
+    if (f) f.charges = Math.min(f.spec.maxCharges, f.charges + a.theft.stolen);
+    a.theft.stolen = 0;
   }
   // A Core Golem leaves burning, chilled or shocked ground behind (6 s).
   if (type === 'golem' && a.mon.spec.variant !== 'none') {

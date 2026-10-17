@@ -175,7 +175,7 @@ describe('the skills that inflict statuses', () => {
     let fled = false;
     for (let i = 0; i < 20 * 60 && !fled; i++) {
       stepWorld(world);
-      fled = dummy.fleeT > 0;
+      fled = dummy.theft.fleeT > 0;
     }
     expect(fled).toBe(true);
   });

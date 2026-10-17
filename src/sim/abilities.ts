@@ -48,13 +48,13 @@ export const tithing = (a: Actor): boolean => tithers.has(a);
 
 /** Run a leap or a charge: cooldown, then a warning on the ground, then the rush itself. */
 function dashing({ w, m, p, dt, d, ab, i }: Ctx, kind: 'leap' | 'charge'): void {
-  if (m.dashT > 0) {
+  if (m.dash.t > 0) {
     advanceDash(w, m, dt);
     return;
   }
-  if (m.windT > 0) {
-    m.windT -= dt;
-    if (m.windT <= 0) beginDash(m, kind);
+  if (m.dash.windT > 0) {
+    m.dash.windT -= dt;
+    if (m.dash.windT <= 0) beginDash(m, kind);
     return;
   }
   // A hound whose pack is about to Encircle waits to leap with the rest (docs/ENCOUNTERS.md 8).
@@ -70,9 +70,9 @@ function dashing({ w, m, p, dt, d, ab, i }: Ctx, kind: 'leap' | 'charge'): void 
 /** Wind up a leap or a charge at where the character stands now: the place is marked on the ground for the whole warning. */
 function aimDash(w: World, m: Actor, kind: 'leap' | 'charge', telegraph: number): void {
   const p = hunted(w, m);
-  m.windT = telegraph;
-  m.dashX = p.x;
-  m.dashY = p.y;
+  m.dash.windT = telegraph;
+  m.dash.x = p.x;
+  m.dash.y = p.y;
   w.effects.push({
     id: w.nextId++,
     x: p.x,
@@ -91,26 +91,26 @@ function aimDash(w: World, m: Actor, kind: 'leap' | 'charge', telegraph: number)
 
 /** A charge on the spot, with a short warning (a Riled Rend-boar, docs/ENCOUNTERS.md 6); the charge ability carries it out. */
 export function startCharge(w: World, m: Actor, telegraph: number): void {
-  if (m.stunT > 0 || m.dashT > 0 || m.windT > 0) return;
+  if (m.stunT > 0 || m.dash.t > 0 || m.dash.windT > 0) return;
   aimDash(w, m, 'charge', telegraph);
 }
 
 function beginDash(m: Actor, kind: 'leap' | 'charge'): void {
-  const dx = m.dashX - m.x;
-  const dy = m.dashY - m.y;
+  const dx = m.dash.x - m.x;
+  const dy = m.dash.y - m.y;
   const len = Math.max(0.01, Math.hypot(dx, dy));
   const dist = kind === 'charge' ? len + CHARGE_OVERSHOOT : len;
-  m.dashV = kind === 'charge' ? CHARGE_SPEED : LEAP_SPEED;
-  m.dashT = dist / m.dashV;
-  m.dashX = m.x + (dx / len) * dist;
-  m.dashY = m.y + (dy / len) * dist;
+  m.dash.v = kind === 'charge' ? CHARGE_SPEED : LEAP_SPEED;
+  m.dash.t = dist / m.dash.v;
+  m.dash.x = m.x + (dx / len) * dist;
+  m.dash.y = m.y + (dy / len) * dist;
 }
 
 function advanceDash(w: World, m: Actor, dt: number): void {
-  const dx = m.dashX - m.x;
-  const dy = m.dashY - m.y;
+  const dx = m.dash.x - m.x;
+  const dy = m.dash.y - m.y;
   const len = Math.hypot(dx, dy);
-  const move = Math.min(len, m.dashV * dt);
+  const move = Math.min(len, m.dash.v * dt);
   const to = w.grid.collide(
     m.x + (dx / Math.max(len, 1e-6)) * move,
     m.y + (dy / Math.max(len, 1e-6)) * move,
@@ -120,12 +120,12 @@ function advanceDash(w: World, m: Actor, dt: number): void {
   m.x = to.x;
   m.y = to.y;
   m.moving = true;
-  m.dashT -= dt;
+  m.dash.t -= dt;
   // It stops at a wall, when it has run its length, or when it has reached the character.
   const p = hunted(w, m);
   const reach = (m.mon?.range ?? 1) + p.r + m.r;
   if (moved < move * 0.3 || len - move < 0.05 || Math.hypot(p.x - m.x, p.y - m.y) <= reach)
-    m.dashT = 0;
+    m.dash.t = 0;
 }
 
 const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {

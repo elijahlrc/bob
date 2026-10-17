@@ -168,7 +168,7 @@ describe('windows and modes (docs/ENCOUNTERS.md 5 and 6)', () => {
     const w = arena();
     const m = put(w, 'boar', 6);
     for (let i = 0; i < 6; i++) strike(w, m, [1, 0, 0, 0, 0]);
-    expect(m.windT).toBeGreaterThan(0);
+    expect(m.dash.windT).toBeGreaterThan(0);
   });
 
   it('a Hag at 30% chants over the bodies round it; a stun stops the chant and its bursts', () => {

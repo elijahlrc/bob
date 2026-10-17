@@ -749,34 +749,35 @@ function minionInSight(w: World, m: Actor, range: number): Actor | null {
  * up (by the minions, or by the crowd around it); `blockT` counts the seconds.
  */
 function chaseStep(w: World, m: Actor, tx: number, ty: number, dt: number, pace = 1): void {
-  if (m.tryTick === w.tick - 1) {
-    const moved = Math.hypot(m.x - m.prevX, m.y - m.prevY);
+  if (m.chase.tryTick === w.tick - 1) {
+    const moved = Math.hypot(m.x - m.chase.prevX, m.y - m.chase.prevY);
     const want = m.def.moveSpeed * (1 - m.ail.chill) * moveMult(m) * dt * pace;
-    if (moved < want * 0.4) m.blockT += dt;
-    else m.blockT = Math.max(0, m.blockT - 2 * dt);
+    if (moved < want * 0.4) m.chase.blockT += dt;
+    else m.chase.blockT = Math.max(0, m.chase.blockT - 2 * dt);
   }
-  m.tryTick = w.tick;
-  m.prevX = m.x;
-  m.prevY = m.y;
+  m.chase.tryTick = w.tick;
+  m.chase.prevX = m.x;
+  m.chase.prevY = m.y;
   monsterMove(w, m, tx, ty, dt * pace);
 }
 
 /** A patrol walks from one of its two points to the other and back, slowly, until it notices the character. */
 function patrolStep(w: World, m: Actor, dt: number): void {
-  const to = m.patrol![m.patrolI];
+  const patrol = m.patrol!;
+  const to = patrol.points[patrol.i];
   if (Math.hypot(to.x - m.x, to.y - m.y) < 1.2) {
-    m.patrolI = 1 - m.patrolI;
-    m.pathT = 0;
+    patrol.i = 1 - patrol.i;
+    m.chase.pathT = 0;
     return;
   }
-  m.pathT -= dt;
-  if (m.pathT <= 0) {
-    m.pathT = 0.4;
+  m.chase.pathT -= dt;
+  if (m.chase.pathT <= 0) {
+    m.chase.pathT = 0.4;
     const n = w.grid.astar(m.x, m.y, to.x, to.y)?.[0];
-    m.nextX = n ? n.x : to.x;
-    m.nextY = n ? n.y : to.y;
+    m.chase.nextX = n ? n.x : to.x;
+    m.chase.nextY = n ? n.y : to.y;
   }
-  step(w, m, m.nextX - m.x, m.nextY - m.y, dt * PATROL_SPEED);
+  step(w, m, m.chase.nextX - m.x, m.chase.nextY - m.y, dt * PATROL_SPEED);
 }
 
 export function monsterAI(w: World, m: Actor, dt: number): void {
@@ -785,7 +786,14 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
   whileStunned(m);
   if (!canAct(m)) return;
   // A Gloomstalker stands still while its blink gathers.
-  if (m.blinkT > 0 || m.phaseT > 0 || m.channelT > 0 || m.windT > 0 || m.dashT > 0 || stepping(m))
+  if (
+    m.blinkT > 0 ||
+    m.phaseT > 0 ||
+    m.channelT > 0 ||
+    m.dash.windT > 0 ||
+    m.dash.t > 0 ||
+    stepping(m)
+  )
     return;
   // A monster in a window (a Brace) holds its ground until it ends.
   if (m.enc && (inWindow(m) || tryWindow(w, m))) return;
@@ -845,8 +853,8 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     }
   }
   // A thief that has taken something runs from the character with it.
-  if (m.fleeT > 0) {
-    m.fleeT -= dt;
+  if (m.theft.fleeT > 0) {
+    m.theft.fleeT -= dt;
     const away = w.grid.collide(m.x - (p.x - m.x), m.y - (p.y - m.y), m.r);
     step(w, m, away.x - m.x, away.y - m.y, dt);
     return;
@@ -905,7 +913,7 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     // It cannot hit the player from here: it walks on toward the player, and shoots a minion in range and in sight only
     // once it is held up (a ranged monster goes for the character, not for what stands about it).
     const v =
-      hunted(w, m).side!.minions.length > 0 && m.blockT >= RANGED_BLOCKED_TIME && tg === p
+      hunted(w, m).side!.minions.length > 0 && m.chase.blockT >= RANGED_BLOCKED_TIME && tg === p
         ? minionInSight(w, m, range)
         : null;
     if (v) {
@@ -917,14 +925,14 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     return;
   }
   if (dtg <= range + tg.r + m.r) {
-    m.blockT = 0;
+    m.chase.blockT = 0;
     // A Bloater does not strike: it bursts on contact.
     if (m.mon!.spec.type === 'bloater') bloaterBurst(w, m);
     else startAction(w, m, 'monster', prof, tg);
     return;
   }
   // Held up on the way to the player (by minions, say): whatever minion is in reach gets hit instead.
-  if (m.blockT >= BLOCKED_TIME && hunted(w, m).side!.minions.length > 0) {
+  if (m.chase.blockT >= BLOCKED_TIME && hunted(w, m).side!.minions.length > 0) {
     const v = minionInReach(w, m, range);
     if (v) {
       startAction(w, m, 'monster', prof, v);
