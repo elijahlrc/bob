@@ -469,7 +469,8 @@ The reference monster is a normal Skeleton Warrior at the current area level.
   projectiles, ground effects (AoE telegraphs, explosions), and loot drops. Each has an integer id, position (tiles,
   float), radius, and team. `World` is the arena and holds the sides; a side's sub-steps of the tick run once per side,
   the arena's once (docs/DUEL.md 3).
-- **Collision:** circle vs tile grid (walls), with soft separation between monsters.
+- **Collision:** circle vs tile grid (walls), with soft separation between monsters, between the characters of different
+  sides, and between a side's minions and the monsters and the other side's character.
 - **Actions:** an action (attack or cast) has a wind-up equal to its use time. The hit lands at **60%** of use time.
   Movement stops during the action.
 - **Projectiles:** speed 12 tiles/s (_tunable_). They hit the first enemy, are destroyed by walls, and pierce or

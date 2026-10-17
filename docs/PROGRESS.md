@@ -1030,6 +1030,16 @@ branch 21.4 to 23.0 s, so the sim is about 3% slower, spread thin over the per-s
 literal, is avoided and written up in docs/PERFORMANCE.md. Looping `stepWorld`'s sides by index instead of `for...of` was tried and
 was inside the noise, so it was not kept.
 
+## Duels: two characters in one world (2026-10-16)
+
+docs/DUEL.md F2 built. `createWorld` makes any number of sides (a map still makes one), and `src/sim/duel.ts` fights two builds in the
+dummy's arena, 8 tiles apart, to a death or the time cap: `runDuel(a, b, seed)`, with `duelHash` for determinism. Two class starters
+fight to a death in about 18 to 25 simulated seconds (80 to 120 ms of wall time). The on-hit effects of a character's skill work on
+another character, a side's damage is credited to that side (ledger, `damageDealt`, the kill, the mend of a debuff), and characters
+and foreign minions separate. `src/sim/duel.test.ts` gives each kit to one side only (a shell, a flask, an ignite) and looks for it
+on the right side. The hash fence (default and `--deep`) is identical: a one-side world makes the very same events. What F3 and F4
+must know is in the Built note under DUEL.md section 7.
+
 ## Equipping: sockets, compare and the phone (2026-10-16)
 
 docs/EQUIP.md Q0 to Q7 built; Q8 is this entry and the docs. A swap now says what happens to the gems (`SocketOutcome`, `dryEquip`,
