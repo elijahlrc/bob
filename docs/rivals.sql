@@ -40,7 +40,7 @@ create table if not exists public.rivals (
   token_hash    text    not null check (token_hash ~ '^[0-9a-f]{64}$'),
   build         jsonb   not null check (pg_column_size(build) < 16384),
   -- The ranking's, never the client's. A ranking job with the service role will fight the pool and write these (docs/DUEL.md
-  -- section 13); the trigger in 3 resets them to these defaults on every insert, whatever the row sent, and the public key has
+  -- section 13); the trigger in 4 resets them to these defaults on every insert, whatever the row sent, and the public key has
   -- no update.
   rating        int         not null default 1000,
   fights        int         not null default 0,

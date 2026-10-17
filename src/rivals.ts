@@ -1,5 +1,7 @@
 import type { Controller } from './run/controller';
 import { hashToken, postRival, rivalRecord, validName } from './run/rivals';
+import type { RunState } from './run/run';
+import type { MapResult } from './sim/runMap';
 import { SINK, type Fetch, type Sink } from './run/telemetry';
 import { loadPref, savePref } from './ui/prefs';
 
@@ -83,6 +85,28 @@ const realDeps = (): RivalDeps => ({
   version: buildId(),
 });
 
+/** Send the character of a run that has just ended, if the player has opted in. Nothing here can throw. */
+function share(run: RunState, res: MapResult, deps: () => RivalDeps): void {
+  try {
+    if (!rivalsConfigured() || !rivalsOn()) return;
+    const d = deps();
+    // The run may not change under the send; the character is copied now.
+    const kept = { ...run, build: structuredClone(run.build) };
+    const name = sendName();
+    void hashToken(rivalToken())
+      .then((tokenHash) =>
+        postRival(
+          d.fetch,
+          d.sink,
+          rivalRecord(kept, res, { name, tokenHash, version: d.version, seed: run.seed }),
+        ),
+      )
+      .catch(() => undefined);
+  } catch {
+    // Never disturbs the end of a run.
+  }
+}
+
 /**
  * Send the character of every run that ends on `c`, a death and a win alike, when the player has opted in. It runs beside any
  * hook already on `c.onRunEnd` (telemetry's), whichever was installed first, and nothing it does can throw into the end of a run.
@@ -93,24 +117,7 @@ export function installRivals(c: Controller, deps: () => RivalDeps = realDeps): 
     try {
       prev?.(run, res);
     } finally {
-      try {
-        if (!rivalsConfigured() || !rivalsOn()) return;
-        const d = deps();
-        // The run may not change under the send; the character is copied now.
-        const kept = { ...run, build: structuredClone(run.build) };
-        const name = sendName();
-        void hashToken(rivalToken())
-          .then((tokenHash) =>
-            postRival(
-              d.fetch,
-              d.sink,
-              rivalRecord(kept, res, { name, tokenHash, version: d.version, seed: run.seed }),
-            ),
-          )
-          .catch(() => undefined);
-      } catch {
-        // Never disturbs the end of a run.
-      }
+      share(run, res, deps);
     }
   };
 }
