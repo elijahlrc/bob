@@ -8,6 +8,7 @@ import { setTelemetry, telemetryConfigured, telemetryOn } from '../telemetry';
 import { ask } from './Confirm';
 import { DebugPanel } from './Debug';
 import { RivalsOptIn } from './RivalsOptIn';
+import { UiScalePicker } from './UiScalePicker';
 import { UpdateNotice } from './UpdateNotice';
 
 /** Copies the saved run so it can be attached to a bug report, and says whether that worked. */
@@ -161,6 +162,7 @@ export function Title({ c }: { c: Controller }) {
       )}
       <TelemetryNotice />
       <RivalsOptIn />
+      <UiScalePicker />
       <DebugPanel c={c} />
     </div>
   );

@@ -37,6 +37,7 @@ import { Tip } from './Tip';
 import { stopDef } from '../data/stops';
 import { TreeView } from './TreeView';
 import { UpdateNotice } from './UpdateNotice';
+import { UiScalePicker } from './UiScalePicker';
 
 type Tab = 'tree' | 'sheet' | 'skills' | 'strategy' | 'items' | 'workbench' | 'report' | 'next';
 
@@ -393,6 +394,7 @@ export function Camp({ c }: { c: Controller }) {
             room.
           </div>
         )}
+        <UiScalePicker />
         <button class="btn" onClick={() => c.quit()}>
           Save and quit
         </button>

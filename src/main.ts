@@ -6,6 +6,7 @@ import { installTelemetry } from './telemetry';
 import { installUpdateCheck } from './update';
 import { Controller } from './run/controller';
 import { App } from './ui/App';
+import { installUiScale } from './ui/uiScale';
 import { monsterPortrait } from './render/styles/grim/portrait';
 import './ui/styles.css';
 import './ui/skins.css';
@@ -26,6 +27,7 @@ function storage(): Storage | null {
   }
 }
 
+installUiScale();
 const controller = new Controller(storage());
 controller.portrait = monsterPortrait;
 installCrashLog(controller);

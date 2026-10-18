@@ -22,6 +22,9 @@
 :root {
   font-family: var(--font);
   color: var(--text);
+  /* The interface size (uiScale.ts) is the player's; iOS must not enlarge text on its own in landscape. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 button {
   font: inherit;
@@ -1580,6 +1583,19 @@ select option {
 .telemetry input {
   accent-color: var(--accent-d);
   color-scheme: dark;
+}
+/* The interface size picker (UiScalePicker.tsx), on the title screen and at the foot of the camp. */
+.ui-scale {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 8px auto 0;
+  font-size: 12px;
+}
+.ui-scale .muted {
+  margin-right: 4px;
 }
 .rivals-opt {
   display: block;
