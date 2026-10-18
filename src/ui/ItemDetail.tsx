@@ -681,13 +681,12 @@ export function ItemDetail(p: Props) {
         )}
         {inBag && selected.kind === 'gem' && (
           <>
-            {!p.phone && <ItemCard it={selected} build={run.build} />}
+            <ItemCard it={selected} build={run.build} />
             <SocketPicker
               run={run}
               gemUid={selected.uid}
               onPlace={(ref) => a.onSocketAt(selected.uid, ref)}
             />
-            {p.phone && full && <ItemCard it={selected} build={run.build} />}
             <ActionRow
               swap="Socket"
               title="Into the place it helps most"
