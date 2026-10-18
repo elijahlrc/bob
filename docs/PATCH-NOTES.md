@@ -4,6 +4,12 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-18
+
+- On phones and tablets, a new Interface size setting on the title screen and at camp makes the whole game bigger or smaller.
+- On phones, tapping a gem in the bag shows its description straight away.
+- When a new version of the game is out, the title screen and camp say so, with a Reload button.
+
 ## 2026-10-17
 
 - Duels: when a run ends, you can fight the characters other players left behind, each with its own build, in a round arena. The button is on the end screen.
