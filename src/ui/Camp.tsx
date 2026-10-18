@@ -36,6 +36,7 @@ import { Satchel } from './Satchel';
 import { Tip } from './Tip';
 import { stopDef } from '../data/stops';
 import { TreeView } from './TreeView';
+import { UpdateNotice } from './UpdateNotice';
 
 type Tab = 'tree' | 'sheet' | 'skills' | 'strategy' | 'items' | 'workbench' | 'report' | 'next';
 
@@ -280,6 +281,7 @@ export function Camp({ c }: { c: Controller }) {
   const newCount = unseenItems(run).length;
   const side = (
     <>
+      <UpdateNotice />
       <h2>Camp</h2>
       <div>
         {classDef(run.classId).name} · Level {run.build.level}

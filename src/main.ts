@@ -3,6 +3,7 @@ import { createGame } from './render/game';
 import { installCrashLog } from './crashlog';
 import { installRivals } from './rivals';
 import { installTelemetry } from './telemetry';
+import { installUpdateCheck } from './update';
 import { Controller } from './run/controller';
 import { App } from './ui/App';
 import { monsterPortrait } from './render/styles/grim/portrait';
@@ -30,6 +31,7 @@ controller.portrait = monsterPortrait;
 installCrashLog(controller);
 installTelemetry(controller);
 installRivals(controller);
+installUpdateCheck(controller);
 const game = createGame('app', controller.bus);
 render(h(App, { c: controller }), document.getElementById('ui')!);
 

@@ -7,6 +7,7 @@ import { Controller } from '../run/controller';
 import type { MySnapshot, Rival } from '../run/rivals';
 import { newRun, SAVE_VERSION } from '../run/run';
 import { postRun, resetPostKeeper } from '../rivals';
+import { setNewBuild } from '../update';
 import { DuelResultView } from './DuelResult';
 import { HighScoresView } from './HighScores';
 import { DUEL_TITLE, Rivals } from './Rivals';
@@ -381,6 +382,20 @@ describe('the run summary’s rivals block', () => {
     click(duelButton(view)!);
     expect(c.screen).toBe('summary');
     expect(typo.posted).toHaveLength(0);
+  });
+
+  it('never asks for a reload, even with a newer build out: the character would be lost before it was posted', () => {
+    browser({ rivals: true, rivalName: 'Wren' });
+    const c = onSummary();
+    setNewBuild('bbbbbbb');
+    try {
+      const view = Summary({ c });
+      expect(all(view)).not.toContain('new version');
+      expect(labels(view)).not.toContain('Reload');
+      expect(duelButton(view)).toBeDefined();
+    } finally {
+      setNewBuild(null);
+    }
   });
 
   it('shows the button, with the field still there, once the box is on and the name is valid and nothing is sent yet', () => {

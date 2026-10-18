@@ -8,6 +8,7 @@ import { setTelemetry, telemetryConfigured, telemetryOn } from '../telemetry';
 import { ask } from './Confirm';
 import { DebugPanel } from './Debug';
 import { RivalsOptIn } from './RivalsOptIn';
+import { UpdateNotice } from './UpdateNotice';
 
 /** Copies the saved run so it can be attached to a bug report, and says whether that worked. */
 function CopySave({ c, id }: { c: Controller; id: SlotId }) {
@@ -130,6 +131,7 @@ export function Title({ c }: { c: Controller }) {
     <div class="screen title">
       <h1>Battle of Builds</h1>
       <p class="subtitle">An auto-battler of bones and numbers.</p>
+      <UpdateNotice />
       {saves.length > 0 && (
         <div class="saves">
           {saves.map((s, i) => (

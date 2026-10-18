@@ -272,6 +272,17 @@ button {
 .notice {
   color: var(--hi);
 }
+/* The nudge to reload a tab left on an older build (src/ui/UpdateNotice.tsx). */
+.notice.update {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+  padding: 8px 12px;
+  border: 1px solid var(--hi);
+  border-radius: 6px;
+}
 .warn {
   color: #ff8a6a;
 }

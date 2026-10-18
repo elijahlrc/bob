@@ -36,12 +36,39 @@ function treeEditSave(): Plugin {
   };
 }
 
+/** The commit a build was made from (`GITHUB_SHA`, set by the deploy workflow and the itch.io build); `local` otherwise. */
+const BUILD_ID = process.env.GITHUB_SHA?.slice(0, 7) ?? 'local';
+
+/**
+ * `version.json` beside the game: `{"build":"<id>"}`, which a tab open on an older build fetches to learn that a newer one is out
+ * (`src/update.ts`). Written into `dist/` by the build; the dev server answers `local`, so the check is a no-op there.
+ */
+function buildVersion(): Plugin {
+  return {
+    name: 'build-version',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'version.json',
+        source: JSON.stringify({ build: BUILD_ID }) + '\n',
+      });
+    },
+    configureServer(server) {
+      server.middlewares.use('/version.json', (_req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Cache-Control', 'no-store');
+        res.end(JSON.stringify({ build: BUILD_ID }) + '\n');
+      });
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [preact(), treeEditSave()],
+  plugins: [preact(), treeEditSave(), buildVersion()],
   // Relative asset paths so `dist/` works when hosted under a sub-path (e.g. GitHub Pages).
   base: './',
   // The commit a build was made from (set by the deploy workflow), so run statistics can be told apart by balance version.
-  define: { __BUILD_ID__: JSON.stringify(process.env.GITHUB_SHA?.slice(0, 7) ?? 'local') },
+  define: { __BUILD_ID__: JSON.stringify(BUILD_ID) },
   server: {
     port: 5173,
     strictPort: true,

@@ -1124,3 +1124,14 @@ the player's own rows marked). The character is posted once per run through one 
 unreachable sink offers a retry); the player's own snapshot id comes from `my_snapshots`. Tested with an injected `fetch` and a text renderer
 for the screens (3,290 tests); **not seen in a browser and nothing posted to the project**: the owner walks the flow end to end (the list under
 "Built: F7" in DUEL.md section 7). Not built: the nightly verifier and the Elo recompute, legality checks, sparring from camp.
+
+## The reload nudge (2026-10-17)
+
+A level-100 win on the published game had no duel button: the tab had loaded the build of the morning before, and the duel
+screens had reached GitHub Pages only an hour before the win (the two publishes of the 17th had failed `npm run check` on a flaky
+test, fixed the same night). The statistics show builds still played five days after they were replaced. So the build now writes
+`version.json` beside the game (a Vite plugin in `vite.config.ts`; the dev server answers `local`), and `src/update.ts` asks for
+it, past the cache, when the tab comes back into view and on arriving at the title screen or at camp, at most once a minute and
+until a newer build is known; the title screen and the camp then show "A new version is out · Reload" (`src/ui/UpdateNotice.tsx`),
+never the end screens (a reload there would lose the character before it was posted). Tested with an injected fetch and faked
+timers; the summary's text test says the line is never there. `window.__dev.update()` shows it on the dev server.

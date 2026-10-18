@@ -12,6 +12,7 @@ import { noteFound } from './run/found';
 import type { Controller } from './run/controller';
 import { uidSource } from './run/run';
 import { rollOffers } from './run/offers';
+import { setNewBuild } from './update';
 
 /**
  * Dev-only helpers on `window.__dev` for driving the game from the browser console or an automation
@@ -288,6 +289,11 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
       );
       controller.bus.emit('state', null);
       return gems.length + 1;
+    },
+    /** As if the server served build `build` (null: this one), to look at the reload nudge, which the dev server never shows. */
+    update(build: string | null = 'abc1234'): void {
+      setNewBuild(build);
+      controller.bus.emit('state', null);
     },
     sleep,
   };

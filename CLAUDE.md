@@ -70,7 +70,8 @@
   the work** (not in the same commit, not as a finishing touch): only the `/patch-notes` skill
   (`.claude/skills/patch-notes/SKILL.md`) writes them, from the commits, then files them and commits; after a confirmation it pushes (a push to main is what
   updates the game, `.github/workflows/pages.yml`) and uploads the same commit's build to itch.io with butler. It is the "publish" command. Its style rules are the standard for every entry. Record decisions in
-  DESIGN.md Appendix A and the plan docs, and leave the notes to the skill.
+  DESIGN.md Appendix A and the plan docs, and leave the notes to the skill. A deploy reaches an open tab only when it is reloaded
+  (players keep one for days): the build writes `version.json`, and `src/update.ts` nudges the title screen and the camp to reload.
 - **In-game text is concise** (2026-10-14): a screen, card or tooltip says what the player gets and what they choose, in as few
   words as it takes. Never say what a level, stop or feature does _not_ do ("no loot, no XP"), restate what the UI already
   shows, or explain the obvious. One short line beats a paragraph. Check new text against this before adding it.
