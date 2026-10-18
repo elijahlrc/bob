@@ -450,9 +450,11 @@ P3 and P7 (P8 had to wait for the MAPS plan to finish with `run.ts`).
 - Clean up defaults: items and flasks, normal, magic and rare; gems and uniques are opt-in; unseen items are kept unless
   asked for; favourites are never chosen.
 - Interface size (added 2026-10-18, `src/ui/uiScale.ts`, picker on the title screen and the camp foot, touch screens only):
-  80–120% in 10% steps, through the viewport tag (`width=<device width ÷ scale>`), not CSS `zoom`, so window size, pointer
-  positions, media queries and the map canvas stay in one coordinate space. A size that would lay a phone out under 320 px
-  is not offered. Not yet tried on a real iPhone (rotation and the runtime tag change are the risks).
+  70–130% in 10% steps, through the viewport tag (`width=<device width ÷ scale>`), not CSS `zoom`, so window size, pointer
+  positions, media queries and the map canvas stay in one coordinate space. A size that would lay a phone out under 270 px
+  is not offered (every screen was checked at 277 px, a 360 px phone at 130%). At 70% a phone over 420 px wide lays out
+  past 600 px and gets the tablet layout (checked at 614 px). Not yet tried on a real iPhone (rotation and the runtime tag
+  change are the risks).
 
 **What is left:** the real-device pass (P7), photographs at the other widths (P0), the optional overflow-check script (P1),
 frame timing on a phone (P6), and the decisions in section 7 that a real device may change.

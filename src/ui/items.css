@@ -1139,6 +1139,12 @@
   align-items: center;
   justify-content: flex-end;
   gap: 4px;
+  min-width: 0;
+}
+/* A long reason ("needs a … skill on one of your items") wraps on a narrow screen instead of running off it. */
+.gem-chip-b .badge {
+  white-space: normal;
+  text-align: right;
 }
 .ix-prow .ix-pips {
   min-width: 56px;

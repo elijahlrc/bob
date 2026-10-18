@@ -8,10 +8,13 @@ import { loadPref, savePref } from './prefs';
  * positions, media queries, the map canvas), so no other code has to know. Desktop browsers ignore the tag; there the
  * browser's own zoom does this job.
  */
-export const UI_SCALES = [0.8, 0.9, 1, 1.1, 1.2] as const;
+export const UI_SCALES = [0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3] as const;
 
-/** The narrowest layout width a scale may produce (docs/MOBILE.md: 320 px is not broken, 360 px is tuned). */
-export const MIN_LAYOUT_WIDTH = 320;
+/**
+ * The narrowest layout width a scale may produce. 360 px is tuned (docs/MOBILE.md); every screen was checked at 277 px
+ * (a 360 px phone at 130%) with nothing running off the side, so 130% is offered there.
+ */
+export const MIN_LAYOUT_WIDTH = 270;
 
 const PREF = 'uiScale';
 const DEFAULT_CONTENT = 'width=device-width, initial-scale=1.0, viewport-fit=cover';

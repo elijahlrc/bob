@@ -12,9 +12,8 @@ describe('interface size', () => {
       for (const s of scalesFor(w))
         expect(layoutWidth(w, s)).toBeGreaterThanOrEqual(s > 1 ? MIN_LAYOUT_WIDTH : 0);
     }
-    expect(scalesFor(360)).toEqual([0.8, 0.9, 1, 1.1]);
-    expect(scalesFor(390)).toEqual([0.8, 0.9, 1, 1.1, 1.2]);
-    expect(scalesFor(320)).toEqual([0.8, 0.9, 1]);
+    expect(scalesFor(360)).toEqual([0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3]);
+    expect(scalesFor(320)).toEqual([0.7, 0.8, 0.9, 1, 1.1]);
   });
 
   it('keeps the default tag at 100% and fixes the width otherwise', () => {
