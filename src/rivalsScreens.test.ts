@@ -121,6 +121,7 @@ describe('loading the Rivals screen', () => {
     browser({ rivals: true, rivalName: 'Wren' });
     const { c, run } = opened();
     let release: (a: Answer) => void = () => undefined;
+    let inFlight = false;
     const net = server({
       my_snapshots: () => ok([snapshotRow(run)]),
       rivals_for: () => ok(Array.from({ length: 12 }, (_, i) => rivalRow(100 + i))),
@@ -128,11 +129,17 @@ describe('loading the Rivals screen', () => {
     // The post is in the air when the screen opens: nothing is asked of the table until it has landed.
     const slow: () => RivalDeps = () => ({
       ...net.deps(),
-      fetch: () => new Promise<Answer>((r) => (release = r)),
+      fetch: () =>
+        new Promise<Answer>((r) => {
+          inFlight = true;
+          release = r;
+        }),
     });
     const first = postRun(run, null, slow);
     const loaded = loadRivals(c, net.deps);
-    await new Promise((r) => setTimeout(r, 20));
+    // The post hashes the token before it reaches the network: wait for the request itself, not a fixed time (a slow
+    // runner once missed a 20 ms window and the release went to nothing, so the test waited forever).
+    await vi.waitFor(() => expect(inFlight).toBe(true));
     expect(net.calls).toHaveLength(0);
     expect(c.rivals!.status).toBe('loading');
     release(ok(undefined, 201));
