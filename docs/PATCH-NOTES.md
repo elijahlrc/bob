@@ -4,6 +4,17 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-19
+
+- Weapons, armour and shields come in over three times as many kinds, with a new one every few levels.
+- Weapons hit much less hard late on, about half the damage at the top, and one-handers no longer match two-handers; this is still being balance-tested.
+- Armour and evasion bases get stronger, energy shield bases weaker, and newly found uniques give more armour, evasion and energy shield.
+- Items ask for more strength, dexterity or intelligence, so gear suited to another class may need attributes your character lacks.
+- Life and mana flasks heal more per drink but use more charges, nine new utility flasks arrive, from lucky critical strikes to consecrated ground, and the Bulwark and Mist Draughts no longer grow with item level.
+- New bases include jewellery with item rarity or a gem socket, a wand that rolls minion affixes, and armour with built-in resistances or spell damage.
+- Items you already have take their base's new numbers and requirements.
+- High-level drops no longer include bases far below their level.
+
 ## 2026-10-18
 
 - On phones and tablets, a new Interface size setting on the title screen and at camp makes the whole game bigger or smaller.
