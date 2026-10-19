@@ -9,6 +9,7 @@ change, and our own names only. Dash bullets under plain headings.
 - On phones and tablets, a new Interface size setting on the title screen and at camp makes the whole game bigger or smaller.
 - On phones, tapping a gem in the bag shows its description straight away.
 - When a new version of the game is out, the title screen and camp say so, with a Reload button.
+- On short screens, such as a phone held sideways, the saved runs on the title screen no longer disappear.
 
 ## 2026-10-17
 
