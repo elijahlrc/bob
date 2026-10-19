@@ -135,7 +135,10 @@ describe('the hook that sends a character when a run ends', () => {
     c.onRunEnd!(won, res);
     await sent(calls, 2);
     expect(calls[0].url).toBe('https://abc.supabase.co/rest/v1/rivals');
-    const [a, b] = calls.map((x) => JSON.parse(x.body)[0]);
+    // Each post awaits its own token hash, so the two can reach fetch in either order.
+    const rows = calls.map((x) => JSON.parse(x.body)[0]);
+    const a = rows.find((r) => r.outcome === 'died');
+    const b = rows.find((r) => r.outcome === 'won');
     expect(a).toMatchObject({
       name: 'Wren',
       class_id: 'mystic',
