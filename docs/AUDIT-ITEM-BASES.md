@@ -68,7 +68,7 @@ base of each family nearest level 45 (`src/sim/gemKit.ts`), where the fences hol
 
 **Measured.** The weapon pass's harness: 16 bot runs per class to map 25 (`scripts/simpar.sh`), median map reached, in the
 order vanguard, strider, mystic, reaver, zealot, shade. Before, seed 1: 20, 17, 18, 17, 14.5, 20. After, seed 1: 13.5, 19, 20,
-20, 20, 20; seed 2: 20, 20, 20, 20, 20, 20; seed 3: 19.5, 17, 15, 19.5, 10, 20. The spread between seeds is as wide as any
+20, 20, 20; seed 2: 20, 19, 20, 18.5, 13.5, 20; seed 3: 19.5, 17, 15, 19.5, 10, 20. The spread between seeds is as wide as any
 difference between before and after, so to map 25 there is no sign of a change beyond it; that run barely sees the weapon change
 (the first three tiers were within 0.7 to 1.4 of the reference already), and the late game, where a top weapon now does half of
 what it did, has no bot measurement (the bot dies at the gate bosses). The Mystic's map-1 check: 0 of 40 died before, 0 of 40
