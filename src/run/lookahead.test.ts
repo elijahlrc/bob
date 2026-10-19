@@ -22,8 +22,8 @@ function setup(): { run: RunState; heart: ReturnType<typeof rollUnique> } {
   body.sockets = [makeGem(uid, 'crushingBlow'), makeGem(uid, 'bruteForce'), null, null];
   run.build.equipment.body = body;
   const maul = makeItem(uid, 'mace2_4', 60, 3);
-  // Enough strength for the Heart's armour base.
-  maul.uniqueMods = [{ stat: 'str', kind: 'base', value: 60 }];
+  // Enough strength for the Heart's armour base (a level-59 plate asks for 160).
+  maul.uniqueMods = [{ stat: 'str', kind: 'base', value: 150 }];
   run.build.equipment.mainHand = maul;
   delete run.build.equipment.offHand;
   run.build.primaryGem = body.sockets[0]!.uid;

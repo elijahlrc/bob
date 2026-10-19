@@ -16,7 +16,8 @@ export function makeItem(
   return {
     kind: 'item',
     uid: uid(),
-    baseId,
+    // An old tier id stands for a base of today; a new item carries that base's own id.
+    baseId: base.id,
     rarity,
     name: base.name,
     ilvl,
@@ -31,5 +32,6 @@ export function makeGem(uid: UidSource, gemId: string): GemItem {
 }
 
 export function makeFlask(uid: UidSource, baseId: string, ilvl: number): FlaskItem {
-  return { kind: 'flask', uid: uid(), baseId, ilvl, name: flaskBase(baseId).name, affixes: [] };
+  const base = flaskBase(baseId);
+  return { kind: 'flask', uid: uid(), baseId: base.id, ilvl, name: base.name, affixes: [] };
 }

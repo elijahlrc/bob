@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { itemBase } from '../data/bases';
 import { makeFlask, makeGem, makeItem } from '../gen/items';
 import { discardedValue, salvageDiscarded, salvageValue } from './craft';
 import { newRun } from './run';
@@ -45,7 +46,8 @@ describe('equipment rules (§11.1)', () => {
     run.inventory.push(maul);
     expect(equip(run, maul.uid, 'mainHand').ok).toBe(true);
     expect(run.build.equipment.offHand).toBeUndefined();
-    expect(run.inventory.some((x) => x.kind === 'item' && x.baseId === 'shield_ar_1')).toBe(true);
+    const shieldId = itemBase('shield_ar_1').id;
+    expect(run.inventory.some((x) => x.kind === 'item' && x.baseId === shieldId)).toBe(true);
     const quiver = makeItem(uid, 'quiver_acc', 1);
     run.inventory.push(quiver);
     expect(equip(run, quiver.uid, 'offHand').ok).toBe(false);

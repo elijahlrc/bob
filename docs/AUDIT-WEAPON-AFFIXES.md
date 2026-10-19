@@ -309,7 +309,7 @@ The author answered the open questions the same day. Done:
    3.9, but plain 3.9 helmets and body armour roll no socketed gem level mod, so `gemLevel` there is a Bob extra, not a match.
 4. **Tier odds:** the top tier of a family is 25% as likely as the lowest (`TOP_TIER_WEIGHT`), where it was 47%. The author's call: a solo
    run finds far fewer items than the reference game's economy, so good rolls are kept within reach. This is the one deliberate departure.
-5. **Flat added damage** has the 3.9 tables for one hand, two hands and the bow (`src/data/weaponTables.ts`): `addPhysLocal`/`2h`,
+5. (Base weapon damage was brought to the reference numbers on 2026-10-18, every reference base with it: [AUDIT-ITEM-BASES.md](AUDIT-ITEM-BASES.md); the lever named below is now `WEAPON_DAMAGE_SCALE`.) **Flat added damage** has the 3.9 tables for one hand, two hands and the bow (`src/data/weaponTables.ts`): `addPhysLocal`/`2h`,
    `addFireLocal`/`2h`/`Bow` (and cold, lightning), `addChaosLocal`/`2h`, and the spell flats `addFireSpells`/`2h` (and cold, lightning).
    Base weapon damage was left alone, so flat damage now weighs about as much against a base as the table values say; the bot to map 25 shows
    no change (it dies at the gate bosses either way), so the real effect on late power is unmeasured. If late weapons turn out too strong,

@@ -117,6 +117,8 @@ export type Defence = {
   immune: boolean[];
   /** Chance (fraction) to avoid each ailment when it would be inflicted. */
   avoid: Record<AilmentName, number>;
+  /** Chance (fraction) to take none of a hit's damage of each type (index = damage type; the Chillwake Draught). */
+  avoidHit: number[];
   /** Multiplier on how long each ailment lasts on this actor. */
   durOnSelf: Record<AilmentName, number>;
   /** Flat damage taken from each attack hit, by type (negative: less). */

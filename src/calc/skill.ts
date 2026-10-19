@@ -493,6 +493,8 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
       const c = (baseCrit + db.sum('base', 'critChance', ctx)) * db.mult('critChance', ctx);
       // 3.6 removed the 5% minimum and 95% maximum.
       critChance = clamp(c / 100, 0, 1);
+      // Lucky: the better of two rolls (the Keen Draught).
+      if (db.flag('critLucky', ctx)) critChance = 1 - (1 - critChance) * (1 - critChance);
     }
     const critMulti = overload ? 1 : (BASE_CRIT_MULTI + db.sum('base', 'critMulti', ctx)) / 100;
     // Accuracy.

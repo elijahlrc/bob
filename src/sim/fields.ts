@@ -69,6 +69,8 @@ export type Field = {
   moved?: number;
   /** Chilling ground that creeps toward the nearest enemy: tiles a second. */
   creep?: number;
+  /** Chilling ground with no skill behind it (a flask's): the chill it applies. */
+  chill?: number;
   /** A bladestorm: the way it drifts, and the stance it was made in. */
   vx?: number;
   vy?: number;
@@ -633,11 +635,12 @@ export function tickFields(w: World, s: Side, dt: number): void {
       // Caustic ground renews the debuff of whoever stands in it, in short spans: patches do not add up.
       for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius))
         applySkillDot(w, e, f.profile, { seconds: 0.5, by: s });
-    } else if (f.kind === 'chilling' && pulse && f.profile && f.dps <= 0) {
-      // Chilled ground that deals no damage (Frostblink) only chills what stands on it.
+    } else if (f.kind === 'chilling' && pulse && f.dps <= 0) {
+      // Chilled ground that deals no damage (Frostblink, a flask's) only chills what stands on it.
+      const effect = f.profile?.chill.effect ?? f.chill ?? 0;
       for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius)) {
-        if (e.def.cannotBeChilled) continue;
-        e.ail.chill = Math.max(e.ail.chill, f.profile.chill.effect);
+        if (e.def.cannotBeChilled || effect <= 0) continue;
+        e.ail.chill = Math.max(e.ail.chill, effect);
         e.ail.chillT = Math.max(e.ail.chillT, f.interval * 2);
       }
     } else if (f.kind === 'chilling' && pulse && f.profile) {

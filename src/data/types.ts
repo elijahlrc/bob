@@ -68,6 +68,10 @@ export type ItemBase = {
   hands?: 1 | 2;
   /** A weapon built for spells: it rolls the spell affixes (a wand, a sceptre, a staff, a rune dagger), and an attack weapon never does. */
   spellWeapon?: boolean;
+  /** A weapon that rolls the minion affixes. */
+  minionWeapon?: boolean;
+  /** A jewellery base with sockets of its own (the slot has none otherwise). */
+  sockets?: number;
 };
 
 export type Rarity = 'normal' | 'magic' | 'rare' | 'unique';

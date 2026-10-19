@@ -94,7 +94,8 @@ describe('the once-per-target rule, and its exceptions', () => {
     const t = tally(world, dummy, 10, 'snareShot');
     expect(t.uses).toBeGreaterThan(3);
     expect(t.hits / t.uses).toBeLessThanOrEqual(1.05);
-    expect(t.spawned / t.uses).toBeGreaterThanOrEqual(3);
+    // The last use may be cut off by the end of the run before its arrows are loosed.
+    expect(t.spawned).toBeGreaterThanOrEqual(3 * (t.uses - 1));
   });
 
   it('a skill flagged to shotgun hits one enemy with several shards at close range', () => {

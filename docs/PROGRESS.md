@@ -48,9 +48,9 @@ controller in dev builds for debugging.
 
 ## M4 — Items ✅
 
-- [x] All bases (60 weapons, 96 armour, 12 shields, jewellery, belts, quivers); 57 affix families /
-      360 tiers (minIlvl 1–82) generated from compact definitions; ilvl-gated rolling with max-affix
-      rules (tested)
+- [x] All bases (since 2026-10-18 one for every droppable 3.9 base: 308 weapons, 275 armour, 88 shields, 58 jewellery,
+      45 flasks; docs/AUDIT-ITEM-BASES.md); the affix families generated from compact definitions; ilvl-gated rolling with
+      max-affix rules (tested)
 - [x] Rarity, naming (magic prefix/suffix names, rare two-word names), drop tables (tested)
 - [x] 30 uniques incl. the 12 listed; at least one per starting weapon class; levels 2–80
 - [x] Flask bases and 9 flask affix families (magic flasks)

@@ -264,6 +264,7 @@ describe('the two gambles: Knucklebone Die and Rot Seal', () => {
     const { run, item } = setup();
     expect(useDie(run, item.uid).ok).toBe(false);
     const w = makeItem(uid, 'mace2_3', 60, 2);
+    const maul = itemBase('mace2_3').id;
     w.sockets = [makeGem(uid, 'crushingBlow'), null];
     run.inventory.push(w);
     for (let i = 0; i < 60; i++) {
@@ -273,9 +274,9 @@ describe('the two gambles: Knucklebone Die and Rot Seal', () => {
       useDie(run, w.uid);
       const now = get(run, w);
       expect(now.uid).toBe(w.uid);
-      expect(now.baseId).toBe('mace2_3');
+      expect(now.baseId).toBe(maul);
       expect(now.sockets.filter(Boolean).some((g) => g!.gemId === 'crushingBlow')).toBe(true);
-      if (now.uniqueId) expect(uniqueDef(now.uniqueId).baseId).toBe('mace2_3');
+      if (now.uniqueId) expect(uniqueDef(now.uniqueId).baseId).toBe(maul);
     }
   });
 

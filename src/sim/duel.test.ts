@@ -528,8 +528,9 @@ describe('bodies', () => {
 
 describe('the events of a duel say whose they are', () => {
   /** Fight a duel to its end and keep every event of every tick. */
-  const events = (a: Build, b: Build, seed: number) => {
+  const events = (a: Build, b: Build, seed: number, prep?: (w: World) => void) => {
     const w = createDuelWorld(a, b, seed);
+    prep?.(w);
     const all: World['events'] = [];
     while (w.t < 60 && w.sides.every((s) => s.player.alive)) {
       stepWorld(w);
@@ -554,7 +555,10 @@ describe('the events of a duel say whose they are', () => {
   });
 
   it('a fall is the faller’s: `src` of playerDied is the character that died', () => {
-    const { w, all } = events(vanguard(1), vanguard(2), 1);
+    // One side starts on its last point of life: two new characters with the reference game's weapons outlast each other's flasks.
+    const { w, all } = events(vanguard(1), vanguard(2), 1, (w) => {
+      w.sides[1].player.life = 1;
+    });
     const dead = w.sides.filter((s) => !s.player.alive);
     expect(dead.length).toBeGreaterThan(0);
     const fell = all.filter((e) => e.t === 'playerDied');

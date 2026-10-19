@@ -11,6 +11,8 @@ into `src/` (DESIGN §3): names and text from the reference game live only in `d
 | `pob-skills.json`        | 3.9-era numbers for every gem: skill types, stats, level 1 and level 20 values, mana cost, effectiveness                                                                                                                     | `npm run coverage:pob -- <dir>`                                                     |
 | `pob-uniques.json`       | 3.9-era unique item lines, with their `{variant:N}` markers                                                                                                                                                                  | `npm run coverage:pob -- <dir>`                                                     |
 | `pob-monster-stats.json` | A monster's evasion and accuracy rating by level, 1 to 100, from the reference game's monster tables (docs/EVASION.md). `src/` has fitted curves, not this                                                                   | read by hand from Path of Building's `Data/Misc.lua`; checked by `formulas.test.ts` |
+| `pob-bases.json`         | The 3.9-era item bases: class, defence type, level, requirements, defences, block, weapon numbers, flask amounts and implicit text                                                                                           | `npm run coverage:bases -- <dir>`                                                   |
+| `base-names.json`        | Reference base name → our name for it, one line per droppable base (docs/AUDIT-ITEM-BASES.md). The emitter and the unique drafts join on it                                                                                  | by hand                                                                             |
 | `map.json`               | Bob id → reference name, status and a note. Hand-maintained: every droppable Bob gem and unique has a line                                                                                                                   | by hand                                                                             |
 | `spirit.json`            | The spirit ledger (docs/SPIRIT.md): for every mapped gem, the loop it has in the reference game, what Bob's version does, the verdict (faithful, drifted, gutted), what is missing, the 3.9 spec and whether it was verified | `npm run spirit` prints it; edited by hand or by the milestones                     |
 | `bucket-overrides.json`  | Optional `{"Reference name": "bucket"}` fixes to the keyword bucket tagging (`scripts/coverage/buckets.ts`)                                                                                                                  | by hand                                                                             |
@@ -31,6 +33,8 @@ into `src/` (DESIGN §3): names and text from the reference game live only in `d
 - `npm run coverage:fetch` re-fetches the reference list from the wiki's Cargo API.
 - `npm run coverage:pob -- <dir>` re-extracts the numbers from an unzipped Path of Building `Data` folder.
 - `npm run coverage:draft -- gem|unique "Name" ...` writes a draft entry to `scripts/coverage/staging/` (git-ignored).
+- `npm run coverage:emit-bases` writes `src/data/baseTables.ts` (every item and flask base) from `pob-bases.json` and
+  `base-names.json`; `npm run coverage:bases-audit` compares the game's bases with the reference bases they stand for.
 
 ## Map statuses
 

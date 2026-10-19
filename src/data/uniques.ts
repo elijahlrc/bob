@@ -1,6 +1,7 @@
 import type { CondId, DamageType, ModKind, SkillTag } from '../mods/types';
 import type { Attrs } from './types';
 import type { TriggerDef } from './triggers';
+import { itemBase } from './bases';
 import { WAVE1_UNIQUES } from './uniquesWave1';
 import { WAVE2_UNIQUES } from './uniquesWave2';
 import { WAVE3_UNIQUES } from './uniquesWave3';
@@ -52,7 +53,7 @@ const m = (
 const L = { local: true };
 const ELE: DamageType[] = ['fire', 'cold', 'lightning'];
 
-export const UNIQUES: UniqueDef[] = [
+const ALL_UNIQUES: UniqueDef[] = [
   // The twelve required examples.
   {
     id: 'hollowCrown',
@@ -424,6 +425,12 @@ export const UNIQUES: UniqueDef[] = [
   // The coverage plan's uniques (docs/coverage/uniques, generated).
   ...GENERATED_UNIQUES,
 ];
+
+/** Every unique, dropping no earlier than its base can be worn (a hand-written level below the base's is raised to it). */
+export const UNIQUES: UniqueDef[] = ALL_UNIQUES.map((u) => {
+  const base = itemBase(u.baseId).level;
+  return u.level >= base ? u : { ...u, level: base };
+});
 
 export function uniqueDef(id: string): UniqueDef {
   const u = UNIQUES.find((x) => x.id === id);

@@ -1,4 +1,5 @@
-import { flaskBase, type FlaskKind } from '../data/flasks';
+import { flaskBase, type FlaskGround, type FlaskKind } from '../data/flasks';
+import type { BuffId } from '../data/buffs';
 import type { FlaskItem } from '../data/types';
 import { ModDB } from '../mods/modDb';
 import type { Mod } from '../mods/types';
@@ -16,6 +17,10 @@ export type FlaskSpec = {
   instant: boolean;
   /** Mods granted while the flask is active (utility buffs and "during effect" affixes). */
   buff: Mod[];
+  /** Ground left where the character stands on use, for as long as the flask runs. */
+  ground?: FlaskGround;
+  /** A buff of the buff layer held for as long as the flask runs. */
+  grants?: BuffId;
   /** Cleansing: removes the ailment on use, and keeps it off while the flask runs (3.9's suffixes). */
   removeIgnite: boolean;
   removeFreeze: boolean;
@@ -36,12 +41,11 @@ export function flaskSpec(f: FlaskItem, charDb: ModDB): FlaskSpec {
   const longer = local.mult('flask.duration') * charDb.mult('flaskDuration');
   const recovery = local.mult('flask.amount') * charDb.mult('flaskRecovery') * effect * longer;
   const duration = base.duration * longer;
-  const scale = base.scaleWithIlvl ? 1 + 0.04 * f.ilvl : 1;
   const src = { kind: 'flask' as const, id: String(f.uid) };
   const buff: Mod[] = [
     ...base.buff.map((m) => ({
       ...m,
-      value: Math.round(m.value * scale * effect),
+      value: m.kind === 'flag' ? m.value : Math.round(m.value * effect),
       source: src,
     })),
     ...f.affixes
@@ -69,6 +73,8 @@ export function flaskSpec(f: FlaskItem, charDb: ModDB): FlaskSpec {
     perUse: base.perUse * Math.max(0.1, 1 - charDb.sum('base', 'flaskChargesUsed') / 100),
     instant: local.flag('flask.instant'),
     buff,
+    ...(base.ground ? { ground: base.ground } : {}),
+    ...(base.grants ? { grants: base.grants } : {}),
     removeIgnite: local.flag('removeIgnite'),
     removeFreeze: local.flag('removeFreeze'),
     removeBleed: local.flag('removeBleed'),

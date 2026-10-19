@@ -1,3 +1,4 @@
+import { ITEM_BASES } from '../data/bases';
 import type { ActiveGemDef, GemDef } from '../data/gems';
 import { ACTIVE_GEMS, GRANTED_GEMS } from '../data/gems';
 import type { Build } from '../data/types';
@@ -12,17 +13,34 @@ import { stepWorld } from './world';
  * spirit ledger both build a character around a gem, put a dummy in front of it and watch. Test support, not game code.
  */
 
+/** The kit's character is level 50; its gear is the base of each family nearest this level. */
+const KIT_GEAR_LEVEL = 45;
+
+/** The droppable base of a family (the prefix of its ids) nearest the kit's gear level. */
+function kitBase(family: string): string {
+  let best: (typeof ITEM_BASES)[number] | undefined;
+  for (const b of ITEM_BASES) {
+    if (b.uniqueOnly || !b.id.startsWith(`${family}_l`)) continue;
+    if (!best || Math.abs(b.level - KIT_GEAR_LEVEL) < Math.abs(best.level - KIT_GEAR_LEVEL))
+      best = b;
+  }
+  if (!best) throw new Error(`no base of ${family}`);
+  return best.id;
+}
+
 const WEAPON_FOR: Record<string, string> = {
-  bow: 'bow_3',
-  dagger: 'dagger_3',
-  claw: 'claw_3',
-  sword: 'sword_3',
-  axe: 'axe_3',
-  mace: 'mace_3',
-  sceptre: 'sceptre_3',
-  wand: 'wand_3',
-  staff: 'staff_3',
+  bow: kitBase('bow'),
+  dagger: kitBase('dagger'),
+  claw: kitBase('claw'),
+  sword: kitBase('sword'),
+  axe: kitBase('axe'),
+  mace: kitBase('mace'),
+  sceptre: kitBase('sceptre'),
+  wand: kitBase('wand'),
+  staff: kitBase('staff'),
 };
+const TWO_HANDER = kitBase('sword2');
+const SHIELD = kitBase('shield_ar');
 const CLASS_FOR = { str: 'vanguard', dex: 'strider', int: 'mystic' } as const;
 
 /** The class whose attribute a gem draws on. */
@@ -38,11 +56,12 @@ const uid = () => n++;
 
 /** A weapon the gem can be used with. */
 export function weaponFor(def: ActiveGemDef): string {
-  if (def.needsTwoHand) return 'sword2_3';
+  if (def.needsTwoHand) return TWO_HANDER;
   const req = def.requiresWeapon?.find((t) => WEAPON_FOR[t]);
   if (req) return WEAPON_FOR[req];
-  if (def.skillType === 'attack') return def.tags.includes('projectile') ? 'bow_3' : 'sword_3';
-  return 'wand_3';
+  if (def.skillType === 'attack')
+    return def.tags.includes('projectile') ? WEAPON_FOR.bow : WEAPON_FOR.sword;
+  return WEAPON_FOR.wand;
 }
 
 /** A level-50 character with `gems` socketed in the body armour, the first of them the primary skill. */
@@ -57,7 +76,7 @@ export function buildFor(
   b.level = 50;
   b.equipment.mainHand = makeItem(uid, main, 50, 1);
   if (off === 'dual') b.equipment.offHand = makeItem(uid, main, 50, 1);
-  else if (off === 'shield') b.equipment.offHand = makeItem(uid, 'shield_ar_3', 50, 1);
+  else if (off === 'shield') b.equipment.offHand = makeItem(uid, SHIELD, 50, 1);
   else delete b.equipment.offHand;
   const body = makeItem(uid, 'body_ar_1', 50, Math.max(1, gems.length));
   body.sockets = gems.map((g) => makeGem(uid, g));

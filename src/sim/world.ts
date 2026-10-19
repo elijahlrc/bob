@@ -1,3 +1,4 @@
+import { COLD } from '../calc/skill';
 import { MONSTER_TYPES } from '../data/monsters';
 import { reservedMana } from './reserve';
 import { tickPhases } from './phases';
@@ -419,6 +420,10 @@ function levelUp(w: World, s: Side): void {
 
 /** Seconds over which a life-to-ES flask returns the life it took. */
 const LIFE_TO_ES_TIME = 2;
+/** The ground a flask leaves: its reach in tiles, the chill of chilled ground (a fraction) and the blind of a smoke cloud. */
+const FLASK_GROUND_RADIUS = 2;
+const FLASK_GROUND_CHILL = 0.1;
+const FLASK_SMOKE_BLIND = 50;
 
 function useFlask(w: World, side: Side, i: number): void {
   const f = side.flasks[i];
@@ -447,6 +452,33 @@ function useFlask(w: World, side: Side, i: number): void {
     p.life = Math.min(p.life, 1);
     f.esRate = Math.min(removed, Math.max(0, p.def.maxEs - p.es)) / LIFE_TO_ES_TIME;
     f.esT = LIFE_TO_ES_TIME;
+  }
+  // Ground left where the character stands, for as long as the flask runs (the Sanctum, Chillwake and Smokeveil Draughts).
+  if (s.ground) {
+    const r = FLASK_GROUND_RADIUS;
+    side.fields.push({
+      id: w.nextId++,
+      owner: p.id,
+      kind: s.ground,
+      x: p.x,
+      y: p.y,
+      r0: r,
+      grow: 1,
+      radius: r,
+      t: s.duration,
+      total: s.duration,
+      hand: 0,
+      pulseT: 0,
+      interval: 0.5,
+      dps: s.ground === 'smoke' ? FLASK_SMOKE_BLIND : 0,
+      dtype: s.ground === 'chilling' ? COLD : 0,
+      ...(s.ground === 'chilling' ? { chill: FLASK_GROUND_CHILL } : {}),
+    });
+  }
+  // A buff held for as long as the flask runs (the Onrush Draught's Quickened).
+  if (s.grants) {
+    side.buffT[s.grants] = Math.max(side.buffT[s.grants], s.duration);
+    w.events.push({ t: 'buff', id: s.grants });
   }
   f.charges -= s.perUse;
   f.uses++;

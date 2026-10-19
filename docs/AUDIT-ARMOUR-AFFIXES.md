@@ -39,7 +39,7 @@ The author asked for parity with 3.9 and took every recommendation of section 10
   (100% halves them); "increased Block Recovery" (`blockRecovery`, the round shield's implicit) shortens the stagger only. The stun hybrids and the
   suffix use `stunBlockRecovery` now (the old reduced stun duration stat stays for the uniques and old items). Item rarity and the light radius half
   of the accuracy hybrid do not apply; with them left out the pools equal the reference's.
-- **Bases.** Shields come in all six defence types (a round shield's implicit is block recovery), every shield type has its 3.9
+- **Bases** (superseded on 2026-10-18 by [AUDIT-ITEM-BASES.md](AUDIT-ITEM-BASES.md): one base for every reference base, at its numbers). Shields come in all six defence types (a round shield's implicit is block recovery), every shield type has its 3.9
   implicit scaled to four tiers (the first tower shield has none, as in the reference), and rings, amulets, belts and quivers have a base for each
   kind of implicit the reference has (55 jewellery bases, from 14). A jewellery base is a kind and not a tier: any one the item level allows is
   as likely as another.

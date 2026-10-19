@@ -3,9 +3,9 @@ import { Rng } from './core/rng';
 import { MONSTER_TYPES, type MonsterTypeId } from './data/monsters';
 import { BOSSES, type BossId } from './data/bosses';
 import { spawnMonster } from './sim/world';
-import { ITEM_BASES } from './data/bases';
+import { ITEM_BASES, itemBase } from './data/bases';
 import type { InventoryItem } from './data/types';
-import { rollFlask, rollGem, rollItemOf } from './gen/loot';
+import { rollFlask, rollGem, rollItemOf, socketLimit } from './gen/loot';
 import { makeGem, makeItem } from './gen/items';
 import { STARTER_GEMS } from './run/starterGems';
 import { noteFound } from './run/found';
@@ -261,6 +261,18 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
       });
       // A new array, because the screens memoise on the identity of the inventory.
       run.inventory = run.inventory.concat(added);
+      controller.bus.emit('state', null);
+      return run.inventory.length;
+    },
+    /** Put a plain item of base `baseId` in the camp inventory, with every socket the base and level allow (for looking at one base). */
+    give(baseId: string, ilvl = 20): number {
+      const run = controller.run;
+      if (!run) return 0;
+      const uid = uidSource(run);
+      const base = itemBase(baseId);
+      const it = makeItem(uid, baseId, ilvl, socketLimit(base, ilvl));
+      noteFound(run, it);
+      run.inventory = run.inventory.concat(it);
       controller.bus.emit('state', null);
       return run.inventory.length;
     },

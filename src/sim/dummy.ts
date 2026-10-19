@@ -28,6 +28,7 @@ export function dummyDefence(over: Partial<Defence> = {}): Defence {
     blockStagger: 0,
     esRegen: 0,
     res: [0, 0, 0, 0, 0],
+    avoidHit: [0, 0, 0, 0, 0],
     maxRes: [75, 75, 75, 75, 75],
     physReduction: 0,
     damageTakenMult: 1,

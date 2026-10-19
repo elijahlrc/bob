@@ -40,7 +40,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gildedTithe',
     name: 'Gilded Tithe',
-    baseId: 'ring_mana',
+    baseId: 'ring_rarity',
     level: 20,
     mods: [m('dex', 'base', 10), m('itemRarity', 'inc', 50, 70), m('resist.allEle', 'base', -20)],
     flavour: 'Pay the toll and the road pays you back.',
@@ -48,13 +48,13 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'whisperersCap',
     name: "Whisperer's Cap",
-    baseId: 'helmet_es_1',
+    baseId: 'helmet_es_l8',
     level: 8,
     mods: [
       m('attackSpeed', 'inc', 10, 15),
       m('castSpeed', 'inc', 10, 15),
       m('manaRegen', 'inc', 30),
-      m('es', 'base', 14, 23),
+      m('es', 'base', 30, 50),
       m('moveSpeed', 'inc', 5),
       m('stunDurationOnSelf', 'base', 10, 15),
     ],
@@ -63,8 +63,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'magpieGauntlets',
     name: 'Magpie Gauntlets',
-    baseId: 'gloves_arev_3',
-    level: 40,
+    baseId: 'gloves_arev_l36',
+    level: 36,
     mods: [
       m('armour', 'inc', 40, 60, { local: true }),
       m('evasion', 'inc', 40, 60, { local: true }),
@@ -77,7 +77,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'paupersRapier',
     name: "Pauper's Rapier",
-    baseId: 'thrust_2',
+    baseId: 'thrust_l17',
     level: 17,
     mods: [
       m('critMulti', 'base', 25),
@@ -91,8 +91,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'triuneRod',
     name: 'Triune Rod',
-    baseId: 'sceptre_2',
-    level: 15,
+    baseId: 'sceptre_l10',
+    level: 10,
     mods: [
       m('damage', 'inc', 12, 12, { damageTypes: ['fire', 'cold', 'lightning'] }),
       m('castSpeed', 'inc', 4, 6),
@@ -114,7 +114,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     mods: [
       m('damage', 'inc', 10),
       m('int', 'base', 15, 25),
-      m('es', 'base', 9, 14),
+      m('es', 'base', 20, 30),
       m('es', 'inc', 20),
       m('esRechargeRate', 'inc', 50),
     ],
@@ -123,8 +123,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'eclipseHelm',
     name: 'Eclipse Helm',
-    baseId: 'helmet_arev_4',
-    level: 60,
+    baseId: 'helmet_arev_l51',
+    level: 51,
     mods: [
       m('socketedGemLevel', 'base', 1),
       m('armour', 'inc', 100, 150, { local: true }),
@@ -137,13 +137,13 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cinderfeatherQuiver',
     name: 'Cinderfeather Quiver',
-    baseId: 'quiver_acc',
+    baseId: 'quiver_fire_bow',
     level: 22,
     mods: [
       m('damage.min', 'base', 4, 4, { damageTypes: ['fire'], tags: ['attack', 'bow'] }),
       m('damage.max', 'base', 8, 8, { damageTypes: ['fire'], tags: ['attack', 'bow'] }),
       m('attackSpeed', 'inc', 10),
-      m('evasion', 'base', 48, 60),
+      m('evasion', 'base', 80, 100),
       m('mana', 'base', 10, 30),
       m('convert.physical.fire', 'base', 50),
       m('damage.min', 'base', 5, 5, { damageTypes: ['fire'], tags: ['attack', 'bow'] }),
@@ -154,7 +154,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gutterStiletto',
     name: 'Gutter Stiletto',
-    baseId: 'dagger_2',
+    baseId: 'dagger_l15',
     level: 15,
     mods: [
       m('dex', 'base', 20),
@@ -169,7 +169,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'tallowHammer',
     name: 'Tallow Hammer',
-    baseId: 'mace_2',
+    baseId: 'mace_l20',
     level: 20,
     mods: [
       m('enemyStunThreshold', 'base', 10),
@@ -184,7 +184,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'butchersFrock',
     name: "Butcher's Frock",
-    baseId: 'body_eves_4',
+    baseId: 'body_eves_l62',
     level: 62,
     mods: [
       m('evasion', 'inc', 120, 150, { local: true }),
@@ -199,8 +199,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gravecapCirclet',
     name: 'Gravecap Circlet',
-    baseId: 'helmet_es_4',
-    level: 60,
+    baseId: 'helmet_es_l54',
+    level: 54,
     mods: [
       m('str', 'base', 20, 30),
       m('mana', 'base', 20, 30),
@@ -214,7 +214,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     id: 'rockfallQuiver',
     name: 'Rockfall Quiver',
     baseId: 'quiver_phys',
-    level: 20,
+    level: 5,
     mods: [
       m('damage.min', 'base', 1, 1, { damageTypes: ['physical'], tags: ['attack', 'bow'] }),
       m('damage.max', 'base', 4, 4, { damageTypes: ['physical'], tags: ['attack', 'bow'] }),
@@ -229,7 +229,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'coinbearerBuckler',
     name: 'Coinbearer Buckler',
-    baseId: 'shield_ev_1',
+    baseId: 'shield_ev_l8',
     level: 8,
     mods: [
       m('moveSpeed', 'inc', 3),
@@ -244,13 +244,13 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wizenedGloves',
     name: 'Wizened Gloves',
-    baseId: 'gloves_es_2',
-    level: 20,
+    baseId: 'gloves_es_l12',
+    level: 12,
     mods: [
       m('damage', 'inc', 50, 60, { tags: ['spell'] }),
       m('int', 'base', 20),
       m('castSpeed', 'inc', -15),
-      m('es', 'base', 14),
+      m('es', 'base', 32),
     ],
     flavour: 'Spells come easier, and slower.',
   },
@@ -273,15 +273,15 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     id: 'lidlessEye',
     name: 'Lidless Eye',
     baseId: 'amulet_all',
-    level: 30,
+    level: 20,
     mods: [m('life', 'inc', -20), m('itemRarity', 'inc', 30), m('cannotBeStunned', 'flag', 1)],
     flavour: 'It has never blinked and never will.',
   },
   {
     id: 'emberstrideBoots',
     name: 'Emberstride Boots',
-    baseId: 'boots_ares_4',
-    level: 60,
+    baseId: 'boots_ares_l58',
+    level: 58,
     mods: [
       m('armour', 'inc', 160, 180, { local: true }),
       m('es', 'inc', 160, 180, { local: true }),
@@ -295,8 +295,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'prismCrown',
     name: 'Prism Crown',
-    baseId: 'helmet_ares_4',
-    level: 60,
+    baseId: 'helmet_ares_l53',
+    level: 53,
     mods: [
       m('socketedGemLevel', 'base', 1),
       m('armour', 'inc', 60, 80, { local: true }),
@@ -311,8 +311,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'maulwrightsClub',
     name: "Maulwright's Club",
-    baseId: 'mace_2',
-    level: 15,
+    baseId: 'mace_l10',
+    level: 10,
     mods: [
       m('enemyStunThreshold', 'base', 10),
       m('damage', 'inc', 300, 360, { damageTypes: ['physical'], local: true }),
@@ -326,13 +326,13 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'snareOfPlenty',
     name: 'Snare of Plenty',
-    baseId: 'boots_es_1',
+    baseId: 'boots_es_l9',
     level: 52,
     mods: [
       m('str', 'base', 5, 10),
       m('dex', 'base', 5, 10),
       m('int', 'base', 5, 10),
-      m('es', 'base', 41, 50),
+      m('es', 'base', 90, 110),
       m('itemQuantity', 'inc', 10, 16, { condition: { id: 'onLowLife' } }),
       m('moveSpeed', 'inc', 20),
     ],
@@ -341,7 +341,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'frostbreakSledge',
     name: 'Frostbreak Sledge',
-    baseId: 'mace2_2',
+    baseId: 'mace2_l17',
     level: 36,
     mods: [
       m('stunDuration', 'inc', 45),
@@ -359,7 +359,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hailbreakHammer',
     name: 'Hailbreak Hammer',
-    baseId: 'mace2_2',
+    baseId: 'mace2_l17',
     level: 17,
     mods: [
       m('stunDuration', 'inc', 45),
@@ -374,7 +374,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'coldfangQuiver',
     name: 'Coldfang Quiver',
-    baseId: 'quiver_acc',
+    baseId: 'quiver_hit',
     level: 10,
     mods: [
       m('str', 'base', 15, 25),
@@ -391,7 +391,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'eelskinQuiver',
     name: 'Eelskin Quiver',
-    baseId: 'quiver_acc',
+    baseId: 'quiver_hit',
     level: 45,
     mods: [
       m('allAttr', 'base', 15, 30),
@@ -434,8 +434,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'glacierCoffin',
     name: 'Glacier Coffin',
-    baseId: 'body_ares_3',
-    level: 40,
+    baseId: 'body_ares_l39',
+    level: 39,
     mods: [
       m('str', 'base', 30, 40),
       m('int', 'base', 30, 40),
@@ -479,7 +479,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sagesHammer',
     name: "Sage's Hammer",
-    baseId: 'mace_2',
+    baseId: 'mace_l20',
     level: 20,
     mods: [
       m('enemyStunThreshold', 'base', 10),
@@ -495,7 +495,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pileOfOdds',
     name: 'Pile of Odds',
-    baseId: 'ring_mana',
+    baseId: 'ring_phys',
     level: 24,
     mods: [
       m('damage', 'inc', 10, 30),
@@ -508,7 +508,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'skinnersKnife',
     name: "Skinner's Knife",
-    baseId: 'dagger_3',
+    baseId: 'dagger_l30',
     level: 35,
     mods: [
       m('damage', 'inc', 80, 100, { damageTypes: ['physical'], local: true }),
@@ -522,7 +522,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'graveBite',
     name: 'Grave Bite',
-    baseId: 'claw_3',
+    baseId: 'claw_l34',
     level: 34,
     mods: [
       m('lifeOnHit', 'base', 20, 20, { tags: ['attack'] }),
@@ -553,7 +553,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'openFistMitts',
     name: 'Open-Fist Mitts',
-    baseId: 'gloves_eves_1',
+    baseId: 'gloves_eves_l5',
     level: 5,
     mods: [
       m('attackSpeed', 'inc', 30, 30, { condition: { id: 'onFullLife' } }),
@@ -591,8 +591,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'prismTreads',
     name: 'Prism Treads',
-    baseId: 'boots_es_4',
-    level: 60,
+    baseId: 'boots_es_l53',
+    level: 53,
     mods: [
       m('blockSpell', 'base', 4, 6),
       m('mana', 'base', 40, 60),
@@ -605,7 +605,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'penitentBlade',
     name: 'Penitent Blade',
-    baseId: 'sword_5',
+    baseId: 'sword_l64',
     level: 64,
     mods: [
       m('accuracy', 'base', 460, 460, { local: true }),
@@ -626,8 +626,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wolfhowlBlade',
     name: 'Wolfhowl Blade',
-    baseId: 'sword2_4',
-    level: 45,
+    baseId: 'sword2_l44',
+    level: 44,
     mods: [
       m('accuracy', 'base', 305, 305, { local: true }),
       m('damage', 'inc', 120, 150, { damageTypes: ['physical'], local: true }),
@@ -640,14 +640,14 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'singedWoolGloves',
     name: 'Singed Wool Gloves',
-    baseId: 'gloves_es_1',
+    baseId: 'gloves_es_l1',
     level: 11,
     mods: [
       m('damage.min', 'base', 4, 4, { damageTypes: ['fire'], tags: ['attack'] }),
       m('damage.max', 'base', 8, 8, { damageTypes: ['fire'], tags: ['attack'] }),
       m('damage.min', 'base', 1, 1, { damageTypes: ['lightning'], tags: ['attack'] }),
       m('damage.max', 'base', 13, 13, { damageTypes: ['lightning'], tags: ['attack'] }),
-      m('es', 'base', 8),
+      m('es', 'base', 18),
       m('itemQuantity', 'inc', 5, 10),
     ],
     flavour: 'Soft, scorched and lucky.',
@@ -655,7 +655,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'longstrideBoots',
     name: 'Longstride Boots',
-    baseId: 'boots_ev_1',
+    baseId: 'boots_ev_l1',
     level: 1,
     mods: [m('moveSpeed', 'inc', 50)],
     flavour: 'The road is shorter in these.',
@@ -663,8 +663,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'scholarsQuickstep',
     name: "Scholar's Quickstep",
-    baseId: 'boots_es_3',
-    level: 40,
+    baseId: 'boots_es_l32',
+    level: 32,
     mods: [
       m('dex', 'base', 10),
       m('int', 'base', 20, 30),
@@ -678,8 +678,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'frostneedleSword',
     name: 'Frostneedle Sword',
-    baseId: 'sword2_2',
-    level: 15,
+    baseId: 'sword2_l12',
+    level: 14,
     mods: [
       m('accuracy', 'inc', 40),
       m('damage', 'inc', 80, 100, { damageTypes: ['physical'], local: true }),
@@ -693,7 +693,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'moonwoodBow',
     name: 'Moonwood Bow',
-    baseId: 'bow_1',
+    baseId: 'bow_l1',
     level: 36,
     mods: [
       m('socketedGemLevel', 'base', 1),
@@ -710,7 +710,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'moonwoodSwitch',
     name: 'Moonwood Switch',
-    baseId: 'bow_1',
+    baseId: 'bow_l1',
     level: 2,
     mods: [
       m('socketedGemLevel', 'base', 1, 1, { tags: ['bow'] }),
@@ -724,7 +724,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'snakeskinGrips',
     name: 'Snakeskin Grips',
-    baseId: 'gloves_arev_2',
+    baseId: 'gloves_arev_l27',
     level: 27,
     mods: [
       m('dex', 'base', 40, 50),
@@ -750,7 +750,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'solsticeTreads',
     name: 'Solstice Treads',
-    baseId: 'boots_eves_2',
+    baseId: 'boots_eves_l27',
     level: 27,
     mods: [
       m('attackSpeed', 'inc', 10),
@@ -764,14 +764,14 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'burnishedFob',
     name: 'Burnished Fob',
-    baseId: 'amulet_all',
-    level: 30,
+    baseId: 'amulet_rarity',
+    level: 8,
     mods: [
       m('dex', 'base', 10),
       m('damage.min', 'base', 12, 12, { damageTypes: ['fire'], tags: ['attack'] }),
       m('damage.max', 'base', 24, 24, { damageTypes: ['fire'], tags: ['attack'] }),
       m('accuracy', 'base', 100, 150),
-      m('evasion', 'base', 60, 90),
+      m('evasion', 'base', 100, 150),
       m('resist.fire', 'base', 20),
     ],
     flavour: 'A small warm lie.',
@@ -779,8 +779,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cinderStaff',
     name: 'Cinder Staff',
-    baseId: 'staff_5',
-    level: 60,
+    baseId: 'staff_l62',
+    level: 62,
     mods: [
       m('blockAttack', 'base', 18),
       m('gemLevel', 'base', 2, 2, { tags: ['fire', 'spell'] }),
@@ -793,13 +793,13 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'beaconQuiver',
     name: 'Beacon Quiver',
-    baseId: 'quiver_acc',
+    baseId: 'quiver_fire_bow',
     level: 24,
     mods: [
       m('damage.min', 'base', 4, 4, { damageTypes: ['fire'], tags: ['attack', 'bow'] }),
       m('damage.max', 'base', 8, 8, { damageTypes: ['fire'], tags: ['attack', 'bow'] }),
       m('attackSpeed', 'inc', 10),
-      m('evasion', 'base', 48, 60),
+      m('evasion', 'base', 80, 100),
       m('mana', 'base', 10, 30),
       m('gain.physical.fire', 'base', 25, 35),
       m('convert.physical.fire', 'base', 50),
@@ -811,8 +811,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gospelSceptre',
     name: 'Gospel Sceptre',
-    baseId: 'sceptre_4',
-    level: 45,
+    baseId: 'sceptre_l41',
+    level: 41,
     mods: [
       m('damage', 'inc', 30, 30, { damageTypes: ['fire', 'cold', 'lightning'] }),
       m('socketedGemLevel', 'base', 1),
@@ -826,7 +826,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'lopsidedPendant',
     name: 'Lopsided Pendant',
-    baseId: 'amulet_dex',
+    baseId: 'amulet_dex_int',
     level: 23,
     mods: [
       m('critChance', 'inc', 100),
@@ -864,7 +864,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'twinchargePendant',
     name: 'Twin-charge Pendant',
-    baseId: 'amulet_dex',
+    baseId: 'amulet_dex_int',
     level: 16,
     mods: [
       m('resist.lightning', 'base', 30, 40),
@@ -879,7 +879,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hollowCapacitor',
     name: 'Hollow Capacitor',
-    baseId: 'wand_5',
+    baseId: 'wand_l68',
     level: 68,
     mods: [
       m('damage', 'inc', 36, 40, { tags: ['spell'] }),
@@ -895,7 +895,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'plainSetting',
     name: 'Plain Setting',
-    baseId: 'ring_mana',
+    baseId: 'ring_socket',
     level: 45,
     mods: [m('socketedGemLevel', 'base', 5)],
     flavour: 'It holds nothing, so it lifts everything.',
@@ -903,8 +903,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'paupersMaul',
     name: "Pauper's Maul",
-    baseId: 'mace2_5',
-    level: 60,
+    baseId: 'mace2_l54',
+    level: 54,
     mods: [
       m('stunDuration', 'inc', 30),
       m('damage', 'inc', 150, 150, { damageTypes: ['physical'], local: true }),
@@ -918,12 +918,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'footlooseShoes',
     name: 'Footloose Shoes',
-    baseId: 'boots_es_1',
+    baseId: 'boots_es_l1',
     level: 1,
     mods: [
       m('dex', 'base', 5),
       m('manaRegen', 'inc', 20, 40),
-      m('es', 'base', 5, 9),
+      m('es', 'base', 10, 20),
       m('moveSpeed', 'inc', 20),
       m('cannotBeFrozen', 'flag', 1),
     ],
@@ -932,13 +932,13 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'luckySnare',
     name: 'Lucky Snare',
-    baseId: 'boots_es_1',
+    baseId: 'boots_es_l9',
     level: 9,
     mods: [
       m('str', 'base', 5, 10),
       m('dex', 'base', 5, 10),
       m('int', 'base', 5, 10),
-      m('es', 'base', 5, 7),
+      m('es', 'base', 10, 16),
       m('itemRarity', 'inc', 100, 100, { condition: { id: 'onLowLife' } }),
       m('moveSpeed', 'inc', 10),
     ],
@@ -947,7 +947,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stormcallersPole',
     name: "Stormcaller's Pole",
-    baseId: 'staff_5',
+    baseId: 'staff_l66',
     level: 66,
     mods: [
       m('blockAttack', 'base', 18),
@@ -962,7 +962,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stormcallersRod',
     name: "Stormcaller's Rod",
-    baseId: 'staff_5',
+    baseId: 'staff_l66',
     level: 66,
     mods: [
       m('blockAttack', 'base', 18),
@@ -978,7 +978,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stormcallersCrook',
     name: "Stormcaller's Crook",
-    baseId: 'staff_5',
+    baseId: 'staff_l66',
     level: 66,
     mods: [
       m('blockAttack', 'base', 18),
@@ -993,7 +993,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stormcallersSpire',
     name: "Stormcaller's Spire",
-    baseId: 'staff_5',
+    baseId: 'staff_l66',
     level: 66,
     mods: [
       m('blockAttack', 'base', 18),
@@ -1008,11 +1008,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'embertoothTotem',
     name: 'Embertooth Totem',
-    baseId: 'amulet_all',
-    level: 30,
+    baseId: 'amulet_liferegen',
+    level: 1,
     mods: [
       m('lifeRegen', 'base', 2, 4),
-      m('evasion', 'base', 60, 60, { condition: { id: 'onLowLife' } }),
+      m('evasion', 'base', 100, 100, { condition: { id: 'onLowLife' } }),
       m('life', 'base', 30, 50),
       m('resist.fire', 'base', 20, 30),
       m('lifeRegenPct', 'base', 1, 1, { condition: { id: 'onLowLife' } }),
@@ -1022,15 +1022,15 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pearlOfPlenty',
     name: 'Pearl of Plenty',
-    baseId: 'amulet_all',
-    level: 30,
+    baseId: 'amulet_manaregen',
+    level: 16,
     mods: [m('mana', 'base', 100), m('mana', 'inc', 16, 24), m('manaRegen', 'inc', 80, 100)],
     flavour: "Round, smooth, and full of other people's mana.",
   },
   {
     id: 'gildedPall',
     name: 'Gilded Pall',
-    baseId: 'body_ar_4',
+    baseId: 'body_ar_l68',
     level: 75,
     mods: [
       m('armour', 'inc', 270, 340, { local: true }),
@@ -1045,7 +1045,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'silksoftSteps',
     name: 'Silk-soft Steps',
-    baseId: 'boots_ev_4',
+    baseId: 'boots_ev_l69',
     level: 69,
     mods: [
       m('evasion', 'inc', 180, 180, { local: true }),
@@ -1058,7 +1058,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wyrmsGut',
     name: "Wyrm's Gut",
-    baseId: 'body_arev_3',
+    baseId: 'body_arev_l46',
     level: 46,
     mods: [
       m('armour', 'inc', 150, 200, { local: true }),
@@ -1071,22 +1071,22 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'passOfTwoWinters',
     name: 'Pass of Two Winters',
-    baseId: 'ring_cold',
+    baseId: 'ring_mana',
     level: 20,
     mods: [
       m('damage', 'inc', 25, 30, { damageTypes: ['fire'] }),
       m('damage.min', 'base', 20, 25, { damageTypes: ['cold'] }),
       m('damage.max', 'base', 30, 50, { damageTypes: ['cold'] }),
-      m('es', 'base', 14, 18),
+      m('es', 'base', 30, 40),
       m('damage', 'inc', 30, 30, { condition: { id: 'ignited' } }),
-      m('armour', 'base', 3000, 3000, { condition: { id: 'frozen' } }),
+      m('armour', 'base', 5000, 5000, { condition: { id: 'frozen' } }),
     ],
     flavour: 'Two fires, one cold road.',
   },
   {
     id: 'charcoalRing',
     name: 'Charcoal Ring',
-    baseId: 'ring_mana',
+    baseId: 'ring_phys',
     level: 1,
     mods: [
       m('damage', 'inc', 5, 5, { damageTypes: ['physical'] }),
@@ -1100,7 +1100,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'clottedGrip',
     name: 'Clotted Grip',
-    baseId: 'amulet_all',
+    baseId: 'amulet_liferegen',
     level: 55,
     mods: [
       m('lifeRegen', 'base', 2, 4),
@@ -1116,7 +1116,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'thirstingPaw',
     name: 'Thirsting Paw',
-    baseId: 'claw_5',
+    baseId: 'claw_l62',
     level: 62,
     mods: [
       m('damage', 'inc', 150, 170, { damageTypes: ['physical'], local: true }),
@@ -1132,7 +1132,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'thornjerkin',
     name: 'Thornjerkin',
-    baseId: 'body_ar_1',
+    baseId: 'body_ar_l1',
     level: 1,
     mods: [
       m('damage.min', 'base', 2, 2, { damageTypes: ['physical'], tags: ['attack'] }),
@@ -1146,10 +1146,10 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'brinewalkerBoots',
     name: 'Brinewalker Boots',
-    baseId: 'boots_eves_3',
+    baseId: 'boots_eves_l41',
     level: 41,
     mods: [
-      m('es', 'base', 36, 45),
+      m('es', 'base', 80, 100),
       m('damage', 'inc', 20, 20, { damageTypes: ['physical'] }),
       m('moveSpeed', 'inc', 25),
       m('resist.lightning', 'base', 20, 30),
@@ -1160,11 +1160,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'quickhideWrap',
     name: 'Quickhide Wrap',
-    baseId: 'body_ev_1',
+    baseId: 'body_ev_l9',
     level: 9,
     mods: [
       m('attackSpeed', 'inc', 10),
-      m('evasion', 'base', 72, 108, { local: true }),
+      m('evasion', 'base', 120, 180, { local: true }),
       m('resist.cold', 'base', 30, 40),
       m('moveSpeed', 'inc', 5),
       m('flaskManaRecovery', 'inc', 20, 25),
@@ -1175,8 +1175,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pelletSceptre',
     name: 'Pellet Sceptre',
-    baseId: 'sceptre_3',
-    level: 30,
+    baseId: 'sceptre_l28',
+    level: 28,
     mods: [
       m('damage', 'inc', 16, 16, { damageTypes: ['fire', 'cold', 'lightning'] }),
       m('damage', 'inc', 20, 20, { damageTypes: ['physical'], local: true }),
@@ -1201,7 +1201,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pactRing',
     name: 'Pact Ring',
-    baseId: 'ring_cold',
+    baseId: 'ring_mana',
     level: 20,
     mods: [
       m('resist.cold', 'base', 12, 16),
@@ -1218,7 +1218,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     id: 'slaughterPendant',
     name: 'Slaughter Pendant',
     baseId: 'amulet_all',
-    level: 30,
+    level: 20,
     mods: [
       m('allAttr', 'base', 20, 40),
       m('resist.allEle', 'base', 10, 20),
@@ -1231,7 +1231,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'smoulderingBulwark',
     name: 'Smouldering Bulwark',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_ar_l61',
     level: 61,
     mods: [
       m('life', 'base', 20, 30),
@@ -1248,7 +1248,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gildedMalice',
     name: 'Gilded Malice',
-    baseId: 'body_arev_4',
+    baseId: 'body_arev_l69',
     level: 69,
     mods: [
       m('damage', 'inc', 50, 80, { damageTypes: ['chaos'] }),
@@ -1262,8 +1262,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pyreRobe',
     name: 'Pyre Robe',
-    baseId: 'body_es_2',
-    level: 20,
+    baseId: 'body_es_l18',
+    level: 18,
     mods: [
       m('resist.fire', 'base', 30, 50),
       m('duration.ignite', 'inc', 30, 50),
@@ -1276,10 +1276,10 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'briarCirclet',
     name: 'Briar Circlet',
-    baseId: 'helmet_es_1',
+    baseId: 'helmet_es_l1',
     level: 1,
     mods: [
-      m('es', 'base', 27, 36),
+      m('es', 'base', 60, 80),
       m('reflect.physical', 'base', 5),
       m('flatTaken.attack.physical', 'base', 5),
       m('grantsKeystone.painConduit', 'flag', 1),
@@ -1289,7 +1289,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'saluteOfThePit',
     name: 'Salute of the Pit',
-    baseId: 'amulet_str',
+    baseId: 'amulet_str_dex',
     level: 16,
     mods: [
       m('es', 'inc', -50),
@@ -1304,11 +1304,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'lastSprint',
     name: 'Last Sprint',
-    baseId: 'ring_mana',
+    baseId: 'ring_chaos',
     level: 46,
     mods: [
       m('accuracy', 'base', 300, 350),
-      m('armour', 'base', 156, 180),
+      m('armour', 'base', 260, 300),
       m('life', 'base', 40, 50),
       m('resist.chaos', 'base', 15, 20),
       m('leech.life', 'base', 0.6, 0.8, { damageTypes: ['physical'], tags: ['attack'] }),
@@ -1319,7 +1319,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'paleHarp',
     name: 'Pale Harp',
-    baseId: 'bow_3',
+    baseId: 'bow_l32',
     level: 32,
     mods: [
       m('damage', 'inc', 100, 125, { damageTypes: ['physical'], local: true }),
@@ -1332,7 +1332,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'paleDirge',
     name: 'Pale Dirge',
-    baseId: 'bow_3',
+    baseId: 'bow_l32',
     level: 44,
     mods: [
       m('damage', 'inc', 100, 125, { damageTypes: ['physical'], local: true }),
@@ -1347,7 +1347,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'faithkeeperVisor',
     name: 'Faithkeeper Visor',
-    baseId: 'helmet_arev_4',
+    baseId: 'helmet_arev_l67',
     level: 67,
     mods: [
       m('damage', 'inc', -10, -10, { damageTypes: ['physical'] }),
@@ -1363,7 +1363,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'starlitSkean',
     name: 'Starlit Skean',
-    baseId: 'dagger_5',
+    baseId: 'runedagger_l66',
     level: 66,
     mods: [
       m('damage', 'inc', 50, 70, { tags: ['spell'] }),
@@ -1381,7 +1381,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'venomtongueGloves',
     name: 'Venomtongue Gloves',
-    baseId: 'gloves_es_2',
+    baseId: 'gloves_es_l12',
     level: 64,
     mods: [
       m('damage', 'inc', 50, 60, { tags: ['spell'] }),
@@ -1389,7 +1389,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
       m('damage.min', 'base', 48, 56, { damageTypes: ['chaos'], tags: ['spell'] }),
       m('damage.max', 'base', 73, 84, { damageTypes: ['chaos'], tags: ['spell'] }),
       m('castSpeed', 'inc', -15),
-      m('es', 'base', 29, 43),
+      m('es', 'base', 64, 96),
       m('costFlat', 'base', 50),
     ],
     flavour: 'They whisper only the cruel parts.',
@@ -1397,7 +1397,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'corsairsTricorne',
     name: "Corsair's Tricorne",
-    baseId: 'helmet_ev_1',
+    baseId: 'helmet_ev_l10',
     level: 12,
     mods: [
       m('damage.min', 'base', 6, 6, { damageTypes: ['cold'], tags: ['attack'] }),
@@ -1413,13 +1413,13 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'vixenHide',
     name: 'Vixen Hide',
-    baseId: 'body_ev_2',
+    baseId: 'body_ev_l25',
     level: 25,
     mods: [
       m('damage.min', 'base', 5, 5, { damageTypes: ['physical'], tags: ['attack'] }),
       m('damage.max', 'base', 12, 12, { damageTypes: ['physical'], tags: ['attack'] }),
       m('dex', 'base', 20, 30),
-      m('evasion', 'base', 300, 300, { condition: { id: 'onFullLife' } }),
+      m('evasion', 'base', 500, 500, { condition: { id: 'onFullLife' } }),
       m('evasion', 'inc', 50, 70, { local: true }),
       m('moveSpeed', 'inc', 10),
     ],
@@ -1428,10 +1428,10 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pennyCap',
     name: 'Penny Cap',
-    baseId: 'helmet_ev_1',
+    baseId: 'helmet_ev_l1',
     level: 1,
     mods: [
-      m('evasion', 'base', 18, 30, { local: true }),
+      m('evasion', 'base', 30, 50, { local: true }),
       m('itemRarity', 'inc', 10),
       m('resist.allEle', 'base', 30, 40),
       m('reflect.physical', 'base', 4),
@@ -1441,7 +1441,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'mindfulClaw',
     name: 'Mindful Claw',
-    baseId: 'claw_2',
+    baseId: 'claw_l22',
     level: 22,
     mods: [
       m('lifeOnHit', 'base', 12, 12, { tags: ['attack'] }),
@@ -1465,7 +1465,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wiseClaw',
     name: 'Wise Claw',
-    baseId: 'claw_5',
+    baseId: 'claw_l68',
     level: 68,
     mods: [
       m('lifeOnHit', 'base', 46, 46, { tags: ['attack'] }),
@@ -1490,7 +1490,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     id: 'seersCharm',
     name: "Seer's Charm",
     baseId: 'amulet_all',
-    level: 30,
+    level: 20,
     mods: [
       m('accuracy', 'base', 1000),
       m('dodgeAttack', 'base', 6, 10),
@@ -1501,7 +1501,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gaolersClaw',
     name: "Gaoler's Claw",
-    baseId: 'claw_5',
+    baseId: 'claw_l68',
     level: 68,
     mods: [
       m('lifeOnHit', 'base', 46, 46, { tags: ['attack'] }),
@@ -1521,8 +1521,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rimeguardBuckler',
     name: 'Rimeguard Buckler',
-    baseId: 'shield_ev_2',
-    level: 20,
+    baseId: 'shield_ev_l16',
+    level: 16,
     mods: [
       m('moveSpeed', 'inc', 6),
       m('evasion', 'inc', 60, 100, { local: true }),
@@ -1537,10 +1537,10 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'penitentsCirclet',
     name: "Penitent's Circlet",
-    baseId: 'helmet_es_1',
+    baseId: 'helmet_es_l1',
     level: 52,
     mods: [
-      m('es', 'base', 77, 95),
+      m('es', 'base', 170, 210),
       m('reflect.physical', 'base', 5),
       m('flatTaken.attack.physical', 'base', 5),
       m('grantsKeystone.painConduit', 'flag', 1),
@@ -1550,7 +1550,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'brawnGirdle',
     name: 'Brawn Girdle',
-    baseId: 'belt_life',
+    baseId: 'belt_str',
     level: 8,
     mods: [
       m('damage.min', 'base', 5, 5, { damageTypes: ['physical'], tags: ['attack'] }),
@@ -1565,7 +1565,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hushwalkBoots',
     name: 'Hush-walk Boots',
-    baseId: 'boots_arev_3',
+    baseId: 'boots_arev_l42',
     level: 42,
     mods: [
       m('damage.min', 'base', 25, 30, { damageTypes: ['cold'], tags: ['spell'] }),
@@ -1580,12 +1580,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cinderTotem',
     name: 'Cinder Totem',
-    baseId: 'amulet_all',
+    baseId: 'amulet_liferegen',
     level: 36,
     mods: [
       m('lifeRegen', 'base', 2, 4),
       m('damage', 'inc', 50, 70, { damageTypes: ['fire'] }),
-      m('evasion', 'base', 60, 60, { condition: { id: 'onLowLife' } }),
+      m('evasion', 'base', 100, 100, { condition: { id: 'onLowLife' } }),
       m('life', 'base', 30, 50),
       m('resist.fire', 'base', 20, 30),
       m('lifeRegenPct', 'base', 1, 1, { condition: { id: 'onLowLife' } }),
@@ -1595,7 +1595,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hailBow',
     name: 'Hail Bow',
-    baseId: 'bow_1',
+    baseId: 'bow_l5',
     level: 5,
     mods: [
       m('dex', 'base', 10, 20),
@@ -1611,7 +1611,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'harvestersChase',
     name: "Harvester's Chase",
-    baseId: 'axe2_3',
+    baseId: 'axe2_l33',
     level: 33,
     mods: [
       m('damage', 'inc', 100, 125, { damageTypes: ['physical'], local: true }),
@@ -1626,7 +1626,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'crimsonGreaves',
     name: 'Crimson Greaves',
-    baseId: 'boots_ar_3',
+    baseId: 'boots_ar_l46',
     level: 46,
     mods: [
       m('life', 'base', 50, 70),
@@ -1642,7 +1642,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sparkQuiver',
     name: 'Spark Quiver',
-    baseId: 'quiver_acc',
+    baseId: 'quiver_crit',
     level: 45,
     mods: [
       m('dex', 'base', 30, 40),
@@ -1657,7 +1657,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'saplingKite',
     name: 'Sapling Kite',
-    baseId: 'shield_ares_1',
+    baseId: 'shield_ares_l7',
     level: 7,
     mods: [
       m('resist.allEle', 'base', 4),
@@ -1672,7 +1672,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'thunderstrideGreaves',
     name: 'Thunderstride Greaves',
-    baseId: 'boots_ar_2',
+    baseId: 'boots_ar_l23',
     level: 23,
     mods: [
       m('resist.lightning', 'base', 1, 50),
@@ -1699,7 +1699,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
       }),
       m('damage.min', 'base', 7, 10, { damageTypes: ['cold'] }),
       m('damage.max', 'base', 15, 20, { damageTypes: ['cold'] }),
-      m('evasion', 'base', 120, 180),
+      m('evasion', 'base', 200, 300),
       m('avoid.chill', 'base', 50),
       m('chance.freeze', 'base', 10),
     ],
@@ -1708,7 +1708,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'heartwoodKite',
     name: 'Heartwood Kite',
-    baseId: 'shield_ares_1',
+    baseId: 'shield_ares_l7',
     level: 40,
     mods: [
       m('armour', 'inc', 80, 120, { local: true }),
@@ -1723,7 +1723,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'ruinwakeBoots',
     name: 'Ruinwake Boots',
-    baseId: 'boots_ares_2',
+    baseId: 'boots_ares_l28',
     level: 28,
     mods: [
       m('moveSpeed', 'inc', 15),
@@ -1738,12 +1738,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'thornwall',
     name: 'Thornwall',
-    baseId: 'body_ar_1',
+    baseId: 'body_ar_l1',
     level: 30,
     mods: [
       m('damage.min', 'base', 2, 2, { damageTypes: ['physical'], tags: ['attack'] }),
       m('damage.max', 'base', 4, 4, { damageTypes: ['physical'], tags: ['attack'] }),
-      m('armour', 'base', 1200, 1200, { local: true }),
+      m('armour', 'base', 2000, 2000, { local: true }),
       m('life', 'base', 12, 20),
       m('flatTaken.attack.physical', 'base', -2),
       m('reflectPhysPct', 'base', 40),
@@ -1753,11 +1753,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'windhideWrap',
     name: 'Windhide Wrap',
-    baseId: 'body_ev_1',
+    baseId: 'body_ev_l9',
     level: 57,
     mods: [
       m('attackSpeed', 'inc', 5, 8),
-      m('evasion', 'base', 360, 420, { local: true }),
+      m('evasion', 'base', 600, 700, { local: true }),
       m('resist.cold', 'base', 30, 40),
       m('moveSpeed', 'inc', 5),
       m('flaskManaRecovery', 'inc', 20, 25),
@@ -1769,7 +1769,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rimeheart',
     name: 'Rimeheart',
-    baseId: 'amulet_all',
+    baseId: 'amulet_rarity',
     level: 42,
     mods: [
       m('dex', 'base', 20, 30),
@@ -1797,7 +1797,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     id: 'stoicPendant',
     name: 'Stoic Pendant',
     baseId: 'amulet_all',
-    level: 30,
+    level: 20,
     mods: [m('allAttr', 'base', 80, 100), m('flatTaken.attack.physical', 'base', -4)],
     flavour: 'Hits land softer on the one who expects them.',
   },
@@ -1805,9 +1805,9 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     id: 'draughtLocket',
     name: 'Draught Locket',
     baseId: 'amulet_all',
-    level: 30,
+    level: 28,
     mods: [
-      m('es', 'base', 9, 14),
+      m('es', 'base', 20, 30),
       m('resist.fire', 'base', 15, 30),
       m('resist.lightning', 'base', 15, 30),
       m('armour', 'inc', 15, 25),
@@ -1853,7 +1853,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'reapingCharm',
     name: 'Reaping Charm',
-    baseId: 'amulet_str',
+    baseId: 'amulet_str_int',
     level: 16,
     mods: [
       m('str', 'base', 30, 50),
@@ -1866,7 +1866,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'singedCameo',
     name: 'Singed Cameo',
-    baseId: 'amulet_str',
+    baseId: 'amulet_str_dex',
     level: 68,
     mods: [
       m('chance.ignite', 'base', 10),
@@ -1883,7 +1883,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     mods: [
       m('accuracy', 'base', 80, 120),
       m('critMulti', 'base', 210, 240),
-      m('evasion', 'base', 48, 60),
+      m('evasion', 'base', 80, 100),
       m('critChance', 'more', -40),
     ],
     flavour: 'A bet that pays rarely and pays enough.',
@@ -1891,8 +1891,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rabbitCharm',
     name: 'Rabbit Charm',
-    baseId: 'amulet_all',
-    level: 30,
+    baseId: 'amulet_rarity',
+    level: 29,
     mods: [m('dex', 'base', 40, 50), m('moveSpeed', 'inc', 5, 8)],
     flavour: 'Lucky for someone.',
   },
@@ -1917,7 +1917,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'altarHeart',
     name: 'Altar Heart',
-    baseId: 'amulet_all',
+    baseId: 'amulet_manaregen',
     level: 32,
     mods: [
       m('damage.min', 'base', 22, 27, { damageTypes: ['fire'] }),
@@ -1932,7 +1932,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sproutingSeed',
     name: 'Sprouting Seed',
-    baseId: 'amulet_str',
+    baseId: 'amulet_str_int',
     level: 16,
     mods: [m('manaRegen', 'inc', 30, 50), m('lifeRegenPct', 'base', 2)],
     flavour: 'Nothing planted here stays small.',
@@ -1945,7 +1945,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     mods: [
       m('attackSpeed', 'inc', -10),
       m('castSpeed', 'inc', -10),
-      m('armour', 'base', 240, 300),
+      m('armour', 'base', 400, 500),
       m('recover.block.life', 'base', 34, 48),
       m('recover.block.mana', 'base', 10, 24),
       m('blockAttack', 'base', 8),
@@ -1956,7 +1956,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'capacitorLocket',
     name: 'Capacitor Locket',
-    baseId: 'amulet_str',
+    baseId: 'amulet_str_int',
     level: 32,
     mods: [
       m('life', 'base', 30, 50),
@@ -1998,7 +1998,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bentHourglass',
     name: 'Bent Hourglass',
-    baseId: 'amulet_dex',
+    baseId: 'amulet_dex_int',
     level: 50,
     mods: [
       m('attackSpeed', 'inc', 8, 12),
@@ -2026,7 +2026,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'blightedCore',
     name: 'Blighted Core',
-    baseId: 'amulet_all',
+    baseId: 'amulet_manaregen',
     level: 70,
     mods: [
       m('damage.min', 'base', 48, 53, { damageTypes: ['chaos'] }),
@@ -2040,7 +2040,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'venomedHook',
     name: 'Venomed Hook',
-    baseId: 'amulet_dex',
+    baseId: 'amulet_dex_int',
     level: 20,
     mods: [
       m('life', 'inc', 4, 8),
@@ -2058,7 +2058,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     mods: [
       m('damage', 'inc', 10, 20, { damageTypes: ['fire', 'cold', 'lightning'], tags: ['attack'] }),
       m('mana', 'base', 45, 55),
-      m('es', 'base', 27, 32),
+      m('es', 'base', 60, 70),
       m('leech.mana', 'base', 0.2, 0.2, {
         damageTypes: ['physical'],
         tags: ['attack'],
@@ -2070,7 +2070,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'tricksterCinch',
     name: 'Trickster Cinch',
-    baseId: 'belt_life',
+    baseId: 'belt_str',
     level: 20,
     mods: [
       m('damage', 'inc', 15, 25, { damageTypes: ['physical'] }),
@@ -2082,11 +2082,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'thunderholdBelt',
     name: 'Thunderhold Belt',
-    baseId: 'belt_life',
+    baseId: 'belt_str',
     level: 68,
     mods: [
       m('damage', 'inc', 20, 30, { damageTypes: ['lightning'] }),
-      m('armour', 'base', 180, 210),
+      m('armour', 'base', 300, 350),
       m('resist.fire', 'base', 30, 35),
       m('resist.cold', 'base', 30, 35),
       m('leech.life', 'base', 0.2, 0.2, { damageTypes: ['lightning'] }),
@@ -2096,7 +2096,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pacifistGirdle',
     name: 'Pacifist Girdle',
-    baseId: 'belt_life',
+    baseId: 'belt_str',
     level: 52,
     mods: [
       m('life', 'base', 70, 85),
@@ -2111,7 +2111,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'quaffersSash',
     name: "Quaffer's Sash",
-    baseId: 'belt_life',
+    baseId: 'belt_phys',
     level: 11,
     mods: [
       m('damage', 'inc', 12, 24, { damageTypes: ['physical'] }),
@@ -2168,7 +2168,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hoardersSash',
     name: "Hoarder's Sash",
-    baseId: 'belt_life',
+    baseId: 'belt_stun',
     level: 16,
     mods: [
       m('stunDurationOnSelf', 'base', 15, 25),
@@ -2183,7 +2183,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stalwartGirdle',
     name: 'Stalwart Girdle',
-    baseId: 'belt_armour',
+    baseId: 'belt_duelist',
     level: 78,
     mods: [
       m('life', 'inc', 4, 8),
@@ -2195,7 +2195,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rainbandSash',
     name: 'Rainband Sash',
-    baseId: 'belt_life',
+    baseId: 'belt_phys',
     level: 25,
     mods: [
       m('damage', 'inc', 12, 24, { damageTypes: ['physical'] }),
@@ -2213,7 +2213,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'brawlStrap',
     name: 'Brawl Strap',
-    baseId: 'belt_life',
+    baseId: 'belt_stunner',
     level: 20,
     mods: [
       m('life', 'base', 80, 100),
@@ -2229,7 +2229,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'foundryBelt',
     name: 'Foundry Belt',
-    baseId: 'belt_life',
+    baseId: 'belt_stunner',
     level: 16,
     mods: [
       m('damage', 'inc', 25, 40, { damageTypes: ['physical'] }),
@@ -2241,7 +2241,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bilgeSash',
     name: 'Bilge Sash',
-    baseId: 'belt_life',
+    baseId: 'belt_phys',
     level: 44,
     mods: [
       m('damage', 'inc', 12, 24, { damageTypes: ['physical'] }),
@@ -2257,7 +2257,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stockroomGirdle',
     name: 'Stockroom Girdle',
-    baseId: 'belt_life',
+    baseId: 'belt_stunner',
     level: 48,
     mods: [
       m('damage', 'inc', 25, 40, { damageTypes: ['physical'] }),
@@ -2285,8 +2285,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'ashwardJerkin',
     name: 'Ashward Jerkin',
-    baseId: 'body_ev_2',
-    level: 20,
+    baseId: 'body_ev_l17',
+    level: 17,
     mods: [
       m('evasion', 'inc', 80, 100, { local: true }),
       m('life', 'base', 30, 50),
@@ -2299,8 +2299,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'mindwallRobe',
     name: 'Mindwall Robe',
-    baseId: 'body_eves_4',
-    level: 60,
+    baseId: 'body_eves_l52',
+    level: 52,
     mods: [
       m('evasion', 'inc', 300, 400, { local: true }),
       m('es', 'inc', 300, 400, { local: true }),
@@ -2313,7 +2313,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rimeLattice',
     name: 'Rime Lattice',
-    baseId: 'body_ares_3',
+    baseId: 'body_ares_l39',
     level: 49,
     mods: [
       m('str', 'base', 30, 40),
@@ -2330,7 +2330,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'drakeHidePlate',
     name: 'Drake Hide Plate',
-    baseId: 'body_arev_4',
+    baseId: 'body_arev_l63',
     level: 63,
     mods: [
       m('armour', 'inc', 160, 200, { local: true }),
@@ -2346,14 +2346,14 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'russetWraps',
     name: 'Russet Wraps',
-    baseId: 'body_ev_2',
+    baseId: 'body_ev_l25',
     level: 54,
     mods: [
       m('damage.min', 'base', 5, 5, { damageTypes: ['physical'], tags: ['attack'] }),
       m('damage.max', 'base', 12, 12, { damageTypes: ['physical'], tags: ['attack'] }),
       m('dex', 'base', 20, 30),
-      m('evasion', 'base', 900, 900, { local: true, condition: { id: 'onFullLife' } }),
-      m('evasion', 'base', 240, 300, { local: true }),
+      m('evasion', 'base', 1500, 1500, { local: true, condition: { id: 'onFullLife' } }),
+      m('evasion', 'base', 400, 500, { local: true }),
       m('evasion', 'inc', 120, 150, { local: true }),
       m('moveSpeed', 'inc', 10),
     ],
@@ -2362,13 +2362,13 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hallowedRingmail',
     name: 'Hallowed Ringmail',
-    baseId: 'body_ares_4',
+    baseId: 'body_ares_l64',
     level: 64,
     mods: [
       m('armour', 'inc', 50, 75, { local: true }),
       m('es', 'inc', 50, 75, { local: true }),
       m('life', 'base', 50, 70),
-      m('es', 'base', 14, 18),
+      m('es', 'base', 30, 40),
       m('resist.allEle', 'base', 14, 18),
       m('es', 'base', 0.9, 0.9, { per: { stat: 'str', div: 5 } }),
     ],
@@ -2377,8 +2377,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hoardPlate',
     name: 'Hoard Plate',
-    baseId: 'body_ar_4',
-    level: 60,
+    baseId: 'body_ar_l56',
+    level: 56,
     mods: [
       m('itemQuantity', 'inc', 10, 15),
       m('itemRarity', 'inc', 30, 50),
@@ -2392,7 +2392,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rimeshotLeathers',
     name: 'Rimeshot Leathers',
-    baseId: 'body_ev_4',
+    baseId: 'body_ev_l65',
     level: 65,
     mods: [
       m('dex', 'base', 40, 50),
@@ -2406,7 +2406,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'emberHaloMail',
     name: 'Ember Halo Mail',
-    baseId: 'body_ares_4',
+    baseId: 'body_ares_l70',
     level: 70,
     mods: [
       m('armour', 'inc', 220, 240, { local: true }),
@@ -2420,7 +2420,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cinderVestment',
     name: 'Cinder Vestment',
-    baseId: 'body_es_4',
+    baseId: 'body_es_l65',
     level: 65,
     mods: [
       m('socketedGemLevel', 'base', 1, 1, { tags: ['fire'] }),
@@ -2434,7 +2434,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'voltaicRags',
     name: 'Voltaic Rags',
-    baseId: 'body_eves_4',
+    baseId: 'body_eves_l68',
     level: 68,
     mods: [
       m('life', 'base', 60, 80),
@@ -2455,7 +2455,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'emberholdPlate',
     name: 'Emberhold Plate',
-    baseId: 'body_ar_4',
+    baseId: 'body_ar_l68',
     level: 68,
     sockets: 0,
     mods: [m('life', 'base', 500), m('damage', 'inc', 20, 40, { damageTypes: ['fire'] })],
@@ -2464,7 +2464,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'seamedLeather',
     name: 'Seamed Leather',
-    baseId: 'body_ev_4',
+    baseId: 'body_ev_l62',
     level: 62,
     mods: [
       m('evasion', 'inc', 100, 120, { local: true }),
@@ -2478,7 +2478,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'blightwardMail',
     name: 'Blightward Mail',
-    baseId: 'body_ares_3',
+    baseId: 'body_ares_l47',
     level: 47,
     mods: [
       m('armour', 'inc', 120, 140, { local: true }),
@@ -2491,7 +2491,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'arcCage',
     name: 'Arc Cage',
-    baseId: 'body_arev_4',
+    baseId: 'body_arev_l60',
     level: 60,
     mods: [
       m('damage.min', 'base', 1, 1, { damageTypes: ['lightning'], tags: ['attack'] }),
@@ -2507,7 +2507,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'prismwovenMail',
     name: 'Prismwoven Mail',
-    baseId: 'body_ares_4',
+    baseId: 'body_ares_l64',
     level: 64,
     sockets: 6,
     mods: [
@@ -2515,7 +2515,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
       m('damage.max', 'base', 14, 36, { damageTypes: ['physical'], tags: ['attack'] }),
       m('allAttr', 'base', 8, 24),
       m('critChance', 'inc', 20, 60),
-      m('es', 'base', 7, 23),
+      m('es', 'base', 15, 50),
       m('life', 'base', 20, 60),
       m('mana', 'base', 20, 50),
       m('itemRarity', 'inc', 6, 30),
@@ -2528,7 +2528,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cracklingVestment',
     name: 'Crackling Vestment',
-    baseId: 'body_es_4',
+    baseId: 'body_es_l62',
     level: 62,
     mods: [
       m('es', 'inc', 100, 150, { local: true }),
@@ -2542,7 +2542,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'paleVestment',
     name: 'Pale Vestment',
-    baseId: 'body_es_1',
+    baseId: 'body_es_l1',
     level: 1,
     mods: [m('socketedGemLevel', 'base', 1), m('globalDefences', 'inc', 100)],
     flavour: 'Wear it once and it is yours for good.',
@@ -2550,7 +2550,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'plainShift',
     name: 'Plain Shift',
-    baseId: 'body_es_1',
+    baseId: 'body_es_l1',
     level: 1,
     mods: [m('socketedGemLevel', 'base', 1), m('globalDefences', 'inc', 100)],
     flavour: 'Plain cloth, remarkably well kept.',
@@ -2558,8 +2558,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'brightsteelCuirass',
     name: 'Brightsteel Cuirass',
-    baseId: 'body_ar_2',
-    level: 20,
+    baseId: 'body_ar_l17',
+    level: 17,
     mods: [
       m('str', 'base', 10, 20),
       m('armour', 'inc', 60, 80, { local: true }),
@@ -2570,7 +2570,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bareCloth',
     name: 'Bare Cloth',
-    baseId: 'body_es_1',
+    baseId: 'body_es_l1',
     level: 1,
     sockets: 6,
     mods: [],
@@ -2579,12 +2579,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'furlinedRegalia',
     name: 'Furlined Regalia',
-    baseId: 'body_es_4',
+    baseId: 'body_es_l68',
     level: 68,
     mods: [
       m('damage', 'inc', 40, 40, { tags: ['spell'] }),
       m('es', 'inc', 110, 130, { local: true }),
-      m('es', 'base', 7, 11),
+      m('es', 'base', 15, 25),
       m('aoe', 'inc', 10, 10, { tags: ['area'] }),
       m('damageTaken', 'inc', 5),
       m('esRechargeRate', 'inc', 30, 40),
@@ -2594,7 +2594,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pactSilkRobe',
     name: 'Pact Silk Robe',
-    baseId: 'body_es_3',
+    baseId: 'body_es_l49',
     level: 49,
     mods: [
       m('int', 'base', 20, 30),
@@ -2607,7 +2607,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rampartPlate',
     name: 'Rampart Plate',
-    baseId: 'body_ar_4',
+    baseId: 'body_ar_l59',
     level: 68,
     mods: [
       m('blockAttack', 'base', 1, 1, { local: true, per: { stat: 'str', div: 50 } }),
@@ -2620,8 +2620,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hutchJerkin',
     name: 'Hutch Jerkin',
-    baseId: 'body_ev_4',
-    level: 60,
+    baseId: 'body_ev_l56',
+    level: 56,
     mods: [
       m('evasion', 'inc', 100, 120, { local: true }),
       m('life', 'base', 160, 200),
@@ -2634,7 +2634,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'driftingVeil',
     name: 'Drifting Veil',
-    baseId: 'body_eves_4',
+    baseId: 'body_eves_l71',
     level: 71,
     mods: [
       m('life', 'base', 60, 80),
@@ -2648,7 +2648,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'festivalSilks',
     name: 'Festival Silks',
-    baseId: 'body_es_1',
+    baseId: 'body_es_l1',
     level: 1,
     mods: [
       m('damage.min', 'base', 2, 2, { damageTypes: ['fire'] }),
@@ -2657,10 +2657,10 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
       m('damage.max', 'base', 3, 3, { damageTypes: ['cold'] }),
       m('damage.min', 'base', 1, 1, { damageTypes: ['lightning'] }),
       m('damage.max', 'base', 4, 4, { damageTypes: ['lightning'] }),
-      m('evasion', 'base', 6, 12, { local: true }),
+      m('evasion', 'base', 10, 20, { local: true }),
       m('life', 'base', 6),
       m('mana', 'base', 6),
-      m('es', 'base', 5, 9),
+      m('es', 'base', 10, 20),
       m('resist.fire', 'base', 5, 10),
       m('resist.cold', 'base', 5, 10),
       m('resist.lightning', 'base', 5, 10),
@@ -2670,7 +2670,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'coilscaleArmour',
     name: 'Coilscale Armour',
-    baseId: 'body_arev_2',
+    baseId: 'body_arev_l28',
     level: 28,
     mods: [
       m('armour', 'inc', 80, 100, { local: true }),
@@ -2686,8 +2686,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'tinderstepBoots',
     name: 'Tinderstep Boots',
-    baseId: 'boots_ev_2',
-    level: 20,
+    baseId: 'boots_ev_l12',
+    level: 12,
     mods: [
       m('str', 'base', 20, 30),
       m('moveSpeed', 'inc', 15),
@@ -2708,8 +2708,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'shellstrideGreaves',
     name: 'Shellstride Greaves',
-    baseId: 'boots_ar_4',
-    level: 60,
+    baseId: 'boots_ar_l54',
+    level: 54,
     mods: [
       m('armour', 'inc', 150, 180, { local: true }),
       m('life', 'base', 50, 70),
@@ -2721,8 +2721,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'titheSlippers',
     name: 'Tithe Slippers',
-    baseId: 'boots_eves_3',
-    level: 40,
+    baseId: 'boots_eves_l34',
+    level: 34,
     mods: [
       m('mana', 'base', 50, 60),
       m('resist.lightning', 'base', 15, 20),
@@ -2737,7 +2737,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'streakBoots',
     name: 'Streak Boots',
-    baseId: 'boots_arev_4',
+    baseId: 'boots_arev_l65',
     level: 65,
     mods: [
       m('armour', 'inc', 40, 70, { local: true }),
@@ -2752,7 +2752,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'deathbedGreaves',
     name: 'Deathbed Greaves',
-    baseId: 'boots_ares_4',
+    baseId: 'boots_ares_l64',
     level: 64,
     mods: [
       m('str', 'base', 20, 40),
@@ -2772,8 +2772,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'vesperCassock',
     name: 'Vesper Cassock',
-    baseId: 'body_es_3',
-    level: 40,
+    baseId: 'body_es_l37',
+    level: 37,
     mods: [
       m('damage.min', 'base', 1, 1, { damageTypes: ['lightning'], tags: ['attack'] }),
       m('damage.max', 'base', 40, 40, { damageTypes: ['lightning'], tags: ['attack'] }),
@@ -2785,7 +2785,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stormfootGreaves',
     name: 'Stormfoot Greaves',
-    baseId: 'boots_ar_4',
+    baseId: 'boots_ar_l68',
     level: 68,
     mods: [
       m('damage.min', 'base', 1, 3, { damageTypes: ['lightning'] }),
@@ -2799,7 +2799,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'murkscaleTreads',
     name: 'Murkscale Treads',
-    baseId: 'boots_arev_2',
+    baseId: 'boots_arev_l18',
     level: 40,
     mods: [
       m('armour', 'inc', 120, 150, { local: true }),
@@ -2814,8 +2814,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gloamstep',
     name: 'Gloamstep',
-    baseId: 'boots_arev_2',
-    level: 20,
+    baseId: 'boots_arev_l18',
+    level: 18,
     mods: [
       m('armour', 'inc', 40, 60, { local: true }),
       m('evasion', 'inc', 40, 60, { local: true }),
@@ -2831,7 +2831,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'longstrideWraps',
     name: 'Longstride Wraps',
-    baseId: 'boots_ev_4',
+    baseId: 'boots_ev_l62',
     level: 62,
     mods: [
       m('dex', 'base', 30, 40),
@@ -2845,8 +2845,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hoardkeeperShoes',
     name: 'Hoardkeeper Shoes',
-    baseId: 'boots_ev_3',
-    level: 40,
+    baseId: 'boots_ev_l34',
+    level: 34,
     mods: [
       m('manaRegen', 'inc', 60),
       m('resist.fire', 'base', 40, 50),
@@ -2858,7 +2858,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'lucidSlippers',
     name: 'Lucid Slippers',
-    baseId: 'boots_es_4',
+    baseId: 'boots_es_l61',
     level: 61,
     mods: [
       m('life', 'base', 50, 70),
@@ -2871,7 +2871,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stonerootGreaves',
     name: 'Stoneroot Greaves',
-    baseId: 'boots_ar_4',
+    baseId: 'boots_ar_l68',
     level: 68,
     sockets: 0,
     mods: [m('life', 'base', 150, 200), m('grantsKeystone.rootedStance', 'flag', 1)],
@@ -2880,7 +2880,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'quickdrawPads',
     name: 'Quickdraw Pads',
-    baseId: 'boots_arev_2',
+    baseId: 'boots_arev_l30',
     level: 30,
     mods: [
       m('str', 'base', 40, 60),
@@ -2904,12 +2904,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wardrunnerBoots',
     name: 'Wardrunner Boots',
-    baseId: 'boots_eves_2',
-    level: 20,
+    baseId: 'boots_eves_l16',
+    level: 16,
     mods: [
       m('dex', 'base', 20, 30),
-      m('evasion', 'base', 18, 30, { local: true }),
-      m('es', 'base', 7, 14),
+      m('evasion', 'base', 30, 50, { local: true }),
+      m('es', 'base', 15, 30),
       m('moveSpeed', 'inc', 20),
       m('resist.cold', 'base', 20),
       m('damageTaken', 'inc', 15, 15, { condition: { id: 'esFull' } }),
@@ -2920,8 +2920,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'vigilSlippers',
     name: 'Vigil Slippers',
-    baseId: 'boots_es_3',
-    level: 40,
+    baseId: 'boots_es_l32',
+    level: 32,
     mods: [
       m('dex', 'base', 10),
       m('int', 'base', 20, 30),
@@ -2935,13 +2935,13 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hushedTreads',
     name: 'Hushed Treads',
-    baseId: 'boots_ev_4',
+    baseId: 'boots_ev_l62',
     level: 62,
     mods: [
       m('dex', 'base', 20, 30),
       m('int', 'base', 20, 30),
       m('evasion', 'inc', 80, 100, { local: true }),
-      m('es', 'base', 45, 68),
+      m('es', 'base', 100, 150),
       m('moveSpeed', 'inc', 30),
     ],
     flavour: 'The quiet kind of fast.',
@@ -2949,7 +2949,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pyrewalkers',
     name: 'Pyrewalkers',
-    baseId: 'boots_eves_2',
+    baseId: 'boots_eves_l27',
     level: 59,
     mods: [
       m('attackSpeed', 'inc', 10),
@@ -2966,7 +2966,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'crimsonReel',
     name: 'Crimson Reel',
-    baseId: 'boots_ev_3',
+    baseId: 'boots_ev_l44',
     level: 44,
     mods: [
       m('dex', 'base', 30, 40),
@@ -2986,8 +2986,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'relentlessGreaves',
     name: 'Relentless Greaves',
-    baseId: 'boots_ar_4',
-    level: 60,
+    baseId: 'boots_ar_l54',
+    level: 54,
     mods: [
       m('life', 'base', 30, 60),
       m('moveSpeed', 'inc', 20),
@@ -2999,7 +2999,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'woundedRoad',
     name: 'Wounded Road',
-    baseId: 'boots_ar_4',
+    baseId: 'boots_ar_l68',
     level: 68,
     mods: [
       m('armour', 'inc', 60, 80, { local: true }),
@@ -3013,8 +3013,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'quickstepWraps',
     name: 'Quickstep Wraps',
-    baseId: 'boots_ev_4',
-    level: 60,
+    baseId: 'boots_ev_l55',
+    level: 55,
     mods: [
       m('dex', 'base', 25, 35),
       m('evasion', 'inc', 20, 40, { local: true }),
@@ -3027,8 +3027,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hillhopperBoots',
     name: 'Hillhopper Boots',
-    baseId: 'boots_ev_2',
-    level: 20,
+    baseId: 'boots_ev_l12',
+    level: 12,
     mods: [
       m('dex', 'base', 15),
       m('int', 'base', 15),
@@ -3040,7 +3040,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hollowSteps',
     name: 'Hollow Steps',
-    baseId: 'boots_eves_4',
+    baseId: 'boots_eves_l69',
     level: 69,
     mods: [
       m('dex', 'base', 30, 50),
@@ -3055,7 +3055,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pointblankBow',
     name: 'Pointblank Bow',
-    baseId: 'bow_5',
+    baseId: 'bow_l62',
     level: 62,
     mods: [
       m('critMulti', 'base', 15, 25),
@@ -3071,7 +3071,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gloomRecurve',
     name: 'Gloom Recurve',
-    baseId: 'bow_5',
+    baseId: 'bow_l62',
     level: 62,
     mods: [
       m('critMulti', 'base', 15, 25),
@@ -3088,8 +3088,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'dyedFletching',
     name: 'Dyed Fletching',
-    baseId: 'bow_3',
-    level: 30,
+    baseId: 'bow_l28',
+    level: 28,
     mods: [
       m('damage', 'inc', 20, 24, { damageTypes: ['fire', 'cold', 'lightning'], tags: ['attack'] }),
       m('damage.min', 'base', 12, 16, { damageTypes: ['physical'], local: true }),
@@ -3103,7 +3103,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'spectrumBow',
     name: 'Spectrum Bow',
-    baseId: 'bow_3',
+    baseId: 'bow_l28',
     level: 40,
     mods: [
       m('damage', 'inc', 20, 24, { damageTypes: ['fire', 'cold', 'lightning'], tags: ['attack'] }),
@@ -3120,7 +3120,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rimeHunter',
     name: 'Rime Hunter',
-    baseId: 'bow_5',
+    baseId: 'bow_l60',
     level: 60,
     mods: [
       m('damage.min', 'base', 130, 150, { damageTypes: ['cold'], local: true }),
@@ -3148,8 +3148,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'skewerBow',
     name: 'Skewer Bow',
-    baseId: 'bow_5',
-    level: 60,
+    baseId: 'bow_l53',
+    level: 53,
     mods: [
       m('damage', 'inc', 110, 125, { damageTypes: ['physical'], local: true }),
       m('damage.min', 'base', 25, 35, { damageTypes: ['physical'], local: true }),
@@ -3164,7 +3164,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'truesightBow',
     name: 'Truesight Bow',
-    baseId: 'bow_5',
+    baseId: 'bow_l66',
     level: 66,
     mods: [
       m('damage', 'inc', 20, 24, { damageTypes: ['fire', 'cold', 'lightning'], tags: ['attack'] }),
@@ -3180,7 +3180,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'winterLyre',
     name: 'Winter Lyre',
-    baseId: 'bow_5',
+    baseId: 'bow_l68',
     level: 68,
     mods: [
       m('damage.min', 'base', 120, 140, { damageTypes: ['cold'], local: true }),
@@ -3193,7 +3193,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'twinArcBow',
     name: 'Twin Arc Bow',
-    baseId: 'bow_5',
+    baseId: 'bow_l64',
     level: 64,
     mods: [
       m('damage', 'inc', 50, 75, { damageTypes: ['physical'], local: true }),
@@ -3208,7 +3208,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'ricochetBow',
     name: 'Ricochet Bow',
-    baseId: 'bow_2',
+    baseId: 'bow_l18',
     level: 18,
     mods: [
       m('critMulti', 'base', 15, 25),
@@ -3223,8 +3223,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'thunderheadBow',
     name: 'Thunderhead Bow',
-    baseId: 'bow_2',
-    level: 15,
+    baseId: 'bow_l9',
+    level: 9,
     mods: [
       m('damage.min', 'base', 1, 1, { damageTypes: ['lightning'], local: true }),
       m('damage.max', 'base', 85, 85, { damageTypes: ['lightning'], local: true }),
@@ -3236,7 +3236,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'squallLongbow',
     name: 'Squall Longbow',
-    baseId: 'bow_2',
+    baseId: 'bow_l9',
     level: 32,
     mods: [
       m('damage', 'inc', 100, 100, { damageTypes: ['lightning'] }),
@@ -3250,8 +3250,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'redrainBow',
     name: 'Redrain Bow',
-    baseId: 'bow_5',
-    level: 60,
+    baseId: 'bow_l57',
+    level: 57,
     mods: [
       m('moveSpeed', 'inc', 4, 6),
       m('damage', 'inc', 140, 170, { damageTypes: ['physical'], local: true }),
@@ -3273,7 +3273,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'livewireBow',
     name: 'Livewire Bow',
-    baseId: 'bow_5',
+    baseId: 'bow_l64',
     level: 64,
     mods: [
       m('damage.min', 'base', 1, 1, { damageTypes: ['lightning'], local: true }),
@@ -3288,7 +3288,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'galeSplitter',
     name: 'Gale Splitter',
-    baseId: 'bow_5',
+    baseId: 'bow_l66',
     level: 66,
     mods: [
       m('damage', 'inc', 20, 24, { damageTypes: ['fire', 'cold', 'lightning'], tags: ['attack'] }),
@@ -3304,8 +3304,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'kindlingBow',
     name: 'Kindling Bow',
-    baseId: 'bow_3',
-    level: 30,
+    baseId: 'bow_l23',
+    level: 23,
     mods: [
       m('damage', 'inc', 70, 90, { damageTypes: ['physical'], local: true }),
       m('gain.physical.fire', 'base', 20),
@@ -3316,7 +3316,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'seedfireBow',
     name: 'Seedfire Bow',
-    baseId: 'bow_5',
+    baseId: 'bow_l58',
     level: 64,
     mods: [
       m('damage', 'inc', 250, 300, { damageTypes: ['physical'], local: true }),
@@ -3337,14 +3337,14 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bastionTalon',
     name: 'Bastion Talon',
-    baseId: 'claw_4',
+    baseId: 'claw_l46',
     level: 46,
     mods: [
       m('lifeOnHit', 'base', 44, 44, { tags: ['attack'] }),
       m('damage', 'inc', 100, 120, { damageTypes: ['physical'], local: true }),
-      m('evasion', 'base', 66),
+      m('evasion', 'base', 110),
       m('life', 'base', 30, 50),
-      m('es', 'base', 16),
+      m('es', 'base', 35),
       m('reflect.physical', 'base', 71, 90),
       m('blockAttack', 'base', 15),
       m('buffOn.meleeHit.fortify', 'base', 100),
@@ -3354,7 +3354,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sirenTalons',
     name: 'Siren Talons',
-    baseId: 'claw_5',
+    baseId: 'claw_l66',
     level: 66,
     mods: [
       m('damage', 'inc', 110, 130, { damageTypes: ['physical'], local: true }),
@@ -3367,7 +3367,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'spellrake',
     name: 'Spellrake',
-    baseId: 'claw_3',
+    baseId: 'claw_l37',
     level: 37,
     mods: [
       m('lifeOnHit', 'base', 25, 25, { tags: ['attack'] }),
@@ -3380,7 +3380,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'leechrake',
     name: 'Leechrake',
-    baseId: 'claw_5',
+    baseId: 'claw_l64',
     level: 64,
     mods: [
       m('lifeOnHit', 'base', 31, 31, { tags: ['attack'] }),
@@ -3388,7 +3388,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
       m('damage.min', 'base', 1, 1, { damageTypes: ['lightning'], local: true }),
       m('damage.max', 'base', 80, 80, { damageTypes: ['lightning'], local: true }),
       m('attackSpeed', 'inc', 20, 30, { local: true }),
-      m('es', 'base', 14, 18),
+      m('es', 'base', 30, 40),
       m('grantsKeystone.shadeLeech', 'flag', 1),
       m('blockAttack', 'base', 8, 8, { condition: { id: 'dualWielding' } }),
     ],
@@ -3397,7 +3397,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'corneredFist',
     name: 'Cornered Fist',
-    baseId: 'claw_1',
+    baseId: 'claw_l1',
     level: 1,
     mods: [
       m('lifeOnHit', 'base', 3, 3, { tags: ['attack'] }),
@@ -3417,7 +3417,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'giltRake',
     name: 'Gilt Rake',
-    baseId: 'claw_4',
+    baseId: 'claw_l46',
     level: 46,
     mods: [
       m('lifeOnHit', 'base', 44, 44, { tags: ['attack'] }),
@@ -3432,7 +3432,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sunderClaw',
     name: 'Sunder Claw',
-    baseId: 'claw_5',
+    baseId: 'claw_l70',
     level: 70,
     mods: [
       m('damage', 'inc', 60, 80, { damageTypes: ['physical'], local: true }),
@@ -3451,7 +3451,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stingerClaw',
     name: 'Stinger Claw',
-    baseId: 'claw_5',
+    baseId: 'claw_l60',
     level: 60,
     mods: [
       m('damage', 'inc', 150, 170, { damageTypes: ['physical'], local: true }),
@@ -3475,7 +3475,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'winterclutch',
     name: 'Winterclutch',
-    baseId: 'claw_5',
+    baseId: 'claw_l68',
     level: 68,
     mods: [
       m('lifeOnHit', 'base', 46, 46, { tags: ['attack'] }),
@@ -3490,7 +3490,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'drainspike',
     name: 'Drainspike',
-    baseId: 'dagger_1',
+    baseId: 'dagger_l5',
     level: 5,
     mods: [
       m('dex', 'base', 10, 15),
@@ -3506,7 +3506,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'redlaceDirk',
     name: 'Redlace Dirk',
-    baseId: 'dagger_1',
+    baseId: 'dagger_l5',
     level: 59,
     mods: [
       m('damage', 'inc', 50, 70, { damageTypes: ['physical'], local: true }),
@@ -3523,7 +3523,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'viperfang',
     name: 'Viperfang',
-    baseId: 'dagger_5',
+    baseId: 'dagger_l60',
     level: 60,
     mods: [
       m('damage', 'inc', 180, 200, { damageTypes: ['physical'], local: true }),
@@ -3537,7 +3537,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sharpwitGauntlets',
     name: 'Sharpwit Gauntlets',
-    baseId: 'gloves_ar_4',
+    baseId: 'gloves_ar_l63',
     level: 75,
     mods: [
       m('int', 'base', 60, 80),
@@ -3551,9 +3551,9 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'seamripperGloves',
     name: 'Seamripper Gloves',
-    baseId: 'gloves_es_3',
+    baseId: 'gloves_es_l41',
     level: 41,
-    mods: [m('castSpeed', 'inc', 15, 20), m('es', 'base', 23, 32), m('life', 'base', 50, 70)],
+    mods: [m('castSpeed', 'inc', 15, 20), m('es', 'base', 50, 70), m('life', 'base', 50, 70)],
     triggers: [
       {
         on: 'cast',
@@ -3567,10 +3567,10 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bareknuckleStorm',
     name: 'Bareknuckle Storm',
-    baseId: 'gloves_ar_4',
+    baseId: 'gloves_ar_l63',
     level: 63,
     mods: [
-      m('es', 'base', 14),
+      m('es', 'base', 30),
       m('chance.shock', 'base', 10),
       m('damage.min', 'base', 150, 225, {
         damageTypes: ['lightning'],
@@ -3586,16 +3586,16 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bulwarkFists',
     name: 'Bulwark Fists',
-    baseId: 'gloves_ar_4',
-    level: 60,
-    mods: [m('armour', 'base', 240, 360, { local: true })],
+    baseId: 'gloves_ar_l53',
+    level: 53,
+    mods: [m('armour', 'base', 400, 600, { local: true })],
     flavour: 'Immovable, and it does not care who knows.',
   },
   {
     id: 'skullsplitterMitts',
     name: 'Skullsplitter Mitts',
-    baseId: 'gloves_eves_2',
-    level: 20,
+    baseId: 'gloves_eves_l16',
+    level: 16,
     mods: [
       m('critMulti', 'base', 30),
       m('enemyStunThreshold', 'base', 10),
@@ -3606,8 +3606,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stalkersClaws',
     name: "Stalker's Claws",
-    baseId: 'gloves_arev_4',
-    level: 60,
+    baseId: 'gloves_arev_l59',
+    level: 59,
     mods: [
       m('armour', 'inc', 100, 140, { local: true }),
       m('evasion', 'inc', 100, 140, { local: true }),
@@ -3620,7 +3620,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'reddenedGauntlets',
     name: 'Reddened Gauntlets',
-    baseId: 'gloves_arev_3',
+    baseId: 'gloves_arev_l43',
     level: 43,
     mods: [
       m('str', 'base', 20, 30),
@@ -3634,11 +3634,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hoarfireMitts',
     name: 'Hoarfire Mitts',
-    baseId: 'gloves_ev_1',
+    baseId: 'gloves_ev_l9',
     level: 24,
     mods: [
       m('str', 'base', 20, 30),
-      m('evasion', 'base', 24, 30, { local: true }),
+      m('evasion', 'base', 40, 50, { local: true }),
       m('resist.cold', 'base', 20, 30),
       m('damage.min', 'base', 5, 7, { damageTypes: ['cold'] }),
       m('damage.max', 'base', 13, 15, { damageTypes: ['cold'] }),
@@ -3650,11 +3650,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'frostgriefMitts',
     name: 'Frostgrief Mitts',
-    baseId: 'gloves_ev_1',
+    baseId: 'gloves_ev_l9',
     level: 9,
     mods: [
       m('str', 'base', 20, 30),
-      m('evasion', 'base', 24, 30, { local: true }),
+      m('evasion', 'base', 40, 50, { local: true }),
       m('resist.cold', 'base', 20, 30),
       m('damage.min', 'base', 5, 7, { damageTypes: ['cold'] }),
       m('damage.max', 'base', 13, 15, { damageTypes: ['cold'] }),
@@ -3666,7 +3666,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'surebladeGloves',
     name: 'Sureblade Gloves',
-    baseId: 'gloves_ev_2',
+    baseId: 'gloves_ev_l21',
     level: 21,
     mods: [
       m('dex', 'base', 20, 30),
@@ -3680,8 +3680,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'ironviceGauntlets',
     name: 'Ironvice Gauntlets',
-    baseId: 'gloves_ar_3',
-    level: 40,
+    baseId: 'gloves_ar_l35',
+    level: 35,
     mods: [
       m('damage', 'inc', 10, 10, { damageTypes: ['physical'] }),
       m('str', 'base', 100),
@@ -3693,8 +3693,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'fangboundGauntlets',
     name: 'Fangbound Gauntlets',
-    baseId: 'gloves_ares_4',
-    level: 60,
+    baseId: 'gloves_ares_l57',
+    level: 57,
     mods: [
       m('allAttr', 'base', 15, 25),
       m('armour', 'inc', 150, 200, { local: true }),
@@ -3708,7 +3708,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'measuredGrasp',
     name: 'Measured Grasp',
-    baseId: 'gloves_ares_4',
+    baseId: 'gloves_ares_l66',
     level: 66,
     mods: [
       m('armour', 'inc', 80, 120, { local: true }),
@@ -3729,8 +3729,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'venomgripMitts',
     name: 'Venomgrip Mitts',
-    baseId: 'gloves_eves_4',
-    level: 60,
+    baseId: 'gloves_eves_l58',
+    level: 58,
     mods: [
       m('evasion', 'inc', 150, 180, { local: true }),
       m('life', 'base', 60, 70),
@@ -3742,8 +3742,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hailstrideGloves',
     name: 'Hailstride Gloves',
-    baseId: 'gloves_ares_4',
-    level: 60,
+    baseId: 'gloves_ares_l51',
+    level: 51,
     mods: [
       m('damage.min', 'base', 30, 36, { damageTypes: ['cold'], tags: ['attack'] }),
       m('damage.max', 'base', 44, 50, { damageTypes: ['cold'], tags: ['attack'] }),
@@ -3756,8 +3756,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'forkstormMitts',
     name: 'Forkstorm Mitts',
-    baseId: 'gloves_eves_4',
-    level: 60,
+    baseId: 'gloves_eves_l58',
+    level: 58,
     mods: [
       m('damage', 'inc', 20, 30, { tags: ['dot'] }),
       m('evasion', 'inc', 250, 300, { local: true }),
@@ -3778,7 +3778,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'tideturnGauntlets',
     name: 'Tideturn Gauntlets',
-    baseId: 'gloves_arev_4',
+    baseId: 'gloves_arev_l67',
     level: 67,
     mods: [
       m('armour', 'inc', 90, 110, { local: true }),
@@ -3801,7 +3801,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gravetallowMitts',
     name: 'Gravetallow Mitts',
-    baseId: 'gloves_eves_3',
+    baseId: 'gloves_eves_l50',
     level: 50,
     mods: [
       m('damage.min', 'base', 13, 17, { damageTypes: ['chaos'] }),
@@ -3815,13 +3815,13 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stormclapMitts',
     name: 'Stormclap Mitts',
-    baseId: 'gloves_eves_4',
+    baseId: 'gloves_eves_l67',
     level: 67,
     mods: [
       m('damage.min', 'base', 1, 1, { damageTypes: ['lightning'], tags: ['attack'] }),
       m('damage.max', 'base', 100, 100, { damageTypes: ['lightning'], tags: ['attack'] }),
       m('attackSpeed', 'inc', 10),
-      m('es', 'base', 11, 14),
+      m('es', 'base', 25, 30),
       m('duration.shock', 'inc', 100),
       m('stunDuration', 'inc', 10),
     ],
@@ -3830,7 +3830,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'ramheadGauntlets',
     name: 'Ramhead Gauntlets',
-    baseId: 'gloves_ar_4',
+    baseId: 'gloves_ar_l69',
     level: 69,
     mods: [
       m('attackSpeed', 'inc', 8, 13),
@@ -3844,8 +3844,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hollowmindGloves',
     name: 'Hollowmind Gloves',
-    baseId: 'gloves_es_4',
-    level: 60,
+    baseId: 'gloves_es_l55',
+    level: 55,
     mods: [
       m('critChance', 'inc', 125, 150, { tags: ['spell'] }),
       m('es', 'inc', 180, 250, { local: true }),
@@ -3860,7 +3860,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'viperwireGloves',
     name: 'Viperwire Gloves',
-    baseId: 'gloves_ares_3',
+    baseId: 'gloves_ares_l43',
     level: 43,
     mods: [
       m('damage.min', 'base', 1, 3, { damageTypes: ['lightning'] }),
@@ -3875,7 +3875,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gustworkGauntlets',
     name: 'Gustwork Gauntlets',
-    baseId: 'gloves_ar_3',
+    baseId: 'gloves_ar_l47',
     level: 47,
     mods: [
       m('life', 'base', 30, 60),
@@ -3888,7 +3888,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gapejawHelm',
     name: 'Gapejaw Helm',
-    baseId: 'helmet_ar_4',
+    baseId: 'helmet_ar_l60',
     level: 60,
     mods: [
       m('damage.min', 'base', 40, 40, { damageTypes: ['physical'], tags: ['attack'] }),
@@ -3903,12 +3903,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hushsongCirclet',
     name: 'Hushsong Circlet',
-    baseId: 'helmet_es_1',
+    baseId: 'helmet_es_l8',
     level: 45,
     mods: [
       m('attackSpeed', 'inc', 10, 15),
       m('castSpeed', 'inc', 10, 15),
-      m('es', 'base', 45, 54),
+      m('es', 'base', 100, 120),
       m('stunDurationOnSelf', 'base', 30, 40),
       m('manaRegen', 'inc', 30),
       m('moveSpeed', 'inc', 5),
@@ -3921,7 +3921,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'manyEyedCirclet',
     name: 'Many-Eyed Circlet',
-    baseId: 'helmet_es_4',
+    baseId: 'helmet_es_l69',
     level: 69,
     mods: [
       m('accuracy', 'base', 300, 350),
@@ -3936,8 +3936,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hollowRegentMask',
     name: 'Hollow Regent Mask',
-    baseId: 'helmet_eves_4',
-    level: 60,
+    baseId: 'helmet_eves_l52',
+    level: 52,
     mods: [
       m('life', 'base', 60, 80),
       m('evasion', 'inc', 150, 200, { local: true }),
@@ -3950,12 +3950,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'tollhelm',
     name: 'Tollhelm',
-    baseId: 'helmet_arev_3',
-    level: 40,
+    baseId: 'helmet_arev_l33',
+    level: 33,
     mods: [
       m('str', 'base', 20, 30),
       m('dex', 'base', 20, 30),
-      m('armour', 'base', 120, 180, { local: true }),
+      m('armour', 'base', 200, 300, { local: true }),
       m('damage', 'inc', 20, 20, { tags: ['melee'] }),
       m('damage.min', 'base', 10, 10, { damageTypes: ['physical'], tags: ['attack'] }),
       m('damage.max', 'base', 20, 20, { damageTypes: ['physical'], tags: ['attack'] }),
@@ -3965,12 +3965,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'alarumSallet',
     name: 'Alarum Sallet',
-    baseId: 'helmet_arev_3',
-    level: 40,
+    baseId: 'helmet_arev_l33',
+    level: 33,
     mods: [
       m('str', 'base', 20, 30),
       m('dex', 'base', 20, 30),
-      m('armour', 'base', 120, 180, { local: true }),
+      m('armour', 'base', 200, 300, { local: true }),
       m('damage', 'inc', 20, 20, { tags: ['melee'] }),
       m('damage.min', 'base', 10, 10, { damageTypes: ['physical'], tags: ['attack'] }),
       m('damage.max', 'base', 20, 20, { damageTypes: ['physical'], tags: ['attack'] }),
@@ -3980,11 +3980,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stonewallHat',
     name: 'Stonewall Hat',
-    baseId: 'helmet_ar_1',
+    baseId: 'helmet_ar_l1',
     level: 1,
     mods: [
       m('damage', 'inc', 20, 20, { damageTypes: ['physical'] }),
-      m('armour', 'base', 9, 15, { local: true }),
+      m('armour', 'base', 15, 25, { local: true }),
       m('life', 'base', 25, 50),
       m('cannotBeStunned', 'flag', 1),
       m('cannotEvade', 'flag', 1),
@@ -3994,11 +3994,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cairnHat',
     name: 'Cairn Hat',
-    baseId: 'helmet_ar_1',
+    baseId: 'helmet_ar_l1',
     level: 1,
     mods: [
       m('damage', 'inc', 20, 20, { damageTypes: ['physical'] }),
-      m('armour', 'base', 9, 15, { local: true }),
+      m('armour', 'base', 15, 25, { local: true }),
       m('life', 'base', 25, 50),
       m('cannotEvade', 'flag', 1),
     ],
@@ -4007,8 +4007,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wormwoodCirclet',
     name: 'Wormwood Circlet',
-    baseId: 'helmet_es_4',
-    level: 60,
+    baseId: 'helmet_es_l54',
+    level: 54,
     mods: [
       m('damage.min', 'base', 16, 21, { damageTypes: ['chaos'], tags: ['spell'] }),
       m('damage.max', 'base', 31, 36, { damageTypes: ['chaos'], tags: ['spell'] }),
@@ -4022,8 +4022,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hearthfireHalo',
     name: 'Hearthfire Halo',
-    baseId: 'helmet_es_4',
-    level: 60,
+    baseId: 'helmet_es_l59',
+    level: 59,
     mods: [
       m('es', 'inc', 240, 280, { local: true }),
       m('resist.fire', 'base', 30, 40),
@@ -4034,8 +4034,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rimeglassHalo',
     name: 'Rimeglass Halo',
-    baseId: 'helmet_es_4',
-    level: 60,
+    baseId: 'helmet_es_l59',
+    level: 59,
     mods: [
       m('es', 'inc', 240, 280, { local: true }),
       m('resist.cold', 'base', 30, 40),
@@ -4046,8 +4046,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stormwireHalo',
     name: 'Stormwire Halo',
-    baseId: 'helmet_es_4',
-    level: 60,
+    baseId: 'helmet_es_l59',
+    level: 59,
     mods: [
       m('es', 'inc', 240, 280, { local: true }),
       m('resist.lightning', 'base', 30, 40),
@@ -4058,7 +4058,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'latticeMask',
     name: 'Lattice Mask',
-    baseId: 'helmet_eves_4',
+    baseId: 'helmet_eves_l62',
     level: 62,
     mods: [
       m('evasion', 'inc', 140, 180, { local: true }),
@@ -4074,7 +4074,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'emberfrostHood',
     name: 'Emberfrost Hood',
-    baseId: 'helmet_ev_2',
+    baseId: 'helmet_ev_l20',
     level: 60,
     mods: [
       m('socketedGemLevel', 'base', 2, 2, { tags: ['fire'] }),
@@ -4090,7 +4090,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'vigilCrown',
     name: 'Vigil Crown',
-    baseId: 'helmet_ares_4',
+    baseId: 'helmet_ares_l53',
     level: 62,
     mods: [
       m('socketedGemLevel', 'base', 1),
@@ -4106,8 +4106,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sergeantsHelm',
     name: "Sergeant's Helm",
-    baseId: 'helmet_ares_2',
-    level: 20,
+    baseId: 'helmet_ares_l12',
+    level: 12,
     mods: [
       m('socketedGemLevel', 'base', 1, 2),
       m('damage.min', 'base', 1, 1, { damageTypes: ['lightning'] }),
@@ -4122,8 +4122,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'embergrateHelm',
     name: 'Embergrate Helm',
-    baseId: 'helmet_ar_4',
-    level: 60,
+    baseId: 'helmet_ar_l55',
+    level: 55,
     mods: [
       m('damage', 'inc', 30, 40, { damageTypes: ['fire'] }),
       m('armour', 'inc', 100, 120, { local: true }),
@@ -4135,7 +4135,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'titheHelm',
     name: 'Tithe Helm',
-    baseId: 'helmet_ares_3',
+    baseId: 'helmet_ares_l44',
     level: 44,
     mods: [
       m('castSpeed', 'inc', -15),
@@ -4149,8 +4149,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'veinletterMask',
     name: 'Veinletter Mask',
-    baseId: 'helmet_eves_2',
-    level: 20,
+    baseId: 'helmet_eves_l17',
+    level: 17,
     mods: [
       m('damage', 'inc', 15, 30, { tags: ['spell'] }),
       m('str', 'base', 20),
@@ -4163,12 +4163,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gravegiltCrown',
     name: 'Gravegilt Crown',
-    baseId: 'helmet_ares_4',
+    baseId: 'helmet_ares_l68',
     level: 68,
     mods: [
       m('damage.min', 'base', 13, 17, { damageTypes: ['chaos'] }),
       m('damage.max', 'base', 29, 37, { damageTypes: ['chaos'] }),
-      m('es', 'base', 68, 90),
+      m('es', 'base', 150, 200),
       m('resist.cold', 'base', 32, 40),
       m('resist.lightning', 'base', 15, 20),
     ],
@@ -4177,7 +4177,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gulletCirclet',
     name: 'Gullet Circlet',
-    baseId: 'helmet_es_3',
+    baseId: 'helmet_es_l48',
     level: 48,
     mods: [
       m('critChance', 'inc', 60, 80, { tags: ['spell'] }),
@@ -4190,8 +4190,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'burrowersPelt',
     name: "Burrower's Pelt",
-    baseId: 'helmet_ev_4',
-    level: 60,
+    baseId: 'helmet_ev_l55',
+    level: 55,
     mods: [
       m('attackSpeed', 'inc', 15),
       m('critChance', 'inc', 60, 75),
@@ -4204,7 +4204,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cutpurseHood',
     name: 'Cutpurse Hood',
-    baseId: 'helmet_ev_4',
+    baseId: 'helmet_ev_l60',
     level: 60,
     mods: [
       m('evasion', 'inc', 100, 130, { local: true }),
@@ -4220,7 +4220,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'saltmarshCrown',
     name: 'Saltmarsh Crown',
-    baseId: 'helmet_ares_4',
+    baseId: 'helmet_ares_l63',
     level: 63,
     mods: [
       m('armour', 'inc', 240, 300, { local: true }),
@@ -4237,7 +4237,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'kestrelSallet',
     name: 'Kestrel Sallet',
-    baseId: 'helmet_arev_2',
+    baseId: 'helmet_arev_l23',
     level: 23,
     mods: [
       m('accuracy', 'base', 500),
@@ -4253,8 +4253,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'triadMask',
     name: 'Triad Mask',
-    baseId: 'helmet_eves_3',
-    level: 40,
+    baseId: 'helmet_eves_l35',
+    level: 35,
     mods: [
       m('resist.allEle', 'base', 26, 30),
       m('canShock.fire', 'flag', 1),
@@ -4266,13 +4266,13 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'apertureMask',
     name: 'Aperture Mask',
-    baseId: 'helmet_eves_4',
+    baseId: 'helmet_eves_l62',
     level: 62,
     mods: [
       m('socketedGemLevel', 'base', 1),
       m('evasion', 'inc', 245, 280, { local: true }),
       m('es', 'inc', 245, 280, { local: true }),
-      m('es', 'base', 14, 18),
+      m('es', 'base', 30, 40),
       m('resist.chaos', 'base', 24, 30),
     ],
     flavour: 'Opens wide on the thing behind the thing.',
@@ -4280,10 +4280,10 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'seneschalCrown',
     name: 'Seneschal Crown',
-    baseId: 'helmet_ares_4',
+    baseId: 'helmet_ares_l68',
     level: 68,
     mods: [
-      m('armour', 'base', 156, 180, { local: true }),
+      m('armour', 'base', 260, 300, { local: true }),
       m('resist.fire', 'base', 26, 32),
       m('resist.chaos', 'base', 8, 16),
       m('life', 'inc', 8, 12),
@@ -4294,7 +4294,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cindercleave',
     name: 'Cindercleave',
-    baseId: 'axe_2',
+    baseId: 'axe_l16',
     level: 60,
     mods: [
       m('damage.min', 'base', 5, 15, { damageTypes: ['physical'], local: true }),
@@ -4311,7 +4311,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'flensingHatchet',
     name: 'Flensing Hatchet',
-    baseId: 'axe_5',
+    baseId: 'axe_l65',
     level: 65,
     mods: [
       m('damage', 'inc', 90, 110, { damageTypes: ['physical'], local: true }),
@@ -4327,8 +4327,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'tallyAxe',
     name: 'Tally Axe',
-    baseId: 'axe_3',
-    level: 30,
+    baseId: 'axe_l29',
+    level: 29,
     mods: [
       m('damage', 'inc', 60, 80, { damageTypes: ['physical'], local: true }),
       m('damage.min', 'base', 3, 5, { damageTypes: ['physical'], local: true }),
@@ -4343,7 +4343,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'twinbladeAxe',
     name: 'Twinblade Axe',
-    baseId: 'axe_5',
+    baseId: 'axe_l67',
     level: 67,
     mods: [
       m('damage.min', 'base', 50, 70, { damageTypes: ['physical'], local: true }),
@@ -4362,8 +4362,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rimeheartCleaver',
     name: 'Rimeheart Cleaver',
-    baseId: 'axe_5',
-    level: 60,
+    baseId: 'axe_l59',
+    level: 59,
     mods: [
       m('damage', 'inc', 100, 140, { damageTypes: ['physical'], local: true }),
       m('damage.min', 'base', 10, 10, { damageTypes: ['physical'], local: true }),
@@ -4377,7 +4377,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'skyrendHatchet',
     name: 'Skyrend Hatchet',
-    baseId: 'axe_1',
+    baseId: 'axe_l6',
     level: 32,
     mods: [
       m('damage', 'inc', 170, 190, { damageTypes: ['physical'], local: true }),
@@ -4393,7 +4393,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'shrillwingHatchet',
     name: 'Shrillwing Hatchet',
-    baseId: 'axe_1',
+    baseId: 'axe_l6',
     level: 6,
     mods: [
       m('damage.min', 'base', 10, 15, { damageTypes: ['physical'], local: true }),
@@ -4407,7 +4407,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'tollbellMace',
     name: 'Tollbell Mace',
-    baseId: 'mace_5',
+    baseId: 'mace_l66',
     level: 66,
     mods: [
       m('enemyStunThreshold', 'base', 15),
@@ -4422,7 +4422,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hoarfrostGavel',
     name: 'Hoarfrost Gavel',
-    baseId: 'mace_5',
+    baseId: 'mace_l60',
     level: 60,
     mods: [
       m('enemyStunThreshold', 'base', 15),
@@ -4437,7 +4437,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gorgeMallet',
     name: 'Gorge Mallet',
-    baseId: 'mace_3',
+    baseId: 'mace_l32',
     level: 32,
     mods: [
       m('enemyStunThreshold', 'base', 10),
@@ -4454,7 +4454,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rimeblowMace',
     name: 'Rimeblow Mace',
-    baseId: 'mace_4',
+    baseId: 'mace_l50',
     level: 50,
     mods: [
       m('enemyStunThreshold', 'base', 15),
@@ -4472,7 +4472,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'skyboltGavel',
     name: 'Skybolt Gavel',
-    baseId: 'mace_5',
+    baseId: 'mace_l60',
     level: 60,
     sockets: 3,
     mods: [
@@ -4494,7 +4494,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gritstoneMaul',
     name: 'Gritstone Maul',
-    baseId: 'mace_5',
+    baseId: 'mace_l68',
     level: 68,
     mods: [
       m('damage.min', 'base', 45, 60, { damageTypes: ['physical'], local: true }),
@@ -4510,7 +4510,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
         local: true,
         per: { stat: 'charges.grit', div: 1 },
       }),
-      m('armour', 'base', 300, 300, { per: { stat: 'charges.grit', div: 1 } }),
+      m('armour', 'base', 500, 500, { per: { stat: 'charges.grit', div: 1 } }),
       m('gain.physical.fire', 'base', 30, 40, { tags: ['attack'] }),
       m('damageTaken.fire', 'inc', -1, -1, { per: { stat: 'charges.grit', div: 1 } }),
       m('damageTaken.cold', 'inc', -1, -1, { per: { stat: 'charges.grit', div: 1 } }),
@@ -4521,7 +4521,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stillhungerBlade',
     name: 'Stillhunger Blade',
-    baseId: 'sword_5',
+    baseId: 'sword_l68',
     level: 68,
     mods: [
       m('damage.min', 'base', 80, 115, { damageTypes: ['physical'], local: true }),
@@ -4535,7 +4535,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'carrionBrand',
     name: 'Carrion Brand',
-    baseId: 'sword_1',
+    baseId: 'sword_l1',
     level: 61,
     mods: [
       m('damage', 'inc', 100, 100, { condition: { id: 'onLowLife' } }),
@@ -4554,14 +4554,14 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'veilwingBlade',
     name: 'Veilwing Blade',
-    baseId: 'sword_5',
+    baseId: 'sword_l66',
     level: 66,
     mods: [
       m('accuracy', 'base', 475, 475, { local: true }),
       m('damage.min', 'base', 30, 50, { damageTypes: ['physical'], local: true }),
       m('damage.max', 'base', 65, 80, { damageTypes: ['physical'], local: true }),
       m('attackSpeed', 'inc', 20, 25, { local: true }),
-      m('evasion', 'base', 108, 120),
+      m('evasion', 'base', 180, 200),
       m('moveSpeed', 'inc', 3),
       m('accuracy', 'base', 280, 300, { local: true }),
     ],
@@ -4570,7 +4570,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wraithRazor',
     name: 'Wraith Razor',
-    baseId: 'sword_3',
+    baseId: 'sword_l32',
     level: 32,
     mods: [
       m('accuracy', 'inc', 40),
@@ -4586,7 +4586,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rootboundSword',
     name: 'Rootbound Sword',
-    baseId: 'sword_5',
+    baseId: 'sword_l66',
     level: 66,
     mods: [
       m('damage', 'inc', 185, 215, { damageTypes: ['physical'], local: true }),
@@ -4601,7 +4601,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stormfrenzyBlade',
     name: 'Stormfrenzy Blade',
-    baseId: 'sword_5',
+    baseId: 'sword_l62',
     level: 62,
     mods: [
       m('accuracy', 'inc', 40),
@@ -4620,7 +4620,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'blightcutSword',
     name: 'Blightcut Sword',
-    baseId: 'sword_4',
+    baseId: 'sword_l47',
     level: 47,
     mods: [
       m('accuracy', 'base', 330, 330, { local: true }),
@@ -4634,7 +4634,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'scarletRite',
     name: 'Scarlet Rite',
-    baseId: 'sword_1',
+    baseId: 'sword_l1',
     level: 1,
     mods: [
       m('accuracy', 'inc', 40),
@@ -4655,7 +4655,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'noonfireRazor',
     name: 'Noonfire Razor',
-    baseId: 'sword_5',
+    baseId: 'sword_l68',
     level: 68,
     mods: [
       m('accuracy', 'inc', 40),
@@ -4674,7 +4674,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'crowpeckSword',
     name: 'Crowpeck Sword',
-    baseId: 'sword_1',
+    baseId: 'sword_l1',
     level: 2,
     mods: [
       m('accuracy', 'inc', 40),
@@ -4691,7 +4691,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pairboundBlade',
     name: 'Pairbound Blade',
-    baseId: 'sword_5',
+    baseId: 'sword_l68',
     level: 68,
     mods: [
       m('accuracy', 'inc', 40),
@@ -4707,8 +4707,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cinderwrathSabre',
     name: 'Cinderwrath Sabre',
-    baseId: 'sword_3',
-    level: 30,
+    baseId: 'sword_l28',
+    level: 28,
     mods: [
       m('accuracy', 'base', 190, 190, { local: true }),
       m('damage', 'inc', 250, 300, { damageTypes: ['physical'], local: true }),
@@ -4724,7 +4724,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'squallforgedSword',
     name: 'Squallforged Sword',
-    baseId: 'sword_2',
+    baseId: 'sword_l20',
     level: 20,
     mods: [
       m('accuracy', 'inc', 40),
@@ -4742,7 +4742,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     id: 'landslideQuiver',
     name: 'Landslide Quiver',
     baseId: 'quiver_phys',
-    level: 20,
+    level: 5,
     mods: [
       m('damage.min', 'base', 1, 1, { damageTypes: ['physical'], tags: ['attack', 'bow'] }),
       m('damage.max', 'base', 4, 4, { damageTypes: ['physical'], tags: ['attack', 'bow'] }),
@@ -4757,12 +4757,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'boreheadQuiver',
     name: 'Borehead Quiver',
-    baseId: 'quiver_acc',
+    baseId: 'quiver_pierce',
     level: 36,
     mods: [
       m('pierce', 'base', 1, 1, { tags: ['bow'] }),
       m('attackSpeed', 'inc', 8, 12),
-      m('evasion', 'base', 210),
+      m('evasion', 'base', 350),
       m('life', 'base', 40, 50),
       m('damage.min', 'base', 10, 14, { damageTypes: ['physical'], tags: ['attack', 'bow'] }),
       m('damage.max', 'base', 19, 24, { damageTypes: ['physical'], tags: ['attack', 'bow'] }),
@@ -4772,7 +4772,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'duskveilQuiver',
     name: 'Duskveil Quiver',
-    baseId: 'quiver_acc',
+    baseId: 'quiver_stun',
     level: 55,
     mods: [
       m('attackSpeed', 'inc', 10),
@@ -4786,12 +4786,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bulwarkQuiver',
     name: 'Bulwark Quiver',
-    baseId: 'quiver_phys',
+    baseId: 'quiver_phys_bow',
     level: 28,
     mods: [
       m('damage.min', 'base', 6, 6, { damageTypes: ['physical'], tags: ['attack', 'bow'] }),
       m('damage.max', 'base', 12, 12, { damageTypes: ['physical'], tags: ['attack', 'bow'] }),
-      m('armour', 'base', 240, 270),
+      m('armour', 'base', 400, 450),
       m('projectileSpeed', 'inc', 20, 30),
       m('stunDurationOnSelf', 'base', 50),
       m('damage', 'inc', 15, 20, { tags: ['projectile'] }),
@@ -4803,14 +4803,14 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wraithpointQuiver',
     name: 'Wraithpoint Quiver',
-    baseId: 'quiver_acc',
+    baseId: 'quiver_crit',
     level: 64,
     mods: [
       m('dex', 'base', 30),
       m('damage.min', 'base', 13, 18, { damageTypes: ['chaos'], tags: ['attack'] }),
       m('damage.max', 'base', 26, 32, { damageTypes: ['chaos'], tags: ['attack'] }),
       m('attackSpeed', 'inc', 8, 12),
-      m('es', 'base', 45, 54),
+      m('es', 'base', 100, 120),
       m('esRechargeRate', 'inc', -40),
       m('esRechargeDelay', 'inc', 80),
     ],
@@ -4819,7 +4819,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stormfrostBand',
     name: 'Stormfrost Band',
-    baseId: 'ring_cold',
+    baseId: 'ring_mana',
     level: 20,
     mods: [
       m('resist.cold', 'base', 12, 16),
@@ -4835,7 +4835,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cinderstormBand',
     name: 'Cinderstorm Band',
-    baseId: 'ring_cold',
+    baseId: 'ring_mana',
     level: 20,
     mods: [
       m('resist.fire', 'base', 12, 16),
@@ -4880,7 +4880,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bastionLoop',
     name: 'Bastion Loop',
-    baseId: 'ring_mana',
+    baseId: 'ring_life',
     level: 1,
     mods: [
       m('str', 'base', 10, 20),
@@ -4892,7 +4892,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wellspringLoop',
     name: 'Wellspring Loop',
-    baseId: 'ring_mana',
+    baseId: 'ring_life',
     level: 32,
     mods: [
       m('str', 'base', 10, 20),
@@ -4906,7 +4906,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     id: 'dimlampRing',
     name: 'Dimlamp Ring',
     baseId: 'ring_all',
-    level: 40,
+    level: 30,
     mods: [
       m('resist.allEle', 'base', 8, 10),
       m('resist.allEle', 'base', 10),
@@ -4918,7 +4918,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hollowAmethyst',
     name: 'Hollow Amethyst',
-    baseId: 'ring_mana',
+    baseId: 'ring_chaos',
     level: 69,
     mods: [
       m('life', 'inc', -5, -10),
@@ -4992,7 +4992,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'twinstoneLoop',
     name: 'Twinstone Loop',
-    baseId: 'ring_cold',
+    baseId: 'ring_mana',
     level: 49,
     mods: [
       m('damage', 'inc', 20, 30, { damageTypes: ['fire'] }),
@@ -5004,7 +5004,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'tempestCinder',
     name: 'Tempest Cinder',
-    baseId: 'ring_mana',
+    baseId: 'ring_ele',
     level: 80,
     mods: [
       m('manaRegen', 'inc', 40, 45),
@@ -5026,7 +5026,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     id: 'prismBridle',
     name: 'Prism Bridle',
     baseId: 'ring_all',
-    level: 40,
+    level: 30,
     mods: [
       m('damage', 'inc', 30, 30, { damageTypes: ['fire', 'cold', 'lightning'], tags: ['attack'] }),
       m('resist.allEle', 'base', 20, 30),
@@ -5040,7 +5040,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'ironShackle',
     name: 'Iron Shackle',
-    baseId: 'ring_mana',
+    baseId: 'ring_phys',
     level: 30,
     mods: [
       m('damage.min', 'base', 5, 15, { damageTypes: ['physical'], tags: ['attack'] }),
@@ -5052,25 +5052,25 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sandturnRing',
     name: 'Sandturn Ring',
-    baseId: 'ring_mana',
+    baseId: 'ring_es',
     level: 22,
     mods: [
       m('attackSpeed', 'inc', 10, 15),
       m('castSpeed', 'inc', 5, 10),
       m('manaRegen', 'inc', 15),
-      m('es', 'base', 7, 11),
+      m('es', 'base', 15, 25),
     ],
     flavour: 'Every grain falls a little faster.',
   },
   {
     id: 'skeinOfHours',
     name: 'Skein of Hours',
-    baseId: 'ring_mana',
+    baseId: 'ring_es',
     level: 64,
     mods: [
       m('attackSpeed', 'inc', 10, 15),
       m('castSpeed', 'inc', 5, 10),
-      m('es', 'base', 14, 23),
+      m('es', 'base', 30, 50),
       m('manaRegen', 'inc', 15),
     ],
     flavour: 'Wound tight, it never runs down.',
@@ -5092,7 +5092,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hollowKnuckle',
     name: 'Hollow Knuckle',
-    baseId: 'ring_mana',
+    baseId: 'ring_phys',
     level: 48,
     mods: [
       m('damage', 'inc', 5, 5, { damageTypes: ['physical'] }),
@@ -5108,7 +5108,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'frostfireBraid',
     name: 'Frostfire Braid',
-    baseId: 'ring_mana',
+    baseId: 'ring_life',
     level: 53,
     mods: [
       m('damage.min', 'base', 12, 15, { damageTypes: ['fire'], tags: ['attack'] }),
@@ -5124,12 +5124,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'quietDirk',
     name: 'Quiet Dirk',
-    baseId: 'dagger_4',
+    baseId: 'runedagger_l50',
     level: 50,
     mods: [
       m('damage', 'inc', 60, 70, { tags: ['spell'] }),
       m('mana', 'base', 40, 50),
-      m('es', 'base', 23),
+      m('es', 'base', 50),
       m('esRechargeDelay', 'inc', 10),
       m('cullingStrike', 'flag', 1, 1, { tags: ['spell'] }),
     ],
@@ -5138,7 +5138,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'twinbladeToken',
     name: 'Twinblade Token',
-    baseId: 'dagger_5',
+    baseId: 'runedagger_l64',
     level: 64,
     mods: [
       m('damage', 'inc', 250, 270, { damageTypes: ['physical'], local: true }),
@@ -5151,8 +5151,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'blightflameDagger',
     name: 'Blightflame Dagger',
-    baseId: 'dagger_5',
-    level: 60,
+    baseId: 'runedagger_l53',
+    level: 53,
     mods: [
       m('gemLevel', 'base', 1, 1, { tags: ['fire', 'spell'] }),
       m('damage', 'inc', 40, 60, { damageTypes: ['fire'] }),
@@ -5165,7 +5165,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'parryingNeedle',
     name: 'Parrying Needle',
-    baseId: 'dagger_2',
+    baseId: 'runedagger_l20',
     level: 20,
     mods: [
       m('damage', 'inc', 80, 100, { damageTypes: ['physical'], local: true }),
@@ -5181,8 +5181,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cutpurseEdge',
     name: 'Cutpurse Edge',
-    baseId: 'dagger_4',
-    level: 45,
+    baseId: 'runedagger_l44',
+    level: 44,
     mods: [
       m('damage.min', 'base', 35, 40, { damageTypes: ['physical'], local: true }),
       m('damage.max', 'base', 55, 60, { damageTypes: ['physical'], local: true }),
@@ -5194,7 +5194,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'conclaveRasp',
     name: 'Conclave Rasp',
-    baseId: 'sceptre_5',
+    baseId: 'sceptre_l66',
     level: 66,
     mods: [
       m('damage', 'inc', 260, 310, { damageTypes: ['physical'], local: true }),
@@ -5206,7 +5206,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'houndboneSceptre',
     name: 'Houndbone Sceptre',
-    baseId: 'sceptre_4',
+    baseId: 'sceptre_l47',
     level: 47,
     mods: [
       m('damage', 'inc', 70, 100, { tags: ['spell'] }),
@@ -5218,8 +5218,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gravetouchSceptre',
     name: 'Gravetouch Sceptre',
-    baseId: 'sceptre_5',
-    level: 60,
+    baseId: 'sceptre_l56',
+    level: 56,
     mods: [
       m('damage', 'inc', 26, 26, { damageTypes: ['fire', 'cold', 'lightning'] }),
       m('damage.min', 'base', 35, 46, { damageTypes: ['physical'], local: true }),
@@ -5232,7 +5232,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'brawnboundRod',
     name: 'Brawnbound Rod',
-    baseId: 'sceptre_5',
+    baseId: 'sceptre_l64',
     level: 64,
     mods: [
       m('damage', 'inc', 32, 32, { damageTypes: ['fire', 'cold', 'lightning'] }),
@@ -5246,8 +5246,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cinderLamp',
     name: 'Cinder Lamp',
-    baseId: 'sceptre_4',
-    level: 45,
+    baseId: 'sceptre_l41',
+    level: 41,
     mods: [
       m('damage', 'inc', 30, 30, { damageTypes: ['fire', 'cold', 'lightning'] }),
       m('socketedGemLevel', 'base', 2, 2, { tags: ['fire'] }),
@@ -5260,7 +5260,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'collapsedStar',
     name: 'Collapsed Star',
-    baseId: 'sceptre_5',
+    baseId: 'sceptre_l62',
     level: 62,
     mods: [
       m('damage', 'inc', 30, 30, { damageTypes: ['fire', 'cold', 'lightning'] }),
@@ -5274,7 +5274,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rimeboneSceptre',
     name: 'Rimebone Sceptre',
-    baseId: 'sceptre_2',
+    baseId: 'sceptre_l20',
     level: 20,
     mods: [
       m('damage', 'inc', 14, 14, { damageTypes: ['fire', 'cold', 'lightning'] }),
@@ -5290,20 +5290,20 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'nightOracle',
     name: 'Night Oracle',
-    baseId: 'sceptre_3',
+    baseId: 'sceptre_l32',
     level: 32,
     mods: [
       m('damage', 'inc', 22, 22, { damageTypes: ['fire', 'cold', 'lightning'] }),
       m('damage', 'inc', 30, 50),
       m('mana', 'base', 1, 1, { per: { stat: 'level', div: 1 } }),
-      m('es', 'base', 0, 0, { per: { stat: 'level', div: 1 } }),
+      m('es', 'base', 1, 1, { per: { stat: 'level', div: 1 } }),
     ],
     flavour: 'It sees best with the lights off.',
   },
   {
     id: 'dawnbreakWard',
     name: 'Dawnbreak Ward',
-    baseId: 'shield_ares_4',
+    baseId: 'shield_ares_l62',
     level: 62,
     mods: [
       m('damage', 'inc', 10, 20, { damageTypes: ['fire', 'cold', 'lightning'], tags: ['attack'] }),
@@ -5326,12 +5326,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'venomveilBarrier',
     name: 'Venomveil Barrier',
-    baseId: 'shield_es_4',
+    baseId: 'shield_es_l62',
     level: 62,
     mods: [
       m('damage.min', 'base', 50, 55, { damageTypes: ['chaos'] }),
       m('damage.max', 'base', 72, 80, { damageTypes: ['chaos'] }),
-      m('es', 'base', 59, 68),
+      m('es', 'base', 130, 150),
       m('esRechargeDelay', 'inc', 30, 50),
       m('avoid.poison', 'base', -25),
       m('maxResist.allEle', 'base', 3, 3, { condition: { id: 'poisoned' } }),
@@ -5342,7 +5342,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'shatteredCreed',
     name: 'Shattered Creed',
-    baseId: 'shield_ares_4',
+    baseId: 'shield_ares_l68',
     level: 68,
     mods: [
       m('leech.life', 'base', 0.4, 0.4, { damageTypes: ['chaos'] }),
@@ -5355,8 +5355,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'parryDisc',
     name: 'Parry Disc',
-    baseId: 'shield_arev_4',
-    level: 60,
+    baseId: 'shield_arev_l54',
+    level: 54,
     mods: [
       m('damage', 'inc', 20, 20, { damageTypes: ['physical'] }),
       m('armour', 'inc', 100, 120, { local: true }),
@@ -5372,7 +5372,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'veilstormWard',
     name: 'Veilstorm Ward',
-    baseId: 'shield_es_4',
+    baseId: 'shield_es_l62',
     level: 62,
     mods: [
       m('damage', 'inc', 5, 10, { tags: ['spell'] }),
@@ -5387,14 +5387,14 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sparkgiltShield',
     name: 'Sparkgilt Shield',
-    baseId: 'shield_eves_2',
+    baseId: 'shield_eves_l27',
     level: 27,
     mods: [
       m('dodgeAttack', 'base', 4),
       m('evasion', 'inc', 120, 140, { local: true }),
       m('es', 'inc', 120, 140, { local: true }),
       m('life', 'base', 30, 50),
-      m('es', 'base', 9, 14),
+      m('es', 'base', 20, 30),
       m('itemRarity', 'inc', 10),
       m('chance.ignite', 'base', 100, 100, { condition: { id: 'ignited' } }),
     ],
@@ -5403,7 +5403,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'deepseaBuckler',
     name: 'Deepsea Buckler',
-    baseId: 'shield_ev_3',
+    baseId: 'shield_ev_l46',
     level: 46,
     mods: [
       m('moveSpeed', 'inc', 3),
@@ -5418,8 +5418,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rimeheartBuckler',
     name: 'Rimeheart Buckler',
-    baseId: 'shield_ev_2',
-    level: 20,
+    baseId: 'shield_ev_l16',
+    level: 16,
     mods: [
       m('moveSpeed', 'inc', 6),
       m('evasion', 'inc', 60, 100, { local: true }),
@@ -5434,7 +5434,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'moonwickWard',
     name: 'Moonwick Ward',
-    baseId: 'shield_es_2',
+    baseId: 'shield_es_l28',
     level: 28,
     mods: [
       m('damage', 'inc', 10, 15, { tags: ['spell'] }),
@@ -5449,7 +5449,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rampartOfPenance',
     name: 'Rampart of Penance',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_ar_l70',
     level: 70,
     mods: [
       m('life', 'base', 20, 30),
@@ -5465,11 +5465,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'spidersilkWall',
     name: 'Spidersilk Wall',
-    baseId: 'shield_ar_2',
-    level: 20,
+    baseId: 'shield_ar_l11',
+    level: 11,
     mods: [
       m('life', 'base', 10, 20),
-      m('armour', 'base', 72, 96, { local: true }),
+      m('armour', 'base', 120, 160, { local: true }),
       m('life', 'base', 30, 40),
       m('blockAttack', 'base', 3, 5, { local: true }),
       m('alwaysHit', 'flag', 1),
@@ -5479,7 +5479,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'surgeRoundel',
     name: 'Surge Roundel',
-    baseId: 'shield_es_4',
+    baseId: 'shield_es_l65',
     level: 65,
     mods: [
       m('damage', 'inc', 10, 15, { tags: ['spell'] }),
@@ -5493,7 +5493,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'brazenFacet',
     name: 'Brazen Facet',
-    baseId: 'shield_eves_3',
+    baseId: 'shield_eves_l45',
     level: 45,
     mods: [
       m('dodgeSpell', 'base', 2),
@@ -5507,7 +5507,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'emberwakeKite',
     name: 'Emberwake Kite',
-    baseId: 'shield_ares_4',
+    baseId: 'shield_ares_l65',
     level: 65,
     mods: [
       m('resist.allEle', 'base', 8),
@@ -5526,8 +5526,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'prismwardHeater',
     name: 'Prismward Heater',
-    baseId: 'shield_ares_4',
-    level: 60,
+    baseId: 'shield_ares_l59',
+    level: 59,
     mods: [
       m('resist.allEle', 'base', 4),
       m('blockSpell', 'base', 15, 20),
@@ -5541,7 +5541,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bracingSlab',
     name: 'Bracing Slab',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_ar_l64',
     level: 64,
     mods: [
       m('life', 'base', 30, 40),
@@ -5555,7 +5555,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stoicTower',
     name: 'Stoic Tower',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_ar_l64',
     level: 64,
     mods: [
       m('life', 'base', 30, 40),
@@ -5570,7 +5570,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gnashingBuckler',
     name: 'Gnashing Buckler',
-    baseId: 'shield_ev_4',
+    baseId: 'shield_ev_l63',
     level: 63,
     mods: [
       m('moveSpeed', 'inc', 3),
@@ -5585,7 +5585,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'quarrelScreen',
     name: 'Quarrel Screen',
-    baseId: 'shield_ar_2',
+    baseId: 'shield_ar_l30',
     level: 30,
     mods: [
       m('life', 'base', 10, 20),
@@ -5598,7 +5598,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pyrewatchBulwark',
     name: 'Pyrewatch Bulwark',
-    baseId: 'shield_ares_4',
+    baseId: 'shield_ares_l68',
     level: 68,
     mods: [
       m('critChance', 'inc', 50, 70),
@@ -5620,11 +5620,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'echoingSpikeguard',
     name: 'Echoing Spikeguard',
-    baseId: 'shield_eves_3',
+    baseId: 'shield_eves_l49',
     level: 49,
     mods: [
       m('damage', 'inc', 40, 50, { tags: ['spell'] }),
-      m('es', 'base', 27, 36),
+      m('es', 'base', 60, 80),
       m('life', 'base', 50, 70),
       m('aoe', 'inc', 50, 50, { condition: { id: 'killedRecently' } }),
       m('regenToES', 'flag', 1, 1, { condition: { id: 'beenHitRecently', not: true } }),
@@ -5634,7 +5634,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pyrePenitent',
     name: 'Pyre Penitent',
-    baseId: 'staff_4',
+    baseId: 'staff_l52',
     level: 52,
     mods: [
       m('blockAttack', 'base', 18),
@@ -5656,8 +5656,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'galeReliquary',
     name: 'Gale Reliquary',
-    baseId: 'staff_3',
-    level: 30,
+    baseId: 'staff_l28',
+    level: 28,
     mods: [
       m('blockAttack', 'base', 18),
       m('damage', 'inc', 80, 100, { damageTypes: ['physical'], local: true }),
@@ -5674,7 +5674,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'thunderfrostPole',
     name: 'Thunderfrost Pole',
-    baseId: 'staff_3',
+    baseId: 'staff_l28',
     level: 60,
     mods: [
       m('blockAttack', 'base', 18),
@@ -5691,7 +5691,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'quillFoil',
     name: 'Quill Foil',
-    baseId: 'thrust_3',
+    baseId: 'thrust_l30',
     level: 30,
     mods: [
       m('critMulti', 'base', 25),
@@ -5707,7 +5707,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rimeglassFoil',
     name: 'Rimeglass Foil',
-    baseId: 'thrust_5',
+    baseId: 'thrust_l68',
     level: 68,
     mods: [
       m('critMulti', 'base', 25),
@@ -5733,8 +5733,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'frostpointEstoc',
     name: 'Frostpoint Estoc',
-    baseId: 'thrust_4',
-    level: 45,
+    baseId: 'thrust_l43',
+    level: 43,
     mods: [
       m('critMulti', 'base', 25),
       m('damage.min', 'base', 30, 38, { damageTypes: ['physical'], local: true }),
@@ -5748,8 +5748,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'loopingRapier',
     name: 'Looping Rapier',
-    baseId: 'thrust_3',
-    level: 30,
+    baseId: 'thrust_l26',
+    level: 26,
     mods: [
       m('critMulti', 'base', 25),
       m('damage', 'inc', 40, 55, { damageTypes: ['fire', 'cold', 'lightning'], tags: ['attack'] }),
@@ -5764,7 +5764,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     id: 'spindleRapier',
     name: 'Spindle Rapier',
     baseId: 'sword2_5',
-    level: 60,
+    level: 7,
     mods: [
       m('critMulti', 'base', 25),
       m('socketedGemLevel', 'base', 1, 1, { tags: ['melee'] }),
@@ -5773,7 +5773,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
       m('damage.max', 'base', 7, 7, { damageTypes: ['fire'], local: true }),
       m('attackSpeed', 'inc', 20, 20, { local: true }),
       m('critChance', 'inc', 30),
-      m('evasion', 'base', 12, 24),
+      m('evasion', 'base', 20, 40),
       m('itemRarity', 'inc', -20),
       m('moveSpeed', 'inc', 30, 30, { condition: { id: 'onLowLife' } }),
     ],
@@ -5782,7 +5782,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gildedCleaver',
     name: 'Gilded Cleaver',
-    baseId: 'axe2_5',
+    baseId: 'axe2_l64',
     level: 75,
     mods: [
       m('damage.min', 'base', 220, 235, { damageTypes: ['physical'], local: true }),
@@ -5796,7 +5796,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'crimsonTally',
     name: 'Crimson Tally',
-    baseId: 'axe2_5',
+    baseId: 'axe2_l64',
     level: 64,
     mods: [
       m('damage', 'inc', 150, 170, { damageTypes: ['physical'], local: true }),
@@ -5810,8 +5810,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'marrowChopper',
     name: 'Marrow Chopper',
-    baseId: 'axe2_5',
-    level: 60,
+    baseId: 'axe2_l58',
+    level: 58,
     mods: [
       m('damage', 'inc', 160, 220, { damageTypes: ['physical'], local: true }),
       m('lifeOnKill', 'base', 20),
@@ -5824,7 +5824,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hollowGorger',
     name: 'Hollow Gorger',
-    baseId: 'axe2_5',
+    baseId: 'axe2_l68',
     level: 68,
     mods: [
       m('damage', 'inc', 265, 330, { damageTypes: ['physical'], local: true }),
@@ -5837,8 +5837,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'timberfall',
     name: 'Timberfall',
-    baseId: 'axe2_2',
-    level: 15,
+    baseId: 'axe2_l13',
+    level: 13,
     mods: [
       m('damage', 'inc', 80, 100, { damageTypes: ['physical'], local: true }),
       m('damage.min', 'base', 5, 5, { damageTypes: ['physical'], local: true }),
@@ -5851,8 +5851,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'kilnSplitter',
     name: 'Kiln Splitter',
-    baseId: 'axe2_5',
-    level: 60,
+    baseId: 'axe2_l55',
+    level: 55,
     mods: [
       m('damage', 'inc', 190, 230, { damageTypes: ['physical'], local: true }),
       m('attackSpeed', 'inc', 8, 12, { local: true }),
@@ -5873,7 +5873,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'titheReaper',
     name: 'Tithe Reaper',
-    baseId: 'axe2_4',
+    baseId: 'axe2_l45',
     level: 45,
     mods: [
       m('damage', 'inc', 180, 200, { damageTypes: ['physical'], local: true }),
@@ -5888,7 +5888,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'brandSplitter',
     name: 'Brand Splitter',
-    baseId: 'axe2_2',
+    baseId: 'axe2_l13',
     level: 40,
     mods: [
       m('damage', 'inc', 80, 100, { damageTypes: ['physical'], local: true }),
@@ -5903,7 +5903,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gleaningChopper',
     name: 'Gleaning Chopper',
-    baseId: 'axe2_3',
+    baseId: 'axe2_l37',
     level: 37,
     mods: [
       m('damage', 'inc', 120, 140, { damageTypes: ['physical'], local: true }),
@@ -5915,7 +5915,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'broadPoleaxe',
     name: 'Broad Poleaxe',
-    baseId: 'axe2_2',
+    baseId: 'axe2_l18',
     level: 18,
     mods: [
       m('damage', 'inc', 120, 160, { damageTypes: ['physical'], local: true }),
@@ -5929,7 +5929,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'skullshaker',
     name: 'Skullshaker',
-    baseId: 'mace2_5',
+    baseId: 'mace2_l63',
     level: 63,
     mods: [
       m('stunDuration', 'inc', 30),
@@ -5944,8 +5944,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'placidMaul',
     name: 'Placid Maul',
-    baseId: 'mace2_3',
-    level: 30,
+    baseId: 'mace2_l27',
+    level: 27,
     mods: [
       m('stunDuration', 'inc', 30),
       m('damage', 'inc', 200, 200, { damageTypes: ['physical'], local: true }),
@@ -5959,7 +5959,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rageboundMaul',
     name: 'Ragebound Maul',
-    baseId: 'mace2_5',
+    baseId: 'mace2_l67',
     level: 67,
     mods: [
       m('stunDuration', 'inc', 30),
@@ -5976,8 +5976,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'leadenMaul',
     name: 'Leaden Maul',
-    baseId: 'mace2_5',
-    level: 60,
+    baseId: 'mace2_l57',
+    level: 57,
     mods: [
       m('stunDuration', 'inc', 30),
       m('damage', 'inc', 230, 260, { damageTypes: ['physical'], local: true }),
@@ -5993,7 +5993,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'blastboneMaul',
     name: 'Blastbone Maul',
-    baseId: 'mace2_2',
+    baseId: 'mace2_l22',
     level: 61,
     mods: [
       m('damage', 'inc', 80, 100, { damageTypes: ['physical'], local: true }),
@@ -6015,7 +6015,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'kindlingMaul',
     name: 'Kindling Maul',
-    baseId: 'mace2_2',
+    baseId: 'mace2_l22',
     level: 22,
     mods: [
       m('stunDuration', 'inc', 30),
@@ -6038,7 +6038,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'surfhammer',
     name: 'Surfhammer',
-    baseId: 'mace2_5',
+    baseId: 'mace2_l65',
     level: 65,
     mods: [
       m('damage.min', 'base', 70, 80, { damageTypes: ['physical'], local: true }),
@@ -6057,8 +6057,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'deadweightMallet',
     name: 'Deadweight Mallet',
-    baseId: 'mace2_4',
-    level: 45,
+    baseId: 'mace2_l40',
+    level: 40,
     mods: [
       m('stunDuration', 'inc', 30),
       m('attackSpeed', 'inc', -50, -50, { local: true }),
@@ -6069,7 +6069,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'warcrestSword',
     name: 'Warcrest Sword',
-    baseId: 'sword2_5',
+    baseId: 'sword2_l65',
     level: 65,
     mods: [
       m('accuracy', 'base', 470, 470, { local: true }),
@@ -6085,7 +6085,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'frenzyGreatsword',
     name: 'Frenzy Greatsword',
-    baseId: 'sword2_2',
+    baseId: 'sword2_l22',
     level: 22,
     mods: [
       m('accuracy', 'inc', 40),
@@ -6110,8 +6110,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bareReaver',
     name: 'Bare Reaver',
-    baseId: 'sword2_5',
-    level: 60,
+    baseId: 'sword2_l59',
+    level: 59,
     mods: [
       m('accuracy', 'inc', 40),
       m('damage.min', 'base', 90, 115, { damageTypes: ['physical'], local: true }),
@@ -6125,7 +6125,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'goredBlade',
     name: 'Gored Blade',
-    baseId: 'sword2_5',
+    baseId: 'sword2_l61',
     level: 61,
     mods: [
       m('accuracy', 'base', 435, 435, { local: true }),
@@ -6139,7 +6139,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'emberOffering',
     name: 'Ember Offering',
-    baseId: 'sword2_5',
+    baseId: 'sword2_l67',
     level: 67,
     mods: [
       m('accuracy', 'inc', 30, 30, { local: true }),
@@ -6157,7 +6157,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'anvilBrand',
     name: 'Anvil Brand',
-    baseId: 'sword2_5',
+    baseId: 'sword2_l67',
     level: 67,
     mods: [
       m('accuracy', 'inc', 30, 30, { local: true }),
@@ -6173,7 +6173,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'finalFang',
     name: 'Final Fang',
-    baseId: 'sword2_4',
+    baseId: 'sword2_l51',
     level: 51,
     mods: [
       m('accuracy', 'base', 360, 360, { local: true }),
@@ -6189,7 +6189,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'tempestClaymore',
     name: 'Tempest Claymore',
-    baseId: 'sword2_5',
+    baseId: 'sword2_l67',
     level: 67,
     mods: [
       m('accuracy', 'inc', 30, 30, { local: true }),
@@ -6210,7 +6210,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cinderSwitch',
     name: 'Cinder Switch',
-    baseId: 'wand_1',
+    baseId: 'wand_l6',
     level: 6,
     mods: [
       m('damage', 'inc', 10, 14, { tags: ['spell'] }),
@@ -6225,7 +6225,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'doublingRod',
     name: 'Doubling Rod',
-    baseId: 'wand_3',
+    baseId: 'wand_l24',
     level: 36,
     mods: [
       m('socketedGemLevel', 'base', 1),
@@ -6241,7 +6241,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gallWand',
     name: 'Gall Wand',
-    baseId: 'wand_5',
+    baseId: 'wand_l62',
     level: 62,
     mods: [
       m('damage', 'inc', 38, 42, { tags: ['spell'] }),
@@ -6256,7 +6256,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'veilcutWand',
     name: 'Veilcut Wand',
-    baseId: 'wand_4',
+    baseId: 'wand_l45',
     level: 45,
     mods: [
       m('damage', 'inc', 29, 33, { tags: ['spell'] }),
@@ -6270,7 +6270,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'saplingSwitch',
     name: 'Sapling Switch',
-    baseId: 'wand_1',
+    baseId: 'wand_l1',
     level: 2,
     mods: [
       m('socketedGemLevel', 'base', 1, 1, { tags: ['spell'] }),
@@ -6285,8 +6285,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'tidewashWand',
     name: 'Tidewash Wand',
-    baseId: 'wand_5',
-    level: 60,
+    baseId: 'wand_l59',
+    level: 59,
     mods: [
       m('damage', 'inc', 33, 37, { tags: ['spell'] }),
       m('damage', 'inc', 30, 40, { tags: ['spell'] }),
@@ -6300,8 +6300,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'blightburstWand',
     name: 'Blightburst Wand',
-    baseId: 'wand_5',
-    level: 60,
+    baseId: 'wand_l56',
+    level: 56,
     mods: [
       m('damage', 'inc', 31, 35, { tags: ['spell'] }),
       m('damage.min', 'base', 24, 30, { damageTypes: ['physical'], local: true }),
@@ -6322,7 +6322,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stillwaterWand',
     name: 'Stillwater Wand',
-    baseId: 'wand_5',
+    baseId: 'wand_l65',
     level: 65,
     mods: [
       m('damage', 'inc', 35, 39, { tags: ['spell'] }),
@@ -6344,8 +6344,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hollowRod',
     name: 'Hollow Rod',
-    baseId: 'wand_3',
-    level: 30,
+    baseId: 'wand_l24',
+    level: 24,
     mods: [
       m('damage', 'inc', 15, 19, { tags: ['spell'] }),
       m('socketedGemLevel', 'base', 1),
@@ -6359,7 +6359,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'umbralSwitch',
     name: 'Umbral Switch',
-    baseId: 'wand_3',
+    baseId: 'wand_l30',
     level: 30,
     mods: [
       m('gain.elemental.chaos', 'base', 10, 20),
@@ -6371,7 +6371,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stormwellWand',
     name: 'Stormwell Wand',
-    baseId: 'wand_5',
+    baseId: 'wand_l65',
     level: 65,
     mods: [
       m('damage', 'inc', 30, 40, { tags: ['spell'] }),
@@ -6396,8 +6396,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cageboltWand',
     name: 'Cagebolt Wand',
-    baseId: 'wand_2',
-    level: 15,
+    baseId: 'wand_l12',
+    level: 12,
     mods: [
       m('damage', 'inc', 11, 15, { tags: ['spell'] }),
       m('damage', 'inc', 40, 60, { damageTypes: ['physical'], local: true }),
@@ -6412,8 +6412,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rimecallWand',
     name: 'Rimecall Wand',
-    baseId: 'wand_3',
-    level: 30,
+    baseId: 'wand_l24',
+    level: 24,
     mods: [
       m('castSpeed', 'inc', 10, 15),
       m('damage.min', 'base', 10, 10, {
@@ -6433,7 +6433,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'splinterWand',
     name: 'Splinter Wand',
-    baseId: 'wand_3',
+    baseId: 'wand_l30',
     level: 30,
     mods: [
       m('damage', 'inc', 17, 21, { tags: ['spell'] }),
@@ -6449,7 +6449,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'halfLightStaff',
     name: 'Half-Light Staff',
-    baseId: 'staff_5',
+    baseId: 'warstaff_l64',
     level: 64,
     mods: [
       m('blockAttack', 'base', 20, 20, { condition: { id: 'wieldingStaff' } }),
@@ -6463,7 +6463,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'crownbreakerStaff',
     name: 'Crownbreaker Staff',
-    baseId: 'staff_5',
+    baseId: 'warstaff_l68',
     level: 68,
     mods: [
       m('blockAttack', 'base', 18),
@@ -6479,8 +6479,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'masonsStaff',
     name: "Mason's Staff",
-    baseId: 'staff_2',
-    level: 15,
+    baseId: 'warstaff_l13',
+    level: 13,
     mods: [
       m('aoe', 'inc', 1, 1, { tags: ['area'], per: { stat: 'int', div: 20 } }),
       m('attackSpeed', 'inc', 1, 1, { local: true, per: { stat: 'dex', div: 10 } }),
@@ -6495,7 +6495,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'oathboundStaff',
     name: 'Oathbound Staff',
-    baseId: 'staff_5',
+    baseId: 'warstaff_l68',
     level: 68,
     mods: [
       m('blockAttack', 'base', 18, 18, { condition: { id: 'wieldingStaff' } }),
@@ -6510,7 +6510,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'fissureStaff',
     name: 'Fissure Staff',
-    baseId: 'staff_2',
+    baseId: 'warstaff_l13',
     level: 40,
     mods: [
       m('blockAttack', 'base', 18),
@@ -6530,7 +6530,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rimeflameStaff',
     name: 'Rimeflame Staff',
-    baseId: 'staff_2',
+    baseId: 'warstaff_l13',
     level: 18,
     mods: [
       m('blockAttack', 'base', 18),
@@ -6547,7 +6547,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'thornfallStaff',
     name: 'Thornfall Staff',
-    baseId: 'staff_4',
+    baseId: 'warstaff_l49',
     level: 49,
     mods: [
       m('blockAttack', 'base', 20),
@@ -6561,7 +6561,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'frostcoilStaff',
     name: 'Frostcoil Staff',
-    baseId: 'staff_5',
+    baseId: 'warstaff_l64',
     level: 64,
     mods: [
       m('blockAttack', 'base', 20),
@@ -6577,7 +6577,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'ashenPylon',
     name: 'Ashen Pylon',
-    baseId: 'staff_5',
+    baseId: 'warstaff_l68',
     level: 68,
     sockets: 0,
     mods: [
@@ -6591,8 +6591,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'windlassStaff',
     name: 'Windlass Staff',
-    baseId: 'staff_3',
-    level: 30,
+    baseId: 'warstaff_l23',
+    level: 28,
     mods: [
       m('blockAttack', 'base', 20),
       m('gemLevel', 'base', 1, 1, { tags: ['spell'] }),
@@ -6606,7 +6606,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gleanersTorc',
     name: "Gleaner's Torc",
-    baseId: 'amulet_all',
+    baseId: 'amulet_rarity',
     level: 30,
     mods: [m('itemRarity', 'inc', 100, 150), m('itemQuantity', 'inc', 35, 50)],
     flavour: 'Whatever falls, it finds.',
@@ -6635,7 +6635,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hollowFang',
     name: 'Hollow Fang',
-    baseId: 'amulet_all',
+    baseId: 'amulet_manaregen_high',
     level: 77,
     mods: [
       m('manaRegen', 'inc', 48, 56),
@@ -6685,7 +6685,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     id: 'gatekeepersTalon',
     name: "Gatekeeper's Talon",
     baseId: 'amulet_all',
-    level: 30,
+    level: 25,
     mods: [m('socketedGemLevel', 'base', 2), m('socketSupport.venomSeed', 'base', 10)],
     flavour: 'Closed doors stay closed.',
   },
@@ -6712,8 +6712,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'frostwakeStar',
     name: 'Frostwake Star',
-    baseId: 'amulet_all',
-    level: 30,
+    baseId: 'amulet_fire',
+    level: 28,
     mods: [
       m('grantSkill.rimeStep', 'base', 10),
       m('resist.fire', 'base', 20, 30),
@@ -6742,22 +6742,22 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hermitsMedallion',
     name: "Hermit's Medallion",
-    baseId: 'amulet_all',
-    level: 30,
+    baseId: 'amulet_rarity',
+    level: 8,
     mods: [m('itemRarity', 'inc', 80, 100), m('itemQuantity', 'inc', 10, 15)],
     flavour: 'Plain on the chest, rich in the pocket.',
   },
   {
     id: 'sootglassCharm',
     name: 'Sootglass Charm',
-    baseId: 'amulet_all',
+    baseId: 'amulet_rarity',
     level: 57,
     mods: [
       m('dex', 'base', 10),
       m('damage.min', 'base', 12, 12, { damageTypes: ['fire'], tags: ['attack'] }),
       m('damage.max', 'base', 24, 24, { damageTypes: ['fire'], tags: ['attack'] }),
       m('accuracy', 'base', 100, 150),
-      m('evasion', 'base', 60, 90),
+      m('evasion', 'base', 100, 150),
       m('resist.fire', 'base', 20),
       m('penetration', 'base', 10, 10, { damageTypes: ['fire'] }),
     ],
@@ -6767,7 +6767,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     id: 'brinewrackCollar',
     name: 'Brinewrack Collar',
     baseId: 'amulet_all',
-    level: 30,
+    level: 25,
     mods: [
       m('resist.fire', 'base', 10, 20),
       m('resist.cold', 'base', 10, 20),
@@ -6784,8 +6784,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     baseId: 'belt_es',
     level: 44,
     mods: [
-      m('evasion', 'base', 180),
-      m('es', 'base', 34, 36),
+      m('evasion', 'base', 300),
+      m('es', 'base', 75, 80),
       m('resist.allEle', 'base', 10, 15),
       m('dodgeAttack', 'base', 6, 6, { condition: { id: 'phaseRun' } }),
       m('moveSpeed', 'inc', 10, 10, { condition: { id: 'phaseRun' } }),
@@ -6795,7 +6795,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gleanersGirdle',
     name: "Gleaner's Girdle",
-    baseId: 'belt_life',
+    baseId: 'belt_str',
     level: 30,
     mods: [m('itemQuantity', 'inc', 5), m('resist.cold', 'base', 20, 40)],
     flavour: 'A short lead on a long haul.',
@@ -6824,7 +6824,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'triplewindBelt',
     name: 'Triplewind Belt',
-    baseId: 'belt_life',
+    baseId: 'belt_str',
     level: 8,
     mods: [m('resist.allEle', 'base', 42, 48)],
     flavour: 'Three knots, one purpose.',
@@ -6832,7 +6832,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'driftersBelt',
     name: "Drifter's Belt",
-    baseId: 'belt_life',
+    baseId: 'belt_stunner',
     level: 48,
     mods: [
       m('damage', 'inc', 25, 40, { damageTypes: ['physical'] }),
@@ -6849,8 +6849,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'swiftwindGarb',
     name: 'Swiftwind Garb',
-    baseId: 'body_ev_4',
-    level: 60,
+    baseId: 'body_ev_l53',
+    level: 53,
     mods: [
       m('socketedGemLevel', 'base', 2, 2, { tags: ['movement'] }),
       m('attackSpeed', 'inc', 10),
@@ -6863,7 +6863,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hexbindersGarb',
     name: "Hexbinder's Garb",
-    baseId: 'body_ev_4',
+    baseId: 'body_ev_l68',
     level: 68,
     mods: [
       m('evasion', 'inc', 120, 160, { local: true }),
@@ -6876,12 +6876,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'frogskinJacket',
     name: 'Frogskin Jacket',
-    baseId: 'body_eves_4',
-    level: 60,
+    baseId: 'body_eves_l59',
+    level: 59,
     mods: [
       m('evasion', 'inc', 130, 150, { local: true }),
       m('es', 'inc', 130, 150, { local: true }),
-      m('es', 'base', 18),
+      m('es', 'base', 40),
       m('resist.allEle', 'base', 15, 25),
       m('damage', 'inc', 75, 100, { tags: ['poison'], per: { stat: 'dex', div: 300 } }),
       m('duration.poison', 'inc', 15, 25, { per: { stat: 'int', div: 150 } }),
@@ -6891,8 +6891,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'silentHide',
     name: 'Silent Hide',
-    baseId: 'body_arev_3',
-    level: 40,
+    baseId: 'body_arev_l38',
+    level: 38,
     mods: [
       m('damage', 'inc', 100, 100, { damageTypes: ['physical'] }),
       m('life', 'base', 200, 240),
@@ -6905,8 +6905,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'longsightPlate',
     name: 'Longsight Plate',
-    baseId: 'body_ar_4',
-    level: 60,
+    baseId: 'body_ar_l59',
+    level: 59,
     mods: [
       m('armour', 'inc', 200, 250, { local: true }),
       m('life', 'base', 60, 100),
@@ -6918,7 +6918,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'taintedSeams',
     name: 'Tainted Seams',
-    baseId: 'body_ar_4',
+    baseId: 'body_ar_l68',
     level: 72,
     mods: [
       m('allAttr', 'base', 20, 30),
@@ -6933,8 +6933,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'tidingsRegalia',
     name: 'Tidings Regalia',
-    baseId: 'body_es_4',
-    level: 60,
+    baseId: 'body_es_l53',
+    level: 53,
     mods: [
       m('es', 'inc', 80, 100, { local: true }),
       m('socketedGemLevel', 'base', 2, 2, { tags: ['herald'] }),
@@ -6948,8 +6948,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sovereignSilks',
     name: 'Sovereign Silks',
-    baseId: 'body_eves_4',
-    level: 60,
+    baseId: 'body_eves_l52',
+    level: 52,
     mods: [
       m('socketedGemLevel', 'base', 1, 1, { tags: ['aura'] }),
       m('socketedReducedReservation', 'base', 30),
@@ -6963,15 +6963,15 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'titheOfCalm',
     name: 'Tithe of Calm',
-    baseId: 'amulet_str',
+    baseId: 'amulet_str_int',
     level: 32,
-    mods: [m('life', 'base', 30, 40), m('es', 'base', 9, 14), m('resist.allEle', 'base', 15, 20)],
+    mods: [m('life', 'base', 30, 40), m('es', 'base', 20, 30), m('resist.allEle', 'base', 15, 20)],
     flavour: 'Steady hands, steady faith.',
   },
   {
     id: 'oathwallMail',
     name: 'Oathwall Mail',
-    baseId: 'body_ares_4',
+    baseId: 'body_ares_l61',
     level: 61,
     mods: [
       m('armour', 'inc', 150, 170, { local: true }),
@@ -6997,7 +6997,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wicklessSash',
     name: 'Wickless Sash',
-    baseId: 'belt_life',
+    baseId: 'belt_stun',
     level: 45,
     mods: [
       m('stunDurationOnSelf', 'base', 15, 25),
@@ -7011,7 +7011,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bellmetalCuirass',
     name: 'Bellmetal Cuirass',
-    baseId: 'body_ar_4',
+    baseId: 'body_ar_l65',
     level: 65,
     mods: [
       m('armour', 'inc', 600, 650, { local: true }),
@@ -7025,8 +7025,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'votiveHauberk',
     name: 'Votive Hauberk',
-    baseId: 'body_ares_3',
-    level: 40,
+    baseId: 'body_ares_l35',
+    level: 35,
     mods: [
       m('armour', 'inc', 100, 150, { local: true }),
       m('es', 'inc', 100, 150, { local: true }),
@@ -7038,8 +7038,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'drillmasterBoots',
     name: 'Drillmaster Boots',
-    baseId: 'boots_ares_4',
-    level: 60,
+    baseId: 'boots_ares_l58',
+    level: 58,
     mods: [
       m('socketedGemLevel', 'base', 2, 2, { tags: ['aura'] }),
       m('armour', 'inc', 250, 300, { local: true }),
@@ -7052,7 +7052,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wellspringSlippers',
     name: 'Wellspring Slippers',
-    baseId: 'boots_es_4',
+    baseId: 'boots_es_l67',
     level: 67,
     mods: [
       m('mana', 'base', 60, 120),
@@ -7066,8 +7066,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hexholdGreaves',
     name: 'Hexhold Greaves',
-    baseId: 'boots_ar_3',
-    level: 40,
+    baseId: 'boots_ar_l33',
+    level: 33,
     mods: [
       m('armour', 'inc', 50, 80, { local: true }),
       m('resist.allEle', 'base', 10, 15),
@@ -7080,7 +7080,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bellmetalGreaves',
     name: 'Bellmetal Greaves',
-    baseId: 'boots_ar_3',
+    baseId: 'boots_ar_l33',
     level: 60,
     mods: [
       m('armour', 'inc', 200, 250, { local: true }),
@@ -7095,7 +7095,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'heronwing',
     name: 'Heronwing',
-    baseId: 'bow_5',
+    baseId: 'bow_l62',
     level: 62,
     mods: [
       m('critMulti', 'base', 15, 25),
@@ -7109,8 +7109,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bloodtitheClaw',
     name: 'Bloodtithe Claw',
-    baseId: 'claw_3',
-    level: 30,
+    baseId: 'claw_l26',
+    level: 26,
     mods: [
       m('lifeOnHit', 'base', 19, 19, { tags: ['attack'] }),
       m('damage', 'inc', 100, 120, { damageTypes: ['physical'], local: true }),
@@ -7121,8 +7121,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'fleetfang',
     name: 'Fleetfang',
-    baseId: 'claw_2',
-    level: 15,
+    baseId: 'claw_l12',
+    level: 12,
     mods: [
       m('lifeOnHit', 'base', 7, 7, { tags: ['attack'] }),
       m('str', 'base', 10, 15),
@@ -7139,7 +7139,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'witherpalmGloves',
     name: 'Witherpalm Gloves',
-    baseId: 'gloves_es_4',
+    baseId: 'gloves_es_l69',
     level: 69,
     mods: [
       m('grantSkill.witheringBreath', 'base', 22),
@@ -7152,7 +7152,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'velvetHold',
     name: 'Velvet Hold',
-    baseId: 'gloves_es_2',
+    baseId: 'gloves_es_l25',
     level: 25,
     mods: [
       m('int', 'base', 20, 30),
@@ -7165,7 +7165,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'slingstoneGauntlets',
     name: 'Slingstone Gauntlets',
-    baseId: 'gloves_ar_2',
+    baseId: 'gloves_ar_l23',
     level: 23,
     mods: [
       m('damage.min', 'base', 3, 6, { damageTypes: ['physical'], tags: ['attack'] }),
@@ -7179,12 +7179,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'quicksilkGloves',
     name: 'Quicksilk Gloves',
-    baseId: 'gloves_es_3',
+    baseId: 'gloves_es_l47',
     level: 47,
     mods: [
       m('socketSupport.quickCast', 'base', 18),
       m('int', 'base', 20, 30),
-      m('es', 'base', 23, 36),
+      m('es', 'base', 50, 80),
       m('life', 'base', 50, 70),
     ],
     flavour: 'The words arrive before the breath does.',
@@ -7192,7 +7192,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'fickleFists',
     name: 'Fickle Fists',
-    baseId: 'gloves_ar_1',
+    baseId: 'gloves_ar_l1',
     level: 1,
     mods: [
       m('attackSpeed', 'inc', 10, 15),
@@ -7208,8 +7208,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'spotterGloves',
     name: 'Spotter Gloves',
-    baseId: 'gloves_ev_3',
-    level: 40,
+    baseId: 'gloves_ev_l33',
+    level: 33,
     mods: [
       m('accuracy', 'inc', 30, 40),
       m('life', 'base', 40, 50),
@@ -7229,13 +7229,13 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hairshirtGloves',
     name: 'Hairshirt Gloves',
-    baseId: 'gloves_ares_4',
+    baseId: 'gloves_ares_l66',
     level: 66,
     mods: [
       m('damage', 'inc', 0, -30, { tags: ['spell'] }),
       m('armour', 'inc', 120, 180, { local: true }),
       m('es', 'inc', 120, 180, { local: true }),
-      m('es', 'base', 4, 7),
+      m('es', 'base', 8, 16),
       m('damage', 'inc', 1, 1, { tags: ['spell'], per: { stat: 'str', div: 5 } }),
     ],
     flavour: 'Strength spent on the wrong kind of prayer.',
@@ -7243,10 +7243,10 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hexweaverGloves',
     name: 'Hexweaver Gloves',
-    baseId: 'gloves_es_3',
-    level: 40,
+    baseId: 'gloves_es_l36',
+    level: 36,
     mods: [
-      m('es', 'base', 23, 41),
+      m('es', 'base', 50, 90),
       m('hexLimit', 'base', 1),
       m('castSpeed', 'inc', 10, 20, { tags: ['curse'] }),
     ],
@@ -7264,7 +7264,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'narrowingGauntlets',
     name: 'Narrowing Gauntlets',
-    baseId: 'gloves_arev_3',
+    baseId: 'gloves_arev_l49',
     level: 49,
     mods: [
       m('socketSupport.denseBlast', 'base', 5),
@@ -7278,7 +7278,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rallymasterHelm',
     name: 'Rallymaster Helm',
-    baseId: 'helmet_ev_4',
+    baseId: 'helmet_ev_l64',
     level: 64,
     mods: [
       m('socketedGemLevel', 'base', 2, 2, { tags: ['aura'] }),
@@ -7293,11 +7293,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cursecallerCirclet',
     name: 'Cursecaller Circlet',
-    baseId: 'helmet_es_3',
-    level: 40,
+    baseId: 'helmet_es_l39',
+    level: 39,
     mods: [
       m('socketedGemLevel', 'base', 2, 2, { tags: ['curse'] }),
-      m('es', 'base', 45, 54),
+      m('es', 'base', 100, 120),
       m('int', 'base', 20, 30),
       m('damage', 'inc', 20, 20, { damageTypes: ['fire', 'cold', 'lightning'] }),
     ],
@@ -7306,7 +7306,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'umbralCirclet',
     name: 'Umbral Circlet',
-    baseId: 'helmet_es_4',
+    baseId: 'helmet_es_l69',
     level: 69,
     mods: [
       m('mana', 'base', 50, 80),
@@ -7319,7 +7319,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'fluxHood',
     name: 'Flux Hood',
-    baseId: 'helmet_ev_2',
+    baseId: 'helmet_ev_l20',
     level: 20,
     mods: [
       m('evasion', 'inc', 80, 100, { local: true }),
@@ -7332,8 +7332,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'staticVeil',
     name: 'Static Veil',
-    baseId: 'helmet_eves_4',
-    level: 60,
+    baseId: 'helmet_eves_l57',
+    level: 57,
     mods: [
       m('evasion', 'inc', 230, 260, { local: true }),
       m('es', 'inc', 230, 260, { local: true }),
@@ -7345,7 +7345,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sightedPelt',
     name: 'Sighted Pelt',
-    baseId: 'helmet_ev_4',
+    baseId: 'helmet_ev_l70',
     level: 70,
     mods: [
       m('accuracy', 'base', 800, 1000),
@@ -7358,7 +7358,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'frostboundCage',
     name: 'Frostbound Cage',
-    baseId: 'helmet_es_4',
+    baseId: 'helmet_es_l65',
     level: 65,
     mods: [
       m('socketSupport.denseBlast', 'base', 20),
@@ -7372,7 +7372,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'monsoonBascinet',
     name: 'Monsoon Bascinet',
-    baseId: 'helmet_arev_4',
+    baseId: 'helmet_arev_l67',
     level: 67,
     mods: [
       m('socketSupport.bruteForce', 'base', 18),
@@ -7390,7 +7390,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'shatteredCoronet',
     name: 'Shattered Coronet',
-    baseId: 'helmet_ares_4',
+    baseId: 'helmet_ares_l63',
     level: 63,
     mods: [
       m('damage', 'inc', 20, 20, { condition: { id: 'onLowLife' } }),
@@ -7398,7 +7398,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
       m('armour', 'inc', 60, 100, { local: true }),
       m('es', 'inc', 60, 100, { local: true }),
       m('manaRegen', 'inc', -20),
-      m('es', 'base', 23, 32),
+      m('es', 'base', 50, 70),
       m('resist.chaos', 'base', 43, 61),
     ],
     flavour: 'Worn by someone who had nothing left to lose.',
@@ -7406,8 +7406,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'ravenousCirclet',
     name: 'Ravenous Circlet',
-    baseId: 'helmet_es_4',
-    level: 60,
+    baseId: 'helmet_es_l54',
+    level: 54,
     mods: [
       m('socketedGemLevel', 'base', 1),
       m('socketedReducedReservation', 'base', 20),
@@ -7419,14 +7419,14 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'thunderboundMask',
     name: 'Thunderbound Mask',
-    baseId: 'helmet_eves_3',
+    baseId: 'helmet_eves_l45',
     level: 45,
     mods: [
       m('socketSupport.frostFang', 'base', 18),
       m('socketSupport.livewire', 'base', 18),
-      m('evasion', 'base', 60, 90, { local: true }),
+      m('evasion', 'base', 100, 150, { local: true }),
       m('life', 'base', 60, 80),
-      m('es', 'base', 18, 27),
+      m('es', 'base', 40, 60),
       m('resist.allEle', 'base', 10, 15),
     ],
     flavour: 'Knotted tight enough to hold weather.',
@@ -7434,7 +7434,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sparkguileCirclet',
     name: 'Sparkguile Circlet',
-    baseId: 'helmet_es_4',
+    baseId: 'helmet_es_l69',
     level: 69,
     mods: [
       m('damage.min', 'base', 1, 1, { damageTypes: ['lightning'] }),
@@ -7447,7 +7447,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cinderCleaver',
     name: 'Cinder Cleaver',
-    baseId: 'axe_2',
+    baseId: 'axe_l16',
     level: 16,
     mods: [
       m('damage.min', 'base', 5, 15, { damageTypes: ['physical'], local: true }),
@@ -7464,8 +7464,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'twinlightHatchet',
     name: 'Twinlight Hatchet',
-    baseId: 'axe_4',
-    level: 45,
+    baseId: 'axe_l39',
+    level: 39,
     mods: [
       m('damage', 'inc', 70, 90, { damageTypes: ['physical'], local: true }),
       m('damage.min', 'base', 5, 9, { damageTypes: ['physical'], local: true }),
@@ -7480,7 +7480,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rimecoinGavel',
     name: 'Rimecoin Gavel',
-    baseId: 'mace_5',
+    baseId: 'mace_l60',
     level: 60,
     mods: [
       m('damage', 'inc', 140, 180, { damageTypes: ['physical'], local: true }),
@@ -7503,8 +7503,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'quietwindBlade',
     name: 'Quietwind Blade',
-    baseId: 'sword_5',
-    level: 60,
+    baseId: 'sword_l58',
+    level: 58,
     mods: [
       m('accuracy', 'inc', 40),
       m('damage.min', 'base', 5, 10, { damageTypes: ['physical'], local: true }),
@@ -7519,8 +7519,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'steadfastFoil',
     name: 'Steadfast Foil',
-    baseId: 'sword_3',
-    level: 30,
+    baseId: 'sword_l28',
+    level: 28,
     mods: [
       m('accuracy', 'base', 190, 190, { local: true }),
       m('damage', 'inc', 60, 80, { damageTypes: ['physical'], local: true }),
@@ -7536,7 +7536,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stormwakeBlade',
     name: 'Stormwake Blade',
-    baseId: 'sword_5',
+    baseId: 'sword_l62',
     level: 62,
     mods: [
       m('damage', 'inc', 75, 90, { tags: ['spell'] }),
@@ -7560,7 +7560,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'winterbreathQuiver',
     name: 'Winterbreath Quiver',
-    baseId: 'quiver_acc',
+    baseId: 'quiver_accpct',
     level: 10,
     mods: [
       m('accuracy', 'inc', 20, 30),
@@ -7576,7 +7576,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'clockworkQuiver',
     name: 'Clockwork Quiver',
-    baseId: 'quiver_acc',
+    baseId: 'quiver_socket',
     level: 45,
     sockets: 2,
     mods: [m('attackSpeed', 'inc', 7, 12), m('life', 'base', 50, 70)],
@@ -7588,7 +7588,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'twinhueQuiver',
     name: 'Twinhue Quiver',
-    baseId: 'quiver_acc',
+    baseId: 'quiver_stun',
     level: 60,
     mods: [
       m('damage.min', 'base', 19, 22, { damageTypes: ['fire'] }),
@@ -7605,12 +7605,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hollowshaftQuiver',
     name: 'Hollowshaft Quiver',
-    baseId: 'quiver_acc',
+    baseId: 'quiver_pierce',
     level: 68,
     mods: [
       m('damage.min', 'base', 30, 40, { damageTypes: ['cold'], tags: ['attack'] }),
       m('damage.max', 'base', 80, 100, { damageTypes: ['cold'], tags: ['attack'] }),
-      m('es', 'base', 36, 54),
+      m('es', 'base', 80, 120),
       m('resist.cold', 'base', 20, 30),
       m('manaOnKill', 'base', 20, 40),
       m('projectileSpeed', 'inc', 30),
@@ -7659,7 +7659,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'ironSignet',
     name: 'Iron Signet',
-    baseId: 'ring_mana',
+    baseId: 'ring_phys',
     level: 52,
     mods: [
       m('damage.min', 'base', 1, 1, { damageTypes: ['physical'], tags: ['attack'] }),
@@ -7667,14 +7667,14 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
       m('allAttr', 'base', 10, 20),
       m('damage.min', 'base', 8, 10, { damageTypes: ['physical'] }),
       m('damage.max', 'base', 13, 15, { damageTypes: ['physical'] }),
-      m('armour', 'base', 210, 240),
+      m('armour', 'base', 350, 400),
     ],
     flavour: 'Heavy for something so small.',
   },
   {
     id: 'rotSignet',
     name: 'Rot Signet',
-    baseId: 'ring_mana',
+    baseId: 'ring_chaos',
     level: 52,
     mods: [
       m('resist.chaos', 'base', 9, 13),
@@ -7717,7 +7717,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hollowCoil',
     name: 'Hollow Coil',
-    baseId: 'ring_mana',
+    baseId: 'ring_socket',
     level: 38,
     mods: [
       m('socketedGemLevel', 'base', 2, 2, { tags: ['aura'] }),
@@ -7742,7 +7742,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'frostpactRing',
     name: 'Frostpact Ring',
-    baseId: 'ring_mana',
+    baseId: 'ring_heavy',
     level: 80,
     mods: [
       m('damage.min', 'base', 26, 32, { damageTypes: ['cold'], tags: ['attack'] }),
@@ -7755,7 +7755,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stormpactRing',
     name: 'Stormpact Ring',
-    baseId: 'ring_mana',
+    baseId: 'ring_ele',
     level: 80,
     mods: [
       m('damage.min', 'base', 13, 18, { damageTypes: ['lightning'], tags: ['spell'] }),
@@ -7768,7 +7768,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'lanternfeastRing',
     name: 'Lanternfeast Ring',
-    baseId: 'ring_mana',
+    baseId: 'ring_crit',
     level: 60,
     mods: [
       m('accuracy', 'base', 333),
@@ -7783,7 +7783,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     id: 'lonePrism',
     name: 'Lone Prism',
     baseId: 'ring_all',
-    level: 40,
+    level: 30,
     mods: [
       m('resist.allEle', 'base', 8, 10),
       m('itemQuantity', 'inc', 10, 16),
@@ -7798,7 +7798,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wagerBand',
     name: 'Wager Band',
-    baseId: 'ring_mana',
+    baseId: 'ring_rarity',
     level: 65,
     mods: [
       m('life', 'base', 0, 60),
@@ -7813,7 +7813,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'luminousCoil',
     name: 'Luminous Coil',
-    baseId: 'ring_mana',
+    baseId: 'ring_socket',
     level: 45,
     mods: [m('socketedGemLevel', 'base', 5, 5, { tags: ['aura'] }), m('allAttr', 'base', 15, 25)],
     flavour: 'It brightens whatever stands near it.',
@@ -7821,7 +7821,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'larderKnife',
     name: 'Larder Knife',
-    baseId: 'dagger_5',
+    baseId: 'runedagger_l58',
     level: 65,
     mods: [
       m('damage', 'inc', 30, 30, { tags: ['dot'] }),
@@ -7845,13 +7845,13 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'paleZephyr',
     name: 'Pale Zephyr',
-    baseId: 'dagger_5',
+    baseId: 'runedagger_l66',
     level: 66,
     mods: [
       m('damage.min', 'base', 160, 190, { damageTypes: ['cold'], local: true }),
       m('damage.max', 'base', 280, 320, { damageTypes: ['cold'], local: true }),
       m('attackSpeed', 'inc', 10, 15, { local: true }),
-      m('evasion', 'base', 180, 240),
+      m('evasion', 'base', 300, 400),
       m('dodgeAttack', 'base', 20, 20, { condition: { id: 'holdingShield', not: true } }),
       m('damage', 'inc', 100, 100, {
         damageTypes: ['cold'],
@@ -7863,7 +7863,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pyreRod',
     name: 'Pyre Rod',
-    baseId: 'sceptre_5',
+    baseId: 'sceptre_l60',
     level: 60,
     mods: [
       m('grantSkill.searingLance', 'base', 25),
@@ -7876,7 +7876,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'winterLullaby',
     name: 'Winter Lullaby',
-    baseId: 'sceptre_3',
+    baseId: 'sceptre_l32',
     level: 32,
     mods: [
       m('damage', 'inc', 22, 22, { damageTypes: ['fire', 'cold', 'lightning'] }),
@@ -7891,7 +7891,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'alembicRod',
     name: 'Alembic Rod',
-    baseId: 'sceptre_5',
+    baseId: 'sceptre_l64',
     level: 75,
     mods: [
       m('damage', 'inc', 32, 32, { damageTypes: ['fire', 'cold', 'lightning'] }),
@@ -7909,8 +7909,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'ashenRebuke',
     name: 'Ashen Rebuke',
-    baseId: 'sceptre_5',
-    level: 60,
+    baseId: 'sceptre_l58',
+    level: 58,
     mods: [
       m('str', 'base', 10, 30),
       m('int', 'base', 10, 30),
@@ -7921,12 +7921,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hexlessBuckler',
     name: 'Hexless Buckler',
-    baseId: 'shield_ev_4',
+    baseId: 'shield_ev_l54',
     level: 68,
     mods: [
       m('int', 'base', 40, 60),
       m('evasion', 'inc', 180, 200, { local: true }),
-      m('es', 'base', 81, 90),
+      m('es', 'base', 180, 200),
       m('resist.allEle', 'base', 20, 30),
       m('curseEffectOnSelf', 'inc', -100),
       m('curseEffect', 'inc', 15, 20),
@@ -7936,8 +7936,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gildedVeil',
     name: 'Gilded Veil',
-    baseId: 'shield_ev_4',
-    level: 60,
+    baseId: 'shield_ev_l54',
+    level: 54,
     mods: [
       m('moveSpeed', 'inc', 6),
       m('int', 'base', 40, 60),
@@ -7951,11 +7951,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'tidalWarding',
     name: 'Tidal Warding',
-    baseId: 'shield_es_2',
+    baseId: 'shield_es_l23',
     level: 23,
     mods: [
       m('damage', 'inc', 5, 10, { tags: ['spell'] }),
-      m('es', 'base', 32, 41),
+      m('es', 'base', 70, 90),
       m('castSpeed', 'inc', 8, 12),
       m('manaRegen', 'inc', 20, 40),
       m('socketedGemLevel', 'base', 3, 3, { tags: ['warcry'] }),
@@ -7965,14 +7965,14 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'dreadBowl',
     name: 'Dread Bowl',
-    baseId: 'shield_ev_2',
+    baseId: 'shield_ev_l29',
     level: 29,
     mods: [
       m('moveSpeed', 'inc', 9),
       m('socketedGemLevel', 'base', 1, 1, { tags: ['curse'] }),
       m('evasion', 'inc', 30, 50, { local: true }),
       m('life', 'base', 40, 50),
-      m('es', 'base', 23, 32),
+      m('es', 'base', 50, 70),
       m('blockAttack', 'base', 5, 5, { local: true }),
     ],
     flavour: 'Drink deep, and the room drinks with you.',
@@ -7980,14 +7980,14 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hollowDraught',
     name: 'Hollow Draught',
-    baseId: 'shield_ev_2',
+    baseId: 'shield_ev_l29',
     level: 32,
     mods: [
       m('moveSpeed', 'inc', 9),
       m('socketedGemLevel', 'base', 1, 1, { tags: ['curse'] }),
       m('evasion', 'inc', 30, 50, { local: true }),
       m('life', 'base', 40, 50),
-      m('es', 'base', 23, 32),
+      m('es', 'base', 50, 70),
       m('blockAttack', 'base', 5, 5, { local: true }),
       m('leech.life', 'base', 1, 1, { condition: { id: 'targetCursed' } }),
     ],
@@ -7996,8 +7996,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'staticPane',
     name: 'Static Pane',
-    baseId: 'shield_es_4',
-    level: 60,
+    baseId: 'shield_es_l53',
+    level: 53,
     mods: [
       m('int', 'base', 20, 30),
       m('life', 'base', 40, 70),
@@ -8017,7 +8017,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'dawnforgedBulwark',
     name: 'Dawnforged Bulwark',
-    baseId: 'shield_ares_4',
+    baseId: 'shield_ares_l68',
     level: 68,
     mods: [
       m('resist.allEle', 'base', 12),
@@ -8041,7 +8041,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'umbralRampart',
     name: 'Umbral Rampart',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_ar_l70',
     level: 70,
     mods: [
       m('socketedGemLevel', 'base', 2),
@@ -8064,7 +8064,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'swiftwardBulwark',
     name: 'Swiftward Bulwark',
-    baseId: 'shield_eves_4',
+    baseId: 'shield_eves_l62',
     level: 62,
     mods: [
       m('socketedGemLevel', 'base', 1, 3, { tags: ['lightning'] }),
@@ -8090,7 +8090,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wintermoonTarge',
     name: 'Wintermoon Targe',
-    baseId: 'shield_arev_4',
+    baseId: 'shield_arev_l66',
     level: 66,
     mods: [
       m('socketedGemLevel', 'base', 2),
@@ -8113,7 +8113,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'mendicantSpike',
     name: 'Mendicant Spike',
-    baseId: 'shield_eves_4',
+    baseId: 'shield_eves_l66',
     level: 66,
     mods: [
       m('dodgeAttack', 'base', 4),
@@ -8133,7 +8133,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'crimsonPrism',
     name: 'Crimson Prism',
-    baseId: 'shield_ares_4',
+    baseId: 'shield_ares_l68',
     level: 68,
     mods: [
       m('resist.allEle', 'base', 12),
@@ -8148,7 +8148,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bloodglassOrb',
     name: 'Bloodglass Orb',
-    baseId: 'shield_es_4',
+    baseId: 'shield_es_l68',
     level: 68,
     mods: [
       m('blockSpell', 'base', 10, 15),
@@ -8160,8 +8160,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'barbedReply',
     name: 'Barbed Reply',
-    baseId: 'shield_es_3',
-    level: 40,
+    baseId: 'shield_es_l33',
+    level: 33,
     mods: [
       m('blockSpell', 'base', 10),
       m('int', 'base', 20, 30),
@@ -8187,7 +8187,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'drownedHide',
     name: 'Drowned Hide',
-    baseId: 'shield_arev_2',
+    baseId: 'shield_arev_l20',
     level: 20,
     mods: [
       m('damage.min', 'base', 4, 4, { damageTypes: ['physical'], tags: ['attack'] }),
@@ -8211,7 +8211,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stillpointKite',
     name: 'Stillpoint Kite',
-    baseId: 'shield_ares_4',
+    baseId: 'shield_ares_l68',
     level: 68,
     mods: [
       m('life', 'base', 60, 80),
@@ -8225,7 +8225,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sanguineBriar',
     name: 'Sanguine Briar',
-    baseId: 'staff_1',
+    baseId: 'staff_l1',
     level: 1,
     mods: [
       m('blockAttack', 'base', 18),
@@ -8246,7 +8246,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'righteousGrudge',
     name: 'Righteous Grudge',
-    baseId: 'staff_5',
+    baseId: 'staff_l66',
     level: 66,
     mods: [
       m('blockAttack', 'base', 18),
@@ -8261,7 +8261,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stormtongueFoil',
     name: 'Stormtongue Foil',
-    baseId: 'thrust_2',
+    baseId: 'thrust_l22',
     level: 22,
     mods: [
       m('critMulti', 'base', 25),
@@ -8277,7 +8277,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'crownsplitter',
     name: 'Crownsplitter',
-    baseId: 'axe2_5',
+    baseId: 'axe2_l66',
     level: 66,
     mods: [
       m('damage', 'inc', 200, 250, { damageTypes: ['physical'], local: true }),
@@ -8291,7 +8291,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'marrowAxe',
     name: 'Marrow Axe',
-    baseId: 'axe2_5',
+    baseId: 'axe2_l64',
     level: 64,
     mods: [
       m('damage', 'inc', 280, 320, { damageTypes: ['physical'], local: true }),
@@ -8312,7 +8312,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gallowsLabrys',
     name: 'Gallows Labrys',
-    baseId: 'axe2_4',
+    baseId: 'axe2_l49',
     level: 49,
     mods: [
       m('damage', 'inc', 140, 170, { damageTypes: ['physical'], local: true }),
@@ -8325,7 +8325,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'penitentMaul',
     name: 'Penitent Maul',
-    baseId: 'mace2_3',
+    baseId: 'mace2_l27',
     level: 61,
     mods: [
       m('damage', 'inc', 200, 200, { damageTypes: ['physical'], local: true }),
@@ -8341,7 +8341,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cindertongue',
     name: 'Cindertongue',
-    baseId: 'wand_2',
+    baseId: 'wand_l18',
     level: 18,
     mods: [
       m('damage', 'inc', 18, 22, { tags: ['spell'] }),
@@ -8355,8 +8355,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'inkwellWand',
     name: 'Inkwell Wand',
-    baseId: 'wand_2',
-    level: 15,
+    baseId: 'wand_l12',
+    level: 12,
     mods: [
       m('attackSpeed', 'inc', 8, 12, { local: true }),
       m('socketedGemLevel', 'base', 1, 1, { per: { stat: 'level', div: 25 } }),
@@ -8386,7 +8386,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wintersparkWand',
     name: 'Winterspark Wand',
-    baseId: 'wand_5',
+    baseId: 'wand_l65',
     level: 65,
     mods: [
       m('castSpeed', 'inc', 10, 15),
@@ -8411,7 +8411,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'frayedStaff',
     name: 'Frayed Staff',
-    baseId: 'staff_5',
+    baseId: 'warstaff_l60',
     level: 60,
     mods: [
       m('blockAttack', 'base', 18),
@@ -8425,8 +8425,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'partingGasp',
     name: 'Parting Gasp',
-    baseId: 'staff_3',
-    level: 30,
+    baseId: 'warstaff_l23',
+    level: 23,
     mods: [
       m('blockAttack', 'base', 20),
       m('castSpeed', 'inc', 18),
@@ -8458,8 +8458,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'mistveinGauntlets',
     name: 'Mistvein Gauntlets',
-    baseId: 'gloves_arev_4',
-    level: 60,
+    baseId: 'gloves_arev_l59',
+    level: 59,
     mods: [
       m('armour', 'inc', 100, 150, { local: true }),
       m('evasion', 'inc', 100, 150, { local: true }),
@@ -8473,7 +8473,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'blackironAwl',
     name: 'Blackiron Awl',
-    baseId: 'dagger_5',
+    baseId: 'runedagger_l62',
     level: 62,
     mods: [
       m('critChance', 'inc', 30),
@@ -8485,8 +8485,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stormwardCowl',
     name: 'Stormward Cowl',
-    baseId: 'helmet_es_4',
-    level: 60,
+    baseId: 'helmet_es_l59',
+    level: 59,
     mods: [
       m('allAttr', 'base', 20, 30),
       m('es', 'inc', 60, 80, { local: true }),
@@ -8499,7 +8499,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rimewardCowl',
     name: 'Rimeward Cowl',
-    baseId: 'helmet_ev_4',
+    baseId: 'helmet_ev_l60',
     level: 60,
     mods: [
       m('allAttr', 'base', 20, 30),
@@ -8513,7 +8513,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cinderwardCowl',
     name: 'Cinderward Cowl',
-    baseId: 'helmet_ar_4',
+    baseId: 'helmet_ar_l60',
     level: 60,
     mods: [
       m('allAttr', 'base', 20, 30),
@@ -8527,8 +8527,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'giltLantern',
     name: 'Gilt Lantern',
-    baseId: 'shield_ar_2',
-    level: 20,
+    baseId: 'shield_ar_l17',
+    level: 17,
     mods: [
       m('resist.chaos', 'base', 11, 19),
       m('damage.min', 'base', 10, 10, { damageTypes: ['fire'], tags: ['attack'] }),
@@ -8540,7 +8540,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gildedCincture',
     name: 'Gilded Cincture',
-    baseId: 'belt_life',
+    baseId: 'belt_rarity',
     level: 1,
     mods: [m('itemRarity', 'inc', 20, 30), m('resist.allEle', 'base', 16, 24)],
     flavour: 'Wide enough to hold a fortune.',
@@ -8548,8 +8548,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'aureateVestment',
     name: 'Aureate Vestment',
-    baseId: 'body_ar_2',
-    level: 20,
+    baseId: 'body_ar_l21',
+    level: 21,
     mods: [
       m('resist.allEle', 'base', 15, 25),
       m('socketedGemLevel', 'base', 1),
@@ -8560,7 +8560,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sunstruckBand',
     name: 'Sunstruck Band',
-    baseId: 'ring_mana',
+    baseId: 'ring_attrs',
     level: 12,
     mods: [
       m('allAttr', 'base', 8, 12),
@@ -8580,16 +8580,16 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'haloLocket',
     name: 'Halo Locket',
-    baseId: 'amulet_all',
-    level: 30,
+    baseId: 'amulet_rarity',
+    level: 8,
     mods: [m('itemRarity', 'inc', 12, 20), m('resist.allEle', 'base', 20)],
     flavour: 'A small sun to wear on the chest.',
   },
   {
     id: 'coinstepTreads',
     name: 'Coinstep Treads',
-    baseId: 'boots_ar_2',
-    level: 20,
+    baseId: 'boots_ar_l9',
+    level: 12,
     mods: [
       m('resist.allEle', 'base', 8, 16),
       m('itemRarity', 'inc', 20, 30),
@@ -8600,8 +8600,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'giltPalms',
     name: 'Gilt Palms',
-    baseId: 'gloves_ar_2',
-    level: 20,
+    baseId: 'gloves_ar_l11',
+    level: 12,
     mods: [
       m('life', 'base', 20, 30),
       m('attackSpeed', 'inc', 10, 16),
@@ -8612,15 +8612,15 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'laurelCrest',
     name: 'Laurel Crest',
-    baseId: 'helmet_ar_2',
-    level: 20,
+    baseId: 'helmet_ar_l7',
+    level: 12,
     mods: [m('allAttr', 'base', 16, 24), m('itemRarity', 'inc', 20, 30), m('lifeRegen', 'base', 2)],
     flavour: 'Worn once for the crowd, then for good.',
   },
   {
     id: 'balefulMask',
     name: 'Baleful Mask',
-    baseId: 'helmet_eves_3',
+    baseId: 'helmet_eves_l45',
     level: 45,
     mods: [
       m('evasion', 'inc', 400, 500, { local: true }),
@@ -8633,7 +8633,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'scattergunPendant',
     name: 'Scattergun Pendant',
-    baseId: 'amulet_dex',
+    baseId: 'amulet_dex_int',
     level: 40,
     mods: [
       m('dex', 'base', 16, 24),
@@ -8648,7 +8648,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'vowkeeperGauntlets',
     name: 'Vowkeeper Gauntlets',
-    baseId: 'gloves_ares_4',
+    baseId: 'gloves_ares_l66',
     level: 66,
     mods: [
       m('armour', 'inc', 150, 200, { local: true }),
@@ -8662,7 +8662,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'frostvenomBand',
     name: 'Frostvenom Band',
-    baseId: 'ring_mana',
+    baseId: 'ring_phys',
     level: 49,
     mods: [
       m('damage.min', 'base', 1, 1, { damageTypes: ['physical'], tags: ['attack'] }),
@@ -8676,7 +8676,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hazeBuckler',
     name: 'Haze Buckler',
-    baseId: 'shield_ev_4',
+    baseId: 'shield_ev_l60',
     level: 60,
     mods: [
       m('moveSpeed', 'inc', 6),
@@ -8692,8 +8692,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'emberandRimeMitts',
     name: 'Ember-and-Rime Mitts',
-    baseId: 'gloves_ev_4',
-    level: 60,
+    baseId: 'gloves_ev_l54',
+    level: 54,
     mods: [
       m('damage.min', 'base', 16, 19, { damageTypes: ['fire'] }),
       m('damage.max', 'base', 25, 29, { damageTypes: ['fire'] }),
@@ -8709,7 +8709,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'twinstrikeRapier',
     name: 'Twinstrike Rapier',
-    baseId: 'thrust_5',
+    baseId: 'thrust_l66',
     level: 66,
     mods: [m('critMulti', 'base', 25), m('damage', 'more', 100, 100, { tags: ['attack'] })],
     flavour: 'It strikes once to be sure, then once more.',
@@ -8717,7 +8717,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'surgeSignet',
     name: 'Surge Signet',
-    baseId: 'ring_cold',
+    baseId: 'ring_mana',
     level: 49,
     mods: [
       m('resist.fire', 'base', 12, 16),
@@ -8734,7 +8734,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'mildewHauberk',
     name: 'Mildew Hauberk',
-    baseId: 'body_ares_4',
+    baseId: 'body_ares_l67',
     level: 67,
     mods: [
       m('armour', 'inc', 200, 250, { local: true }),
@@ -8755,8 +8755,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'laurelCharm',
     name: 'Laurel Charm',
-    baseId: 'amulet_all',
-    level: 30,
+    baseId: 'amulet_ele',
+    level: 12,
     mods: [
       m('resist.allEle', 'base', 8, 12),
       m('moveSpeed', 'inc', 3, 6),
@@ -8767,7 +8767,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'duskSceptre',
     name: 'Dusk Sceptre',
-    baseId: 'sceptre_4',
+    baseId: 'sceptre_l50',
     level: 50,
     mods: [
       m('damage', 'inc', 24, 24, { damageTypes: ['fire', 'cold', 'lightning'] }),
@@ -8780,7 +8780,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hexweaveTalisman',
     name: 'Hexweave Talisman',
-    baseId: 'amulet_str',
+    baseId: 'amulet_str_dex',
     level: 48,
     mods: [
       m('str', 'base', 16, 24),
@@ -8794,7 +8794,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'thunderhoofBoots',
     name: 'Thunderhoof Boots',
-    baseId: 'boots_eves_4',
+    baseId: 'boots_eves_l63',
     level: 63,
     mods: [
       m('evasion', 'inc', 100, 150, { local: true }),
@@ -8808,7 +8808,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'lancetBand',
     name: 'Lancet Band',
-    baseId: 'ring_mana',
+    baseId: 'ring_phys',
     level: 49,
     mods: [
       m('damage.min', 'base', 1, 1, { damageTypes: ['physical'], tags: ['attack'] }),
@@ -8868,15 +8868,15 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
     id: 'brawlersFetish',
     name: "Brawler's Fetish",
     baseId: 'amulet_all',
-    level: 30,
+    level: 28,
     mods: [m('critMulti', 'base', 24, 36), m('critChance', 'base', 7, 7, { tags: ['unarmed'] })],
     flavour: 'Empty hands, and nothing to apologise for.',
   },
   {
     id: 'ebbtideCharm',
     name: 'Ebbtide Charm',
-    baseId: 'amulet_all',
-    level: 30,
+    baseId: 'amulet_manaregen',
+    level: 1,
     mods: [
       m('resist.cold', 'base', 25),
       m('minionLife', 'inc', 10, 15),
@@ -8889,7 +8889,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wrathwingPendant',
     name: 'Wrathwing Pendant',
-    baseId: 'amulet_all',
+    baseId: 'amulet_liferegen',
     level: 54,
     mods: [
       m('int', 'base', 30, 40),
@@ -8901,7 +8901,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'golemcallerChain',
     name: 'Golemcaller Chain',
-    baseId: 'amulet_all',
+    baseId: 'amulet_liferegen',
     level: 34,
     mods: [
       m('lifeRegen', 'base', 2, 4),
@@ -8925,7 +8925,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hollowgutSash',
     name: 'Hollowgut Sash',
-    baseId: 'belt_life',
+    baseId: 'belt_phys',
     level: 18,
     mods: [
       m('damage', 'inc', 12, 24, { damageTypes: ['physical'] }),
@@ -8939,7 +8939,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'snaresmithCord',
     name: 'Snaresmith Cord',
-    baseId: 'belt_life',
+    baseId: 'belt_stun',
     level: 37,
     mods: [
       m('stunDurationOnSelf', 'base', 15, 25),
@@ -8952,16 +8952,16 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pallbearerRobe',
     name: 'Pallbearer Robe',
-    baseId: 'body_es_4',
-    level: 60,
+    baseId: 'body_es_l56',
+    level: 56,
     mods: [m('es', 'inc', 150, 200, { local: true }), m('socketSupport.bloodthirst', 'base', 16)],
     flavour: 'The mourners lean on it as they follow.',
   },
   {
     id: 'tidewallPlate',
     name: 'Tidewall Plate',
-    baseId: 'body_ar_4',
-    level: 60,
+    baseId: 'body_ar_l56',
+    level: 56,
     mods: [
       m('armour', 'inc', 300, 350, { local: true }),
       m('life', 'base', 100, 120),
@@ -8982,7 +8982,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hexwovenRobe',
     name: 'Hexwoven Robe',
-    baseId: 'body_es_4',
+    baseId: 'body_es_l65',
     level: 65,
     mods: [
       m('int', 'base', 30, 40),
@@ -8995,7 +8995,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'prowlersPelt',
     name: "Prowler's Pelt",
-    baseId: 'body_arev_4',
+    baseId: 'body_arev_l69',
     level: 69,
     mods: [
       m('armour', 'inc', 100, 150, { local: true }),
@@ -9015,7 +9015,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'silkweaverShroud',
     name: 'Silkweaver Shroud',
-    baseId: 'body_es_4',
+    baseId: 'body_es_l65',
     level: 65,
     mods: [m('int', 'base', 30, 40), m('es', 'inc', 120, 140, { local: true })],
     triggers: [
@@ -9031,8 +9031,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'moulderingHost',
     name: 'Mouldering Host',
-    baseId: 'body_ares_4',
-    level: 60,
+    baseId: 'body_ares_l58',
+    level: 58,
     mods: [
       m('socketSupport.wardingPack', 'base', 1),
       m('armour', 'inc', 100, 140, { local: true }),
@@ -9046,7 +9046,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'duskveilCarapace',
     name: 'Duskveil Carapace',
-    baseId: 'body_eves_4',
+    baseId: 'body_eves_l71',
     level: 71,
     mods: [
       m('mana', 'base', 20, 25),
@@ -9061,7 +9061,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'totemwrightRobe',
     name: 'Totemwright Robe',
-    baseId: 'body_es_3',
+    baseId: 'body_es_l49',
     level: 49,
     mods: [
       m('socketSupport.standingCast', 'base', 20),
@@ -9074,7 +9074,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'feastdayRegalia',
     name: 'Feastday Regalia',
-    baseId: 'body_es_4',
+    baseId: 'body_es_l68',
     level: 68,
     mods: [m('es', 'inc', 100, 130, { local: true }), m('life', 'inc', 6, 10)],
     triggers: [
@@ -9102,8 +9102,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gravecallerSilks',
     name: 'Gravecaller Silks',
-    baseId: 'body_es_4',
-    level: 60,
+    baseId: 'body_es_l59',
+    level: 59,
     mods: [
       m('es', 'inc', 200, 220, { local: true }),
       m('mana', 'base', 20, 30),
@@ -9115,7 +9115,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'huntersHide',
     name: "Hunter's Hide",
-    baseId: 'body_ev_4',
+    baseId: 'body_ev_l62',
     level: 62,
     mods: [
       m('accuracy', 'base', 300, 400),
@@ -9128,12 +9128,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'ironstrideBoots',
     name: 'Ironstride Boots',
-    baseId: 'boots_ares_3',
+    baseId: 'boots_ares_l49',
     level: 49,
     mods: [
       m('damage.min', 'base', 1, 1, { damageTypes: ['chaos'], tags: ['attack'] }),
       m('damage.max', 'base', 80, 80, { damageTypes: ['chaos'], tags: ['attack'] }),
-      m('armour', 'base', 108, 132, { local: true }),
+      m('armour', 'base', 180, 220, { local: true }),
       m('resist.chaos', 'base', 9, 12),
       m('moveSpeed', 'inc', 20),
       m('minionCount', 'base', 1),
@@ -9144,7 +9144,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gravetreadSlippers',
     name: 'Gravetread Slippers',
-    baseId: 'boots_es_2',
+    baseId: 'boots_es_l22',
     level: 22,
     mods: [
       m('life', 'base', 20),
@@ -9158,7 +9158,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'deathpledgePlate',
     name: 'Deathpledge Plate',
-    baseId: 'body_ar_4',
+    baseId: 'body_ar_l62',
     level: 62,
     mods: [
       m('allAttr', 'base', 40, 50),
@@ -9173,7 +9173,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'featherstormRaiment',
     name: 'Featherstorm Raiment',
-    baseId: 'body_eves_4',
+    baseId: 'body_eves_l65',
     level: 65,
     mods: [
       m('allAttr', 'base', 25, 75),
@@ -9195,7 +9195,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'moonstepLeathers',
     name: 'Moonstep Leathers',
-    baseId: 'body_ev_4',
+    baseId: 'body_ev_l65',
     level: 65,
     mods: [
       m('evasion', 'inc', 30, 50, { local: true }),
@@ -9210,7 +9210,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'whiteoutLeathers',
     name: 'Whiteout Leathers',
-    baseId: 'body_ev_3',
+    baseId: 'body_ev_l49',
     level: 49,
     mods: [
       m('dex', 'base', 30, 40),
@@ -9224,7 +9224,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'springwireBoots',
     name: 'Springwire Boots',
-    baseId: 'boots_ev_2',
+    baseId: 'boots_ev_l22',
     level: 22,
     mods: [
       m('socketSupport.setSnare', 'base', 11),
@@ -9239,7 +9239,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hushpadBoots',
     name: 'Hushpad Boots',
-    baseId: 'boots_ev_4',
+    baseId: 'boots_ev_l69',
     level: 69,
     mods: [
       m('evasion', 'inc', 110, 150, { local: true }),
@@ -9252,7 +9252,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'webspunTreads',
     name: 'Webspun Treads',
-    baseId: 'boots_eves_4',
+    baseId: 'boots_eves_l63',
     level: 63,
     mods: [
       m('evasion', 'inc', 160, 200, { local: true }),
@@ -9267,8 +9267,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'spendthriftBoots',
     name: 'Spendthrift Boots',
-    baseId: 'boots_eves_4',
-    level: 60,
+    baseId: 'boots_eves_l55',
+    level: 55,
     mods: [
       m('mana', 'inc', 15, 20),
       m('resist.lightning', 'base', 25, 30),
@@ -9285,8 +9285,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stormcrowBoots',
     name: 'Stormcrow Boots',
-    baseId: 'boots_arev_4',
-    level: 60,
+    baseId: 'boots_arev_l59',
+    level: 59,
     mods: [
       m('grantSkill.aspectOfWing', 'base', 20),
       m('armour', 'inc', 100, 150, { local: true }),
@@ -9300,8 +9300,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hearthstepGreaves',
     name: 'Hearthstep Greaves',
-    baseId: 'boots_ar_3',
-    level: 40,
+    baseId: 'boots_ar_l37',
+    level: 37,
     mods: [
       m('armour', 'inc', 80, 120, { local: true }),
       m('moveSpeed', 'inc', 25),
@@ -9313,7 +9313,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'garrisonBow',
     name: 'Garrison Bow',
-    baseId: 'bow_3',
+    baseId: 'bow_l32',
     level: 32,
     mods: [
       m('damage.min', 'base', 8, 12, { damageTypes: ['physical'], local: true }),
@@ -9338,7 +9338,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'ghoulstring',
     name: 'Ghoulstring',
-    baseId: 'bow_5',
+    baseId: 'bow_l60',
     level: 60,
     mods: [
       m('damage.min', 'base', 50, 80, { damageTypes: ['chaos'], local: true }),
@@ -9361,7 +9361,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'splitfangBow',
     name: 'Splitfang Bow',
-    baseId: 'bow_5',
+    baseId: 'bow_l68',
     level: 68,
     mods: [
       m('damage.min', 'base', 110, 125, { damageTypes: ['physical'], local: true }),
@@ -9375,7 +9375,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'kennelTalon',
     name: 'Kennel Talon',
-    baseId: 'claw_5',
+    baseId: 'claw_l70',
     level: 70,
     mods: [
       m('damage.min', 'base', 35, 50, { damageTypes: ['physical'], local: true }),
@@ -9397,8 +9397,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'snarewrightMitts',
     name: 'Snarewright Mitts',
-    baseId: 'gloves_eves_2',
-    level: 20,
+    baseId: 'gloves_eves_l16',
+    level: 16,
     mods: [
       m('dex', 'base', 30, 40),
       m('evasion', 'inc', 100, 125, { local: true }),
@@ -9412,8 +9412,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gravetenderGloves',
     name: 'Gravetender Gloves',
-    baseId: 'gloves_eves_3',
-    level: 40,
+    baseId: 'gloves_eves_l31',
+    level: 31,
     mods: [
       m('dex', 'base', 30, 40),
       m('castSpeed', 'inc', 5, 7),
@@ -9427,7 +9427,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'spindleGloves',
     name: 'Spindle Gloves',
-    baseId: 'gloves_eves_3',
+    baseId: 'gloves_eves_l50',
     level: 50,
     mods: [
       m('grantSkill.aspectOfWeb', 'base', 20),
@@ -9442,8 +9442,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bloodrushGauntlets',
     name: 'Bloodrush Gauntlets',
-    baseId: 'gloves_arev_2',
-    level: 20,
+    baseId: 'gloves_arev_l15',
+    level: 15,
     mods: [
       m('attackSpeed', 'inc', 6, 9),
       m('armour', 'inc', 80, 120, { local: true }),
@@ -9456,7 +9456,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'frostbinderGloves',
     name: 'Frostbinder Gloves',
-    baseId: 'gloves_es_4',
+    baseId: 'gloves_es_l60',
     level: 60,
     mods: [
       m('str', 'base', 30),
@@ -9469,7 +9469,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cyclegripMitts',
     name: 'Cyclegrip Mitts',
-    baseId: 'gloves_eves_4',
+    baseId: 'gloves_eves_l67',
     level: 67,
     mods: [
       m('evasion', 'inc', 80, 100, { local: true }),
@@ -9486,8 +9486,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'zephyrGauntlets',
     name: 'Zephyr Gauntlets',
-    baseId: 'gloves_ares_4',
-    level: 60,
+    baseId: 'gloves_ares_l51',
+    level: 51,
     mods: [
       m('armour', 'inc', 140, 180, { local: true }),
       m('es', 'inc', 140, 180, { local: true }),
@@ -9507,8 +9507,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'smokeveilGloves',
     name: 'Smokeveil Gloves',
-    baseId: 'gloves_eves_3',
-    level: 40,
+    baseId: 'gloves_eves_l31',
+    level: 31,
     mods: [
       m('critChance', 'inc', 20, 30),
       m('critMulti', 'base', 20, 30),
@@ -9522,7 +9522,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pitfallMitts',
     name: 'Pitfall Mitts',
-    baseId: 'gloves_eves_3',
+    baseId: 'gloves_eves_l45',
     level: 45,
     mods: [
       m('dex', 'base', 30, 40),
@@ -9538,7 +9538,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'voidlitCrown',
     name: 'Voidlit Crown',
-    baseId: 'helmet_ares_4',
+    baseId: 'helmet_ares_l68',
     level: 68,
     mods: [
       m('allAttr', 'base', 15, 20),
@@ -9553,7 +9553,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'threefoldCrown',
     name: 'Threefold Crown',
-    baseId: 'helmet_ares_4',
+    baseId: 'helmet_ares_l63',
     level: 63,
     mods: [
       m('armour', 'inc', 333, 333, { local: true }),
@@ -9567,7 +9567,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'powderMask',
     name: 'Powder Mask',
-    baseId: 'helmet_eves_1',
+    baseId: 'helmet_eves_l10',
     level: 20,
     mods: [
       m('life', 'base', 23),
@@ -9579,8 +9579,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'prowlMask',
     name: 'Prowl Mask',
-    baseId: 'helmet_eves_4',
-    level: 60,
+    baseId: 'helmet_eves_l57',
+    level: 57,
     mods: [
       m('grantSkill.aspectOfPrey', 'base', 20),
       m('evasion', 'inc', 180, 220, { local: true }),
@@ -9593,10 +9593,10 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wraithveilMask',
     name: 'Wraithveil Mask',
-    baseId: 'helmet_eves_4',
+    baseId: 'helmet_eves_l67',
     level: 67,
     mods: [
-      m('es', 'base', 18, 23),
+      m('es', 'base', 40, 50),
       m('evasion', 'inc', 90, 110, { local: true }),
       m('es', 'inc', 90, 110, { local: true }),
       m('socketedGemLevel', 'base', 1, 1, { tags: ['curse'] }),
@@ -9607,8 +9607,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stonewardGauntlets',
     name: 'Stoneward Gauntlets',
-    baseId: 'gloves_ares_4',
-    level: 60,
+    baseId: 'gloves_ares_l57',
+    level: 57,
     mods: [
       m('str', 'base', 20, 30),
       m('armour', 'inc', 150, 180, { local: true }),
@@ -9622,7 +9622,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'grinningMask',
     name: 'Grinning Mask',
-    baseId: 'helmet_eves_2',
+    baseId: 'helmet_eves_l28',
     level: 28,
     mods: [
       m('dex', 'base', 20, 30),
@@ -9636,7 +9636,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bloodglassVisor',
     name: 'Bloodglass Visor',
-    baseId: 'helmet_eves_2',
+    baseId: 'helmet_eves_l17',
     level: 60,
     mods: [
       m('damage', 'inc', 15, 30, { tags: ['spell'] }),
@@ -9655,10 +9655,10 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'emberwritCirclet',
     name: 'Emberwrit Circlet',
-    baseId: 'helmet_es_2',
+    baseId: 'helmet_es_l26',
     level: 26,
     mods: [
-      m('es', 'base', 14, 23),
+      m('es', 'base', 30, 50),
       m('minionSpeed', 'inc', 10, 15),
       m('minionDamage', 'inc', 130, 150),
     ],
@@ -9667,8 +9667,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'assizeCrown',
     name: 'Assize Crown',
-    baseId: 'helmet_ares_4',
-    level: 60,
+    baseId: 'helmet_ares_l58',
+    level: 58,
     mods: [
       m('allAttr', 'base', 25, 30),
       m('armour', 'inc', 150, 200, { local: true }),
@@ -9682,8 +9682,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'whorlHelm',
     name: 'Whorl Helm',
-    baseId: 'helmet_ares_3',
-    level: 40,
+    baseId: 'helmet_ares_l37',
+    level: 37,
     mods: [
       m('damage', 'inc', 10, 15, { damageTypes: ['cold'] }),
       m('damage', 'inc', 10, 15, { damageTypes: ['lightning'] }),
@@ -9695,7 +9695,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'featherstormHood',
     name: 'Featherstorm Hood',
-    baseId: 'helmet_ev_4',
+    baseId: 'helmet_ev_l60',
     level: 60,
     mods: [
       m('evasion', 'inc', 60, 80, { local: true }),
@@ -9716,7 +9716,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'oratorsGarland',
     name: "Orator's Garland",
-    baseId: 'helmet_ares_4',
+    baseId: 'helmet_ares_l63',
     level: 63,
     mods: [
       m('dex', 'base', 20, 40),
@@ -9728,7 +9728,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sinewlordHelm',
     name: 'Sinewlord Helm',
-    baseId: 'helmet_ar_2',
+    baseId: 'helmet_ar_l26',
     level: 26,
     mods: [
       m('socketedGemLevel', 'base', 2, 2, { tags: ['minion'] }),
@@ -9742,10 +9742,10 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'smoulderplateHelm',
     name: 'Smoulderplate Helm',
-    baseId: 'helmet_ar_3',
+    baseId: 'helmet_ar_l48',
     level: 48,
     mods: [
-      m('armour', 'base', 60, 72, { local: true }),
+      m('armour', 'base', 100, 120, { local: true }),
       m('life', 'base', 40, 50),
       m('flatTaken.attack.fire', 'base', -20),
       m('armour', 'inc', 75, 75, { local: true }),
@@ -9755,7 +9755,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pyreplateHelm',
     name: 'Pyreplate Helm',
-    baseId: 'helmet_ar_4',
+    baseId: 'helmet_ar_l65',
     level: 65,
     mods: [
       m('armour', 'inc', 80, 120, { local: true }),
@@ -9769,8 +9769,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gravecallCirclet',
     name: 'Gravecall Circlet',
-    baseId: 'helmet_es_3',
-    level: 40,
+    baseId: 'helmet_es_l34',
+    level: 34,
     mods: [
       m('socketedGemLevel', 'base', 2, 2, { tags: ['minion'] }),
       m('es', 'inc', 120, 150, { local: true }),
@@ -9781,7 +9781,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'twinflameHatchet',
     name: 'Twinflame Hatchet',
-    baseId: 'axe_5',
+    baseId: 'axe_l69',
     level: 69,
     mods: [
       m('attackSpeed', 'inc', 10, 15, { local: true }),
@@ -9795,8 +9795,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pottersMaul',
     name: "Potter's Maul",
-    baseId: 'mace_4',
-    level: 45,
+    baseId: 'mace_l41',
+    level: 41,
     mods: [
       m('enemyStunThreshold', 'base', 15),
       m('damage.min', 'base', 24, 30, { damageTypes: ['physical'], local: true }),
@@ -9811,7 +9811,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'fleetsongBlade',
     name: 'Fleetsong Blade',
-    baseId: 'sword_5',
+    baseId: 'sword_l66',
     level: 66,
     mods: [
       m('damage', 'inc', 185, 215, { damageTypes: ['physical'], local: true }),
@@ -9824,8 +9824,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'dicebrand',
     name: 'Dicebrand',
-    baseId: 'sword_5',
-    level: 60,
+    baseId: 'sword_l56',
+    level: 56,
     mods: [
       m('damage', 'inc', 160, 180, { damageTypes: ['physical'], local: true }),
       m('attackSpeed', 'inc', 10, 15, { local: true }),
@@ -9844,8 +9844,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'slumberCutlass',
     name: 'Slumber Cutlass',
-    baseId: 'sword_4',
-    level: 45,
+    baseId: 'sword_l38',
+    level: 38,
     mods: [
       m('accuracy', 'inc', 40),
       m('allAttr', 'base', 10, 20),
@@ -9856,7 +9856,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wagerBlade',
     name: 'Wager Blade',
-    baseId: 'sword_3',
+    baseId: 'sword_l35',
     level: 35,
     mods: [
       m('damage', 'inc', 110, 120, { damageTypes: ['physical'], local: true }),
@@ -9874,8 +9874,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'winterbrideSabre',
     name: 'Winterbride Sabre',
-    baseId: 'sword_2',
-    level: 15,
+    baseId: 'sword_l10',
+    level: 10,
     mods: [
       m('accuracy', 'inc', 40),
       m('damage', 'inc', 20, 50, { damageTypes: ['physical'], local: true }),
@@ -9889,7 +9889,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'forkfeatherQuiver',
     name: 'Forkfeather Quiver',
-    baseId: 'quiver_acc',
+    baseId: 'quiver_accpct',
     level: 56,
     mods: [
       m('accuracy', 'inc', 20, 30),
@@ -9905,7 +9905,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'standmakerQuiver',
     name: 'Standmaker Quiver',
-    baseId: 'quiver_acc',
+    baseId: 'quiver_accpct',
     level: 19,
     mods: [
       m('accuracy', 'inc', 20, 30),
@@ -9920,12 +9920,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'saltmireBand',
     name: 'Saltmire Band',
-    baseId: 'ring_mana',
+    baseId: 'ring_socket',
     level: 45,
     mods: [
       m('socketedGemLevel', 'base', 3, 3, { tags: ['minion'] }),
       m('damage', 'inc', 20, 25, { tags: ['spell'] }),
-      m('es', 'base', 7, 11),
+      m('es', 'base', 15, 25),
       m('resist.lightning', 'base', 20, 40),
     ],
     flavour: 'Cursed with stone and with storm.',
@@ -9933,7 +9933,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'lifelineLoop',
     name: 'Lifeline Loop',
-    baseId: 'ring_mana',
+    baseId: 'ring_es',
     level: 20,
     mods: [
       m('lifeRegen', 'base', 10, 15),
@@ -9945,7 +9945,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'yokemarkRing',
     name: 'Yokemark Ring',
-    baseId: 'ring_mana',
+    baseId: 'ring_socket',
     level: 24,
     mods: [m('hexOnHit.brittleDoom', 'base', 10)],
     flavour: 'Look at it, and you kneel.',
@@ -9953,7 +9953,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hushgaleSeal',
     name: 'Hushgale Seal',
-    baseId: 'ring_mana',
+    baseId: 'ring_socket',
     level: 45,
     mods: [
       m('socketedGemLevel', 'base', 3, 3, { tags: ['minion'] }),
@@ -9967,7 +9967,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rustforgeBand',
     name: 'Rustforge Band',
-    baseId: 'ring_mana',
+    baseId: 'ring_socket',
     level: 45,
     mods: [
       m('socketedGemLevel', 'base', 3, 3, { tags: ['minion'] }),
@@ -9980,7 +9980,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'reefflareRing',
     name: 'Reefflare Ring',
-    baseId: 'ring_mana',
+    baseId: 'ring_life',
     level: 45,
     mods: [
       m('damage', 'inc', 20, 30, { damageTypes: ['fire', 'cold', 'lightning'], tags: ['attack'] }),
@@ -10005,7 +10005,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'anchorfallBlade',
     name: 'Anchorfall Blade',
-    baseId: 'sword_5',
+    baseId: 'sword_l64',
     level: 64,
     mods: [
       m('accuracy', 'base', 460, 460, { local: true }),
@@ -10019,8 +10019,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'venomstingDirk',
     name: 'Venomsting Dirk',
-    baseId: 'dagger_5',
-    level: 60,
+    baseId: 'runedagger_l53',
+    level: 53,
     mods: [
       m('damage', 'inc', 170, 200, { damageTypes: ['physical'], local: true }),
       m('damage.min', 'base', 8, 13, { damageTypes: ['physical'], local: true }),
@@ -10042,7 +10042,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'cinderfangKnife',
     name: 'Cinderfang Knife',
-    baseId: 'dagger_5',
+    baseId: 'runedagger_l68',
     level: 68,
     mods: [
       m('damage.min', 'base', 85, 110, { damageTypes: ['physical'], local: true }),
@@ -10063,7 +10063,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'charnelWand',
     name: 'Charnel Wand',
-    baseId: 'sceptre_5',
+    baseId: 'sceptre_l68',
     level: 68,
     mods: [
       m('damage', 'inc', 40, 40, { damageTypes: ['fire', 'cold', 'lightning'] }),
@@ -10075,7 +10075,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bulwarkOfGrit',
     name: 'Bulwark of Grit',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_ar_l67',
     level: 67,
     mods: [
       m('life', 'base', 10, 20),
@@ -10092,12 +10092,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'venomboundAegis',
     name: 'Venombound Aegis',
-    baseId: 'shield_es_3',
+    baseId: 'shield_es_l45',
     level: 45,
     mods: [
       m('damage.min', 'base', 20, 22, { damageTypes: ['chaos'] }),
       m('damage.max', 'base', 30, 37, { damageTypes: ['chaos'] }),
-      m('es', 'base', 36, 45),
+      m('es', 'base', 80, 100),
       m('maxResist.allEle', 'base', 3, 3, { condition: { id: 'poisoned' } }),
       m('maxResist.chaos', 'base', 3, 3, { condition: { id: 'poisoned' } }),
       m('esRechargeRate', 'inc', 100, 100, { condition: { id: 'poisoned' } }),
@@ -10108,7 +10108,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'surgemarkAegis',
     name: 'Surgemark Aegis',
-    baseId: 'shield_es_4',
+    baseId: 'shield_es_l68',
     level: 68,
     mods: [
       m('damage', 'inc', 30, 50, { tags: ['spell'] }),
@@ -10121,7 +10121,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'snapjawBulwark',
     name: 'Snapjaw Bulwark',
-    baseId: 'shield_eves_4',
+    baseId: 'shield_eves_l70',
     level: 70,
     mods: [
       m('dodgeSpell', 'base', 4),
@@ -10136,7 +10136,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'broodWarden',
     name: 'Brood Warden',
-    baseId: 'shield_es_2',
+    baseId: 'shield_es_l23',
     level: 23,
     mods: [
       m('damage', 'inc', 5, 10, { tags: ['spell'] }),
@@ -10150,7 +10150,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'howlcallBuckler',
     name: 'Howlcall Buckler',
-    baseId: 'shield_ev_3',
+    baseId: 'shield_ev_l42',
     level: 42,
     mods: [
       m('moveSpeed', 'inc', 6),
@@ -10165,8 +10165,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'rootspireBulwark',
     name: 'Rootspire Bulwark',
-    baseId: 'shield_ar_2',
-    level: 20,
+    baseId: 'shield_ar_l17',
+    level: 17,
     mods: [
       m('life', 'base', 20, 30),
       m('life', 'base', 40, 60),
@@ -10180,7 +10180,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'totemboundRampart',
     name: 'Totembound Rampart',
-    baseId: 'shield_ar_4',
+    baseId: 'shield_ar_l61',
     level: 61,
     mods: [
       m('life', 'base', 20, 30),
@@ -10195,7 +10195,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'almsgiverKite',
     name: 'Almsgiver Kite',
-    baseId: 'shield_ares_3',
+    baseId: 'shield_ares_l50',
     level: 50,
     mods: [
       m('life', 'base', 50, 70),
@@ -10210,11 +10210,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hatcheryWarden',
     name: 'Hatchery Warden',
-    baseId: 'shield_es_2',
+    baseId: 'shield_es_l23',
     level: 63,
     mods: [
       m('socketedGemLevel', 'base', 3, 3, { tags: ['minion'] }),
-      m('es', 'base', 18, 36),
+      m('es', 'base', 40, 80),
       m('es', 'inc', 40, 80, { local: true }),
       m('mana', 'base', 15, 25),
       m('auraEffect', 'inc', 20),
@@ -10225,10 +10225,10 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hexholdRoundel',
     name: 'Hexhold Roundel',
-    baseId: 'shield_arev_1',
+    baseId: 'shield_arev_l5',
     level: 5,
     mods: [
-      m('armour', 'base', 3, 6, { local: true }),
+      m('armour', 'base', 5, 10, { local: true }),
       m('itemRarity', 'inc', 30, 40),
       m('blockAttack', 'base', 5, 5, { local: true }),
       m('skillDuration', 'inc', 25, 25, { tags: ['curse'] }),
@@ -10238,8 +10238,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'ossuaryStaff',
     name: 'Ossuary Staff',
-    baseId: 'staff_5',
-    level: 60,
+    baseId: 'staff_l58',
+    level: 58,
     mods: [
       m('blockAttack', 'base', 18, 18, { condition: { id: 'wieldingStaff' } }),
       m('socketedGemLevel', 'base', 2, 2, { tags: ['minion'] }),
@@ -10250,7 +10250,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'briarsnareRod',
     name: 'Briarsnare Rod',
-    baseId: 'staff_1',
+    baseId: 'staff_l1',
     level: 1,
     mods: [
       m('blockAttack', 'base', 18),
@@ -10264,7 +10264,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'marshsnareRod',
     name: 'Marshsnare Rod',
-    baseId: 'staff_1',
+    baseId: 'staff_l1',
     level: 32,
     mods: [
       m('blockAttack', 'base', 18),
@@ -10280,7 +10280,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'roarboundCleaver',
     name: 'Roarbound Cleaver',
-    baseId: 'axe2_5',
+    baseId: 'axe2_l66',
     level: 66,
     mods: [
       m('damage.min', 'base', 310, 350, { damageTypes: ['cold'], local: true }),
@@ -10296,7 +10296,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'streakbreakerAxe',
     name: 'Streakbreaker Axe',
-    baseId: 'axe2_5',
+    baseId: 'axe2_l62',
     level: 62,
     mods: [
       m('damage', 'inc', 200, 212, { damageTypes: ['physical'], local: true }),
@@ -10309,7 +10309,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'twinfireCleaver',
     name: 'Twinfire Cleaver',
-    baseId: 'axe2_5',
+    baseId: 'axe2_l60',
     level: 60,
     mods: [
       m('blockSpell', 'base', 7),
@@ -10325,7 +10325,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'barrowmaul',
     name: 'Barrowmaul',
-    baseId: 'mace2_4',
+    baseId: 'mace2_l40',
     level: 60,
     mods: [
       m('socketedGemLevel', 'base', 1, 1, { tags: ['melee'] }),
@@ -10342,8 +10342,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gravemaul',
     name: 'Gravemaul',
-    baseId: 'mace2_4',
-    level: 45,
+    baseId: 'mace2_l40',
+    level: 40,
     mods: [
       m('stunDuration', 'inc', 30),
       m('socketedGemLevel', 'base', 1, 1, { tags: ['melee'] }),
@@ -10358,8 +10358,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'regentsWrit',
     name: "Regent's Writ",
-    baseId: 'sword2_3',
-    level: 30,
+    baseId: 'sword2_l27',
+    level: 27,
     mods: [
       m('accuracy', 'base', 185, 185, { local: true }),
       m('minionLife', 'inc', 30, 40),
@@ -10374,7 +10374,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'regentsFlight',
     name: "Regent's Flight",
-    baseId: 'sword2_3',
+    baseId: 'sword2_l27',
     level: 38,
     mods: [
       m('accuracy', 'base', 185, 185, { local: true }),
@@ -10391,8 +10391,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bonepactWand',
     name: 'Bonepact Wand',
-    baseId: 'wand_4',
-    level: 45,
+    baseId: 'wand_l40',
+    level: 40,
     mods: [
       m('damage', 'inc', 22, 26, { tags: ['spell'] }),
       m('int', 'base', 10, 20),
@@ -10408,7 +10408,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wraithcallStaff',
     name: 'Wraithcall Staff',
-    baseId: 'staff_5',
+    baseId: 'warstaff_l60',
     level: 62,
     mods: [
       m('damage', 'inc', 100, 140, { tags: ['spell'] }),
@@ -10428,7 +10428,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hoarwhisperStaff',
     name: 'Hoarwhisper Staff',
-    baseId: 'staff_3',
+    baseId: 'warstaff_l33',
     level: 33,
     mods: [
       m('blockAttack', 'base', 18),
@@ -10442,7 +10442,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'quakefuseStaff',
     name: 'Quakefuse Staff',
-    baseId: 'staff_4',
+    baseId: 'warstaff_l41',
     level: 45,
     mods: [
       m('blockAttack', 'base', 18),
@@ -10457,7 +10457,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'pairingLocket',
     name: 'Pairing Locket',
-    baseId: 'amulet_dex',
+    baseId: 'amulet_dex_int',
     level: 60,
     mods: [
       m('dex', 'base', 16, 24),
@@ -10511,7 +10511,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'broodGirdle',
     name: 'Brood Girdle',
-    baseId: 'belt_life',
+    baseId: 'belt_str',
     level: 40,
     mods: [
       m('str', 'base', 25, 35),
@@ -10525,7 +10525,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sappersGirdle',
     name: "Sapper's Girdle",
-    baseId: 'belt_life',
+    baseId: 'belt_str',
     level: 44,
     mods: [
       m('str', 'base', 25, 35),
@@ -10539,7 +10539,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'ebbingCincture',
     name: 'Ebbing Cincture',
-    baseId: 'belt_life',
+    baseId: 'belt_stun',
     level: 48,
     mods: [
       m('int', 'base', 20, 40),
@@ -10552,7 +10552,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'unboundSash',
     name: 'Unbound Sash',
-    baseId: 'belt_life',
+    baseId: 'belt_stun',
     level: 60,
     mods: [
       m('attackSpeed', 'inc', 10, 15),
@@ -10573,7 +10573,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'vanguardMail',
     name: 'Vanguard Mail',
-    baseId: 'body_ares_3',
+    baseId: 'body_ares_l43',
     level: 43,
     mods: [
       m('armour', 'inc', 180, 220, { local: true }),
@@ -10588,8 +10588,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gorewritHauberk',
     name: 'Gorewrit Hauberk',
-    baseId: 'body_eves_3',
-    level: 40,
+    baseId: 'body_eves_l35',
+    level: 35,
     mods: [
       m('evasion', 'inc', 100, 120, { local: true }),
       m('es', 'inc', 100, 120, { local: true }),
@@ -10603,16 +10603,16 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gemweaverHabit',
     name: 'Gemweaver Habit',
-    baseId: 'body_es_3',
-    level: 40,
+    baseId: 'body_es_l37',
+    level: 37,
     mods: [m('socketedGemLevel', 'base', 2)],
     flavour: 'Any stone fits, and every stone shines.',
   },
   {
     id: 'thornwoodHide',
     name: 'Thornwood Hide',
-    baseId: 'body_ev_4',
-    level: 60,
+    baseId: 'body_ev_l59',
+    level: 59,
     mods: [
       m('evasion', 'inc', 200, 240, { local: true }),
       m('life', 'base', 60, 70),
@@ -10627,7 +10627,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'evermoreRaiment',
     name: 'Evermore Raiment',
-    baseId: 'body_eves_4',
+    baseId: 'body_eves_l65',
     level: 65,
     mods: [
       m('evasion', 'inc', 100, 150, { local: true }),
@@ -10649,7 +10649,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'paleBastion',
     name: 'Pale Bastion',
-    baseId: 'body_ares_4',
+    baseId: 'body_ares_l67',
     level: 67,
     mods: [
       m('int', 'base', 40, 70),
@@ -10662,7 +10662,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'snarebinderVest',
     name: 'Snarebinder Vest',
-    baseId: 'body_eves_4',
+    baseId: 'body_eves_l68',
     level: 68,
     mods: [
       m('evasion', 'inc', 140, 170, { local: true }),
@@ -10677,7 +10677,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'charnelTreads',
     name: 'Charnel Treads',
-    baseId: 'boots_eves_4',
+    baseId: 'boots_eves_l69',
     level: 69,
     mods: [m('life', 'inc', 4, 6), m('moveSpeed', 'inc', 30), m('damage', 'inc', 10)],
     flavour: 'Something goes before you, and it is not friendly.',
@@ -10685,8 +10685,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'patientTreads',
     name: 'Patient Treads',
-    baseId: 'boots_ares_3',
-    level: 40,
+    baseId: 'boots_ares_l36',
+    level: 36,
     mods: [
       m('resist.cold', 'base', 15, 25),
       m('resist.chaos', 'base', 15, 25),
@@ -10700,11 +10700,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hazardSlippers',
     name: 'Hazard Slippers',
-    baseId: 'boots_es_4',
+    baseId: 'boots_es_l67',
     level: 67,
     mods: [
       m('es', 'inc', 50, 80, { local: true }),
-      m('es', 'base', 9, 14),
+      m('es', 'base', 20, 30),
       m('moveSpeed', 'inc', 30),
       m('damage', 'inc', 50, 50, { condition: { id: 'ignited' } }),
       m('moveSpeed', 'inc', 20, 20, { condition: { id: 'shocked' } }),
@@ -10715,8 +10715,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'stainedMitts',
     name: 'Stained Mitts',
-    baseId: 'gloves_eves_4',
-    level: 60,
+    baseId: 'gloves_eves_l58',
+    level: 58,
     mods: [
       m('dex', 'base', 40, 50),
       m('evasion', 'inc', 150, 200, { local: true }),
@@ -10730,8 +10730,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gloamcasterGrips',
     name: 'Gloamcaster Grips',
-    baseId: 'gloves_ares_3',
-    level: 40,
+    baseId: 'gloves_ares_l37',
+    level: 37,
     mods: [
       m('castSpeed', 'inc', 6, 10),
       m('life', 'inc', 4, 6),
@@ -10742,7 +10742,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'barnacleGauntlets',
     name: 'Barnacle Gauntlets',
-    baseId: 'gloves_ar_4',
+    baseId: 'gloves_ar_l69',
     level: 69,
     mods: [
       m('armour', 'inc', 150, 200, { local: true }),
@@ -10755,7 +10755,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sapperMitts',
     name: 'Sapper Mitts',
-    baseId: 'gloves_eves_4',
+    baseId: 'gloves_eves_l67',
     level: 67,
     mods: [
       m('evasion', 'inc', 200, 250, { local: true }),
@@ -10767,7 +10767,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'fetterbreakGauntlets',
     name: 'Fetterbreak Gauntlets',
-    baseId: 'gloves_ares_1',
+    baseId: 'gloves_ares_l7',
     level: 7,
     mods: [
       m('stunDurationOnSelf', 'base', 40, 60),
@@ -10781,8 +10781,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gravehandGauntlets',
     name: 'Gravehand Gauntlets',
-    baseId: 'gloves_arev_3',
-    level: 40,
+    baseId: 'gloves_arev_l36',
+    level: 36,
     mods: [
       m('attackSpeed', 'inc', 6, 10),
       m('life', 'inc', 4, 6),
@@ -10793,8 +10793,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'packmasterMesh',
     name: 'Packmaster Mesh',
-    baseId: 'gloves_ares_3',
-    level: 40,
+    baseId: 'gloves_ares_l32',
+    level: 32,
     mods: [
       m('armour', 'inc', 80, 120, { local: true }),
       m('es', 'inc', 80, 120, { local: true }),
@@ -10805,7 +10805,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bronzecladGrips',
     name: 'Bronzeclad Grips',
-    baseId: 'gloves_arev_2',
+    baseId: 'gloves_arev_l27',
     level: 27,
     mods: [
       m('armour', 'inc', 120, 140, { local: true }),
@@ -10820,7 +10820,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'earthwrightGrips',
     name: 'Earthwright Grips',
-    baseId: 'gloves_arev_4',
+    baseId: 'gloves_arev_l67',
     level: 67,
     mods: [
       m('accuracy', 'base', 200, 300),
@@ -10835,8 +10835,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'barnacleCrown',
     name: 'Barnacle Crown',
-    baseId: 'helmet_ares_4',
-    level: 60,
+    baseId: 'helmet_ares_l58',
+    level: 58,
     mods: [
       m('blockSpell', 'base', 4, 6),
       m('armour', 'inc', 140, 180, { local: true }),
@@ -10849,8 +10849,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'gildedDiadem',
     name: 'Gilded Diadem',
-    baseId: 'helmet_ares_4',
-    level: 60,
+    baseId: 'helmet_ares_l58',
+    level: 58,
     mods: [
       m('life', 'base', 50, 100),
       m('damage.min', 'base', 64, 64, { damageTypes: ['fire'] }),
@@ -10866,8 +10866,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'basaltVisage',
     name: 'Basalt Visage',
-    baseId: 'helmet_eves_4',
-    level: 60,
+    baseId: 'helmet_eves_l52',
+    level: 52,
     mods: [
       m('es', 'inc', 200, 250, { local: true }),
       m('life', 'base', 60, 80),
@@ -10883,7 +10883,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'mendingCage',
     name: 'Mending Cage',
-    baseId: 'helmet_es_4',
+    baseId: 'helmet_es_l65',
     level: 65,
     mods: [m('life', 'inc', 6, 8)],
     triggers: [
@@ -10907,7 +10907,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'fluxCirclet',
     name: 'Flux Circlet',
-    baseId: 'helmet_es_4',
+    baseId: 'helmet_es_l69',
     level: 69,
     mods: [
       m('es', 'inc', 150, 180, { local: true }),
@@ -10920,8 +10920,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wispCrown',
     name: 'Wisp Crown',
-    baseId: 'helmet_ares_4',
-    level: 60,
+    baseId: 'helmet_ares_l53',
+    level: 53,
     mods: [m('resist.allEle', 'base', 10, 15)],
     triggers: [
       {
@@ -10936,8 +10936,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wellspringHelm',
     name: 'Wellspring Helm',
-    baseId: 'helmet_ares_3',
-    level: 40,
+    baseId: 'helmet_ares_l31',
+    level: 31,
     mods: [
       m('armour', 'inc', 60, 80, { local: true }),
       m('es', 'inc', 60, 80, { local: true }),
@@ -10950,11 +10950,11 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'seamedCrown',
     name: 'Seamed Crown',
-    baseId: 'helmet_ares_4',
-    level: 60,
+    baseId: 'helmet_ares_l58',
+    level: 58,
     mods: [
       m('int', 'base', 40, 50),
-      m('es', 'base', 72, 81),
+      m('es', 'base', 160, 180),
       m('life', 'base', 1, 1, { per: { stat: 'int', div: 2 } }),
       m('lifeRegenPct', 'base', 1),
       m('esRechargeRate', 'inc', -100),
@@ -10964,10 +10964,10 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'reservoirCrown',
     name: 'Reservoir Crown',
-    baseId: 'helmet_ares_4',
+    baseId: 'helmet_ares_l68',
     level: 68,
     mods: [
-      m('es', 'base', 59, 72),
+      m('es', 'base', 130, 160),
       m('mana', 'base', 150, 200),
       m('manaRegen', 'inc', 30, 40),
       m('resist.fire', 'base', 20, 30),
@@ -10979,7 +10979,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hushedMuzzle',
     name: 'Hushed Muzzle',
-    baseId: 'helmet_es_4',
+    baseId: 'helmet_es_l65',
     level: 65,
     mods: [
       m('damage', 'inc', 80, 100, { tags: ['spell'] }),
@@ -10991,8 +10991,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'bonecrestHelm',
     name: 'Bonecrest Helm',
-    baseId: 'helmet_arev_3',
-    level: 40,
+    baseId: 'helmet_arev_l36',
+    level: 36,
     mods: [
       m('armour', 'inc', 60, 80, { local: true }),
       m('evasion', 'inc', 60, 80, { local: true }),
@@ -11008,12 +11008,12 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'shrinekeeperMask',
     name: 'Shrinekeeper Mask',
-    baseId: 'helmet_eves_3',
-    level: 40,
+    baseId: 'helmet_eves_l38',
+    level: 38,
     mods: [
       m('evasion', 'inc', 120, 150, { local: true }),
       m('es', 'inc', 120, 150, { local: true }),
-      m('es', 'base', 14, 20),
+      m('es', 'base', 30, 45),
       m('life', 'base', 60, 80),
       m('resist.cold', 'base', 30, 40),
       m('buffOn.kill.onslaught', 'base', 20),
@@ -11023,7 +11023,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'duskwardHelm',
     name: 'Duskward Helm',
-    baseId: 'helmet_ares_2',
+    baseId: 'helmet_ares_l22',
     level: 22,
     mods: [
       m('stunDurationOnSelf', 'base', 20, 22),
@@ -11035,7 +11035,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'lanternCirclet',
     name: 'Lantern Circlet',
-    baseId: 'helmet_es_1',
+    baseId: 'helmet_es_l8',
     level: 8,
     mods: [m('noChaosDamage', 'flag', 1), m('damage', 'inc', 15, 25), m('aoe', 'inc', 8, 12)],
     flavour: 'A little light goes a long way, and so does the damage.',
@@ -11043,8 +11043,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'spectrumBlade',
     name: 'Spectrum Blade',
-    baseId: 'sword_5',
-    level: 60,
+    baseId: 'sword_l53',
+    level: 53,
     mods: [
       m('accuracy', 'inc', 40),
       m('damage.min', 'base', 60, 70, { damageTypes: ['physical'], local: true }),
@@ -11059,7 +11059,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'centurionEdge',
     name: 'Centurion Edge',
-    baseId: 'sword_5',
+    baseId: 'sword_l60',
     level: 60,
     mods: [
       m('accuracy', 'inc', 40),
@@ -11076,7 +11076,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'dreamtideCutlass',
     name: 'Dreamtide Cutlass',
-    baseId: 'sword_4',
+    baseId: 'sword_l38',
     level: 69,
     mods: [
       m('accuracy', 'inc', 40),
@@ -11088,7 +11088,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'hallowedDiamond',
     name: 'Hallowed Diamond',
-    baseId: 'ring_mana',
+    baseId: 'ring_crit',
     level: 28,
     mods: [
       m('critChance', 'inc', 30, 35),
@@ -11100,7 +11100,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'blankBand',
     name: 'Blank Band',
-    baseId: 'ring_mana',
+    baseId: 'ring_socket',
     level: 5,
     mods: [m('resist.allEle', 'base', -20), m('resist.fire', 'base', 75, 100)],
     flavour: 'Colourless, so it takes any colour you give it.',
@@ -11108,10 +11108,10 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'twinMoonRing',
     name: 'Twin Moon Ring',
-    baseId: 'ring_mana',
+    baseId: 'ring_es',
     level: 30,
     mods: [
-      m('es', 'base', 7, 11),
+      m('es', 'base', 15, 25),
       m('int', 'base', 60, 75),
       m('es', 'base', 45),
       m('manaRegenFlat', 'base', 40),
@@ -11122,7 +11122,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'outcastBand',
     name: 'Outcast Band',
-    baseId: 'ring_mana',
+    baseId: 'ring_socket',
     level: 60,
     mods: [
       m('socketedGemLevel', 'base', 2),
@@ -11135,10 +11135,10 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'brittleMoonring',
     name: 'Brittle Moonring',
-    baseId: 'ring_mana',
+    baseId: 'ring_es',
     level: 38,
     mods: [
-      m('es', 'base', 5, 9),
+      m('es', 'base', 10, 20),
       m('resist.fire', 'base', 20, 30),
       m('resist.cold', 'base', -40),
       m('stunThreshold', 'inc', -50),
@@ -11148,7 +11148,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'tidalSceptre',
     name: 'Tidal Sceptre',
-    baseId: 'sceptre_5',
+    baseId: 'sceptre_l68',
     level: 68,
     mods: [
       m('damage', 'inc', 180, 200, { damageTypes: ['physical'], local: true }),
@@ -11169,7 +11169,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'ashenFetish',
     name: 'Ashen Fetish',
-    baseId: 'sceptre_3',
+    baseId: 'sceptre_l35',
     level: 35,
     mods: [m('allAttr', 'base', 20, 30), m('minionDamage', 'inc', 30, 40)],
     flavour: 'Whatever it raises is already half burnt.',
@@ -11177,7 +11177,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'polarSceptre',
     name: 'Polar Sceptre',
-    baseId: 'sceptre_5',
+    baseId: 'sceptre_l68',
     level: 68,
     mods: [
       m('damage', 'inc', 40, 40, { damageTypes: ['fire', 'cold', 'lightning'] }),
@@ -11190,7 +11190,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'veilcasterWard',
     name: 'Veilcaster Ward',
-    baseId: 'shield_es_3',
+    baseId: 'shield_es_l41',
     level: 41,
     mods: [
       m('damage', 'inc', 15, 20, { tags: ['spell'] }),
@@ -11205,8 +11205,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'wellburstWard',
     name: 'Wellburst Ward',
-    baseId: 'shield_es_4',
-    level: 60,
+    baseId: 'shield_es_l56',
+    level: 56,
     mods: [
       m('damage', 'inc', 5, 10, { tags: ['spell'] }),
       m('mana', 'base', 1, 100),
@@ -11220,8 +11220,8 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'crimsonStandard',
     name: 'Crimson Standard',
-    baseId: 'shield_ar_3',
-    level: 40,
+    baseId: 'shield_ar_l35',
+    level: 35,
     mods: [
       m('life', 'base', 20, 30),
       m('life', 'base', 50, 60),
@@ -11234,7 +11234,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'everfruitWard',
     name: 'Everfruit Ward',
-    baseId: 'shield_es_3',
+    baseId: 'shield_es_l49',
     level: 49,
     mods: [
       m('life', 'base', 60, 80),
@@ -11256,7 +11256,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'glarewand',
     name: 'Glarewand',
-    baseId: 'wand_4',
+    baseId: 'wand_l45',
     level: 63,
     mods: [
       m('damage.min', 'base', 18, 22, { damageTypes: ['physical'], local: true }),
@@ -11279,7 +11279,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   {
     id: 'sunderStaff',
     name: 'Sunder Staff',
-    baseId: 'staff_5',
+    baseId: 'warstaff_l64',
     level: 64,
     mods: [
       m('blockAttack', 'base', 20),

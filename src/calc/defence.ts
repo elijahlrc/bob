@@ -165,6 +165,7 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
       bleed: avoidOf(db, ctx, 'bleed'),
       poison: avoidOf(db, ctx, 'poison'),
     },
+    avoidHit: DAMAGE_TYPES.map((t) => clamp(db.sum('base', `avoidHit.${t}`, ctx) / 100, 0, 1)),
     durOnSelf: {
       ignite: db.mult('durationOnSelf.ignite', ctx),
       shock: db.mult('durationOnSelf.shock', ctx),

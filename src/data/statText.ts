@@ -520,6 +520,8 @@ Object.assign(STAT_TEXT, {
   noMovingBleed: { flag: "Moving while Bleeding doesn't cause you to take extra Damage" },
   dodgeAttack: { base: '{v}% chance to Dodge Attack Hits' },
   dodgeSpell: { base: '{v}% chance to Dodge Spell Hits' },
+  critLucky: { flag: 'Your Critical Strike Chance is Lucky' },
+  'avoidHit.cold': { base: '{v}% chance to Avoid Cold Damage from Hits' },
 } satisfies Record<string, StatText>);
 
 Object.assign(STAT_TEXT, {

@@ -14,7 +14,17 @@ import { eligible, itemTags } from './loot';
 let n = 91000;
 const uid = () => n++;
 
-const WEAPONS = ITEM_BASES.filter((b) => isWeaponClass(b.itemClass) && b.id.endsWith('_5'));
+/** The highest-level base of each weapon family (a family's ids share the prefix before `_l<level>`). */
+const WEAPONS = (() => {
+  const best = new Map<string, (typeof ITEM_BASES)[number]>();
+  for (const b of ITEM_BASES) {
+    if (!isWeaponClass(b.itemClass) || b.uniqueOnly) continue;
+    const fam = b.id.replace(/_l\d+[a-z]?$/, '');
+    const cur = best.get(fam);
+    if (!cur || b.level > cur.level) best.set(fam, b);
+  }
+  return [...best.values()];
+})();
 const rolls = (baseId: string): Set<string> => {
   const tags = itemTags(itemBase(baseId));
   return new Set(FAMILIES.filter((f) => eligible(f, tags, 'rare')).map((f) => f.id));
@@ -258,7 +268,7 @@ describe('the 3.9 rules for a weapon kind', () => {
         .implicits.map((m) => modText(m))
         .join(' / ');
     expect(imp('mace2_1')).toBe('30% increased Stun Duration on Enemies');
-    expect(imp('staff_3')).toBe('+18% Chance to Block');
+    expect(imp('staff_3')).toBe('+18% Chance to Block while wielding a Staff');
     expect(imp('thrust_3')).toBe('+25% to Critical Strike Multiplier');
     expect(imp('dagger_3')).toBe('30% increased Critical Strike Chance');
     expect(imp('axe_3')).toBe('');

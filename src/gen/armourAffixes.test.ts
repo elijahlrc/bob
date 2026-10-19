@@ -35,7 +35,17 @@ function withAffix(baseId: string, familyId: string, tier?: number): Item {
   return it;
 }
 
-const ARMOUR = ITEM_BASES.filter((b) => b.defenceType && b.id.endsWith('_4'));
+/** The highest-level base of each armour and shield family (a family's ids share the prefix before `_l<level>`). */
+const ARMOUR = (() => {
+  const best = new Map<string, (typeof ITEM_BASES)[number]>();
+  for (const b of ITEM_BASES) {
+    if (!b.defenceType || b.uniqueOnly) continue;
+    const fam = b.id.replace(/_l\d+[a-z]?$/, '');
+    const cur = best.get(fam);
+    if (!cur || b.level > cur.level) best.set(fam, b);
+  }
+  return [...best.values()];
+})();
 const JEWELLERY = ITEM_BASES.filter((b) =>
   ['ring', 'amulet', 'belt', 'quiver'].includes(b.itemClass),
 );
@@ -270,13 +280,15 @@ describe('the bases', () => {
     for (const t of ['ar', 'ev', 'es', 'arev', 'ares', 'eves'])
       for (let k = 1; k <= 4; k++) expect(itemBase(`shield_${t}_${k}`).defenceType).toBe(t);
     const imp = (id: string) => modsText(itemBase(id).implicits).join(' / ');
+    // The old tier ids stand for the base of the type nearest their level (1, 20, 40, 60).
     expect(imp('shield_ar_1')).toBe('');
-    expect(imp('shield_ar_4')).toBe('+35 to maximum Life');
-    expect(imp('shield_ev_4')).toBe('9% increased Movement Speed');
+    expect(imp('shield_ar_4')).toBe('+25 to maximum Life');
+    expect(imp('shield_ev_4')).toBe('6% increased Movement Speed');
     expect(imp('shield_es_4')).toBe('18% increased Spell Damage');
-    expect(imp('shield_ares_4')).toBe('+12% to all Elemental Resistances');
+    expect(imp('shield_ares_4')).toBe('+4% to all Elemental Resistances');
     expect(imp('shield_eves_1')).toBe('2% chance to Dodge Attack Hits');
     expect(imp('shield_eves_2')).toBe('2% chance to Dodge Spell Hits');
+    expect(imp('shield_arev_l5')).toBe('60% increased Block Recovery');
   });
 
   it('jewellery has a base for each kind of implicit, and every one drops', () => {

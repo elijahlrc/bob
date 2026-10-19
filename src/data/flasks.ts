@@ -1,7 +1,15 @@
 import { mod, type Mod } from '../mods/types';
+import { BASE_ROWS } from './baseTables';
+import type { BuffId } from './buffs';
 
-/** DESIGN.md §11.6. */
+/**
+ * DESIGN.md §11.6. The flask bases are the reference game's (docs/AUDIT-ITEM-BASES.md): twelve life and twelve mana
+ * tiers, six hybrids and fifteen utility kinds, with their amounts, seconds and charges; the rows are `baseTables.ts`.
+ */
 export type FlaskKind = 'life' | 'mana' | 'hybrid' | 'utility';
+
+/** The ground a utility flask leaves where the character stands when it is drunk. */
+export type FlaskGround = 'consecrated' | 'chilling' | 'smoke';
 
 export type FlaskBase = {
   id: string;
@@ -13,79 +21,62 @@ export type FlaskBase = {
   maxCharges: number;
   perUse: number;
   duration: number;
-  /** Utility buff mods; `scale` mods are multiplied by (1 + 0.04 · ilvl). */
+  /** Utility buff mods, granted while the flask runs. */
   buff: Mod[];
-  scaleWithIlvl?: boolean;
+  /** Ground left on use, lasting as long as the flask. */
+  ground?: FlaskGround;
+  /** A buff of the buff layer (src/data/buffs.ts) held for as long as the flask runs. */
+  grants?: BuffId;
   /** Never drops on its own; only a unique flask uses it. */
   uniqueOnly?: boolean;
 };
 
-const LIFE_AMOUNTS = [70, 150, 270, 450, 700, 1000, 1400, 1900];
-const LIFE_REQS = [1, 8, 18, 30, 42, 54, 66, 78];
-const MANA_AMOUNTS = [50, 110, 200, 320, 460, 620];
-const MANA_REQS = [1, 10, 22, 36, 50, 64];
-const TIER_WORDS = [
-  'Cracked',
-  'Corked',
-  'Stoppered',
-  'Sealed',
-  'Gilded',
-  'Runed',
-  'Hallowed',
-  'Everfull',
-];
+/** What each utility kind does while it runs (the reference flasks' lines; phasing is not modelled). */
+const UTILITY: Record<string, Pick<FlaskBase, 'buff' | 'ground' | 'grants'>> = {
+  flask_haste: { buff: [mod('moveSpeed', 'inc', 40)] },
+  flask_prism: { buff: [mod('resist.allEle', 'base', 35)] },
+  flask_smokeveil: { buff: [mod('evasion', 'inc', 100)], ground: 'smoke' },
+  flask_ember: { buff: [mod('resist.fire', 'base', 50), mod('maxResist.fire', 'base', 6)] },
+  flask_frost: { buff: [mod('resist.cold', 'base', 50), mod('maxResist.cold', 'base', 6)] },
+  flask_storm: {
+    buff: [mod('resist.lightning', 'base', 50), mod('maxResist.lightning', 'base', 6)],
+  },
+  flask_mire: { buff: [mod('resist.chaos', 'base', 35)] },
+  flask_onrush: { buff: [], grants: 'onslaught' },
+  flask_keen: { buff: [mod('critLucky', 'flag', 1)] },
+  flask_bulwark: { buff: [mod('armour', 'base', 3000)] },
+  flask_ghoststep: { buff: [mod('dodgeAttack', 'base', 10), mod('dodgeSpell', 'base', 10)] },
+  flask_mist: { buff: [mod('evasion', 'base', 3000)] },
+  flask_chillwake: { buff: [mod('avoidHit.cold', 'base', 20)], ground: 'chilling' },
+  flask_sanctum: { buff: [mod('damage', 'inc', 40)], ground: 'consecrated' },
+  flask_stonehide: {
+    buff: [mod('physReduction', 'base', 20), mod('reflectPhysPct', 'base', 20)],
+  },
+};
 
-function lifeFlasks(): FlaskBase[] {
-  return LIFE_AMOUNTS.map((life, i) => ({
-    id: `flask_life_${i + 1}`,
-    name: `${TIER_WORDS[i]} Life Draught`,
-    kind: 'life',
-    level: LIFE_REQS[i],
-    life,
-    mana: 0,
-    maxCharges: 21,
-    perUse: 7,
-    duration: 4,
-    buff: [],
-  }));
+function flasksOf(kind: FlaskKind): FlaskBase[] {
+  return (BASE_ROWS[`flask_${kind}`] ?? []).map((r) => {
+    const [life, mana, duration, maxCharges, perUse] = r.flask!;
+    const u = kind === 'utility' ? UTILITY[r.id] : undefined;
+    if (kind === 'utility' && !u) throw new Error(`utility flask ${r.id} has no effect`);
+    return {
+      id: r.id,
+      name: r.name,
+      kind,
+      level: r.level,
+      life,
+      mana,
+      maxCharges,
+      perUse,
+      duration,
+      buff: u?.buff ?? [],
+      ...(u?.ground ? { ground: u.ground } : {}),
+      ...(u?.grants ? { grants: u.grants } : {}),
+    };
+  });
 }
 
-function manaFlasks(): FlaskBase[] {
-  return MANA_AMOUNTS.map((mana, i) => ({
-    id: `flask_mana_${i + 1}`,
-    name: `${TIER_WORDS[i]} Mana Draught`,
-    kind: 'mana',
-    level: MANA_REQS[i],
-    life: 0,
-    mana,
-    maxCharges: 24,
-    perUse: 6,
-    duration: 4,
-    buff: [],
-  }));
-}
-
-function hybridFlasks(): FlaskBase[] {
-  const tiers = [
-    { life: 1, mana: 1, level: 10, word: 'Murky' },
-    { life: 3, mana: 3, level: 35, word: 'Twilight' },
-    { life: 5, mana: 5, level: 60, word: 'Dawnlit' },
-  ];
-  return tiers.map((t, i) => ({
-    id: `flask_hybrid_${i + 1}`,
-    name: `${t.word} Blended Draught`,
-    kind: 'hybrid',
-    level: t.level,
-    life: Math.round(LIFE_AMOUNTS[t.life] * 0.6),
-    mana: Math.round(MANA_AMOUNTS[t.mana] * 0.6),
-    maxCharges: 30,
-    perUse: 10,
-    duration: 5,
-    buff: [],
-  }));
-}
-
-const util = (id: string, name: string, level: number, buff: Mod[], scale = false): FlaskBase => ({
+const util = (id: string, name: string, level: number): FlaskBase => ({
   id,
   name,
   kind: 'utility',
@@ -94,60 +85,68 @@ const util = (id: string, name: string, level: number, buff: Mod[], scale = fals
   mana: 0,
   maxCharges: 50,
   perUse: 25,
-  duration: 4,
-  buff,
-  scaleWithIlvl: scale,
-});
-
-/** The bases of the unique flasks (their effect comes from the unique, not the base). */
-const uniqueUtil = (id: string, name: string, level: number): FlaskBase => ({
-  ...util(id, name, level, []),
   duration: 6,
+  buff: [],
   uniqueOnly: true,
 });
 
+/** The bases of the unique flasks (their effect comes from the unique, not the base). */
+const UNIQUE_BASES: FlaskBase[] = [
+  util('flask_hoarfrost', 'Hoarfrost Draught', 26),
+  util('flask_lastlight', 'Last Light Flask', 40),
+  util('flask_rotwine', 'Rotwine Flask', 35),
+  util('flask_stonebrew', 'Stonebrew Flask', 20),
+  util('flask_tonic', "Gambler's Tonic", 22),
+  util('flask_martyr', "Martyr's Draught", 30),
+  util('flask_penitent', 'Penitent Draught', 35),
+  util('flask_hollowoak', 'Hollow Oak Draught', 8),
+  util('flask_brimming', 'Brimming Cup', 35),
+  util('flask_emberwell', 'Emberwell Urn', 22),
+  util('flask_venomvein', 'Venomvein Phial', 27),
+  util('flask_steadfast', 'Steadfast Tonic', 22),
+  util('flask_unbound', 'Unbound Draught', 50),
+  util('flask_bellowing', 'Bellowing Draught', 27),
+  util('flask_swiftgut', 'Swiftgut Flask', 40),
+  util('flask_ashen', 'Ashen Tonic', 14),
+  util('flask_thunderblood', 'Thunderblood Vial', 68),
+  util('flask_hexfire', 'Hexfire Brew', 48),
+];
+
 export const FLASK_BASES: FlaskBase[] = [
-  ...lifeFlasks(),
-  ...manaFlasks(),
-  ...hybridFlasks(),
-  util('flask_bulwark', 'Bulwark Draught', 6, [mod('armour', 'base', 1500)], true),
-  util('flask_mist', 'Mist Draught', 6, [mod('evasion', 'base', 1500)], true),
-  util('flask_haste', 'Haste Draught', 12, [mod('moveSpeed', 'inc', 40)]),
-  util('flask_ember', 'Ember Draught', 16, [
-    mod('resist.fire', 'base', 50),
-    mod('maxResist.fire', 'base', 5),
-  ]),
-  util('flask_frost', 'Frost Draught', 16, [
-    mod('resist.cold', 'base', 50),
-    mod('maxResist.cold', 'base', 5),
-  ]),
-  util('flask_storm', 'Storm Draught', 16, [
-    mod('resist.lightning', 'base', 50),
-    mod('maxResist.lightning', 'base', 5),
-  ]),
-  uniqueUtil('flask_hoarfrost', 'Hoarfrost Draught', 26),
-  uniqueUtil('flask_lastlight', 'Last Light Flask', 40),
-  uniqueUtil('flask_rotwine', 'Rotwine Flask', 35),
-  uniqueUtil('flask_stonebrew', 'Stonebrew Flask', 20),
-  uniqueUtil('flask_tonic', "Gambler's Tonic", 22),
-  uniqueUtil('flask_martyr', "Martyr's Draught", 30),
-  uniqueUtil('flask_penitent', 'Penitent Draught', 35),
-  uniqueUtil('flask_hollowoak', 'Hollow Oak Draught', 8),
-  uniqueUtil('flask_brimming', 'Brimming Cup', 35),
-  uniqueUtil('flask_emberwell', 'Emberwell Urn', 22),
-  uniqueUtil('flask_venomvein', 'Venomvein Phial', 27),
-  uniqueUtil('flask_steadfast', 'Steadfast Tonic', 22),
-  uniqueUtil('flask_unbound', 'Unbound Draught', 50),
-  uniqueUtil('flask_bellowing', 'Bellowing Draught', 27),
-  uniqueUtil('flask_swiftgut', 'Swiftgut Flask', 40),
-  uniqueUtil('flask_ashen', 'Ashen Tonic', 14),
-  uniqueUtil('flask_thunderblood', 'Thunderblood Vial', 68),
-  uniqueUtil('flask_hexfire', 'Hexfire Brew', 48),
+  ...flasksOf('life'),
+  ...flasksOf('mana'),
+  ...flasksOf('hybrid'),
+  ...flasksOf('utility'),
+  ...UNIQUE_BASES,
 ];
 
 const BY_ID = new Map(FLASK_BASES.map((f) => [f.id, f]));
+
+/** The base of a kind nearest a level (the lower one when two are as near). */
+function nearestFlask(kind: FlaskKind, level: number): FlaskBase | undefined {
+  let best: FlaskBase | undefined;
+  for (const f of FLASK_BASES)
+    if (f.kind === kind && !f.uniqueOnly)
+      if (!best || Math.abs(f.level - level) < Math.abs(best.level - level)) best = f;
+  return best;
+}
+
+/** The ids of the flask tiers the game had before the reference ladders (2026-10-18): each stands for the tier nearest its level. */
+const LEGACY_IDS: Map<string, string> = (() => {
+  const m = new Map<string, string>();
+  const add = (kind: FlaskKind, levels: number[]) =>
+    levels.forEach((level, i) => {
+      const f = nearestFlask(kind, level);
+      if (f) m.set(`flask_${kind}_${i + 1}`, f.id);
+    });
+  add('life', [1, 8, 18, 30, 42, 54, 66, 78]);
+  add('mana', [1, 10, 22, 36, 50, 64]);
+  add('hybrid', [10, 35, 60]);
+  return m;
+})();
+
 export function flaskBase(id: string): FlaskBase {
-  const f = BY_ID.get(id);
+  const f = BY_ID.get(id) ?? BY_ID.get(LEGACY_IDS.get(id) ?? '');
   if (!f) throw new Error(`unknown flask ${id}`);
   return f;
 }

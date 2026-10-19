@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { itemBase } from '../data/bases';
+import { flaskBase } from '../data/flasks';
 import { makeFlask, makeGem, makeItem } from '../gen/items';
 import { mod } from '../mods/types';
 import { Controller } from './controller';
@@ -35,7 +37,8 @@ const ids = (xs: { uid: number }[]) => xs.map((x) => x.uid);
 describe('upgrade hints and quick equip', () => {
   it('reports the best slot and a positive delta for an upgrade', () => {
     const { run, uid } = setup('vanguard');
-    const better = makeItem(uid, 'mace2_2', 20);
+    // The same base as the maul worn (a heavier one asks for more strength than a new Vanguard has), rolled better.
+    const better = makeItem(uid, 'mace2_1', 20);
     better.affixes = [
       {
         family: 'physLocal',
@@ -47,7 +50,7 @@ describe('upgrade hints and quick equip', () => {
     const info = itemInfos(run).get(better.uid)!;
     expect(info.slot).toBe('mainHand');
     expect(info.dpsPct).toBeGreaterThan(5);
-    expect(info.replaces?.baseId).toBe('mace2_1');
+    expect(info.replaces?.baseId).toBe(itemBase('mace2_1').id);
     expect(quickEquip(run, better.uid)).toMatchObject({ ok: true, slot: 'mainHand' });
     expect(run.build.equipment.mainHand!.uid).toBe(better.uid);
   });
@@ -90,7 +93,7 @@ describe('upgrade hints and quick equip', () => {
     run.inventory.push(l2);
     const r = quickEquip(run, l2.uid);
     expect(r.ok).toBe(true);
-    expect(run.build.flasks[r.flask!]!.baseId).toBe('flask_life_2');
+    expect(run.build.flasks[r.flask!]!.baseId).toBe(flaskBase('flask_life_2').id);
   });
 });
 
@@ -321,7 +324,7 @@ describe('comparing an item with every slot it could go into', () => {
     const shield = makeItem(uid, 'shield_ar_1', 1);
     run.build.equipment.mainHand = sword;
     run.build.equipment.offHand = shield;
-    const mace = makeItem(uid, 'mace2_2', 15);
+    const mace = makeItem(uid, 'mace2_1', 15);
     run.inventory.push(mace);
     const [main] = compareSlots(run, mace.uid);
     expect(main.slot).toBe('mainHand');

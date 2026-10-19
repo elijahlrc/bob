@@ -8,7 +8,7 @@ import {
   type Family,
   type SlotTag,
 } from '../data/affixes';
-import { isWeaponClass, ITEM_BASES } from '../data/bases';
+import { isWeaponClass, ITEM_BASES, itemBase } from '../data/bases';
 import { FLASK_AFFIXES, FLASK_BASES } from '../data/flasks';
 import { classDef } from '../data/classes';
 import { ALL_GEMS, type GemDef } from '../data/gems';
@@ -50,6 +50,7 @@ export function itemTags(base: ItemBase): Set<SlotTag> {
     t.add(base.hands === 2 ? 'twoHand' : 'oneHand');
     if (base.spellWeapon) t.add('casterWeapon');
     else t.add('attackWeapon');
+    if (base.minionWeapon) t.add('minionWeapon');
     // The kind of weapon (sword, axe, ..., two-handed or not): some affixes roll only on some kinds.
     for (const k of base.tags) if (WEAPON_KIND_TAGS.has(k)) t.add(k as SlotTag);
   } else if (c === 'helmet' || c === 'gloves' || c === 'boots' || c === 'body' || c === 'shield') {
@@ -148,6 +149,8 @@ export function socketCap(ilvl: number): number {
 
 /** The most sockets an item of this base and level can have. */
 export function socketLimit(base: ItemBase, ilvl: number): number {
+  // A ring or quiver with a socket of its own has it at any level.
+  if (base.sockets) return base.sockets;
   const slotMax = isWeaponClass(base.itemClass)
     ? base.hands === 2
       ? 6
@@ -177,7 +180,10 @@ const CLASS_WEIGHTS: [string, number][] = [
   ['quiver', 3],
 ];
 
-/** Pick a base: a class by weight, then usually the best tier the item level allows. */
+/** The other 40% of armour and weapon drops come from the bases of the last so many levels below the best (not the whole ladder). */
+export const BASE_DROP_WINDOW = 20;
+
+/** Pick a base: a class by weight, then usually the best tier the item level allows, else one of the recent tiers. */
 export function rollBase(rng: Rng, ilvl: number): ItemBase {
   for (let guard = 0; guard < 20; guard++) {
     const group = rng.weighted(CLASS_WEIGHTS, (x) => x[1])[0];
@@ -186,8 +192,11 @@ export function rollBase(rng: Rng, ilvl: number): ItemBase {
         !b.uniqueOnly && (group === 'weapon' ? isWeaponClass(b.itemClass) : b.itemClass === group),
     );
     if (group === 'weapon') {
-      const cls = rng.pick([...new Set(pool.map((b) => b.itemClass))]);
-      pool = pool.filter((b) => b.itemClass === cls);
+      // A weapon family (a family's ids share the prefix before `_l<level>`): a thrusting sword, a rune dagger and a
+      // warstaff drop as readily as the class they sit in, as their own classes do in the reference game.
+      const familyOf = (id: string) => id.replace(/_l\d+[a-z]?$/, '');
+      const fam = rng.pick([...new Set(pool.map((b) => familyOf(b.id)))]);
+      pool = pool.filter((b) => familyOf(b.id) === fam);
     } else if (pool[0]?.defenceType) {
       const dt = rng.pick([...new Set(pool.map((b) => b.defenceType))]);
       pool = pool.filter((b) => b.defenceType === dt);
@@ -197,7 +206,9 @@ export function rollBase(rng: Rng, ilvl: number): ItemBase {
     // Jewellery has no tiers: a base is a kind, and any kind the item level allows is as likely as another.
     if (!pool[0].defenceType && !isWeaponClass(pool[0].itemClass)) return rng.pick(pool);
     pool.sort((a, b) => a.level - b.level);
-    return rng.chance(0.6) ? pool[pool.length - 1] : rng.pick(pool);
+    const best = pool[pool.length - 1];
+    if (rng.chance(0.6)) return best;
+    return rng.pick(pool.filter((b) => b.level >= best.level - BASE_DROP_WINDOW));
   }
   return ITEM_BASES[0];
 }
@@ -285,7 +296,7 @@ export function rollItemOf(
 }
 
 export function rollUnique(rng: Rng, uid: UidSource, u: UniqueDef, ilvl: number): Item {
-  const base = ITEM_BASES.find((b) => b.id === u.baseId)!;
+  const base = itemBase(u.baseId);
   const mods: Mod[] = u.mods.map((m) => ({
     stat: m.stat,
     kind: m.kind,

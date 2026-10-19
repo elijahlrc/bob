@@ -7,7 +7,8 @@ import { newRun } from './run';
 describe('item rule: no other ring (EXPANSION 5.3)', () => {
   const setup = () => {
     const run = newRun('reaver', 1);
-    run.build.level = 10;
+    // High enough for the ring of fire resistance (level 16).
+    run.build.level = 20;
     const uid = () => run.nextUid++;
     const lone = makeItem(uid, 'ring_fire', 1, 0, 'unique');
     lone.name = 'Test Lone Ring';

@@ -118,6 +118,7 @@ import {
 } from './combat';
 import { defenceFromDb } from './defence';
 import { flaskSpec, type FlaskSpec } from './flasks';
+import { flaskBase } from '../data/flasks';
 import { armourReduction, effectiveRes, hitChance, monsterHit } from './formulas';
 import {
   DEFAULT_ATTACK,
@@ -673,6 +674,11 @@ export class Character {
           if (mb) utilBuffs.add(mb);
         }
       }
+    // A flask that holds a buff while it runs (the Onrush Draught) is a source of it too.
+    for (const f of build.flasks) {
+      const g = f ? flaskBase(f.baseId).grants : undefined;
+      if (g) utilBuffs.add(g);
+    }
     for (const id of BUFF_IDS) {
       this.buffSource[id] = buffIdsGranted.has(id) || utilBuffs.has(id);
       if (this.buffSource[id]) mods.push(...BUFFS[id].mods);

@@ -17,6 +17,8 @@ export type SlotTag =
   | 'twoHand'
   | 'casterWeapon'
   | 'attackWeapon'
+  /** A weapon that rolls the minion affixes (the Beckoning Wand). */
+  | 'minionWeapon'
   | 'sword'
   | 'axe'
   | 'mace'
@@ -1033,7 +1035,101 @@ const HAND_DEFS: FamilyDef[] = [
   },
 ];
 
-export const FAMILY_DEFS: FamilyDef[] = [...HAND_DEFS, ...ARMOUR_FAMILY_DEFS];
+/**
+ * The minion affixes of the one weapon base that rolls them (the Beckoning Wand, `ItemBase.minionWeapon`), with the 3.9
+ * tiers (docs/AUDIT-ITEM-BASES.md): minion damage, damage with mana, attack and cast speed (Bob's one minion speed stat),
+ * minion life and the minion gem level. Minion resistances and accuracy have no stat here and are left out.
+ */
+const MINION_WEAPON_DEFS: FamilyDef[] = [
+  {
+    id: 'minionDamageWand',
+    type: 'prefix',
+    slots: ['minionWeapon'],
+    ...tabled(
+      [
+        [2, [10, 19]],
+        [11, [20, 29]],
+        [23, [30, 39]],
+        [35, [40, 49]],
+        [46, [50, 59]],
+        [58, [60, 69]],
+        [64, [70, 74]],
+        [84, [75, 79]],
+      ],
+      [{ stat: 'minionDamage', kind: 'inc' }],
+    ),
+    names: ['Herding', 'Marshalling', 'Commanding'],
+  },
+  {
+    id: 'minionDamageManaWand',
+    type: 'prefix',
+    slots: ['minionWeapon'],
+    ...tabled(
+      [
+        [2, [17, 20], [5, 9]],
+        [11, [21, 24], [10, 14]],
+        [23, [25, 28], [15, 19]],
+        [35, [29, 33], [20, 24]],
+        [46, [34, 37], [25, 29]],
+        [58, [38, 41], [30, 34]],
+        [80, [42, 45], [35, 39]],
+      ],
+      [
+        { stat: 'mana', kind: 'base' },
+        { stat: 'minionDamage', kind: 'inc' },
+      ],
+    ),
+    names: ['Attendant', 'Steward', 'Regent'],
+  },
+  {
+    id: 'minionGemLevelWand',
+    type: 'prefix',
+    slots: ['minionWeapon'],
+    ...tabled([[60, [1, 1]]], [{ stat: 'gemLevel', kind: 'base', tags: ['minion'] }]),
+    names: ['Shepherding', 'Shepherding', 'Shepherding'],
+  },
+  {
+    id: 'minionSpeedWand',
+    type: 'suffix',
+    slots: ['minionWeapon'],
+    ...tabled(
+      [
+        [2, [5, 7]],
+        [15, [8, 10]],
+        [30, [11, 13]],
+        [40, [14, 16]],
+        [55, [17, 19]],
+        [72, [20, 22]],
+        [83, [23, 25]],
+      ],
+      [{ stat: 'minionSpeed', kind: 'inc' }],
+    ),
+    names: ['of Urging', 'of Driving', 'of Goading'],
+  },
+  {
+    id: 'minionLifeWand',
+    type: 'suffix',
+    slots: ['minionWeapon'],
+    ...tabled(
+      [
+        [10, [13, 17]],
+        [26, [18, 22]],
+        [42, [23, 27]],
+        [58, [28, 32]],
+        [74, [33, 36]],
+        [82, [37, 40]],
+      ],
+      [{ stat: 'minionLife', kind: 'inc' }],
+    ),
+    names: ['of the Keeper', 'of the Warden', 'of the Overseer'],
+  },
+];
+
+export const FAMILY_DEFS: FamilyDef[] = [
+  ...HAND_DEFS,
+  ...ARMOUR_FAMILY_DEFS,
+  ...MINION_WEAPON_DEFS,
+];
 
 function round(v: number, dec = 0): number {
   const f = Math.pow(10, dec);

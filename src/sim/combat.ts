@@ -411,6 +411,15 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     for (let i = 0; i < res.dmg.length; i++) res.dmg[i] *= dealt;
     res.total *= dealt;
   }
+  // A chance to take none of a hit's damage of a type (the Chillwake Draught's cold).
+  if (dst.isPlayer && res.outcome !== 'block')
+    for (let i = 0; i < res.dmg.length; i++) {
+      const c = dst.def.avoidHit[i];
+      if (c > 0 && res.dmg[i] > 0 && w.rngCombat.chance(c)) {
+        res.total -= res.dmg[i];
+        res.dmg[i] = 0;
+      }
+    }
   // Infused Channelling: while channelling, hits of the types the skill is made of do less.
   if (dst.isPlayer && res.outcome !== 'block' && dst.side!.channel?.profile.infuse) {
     const ch = dst.side!.channel.profile;

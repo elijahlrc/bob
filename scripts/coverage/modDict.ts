@@ -19,8 +19,11 @@ const mk = (stat: string, kind: ModT['kind'], n: Num, extra: Partial<ModT> = {})
 const neg = (n: Num): Num => [-n[0], -n[1]];
 const flag = (stat: string): ModT => ({ stat, kind: 'flag', min: 1, max: 1 });
 
-/** Bob's flat defences run below the reference game's: apply the ratio from the base tables (scale.ts). */
-const FLAT_SCALE: Record<string, number> = { armour: 0.6, evasion: 0.6, es: 0.45 };
+/**
+ * Flat defences were scaled to Bob's lighter bases (armour and evasion 0.6, energy shield 0.45) until the bases took the
+ * reference numbers (docs/AUDIT-ITEM-BASES.md, 2026-10-18); a flat line is now taken as it is.
+ */
+const FLAT_SCALE: Record<string, number> = {};
 const scaled = (stat: string, n: Num): Num => {
   const f = FLAT_SCALE[stat] ?? 1;
   return [Math.round(n[0] * f), Math.round(n[1] * f)];
@@ -44,7 +47,10 @@ export const IGNORED: RegExp[] = [
   /^Mirrored$/,
   /^Unidentified$/,
   /^Has # Abyssal Sockets?$/,
+  // A socket on a ring or quiver and the minion wand are fields of the base (emit-bases.ts), as is the ground a flask leaves.
   /^Has # Socket$/,
+  /^Can roll Minion Modifiers$/,
+  /^Creates (a Smoke Cloud|Chilled Ground|Consecrated Ground) on Use$/,
   /^Cannot be Blinded$/,
   /^Items and Gems have # reduced Attribute Requirements$/,
   /^Unaffected by (Shocked|Chilled|Burning|Desecrated) Ground$/,
@@ -342,6 +348,7 @@ for (const [phrase, tags] of [
   ['to Attacks', ['attack']],
   ['to Spells', ['spell']],
   ['to Attacks with Bows', ['attack', 'bow']],
+  ['to Bow Attacks', ['attack', 'bow']],
 ] as [string, SkillTag[]][])
   rule(new RegExp(`^Adds # to # ${TYPE} Damage ${phrase}$`), (m, n) => {
     const t = typeOf(m[1]);
@@ -658,6 +665,13 @@ rule(/^# of Melee Physical Damage taken reflected to Attacker$/, (_m, n) => [
 ]);
 rule(/^# chance to Dodge Attacks$/, (_m, n) => [mk('dodgeAttack', 'base', n[0])]);
 rule(/^# [Cc]hance to Dodge Spell Damage$/, (_m, n) => [mk('dodgeSpell', 'base', n[0])]);
+rule(/^# chance to Dodge Spell Hits$/, (_m, n) => [mk('dodgeSpell', 'base', n[0])]);
+// Block recovery is a `base` stat in Bob (defence.ts sums it with stun and block recovery).
+rule(/^# increased Block Recovery$/, (_m, n) => [mk('blockRecovery', 'base', n[0])]);
+rule(/^# to Armour and Evasion Rating$/, (_m, n) => [
+  mk('armour', 'base', n[0]),
+  mk('evasion', 'base', n[0]),
+]);
 rule(/^# chance to Dodge Attack and Spell Hits$/, (_m, n) => [
   mk('dodgeAttack', 'base', n[0]),
   mk('dodgeSpell', 'base', n[0]),
