@@ -96,6 +96,42 @@ describe('spells and attacks have their own copy of a support', () => {
   });
 });
 
+describe('the Duration tag means that something lasts', () => {
+  it('a mine or a trap whose blast is over at once takes neither duration support', () => {
+    for (const sk of [
+      'icicleCharge',
+      'mortarCharge',
+      'stormCharge',
+      'shrapnelTrap',
+      'frostTrap',
+      'boltTrap',
+    ]) {
+      expect(skill(sk).types, sk).not.toContain('duration');
+      expect(offered('lingeringEffect', sk), `Lingering Effect on ${sk}`).toBe(false);
+      expect(offered('briefBurst', sk), `Brief Burst on ${sk}`).toBe(false);
+    }
+  });
+
+  it('a trap that leaves ground or drains, and a mine that blinks, still do', () => {
+    for (const sk of [
+      'blazeTrap',
+      'fireBreathTrap',
+      'spireTrap',
+      'rumbleTrap',
+      'drainTrap',
+      'smokeCharge',
+    ])
+      expect(offered('lingeringEffect', sk), `Lingering Effect on ${sk}`).toBe(true);
+  });
+
+  it('every mine that carries the tag lets Lingering Effect act', () => {
+    for (const g of ACTIVE_GEMS) {
+      if (!g.tags.includes('mine') || !g.tags.includes('duration')) continue;
+      expect(offered('lingeringEffect', g.id), g.id).toBe(true);
+    }
+  });
+});
+
 describe('across every pair', () => {
   const pairs: [SupportGemDef, SkillDef][] = [];
   for (const a of ACTIVE_GEMS) {

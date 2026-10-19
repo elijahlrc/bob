@@ -303,7 +303,6 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
         `Rains ${def.mineRain.count} smaller bursts around the mine, one more for every ${def.mineRain.perPrior} mines before it`,
       );
     if (def.mineAura) stats.push('Mines near an enemy add fire damage to the hits against it');
-    if (def.deploySeconds) stats.push(`What it puts down stands for ${num(def.deploySeconds)} s`);
     // A blink's own cooldown is the stored-uses one; any other skill's line is made in fxLines or utilityLines.
     if (def.utility?.kind === 'blink' && def.cooldown !== undefined)
       stats.push(

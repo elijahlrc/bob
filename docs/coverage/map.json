@@ -1328,7 +1328,7 @@
   "mortarCharge": {
    "ref": "Pyroclast Mine",
    "status": "covered",
-   "note": "A mine (standing five seconds, set off with the rest of its set) that bursts in fire and then rains two more, smaller bursts around it, one more for every two mines that went off before it; the mines near an enemy add fire damage to the hits against it."
+   "note": "A mine (waiting five seconds to be set off, and going with the rest of its set) that bursts in fire and then rains two more, smaller bursts around it, one more for every two mines that went off before it; the mines near an enemy add fire damage to the hits against it."
   },
   "stormCharge": {
    "ref": "Stormblast Mine",

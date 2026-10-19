@@ -5140,7 +5140,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Frost Trap',
     attr: 'dex',
     skillType: 'spell',
-    tags: ['spell', 'trap', 'area', 'cold', 'duration'],
+    tags: ['spell', 'trap', 'area', 'cold'],
     types: ['trap'],
     behaviour: {
       kind: 'burst',
@@ -5166,7 +5166,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Shrapnel Trap',
     attr: 'dex',
     skillType: 'spell',
-    tags: ['spell', 'trap', 'area', 'fire', 'physical', 'duration'],
+    tags: ['spell', 'trap', 'area', 'fire', 'physical'],
     types: ['trap'],
     behaviour: {
       kind: 'burst',
@@ -5278,7 +5278,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Bolt Trap',
     attr: 'dex',
     skillType: 'spell',
-    tags: ['spell', 'trap', 'projectile', 'lightning', 'duration'],
+    tags: ['spell', 'trap', 'projectile', 'lightning'],
     types: ['trap'],
     behaviour: {
       kind: 'projectile',
@@ -5402,7 +5402,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Icicle Charge',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'mine', 'projectile', 'cold', 'duration'],
+    tags: ['spell', 'mine', 'projectile', 'cold'],
     types: ['mine'],
     behaviour: {
       kind: 'projectile',
@@ -5429,7 +5429,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Mortar Charge',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'mine', 'area', 'fire', 'duration'],
+    tags: ['spell', 'mine', 'area', 'fire'],
     types: ['mine'],
     behaviour: {
       kind: 'burst',
@@ -5461,7 +5461,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       radius: 3.5,
     },
     mods: [],
-    description: 'A mine that lobs fire when it goes off, and more fire after.',
+    description:
+      'A mine that bursts in fire when it goes off, then rains smaller bursts around it.',
   },
   {
     kind: 'active',
@@ -5469,7 +5470,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Storm Charge',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'mine', 'area', 'lightning', 'duration'],
+    tags: ['spell', 'mine', 'area', 'lightning'],
     types: ['mine'],
     behaviour: {
       kind: 'burst',

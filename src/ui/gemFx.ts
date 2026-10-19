@@ -244,7 +244,13 @@ export function fxLines(def: ActiveGemDef, level: number): string[] {
   if (def.catches) out.push(`Catches up to ${def.catches} returning projectiles`);
   if (def.releasesCaught) out.push('Sends out the projectiles that were caught');
   if (def.detonation) out.push(`Mines go ${num(def.detonation)} s after being set off`);
-  if (def.deploySeconds) out.push(`What it puts down stands for ${num(def.deploySeconds)} s`);
+  if (def.deploySeconds)
+    out.push(
+      // A mine or a trap waits to be set off and is gone once it is; a totem or brand stands and keeps shooting.
+      def.types?.some((t) => t === 'mine' || t === 'trap')
+        ? `Waits up to ${num(def.deploySeconds)} s to go off`
+        : `What it puts down stands for ${num(def.deploySeconds)} s`,
+    );
   return out;
 }
 

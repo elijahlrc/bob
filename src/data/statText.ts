@@ -609,7 +609,7 @@ Object.assign(STAT_TEXT, {
   shatter: { flag: 'Frozen enemies on less than a third of their life shatter when hit' },
   shieldAttack: { flag: 'Attacks with the shield, not the weapon' },
   knockback: { base: 'Enemies hit are knocked back {v} tiles' },
-  deploySeconds: { base: 'What it puts down stands for {v} seconds' },
+  deploySeconds: { base: 'Waits up to {v} seconds to go off' },
   'mine.chain': { base: 'Mines deal {v}% more damage for each mine that went off before them' },
   'mine.double': {
     base: 'Each mine gives hits against enemies near it a {v}% chance to deal double damage',

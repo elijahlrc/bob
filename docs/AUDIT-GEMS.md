@@ -1284,7 +1284,7 @@ Each gem's "Repair" line says the smallest change its reviewer saw. Any repair t
 **Swift Snares** (Advanced Traps Support) · support · confidence low
 
 - PoE: Three-in-one trap support: faster throwing, faster trap cooldown recovery, and longer trap/effect duration.
-- Bob: Only the throw speed (as cast/attack speed inc). The duration component is dropped even though deployable lifetime does scale with skillDuration (deploy.ts), and Bob has no trap cooldown at all.
+- Bob: Only the throw speed (as cast/attack speed inc). The duration component is dropped even though a totem or brand lasts longer with skillDuration (deploy.ts; a trap or mine does not since 2026-10-08, it stands for its own time as in the reference game), and Bob has no trap cooldown at all.
 - Missing: `trap_cooldown`, `skill_duration_bonus`
 - Repair: Add skillDuration to the mods so traps last longer; a trap cooldown system would be needed for the third stat.
 
