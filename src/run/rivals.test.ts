@@ -298,7 +298,11 @@ describe('sending and fetching', () => {
       100,
     );
     expect(calls[0].url).toBe('https://abc.supabase.co/rest/v1/rpc/high_scores');
-    expect(JSON.parse(calls[0].body)).toEqual({ k: 100 });
+    expect(JSON.parse(calls[0].body)).toEqual({
+      k: 100,
+      save_version: SAVE_VERSION,
+      outdated: false,
+    });
     expect(scores).toEqual([
       {
         id: '3',
@@ -315,6 +319,20 @@ describe('sending and fetching', () => {
       },
       expect.objectContaining({ id: '3' }),
     ]);
+  });
+
+  it('asks for the older versions’ list when told to', async () => {
+    const bodies: string[] = [];
+    await fetchHighScores(
+      async (_url, init) => {
+        bodies.push(init.body as string);
+        return { ok: true, json: async () => [] };
+      },
+      sink,
+      100,
+      { saveVersion: SAVE_VERSION, outdated: true },
+    );
+    expect(JSON.parse(bodies[0])).toEqual({ k: 100, save_version: SAVE_VERSION, outdated: true });
   });
 
   it('never throws: offline, refused, or an answer that is not a list is just false or empty', async () => {

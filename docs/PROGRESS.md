@@ -1135,3 +1135,13 @@ it, past the cache, when the tab comes back into view and on arriving at the tit
 until a newer build is known; the title screen and the camp then show "A new version is out · Reload" (`src/ui/UpdateNotice.tsx`),
 never the end screens (a reload there would lose the character before it was posted). Tested with an injected fetch and faked
 timers; the summary's text test says the line is never there. `window.__dev.update()` shows it on the dev server.
+
+## High scores by version (2026-10-20)
+
+The new passive tree (save version 20) made every earlier rival unfightable, while the high score list still ranked them. The list is now
+per save version: `high_scores(k, save_version, outdated)` (migration `high_scores_by_save_version`, dry-run in a rolled-back transaction
+first; called without a version it answers as before, so builds already out keep working). The game asks for its own version's list, which
+starts empty, so nothing was deleted and no rating reset; a box on the screen, "Show high scores from older versions", adds the older list
+below it, headed "Older versions (outdated)" with a line that those characters can no longer be fought. Seen in the browser against the
+project at desktop and phone width: "No duels yet." above, the 17 older characters below when ticked. The version 20 pool has no bot
+characters yet.

@@ -180,8 +180,9 @@ address hash:
   are fewer than `k`), not the caller's own, players before bots, newest first. The game checks every row before it offers it
   (`validateRival`: the save version, and that every passive node, item base, affix, gem, unique and flask the build names exists in
   this version) and skips one that fails.
-- `high_scores(k)`: the top rated rival snapshots, at most 100, one row per snapshot, never a bot, and only a snapshot that has
-  fought. The ratings move with every reported fight ("The duel log"); the list is empty until fights are reported. A trigger
+- `high_scores(k, save_version, outdated)`: the top rated rival snapshots, at most 100, one row per snapshot, never a bot, and
+  only a snapshot that has fought; of that save version, or with `outdated` of older ones, or of all when no version is given
+  (the migration `high_scores_by_save_version`, 2026-10-20). The ratings move with every reported fight ("The duel log"); the list is empty until fights are reported. A trigger
   sets `rating` (ten times the level), `fights`, `wins` and `rated_at` on every insert, so a client cannot post itself with a
   rating. The high scores screen (a button on the title screen) reads it.
 - `my_snapshots(token_hash)`: the caller's own snapshots, newest first (at most 50): `id, created_at, name, class_id, level, map,
@@ -255,8 +256,9 @@ Then, with the project's URL (`SINK.url`) and the publishable key (`SINK.key`) i
 # the pool at this save version (19 in src/run/run.ts today) near map 20: one row, "bot": true, a made-up name, a build, no token_hash
 curl -s "$URL/rest/v1/rpc/rivals_for" -H "apikey: $KEY" -H "Content-Type: application/json" \
   -d '{"save_version": 19, "map": 20, "k": 5, "exclude_token_hash": null}'
-# the high scores: [] until a ranking job has written ratings
-curl -s "$URL/rest/v1/rpc/high_scores" -H "apikey: $KEY" -H "Content-Type: application/json" -d '{"k": 10}'
+# the high scores of this save version, then of the older ones
+curl -s "$URL/rest/v1/rpc/high_scores" -H "apikey: $KEY" -H "Content-Type: application/json" -d '{"k": 10, "save_version": 20}'
+curl -s "$URL/rest/v1/rpc/high_scores" -H "apikey: $KEY" -H "Content-Type: application/json"   -d '{"k": 10, "save_version": 20, "outdated": true}'
 # the table itself must refuse the public key: a permission error, never rows
 curl -s "$URL/rest/v1/rivals?select=*" -H "apikey: $KEY"
 ```

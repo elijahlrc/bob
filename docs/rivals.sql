@@ -13,10 +13,11 @@
 --     id, name, class_id, level, map, outcome, difficulty, save_version, game_version, bot, build, rating, fights, wins.
 --     No token hash, no address.
 --
---   high_scores(k)
+--   high_scores(k, save_version, outdated)
 --     the top k (at most 100) snapshots by duel rating, one row per snapshot, only those that have fought (fights > 0) and
 --     never a bot: id, name, class_id, level, map, outcome, rating, fights, wins, game_version, posted_on (the day it was
---     posted).
+--     posted). With a save version, only the snapshots of that version (the ones a game of that version can fight), or with
+--     `outdated` those of older versions; without one, all of them (what builds before 2026-10-20 ask for).
 --
 --   my_snapshots(token_hash)
 --     the caller's own snapshots, newest first (at most 50), by the token hash that only its browser knows: id, created_at,
@@ -435,6 +436,7 @@ revoke all on function public.duels_elo() from public, anon, authenticated;
 -- 13. The shapes the two functions return (a declared type, so that no hash can go out with the rest of a row).
 drop function if exists public.rivals_for(int, int, int, text);
 drop function if exists public.high_scores(int);
+drop function if exists public.high_scores(int, int, boolean);
 drop type if exists public.rival_row;
 drop type if exists public.high_score_row;
 
@@ -502,8 +504,10 @@ $$;
 revoke all on function public.rivals_for(int, int, int, text) from public;
 grant execute on function public.rivals_for(int, int, int, text) to anon, authenticated;
 
--- 15. The high score list: see the header. One row per snapshot (not per player), by rating.
-create function public.high_scores(k int)
+-- 15. The high score list: see the header. One row per snapshot (not per player), by rating. A game asks for its own save
+--     version, since only those snapshots can be fought (`rivals_for`); a new save version starts an empty list, and the older
+--     versions' list stays readable with `outdated`. Ratings are never reset: the version filter is the reset.
+create function public.high_scores(k int, save_version int default null, outdated boolean default false)
 returns setof public.high_score_row
 language sql
 stable
@@ -514,12 +518,15 @@ as $$
          (r.created_at at time zone 'utc')::date
   from public.rivals r
   where r.fights > 0 and not r.bot
+    and (high_scores.save_version is null
+         or (coalesce(high_scores.outdated, false) and r.save_version < high_scores.save_version)
+         or (not coalesce(high_scores.outdated, false) and r.save_version = high_scores.save_version))
   order by r.rating desc, r.wins desc, r.created_at asc
   limit least(greatest(coalesce(high_scores.k, 0), 0), 100);
 $$;
 
-revoke all on function public.high_scores(int) from public;
-grant execute on function public.high_scores(int) to anon, authenticated;
+revoke all on function public.high_scores(int, int, boolean) from public;
+grant execute on function public.high_scores(int, int, boolean) to anon, authenticated;
 
 -- 15b. A browser's own snapshots, by the token hash that only it knows (the same proof of ownership as a report's): the ids the
 --      game needs for the seed of a rated fight and for the report, and what it may show the player of their own characters.

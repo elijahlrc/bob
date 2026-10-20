@@ -592,4 +592,34 @@ describe('the high scores', () => {
     click(button(view, 'Back'));
     expect(back).toHaveBeenCalled();
   });
+
+  it('has a box that shows the older versions’ list below, marked outdated, and hides it when unticked', () => {
+    const onShowOlder = vi.fn();
+    const got = { scores: [], mine: new Set<string>() };
+    const plain = HighScoresView({ got, onShowOlder, onBack: back });
+    const box = hosts(plain, (v) => v.type === 'input' && v.props.type === 'checkbox');
+    expect(box).toHaveLength(1);
+    expect(box[0].props.checked).toBe(false);
+    expect(all(plain)).toContain('Show high scores from older versions');
+    expect(all(plain)).not.toContain('outdated');
+    (box[0].props.onChange as (e: unknown) => void)({ target: { checked: true } });
+    expect(onShowOlder).toHaveBeenCalledWith(true);
+
+    const loading = HighScoresView({ got, older: null, onShowOlder, onBack: back });
+    expect(all(loading)).toContain('Older versions (outdated)');
+    expect(all(loading)).toContain('Looking for rivals…');
+
+    const shown = HighScoresView({
+      got,
+      older: { scores: [row(3, 1500), row(4, 1400)], mine: new Set(['4']) },
+      onShowOlder,
+      onBack: back,
+    });
+    expect(hosts(shown, (v) => v.type === 'input')[0].props.checked).toBe(true);
+    expect(all(shown)).toContain('No duels yet.');
+    expect(all(shown)).toContain('can no longer be fought');
+    const rows = hosts(shown, (v) => v.type === 'tr' && v.props.class !== undefined);
+    expect(rows.map((r) => r.props.class)).toEqual(['', 'hs-me']);
+    expect(labels(shown)).toEqual(['Back']);
+  });
 });

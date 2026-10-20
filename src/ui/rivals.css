@@ -125,6 +125,19 @@
   max-height: 70vh;
   overflow: auto;
 }
+/* With the older versions' list shown, the two tables share the screen. */
+.hs-both .hs-scroll {
+  max-height: 34vh;
+}
+.highscores h3,
+.highscores p {
+  margin: 0;
+}
+.hs-older {
+  font-size: 15px;
+  font-weight: normal;
+  color: var(--muted);
+}
 .hs-table {
   border-collapse: collapse;
   width: 100%;

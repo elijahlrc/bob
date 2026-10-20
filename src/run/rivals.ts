@@ -361,13 +361,20 @@ export async function fetchRivalsOrNull(
   return out;
 }
 
+/**
+ * Which part of the rating list to ask for: the snapshots of this save version (the ones a game of this version can fight), or
+ * with `outdated` those of older versions, whose ratings stand as they were left.
+ */
+export type HighScoresQuery = { saveVersion: number; outdated: boolean };
+
 /** The top of the rating list (`high_scores`, at most 100); empty when offline, when nothing is rated yet, or when the table is not there. */
 export async function fetchHighScores(
   fetchFn: FetchAny,
   sink: Sink,
   k: number,
+  q: HighScoresQuery = { saveVersion: SAVE_VERSION, outdated: false },
 ): Promise<HighScore[]> {
-  return (await fetchHighScoresOrNull(fetchFn, sink, k)) ?? [];
+  return (await fetchHighScoresOrNull(fetchFn, sink, k, q)) ?? [];
 }
 
 /** `fetchHighScores`, but null when the sink could not be asked. */
@@ -375,8 +382,13 @@ export async function fetchHighScoresOrNull(
   fetchFn: FetchAny,
   sink: Sink,
   k: number,
+  q: HighScoresQuery = { saveVersion: SAVE_VERSION, outdated: false },
 ): Promise<HighScore[] | null> {
-  const rows = await rpc(fetchFn, sink, 'high_scores', { k });
+  const rows = await rpc(fetchFn, sink, 'high_scores', {
+    k,
+    save_version: q.saveVersion,
+    outdated: q.outdated,
+  });
   if (!rows) return null;
   const out: HighScore[] = [];
   for (const row of rows) {

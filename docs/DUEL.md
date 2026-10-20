@@ -359,7 +359,9 @@ rating, fights, wins`;
   - `high_scores(k int)` returns the **top rated rival snapshots, one row per snapshot, not per player**: those with
     `fights > 0` that are not a bot, by `rating desc, wins desc, created_at asc`, at most 100:
     `id, name, class_id, level, map, outcome, rating, fights, wins, game_version, posted_on` (the day it was posted). Empty
-    until fights are reported. F7 draws the screen;
+    until fights are reported. F7 draws the screen. Since 2026-10-20 it is `high_scores(k, save_version, outdated)`: the game
+    asks for its own save version's snapshots (the ones it can fight), so a new save version starts an empty list, and with
+    `outdated` for the older versions'; without a version it lists all of them, as builds before then ask;
 - names (6.4): the table checks the character set and a length cap, and a trigger refuses a name that contains a word of
   `blocked_words`, a table the SQL creates **empty** and the owner fills in the Supabase table editor;
 - the caps: 20 snapshots in 24 hours per token hash, 60 per address hash (several people can share an address), 300 an hour
@@ -447,7 +449,10 @@ empty or unreachable pool, is dropped (an empty pool is a line and Back). Diffic
   run's snapshot. 300 pairs are kept.
 - **High scores** (`src/ui/HighScores.tsx`): a button on the title screen beside Codex and Patch notes. `high_scores(100)`: rank,
   name, class, level, rating, fights, wins and the day posted; the player's own rows (the ids from `my_snapshots`) highlighted; "No
-  duels yet." when empty, one line when offline, Back. On a phone only the rank, name, class and rating stay.
+  duels yet." when empty, one line when offline, Back. On a phone only the rank, name, class and rating stay. The list is this
+  save version's; a box, "Show high scores from older versions", adds the older versions' list below it under "Older versions
+  (outdated)" and a line saying those characters can no longer be fought (2026-10-20, when the new passive tree made every
+  earlier snapshot unfightable).
 - **Camp** (later, out of this plan): the same screens from a "Spar" button, with the character as it stands.
 
 In-game text: a card says who the rival is and what they reached; the result says what the fight counted for, who won, how, and the

@@ -333,17 +333,19 @@ export async function reportDuel(
 
 /**
  * The top of the list (`high_scores`, at most 100) and the ids of the caller's own snapshots in it (`my_snapshots`), so that a
- * screen can mark the player's rows. `scores` is null when the rivals could not be reached; `mine` is empty when the player's
+ * screen can mark the player's rows. The list is of this save version's characters, the ones that can be fought, or with
+ * `outdated` of older versions'. `scores` is null when the rivals could not be reached; `mine` is empty when the player's
  * snapshots could not be read (the list is shown without the marks).
  */
 export async function loadHighScores(
   deps: () => RivalDeps = realDeps,
+  outdated = false,
 ): Promise<{ scores: HighScore[] | null; mine: Set<string> }> {
   try {
     const d = deps();
     const tokenHash = await hashToken(rivalToken());
     const [scores, rows] = await Promise.all([
-      fetchHighScoresOrNull(d.fetch, d.sink, 100),
+      fetchHighScoresOrNull(d.fetch, d.sink, 100, { saveVersion: SAVE_VERSION, outdated }),
       fetchMySnapshots(d.fetch, d.sink, tokenHash),
     ]);
     return { scores, mine: new Set((rows ?? []).map((r) => r.id)) };

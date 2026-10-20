@@ -472,7 +472,23 @@ describe('the high scores', () => {
     const got = await loadHighScores(net.deps);
     expect(got.scores!.map((s) => s.id)).toEqual(['7', '8']);
     expect([...got.mine]).toEqual(['8']);
-    expect(net.calls.find((x) => x.path === 'high_scores')!.body).toEqual({ k: 100 });
+    expect(net.calls.find((x) => x.path === 'high_scores')!.body).toEqual({
+      k: 100,
+      save_version: SAVE_VERSION,
+      outdated: false,
+    });
+  });
+
+  it('asks for the older versions’ list when told to', async () => {
+    browser();
+    const net = server({ high_scores: () => ok([row(5, 1200)]), my_snapshots: () => ok([]) });
+    const got = await loadHighScores(net.deps, true);
+    expect(got.scores!.map((s) => s.id)).toEqual(['5']);
+    expect(net.calls.find((x) => x.path === 'high_scores')!.body).toEqual({
+      k: 100,
+      save_version: SAVE_VERSION,
+      outdated: true,
+    });
   });
 
   it('is an empty list when no one has fought, null when the rivals cannot be reached, and a list without marks when the player’s snapshots cannot be read', async () => {
