@@ -40,10 +40,11 @@ describe('the keystones of the tree pass', () => {
     expect(c.defence().armour).toBeLessThanOrEqual(plain.defence().armour);
   });
 
-  it('Spellslip: dodge spells', () => {
-    expect(new Character(build(['spellslip'], ['flameBolt'])).defence().dodgeSpell).toBeCloseTo(
-      0.3,
-    );
+  it('Spellslip: dodge spells, for 30% less energy shield', () => {
+    const c = new Character(build(['spellslip'], ['flameBolt']));
+    const plain = new Character(build([], ['flameBolt']));
+    expect(c.defence().dodgeSpell).toBeCloseTo(0.3);
+    expect(c.db.mult('es') / plain.db.mult('es')).toBeCloseTo(0.7, 2);
   });
 
   it('Idle Hands: your own skills deal nothing, a totem does, and there is one more totem', () => {

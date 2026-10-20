@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { makeCtx } from '../mods/modDb';
 import { getTree } from '../data/tree';
 import { KEYSTONES } from '../data/tree/keystones';
 import type { Build } from '../data/types';
@@ -152,14 +153,15 @@ describe('keystones (§9.4) — every one has an effect', () => {
     expect(d.esRecharge / d.maxEs).toBeCloseTo((without.esRecharge / without.maxEs) * 0.5);
   });
 
-  it('Strongarm: strength boosts projectile attacks', () => {
+  it('Strongarm: strength boosts projectile attacks; dexterity gives no evasion', () => {
     const { without, with: w } = both('strider', 'strongarm');
     expect(w.profile(w.primary).hands[0].chunks[0].min).toBeGreaterThan(
       without.profile(without.primary).hands[0].chunks[0].min,
     );
+    expect(w.defence().evasion).toBeLessThan(without.defence().evasion);
   });
 
-  it('Wound Dance: bleeds stack and ignore movement', () => {
+  it('Wound Dance: bleeds stack (and moving targets still take more), for 50% less bleed damage', () => {
     const c = both('reaver', 'woundDance').with;
     expect(c.profile(c.primary).woundDance).toBe(true);
     const { world, dummy } = createDummyWorld(build('reaver', []), { distance: 20 });
@@ -171,7 +173,8 @@ describe('keystones (§9.4) — every one has an effect', () => {
     dummy.moving = true;
     const l0 = dummy.life;
     stepWorld(world);
-    expect((l0 - dummy.life) * 60).toBeCloseTo(30);
+    expect((l0 - dummy.life) * 60).toBeCloseTo(90);
+    expect(c.db.mult('damage', makeCtx({ tags: ['bleed'] }))).toBeCloseTo(0.5);
   });
 
   it('Cruel Agony: crits deal 30% less hit damage', () => {

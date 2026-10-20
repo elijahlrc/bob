@@ -745,7 +745,8 @@ export class Character {
           source: src,
         }),
       );
-    if (!db0.flag('evasionToArmour', ctx0))
+    // Plated Hide and Strongarm both take dexterity's evasion bonus away.
+    if (!db0.flag('evasionToArmour', ctx0) && !db0.flag('dexNoEvasion', ctx0))
       aMods.push(mod('evasion', 'inc', attrs.dex * DEX_EVASION_INC, { source: src }));
     db0.addAll(aMods);
     // "Increased global defences" raises armour, evasion and energy shield alike.
@@ -1105,7 +1106,15 @@ export class Character {
           (u.seconds * db0.mult('buffDuration', ctx0)) / (u.cooldown ?? u.seconds * 0.9),
         );
         const src = { kind: 'gem' as const, id: a.skill.id };
-        const mods = gemMods(u.mods, a.skill.level, a.skill.id);
+        // A warcry's buff is scaled by `warcryEffect` (the tree's "effect of your Warcries"), as an aura's is by `auraEffect`.
+        // A guard with the warcry tag is left alone: its "less damage taken" is a different kind of number.
+        const cryEffect =
+          a.skill.tags.includes('warcry') && u.policy !== 'guard'
+            ? db0.mult('warcryEffect', ctx0)
+            : 1;
+        const mods = gemMods(u.mods, a.skill.level, a.skill.id).map((m) =>
+          cryEffect === 1 || m.kind === 'flag' ? m : { ...m, value: m.value * cryEffect },
+        );
         // The sheet of a bot's build counts a buff that is only up part of the time by its uptime.
         if (this.config.steady && uptime < 0.5)
           db0.addAll(mods.map((m) => ({ ...m, value: m.value * uptime, source: src })));
@@ -1116,6 +1125,7 @@ export class Character {
           db0.addAll(
             gemMods(u.second.mods, a.skill.level, a.skill.id).map((m) => ({
               ...m,
+              value: m.kind === 'flag' ? m.value : m.value * cryEffect,
               condition: { id: sd.cond },
               source: src,
             })),

@@ -324,9 +324,14 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     const near = enemiesNear(w, a.team, a.x, a.y, u.radius);
     for (const e of near)
       for (const s of u.statuses) {
+        // A warcry's shout is scaled by `warcryEffect`, as its buffs are on the character (calc/character.ts).
+        const cryEffect = c.skill.tags.includes('warcry')
+          ? a.side!.char.db.mult('warcryEffect')
+          : 1;
         const v =
-          levelValue(s.v, c.skill.level) +
-          levelValue(s.perNearby ?? 0, c.skill.level) * (near.length - 1);
+          (levelValue(s.v, c.skill.level) +
+            levelValue(s.perNearby ?? 0, c.skill.level) * (near.length - 1)) *
+          cryEffect;
         applyStatus(w, e, s.id, {
           seconds: s.seconds * a.side!.char.db.mult('buffDuration') * act.profile.skillDuration,
           v,

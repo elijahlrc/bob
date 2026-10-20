@@ -113,6 +113,7 @@ export const STAT_TEXT: Record<string, StatText> = {
   aoe: { name: 'Area of Effect' },
   reducedReservation: { base: '{v}% reduced Mana Reserved' },
   auraEffect: { name: 'effect of Auras on you' },
+  warcryEffect: { name: 'effect of your Warcries' },
   flaskEffect: { name: 'effect of Flasks' },
   flaskCharges: { name: 'Flask Charges gained' },
   flaskRecovery: { name: 'Flask Recovery amount' },
@@ -135,6 +136,7 @@ export const STAT_TEXT: Record<string, StatText> = {
     flag: 'Skills cost Life instead of Mana; Maximum Mana is 0; Auras reserve Life',
   },
   evasionToArmour: { flag: 'Evasion Rating is converted to Armour; Dexterity gives no Evasion' },
+  dexNoEvasion: { flag: 'Dexterity gives no Evasion' },
   manaBeforeLife30: { flag: '30% of Damage is taken from Mana before Life' },
   avatarOfFire: { flag: 'Deal no non-Fire Damage: what is not converted to Fire is not dealt' },
   closeQuarters: {

@@ -1373,8 +1373,9 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       for (let i = 0; i < Math.min(WOUND_DANCE_STACKS, sorted.length); i++) b += sorted[i];
     } else {
       for (const d of ail.bleeds) if (d.dps > b) b = d.dps;
-      if (a.moving && !def.noMovingBleed) b *= BLEED_MOVING_MULT;
     }
+    // Moving targets take more from bleeding, stacked (Wound Dance) or not: the keystone's cost is its 50% less, not this.
+    if (a.moving && !def.noMovingBleed) b *= BLEED_MOVING_MULT;
     dotPhys += b;
     if (multi) bleedBy = dotShares(ail.bleeds, stacking ? WOUND_DANCE_STACKS : 1);
     decay(ail.bleeds, dtDot);

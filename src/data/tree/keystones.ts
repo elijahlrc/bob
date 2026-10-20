@@ -109,15 +109,15 @@ export const KEYSTONES: KeystoneDef[] = [
   {
     id: 'strongarm',
     name: 'Strongarm',
-    mods: [mod('strongarm', 'flag', 1)],
-    description: "Strength's melee damage bonus also applies to projectile attacks.",
+    mods: [mod('strongarm', 'flag', 1), mod('dexNoEvasion', 'flag', 1)],
+    description:
+      "Strength's melee damage bonus also applies to projectile attacks. Dexterity gives no evasion bonus.",
   },
   {
     id: 'woundDance',
     name: 'Wound Dance',
-    mods: [mod('woundDance', 'flag', 1)],
-    description:
-      'Bleeds stack up to 8 times. Bleeding no longer deals extra damage to moving targets.',
+    mods: [mod('woundDance', 'flag', 1), mod('damage', 'more', -50, { tags: ['bleed'] })],
+    description: 'Bleeds stack up to 8 times. Bleeding deals 50% less damage.',
   },
   {
     id: 'cruelAgony',
@@ -165,8 +165,8 @@ export const KEYSTONES: KeystoneDef[] = [
   {
     id: 'spellslip',
     name: 'Spellslip',
-    mods: [mod('dodgeSpell', 'base', 30)],
-    description: '30% chance to dodge spell hits.',
+    mods: [mod('dodgeSpell', 'base', 30), mod('es', 'more', -30)],
+    description: '30% chance to dodge spell hits. 30% less energy shield.',
   },
   {
     id: 'volatileServants',
