@@ -11,6 +11,7 @@ change, and our own names only. Dash bullets under plain headings.
 - Strongarm and Spellslip get weaker: Strongarm removes dexterity's evasion bonus, and Spellslip lowers energy shield.
 - Wound Dance's bleeds deal half damage, but moving targets take the usual extra bleed damage again.
 - Mine and trap cards say how long they wait to go off, and those that leave nothing lasting behind no longer take duration supports.
+- The high score list starts over with this version; a checkbox on its screen shows the older versions' scores, whose characters can no longer be fought.
 
 ## 2026-10-19
 
