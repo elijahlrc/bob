@@ -637,6 +637,8 @@ export type BotRunOpts = {
   abandonBelow?: number;
   /** The difficulty settings of the run (default: the new baseline). */
   difficulty?: Difficulty;
+  /** Called once on the new run before the first camp (the seeding of bot rivals gives some a strong kit: scripts/strongkit.ts). */
+  onStart?: (run: RunState) => void;
   /** Called once when the run ends (a death or a win) with the run and the result of its last map. */
   onEnd?: (run: RunState, res: MapResult) => void;
   /** Called every tick of every map (a measurement watches the fights: scripts/boss-gauntlet.ts). */
@@ -653,6 +655,7 @@ export function botRun(
   opts: BotRunOpts = {},
 ): BotRunResult {
   const run = newRun(classId, seed, opts.difficulty);
+  opts.onStart?.(run);
   const maps: BotMapRecord[] = [];
   const tally = new RunTally();
   const killer = killerTracker();

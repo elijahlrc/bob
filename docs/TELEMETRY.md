@@ -205,7 +205,12 @@ rolled-back transaction. For a new project, or after a change to the file:
    other `--seed` values for more; the pool needs rivals at the current save version, and it is replaced by players' own as they
    come. **Seed on the default difficulty only** (never `--legacy`): difficulty is a dev setting that players never see, the
    rival's card never shows it, and a character levelled under the easier dev curve would carry a map it did not earn. The bot
-   dies by map 20 on the default curve, so the deep end of the pool is the players' to fill.
+   dies by map 20 on the default curve, so the deep end of the pool is the players' to fill. For a new save version (2026-10-20,
+   the owner's rule) a bit more than half the bots start with a strong kit, to reach past level 20: rares of item level 84 on
+   the level 1 bases, the best of four rolls per base (`--strong-kit 0.56`, `scripts/strongkit.ts`). A kitted bot is posted
+   only if it died below level 100: it is then a fair fight at the level it died at. Write the characters to a file first
+   (`--rivals-dump <file>`, one file per process), look at them with `npx tsx scripts/postrivals.ts <files>`, then send them
+   with `--post`. Stay under the cap of 60 inserts a day from one address.
 4. The same project and key as the run statistics (`SINK`, `src/run/telemetry.ts`). No new secret anywhere.
 
 ### The deny-list

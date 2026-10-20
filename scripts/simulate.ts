@@ -1,10 +1,13 @@
 /**
  * Headless bot runs (DESIGN.md §15.5).
  *
- *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|stopper|abandoner] [--craft greedy|random|none] [--no-wayside] [--report] [--scaling 1.5] [--base 1] [--variance 0.1] [--legacy] [--biome <id>] [--density <id>] [--log <batch>] [--rivals]
+ *   npm run sim -- --runs 10 --class all [--maps 1-20] [--seed 1] [--measure-xp] [--themes first|best] [--strategy anchor|greedy|random|lowball|resting|stopper|abandoner] [--craft greedy|random|none] [--no-wayside] [--report] [--scaling 1.5] [--base 1] [--variance 0.1] [--legacy] [--biome <id>] [--density <id>] [--log <batch>] [--rivals] [--rivals-dump <file>] [--strong-kit <share>]
  *
  * `--log <batch>` also sends each run that ends to the `sim_runs` table (scripts/simlog.ts, docs/TELEMETRY.md).
  * `--rivals` posts the character each run ends with to the `rivals` table as a bot rival (scripts/rivallog.ts, docs/TELEMETRY.md).
+ * `--rivals-dump <file>` writes those characters to a file instead, for `scripts/postrivals.ts` to send after a look.
+ * `--strong-kit <share>` starts that share of each class's runs with the strong kit (scripts/strongkit.ts); a run with it is
+ * kept as a rival only if it died below level 100.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { median } from '../src/core/math';
@@ -13,6 +16,7 @@ import { botRun, type BotRunResult, type CraftPolicy, type ThemeRule } from '../
 import { depthReport, varietyReport } from '../src/run/report';
 import { SimLog } from './simlog';
 import { RivalLog } from './rivallog';
+import { getsKit, giveStrongKit, keepRival } from './strongkit';
 import { forceBiome, type BiomeId } from '../src/data/biomes';
 import { forceDensity, type DensityId } from '../src/data/density';
 import { clampDifficulty, DEFAULT, difficultyText, type Difficulty } from '../src/data/difficulty';
@@ -42,6 +46,10 @@ type Args = {
   log?: string;
   /** Post each run's character to the rivals table as a bot rival. */
   rivals: boolean;
+  /** Write the rivals to this file instead of posting them. */
+  rivalsDump?: string;
+  /** The share of each class's runs that start with the strong kit (0: none). */
+  strongKit: number;
   dump?: string;
   merge: string[];
 };
@@ -62,6 +70,7 @@ function parseArgs(argv: string[]): Args {
     from: 0,
     noWayside: false,
     rivals: false,
+    strongKit: 0,
     merge: [],
   };
   for (let i = 0; i < argv.length; i++) {
@@ -92,6 +101,8 @@ function parseArgs(argv: string[]): Args {
     else if (k === '--dump') a.dump = v;
     else if (k === '--log') a.log = v;
     else if (k === '--rivals') a.rivals = true;
+    else if (k === '--rivals-dump') a.rivalsDump = v;
+    else if (k === '--strong-kit') a.strongKit = Number(v);
     else if (k === '--merge') a.merge = argv.slice(i + 1);
     else if (k === '--report') a.report = true;
     else if (k === '--craft')
@@ -111,7 +122,7 @@ const simLog =
         `bot:${args.themes}/${args.crafting}${args.abandonBelow === undefined ? '' : '/abandon'}`,
       )
     : null;
-const rivalLog = args.rivals && !args.merge.length ? new RivalLog() : null;
+const rivalLog = (args.rivals || args.rivalsDump) && !args.merge.length ? new RivalLog() : null;
 if (args.merge.length) {
   // Join the raw results of runs made in other processes (--dump), then report on them as one.
   for (const file of args.merge) {
@@ -123,7 +134,9 @@ if (args.merge.length) {
 for (const cls of args.merge.length ? [] : args.classes) {
   for (let r = args.from; r < args.from + args.runs; r++) {
     const start = performance.now();
+    const kit = getsKit(r, args.strongKit);
     const res = botRun(cls, args.seed * 1000 + r, args.maxMap, {
+      onStart: kit ? giveStrongKit : undefined,
       themes: args.themes,
       crafting: args.crafting,
       wayside: !args.noWayside,
@@ -133,7 +146,7 @@ for (const cls of args.merge.length ? [] : args.classes) {
         simLog || rivalLog
           ? (run, res) => {
               simLog?.add(run, res);
-              rivalLog?.add(run, res);
+              if (keepRival(run, kit)) rivalLog?.add(run, res, kit);
             }
           : undefined,
     });
@@ -141,7 +154,7 @@ for (const cls of args.merge.length ? [] : args.classes) {
     const simSeconds = res.maps.reduce((s, m) => s + m.time, 0);
     results.push({ ...res, wallMs, simSeconds });
     process.stderr.write(
-      `${cls} run ${r + 1}/${args.from + args.runs}: ${res.won ? 'WON' : `reached map ${res.reached}`} · level ${res.maps.at(-1)?.level ?? 1} · ${(wallMs / 1000).toFixed(1)} s wall (${(simSeconds / (wallMs / 1000)).toFixed(0)}× real time)\n`,
+      `${cls} run ${r + 1}/${args.from + args.runs}${kit ? ' (strong kit)' : ''}: ${res.won ? 'WON' : `reached map ${res.reached}`} · level ${res.maps.at(-1)?.level ?? 1} · ${(wallMs / 1000).toFixed(1)} s wall (${(simSeconds / (wallMs / 1000)).toFixed(0)}× real time)\n`,
     );
   }
 }
@@ -151,8 +164,10 @@ if (simLog)
   process.stderr.write(`${await simLog.flush()}
 `);
 if (rivalLog)
-  process.stderr.write(`${await rivalLog.flush()}
-`);
+  process.stderr.write(
+    `${args.rivalsDump ? await rivalLog.dump(args.rivalsDump) : await rivalLog.flush()}
+`,
+  );
 const lines: string[] = [];
 lines.push(
   `Bot results — ${args.runs} run(s) per class, maps up to ${args.maxMap}, seed ${args.seed}, difficulty: ${difficultyText(args.difficulty)}`,

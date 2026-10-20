@@ -1145,3 +1145,13 @@ starts empty, so nothing was deleted and no rating reset; a box on the screen, "
 below it, headed "Older versions (outdated)" with a line that those characters can no longer be fought. Seen in the browser against the
 project at desktop and phone width: "No duels yet." above, the 17 older characters below when ticked. The version 20 pool has no bot
 characters yet.
+
+## Bot rivals for save version 20 (2026-10-20)
+
+The version 20 pool had one player character and no bots. At the owner's request a bit more than half the seeded bots start with a strong
+kit so the pool reaches past level 20 (`scripts/strongkit.ts`): rares of item level 84 on the bases a level 1 character can wear, the
+best of four rolls per base by the bot's own equip choice, the start's gems kept. A kitted bot is posted only if it died below level 100,
+since it is then a fair fight at the level it died at. `npm run sim -- --strong-kit <share> --rivals-dump <file>` writes the characters
+to a file and `scripts/postrivals.ts` shows them and, with `--post`, sends them. One sim at seed 20: 9 runs a class, 5 with the kit, all
+54 died below level 100 (kitted levels 19 to 91, median about 40; plain 8 to 77, most near 21 at the map-20 boss). All 54 were posted and
+pass the game's rival check; `rivals_for` now gives 20 rivals near maps 10, 30 and 60 and 5 near map 85.
