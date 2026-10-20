@@ -19,13 +19,13 @@ describe('the tree search', () => {
 
   it('wants every word, in any order, as part of a word', () => {
     const hit = searchMatches('crit spell', texts, notStart);
-    expect(hit.length).toBeGreaterThan(5);
+    expect(hit.length).toBeGreaterThan(3);
     for (const i of hit) {
       expect(texts[i]).toContain('crit');
       expect(texts[i]).toContain('spell');
     }
     // "minion" alone finds the minion clusters; adding a word that is nowhere narrows it to nothing.
-    expect(searchMatches('minion', texts, notStart).length).toBeGreaterThan(20);
+    expect(searchMatches('minion', texts, notStart).length).toBeGreaterThan(12);
     expect(searchMatches('minion qqqq', texts, notStart)).toEqual([]);
   });
 });

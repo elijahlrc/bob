@@ -16,37 +16,6 @@ svg.tree polygon {
   vector-effect: non-scaling-stroke;
 }
 
-/* The map behind the tree. */
-.bd-div {
-  stroke: #ffffff;
-  stroke-opacity: 0.05;
-  stroke-width: 1px;
-}
-.bd-ring {
-  fill: none;
-  stroke: #ffffff;
-  stroke-opacity: 0.035;
-  stroke-width: 1px;
-}
-.bd-rim {
-  fill: none;
-  stroke: #c9a468;
-  stroke-opacity: 0.35;
-  stroke-width: 2px;
-}
-.bd-rim.thin {
-  stroke-opacity: 0.18;
-  stroke-width: 1px;
-}
-.bd-name {
-  fill: #c9a468;
-  fill-opacity: 0.55;
-  font-size: 150px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  pointer-events: none;
-}
-
 /* Paths between nodes. */
 .edge {
   fill: none;

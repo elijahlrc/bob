@@ -27,6 +27,19 @@ describe('migrating a save of the passive tree before the district layout (docs/
       expect(out!.build.allocated).toEqual([]);
     }
   });
+
+  it('hands them back from a save of the generated tree, before the hand-written one (docs/PASSIVE-TREE.md)', () => {
+    for (const v of [18, 19]) {
+      const run = newRun('zealot', 1);
+      run.build.allocated = getTree().nodes[getTree().starts[run.classId]].links.slice(0, 2);
+      run.bonusPoints = 1;
+      run.version = v;
+      const out = migrate(v, run);
+      expect(out!.version).toBe(SAVE_VERSION);
+      expect(out!.build.allocated).toEqual([]);
+      expect(out!.bonusPoints).toBe(1);
+    }
+  });
 });
 
 describe('the Wayside state (docs/WAYSIDE.md)', () => {

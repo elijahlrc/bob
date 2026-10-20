@@ -1,17 +1,16 @@
-import { applyTreeEdits, type TreeEdits } from './edits';
-import edits from './treeEdits.json';
-import { BAKED_TREE } from './treeBaked';
-import type { Tree } from './types';
+import { PASSIVE_TREE } from '../passives/baked';
+import type { Tree, TreeNode } from './types';
 
 export type { Tree, TreeNode, TreeNodeKind } from './types';
 
-let cached: Tree | null = null;
-
 /**
- * The passive tree. It is laid out once, at build time (`npm run tree:bake` writes `treeBaked.ts` from `layout.ts`), not in the browser:
- * the layout takes seconds. The tools that want a fresh layout call `buildLayoutTree` themselves. Hand edits made in the tree editor
- * (`npm run tree:edit`, saved to `treeEdits.json`) are applied on top of the baked tree.
+ * The passive tree: the hand-written one (src/data/passives, docs/PASSIVE-TREE.md), baked at build time by
+ * `npm run passives:bake` with the tree editor's patch applied. The old generated tree (`treeBaked.ts`, `layout.ts`) is no
+ * longer loaded by the game; its pipeline and tests remain until they are cleaned up.
  */
 export function getTree(): Tree {
-  return (cached ??= applyTreeEdits(BAKED_TREE, edits as TreeEdits));
+  return PASSIVE_TREE;
 }
+
+/** Whether a node is part of the tree, not a hole left by a retired id. */
+export const isLive = (n: TreeNode | undefined): n is TreeNode => !!n && !n.retired;

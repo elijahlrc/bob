@@ -1,11 +1,12 @@
 /**
- * The tree editor (`npm run tree:edit`, then http://localhost:5173/tree-editor.html). Move nodes, change their type, add and remove
- * nodes and connections, copy the stats of one node onto another. Save writes `src/data/tree/treeEdits.json` (a patch against the
- * baked tree; see src/data/tree/edits.ts), and the game reads it from there. Dev server only: the page is not part of the build.
+ * The tree editor (`npm run passives:edit`, then http://localhost:5173/tree-editor.html). Move nodes, change their type, add
+ * and remove nodes and connections, copy the stats of one node onto another, change a node's lines. It edits the game's
+ * tree, the hand-written one (src/data/passives): the base is the tree built from the area files, and Save writes the patch
+ * to src/data/passives/edits.json, keyed by the registry numbers of ids.json. The tools apply it at once; the game reads it
+ * after `npm run passives:bake`. Dev server only: the page is not part of the build.
  *
- * With `?tree=next` (`npm run passives:edit`) it edits the hand-written tree instead (src/data/passives): the base is the tree
- * built from the area files, the patch is src/data/passives/edits.json, keyed by the registry numbers of ids.json, and the
- * listing, picture and audit tools apply it. No region backdrop then: the new tree has its own map.
+ * With `?tree=old` (`npm run tree:edit`) it edits the old generated tree instead, which the game no longer loads: the patch
+ * is `src/data/tree/treeEdits.json` against `treeBaked.ts`, with the region backdrop of that layout.
  */
 import { applyEditsStable, diffTree, NO_EDITS, type TreeEdits } from '../data/tree/edits';
 import edits from '../data/tree/treeEdits.json';
@@ -65,14 +66,14 @@ const side = document.getElementById('side') as HTMLElement;
 const ctx = canvas.getContext('2d')!;
 
 // ---- which tree ----------------------------------------------------------------------------------------------------------------
-const NEXT = new URLSearchParams(location.search).get('tree') === 'next';
+const NEXT = new URLSearchParams(location.search).get('tree') !== 'old';
 const BUILT = NEXT ? buildAll({ allowNew: true, edits: false }) : null;
 const BASE: Tree = BUILT ? BUILT.tree : BAKED_TREE;
 /** Every base node's lines in the vocabulary (hand-written tree only): what the line editor starts from and diffs against. */
 const BASE_LINES: LineSpec[][] = BUILT?.lines ?? [];
 const EDITS = (NEXT ? passiveEdits : edits) as unknown as TreeEdits;
 const EDITS_FILE = NEXT ? 'src/data/passives/edits.json' : 'src/data/tree/treeEdits.json';
-const SAVE_URL = NEXT ? '/__tree-edits?tree=next' : '/__tree-edits';
+const SAVE_URL = NEXT ? '/__tree-edits' : '/__tree-edits?tree=old';
 if (NEXT) document.title = 'Bob tree editor (hand-written tree)';
 
 // ---- state -------------------------------------------------------------------------------------------------------------------
@@ -569,7 +570,7 @@ async function save() {
     const res = await fetch(SAVE_URL, { method: 'POST', body: JSON.stringify(patch) });
     if (!res.ok) throw new Error(await res.text());
     dirty = false;
-    status = `Saved ${new Date().toLocaleTimeString()} to ${EDITS_FILE}. ${NEXT ? 'The passives tools (list, pic, audit) apply it.' : 'The game reads it on its next load.'}`;
+    status = `Saved ${new Date().toLocaleTimeString()} to ${EDITS_FILE}. ${NEXT ? 'The passives tools (list, pic, audit) apply it; run npm run passives:bake for the game.' : 'The game no longer loads the old tree.'}`;
   } catch (err) {
     status = `Could not save (is this the dev server?): ${String(err)}. Use Download instead.`;
   }

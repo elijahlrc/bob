@@ -4,8 +4,8 @@ import { resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vitest/config';
 
 /**
- * Dev server only: the tree editor (tree-editor.html) saves its patch through here: the old tree's to
- * src/data/tree/treeEdits.json, the hand-written tree's (tree-editor.html?tree=next) to src/data/passives/edits.json.
+ * Dev server only: the tree editor (tree-editor.html) saves its patch through here: the hand-written tree's to
+ * src/data/passives/edits.json, the old generated tree's (tree-editor.html?tree=old) to src/data/tree/treeEdits.json.
  */
 function treeEditSave(): Plugin {
   return {
@@ -18,7 +18,7 @@ function treeEditSave(): Plugin {
           res.end('POST only');
           return;
         }
-        const next = new URL(req.url ?? '', 'http://x').searchParams.get('tree') === 'next';
+        const next = new URL(req.url ?? '', 'http://x').searchParams.get('tree') !== 'old';
         let body = '';
         req.on('data', (c) => (body += c));
         req.on('end', () => {

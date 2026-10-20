@@ -14,7 +14,7 @@ import {
   UTILITY_FLASK_NAMES,
   WHEN_NAMES,
 } from '../data/strategy';
-import { getTree } from '../data/tree';
+import { getTree, isLive } from '../data/tree';
 import { uniqueFlaskDef } from '../data/uniqueFlasks';
 import { uniqueDef } from '../data/uniques';
 import { EQUIP_SLOTS, type Build } from '../data/types';
@@ -648,7 +648,7 @@ function buildOk(b: unknown, classId: string, level: number): b is Build {
   if (
     !Array.isArray(b.allocated) ||
     b.allocated.length > tree.nodes.length ||
-    !b.allocated.every((id) => isInt(id, 0, tree.nodes.length - 1) && tree.nodes[id])
+    !b.allocated.every((id) => isInt(id, 0, tree.nodes.length - 1) && isLive(tree.nodes[id]))
   )
     return false;
   if (!isObj(b.equipment)) return false;

@@ -197,6 +197,10 @@ Blades), a third dagger-caster cluster on a new ridge road (Ritual Blade), and i
 955 to 1009 nodes. Last, the label pass: area names are placed so none overlaps another, drawn in tree
 units behind the nodes, and fade as the view closes in (the user's idea), in the game's tree screen and the editor.
 
+**2026-10-20, phase F (the hookup):** the game loads the hand-written tree (`src/data/passives/baked.ts` via
+`npm run passives:bake`); save version 20 hands passives back; the editor edits this tree by default (`?tree=old` for
+the old one). Still owed: the supply audit beside the brief and the brief-against-built note.
+
 Judging tools in the session scratchpad (recreate if gone, they are twenty lines each): a crossing check that also
 counts nodes within 100 units and labels over nodes; a line-usage count per region; a walk script that buys the
 cheapest tree from a start to a list of notables and prints every node bought.

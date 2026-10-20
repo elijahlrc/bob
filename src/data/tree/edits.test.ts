@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { checkTree } from '../../treeEditor/check';
 import edits from './treeEdits.json';
 import { applyEditsStable, applyTreeEdits, diffTree, type TreeEdits } from './edits';
-import { getTree } from './index';
 import { BAKED_TREE } from './treeBaked';
 
 describe('hand edits to the tree', () => {
@@ -41,9 +40,9 @@ describe('hand edits to the tree', () => {
     for (const id of Object.values(t.starts)) expect(t.nodes[id].kind).toBe('start');
   });
 
-  it('the saved edits leave a tree every class can walk all of', () => {
+  it('the saved edits leave a tree every class can walk all of (the old generated tree, no longer loaded by the game)', () => {
     expect(edits.version).toBe(1);
-    const t = getTree();
+    const t = applyTreeEdits(BAKED_TREE, edits as TreeEdits);
     const c = checkTree(t.nodes, t.starts);
     expect(c.unreachable).toEqual(Object.fromEntries(Object.keys(t.starts).map((k) => [k, 0])));
     expect(c.loose).toEqual([]);

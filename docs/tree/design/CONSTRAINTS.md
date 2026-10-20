@@ -445,6 +445,8 @@ Each was tried or proposed and struck by the user. The date is when it was struc
   Rapid Fire's link to the flask pocket was cut (the four rim projectile notables are 7 to 11 apart, were 2 to 4);
   Quick Hands, Killing Eye and Hatchet Work were re-partnered; Pitch Arrows (fire bows) was added. Close Quarters' spur
   is still a road, by the user's choice.
+- **In the game.** Since 2026-10-20 the game loads this tree (phase F): change an area file, `lines.ts`, the registry or
+  the editor's patch, then run `npm run passives:bake`. Retired ids stay as holes so saved ids keep their meaning.
 - **Labels.** Done in round 4 (`E-round4.md`, "The label pass"): every area name sits over its own area, no two
   overlap, none covers a notable, keystone or start. Move one when an area grows under another's name.
 - **Weapon placement against attributes (§5 item 4).** Every weapon cluster sits in a region that supplies at least one

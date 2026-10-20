@@ -44,9 +44,12 @@ export function loadRun(store: KeyValueStore, key: string = SAVE_KEY): LoadResul
  */
 export function migrate(version: number, run: RunState): RunState | null {
   if (version === SAVE_VERSION) return run;
-  // Version 18 only lacks the Wayside state (docs/WAYSIDE.md), which every reader fills in with `waysideOf`.
-  if (version === 18) {
+  // Versions 18 and 19 have the generated passive tree, before the hand-written one (docs/PASSIVE-TREE.md, phase F): their
+  // node ids mean other nodes now, so the allocated passives are handed back as unspent points. Version 18 also lacks the
+  // Wayside state (docs/WAYSIDE.md), which every reader fills in with `waysideOf`.
+  if (version === 18 || version === 19) {
     run.version = SAVE_VERSION;
+    run.build = { ...run.build, allocated: [] };
     return run;
   }
   // Versions 10 to 16 have a passive tree of before one of the iterations of docs/TREE-REDESIGN.md (10: roads and districts; 11: before

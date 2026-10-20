@@ -203,7 +203,16 @@ export function buildPassives(
   // Ids retired from the registry leave holes: fill them with nothing the game can reach (kept for save compatibility).
   for (let i = 0; i < count; i++)
     if (!nodes[i]) {
-      nodes[i] = { id: i, kind: 'small', name: '(retired)', mods: [], x: 0, y: 0, links: [] };
+      nodes[i] = {
+        id: i,
+        kind: 'small',
+        name: '(retired)',
+        mods: [],
+        x: 0,
+        y: 0,
+        links: [],
+        retired: true,
+      };
       ids[i] = '(retired)';
       place[i] = { area: '', cluster: '', region: '' };
     }

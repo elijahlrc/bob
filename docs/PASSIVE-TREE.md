@@ -285,6 +285,12 @@ The whole-tree picture, the six region pictures, the audit beside the brief (the
 against the real ones), the bot's smoke test, and the simulated players' triage, with a short note on what the brief said and what was built differently and why. The
 save version is bumped once, and passives are handed back as unspent points. Patch notes are the `/patch-notes` skill's.
 
+**Status, 2026-10-20:** the user asked to hook the tree in. The game loads it (`getTree()` reads the bake of
+`src/data/passives`), save version 20 hands passives back, the tree editor edits it by default, and a smoke test of one
+bot per class to map 15 played without errors (five reached map 15; the Strider's one run died on map 3 at level 2).
+Still owed from this phase: the supply audit beside the brief (supply tables, intended against real costs) and the
+note on what the brief said and what was built differently.
+
 ---
 
 ## 7. Who does what

@@ -1,7 +1,8 @@
 /**
  * Launches the tree editor (docs/TREE-REDESIGN.md, "Hand editing"): first makes sure the baked tree is a fresh layout (a stale
  * bake is rebaked, unless hand edits are saved, because a rebake renumbers nodes and the patch would land on the wrong ones),
- * then starts the dev server on the first free port from 5173 and opens tree-editor.html.
+ * then starts the dev server on the first free port from 5173 and opens tree-editor.html?tree=old (the game loads the hand-written
+ * tree now; `npm run passives:edit` edits that one).
  *
  *   npm run tree:edit
  */
@@ -31,10 +32,10 @@ if (!same) {
 } else console.log('Baked tree is up to date.');
 
 const server = await createServer({
-  server: { port: 5173, strictPort: false, open: '/tree-editor.html' },
+  server: { port: 5173, strictPort: false, open: '/tree-editor.html?tree=old' },
 });
 await server.listen();
 server.printUrls();
 console.log(
-  'Tree editor: add /tree-editor.html to the address above if it did not open. Ctrl+C stops.',
+  'Tree editor (the old generated tree): add /tree-editor.html?tree=old to the address above if it did not open. Ctrl+C stops.',
 );

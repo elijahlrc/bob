@@ -20,6 +20,8 @@ export type TreeNode = {
   region?: RegionId | 'hub';
   /** The centre of the loop this node stands on, so the lines between neighbours on it can be drawn as arcs. */
   orbit?: [number, number];
+  /** A hole left by an id the hand-written tree retired (kept so saved ids keep their meaning): drawn, searched and reached by nothing. */
+  retired?: true;
 };
 
 export type Tree = {

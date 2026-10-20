@@ -204,7 +204,8 @@ describe('wave 3 uniques (EXPANSION 6.4)', () => {
 describe('the tree after X8 (EXPANSION 6.5)', () => {
   const tree = getTree();
   it('a notable that grants charges is a source for the sheet', () => {
-    const node = tree.nodes.find((x) => x.name === 'Feast of Frenzy')!;
+    // The hand-written tree's fervour notable (the Yard's Lists).
+    const node = tree.nodes.find((x) => x.name === 'Hot Blood')!;
     const b = build(['crushingBlow']);
     b.allocated = [node.id];
     const c = new Character(b, { areaLevel: 40 });

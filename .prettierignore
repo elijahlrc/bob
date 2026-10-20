@@ -12,3 +12,7 @@ docs/tree/pob-tree.json
 src/data/tree/treeBaked.ts
 # Written by the tree editor (npm run tree:edit).
 src/data/tree/treeEdits.json
+# The baked hand-written passive tree: one generated line (npm run passives:bake).
+src/data/passives/baked.ts
+# Written by the tree editor (npm run passives:edit).
+src/data/passives/edits.json
