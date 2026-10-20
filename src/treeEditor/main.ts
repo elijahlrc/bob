@@ -2,14 +2,33 @@
  * The tree editor (`npm run tree:edit`, then http://localhost:5173/tree-editor.html). Move nodes, change their type, add and remove
  * nodes and connections, copy the stats of one node onto another. Save writes `src/data/tree/treeEdits.json` (a patch against the
  * baked tree; see src/data/tree/edits.ts), and the game reads it from there. Dev server only: the page is not part of the build.
+ *
+ * With `?tree=next` (`npm run passives:edit`) it edits the hand-written tree instead (src/data/passives): the base is the tree
+ * built from the area files, the patch is src/data/passives/edits.json, keyed by the registry numbers of ids.json, and the
+ * listing, picture and audit tools apply it. No region backdrop then: the new tree has its own map.
  */
 import { applyEditsStable, diffTree, NO_EDITS, type TreeEdits } from '../data/tree/edits';
 import edits from '../data/tree/treeEdits.json';
 import { BAKED_TREE } from '../data/tree/treeBaked';
-import type { TreeNode, TreeNodeKind } from '../data/tree/types';
+import type { Tree, TreeNode, TreeNodeKind } from '../data/tree/types';
+import { buildAll } from '../data/passives';
+import type { LineSpec } from '../data/passives/types';
+import { CHOICES, defaultSpec, makeLine, nameOfLines, VOCAB } from '../data/passives/vocab';
+import passiveEdits from '../data/passives/edits.json';
 import { modsText } from '../mods/text';
 import { edgePath } from '../ui/treeStyle';
-import { BG, edgeStyle, GOLD, paintBackdrop, paintLabel, paintNode, reach } from './paint';
+import {
+  BG,
+  edgeStyle,
+  GOLD,
+  paintAreaLabels,
+  paintBackdrop,
+  paintLabel,
+  paintNode,
+  paintText,
+  reach,
+} from './paint';
+import { KEYSTONES } from '../data/tree/keystones';
 import { checkTree } from './check';
 
 type Tool = 'select' | 'link' | 'add' | 'stamp';
@@ -45,14 +64,59 @@ const canvas = document.getElementById('cv') as HTMLCanvasElement;
 const side = document.getElementById('side') as HTMLElement;
 const ctx = canvas.getContext('2d')!;
 
+// ---- which tree ----------------------------------------------------------------------------------------------------------------
+const NEXT = new URLSearchParams(location.search).get('tree') === 'next';
+const BUILT = NEXT ? buildAll({ allowNew: true, edits: false }) : null;
+const BASE: Tree = BUILT ? BUILT.tree : BAKED_TREE;
+/** Every base node's lines in the vocabulary (hand-written tree only): what the line editor starts from and diffs against. */
+const BASE_LINES: LineSpec[][] = BUILT?.lines ?? [];
+const EDITS = (NEXT ? passiveEdits : edits) as unknown as TreeEdits;
+const EDITS_FILE = NEXT ? 'src/data/passives/edits.json' : 'src/data/tree/treeEdits.json';
+const SAVE_URL = NEXT ? '/__tree-edits?tree=next' : '/__tree-edits';
+if (NEXT) document.title = 'Bob tree editor (hand-written tree)';
+
 // ---- state -------------------------------------------------------------------------------------------------------------------
-let nodes: TreeNode[] = applyEditsStable(BAKED_TREE, edits as TreeEdits);
+let nodes: TreeNode[] = applyEditsStable(BASE, EDITS);
+/** The lines of every node, by id, as edited (hand-written tree only); the patch records those that differ from the base. */
+let nodeLines: Record<number, LineSpec[]> = baseLines();
+function baseLines(): Record<number, LineSpec[]> {
+  const out: Record<number, LineSpec[]> = {};
+  BASE_LINES.forEach((l, i) => l.length && (out[i] = JSON.parse(JSON.stringify(l))));
+  for (const [id, l] of Object.entries(EDITS.lines ?? {}))
+    out[Number(id)] = JSON.parse(JSON.stringify(l));
+  return out;
+}
+/** The lines that differ from the base, for the patch. */
+function linesPatch(): Record<string, LineSpec[]> | undefined {
+  if (!NEXT) return undefined;
+  const out: Record<string, LineSpec[]> = {};
+  for (const n of nodes) {
+    if (n.kind === 'start' || n.kind === 'keystone') continue;
+    const now = nodeLines[n.id] ?? [];
+    const was = BASE_LINES[n.id] ?? [];
+    if (JSON.stringify(now) !== JSON.stringify(was)) out[String(n.id)] = now;
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+/** The whole patch: the node and link diff, plus the changed lines. */
+function currentPatch(): TreeEdits {
+  const patch = diffTree(BASE, nodes);
+  const lines = linesPatch();
+  return lines ? { ...patch, lines } : patch;
+}
+/** Gives a node new lines: its mods follow, and a small or attribute node's name too. */
+function setLines(n: TreeNode, specs: LineSpec[]) {
+  nodeLines[n.id] = specs;
+  const made = specs.map(makeLine).filter((l): l is NonNullable<typeof l> => l !== null);
+  n.mods = made.flatMap((l) => l.mods);
+  if (n.kind === 'small' || n.kind === 'travel') n.name = nameOfLines(made);
+}
 let byId = new Map<number, TreeNode>();
 const reindex = () => (byId = new Map(nodes.map((n) => [n.id, n])));
 reindex();
-let nextId = Math.max(BAKED_TREE.nodes.length, ...nodes.map((n) => n.id + 1));
-const baseBy = new Map(BAKED_TREE.nodes.map((n) => [n.id, n]));
-const startIds = new Set(Object.values(BAKED_TREE.starts));
+let nextId = Math.max(BASE.nodes.length, ...nodes.map((n) => n.id + 1));
+const baseBy = new Map(BASE.nodes.map((n) => [n.id, n]));
+const startIds = new Set(Object.values(BASE.starts));
 
 let tool: Tool = 'select';
 let sel = new Set<number>();
@@ -61,6 +125,27 @@ let stampFrom: number | null = null;
 let addKind: TreeNodeKind = 'small';
 let snap = true;
 let showLabels = true;
+/** The areas' names, zoomed out (the hand-written tree only). */
+let showAreas = true;
+/** Stat lines under every node once the view is close enough for them to fit (paintText). */
+let showText = true;
+/** A node's lines as text, kept per mods array (an edit replaces the array, so the cache follows). */
+const textCache = new WeakMap<object, string[]>();
+function textOf(n: TreeNode): string[] {
+  if (n.kind === 'start') return [];
+  let t = textCache.get(n.mods);
+  if (!t) {
+    t =
+      n.kind === 'keystone'
+        ? (KEYSTONES.find((k) => k.name === n.name)?.description ?? '')
+            .split('. ')
+            .map((s) => s.replace(/\.$/, ''))
+            .filter(Boolean)
+        : modsText(n.mods);
+    textCache.set(n.mods, t);
+  }
+  return t;
+}
 let view = { x: 0, y: 0, k: 0.2 };
 let dirty = false;
 let status = '';
@@ -70,16 +155,21 @@ let hover: number | null = null;
 const undoStack: string[] = [];
 const redoStack: string[] = [];
 
-const snapshot = () => JSON.stringify({ nodes, nextId });
+const snapshot = () => JSON.stringify({ nodes, nextId, nodeLines });
 function remember() {
   undoStack.push(snapshot());
   if (undoStack.length > 40) undoStack.shift();
   redoStack.length = 0;
 }
 function restore(s: string) {
-  const o = JSON.parse(s) as { nodes: TreeNode[]; nextId: number };
+  const o = JSON.parse(s) as {
+    nodes: TreeNode[];
+    nextId: number;
+    nodeLines?: Record<number, LineSpec[]>;
+  };
   nodes = o.nodes;
   nextId = o.nextId;
+  nodeLines = o.nodeLines ?? {};
   reindex();
   sel = new Set([...sel].filter((i) => byId.has(i)));
   anchor = null;
@@ -107,7 +197,8 @@ function redo() {
 /** Which nodes differ from the baked tree (they get a ring). */
 function refreshChanged() {
   changed = new Set();
-  const patch = diffTree(BAKED_TREE, nodes);
+  const patch = currentPatch();
+  for (const id of Object.keys(patch.lines ?? {})) changed.add(Number(id));
   for (const id of Object.keys(patch.nodes ?? {})) changed.add(Number(id));
   for (const a of patch.add ?? []) changed.add(a.id);
   for (const [a, b] of [...(patch.linkAdd ?? []), ...(patch.linkRemove ?? [])]) {
@@ -157,7 +248,7 @@ function nodeAt(wx: number, wy: number): number | null {
 }
 
 // ---- drawing -----------------------------------------------------------------------------------------------------------------
-const maxR = Math.max(...BAKED_TREE.nodes.map((n) => Math.hypot(n.x, n.y)));
+const maxR = Math.max(...BASE.nodes.map((n) => Math.hypot(n.x, n.y)));
 
 function draw() {
   const dpr = window.devicePixelRatio || 1;
@@ -175,7 +266,8 @@ function draw() {
   const top = view.y - h / dpr / 2 / k - 80;
   const bottom = view.y + h / dpr / 2 / k + 80;
   const seen = (n: TreeNode) => n.x >= left && n.x <= right && n.y >= top && n.y <= bottom;
-  paintBackdrop(ctx, maxR, k);
+  if (!NEXT) paintBackdrop(ctx, maxR, k);
+  else if (showAreas) paintAreaLabels(ctx, BUILT?.tree.areas ?? [], k);
   // links (a link is drawn when either end is on screen)
   edgeStyle(ctx, k);
   for (const n of nodes)
@@ -185,7 +277,7 @@ function draw() {
       if (o && (seen(n) || seen(o))) ctx.stroke(new Path2D(edgePath(n, o)));
     }
   // links that differ from the baked tree
-  const patch = diffTree(BAKED_TREE, nodes);
+  const patch = diffTree(BASE, nodes);
   ctx.strokeStyle = GOLD;
   ctx.lineWidth = 2.6 * px;
   for (const [a, b] of patch.linkAdd ?? []) {
@@ -216,6 +308,7 @@ function draw() {
   }
   // names, as in the game; the node under the pointer and the selection always show theirs
   if (showLabels) for (const n of nodes) if (seen(n)) paintLabel(ctx, n, k);
+  if (showText) for (const n of nodes) if (seen(n)) paintText(ctx, n, k, textOf(n));
   for (const id of [hover, ...sel]) {
     const n = id === null ? null : byId.get(id);
     if (n) paintLabel(ctx, n, k, true);
@@ -336,6 +429,8 @@ canvas.addEventListener('pointerdown', (e) => {
         ...(from?.region ? { region: from.region } : {}),
       };
       nodes.push(n);
+      if (from && nodeLines[from.id])
+        nodeLines[n.id] = JSON.parse(JSON.stringify(nodeLines[from.id]));
       reindex();
       if (from) toggleLink(from.id, n.id);
       sel = new Set([n.id]);
@@ -469,37 +564,42 @@ function setTool(t: Tool) {
 
 // ---- saving ------------------------------------------------------------------------------------------------------------------
 async function save() {
-  const patch = diffTree(BAKED_TREE, nodes);
+  const patch = currentPatch();
   try {
-    const res = await fetch('/__tree-edits', { method: 'POST', body: JSON.stringify(patch) });
+    const res = await fetch(SAVE_URL, { method: 'POST', body: JSON.stringify(patch) });
     if (!res.ok) throw new Error(await res.text());
     dirty = false;
-    status = `Saved ${new Date().toLocaleTimeString()} to src/data/tree/treeEdits.json. The game reads it on its next load.`;
+    status = `Saved ${new Date().toLocaleTimeString()} to ${EDITS_FILE}. ${NEXT ? 'The passives tools (list, pic, audit) apply it.' : 'The game reads it on its next load.'}`;
   } catch (err) {
     status = `Could not save (is this the dev server?): ${String(err)}. Use Download instead.`;
   }
   panel();
 }
 function download() {
-  const blob = new Blob([JSON.stringify(diffTree(BAKED_TREE, nodes), null, 2) + '\n'], {
+  const blob = new Blob([JSON.stringify(currentPatch(), null, 2) + '\n'], {
     type: 'application/json',
   });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'treeEdits.json';
+  a.download = NEXT ? 'edits.json' : 'treeEdits.json';
   a.click();
 }
 function revertAll() {
-  if (!confirm('Throw away every hand edit and go back to the baked tree?')) return;
+  if (
+    !confirm(`Throw away every hand edit and go back to the ${NEXT ? 'area files' : 'baked tree'}?`)
+  )
+    return;
   remember();
-  nodes = applyEditsStable(BAKED_TREE, NO_EDITS);
+  nodes = applyEditsStable(BASE, NO_EDITS);
+  nodeLines = {};
+  BASE_LINES.forEach((l, i) => l.length && (nodeLines[i] = JSON.parse(JSON.stringify(l))));
   reindex();
-  nextId = BAKED_TREE.nodes.length;
+  nextId = BASE.nodes.length;
   sel = new Set();
   touched();
 }
 function runCheck() {
-  const c = checkTree(nodes, BAKED_TREE.starts);
+  const c = checkTree(nodes, BASE.starts);
   const lines: string[] = [];
   const bad = Object.entries(c.unreachable).filter(([, n]) => n > 0);
   lines.push(
@@ -565,11 +665,40 @@ function panel() {
     checked: showLabels,
     onchange: () => ((showLabels = lblBox.checked), draw()),
   });
+  const areaBox = el('input', {
+    type: 'checkbox',
+    checked: showAreas,
+    onchange: () => ((showAreas = areaBox.checked), draw()),
+  });
+  const textBox = el('input', {
+    type: 'checkbox',
+    checked: showText,
+    onchange: () => ((showText = textBox.checked), draw()),
+  });
   opts.append(
     'New node type',
     kindSel,
     el('label', {}, snapBox, ' snap to 10'),
     el('label', {}, lblBox, ' names'),
+    ...(NEXT
+      ? [
+          el(
+            'label',
+            { title: 'The areas’ names, shown zoomed out and fading as you zoom in.' },
+            areaBox,
+            ' areas',
+          ),
+        ]
+      : []),
+    el(
+      'label',
+      {
+        title:
+          'Every node’s stat lines, once you are zoomed in far enough for them to fit between nodes.',
+      },
+      textBox,
+      ' stats',
+    ),
   );
   side.append(opts);
 
@@ -612,6 +741,7 @@ function panel() {
       for (const k of KINDS) row.append(btn(k, () => setKind([n.id], k), n.kind === k));
       side.append(row);
     }
+    if (NEXT && n.kind !== 'start' && n.kind !== 'keystone') side.append(lineEditor(n));
     side.append(
       el('div', { className: 'mods', textContent: modsText(n.mods).join('\n') || '(no stats)' }),
     );
@@ -700,6 +830,79 @@ function panel() {
     const again = side.querySelector<HTMLInputElement>(`[data-keep="${keep}"]`);
     again?.focus();
   }
+}
+
+/**
+ * The lines of a node of the hand-written tree, each a vocabulary function and its arguments, with a row to add one.
+ * A change rebuilds the node's mods (and a small node's name) at once.
+ */
+function lineEditor(n: TreeNode): HTMLElement {
+  const box = el('div', { className: 'lines' });
+  box.append(el('h3', { textContent: 'Lines' }));
+  const specs = nodeLines[n.id] ?? [];
+  const commit = (next: LineSpec[]) => {
+    remember();
+    setLines(n, next);
+    touched();
+  };
+  specs.forEach((spec, i) => {
+    const row = el('div', { className: 'row' });
+    const fnSel = el('select');
+    for (const fn of Object.keys(VOCAB))
+      fnSel.append(el('option', { value: fn, textContent: fn, selected: fn === spec.fn }));
+    fnSel.onchange = () => {
+      const next = specs.map((x) => ({ ...x }));
+      next[i] = defaultSpec(fnSel.value);
+      commit(next);
+    };
+    row.append(fnSel);
+    const kinds = VOCAB[spec.fn] ?? ['n'];
+    kinds.forEach((kind, j) => {
+      const set = (v: unknown) => {
+        const next = specs.map((x) => ({ fn: x.fn, args: [...x.args] }));
+        next[i].args[j] = v;
+        commit(next);
+      };
+      if (kind === 'n') {
+        const inp = el('input', { type: 'number', value: String(spec.args[j] ?? 0), step: 'any' });
+        inp.onchange = () => set(Number(inp.value));
+        row.append(inp);
+      } else if (kind === 'tags?') {
+        const inp = el('input', {
+          type: 'text',
+          value: ((spec.args[j] as string[] | undefined) ?? []).join(','),
+          placeholder: 'tags',
+        });
+        inp.title =
+          'Skill tags the line is limited to, comma-separated (bow, melee, spell...); empty for all.';
+        inp.onchange = () =>
+          set(
+            inp.value
+              .split(',')
+              .map((t) => t.trim())
+              .filter(Boolean),
+          );
+        row.append(inp);
+      } else {
+        const sel = el('select');
+        for (const c of CHOICES[kind])
+          sel.append(el('option', { value: c, textContent: c, selected: c === spec.args[j] }));
+        sel.onchange = () => set(sel.value);
+        row.append(sel);
+      }
+    });
+    row.append(btn('×', () => commit(specs.filter((_, k) => k !== i))));
+    box.append(row);
+  });
+  const add = el('div', { className: 'row' });
+  const addSel = el('select');
+  for (const fn of Object.keys(VOCAB)) addSel.append(el('option', { value: fn, textContent: fn }));
+  add.append(
+    addSel,
+    btn('add line', () => commit([...specs, defaultSpec(addSel.value)])),
+  );
+  box.append(add);
+  return box;
 }
 
 function setKind(ids: number[], k: TreeNodeKind) {

@@ -3,6 +3,9 @@ import { classDef } from '../data/classes';
 import { HUB_RADIUS, REGIONS, START_RADIUS } from '../data/tree/spec';
 import type { TreeNode, TreeNodeKind } from '../data/tree/types';
 import {
+  AREA_COLOUR,
+  AREA_LABEL,
+  areaLabelAlpha,
   LABEL_K_KEYSTONE,
   LABEL_K_NOTABLE,
   NODE_RADIUS,
@@ -132,6 +135,26 @@ export function paintBackdrop(ctx: CanvasRenderingContext2D, maxR: number, k: nu
   ctx.textBaseline = 'alphabetic';
 }
 
+/** The hand-written tree's area names, behind everything, in tree units; they fade as the view closes in (as in the game). */
+export function paintAreaLabels(
+  ctx: CanvasRenderingContext2D,
+  areas: readonly { name: string; region: string; x: number; y: number }[],
+  k: number,
+) {
+  const alpha = areaLabelAlpha(k) * 0.5;
+  if (alpha <= 0) return;
+  ctx.globalAlpha = alpha;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `bold ${AREA_LABEL.size}px system-ui, sans-serif`;
+  for (const a of areas) {
+    ctx.fillStyle = AREA_COLOUR[a.region] ?? '#8a90a0';
+    ctx.fillText(a.name, a.x, a.y);
+  }
+  ctx.globalAlpha = 1;
+  ctx.textBaseline = 'alphabetic';
+}
+
 export const edgeStyle = (ctx: CanvasRenderingContext2D, k: number) => {
   ctx.strokeStyle = EDGE;
   ctx.lineWidth = 1.6 / k;
@@ -205,6 +228,37 @@ export function reach(kind: TreeNodeKind, k: number): number {
       ? FRAME_R[kind]
       : NODE_RADIUS[kind];
   return frame * s;
+}
+
+/** The widest a node's text may be, in tree units, before it is left out: about the spacing of neighbouring nodes. */
+export const TEXT_FIT = 130;
+
+/**
+ * A node's stat lines under it, once the view is close enough that they fit: the text is set in screen pixels, so zooming
+ * in shrinks its width in tree units until it is narrower than `TEXT_FIT` and appears. Under the name when the node has one
+ * drawn (notable, keystone, start), else under the node itself.
+ */
+export function paintText(ctx: CanvasRenderingContext2D, n: TreeNode, k: number, lines: string[]) {
+  if (!lines.length) return;
+  const px = 1 / k;
+  const size = 11 * px;
+  ctx.font = `${size}px system-ui, sans-serif`;
+  let w = 0;
+  for (const t of lines) w = Math.max(w, ctx.measureText(t).width);
+  if (w > TEXT_FIT) return;
+  const named = n.kind === 'notable' || n.kind === 'keystone' || n.kind === 'start';
+  const nameSize = (n.kind === 'notable' ? 13 : 15) * px;
+  const y0 = n.y + reach(n.kind, k) + 13 * px + (named ? nameSize + 6 * px : 0) + size * 0.5;
+  ctx.textAlign = 'center';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 3 * px;
+  ctx.strokeStyle = '#05040a';
+  ctx.fillStyle = '#b8c0cc';
+  lines.forEach((t, i) => {
+    const y = y0 + i * size * 1.25;
+    ctx.strokeText(t, n.x, y);
+    ctx.fillText(t, n.x, y);
+  });
 }
 
 /** A name under a notable, keystone or class start, once the view is close enough (as in the game). */

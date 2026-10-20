@@ -27,6 +27,12 @@ export type TreeEdits = {
   /** Links added and taken away, as id pairs. */
   linkAdd?: [number, number][];
   linkRemove?: [number, number][];
+  /**
+   * Hand-written tree only (src/data/passives/edits.ts): the lines of nodes whose lines were changed or that were added,
+   * in the vocabulary of lines.ts (`{ fn: 'bowDamage', args: [10] }`), so the patch can be folded back into an area file.
+   * The `mods` above are rebuilt from these when the patch is applied.
+   */
+  lines?: Record<string, { fn: string; args: unknown[] }[]>;
 };
 
 export const NO_EDITS: TreeEdits = { version: 1 };

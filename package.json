@@ -57,7 +57,12 @@
     "tree:pic": "tsx scripts/tree/pic.ts",
     "tree:explore": "tsx scripts/tree/explore.ts",
     "tree:edit": "tsx scripts/tree/edit.ts",
-    "tree:charter": "tsx scripts/tree/charter.ts"
+    "tree:charter": "tsx scripts/tree/charter.ts",
+    "passives:list": "tsx scripts/passives/list.ts",
+    "passives:pic": "tsx scripts/passives/pic.ts",
+    "passives:audit": "tsx scripts/passives/audit.ts",
+    "passives:register": "tsx scripts/passives/register.ts",
+    "passives:edit": "tsx scripts/passives/edit.ts"
   },
   "dependencies": {
     "@preact/signals": "^2.11.3",

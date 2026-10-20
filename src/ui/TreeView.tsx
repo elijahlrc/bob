@@ -19,6 +19,9 @@ import {
   type View,
 } from './treeHit';
 import {
+  AREA_COLOUR,
+  AREA_LABEL,
+  areaLabelAlpha,
   LABEL_K_KEYSTONE,
   LABEL_K_NOTABLE,
   NODE_RADIUS,
@@ -184,6 +187,7 @@ export function TreeView({ c }: { c: Controller }) {
     s.setProperty('--fs-s', `${(11 / v.k).toFixed(1)}px`);
     s.setProperty('--fs-b', `${(15 / v.k).toFixed(1)}px`);
     s.setProperty('--sw', `${(3.2 / v.k).toFixed(1)}px`);
+    s.setProperty('--al', areaLabelAlpha(v.k).toFixed(3));
     svg.classList.toggle('z-n', v.k >= LABEL_K_NOTABLE);
     svg.classList.toggle('z-k', v.k >= LABEL_K_KEYSTONE);
   };
@@ -331,8 +335,24 @@ export function TreeView({ c }: { c: Controller }) {
           {n.kind === 'start' ? classDef(n.classStart!).name : n.name}
         </text>
       ));
+    // The areas' names, behind everything, in tree units; they fade as the view closes in (--al).
+    const areaNames = (tree.areas ?? []).map((a) => (
+      <text
+        key={a.name}
+        class="al"
+        x={a.x}
+        y={a.y}
+        font-size={AREA_LABEL.size}
+        fill={AREA_COLOUR[a.region] ?? '#8a90a0'}
+        text-anchor="middle"
+        dominant-baseline="middle"
+      >
+        {a.name}
+      </text>
+    ));
     return (
       <g>
+        <g>{areaNames}</g>
         <g>{off}</g>
         <g>{on}</g>
         <g>{nodes}</g>

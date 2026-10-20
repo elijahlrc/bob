@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { mod } from '../mods/types';
-import { edgePath, MIN_SCREEN_R, NODE_RADIUS, shapeScale, toneOf } from './treeStyle';
+import {
+  AREA_K_GONE,
+  areaLabelAlpha,
+  edgePath,
+  LABEL_K_KEYSTONE,
+  LABEL_K_NOTABLE,
+  MIN_SCREEN_R,
+  NODE_RADIUS,
+  shapeScale,
+  toneOf,
+} from './treeStyle';
 
 describe('how the passive tree is drawn', () => {
   it('draws a road across rings as a line, a stretch of ring and a loop as arcs', () => {
@@ -41,5 +51,17 @@ describe('how the passive tree is drawn', () => {
     expect(shapeScale('keystone', 0.1) * NODE_RADIUS.keystone * 0.1).toBeGreaterThan(
       shapeScale('notable', 0.1) * NODE_RADIUS.notable * 0.1,
     );
+  });
+
+  it('shows area names zoomed out and fades them before the notable names appear', () => {
+    expect(areaLabelAlpha(0.05)).toBe(1);
+    expect(areaLabelAlpha(LABEL_K_KEYSTONE)).toBe(1);
+    const mid = areaLabelAlpha((LABEL_K_KEYSTONE + AREA_K_GONE) / 2);
+    expect(mid).toBeGreaterThan(0.3);
+    expect(mid).toBeLessThan(0.7);
+    expect(areaLabelAlpha(AREA_K_GONE)).toBe(0);
+    expect(AREA_K_GONE).toBeLessThan(LABEL_K_NOTABLE);
+    for (let k = 0.1; k < 0.4; k += 0.01)
+      expect(areaLabelAlpha(k + 0.01)).toBeLessThanOrEqual(areaLabelAlpha(k));
   });
 });

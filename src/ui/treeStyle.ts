@@ -195,6 +195,39 @@ export function shapeScale(kind: TreeNodeKind, k: number): number {
 export const LABEL_K_NOTABLE = 0.4;
 export const LABEL_K_KEYSTONE = 0.14;
 
+/**
+ * Area names (the hand-written tree's areas): set in tree units behind the nodes, like place names on a map, so they
+ * shrink with the tree when it is zoomed out. `size` is the font size; `glyph` the width of an average letter as a share
+ * of it, which the placement checks use (scripts/passives).
+ */
+export const AREA_LABEL = { size: 150, glyph: 0.58 } as const;
+/** The width an area name takes, in tree units (an estimate: the checks pad it). */
+export const areaLabelWidth = (name: string) => name.length * AREA_LABEL.size * AREA_LABEL.glyph;
+/** The colour of an area's name, by the hand-written tree's region. */
+export const AREA_COLOUR: Record<string, string> = {
+  mystic: '#6a8cf0',
+  shade: '#c45ad6',
+  strider: '#6cc070',
+  reaver: '#d8c07a',
+  vanguard: '#d8654a',
+  zealot: '#e6b060',
+  centre: '#8a90a0',
+};
+/** The zoom up to which area names show in full, and the zoom by which they have faded out (before notable names show). */
+export const AREA_K_FULL = LABEL_K_KEYSTONE;
+export const AREA_K_GONE = 0.32;
+
+/**
+ * How strongly area names show at zoom `k`: in full when zoomed out, fading as the view closes in, gone before the
+ * notables' names appear, so the names of places hand over to the names of nodes.
+ */
+export function areaLabelAlpha(k: number): number {
+  if (k <= AREA_K_FULL) return 1;
+  if (k >= AREA_K_GONE) return 0;
+  const t = (k - AREA_K_FULL) / (AREA_K_GONE - AREA_K_FULL);
+  return 1 - t * t * (3 - 2 * t);
+}
+
 /** The corner points of a regular octagon (a keystone's frame), as an SVG `points` value. */
 export function octagon(r: number, turn = 0): string {
   const pts: string[] = [];

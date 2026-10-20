@@ -3,7 +3,10 @@ import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vitest/config';
 
-/** Dev server only: the tree editor (tree-editor.html) saves its patch through here. */
+/**
+ * Dev server only: the tree editor (tree-editor.html) saves its patch through here: the old tree's to
+ * src/data/tree/treeEdits.json, the hand-written tree's (tree-editor.html?tree=next) to src/data/passives/edits.json.
+ */
 function treeEditSave(): Plugin {
   return {
     name: 'tree-edit-save',
@@ -15,6 +18,7 @@ function treeEditSave(): Plugin {
           res.end('POST only');
           return;
         }
+        const next = new URL(req.url ?? '', 'http://x').searchParams.get('tree') === 'next';
         let body = '';
         req.on('data', (c) => (body += c));
         req.on('end', () => {
@@ -22,7 +26,10 @@ function treeEditSave(): Plugin {
             const patch = JSON.parse(body) as { version?: number };
             if (patch.version !== 1) throw new Error('not a tree edit file');
             writeFileSync(
-              resolve(import.meta.dirname, 'src/data/tree/treeEdits.json'),
+              resolve(
+                import.meta.dirname,
+                next ? 'src/data/passives/edits.json' : 'src/data/tree/treeEdits.json',
+              ),
               JSON.stringify(patch, null, 2) + '\n',
             );
             res.end('ok');

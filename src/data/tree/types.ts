@@ -26,6 +26,8 @@ export type Tree = {
   nodes: TreeNode[];
   /** Class id → start node id. */
   starts: Record<string, number>;
+  /** The names of the tree's areas and where they are drawn (the hand-written tree; the old tree has none). */
+  areas?: { name: string; region: string; x: number; y: number }[];
 };
 
 /** A generated cluster (src/data/tree/clustersGen.ts): a notable and the small nodes beside it. */

@@ -1,0 +1,273 @@
+/**
+ * The Docks (the Knife's south barb, hooking toward the rim): the trap junction off the venom junction, the wheel
+ * (traps on the north side, minions on the south since round 3, life at the ends), the Quiet Shot chain (the Shade's bow)
+ * from the wheel's far side back up to the point, so the barb is a loop with the blade; and the Bow's dear road, three
+ * attribute nodes from the Bow's poison stub up to the trap junction.
+ */
+import {
+  aoe,
+  bowDamage,
+  critMulti,
+  damageVsLowLife,
+  dex,
+  dodgeAttack,
+  dodgeSpell,
+  evasion,
+  int,
+  life,
+  minionDamage,
+  minionSpeed,
+  moveSpeed,
+  projectileSpeed,
+  reducedReservation,
+  stunAvoid,
+  trapDamage,
+} from '../lines';
+import type { AreaSpec } from '../types';
+import { P } from './frame';
+
+export const snares: AreaSpec = {
+  id: 'knife.snares',
+  region: 'shade',
+  name: 'The Docks',
+  why: "The Knife's south barb: traps or minions on one wheel, the Shade's bow, and the Bow's dear road.",
+  at: [2817, -478], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  clusters: [
+    {
+      id: 'jT',
+      name: 'Trap junction',
+      why: "Where the barb leaves the blade: the wheel south-east, the Bow's dear road south, the star's lightning spoke arriving from the west.",
+      at: P(1520, 330),
+      shape: { kind: 'hand' },
+      nodes: [{ id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: P(1520, 330) }],
+      links: [],
+    },
+    {
+      id: 'wheel',
+      name: 'Trapper',
+      why: 'The wheel of eight on the south barb: entered from the trap junction on the west, left toward Quiet Shot on the east. Traps on the north side; minions on the south (Black Flock, round 3: the claw with chaos was here, which put both claw notables, both poison notables and Cruel Agony within six steps of one junction; it went out to the Rooftops). Two kinds of thing a Shade puts down and lets fight. Life at the ends, which both sides use.',
+      at: P(1760, 620),
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: 't1', kind: 'small', lines: [life(5)], at: P(1552, 620), why: 'The west entrance.' },
+        {
+          id: 't2',
+          kind: 'small',
+          lines: [trapDamage(12)],
+          at: P(1656, 438),
+          why: 'The trap side.',
+        },
+        {
+          id: 't3',
+          kind: 'notable',
+          name: 'Trapper',
+          lines: [trapDamage(24), aoe(16, ['trap'])],
+          at: P(1864, 438),
+          why: "Trap damage and trap area: 2 + 2 units. Tripwire, in the Strider, sells traps with throwing speed and cooldown; Snare Line, on the Spire's rim, with duration (round 4).",
+        },
+        {
+          id: 't4',
+          kind: 'small',
+          lines: [life(5)],
+          at: P(1968, 620),
+          why: 'The east exit, to the bow chain.',
+        },
+        {
+          id: 't5',
+          kind: 'notable',
+          name: 'Black Flock',
+          lines: [minionDamage(20), minionSpeed(6), moveSpeed(4)],
+          at: P(1864, 802),
+          why: "Fast minions and a summoner who keeps up: 1.7 + 1.2 + 1 units. The Shade's summoner finds it twelve steps out; Shepherd and Ossuary are in the Cathedral, Familiars on the Spire's Cathedral side, Grave Host in the Barrows.",
+        },
+        {
+          id: 't6',
+          kind: 'small',
+          lines: [minionDamage(12)],
+          at: P(1656, 802),
+          why: 'The minion side.',
+        },
+        { id: 't7', kind: 'small', lines: [trapDamage(12)], at: P(1956, 506) },
+        { id: 't8', kind: 'small', lines: [minionDamage(12)], at: P(1956, 734) },
+      ],
+      links: [
+        ['t1', 't2'],
+        ['t2', 't3'],
+        ['t3', 't7'],
+        ['t7', 't4'],
+        ['t4', 't8'],
+        ['t8', 't5'],
+        ['t5', 't6'],
+        ['t6', 't1'],
+      ],
+    },
+    {
+      id: 'quietShot',
+      name: 'Quiet Shot',
+      why: "Bow damage, then the notable with bow damage, crit multiplier and projectile speed: the Shade's bow, as a chain from the trap wheel's far side up to the point, so the barb is a loop with the blade and a bow reaches Cruel Agony without walking back. The Strider's bow wheel sells crit chance and speed, the Yard's physical damage. (It was Powder Keg, a second mine cluster three steps from the first, until 2026-10-20.)",
+      at: P(2080, 350),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [bowDamage(10)],
+          at: P(2040, 440),
+          why: 'The entrance, from the wheel.',
+        },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Quiet Shot',
+          lines: [bowDamage(16), critMulti(20), projectileSpeed(10)],
+          at: P(2120, 250),
+          why: '1.6 + 1.7 + 1 units. The exit, to the point.',
+        },
+      ],
+      links: [['a', 'n']],
+    },
+    {
+      id: 'toBow',
+      name: 'To the Bow',
+      why: "The dear crossing to the Bow's poison and chaos (brief §4): three attribute nodes from the Bow's stub up to the trap junction, deliberately long, so that a poison bow pays for the Knife in the attributes a dagger or a bow asks for anyway. The star's chaos spoke lands on the third.",
+      at: P(1330, 940),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'attribute',
+          lines: [dex(6), int(6)],
+          at: P(1180, 1200),
+          why: "Where the Bow's stub lands.",
+        },
+        { id: 'b', kind: 'attribute', lines: [dex(6), int(6)], at: P(1360, 950) },
+        {
+          id: 'c',
+          kind: 'attribute',
+          lines: [dex(6), int(6)],
+          at: P(1450, 660),
+          why: "Where the star's chaos spoke lands.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'c'],
+      ],
+    },
+    {
+      id: 'toRicochet',
+      name: 'To Ricochet',
+      why: "Four attribute nodes from the minion side of the Docks wheel to Ricochet: a dear road between the Knife's south barb and the Strider's rim. Veiled Herald leaves from the third node.",
+      at: [2759, -478],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: 'r1', kind: 'attribute', lines: [dex(6), int(6)], at: [2759, -478] },
+        { id: 'r2', kind: 'attribute', lines: [dex(6), int(6)], at: [2817, -274] },
+        { id: 'r3', kind: 'attribute', lines: [dex(7)], at: [2874, -69] },
+        { id: 'r4', kind: 'attribute', lines: [dex(7)], at: [2932, 135] },
+      ],
+      links: [
+        ['r1', 'r2'],
+        ['r2', 'r3'],
+        ['r3', 'r4'],
+      ],
+    },
+    {
+      id: 'herald',
+      name: 'Veiled Herald',
+      why: 'A pocket off the road to Ricochet: evasion twice, then room for a herald with evasion. The Strider had no reservation.',
+      at: [3211, -164],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: 'a', kind: 'small', lines: [evasion(12)], at: [3047, -118] },
+        { id: 'b', kind: 'small', lines: [evasion(12)], at: [3211, -164] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Veiled Herald',
+          lines: [reducedReservation(5), evasion(16)],
+          at: [3374, -211],
+          why: '1.7 + 1.3 units.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+      ],
+    },
+    {
+      id: 'tumble',
+      name: 'Tumble',
+      why: 'A pocket off the road to Ricochet: attack dodge twice, then dodge with stun avoidance, for the Shade who is never there and never knocked down. Mist Walk, in the Spire, sells dodge with movement (round 4: Tumble had the same lines).',
+      at: [3099, -478],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: 'a', kind: 'small', lines: [dodgeAttack(3)], at: [2929, -478] },
+        { id: 'b', kind: 'small', lines: [dodgeAttack(3)], at: [3099, -478] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Tumble',
+          lines: [dodgeAttack(5), dodgeSpell(3), stunAvoid(20)],
+          at: [3269, -478],
+          why: '1.7 + 1 + 1 units.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+      ],
+    },
+    {
+      id: 'mercy',
+      name: 'Mercy Stroke',
+      why: 'A pocket off the road to the Bow: crit multiplier twice, then the finishing blow, for the crit Shade of any weapon.',
+      at: [2649, -43],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: 'a', kind: 'small', lines: [critMulti(12)], at: [2584, -200] },
+        { id: 'b', kind: 'small', lines: [critMulti(12)], at: [2649, -43] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Mercy Stroke',
+          lines: [critMulti(25), damageVsLowLife(10)],
+          at: [2714, 114],
+          why: '2.1 + 1.25 units.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+      ],
+    },
+  ],
+  links: [
+    { from: 'toBow.b', to: 'mercy.a', why: 'The road onto Mercy Stroke.' },
+    { from: 'toRicochet.r1', to: 'tumble.a', why: 'The road onto Tumble.' },
+    {
+      from: 'knife.snares.wheel.t6',
+      to: 'knife.snares.toRicochet.r1',
+      why: "Four attribute nodes from the minion side of the Docks wheel to Ricochet: a dear road between the Knife's south barb and the Strider's rim.",
+    },
+    {
+      from: 'knife.snares.toRicochet.r4',
+      to: 'bow.flight.ricochet.n',
+      why: 'The far end of the road.',
+    },
+    {
+      from: 'knife.snares.toRicochet.r3',
+      to: 'knife.snares.herald.a',
+      why: 'The road onto Veiled Herald.',
+    },
+    { from: 'jT.a', to: 'wheel.t1', why: 'The trap junction to the wheel.' },
+    { from: 'wheel.t4', to: 'quietShot.a', why: "The wheel's far side onto the bow chain." },
+    { from: 'quietShot.n', to: 'knife.venom.j5.a', why: 'The bow chain lands on the point.' },
+    {
+      from: 'bow.flight.toKnife.a',
+      to: 'toBow.a',
+      why: "The Bow's dear stub lands on the dear road.",
+    },
+    { from: 'toBow.c', to: 'jT.a', why: 'The dear road reaches the trap junction.' },
+  ],
+};
