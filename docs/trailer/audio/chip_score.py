@@ -356,6 +356,19 @@ for at in (23.9, 24.2):
 place('sfx', 29.5, noise(0.5, 9000) * np.exp(-np.arange(int(0.5 * SR)) / SR / 0.15), 0.15)
 
 # ================= the mix =================
+
+
+def degrade(x, rate, bits, drive):
+    """Crunch: hold each sample to a lower rate (aliasing grit), drive it into clipping, then cut the bit depth."""
+    hold = max(1, int(SR / rate))
+    y = np.repeat(x[::hold], hold)[: len(x)]
+    y = np.tanh(y * drive) / np.tanh(drive) * np.max(np.abs(x) + 1e-9)
+    q = 2 ** (bits - 1) / max(1e-9, np.max(np.abs(y)))
+    return np.round(y * q) / q
+
+
+bus['bass'] = degrade(bus['bass'], 9000, 4, 3.0) * 0.7  # a gritty, clipped bass, trimmed back to its old level
+bus['lead'] = degrade(bus['lead'], 11025, 4, 2.5)  # the phrase rougher, the same level
 for a_, b_ in mute_spans:  # held silences
     for k_ in bus:
         bus[k_][int(a_ * SR) : int(b_ * SR)] = 0
