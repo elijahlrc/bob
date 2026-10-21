@@ -305,7 +305,7 @@ export async function reportDuel(
       b_id: Number(rv.rivalId),
       winner: result.winner,
       how: result.how,
-      // The table takes up to 600 s (docs/rivals.sql 9); the cap is 180.
+      // The table takes up to 600 s (docs/rivals.sql 9); the cap is 250.
       seconds: Math.min(600, Math.max(0, Math.round(result.time * 100) / 100)),
       game_version: d.version,
       token_hash: tokenHash,

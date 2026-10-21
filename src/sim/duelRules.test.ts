@@ -192,7 +192,7 @@ describe('how a duel ends', () => {
   });
 
   it('the cap with as many reprieves used on each side is a draw by time', () => {
-    expect(DUEL_MAX_TIME).toBe(180);
+    expect(DUEL_MAX_TIME).toBe(250);
     const { result } = playDuel(vanguard(1), vanguard(2), 1, { maxTime: 2 });
     expect(result.how).toBe('time');
     expect(result.winner).toBeNull();

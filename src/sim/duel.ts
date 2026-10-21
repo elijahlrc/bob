@@ -29,8 +29,11 @@ import { createWorld, stepWorld } from './world';
 export const DUEL_ARENA_SIZE = BOSS_ARENA_RADIUS * 2 + 3;
 /** How far apart the characters start, in tiles: outside the stock AI's engage range (9), so it is the duel option that makes them fight. */
 export const DUEL_GAP = 10;
-/** Seconds after which a fight ends on time: the side that used fewer reprieves wins it, an equal number is a draw. */
-export const DUEL_MAX_TIME = 180;
+/**
+ * Seconds after which a fight ends on time: the side that used fewer reprieves wins it, an equal number is a draw. 250 s (the owner,
+ * 2026-10-20) after 19% of the measured fights reached a cap of 180 s (docs/DUEL-BALANCE.md 8.1).
+ */
+export const DUEL_MAX_TIME = 250;
 /** The reprieve each side carries into a duel, `DUEL_REPRIEVES` of them (docs/DUEL-BALANCE.md 2). Its curse never reaches a duel. */
 export const DUEL_REPRIEVE = 'bargainCoin';
 /** Seconds without either character taking damage after which a fight is a draw. */

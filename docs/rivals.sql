@@ -294,7 +294,7 @@ create table if not exists public.duels (
 
 -- The rules of a fight's end and length (docs/DUEL-BALANCE.md 5, 2026-10-20), as constraints of their own so that a table made
 -- before can be brought up to them: a death names a winner unless both fell in one tick, the time cap names the side that used
--- fewer reprieves (a draw when both used as many), and a stall is a draw. A fight lasts at most the cap (180 s), with room.
+-- fewer reprieves (a draw when both used as many), and a stall is a draw. A fight lasts at most the cap (250 s), with room.
 alter table public.duels drop constraint if exists duels_seconds_check;
 alter table public.duels drop constraint if exists duels_seconds;
 alter table public.duels add constraint duels_seconds check (seconds >= 0 and seconds <= 600);

@@ -212,7 +212,7 @@ own, 25 tiles across with its rim, the characters at 7.5 and 17.5 of 25 on the m
 | -------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | A character dies with no reprieve left (each side has three Bargain Coins) | The other side wins                                                     |
 | Both die in the same tick                                                  | A draw                                                                  |
-| **Time cap** 180 s (90 s before 2026-10-20)                                | The side that used fewer reprieves wins; as many on each side is a draw |
+| **Time cap** 250 s (90 s before 2026-10-20)                                | The side that used fewer reprieves wins; as many on each side is a draw |
 | **Stall**: neither character has taken damage for 15 s                     | A draw                                                                  |
 
 `DuelResult`: `{ winner: 0 | 1 | null, how: 'death' | 'time' | 'stall', time, sides: [{ recap, ledger, lifeLeft, reprieves, reprievesHeld }] }`. The
@@ -245,7 +245,7 @@ ledger of each side (damage dealt and taken by source, `src/sim/ledger.ts`) is t
   other side's level: 1 at level 1 to 10 at level 100 on a straight line, so the lower-level character has the larger factor. It
   sits on top of the ×0.3 scale; minions are not multiplied. Measured with three Bargain Coins a side and the 180 s cap on the 54
   bot rivals of save version 20 (DUEL-BALANCE.md 8.1): median 57 s (F4's rules: 7.4 s), 34 to 46 s up to level 30 and 91 to 106 s
-  at levels 30 to 59, with 19% of the fights on the cap (a third at levels 30 to 59), so the cap and the scale are still open.
+  at levels 30 to 59, with 19% of the fights on the cap (a third at levels 30 to 59); the owner raised the cap to 250 s.
 
 ---
 
@@ -1099,7 +1099,7 @@ Ten to seventeen working days (section 7). Risks, each with its fence:
 | --- | ------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
 | 1   | Where the side comes from | The three patterns of 3.2: a parameter, the actor, `hunted`                                                  | A side on the world's "current context" (a hidden singleton again)                          |
 | 2   | Tests                     | A codemod to `w.sides[0].<field>`; no compatibility getters on `World`                                       | Getters that keep `w.player` working (and keep the singleton alive)                         |
-| 3   | What ends a duel          | A death; the 180 s cap goes to fewer reprieves used, else a draw; a 15 s stall is a draw (DUEL-BALANCE.md)   | Decide a cap by life left (rejected: it punishes low-life builds); let the stall skip       |
+| 3   | What ends a duel          | A death; the 250 s cap goes to fewer reprieves used, else a draw; a 15 s stall is a draw (DUEL-BALANCE.md)   | Decide a cap by life left (rejected: it punishes low-life builds); let the stall skip       |
 | 4   | Reprieves and provisions  | Three Bargain Coins a side, no provisions (DUEL-BALANCE.md 2)                                                | Bring the reprieves the run still held; none (F4)                                           |
 | 5   | Resist penalty and level  | None; each character at its own level                                                                        | Each at its own map tier's penalty                                                          |
 | 6   | Damage scale              | ×0.3 (F4 measured: median fights of 16 s and 25 s, 3% and 6% on the cap)                                     | ×1 always (the first hit decides); a scale that falls with the level                        |

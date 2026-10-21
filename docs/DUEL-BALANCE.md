@@ -1,7 +1,8 @@
 # Bob — Duel balance: reprieves, a life curve and the end of a fight
 
-Status: **B0 to B4 built and measured (2026-10-20, section 8.1); the cap's target is missed and the tuning is the owner's. The
-`duels` table's new rules (docs/rivals.sql 9) are applied to the live database (2026-10-20)** · Owner: the user · Author: Claude
+Status: **B0 to B4 built and measured (2026-10-20, section 8.1); the cap's target was missed at 180 s, and the owner raised
+the cap to 250 s. The `duels` table's new rules (docs/rivals.sql 9) are applied to the live database (2026-10-20)** · Owner:
+the user · Author: Claude
 
 The duels of [DUEL.md](DUEL.md) (rivals after a run, "Duel for your damned soul's fate") are decided by damage. A character in
 a duel has the life it has on a map, but its opponent hits like a character and not like a monster, so a fight is a race of a
@@ -281,21 +282,22 @@ What it says:
 
 The levers, for the owner: a longer cap (180 s is three minutes at 1×), a larger damage scale under the curve (×0.3 was chosen
 for a fight with one life and no curve; the "flat" column is the curve's whole effect on length), or a gentler curve. Until then
-the defaults stand as built: 180 s, ×0.3, the straight line to 10×.
+the defaults stand as built: 180 s, ×0.3, the straight line to 10×. **The owner raised the cap to 250 s** (2026-10-20), not
+measured again; the scale and the curve stay.
 
 ### 8.2 Decisions
 
-| #   | Decision                   | Settled (the owner, 2026-10-20, unless marked default)                                      |
-| --- | -------------------------- | ------------------------------------------------------------------------------------------- |
-| 1   | The duel reprieve          | **Bargain Coin**, three a side; its curse does not reach a duel                             |
-| 2   | The curve's shape          | A straight line, 1× at level 1 to 10× at level 100 (default)                                |
-| 3   | How more life is built     | **The pool:** maximum life and ES multiplied, flat recovery not                             |
-| 4   | Minions                    | **Not multiplied:** minion life is the build's, through the tree                            |
-| 5   | The ×0.3 damage scale      | Kept, under the curve, until B4 measures (default)                                          |
-| 6   | The time cap               | **Fewer reprieves used wins; otherwise a draw.** Life left is not counted. 180 s, set by B4 |
-| 7   | Rated fights               | **The first fight of a pair, as now**                                                       |
-| 8   | Version 20's 4 rated duels | **Left as they are**                                                                        |
-| 9   | Speed                      | **Every duel starts at 1×**; leaving puts back the run's speed                              |
+| #   | Decision                   | Settled (the owner, 2026-10-20, unless marked default)                                                 |
+| --- | -------------------------- | ------------------------------------------------------------------------------------------------------ |
+| 1   | The duel reprieve          | **Bargain Coin**, three a side; its curse does not reach a duel                                        |
+| 2   | The curve's shape          | A straight line, 1× at level 1 to 10× at level 100 (default)                                           |
+| 3   | How more life is built     | **The pool:** maximum life and ES multiplied, flat recovery not                                        |
+| 4   | Minions                    | **Not multiplied:** minion life is the build's, through the tree                                       |
+| 5   | The ×0.3 damage scale      | Kept, under the curve, until B4 measures (default)                                                     |
+| 6   | The time cap               | **Fewer reprieves used wins; otherwise a draw.** Life left is not counted. 250 s (the owner, after B4) |
+| 7   | Rated fights               | **The first fight of a pair, as now**                                                                  |
+| 8   | Version 20's 4 rated duels | **Left as they are**                                                                                   |
+| 9   | Speed                      | **Every duel starts at 1×**; leaving puts back the run's speed                                         |
 
 ### 8.3 Edits to DESIGN.md and DUEL.md when built
 
