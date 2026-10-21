@@ -158,11 +158,11 @@ The tree today: 2,618 nodes (6 starts, 694 travel, 1,446 small, 445 notable, 27 
 
 **What a point gives** (`src/data/constants.ts:33-38`; applied in `src/calc/character.ts:729-750`; DESIGN.md 6.2):
 
-| Attribute    | Per point                                        | Per +10 node | Notes                                                                                                                                                    |
-| ------------ | ------------------------------------------------ | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Strength     | +0.5 life; +0.2% increased melee physical damage | +5 life, +2% | The melee bonus also reaches projectile attacks under the `strongarm` flag (character.ts:740-747) and spells with Iron Will-style supports (:1452-1462). |
-| Dexterity    | +2 accuracy; +0.2% increased evasion             | +20, +2%     | No evasion bonus under `evasionToArmour` (Plated Hide; character.ts:748-749).                                                                            |
-| Intelligence | +0.5 mana; +0.2% increased energy shield         | +5 mana, +2% |                                                                                                                                                          |
+| Attribute    | Per point                                        | Per +10 node | Notes                                                                                                                                                        |
+| ------------ | ------------------------------------------------ | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Strength     | +0.5 life; +0.2% increased melee physical damage | +5 life, +2% | The melee bonus also reaches projectile attacks under the `strongarm` flag (character.ts:740-747) and spells with Steel Resolve-style supports (:1452-1462). |
+| Dexterity    | +2 accuracy; +0.2% increased evasion             | +20, +2%     | No evasion bonus under `evasionToArmour` (Plated Hide; character.ts:748-749).                                                                                |
+| Intelligence | +0.5 mana; +0.2% increased energy shield         | +5 mana, +2% |                                                                                                                                                              |
 
 Attributes do not grow with level: `attrs` is the sum of base `str`/`dex`/`int` mods plus `allAttr`, times any multiplier
 (character.ts:698-701), so the class start, the tree and gear are the only sources.
@@ -175,7 +175,7 @@ main attribute is 32, the others 14; a hybrid has 23/23/14.
 
 - Gear: `canEquip` refuses an item whose base requirement (a unique's own if higher; `reqReduction` cuts it) exceeds the
   character's attributes without the item being replaced (`src/run/inventory.ts:64-75`; `src/calc/items.ts:105-112`).
-  Requirements are the 3.9 reference numbers times `REQUIREMENT_SCALE = 1` (`src/data/bases.ts:15`, 57-61), from
+  Requirements are the reference numbers times `REQUIREMENT_SCALE = 1` (`src/data/bases.ts:15`, 57-61), from
   `src/data/baseTables.ts` (str/dex/int at the nearest base at or below each level; the top base of the family last):
 
 | Family          | L1      | ~L20    | ~L40     | ~L60      | ~L70          |

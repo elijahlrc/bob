@@ -138,7 +138,7 @@ Any skill is skipped when:
 - the skill puts down totems, traps or mines and **all of them are out**,
 - the skill **needs a corpse** and none is near the target (within 6 tiles of it and in the character's reach).
 
-A main skill that is a **renewable debuff** (like Contagion) also waits while it is on the target with more than
+A main skill that is a **renewable debuff** (like Creeping Plague) also waits while it is on the target with more than
 0.8 s left, so the next main skill or the weapon is used meanwhile.
 
 ### 4.2 Periodic skills
@@ -186,7 +186,7 @@ damage does not move the figure. It counts one target, with free mana (docs/SHEE
     up to 0.6 s, then fights on. It waits 1.5 s before stepping back again. It only steps to a spot outside every
     warning, not through a monster, from which its target is still in reach and in sight, and only if the step gains
     at least 1.5 tiles. Skills with less than 5 tiles of reach don't kite.
-- **Burning aura or circling blades** (Righteous Fire and Orbiting Blades analogs): the character walks in to
+- **Burning aura or circling blades** (Searing Mantle and Orbiting Blades): the character walks in to
   about **2.2 tiles**, whatever its attack's range, so the aura reaches.
 - **Arrows hitting walls:** if its shots hit walls **5 times within 3 seconds** (a wide fan in a narrow corridor),
   it closes to within **3.5 tiles** of the target for 3 seconds to get a clearer shot. Shots from totems, traps and
@@ -223,25 +223,25 @@ Utility skills deal no damage of their own. The character casts **at most one pe
 has a target. By default they come **before** its damage skills in the order (section 4.1), in the order they sit in
 your build. With the role **Auto**, the default, each follows these rules:
 
-| Kind                                             | When the character casts it                                                                                                                                                                                                                  |
-| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Buff** (general)                               | Any enemy within 7 tiles, and the buff is off or about to run out.                                                                                                                                                                           |
-| **Guard** (e.g. a Steelskin analog)              | Life **below 60%** and no guard up. All guards share one timer, and a guard's cooldown starts only after it ends.                                                                                                                            |
-| **Rally-type buff**                              | 3+ enemies within 7 tiles, **or** the target is rare, a champion or a boss.                                                                                                                                                                  |
-| **Berserk-type buff**                            | Only when you have enough rage to start it.                                                                                                                                                                                                  |
-| **Self-damaging buff** (a Blood Rage analog)     | Not started below 60% life.                                                                                                                                                                                                                  |
-| **Run buff** (Phase Run, Withering Step analogs) | Life below 70% with an enemy within 5 tiles, **or** 3+ enemies within 4 tiles. **It makes no attacks while the run lasts**, since attacking would end it.                                                                                    |
-| **Warcry**                                       | 3+ enemies near (in the cry's radius + 2), **or** a rare, champion or boss target in that radius. All warcries share a 4 s timer.                                                                                                            |
-| **Standing channel** (Wither analog)             | Any enemy in its radius.                                                                                                                                                                                                                     |
-| **Curse**                                        | Target within 9 tiles and in sight. Not recast while the curse has more than about 0.5 s left. Not cast if the target already has as many curses as your limit allows. Skipped on a lone, normal enemy below half life (not worth the cast). |
-| **Offering**                                     | When it can work (you have minions for it), a corpse is within 11 tiles, and the last offering has less than 1.5 s left.                                                                                                                     |
-| **Minions**                                      | In the first fight, and again whenever you have fewer than your maximum. Spectres need a corpse within 9 tiles.                                                                                                                              |
-| **Decoy totem**                                  | 3+ enemies within 7 tiles, a rare, champion or boss target, or life below 70%.                                                                                                                                                               |
-| **Gap-closer blink**                             | The target is more than 2 tiles beyond your primary's reach, but within blink distance and in sight.                                                                                                                                         |
-| **Blink with a blast where it leaves**           | 3+ enemies around you.                                                                                                                                                                                                                       |
-| **Blink with a blast where it lands**            | Closing a gap to a target with 2+ enemies near it.                                                                                                                                                                                           |
-| **Escape blink**                                 | Life below 70% with an enemy within 5 tiles, or 3+ enemies within 4 tiles.                                                                                                                                                                   |
-| **Bodyswap**                                     | A corpse within reach with 2+ enemies around it.                                                                                                                                                                                             |
+| Kind                                          | When the character casts it                                                                                                                                                                                                                  |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Buff** (general)                            | Any enemy within 7 tiles, and the buff is off or about to run out.                                                                                                                                                                           |
+| **Guard** (e.g. Iron Hide)                    | Life **below 60%** and no guard up. All guards share one timer, and a guard's cooldown starts only after it ends.                                                                                                                            |
+| **Rally-type buff**                           | 3+ enemies within 7 tiles, **or** the target is rare, a champion or a boss.                                                                                                                                                                  |
+| **Rage buff** (e.g. Rampage Call)             | Only when you have enough rage to start it.                                                                                                                                                                                                  |
+| **Self-damaging buff** (e.g. Surge of Blood)  | Not started below 60% life.                                                                                                                                                                                                                  |
+| **Run buff** (Slipstream Run, Rotting Stride) | Life below 70% with an enemy within 5 tiles, **or** 3+ enemies within 4 tiles. **It makes no attacks while the run lasts**, since attacking would end it.                                                                                    |
+| **Warcry**                                    | 3+ enemies near (in the cry's radius + 2), **or** a rare, champion or boss target in that radius. All warcries share a 4 s timer.                                                                                                            |
+| **Standing channel** (e.g. Rot Touch)         | Any enemy in its radius.                                                                                                                                                                                                                     |
+| **Curse**                                     | Target within 9 tiles and in sight. Not recast while the curse has more than about 0.5 s left. Not cast if the target already has as many curses as your limit allows. Skipped on a lone, normal enemy below half life (not worth the cast). |
+| **Offering**                                  | When it can work (you have minions for it), a corpse is within 11 tiles, and the last offering has less than 1.5 s left.                                                                                                                     |
+| **Minions**                                   | In the first fight, and again whenever you have fewer than your maximum. Spectres need a corpse within 9 tiles.                                                                                                                              |
+| **Lure totem**                                | 3+ enemies within 7 tiles, a rare, champion or boss target, or life below 70%.                                                                                                                                                               |
+| **Gap-closer blink**                          | The target is more than 2 tiles beyond your primary's reach, but within blink distance and in sight.                                                                                                                                         |
+| **Blink with a blast where it leaves**        | 3+ enemies around you.                                                                                                                                                                                                                       |
+| **Blink with a blast where it lands**         | Closing a gap to a target with 2+ enemies near it.                                                                                                                                                                                           |
+| **Escape blink**                              | Life below 70% with an enemy within 5 tiles, or 3+ enemies within 4 tiles.                                                                                                                                                                   |
+| **Shadow Swap**                               | A corpse within reach with 2+ enemies around it.                                                                                                                                                                                             |
 
 _Strategy:_
 
@@ -279,7 +279,7 @@ Flasks are drunk automatically, on top of whatever else the character is doing:
 - **Before a blow it cannot dodge**: when a Sentence is about to land and would take more than the character's life and
   energy shield, a life flask is drunk at once, whatever the threshold.
 - **Stolen flasks**: while the Unmaker holds them (docs/BOSSES.md 9), none can be drunk.
-- **Burning aura** (Righteous Fire analog): it is **switched off below 40% life** and back on at **75%**, the way
+- **Burning aura** (Searing Mantle): it is **switched off below 40% life** and back on at **75%**, the way
   a player would click it off.
 
 _Strategy:_ Life flasks wait until 50% by default, which is late against hard hitters; raise the threshold if you
@@ -316,7 +316,7 @@ It loots **between** fights, never during one. Drops more than 6 tiles from wher
 Most of how a fight goes depends on monsters. Here is what is useful to know:
 
 - **Noticing:** a sleeping monster wakes when you are within **10 tiles** and in its sight. That is just over the
-  character's 9, so monsters usually see you first. **Phase Run halves this distance**, so you can slip past
+  character's 9, so monsters usually see you first. **Slipstream Run halves this distance**, so you can slip past
   packs. **Ambushes** wake at 4.5 tiles, walls or not. A waking monster wakes its pack-mates within about 6 tiles.
 - **Leash:** a monster that loses sight of you for 6 seconds walks home and **heals to full**. Bosses and some
   hunters never give up. Combined with the stall breaker (section 2), this means an enemy you can't damage can
@@ -325,9 +325,9 @@ Most of how a fight goes depends on monsters. Here is what is useful to know:
   at 4.5 tiles, faster and more often. A melee character chases them around.
 - **Minions are walls.** Monsters can't walk through your minions. A melee monster that is blocked for about a
   third of a second hits the minion in its way. A ranged monster keeps walking toward **you** and only shoots a
-  minion after being blocked for 1.5 seconds. Some monster types go for minions first. A **decoy totem** draws
+  minion after being blocked for 1.5 seconds. Some monster types go for minions first. A **lure totem** draws
   every monster within its reach.
-- **Under Phase Run** you walk through monsters instead of being blocked by them.
+- **Under Slipstream Run** you walk through monsters instead of being blocked by them.
 
 ---
 
@@ -362,14 +362,14 @@ from the same Strategy tab, so everything above holds except this:
   kills the minions in its way to reach it.
 - **It never gives up on a target.** There is no stall breaker (section 2).
 - **It never loots, leaves or walks the route.** With nothing it can hit (the other character is out of reach, or it is itself
-  running in Phase Run) it walks toward the other character.
+  running in Slipstream Run) it walks toward the other character.
 - **Nothing of the run comes along.** No provisions, no reprieves and no map penalty to the resistances; each character is at its own
   level with full life, mana, energy shield and flasks.
 - **A duel ends** when a character dies (the other wins; both in one moment is a draw), after **90 seconds**, or when **15 seconds**
   pass in which neither character took damage (a stall). The last two are draws.
 - **Who acts first is a coin toss every tick.** When both characters act in the same moment, one goes first, and which one is drawn
   anew each tick (the same for the same seed), so neither has the first blow by where it stands or by its speed.
-- **Damage is scaled to ×0.3** for both characters: hits, bursts, damage over time and what a self-damaging buff (a Blood Rage analog)
+- **Damage is scaled to ×0.3** for both characters: hits, bursts, damage over time and what a self-damaging buff (such as Surge of Blood)
   costs. A minion takes full damage;
   ailments and stuns are as strong as on a map (their damage is scaled like any other). Regeneration, leech and flasks work as on a
   map, so a duel is long, and it favours builds that recover well.

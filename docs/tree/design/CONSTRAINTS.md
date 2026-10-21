@@ -8,7 +8,7 @@ wins. When a new constraint is learned, it is added here, not only to the docume
 Each item says where it came from:
 
 - **[user]**: the user said it, with the date.
-- **[ref]**: measured on the Path of Exile 3.9 tree (`B-poe.md`, `ref-tree.json`).
+- **[ref]**: measured on the reference tree (the reference game's study and `ref-tree.json`, local reference material in `reference/`, not in the repository).
 - **[derived]**: read from the user's own edit of the Strider.
 - **[adopted]**: proposed by Claude and accepted or left standing by the user. Weaker than the others, and open to change.
 
@@ -40,7 +40,7 @@ Each item states the rule or the workflow, not how it was learned. History lives
    "All of these need to be massively improved. There is no point in ranking them." [user, 10-19]
 
 4. **Bob's facts that shape it:**
-   - **It is the only build identity.** [adopted] There are no ascendancies or masteries. The tree is where a run becomes
+   - **It is the only build identity.** [adopted] There are no subclasses or masteries. The tree is where a run becomes
      "a poison Shade".
    - **Points.** [ref: A3] There are 123 in all: 99 from levels and 24 bonus points from maps 10 to 80. Level roughly
      equals map.
@@ -62,18 +62,18 @@ Each item states the rule or the workflow, not how it was learned. History lives
 
 ## 2. The reference
 
-1. **Path of Exile is the most important reference.** [user, 10-18] Last Epoch, Diablo, Grim Dawn and the others are
+1. **The reference game is the most important reference.** [user, 10-18] Last Epoch, Diablo, Grim Dawn and the others are
    secondary.
 2. **Never copy** another game's tree, layout, names, cluster shapes or line sets. [user, 10-18]
 3. **When referencing the tree, look at its layout, not only its statistics.** [user, 10-19] Open the live site (pick a
    class, press F) and study how the matching part of the tree is laid out: what sits next to what, how roads run, where
    clusters and keystones sit. Trace the matching class's start node by node in `reference/tree/ref-tree.json`. Looking is
    allowed; copying is not; screenshots never go in the repo.
-4. **Names use plain vocabulary a PoE player would use,** never a reference notable, gem or unique name. Check with
+4. **Names use plain vocabulary a player of the reference game would use,** never a reference notable, gem or unique name. Check with
    `npx vitest run src/data/ip.test.ts` and a grep of `ref-tree.json`.
 5. **Measured facts worth keeping** [ref]:
    - **Starts.** A start touches two nodes, but each one branches at once, so a start has at least four real ways out
-     within two steps: highways and small-node paths into clusters. The Ranger, traced in the graph, touches two +10
+     within two steps: highways and small-node paths into clusters. The dexterity class's start, traced in the graph, touches two +10
      dexterity nodes. Each leads straight to an attribute hub, with six and four onward exits: attribute highways, plus
      small-node paths into bow, attack speed, crit and evasion clusters. Its nearest notables are four points out.
    - **Pockets.** Pockets are tight orbits beside their junction, about a third of the spacing between clusters.
@@ -133,7 +133,7 @@ Each item states the rule or the workflow, not how it was learned. History lives
 3. **Region shapes and names are a frame, not the point.** [user, 10-19] "Neat," and a great tree can be built within
    most of them. But "the bow region is shaped like a bow" must never come at the cost of a good tree. The tree's outline
    may be any shape. [user, 10-19]
-4. **A second element is a cost, not a wall.** [user, 10-19] Multi-element builds are easy in PoE. There should be some
+4. **A second element is a cost, not a wall.** [user, 10-19] Multi-element builds are easy in the reference game. There should be some
    cost, but blocking a whole range of builds is not interesting.
 5. **Every region has varied defences.** [user, 10-20] That includes life, resistances, the class's own defence and some
    of the others (block, dodge, stun, recovery, maximum resistances). A resist star is one way to place resistances, not a
@@ -270,7 +270,7 @@ The core of section 1, made concrete.
    - reduced reservation
    - poison damage
 
-   Most of PoE's stats can appear here with no engine changes. Exact parity is not needed, and some mechanics should not
+   Most of the reference game's stats can appear here with no engine changes. Exact parity is not needed, and some mechanics should not
    be copied at all.
 
 2. **Within a cluster, every node shares one theme.** [user, 10-20] The broad vocabulary belongs between clusters, not
@@ -367,7 +367,7 @@ Each was tried or proposed and struck by the user. The date is when it was struc
 - **Fake micro-choices** between near-identical smalls, and two notables one build wants both of placed as the two sides
   of a circle. [10-19]
 - **Long paths that connect to nothing.** [10-19]
-- **Writing a region without looking at PoE's layout.** [10-19]
+- **Writing a region without looking at the reference game's layout.** [10-19]
 - **A one-note palette** of a few generic stats. [10-20]
 - **"One resist star per region"** as a rule. [10-20]
 - **"Every pocket is a bridge"** as an absolute. [10-20]

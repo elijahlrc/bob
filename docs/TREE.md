@@ -1,16 +1,16 @@
-# Passive tree parity (3.9)
+# Passive tree parity (reference version)
 
 _Follow-up, 2026-10-11:_ the tree's design (roads, districts, landmarks, node strength) is planned in
 [TREE-REDESIGN.md](TREE-REDESIGN.md).
 
-Goal: a tree with the breadth of the 3.9 tree: far more notables with several lines each (some conditional), keystones that
+Goal: a tree with the breadth of the reference tree: far more notables with several lines each (some conditional), keystones that
 change how a build plays, and nodes for every system added since the tree was written (minions, totems, traps, mines,
 brands, curses, warcries, guards, auras and heralds, ailment damage over time). Layout, names and numbers stay our own
 (DESIGN §3, §9.1); the reference only says which kinds of node and which mod lines exist.
 
-## Reference measured (`reference/tree/ref-tree.json`, `npm run tree:extract`)
+## Reference measured (`reference/tree/ref-tree.json`, local and not in the repository; `npm run tree:extract`)
 
-Main tree of 3.9.x, without ascendancy nodes, jewel sockets and class starts:
+Main tree of the reference version, without subclass nodes, jewel sockets and class starts:
 
 | Kind      | Reference | Bob before  |
 | --------- | --------- | ----------- |
@@ -24,15 +24,15 @@ Bob's mod vocabulary did not have a phrase for (`npm run tree:lines`).
 
 ## Targets (this pass)
 
-| Item         | Target                                                                                                                                                                                                      |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Keystones    | 27 (the 21 we have, plus analogs of Acrobatics, Phase Acrobatics, Minion Instability, Ancestral Bond, Runebinder, Necromantic Aegis; Mortal Conviction and Wicked Ward if cheap). Conduit (parties) is out. |
-| Notables     | at least 300, each an analog of a reference notable's defining line (at least 85% of 369), written with our own names                                                                                       |
-| Nodes        | about 1,650 to 1,800 (123 points still cover about 7% of the tree)                                                                                                                                          |
-| Small themes | cover every family of small-node line the reference has that the engine can express                                                                                                                         |
-| Interesting  | at least a third of notables carry a conditional or secondary line                                                                                                                                          |
-| Saves        | `SAVE_VERSION` bumped (node ids change)                                                                                                                                                                     |
-| Not in scope | jewel sockets and jewels, ascendancies, party effects, knockback, blind, maim, phasing                                                                                                                      |
+| Item         | Target                                                                                                                                                                                                                                                                                   |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Keystones    | 27 (the 21 we have, plus analogs of the reference keystones for dodge, spell dodge, exploding minions, totem-only damage, an extra brand and a shield's bonuses passed to minions; the one-aura and unbroken energy shield recharge ones if cheap). The party charge-sharing one is out. |
+| Notables     | at least 300, each an analog of a reference notable's defining line (at least 85% of 369), written with our own names                                                                                                                                                                    |
+| Nodes        | about 1,650 to 1,800 (123 points still cover about 7% of the tree)                                                                                                                                                                                                                       |
+| Small themes | cover every family of small-node line the reference has that the engine can express                                                                                                                                                                                                      |
+| Interesting  | at least a third of notables carry a conditional or secondary line                                                                                                                                                                                                                       |
+| Saves        | `SAVE_VERSION` bumped (node ids change)                                                                                                                                                                                                                                                  |
+| Not in scope | jewel sockets and jewels, subclasses, party effects, knockback, blind, maim, phasing                                                                                                                                                                                                     |
 
 Every stat the tree grants must be read by the sheet or the sim, or the bot never allocates it and the player gets nothing.
 
@@ -60,7 +60,7 @@ See the end of this file; each step is appended when it lands.
 - **Engine stats added**: attack skills as an ailment keyword (`attackSkill`), the damage over time multiplier (`dotMulti`),
   bleed and poison speed, enemy physical reduction, double damage, shield defences, minion physical reduction and block, charge
   duration, duration of deployables and timed minions (`skillDuration`), weapon-held conditions for two and one handed.
-  Ailment damage still ignores the hit-scaling tags and the weapon held (3.9): "damage with ailments while wielding a sword"
+  Ailment damage still ignores the hit-scaling tags and the weapon held (as in the reference): "damage with ailments while wielding a sword"
   is a condition, not a tag.
 - **Generated clusters** (`npm run tree:emit`): one cluster per reference notable with an analog (357), made of its translated
   lines and small nodes that repeat the cluster's own small-node theme, named by us (`docs/tree/names/<region>.json`, written
@@ -97,14 +97,14 @@ the reference's (its links are one-directional in `ref-tree.json`; the script ma
 (The reference's 22% of nodes with three or more links counts the mastery and hub nodes with six and more; Bob's 32% is every
 loop's entry node.)
 
-What the real tree looks like (screenshots of the 3.x tree, read for structure and never traced):
+What the real tree looks like (screenshots of the reference tree, read for structure and never traced):
 
 - **Sparse roads.** A few long edges, straight or bending round a ring, meet at junction nodes that are attribute nodes; between two
   junctions there are many cluster-widths of nothing.
 - **Clusters are small loops.** A notable, usually with a decorative ring round it, and two to six small nodes on an orbit,
   joined to a road at one or two nodes. Many notables are not on a road at all but at the end of a short stalk.
 - **Little else is connected.** Most nodes have two links; the loops are few and big.
-- PoE 2's tree (a plain graph render of it) is far more meshed, but curved edges and repeated shapes keep it legible; Last Epoch's
+- The reference game's sequel's tree (a plain graph render of it) is far more meshed, but curved edges and repeated shapes keep it legible; Last Epoch's
   is a tidy grid of three tall trees with spend-points gates, which is a different design and was not taken.
 
 What was built:

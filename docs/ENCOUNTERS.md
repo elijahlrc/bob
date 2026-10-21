@@ -267,7 +267,7 @@ A **status** on the player: one record, a timer, a HUD icon, and one place in th
 | Status     | What it does                                                                            | Source (type, how)                                   | The character's answer                             |
 | ---------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------- |
 | **Hobble** | 30% slower for 2 s (exists as the Hobbling mod)                                         | Guard, Wrack, Slinger, Handler sidearms              | speed, `cannotBeChilled` (as today)                |
-| **Blind**  | a lower chance to hit for 3 s (the size to be checked against the 3.9 rule)             | Gloomstalker sidearm; Hollow Watcher lance           | accuracy; spells ignore it                         |
+| **Blind**  | a lower chance to hit for 3 s (the size to be checked against the reference rule)       | Gloomstalker sidearm; Hollow Watcher lance           | accuracy; spells ignore it                         |
 | **Hexed**  | a hex (exists): from the Hexer's **sigil**, a ground zone that hexes while stood in     | Hexer                                                | the dodge leaves the sigil; curse immunity         |
 | **Tithe**  | a beam from a Bursar drains life while the character is within 8 tiles and in its sight | Bursar (Gilded)                                      | a new priority: a tethering monster counts as near |
 | **Marked** | takes 20% more damage from the marker's pack for 4 s; the mark shows                    | Kennel Handler: its whistle marks as well as rallies | killing the Handler; defences                      |
@@ -440,7 +440,7 @@ encounters feel better before building out the rest.
 | Rooms become unreadable                                         | Every mechanic has its tell on the floor or the body. Colours follow `VISUAL_LANGUAGE.md`. New tells are checked in the pane.                    |
 | The game gets much harder                                       | Each mechanic replaces time the monster would spend hitting (a window is time it does not attack; a pattern is its attack). N8 measures.         |
 | Sim speed                                                       | Counters in `hit()` are two multiplies; modes on the 0.25 s tick; patterns are a few effects each. The x9 floor before and after each milestone. |
-| Names clash with the reference game                             | Every new name passes `ip.test.ts` (no exact gem or unique names: "Riposte" is a gem, so the Guard's window is Counter-stance).                  |
+| Names clash with the reference game                             | Every new name passes `ip.test.ts` (no exact gem or unique names: the obvious name is a reference gem, so the Guard's window is Counter-stance). |
 | Phases moving onto modes breaks a test                          | The phase tests are the characterisation; they pass unchanged.                                                                                   |
 | PLAYER-AI.md is someone else's work in progress                 | Coordinate before editing; the code's rules are documented in it only when it is committed.                                                      |
 

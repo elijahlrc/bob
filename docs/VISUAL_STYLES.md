@@ -25,7 +25,7 @@ Screenshots: `docs/screenshots/styles/` (`grim-spell.jpg`, `cel-spell.jpg`, `ink
 
 ## References
 
-- Grimdark: Path of Exile / Diablo-style dark pixel work as seen in _Children of Morta_ (lit pixel art with dynamic lights) and _Dead Cells_ (crunchy sprite animation, hit flashes).
+- Grimdark: Diablo-style dark pixel work as seen in _Children of Morta_ (lit pixel art with dynamic lights) and _Dead Cells_ (crunchy sprite animation, hit flashes).
 - Cel Isometric: _Tunic_ (isometric, outlined flat shading, chunky readable silhouettes); _Romestead_, _Wanderburg_ for tone.
 - Inkwell (our own pick): _Cuphead_-style hand-drawn "boil" and parchment/engraving maps, to show a style that is cheap in assets but distinctive.
 

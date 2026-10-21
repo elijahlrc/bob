@@ -508,7 +508,7 @@ Rooted Stance (`W.maces.rooted.k`, "cannot evade") costs nothing on a Vanguard o
 
 Unerring Discipline (`W.rampart.unerring.k`) is free for any non-crit Vanguard, and it sits beside the accuracy cluster it makes redundant.
 
-**Fix:** give Rooted Stance a sheet-visible cost an armour build feels, for example less movement speed or less attack speed, or "armour from your shield does not apply". Unerring Discipline is defensible as a PoE-style trade, but consider moving it away from Steady Hands.
+**Fix:** give Rooted Stance a sheet-visible cost an armour build feels, for example less movement speed or less attack speed, or "armour from your shield does not apply". Unerring Discipline is defensible as a trade in the reference game's style, but consider moving it away from Steady Hands.
 
 ### F8 (medium): Iron Liturgy is misplaced for its build
 

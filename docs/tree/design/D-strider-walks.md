@@ -10,19 +10,19 @@ fake micro-choices, long paths to nothing. The layout is new from scratch; the l
 
 ## What was read first
 
-**The reference's graph**, its Ranger start traced node by node from `reference/tree/ref-tree.json` (the 3.9 tree: lines,
+**The reference's graph**, its dexterity class's start traced node by node from `reference/tree/ref-tree.json` (the reference tree: lines,
 groups, links; no coordinates). Earlier phases only measured rates from that file and never read a start as a walk:
 
 - The start touches **two +10 dexterity nodes**. Each is one step from a **bare dexterity hub of degree five to
   seven**. So point one is a side, and point two is a crossroads.
-- The first notable (Fervour, frenzy charges) sits on a **loop between the two hubs**; the other early notables (Aspect
-  of the Lynx, Weapon Artistry) are about **attacks**, not bows. Nothing within three steps names a weapon.
+- The first notable (its attack-speed charges) sits on a **loop between the two hubs**; the other early notables (evasion
+  with a charge; damage with every weapon) are about **attacks**, not bows. Nothing within three steps names a weapon.
 - Off the hubs: **three-node pockets** (accuracy and attack speed, crit, evasion and resistances, life), each a dead
-  end; the bow road; the centre. Acrobatics is **five steps** from the start, one node off a hub; Arrow Dancing six.
+  end; the bow road; the centre. Its dodge keystone is **five steps** from the start, one node off a hub; its projectile-evasion keystone six.
 - The skeleton is a **mesh of bare dexterity nodes** (degree 4 to 8) with pockets hanging off them; within ten steps,
   roughly a quarter of the nodes are bare attribute and almost every junction is one.
 
-**The reference's layout**, looked at on its site (the live tree, 3.29, Ranger start) after the user asked why it had
+**The reference's layout**, looked at on its site (the live tree, the current version, the dexterity class's start) after the user asked why it had
 never been looked at. The extraction had dropped coordinates under the no-copying rule and "never copy" had been read
 as "never look". What it shows, and what the first version of this section got wrong:
 
@@ -32,8 +32,8 @@ as "never look". What it shows, and what the first version of this section got w
   the empty space inside them, not as a uniform web.
 - **The big clusters are closed rings** with the notables on the rim, entered at one node and walkable through.
 - **Density near the start is several times** what the first version had at the same extent. (On the live tree the
-  cluster beside the start has an inert centre, a mastery added after 3.9, with its notable on the rim; the start's own
-  nodes are no longer bare dexterity. The 3.9 graph above is the one this section's structure follows.)
+  cluster beside the start has an inert centre, a mastery added after the reference version, with its notable on the rim; the start's own
+  nodes are no longer bare dexterity. The reference graph above is the one this section's structure follows.)
 
 ## The rules this section follows (where they differ from the brief)
 

@@ -62,7 +62,7 @@ Ranked by how much it matters to the reader.
    delays the damage by up to a tenth of a second. _Sim change; the numbers shift slightly._
 2. **Frost Lance changes form at 48 tiles a second** and crosses the whole room in half a second (its life), a streak that is hard to follow. Its
    fast form could keep the trail only. _Render or a speed cap._
-3. **Some skills show no body at all:** the chains (Arc, Storm Arrow, Tempest Sigil) are bolts that jump between enemies at once (readable, but not a projectile), and
+3. **Some skills show no body at all:** the chains (Arc Chain, Storm Arrow, Tempest Sigil) are bolts that jump between enemies at once (readable, but not a projectile), and
    the **strikes that carry bolts** (Bolt Cleave, Prime Splash, Rime Splinter: a strike, then projectiles) draw the bolts but nothing says they came from the blow.
 4. **A sweep reaches farther than it is drawn.** The sim hits anything within the radius plus the enemy's body plus 0.4 of a tile; the wedge shows the radius.
    The honest fix is to draw the reach, or to cut the slack. _Sim or render, and a balance question._

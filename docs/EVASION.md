@@ -1,7 +1,7 @@
 # Evasion and accuracy against the reference game
 
 Built 2026-10-10. The aim: a player who puts the same amount into evasion or accuracy should deal with enemies about as they
-would in Path of Exile. `npm run evasion` (`scripts/coverage/fit-monster-defence.ts`) prints everything below.
+would in the reference game. `npm run evasion` (`scripts/coverage/fit-monster-defence.ts`) prints everything below.
 
 ## 1. What was wrong
 
@@ -55,7 +55,7 @@ the level allows, no affixes, passives or gems, dexterity equal to level):
 The accuracy side needs no factor: the weapon is a little weaker, but Bob's total is the same at level 60 (640 and 640) and
 within 10% at level 100. The evasion side is lower: Bob's armour bases came in four tiers (levels 1, 20, 40 and 60) and stopped
 at 480 for a body, where the reference's grow smoothly past 800 (since 2026-10-18 the bases are the reference's, one for each:
-docs/AUDIT-ITEM-BASES.md). That cost a plain-geared evasion character up to 15 points
+the local reference audit `reference/docs/AUDIT-ITEM-BASES.md`, not in the repository). That cost a plain-geared evasion character up to 15 points
 more hit chance taken at levels 10 to 30, between tiers, and 4 to 7 at level 60 and above (table below). It was not corrected: the
 effect is small next to the 100% it replaces, and scaling the armour tiers touches armour and energy shield too. If it is
 corrected later, the rule that keeps the interaction equal is: where a player's evasion is a factor `k` of the reference's,

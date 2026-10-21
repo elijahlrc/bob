@@ -26,8 +26,8 @@ project's own data and applicability functions (`ACTIVE_GEMS`, `SUPPORT_GEMS`, `
 - Worst offenders by support: Ricochet (dead on 28 of 49 skills), Split Shot (30 of 48), Piercing Shot (18 of 48), Echoing Blow (20 of 38),
   Brief Burst / Lingering Effect (18 of 56 each), Wide Crush (13 of 41).
 - Separate classes found on the way (sections 3.4 to 3.6): utility skills accept 98 of the 120 supports (2,797 pairs, about 2,200 of them
-  damage supports with nothing to act on); the calc sheet and the sim disagree for ground-zone duration, Spell Cascade and Echoing Cast
-  on deployables; Spell Cascade on a self-centred nova fires three overlapping novas at the caster.
+  damage supports with nothing to act on); the calc sheet and the sim disagree for ground-zone duration, Flanking Cast and Echoing Cast
+  on deployables; Flanking Cast on a self-centred nova fires three overlapping novas at the caster.
 - Cleanest fix for the user's case: let a ground skill that has the projectile tag turn extra projectiles into extra **landing spots on
   one zone** (section 5). It touches one calc line, one sim branch, one tick function, one renderer function, five zone literals, and
   needs no new event type. The rest of the dead pairs are best closed by one **inert-pairing audit test** built from the table in
@@ -362,7 +362,7 @@ projectile kind the path is `fan` (normal), `pulse`, `creep`, `mirror`, `tornado
 | Lingering Effect (lingeringEffect) | 56          | 38   | 0      | 18   | Rain of Steel [burst], Ember Hail [ground], Faultline [burst], Venom Strike [melee], Skitter Flash [fan], Toxin Circle [fan], Tide of Judgement [beam], Jaws Trap [burst], Blaze Trap [ground], Frost Trap [burst], Shrapnel Trap [burst], Fire Breath Trap [ground], Spire Trap [ground], Bolt Trap [fan], Rumble Trap [ground], Icicle Charge [fan], Mortar Charge [burst], Storm Charge [burst]                                                                                                                                                                                                                                       |
 | Wide Salvo (wideSalvo)             | 46          | 30   | 3      | 13   | Drifting Storm [pulse], Ember Downpour [ground], Pyre Burst [burst], Rime Splinter [melee], Storm Arrow [chain], Bolt Cleave [melee], Slag Blow [melee], Arrow Shower [ground], Rime Drift [creep], Slag Lob [burst], Whirl Shot [tornado], Prime Splash [melee], Mirror Quiver [mirror] ; partly: Ghost Shard [shield] (parallel lanes ignored), Venom Shower [pods] (parallel lanes ignored), Mortar Bow [mortar] (parallel lanes ignored)                                                                                                                                                                                             |
 | Twin Salvo (twinSalvo)             | 46          | 30   | 3      | 13   | Drifting Storm [pulse], Ember Downpour [ground], Pyre Burst [burst], Rime Splinter [melee], Storm Arrow [chain], Bolt Cleave [melee], Slag Blow [melee], Arrow Shower [ground], Rime Drift [creep], Slag Lob [burst], Whirl Shot [tornado], Prime Splash [melee], Mirror Quiver [mirror] ; partly: Ghost Shard [shield] (parallel lanes ignored), Venom Shower [pods] (parallel lanes ignored), Mortar Bow [mortar] (parallel lanes ignored)                                                                                                                                                                                             |
-| Arrow Tempest (arrowTempest)       | 46          | 31   | 3      | 12   | Drifting Storm [pulse], Ember Downpour [ground], Pyre Burst [burst], Rime Splinter [melee], Storm Arrow [chain], Bolt Cleave [melee], Slag Blow [melee], Arrow Shower [ground], Rime Drift [creep], Slag Lob [burst], Prime Splash [melee], Mirror Quiver [mirror] ; partly: Ghost Shard [shield] (arrow nova ring ignored), Whirl Shot [tornado] (+4 projectiles ignored), Venom Shower [pods] (arrow nova ring ignored)                                                                                                                                                                                                                |
+| Arrow Tempest (arrowTempest)       | 46          | 31   | 3      | 12   | Drifting Storm [pulse], Ember Downpour [ground], Pyre Burst [burst], Rime Splinter [melee], Storm Arrow [chain], Bolt Cleave [melee], Slag Blow [melee], Arrow Shower [ground], Rime Drift [creep], Slag Lob [burst], Prime Splash [melee], Mirror Quiver [mirror] ; partly: Ghost Shard [shield] (Arrow Tempest's ring ignored), Whirl Shot [tornado] (+4 projectiles ignored), Venom Shower [pods] (Arrow Tempest's ring ignored)                                                                                                                                                                                                      |
 | Volley Split (volleySplit)         | 48          | 34   | 0      | 14   | Drifting Storm [pulse], Ember Downpour [ground], Pyre Burst [burst], Rime Splinter [melee], Storm Arrow [chain], Bolt Cleave [melee], Slag Blow [melee], Arrow Shower [ground], Rime Drift [creep], Slag Lob [burst], Whirl Shot [tornado], Prime Splash [melee], Hoarfrost Mote [burst], Mirror Quiver [mirror]                                                                                                                                                                                                                                                                                                                         |
 | Wide Crush (wideCrush)             | 41          | 28   | 0      | 13   | Crushing Blow [melee], Venom Cut [melee], Twin Cut [melee], Twin Blades [melee], Rime Splinter [melee], Rime Mallet [melee], Bolt Cleave [melee], Venom Strike [melee], Gouge Shot [fan], Rime Rebuke [melee], Guarded Strike [melee], Blinking Cut [melee], Guardian Cairn [melee]                                                                                                                                                                                                                                                                                                                                                      |
 | Triple Shot (tripleShot)           | 46          | 33   | 0      | 13   | Drifting Storm [pulse], Ember Downpour [ground], Pyre Burst [burst], Rime Splinter [melee], Storm Arrow [chain], Bolt Cleave [melee], Slag Blow [melee], Arrow Shower [ground], Rime Drift [creep], Slag Lob [burst], Whirl Shot [tornado], Prime Splash [melee], Mirror Quiver [mirror]                                                                                                                                                                                                                                                                                                                                                 |
@@ -503,10 +503,10 @@ Free lunch (the penalty is the inert part, the bonus is live): the support is a 
 
 **Utility skills accept damage supports.** The 50 utility skills (curses, warcries, guards, buffs, minions, blinks, banners, sigils) are
 `spell`/`area`/`duration` tagged, so `typesAllow` lets 98 of the 120 supports onto them: 2,797 pairs. Roughly 560 are meaningful
-(trigger supports cast the curse, minion supports on summoners, Blasphemy-style Standing Curse, Exalted Focus, Deep Insight, Scavenger,
+(trigger supports cast the curse, minion supports on summoners, Standing Curse, Exalted Focus, Deep Insight, Scavenger,
 Quick Cast, Lingering Effect); about 2,200 are damage, crit, ailment or area supports with nothing to act on. (A few "utility" skills have
 a damaging part: Cinder Step, Rime Step, Bolt Step, Shadow Swap, Ruin Ritual, Cinder Bond; so say "up to".) `gemStatus`
-(`src/ui/Skills.tsx:57`) reports "Supporting: Despair-like skill" for these as if it worked.
+(`src/ui/Skills.tsx:57`) reports "Supporting: Void Curse" for these as if it worked.
 
 **Damage-type gates (build dependent).** Mods that need a damage type the skill does not deal. Counted over the 124 skills with the
 skill's own base types, its conversions and its tag elements:
@@ -544,8 +544,8 @@ Probes were run with `createDummyWorld` (bow_3 for Strider, wand_3 for Mystic, a
 | Sudden Frost + Flanking Cast                        | 1 pulse                         | explode events 6 -> 12, target hits unchanged (the flanks land beside it): the intended behaviour                                                                                                                                                                                                                                    |
 | Blaze Trap + Echoing Cast                           | repeats 1                       | 8 echo events, hits 62 -> 96, uses 20 -> 23: the repeat re-runs `placeDeployable` (another set of traps), the traps themselves never repeat (`deploy.ts:235-266`), but the sheet multiplies every shot by `1 + repeats` (`character.ts:1536,1545`)                                                                                   |
 
-Further sheet/sim gaps, by reading: `cascade`, `extraTargets`, `shockwave`, `mirage`, `unleash` and the Multistrike ramp are not in
-`character.ts` (the sheet under-reports them; the sheet counts `lands = 1 + repeats` for Multistrike while the sim hits 1.22x and 1.44x on
+Further sheet/sim gaps, by reading: `cascade`, `extraTargets`, `shockwave`, `mirage`, `unleash` and the Triple Cadence ramp are not in
+`character.ts` (the sheet under-reports them; the sheet counts `lands = 1 + repeats` for Triple Cadence while the sim hits 1.22x and 1.44x on
 the repeats); `SkillZone`'s own comment says "duration over interval, rounded down (the calc counts the same)" (`src/sim/types.ts:372`),
 which stopped being true when Brief Burst and Lingering Effect were given `skillDuration` (docs/SPIRIT.md S13c says they are "read by the
 sim"; they are read by the sheet and by leaves/fields/orbs, not by ground zones, trap lifetimes (`deploy.ts:111`) or plain bursts).
@@ -560,7 +560,7 @@ Item mods reach the same dead path: 12 uniques grant `projectiles` (`grep "'proj
 `dps x` = (damage more) x (speed more) x inc factor, ignoring behaviour and repeats; `mana/s x` = cost multiplier x speed factor (more
 speed means more casts a second, each paying the multiplied cost); both at gem level 20, assuming +200% inc damage and +100% inc speed
 already. Supports whose upside is a placement, a count or a trigger are blank in the damage columns and are not comparable by it.
-Projectile count is worth nothing against a single target in the sheet (`volleyHits` is 1, docs/AUDIT-GEMS.md "right for simultaneous
+Projectile count is worth nothing against a single target in the sheet (`volleyHits` is 1, the local gem audit, `reference/docs/AUDIT-GEMS.md`, not in the repository: "right for simultaneous
 projectiles"), so the whole count family is a net loss in the sheet and lives on pack coverage only.
 
 | support                                                                              | dps x                                      | mana/s x         | note                                                                                        |
@@ -607,7 +607,7 @@ listed in 3.2: 135 pairs where nothing but the cost remains.
 ## 5. Making "more instances" real, kind by kind
 
 What "instance" means per behaviour, and the code that would change. Semantics for stacking on one enemy must be checked against the
-3.9 wiki / Path of Building data before building (project rule: verify PoE claims first). Today's decided rule (docs/SPIRIT.md 2.3 and
+reference wiki / reference data before building (project rule: verify claims about the reference game first). Today's decided rule (docs/SPIRIT.md 2.3 and
 S4, D1): projectiles of one use share a hit list, so one enemy is hit once per use unless the skill fires sequentially or is flagged
 to shotgun.
 
@@ -651,7 +651,7 @@ spread)^2)`) in the sheet for the expected hits on a stationary target.
 10. Tests: `src/sim/shapes.test.ts:132-181` pins one zone per cast, pulses by interval and `profileOf(rain).pulses === 4`; keep, then
     add: count 3 gives three spots and three `explode` events per pulse; an enemy under two spots is hit once; Twin Salvo changes
     `profile.projectiles` on Arrow Shower; Brief Burst changes the sim's pulse count. There is **no `src/sim/shots.test.ts`**; projectile
-    shapes are tested in `src/sim/spiritS4.test.ts:58-172` (Barrage, once-per-target, fork/chain/nova/tornado, afterHit). The ground
+    shapes are tested in `src/sim/spiritS4.test.ts:58-172` (Quiver Rush, once-per-target, fork/chain/nova/tornado, afterHit). The ground
     count would be a new describe in `shapes.test.ts`.
 
 Performance: `x9.test.ts:326-343` (forty Swarm actors, `crushingBlow`, must stay above 250x) never casts a ground skill, so it is
@@ -664,7 +664,7 @@ Do not add fields to `Actor`.
 
 The chain loop (`actions.ts:469-522`) walks one sequence from the target. Extra projectiles can mean extra **branches**: repeat the loop
 for the `n - 1` nearest other enemies as extra first targets sharing `hitIds` (so no enemy is hit twice). Cost O(n x chains x enemies) per
-use. The alternative is to exclude chain-kind skills from the count supports (data), which is cheaper and defensible: Lightning Arrow
+use. The alternative is to exclude chain-kind skills from the count supports (data), which is cheaper and defensible: Storm Arrow
 fires one arrow.
 
 ### 5.3 `burst` (Pyre Burst, Slag Lob, Hoarfrost Mote carry the projectile tag; the projectiles are inside the skill)
@@ -698,7 +698,7 @@ Shot: fixed `TORNADO_SECONDARIES = 3`, `shots.ts:42`). Whirl Shot could take `3 
 
 ## 6. Existing design rules and notes
 
-- **Skill types** (docs/COVERAGE.md 5.2 :201-205, docs/PROGRESS.md :480): "3.9 decides what a support can support with skill types ...
+- **Skill types** (docs/COVERAGE.md 5.2 :201-205, docs/PROGRESS.md :480): "The reference decides what a support can support with skill types ...
   add `allowed` and `excluded` type sets to supports, and generate the compatibility table from them. `gemStatus` already explains a
   mismatch." Supports have `supports` (any of), `needs` (all), `excludes`, `adds`, resolved to a fixpoint. The type names are Bob's own;
   the reference names live only in `scripts/coverage`. `defaultTypes` (`src/calc/gems.ts:257-263`) gives spells without declared types
@@ -724,16 +724,16 @@ Shot: fixed `TORNADO_SECONDARIES = 3`, `shots.ts:42`). Whirl Shot could take `3 
 Venom Shower, Toxin Circle, Pyre Totem, Mortar Bow, Lance Bow, Scatter Bow, Bolt Trap, Icicle Charge) while Arrow Shower and Storm Arrow
 _have_ it though the count is dead on them. So it is not a ready-made gate; it would have to be re-authored.
 
-- **Projectile rules** (docs/SPIRIT.md 2.3, S4, Q1; docs/AUDIT-GEMS.md :97-104): projectiles of one use share a hit list (verified against the
-  3.9 wiki; the user kept it, 2026-10-08), with sequential volleys (Barrage, Rolling Volleys), a shotgun flag (two skills), parallel lanes,
+- **Projectile rules** (docs/SPIRIT.md 2.3, S4, Q1; the local gem audit `reference/docs/AUDIT-GEMS.md` :97-104): projectiles of one use share a hit list (verified against the
+  reference wiki; the user kept it, 2026-10-08), with sequential volleys (Quiver Rush, Rolling Volleys), a shotgun flag (two skills), parallel lanes,
   nova, tornado, fork and chain as the exceptions and shapes built in S4. The sheet ignores projectile count except for those exceptions.
   The audit's Twin/Wide Salvo entries (:1186, :1242) are about parallel lanes, not about which skills accept the support.
-- **Ground skills** are described in docs/AUDIT-GEMS.md :1415-1435: Ember Downpour and Arrow Shower have their "stacked small explosions folded
+- **Ground skills** are described in the local gem audit (`reference/docs/AUDIT-GEMS.md` :1415-1435): Ember Downpour and Arrow Shower have their "stacked small explosions folded
   into one pulse". The audit never considered what extra projectiles do to the folded pulse; this is the gap the user hit.
-- **Supports built in S13c** (docs/SPIRIT.md :508-511): "Spell Cascade and Echo's lateral and offset casts, Ancestral Call's extra targets,
+- **Supports built in S13c** (docs/SPIRIT.md :508-511): "Flanking Cast and Echo's lateral and offset casts, Echoing Blow's extra targets,
   ... Brief Burst and Lingering Effect (duration that the sim reads), Merciless Cadence, Swell, Echoing Blow ... Twin Shadow, Veil Cut,
   Shattering Blows". Nothing in S13c records which skills each applies to.
-- `chains` was "read only by skills with chain behaviour" (AUDIT-GEMS :99, SPIRIT 2.3); S4 fixed it for fan projectiles (`shots.ts:139`), not
+- `chains` was "read only by skills with chain behaviour" (the local gem audit :99, SPIRIT 2.3); S4 fixed it for fan projectiles (`shots.ts:139`), not
   for ground, burst or melee.
 - No document states a rule that a support must have an effect on every skill it is accepted on. The nearest is COVERAGE.md :308 ("its support
   compatibility matches its skill types"), which is what `typesAllow` does.
@@ -753,7 +753,7 @@ Recommendation: **A for Arrow Shower / Ember Downpour** (one zone with landing s
 **plus C**, with the test as the guard that makes the class stop growing. Use B only for the cases where the behaviour is intentionally
 absent (Storm Arrow, Rime Drift, Mirror Quiver, Drifting Storm, Pyre Burst, Slag Lob, Hoarfrost Mote for count; Echoing Blow / Shattering
 Blows on slams). Fix the three cheap sheet/sim mismatches at the same time: ground pulses ignoring `skillDuration` (`actions.ts:584`),
-Spell Cascade on self-centred novas (`actions.ts:526`), Echoing Cast on deployables (decide: repeat each shot or refuse). Optional
+Flanking Cast on self-centred novas (`actions.ts:526`), Echoing Cast on deployables (decide: repeat each shot or refuse). Optional
 cleanups: stop utility skills accepting damage supports (an implicit `utility` type that supports must opt into), drop Snare Cluster, and
 review Triple Cadence.
 
@@ -768,7 +768,7 @@ intrinsic `pierce`, `arc`, tags, `dot.splash/carried`, `bleed/poison.baseDur`).
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | projectile count      | projectile kind and not pulse / mirror / creep / tornado                                                                                                                                                                                            |
 | parallel / sequential | projectile fan path only (not pods, mortar, shield, nova, pulse, mirror, creep, tornado)                                                                                                                                                            |
-| arrow nova            | projectile kind except pulse / mirror / creep / shield / pods                                                                                                                                                                                       |
+| arrow ring            | projectile kind except pulse / mirror / creep / shield / pods                                                                                                                                                                                       |
 | fork                  | fan path, no explosion, no fuse, no intrinsic pierce                                                                                                                                                                                                |
 | pierce                | projectile kind, no explosion, no fuse, not mirror / creep / shield / pods; or `afterHit` bolts / blades                                                                                                                                            |
 | chains                | chain kind, or fan path with no explosion, no fuse, no intrinsic pierce                                                                                                                                                                             |
@@ -785,5 +785,5 @@ Counts were then confirmed on 24 sim runs (3.6). Results: 280 behaviour-dead pai
 
 ### Footnotes to 3.2
 
-- Whirl Shot + Arrow Tempest and Mortar Bow + Arrow Tempest: `mode.nova` is tested before `mode.tornado` and `mortar` (`shots.ts:190` vs `:202`, `:218`), so the +4 **is** consumed, but the shot is hijacked: Whirl Shot's tornado scatter and Mortar Bow's landing line are replaced by an Arrow Nova ring. The "+4 projectiles ignored" note on Whirl Shot in the table is wrong in that sense: read it as "tornado scatter lost", and add Mortar Bow to the hijacked rows (nova ring replaces the mortar burst).
+- Whirl Shot + Arrow Tempest and Mortar Bow + Arrow Tempest: `mode.nova` is tested before `mode.tornado` and `mortar` (`shots.ts:190` vs `:202`, `:218`), so the +4 **is** consumed, but the shot is hijacked: Whirl Shot's tornado scatter and Mortar Bow's landing line are replaced by an Arrow Tempest ring. The "+4 projectiles ignored" note on Whirl Shot in the table is wrong in that sense: read it as "tornado scatter lost", and add Mortar Bow to the hijacked rows (nova ring replaces the mortar burst).
 - Blizzard Ring + Flanking Cast: the claim rests on the code (`actions.ts:526`); a discriminating probe would put an enemy behind the caster.

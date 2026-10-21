@@ -8,7 +8,7 @@ Build file: `.../scratchpad/audit/09.json`. 98 of 100 points spent. Brief: a Zea
 - Inside a wedge the nodes cluster into islands joined by long grey road lines.
 - Labelled keystones stick out at the ends of thin dotted spokes (Searing Avatar, Living Ward, Lone Vow, Shade Leech). They are easy to spot and look like long "pay to reach" dares.
 - My region (strint, upper left) is a big sprawl. The north part is a column of weapon-specific notables (Staves, Maces, Sceptres, Wands: Vesper Rod, Cantor's Cudgel and so on). The west holds life, armour and resistances. The middle holds mana and aura nodes. The far north-east has minion clusters (green).
-- I assumed I could walk into the neighbouring wedges, as in PoE. The pictures show faint divider lines but also many nodes sitting right on the border. I expected the Intelligence region directly above to be open to me, because it holds the energy shield nodes, Mana Bastion and the aura and hex clusters I wanted.
+- I assumed I could walk into the neighbouring wedges, as in the reference game. The pictures show faint divider lines but also many nodes sitting right on the border. I expected the Intelligence region directly above to be open to me, because it holds the energy shield nodes, Mana Bastion and the aura and hex clusters I wanted.
 - Looks pointless at a glance: the northern staff and mace column for a caster aura build, and the "Intelligence/Strength/Dexterity" road dots that are the only way through many places.
 - A name-only legend would help. The picture labels are only the big nodes, so I had to rely on the tool's `find`.
 

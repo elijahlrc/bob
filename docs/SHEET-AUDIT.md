@@ -90,16 +90,16 @@ The rotation says how often a skill is used; these say what a use is worth. Each
 the sim does with the gem's own fields (never a gem id), with a test that plays the gem against the sim
 (`src/calc/sheetVsSim.<family>.test.ts`, held to 0.9 to 1.1; the supports named below are checked too).
 
-| Module                | What it counts                                                                                                                                                                                                                      |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `afterHit.ts`         | the bolts, balls, bounces and scattered arrows that follow a hit (Bolt Cleave, Slag Blow, Slag Lob, Whirl Shot)                                                                                                                     |
-| `ailmentMax.ts`       | only the strongest bleed or ignite burns, not the average (Gouge Shot, Torch Arrow)                                                                                                                                                 |
-| `patterns.ts`         | pods, volleys, the pulses of a drifting orb, the ground a skull leaves, the true shotgun, the clones of Mirror Quiver, the cold wave of Prime Splash, the debuff that makes a skill's own later hits harder (Snare Shot)            |
-| `channelFx.ts`        | the thorns a channel scatters (Blight Hail), blades that circle (Orbiting Blades), a mote's own beat (Tempest Mote), half-hit builds (Judgement Tempest), an exposure at the top stage (Searing Lance)                              |
-| `dot.ts`, `geyser.ts` | how long a carried debuff stays on (Spirit Saw); how often the character recasts a renewed debuff (`renewalGap`: Creeping Plague, Ruin Ritual, the weapon fills the rest); the blasts of a geyser (Pyre Burst)                      |
-| `melee.ts`            | a spin's sweeps, the bladestorm, the aftershock, charges, beams, the Multistrike ramp, the buffs a skill keeps up by its own use (Whirlwind Cleave, Faultline, Charged Blow, Cinder Blow, Thunder Rebuke, Bulwark Rush, Storm Rush) |
-| `deployed.ts`         | every arrow of a mortar totem, a mine's rain and aura, the traps and mines that stand (Mortar Bow, Mortar Charge, Shrapnel Trap, Storm Charge, Glacier Wall)                                                                        |
-| `minionDps.ts`        | a golem or colossus counts one target, a relic its nova, a band its gaps between lots, the minion supports (all the summoning gems except Bind Shade)                                                                               |
+| Module                | What it counts                                                                                                                                                                                                                         |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `afterHit.ts`         | the bolts, balls, bounces and scattered arrows that follow a hit (Bolt Cleave, Slag Blow, Slag Lob, Whirl Shot)                                                                                                                        |
+| `ailmentMax.ts`       | only the strongest bleed or ignite burns, not the average (Gouge Shot, Torch Arrow)                                                                                                                                                    |
+| `patterns.ts`         | pods, volleys, the pulses of a drifting orb, the ground a skull leaves, the true shotgun, the clones of Mirror Quiver, the cold wave of Prime Splash, the debuff that makes a skill's own later hits harder (Snare Shot)               |
+| `channelFx.ts`        | the thorns a channel scatters (Blight Hail), blades that circle (Orbiting Blades), a mote's own beat (Tempest Mote), half-hit builds (Judgement Tempest), an exposure at the top stage (Searing Lance)                                 |
+| `dot.ts`, `geyser.ts` | how long a carried debuff stays on (Spirit Saw); how often the character recasts a renewed debuff (`renewalGap`: Creeping Plague, Ruin Ritual, the weapon fills the rest); the blasts of a geyser (Pyre Burst)                         |
+| `melee.ts`            | a spin's sweeps, the bladestorm, the aftershock, charges, beams, the Triple Cadence ramp, the buffs a skill keeps up by its own use (Whirlwind Cleave, Faultline, Charged Blow, Cinder Blow, Thunder Rebuke, Bulwark Rush, Storm Rush) |
+| `deployed.ts`         | every arrow of a mortar totem, a mine's rain and aura, the traps and mines that stand (Mortar Bow, Mortar Charge, Shrapnel Trap, Storm Charge, Glacier Wall)                                                                           |
+| `minionDps.ts`        | a golem or colossus counts one target, a relic its nova, a band its gaps between lots, the minion supports (all the summoning gems except Bind Shade)                                                                                  |
 
 Also fixed in `skill.ts`: a crystal (Rime Core) and a wall are one hit, not a pulse each interval (Rime Core was five times too high,
 and it is the first spell most characters are given).
@@ -162,7 +162,7 @@ Sim behaviour that contradicts what the gem says; **not changed**, because each 
 - **Hallowed Relic** stays where it is put (reach 6); the text says it follows the character.
 - **Mirror Quiver** clones are not capped (about four stand at once at 1.4 uses a second); the clone data has `respawn: 4`, which
   `summonAt` ignores.
-- **Swelling Blast** (Intensify) shrinks area spells by 12% a stage; the text says they swell.
+- **Swelling Blast** shrinks area spells by 12% a stage; the text says they swell.
 - **Slow channels:** `LULL = 0.9 s` ends a channel whenever two uses are more than 0.9 s apart, so a channelling skill with a slow
   use time (Blight Hail on a ballista, or with little attack speed) can never build its stages.
 - `reference/coverage/spirit.json` still says Hallowed Relic's "nova trigger not modelled"; the sim models it.

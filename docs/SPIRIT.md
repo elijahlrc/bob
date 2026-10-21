@@ -1,7 +1,7 @@
 # Bob — Spirit Plan: making every gem do what its reference gem does
 
-Status: **plan, 2026-10-08. Nothing is built; the user has said to implement all of it, on their go-ahead.** It follows [AUDIT-GEMS.md](AUDIT-GEMS.md), which re-judged all 326 gems of the
-coverage plan against what each is _for_ in the reference game (PoE 3.9.0): 155 faithful, 133 drifted, 38 gutted. This plan
+Status: **plan, 2026-10-08. Nothing is built; the user has said to implement all of it, on their go-ahead.** It follows the gem spirit audit (`reference/docs/AUDIT-GEMS.md`, local reference material, not in the repository), which re-judged all 326 gems of the
+coverage plan against what each is _for_ in the reference game (the reference version): 155 faithful, 133 drifted, 38 gutted. This plan
 is the work to make the other 171 faithful. The user answered four of the open questions on 2026-10-08 (section 11); the rest have defaults, and the user can overturn any of them. It reopens
 several rows of [DESIGN.md](DESIGN.md) 2.1 and says so in section 3.
 
@@ -9,11 +9,11 @@ several rows of [DESIGN.md](DESIGN.md) 2.1 and says so in section 3.
 
 ## 0. Summary
 
-**The bar.** The user, 2026-10-08: _"I would like player abilities to be totally analogous to POE 3.9 when this plan is
+**The bar.** The user, 2026-10-08: _"I would like player abilities to be totally analogous to [the reference game] when this plan is
 implemented."_ Earlier the same day: _"I don't need the numbers to be exactly the same, but the spirit of the ability does
 need to be captured and transferred over."_ Put together, and made testable:
 
-> When this plan is done, **all 326 gems read `faithful` under the rubric of AUDIT-GEMS.md**: a player of the reference game
+> When this plan is done, **all 326 gems read `faithful` under the rubric of the gem spirit audit**: a player of the reference game
 > would pick the gem for the same reason and get the same loop (what it consumes, what it gives, what it needs, how it is
 > timed, what it trades off), with Bob's own names and tuned numbers. The test is a **re-run of the audit** by fresh
 > reviewers who are not told the old verdicts (milestone S14), not a feeling.
@@ -26,31 +26,31 @@ listed there has to behave as the reference game does.
 the defining _number_ kept and the defining _loop_ lost, because the engine had no way to say the loop. A dozen engine
 pieces are missing: skills cannot have a cooldown and charges cannot be spent; "channelling" is a tag nothing reads; enemies
 cannot be slowed, maimed, blinded or made vulnerable by a skill; the player cannot leave burning ground; projectiles cannot
-fire in sequence (Barrage) or be flagged to shotgun; there is no skill damage over time; corpses are not objects the player can
+fire in sequence or be flagged to shotgun; there is no skill damage over time; corpses are not objects the player can
 use; totems cannot be hit.
 
 **The parts.**
 
-| Part                                      | What                                                                                                                                                                                                                                | Gems it makes whole (see the curve, section 7) | Size                 |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | -------------------- |
-| **S0 Ledger and checking**                | The audit pipeline moves into `scripts/`; a ledger with one row per gem; every claim the audit left as "a reviewer's reading" is checked before it is fixed; the 3.9 text of each gem's reference page is read at the point of work | 0 (it is how the rest is measured)             | M                    |
-| **S1 Gems that do nothing**               | Cast on Melee Kill, the Multistrike echo, four uncastable curses, Dual Strike's off hand, kill triggers that fire on any death, notes that claim more than the code does                                                            | 8 start working                                | S                    |
-| **S2 The use model**                      | Cooldowns on any skill, spending charges, cooldown bypass, a buff on use, exerted attacks, windows after a block, how the character chooses among its skills                                                                        | 10                                             | L                    |
-| **S3 The enemy status layer, and curses** | Slow, maim, blind, hinder, immobilise, exposure, vulnerability, stacking debuffs; self-cast curses and marks with their real effects and the curse limit                                                                            | 18                                             | L                    |
-| **S4 Projectile shapes**                  | Sequential volleys (Barrage), the two skills flagged to shotgun, parallel lanes, nova, split, chain and fork, strike-then-projectiles; calc agrees with the sim                                                                     | 16                                             | M                    |
-| **S5 Channelling**                        | Stages, ramp and release as a way to use a skill                                                                                                                                                                                    | 8                                              | L                    |
-| **S6 Ground and lasting objects**         | Burning, chilling and consecrated ground the player leaves; walls; Standards; orbs; the Righteous Fire family done properly                                                                                                         | 11                                             | L                    |
-| **S7 Damage over time and spread**        | Skill damage over time, stacks, leech from it, ailments that spread                                                                                                                                                                 | 12                                             | M                    |
-| **S8 Blink and travel**                   | What a blink does on arrival and departure; a delayed warp; hits along a dash; distance scaling                                                                                                                                     | 8                                              | M                    |
-| **S9 Stances, guards, rage and absorb**   | Toggle stances the character swaps by situation; absorb-then-release pools; rage that is spent; buff rules                                                                                                                          | 6                                              | M                    |
-| **S10 Deployables that exist**            | Totems, traps, mines as things in the world that can be hit, taunt, hold and detonate                                                                                                                                               | 6                                              | L                    |
-| **S11 Corpses**                           | Every kill leaves one; skills that consume them (swap, raise, offer, detonate, desecrate, unearth)                                                                                                                                  | 4                                              | M                    |
-| **S12 Minions**                           | Golem and offering buffs that follow the minion, a spectre that is a monster, an animated guardian that wears items, minion auras                                                                                                   | 7                                              | M                    |
-| **S13 The long tail**                     | The 65 gems whose gap is their own: a stack, a weapon rule, a conditional, a per-charge scaling                                                                                                                                     | 65                                             | L (in three batches) |
-| **S14 Close**                             | A fresh re-audit, the residue, the docs, a bot sample                                                                                                                                                                               | the verdict                                    | M                    |
+| Part                                      | What                                                                                                                                                                                                                                      | Gems it makes whole (see the curve, section 7) | Size                 |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | -------------------- |
+| **S0 Ledger and checking**                | The audit pipeline moves into `scripts/`; a ledger with one row per gem; every claim the audit left as "a reviewer's reading" is checked before it is fixed; the reference text of each gem's reference page is read at the point of work | 0 (it is how the rest is measured)             | M                    |
+| **S1 Gems that do nothing**               | Slayer's Echo, the Triple Cadence echo, four uncastable curses, Twin Blades' off hand, kill triggers that fire on any death, notes that claim more than the code does                                                                     | 8 start working                                | S                    |
+| **S2 The use model**                      | Cooldowns on any skill, spending charges, cooldown bypass, a buff on use, exerted attacks, windows after a block, how the character chooses among its skills                                                                              | 10                                             | L                    |
+| **S3 The enemy status layer, and curses** | Slow, maim, blind, hinder, immobilise, exposure, vulnerability, stacking debuffs; self-cast curses and marks with their real effects and the curse limit                                                                                  | 18                                             | L                    |
+| **S4 Projectile shapes**                  | Sequential volleys, the two skills flagged to shotgun, parallel lanes, nova, split, chain and fork, strike-then-projectiles; calc agrees with the sim                                                                                     | 16                                             | M                    |
+| **S5 Channelling**                        | Stages, ramp and release as a way to use a skill                                                                                                                                                                                          | 8                                              | L                    |
+| **S6 Ground and lasting objects**         | Burning, chilling and consecrated ground the player leaves; walls; Standards; orbs; the Searing Mantle family done properly                                                                                                               | 11                                             | L                    |
+| **S7 Damage over time and spread**        | Skill damage over time, stacks, leech from it, ailments that spread                                                                                                                                                                       | 12                                             | M                    |
+| **S8 Blink and travel**                   | What a blink does on arrival and departure; a delayed warp; hits along a dash; distance scaling                                                                                                                                           | 8                                              | M                    |
+| **S9 Stances, guards, rage and absorb**   | Toggle stances the character swaps by situation; absorb-then-release pools; rage that is spent; buff rules                                                                                                                                | 6                                              | M                    |
+| **S10 Deployables that exist**            | Totems, traps, mines as things in the world that can be hit, taunt, hold and detonate                                                                                                                                                     | 6                                              | L                    |
+| **S11 Corpses**                           | Every kill leaves one; skills that consume them (swap, raise, offer, detonate, desecrate, unearth)                                                                                                                                        | 4                                              | M                    |
+| **S12 Minions**                           | Golem and offering buffs that follow the minion, a spectre that is a monster, an animated guardian that wears items, minion auras                                                                                                         | 7                                              | M                    |
+| **S13 The long tail**                     | The 65 gems whose gap is their own: a stack, a weapon rule, a conditional, a per-charge scaling                                                                                                                                           | 65                                             | L (in three batches) |
+| **S14 Close**                             | A fresh re-audit, the residue, the docs, a bot sample                                                                                                                                                                                     | the verdict                                    | M                    |
 
 **Order of work.** S0, S1, S2, S3, S4 first: they repair the most gems per unit of engine, and they are what the user's
-Flicker Strike example is about. S5 to S12 follow the dependencies of section 7. S13 and S14 close. The plan can be stopped
+Blinking Cut example is about. S5 to S12 follow the dependencies of section 7. S13 and S14 close. The plan can be stopped
 at a few points and still be worth having; section 7 says what each stopping point buys.
 
 **What this plan does not touch.** Gems, and the granted skills and item-linked supports that a gem change reaches. Not the
@@ -66,27 +66,27 @@ From the user:
 - 2026-10-08: the Blinking Cut port _"just generates charges and ramps up into faster attacks"_ where the original
   _"fills a niche of converting charges into burst damage"_; the worry that _"coarse assumptions lead to a dumbing down and
   simplification of many of the more interesting"_ abilities.
-- 2026-10-08: _"When porting an ability from POE to this project, I don't need the numbers to be exactly the same, but the
+- 2026-10-08: _"When porting an ability from [the reference game] to this project, I don't need the numbers to be exactly the same, but the
   spirit of the ability does need to be captured and transferred over."_
-- 2026-10-08: _"I would like player abilities to be totally analogous to POE 3.9 when this plan is implemented."_
+- 2026-10-08: _"I would like player abilities to be totally analogous to [the reference game] when this plan is implemented."_
 
 Principles, in addition to those of [COVERAGE.md](COVERAGE.md) and DESIGN.md 3:
 
 - **Verify the reference before building on it.** The first audit stated how the reference game handles several projectiles from
-  memory, and was wrong (AUDIT-GEMS.md, erratum). Every claim about the reference game that a change depends on is read from the
-  3.9 wiki through `npm run coverage:wiki`, or from the PoB data, and recorded in the gem's spec before the change is made.
+  memory, and was wrong (the audit's erratum). Every claim about the reference game that a change depends on is read from the
+  reference wiki through `npm run coverage:wiki`, or from the reference data, and recorded in the gem's spec before the change is made.
   A reviewer's memory is a lead, not a source.
 - **Spirit is the loop, not the number.** For an active skill, the loop is what it consumes, gives, needs, how it is timed and
   what it trades off. For a support, it is the trade it offers (a restriction for power, a cost for a mode, a trigger, a
   change of behaviour). Dropping a cosmetic does not lose it; dropping the interaction that made the gem a niche does.
 - **Say it once, as an engine primitive.** A gem that needs "spend a charge to skip the cooldown" gets a field that says
   exactly that and a test of exactly that, not a special case in `abilities.ts`. The next gem that needs it is a data row.
-- **The 3.9 numbers are the default where the mechanic exists.** The Path of Building v1.4.155 data in `reference/coverage` has
-  mana costs, cooldowns, durations, effectiveness and per-level values for 3.9. Where the engine can now express a loop,
+- **The reference numbers are the default where the mechanic exists.** The reference data in `reference/coverage` has
+  mana costs, cooldowns, durations, effectiveness and per-level values for the reference version. Where the engine can now express a loop,
   its numbers are those, scaled by Bob's existing level and damage curves; where Bob has its own tuned number, it keeps it.
 - **A gem's text derives from its data.** Cards, the skill bar and the inspect panel are built from the definition
   (`src/ui/gemText.ts`); a new primitive ships with its string, or it does not ship. A gem that claims an effect its code does
-  not have is the failure the audit found most often (Ensnaring Arrow's chill, Spirit Saw's energy shield).
+  not have is the failure the audit found most often (Snare Shot's chill, Spirit Saw's energy shield).
 - **Calc and sim agree.** Every primitive is modelled in `src/calc` (the sheet, the DPS the player reads) and in `src/sim`
   (what happens), and the convergence tests hold them together. A mechanic that only the sim has makes the sheet lie; one
   that only the sheet has is the old failure again.
@@ -94,7 +94,7 @@ Principles, in addition to those of [COVERAGE.md](COVERAGE.md) and DESIGN.md 3:
   names its policy (section 5), and the policy is something a good player would do, not a convenience.
 - **Our own names, our own text.** Names, descriptions and art are Bob's (DESIGN.md 3; the IP scan, `src/data/ip.test.ts`).
   Reference names appear in `docs/` and `scripts/` only. No code from any tool is copied.
-- **Data first.** A gem is a decision file in `reference/coverage/gems/*.json` turned into `src/data/gemsGen.ts` by the emitter.
+- **Data first.** A gem is a decision file (kept with the local reference material, `reference/coverage/gems/*.json`, not in the repository) turned into `src/data/gemsGen.ts` by the emitter.
   Nothing is edited in `gemsGen.ts` by hand. Engine work lands in `src/calc`, `src/sim` and the type files.
 - **Ids are stable.** Gem ids are never renamed (items in saves hold them). A change of `kind` (the four old hex gems)
   keeps the id.
@@ -137,12 +137,12 @@ readings that milestone S0 confirms before anything is built on them.
 ### 2.3 Projectiles, areas, lasting things
 
 - **All projectiles of one use share a hit list** (`useHits`, `src/sim/actions.ts:396`; a decision of 2026-10-06), so a target is
-  hit once per use. **This matches the reference game for projectiles fired together** (the 3.9 wiki: a single enemy cannot be hit
-  by more than one projectile of a bow attack fired together; shotgunning was removed in 2.0.0). It does not allow for the
-  exceptions: Barrage and Barrage Support fire their projectiles in sequence, so they can all hit one target; the 3.9 data flags
-  Shrapnel Ballista and Shattering Steel as able to shotgun. **Checked** in the code and the wiki. Projectile count is ignored
+  hit once per use. **This matches the reference game for projectiles fired together** (the reference wiki: a single enemy cannot be hit
+  by more than one projectile of a bow attack fired together; shotgunning was removed in an early version). It does not allow for the
+  exceptions: Quiver Rush and Rolling Volleys fire their projectiles in sequence, so they can all hit one target; the reference data flags
+  Scatter Bow and Splinter Volley as able to shotgun. **Checked** in the code and the wiki. Projectile count is ignored
   by the sheet's DPS, which is right for simultaneous projectiles and wrong for those exceptions.
-- `chains` is consumed only inside the `chain` behaviour (`actions.ts:292`). Chain Support does nothing on a projectile
+- `chains` is consumed only inside the `chain` behaviour (`actions.ts:292`). Ricochet does nothing on a projectile
   skill. **Checked.**
 - Skills can leave a **zone** (`behaviour: ground`, `w.zones`, `tickSkillZones`) that pulses a hit. Burning, chilling and
   consecrated ground that does something other than hit, a wall, a placed object, an orb: none exist on the player's side.
@@ -163,7 +163,7 @@ readings that milestone S0 confirms before anything is built on them.
 
 ### 2.5 The gems that do nothing
 
-Listed in AUDIT-GEMS.md; they are milestone S1.
+Listed in the gem spirit audit; they are milestone S1.
 
 ---
 
@@ -172,16 +172,16 @@ Listed in AUDIT-GEMS.md; they are milestone S1.
 "Totally analogous" overturns, or narrows, several rows of DESIGN.md 2.1 and one decision of 2026-10-06. D1, D4, D5 and D7 were put to the user on 2026-10-08
 and are answered as marked; the others are defaults in effect until the user says otherwise (section 11).
 
-| #   | Today                                                                                                                                                                                    | The plan proposes                                                                                                                                                                                                                                                                                         | Why                                                                                                                                                                                          |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D1  | **Projectiles share a hit list** (2026-10-06): a use hits each target once                                                                                                               | **Kept**, because it is the reference game's rule for projectiles fired together. Added: a `sequential` mode (Barrage and Barrage Support: each volley has its own hit list, so they can hit one target) and a `shotgun` flag for the two skills the 3.9 data flags (Shrapnel Ballista, Shattering Steel) | Checked against the 3.9 wiki after the user questioned the first draft of this plan, which proposed removing the rule. The audit's shotgun findings were mostly this error and are corrected |
-| D2  | "Multiple skills: **one primary skill**, auto-used"                                                                                                                                      | The primary may be on a cooldown or conditional, and the character then uses the next skill or the default attack, as a player does                                                                                                                                                                       | Flicker Strike, Cold Snap, Vigilant Strike and the retaliation skills are cooldown or conditional skills; the engine already has the fallback                                                |
-| D3  | "Block: a blocked hit does nothing else"                                                                                                                                                 | Unchanged for hits; a block still fires the `block` event, and retaliation skills become usable for a window after it                                                                                                                                                                                     | The event exists; only the skills need it                                                                                                                                                    |
-| D4  | "Curses: self-cast 9 to 11 s in PoE; Bob's hexes last 6 s, are applied on hit and use Bob's numbers"                                                                                     | **Decided by the user, 2026-10-08:** curses are cast by the character, last as long as the 3.9 gem says (scaled by the curse-duration mods), use the 3.9 effect lists and the curse limit; Hexing Strikes keeps applying curses on hit as Hextouch does                                                   | The curses' effects (accuracy, crit, slow, vulnerability, ailment chance) are their reason to be taken                                                                                       |
-| D5  | "Gem quality: not modelled"                                                                                                                                                              | **Stays out** (the user, 2026-10-08). The Enhance analog is then the one gem that cannot be faithful, and is recorded as such in the ledger (`accepted`)                                                                                                                                                  | Quality is an upgrade path with its own economy, not a skill behaviour                                                                                                                       |
-| D6  | "Critical rolls: once per target hit"                                                                                                                                                    | Unchanged. It changes variance, not any gem's loop                                                                                                                                                                                                                                                        |                                                                                                                                                                                              |
-| D7  | COVERAGE excluded corpse skills (Desecrate, Detonate Dead, Unearth, Volatile Dead), Vaal skills, Manabond, Plague Bearer, Herald of Purity, Tempest Shield, remote trap and mine control | **Unchanged: they stay out.** The user, 2026-10-08, chose "none of them". The corpses part (S11) builds only what the 326 gems need (Bodyswap, Spectre, the Offerings)                                                                                                                                    | The 23 uncovered gems are not in the audit                                                                                                                                                   |
-| D8  | Cooldowns: "guards, warcries and blinks do not share"                                                                                                                                    | Whatever the 3.9 rules are (S0 checks them), including any shared cooldowns between guard skills                                                                                                                                                                                                          |                                                                                                                                                                                              |
+| #   | Today                                                                                                                                                                                                                               | The plan proposes                                                                                                                                                                                                                                                                                            | Why                                                                                                                                                                                                |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | **Projectiles share a hit list** (2026-10-06): a use hits each target once                                                                                                                                                          | **Kept**, because it is the reference game's rule for projectiles fired together. Added: a `sequential` mode (Quiver Rush and Rolling Volleys: each volley has its own hit list, so they can hit one target) and a `shotgun` flag for the two skills the reference data flags (Scatter Bow, Splinter Volley) | Checked against the reference wiki after the user questioned the first draft of this plan, which proposed removing the rule. The audit's shotgun findings were mostly this error and are corrected |
+| D2  | "Multiple skills: **one primary skill**, auto-used"                                                                                                                                                                                 | The primary may be on a cooldown or conditional, and the character then uses the next skill or the default attack, as a player does                                                                                                                                                                          | Blinking Cut, Sudden Frost, Guarded Strike and the retaliation skills are cooldown or conditional skills; the engine already has the fallback                                                      |
+| D3  | "Block: a blocked hit does nothing else"                                                                                                                                                                                            | Unchanged for hits; a block still fires the `block` event, and retaliation skills become usable for a window after it                                                                                                                                                                                        | The event exists; only the skills need it                                                                                                                                                          |
+| D4  | "Curses: self-cast 9 to 11 s in the reference game; Bob's hexes last 6 s, are applied on hit and use Bob's numbers"                                                                                                                 | **Decided by the user, 2026-10-08:** curses are cast by the character, last as long as the reference gem says (scaled by the curse-duration mods), use the reference effect lists and the curse limit; Hexing Strikes keeps applying curses on hit as its reference support does                             | The curses' effects (accuracy, crit, slow, vulnerability, ailment chance) are their reason to be taken                                                                                             |
+| D5  | "Gem quality: not modelled"                                                                                                                                                                                                         | **Stays out** (the user, 2026-10-08). Refine Gem is then the one gem that cannot be faithful, and is recorded as such in the ledger (`accepted`)                                                                                                                                                             | Quality is an upgrade path with its own economy, not a skill behaviour                                                                                                                             |
+| D6  | "Critical rolls: once per target hit"                                                                                                                                                                                               | Unchanged. It changes variance, not any gem's loop                                                                                                                                                                                                                                                           |                                                                                                                                                                                                    |
+| D7  | COVERAGE excluded corpse skills (making, detonating, raising and exploding corpses), the corrupted-gem skills, a mana-bond spell, a plague aura, a herald of physical damage, a lightning shield buff, remote trap and mine control | **Unchanged: they stay out.** The user, 2026-10-08, chose "none of them". The corpses part (S11) builds only what the 326 gems need (Shadow Swap, Bind Shade, the Rites)                                                                                                                                     | The 23 uncovered gems are not in the audit                                                                                                                                                         |
+| D8  | Cooldowns: "guards, warcries and blinks do not share"                                                                                                                                                                               | Whatever the reference rules are (S0 checks them), including any shared cooldowns between guard skills                                                                                                                                                                                                       |                                                                                                                                                                                                    |
 
 ---
 
@@ -189,29 +189,29 @@ and are answered as marked; the others are defaults in effect until the user say
 
 ### 4.1 The ledger
 
-`reference/coverage/spirit.json` (new): one row per mapped gem, keyed by id: `verdict` (faithful, drifted, gutted), `missing`
+The ledger, `reference/coverage/spirit.json` (new; now local reference material, not in the repository): one row per mapped gem, keyed by id: `verdict` (faithful, drifted, gutted), `missing`
 (primitives), `milestone` (the one that finishes it), `effects` (what a run of the gem must visibly do: see 4.3), `verified`
 (a person or a test has checked the claim), `accepted` (a documented adaptation that is not a gap). A test fails if a mapped
 gem has no row, if a gem marked `faithful` lists a missing primitive, or if a milestone is marked done while its gems are
 not `faithful`. Today's rows come from the audit's merged output.
 
 `npm run spirit` prints counts by verdict and milestone; `npm run spirit -- --gem blinkingCut` prints the join block for one
-gem (the reference description, skill types, stats and level-1 and level-20 values from the PoB data, Bob's definition and
+gem (the reference description, skill types, stats and level-1 and level-20 values from the reference data, Bob's definition and
 its note), which is how a milestone starts work on a gem. These are the audit's own scripts, moved from the scratchpad into
 `scripts/spirit/` so the audit can be repeated.
 
 ### 4.2 Read the reference first, at the point of work
 
-Each milestone starts, per gem it repairs, by writing a **spec**: five lines at most, in the ledger, of what the 3.9 gem does,
-read from (1) the PoB data and (2) the 3.9 wiki page as it stood before 3.10 (`npm run coverage:wiki -- "Page title"`, which
-AUDIT-3.9.md used). The wiki site blocks bots, so the tool is the way; poedb shows later versions and is a hint, not a
-source. **Every non-faithful row's account of the reference game (the "PoE" line of AUDIT-GEMS.md) is re-checked this way before
+Each milestone starts, per gem it repairs, by writing a **spec**: five lines at most, in the ledger, of what the reference gem does,
+read from (1) the reference data and (2) the reference wiki page as it stood at the reference version (`npm run coverage:wiki -- "Page title"`, which
+the earlier version audit used). The wiki site blocks bots, so the tool is the way; the reference database site shows later versions and is a hint, not a
+source. **Every non-faithful row's account of the reference game (the reference-game line of the gem spirit audit) is re-checked this way before
 its milestone starts**; where the wiki says something different, the row is corrected first, as the projectile rows were. The spec is the acceptance test's source. Nothing in `docs/` is copied into `src/`.
 
 ### 4.3 Tests
 
 - **A loop test per gem**, in the style of `src/sim/gemSmoke.test.ts` and `triggers.test.ts`: a scripted world, the gem
-  in a build, and the assertion that the loop happens (Flicker Strike: a charge is spent and the cooldown is skipped; the
+  in a build, and the assertion that the loop happens (Blinking Cut: a charge is spent and the cooldown is skipped; the
   movement buff starts; with no charge the second use waits). The test is written from the spec, before the gem is edited.
 - **A primitive test per primitive**: the sim and the calc each, and a convergence check that the sheet and the sim agree to
   the existing tolerance.
@@ -236,20 +236,20 @@ An autobattler cannot ask for a keypress, so each skill that a human drives gets
 and what it chooses. These are the adaptations the bar allows. A policy is data on the gem (a `use` field), not code in the
 AI, so the card can state it ("Used when 3 enemies are near").
 
-| Skill class                                                                                   | The reference game                               | The policy                                                                                                                                                                                                                  |
-| --------------------------------------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cooldown skill with a bypass (Flicker Strike, Cold Snap, Vigilant Strike)                     | Press again, spending a charge, to skip the wait | Use when ready. While the cooldown runs, spend a charge to use again if one is held and the target is in reach or about to be (keeps a reserve of one if a spend-gated support needs it). The default attack fills the gaps |
-| Channelled skill (Flameblast, Blade Flurry, Winter Orb, Cyclone, Divine Ire, Storm Rush, ...) | Hold the button; release to fire or stop         | Channel while a target is in reach and the path is clear. A release skill fires at the stage cap or when the target dies, and a stun or a move ends it. Movement-based channels (Cyclone) move with the fight               |
-| Warcry that exerts attacks (Infernal Cry, the cries)                                          | Cry, then attack                                 | Cry when a pack or a rare is near and attacks are about to land; the next N attacks are exerted                                                                                                                             |
-| Retaliation skill (Anvil Drop, Rime Rebuke, Blade Wind)                                       | Usable for a short window after you block        | Used at once when the window opens                                                                                                                                                                                          |
-| Stance skill (Dune Stance, Stone Stance)                                                      | Swap by clicking the skill                       | The stance fitting the situation: the single-target stance against a boss or one enemy, the area stance against three or more, re-evaluated at most every two seconds, as a player would                                    |
-| Guard, buff, aura-like skill                                                                  | Press when needed                                | Guard when life is low or a large hit lands; upkeep while enemies are near; rally against a pack or a rare (today's `utility.policy`)                                                                                       |
-| Blink (Flame Dash, Frostblink, Lightning Warp, Shadow Swap)                                   | Aim, press to move                               | Used to close a gap, to leave a hazard the dodge cannot walk out of, and, for those with an effect on arrival, when the effect would land on a pack                                                                         |
-| Curse or mark                                                                                 | Cast on a target                                 | A rare, a boss or a pack gets the curses the build holds, up to the curse limit, strongest first; refreshed before it ends                                                                                                  |
-| Totem, trap, mine, brand                                                                      | Place by hand; mines are detonated by hand       | Place near the fight when enemies are in reach and fewer than the cap stand. Traps trigger by walking into them as in the game. A mine set detonates when enough enemies stand in its radius or the set is about to expire  |
-| Corpse skill (Bodyswap, Detonate Dead, Spectre, Offerings, Desecrate)                         | Aim at a corpse                                  | Used when a corpse is within reach and the skill's purpose applies (a pack near it to detonate; a gap to close by swapping; fewer minions than the cap to raise)                                                            |
-| Minion skill                                                                                  | Summon, and sometimes command                    | Summon when under the cap; no commands (the reference game's minions follow and fight)                                                                                                                                      |
-| Trigger                                                                                       | The game casts it                                | As the game, with the triggers' rules and mana (already built)                                                                                                                                                              |
+| Skill class                                                                                                         | The reference game                               | The policy                                                                                                                                                                                                                  |
+| ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cooldown skill with a bypass (Blinking Cut, Sudden Frost, Guarded Strike)                                           | Press again, spending a charge, to skip the wait | Use when ready. While the cooldown runs, spend a charge to use again if one is held and the target is in reach or about to be (keeps a reserve of one if a spend-gated support needs it). The default attack fills the gaps |
+| Channelled skill (Furnace Roar, Flurry of Edges, Hoarfrost Mote, Twister Blade, Judgement Tempest, Storm Rush, ...) | Hold the button; release to fire or stop         | Channel while a target is in reach and the path is clear. A release skill fires at the stage cap or when the target dies, and a stun or a move ends it. Movement-based channels move with the fight                         |
+| Warcry that exerts attacks (Graveyard Bellow, the cries)                                                            | Cry, then attack                                 | Cry when a pack or a rare is near and attacks are about to land; the next N attacks are exerted                                                                                                                             |
+| Retaliation skill (Anvil Drop, Rime Rebuke, Blade Wind)                                                             | Usable for a short window after you block        | Used at once when the window opens                                                                                                                                                                                          |
+| Stance skill (Dune Stance, Stone Stance)                                                                            | Swap by clicking the skill                       | The stance fitting the situation: the single-target stance against a boss or one enemy, the area stance against three or more, re-evaluated at most every two seconds, as a player would                                    |
+| Guard, buff, aura-like skill                                                                                        | Press when needed                                | Guard when life is low or a large hit lands; upkeep while enemies are near; rally against a pack or a rare (today's `utility.policy`)                                                                                       |
+| Blink (Cinder Step, Rime Step, Bolt Step, Shadow Swap)                                                              | Aim, press to move                               | Used to close a gap, to leave a hazard the dodge cannot walk out of, and, for those with an effect on arrival, when the effect would land on a pack                                                                         |
+| Curse or mark                                                                                                       | Cast on a target                                 | A rare, a boss or a pack gets the curses the build holds, up to the curse limit, strongest first; refreshed before it ends                                                                                                  |
+| Totem, trap, mine, brand                                                                                            | Place by hand; mines are detonated by hand       | Place near the fight when enemies are in reach and fewer than the cap stand. Traps trigger by walking into them as in the game. A mine set detonates when enough enemies stand in its radius or the set is about to expire  |
+| Corpse skill (Shadow Swap, Bind Shade, the Rites, corpse detonation and creation)                                   | Aim at a corpse                                  | Used when a corpse is within reach and the skill's purpose applies (a pack near it to detonate; a gap to close by swapping; fewer minions than the cap to raise)                                                            |
+| Minion skill                                                                                                        | Summon, and sometimes command                    | Summon when under the cap; no commands (the reference game's minions follow and fight)                                                                                                                                      |
+| Trigger                                                                                                             | The game casts it                                | As the game, with the triggers' rules and mana (already built)                                                                                                                                                              |
 
 If the reference game does something here that the table does not cover, the gem is not done until it does it or the table
 gains a row the user accepts.
@@ -265,40 +265,40 @@ this plan is larger than the coverage plan.
 ### S0 Ledger and checking (M)
 
 - `scripts/spirit/` (join, merge, report), `reference/coverage/spirit.json`, `npm run spirit`, the ledger test (4.1).
-- **Check the unchecked claims** before any fix is built on them: Cast on Melee Kill is inert; Dual Strike hits with one
+- **Check the unchecked claims** before any fix is built on them: Slayer's Echo is inert; Twin Blades hits with one
   weapon; Chain; the totems and deployables facts; golem and offering buffs; the kill-trigger rule; the mark rule; each port
-  note that the audit says claims more than the code does (Shield Charge, Wild Strike, Gouge Shot, Spirit Saw, Ghost Shard,
-  Ensnaring Arrow, Slow Rot, Vile Toxins, Frost Fang). Each is a test that fails now, or a note that it was wrong.
-- **Re-read the reference for the weakest rows.** Sixteen gems had no PoB data and were judged partly from memory or from
-  poedb (current-version values): Rime Drift, Anvil Drop, Rime Rebuke, Halo Sweep, Cluster Bolt, Slag Lob, Ghost Coil, Blade
-  Wind, Hunt Sigil, Kindled Bellow, Rot Drain Trap, Toxin Coat, and the supports Chance to Poison, Multiple Projectiles,
-  Critical Strike Affliction, More Duration, Hextouch. The Barrage active gem was judged from a mismatched join and from memory.
-  Some of these may be later additions that the coverage list admitted through its release-version field: if the 3.9 wiki
-  has no such page, the gem is recorded `not in 3.9`, leaves the plan, and keeps its definition.
-- **Check the PoE side of the audit itself.** Each of the 171 non-faithful rows has a "PoE" line written by a reviewer, partly
-  from memory. S0 re-reads the 3.9 wiki and PoB text for the rows of S1 to S4 (about 75 gems) and corrects any that are wrong,
+  note that the audit says claims more than the code does (Bulwark Rush, Prime Splash, Gouge Shot, Spirit Saw, Ghost Shard,
+  Snare Shot, Slow Rot, Foul Brew, Frost Fang). Each is a test that fails now, or a note that it was wrong.
+- **Re-read the reference for the weakest rows.** Sixteen gems had no reference data and were judged partly from memory or from
+  the reference database site (current-version values): Rime Drift, Anvil Drop, Rime Rebuke, Halo Sweep, Cluster Bolt, Slag Lob, Ghost Coil, Blade
+  Wind, Hunt Sigil, Graveyard Bellow, Rot Drain Trap, and the supports Toxin Coat, Triple Shot,
+  Festering Crit, Lingering Effect, Hexing Strikes. The Quiver Rush active gem was judged from a mismatched join and from memory.
+  Some of these may be later additions that the coverage list admitted through its release-version field: if the reference wiki
+  has no such page, the gem is recorded `not in the reference version`, leaves the plan, and keeps its definition.
+- **Check the reference-game side of the audit itself.** Each of the 171 non-faithful rows has a reference-game line written by a reviewer, partly
+  from memory. S0 re-reads the reference wiki and reference data text for the rows of S1 to S4 (about 75 gems) and corrects any that are wrong,
   as the projectile rows were; later milestones do the same for their own rows at their start (4.2).
 - The `effects` vocabulary and the parity smoke (4.3).
 
 ### S1 Gems that do nothing (S)
 
-- Cast on Melee Kill (`slayersEcho`): a trigger links _spells_ and the gem supports melee, so its list is empty. Fix the
+- Slayer's Echo (`slayersEcho`): a trigger links _spells_ and the gem supports melee, so its list is empty. Fix the
   linking rule so a melee-kill trigger casts the spells in the same item, as the reference gem does; honour its `tags`
   filter.
-- Multistrike (`tripleCadence`): the second echo lands at 1.1 of the use time, after the action ends. Echo timing is
+- Triple Cadence (`tripleCadence`): the second echo lands at 1.1 of the use time, after the action ends. Echo timing is
   fitted to the action (the sim and the sheet then agree on the number of hits); the ramp and the target choice are S13.
-- Dual Strike (`twinBlades`): single-target melee hits with one hand per use; the sheet counts two.
+- Twin Blades (`twinBlades`): single-target melee hits with one hand per use; the sheet counts two.
 - The four curse gems become castable curses: `kind` `hex` becomes `active` with `utility: curse`, ids kept. The Hexing
   Strikes support then applies "the curse gems in the same item" by their utility, not by their kind. (The curses' real
   effects are S3.)
 - Kill triggers fire on the player's kills (and the minions', where the reference game counts them), not on any death.
 - Every port note that overclaims is rewritten to what the gem does today (S13 fixes the gem; the note is honest meanwhile).
-- **Gems:** Cast on Melee Kill, Multistrike (start), Dual Strike (start), the four curses (start). Most of these finish in
+- **Gems:** Slayer's Echo, Triple Cadence (start), Twin Blades (start), the four curses (start). Most of these finish in
   later parts.
 
 ### S2 The use model (L)
 
-The foundation for Flicker Strike, Cold Snap, Vigilant Strike, Discharge, Immortal Call, Phase Run, Blood Rage, the
+The foundation for Blinking Cut, Sudden Frost, Guarded Strike, Charge Release, Deathless Call, Slipstream Run, Surge of Blood, the
 warcries, the retaliation skills and Lightheart.
 
 - **Types.** `ActiveGemDef` gains: `cooldown` (a level value, seconds); `spend` (what using the skill consumes: charges of a
@@ -312,37 +312,37 @@ warcries, the retaliation skills and Lightheart.
 - **Calc.** The sheet accounts for the cooldown (a cooldown-limited skill's DPS is its burst over its cycle), for spent charges
   (the uptime they allow), and for exerted attacks.
 - **Policy.** Section 5, rows 1, 3, 4, 6.
-- **Gems:** Blinking Cut, Sudden Frost (Cold Snap, with S3 for its chill and S6 for its ground),
+- **Gems:** Blinking Cut, Sudden Frost (with S3 for its chill and S6 for its ground),
   Guarded Strike, Charge Release, Deathless Call, Slipstream Run,
-  Surge of Blood, Lightheart, the retaliation skills (Anvil Drop, Rime Rebuke, Blade Wind), the cries (Kindled
+  Surge of Blood, Lightheart, the retaliation skills (Anvil Drop, Rime Rebuke, Blade Wind), the cries (Graveyard
   Bellow and the others), Thunder Rebuke, Cinder Herald and Storm Herald (their kill effects use S2's on-use
   and trigger plumbing).
-- **Tests.** Flicker Strike's loop as the model: a charge is spent, the cooldown is skipped, the buff starts, the second
-  use waits with no charge; Cold Snap's bypass; a retaliation skill unusable until a block, usable for the window after one;
+- **Tests.** Blinking Cut's loop as the model: a charge is spent, the cooldown is skipped, the buff starts, the second
+  use waits with no charge; Sudden Frost's bypass; a retaliation skill unusable until a block, usable for the window after one;
   a cry exerts exactly N attacks. A convergence test for a cooldown-limited skill.
 - **Risk.** Cooldowns cut DPS and shift the balance. Section 9.
 
 ### S3 The enemy status layer, and curses (L)
 
 - **Statuses on an enemy.** A small registry (`src/data/statuses.ts`) of the effects a skill can apply: slow (a
-  movement-speed reduction), hinder, maim (slower movement and attack, and more physical damage taken in the 3.9 form),
+  movement-speed reduction), hinder, maim (slower movement and attack, and more physical damage taken in the reference form),
   blind (its hits miss more), immobilise (cannot move), exposure (elemental resistance reduced), vulnerability and
-  stacking "takes more damage" debuffs (Wither's stacks, Punishment), stun vulnerability. Each says its effect, its stacking
+  stacking "takes more damage" debuffs (Rot Touch's stacks, Penance), stun vulnerability. Each says its effect, its stacking
   rule (strongest wins, or stacks to a cap), its source, and how a boss or a unique resists it (today's hexes take 0.67 of
   the effect on bosses and are refused by `hexWarded` enemies; the same rule).
 - **Skills apply them**: on hit with a chance, on a cast, from an aura or a ground effect (S6), from a trap (S10).
   `GemMod` stats such as `status.slow.onHit` carry them; the support that adds a chance (Dazzle, Hamstring and so on) is a data row.
-- **Curses.** A curse gem is a spell the character casts (S1 makes the old four castable), with the effect list of the 3.9
-  gem: Enfeeble's accuracy and critical penalties, Vulnerability's physical taken, bleed and maim, Temporal Chains' slow and
+- **Curses.** A curse gem is a spell the character casts (S1 makes the old four castable), with the effect list of the reference
+  gem: Feeble Grip's accuracy and critical penalties, Open Wounds' physical taken, bleed and maim, Leaden Limbs' slow and
   its effect on the enemy's actions, the elemental curses' resistance reduction **and** their extra chance to be ignited, frozen
-  or shocked, Punishment, Despair, Conductivity, Flammability, Frostbite, and the marks. The curse limit (`hexLimit`) is
-  a real limit with 3.9's duration; **a mark's bonuses apply only to the target that carries that mark** (today they apply
+  or shocked, Penance, Void Curse, Static Curse, Tinder Curse, Rime Curse, and the marks. The curse limit (`hexLimit`) is
+  a real limit with the reference duration; **a mark's bonuses apply only to the target that carries that mark** (today they apply
   to any hexed target). The on-hit "hex supports" stop competing with real curses for the one slot.
 - **Calc and sim.** Enemy-side multipliers feed `hit`; the sheet shows "enemies are slowed/maimed/blind" as a configurable
   condition like the existing ones.
-- **Gems:** Wither (Rot Touch, with S7), Bear Trap (Jaws Trap, with S10), Snare Shot, Hamstring, Dazzle,
+- **Gems:** Rot Touch (with S7), Jaws Trap (with S10), Snare Shot, Hamstring, Dazzle,
   Rout, Penance, the Sigils (Ruin, Warlord, Plenty, Hunt), Guard Breaker, Void Curse, Standing Curse, Deep
-  Chill, Charged Breath, Kindled Bellow, the Standards' debuffs (with S6), Tide of Judgement, Brittle Doom, Leaden Limbs,
+  Chill, Charged Breath, Graveyard Bellow, the Standards' debuffs (with S6), Tide of Judgement, Brittle Doom, Leaden Limbs,
   Feeble Grip, Open Wounds, and the other curses and marks.
 - **Tests.** One per status (the effect, the stacking rule, the boss rule); one per curse (every item on its effect list).
 - **Risk.** Monster AI that reads speed and accuracy must see the statuses (`speedMult` in `src/sim/factions.ts` already
@@ -353,44 +353,44 @@ warcries, the retaliation skills and Lightheart.
 The once-per-target rule for projectiles fired together stays (D1). What is built is what the reference game does around it.
 
 - **Sequential volleys.** A `sequential` mode on projectile behaviour: the projectiles are fired one after another, each with its
-  own hit list, so they can all hit one target; with the per-projectile attack-time cost and damage the gem says (Barrage fires
-  its projectiles at 40% of base damage each in 3.9; Barrage Support's penalty is a data value from the PoB data). The sheet counts
+  own hit list, so they can all hit one target; with the per-projectile attack-time cost and damage the gem says (Quiver Rush fires
+  its projectiles at 40% of base damage each in the reference; Rolling Volleys' penalty is a data value from the reference data). The sheet counts
   each volley as a hit on the target.
-- **The shotgun flag.** A `shotgun` flag for a skill whose projectiles each have their own hit list (Shrapnel Ballista and
-  Shattering Steel are the two 3.9 flags). The sheet then needs the overlap model: given the spread, the target's size and the
+- **The shotgun flag.** A `shotgun` flag for a skill whose projectiles each have their own hit list (Scatter Bow and
+  Splinter Volley are the two reference flags). The sheet then needs the overlap model: given the spread, the target's size and the
   distance, how many projectiles hit one target (the community's "shotgun" effect); the sim needs none, geometry does it.
-- **Parallel lanes** (Volley and Greater Volley): the extra projectiles fly side by side instead of in a fan, which widens the
+- **Parallel lanes** (Twin Salvo and Wide Salvo): the extra projectiles fly side by side instead of in a fan, which widens the
   front without the cone.
-- **Nova** (Arrow Nova: the arrow lands, then a ring), **split at the end** (Tornado Shot: a piercing arrow, then arrows out in
-  all directions from where it ends), **spawned from the target** (a strike, then projectiles from the target: Wild Strike),
-  **fork** (the projectile splits at the first enemy it hits, once, at 60 degrees: the 3.9 wiki) and **chain** (a projectile
+- **Nova** (Arrow Tempest: the arrow lands, then a ring), **split at the end** (Whirl Shot: a piercing arrow, then arrows out in
+  all directions from where it ends), **spawned from the target** (a strike, then projectiles from the target: Prime Splash),
+  **fork** (the projectile splits at the first enemy it hits, once, at 60 degrees: the reference wiki) and **chain** (a projectile
   chooses a target in range and flies to it; it cannot hit a target twice, and none of the projectiles of one use may chain to
-  an enemy already hit by another of them: also the 3.9 wiki). Chain Support then works on any projectile skill, which it does
+  an enemy already hit by another of them: also the reference wiki). Ricochet then works on any projectile skill, which it does
   not today (`chains` is read only by skills with chain behaviour).
-- **A cone from the impact** (Galvanic Arrow).
+- **A cone from the impact** (Storm Quill).
 - **Policy.** None new. The AI already closes for a clearer shot when arrows hit walls.
-- **Gems:** Quiver Rush and Rolling Volleys, Scatter Bow, Shattering Steel (Splinter
-  Volley), Volley and Greater Volley (Twin Salvo, Wide Salvo), Arrow Tempest, Whirl Shot, Fork (Split
-  Shot), Ricochet, Storm Quill, Wild Strike (Prime Splash, with S13a), Bolt Cleave and Slag Blow, Rime
+- **Gems:** Quiver Rush and Rolling Volleys, Scatter Bow, Splinter Volley,
+  Twin Salvo and Wide Salvo, Arrow Tempest, Whirl Shot, Split
+  Shot, Ricochet, Storm Quill, Prime Splash (with S13a), Bolt Cleave and Slag Blow, Rime
   Splinter, Ghost Coil, Toxin Circle, Mortar Bow and Mortar Charge. Volley Split was found faithful.
 - **Tests.** A sequential volley hits one target once per volley; a fan does not; a flagged shotgun skill hits a close target
   with several projectiles and a far one with fewer; fork, chain and nova as the wiki describes; the sheet and the sim agree.
-- **Risk.** Barrage and the two shotgun skills raise single-target damage, as in the reference game. Section 9.
+- **Risk.** Quiver Rush and the two shotgun skills raise single-target damage, as in the reference game. Section 9.
 
 ### S5 Channelling (L)
 
 - **Type.** `channel` on an active gem: the stages (how many, and how long each takes), what each stage adds (damage, area,
-  projectiles, speed), and the end: a **release** (fires once with the accumulated stage: Flameblast, Blade Flurry, Divine
-  Ire's burst) or a **sustain** (keeps hitting while held: Incinerate, Scorching Ray, Winter Orb's stages feeding its
-  orb). A movement channel (Cyclone, Charged Dash) moves the character while it runs.
+  projectiles, speed), and the end: a **release** (fires once with the accumulated stage: Furnace Roar, Flurry of Edges, Judgement
+  Tempest's burst) or a **sustain** (keeps hitting while held: Blaze Stream, Searing Lance, Hoarfrost Mote's stages feeding its
+  orb). A movement channel (Twister Blade, Storm Rush) moves the character while it runs.
 - **Sim.** A channelled use is a long action, ticking at the skill's rate, that the AI keeps going while the target is in reach;
   stun, freeze, death of the target and the stage cap end it; a release fires at the end. Stages accumulate in the action.
 - **Calc.** The sheet's DPS for a channel is the average over an assumed channel length (configurable, default the skill's
   stage cap plus a sustain interval), as players read channel DPS, so the "ramp" is visible rather than flattened.
 - **Policy.** Section 5, row 2.
-- **Gems:** Flurry of Edges, Judgement Tempest, Furnace Roar, Blaze Stream
-  (Incinerate), Searing Lance, Hoarfrost Mote, Twister Blade, Storm Rush, Blight
-  (Blight Hail), Static Strike's cousins, Sweeping Cut, Thunder Spiral, Double Release, Infused Channelling, and
+- **Gems:** Flurry of Edges, Judgement Tempest, Furnace Roar, Blaze Stream,
+  Searing Lance, Hoarfrost Mote, Twister Blade, Storm Rush, Withering Breath,
+  Blight Hail, Charged Blow's cousins, Sweeping Cut, Thunder Spiral, Double Release, Charged Breath, and
   the supports that act on channelling.
 - **Tests.** Stages accumulate; a release fires the stage reached; a stun ends the channel; the sheet's average matches the
   sim's over the assumed length.
@@ -403,71 +403,71 @@ The once-per-target rule for projectiles fired together stays (D1). What is buil
   keeps stepping out of _enemy_ zones only.
 - **Walls.** A skill may place a temporary solid in the grid that blocks enemy movement and projectiles (Glacier Wall). The
   grid already supports collision queries; a temporary solid needs a lifetime and a cleanup.
-- **Placed objects.** A Standard (War Banner and Dread Banner analogs) is an object with an aura and **stages from kills**,
-  and ends on its lifetime. An **orb** (Orb of Storms analog) is a summoned object that fires at enemies near it and is replaced
+- **Placed objects.** A Standard (Standard of Valour, Standard of Dread) is an object with an aura and **stages from kills**,
+  and ends on its lifetime. An **orb** (Tempest Mote) is a summoned object that fires at enemies near it and is replaced
   by a new cast; an orb that follows an owner (Storm Halo/Frost Halo patterns) is an aura object.
-- **Righteous Fire and its family.** The self-burn goes through resistance and energy shield like fire damage, not directly
-  off life; the enemy burn is the reference formula (a share of life, scaled by damage mods). Arctic Armour's conditions:
+- **Searing Mantle and its family.** The self-burn goes through resistance and energy shield like fire damage, not directly
+  off life; the enemy burn is the reference formula (a share of life, scaled by damage mods). Rimeplate's conditions:
   stationary, physical and fire only, chills attackers.
 - **Calc.** Ground and object DPS in the sheet with an assumed uptime.
-- **Gems:** Fire Trap, Flame Dash's ground (with S8), Frostblink's ground, Blessed Trail, Cleansing Blaze
-  (Purifying Flame), Glacier Wall, Faultline (Seismic Trap's cousin), Rime Core, Magma Crack, Venom Shower, Hoarfrost
-  Mote, Standard of Valour and Standard of Dread, Fervent Halo, Searing Mantle, Rimeplate (Arctic
-  Armour), Storm Halo and Frost Halo, Slag Carapace's burst (with S9).
+- **Gems:** Blaze Trap, Cinder Step's ground (with S8), Rime Step's ground, Blessed Trail, Cleansing Blaze,
+  Glacier Wall, Faultline (Rumble Trap's cousin), Rime Core, Magma Crack, Venom Shower, Hoarfrost
+  Mote, Standard of Valour and Standard of Dread, Fervent Halo, Searing Mantle, Rimeplate,
+  Storm Halo and Frost Halo, Slag Carapace's burst (with S9).
 - **Risk.** The most code, and the walls touch the grid. The walls may be cut to "blocks projectiles and slows" if the grid
   change is too large.
 
 ### S7 Damage over time and spread (M)
 
-- **Skill damage over time.** A damage-over-time component on a skill (Contagion, Blight, Caustic Arrow's ground, Essence Drain,
-  Toxic Rain's ticks, Vortex's cousins): ticks at the reference interval, scales with the damage-over-time stats rather than
-  hit stats, stacks by the reference rule (Blight stacks to a cap; Contagion does not), and may be leeched from where the
-  reference game allows (Essence Drain's recovery). Plumb it through `dotMult` in calc and a `dot` list on the actor in sim.
-- **Spread.** Ailments that spread: Pestilent Strike's poison, Contagion, Wildfire and Elemental Proliferation (spread on
+- **Skill damage over time.** A damage-over-time component on a skill (Creeping Plague, Withering Breath, Acid Arrow's ground, Sap Bolt,
+  Venom Shower's ticks, Blizzard Ring's cousins): ticks at the reference interval, scales with the damage-over-time stats rather than
+  hit stats, stacks by the reference rule (Withering Breath stacks to a cap; Creeping Plague does not), and may be leeched from where the
+  reference game allows (Sap Bolt's recovery). Plumb it through `dotMult` in calc and a `dot` list on the actor in sim.
+- **Spread.** Ailments that spread: Venom Strike's poison, Creeping Plague, Wildfire and Wildfire Spread (spread on
   application, or on death, per gem), reusing the `spread` trigger effect where it fits.
-- **Per-stack scaling** (Vile Toxins and similar supports) reads the real stack count.
-- **Gems:** Creeping Plague, Blight (Blight Hail, with S5), Acid Arrow, Sap Bolt,
-  Torch Arrow, Searing Lance's DoT, Wither Mark/Wither, Wildfire Spread and Wildfire Seed, Slow Rot,
-  Foul Brew, Venom Strike, Withering Breath, Open Wounds and Cinder Bond.
+- **Per-stack scaling** (Foul Brew and similar supports) reads the real stack count.
+- **Gems:** Creeping Plague, Withering Breath (with S5), Acid Arrow, Sap Bolt,
+  Torch Arrow, Searing Lance's DoT, Wither Mark/Rot Touch, Wildfire Spread and Wildfire Seed, Slow Rot,
+  Foul Brew, Venom Strike, Open Wounds and Cinder Bond.
 - **Tests.** A DoT's tick and total; its stack cap; leech from it; spread on death.
 
 ### S8 Blink and travel (M)
 
 - A blink or travel skill gains `onDepart` and `onArrive` (a burst, a ground effect from S6, a status from S3, a corpse use
-  from S11), `delay` (Lightning Warp's teleport lands after a delay along the path, leaving markers), `along` (hits enemies
-  along the path: Whirling Blades, Charged Dash), and `scaleWithDistance` (Shield Charge's damage per distance travelled).
-- Blinks respect the cooldown rules of S2. Phase Run and Withering Step's real buffs (phasing; the elusive-like effect) are
+  from S11), `delay` (Bolt Step's teleport lands after a delay along the path, leaving markers), `along` (hits enemies
+  along the path: Spinning Dash, Storm Rush), and `scaleWithDistance` (Bulwark Rush's damage per distance travelled).
+- Blinks respect the cooldown rules of S2. Slipstream Run and Rotting Stride's real buffs (phasing; the elusive-like effect) are
   buffs from S2 and S9.
-- **Gems:** Cinder Step, Rime Step, Bolt Step, Bodyswap (Shadow Swap, with S11),
+- **Gems:** Cinder Step, Rime Step, Bolt Step, Shadow Swap (with S11),
   Rotting Stride, Bulwark Rush, Spinning Dash, Skyfall Leap,
-  Storm Rush, Shadow Quiver, Ice Spear's cousin (Frost Lance), Close Quarters.
+  Storm Rush, Shadow Quiver, Frost Lance, Close Quarters.
 
 ### S9 Stances, guards, rage and absorb (M)
 
-- **Stance state.** Two stances on one gem (Blood and Sand, Flesh and Stone), a current stance on the character, swapped by the
+- **Stance state.** Two stances on one gem (Dune Stance, Stone Stance), a current stance on the character, swapped by the
   policy of section 5; each stance's mods and costs.
 - **Absorb pools.** Damage taken first drains a pool with the reference rule for how it is consumed and what it does
-  afterwards (Steelskin's absorb with its reduction; Molten Shell's absorb and reflection; Immortal Call's endurance
+  afterwards (Iron Hide's absorb with its reduction; Slag Carapace's absorb and reflection; Deathless Call's endurance
   consumption). A `release` can follow (a burst of the absorbed amount).
-- **Rage.** Berserk needs rage and spends it; its effects scale with rage held; Blood Rage's life drain and its frenzy gain on
+- **Rage.** Rampage Call needs rage and spends it; its effects scale with rage held; Surge of Blood's life drain and its frenzy gain on
   kill; "refresh on kill".
 - **Buff rules.** A skill that replaces another buff; a buff that ends on using a skill; guard skills' shared limits.
 - **Gems:** Dune Stance and Stone Stance, Whirlwind Cleave, Rampage Call, Slag Carapace,
-  Iron Hide, Deathless Call, Surge of Blood, Warding Pack, Arcane Ward
-  (Discipline), Rimeplate.
+  Iron Hide, Deathless Call, Surge of Blood, Warding Pack, Arcane Ward,
+  Rimeplate.
 
 ### S10 Deployables that exist (L)
 
 - A totem, trap, mine or brand becomes an **object with life and a place**: it can be targeted and killed by monsters when the
-  reference game lets it be (totems take hits; traps and mines do not), it draws aggro when it taunts (Decoy Totem), and is
+  reference game lets it be (totems take hits; traps and mines do not), it draws aggro when it taunts, and is
   counted by the cap. It stays in `w.deployables`, but the monsters' target choice (`src/sim/ai.ts`, and the Hunter and
   taunt rules of ROSTER 6.4) learns it.
-- **Traps and mines.** Trap cooldown and throw time (Advanced Traps); mines' laying time and **detonation by the policy of
+- **Traps and mines.** Trap cooldown and throw time (Swift Snares); mines' laying time and **detonation by the policy of
   section 5**; delayed repeated detonations (Shrapnel Trap's `repeats` become delays, not a pile on one spot); a cascade (Chained
-  Charges); a trap that holds (Bear Trap's immobilise from S3); mine/trap damage supports.
+  Charges); a trap that holds (Jaws Trap's immobilise from S3); mine/trap damage supports.
 - **Totem life, placement speed and the attack/cast speed of totems** are the reference stats.
-- **Gems:** Lure Totem, Guardian Cairn, Slamming Cairn, Ancestral-style totems, Jaws Trap, Bolt Trap,
-  Drain Trap and Rot Drain Trap, Smoke Charge, Mortar Charge (Shrapnel/Explosive Trap cousin), Whirring Motes,
+- **Gems:** Lure Totem, Guardian Cairn, Slamming Cairn, the other cairn-style totems, Jaws Trap, Bolt Trap,
+  Drain Trap and Rot Drain Trap, Smoke Charge, Mortar Charge (a Shrapnel Trap cousin), Whirring Motes,
   Chained Charges, Heavy Charge, Swift Snares, Cinder Bond.
 - **Size L, and the one part that bleeds into the monsters' rules**: it needs a test that no enemy type's behaviour changes when
   no deployable stands.
@@ -475,47 +475,47 @@ The once-per-target rule for projectiles fired together stays (D1). What is buil
 ### S11 Corpses (M)
 
 - Every monster death leaves a **corpse** (unless the monster is a spectre, burnt away, or desecrated) with a lifetime,
-  a life value (for Detonate Dead's damage and Bodyswap's) and a type (for the Spectre). The monsters' `Corpse` of
+  a life value (for a corpse detonation's damage and Shadow Swap's) and a type (for Bind Shade). The monsters' `Corpse` of
   `src/sim/factions.ts` becomes the one corpse model; the Reliquary's raising keeps working through it.
-- Skills take `consumeCorpse` (and `needsCorpse`): Bodyswap (swap with it, then it explodes), Raise Spectre (the minion is the
-  monster, S12), the Offerings (S12). The corpse skills COVERAGE left out (Desecrate, Detonate Dead, Unearth, Volatile Dead) stay out.
-- **Gems:** Shadow Swap, Bind Shade, Pyre Burst (Cremation-style corpse fire), Wake Blades (Animate Weapon, if it
-  needs a corpse in 3.9; S0 checks), and the Offerings.
+- Skills take `consumeCorpse` (and `needsCorpse`): Shadow Swap (swap with it, then it explodes), Bind Shade (the minion is the
+  monster, S12), the Rites (S12). The corpse skills COVERAGE left out (making, detonating, raising and exploding corpses) stay out.
+- **Gems:** Shadow Swap, Bind Shade, Pyre Burst (corpse fire), Wake Blades (if it
+  needs a corpse in the reference; S0 checks), and the Rites.
 
 ### S12 Minions (M)
 
 - **Owner buffs follow the minion.** A golem's buff and an offering's apply while the minion or object lives and only then.
-- **Spectres are monsters.** Raise Spectre takes a corpse's monster type and makes a minion from `MONSTER_TYPES`, with that
+- **Spectres are monsters.** Bind Shade takes a corpse's monster type and makes a minion from `MONSTER_TYPES`, with that
   type's attack shape and ability (ROSTER); the cap is the reference rule.
-- **Animate Guardian wears items.** It copies stats of the character's equipped pieces by the reference rule.
-- **Minion damage** takes flat added damage; minion auras (Infernal Legion's burn, Meat Shield's taunt and defensive stance,
-  Elemental Army's resistances and exposure) are data rows over S3 and S6.
-- **Gems:** Carrion Golem (Carrion Colossus), Animate Guardian (Wake Sentinel), Bind Shade, the three Offerings
-  (Bone, Flesh, Spirit Ward Rite), Elemental Pack, Burning Pack, Warding Pack,
+- **Wake Sentinel wears items.** It copies stats of the character's equipped pieces by the reference rule.
+- **Minion damage** takes flat added damage; minion auras (Burning Pack's burn, Warding Pack's taunt and defensive stance,
+  Elemental Pack's resistances and exposure) are data rows over S3 and S6.
+- **Gems:** Carrion Colossus, Wake Sentinel, Bind Shade, the three Rites
+  (Bone Ward, Flesh Surge, Spirit Ward), Elemental Pack, Burning Pack, Warding Pack,
   Sour Herald, and the minion supports.
 
 ### S13 The long tail (L, in three batches)
 
-The 65 gems whose gap is their own. Each has a "Missing" line in AUDIT-GEMS.md; the work is a decision-file change and, for
+The 65 gems whose gap is their own. Each has a "Missing" line in the gem spirit audit; the work is a decision-file change and, for
 a few, a small primitive. Three batches by kind, each an S0-style spec, loop tests and re-judging:
 
-- **S13a Attacks and spells**: Orbiting Blades, Primal Strike (Wild Strike), Fuse Arrow, Rime Mallet (Frost Blades' cousin), Cinder Blow
-  (Infernal Blow), Tempest Mote, Spear Burst, Gouge Shot, Charged Blow, Skyfall,
+- **S13a Attacks and spells**: Orbiting Blades, Primal Strike, Fuse Arrow, Rime Mallet (Rime Splinter's cousin), Cinder Blow,
+  Tempest Mote, Spear Burst, Gouge Shot, Charged Blow, Skyfall,
   Rupture Line, Glacier Wall, Halo Sweep, Cluster Bolt, Slag Lob, Spirit Saw, Ghost Shard, Prime Splash, Snag Lash,
-  Twister Blade, Ice Spear's distance crit, Spark's erratic paths, and the rest of the attack and spell tail.
+  Twister Blade, Frost Lance's distance crit, Skitter Flash's erratic paths, and the rest of the attack and spell tail.
 - **S13b Auras, heralds, curse-likes, traps**: Storm Halo, Frost Halo, Arcane Ward, Sour Herald, Plenty Sigil, Kindle, Tinderbox,
   Bolt Trap, Drain Trap, Smoke Charge, Lure Totem, Thunder Rebuke, Rot Touch, Void Curse.
-- **S13c Supports**: Multistrike's ramp and random targets, Spell Cascade and Echo's lateral and offset casts, Ancestral Call's extra
+- **S13c Supports**: Triple Cadence's ramp and random targets, Flanking Cast and Echoing Cast's lateral and offset casts, Echoing Blow's extra
   targets, Lightheart (its own charge), Knife Range, Stagger Resolve, Frost Fang, Firm Hold, Steel Resolve, Close Quarters,
   Brief Burst and Lingering Effect (duration that the sim reads), Merciless Cadence, Swell, Echoing Blow, Ward Siphon (energy shield
-  leech), Cindering, Wildfire Seed, Twin Shadow, Veil Cut, Shattering Blows, Enhance (an accepted divergence, D5).
+  leech), Cindering, Wildfire Seed, Twin Shadow, Veil Cut, Shattering Blows, Refine Gem (an accepted divergence, D5).
 - Each batch ends with its own re-judge.
 
 ### S14 Close (M)
 
 - A **fresh audit**: the same seven-batch process, with reviewers who are not shown the old verdicts, against the code as it
   then stands. Residue is fixed or recorded as `accepted` with the user's say.
-- Docs: AUDIT-GEMS.md gets a second status section; COVERAGE.md and CLAUDE.md say that `covered` now means `faithful`;
+- Docs: the gem spirit audit gets a second status section; COVERAGE.md and CLAUDE.md say that `covered` now means `faithful`;
   DESIGN.md 2.1 rows D1 to D8 are rewritten; PROGRESS.md.
 - **One bot sample** on the final build (section 8), which also measures the 1.75 / 1.8 / 0.3 default difficulty for the
   first time.
@@ -541,23 +541,23 @@ S0 ── S1 ── S2 ─┬─ S5 channelling ──────────�
   removes the gems that do nothing.
 - **S3 before S6, S7, S10.** Ground effects apply statuses; DoT needs the stacking rule; a trap that holds applies immobilise.
 - **S4 is independent** of S3 and of S2 apart from the policy plumbing, and can run alongside either.
-- **S6 before S8**: a blink leaves ground. **S11 before S12**: a Spectre needs a corpse. **S10 before S12's taunt.**
+- **S6 before S8**: a blink leaves ground. **S11 before S12**: Bind Shade needs a corpse. **S10 before S12's taunt.**
 - **S13 last**, because many of its gems finish only after their engine parts.
 
 **Where to stop.** "Finishes" counts the gems whose last missing piece is that part; the figures are from the audit's missing
 primitives, matched by keyword, so they are close, not exact (S0 recomputes them in the ledger).
 
-| After     | Gems made faithful (cumulative) | Of the 38 gutted | What it buys                                                                         |
-| --------- | ------------------------------: | ---------------: | ------------------------------------------------------------------------------------ |
-| S1        |     0 finished; 8 start working |                0 | the gems that do nothing now do something                                            |
-| S2        |                              10 |                2 | the Flicker Strike family: cooldowns, spending charges, exerted attacks, retaliation |
-| S3        |                              28 |                5 | enemies can be slowed, maimed, blinded and cursed as the game does; curses are real  |
-| S4        |                              44 |                7 | Barrage, the two shotgun skills, parallel lanes, Chain, Fork, Arrow Nova             |
-| S5        |                              52 |               10 | channelled skills ramp and release                                                   |
-| S6        |                              63 |               12 | ground, walls, Standards, orbs, Righteous Fire                                       |
-| S7        |                              75 |               14 | skill damage over time and spread                                                    |
-| S8 to S12 |                             106 |               21 | blinks, stances, deployables, corpses and minions                                    |
-| S13       |                       171 (all) |               38 | the long tail                                                                        |
+| After     | Gems made faithful (cumulative) | Of the 38 gutted | What it buys                                                                             |
+| --------- | ------------------------------: | ---------------: | ---------------------------------------------------------------------------------------- |
+| S1        |     0 finished; 8 start working |                0 | the gems that do nothing now do something                                                |
+| S2        |                              10 |                2 | the Blinking Cut family: cooldowns, spending charges, exerted attacks, retaliation       |
+| S3        |                              28 |                5 | enemies can be slowed, maimed, blinded and cursed as the game does; curses are real      |
+| S4        |                              44 |                7 | Quiver Rush, the two shotgun skills, parallel lanes, Ricochet, Split Shot, Arrow Tempest |
+| S5        |                              52 |               10 | channelled skills ramp and release                                                       |
+| S6        |                              63 |               12 | ground, walls, Standards, orbs, Searing Mantle                                           |
+| S7        |                              75 |               14 | skill damage over time and spread                                                        |
+| S8 to S12 |                             106 |               21 | blinks, stances, deployables, corpses and minions                                        |
+| S13       |                       171 (all) |               38 | the long tail                                                                            |
 
 A sensible first commitment is **S0 to S4**: cheap bugs, cooldowns and charges, the status layer and the projectile rule. It
 repairs the user's example and the largest blocks of gutted gems that share a cause, and it is about a third of the work. After S4 the user can look at the audit again and decide whether the rest
@@ -572,7 +572,7 @@ is worth its cost.
   convergence tests, and the parity smoke.
 - **Balance: two bot samples in all**, per the user's answer of 2026-10-08 and standing instruction (no incremental sims): one at
   the S4 stopping point, so the user can decide whether to continue, and one at S14. Nothing in between. This plan will move balance a lot: cooldowns cut DPS, ramps reshape it,
-  Barrage and the shotgun skills raise single-target damage, statuses make enemies weaker, deployables make some builds stronger or weaker. The difficulty
+  Quiver Rush and the shotgun skills raise single-target damage, statuses make enemies weaker, deployables make some builds stronger or weaker. The difficulty
   default of 1.75 / 1.8 / 0.3 has never been measured and is first measured at S4. The sample is read as a regression
   detector, not a target (it is a weak proxy for a human; the user has said so).
 - **The re-audit is the verdict** (4.4).
@@ -581,21 +581,21 @@ is worth its cost.
 
 ## 9. Risks
 
-| Risk                                                                     | Answer                                                                                                                                                                                               |
-| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The balance moves a lot and is not measured until the end                | Stated up front; each part states its direction (section 6); a sample at S4 and one at S14; the difficulty knobs (scaling, base, variance) are the user's to turn                                    |
-| Barrage and the shotgun skills raise single-target damage                | That is the reference game's balance; the sheet's overlap model keeps the DPS honest; S14's sample shows the effect                                                                                  |
-| Calc and sim diverge on a new primitive                                  | Every primitive has a convergence test; the sheet is a first-class citizen of each milestone                                                                                                         |
-| The AI plays a skill badly (a bad stance swap, a wasted spend)           | The policy is data, stated on the card, tested; a bad policy is a data change                                                                                                                        |
-| The chosen 3.9 behaviour is wrong because the source was current-version | Specs are read from the 3.9 wiki through the tool and the PoB data; poedb is only a hint; low-confidence rows are re-read in S0                                                                      |
-| Deployables as actors changes monster behaviour (S10)                    | A test that nothing changes with no deployable; the targeting rule is one function                                                                                                                   |
-| Walls in the grid (S6)                                                   | May be cut to "blocks projectiles and slows"; the plan says so                                                                                                                                       |
-| More mechanics make the skill card unreadable                            | Strings derive from data; a test that every field has a string; the "Policy" line on the card                                                                                                        |
-| Saves                                                                    | Gem ids and kinds do not change shape; run state that gains fields (cooldown clocks, stances, rage spent) is rebuilt per map and not saved, as today; `SAVE_VERSION` is bumped if `RunState` changes |
-| Speed: more simulated objects (corpses, statuses, DoT stacks)            | The `x9` floor and the bot speed floor re-run; objects are lists with caps                                                                                                                           |
-| The tree and uniques that refer to a gem change meaning                  | Uniques that grant or modify skills are found by `npm run coverage`'s map; S14 runs their tests; no unique is edited unless a gem change breaks it                                                   |
-| Scope: "totally analogous" has no end                                    | Section 4.4: done is the re-audit, and the user can stop at a stopping point in section 7                                                                                                            |
-| The other agent's uncommitted work in the same tree                      | Stage by explicit path; never `git stash`; commit only our hunks                                                                                                                                     |
+| Risk                                                                           | Answer                                                                                                                                                                                               |
+| ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The balance moves a lot and is not measured until the end                      | Stated up front; each part states its direction (section 6); a sample at S4 and one at S14; the difficulty knobs (scaling, base, variance) are the user's to turn                                    |
+| Quiver Rush and the shotgun skills raise single-target damage                  | That is the reference game's balance; the sheet's overlap model keeps the DPS honest; S14's sample shows the effect                                                                                  |
+| Calc and sim diverge on a new primitive                                        | Every primitive has a convergence test; the sheet is a first-class citizen of each milestone                                                                                                         |
+| The AI plays a skill badly (a bad stance swap, a wasted spend)                 | The policy is data, stated on the card, tested; a bad policy is a data change                                                                                                                        |
+| The chosen reference behaviour is wrong because the source was current-version | Specs are read from the reference wiki through the tool and the reference data; the reference database site is only a hint; low-confidence rows are re-read in S0                                    |
+| Deployables as actors changes monster behaviour (S10)                          | A test that nothing changes with no deployable; the targeting rule is one function                                                                                                                   |
+| Walls in the grid (S6)                                                         | May be cut to "blocks projectiles and slows"; the plan says so                                                                                                                                       |
+| More mechanics make the skill card unreadable                                  | Strings derive from data; a test that every field has a string; the "Policy" line on the card                                                                                                        |
+| Saves                                                                          | Gem ids and kinds do not change shape; run state that gains fields (cooldown clocks, stances, rage spent) is rebuilt per map and not saved, as today; `SAVE_VERSION` is bumped if `RunState` changes |
+| Speed: more simulated objects (corpses, statuses, DoT stacks)                  | The `x9` floor and the bot speed floor re-run; objects are lists with caps                                                                                                                           |
+| The tree and uniques that refer to a gem change meaning                        | Uniques that grant or modify skills are found by `npm run coverage`'s map; S14 runs their tests; no unique is edited unless a gem change breaks it                                                   |
+| Scope: "totally analogous" has no end                                          | Section 4.4: done is the re-audit, and the user can stop at a stopping point in section 7                                                                                                            |
+| The other agent's uncommitted work in the same tree                            | Stage by explicit path; never `git stash`; commit only our hunks                                                                                                                                     |
 
 ---
 
@@ -607,12 +607,12 @@ decision, DESIGN.md Appendix A. One commit a milestone, with explicit paths.
 | #   | Milestone                     | What                                                                                                                                                                             | Size |
 | --- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | S0  | Ledger and checking           | `scripts/spirit/`, the ledger and its test, `npm run spirit`; the unchecked claims turned into tests; the sixteen weak rows re-read; the parity smoke and the effects vocabulary | M    |
-| S1  | Gems that do nothing          | Cast on Melee Kill, the Multistrike echo, Dual Strike, the four castable curses, kill-trigger ownership, honest notes                                                            | S    |
-| S2  | The use model                 | cooldown, spend, bypass, onUse, window, exert, the `use` policies; Flicker Strike and its family; calc and sim                                                                   | L    |
+| S1  | Gems that do nothing          | Slayer's Echo, the Triple Cadence echo, Twin Blades, the four castable curses, kill-trigger ownership, honest notes                                                              | S    |
+| S2  | The use model                 | cooldown, spend, bypass, onUse, window, exert, the `use` policies; Blinking Cut and its family; calc and sim                                                                     | L    |
 | S3  | Status layer and curses       | the registry, the curses' real effects, marks, the curse limit; the gems that apply statuses                                                                                     | L    |
 | S4  | Projectile rules              | per-projectile hits, parallel, nova, spawn-from-target, chain, fork; the overlap model                                                                                           | L    |
 | S5  | Channelling                   | stages, ramp, release, sustain, movement channels; the sheet's average                                                                                                           | L    |
-| S6  | Ground and lasting objects    | player ground effects, walls, Standards, orbs, Righteous Fire done properly                                                                                                      | L    |
+| S6  | Ground and lasting objects    | player ground effects, walls, Standards, orbs, Searing Mantle done properly                                                                                                      | L    |
 | S7  | Damage over time and spread   | skill DoT, stacking, leech, spread                                                                                                                                               | M    |
 | S8  | Blink and travel              | arrive, depart, delay, along, scale with distance                                                                                                                                | M    |
 | S9  | Stances, guards, rage, absorb | stance state and swap policy, absorb pools, rage spent, buff rules                                                                                                               | M    |
@@ -630,11 +630,11 @@ decision, DESIGN.md Appendix A. One commit a milestone, with explicit paths.
 
 1. **Projectiles (D1).** The user asked for the reference game's rule to be verified before deciding. It was: the shared hit list
    is the reference rule for projectiles fired together, so it stays, with sequential volleys and a shotgun flag added (S4).
-2. **Gem quality (D5).** Not built. Enhance is recorded as the one unfaithful gem.
+2. **Gem quality (D5).** Not built. Refine Gem is recorded as the one unfaithful gem.
 3. **The gems COVERAGE left out (D7).** None of them: the plan covers the 326 gems of the audit.
-4. **Curses (D4).** The 3.9 duration, effect lists and curse limit.
+4. **Curses (D4).** The reference duration, effect lists and curse limit.
 
-5. **Numbers.** The 3.9 value where the engine can express the loop (costs, cooldowns, durations, effectiveness), scaled by Bob's
+5. **Numbers.** The reference value where the engine can express the loop (costs, cooldowns, durations, effectiveness), scaled by Bob's
    curves; Bob's tuned values stay only where the reference game has none.
 6. **The AI's policies (section 5).** Accepted as written. They are the only allowed adaptations.
 7. **Bot samples.** One at the S4 stopping point and one at S14, and none in between. A sample is a regression detector. If a
@@ -650,9 +650,9 @@ decision, DESIGN.md Appendix A. One commit a milestone, with explicit paths.
 - `docs/DESIGN.md`: Appendix A (the decisions D1 to D8) and 2.1 (the rows of section 3); section 11 (gems) for the new fields.
 - `docs/COVERAGE.md`: a note that `covered` is now `faithful` by the ledger; the "Known divergences" line rewritten as each
   divergence is removed.
-- `docs/AUDIT-GEMS.md`: a status line pointing here; a second section at S14.
+- The gem spirit audit (now `reference/docs/AUDIT-GEMS.md`, local reference material, not in the repository): a status line pointing here; a second section at S14.
 - `CLAUDE.md`: a pointer to this plan beside the audit's, and, when S0 lands, one line for `npm run spirit`.
-- `reference/coverage/README.md`: the ledger file.
+- `reference/coverage/README.md` (local reference material, not in the repository): the ledger file.
 
 ---
 
@@ -662,19 +662,19 @@ All milestones are built (2026-10-08). One row for each:
 
 | #   | State | What was built                                                                                                                                                                                                                                            |
 | --- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| S0  | done  | The ledger (`reference/coverage/spirit.json`, `npm run spirit`), the join of a gem with its reference, the effects smoke.                                                                                                                                 |
-| S1  | done  | Cast on Melee Kill and kill triggers, the four old hexes castable, Multistrike and Dual Strike repaired.                                                                                                                                                  |
-| S2  | done  | Skill cooldowns with stored uses, spending charges to skip them, a skill that grants a buff on use; Discharge, Immortal Call, Vengeance, Ice Bite.                                                                                                        |
-| S3  | done  | The enemy status layer (hinder, maim, blind, exposure, doomed and the rest), curses and marks with their 3.9 effects, shouts.                                                                                                                             |
+| S0  | done  | The ledger (`reference/coverage/spirit.json`, local and not in the repository; `npm run spirit`), the join of a gem with its reference, the effects smoke.                                                                                                |
+| S1  | done  | Slayer's Echo and kill triggers, the four old hexes castable, Triple Cadence and Twin Blades repaired.                                                                                                                                                    |
+| S2  | done  | Skill cooldowns with stored uses, spending charges to skip them, a skill that grants a buff on use; Charge Release, Deathless Call, Anvil Drop, Frost Fang.                                                                                               |
+| S3  | done  | The enemy status layer (hinder, maim, blind, exposure, doomed and the rest), curses and marks with their reference effects, shouts.                                                                                                                       |
 | S4  | done  | Projectile shapes (sequential, parallel, shotgun, nova, tornado) with the once-per-target rule kept; the S4 bot sample.                                                                                                                                   |
 | S5  | done  | Channelling builds stages and is released (`src/sim/channel.ts`).                                                                                                                                                                                         |
 | S6  | done  | Ground and lasting objects: consecrated and chilling ground, crystals, walls, orbs, banners (`src/sim/fields.ts`, `banners.ts`).                                                                                                                          |
-| S7  | done  | Skill damage over time as its own debuff, proliferation, Bane, pods, overkill burn.                                                                                                                                                                       |
-| S8  | done  | Blink and travel: Flame Dash, Frostblink, Lightning Warp, Withering Step, Blink Arrow, Charged Dash, Frost Lance, Venom Gyre.                                                                                                                             |
-| S9  | done  | Stances, Berserk, Blood Rage, Bladestorm.                                                                                                                                                                                                                 |
+| S7  | done  | Skill damage over time as its own debuff, proliferation, Ruin Ritual, pods, overkill burn.                                                                                                                                                                |
+| S8  | done  | Blink and travel: Cinder Step, Rime Step, Bolt Step, Rotting Stride, Shadow Quiver, Storm Rush, Frost Lance, Toxin Circle.                                                                                                                                |
+| S9  | done  | Stances, Rampage Call, Surge of Blood, Whirlwind Cleave.                                                                                                                                                                                                  |
 | S10 | done  | Deployables that do what they do: mines set off together, ballistas, Cairns, bonds.                                                                                                                                                                       |
-| S11 | done  | Corpses: Raise Spectre, Bodyswap, Pyre Burst, Animate Weapon.                                                                                                                                                                                             |
-| S12 | done  | Minions: offerings, golems, supports, the Guardian.                                                                                                                                                                                                       |
+| S11 | done  | Corpses: Bind Shade, Shadow Swap, Pyre Burst, Wake Blades.                                                                                                                                                                                                |
+| S12 | done  | Minions: rites, golems, supports, the Sentinel.                                                                                                                                                                                                           |
 | S13 | done  | The long tail in three batches: the supports (`supportFx.ts`), the attacks, spells and auras, traps and guards (`skillFx.ts`, the `SkillFx` fields of a gem); ledger 322 of 326 faithful.                                                                 |
 | S14 | done  | Second audit by fresh reviewers (288 faithful, 37 drifted, 1 gutted as reviewed), the repairs it found, card text for every special field (`src/ui/gemFx.ts`), docs, the final bot sample. Ledger: 318 of 320 faithful (six gems were cut on 2026-10-09). |
 
@@ -691,11 +691,11 @@ Anvil Drop [G]; Guarded Strike [D]; Deathless Call [D]; Blinking Cut [G]; Charge
 
 ### S3 The enemy status layer, and curses (18)
 
-Tide of Judgement [D]; Void Curse [D]; Penance [D]; Ruin Sigil [D]; Plenty Sigil [D]; Warlord Sigil [D]; Kindled Bellow (Infernal Cry) [G]; Jaws Trap [G]; Brittle Doom [D]; Leaden Limbs [D]; Deep Chill [D]; Wither Mark [D]; Charged Breath [D]; Dazzle [D]; Guard Breaker [G]; Rout [D]; Hamstring [D]; Standing Curse [D].
+Tide of Judgement [D]; Void Curse [D]; Penance [D]; Ruin Sigil [D]; Plenty Sigil [D]; Warlord Sigil [D]; Graveyard Bellow [G]; Jaws Trap [G]; Brittle Doom [D]; Leaden Limbs [D]; Deep Chill [D]; Wither Mark [D]; Charged Breath [D]; Dazzle [D]; Guard Breaker [G]; Rout [D]; Hamstring [D]; Standing Curse [D].
 
 ### S4 Projectile shapes (16)
 
-Rime Splinter [D]; Storm Quill [D]; Bolt Cleave [D]; Slag Blow [D]; Splinter Volley [D]; Ghost Coil (Spectral Helix) [D]; Whirl Shot [D]; Toxin Circle [D]; Mortar Bow [D]; Scatter Bow [D]; Mortar Charge [D]; Ricochet [G]; Split Shot [D]; Wide Salvo [D]; Arrow Tempest [G]; Twin Salvo [D].
+Rime Splinter [D]; Storm Quill [D]; Bolt Cleave [D]; Slag Blow [D]; Splinter Volley [D]; Ghost Coil [D]; Whirl Shot [D]; Toxin Circle [D]; Mortar Bow [D]; Scatter Bow [D]; Mortar Charge [D]; Ricochet [G]; Split Shot [D]; Wide Salvo [D]; Arrow Tempest [G]; Twin Salvo [D].
 
 ### S5 Channelling (8)
 
@@ -723,12 +723,12 @@ Cinder Bond [D]; Guardian Cairn [D]; Slamming Cairn [D]; Whirring Motes [D]; Cha
 
 ### S11 Corpses (4)
 
-Pyre Burst [D]; Shadow Swap [G]; Bind Shade [G]; Wake Blades (Animate Weapon) [D].
+Pyre Burst [D]; Shadow Swap [G]; Bind Shade [G]; Wake Blades [D].
 
 ### S12 Minions (7)
 
-Carrion Colossus [D]; Wake Sentinel (Animate Guardian) [G]; Bone Ward Rite [D]; Flesh Surge Rite [D]; Spirit Ward Rite [D]; Elemental Pack [D]; Burning Pack [G].
+Carrion Colossus [D]; Wake Sentinel [G]; Bone Ward Rite [D]; Flesh Surge Rite [D]; Spirit Ward Rite [D]; Elemental Pack [D]; Burning Pack [G].
 
 ### S13 The long tail (65)
 
-Quiver Rush [G]; Orbiting Blades [D]; Twin Blades [D]; Primal Strike [D]; Fuse Arrow [D]; Rime Mallet [D]; Cinder Blow [G]; Tempest Mote [D]; Spear Burst [D]; Venom Strike [D]; Gouge Shot [D]; Charged Blow [G]; Skyfall [D]; Rupture Line [D]; Snare Shot [G]; Glacier Wall [D]; Rime Rebuke [G]; Halo Sweep [D]; Cluster Bolt (Kinetic Blast of Clustering) [D]; Cleansing Blaze [D]; Slag Lob [D]; Spirit Saw [D]; Ghost Shard [D]; Blade Wind [G]; Prime Splash [G]; Rot Touch [G]; Slag Carapace [G]; Slipstream Run [D]; Bulwark Rush [D]; Twister Blade [D]; Snag Lash [D]; Thunder Rebuke [D]; Lure Totem [G]; Bolt Trap [D]; Drain Trap [D]; Smoke Charge [G]; Rot Drain Trap (Siphoning Trap of Pain) [D]; Storm Halo [D]; Frost Halo [D]; Arcane Ward [D]; Rimeplate [D]; Sour Herald [D]; Feeble Grip [D]; Kindle [D]; Tinderbox [D]; Knife Range [D]; Firm Hold [D]; Steel Resolve [D]; Triple Cadence [D]; Freed Rot [D]; Merciless Cadence [D]; Swift Snares [D]; Echoing Blow [G]; Rolling Volleys [G]; Ward Siphon [D]; Refine Gem [G]; Cindering (Immolate Support) [D]; Swelling Blast [D]; Brief Burst [D]; Lingering Effect (Increased Duration Support) [D]; Twin Shadow [D]; Veil Cut [D]; Shattering Blows [G]; Flanking Cast [G]; Slayer's Echo (Cast on Melee Kill Support) [G].
+Quiver Rush [G]; Orbiting Blades [D]; Twin Blades [D]; Primal Strike [D]; Fuse Arrow [D]; Rime Mallet [D]; Cinder Blow [G]; Tempest Mote [D]; Spear Burst [D]; Venom Strike [D]; Gouge Shot [D]; Charged Blow [G]; Skyfall [D]; Rupture Line [D]; Snare Shot [G]; Glacier Wall [D]; Rime Rebuke [G]; Halo Sweep [D]; Cluster Bolt [D]; Cleansing Blaze [D]; Slag Lob [D]; Spirit Saw [D]; Ghost Shard [D]; Blade Wind [G]; Prime Splash [G]; Rot Touch [G]; Slag Carapace [G]; Slipstream Run [D]; Bulwark Rush [D]; Twister Blade [D]; Snag Lash [D]; Thunder Rebuke [D]; Lure Totem [G]; Bolt Trap [D]; Drain Trap [D]; Smoke Charge [G]; Rot Drain Trap [D]; Storm Halo [D]; Frost Halo [D]; Arcane Ward [D]; Rimeplate [D]; Sour Herald [D]; Feeble Grip [D]; Kindle [D]; Tinderbox [D]; Knife Range [D]; Firm Hold [D]; Steel Resolve [D]; Triple Cadence [D]; Freed Rot [D]; Merciless Cadence [D]; Swift Snares [D]; Echoing Blow [G]; Rolling Volleys [G]; Ward Siphon [D]; Refine Gem [G]; Cindering [D]; Swelling Blast [D]; Brief Burst [D]; Lingering Effect [D]; Twin Shadow [D]; Veil Cut [D]; Shattering Blows [G]; Flanking Cast [G]; Slayer's Echo [G].

@@ -8,7 +8,7 @@ below is derived from the constraints (`A1-axes.md`, `A2-vocabulary.md`, `A3-rul
 item ends with **the check**: the property the finished tree will be held to. The picture is `C-sketch.png`, drawn by
 `scripts/tree/sketch.ts` from `C-sketch.json`, which is the brief's own data: the places, not the nodes.
 
-Vocabulary, as a PoE player would use it: a **region** is a class's part of the tree; an **area** is a named group of
+Vocabulary, as a player of the reference game would use it: a **region** is a class's part of the tree; an **area** is a named group of
 clusters inside a region about one thing (the bow area, the minion area); a **cluster** is a notable with its small nodes;
 a **wheel** is a big cluster with two or three notables; a **road** or **highway** is the string of plain nodes between
 places; the **home** is the first dozen nodes out of a class start; a **spur** is the short dead-end road to a keystone.
@@ -20,7 +20,7 @@ places; the **home** is the first dozen nodes out of a class start; a **spur** i
 A player opens the tree between maps, up to a hundred times a run, holding one to four points, usually on a phone, and
 closes it in seconds. The tree's first job is to make **the next node obvious** on every one of those visits, and its
 second job is to make **the next destination worth wanting** so that the obvious node is also a step toward something.
-Nothing else in Bob carries a build's identity: no ascendancy, no masteries, no skill trees. The tree is where a run becomes
+Nothing else in Bob carries a build's identity: no subclass, no masteries, no skill trees. The tree is where a run becomes
 "a poison Shade" or "a totem Vanguard", and it must do that for a run that may end on map 4 as much as for one that
 reaches map 100.
 
@@ -99,7 +99,7 @@ Every class has a **home** of about fourteen nodes, and the first four points ca
    a +10 node of the class attribute, which is also the junction to the centre ring.
 2. At step three, the **signature notable**: the class in one node, its weapon's basic included (the Vanguard's: life,
    melee physical damage and strength; the Strider's: projectile damage, evasion and dexterity; the Mystic's: spell
-   damage, mana and intelligence). PoE puts its first notable at exactly three steps from every start; so does this.
+   damage, mana and intelligence). The reference game puts its first notable at exactly three steps from every start; so does this.
 3. From the signature, **two ways out, to different things**, each through a small "porch" cluster that announces the area
    beyond: for the Vanguard, one porch toward life and armour (the rampart), one toward the maces. The porches are the
    first real choice, at point five or six, and the choice is between named places, never between two roads of the same
@@ -107,7 +107,7 @@ Every class has a **home** of about fourteen nodes, and the first four points ca
 4. The first keystone is 10 to 14 steps from the start, at the near end of the region's first area.
 
 Everything in the home is generic for the class: no damage type, no skill type, no condition. The hybrid classes' homes
-are the same size as the pure ones' (PoE's 3-node vs 9-node asymmetry is a lever kept for later if a class needs it).
+are the same size as the pure ones' (the reference game's 3-node vs 9-node asymmetry is a lever kept for later if a class needs it).
 
 **The check:** a table of each class's first fifteen steps, printed by the audit: the chain, the signature, the two porches
 and where they lead, and the steps to the first keystone.
@@ -119,14 +119,14 @@ and where they lead, and the steps to the first keystone.
 A road is a string of plain nodes between places. Its rules:
 
 - **Junctions are +10 attribute nodes** of the region's attribute (its hybrids' at the borders). They are the plainest
-  nodes in the tree and they sit where the roads fork, as PoE's do (its 220 attribute nodes have a mean degree of 3.85).
+  nodes in the tree and they sit where the roads fork, as the reference game's do (its 220 attribute nodes have a mean degree of 3.85).
 - **Road nodes between junctions** are small nodes from the region's generic pool: life, energy shield, armour, evasion,
   mana, resistances, regeneration, movement speed. Never a weapon, a skill type, a damage type or a condition.
 - **Runs are short**: one to three nodes between two junctions, never more than four.
 - **Every fork is between two named areas.** No fork offers two roads of the same stuff; the brief's sketch lists every
   fork, and a fork the sketch does not name is a bug.
-- **Share**: about a fifth of all nodes are road nodes (PoE: 19%), and a full build spends about 30% of its points on them
-  (PoE: 29 to 43%; the low end, because travel is the cost players resent in every game studied).
+- **Share**: about a fifth of all nodes are road nodes (reference: 19%), and a full build spends about 30% of its points on them
+  (reference: 29 to 43%; the low end, because travel is the cost players resent in every game studied).
 - **Crossings**: the centre ring between neighbouring starts (cheap), and **one bridge per neighbouring pair** half way out,
   between the two areas that make sense together (the Spire's lightning arm and the Knife's curses; the Bow's physical end
   and the Yard; the Wall's resistances and the Cathedral's fire tower...). None at the rim: the keystones there are meant
@@ -139,14 +139,14 @@ neighbouring pair, and the road tax of the intended-cost builds (section 11).
 
 ## 5. Clusters and notables
 
-- **A cluster is one idea.** Every small node in a cluster carries its notable's keyword (PoE: 100%); a cluster is
+- **A cluster is one idea.** Every small node in a cluster carries its notable's keyword (reference: 100%); a cluster is
   guessable from one word at phone zoom.
 - **Sizes say cost.** Near the home, clusters of three or four (one notable, two or three smalls); in an area, four or
   five; **one wheel per area** of six to eight nodes with two or three notables, the landmark the area is named by; a
   **spur** of three small nodes and a keystone. Unequal on purpose: a player learns that a big ring is a big commitment.
 - **One way in** for three clusters in four; wheels can be passed through (the road enters one side and leaves the other,
   taking the wheel's own nodes, which is the price of the shortcut).
-- **A notable is worth three to five small nodes** of its own stat (PoE's matched median is 4.9×), two steps off the road,
+- **A notable is worth three to five small nodes** of its own stat (the reference's matched median is 4.9×), two steps off the road,
   four to six steps from the next notable. One **strength table** prices every node: a unit is the median small node of
   that stat; a notable is at least three units, a wheel notable four to six; lines no small node gives (a maximum charge,
   a mechanic) are hand-valued in the table with a comment. The table is data and the tests read it.
@@ -159,14 +159,14 @@ and the share of clusters with one entrance.
 
 ## 6. Keystones and the late build
 
-**Placement.** Twenty-seven keystones, each at the end of a spur at the far edge of the area it belongs to (PoE: 17 of 28
+**Placement.** Twenty-seven keystones, each at the end of a spur at the far edge of the area it belongs to (reference: 17 of 28
 in the outer third, 26 of 28 dead ends one step off a junction): four to six a region, the nearest 10 to 14 steps from the
 start, the farthest 30 or more. Two sit on borders where both neighbours can reach them (Searing Avatar at the Cathedral's
 fire tower tip, near the Spire's fire arm; Idle Hands on the Wall–Cathedral crossing). The sketch places all 27.
 
 **Trades, written on the node.** Four in five keystones carry a cost the sheet can show: a stat that goes down, a thing you
 can no longer do. The 22 that already are trades stay. The five buffs: Pain Conduit and Mind Bulwark are conditional and
-keep their shape (PoE keeps three pure buffs of 28 too); **Strongarm and Spellslip get a cost** (proposed: Strongarm,
+keep their shape (the reference keeps three pure buffs of 28 too); **Strongarm and Spellslip get a cost** (proposed: Strongarm,
 strength's melee bonus also applies to projectile attacks, _dexterity gives no evasion_; Spellslip, 30% chance to dodge
 spell hits, _30% less energy shield_); Volatile Servants stays a conditional buff. The two half-dead halves: **Wound Dance**
 loses "no extra damage against moving targets" (nobody can act on it) for a sheet-visible cost (_bleeds deal 50% less
@@ -193,13 +193,13 @@ points of each intended-cost build, on paper.
 
 In Bob an attribute does two things: a small direct bonus (strength +0.5 life and 0.2% melee physical per point; dexterity
 +2 accuracy and 0.2% evasion; intelligence +0.5 mana and 0.2% energy shield) and **gating gear and gem levels**, with
-PoE's requirement numbers against a start of 32 in the main attribute and 14 in the others (A3 §6): a level-60 bow wants
+the reference game's requirement numbers against a start of 32 in the main attribute and 14 in the others (A3 §6): a level-60 bow wants
 212 dexterity, a level-20 gem 98 of its attribute. Attributes do not grow with level; the tree and gear are the only sources.
 
-- **Supply**: attribute nodes are 12 to 15% of the tree (PoE: 13.6%), all at junctions, +10 each. A build that stays in
+- **Supply**: attribute nodes are 12 to 15% of the tree (reference: 13.6%), all at junctions, +10 each. A build that stays in
   its own region passes about one junction in five nodes, so by 60 points it has about +120 of its attribute on its natural
   path without walking for it.
-- **Off attribute**: from a pure start the first +30 of an off attribute costs 8 to 10 steps (PoE: 8 to 11), which is the
+- **Off attribute**: from a pure start the first +30 of an off attribute costs 8 to 10 steps (reference: 8 to 11), which is the
   price that keeps a class in its corner; a hybrid pays 4 to 6 for its third attribute.
 - **A few notables pay at a threshold** (hypothesis, cheap in the engine: `per` with a cap): "+X; and +Y while you have
   150 strength", so that attribute travel is sometimes a choice rather than a toll (Diablo 4's lesson).
@@ -256,9 +256,9 @@ Counted from what the regions above must supply, not chosen first.
 | **Total**                    |                                                                                                                                                                                                       | **about 1,100** |
 
 Sensitivity: one cluster more or less per archetype value moves the total by about 175, so the honest range is **950 to
-1,300**; the current tree has 2,618. A 123-point build takes about 11% of it (PoE: 7.4%; Grim Dawn: 10%). Notables: about
+1,300**; the current tree has 2,618. A 123-point build takes about 11% of it (reference: 7.4%; Grim Dawn: 10%). Notables: about
 210 (161 clusters, a second or third notable on each of 21 wheels, six signatures and twelve porches: one per 5 or 6 nodes;
-PoE one per 4.5, Diablo 4 one per 11); keystones 27 (2.5%).
+the reference one per 4.5, Diablo 4 one per 11); keystones 27 (2.5%).
 
 Why smaller is right here, not only cheaper: a phone shows fewer nodes legibly; a shorter tree has shorter roads (section 4's
 30% road tax needs it); and the supply rule (section 11) is about _comparable_ supply per axis value, which a tree of this
@@ -375,7 +375,7 @@ Each with the answer I would take by default.
 
 1. **The six shapes and names** (section 2, the picture). Default: as drawn. The thing most worth disagreeing with: is the
    Spire's three-arm fork the Mystic's identity, or should the elements be spread (fire at the Cathedral, cold at the Knife)?
-2. **The centre**: a bare ring road and nothing inside. Default: yes. The alternative is PoE's small centre with a few
+2. **The centre**: a bare ring road and nothing inside. Default: yes. The alternative is the reference game's small centre with a few
    generic clusters.
 3. **Gear requirements** (section 7): keep `REQUIREMENT_SCALE` at 1.0 and let the tree supply ~+120 own attribute by 60
    points, or lower the scale (0.6 to 0.7) so that attributes are mostly a bonus and the tree needs fewer junctions?

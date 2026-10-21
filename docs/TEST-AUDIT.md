@@ -6,7 +6,7 @@ looks), tests that can practically never fail (tautologies the types already gua
 read back from a table) and duplicates were removed. Where a test held a real mechanism check beside a pin, the pin was
 dropped or loosened to the relation the test is about (`toBe(37)` → `> plain`), and the mechanism was kept.
 
-Kept on purpose: mechanism tests (including Path of Exile 3.9 rules), relational checks, smoke tests over all content,
+Kept on purpose: mechanism tests (including the reference game's rules), relational checks, smoke tests over all content,
 determinism and invariant sweeps, sim ↔ sheet parity (`sheetVsSim.*`, `rotationVsSim`, `convergence`), regression guards,
 generated-file staleness checks, save migration, and the policy tests (`ip.test.ts`, the tree bake check, boss rule 4,
 the speed floors).
@@ -119,7 +119,7 @@ R = removed, C = changed (what was dropped or loosened).
   - R "§12.1 monster scaling fixtures", levels 1 / 10 / 25 / 50 / 75 / 100 (6 tests): Bob's own constants.
   - R "has the tables for levels 1 to 100": static JSON length.
   - R "the reference player of the build matrix is about as accurate as a plain-geared character": a band around a tuned formula.
-  - C "level penalty": 0.76 became `< 1`; dropped the 0.05 floor. The 3.9 safe zone is kept.
+  - C "level penalty": 0.76 became `< 1`; dropped the 0.05 floor. The reference safe zone is kept.
 - **gems**
   - R "has the first 7 actives, 19 supports and 7 auras…": a milestone count.
   - C "auto-levels by character level and attributes": dropped the attribute-requirement pins.
@@ -128,7 +128,7 @@ R = removed, C = changed (what was dropped or loosened).
   - R "turns a spread and an effectiveness into a damage range": copies the formula.
 - **keystones**
   - C Arrow Weave: melee −0.3 became `< 0`.
-  - C Shieldwall: 0.85 and 0.7 became relations; the 3.9 cap of 0.75 is kept.
+  - C Shieldwall: 0.85 and 0.7 became relations; the reference cap of 0.75 is kept.
   - C Steady Draw: 1.35 and 1/0.8 became relations.
 - **keystones2**
   - R "all 27 keystones are in the tree": a count pin and a duplicate.
@@ -393,7 +393,7 @@ R = removed, C = changed (what was dropped or loosened).
   - C Heap first level now comes from `minLevel`.
   - C Tolling Bell, Silkspinner and Hollow Watcher: dropped the data pins.
 - **areaSpots**
-  - C "Artillery Ballista": 6 arrows became `> 1`.
+  - C "Mortar Bow": 6 arrows became `> 1`.
 - **attackShapes**
   - R "a shape sets the behaviour a type attacks with": pins which shape each type has.
   - R "a salvo fires again, and an orb flies slowly": data pins.
@@ -487,8 +487,8 @@ R = removed, C = changed (what was dropped or loosened).
   - C enrage, leader falls, Warding Pulse, Mirrored: the values became relations.
   - R "phases have words": text.
 - **rain**
-  - C "starts with six arrows…": now base + 2 and base + 4 (the 3.9 rule).
-  - R "Twin Salvo is in effect on a rain of arrows": a duplicate of the gemSmoke sweep.
+  - C "starts with six arrows…": now base + 2 and base + 4 (the reference rule).
+  - R "Twin Salvo is in effect on an arrow rain": a duplicate of the gemSmoke sweep.
   - R "Wide Crush needs a skill with an area": a duplicate of the gemSmoke sweep.
   - C "Snare Cluster throws five traps… Triple Snare three": the counts became `> 1`.
 - **reprieve**
@@ -500,46 +500,46 @@ R = removed, C = changed (what was dropped or loosened).
   - C "lists every other active skill as a secondary": dropped the formula copies.
   - C "Echoing Cast: each cast lands twice": dropped the support tuning.
 - **spiritS1**
-  - R "Cast on Melee Kill links the spells beside it": restates the definition.
+  - R "Slayer's Echo links the spells beside it": restates the definition.
 - **spiritS2**
-  - R "Flicker Strike has a cooldown of two seconds…": the definition.
-  - C Flicker Strike sheet rate, Vigilant Strike, Discharge, Immortal Call: dropped the gem-data pins.
+  - R "Blinking Cut has a cooldown of two seconds…": the definition.
+  - C Blinking Cut sheet rate, Guarded Strike, Charge Release, Deathless Call: dropped the gem-data pins.
 - **spiritS3**
   - R "last as long as their gem says": data.
-  - R "Vulnerability raises physical damage…": a data pass-through.
-  - C Enfeeble/Temporal Chains, Mark of Plenty, Ensnaring Arrow, Bear Trap, Wave of Conviction: dropped the data pins; the mechanisms are kept.
+  - R "Open Wounds raises physical damage…": a data pass-through.
+  - C Feeble Grip/Leaden Limbs, Mark of Plenty, Snare Shot, Jaws Trap, Tide of Judgement: dropped the data pins; the mechanisms are kept.
 - **spiritS4**
-  - C "the sheet counts every projectile as a hit", Barrage Support: dropped the field pins.
+  - C "the sheet counts every projectile as a hit", Rolling Volleys: dropped the field pins.
 - **spiritS5**
-  - R "Flameblast: the sheet spreads the blast over the uses that built it": a formula copy.
-  - R "Cyclone is a channel with a weak first hit and a stun-proof spin": field checks only.
+  - R "Furnace Roar: the sheet spreads the blast over the uses that built it": a formula copy.
+  - R "Twister Blade is a channel with a weak first hit and a stun-proof spin": field checks only.
 - **spiritS6**
-  - C Frost Bomb timing, banner stages (×2): the pins became relations.
-  - R "Winter Orb fires faster with stages…": a duplicate; fire rate was never measured.
+  - C Rime Core timing, banner stages (×2): the pins became relations.
+  - R "Hoarfrost Mote fires faster with stages…": a duplicate; fire rate was never measured.
 - **spiritS8**
-  - R "Flame Dash holds three uses, and shares its cooldown…": a field pin and an assertion that could not fail.
-  - C Withering Step, Venom Gyre, Point Blank: dropped the pins.
+  - R "Cinder Step holds three uses, and shares its cooldown…": a field pin and an assertion that could not fail.
+  - C Rotting Stride, Toxin Circle, Close Quarters: dropped the pins.
 - **spiritS9**
   - C "its cooldown starts when it ends": now read from the gem.
   - C "costs life each second…": the band became `< maxLife`.
 - **spiritS10**
   - R "mines made by the supports last five seconds": data.
-  - R "Bear Trap stores three uses of a four-second cooldown…": data.
+  - R "Jaws Trap stores three uses of a four-second cooldown…": data.
   - C ballista, Chained Charges, Pyroclast: dropped the pins; the orderings are kept.
 - **spiritS11**
-  - C "Raise Spectre…": `>= 31` became `> 10`.
+  - C "Bind Shade…": `>= 31` became `> 10`.
 - **spiritS12**
   - R "Carrion Colossus gives the other minions added physical damage": data only.
-  - C Bone Offering, Elemental Army, Infernal Legion: dropped the pins.
+  - C Bone Ward Rite, Elemental Pack, Burning Pack: dropped the pins.
 - **spiritS13a**
-  - R "Static Strike beams hit harder while the character moves": data.
-  - R "Perforate: six spikes in Blood Stance, one thrust in Sand Stance": data.
-  - R "Ice Nova can expand from Glacier Darts in flight": field checks.
-  - R "Spectral Throw pierces": a field check.
-  - C 19 tests (Discipline, Dual Strike, Lightning Trap, Puncture, Elemental Hit, Glacial Hammer, shards, Soulrend, Arctic Armour, Herald of Agony, burning aura, Arc, Viper Strike, Whirling Blades, Cast when Stunned, Cobra Lash, Mirror Arrow, Bladefall, Creeping Frost, Melee Physical Damage): dropped the gem-data pins and exact margins; the mechanisms are kept.
+  - R "Charged Blow beams hit harder while the character moves": data.
+  - R "Spear Burst: six spikes in Blood Stance, one thrust in Sand Stance": data.
+  - R "Frost Ring can expand from Glacier Darts in flight": field checks.
+  - R "Phantom Toss pierces": a field check.
+  - C 19 tests (Arcane Ward, Twin Blades, Bolt Trap, Gouge Shot, Primal Strike, Rime Mallet, shards, Spirit Saw, Rimeplate, Sour Herald, burning aura, Arc Chain, Venom Cut, Spinning Dash, Reeling Cast, Viper Lash, Mirror Quiver, Rain of Steel, Rime Drift, Brute Force): dropped the gem-data pins and exact margins; the mechanisms are kept.
 - **spiritS13c**
-  - C Close Combat, Multistrike, Intensify, Kindle, Combustion, Infused Channelling: the pins became relations.
-  - R "Meat Shield: the minions stay near the character…": a field read only.
+  - C Knife Range, Triple Cadence, Swelling Blast, Kindle, Tinderbox, Charged Breath: the pins became relations.
+  - R "Warding Pack: the minions stay near the character…": a field read only.
 - **steps**
   - C "a few basic types have one…": dropped the count and text.
   - C "a Wisp that is ready…": `> 5` became `> 0`.
@@ -588,7 +588,7 @@ R = removed, C = changed (what was dropped or loosened).
 - `calc/character` "computes in under 5 ms": a calc speed floor, kept like the sim floors.
 
 Titles that named numbers the tests no longer assert were reworded: Carrion Hag, Carrion Mother, Huntsmaster, Treasurer,
-Ember Downpour's arrows, Snare Cluster, Infused Channelling, Discharge and Point Blank.
+Ember Downpour's arrows, Snare Cluster, Charged Breath, Charge Release and Close Quarters.
 
 ## Removed on judgment, easy to restore
 

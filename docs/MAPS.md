@@ -271,7 +271,7 @@ that is, **reward ≈ half the pressure it adds**. The bot measures whether that
 ### 6.2 New affixes
 
 The "Analogue" column names the reference mod type in parentheses. The "Cost" column is an **estimate from reading the
-existing affix and monster-mod definitions, not a stat audit**; R4's first task is to cross-check the names in the "Ours" column against the 3.9 map prefixes and suffixes drafted into `reference/coverage/` (the IP deny-list catches proper nouns, not generic adjectives that coincide; the existing "Savage" is a candidate to check) and to check the cost column against
+existing affix and monster-mod definitions, not a stat audit**; R4's first task is to cross-check the names in the "Ours" column against the reference map prefixes and suffixes drafted into `reference/coverage/` (local, not in the repository) (the IP deny-list catches proper nouns, not generic adjectives that coincide; the existing "Savage" is a candidate to check) and to check the cost column against
 `src/mods/types.ts` and the monster calc. `D` means data only; `F` a new flag or stat hook; `P` population only.
 
 | Ours (provisional)         | Text                                                                 | Analogue                       | Punishes / favours          | Reward     | Cost |

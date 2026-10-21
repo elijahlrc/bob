@@ -228,8 +228,8 @@ rest, and a controller walks it one tile at a time. The thresholds are the glue:
 without making them complicated, and they are the only reason a +5 is ever a choice.
 
 The cost is variety. Boards are prebuilt, so a build is choose-4-of-8 boards x 4 rotations x 5 glyphs; the design
-space is order and orientation, and guides reduce it to a list. Travel nodes are identical, so the texture of a PoE
-path (a small node that is a tiny decision) is gone. Blizzard capped a character at five boards (Season 6) and said it
+space is order and orientation, and guides reduce it to a list. Travel nodes are identical, so the texture of a
+reference-game path (a small node that is a tiny decision) is gone. Blizzard capped a character at five boards (Season 6) and said it
 aims for 30 to 40% of the skill tree filled by endgame (sourced, Den of Geek on the 2020 quarterly update): a system
 tuned for a clear read of a few big choices, not for tens of thousands of distinct builds. Legendaries are buffs placed
 far away, not trades, so no node is feared. A theme is a board, so locality is total and mixing is coarse.

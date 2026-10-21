@@ -1,7 +1,7 @@
-# B — The secondary references: Wolcen, Borderlands, Torchlight, Titan Quest and PoE 2
+# B — The secondary references: Wolcen, Borderlands, Torchlight, Titan Quest and the reference game's sequel
 
 Phase B of [PASSIVE-TREE.md](../../PASSIVE-TREE.md), section 2. Written 2026-10-19 from the web only. Every number is
-marked **sourced (url)** or **recalled**; where sources disagree both are given. Fandom, poe2wiki, Maxroll and IGN were
+marked **sourced (url)** or **recalled**; where sources disagree both are given. Fandom, the sequel's wiki, Maxroll and IGN were
 behind bot walls or paywalls this pass, so some figures come from fan guides or search snippets of those pages, and the
 gaps are named rather than filled. Only the plan's questions a game answers distinctively are covered.
 
@@ -34,14 +34,14 @@ reach across the tree" and "allows you to hybrid fairly well"; sourced
 **Keystone-equivalents.** The big nodes are mostly buffs; the trades cluster in the outer ring. Wiki examples (sourced):
 +100% crit damage with -30% damage; extra projectiles with -50% projectile damage; +2 ailment stacks with -30% non-DoT
 damage; health capped at 5% of force shield; -20% health and shield for summons taking 25% less. About **8 of ~30 outer
-majors** carry a penalty. The shape is PoE's: a restriction paid for a multiplier.
+majors** carry a penalty. The shape is the reference game's: a restriction paid for a multiplier.
 
 **Decisions and budget.** One point per level to cap 90, so about **90 points**; sourced (gameplay sheet: "At each
 level, players receive one point"; "up to level 90"); up to 40 more from endgame Operations, capped; sourced
 (https://mp1st.com/title-updates-and-patches/wolcen-lords-of-mayhem-update-1-10-out-for-patch-8-this-may-22/). A build
 meets: which inner branch (1), which middle and outer branches to rotate under it (2 to 4), and the rotation, which
 players do **once per respec**: "you never needed to actually use it. You'd always just keep it in one configuration";
-sourced (https://pathofexile.com/forum/view-thread/3067222). Respec costs a currency item (steamah).
+sourced (a thread on the reference game's official forum, 3067222). Respec costs a currency item (steamah).
 
 **Communication and legibility.** Three colours run through all rings and "same color shares the same shape within each
 ring" (sourced, steamah): lineage reads by colour and shape at any zoom. Reviews split: "labyrinthine"
@@ -127,7 +127,7 @@ than a screen.
 
 ---
 
-## 4. Titan Quest and Path of Exile 2
+## 4. Titan Quest and the reference game's sequel
 
 **Titan Quest.** Pick 2 masteries (8 in the base game, 11 with all expansions; sourced, TQ2 wiki below); 3 skill
 points per level; each mastery's bar gives attributes and health per
@@ -137,35 +137,34 @@ draws passives as circles, actives as squares; sourced (https://titanquest2.wiki
 the gate is itself useful (bar points give stats), so a deep tier is never wasted travel, and the steps grow (3, 6, 6,
 8, 8) so each deeper tier costs more commitment.
 
-**PoE 2.** Node types: **attribute (travel) nodes giving +5 to an attribute the player chooses**, small, notable,
+**The sequel.** Node types: **attribute (travel) nodes giving +5 to an attribute the player chooses**, small, notable,
 keystone, jewel socket; **no masteries**; **no life nodes**; sourced
-(https://vulkk.com/2025/02/08/path-of-exile-2-passive-tree-guide/,
-https://maxroll.gg/poe2/resources/poe-2-passive-tree-and-dual-specialization). The attribute highways "create three
+(a vulkk.com passive tree guide, February 2025, and a Maxroll guide to the sequel's tree and dual specialisation). The attribute highways "create three
 distinct rings around the Passive Tree" and "become more cost-efficient per point" farther out (vulkk). Six start positions
 shared by class pairs (12 planned, 8 playable at 0.4; recalled), with class-specific start nodes. Size: "over 1,500 nodes" and **122 points** (player post,
-https://www.pathofexile.com/forum/view-thread/3767066, April 2025) against **1,800+ nodes, 500+ notables, 18 keystones**
-at 0.2.0, ~120 allocated (https://www.switchbladegaming.com/path-of-exile-2/passive-tree-guide/); neither is official.
-Weapon-set points: a separate pool of **24**, two per Book of Specialisation, spendable only with regular points in
-hand, so one build can hold two trees; sourced (Maxroll above, https://mobalytics.gg/poe-2/guides/dual-specialisation).
+the sequel's official forum, thread 3767066, April 2025) against **1,800+ nodes, 500+ notables, 18 keystones**
+at 0.2.0, ~120 allocated (a switchbladegaming.com passive tree guide); neither is official.
+Weapon-set points: a separate pool of **24**, two per specialisation book (a quest reward), spendable only with regular points in
+hand, so one build can hold two trees; sourced (Maxroll above, a Mobalytics dual specialisation guide).
 Respec costs gold, dynamic, attribute nodes half price (Maxroll).
 
-**What GGG changed.** Official 0.3.0 notes: **105 new clusters** (Warrior 15, Mercenary 23, Ranger/Huntress 17, Monk 17,
-Witch/Sorceress 25, between Warrior and Witch 8); "A small Attribute Passive Skill has been removed on all of the outward
-highways between class starting locations"; Acrobatics removed; keystones sharpened into trades (Giant's Blood "now
-halves the Life granted by Strength"; Eternal Youth makes flasks recover 50% less); four new keystones; stated aim "build
-diversity"; sourced (https://www.pathofexile.com/forum/view-thread/3826682). 0.4.0: "more than 250 new Passive Skills to
-the Druid side"; sourced (https://www.pathofexile.com/forum/view-thread/3883495). Reception: from a tree that "almost
+**What the developer changed.** Official 0.3.0 notes: **105 new clusters** (15 to 25 per start, 8 between the strength
+and intelligence starts); one small attribute node "removed on all of the outward
+highways between class starting locations"; its evasion-to-dodge keystone removed; keystones sharpened into trades (its two-handed
+keystone now halves the life granted by strength; its energy shield recharge keystone makes flasks recover 50% less); four new keystones; stated aim "build
+diversity"; sourced (official forum, thread 3826682). 0.4.0: "more than 250 new Passive Skills" for the
+side of a new class; sourced (official forum, thread 3883495). Reception: from a tree that "almost
 feels empty" to one players found "overwhelming at first"; sourced
-(https://www.poe-vault.com/poe2/news/poe2s-passive-tree-got-huge-here-is-the-before-and-after). The no-life-nodes
-reasoning as relayed from ExileCon 2023, "its not fun to simply pick up %life nodes", is secondary only
-(https://www.pathofexile.com/forum/view-thread/3408808). **No primary source was found for why attribute nodes became a
-choice or why masteries were dropped.** Choice-nodes returned in 0.5.4's Expedition atlas tree: "a choice between several
+(a fan site's before-and-after article on the tree). The no-life-nodes
+reasoning as relayed from the developer's 2023 convention, "its not fun to simply pick up %life nodes", is secondary only
+(official forum, thread 3408808). **No primary source was found for why attribute nodes became a
+choice or why masteries were dropped.** Choice-nodes returned in 0.5.4's endgame passive tree: "a choice between several
 possible modifiers that you can flip between at will", 24 points, half notables; sourced
-(https://www.pcgamesn.com/path-of-exile-2/patch-notes-0-5-4-expedition-passive-tree).
+(PCGamesN on the 0.5.4 patch notes).
 
-**Communication.** Jonathan Rogers: hovering a passive "should tell you what the DPS change will be on all of your
-skills"; an imported build file "will highlight the nodes on your tree"; no in-game PoB because "that's the game telling
-you that you're supposed to use it"; sourced (https://www.pcgamesn.com/path-of-exile-2/tooltips). Layout by attribute
+**Communication.** The game director: hovering a passive "should tell you what the DPS change will be on all of your
+skills"; an imported build file "will highlight the nodes on your tree"; no in-game build planner because "that's the game telling
+you that you're supposed to use it"; sourced (PCGamesN on the sequel's tooltips). Layout by attribute
 (Intelligence top, Dexterity right, Strength lower-left, hybrids at junctions); hovering a distant notable previews the
 cheapest path and its node count (switchblade guide). Player critique (forum 3767066): "Half the nodes seem like filler",
 the +5 node is "demoralizing", and "travel nodes taking too much of points and too long travel distance".
@@ -178,9 +177,9 @@ keystones became trades. Players still name travel as the cost they resent.
 
 ## 5. Property x game
 
-PoE 1 column **recalled** (3.9 era); the measured figures belong to the PoE file.
+Reference column **recalled** (the reference version's era); the measured figures belong to the reference game's study (local reference material in `reference/docs/tree/`, not in the repository).
 
-| Property                               | Wolcen                                                           | Borderlands 3                                                | Torchlight: Infinite                                            | Titan Quest                            | PoE 2                                             | PoE 1 (recalled)               |
+| Property                               | Wolcen                                                           | Borderlands 3                                                | Torchlight: Infinite                                            | Titan Quest                            | The sequel                                        | The reference game (recalled)  |
 | -------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------ | --------------------------------------------------------------- | -------------------------------------- | ------------------------------------------------- | ------------------------------ |
 | Node count                             | 492 (fan count)                                                  | 130 ranks to fill, per class                                 | 24 boards, ~25-35 nodes each (recalled)                         | 8-11 masteries x ~20 skills (recalled) | 1,500-1,800 (sources disagree)                    | ~1,300                         |
 | Points per full build                  | ~90 (+40 endgame)                                                | 70 of 130                                                    | 116                                                             | 3/level, ~225 at cap 75 (recalled)     | ~122 + 24 weapon-set                              | ~123                           |
@@ -193,21 +192,21 @@ PoE 1 column **recalled** (3.9 era); the measured figures belong to the PoE file
 
 ## 6. What the secondary games suggest for Bob (suggestions, not decisions)
 
-1. _Suggestion:_ every game but PoE replaces travel with a gate by points spent (5 per tier, 16/32 per board, a mastery
+1. _Suggestion:_ every game but the reference game replaces travel with a gate by points spent (5 per tier, 16/32 per board, a mastery
    bar), and players of the one game with travel name it as the cost they resent. Bob could keep highways short and make
-   each travel node give something a build wants (PoE 2's chosen attribute), so the audit's "share of travel" can sit
-   under PoE 1's.
+   each travel node give something a build wants (the sequel's chosen attribute), so the audit's "share of travel" can sit
+   under the reference game's.
 2. _Suggestion:_ "commit to a theme" needs no distance. Borderlands makes it with a capstone that needs 25 of its own
    column; Torchlight Infinite with a major at 16/32 points in its board. A Bob keystone that opens when N points sit in
    its region gives the same feeling with no road.
-3. _Suggestion:_ keystones that are trades are the minority everywhere (about a quarter of Wolcen's outer majors; PoE 2
+3. _Suggestion:_ keystones that are trades are the minority everywhere (about a quarter of Wolcen's outer majors; the sequel
    redesigned its own in 0.3.0). The brief should fix the share of keystones that are trades on purpose, written as a
    restriction paid for a multiplier, the shape all four games use.
 4. _Suggestion:_ for a phone, Torchlight Infinite's answer is boards no larger than a screen with the theme as the tab
    name; Borderlands' is a column whose depth is commitment. Each Bob region could be legible whole at one zoom level,
    with its name as the label, before any node text is read.
-5. _Suggestion:_ PoE 2's 0.3.0 widening (105 clusters) is the one data point on how much supply a shared tree needs, and
+5. _Suggestion:_ the sequel's 0.3.0 widening (105 clusters) is the one data point on how much supply a shared tree needs, and
    the reaction was "overwhelming". Bob's count should come from supply arithmetic (plan C9) and be checked against the
-   time a player has between maps, not against PoE's size.
+   time a player has between maps, not against the reference game's size.
 6. _Suggestion:_ Wolcen's rotation warns against clever navigation: a mechanism used once and then ignored is not a
    decision. Anything set once per run in Bob (a start, a first keystone) should be designed as a commitment, not a tool.
