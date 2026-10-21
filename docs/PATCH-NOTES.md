@@ -14,6 +14,15 @@ change, and our own names only. Dash bullets under plain headings.
 - The high score list starts over with this version; a checkbox on its screen shows the older versions' scores, whose characters can no longer be fought.
 - Totems and brands no longer pile up past their limit when it drops, and shots from totems, traps and mines hitting walls no longer pull your character in.
 - The Onrush Draught's card now says what it does.
+- Duels give each side three Bargain Coins and more life the higher the opponent's level, and last up to 250 seconds, when the side that used fewer reprieves wins.
+- Duels start at normal speed, and leaving one puts back the speed you had.
+- Reprieves now show when they fire, with a ward while the saved character cannot be hurt and "Immune" on the hits it shrugs off.
+- The first maps offer skill gems your weapon can use, and gems it cannot use drop half as often.
+- While a flask slot is empty, the best flask in the bag for it is marked as an upgrade.
+- The Skills tab shows your total damage per second, makes your strongest skill primary until you star one, and gets more gem filters; the Strategy tab shows each skill's single-target damage.
+- Gem and flask cards read more clearly, and socket previews say when a gem would do nothing.
+- Characters whose shots keep hitting minions in front of their target now deal with those minions instead of standing stuck.
+- Links to the game show its name and a picture when shared.
 
 ## 2026-10-19
 
