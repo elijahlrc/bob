@@ -379,7 +379,7 @@
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">Storyboard · draft 2 · 2026-10-21</div>
+    <div class="eyebrow">Storyboard · draft 3 · 2026-10-21</div>
     <h1>Battle of Builds: the 30-second trailer</h1>
     <p class="lede">
       For players who love ARPGs and roguelikes. The pitch: <b>every run is a new build</b>, crafted
@@ -389,7 +389,7 @@
       gameplay; only the text and the edit are made for the trailer.
     </p>
     <ul class="specs">
-      <li><b>30.0 s</b> · 11 shots</li>
+      <li><b>30.0 s</b> · 12 shots</li>
       <li><b>16:9</b> 1920×1080, 60 fps</li>
       <li><b>Music</b> 120 bpm, 15 bars of 2 s</li>
       <li><b>Text</b> on cards and overlays, no voice-over</li>
@@ -447,8 +447,8 @@
           are under shot 9.
         </li>
         <li>
-          <b>The run-length line.</b> "Level 1 to 100. One sitting." says short without a number.
-          Does it overpromise for slower players?
+          <b>The genre card.</b> Roguelike, ARPG, arcade, autobattler, one word per beat, each over
+          a flash of footage that proves it. Is that the order, and are those the four words?
         </li>
         <li><b>The itch.io address</b> for the end card (a placeholder for now).</li>
         <li><b>Music:</b> licensed track, or a 30 s cue written to this cut sheet?</li>
@@ -475,15 +475,20 @@
       id: 'climb',
       name: 'The climb',
       span: '0:15–0:20',
-      note: 'A whole build, level 1 to 100, in one sitting. Death ends the run.',
+      note: 'A whole build, level 1 to 100, in one sitting, and then it falls. The fall is shown, not captioned.',
     },
     {
       id: 'duel',
       name: 'Duels and the board',
-      span: '0:20–0:27',
+      span: '0:20–0:26',
       note: 'The arcade loop: the finished build fights other players’ builds, its Elo moves, and its name climbs the high scores.',
     },
-    { id: 'title', name: 'Title', span: '0:27–0:30', note: 'Name, price, where to play.' },
+    {
+      id: 'title',
+      name: 'The mashup',
+      span: '0:26–0:30',
+      note: 'The genre mix is the selling point, so it gets said outright, then the name, the price and where to play.',
+    },
   ];
 
   const SHOTS = [
@@ -542,7 +547,7 @@
       t: [15, 18.5],
       name: 'Level 1 to 100',
       frame: 'climb',
-      text: 'Level 1 to 100. One sitting.',
+      text: 'Grind to level 100 in a sitting.',
       screen:
         'Half-second cuts through biomes, each a deeper map; the HUD map number rolls up to 100 under the text.',
       sound: 'A riser across the whole shot.',
@@ -551,9 +556,8 @@
     {
       act: 'climb',
       t: [18.5, 20],
-      name: 'One life',
+      name: 'The fall',
       frame: 'fallen',
-      text: 'One life.',
       screen:
         'A boss telegraph fills the floor, the life globe empties, the character falls. Cut to the end screen; the duel button is pressed.',
       sound: 'The music cuts on the death, a single low hit, a bell on the button.',
@@ -561,7 +565,7 @@
     },
     {
       act: 'duel',
-      t: [20, 24],
+      t: [20, 23.5],
       name: 'The duel',
       frame: 'duel',
       text: 'Duel their builds.',
@@ -572,7 +576,7 @@
     },
     {
       act: 'duel',
-      t: [24, 25.5],
+      t: [23.5, 24.5],
       name: 'The rating',
       frame: 'elo',
       screen: 'The result line: “Rated · 712 → 748”, the number counting up.',
@@ -581,7 +585,7 @@
     },
     {
       act: 'duel',
-      t: [25.5, 27],
+      t: [24.5, 26],
       name: 'The board',
       frame: 'board',
       text: 'Take the top spot.',
@@ -593,13 +597,24 @@
     },
     {
       act: 'title',
-      t: [27, 30],
+      t: [26, 28],
+      name: 'The genres',
+      frame: 'genres',
+      text: 'Roguelike. ARPG. Arcade. Autobattler.',
+      screen:
+        'One word per beat, each stamped over a half-second flash that proves it: Roguelike over a run’s end screen, ARPG over the passive tree and a loot drop, Arcade over the high scores, Autobattler over the character fighting on its own at 8×.',
+      sound: 'Four hits, one per word, on the beats of bar 14.',
+      cap: 'Made in the edit from leftover footage of shots 3, 7 and 10.',
+    },
+    {
+      act: 'title',
+      t: [28, 30],
       name: 'Battle of Builds',
       frame: 'logo',
       text: 'Battle of Builds · Play free',
       screen:
         'The title over a dim crypt, “Play free” and the itch.io address under it. The torch gutters out on the last frame.',
-      sound: 'Final hit at 27 s, the drone rings out, the torch hisses out at 30 s.',
+      sound: 'Final hit at 28 s, the drone rings out, the torch hisses out at 30 s.',
       cap: 'Made in the edit; address is a placeholder until the itch.io page is up.',
     },
   ];
@@ -859,7 +874,7 @@
           )
           .join('') +
         `<rect x="0" y="66" width="320" height="50" fill="#000" opacity=".6"/>` +
-        say(160, 98, 'Level 1 to 100. One sitting.', 18)
+        say(160, 98, 'Grind to level 100 in a sitting.', 17)
       );
     },
     fallen: () =>
@@ -869,7 +884,22 @@
       `<rect x="200" y="50" width="16" height="26" fill="${C.wall}"/><circle cx="208" cy="44" r="7" fill="${C.wall}"/>` +
       `<g transform="rotate(80 150 108)">${hero(150, 104, C.bone)}</g>` +
       `<circle cx="20" cy="162" r="13" fill="${C.ui}" stroke="${C.uiLine}"/><circle cx="300" cy="162" r="13" fill="${C.mana}"/>` +
-      caption('One life.'),
+      label(8, 14, 'NO TEXT · THE DEATH SPEAKS'),
+    genres: () =>
+      ['Roguelike.', 'ARPG.', 'Arcade.', 'Autobattler.']
+        .map(
+          (w, i) =>
+            `<rect x="${2 + (i % 2) * 159}" y="${2 + Math.floor(i / 2) * 89}" width="157" height="87" fill="${['#2a1416', '#28324a', '#2a2614', '#2d3a32'][i]}" opacity=".7" stroke="${C.uiLine}"/>` +
+            label(
+              8 + (i % 2) * 159,
+              14 + Math.floor(i / 2) * 89,
+              ['END SCREEN', 'TREE + LOOT', 'HIGH SCORES', 'FIGHTING AT 8×'][i] +
+                ' · BEAT ' +
+                (i + 1),
+            ) +
+            say(80 + (i % 2) * 159, 54 + Math.floor(i / 2) * 89, w, 20),
+        )
+        .join(''),
     duel: () =>
       defs([C.cold, C.fire]) +
       `<ellipse cx="160" cy="104" rx="130" ry="56" fill="${C.floor}" opacity=".5" stroke="${C.dim}" stroke-width="2"/>` +
