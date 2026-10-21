@@ -334,8 +334,9 @@ for k in range(6):
 blip(2.75, 79, 0.08, 0.8, 0.5)
 blip(2.82, 86, 0.12, 0.7, 0.5)
 # 3-6: four node chimes up the tree, the wind-up and the slam
-for k, m in enumerate((74, 77, 81, 86)):
-    blip(3.2 + k * 0.18, m, 0.14, 0.8, 0.125)
+for k, m in enumerate((74, 77, 81)):  # a chime per node, on the eighth notes; the keystone's is fuller
+    blip(3.25 + k * 0.25, m, 0.14 if k < 2 else 0.3, 0.8 if k < 2 else 1.0, 0.125)
+blip(3.75, 86, 0.3, 0.5, 0.25)
 whoosh(4.6, 0.4, 0.8)
 thud(5.0, 1.5)
 place('sfx', 5.0, noise(0.6, 3000) * np.exp(-np.arange(int(0.6 * SR)) / SR / 0.15), 0.25)  # the floor cracking
