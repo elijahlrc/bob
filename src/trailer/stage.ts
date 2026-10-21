@@ -251,7 +251,10 @@ export function dropNear(w: World, run: RunState, itemUid: number, dx = 1.5, dy 
   w.drops.push({ id: w.nextId++, x: p.x + dx, y: p.y + dy, item } as World['drops'][number]);
 }
 
-/** A duel of `a` against `b`, named, rated as the trailer has it (712 to 748 for the viewer when it ends). */
+/**
+ * A duel of `a` against `b`, named, rated as the trailer has it (712 to 748 for the viewer when it ends). `rules` change how hard the
+ * two hit and how much life they have, so the fight is short enough to film.
+ */
 export function duel(
   c: Controller,
   a: Build,
@@ -259,10 +262,11 @@ export function duel(
   seed: number,
   names: [string, string],
   rating: { before: number; after: number },
+  rules: { damageScale?: number; lifeCurve?: boolean } = {},
 ): boolean {
   c.screen = 'title';
   c.world = null;
-  const ok = c.startDuel(a, b, seed, { names, reprieves: 0 }, 'title');
+  const ok = c.startDuel(a, b, seed, { names, reprieves: 0, ...rules }, 'title');
   if (!ok || !c.duel) return false;
   c.duel.rival = { rivalId: '7', myId: '3', rated: true, home: 'summary' };
   c.onDuelEnd = (_d, out) => {
@@ -332,6 +336,16 @@ export function mortal(w: World, life = 1): void {
 /** The labelled ground effect (a boss's move, e.g. 'Sentence') now on the floor, if any. */
 export function effect(w: World, label: string): World['effects'][number] | undefined {
   return w.effects.find((e) => e.label === label);
+}
+
+/** Keep a duel on screen when it ends, so the frames after the killing blow can be filmed (undone by `releaseDuelEnd`). */
+export function holdDuelEnd(c: Controller): void {
+  (c as unknown as { endDuel: () => void }).endDuel = () => {};
+}
+
+/** Let a held duel end: the next frame goes to the result screen. */
+export function releaseDuelEnd(c: Controller): void {
+  delete (c as unknown as { endDuel?: unknown }).endDuel;
 }
 
 /** Let a held map end (undo `holdEnd`): the next frame goes to the screen the map's end leads to. */

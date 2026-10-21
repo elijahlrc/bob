@@ -363,9 +363,7 @@
     climb7: 75,
     fall: 64,
     summary: 36,
-    duel1: 38,
-    duel2: 30,
-    duel: 125,
+    duel: 106,
     result: 30,
     board: 45,
     auto: 60,
@@ -384,9 +382,7 @@
     climb5: 0,
     climb6: 2,
     climb7: 28,
-    duel1: 0,
-    duel2: 0,
-    duel: 26,
+    duel: 0,
     auto: 0,
   };
   const src = (clip, i) =>
@@ -494,17 +490,8 @@
     {
       t: [19, 22.5],
       name: 'The duel',
-      what: 'The arena: our Mystic against Sin’s Reaver, Sin’s name on the boss bar, in three cuts of the one fight: the first exchanges at full life, the middle, and the last blows. The deciding blow is held for a quarter beat, then lands on 22.25.',
-      draw(lt) {
-        const cap = caption('Duel their builds.', lt, 0.1, 170, 16);
-        if (lt < 1.25) return img(at('duel1', lt, 0)) + cap;
-        if (lt < 2.25) return img(at('duel2', lt - 1.25, 0)) + cap;
-        /* the deciding blow lands at frame IN + 90 of the duel clip */
-        const tt = lt < 3.0 ? lt : lt < 3.25 ? 3.0 : 3.0 + (lt - 3.25);
-        /* frame 118 is the last before the result screen comes up */
-        const f = Math.min(118, IN.duel + tt * FPS);
-        return img(src('duel', f)) + cap;
-      },
+      what: 'The arena: our Mystic against Sin’s Reaver, Sin’s name on the boss bar. They trade blows from the first second and the deciding blow lands on 22.25, with no hold.',
+      draw: (lt) => img(at('duel', lt, 0)) + caption('Duel their builds.', lt, 0.1, 170, 16),
     },
     {
       t: [22.5, 23.5],

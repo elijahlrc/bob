@@ -479,72 +479,73 @@ export const CLIPS: Clip[] = [
     prefs: { 'bob.pref.rivalName': ME, 'bob.pref.rivals': true },
   },
 
-  /* 8. The duel: our Mystic against Sin's Reaver, in three cuts of the same fight: the start (full life, the first exchanges), the
-        middle, and the last four seconds up to the deciding blow; then the rating. A whole duel runs over a minute, so the cuts
-        skip what is between. */
+  /* 8. The duel: our Mystic against Sin's Reaver, the whole fight: they trade blows from the first second and the Mystic lands the
+        deciding blow on 3.25 s, with the frames after it filmed; then the rating. The duel's own rules are turned up (the damage
+        each takes is multiplied by 5, not 0.3) so a fight is a few seconds, not over a minute. */
   {
-    name: 'duel1',
+    name: 'duel',
     zoom: 3.2,
     css: `.hud-top .muted, .speeds, .biome-banner { display: none !important; }`,
     async film(t) {
-      const n = await t.stage((S, c, _g, me) => {
-        const mk = (l: any) => S.stagedRun(l, 80).build;
-        const a = mk({
-          classId: 'mystic',
-          level: 84,
-          weapon: 'wand_l72',
-          body: ['flameBolt', 'echoingCast'],
-        });
-        const b = mk({ classId: 'reaver', level: 84, body: ['reapingArc', 'bruteForce'] });
-        (window as any).__builds = [a, b];
-        // Find a seed the Mystic wins, in a fight that is not the longest.
-        for (let seed = 1; seed < 60; seed++) {
-          S.duel(c, a, b, seed, [me, 'Sin'], { before: 712, after: 748 });
-          let f = 0;
-          while (c.screen === 'map' && f < 30 * 120) {
-            c.bus.emit('frame', { dtMs: 1000 / 30 });
-            f++;
+      const RULES = { damageScale: 5 };
+      const n = await t.stage(
+        (S, c, _g, a) => {
+          const mk = (l: any) => S.stagedRun(l, 80).build;
+          const x = mk({
+            classId: 'mystic',
+            level: 84,
+            weapon: 'wand_l72',
+            body: ['flameBolt', 'echoingCast'],
+          });
+          const y = mk({ classId: 'reaver', level: 84, body: ['reapingArc', 'bruteForce'] });
+          (window as any).__builds = [x, y];
+          // A seed the Mystic wins with a third of its life left, in a fight of 3.3 to 4.2 s.
+          for (let seed = 1; seed < 60; seed++) {
+            S.duel(c, x, y, seed, [a.me, 'Sin'], { before: 712, after: 748 }, a.rules);
+            let f = 0;
+            while (c.screen === 'map' && f < 30 * 30) {
+              c.bus.emit('frame', { dtMs: 1000 / 30 });
+              f++;
+            }
+            const out = c.lastDuel;
+            const left = out ? out.result.sides[0].lifeLeft : 0;
+            if (out && out.result.winner === 0 && out.result.how === 'death') {
+              if (f >= 100 && f <= 126 && left > 0.2 && left < 0.5) {
+                (window as any).__seed = seed;
+                return f;
+              }
+            }
           }
-          const out = c.lastDuel;
-          if (out && out.result.winner === 0 && out.result.how === 'death' && f > 150 && f < 2400) {
-            (window as any).__seed = seed;
-            return f;
-          }
-        }
-        return -1;
-      }, ME);
+          return -1;
+        },
+        { me: ME, rules: RULES },
+      );
       if (n < 0) throw new Error('no duel the Mystic wins');
-      const A = 75; // frames into the fight where the first cut opens (the fighters have met)
-      const MID = Math.round(n * 0.45); // where the second opens
+      // Start so that the last blow is the 98th frame of the clip (3.25 s), then film a few frames more.
       await t.stage(
         (S, c, game, a) => {
           const [x, y] = (window as any).__builds;
-          S.duel(c, x, y, (window as any).__seed, [a.me, 'Sin'], { before: 712, after: 748 });
-          S.warm(c, a.A);
+          S.duel(
+            c,
+            x,
+            y,
+            (window as any).__seed,
+            [a.me, 'Sin'],
+            { before: 712, after: 748 },
+            a.rules,
+          );
+          S.holdDuelEnd(c);
+          S.warm(c, a.skip);
           S.settle(game, c);
         },
-        { me: ME, A },
+        { me: ME, rules: RULES, skip: n - 98 },
       );
-      await t.rec(38);
-      t.cut('duel2');
-      await t.stage(
-        (S, c, game, a) => {
-          S.warm(c, a.gap);
-          S.settle(game, c);
-        },
-        { gap: MID - A - 38 },
-      );
-      await t.rec(30);
-      t.cut('duel');
-      await t.stage(
-        (S, c, game, a) => {
-          S.warm(c, a.gap);
-          S.settle(game, c);
-        },
-        { gap: n - 120 - (MID + 30) },
-      );
-      await t.rec(125);
+      await t.rec(106);
       t.cut('result');
+      await t.stage((S, c) => {
+        S.releaseDuelEnd(c);
+        c.bus.emit('frame', { dtMs: 33 });
+      });
       await t.page.waitForTimeout(300);
       for (let i = 0; i < 30; i++) {
         const k = Math.min(1, Math.max(0, (i - 4) / 18));
