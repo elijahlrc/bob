@@ -188,8 +188,8 @@
 <div class="wrap">
   <h1>Battle of Builds: animatic</h1>
   <p class="sub">
-    The 30-second trailer storyboard (draft 6) in motion, on a synthesized temp track. Sketches
-    stand in for footage.
+    The 30-second trailer storyboard in motion, on a synthesized temp track. Sketches stand in for
+    footage.
   </p>
   <div class="stage" id="stage">
     <svg id="svg" viewBox="0 0 320 180" role="img" aria-label="Trailer animatic"></svg>
@@ -311,6 +311,29 @@
   const deadAfter = (t0, lt) => clamp(1 - (lt - t0) / 0.25);
   const crack = (x, y, o) =>
     `<path d="M${x} ${y} l-18 6 l-10 -4 M${x} ${y} l14 9 l12 -2 M${x} ${y} l4 -12 l10 -4" stroke="#000" stroke-width="1.5" fill="none" opacity="${o}"/>`;
+  /* enemies, one shape per kind */
+  const foe = (kind, x, y, o = 1, sc = 1) => {
+    if (o <= 0) return '';
+    let b = '';
+    if (kind === 'rat')
+      b = `<ellipse cx="${x}" cy="${y}" rx="4.5" ry="2.6" fill="#8a7a6a"/><circle cx="${x + 4}" cy="${y - 1}" r="1.8" fill="#8a7a6a"/><path d="M${x - 4} ${y} q-4 -1 -6 2" stroke="#8a7a6a" fill="none"/><circle cx="${x + 4.6}" cy="${y - 1.4}" r=".6" fill="${C.fire}"/>`;
+    if (kind === 'knight')
+      b = `<rect x="${x - 4}" y="${y - 4}" width="8" height="13" fill="#6f7480"/><rect x="${x - 3.5}" y="${y - 10}" width="7" height="6" fill="#8a909c"/><rect x="${x - 2.5}" y="${y - 8}" width="5" height="1" fill="#000"/><rect x="${x + 4}" y="${y - 2}" width="2" height="10" fill="#9aa0aa"/>`;
+    if (kind === 'wraith')
+      b = `<path d="M${x - 5} ${y + 8} Q${x - 6} ${y - 8} ${x} ${y - 10} Q${x + 6} ${y - 8} ${x + 5} ${y + 8} l-2.5 -3 l-2.5 3 l-2.5 -3 z" fill="#b8c4d8" opacity=".7"/><circle cx="${x - 2}" cy="${y - 5}" r=".9" fill="#000"/><circle cx="${x + 2}" cy="${y - 5}" r=".9" fill="#000"/>`;
+    if (kind === 'spider')
+      b =
+        `<circle cx="${x}" cy="${y}" r="3.5" fill="#5a4a5a"/>` +
+        [-1, 1]
+          .map(
+            (d) =>
+              `<path d="M${x} ${y} l${d * 6} -4 l${d * 2} 6 M${x} ${y} l${d * 7} 1 l${d * 2} 5" stroke="#5a4a5a" fill="none"/>`,
+          )
+          .join('');
+    if (kind === 'brute')
+      b = `<g transform="translate(${x} ${y}) scale(${sc}) translate(${-x} ${-y})"><rect x="${x - 9}" y="${y - 6}" width="18" height="22" rx="3" fill="#7a4a3a"/><circle cx="${x}" cy="${y - 10}" r="6" fill="#7a4a3a"/><rect x="${x - 14}" y="${y - 4}" width="5" height="16" fill="#6a3a2a"/><rect x="${x + 9}" y="${y - 4}" width="5" height="16" fill="#6a3a2a"/><circle cx="${x - 2}" cy="${y - 11}" r="1" fill="${C.fire}"/><circle cx="${x + 2}" cy="${y - 11}" r="1" fill="${C.fire}"/></g>`;
+    return `<g opacity="${o}">${b}</g>`;
+  };
 
   /* ---------- the shots ---------- */
   const SHOTS = [
@@ -585,42 +608,142 @@
     {
       t: [13, 15],
       name: 'Three more builds',
-      what: 'The other three classes side by side in phone-shaped panels, all hitting together on the bar line at 14 s.',
+      what: 'The other three classes side by side in phone-shaped panels, each fighting its own way on its own rhythm: rapid poison arrows, slow heavy sweeps, a totem pulsing on holy ground.',
       draw(lt) {
-        const builds = [
+        const panels = [
           ['#22301f', C.chaos, '#5aa04a', 'STRIDER'],
           ['#2e2a24', C.bone, '#d09a3a', 'REAVER'],
           ['#2e2b1c', C.gold, '#d0c070', 'ZEALOT'],
         ];
         let s = '';
-        builds.forEach(([fl, fx, col, nm], i) => {
-          const k = ease((lt - i * 0.08) / 0.3);
+        panels.forEach(([fl, fx, col, nm], i) => {
+          const k = ease((lt - i * 0.1) / 0.3);
           const x = 44 + i * 82,
             cx = x + 33,
             dy = (1 - k) * 160;
           s += `<g transform="translate(0 ${dy})"><rect x="${x}" y="8" width="66" height="146" rx="8" fill="${fl}" stroke="${C.uiLine}"/>`;
           s += `<clipPath id="ph${i}"><rect x="${x}" y="8" width="66" height="146" rx="8"/></clipPath><g clip-path="url(#ph${i})">`;
-          s += glow(cx, 86, 44, fx, 0.4);
-          const beat = lt % 0.5;
+          s += glow(cx, 90, 44, fx, 0.3);
           if (i === 0) {
-            for (let a = 0; a < 3; a++) {
-              const f = (lt * 2 + a / 3) % 1;
-              s += `<line x1="${cx}" y1="${86 - f * 30}" x2="${cx}" y2="${80 - f * 30}" stroke="${fx}" stroke-width="2"/>`;
+            /* Strider: a stream of arrows every 0.18 s into a swarm of rats, green poison stacking on them */
+            const rats = [
+              [x + 14, 44],
+              [x + 30, 38],
+              [x + 48, 46],
+              [x + 22, 58],
+              [x + 42, 60],
+            ];
+            const hero_ = [cx, 118];
+            for (let n = 0; n < 11; n++) {
+              const t0 = 0.15 + n * 0.18,
+                f = (lt - t0) / 0.15;
+              const [tx, ty] = rats[n % 5];
+              if (f >= 0 && f < 1)
+                s += `<line x1="${lerp(hero_[0], tx, f)}" y1="${lerp(hero_[1] - 8, ty, f)}" x2="${lerp(hero_[0], tx, f) + (tx - hero_[0]) * 0.08}" y2="${lerp(hero_[1] - 8, ty, f) - 5}" stroke="${fx}" stroke-width="1.6"/>`;
             }
+            rats.forEach(([rx, ry], j) => {
+              const hits = Math.max(0, Math.floor((lt - 0.3 - j * 0.18) / 0.9) + 1);
+              const dead = lt > 1.3 + j * 0.12;
+              s += `<circle cx="${rx}" cy="${ry}" r="${4 + Math.min(3, hits) * 2}" fill="${fx}" opacity="${dead ? 0 : 0.25}"/>`;
+              s += foe(
+                'rat',
+                rx + Math.sin(lt * 8 + j) * 1.5,
+                ry,
+                dead ? clamp(1 - (lt - 1.3 - j * 0.12) / 0.2) : 1,
+              );
+            });
+            for (let n = 0; n < 6; n++)
+              s += floatNum(
+                x + 8 + (n % 3) * 18,
+                70 - (n % 2) * 6,
+                String(180 + n * 37),
+                fx,
+                0.35 + n * 0.27,
+                lt,
+                7,
+              );
+            s += hero(hero_[0], hero_[1], col);
           }
-          if (i === 1)
-            s += `<path d="M${cx - 16} 92 Q${cx} ${70 + beat * 20} ${cx + 16} 92" stroke="${fx}" stroke-width="2" fill="none" opacity="${1 - beat * 2}"/>`;
-          if (i === 2)
-            s +=
-              `<ellipse cx="${cx}" cy="98" rx="26" ry="10" fill="${fx}" opacity=".18"/>` +
-              `<rect x="${cx + 14}" y="74" width="6" height="18" fill="${fx}"/><circle cx="${cx + 17}" cy="72" r="3" fill="${fx}"/>`;
-          s +=
-            hero(cx, 86, col) +
-            skel(cx - 18, 70, deadAfter(1.0, lt) * 0.85) +
-            skel(cx + 17, 108, deadAfter(1.05, lt) * 0.85);
-          s += burst(cx, 92, fx, 1.0, lt, 30, 2.5);
+          if (i === 1) {
+            /* Reaver: one slow, heavy sweep every 0.6 s through armoured knights; big numbers, bleeding */
+            const knights = [
+              [cx - 14, 74],
+              [cx + 14, 72],
+              [cx, 62],
+            ];
+            const swings = [0.35, 0.95, 1.55];
+            s += hero(cx, 100, col);
+            swings.forEach((t0, n) => {
+              const f = (lt - t0) / 0.22;
+              if (f >= 0 && f < 1.4) {
+                const a0 = -150 + f * 120;
+                const r = 26;
+                const p = (a) => [
+                  cx + Math.cos((a * Math.PI) / 180) * r,
+                  92 + Math.sin((a * Math.PI) / 180) * r * 0.7,
+                ];
+                const [x1, y1] = p(a0 - 70),
+                  [x2, y2] = p(a0);
+                s += `<path d="M${x1} ${y1} A${r} ${r * 0.7} 0 0 1 ${x2} ${y2}" stroke="${fx}" stroke-width="${4 - f * 2}" fill="none" opacity="${1 - clamp((f - 0.8) / 0.6)}"/>`;
+              }
+              s += floatNum(
+                cx - 18 + n * 10,
+                54,
+                ['1,840', '2,215', '3,960!'][n],
+                fx,
+                t0 + 0.12,
+                lt,
+                n === 2 ? 11 : 9,
+              );
+            });
+            knights.forEach(([kx, ky], j) => {
+              const hit = lt > 0.47 + j * 0.6;
+              const dead = lt > 1.67 && j < 3;
+              s += foe(
+                'knight',
+                kx + (hit ? Math.sin(lt * 40) * 0.8 : 0),
+                ky,
+                dead ? clamp(1 - (lt - 1.67) / 0.2) : 1,
+              );
+              if (hit && !dead)
+                s += `<circle cx="${kx + 2}" cy="${ky + 10 + ((lt * 30) % 6)}" r="1" fill="${C.life}"/>`;
+            });
+          }
+          if (i === 2) {
+            /* Zealot: a totem drops at 0.2 s, holy ground spreads, the totem pulses every 0.33 s at wraiths */
+            const f = clamp((lt - 0.2) / 0.15);
+            const groundR = 30 * ease((lt - 0.35) / 0.5);
+            if (lt > 0.35)
+              s += `<ellipse cx="${cx}" cy="86" rx="${groundR}" ry="${groundR * 0.45}" fill="${fx}" opacity=".22" stroke="${fx}" stroke-width=".8"/>`;
+            const ty = lerp(10, 80, f);
+            s += `<rect x="${cx - 3}" y="${ty - 18}" width="6" height="18" fill="${fx}"/><circle cx="${cx}" cy="${ty - 20}" r="3.5" fill="#fff6d0"/>`;
+            if (f >= 1 && lt < 0.5) s += burst(cx, 82, fx, 0.35, lt, 18);
+            const wraiths = [
+              [x + 12, 44],
+              [x + 52, 50],
+              [x + 30, 36],
+            ];
+            for (let n = 0; n < 5; n++) {
+              const t0 = 0.55 + n * 0.33,
+                w = wraiths[n % 3],
+                g = (lt - t0) / 0.12;
+              if (g >= 0 && g < 1.5)
+                s += `<line x1="${cx}" y1="${ty - 20}" x2="${w[0]}" y2="${w[1]}" stroke="#fff6d0" stroke-width="${2.2 - g}" opacity="${1 - g / 1.5}"/>`;
+              s += burst(w[0], w[1] + 6, fx, t0 + 0.05, lt, 12, 1.5);
+            }
+            wraiths.forEach(
+              ([wx, wy], j) =>
+                (s += foe(
+                  'wraith',
+                  wx,
+                  wy + Math.sin(lt * 5 + j) * 2,
+                  lt > 1.4 + j * 0.15 ? clamp(1 - (lt - 1.4 - j * 0.15) / 0.2) : 0.9,
+                )),
+            );
+            s += hero(cx - 16, 112, col);
+          }
           s += `<circle cx="${x + 10}" cy="144" r="5" fill="${C.life}"/><circle cx="${x + 56}" cy="144" r="5" fill="${C.mana}"/>`;
-          s += label(x + 6, 20, nm) + '</g></g>';
+          s += label(x + 5, 20, nm) + '</g></g>';
         });
         return s;
       },
@@ -628,54 +751,225 @@
     {
       t: [15, 18.5],
       name: 'Level 1 to 100',
-      what: 'Half-second cuts through deeper and deeper maps; the map number rolls up to 100.',
+      what: 'Half-second cuts, each a different build in a different place, using different skills against different enemies; the map number rolls up to 100.',
       draw(lt) {
-        const biomes = [
-          ['#2d3a32', C.bone, 'Crypt'],
-          ['#3a2a22', C.fire, 'Forge'],
-          ['#28324a', C.cold, 'Cavern'],
-          ['#2a2a33', C.light, 'Ruins'],
-          ['#2a3a2a', C.chaos, 'Marsh'],
-          ['#33302a', C.gold, 'Shrine'],
-          ['#3a2224', C.fire, 'Hollow'],
-        ];
         const i = Math.min(6, Math.floor(lt / 0.5));
-        const [fl, fx, nm] = biomes[i];
-        const local = lt - i * 0.5;
-        const map = Math.round(1 + 99 * Math.pow(clamp(lt / 3.3), 1.6));
-        let s =
-          `<rect width="320" height="180" fill="${fl}" opacity=".35"/>` +
-          floor(160, 100, 150, 60, fl);
-        s += glow(170, 96, 70, fx, 0.5) + burst(190, 100, fx, 0.15, local, 36);
-        s +=
-          hero(150 + local * 30, 100) +
-          skel(200, 94, deadAfter(0.2, local) * 0.8) +
-          skel(214, 106, deadAfter(0.25, local) * 0.8);
+        const l = lt - i * 0.5;
+        const map = [4, 17, 31, 48, 63, 82, 100][i];
+        const CUTS = [
+          /* a Crypt corridor: a Reaver cleaving skeletons */
+          () => {
+            let s =
+              `<polygon points="20,120 180,40 300,70 140,150" fill="#2d3a32" opacity=".6"/>` +
+              glow(110, 100, 70, C.bone, 0.3);
+            s += hero(80, 112, '#d09a3a');
+            const f = clamp((l - 0.12) / 0.15);
+            if (l > 0.12 && l < 0.4)
+              s += `<path d="M86 88 A30 20 0 0 1 112 118" stroke="${C.bone}" stroke-width="${4 - f * 3}" fill="none"/>`;
+            [
+              [108, 98],
+              [118, 110],
+              [130, 92],
+            ].forEach(
+              ([x, y]) => (s += skel(x + (l > 0.2 ? (l - 0.2) * 40 : 0), y, deadAfter(0.25, l))),
+            );
+            return (
+              s +
+              floatNum(116, 82, '2,140', C.bone, 0.2, l) +
+              `<rect x="200" y="30" width="8" height="40" fill="${C.wall}"/>`
+            );
+          },
+          /* a Forge hall: a Mystic's fireball into a slag brute */
+          () => {
+            let s = floor(170, 100, 150, 56, '#3a2a22') + glow(230, 90, 60, C.fire, 0.4);
+            [70, 150, 250].forEach(
+              (x) =>
+                (s += `<path d="M${x} ${118} l12 -4 l10 6" stroke="${C.fire}" stroke-width="1" fill="none" opacity=".6"/>`),
+            );
+            s += hero(260, 108, '#5a78d0');
+            const f = clamp(l / 0.22);
+            if (l < 0.22)
+              s +=
+                `<circle cx="${lerp(250, 110, f)}" cy="${lerp(100, 92, f)}" r="5" fill="${C.fire}"/>` +
+                glow(lerp(250, 110, f), lerp(100, 92, f), 14, C.fire);
+            s += foe('brute', 104, 92, deadAfter(0.35, l)) + burst(110, 96, C.fire, 0.22, l, 40, 3);
+            return s + floatNum(96, 66, '5,512', C.fire, 0.22, l, 12);
+          },
+          /* a Cavern: a frost nova round a Shade, spiders frozen mid-leap */
+          () => {
+            let s =
+              `<path d="M30 140 Q60 60 150 50 Q260 40 300 120 Q200 170 30 140" fill="#28324a" opacity=".6"/>` +
+              glow(160, 96, 70, C.cold, 0.4);
+            s += hero(160, 92, '#9a5ac0') + burst(160, 104, C.cold, 0.1, l, 60, 3);
+            [
+              [120, 86],
+              [204, 96],
+              [146, 124],
+              [186, 120],
+            ].forEach(([x, y], j) => {
+              s += foe('spider', x, y, deadAfter(0.38, l));
+              if (l > 0.12)
+                s += `<polygon points="${x - 5},${y + 4} ${x},${y - 7} ${x + 5},${y + 4}" fill="${C.cold}" opacity=".55"/>`;
+            });
+            return s + floatNum(196, 78, '3,377', C.cold, 0.14, l);
+          },
+          /* Ruins with pillars: a Zealot's lightning chaining through wraiths */
+          () => {
+            let s = floor(150, 104, 140, 52, '#2a2a33') + glow(170, 80, 70, C.light, 0.35);
+            [
+              [80, 70],
+              [230, 64],
+              [260, 120],
+            ].forEach(
+              ([x, y]) => (s += `<rect x="${x}" y="${y}" width="10" height="30" fill="#4a4558"/>`),
+            );
+            s += hero(60, 124, '#d0c070');
+            const pts = [
+              [64, 112],
+              [124, 80],
+              [170, 104],
+              [214, 76],
+              [250, 96],
+            ];
+            const n = Math.min(4, Math.floor(l / 0.06));
+            let d = `M${pts[0][0]} ${pts[0][1]}`;
+            for (let j = 1; j <= n; j++)
+              d += ` L${(pts[j - 1][0] + pts[j][0]) / 2 + (j % 2 ? 6 : -6)} ${(pts[j - 1][1] + pts[j][1]) / 2 - 8} L${pts[j][0]} ${pts[j][1]}`;
+            s += `<path d="${d}" stroke="${C.light}" stroke-width="1.8" fill="none" opacity="${1 - clamp((l - 0.35) / 0.15)}"/>`;
+            pts
+              .slice(1)
+              .forEach(([x, y], j) => (s += foe('wraith', x, y - 6, deadAfter(0.3 + j * 0.03, l))));
+            return s + floatNum(170, 86, '4,019', C.light, 0.15, l);
+          },
+          /* a Marsh: a Strider's plague cloud drifting over rats in the reeds */
+          () => {
+            let s =
+              `<rect width="320" height="180" fill="#1c2a1c" opacity=".7"/>` +
+              `<ellipse cx="200" cy="120" rx="60" ry="14" fill="#2f4a3a" opacity=".7"/>`;
+            [40, 70, 270, 290].forEach(
+              (x) =>
+                (s += `<path d="M${x} 150 l2 -24 M${x + 4} 150 l-2 -18" stroke="#4a6a3a" stroke-width="1.5"/>`),
+            );
+            s += hero(240, 96, '#5aa04a');
+            const cx = lerp(200, 130, l / 0.5);
+            s += `<circle cx="${cx}" cy="100" r="${20 + l * 30}" fill="${C.chaos}" opacity=".22"/><circle cx="${cx - 12}" cy="94" r="${12 + l * 20}" fill="${C.chaos}" opacity=".18"/>`;
+            [
+              [110, 100],
+              [128, 110],
+              [140, 94],
+              [150, 116],
+              [118, 120],
+            ].forEach(
+              ([x, y], j) =>
+                (s += foe('rat', x + Math.sin(l * 20 + j) * 2, y, deadAfter(0.3 + j * 0.03, l))),
+            );
+            return (
+              s +
+              floatNum(118, 82, '611', C.chaos, 0.1, l, 9) +
+              floatNum(140, 88, '611', C.chaos, 0.25, l, 9)
+            );
+          },
+          /* a Shrine: a Vanguard's holy slam on armoured knights, light from above */
+          () => {
+            let s =
+              floor(160, 104, 120, 50, '#33302a') +
+              `<polygon points="140,0 180,0 200,110 120,110" fill="${C.gold}" opacity=".12"/>`;
+            [100, 220].forEach(
+              (x) =>
+                (s += `<rect x="${x}" y="60" width="4" height="14" fill="${C.gold}"/><circle cx="${x + 2}" cy="58" r="2" fill="#fff6d0"/>`),
+            );
+            s += hero(160, 98, '#c0503a') + burst(160, 108, C.gold, 0.18, l, 50, 3);
+            if (l > 0.18 && l < 0.35)
+              s += `<rect x="156" y="0" width="8" height="108" fill="#fff6d0" opacity="${1 - (l - 0.18) / 0.17}"/>`;
+            [
+              [124, 104],
+              [198, 100],
+              [178, 120],
+            ].forEach(([x, y]) => (s += foe('knight', x, y, deadAfter(0.3, l))));
+            return s + floatNum(184, 82, '7,230', C.gold, 0.2, l, 12);
+          },
+          /* the Hollow at map 100: a Shade's ring of blades round a towering brute */
+          () => {
+            let s =
+              `<rect width="320" height="180" fill="#3a2224" opacity=".45"/>` +
+              floor(160, 100, 160, 64, '#3a2224') +
+              glow(190, 80, 80, C.fire, 0.3);
+            s += foe('brute', 200, 76, 1, 1.8);
+            s += hero(130, 108, '#9a5ac0') + ring(130, 112, 26, C.light, 1, 0.6);
+            for (let j = 0; j < 4; j++) {
+              const a = l * 14 + (j * Math.PI) / 2;
+              s += `<rect x="${130 + Math.cos(a) * 26 - 5}" y="${112 + Math.sin(a) * 13 - 1}" width="10" height="2" fill="${C.light}"/>`;
+            }
+            return (
+              s +
+              floatNum(206, 52, '12,800', C.light, 0.1, l, 12) +
+              floatNum(214, 64, '13,105', C.light, 0.3, l, 12)
+            );
+          },
+        ];
+        const names = ['Crypt', 'Forge', 'Cavern', 'Ruins', 'Marsh', 'Shrine', 'Hollow'];
+        let s = CUTS[i]();
         s +=
           txt(10, 18, `Map ${map}`, { size: 10, col: C.torch, weight: 600 }) +
-          txt(310, 18, nm, { size: 8, col: C.mute, anchor: 'end' });
-        s += txt(10, 32, `Level ${map}`, { size: 8, col: C.mute });
-        return s + caption('Grind to level 100 in a sitting.', lt, 0.15, 104, 18);
+          txt(310, 18, names[i], { size: 8, col: C.mute, anchor: 'end' });
+        s += txt(10, 30, `Level ${map}`, { size: 8, col: C.mute });
+        return s + caption('Grind to level 100 in a sitting.', lt, 0.15, 170, 17);
       },
     },
     {
       t: [18.5, 20],
       name: 'The fall',
-      what: 'A boss telegraph, the life globe empties, the character falls. The end screen, the duel button pressed. No text.',
+      what: 'A boss’s signature attack: the light drains, a vast rune closes on the character, a column of void slams down and the floor shatters. The character falls. Then the end screen, the duel button pressed. No text.',
       draw(lt) {
-        if (lt < 0.85) {
-          const g = ease(lt / 0.5);
-          let s =
-            floor(160, 100, 150, 60) +
-            `<ellipse cx="150" cy="104" rx="${70 * g}" ry="${30 * g}" fill="${C.fire}" opacity="${0.12 + 0.2 * g}" stroke="${C.fire}"/>`;
-          s += `<rect x="200" y="50" width="16" height="26" fill="${C.wall}"/><circle cx="208" cy="44" r="7" fill="${C.wall}"/>`;
-          const fall = lt > 0.5 ? ease((lt - 0.5) / 0.25) * 85 : 0;
-          s += hero(150, 100, C.bone, fall) + globes(clamp(1 - lt / 0.5) * 0.25);
-          if (lt > 0.5) s += glow(150, 104, 80, C.fire, clamp(1 - (lt - 0.5) / 0.3));
-          return s;
+        if (lt < 0.95) {
+          const charge = clamp(lt / 0.5);
+          const hit = 0.5;
+          const k = lt - hit;
+          const shake = k > 0 && k < 0.3 ? (1 - k / 0.3) * 5 : 0;
+          const sx = Math.sin(lt * 90) * shake,
+            sy = Math.cos(lt * 77) * shake;
+          let s = `<g transform="translate(${sx} ${sy})">`;
+          s += floor(160, 104, 160, 64, '#2a2030');
+          /* the boss, raising its arms as the light drains */
+          s += `<rect x="216" y="${40 - charge * 4}" width="22" height="34" fill="#3a2a40"/><circle cx="227" cy="${34 - charge * 4}" r="9" fill="#3a2a40"/>`;
+          s += `<line x1="216" y1="${48 - charge * 4}" x2="${206}" y2="${30 - charge * 14}" stroke="#3a2a40" stroke-width="5"/><line x1="238" y1="${48 - charge * 4}" x2="248" y2="${30 - charge * 14}" stroke="#3a2a40" stroke-width="5"/>`;
+          s +=
+            `<circle cx="227" cy="${32 - charge * 4}" r="${2 + charge * 2}" fill="${C.light}"/>` +
+            glow(227, 30, 30 * charge, C.light, charge);
+          /* the closing rune: an outer ring with spokes that shrinks onto the character */
+          if (lt < hit) {
+            const r = lerp(120, 22, ease(charge));
+            s += ring(150, 108, r, C.light, 2, 0.9) + ring(150, 108, r * 0.8, C.light, 0.8, 0.6);
+            for (let j = 0; j < 8; j++) {
+              const a = (j * Math.PI) / 4 + lt * 2;
+              s += `<line x1="${150 + Math.cos(a) * r}" y1="${108 + Math.sin(a) * r * 0.5}" x2="${150 + Math.cos(a) * r * 0.8}" y2="${108 + Math.sin(a) * r * 0.4}" stroke="${C.light}" stroke-width="1.2"/>`;
+            }
+            s += `<ellipse cx="150" cy="108" rx="${r}" ry="${r / 2}" fill="${C.light}" opacity="${0.08 + charge * 0.15}"/>`;
+          }
+          /* the column of void slamming down, then the shattered floor */
+          if (k >= 0) {
+            const col = clamp(1 - k / 0.35);
+            s += `<rect x="${136 - col * 6}" y="-10" width="${28 + col * 12}" height="120" fill="#120818" opacity="${col}"/>`;
+            s += `<rect x="${144}" y="-10" width="12" height="120" fill="#e6d8ff" opacity="${col}"/>`;
+            s +=
+              burst(150, 108, C.light, hit, lt, 120, 4) +
+              burst(150, 108, '#ffffff', hit + 0.05, lt, 70, 2);
+            s += `<path d="M150 108 l-40 10 l-24 -6 M150 108 l36 16 l30 -4 M150 108 l-10 -22 l-26 -8 M150 108 l20 -20 l34 2 M150 108 l-6 30" stroke="#000" stroke-width="2" fill="none"/>`;
+            for (let j = 0; j < 8; j++) {
+              const a = j * 0.8 + 0.3,
+                d = ease(k / 0.45) * 60;
+              s += `<rect x="${150 + Math.cos(a) * d}" y="${108 + Math.sin(a) * d * 0.5 - Math.sin(clamp(k / 0.45) * Math.PI) * 20}" width="4" height="3" fill="#4a4050" opacity="${1 - clamp(k / 0.45)}"/>`;
+            }
+          }
+          const fall = k > 0.05 ? ease((k - 0.05) / 0.25) * 85 : 0;
+          s += hero(150, 100, C.bone, fall) + '</g>';
+          /* the light drains to a vignette */
+          s += `<rect width="320" height="180" fill="#000" opacity="${charge * 0.35 * (k > 0 ? 1 - clamp(k / 0.1) * 0.6 : 1)}"/>`;
+          s += globes(lt < hit ? 0.3 : clamp(0.3 - k * 2));
+          return s + label(8, 14, 'BOSS · SIGNATURE ATTACK');
         }
-        const k = lt - 0.85;
-        const pressed = k > 0.3;
+        const k = lt - 0.95;
+        const pressed = k > 0.25;
         let s =
           panel(60, 26, 200, 116) +
           txt(160, 50, 'Fallen on map 63', {
@@ -692,7 +986,7 @@
           col: C.ink,
           anchor: 'middle',
         });
-        if (pressed) s += glow(160, 75, 90, C.torch, clamp(1 - (k - 0.3) / 0.3));
+        if (pressed) s += glow(160, 75, 90, C.torch, clamp(1 - (k - 0.25) / 0.3));
         s += `<rect x="84" y="100" width="152" height="6" fill="${C.mute}" opacity=".4"/><rect x="84" y="112" width="120" height="6" fill="${C.mute}" opacity=".3"/>`;
         return s;
       },
@@ -816,72 +1110,80 @@
     {
       t: [26, 28],
       name: 'The genres',
-      what: 'One word per beat, each over a flash of the footage that proves it.',
+      what: 'All four words on screen at once, appearing one by one on the beats, each over a sketch of the footage that proves it.',
       draw(lt) {
-        const words = [
-          ['Roguelike.', '#2a1416', 'the end screen'],
-          ['ARPG.', '#28324a', 'the tree and a loot drop'],
-          ['Arcade.', '#2a2614', 'the high scores'],
-          ['Autobattler.', '#2d3a32', 'fighting on its own at 8×'],
+        const cells = [
+          ['Roguelike.', '#2a1416'],
+          ['ARPG.', '#28324a'],
+          ['Arcade.', '#2a2614'],
+          ['Autobattler.', '#2d3a32'],
         ];
-        const i = Math.min(3, Math.floor(lt / 0.5));
-        const k = (lt - i * 0.5) / 0.5;
-        const [w, bg, under] = words[i];
-        let s =
-          `<rect width="320" height="180" fill="${bg}"/>` +
-          glow(160, 90, 140, C.torch, 0.25 * (1 - k));
-        if (i === 0) s += hero(240, 120, C.bone, 85);
-        if (i === 1)
-          s +=
-            [0, 1, 2, 3]
+        let s = '';
+        cells.forEach(([w, bg], i) => {
+          const t0 = i * 0.5,
+            k = lt - t0;
+          if (k < 0) return;
+          const x = (i % 2) * 160,
+            y = Math.floor(i / 2) * 90,
+            cx = x + 80,
+            cy = y + 45;
+          s += `<g opacity="${clamp(k / 0.06)}"><rect x="${x + 1}" y="${y + 1}" width="158" height="88" fill="${bg}"/>`;
+          s += `<clipPath id="gc${i}"><rect x="${x + 1}" y="${y + 1}" width="158" height="88"/></clipPath><g clip-path="url(#gc${i})">`;
+          if (i === 0) s += hero(x + 130, y + 66, C.bone, 85) + skel(x + 112, y + 60, 0.5);
+          if (i === 1)
+            s +=
+              [0, 1, 2, 3]
+                .map(
+                  (j) =>
+                    `<circle cx="${x + 18 + j * 16}" cy="${y + 74 - j * 6}" r="4" fill="${C.torch}"/>`,
+                )
+                .join('') +
+              `<rect x="${x + 116}" y="${y + 54}" width="34" height="26" fill="${C.ui}" stroke="${C.gold}"/>`;
+          if (i === 2)
+            s += [0, 1, 2, 3]
               .map(
-                (j) => `<circle cx="${40 + j * 22}" cy="${130 - j * 8}" r="5" fill="${C.torch}"/>`,
+                (j) =>
+                  `<rect x="${x + 10}" y="${y + 12 + j * 9}" width="${60 - j * 8}" height="6" fill="${j === 2 ? C.torch : C.ui}"/>`,
               )
-              .join('') +
-            `<rect x="230" y="104" width="48" height="34" fill="${C.ui}" stroke="${C.gold}"/>`;
-        if (i === 2)
-          s += [0, 1, 2, 3, 4]
-            .map(
-              (j) =>
-                `<rect x="24" y="${30 + j * 12}" width="${90 - j * 10}" height="8" fill="${j === 3 ? C.torch : C.ui}"/>`,
-            )
-            .join('');
-        if (i === 3)
+              .join('');
+          if (i === 3)
+            s +=
+              hero(x + 130 + Math.sin(lt * 30) * 4, y + 64) +
+              skel(x + 148, y + 60, 0.6) +
+              ring(x + 130, y + 74, 10 + ((lt * 60) % 14), C.bone, 1, 0.6);
+          s += `<rect x="${x}" y="${y}" width="160" height="90" fill="#000" opacity=".35"/>`;
+          s += glow(cx, cy, 70, C.torch, 0.5 * clamp(1 - k / 0.4));
+          const sc = lerp(1.5, 1, ease(k / 0.18));
           s +=
-            hero(230 + Math.sin(lt * 30) * 6, 120) +
-            skel(262, 116, 0.6) +
-            ring(230, 130, 20 + ((lt * 120) % 30), C.bone, 1, 0.6);
-        const sc = lerp(1.35, 1, ease(k / 0.25));
-        s +=
-          `<g transform="translate(160 96) scale(${sc}) translate(-160 -96)">` +
-          txt(160, 104, w, { size: 34, font: 'display', anchor: 'middle' }) +
-          '</g>';
-        return s + label(10, 172, 'UNDER IT: ' + under.toUpperCase());
+            `<g transform="translate(${cx} ${cy}) scale(${sc}) translate(${-cx} ${-cy})">` +
+            txt(cx, cy + 8, w, { size: 19, font: 'display', anchor: 'middle' }) +
+            '</g>';
+          s += '</g></g>';
+        });
+        return (
+          s +
+          `<line x1="160" y1="0" x2="160" y2="180" stroke="#07070b" stroke-width="2"/><line x1="0" y1="90" x2="320" y2="90" stroke="#07070b" stroke-width="2"/>`
+        );
       },
     },
     {
       t: [28, 30],
       name: 'Battle of Builds',
-      what: 'The title, “Play free” and the itch.io address. The torch gutters out.',
+      what: 'The title and “Free on itch.io”. The torch gutters out.',
       draw(lt) {
         const flick = 0.55 + 0.1 * Math.sin(lt * 23) + 0.06 * Math.sin(lt * 51);
         const out = clamp((lt - 1.6) / 0.4);
         let s = glow(160, 80, 130, C.torch, flick * (1 - out));
         s +=
           `<g opacity="${ease(lt / 0.3) * (1 - out)}">` +
-          txt(160, 84, 'Battle of Builds', { size: 32, font: 'display', anchor: 'middle' }) +
+          txt(160, 86, 'Battle of Builds', { size: 32, font: 'display', anchor: 'middle' }) +
           '</g>';
-        s += txt(160, 114, 'Play free', {
-          size: 16,
+        s += txt(160, 120, 'Free on itch.io', {
+          size: 17,
           font: 'display',
           col: C.torch,
           anchor: 'middle',
           o: clamp((lt - 0.4) / 0.2) * (1 - out),
-        });
-        s += txt(160, 140, '[itch.io address]', {
-          size: 9,
-          anchor: 'middle',
-          o: clamp((lt - 0.7) / 0.2) * (1 - out),
         });
         return s;
       },
@@ -889,7 +1191,7 @@
   ];
 
   /* hard cuts that land on a hit get a short flash */
-  const FLASH = [2.0, 6.0, 12.0, 14.0, 20.0, 23.25, 26.0, 26.5, 27.0, 27.5, 28.0];
+  const FLASH = [2.0, 6.0, 12.0, 14.0, 19.0, 20.0, 23.25, 26.0, 26.5, 27.0, 27.5, 28.0];
 
   const svg = document.getElementById('svg');
   function draw(t) {

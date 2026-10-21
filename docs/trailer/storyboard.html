@@ -379,7 +379,7 @@
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">Storyboard · draft 6 · 2026-10-21</div>
+    <div class="eyebrow">Storyboard · draft 7 · 2026-10-21</div>
     <h1>Battle of Builds: the 30-second trailer</h1>
     <p class="lede">
       For players who love ARPGs and roguelikes. The pitch: <b>every run is a new build</b>, crafted
@@ -452,7 +452,6 @@
           <b>The genre card.</b> Roguelike, ARPG, arcade, autobattler, one word per beat, each over
           a flash of footage that proves it. Is that the order, and are those the four words?
         </li>
-        <li><b>The itch.io address</b> for the end card (a placeholder for now).</li>
         <li><b>Music:</b> licensed track, or a 30 s cue written to this cut sheet?</li>
       </ol>
     </div>
@@ -550,7 +549,7 @@
       name: 'Three more builds',
       frame: 'triptych',
       screen:
-        'Three more builds, one for each class not yet shown, side by side in upright phone-shaped panels with rounded corners, all fighting at once: a Strider loosing poison arrows in green, a Reaver’s sword sweeps opening bleeds in bone white, a Zealot’s totems on consecrated gold ground. Six classes, six builds in fifteen seconds. No hands, no device bezels; the shape alone says it runs on a phone.',
+        'Three more builds, one for each class not yet shown, side by side in upright phone-shaped panels with rounded corners, each fighting its own way on its own rhythm: a Strider loosing a fast stream of poison arrows into a rat swarm, a Reaver’s slow, heavy sword sweeps through armoured knights with big numbers, a Zealot dropping a totem that spreads holy ground and pulses beams at wraiths. Six classes, six builds in fifteen seconds. No hands, no device bezels; the shape alone says it runs on a phone.',
       sound: 'All three skills’ impacts layered on the bar line at 14 s.',
       cap: 'Three more late saves (Strider, Reaver, Zealot), each recorded on a real phone in portrait (the game’s phone layout and HUD), laid side by side in the edit.',
     },
@@ -561,7 +560,7 @@
       frame: 'climb',
       text: 'Grind to level 100 in a sitting.',
       screen:
-        'Half-second cuts through biomes, each a deeper map; the HUD map number rolls up to 100 under the text.',
+        'Seven half-second cuts, each a different build in a different place, with a different skill against different enemies: a cleave through skeletons in a Crypt corridor, a fireball into a brute in a Forge, a frost nova freezing spiders in a Cavern, lightning chaining through wraiths among Ruins pillars, a plague cloud over rats in a Marsh, a holy slam on knights in a Shrine, and a ring of blades round a towering brute at map 100. The map number jumps with each cut.',
       sound: 'A riser across the whole shot.',
       cap: 'Showcase at 8× for the footage; the rolling number is made in the edit.',
     },
@@ -571,7 +570,7 @@
       name: 'The fall',
       frame: 'fallen',
       screen:
-        'A boss telegraph fills the floor, the life globe empties, the character falls. Cut to the end screen; the duel button is pressed.',
+        'A boss’s signature attack: it raises its arms and the light drains, a vast rune closes on the character, a column of void slams down on the beat, the screen shakes and the floor shatters. The character falls. Cut to the end screen; the duel button is pressed.',
       sound: 'The music cuts on the death, a single low hit, a bell on the button.',
       cap: 'A run that dies to a boss; end screen with rivals switched on.',
     },
@@ -614,7 +613,7 @@
       frame: 'genres',
       text: 'Roguelike. ARPG. Arcade. Autobattler.',
       screen:
-        'One word per beat, each stamped over a half-second flash that proves it: Roguelike over a run’s end screen, ARPG over the passive tree and a loot drop, Arcade over the high scores, Autobattler over the character fighting on its own at 8×.',
+        'All four words on screen at once, in four panels that appear one per beat, each over footage that proves it: Roguelike over a run’s end screen, ARPG over the passive tree and a loot drop, Arcade over the high scores, Autobattler over the character fighting on its own at 8×.',
       sound: 'Four hits, one per word, on the beats of bar 14.',
       cap: 'Made in the edit from leftover footage of shots 3, 7 and 10.',
     },
@@ -623,11 +622,11 @@
       t: [28, 30],
       name: 'Battle of Builds',
       frame: 'logo',
-      text: 'Battle of Builds · Play free',
+      text: 'Battle of Builds · Free on itch.io',
       screen:
-        'The title over a dim crypt, “Play free” and the itch.io address under it. The torch gutters out on the last frame.',
+        'The title over a dim crypt, “Free on itch.io” under it. The torch gutters out on the last frame.',
       sound: 'Final hit at 28 s, the drone rings out, the torch hisses out at 30 s.',
-      cap: 'Made in the edit; address is a placeholder until the itch.io page is up.',
+      cap: 'Made in the edit.',
     },
   ];
 
@@ -985,8 +984,7 @@
       defs([C.torch]) +
       `<g class="flicker">${glow(160, 80, 120, C.torch, 0.6)}</g>` +
       say(160, 82, 'Battle of Builds', 30) +
-      say(160, 112, 'Play free', 16, C.torch) +
-      `<text x="160" y="140" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="${C.bone}">[itch.io address]</text>`,
+      say(160, 116, 'Free on itch.io', 16, C.torch),
   };
 
   /* ---- timeline ---- */
