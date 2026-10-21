@@ -1,5 +1,5 @@
 /**
- * How connected the reference tree is (docs/TREE.md, "Look and density"): the links of `docs/tree/pob-tree.json` are
+ * How connected the reference tree is (docs/TREE.md, "Look and density"): the links of `reference/tree/ref-tree.json` are
  * one-directional, so they are made symmetric before counting edges, loops, degrees and the links that leave a group.
  * `npm run tree:refmix`.
  */
@@ -13,7 +13,7 @@ type R = {
   group: number;
   links: number[];
 };
-const ref = JSON.parse(readFileSync('docs/tree/pob-tree.json', 'utf8')) as { nodes: R[] };
+const ref = JSON.parse(readFileSync('reference/tree/ref-tree.json', 'utf8')) as { nodes: R[] };
 const ids = new Set(ref.nodes.map((n) => n.id));
 const adj = new Map<number, Set<number>>();
 for (const n of ref.nodes) adj.set(n.id, new Set());

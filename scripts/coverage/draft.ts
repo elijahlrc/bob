@@ -67,12 +67,12 @@ export function draftGem(name: string): string {
   const ref = loadReference();
   const entry = ref.gems.find((g) => key(g.name) === key(name));
   if (!entry) throw new Error(`"${name}" is not in the reference list`);
-  const skills = pob<{ skills: PobSkill[] }>('pob-skills.json').skills;
+  const skills = pob<{ skills: PobSkill[] }>('ref-skills.json').skills;
   const s =
     skills.find((x) => key(x.name) === key(name)) ??
     skills.find((x) => key(x.name) === key(name.replace(/ Support$/, '')));
   const head = `  // reference: ${entry.name} (${entry.kind}; wiki tags ${entry.tags.join(', ')}; released ${entry.release || 'at launch'})`;
-  if (!s) return `${head}\n  // no 3.9-era data found in pob-skills.json: draft by hand\n`;
+  if (!s) return `${head}\n  // no 3.9-era data found in ref-skills.json: draft by hand\n`;
   const f = s.levels.first;
   const l = s.levels.l20;
   const lines: string[] = [head];
@@ -129,7 +129,7 @@ export function draftUnique(name: string): string {
   const ref = loadReference();
   const entry = ref.uniques.find((u) => key(u.name) === key(name));
   if (!entry) throw new Error(`"${name}" is not in the reference list`);
-  const pu = pob<{ uniques: PobUnique[] }>('pob-uniques.json').uniques.find(
+  const pu = pob<{ uniques: PobUnique[] }>('ref-uniques.json').uniques.find(
     (u) => key(u.name) === key(name),
   );
   const lines = [

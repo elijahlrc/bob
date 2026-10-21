@@ -81,7 +81,7 @@ Principles, in addition to those of [COVERAGE.md](COVERAGE.md) and DESIGN.md 3:
   change of behaviour). Dropping a cosmetic does not lose it; dropping the interaction that made the gem a niche does.
 - **Say it once, as an engine primitive.** A gem that needs "spend a charge to skip the cooldown" gets a field that says
   exactly that and a test of exactly that, not a special case in `abilities.ts`. The next gem that needs it is a data row.
-- **The 3.9 numbers are the default where the mechanic exists.** The Path of Building v1.4.155 data in `docs/coverage` has
+- **The 3.9 numbers are the default where the mechanic exists.** The Path of Building v1.4.155 data in `reference/coverage` has
   mana costs, cooldowns, durations, effectiveness and per-level values for 3.9. Where the engine can now express a loop,
   its numbers are those, scaled by Bob's existing level and damage curves; where Bob has its own tuned number, it keeps it.
 - **A gem's text derives from its data.** Cards, the skill bar and the inspect panel are built from the definition
@@ -94,7 +94,7 @@ Principles, in addition to those of [COVERAGE.md](COVERAGE.md) and DESIGN.md 3:
   names its policy (section 5), and the policy is something a good player would do, not a convenience.
 - **Our own names, our own text.** Names, descriptions and art are Bob's (DESIGN.md 3; the IP scan, `src/data/ip.test.ts`).
   Reference names appear in `docs/` and `scripts/` only. No code from any tool is copied.
-- **Data first.** A gem is a decision file in `docs/coverage/gems/*.json` turned into `src/data/gemsGen.ts` by the emitter.
+- **Data first.** A gem is a decision file in `reference/coverage/gems/*.json` turned into `src/data/gemsGen.ts` by the emitter.
   Nothing is edited in `gemsGen.ts` by hand. Engine work lands in `src/calc`, `src/sim` and the type files.
 - **Ids are stable.** Gem ids are never renamed (items in saves hold them). A change of `kind` (the four old hex gems)
   keeps the id.
@@ -189,7 +189,7 @@ and are answered as marked; the others are defaults in effect until the user say
 
 ### 4.1 The ledger
 
-`docs/coverage/spirit.json` (new): one row per mapped gem, keyed by id: `verdict` (faithful, drifted, gutted), `missing`
+`reference/coverage/spirit.json` (new): one row per mapped gem, keyed by id: `verdict` (faithful, drifted, gutted), `missing`
 (primitives), `milestone` (the one that finishes it), `effects` (what a run of the gem must visibly do: see 4.3), `verified`
 (a person or a test has checked the claim), `accepted` (a documented adaptation that is not a gap). A test fails if a mapped
 gem has no row, if a gem marked `faithful` lists a missing primitive, or if a milestone is marked done while its gems are
@@ -264,7 +264,7 @@ this plan is larger than the coverage plan.
 
 ### S0 Ledger and checking (M)
 
-- `scripts/spirit/` (join, merge, report), `docs/coverage/spirit.json`, `npm run spirit`, the ledger test (4.1).
+- `scripts/spirit/` (join, merge, report), `reference/coverage/spirit.json`, `npm run spirit`, the ledger test (4.1).
 - **Check the unchecked claims** before any fix is built on them: Cast on Melee Kill is inert; Dual Strike hits with one
   weapon; Chain; the totems and deployables facts; golem and offering buffs; the kill-trigger rule; the mark rule; each port
   note that the audit says claims more than the code does (Shield Charge, Wild Strike, Gouge Shot, Spirit Saw, Ghost Shard,
@@ -652,7 +652,7 @@ decision, DESIGN.md Appendix A. One commit a milestone, with explicit paths.
   divergence is removed.
 - `docs/AUDIT-GEMS.md`: a status line pointing here; a second section at S14.
 - `CLAUDE.md`: a pointer to this plan beside the audit's, and, when S0 lands, one line for `npm run spirit`.
-- `docs/coverage/README.md`: the ledger file.
+- `reference/coverage/README.md`: the ledger file.
 
 ---
 
@@ -662,7 +662,7 @@ All milestones are built (2026-10-08). One row for each:
 
 | #   | State | What was built                                                                                                                                                                                                                                            |
 | --- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| S0  | done  | The ledger (`docs/coverage/spirit.json`, `npm run spirit`), the join of a gem with its reference, the effects smoke.                                                                                                                                      |
+| S0  | done  | The ledger (`reference/coverage/spirit.json`, `npm run spirit`), the join of a gem with its reference, the effects smoke.                                                                                                                                 |
 | S1  | done  | Cast on Melee Kill and kill triggers, the four old hexes castable, Multistrike and Dual Strike repaired.                                                                                                                                                  |
 | S2  | done  | Skill cooldowns with stored uses, spending charges to skip them, a skill that grants a buff on use; Discharge, Immortal Call, Vengeance, Ice Bite.                                                                                                        |
 | S3  | done  | The enemy status layer (hinder, maim, blind, exposure, doomed and the rest), curses and marks with their 3.9 effects, shouts.                                                                                                                             |

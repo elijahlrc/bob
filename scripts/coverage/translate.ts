@@ -151,7 +151,7 @@ let pobCache: PobUnique[] | null = null;
 export function loadPobUniques(): PobUnique[] {
   if (pobCache) return pobCache;
   const pob = (
-    JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'pob-uniques.json'), 'utf8')) as {
+    JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'ref-uniques.json'), 'utf8')) as {
       uniques: PobUnique[];
     }
   ).uniques;

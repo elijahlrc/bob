@@ -5,13 +5,13 @@ made the tree big enough (1,727 nodes, 27 keystones, 376 notables) and gave it t
 connectivity _numbers_. This plan is about what those numbers hide: the tree is the right size and has no design.
 
 Source of the feedback: the user, 2026-10-11 (seven points, quoted in section 1). Code read for this plan:
-`src/data/tree/{spec,build,notableThemes,keystones,types,tree.test}.ts`, `clustersGen.ts`, `scripts/tree/*`, `docs/tree/pob-tree.json`
+`src/data/tree/{spec,build,notableThemes,keystones,types,tree.test}.ts`, `clustersGen.ts`, `scripts/tree/*`, `reference/tree/ref-tree.json`
 and the class list. Every number below was measured on the tree as it stands (`buildTree()`) with throwaway scripts that T0
 turns into `npm run tree:audit`.
 
 **The IP boundary stays where TREE.md put it** (DESIGN §3, §9.1). From the reference we take _proportions and rates_: how
 strongly it keeps a weapon or a deployable in one corner, how much of its road is attribute nodes, how often a notable's
-small nodes agree with it. We do not take positions, shapes, the arrangement of regions, names or text. `pob-tree.json` has no
+small nodes agree with it. We do not take positions, shapes, the arrangement of regions, names or text. `ref-tree.json` has no
 coordinates anyway, so the macro-shape in section 5 is ours to invent, and it has to be invented, not derived.
 
 ---
@@ -60,7 +60,7 @@ The measurements, with the user's wording on the left. Where the data disagrees 
 | 6   | Regions should be coherent: clusters of fire, ice, mana, cast speed, a nexus.        | Bob has 40 _families_ but they are only sorted within a ring (`FAMILY_ORDER`); a region has no sub-structure. And inside a cluster: **66 of 357 clusters (18%) have small nodes that share no stat with their notable** (Brimming Inkwell, a damage notable with leech smalls; Fervid Thicket, +1 fervour charge with +10 dexterity smalls; Buttress Stance, 30% armour with damage smalls). The reference scores 238 of 256 (93%) on a looser test (a shared keyword), so read this as direction, not as a gap of 12 points.                                                              |
 | 7   | Main pathways should be simple stat nodes of their region.                           | Not so: see the root cause in section 0. There is no pathway made of anything; the +10 dots are decoration between clusters.                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
-What the reference does that Bob can learn from (measured from `pob-tree.json`, never traced):
+What the reference does that Bob can learn from (measured from `ref-tree.json`, never traced):
 
 - **Localisation is strong for archetypes and absent for generic stats.** A wand keyword is in one sector only (6 of 6
   notables); traps and mines 79% in one sector; staves 75%; bows 67%; energy shield 60%, evasion 59%; minions 56% in one and
@@ -464,7 +464,7 @@ Measured on `buildTree()` on 2026-10-11 (1,727 nodes). `tree:audit` (T0) reprodu
   "Maximum Mana" ×46 are the most common names. Life smalls: 1.7% ×2, 3% ×9, 4% ×32, 5% ×37.
 - **Routes from a start to every notable and keystone** (shortest, by node count): about 30 intermediate nodes on average;
   25% attribute dots, 67% small nodes of clusters. First notable 3 steps from every start; nearest keystone 5–16 steps.
-- **Reference** (`pob-tree.json`): 536 groups, 303 with a notable, 206 without; smalls in road-only groups: 188 attribute, 95
+- **Reference** (`ref-tree.json`): 536 groups, 303 with a notable, 206 without; smalls in road-only groups: 188 attribute, 95
   offence, 22 life, 14 other, 11 mana, 11 energy shield, 6 defence, 3 resistance; smalls in notable clusters: 546 offence, 85
   other, 76 life, 57 mana, 40 defence, 33 energy shield, 20 attribute, 17 resistance.
 

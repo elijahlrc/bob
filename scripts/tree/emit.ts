@@ -1,6 +1,6 @@
 /**
  * Writes src/data/tree/clustersGen.ts: the generated clusters of the passive tree (one per notable of the reference
- * that has an analog), from the reference (docs/tree/pob-tree.json), the names (docs/tree/names/*.json) and the
+ * that has an analog), from the reference (reference/tree/ref-tree.json), the names (docs/tree/names/*.json) and the
  * overrides (docs/tree/overrides.json). No reference name or line is written into src/.
  *
  *   npm run tree:emit

@@ -8,7 +8,7 @@ wins. When a new constraint is learned, it is added here, not only to the docume
 Each item says where it came from:
 
 - **[user]**: the user said it, with the date.
-- **[ref]**: measured on the Path of Exile 3.9 tree (`B-poe.md`, `pob-tree.json`).
+- **[ref]**: measured on the Path of Exile 3.9 tree (`B-poe.md`, `ref-tree.json`).
 - **[derived]**: read from the user's own edit of the Strider.
 - **[adopted]**: proposed by Claude and accepted or left standing by the user. Weaker than the others, and open to change.
 
@@ -67,10 +67,10 @@ Each item states the rule or the workflow, not how it was learned. History lives
 2. **Never copy** another game's tree, layout, names, cluster shapes or line sets. [user, 10-18]
 3. **When referencing the tree, look at its layout, not only its statistics.** [user, 10-19] Open the live site (pick a
    class, press F) and study how the matching part of the tree is laid out: what sits next to what, how roads run, where
-   clusters and keystones sit. Trace the matching class's start node by node in `docs/tree/pob-tree.json`. Looking is
+   clusters and keystones sit. Trace the matching class's start node by node in `reference/tree/ref-tree.json`. Looking is
    allowed; copying is not; screenshots never go in the repo.
 4. **Names use plain vocabulary a PoE player would use,** never a reference notable, gem or unique name. Check with
-   `npx vitest run src/data/ip.test.ts` and a grep of `pob-tree.json`.
+   `npx vitest run src/data/ip.test.ts` and a grep of `ref-tree.json`.
 5. **Measured facts worth keeping** [ref]:
    - **Starts.** A start touches two nodes, but each one branches at once, so a start has at least four real ways out
      within two steps: highways and small-node paths into clusters. The Ranger, traced in the graph, touches two +10

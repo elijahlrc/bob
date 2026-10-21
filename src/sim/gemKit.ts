@@ -150,7 +150,7 @@ export function seedFor(def: ActiveGemDef, world: World, dummy: Actor): void {
     });
 }
 
-/** The tags a sim step shows (the vocabulary of `effects` in docs/coverage/spirit.json). */
+/** The tags a sim step shows (the vocabulary of `effects` in reference/coverage/spirit.json). */
 export function noteEffects(w: World, into: Set<string>): void {
   for (const e of w.events) {
     switch (e.t) {

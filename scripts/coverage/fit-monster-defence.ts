@@ -1,9 +1,9 @@
 /**
  * Monster evasion and accuracy against the reference game's tables (docs/EVASION.md). `npm run evasion` prints:
- *   1. how close Bob's monster curves (src/calc/formulas.ts) are to docs/coverage/pob-monster-stats.json;
+ *   1. how close Bob's monster curves (src/calc/formulas.ts) are to reference/coverage/ref-monster-stats.json;
  *   2. what a character with plain gear (no affixes, no passives) hits and is hit for, in Bob before the change, in Bob now
  *      and in the reference game, level by level.
- * The reference table and the reference bases (docs/coverage/pob-bases.json) are data and stay in docs/; the game has only
+ * The reference table and the reference bases (reference/coverage/ref-bases.json) are data and stay in docs/; the game has only
  * its own fitted curves.
  */
 import { readFileSync } from 'node:fs';
@@ -21,9 +21,9 @@ type PobBase = {
 };
 
 const read = <T>(f: string): T =>
-  JSON.parse(readFileSync(new URL(`../../docs/coverage/${f}`, import.meta.url), 'utf8')) as T;
-const table = read<Table>('pob-monster-stats.json');
-const pob = read<{ bases: PobBase[] }>('pob-bases.json').bases;
+  JSON.parse(readFileSync(new URL(`../../reference/coverage/${f}`, import.meta.url), 'utf8')) as T;
+const table = read<Table>('ref-monster-stats.json');
+const pob = read<{ bases: PobBase[] }>('ref-bases.json').bases;
 
 // ---- 1. The fit ----
 function worst(values: number[], f: (m: number) => number): [number, number] {

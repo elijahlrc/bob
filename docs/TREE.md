@@ -8,7 +8,7 @@ change how a build plays, and nodes for every system added since the tree was wr
 brands, curses, warcries, guards, auras and heralds, ailment damage over time). Layout, names and numbers stay our own
 (DESIGN §3, §9.1); the reference only says which kinds of node and which mod lines exist.
 
-## Reference measured (`docs/tree/pob-tree.json`, `npm run tree:extract`)
+## Reference measured (`reference/tree/ref-tree.json`, `npm run tree:extract`)
 
 Main tree of 3.9.x, without ascendancy nodes, jewel sockets and class starts:
 
@@ -79,7 +79,7 @@ The tree was a uniform web: filler was a third of the nodes, every notable was a
 barely told apart. A first pass over-corrected (every ring one continuous road: twice the loops of the reference). This pass
 follows the reference in what it is made of, how connected it is and how it reads, not in its layout (positions, shapes and
 the arrangement of the regions stay our own, DESIGN §9.1). `npm run tree:mix` prints Bob's numbers and `npm run tree:refmix`
-the reference's (its links are one-directional in `pob-tree.json`; the script makes them symmetric).
+the reference's (its links are one-directional in `ref-tree.json`; the script makes them symmetric).
 
 | Measure                         | Reference   | Before (2,257 nodes) | Now         |
 | ------------------------------- | ----------- | -------------------- | ----------- |

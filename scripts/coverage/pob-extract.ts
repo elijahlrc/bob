@@ -1,7 +1,7 @@
 /**
  * Extracts the numbers the draft script needs from Path of Building data of the 3.9 era (DESIGN §3 rule 2: data may be
  * consulted; no code is copied). Raw files stay outside the repo; the trimmed JSON written here is reference data
- * under docs/coverage/ and is never loaded by the game.
+ * under reference/coverage/ and is never loaded by the game.
  *
  *   npm run coverage:pob -- <path to the unzipped PathOfBuilding-1.4.155/Data folder>
  *
@@ -253,7 +253,7 @@ function main(): void {
   }
   const gemSkills = skills.filter((s) => s.gem);
   writeFileSync(
-    join(COVERAGE_DIR, 'pob-skills.json'),
+    join(COVERAGE_DIR, 'ref-skills.json'),
     JSON.stringify({ source: POB_SOURCE, skills: gemSkills }) + '\n',
   );
   const uniques: PobUnique[] = [];
@@ -262,7 +262,7 @@ function main(): void {
     uniques.push(...parseUniques(readFileSync(join(udir, f), 'utf8'), f.replace('.lua', '')));
   }
   writeFileSync(
-    join(COVERAGE_DIR, 'pob-uniques.json'),
+    join(COVERAGE_DIR, 'ref-uniques.json'),
     JSON.stringify({ source: POB_SOURCE, uniques }) + '\n',
   );
   console.log(

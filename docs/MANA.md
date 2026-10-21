@@ -2,7 +2,7 @@
 
 Audit of 2026-10-09. Fixed the same day: F1, F6 (the bot now weighs mana by itself, the sheet's DPS still does not), F7 and the mine supports of 3.1. The rest is open. The figures come from throw-away scripts (sheet calls,
 the gem sim against a training dummy, instrumented bot runs) checked against the 3.9 reference data in
-`docs/coverage/pob-skills.json` and the wiki pages for Mana, Mana regeneration, Mana reservation, Eldritch Battery and Blastchain
+`reference/coverage/ref-skills.json` and the wiki pages for Mana, Mana regeneration, Mana reservation, Eldritch Battery and Blastchain
 Mine Support.
 
 The intended trade-off: using spells rapidly with many supports should need real investment in mana, on the tree, in gear, or both.
@@ -138,7 +138,7 @@ channels (Blaze Stream, a Winter Orb analog, a Flameblast analog) and the totems
 
 ## 5. Suggested order of work
 
-1. F1: add the attack tag to Lone Prism's mana on hit (data fix, `docs/coverage/uniques/c3-b03.json`).
+1. F1: add the attack tag to Lone Prism's mana on hit (data fix, `reference/coverage/uniques/c3-b03.json`).
 2. 3.2: cost a blink or curse by its real policy rate (or leave it out of `primaryShare`) so the sheet stops penalising them.
 3. 3.1: bring the two mine supports to a price that fits (0.3 is the 3.9 number; 1.0 to 1.2 would be gentler).
 4. F2, F3, F4: decide the target (a share of the pool, a lower flat number, fewer flask charges).

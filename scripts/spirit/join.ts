@@ -23,7 +23,7 @@ let pobByName: Map<string, PobSkill> | null = null;
 function pob(): Map<string, PobSkill> {
   if (!pobByName) {
     const skills = (
-      JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'pob-skills.json'), 'utf8')) as {
+      JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'ref-skills.json'), 'utf8')) as {
         skills: PobSkill[];
       }
     ).skills;

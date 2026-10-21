@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { bare, loadPobNames, loadReference } from '../../scripts/coverage/reference';
+import {
+  bare,
+  hasReference,
+  loadDenyList,
+  loadRefNames,
+  loadReference,
+} from '../../scripts/coverage/reference';
 import { ipViolations } from './ipScan';
 
-const modules = import.meta.glob<Record<string, unknown>>(
-  ['./**/*.ts', '!./**/*.test.ts', '!./ipDenyList.ts'],
-  {
-    eager: true,
-  },
-);
+const modules = import.meta.glob<Record<string, unknown>>(['./**/*.ts', '!./**/*.test.ts'], {
+  eager: true,
+});
 
 function collectStrings(v: unknown, out: string[], seen: Set<unknown>): void {
   if (typeof v === 'string') {
@@ -41,7 +44,8 @@ function collectNameValues(v: unknown, out: string[], seen: Set<unknown>): void 
   }
 }
 
-describe('IP deny-list scan (DESIGN.md §3)', () => {
+/** The reference data is local to the owner's machine (scripts/coverage/reference.ts): without it these checks skip. */
+describe.skipIf(!hasReference())('IP deny-list scan (DESIGN.md §3)', () => {
   it('finds the data modules', () => {
     expect(Object.keys(modules).length).toBeGreaterThan(0);
   });
@@ -50,17 +54,17 @@ describe('IP deny-list scan (DESIGN.md §3)', () => {
     const strings: string[] = [];
     const seen = new Set<unknown>();
     for (const m of Object.values(modules)) collectStrings(m, strings, seen);
-    expect(ipViolations(strings)).toEqual([]);
+    expect(ipViolations(strings, loadDenyList())).toEqual([]);
   });
 
-  it('no gem or unique is named like a reference entry (docs/coverage/reference-3.9.0.json)', () => {
+  it('no gem or unique is named like a reference entry (reference/coverage/ref-list.json)', () => {
     const ref = loadReference();
     const denied = new Map<string, string>();
     for (const g of ref.gems) denied.set(bare(g.name), `gem "${g.name}"`);
     for (const u of ref.uniques) denied.set(bare(u.name), `unique "${u.name}"`);
-    const pob = loadPobNames();
-    for (const n of pob.gems) denied.set(bare(n), `gem "${n}" (3.9-era name)`);
-    for (const n of pob.uniques) denied.set(bare(n), `unique "${n}" (3.9-era name)`);
+    const older = loadRefNames();
+    for (const n of older.gems) denied.set(bare(n), `gem "${n}" (an older name)`);
+    for (const n of older.uniques) denied.set(bare(n), `unique "${n}" (an older name)`);
     const names: string[] = [];
     collectNameValues(modules, names, new Set());
     const bad = names
@@ -69,17 +73,20 @@ describe('IP deny-list scan (DESIGN.md §3)', () => {
     expect(bad).toEqual([]);
   });
 
-  it('the reference deny-list scan catches a slip', () => {
+  it('the reference name scan catches a slip', () => {
     const ref = loadReference();
     const names = new Set([...ref.gems, ...ref.uniques].map((e) => bare(e.name)));
-    expect(names.has(bare('Mjölner'))).toBe(true);
-    expect(names.has(bare('Poet’s Pen'))).toBe(true);
     expect(ref.uniques.length).toBeGreaterThan(700);
+    // A reference name, in another case and spacing, is still found.
+    expect(names.has(bare(`  ${ref.uniques[0].name.toUpperCase()} `))).toBe(true);
   });
 
   it('the scanner catches a slip', () => {
-    expect(ipViolations(['Resolute Technique']).length).toBe(1);
-    expect(ipViolations(['Hatred']).length).toBe(1);
-    expect(ipViolations(['Veil of Grace', 'Haste flask']).length).toBe(0);
+    const list = loadDenyList();
+    const single = list.find((e) => !e.startsWith('=') && !/\s/.test(e))!;
+    const phrase = list.find((e) => !e.startsWith('=') && /\s/.test(e))!;
+    expect(ipViolations([single], list).length).toBe(1);
+    expect(ipViolations([`The ${phrase} of old`], list).length).toBe(1);
+    expect(ipViolations(['Veil of Grace', 'Haste flask'], list).length).toBe(0);
   });
 });

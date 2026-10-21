@@ -1,6 +1,6 @@
 /**
  * Shows the next undecided gems with their 3.9-era numbers, a few lines each, for a human to turn into decisions
- * (docs/coverage/gems/*.json). The bucket of each gem is the one coverage.ts uses.
+ * (reference/coverage/gems/*.json). The bucket of each gem is the one coverage.ts uses.
  *
  *   npm run coverage:gems -- --next 20 [active|support] [bucket,bucket]
  */
@@ -69,7 +69,7 @@ function main(): void {
   const buckets = (args[3] ?? 'plain,dot,charges,triggers,channelling').split(',') as Bucket[];
   const ref = loadReference();
   const pob = (
-    JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'pob-skills.json'), 'utf8')) as {
+    JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'ref-skills.json'), 'utf8')) as {
       skills: PobSkill[];
     }
   ).skills;

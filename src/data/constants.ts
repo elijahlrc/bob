@@ -179,7 +179,7 @@ export const MONSTER_HIT_COEF = 0.085;
 export const MONSTER_HIT_EXP = 1.5;
 /**
  * A monster's evasion rating by level is `(BASE + LINEAR · m) · GROWTH^m`, and its accuracy the same with its own numbers.
- * Fitted to the reference game's monster tables (docs/coverage/pob-monster-stats.json, `npm run evasion`) so that the
+ * Fitted to the reference game's monster tables (reference/coverage/ref-monster-stats.json, `npm run evasion`) so that the
  * same accuracy against the same evasion hits as often: evasion equals the table at every level, accuracy is within 2 points
  * of it (4% at worst, where the numbers are small).
  * The tables are an exponential in the level, not a straight line (docs/EVASION.md).

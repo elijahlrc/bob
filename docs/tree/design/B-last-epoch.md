@@ -12,7 +12,7 @@ Last Epoch (LE) has five base classes, each with a base passive tree and three m
 sees one base tree and three mastery trees and nothing else; there is no shared graph of character power. What that buys
 and what it costs:
 
-The PoE column is recalled; the PoE note measures these from `pob-tree.json` and its values replace them.
+The PoE column is recalled; the PoE note measures these from `ref-tree.json` and its values replace them.
 
 |                            | PoE (one shared tree)                                      | Last Epoch (per-class trees)                                                         |
 | -------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------ |

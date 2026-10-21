@@ -1,7 +1,7 @@
 /**
  * Buckets (COVERAGE section 4): each reference entry belongs to the first *new system* Bob needs before it can be
  * covered. This is a keyword pass over wiki tags and text, not a judgement. Per-entry corrections go in
- * docs/coverage/bucket-overrides.json ({"Entry name": "bucket"}); C3 and later batches refine them as they review.
+ * reference/coverage/bucket-overrides.json ({"Entry name": "bucket"}); C3 and later batches refine them as they review.
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';

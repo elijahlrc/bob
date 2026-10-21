@@ -171,7 +171,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const path = process.argv[2];
   if (!path) throw new Error('usage: npm run tree:extract -- <path to tree.lua>');
   const ref = extract(resolve(path));
-  const out = resolve(import.meta.dirname, '../../docs/tree/pob-tree.json');
+  const out = resolve(import.meta.dirname, '../../reference/tree/ref-tree.json');
   writeFileSync(out, JSON.stringify(ref));
   const c = (k: string) => ref.nodes.filter((n) => n.kind === k).length;
   console.log(

@@ -16,7 +16,7 @@ import type { RefNode, TreeRef } from './extract';
 
 export function loadTreeRef(): TreeRef {
   return JSON.parse(
-    readFileSync(resolve(import.meta.dirname, '../../docs/tree/pob-tree.json'), 'utf8'),
+    readFileSync(resolve(import.meta.dirname, '../../reference/tree/ref-tree.json'), 'utf8'),
   ) as TreeRef;
 }
 

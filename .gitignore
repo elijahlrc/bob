@@ -34,3 +34,4 @@ scripts/hash-fence.json
 scripts/coverage/staging/
 scripts/coverage/_*
 scripts/tree/staging/
+/reference/

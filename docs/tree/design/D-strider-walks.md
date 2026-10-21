@@ -10,7 +10,7 @@ fake micro-choices, long paths to nothing. The layout is new from scratch; the l
 
 ## What was read first
 
-**The reference's graph**, its Ranger start traced node by node from `docs/tree/pob-tree.json` (the 3.9 tree: lines,
+**The reference's graph**, its Ranger start traced node by node from `reference/tree/ref-tree.json` (the 3.9 tree: lines,
 groups, links; no coordinates). Earlier phases only measured rates from that file and never read a start as a walk:
 
 - The start touches **two +10 dexterity nodes**. Each is one step from a **bare dexterity hub of degree five to

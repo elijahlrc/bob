@@ -422,7 +422,7 @@ const ALL_UNIQUES: UniqueDef[] = [
   ...WAVE1_UNIQUES,
   ...WAVE2_UNIQUES,
   ...WAVE3_UNIQUES,
-  // The coverage plan's uniques (docs/coverage/uniques, generated).
+  // The coverage plan's uniques (reference/coverage/uniques, generated).
   ...GENERATED_UNIQUES,
 ];
 

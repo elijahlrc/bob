@@ -120,7 +120,7 @@ Implementation (from the audit, section 5.1): one calc line (`skill.ts:800`), th
 `spots?` on `SkillZone` with a loop in `tickSkillZones` (`actions.ts:239`), the loop in the renderer's `zones()` (`skillFx.ts:446`), and the
 same `spots: undefined` on the other four zone literals (`actions.ts:290`, `shots.ts:543`, `skillFx.ts:503`, `skillFx.ts:922`) so the
 object shape stays stable. `placePods` (`fields.ts:128`) is the placement helper to reuse. No new event type: `explode` already fires per
-pulse. Do not add fields to `Actor`. Edit gem data through `docs/coverage/gems/*.json` and `npm run coverage:emit-gems`, never `gemsGen.ts`.
+pulse. Do not add fields to `Actor`. Edit gem data through `reference/coverage/gems/*.json` and `npm run coverage:emit-gems`, never `gemsGen.ts`.
 
 ### 4.3 Sheet and sim parity (cheap, found by the audit)
 

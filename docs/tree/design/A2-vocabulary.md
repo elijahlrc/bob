@@ -1,7 +1,7 @@
 # A2. The engine's vocabulary
 
 Counted 2026-10-19 from `src/mods/types.ts`, `src/data/statText.ts` (the stat catalogue), the live tree (`getTree()`: baked tree plus
-`treeEdits.json`), `src/calc/*` (the sheet), `src/sim/*` (the fight) and `docs/tree/pob-tree.json` (the 3.9 reference tree). Counting and
+`treeEdits.json`), `src/calc/*` (the sheet), `src/sim/*` (the fight) and `reference/tree/ref-tree.json` (the 3.9 reference tree). Counting and
 classification only; nothing here is a design decision. Scratch scripts: `scratchpad/a2/{treeStats,statReads,conds,pobPhrases}.ts`.
 
 ## 0. The grammar of a node
@@ -192,7 +192,7 @@ nor of the shield-to-minions one or the "ES recharge not interrupted" one (secti
 
 ## 4. What the reference tree says that Bob cannot say
 
-From the 586 line templates of `pob-tree.json` (counts are lines on the 3.9 tree). Four buckets. Judged against `STAT_TEXT` and the
+From the 586 line templates of `ref-tree.json` (counts are lines on the 3.9 tree). Four buckets. Judged against `STAT_TEXT` and the
 engine, not against the tree: most of the task's examples turn out to be stats already.
 
 > Correction (2026-10-19, `D-engine-stats.md`): bucket A's "warcry cooldown recovery" is **not** live (utility cooldowns are stored

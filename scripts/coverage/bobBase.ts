@@ -1,6 +1,6 @@
 /**
  * Picks the Bob item base for a reference unique: the base the game has for that very reference base (every droppable
- * 3.9 base has one, under the name docs/coverage/base-names.json gives it). A reference base the game does not take on
+ * 3.9 base has one, under the name reference/coverage/base-names.json gives it). A reference base the game does not take on
  * (the Demigod bases, a quest sword, a league belt or ring) falls back to the base of the same class, type and nearest
  * level.
  */
@@ -16,7 +16,7 @@ let names: Record<string, string> | null = null;
 export function pobBase(name: string): PobBase | undefined {
   if (!cache) {
     const all = (
-      JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'pob-bases.json'), 'utf8')) as {
+      JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'ref-bases.json'), 'utf8')) as {
         bases: PobBase[];
       }
     ).bases;
@@ -25,7 +25,7 @@ export function pobBase(name: string): PobBase | undefined {
   return cache.get(norm(name));
 }
 
-/** Our name for a reference base, from docs/coverage/base-names.json. */
+/** Our name for a reference base, from reference/coverage/base-names.json. */
 export function bobNameFor(refBaseName: string): string | undefined {
   if (!names)
     names = JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'base-names.json'), 'utf8')) as Record<

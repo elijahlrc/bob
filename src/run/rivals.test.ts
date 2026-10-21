@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { Rng } from '../core/rng';
 import { ACTIVE_GEMS, ALL_GEMS } from '../data/gems';
 import { ipViolations } from '../data/ipScan';
+import { hasReference, loadDenyList } from '../../scripts/coverage/reference';
 import { RIVAL_EPITHETS, RIVAL_PLACES, MAX_GENERATED_NAME } from '../data/rivalNames';
 import { itemBase } from '../data/bases';
 import { UNIQUE_FLASKS } from '../data/uniqueFlasks';
@@ -406,13 +407,16 @@ describe('the names the game makes up', () => {
     expect(new Set(RIVAL_PLACES).size).toBe(RIVAL_PLACES.length);
   });
 
-  it('use no word of the reference game (every entry and every name of 500 seeds)', () => {
-    const words = [...RIVAL_EPITHETS, ...RIVAL_PLACES].flatMap((s) => [s, ...s.split(' ')]);
-    const names = Array.from({ length: 500 }, (_, i) => generateName(i));
-    expect(ipViolations([...words, ...names])).toEqual([]);
-    // (The scan catches a slip: a whole-string single word, or a phrase anywhere.)
-    expect(ipViolations(['Shaper', 'The Eternal Empire of the Low Road']).length).toBe(2);
-  });
+  // The deny-list is in the local reference data (scripts/coverage/reference.ts): without it this skips.
+  it.skipIf(!hasReference())(
+    'use no word of the reference game (every entry and every name of 500 seeds)',
+    () => {
+      const list = loadDenyList();
+      const words = [...RIVAL_EPITHETS, ...RIVAL_PLACES].flatMap((s) => [s, ...s.split(' ')]);
+      const names = Array.from({ length: 500 }, (_, i) => generateName(i));
+      expect(ipViolations([...words, ...names], list)).toEqual([]);
+    },
+  );
 });
 
 describe('checking a rival before it is shown', () => {

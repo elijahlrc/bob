@@ -448,16 +448,16 @@ revert if they would rather not.
 
 - **Reference list** (`npm run coverage:fetch`, wiki Cargo API): 349 gems (219 active, 130 support) as planned, and **782
   uniques** (the plan's 797 counted 15 wiki entries marked "not in game"; C-6 corrected). Provenance and filters are in
-  `docs/coverage/README.md`.
+  `reference/coverage/README.md`.
 - **3.9-era numbers:** Path of Building v1.4.155 (commit e3719726d7, the day after 3.9.0 launched) is extracted to
-  `docs/coverage/pob-skills.json` (418 gems, level 1 and 20 values) and `pob-uniques.json` (749 uniques with variants).
-- **Measurement:** `npm run coverage` and `docs/coverage/map.json` (every Bob gem and unique mapped; 2 gems are partial
+  `reference/coverage/ref-skills.json` (418 gems, level 1 and 20 values) and `ref-uniques.json` (749 uniques with variants).
+- **Measurement:** `npm run coverage` and `reference/coverage/map.json` (every Bob gem and unique mapped; 2 gems are partial
   analogs). `scripts/coverage/coverage.test.ts` checks the map.
 - **IP test** now denies every reference gem and unique name, and the 3.9-era names, as an exact `name`
   (`src/data/ip.test.ts`). No existing Bob name collides.
 - **Draft tool:** `npm run coverage:draft -- gem|unique "Name"` writes a hand-review draft to
   `scripts/coverage/staging/` (git-ignored).
-- **Fixed on the way:** `.gitignore` had a bare `coverage` that would have ignored `docs/coverage` and `scripts/coverage`;
+- **Fixed on the way:** `.gitignore` had a bare `coverage` that would have ignored `reference/coverage` and `scripts/coverage`;
   CLAUDE.md's IP bullet still said "never consult wiki or PoB data".
 - **Coverage now: gems 36/349 (10.3%), uniques 38/782 (4.9%).** Potential if every bucket of a milestone is covered:
   C3 64% / 82%, C4 80% / 91%, C5 91% / 93%.
@@ -495,12 +495,12 @@ revert if they would rather not.
 
 ### C3 in progress: gem content (2026-10-07)
 
-- **Gems.** 174 of 349 (104 of 219 actives, 70 of 130 supports) in nine hand-written batches (`docs/coverage/gems/c3g-*.json`,
+- **Gems.** 174 of 349 (104 of 219 actives, 70 of 130 supports) in nine hand-written batches (`reference/coverage/gems/c3g-*.json`,
   emitted to `src/data/gemsGen.ts`); every gem has its own name; numbers are the 3.9 level 1 and 20 anchors. Channelling,
   ramping stages, fuses and spreads are averaged into one repeated hit or a short ground zone (note on each map entry).
 - **Engine additions for gems.** `needsDualWield` and `needsShield` on actives; per-charge `per` mods for charge skills; the bot
   skips supports whose rules cannot hold for the chosen skill; `ModDB` keeps its mods per kind.
-- **Unique pipeline.** `docs/coverage/AUTHORING.md` and `emit-uniques.ts --check <file>` (dry run: open lines, stats,
+- **Unique pipeline.** `reference/coverage/AUTHORING.md` and `emit-uniques.ts --check <file>` (dry run: open lines, stats,
   conditions, names, ids) so decision files can be drafted in parallel and emitted together.
 - **Bot speed.** The headless bot measured 500–560× alone and 450–500× under a loaded full test run once the gem pool grew
   (the cost is spread over every `Character` build, not one hot spot), so the local speed test floor is now 440×. The user
@@ -512,7 +512,7 @@ revert if they would rather not.
 
 - **Coverage.** Gems 325 of 349 (93.1%), uniques 707 of 782 (90.4%): both targets met. Gem batches c3g-001..010, c4g-001..003,
   c5g-001..003, c6g-001; unique decisions c3-001..003 and c3-a, c3-b, c3-c, c3-d files drafted by parallel agents from
-  `docs/coverage/AUTHORING.md` and emitted together.
+  `reference/coverage/AUTHORING.md` and emitted together.
 - **C4 engine.** Utility skills (`ActiveGemDef.utility`: curse, buff, blink, summon) cast by policy (`src/sim/utility.ts`: upkeep,
   guard, rally); curses and marks are hexes with effect tables and self-mods; auras carry triggers (heralds) and a burning aura
   (Searing Mantle); granted skills (`grantSkill.<id>`) and socketed supports (`socketSupport.<id>`); supports with global mods,
@@ -640,7 +640,7 @@ Plan: [MAPS.md](MAPS.md). First pass of the numbers; the plan says to re-evaluat
   median 32% (83% of maps under 60%). The plan's target for life (median 60 to 90%) is not met: camp's ten seconds, leech and
   flasks bring the bot back to nearly full. The first lever is `CAMP_REST_SECONDS`.
 - **Names to check.** The new affix names have not been compared with the reference game's map mod names (the deny-list only
-  catches proper nouns); the plan makes that check the first R4 task and there is no reference table in `docs/coverage/` yet.
+  catches proper nouns); the plan makes that check the first R4 task and there is no reference table in `reference/coverage/` yet.
 - **Browser.** Checked in the in-app pane with `window.__dev` stepping the game (the pane runs it slowly): the camp shows "Arriving
   with life, mana, flasks" and each offer's level with its offset ("Level 9 (+2)") and affix text scaled to the band
   ("+13% monsters (+5% experience)"); the map HUD shows Abandon, then "Leave this map?", then "Leaving in 5.0 s" with a Stay button;
@@ -822,7 +822,7 @@ A second table, `sim_runs` (`docs/telemetry-dev.sql`), takes the same record fro
 
 ### Spirit plan (docs/SPIRIT.md), built (2026-10-08)
 
-S0 to S14 are built, local commits only. Every one of the 320 mapped gems has a verdict in the spirit ledger (`docs/coverage/spirit.json`, `npm run spirit`): 318 faithful,
+S0 to S14 are built, local commits only. Every one of the 320 mapped gems has a verdict in the spirit ledger (`reference/coverage/spirit.json`, `npm run spirit`): 318 faithful,
 2 drifted with a reason (Enhance, no gem quality; Raise Spectre keeps only its monster's numbers, not its abilities). On 2026-10-09 six gems were cut (four that are not 3.9 gems, and
 Animate Weapon and Animate Guardian, which used up ground loot) and the last open repairs were made (Mirror Arrow's clone, Melee Physical Damage's ailments, Bladefall, Creeping Frost). The four uniques that were built on Animate Weapon were cut too (gems 319 of 349, uniques 765 of 782 now), a banner's stages now strengthen what it gives the character as well as what it does to enemies, and Withering Step and Phase Run became runs: begun amid a crowd, the character runs on without attacking until the effect is over. The engine gained cooldowns and charge spending, an enemy status layer, channelling, ground and lasting
 objects, skill damage over time, blinks, stances and rage, deployables, corpses, minion effects, and a bag of single-skill behaviours (`SkillFx` in `src/data/gems.ts`,
@@ -899,7 +899,7 @@ the difference is the monsters and how much the other change.
 Monster evasion and accuracy were straight lines tuned by the bot; the reference game's are exponentials, so a character hit
 100% of the time at any level and a monster hit a character 100% of the time whatever its evasion. They are now fitted to the
 reference game's per-level monster tables (evasion exactly, accuracy within 2 points), the table itself kept in
-`docs/coverage/pob-monster-stats.json` and checked by `formulas.test.ts`. The player side was compared (base stats and
+`reference/coverage/ref-monster-stats.json` and checked by `formulas.test.ts`. The player side was compared (base stats and
 attribute bonuses are the same; item bases are 0.7 to 0.85 times as large) and left alone; `npm run evasion` prints the
 comparison. The build matrix's reference player has its own accuracy curve now. Bot sample (8 runs a class, seeds 7 and 11,
 `scripts/simpar.sh`): mean map reached 27.2 before and 28.8 after, inside the noise; pacing unchanged. The medians for the strider

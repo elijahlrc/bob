@@ -4,7 +4,7 @@
  *
  *   npm run coverage:fetch
  *
- * Writes docs/coverage/reference-3.9.0.json. The file is reference data: it lives outside `src/` and the game never
+ * Writes reference/coverage/ref-list.json. The file is reference data: it lives outside `src/` and the game never
  * loads it (DESIGN §3). Mod text on the wiki is the *current* text, not 3.9's (COVERAGE §2, caveat on mod text).
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -16,7 +16,7 @@ const API = 'https://www.poewiki.net/w/api.php';
 const AGENT = 'bob-coverage/0.1 (personal hobby project; reference list for a game design plan)';
 const OUT = resolve(
   dirname(fileURLToPath(import.meta.url)),
-  '../../docs/coverage/reference-3.9.0.json',
+  '../../reference/coverage/ref-list.json',
 );
 
 /** Reference version: everything released at 3.9.x or earlier (COVERAGE §2). */

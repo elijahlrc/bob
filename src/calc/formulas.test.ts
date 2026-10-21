@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { hasReference } from '../../scripts/coverage/reference';
 import { describe, expect, it } from 'vitest';
 import {
   armourReduction,
@@ -11,18 +12,25 @@ import {
   stunChance,
 } from './formulas';
 
-describe('§12.1 monster evasion and accuracy follow the reference tables (docs/EVASION.md)', () => {
-  const table = JSON.parse(
-    readFileSync(new URL('../../docs/coverage/pob-monster-stats.json', import.meta.url), 'utf8'),
-  ) as { evasion: number[]; accuracy: number[] };
+// The table is in the local reference data (scripts/coverage/reference.ts): without it this skips.
+describe.skipIf(!hasReference())(
+  '§12.1 monster evasion and accuracy follow the reference tables (docs/EVASION.md)',
+  () => {
+    const table = JSON.parse(
+      readFileSync(
+        new URL('../../reference/coverage/ref-monster-stats.json', import.meta.url),
+        'utf8',
+      ),
+    ) as { evasion: number[]; accuracy: number[] };
 
-  it('evasion is the table to the unit, accuracy within two points', () => {
-    table.evasion.forEach((v, i) => expect(monsterEvasion(i + 1)).toBe(v));
-    table.accuracy.forEach((v, i) =>
-      expect(Math.abs(monsterAccuracy(i + 1) - v)).toBeLessThanOrEqual(2),
-    );
-  });
-});
+    it('evasion is the table to the unit, accuracy within two points', () => {
+      table.evasion.forEach((v, i) => expect(monsterEvasion(i + 1)).toBe(v));
+      table.accuracy.forEach((v, i) =>
+        expect(Math.abs(monsterAccuracy(i + 1) - v)).toBeLessThanOrEqual(2),
+      );
+    });
+  },
+);
 
 describe('§6.3 defences', () => {
   it('hit chance', () => {

@@ -10,7 +10,7 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { modsText } from '../../src/mods/text';
 import type { Mod } from '../../src/mods/types';
-import { loadReference, loadPobNames, key } from '../coverage/reference';
+import { loadReference, loadRefNames, key } from '../coverage/reference';
 import type { ModT } from '../coverage/translate';
 import { buildClusters, loadOverrides, SECTOR_REGION, TREE_DIR } from './clusters';
 import { loadTreeRef } from './lines';
@@ -44,7 +44,7 @@ export const asMods = (mods: ModT[]): Mod[] =>
 /** The names that may not be used: reference gems, uniques and tree nodes, in every spelling the IP test knows. */
 export function deniedNames(): Set<string> {
   const ref = loadReference();
-  const pob = loadPobNames();
+  const pob = loadRefNames();
   const tree = loadTreeRef();
   const set = new Set<string>();
   for (const g of ref.gems) set.add(key(g.name));

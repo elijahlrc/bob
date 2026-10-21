@@ -98,7 +98,7 @@ flask active, nearby enemies) because the sim produces it.
 Output: `docs/tree/design/B-references.md`. Subagents, one per game, in parallel, writing to a shared template so the
 result is one table.
 
-Games: **Path of Exile** (the main reference: `docs/tree/pob-tree.json` holds its 3.9 tree with node text, group, sector
+Games: **Path of Exile** (the main reference: `reference/tree/ref-tree.json` holds its 3.9 tree with node text, group, sector
 and depth, so rates are measured, not recalled; the wiki for masteries, ascendancies and the later changes), **Last
 Epoch** (per-class trees with ranked nodes and specialisation trees per skill), **Diablo 2 and 4** (skill trees and the
 Paragon board: small, clear, with glyphs and legendary nodes), **Grim Dawn** (devotion constellations: shapes that are
@@ -315,7 +315,7 @@ being asked; only C and F wait for an answer.
 | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | The brief becomes a list of numbers again and the tree built to it has no more design than the last one           | Every item in C has a sketch or a worked example beside its property; the user's stop is on the brief, not on a spreadsheet       |
 | Supply parity makes every axis value equally cheap and the tree bland (no build is dear, so none is a commitment) | The brief names the exceptions it intends, and locality (item 2) makes a combination dear by distance, not by starving a stat     |
-| References are recalled rather than measured, and the rates are wrong                                             | PoE is measured from `pob-tree.json`; the other games' numbers are marked recalled or sourced, and only PoE's drive a Bob number  |
+| References are recalled rather than measured, and the rates are wrong                                             | PoE is measured from `ref-tree.json`; the other games' numbers are marked recalled or sourced, and only PoE's drive a Bob number  |
 | New engine stats grow into engine work that stalls the tree                                                       | A2 prices each; the brief takes only the cheap ones and lists the rest as later                                                   |
 | No player model: the bot is weak and the simulated players share one mind, so outcomes cannot be trusted          | Balance is judged on supply (arithmetic), the user reads the intended-cost table, and telemetry after release is the ground truth |
 | A hand-authored tree is slow to change when a review asks for a move                                              | D1's criterion is exactly that; stable ids and edit-aware pictures come before any region                                         |

@@ -26,7 +26,7 @@ hit a character 100% of the time whatever its evasion. Evasion was worth nothing
 - `monsterAccuracy(m) = (12.9 + 0.385 m) · 1.0299^m`, within 2 points of the table (4% at worst, at levels 10 to 20, where
   the numbers are small).
 - Both are formulas in `src/data/constants.ts` and `src/calc/formulas.ts`, not tables: the 100-entry tables are reference
-  data and stay in `docs/coverage/pob-monster-stats.json` (DESIGN.md 3), and a formula goes on past level 100 for the
+  data and stay in `reference/coverage/ref-monster-stats.json` (DESIGN.md 3), and a formula goes on past level 100 for the
   map-level offsets. `formulas.test.ts` holds the fit to the table.
 - Monster types keep their own evasion modifiers (the defence profiles of docs/ROSTER.md 6.2 multiply the level's value), so
   an evasive type is still evasive in proportion.

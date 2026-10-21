@@ -165,7 +165,7 @@ Sim behaviour that contradicts what the gem says; **not changed**, because each 
 - **Swelling Blast** (Intensify) shrinks area spells by 12% a stage; the text says they swell.
 - **Slow channels:** `LULL = 0.9 s` ends a channel whenever two uses are more than 0.9 s apart, so a channelling skill with a slow
   use time (Blight Hail on a ballista, or with little attack speed) can never build its stages.
-- `docs/coverage/spirit.json` still says Hallowed Relic's "nova trigger not modelled"; the sim models it.
+- `reference/coverage/spirit.json` still says Hallowed Relic's "nova trigger not modelled"; the sim models it.
 
 ## 6. Open
 

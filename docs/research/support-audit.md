@@ -621,7 +621,7 @@ Recommended design: **one zone, several landing spots, one hit per enemy per pul
 widen coverage, which is what helps against packs; the sheet needs no new overlap model).
 
 1. Data: give the `ground` behaviour an optional `count` (default 1) in `SkillBehaviour` (`src/data/gems.ts:113-121`) and set it on
-   the two skills through the decision files in `docs/coverage/gems/` (never edit `gemsGen.ts`; `npm run coverage:emit-gems`).
+   the two skills through the decision files in `reference/coverage/gems/` (never edit `gemsGen.ts`; `npm run coverage:emit-gems`).
 2. Calc: `skill.ts:800-803` becomes "projectile kind, or ground kind with the projectile tag": `(count ?? 1) + db.sum('projectiles')`.
    Leave other kinds at 1. `pulses` (`skill.ts:591`) is unchanged.
 3. Sim, creation: in the ground branch of `fireEffect`, when `p.projectiles > 1` build `spots`: the first at the aim point, the rest on a
@@ -737,8 +737,8 @@ _have_ it though the count is dead on them. So it is not a ready-made gate; it w
   for ground, burst or melee.
 - No document states a rule that a support must have an effect on every skill it is accepted on. The nearest is COVERAGE.md :308 ("its support
   compatibility matches its skill types"), which is what `typesAllow` does.
-- Generated data: gems are emitted from decision files (`docs/coverage/gems/*.json`, `docs/coverage/AUTHORING.md`), so a type or support
-  change belongs there followed by `npm run coverage:emit-gems`; every droppable gem also needs a `docs/coverage/map.json` line.
+- Generated data: gems are emitted from decision files (`reference/coverage/gems/*.json`, `reference/coverage/AUTHORING.md`), so a type or support
+  change belongs there followed by `npm run coverage:emit-gems`; every droppable gem also needs a `reference/coverage/map.json` line.
 
 ## 7. Design space and recommendation
 

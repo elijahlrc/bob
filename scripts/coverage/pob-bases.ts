@@ -77,7 +77,7 @@ function main(): void {
   for (const f of readdirSync(root).filter((x) => x.endsWith('.lua')))
     bases.push(...parseBases(readFileSync(join(root, f), 'utf8')));
   writeFileSync(
-    join(COVERAGE_DIR, 'pob-bases.json'),
+    join(COVERAGE_DIR, 'ref-bases.json'),
     JSON.stringify({ source: POB_SOURCE, bases }) + '\n',
   );
   console.log(`bases: ${bases.length}`);

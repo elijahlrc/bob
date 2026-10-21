@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { bare } from '../../../scripts/coverage/reference';
+import { bare, hasReference } from '../../../scripts/coverage/reference';
 import { CLASSES } from '../classes';
 import { EDGE_CLEARANCE, MIN_NODE_DIST, segDist } from './builder';
 import { GEN_CLUSTERS } from './clustersGen';
@@ -126,17 +126,20 @@ describe('passive tree invariants (§9.3)', () => {
     expect(new Set(names).size).toBe(names.length);
   });
 
-  it('no notable or keystone is named like a passive of the reference tree (docs/tree/pob-tree.json)', () => {
-    const ref = JSON.parse(
-      readFileSync(new URL('../../../docs/tree/pob-tree.json', import.meta.url), 'utf8'),
-    ) as { nodes: { name: string; kind: string }[] };
-    const denied = new Set(ref.nodes.filter((n) => n.kind !== 'small').map((n) => bare(n.name)));
-    const bad = nodes
-      .filter((n) => n.kind === 'notable' || n.kind === 'keystone')
-      .filter((n) => denied.has(bare(n.name)))
-      .map((n) => n.name);
-    expect(bad).toEqual([]);
-  });
+  it.skipIf(!hasReference())(
+    'no notable or keystone is named like a passive of the reference tree (reference/tree/ref-tree.json)',
+    () => {
+      const ref = JSON.parse(
+        readFileSync(new URL('../../../reference/tree/ref-tree.json', import.meta.url), 'utf8'),
+      ) as { nodes: { name: string; kind: string }[] };
+      const denied = new Set(ref.nodes.filter((n) => n.kind !== 'small').map((n) => bare(n.name)));
+      const bad = nodes
+        .filter((n) => n.kind === 'notable' || n.kind === 'keystone')
+        .filter((n) => denied.has(bare(n.name)))
+        .map((n) => n.name);
+      expect(bad).toEqual([]);
+    },
+  );
 
   it('a notable is worth more than a small node (docs/TREE-REDESIGN.md section 4)', () => {
     const units = unitsOf(nodes.filter((n) => n.kind === 'small').flatMap((n) => n.mods));

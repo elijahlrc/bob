@@ -1351,7 +1351,7 @@ export const GRANTED_GEMS: ActiveGemDef[] = [
   },
 ];
 
-// The coverage plan's gems (docs/coverage/gems, generated).
+// The coverage plan's gems (reference/coverage/gems, generated).
 ACTIVE_GEMS.push(...GEN_ACTIVE_GEMS);
 SUPPORT_GEMS.push(...GEN_SUPPORT_GEMS);
 AURA_GEMS.push(...GEN_AURA_GEMS);

@@ -16,7 +16,7 @@ picture is a few long strands with rooms hanging off them is wrong even if every
 
 ## 2. The reference is Path of Exile's tree, looked at, not inferred
 
-The 3.9 graph is in `docs/tree/pob-tree.json` (lines, groups, links, no coordinates); the live layout is on the
+The 3.9 graph is in `reference/tree/ref-tree.json` (lines, groups, links, no coordinates); the live layout is on the
 official site (pick a class, press F). Trace the matching class start node by node before writing a region, and look
 at the layout in the browser. Looking is allowed; copying names, shapes or lines is not; screenshots stay out of the
 repo. What the Ranger start taught: the start touches two nodes, each one step from a hub of degree five to seven;
