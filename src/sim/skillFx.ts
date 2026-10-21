@@ -326,12 +326,22 @@ export function tickSkillFx(w: World, s: Side, dt: number): void {
 
 // ---- Orbiting Blades: blades that orbit the caster and hit everything about it together
 
+/** The radius of the ring now: the skill's, times its area, and wider for every blade. */
+export function vortexRadius(s: Side): number {
+  const v = s.vortex;
+  const spec = v && s.char.actives.find((x) => x.skill.id === v.key)?.skill.vortex;
+  if (!v || !spec) return 0;
+  return spec.radius * v.mult * (1 + (spec.grow / 100) * v.blades.length);
+}
+
 /** A cast adds a blade (up to the most; at the most the oldest is replaced). */
 export function addBlade(s: Side, p: SkillProfile): void {
   const spec = p.skill.vortex;
   if (!spec) return;
   let v = s.vortex;
-  if (!v || v.key !== p.skill.id) v = s.vortex = { key: p.skill.id, blades: [], acc: 0 };
+  if (!v || v.key !== p.skill.id)
+    v = s.vortex = { key: p.skill.id, blades: [], acc: 0, mult: p.radiusMult };
+  v.mult = p.radiusMult;
   const t = spec.seconds * p.skillDuration;
   if (v.blades.length < spec.max) v.blades.push(t);
   else {
@@ -379,7 +389,8 @@ function tickVortex(w: World, s: Side, dt: number): void {
         critChance: Math.min(1, h.critChance * (1 + (spec.crit / 100) * j)),
       })),
     };
-    const r = spec.radius * base.radiusMult;
+    v.mult = base.radiusMult;
+    const r = vortexRadius(s);
     w.events.push({
       t: 'explode',
       x: p.x,

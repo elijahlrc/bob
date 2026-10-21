@@ -20,6 +20,7 @@ import {
   TRAP_RADIUS,
 } from '../../../sim/deploy';
 import type { Field } from '../../../sim/fields';
+import { vortexRadius } from '../../../sim/skillFx';
 import type { Side } from '../../../sim/side';
 import type { Actor, SimEvent, World } from '../../../sim/types';
 import { beamMotifOf, fallbackMotif, motifOf } from '../../../calc/areaLook';
@@ -1531,10 +1532,10 @@ export class SkillFx {
     this.spinning(ground, air, w, side, time);
     const vx = side.vortex;
     if (vx && p.alive && vx.blades.length > 0) {
-      const spec = choiceByKey(side, vx.key)?.skill.vortex;
       const color = this.colorOfSkill(side, choiceByKey(side, vx.key)?.skill.id ?? '');
       const o = this.host.project(p.x, p.y);
-      const rx = this.host.rpx(Math.min(1.4, spec?.radius ?? 1.4));
+      // The ring is drawn where the blades hit: wider for every blade.
+      const rx = this.host.rpx(vortexRadius(side) || 1.4);
       const sq = this.host.squash();
       const n = vx.blades.length;
       ground.lineStyle(1, color, 0.3).strokeEllipse(o.x, o.y, rx * 2, rx * 2 * sq);

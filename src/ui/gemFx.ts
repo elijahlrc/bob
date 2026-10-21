@@ -161,9 +161,10 @@ export function fxLines(def: ActiveGemDef, level: number): string[] {
   if (def.vortex) {
     const v = def.vortex;
     out.push(
-      `Each cast adds a blade that circles you for ${num(v.seconds)} s (up to ${v.max}); every ${num(v.spin)} s, ${v.hitRate}% sooner for each blade, everything within ${num(v.radius)} is hit together, for ${v.more}% more damage and ${v.crit}% more critical chance for each blade; while blades circle you, you walk in among the enemies`,
+      `Each cast adds a blade that circles you for ${num(v.seconds)} s (up to ${v.max}); every ${num(v.spin)} s, ${v.hitRate}% sooner for each blade, everything within ${num(v.radius)} is hit together, for ${v.more}% more damage, ${v.crit}% more critical chance and ${v.grow}% more radius for each blade; while blades circle you, you walk in among the enemies`,
     );
   }
+  if (def.castMoving) out.push(`Cast on the move, at ${num(def.castMoving * 100)}% of your speed`);
   if (def.markers)
     out.push(
       `Sets a marker; ${num(def.markers.delay)} s later it is struck in a radius of ${num(def.markers.radius)}, and every other marker with it`,

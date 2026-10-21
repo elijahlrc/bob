@@ -15,7 +15,7 @@ import { applyHex } from './hexes';
 import { minionCount, raiseSpectre, summonCount, summonMinions, summonRespawn } from './minions';
 import { corpseNear, takeCorpse } from './factions';
 import { castOffering, offeringWanted } from './minionFx';
-import { startShell } from './skillFx';
+import { startShell, vortexRadius } from './skillFx';
 import type { Action, Actor, World } from './types';
 import { ESCAPE_CROWD_RADIUS, ESCAPE_NEAR, PACK_RADIUS, PACK_SIZE } from '../data/strategy';
 import type { RotationEntry } from '../calc/strategy';
@@ -267,11 +267,26 @@ const BURN_RADIUS = 2.8;
 export function contactRange(_w: World, s: Side): number {
   let r = s.char.burn.pct > 0 && !burnOff.has(s) ? BURN_RADIUS * 0.8 : 0;
   const v = s.vortex;
-  if (v && v.blades.length > 0) {
-    const c = s.char.actives.find((x) => x.skill.id === v.key);
-    if (c?.skill.vortex) r = Math.max(r, c.skill.vortex.radius * 0.8);
+  if (v && v.blades.length > 0) r = Math.max(r, vortexRadius(s) * 0.8);
+  else {
+    // The first blade is still being cast: it walks in as it casts.
+    const spec = s.player.action?.profile.skill.vortex;
+    if (spec) r = Math.max(r, spec.radius * s.player.action!.profile.radiusMult * 0.8);
   }
   return r;
+}
+
+/** Blades are cast from this far off while the ring is under this share of full: a blade needs nothing in reach. */
+export const PRIME_RANGE = 6;
+export const PRIME_SHARE = 0.5;
+
+/** How far off the character may cast a skill of circling blades now (zero for any other skill, or a ring half full or more). */
+export function primeRange(s: Side, p: SkillProfile): number {
+  const spec = p.skill.vortex;
+  if (!spec) return 0;
+  const v = s.vortex;
+  const n = v && v.key === p.skill.id ? v.blades.length : 0;
+  return n < spec.max * PRIME_SHARE ? PRIME_RANGE : 0;
 }
 const BURN_EVERY = 0.5;
 /** The character switches a burning aura off below this share of its life, as a player clicks Searing Mantle off, and on again from the second. */

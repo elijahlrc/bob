@@ -351,7 +351,7 @@ export type SkillFx = {
   /**
    * Each cast adds a blade that circles the caster for `seconds` (at most `max`, the oldest replaced); every `spin` seconds, shortened
    * by `hitRate` percent for each blade, everything within `radius` is hit together, for `more` percent more damage and `crit`
-   * percent more critical chance for each blade (Orbiting Blades).
+   * percent more critical chance for each blade; the ring's radius is `grow` percent larger for each blade (Orbiting Blades).
    */
   vortex?: {
     seconds: number;
@@ -361,7 +361,10 @@ export type SkillFx = {
     more: number;
     crit: number;
     radius: number;
+    grow: number;
   };
+  /** The character keeps walking while it uses the skill, at this share of its speed (Orbiting Blades). */
+  castMoving?: number;
   /** A cast sets a marker; `delay` seconds later it is struck for area damage, and every other marker with it (Skyfall). */
   markers?: { delay: number; radius: number };
   /**
@@ -416,6 +419,7 @@ export const FX_KEYS = [
   'shield',
   'homing',
   'vortex',
+  'castMoving',
   'markers',
   'stormOrb',
   'bounces',

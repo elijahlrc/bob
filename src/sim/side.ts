@@ -178,8 +178,8 @@ export type Side = {
   relicRegen: { t: number; me: number; minions: number };
   relicT: number;
   trailT: number;
-  /** The blades of Orbiting Blades: seconds left of each, and the time toward the next round. */
-  vortex: { key: string; blades: number[]; acc: number } | null;
+  /** The blades of Orbiting Blades: seconds left of each, the time toward the next round, and the skill's area multiplier of radius. */
+  vortex: { key: string; blades: number[]; acc: number; mult: number } | null;
   /** The markers of Skyfall. */
   markers: { x: number; y: number; t: number; profile: SkillProfile; hand: number }[];
   /** The orb of Tempest Mote. */

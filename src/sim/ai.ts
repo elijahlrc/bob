@@ -46,7 +46,14 @@ import {
 } from './movement';
 import { running } from './blinks';
 import { stepping } from './steps';
-import { contactRange, enemiesNear, markOpened, openerDue, utilityPick } from './utility';
+import {
+  contactRange,
+  enemiesNear,
+  markOpened,
+  openerDue,
+  primeRange,
+  utilityPick,
+} from './utility';
 import type { RotationEntry } from '../calc/strategy';
 import {
   CLOSE_RANGE,
@@ -70,11 +77,17 @@ function canAct(a: Actor): boolean {
   return a.alive && !a.action && a.stunT <= 0 && a.ail.freezeT <= 0;
 }
 
+/** Whether the player is using a skill it walks on through (Orbiting Blades): it moves, but starts nothing new. */
+function castingOnTheMove(a: Actor): boolean {
+  return a.alive && !!a.action?.profile.skill.castMoving && a.stunT <= 0 && a.ail.freezeT <= 0;
+}
+
 /** Move an actor toward a point at its speed, sliding along walls. */
 export function step(w: World, a: Actor, dx: number, dy: number, dt: number): void {
   const len = Math.hypot(dx, dy);
   if (len < 1e-6) return;
-  const speed = a.def.moveSpeed * (1 - a.ail.chill) * moveMult(a);
+  const speed =
+    a.def.moveSpeed * (1 - a.ail.chill) * moveMult(a) * (a.action?.profile.skill.castMoving ?? 1);
   const d = Math.min(len, speed * dt);
   const nx = a.x + (dx / len) * d;
   const ny = a.y + (dy / len) * d;
@@ -218,7 +231,7 @@ export function canHurt(p: SkillProfile, def: Defence): boolean {
 function inReach(w: World, s: Side, prof: SkillProfile, target: Actor): boolean {
   const p = s.player;
   const melee = prof.skill.behaviour.kind === 'melee';
-  const reach = skillRange(prof) + target.r + (melee ? p.r : 0);
+  const reach = Math.max(skillRange(prof), primeRange(s, prof)) + target.r + (melee ? p.r : 0);
   const d = Math.hypot(target.x - p.x, target.y - p.y);
   return d <= reach && (melee || w.grid.los(p.x, p.y, target.x, target.y));
 }
@@ -485,7 +498,9 @@ export function playerAI(w: World, s: Side, dt: number): void {
   const p = s.player;
   const ai = s.ai;
   p.moving = false;
-  if (!canAct(p)) return;
+  // A skill used on the move: the character walks on while it casts (and starts nothing new until it is done).
+  const busy = !!p.action;
+  if (!canAct(p) && !castingOnTheMove(p)) return;
   if (avoidHazard(w, s, dt)) return;
 
   // Engage. (A duel has no range to engage within, and no target to give up on: docs/DUEL.md 3.4.)
@@ -548,6 +563,13 @@ export function playerAI(w: World, s: Side, dt: number): void {
     if (kiteStep(w, s, target, dt)) return;
     const pick = chooseSkill(w, s, target);
     const { which, prof, costsLife, choice, entry } = pick;
+    // A skill used on the move: walk on toward what the blades reach until it is done.
+    const contact = contactRange(w, s);
+    if (busy && which === 'utility') {
+      if (contact > 0 && Math.hypot(target.x - p.x, target.y - p.y) > contact + target.r)
+        moveTo(w, s, p, target.x, target.y, dt);
+      return;
+    }
     if (which === 'utility') {
       payCost(s, costsLife, prof.cost);
       s.utilityReady[choice.key] = w.t + pick.cd;
@@ -557,12 +579,13 @@ export function playerAI(w: World, s: Side, dt: number): void {
       return;
     }
     const melee = prof.skill.behaviour.kind === 'melee';
-    // A burning aura or circling blades only reach what is close: walk in among the enemies, whatever the attack's range.
-    const contact = contactRange(w, s);
-    const reach0 = skillRange(prof) + target.r + (melee ? p.r : 0);
+    // A burning aura or circling blades only reach what is close: walk in among the enemies, whatever the attack's range. While
+    // the ring is thin the blades are cast from farther off (the character walks in as it casts them).
+    const prime = busy ? 0 : primeRange(s, prof);
+    const reach0 = Math.max(skillRange(prof), prime) + target.r + (melee ? p.r : 0);
     // The `close` spacing (Strategy tab): a ranged character stands nearer than its skill's range.
     const close = !melee && strategy?.spacing === 'close' ? CLOSE_RANGE + target.r : Infinity;
-    const reach = Math.min(reach0, contact > 0 ? contact + target.r : Infinity, close);
+    const reach = Math.min(reach0, contact > 0 && !prime ? contact + target.r : Infinity, close);
     const d = Math.hypot(target.x - p.x, target.y - p.y);
     const inRange = d <= reach && (melee || w.grid.los(p.x, p.y, target.x, target.y));
     // Arrows keep hitting walls (a wide fan in a narrow corridor): close in for a clearer shot.
@@ -577,6 +600,7 @@ export function playerAI(w: World, s: Side, dt: number): void {
         return;
       }
     }
+    if (inRange && busy) return;
     if (inRange) {
       if (which === 'primary' || which === 'secondary') payCost(s, costsLife, prof.cost);
       if (entry?.role === 'periodic' && choice.skill.cooldown === undefined)

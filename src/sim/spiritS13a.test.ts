@@ -6,7 +6,7 @@ import { createDummyWorld, dummyDefence } from './dummy';
 import { killActor, playerConds, rawHit } from './combat';
 import { fireTriggers } from './triggers';
 import { afterStrike } from './shots';
-import { frostBite, orbAnswers, tickSkillFx } from './skillFx';
+import { frostBite, orbAnswers, tickSkillFx, vortexRadius } from './skillFx';
 import { targetOf } from './movement';
 import { mineAuraAt } from './deploy';
 import type { Action, Actor, World } from './types';
@@ -463,12 +463,51 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
         key: 'orbitingBlades',
         blades: Array.from({ length: n }, () => 5),
         acc: 0,
+        mult: 1,
       };
       dummy.life = 1e9;
       run(w, 2);
       return 1e9 - dummy.life;
     };
     expect(dmg(8)).toBeGreaterThan(dmg(1) * 3);
+  });
+
+  it('Orbiting Blades: the ring widens with every blade', () => {
+    const { world: w } = world(['orbitingBlades'], 1.2, 'wand_3', DEX);
+    const s = w.sides[0];
+    s.player.stunT = 100;
+    const far = neighbour(w, s.player.x, s.player.y - 2.6);
+    const ring = (n: number) => {
+      s.vortex = { key: 'orbitingBlades', blades: Array(n).fill(5), acc: 0, mult: 1 };
+      return vortexRadius(s);
+    };
+    expect(ring(1)).toBeCloseTo(1.8 * 1.04, 6);
+    expect(ring(10)).toBeCloseTo(1.8 * 1.4, 6);
+    // One blade does not reach a neighbour 2.6 tiles off; ten do.
+    ring(1);
+    run(w, 1);
+    expect(far.life).toBe(1e9);
+    ring(10);
+    run(w, 1);
+    expect(far.life).toBeLessThan(1e9);
+  });
+
+  it('Orbiting Blades: cast from afar while the ring is thin, walking in as it casts', () => {
+    const { world: w, dummy } = world(['orbitingBlades'], 5.5, 'wand_3', DEX);
+    const p = w.sides[0].player;
+    const dist = () => Math.hypot(p.x - dummy.x, p.y - dummy.y);
+    let firstAt = 0;
+    let walkedCasting = false;
+    for (let i = 0; i < 60 * 3; i++) {
+      const [x, y] = [p.x, p.y];
+      stepWorld(w);
+      if (p.action && (p.x !== x || p.y !== y)) walkedCasting = true;
+      if (!firstAt && (w.sides[0].vortex?.blades.length ?? 0) > 0) firstAt = dist();
+    }
+    expect(firstAt).toBeGreaterThan(3);
+    expect(walkedCasting).toBe(true);
+    // And it ends among the enemies, where the blades reach.
+    expect(dist()).toBeLessThan(vortexRadius(w.sides[0]) + dummy.r);
   });
 
   it('Skyfall: markers wait, and when one is struck all of them are', () => {
@@ -752,10 +791,10 @@ describe('carrying damage about oneself (searingMantle, orbitingBlades)', () => 
 
   it('with blades circling it closes in on the enemies too', () => {
     const { world: w, dummy } = world(['arcChain', 'orbitingBlades'], 7, 'wand_3', INT);
-    w.sides[0].vortex = { key: 'orbitingBlades', blades: [20, 20, 20], acc: 0 };
+    w.sides[0].vortex = { key: 'orbitingBlades', blades: [20, 20, 20], acc: 0, mult: 1 };
     run(w, 4);
     expect(Math.hypot(w.sides[0].player.x - dummy.x, w.sides[0].player.y - dummy.y)).toBeLessThan(
-      1.6 + dummy.r,
+      vortexRadius(w.sides[0]) + dummy.r,
     );
   });
 });

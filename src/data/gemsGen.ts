@@ -114,7 +114,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     types: ['totemable', 'repeatable', 'triggerable'],
     behaviour: {
       kind: 'burst',
-      radius: 1.6,
+      radius: 1.8,
       origin: 'self',
     },
     spellDamage: [
@@ -135,15 +135,17 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       },
     ],
     description:
-      'Each cast sets a blade circling you; the more blades, the harder and faster they cut.',
+      'Each cast sets a blade circling you, even on the move; the more blades, the wider, harder and faster they cut.',
+    castMoving: 0.9,
     vortex: {
-      seconds: 5,
+      seconds: 6,
       max: 10,
       spin: 0.6,
       hitRate: 35,
       more: 35,
       crit: 10,
-      radius: 1.6,
+      radius: 1.8,
+      grow: 4,
     },
   },
   {

@@ -186,8 +186,11 @@ damage does not move the figure. It counts one target, with free mana (docs/SHEE
     up to 0.6 s, then fights on. It waits 1.5 s before stepping back again. It only steps to a spot outside every
     warning, not through a monster, from which its target is still in reach and in sight, and only if the step gains
     at least 1.5 tiles. Skills with less than 5 tiles of reach don't kite.
-- **Burning aura or circling blades** (Searing Mantle and Orbiting Blades): the character walks in to
-  about **2.2 tiles**, whatever its attack's range, so the aura reaches.
+- **Burning aura or circling blades** (Searing Mantle and Orbiting Blades): the character walks in until the aura
+  or the ring reaches (about **2.2 tiles** for the aura; the ring widens with every blade), whatever its attack's range.
+- **Orbiting Blades** is cast on the move: the character keeps walking while it casts (at 90% of its speed) but starts
+  nothing else until the cast is done. While fewer than half the blades circle it, it casts them from up to
+  **6 tiles** off and walks in as it casts.
 - **Arrows hitting walls:** if its shots hit walls **5 times within 3 seconds** (a wide fan in a narrow corridor),
   it closes to within **3.5 tiles** of the target for 3 seconds to get a clearer shot. Shots from totems, traps and
   mines don't count: walking closer doesn't change where they shoot from.
