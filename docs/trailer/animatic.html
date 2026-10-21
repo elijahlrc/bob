@@ -1,0 +1,1333 @@
+<title>Battle of Builds Animatic</title>
+<meta name="claude:viewport-fit-sides" content="cover" />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Alegreya+Sans:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap"
+/>
+<style>
+  /* Layout: a 16:9 stage, a transport bar under it (play, scrubber with shot marks, time), the shot's notes below. */
+  :root {
+    --bg: #0f1016;
+    --panel: #171821;
+    --rule: #2b2c3a;
+    --ink: #e6dcc6;
+    --muted: #9a927f;
+    --torch: #d98a3a;
+    --display: 'IM Fell English SC', 'Iowan Old Style', Georgia, serif;
+    --body: 'Alegreya Sans', 'Gill Sans', 'Segoe UI', sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    color-scheme: dark;
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+  }
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-block: 28px 48px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    display: grid;
+    gap: 14px;
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(26px, 4vw, 38px);
+    margin: 0;
+  }
+  .sub {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .stage {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    max-width: 100%;
+    background: #000;
+    border: 1px solid var(--rule);
+    overflow: hidden;
+  }
+  .stage svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .big-play {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.45);
+    border: 0;
+    color: var(--ink);
+    font-family: var(--display);
+    font-size: clamp(20px, 4vw, 34px);
+    cursor: pointer;
+  }
+  .big-play span {
+    border: 1px solid var(--torch);
+    padding: 10px 26px;
+    background: rgba(15, 16, 22, 0.8);
+  }
+  .transport {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .transport button {
+    font-family: var(--mono);
+    font-size: 13px;
+    background: var(--panel);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    padding: 7px 12px;
+    cursor: pointer;
+    min-width: 76px;
+  }
+  .transport button:focus-visible,
+  #scrub:focus-visible {
+    outline: 2px solid var(--torch);
+    outline-offset: 2px;
+  }
+  .scrub {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 30px;
+  }
+  .scrub .marks {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 30px;
+    display: flex;
+    pointer-events: none;
+  }
+  .scrub .mark {
+    border-left: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    padding: 2px 0 0 3px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .scrub .mark.on {
+    color: var(--torch);
+  }
+  #scrub {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    margin: 0;
+    accent-color: var(--torch);
+  }
+  .time {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    min-width: 92px;
+    text-align: right;
+  }
+  .now {
+    display: grid;
+    gap: 4px;
+    border-top: 1px solid var(--rule);
+    padding-top: 12px;
+  }
+  .now h2 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 22px;
+    margin: 0;
+  }
+  .now h2 small {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+  .now p {
+    margin: 0;
+    color: var(--muted);
+    max-width: 75ch;
+    line-height: 1.5;
+  }
+  .note {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+  }
+  /* render mode: the stage alone, for recording */
+  body.render .wrap {
+    padding: 0;
+    max-width: none;
+  }
+  body.render .wrap > :not(.stage) {
+    display: none;
+  }
+  body.render .stage {
+    border: 0;
+    width: 1280px;
+    height: 720px;
+  }
+  body.render .big-play {
+    display: none;
+  }
+</style>
+
+<div class="wrap">
+  <h1>Battle of Builds: animatic</h1>
+  <p class="sub">
+    The 30-second trailer storyboard in motion, on a chiptune score written to the cut. Sketches
+    stand in for footage.
+  </p>
+  <div class="stage" id="stage">
+    <svg id="svg" viewBox="0 0 320 180" role="img" aria-label="Trailer animatic"></svg>
+    <button class="big-play" id="bigplay" type="button"><span>▶ Play with sound</span></button>
+  </div>
+  <div class="transport">
+    <button id="play" type="button">▶ Play</button>
+    <div class="scrub">
+      <div class="marks" id="marks"></div>
+      <input id="scrub" type="range" min="0" max="30" step="0.01" value="0" aria-label="Position" />
+    </div>
+    <div class="time" id="time">0:00.0 / 0:30</div>
+  </div>
+  <div class="now" aria-live="polite">
+    <h2 id="nowname"></h2>
+    <p id="nowtext"></p>
+  </div>
+  <p class="note">
+    Score: one chiptune groove in D minor at 120 bpm, a pulsing bass on D and a noise kit with a
+    quiet four-note phrase, stopping only for the fall, with chip sound effects on the picture;
+    generated by
+    <code>docs/trailer/audio/chip_score.py</code>. Space plays and pauses; the arrow keys step by a
+    beat.
+  </p>
+  <audio id="audio" src="animatic.mp3" preload="auto"></audio>
+</div>
+
+<script>
+  /* ---------- palette and drawing helpers (viewBox 320×180) ---------- */
+  const C = {
+    bone: '#e8dcc0',
+    fire: '#ff8a3a',
+    cold: '#8fd3ff',
+    light: '#a97cf2',
+    chaos: '#74d36c',
+    gold: '#e8c45a',
+    life: '#c23a32',
+    mana: '#3b6fd2',
+    torch: '#d98a3a',
+    wall: '#6b3a2c',
+    floor: '#2d3a32',
+    dim: '#4a4b5c',
+    ui: '#1d1e29',
+    uiLine: '#3a3b4c',
+    mute: '#9a927f',
+    ink: '#0f1016',
+  };
+  const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+  const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const fmtN = (n) => Math.round(n).toLocaleString('en-US');
+
+  const DEFS = `<defs>${[C.fire, C.cold, C.light, C.chaos, C.bone, C.torch, C.gold]
+    .map(
+      (c) =>
+        `<radialGradient id="g${c.slice(1)}"><stop offset="0" stop-color="${c}" stop-opacity=".6"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`,
+    )
+    .join('')}</defs>`;
+  const glow = (x, y, r, col, o = 1) =>
+    `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g${col.slice(1)})" opacity="${o}"/>`;
+  const floor = (cx, cy, w, h, fill = C.floor) =>
+    `<polygon points="${cx},${cy - h} ${cx + w},${cy} ${cx},${cy + h} ${cx - w},${cy}" fill="${fill}" opacity=".6"/>`;
+  const hero = (x, y, col = C.bone, rot = 0) =>
+    `<g transform="rotate(${rot} ${x} ${y + 8})"><ellipse cx="${x}" cy="${y + 12}" rx="7" ry="2.5" fill="#000" opacity=".5"/><rect x="${x - 4}" y="${y - 6}" width="8" height="14" rx="2" fill="${col}"/><circle cx="${x}" cy="${y - 10}" r="4" fill="${col}"/></g>`;
+  const skel = (x, y, o = 1) =>
+    o <= 0
+      ? ''
+      : `<g opacity="${o}"><rect x="${x - 3}" y="${y - 4}" width="6" height="11" fill="none" stroke="${C.bone}" stroke-width="1.2"/><circle cx="${x}" cy="${y - 8}" r="3" fill="none" stroke="${C.bone}" stroke-width="1.2"/><circle cx="${x - 1}" cy="${y - 8}" r=".8" fill="${C.fire}"/><circle cx="${x + 1.2}" cy="${y - 8}" r=".8" fill="${C.fire}"/></g>`;
+  const ring = (x, y, rx, col, w = 1.5, o = 1) =>
+    `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${rx / 2}" fill="none" stroke="${col}" stroke-width="${w}" opacity="${o}"/>`;
+  const txt = (
+    x,
+    y,
+    t,
+    { size = 10, col = C.bone, font = 'mono', anchor = 'start', weight = 400, o = 1 } = {},
+  ) => {
+    const f =
+      font === 'display'
+        ? 'IM Fell English SC, Georgia, serif'
+        : font === 'body'
+          ? 'Alegreya Sans, sans-serif'
+          : 'JetBrains Mono, monospace';
+    return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="${f}" font-size="${size}" font-weight="${weight}" fill="${col}" opacity="${o}">${t}</text>`;
+  };
+  const panel = (x, y, w, h, stroke = C.uiLine) =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="${C.ui}" stroke="${stroke}"/>`;
+  const globes = (life = 1) =>
+    `<circle cx="20" cy="162" r="13" fill="${C.ui}" stroke="${C.uiLine}"/>` +
+    `<clipPath id="lg"><rect x="7" y="${175 - 26 * life}" width="26" height="${26 * life}"/></clipPath>` +
+    `<circle cx="20" cy="162" r="13" fill="${C.life}" clip-path="url(#lg)"/>` +
+    `<circle cx="300" cy="162" r="13" fill="${C.mana}"/>`;
+  /* an area going off at time t0: a ring that grows and fades */
+  const burst = (x, y, col, t0, lt, size = 50, w = 2) => {
+    const k = lt - t0;
+    if (k < 0 || k > 0.7) return '';
+    return (
+      ring(x, y, 6 + ease(k / 0.5) * size, col, w, 1 - k / 0.7) +
+      glow(x, y, size * 0.9, col, (1 - k / 0.7) * 0.9)
+    );
+  };
+  /* a damage number that floats up from t0 */
+  const floatNum = (x, y, t, col, t0, lt, size = 11) => {
+    const k = lt - t0;
+    if (k < 0 || k > 1.1) return '';
+    return txt(x, y - k * 18, t, {
+      size: size * (k < 0.08 ? 1.4 : 1),
+      col,
+      weight: 600,
+      o: 1 - clamp((k - 0.6) / 0.5),
+    });
+  };
+  /* a text card that stamps in from t0 */
+  const caption = (t, lt, t0 = 0.05, y = 170, size = 17) => {
+    const k = clamp((lt - t0) / 0.18);
+    if (k <= 0) return '';
+    return (
+      `<rect x="0" y="${y - 24}" width="320" height="34" fill="#000" opacity="${0.65 * k}"/>` +
+      `<g transform="translate(160 ${y - 5}) scale(${lerp(1.25, 1, ease(k))}) translate(-160 ${-(y - 5)})">${txt(160, y, t, { size, font: 'display', anchor: 'middle', o: k })}</g>`
+    );
+  };
+  const label = (x, y, t) => txt(x, y, t, { size: 6.5, col: C.mute });
+  const deadAfter = (t0, lt) => clamp(1 - (lt - t0) / 0.25);
+  const crack = (x, y, o) =>
+    `<path d="M${x} ${y} l-18 6 l-10 -4 M${x} ${y} l14 9 l12 -2 M${x} ${y} l4 -12 l10 -4" stroke="#000" stroke-width="1.5" fill="none" opacity="${o}"/>`;
+  /* enemies, one shape per kind */
+  const foe = (kind, x, y, o = 1, sc = 1) => {
+    if (o <= 0) return '';
+    let b = '';
+    if (kind === 'rat')
+      b = `<ellipse cx="${x}" cy="${y}" rx="4.5" ry="2.6" fill="#8a7a6a"/><circle cx="${x + 4}" cy="${y - 1}" r="1.8" fill="#8a7a6a"/><path d="M${x - 4} ${y} q-4 -1 -6 2" stroke="#8a7a6a" fill="none"/><circle cx="${x + 4.6}" cy="${y - 1.4}" r=".6" fill="${C.fire}"/>`;
+    if (kind === 'knight')
+      b = `<rect x="${x - 4}" y="${y - 4}" width="8" height="13" fill="#6f7480"/><rect x="${x - 3.5}" y="${y - 10}" width="7" height="6" fill="#8a909c"/><rect x="${x - 2.5}" y="${y - 8}" width="5" height="1" fill="#000"/><rect x="${x + 4}" y="${y - 2}" width="2" height="10" fill="#9aa0aa"/>`;
+    if (kind === 'wraith')
+      b = `<path d="M${x - 5} ${y + 8} Q${x - 6} ${y - 8} ${x} ${y - 10} Q${x + 6} ${y - 8} ${x + 5} ${y + 8} l-2.5 -3 l-2.5 3 l-2.5 -3 z" fill="#b8c4d8" opacity=".7"/><circle cx="${x - 2}" cy="${y - 5}" r=".9" fill="#000"/><circle cx="${x + 2}" cy="${y - 5}" r=".9" fill="#000"/>`;
+    if (kind === 'spider')
+      b =
+        `<circle cx="${x}" cy="${y}" r="3.5" fill="#5a4a5a"/>` +
+        [-1, 1]
+          .map(
+            (d) =>
+              `<path d="M${x} ${y} l${d * 6} -4 l${d * 2} 6 M${x} ${y} l${d * 7} 1 l${d * 2} 5" stroke="#5a4a5a" fill="none"/>`,
+          )
+          .join('');
+    if (kind === 'brute')
+      b = `<g transform="translate(${x} ${y}) scale(${sc}) translate(${-x} ${-y})"><rect x="${x - 9}" y="${y - 6}" width="18" height="22" rx="3" fill="#7a4a3a"/><circle cx="${x}" cy="${y - 10}" r="6" fill="#7a4a3a"/><rect x="${x - 14}" y="${y - 4}" width="5" height="16" fill="#6a3a2a"/><rect x="${x + 9}" y="${y - 4}" width="5" height="16" fill="#6a3a2a"/><circle cx="${x - 2}" cy="${y - 11}" r="1" fill="${C.fire}"/><circle cx="${x + 2}" cy="${y - 11}" r="1" fill="${C.fire}"/></g>`;
+    return `<g opacity="${o}">${b}</g>`;
+  };
+
+  /* the end of the Shade's run: the last kill drops a rare amulet that suits a lightning trap build */
+  const shadeLoot = (k) => {
+    if (k < 0.5) {
+      let s = floor(130, 112, 140, 56, '#2a2a33') + glow(150, 106, 80, C.light, 0.25);
+      const drop = ease(k / 0.15);
+      s += `<rect x="183" y="${-10}" width="6" height="${108 * drop}" fill="${C.gold}" opacity="${0.5 * (1 - clamp((k - 0.15) / 0.35)) + 0.15}"/>`;
+      s +=
+        glow(186, 98, 26, C.gold, 0.8) +
+        `<circle cx="186" cy="${lerp(60, 98, drop)}" r="3" fill="${C.gold}"/>`;
+      s +=
+        `<g opacity="${clamp((k - 0.12) / 0.1)}">` +
+        `<rect x="160" y="74" width="52" height="11" fill="#000" opacity=".75" stroke="${C.gold}" stroke-width=".6"/>` +
+        txt(186, 82, 'Gale Knot', { size: 6.5, font: 'body', col: C.gold, anchor: 'middle' }) +
+        '</g>';
+      s += hero(lerp(60, 150, ease(k / 0.5)), 104, '#9a5ac0');
+      return s + label(8, 14, 'SHADE · RUINS · THE LAST KILL DROPS') + globes(0.9);
+    }
+    const j = k - 0.5;
+    const a = ease(j / 0.15);
+    let s = txt(16, 22, 'Items', { size: 9, col: C.mute });
+    s +=
+      `<g opacity="${a}" transform="translate(0 ${(1 - a) * 12})">` +
+      panel(90, 30, 140, 112, C.gold);
+    s +=
+      txt(100, 46, 'Gale Knot', { size: 11, font: 'display', col: C.gold }) +
+      txt(220, 46, 'Rare amulet', { size: 6.5, col: C.mute, anchor: 'end' });
+    const lines = [
+      '+24% increased Lightning Damage',
+      '+31% increased Critical Strike Chance',
+      '+38 to Dexterity',
+      '+54 to maximum Life',
+    ];
+    lines.forEach((l, i) => {
+      if (j > 0.15 + i * 0.08)
+        s += txt(100, 64 + i * 13, l, { size: 7.5, col: C.chaos, font: 'body' });
+    });
+    const pressed = j > 0.7;
+    s += `<rect x="100" y="118" width="120" height="16" rx="2" fill="${pressed ? '#f0b070' : C.torch}"/>`;
+    s +=
+      txt(160, 129.5, 'Equip', {
+        size: 9,
+        font: 'body',
+        weight: 700,
+        col: C.ink,
+        anchor: 'middle',
+      }) + '</g>';
+    if (pressed) s += glow(160, 126, 60, C.torch, clamp(1 - (j - 0.7) / 0.25));
+    return s;
+  };
+
+  /* ---------- the shots ---------- */
+  const SHOTS = [
+    {
+      t: [0, 2],
+      name: 'Endgame',
+      what: 'Cold open on a late build tearing through a packed room. No text.',
+      push: 0.06,
+      draw(lt) {
+        lt += 0.5;
+        const traps = [
+          [96, 86, 0.5],
+          [128, 98, 1.0],
+          [110, 116, 1.5],
+        ];
+        let s = floor(160, 100, 150, 62) + glow(150, 100, 90, C.torch, 0.35);
+        traps.forEach(([x, y, t0]) => {
+          const k = lt - t0;
+          if (k >= 0 && k < 0.6) {
+            const h = 30 * ease(k / 0.15) * (1 - clamp((k - 0.35) / 0.25));
+            s += `<polygon points="${x},${y - h} ${x - 4},${y} ${x + 4},${y}" fill="${C.light}"/>`;
+          }
+          s += burst(x, y, C.light, t0, lt, 22);
+        });
+        const a = lt * 3;
+        s += ring(170, 100, 34, C.bone, 1, 0.6);
+        for (let i = 0; i < 3; i++) {
+          const ang = a + (i * Math.PI * 2) / 3;
+          s += `<rect x="${170 + Math.cos(ang) * 34 - 5}" y="${100 + Math.sin(ang) * 17 - 1}" width="10" height="2" fill="${C.bone}"/>`;
+        }
+        s += hero(170, 96);
+        const pack = [
+          [90, 104, 0.6],
+          [120, 82, 1.1],
+          [214, 92, 2.0],
+          [230, 112, 2.0],
+          [200, 122, 2.0],
+          [246, 98, 2.05],
+          [104, 120, 1.6],
+        ];
+        pack.forEach(
+          ([x, y, d]) => (s += skel(x + Math.sin(lt * 4 + x) * 1.5, y, deadAfter(d, lt) * 0.85)),
+        );
+        s += burst(222, 106, C.fire, 2.0, lt, 70, 3);
+        s += floatNum(84, 70, '18,442', C.light, 0.55, lt, 12);
+        s += floatNum(128, 84, '12,907', C.light, 1.05, lt);
+        s += floatNum(98, 108, '16,330', C.light, 1.55, lt);
+        s += floatNum(206, 84, '21,960!', C.fire, 2.0, lt, 15);
+        s += floatNum(236, 102, '9,207', C.fire, 2.1, lt);
+        return s + txt(8, 14, 'Map 84 · Packed', { size: 7, col: C.mute }) + globes(0.9);
+      },
+    },
+    {
+      t: [2, 3],
+      name: 'Pick a class',
+      what: 'The class screen flicks through classes and lands on the Vanguard.',
+      draw(lt) {
+        const names = ['Vanguard', 'Strider', 'Mystic', 'Reaver', 'Zealot', 'Shade'];
+        const cols = ['#c0503a', '#5aa04a', '#5a78d0', '#d09a3a', '#d0c070', '#9a5ac0'];
+        const seq = [1, 2, 3, 4, 5, 0];
+        const on = seq[Math.min(5, Math.floor(lt / 0.125))];
+        let s = '';
+        names.forEach((n, i) => {
+          const sel = i === on;
+          s +=
+            `<rect x="${12 + i * 50}" y="${sel ? 34 : 40}" width="44" height="74" rx="2" fill="${C.ui}" stroke="${sel ? C.torch : C.uiLine}" stroke-width="${sel ? 2 : 1}"/>` +
+            hero(34 + i * 50, sel ? 64 : 70, cols[i]) +
+            txt(34 + i * 50, sel ? 100 : 106, n, { size: 8, font: 'body', anchor: 'middle' });
+        });
+        return s + caption('New run. New build.', lt, 0.05);
+      },
+    },
+    {
+      t: [3, 6],
+      name: 'Run one: the Vanguard',
+      what: 'The passive tree lights a path to a keystone, then a fire slam in a Forge, on the bar line at 6 s.',
+      push: 0.05,
+      draw(lt) {
+        if (lt < 1) {
+          const pts = [
+            [90, 116],
+            [140, 100],
+            [190, 74],
+            [240, 92],
+          ];
+          /* the first node is already taken; the next three light on the eighth notes (3.25, 3.5, 3.75 s), the keystone last */
+          const at = (i) => i * 0.25;
+          let s = txt(16, 22, 'Passive tree', { size: 9, col: C.mute });
+          const other = [
+            [90, 60],
+            [140, 50],
+            [130, 140],
+            [210, 130],
+            [260, 50],
+            [280, 140],
+          ];
+          other.forEach(
+            ([x, y]) => (s += `<line x1="${x}" y1="${y}" x2="140" y2="100" stroke="${C.dim}"/>`),
+          );
+          other.forEach(
+            ([x, y]) =>
+              (s += `<circle cx="${x}" cy="${y}" r="5" fill="${C.ui}" stroke="${C.mute}"/>`),
+          );
+          pts.forEach((p, i) => {
+            const on = lt >= at(i);
+            if (i)
+              s += `<line x1="${pts[i - 1][0]}" y1="${pts[i - 1][1]}" x2="${p[0]}" y2="${p[1]}" stroke="${on ? C.torch : C.dim}" stroke-width="${on ? 3 : 1.5}"/>`;
+          });
+          pts.forEach((p, i) => {
+            const on = lt >= at(i);
+            const r = i === 3 ? 11 : 6;
+            s += `<circle cx="${p[0]}" cy="${p[1]}" r="${r}" fill="${on ? C.torch : C.ui}" stroke="${on ? C.torch : C.mute}" stroke-width="1.5"/>`;
+            if (i && on && lt - at(i) < 0.2) s += glow(p[0], p[1], 24, C.torch);
+          });
+          return (
+            s +
+            (lt >= 0.75
+              ? txt(240, 120, 'Keystone', { size: 9, anchor: 'middle', col: C.torch })
+              : '')
+          );
+        }
+        const k = lt - 1;
+        const hit = 1.0;
+        const after = k >= hit;
+        let s = floor(130, 112, 140, 56, '#3a2a22') + glow(120, 110, 80, C.fire, 0.5);
+        if (after) s += crack(120, 110, 1);
+        s += burst(120, 110, C.fire, hit, k, 60, 3);
+        s += hero(112, 98, '#c0503a');
+        const raise = k < hit ? -60 * ease(k / hit) : 35;
+        s += `<rect x="114" y="86" width="20" height="4" fill="${C.bone}" transform="rotate(${raise} 114 88)"/>`;
+        [
+          [170, 92, 1],
+          [180, 118, 1],
+          [64, 124, -1],
+          [76, 92, -1],
+        ].forEach(([x, y, d]) => {
+          const fly = after ? ease((k - hit) / 0.4) * 24 * d : 0;
+          s += skel(
+            x + fly,
+            y - (after ? 6 * Math.sin(clamp((k - hit) / 0.4) * Math.PI) : 0),
+            after ? 1 - clamp((k - hit) / 0.6) : 0.9,
+          );
+        });
+        s +=
+          floatNum(150, 80, '6,310', C.fire, hit, k, 13) +
+          floatNum(70, 100, '5,884', C.fire, hit + 0.05, k);
+        return s + label(8, 14, 'VANGUARD · FORGE') + globes(0.95);
+      },
+    },
+    {
+      t: [6, 10.5],
+      name: 'Run two: the Shade',
+      what: 'A support gem goes into a link and the damage jumps, then Spire Traps thrown across Ruins, springing on the beats. The last kill drops a rare amulet for the build; it is compared and equipped.',
+      push: 0.05,
+      draw(lt) {
+        if (lt >= 3) return shadeLoot(lt - 3);
+        if (lt < 1) {
+          let s = txt(16, 22, 'Skills', { size: 9, col: C.mute });
+          const xs = [80, 130, 180];
+          xs.forEach((x, i) => {
+            if (i)
+              s += `<line x1="${xs[i - 1] + 14}" y1="80" x2="${x - 14}" y2="80" stroke="${C.mute}" stroke-width="3"/>`;
+            s += `<circle cx="${x}" cy="80" r="14" fill="${C.ui}" stroke="${C.mute}" stroke-width="2"/>`;
+          });
+          s += `<circle cx="80" cy="80" r="9" fill="${C.light}" opacity=".85"/><circle cx="130" cy="80" r="9" fill="${C.bone}" opacity=".6"/>`;
+          const gy = lerp(10, 80, ease(lt / 0.4));
+          s += `<circle cx="180" cy="${gy}" r="9" fill="${C.light}"/>`;
+          if (lt > 0.4 && lt < 0.6) s += glow(180, 80, 30, C.light);
+          const n = lt < 0.5 ? 1240 : lerp(1240, 3980, ease((lt - 0.5) / 0.35));
+          s += panel(220, 56, 84, 50) + label(228, 70, 'TOTAL DPS');
+          s += txt(228, 94, fmtN(n), { size: 15, weight: 600, col: lt > 0.5 ? C.chaos : C.bone });
+          return s;
+        }
+        const k = lt - 1;
+        let s = floor(130, 112, 140, 56, '#2a2a33') + glow(150, 106, 80, C.light, 0.35);
+        const traps = [
+          [110, 92, 0.0, 0.5],
+          [150, 112, 0.2, 1.0],
+          [186, 98, 0.4, 1.5],
+        ];
+        const pack = [
+          [120, 100, 0.5],
+          [140, 88, 0.5],
+          [160, 120, 1.0],
+          [196, 106, 1.5],
+          [178, 92, 1.5],
+        ];
+        pack.forEach(([x, y, d]) => (s += skel(x, y, deadAfter(d, k) * 0.85)));
+        traps.forEach(([x, y, th, sp]) => {
+          const f = clamp((k - th) / 0.3);
+          if (k >= th && k < sp) {
+            if (f < 1) {
+              const px = lerp(60, x, f),
+                py = lerp(104, y, f) - Math.sin(f * Math.PI) * 40;
+              s += `<circle cx="${px}" cy="${py}" r="3" fill="${C.light}"/>`;
+            } else
+              s +=
+                `<rect x="${x - 4}" y="${y - 2}" width="8" height="4" fill="${C.light}"/>` +
+                ring(x, y, 8, C.light, 1, 0.7);
+          }
+          const j = k - sp;
+          if (j >= 0 && j < 0.4) {
+            const h = 34 * ease(j / 0.1) * (1 - clamp((j - 0.2) / 0.2));
+            s += `<polygon points="${x},${y - h} ${x - 4},${y} ${x + 4},${y}" fill="${C.light}"/>`;
+          }
+          s += burst(x, y, C.light, sp, k, 26);
+          s += floatNum(x - 8, y - 30, fmtN(4000 + x * 23), C.light, sp, k);
+        });
+        return (
+          s + hero(60, 104, '#9a5ac0') + label(8, 14, 'SHADE · RUINS · SPIRE TRAP') + globes(0.9)
+        );
+      },
+    },
+    {
+      t: [10.5, 12.5],
+      name: 'Three more builds',
+      what: 'The other three classes side by side in phone-shaped panels, each fighting its own way on its own rhythm: rapid poison arrows, slow heavy sweeps, a totem pulsing on holy ground.',
+      draw(lt) {
+        const panels = [
+          ['#22301f', C.chaos, '#5aa04a', 'STRIDER'],
+          ['#2e2a24', C.bone, '#d09a3a', 'REAVER'],
+          ['#2e2b1c', C.gold, '#d0c070', 'ZEALOT'],
+        ];
+        let s = '';
+        panels.forEach(([fl, fx, col, nm], i) => {
+          const k = ease((lt - i * 0.1) / 0.3);
+          const x = 44 + i * 82,
+            cx = x + 33,
+            dy = (1 - k) * 160;
+          s += `<g transform="translate(0 ${dy})"><rect x="${x}" y="8" width="66" height="146" rx="8" fill="${fl}" stroke="${C.uiLine}"/>`;
+          s += `<clipPath id="ph${i}"><rect x="${x}" y="8" width="66" height="146" rx="8"/></clipPath><g clip-path="url(#ph${i})">`;
+          s += glow(cx, 90, 44, fx, 0.3);
+          if (i === 0) {
+            /* Strider: a stream of arrows every 0.18 s into a swarm of rats, green poison stacking on them */
+            const rats = [
+              [x + 14, 44],
+              [x + 30, 38],
+              [x + 48, 46],
+              [x + 22, 58],
+              [x + 42, 60],
+            ];
+            const hero_ = [cx, 118];
+            for (let n = 0; n < 11; n++) {
+              const t0 = 0.15 + n * 0.18,
+                f = (lt - t0) / 0.15;
+              const [tx, ty] = rats[n % 5];
+              if (f >= 0 && f < 1)
+                s += `<line x1="${lerp(hero_[0], tx, f)}" y1="${lerp(hero_[1] - 8, ty, f)}" x2="${lerp(hero_[0], tx, f) + (tx - hero_[0]) * 0.08}" y2="${lerp(hero_[1] - 8, ty, f) - 5}" stroke="${fx}" stroke-width="1.6"/>`;
+            }
+            rats.forEach(([rx, ry], j) => {
+              const hits = Math.max(0, Math.floor((lt - 0.3 - j * 0.18) / 0.9) + 1);
+              const dead = lt > 1.3 + j * 0.12;
+              s += `<circle cx="${rx}" cy="${ry}" r="${4 + Math.min(3, hits) * 2}" fill="${fx}" opacity="${dead ? 0 : 0.25}"/>`;
+              s += foe(
+                'rat',
+                rx + Math.sin(lt * 8 + j) * 1.5,
+                ry,
+                dead ? clamp(1 - (lt - 1.3 - j * 0.12) / 0.2) : 1,
+              );
+            });
+            for (let n = 0; n < 6; n++)
+              s += floatNum(
+                x + 8 + (n % 3) * 18,
+                70 - (n % 2) * 6,
+                String(180 + n * 37),
+                fx,
+                0.35 + n * 0.27,
+                lt,
+                7,
+              );
+            s += hero(hero_[0], hero_[1], col);
+          }
+          if (i === 1) {
+            /* Reaver: one slow, heavy sweep every 0.6 s through armoured knights; big numbers, bleeding */
+            const knights = [
+              [cx - 14, 74],
+              [cx + 14, 72],
+              [cx, 62],
+            ];
+            const swings = [0.35, 0.95, 1.55];
+            s += hero(cx, 100, col);
+            swings.forEach((t0, n) => {
+              const f = (lt - t0) / 0.22;
+              if (f >= 0 && f < 1.4) {
+                const a0 = -150 + f * 120;
+                const r = 26;
+                const p = (a) => [
+                  cx + Math.cos((a * Math.PI) / 180) * r,
+                  92 + Math.sin((a * Math.PI) / 180) * r * 0.7,
+                ];
+                const [x1, y1] = p(a0 - 70),
+                  [x2, y2] = p(a0);
+                s += `<path d="M${x1} ${y1} A${r} ${r * 0.7} 0 0 1 ${x2} ${y2}" stroke="${fx}" stroke-width="${4 - f * 2}" fill="none" opacity="${1 - clamp((f - 0.8) / 0.6)}"/>`;
+              }
+              s += floatNum(
+                cx - 18 + n * 10,
+                54,
+                ['1,840', '2,215', '3,960!'][n],
+                fx,
+                t0 + 0.12,
+                lt,
+                n === 2 ? 11 : 9,
+              );
+            });
+            knights.forEach(([kx, ky], j) => {
+              const hit = lt > 0.47 + j * 0.6;
+              const dead = lt > 1.67 && j < 3;
+              s += foe(
+                'knight',
+                kx + (hit ? Math.sin(lt * 40) * 0.8 : 0),
+                ky,
+                dead ? clamp(1 - (lt - 1.67) / 0.2) : 1,
+              );
+              if (hit && !dead)
+                s += `<circle cx="${kx + 2}" cy="${ky + 10 + ((lt * 30) % 6)}" r="1" fill="${C.life}"/>`;
+            });
+          }
+          if (i === 2) {
+            /* Zealot: a totem drops at 0.2 s, holy ground spreads, the totem pulses every 0.33 s at wraiths */
+            const f = clamp((lt - 0.2) / 0.15);
+            const groundR = 30 * ease((lt - 0.35) / 0.5);
+            if (lt > 0.35)
+              s += `<ellipse cx="${cx}" cy="86" rx="${groundR}" ry="${groundR * 0.45}" fill="${fx}" opacity=".22" stroke="${fx}" stroke-width=".8"/>`;
+            const ty = lerp(10, 80, f);
+            s += `<rect x="${cx - 3}" y="${ty - 18}" width="6" height="18" fill="${fx}"/><circle cx="${cx}" cy="${ty - 20}" r="3.5" fill="#fff6d0"/>`;
+            if (f >= 1 && lt < 0.5) s += burst(cx, 82, fx, 0.35, lt, 18);
+            const wraiths = [
+              [x + 12, 44],
+              [x + 52, 50],
+              [x + 30, 36],
+            ];
+            for (let n = 0; n < 5; n++) {
+              const t0 = 0.55 + n * 0.33,
+                w = wraiths[n % 3],
+                g = (lt - t0) / 0.12;
+              if (g >= 0 && g < 1.5)
+                s += `<line x1="${cx}" y1="${ty - 20}" x2="${w[0]}" y2="${w[1]}" stroke="#fff6d0" stroke-width="${2.2 - g}" opacity="${1 - g / 1.5}"/>`;
+              s += burst(w[0], w[1] + 6, fx, t0 + 0.05, lt, 12, 1.5);
+            }
+            wraiths.forEach(
+              ([wx, wy], j) =>
+                (s += foe(
+                  'wraith',
+                  wx,
+                  wy + Math.sin(lt * 5 + j) * 2,
+                  lt > 1.4 + j * 0.15 ? clamp(1 - (lt - 1.4 - j * 0.15) / 0.2) : 0.9,
+                )),
+            );
+            s += hero(cx - 16, 112, col);
+          }
+          s += `<circle cx="${x + 10}" cy="144" r="5" fill="${C.life}"/><circle cx="${x + 56}" cy="144" r="5" fill="${C.mana}"/>`;
+          s += label(x + 5, 20, nm) + '</g></g>';
+        });
+        return s;
+      },
+    },
+    {
+      t: [12.5, 16],
+      name: 'Level 1 to 100',
+      what: 'Half-second cuts, each a different build in a different place, using different skills against different enemies; the map number climbs to 63, the map the character falls on.',
+      draw(lt) {
+        const i = Math.min(6, Math.floor(lt / 0.5));
+        const l = lt - i * 0.5;
+        const map = [4, 12, 21, 31, 41, 52, 63][i];
+        const CUTS = [
+          /* a Crypt corridor: a Reaver cleaving skeletons */
+          () => {
+            let s =
+              `<polygon points="20,120 180,40 300,70 140,150" fill="#2d3a32" opacity=".6"/>` +
+              glow(110, 100, 70, C.bone, 0.3);
+            s += hero(80, 112, '#d09a3a');
+            const f = clamp((l - 0.12) / 0.15);
+            if (l > 0.12 && l < 0.4)
+              s += `<path d="M86 88 A30 20 0 0 1 112 118" stroke="${C.bone}" stroke-width="${4 - f * 3}" fill="none"/>`;
+            [
+              [108, 98],
+              [118, 110],
+              [130, 92],
+            ].forEach(
+              ([x, y]) => (s += skel(x + (l > 0.2 ? (l - 0.2) * 40 : 0), y, deadAfter(0.25, l))),
+            );
+            return (
+              s +
+              floatNum(116, 82, '2,140', C.bone, 0.2, l) +
+              `<rect x="200" y="30" width="8" height="40" fill="${C.wall}"/>`
+            );
+          },
+          /* a Forge hall: a Mystic's fireball into a slag brute */
+          () => {
+            let s = floor(170, 100, 150, 56, '#3a2a22') + glow(230, 90, 60, C.fire, 0.4);
+            [70, 150, 250].forEach(
+              (x) =>
+                (s += `<path d="M${x} ${118} l12 -4 l10 6" stroke="${C.fire}" stroke-width="1" fill="none" opacity=".6"/>`),
+            );
+            s += hero(260, 108, '#5a78d0');
+            const f = clamp(l / 0.22);
+            if (l < 0.22)
+              s +=
+                `<circle cx="${lerp(250, 110, f)}" cy="${lerp(100, 92, f)}" r="5" fill="${C.fire}"/>` +
+                glow(lerp(250, 110, f), lerp(100, 92, f), 14, C.fire);
+            s += foe('brute', 104, 92, deadAfter(0.35, l)) + burst(110, 96, C.fire, 0.22, l, 40, 3);
+            return s + floatNum(96, 66, '5,512', C.fire, 0.22, l, 12);
+          },
+          /* a Cavern: a frost nova round a Shade, spiders frozen mid-leap */
+          () => {
+            let s =
+              `<path d="M30 140 Q60 60 150 50 Q260 40 300 120 Q200 170 30 140" fill="#28324a" opacity=".6"/>` +
+              glow(160, 96, 70, C.cold, 0.4);
+            s += hero(160, 92, '#9a5ac0') + burst(160, 104, C.cold, 0.1, l, 60, 3);
+            [
+              [120, 86],
+              [204, 96],
+              [146, 124],
+              [186, 120],
+            ].forEach(([x, y], j) => {
+              s += foe('spider', x, y, deadAfter(0.38, l));
+              if (l > 0.12)
+                s += `<polygon points="${x - 5},${y + 4} ${x},${y - 7} ${x + 5},${y + 4}" fill="${C.cold}" opacity=".55"/>`;
+            });
+            return s + floatNum(196, 78, '3,377', C.cold, 0.14, l);
+          },
+          /* Ruins with pillars: a Zealot's lightning chaining through wraiths */
+          () => {
+            let s = floor(150, 104, 140, 52, '#2a2a33') + glow(170, 80, 70, C.light, 0.35);
+            [
+              [80, 70],
+              [230, 64],
+              [260, 120],
+            ].forEach(
+              ([x, y]) => (s += `<rect x="${x}" y="${y}" width="10" height="30" fill="#4a4558"/>`),
+            );
+            s += hero(60, 124, '#d0c070');
+            const pts = [
+              [64, 112],
+              [124, 80],
+              [170, 104],
+              [214, 76],
+              [250, 96],
+            ];
+            const n = Math.min(4, Math.floor(l / 0.06));
+            let d = `M${pts[0][0]} ${pts[0][1]}`;
+            for (let j = 1; j <= n; j++)
+              d += ` L${(pts[j - 1][0] + pts[j][0]) / 2 + (j % 2 ? 6 : -6)} ${(pts[j - 1][1] + pts[j][1]) / 2 - 8} L${pts[j][0]} ${pts[j][1]}`;
+            s += `<path d="${d}" stroke="${C.light}" stroke-width="1.8" fill="none" opacity="${1 - clamp((l - 0.35) / 0.15)}"/>`;
+            pts
+              .slice(1)
+              .forEach(([x, y], j) => (s += foe('wraith', x, y - 6, deadAfter(0.3 + j * 0.03, l))));
+            return s + floatNum(170, 86, '4,019', C.light, 0.15, l);
+          },
+          /* a Marsh: a Strider's plague cloud drifting over rats in the reeds */
+          () => {
+            let s =
+              `<rect width="320" height="180" fill="#1c2a1c" opacity=".7"/>` +
+              `<ellipse cx="200" cy="120" rx="60" ry="14" fill="#2f4a3a" opacity=".7"/>`;
+            [40, 70, 270, 290].forEach(
+              (x) =>
+                (s += `<path d="M${x} 150 l2 -24 M${x + 4} 150 l-2 -18" stroke="#4a6a3a" stroke-width="1.5"/>`),
+            );
+            s += hero(240, 96, '#5aa04a');
+            const cx = lerp(200, 130, l / 0.5);
+            s += `<circle cx="${cx}" cy="100" r="${20 + l * 30}" fill="${C.chaos}" opacity=".22"/><circle cx="${cx - 12}" cy="94" r="${12 + l * 20}" fill="${C.chaos}" opacity=".18"/>`;
+            [
+              [110, 100],
+              [128, 110],
+              [140, 94],
+              [150, 116],
+              [118, 120],
+            ].forEach(
+              ([x, y], j) =>
+                (s += foe('rat', x + Math.sin(l * 20 + j) * 2, y, deadAfter(0.3 + j * 0.03, l))),
+            );
+            return (
+              s +
+              floatNum(118, 82, '611', C.chaos, 0.1, l, 9) +
+              floatNum(140, 88, '611', C.chaos, 0.25, l, 9)
+            );
+          },
+          /* a Shrine: a Vanguard's holy slam on armoured knights, light from above */
+          () => {
+            let s =
+              floor(160, 104, 120, 50, '#33302a') +
+              `<polygon points="140,0 180,0 200,110 120,110" fill="${C.gold}" opacity=".12"/>`;
+            [100, 220].forEach(
+              (x) =>
+                (s += `<rect x="${x}" y="60" width="4" height="14" fill="${C.gold}"/><circle cx="${x + 2}" cy="58" r="2" fill="#fff6d0"/>`),
+            );
+            s += hero(160, 98, '#c0503a') + burst(160, 108, C.gold, 0.18, l, 50, 3);
+            if (l > 0.18 && l < 0.35)
+              s += `<rect x="156" y="0" width="8" height="108" fill="#fff6d0" opacity="${1 - (l - 0.18) / 0.17}"/>`;
+            [
+              [124, 104],
+              [198, 100],
+              [178, 120],
+            ].forEach(([x, y]) => (s += foe('knight', x, y, deadAfter(0.3, l))));
+            return s + floatNum(184, 82, '7,230', C.gold, 0.2, l, 12);
+          },
+          /* the Hollow at map 63: a Shade's ring of blades round a towering brute, the last map before the fall */
+          () => {
+            let s =
+              `<rect width="320" height="180" fill="#3a2224" opacity=".45"/>` +
+              floor(160, 100, 160, 64, '#3a2224') +
+              glow(190, 80, 80, C.fire, 0.3);
+            s += foe('brute', 200, 76, 1, 1.8);
+            s += hero(130, 108, '#9a5ac0') + ring(130, 112, 26, C.light, 1, 0.6);
+            for (let j = 0; j < 4; j++) {
+              const a = l * 14 + (j * Math.PI) / 2;
+              s += `<rect x="${130 + Math.cos(a) * 26 - 5}" y="${112 + Math.sin(a) * 13 - 1}" width="10" height="2" fill="${C.light}"/>`;
+            }
+            return (
+              s +
+              floatNum(206, 52, '12,800', C.light, 0.1, l, 12) +
+              floatNum(214, 64, '13,105', C.light, 0.3, l, 12)
+            );
+          },
+        ];
+        const names = ['Crypt', 'Forge', 'Cavern', 'Ruins', 'Marsh', 'Shrine', 'Hollow'];
+        let s = CUTS[i]();
+        s +=
+          txt(10, 18, `Map ${map}`, { size: 10, col: C.torch, weight: 600 }) +
+          txt(310, 18, names[i], { size: 8, col: C.mute, anchor: 'end' });
+        s += txt(10, 30, `Level ${map}`, { size: 8, col: C.mute });
+        return s + caption('Grind to level 100 in a sitting.', lt, 0.15, 170, 17);
+      },
+    },
+    {
+      t: [16, 19],
+      name: 'The fall',
+      what: 'A boss’s signature attack: the light drains, a vast rune closes on the character, a column of void slams down and the floor shatters. The character falls. Then the end screen, the duel button pressed. No text.',
+      draw(lt) {
+        if (lt < 1.85) {
+          const charge = clamp(lt / 0.5);
+          const hit = 0.5;
+          const k = lt - hit;
+          const shake = k > 0 && k < 0.3 ? (1 - k / 0.3) * 5 : 0;
+          const sx = Math.sin(lt * 90) * shake,
+            sy = Math.cos(lt * 77) * shake;
+          let s = `<g transform="translate(${sx} ${sy})">`;
+          s += floor(160, 104, 160, 64, '#2a2030');
+          /* the boss, raising its arms as the light drains */
+          s += `<rect x="216" y="${40 - charge * 4}" width="22" height="34" fill="#3a2a40"/><circle cx="227" cy="${34 - charge * 4}" r="9" fill="#3a2a40"/>`;
+          s += `<line x1="216" y1="${48 - charge * 4}" x2="${206}" y2="${30 - charge * 14}" stroke="#3a2a40" stroke-width="5"/><line x1="238" y1="${48 - charge * 4}" x2="248" y2="${30 - charge * 14}" stroke="#3a2a40" stroke-width="5"/>`;
+          s +=
+            `<circle cx="227" cy="${32 - charge * 4}" r="${2 + charge * 2}" fill="${C.light}"/>` +
+            glow(227, 30, 30 * charge, C.light, charge);
+          /* the closing rune: an outer ring with spokes that shrinks onto the character */
+          if (lt < hit) {
+            const r = lerp(120, 22, ease(charge));
+            s += ring(150, 108, r, C.light, 2, 0.9) + ring(150, 108, r * 0.8, C.light, 0.8, 0.6);
+            for (let j = 0; j < 8; j++) {
+              const a = (j * Math.PI) / 4 + lt * 2;
+              s += `<line x1="${150 + Math.cos(a) * r}" y1="${108 + Math.sin(a) * r * 0.5}" x2="${150 + Math.cos(a) * r * 0.8}" y2="${108 + Math.sin(a) * r * 0.4}" stroke="${C.light}" stroke-width="1.2"/>`;
+            }
+            s += `<ellipse cx="150" cy="108" rx="${r}" ry="${r / 2}" fill="${C.light}" opacity="${0.08 + charge * 0.15}"/>`;
+          }
+          /* the column of void slamming down, then the shattered floor */
+          if (k >= 0) {
+            const col = clamp(1 - k / 0.35);
+            s += `<rect x="${136 - col * 6}" y="-10" width="${28 + col * 12}" height="120" fill="#120818" opacity="${col}"/>`;
+            s += `<rect x="${144}" y="-10" width="12" height="120" fill="#e6d8ff" opacity="${col}"/>`;
+            s +=
+              burst(150, 108, C.light, hit, lt, 120, 4) +
+              burst(150, 108, '#ffffff', hit + 0.05, lt, 70, 2);
+            s += `<path d="M150 108 l-40 10 l-24 -6 M150 108 l36 16 l30 -4 M150 108 l-10 -22 l-26 -8 M150 108 l20 -20 l34 2 M150 108 l-6 30" stroke="#000" stroke-width="2" fill="none"/>`;
+            for (let j = 0; j < 8; j++) {
+              const a = j * 0.8 + 0.3,
+                d = ease(k / 0.45) * 60;
+              s += `<rect x="${150 + Math.cos(a) * d}" y="${108 + Math.sin(a) * d * 0.5 - Math.sin(clamp(k / 0.45) * Math.PI) * 20}" width="4" height="3" fill="#4a4050" opacity="${1 - clamp(k / 0.45)}"/>`;
+            }
+          }
+          const fall = k > 0.05 ? ease((k - 0.05) / 0.25) * 85 : 0;
+          s += hero(150, 100, C.bone, fall) + '</g>';
+          /* the light drains to a vignette */
+          s += `<rect width="320" height="180" fill="#000" opacity="${charge * 0.35 * (k > 0 ? 1 - clamp(k / 0.1) * 0.6 : 1)}"/>`;
+          s += globes(lt < hit ? 0.3 : clamp(0.3 - k * 2));
+          /* the pause: dust settles, the boss lowers its glow, the room goes dark */
+          s += `<rect width="320" height="180" fill="#000" opacity="${clamp((lt - 0.9) / 0.9) * 0.55}"/>`;
+          return (
+            s +
+            txt(10, 18, 'Map 63', { size: 10, col: C.torch, weight: 600 }) +
+            label(8, 30, 'BOSS · SIGNATURE ATTACK')
+          );
+        }
+        const k = lt - 1.85;
+        const pressed = k > 0.4;
+        let s =
+          panel(60, 26, 200, 116) +
+          txt(160, 50, 'Fallen on map 63', {
+            size: 13,
+            font: 'display',
+            col: C.mute,
+            anchor: 'middle',
+          });
+        s += `<rect x="84" y="62" width="152" height="26" rx="2" fill="${pressed ? '#f0b070' : C.torch}"/>`;
+        s += txt(160, 79, 'Duel for your damned soul’s fate', {
+          size: 10,
+          font: 'body',
+          weight: 700,
+          col: C.ink,
+          anchor: 'middle',
+        });
+        if (pressed) s += glow(160, 75, 90, C.torch, clamp(1 - (k - 0.4) / 0.3));
+        s += `<rect x="84" y="100" width="152" height="6" fill="${C.mute}" opacity=".4"/><rect x="84" y="112" width="120" height="6" fill="${C.mute}" opacity=".3"/>`;
+        return s;
+      },
+    },
+    {
+      t: [19, 22.5],
+      name: 'The duel',
+      what: 'Our build against Sin’s. One kites and shoots, the other closes in; a held frame, then the deciding hit.',
+      push: 0.07,
+      draw(lt) {
+        const hold = lt >= 3.0 && lt < 3.25;
+        const tt = lt < 3.0 ? lt : lt < 3.25 ? 3.0 : 3.0 + (lt - 3.25);
+        const ax = 110 + Math.sin(tt * 1.6) * 30,
+          ay = 108 + Math.cos(tt * 1.6) * 10;
+        const bx = lerp(230, ax + 46, ease(tt / 3.2)),
+          by = lerp(84, ay - 8, ease(tt / 3.2));
+        let s =
+          `<ellipse cx="160" cy="104" rx="132" ry="58" fill="${C.floor}" opacity=".55" stroke="${C.dim}" stroke-width="2"/>` +
+          glow(ax, ay, 46, C.cold, 0.5) +
+          glow(bx, by, 46, C.fire, 0.5);
+        for (let n = 0; n < 5; n++) {
+          const t0 = n * 0.5;
+          const f = (tt - t0) / 0.25;
+          if (f >= 0 && f < 1)
+            s += `<line x1="${lerp(ax, bx, f)}" y1="${lerp(ay - 4, by - 4, f)}" x2="${lerp(ax, bx, f) + 8}" y2="${lerp(ay - 4, by - 4, f) - 1}" stroke="${C.cold}" stroke-width="2"/>`;
+          if (f >= 1 && f < 3)
+            s += floatNum(bx + 6, by - 14, fmtN(2100 + n * 211), C.cold, t0 + 0.25, tt);
+        }
+        for (let n = 0; n < 4; n++) s += burst(bx, by + 12, C.fire, 0.75 + n * 0.75, tt, 24);
+        if (lt >= 3.25)
+          s +=
+            burst(bx, by, '#ffffff', 3.25, lt, 60, 3) +
+            floatNum(bx - 10, by - 18, '9,880!', C.cold, 3.25, lt, 15);
+        s +=
+          hero(ax, ay, C.bone) +
+          hero(bx, by, '#c9a77a', lt > 3.3 ? ease((lt - 3.3) / 0.2) * 85 : 0);
+        const rival = lt >= 3.25 ? 0 : clamp(1 - tt / 3.4) * 0.9 + 0.08;
+        s +=
+          panel(80, 8, 160, 12) +
+          `<rect x="82" y="10" width="${156 * rival}" height="8" fill="${C.life}"/>`;
+        s += txt(84, 30, 'Sin · Reaver · Level 71', { size: 7, col: C.bone });
+        s += globes(0.55 + 0.1 * Math.cos(tt));
+        if (hold)
+          s +=
+            `<rect width="320" height="180" fill="#fff" opacity=".08"/>` +
+            txt(310, 172, '½ beat hold', { size: 6, col: C.mute, anchor: 'end' });
+        return s + caption('Duel their builds.', lt, 0.1, 170, 16);
+      },
+    },
+    {
+      t: [22.5, 23.5],
+      name: 'The rating',
+      what: 'Victory, and the Elo rating counts up.',
+      draw(lt) {
+        const n = lerp(712, 748, ease((lt - 0.15) / 0.6));
+        const k = ease(lt / 0.2);
+        let s = panel(70, 34, 180, 100);
+        s +=
+          `<g transform="translate(160 62) scale(${lerp(1.4, 1, k)}) translate(-160 -62)">` +
+          txt(160, 68, 'Victory', {
+            size: 22,
+            font: 'display',
+            col: C.torch,
+            anchor: 'middle',
+            o: k,
+          }) +
+          '</g>';
+        s += txt(122, 100, 'Rated · 712 →', { size: 11, col: C.mute, anchor: 'middle' });
+        s += txt(190, 100, Math.round(n), {
+          size: 15,
+          col: C.chaos,
+          weight: 600,
+          anchor: 'middle',
+        });
+        return s + label(118, 120, 'ELO · FIRST FIGHT VS THIS RIVAL');
+      },
+    },
+    {
+      t: [23.5, 25],
+      name: 'The board',
+      what: 'The high scores, Sin on top; our character climbs past two players, arcade style.',
+      draw(lt) {
+        const others = [
+          ['Sin', 'Reaver', 1184],
+          ['oostin', 'Shade', 1092],
+          ['Gravewick', 'Zealot', 968],
+          ['Eli', 'Strider', 901],
+          ['marrowbyte', 'Vanguard', 731],
+          ['Tessaly', 'Mystic', 702],
+          ['Ninefingers', 'Shade', 655],
+        ];
+        /* our row starts 7th and rises to 5th: one place at 0.4 s, one at 0.7 s */
+        const from = 6,
+          to = 4;
+        const pos = lerp(from, to, ease((lt - 0.3) / 0.6));
+        let s = panel(40, 8, 240, 128) + label(50, 21, 'HIGH SCORES');
+        const rowY = (p) => 26 + p * 13;
+        others.forEach(([n, c, r], i) => {
+          let p = i;
+          if (i >= to && i < from) p = i + clamp(i - pos + 1);
+          if (i >= from) p = i + 1;
+          s += `<rect x="48" y="${rowY(p)}" width="224" height="11" fill="${p % 2 ? C.ui : '#20212d'}"/>`;
+          s +=
+            txt(54, rowY(p) + 8.5, `${Math.round(p) + 1}. ${n}`, { size: 7.5 }) +
+            txt(170, rowY(p) + 8.5, c, { size: 7.5, col: C.mute }) +
+            txt(264, rowY(p) + 8.5, r, { size: 7.5, anchor: 'end' });
+        });
+        const rating = Math.round(lerp(712, 748, ease(lt / 0.3)));
+        s += `<rect x="46" y="${rowY(pos) - 1}" width="228" height="13" fill="${C.torch}"/>`;
+        s +=
+          txt(54, rowY(pos) + 8.5, `${Math.round(pos) + 1}. (our character)`, {
+            size: 7.5,
+            col: C.ink,
+            weight: 600,
+          }) +
+          txt(170, rowY(pos) + 8.5, 'Mystic', { size: 7.5, col: C.ink }) +
+          txt(264, rowY(pos) + 8.5, rating, { size: 7.5, col: C.ink, anchor: 'end', weight: 600 });
+        return s + caption('Take the top spot.', lt, 0.35, 170, 16);
+      },
+    },
+    {
+      t: [25, 27],
+      name: 'The genres',
+      what: 'All four words on screen at once, appearing one by one on the beats, each over a sketch of the footage that proves it.',
+      draw(lt) {
+        const cells = [
+          ['Arcade.', '#2a2614', 'arcade'],
+          ['ARPG.', '#28324a', 'arpg'],
+          ['Roguelike.', '#2a1416', 'rogue'],
+          ['Autobattler.', '#2d3a32', 'auto'],
+        ];
+        let s = '';
+        cells.forEach(([w, bg, id], i) => {
+          const t0 = i * 0.5,
+            k = lt - t0;
+          if (k < 0) return;
+          const x = (i % 2) * 160,
+            y = Math.floor(i / 2) * 90,
+            cx = x + 80,
+            cy = y + 45;
+          s += `<g opacity="${clamp(k / 0.06)}"><rect x="${x + 1}" y="${y + 1}" width="158" height="88" fill="${bg}"/>`;
+          s += `<clipPath id="gc${i}"><rect x="${x + 1}" y="${y + 1}" width="158" height="88"/></clipPath><g clip-path="url(#gc${i})">`;
+          if (id === 'rogue') s += hero(x + 130, y + 66, C.bone, 85) + skel(x + 112, y + 60, 0.5);
+          if (id === 'arpg')
+            s +=
+              [0, 1, 2, 3]
+                .map(
+                  (j) =>
+                    `<circle cx="${x + 18 + j * 16}" cy="${y + 74 - j * 6}" r="4" fill="${C.torch}"/>`,
+                )
+                .join('') +
+              `<rect x="${x + 116}" y="${y + 54}" width="34" height="26" fill="${C.ui}" stroke="${C.gold}"/>`;
+          if (id === 'arcade')
+            s += [0, 1, 2, 3]
+              .map(
+                (j) =>
+                  `<rect x="${x + 10}" y="${y + 12 + j * 9}" width="${60 - j * 8}" height="6" fill="${j === 2 ? C.torch : C.ui}"/>`,
+              )
+              .join('');
+          if (id === 'auto')
+            s +=
+              hero(x + 130 + Math.sin(lt * 30) * 4, y + 64) +
+              skel(x + 148, y + 60, 0.6) +
+              ring(x + 130, y + 74, 10 + ((lt * 60) % 14), C.bone, 1, 0.6);
+          s += `<rect x="${x}" y="${y}" width="160" height="90" fill="#000" opacity=".35"/>`;
+          s += glow(cx, cy, 70, C.torch, 0.5 * clamp(1 - k / 0.4));
+          const sc = lerp(1.5, 1, ease(k / 0.18));
+          s +=
+            `<g transform="translate(${cx} ${cy}) scale(${sc}) translate(${-cx} ${-cy})">` +
+            txt(cx, cy + 8, w, { size: 19, font: 'display', anchor: 'middle' }) +
+            '</g>';
+          s += '</g></g>';
+        });
+        return (
+          s +
+          `<line x1="160" y1="0" x2="160" y2="180" stroke="#07070b" stroke-width="2"/><line x1="0" y1="90" x2="320" y2="90" stroke="#07070b" stroke-width="2"/>`
+        );
+      },
+    },
+    {
+      t: [27, 30],
+      name: 'Battle of Builds',
+      what: 'The title and “Free on itch.io” over the dimmed genre grid, held; the torch gutters out.',
+      draw(lt) {
+        const flick = 0.55 + 0.1 * Math.sin(lt * 23) + 0.06 * Math.sin(lt * 51);
+        const out = clamp((lt - 2.6) / 0.4);
+        /* the genre grid stays, dimmed, under the title */
+        let s =
+          SHOTS.find((x) => x.name === 'The genres').draw(2 + lt) +
+          `<rect width="320" height="180" fill="#07070b" opacity="${lerp(0, 0.8, ease(lt / 0.25)) + 0.2 * out}"/>`;
+        s += glow(160, 80, 130, C.torch, flick * (1 - out));
+        s +=
+          `<g opacity="${ease(lt / 0.3) * (1 - out)}">` +
+          txt(160, 86, 'Battle of Builds', { size: 32, font: 'display', anchor: 'middle' }) +
+          '</g>';
+        s += txt(160, 120, 'Free on itch.io', {
+          size: 17,
+          font: 'display',
+          col: C.torch,
+          anchor: 'middle',
+          o: clamp((lt - 0.4) / 0.2) * (1 - out),
+        });
+        return s;
+      },
+    },
+  ];
+
+  /* hard cuts that land on a hit get a short flash */
+  const FLASH = [1.5, 5.0, 16.5, 22.25, 25.0, 25.5, 26.0, 26.5, 27.0];
+
+  const svg = document.getElementById('svg');
+  function draw(t) {
+    t = clamp(t, 0, 29.999);
+    const i = SHOTS.findIndex((s) => t >= s.t[0] && t < s.t[1]);
+    const shot = SHOTS[i];
+    const lt = t - shot.t[0],
+      d = shot.t[1] - shot.t[0];
+    const z = 1 + (shot.push || 0.02) * (lt / d);
+    let body = shot.draw(lt);
+    let fl = 0;
+    FLASH.forEach((f) => {
+      const k = t - f;
+      if (k >= 0 && k < 0.15) fl = Math.max(fl, 0.35 * (1 - k / 0.15));
+    });
+    svg.innerHTML =
+      DEFS +
+      `<rect width="320" height="180" fill="#07070b"/>` +
+      `<g transform="translate(160 90) scale(${z}) translate(-160 -90)">${body}</g>` +
+      (fl ? `<rect width="320" height="180" fill="#fff4e0" opacity="${fl}"/>` : '');
+    return i;
+  }
+  window.seek = (t) => draw(t);
+
+  /* ---------- transport ---------- */
+  const audio = document.getElementById('audio');
+  const playBtn = document.getElementById('play');
+  const big = document.getElementById('bigplay');
+  const scrub = document.getElementById('scrub');
+  const time = document.getElementById('time');
+  const marks = document.getElementById('marks');
+  const nowName = document.getElementById('nowname');
+  const nowText = document.getElementById('nowtext');
+  const fmt = (s) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, '0')}`;
+  marks.innerHTML = SHOTS.map(
+    (s, i) => `<div class="mark" style="width:${((s.t[1] - s.t[0]) / 30) * 100}%">${i + 1}</div>`,
+  ).join('');
+
+  let playing = false,
+    t = 0,
+    t0Wall = 0,
+    t0 = 0,
+    useAudio = true,
+    lastShot = -1;
+  function show(tt) {
+    const i = draw(tt);
+    scrub.value = tt;
+    time.textContent = `${fmt(tt)} / 0:30`;
+    if (i !== lastShot) {
+      lastShot = i;
+      const s = SHOTS[i];
+      nowName.innerHTML = `${i + 1}. ${s.name}<small>${fmt(s.t[0])}–${fmt(s.t[1])}</small>`;
+      nowText.textContent = s.what;
+      [...marks.children].forEach((m, j) => m.classList.toggle('on', j === i));
+    }
+  }
+  function clock() {
+    if (useAudio && !audio.paused) return audio.currentTime;
+    return t0 + (performance.now() - t0Wall) / 1000;
+  }
+  function tick() {
+    if (!playing) return;
+    t = clock();
+    if (t >= 30) {
+      pause();
+      t = 30;
+      show(29.999);
+      return;
+    }
+    show(t);
+    requestAnimationFrame(tick);
+  }
+  function play() {
+    if (t >= 29.99) t = 0;
+    playing = true;
+    big.hidden = true;
+    playBtn.textContent = '❚❚ Pause';
+    t0 = t;
+    t0Wall = performance.now();
+    try {
+      audio.currentTime = t;
+      const p = audio.play();
+      if (p && p.catch) p.catch(() => (useAudio = false));
+    } catch (e) {
+      useAudio = false;
+    }
+    requestAnimationFrame(tick);
+  }
+  function pause() {
+    playing = false;
+    playBtn.textContent = '▶ Play';
+    try {
+      audio.pause();
+    } catch (e) {}
+  }
+  playBtn.addEventListener('click', () => (playing ? pause() : play()));
+  big.addEventListener('click', play);
+  audio.addEventListener('error', () => (useAudio = false));
+  scrub.addEventListener('input', () => {
+    t = parseFloat(scrub.value);
+    if (playing) {
+      t0 = t;
+      t0Wall = performance.now();
+      try {
+        audio.currentTime = t;
+      } catch (e) {}
+    }
+    show(Math.min(t, 29.999));
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' && e.key !== ' ') return;
+    if (e.key === ' ') {
+      e.preventDefault();
+      playing ? pause() : play();
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      t = clamp(t + (e.key === 'ArrowRight' ? 0.5 : -0.5), 0, 29.999);
+      if (playing) {
+        t0 = t;
+        t0Wall = performance.now();
+        try {
+          audio.currentTime = t;
+        } catch (e2) {}
+      }
+      show(t);
+    }
+  });
+  if (/[?&]render/.test(location.search)) document.body.classList.add('render');
+  /* open on a frame that shows what this is */
+  t = 0;
+  show(2.15);
+  scrub.value = 0;
+  time.textContent = `${fmt(0)} / 0:30`;
+</script>

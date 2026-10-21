@@ -1,0 +1,986 @@
+<title>Battle of Builds Trailer</title>
+<meta name="claude:viewport-fit-sides" content="cover" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap"
+/>
+<style>
+  /* Layout: a film storyboard sheet. A 30 s timeline strip on top, then one row per shot: frame sketch left, notes right. */
+  :root {
+    --bg: #0f1016; /* the game's own theme colour */
+    --panel: #171821;
+    --rule: #2b2c3a;
+    --ink: #e6dcc6; /* bone */
+    --muted: #9a927f;
+    --torch: #d98a3a; /* the one accent: torchlight */
+    --display: 'IM Fell English SC', 'Iowan Old Style', Georgia, serif;
+    --body: 'Alegreya Sans', 'Gill Sans', 'Segoe UI', sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    color-scheme: dark;
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding-block: 40px 64px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    display: grid;
+    gap: 40px;
+  }
+  header {
+    display: grid;
+    gap: 10px;
+  }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--torch);
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(36px, 6vw, 60px);
+    line-height: 1.05;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .lede {
+    max-width: 68ch;
+    color: var(--muted);
+    margin: 0;
+  }
+  .lede b {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .specs b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* timeline */
+  .timeline {
+    display: grid;
+    gap: 8px;
+  }
+  .tl-scroll {
+    overflow-x: auto;
+  }
+  .tl {
+    position: relative;
+    min-width: 640px;
+    height: 92px;
+  }
+  .tl .acts,
+  .tl .shots {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+  }
+  .tl .acts {
+    top: 0;
+    height: 24px;
+  }
+  .tl .shots {
+    top: 30px;
+    height: 34px;
+  }
+  .tl .act {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-left: 1px solid var(--rule);
+    padding-left: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .tl .shot {
+    border: 1px solid var(--rule);
+    border-right: 0;
+    background: var(--panel);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .tl .shot:last-child {
+    border-right: 1px solid var(--rule);
+  }
+  .tl .shot:hover,
+  .tl .shot:focus-visible {
+    background: var(--torch);
+    color: var(--bg);
+    outline: none;
+  }
+  .tl .beats {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 68px;
+    height: 24px;
+  }
+  .tl .tick {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    background: var(--rule);
+    height: 6px;
+  }
+  .tl .tick.bar {
+    height: 12px;
+    background: var(--muted);
+  }
+  .tl .sec {
+    position: absolute;
+    top: 12px;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .legend {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* the text cards, read in order */
+  .script {
+    display: grid;
+    gap: 10px;
+  }
+  .script h2 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 26px;
+    margin: 0;
+  }
+  .script ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 0;
+  }
+  .script li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: var(--display);
+    font-size: 20px;
+  }
+  .script li + li::before {
+    content: '/';
+    color: var(--rule);
+    margin: 0 12px;
+  }
+  .script li span {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* acts and shots */
+  .act-h {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    border-top: 1px solid var(--rule);
+    padding-top: 18px;
+    flex-wrap: wrap;
+  }
+  .act-h h2 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 28px;
+    margin: 0;
+  }
+  .act-h span {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .act-h p {
+    flex-basis: 100%;
+    margin: 0;
+    color: var(--muted);
+    max-width: 70ch;
+  }
+  section.act {
+    display: grid;
+    gap: 28px;
+  }
+  article.shot {
+    display: grid;
+    grid-template-columns: minmax(0, 46%) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+    scroll-margin-top: 16px;
+  }
+  .frame {
+    display: grid;
+    gap: 6px;
+  }
+  .frame svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--rule);
+    background: #07070b;
+  }
+  .frame .cap {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .frame .cap b {
+    color: var(--torch);
+    font-weight: 600;
+  }
+  .notes {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+  }
+  .notes h3 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 24px;
+    margin: 0;
+    line-height: 1.15;
+  }
+  dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 6px 14px;
+  }
+  dt {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-top: 3px;
+  }
+  dd {
+    margin: 0;
+  }
+  dd.txt {
+    font-family: var(--display);
+    font-size: 19px;
+    color: var(--ink);
+  }
+  dd.alt {
+    font-size: 14px;
+    color: var(--muted);
+    font-style: italic;
+  }
+  dd.cap {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  /* closing */
+  .two {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 28px;
+  }
+  .two h2 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 26px;
+    margin: 0 0 8px;
+  }
+  .two ul,
+  .two ol {
+    margin: 0;
+    padding-left: 20px;
+    display: grid;
+    gap: 6px;
+  }
+  .two li::marker {
+    color: var(--torch);
+  }
+  .q {
+    color: var(--muted);
+  }
+  .q b,
+  .two b {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  code {
+    font-family: var(--mono);
+    font-size: 0.85em;
+  }
+
+  @media (max-width: 720px) {
+    article.shot {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+    }
+    dl {
+      grid-template-columns: 64px minmax(0, 1fr);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .flicker {
+      animation: flick 3.2s infinite;
+    }
+    @keyframes flick {
+      0%,
+      100% {
+        opacity: 0.9;
+      }
+      40% {
+        opacity: 0.7;
+      }
+      55% {
+        opacity: 1;
+      }
+      70% {
+        opacity: 0.8;
+      }
+    }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Storyboard · draft 9 · 2026-10-21</div>
+    <h1>Battle of Builds: the 30-second trailer</h1>
+    <p class="lede">
+      For players who love ARPGs and roguelikes. The pitch: <b>every run is a new build</b>, crafted
+      from the tree, linked gems and rolled gear, and taken
+      <b>from level 1 to 100 in a single sitting</b>. Then the build you made
+      <b>duels other players' builds for a place on the high scores</b>. Every shot is real
+      gameplay; only the text and the edit are made for the trailer.
+    </p>
+    <ul class="specs">
+      <li><b>30.0 s</b> · 12 shots</li>
+      <li><b>16:9</b> 1920×1080, 60 fps</li>
+      <li><b>Music</b> 120 bpm, 15 bars of 2 s</li>
+      <li><b>Text</b> on cards and overlays, no voice-over</li>
+    </ul>
+  </header>
+
+  <section class="timeline" aria-label="Timeline">
+    <div class="tl-scroll"><div class="tl" id="tl"></div></div>
+    <p class="legend">
+      Acts on top, shots in the middle (tap one to jump to it), bars and beats at the bottom. Cuts
+      land on beats; the big hits land on bar lines.
+    </p>
+  </section>
+
+  <section class="script" aria-label="On-screen text">
+    <h2>Every line of text, in order</h2>
+    <ol id="script"></ol>
+  </section>
+
+  <div id="acts"></div>
+
+  <section class="two">
+    <div>
+      <h2>Capture notes</h2>
+      <ul>
+        <li>
+          Record in the browser at 1920×1080 with the Interface size at its default; hide the cursor
+          except in the crafting inserts. Shot 6 is the exception: three portrait recordings from a
+          real phone, so the trailer shows the game plays there too.
+        </li>
+        <li>
+          Prepare six late saves, one per class, each with a different main skill and damage colour:
+          the Vanguard and Shade for the two runs, the Strider, Reaver and Zealot for the phone
+          shot, the Mystic for the climb. Any one of them can be the duellist.
+        </li>
+        <li>
+          <b>Showcase</b> on the title screen auto-plays a run; the <b>Skill gallery</b> plays one
+          skill against three dummies at down to 0.25× speed for clean slow motion. The Debug panel
+          (dev build or <code>?debug</code>) forces a biome so each cut is set up on purpose.
+        </li>
+        <li>
+          The high scores and rival names are staged: duel snapshots named oostin, Sin and Eli (real
+          players, names used with their say-so) and the made-up Gravewick, marrowbyte, Tessaly and
+          Ninefingers. Shoot on a local or test database so the live board is untouched.
+        </li>
+        <li>
+          Every name on screen is the game's own. Before export, check that no frame shows anything
+          from the reference game.
+        </li>
+      </ul>
+    </div>
+    <div>
+      <h2>Open questions</h2>
+      <ol class="q">
+        <li>
+          <b>The duel line.</b> "Duel their builds. Take the top spot." is the draft; alternatives
+          are under shot 9.
+        </li>
+        <li><b>Music:</b> licensed track, or a 30 s cue written to this cut sheet?</li>
+      </ol>
+    </div>
+  </section>
+</div>
+
+<script>
+  const ACTS = [
+    {
+      id: 'hook',
+      name: 'Hook',
+      span: '0:00–0:02',
+      note: 'An endgame build at full power. No text. The first frame should already look like the genre the viewer loves.',
+    },
+    {
+      id: 'builds',
+      name: 'New run, new build',
+      span: '0:02–0:12.5',
+      note: 'The selling point. Two full runs show the crafting, the tree, linked gems and a drop for the build, then three more classes fight side by side. Five builds in ten seconds.',
+    },
+    {
+      id: 'climb',
+      name: 'The climb',
+      span: '0:12.5–0:19',
+      note: 'A whole build, level 1 to 100, in one sitting, and then it falls. The fall is shown, not captioned.',
+    },
+    {
+      id: 'duel',
+      name: 'Duels and the board',
+      span: '0:19–0:25',
+      note: 'The arcade loop: the finished build fights other players’ builds, its Elo moves, and its name climbs the high scores.',
+    },
+    {
+      id: 'title',
+      name: 'The mashup',
+      span: '0:25–0:30',
+      note: 'The genre mix is the selling point, so it gets said outright, then the name, the price and where to play.',
+    },
+  ];
+
+  const SHOTS = [
+    {
+      act: 'hook',
+      t: [0, 2],
+      name: 'Endgame',
+      frame: 'endgame',
+      screen:
+        'Cold open on map 80-something: a late build tears through a packed room, traps bursting violet, a ring of blades, critical strike numbers stacking up. The camera holds wide so the whole screen is busy.',
+      sound:
+        'Trap spires on the first beats, then the first full hit at 1.5 s on the biggest burst.',
+      cap: 'A late save on a Packed map (Debug panel). Several takes; keep the busiest two seconds.',
+    },
+    {
+      act: 'builds',
+      t: [2, 3],
+      name: 'Pick a class',
+      frame: 'classes',
+      text: 'New run. New build.',
+      screen: 'The class screen flicks through classes on the beats and lands on the Vanguard.',
+      sound: 'A click per class, on the eighth notes.',
+      cap: 'Class select, cursor stepping across the cards.',
+    },
+    {
+      act: 'builds',
+      t: [3, 6],
+      name: 'Run one: the Vanguard',
+      frame: 'runA',
+      screen:
+        'Insert (1 s): the passive tree, a path of nodes lighting up towards a keystone. Then the payoff (2 s): the Vanguard in a Forge, a fire slam cracking the floor, the pack thrown apart in orange.',
+      sound: 'Node chimes, then the slam on the beat at 5 s.',
+      cap: 'Tree tab with points to spend; a fire slam build on a Forge map.',
+    },
+    {
+      act: 'builds',
+      t: [6, 10.5],
+      name: 'Run two: the Shade',
+      frame: 'runB',
+      screen:
+        'Insert (1 s): a support gem dropped into a linked socket, the damage per second jumping, the change in green. Then the payoff (2 s): the Shade in Ruins throwing Spire Traps in arcs; they spring into violet spires across the pack. The last kill drops a rare amulet for this build in a beam of gold (0.5 s), and its card shows the gains, lightning damage and critical strike chance, before Equip (1 s).',
+      sound:
+        'Socket click and a rising tick, the traps going off on the beats, a chime for the drop, a click on Equip.',
+      cap: 'Skills tab, a support with a big jump; a trap build on a Ruins map; a rare that suits the build in the bag to drop and equip. The amulet’s lines in the animatic are illustrative; use a real roll.',
+    },
+    {
+      act: 'builds',
+      t: [10.5, 12.5],
+      name: 'Three more builds',
+      frame: 'triptych',
+      screen:
+        'Three more builds, one for each class not yet shown, side by side in upright phone-shaped panels with rounded corners, each fighting its own way on its own rhythm: a Strider loosing a fast stream of poison arrows into a rat swarm, a Reaver’s slow, heavy sword sweeps through armoured knights with big numbers, a Zealot dropping a totem that spreads holy ground and pulses beams at wraiths. The Mystic turns up in the climb. No hands, no device bezels; the shape alone says it runs on a phone.',
+      sound:
+        'Each panel’s own sounds on its own rhythm: arrow rattles, sweep whooshes, totem chimes.',
+      cap: 'Three more late saves (Strider, Reaver, Zealot), each recorded on a real phone in portrait (the game’s phone layout and HUD), laid side by side in the edit.',
+    },
+    {
+      act: 'climb',
+      t: [12.5, 16],
+      name: 'Level 1 to 100',
+      frame: 'climb',
+      text: 'Grind to level 100 in a sitting.',
+      screen:
+        'Seven half-second cuts, each a different build in a different place, with a different skill against different enemies: a cleave through skeletons in a Crypt corridor, a fireball into a brute in a Forge, a frost nova freezing spiders in a Cavern, lightning chaining through wraiths among Ruins pillars, a plague cloud over rats in a Marsh, a holy slam on knights in a Shrine, and a ring of blades round a towering brute at map 63. The map number jumps with each cut and stops at 63, the map the character falls on in the next shot.',
+      sound: 'A riser across the whole shot.',
+      cap: 'Showcase at 8× for the footage; the rolling number is made in the edit.',
+    },
+    {
+      act: 'climb',
+      t: [16, 19],
+      name: 'The fall',
+      frame: 'fallen',
+      screen:
+        'A boss’s signature attack: it raises its arms and the light drains, a vast rune closes on the character, a column of void slams down on the beat, the screen shakes and the floor shatters. The character falls, and the shot holds on the body for a full second while the room goes dark. Then the end screen; the duel button is pressed.',
+      sound:
+        'The music stops for the boss’s charge, a huge low impact, then silence through the pause, and a bell on the button.',
+      cap: 'A run that dies to a boss; end screen with rivals switched on.',
+    },
+    {
+      act: 'duel',
+      t: [19, 22.5],
+      name: 'The duel',
+      frame: 'duel',
+      text: 'Duel their builds.',
+      screen:
+        'The round arena: our character against Sin, whose name sits on a boss bar. Ranged against melee: one kites and shoots, the other closes in. Slow motion on the deciding hit, held for half a beat.',
+      sound:
+        'The groove keeps going through the held frame; the deciding hit gets a restrained crash.',
+      cap: 'A duel at normal speed against the staged rival “Sin”; several takes, keep the closest.',
+    },
+    {
+      act: 'duel',
+      t: [22.5, 23.5],
+      name: 'The rating',
+      frame: 'elo',
+      screen: 'The result line: “Rated · 712 → 748”, the number counting up.',
+      sound: 'A rising tone as the number climbs.',
+      cap: 'Result screen of a first (rated) duel.',
+    },
+    {
+      act: 'duel',
+      t: [23.5, 25],
+      name: 'The board',
+      frame: 'board',
+      text: 'Take the top spot.',
+      alt: 'Alternatives: “Climb the board.” · “Beat their builds. Take their spot.” · “Your build against everyone’s.”',
+      screen:
+        'High scores, Sin at the top (the first to beat the game), then oostin, Eli, Gravewick, marrowbyte, Tessaly, Ninefingers. Our character’s row slides up past two of them, arcade style.',
+      sound: 'An arcade-style tick per place gained.',
+      cap: 'High scores on the title screen, from the staged snapshots.',
+    },
+    {
+      act: 'title',
+      t: [25, 27],
+      name: 'The genres',
+      frame: 'genres',
+      text: 'Arcade. ARPG. Roguelike. Autobattler.',
+      screen:
+        'All four words on screen at once, in four panels that appear one per beat, each over footage that proves it: Arcade over the high scores, ARPG over the passive tree and a loot drop, Roguelike over a run’s end screen, Autobattler over the character fighting on its own at 8×.',
+      sound: 'Four hits, one per word, on the beats.',
+      cap: 'Made in the edit from leftover footage of shots 3, 7 and 10.',
+    },
+    {
+      act: 'title',
+      t: [27, 30],
+      name: 'Battle of Builds',
+      frame: 'logo',
+      text: 'Battle of Builds · Free on itch.io',
+      screen:
+        'The title stamps in over the genre grid, which stays on screen dimmed, with “Free on itch.io” under it. It holds for three seconds; the torch gutters out on the last frame.',
+      sound:
+        'The last genre hit carries into the title at 27 s; the drone rings out and the torch hisses out at 30 s.',
+      cap: 'Made in the edit.',
+    },
+  ];
+
+  const fmt = (s) => {
+    const m = Math.floor(s / 60),
+      r = s - m * 60;
+    return m + ':' + (r < 10 ? '0' : '') + (Number.isInteger(r) ? r : r.toFixed(1));
+  };
+
+  /* ---- frame sketches (viewBox 320×180) ---- */
+  const C = {
+    bone: '#e8dcc0',
+    fire: '#ff8a3a',
+    cold: '#8fd3ff',
+    light: '#a97cf2',
+    chaos: '#74d36c',
+    life: '#c23a32',
+    mana: '#3b6fd2',
+    torch: '#d98a3a',
+    wall: '#6b3a2c',
+    floor: '#2d3a32',
+    dim: '#4a4b5c',
+    ui: '#1d1e29',
+    uiLine: '#3a3b4c',
+    mute: '#9a927f',
+  };
+  const floor = (cx, cy, w, h, fill) =>
+    `<polygon points="${cx},${cy - h} ${cx + w},${cy} ${cx},${cy + h} ${cx - w},${cy}" fill="${fill || C.floor}" opacity=".55"/>`;
+  const hero = (x, y, col) =>
+    `<g><ellipse cx="${x}" cy="${y + 12}" rx="7" ry="2.5" fill="#000" opacity=".5"/><rect x="${x - 4}" y="${y - 6}" width="8" height="14" rx="2" fill="${col || C.bone}"/><circle cx="${x}" cy="${y - 10}" r="4" fill="${col || C.bone}"/></g>`;
+  const skel = (x, y, o) =>
+    `<g opacity="${o || 1}"><rect x="${x - 3}" y="${y - 4}" width="6" height="11" fill="none" stroke="${C.bone}" stroke-width="1.2"/><circle cx="${x}" cy="${y - 8}" r="3" fill="none" stroke="${C.bone}" stroke-width="1.2"/><circle cx="${x - 1}" cy="${y - 8}" r=".8" fill="${C.fire}"/><circle cx="${x + 1.2}" cy="${y - 8}" r=".8" fill="${C.fire}"/></g>`;
+  const ring = (x, y, rx, col, w) =>
+    `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${rx / 2}" fill="none" stroke="${col}" stroke-width="${w || 1.5}"/>`;
+  const num = (x, y, t, col, s) =>
+    `<text x="${x}" y="${y}" font-family="JetBrains Mono, monospace" font-size="${s || 10}" font-weight="600" fill="${col}">${t}</text>`;
+  const say = (x, y, t, s, col) =>
+    `<text x="${x}" y="${y}" text-anchor="middle" font-family="IM Fell English SC, Georgia, serif" font-size="${s || 18}" fill="${col || C.bone}">${t}</text>`;
+  const label = (x, y, t) =>
+    `<text x="${x}" y="${y}" font-family="JetBrains Mono, monospace" font-size="7" fill="${C.mute}">${t}</text>`;
+  const globes = (lf) =>
+    `<circle cx="20" cy="162" r="13" fill="${C.life}" opacity="${lf ?? 1}"/><circle cx="300" cy="162" r="13" fill="${C.mana}"/>`;
+  const panel = (x, y, w, h) =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="${C.ui}" stroke="${C.uiLine}"/>`;
+  const glow = (x, y, r, col, o) =>
+    `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g-${col.slice(1)})" opacity="${o || 1}"/>`;
+  const defs = (cols) =>
+    `<defs>${cols.map((c) => `<radialGradient id="g-${c.slice(1)}"><stop offset="0" stop-color="${c}" stop-opacity=".55"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`).join('')}</defs>`;
+  const caption = (t) =>
+    `<rect x="0" y="146" width="320" height="34" fill="#000" opacity=".6"/>` + say(160, 170, t, 16);
+  /* a small inset showing the crafting layer, top-right */
+  const inset = (body, title) =>
+    `<rect x="196" y="8" width="116" height="66" rx="2" fill="${C.ui}" stroke="${C.torch}"/>` +
+    label(202, 20, title) +
+    body;
+  const pack = (pts, o) => pts.map(([x, y]) => skel(x, y, o)).join('');
+
+  const FRAMES = {
+    endgame: () =>
+      defs([C.light, C.fire]) +
+      floor(160, 100, 150, 62) +
+      glow(110, 90, 60, C.light, 0.9) +
+      glow(220, 108, 60, C.fire, 0.7) +
+      [
+        [96, 84],
+        [128, 96],
+        [112, 112],
+      ]
+        .map(
+          ([x, y]) =>
+            `<polygon points="${x},${y - 26} ${x - 4},${y} ${x + 4},${y}" fill="${C.light}" opacity=".85"/>` +
+            ring(x, y, 14, C.light, 1),
+        )
+        .join('') +
+      ring(170, 100, 34, C.bone, 1) +
+      `<rect x="200" y="98" width="10" height="2" fill="${C.bone}"/><rect x="132" y="102" width="10" height="2" fill="${C.bone}"/>` +
+      hero(170, 96) +
+      pack(
+        [
+          [90, 104],
+          [120, 82],
+          [214, 92],
+          [230, 112],
+          [200, 122],
+          [246, 98],
+          [104, 120],
+        ],
+        0.8,
+      ) +
+      num(84, 64, '18,442', C.light, 12) +
+      num(212, 76, '9,207', C.fire, 11) +
+      num(132, 140, '21,960!', C.bone, 13) +
+      label(8, 14, 'MAP 84 · PACKED') +
+      globes(0.9),
+    classes: () =>
+      ['Vanguard', 'Strider', 'Mystic', 'Reaver', 'Zealot', 'Shade']
+        .map(
+          (n, i) =>
+            `<rect x="${12 + i * 50}" y="40" width="44" height="74" rx="2" fill="${C.ui}" stroke="${i === 0 ? C.torch : C.uiLine}" stroke-width="${i === 0 ? 2 : 1}"/>` +
+            hero(
+              34 + i * 50,
+              70,
+              ['#c0503a', '#5aa04a', '#5a78d0', '#d09a3a', '#d0c070', '#9a5ac0'][i],
+            ) +
+            `<text x="${34 + i * 50}" y="106" text-anchor="middle" font-family="Alegreya Sans, sans-serif" font-size="8" fill="${C.bone}">${n}</text>`,
+        )
+        .join('') + caption('New run. New build.'),
+    runA: () => {
+      const tree =
+        [
+          [210, 50, 228, 38],
+          [228, 38, 248, 46],
+          [248, 46, 266, 34],
+          [266, 34, 290, 44],
+        ]
+          .map(
+            ([a, b, c, d]) =>
+              `<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke="${C.torch}" stroke-width="2"/>`,
+          )
+          .join('') +
+        [
+          [210, 50, 3],
+          [228, 38, 3],
+          [248, 46, 3],
+          [266, 34, 3],
+          [290, 44, 6],
+        ]
+          .map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${C.torch}"/>`)
+          .join('') +
+        `<circle cx="226" cy="62" r="3" fill="${C.ui}" stroke="${C.mute}"/><circle cx="270" cy="62" r="3" fill="${C.ui}" stroke="${C.mute}"/>`;
+      return (
+        defs([C.fire]) +
+        floor(130, 112, 130, 52, '#3a2a22') +
+        glow(120, 110, 70, C.fire) +
+        ring(120, 110, 30, C.fire, 2) +
+        ring(120, 110, 50, C.fire, 1) +
+        `<path d="M120 110 l-18 6 l-10 -4 M120 110 l14 9 l12 -2 M120 110 l4 -12" stroke="#000" stroke-width="1.5" fill="none"/>` +
+        hero(112, 98, '#c0503a') +
+        pack(
+          [
+            [170, 92],
+            [180, 118],
+            [64, 124],
+            [76, 92],
+          ],
+          0.9,
+        ) +
+        num(160, 80, '6,310', C.fire, 12) +
+        label(8, 14, 'VANGUARD · FORGE') +
+        inset(tree, 'TREE → KEYSTONE')
+      );
+    },
+    runB: () => {
+      const gems =
+        [0, 1, 2]
+          .map(
+            (i) =>
+              `<circle cx="${214 + i * 22}" cy="44" r="7" fill="${i === 2 ? C.light : C.ui}" stroke="${i === 2 ? C.light : C.mute}" stroke-width="1.5"/>` +
+              (i < 2
+                ? `<line x1="${221 + i * 22}" y1="44" x2="${229 + i * 22}" y2="44" stroke="${C.mute}" stroke-width="2"/>`
+                : ''),
+          )
+          .join('') +
+        `<circle cx="214" cy="44" r="4" fill="${C.light}" opacity=".7"/><circle cx="236" cy="44" r="4" fill="${C.bone}" opacity=".6"/>` +
+        num(264, 40, '1,240', C.mute, 8) +
+        num(264, 56, '3,980', C.chaos, 10);
+      return (
+        defs([C.light]) +
+        floor(130, 112, 130, 52, '#2a2a33') +
+        glow(150, 106, 70, C.light) +
+        [
+          [60, 120, 110, 92],
+          [60, 120, 150, 112],
+          [60, 120, 186, 98],
+        ]
+          .map(
+            ([a, b, c, d]) =>
+              `<path d="M${a} ${b} Q${(a + c) / 2} ${b - 50} ${c} ${d}" stroke="${C.light}" stroke-dasharray="3 2" fill="none"/>`,
+          )
+          .join('') +
+        [
+          [110, 92],
+          [150, 112],
+          [186, 98],
+        ]
+          .map(
+            ([x, y]) =>
+              `<polygon points="${x},${y - 28} ${x - 3},${y} ${x + 3},${y}" fill="${C.light}" opacity=".9"/>` +
+              ring(x, y, 10, C.light, 1),
+          )
+          .join('') +
+        hero(60, 112, '#9a5ac0') +
+        pack(
+          [
+            [120, 100],
+            [160, 120],
+            [196, 106],
+            [140, 88],
+          ],
+          0.8,
+        ) +
+        label(8, 14, 'SHADE · RUINS · SPIRE TRAP') +
+        inset(gems, 'LINK A SUPPORT')
+      );
+    },
+    triptych: () =>
+      [
+        ['#22301f', C.chaos, '#5aa04a', 'STRIDER'],
+        ['#2e2a24', C.bone, '#d09a3a', 'REAVER'],
+        ['#2e2b1c', '#e8c45a', '#d0c070', 'ZEALOT'],
+      ]
+        .map(([fl, fx, col, nm], i) => {
+          const x = 44 + i * 82,
+            cx = x + 33;
+          return (
+            `<rect x="${x}" y="8" width="66" height="146" rx="8" fill="${fl}" stroke="${C.uiLine}"/>` +
+            `<ellipse cx="${cx}" cy="86" rx="40" ry="44" fill="${fx}" opacity=".16"/>` +
+            ring(cx, 92, 18, fx, 1.5) +
+            hero(cx, 86, col) +
+            skel(cx - 18, 70, 0.8) +
+            skel(cx + 17, 104, 0.8) +
+            `<circle cx="${x + 10}" cy="144" r="5" fill="${C.life}"/><circle cx="${x + 56}" cy="144" r="5" fill="${C.mana}"/>` +
+            label(x + 6, 20, nm)
+          );
+        })
+        .join('') + label(44, 172, 'THREE PHONE RECORDINGS, NO DEVICE FRAMES'),
+    climb: () => {
+      const cols = ['#2d3a32', '#3a2a22', '#28324a', '#2a2a33', '#33302a', '#2a3a2a'];
+      return (
+        cols
+          .map(
+            (c, i) =>
+              `<rect x="${i * 54}" y="0" width="52" height="180" fill="${c}" opacity="${0.35 + i * 0.1}"/>` +
+              hero(i * 54 + 26, 104, C.bone) +
+              num(i * 54 + 8, 22, 'MAP ' + [4, 12, 21, 31, 41, 63][i], C.torch, 8),
+          )
+          .join('') +
+        `<rect x="0" y="66" width="320" height="50" fill="#000" opacity=".6"/>` +
+        say(160, 98, 'Grind to level 100 in a sitting.', 17)
+      );
+    },
+    fallen: () =>
+      defs([C.fire]) +
+      floor(160, 100, 150, 60) +
+      `<ellipse cx="150" cy="104" rx="70" ry="30" fill="${C.fire}" opacity=".18" stroke="${C.fire}"/>` +
+      `<rect x="200" y="50" width="16" height="26" fill="${C.wall}"/><circle cx="208" cy="44" r="7" fill="${C.wall}"/>` +
+      `<g transform="rotate(80 150 108)">${hero(150, 104, C.bone)}</g>` +
+      `<circle cx="20" cy="162" r="13" fill="${C.ui}" stroke="${C.uiLine}"/><circle cx="300" cy="162" r="13" fill="${C.mana}"/>` +
+      label(8, 14, 'NO TEXT · THE DEATH SPEAKS'),
+    genres: () =>
+      ['Arcade.', 'ARPG.', 'Roguelike.', 'Autobattler.']
+        .map(
+          (w, i) =>
+            `<rect x="${2 + (i % 2) * 159}" y="${2 + Math.floor(i / 2) * 89}" width="157" height="87" fill="${['#2a2614', '#28324a', '#2a1416', '#2d3a32'][i]}" opacity=".7" stroke="${C.uiLine}"/>` +
+            label(
+              8 + (i % 2) * 159,
+              14 + Math.floor(i / 2) * 89,
+              ['HIGH SCORES', 'TREE + LOOT', 'END SCREEN', 'FIGHTING AT 8×'][i] +
+                ' · BEAT ' +
+                (i + 1),
+            ) +
+            say(80 + (i % 2) * 159, 54 + Math.floor(i / 2) * 89, w, 20),
+        )
+        .join(''),
+    duel: () =>
+      defs([C.cold, C.fire]) +
+      `<ellipse cx="160" cy="104" rx="130" ry="56" fill="${C.floor}" opacity=".5" stroke="${C.dim}" stroke-width="2"/>` +
+      glow(110, 110, 50, C.cold, 0.7) +
+      glow(214, 92, 50, C.fire, 0.7) +
+      hero(110, 108, C.bone) +
+      hero(214, 90, '#c9a77a') +
+      `<line x1="118" y1="104" x2="200" y2="92" stroke="${C.cold}" stroke-width="2"/><line x1="140" y1="101" x2="170" y2="97" stroke="#fff" stroke-width="2"/>` +
+      ring(214, 104, 22, C.fire, 1.5) +
+      num(222, 70, '2,904', C.cold, 12) +
+      panel(80, 8, 160, 12) +
+      `<rect x="82" y="10" width="40" height="8" fill="${C.life}"/>` +
+      label(86, 30, 'SIN · REAVER · LV 71') +
+      globes(0.6) +
+      caption('Duel their builds.'),
+    elo: () =>
+      panel(70, 34, 180, 100) +
+      say(160, 66, 'Victory', 22, C.torch) +
+      `<text x="160" y="96" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" fill="${C.mute}">Rated · 712 <tspan fill="${C.chaos}" font-weight="600">→ 748</tspan></text>` +
+      label(114, 118, 'ELO · FIRST FIGHT VS THIS RIVAL'),
+    board: () => {
+      const rows = [
+        ['Sin', 'Reaver', 1184],
+        ['oostin', 'Shade', 1092],
+        ['Gravewick', 'Zealot', 968],
+        ['Eli', 'Strider', 901],
+        ['YOU', 'Mystic', 748],
+        ['marrowbyte', 'Vanguard', 731],
+        ['Tessaly', 'Mystic', 702],
+        ['Ninefingers', 'Shade', 655],
+      ];
+      return (
+        panel(40, 8, 240, 132) +
+        label(50, 22, 'HIGH SCORES') +
+        rows
+          .map(
+            ([n, c, r], i) =>
+              `<rect x="48" y="${28 + i * 13}" width="224" height="11" fill="${n === 'YOU' ? C.torch : i % 2 ? C.ui : '#20212d'}"/>` +
+              `<text x="54" y="${36.5 + i * 13}" font-family="JetBrains Mono, monospace" font-size="7.5" fill="${n === 'YOU' ? '#0f1016' : C.bone}">${i + 1}. ${n === 'YOU' ? '(our character)' : n}</text>` +
+              `<text x="170" y="${36.5 + i * 13}" font-family="JetBrains Mono, monospace" font-size="7.5" fill="${n === 'YOU' ? '#0f1016' : C.mute}">${c}</text>` +
+              `<text x="264" y="${36.5 + i * 13}" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="7.5" fill="${n === 'YOU' ? '#0f1016' : C.bone}">${r}</text>`,
+          )
+          .join('') +
+        `<path d="M282 96 l0 -22 m-4 4 l4 -4 l4 4" stroke="${C.chaos}" fill="none" stroke-width="1.5"/>` +
+        caption('Take the top spot.')
+      );
+    },
+    logo: () =>
+      defs([C.torch]) +
+      `<g class="flicker">${glow(160, 80, 120, C.torch, 0.6)}</g>` +
+      say(160, 82, 'Battle of Builds', 30) +
+      say(160, 116, 'Free on itch.io', 16, C.torch),
+  };
+
+  /* ---- timeline ---- */
+  const pct = (s) => (s / 30) * 100 + '%';
+  let acts = '<div class="acts">',
+    shots = '<div class="shots">',
+    beats = '<div class="beats">';
+  ACTS.forEach((a) => {
+    const ss = SHOTS.filter((s) => s.act === a.id);
+    acts += `<div class="act" style="width:${pct(ss.at(-1).t[1] - ss[0].t[0])}">${a.name}</div>`;
+  });
+  SHOTS.forEach(
+    (s, i) =>
+      (shots += `<a class="shot" href="#shot-${i + 1}" style="width:${pct(s.t[1] - s.t[0])}" title="${s.name}">${i + 1}</a>`),
+  );
+  for (let b = 0; b <= 60; b++) {
+    const sec = b / 2;
+    beats += `<div class="tick${b % 4 === 0 ? ' bar' : ''}" style="left:${pct(sec)}"></div>`;
+    if (b % 4 === 0) beats += `<div class="sec" style="left:${pct(sec)}">${sec}s</div>`;
+  }
+  document.getElementById('tl').innerHTML = acts + '</div>' + shots + '</div>' + beats + '</div>';
+
+  /* ---- the script ---- */
+  document.getElementById('script').innerHTML = SHOTS.filter((s) => s.text)
+    .map((s) => `<li><span>${fmt(s.t[0])}</span>${s.text}</li>`)
+    .join('');
+
+  /* ---- shots ---- */
+  let html = '',
+    n = 0;
+  ACTS.forEach((a) => {
+    html += `<section class="act" aria-labelledby="act-${a.id}"><div class="act-h"><h2 id="act-${a.id}">${a.name}</h2><span>${a.span}</span><p>${a.note}</p></div>`;
+    SHOTS.filter((s) => s.act === a.id).forEach((s) => {
+      n++;
+      html += `<article class="shot" id="shot-${n}">
+      <div class="frame"><svg viewBox="0 0 320 180" role="img" aria-label="Sketch of shot ${n}: ${s.name}">${FRAMES[s.frame]()}</svg>
+        <div class="cap"><span><b>${String(n).padStart(2, '0')}</b> · ${fmt(s.t[0])}–${fmt(s.t[1])}</span><span>${(s.t[1] - s.t[0]).toFixed(1)} s</span></div></div>
+      <div class="notes"><h3>${s.name}</h3><dl>
+        ${s.text ? `<dt>Text</dt><dd class="txt">${s.text}</dd>` : ''}
+        ${s.alt ? `<dt></dt><dd class="alt">${s.alt}</dd>` : ''}
+        <dt>Picture</dt><dd>${s.screen}</dd>
+        <dt>Sound</dt><dd>${s.sound}</dd>
+        <dt>Capture</dt><dd class="cap">${s.cap}</dd>
+      </dl></div></article>`;
+    });
+    html += '</section>';
+  });
+  document.getElementById('acts').innerHTML = html;
+</script>
