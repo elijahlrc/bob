@@ -335,6 +335,56 @@
     return `<g opacity="${o}">${b}</g>`;
   };
 
+  /* the end of the Shade's run: the last kill drops a rare amulet that suits a lightning trap build */
+  const shadeLoot = (k) => {
+    if (k < 0.5) {
+      let s = floor(130, 112, 140, 56, '#2a2a33') + glow(150, 106, 80, C.light, 0.25);
+      const drop = ease(k / 0.15);
+      s += `<rect x="183" y="${-10}" width="6" height="${108 * drop}" fill="${C.gold}" opacity="${0.5 * (1 - clamp((k - 0.15) / 0.35)) + 0.15}"/>`;
+      s +=
+        glow(186, 98, 26, C.gold, 0.8) +
+        `<circle cx="186" cy="${lerp(60, 98, drop)}" r="3" fill="${C.gold}"/>`;
+      s +=
+        `<g opacity="${clamp((k - 0.12) / 0.1)}">` +
+        `<rect x="160" y="74" width="52" height="11" fill="#000" opacity=".75" stroke="${C.gold}" stroke-width=".6"/>` +
+        txt(186, 82, 'Gale Knot', { size: 6.5, font: 'body', col: C.gold, anchor: 'middle' }) +
+        '</g>';
+      s += hero(lerp(60, 150, ease(k / 0.5)), 104, '#9a5ac0');
+      return s + label(8, 14, 'SHADE · RUINS · THE LAST KILL DROPS') + globes(0.9);
+    }
+    const j = k - 0.5;
+    const a = ease(j / 0.15);
+    let s = txt(16, 22, 'Items', { size: 9, col: C.mute });
+    s +=
+      `<g opacity="${a}" transform="translate(0 ${(1 - a) * 12})">` +
+      panel(90, 30, 140, 112, C.gold);
+    s +=
+      txt(100, 46, 'Gale Knot', { size: 11, font: 'display', col: C.gold }) +
+      txt(220, 46, 'Rare amulet', { size: 6.5, col: C.mute, anchor: 'end' });
+    const lines = [
+      '+24% increased Lightning Damage',
+      '+31% increased Critical Strike Chance',
+      '+38 to Dexterity',
+      '+54 to maximum Life',
+    ];
+    lines.forEach((l, i) => {
+      if (j > 0.15 + i * 0.08)
+        s += txt(100, 64 + i * 13, l, { size: 7.5, col: C.chaos, font: 'body' });
+    });
+    const pressed = j > 0.7;
+    s += `<rect x="100" y="118" width="120" height="16" rx="2" fill="${pressed ? '#f0b070' : C.torch}"/>`;
+    s +=
+      txt(160, 129.5, 'Equip', {
+        size: 9,
+        font: 'body',
+        weight: 700,
+        col: C.ink,
+        anchor: 'middle',
+      }) + '</g>';
+    if (pressed) s += glow(160, 126, 60, C.torch, clamp(1 - (j - 0.7) / 0.25));
+    return s;
+  };
+
   /* ---------- the shots ---------- */
   const SHOTS = [
     {
@@ -483,11 +533,12 @@
       },
     },
     {
-      t: [6, 9],
+      t: [6, 10.5],
       name: 'Run two: the Shade',
-      what: 'A support gem goes into a link and the damage jumps, then Spire Traps thrown across Ruins, springing on the beats.',
+      what: 'A support gem goes into a link and the damage jumps, then Spire Traps thrown across Ruins, springing on the beats. The last kill drops a rare amulet for the build; it is compared and equipped.',
       push: 0.05,
       draw(lt) {
+        if (lt >= 3) return shadeLoot(lt - 3);
         if (lt < 1) {
           let s = txt(16, 22, 'Skills', { size: 9, col: C.mute });
           const xs = [80, 130, 180];
@@ -546,69 +597,7 @@
       },
     },
     {
-      t: [9, 11],
-      name: 'Run three: the Mystic',
-      what: 'A rare drop compared and equipped, then minions pouring into the pack in a Cavern, surging on the bar line at 12 s.',
-      push: 0.05,
-      draw(lt) {
-        if (lt < 0.6) {
-          lt /= 0.6;
-          const k = ease(lt / 0.25);
-          let s = txt(16, 22, 'Items', { size: 9, col: C.mute });
-          s +=
-            `<g opacity="${k}" transform="translate(0 ${(1 - k) * 12})">` +
-            panel(90, 30, 140, 112, C.gold);
-          s += txt(100, 46, 'Gloomweave Mantle', { size: 10, font: 'display', col: C.gold });
-          const lines = [
-            ['+74 to maximum Life', C.chaos],
-            ['+31% to Cold Resistance', C.chaos],
-            ['+1 to Level of Minion Gems', C.chaos],
-            ['−12 Energy Shield', C.life],
-          ];
-          lines.forEach(([l, c], i) => {
-            if (lt > 0.25 + i * 0.1)
-              s += txt(100, 64 + i * 13, l, { size: 7.5, col: c, font: 'body' });
-          });
-          const pressed = lt > 0.8;
-          s += `<rect x="100" y="118" width="120" height="16" rx="2" fill="${pressed ? '#f0b070' : C.torch}"/>`;
-          s +=
-            txt(160, 129.5, 'Equip', {
-              size: 9,
-              font: 'body',
-              weight: 700,
-              col: C.ink,
-              anchor: 'middle',
-            }) + '</g>';
-          return s;
-        }
-        const k = lt - 0.6;
-        const surge = 0.4;
-        let s = floor(130, 112, 140, 56, '#28324a') + glow(130, 110, 80, C.cold, 0.35);
-        const pack = [
-          [176, 100],
-          [190, 118],
-          [168, 128],
-          [200, 96],
-        ];
-        pack.forEach(([x, y], i) => (s += skel(x, y, deadAfter(surge + i * 0.08, k) * 0.85)));
-        for (let i = 0; i < 7; i++) {
-          const f = clamp((k - i * 0.04) / 0.4);
-          const tx = 170 + (i % 3) * 12,
-            ty = 100 + (i % 4) * 7;
-          const x = lerp(70, tx, ease(f)) + Math.sin(k * 9 + i) * 2,
-            y = lerp(108, ty, ease(f)) + Math.cos(k * 7 + i) * 2;
-          s += `<circle cx="${x}" cy="${y}" r="4" fill="${C.cold}" opacity=".9"/><circle cx="${x}" cy="${y}" r="7" fill="none" stroke="${C.chaos}" stroke-width=".8" opacity=".6"/>`;
-        }
-        s +=
-          burst(182, 110, C.cold, surge, k, 60, 3) + burst(182, 110, C.chaos, surge + 0.1, k, 40);
-        s +=
-          floatNum(170, 86, '7,412', C.cold, surge, k, 12) +
-          floatNum(196, 100, '2,951', C.chaos, surge + 0.1, k);
-        return s + hero(60, 104, '#5a78d0') + label(8, 14, 'MYSTIC · CAVERN · MINIONS') + globes(1);
-      },
-    },
-    {
-      t: [11, 13],
+      t: [10.5, 12.5],
       name: 'Three more builds',
       what: 'The other three classes side by side in phone-shaped panels, each fighting its own way on its own rhythm: rapid poison arrows, slow heavy sweeps, a totem pulsing on holy ground.',
       draw(lt) {
@@ -751,7 +740,7 @@
       },
     },
     {
-      t: [13, 16.5],
+      t: [12.5, 16],
       name: 'Level 1 to 100',
       what: 'Half-second cuts, each a different build in a different place, using different skills against different enemies; the map number rolls up to 100.',
       draw(lt) {
@@ -919,7 +908,7 @@
       },
     },
     {
-      t: [16.5, 19],
+      t: [16, 19],
       name: 'The fall',
       what: 'A boss’s signature attack: the light drains, a vast rune closes on the character, a column of void slams down and the floor shatters. The character falls. Then the end screen, the duel button pressed. No text.',
       draw(lt) {
@@ -973,7 +962,7 @@
           return s + label(8, 14, 'BOSS · SIGNATURE ATTACK');
         }
         const k = lt - 1.85;
-        const pressed = k > 0.25;
+        const pressed = k > 0.4;
         let s =
           panel(60, 26, 200, 116) +
           txt(160, 50, 'Fallen on map 63', {
@@ -990,7 +979,7 @@
           col: C.ink,
           anchor: 'middle',
         });
-        if (pressed) s += glow(160, 75, 90, C.torch, clamp(1 - (k - 0.25) / 0.3));
+        if (pressed) s += glow(160, 75, 90, C.torch, clamp(1 - (k - 0.4) / 0.3));
         s += `<rect x="84" y="100" width="152" height="6" fill="${C.mute}" opacity=".4"/><rect x="84" y="112" width="120" height="6" fill="${C.mute}" opacity=".3"/>`;
         return s;
       },
@@ -1179,7 +1168,7 @@
         const out = clamp((lt - 2.6) / 0.4);
         /* the genre grid stays, dimmed, under the title */
         let s =
-          SHOTS[11].draw(2 + lt) +
+          SHOTS.find((x) => x.name === 'The genres').draw(2 + lt) +
           `<rect width="320" height="180" fill="#07070b" opacity="${lerp(0, 0.8, ease(lt / 0.25)) + 0.2 * out}"/>`;
         s += glow(160, 80, 130, C.torch, flick * (1 - out));
         s +=
@@ -1199,7 +1188,7 @@
   ];
 
   /* hard cuts that land on a hit get a short flash */
-  const FLASH = [1.5, 5.0, 10.0, 17.0, 22.25, 25.0, 25.5, 26.0, 26.5, 27.0];
+  const FLASH = [1.5, 5.0, 16.5, 22.25, 25.0, 25.5, 26.0, 26.5, 27.0];
 
   const svg = document.getElementById('svg');
   function draw(t) {

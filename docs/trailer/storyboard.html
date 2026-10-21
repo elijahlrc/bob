@@ -379,7 +379,7 @@
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">Storyboard · draft 8 · 2026-10-21</div>
+    <div class="eyebrow">Storyboard · draft 9 · 2026-10-21</div>
     <h1>Battle of Builds: the 30-second trailer</h1>
     <p class="lede">
       For players who love ARPGs and roguelikes. The pitch: <b>every run is a new build</b>, crafted
@@ -389,7 +389,7 @@
       gameplay; only the text and the edit are made for the trailer.
     </p>
     <ul class="specs">
-      <li><b>30.0 s</b> · 13 shots</li>
+      <li><b>30.0 s</b> · 12 shots</li>
       <li><b>16:9</b> 1920×1080, 60 fps</li>
       <li><b>Music</b> 120 bpm, 15 bars of 2 s</li>
       <li><b>Text</b> on cards and overlays, no voice-over</li>
@@ -422,8 +422,8 @@
         </li>
         <li>
           Prepare six late saves, one per class, each with a different main skill and damage colour:
-          the Vanguard, Shade and Mystic for the three runs, the Strider, Reaver and Zealot for the
-          phone shot. Any one of them can be the duellist.
+          the Vanguard and Shade for the two runs, the Strider, Reaver and Zealot for the phone
+          shot, the Mystic for the climb. Any one of them can be the duellist.
         </li>
         <li>
           <b>Showcase</b> on the title screen auto-plays a run; the <b>Skill gallery</b> plays one
@@ -469,13 +469,13 @@
     {
       id: 'builds',
       name: 'New run, new build',
-      span: '0:02–0:13',
-      note: 'The selling point. Three runs, three classes, three colours, and each shows one layer of the crafting: the tree, linked gems, rolled gear. Together they show the whole depth in eleven seconds.',
+      span: '0:02–0:12.5',
+      note: 'The selling point. Two full runs show the crafting, the tree, linked gems and a drop for the build, then three more classes fight side by side. Five builds in ten seconds.',
     },
     {
       id: 'climb',
       name: 'The climb',
-      span: '0:13–0:19',
+      span: '0:12.5–0:19',
       note: 'A whole build, level 1 to 100, in one sitting, and then it falls. The fall is shown, not captioned.',
     },
     {
@@ -526,38 +526,29 @@
     },
     {
       act: 'builds',
-      t: [6, 9],
+      t: [6, 10.5],
       name: 'Run two: the Shade',
       frame: 'runB',
       screen:
-        'Insert (1 s): a support gem dropped into a linked socket, the damage per second jumping, the change in green. Then the payoff (2 s): the Shade in Ruins throwing Spire Traps in arcs; they spring into violet spires across the pack.',
-      sound: 'Socket click and a rising tick, then the traps going off on the beats.',
-      cap: 'Skills tab, a support with a big jump; a trap build on a Ruins map.',
+        'Insert (1 s): a support gem dropped into a linked socket, the damage per second jumping, the change in green. Then the payoff (2 s): the Shade in Ruins throwing Spire Traps in arcs; they spring into violet spires across the pack. The last kill drops a rare amulet for this build in a beam of gold (0.5 s), and its card shows the gains, lightning damage and critical strike chance, before Equip (1 s).',
+      sound:
+        'Socket click and a rising tick, the traps going off on the beats, a chime for the drop, a click on Equip.',
+      cap: 'Skills tab, a support with a big jump; a trap build on a Ruins map; a rare that suits the build in the bag to drop and equip. The amulet’s lines in the animatic are illustrative; use a real roll.',
     },
     {
       act: 'builds',
-      t: [9, 11],
-      name: 'Run three: the Mystic',
-      frame: 'runC',
-      screen:
-        'Insert (0.6 s): a rare item drops, its card compared against what is worn, the gains in colour, and it goes on. Then the payoff (1.4 s): the Mystic in a Cavern with a crowd of minions pouring into the pack, cold and chaos glinting.',
-      sound: 'Item drop chime, then the minions surge on the bar line at 10 s.',
-      cap: 'Items tab with a clear upgrade; a minion build on a Cavern map.',
-    },
-    {
-      act: 'builds',
-      t: [11, 13],
+      t: [10.5, 12.5],
       name: 'Three more builds',
       frame: 'triptych',
       screen:
-        'Three more builds, one for each class not yet shown, side by side in upright phone-shaped panels with rounded corners, each fighting its own way on its own rhythm: a Strider loosing a fast stream of poison arrows into a rat swarm, a Reaver’s slow, heavy sword sweeps through armoured knights with big numbers, a Zealot dropping a totem that spreads holy ground and pulses beams at wraiths. Six classes, six builds in thirteen seconds. No hands, no device bezels; the shape alone says it runs on a phone.',
+        'Three more builds, one for each class not yet shown, side by side in upright phone-shaped panels with rounded corners, each fighting its own way on its own rhythm: a Strider loosing a fast stream of poison arrows into a rat swarm, a Reaver’s slow, heavy sword sweeps through armoured knights with big numbers, a Zealot dropping a totem that spreads holy ground and pulses beams at wraiths. The Mystic turns up in the climb. No hands, no device bezels; the shape alone says it runs on a phone.',
       sound:
         'Each panel’s own sounds on its own rhythm: arrow rattles, sweep whooshes, totem chimes.',
       cap: 'Three more late saves (Strider, Reaver, Zealot), each recorded on a real phone in portrait (the game’s phone layout and HUD), laid side by side in the edit.',
     },
     {
       act: 'climb',
-      t: [13, 16.5],
+      t: [12.5, 16],
       name: 'Level 1 to 100',
       frame: 'climb',
       text: 'Grind to level 100 in a sitting.',
@@ -568,7 +559,7 @@
     },
     {
       act: 'climb',
-      t: [16.5, 19],
+      t: [16, 19],
       name: 'The fall',
       frame: 'fallen',
       screen:
@@ -836,48 +827,6 @@
         inset(gems, 'LINK A SUPPORT')
       );
     },
-    runC: () => {
-      const item =
-        `<rect x="204" y="28" width="60" height="40" fill="${C.ui}" stroke="#e8c45a"/>` +
-        [0, 1, 2, 3]
-          .map(
-            (i) =>
-              `<rect x="208" y="${33 + i * 8}" width="${[46, 36, 42, 30][i]}" height="4" fill="${[C.chaos, C.chaos, C.bone, C.chaos][i]}" opacity="${i === 2 ? 0.4 : 0.85}"/>`,
-          )
-          .join('') +
-        `<path d="M276 58 l0 -16 m-4 4 l4 -4 l4 4" stroke="${C.chaos}" fill="none" stroke-width="1.5"/>`;
-      const minions = [
-        [96, 110],
-        [112, 96],
-        [128, 116],
-        [144, 100],
-        [104, 126],
-        [150, 124],
-      ]
-        .map(
-          ([x, y]) =>
-            `<circle cx="${x}" cy="${y}" r="4" fill="${C.cold}" opacity=".85"/><circle cx="${x}" cy="${y}" r="7" fill="none" stroke="${C.chaos}" stroke-width=".8" opacity=".6"/>`,
-        )
-        .join('');
-      return (
-        defs([C.cold]) +
-        floor(130, 112, 130, 52, '#28324a') +
-        glow(130, 110, 70, C.cold) +
-        minions +
-        hero(60, 108, '#5a78d0') +
-        pack(
-          [
-            [176, 100],
-            [190, 118],
-            [168, 128],
-          ],
-          0.8,
-        ) +
-        label(8, 14, 'MYSTIC · CAVERN · MINIONS') +
-        inset(item, 'A RARE DROP')
-      );
-    },
-    /* the three builds side by side, each in a phone's upright frame */
     triptych: () =>
       [
         ['#22301f', C.chaos, '#5aa04a', 'STRIDER'],
