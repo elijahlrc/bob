@@ -334,7 +334,7 @@ export function skillSlots(w: World): SkillSlot[] {
           look,
           'No cost',
           `Cooldown ${secs(src.def.cooldown)}`,
-          `${triggerText(src.def, src.self)}.${cooling ? `Cooling down, ${secs(left)} left` : 'Waiting for its trigger'}`,
+          `${triggerText(src.def, src.self)}. ${cooling ? `Cooling down, ${secs(left)} left` : 'Waiting for its trigger'}`,
         ),
       });
     }
