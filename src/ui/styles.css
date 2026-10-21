@@ -951,6 +951,22 @@ select option {
 .hud-reprieve.used {
   border-color: #5a5a68;
   color: #8d8fa8;
+  /* The moment a reprieve fires its badge flashes once, so the effect on the map is tied to the item. */
+  animation: reprieve-flash 1s ease-out;
+}
+@keyframes reprieve-flash {
+  0% {
+    border-color: #fff2c0;
+    color: #fff8e0;
+    background: rgba(255, 230, 160, 0.55);
+    box-shadow: 0 0 14px #ffe6a0;
+  }
+  100% {
+    border-color: #5a5a68;
+    color: #8d8fa8;
+    background: rgba(20, 17, 26, 0.8);
+    box-shadow: none;
+  }
 }
 .hud-showcase {
   position: absolute;

@@ -16,6 +16,7 @@ import {
 import { BIOMES, forceBiome, type BiomeId } from '../data/biomes';
 import { CLASSES, classDef } from '../data/classes';
 import { DENSITIES, forceDensity, type DensityId } from '../data/density';
+import { REPRIEVES } from '../data/reprieves';
 import type { Controller } from '../run/controller';
 import { botBuild } from '../run/duelBot';
 import { debugEnabled } from './debugFlag';
@@ -177,6 +178,22 @@ function DuelRow({ c }: { c: Controller }) {
   );
 }
 
+/** Put a reprieve in the pouch, to see it fire on the next map (docs/DUEL-BALANCE.md 3). */
+function ReprieveRow({ c }: { c: Controller }) {
+  const [full, setFull] = useState(false);
+  return (
+    <div class="debug-row">
+      <span class="debug-label">Reprieve</span>
+      {REPRIEVES.map((r) => (
+        <button key={r.id} class="btn small" onClick={() => setFull(!c.debugGiveProvision(r.id))}>
+          {r.name}
+        </button>
+      ))}
+      {full && <span class="muted">Pouch full</span>}
+    </div>
+  );
+}
+
 /**
  * The difficulty controls (docs/ENEMIES.md 8.3): scaling, base difficulty and variance. At camp they edit the run in
  * progress (from the next map on); on the title screen they set the next new run. Hidden unless `debugEnabled()`.
@@ -216,6 +233,7 @@ export function DebugPanel({ c }: { c: Controller }) {
       <summary>Debug: difficulty and maps</summary>
       <MapLooks />
       {atCamp && <DuelRow c={c} />}
+      {atCamp && <ReprieveRow c={c} />}
       <div class="muted">
         {atCamp
           ? 'Changes apply from the next map you start.'

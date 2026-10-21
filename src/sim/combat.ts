@@ -523,7 +523,15 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   }
   let dtype = 0;
   for (let i = 1; i < 5; i++) if (res.dmg[i] > res.dmg[dtype]) dtype = i;
-  w.events.push({ t: 'hit', src: src.id, dst: dst.id, amount: res.total, crit: res.crit, dtype });
+  w.events.push({
+    t: 'hit',
+    src: src.id,
+    dst: dst.id,
+    amount: res.total,
+    crit: res.crit,
+    dtype,
+    ...(dst.isPlayer && invulnerable(dst.side!) ? { immune: true } : {}),
+  });
   if (how) noteHit(w, dst, how, res.total, res.crit);
   if (dst.isPlayer) logDamage(w, dst, src, src.name, dtype, res.total);
   src.since.hit = 0;
@@ -1027,7 +1035,15 @@ export function rawHit(
     dmg[i] *= (1 + dst.hex.vulnAll) * (1 + st.vulnType[i]);
   }
   const total = dmg[0] + dmg[1] + dmg[2] + dmg[3] + dmg[4];
-  w.events.push({ t: 'hit', src: 0, dst: dst.id, amount: total, crit: false, dtype: type });
+  w.events.push({
+    t: 'hit',
+    src: 0,
+    dst: dst.id,
+    amount: total,
+    crit: false,
+    dtype: type,
+    ...(dst.isPlayer && invulnerable(dst.side!) ? { immune: true } : {}),
+  });
   if (dst.isPlayer) logDamage(w, dst, null, label, type, total, via);
   // The map report: an effect on the character is its own row (a blast counts as a hit), one on a monster is the skill's or the
   // minion's; a minion's blow is the minion's wherever it lands.

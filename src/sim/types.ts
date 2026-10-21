@@ -418,9 +418,18 @@ export type FlaskState = {
 };
 
 export type SimEvent =
-  /** A Reprieve fired (docs/WAYSIDE.md 7): the character was pulled out of the map, or stood up again. */
-  | { t: 'reprieve'; how: 'retreat' | 'revive'; id: string }
-  | { t: 'hit'; src: number; dst: number; amount: number; crit: boolean; dtype: number }
+  /** A Reprieve fired (docs/WAYSIDE.md 7): the character (`src`) was pulled out of the map, or stood up again. */
+  | { t: 'reprieve'; src: number; how: 'retreat' | 'revive'; id: string }
+  /** `immune`: it struck a character that cannot be hurt just after a Revive, so it dealt nothing. */
+  | {
+      t: 'hit';
+      src: number;
+      dst: number;
+      amount: number;
+      crit: boolean;
+      dtype: number;
+      immune?: boolean;
+    }
   | { t: 'dot'; dst: number; amount: number }
   | { t: 'miss'; src: number; dst: number }
   | { t: 'block'; src: number; dst: number }

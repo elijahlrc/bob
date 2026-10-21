@@ -3,7 +3,9 @@ import { Rng } from '../../../core/rng';
 import { HIT_AT } from '../../../data/constants';
 import { beamMotifOf, motifOf } from '../../../calc/areaLook';
 import { factionOfSpec, leavesBody } from '../../../data/monsters';
+import { reprieveDef } from '../../../data/reprieves';
 import { revealed } from '../../../sim/movement';
+import { PULSE_RADIUS } from '../../../sim/reprieve';
 import { telegraphs, type Telegraph } from '../../../sim/telegraph';
 import type {
   Actor,
@@ -117,6 +119,8 @@ export class GrimStyle extends StyleBase {
   private lightsOwned: Phaser.GameObjects.Light[] = [];
   private em!: Record<string, Emitter>;
   private gfx!: Phaser.GameObjects.Graphics;
+  /** The ward of a character that cannot be hurt just after a Revive, drawn over the figures every frame. */
+  private ward!: Phaser.GameObjects.Graphics;
   private bolts: Bolt[] = [];
   private fx!: SkillFx;
   private enc!: EncounterFx;
@@ -234,6 +238,8 @@ export class GrimStyle extends StyleBase {
     this.makeEmitters();
     this.gfx = s.add.graphics().setDepth(600);
     this.owned.push(this.gfx);
+    this.ward = s.add.graphics().setDepth(95500).setBlendMode(Phaser.BlendModes.ADD);
+    this.owned.push(this.ward);
     this.fx?.destroy();
     const host: FxHost = {
       project: (x, y) => this.project(x, y),
@@ -1276,6 +1282,63 @@ export class GrimStyle extends StyleBase {
     }
   }
 
+  /** A column of light rising from a character's feet that widens and fades (a reprieve). */
+  private column(x: number, y: number, color: number, ms: number): void {
+    const beam = this.scene.add
+      .image(x, y, 'g_beam')
+      .setOrigin(0.5, 1)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setTint(color)
+      .setDepth(96000)
+      .setScale(1.6, 2.4);
+    this.scene.tweens.add({
+      targets: beam,
+      alpha: 0,
+      scaleX: 3,
+      duration: ms,
+      onComplete: () => beam.destroy(),
+    });
+  }
+
+  /** A ring on the ground that grows from a character to `r` tiles and fades. */
+  private ringOut(x: number, y: number, r: number, color: number, ms: number): void {
+    const g = this.scene.add.graphics().setDepth(700).setBlendMode(Phaser.BlendModes.ADD);
+    g.setPosition(x, y);
+    const w = this.rpx(r) * 2;
+    g.lineStyle(3, color, 0.9).strokeEllipse(0, 0, w, w * this.squash());
+    g.setScale(0.15);
+    this.scene.tweens.add({
+      targets: g,
+      scale: 1,
+      alpha: 0,
+      duration: ms,
+      ease: 'Cubic.easeOut',
+      onComplete: () => g.destroy(),
+    });
+  }
+
+  /**
+   * The ward of each character that cannot be hurt just after a Revive: a shell about the figure that thins as the seconds run
+   * out. It is read from the side every frame, so a paused or a sped-up game shows it as it is.
+   */
+  private drawWards(world: World): void {
+    const g = this.ward;
+    g.clear();
+    for (const side of world.sides) {
+      const left = side.reprieve.invulnT;
+      if (left <= 0 || !side.player.alive) continue;
+      const last = side.reprieve.fired[side.reprieve.fired.length - 1];
+      const total = (last && reprieveDef(last).invuln) || 1;
+      const k = Math.min(1, left / total);
+      const pp = this.sidePos(side);
+      const { x, y } = this.project(pp.x, pp.y);
+      const pulse = 0.85 + 0.15 * Math.sin(this.time * 10);
+      g.fillStyle(0xfff2c0, 0.08 * k * pulse).fillEllipse(x, y - 11, 26, 30);
+      g.lineStyle(1.5, 0xfff2c0, (0.25 + 0.5 * k) * pulse).strokeEllipse(x, y - 11, 26, 30);
+      g.lineStyle(1, 0xffe8a0, 0.5 * k).strokeEllipse(x, y + 1, 22, 11);
+    }
+  }
+
   /** A minion of any side (minions are not in `world.actors`). */
   private minionById(id: number): Actor | null {
     for (const side of this.world.sides) {
@@ -1335,6 +1398,12 @@ export class GrimStyle extends StyleBase {
           ? (this.byId.get(e.src) ?? world.actors.find((a) => a.id === e.src))
           : undefined;
         const amt = Math.round(e.amount);
+        // A character that cannot be hurt just after a Revive: the hit glances off the ward.
+        if (e.immune) {
+          em.spark.explode(4, p.x, p.y - 8);
+          this.floater(p.x, p.y - 14, 'Immune', 0xfff2c0, false);
+          break;
+        }
         // The viewer's own character: red numbers and the screen shakes; the rival of a duel bleeds without the shake.
         const own = isViewer(dst);
         if (dst.isPlayer) {
@@ -1494,6 +1563,31 @@ export class GrimStyle extends StyleBase {
         if (p) em.spark.explode(8, p.x, p.y - 22);
         break;
       }
+      case 'reprieve': {
+        const side = this.sideOf(world, e.src);
+        const pp = this.sidePos(side);
+        const p = this.project(pp.x, pp.y);
+        const def = reprieveDef(e.id);
+        if (e.how === 'retreat') {
+          // A Retreat: the figure leaves in a column of pale light.
+          this.flash(p.x, p.y - 10, 0xbfe8ff, 2.4, 0.9);
+          em.mote.explode(40, p.x, p.y - 8);
+          this.column(p.x, p.y, 0xbfe8ff, 1400);
+          const v = this.views.get(side.player.id) as View | undefined;
+          if (v) this.scene.tweens.add({ targets: v.data.sprite, alpha: 0, duration: 700 });
+        } else {
+          // A Revive: a pale burst, motes rising, a short ring; Last Spark's ring reaches as far as it throws monsters back.
+          this.flash(p.x, p.y - 10, 0xfff2c0, 2.6, 0.9);
+          em.mote.explode(36, p.x, p.y - 8);
+          em.spark.explode(24, p.x, p.y - 8);
+          this.column(p.x, p.y, 0xfff2c0, 900);
+          this.ringOut(p.x, p.y, 1.6, 0xfff2c0, 450);
+          if (def.pulse) this.ringOut(p.x, p.y, PULSE_RADIUS, 0xffd27a, 650);
+          this.shake = Math.max(this.shake, 2.5);
+        }
+        this.floater(p.x, p.y - 30, def.name, 0xfff2c0, true);
+        break;
+      }
       case 'levelUp': {
         const who = this.sideOf(world, e.src).player;
         const p = this.project(who.x, who.y);
@@ -1599,6 +1693,7 @@ export class GrimStyle extends StyleBase {
         cam.height / cam.zoom,
       ),
     } as never);
+    this.drawWards(world);
     // Ailment effects on actors.
     for (const a of world.actors) {
       if (!a.alive) continue;

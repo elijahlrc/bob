@@ -62,8 +62,8 @@ describe('a duel on the map screen', () => {
       [4, 55],
     ] as const) {
       const c = atCamp();
-      c.setSpeed(speed);
       c.startDuel(a, b, 3);
+      c.setSpeed(speed);
       frames(c, dtMs);
       const got = c.lastDuel!.result;
       expect(got.winner, `speed ${speed}`).toBe(want.winner);
@@ -81,8 +81,8 @@ describe('a duel on the map screen', () => {
     const want = runDuel(a, b, 3, opts);
     expect(want.how).not.toBe('death');
     const c = atCamp();
-    c.setSpeed(8);
     c.startDuel(a, b, 3, opts);
+    c.setSpeed(8);
     frames(c, 100);
     const got = c.lastDuel!.result;
     expect([got.winner, got.how, got.time]).toEqual([want.winner, want.how, want.time]);
@@ -160,8 +160,8 @@ describe('a duel on the map screen', () => {
     // Frames after it do nothing.
     for (let i = 0; i < 5; i++) c.bus.emit('frame', { dtMs: 100 });
     expect(c.screen).toBe('camp');
-    c.setSpeed(8);
     c.startDuel(c.run!.build, starter('strider', 2), 1);
+    c.setSpeed(8);
     frames(c, 100);
     expect(c.screen).toBe('duelResult');
     c.leaveDuel();
@@ -171,8 +171,8 @@ describe('a duel on the map screen', () => {
 
   it('started with no run, it goes back to the title screen and leaves no run behind', () => {
     const c = new Controller(null);
-    c.setSpeed(8);
     c.startDuel(starter('mystic', 1), starter('zealot', 2), 1);
+    c.setSpeed(8);
     expect(c.duel!.from).toBe('title');
     frames(c, 100);
     expect(c.screen).toBe('duelResult');
@@ -186,11 +186,27 @@ describe('a duel on the map screen', () => {
     const c = atCamp();
     const a = c.run!.build;
     const snapshot = JSON.stringify(a);
-    c.setSpeed(8);
     c.startDuel(a, a, 2);
+    c.setSpeed(8);
     frames(c, 100);
     expect(JSON.stringify(a)).toBe(snapshot);
     expect(c.duel!.a).not.toBe(a);
+  });
+
+  it('starts every fight at 1× and unpaused, Again included, and leaving puts back the speed the run had', () => {
+    const c = atCamp();
+    c.setSpeed(8);
+    c.togglePause();
+    c.startDuel(c.run!.build, starter('strider', 2), 1);
+    expect([c.speed, c.paused]).toEqual([1, false]);
+    c.setSpeed(4);
+    frames(c, 100);
+    expect(c.screen).toBe('duelResult');
+    c.againDuel();
+    expect([c.speed, c.paused]).toEqual([1, false]);
+    c.leaveDuel();
+    expect(c.screen).toBe('camp');
+    expect([c.speed, c.paused]).toEqual([8, true]);
   });
 
   it('names the two characters (the boss bar shows the rival by it) and a map after a duel is a map again', () => {

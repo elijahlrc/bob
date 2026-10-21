@@ -146,8 +146,8 @@ function onSummary(pool: Rival[] | null = null) {
 }
 
 function fightRival(c: Controller, rival: Rival) {
-  c.setSpeed(8);
   expect(c.startRivalDuel(rival, '41', 'Wren')).toBe(true);
+  c.setSpeed(8);
   for (let i = 0; i < 20000 && c.screen === 'map'; i++) c.bus.emit('frame', { dtMs: 100 });
   expect(c.screen).toBe('duelResult');
 }
@@ -156,8 +156,8 @@ describe('the result of a duel', () => {
   it('is Again and Back for the Debug panel’s duel, with no word of a rating', () => {
     const c = new Controller(null);
     c.startRun('vanguard', 1);
-    c.setSpeed(8);
     c.startDuel(c.run!.build, starter('strider', 2), 3);
+    c.setSpeed(8);
     for (let i = 0; i < 20000 && c.screen === 'map'; i++) c.bus.emit('frame', { dtMs: 100 });
     const view = DuelResultView({ c });
     expect(labels(view)).toEqual(['Again', 'Back']);

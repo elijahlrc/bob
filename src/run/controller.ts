@@ -24,7 +24,13 @@ import { CLASSES, classDef } from '../data/classes';
 import { botCamp } from './bot';
 import { takeStop, type StopChoice } from './stops';
 import { waysideOf } from './wayside';
-import { armProvision, disarmProvision, readyReprieves, startProvisions } from './provisions';
+import {
+  addProvision,
+  armProvision,
+  disarmProvision,
+  readyReprieves,
+  startProvisions,
+} from './provisions';
 import type { ProvisionId } from '../data/provisions';
 import type { CraftResult } from './craft';
 import type { MapOffer } from './offers';
@@ -97,6 +103,8 @@ export type DuelMode = {
   watch: DuelWatch;
   /** Set for a fight against a rival (`startRivalDuel`); null for the Debug panel's. */
   rival: RivalFight | null;
+  /** The game's speed and pause before the duel: every fight starts at 1× (people watch them), and leaving puts these back. */
+  runSpeed: { speed: number; paused: boolean };
 };
 
 /**
@@ -358,6 +366,7 @@ export class Controller {
       from: back,
       watch: duelWatch(opts),
       rival: null,
+      runSpeed: this.duel?.runSpeed ?? { speed: this.speed, paused: this.paused },
     });
     return true;
   }
@@ -416,6 +425,8 @@ export class Controller {
     this.world = null;
     this.duel = null;
     this.lastDuel = null;
+    this.speed = d.runSpeed.speed;
+    this.paused = d.runSpeed.paused;
     this.goTo(to ?? d.from);
   }
 
@@ -428,6 +439,9 @@ export class Controller {
     this.lastDuel = null;
     this.world = world;
     this.acc = 0;
+    // Every fight, Again included, starts at 1× and unpaused: duels are watched, and some are over in seconds.
+    this.speed = 1;
+    this.paused = false;
     this.screen = 'map';
     this.bus.emit('select', { id: null });
     this.bus.emit('mapStart', { world: this.world });
@@ -616,6 +630,14 @@ export class Controller {
     if (!run || run.phase !== 'camp' || this.screen !== 'camp') return;
     run.difficulty = clampDifficulty({ ...run.difficulty, ...d });
     this.changed();
+  }
+
+  /** Debug panel: put a provision (a reprieve, say) in the pouch of the run in progress (camp only). False when it is full. */
+  debugGiveProvision(id: ProvisionId): boolean {
+    const run = this.run;
+    if (!run || this.screen !== 'camp' || !addProvision(run, id)) return false;
+    this.changed();
+    return true;
   }
 
   /** Start the next map with one of the offered maps. */

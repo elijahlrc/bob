@@ -4,7 +4,7 @@ import type { World } from './types';
 import type { Side } from './side';
 
 /** Monsters within this many tiles of a Revive are thrown back and stunned. */
-const PULSE_RADIUS = 6;
+export const PULSE_RADIUS = 6;
 const PULSE_KNOCK = 4;
 const PULSE_STUN = 1.5;
 
@@ -59,12 +59,12 @@ export function reprieveFires(w: World, s: Side): boolean {
   for (const f of s.flasks) f.charges = f.spec.maxCharges;
   if (def.family === 'retreat') {
     w.status = 'abandoned';
-    w.events.push({ t: 'reprieve', how: 'retreat', id: def.id });
+    w.events.push({ t: 'reprieve', src: p.id, how: 'retreat', id: def.id });
     w.events.push({ t: 'abandoned' });
     return true;
   }
   s.reprieve.invulnT = def.invuln ?? 0;
-  w.events.push({ t: 'reprieve', how: 'revive', id: def.id });
+  w.events.push({ t: 'reprieve', src: p.id, how: 'revive', id: def.id });
   if (def.pulse) {
     for (const m of w.actors) {
       if (m.isPlayer || m.team !== 1 || !m.alive) continue;

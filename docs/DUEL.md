@@ -3,7 +3,7 @@
 Status: **F0 to F5 built on 2026-10-16, F6 and F7 on 2026-10-17** (the plan was the second draft of 2026-10-16, after the user rejected the
 two-world engine of the first); the plan is complete but for section 13 (the nightly verifier and what else was left out), and
 `docs/rivals.sql` is applied to the project; the screens of F7 have not been seen in a browser, see "Built: F7" under section 7 ·
-Owner: the user · Author: Claude
+Owner: the user · Author: Claude. The balance of a duel (reprieves, a life curve, the end rules) is re-planned in [DUEL-BALANCE.md](DUEL-BALANCE.md) (2026-10-20)
 
 A duel is a real fight, watched in the game, between the player's character and a **rival**: a snapshot of another player's
 character (class, level, passive tree, gems, items and Strategy settings) taken when that player's run ended. The rival is
