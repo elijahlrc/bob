@@ -79,6 +79,11 @@
   font-size: 12px;
   white-space: nowrap;
 }
+.sx-dps {
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--accent, inherit);
+}
 .sx-move {
   margin-left: auto;
   display: flex;

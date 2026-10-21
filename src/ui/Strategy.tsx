@@ -87,6 +87,11 @@ function SkillRow(p: {
           {choice.skill.utility ? 'utility' : 'damage'}
           {starred ? ' · ★' : ''}
         </span>
+        {!choice.skill.utility && (
+          <span class="sx-dps" title="Used on its own, all the time, against one enemy">
+            {f0(ch.skillSheet(choice).totalDps)} DPS single target
+          </span>
+        )}
         {list.length > 1 && (
           <span class="sx-move">
             <button
