@@ -47,15 +47,17 @@ function mapClip(
   return {
     name,
     viewport: opts.viewport,
-    zoom: opts.zoom ?? (opts.viewport ? 1.5 : 2.5),
+    zoom: opts.zoom ?? (opts.viewport ? 2 : 2.5),
     css: BARE,
     async film(t) {
       await t.stage(
         (S, c, _g, a) => {
           const run = S.stagedRun(a.loadout, a.map);
           S.playMap(c, run, a.where);
+          // A map cleared before the clip ends stays on screen.
+          S.holdEnd(c);
           S.warm(c, a.warm);
-          S.warmUntil(c, (w: any) => S.near(w, 4) >= a.pack, 4000);
+          S.warmUntil(c, (w: any) => S.near(w, 6) >= a.pack, 4000);
           if (a.speed) c.setSpeed(a.speed);
         },
         {
@@ -249,18 +251,18 @@ export const CLIPS: Clip[] = [
       await t.stage((S, c) => {
         const run = (window as any).__run;
         const uid = S.rareAmulet(run, 70);
-        (window as any).__amulet = uid;
-        S.dropNear(c.world, run, uid);
+        (window as any).__amulet = run.inventory.find((i: any) => i.uid === uid);
+        S.dropNear(c.world, run, uid, 3, 1);
         run.inventory = run.inventory.filter((i: any) => i.uid !== uid);
       });
       await t.rec(30);
       t.cut('equip');
       await t.stage((S, c) => {
         const run = (window as any).__run;
-        const w = c.world;
-        const d = w.drops.find((x: any) => x.item.uid === (window as any).__amulet);
-        run.inventory = run.inventory.concat(d.item);
-        run.lastDrops = [d.item.uid];
+        // (the character may have picked it up: the bag gets it either way, as just found)
+        const item = (window as any).__amulet;
+        run.inventory = run.inventory.filter((i: any) => i.uid !== item.uid).concat(item);
+        run.lastDrops = [item.uid];
         S.toCamp(c, run);
       });
       await tab(t, 'Items');
