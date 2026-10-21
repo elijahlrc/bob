@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ACTIVE_GEMS, GRANTED_GEMS, type ActiveGemDef } from '../data/gems';
-import { BEAM_MOTIF, SKILL_MOTIF } from './areaLook';
+import { BEAM_MOTIF, motifOf, SKILL_MOTIF } from './areaLook';
 import { activeLook } from './skillLook';
 
 const GEMS: ActiveGemDef[] = [...ACTIVE_GEMS, ...GRANTED_GEMS];
@@ -44,6 +44,15 @@ describe('what an area looks like (areaLook.ts)', () => {
       const l = activeLook(g);
       const element = ['physical', 'lightning', 'cold', 'fire', 'chaos'][l.element];
       expect(g.tags.includes(tag as never) || element === tag, `${id}: ${m}`).toBe(true);
+    }
+  });
+
+  it('a skill that picks an element for each use looks like the element it dealt', () => {
+    for (const id of ['primalStrike', 'primeSplash']) {
+      expect(byId.get(id)!.element, id).toBeDefined();
+      expect(motifOf(id, 1)).toBe('crackleNova');
+      expect(motifOf(id, 2)).toBe('iceShatter');
+      expect(motifOf(id, 3)).toBe('fireball');
     }
   });
 });

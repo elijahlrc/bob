@@ -127,8 +127,6 @@ export const SKILL_MOTIF: Readonly<Record<string, Motif>> = {
   // Fire.
   flameBolt: 'fireball',
   cinderBlow: 'fireball',
-  primalStrike: 'fireball',
-  primeSplash: 'fireball',
   fuseArrow: 'fireball',
   mortarCharge: 'fireball',
   mortarBow: 'fireball',
@@ -203,6 +201,13 @@ export function beamMotifOf(id: string, dtype: number): Motif | null {
   return ['forceWave', null, 'iceSpikes', 'flameLine', 'breath'][dtype] as Motif | null;
 }
 
+/** The burst of a skill that picks an element for each use, by the element (lightning, cold, fire). */
+const PICKED_MOTIF: Partial<Record<number, Motif>> = {
+  1: 'crackleNova',
+  2: 'iceShatter',
+  3: 'fireball',
+};
+
 /** What an area of this delivery and element looks like when its skill has no motif of its own. */
 const BY_ELEMENT: Record<'blast' | 'nova' | 'wall', readonly Motif[]> = {
   // physical, lightning, cold, fire, chaos
@@ -227,6 +232,11 @@ export function motifOf(id: string, dtype: number, strip = false): Motif {
   const own = SKILL_MOTIF[id];
   if (own) return own;
   const def = DEFS.get(id);
+  // A skill that picks an element for each use (Primal Strike) looks like the element it dealt this time.
+  if (def?.element) {
+    const picked = PICKED_MOTIF[dtype >= 1 && dtype <= 3 ? dtype : activeLook(def).element];
+    if (picked) return picked;
+  }
   const delivery: Delivery = strip
     ? 'wall'
     : def
