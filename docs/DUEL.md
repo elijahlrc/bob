@@ -467,16 +467,16 @@ two ledgers. Nothing explains the obvious.
 
 ## 7. Milestones
 
-| Id     | Milestone          | Work                                                                                                                                                                                                                                                                                                                                                                           | Done when                                                                                                                                                                                                                                                                                                      | Days     |
-| ------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| **F0** | The fence          | `scripts/hash-fence.ts` (8.1), recorded before any change; `Side` as `{ id, team }` only (it grows a group at a time), `Actor.side`, `World.sides` with one side built by `createWorld`; no field moved yet.                                                                                                                                                                   | The fence records and matches itself; `npm run check` green.                                                                                                                                                                                                                                                   | 0.5      |
-| **F1** | The extraction     | Groups G1 to G5 of 3.3, one commit each, the test and script codemod after each group, `render`, `ui` and `run` by `w.sides[0]`, `hunted`, `team` for `faction`, `enemiesOf`, `findTarget`, `tickMinions`, `actorById`, `separate` and the hazard dodge by team; no field of a side left on `World`.                                                                           | The fence is identical after every group; `npm run check` and `npm run perf` unchanged; in `src/sim`, `sides[0]` appears only in `runMap.ts`, `vitals.ts`, `recap.ts` and `createWorld` (3.3).                                                                                                                 | 3 to 5   |
-| **F2** | Two characters     | `createWorld` takes any number of characters (`CreateWorldInput.sides: { build, x, y, opts }[]`; a map passes one at the plan's start); `runDuel(a, b, seed, opts) → DuelResult` in `src/sim/duel.ts`; two class starters with weapons alone fight headlessly on the dummy arena, 8 tiles apart; characters collide with each other and with foreign minions.                  | `runDuel` of two starters ends with **one dead** (a draw by the cap means they never engaged, and fails); `src/sim/duel.test.ts`: only B has a Molten Shell and A's hit is absorbed by B's shell while A's stays null; B's flask fires when B is hurt, not A's; A's ignite on B ticks against B's resistances. | 1 to 2   |
-| **F3** | Kits across sides  | Minions (target, are targeted, separate), deployables, fields and zones, projectiles and shots, triggers, charges, buffs, channel, blinks, banners, offerings, supports' counters; `scripts/duel.ts` (two builds from saves, bot builds or the probe's snapshots: the result and both ledgers); the bot-versus-bot matrix of `scripts/ladder-probe.ts` re-run with real duels. | A test per kit (a minion of B attacks A; A's totem shoots B; B's field burns A; A's trigger fires on B's hit); every active gem duels without an exception (a smoke test like `gemSmoke.test.ts`); the fence still matches.                                                                                    | 1 to 2   |
-| **F4** | The rules          | `SideOpts.duel`: engage anywhere, no advance, loot or exit; the ends of 4.3; order alternation; `damageScale`; the measurement of fight lengths and the default (4.4); the symmetry test.                                                                                                                                                                                      | The same build on both sides wins about half over 100 seeds; fight lengths measured and the default recorded in Appendix A; `docs/PLAYER-AI.md` gains a section on duels; the fence still matches.                                                                                                             | 0.5 to 1 |
-| **F5** | The watchable duel | The round arena in a biome's look; the scene draws every side; effects by actor; the figure rig by side; the camera; the rival as the boss bar (no second HUD); `startDuel` and the controller's duel mode; `DuelResult.tsx`; "Again"; a Debug panel entry that starts a duel against a bot build.                                                                             | A duel between the current character and a bot build can be watched from the Debug panel at every speed, on a phone layout too; no console errors; the boss bar follows the rival.                                                                                                                             | 2 to 3   |
-| **F6** | Rivals             | `Rival`, `src/run/rivals.ts` (post, fetch, validate, token, names), `docs/rivals.sql` run on the project, the opt-in preference and checkboxes, capture in `onRunEnd`, `npm run sim -- --rivals`, TELEMETRY.md's new section.                                                                                                                                                  | A death with the opt-in posts a row the table accepts; `rivals_for` returns K rows of the version near the map, none of the caller's; a row with an unknown gem id is skipped by the client; the bot has seeded the pool at the current version.                                                               | 1 to 2   |
-| **F7** | The screens        | "Duel for your damned soul's fate" on the summary, `Rivals.tsx`, the rated fight and its report, the record, the high scores.                                                                                                                                                                                                                                                  | From a death: opt in with a name, pick a rival, watch the duel, see the result (rated or practice), fight again, fight another; the record persists across reloads; the high scores; `npm run check` and `npm run build` green.                                                                                | 1 to 2   |
+| Id     | Milestone          | Work                                                                                                                                                                                                                                                                                                                                                                           | Done when                                                                                                                                                                                                                                                                                                       | Days     |
+| ------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| **F0** | The fence          | `scripts/hash-fence.ts` (8.1), recorded before any change; `Side` as `{ id, team }` only (it grows a group at a time), `Actor.side`, `World.sides` with one side built by `createWorld`; no field moved yet.                                                                                                                                                                   | The fence records and matches itself; `npm run check` green.                                                                                                                                                                                                                                                    | 0.5      |
+| **F1** | The extraction     | Groups G1 to G5 of 3.3, one commit each, the test and script codemod after each group, `render`, `ui` and `run` by `w.sides[0]`, `hunted`, `team` for `faction`, `enemiesOf`, `findTarget`, `tickMinions`, `actorById`, `separate` and the hazard dodge by team; no field of a side left on `World`.                                                                           | The fence is identical after every group; `npm run check` and `npm run perf` unchanged; in `src/sim`, `sides[0]` appears only in `runMap.ts`, `vitals.ts`, `recap.ts` and `createWorld` (3.3).                                                                                                                  | 3 to 5   |
+| **F2** | Two characters     | `createWorld` takes any number of characters (`CreateWorldInput.sides: { build, x, y, opts }[]`; a map passes one at the plan's start); `runDuel(a, b, seed, opts) → DuelResult` in `src/sim/duel.ts`; two class starters with weapons alone fight headlessly on the dummy arena, 8 tiles apart; characters collide with each other and with foreign minions.                  | `runDuel` of two starters ends with **one dead** (a draw by the cap means they never engaged, and fails); `src/sim/duel.test.ts`: only B has a Slag Carapace and A's hit is absorbed by B's shell while A's stays null; B's flask fires when B is hurt, not A's; A's ignite on B ticks against B's resistances. | 1 to 2   |
+| **F3** | Kits across sides  | Minions (target, are targeted, separate), deployables, fields and zones, projectiles and shots, triggers, charges, buffs, channel, blinks, banners, offerings, supports' counters; `scripts/duel.ts` (two builds from saves, bot builds or the probe's snapshots: the result and both ledgers); the bot-versus-bot matrix of `scripts/ladder-probe.ts` re-run with real duels. | A test per kit (a minion of B attacks A; A's totem shoots B; B's field burns A; A's trigger fires on B's hit); every active gem duels without an exception (a smoke test like `gemSmoke.test.ts`); the fence still matches.                                                                                     | 1 to 2   |
+| **F4** | The rules          | `SideOpts.duel`: engage anywhere, no advance, loot or exit; the ends of 4.3; order alternation; `damageScale`; the measurement of fight lengths and the default (4.4); the symmetry test.                                                                                                                                                                                      | The same build on both sides wins about half over 100 seeds; fight lengths measured and the default recorded in Appendix A; `docs/PLAYER-AI.md` gains a section on duels; the fence still matches.                                                                                                              | 0.5 to 1 |
+| **F5** | The watchable duel | The round arena in a biome's look; the scene draws every side; effects by actor; the figure rig by side; the camera; the rival as the boss bar (no second HUD); `startDuel` and the controller's duel mode; `DuelResult.tsx`; "Again"; a Debug panel entry that starts a duel against a bot build.                                                                             | A duel between the current character and a bot build can be watched from the Debug panel at every speed, on a phone layout too; no console errors; the boss bar follows the rival.                                                                                                                              | 2 to 3   |
+| **F6** | Rivals             | `Rival`, `src/run/rivals.ts` (post, fetch, validate, token, names), `docs/rivals.sql` run on the project, the opt-in preference and checkboxes, capture in `onRunEnd`, `npm run sim -- --rivals`, TELEMETRY.md's new section.                                                                                                                                                  | A death with the opt-in posts a row the table accepts; `rivals_for` returns K rows of the version near the map, none of the caller's; a row with an unknown gem id is skipped by the client; the bot has seeded the pool at the current version.                                                                | 1 to 2   |
+| **F7** | The screens        | "Duel for your damned soul's fate" on the summary, `Rivals.tsx`, the rated fight and its report, the record, the high scores.                                                                                                                                                                                                                                                  | From a death: opt in with a name, pick a rival, watch the duel, see the result (rated or practice), fight again, fight another; the record persists across reloads; the high scores; `npm run check` and `npm run build` green.                                                                                 | 1 to 2   |
 
 Order: F0 to F4 are the engine and are measured headlessly; F5 is independent of F6; F7 needs both. Commits at the end of
 each milestone and of each group of F1; the fence runs before every one of them.
@@ -543,19 +543,19 @@ time). As planned, with these differences and findings:
   drain). A tick of damage over time is shared by owner (`dotShares`) only when the world has several sides: with one, the code is
   the old code (the fence). What F1's note feared, B's on-kill effects firing on an ignite kill of B, does not happen: `killActor`
   returns for a character before any of them, for either side. A kill of a character counts for nothing yet (F4 decides).
-- **Collision**: `separateSides` (the characters of different sides give way half each; Phase Run passes through) and
+- **Collision**: `separateSides` (the characters of different sides give way half each; Slipstream Run passes through) and
   `separateMinions` also pushes a minion and a foreign character apart (half each). A side's own minions still yield to its
   character, as ever.
 - **Tests** (`duel.test.ts`): a duel of starters; determinism (the same builds and seed give the same result and event hash);
-  B's Molten Shell absorbs A's hits and A has none; B's life flask fires for B's damage and A's does not (and the other way); A's
+  B's Slag Carapace absorbs A's hits and A has none; B's life flask fires for B's damage and A's does not (and the other way); A's
   ignite sets `ignites` (by A) on B, burns it less when B resists fire, and is in A's `ledger.dealt` and `damageDealt` and none
   of B's; every on-hit effect of a skill on a character; a kill by A's damage over time and by an owned hit is A's; bodies. One
   side of a map: `side.test.ts`. The deep fence (maps 1 to 30, three seeds) was recorded on the base and holds too.
 - **For F3 and F4:**
-  - _Not credited yet._ Only a reflect and an impale name their owner. The other twenty-odd `rawHit` callers (Molten Shell's burst,
+  - _Not credited yet._ Only a reflect and an impale name their owner. The other twenty-odd `rawHit` callers (Slag Carapace's burst,
     mines, fields, auras, minions, triggers) deal damage to a character that it takes and nobody deals, and `applyFlatDot`,
     `applySkillDot` (from fields, deployables, `skillFx`) and `applyStatus` (banners, stances, utility, minions, triggers) now apply
-    to a character but carry no `by`. The Herald of Agony's Virulence is still gated `!dst.isPlayer`.
+    to a character but carry no `by`. The Sour Herald's Virulence is still gated `!dst.isPlayer`.
   - _Targeting leftovers._ `bodyOnWay` (the dodge and the kite) and `creepToward` skip characters; `enemiesOf` for a minion lists
     the other sides' characters and minions, never monsters; `stepWorld` builds the flow field for every side's character but the
     grid keeps one (the last), which nothing reads without monsters.
@@ -595,45 +595,45 @@ re-recorded). As planned, with these differences and findings:
   a straight line and the field a path, so across a wall a monster can head for the farther character; fine for F3 (monsters and
   two characters is out of scope, section 10).
 - **`rawHit(w, dst, amount, type, owner, label, by, via)`** takes its owner (a `Side` or `null`) right after the type, so that the
-  compiler listed every caller. Owned: Molten Shell's burst, the Relic's nova, mines (`mineAuraHit`), the Herald of Thunder's bolts,
-  the corpse bursts of Pyre Burst and of the corpse blinks, Bodyswap, the burning aura, the queued explosions of triggers, a
-  minion's blows and its Volatile burst. `null` on purpose: Righteous Fire and a minion's own burn (self-damage: on a map ownerless
+  compiler listed every caller. Owned: Slag Carapace's burst, the Relic's nova, mines (`mineAuraHit`), the Storm Herald's bolts,
+  the corpse bursts of Pyre Burst and of the corpse blinks, Shadow Swap, the burning aura, the queued explosions of triggers, a
+  minion's blows and its Volatile burst. `null` on purpose: Searing Mantle and a minion's own burn (self-damage: on a map ownerless
   damage onto a character earns no `dealt` row, and an owner would grow the side's own), the share a Thorned monster throws back, the
   Collapse, Tithe, the Counter-stance, the zones of the monsters, and **every blast of `world.ts`** (`tickEffects`): no side pushes
   a ground effect, they are all monsters', and they land on characters and minions, never on monsters. A debuff of damage over time
-  (a skill's, Decay, the Herald of Ash's and Infernal Legion's burns, a venom burst) carries `by`. **Statuses carry no owner**:
+  (a skill's, Slow Rot's, the Cinder Herald's and Burning Pack's burns, a venom burst) carries `by`. **Statuses carry no owner**:
   they deal no damage, and the damage they raise is credited by whoever deals it.
 - **The ledger.** A side's hit on another side's minion earns a row (`applyHit`'s `how` gate is now "a character, a monster, or a
   side's hit on another team"; `rawHit` on a minion already did). A minion's blows are `minion` rows wherever they land (they were
   `effect` rows on a character). `noteHit` stays gated on a character as `dst` (a `hits` count for the monsters' sake would move
-  the report of every map). The Herald of Agony's Virulence is fed by a side's poison on an enemy of its team (a monster, the
+  the report of every map). The Sour Herald's Virulence is fed by a side's poison on an enemy of its team (a monster, the
   other character or its minion); a monster's poison keeps today's rule.
 - **A kill of a minion** by the other side's damage gives that side what a kill gives that needs no loot or experience: the charges
   (`kill`, `killFrozen`), the gains (`kill`, `killShocked`), a banner stage, "killed recently", the stances' refresh and the kill
   triggers; no kill counted, no experience, no flask charges, no life or mana on kill, nothing dropped (Appendix A, 2026-10-16: F4
   prices the rest). A minion that falls of its own side's damage or of nobody's gives nothing. A character's fall still counts for
   nothing (F2). The kill effects read `causes` (the side that last struck it), which a monster's damage on a minion never sets.
-- **One bug of the same kind found.** The burning aura's off switch (Righteous Fire goes off below 40% life and on from 75%) was a
+- **One bug of the same kind found.** The burning aura's off switch (Searing Mantle goes off below 40% life and on from 75%) was a
   `WeakSet<World>`: two characters with an aura would have shared one switch. It is a `WeakSet<Side>` now. (The other module-level
   state keyed by world is the monsters': locks of bosses, thefts, packs, telegraphs.)
 - **Per kit, what changed** (everything in it that picked "the enemy" by `isPlayer`, `w.actors` or `hunted`):
-  - _Minions_: what they seek (above), their blows and splash, Volatile Servants' burst, the Herald of Agony's crawler, the Relic,
-    the Skitterbots' auras, Infernal Legion's burn; a foreign minion in the way of a projectile is hit.
-  - _Deployables_ (totems, brands, traps, mines, ballistas, the mirage archer, the stand-ins): their foes include the other side's
+  - _Minions_: what they seek (above), their blows and splash, Volatile Servants' burst, the Sour Herald's crawler, the Relic,
+    the Skitterbots' auras, Burning Pack's burn; a foreign minion in the way of a projectile is hit.
+  - _Deployables_ (totems, brands, traps, mines, ballistas, Twin Shadow's archer, the stand-ins): their foes include the other side's
     minions; a mine's aura hit and the beams' debuffs are the side's.
   - _Fields and zones_ (consecrated, chilling, caustic, pods, crystals, storms, walls, orbs, ghosts, geysers, trails, smoke, rain):
     `enemiesIn` and `tickSkillZones` through the lists, debuffs carry `by`; a creeping patch drifts toward the other side.
   - _Projectiles and shots_: a projectile of A hits B's character and B's minions (stops, pierces, forks, chains), never A's own;
     the bursts of mortars, creeping skulls and the nova, the chain of lightning of a strike, a cone and the blades from behind the
-    struck one choose among the same list; Soulrend's homing, Storm Orb's bolts, the drifting orb, Blade Vortex, Storm Call's
-    markers and Explosive Arrow's fuses (the target may be a minion: `actorById`) too.
+    struck one choose among the same list; Spirit Saw's homing, Tempest Mote's bolts, the drifting orb, Orbiting Blades, Skyfall's
+    markers and Fuse Arrow's fuses (the target may be a minion: `actorById`) too.
   - _Triggers_: the counter-trigger of A fires when B hits A (it already did: `fireTriggers(dst.side)`); the target it picks is the
     nearest enemy including minions; kill explosions and the overkill burn are the side's.
   - _Charges_: a hit on a minion feeds them (`applyHit`); a kill of one does (above). _Buffs that count enemies near_ (stances,
-    banners' fight size, the channel's crowd stage, Frostblink's cooldown, the AI's packs, escapes and flasks, curses under
-    Blasphemy) count the minions too. _Banners_: the enemy status lands on the other character and minions in reach. _Blinks_:
-    the corpse and Bodyswap bursts, Withering Step's wither, the safest spot, the pack a blink lands in. _Supports_: Multistrike's
-    repeats, Ancestral Call, the mirage archer, the shockwave. _Offerings, hexes and the exposure_: nothing was wrong (own minions
+    banners' fight size, the channel's crowd stage, Rime Step's cooldown, the AI's packs, escapes and flasks, curses under
+    Standing Curse) count the minions too. _Banners_: the enemy status lands on the other character and minions in reach. _Blinks_:
+    the corpse and Shadow Swap bursts, Rotting Stride's wither, the safest spot, the pack a blink lands in. _Supports_: Triple Cadence's
+    repeats, Echoing Blow, Twin Shadow's archer, the shockwave. _Offerings, hexes and the exposure_: nothing was wrong (own minions
     only; a hex or a status goes onto any actor).
 - **Monster-only by meaning, left as it was:** `fieldKill`, `chargedDeath` and `hexKill` ask `hunted` who killed (they run for a
   monster's death, and a character's or a minion's never reaches them); with monsters and two characters in one world they would
@@ -645,7 +645,7 @@ re-recorded). As planned, with these differences and findings:
   other side's character and minions and none of one's own, a hit on a minion earns a row and a charge, a kill of one gives the
   charges and no kill (and a fall of nobody's or one's own gives nothing); A's totem and A's mines; B's caustic ground burns A and is
   B's (and spares B), A's creeping ground drifts toward B, B's banner's status lands on A in reach and not beyond; A's counter-attack
-  answers B's blows; A's Molten Shell goes off on B; a projectile of A hits B's minion and B and never A's own minion, and stops at
+  answers B's blows; A's Slag Carapace goes off on B; a projectile of A hits B's minion and B and never A's own minion, and stops at
   B's minion in its way; a monster between two sides walks to the nearer by the flow field (west and east); the flow field itself
   against the old search; the helpers. 11 of the 19 kit tests fail on F2's code. **The duel gem smoke test**: every active and
   item-granted gem (178) on side A against a class starter on side B for ten simulated seconds: no exception, life finite, and a
@@ -668,7 +668,7 @@ re-recorded). As planned, with these differences and findings:
   The two orders of a pair agree on the winner (the same build wins both) in 62 of 66 at map 20 (3 disagree: the west side won
   both, or the east side did; 1 had a draw in one order) and in 39 of 45 at map 40 (6 disagree). The west side wins a little more
   (52% and 57%), as it strikes first. A fight takes about 10 milliseconds of wall time. The fights include totems (Mortar Bow),
-  traps, mines, creeping ground, Orbiting Blades and a Herald of Agony crawler with no error. **F4's damage scale starts here:** the
+  traps, mines, creeping ground, Orbiting Blades and a Sour Herald crawler with no error. **F4's damage scale starts here:** the
   median fight is 4 to 6 seconds, well short of the 15 to 40 s that 4.4 asks for, and none reached the cap.
 
 - **For F4 and F5:**
@@ -691,7 +691,7 @@ differences and findings:
 
 - **The duel option** (`SideOpts.duel`, `src/sim/ai.ts`): `findTarget` has no engage range and `playerAI` no drop at `ENGAGE_RANGE + 3`;
   the stall breaker is off (so a target is never given up on, the other character included); with no target (the other cannot be
-  targeted, or the character is itself running in Phase Run) it walks toward the other character in mode `engage`, and never reaches
+  targeted, or the character is itself running in Slipstream Run) it walks toward the other character in mode `engage`, and never reaches
   the loot, the exit or the waypoints. A side with the option starts in mode `engage` (a side starts in `advance`), so no state of
   a duel is `loot`, `exit` or `advance`. **`WorldOpts.noExit` is not made redundant:** the option keeps the characters from walking to
   the exit, but with no monsters `checkExit` opens it at the first tick (the flag and an `exitOpen` event that F5's scene would
@@ -724,11 +724,11 @@ differences and findings:
   after the ailments and the stun were worked out (**the ailments read the hit before it is mitigated, so they need no code: an
   ignite of 40 is 40 at any scale, and so is a stun**) and before the map report, the recap, the damage log and the leech read it
   (**the leech of the hit is of the scaled damage**); in `rawHit` and in the damage-over-time tick, one more factor beside
-  `damageTakenMult`, for a character only; and on Blood Rage's own cost (life and energy shield). **Not scaled: a minion's damage taken,**
+  `damageTakenMult`, for a character only; and on Surge of Blood's own cost (life and energy shield). **Not scaled: a minion's damage taken,**
   which is a balance question (a minion dies 3.3 times sooner relatively); the sheet's DPS and EHP know nothing of the scale. The ledgers,
   `damageDealt`, `damageTaken`, the recap and `DuelSide.lifeLeft` are of what landed (scaled). The share of a hit a character reflects
   (`reflectPhysPct`) is of the unscaled hit (`reflectBack` divides by the scale: `res.dmg[0] > 0` says it is not 0), so the reflection
-  is scaled once, when it lands. A Molten Shell's burst is kept to one scale in the same way: the shell's pool is measured against the
+  is scaled once, when it lands. A Slag Carapace's burst is kept to one scale in the same way: the shell's pool is measured against the
   damage the character takes, scaled like its life, and what it took is stored divided by the scale (`shellTakes`), so the burst, of
   the unscaled damage, is scaled once when it lands (a test). Sacrifice and a skill's life cost are costs, not damage, and are not
   scaled.
@@ -816,7 +816,7 @@ differences and findings:
   exit, walking to a target that cannot be targeted, off on a map), the ends (death, both dead, the stall at 15 s and the option, the
   cap), the order (a policy trace of 1,000 ticks of one fight: the order changes within it and neither side is first more often than a
   fair coin allows, the same seed the same order, the two cached arrays, `use` events of two mirror characters over 12 seeds, one side),
-  the scale (hit and what is recorded of it, a burst, a Molten Shell's burst, a tick, both sides, a minion, an ignite), what a character goes for (the nearest, the
+  the scale (hit and what is recorded of it, a burst, a Slag Carapace's burst, a tick, both sides, a minion, an ignite), what a character goes for (the nearest, the
   `rares` priority, a screen of four minions then the character with no stall, a minion's kill gives flasks and life, not experience),
   a summon's ring, and the symmetry. **The symmetry test** fights the same build on both sides over 60 seeds for the Vanguard, Strider and
   Mystic starters and 30 for two summoners, and asserts side 0's wins stand within 3 standard deviations of a fair coin of the fights

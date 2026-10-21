@@ -239,7 +239,7 @@ grow in steps.
 - Chained Charges and Heavy Charge cost far less mana (30% of the skill's cost instead of 150%), so mine setups are no longer
   the most expensive way to run a spell.
 - Skills tab and gear comparisons: a blink, guard or buff skill in the loadout no longer makes the main skill's damage and mana
-  sustain look far worse than they are. Frostblink, Flame Dash and Blood Rage all had this problem.
+  sustain look far worse than they are. Rime Step, Cinder Step and Surge of Blood all had this problem.
 
 ### Strategy
 
@@ -251,8 +251,8 @@ grow in steps.
 - A periodic skill no longer needs the main skill's reach. It fires when its own target is in reach and waits out its pause after
   a use. It also no longer stands in for a main skill that is waiting for mana, so the weapon attacks while mana comes back.
 - The skill bar lists every main and damage skill.
-- New Escape role for blinks and run buffs (Dash, Flame Dash, Frostblink, Lightning Warp, Withering Step, Bodyswap, Smoke Mine,
-  Blink Arrow, Phase Run). An escape skill is used when life is below its threshold (70% by default, 30% to 70%) with an enemy
+- New Escape role for blinks and run buffs (Quick Step, Cinder Step, Rime Step, Bolt Step, Rotting Stride, Shadow Swap, Smoke Charge,
+  Shadow Quiver, Slipstream Run). An escape skill is used when life is below its threshold (70% by default, 30% to 70%) with an enemy
   within 5 tiles, or when 3 or more enemies are within 4 tiles. A blink with this role goes to the safest spot in its reach,
   away from the enemies.
 
@@ -301,9 +301,9 @@ grow in steps.
 
 ### Known issues
 
-- Searing Mantle, Blood Rage, and the running behaviour of Rotting Stride and Slipstream Run are new and still being
+- Searing Mantle, Surge of Blood, and the running behaviour of Rotting Stride and Slipstream Run are new and still being
   balance-tested. They may feel too strong or too weak.
-- Withering Breath and Flame Dash's burning trail are due for a balance pass.
+- Withering Breath and Cinder Step's burning trail are due for a balance pass.
 
 ### Skills rework
 

@@ -13,7 +13,7 @@ that one, what a player holding two points on map 9 sees. Every rule below is a 
 would make a node or a link worse, the rule loses. The brief therefore has fewer rules than its first draft, and Phase D's
 method (hand-written areas, every node and link a written decision) follows from this.
 
-Vocabulary, as a PoE player would use it: a **region** is a class's part of the tree; an **area** is a named group of
+Vocabulary, as a player of the reference game would use it: a **region** is a class's part of the tree; an **area** is a named group of
 clusters inside a region about one thing (the bow area, the minion area); a **cluster** is a notable with its small nodes;
 a **wheel** is a big cluster with two or three notables; a **road** or **highway** is the string of plain nodes between
 places; the **home** is the first dozen nodes out of a class start; a **spur** is the short dead-end road to a keystone.
@@ -25,7 +25,7 @@ places; the **home** is the first dozen nodes out of a class start; a **spur** i
 A player opens the tree between maps, up to a hundred times a run, holding one to four points, usually on a phone, and
 closes it in seconds. The tree's first job is to make **the next node obvious** on every one of those visits, and its
 second job is to make **the next destination worth wanting** so that the obvious node is also a step toward something.
-Nothing else in Bob carries a build's identity: no ascendancy, no masteries, no skill trees. The tree is where a run becomes
+Nothing else in Bob carries a build's identity: no subclass, no masteries, no skill trees. The tree is where a run becomes
 "a poison Shade" or "a totem Vanguard", and it must do that for a run that may end on map 4 as much as for one that
 reaches map 100.
 
@@ -50,7 +50,7 @@ zoom-out; the prose uses plain words.
 spellcraft (spell damage, cast speed, spell crit), and at the top a fork into **three elemental arms**: cold straight up,
 fire leaning toward the Zealot, lightning leaning toward the Shade. The farthest reach of the six. _Why:_ the element is a
 caster's first real decision and the arms make it visible. But a second element is a cost, never a wall (the first draft
-said "you cannot be two things at once"; the user struck it, rightly: PoE's multi-element casters are common and good):
+said "you cannot be two things at once"; the user struck it, rightly: the reference game's multi-element casters are common and good):
 neighbouring arms are joined by a short link a few steps above the fork (cold to fire, cold to lightning), so a two-element
 caster pays four to six points for the second arm's first cluster instead of walking back through the fork. The Zealot
 borrows the fire arm's root and the Shade the lightning arm's. Minions and curses are not
@@ -90,7 +90,7 @@ Staves have no class of their own (no kit starts with one, A1) and live here, wh
 **The centre.** A ring road inside the six starts, with **a few generic clusters hanging off its inner side**: the things
 every class may want and no region sells well: the three resistances, movement speed, flask charges and effect, all
 attributes, life and mana regeneration. Three or four clusters of three or four nodes, none stronger than a region's, no
-keystones. (The first draft had nothing inside the ring; the user asked for the generic nodes, which is also what PoE's
+keystones. (The first draft had nothing inside the ring; the user asked for the generic nodes, which is also what the reference game's
 small centre is.) **A start is never on the ring**: the ring runs beside the starts and each class joins it at the
 attribute junction two steps out of its home (a path never passes through a start, `pathTo`; the round-1 playtest found
 what happens when a tree forgets that). The ring's own nodes are attribute nodes (section 7) and it is the cheap crossing
@@ -112,7 +112,7 @@ Every class has a **home** of about a dozen nodes out of its start:
    class; nothing else in the home has to be generic.
 2. At step three, the **signature notable**: the class in one node, its weapon's basic included (the Vanguard's: life,
    melee physical damage and strength; the Strider's: projectile damage, evasion and dexterity; the Mystic's: spell
-   damage, mana and intelligence). PoE puts its first notable at exactly three steps from every start; so does this.
+   damage, mana and intelligence). The reference game puts its first notable at exactly three steps from every start; so does this.
 3. From the signature, **two or three ways out, to different things**, each through a small "porch" cluster that
    announces the area beyond: for the Vanguard, one porch toward life and armour (the rampart), one toward the maces. A
    porch may be specific (a cold porch on the Mystic's) as long as it is optional and another porch serves the class's
@@ -120,7 +120,7 @@ Every class has a **home** of about a dozen nodes out of its start:
    same stuff.
 4. The first keystone is 10 to 14 steps from the start, at the near end of the region's first area.
 
-The six homes need not be the same size; a hybrid's may run a node or two longer if its two attributes need it (PoE's
+The six homes need not be the same size; a hybrid's may run a node or two longer if its two attributes need it (the reference game's
 3-node vs 9-node asymmetry).
 
 **The check:** a table of each class's first fifteen steps, printed by the audit: the chain, the signature, the porches
@@ -145,7 +145,7 @@ A road node is a node whose only job is to get somewhere. The rules, cut down fr
   traps or mines, cold or fire), between areas, or between two clusters that belong to no area. The first draft required
   every fork to be between two named areas; the user struck that, and they are right that forks inside an area are the good
   ones.
-- **Share**: road nodes about a tenth of the tree (PoE: 19% in runs of 1 to 3; fewer here because clusters touch), and a
+- **Share**: road nodes about a tenth of the tree (reference: 19% in runs of 1 to 3; fewer here because clusters touch), and a
   full build spends 15 to 25% of its points on them, almost all of it attribute it needs anyway.
 - **Crossings: many, each placed by hand for a cross-region build that is plausibly wanted**, never by rule or at random.
   The centre ring between neighbouring homes (cheap), and **two bridges per neighbouring pair**: one _near_, between the two
@@ -171,14 +171,14 @@ homes, and the road tax of the intended-cost builds (section 11).
 
 ## 5. Clusters and notables
 
-- **A cluster is one idea.** Every small node in a cluster carries its notable's keyword (PoE: 100%); a cluster is
+- **A cluster is one idea.** Every small node in a cluster carries its notable's keyword (reference: 100%); a cluster is
   guessable from one word at phone zoom.
 - **Sizes say cost.** Near the home, clusters of three or four (one notable, two or three smalls); in an area, four or
   five; **one wheel per area** of six to eight nodes with two or three notables, the landmark the area is named by; a
   **spur** of three small nodes and a keystone. Unequal on purpose: a player learns that a big ring is a big commitment.
 - **One way in** for three clusters in four; wheels can be passed through (the road enters one side and leaves the other,
   taking the wheel's own nodes, which is the price of the shortcut).
-- **A notable is worth three to five small nodes** of its own stat (PoE's matched median is 4.9×), two steps off the road,
+- **A notable is worth three to five small nodes** of its own stat (the reference's matched median is 4.9×), two steps off the road,
   four to six steps from the next notable. One **strength table** prices every node: a unit is the median small node of
   that stat; a notable is at least three units, a wheel notable four to six; lines no small node gives (a maximum charge,
   a mechanic) are hand-valued in the table with a comment. The table is data and the tests read it.
@@ -191,14 +191,14 @@ and the share of clusters with one entrance.
 
 ## 6. Keystones and the late build
 
-**Placement.** Twenty-seven keystones, each at the end of a spur at the far edge of the area it belongs to (PoE: 17 of 28
+**Placement.** Twenty-seven keystones, each at the end of a spur at the far edge of the area it belongs to (reference: 17 of 28
 in the outer third, 26 of 28 dead ends one step off a junction): four to six a region, the nearest 10 to 14 steps from the
 start, the farthest 30 or more. Two sit on borders where both neighbours can reach them (Searing Avatar at the Cathedral's
 fire tower tip, near the Spire's fire arm; Idle Hands on the Wall–Cathedral crossing). The sketch places all 27.
 
 **Trades, written on the node.** Four in five keystones carry a cost the sheet can show: a stat that goes down, a thing you
 can no longer do. The 22 that already are trades stay. The five buffs: Pain Conduit and Mind Bulwark are conditional and
-keep their shape (PoE keeps three pure buffs of 28 too); **Strongarm and Spellslip get a cost** (proposed: Strongarm,
+keep their shape (the reference keeps three pure buffs of 28 too); **Strongarm and Spellslip get a cost** (proposed: Strongarm,
 strength's melee bonus also applies to projectile attacks, _dexterity gives no evasion_; Spellslip, 30% chance to dodge
 spell hits, _30% less energy shield_); Volatile Servants stays a conditional buff. The two half-dead halves: **Wound Dance**
 loses "no extra damage against moving targets" (nobody can act on it) for a sheet-visible cost (_bleeds deal 50% less
@@ -222,7 +222,7 @@ points of each intended-cost build, on paper.
 
 In Bob an attribute does two things: a small direct bonus (strength +0.5 life and 0.2% melee physical per point; dexterity
 +2 accuracy and 0.2% evasion; intelligence +0.5 mana and 0.2% energy shield) and **gating gear and gem levels**, with
-PoE's requirement numbers against a start of 32 in the main attribute and 14 in the others (A3 §6): a level-60 bow wants
+the reference game's requirement numbers against a start of 32 in the main attribute and 14 in the others (A3 §6): a level-60 bow wants
 212 dexterity, a level-20 gem 98 of its attribute. Attributes do not grow with level; the tree and gear are the only sources.
 
 **What the old tree supplied, measured** (2026-10-19: the player builds in the rivals table, not the bot's, on the
@@ -252,12 +252,12 @@ The rules, then:
   each. A build then meets its own level-60 gear at about 60 points and a level-20 gem of its own attribute (98) by about
   25, without walking for either.
 - **Fewer, bigger attribute nodes** (the user's suggestion): junctions and the few road nodes are **+20** of the region's
-  attribute, or **+10/+10** in a hybrid region, at 12 to 15% of nodes (PoE: 13.6% at +10; doubling the node is what lets the
+  attribute, or **+10/+10** in a hybrid region, at 12 to 15% of nodes (reference: 13.6% at +10; doubling the node is what lets the
   road be short). The signature notable carries +20; a handful of notables carry an attribute line beside their stat, as
-  PoE's do (17% of its nodes carry one). The centre's all-attributes cluster is the cheap partial answer for everyone.
+  the reference game's do (17% of its nodes carry one). The centre's all-attributes cluster is the cheap partial answer for everyone.
 - **A hybrid region supplies both of its attributes along every natural path**; the audit checks supply per attribute,
   never summed.
-- **Off attribute**: from a pure start the first +40 of an off attribute (two nodes) costs 8 to 10 steps (PoE: 8 to 11
+- **Off attribute**: from a pure start the first +40 of an off attribute (two nodes) costs 8 to 10 steps (reference: 8 to 11
   for +30), the price that keeps a class in its corner; a hybrid pays 4 to 6 for its third attribute.
 - The gear requirement scale stays at 1.0 (the user, 2026-10-19). Threshold notables are postponed (section 12).
 
@@ -331,8 +331,8 @@ quality beats count, so a node that makes the tree better is added and one that 
 | **Total**                    |                                                                                                                                                                                                       | **about 1,000** |
 
 Sensitivity: one cluster more or less per archetype value moves the total by about 175, so the honest range is **850 to
-1,200**; the current tree has 2,618. A 123-point build takes about 12% of it (PoE: 7.4%; Grim Dawn: 10%). Notables: about
-210 (161 clusters, a second or third notable on each of 21 wheels, six signatures and twelve porches: one per 5 nodes; PoE
+1,200**; the current tree has 2,618. A 123-point build takes about 12% of it (reference: 7.4%; Grim Dawn: 10%). Notables: about
+210 (161 clusters, a second or third notable on each of 21 wheels, six signatures and twelve porches: one per 5 nodes; the reference
 one per 4.5, Diablo 4 one per 11); keystones 27.
 
 Why smaller is right here, not only cheaper: a phone shows fewer nodes legibly; a tree whose clusters touch has few road

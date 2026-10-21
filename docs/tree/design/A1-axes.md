@@ -101,11 +101,11 @@ Ten of 69 attacks need no weapon kind. Spell weapons (sceptre, wand, rune dagger
 
 ## Resource
 
-| Value        | Gems                                                                          | Uniques | Tree today | Stat(s)                                                                                                       | Note                                            |
-| ------------ | ----------------------------------------------------------------------------- | ------- | ---------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| mana         | every skill costs it; 3 gems touch it                                         | 135     | 150        | `mana`, `manaRegen(Flat/Pct)`, `cost`, `costFlat`, `leech.mana`, `manaOnKill/Hit`; Mind Bulwark, Mana Bastion | universal, so not a lean on its own             |
-| life as cost | 0                                                                             | 9       | 3          | `skillsCostLife` (Blood Rite), `rule.socketedGemsUseLife`, `lifeIsOne`                                        | flags only; no dial such as "reduced life cost" |
-| reservation  | 25 auras (23 by %, 1 flat, 1 free), 2 banners, 1 skitter, 1 blasphemy support | 20      | 29         | `reducedReservation`, `socketedReducedReservation`, `auraEffect`                                              |                                                 |
+| Value        | Gems                                                                               | Uniques | Tree today | Stat(s)                                                                                                       | Note                                            |
+| ------------ | ---------------------------------------------------------------------------------- | ------- | ---------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| mana         | every skill costs it; 3 gems touch it                                              | 135     | 150        | `mana`, `manaRegen(Flat/Pct)`, `cost`, `costFlat`, `leech.mana`, `manaOnKill/Hit`; Mind Bulwark, Mana Bastion | universal, so not a lean on its own             |
+| life as cost | 0                                                                                  | 9       | 3          | `skillsCostLife` (Blood Rite), `rule.socketedGemsUseLife`, `lifeIsOne`                                        | flags only; no dial such as "reduced life cost" |
+| reservation  | 25 auras (23 by %, 1 flat, 1 free), 2 banners, 1 skitter, 1 Standing Curse support | 20      | 29         | `reducedReservation`, `socketedReducedReservation`, `auraEffect`                                              |                                                 |
 
 ## Mechanics with their own stats
 

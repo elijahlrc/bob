@@ -494,9 +494,9 @@ The Rotwife needs ailment play on the character's side to be legible and answera
 leaves real gaps:
 
 - **Cleansing flasks:** only burning, bleeding and freezing (with chill) can be removed. There is **no removal for poison
-  or shock**. Add the missing flask suffixes, after checking the 3.9 data for what they are and do.
+  or shock**. Add the missing flask suffixes, after checking the reference data for what they are and do.
 - **Avoidance:** `avoid.*` is rolled for every ailment, but its only sources are uniques: nothing in the tree or the
-  affixes. Add the 3.9 sources the build can reach before map 90 (passives, item mods, auras), again from the 3.9 data,
+  affixes. Add the reference sources the build can reach before map 90 (passives, item mods, auras), again from the reference data,
   not from memory.
 - **Holes in immunity:**
   - the shocking ground zone sets shock without checking immunity or avoidance;
@@ -524,7 +524,7 @@ Ailment play is polished for every map, not only hers; the user welcomed that. I
   - regeneration, plus the new rule that it stops while a DoT is on her;
   - adaptation, graded and with physical;
   - monster ES recharge.
-- **Culling strike** has no rarity check today. In 3.9 it works on bosses, so it stays.
+- **Culling strike** has no rarity check today. In the reference game it works on bosses, so it stays.
 
 ---
 
@@ -747,7 +747,7 @@ Built the same day, all milestones at once (the user asked for the whole plan wi
 - **The Unmaker** hits in the element it stole (it takes that element's variant) and drinks the flasks it holds. It does
   **not** yet wear the stolen defence or copy the stolen supports' shape; the theft itself, the shards and the stagger are
   as planned.
-- **Ailment avoidance from items and passives** was not added: the cleansing flasks (now all of 3.9's: removal on use and
+- **Ailment avoidance from items and passives** was not added: the cleansing flasks (now all of the reference's: removal on use and
   immunity during the effect) are every build's answer, and the holes in immunity (shocking ground, hobble) are closed.
 - **Rule 5** is measured by the gauntlet (the Sentence's share of the pool), not a unit test: the pool of a curve
   character is the bot's.

@@ -6,15 +6,15 @@ and icy-veins system guides, the 1.2 patch notes, and the fandom wiki (whose nod
 for the _pattern_ of point gates, never for values). Each number is marked **sourced (url)** or **recalled**. IP line:
 node names appear only as evidence in tables; nothing here is a shape, a position or node text to copy.
 
-## The contrast with PoE, first
+## The contrast with the reference game, first
 
 Last Epoch (LE) has five base classes, each with a base passive tree and three mastery trees (15 masteries). A character
 sees one base tree and three mastery trees and nothing else; there is no shared graph of character power. What that buys
 and what it costs:
 
-The PoE column is recalled; the PoE note measures these from `ref-tree.json` and its values replace them.
+The reference column is recalled; the reference game's study (local reference material in `reference/docs/tree/`, not in the repository) measures these from `ref-tree.json` and its values replace them.
 
-|                            | PoE (one shared tree)                                      | Last Epoch (per-class trees)                                                         |
+|                            | The reference game (one shared tree)                       | Last Epoch (per-class trees)                                                         |
 | -------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | Nodes a max build touches  | ~120 distinct nodes, one point each (recalled)             | ~20–30 distinct nodes, 1–10 ranks each (my estimate from the counts below)           |
 | What a point decides       | _which_ node next (position)                               | _how many more ranks here_ (depth)                                                   |
@@ -32,7 +32,7 @@ decisions are moved to systems that read well on their own (mastery choice, five
 no spatial discovery and no "I found a shorter road"; no cross-class combination made dear by distance (either it is in
 your trees or it does not exist); less variety per class (two Void Knights differ mostly in rank counts and skills); and
 a much thinner sense of a "build on the map" — the character sheet, not the tree, is where an LE build lives. When LE
-wanted a PoE-shaped shared graph it put one on the _content_, not the character: the 1.2 Weaver tree (~70 nodes, 50
+wanted a shared graph shaped like the reference game's it put one on the _content_, not the character: the 1.2 Weaver tree (~70 nodes, 50
 points, radial, class-agnostic) modifies the Monolith endgame, not your stats (sourced, https://forum.lastepoch.com/t/last-epoch-tombs-of-the-erased-patch-notes/75247/2).
 
 ## 1. Starting areas
@@ -75,7 +75,7 @@ node in eight). **Recalled:** adjacency is required in the UI, thresholds are th
 So LE converts the highway's _cost_ (points spent to reach power) into a _threshold_ (points spent anywhere in the tree)
 and lets those points be spent on stats. The price of depth is still paid, but in ranks of something useful rather than in
 +10 Strength nodes. My estimate: a 113-point build "wastes" 3–8 points on ranks it would not otherwise take, against
-PoE's 40–60 travel points (recalled; the PoE note's measured figure governs).
+the reference game's 40–60 travel points (recalled; the reference study's measured figure governs).
 
 > **Suggestion:** Bob cannot drop highways (it has a shared tree and wants locality by distance), but LE shows the rate a
 > player will tolerate when every point buys something: ~5% filler. Bob's highways should give small real stats, not only
@@ -205,7 +205,7 @@ reading it top to bottom once; there is nothing to find.
 at the top; node art is a painted icon per node; density is high and uniform (no dark space, no silhouette); the three
 mastery panels sit side by side so the screen reads as "one base, three futures". It is a character sheet, not a map. The
 Weaver tree (seen, planner screenshot 2026-10-19) is the opposite: a radial graph with a central start, ~70 nodes, three
-or four emblem landmarks on the rim, dark space between spokes, PoE-like at a glance.
+or four emblem landmarks on the rim, dark space between spokes, like the reference game's tree at a glance.
 
 > **Suggestion:** LE confirms by contrast what a shared tree is for: silhouette, dark space and landmarks only earn their
 > cost if the player travels. Bob's tree travels, so it keeps the map; but each _region_ could aim for LE's density and
@@ -217,7 +217,7 @@ or four emblem landmarks on the rim, dark space between spokes, PoE-like at a gl
 | -------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | Ranked nodes (1–10 ranks, 1 point each)                        | depth as a decision; fewer nodes on screen; per-rank values that add up smoothly | low in data (a `maxRanks` and a per-rank stat); medium in UI (counter, +/- control, refund per rank)                | **yes**: tap a node again instead of hunting the next node; refund-one-per-map maps cleanly to "remove one rank" |
 | Threshold gating (points spent in tree/region)                 | replaces travel with commitment; a progress bar the player can read              | low (a counter per region); interacts with refunds (a refund must not drop a tier below what is allocated above it) | **yes, as a region counter**; as the sole structure, no (Bob wants distance)                                     |
-| Mastery choice + free bonus                                    | one big named decision; a keystone's worth of identity for 0 points              | medium (a UI moment, 3 bonuses per class)                                                                           | partly: Bob has six classes and no ascendancies by brief; a free bonus at a point threshold is the cheap form    |
+| Mastery choice + free bonus                                    | one big named decision; a keystone's worth of identity for 0 points              | medium (a UI moment, 3 bonuses per class)                                                                           | partly: Bob has six classes and no subclasses by brief; a free bonus at a point threshold is the cheap form      |
 | 1-rank switch nodes with a cost                                | real trade-offs for 1 point                                                      | low                                                                                                                 | yes; they are Bob's keystones already                                                                            |
 | Skill specialisation trees (5 × 20 points)                     | most of LE's build variety                                                       | high (a tree per gem)                                                                                               | no for the tree work; noted for later                                                                            |
 | Idols (grid of 1×1 … 4×1, 2×2; 1 prefix + 1 suffix; ≤20 slots) | class-specific passives as loot; a tetris sub-game                               | high (item system)                                                                                                  | no for the tree; the "passive as a drop" idea is a jewel-socket cousin the brief already defaults to no          |

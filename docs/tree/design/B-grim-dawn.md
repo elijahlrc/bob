@@ -82,7 +82,7 @@ ignores build order, so a real route can cost a few points more.
 So the "highway tax" is paid in **stat quality**, not in dead nodes: a build spends two fifths of its points on
 tier-1 islands that are each a fifth to a third as strong per star as the tier-3 it is climbing to, but each of those
 islands is a real pick (14 of 45 tier-1s carry a proc; nearly all carry resistances, life or OA/DA that endgame builds need
-anyway). In PoE a highway is a _path_ you must walk; here it is a _ladder_ you build from parts that are worth having,
+anyway). In the reference game a highway is a _path_ you must walk; here it is a _ladder_ you build from parts that are worth having,
 and the parts can be swapped (any five tier-1s of the right colours will do), so two builds reaching the same tier-3
 walk different roads.
 
@@ -266,7 +266,7 @@ face**: you remember "the armoured animal in the yellow wedge, second ring", not
 cost a third of the budget to reach. The inequality is the map's legibility: size and ring tell you cost before you
 read a star.
 
-Affinity does what PoE's highways do, by a different mechanism. A highway makes a far notable dear by _steps_; affinity
+Affinity does what the reference game's highways do, by a different mechanism. A highway makes a far notable dear by _steps_; affinity
 makes a capstone dear by _colour_, and the colour is bought from islands that are themselves worth having. The
 consequences: no dead nodes; two builds reach the same capstone by different islands; "travel" is a set of picks, not
 a path; and the decision "finish this island or take its proc and leave" exists, which a connected graph cannot offer.

@@ -60,7 +60,7 @@ Severity: **H** (breaks a constraint or blocks other work), **M** (clearly again
 | Zealot    | 88    | 102            | 15                | 17.0                | 2.42        | 0                                                                          |
 | whole map | 732   | 924            | 193               | 26.4                | 2.52        | —                                                                          |
 
-The reference (B-poe §2) has 1,612 nodes and 1,858 links, which is 15 loops per 100 nodes and a mean degree of 2.31. Bob
+The reference (the reference game's study, §2; local reference material, not in the repository) has 1,612 nodes and 1,858 links, which is 15 loops per 100 nodes and a mean degree of 2.31. Bob
 has 1.7 times as many loops per node, so §3.1 holds everywhere. **The loops are spent locally, inside regions,** as
 wheels and lattices, not on crossings: the whole map has 18 links between regions (§3.4). See §13.1.
 

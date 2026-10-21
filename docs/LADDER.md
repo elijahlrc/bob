@@ -389,7 +389,7 @@ controller's `onFrame` steps `this.world`; a duel mode steps the sides and ends 
   the status and hex appliers) the world parameter is renamed `ws` (the attacker's side) and `const wd = sideOf(dst)` is
   taken at the top, so no `w` is in scope: any `w.` left behind fails `tsc`. This is the first line of defence; the tests
   below are the second.
-- Duel tests with **asymmetric builds** prove the side lookup: only B has a Molten Shell, so A's hit on B is absorbed by B's
+- Duel tests with **asymmetric builds** prove the side lookup: only B has a Slag Carapace, so A's hit on B is absorbed by B's
   shell and A's `shell` stays null; B's flask fires when B is hurt, not A's; a kill of B's minion credits A's ledger; A's
   ignite on B ticks against B's resistances; the same build on both sides ends in a draw or a coin flip over seeds, never a
   fixed win for the first side.

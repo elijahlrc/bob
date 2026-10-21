@@ -14,12 +14,12 @@ reached two ways, and a build mixes areas by paying for the nodes between them. 
 region (now 15 to 30), mean degree (about 2.5), ways in per notable cluster (two, except keystone spurs). A region whose
 picture is a few long strands with rooms hanging off them is wrong even if every node is sensible.
 
-## 2. The reference is Path of Exile's tree, looked at, not inferred
+## 2. The reference is the reference game's tree, looked at, not inferred
 
-The 3.9 graph is in `reference/tree/ref-tree.json` (lines, groups, links, no coordinates); the live layout is on the
+The reference graph is in `reference/tree/ref-tree.json` (local reference material, not in the repository) (lines, groups, links, no coordinates); the live layout is on the
 official site (pick a class, press F). Trace the matching class start node by node before writing a region, and look
 at the layout in the browser. Looking is allowed; copying names, shapes or lines is not; screenshots stay out of the
-repo. What the Ranger start taught: the start touches two nodes, each one step from a hub of degree five to seven;
+repo. What the dexterity class's start taught: the start touches two nodes, each one step from a hub of degree five to seven;
 the first notables are about attacks in general, not the weapon; pockets of three dead-end off hubs; the skeleton is a
 mesh; pockets are tight orbits a third of the spacing between clusters; roads are straight runs that turn at junctions.
 

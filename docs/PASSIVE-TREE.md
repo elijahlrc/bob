@@ -8,7 +8,7 @@ later where they happen to fit; nothing below assumes they will be. Its decision
 The user's brief (2026-10-18): the tree must be well balanced for tens of build archetypes and tens of thousands of
 specific builds; offer many meaningful decisions; communicate them clearly; look good; have good starting areas, good
 late-build decisions, the right amount of highways, the right spread of attributes, and the right numerical and spatial
-distribution of node types. The set of node types may change. Other games' trees are references, PoE first, never copied.
+distribution of node types. The set of node types may change. Other games' trees are references, the reference game first, never copied.
 Answers given the same day: the design comes first and how to author it comes after; the node count follows from the
 constraints; the tree may be any shape; new nodes may use existing stats and new engine stats where a theme clearly needs
 one; the user reviews at two stops (the design brief and the finished tree) and reads drafts saved along the way; a
@@ -98,8 +98,9 @@ flask active, nearby enemies) because the sim produces it.
 Output: `docs/tree/design/B-references.md`. Subagents, one per game, in parallel, writing to a shared template so the
 result is one table.
 
-Games: **Path of Exile** (the main reference: `reference/tree/ref-tree.json` holds its 3.9 tree with node text, group, sector
-and depth, so rates are measured, not recalled; the wiki for masteries, ascendancies and the later changes), **Last
+Games: **the reference game** (the main reference: `reference/tree/ref-tree.json`, local and not in the repository, holds
+its tree at the reference version with node text, group, sector and depth, so rates are measured, not recalled; the
+reference wiki for masteries, subclass trees and the later changes), **Last
 Epoch** (per-class trees with ranked nodes and specialisation trees per skill), **Diablo 2 and 4** (skill trees and the
 Paragon board: small, clear, with glyphs and legendary nodes), **Grim Dawn** (devotion constellations: shapes that are
 named, affinities that gate), and a glance at **Wolcen**, **Torchlight** and **Borderlands** for how they place
@@ -124,11 +125,11 @@ For each game, the same questions, answered with numbers where there are any:
    groups, shapes, the background, labels at zoom levels.
 9. **Aesthetics.** The silhouette; whether regions differ in shape; how dense; what dark space does; what the eye
    lands on at full zoom-out.
-10. **Node types** beyond small, notable, keystone: masteries, jewel sockets, ascendancy, ranked nodes, glyphs.
+10. **Node types** beyond small, notable, keystone: masteries, jewel sockets, subclass nodes, ranked nodes, glyphs.
     What each adds, what it costs to build, whether it suits an auto-battler.
 
-The output table: property, range per game, **what Bob wants and why**. Where PoE and Bob differ in a way that matters
-(Bob has no manual play, no respec economy, a 25-minute run, six classes and no ascendancies), the "why" says so.
+The output table: property, range per game, **what Bob wants and why**. Where the reference game and Bob differ in a way that matters
+(Bob has no manual play, no respec economy, a 25-minute run, six classes and no subclasses), the "why" says so.
 
 **The IP line, once:** from the references come properties and rates (how long a highway, how much stronger a notable,
 how strongly a weapon keeps to a corner). From them never come shapes, positions, arrangements, names or text. The
@@ -311,13 +312,13 @@ being asked; only C and F wait for an answer.
 
 ## 8. Risks
 
-| Risk                                                                                                              | What is done about it                                                                                                             |
-| ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| The brief becomes a list of numbers again and the tree built to it has no more design than the last one           | Every item in C has a sketch or a worked example beside its property; the user's stop is on the brief, not on a spreadsheet       |
-| Supply parity makes every axis value equally cheap and the tree bland (no build is dear, so none is a commitment) | The brief names the exceptions it intends, and locality (item 2) makes a combination dear by distance, not by starving a stat     |
-| References are recalled rather than measured, and the rates are wrong                                             | PoE is measured from `ref-tree.json`; the other games' numbers are marked recalled or sourced, and only PoE's drive a Bob number  |
-| New engine stats grow into engine work that stalls the tree                                                       | A2 prices each; the brief takes only the cheap ones and lists the rest as later                                                   |
-| No player model: the bot is weak and the simulated players share one mind, so outcomes cannot be trusted          | Balance is judged on supply (arithmetic), the user reads the intended-cost table, and telemetry after release is the ground truth |
-| A hand-authored tree is slow to change when a review asks for a move                                              | D1's criterion is exactly that; stable ids and edit-aware pictures come before any region                                         |
-| The user's two stops are far apart and the build drifts from what they meant                                      | Drafts after every region, with pictures, in the folder; a region that departs from the brief says so in its note                 |
-| Players lose their allocated passives                                                                             | Handed back as unspent once, at F                                                                                                 |
+| Risk                                                                                                              | What is done about it                                                                                                                                          |
+| ----------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The brief becomes a list of numbers again and the tree built to it has no more design than the last one           | Every item in C has a sketch or a worked example beside its property; the user's stop is on the brief, not on a spreadsheet                                    |
+| Supply parity makes every axis value equally cheap and the tree bland (no build is dear, so none is a commitment) | The brief names the exceptions it intends, and locality (item 2) makes a combination dear by distance, not by starving a stat                                  |
+| References are recalled rather than measured, and the rates are wrong                                             | The reference game is measured from `ref-tree.json`; the other games' numbers are marked recalled or sourced, and only the reference game's drive a Bob number |
+| New engine stats grow into engine work that stalls the tree                                                       | A2 prices each; the brief takes only the cheap ones and lists the rest as later                                                                                |
+| No player model: the bot is weak and the simulated players share one mind, so outcomes cannot be trusted          | Balance is judged on supply (arithmetic), the user reads the intended-cost table, and telemetry after release is the ground truth                              |
+| A hand-authored tree is slow to change when a review asks for a move                                              | D1's criterion is exactly that; stable ids and edit-aware pictures come before any region                                                                      |
+| The user's two stops are far apart and the build drifts from what they meant                                      | Drafts after every region, with pictures, in the folder; a region that departs from the brief says so in its note                                              |
+| Players lose their allocated passives                                                                             | Handed back as unspent once, at F                                                                                                                              |

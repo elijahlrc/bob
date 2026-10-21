@@ -215,8 +215,8 @@ Four short ones, saved in `wayside.seen` and dismissed with "Got it" (a stop is 
 Reprieve). Dismissing one is not an undoable change.
 
 **Q. Names.**
-All new names were compared with every unique, flask, gem, currency, affix, base, theme and boss name in the game. No clash. "Haste"
-was a deny-list hit (the Shrine's blessing is "Swiftness"). The substring matches left ("Swift" the map affix, "Shrinekeeper Mask")
+All new names were compared with every unique, flask, gem, currency, affix, base, theme and boss name in the game. No clash. One name
+was a deny-list hit (the Shrine's blessing became "Swiftness"). The substring matches left ("Swift" the map affix, "Shrinekeeper Mask")
 are different things.
 
 **Q. The reprieve badge on a phone.**

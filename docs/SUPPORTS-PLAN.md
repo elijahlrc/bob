@@ -2,13 +2,13 @@
 
 Status: built, 2026-10-12 (section 7 says what was built and where it differs from the plan). Written after the "Twin Salvo does nothing
 on Arrow Shower" report.
-Evidence: `docs/research/poe-supports-multi-instance.md` (what PoE 3.9 does, with sources) and `docs/research/support-audit.md`
+Evidence: the local reference research note (`reference/docs/research/`, not in the repository: what the reference game does, with sources) and `docs/research/support-audit.md`
 (what every support does in Bob, with a matrix of dead pairings). Read those for numbers; this document is the decision and the work.
 
 ## 1. The problem, in three layers
 
 1. **The bug.** Twin Salvo is accepted on Arrow Shower and does nothing: `skill.ts:800` counts projectiles only for `projectile`
-   behaviour, and Arrow Shower is a `ground` zone whose arrows are "folded into one pulse" (AUDIT-GEMS). The mana cost and the damage
+   behaviour, and Arrow Shower is a `ground` zone whose arrows are "folded into one pulse" (the local gem audit). The mana cost and the damage
    penalty still apply, so the socket is worse than empty.
 2. **The class.** Acceptance is decided by skill types alone (`typesAllow`, `skillTypes.ts:54`); nothing checks that the support's effect
    can happen on the skill's behaviour. Of 1,092 pairs where the effect depends on behaviour, **280 are dead or half dead (19 supports,
@@ -19,31 +19,31 @@ Evidence: `docs/research/poe-supports-multi-instance.md` (what PoE 3.9 does, wit
    (Triple Cadence about 4.7x DPS in the sim; Snare Cluster strictly dominated by Triple Snare; Refine Gem dominated by Steel Resolve /
    Firm Hold). `volleyable` is declared on 21 skills and used by no support. That is the "supports are not interesting or balanced" part.
 
-## 2. What Path of Exile 3.9 does (verified in the research file)
+## 2. What the reference game does (verified in the research file)
 
-- **Rain of Arrows** fires many arrows (18 at level 1, 22 at 20; the 3.9 counts are inferred), each with its own small area. Half land
-  at random, half on targets in rings; **extra arrows go on outer rings and widen coverage without raising damage on one target** (GGG).
-  Greater/Lesser Multiple Projectiles **are allowed** on it by a special per-skill flag (`Type73`, now `ProjectileNumber`). Fork, Chain,
-  Pierce, Volley, Arrow Nova are **not**, because the arrows never collide. GMP at level 20 comes to about 0.87x total damage and 0.74x on
+- **Its arrow rain** fires many arrows (18 at level 1, 22 at 20; the reference counts are inferred), each with its own small area. Half land
+  at random, half on targets in rings; **extra arrows go on outer rings and widen coverage without raising damage on one target** (the
+  developers). The greater and lesser extra-projectile supports **are allowed** on it by a special per-skill flag. The fork, chain,
+  pierce, parallel-volley and arrow-nova supports are **not**, because the arrows never collide. The greater extra-projectile support at level 20 comes to about 0.87x total damage and 0.74x on
   one target: a coverage tool paid for with damage and cost, not a free multiplier.
-- **Blast Rain** (the same family, overlapping arrows) goes the other way: 3.9.0 made extra projectiles add extra explosions on the same
+- **Its exploding rain** (the same family, overlapping arrows) goes the other way: the reference version made extra projectiles add extra explosions on the same
   spot. The same support is worth about 1.23x there. **Same support, opposite value, decided by the skill's geometry.**
-- **Eligibility is a per-skill capability flag, not a tag**: `SkillCanVolley`, `SpellCanCascade`, `AttackCanRepeat`, `ProjectileNumber`.
-  Rain of Arrows has the Projectile tag but not the flags that Fork/Chain/Pierce need. Dead pairs are rejected by data; PoE does not give
+- **Eligibility is a per-skill capability flag, not a tag**: can volley, can cascade, can repeat, takes a projectile count.
+  The arrow rain has the Projectile tag but not the flags that the fork, chain and pierce supports need. Dead pairs are rejected by data; the reference game does not give
   a no-op support a penalty.
-- **Spell Cascade** is a lateral copy: three areas (target, one in front, one behind), area 25..16% less, damage 40..21% less, 140% cost,
+- **Its lateral-cascade support** is a lateral copy: three areas (target, one in front, one behind), area 25..16% less, damage 40..21% less, 140% cost,
   spells only, no totems/traps/mines/minions. Bob's Flanking Cast re-casts on the same point, which is an Echo with extra steps.
-- **Design rules GGG states** (3.9 and the 3.15 manifesto): the multiplier is the price and the mechanic is the product; pair each count
+- **Design rules its developers state** (in the reference version and a later design statement): the multiplier is the price and the mechanic is the product; pair each count
   bonus with a different cost axis (damage, attack time, risk, reliability); side-benefit supports stay under about 25% more damage at
   level 20, damage-only about 30-35%, real downsides 38-48%; pure damage supports were cut because they crowded out interesting ones;
-  keep tiers distinct (LMP and Volley were cheapened in 3.9 because GMP dominated); a flat "+N projectiles" is worth N over the skill's
+  keep tiers distinct (the lesser extra-projectile and parallel-volley supports were cheapened in the reference version because the greater one dominated); a flat "+N projectiles" is worth N over the skill's
   base count, so tune the base count.
-- Unverified: the Cascade delay, exact 3.9 arrow counts, Barrage on Rain of Arrows, Multistrike repeat numbers (wiki and Path of Building
-  disagree), the LMP 3.9 penalty (Path of Building only).
+- Unverified: the cascade delay, exact reference arrow counts, the sequential-arrow support on the arrow rain, the melee repeat support's numbers (the reference wiki and the reference data
+  disagree), the lesser extra-projectile support's penalty in the reference version (the reference data only).
 
 ## 3. Principles for Bob
 
-1. **A support never costs anything on a skill it cannot affect.** Not "warns": cannot be socketed to effect. PoE refuses; Bob refuses.
+1. **A support never costs anything on a skill it cannot affect.** Not "warns": cannot be socketed to effect. The reference game refuses; Bob refuses.
 2. **Skill geometry decides what "more" means; the support stays uniform.** `+N projectiles` is the same text everywhere and pays off
    differently on a fan, a rain, a stacking barrage and a strike-then-bolts skill.
 3. **Every support has a price axis and a product, and the product is a behaviour where possible.** Pure multipliers get a drawback or
@@ -94,12 +94,12 @@ Consequences and rules:
 - A vitest enumerates every support x skill pair and fails on any accepted pair with no live upside that is not on an allowlist (which
   starts as today's dead pairs and shrinks to empty in phase 2). This stops the class from growing as gems are added.
 
-### 4.2 Making "more instances" real, per behaviour (PoE's rule: geometry decides)
+### 4.2 Making "more instances" real, per behaviour (the reference game's rule: geometry decides)
 
-| skill                                                                        | geometry              | what `+N projectiles` does                                                                                               | PoE analogue          |
+| skill                                                                        | geometry              | what `+N projectiles` does                                                                                               | reference analogue    |
 | ---------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------ | --------------------- |
-| Arrow Shower (`ground`)                                                      | rings                 | one zone, N landing spots on rings; **N widens the area, one hit per enemy per pulse**; single-target damage never rises | Rain of Arrows        |
-| Ember Downpour (`ground`)                                                    | stack                 | N small explosions on nearly the same spot; **each hits**, so N adds damage on one target                                | Blast Rain            |
+| Arrow Shower (`ground`)                                                      | rings                 | one zone, N landing spots on rings; **N widens the area, one hit per enemy per pulse**; single-target damage never rises | its arrow rain        |
+| Ember Downpour (`ground`)                                                    | stack                 | N small explosions on nearly the same spot; **each hits**, so N adds damage on one target                                | its exploding rain    |
 | Rime Splinter, Bolt Cleave, Slag Blow, Prime Splash (`melee` + `afterHit`)   | bolts after a strike  | `spec.count + N` bolts; the shared hit list keeps once-per-target                                                        | normal projectile fan |
 | Whirl Shot (`tornado`)                                                       | 3 secondaries         | `3 + N` secondaries                                                                                                      |                       |
 | Drifting Storm                                                               | one orb               | refuse (or N orbs; decide)                                                                                               |                       |
@@ -110,7 +110,7 @@ gets a real base count (say Arrow Shower 6 landing spots, a working number to tu
 default: per-spot radius `b = R0 / sqrt(n0)`, per-spot damage `folded / n0` in `stack` mode. With `rings`, N spots cover an envelope of
 radius `R0 * sqrt(N / n0)` at the same density, which is exactly "extra arrows widen the shower". Then `+2` on 6 is +33% area, `+4` is +67%,
 and Twin Salvo's cost/penalty buys coverage on packs. The sheet's pack scenario needs a coverage term (reuse the `volleyHits` pod overlap
-formula, `character.ts:2038`); the single-target figure stays flat, which is true to PoE and to docs/SPIRIT.md (one hit per use).
+formula, `character.ts:2038`); the single-target figure stays flat, which is true to the reference game and to docs/SPIRIT.md (one hit per use).
 
 Lanes (`projectilesParallel`, sequential, nova) are not projectile paths on a rain: on ground skills only the **count** half of Twin Salvo,
 Wide Salvo, Triple Shot and Rolling Volleys is live. Say so in their text rather than splitting the gems. Rolling Volleys' sequential
@@ -127,44 +127,44 @@ pulse. Do not add fields to `Actor`. Edit gem data through `reference/coverage/g
 - Ground pulses ignore `skillDuration` in the sim (`actions.ts:584`) but the sheet counts it: Lingering Effect on Ember Hail shows 11
   pulses and hits 97 times either way. Fix the sim; update the `SkillZone` comment.
 - Flanking Cast on a self-centred nova (Blizzard Ring) fires three novas on the caster (`actions.ts:526`). Make Cascade lateral:
-  offset along the line to the target, front and back, as PoE does, and refuse it on `origin: 'self'` skills.
+  offset along the line to the target, front and back, as the reference game does, and refuse it on `origin: 'self'` skills.
 - Echoing Cast on traps repeats the placement, not each shot (`deploy.ts:235`), while the sheet multiplies every shot. Pick one and make
   both agree (recommend: the repeat applies to the use, so it places another set; correct the sheet).
 
 ### 4.4 Making supports interesting and balanced (the "write large" part)
 
-**Scope (your call, 2026-10-12):** the work is fixing and balancing first. Add a new support only where PoE has an obvious one that is
+**Scope (your call, 2026-10-12):** the work is fixing and balancing first. Add a new support only where the reference game has an obvious one that is
 missing, or where an idea is clearly good; do not invent a roster. The candidates below are the ones that pass that test, in this
 order; anything else waits for a reason.
 
 **Interesting.** Today `repeatable`, `cascadable`, `trappable`, `mineable`, `totemable` are each used by one or two supports, `volleyable`
-and `orb` by none. Candidate supports, each a trade plus a geometry, in PoE's spirit:
+and `orb` by none. Candidate supports, each a trade plus a geometry, in the reference game's spirit:
 
-- _Scatter_ (trap/mine, ground): copies thrown at random within a disc instead of a line (PoE's Cluster vs Multiple Traps). Replaces the
+- _Scatter_ (trap/mine, ground): copies thrown at random within a disc instead of a line (as the reference game's scattered and lined-up trap supports differ). Replaces the
   dominated Snare Cluster; gives Triple Snare a distinct partner.
 - _Lateral cascade for attacks that land on the ground_ (Arrow Shower, Ember Downpour): a staggered second and third shower to the sides,
   area and damage down. Uses `volleyable` or `cascadable`; this is the "more AoE regions" support the user asked about.
-- _Hold the line / Barrage on a rain_: stagger (above) as a real identity, with an attack-time cost per extra arrow (GGG's Barrage rule).
-- A risk-priced damage support (PoE's Trauma): more damage per consecutive use, self-cost on a miss window. Optional.
+- _Hold the line / Rolling Volleys on a rain_: stagger (above) as a real identity, with an attack-time cost per extra arrow (the reference game's rule for its sequential-arrow support).
+- A risk-priced damage support (as in the reference game): more damage per consecutive use, self-cost on a miss window. Optional.
 
 **Balanced.** One script, `scripts/audit-supports`, computes for each support at level 20: damage more, speed more, mana per second
 multiplier, and the capability it unlocks, then flags: outside its band (section 3, rule 4), strictly dominated by another support with the
 same `supports`/`needs`, or worse than empty on the skills it is accepted on. Known targets: Triple Cadence (about 4.7x), Cruel Flight
 (second `more` is damage over time only; its sheet number is inflated), Blunt Intent (1.59x on everything, zero on pure elemental),
 Snare Cluster, Refine Gem, Chained Charges / Heavy Charge (0.3 cost multiplier), and the pure-multiplier group (Brute Force, Focused Ruin,
-Patient Power, Lingering Cruelty, Channelled Elements) which get a drawback or sit in the lowest band, as GGG did in 3.15. Per project
+Patient Power, Lingering Cruelty, Channelled Elements) which get a drawback or sit in the lowest band, as the reference game's developers did in a later version. Per project
 rule, this uses one bot sim at the end of the work, not incremental sims, and does not tune bot kill times into player balance.
 
 ## 5. Order of work
 
-| phase | what                                                                                                                                                                                                                                                               | size         | why first                                                                             |
-| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------ | ------------------------------------------------------------------------------------- |
-| 0     | `reaches(stat, skill)` gathered out of `skill.ts` and called by the profile builder; `supportLive` with a reason for `gemStatus`; enumerating vitest with an allowlist of today's dead pairs; fix ground `skillDuration`; correct AUDIT-GEMS for the ground skills | small        | stops the class growing, no behaviour change, makes the user's case visible in the UI |
-| 1     | Ground `count`/`spread` and spots (sim, calc, sheet, renderer, tests); melee `afterHit` count; Whirl Shot                                                                                                                                                          | medium       | fixes the report, makes the supports work where PoE lets them                         |
-| 2     | Turn on refusal: `typesAllow && supportLive` in acceptance; greyed-out socketed leftovers; shrink the allowlist to empty                                                                                                                                           | medium       | removes the 101 worse-than-empty pairs and the 2,200 utility pairs                    |
-| 3     | Cascade made lateral; Echoing Cast on deployables decided; sheet/sim parity                                                                                                                                                                                        | small-medium |                                                                                       |
-| 4     | Balance script and pass: outliers, dominated supports, bands; one bot sim                                                                                                                                                                                          | medium       | needs 0-3 so numbers mean something                                                   |
-| 5     | New supports (section 4.4)                                                                                                                                                                                                                                         | open         | only after the pool is honest                                                         |
+| phase | what                                                                                                                                                                                                                                                                        | size         | why first                                                                             |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------------------------------------------------------------------------- |
+| 0     | `reaches(stat, skill)` gathered out of `skill.ts` and called by the profile builder; `supportLive` with a reason for `gemStatus`; enumerating vitest with an allowlist of today's dead pairs; fix ground `skillDuration`; correct the local gem audit for the ground skills | small        | stops the class growing, no behaviour change, makes the user's case visible in the UI |
+| 1     | Ground `count`/`spread` and spots (sim, calc, sheet, renderer, tests); melee `afterHit` count; Whirl Shot                                                                                                                                                                   | medium       | fixes the report, makes the supports work where the reference lets them               |
+| 2     | Turn on refusal: `typesAllow && supportLive` in acceptance; greyed-out socketed leftovers; shrink the allowlist to empty                                                                                                                                                    | medium       | removes the 101 worse-than-empty pairs and the 2,200 utility pairs                    |
+| 3     | Cascade made lateral; Echoing Cast on deployables decided; sheet/sim parity                                                                                                                                                                                                 | small-medium |                                                                                       |
+| 4     | Balance script and pass: outliers, dominated supports, bands; one bot sim                                                                                                                                                                                                   | medium       | needs 0-3 so numbers mean something                                                   |
+| 5     | New supports (section 4.4)                                                                                                                                                                                                                                                  | open         | only after the pool is honest                                                         |
 
 Each phase ends with `tsc`, prettier, the full suite (the x9 "forty Swarm actors" speed test is flaky under parallel load and passes alone)
 and a docs/PROGRESS.md entry. Phase 1 adds a ground-skill speed test so the zone work cannot cost speed unnoticed.
@@ -173,10 +173,10 @@ and a docs/PROGRESS.md entry. Phase 1 adds a ground-skill speed test so the zone
 
 Decided (2026-10-12):
 
-1. **Refuse** a support on a skill it cannot affect (PoE's rule). Existing socketed pairs stay, greyed and inactive.
-2. **Arrow Shower widens coverage (rings); Ember Downpour stacks explosions**, per PoE (Rain of Arrows vs Blast Rain).
+1. **Refuse** a support on a skill it cannot affect (the reference game's rule). Existing socketed pairs stay, greyed and inactive.
+2. **Arrow Shower widens coverage (rings); Ember Downpour stacks explosions**, per the reference game (its arrow rain versus its exploding rain).
 3. **Six base landing spots** for the two ground skills; the default look and total damage do not change.
-4. **Scope of 4.4**: fix and balance first; add a support only where PoE has an obvious missing one or the idea is clearly good.
+4. **Scope of 4.4**: fix and balance first; add a support only where the reference game has an obvious missing one or the idea is clearly good.
    Compatibility comes from the gem data (section 4.1), not from a table.
 
 Open:
@@ -216,8 +216,8 @@ counts them as the calc does.
 about 1.45 times the plain skill and not 4.7 (its repeats cost no time; the cost is now written as -55% to -52% attack speed); Snare Cluster
 scatters five traps over a wide place (it was Triple Snare at a higher price); Kindle and Cindering, one gem at two prices, are one gem (Kindle; a
 saved Cindering loads as Kindle); Blunt Intent and the penetration supports are refused where the skill deals no such damage. **Left alone on purpose:** the
-pool as a whole follows the 3.9 numbers, which are above GGG's later bands (damage-only supports give about +35% to +59% at level 20 against 30-35%
-in the 3.15 note). Moving them is a game-wide rebalance that needs a bot run and a decision; the script shows where each stands.
+pool as a whole follows the reference numbers, which are above the developers' later bands (damage-only supports give about +35% to +59% at level 20 against 30-35%
+in their later note). Moving them is a game-wide rebalance that needs a bot run and a decision; the script shows where each stands.
 
-**New supports:** Flanking Volley and the scatter on Snare Cluster. Nothing else was added: a risk-priced damage support (Trauma) and the
+**New supports:** Flanking Volley and the scatter on Snare Cluster. Nothing else was added: a risk-priced damage support and the
 rest wait for a reason.

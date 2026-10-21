@@ -410,7 +410,7 @@ goes on a "later" list in the triage file, with the complaint that asked for it.
 
 - **New keystone mechanics.** The 27 stay; only their placement and approach change.
 - **New nodes of any kind**, including hand-written conjunction nodes for a nexus, and the engine work they would need (D5).
-- **Masteries, jewels, ascendancies, a bigger point budget**, and any respec or refund rule beyond the one the save migration
+- **Masteries, jewels, subclasses, a bigger point budget**, and any respec or refund rule beyond the one the save migration
   already has.
 - **Node art**: the 18 emblems and the colour language stay (TREE.md); nothing in this plan changes them.
 - **A different tree screen** (a grid, a list, a three-tree layout): the camera, pinch zoom and taps stay as MOBILE.md built them.

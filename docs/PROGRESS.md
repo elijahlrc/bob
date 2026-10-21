@@ -31,7 +31,7 @@ controller in dev builds for debugging.
 - [x] Full damage pipeline, unit-tested (`calc/pipeline.test.ts`, `sim/combat.test.ts`)
 - [x] Six ailments + stun in sim with indicators (pips, freeze ring, stun stars)
 - [x] `computeCharacter` full sheet + `diffSheets` (< 5 ms)
-- [x] Convergence test: melee phys, crit spell, conversion, dual wield (alternating and Sweep),
+- [x] Convergence test: melee phys, crit spell, conversion, dual wield (alternating and Reaping Arc),
       projectile attack, chaining spell, falloff spell, poison — each with and without evasion/resists
 - [x] Flasks with auto-use policy
 
@@ -48,8 +48,8 @@ controller in dev builds for debugging.
 
 ## M4 — Items ✅
 
-- [x] All bases (since 2026-10-18 one for every droppable 3.9 base: 308 weapons, 275 armour, 88 shields, 58 jewellery,
-      45 flasks; docs/AUDIT-ITEM-BASES.md); the affix families generated from compact definitions; ilvl-gated rolling with
+- [x] All bases (since 2026-10-18 one for every droppable base of the reference: 308 weapons, 275 armour, 88 shields, 58 jewellery,
+      45 flasks; the local reference audit `reference/docs/AUDIT-ITEM-BASES.md`, not in the repository); the affix families generated from compact definitions; ilvl-gated rolling with
       max-affix rules (tested)
 - [x] Rarity, naming (magic prefix/suffix names, rare two-word names), drop tables (tested)
 - [x] 30 uniques incl. the 12 listed; at least one per starting weapon class; levels 2–80
@@ -446,30 +446,30 @@ revert if they would rather not.
 
 ### C0 done: reference and measurement (2026-10-07)
 
-- **Reference list** (`npm run coverage:fetch`, wiki Cargo API): 349 gems (219 active, 130 support) as planned, and **782
-  uniques** (the plan's 797 counted 15 wiki entries marked "not in game"; C-6 corrected). Provenance and filters are in
-  `reference/coverage/README.md`.
-- **3.9-era numbers:** Path of Building v1.4.155 (commit e3719726d7, the day after 3.9.0 launched) is extracted to
+- **Reference list** (`npm run coverage:fetch`, the reference wiki's Cargo API): 349 gems (219 active, 130 support) as planned, and **782
+  uniques** (the plan's 797 counted 15 reference wiki entries marked "not in game"; C-6 corrected). Provenance and filters are in
+  `reference/coverage/README.md` (local reference material, not in the repository).
+- **Reference-era numbers:** the reference data, as released the day after the reference version launched, is extracted to
   `reference/coverage/ref-skills.json` (418 gems, level 1 and 20 values) and `ref-uniques.json` (749 uniques with variants).
 - **Measurement:** `npm run coverage` and `reference/coverage/map.json` (every Bob gem and unique mapped; 2 gems are partial
   analogs). `scripts/coverage/coverage.test.ts` checks the map.
-- **IP test** now denies every reference gem and unique name, and the 3.9-era names, as an exact `name`
+- **IP test** now denies every reference gem and unique name, and the reference-era names, as an exact `name`
   (`src/data/ip.test.ts`). No existing Bob name collides.
 - **Draft tool:** `npm run coverage:draft -- gem|unique "Name"` writes a hand-review draft to
   `scripts/coverage/staging/` (git-ignored).
 - **Fixed on the way:** `.gitignore` had a bare `coverage` that would have ignored `reference/coverage` and `scripts/coverage`;
-  CLAUDE.md's IP bullet still said "never consult wiki or PoB data".
+  CLAUDE.md's IP bullet still said "never consult the reference wiki or data".
 - **Coverage now: gems 36/349 (10.3%), uniques 38/782 (4.9%).** Potential if every bucket of a milestone is covered:
   C3 64% / 82%, C4 80% / 91%, C5 91% / 93%.
 
-### C1 done: mechanics audit against 3.9.0 (2026-10-07)
+### C1 done: mechanics audit against the reference version (2026-10-07)
 
-- `docs/AUDIT-3.9.md`: 24 rules brought in line with 3.9.0 (each with a wiki revision), 12 divergences recorded in DESIGN 2.1,
-  and the missing buff layer (Fortify, Onslaught, Impale, Rage, Arcane Surge, Culling Strike, Unholy Might) scheduled for C2.
+- The mechanics audit (local reference material, not in the repository): 24 rules brought in line with the reference (each with a reference wiki revision), 12 divergences recorded in DESIGN 2.1,
+  and the missing buff layer (fortify, onslaught, impale, rage, a spell-damage surge, culling, a might buff) scheduled for C2.
 - Biggest changes: hit chance ×1.15; crit confirmation and crit ailments ×1.5; bleed 70% a second (×3 moving); shock and
   chill `50 · r^0.4`; stun rules (ES ignore, 20% floor, melee weights); ES recharge 20% a second; dual wielding +20% more
   physical damage and +15% block; triggered skills cost no mana and have per-spell cooldowns; flask charges per kill.
-- New tool: `npm run coverage:wiki -- "Page" [date]` prints a wiki page as it stood in the 3.9 era.
+- New tool: `npm run coverage:wiki -- "Page" [date]` prints a reference wiki page as it stood in the reference era.
 - Convergence tests needed no retuning. Small bot check (4 × 6, seed 11): 3/24 wins (was 2/24), within noise.
 - **Tests.** 521.
 
@@ -483,7 +483,7 @@ revert if they would rather not.
   tool emits it. The four hand-tuned spells keep their numbers.
 - **Ailments scale from base damage** (the C1 fix, completed): per-chunk multipliers per ailment (`AilChunk`).
 - **Buff layer** (`src/data/buffs.ts`, `src/sim/buffs.ts`): Fortified (hit-only damage taken), Quickened, Dread Might, Arcane
-  Tide as conditions with timers; rage as a count carried in the dynamic mask; impale; culling strike.
+  Tide as conditions with timers; rage as a count carried in the dynamic mask; impale; culling.
 - **Shapes:** nova and slam (burst with an origin), beam, ground zones (rain, clouds, walls, delayed blasts), returning
   projectiles. A channelled skill is repeated short casts, so there is no new action model; ramping stages are averaged.
 - **Weapon families:** rune dagger, thrusting sword, warstaff (inside the dagger, sword and staff classes).
@@ -496,7 +496,7 @@ revert if they would rather not.
 ### C3 in progress: gem content (2026-10-07)
 
 - **Gems.** 174 of 349 (104 of 219 actives, 70 of 130 supports) in nine hand-written batches (`reference/coverage/gems/c3g-*.json`,
-  emitted to `src/data/gemsGen.ts`); every gem has its own name; numbers are the 3.9 level 1 and 20 anchors. Channelling,
+  emitted to `src/data/gemsGen.ts`); every gem has its own name; numbers are the reference's level 1 and 20 anchors. Channelling,
   ramping stages, fuses and spreads are averaged into one repeated hit or a short ground zone (note on each map entry).
 - **Engine additions for gems.** `needsDualWield` and `needsShield` on actives; per-charge `per` mods for charge skills; the bot
   skips supports whose rules cannot hold for the chosen skill; `ModDB` keeps its mods per kind.
@@ -505,8 +505,8 @@ revert if they would rather not.
 - **Bot speed.** The headless bot measured 500–560× alone and 450–500× under a loaded full test run once the gem pool grew
   (the cost is spread over every `Character` build, not one hot spot), so the local speed test floor is now 440×. The user
   asked not to optimise per gem until the whole plan is done; revisit candidate pruning and cheaper `Character` builds in C7.
-- **Deferred gems** (need systems from later milestones): corpse skills (Desecrate, Detonate Dead, Unearth, Volatile Dead),
-  Discharge (consumes charges), Manabond, Plague Bearer, trap/mine/totem supports, trigger supports, minions.
+- **Deferred gems** (need systems from later milestones): corpse skills (making corpses, exploding them, raising bone from them),
+  Charge Release (consumes charges), a mana-fuelled nova, a poison-storing aura, trap/mine/totem supports, trigger supports, minions.
 
 ### C3 to C6 done: gems and uniques, deployables, minions (2026-10-07)
 
@@ -516,7 +516,7 @@ revert if they would rather not.
 - **C4 engine.** Utility skills (`ActiveGemDef.utility`: curse, buff, blink, summon) cast by policy (`src/sim/utility.ts`: upkeep,
   guard, rally); curses and marks are hexes with effect tables and self-mods; auras carry triggers (heralds) and a burning aura
   (Searing Mantle); granted skills (`grantSkill.<id>`) and socketed supports (`socketSupport.<id>`); supports with global mods,
-  triggers and Blasphemy; `needsShield`, `needsDualWield`, `travel`.
+  triggers and Standing Curse; `needsShield`, `needsDualWield`, `travel`.
 - **C5 engine.** Totems, brands, traps and mines (`src/sim/deploy.ts`): a skill with the tag, or under the support, is put down
   and fires from where it stands; `deployCount` raises the number at once; the sheet counts totems as extra uses.
 - **C6 engine.** Minions (`src/data/minions.ts`, `src/sim/minions.ts`): summon skills keep minions standing that follow the
@@ -541,7 +541,7 @@ revert if they would rather not.
 - **UI.** A Codex on the title screen lists every gem and unique with the ones found in this browser marked (kept through the
   store the controller was given); the gem inventory in Skills groups by role (skills, utility skills, supports, hexes, auras) and
   has a search; gem cards describe curses, buffs, summons, blinks, travel, shield and two-weapon needs, herald triggers and
-  Blasphemy.
+  Standing Curse.
 - **Calc and sim.** Convergence cases for the new shapes (ground line and zone, nova, beam, returning projectile, chain, trap,
   mine, totem, brand) hold the anchor (3% for shapes, 5% for traps and mines, 10% for totems and brands); standing
   totems and brands count the character's own default attack, as the sim shows it fighting beside them.
@@ -551,12 +551,12 @@ revert if they would rather not.
 
 ### Minions that can be hurt (2026-10-07)
 
-Minions used to be untouchable (a departure from PoE that made them far stronger against area enemies). Now:
+Minions used to be untouchable (a departure from the reference game that made them far stronger against area enemies). Now:
 
 - **Life and defence.** A minion is an `Actor` of the player's side kept in `w.minions` (not `w.actors`, so no monster-only code
   sees it). Its life is a normal monster's life at the map level, scaled by the kind's share (`MinionDef.life`: skeletons 0.5,
   zombies 1.4, golems 2.4 to 3) and by the summoning skill's `minionLife`; it has the monster armour curve, the kind's elemental
-  resistance, and has no regeneration of its own (as in PoE; the `minionRegen` stat, from gear, gives some) (`src/calc/minion.ts`, memoised). `minionTaken` (less damage taken) scales
+  resistance, and has no regeneration of its own (as in the reference game; the `minionRegen` stat, from gear, gives some) (`src/calc/minion.ts`, memoised). `minionTaken` (less damage taken) scales
   what it suffers. Ailments, stun and freeze work on it like on any actor.
 - **Who hits them.** Enemies go for the player first. A melee monster that has been held up (it keeps walking and barely moves,
   0.35 s) hits a minion within reach; a ranged monster that cannot hit the player from where it stands shoots a minion it can see
@@ -574,7 +574,7 @@ Minions used to be untouchable (a departure from PoE that made them far stronger
   map. With no regeneration (probe runs on maps 10 to 50) zombies fall 0 to 5 times a map and skeletons 0 to 13, standing
   about 0.93 to 0.97 of the time; golems rarely fall. Tuning knobs if that proves too safe: the respawn times, the 0.35 s
   hold-up time, or letting monsters pick the nearest of player and minion instead of the player first.
-- **Not done.** Minions do not draw aggro on their own (no taunt, no "nearest target" rule), and Meat Shield does not
+- **Not done.** Minions do not draw aggro on their own (no taunt, no "nearest target" rule), and Warding Pack does not
   redirect hits. Flame and ice golem buffs to the owner are unchanged.
 
 ### Skill bar, visual language and skill gallery (2026-10-07)
@@ -823,11 +823,11 @@ A second table, `sim_runs` (`docs/telemetry-dev.sql`), takes the same record fro
 ### Spirit plan (docs/SPIRIT.md), built (2026-10-08)
 
 S0 to S14 are built, local commits only. Every one of the 320 mapped gems has a verdict in the spirit ledger (`reference/coverage/spirit.json`, `npm run spirit`): 318 faithful,
-2 drifted with a reason (Enhance, no gem quality; Raise Spectre keeps only its monster's numbers, not its abilities). On 2026-10-09 six gems were cut (four that are not 3.9 gems, and
-Animate Weapon and Animate Guardian, which used up ground loot) and the last open repairs were made (Mirror Arrow's clone, Melee Physical Damage's ailments, Bladefall, Creeping Frost). The four uniques that were built on Animate Weapon were cut too (gems 319 of 349, uniques 765 of 782 now), a banner's stages now strengthen what it gives the character as well as what it does to enemies, and Withering Step and Phase Run became runs: begun amid a crowd, the character runs on without attacking until the effect is over. The engine gained cooldowns and charge spending, an enemy status layer, channelling, ground and lasting
+2 drifted with a reason (Refine Gem, no gem quality; Bind Shade keeps only its monster's numbers, not its abilities). On 2026-10-09 six gems were cut (four that are not gems of the reference, and
+the two that animated ground loot into minions) and the last open repairs were made (Mirror Quiver's clone, Brute Force's ailments, Rain of Steel, Rime Drift). The four uniques that were built on animated weapons were cut too (gems 319 of 349, uniques 765 of 782 now), a banner's stages now strengthen what it gives the character as well as what it does to enemies, and Rotting Stride and Slipstream Run became runs: begun amid a crowd, the character runs on without attacking until the effect is over. The engine gained cooldowns and charge spending, an enemy status layer, channelling, ground and lasting
 objects, skill damage over time, blinks, stances and rage, deployables, corpses, minion effects, and a bag of single-skill behaviours (`SkillFx` in `src/data/gems.ts`,
-carried out in `src/sim/skillFx.ts` and `supportFx.ts`). The 3.9 rule that the projectiles of one use hit an enemy once stands. A second audit by reviewers who had not
-seen the first verdicts (docs/AUDIT-GEMS.md) found 288 of 326 faithful as it stood and about thirty small gaps, which were repaired. See the plan's section 13 for each milestone.
+carried out in `src/sim/skillFx.ts` and `supportFx.ts`). The reference rule that the projectiles of one use hit an enemy once stands. A second audit by reviewers who had not
+seen the first verdicts (the local reference audit `reference/docs/AUDIT-GEMS.md`, not in the repository) found 288 of 326 faithful as it stood and about thirty small gaps, which were repaired. See the plan's section 13 for each milestone.
 
 The bot sample at the end (60 runs, 10 for each class, maps 1 to 20, seed 3, the default difficulty 1.75 / 1.8 / 0.3, committed code) against the same sample on the code
 before the plan began: runs that died before map 20 were 31 of 60 (38 of 60 before); no class won the 20 maps either way (the bot is a weak proxy, and 20 maps is a short
@@ -914,7 +914,7 @@ reach and mobility), the Magistrate (an unavoidable Sentence made heavier by Wit
 element in turn, immune to it), the Rotwife (every ailment in turn; regrows unless a DoT is on her) and the Unmaker (steals
 the build's best resistance, defence, supports and flasks as shards). Champions stay on maps 20 to 80; the Ossuary Regent
 is retired. A test holds every boss to the plan's rule that no damage profile takes more than twice the mean to kill it.
-On the character's side: 3.9's cleansing flasks are complete (poison, shock and curses added, immunity during every
+On the character's side: the reference's cleansing flasks are complete (poison, shock and curses added, immunity during every
 cleansing flask), drunk when the ailment is on; a boss cannot freeze or stun the character twice within 4 s. One 24-run
 gauntlet (`scripts/boss-gauntlet.ts`) is recorded in docs/BOSSES.md 18.3; boss life is not tuned from the bot.
 
