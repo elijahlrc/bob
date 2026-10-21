@@ -1,8 +1,8 @@
 /**
- * Compares every Bob item and flask base with the 3.9 base it stands for (reference/coverage/base-names.json against
+ * Compares every Bob item and flask base with the reference base it stands for (reference/coverage/base-names.json against
  * reference/coverage/ref-bases.json): level, requirements, defences, block, weapon numbers, flask amounts and charges, and the
  * implicit lines. Prints what differs, and the reference bases the game has no base for. The check behind
- * docs/AUDIT-ITEM-BASES.md: at parity it prints nothing but the counts.
+ * reference/docs/AUDIT-ITEM-BASES.md: at parity it prints nothing but the counts.
  *
  *   npm run coverage:bases-audit
  */
@@ -13,7 +13,7 @@ import { ITEM_BASES, REQUIREMENT_SCALE, WEAPON_DAMAGE_SCALE } from '../../src/da
 import { FLASK_BASES } from '../../src/data/flasks';
 import { modsText } from '../../src/mods/text';
 import { COVERAGE_DIR } from './reference';
-import type { PobBase } from './pob-bases';
+import type { RefBase } from './ref-bases-extract';
 import { familyOf, loadNames } from './emit-bases';
 
 type Diff = { base: string; what: string; ours: string; theirs: string };
@@ -21,7 +21,7 @@ type Diff = { base: string; what: string; ours: string; theirs: string };
 export function auditBases(): { diffs: Diff[]; unmatched: string[]; compared: number } {
   const bases = (
     JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'ref-bases.json'), 'utf8')) as {
-      bases: PobBase[];
+      bases: RefBase[];
     }
   ).bases;
   const names = loadNames();

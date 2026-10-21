@@ -138,7 +138,7 @@ describe('triggers: casting a socketed spell (EXPANSION 5.5)', () => {
     expect(t.triggers).toBe(t.uses);
   });
 
-  it('cost no mana, and fire with none left (3.9)', () => {
+  it('cost no mana, and fire with none left (as in the reference game)', () => {
     const none = run(buildFor([onHit({ cooldown: 0 })]), 20, 1, 1.6, 0).t;
     expect(none.triggers).toBeGreaterThan(5);
     expect(none.hits).toBeGreaterThan(5);

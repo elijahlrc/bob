@@ -63,9 +63,9 @@ export function utilityPick(
   const p = s.player;
   if ((s.utilityReady[c.key] ?? 0) > w.t) return null;
   const u = c.skill.utility!;
-  // The warcries wait on one another (3.9: a shared four seconds).
+  // The warcries wait on one another (the reference game: a shared four seconds).
   if (c.skill.tags.includes('warcry') && (s.utilityReady[WARCRIES] ?? 0) > w.t) return null;
-  // The guard skills wait on one another (3.9).
+  // The guard skills wait on one another (as in the reference game).
   if (u.kind === 'buff' && u.policy === 'guard' && (s.utilityReady[GUARDS] ?? 0) > w.t) return null;
   const d = Math.hypot(target.x - p.x, target.y - p.y);
   const prof = ch.profile(c, playerConds(w, s, target), flaskMask(s));

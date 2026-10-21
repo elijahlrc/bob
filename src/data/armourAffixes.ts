@@ -3,7 +3,7 @@ import type { FamilyDef } from './affixes';
 import { tabled } from './tierTables';
 
 /**
- * The armour and jewellery affixes, fitted to the 3.9 tables at the author's request (docs/AUDIT-ARMOUR-AFFIXES.md,
+ * The armour and jewellery affixes, fitted to the reference tables at the author's request (reference/docs/AUDIT-ARMOUR-AFFIXES.md,
  * DESIGN.md Appendix A, 2026-10-16): a family per mod and per set of slots that share a ladder, with the item levels and
  * ranges of each tier written out. Generated once by a script from the reference tables; edit by hand.
  */

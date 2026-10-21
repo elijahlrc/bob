@@ -1,22 +1,22 @@
 /**
- * Drafts entries in our data format from the reference list and the 3.9-era Path of Building numbers (COVERAGE 7.1).
+ * Drafts entries in our data format from the reference list and the reference data's numbers (COVERAGE 7.1).
  * A draft is a starting point for hand review (7.2): the reference name appears in a comment only, the name is a TODO,
  * and every number still has to be rescaled to Bob's 1-100 curve.
  *
- *   npm run coverage:draft -- gem "Heavy Strike" "Faster Attacks Support"
- *   npm run coverage:draft -- unique "Kaom's Heart"
+ *   npm run coverage:draft -- gem "<reference gem>" "<reference support> Support"
+ *   npm run coverage:draft -- unique "<reference unique>"
  *
  * Output goes to scripts/coverage/staging/ (git-ignored, outside src) and is echoed to the terminal.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type { PobSkill, PobUnique } from './pob-extract';
+import type { RefSkill, RefDataUnique } from './ref-extract';
 import { COVERAGE_DIR, key, loadReference } from './reference';
 
 const STAGING = resolve(COVERAGE_DIR, '../../scripts/coverage/staging');
 
-function pob<T>(file: string): T {
+function refData<T>(file: string): T {
   return JSON.parse(readFileSync(resolve(COVERAGE_DIR, file), 'utf8')) as T;
 }
 
@@ -24,12 +24,12 @@ const round = (n: number) => Math.round(n * 100) / 100;
 const pair = (a: number, b: number) => (a === b ? `${a}` : `[${a}, ${b}]`);
 
 /**
- * Pairs "..._minimum_..." with "..._maximum_..." stats. In 3.9 data these are ratios of a base damage that comes from a
+ * Pairs "..._minimum_..." with "..._maximum_..." stats. In the reference data these are ratios of a base damage that comes from a
  * per-level table scaled by the skill's damage effectiveness. Bob keeps one such table (`spellBaseDamage`), so a spell
  * is drafted as a `spread` (the lowest and highest roll as a share of their average) plus the effectiveness, and the
  * shared curve does the rest. A `share` other than 1 means the type carries more or less than the skill's average.
  */
-function damageRanges(s: PobSkill): string[] {
+function damageRanges(s: RefSkill): string[] {
   const out: string[] = [];
   s.stats.forEach((stat, i) => {
     const m = stat.match(
@@ -52,7 +52,7 @@ function damageRanges(s: PobSkill): string[] {
 const ATTR: Record<string, string> = { strength: 'str', dexterity: 'dex', intelligence: 'int' };
 
 /** The stats that carry a per-level value (the rest are flags or constants). */
-function statList(s: PobSkill): string {
+function statList(s: RefSkill): string {
   return s.stats
     .map((st, i) =>
       s.levels.first.values[i] === undefined
@@ -67,12 +67,12 @@ export function draftGem(name: string): string {
   const ref = loadReference();
   const entry = ref.gems.find((g) => key(g.name) === key(name));
   if (!entry) throw new Error(`"${name}" is not in the reference list`);
-  const skills = pob<{ skills: PobSkill[] }>('ref-skills.json').skills;
+  const skills = refData<{ skills: RefSkill[] }>('ref-skills.json').skills;
   const s =
     skills.find((x) => key(x.name) === key(name)) ??
     skills.find((x) => key(x.name) === key(name.replace(/ Support$/, '')));
-  const head = `  // reference: ${entry.name} (${entry.kind}; wiki tags ${entry.tags.join(', ')}; released ${entry.release || 'at launch'})`;
-  if (!s) return `${head}\n  // no 3.9-era data found in ref-skills.json: draft by hand\n`;
+  const head = `  // reference: ${entry.name} (${entry.kind}; reference wiki tags ${entry.tags.join(', ')}; released ${entry.release || 'at launch'})`;
+  if (!s) return `${head}\n  // no reference data found in ref-skills.json: draft by hand\n`;
   const f = s.levels.first;
   const l = s.levels.l20;
   const lines: string[] = [head];
@@ -101,7 +101,7 @@ export function draftGem(name: string): string {
       "    name: 'TODO',",
       `    attr: '${ATTR[entry.attr] ?? (entry.attr || 'TODO')}',`,
       `    skillType: '${attack ? 'attack' : 'spell'}',`,
-      `    // wiki tags: ${entry.tags.join(', ')}; skill types: ${s.skillTypes.join(', ')}`,
+      `    // reference wiki tags: ${entry.tags.join(', ')}; skill types: ${s.skillTypes.join(', ')}`,
       '    tags: [],',
       "    behaviour: { kind: 'TODO' },",
     );
@@ -129,7 +129,7 @@ export function draftUnique(name: string): string {
   const ref = loadReference();
   const entry = ref.uniques.find((u) => key(u.name) === key(name));
   if (!entry) throw new Error(`"${name}" is not in the reference list`);
-  const pu = pob<{ uniques: PobUnique[] }>('ref-uniques.json').uniques.find(
+  const pu = refData<{ uniques: RefDataUnique[] }>('ref-uniques.json').uniques.find(
     (u) => key(u.name) === key(name),
   );
   const lines = [
@@ -137,12 +137,12 @@ export function draftUnique(name: string): string {
   ];
   if (!pu) {
     lines.push(
-      '  // not in the 3.9-era data: draft from the wiki lines below, which are the current text',
+      '  // not in the reference data: draft from the reference wiki lines below, which are the current text',
       ...entry.explicit.split('\n').map((l) => `  //   ${l}`),
     );
   } else {
     lines.push(
-      `  // 3.9-era lines (variants: ${pu.variants.join(' | ') || 'none'}; ${pu.implicits} implicit):`,
+      `  // reference data lines (variants: ${pu.variants.join(' | ') || 'none'}; ${pu.implicits} implicit):`,
       ...pu.lines.map((l) => `  //   ${l}`),
     );
   }

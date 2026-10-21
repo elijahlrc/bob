@@ -6,7 +6,7 @@
  * as if the character already had +200% increased damage and +100% increased speed. A support that adds a count, a shape or a
  * trigger has numbers that mean nothing alone (they are blank in `dps`); read those by what they do.
  *
- * Bands (the reference game's, GGG's 3.15 note): a support with a side benefit gives under about 25% more damage at level 20; a
+ * Bands (the reference game's, from its developer's note on supports in a later version): a support with a side benefit gives under about 25% more damage at level 20; a
  * support that is only damage, 30-35%; one with a real drawback, 38-48%.
  */
 import { SUPPORT_GEMS, type GemMod, type SupportGemDef } from '../src/data/gems';

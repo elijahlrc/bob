@@ -13,7 +13,7 @@ import type { Action, Actor, World } from './types';
 import { contactRange } from './utility';
 import { spawnMonster, stepWorld } from './world';
 
-/** Tests of the spirit plan's S13a/S13b (docs/SPIRIT.md): attacks, spells, auras and traps rebuilt to be like their 3.9 originals. */
+/** Tests of the spirit plan's S13a/S13b (docs/SPIRIT.md): attacks, spells, auras and traps rebuilt to be like their reference originals. */
 
 const INT = classFor('int');
 const STR = classFor('str');

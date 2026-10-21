@@ -1,21 +1,22 @@
 /**
- * Extracts the parts of the 3.9 passive tree that parity is measured against (DESIGN §3 rule 2: data may be consulted,
- * layout and names are never copied). Raw files stay outside the repo; the trimmed JSON written here is reference data
- * under docs/tree/ and is never loaded by the game.
+ * Extracts the parts of the reference passive tree that parity is measured against (DESIGN §3 rule 2: data may be
+ * consulted, layout and names are never copied). Raw files stay outside the repo; the trimmed JSON written here is
+ * reference data under reference/tree/ and is never loaded by the game.
  *
- *   npm run tree:extract -- <path to TreeData/3_9/tree.lua>
+ *   npm run tree:extract -- <path to the tree data file of the reference release>
  *
- * Source: the tree-3_9.zip of Path of Building v1.4.155 (see scripts/coverage/pob-extract.ts), 2019-12-11, 3.9.x. Kept per
- * node: its kind, its stat lines, the group (cluster) it sits in and the sector of the tree it is in (the class whose start
- * is nearest); no coordinates, so the layout cannot be reproduced from it.
+ * Source: the tree data of the release that scripts/coverage/ref-extract.ts reads (which file: `data.tree` in
+ * reference/sources.json). Kept per node: its kind, its stat lines, the group (cluster) it sits in and the sector of the
+ * tree it is in (the class whose start is nearest); no coordinates, so the layout cannot be reproduced from it.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { loadSources } from '../coverage/reference';
 
 type Lua = unknown;
 
-/** A reader for the plain tables Path of Building writes its data in: numbers, strings, booleans and nested tables. */
+/** A reader for the plain Lua tables the reference data is written in: numbers, strings, booleans and nested tables. */
 export function parseLua(src: string): Lua {
   let i = src.indexOf('{');
   const ws = () => {
@@ -113,16 +114,17 @@ type RawNode = {
 
 const hasClass = (n: RawNode): boolean => !!n.spc && Object.keys(n.spc).length > 0;
 
-export function extract(luaPath: string): TreeRef {
-  const raw = parseLua(readFileSync(luaPath, 'utf8')) as {
+export function extract(dataPath: string): TreeRef {
+  const layout = loadSources().data;
+  const raw = parseLua(readFileSync(dataPath, 'utf8')) as {
     nodes: Record<string, RawNode>;
     groups: Record<string, { x: number; y: number }>;
   };
   const all = Object.values(raw.nodes);
   const starts = all.filter((n) => hasClass(n) && !n.ascendancyName);
-  const names = ['MARAUDER', 'RANGER', 'WITCH', 'DUELIST', 'TEMPLAR', 'SHADOW'];
+  const names = layout.treeStarts;
   const startNodes = names.map((nm) =>
-    starts.find((n) => n.dn === nm || (n.dn === 'SIX' && nm === 'SHADOW')),
+    starts.find((n) => n.dn === nm || layout.treeStartAliases[n.dn] === nm),
   );
   const sectors = names.map((s) => s.toLowerCase());
   const sectorOf = (g: number): number => {
@@ -161,7 +163,7 @@ export function extract(luaPath: string): TreeRef {
   }
   nodes.sort((a, b) => a.id - b.id);
   return {
-    source: 'Path of Building v1.4.155, TreeData/3_9/tree.lua (3.9.x)',
+    source: layout.treeSource,
     sectors,
     nodes,
   };
@@ -169,7 +171,7 @@ export function extract(luaPath: string): TreeRef {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const path = process.argv[2];
-  if (!path) throw new Error('usage: npm run tree:extract -- <path to tree.lua>');
+  if (!path) throw new Error('usage: npm run tree:extract -- <path to the tree data file>');
   const ref = extract(resolve(path));
   const out = resolve(import.meta.dirname, '../../reference/tree/ref-tree.json');
   writeFileSync(out, JSON.stringify(ref));

@@ -65,7 +65,7 @@ export type Chunk = { type: number; anc: number; min: number; max: number };
 /**
  * A chunk's base damage before scaling, with the multiplier each damaging ailment applies to it. Ailments are
  * calculated from base damage separately from hits: attack, spell, melee, projectile, area and weapon modifiers never
- * reach them, only damage-over-time, ailment-tagged, damage-type and generic ones (3.9, AUDIT-3.9).
+ * reach them, only damage-over-time, ailment-tagged, damage-type and generic ones (as in the reference game; the mechanics audit).
  */
 export type AilChunk = {
   type: number;
@@ -223,7 +223,7 @@ export type SkillProfile = {
   cannotInflictEle: boolean;
   /**
    * Impale: the chance a hit impales, the share of its physical damage each impale records, how many hits each lasts, and
-   * how many can be on one target (3.9).
+   * how many can be on one target (as in the reference game).
    */
   impale: { chance: number; share: number; hits: number; max: number };
   /** A hit that leaves the target at 10% life or less kills it. */
@@ -282,13 +282,13 @@ export type ProfileInput = {
 };
 
 const DOT_TAGS = tagBit('dot');
-/** How long Decay lasts, in seconds (3.9: eight). */
+/** How long Decay lasts, in seconds (the reference game: eight). */
 const DECAY_SECONDS = 8;
 /** Skills that are put down or summoned rather than used by the character. */
 const DEPLOYED_TAGS = tagMask(['totem', 'trap', 'mine', 'brand', 'minion']);
 
 /**
- * The keywords of a skill that reach the damage of its ailments (3.9): what kind of skill it is, the element it is, and
+ * The keywords of a skill that reach the damage of its ailments (as in the reference game): what kind of skill it is, the element it is, and
  * what it is put down or summoned as. The modifiers that scale hits (attack, spell, melee, projectile, area, and the
  * weapon held) are not among them; "ailment damage while wielding a sword" is a condition instead.
  */
@@ -455,7 +455,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     for (const c of chunks) {
       const cctx = { ...ctx, ancestry: c.anc };
       // An ailment takes the modifiers of the type it deals (ignite fire, bleed physical, poison chaos), whatever type
-      // the hit was, and no condition on the target (3.9).
+      // the hit was, and no condition on the target (as in the reference game).
       ailChunks.push({
         type: c.type,
         min: c.min,

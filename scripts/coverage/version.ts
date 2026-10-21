@@ -1,4 +1,4 @@
-/** Wiki versions are dotted numbers ("3.10.0"): compare them as numbers, never as strings. */
+/** Reference versions are dotted numbers ("1.10.0"): compare them as numbers, never as strings. */
 export function parseVersion(v: string): number[] {
   return v
     .trim()
@@ -21,7 +21,7 @@ export function versionBefore(v: string, limit: string): boolean {
 }
 
 /**
- * True when `v` is at most the given major.minor line, whatever its patch ("3.9.2" is at most "3.9").
+ * True when `v` is at most the given major.minor line, whatever its patch ("1.9.2" is at most "1.9").
  * An unparsable version counts as late, not early.
  */
 export function versionAtMost(v: string, majorMinor: string): boolean {

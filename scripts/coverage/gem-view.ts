@@ -1,5 +1,5 @@
 /**
- * Shows the next undecided gems with their 3.9-era numbers, a few lines each, for a human to turn into decisions
+ * Shows the next undecided gems with their reference numbers, a few lines each, for a human to turn into decisions
  * (reference/coverage/gems/*.json). The bucket of each gem is the one coverage.ts uses.
  *
  *   npm run coverage:gems -- --next 20 [active|support] [bucket,bucket]
@@ -7,7 +7,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { gemBucket, loadOverrides, type Bucket } from './buckets';
-import type { PobSkill } from './pob-extract';
+import type { RefSkill } from './ref-extract';
 import { COVERAGE_DIR, key, loadReference } from './reference';
 
 const round = (n: number | undefined) => (n === undefined ? '' : String(Math.round(n * 100) / 100));
@@ -34,10 +34,10 @@ function decidedRefs(): Set<string> {
 
 export function describeGem(
   g: ReturnType<typeof loadReference>['gems'][number],
-  s: PobSkill | undefined,
+  s: RefSkill | undefined,
 ): string {
-  const head = `## ${g.name} [${g.kind}] ${gemBucket(g)} | attr ${g.attr} | wiki tags ${g.tags.join(' ')} | released ${g.release || 'launch'}`;
-  if (!s) return `${head}\n   (no 3.9-era data found: draft from the wiki)`;
+  const head = `## ${g.name} [${g.kind}] ${gemBucket(g)} | attr ${g.attr} | reference wiki tags ${g.tags.join(' ')} | released ${g.release || 'launch'}`;
+  if (!s) return `${head}\n   (no reference data found: draft from the reference wiki)`;
   const f = s.levels.first;
   const l = s.levels.l20;
   const lines = [head];
@@ -68,9 +68,9 @@ function main(): void {
   const kind = args[2] === 'active' || args[2] === 'support' ? args[2] : undefined;
   const buckets = (args[3] ?? 'plain,dot,charges,triggers,channelling').split(',') as Bucket[];
   const ref = loadReference();
-  const pob = (
+  const refSkills = (
     JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'ref-skills.json'), 'utf8')) as {
-      skills: PobSkill[];
+      skills: RefSkill[];
     }
   ).skills;
   const over = loadOverrides();
@@ -82,7 +82,8 @@ function main(): void {
   for (const g of rows) {
     const bare = g.name.replace(/ Support$/, '');
     const s =
-      pob.find((x) => key(x.name) === key(g.name)) ?? pob.find((x) => key(x.name) === key(bare));
+      refSkills.find((x) => key(x.name) === key(g.name)) ??
+      refSkills.find((x) => key(x.name) === key(bare));
     console.log(describeGem(g, s));
   }
 }

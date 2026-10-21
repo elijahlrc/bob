@@ -1,6 +1,6 @@
 /**
  * Picks the Bob item base for a reference unique: the base the game has for that very reference base (every droppable
- * 3.9 base has one, under the name reference/coverage/base-names.json gives it). A reference base the game does not take on
+ * reference base has one, under the name reference/coverage/base-names.json gives it). A reference base the game does not take on
  * (the Demigod bases, a quest sword, a league belt or ring) falls back to the base of the same class, type and nearest
  * level.
  */
@@ -8,16 +8,16 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { ITEM_BASES, itemBase } from '../../src/data/bases';
 import { COVERAGE_DIR, norm } from './reference';
-import type { PobBase } from './pob-bases';
+import type { RefBase } from './ref-bases-extract';
 
-let cache: Map<string, PobBase> | null = null;
+let cache: Map<string, RefBase> | null = null;
 let names: Record<string, string> | null = null;
 
-export function pobBase(name: string): PobBase | undefined {
+export function refBase(name: string): RefBase | undefined {
   if (!cache) {
     const all = (
       JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'ref-bases.json'), 'utf8')) as {
-        bases: PobBase[];
+        bases: RefBase[];
       }
     ).bases;
     cache = new Map(all.map((b) => [norm(b.name), b]));
@@ -59,7 +59,7 @@ const SLOT_PREFIX: Record<string, string> = {
   Shield: 'shield',
 };
 
-function defType(b: PobBase): string {
+function defType(b: RefBase): string {
   const t =
     (b.armour > 0 ? 'ar' : '') + (b.evasion > 0 ? 'ev' : '') + (b.energyShield > 0 ? 'es' : '');
   // A three-way base (Sacrificial Garb) and a base with no defences (the Demigod set) sit with the armour-and-evasion ones.
@@ -78,7 +78,7 @@ function nearestOf(prefix: string, level: number): string | null {
 
 /** The Bob base id for a reference base name and class, or null when none fits (flasks, jewels). */
 export function bobBaseFor(refBaseName: string, refClass: string): string | null {
-  const b = pobBase(refBaseName);
+  const b = refBase(refBaseName);
   if (!b) return null;
   const own = bobNameFor(b.name);
   if (own) {

@@ -1,5 +1,5 @@
 /**
- * The translation rules: phrases of the 3.9-era unique item text, in the normalised form of translate.ts (numbers are
+ * The translation rules: phrases of the reference unique item text, in the normalised form of translate.ts (numbers are
  * `#`), to mods in Bob's own stat vocabulary. A stat that does not exist in Bob yet is listed by `needs-verb` (npm run
  * coverage:translate -- --needs) and is implemented when three or more uniques want it.
  */
@@ -21,7 +21,7 @@ const flag = (stat: string): ModT => ({ stat, kind: 'flag', min: 1, max: 1 });
 
 /**
  * Flat defences were scaled to Bob's lighter bases (armour and evasion 0.6, energy shield 0.45) until the bases took the
- * reference numbers (docs/AUDIT-ITEM-BASES.md, 2026-10-18); a flat line is now taken as it is.
+ * reference numbers (reference/docs/AUDIT-ITEM-BASES.md, 2026-10-18); a flat line is now taken as it is.
  */
 const FLAT_SCALE: Record<string, number> = {};
 const scaled = (stat: string, n: Num): Num => {

@@ -1,7 +1,7 @@
 /**
  * Turns the reviewed gem decisions in reference/coverage/gems/*.json into src/data/gemsGen.ts and the matching lines of
  * reference/coverage/map.json. A decision carries the whole Bob definition (`def`, an ActiveGemDef or SupportGemDef) written
- * by hand from the 3.9-era numbers (`npm run coverage:gems -- --next 20`), and the defining-mechanic note. The generated
+ * by hand from the reference numbers (`npm run coverage:gems -- --next 20`), and the defining-mechanic note. The generated
  * file is type-checked, so a typo in a decision stops the build.
  *
  *   npm run coverage:emit-gems
@@ -13,7 +13,7 @@ import { format, resolveConfig } from 'prettier';
 import { COVERAGE_DIR, key, loadReference } from './reference';
 
 export type GemDecision = {
-  /** The reference gem this is an analog of (its wiki name, "Support" included for supports). */
+  /** The reference gem this is an analog of (its reference wiki name, "Support" included for supports). */
   ref: string;
   /** What the gem does and why it counts. */
   note: string;

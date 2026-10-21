@@ -1,7 +1,7 @@
 /**
  * Statuses a skill can put on an enemy (docs/SPIRIT.md S3): the debuffs that are not curses and not ailments. A skill names
  * one with a chance on hit (`status.<id>.chance`), and the status says what it does and how it lasts. Magnitudes are the
- * reference game's 3.9 values; `v` is the main one (a slow, a share of hits that miss), `x` a second one a gem can give.
+ * reference game's values; `v` is the main one (a slow, a share of hits that miss), `x` a second one a gem can give.
  */
 export type StatusId =
   | 'hinder'

@@ -41,7 +41,7 @@ export const ALL_HEX_IDS: HexId[] = [
 ];
 
 export const HEX_SECONDS = 6;
-/** Bosses take a third less effect from curses (3.9). */
+/** Bosses take a third less effect from curses (as in the reference game). */
 export const BOSS_CURSE_EFFECT = 0.67;
 /** How many of the player's hexes a target holds at once, before items and the tree. */
 export const BASE_HEX_LIMIT = 1;

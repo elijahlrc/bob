@@ -34,7 +34,7 @@ export type BossDef = {
   says: string[];
   /** Its stun threshold, as a multiple of a normal monster's (bosses are 4 times). */
   stunMult: number;
-  /** How much of a curse's effect it takes (3.9 bosses take a third less). */
+  /** How much of a curse's effect it takes (the reference game's bosses take a third less). */
   curseEffect: number;
 };
 

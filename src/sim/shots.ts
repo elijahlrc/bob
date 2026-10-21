@@ -13,7 +13,7 @@ import type { Side } from './side';
  * How projectiles come about and what they do after a hit (docs/SPIRIT.md S4). A fan, a barrage fired one after another,
  * parallel lanes, an arrow that lands and bursts into a ring, an arrow that scatters at its end; a projectile that forks or
  * chains when it hits; and the skills that strike and then send projectiles out (bolts from the weapon, blades from behind the
- * struck enemy, balls that land and burst). The reference game's rule stands (3.9): the projectiles of one use cannot hit the same
+ * struck enemy, balls that land and burst). The reference game's rule stands: the projectiles of one use cannot hit the same
  * enemy twice, unless the skill fires them in sequence or is flagged to shotgun.
  */
 

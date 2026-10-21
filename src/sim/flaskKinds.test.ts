@@ -8,7 +8,7 @@ import { createDummyWorld } from './dummy';
 import { stepWorld } from './world';
 
 /**
- * The utility flask kinds the reference game has and Bob gained with the base audit (docs/AUDIT-ITEM-BASES.md): a flask that
+ * The utility flask kinds the reference game has and Bob gained with the base audit (reference/docs/AUDIT-ITEM-BASES.md): a flask that
  * leaves ground, one that holds a buff, one that makes critical strikes lucky, one that lets a share of cold hits by.
  */
 

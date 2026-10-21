@@ -18,7 +18,7 @@ import { STAT_TEXT } from '../../src/data/statText';
 import { UNIQUES } from '../../src/data/uniques';
 import { GENERATED_UNIQUES } from '../../src/data/uniquesGen';
 import { COVERAGE_DIR, key, loadRefNames, loadReference } from './reference';
-import { ctxFor, currentLines, loadPobUniques, translateLine, type ModT } from './translate';
+import { ctxFor, currentLines, loadRefUniques, translateLine, type ModT } from './translate';
 
 export type Decision = {
   /** The reference unique this is an analog of. */
@@ -87,16 +87,17 @@ export type Built = {
 };
 
 export function build(d: Decision): Built {
-  const pob = loadPobUniques().find((u) => key(u.name) === key(d.ref));
-  if (!pob) throw new Error(`decision "${d.name}": no reference unique "${d.ref}" in the 3.9 data`);
+  const refU = loadRefUniques().find((u) => key(u.name) === key(d.ref));
+  if (!refU)
+    throw new Error(`decision "${d.name}": no reference unique "${d.ref}" in the reference data`);
   const ref = loadReference().uniques.find((u) => key(u.name) === key(d.ref));
-  const baseId = d.base ?? bobBaseFor(pob.base, ref?.class ?? '');
-  if (!baseId) throw new Error(`decision "${d.name}": no Bob base for "${pob.base}"`);
-  const ctx = ctxFor(pob.base, pob.slot);
+  const baseId = d.base ?? bobBaseFor(refU.base, ref?.class ?? '');
+  if (!baseId) throw new Error(`decision "${d.name}": no Bob base for "${refU.base}"`);
+  const ctx = ctxFor(refU.base, refU.slot);
   const mods: ModT[] = [];
   let sockets = d.sockets;
   const open: string[] = [];
-  for (const line of currentLines(pob)) {
+  for (const line of currentLines(refU)) {
     if (d.drop?.some((s) => line.includes(s))) continue;
     const r = translateLine(line, ctx);
     if (r.kind === 'mods') {
@@ -111,7 +112,7 @@ export function build(d: Decision): Built {
   mods.push(...(d.mods ?? []));
   const id = d.id ?? camel(d.name);
   const baseLevel = ITEM_BASES.find((b) => b.id === baseId)?.level ?? 1;
-  const level = Math.max(baseLevel, d.level ?? pob.levelReq ?? ref?.level ?? 1);
+  const level = Math.max(baseLevel, d.level ?? refU.levelReq ?? ref?.level ?? 1);
   const parts = [
     `    id: ${q(id)},`,
     `    name: ${q(d.name)},`,

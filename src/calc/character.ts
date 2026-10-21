@@ -559,7 +559,7 @@ export class Character {
       }),
     ];
     if (this.dualWielding) {
-      // Dual wielding (3.9): 20% more physical attack damage and 15% additional chance to block attacks.
+      // Dual wielding (as in the reference game): 20% more physical attack damage and 15% additional chance to block attacks.
       mods.push(
         mod('damage', 'more', DUAL_WIELD_MORE_PHYS, {
           damageTypes: ['physical'],
@@ -2374,7 +2374,7 @@ export class Character {
           skill: sheet,
           usesPerSec: each,
           dps: sheet.totalDps,
-          // A triggered skill costs no mana (3.9).
+          // A triggered skill costs no mana (as in the reference game).
           manaPerSec: 0,
         });
       }
@@ -2448,7 +2448,7 @@ export class Character {
 
 /**
  * How many hits of a projectile skill's one use land on a single target. The projectiles of a use cannot hit the same enemy
- * twice (3.9), so it is one, unless they are fired in sequence (all of them), or the skill is flagged to shotgun (those that
+ * twice (in the reference game), so it is one, unless they are fired in sequence (all of them), or the skill is flagged to shotgun (those that
  * fly within the target's width at its distance); a cone burst with each shot is one more. What a strike sends out after it, a
  * Tornado Shot's scatter and an orb's bounces are counted in `afterHit.ts`; `hitChance` is the chance a hit lands (for the first).
  */

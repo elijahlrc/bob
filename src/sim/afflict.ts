@@ -11,7 +11,7 @@ import type { Side } from './side';
  * on it, a cleansing flask that is running, and the boss lock (rule 6).
  */
 
-/** What a cleansing flask keeps off (3.9: removes on use, and immunity during the flask effect). */
+/** What a cleansing flask keeps off (the reference game: removes on use, and immunity during the flask effect). */
 export type Cleansed = 'bleed' | 'poison' | 'ignite' | 'freeze' | 'shock' | 'curse';
 
 export function flaskCleanses(s: FlaskSpec, kind: Cleansed): boolean {

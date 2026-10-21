@@ -496,7 +496,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
         Math.max(0, dst.def.maxMana - reservedMana(dst.side!)),
         dst.mana + dst.def.manaOnBlock,
       );
-    // Blocking staggers the character for a moment (3.9 block recovery), once it has recovered from the last stagger.
+    // Blocking staggers the character for a moment (the reference game's block recovery), once it has recovered from the last stagger.
     if (
       dst.isPlayer &&
       dst.def.blockStagger > 0 &&
@@ -723,7 +723,7 @@ function applyAilments(w: World, src: Actor, dst: Actor, res: HitResult, p: Skil
   // Chances to avoid an ailment, and how long each lasts on this actor.
   for (const name of AILMENT_NAMES)
     if (a[name] > 0 && d.avoid[name] > 0 && w.rngCombat.chance(d.avoid[name])) a[name] = 0;
-  // A cleansing flask that is running keeps its ailment off the character (3.9; docs/BOSSES.md 11.2).
+  // A cleansing flask that is running keeps its ailment off the character (as in the reference game; docs/BOSSES.md 11.2).
   if (dst.isPlayer && dst.side!.flasks.some((f) => f.activeT > 0))
     for (const name of AILMENT_NAMES)
       if (a[name] > 0 && flaskWards(dst.side!, name === 'chill' ? 'freeze' : name)) a[name] = 0;

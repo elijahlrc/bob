@@ -3,7 +3,7 @@ import { gemDef } from './gems';
 
 /**
  * Triggers (EXPANSION 5.5). A trigger makes something happen when the player does something, without
- * the player spending action time on it. Triggered skills follow the reference game's rules (AUDIT-3.9): each
+ * the player spending action time on it. Triggered skills follow the reference game's rules (the mechanics audit): each
  * triggered skill has its own cooldown, a triggered skill costs no mana, and nothing triggers from a triggered skill.
  */
 export type TriggerOn =

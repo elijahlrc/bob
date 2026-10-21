@@ -178,7 +178,7 @@ describe('which weapons roll which affixes', () => {
   });
 });
 
-describe('the 3.9 rules for a weapon kind', () => {
+describe('the reference rules for a weapon kind', () => {
   const has = (b: string, f: string) => rolls(b).has(f);
 
   it('ailment chances are for the kinds of weapon that have them', () => {
@@ -262,7 +262,7 @@ describe('the 3.9 rules for a weapon kind', () => {
     }
   });
 
-  it('the base implicits follow the 3.9 bases', () => {
+  it('the base implicits follow the reference bases', () => {
     const imp = (id: string) =>
       itemBase(id)
         .implicits.map((m) => modText(m))

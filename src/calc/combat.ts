@@ -304,11 +304,11 @@ export function ailmentsFromHit(
   const def = t.def;
   const a = emptyAilments();
   if (def.immuneAilments) return a;
-  // 3.9: ailments from a critical strike carry a fixed 150%, whatever the critical strike multiplier.
+  // In the reference game, ailments from a critical strike carry a fixed 150%, whatever the critical strike multiplier.
   const agony = crit ? (p.cruelAgony ? hand.critMulti : CRIT_AILMENT_MULT) : 1;
   const resMult = (i: number) => {
     if (def.immune[i] || (i === CHAOS && def.immuneChaos)) return 0;
-    // Penetration does not apply to damage over time (3.9).
+    // Penetration does not apply to damage over time (as in the reference game).
     const r = effectiveRes(def.res[i] + t.resShift[i], def.maxRes[i]);
     return 1 - r / 100;
   };
@@ -374,7 +374,7 @@ export function stunFromHit(
   bonus = 0,
 ): { chance: number; duration: number } {
   if (!canStun || def.cannotBeStunned) return { chance: 0, duration: 0 };
-  // 3.9: melee physical damage stuns best (x1.25), non-melee non-physical worst (x0.75).
+  // As in the reference game, melee physical damage stuns best (x1.25), non-melee non-physical worst (x0.75).
   const melee = maskIntersects(p.tagMask, tagBit('melee'));
   let s = 0;
   for (let i = 0; i < NT; i++) {
@@ -441,7 +441,7 @@ export function resolveHit(
     ha.bleed[c.type] += base * ac.k[1];
     ha.poison[c.type] += base * ac.k[2];
   }
-  // 3.9: an attack must also pass an accuracy check to confirm a critical strike.
+  // As in the reference game, an attack must also pass an accuracy check to confirm a critical strike.
   res.crit =
     forceCrit ??
     (hand.critChance > 0 &&
@@ -519,7 +519,7 @@ export function expectedHit(
   const hc = p.isAttack
     ? attackHitChance(p, hand, t.def, t.hitChanceMult, t.evasionLess)
     : 1 - t.def.dodgeSpell;
-  // An attack confirms a critical strike with a second accuracy check (3.9).
+  // An attack confirms a critical strike with a second accuracy check (as in the reference game).
   const cc = hand.critChance * (p.isAttack ? hc : 1);
   const perType = nonCrit.map((n, i) => n * (1 - cc) + crit[i] * cc);
   // Impale: each landed hit also deals the damage the impales on the target recorded, as reflected physical damage.

@@ -12,7 +12,7 @@ import { BASE_ACCURACY, BASE_EVASION, DEX_ACCURACY } from '../../src/data/consta
 import { ITEM_BASES } from '../../src/data/bases';
 
 type Table = { evasion: number[]; accuracy: number[] };
-type PobBase = {
+type RefBase = {
   type: string;
   subType: string;
   level: number;
@@ -23,7 +23,7 @@ type PobBase = {
 const read = <T>(f: string): T =>
   JSON.parse(readFileSync(new URL(`../../reference/coverage/${f}`, import.meta.url), 'utf8')) as T;
 const table = read<Table>('ref-monster-stats.json');
-const pob = read<{ bases: PobBase[] }>('ref-bases.json').bases;
+const refBases = read<{ bases: RefBase[] }>('ref-bases.json').bases;
 
 // ---- 1. The fit ----
 function worst(values: number[], f: (m: number) => number): [number, number] {
@@ -48,7 +48,7 @@ const OLD_EVASION = (m: number) => 30 + 12 * m;
 const dex = (level: number) => level;
 
 const SLOTS = ['body', 'helmet', 'gloves', 'boots'] as const;
-const POB_SLOT: Record<(typeof SLOTS)[number], string> = {
+const REF_SLOT: Record<(typeof SLOTS)[number], string> = {
   body: 'Body Armour',
   helmet: 'Helmet',
   gloves: 'Gloves',
@@ -70,15 +70,15 @@ function bob(level: number): { eva: number; acc: number } {
   return { eva, acc: BASE_ACCURACY(level) + DEX_ACCURACY * dex(level) + sword };
 }
 
-/** The same in the reference game, from its 3.9-era bases. */
+/** The same in the reference game, from its bases. */
 function reference(level: number): { eva: number; acc: number } {
   let eva = BASE_EVASION(level);
   for (const slot of SLOTS) {
-    eva += pob
-      .filter((b) => b.type === POB_SLOT[slot] && b.subType === 'Evasion' && b.level <= level)
+    eva += refBases
+      .filter((b) => b.type === REF_SLOT[slot] && b.subType === 'Evasion' && b.level <= level)
       .reduce((m, b) => Math.max(m, b.evasion), 0);
   }
-  const sword = pob
+  const sword = refBases
     .filter((b) => b.type === 'One Handed Sword' && b.level <= level)
     .map((b) => Number(/\+(\d+) to Accuracy Rating/.exec(b.implicit)?.[1] ?? 0))
     .reduce((m, v) => Math.max(m, v), 0);

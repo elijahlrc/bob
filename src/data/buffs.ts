@@ -1,7 +1,7 @@
 import { mod, type CondId, type Mod } from '../mods/types';
 
 /**
- * The buff layer (COVERAGE C2, from AUDIT-3.9): timed states the player gains from events. Each buff is a condition
+ * The buff layer (COVERAGE C2, from the mechanics audit): timed states the player gains from events. Each buff is a condition
  * with fixed effects (the mods below, added to the character only when something can grant the buff), and the sim holds
  * the seconds left of each. Rage is different: it is a count, and each point is worth a little.
  * The names are descriptive; the effects follow the reference game's numbers.

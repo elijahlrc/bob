@@ -679,7 +679,7 @@ const HAND_DEFS: FamilyDef[] = [
     names: ['of Grit', 'of Fortitude', 'of the Bulwark'],
     weight: 0.7,
   },
-  // ---- Weapons: the rest of the pool a weapon rolls in the reference game (docs/AUDIT-WEAPON-AFFIXES.md) ----------
+  // ---- Weapons: the rest of the pool a weapon rolls in the reference game (reference/docs/AUDIT-WEAPON-AFFIXES.md) ----------
   {
     id: 'physAcc',
     type: 'prefix',
@@ -1036,8 +1036,8 @@ const HAND_DEFS: FamilyDef[] = [
 ];
 
 /**
- * The minion affixes of the one weapon base that rolls them (the Beckoning Wand, `ItemBase.minionWeapon`), with the 3.9
- * tiers (docs/AUDIT-ITEM-BASES.md): minion damage, damage with mana, attack and cast speed (Bob's one minion speed stat),
+ * The minion affixes of the one weapon base that rolls them (the Beckoning Wand, `ItemBase.minionWeapon`), with the reference
+ * tiers (reference/docs/AUDIT-ITEM-BASES.md): minion damage, damage with mana, attack and cast speed (Bob's one minion speed stat),
  * minion life and the minion gem level. Minion resistances and accuracy have no stat here and are left out.
  */
 const MINION_WEAPON_DEFS: FamilyDef[] = [

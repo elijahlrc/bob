@@ -1,16 +1,16 @@
 /**
- * Extracts base item data (class, defence type, level, weapon numbers) from the 3.9-era Path of Building data, for the
- * unique drafts: a draft picks the Bob base nearest the reference base. Same source and rules as pob-extract.ts.
+ * Extracts base item data (class, defence type, level, weapon numbers) from the reference data, for the unique drafts: a
+ * draft picks the Bob base nearest the reference base. Same source and rules as ref-extract.ts.
  *
- *   npm run coverage:bases -- <path to the unzipped PathOfBuilding-1.4.155/Data folder>
+ *   npm run coverage:bases-extract -- <path to the unzipped data folder of the reference release>
  */
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { POB_SOURCE } from './pob-extract';
-import { COVERAGE_DIR } from './reference';
+import { refSource } from './ref-extract';
+import { COVERAGE_DIR, loadSources } from './reference';
 
-export type PobBase = {
+export type RefBase = {
   name: string;
   /** "Body Armour", "One Handed Sword", "Ring", "Utility Flask", ... */
   type: string;
@@ -28,11 +28,11 @@ export type PobBase = {
 
 const num = (block: string, re: RegExp): number => Number(block.match(re)?.[1] ?? 0);
 
-export function parseBases(lua: string): PobBase[] {
-  const out: PobBase[] = [];
-  for (const part of lua.split(/\nitemBases\["/).slice(1)) {
+export function parseBases(text: string): RefBase[] {
+  const out: RefBase[] = [];
+  for (const part of text.split(/\nitemBases\["/).slice(1)) {
     const name = part.slice(0, part.indexOf('"'));
-    const base: PobBase = {
+    const base: RefBase = {
       name,
       type: part.match(/type = "([^"]*)"/)?.[1] ?? '',
       subType: part.match(/subType = "([^"]*)"/)?.[1] ?? '',
@@ -71,14 +71,18 @@ export function parseBases(lua: string): PobBase[] {
 
 function main(): void {
   const dir = process.argv[2];
-  if (!dir) throw new Error('usage: coverage:bases -- <path to PathOfBuilding-1.4.155/Data>');
-  const root = resolve(dir, '3_0/Bases');
-  const bases: PobBase[] = [];
-  for (const f of readdirSync(root).filter((x) => x.endsWith('.lua')))
+  if (!dir)
+    throw new Error(
+      'usage: coverage:bases-extract -- <path to the data folder of the reference release>',
+    );
+  const layout = loadSources().data;
+  const root = resolve(dir, layout.bases);
+  const bases: RefBase[] = [];
+  for (const f of readdirSync(root).filter((x) => x.endsWith(layout.ext)))
     bases.push(...parseBases(readFileSync(join(root, f), 'utf8')));
   writeFileSync(
     join(COVERAGE_DIR, 'ref-bases.json'),
-    JSON.stringify({ source: POB_SOURCE, bases }) + '\n',
+    JSON.stringify({ source: refSource(), bases }) + '\n',
   );
   console.log(`bases: ${bases.length}`);
 }

@@ -39,7 +39,7 @@ export function applyHex(
   seconds?: number,
 ): void {
   if (!a.alive || a.modIds.includes('hexWarded')) return;
-  // Bosses take a third less (3.9); a boss of docs/BOSSES.md takes what its card says (the Rotwife all of it).
+  // Bosses take a third less (as in the reference game); a boss of docs/BOSSES.md takes what its card says (the Rotwife all of it).
   if (a.rarity === 'boss')
     effect *= a.mon
       ? (bossOfType(a.mon.spec.type)?.curseEffect ?? BOSS_CURSE_EFFECT)
