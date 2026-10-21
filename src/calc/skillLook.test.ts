@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { ACTIVE_GEMS, GRANTED_GEMS } from '../data/gems';
-import { DELIVERIES, activeLook, ELEMENT_COLOR } from './skillLook';
+import { DELIVERIES, activeLook, ELEMENT_COLOR, initialsOf } from './skillLook';
+
+describe('icon initials', () => {
+  it('skip the small joining words', () => {
+    expect(initialsOf('Standard of Dread')).toBe('SD');
+    expect(initialsOf('Veil of Grace')).toBe('VG');
+    expect(initialsOf('Rime Drift')).toBe('RD');
+  });
+});
 
 describe('skill look', () => {
   const actives = [...ACTIVE_GEMS, ...GRANTED_GEMS];

@@ -860,7 +860,8 @@ export class Character {
       }
       if (skill.requiresWeapon && !skill.requiresWeapon.some((t) => weaponTags.has(t))) {
         usable = false;
-        reason = `${skill.name} needs a ${skill.requiresWeapon.join(' or ')}`;
+        const w = skill.requiresWeapon.join(' or ');
+        reason = `${skill.name} needs ${/^[aeiou]/.test(w) ? 'an' : 'a'} ${w}`;
       }
       if (skill.needsTwoHand && !weaponTags.has('twoHand')) {
         usable = false;

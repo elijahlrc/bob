@@ -65,12 +65,18 @@ export function excludedBy(rules: SupportRules, types: ReadonlySet<SkillType>): 
   return rules.excludes?.find((t) => types.has(t)) ?? null;
 }
 
+/** "an attack skill", "a projectile or area skill", "an active skill" (none named), with the right article. */
+export function aSkill(kinds: readonly string[]): string {
+  const words = kinds.length ? kinds.join(' or ') : 'active';
+  return `${/^[aeiou]/i.test(words) ? 'an' : 'a'} ${words} skill`;
+}
+
 /** Why a skill does not satisfy a support, in words (for the gem's status line). */
 export function typesWhy(rules: SupportRules, types: ReadonlySet<SkillType>): string | null {
   if (rules.supports.length > 0 && !rules.supports.some((t) => types.has(t)))
-    return `needs a ${rules.supports.join(' or ')} skill`;
+    return `needs ${aSkill(rules.supports)}`;
   const missing = rules.needs?.find((t) => !types.has(t));
-  if (missing) return `needs a ${missing} skill`;
+  if (missing) return `needs ${aSkill([missing])}`;
   const bad = excludedBy(rules, types);
   if (bad) return `cannot support ${bad} skills`;
   return null;

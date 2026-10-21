@@ -1,5 +1,6 @@
 import type { Character } from '../calc/character';
 import { gemDef } from '../data/gems';
+import { aSkill } from '../data/skillTypes';
 
 /**
  * Whether a socketed gem is doing anything, in a line: which skills a support is on, what supports a skill, whether an aura
@@ -70,8 +71,7 @@ function supportIdle(
   if (ch.actives.some((a) => a.supports.some((x) => x.gem.uid === uid))) return null;
   const idle = ch.actives.flatMap((a) => (a.inert ?? []).filter((x) => x.gem.gem.uid === uid));
   if (idle.length) return { why: idle[0].why, inert: true };
-  const needs = def.supports.length ? def.supports.join(' or ') : 'an active skill';
-  return { why: `needs a ${needs} skill in the same item`, inert: false };
+  return { why: `needs ${aSkill(def.supports)} in the same item`, inert: false };
 }
 
 /**

@@ -102,8 +102,13 @@ export type SkillLook = {
   initials: string;
 };
 
+/** Small joining words an icon skips ("Standard of Dread" is SD, not SO). */
+const JOINERS = new Set(['of', 'the', 'and', 'a', 'an', 'to', 'in', 'on']);
+
 export function initialsOf(name: string): string {
-  const words = name.split(/\s+/).filter(Boolean);
+  const all = name.split(/\s+/).filter(Boolean);
+  const words = all.filter((w) => !JOINERS.has(w.toLowerCase()));
+  if (words.length === 0) words.push(...all);
   if (words.length === 0) return '?';
   if (words.length === 1) return words[0].slice(0, 2);
   return (words[0][0] + words[1][0]).toUpperCase();

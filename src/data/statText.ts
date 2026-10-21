@@ -307,6 +307,11 @@ Object.assign(STAT_TEXT, {
   curseEffectOnSelf: { name: 'effect of Curses on you' },
   'ignite.extra': { base: 'You can inflict {v} additional Ignite on an enemy' },
   'ignite.speed': { name: 'speed at which Ignites deal their damage' },
+  // A flask's own affixes ("Brimming", "Deep", "Lasting", "Bursting"), local to the flask.
+  'flask.amount': { name: 'Amount Recovered' },
+  'flask.maxCharges': { name: 'maximum Charges' },
+  'flask.duration': { name: 'Duration' },
+  'flask.instant': { flag: 'Recovers instantly' },
   'flask.lifeToEs': {
     flag: 'On use, removes all but 1 Life; the removed Life returns as Energy Shield over 2 seconds',
   },

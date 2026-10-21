@@ -14,9 +14,33 @@ describe('gemCardData', () => {
   it('a card never says the same thing twice', () => {
     for (const def of ALL_GEMS)
       for (const level of [1, 20]) {
-        const lines = gemCardData(def, level).stats;
-        expect(new Set(lines).size, `${def.id} at level ${level}`).toBe(lines.length);
+        const d = gemCardData(def, level);
+        for (const lines of [d.stats, d.effects])
+          expect(new Set(lines).size, `${def.id} at level ${level}`).toBe(lines.length);
       }
+  });
+
+  it('a card shows no stat id and no line worth nothing', () => {
+    for (const def of ALL_GEMS)
+      for (const level of [1, 20]) {
+        const d = gemCardData(def, level);
+        for (const l of [...d.stats, ...d.effects]) {
+          expect(l, `${def.id} at level ${level}`).not.toMatch(/\b[a-z]+\.[a-zA-Z]+\b/);
+          expect(l, `${def.id} at level ${level}`).not.toMatch(
+            /^[+-]?0%? (increased|reduced|more|less|to) /,
+          );
+        }
+      }
+  });
+
+  it('a warcry shouts; a channelled touch does not', () => {
+    const stats = (id: string) =>
+      gemCardData(
+        ALL_GEMS.find((g) => g.id === id)!,
+        1,
+      ).stats.join('|');
+    expect(stats('rotTouch')).not.toMatch(/warcr|Shouts/);
+    expect(stats('kindledBellow')).toContain('shared with the other warcries');
   });
 
   it('a mine or trap says how long it waits to be set off, a totem how long it stands', () => {

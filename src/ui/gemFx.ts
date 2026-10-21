@@ -26,10 +26,11 @@ function dotLine(d: DotSpec, level: number): string {
   if (d.carried) parts.push(`on everything within ${num(d.carried)} of it as it flies`);
   if (d.maxTargets) parts.push(`on the ${d.maxTargets} nearest enemies`);
   if (d.splash) parts.push(`and on enemies within ${num(d.splash)} of the target`);
-  if (d.spread) parts.push('passed on when the enemy dies');
+  if (d.spread) parts.push(', passed on when the enemy dies');
   if (d.regen) parts.push(`; you mend ${num(d.regen)}% of it for each enemy that carries it`);
   if (d.hinder) parts.push(`; slows them by ${num(d.hinder.v)}%`);
-  return parts.join(' ');
+  // A part that starts with its own punctuation sits right after the one before it.
+  return parts.reduce((s, p) => (/^[,;]/.test(p) ? s + p : `${s} ${p}`));
 }
 
 /** The lines for the special behaviours of an active skill. */

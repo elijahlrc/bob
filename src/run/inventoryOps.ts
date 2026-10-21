@@ -10,6 +10,7 @@ import { itemBase, isWeaponClass } from '../data/bases';
 import { flaskBase } from '../data/flasks';
 import { modsText } from '../mods/text';
 import { gemDef } from '../data/gems';
+import { aSkill } from '../data/skillTypes';
 import {
   EQUIP_SLOTS,
   type InventoryItem,
@@ -361,8 +362,6 @@ export function placementsFor(
     // A support in an empty socket of an item with no skill to support changes nothing: no need to work the sheet out.
     if (kind === 'support' && !cur && !hasActiveSkill(it)) {
       const def = gemDef(gem.gemId);
-      const needs =
-        def.kind === 'support' && def.supports.length ? def.supports.join(' or ') : 'an active';
       out.push({
         slot,
         socket,
@@ -370,7 +369,7 @@ export function placementsFor(
         ehpPct: 0,
         scorePct: 0,
         replaces,
-        idle: `needs ${needs === 'an active' ? needs : 'a ' + needs} skill on this item`,
+        idle: `needs ${aSkill(def.kind === 'support' ? def.supports : [])} on this item`,
       });
       continue;
     }

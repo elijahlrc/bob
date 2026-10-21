@@ -14,6 +14,16 @@ import { triggerCause, triggerText } from '../data/triggers';
 import { modsText } from '../mods/text';
 import { auraFxLines, fxLines, utilityFxLines } from './gemFx';
 
+/** A gem's mods at a level as card lines; one worth nothing at this level ("0% increased Projectile Speed") is left out. */
+function cardMods(...args: Parameters<typeof gemMods>): string[] {
+  return modsText(
+    gemMods(...args).filter(
+      (m) =>
+        m.kind === 'flag' || m.value !== 0 || m.stat === 'damage.min' || m.stat === 'damage.max',
+    ),
+  );
+}
+
 export type GemCardData = {
   name: string;
   /** "Active skill · Attack", "Support gem", "Aura gem". */
@@ -67,14 +77,19 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
       ],
       effects: [
         hexText(u.hex, hexEffect(u.hex, level)),
-        ...(HEXES[u.hex].selfMods ?? []).map((m) => {
-          const t = Math.max(0, Math.min(1, (level - 1) / 19));
-          return modsText([
-            { stat: m.stat, kind: m.kind, value: m.low + (m.high - m.low) * t, tags: m.tags },
-          ])
-            .map((x) => `${x} against them`)
-            .join('');
-        }),
+        // Rendered together, so an added-damage pair reads as one line ("Adds 9 to 12 Chaos Damage against them").
+        ...modsText(
+          (HEXES[u.hex].selfMods ?? []).map((m) => {
+            const t = Math.max(0, Math.min(1, (level - 1) / 19));
+            return {
+              stat: m.stat,
+              kind: m.kind,
+              value: Math.round(m.low + (m.high - m.low) * t),
+              tags: m.tags,
+              damageTypes: m.damageTypes,
+            };
+          }),
+        ).map((x) => `${x} against them`),
       ],
     };
   if (u.kind === 'buff' && u.banner) {
@@ -90,7 +105,7 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
         ...(u.cooldown ? [`${num(u.cooldown)} s cooldown`] : []),
       ],
       effects: [
-        ...modsText(gemMods(u.mods, level, def.id)),
+        ...cardMods(u.mods, level, def.id),
         `Enemies near it: ${d.text.replace('{v}', num(levelValue(b.enemy.v, level)))}`,
         `Putting it down gives ${BUFFS[b.place.buff].name} for ${num(b.place.secondsPerStage)} s for each stage`,
       ],
@@ -115,7 +130,7 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
           ? [`${num(u.cooldown)} s cooldown${u.rage ? ', which does not run while it lasts' : ''}`]
           : []),
       ],
-      effects: modsText(gemMods(u.mods, level, def.id)),
+      effects: cardMods(u.mods, level, def.id),
     };
   if (u.kind === 'buff')
     return {
@@ -124,15 +139,25 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
         u.second ? 'Used when a crowd closes in or you are hurt' : POLICY_TEXT[u.policy],
         ...(u.cooldown ? [`${num(u.cooldown)} s cooldown`] : []),
       ],
-      effects: modsText(gemMods(u.mods, level, def.id)),
+      effects: cardMods(u.mods, level, def.id),
     };
-  if (u.kind === 'shout')
+  if (u.kind === 'shout') {
+    // A warcry shouts and shares its cooldown with the other warcries; a channelled touch (Rot Touch) does neither.
+    const cry = def.tags.includes('warcry');
     return {
-      stats: [
-        `Shouts at enemies in a radius of ${num(u.radius)}`,
-        POLICY_TEXT.rally,
-        `${num(u.cooldown)} s cooldown, shared with the other warcries`,
-      ],
+      stats: cry
+        ? [
+            `Shouts at enemies in a radius of ${num(u.radius)}`,
+            POLICY_TEXT.rally,
+            `${num(u.cooldown)} s cooldown, shared with the other warcries`,
+          ]
+        : [
+            `Afflicts enemies in a radius of ${num(u.radius)}`,
+            u.policy === 'upkeep'
+              ? 'Channelled while an enemy is within it'
+              : POLICY_TEXT[u.policy ?? 'rally'],
+            `${num(u.cooldown)} s between uses`,
+          ],
       effects: u.statuses.map((s) => {
         const d = STATUSES[s.id];
         const v = levelValue(s.v, level);
@@ -145,6 +170,7 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
           .replace('{n}', '1')}${more}`;
       }),
     };
+  }
   if (u.kind === 'summon') {
     const m = MINIONS[u.minion];
     const n = Math.round(levelValue(u.count, level));
@@ -161,7 +187,7 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
       'They follow you and strike the nearest enemy; they can fall, and casting again fills their places',
     );
     if (def.cooldown) lines.push(`${num(levelValue(def.cooldown, level))} s cooldown`);
-    const effects = modsText(gemMods(u.ownerMods ?? [], level, def.id));
+    const effects = cardMods(u.ownerMods ?? [], level, def.id);
     if (u.golem)
       effects.push(
         `The other minions deal ${num(levelValue(u.golem.addMin, level))} to ${num(levelValue(u.golem.addMax, level))} added physical damage while it stands`,
@@ -315,12 +341,10 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
     if (def.requiresWeapon?.length)
       stats.push(`Requires ${def.requiresWeapon.map(tagLabel).join(' or ')} weapon`);
     if (def.bothWeapons) stats.push('Hits with both weapons when dual wielding');
-    effects = [...modsText(gemMods(def.mods, level, def.id)), ...utilityLines(def, level).effects];
+    effects = [...cardMods(def.mods, level, def.id), ...utilityLines(def, level).effects];
     if (def.ancestral)
       effects.push(
-        ...modsText(gemMods(def.ancestral.mods, level, def.id)).map(
-          (m) => `While it is active: ${m}`,
-        ),
+        ...cardMods(def.ancestral.mods, level, def.id).map((m) => `While it is active: ${m}`),
       );
   } else if (def.kind === 'support') {
     type = 'Support gem';
@@ -344,10 +368,7 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
       stats.push(`Only works with ${def.limitWeapon.map(tagLabel).join(' or ')} weapons`);
     const extra = Math.round((def.costMult - 1) * 100);
     if (extra) stats.push(`${extra > 0 ? '+' : ''}${extra}% mana cost of the supported skill`);
-    effects = [
-      ...modsText(gemMods(def.mods, level, def.id)),
-      ...modsText(gemMods(def.global ?? [], level, def.id)),
-    ];
+    effects = [...cardMods(def.mods, level, def.id), ...cardMods(def.global ?? [], level, def.id)];
   } else {
     type = 'Aura gem';
     if (def.reservePct) stats.push(`Reserves ${def.reservePct}% of your mana`);
@@ -355,7 +376,7 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
       stats.push(`Reserves ${Math.round(levelValue(def.reserveFlat, level))} mana`);
     for (const t of def.triggers ?? []) stats.push(triggerText(t));
     stats.push(...auraFxLines(def, level));
-    effects = modsText(gemMods(def.mods, level, def.id));
+    effects = cardMods(def.mods, level, def.id);
     // A stance has two sets of effects, one for each stance; the character swaps by policy (a crowd: the Sand stance).
     if (def.stance) {
       stats.push(
@@ -365,7 +386,7 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
         ['Blood stance', def.stance.blood],
         ['Sand stance', def.stance.sand],
       ] as const) {
-        for (const m of modsText(gemMods(side.mods, level, def.id))) effects.push(`${name}: ${m}`);
+        for (const m of cardMods(side.mods, level, def.id)) effects.push(`${name}: ${m}`);
         if (side.enemies) {
           const s = STATUSES[side.enemies.id];
           effects.push(

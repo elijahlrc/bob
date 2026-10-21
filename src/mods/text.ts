@@ -43,6 +43,12 @@ function statName(m: Mod): string {
   }
   const conv = /^(convert|gain|convertSkill)\.(\w+)\.(\w+)$/.exec(m.stat);
   if (conv) return `${TYPE_NAME[conv[2] as DamageType]} as ${TYPE_NAME[conv[3] as DamageType]}`;
+  // "less Physical Damage taken from Hits": a mod limited to damage types names them.
+  if (m.stat === 'hitTakenType' || m.stat === 'damageTaken') {
+    const tp = typesPhrase(m.damageTypes);
+    const what = m.stat === 'hitTakenType' ? 'Damage taken from Hits' : 'Damage taken';
+    return tp ? `${tp} ${what}` : what;
+  }
   return STAT_TEXT[m.stat]?.name ?? m.stat;
 }
 
