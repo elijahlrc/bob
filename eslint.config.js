@@ -8,7 +8,7 @@ const HEADLESS = ['src/{core,data,mods,calc,gen,sim,run}/**/*.{ts,tsx}'];
 const DETERMINISTIC = HEADLESS;
 
 export default defineConfig(
-  globalIgnores(['dist', 'coverage']),
+  globalIgnores(['dist', 'coverage', 'reference']),
   js.configs.recommended,
   tseslint.configs.recommended,
   {
