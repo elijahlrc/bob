@@ -256,6 +256,105 @@ crash(27.0, 0.6, 2.5)
 bassnote(27.0, D2, 2.2, 0.6)
 lead(27.0, 62, 1.8, 0.3, duty=0.125)
 
+# ================= sound effects =================
+# The game has no sound yet, so the trailer's effects are made here: short chip sounds on their own bus, laid over
+# the groove and never ducked by it. The music stays the same underneath.
+
+
+def zap(at, m=93, g=1.0, d=0.1):
+    blip(at, m, d, 0.9 * g, 0.125, slide=-5)
+    place('sfx', at, noise(d, 20000) * np.exp(-np.arange(int(d * SR)) / SR / 0.02), 0.12 * g)
+
+
+def thud(at, g=1.0):
+    d = 0.3
+    place('sfx', at, tri(110, d, slide=-6) * np.exp(-np.arange(int(d * SR)) / SR / 0.08), 0.5 * g)
+    place('sfx', at, noise(d, 6000) * np.exp(-np.arange(int(d * SR)) / SR / 0.06), 0.3 * g)
+
+
+def whoosh(at, d=0.2, g=1.0, rise=True):
+    n = int(d * SR)
+    env_ = np.sin(np.pi * np.arange(n) / n)
+    place('sfx', at, noise(d, 9000 if rise else 5000) * env_, 0.25 * g)
+
+
+def click(at, g=1.0):
+    blip(at, 84, 0.02, 0.9 * g, 0.5)
+
+
+def tick(at, m=88, g=1.0):
+    blip(at, m, 0.03, 0.6 * g, 0.5)
+
+
+# 0-2: three trap spires, then the big burst
+for at in (0.0, 0.5, 1.0):
+    zap(at)
+thud(1.5, 1.2)
+whoosh(1.5, 0.4, 0.8)
+# 2-3: a tick per class card, a confirm on the Vanguard
+for k in range(6):
+    tick(2.0 + k * 0.125, 86 + k)
+blip(2.75, 79, 0.08, 0.8, 0.5)
+blip(2.82, 86, 0.12, 0.7, 0.5)
+# 3-6: four node chimes up the tree, the wind-up and the slam
+for k, m in enumerate((74, 77, 81, 86)):
+    blip(3.2 + k * 0.18, m, 0.14, 0.8, 0.125)
+whoosh(4.6, 0.4, 0.8)
+thud(5.0, 1.5)
+place('sfx', 5.0, noise(0.6, 3000) * np.exp(-np.arange(int(0.6 * SR)) / SR / 0.15), 0.25)  # the floor cracking
+# 6-10.5: the gem drops into its socket, the number climbs, the traps are thrown and spring, the amulet drops, Equip
+blip(6.0, 81, 0.25, 0.4, 0.5, slide=-2)
+click(6.4, 1.3)
+for k in range(8):
+    tick(6.5 + k * 0.05, 76 + k * 2, 0.8)
+for at in (7.0, 7.2, 7.4):
+    whoosh(at, 0.15, 0.6)
+for at in (7.5, 8.0, 8.5):
+    zap(at, 96)
+for k, m in enumerate((81, 86, 89, 93)):
+    blip(9.02 + k * 0.06, m, 0.1, 0.7, 0.5)
+blip(9.26, 98, 0.3, 0.5, 0.25)
+click(10.2, 1.2)
+blip(10.24, 86, 0.08, 0.6, 0.5)
+# 10.5-12.5: three panels: arrows loosed, heavy sweeps, a totem's bell
+for n in range(11):
+    tick(10.65 + n * 0.18, 95, 0.6)
+for at in (10.85, 11.45, 12.05):
+    whoosh(at, 0.18, 1.0)
+    thud(at + 0.12, 0.5)
+place('sfx', 10.7, tri(220, 0.12, slide=-4) * adsr(int(0.12 * SR), d=0.1, s=0), 0.4)  # the totem lands
+for n in range(5):
+    blip(11.05 + n * 0.33, 93, 0.18, 0.5, 0.125)
+# 12.5-16: an impact on every cut
+for k in range(7):
+    at = 12.5 + k * 0.5
+    [zap, thud, zap, zap, whoosh, thud, zap][k](at + 0.12)
+# 16-19: the boss charges, the void slams down; the duel button
+place('sfx', 16.0, pulse(midi(74), 0.5, 0.5, slide=-3) * np.linspace(0.2, 1, int(0.5 * SR)), 0.16)
+place('sfx', 16.0, noise(0.5, 4000) * np.linspace(0, 1, int(0.5 * SR)) ** 2, 0.15)
+thud(16.5, 1.6)
+place('sfx', 16.5, noise(1.2, 2500) * np.exp(-np.arange(int(1.2 * SR)) / SR / 0.35), 0.35)  # the floor shattering
+click(18.25, 1.2)
+blip(18.3, 74, 0.12, 0.7, 0.5)
+blip(18.45, 69, 0.3, 0.6, 0.5)
+# 19-22.5: the duel: our shots every half beat, the rival's fire, the held frame, the deciding hit
+for n in range(5):
+    blip(19.0 + n * 0.5, 88, 0.06, 0.6, 0.25, slide=-3)
+    tick(19.25 + n * 0.5, 72, 0.7)
+for n in range(3):
+    whoosh(19.75 + n * 0.75, 0.15, 0.7)
+    thud(19.75 + n * 0.75, 0.5)
+thud(22.25, 1.6)
+zap(22.25, 98, 1.2, 0.2)
+# 22.5-25: the rating counts up, a coin per place gained
+for k in range(10):
+    tick(22.65 + k * 0.05, 79 + k, 0.7)
+for at in (23.9, 24.2):
+    blip(at, 88, 0.05, 0.9, 0.5)
+    blip(at + 0.05, 93, 0.12, 0.9, 0.5)
+# 29.5: the torch gutters out
+place('sfx', 29.5, noise(0.5, 9000) * np.exp(-np.arange(int(0.5 * SR)) / SR / 0.15), 0.15)
+
 # ================= the mix =================
 for a_, b_ in mute_spans:  # held silences
     for k_ in bus:
