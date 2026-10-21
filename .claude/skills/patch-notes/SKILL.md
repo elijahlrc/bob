@@ -69,8 +69,8 @@ performance work with no visible effect, balance of unreleased content.
 - **Public-facing, impersonal.** No "I", no "we", no "you asked", no mention of the developer, the user or a session. "Your
   character" and "you" for the player are fine.
 - **Only what changed.** Never write "X is unchanged", "still the same" or anything about what was checked and left alone.
-- **Our own names only** (Spirit Saw, Storm Rush, Rotting Stride, Searing Mantle...), never the Path of Exile names, and no
-  mention of Path of Exile, Path of Building, the wiki, or version numbers like 3.9.
+- **Our own names only** (Spirit Saw, Storm Rush, Rotting Stride, Searing Mantle...), never the reference game's names, and
+  no mention of the reference game, its tools, its wiki, or its version numbers.
 - **No internals.** No file names or paths, commands, commit hashes, milestones, audits, ledgers, tests, constants, "sim", "bot",
   "build matrix", "refactor". No "See docs/...".
 - **Known issues are fine, written neutrally** ("new and still being balance-tested"), never as dev notes about what was not
@@ -93,7 +93,7 @@ high level are all they want. When in doubt, cut; then cut again.
 - Bullets start with `- `, wrapped by prettier; blank line between blocks; the file ends with a newline.
 - `npx prettier --write docs/PATCH-NOTES.md`.
 - Re-read the new bullets once against the rules in step 3 before going on (search them for `**`, backticks, `docs/`, `I`,
-  `3.9`, `unchanged`, `.ts`).
+  version numbers, `unchanged`, `.ts`).
 
 ## 5. Audit (Opus)
 
