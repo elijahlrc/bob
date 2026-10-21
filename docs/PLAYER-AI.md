@@ -186,7 +186,8 @@ damage does not move the figure. It counts one target, with free mana (docs/SHEE
 - **Burning aura or circling blades** (Righteous Fire and Orbiting Blades analogs): the character walks in to
   about **2.2 tiles**, whatever its attack's range, so the aura reaches.
 - **Arrows hitting walls:** if its shots hit walls **5 times within 3 seconds** (a wide fan in a narrow corridor),
-  it closes to within **3.5 tiles** of the target for 3 seconds to get a clearer shot.
+  it closes to within **3.5 tiles** of the target for 3 seconds to get a clearer shot. Shots from totems, traps and
+  mines don't count: walking closer doesn't change where they shoot from.
 
 ### 4.4 Cast time
 

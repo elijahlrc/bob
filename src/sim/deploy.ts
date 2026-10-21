@@ -211,6 +211,31 @@ function totemSpot(
   return best;
 }
 
+/**
+ * Leaves room for one more of a skill's totems or brands: while `n` or more stand, the one furthest from the character (the one
+ * left behind) gives way. A loop, not one removal, because the cap can fall below what stands (a condition that raised it ends).
+ */
+function makeRoom(w: World, a: Actor, key: string, n: number): void {
+  const list = a.side!.deployables;
+  for (;;) {
+    let far = -1;
+    let count = 0;
+    let fd = -1;
+    list.forEach((d, i) => {
+      if (d.key !== key) return;
+      count++;
+      const dist = Math.hypot(d.x - a.x, d.y - a.y);
+      if (dist > fd) {
+        fd = dist;
+        far = i;
+      }
+    });
+    if (count < n || far < 0) return;
+    const [gone] = list.splice(far, 1);
+    w.events.push({ t: 'deploy', id: gone.id, kind: gone.kind, x: gone.x, y: gone.y, end: true });
+  }
+}
+
 /** The use of a deploying skill lands: put its totem, brand, traps or mines down. */
 export function placeDeployable(w: World, a: Actor, act: Action): void {
   const c = a.side!.char.actives.find((x) => x.skill.id === act.profile.skill.id);
@@ -248,12 +273,7 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
     w.events.push({ t: 'deploy', id, kind: c.deploy!, x: spot.x, y: spot.y, end: false });
   };
   if (c.deploy === 'totem') {
-    // Only as many as the skill allows stand: the one furthest from the character (the one left behind) gives way.
-    const mine = a.side!.deployables.filter((d) => d.key === c.key);
-    if (mine.length >= n) {
-      mine.sort((u, v) => Math.hypot(v.x - a.x, v.y - a.y) - Math.hypot(u.x - a.x, u.y - a.y));
-      a.side!.deployables.splice(a.side!.deployables.indexOf(mine[0]), 1);
-    }
+    makeRoom(w, a, c.key, n);
     const spot = totemSpot(w, a, target, c);
     put(spot.x, spot.y);
     return;
@@ -261,11 +281,7 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
   const tx = target ? target.x : a.x;
   const ty = target ? target.y : a.y;
   if (c.deploy === 'brand') {
-    const mine = a.side!.deployables.filter((d) => d.key === c.key);
-    if (mine.length >= n) {
-      mine.sort((u, v) => Math.hypot(v.x - a.x, v.y - a.y) - Math.hypot(u.x - a.x, u.y - a.y));
-      a.side!.deployables.splice(a.side!.deployables.indexOf(mine[0]), 1);
-    }
+    makeRoom(w, a, c.key, n);
     put(tx, ty);
     return;
   }

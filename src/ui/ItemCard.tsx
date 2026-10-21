@@ -3,6 +3,7 @@ import { Character, diffSheets, type SheetDiff } from '../calc/character';
 import { armourStats, itemReq, weaponStats } from '../calc/items';
 import { isWeaponClass, itemBase, WEAPON_TYPE_NAME } from '../data/bases';
 import { triggerText } from '../data/triggers';
+import { BUFFS } from '../data/buffs';
 import { flaskBase } from '../data/flasks';
 import { naturalGemLevel } from '../calc/gems';
 import { gemDef } from '../data/gems';
@@ -113,13 +114,21 @@ export function reqText(it: Item): string {
   return req.join(', ');
 }
 
+/** What a flask's base gives while it runs: its mods, and the buff it holds (the Onrush Draught's). */
+function flaskBuffLines(b: ReturnType<typeof flaskBase>): string[] {
+  return [
+    ...modsText(b.buff),
+    ...(b.grants ? [`${BUFFS[b.grants].name}: ${BUFFS[b.grants].text}`] : []),
+  ];
+}
+
 /** Every line a flask shows: what it recovers, its buff, and its affixes. */
 export function flaskLines(f: FlaskItem): string[] {
   const b = flaskBase(f.baseId);
   return [
     ...(b.life > 0 ? [`Recovers ${b.life} life`] : []),
     ...(b.mana > 0 ? [`Recovers ${b.mana} mana`] : []),
-    ...modsText(b.buff),
+    ...flaskBuffLines(b),
     ...f.affixes.flatMap((a) => modsText(a.mods)),
   ];
 }
@@ -199,7 +208,7 @@ export function ItemCard({
             Recovers {b.mana} mana
           </div>
         )}
-        {modsText(b.buff).map((l, i) => (
+        {flaskBuffLines(b).map((l, i) => (
           <div key={i} class={'ic-mod' + markClass(marks, l)}>
             {l}
           </div>

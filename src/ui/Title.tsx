@@ -120,7 +120,7 @@ function DiscordInvite() {
         <DiscordMark />
         Join the Discord
       </a>{' '}
-      and tell us.
+      and tell me.
     </p>
   );
 }
@@ -157,9 +157,6 @@ export function Title({ c }: { c: Controller }) {
         )}
       </div>
       <DiscordInvite />
-      {anyOk && (
-        <p class="muted">Each run keeps its own save; a new run leaves the others alone.</p>
-      )}
       <TelemetryNotice />
       <RivalsOptIn />
       <UiScalePicker />

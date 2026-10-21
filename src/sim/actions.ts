@@ -845,9 +845,14 @@ export function updateProjectiles(w: World, dt: number): void {
       const aim = pr.aimId ? actorById(w, pr.aimId) : undefined;
       if (aim) pr.minDist = Math.min(pr.minDist, Math.hypot(aim.x - pr.x, aim.y - pr.y));
       if (!w.grid.isFloor(Math.floor(pr.x), Math.floor(pr.y))) {
-        // A shot that struck something before it reached the wall was not blocked by it.
-        if (owner?.isPlayer && pr.hitIds.length === 0) {
-          const os = owner.side!;
+        // A shot that struck something before it reached the wall was not blocked by it. (Nor is it the character's to fix when a
+        // totem, trap or mine shot it: walking closer does not move where those shoot from.)
+        const os = owner?.isPlayer ? owner.side! : null;
+        if (
+          os &&
+          pr.hitIds.length === 0 &&
+          !os.char.actives.find((c) => c.skill.id === pr.profile.skill.id)?.deploy
+        ) {
           os.stats.wallBlocked++;
           if (w.t - os.ai.blockedT > BLOCK_WINDOW) os.ai.blocked = 0;
           if (os.ai.blocked === 0) os.ai.blockedT = w.t;

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { bondLinks, deployFull, DEPLOY_NEAR, type Deployable } from './deploy';
+import { bondLinks, deployFull, DEPLOY_NEAR, placeDeployable, type Deployable } from './deploy';
 import { createDummyWorld } from './dummy';
 import { buildFor, classFor } from './gemKit';
-import type { World } from './types';
+import type { Action, World } from './types';
 import { stepWorld } from './world';
 
 /** Where totems go and when the character puts more down: Cinder Bond and the totems after it. */
@@ -85,6 +85,18 @@ describe('a set of deployables that is full', () => {
     w.sides[0].player.stunT = 0;
     run(w, 5, () => !w.sides[0].deployables.includes(far));
     expect(w.sides[0].deployables.includes(far)).toBe(false);
+  });
+
+  it('when the cap has fallen below what stands, a new totem takes the set down to the cap, not one short of it', () => {
+    const { world: w } = world(['cinderBond'], 5);
+    const s = w.sides[0];
+    const c = s.char.actives.find((x) => x.skill.id === 'cinderBond')!;
+    const prof = { ...s.char.profile(c, s.char.configConds), deployCount: 2 };
+    s.deployables.length = 0;
+    for (let i = 0; i < 5; i++) totem(w, c.key, s.player.x + 2 + i, s.player.y + 2);
+    const act = { profile: prof, targetId: w.sides[1]?.player.id ?? 0 } as unknown as Action;
+    placeDeployable(w, s.player, act);
+    expect(s.deployables.filter((d) => d.key === c.key).length).toBe(2);
   });
 
   it('the character moves on to another skill while the totems stand, rather than casting more', () => {
