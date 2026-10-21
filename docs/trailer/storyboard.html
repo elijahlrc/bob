@@ -379,7 +379,7 @@
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">Storyboard · draft 4 · 2026-10-21</div>
+    <div class="eyebrow">Storyboard · draft 5 · 2026-10-21</div>
     <h1>Battle of Builds: the 30-second trailer</h1>
     <p class="lede">
       For players who love ARPGs and roguelikes. The pitch: <b>every run is a new build</b>, crafted
@@ -389,7 +389,7 @@
       gameplay; only the text and the edit are made for the trailer.
     </p>
     <ul class="specs">
-      <li><b>30.0 s</b> · 12 shots</li>
+      <li><b>30.0 s</b> · 13 shots</li>
       <li><b>16:9</b> 1920×1080, 60 fps</li>
       <li><b>Music</b> 120 bpm, 15 bars of 2 s</li>
       <li><b>Text</b> on cards and overlays, no voice-over</li>
@@ -417,8 +417,8 @@
       <ul>
         <li>
           Record in the browser at 1920×1080 with the Interface size at its default; hide the cursor
-          except in the crafting inserts. Shot 5 is the exception: a real phone, so the trailer
-          shows the game plays there too.
+          except in the crafting inserts. Shot 6 is the exception: three portrait recordings from a
+          real phone, so the trailer shows the game plays there too.
         </li>
         <li>
           Prepare three late saves, one per run in act two: a Vanguard, a Shade and a Mystic, each
@@ -515,33 +515,43 @@
     },
     {
       act: 'builds',
-      t: [4, 7.5],
+      t: [4, 7],
       name: 'Run one: the Vanguard',
       frame: 'runA',
       screen:
-        'Insert (1 s): the passive tree, a path of nodes lighting up towards a keystone. Then the payoff (2.5 s): the Vanguard in a Forge, a fire slam cracking the floor, the pack thrown apart in orange.',
+        'Insert (1 s): the passive tree, a path of nodes lighting up towards a keystone. Then the payoff (2 s): the Vanguard in a Forge, a fire slam cracking the floor, the pack thrown apart in orange.',
       sound: 'Node chimes, then the slam on the bar line at 6 s.',
       cap: 'Tree tab with points to spend; a fire slam build on a Forge map.',
     },
     {
       act: 'builds',
-      t: [7.5, 11],
+      t: [7, 10],
       name: 'Run two: the Shade',
       frame: 'runB',
       screen:
-        'Insert (1 s): a support gem dropped into a linked socket, the damage per second jumping, the change in green. Then the payoff (2.5 s): the Shade in Ruins throwing Spire Traps in arcs; they spring into violet spires across the pack.',
+        'Insert (1 s): a support gem dropped into a linked socket, the damage per second jumping, the change in green. Then the payoff (2 s): the Shade in Ruins throwing Spire Traps in arcs; they spring into violet spires across the pack.',
       sound: 'Socket click and a rising tick, then the traps going off on the beats.',
       cap: 'Skills tab, a support with a big jump; a trap build on a Ruins map.',
     },
     {
       act: 'builds',
-      t: [11, 15],
-      name: 'Run three: the Mystic, on a phone',
+      t: [10, 13],
+      name: 'Run three: the Mystic',
       frame: 'runC',
       screen:
-        'This run is played on a phone, held in a hand in front of a dark background. Insert (1 s): a rare item drops, a thumb taps it, the phone compare lists the stats that change, Equip. Then the payoff (3 s): the camera pushes into the phone screen until it fills the frame, the Mystic in a Cavern with a crowd of minions pouring into the pack, cold and chaos glinting.',
+        'Insert (1 s): a rare item drops, its card compared against what is worn, the gains in colour, and it goes on. Then the payoff (2 s): the Mystic in a Cavern with a crowd of minions pouring into the pack, cold and chaos glinting.',
       sound: 'Item drop chime, then the minions surge on the bar line at 12 s.',
-      cap: 'A real phone, filmed or screen-recorded and composited into a hand. Items tab with a clear upgrade (the phone peek), then a minion build on a Cavern map. The push-in hides the change from the phone recording to the 1080p one.',
+      cap: 'Items tab with a clear upgrade; a minion build on a Cavern map.',
+    },
+    {
+      act: 'builds',
+      t: [13, 15],
+      name: 'Three builds',
+      frame: 'triptych',
+      screen:
+        'The three builds side by side, each in an upright phone-shaped panel with rounded corners: fire, violet, cold, all fighting at once. No hands, no device bezels; the shape alone says it runs on a phone.',
+      sound: 'All three skills’ impacts layered on the bar line at 14 s.',
+      cap: 'Screen recordings from a real phone in portrait (the game’s phone layout and HUD), one per build, laid side by side in the edit.',
     },
     {
       act: 'climb',
@@ -823,22 +833,15 @@
       );
     },
     runC: () => {
-      /* a phone held upright at the right, showing the item peek */
-      const phone =
-        `<rect x="228" y="10" width="76" height="150" rx="9" fill="#0b0b11" stroke="${C.mute}" stroke-width="2"/>` +
-        `<rect x="234" y="20" width="64" height="122" fill="${C.ui}"/>` +
-        label(238, 30, 'RARE DROP') +
-        `<rect x="238" y="36" width="56" height="54" fill="#0f1016" stroke="#e8c45a"/>` +
-        [0, 1, 2, 3, 4]
+      const item =
+        `<rect x="204" y="28" width="60" height="40" fill="${C.ui}" stroke="#e8c45a"/>` +
+        [0, 1, 2, 3]
           .map(
             (i) =>
-              `<rect x="242" y="${42 + i * 9}" width="${[46, 36, 42, 30, 38][i]}" height="4" fill="${[C.chaos, C.chaos, C.life, C.chaos, C.bone][i]}" opacity="${i === 4 ? 0.4 : 0.85}"/>`,
+              `<rect x="208" y="${33 + i * 8}" width="${[46, 36, 42, 30][i]}" height="4" fill="${[C.chaos, C.chaos, C.bone, C.chaos][i]}" opacity="${i === 2 ? 0.4 : 0.85}"/>`,
           )
           .join('') +
-        `<rect x="238" y="98" width="56" height="16" rx="2" fill="${C.torch}"/><text x="266" y="109" text-anchor="middle" font-family="Alegreya Sans, sans-serif" font-size="8" font-weight="700" fill="#0f1016">Equip</text>` +
-        `<circle cx="270" cy="112" r="7" fill="${C.bone}" opacity=".25"/>` +
-        `<path d="M300 150 q-14 -10 -26 -36" stroke="#c9a77a" stroke-width="9" stroke-linecap="round" fill="none" opacity=".55"/>` +
-        label(236, 152, 'PHONE → PUSH IN');
+        `<path d="M276 58 l0 -16 m-4 4 l4 -4 l4 4" stroke="${C.chaos}" fill="none" stroke-width="1.5"/>`;
       const minions = [
         [96, 110],
         [112, 96],
@@ -867,9 +870,31 @@
           0.8,
         ) +
         label(8, 14, 'MYSTIC · CAVERN · MINIONS') +
-        phone
+        inset(item, 'A RARE DROP')
       );
     },
+    /* the three builds side by side, each in a phone's upright frame */
+    triptych: () =>
+      [
+        ['#3a2a22', C.fire, '#c0503a', 'VANGUARD'],
+        ['#2a2a33', C.light, '#9a5ac0', 'SHADE'],
+        ['#28324a', C.cold, '#5a78d0', 'MYSTIC'],
+      ]
+        .map(([fl, fx, col, nm], i) => {
+          const x = 44 + i * 82,
+            cx = x + 33;
+          return (
+            `<rect x="${x}" y="8" width="66" height="146" rx="8" fill="${fl}" stroke="${C.uiLine}"/>` +
+            `<ellipse cx="${cx}" cy="86" rx="40" ry="44" fill="${fx}" opacity=".16"/>` +
+            ring(cx, 92, 18, fx, 1.5) +
+            hero(cx, 86, col) +
+            skel(cx - 18, 70, 0.8) +
+            skel(cx + 17, 104, 0.8) +
+            `<circle cx="${x + 10}" cy="144" r="5" fill="${C.life}"/><circle cx="${x + 56}" cy="144" r="5" fill="${C.mana}"/>` +
+            label(x + 6, 20, nm)
+          );
+        })
+        .join('') + label(44, 172, 'THREE PHONE RECORDINGS, NO DEVICE FRAMES'),
     climb: () => {
       const cols = ['#2d3a32', '#3a2a22', '#28324a', '#2a2a33', '#33302a', '#2a3a2a'];
       return (
