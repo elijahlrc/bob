@@ -79,11 +79,11 @@ reserve life, as the keystone does.)
 
 | Gem                                                                                        | Ours (level 20) | 3.9     |
 | ------------------------------------------------------------------------------------------ | --------------- | ------- |
-| Chained Charges (Blastchain Mine) and Heavy Charge (High-Impact Mine), support multiplier  | 1.5             | 0.3     |
-| Greater Multiple Projectiles (Volley Split)                                                | 1.5             | 1.65    |
-| Barrage (Rolling Volleys)                                                                  | 1.4             | 1.5     |
-| Cast On Critical Strike (Critical Relay)                                                   | 1.3             | 1.4     |
-| Minion Speed (Pack Haste)                                                                  | 1.2             | 1.3     |
+| Chained Charges and Heavy Charge, support multiplier  | 1.5             | 0.3     |
+| Volley Split                                                | 1.5             | 1.65    |
+| Rolling Volleys                                                                  | 1.4             | 1.5     |
+| Critical Relay                                                   | 1.3             | 1.4     |
+| Pack Haste                                                                  | 1.2             | 1.3     |
 | Pierce, Chance to Bleed, Immolate (Cindering): +0.1 each; Increased Critical Strikes +0.05 | 1.1–1.3         |         |
 | Heavy Strike, Cleave, Viper Strike analogs (Crushing Blow, Reaping Arc, Venom Cut)         | 8, 9, 7         | 5, 6, 5 |
 | Molten Shell analog (Slag Carapace)                                                        | 16              | 12      |
@@ -91,7 +91,7 @@ reserve life, as the keystone does.)
 The wiki confirms the mine supports at a 30% multiplier (`static_mana_multiplier = 30`). Ours are five times that, with no reason in
 the gem notes, on supports that already cost damage (less damage, a five-second wait): they make mines the dearest way to run a
 spell. The three starter attacks cost more than 3.9 at level 20 and a fifth of it at level 1 (1 against 5); the other early-level
-gaps are in our favour (Fireball analog 3 against 6 at level 1). Clear Mind (Clarity) reserves a flat 35 to 100 for 1.8 to 8
+gaps are in our favour (Fireball analog 3 against 6 at level 1). Clear Mind reserves a flat 35 to 100 for 1.8 to 8
 regeneration a second against 3.9's 34 to 279 for 1.8 to 19.8: weaker and cheaper in proportion.
 
 ### 3.2 The character sheet costs utility skills as if they were cast non-stop
@@ -127,11 +127,11 @@ damage for their price at the same level:
 
 | Skill                        | Mana/s | Damage/s | Damage per mana |
 | ---------------------------- | ------ | -------- | --------------- |
-| Tempest Mote (Orb of Storms) | 14     | 26       | 1.9             |
-| Skitter Flash (Spark)        | 12     | 27       | 2.2             |
-| Frost Lance (Ice Spear)      | 16     | 43       | 2.7             |
-| Flame Bolt (Fireball)        | 9      | 55       | 5.8             |
-| Glacier Dart (Frostbolt)     | 14     | 116      | 8.6             |
+| Tempest Mote | 14     | 26       | 1.9             |
+| Skitter Flash        | 12     | 27       | 2.2             |
+| Frost Lance      | 16     | 43       | 2.7             |
+| Flame Bolt        | 9      | 55       | 5.8             |
+| Glacier Dart     | 14     | 116      | 8.6             |
 
 These are damage questions (narrow projectiles into a compact pack) rather than price ones; the cheap-per-damage end is the rapid
 channels (Blaze Stream, a Winter Orb analog, a Flameblast analog) and the totems and brands, whose cost is paid once.

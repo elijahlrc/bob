@@ -188,7 +188,7 @@ Light Hand (`bow.flight.added.n415`) is 3.17 as authored and 2.5 at §8.1 sizes,
 **The hand-valued lines carry the real pricing risk.** Their units are asserted, not measured:
 
 - +1 projectile (Split Volley) at 4 units.
-- Chain (Ricochet) at 4.
+- Ricochet at 4.
 - Pierce (Skewer) at 3.
 - +1 curse (Second Curse) at 5.
 - +1 charge (Hot Blood, Unbroken, Flashes of Insight) at 3.

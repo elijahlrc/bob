@@ -312,10 +312,10 @@ warcries, the retaliation skills and Lightheart.
 - **Calc.** The sheet accounts for the cooldown (a cooldown-limited skill's DPS is its burst over its cycle), for spent charges
   (the uptime they allow), and for exerted attacks.
 - **Policy.** Section 5, rows 1, 3, 4, 6.
-- **Gems:** Blinking Cut (Flicker Strike), Sudden Frost (Cold Snap, with S3 for its chill and S6 for its ground),
-  Guarded Strike (Vigilant Strike), Charge Release (Discharge), Deathless Call (Immortal Call), Slipstream Run (Phase Run),
-  Surge of Blood (Blood Rage), Lightheart, the retaliation skills (Anvil Drop, Rime Rebuke, Blade Wind), the cries (Kindled
-  Bellow and the others), Thunder Rebuke (Smite), Cinder Herald and Storm Herald (their kill effects use S2's on-use
+- **Gems:** Blinking Cut, Sudden Frost (Cold Snap, with S3 for its chill and S6 for its ground),
+  Guarded Strike, Charge Release, Deathless Call, Slipstream Run,
+  Surge of Blood, Lightheart, the retaliation skills (Anvil Drop, Rime Rebuke, Blade Wind), the cries (Kindled
+  Bellow and the others), Thunder Rebuke, Cinder Herald and Storm Herald (their kill effects use S2's on-use
   and trigger plumbing).
 - **Tests.** Flicker Strike's loop as the model: a charge is spent, the cooldown is skipped, the buff starts, the second
   use waits with no charge; Cold Snap's bypass; a retaliation skill unusable until a block, usable for the window after one;
@@ -340,8 +340,8 @@ warcries, the retaliation skills and Lightheart.
   to any hexed target). The on-hit "hex supports" stop competing with real curses for the one slot.
 - **Calc and sim.** Enemy-side multipliers feed `hit`; the sheet shows "enemies are slowed/maimed/blind" as a configurable
   condition like the existing ones.
-- **Gems:** Wither (Rot Touch, with S7), Bear Trap (Jaws Trap, with S10), Ensnaring Arrow (Snare Shot), Hamstring, Dazzle,
-  Rout, Punishment (Penance), the Sigils (Ruin, Warlord, Plenty, Hunt), Guard Breaker, Void Curse, Standing Curse, Deep
+- **Gems:** Wither (Rot Touch, with S7), Bear Trap (Jaws Trap, with S10), Snare Shot, Hamstring, Dazzle,
+  Rout, Penance, the Sigils (Ruin, Warlord, Plenty, Hunt), Guard Breaker, Void Curse, Standing Curse, Deep
   Chill, Charged Breath, Kindled Bellow, the Standards' debuffs (with S6), Tide of Judgement, Brittle Doom, Leaden Limbs,
   Feeble Grip, Open Wounds, and the other curses and marks.
 - **Tests.** One per status (the effect, the stacking rule, the boss rule); one per curse (every item on its effect list).
@@ -369,10 +369,10 @@ The once-per-target rule for projectiles fired together stays (D1). What is buil
   not today (`chains` is read only by skills with chain behaviour).
 - **A cone from the impact** (Galvanic Arrow).
 - **Policy.** None new. The AI already closes for a clearer shot when arrows hit walls.
-- **Gems:** Barrage (Quiver Rush) and Barrage Support (Rolling Volleys), Shrapnel Ballista (Scatter Bow), Shattering Steel (Splinter
-  Volley), Volley and Greater Volley (Twin Salvo, Wide Salvo), Arrow Nova (Arrow Tempest), Tornado Shot (Whirl Shot), Fork (Split
-  Shot), Chain (Ricochet), Galvanic Arrow (Storm Quill), Wild Strike (Prime Splash, with S13a), Bolt Cleave and Slag Blow, Rime
-  Splinter, Ghost Coil, Toxin Circle, Mortar Bow and Mortar Charge. Greater Multiple Projectiles (Volley Split) was found faithful.
+- **Gems:** Quiver Rush and Rolling Volleys, Scatter Bow, Shattering Steel (Splinter
+  Volley), Volley and Greater Volley (Twin Salvo, Wide Salvo), Arrow Tempest, Whirl Shot, Fork (Split
+  Shot), Ricochet, Storm Quill, Wild Strike (Prime Splash, with S13a), Bolt Cleave and Slag Blow, Rime
+  Splinter, Ghost Coil, Toxin Circle, Mortar Bow and Mortar Charge. Volley Split was found faithful.
 - **Tests.** A sequential volley hits one target once per volley; a fan does not; a flagged shotgun skill hits a close target
   with several projectiles and a far one with fewer; fork, chain and nova as the wiki describes; the sheet and the sim agree.
 - **Risk.** Barrage and the two shotgun skills raise single-target damage, as in the reference game. Section 9.
@@ -388,9 +388,9 @@ The once-per-target rule for projectiles fired together stays (D1). What is buil
 - **Calc.** The sheet's DPS for a channel is the average over an assumed channel length (configurable, default the skill's
   stage cap plus a sustain interval), as players read channel DPS, so the "ramp" is visible rather than flattened.
 - **Policy.** Section 5, row 2.
-- **Gems:** Blade Flurry (Flurry of Edges), Divine Ire (Judgement Tempest), Flameblast (Furnace Roar), Blaze Stream
-  (Incinerate), Searing Lance (Scorching Ray), Winter Orb (Hoarfrost Mote), Cyclone (Twister Blade), Charged Dash (Storm Rush), Blight
-  (Blight Hail), Static Strike's cousins, Reave (Sweeping Cut), Thunder Spiral, Double Release, Infused Channelling, and
+- **Gems:** Flurry of Edges, Judgement Tempest, Furnace Roar, Blaze Stream
+  (Incinerate), Searing Lance, Hoarfrost Mote, Twister Blade, Storm Rush, Blight
+  (Blight Hail), Static Strike's cousins, Sweeping Cut, Thunder Spiral, Double Release, Infused Channelling, and
   the supports that act on channelling.
 - **Tests.** Stages accumulate; a release fires the stage reached; a stun ends the channel; the sheet's average matches the
   sim's over the assumed length.
@@ -410,9 +410,9 @@ The once-per-target rule for projectiles fired together stays (D1). What is buil
   off life; the enemy burn is the reference formula (a share of life, scaled by damage mods). Arctic Armour's conditions:
   stationary, physical and fire only, chills attackers.
 - **Calc.** Ground and object DPS in the sheet with an assumed uptime.
-- **Gems:** Fire Trap, Flame Dash's ground (with S8), Frostblink's ground, Blessed Trail (Consecrated Path), Cleansing Blaze
-  (Purifying Flame), Glacier Wall, Faultline (Seismic Trap's cousin), Rime Core, Magma Crack (Tectonic Slam), Venom Shower, Hoarfrost
-  Mote, Standard of Valour and Standard of Dread, Fervent Halo (Zealotry), Searing Mantle (Righteous Fire), Rimeplate (Arctic
+- **Gems:** Fire Trap, Flame Dash's ground (with S8), Frostblink's ground, Blessed Trail, Cleansing Blaze
+  (Purifying Flame), Glacier Wall, Faultline (Seismic Trap's cousin), Rime Core, Magma Crack, Venom Shower, Hoarfrost
+  Mote, Standard of Valour and Standard of Dread, Fervent Halo, Searing Mantle, Rimeplate (Arctic
   Armour), Storm Halo and Frost Halo, Slag Carapace's burst (with S9).
 - **Risk.** The most code, and the walls touch the grid. The walls may be cut to "blocks projectiles and slows" if the grid
   change is too large.
@@ -426,9 +426,9 @@ The once-per-target rule for projectiles fired together stays (D1). What is buil
 - **Spread.** Ailments that spread: Pestilent Strike's poison, Contagion, Wildfire and Elemental Proliferation (spread on
   application, or on death, per gem), reusing the `spread` trigger effect where it fits.
 - **Per-stack scaling** (Vile Toxins and similar supports) reads the real stack count.
-- **Gems:** Contagion (Creeping Plague), Blight (Blight Hail, with S5), Caustic Arrow (Acid Arrow), Essence Drain (Sap Bolt),
-  Torch Arrow, Searing Lance's DoT, Wither Mark/Wither, Elemental Proliferation (Wildfire Spread) and Wildfire Seed, Slow Rot,
-  Vile Toxins (Foul Brew), Pestilent Strike (Venom Strike), Withering Breath, Open Wounds and Cinder Bond.
+- **Gems:** Creeping Plague, Blight (Blight Hail, with S5), Acid Arrow, Sap Bolt,
+  Torch Arrow, Searing Lance's DoT, Wither Mark/Wither, Wildfire Spread and Wildfire Seed, Slow Rot,
+  Foul Brew, Venom Strike, Withering Breath, Open Wounds and Cinder Bond.
 - **Tests.** A DoT's tick and total; its stack cap; leech from it; spread on death.
 
 ### S8 Blink and travel (M)
@@ -438,9 +438,9 @@ The once-per-target rule for projectiles fired together stays (D1). What is buil
   along the path: Whirling Blades, Charged Dash), and `scaleWithDistance` (Shield Charge's damage per distance travelled).
 - Blinks respect the cooldown rules of S2. Phase Run and Withering Step's real buffs (phasing; the elusive-like effect) are
   buffs from S2 and S9.
-- **Gems:** Flame Dash (Cinder Step), Frostblink (Rime Step), Lightning Warp (Bolt Step), Bodyswap (Shadow Swap, with S11),
-  Withering Step (Rotting Stride), Shield Charge (Bulwark Rush), Whirling Blades (Spinning Dash), Leap Slam (Skyfall Leap),
-  Charged Dash (Storm Rush), Shadow Quiver, Ice Spear's cousin (Frost Lance), Point Blank (Close Quarters).
+- **Gems:** Cinder Step, Rime Step, Bolt Step, Bodyswap (Shadow Swap, with S11),
+  Rotting Stride, Bulwark Rush, Spinning Dash, Skyfall Leap,
+  Storm Rush, Shadow Quiver, Ice Spear's cousin (Frost Lance), Close Quarters.
 
 ### S9 Stances, guards, rage and absorb (M)
 
@@ -452,8 +452,8 @@ The once-per-target rule for projectiles fired together stays (D1). What is buil
 - **Rage.** Berserk needs rage and spends it; its effects scale with rage held; Blood Rage's life drain and its frenzy gain on
   kill; "refresh on kill".
 - **Buff rules.** A skill that replaces another buff; a buff that ends on using a skill; guard skills' shared limits.
-- **Gems:** Dune Stance and Stone Stance, Bladestorm (Whirlwind Cleave), Berserk (Rampage Call), Molten Shell (Slag Carapace),
-  Steelskin (Iron Hide), Immortal Call (Deathless Call), Blood Rage (Surge of Blood), Warding Pack (Meat Shield), Arcane Ward
+- **Gems:** Dune Stance and Stone Stance, Whirlwind Cleave, Rampage Call, Slag Carapace,
+  Iron Hide, Deathless Call, Surge of Blood, Warding Pack, Arcane Ward
   (Discipline), Rimeplate.
 
 ### S10 Deployables that exist (L)
@@ -466,9 +466,9 @@ The once-per-target rule for projectiles fired together stays (D1). What is buil
   section 5**; delayed repeated detonations (Shrapnel Trap's `repeats` become delays, not a pile on one spot); a cascade (Chained
   Charges); a trap that holds (Bear Trap's immobilise from S3); mine/trap damage supports.
 - **Totem life, placement speed and the attack/cast speed of totems** are the reference stats.
-- **Gems:** Decoy Totem (Lure Totem), Guardian Cairn, Slamming Cairn, Ancestral-style totems, Bear Trap (Jaws Trap), Bolt Trap,
-  Drain Trap and Rot Drain Trap, Smoke Charge (Smoke Mine), Mortar Charge (Shrapnel/Explosive Trap cousin), Whirring Motes,
-  Chained Charges, Heavy Charge (High-Impact Mine), Swift Snares (Advanced Traps), Cinder Bond.
+- **Gems:** Lure Totem, Guardian Cairn, Slamming Cairn, Ancestral-style totems, Jaws Trap, Bolt Trap,
+  Drain Trap and Rot Drain Trap, Smoke Charge, Mortar Charge (Shrapnel/Explosive Trap cousin), Whirring Motes,
+  Chained Charges, Heavy Charge, Swift Snares, Cinder Bond.
 - **Size L, and the one part that bleeds into the monsters' rules**: it needs a test that no enemy type's behaviour changes when
   no deployable stands.
 
@@ -479,7 +479,7 @@ The once-per-target rule for projectiles fired together stays (D1). What is buil
   `src/sim/factions.ts` becomes the one corpse model; the Reliquary's raising keeps working through it.
 - Skills take `consumeCorpse` (and `needsCorpse`): Bodyswap (swap with it, then it explodes), Raise Spectre (the minion is the
   monster, S12), the Offerings (S12). The corpse skills COVERAGE left out (Desecrate, Detonate Dead, Unearth, Volatile Dead) stay out.
-- **Gems:** Bodyswap (Shadow Swap), Raise Spectre (Bind Shade), Pyre Burst (Cremation-style corpse fire), Wake Blades (Animate Weapon, if it
+- **Gems:** Shadow Swap, Bind Shade, Pyre Burst (Cremation-style corpse fire), Wake Blades (Animate Weapon, if it
   needs a corpse in 3.9; S0 checks), and the Offerings.
 
 ### S12 Minions (M)
@@ -490,9 +490,9 @@ The once-per-target rule for projectiles fired together stays (D1). What is buil
 - **Animate Guardian wears items.** It copies stats of the character's equipped pieces by the reference rule.
 - **Minion damage** takes flat added damage; minion auras (Infernal Legion's burn, Meat Shield's taunt and defensive stance,
   Elemental Army's resistances and exposure) are data rows over S3 and S6.
-- **Gems:** Carrion Golem (Carrion Colossus), Animate Guardian (Wake Sentinel), Raise Spectre (Bind Shade), the three Offerings
-  (Bone, Flesh, Spirit Ward Rite), Elemental Army (Elemental Pack), Infernal Legion (Burning Pack), Meat Shield (Warding Pack),
-  Herald of Agony (Sour Herald), and the minion supports.
+- **Gems:** Carrion Golem (Carrion Colossus), Animate Guardian (Wake Sentinel), Bind Shade, the three Offerings
+  (Bone, Flesh, Spirit Ward Rite), Elemental Pack, Burning Pack, Warding Pack,
+  Sour Herald, and the minion supports.
 
 ### S13 The long tail (L, in three batches)
 
@@ -500,8 +500,8 @@ The 65 gems whose gap is their own. Each has a "Missing" line in AUDIT-GEMS.md; 
 a few, a small primitive. Three batches by kind, each an S0-style spec, loop tests and re-judging:
 
 - **S13a Attacks and spells**: Orbiting Blades, Primal Strike (Wild Strike), Fuse Arrow, Rime Mallet (Frost Blades' cousin), Cinder Blow
-  (Infernal Blow), Tempest Mote (Orb of Storms), Spear Burst (Perforate), Gouge Shot, Charged Blow (Static Strike), Skyfall,
-  Rupture Line, Glacier Wall, Halo Sweep, Cluster Bolt, Slag Lob, Spirit Saw, Ghost Shard, Prime Splash, Snag Lash (Chain Hook),
+  (Infernal Blow), Tempest Mote, Spear Burst, Gouge Shot, Charged Blow, Skyfall,
+  Rupture Line, Glacier Wall, Halo Sweep, Cluster Bolt, Slag Lob, Spirit Saw, Ghost Shard, Prime Splash, Snag Lash,
   Twister Blade, Ice Spear's distance crit, Spark's erratic paths, and the rest of the attack and spell tail.
 - **S13b Auras, heralds, curse-likes, traps**: Storm Halo, Frost Halo, Arcane Ward, Sour Herald, Plenty Sigil, Kindle, Tinderbox,
   Bolt Trap, Drain Trap, Smoke Charge, Lure Totem, Thunder Rebuke, Rot Touch, Void Curse.
@@ -687,48 +687,48 @@ in brackets (G gutted, D drifted). S0 recomputes this from the ledger.
 
 ### S2 The use model (10)
 
-Anvil Drop (Crushing Fist) [G]; Guarded Strike (Vigilant Strike) [D]; Deathless Call (Immortal Call) [D]; Blinking Cut (Flicker Strike) [G]; Charge Release (Discharge) [D]; Cinder Herald (Herald of Ash) [D]; Storm Herald (Herald of Thunder) [D]; Stagger Resolve (Endurance Charge on Melee Stun) [D]; Frost Fang (Ice Bite) [D]; Lightheart (Inspiration Support) [D].
+Anvil Drop [G]; Guarded Strike [D]; Deathless Call [D]; Blinking Cut [G]; Charge Release [D]; Cinder Herald [D]; Storm Herald [D]; Stagger Resolve [D]; Frost Fang [D]; Lightheart [D].
 
 ### S3 The enemy status layer, and curses (18)
 
-Tide of Judgement (Wave of Conviction) [D]; Void Curse (Despair) [D]; Penance (Punishment) [D]; Ruin Sigil (Assassin's Mark) [D]; Plenty Sigil (Poacher's Mark) [D]; Warlord Sigil (Warlord's Mark) [D]; Kindled Bellow (Infernal Cry) [G]; Jaws Trap (Bear Trap) [G]; Brittle Doom (Elemental Weakness) [D]; Leaden Limbs (Temporal Chains) [D]; Deep Chill (Bonechill) [D]; Wither Mark (Withering Touch) [D]; Charged Breath (Infused Channelling Support) [D]; Dazzle (Blind Support) [D]; Guard Breaker (Block Chance Reduction Support) [G]; Rout (Chance to Flee Support) [D]; Hamstring (Maim Support) [D]; Standing Curse (Blasphemy Support) [D].
+Tide of Judgement [D]; Void Curse [D]; Penance [D]; Ruin Sigil [D]; Plenty Sigil [D]; Warlord Sigil [D]; Kindled Bellow (Infernal Cry) [G]; Jaws Trap [G]; Brittle Doom [D]; Leaden Limbs [D]; Deep Chill [D]; Wither Mark [D]; Charged Breath [D]; Dazzle [D]; Guard Breaker [G]; Rout [D]; Hamstring [D]; Standing Curse [D].
 
 ### S4 Projectile shapes (16)
 
-Rime Splinter (Frost Blades) [D]; Storm Quill (Galvanic Arrow) [D]; Bolt Cleave (Lightning Strike) [D]; Slag Blow (Molten Strike) [D]; Splinter Volley (Shattering Steel) [D]; Ghost Coil (Spectral Helix) [D]; Whirl Shot (Tornado Shot) [D]; Toxin Circle (Venom Gyre) [D]; Mortar Bow (Artillery Ballista) [D]; Scatter Bow (Shrapnel Ballista) [D]; Mortar Charge (Pyroclast Mine) [D]; Ricochet (Chain) [G]; Split Shot (Fork) [D]; Wide Salvo (Greater Volley) [D]; Arrow Tempest (Arrow Nova) [G]; Twin Salvo (Volley) [D].
+Rime Splinter [D]; Storm Quill [D]; Bolt Cleave [D]; Slag Blow [D]; Splinter Volley [D]; Ghost Coil (Spectral Helix) [D]; Whirl Shot [D]; Toxin Circle [D]; Mortar Bow [D]; Scatter Bow [D]; Mortar Charge [D]; Ricochet [G]; Split Shot [D]; Wide Salvo [D]; Arrow Tempest [G]; Twin Salvo [D].
 
 ### S5 Channelling (8)
 
-Flurry of Edges (Blade Flurry) [G]; Judgement Tempest (Divine Ire) [G]; Furnace Roar (Flameblast) [G]; Blaze Stream (Incinerate) [D]; Sweeping Cut (Reave) [D]; Blight Hail (Scourge Arrow) [D]; Thunder Spiral (Storm Burst) [D]; Double Release (Unleash Support) [D].
+Flurry of Edges [G]; Judgement Tempest [G]; Furnace Roar [G]; Blaze Stream [D]; Sweeping Cut [D]; Blight Hail [D]; Thunder Spiral [D]; Double Release [D].
 
 ### S6 Ground and lasting objects (11)
 
-Sudden Frost (Cold Snap) [G]; Faultline (Earthquake) [D]; Rime Core (Frost Bomb) [D]; Magma Crack (Tectonic Slam) [D]; Venom Shower (Toxic Rain) [D]; Hoarfrost Mote (Winter Orb) [G]; Standard of Valour (War Banner) [D]; Standard of Dread (Dread Banner) [D]; Blessed Trail (Consecrated Path) [D]; Fervent Halo (Zealotry) [D]; Searing Mantle (Righteous Fire) [D].
+Sudden Frost [G]; Faultline [D]; Rime Core [D]; Magma Crack [D]; Venom Shower [D]; Hoarfrost Mote [G]; Standard of Valour [D]; Standard of Dread [D]; Blessed Trail [D]; Fervent Halo [D]; Searing Mantle [D].
 
 ### S7 Damage over time and spread (12)
 
-Withering Breath (Blight) [D]; Torch Arrow (Burning Arrow) [D]; Acid Arrow (Caustic Arrow) [D]; Creeping Plague (Contagion) [D]; Sap Bolt (Essence Drain) [D]; Searing Lance (Scorching Ray) [D]; Ruin Ritual (Bane) [G]; Open Wounds (Vulnerability) [D]; Slow Rot (Decay) [D]; Wildfire Spread (Elemental Proliferation) [G]; Foul Brew (Vile Toxins) [D]; Wildfire Seed (Ignite Proliferation Support) [D].
+Withering Breath [D]; Torch Arrow [D]; Acid Arrow [D]; Creeping Plague [D]; Sap Bolt [D]; Searing Lance [D]; Ruin Ritual [G]; Open Wounds [D]; Slow Rot [D]; Wildfire Spread [G]; Foul Brew [D]; Wildfire Seed [D].
 
 ### S8 Blink and travel (8)
 
-Frost Lance (Ice Spear) [D]; Cinder Step (Flame Dash) [D]; Rime Step (Frostblink) [D]; Bolt Step (Lightning Warp) [D]; Rotting Stride (Withering Step) [D]; Storm Rush (Charged Dash) [D]; Shadow Quiver (Blink Arrow) [D]; Close Quarters (Point Blank) [D].
+Frost Lance [D]; Cinder Step [D]; Rime Step [D]; Bolt Step [D]; Rotting Stride [D]; Storm Rush [D]; Shadow Quiver [D]; Close Quarters [D].
 
 ### S9 Stances, guards, rage and absorb (6)
 
-Whirlwind Cleave (Bladestorm) [G]; Surge of Blood (Blood Rage) [D]; Rampage Call (Berserk) [D]; Dune Stance (Blood and Sand) [G]; Stone Stance (Flesh and Stone) [G]; Warding Pack (Meat Shield Support) [D].
+Whirlwind Cleave [G]; Surge of Blood [D]; Rampage Call [D]; Dune Stance [G]; Stone Stance [G]; Warding Pack [D].
 
 ### S10 Deployables that exist (6)
 
-Cinder Bond (Searing Bond) [D]; Guardian Cairn (Ancestral Protector) [D]; Slamming Cairn (Ancestral Warchief) [D]; Whirring Motes (Summon Skitterbots) [D]; Chained Charges (Blastchain Mine Support) [D]; Heavy Charge (High-Impact Mine Support) [D].
+Cinder Bond [D]; Guardian Cairn [D]; Slamming Cairn [D]; Whirring Motes [D]; Chained Charges [D]; Heavy Charge [D].
 
 ### S11 Corpses (4)
 
-Pyre Burst (Cremation) [D]; Shadow Swap (Bodyswap) [G]; Bind Shade (Raise Spectre) [G]; Wake Blades (Animate Weapon) [D].
+Pyre Burst [D]; Shadow Swap [G]; Bind Shade [G]; Wake Blades (Animate Weapon) [D].
 
 ### S12 Minions (7)
 
-Carrion Colossus (Summon Carrion Golem) [D]; Wake Sentinel (Animate Guardian) [G]; Bone Ward Rite (Bone Offering) [D]; Flesh Surge Rite (Flesh Offering) [D]; Spirit Ward Rite (Spirit Offering) [D]; Elemental Pack (Elemental Army Support) [D]; Burning Pack (Infernal Legion Support) [G].
+Carrion Colossus [D]; Wake Sentinel (Animate Guardian) [G]; Bone Ward Rite [D]; Flesh Surge Rite [D]; Spirit Ward Rite [D]; Elemental Pack [D]; Burning Pack [G].
 
 ### S13 The long tail (65)
 
-Quiver Rush (Barrage) [G]; Orbiting Blades (Blade Vortex) [D]; Twin Blades (Dual Strike) [D]; Primal Strike (Elemental Hit) [D]; Fuse Arrow (Explosive Arrow) [D]; Rime Mallet (Glacial Hammer) [D]; Cinder Blow (Infernal Blow) [G]; Tempest Mote (Orb of Storms) [D]; Spear Burst (Perforate) [D]; Venom Strike (Pestilent Strike) [D]; Gouge Shot (Puncture) [D]; Charged Blow (Static Strike) [G]; Skyfall (Storm Call) [D]; Rupture Line (Sunder) [D]; Snare Shot (Ensnaring Arrow) [G]; Glacier Wall (Frost Wall) [D]; Rime Rebuke (Glacial Shield Swipe) [G]; Halo Sweep (Holy Sweep) [D]; Cluster Bolt (Kinetic Blast of Clustering) [D]; Cleansing Blaze (Purifying Flame) [D]; Slag Lob (Rolling Magma) [D]; Spirit Saw (Soulrend) [D]; Ghost Shard (Spectral Shield Throw) [D]; Blade Wind (Swordstorm) [G]; Prime Splash (Wild Strike) [G]; Rot Touch (Wither) [G]; Slag Carapace (Molten Shell) [G]; Slipstream Run (Phase Run) [D]; Bulwark Rush (Shield Charge) [D]; Twister Blade (Cyclone) [D]; Snag Lash (Chain Hook) [D]; Thunder Rebuke (Smite) [D]; Lure Totem (Decoy Totem) [G]; Bolt Trap (Lightning Trap) [D]; Drain Trap (Siphoning Trap) [D]; Smoke Charge (Smoke Mine) [G]; Rot Drain Trap (Siphoning Trap of Pain) [D]; Storm Halo (Wrath) [D]; Frost Halo (Hatred) [D]; Arcane Ward (Discipline) [D]; Rimeplate (Arctic Armour) [D]; Sour Herald (Herald of Agony) [D]; Feeble Grip (Enfeeble) [D]; Kindle (Immolate) [D]; Tinderbox (Combustion) [D]; Knife Range (Close Combat) [D]; Firm Hold (Iron Grip) [D]; Steel Resolve (Iron Will) [D]; Triple Cadence (Multistrike) [D]; Freed Rot (Unbound Ailments) [D]; Merciless Cadence (Ruthless Support) [D]; Swift Snares (Advanced Traps Support) [D]; Echoing Blow (Ancestral Call Support) [G]; Rolling Volleys (Barrage Support) [G]; Ward Siphon (Energy Leech Support) [D]; Refine Gem (Enhance Support) [G]; Cindering (Immolate Support) [D]; Swelling Blast (Intensify Support) [D]; Brief Burst (Less Duration Support) [D]; Lingering Effect (Increased Duration Support) [D]; Twin Shadow (Mirage Archer Support) [D]; Veil Cut (Nightblade Support) [D]; Shattering Blows (Shockwave Support) [G]; Flanking Cast (Spell Cascade Support) [G]; Slayer's Echo (Cast on Melee Kill Support) [G].
+Quiver Rush [G]; Orbiting Blades [D]; Twin Blades [D]; Primal Strike [D]; Fuse Arrow [D]; Rime Mallet [D]; Cinder Blow [G]; Tempest Mote [D]; Spear Burst [D]; Venom Strike [D]; Gouge Shot [D]; Charged Blow [G]; Skyfall [D]; Rupture Line [D]; Snare Shot [G]; Glacier Wall [D]; Rime Rebuke [G]; Halo Sweep [D]; Cluster Bolt (Kinetic Blast of Clustering) [D]; Cleansing Blaze [D]; Slag Lob [D]; Spirit Saw [D]; Ghost Shard [D]; Blade Wind [G]; Prime Splash [G]; Rot Touch [G]; Slag Carapace [G]; Slipstream Run [D]; Bulwark Rush [D]; Twister Blade [D]; Snag Lash [D]; Thunder Rebuke [D]; Lure Totem [G]; Bolt Trap [D]; Drain Trap [D]; Smoke Charge [G]; Rot Drain Trap (Siphoning Trap of Pain) [D]; Storm Halo [D]; Frost Halo [D]; Arcane Ward [D]; Rimeplate [D]; Sour Herald [D]; Feeble Grip [D]; Kindle [D]; Tinderbox [D]; Knife Range [D]; Firm Hold [D]; Steel Resolve [D]; Triple Cadence [D]; Freed Rot [D]; Merciless Cadence [D]; Swift Snares [D]; Echoing Blow [G]; Rolling Volleys [G]; Ward Siphon [D]; Refine Gem [G]; Cindering (Immolate Support) [D]; Swelling Blast [D]; Brief Burst [D]; Lingering Effect (Increased Duration Support) [D]; Twin Shadow [D]; Veil Cut [D]; Shattering Blows [G]; Flanking Cast [G]; Slayer's Echo (Cast on Melee Kill Support) [G].
