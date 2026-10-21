@@ -448,10 +448,6 @@
           <b>The duel line.</b> "Duel their builds. Take the top spot." is the draft; alternatives
           are under shot 9.
         </li>
-        <li>
-          <b>The genre card.</b> Roguelike, ARPG, arcade, autobattler, one word per beat, each over
-          a flash of footage that proves it. Is that the order, and are those the four words?
-        </li>
         <li><b>Music:</b> licensed track, or a 30 s cue written to this cut sheet?</li>
       </ol>
     </div>
@@ -606,9 +602,9 @@
       t: [25, 27],
       name: 'The genres',
       frame: 'genres',
-      text: 'Roguelike. ARPG. Arcade. Autobattler.',
+      text: 'Arcade. ARPG. Roguelike. Autobattler.',
       screen:
-        'All four words on screen at once, in four panels that appear one per beat, each over footage that proves it: Roguelike over a run’s end screen, ARPG over the passive tree and a loot drop, Arcade over the high scores, Autobattler over the character fighting on its own at 8×.',
+        'All four words on screen at once, in four panels that appear one per beat, each over footage that proves it: Arcade over the high scores, ARPG over the passive tree and a loot drop, Roguelike over a run’s end screen, Autobattler over the character fighting on its own at 8×.',
       sound: 'Four hits, one per word, on the beats.',
       cap: 'Made in the edit from leftover footage of shots 3, 7 and 10.',
     },
@@ -873,14 +869,14 @@
       `<circle cx="20" cy="162" r="13" fill="${C.ui}" stroke="${C.uiLine}"/><circle cx="300" cy="162" r="13" fill="${C.mana}"/>` +
       label(8, 14, 'NO TEXT · THE DEATH SPEAKS'),
     genres: () =>
-      ['Roguelike.', 'ARPG.', 'Arcade.', 'Autobattler.']
+      ['Arcade.', 'ARPG.', 'Roguelike.', 'Autobattler.']
         .map(
           (w, i) =>
-            `<rect x="${2 + (i % 2) * 159}" y="${2 + Math.floor(i / 2) * 89}" width="157" height="87" fill="${['#2a1416', '#28324a', '#2a2614', '#2d3a32'][i]}" opacity=".7" stroke="${C.uiLine}"/>` +
+            `<rect x="${2 + (i % 2) * 159}" y="${2 + Math.floor(i / 2) * 89}" width="157" height="87" fill="${['#2a2614', '#28324a', '#2a1416', '#2d3a32'][i]}" opacity=".7" stroke="${C.uiLine}"/>` +
             label(
               8 + (i % 2) * 159,
               14 + Math.floor(i / 2) * 89,
-              ['END SCREEN', 'TREE + LOOT', 'HIGH SCORES', 'FIGHTING AT 8×'][i] +
+              ['HIGH SCORES', 'TREE + LOOT', 'END SCREEN', 'FIGHTING AT 8×'][i] +
                 ' · BEAT ' +
                 (i + 1),
             ) +
