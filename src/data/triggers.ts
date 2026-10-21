@@ -123,12 +123,19 @@ export function triggerCause(t: TriggerDef): string {
     case 'stunned':
       return 'when you are stunned';
     case 'hitTaken':
-      return `when you take damage (after ${t.threshold ?? 0}% of maximum life)`;
+      return t.threshold
+        ? `when you take damage (after ${t.threshold}% of maximum life)`
+        : 'when you take damage';
   }
 }
 
-/** One line for an item card, rendered from the structure (never parsed back). */
-export function triggerText(t: TriggerDef): string {
-  const chance = t.chance < 100 ? `${t.chance}% chance to ` : '';
-  return `${chance}${effectText(t.effect)} ${triggerCause(t)}, ${t.cooldown} s cooldown`;
+/** One line for an item card, rendered from the structure (never parsed back). `self`: a skill's own trigger, which
+ * casts only that skill. */
+export function triggerText(t: TriggerDef, self = false): string {
+  const effect = self ? 'use this skill' : effectText(t.effect);
+  const cause = triggerCause(t);
+  if (t.chance < 100) return `${t.chance}% chance to ${effect} ${cause}, ${t.cooldown} s cooldown`;
+  return self
+    ? `Used ${cause}, ${t.cooldown} s cooldown`
+    : `${effect} ${cause}, ${t.cooldown} s cooldown`;
 }

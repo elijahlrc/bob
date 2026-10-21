@@ -40,7 +40,7 @@ function statParts(it: Item): string[] {
 
 const modLines = (it: Item): string[] => [
   ...itemLines(it),
-  ...(it.uniqueTriggers ?? []).map(triggerText),
+  ...(it.uniqueTriggers ?? []).map((t) => triggerText(t)),
 ];
 
 /**

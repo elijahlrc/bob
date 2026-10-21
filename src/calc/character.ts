@@ -264,6 +264,8 @@ export type TriggerSource = {
   skills: SkillChoice[];
   /** Tags the triggering skill use must carry. */
   tagMask: number;
+  /** The skill's own trigger (a counter-attack): it casts only that skill. */
+  self?: boolean;
 };
 
 /** One triggered skill on the sheet: how often it fires and what it does. */
@@ -1298,6 +1300,7 @@ export class Character {
         slot: sg.slot,
         skills: [trig],
         tagMask: tagMask(def.tags),
+        self: true,
       });
     }
   }

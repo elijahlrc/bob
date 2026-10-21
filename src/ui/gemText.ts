@@ -334,7 +334,7 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
       stats.push(
         `${num(levelValue(def.cooldown, level))} s cooldown${def.cooldownUses && def.cooldownUses > 1 ? `, ${def.cooldownUses} uses stored` : ''}`,
       );
-    if (def.selfTrigger) stats.push(triggerText(def.selfTrigger));
+    if (def.selfTrigger) stats.push(triggerText(def.selfTrigger, true));
     if (def.needsShield) stats.push('Requires a shield');
     if (def.needsTwoHand) stats.push('Requires a two-handed weapon');
     if (def.needsDualWield) stats.push('Requires two weapons');
