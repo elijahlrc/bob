@@ -12,56 +12,22 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { format, resolveConfig } from 'prettier';
-import { COVERAGE_DIR } from './reference';
+import { COVERAGE_DIR, loadPhrases } from './reference';
 import type { RefBase } from './ref-bases-extract';
 import { ctxFor, translateLine, type ModT } from './translate';
 
 export const NAMES_FILE = resolve(COVERAGE_DIR, 'base-names.json');
 export const OUT = resolve(COVERAGE_DIR, '../../src/data/baseTables.ts');
 
-/** Reference bases the game does not take on (reference/docs/AUDIT-ITEM-BASES.md section 9): quest, league and Demigod bases. */
-export const SKIPPED = new Set([
-  "Charan's Sword",
-  'Keyblade',
-  'Golden Wreath',
-  'Golden Caligae',
-  'Golden Bracers',
-  'Golden Mantle',
-  'Golden Flame',
-  'Sacrificial Garb',
-  'Stygian Vise',
-  'Breach Ring',
-]);
+/**
+ * Reference bases the game does not take on (reference/docs/AUDIT-ITEM-BASES.md section 9): quest, league and other
+ * special bases (named in the local reference data).
+ */
+export const SKIPPED = new Set(loadPhrases().skippedBases);
 
-/** The rune daggers and warstaves of the class split of 3.8: the files carry them as daggers and staves. */
-export const RUNE_DAGGERS = new Set([
-  'Carving Knife',
-  'Boot Knife',
-  'Copper Kris',
-  'Skean',
-  'Imp Dagger',
-  'Butcher Knife',
-  'Boot Blade',
-  'Golden Kris',
-  'Royal Skean',
-  'Fiend Dagger',
-  'Slaughter Knife',
-  'Ezomyte Dagger',
-  'Platinum Kris',
-  'Imperial Skean',
-  'Demon Dagger',
-]);
-export const WARSTAVES = new Set([
-  'Iron Staff',
-  'Coiled Staff',
-  'Vile Staff',
-  'Military Staff',
-  'Serpentine Staff',
-  'Foul Staff',
-  'Ezomyte Staff',
-  'Maelstrom Staff',
-  'Judgement Staff',
-]);
+/** The rune daggers and warstaves of an earlier class split: the files carry them as daggers and staves. */
+export const RUNE_DAGGERS = new Set(loadPhrases().runeDaggers);
+export const WARSTAVES = new Set(loadPhrases().warstaves);
 
 const WEAPON_FAMILY: Record<string, string> = {
   'One Handed Sword': 'sword',
@@ -224,7 +190,6 @@ export function loadNames(): Record<string, string> {
 /** The family key of a reference base, or null when the game does not take it on. */
 export function familyOf(b: RefBase): string | null {
   if (SKIPPED.has(b.name) || b.type === 'Jewel' || b.subType === 'Talisman') return null;
-  if (b.type === 'Two Handed Sword' && b.name === 'Keyblade') return null;
   const w = WEAPON_FAMILY[b.type];
   if (w) {
     if (w === 'dagger' && RUNE_DAGGERS.has(b.name)) return 'runedagger';

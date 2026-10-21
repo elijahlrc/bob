@@ -66,6 +66,66 @@ export function loadSources(): Sources {
   return JSON.parse(readFileSync(resolve(REFERENCE_DIR, 'sources.json'), 'utf8')) as Sources;
 }
 
+/**
+ * The reference game's proper nouns that the translator, the bucketer and the base emitter match in the reference data
+ * (`reference/coverage/ref-phrases.json`). Without the local reference data every list is empty.
+ */
+export type RefPhrases = {
+  /** Item lines that say nothing Bob models (regular expressions). */
+  ignoredLines: string[];
+  /** "while affected by <aura>": the aura's name and the condition it is. */
+  auraConds: Record<string, string>;
+  /** Buffs granted on events, by name, after the plain-word ones. */
+  buffWords: Record<string, string>;
+  /** "Curse Enemies with <curse> on Hit": the curse's name and Bob's hex. */
+  curseHexes: Record<string, string>;
+  /** A keystone named on an item, and Bob's keystone. */
+  keystones: Record<string, string>;
+  /** Tree lines dropped at the end (regular expressions). */
+  lateIgnored: string[];
+  /** Reference bases the game does not take on, and the bases that are rune daggers and warstaves. */
+  skippedBases: string[];
+  runeDaggers: string[];
+  warstaves: string[];
+  /** Keyword lists the bucketer matches in reference gem names (alternatives of a regular expression). */
+  buckets: {
+    buffSpells: string[];
+    deployableSupports: string;
+    minionSupports: string;
+    curseSupports: string;
+    dotSupports: string;
+    dotActives: string;
+  };
+};
+
+const NO_MATCH = '(?!)';
+let phrases: RefPhrases | null = null;
+
+export function loadPhrases(): RefPhrases {
+  if (phrases) return phrases;
+  const file = resolve(COVERAGE_DIR, 'ref-phrases.json');
+  if (existsSync(file)) return (phrases = JSON.parse(readFileSync(file, 'utf8')) as RefPhrases);
+  return (phrases = {
+    ignoredLines: [],
+    auraConds: {},
+    buffWords: {},
+    curseHexes: {},
+    keystones: {},
+    lateIgnored: [],
+    skippedBases: [],
+    runeDaggers: [],
+    warstaves: [],
+    buckets: {
+      buffSpells: [],
+      deployableSupports: NO_MATCH,
+      minionSupports: NO_MATCH,
+      curseSupports: NO_MATCH,
+      dotSupports: NO_MATCH,
+      dotActives: NO_MATCH,
+    },
+  });
+}
+
 export function loadReference(): Reference {
   return JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'ref-list.json'), 'utf8')) as Reference;
 }
@@ -82,8 +142,8 @@ export function norm(s: string): string {
 }
 
 /**
- * Like `norm`, and also ignores a leading "The" (the reference wiki lists some uniques that way). Exact otherwise: the active
- * gem "Barrage" and "Barrage Support" are different gems.
+ * Like `norm`, and also ignores a leading "The" (the reference wiki lists some uniques that way). Exact otherwise: an active gem
+ * and the support gem of the same name with " Support" are different gems.
  */
 export function key(s: string): string {
   return norm(s).replace(/^the /, '');
