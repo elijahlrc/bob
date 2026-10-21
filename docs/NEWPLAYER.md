@@ -73,7 +73,7 @@ but not by weapon (`gemWeight`, `src/gen/loot.ts:423`), and the Gem Hoard can of
   helper (`gemUsableWith(def, build)`), so the pick and the Skills tab agree. Weight the draw with `gemWeight` (class
   attribute ×4 early) and leave out the "special" gems the drops already hold back early. At least one of the three is
   a damage skill of the class's main attribute.
-- **Drops:** gems the character cannot use with its weapon get a small weight (×0.25), not zero: a player may change
+- **Drops:** gems the character cannot use with its weapon get half the weight (×0.5; ×0.25 at first), not zero: a player may change
   weapons, and the bow gems are still found.
 - ~~Gem Hoard filtering and support usability~~ (cut).
 - Tests: for each class with its start weapon, 200 seeds of maps 1 to 4 give only usable picks.

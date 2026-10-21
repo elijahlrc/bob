@@ -439,7 +439,7 @@ export function mainAttr(classId: string): 'str' | 'dex' | 'int' {
 }
 
 /** How much less often a skill gem drops when the weapons in hand cannot use it. */
-export const OFF_WEAPON_MULT = 0.25;
+export const OFF_WEAPON_MULT = 0.5;
 
 export const EARLY_MAPS = 4;
 /** Through this area level the class's own attribute is favoured this much (twice as much after), so the first gems fit the class. */
