@@ -11,6 +11,25 @@ promises. Decisions the spec does not cover go in DESIGN.md Appendix A.
 **Cut by the user (2026-10-20):** the Gem Hoard changes in N3, all of N5 (being short of mana early is a valid state),
 all of N6, and the buff-uptime change in N4 (buffs stay counted as on, as the preview does today).
 
+**Built (2026-10-20), N1 to N4:**
+
+- N1: as planned. The new card test also found Void Curse's "+9 to damage.min against them" (its pair was rendered one mod
+  at a time) and Mouldering Host's `damageTaken` dropping its damage type; both fixed. The weapon reason "needs a axe" had
+  the same article bug.
+- N2: as planned; the badge reads "▲ empty flask slot", and quick-equip already fills an empty slot first.
+- N3: `weaponBar` (`src/data/weaponFit.ts`) is the one weapon rule for `Character` and the picks; `gemWeight` takes the
+  hold. The new picks changed seed 7001's Strider campaign in `stall.test.ts`, which then stood 20 s on map 11 shooting
+  a rare whose summoned minions took every arrow. Fixed in the AI rather than the test: a target its hits have not
+  reached for 4 s while 3 land on other enemies is set aside for 4 s (`SCREENED_*`, docs/PLAYER-AI.md 2). A 3-run bot
+  sample to map 30 (seed 11) looked the same before and after.
+- N4: the headline is `sheetDps(sheetOf(run))` (what the badges compare), with the main skill's own DPS and the mana
+  figure on the second line; the badge reads `mainSheet().sustain` like the header. `settlePrimary`
+  (`src/run/primary.ts`) picks the strongest skill as primary while none is starred (`Build.primaryAuto`), after every
+  camp action, a map and loading a save; a star from the player is kept. A placement over a gem carries `fromRemoval`,
+  and a support that would act on nothing or a skill the rotation never casts carries `idle` (`Character.unusedWhy`).
+  On the playtest Mystic, Creeping Plague and Rime Drift as primary rate within 0.3% of each other in total, so the auto
+  pick can be either; the old headline (main skill only) was what made one look six times the other.
+
 ## N1. Card text and labels (small)
 
 | Bug                                                                                                     | Cause                                                                                                                                                                     | Fix                                                                                                                                                                                                                                                                                                             |

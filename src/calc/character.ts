@@ -2026,6 +2026,29 @@ export class Character {
     return plan;
   }
 
+  /**
+   * Why a socketed active skill is never cast by the rotation, in words after its name; null when it is cast (or it is a utility
+   * skill, whose use is its own judgement). The Skills tab says this where a gem would otherwise show "no change".
+   */
+  unusedWhy(gemUid: number): string | null {
+    const a = this.actives.find((x) => x.gemUid === gemUid);
+    if (!a || a.triggered || a.skill.utility) return null;
+    if (!a.usable) return a.reason ?? 'cannot be used';
+    if (this.mains.some((e) => e.choice.gemUid === gemUid)) return null;
+    if (this.unused.some((e) => e.choice.gemUid === gemUid))
+      return 'set to Off on the Strategy tab';
+    const e = this.rotation.find((x) => x.choice.gemUid === gemUid);
+    if (e?.role !== 'periodic') return null;
+    const main = this.mainFor('pack');
+    const reach = Math.min(
+      skillRange(this.profile(main, this.configConds)),
+      this.config.targetDistance ?? 3,
+    );
+    return skillRange(this.profile(e.choice, this.configConds)) < reach - 0.05
+      ? `never used: shorter reach than ${main.skill.name}`
+      : null;
+  }
+
   /** What the plan gives a skill, as `skillSheet` takes it: the times it fires a second, and the uses a second the character pays for. */
   planned(
     choice: SkillChoice,

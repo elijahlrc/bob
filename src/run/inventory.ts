@@ -365,8 +365,9 @@ export function unsocketGem(run: RunState, slot: EquipSlot, socket: number): voi
   run.build = { ...run.build, equipment: { ...run.build.equipment, [slot]: { ...item, sockets } } };
 }
 
+/** The player stars a skill: it stays the primary until the player changes it or the gem leaves its socket. */
 export function setPrimary(run: RunState, gemUid: number): void {
-  run.build = { ...run.build, primaryGem: gemUid };
+  run.build = { ...run.build, primaryGem: gemUid, primaryAuto: undefined };
 }
 
 /** Put an inventory flask into a flask slot (the previous flask returns to the inventory). */

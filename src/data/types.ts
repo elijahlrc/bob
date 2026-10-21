@@ -146,6 +146,8 @@ export type Build = {
   flasks: (FlaskItem | null)[];
   /** uid of the primary active gem, if chosen. */
   primaryGem?: number;
+  /** The primary was picked by the game (the strongest skill socketed), not starred by the player: it is picked again as gems move. */
+  primaryAuto?: boolean;
   /** How the character mixes its skills and fights (the Strategy tab); unset parts take their defaults. */
   strategy?: Strategy;
 };

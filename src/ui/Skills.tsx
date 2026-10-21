@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
-import type { Character } from '../calc/character';
+import { sheetDps, type Character } from '../calc/character';
 import { naturalGemLevel } from '../calc/gems';
 import { gemDef, type GemDef } from '../data/gems';
 import { EQUIP_SLOTS, type EquipSlot, type GemItem } from '../data/types';
@@ -226,6 +226,9 @@ export function Skills({
     ) : null;
   const summary = ch.mainSheet();
   const secondary = ch.secondarySheets();
+  // The headline is the sheet the socket badges compare against, so a "▲13% DPS" moves it by 13% (docs/NEWPLAYER.md N4).
+  const whole = sheetOf(run);
+  const r1 = (v: number) => Math.round(v * 10) / 10;
   return (
     <div class="skills-wrap">
       <div class="skills">
@@ -242,22 +245,20 @@ export function Skills({
           {summary.isDefault ? ' (default attack)' : ''}
           <span class="muted">
             {' '}
-            · {Math.round(summary.totalDps * 10) / 10} DPS
-            {summary.sustain < 1
-              ? ` (mana regeneration alone pays for ${Math.round(summary.sustain * 100)}% of its casts)`
-              : ''}{' '}
-            · {Math.round(ch.ehp())} effective HP
+            · {r1(sheetDps(whole))} DPS{secondary.length > 0 ? ' in all' : ''} ·{' '}
+            {Math.round(whole.ehp)} effective HP
           </span>
         </div>
-        {secondary.length > 0 && (
+        {(secondary.length > 0 || summary.sustain < 1) && (
           <div class="skill-summary muted">
-            Also used every so often:{' '}
-            {secondary
-              .map(
-                (x) =>
-                  `${x.skill.name} (every ${Math.round(x.cooldown * 10) / 10} s, ${Math.round(x.dps * 10) / 10} DPS)`,
-              )
-              .join(' · ')}
+            {secondary.length > 0 ? `${summary.name} alone: ${r1(summary.totalDps)} DPS` : ''}
+            {summary.sustain < 1
+              ? `${secondary.length > 0 ? '; m' : 'M'}ana regeneration pays for ${Math.round(summary.sustain * 100)}% of its casts`
+              : ''}
+            {secondary.length > 0 &&
+              ` · also every so often: ${secondary
+                .map((x) => `${x.skill.name} (every ${r1(x.cooldown)} s, ${r1(x.dps)} DPS)`)
+                .join(' · ')}`}
           </div>
         )}
         {hint && (

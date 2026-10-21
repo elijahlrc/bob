@@ -31,21 +31,14 @@ export function gemStatus(
     const names = a.supports.map((x) => x.def.name);
     const linked = names.length ? `Supported by: ${names.join(', ')}` : 'No supports linked';
     // A skill the mana cannot pay for is mostly replaced by the weapon attack: say so.
+    // The same figure as the Skills tab's summary line: the regeneration left after the other skills' casts.
     if (ch.primary.gemUid === uid) {
-      const sustain = ch.skillSheet(
-        a,
-        undefined,
-        ch.configConds,
-        undefined,
-        0,
-        1,
-        ch.planned(a),
-      ).sustain;
+      const sustain = ch.mainSheet().sustain;
       if (sustain < 0.9)
         return {
           ok: false,
           text: `${linked} · Mana-starved (${Math.round(sustain * 100)}%)`,
-          hint: `Your mana regeneration can pay for about ${Math.round(sustain * 100)}% of this skill's casts. The rest are weapon attacks. Add mana regeneration, reduce the cost, or use fewer supports.`,
+          hint: `What your mana regeneration has left after your other skills pays for about ${Math.round(sustain * 100)}% of this skill's casts. The rest are weapon attacks. Add mana regeneration, reduce the cost, or use fewer skills or supports.`,
         };
     }
     return { ok: true, text: linked };

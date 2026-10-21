@@ -22,6 +22,7 @@ import type { Build } from '../data/types';
 import type { Vitals } from '../sim/types';
 import { CLASSES, classDef } from '../data/classes';
 import { botCamp } from './bot';
+import { settlePrimary } from './primary';
 import { takeStop, type StopChoice } from './stops';
 import { waysideOf } from './wayside';
 import {
@@ -578,6 +579,7 @@ export class Controller {
     const found = this.saves.find((s) => s.id === id);
     if (!found || found.result.status !== 'ok') return;
     this.run = found.result.run;
+    this.run.build = settlePrimary(this.run);
     this.rivals = null;
     this.slot = id;
     this.undoStack = [];
@@ -809,6 +811,8 @@ export class Controller {
     }
     this.lastResult = res;
     finishMap(run, res);
+    // A level gained can change which skill is strongest; a primary the game picked is picked again.
+    if (run.phase === 'camp') run.build = settlePrimary(run);
     if (run.phase !== 'camp') this.onRunEnd?.(run, res);
     this.world = null;
     this.bus.emit('mapEnd', null);
@@ -860,6 +864,8 @@ export class Controller {
     if (!this.run) return undefined;
     const before = this.snapshot(this.run);
     const r = fn(this.run);
+    // With no skill starred by the player, the strongest one socketed is the primary (docs/NEWPLAYER.md N4).
+    this.run.build = settlePrimary(this.run);
     if (this.snapshot(this.run) !== before) {
       this.undoStack.push(before);
       if (this.undoStack.length > 40) this.undoStack.shift();

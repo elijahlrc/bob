@@ -32,6 +32,7 @@ import {
 } from './inventory';
 import { cfgFor, flaskRank, score, sheetOf } from './bot';
 import { gemIdle } from './gemStatus';
+import { settlePrimary } from './primary';
 import { isFavourite } from './found';
 import type { RunState } from './run';
 
@@ -320,8 +321,13 @@ export type Placement = SocketRef & {
   scorePct: number;
   /** The gem currently there (it would return to the inventory). */
   replaces?: string;
-  /** Why the gem would do nothing there, when the reason is that its item has no skill for it to support ("needs a melee skill on this item"). */
+  /**
+   * Why the gem would do nothing there: its item has no skill for it to support ("needs a melee skill on this item"), the skill
+   * it is linked to cannot use it ("Rime Drift sends a single skull"), or the rotation would never cast it.
+   */
   idle?: string;
+  /** The DPS change (percent) that comes from taking out the gem it replaces, by itself. */
+  fromRemoval?: number;
 };
 
 /**
@@ -383,19 +389,40 @@ export function placementsFor(
       });
       continue;
     }
-    const sockets = [...it.sockets];
-    sockets[socket] = gem;
-    const s = sheetOf(run, {
-      ...run.build,
-      equipment: { ...run.build.equipment, [slot]: { ...it, sockets } },
-    });
+    const withGem = (g: GemItem | null): Build => {
+      const sockets = [...it.sockets];
+      sockets[socket] = g;
+      // The primary as camp would settle it once the gem is in (the strongest skill, unless one is starred).
+      return settlePrimary(run, {
+        ...run.build,
+        equipment: { ...run.build.equipment, [slot]: { ...it, sockets } },
+      });
+    };
+    const trial = withGem(gem);
+    const s = sheetOf(run, trial);
+    const dpsPct = pct(baseDps, sheetDps(s));
+    const ehpPct = pct(base.ehp, s.ehp);
+    // What taking the old gem out does by itself, so a gain that comes from the gem leaving is not credited to the new one.
+    const fromRemoval = cur ? pct(baseDps, sheetDps(sheetOf(run, withGem(null)))) : undefined;
+    // A support that would act on nothing, or a skill the rotation would never cast, says why.
+    let idle: string | undefined;
+    const def = gemDef(gem.gemId);
+    if (def.kind === 'support' || (Math.abs(dpsPct) < 0.5 && Math.abs(ehpPct) < 0.5)) {
+      const ch = new Character(trial, cfgFor(run));
+      idle =
+        def.kind === 'support'
+          ? (gemIdle(ch, gem.uid, def) ?? undefined)
+          : (ch.unusedWhy(gem.uid) ?? undefined);
+    }
     out.push({
       slot,
       socket,
-      dpsPct: pct(baseDps, sheetDps(s)),
-      ehpPct: pct(base.ehp, s.ehp),
+      dpsPct,
+      ehpPct,
       scorePct: pct(baseScore, score(s)),
       replaces,
+      ...(fromRemoval !== undefined && Math.abs(fromRemoval) >= 0.5 ? { fromRemoval } : {}),
+      ...(idle ? { idle } : {}),
     });
   }
   return out;
