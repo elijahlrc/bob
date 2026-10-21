@@ -238,11 +238,11 @@ for st in range(4):  # a pickup in sixteenths that ends before the downbeat, the
     snare(18.5 + st * S16, 0.45 + 0.15 * st)
 boom(19.0, 0.9)
 
-# 19-25 s: the groove again, three bars, with one hit on the duel's deciding blow at 22.25 after a beat of silence.
+# 19-25 s: the groove again, three bars; the duel's deciding blow at 22.25 gets a restrained crash, no break.
 bar(19.0)
 bar(21.0)
 bar(23.0, steps=8)
-mute_spans = [(22.0, 22.25), (24.875, 25.0)]
+mute_spans = [(24.875, 25.0)]
 
 # 23-25 s: the set-up for the four words, by taking away. The groove runs half a bar, then at 24 it drops out: no kick,
 # no snare, the bass holds one low D, only sixteenth hats tick. At 24.5 a tom fill falls down the kit, then a sixteenth
@@ -264,7 +264,7 @@ for at in (24.625, 24.75):  # then two long floor-tom kicks on the sixteenths: d
     d = 0.3
     place('drums', at, tri(midi(40), d, slide=-5) * np.exp(-np.arange(int(d * SR)) / SR / 0.12), 1.0)
     kick(at, 0.9)
-boom(22.25, 1.1)
+crash(22.25, 0.4, 0.6)  # the deciding blow: a restrained crash on top of the groove, which keeps going
 for t0 in (19.0, 23.0):
     motif(t0)
 
@@ -381,8 +381,8 @@ for n in range(5):
 for n in range(3):
     whoosh(19.75 + n * 0.75, 0.15, 0.7)
     thud(19.75 + n * 0.75, 0.5)
-thud(22.25, 1.6)
-zap(22.25, 98, 1.2, 0.2)
+thud(22.25, 0.8)
+zap(22.25, 98, 0.7, 0.1)
 # 22.5-25: the rating counts up, a coin per place gained
 for k in range(10):
     tick(22.65 + k * 0.05, 79 + k, 0.7)
