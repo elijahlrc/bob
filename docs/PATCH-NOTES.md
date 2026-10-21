@@ -12,6 +12,8 @@ change, and our own names only. Dash bullets under plain headings.
 - Wound Dance's bleeds deal half damage, but moving targets take the usual extra bleed damage again.
 - Mine and trap cards say how long they wait to go off, and those that leave nothing lasting behind no longer take duration supports.
 - The high score list starts over with this version; a checkbox on its screen shows the older versions' scores, whose characters can no longer be fought.
+- Totems and brands no longer pile up past their limit when it drops, and shots from totems, traps and mines hitting walls no longer pull your character in.
+- The Onrush Draught's card now says what it does.
 
 ## 2026-10-19
 
