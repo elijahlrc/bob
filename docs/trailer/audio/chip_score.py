@@ -243,22 +243,22 @@ bar(21.0)
 bar(23.0, steps=8)
 mute_spans = [(22.0, 22.25), (24.875, 25.0)]
 
-# 23-25 s: the build into the four words. A riser from 23; at 24 the kick goes to eighths, the snare rolls in
-# sixteenths then thirty-seconds, the bass climbs a half step at a time; a sixteenth of silence before the first word.
-n = int(1.875 * SR)
-k_ = np.arange(n) / n
-hold_rates = 2000 + 18000 * k_ ** 2  # the noise brightens as it rises
-idx = np.cumsum(hold_rates / SR).astype(int) % len(_lfsr_long)
-place('sfx', 23.0, _lfsr_long[idx] * k_ ** 2, 0.22)
-place('pad', 23.0, pulse(midi(50), 1.875, 0.25, slide=1.6) * k_ ** 1.5, 0.12)
+# 23-25 s: the set-up for the four words, by taking away. The groove runs half a bar, then at 24 it drops out: no kick,
+# no snare, the bass holds one low D, only sixteenth hats tick. At 24.5 a tom fill falls down the kit, then a sixteenth
+# of silence before the first word.
+place('bass', 24.0, tri(midi(D2 - 12), 0.5) * adsr(int(0.5 * SR), d=0.3, s=0.6, r=0.05), 0.5)
 for j in range(4):
-    kick(24.0 + j * 0.25, 0.9 + 0.05 * j)
-for j in range(4):
-    snare(24.0 + j * S16, 0.45 + 0.05 * j)
-for j in range(6):
-    snare(24.5 + j * S16 / 2, 0.7 + 0.05 * j)
-for j, m in enumerate((38, 39, 40, 41, 42, 43, 44)):
-    bassnote(24.0 + j * S16, m, S16 * 0.8, 1.0)
+    hat(24.0 + j * S16, 0.5 + 0.1 * j)
+
+
+def tom(at, m, g=1.0):
+    d = 0.16
+    place('drums', at, tri(midi(m), d, slide=-4) * np.exp(-np.arange(int(d * SR)) / SR / 0.06), 0.85 * g)
+    place('drums', at, noise(0.03, 12000) * np.exp(-np.arange(int(0.03 * SR)) / SR / 0.008), 0.2 * g)
+
+
+for j, m in enumerate((57, 57, 52, 52, 45, 45)):  # high, mid, floor: ta-ka ta-ka dum-dum
+    tom(24.5 + j * S16 / 2, m, 0.8 + 0.05 * j)
 boom(22.25, 1.1)
 for t0 in (19.0, 23.0):
     motif(t0)
