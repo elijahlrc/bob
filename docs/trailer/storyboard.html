@@ -379,7 +379,7 @@
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">Storyboard · draft 5 · 2026-10-21</div>
+    <div class="eyebrow">Storyboard · draft 6 · 2026-10-21</div>
     <h1>Battle of Builds: the 30-second trailer</h1>
     <p class="lede">
       For players who love ARPGs and roguelikes. The pitch: <b>every run is a new build</b>, crafted
@@ -421,8 +421,9 @@
           real phone, so the trailer shows the game plays there too.
         </li>
         <li>
-          Prepare three late saves, one per run in act two: a Vanguard, a Shade and a Mystic, each
-          with a different main skill and damage colour. A fourth save, any class, is our duellist.
+          Prepare six late saves, one per class, each with a different main skill and damage colour:
+          the Vanguard, Shade and Mystic for the three runs, the Strider, Reaver and Zealot for the
+          phone shot. Any one of them can be the duellist.
         </li>
         <li>
           <b>Showcase</b> on the title screen auto-plays a run; the <b>Skill gallery</b> plays one
@@ -546,12 +547,12 @@
     {
       act: 'builds',
       t: [13, 15],
-      name: 'Three builds',
+      name: 'Three more builds',
       frame: 'triptych',
       screen:
-        'The three builds side by side, each in an upright phone-shaped panel with rounded corners: fire, violet, cold, all fighting at once. No hands, no device bezels; the shape alone says it runs on a phone.',
+        'Three more builds, one for each class not yet shown, side by side in upright phone-shaped panels with rounded corners, all fighting at once: a Strider loosing poison arrows in green, a Reaver’s sword sweeps opening bleeds in bone white, a Zealot’s totems on consecrated gold ground. Six classes, six builds in fifteen seconds. No hands, no device bezels; the shape alone says it runs on a phone.',
       sound: 'All three skills’ impacts layered on the bar line at 14 s.',
-      cap: 'Screen recordings from a real phone in portrait (the game’s phone layout and HUD), one per build, laid side by side in the edit.',
+      cap: 'Three more late saves (Strider, Reaver, Zealot), each recorded on a real phone in portrait (the game’s phone layout and HUD), laid side by side in the edit.',
     },
     {
       act: 'climb',
@@ -876,9 +877,9 @@
     /* the three builds side by side, each in a phone's upright frame */
     triptych: () =>
       [
-        ['#3a2a22', C.fire, '#c0503a', 'VANGUARD'],
-        ['#2a2a33', C.light, '#9a5ac0', 'SHADE'],
-        ['#28324a', C.cold, '#5a78d0', 'MYSTIC'],
+        ['#22301f', C.chaos, '#5aa04a', 'STRIDER'],
+        ['#2e2a24', C.bone, '#d09a3a', 'REAVER'],
+        ['#2e2b1c', '#e8c45a', '#d0c070', 'ZEALOT'],
       ]
         .map(([fl, fx, col, nm], i) => {
           const x = 44 + i * 82,
