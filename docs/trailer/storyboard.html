@@ -14,13 +14,6 @@
     --ink: #e6dcc6; /* bone */
     --muted: #9a927f;
     --torch: #d98a3a; /* the one accent: torchlight */
-    --life: #c23a32;
-    --mana: #3b6fd2;
-    --phys: #e8dcc0;
-    --fire: #ff8a3a;
-    --cold: #8fd3ff;
-    --light: #a97cf2;
-    --chaos: #74d36c;
     --display: 'IM Fell English SC', 'Iowan Old Style', Georgia, serif;
     --body: 'Alegreya Sans', 'Gill Sans', 'Segoe UI', sans-serif;
     --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
@@ -178,6 +171,43 @@
     margin: 0;
   }
 
+  /* the text cards, read in order */
+  .script {
+    display: grid;
+    gap: 10px;
+  }
+  .script h2 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 26px;
+    margin: 0;
+  }
+  .script ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 0;
+  }
+  .script li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: var(--display);
+    font-size: 20px;
+  }
+  .script li + li::before {
+    content: '/';
+    color: var(--rule);
+    margin: 0 12px;
+  }
+  .script li span {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
   /* acts and shots */
   .act-h {
     display: flex;
@@ -249,13 +279,6 @@
     margin: 0;
     line-height: 1.15;
   }
-  .notes h3 small {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--muted);
-    margin-left: 8px;
-    letter-spacing: 0.04em;
-  }
   dl {
     margin: 0;
     display: grid;
@@ -278,14 +301,14 @@
     font-size: 19px;
     color: var(--ink);
   }
+  dd.alt {
+    font-size: 14px;
+    color: var(--muted);
+    font-style: italic;
+  }
   dd.cap {
     font-size: 14px;
     color: var(--muted);
-  }
-  dd.cap code {
-    font-family: var(--mono);
-    font-size: 12.5px;
-    color: var(--ink);
   }
 
   /* closing */
@@ -313,9 +336,14 @@
   .q {
     color: var(--muted);
   }
-  .q b {
+  .q b,
+  .two b {
     color: var(--ink);
     font-weight: 500;
+  }
+  code {
+    font-family: var(--mono);
+    font-size: 0.85em;
   }
 
   @media (max-width: 720px) {
@@ -351,17 +379,18 @@
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">Storyboard · draft 1 · 2026-10-21</div>
+    <div class="eyebrow">Storyboard · draft 2 · 2026-10-21</div>
     <h1>Battle of Builds: the 30-second trailer</h1>
     <p class="lede">
-      One idea, told in three beats that match the game's loop: <b>you build it</b>,
-      <b>you watch it fight</b>, <b>then it fights other players' builds</b>. Every shot is real
-      gameplay captured from the game; the only made-for-trailer parts are the text cards and the
-      edit.
+      For players who love ARPGs and roguelikes. The pitch: <b>every run is a new build</b>, crafted
+      from the tree, linked gems and rolled gear, and taken
+      <b>from level 1 to 100 in a single sitting</b>. Then the build you made
+      <b>duels other players' builds for a place on the high scores</b>. Every shot is real
+      gameplay; only the text and the edit are made for the trailer.
     </p>
     <ul class="specs">
-      <li><b>30.0 s</b> · 15 shots</li>
-      <li><b>16:9</b> 1920×1080, 60 fps (9:16 cut-down noted per shot)</li>
+      <li><b>30.0 s</b> · 11 shots</li>
+      <li><b>16:9</b> 1920×1080, 60 fps</li>
       <li><b>Music</b> 120 bpm, 15 bars of 2 s</li>
       <li><b>Text</b> on cards and overlays, no voice-over</li>
     </ul>
@@ -375,6 +404,11 @@
     </p>
   </section>
 
+  <section class="script" aria-label="On-screen text">
+    <h2>Every line of text, in order</h2>
+    <ol id="script"></ol>
+  </section>
+
   <div id="acts"></div>
 
   <section class="two">
@@ -383,24 +417,25 @@
       <ul>
         <li>
           Record in the browser at 1920×1080 with the Interface size at its default; hide the cursor
-          except in the build shots.
+          except in the crafting inserts.
         </li>
         <li>
-          <b>Showcase</b> on the title screen auto-plays a run (N picks the next class); the
-          <b>Skill gallery</b> shows one skill against three dummies at down to 0.25× speed, which
-          is where the slow-motion comes from.
+          Prepare three late saves, one per run in act two: a Vanguard, a Shade and a Mystic, each
+          with a different main skill and damage colour. A fourth save, any class, is our duellist.
         </li>
         <li>
-          The Debug panel (dev build or <code>?debug</code>) forces a biome or a density style, so
-          each montage cut can be set up on purpose instead of waited for.
+          <b>Showcase</b> on the title screen auto-plays a run; the <b>Skill gallery</b> plays one
+          skill against three dummies at down to 0.25× speed for clean slow motion. The Debug panel
+          (dev build or <code>?debug</code>) forces a biome so each cut is set up on purpose.
         </li>
         <li>
-          Build a late character (map 40 or later) for the action shots: more skills on the bar,
-          bigger numbers, more on screen.
+          The high scores and rival names are staged: duel snapshots named oostin, Sin and Eli (real
+          players, names used with their say-so) and the made-up Gravewick, marrowbyte, Tessaly and
+          Ninefingers. Shoot on a local or test database so the live board is untouched.
         </li>
         <li>
-          Every name on screen is the game's own. Before export, check that no frame, menu or
-          overlay shows anything from the reference game.
+          Every name on screen is the game's own. Before export, check that no frame shows anything
+          from the reference game.
         </li>
       </ul>
     </div>
@@ -408,22 +443,15 @@
       <h2>Open questions</h2>
       <ol class="q">
         <li>
-          <b>Where does it go first?</b> itch.io page, Reddit, Discord or a store page changes the
-          end card and whether the 9:16 cut matters.
+          <b>The duel line.</b> "Duel their builds. Take the top spot." is the draft; alternatives
+          are under shot 9.
         </li>
         <li>
-          <b>Is "Play free in your browser" right?</b> The end card assumes the game stays free on
-          GitHub Pages and itch.io.
+          <b>The run-length line.</b> "Level 1 to 100. One sitting." says short without a number.
+          Does it overpromise for slower players?
         </li>
-        <li><b>Music:</b> licensed track, or commission a 30 s cue to this cut sheet?</li>
-        <li>
-          <b>The duel act</b> is the newest feature and the most distinctive. Give it more time (cut
-          the item flash, shot 7) or keep the balance as is?
-        </li>
-        <li>
-          <b>Rival names</b> in shots 13 and 14 are real players' names. Use our own test
-          characters, or ask permission?
-        </li>
+        <li><b>The itch.io address</b> for the end card (a placeholder for now).</li>
+        <li><b>Music:</b> licensed track, or a 30 s cue written to this cut sheet?</li>
       </ol>
     </div>
   </section>
@@ -434,186 +462,145 @@
     {
       id: 'hook',
       name: 'Hook',
-      span: '0:00–0:04',
-      note: 'No logo, no text. Start inside the fight so the first two seconds already show what the game looks like.',
+      span: '0:00–0:03',
+      note: 'An endgame build at full power. No text. The first frame should already look like the genre the viewer loves.',
     },
     {
-      id: 'build',
-      name: 'Build',
-      span: '0:04–0:11',
-      note: 'The part other auto-battlers skip: the depth. Fast, legible UI cuts, each ending on a number going up.',
+      id: 'builds',
+      name: 'New run, new build',
+      span: '0:03–0:15',
+      note: 'The selling point. Three runs, three classes, three colours, and each shows one layer of the crafting: the tree, linked gems, rolled gear. Together they show the whole depth in twelve seconds.',
     },
     {
-      id: 'watch',
-      name: 'Watch',
-      span: '0:11–0:19',
-      note: 'The payoff: the build plays itself out. Colour is damage type, so the montage reads as variety at a glance.',
+      id: 'climb',
+      name: 'The climb',
+      span: '0:15–0:20',
+      note: 'A whole build, level 1 to 100, in one sitting. Death ends the run.',
     },
     {
       id: 'duel',
-      name: 'Duel',
-      span: '0:19–0:27',
-      note: 'The hook no one else has: your finished character against the one another player left behind.',
+      name: 'Duels and the board',
+      span: '0:20–0:27',
+      note: 'The arcade loop: the finished build fights other players’ builds, its Elo moves, and its name climbs the high scores.',
     },
-    { id: 'title', name: 'Title', span: '0:27–0:30', note: 'Name, promise, where to play.' },
+    { id: 'title', name: 'Title', span: '0:27–0:30', note: 'Name, price, where to play.' },
   ];
 
   const SHOTS = [
     {
       act: 'hook',
-      t: [0, 2],
-      name: 'Torchlight',
-      frame: 'torch',
+      t: [0, 3],
+      name: 'Endgame',
+      frame: 'endgame',
       screen:
-        'Black. A wall torch flares and lights a strip of crypt floor. A Vanguard with a two-handed mace steps into the light; behind it, a pack of skeletons stands up out of the dark.',
-      sound: 'Low drone, torch crackle, one footstep on the beat at 1.5 s.',
-      cap: 'Showcase mode, Vanguard, Crypt biome. Pause on the reveal and push in slightly in the edit.',
+        'Cold open on map 80-something: a late build tears through a packed room, traps bursting violet, a ring of blades, critical strike numbers stacking up. The camera holds wide so the whole screen is busy.',
+      sound: 'Drone, then the first full downbeat at 2 s on the biggest burst.',
+      cap: 'A late save on a Packed map (Debug panel). Several takes; keep the busiest two seconds.',
     },
     {
-      act: 'hook',
-      t: [2, 4],
-      name: 'First blow',
-      frame: 'slam',
+      act: 'builds',
+      t: [3, 4],
+      name: 'Pick a class',
+      frame: 'classes',
+      text: 'New run. New build.',
+      screen: 'The class screen flicks through classes on the beats and lands on the Vanguard.',
+      sound: 'A click per class, on the eighth notes.',
+      cap: 'Class select, cursor stepping across the cards.',
+    },
+    {
+      act: 'builds',
+      t: [4, 7.5],
+      name: 'Run one: the Vanguard',
+      frame: 'runA',
       screen:
-        'The mace comes down: a bone-white ring grows from the impact, the floor cracks, the pack bursts apart, critical strike numbers fly.',
-      sound: 'First downbeat of the music lands exactly on the impact (bar 2).',
-      cap: 'A slam skill in the Skill gallery at 0.25×, ramped to 1× in the edit just after the hit.',
-    },
-
-    {
-      act: 'build',
-      t: [4, 5.5],
-      name: 'The premise',
-      frame: 'card1',
-      text: 'You don’t play the fight.',
-      screen: 'Hard cut to black. Bone-coloured text, set in the title screen’s face.',
-      sound: 'Music drops to the kick only.',
-      cap: 'Made in the edit.',
+        'Insert (1 s): the passive tree, a path of nodes lighting up towards a keystone. Then the payoff (2.5 s): the Vanguard in a Forge, a fire slam cracking the floor, the pack thrown apart in orange.',
+      sound: 'Node chimes, then the slam on the bar line at 6 s.',
+      cap: 'Tree tab with points to spend; a fire slam build on a Forge map.',
     },
     {
-      act: 'build',
-      t: [5.5, 7.5],
-      name: 'The tree',
-      frame: 'tree',
-      text: 'You build it.',
+      act: 'builds',
+      t: [7.5, 11],
+      name: 'Run two: the Shade',
+      frame: 'runB',
       screen:
-        'The passive tree zoomed all the way out with its named areas showing, then a fast push in to a path of nodes lighting up one after another.',
-      sound: 'A soft chime per allocated node, on the eighth notes.',
-      cap: 'Passive tree tab with points to spend. Record the zoom with the mouse wheel; allocate four nodes in a line.',
+        'Insert (1 s): a support gem dropped into a linked socket, the damage per second jumping, the change in green. Then the payoff (2.5 s): the Shade in Ruins throwing Spire Traps in arcs; they spring into violet spires across the pack.',
+      sound: 'Socket click and a rising tick, then the traps going off on the beats.',
+      cap: 'Skills tab, a support with a big jump; a trap build on a Ruins map.',
     },
     {
-      act: 'build',
-      t: [7.5, 9],
-      name: 'The gem',
-      frame: 'gem',
+      act: 'builds',
+      t: [11, 15],
+      name: 'Run three: the Mystic',
+      frame: 'runC',
       screen:
-        'Skills tab: a support gem drops into a linked socket. The total damage per second ticks from about 1,200 to about 4,000, the change in green.',
-      sound: 'Socket click, then a rising tick as the number climbs.',
-      cap: 'Skills tab. Pick a support with a big jump for the shown skill; check the number after the tab settles (it updates a moment later).',
+        'Insert (1 s): a rare item drops, its card compared against what is worn, the gains in colour, and it goes on. Then the payoff (3 s): the Mystic in a Cavern with a crowd of minions pouring into the pack, cold and chaos glinting.',
+      sound: 'Item drop chime, then the minions surge on the bar line at 12 s.',
+      cap: 'Items tab with a clear upgrade; a minion build on a Cavern map.',
     },
     {
-      act: 'build',
-      t: [9, 10],
-      name: 'Gear and orders',
-      frame: 'items',
+      act: 'climb',
+      t: [15, 18.5],
+      name: 'Level 1 to 100',
+      frame: 'climb',
+      text: 'Level 1 to 100. One sitting.',
       screen:
-        'Two half-second cuts: an item card compared against what is worn, its changed lines in colour; then the Strategy tab, spacing switched to Kite.',
-      sound: 'Two clicks on the beats.',
-      cap: 'Items tab with a clear upgrade in the bag; Strategy tab.',
+        'Half-second cuts through biomes, each a deeper map; the HUD map number rolls up to 100 under the text.',
+      sound: 'A riser across the whole shot.',
+      cap: 'Showcase at 8× for the footage; the rolling number is made in the edit.',
     },
     {
-      act: 'build',
-      t: [10, 11],
-      name: 'Choose the map',
-      frame: 'maps',
-      text: 'Then you watch.',
-      screen: 'The three map offers side by side; one is picked and the screen pulls into it.',
-      sound: 'Whoosh into a full-band downbeat at 11 s.',
-      cap: 'Camp, map choice. A boss map among the offers reads well.',
-    },
-
-    {
-      act: 'watch',
-      t: [11, 14],
-      name: 'Eight biomes, five colours',
-      frame: 'montage',
+      act: 'climb',
+      t: [18.5, 20],
+      name: 'One life',
+      frame: 'fallen',
+      text: 'One life.',
       screen:
-        'Six cuts of half a second, one per beat: chaos plague drifting through a Marsh, traps thrown in arcs across a Forge, Glacier Wall rising in a Cavern, violet arcs forking through Ruins, Orbiting Blades in the open Hollow, minions pouring down a Warren passage.',
-      sound: 'Each cut on a beat; the skill’s own impact sound on top of the music.',
-      cap: 'Debug panel to force each biome; Skill gallery for clean single-skill moments if a live map is too busy.',
-    },
-    {
-      act: 'watch',
-      t: [14, 16],
-      name: 'The Siege Marshal',
-      frame: 'boss',
-      screen:
-        'A boss fight: the horn sounds, a regiment charges, warning shapes fill the floor; the character kites out between them, skills firing on its own.',
-      sound: 'War horn on bar 8 (14 s).',
-      cap: 'A save at the Siege Marshal’s map, Strider or a ranged build so it kites. Any boss with big telegraphs works.',
-    },
-    {
-      act: 'watch',
-      t: [16, 17.5],
-      name: 'The last spark',
-      frame: 'reprieve',
-      screen:
-        'The life globe drains to a sliver. Slow motion. The Last Spark reprieve fires: a ward, the pack thrown back, “Immune” over the hits it shrugs off.',
-      sound: 'Music cuts out for half a beat, then a heavy hit as the reprieve fires.',
-      cap: 'Carry a Last Spark into a hard map; slow down in the edit. Record a few attempts.',
-    },
-    {
-      act: 'watch',
-      t: [17.5, 19],
-      name: 'A hundred maps',
-      frame: 'count',
-      text: '100 maps. Death ends the run.',
-      screen: 'Fast run footage behind the card; the map number in the HUD rolls from 1 to 100.',
-      sound: 'A riser into the duel act.',
-      cap: 'Footage from Showcase at 8× speed; the counter is made in the edit.',
-    },
-
-    {
-      act: 'duel',
-      t: [19, 20.5],
-      name: 'The end screen',
-      frame: 'endscreen',
-      text: 'Then your build meets theirs.',
-      screen: 'A run’s end screen; the duel button at the top is pressed.',
-      sound: 'A single bell.',
-      cap: 'End screen with rivals switched on and a name typed.',
+        'A boss telegraph fills the floor, the life globe empties, the character falls. Cut to the end screen; the duel button is pressed.',
+      sound: 'The music cuts on the death, a single low hit, a bell on the button.',
+      cap: 'A run that dies to a boss; end screen with rivals switched on.',
     },
     {
       act: 'duel',
-      t: [20.5, 25],
+      t: [20, 24],
       name: 'The duel',
       frame: 'duel',
+      text: 'Duel their builds.',
       screen:
-        'The round arena. Our character against a rival shown with a boss bar and the other player’s name. Two builds trade: one kites and shoots, the other closes in. Cross-cut close-ups on each, then slow motion on the deciding hit, held for half a second.',
-      sound: 'The music’s biggest section. Silence for the held frame, then the hit.',
-      cap: 'A duel at normal speed against a rival with a different play style (ranged against melee reads best). Record several and keep the closest.',
+        'The round arena: our character against Sin, whose name sits on a boss bar. Ranged against melee: one kites and shoots, the other closes in. Slow motion on the deciding hit, held for half a beat.',
+      sound: 'The biggest section of the music; silence for the held frame, then the hit.',
+      cap: 'A duel at normal speed against the staged rival “Sin”; several takes, keep the closest.',
     },
     {
       act: 'duel',
-      t: [25, 27],
+      t: [24, 25.5],
       name: 'The rating',
-      frame: 'rating',
-      screen:
-        'The result: the rating goes up. Cut to the high scores with our character’s name moving up the list.',
+      frame: 'elo',
+      screen: 'The result line: “Rated · 712 → 748”, the number counting up.',
       sound: 'A rising tone as the number climbs.',
-      cap: 'Result screen of a rated (first) duel; High scores on the title screen.',
+      cap: 'Result screen of a first (rated) duel.',
     },
-
+    {
+      act: 'duel',
+      t: [25.5, 27],
+      name: 'The board',
+      frame: 'board',
+      text: 'Take the top spot.',
+      alt: 'Alternatives: “Climb the board.” · “Beat their builds. Take their spot.” · “Your build against everyone’s.”',
+      screen:
+        'High scores: oostin, Sin, Eli, Gravewick, marrowbyte, Tessaly, Ninefingers. Our character’s row slides up past two of them, arcade style.',
+      sound: 'An arcade-style tick per place gained.',
+      cap: 'High scores on the title screen, from the staged snapshots.',
+    },
     {
       act: 'title',
       t: [27, 30],
       name: 'Battle of Builds',
       frame: 'logo',
-      text: 'Battle of Builds',
+      text: 'Battle of Builds · Play free',
       screen:
-        'The title over a dim crypt: “An auto-battler of bones and numbers.” Below it, “Play free in your browser” and the address. The torch gutters out on the last frame.',
+        'The title over a dim crypt, “Play free” and the itch.io address under it. The torch gutters out on the last frame.',
       sound: 'Final hit at 27 s, the drone rings out, the torch hisses out at 30 s.',
-      cap: 'Made in the edit over a still of the title screen’s background or a dark map frame.',
+      cap: 'Made in the edit; address is a placeholder until the itch.io page is up.',
     },
   ];
 
@@ -662,247 +649,227 @@
     `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g-${col.slice(1)})" opacity="${o || 1}"/>`;
   const defs = (cols) =>
     `<defs>${cols.map((c) => `<radialGradient id="g-${c.slice(1)}"><stop offset="0" stop-color="${c}" stop-opacity=".55"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`).join('')}</defs>`;
+  const caption = (t) =>
+    `<rect x="0" y="146" width="320" height="34" fill="#000" opacity=".6"/>` + say(160, 170, t, 16);
+  /* a small inset showing the crafting layer, top-right */
+  const inset = (body, title) =>
+    `<rect x="196" y="8" width="116" height="66" rx="2" fill="${C.ui}" stroke="${C.torch}"/>` +
+    label(202, 20, title) +
+    body;
+  const pack = (pts, o) => pts.map(([x, y]) => skel(x, y, o)).join('');
 
   const FRAMES = {
-    torch: () =>
-      defs([C.torch]) +
-      `<g class="flicker">${glow(160, 70, 90, C.torch)}</g>` +
-      floor(160, 110, 120, 45) +
-      `<rect x="150" y="30" width="20" height="40" fill="${C.wall}" opacity=".7"/><rect x="157" y="42" width="6" height="12" fill="${C.torch}"/>` +
-      hero(150, 104) +
-      skel(220, 96, 0.55) +
-      skel(236, 104, 0.4) +
-      skel(206, 110, 0.35) +
-      skel(250, 92, 0.25) +
-      label(8, 14, 'CRYPT · WIDE → PUSH IN'),
-    slam: () =>
-      defs([C.bone]) +
-      floor(160, 100, 130, 50) +
-      glow(150, 100, 70, C.bone, 0.7) +
-      ring(150, 100, 30, C.bone, 2) +
-      ring(150, 100, 52, C.bone, 1) +
-      `<path d="M150 100 l-18 6 l-10 -4 M150 100 l14 9 l12 -2 M150 100 l4 -12 l10 -4" stroke="#000" stroke-width="1.5" fill="none"/>` +
-      hero(142, 88) +
-      `<rect x="146" y="78" width="16" height="4" fill="${C.bone}" transform="rotate(35 146 80)"/>` +
-      skel(200, 80, 0.9) +
-      skel(214, 104, 0.9) +
-      skel(98, 118, 0.9) +
-      num(196, 60, '4,812', C.bone, 13) +
-      num(222, 88, '3,977', C.bone, 10) +
-      num(80, 104, '5,106!', C.fire, 12) +
-      label(8, 14, '0.25× → 1× RAMP'),
-    card1: () => say(160, 96, 'You don’t play the fight.', 20),
-    tree: () => {
-      let s = '';
-      const pts = [
-        [60, 40],
-        [90, 60],
-        [70, 95],
-        [110, 120],
-        [150, 50],
-        [180, 80],
-        [160, 120],
-        [210, 45],
-        [240, 90],
-        [220, 135],
-        [270, 60],
-        [280, 120],
-        [120, 85],
-        [200, 110],
-      ];
-      const links = [
-        [0, 1],
-        [1, 2],
-        [2, 3],
-        [1, 4],
-        [4, 5],
-        [5, 6],
-        [4, 7],
-        [7, 8],
-        [8, 9],
-        [7, 10],
-        [10, 11],
-        [1, 12],
-        [12, 5],
-        [5, 13],
-        [13, 9],
-        [3, 12],
-        [6, 13],
-      ];
-      links.forEach(
-        ([a, b]) =>
-          (s += `<line x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" stroke="${C.dim}" stroke-width="1.2"/>`),
-      );
+    endgame: () =>
+      defs([C.light, C.fire]) +
+      floor(160, 100, 150, 62) +
+      glow(110, 90, 60, C.light, 0.9) +
+      glow(220, 108, 60, C.fire, 0.7) +
       [
-        [1, 4],
-        [4, 5],
-        [5, 13],
-      ].forEach(
-        ([a, b]) =>
-          (s += `<line x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" stroke="${C.torch}" stroke-width="2.5"/>`),
-      );
-      pts.forEach(
-        (p, i) =>
-          (s += `<circle cx="${p[0]}" cy="${p[1]}" r="${[4, 10].includes(i) ? 7 : 4}" fill="${[1, 4, 5, 13].includes(i) ? C.torch : C.ui}" stroke="${[1, 4, 5, 13].includes(i) ? C.torch : C.mute}"/>`),
-      );
-      return (
-        s +
-        label(40, 22, 'AREA NAMES SHOW ZOOMED OUT') +
-        `<rect x="0" y="146" width="320" height="34" fill="#000" opacity=".6"/>` +
-        say(160, 170, 'You build it.', 16)
-      );
-    },
-    gem: () =>
-      panel(20, 20, 180, 140) +
-      label(30, 36, 'SKILLS') +
-      [0, 1, 2, 3]
-        .map(
-          (i) =>
-            `<circle cx="${50 + i * 36}" cy="80" r="11" fill="${i === 3 ? C.light : C.ui}" stroke="${i === 3 ? C.light : C.mute}" stroke-width="1.5"/>` +
-            (i < 3
-              ? `<line x1="${61 + i * 36}" y1="80" x2="${75 + i * 36}" y2="80" stroke="${C.mute}" stroke-width="2"/>`
-              : ''),
-        )
-        .join('') +
-      `<circle cx="50" cy="80" r="7" fill="${C.fire}"/><circle cx="86" cy="80" r="7" fill="${C.bone}" opacity=".7"/><circle cx="122" cy="80" r="7" fill="${C.cold}" opacity=".8"/>` +
-      `<path d="M158 130 q-4 -30 0 -44" stroke="${C.mute}" stroke-dasharray="3 3" fill="none"/>` +
-      panel(212, 50, 92, 70) +
-      label(220, 66, 'TOTAL DPS') +
-      num(220, 90, '1,240', C.mute, 11) +
-      num(220, 110, '3,980', C.chaos, 16),
-    items: () =>
-      panel(14, 18, 138, 144) +
-      label(22, 34, 'COMPARE') +
-      [0, 1, 2, 3, 4]
-        .map(
-          (i) =>
-            `<rect x="22" y="${46 + i * 18}" width="${[100, 80, 110, 70, 90][i]}" height="6" fill="${[C.chaos, C.bone, C.chaos, C.life, C.bone][i]}" opacity="${i % 2 ? 0.35 : 0.8}"/>`,
-        )
-        .join('') +
-      `<line x1="160" y1="10" x2="160" y2="170" stroke="${C.uiLine}"/>` +
-      panel(168, 18, 138, 144) +
-      label(176, 34, 'STRATEGY · SPACING') +
-      ['Hold', 'Close in', 'Kite']
-        .map(
-          (t, i) =>
-            `<rect x="176" y="${50 + i * 30}" width="120" height="22" rx="2" fill="${i === 2 ? C.torch : C.ui}" stroke="${C.uiLine}"/><text x="186" y="${65 + i * 30}" font-family="Alegreya Sans, sans-serif" font-size="11" fill="${i === 2 ? '#0f1016' : C.bone}">${t}</text>`,
-        )
-        .join(''),
-    maps: () =>
-      [0, 1, 2]
-        .map(
-          (i) =>
-            panel(22 + i * 96, 26, 84, 110) +
-            `<rect x="${30 + i * 96}" y="34" width="68" height="40" fill="${[C.floor, '#3a2a22', '#28324a'][i]}"/>` +
-            `<rect x="${30 + i * 96}" y="82" width="50" height="5" fill="${C.mute}" opacity=".6"/><rect x="${30 + i * 96}" y="94" width="40" height="5" fill="${C.mute}" opacity=".4"/>`,
-        )
-        .join('') +
-      `<rect x="116" y="24" width="88" height="114" rx="3" fill="none" stroke="${C.torch}" stroke-width="2"/>` +
-      `<rect x="0" y="146" width="320" height="34" fill="#000" opacity=".6"/>` +
-      say(160, 170, 'Then you watch.', 16),
-    montage: () => {
-      const cells = [
-        [C.chaos, 'MARSH'],
-        [C.fire, 'FORGE'],
-        [C.cold, 'CAVERN'],
-        [C.light, 'RUINS'],
-        [C.bone, 'HOLLOW'],
-        ['#c9b48a', 'WARREN'],
-      ];
-      return (
-        defs(cells.map((c) => c[0])) +
-        cells
-          .map(([col, nm], i) => {
-            const x = (i % 3) * 106 + 2,
-              y = Math.floor(i / 3) * 89 + 2;
-            let fx = '';
-            if (i === 0)
-              fx = `<circle cx="${x + 60}" cy="${y + 48}" r="20" fill="${col}" opacity=".25"/><circle cx="${x + 70}" cy="${y + 40}" r="12" fill="${col}" opacity=".3"/>`;
-            if (i === 1)
-              fx = `<path d="M${x + 30} ${y + 60} q20 -40 50 -10" stroke="${col}" fill="none" stroke-width="1.5" stroke-dasharray="3 2"/><circle cx="${x + 80}" cy="${y + 50}" r="4" fill="${col}"/>`;
-            if (i === 2)
-              fx = `<polygon points="${x + 30},${y + 62} ${x + 40},${y + 36} ${x + 52},${y + 58} ${x + 64},${y + 30} ${x + 76},${y + 56} ${x + 84},${y + 38} ${x + 90},${y + 62}" fill="${col}" opacity=".7"/>`;
-            if (i === 3)
-              fx = `<path d="M${x + 30} ${y + 50} l14 -6 l8 8 l14 -10 l10 6 l14 -8 M${x + 66} ${y + 42} l6 14 l12 4" stroke="${col}" fill="none" stroke-width="1.6"/>`;
-            if (i === 4)
-              fx =
-                ring(x + 52, y + 50, 24, col, 1) +
-                `<rect x="${x + 72}" y="${y + 46}" width="8" height="2" fill="${col}"/><rect x="${x + 26}" y="${y + 52}" width="8" height="2" fill="${col}"/>`;
-            if (i === 5)
-              fx = [0, 1, 2, 3]
-                .map(
-                  (k) =>
-                    `<circle cx="${x + 30 + k * 14}" cy="${y + 58 - k * 4}" r="3" fill="${col}" opacity=".8"/>`,
-                )
-                .join('');
-            return (
-              `<rect x="${x}" y="${y}" width="102" height="85" fill="#0b0b11" stroke="${C.uiLine}"/>` +
-              glow(x + 52, y + 46, 40, col, 0.5) +
-              fx +
-              hero(x + 52, y + 52, C.bone) +
-              label(x + 5, y + 12, `${i + 1} · ${nm}`)
-            );
-          })
-          .join('')
-      );
-    },
-    boss: () =>
-      defs([C.fire]) +
-      floor(160, 100, 150, 60) +
-      [
-        [90, 80],
-        [130, 70],
-        [200, 74],
-        [230, 96],
-        [110, 118],
+        [96, 84],
+        [128, 96],
+        [112, 112],
       ]
         .map(
           ([x, y]) =>
-            `<ellipse cx="${x}" cy="${y}" rx="22" ry="11" fill="${C.fire}" opacity=".18" stroke="${C.fire}" stroke-width="1"/>`,
+            `<polygon points="${x},${y - 26} ${x - 4},${y} ${x + 4},${y}" fill="${C.light}" opacity=".85"/>` +
+            ring(x, y, 14, C.light, 1),
         )
         .join('') +
-      `<rect x="210" y="52" width="16" height="24" fill="${C.wall}"/><circle cx="218" cy="46" r="7" fill="${C.wall}"/>` +
-      [0, 1, 2, 3, 4].map((i) => skel(176 + i * 10, 104 + (i % 2) * 6, 0.8)).join('') +
-      hero(84, 122, C.bone) +
-      `<path d="M84 122 q-20 6 -30 -6" stroke="${C.bone}" stroke-dasharray="2 3" fill="none"/>` +
-      panel(90, 8, 140, 12) +
-      `<rect x="92" y="10" width="96" height="8" fill="${C.life}"/>` +
-      label(96, 30, 'THE SIEGE MARSHAL') +
-      globes(0.85),
-    reprieve: () =>
-      defs([C.torch]) +
-      floor(160, 98, 140, 55) +
-      glow(160, 94, 70, C.torch, 0.9) +
-      ring(160, 98, 26, C.torch, 2) +
-      ring(160, 98, 44, C.torch, 1) +
-      hero(160, 92) +
-      [
-        [110, 80, -1],
-        [214, 84, 1],
-        [126, 124, -1],
-        [202, 120, 1],
+      ring(170, 100, 34, C.bone, 1) +
+      `<rect x="200" y="98" width="10" height="2" fill="${C.bone}"/><rect x="132" y="102" width="10" height="2" fill="${C.bone}"/>` +
+      hero(170, 96) +
+      pack(
+        [
+          [90, 104],
+          [120, 82],
+          [214, 92],
+          [230, 112],
+          [200, 122],
+          [246, 98],
+          [104, 120],
+        ],
+        0.8,
+      ) +
+      num(84, 64, '18,442', C.light, 12) +
+      num(212, 76, '9,207', C.fire, 11) +
+      num(132, 140, '21,960!', C.bone, 13) +
+      label(8, 14, 'MAP 84 · PACKED') +
+      globes(0.9),
+    classes: () =>
+      ['Vanguard', 'Strider', 'Mystic', 'Reaver', 'Zealot', 'Shade']
+        .map(
+          (n, i) =>
+            `<rect x="${12 + i * 50}" y="40" width="44" height="74" rx="2" fill="${C.ui}" stroke="${i === 0 ? C.torch : C.uiLine}" stroke-width="${i === 0 ? 2 : 1}"/>` +
+            hero(
+              34 + i * 50,
+              70,
+              ['#c0503a', '#5aa04a', '#5a78d0', '#d09a3a', '#d0c070', '#9a5ac0'][i],
+            ) +
+            `<text x="${34 + i * 50}" y="106" text-anchor="middle" font-family="Alegreya Sans, sans-serif" font-size="8" fill="${C.bone}">${n}</text>`,
+        )
+        .join('') + caption('New run. New build.'),
+    runA: () => {
+      const tree =
+        [
+          [210, 50, 228, 38],
+          [228, 38, 248, 46],
+          [248, 46, 266, 34],
+          [266, 34, 290, 44],
+        ]
+          .map(
+            ([a, b, c, d]) =>
+              `<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke="${C.torch}" stroke-width="2"/>`,
+          )
+          .join('') +
+        [
+          [210, 50, 3],
+          [228, 38, 3],
+          [248, 46, 3],
+          [266, 34, 3],
+          [290, 44, 6],
+        ]
+          .map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${C.torch}"/>`)
+          .join('') +
+        `<circle cx="226" cy="62" r="3" fill="${C.ui}" stroke="${C.mute}"/><circle cx="270" cy="62" r="3" fill="${C.ui}" stroke="${C.mute}"/>`;
+      return (
+        defs([C.fire]) +
+        floor(130, 112, 130, 52, '#3a2a22') +
+        glow(120, 110, 70, C.fire) +
+        ring(120, 110, 30, C.fire, 2) +
+        ring(120, 110, 50, C.fire, 1) +
+        `<path d="M120 110 l-18 6 l-10 -4 M120 110 l14 9 l12 -2 M120 110 l4 -12" stroke="#000" stroke-width="1.5" fill="none"/>` +
+        hero(112, 98, '#c0503a') +
+        pack(
+          [
+            [170, 92],
+            [180, 118],
+            [64, 124],
+            [76, 92],
+          ],
+          0.9,
+        ) +
+        num(160, 80, '6,310', C.fire, 12) +
+        label(8, 14, 'VANGUARD · FORGE') +
+        inset(tree, 'TREE → KEYSTONE')
+      );
+    },
+    runB: () => {
+      const gems =
+        [0, 1, 2]
+          .map(
+            (i) =>
+              `<circle cx="${214 + i * 22}" cy="44" r="7" fill="${i === 2 ? C.light : C.ui}" stroke="${i === 2 ? C.light : C.mute}" stroke-width="1.5"/>` +
+              (i < 2
+                ? `<line x1="${221 + i * 22}" y1="44" x2="${229 + i * 22}" y2="44" stroke="${C.mute}" stroke-width="2"/>`
+                : ''),
+          )
+          .join('') +
+        `<circle cx="214" cy="44" r="4" fill="${C.light}" opacity=".7"/><circle cx="236" cy="44" r="4" fill="${C.bone}" opacity=".6"/>` +
+        num(264, 40, '1,240', C.mute, 8) +
+        num(264, 56, '3,980', C.chaos, 10);
+      return (
+        defs([C.light]) +
+        floor(130, 112, 130, 52, '#2a2a33') +
+        glow(150, 106, 70, C.light) +
+        [
+          [60, 120, 110, 92],
+          [60, 120, 150, 112],
+          [60, 120, 186, 98],
+        ]
+          .map(
+            ([a, b, c, d]) =>
+              `<path d="M${a} ${b} Q${(a + c) / 2} ${b - 50} ${c} ${d}" stroke="${C.light}" stroke-dasharray="3 2" fill="none"/>`,
+          )
+          .join('') +
+        [
+          [110, 92],
+          [150, 112],
+          [186, 98],
+        ]
+          .map(
+            ([x, y]) =>
+              `<polygon points="${x},${y - 28} ${x - 3},${y} ${x + 3},${y}" fill="${C.light}" opacity=".9"/>` +
+              ring(x, y, 10, C.light, 1),
+          )
+          .join('') +
+        hero(60, 112, '#9a5ac0') +
+        pack(
+          [
+            [120, 100],
+            [160, 120],
+            [196, 106],
+            [140, 88],
+          ],
+          0.8,
+        ) +
+        label(8, 14, 'SHADE · RUINS · SPIRE TRAP') +
+        inset(gems, 'LINK A SUPPORT')
+      );
+    },
+    runC: () => {
+      const item =
+        `<rect x="204" y="28" width="60" height="40" fill="${C.ui}" stroke="#e8c45a"/>` +
+        [0, 1, 2, 3]
+          .map(
+            (i) =>
+              `<rect x="208" y="${33 + i * 8}" width="${[46, 36, 42, 30][i]}" height="4" fill="${[C.chaos, C.chaos, C.bone, C.chaos][i]}" opacity="${i === 2 ? 0.4 : 0.85}"/>`,
+          )
+          .join('') +
+        `<path d="M276 58 l0 -16 m-4 4 l4 -4 l4 4" stroke="${C.chaos}" fill="none" stroke-width="1.5"/>`;
+      const minions = [
+        [96, 110],
+        [112, 96],
+        [128, 116],
+        [144, 100],
+        [104, 126],
+        [150, 124],
       ]
-        .map(([x, y]) => skel(x, y, 0.8))
-        .join('') +
-      num(180, 66, 'Immune', C.bone, 10) +
-      num(98, 70, 'Immune', C.bone, 9) +
-      `<circle cx="20" cy="162" r="13" fill="${C.ui}" stroke="${C.uiLine}"/><rect x="7" y="170" width="26" height="5" fill="${C.life}"/><circle cx="300" cy="162" r="13" fill="${C.mana}"/>` +
-      label(8, 14, 'SLOW MOTION · LAST SPARK'),
-    count: () =>
+        .map(
+          ([x, y]) =>
+            `<circle cx="${x}" cy="${y}" r="4" fill="${C.cold}" opacity=".85"/><circle cx="${x}" cy="${y}" r="7" fill="none" stroke="${C.chaos}" stroke-width=".8" opacity=".6"/>`,
+        )
+        .join('');
+      return (
+        defs([C.cold]) +
+        floor(130, 112, 130, 52, '#28324a') +
+        glow(130, 110, 70, C.cold) +
+        minions +
+        hero(60, 108, '#5a78d0') +
+        pack(
+          [
+            [176, 100],
+            [190, 118],
+            [168, 128],
+          ],
+          0.8,
+        ) +
+        label(8, 14, 'MYSTIC · CAVERN · MINIONS') +
+        inset(item, 'A RARE DROP')
+      );
+    },
+    climb: () => {
+      const cols = ['#2d3a32', '#3a2a22', '#28324a', '#2a2a33', '#33302a', '#2a3a2a'];
+      return (
+        cols
+          .map(
+            (c, i) =>
+              `<rect x="${i * 54}" y="0" width="52" height="180" fill="${c}" opacity="${0.35 + i * 0.1}"/>` +
+              hero(i * 54 + 26, 104, C.bone) +
+              num(i * 54 + 8, 22, 'MAP ' + [3, 19, 38, 57, 76, 100][i], C.torch, 8),
+          )
+          .join('') +
+        `<rect x="0" y="66" width="320" height="50" fill="#000" opacity=".6"/>` +
+        say(160, 98, 'Level 1 to 100. One sitting.', 18)
+      );
+    },
+    fallen: () =>
+      defs([C.fire]) +
       floor(160, 100, 150, 60) +
-      hero(130, 96) +
-      skel(190, 90, 0.6) +
-      skel(204, 100, 0.6) +
-      `<rect x="0" y="0" width="320" height="180" fill="#000" opacity=".55"/>` +
-      num(14, 20, 'MAP 1 → 100', C.torch, 11) +
-      say(160, 98, '100 maps. Death ends the run.', 19),
-    endscreen: () =>
-      panel(60, 20, 200, 120) +
-      say(160, 44, 'Fallen on map 63', 14, C.mute) +
-      `<rect x="84" y="56" width="152" height="26" rx="2" fill="${C.torch}"/><text x="160" y="73" text-anchor="middle" font-family="Alegreya Sans, sans-serif" font-size="10.5" font-weight="700" fill="#0f1016">Duel for your damned soul’s fate</text>` +
-      `<rect x="84" y="92" width="152" height="6" fill="${C.mute}" opacity=".4"/><rect x="84" y="104" width="120" height="6" fill="${C.mute}" opacity=".3"/>` +
-      `<rect x="0" y="146" width="320" height="34" fill="#000" opacity=".6"/>` +
-      say(160, 170, 'Then your build meets theirs.', 16),
+      `<ellipse cx="150" cy="104" rx="70" ry="30" fill="${C.fire}" opacity=".18" stroke="${C.fire}"/>` +
+      `<rect x="200" y="50" width="16" height="26" fill="${C.wall}"/><circle cx="208" cy="44" r="7" fill="${C.wall}"/>` +
+      `<g transform="rotate(80 150 108)">${hero(150, 104, C.bone)}</g>` +
+      `<circle cx="20" cy="162" r="13" fill="${C.ui}" stroke="${C.uiLine}"/><circle cx="300" cy="162" r="13" fill="${C.mana}"/>` +
+      caption('One life.'),
     duel: () =>
       defs([C.cold, C.fire]) +
       `<ellipse cx="160" cy="104" rx="130" ry="56" fill="${C.floor}" opacity=".5" stroke="${C.dim}" stroke-width="2"/>` +
@@ -915,41 +882,57 @@
       num(222, 70, '2,904', C.cold, 12) +
       panel(80, 8, 160, 12) +
       `<rect x="82" y="10" width="40" height="8" fill="${C.life}"/>` +
-      label(86, 30, 'RIVAL: (A PLAYER’S NAME) · LV 71') +
-      globes(0.6),
-    rating: () =>
-      panel(30, 24, 120, 120) +
-      say(90, 54, 'Victory', 18, C.torch) +
-      label(48, 80, 'RATING') +
-      num(48, 104, '712', C.mute, 12) +
-      num(84, 104, '→ 748', C.chaos, 14) +
-      panel(170, 24, 120, 120) +
-      label(180, 40, 'HIGH SCORES') +
-      [0, 1, 2, 3, 4]
-        .map(
-          (i) =>
-            `<rect x="180" y="${50 + i * 17}" width="100" height="12" fill="${i === 2 ? C.torch : C.ui}" opacity="${i === 2 ? 0.9 : 1}" stroke="${C.uiLine}"/>`,
-        )
-        .join('') +
-      `<path d="M285 96 l0 -16 m-4 4 l4 -4 l4 4" stroke="${C.chaos}" fill="none" stroke-width="1.5"/>`,
+      label(86, 30, 'SIN · REAVER · LV 71') +
+      globes(0.6) +
+      caption('Duel their builds.'),
+    elo: () =>
+      panel(70, 34, 180, 100) +
+      say(160, 66, 'Victory', 22, C.torch) +
+      `<text x="160" y="96" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" fill="${C.mute}">Rated · 712 <tspan fill="${C.chaos}" font-weight="600">→ 748</tspan></text>` +
+      label(114, 118, 'ELO · FIRST FIGHT VS THIS RIVAL'),
+    board: () => {
+      const rows = [
+        ['oostin', 'Shade', 1184],
+        ['Sin', 'Reaver', 1092],
+        ['Gravewick', 'Zealot', 968],
+        ['Eli', 'Strider', 901],
+        ['YOU', 'Mystic', 748],
+        ['marrowbyte', 'Vanguard', 731],
+        ['Tessaly', 'Mystic', 702],
+        ['Ninefingers', 'Shade', 655],
+      ];
+      return (
+        panel(40, 8, 240, 132) +
+        label(50, 22, 'HIGH SCORES') +
+        rows
+          .map(
+            ([n, c, r], i) =>
+              `<rect x="48" y="${28 + i * 13}" width="224" height="11" fill="${n === 'YOU' ? C.torch : i % 2 ? C.ui : '#20212d'}"/>` +
+              `<text x="54" y="${36.5 + i * 13}" font-family="JetBrains Mono, monospace" font-size="7.5" fill="${n === 'YOU' ? '#0f1016' : C.bone}">${i + 1}. ${n === 'YOU' ? '(our character)' : n}</text>` +
+              `<text x="170" y="${36.5 + i * 13}" font-family="JetBrains Mono, monospace" font-size="7.5" fill="${n === 'YOU' ? '#0f1016' : C.mute}">${c}</text>` +
+              `<text x="264" y="${36.5 + i * 13}" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="7.5" fill="${n === 'YOU' ? '#0f1016' : C.bone}">${r}</text>`,
+          )
+          .join('') +
+        `<path d="M282 96 l0 -22 m-4 4 l4 -4 l4 4" stroke="${C.chaos}" fill="none" stroke-width="1.5"/>` +
+        caption('Take the top spot.')
+      );
+    },
     logo: () =>
       defs([C.torch]) +
       `<g class="flicker">${glow(160, 80, 120, C.torch, 0.6)}</g>` +
       say(160, 82, 'Battle of Builds', 30) +
-      `<text x="160" y="102" text-anchor="middle" font-family="Alegreya Sans, sans-serif" font-style="italic" font-size="11" fill="${C.mute}">An auto-battler of bones and numbers.</text>` +
-      `<text x="160" y="140" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="${C.bone}">PLAY FREE IN YOUR BROWSER · elijahlrc.github.io/bob</text>`,
+      say(160, 112, 'Play free', 16, C.torch) +
+      `<text x="160" y="140" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="${C.bone}">[itch.io address]</text>`,
   };
 
   /* ---- timeline ---- */
-  const tl = document.getElementById('tl');
   const pct = (s) => (s / 30) * 100 + '%';
   let acts = '<div class="acts">',
     shots = '<div class="shots">',
     beats = '<div class="beats">';
   ACTS.forEach((a) => {
     const ss = SHOTS.filter((s) => s.act === a.id);
-    const d = ss.at(-1).t[1] - ss[0].t[0];
-    acts += `<div class="act" style="width:${pct(d)}">${a.name}</div>`;
+    acts += `<div class="act" style="width:${pct(ss.at(-1).t[1] - ss[0].t[0])}">${a.name}</div>`;
   });
   SHOTS.forEach(
     (s, i) =>
@@ -960,22 +943,26 @@
     beats += `<div class="tick${b % 4 === 0 ? ' bar' : ''}" style="left:${pct(sec)}"></div>`;
     if (b % 4 === 0) beats += `<div class="sec" style="left:${pct(sec)}">${sec}s</div>`;
   }
-  tl.innerHTML = acts + '</div>' + shots + '</div>' + beats + '</div>';
+  document.getElementById('tl').innerHTML = acts + '</div>' + shots + '</div>' + beats + '</div>';
+
+  /* ---- the script ---- */
+  document.getElementById('script').innerHTML = SHOTS.filter((s) => s.text)
+    .map((s) => `<li><span>${fmt(s.t[0])}</span>${s.text}</li>`)
+    .join('');
 
   /* ---- shots ---- */
-  const out = document.getElementById('acts');
   let html = '',
     n = 0;
   ACTS.forEach((a) => {
     html += `<section class="act" aria-labelledby="act-${a.id}"><div class="act-h"><h2 id="act-${a.id}">${a.name}</h2><span>${a.span}</span><p>${a.note}</p></div>`;
     SHOTS.filter((s) => s.act === a.id).forEach((s) => {
       n++;
-      const d = s.t[1] - s.t[0];
       html += `<article class="shot" id="shot-${n}">
       <div class="frame"><svg viewBox="0 0 320 180" role="img" aria-label="Sketch of shot ${n}: ${s.name}">${FRAMES[s.frame]()}</svg>
-        <div class="cap"><span><b>${String(n).padStart(2, '0')}</b> · ${fmt(s.t[0])}–${fmt(s.t[1])}</span><span>${d.toFixed(1)} s</span></div></div>
+        <div class="cap"><span><b>${String(n).padStart(2, '0')}</b> · ${fmt(s.t[0])}–${fmt(s.t[1])}</span><span>${(s.t[1] - s.t[0]).toFixed(1)} s</span></div></div>
       <div class="notes"><h3>${s.name}</h3><dl>
         ${s.text ? `<dt>Text</dt><dd class="txt">${s.text}</dd>` : ''}
+        ${s.alt ? `<dt></dt><dd class="alt">${s.alt}</dd>` : ''}
         <dt>Picture</dt><dd>${s.screen}</dd>
         <dt>Sound</dt><dd>${s.sound}</dd>
         <dt>Capture</dt><dd class="cap">${s.cap}</dd>
@@ -983,5 +970,5 @@
     });
     html += '</section>';
   });
-  out.innerHTML = html;
+  document.getElementById('acts').innerHTML = html;
 </script>
