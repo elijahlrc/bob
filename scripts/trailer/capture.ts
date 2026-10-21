@@ -5,8 +5,8 @@
  *   npx tsx scripts/trailer/capture.ts [clip ...] [--peek]
  *
  * Each clip is staged by `src/trailer/stage.ts` in headless Chromium, and every frame is stepped by hand (the game's own loop is
- * stopped), so a clip is the same every time and takes as long as it takes to draw: about a second a frame at 1280×720 in
- * software WebGL. Frames go to docs/trailer/footage/<clip>/f0000.jpg (git-ignored), with `events.json`, the sim events of each
+ * stopped), so a clip is the same every time and takes as long as it takes to draw (milliseconds a frame on a GPU, about a
+ * second in software WebGL). Frames go to docs/trailer/footage/<clip>/f0000.jpg (git-ignored), with `events.json`, the sim events of each
  * frame (to find where the hits land). `--peek` saves four stills of each clip to footage/peek/ instead.
  * Needs playwright-core (`npm i --no-save playwright-core`) and Chromium (CHROME_PATH, or the one Playwright installs).
  */
@@ -159,14 +159,20 @@ async function main(): Promise<void> {
   const names = args.filter((a) => !a.startsWith('--'));
   const lib = 'playwright-core';
   const { chromium } = await import(lib);
+  // The GPU by default (a frame takes milliseconds). TRAILER_SOFTWARE_GL=1 draws on the CPU instead, for a machine with no
+  // GPU (a cloud container: about a second a frame). TRAILER_HEADED=1 opens a visible window, if headless gets no GPU.
+  const software = !!process.env.TRAILER_SOFTWARE_GL;
   const browser = await chromium.launch({
     ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}),
-    args: [
-      '--use-gl=angle',
-      '--use-angle=swiftshader',
-      '--enable-unsafe-swiftshader',
-      '--ignore-gpu-blocklist',
-    ],
+    headless: !process.env.TRAILER_HEADED,
+    args: software
+      ? [
+          '--use-gl=angle',
+          '--use-angle=swiftshader',
+          '--enable-unsafe-swiftshader',
+          '--ignore-gpu-blocklist',
+        ]
+      : ['--ignore-gpu-blocklist', '--enable-gpu'],
   });
   try {
     for (const clip of CLIPS) {

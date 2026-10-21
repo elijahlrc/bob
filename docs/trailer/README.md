@@ -17,9 +17,18 @@ The 30-second trailer, planned with the owner on 2026-10-21. Nothing here ships 
   `scripts/trailer/clips.ts`. The frames go to `footage/` (git-ignored); `cut.html` picks which frames each shot uses (its `IN`
   table; `npx tsx scripts/trailer/events.ts` shows where the kills fall in each clip).
 
-**Filming the footage:** run `npm run dev`, then `npx tsx scripts/trailer/capture.ts [clip ...]` (all clips with no names).
-Every frame is stepped by hand with the game's loop stopped, so a clip is the same on every run; at 1280×720 in software
-WebGL a frame takes about a second, the whole set about half an hour. Then `npm run trailer:render -- --cut` writes `cut.mp4`.
+**Filming the footage:**
+
+1. Once: `npm i --no-save playwright-core`, then `npx playwright install chromium`.
+2. In one terminal, `npm run dev`.
+3. In another, `npm run trailer:capture` films every clip; name clips to film only those, e.g.
+   `npm run trailer:capture -- climb2 duel`. Don't edit `src/` while it runs: the dev server reloads the page and the clip
+   fails.
+4. `npm run trailer:render -- --cut` writes `cut.mp4` from the footage and the score.
+
+Every frame is stepped by hand with the game's loop stopped, so a clip is the same on every run. On a GPU the whole set takes
+minutes. `TRAILER_SOFTWARE_GL=1` draws on the CPU, for a machine with no GPU (about a second a frame, half an hour for the
+set). If headless Chromium gets no GPU, `TRAILER_HEADED=1` films in a visible window (PowerShell: `$env:TRAILER_HEADED=1`).
 
 **Re-rendering:** `npm run trailer:render` (`scripts/trailer/render.ts`) runs the score script, renders every frame in
 headless Chromium and joins them with ffmpeg. It needs Python 3 with numpy, ffmpeg on PATH and
