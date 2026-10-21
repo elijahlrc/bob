@@ -191,222 +191,75 @@ def groove(start, bars, g=1.0, busy=False, fill=False):
                 snare(t0 + st * S16, g * 0.8)
 
 
-# ================= the score, cue by cue =================
-# Rhythm first. One note of harmony (a D pedal) under drums that carry the energy; no melody. Pitch comes only from
-# the bass pulse, a low stab on the big hits and the cue sounds.
+# ================= the score =================
+# One groove, start to finish: the same beat and the same pulsing bass on D. It stops once, for the fall, and comes
+# back for the duel; the genre words get a hit each and the title rings out. The game's own sounds come with the
+# footage, so the score does not follow the cuts.
 
-D1, D2, Eb2, C2, Bb1 = 26, 38, 39, 36, 34
-
-
-def pulse_bass(start, dur, step=S16 * 2, g=1.0, notes=None):
-    """A pulsing bass on D, a note per step; `notes` may bend the last steps of each bar."""
-    n = int(round(dur / step))
-    for j in range(n):
-        at = start + j * step
-        m = D2
-        if notes:
-            m = notes(at, j)
-        bassnote(at, m, step * 0.7, g * (1.0 if j % 2 == 0 else 0.75))
+D1, D2, Eb2 = 26, 38, 39
 
 
-def turn(at, j):
-    """Every second bar ends on a half-step lift and back: D D D ... Eb D."""
-    pos = round((at % 4.0) / (S16 * 2))
-    return Eb2 if pos == 14 else D2
+def bar(t0, g=1.0):
+    """The groove, one bar: kick on 1, the and-of-2 and 3; snare on 2 and 4; eighth hats; sixteenth bass on D,
+    lifting to Eb on the last eighth of every second bar."""
+    for st in range(16):
+        at = t0 + st * S16
+        if st in (0, 6, 8):
+            kick(at, g)
+        if st in (4, 12):
+            snare(at, g)
+        if st % 2 == 0:
+            hat(at, g * (0.9 if st % 4 == 2 else 0.6))
+        lift = st >= 14 and round(t0 / 2.0) % 2 == 1
+        bassnote(at, Eb2 if lift else D2, S16 * 0.7, g * (1.0 if st % 2 == 0 else 0.7))
 
 
-def stab(at, g=1.0, d=0.35):
-    """A low, hard stab: D and A an octave apart on two pulse voices."""
-    for m, duty in ((D2 + 12, 0.5), (D2 + 19, 0.25)):
-        place('pad', at, pulse(midi(m), d, duty) * adsr(int(d * SR), d=d * 0.9, s=0, r=0.01), 0.5 * g)
+MOTIF = ((0.0, 62, 0.4), (0.75, 65, 0.2), (1.0, 63, 0.4), (1.5, 62, 0.45))  # D F Eb D
 
 
-def tom(at, m, g=1.0):
-    d = 0.14
-    place('drums', at, tri(midi(m), d, slide=-5) * np.exp(-np.arange(int(d * SR)) / SR / 0.05), 0.7 * g)
-
-
-def beat(start, bars, kind='full', g=1.0):
-    """The patterns. half: kick on 1 and 3, snare on 3. full: a driving kick and a backbeat. drive: four on the floor, sixteenth hats."""
-    for b in range(bars):
-        t0 = start + b * 2.0
-        for st in range(16):
-            at = t0 + st * S16
-            if kind == 'half':
-                if st in (0, 10):
-                    kick(at, g)
-                if st == 8:
-                    snare(at, g)
-                if st % 4 == 2:
-                    hat(at, 0.7 * g)
-            elif kind == 'full':
-                if st in (0, 3, 8, 10):
-                    kick(at, g)
-                if st in (4, 12):
-                    snare(at, g)
-                if st % 2 == 0:
-                    hat(at, g * (0.9 if st % 4 == 2 else 0.6))
-            elif kind == 'drive':
-                if st % 4 == 0:
-                    kick(at, g)
-                if st in (4, 12):
-                    snare(at, g)
-                hat(at, g * (0.9 if st % 2 else 0.5), open_=(st % 4 == 2))
-
-
-def roll(start, dur, step=S16, g0=0.4, g1=1.0):
-    n = int(round(dur / step))
-    for j in range(n):
-        snare(start + j * step, g0 + (g1 - g0) * j / max(1, n - 1))
-
-
-# 0-2 s, Endgame: a hard start. Kick and stab with each trap spire, sixteenth hats, the big hit on 1.5.
-for at in (0.0, 0.5, 1.0):
-    kick(at, 1.1)
-    stab(at, 0.7, 0.2)
-    blip(at + 0.01, 86, 0.08, 0.5, 0.25, slide=-4)
-for st in range(12):
-    hat(st * S16, 0.8)
-pulse_bass(0.0, 1.5, S16)
-roll(1.25, 0.25, S16 / 2, 0.5, 0.9)
-boom(1.5)
-stab(1.5, 1.0, 0.5)
-
-# 2-3 s, Pick a class: drop to the bass pulse and a tick per card.
-pulse_bass(2.0, 1.0, S16 * 2, 0.8)
-for k in range(6):
-    hat(2.0 + k * 0.125, 1.0)
-blip(2.75, 74, 0.06, 0.7, 0.5)
-
-# 3-6 s, the Vanguard: a half-time beat under the tree, four ticks for the nodes, the full beat from the slam.
-beat(3.0, 1, 'half')
-pulse_bass(3.0, 2.0, S16 * 2, 0.9, turn)
-for k in range(4):
-    blip(3.2 + k * 0.18, 62 + k * 5, 0.06, 0.6, 0.5)
-boom(5.0)
-stab(5.0)
-beat(5.0, 1, 'full')
-pulse_bass(5.0, 1.0, S16 * 2, 1.0, turn)
-
-# 6-10.5 s, the Shade: the full beat with a sixteenth bass. Traps are snare-and-zap accents on the beats; the drop gets two notes.
-beat(6.0, 2, 'full')
-pulse_bass(6.0, 4.0, S16, 1.0, turn)
-blip(6.4, 69, 0.03, 1.0, 0.5)
-for at in (7.5, 8.0, 8.5):
-    snare(at, 0.8)
-    blip(at, 93, 0.06, 0.6, 0.125, slide=-6)
-blip(9.02, 81, 0.1, 0.7, 0.5)
-blip(9.14, 86, 0.25, 0.6, 0.5)
-beat(10.0, 1, 'half', 0.9)
-pulse_bass(10.0, 0.5, S16 * 2, 0.9)
-blip(10.2, 74, 0.04, 0.9, 0.5)
-
-# 10.5-12.5 s, three more builds: four on the floor. Each panel is a rhythm laid on top: arrow ticks, sweep toms, totem rim clicks.
-beat(10.5, 1, 'drive')
-pulse_bass(10.5, 2.0, S16, 1.0)
-for n in range(11):
-    hat(10.65 + n * 0.18, 0.7)
-for at in (10.85, 11.45, 12.05):
-    tom(at, 45, 0.9)
-    tom(at + 0.07, 41, 0.7)
-for n in range(5):
-    blip(11.05 + n * 0.33, 84, 0.02, 0.5, 0.5)
-
-# 12.5-16 s, the climb: a hit on every cut, the kicks double, a roll builds into the fall.
-for k in range(7):
-    at = 12.5 + k * 0.5
-    kick(at, 1.1)
-    crash(at + 0.01, 0.3, 0.35)
-    stab(at, 0.55 + 0.06 * k, 0.15)
-for st in range(28):
-    at = 12.5 + st * S16
-    hat(at, 0.6)
-    if st >= 14 and st % 2:
-        kick(at, 0.8)
-pulse_bass(12.5, 3.5, S16, 1.0)
-roll(14.75, 1.25, S16 / 2, 0.3, 1.0)
-
-# 16-19 s, the fall: everything stops. A falling charge, the impact on 16.5, a slow heartbeat in the dark,
-# a two-note fall on the duel button, a roll back in.
-place('sfx', 16.0, pulse(midi(62), 0.5, 0.5, slide=-3) * np.linspace(0.2, 1, int(0.5 * SR)), 0.16)
-place('sfx', 16.0, noise(0.5, 4000) * np.linspace(0, 1, int(0.5 * SR)) ** 2, 0.15)
-boom(16.5, 1.4)
-crash(16.5, 0.7, 1.2)
-place('bass', 16.5, tri(midi(D1), 1.4) * np.exp(-np.arange(int(1.4 * SR)) / SR / 0.45), 0.6)
-for at in (17.25, 17.45, 17.95, 18.15):
-    kick(at, 0.45)
-blip(18.25, 62, 0.15, 0.7, 0.5)
-blip(18.4, 61, 0.4, 0.6, 0.5)
-roll(18.5, 0.5, S16 / 2, 0.3, 1.0)
-
-# 19-25 s, the duel and the board: the drive beat at full weight, sixteenth bass, the held frame silent, the hit on 22.25.
-boom(19.0)
-stab(19.0)
-beat(19.0, 1, 'drive')
-pulse_bass(19.0, 3.0, S16, 1.0, turn)
-for st in range(8):  # 21-22: the drive beat continues to the hold
-    at = 21.0 + st * S16
-    if st % 4 == 0:
-        kick(at)
-    if st == 4:
-        snare(at)
-    hat(at, 0.8)
-boom(22.25, 1.3)
-stab(22.25, 1.1, 0.5)
-for st in range(6):
-    at = 22.5 + st * S16 * 2
-    hat(at)
-    if st % 2 == 0:
-        kick(at)
-    if st == 3:
-        snare(at)
-pulse_bass(22.25, 0.75, S16, 1.0)
-beat(23.0, 1, 'drive')
-pulse_bass(23.0, 2.0, S16, 1.0, turn)
-for k in range(6):  # the rating counts up in ticks
-    hat(22.6 + k * 0.06, 0.9)
-for at in (23.9, 24.2):
-    blip(at, 81, 0.05, 0.7, 0.5)
-roll(24.5, 0.5, S16 / 2, 0.4, 0.9)
-
-# 25-27 s, the genres: one hit and one stab per word, nothing between.
-for k in range(4):
-    at = 25.0 + k * 0.5
-    boom(at, 0.85)
-    stab(at, 0.9, 0.3)
-    bassnote(at, [Bb1, C2, Eb2, D2][k], 0.3, 1.1)
-
-# 27-30 s, the title: the last hit, the D pedal rings out, the pulse slows and stops; the torch gutters out.
-boom(27.0, 1.3)
-crash(27.0, 0.7, 2.5)
-stab(27.0, 1.0, 1.2)
-bassnote(27.0, D2, 2.0, 0.6)
-t = 27.5
-gap = 0.25
-while t < 29.6:
-    kick(t, 0.5 * (1 - (t - 27.5) / 2.4))
-    t += gap
-    gap *= 1.25
-place('sfx', 29.5, noise(0.5, 9000) * np.exp(-np.arange(int(0.5 * SR)) / SR / 0.15), 0.12)  # the torch
-
-# ---- the motif: one short, dark phrase, low and quiet, the same every time; it sits under the drums ----
-MOTIF = ((0.0, 62, 0.4), (0.75, 65, 0.2), (1.0, 63, 0.4), (1.5, 62, 0.45))  # D F Eb D, a bar long
-
-
-def motif(bar_start, g=0.55, octave=0):
+def motif(t0, g=0.32):
     for off, m, d in MOTIF:
-        lead(bar_start + off, m + octave, d, g, duty=0.125, vib=0.004)
+        lead(t0 + off, m, d, g, duty=0.125, vib=0.0)
 
 
-for b0 in (6.0, 8.0):  # the Shade's groove
-    motif(b0)
-for b0 in (12.5, 14.5):  # the climb: the same phrase, cut short by the roll
-    motif(b0, 0.5)
-for b0 in (19.0, 21.0, 23.0):  # the duel: an octave up, still under the drums
-    motif(b0, 0.6, 12)
-lead(27.0, 62, 2.0, 0.6, duty=0.125, vib=0.008)  # the title: the first note of the phrase, held
+# 0-16 s: the groove, eight bars. In on the first frame, one hit at 1.5 on the opening's biggest burst.
+for b in range(8):
+    bar(b * 2.0)
+boom(1.5)
+for t0 in (4.0, 8.0, 12.0):  # the phrase every other bar from bar 3
+    motif(t0)
+for st in range(8):  # a short roll into the stop
+    snare(15.0 + st * S16, 0.4 + 0.08 * st)
+
+# 16-19 s: the fall. Silence but for the impact on 16.5 and its low ring; a roll back in.
+boom(16.5, 1.3)
+place('bass', 16.5, tri(midi(D1), 1.4) * np.exp(-np.arange(int(1.4 * SR)) / SR / 0.45), 0.6)
+for st in range(4):
+    snare(18.5 + st * S16 * 2, 0.4 + 0.15 * st)
+
+# 19-25 s: the groove again, three bars, with one hit on the duel's deciding blow at 22.25 after a beat of silence.
+for b in range(3):
+    bar(19.0 + b * 2.0)
+mute_spans = [(22.0, 22.25)]
+boom(22.25, 1.1)
+for t0 in (19.0, 23.0):
+    motif(t0)
+
+# 25-27 s: the genres, a hit per word on the bass note, nothing between.
+for k in range(4):
+    boom(25.0 + k * 0.5, 0.85)
+    bassnote(25.0 + k * 0.5, D2, 0.3, 1.1)
+
+# 27-30 s: the title. The last hit, the D rings out.
+boom(27.0, 1.2)
+crash(27.0, 0.6, 2.5)
+bassnote(27.0, D2, 2.2, 0.6)
+lead(27.0, 62, 1.8, 0.3, duty=0.125)
 
 # ================= the mix =================
+for a_, b_ in mute_spans:  # held silences
+    for k_ in bus:
+        bus[k_][int(a_ * SR) : int(b_ * SR)] = 0
 # kick ducking: the music dips under each kick and swells back (the modern pump)
 duck = np.ones(N)
 for at in duck_points:
