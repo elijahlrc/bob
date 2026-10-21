@@ -331,3 +331,25 @@ export function effect(w: World, label: string): World['effects'][number] | unde
 export function releaseEnd(c: Controller): void {
   delete (c as unknown as { endMap?: unknown }).endMap;
 }
+
+/**
+ * Catch the renderer up with a sim warmed without drawing, before the first filmed frame: the effects age a little, the shake
+ * left by the warm-up dies, and the camera is put on the character at once (it would otherwise swing across the map from where
+ * the map began).
+ */
+export function settle(game: { scene: { getScene(key: string): unknown } }, c: Controller): void {
+  const style = (
+    game.scene.getScene('map') as {
+      style: {
+        update(w: World, dt: number): void;
+        followCamera(w: World, dt: number): void;
+        shake: number;
+      } | null;
+    }
+  ).style;
+  const w = c.world;
+  if (!style || !w) return;
+  for (let i = 0; i < 15; i++) style.update(w, 1 / 30);
+  style.followCamera(w, 1);
+  style.shake = 0;
+}

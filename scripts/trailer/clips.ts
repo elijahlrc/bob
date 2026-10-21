@@ -51,7 +51,7 @@ function mapClip(
     css: BARE,
     async film(t) {
       await t.stage(
-        (S, c, _g, a) => {
+        (S, c, game, a) => {
           const run = S.stagedRun(a.loadout, a.map);
           S.playMap(c, run, a.where);
           // A map cleared before the clip ends stays on screen.
@@ -59,6 +59,7 @@ function mapClip(
           S.warm(c, a.warm);
           S.warmUntil(c, (w: any) => S.near(w, 6) >= a.pack, 4000);
           if (a.speed) c.setSpeed(a.speed);
+          S.settle(game, c);
         },
         {
           loadout: { difficulty: SOFT, ...loadout },
@@ -235,12 +236,13 @@ export const CLIPS: Clip[] = [
     css: BARE,
     async film(t) {
       await t.stage(
-        (S, c, _g, a) => {
+        (S, c, game, a) => {
           const run = S.stagedRun(a, 45);
           (window as any).__run = run;
           S.playMap(c, run, { theme: 'hollowVigil', biome: 'ruins', density: 'packed' });
           S.warm(c, 45);
           S.warmUntil(c, (w: any) => S.near(w, 4) >= 3, 4000);
+          S.settle(game, c);
         },
         {
           classId: 'shade',
@@ -400,7 +402,7 @@ export const CLIPS: Clip[] = [
     zoom: 2.5,
     css: BARE + ` .duel-cta.trailer-press { filter: brightness(1.5); transform: scale(0.97); }`,
     async film(t) {
-      await t.stage((S, c) => {
+      await t.stage((S, c, game) => {
         const run = S.stagedRun(
           { classId: 'shade', level: 72, body: ['orbitingBlades'], seed: 9 },
           63,
@@ -417,6 +419,7 @@ export const CLIPS: Clip[] = [
           },
           2000,
         );
+        S.settle(game, c);
       });
       await t.rec(64, {
         each: (S, c) => {
@@ -480,10 +483,11 @@ export const CLIPS: Clip[] = [
       }, ME);
       if (n < 0) throw new Error('no duel the Mystic wins');
       await t.stage(
-        (S, c, _g, a) => {
+        (S, c, game, a) => {
           const [x, y] = (window as any).__builds;
           S.duel(c, x, y, (window as any).__seed, [a.me, 'Sin'], { before: 712, after: 748 });
           S.warm(c, a.n - 120);
+          S.settle(game, c);
         },
         { me: ME, n },
       );
