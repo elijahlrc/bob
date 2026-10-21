@@ -1,7 +1,7 @@
 # Bob — Duel balance: reprieves, a life curve and the end of a fight
 
-Status: **B0 to B4 built and measured (2026-10-20, section 8.1); the cap's target is missed and the tuning is the owner's. The `duels` table's new rules (docs/rivals.sql 9) wait for
-the owner's go-ahead before they are applied to the live database** · Owner: the user · Author: Claude
+Status: **B0 to B4 built and measured (2026-10-20, section 8.1); the cap's target is missed and the tuning is the owner's. The
+`duels` table's new rules (docs/rivals.sql 9) are applied to the live database (2026-10-20)** · Owner: the user · Author: Claude
 
 The duels of [DUEL.md](DUEL.md) (rivals after a run, "Duel for your damned soul's fate") are decided by damage. A character in
 a duel has the life it has on a map, but its opponent hits like a character and not like a monster, so a fight is a race of a
