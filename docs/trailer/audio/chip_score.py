@@ -234,8 +234,9 @@ for st in range(8):  # a short roll into the stop
 # 16-19 s: the fall. Silence but for the impact on 16.5 and its low ring; a roll back in.
 boom(16.5, 1.3)
 place('bass', 16.5, tri(midi(D1), 1.4) * np.exp(-np.arange(int(1.4 * SR)) / SR / 0.45), 0.6)
-for st in range(4):
-    snare(18.5 + st * S16 * 2, 0.4 + 0.15 * st)
+for st in range(4):  # a pickup in sixteenths that ends before the downbeat, then the groove lands with a hit
+    snare(18.5 + st * S16, 0.45 + 0.15 * st)
+boom(19.0, 0.9)
 
 # 19-25 s: the groove again, three bars, with one hit on the duel's deciding blow at 22.25 after a beat of silence.
 bar(19.0)
