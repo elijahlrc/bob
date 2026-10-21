@@ -7,9 +7,9 @@ import type { Actor, RainSpot, SkillZone, World } from './types';
 /**
  * A rain of arrows that has more arrows than the skill starts with (docs/SUPPORTS-PLAN.md 4.2). Geometry decides what an extra arrow is
  * worth, as in the reference game:
- *  - 'rings' (Rain of Arrows): the shower stays where it is and the extra arrows burst on rings round it. It reaches more ground, and
+ *  - 'rings' (Arrow Shower): the shower stays where it is and the extra arrows burst on rings round it. It reaches more ground, and
  *    an enemy under several of them is hit once. Alone against one enemy the extra arrows add nothing.
- *  - 'stack' (Blast Rain): the extra arrows are more explosions on the same place and every one hits. Each of the skill's explosions
+ *  - 'stack' (Ember Downpour): the extra arrows are more explosions on the same place and every one hits. Each of the skill's explosions
  *    is worth `1 / count` of the use, so the default count deals what the skill always dealt.
  * At the skill's own count there is nothing to place: the zone is the one it always was (`null`).
  */

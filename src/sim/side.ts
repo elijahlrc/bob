@@ -119,7 +119,7 @@ export type Side = {
   openers: Record<string, { fight: number; ids: number[] }>;
   /** Time since the burning aura last struck. */
   auraBurnT: number;
-  /** Seconds a Berserk has lasted (its drain of rage rises with it). */
+  /** Seconds a Rampage Call has lasted (its drain of rage rises with it). */
   berserkT: number;
   chars: Map<string, Character>;
   // G3: summons and ground (deployables, minions, fields, zones, banner, offering, warp, wither, caught)
@@ -136,12 +136,12 @@ export type Side = {
   banner: BannerState | null;
   /** The offering that stands, if one does (src/sim/minionFx.ts). */
   offering: OfferingState | null;
-  /** A teleport on its way, Withering Step's aura, and the projectiles a Venom Gyre has caught (src/sim/blinks.ts). */
+  /** A teleport on its way, Rotting Stride's aura, and the projectiles a Toxin Circle has caught (src/sim/blinks.ts). */
   warp: WarpState | null;
   wither: WitherState | null;
   caught: CaughtState | null;
   // G4: the skills' running state
-  /** Counters the supports keep (src/sim/supportFx.ts): uses of a skill, Intensity, Seals, a mirage archer, Inspiration's mana. */
+  /** Counters the supports keep (src/sim/supportFx.ts): uses of a skill, Intensity, Seals, a mirage archer, Lightheart's mana. */
   uses: Record<string, number>;
   intensity: Record<string, number>;
   intensityT: Record<string, number>;
@@ -158,9 +158,9 @@ export type Side = {
   /** The element of the next use of a skill that picks one (1 lightning, 2 cold, 3 fire), and the last one used. */
   elem: number;
   elemLast: number;
-  /** The buff of Static Strike: its stacks (seconds left) and the time toward the next beams. */
+  /** The buff of Charged Blow: its stacks (seconds left) and the time toward the next beams. */
   staticFx: { key: string; stacks: number[]; acc: number } | null;
-  /** Molten Shell: the pool left, the damage it has taken, and what comes of it. */
+  /** Slag Carapace: the pool left, the damage it has taken, and what comes of it. */
   shell: {
     left: number;
     taken: number;
@@ -170,19 +170,19 @@ export type Side = {
     buff: BuffId;
     profile: SkillProfile;
   } | null;
-  /** Herald of Agony: the Virulence held (it runs out), and the time to the next patch of Rimeplate's trail. */
+  /** Sour Herald: the Virulence held (it runs out), and the time to the next patch of Rimeplate's trail. */
   virulence: number;
-  /** The mana the supported skills have spent toward Arcane Surge. */
+  /** The mana the supported skills have spent toward Arcane Tide. */
   surgeMana: number;
   /** The relic's regeneration: seconds left, and the life a second for the character and for the minions; and its nova's cooldown. */
   relicRegen: { t: number; me: number; minions: number };
   relicT: number;
   trailT: number;
-  /** The blades of Blade Vortex: seconds left of each, and the time toward the next round. */
+  /** The blades of Orbiting Blades: seconds left of each, and the time toward the next round. */
   vortex: { key: string; blades: number[]; acc: number } | null;
-  /** The markers of Storm Call. */
+  /** The markers of Skyfall. */
   markers: { x: number; y: number; t: number; profile: SkillProfile; hand: number }[];
-  /** The orb of Orb of Storms. */
+  /** The orb of Tempest Mote. */
   stormOrb: {
     x: number;
     y: number;
@@ -199,7 +199,7 @@ export type Side = {
     t: number;
     arrows: { profile: SkillProfile; hand: number }[];
   }[];
-  /** The pods of Scourge Arrow waiting to bloom. */
+  /** The pods of Blight Hail waiting to bloom. */
   spores: {
     x: number;
     y: number;
@@ -209,7 +209,7 @@ export type Side = {
     arrows: number;
     range: number;
   }[];
-  /** The enemies carrying a charged debuff (Infernal Blow), by id. */
+  /** The enemies carrying a charged debuff (Cinder Blow), by id. */
   charged: Record<number, { n: number; t: number; key: string }>;
   /** Set while a skill's own secondary hits are made, so they do not feed the skill again. */
   inFx: boolean;

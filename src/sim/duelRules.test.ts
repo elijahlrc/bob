@@ -346,7 +346,7 @@ describe('the damage scale', () => {
     };
     expect(burning(1)).toBeGreaterThan(0);
     expect(burning(0.5)).toBeCloseTo(burning(1) / 2, 6);
-    // A Molten Shell's burst is of what the shell took as it was before the scale, and is scaled once, as it lands on the other
+    // A Slag Carapace's burst is of what the shell took as it was before the scale, and is scaled once, as it lands on the other
     // character: ×0.5 of the burst at ×1, not ×0.25.
     const shellBurst = (k: number) => {
       const w = scaled(k);

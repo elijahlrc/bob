@@ -93,7 +93,7 @@ describe('every support gem', () => {
       const b = buildFor([a.id, s.id], weaponFor(a), ATTR_CLASS(a.attr));
       const c = new Character(b, { areaLevel: 50 });
       expect(finite(c.sheet().skill.totalDps)).toBe(true);
-      if (s.blasphemy) {
+      if (s.curseAura) {
         // The curse stands on enemies hit and reserves mana instead of being cast.
         const choice = c.actives.find((x) => x.skill.id === a.id)!;
         expect(choice.supports.map((x) => x.def.id)).toContain(s.id);

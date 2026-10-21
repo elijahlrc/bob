@@ -82,7 +82,7 @@ export function releaseChannel(w: World, a: Actor): void {
     };
   }
   if (r.repeat) {
-    // One extra strike for each stage built, each at the full bonus (Blade Flurry).
+    // One extra strike for each stage built, each at the full bonus (Flurry of Edges).
     const q = scaleProfile(st.profile, 1 + ((spec.perStage ?? 0) * spec.cap) / 100);
     for (let i = 0; i < st.stage; i++) fireEffect(w, a, actFrom(st, q));
     return;
@@ -119,14 +119,14 @@ export function channelUse(w: World, a: Actor, act: Action): void {
   st.aimX = act.aimX;
   st.aimY = act.aimY;
   st.lastT = w.t;
-  // A spin that travels (Cyclone) closes in on its target as it goes, at the character's walking pace: it does not stop to chase.
+  // A spin that travels (Twister Blade) closes in on its target as it goes, at the character's walking pace: it does not stop to chase.
   const target = p.skill.travel ? actorById(w, act.targetId) : undefined;
   if (target?.alive) {
     const pace = a.def.moveSpeed * (1 - a.ail.chill) * moveMult(a) * p.useTime;
     carryToward(w, a, p, act, target, Math.min(p.skill.travel!, pace), true);
   }
   if (spec.tick) {
-    // The first use of Cyclone hits for half; each stage built makes the hit of Blade Flurry and Incinerate harder.
+    // The first use of Twister Blade hits for half; each stage built makes the hit of Flurry of Edges and Blaze Stream harder.
     const base = st.stage === 0 && spec.first !== undefined ? spec.first / 100 : 1;
     const f = base * ((spec.tickMult ?? 100) / 100) * (1 + ((spec.perStage ?? 0) * st.stage) / 100);
     let q = scaleProfile(p, f);
@@ -135,7 +135,7 @@ export function channelUse(w: World, a: Actor, act: Action): void {
     const ringed = b.kind === 'burst' && b.origin === 'self';
     fireEffect(w, a, { ...act, profile: q, which: 'channelled', ringed });
   }
-  // Stages also come from hits: a crowd charges the skill faster (Divine Ire).
+  // Stages also come from hits: a crowd charges the skill faster (Judgement Tempest).
   let gain = 1;
   if (spec.crowdStage) {
     let near = 0;
@@ -145,8 +145,8 @@ export function channelUse(w: World, a: Actor, act: Action): void {
   }
   st.stage = Math.min(spec.cap, st.stage + gain);
   if (p.skill.orb) orbUse(w, a, act, st.stage);
-  // An orb keeps being fed at the cap, and so does a channel with nothing to release or one that is held (Cyclone just keeps its
-  // stages and spins on; Incinerate keeps burning and sends its last wave when the fight pauses); the others (and an illusion at
+  // An orb keeps being fed at the cap, and so does a channel with nothing to release or one that is held (Twister Blade just keeps its
+  // stages and spins on; Blaze Stream keeps burning and sends its last wave when the fight pauses); the others (and an illusion at
   // its last stage) are let go.
   const letGo = p.skill.orb ? p.skill.orb.kind === 'illusion' : !!spec.release && !spec.hold;
   if (letGo && st.stage >= spec.cap) releaseChannel(w, a);
@@ -154,7 +154,7 @@ export function channelUse(w: World, a: Actor, act: Action): void {
 
 export type StackState = { key: string; n: number; lastHit: number; fadeT: number };
 
-/** A skill that grows with use (Reave): its area follows the stages built, and a use that hits builds another. */
+/** A skill that grows with use (Sweeping Cut): its area follows the stages built, and a use that hits builds another. */
 export function stackedUse(w: World, a: Actor, act: Action): void {
   const p = act.profile;
   const spec = p.skill.stacks!;

@@ -61,7 +61,7 @@ export function useSkill(w: World, s: Side, c: SkillChoice): void {
   s.secondaryReady[c.key] = st.uses > 0 ? 0 : w.t + st.t;
 }
 
-/** How much faster a cooldown runs for the enemies near the character (Frostblink: a little for each, a lot for a rare one). */
+/** How much faster a cooldown runs for the enemies near the character (Rime Step: a little for each, a lot for a rare one). */
 function recoverRate(w: World, s: Side, c: SkillChoice): number {
   const r = c.skill.recoverNear;
   if (!r) return 1;
@@ -81,7 +81,7 @@ export function tickCooldowns(w: World, s: Side, dt: number): void {
     const st = s.cooldowns[key];
     if (st.t <= 0) continue;
     const c0 = s.char.actives.find((x) => x.key === key);
-    // A cooldown that waits out a buff (Withering Step) does not run while it lasts.
+    // A cooldown that waits out a buff (Rotting Stride) does not run while it lasts.
     if (c0?.skill.pausedBy && s.buffT[c0.skill.pausedBy] > 0) continue;
     st.t -= dt * (c0 ? recoverRate(w, s, c0) : 1);
     if (st.t > 0) continue;

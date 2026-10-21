@@ -9,10 +9,10 @@ import type { Side } from './side';
 /**
  * Stances, rage-fed buffs and the storms of a stance (docs/SPIRIT.md S9).
  *
- * A stance gem (Blood and Sand, Flesh and Stone) holds two sets of effects and the character is in one of them at a time; the
- * stance is shared by every stance gem and by the skills that read it (Bladestorm). The character swaps by the policy of
+ * A stance gem (Dune Stance, Stone Stance) holds two sets of effects and the character is in one of them at a time; the
+ * stance is shared by every stance gem and by the skills that read it (Whirlwind Cleave). The character swaps by the policy of
  * docs/SPIRIT.md section 5: the stance for a crowd when three or more enemies are near, the other otherwise, at most every two
- * seconds. Berserk needs rage, drains it faster each second and ends when it is gone; Blood Rage costs life every second, is
+ * seconds. Rampage Call needs rage, drains it faster each second and ends when it is gone; Surge of Blood costs life every second, is
  * renewed by a kill, and the character lets it go when life runs low.
  */
 
@@ -22,7 +22,7 @@ const SWAP_EVERY = 2;
 const AURA_EVERY = 0.5;
 const PACK_RADIUS = 7;
 const PACK_SIZE = 3;
-/** Blood Rage is let go below this share of life. */
+/** Surge of Blood is let go below this share of life. */
 const BLOOD_RAGE_FLOOR = 0.25;
 
 export function stanceOf(s: Side): Stance {
@@ -37,7 +37,7 @@ export function setStance(w: World, side: Side, s: Stance): void {
 
 const stanceAuras = (s: Side) => s.char.auras.filter((a) => a.active && a.def.stance);
 
-/** Percent less damage the character takes from attacks by enemies that are not near, in the stance it is in (Flesh and Stone). */
+/** Percent less damage the character takes from attacks by enemies that are not near, in the stance it is in (Stone Stance). */
 export function stanceFarLess(sd: Side): { less: number; radius: number } | null {
   const s = stanceOf(sd);
   for (const a of stanceAuras(sd)) {
@@ -74,17 +74,17 @@ export function tickStance(w: World, sd: Side): void {
   }
 }
 
-// ---- Bladestorm
+// ---- Whirlwind Cleave
 
-type Blades = NonNullable<import('../calc/gems').SkillDef['bladestorm']>;
+type Blades = NonNullable<import('../calc/gems').SkillDef['stanceStorm']>;
 
 /** A spin that makes a storm in the stance the character is in: a still one that quickens attacks, a drifting one that quickens feet. */
-export function placeBladestorm(w: World, a: Actor, act: Action): void {
+export function placeStanceStorm(w: World, a: Actor, act: Action): void {
   const p = act.profile;
-  const spec = p.skill.bladestorm as Blades | undefined;
+  const spec = p.skill.stanceStorm as Blades | undefined;
   if (!spec || !a.isPlayer) return;
   const s = stanceOf(a.side!);
-  const mine = a.side!.fields.filter((f) => f.kind === 'bladestorm');
+  const mine = a.side!.fields.filter((f) => f.kind === 'stanceStorm');
   if (mine.length >= spec.max) {
     const oldest = mine.reduce((x, y) => (x.t < y.t ? x : y));
     a.side!.fields.splice(a.side!.fields.indexOf(oldest), 1);
@@ -94,7 +94,7 @@ export function placeBladestorm(w: World, a: Actor, act: Action): void {
   a.side!.fields.push({
     id: w.nextId++,
     owner: a.id,
-    kind: 'bladestorm',
+    kind: 'stanceStorm',
     x: a.x,
     y: a.y,
     vx: Math.cos(a.facing) * drift,
@@ -115,9 +115,9 @@ export function placeBladestorm(w: World, a: Actor, act: Action): void {
   w.events.push({ t: 'explode', x: a.x, y: a.y, r, dtype: 0, skill: p.skill.id });
 }
 
-export function tickBladestorm(w: World, s: Side, f: import('./fields').Field, dt: number): void {
+export function tickStanceStorm(w: World, s: Side, f: import('./fields').Field, dt: number): void {
   const p = s.player;
-  const spec = f.profile!.skill.bladestorm as Blades;
+  const spec = f.profile!.skill.stanceStorm as Blades;
   if (f.vx || f.vy) {
     const spot = w.grid.collide(f.x + f.vx! * dt, f.y + f.vy! * dt, 0.3);
     f.x = spot.x;
@@ -137,9 +137,9 @@ export function tickBladestorm(w: World, s: Side, f: import('./fields').Field, d
   });
 }
 
-// ---- Berserk, Blood Rage
+// ---- Rampage Call, Surge of Blood
 
-/** The rage a Berserk spends, faster each second, and the end when none is left. */
+/** The rage a Rampage Call spends, faster each second, and the end when none is left. */
 export function tickBerserk(w: World, s: Side, dt: number): void {
   for (const c of s.char.utilities) {
     const u = c.skill.utility;
@@ -156,7 +156,7 @@ export function tickBerserk(w: World, s: Side, dt: number): void {
   }
 }
 
-/** Blood Rage: the life and energy shield it costs each second, and the character lets it go when life runs low. */
+/** Surge of Blood: the life and energy shield it costs each second, and the character lets it go when life runs low. */
 export function tickDegen(w: World, s: Side, dt: number): void {
   const p = s.player;
   for (const c of s.char.utilities) {
@@ -175,7 +175,7 @@ export function tickDegen(w: World, s: Side, dt: number): void {
   }
 }
 
-/** A kill renews the buffs that a kill renews (Blood Rage). */
+/** A kill renews the buffs that a kill renews (Surge of Blood). */
 export function refreshOnKill(s: Side): void {
   for (const c of s.char.utilities) {
     const u = c.skill.utility;

@@ -112,7 +112,7 @@ describe('Whirlwind Cleave', () => {
     for (let i = 0; i < 60 * 0.95; i++) {
       stepWorld(w);
       uses += w.events.filter((e) => e.t === 'use' && e.src === w.sides[0].player.id).length;
-      storms = Math.max(storms, w.sides[0].fields.filter((f) => f.kind === 'bladestorm').length);
+      storms = Math.max(storms, w.sides[0].fields.filter((f) => f.kind === 'stanceStorm').length);
       if (dummy.life < last - 1e-6) hitSteps++;
       last = dummy.life;
     }

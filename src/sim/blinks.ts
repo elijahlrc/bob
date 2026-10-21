@@ -15,8 +15,8 @@ import type { Side } from './side';
 
 /**
  * Blink and travel (docs/SPIRIT.md S8). A blink skill carries the character to a spot beside its target; around it the
- * reference game's blinks do their work: Flame Dash burns the ground it crossed and the enemies where it lands, Frostblink hurts
- * and chills where the character left, Lightning Warp takes the time the run would have taken and bursts at both ends, Withering
+ * reference game's blinks do their work: Cinder Step burns the ground it crossed and the enemies where it lands, Rime Step hurts
+ * and chills where the character left, Bolt Step takes the time the run would have taken and bursts at both ends, Withering
  * Step wraps the character in an Elusive buff and withers the enemies that come near until another skill is used, and a Blink
  * Arrow flies first, then takes the character to where it landed and leaves a clone where it stood.
  */
@@ -35,7 +35,7 @@ export type WarpState = {
 const RUN_PACK_RADIUS = 7;
 const RUN_PACK_SIZE = 3;
 
-/** Withering Step: enemies that come within the radius are withered, the first time each does; any other skill ends it. */
+/** Rotting Stride: enemies that come within the radius are withered, the first time each does; any other skill ends it. */
 export type WitherState = {
   skill: string;
   radius: number;
@@ -46,7 +46,7 @@ export type WitherState = {
   run: boolean;
 };
 
-/** Projectiles a returning skill has caught (Venom Gyre) and the time they are kept. */
+/** Projectiles a returning skill has caught (Toxin Circle) and the time they are kept. */
 export type CaughtState = { profile: SkillProfile; hand: number; n: number; t: number };
 
 type BlinkChoice = { c: SkillChoice; u: BlinkSpec };
@@ -98,8 +98,8 @@ function burstAt(w: World, a: Actor, p: SkillProfile, x: number, y: number, u?: 
       : 0;
   for (const e of enemiesAt(w, a.team, x, y, r)) {
     hit(w, a, e, p, 0, Math.hypot(e.x - a.x, e.y - a.y));
-    // Bodyswap adds a share of the character's own life to what it deals.
-    if (own > 0 && e.alive) rawHit(w, e, own, p.hands[0].chunks[0].type, a.side!, 'Bodyswap');
+    // Shadow Swap adds a share of the character's own life to what it deals.
+    if (own > 0 && e.alive) rawHit(w, e, own, p.hands[0].chunks[0].type, a.side!, 'Shadow Swap');
   }
 }
 
@@ -202,7 +202,7 @@ function safestSpot(w: World, a: Actor, distance: number): { x: number; y: numbe
   return best;
 }
 
-/** Smoke Mine: the character goes to the safest spot in reach, smoke at both ends, and the buff that follows. */
+/** Smoke Charge: the character goes to the safest spot in reach, smoke at both ends, and the buff that follows. */
 function escapeCast(w: World, a: Actor, p: SkillProfile, c: SkillChoice, u: BlinkSpec): void {
   const esc = u.escape!;
   const best = safestSpot(w, a, u.distance);
@@ -354,7 +354,7 @@ export function tickWarp(w: World, side: Side, dt: number): void {
   arrive(w, a, s.profile, c, u, s.toX, s.toY);
 }
 
-/** Withering Step: enemies that come within the radius are withered, the first time each does. Ends with the Elusive buff. */
+/** Rotting Stride: enemies that come within the radius are withered, the first time each does. Ends with the Elusive buff. */
 export function tickWither(w: World, side: Side): void {
   const s = side.wither;
   if (!s) return;
@@ -371,7 +371,7 @@ export function tickWither(w: World, side: Side): void {
 }
 
 /**
- * Whether the character is running: Withering Step or Phase Run was used and its effect, which the first skill used would end, is
+ * Whether the character is running: Rotting Stride or Slipstream Run was used and its effect, which the first skill used would end, is
  * still on. The character then runs on along its way, past the enemies, and makes no attack until it is over.
  */
 export function running(s: Side): boolean {
@@ -385,7 +385,7 @@ export function running(s: Side): boolean {
   return false;
 }
 
-/** The character uses a skill: Withering Step ends (the buff and its aura), unless the skill is the blink itself. */
+/** The character uses a skill: Rotting Stride ends (the buff and its aura), unless the skill is the blink itself. */
 export function skillUsed(s: Side, skillId: string): void {
   if (!s.wither || s.wither.skill === skillId) return;
   s.buffT.elusive = 0;

@@ -222,9 +222,9 @@ export function fxLines(def: ActiveGemDef, level: number): string[] {
       `Turns a corpse into a geyser for ${num(def.geyser.seconds)} s that fires projectiles about it, after exploding for ${def.geyser.explodePct}% of the corpse's life`,
     );
   if (def.needsCorpse) out.push('Needs a corpse');
-  if (def.bladestorm)
+  if (def.stanceStorm)
     out.push(
-      `Leaves a storm for ${num(def.bladestorm.seconds)} s that hits what is in it; you gain a buff in it that depends on your stance`,
+      `Leaves a storm for ${num(def.stanceStorm.seconds)} s that hits what is in it; you gain a buff in it that depends on your stance`,
     );
   if (def.form)
     out.push(

@@ -14,7 +14,7 @@ describe('utility skills on the sheet', () => {
       expect(dps(['frostLance', util])).toBeGreaterThan(alone * 0.85);
   });
 
-  it('a standing channel (Wither) still takes the time it takes', () => {
+  it('a standing channel (Rot Touch) still takes the time it takes', () => {
     // It is recast every third of a second, each time for the time it takes to cast; the main skill gets the rest. The sim agrees
     // (docs/SHEET-AUDIT.md): about 70% of the damage with an enemy in its reach.
     const alone = dps(['frostLance']);

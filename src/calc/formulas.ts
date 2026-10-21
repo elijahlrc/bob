@@ -18,7 +18,7 @@ import {
   RES_FLOOR,
 } from '../data/constants';
 
-/** §6.3 Hit chance of an attack: 1.15 · acc / (acc + (evasion / 4)^0.8), between 5% and 100% (3.9). */
+/** §6.3 Hit chance of an attack: 1.15 · acc / (acc + (evasion / 4)^0.8), between 5% and 100% (as in the reference game). */
 export function hitChance(accuracy: number, evasion: number): number {
   if (evasion <= 0) return 1;
   const acc = Math.max(0, accuracy);
@@ -38,7 +38,7 @@ export function effectiveRes(res: number, maxRes: number, pen = 0): number {
 
 /**
  * §6.6 Shock and chill magnitude, in percent: `50 · r^0.4 · (1 + effect)`, at most `cap` (50 for shock, 30 for chill).
- * `r` is the damage dealt over the target's ailment threshold; the effect bonus counts before the cap (3.9).
+ * `r` is the damage dealt over the target's ailment threshold; the effect bonus counts before the cap (as in the reference game).
  */
 export function mag(r: number, cap: number, effect = 1): number {
   if (r <= 0) return 0;

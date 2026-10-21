@@ -1,5 +1,5 @@
 /**
- * Translator from 3.9-era unique item lines to Bob mods (COVERAGE C3). The rules live in modDict.ts (phrases of the
+ * Translator from the reference unique item lines to Bob mods (COVERAGE C3). The rules live in modDict.ts (phrases of the
  * reference game are allowed in scripts/). A line is parsed in four steps:
  *
  *   1. markers like {variant:2} are dropped, and every number becomes `#` with its [min, max] kept;
@@ -18,7 +18,7 @@ import type { UniqueMod } from '../../src/data/uniques';
 import type { CondId, DamageType, SkillTag } from '../../src/mods/types';
 import { CLAUSES, IGNORED, RULES } from './modDict';
 import { LATE_IGNORED } from './treeRules';
-import { pobBase } from './bobBase';
+import { refBase } from './bobBase';
 import { COVERAGE_DIR, key, loadReference } from './reference';
 
 export type Num = [number, number];
@@ -131,7 +131,7 @@ export function translateLine(line: string, ctx: LineCtx): Translated {
 
 // ---------------------------------------------------------------------------------------------------------------
 
-export type PobUnique = {
+export type RefDataUnique = {
   name: string;
   base: string;
   slot: string;
@@ -142,21 +142,21 @@ export type PobUnique = {
   implicits: number;
 };
 
-let pobCache: PobUnique[] | null = null;
+let refCache: RefDataUnique[] | null = null;
 
 /**
- * The 3.9-era unique data: Path of Building's, plus (for the reference uniques it does not have) the wiki's current text,
+ * The reference unique data: the reference data's, plus (for the reference uniques it does not have) the reference wiki's current text,
  * its implicit lines first. Those carry no variants and are marked by an empty `req`.
  */
-export function loadPobUniques(): PobUnique[] {
-  if (pobCache) return pobCache;
-  const pob = (
+export function loadRefUniques(): RefDataUnique[] {
+  if (refCache) return refCache;
+  const fromData = (
     JSON.parse(readFileSync(resolve(COVERAGE_DIR, 'ref-uniques.json'), 'utf8')) as {
-      uniques: PobUnique[];
+      uniques: RefDataUnique[];
     }
   ).uniques;
-  const have = new Set(pob.map((u) => key(u.name)));
-  const extra: PobUnique[] = [];
+  const have = new Set(fromData.map((u) => key(u.name)));
+  const extra: RefDataUnique[] = [];
   for (const r of loadReference().uniques) {
     if (have.has(key(r.name)) || /flask$/i.test(r.class)) continue;
     const split = (t: string) =>
@@ -176,21 +176,21 @@ export function loadPobUniques(): PobUnique[] {
       implicits: imp.length,
     });
   }
-  return (pobCache = [...pob, ...extra]);
+  return (refCache = [...fromData, ...extra]);
 }
 
 /**
  * The lines of the *current* variant: a line tagged with variants is kept if the last variant is among them. A first
  * line that is only the base item's own implicit is dropped (Bob's bases carry theirs).
  */
-export function currentLines(u: PobUnique): string[] {
+export function currentLines(u: RefDataUnique): string[] {
   const last = u.variants.length;
   const lines = u.lines.filter((l) => {
     const m = l.match(/\{variant:([\d,]+)\}/);
     if (!m) return true;
     return m[1].split(',').map(Number).includes(last);
   });
-  const imp = pobBase(u.base)?.implicit;
+  const imp = refBase(u.base)?.implicit;
   if (imp && u.implicits === 0 && lines.length > 0) {
     const same = (x: string) => parseNumbers(x).text.replace(/[–-]/g, '-');
     if (same(lines[0]) === same(imp)) lines.shift();
@@ -212,10 +212,10 @@ export function ctxFor(base: string, slot: string): LineCtx {
 
 function main(): void {
   const args = process.argv.slice(2);
-  const pob = loadPobUniques();
+  const fromData = loadRefUniques();
   const ref = loadReference();
   const inScope = new Set(ref.uniques.map((u) => key(u.name)));
-  const unique = pob.filter((u) => inScope.has(key(u.name)));
+  const unique = fromData.filter((u) => inScope.has(key(u.name)));
   if (args[0] === '--unmapped') {
     const n = Number(args[1] ?? 40);
     const freq = new Map<string, number>();

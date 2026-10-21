@@ -96,7 +96,7 @@ export function hasArea(s: SkillDef): boolean {
     s.geyser ||
     s.bounces ||
     s.cone ||
-    s.bladestorm ||
+    s.stanceStorm ||
     s.volleys ||
     s.dot?.splash ||
     s.dot?.carried ||
@@ -118,7 +118,7 @@ function hasDuration(s: SkillDef): boolean {
     s.wall ||
     s.orb ||
     s.vortex ||
-    s.bladestorm ||
+    s.stanceStorm ||
     s.geyser ||
     s.pods ||
     s.mirror ||
@@ -390,7 +390,7 @@ export function supportLive(
     !!sup.extraTriggers?.length ||
     !!sup.global?.length ||
     sup.levelBonus !== undefined ||
-    !!sup.blasphemy ||
+    !!sup.curseAura ||
     !!sup.hexOnHit;
   if (ups.length === 0 || other) return { live: true };
   // What a support is for is what it does to the skill (more projectiles, pierce, a wider area), not the damage it adds to go with

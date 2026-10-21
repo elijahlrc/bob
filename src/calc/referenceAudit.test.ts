@@ -20,7 +20,7 @@ import { DEFAULT_ATTACK } from './gems';
 import { buildMonster, referenceMonster } from './monster';
 import { buildProfile, type HandStats } from './skill';
 
-/** Changes made by the 3.9 mechanics audit (docs/AUDIT-3.9.md), one test per rule. */
+/** Changes made by the mechanics audit against the reference game (reference/docs/, local), one test per rule. */
 
 const hand = (crit = 5): HandStats => ({
   flats: [
@@ -73,7 +73,7 @@ function build(offHand: boolean): Build {
   return b;
 }
 
-describe('audit 3.9: hits and criticals', () => {
+describe('reference audit: hits and criticals', () => {
   it('an attack confirms a critical strike with a second accuracy check', () => {
     const p = profile(new ModDB([mod('critChance', 'base', 95)]));
     const evasive = target({ evasion: 4000 });
@@ -160,7 +160,7 @@ describe('audit 3.9: hits and criticals', () => {
   });
 });
 
-describe('audit 3.9: stun', () => {
+describe('reference audit: stun', () => {
   it('energy shield ignores half of all stuns', () => {
     const p = profile(new ModDB());
     const def = dummyDefence({ stunThreshold: 100, cannotBeStunned: false });
@@ -191,7 +191,7 @@ describe('audit 3.9: stun', () => {
   });
 });
 
-describe('audit 3.9: dual wielding and characters', () => {
+describe('reference audit: dual wielding and characters', () => {
   it('dual wielding gives 15% block and 20% more physical attack damage', () => {
     const one = new Character(build(false), { areaLevel: 30 });
     const two = new Character(build(true), { areaLevel: 30 });
@@ -210,7 +210,7 @@ describe('audit 3.9: dual wielding and characters', () => {
     expect(d.esRecharge / d.maxEs).toBeCloseTo(0.2);
   });
 
-  it('chaos inoculation keeps the stun threshold of the life it replaces', () => {
+  it('Hollow Vessel keeps the stun threshold of the life it replaces', () => {
     const b = build(false);
     const normal = new Character(b, { areaLevel: 30 }).defence();
     // Items are never edited in place (what an item gives is remembered by object): equip an edited copy.

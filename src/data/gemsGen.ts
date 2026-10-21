@@ -205,7 +205,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     cost: [8, 8],
     requiresWeapon: ['sword', 'axe'],
-    bladestorm: {
+    stanceStorm: {
       seconds: 3,
       radius: 2.4,
       interval: 0.5,
@@ -6790,7 +6790,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       },
     ],
     description:
-      'Spending enough mana on the supported spells grants Arcane Surge, which they also profit from.',
+      'Spending enough mana on the supported spells grants Arcane Tide, which they also profit from.',
   },
   {
     kind: 'support',
@@ -8647,7 +8647,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         value: [0, 76],
       },
     ],
-    blasphemy: {
+    curseAura: {
       reservePct: 35,
     },
     description:

@@ -190,7 +190,7 @@ describe('a duel of two starters', () => {
 });
 
 describe('what is one side’s stays its side’s', () => {
-  it('only B has a Molten Shell: A’s hits go into it, and A has none', () => {
+  it('only B has a Slag Carapace: A’s hits go into it, and A has none', () => {
     const w = createDuelWorld(vanguard(1), vanguard(2), 1);
     const [sa, sb] = w.sides;
     sb.buffT.moltenGuard = 1e9;

@@ -103,7 +103,7 @@ describe('conditional mods are seen by the sim', () => {
     expect(lootMults(w).quantity).toBeCloseTo(1.5, 5);
   });
 
-  it("Herald of Ash's burn counts damage mods that hold now", () => {
+  it("Cinder Herald's burn counts damage mods that hold now", () => {
     const burn = (hit: boolean): number => {
       const mods: Mod[] = [{ stat: 'damage', kind: 'more', value: 100, ...when('hitRecently') }];
       const { world: w, dummy } = worldWith(
@@ -142,7 +142,7 @@ describe('conditional mods are seen by the sim', () => {
     expect(hurt(true)).toBeGreaterThan(off * 1.8);
   });
 
-  it("Infernal Blow's burst counts damage mods that hold now", () => {
+  it("Cinder Blow's burst counts damage mods that hold now", () => {
     const burst = (hit: boolean): number => {
       const mods: Mod[] = [{ stat: 'damage', kind: 'more', value: 100, ...when('hitRecently') }];
       const { world: w, dummy } = worldWith(['cinderBlow'], 1.4, 'sword_3', STR, mods);
@@ -185,7 +185,7 @@ describe('conditional mods are seen by the sim', () => {
     expect(beam(true)).toBeGreaterThan(beam(false) * 1.8);
   });
 
-  it("Herald of Agony's crawler counts minion mods that hold now", () => {
+  it("Sour Herald's crawler counts minion mods that hold now", () => {
     const crawler = (hit: boolean): number => {
       const mods: Mod[] = [
         { stat: 'minionDamage', kind: 'more', value: 100, ...when('hitRecently') },

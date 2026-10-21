@@ -360,9 +360,9 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
         `Linked spells are cast ${triggerCause(def.trigger)} (${def.trigger.cooldown} s cooldown)`,
       );
     for (const t of def.extraTriggers ?? []) stats.push(triggerText(t));
-    if (def.blasphemy)
+    if (def.curseAura)
       stats.push(
-        `Stands on every enemy you hit, and reserves ${def.blasphemy.reservePct}% of your mana`,
+        `Stands on every enemy you hit, and reserves ${def.curseAura.reservePct}% of your mana`,
       );
     if (def.limitWeapon)
       stats.push(`Only works with ${def.limitWeapon.map(tagLabel).join(' or ')} weapons`);

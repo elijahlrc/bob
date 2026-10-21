@@ -42,26 +42,26 @@ export const ARMOUR_CAP = 0.9;
 export const BLOCK_CAP = 75;
 export const RES_FLOOR = -200;
 export const ES_RECHARGE_DELAY = 2.0;
-/** Share of maximum energy shield recharged per second (3.9: 20%; AUDIT-3.9). */
+/** Share of maximum energy shield recharged per second (the reference game: 20%; the mechanics audit). */
 export const ES_RECHARGE_RATE = 0.2;
 export const MIN_HIT_CHANCE = 0.05;
-/** Attacker accuracy counts 15% extra in the hit chance formula (3.9). */
+/** Attacker accuracy counts 15% extra in the hit chance formula (as in the reference game). */
 export const ACCURACY_FACTOR = 1.15;
 
 // §6.4 Recovery.
 export const LEECH_RATE_PER_INSTANCE = 0.02;
 export const LEECH_RATE_CAP = 0.2;
-/** One leech instance can recover at most this share of the maximum (3.9). */
+/** One leech instance can recover at most this share of the maximum (as in the reference game). */
 export const LEECH_INSTANCE_MAX = 0.1;
 
 // §6.6 Ailments.
 export const IGNITE_DPS_FRAC = 0.5;
 export const IGNITE_DURATION = 4;
-/** Bleed deals 70% of the hit's physical damage a second (3.9), tripled while the target moves; a monster's bleed on the player deals 10%. */
+/** Bleed deals 70% of the hit's physical damage a second (as in the reference game), tripled while the target moves; a monster's bleed on the player deals 10%. */
 export const BLEED_DPS_FRAC = 0.7;
 export const MONSTER_BLEED_DPS_FRAC = 0.1;
 export const BLEED_MOVING_MULT = 3;
-/** Ailments inflicted by a critical strike carry this fixed multiplier, whatever the critical strike multiplier (3.9). */
+/** Ailments inflicted by a critical strike carry this fixed multiplier, whatever the critical strike multiplier (as in the reference game). */
 export const CRIT_AILMENT_MULT = 1.5;
 export const BLEED_DURATION = 5;
 export const POISON_DPS_FRAC = 0.2;
@@ -80,18 +80,18 @@ export const WOUND_DANCE_STACKS = 8;
 
 // §6.6a Stun.
 export const STUN_BASE_DURATION = 0.35;
-/** A stun chance at or under this is ignored (3.9: 20%). */
+/** A stun chance at or under this is ignored (the reference game: 20%). */
 export const STUN_MIN_CHANCE = 0.2;
-/** Stun damage weights (3.9): melee physical, and non-melee non-physical. */
+/** Stun damage weights (as in the reference game): melee physical, and non-melee non-physical. */
 export const STUN_MELEE_PHYS = 1.25;
 export const STUN_NON_MELEE_NON_PHYS = 0.75;
-/** While energy shield is up, a stun is ignored with this chance (3.9). */
+/** While energy shield is up, a stun is ignored with this chance (as in the reference game). */
 export const STUN_ES_IGNORE = 0.5;
 export const STUN_GRACE = 0.5;
-/** Blocking a hit staggers the character for this long (3.9: block recovery), before faster recovery shortens it. */
+/** Blocking a hit staggers the character for this long (the reference game's block recovery), before faster recovery shortens it. */
 export const BLOCK_STAGGER = STUN_BASE_DURATION;
 
-// Impale (3.9): a hit that impales records 10% of its physical damage; the next 5 hits each deal it again as reflected
+// Impale (as in the reference game): a hit that impales records 10% of its physical damage; the next 5 hits each deal it again as reflected
 // physical damage. A target holds at most 5 impales.
 export const IMPALE_SHARE = 0.1;
 export const IMPALE_HITS = 5;
@@ -101,10 +101,10 @@ export const CULLING_SHARE = 0.1;
 
 // §6.7 Speeds and costs.
 export const DUAL_WIELD_MORE_APS = 10;
-/** Dual wielding (3.9): 20% more physical attack damage and 15% additional chance to block attacks. */
+/** Dual wielding (as in the reference game): 20% more physical attack damage and 15% additional chance to block attacks. */
 export const DUAL_WIELD_MORE_PHYS = 20;
 export const DUAL_WIELD_BLOCK = 15;
-/** Monsters crit for 130% (3.9), not the 150% of players. */
+/** Monsters crit for 130% (as in the reference game), not the 150% of players. */
 export const MONSTER_CRIT_MULTI = 130;
 export const FISTS = { min: 2, max: 6, aps: 1.2, crit: 0 };
 export const HIT_AT = 0.6;
@@ -116,7 +116,7 @@ export const PROJECTILE_SPEED = 12;
 export const RECENT = 4;
 
 // §6.9 Flasks.
-/** Charges a kill grants each flask, by the monster's rarity (3.9; fractions are kept). */
+/** Charges a kill grants each flask, by the monster's rarity (as in the reference game; fractions are kept). */
 export const FLASK_CHARGES_ON_KILL = { normal: 1, magic: 3.5, rare: 6, unique: 11 } as const;
 
 // Duels (docs/DUEL.md 4.4).

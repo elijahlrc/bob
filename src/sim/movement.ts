@@ -401,7 +401,7 @@ export function steer(w: World, m: Actor, tgt: Actor, d: number, dt: number): St
 /** Whom a monster goes for: the character, or (for a hunter) the nearest of the character's minions first. */
 export function targetOf(w: World, m: Actor): Actor {
   const s = hunted(w, m).side!;
-  // A decoy totem draws what is within its reach.
+  // A lure totem draws what is within its reach.
   for (const v of s.minions) {
     if (!v.alive || v.kind !== 'decoy') continue;
     const taunt = hunted(w, m).side!.char.utilities.find((c) => c.key === v.key)?.skill.utility;

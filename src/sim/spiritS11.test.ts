@@ -62,7 +62,7 @@ describe('corpses', () => {
   });
 });
 
-describe('Raise Spectre (bindShade)', () => {
+describe('Bind Shade (bindShade)', () => {
   it("needs a corpse, raises that monster at the gem's level, and uses the corpse up", () => {
     const { world: w, dummy } = world(['crushingBlow', 'bindShade'], 3, 'sword_3', INT);
     dummy.rarity = 'boss';
@@ -98,7 +98,7 @@ describe('Raise Spectre (bindShade)', () => {
   });
 });
 
-describe('Bodyswap (shadowSwap)', () => {
+describe('Shadow Swap (shadowSwap)', () => {
   it('goes to a corpse with enemies about it: fire bursts at both ends, the corpse bursts and is used up', () => {
     const { world: w } = world(['crushingBlow', 'shadowSwap'], 20, 'sword_3', DEX);
     const start = { x: w.sides[0].player.x, y: w.sides[0].player.y };

@@ -1,12 +1,12 @@
 /**
  * Buckets (COVERAGE section 4): each reference entry belongs to the first *new system* Bob needs before it can be
- * covered. This is a keyword pass over wiki tags and text, not a judgement. Per-entry corrections go in
+ * covered. This is a keyword pass over reference wiki tags and text, not a judgement. Per-entry corrections go in
  * reference/coverage/bucket-overrides.json ({"Entry name": "bucket"}); C3 and later batches refine them as they review.
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { RefGem, RefUnique } from './fetch-reference';
-import { COVERAGE_DIR, norm } from './reference';
+import { COVERAGE_DIR, loadPhrases, norm } from './reference';
 
 export const BUCKETS = [
   'plain',
@@ -54,14 +54,15 @@ export const BUCKET_MILESTONE: Record<Bucket, string> = {
 
 export const MILESTONES = ['C3', 'C4', 'C5', 'C6'] as const;
 
-const BUFF_SPELLS = new Set([
-  'blood rage',
-  'berserk',
-  'arctic armour',
-  'tempest shield',
-  'righteous fire',
-  'vaal',
-]);
+/** The keyword lists that name the reference game's gems (local reference data). */
+const WORDS = loadPhrases().buckets;
+const BUFF_SPELLS = new Set(WORDS.buffSpells);
+const words = (alternatives: string) => new RegExp(`\\b(${alternatives})\\b`);
+const DEPLOYABLE_SUPPORTS = words(WORDS.deployableSupports);
+const MINION_SUPPORTS = words(WORDS.minionSupports);
+const CURSE_SUPPORTS = words(WORDS.curseSupports);
+const DOT_SUPPORTS = words(WORDS.dotSupports);
+const DOT_ACTIVES = words(WORDS.dotActives);
 
 const DOT_WORDS =
   /\b(ignite|ignited|bleed|bleeding|poison|poisoned|ailment|ailments|damage over time|shock|shocked|chill|chilled|freeze|frozen|burning|scorch|brittle|sap)\b/i;
@@ -70,24 +71,13 @@ export function gemBucket(g: RefGem): Bucket {
   const tags = new Set(g.tags.map((t) => t.toLowerCase()));
   const name = norm(g.name.replace(/ Support$/, ''));
   if (g.kind === 'support') {
-    if (/\b(trap|mine|totem|ballista|minefield|cluster|blastchain)\b/.test(name))
-      return 'deployables';
-    if (
-      /\b(minion|elemental army|infernal legion|meat shield|summon phantasm|feeding frenzy|predator|spectre)\b/.test(
-        name,
-      )
-    )
-      return 'minions';
-    if (/\b(blasphemy|hextouch|curse)\b/.test(name)) return 'curses';
+    if (DEPLOYABLE_SUPPORTS.test(name)) return 'deployables';
+    if (MINION_SUPPORTS.test(name)) return 'minions';
+    if (CURSE_SUPPORTS.test(name)) return 'curses';
     if (/^cast |\btrigger/.test(name)) return 'triggers';
     if (/channelling/.test(name)) return 'channelling';
     if (/charge/.test(name)) return 'charges';
-    if (
-      /\b(bleed|poison|ignite|burning|combustion|decay|ailment|affliction|toxin|toxins|bonechill|hypothermia|unbound|vile|withering|brutality|swift affliction|deadly|critical strike affliction)\b/.test(
-        name,
-      )
-    )
-      return 'dot';
+    if (DOT_SUPPORTS.test(name)) return 'dot';
     return 'plain';
   }
   if (tags.has('minion') && !tags.has('herald')) return 'minions';
@@ -106,12 +96,7 @@ export function gemBucket(g: RefGem): Bucket {
     return 'auras';
   if (tags.has('channelling')) return 'channelling';
   if (tags.has('trigger')) return 'triggers';
-  if (
-    /\b(bleed|poison|ignite|contagion|caustic|toxic|wither|blight|essence drain|venom|viper|cobra|pestilent|scorching|decay)\b/.test(
-      name,
-    )
-  )
-    return 'dot';
+  if (DOT_ACTIVES.test(name)) return 'dot';
   return 'plain';
 }
 

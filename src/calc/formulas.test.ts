@@ -35,7 +35,7 @@ describe.skipIf(!hasReference())(
 describe('§6.3 defences', () => {
   it('hit chance', () => {
     expect(hitChance(100, 0)).toBe(1);
-    // 3.9: the attacker's accuracy counts 15% extra, and the chance tops out at 100%.
+    // As in the reference game: the attacker's accuracy counts 15% extra, and the chance tops out at 100%.
     expect(hitChance(100, 400)).toBeCloseTo((1.15 * 100) / (100 + Math.pow(100, 0.8)));
     expect(hitChance(1000, 400)).toBe(1);
     expect(hitChance(0, 1000)).toBe(0.05);
@@ -54,7 +54,7 @@ describe('§6.3 defences', () => {
 
 describe('§6.6 ailments', () => {
   it('mag', () => {
-    // 50 · r^0.4 · (1 + effect), capped (3.9).
+    // 50 · r^0.4 · (1 + effect), capped (as in the reference game).
     expect(mag(0.5, 50)).toBeCloseTo(50 * Math.pow(0.5, 0.4));
     expect(mag(0.125, 50)).toBeCloseTo(50 * Math.pow(0.125, 0.4));
     expect(mag(1, 50)).toBe(50);
@@ -69,7 +69,7 @@ describe('§6.6a stun', () => {
   it('chance with minimum', () => {
     expect(stunChance(50, 100, 0.2)).toBe(1);
     expect(stunChance(15, 100, 0.2)).toBeCloseTo(0.3);
-    expect(stunChance(10, 100, 0.2)).toBe(0); // a chance at or under 20% is ignored (3.9)
+    expect(stunChance(10, 100, 0.2)).toBe(0); // a chance at or under 20% is ignored (as in the reference game)
   });
 });
 

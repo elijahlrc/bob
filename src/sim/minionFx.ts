@@ -222,7 +222,7 @@ export function minionStrike(
         )
           rawHit(w, e, parts[t] * 0.5, t, m.side!, 'Minion', 'minion');
   }
-  // Elemental Army: a hit exposes the enemy to the element it dealt.
+  // Elemental Pack: a hit exposes the enemy to the element it dealt.
   if (m.sup.exposure > 0 && elemental && target.alive)
     applyStatus(
       w,
@@ -234,7 +234,7 @@ export function minionStrike(
     );
 }
 
-/** Infernal Legion: the minions burn the enemies near them and themselves. */
+/** Burning Pack: the minions burn the enemies near them and themselves. */
 export function tickLegion(w: World, s: Side, dt: number): void {
   for (const m of s.minions) {
     if (!m.alive || m.sup.burn <= 0) continue;

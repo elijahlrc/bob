@@ -92,7 +92,7 @@ describe('charges in the sim (EXPANSION 5.6)', () => {
     gainCharge(w, w.sides[0], 'fervour');
     gainCharge(w, w.sides[0], 'fervour');
     expect(w.sides[0].char.charges.fervour).toBe(2);
-    expect(w.sides[0].player.def.moveSpeed).toBeCloseTo(speedBefore, 6); // no movement speed from Fervour (3.9)
+    expect(w.sides[0].player.def.moveSpeed).toBeCloseTo(speedBefore, 6); // no movement speed from Fervour (as in the reference game)
     run(w, 5);
     gainCharge(w, w.sides[0], 'fervour');
     gainCharge(w, w.sides[0], 'fervour');

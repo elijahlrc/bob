@@ -1,5 +1,5 @@
 /**
- * Coverage report (COVERAGE section 2): how much of the 3.9.0 reference list Bob covers, by category, by bucket and by
+ * Coverage report (COVERAGE section 2): how much of the reference list Bob covers, by category, by bucket and by
  * milestone.
  *
  *   npm run coverage            print the report
@@ -116,7 +116,7 @@ export function report(map: CoverageMap, list: boolean): string {
   const uniq = (r: Row) => r.cat === 'unique';
   const cov = (r: Row) => r.covered;
 
-  out.push('Coverage of the 3.9.0 reference list (docs/COVERAGE.md)');
+  out.push('Coverage of the reference list (docs/COVERAGE.md)');
   out.push('');
   for (const [label, f, target] of [
     ['Active gems', (r: Row) => r.cat === 'active', 0.9],

@@ -76,7 +76,7 @@ describe('ballistas (mortarBow, scatterBow)', () => {
     expect(uses).toBeGreaterThan(5);
   });
 
-  it('Artillery Ballista: the arrows come down in a line toward the target and burst where they land', () => {
+  it('Mortar Bow: the arrows come down in a line toward the target and burst where they land', () => {
     const { world: w, dummy } = world(['mortarBow'], 7, 'bow_3', DEX);
     const bursts: number[] = [];
     for (let i = 0; i < 6 * 60; i++) {

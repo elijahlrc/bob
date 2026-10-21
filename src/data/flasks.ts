@@ -3,7 +3,7 @@ import { BASE_ROWS } from './baseTables';
 import type { BuffId } from './buffs';
 
 /**
- * DESIGN.md §11.6. The flask bases are the reference game's (docs/AUDIT-ITEM-BASES.md): twelve life and twelve mana
+ * DESIGN.md §11.6. The flask bases are the reference game's (reference/docs/AUDIT-ITEM-BASES.md): twelve life and twelve mana
  * tiers, six hybrids and fifteen utility kinds, with their amounts, seconds and charges; the rows are `baseTables.ts`.
  */
 export type FlaskKind = 'life' | 'mana' | 'hybrid' | 'utility';
@@ -242,7 +242,7 @@ export const FLASK_AFFIXES: FlaskAffixDef[] = [
     weight: 100,
     mods: [{ stat: 'removeBleed', kind: 'flag', min: 1, max: 1 }],
   },
-  // The rest of the 3.9 cleansing suffixes (docs/BOSSES.md 11.2): each also keeps its ailment off while the flask runs.
+  // The rest of the reference game's cleansing suffixes (docs/BOSSES.md 11.2): each also keeps its ailment off while the flask runs.
   {
     id: 'flaskRemovePoison',
     type: 'suffix',

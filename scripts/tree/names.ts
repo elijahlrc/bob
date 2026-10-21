@@ -44,13 +44,13 @@ export const asMods = (mods: ModT[]): Mod[] =>
 /** The names that may not be used: reference gems, uniques and tree nodes, in every spelling the IP test knows. */
 export function deniedNames(): Set<string> {
   const ref = loadReference();
-  const pob = loadRefNames();
+  const refNames = loadRefNames();
   const tree = loadTreeRef();
   const set = new Set<string>();
   for (const g of ref.gems) set.add(key(g.name));
   for (const u of ref.uniques) set.add(key(u.name));
-  for (const n of pob.gems) set.add(key(n));
-  for (const n of pob.uniques) set.add(key(n));
+  for (const n of refNames.gems) set.add(key(n));
+  for (const n of refNames.uniques) set.add(key(n));
   for (const n of tree.nodes) set.add(key(n.name));
   return set;
 }

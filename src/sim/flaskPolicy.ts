@@ -84,7 +84,7 @@ export const autoFlaskPolicy: FlaskPolicy = (w, s) => {
   s.flasks.forEach((f, i) => {
     if (f.charges < f.spec.perUse) return;
     const k = f.spec.kind;
-    // A flask that cleanses is drunk for what it cleanses, as a player would (3.9 cleansing suffixes).
+    // A flask that cleanses is drunk for what it cleanses, as a player would (the reference game's cleansing suffixes).
     const cleanse = f.activeT <= 0 && cleansNow(s, f.spec);
     if (
       (k === 'life' || k === 'hybrid') &&

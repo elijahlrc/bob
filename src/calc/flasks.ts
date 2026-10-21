@@ -21,7 +21,7 @@ export type FlaskSpec = {
   ground?: FlaskGround;
   /** A buff of the buff layer held for as long as the flask runs. */
   grants?: BuffId;
-  /** Cleansing: removes the ailment on use, and keeps it off while the flask runs (3.9's suffixes). */
+  /** Cleansing: removes the ailment on use, and keeps it off while the flask runs (the reference game's suffixes). */
   removeIgnite: boolean;
   removeFreeze: boolean;
   removeBleed: boolean;
@@ -37,7 +37,7 @@ export function flaskSpec(f: FlaskItem, charDb: ModDB): FlaskSpec {
   const local = new ModDB(f.affixes.flatMap((a) => a.mods));
   const effect = charDb.mult('flaskEffect');
   // Flask effect scales what a flask recovers as well as its buffs; a longer duration is the same rate for longer,
-  // so it recovers proportionally more (3.9).
+  // so it recovers proportionally more (as in the reference game).
   const longer = local.mult('flask.duration') * charDb.mult('flaskDuration');
   const recovery = local.mult('flask.amount') * charDb.mult('flaskRecovery') * effect * longer;
   const duration = base.duration * longer;

@@ -400,7 +400,7 @@ describe('triggers and burst skills across sides', () => {
     expect(rowTotal(sb.ledger.dealt, def.name)).toBe(0);
   });
 
-  it('A’s Molten Shell goes off on B, and the burst is A’s', () => {
+  it('A’s Slag Carapace goes off on B, and the burst is A’s', () => {
     const w = createDuelWorld(buildForActive(activeGem('slagCarapace')), vanguard(2), 1);
     const [sa, sb] = w.sides;
     still(sa);
@@ -419,9 +419,9 @@ describe('triggers and burst skills across sides', () => {
     stepWorld(w);
     expect(sa.shell).toBeNull();
     expect(sb.player.life).toBeLessThan(lifeCap(sb.player));
-    expect(rowTotal(sa.ledger.dealt, 'Molten Shell')).toBeGreaterThan(0);
-    expect(rowTotal(sb.ledger.taken, 'Molten Shell')).toBeCloseTo(
-      rowTotal(sa.ledger.dealt, 'Molten Shell'),
+    expect(rowTotal(sa.ledger.dealt, 'Slag Carapace')).toBeGreaterThan(0);
+    expect(rowTotal(sb.ledger.taken, 'Slag Carapace')).toBeCloseTo(
+      rowTotal(sa.ledger.dealt, 'Slag Carapace'),
       6,
     );
     expect(sa.stats.damageDealt).toBeGreaterThan(0);

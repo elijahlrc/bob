@@ -1,5 +1,5 @@
 /**
- * Phrases of the 3.9 passive tree that the unique-item rules in modDict.ts do not have: weapon-scoped ailment damage,
+ * Phrases of the reference passive tree that the unique-item rules in modDict.ts do not have: weapon-scoped ailment damage,
  * deployable and minion lines, damage over time multipliers, charge gains, and so on. They are added to the same
  * rule and clause lists (translate.ts imports this file), so uniques that use the same phrase translate too.
  *
@@ -7,6 +7,7 @@
  */
 import type { SkillTag } from '../../src/mods/types';
 import { CLAUSES, RULES } from './modDict';
+import { loadPhrases } from './reference';
 import { DMG_TYPES, type Clause, type ModT, type Num, type Rule } from './translate';
 
 const mk = (stat: string, kind: ModT['kind'], n: Num, extra: Partial<ModT> = {}): ModT => ({
@@ -493,15 +494,14 @@ export const LATE_IGNORED: RegExp[] = [
   /Reflected (?:Elemental|Physical) Damage taken$/,
   /^Golems have/,
   /Golems?\b/,
-  /^Skills supported by Unleash/,
+  // The lines that name the reference game's own things (local reference data).
+  ...loadPhrases().lateIgnored.map((re) => new RegExp(re)),
   /Ballista/,
   /Transfiguration of/,
   /Cooldown Recovery Speed/,
   /Fortify/,
   /Onslaught Effect$/,
   /Warcr/,
-  /Arcane Surge/,
-  /Unholy Might/,
   /Stun Duration/,
   /Maximum total Recovery per second/,
   /^# chance to double Stun Duration$/,

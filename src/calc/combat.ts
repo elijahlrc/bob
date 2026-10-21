@@ -71,7 +71,7 @@ export type Defence = {
   physReduction: number;
   /** Multiplier on damage taken (before shock). */
   damageTakenMult: number;
-  /** Multiplier on damage taken from hits only, not from damage over time (Fortify). */
+  /** Multiplier on damage taken from hits only, not from damage over time (Bulwark Strikes). */
   hitTakenMult: number;
   /** Less (or more) damage taken from hits, by damage type (Rimeplate); one when absent. */
   hitTakenType?: number[];
@@ -154,12 +154,12 @@ export type TargetState = {
   blockLess?: number;
   /** What a blinded attacker's chance to hit is multiplied by. */
   hitChanceMult?: number;
-  /** Less evasion (fraction) and less physical damage reduction (points, fraction): Poacher's Mark, Punishment. */
+  /** Less evasion (fraction) and less physical damage reduction (points, fraction): Plenty Sigil, Penance. */
   evasionLess?: number;
   physRedLess?: number;
-  /** How many poisons the target carries (Vile Toxins counts them). */
+  /** How many poisons the target carries (Foul Brew counts them). */
   poisons?: number;
-  /** Extra chance (fraction) to be bled by an attack hit (Vulnerability), and to be stunned (Warlord's Mark). */
+  /** Extra chance (fraction) to be bled by an attack hit (Open Wounds), and to be stunned (Warlord Sigil). */
   bleedChance?: number;
   stunBonus?: number;
 };
@@ -304,11 +304,11 @@ export function ailmentsFromHit(
   const def = t.def;
   const a = emptyAilments();
   if (def.immuneAilments) return a;
-  // 3.9: ailments from a critical strike carry a fixed 150%, whatever the critical strike multiplier.
+  // In the reference game, ailments from a critical strike carry a fixed 150%, whatever the critical strike multiplier.
   const agony = crit ? (p.cruelAgony ? hand.critMulti : CRIT_AILMENT_MULT) : 1;
   const resMult = (i: number) => {
     if (def.immune[i] || (i === CHAOS && def.immuneChaos)) return 0;
-    // Penetration does not apply to damage over time (3.9).
+    // Penetration does not apply to damage over time (as in the reference game).
     const r = effectiveRes(def.res[i] + t.resShift[i], def.maxRes[i]);
     return 1 - r / 100;
   };
@@ -374,7 +374,7 @@ export function stunFromHit(
   bonus = 0,
 ): { chance: number; duration: number } {
   if (!canStun || def.cannotBeStunned) return { chance: 0, duration: 0 };
-  // 3.9: melee physical damage stuns best (x1.25), non-melee non-physical worst (x0.75).
+  // As in the reference game, melee physical damage stuns best (x1.25), non-melee non-physical worst (x0.75).
   const melee = maskIntersects(p.tagMask, tagBit('melee'));
   let s = 0;
   for (let i = 0; i < NT; i++) {
@@ -385,7 +385,7 @@ export function stunFromHit(
   const eff = def.stunThreshold * (1 - p.enemyStunThreshRed);
   const chance = Math.min(1, stunChance(s, eff, STUN_MIN_CHANCE) + bonus);
   const duration = STUN_BASE_DURATION * p.stunDurMult * def.stunDurOnSelf;
-  // While energy shield is up, half of all stuns are ignored (not with Eldritch Battery-style rules).
+  // While energy shield is up, half of all stuns are ignored (not with Mana Bastion-style rules).
   const ignore = esUp && !def.esProtectsMana ? STUN_ES_IGNORE : 0;
   if (!rng) return { chance: chance * (1 - def.stunAvoid) * (1 - ignore), duration };
   if (chance <= 0 || !rng.chance(chance)) return { chance, duration: 0 };
@@ -441,7 +441,7 @@ export function resolveHit(
     ha.bleed[c.type] += base * ac.k[1];
     ha.poison[c.type] += base * ac.k[2];
   }
-  // 3.9: an attack must also pass an accuracy check to confirm a critical strike.
+  // As in the reference game, an attack must also pass an accuracy check to confirm a critical strike.
   res.crit =
     forceCrit ??
     (hand.critChance > 0 &&
@@ -519,7 +519,7 @@ export function expectedHit(
   const hc = p.isAttack
     ? attackHitChance(p, hand, t.def, t.hitChanceMult, t.evasionLess)
     : 1 - t.def.dodgeSpell;
-  // An attack confirms a critical strike with a second accuracy check (3.9).
+  // An attack confirms a critical strike with a second accuracy check (as in the reference game).
   const cc = hand.critChance * (p.isAttack ? hc : 1);
   const perType = nonCrit.map((n, i) => n * (1 - cc) + crit[i] * cc);
   // Impale: each landed hit also deals the damage the impales on the target recorded, as reflected physical damage.

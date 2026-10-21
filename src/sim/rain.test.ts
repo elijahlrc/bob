@@ -46,7 +46,7 @@ function sheetOf(gems: string[], main = 'bow_3') {
   return { c, p: c.profile(c.primary, 0) };
 }
 
-describe('Arrow Shower: extra arrows widen the shower (Rain of Arrows)', () => {
+describe('Arrow Shower: extra arrows widen the shower', () => {
   it('counts the arrows a support adds', () => {
     const base = sheetOf(['arrowShower']).p.projectiles;
     expect(sheetOf(['arrowShower', 'twinSalvo']).p.projectiles).toBe(base + 2);
@@ -83,7 +83,7 @@ describe('Arrow Shower: extra arrows widen the shower (Rain of Arrows)', () => {
   });
 });
 
-describe('Ember Downpour: extra arrows are more explosions on the same place (Blast Rain)', () => {
+describe('Ember Downpour: extra arrows are more explosions on the same place', () => {
   it('each explosion is a share of the use, so the skill’s own count deals what it always dealt', () => {
     const { world, dummy } = createDummyWorld(holding('bow_3', ['emberDownpour']), {
       distance: 3,

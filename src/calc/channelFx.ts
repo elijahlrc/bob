@@ -16,7 +16,7 @@ export const TARGET_RADIUS = 0.5;
 /** The radius of a projectile in flight (`launch`, `src/sim/shots.ts`). */
 const PROJECTILE_RADIUS = 0.15;
 
-// ---- Scourge Arrow: the pods the released arrow leaves, and the thorns they bloom into
+// ---- Blight Hail: the pods the released arrow leaves, and the thorns they bloom into
 
 /**
  * The share of a fan of `arrows` projectiles, set off evenly all round from a point `gap` tiles from the target and flying
@@ -130,7 +130,7 @@ export function standingHits(p: SkillProfile, usesPerSec: number): StandingHits 
   return null;
 }
 
-// ---- Scorching Ray: the exposure at the top stage
+// ---- Searing Lance: the exposure at the top stage
 
 /**
  * Points off the resistance of the type a damage-over-time debuff deals, from the exposure it inflicts at its top stage (zero for a

@@ -247,10 +247,10 @@ describe('§6.6 ailments', () => {
   const chances = [mod('chance.bleed', 'base', 100), mod('chance.poison', 'base', 100)];
   it('bleed and poison scale with their own mods only', () => {
     const a = ailmentsOf(new ModDB([...chances, mod('damage', 'more', 100, { tags: ['poison'] })]));
-    expect(a.bleed).toBeCloseTo(0.7 * 15); // 70% of the physical hit a second (3.9)
+    expect(a.bleed).toBeCloseTo(0.7 * 15); // 70% of the physical hit a second (as in the reference game)
     expect(a.poison).toBeCloseTo(0.2 * 15 * 2);
   });
-  it('attack, melee and weapon modifiers do not reach ailments; generic, dot and damage-type ones do (3.9)', () => {
+  it('attack, melee and weapon modifiers do not reach ailments; generic, dot and damage-type ones do (as in the reference game)', () => {
     const plain = ailmentsOf(new ModDB(chances));
     for (const tag of ['attack', 'melee', 'mace', 'oneHand'] as const) {
       const a = ailmentsOf(new ModDB([...chances, mod('damage', 'inc', 100, { tags: [tag] })]));
@@ -270,7 +270,7 @@ describe('§6.6 ailments', () => {
     );
     expect(fire.bleed).toBeCloseTo(plain.bleed);
   });
-  it('an ailment takes the modifiers of the type it deals, whatever the hit was (3.9)', () => {
+  it('an ailment takes the modifiers of the type it deals, whatever the hit was (as in the reference game)', () => {
     const plain = ailmentsOf(new ModDB(chances));
     // The hit is physical: bleed (physical) takes physical mods, poison (chaos) takes chaos mods.
     const phys = ailmentsOf(

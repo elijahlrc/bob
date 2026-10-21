@@ -1,28 +1,31 @@
 /**
- * Prints the wikitext of a PoE wiki page as it stood at a date (default: the end of the 3.9 era, just before 3.10
- * launched on 2020-03-13). The audit (docs/AUDIT-3.9.md) uses it to read 3.9's rules from a revision of the period
- * rather than from today's page.
+ * Prints the wikitext of a reference wiki page as it stood at a date (default: the end of the reference version, just
+ * before the next one launched; the wiki's address and the date are in reference/sources.json). The mechanics audit
+ * (reference/docs/, local) uses it to read the reference version's rules from a revision of the period rather than
+ * from today's page.
  *
  *   npm run coverage:wiki -- "Evasion"            print to the terminal
  *   npm run coverage:wiki -- "Evasion" 2019-12-20 an earlier date
  *   npm run coverage:wiki -- --search "freeze"     list page titles that contain the text
  */
 import { pathToFileURL } from 'node:url';
+import { loadSources } from './reference';
 
-const API = 'https://www.poewiki.net/w/api.php';
 const AGENT = 'bob-coverage/0.1 (personal hobby project; mechanics audit)';
-export const DEFAULT_DATE = '2020-03-12T00:00:00Z';
 
 async function get(params: Record<string, string>): Promise<unknown> {
-  const res = await fetch(`${API}?${new URLSearchParams({ format: 'json', ...params })}`, {
-    headers: { 'User-Agent': AGENT },
-  });
+  const res = await fetch(
+    `${loadSources().wiki.api}?${new URLSearchParams({ format: 'json', ...params })}`,
+    {
+      headers: { 'User-Agent': AGENT },
+    },
+  );
   return res.json();
 }
 
 export async function pageAt(
   title: string,
-  date = DEFAULT_DATE,
+  date = loadSources().wiki.defaultDate,
 ): Promise<{ text: string; revision: string } | null> {
   const d = (await get({
     action: 'query',

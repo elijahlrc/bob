@@ -1,6 +1,6 @@
 /**
  * The spirit ledger (docs/SPIRIT.md 4.1): one row per mapped gem saying whether it keeps the reason to use it in the reference
- * game, what is missing, and which milestone of the plan finishes it. Rows start from the audit (docs/AUDIT-GEMS.md); a
+ * game, what is missing, and which milestone of the plan finishes it. Rows start from the audit (reference/docs/AUDIT-GEMS.md); a
  * milestone updates the rows of the gems it repairs.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -26,11 +26,11 @@ export const MILESTONES = [
 export type Milestone = (typeof MILESTONES)[number];
 
 export type Spec = {
-  /** The wiki page read at its 2020-03-12 revision, or null. */
+  /** The reference wiki page read at its revision from the end of the reference version, or null. */
   page: string | null;
-  /** confirmed: the audit's account held; corrected: it changed; not-in-3.9: the gem came later; unverified: no source read. */
-  status: 'confirmed' | 'corrected' | 'not-in-3.9' | 'unverified';
-  /** What the 3.9 gem does, mechanic by mechanic, each line tagged [wiki], [pob] or [memory]. */
+  /** confirmed: the audit's account held; corrected: it changed; not-in-reference: the gem came later; unverified: no source read. */
+  status: 'confirmed' | 'corrected' | 'not-in-reference' | 'unverified';
+  /** What the reference gem does, mechanic by mechanic, each line tagged with its source (the reference wiki, the reference data or memory). */
   lines: string[];
   /** What the check changed, in a sentence or two. */
   check: string;
@@ -50,7 +50,7 @@ export type LedgerRow = {
   /** The engine primitives still missing (empty when faithful). */
   missing: string[];
   /** The audit's account, for continuity. */
-  audit: { poe: string; bob: string; repair: string };
+  audit: { reference: string; bob: string; repair: string };
   spec?: Spec;
   /** A person or a test has checked the verdict. */
   verified: boolean;

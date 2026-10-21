@@ -85,7 +85,7 @@ function tally(b: Build, seconds: number) {
   return { uses, hits };
 }
 
-describe('Multistrike (tripleCadence)', () => {
+describe('Triple Cadence (tripleCadence)', () => {
   it('strikes three times in a use: the second echo lands before the action ends', () => {
     const { uses, hits } = tally(holding('sword_3', ['reapingArc', 'tripleCadence']), 20);
     expect(uses).toBeGreaterThan(10);
@@ -94,14 +94,14 @@ describe('Multistrike (tripleCadence)', () => {
     expect(hits).toBeLessThanOrEqual(3 * uses);
   });
 
-  it('the extra strikes of Ancestral Call go to other enemies: against one enemy nothing is added', () => {
+  it('the extra strikes of Echoing Blow go to other enemies: against one enemy nothing is added', () => {
     const { uses, hits } = tally(holding('sword_3', ['crushingBlow', 'echoingBlow']), 20);
     expect(hits).toBeGreaterThanOrEqual(uses - 1);
     expect(hits).toBeLessThanOrEqual(uses);
   });
 });
 
-describe('Dual Strike (twinBlades)', () => {
+describe('Twin Blades (twinBlades)', () => {
   it('hits with both weapons in one use against a single target', () => {
     const { uses, hits } = tally(holding('dagger_3', ['twinBlades'], 'dual'), 20);
     expect(uses).toBeGreaterThan(10);

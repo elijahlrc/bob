@@ -156,7 +156,7 @@ describe('the pools against the reference tables', () => {
       fams.filter((f) => f.type === 'suffix').length,
     ];
   };
-  it('match the counts of the 3.9 pools less item rarity', () => {
+  it('match the counts of the reference pools less item rarity', () => {
     const want: Record<string, [number, number]> = {
       helmet_ar_4: [7, 11],
       helmet_es_4: [9, 10],

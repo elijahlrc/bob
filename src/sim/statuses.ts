@@ -142,7 +142,7 @@ export function rollStatuses(
     if (s.id === 'bound' && holds) continue;
     if (s.chance < 1 && !w.rngTrig.chance(s.chance)) continue;
     if (s.id === 'immobilised' && hit) {
-      // A hold lasts 0.15 s for each percent of the enemy's life the hit took, up to five seconds (Bear Trap), and a shackle follows it.
+      // A hold lasts 0.15 s for each percent of the enemy's life the hit took, up to five seconds (Jaws Trap), and a shackle follows it.
       const pct = (100 * hit.total) / Math.max(1, dst.def.maxLife);
       const seconds =
         Math.min(5, Math.max(0.3, 0.15 * pct)) * (s.seconds / STATUSES.immobilised.seconds);

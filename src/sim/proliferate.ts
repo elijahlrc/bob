@@ -2,7 +2,7 @@ import { pushDot } from './combat';
 import type { Actor, World } from './types';
 
 /**
- * Proliferation (docs/SPIRIT.md S7): an ailment that was inflicted by a skill with Wildfire Seed or Elemental Proliferation
+ * Proliferation (docs/SPIRIT.md S7): an ailment that was inflicted by a skill with Wildfire Seed or Wildfire Spread
  * carries a radius, and while its carrier has it, the enemies within that radius get the same ailment with the same time left.
  * What they get does not itself spread. A carrier that dies passes its ailments on once more, as its corpse would.
  */

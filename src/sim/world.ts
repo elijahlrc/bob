@@ -36,7 +36,7 @@ import { tickCaught, tickWarp, tickWither } from './blinks';
 import { tickLegion, tickOffering } from './minionFx';
 import { tickSupports } from './supportFx';
 import { tickSkillFx } from './skillFx';
-import { recompute, tickBlasphemy } from './hexes';
+import { recompute, tickCurseAura } from './hexes';
 import { tickBerserk, tickDegen, tickStance } from './stances';
 import { tickProliferation } from './proliferate';
 import { tickFields } from './fields';
@@ -818,7 +818,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   for (const s of w.order) tickLegion(w, s, dt);
   for (const s of w.order) tickSupports(w, s, dt);
   for (const s of w.order) tickSkillFx(w, s, dt);
-  for (const s of w.order) tickBlasphemy(w, s, dt);
+  for (const s of w.order) tickCurseAura(w, s, dt);
   tickProliferation(w, dt);
   updateProjectiles(w, dt);
   tickEffects(w, dt);

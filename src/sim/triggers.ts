@@ -12,7 +12,7 @@ import { eachEnemy, livingEnemiesOf } from './side';
 import type { Side } from './side';
 
 /**
- * Triggers (EXPANSION 5.5). Rules, as in the reference game (AUDIT-3.9):
+ * Triggers (EXPANSION 5.5). Rules, as in the reference game (the mechanics audit):
  * - each triggered skill has its own cooldown, and a source with several spells casts them in turn;
  * - a triggered skill costs no mana (and needs none) and takes no action time;
  * - nothing triggers from a triggered skill (its hits carry the 'triggered' tag).
@@ -65,7 +65,7 @@ export function fireTriggers(w: World, s: Side, ev: TriggerEvent): void {
       s.trig.taken[src.key] = (s.trig.taken[src.key] ?? 0) + ev.damage;
       if (s.trig.taken[src.key] < ((d.threshold ?? 0) / 100) * s.player.def.maxLife) continue;
     }
-    // The next spell in socket order; its own cooldown, not the source's (3.9).
+    // The next spell in socket order; its own cooldown, not the source's (as in the reference game).
     const turn = s.trig.next[src.key] ?? 0;
     const skill = src.skills.length ? src.skills[turn % src.skills.length] : undefined;
     const cdKey = skill ? `${src.key}:${skill.key}` : src.key;
@@ -159,7 +159,7 @@ function castTriggered(w: World, s: Side, choice: SkillChoice, ev: TriggerEvent)
   return true;
 }
 
-/** An enemy that dies under a status that makes it explode (Abyssal Cry): a blast of a share of its own life. */
+/** An enemy that dies under a status that makes it explode (a war cry's): a blast of a share of its own life. */
 export function corpseBlast(
   w: World,
   s: Side,

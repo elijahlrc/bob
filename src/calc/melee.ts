@@ -28,7 +28,7 @@ export type LandsInput = {
 export function landsPerUse(p: SkillProfile, o: LandsInput): number {
   const s = p.skill;
   const repeats = o.triggered ? 0 : p.repeats;
-  // Each repeat of a Multistrike is harder than the one before; the first blow is a blow.
+  // Each repeat of a Triple Cadence is harder than the one before; the first blow is a blow.
   const ramp = p.multistrike && !o.triggered ? p.multistrike.ramp / 100 : 0;
   const echoes = repeats + (ramp * repeats * (repeats + 1)) / 2;
   // A spin sweeps `hits` times; an echo or a trigger of it is one sweep. What a use leaves behind (the quake, the storm) is left once.
@@ -49,7 +49,7 @@ export function landsPerUse(p: SkillProfile, o: LandsInput): number {
 
   // A storm of blades stays where the spin was made and hits every interval: as many storms as the uses keep up, and no more than
   // the most (the oldest goes when another is made).
-  const st = s.bladestorm;
+  const st = s.stanceStorm;
   if (st) {
     const made = rate * placed;
     const life = st.seconds * p.skillDuration;
@@ -79,8 +79,8 @@ export function landsPerUse(p: SkillProfile, o: LandsInput): number {
 }
 
 /**
- * The buffs a skill's own use keeps up when it is used one blow after another: the buff its hit gives (Smite), and the one of the
- * storm it stands in (Bladestorm; the sheet is for one target, so the stance for a lone enemy, Blood). A buff is kept up when the
+ * The buffs a skill's own use keeps up when it is used one blow after another: the buff its hit gives (Thunder Rebuke), and the one of the
+ * storm it stands in (Whirlwind Cleave; the sheet is for one target, so the stance for a lone enemy, Blood). A buff is kept up when the
  * skill is used again before it ends. `p` is the skill's profile without them; `buffDuration` the character's multiplier on how long
  * the buffs it gains last.
  */
@@ -89,8 +89,8 @@ export function ownBuffs(p: SkillProfile, buffDuration: number): BuffId[] {
   const out: BuffId[] = [];
   if (s.hitBuff && p.useTime <= BUFFS[s.hitBuff.buff].seconds * buffDuration)
     out.push(s.hitBuff.buff);
-  if (s.bladestorm && p.useTime <= s.bladestorm.seconds * p.skillDuration)
-    out.push(s.bladestorm.blood);
+  if (s.stanceStorm && p.useTime <= s.stanceStorm.seconds * p.skillDuration)
+    out.push(s.stanceStorm.blood);
   return out;
 }
 

@@ -37,7 +37,7 @@ export function rolesFor(skill: SkillDef): SkillRole[] {
     case 'buff':
       if (u.banner) return ['auto', 'off'];
       if (u.policy === 'guard') return ['auto', 'emergency', 'keepUp', 'off'];
-      // A run (Phase Run) is a way out.
+      // A run (Slipstream Run) is a way out.
       if (u.second) return ['auto', 'escape', 'keepUp', 'opener', 'emergency', 'off'];
       return ['auto', 'keepUp', 'opener', 'emergency', 'off'];
     case 'shout':

@@ -1,5 +1,5 @@
 import type { SkillChoice } from '../calc/character';
-import { blasphemyOf } from '../calc/character';
+import { curseAuraOf } from '../calc/character';
 import {
   auraLook,
   DELIVERY_NAME,
@@ -288,9 +288,9 @@ export function skillSlots(w: World): SkillSlot[] {
       ),
     });
   }
-  // A curse under Blasphemy stands as an aura instead of being cast.
+  // A curse under Standing Curse stands as an aura instead of being cast.
   for (const c of ch.actives) {
-    const b = blasphemyOf(c);
+    const b = curseAuraOf(c);
     if (!c.usable || !b) continue;
     const look = profileLook(ch.profile(c, 0, 0));
     out.push({

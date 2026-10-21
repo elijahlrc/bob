@@ -1,12 +1,12 @@
 /**
- * The translation rules: phrases of the 3.9-era unique item text, in the normalised form of translate.ts (numbers are
+ * The translation rules: phrases of the reference unique item text, in the normalised form of translate.ts (numbers are
  * `#`), to mods in Bob's own stat vocabulary. A stat that does not exist in Bob yet is listed by `needs-verb` (npm run
  * coverage:translate -- --needs) and is implemented when three or more uniques want it.
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { SkillTag } from '../../src/mods/types';
-import { COVERAGE_DIR, key } from './reference';
+import { COVERAGE_DIR, key, loadPhrases } from './reference';
 import { DMG_TYPES, type Clause, type LineCtx, type ModT, type Num, type Rule } from './translate';
 
 const mk = (stat: string, kind: ModT['kind'], n: Num, extra: Partial<ModT> = {}): ModT => ({
@@ -21,7 +21,7 @@ const flag = (stat: string): ModT => ({ stat, kind: 'flag', min: 1, max: 1 });
 
 /**
  * Flat defences were scaled to Bob's lighter bases (armour and evasion 0.6, energy shield 0.45) until the bases took the
- * reference numbers (docs/AUDIT-ITEM-BASES.md, 2026-10-18); a flat line is now taken as it is.
+ * reference numbers (reference/docs/AUDIT-ITEM-BASES.md, 2026-10-18); a flat line is now taken as it is.
  */
 const FLAT_SCALE: Record<string, number> = {};
 const scaled = (stat: string, n: Num): Num => {
@@ -36,13 +36,11 @@ const typeOf = (w: string) => DMG_TYPES[w];
 export const IGNORED: RegExp[] = [
   /^Requires Level: #$/,
   /^Corrupted$/,
-  /^(Elder|Shaper|Fractured|Synthesised) Item$/,
   /^Extra [Gg]ore$/,
   /^Gore Footprints$/,
   /light radius/i,
   /^# increased (Strength|Dexterity|Intelligence) Requirement$/,
   /^#% (increased|reduced) (Strength|Dexterity|Intelligence|Attribute) Requirements?$/,
-  /^When used in the Synthesiser/,
   /^Can't use Flask in/i,
   /^Mirrored$/,
   /^Unidentified$/,
@@ -58,10 +56,10 @@ export const IGNORED: RegExp[] = [
   /^# chance to Cause Monsters to Flee/i,
   /^# increased Effect of Socketed Jewels$/,
   /^Cover Enemies in Ash/,
-  /^Zealot's Oath$/,
   /^# increased Character Size$/,
   /^Minions have # (to|increased|reduced) .*(Resistance|Resistances)$/,
-  /^Aspect of the (Cat|Avian|Spider|Crab) Reserves no Mana$/,
+  // The lines that name the reference game's own things (local reference data).
+  ...loadPhrases().ignoredLines.map((re) => new RegExp(re)),
   /^Can have a second Enchantment Modifier$/,
   /^Can be modified while Corrupted$/,
   /^Can have up to # Implicit Modifiers while Item has this Modifier$/,
@@ -104,10 +102,10 @@ export const CLAUSES: Clause[] = [
   { re: /(?:against|on) Bleeding Enemies$/, apply: withCond('targetBleeding') },
   { re: /(?:against|on) Poisoned Enemies$/, apply: withCond('targetPoisoned') },
   { re: /(?:against|when Hitting) Cursed Enemies$/, apply: withCond('targetCursed') },
-  { re: /while affected by Herald of Ash$/, apply: withCond('heraldAsh') },
-  { re: /while affected by Herald of Ice$/, apply: withCond('heraldIce') },
-  { re: /while affected by Herald of Thunder$/, apply: withCond('heraldThunder') },
-  { re: /while affected by Herald of Agony$/, apply: withCond('heraldAgony') },
+  ...Object.entries(loadPhrases().auraConds).map(([aura, cond]) => ({
+    re: new RegExp(`while affected by ${aura}$`),
+    apply: withCond(cond as NonNullable<ModT['condition']>['id']),
+  })),
   { re: /against Rare or Unique Enemies$/, apply: withCond('targetRareOrUnique') },
   { re: /(?:when|while) at least # Enemies are Nearby$/, apply: withCond('targetNearby') },
   {
@@ -574,8 +572,7 @@ rule(/^# Mana gained for each Enemy hit by Attacks$/, (_m, n) => [
 const BUFF_WORDS: Record<string, string> = {
   Onslaught: 'onslaught',
   Fortify: 'fortify',
-  'Unholy Might': 'unholyMight',
-  'Arcane Surge': 'arcaneSurge',
+  ...loadPhrases().buffWords,
 };
 const BUFF_EVENTS: [string, string][] = [
   ['on Kill', 'kill'],
@@ -728,12 +725,7 @@ rule(new RegExp(`^Adds # to # ${TYPE} Damage to Attacks with this Weapon$`), (m,
 rule(/^Your spells have # chance to Shock against Frozen enemies$/, (_m, n) => [
   mk('chance.shock', 'base', n[0], { tags: ['spell'], condition: { id: 'targetFrozen' } }),
 ]);
-const CURSE_HEX: Record<string, string> = {
-  'Temporal Chains': 'leadenLimbs',
-  Enfeeble: 'feebleGrip',
-  Vulnerability: 'openWounds',
-  'Elemental Weakness': 'brittleDoom',
-};
+const CURSE_HEX: Record<string, string> = loadPhrases().curseHexes;
 for (const [word, id] of Object.entries(CURSE_HEX)) {
   rule(new RegExp(`^# chance to Curse (?:un-cursed )?Enemies with ${word} on Hit$`), () => [
     mk(`hexOnHit.${id}`, 'base', [10, 10]),
@@ -745,22 +737,7 @@ for (const [word, id] of Object.entries(CURSE_HEX)) {
     mk(`hexOnHit.${id}`, 'base', n[1] ?? n[0]),
   ]);
 }
-for (const [phrase, id] of [
-  ['Pain Attunement', 'painConduit'],
-  ['Chaos Inoculation', 'hollowVessel'],
-  ['Iron Reflexes', 'platedHide'],
-  ['Mind Over Matter', 'mindBulwark'],
-  ['Avatar of Fire', 'searingAvatar'],
-  ['Point Blank', 'closeQuarters'],
-  ['Ghost Reaver', 'shadeLeech'],
-  ['Elemental Overload', 'feverPitch'],
-  ['Crimson Dance', 'woundDance'],
-  ['Perfect Agony', 'cruelAgony'],
-  ['Eldritch Battery', 'manaBastion'],
-  ['Resolute Technique', 'unerringDiscipline'],
-  ['Unwavering Stance', 'rootedStance'],
-  ['Arrow Dancing', 'arrowWeave'],
-] as const)
+for (const [phrase, id] of Object.entries(loadPhrases().keystones))
   rule(new RegExp(`^${phrase}$`), () => [flag(`grantsKeystone.${id}`)]);
 
 // All gems of a kind (not only the socketed ones).

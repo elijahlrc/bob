@@ -38,7 +38,7 @@ const run = (w: World, seconds: number) => {
   for (let i = 0; i < seconds * 60; i++) stepWorld(w);
 };
 
-describe('Contagion (creepingPlague)', () => {
+describe('Creeping Plague (creepingPlague)', () => {
   it('leaves a debuff on every enemy in the area that deals chaos damage over time, and no hit', () => {
     const { world: w, dummy } = world(buildFor(['creepingPlague'], 'wand_3', INT));
     const other = neighbour(w, dummy.x + 1, dummy.y + 0.5);
@@ -85,7 +85,7 @@ describe('Contagion (creepingPlague)', () => {
   });
 });
 
-describe('Withering Breath (Blight)', () => {
+describe('Withering Breath', () => {
   it('adds a layer with each breath, each on its own time, up to twenty, and slows what was not withered', () => {
     const { world: w, dummy } = world(buildFor(['witheringBreath'], 'wand_3', INT), 3);
     let most = 0;
@@ -101,7 +101,7 @@ describe('Withering Breath (Blight)', () => {
   });
 });
 
-describe('Scorching Ray (searingLance)', () => {
+describe('Searing Lance (searingLance)', () => {
   it('gains a stage with each breath, hotter for each, and exposes to fire at the last', () => {
     const { world: w, dummy } = world(buildFor(['searingLance'], 'wand_3', INT), 3);
     let first = 0;
@@ -128,7 +128,7 @@ describe('Scorching Ray (searingLance)', () => {
   });
 });
 
-describe('Essence Drain (sapBolt)', () => {
+describe('Sap Bolt (sapBolt)', () => {
   it('leaves a debuff on the enemies where it lands, and the caster mends from it', () => {
     const { world: w, dummy } = world(buildFor(['sapBolt'], 'wand_3', INT));
     const next = neighbour(w, dummy.x + 0.8, dummy.y);
@@ -142,7 +142,7 @@ describe('Essence Drain (sapBolt)', () => {
     expect(w.sides[0].player.life).toBeGreaterThan(l0 + 1);
   });
 
-  it('goes along with Contagion to the enemies near a corpse, but not without it', () => {
+  it('goes along with Creeping Plague to the enemies near a corpse, but not without it', () => {
     const dot = (src: string, spreadR: number, carry: boolean) => ({
       src,
       dps: 10,
@@ -168,7 +168,7 @@ describe('Essence Drain (sapBolt)', () => {
   });
 });
 
-describe('Caustic Arrow (acidArrow)', () => {
+describe('Acid Arrow (acidArrow)', () => {
   it('leaves ground that afflicts what stands in it, and nothing sticks to what leaves it', () => {
     const { world: w, dummy } = world(buildFor(['acidArrow'], 'bow_3', DEX));
     const far = neighbour(w, dummy.x + 8, dummy.y);
@@ -201,7 +201,7 @@ describe('Torch Arrow (torchArrow)', () => {
   });
 });
 
-describe('Decay (slowRot) and Vile Toxins (foulBrew)', () => {
+describe('Decay (slowRot) and Foul Brew (foulBrew)', () => {
   it('Decay: a hit leaves flat chaos damage over time, one at a time, that is not poison', () => {
     const { world: w, dummy } = world(buildFor(['sapBolt', 'slowRot'], 'wand_3', INT));
     run(w, 4);
@@ -211,7 +211,7 @@ describe('Decay (slowRot) and Vile Toxins (foulBrew)', () => {
     expect(decays[0].type).toBe(4);
   });
 
-  it('Vile Toxins: a hit deals more for each poison on the target, up to a limit', () => {
+  it('Foul Brew: a hit deals more for each poison on the target, up to a limit', () => {
     const { world: w, dummy } = world(buildFor(['sapBolt', 'foulBrew'], 'wand_3', INT));
     const prof = w.sides[0].char.profile(w.sides[0].primary, 0);
     expect(prof.perPoison).not.toBeNull();
@@ -231,7 +231,7 @@ describe('Decay (slowRot) and Vile Toxins (foulBrew)', () => {
   });
 });
 
-describe('Wildfire Seed and Elemental Proliferation', () => {
+describe('Wildfire Seed and Wildfire Spread', () => {
   it('an ignite spreads while its carrier burns, to the enemies near it only, and the copies do not spread', () => {
     const { world: w, dummy } = world(buildFor(['torchArrow', 'wildfireSeed'], 'bow_3', DEX));
     const near = neighbour(w, dummy.x + 1.5, dummy.y);
@@ -249,7 +249,7 @@ describe('Wildfire Seed and Elemental Proliferation', () => {
     expect(farther.ail.ignites.length).toBe(0);
   });
 
-  it('shock spreads with Elemental Proliferation, and again as the carrier dies', () => {
+  it('shock spreads with Wildfire Spread, and again as the carrier dies', () => {
     const { world: w, dummy } = world(buildFor(['searingLance', 'wildfireSpread'], 'wand_3', INT));
     const near = neighbour(w, dummy.x + 1.5, dummy.y);
     dummy.ail.shock = 0.2;
@@ -261,7 +261,7 @@ describe('Wildfire Seed and Elemental Proliferation', () => {
   });
 });
 
-describe('Bane (ruinRitual)', () => {
+describe('Ruin Ritual (ruinRitual)', () => {
   it('puts a debuff on the enemies, with the curses linked to it, and is stronger and longer for each', () => {
     const plain = world(buildFor(['ruinRitual'], 'wand_3', INT));
     run(plain.world, 1.5);
@@ -278,7 +278,7 @@ describe('Bane (ruinRitual)', () => {
   });
 });
 
-describe('Toxic Rain (venomShower)', () => {
+describe('Venom Shower (venomShower)', () => {
   it('drops pods that afflict and slow what is near them, and burst after a moment', () => {
     const { world: w, dummy } = world(buildFor(['venomShower'], 'bow_3', DEX));
     let pods = 0;
@@ -297,7 +297,7 @@ describe('Toxic Rain (venomShower)', () => {
   });
 });
 
-describe('Herald of Ash (cinderHerald)', () => {
+describe('Cinder Herald (cinderHerald)', () => {
   it('a kill sets the enemies near the corpse burning by the damage it had to spare', () => {
     const { world: w, dummy } = world(
       buildFor(['crushingBlow', 'cinderHerald'], 'sword_3', classFor('str')),

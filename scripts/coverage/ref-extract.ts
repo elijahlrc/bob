@@ -1,28 +1,31 @@
 /**
- * Extracts the numbers the draft script needs from Path of Building data of the 3.9 era (DESIGN §3 rule 2: data may be
- * consulted; no code is copied). Raw files stay outside the repo; the trimmed JSON written here is reference data
- * under reference/coverage/ and is never loaded by the game.
+ * Extracts the numbers the draft script needs from the reference data (DESIGN §3 rule 2: data may be consulted; no code
+ * is copied). Raw files stay outside the repo; the trimmed JSON written here is reference data under reference/coverage/
+ * and is never loaded by the game.
  *
- *   npm run coverage:pob -- <path to the unzipped PathOfBuilding-1.4.155/Data folder>
+ *   npm run coverage:extract -- <path to the unzipped data folder of the reference release>
  *
- * Source: PathOfBuildingCommunity/PathOfBuilding tag v1.4.155, commit e3719726d7, released 2019-12-14, the day after
- * 3.9.0 launched and the last release before 3.10 (2020-03-13). Download it from
- * https://github.com/PathOfBuildingCommunity/PathOfBuilding/archive/refs/tags/v1.4.155.zip
+ * Source: the release named in reference/sources.json (`data`: repository, tag, commit, date, download link), the last
+ * one of the reference version. The file layout inside the data folder comes from there too.
  */
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { COVERAGE_DIR } from './reference';
+import { COVERAGE_DIR, loadSources } from './reference';
 
-export const POB_SOURCE = {
-  repo: 'PathOfBuildingCommunity/PathOfBuilding',
-  tag: 'v1.4.155',
-  commit: 'e3719726d7',
-  date: '2019-12-14',
-  note: 'last PoB release before 3.10; gem and unique data are 3.9.x',
-};
+/** The release the data comes from, as written into the extracted JSON. */
+export function refSource(): {
+  repo: string;
+  tag: string;
+  commit: string;
+  date: string;
+  note: string;
+} {
+  const { repo, tag, commit, date, note } = loadSources().data;
+  return { repo, tag, commit, date, note };
+}
 
-export type PobLevel = {
+export type RefLevel = {
   /** Positional stat values, in the order of the skill's `stats` list (per-level interpolated values at this level). */
   values: number[];
   levelRequirement?: number;
@@ -38,7 +41,7 @@ export type PobLevel = {
   other?: Record<string, number>;
 };
 
-export type PobSkill = {
+export type RefSkill = {
   id: string;
   name: string;
   support: boolean;
@@ -52,12 +55,12 @@ export type PobSkill = {
   constantStats: [string, number][];
   qualityStats: [string, number][];
   /** Level 1 and 20 (or the top level if it is lower), the anchors of COVERAGE open question 5. */
-  levels: { count: number; first: PobLevel; l20: PobLevel };
-  /** From Gems.lua. */
+  levels: { count: number; first: RefLevel; l20: RefLevel };
+  /** From the data's gem list. */
   gem?: { tags: string[]; reqStr: number; reqDex: number; reqInt: number; id: string };
 };
 
-export type PobUnique = {
+export type RefDataUnique = {
   name: string;
   base: string;
   slot: string;
@@ -71,7 +74,7 @@ export type PobUnique = {
   lines: string[];
 };
 
-function parseLevel(line: string): PobLevel {
+function parseLevel(line: string): RefLevel {
   const body = line.replace(/^\s*\[\d+\] = \{/, '').replace(/\},?\s*$/, '');
   const interp = body.replace(/statInterpolation = \{[^}]*\},?/, '');
   const cost: Record<string, number> = {};
@@ -98,8 +101,8 @@ function parseLevel(line: string): PobLevel {
     cooldown,
     ...other
   } = named;
-  const lv: PobLevel = { values: positional };
-  const set = <K extends keyof PobLevel>(k: K, v: PobLevel[K] | undefined) => {
+  const lv: RefLevel = { values: positional };
+  const set = <K extends keyof RefLevel>(k: K, v: RefLevel[K] | undefined) => {
     if (v !== undefined) lv[k] = v;
   };
   set('levelRequirement', levelRequirement);
@@ -128,9 +131,9 @@ function pairs(block: string, field: string): [string, number][] {
   return [...m[1].matchAll(/\{ "([^"]+)", (-?[\d.]+) \}/g)].map((x) => [x[1], Number(x[2])]);
 }
 
-export function parseSkills(lua: string): PobSkill[] {
-  const out: PobSkill[] = [];
-  const parts = lua.split(/\nskills\["/).slice(1);
+export function parseSkills(text: string): RefSkill[] {
+  const out: RefSkill[] = [];
+  const parts = text.split(/\nskills\["/).slice(1);
   for (const part of parts) {
     const id = part.slice(0, part.indexOf('"'));
     const block = part;
@@ -166,10 +169,10 @@ export function parseSkills(lua: string): PobSkill[] {
 }
 
 export function parseGems(
-  lua: string,
-): Map<string, NonNullable<PobSkill['gem']> & { name: string }> {
-  const out = new Map<string, NonNullable<PobSkill['gem']> & { name: string }>();
-  for (const part of lua.split(/\n\t\["Metadata\/Items\/Gems\//).slice(1)) {
+  text: string,
+): Map<string, NonNullable<RefSkill['gem']> & { name: string }> {
+  const out = new Map<string, NonNullable<RefSkill['gem']> & { name: string }>();
+  for (const part of text.split(/\n\t\["Metadata\/Items\/Gems\//).slice(1)) {
     const name = part.match(/\n\t\tname = "([^"]*)"/)?.[1];
     const granted = part.match(/grantedEffectId = "([^"]*)"/)?.[1];
     if (!name || !granted) continue;
@@ -189,12 +192,12 @@ export function parseGems(
   return out;
 }
 
-export function parseUniques(lua: string, slot: string): PobUnique[] {
-  const out: PobUnique[] = [];
-  for (const m of lua.matchAll(/\[\[\n([\s\S]*?)\n\]\]/g)) {
+export function parseUniques(text: string, slot: string): RefDataUnique[] {
+  const out: RefDataUnique[] = [];
+  for (const m of text.matchAll(/\[\[\n([\s\S]*?)\n\]\]/g)) {
     const lines = m[1].split('\n').map((l) => l.trim());
     if (lines.length < 2) continue;
-    const u: PobUnique = {
+    const u: RefDataUnique = {
       name: lines[0],
       base: lines[1],
       slot,
@@ -229,8 +232,13 @@ export function parseUniques(lua: string, slot: string): PobUnique[] {
 
 function main(): void {
   const dir = process.argv[2];
-  if (!dir) throw new Error('usage: coverage:pob -- <path to PathOfBuilding-1.4.155/Data>');
+  if (!dir)
+    throw new Error(
+      'usage: coverage:extract -- <path to the data folder of the reference release>',
+    );
   const root = resolve(dir);
+  const layout = loadSources().data;
+  const source = refSource();
   const skillFiles = [
     'act_str',
     'act_dex',
@@ -243,10 +251,12 @@ function main(): void {
     'spectre',
     'glove',
   ];
-  const gems = parseGems(readFileSync(join(root, '3_0/Gems.lua'), 'utf8'));
-  const skills: PobSkill[] = [];
+  const gems = parseGems(readFileSync(join(root, layout.gems), 'utf8'));
+  const skills: RefSkill[] = [];
   for (const f of skillFiles)
-    skills.push(...parseSkills(readFileSync(join(root, `3_0/Skills/${f}.lua`), 'utf8')));
+    skills.push(
+      ...parseSkills(readFileSync(join(root, layout.skills, `${f}${layout.ext}`), 'utf8')),
+    );
   for (const s of skills) {
     const g = gems.get(s.id);
     if (g) s.gem = { tags: g.tags, reqStr: g.reqStr, reqDex: g.reqDex, reqInt: g.reqInt, id: g.id };
@@ -254,17 +264,17 @@ function main(): void {
   const gemSkills = skills.filter((s) => s.gem);
   writeFileSync(
     join(COVERAGE_DIR, 'ref-skills.json'),
-    JSON.stringify({ source: POB_SOURCE, skills: gemSkills }) + '\n',
+    JSON.stringify({ source, skills: gemSkills }) + '\n',
   );
-  const uniques: PobUnique[] = [];
-  const udir = join(root, 'Uniques');
-  for (const f of readdirSync(udir).filter((x) => x.endsWith('.lua') && x !== 'jewel.lua')) {
-    uniques.push(...parseUniques(readFileSync(join(udir, f), 'utf8'), f.replace('.lua', '')));
+  const uniques: RefDataUnique[] = [];
+  const udir = join(root, layout.uniques);
+  const files = readdirSync(udir).filter(
+    (x) => x.endsWith(layout.ext) && !layout.uniquesSkipped.includes(x),
+  );
+  for (const f of files) {
+    uniques.push(...parseUniques(readFileSync(join(udir, f), 'utf8'), f.replace(layout.ext, '')));
   }
-  writeFileSync(
-    join(COVERAGE_DIR, 'ref-uniques.json'),
-    JSON.stringify({ source: POB_SOURCE, uniques }) + '\n',
-  );
+  writeFileSync(join(COVERAGE_DIR, 'ref-uniques.json'), JSON.stringify({ source, uniques }) + '\n');
   console.log(
     `skills with gems: ${gemSkills.length} (of ${skills.length} skill blocks), uniques: ${uniques.length}`,
   );

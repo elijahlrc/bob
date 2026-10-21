@@ -50,7 +50,7 @@ describe('offerings (boneWardRite, fleshSurgeRite, spiritWardRite)', () => {
     expect(w.corpses.length).toBe(7);
   });
 
-  it('Bone Offering: the minions block more, and recover life when they block', () => {
+  it('Bone Ward Rite: the minions block more, and recover life when they block', () => {
     const { world: w } = world(
       ['crushingBlow', 'stoneColossus', 'boneWardRite'],
       4,
@@ -77,7 +77,7 @@ describe('offerings (boneWardRite, fleshSurgeRite, spiritWardRite)', () => {
     expect(m.def.blockAttack).toBeCloseTo(before, 5);
   });
 
-  it('Flesh Offering quickens the minions; Spirit Offering gives energy shield, chaos from physical and resistances; a new one replaces the old', () => {
+  it('Flesh Surge Rite quickens the minions; Spirit Ward Rite gives energy shield, chaos from physical and resistances; a new one replaces the old', () => {
     const { world: w } = world(
       ['crushingBlow', 'stoneColossus', 'fleshSurgeRite', 'spiritWardRite'],
       4,
@@ -100,7 +100,7 @@ describe('offerings (boneWardRite, fleshSurgeRite, spiritWardRite)', () => {
 });
 
 describe('minion supports (elementalPack, burningPack)', () => {
-  it('Elemental Army: resistances, more elemental damage and exposure from the hits', () => {
+  it('Elemental Pack: resistances, more elemental damage and exposure from the hits', () => {
     const { world: w, dummy } = world(
       ['crushingBlow', 'emberColossus', 'elementalPack'],
       3,
@@ -115,7 +115,7 @@ describe('minion supports (elementalPack, burningPack)', () => {
     expect(dummy.fx.exposedFire).toBeDefined();
   });
 
-  it('Infernal Legion: the minions burn the enemies near them, once between them, and burn themselves', () => {
+  it('Burning Pack: the minions burn the enemies near them, once between them, and burn themselves', () => {
     const { world: w, dummy } = world(
       ['crushingBlow', 'stoneColossus', 'burningPack'],
       3,

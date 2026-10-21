@@ -37,7 +37,7 @@ export function carriedSeconds(p: SkillProfile, distance: number): number {
  * Ritual), when the character keeps the debuff on and does not cast it again while it holds: the debuff lands part of the way
  * through the use, lasts its length, and the character casts again when `RENEW_AT` seconds are left. A skill with a debuff that
  * is not renewed this way (stacked, or with a hit of its own) has no such gap and gives undefined. `seconds` is the debuff's
- * length when it differs from the profile's (Bane with curses linked).
+ * length when it differs from the profile's (Ruin Ritual with curses linked).
  */
 export function renewalGap(p: SkillProfile, seconds?: number): number | undefined {
   const sd = p.skillDot;

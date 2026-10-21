@@ -2,7 +2,7 @@ import type { SkillProfile } from '../calc/skill';
 import { spellBaseDamage } from '../data/constants';
 import type { ChargeKind } from '../calc/charges';
 import { fallField, segmentDist } from './actions';
-import { tickBladestorm } from './stances';
+import { tickStanceStorm } from './stances';
 import { corpseNear, takeCorpse } from './factions';
 import { applySkillDot } from './skillDots';
 import { applyStatus } from './statuses';
@@ -33,7 +33,7 @@ export type FieldKind =
   | 'zap'
   | 'trail'
   | 'ghost'
-  | 'bladestorm'
+  | 'stanceStorm'
   | 'geyser'
   | 'smoke';
 
@@ -71,7 +71,7 @@ export type Field = {
   creep?: number;
   /** Chilling ground with no skill behind it (a flask's): the chill it applies. */
   chill?: number;
-  /** A bladestorm: the way it drifts, and the stance it was made in. */
+  /** A stanceStorm: the way it drifts, and the stance it was made in. */
   vx?: number;
   vy?: number;
   stance?: 'blood' | 'sand';
@@ -132,7 +132,7 @@ export function leaveGround(w: World, a: Actor, act: Action): void {
   if (!marked) w.events.push({ t: 'explode', x, y, r, dtype: dominantType(p), skill: p.skill.id });
 }
 
-/** Arrows fall around the target and each leaves a spore pod (Toxic Rain). */
+/** Arrows fall around the target and each leaves a spore pod (Venom Shower). */
 export function placePods(w: World, a: Actor, act: Action): void {
   const p = act.profile;
   const spec = p.skill.pods!;
@@ -199,7 +199,7 @@ export function placeCrystal(w: World, a: Actor, act: Action): void {
   });
 }
 
-/** A storm of bolts that follows the character (Herald of Thunder after a kill). */
+/** A storm of bolts that follows the character (Storm Herald after a kill). */
 export function startStorm(
   w: World,
   s: Side,
@@ -305,7 +305,7 @@ export function orbUse(w: World, a: Actor, act: Action, stage: number): void {
     if (stage % spec.waveStages === 0) {
       const still =
         (g.moved ?? 0) >= spec.distance || Math.hypot((g.tx ?? 0) - g.x, (g.ty ?? 0) - g.y) < 0.3;
-      // A wave is one hit of the skill (3.9: only the final wave grows with the stages), more once the illusion has stopped.
+      // A wave is one hit of the skill (the reference game: only the final wave grows with the stages), more once the illusion has stopped.
       const q = scaleProfile(p, still ? 1 + spec.stillMore / 100 : 1);
       blast(w, a.side!, { ...g, profile: q }, g.x, g.y, g.radius);
     }
@@ -564,8 +564,8 @@ export function tickFields(w: World, s: Side, dt: number): void {
       if (f.t > 0) s.fields[j++] = f;
       continue;
     }
-    if (f.kind === 'bladestorm') {
-      tickBladestorm(w, s, f, dt);
+    if (f.kind === 'stanceStorm') {
+      tickStanceStorm(w, s, f, dt);
       if (f.t > 0) s.fields[j++] = f;
       continue;
     }
@@ -636,7 +636,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
       for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius))
         applySkillDot(w, e, f.profile, { seconds: 0.5, by: s });
     } else if (f.kind === 'chilling' && pulse && f.dps <= 0) {
-      // Chilled ground that deals no damage (Frostblink, a flask's) only chills what stands on it.
+      // Chilled ground that deals no damage (Rime Step, a flask's) only chills what stands on it.
       const effect = f.profile?.chill.effect ?? f.chill ?? 0;
       for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius)) {
         if (e.def.cannotBeChilled || effect <= 0) continue;

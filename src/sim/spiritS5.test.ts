@@ -38,7 +38,7 @@ function record(w: World, target: Actor, seconds: number, skill: string) {
   return { hits, uses };
 }
 
-describe('Flameblast (furnaceRoar): stages, then one blast', () => {
+describe('Furnace Roar (furnaceRoar): stages, then one blast', () => {
   it('builds ten stages without hitting, and then one explosion bigger than the whole channel', () => {
     const { world, dummy } = createDummyWorld(holding('wand_3', ['furnaceRoar'], 'mystic'), {
       distance: 2,
@@ -84,7 +84,7 @@ describe('Flameblast (furnaceRoar): stages, then one blast', () => {
   });
 });
 
-describe('Blade Flurry (flurryOfEdges): a strike a stage, then a strike for each stage built', () => {
+describe('Flurry of Edges (flurryOfEdges): a strike a stage, then a strike for each stage built', () => {
   it('hits harder with each stage, and lets go with one more strike for each', () => {
     const { world, dummy } = createDummyWorld(holding('dagger_3', ['flurryOfEdges']), {
       distance: 1.2,
@@ -98,7 +98,7 @@ describe('Blade Flurry (flurryOfEdges): a strike a stage, then a strike for each
   });
 });
 
-describe('Divine Ire (judgementTempest): a crowd charges it faster, and the beam grows with the stages', () => {
+describe('Judgement Tempest (judgementTempest): a crowd charges it faster, and the beam grows with the stages', () => {
   it('releases a beam far stronger than a zap, after twenty stages', () => {
     const { world, dummy } = createDummyWorld(holding('wand_3', ['judgementTempest'], 'mystic'), {
       distance: 2,
@@ -112,7 +112,7 @@ describe('Divine Ire (judgementTempest): a crowd charges it faster, and the beam
   });
 });
 
-describe('Incinerate (blazeStream): it grows as it goes and ends with a final wave', () => {
+describe('Blaze Stream (blazeStream): it grows as it goes and ends with a final wave', () => {
   it('hits harder the longer it is held', () => {
     const { world, dummy } = createDummyWorld(holding('wand_3', ['blazeStream'], 'mystic'), {
       distance: 2.5,
@@ -146,7 +146,7 @@ describe('Incinerate (blazeStream): it grows as it goes and ends with a final wa
   });
 });
 
-describe('Scourge Arrow (blightHail): hold to charge, let go for one arrow', () => {
+describe('Blight Hail (blightHail): hold to charge, let go for one arrow', () => {
   it('shoots nothing while it charges, then one big piercing arrow', () => {
     const { world, dummy } = createDummyWorld(holding('bow_3', ['blightHail'], 'strider'), {
       distance: 3,
@@ -172,7 +172,7 @@ describe('Scourge Arrow (blightHail): hold to charge, let go for one arrow', () 
   });
 });
 
-describe('Reave (sweepingCut): the area grows with every use that hits', () => {
+describe('Sweeping Cut (sweepingCut): the area grows with every use that hits', () => {
   it('reaches an enemy further away only after it has built its stages, and they fade', () => {
     const { world, dummy } = createDummyWorld(holding('sword_3', ['sweepingCut'], 'strider'), {
       distance: 1.2,
@@ -206,7 +206,7 @@ describe('Reave (sweepingCut): the area grows with every use that hits', () => {
   });
 });
 
-describe('Cyclone (twisterBlade): the first spin hits for half, and a stun cannot break it', () => {
+describe('Twister Blade (twisterBlade): the first spin hits for half, and a stun cannot break it', () => {
   it('keeps its stages at the cap and spins on, instead of starting over', () => {
     const b = holding('sword_3', ['twisterBlade'], 'strider');
     const cap = new Character(b, {}).primary.skill.channel!.cap;

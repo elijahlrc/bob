@@ -104,7 +104,7 @@ describe('what one use of a skill does with its supports', () => {
     }
   });
 
-  it('Artillery Ballista: the arrows of one shot burst along a line, not on one spot', () => {
+  it('Mortar Bow: the arrows of one shot burst along a line, not on one spot', () => {
     const { bursts } = run(['mortarBow'], 1.6, 2.5);
     const first = bursts.filter((b) => b.t < 1.5);
     expect(first.length).toBeGreaterThan(1);
@@ -113,7 +113,7 @@ describe('what one use of a skill does with its supports', () => {
         expect(apart(first[i], first[j])).toBeGreaterThan(0.3);
   });
 
-  it('Molten Strike: the balls thrown round the enemy keep their distance', () => {
+  it('Slag Blow: the balls thrown round the enemy keep their distance', () => {
     const { zones } = run(['slagBlow'], 8, 1.6);
     const groups = together(zones);
     expect(groups.length).toBeGreaterThan(0);

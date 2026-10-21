@@ -34,7 +34,7 @@ export function minionBlow(
   let hit = spellBaseDamage(level) * def.dmg * p.minionDamage * MINION_ENEMY_RES;
   const elemental = def.dtype === 'lightning' || def.dtype === 'cold' || def.dtype === 'fire';
   if (elemental && p.minionSup.eleMore > 0) hit *= 1 + p.minionSup.eleMore / 100;
-  // Elemental Army: a blow exposes the enemy to its element, which takes that many points off its resistance (the sheet's
+  // Elemental Pack: a blow exposes the enemy to its element, which takes that many points off its resistance (the sheet's
   // minions meet no resistance of their own, so a point of exposure is a point of damage).
   if (elemental && p.minionSup.exposure > 0) hit *= 1 + p.minionSup.exposure / 100;
   if (p.minionNearMore > 0 && targetDistance <= NEAR_ENEMY) hit *= 1 + p.minionNearMore / 100;

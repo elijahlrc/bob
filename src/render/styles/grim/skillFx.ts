@@ -1218,7 +1218,7 @@ export class SkillFx {
           air.lineStyle(1, 0xffffff, 0.6).strokeCircle(o.x, o.y - 19, 3.5);
           break;
         }
-        case 'bladestorm':
+        case 'stanceStorm':
           // Blades that drift over the ground, one ring with two blades going round it, as the spin of a character.
           this.whirl(
             ground,
@@ -1431,9 +1431,9 @@ export class SkillFx {
 
   /**
    * What single skills leave standing that is not a zone or a deployable, drawn from the sim's state: the blades circling the
-   * character (Blade Vortex), the orb (Orb of Storms), the markers waiting to be struck (Storm Call), the arrows stuck in an
-   * enemy (Explosive Arrow) and the pods in the ground (Scourge Arrow), the mirage archer, the charges on an enemy
-   * (Infernal Blow) and the shell about the character (Molten Shell).
+   * character (Orbiting Blades), the orb (Tempest Mote), the markers waiting to be struck (Skyfall), the arrows stuck in an
+   * enemy (Fuse Arrow) and the pods in the ground (Blight Hail), the mirage archer, the charges on an enemy
+   * (Cinder Blow) and the shell about the character (Slag Carapace).
    */
   /**
    * What stays on the character while a skill carries it or spins it: one ring with two blades going round it (a spin, or a channel

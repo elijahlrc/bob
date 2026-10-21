@@ -8,7 +8,7 @@ import {
   hexTotals,
   type HexId,
 } from '../data/hexes';
-import { blasphemyOf } from '../calc/character';
+import { curseAuraOf } from '../calc/character';
 import { reservedMana } from './reserve';
 import { gainBuff } from './buffs';
 import { gainCharge } from './charges';
@@ -39,7 +39,7 @@ export function applyHex(
   seconds?: number,
 ): void {
   if (!a.alive || a.modIds.includes('hexWarded')) return;
-  // Bosses take a third less (3.9); a boss of docs/BOSSES.md takes what its card says (the Rotwife all of it).
+  // Bosses take a third less (as in the reference game); a boss of docs/BOSSES.md takes what its card says (the Rotwife all of it).
   if (a.rarity === 'boss')
     effect *= a.mon
       ? (bossOfType(a.mon.spec.type)?.curseEffect ?? BOSS_CURSE_EFFECT)
@@ -72,13 +72,13 @@ export function applyPlayerHexes(w: World, s: Side, dst: Actor): void {
   for (const h of ch.hexes) applyHex(w, dst, h.id, h.effect, ch.hexLimit, h.level);
 }
 
-/** A curse under Blasphemy is an aura: every enemy within its reach, hit or not, is cursed (refreshed twice a second). */
-export function tickBlasphemy(w: World, s: Side, dt: number): void {
+/** A curse under Standing Curse is an aura: every enemy within its reach, hit or not, is cursed (refreshed twice a second). */
+export function tickCurseAura(w: World, s: Side, dt: number): void {
   if (Math.floor(w.t * 2) === Math.floor((w.t - dt) * 2)) return;
   const p = s.player;
   for (const c of s.char.actives) {
     const u = c.skill.utility;
-    if (!c.usable || u?.kind !== 'curse' || !blasphemyOf(c)) continue;
+    if (!c.usable || u?.kind !== 'curse' || !curseAuraOf(c)) continue;
     const h = s.char.hexes.find((x) => x.id === u.hex);
     if (!h) continue;
     const radius = Math.max(u.radius, 3) * s.char.profile(c, 0).radiusMult * 1.5;

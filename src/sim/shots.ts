@@ -13,7 +13,7 @@ import type { Side } from './side';
  * How projectiles come about and what they do after a hit (docs/SPIRIT.md S4). A fan, a barrage fired one after another,
  * parallel lanes, an arrow that lands and bursts into a ring, an arrow that scatters at its end; a projectile that forks or
  * chains when it hits; and the skills that strike and then send projectiles out (bolts from the weapon, blades from behind the
- * struck enemy, balls that land and burst). The reference game's rule stands (3.9): the projectiles of one use cannot hit the same
+ * struck enemy, balls that land and burst). The reference game's rule stands: the projectiles of one use cannot hit the same
  * enemy twice, unless the skill fires them in sequence or is flagged to shotgun.
  */
 
@@ -43,7 +43,7 @@ const BALL_APART = 0.7;
 const LANE = 0.6;
 /** The randomised spread of a barrage, in radians (about twenty degrees across). */
 const BARRAGE_SPREAD = (20 * Math.PI) / 180;
-/** Arrows of a ring (Arrow Nova) and of a scatter (Tornado Shot) fly this far, in tiles. */
+/** Arrows of a ring (Arrow Tempest) and of a scatter (Whirl Shot) fly this far, in tiles. */
 const BURST_RANGE = 6;
 const TORNADO_SECONDARIES = 3;
 
@@ -349,7 +349,7 @@ export function changeForm(pr: Projectile): void {
   pr.profile = formedProfile(pr.profile);
 }
 
-/** A skill that releases what a Venom Gyre caught sends it outward in a spiral, none of it returning. */
+/** A skill that releases what a Toxin Circle caught sends it outward in a spiral, none of it returning. */
 export function releaseCaught(w: World, a: Actor): void {
   const c = a.side!.caught;
   if (!c) return;
@@ -430,7 +430,7 @@ export function afterProjectileHit(w: World, pr: Projectile, owner: Actor | unde
   return false;
 }
 
-/** A projectile that lands (Arrow Nova) or reaches the end of its way (Tornado Shot) sends its arrows out all round. */
+/** A projectile that lands (Arrow Tempest) or reaches the end of its way (Whirl Shot) sends its arrows out all round. */
 export function projectileLanded(w: World, pr: Projectile, owner: Actor | undefined): void {
   if (pr.kind === 'mirror' && owner) mirrorLanded(w, owner.side!, pr);
   if (!pr.ring || !owner) return;
@@ -592,7 +592,7 @@ function ailedBy(e: Actor, elem: number): boolean {
         : false;
 }
 
-/** A burst in a cone in front of the shooter that hits everything in it (Galvanic Arrow), once for the shot, not for each arrow. */
+/** A burst in a cone in front of the shooter that hits everything in it (Storm Quill), once for the shot, not for each arrow. */
 export function coneBurst(w: World, a: Actor, act: Action): void {
   const spec = act.profile.skill.cone;
   if (!spec) return;

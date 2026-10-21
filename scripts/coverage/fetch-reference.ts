@@ -1,41 +1,25 @@
 /**
  * Fetches the coverage reference list (docs/COVERAGE.md section 2): every skill gem and unique item that
- * existed in PoE 1 patch 3.9.x, from the wiki's Cargo API.
+ * existed in the reference version, from the reference wiki's Cargo API (its address, the version and the filters are in
+ * reference/sources.json).
  *
  *   npm run coverage:fetch
  *
  * Writes reference/coverage/ref-list.json. The file is reference data: it lives outside `src/` and the game never
- * loads it (DESIGN §3). Mod text on the wiki is the *current* text, not 3.9's (COVERAGE §2, caveat on mod text).
+ * loads it (DESIGN §3). Mod text on the reference wiki is the *current* text, not the reference version's (COVERAGE §2,
+ * caveat on mod text).
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { loadSources, type Sources } from './reference';
 import { versionAtMost, versionBefore } from './version';
 
-const API = 'https://www.poewiki.net/w/api.php';
 const AGENT = 'bob-coverage/0.1 (personal hobby project; reference list for a game design plan)';
 const OUT = resolve(
   dirname(fileURLToPath(import.meta.url)),
   '../../reference/coverage/ref-list.json',
 );
-
-/** Reference version: everything released at 3.9.x or earlier (COVERAGE §2). */
-export const REF_MAJOR_MINOR = '3.9';
-
-/** Item classes that are not in the unique denominator (COVERAGE C-6), with the reason. */
-export const EXCLUDED_UNIQUE_CLASSES: Record<string, string> = {
-  Jewel: 'jewels are out of scope (C-6)',
-  'Abyss Jewel': 'jewels are out of scope (C-6)',
-  Map: 'maps are not equipment (C-6)',
-  Watchstone: 'watchstones are not equipment (C-6)',
-  'Fishing Rod': 'fishing rods are excluded (C-6)',
-  'Item Piece': 'fragments are not equipment (C-6)',
-  Contract: 'heist items are post-3.9 (C-6)',
-  Idol: 'not equipment (C-6)',
-  Relic: 'sanctum relics are not equipment (C-6)',
-  Sentinel: 'Sentinels are not equipment (C-6)',
-  Tincture: 'post-3.9 item class (C-6)',
-};
 
 type Row = Record<string, string | null>;
 
@@ -51,7 +35,7 @@ function decode(s: string | null): string {
     .replace(/&amp;/g, '&');
 }
 
-/** Wiki stat text carries markup (<br>, [[links]], <span>): reduce it to plain lines. */
+/** Reference wiki stat text carries markup (<br>, [[links]], <span>): reduce it to plain lines. */
 function plain(s: string | null): string {
   return decode(s)
     .replace(/<br\s*\/?>/gi, '\n')
@@ -60,7 +44,7 @@ function plain(s: string | null): string {
     .trim();
 }
 
-async function cargo(query: Record<string, string>): Promise<Row[]> {
+async function cargo(api: string, query: Record<string, string>): Promise<Row[]> {
   const rows: Row[] = [];
   for (let offset = 0; ; offset += 500) {
     const params = new URLSearchParams({
@@ -72,7 +56,7 @@ async function cargo(query: Record<string, string>): Promise<Row[]> {
     });
     let data: { cargoquery?: { title: Row }[]; error?: unknown } | undefined;
     for (let attempt = 0; attempt < 4; attempt++) {
-      const res = await fetch(`${API}?${params}`, { headers: { 'User-Agent': AGENT } });
+      const res = await fetch(`${api}?${params}`, { headers: { 'User-Agent': AGENT } });
       data = (await res.json()) as typeof data;
       if (data?.cargoquery) break;
       await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
@@ -100,7 +84,7 @@ export type RefGem = {
 
 export type RefUnique = {
   name: string;
-  /** Wiki item class ("Body Armour", "Utility Flask"). */
+  /** Reference wiki item class ("Body Armour", "Utility Flask"). */
   class: string;
   page: string;
   base: string;
@@ -110,7 +94,7 @@ export type RefUnique = {
   dropEnabled: boolean;
   implicit: string;
   explicit: string;
-  /** Other wiki entries folded into this one (same name, different page). */
+  /** Other reference wiki entries folded into this one (same name, different page). */
   variants: string[];
 };
 
@@ -128,19 +112,26 @@ export type Reference = {
   uniques: RefUnique[];
 };
 
-function inScope(release: string | null, removal: string | null): string | null {
-  if (release && !versionAtMost(release, REF_MAJOR_MINOR)) return 'released after 3.9';
-  if (removal && versionBefore(removal, '3.9.0')) return 'removed before 3.9.0';
+/** In the reference: released at the reference version or earlier, and not removed before it (COVERAGE §2). */
+function inScope(
+  release: string | null,
+  removal: string | null,
+  v: Sources['version'],
+): string | null {
+  if (release && !versionAtMost(release, v.line)) return `released after ${v.line}`;
+  if (removal && versionBefore(removal, v.full)) return `removed before ${v.full}`;
   return null;
 }
 
 async function main(): Promise<void> {
+  const { version, wiki } = loadSources();
   const excludedGems: Record<string, number> = {};
   const excludedUniques: Record<string, number> = {};
   const bump = (m: Record<string, number>, k: string) => (m[k] = (m[k] ?? 0) + 1);
+  const namesOut = wiki.gemNamesExcluded.patterns.map(([re, flags]) => new RegExp(re, flags));
 
   // --- Gems -------------------------------------------------------------------------------------------------
-  const gemRows = await cargo({
+  const gemRows = await cargo(wiki.api, {
     tables: 'items,skill_gems',
     join_on: 'items._pageID=skill_gems._pageID',
     fields: [
@@ -152,7 +143,7 @@ async function main(): Promise<void> {
       'items.required_level=level',
       'items.drop_enabled=drop',
       'skill_gems.gem_tags=tags',
-      'skill_gems.is_vaal_skill_gem=vaal',
+      `${wiki.gemFlagField}=flag`,
       'skill_gems.primary_attribute=attr',
       'skill_gems.max_level=maxLevel',
     ].join(','),
@@ -163,21 +154,21 @@ async function main(): Promise<void> {
   const seenGems = new Set<string>();
   for (const r of gemRows) {
     const name = decode(r.name);
-    const out = inScope(r.release, r.removal);
+    const out = inScope(r.release, r.removal, version);
     if (out) {
       bump(excludedGems, out);
       continue;
     }
-    if (r.vaal === '1') {
-      bump(excludedGems, 'Vaal');
+    if (r.flag === '1') {
+      bump(excludedGems, wiki.gemFlagLabel);
       continue;
     }
-    if (name.startsWith('Awakened ')) {
-      bump(excludedGems, 'Awakened');
+    if (name.startsWith(wiki.gemPrefixExcluded.prefix)) {
+      bump(excludedGems, wiki.gemPrefixExcluded.label);
       continue;
     }
-    if (/^Portal$/i.test(name) || /Vaal /.test(name)) {
-      bump(excludedGems, 'Portal/Vaal name');
+    if (namesOut.some((re) => re.test(name))) {
+      bump(excludedGems, wiki.gemNamesExcluded.label);
       continue;
     }
     if (seenGems.has(name)) {
@@ -201,7 +192,7 @@ async function main(): Promise<void> {
   gems.sort((a, b) => a.name.localeCompare(b.name));
 
   // --- Uniques ----------------------------------------------------------------------------------------------
-  const uniqueRows = await cargo({
+  const uniqueRows = await cargo(wiki.api, {
     tables: 'items',
     fields: [
       'name',
@@ -224,12 +215,12 @@ async function main(): Promise<void> {
   for (const r of uniqueRows) {
     const cls = decode(r.class);
     const name = decode(r.name);
-    const exClass = EXCLUDED_UNIQUE_CLASSES[cls];
+    const exClass = wiki.uniqueClassesExcluded[cls];
     if (exClass) {
       bump(excludedUniques, `class ${cls}`);
       continue;
     }
-    const out = inScope(r.release, r.removal);
+    const out = inScope(r.release, r.removal, version);
     if (out) {
       bump(excludedUniques, out);
       continue;
@@ -274,14 +265,14 @@ async function main(): Promise<void> {
   };
   const ref: Reference = {
     header: {
-      version: '3.9.0',
+      version: version.full,
       fetched: new Date().toISOString().slice(0, 10),
-      source: `${API} (Cargo tables items, skill_gems)`,
-      note: 'Names and classes are reliable for 3.9. Mod text is the current wiki text, not 3.9 text (COVERAGE section 2).',
+      source: `${wiki.api} (Cargo tables items, skill_gems)`,
+      note: wiki.listNote,
       filters: [
-        'gems: class Skill Gem or Support Gem; release_version <= 3.9.x (blank = original); not removed before 3.9.0; no Vaal, Awakened or Portal',
+        wiki.gemFilter,
         'uniques: rarity unique; classes excluded: ' +
-          Object.keys(EXCLUDED_UNIQUE_CLASSES).join(', '),
+          Object.keys(wiki.uniqueClassesExcluded).join(', '),
         'uniques: not a replica, in game; one entry per name (variants folded in)',
       ],
       counts,
