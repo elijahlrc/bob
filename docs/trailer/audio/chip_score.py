@@ -257,16 +257,34 @@ def tom(at, m, g=1.0):
     place('drums', at, noise(0.03, 12000) * np.exp(-np.arange(int(0.03 * SR)) / SR / 0.008), 0.2 * g)
 
 
-for j, m in enumerate((57, 57, 52, 52, 45, 45)):  # high, mid, floor: ta-ka ta-ka dum-dum
+for j, m in enumerate((57, 57, 52, 52)):  # high and mid toms in thirty-seconds: ta-ka ta-ka
     tom(24.5 + j * S16 / 2, m, 0.8 + 0.05 * j)
+for at in (24.625, 24.75):  # then two long floor-tom kicks on the sixteenths: dum, dum
+    d = 0.3
+    place('drums', at, tri(midi(40), d, slide=-5) * np.exp(-np.arange(int(d * SR)) / SR / 0.12), 1.0)
+    kick(at, 0.9)
 boom(22.25, 1.1)
 for t0 in (19.0, 23.0):
     motif(t0)
 
-# 25-27 s: the genres, a hit per word on the bass note, nothing between.
+# 25-27 s: the genres, a hit per word, nothing between. Tight hits with no cymbal wash: a long, deep kick with
+# a short bright attack, and a low D under it, each one stopping before the next.
+
+
+def slam(at, g=1.0):
+    d = 0.42
+    n = int(d * SR)
+    body = tri(140, d, slide=-7) * np.exp(-np.arange(n) / SR / 0.16)
+    body[: int(0.004 * SR)] += 0.9
+    place('drums', at, body, 1.0 * g)
+    place('drums', at, pulse(midi(26), d, 0.5) * np.exp(-np.arange(n) / SR / 0.14), 0.3 * g)
+    place('drums', at, noise(0.035, 16000) * np.exp(-np.arange(int(0.035 * SR)) / SR / 0.01), 0.35 * g)
+    duck_points.append(at)
+
+
 for k in range(4):
-    boom(25.0 + k * 0.5, 0.85)
-    bassnote(25.0 + k * 0.5, D2, 0.3, 1.1)
+    slam(25.0 + k * 0.5, 1.0)
+    bassnote(25.0 + k * 0.5, D2, 0.4, 1.1)
 
 # 27-30 s: the title. The last hit, the D rings out.
 boom(27.0, 1.2)
