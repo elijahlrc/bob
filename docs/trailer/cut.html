@@ -371,20 +371,20 @@
   };
   /* where each clip is cut in: the frame shown at the shot's (or sub-shot's) first frame; picked by eye from the events */
   const IN = {
-    endgame: 40,
-    vanguard: 40,
-    shade: 40,
-    strider: 10,
-    reaver: 10,
-    zealot: 10,
-    climb1: 15,
-    climb2: 15,
-    climb3: 15,
-    climb4: 15,
-    climb5: 15,
-    climb6: 15,
-    climb7: 15,
-    duel: 30,
+    endgame: 0,
+    vanguard: 17,
+    shade: 0,
+    strider: 0,
+    reaver: 0,
+    zealot: 16,
+    climb1: 2,
+    climb2: 0,
+    climb3: 2,
+    climb4: 0,
+    climb5: 0,
+    climb6: 2,
+    climb7: 28,
+    duel: 26,
     auto: 0,
   };
   const src = (clip, i) =>
@@ -431,10 +431,10 @@
       name: 'Run two: the Shade',
       what: 'Wired Harm into the Spire Trap’s link, the damage jumps; traps across Ruins; the last kill drops a rare amulet for the build; Equip.',
       draw(lt) {
-        if (lt < 1) return crop(at('skills', lt), [0, 0, 960, 540]);
+        if (lt < 1) return img(at('skills', lt));
         if (lt < 3) return img(at('shade', lt - 1));
         if (lt < 3.5) return img(at('drop', lt - 3, 0));
-        return img(at('equip', lt - 3.5, 0));
+        return crop(at('equip', lt - 3.5, 0), [373, 50, 907, 510]);
       },
     },
     {
@@ -493,16 +493,18 @@
       name: 'The duel',
       what: 'The arena: our Mystic against Sin’s Reaver, Sin’s name on the boss bar. The deciding blow is held for a quarter beat, then lands on 22.25.',
       draw(lt) {
-        /* the duel clip ends just after the kill, at frame K = IN + 90 */
+        /* the deciding blow lands at frame IN + 90 of the duel clip */
         const tt = lt < 3.0 ? lt : lt < 3.25 ? 3.0 : 3.0 + (lt - 3.25);
-        return img(at('duel', tt)) + caption('Duel their builds.', lt, 0.1, 170, 16);
+        /* frame 118 is the last before the result screen comes up */
+        const f = Math.min(118, IN.duel + tt * FPS);
+        return img(src('duel', f)) + caption('Duel their builds.', lt, 0.1, 170, 16);
       },
     },
     {
       t: [22.5, 23.5],
       name: 'The rating',
       what: 'The result screen: the rating counts up, 712 to 748.',
-      draw: (lt) => crop(at('result', lt, 0), [160, 0, 960, 540]),
+      draw: (lt) => crop(at('result', lt, 0), [400, 0, 480, 270]),
     },
     {
       t: [23.5, 25],

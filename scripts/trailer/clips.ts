@@ -211,7 +211,10 @@ export const CLIPS: Clip[] = [
       await tab(t, 'Skills');
       await t.page.waitForTimeout(200);
       for (let i = 0; i < 30; i++) {
-        if (i === 6) await t.page.click('.gem-chip:has-text("Wired Harm")');
+        if (i === 6) {
+          await t.page.click('.gem-chip:has-text("Wired Harm")');
+          await t.page.mouse.move(5, 470);
+        }
         if (i === 12) await t.page.locator('.socket.empty').last().click();
         if (i === 12) {
           await t.page.mouse.move(5, 470);
@@ -256,19 +259,34 @@ export const CLIPS: Clip[] = [
         run.inventory = run.inventory.filter((i: any) => i.uid !== uid);
       });
       await t.rec(30);
-      t.cut('equip');
-      await t.stage((S, c) => {
-        const run = (window as any).__run;
-        // (the character may have picked it up: the bag gets it either way, as just found)
-        const item = (window as any).__amulet;
-        run.inventory = run.inventory.filter((i: any) => i.uid !== item.uid).concat(item);
-        run.lastDrops = [item.uid];
+    },
+  },
+
+  /* 4c. The amulet's card in the bag, and Equip on 10.2 s. */
+  {
+    name: 'equip',
+    viewport: UI,
+    async film(t) {
+      const name = await t.stage((S, c) => {
+        const run = S.stagedRun(
+          { classId: 'shade', level: 70, body: ['spireTrap', 'wiredHarm', 'swiftSnares'] },
+          45,
+        );
+        const uid = S.rareAmulet(run, 70);
+        run.lastDrops = [uid];
         S.toCamp(c, run);
+        return run.inventory.find((i: any) => i.uid === uid).name;
       });
       await tab(t, 'Items');
       await t.page.waitForTimeout(200);
-      await t.page.click('.item-row:has-text("Amulet"), .item-list .row >> nth=0').catch(() => {});
-      await t.page.mouse.move(5, 700);
+      await t.page.click(`text=${name}`);
+      await t.page.mouse.move(5, 470);
+      await t.page.evaluate(() =>
+        [...document.querySelectorAll('button')]
+          .find((x) => /^(Equip|Swap)/.test(x.textContent ?? ''))
+          ?.scrollIntoView({ block: 'nearest' }),
+      );
+      await t.page.waitForTimeout(200);
       for (let i = 0; i < 30; i++) {
         if (i === 21)
           await t.page.evaluate(() => {
@@ -278,13 +296,13 @@ export const CLIPS: Clip[] = [
             (b as HTMLElement | undefined)?.classList.add('trailer-press');
           });
         if (i === 24)
-          await t.page.evaluate(() => {
-            const b = document.querySelector('.trailer-press') as HTMLElement | null;
-            b?.click();
-          });
+          await t.page.evaluate(() =>
+            (document.querySelector('.trailer-press') as HTMLElement | null)?.click(),
+          );
         await t.still(1);
       }
     },
+    css: `.trailer-press { filter: brightness(1.5); transform: scale(0.96); }`,
   },
 
   /* 5. Three more builds, in phone-shaped panels. */
