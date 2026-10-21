@@ -34,6 +34,22 @@ function setup(classId = 'reaver'): { run: RunState; uid: () => number } {
 
 const ids = (xs: { uid: number }[]) => xs.map((x) => x.uid);
 
+describe('a flask for an empty flask slot is an upgrade', () => {
+  it('as many of the best flasks as there are empty slots, and none when the slots are full', () => {
+    const { run, uid } = setup();
+    const empty = run.build.flasks.filter((f) => !f).length;
+    expect(empty).toBeGreaterThan(0);
+    const bag = Array.from({ length: empty + 2 }, () => makeFlask(uid, 'flask_life_1', 20));
+    run.inventory.push(...bag);
+    let infos = itemInfos(run);
+    expect(bag.filter((f) => infos.get(f.uid)!.fillsFlask)).toHaveLength(empty);
+    expect(filterItems(run.inventory, infos, 'upgrades').length).toBeGreaterThanOrEqual(empty);
+    run.build = { ...run.build, flasks: run.build.flasks.map((f) => f ?? bag[0]) };
+    infos = itemInfos(run);
+    expect(bag.some((f) => infos.get(f.uid)!.fillsFlask)).toBe(false);
+  });
+});
+
 describe('upgrade hints and quick equip', () => {
   it('reports the best slot and a positive delta for an upgrade', () => {
     const { run, uid } = setup('vanguard');

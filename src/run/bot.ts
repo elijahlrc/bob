@@ -471,7 +471,8 @@ export function botEquip(run: RunState): void {
   }
 }
 
-function flaskRank(f: InventoryItem): number {
+/** How good a flask is to wear, roughly: life and mana recovered, any utility flask, its affixes. */
+export function flaskRank(f: InventoryItem): number {
   if (f.kind !== 'flask') return -1;
   const b = flaskBase(f.baseId);
   return b.life * 1.0 + b.mana * 0.5 + (b.kind === 'utility' ? 300 : 0) + f.affixes.length * 20;

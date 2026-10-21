@@ -30,7 +30,7 @@ import {
   type EquipCheck,
   type SocketOutcome,
 } from './inventory';
-import { cfgFor, score, sheetOf } from './bot';
+import { cfgFor, flaskRank, score, sheetOf } from './bot';
 import { gemIdle } from './gemStatus';
 import { isFavourite } from './found';
 import type { RunState } from './run';
@@ -56,6 +56,8 @@ export type ItemInfo = {
   replaces?: Item;
   /** The gems the best-slot swap sends to the bag (a row's warning; no sheet is worked out for it). */
   gemsOut: GemItem[];
+  /** A flask that would fill an empty flask slot (one of the best few, as many as there are empty slots). */
+  fillsFlask?: boolean;
 };
 
 const SLOT_LABEL: Record<EquipSlot, string> = {
@@ -159,6 +161,14 @@ export function itemInfos(run: RunState): Map<number, ItemInfo> {
     }
     out.set(it.uid, info);
   }
+  // An empty flask slot is filled by the best usable flasks in the bag, as many as there are empty slots.
+  const empty = run.build.flasks.filter((f) => !f).length;
+  if (empty > 0) {
+    const flasks = run.inventory
+      .filter((x) => x.kind === 'flask' && out.get(x.uid)!.equippable)
+      .sort((a, b) => flaskRank(b) - flaskRank(a));
+    for (const f of flasks.slice(0, empty)) out.get(f.uid)!.fillsFlask = true;
+  }
   return out;
 }
 
@@ -194,7 +204,7 @@ function name(it: InventoryItem): string {
 
 /** Whether an item is an upgrade worth highlighting. */
 export function isUpgrade(info: ItemInfo): boolean {
-  return info.group !== 'gem' && info.equippable && info.scorePct > 0.5;
+  return info.group !== 'gem' && info.equippable && (info.scorePct > 0.5 || !!info.fillsFlask);
 }
 
 export function filterItems(

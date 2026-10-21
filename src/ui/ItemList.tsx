@@ -109,6 +109,7 @@ export function ItemRow(p: RowProps) {
           </span>
         )}
         <span class="row-badges">
+          {info.fillsFlask && <span class="badge up">▲ empty flask slot</span>}
           {gear && info.equippable && (
             <>
               <Badge v={info.dpsPct} label="DPS" />
