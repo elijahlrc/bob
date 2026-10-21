@@ -12,17 +12,23 @@ import {
   createDuelWorld,
   DUEL_ARENA_SIZE,
   DUEL_GAP,
-  DUEL_MAX_TIME,
   duelHash,
   duelPlan,
   playDuel,
   runDuel,
+  type DuelOpts,
 } from './duel';
 import { buildFor } from './gemKit';
 import type { Ledger } from './ledger';
 import type { Side } from './side';
 import type { World } from './types';
 import { spawnMonster, stepWorld } from './world';
+
+/**
+ * The rules of F4, before docs/DUEL-BALANCE.md: no reprieves, no life curve, a 90 s cap. Two level 1 starters with no gems take
+ * minutes to go through four lives each, so the tests of how a fight works (not of the balance) play by these.
+ */
+const F4: DuelOpts = { reprieves: 0, lifeCurve: false, maxTime: 90 };
 
 /**
  * Duels (docs/DUEL.md 8.2): asymmetric by design. Every kit is given to one side only and the effect is looked for on the right
@@ -111,11 +117,11 @@ describe('the arena of a duel', () => {
 
 describe('a duel of two starters', () => {
   it('ends with one dead (a draw by the cap would mean they never met)', () => {
-    const r = runDuel(vanguard(1), vanguard(2), 1);
+    const r = runDuel(vanguard(1), vanguard(2), 1, F4);
     expect(r.how).toBe('death');
     expect(r.winner === 0 || r.winner === 1).toBe(true);
     expect(r.time).toBeGreaterThan(1);
-    expect(r.time).toBeLessThan(DUEL_MAX_TIME);
+    expect(r.time).toBeLessThan(F4.maxTime!);
     const [won, lost] = r.winner === 0 ? [r.sides[0], r.sides[1]] : [r.sides[1], r.sides[0]];
     expect(won.lifeLeft).toBeGreaterThan(0);
     expect(won.recap).toBeUndefined();
@@ -177,7 +183,7 @@ describe('a duel of two starters', () => {
   it('a different level on each side is a different character (the fight reads each its own)', () => {
     const strong = vanguard(1);
     strong.level = 30;
-    const r = runDuel(strong, vanguard(2), 1);
+    const r = runDuel(strong, vanguard(2), 1, F4);
     expect(r.winner).toBe(0);
     expect(r.sides[0].lifeLeft).toBeGreaterThan(0.9);
   });
@@ -529,7 +535,7 @@ describe('bodies', () => {
 describe('the events of a duel say whose they are', () => {
   /** Fight a duel to its end and keep every event of every tick. */
   const events = (a: Build, b: Build, seed: number, prep?: (w: World) => void) => {
-    const w = createDuelWorld(a, b, seed);
+    const w = createDuelWorld(a, b, seed, F4);
     prep?.(w);
     const all: World['events'] = [];
     while (w.t < 60 && w.sides.every((s) => s.player.alive)) {

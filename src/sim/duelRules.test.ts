@@ -14,6 +14,7 @@ import {
   duelResult,
   playDuel,
   runDuel,
+  type DuelOpts,
 } from './duel';
 import { activeGem, buildFor, buildForActive } from './gemKit';
 import { makeMinion, summonMinions, type Minion } from './minions';
@@ -25,6 +26,12 @@ import { stepWorld } from './world';
  * The rules of a duel (docs/DUEL.md 4.2 to 4.4, F4): the duel option of the AI, the ends of a fight, the alternating order of
  * the sides, the damage scale, what a character targets, and that the same build on both sides wins about half.
  */
+
+/**
+ * The rules of F4, before docs/DUEL-BALANCE.md: no reprieves, no life curve, a 90 s cap. Two level 1 starters with no gems take
+ * minutes to go through four lives each, so the tests of how a fight works (not of the balance) play by these.
+ */
+const F4: DuelOpts = { reprieves: 0, lifeCurve: false, maxTime: 90 };
 
 const vanguard = (seed = 1): Build => newRun('vanguard', seed).build;
 const skeletons = (): Build => buildForActive(activeGem('callBonewalkers'));
@@ -66,7 +73,7 @@ describe('the duel option', () => {
   it('two starters 10 tiles apart fight to a death', () => {
     const w = createDuelWorld(vanguard(1), vanguard(2), 1);
     expect(w.sides[1].player.x - w.sides[0].player.x).toBeGreaterThan(ENGAGE_RANGE);
-    const r = runDuel(vanguard(1), vanguard(2), 1);
+    const r = runDuel(vanguard(1), vanguard(2), 1, F4);
     expect(r.how).toBe('death');
     expect(r.winner === 0 || r.winner === 1).toBe(true);
     expect(r.time).toBeGreaterThan(3);
@@ -147,7 +154,7 @@ describe('the duel option', () => {
 
 describe('how a duel ends', () => {
   it('a death is a death: the one left wins', () => {
-    const r = runDuel(vanguard(1), vanguard(2), 1);
+    const r = runDuel(vanguard(1), vanguard(2), 1, F4);
     expect(r.how).toBe('death');
     const dead = r.sides.filter((s) => s.lifeLeft === 0);
     expect(dead).toHaveLength(1);
@@ -184,8 +191,8 @@ describe('how a duel ends', () => {
     expect(world.sides[0].stats.damageTaken + world.sides[1].stats.damageTaken).toBe(0);
   });
 
-  it('the cap is a draw by time', () => {
-    expect(DUEL_MAX_TIME).toBe(90);
+  it('the cap with as many reprieves used on each side is a draw by time', () => {
+    expect(DUEL_MAX_TIME).toBe(180);
     const { result } = playDuel(vanguard(1), vanguard(2), 1, { maxTime: 2 });
     expect(result.how).toBe('time');
     expect(result.winner).toBeNull();
@@ -436,7 +443,7 @@ describe('what a character goes for', () => {
   });
 
   it('kills a screen of minions and then the character behind it, and does not give the fight up', () => {
-    const w = createDuelWorld(swordsman(), skeletons(), 1);
+    const w = createDuelWorld(swordsman(), skeletons(), 1, F4);
     const [sa, sb] = w.sides;
     still(sb, false);
     // Four minions in an arc in front of B, standing still with little life: a melee blow cannot reach B past them.
@@ -491,7 +498,7 @@ describe('fairness: the same build on both sides wins about half', () => {
     let w0 = 0;
     let w1 = 0;
     for (let seed = 1; seed <= n; seed++) {
-      const r = runDuel(structuredClone(a), structuredClone(a), seed);
+      const r = runDuel(structuredClone(a), structuredClone(a), seed, F4);
       if (r.winner === 0) w0++;
       else if (r.winner === 1) w1++;
     }

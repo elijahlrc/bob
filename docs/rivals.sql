@@ -283,16 +283,23 @@ create table if not exists public.duels (
   seed         bigint not null,
   winner       smallint check (winner in (0, 1)),
   how          text    not null check (how in ('death', 'time', 'stall')),
-  seconds      real    not null check (seconds >= 0 and seconds <= 120),
+  seconds      real    not null,
   game_version text    check (char_length(game_version) <= 64),
   token_hash   text    not null check (token_hash ~ '^[0-9a-f]{64}$'),
   ip_hash      text    check (ip_hash ~ '^[0-9a-f]{64}$'),
   verified     boolean,
   constraint duels_one_per_pair unique (a_id, b_id),
-  constraint duels_not_self check (a_id <> b_id),
-  -- Time and a stall are draws; a death names a winner unless both fell in one tick.
-  constraint duels_winner_how check (how = 'death' or winner is null)
+  constraint duels_not_self check (a_id <> b_id)
 );
+
+-- The rules of a fight's end and length (docs/DUEL-BALANCE.md 5, 2026-10-20), as constraints of their own so that a table made
+-- before can be brought up to them: a death names a winner unless both fell in one tick, the time cap names the side that used
+-- fewer reprieves (a draw when both used as many), and a stall is a draw. A fight lasts at most the cap (180 s), with room.
+alter table public.duels drop constraint if exists duels_seconds_check;
+alter table public.duels drop constraint if exists duels_seconds;
+alter table public.duels add constraint duels_seconds check (seconds >= 0 and seconds <= 600);
+alter table public.duels drop constraint if exists duels_winner_how;
+alter table public.duels add constraint duels_winner_how check (how <> 'stall' or winner is null);
 
 create index if not exists duels_token_idx on public.duels (token_hash, created_at);
 create index if not exists duels_ip_idx on public.duels (ip_hash, created_at);

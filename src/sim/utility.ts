@@ -297,9 +297,13 @@ export function tickAuraBurn(w: World, s: Side, dt: number): void {
     burnOff.add(s);
     return;
   }
-  // The enemies burn for a share of the character's life, with the character's damage over time modifiers.
+  // The enemies burn for a share of the character's life, with the character's damage over time modifiers. The life is the
+  // sheet's: a duel's larger pool (docs/DUEL-BALANCE.md 4.2) is toughness, not damage.
   const amount =
-    (b.pct / 100) * p.def.maxLife * BURN_EVERY * s.char.db.mult('damage', playerCtx(w, s));
+    (b.pct / 100) *
+    (p.def.maxLife / s.lifeMult) *
+    BURN_EVERY *
+    s.char.db.mult('damage', playerCtx(w, s));
   if (amount > 0)
     for (const e of enemiesNear(w, p.team, p.x, p.y, BURN_RADIUS))
       rawHit(w, e, amount, 3, s, 'Burning aura');

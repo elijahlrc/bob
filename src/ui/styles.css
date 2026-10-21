@@ -954,6 +954,38 @@ select option {
   /* The moment a reprieve fires its badge flashes once, so the effect on the map is tied to the item. */
   animation: reprieve-flash 1s ease-out;
 }
+/* A duel's reprieves (docs/DUEL-BALANCE.md 3): a pip for each Bargain Coin, emptied as it fires. */
+.reprieve-pips {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 8px;
+  vertical-align: middle;
+  pointer-events: auto;
+}
+.reprieve-pips .pip {
+  width: 9px;
+  height: 9px;
+  border: 1px solid #e6b84a;
+  border-radius: 50%;
+  background: #e6c07a;
+  box-shadow: 0 0 4px rgba(230, 184, 74, 0.6);
+}
+.reprieve-pips .pip.used {
+  border-color: #5a5a68;
+  background: transparent;
+  box-shadow: none;
+  animation: pip-flash 1s ease-out;
+}
+@keyframes pip-flash {
+  0% {
+    background: #fff2c0;
+    box-shadow: 0 0 12px #ffe6a0;
+  }
+  100% {
+    background: transparent;
+    box-shadow: none;
+  }
+}
 @keyframes reprieve-flash {
   0% {
     border-color: #fff2c0;

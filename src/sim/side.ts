@@ -45,6 +45,8 @@ export type SideStats = {
  */
 export type DuelSideOpts = {
   damageScale?: number;
+  /** What the character's maximum life and energy shield are multiplied by (docs/DUEL-BALANCE.md 4.2; default 1). */
+  lifeMult?: number;
 };
 
 /** What a character brings to a map (what the map decides is `WorldOpts`). */
@@ -86,6 +88,12 @@ export type Side = {
   opts: SideOpts;
   /** What the character's damage taken is multiplied by: `opts.duel.damageScale`, resolved (1 on a map; docs/DUEL.md 4.4). */
   damageScale: number;
+  /**
+   * What the character's maximum life and energy shield are multiplied by: `opts.duel.lifeMult`, resolved (1 on a map). It is put
+   * into the defence the sim makes (`Character.defence`), so the shares of the pool (regeneration by percent, recharge, the
+   * reprieve's half) follow it and flat amounts (flasks, life on hit) do not; the sheet never sees it.
+   */
+  lifeMult: number;
   // G2: charges, buffs and rage, the triggers, cooldowns and openers
   /** Seconds left on the charges of each kind (EXPANSION 5.6), and the characters built for each count held. */
   chargeT: Record<'grit' | 'fervour' | 'insight', number>;

@@ -5,7 +5,7 @@ import { levelValue } from '../calc/gems';
 import { launch, scaleProfile } from './shots';
 import { cloneOfPlayer, makeMinion, summonAt } from './minions';
 import { actorById, enemiesOf } from './actions';
-import { flaskMask, hit, playerConds, rawHit } from './combat';
+import { flaskMask, hit, lifeCap, playerConds, rawHit } from './combat';
 import { corpseBlast } from './triggers';
 import { MINIONS, MINION_ENEMY_RES } from '../data/minions';
 import { spellBaseDamage } from '../data/constants';
@@ -756,7 +756,7 @@ function tickSiphon(w: World, s: Side, dt: number): void {
     const lv = c.skill.level;
     const life = levelValue(sp.life, lv) + n * levelValue(sp.lifeEach, lv);
     const mana = levelValue(sp.mana, lv) + n * levelValue(sp.manaEach, lv);
-    p.life = Math.min(Math.max(1, p.def.maxLife - s.char.reservedLife), p.life + life * dt);
+    p.life = Math.min(lifeCap(p), p.life + life * dt);
     p.mana = Math.min(p.def.maxMana - s.char.reservedMana, p.mana + mana * dt);
   }
 }
@@ -867,8 +867,7 @@ function tickRelicRegen(s: Side, dt: number): void {
   const g = s.relicRegen;
   g.t -= dt;
   const p = s.player;
-  if (p.alive)
-    p.life = Math.min(Math.max(1, p.def.maxLife - s.char.reservedLife), p.life + g.me * dt);
+  if (p.alive) p.life = Math.min(lifeCap(p), p.life + g.me * dt);
   for (const m of s.minions) if (m.alive) m.life = Math.min(m.def.maxLife, m.life + g.minions * dt);
 }
 

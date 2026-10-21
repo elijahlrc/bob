@@ -19,7 +19,9 @@ import type { ThemeDef } from '../data/themes';
 import { themeInfo } from '../run/themeInfo';
 import { HEXES, hexText } from '../data/hexes';
 import { CHARGE_KINDS, CHARGE_NAMES, CHARGE_SECONDS, CHARGE_TEXT } from '../calc/charges';
+import type { Side } from '../sim/side';
 import type { Actor, World } from '../sim/types';
+import { reservedLife } from '../sim/reserve';
 import { SPEEDS, type Controller } from '../run/controller';
 import { DELIVERY_NAME, ELEMENT_NAME } from '../calc/skillLook';
 import { useTicks } from './hooks';
@@ -246,7 +248,10 @@ function BossBar({ w }: { w: World }) {
         const lines = b.isPlayer ? [] : bossReadout(w, b);
         return (
           <div class="boss-bar" key={b.id}>
-            <div class="boss-bar-name">{b.name}</div>
+            <div class="boss-bar-name">
+              {b.name}
+              {b.isPlayer && b.side && <ReprievePips s={b.side} />}
+            </div>
             <div class="boss-bar-life">
               <div style={{ width: `${Math.max(0, Math.min(100, (b.life / max) * 100))}%` }} />
               {b.def.maxEs > 0 && (
@@ -391,6 +396,29 @@ function Charges({ w }: { w: World }) {
 }
 
 /** The reprieves carried (docs/WAYSIDE.md 7), in the status line: what each will do, or that it has just been used. */
+/**
+ * A duel's reprieves for one side (docs/DUEL-BALANCE.md 3): a pip for each one carried, emptied as they fire. The newest one used
+ * flashes as it empties.
+ */
+function ReprievePips({ s }: { s: Side }) {
+  const r = s.reprieve;
+  if (!r.held.length) return null;
+  const left = r.held.length - r.fired.length;
+  const d = reprieveDef(r.held[0]);
+  return (
+    <span
+      class="reprieve-pips"
+      {...infoProps(
+        `${d.name}, ${left} of ${r.held.length} left: if you would die, you rise at ${Math.round(d.life * 100)}% life with your flasks refilled and cannot be hurt for ${d.invuln ?? 0} s.`,
+      )}
+    >
+      {r.held.map((_, i) => (
+        <span key={i} class={'pip' + (i < left ? '' : ' used')} />
+      ))}
+    </span>
+  );
+}
+
 function ReprieveBadge({ w }: { w: World }) {
   const r = w.sides[0].reprieve;
   if (!r.held.length) return null;
@@ -541,6 +569,7 @@ export function Hud({ c }: { c: Controller }) {
         )}
         {!duel && <span>{w.exitOpen ? 'Exit open' : ''}</span>}
         {!sc && !c.gallery && !duel && <ReprieveBadge w={w} />}
+        {duel && <ReprievePips s={w.sides[0]} />}
       </div>
       {!sc && !c.gallery && !duel && <AbandonButton c={c} w={w} />}
       <BossBar w={w} />
@@ -607,7 +636,7 @@ export function Hud({ c }: { c: Controller }) {
         <Orb
           value={p.life}
           max={lifeMax}
-          reserved={w.sides[0].char.reservedLife}
+          reserved={reservedLife(w.sides[0])}
           kind="life"
           label="Life"
           es={p.es}

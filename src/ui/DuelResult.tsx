@@ -6,8 +6,8 @@ import { MapReportView } from './MapReport';
 /** Who won and how, as a headline (side 0 is the viewer's). */
 function headline(o: DuelOutcome): string {
   const { winner, how } = o.result;
-  if (winner === 0) return 'You won';
-  if (winner === 1) return 'You fell';
+  if (winner === 0) return how === 'time' ? 'Won on time: fewer reprieves used' : 'You won';
+  if (winner === 1) return how === 'time' ? 'Lost on time: more reprieves used' : 'You fell';
   if (how === 'time') return 'A draw: time ran out';
   if (how === 'stall') return `A draw: nobody landed a blow for ${DUEL_STALL_TIME} s`;
   return 'A draw: both fell';
@@ -59,6 +59,12 @@ export function DuelResultView({ c }: { c: Controller }) {
         {survivor !== null &&
           ` · ${survivor === 0 ? 'you' : names[1]} left with ${Math.round(result.sides[survivor].lifeLeft * 100)}% of ${survivor === 0 ? 'your' : 'its'} life`}
       </p>
+      {result.sides[0].reprievesHeld > 0 && (
+        <p class="muted duel-reprieves">
+          Reprieves used: you {result.sides[0].reprieves} of {result.sides[0].reprievesHeld} ·{' '}
+          {names[1]} {result.sides[1].reprieves} of {result.sides[1].reprievesHeld}
+        </p>
+      )}
       {o.rival && <p class="duel-standing">{standing(o.rival)}</p>}
       <div class="menu row">
         <button class="btn primary" onClick={() => c.againDuel()}>

@@ -236,6 +236,7 @@ function makeSide(plan: MapPlan, id: number, inp: SideInput): Side {
       duel: o?.duel,
     },
     damageScale: o?.duel?.damageScale ?? 1,
+    lifeMult: o?.duel?.lifeMult ?? 1,
     chargeT: { grit: 0, fervour: 0, insight: 0 },
     buffT: {
       ...Object.fromEntries(BUFF_IDS.map((b) => [b, 0])),
@@ -315,7 +316,7 @@ function makeSide(plan: MapPlan, id: number, inp: SideInput): Side {
   };
   player.side = side;
   player.team = side.team;
-  player.def = char.defence();
+  player.def = char.defence(undefined, undefined, side.lifeMult);
   // The character starts with what the last map left (full on a new run), as fractions of the maximum.
   const frac = (f: number | undefined) => Math.min(1, Math.max(0, f ?? 1));
   player.life = Math.max(1, lifeCap(player) * frac(o?.start?.life));

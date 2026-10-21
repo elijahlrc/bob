@@ -1,6 +1,7 @@
 import { STRATEGY_DEFAULTS } from '../data/strategy';
 import { armourReduction } from '../calc/formulas';
 import type { FlaskSpec } from '../calc/flasks';
+import { lifeCap } from './combat';
 import { flasksSealed } from './theft';
 import type { World } from './types';
 import { livingEnemiesOf } from './side';
@@ -50,7 +51,7 @@ export const autoFlaskPolicy: FlaskPolicy = (w, s) => {
   // The Unmaker holds them (docs/BOSSES.md 9).
   if (flasksSealed(w)) return out;
   const brace = w.effects.length > 0 && braceFor(w, s);
-  const cap = Math.max(1, p.def.maxLife - s.char.reservedLife);
+  const cap = lifeCap(p);
   const cost = s.primary.usable ? s.char.profile(s.primary).cost : 0;
   // The thresholds the Strategy tab sets.
   const strategy = s.char.build.strategy;

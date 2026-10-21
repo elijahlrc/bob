@@ -1535,10 +1535,17 @@ export class Character {
     return db;
   }
 
-  /** Defences for a condition mask and a bitmask of active flasks (cached). */
-  defence(conds: number = this.configConds, flaskMask: number = this.defaultDyn): Defence {
+  /**
+   * Defences for a condition mask and a bitmask of active flasks (cached). `lifeMult` multiplies maximum life and energy shield
+   * (a duel's life curve, docs/DUEL-BALANCE.md 4.2): only the sim passes it, so the sheet shows the character as it is.
+   */
+  defence(
+    conds: number = this.configConds,
+    flaskMask: number = this.defaultDyn,
+    lifeMult = 1,
+  ): Defence {
     const c = maskAnd(conds, this.cond.all);
-    const k = `${c}|${flaskMask}`;
+    const k = lifeMult === 1 ? `${c}|${flaskMask}` : `${c}|${flaskMask}|${lifeMult}`;
     let d = this.defences.get(k);
     if (!d) {
       const db = this.dbWith(flaskMask);
@@ -1549,6 +1556,7 @@ export class Character {
           isPlayer: true,
           resistPenalty: this.config.resistPenalty,
           reservedLife: this.reservedLife,
+          lifeMult,
         },
       );
       this.defences.set(k, d);

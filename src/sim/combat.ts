@@ -6,7 +6,7 @@ import {
   type HitResult,
   type TargetState,
 } from '../calc/combat';
-import { reservedMana } from './reserve';
+import { reservedLife, reservedMana } from './reserve';
 import {
   dotSources,
   monsterSrc,
@@ -102,7 +102,7 @@ const THORNS_SHARE = 0.1;
 const OVERLOAD_TIME = 8;
 
 export function lifeCap(a: Actor): number {
-  return a.isPlayer ? Math.max(1, a.def.maxLife - a.side!.char.reservedLife) : a.def.maxLife;
+  return a.isPlayer ? Math.max(1, a.def.maxLife - reservedLife(a.side!)) : a.def.maxLife;
 }
 
 /** What makes each condition true for the player; a condition is only evaluated when this character's mods use it. */
@@ -230,7 +230,7 @@ export function flaskMask(s: Side): number {
 /** Refresh the player's cached defence for the current conditions and flasks. */
 export function refreshPlayerDefence(w: World, s: Side): void {
   const p = s.player;
-  p.def = s.char.defence(playerConds(w, s, null), flaskMask(s));
+  p.def = s.char.defence(playerConds(w, s, null), flaskMask(s), s.lifeMult);
   const cap = lifeCap(p);
   if (p.life > cap) p.life = cap;
   if (p.es > p.def.maxEs) p.es = p.def.maxEs;

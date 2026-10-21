@@ -19,6 +19,11 @@ export type DefenceOpts = {
   /** Multiplier on stun threshold (bosses ×4, mini-bosses ×2). */
   stunThreshMult?: number;
   reservedLife?: number;
+  /**
+   * What maximum life and energy shield are multiplied by (a duel's life curve, docs/DUEL-BALANCE.md 4.2; default 1). Everything
+   * worked out from them follows: regeneration and recharge by percent, the ailment and stun thresholds; flat amounts do not.
+   */
+  lifeMult?: number;
 };
 
 /** Shares of physical hit damage taken as other types (fractions; they never add up to more than 1). */
@@ -42,10 +47,11 @@ function avoidOf(db: ModDB, ctx: ModCtx, name: string): number {
 export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defence {
   const flag = (s: string) => db.flag(s, ctx);
   const lifeIsOne = flag('lifeIsOne');
-  const fullLife = Math.max(1, Math.round(db.calc('life', ctx)));
+  const k = opts.lifeMult ?? 1;
+  const fullLife = Math.max(1, Math.round(db.calc('life', ctx) * k));
   const maxLife = lifeIsOne ? 1 : fullLife;
   const maxMana = flag('skillsCostLife') ? 0 : Math.max(0, Math.round(db.calc('mana', ctx)));
-  const maxEs = Math.max(0, Math.round(db.calc('es', ctx)));
+  const maxEs = Math.max(0, Math.round(db.calc('es', ctx) * k));
 
   let armour: number;
   let evasion: number;

@@ -91,7 +91,11 @@ function burstAt(w: World, a: Actor, p: SkillProfile, x: number, y: number, u?: 
     dtype: p.hands[0].chunks[0].type,
     skill: p.skill.id,
   });
-  const own = u?.corpse && u.corpse.lifePct > 0 ? (a.def.maxLife * u.corpse.lifePct) / 100 : 0;
+  // The character's own life as its sheet has it: a duel's larger pool (docs/DUEL-BALANCE.md 4.2) is toughness, not damage.
+  const own =
+    u?.corpse && u.corpse.lifePct > 0
+      ? (a.def.maxLife * u.corpse.lifePct) / 100 / (a.side?.lifeMult ?? 1)
+      : 0;
   for (const e of enemiesAt(w, a.team, x, y, r)) {
     hit(w, a, e, p, 0, Math.hypot(e.x - a.x, e.y - a.y));
     // Bodyswap adds a share of the character's own life to what it deals.

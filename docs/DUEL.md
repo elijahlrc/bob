@@ -188,11 +188,11 @@ them either); a later plan may give them life.
 
 ### 4.1 What each side brings
 
-| Brought                                                                                                          | Left behind                                                                                                                                                  |
-| ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| The `Build`: class, level, allocated passives, equipment with sockets and gems, flasks, `primaryGem`, `strategy` | Provisions (per-map buffs, armed at camp and burnt by a map), Reprieves (consumables of the run), the map's affixes, the difficulty settings (monsters only) |
-| Full life, mana, energy shield and flask charges; no charges, buffs or rage                                      | Carried-over vitals (`run.vitals`)                                                                                                                           |
-| The character at its own level: `areaLevel = build.level`, **no resist penalty** for either side                 | The map tier's penalty (a map-70 character fought at −60% in its own maps; the duel is symmetric instead)                                                    |
+| Brought                                                                                                          | Left behind                                                                                                                                                                                                       |
+| ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The `Build`: class, level, allocated passives, equipment with sockets and gems, flasks, `primaryGem`, `strategy` | Provisions (per-map buffs, armed at camp and burnt by a map), the run's own Reprieves (each side gets three Bargain Coins instead, DUEL-BALANCE.md 2), the map's affixes, the difficulty settings (monsters only) |
+| Full life, mana, energy shield and flask charges; no charges, buffs or rage                                      | Carried-over vitals (`run.vitals`)                                                                                                                                                                                |
+| The character at its own level: `areaLevel = build.level`, **no resist penalty** for either side                 | The map tier's penalty (a map-70 character fought at −60% in its own maps; the duel is symmetric instead)                                                                                                         |
 
 ### 4.2 The arena
 
@@ -208,14 +208,14 @@ own, 25 tiles across with its rim, the characters at 7.5 and 17.5 of 25 on the m
 
 ### 4.3 How a duel ends
 
-| End                                                                 | Result              |
-| ------------------------------------------------------------------- | ------------------- |
-| A character dies (reprieves are not brought, so a death is a death) | The other side wins |
-| Both die in the same tick                                           | A draw              |
-| **Time cap** 90 s                                                   | A draw              |
-| **Stall**: neither character has taken damage for 15 s              | A draw              |
+| End                                                                        | Result                                                                  |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| A character dies with no reprieve left (each side has three Bargain Coins) | The other side wins                                                     |
+| Both die in the same tick                                                  | A draw                                                                  |
+| **Time cap** 180 s (90 s before 2026-10-20)                                | The side that used fewer reprieves wins; as many on each side is a draw |
+| **Stall**: neither character has taken damage for 15 s                     | A draw                                                                  |
 
-`DuelResult`: `{ winner: 0 | 1 | null, how: 'death' | 'time' | 'stall', time, sides: [{ recap, ledger, lifeLeft }] }`. The
+`DuelResult`: `{ winner: 0 | 1 | null, how: 'death' | 'time' | 'stall', time, sides: [{ recap, ledger, lifeLeft, reprieves, reprievesHeld }] }`. The
 ledger of each side (damage dealt and taken by source, `src/sim/ledger.ts`) is the result screen's material.
 
 ### 4.4 Fairness
@@ -241,6 +241,9 @@ ledger of each side (damage dealt and taken by source, `src/sim/ledger.ts`) is t
   (6 s at ×1), with 3% and 6% of the fights ending on the cap. The medians of the maps differ by a factor of four to five at
   ×0.3 (default pool: 44 s at map 5, 22 s at map 10, 10 s at maps 15 and 20), so no one number fits every level: a scale that
   falls with the level is the open question (Built: F4).
+- **Life curve** (DUEL-BALANCE.md 4, 2026-10-20). Each side's maximum life and energy shield are multiplied by `duelLifeMult` of the
+  other side's level: 1 at level 1 to 10 at level 100 on a straight line, so the lower-level character has the larger factor. It
+  sits on top of the ×0.3 scale; minions are not multiplied.
 
 ---
 
@@ -261,7 +264,7 @@ not what they watch.
 - **Arena and camera.** `duelPlan` (4.2). The camera follows the middle of the characters still alive (all of them when none is),
   kept on the floor; side 0's character on a map as before.
 - **HUD.** The player's HUD as on a map, with the chrome that does not apply left out: "Map N · theme" is "Duel", no Kills, Exit open,
-  reprieves or Abandon; the banner on entering says "Duelling arena" and the top line "Duel", with no biome name (the biome is the arena's look alone, and its text describes a layout the arena has not; the user, 2026-10-17). The speed controls and pause are as they are. **The rival is the boss bar** (`BossBar`, name,
+  reprieve badges or Abandon; the banner on entering says "Duelling arena" and the top line "Duel", with no biome name (the biome is the arena's look alone, and its text describes a layout the arena has not; the user, 2026-10-17). Every fight starts at 1× and unpaused, and leaving puts back the run's speed (DUEL-BALANCE.md 5.1); the speed controls and pause are as they are. Three pips on the top line and beside the rival's name show the Bargain Coins left. **The rival is the boss bar** (`BossBar`, name,
   life, energy shield; no readout), and clicking it shows its name, class and level. **Leave** (a small button as the showcase's Exit)
   ends the duel with no result.
 - **Controller.** A duel mode beside the showcase and the gallery (`launchShowcase` is the precedent for a world outside a run):
@@ -272,8 +275,8 @@ not what they watch.
   both reports), a `mapEnd`, and the `'duelResult'` screen, never `endMap`, so the run's map flow (`finishMap`, Crawls, reprieves,
   telemetry, the save) is untouched and `Controller.run` is whatever it was. `againDuel()` fights on the next seed; `leaveDuel()` goes
   back to `from`.
-- **Result screen** (`src/ui/DuelResult.tsx`): who won and how ("You won", "You fell", "A draw: time ran out", "A draw: nobody landed a
-  blow for 15 s"), the time, each side's damage dealt by skill and taken by source (`MapReportView`, the numbers are what landed), and
+- **Result screen** (`src/ui/DuelResult.tsx`): who won and how ("You won", "You fell", "Won on time: fewer reprieves used", "Lost on
+  time: more reprieves used", "A draw: time ran out", "A draw: nobody landed a blow for 15 s"), the reprieves each side used, the time, each side's damage dealt by skill and taken by source (`MapReportView`, the numbers are what landed), and
   **Again** (the next seed) and **Back**. A fight against a rival (F7, 6.5) adds a line ("Rated" or "Practice") and **Another rival**.
 - **Debug panel** (`src/ui/Debug.tsx`, at camp): a Duel row with a class, a map, a seed, **Mirror** (the character against a copy of
   itself) and **Bot** (a bot build of that class played to that map on the legacy curve; `botBuild`, `src/run/duelBot.ts`).
@@ -1094,8 +1097,8 @@ Ten to seventeen working days (section 7). Risks, each with its fence:
 | --- | ------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
 | 1   | Where the side comes from | The three patterns of 3.2: a parameter, the actor, `hunted`                                                  | A side on the world's "current context" (a hidden singleton again)                          |
 | 2   | Tests                     | A codemod to `w.sides[0].<field>`; no compatibility getters on `World`                                       | Getters that keep `w.player` working (and keep the singleton alive)                         |
-| 3   | What ends a duel          | A death; a 90 s cap or a 15 s stall is a draw                                                                | Decide a cap by life left; let the stall skip as in maps                                    |
-| 4   | Reprieves and provisions  | Neither side brings any                                                                                      | Bring the reprieves the run still held                                                      |
+| 3   | What ends a duel          | A death; the 180 s cap goes to fewer reprieves used, else a draw; a 15 s stall is a draw (DUEL-BALANCE.md)   | Decide a cap by life left (rejected: it punishes low-life builds); let the stall skip       |
+| 4   | Reprieves and provisions  | Three Bargain Coins a side, no provisions (DUEL-BALANCE.md 2)                                                | Bring the reprieves the run still held; none (F4)                                           |
 | 5   | Resist penalty and level  | None; each character at its own level                                                                        | Each at its own map tier's penalty                                                          |
 | 6   | Damage scale              | ×0.3 (F4 measured: median fights of 16 s and 25 s, 3% and 6% on the cap)                                     | ×1 always (the first hit decides); a scale that falls with the level                        |
 | 7   | Arena and distance        | The boss arena's round room, a biome look, 10 tiles apart                                                    | The dummy's open floor; a labyrinth room                                                    |

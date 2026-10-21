@@ -127,6 +127,13 @@ export const FLASK_CHARGES_ON_KILL = { normal: 1, magic: 3.5, rare: 6, unique: 1
  * (at ×1 the median is 6 s).
  */
 export const DUEL_DAMAGE_SCALE = 0.3;
+/** The Bargain Coins each side carries into a duel (docs/DUEL-BALANCE.md 2): a fight is one of four lives a side. */
+export const DUEL_REPRIEVES = 3;
+/**
+ * What a character's life and energy shield are multiplied by in a duel against an opponent of level 100 (docs/DUEL-BALANCE.md 4):
+ * the factor runs on a straight line from 1 at level 1 to this at level 100, and each side's is read from the other side's level.
+ */
+export const DUEL_LIFE_MULT_TOP = 10;
 
 // §13 AI.
 export const ENGAGE_RANGE = 9;

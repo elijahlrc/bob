@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Build } from '../data/types';
-import { runDuel } from '../sim/duel';
+import { runDuel, type DuelOpts } from '../sim/duel';
 import { Controller } from './controller';
 import { newRun } from './run';
 
@@ -10,6 +10,9 @@ import { newRun } from './run';
  */
 
 const starter = (cls: string, seed = 1): Build => newRun(cls, seed).build;
+
+/** The rules of F4 (no reprieves, no life curve, 90 s): two level 1 starters take minutes to go through four lives each. */
+const F4: DuelOpts = { reprieves: 0, lifeCurve: false, maxTime: 90 };
 
 /** A controller at camp with a run, as the Debug panel finds it. */
 function atCamp(): Controller {
@@ -54,7 +57,7 @@ describe('a duel on the map screen', () => {
   it('ends where the headless runner ends it: the same winner, the same time, at any speed and frame size', () => {
     const a = starter('vanguard', 1);
     const b = starter('strider', 2);
-    const want = runDuel(a, b, 3);
+    const want = runDuel(a, b, 3, F4);
     expect(want.how).toBe('death');
     for (const [speed, dtMs] of [
       [1, 16],
@@ -62,7 +65,7 @@ describe('a duel on the map screen', () => {
       [4, 55],
     ] as const) {
       const c = atCamp();
-      c.startDuel(a, b, 3);
+      c.startDuel(a, b, 3, F4);
       c.setSpeed(speed);
       frames(c, dtMs);
       const got = c.lastDuel!.result;
@@ -126,7 +129,7 @@ describe('a duel on the map screen', () => {
     const b = starter('strider', 2);
     const c = atCamp();
     c.setSpeed(8);
-    c.startDuel(a, b, 10);
+    c.startDuel(a, b, 10, F4);
     frames(c, 100);
     const first = c.lastDuel!;
     expect(first.seed).toBe(10);
@@ -140,7 +143,7 @@ describe('a duel on the map screen', () => {
     const second = c.lastDuel!;
     expect(second.seed).toBe(11);
     // A new seed is a new fight, and a fight is a pure function of its builds and seed.
-    const want = runDuel(a, b, 11);
+    const want = runDuel(a, b, 11, F4);
     expect([second.result.winner, second.result.time]).toEqual([want.winner, want.time]);
     expect(second.result.time).not.toBe(first.result.time);
     c.againDuel();
