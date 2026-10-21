@@ -19,6 +19,7 @@
     "sim": "tsx scripts/simulate.ts",
     "dpsaudit": "tsx scripts/dps-audit.ts",
     "dpsgems": "tsx scripts/dps-gems.ts",
+    "fxaudit": "tsx scripts/fx-audit.ts",
     "dpsinspect": "tsx scripts/dps-inspect.ts",
     "dpsminions": "tsx scripts/dps-minions.ts",
     "perf": "tsx scripts/perf-calc.ts",

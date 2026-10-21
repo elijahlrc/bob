@@ -1,4 +1,5 @@
 import type { SkillProfile } from '../calc/skill';
+import { profileElement } from '../calc/skillLook';
 import { spellBaseDamage } from '../data/constants';
 import type { ChargeKind } from '../calc/charges';
 import { fallField, segmentDist } from './actions';
@@ -84,16 +85,7 @@ export type Field = {
 const REGEN_CONSECRATED = 0.06;
 const CRIT_ON_CONSECRATED = 2;
 
-function dominantType(p: SkillProfile): number {
-  let dtype = 0;
-  let best = -1;
-  for (const c of p.hands[0]?.chunks ?? [])
-    if (c.max > best) {
-      best = c.max;
-      dtype = c.type;
-    }
-  return dtype;
-}
+const dominantType = (p: SkillProfile): number => profileElement(p);
 
 /** A skill that leaves ground behind it does so where it lands. */
 export function leaveGround(w: World, a: Actor, act: Action): void {
