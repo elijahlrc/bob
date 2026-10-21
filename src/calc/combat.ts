@@ -71,7 +71,7 @@ export type Defence = {
   physReduction: number;
   /** Multiplier on damage taken (before shock). */
   damageTakenMult: number;
-  /** Multiplier on damage taken from hits only, not from damage over time (Fortify). */
+  /** Multiplier on damage taken from hits only, not from damage over time (Bulwark Strikes). */
   hitTakenMult: number;
   /** Less (or more) damage taken from hits, by damage type (Rimeplate); one when absent. */
   hitTakenType?: number[];
@@ -154,12 +154,12 @@ export type TargetState = {
   blockLess?: number;
   /** What a blinded attacker's chance to hit is multiplied by. */
   hitChanceMult?: number;
-  /** Less evasion (fraction) and less physical damage reduction (points, fraction): Poacher's Mark, Punishment. */
+  /** Less evasion (fraction) and less physical damage reduction (points, fraction): Plenty Sigil, Penance. */
   evasionLess?: number;
   physRedLess?: number;
-  /** How many poisons the target carries (Vile Toxins counts them). */
+  /** How many poisons the target carries (Foul Brew counts them). */
   poisons?: number;
-  /** Extra chance (fraction) to be bled by an attack hit (Vulnerability), and to be stunned (Warlord's Mark). */
+  /** Extra chance (fraction) to be bled by an attack hit (Open Wounds), and to be stunned (Warlord Sigil). */
   bleedChance?: number;
   stunBonus?: number;
 };
@@ -385,7 +385,7 @@ export function stunFromHit(
   const eff = def.stunThreshold * (1 - p.enemyStunThreshRed);
   const chance = Math.min(1, stunChance(s, eff, STUN_MIN_CHANCE) + bonus);
   const duration = STUN_BASE_DURATION * p.stunDurMult * def.stunDurOnSelf;
-  // While energy shield is up, half of all stuns are ignored (not with Eldritch Battery-style rules).
+  // While energy shield is up, half of all stuns are ignored (not with Mana Bastion-style rules).
   const ignore = esUp && !def.esProtectsMana ? STUN_ES_IGNORE : 0;
   if (!rng) return { chance: chance * (1 - def.stunAvoid) * (1 - ignore), duration };
   if (chance <= 0 || !rng.chance(chance)) return { chance, duration: 0 };

@@ -161,7 +161,7 @@ const TARGET_TESTS: Partial<Record<CondId, TargetTest>> = {
   targetNearby: (t, from) => Math.hypot(t.x - from.x, t.y - from.y) <= 2 + t.r,
 };
 
-// What waits for a particular curse or mark on the target (the bonuses against Despair, Punishment and the marks).
+// What waits for a particular curse or mark on the target (the bonuses against Void Curse, Penance and the marks).
 for (const id of ALL_HEX_IDS) {
   const cond = HEXES[id].selfCond;
   if (cond) TARGET_TESTS[cond] = (t) => t.hexes.some((h) => h.id === id);
@@ -420,7 +420,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
         res.dmg[i] = 0;
       }
     }
-  // Infused Channelling: while channelling, hits of the types the skill is made of do less.
+  // Charged Breath: while channelling, hits of the types the skill is made of do less.
   if (dst.isPlayer && res.outcome !== 'block' && dst.side!.channel?.profile.infuse) {
     const ch = dst.side!.channel.profile;
     const less = ch.infuse!.barrier / 100;
@@ -434,7 +434,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   // Rimeplate: what hits the character is chilled a moment.
   if (dst.isPlayer && src.team !== dst.team && res.outcome === 'hit' && dst.side!.char.frostSpec)
     frostBite(dst.side!, src);
-  // Flesh and Stone in the Sand stance: attacks by enemies that are not near do less.
+  // Stone Stance in the Sand stance: attacks by enemies that are not near do less.
   if (dst.isPlayer && src.team !== dst.team && res.outcome !== 'block' && p.isAttack) {
     const far = stanceFarLess(dst.side!);
     if (far && Math.hypot(src.x - dst.x, src.y - dst.y) > far.radius + src.r) {
@@ -442,7 +442,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       res.total *= 1 - far.less;
     }
   }
-  // Immortal Call: the endurance spent makes the physical part of a hit smaller while the guard stands.
+  // Deathless Call: the endurance spent makes the physical part of a hit smaller while the guard stands.
   const guard = dst.isPlayer ? dst.side!.guard : null;
   if (guard && dst.side!.buffT[guard.buff] > 0 && res.outcome !== 'block') {
     res.total -= res.dmg[0] * (1 - guard.physMult);
@@ -580,7 +580,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (src.def.leechToEs && instant) src.es = Math.min(src.def.maxEs, src.es + ll);
   else addLeech(src, 'life', ll, instant);
   addLeech(src, 'mana', lm, instant);
-  // Energy shield leeched from the damage (Energy Leech).
+  // Energy shield leeched from the damage (Ward Siphon).
   let le = 0;
   if (!dst.def.cannotBeLeechedFrom)
     for (let i = 0; i < 5; i++) le += res.dmg[i] * (p.leechEs[i] ?? 0);
@@ -603,7 +603,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (wasAlive && dst.alive) {
     if (src.isPlayer) {
       rollStatuses(w, dst, p, false, res);
-      // Vulnerability: a chance to be maimed by an attack.
+      // Open Wounds: a chance to be maimed by an attack.
       if (p.isAttack && dst.hex.more.maimHit > 0 && w.rngTrig.chance(dst.hex.more.maimHit))
         applyStatus(w, dst, 'maim', { seconds: 4 });
     }
@@ -737,7 +737,7 @@ function applyAilments(w: World, src: Actor, dst: Actor, res: HitResult, p: Skil
     });
     ail.igniteMax = p.ignite.max;
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'ignite' });
-    // Combustion: an enemy ignited by the skill is weaker to fire for as long as it burns.
+    // Tinderbox: an enemy ignited by the skill is weaker to fire for as long as it burns.
     if (p.igniteResShift > 0)
       applyStatus(w, dst, 'exposedFire', {
         seconds: p.ignite.dur * d.durOnSelf.ignite,
@@ -771,7 +771,7 @@ function applyAilments(w: World, src: Actor, dst: Actor, res: HitResult, p: Skil
       400,
     );
     w.events.push({ t: 'ailment', dst: dst.id, kind: 'poison' });
-    // Herald of Agony: a poison a side's hit put on an enemy (a monster, or the other side's character or minion) gives its side a
+    // Sour Herald: a poison a side's hit put on an enemy (a monster, or the other side's character or minion) gives its side a
     // point of Virulence. (A monster's poison on a minion feeds the side it hunts, as it always has; on a character, nobody.)
     if (src.side ? dst.team !== src.side.team : !dst.isPlayer) {
       const owner = src.side ?? hunted(w, src).side!;
@@ -809,7 +809,7 @@ export function hit(
   // A skill that deals no hit of its own only inflicts its debuff.
   if (src.isPlayer && p.skillDot?.spec.hitless) {
     if (!dst.alive) return;
-    // Bane also puts the curses linked to it on the enemy, and grows with each.
+    // Ruin Ritual also puts the curses linked to it on the enemy, and grows with each.
     const bane = p.skillDot.spec.perCurse;
     if (bane) {
       const linked = src.side!.char.actives.find((x) => x.skill.id === p.skill.id)?.linked ?? [];
@@ -873,7 +873,7 @@ export function hit(
     undefined,
     veiled ? false : (src.side?.critLock ?? undefined),
   );
-  // A hit of Leap Slam always stuns an enemy that was on full life.
+  // A hit of Skyfall Leap always stuns an enemy that was on full life.
   if (p.stunFull > 0 && wasFull && canStun && res.outcome === 'hit' && res.stun < p.stunFull)
     res.stun = p.stunFull;
   applyHit(w, src, dst, p, res);
@@ -995,7 +995,7 @@ function recordImpale(w: World, s: Side, dst: Actor, p: SkillProfile, res: HitRe
 /**
  * Damage of one type that ignores evasion and block (explosions, slams, auras, a minion's blow). `owner` is the side whose damage it
  * is, and is credited with it (its ledger, its `damageDealt`, the kill); it is `null` on purpose for what is nobody's or a
- * monster's (the ground, a drain, a monster's blast) and for damage a side deals to itself (Righteous Fire, a minion's own burn,
+ * monster's (the ground, a drain, a monster's blast) and for damage a side deals to itself (Searing Mantle, a minion's own burn,
  * the share of a hit that a Thorned monster throws back), which no side deals to an enemy.
  */
 export function rawHit(
@@ -1257,7 +1257,7 @@ export function killActor(w: World, a: Actor): void {
   if (!a.isPlayer && a.sdots.length > 0) spreadSkillDots(w, a);
   // A kill on chilling ground may give a charge.
   if (!a.isPlayer && fs.fields.length > 0) fieldKill(w, a);
-  // A charged enemy (Infernal Blow) goes off.
+  // A charged enemy (Cinder Blow) goes off.
   if (fs.charged[a.id]) chargedDeath(w, a);
   // A Venomed enemy that dies poisoned passes the rest of its poison on to those around it.
   if (a.fx.venomed && a.ail.poisons.length > 0) venomBurst(w, a, a.fx.venomed.v, fs);
@@ -1359,7 +1359,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
     ail.chillT -= dt;
     if (ail.chillT <= 0) ail.chill = 0;
   }
-  // Damage over time. Temporal Chains lets effects on a cursed enemy run out more slowly; Vulnerability and Despair raise what they deal.
+  // Damage over time. Leaden Limbs lets effects on a cursed enemy run out more slowly; Open Wounds and Void Curse raise what they deal.
   const taken =
     def.damageTakenMult * shockTaken(def, ail.shock) * (a.isPlayer ? a.side!.damageScale : 1);
   const hm = a.hex.more;
@@ -1410,7 +1410,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   const fromBleed = dotPhys;
   const fromPoison = dotChaos;
   let fromSkills: SkillDot[] | null = null;
-  // Debuffs that skills inflicted: Contagion, Blight, Essence Drain, Decay.
+  // Debuffs that skills inflicted: Creeping Plague, Withering Breath, Sap Bolt, Decay.
   let dotLight = 0;
   let dotCold = 0;
   if (a.sdots.length) {
@@ -1467,7 +1467,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   // Regeneration (a Bursar or the Treasurer near the player stops it, with leech and the recharge of energy shield).
   const cap = lifeCap(a);
   const suppressed = a.suppressT > 0;
-  // A Frost Bomb leaves an enemy regenerating very little.
+  // A Rime Core leaves an enemy regenerating very little.
   const regen = def.lifeRegen * (a.fx.regenLess ? 1 - a.fx.regenLess.v / 100 : 1);
   if (!suppressed && regen > 0) {
     if (def.regenToEs) a.es = Math.min(def.maxEs, a.es + regen * dt);

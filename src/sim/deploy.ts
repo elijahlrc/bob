@@ -26,10 +26,10 @@ import type { Side } from './side';
  * enemy steps close, mines are set off together once enough enemies stand near one. Each uses the character's numbers (a hit from
  * one is the character's skill, fired from where it stands) and lasts a while. The calc sheet counts them as extra uses.
  *
- * What the reference game adds, and is built here: a ballista attacks at half speed; an Ancestral totem is active only while the
- * character is near and gives the character a buff meanwhile; Searing Bond totems cast beams of damage over time at the character and
+ * What the reference game adds, and is built here: a ballista attacks at half speed; a war-cry totem is active only while the
+ * character is near and gives the character a buff meanwhile; Cinder Bond totems cast beams of damage over time at the character and
  * at each other; mines go off in a sequence (Chained Charges: each deals more than the one before) and the aura of a mine adds
- * to the hits against enemies near it (High-Impact: double damage; Pyroclast: fire damage); a Pyroclast mine rains projectiles.
+ * to the hits against enemies near it (Heavy Charge: double damage; Mortar Charge: fire damage); a Mortar Charge mine rains projectiles.
  */
 export type Deployable = {
   id: number;
@@ -579,7 +579,7 @@ export function tickDeployables(w: World, s: Side, dt: number): void {
     const c = choiceByKey(s, d.key);
     let keep = d.t > 0 && !!c;
     if (keep && c && d.kind === 'totem' && c.skill.ancestral) {
-      // An Ancestral totem is active while the character is near and in sight of it, and gives the character its buff.
+      // A war-cry totem is active while the character is near and in sight of it, and gives the character its buff.
       const an = c.skill.ancestral;
       d.active = Math.hypot(d.x - p.x, d.y - p.y) <= an.range && w.grid.los(d.x, d.y, p.x, p.y);
       if (d.active) s.buffT[an.buff] = Math.max(s.buffT[an.buff], 0.3);

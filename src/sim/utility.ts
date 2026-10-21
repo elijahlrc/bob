@@ -157,7 +157,7 @@ function autoPick(
   }
   if (u.kind === 'buff') {
     if (d > CAST_RANGE + 1) return null;
-    // Berserk needs rage to start; Blood Rage is not begun on low life.
+    // Rampage Call needs rage to start; Surge of Blood is not begun on low life.
     if (u.rage && s.rage < u.rage.min) return null;
     if (u.degen && p.life < p.def.maxLife * 0.6) return null;
     const left = s.buffT[u.buff];
@@ -177,7 +177,7 @@ function autoPick(
     return { choice: c, prof, cd: u.cooldown ?? 0.5 };
   }
   if (u.kind === 'shout') {
-    // Cast when a pack or a rare enemy is near, like a rallying cry; a standing channel (Wither) goes on while any enemy is near.
+    // Cast when a pack or a rare enemy is near, like a rallying cry; a standing channel (Rot Touch) goes on while any enemy is near.
     if (u.policy === 'upkeep') {
       if (enemiesNear(w, p.team, p.x, p.y, u.radius).length < 1) return null;
       return { choice: c, prof, cd: u.cooldown };
@@ -216,7 +216,7 @@ function autoPick(
     return { choice: c, prof, cd: summonRespawn(c) };
   }
   // A blink closes the gap to a target the primary skill cannot reach yet; one with an effect where it leaves or lands is also
-  // used when that would fall on a pack, and Withering Step to run through a pack (the character then makes no attack while it lasts).
+  // used when that would fall on a pack, and Rotting Stride to run through a pack (the character then makes no attack while it lasts).
   if (u.kind !== 'blink') return null;
   if (c.skill.cooldown !== undefined && !skillReady(s, c)) return null;
   if (blinkGroupBusy(w, s, c)) return null;
@@ -234,7 +234,7 @@ function autoPick(
   const packHere =
     (u.burst === 'depart' || u.burst === 'both') &&
     enemiesNear(w, p.team, p.x, p.y, radius * 1.3).length >= PACK_SIZE;
-  // Bodyswap goes to a corpse with enemies about it.
+  // Shadow Swap goes to a corpse with enemies about it.
   const corpseGo =
     !!u.corpse &&
     w.corpses.some(
@@ -274,7 +274,7 @@ export function contactRange(_w: World, s: Side): number {
   return r;
 }
 const BURN_EVERY = 0.5;
-/** The character switches a burning aura off below this share of its life, as a player clicks Righteous Fire off, and on again from the second. */
+/** The character switches a burning aura off below this share of its life, as a player clicks Searing Mantle off, and on again from the second. */
 export const BURN_OFF_BELOW = 0.4;
 export const BURN_ON_FROM = 0.75;
 /** The sides whose character has its burning aura switched off just now (each its own: two characters of a world switch on their own life). */
@@ -311,7 +311,7 @@ export function tickAuraBurn(w: World, s: Side, dt: number): void {
   if (b.self > 0) {
     const was = s.opts.godMode;
     s.opts.godMode = true;
-    rawHit(w, p, (b.self / 100) * p.def.maxLife * BURN_EVERY, 3, null, 'Righteous Fire');
+    rawHit(w, p, (b.self / 100) * p.def.maxLife * BURN_EVERY, 3, null, 'Searing Mantle');
     s.opts.godMode = was;
     p.life = Math.max(1, p.life);
   }
@@ -350,7 +350,7 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
   }
   if (u.kind === 'buff') {
     const before = a.side!.buffT[u.buff];
-    // Berserk lasts as long as the rage does, and its cooldown waits for the end.
+    // Rampage Call lasts as long as the rage does, and its cooldown waits for the end.
     if (u.rage) {
       a.side!.berserkT = 0.001;
       a.side!.buffT[u.buff] = 1e9;

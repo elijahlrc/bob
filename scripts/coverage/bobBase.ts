@@ -1,7 +1,7 @@
 /**
  * Picks the Bob item base for a reference unique: the base the game has for that very reference base (every droppable
  * reference base has one, under the name reference/coverage/base-names.json gives it). A reference base the game does not take on
- * (the Demigod bases, a quest sword, a league belt or ring) falls back to the base of the same class, type and nearest
+ * (the special bases, a quest sword, a league belt or ring) falls back to the base of the same class, type and nearest
  * level.
  */
 import { readFileSync } from 'node:fs';
@@ -62,7 +62,7 @@ const SLOT_PREFIX: Record<string, string> = {
 function defType(b: RefBase): string {
   const t =
     (b.armour > 0 ? 'ar' : '') + (b.evasion > 0 ? 'ev' : '') + (b.energyShield > 0 ? 'es' : '');
-  // A three-way base (Sacrificial Garb) and a base with no defences (the Demigod set) sit with the armour-and-evasion ones.
+  // A three-way base and a base with no defences (a special set) sit with the armour-and-evasion ones.
   return t === '' || t === 'arevees' ? (t === '' ? 'ar' : 'arev') : t;
 }
 

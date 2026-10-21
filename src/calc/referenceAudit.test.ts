@@ -210,7 +210,7 @@ describe('reference audit: dual wielding and characters', () => {
     expect(d.esRecharge / d.maxEs).toBeCloseTo(0.2);
   });
 
-  it('chaos inoculation keeps the stun threshold of the life it replaces', () => {
+  it('Hollow Vessel keeps the stun threshold of the life it replaces', () => {
     const b = build(false);
     const normal = new Character(b, { areaLevel: 30 }).defence();
     // Items are never edited in place (what an item gives is remembered by object): equip an edited copy.

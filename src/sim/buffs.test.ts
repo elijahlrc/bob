@@ -44,7 +44,7 @@ describe('buffs: conditions with timers (C2)', () => {
     expect(w.sides[0].char.buffSource.fortify).toBe(false);
   });
 
-  it('Fortify: 20% less damage from hits for 4 seconds, and none from damage over time', () => {
+  it('Fortified: 20% less damage from hits for 4 seconds, and none from damage over time', () => {
     const { w, p } = arena([mod('buffOn.hit.fortify', 'base', 100)]);
     expect(w.sides[0].char.buffSource.fortify).toBe(true);
     const plain = p.def.hitTakenMult;

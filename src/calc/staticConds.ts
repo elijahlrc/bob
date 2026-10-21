@@ -1,6 +1,6 @@
 import type { CondId, SkillTag } from '../mods/types';
 
-/** Conditions that hold while an aura gem is active, and the gem each needs ("while affected by Herald of Ice"). */
+/** Conditions that hold while an aura gem is active, and the gem each needs ("while affected by Rime Herald"). */
 export const AURA_CONDS: [CondId, string][] = [
   ['heraldAsh', 'cinderHerald'],
   ['heraldIce', 'rimeHerald'],

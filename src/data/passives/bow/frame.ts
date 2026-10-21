@@ -3,7 +3,7 @@
  * radial (30 degrees), `side` across it, positive toward the Reaver (south) and negative toward the Shade (north).
  * Writing the region this way keeps every "north of the road" and "farther out" decision readable in the file.
  *
- * The geometry follows the reference's tree as seen (its live tree, Ranger start, 2026-10-19): clusters are compact
+ * The geometry follows the reference's tree as seen (its live tree, dexterity start, 2026-10-19): clusters are compact
  * orbits whose nodes sit a third of the distance between clusters apart; roads are long straight runs that turn at a
  * junction node; the big clusters are closed rings with the notables on the rim; a pocket's entrance faces the junction it
  * hangs off. Nothing is copied from it: the clusters, lines and links are this game's.

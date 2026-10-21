@@ -43,7 +43,7 @@ export type Minion = Actor & {
   /** A Skitterbot: the aura it carries, and the seconds before it may set off a trap or mine again. */
   bot?: { kind: 'chill' | 'shock'; v: number; radius: number };
   botCd?: number;
-  /** Meat Shield: it stays near the character, goes for the enemies near it, and hits those harder. */
+  /** Warding Pack: it stays near the character, goes for the enemies near it, and hits those harder. */
   defensive?: boolean;
   nearMore?: number;
   /** A golem: the added physical damage it gives the other minions, and how much harder it hits for each of them near. */
@@ -230,7 +230,7 @@ export function raiseSpectre(
   });
 }
 
-/** One minion put down at a spot (the clone a Blink Arrow leaves where the character stood). */
+/** One minion put down at a spot (the clone a Shadow Quiver leaves where the character stood). */
 export function summonAt(
   w: World,
   s: Side,
@@ -246,7 +246,7 @@ export function summonAt(
 
 /**
  * A clone of the character fights with the character's weapon: its blows are the weapon's damage (flat parts and all), at the
- * weapon's speed, and a share more (Mirror Arrow, Blink Arrow: 75% more).
+ * weapon's speed, and a share more (Mirror Quiver, Shadow Quiver: 75% more).
  */
 export function cloneOfPlayer(m: Minion, morePct: number): void {
   const hand = m.side!.char.hands[0];

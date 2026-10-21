@@ -213,11 +213,11 @@ function deployKind(own: readonly string[], all: ReadonlySet<string>): DeployKin
   return undefined;
 }
 
-/** The Blasphemy support on a curse skill, if there is one: the curse is a standing aura, not a cast. */
-export function blasphemyOf(c: SkillChoice): { reservePct: number } | undefined {
+/** The Standing Curse support on a curse skill, if there is one: the curse is a standing aura, not a cast. */
+export function curseAuraOf(c: SkillChoice): { reservePct: number } | undefined {
   if (c.skill.utility?.kind !== 'curse') return undefined;
   for (const s of c.supports) {
-    const b = (s.def as SupportGemDef).blasphemy;
+    const b = (s.def as SupportGemDef).curseAura;
     if (b) return b;
   }
   return undefined;
@@ -250,7 +250,7 @@ export type SkillChoice = {
   triggered?: boolean;
   /** The skill is put on the ground as a totem, brand, trap or mine (a support or the gem itself makes it so). */
   deploy?: DeployKind;
-  /** The curses linked to a skill that applies them (Bane): the gems of the same item. */
+  /** The curses linked to a skill that applies them (Ruin Ritual): the gems of the same item. */
   linked?: PlayerHex[];
 };
 
@@ -410,7 +410,7 @@ export class Character {
   readonly auras: AuraState[] = [];
   readonly reservedMana: number = 0;
   readonly reservedLife: number = 0;
-  /** Rimeplate and Herald of Agony, when their auras stand. */
+  /** Rimeplate and Sour Herald, when their auras stand. */
   frostSpec: { seconds: number; slow: number; trail: number; radius: number } | null = null;
   agonySpec: { max: number; dmgPer: number; atkPer: number; level: number } | null = null;
   readonly actives: SkillChoice[] = [];
@@ -423,7 +423,7 @@ export class Character {
   readonly hexes: PlayerHex[] = [];
   /** How many of the hexes of the character a target holds at once. */
   hexLimit = BASE_HEX_LIMIT;
-  /** A burning aura (Righteous Fire's analog): fire damage to enemies near, and to the character, as a percent of maximum life a second. */
+  /** A burning aura (Searing Mantle): fire damage to enemies near, and to the character, as a percent of maximum life a second. */
   readonly burn: { pct: number; self: number } = { pct: 0, self: 0 };
   /** The utility skills (curses, buffs, warcries, blinks) the character casts by policy, not as damage. */
   readonly utilities: SkillChoice[] = [];
@@ -661,8 +661,8 @@ export class Character {
         if (gd?.kind === 'active' && gd.hitBuff) utilBuffs.add(gd.hitBuff.buff);
         if (gd?.kind === 'active' && gd.utility?.kind === 'blink' && gd.utility.escape)
           utilBuffs.add(gd.utility.escape.buff);
-        if (gd?.kind === 'active' && gd.bladestorm) {
-          for (const id of [gd.bladestorm.blood, gd.bladestorm.sand]) {
+        if (gd?.kind === 'active' && gd.stanceStorm) {
+          for (const id of [gd.stanceStorm.blood, gd.stanceStorm.sand]) {
             utilBuffs.add(id);
             if (!buffIdsGranted.has(id)) this.briefBuffs.add(id);
           }
@@ -677,7 +677,7 @@ export class Character {
             if (!buffIdsGranted.has(pb)) this.briefBuffs.add(pb);
           }
         }
-        // Punishment: a melee hit on the cursed enemy grants a buff.
+        // Penance: a melee hit on the cursed enemy grants a buff.
         if (gd?.kind === 'active' && gd.utility?.kind === 'curse') {
           const mb = HEXES[gd.utility.hex].meleeBuff;
           if (mb) utilBuffs.add(mb);
@@ -950,7 +950,7 @@ export class Character {
     for (const a of starred.gemUid === null ? this.actives : [starred, ...this.actives]) {
       if (!a.usable || a.triggered || a.gemUid === null || casting.has(a.skill.id)) continue;
       casting.add(a.skill.id);
-      if (a !== starred && (blasphemyOf(a) || this.hexTouched.has(a.gemUid))) continue;
+      if (a !== starred && (curseAuraOf(a) || this.hexTouched.has(a.gemUid))) continue;
       cast.push(a);
     }
     // The strategy (the Strategy tab): each skill's role, and the order the character considers them in.
@@ -990,9 +990,9 @@ export class Character {
     let reservedMana = 0;
     let reservedLife = 0;
     const auraEffect = db0.mult('auraEffect', ctx0);
-    // A curse under Blasphemy stands as an aura that reserves mana.
+    // A curse under Standing Curse stands as an aura that reserves mana.
     for (const a of this.actives) {
-      const b = blasphemyOf(a);
+      const b = curseAuraOf(a);
       if (a.usable && b)
         reservedMana += Math.ceil((b.reservePct / 100) * pre.maxMana * (1 - Math.min(0.95, red)));
     }
@@ -1072,7 +1072,7 @@ export class Character {
           }),
         );
     }
-    // A skill whose hit gives the character a buff (Smite): the buff's mods are the gem's, by level, and hold while the buff lasts.
+    // A skill whose hit gives the character a buff (Thunder Rebuke): the buff's mods are the gem's, by level, and hold while the buff lasts.
     for (const a of this.actives) {
       const hb = a.usable ? a.skill.hitBuff : undefined;
       if (!hb) continue;
@@ -1333,7 +1333,7 @@ export class Character {
         }
     for (const a of this.actives) {
       const u = a.skill.utility;
-      if (a.usable && u?.kind === 'curse' && blasphemyOf(a))
+      if (a.usable && u?.kind === 'curse' && curseAuraOf(a))
         out.push({ id: u.hex, level: a.skill.level, effect: 0 });
     }
     for (const id of ALL_HEX_IDS) {
@@ -1348,7 +1348,7 @@ export class Character {
   }
 
   /**
-   * A skill that applies the curses linked to it (Bane) takes the curse gems of its own item; they are then applied by it and
+   * A skill that applies the curses linked to it (Ruin Ritual) takes the curse gems of its own item; they are then applied by it and
    * not cast on their own.
    */
   private linkCurses(db: ModDB, ctx: ModCtx): void {
@@ -1444,13 +1444,13 @@ export class Character {
     plain = false,
   ): SkillProfile {
     let c = maskAnd(conds, this.cond.all);
-    // A skill whose hit gives a buff (Smite), or that stands in its own storm (Bladestorm), has the buff while it is used again and
+    // A skill whose hit gives a buff (Thunder Rebuke), or that stands in its own storm (Whirlwind Cleave), has the buff while it is used again and
     // again. That is the sheet's assumption, as it is for charges: the sim passes the charges it holds, and keeps its own buffs.
     if (
       !plain &&
       !this.config.charges &&
       !choice.triggered &&
-      (choice.skill.hitBuff || choice.skill.bladestorm)
+      (choice.skill.hitBuff || choice.skill.stanceStorm)
     )
       for (const id of ownBuffs(
         this.profile(choice, c, flaskMask, true),
@@ -1463,7 +1463,7 @@ export class Character {
     const supportMods: Mod[] = [];
     for (const s of choice.supports)
       supportMods.push(...gemMods((s.def as SupportGemDef).mods, s.level, s.def.id));
-    // A support can give a skill the strength bonus of a keystone: Iron Grip for physical projectile attacks, Iron Will for spells.
+    // A support can give a skill the strength bonus of a keystone: Firm Hold for physical projectile attacks, Steel Resolve for spells.
     if (supportMods.some((m) => m.stat === 'ironGrip'))
       supportMods.push(
         mod('damage', 'inc', this.attrs.str * STR_MELEE_PHYS_INC, {
@@ -1602,7 +1602,7 @@ export class Character {
     // A totem or brand shoots on its own, whatever the character does; traps and mines go off several at a time.
     const deployN = choice.deploy ? p.deployCount : 1;
     const standing = choice.deploy === 'totem' || choice.deploy === 'brand';
-    // The mines laid together give the hits near them a chance to deal double damage (High-Impact Mine).
+    // The mines laid together give the hits near them a chance to deal double damage (Heavy Charge).
     if (choice.deploy === 'mine' && p.mineDouble > 0)
       p = { ...p, doubleChance: Math.min(1, p.doubleChance + (p.mineDouble * deployN) / 100) };
     // A skill with a cooldown of its own is used as often as the cooldown (and the charges that skip it) allow; the weapon fills the rest.
@@ -2450,7 +2450,7 @@ export class Character {
  * How many hits of a projectile skill's one use land on a single target. The projectiles of a use cannot hit the same enemy
  * twice (in the reference game), so it is one, unless they are fired in sequence (all of them), or the skill is flagged to shotgun (those that
  * fly within the target's width at its distance); a cone burst with each shot is one more. What a strike sends out after it, a
- * Tornado Shot's scatter and an orb's bounces are counted in `afterHit.ts`; `hitChance` is the chance a hit lands (for the first).
+ * Whirl Shot's scatter and an orb's bounces are counted in `afterHit.ts`; `hitChance` is the chance a hit lands (for the first).
  */
 export function volleyHits(p: SkillProfile, distance: number, hitChance = 1): number {
   const scatter = tornadoHits(p);
@@ -2511,9 +2511,9 @@ export function channelMult(
     return total / c.cap;
   }
   const per = (c.perStage ?? 0) / 100;
-  // A use may hit for a share of the skill's hit (Divine Ire's zaps while it builds).
+  // A use may hit for a share of the skill's hit (Judgement Tempest's zaps while it builds).
   const tick = (c.tickMult ?? 100) / 100;
-  // A channel with nothing to release, or one that is held (Cyclone, Incinerate), stays at its cap: over a fight it is the full
+  // A channel with nothing to release, or one that is held (Twister Blade, Blaze Stream), stays at its cap: over a fight it is the full
   // hit, the weak first one and the last wave aside.
   if (c.tick && (!c.release || c.hold)) return tick * (1 + per * c.cap);
   let total = 0;

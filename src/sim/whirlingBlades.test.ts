@@ -49,7 +49,7 @@ function hitsOn(w: World, actors: Actor[], seconds: number): number[] {
   return n;
 }
 
-describe('Spinning Dash (Whirling Blades)', () => {
+describe('Spinning Dash', () => {
   it('is a spin that takes time: the character runs, it does not blink', () => {
     const { w } = arena(['spinningDash'], 8);
     const x0 = w.sides[0].player.x;

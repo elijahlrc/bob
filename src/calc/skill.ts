@@ -138,29 +138,29 @@ export type SkillProfile = {
   ignite: AilmentSpec & { max: number; speed: number };
   bleed: AilmentSpec & { speed: number };
   poison: AilmentSpec & { speed: number };
-  /** Percent off the fire resistance of an enemy that the skill ignites (Combustion). */
+  /** Percent off the fire resistance of an enemy that the skill ignites (Tinderbox). */
   igniteResShift: number;
-  /** Percent more melee damage at point blank, falling to none at five tiles (Close Combat). */
+  /** Percent more melee damage at point blank, falling to none at five tiles (Knife Range). */
   closeCombat: number;
   /** Every third use is a Ruthless Blow: percent more melee and bleed damage, and a stun of this many seconds. */
   ruthless: { more: number; bleed: number; stun: number } | null;
-  /** The strike also hits this many other enemies near it at once (Ancestral Call). */
+  /** The strike also hits this many other enemies near it at once (Echoing Blow). */
   extraTargets: number;
-  /** A spell also lands on the ground before and behind the target (Spell Cascade). */
+  /** A spell also lands on the ground before and behind the target (Flanking Cast). */
   cascade: boolean;
-  /** Melee repeats go to random enemies, each with more damage than the one before, and share one critical roll (Multistrike). */
+  /** Melee repeats go to random enemies, each with more damage than the one before, and share one critical roll (Triple Cadence). */
   multistrike: { ramp: number } | null;
-  /** Each cast builds a stack: percent more area damage and less area for each (Intensify). */
+  /** Each cast builds a stack: percent more area damage and less area for each (Swelling Blast). */
   intensify: { more: number; area: number; max: number } | null;
-  /** The spell gains a seal while idle, and a cast spends them as repeats at this much less damage (Unleash). */
+  /** The spell gains a seal while idle, and a cast spends them as repeats at this much less damage (Double Release). */
   unleash: { every: number; less: number } | null;
-  /** A hit calls a mirage archer for some seconds that uses the skill at less damage and speed (Mirage Archer). */
+  /** A hit calls a mirage archer for some seconds that uses the skill at less damage and speed (Twin Shadow). */
   mirage: { less: number; slow: number; seconds: number } | null;
-  /** A melee hit triggers a shockwave of so much of the base attack damage, with its own cooldown (Shockwave). */
+  /** A melee hit triggers a shockwave of so much of the base attack damage, with its own cooldown (Shattering Blows). */
   shockwave: { mult: number; cooldown: number } | null;
-  /** Seconds of stun a hit gives an enemy on full life, always (Leap Slam); 0 for none. */
+  /** Seconds of stun a hit gives an enemy on full life, always (Skyfall Leap); 0 for none. */
   stunFull: number;
-  /** Mana the supported skills must spend for Arcane Surge, and 0 for a support that does not count it. */
+  /** Mana the supported skills must spend for Arcane Tide, and 0 for a support that does not count it. */
   surgeThreshold: number;
   /** The skill's cooldown recovery speed, with its supports'. */
   cooldownRecovery: number;
@@ -172,9 +172,9 @@ export type SkillProfile = {
   freezeThird: number;
   /** A frozen enemy on less than a third of its life is shattered by a hit. */
   shatter: boolean;
-  /** Infused Channelling: seconds of channelling before the Infusion, and the percent less damage taken from matching hits while channelling. */
+  /** Charged Breath: seconds of channelling before the Infusion, and the percent less damage taken from matching hits while channelling. */
   infuse: { after: number; barrier: number } | null;
-  /** The minions of the skill stay near the character and do more damage to the enemies near it (Meat Shield). */
+  /** The minions of the skill stay near the character and do more damage to the enemies near it (Warding Pack). */
   minionDefensive: boolean;
   minionNearMore: number;
   /** The mana the supported skills may spend before the Inspiration charges are lost (0: none). */
@@ -186,15 +186,15 @@ export type SkillProfile = {
   /** Damage over time the skill inflicts as a debuff of its own, and Decay's flat damage over time on every hit. */
   skillDot: SkillDotProfile | null;
   decay: { dps: number; seconds: number } | null;
-  /** More damage with hits for each poison on the target, in percent, up to this many poisons (Vile Toxins). */
+  /** More damage with hits for each poison on the target, in percent, up to this many poisons (Foul Brew). */
   perPoison: { per: number; max: number } | null;
   /** The tiles around an afflicted enemy to which its ignite, and its other elemental ailments, spread. */
   spreadAil: { ignite: number; ele: number };
-  /** Seconds a support makes what the skill puts down stand (Blastchain and High-Impact Mine: five). */
+  /** Seconds a support makes what the skill puts down stand (Blastchain and Heavy Charge: five). */
   deploySeconds: number;
   /** Percent more damage for each mine that has gone off before in the sequence (Chained Charges). */
   mineChain: number;
-  /** The percent chance to deal double damage that each mine adds to hits against enemies near it (High-Impact Mine). */
+  /** The percent chance to deal double damage that each mine adds to hits against enemies near it (Heavy Charge). */
   mineDouble: number;
   /** Chance (fraction) that a hit deals double damage. */
   doubleChance: number;
@@ -441,7 +441,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     const ailTags = (tag: SkillTag) =>
       maskOr(maskOr(DOT_TAGS, tagBit(tag)), maskAnd(tags, AILMENT_KEYWORDS));
     // "Damage over Time Multiplier": added to the ailment's damage as a share of it.
-    // Melee Physical Damage also makes the bleed and poison of melee hits stronger (they take no melee tag of their own).
+    // Brute Force also makes the bleed and poison of melee hits stronger (they take no melee tag of their own).
     const meleeAilments =
       baseTags & tagBit('melee') ? 1 + db.sum('base', 'meleeAilmentMore', baseCtx) / 100 : 1;
     const ak = (tag: SkillTag, anc: number) => {
@@ -851,7 +851,7 @@ export function formedProfile(p: SkillProfile): SkillProfile {
 export function distanceMult(p: SkillProfile, d: number): number {
   let m = 1;
   const b = p.skill.behaviour;
-  // Close Combat: the melee damage is higher near the character, and none higher at five tiles.
+  // Knife Range: the melee damage is higher near the character, and none higher at five tiles.
   if (p.closeCombat > 0 && p.skill.tags.includes('melee'))
     m *= 1 + (p.closeCombat / 100) * clamp((5.3 - d) / 3.3, 0, 1);
   // More damage the farther the shot has flown or the charge has run.

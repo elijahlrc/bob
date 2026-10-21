@@ -190,7 +190,7 @@ function findTarget(w: World, s: Side): Actor | null {
 /** The character's choice of target now (for tests). */
 export const findTargetForTest = (w: World, s: Side): Actor | null => findTarget(w, s);
 
-/** A debuff that is renewed, not stacked, is cast again when it is about to end, not while it holds (Contagion). */
+/** A debuff that is renewed, not stacked, is cast again when it is about to end, not while it holds (Creeping Plague). */
 function alreadyAfflicted(p: SkillProfile, target: Actor): boolean {
   const sd = p.skillDot;
   if (!sd || sd.spec.stack !== 'refresh' || !sd.spec.hitless) return false;
@@ -505,7 +505,7 @@ export function playerAI(w: World, s: Side, dt: number): void {
     target = findTarget(w, s) ?? undefined;
   }
   if (target && target.id === ai.skipId && w.t < ai.skipUntil) target = undefined;
-  // Withering Step and Phase Run are run in: no attack until they are over (a skill used would end them).
+  // Rotting Stride and Slipstream Run are run in: no attack until they are over (a skill used would end them).
   if (target && running(s)) target = undefined;
   if (target) {
     // Stall breaker: a target that takes no damage for a long time is dropped for a while, so the
@@ -592,7 +592,7 @@ export function playerAI(w: World, s: Side, dt: number): void {
   ai.targetId = 0;
 
   // A duel is for the other character: with nothing to hit (it is phased out, or out of sight, or this character is running in
-  // Phase Run) walk toward it, so that the distance closes rather than stands; no loot, no exit, no waypoints (docs/DUEL.md 3.4).
+  // Slipstream Run) walk toward it, so that the distance closes rather than stands; no loot, no exit, no waypoints (docs/DUEL.md 3.4).
   if (duel) {
     ai.mode = 'engage';
     let foe: Actor | null = null;
@@ -875,7 +875,7 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
     m.noticeT -= dt;
     if (m.noticeT <= 0) {
       m.noticeT = 0.25;
-      // Phase Run halves how far the character is noticed from.
+      // Slipstream Run halves how far the character is noticed from.
       const seen =
         (senseOf(m).aggro ?? MONSTER_AGGRO) * (hunted(w, m).side!.buffT.phaseRun > 0 ? 0.5 : 1);
       if (d <= seen && w.grid.los(m.x, m.y, p.x, p.y)) {
@@ -1055,7 +1055,7 @@ export function separate(w: World): void {
         }
       }
     }
-    // Character vs monster: the monster yields most of the overlap; under Phase Run the character passes through.
+    // Character vs monster: the monster yields most of the overlap; under Slipstream Run the character passes through.
     for (const s of w.sides) {
       if (s.buffT.phaseRun > 0) continue;
       const p = s.player;
@@ -1101,7 +1101,7 @@ function pushApart(w: World, a: Actor, b: Actor): void {
 
 /**
  * The characters of different sides are bodies too: each gives way half of what they overlap by (a melee blow reaches its
- * range plus both radii, so two characters standing in each other would be in reach of anything). Under Phase Run a character
+ * range plus both radii, so two characters standing in each other would be in reach of anything). Under Slipstream Run a character
  * passes through.
  */
 function separateSides(w: World): void {

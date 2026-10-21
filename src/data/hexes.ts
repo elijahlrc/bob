@@ -58,7 +58,7 @@ export type HexFx = {
   dmg?: boolean;
   /** Reduced action and movement speed. */
   speed?: boolean;
-  /** The share of the effect that rare and unique enemies take (Enfeeble and Temporal Chains: half). */
+  /** The share of the effect that rare and unique enemies take (Feeble Grip and Leaden Limbs: half). */
   rarityShare?: number;
   /** Increased physical damage over time taken, as a multiple of the effect. */
   dotPhys?: number;
@@ -117,7 +117,7 @@ export type HexDef = {
   selfCond?: CondId;
   /** What the character gets when it kills an enemy under this hex. */
   onKill?: HexKill;
-  /** A melee hit against an enemy under this hex grants the character this buff (Punishment). */
+  /** A melee hit against an enemy under this hex grants the character this buff (Penance). */
   meleeBuff?: BuffId;
   /** Recovery on each attack hit against an enemy under this hex. */
   onHit?: { life?: [number, number]; mana?: [number, number] };

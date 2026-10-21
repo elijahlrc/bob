@@ -72,7 +72,7 @@ describe('consecrated ground (blessedTrail)', () => {
   });
 });
 
-describe('Cold Snap (suddenFrost): chilled ground', () => {
+describe('Sudden Frost (suddenFrost): chilled ground', () => {
   it('leaves ground that grows and hurts, and a kill on it may give a Fervour charge', () => {
     const { world, dummy } = createDummyWorld(holding('wand_3', ['suddenFrost'], 'mystic'), {
       distance: 3,
@@ -116,7 +116,7 @@ describe('Cold Snap (suddenFrost): chilled ground', () => {
   });
 });
 
-describe('Earthquake (faultline): the aftershock', () => {
+describe('Faultline (faultline): the aftershock', () => {
   it('hits again a moment later, harder', () => {
     const { world, dummy } = createDummyWorld(holding('mace_3', ['faultline']), {
       distance: 1.4,
@@ -135,7 +135,7 @@ describe('Earthquake (faultline): the aftershock', () => {
   });
 });
 
-describe('Tectonic Slam (magmaCrack): a charge now and then', () => {
+describe('Magma Crack (magmaCrack): a charge now and then', () => {
   it('spends a Grit charge on some of its uses', () => {
     const { world } = createDummyWorld(holding('mace_3', ['magmaCrack']), {
       distance: 1.4,
@@ -158,7 +158,7 @@ describe('Tectonic Slam (magmaCrack): a charge now and then', () => {
   });
 });
 
-describe('Frost Wall (glacierWall)', () => {
+describe('Glacier Wall (glacierWall)', () => {
   it('shuts tiles for a few seconds and opens them again', () => {
     const { world } = createDummyWorld(holding('wand_3', ['glacierWall'], 'mystic'), {
       distance: 3,
@@ -181,7 +181,7 @@ describe('Frost Wall (glacierWall)', () => {
   });
 });
 
-describe('Frost Wall: what the raising hits', () => {
+describe('Glacier Wall: what the raising hits', () => {
   it('hurts what stands along the blocks, and not what stands beside them', () => {
     const { world, dummy } = createDummyWorld(holding('wand_3', ['glacierWall'], 'mystic'), {
       distance: 3,
@@ -223,7 +223,7 @@ describe('Frost Wall: what the raising hits', () => {
   });
 });
 
-describe('Frost Bomb (rimeCore)', () => {
+describe('Rime Core (rimeCore)', () => {
   it('exposes what is near it, then bursts when its time is up', () => {
     const { world, dummy } = createDummyWorld(holding('wand_3', ['rimeCore'], 'mystic'), {
       distance: 3,
@@ -246,7 +246,7 @@ describe('Frost Bomb (rimeCore)', () => {
   });
 });
 
-describe('Righteous Fire (searingMantle)', () => {
+describe('Searing Mantle (searingMantle)', () => {
   it('burns the character through its fire resistance and never to death', () => {
     const b = holding('sword_3', ['crushingBlow'], 'vanguard', ['searingMantle']);
     const { world } = createDummyWorld(b, { distance: 9, maxTime: 60 });
@@ -260,7 +260,7 @@ describe('Righteous Fire (searingMantle)', () => {
   });
 });
 
-describe('Herald of Thunder (stormHerald)', () => {
+describe('Storm Herald (stormHerald)', () => {
   it('calls bolts down on the enemies around when a shocked enemy is killed', () => {
     const b = holding('sword_3', ['crushingBlow'], 'vanguard', ['stormHerald']);
     const { world, dummy } = createDummyWorld(b, { distance: 1.4, maxTime: 60 });
@@ -371,7 +371,7 @@ describe('banners (standardOfValour, standardOfDread)', () => {
     expect(world.sides[0].buffT.warBanner).toBe(0);
   });
 
-  it('the dread banner takes its stages from impales, five a second at most, and unnerves enemies', () => {
+  it('the Standard of Dread takes its stages from impales, five a second at most, and unnerves enemies', () => {
     const { world, dummy } = carried('standardOfDread');
     const b = world.sides[0].banner!;
     for (let i = 0; i < 12; i++) bannerStage(world, world.sides[0], 'impale');
@@ -386,7 +386,7 @@ describe('banners (standardOfValour, standardOfDread)', () => {
   });
 });
 
-describe('Winter Orb (hoarfrostMote)', () => {
+describe('Hoarfrost Mote (hoarfrostMote)', () => {
   const orbWorld = () => {
     const run = createDummyWorld(holding('wand_3', ['hoarfrostMote'], 'mystic'), {
       distance: 4,
@@ -429,7 +429,7 @@ describe('Winter Orb (hoarfrostMote)', () => {
   });
 });
 
-describe('Storm Burst (brimstoneStorm)', () => {
+describe('Thunder Spiral (brimstoneStorm)', () => {
   const stormWorld = () => {
     const run = createDummyWorld(holding('wand_3', ['brimstoneStorm'], 'mystic'), {
       distance: 4,

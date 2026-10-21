@@ -66,7 +66,7 @@ describe('strength and weapons (firmHold, steelResolve, knifeRange, veilCut, sha
     expect(bad.sides[0].char.primary.skill.id).not.toBe('crushingBlow');
   });
 
-  it('Close Combat: more melee damage near, none at five tiles', () => {
+  it('Knife Range: more melee damage near, none at five tiles', () => {
     const p = profile(['crushingBlow', 'knifeRange'], 'sword_3', STR);
     expect(p.closeCombat).toBeGreaterThan(0);
     expect(distanceMult(p, 1.5)).toBeCloseTo(1 + p.closeCombat / 100, 5);
@@ -76,13 +76,13 @@ describe('strength and weapons (firmHold, steelResolve, knifeRange, veilCut, sha
     expect(mid).toBeLessThan(1 + p.closeCombat / 100);
   });
 
-  it('a hit with Close Combat gives Combat Rush', () => {
+  it('a hit with Knife Range gives Combat Rush', () => {
     const { world: w } = world(['crushingBlow', 'knifeRange'], 1.4, 'sword_3', STR);
     run(w, 3);
     expect(w.sides[0].buffT.combatRush).toBeGreaterThan(0);
   });
 
-  it('Shockwave: a melee hit sets off a shockwave on the others around, one a second', () => {
+  it('Shattering Blows: a melee hit sets off a shockwave on the others around, one a second', () => {
     const { world: w, dummy } = world(['crushingBlow', 'shatteringBlows'], 1.4, 'mace_3', STR);
     const near = neighbour(w, dummy.x + 1.2, dummy.y);
     let bursts = 0;
@@ -96,7 +96,7 @@ describe('strength and weapons (firmHold, steelResolve, knifeRange, veilCut, sha
     expect(bursts).toBeGreaterThanOrEqual(2);
   });
 
-  it('Nightblade: a critical strike makes the character Elusive, which cannot be renewed while it lasts', () => {
+  it('Veil Cut: a critical strike makes the character Elusive, which cannot be renewed while it lasts', () => {
     const { world: w } = world(['viperLash', 'veilCut'], 4, 'dagger_3', DEX);
     expect(w.sides[0].char.primary.usable).toBe(true);
     let got = false;
@@ -112,7 +112,7 @@ describe('strength and weapons (firmHold, steelResolve, knifeRange, veilCut, sha
   });
 });
 
-describe('Ruthless, Ancestral Call, Multistrike (mercilessCadence, echoingBlow, tripleCadence)', () => {
+describe('Ruthless, Echoing Blow, Triple Cadence (mercilessCadence, echoingBlow, tripleCadence)', () => {
   it('every third use is a Ruthless Blow: much harder and it stuns', () => {
     const { world: w, dummy } = world(['crushingBlow', 'mercilessCadence'], 1.4, 'sword_3', STR);
     const amounts: number[] = [];
@@ -137,7 +137,7 @@ describe('Ruthless, Ancestral Call, Multistrike (mercilessCadence, echoingBlow, 
     expect(stuns).toBeGreaterThanOrEqual(1);
   });
 
-  it('Ancestral Call: the strike also hits two other enemies, and nothing extra without them', () => {
+  it('Echoing Blow: the strike also hits two other enemies, and nothing extra without them', () => {
     const { world: w, dummy } = world(['crushingBlow', 'echoingBlow'], 1.4, 'sword_3', STR);
     const a = neighbour(w, dummy.x + 0.5, dummy.y + 0.9);
     const b = neighbour(w, dummy.x + 0.5, dummy.y - 0.9);
@@ -148,7 +148,7 @@ describe('Ruthless, Ancestral Call, Multistrike (mercilessCadence, echoingBlow, 
     expect(dummy.life).toBeLessThan(1e9);
   });
 
-  it('Multistrike: three strikes, the repeats ramping and going to enemies near', () => {
+  it('Triple Cadence: three strikes, the repeats ramping and going to enemies near', () => {
     const { world: w, dummy } = world(['crushingBlow', 'tripleCadence'], 1.4, 'sword_3', STR);
     const other = neighbour(w, dummy.x + 0.6, dummy.y + 0.8);
     run(w, 6);
@@ -157,8 +157,8 @@ describe('Ruthless, Ancestral Call, Multistrike (mercilessCadence, echoingBlow, 
   });
 });
 
-describe('Spell Cascade, Intensify, Unleash (flankingCast, swellingBlast, doubleRelease)', () => {
-  it('Spell Cascade: the spell lands three times, before and behind its target too', () => {
+describe('Flanking Cast, Swelling Blast, Double Release (flankingCast, swellingBlast, doubleRelease)', () => {
+  it('Flanking Cast: the spell lands three times, before and behind its target too', () => {
     const { world: w } = world(['suddenFrost', 'flankingCast'], 4, 'wand_3', INT);
     const xs: number[] = [];
     for (let i = 0; i < 90 && xs.length < 3; i++) {
@@ -169,7 +169,7 @@ describe('Spell Cascade, Intensify, Unleash (flankingCast, swellingBlast, double
     expect(Math.max(...xs) - Math.min(...xs)).toBeGreaterThan(2);
   });
 
-  it('Intensify: each cast builds a stack, and moving loses it', () => {
+  it('Swelling Blast: each cast builds a stack, and moving loses it', () => {
     const { world: w } = world(['suddenFrost', 'swellingBlast'], 4, 'wand_3', INT);
     run(w, 14);
     const n = w.sides[0].intensity.suddenFrost ?? 0;
@@ -185,7 +185,7 @@ describe('Spell Cascade, Intensify, Unleash (flankingCast, swellingBlast, double
     expect(w.sides[0].intensity.suddenFrost ?? 0).toBe(after);
   });
 
-  it('Unleash: seals gather while the spell rests, up to three, and the next cast spends them as repeats', () => {
+  it('Double Release: seals gather while the spell rests, up to three, and the next cast spends them as repeats', () => {
     const { world: w } = world(['frostLance', 'doubleRelease'], 6, 'wand_3', INT);
     w.sides[0].player.action = null;
     for (let i = 0; i < 4 * 60; i++) tickSupports(w, w.sides[0], 1 / 60);
@@ -196,7 +196,7 @@ describe('Spell Cascade, Intensify, Unleash (flankingCast, swellingBlast, double
   });
 });
 
-describe('Immolate, Combustion (kindle, tinderbox)', () => {
+describe('Kindle, Tinderbox (kindle, tinderbox)', () => {
   it('Kindle adds fire damage only against burning enemies', () => {
     const { world: w, dummy } = world(['suddenFrost', 'kindle'], 3, 'wand_3', INT);
     const cold = w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
@@ -220,7 +220,7 @@ describe('Immolate, Combustion (kindle, tinderbox)', () => {
     expect(fire(k1)).toBeGreaterThan(0);
   });
 
-  it('Combustion: an enemy the skill ignites has less fire resistance while it burns', () => {
+  it('Tinderbox: an enemy the skill ignites has less fire resistance while it burns', () => {
     const { world: w, dummy } = world(['cleansingBlaze', 'tinderbox'], 3, 'wand_3', INT);
     let seen = false;
     for (let i = 0; i < 60 * 20 && !seen; i++) {
@@ -232,8 +232,8 @@ describe('Immolate, Combustion (kindle, tinderbox)', () => {
   });
 });
 
-describe('Energy Leech, Mirage Archer, Inspiration, Infused Channelling', () => {
-  it('Energy Leech: damage dealt comes back as energy shield', () => {
+describe('Ward Siphon, Twin Shadow, Lightheart, Charged Breath', () => {
+  it('Ward Siphon: damage dealt comes back as energy shield', () => {
     const build = buildFor(['crushingBlow', 'wardSiphon'], 'sword_3', STR);
     build.equipment.body!.uniqueMods = [{ stat: 'es', kind: 'base', value: 300 }];
     const r0 = createDummyWorld(build, { distance: 1.4, maxTime: 120 });
@@ -251,7 +251,7 @@ describe('Energy Leech, Mirage Archer, Inspiration, Infused Channelling', () => 
     expect(max).toBeGreaterThan(0);
   });
 
-  it('Mirage Archer: an arrow hit calls one archer that shoots with the skill for a while', () => {
+  it('Twin Shadow: an arrow hit calls one archer that shoots with the skill for a while', () => {
     const { world: w, dummy } = world(['splitVolley', 'twinShadow'], 6, 'bow_3', DEX);
     let called = false;
     let shots = 0;
@@ -277,7 +277,7 @@ describe('Energy Leech, Mirage Archer, Inspiration, Infused Channelling', () => 
     expect(w.sides[0].inspireMana).toBeLessThan(p.inspire);
   });
 
-  it('Infused Channelling: after a while of channelling you are Infused', () => {
+  it('Charged Breath: after a while of channelling you are Infused', () => {
     const { world: w } = world(['flurryOfEdges', 'chargedBreath'], 1.4, 'sword_3', DEX);
     run(w, 3);
     expect(w.sides[0].buffT.infusion).toBeGreaterThan(0);
@@ -309,8 +309,8 @@ describe('durations, ailments and traps (briefBurst, lingeringEffect, freedRot, 
   });
 });
 
-describe('Blasphemy and Meat Shield (standingCurse, wardingPack)', () => {
-  it('a curse under Blasphemy falls on every enemy within its reach, hit or not', () => {
+describe('Standing Curse and Warding Pack (standingCurse, wardingPack)', () => {
+  it('a curse under Standing Curse falls on every enemy within its reach, hit or not', () => {
     const { world: w, dummy } = world(
       ['crushingBlow', 'tinderCurse', 'standingCurse'],
       8,

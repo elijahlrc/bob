@@ -204,7 +204,7 @@ describe('skill effects', () => {
       'zap',
       'trail',
       'ghost',
-      'bladestorm',
+      'stanceStorm',
       'geyser',
       'smoke',
     ];

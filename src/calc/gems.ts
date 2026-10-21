@@ -108,21 +108,21 @@ export type SkillDef = SkillFx & {
   channel?: {
     /** The stages it builds before it is released. */
     cap: number;
-    /** Whether each use hits as it goes (Blade Flurry, Incinerate) or only builds a stage (Flameblast). */
+    /** Whether each use hits as it goes (Flurry of Edges, Blaze Stream) or only builds a stage (Furnace Roar). */
     tick: boolean;
-    /** The damage of a use's own hit as a percentage of the skill's (Divine Ire's zaps while channelling deal half). */
+    /** The damage of a use's own hit as a percentage of the skill's (Judgement Tempest's zaps while channelling deal half). */
     tickMult?: number;
-    /** The channelling character cannot be stunned (Cyclone). */
+    /** The channelling character cannot be stunned (Twister Blade). */
     stunImmune?: boolean;
-    /** Held at the cap instead of released there: it goes on until the fight pauses, and the release (if any) is the last thing it does (Incinerate). */
+    /** Held at the cap instead of released there: it goes on until the fight pauses, and the release (if any) is the last thing it does (Blaze Stream). */
     hold?: boolean;
     /** Percent more damage per stage built, on the hits as it goes. */
     perStage?: number;
-    /** The damage of the first use, as a percentage of the others (Cyclone's first hit deals half). */
+    /** The damage of the first use, as a percentage of the others (Twister Blade's first hit deals half). */
     first?: number;
     /** Percent more area per stage built, on the hits as it goes. */
     tickRadiusPerStage?: number;
-    /** A use also builds an extra stage while this many enemies are within the radius (a crowd charges Divine Ire faster). */
+    /** A use also builds an extra stage while this many enemies are within the radius (a crowd charges Judgement Tempest faster). */
     crowdStage?: { min: number; radius: number };
     /** What the release does: percent more damage in all and per stage, more area per stage, another shape, one strike per stage. */
     release?: {
@@ -134,7 +134,7 @@ export type SkillDef = SkillFx & {
       ignite?: number;
     };
   };
-  /** Arrows that fall around the target and each leave a spore pod: it afflicts and slows what is near, then bursts (Toxic Rain). */
+  /** Arrows that fall around the target and each leave a spore pod: it afflicts and slows what is near, then bursts (Venom Shower). */
   pods?: {
     /** Seconds before a pod bursts, the radius of its cloud and of its burst, and how far from the target the pods land (before more arrows widen it). */
     seconds: number;
@@ -148,7 +148,7 @@ export type SkillDef = SkillFx & {
   /** A debuff of damage over time the skill inflicts (docs/SPIRIT.md S7). */
   dot?: DotSpec;
   burning?: { pct: LevelValue; seconds: number; cap: number };
-  bladestorm?: ActiveGemDef['bladestorm'];
+  stanceStorm?: ActiveGemDef['stanceStorm'];
   needsCorpse?: boolean;
   geyser?: ActiveGemDef['geyser'];
   deploySeconds?: number;
@@ -184,7 +184,7 @@ export type SkillDef = SkillFx & {
     dps?: number;
     killCharge?: { kind: 'grit' | 'fervour' | 'insight'; chance: number };
   };
-  /** A crystal that stands a moment, exposes what is near, and bursts (Frost Bomb). */
+  /** A crystal that stands a moment, exposes what is near, and bursts (Rime Core). */
   crystal?: {
     radius: number;
     seconds: number;
@@ -193,18 +193,18 @@ export type SkillDef = SkillFx & {
     regenLess: number;
     debuffSeconds: number;
   };
-  /** A wall of ice across the way, that holds the tiles shut for a while and pushes what stands there back (Frost Wall). */
+  /** A wall of ice across the way, that holds the tiles shut for a while and pushes what stands there back (Glacier Wall). */
   wall?: { length: number; seconds: number; push: number };
-  /** A second, harder hit a moment after the first, over a larger area (Earthquake). */
+  /** A second, harder hit a moment after the first, over a larger area (Faultline). */
   aftershock?: { delay: number; more: number; radius: number };
-  /** A chance to spend a charge to make the use a Charged Slam (Tectonic Slam). */
+  /** A chance to spend a charge to make the use a Charged Slam (Magma Crack). */
   chargedSlam?: {
     chance: number;
     charge: 'grit' | 'fervour' | 'insight';
     more: number;
     radius: number;
   };
-  /** A skill that grows with use: each use that hits adds a stage (more area), and they fade when it stops hitting (Reave). */
+  /** A skill that grows with use: each use that hits adds a stage (more area), and they fade when it stops hitting (Sweeping Cut). */
   stacks?: { cap: number; areaPer: number; fadeAfter: number };
   afterHit?: {
     kind: 'bolts' | 'blades' | 'balls' | 'area' | 'element';
@@ -339,7 +339,7 @@ function resolveActiveUncached(def: ActiveGemDef, level: number): SkillDef {
     burning: def.burning,
     orb: def.orb,
     form: def.form,
-    bladestorm: def.bladestorm,
+    stanceStorm: def.stanceStorm,
     needsCorpse: def.needsCorpse,
     geyser: def.geyser,
     deploySeconds: def.deploySeconds,

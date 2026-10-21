@@ -33,11 +33,11 @@ export type TriggerEffect =
   | { kind: 'explode'; pctOfMaxLife: number; dtype: DamageType; radius: number }
   /** Kill triggers: the dead enemy's shock or ignite spreads to enemies nearby. */
   | { kind: 'spread'; ailment: 'shock' | 'ignite'; radius: number }
-  /** Give up a share of maximum life to gain that much in another pool (Demon Stitcher analog). */
+  /** Give up a share of maximum life to gain that much in another pool (as Seamripper Gloves do). */
   | { kind: 'sacrifice'; pctOfLife: number; pool: 'es' | 'mana' }
-  /** Kill triggers: the enemies near the corpse burn for a share of the blow's overkill each second (Herald of Ash). */
+  /** Kill triggers: the enemies near the corpse burn for a share of the blow's overkill each second (Cinder Herald). */
   | { kind: 'overkillBurn'; pct: number; seconds: number; radius: number }
-  /** Kill triggers: bolts strike the enemies around the character for a while (Herald of Thunder). */
+  /** Kill triggers: bolts strike the enemies around the character for a while (Storm Herald). */
   | {
       kind: 'storm';
       seconds: number;

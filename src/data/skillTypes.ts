@@ -46,7 +46,7 @@ export type SupportRules = {
   needs?: SkillType[];
   /** The skill must have none of these. */
   excludes?: SkillType[];
-  /** Types the support adds to the skill (Spell Totem makes it a totem). */
+  /** Types the support adds to the skill (Standing Cast makes it a totem). */
   adds?: SkillType[];
 };
 
@@ -83,7 +83,7 @@ export function typesWhy(rules: SupportRules, types: ReadonlySet<SkillType>): st
 }
 
 /**
- * The supports that apply to a skill, and the types the skill ends up with. A support can add types (Spell Totem adds
+ * The supports that apply to a skill, and the types the skill ends up with. A support can add types (Standing Cast adds
  * "totem") that change what the others may do, so this is a greatest fixpoint: start with every candidate applying and
  * drop any whose rules fail against the skill's types plus what the *other* applying supports add, until nothing changes.
  */

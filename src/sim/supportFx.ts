@@ -14,9 +14,9 @@ import type { Side } from './side';
 
 /**
  * What supports do around a use of a skill (docs/SPIRIT.md S13c): a Ruthless Blow every third use, Intensity built by casting, Seals
- * gained while idle and spent by the next cast, the repeats of Multistrike that go to random enemies with one shared critical roll,
+ * gained while idle and spent by the next cast, the repeats of Triple Cadence that go to random enemies with one shared critical roll,
  * the strike that hits more than one enemy, the spell that lands before and behind its target, a mirage archer called by a hit, a
- * shockwave called by a melee hit, and the mana counter of Inspiration.
+ * shockwave called by a melee hit, and the mana counter of Lightheart.
  */
 
 export type Mirage = { key: string; x: number; y: number; t: number; fireT: number };
@@ -72,7 +72,7 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
   }
   // Every third use freezes as though it dealt much more.
   orbAnswers(w, a.side!, p);
-  // The first skill used after a Phase Run ends its speed; the damage stays a moment.
+  // The first skill used after a Slipstream Run ends its speed; the damage stays a moment.
   if (!p.skill.utility)
     for (const c of a.side!.char.utilities) {
       const u = c.skill.utility;
@@ -109,7 +109,7 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
       echoMult = [...(echoMult ?? []), ...Array.from({ length: n }, () => m)];
     }
   }
-  // Arcane Surge: after the supported skills have spent enough mana the character gains it.
+  // Arcane Tide: after the supported skills have spent enough mana the character gains it.
   if (p.surgeThreshold > 0) {
     a.side!.surgeMana += p.cost;
     if (a.side!.surgeMana >= p.surgeThreshold) {
@@ -117,7 +117,7 @@ export function startUse(w: World, a: Actor, p0: SkillProfile): UseStart {
       rollGains(w, a.side!, 'surge', p.gains);
     }
   }
-  // Inspiration: the mana a supported skill spends is counted, and the charges are lost when it passes the limit.
+  // Lightheart: the mana a supported skill spends is counted, and the charges are lost when it passes the limit.
   if (p.inspire > 0) {
     a.side!.inspireMana += p.cost;
     if (a.side!.inspireMana > p.inspire) {
@@ -193,7 +193,7 @@ function mirageShoots(w: World, s: Side, m: Mirage): void {
 
 /** After a hit of the player's lands: a mirage archer is called, a shockwave goes off. */
 export function afterPlayerHit(w: World, s: Side, dst: Actor, p: SkillProfile): void {
-  // A skill whose hit gives the character a buff (Smite).
+  // A skill whose hit gives the character a buff (Thunder Rebuke).
   if (p.skill.hitBuff && !p.skill.tags.includes('triggered')) gainBuff(w, s, p.skill.hitBuff.buff);
   if (p.isAttack && !p.skill.tags.includes('triggered')) relicNova(w, s);
   if (!s.inFx) {
@@ -260,7 +260,7 @@ export function cascadeCast(w: World, a: Actor, act: Action): void {
   }
 }
 
-/** The target of a repeat of Multistrike: a random enemy in reach, or the place where the character is. */
+/** The target of a repeat of Triple Cadence: a random enemy in reach, or the place where the character is. */
 export function repeatTarget(w: World, a: Actor, act: Action): Actor | undefined {
   const p = act.profile;
   if (!p.multistrike || !a.isPlayer) return undefined;

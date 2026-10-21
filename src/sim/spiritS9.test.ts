@@ -6,7 +6,7 @@ import { stanceFarLess, stanceOf } from './stances';
 import type { Actor, World } from './types';
 import { spawnMonster, stepWorld } from './world';
 
-/** Tests of the spirit plan's S9 (docs/SPIRIT.md): stances, rage, Blood Rage and the storms of a stance. */
+/** Tests of the spirit plan's S9 (docs/SPIRIT.md): stances, rage, Surge of Blood and the storms of a stance. */
 
 const STR = classFor('str');
 const DEX = classFor('dex');
@@ -37,7 +37,7 @@ const run = (w: World, seconds: number) => {
   for (let i = 0; i < seconds * 60; i++) stepWorld(w);
 };
 
-describe('stances (Blood and Sand, Flesh and Stone)', () => {
+describe('stances (Dune Stance, Stone Stance)', () => {
   it('start in the Blood stance, hold mana, and swap to the Sand stance when a crowd is near', () => {
     const { world: w, dummy } = world(['whirlwindCleave', 'duneStance']);
     expect(stanceOf(w.sides[0])).toBe('blood');
@@ -51,7 +51,7 @@ describe('stances (Blood and Sand, Flesh and Stone)', () => {
     expect(stanceOf(w.sides[0])).toBe('sand');
   });
 
-  it('Blood and Sand: more area damage over less area, or more area and less damage', () => {
+  it('Dune Stance: more area damage over less area, or more area and less damage', () => {
     const { world: w, dummy } = world(['whirlwindCleave', 'duneStance']);
     const prof = () =>
       w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
@@ -63,7 +63,7 @@ describe('stances (Blood and Sand, Flesh and Stone)', () => {
     expect(sand.radiusMult).toBeGreaterThan(blood.radiusMult);
   });
 
-  it('Flesh and Stone: the Blood stance maims the enemies near, the Sand stance blinds them and softens far attacks', () => {
+  it('Stone Stance: the Blood stance maims the enemies near, the Sand stance blinds them and softens far attacks', () => {
     const { world: w, dummy } = world(['crushingBlow', 'stoneStance']);
     run(w, 1);
     expect(dummy.fx.maim).toBeDefined();
@@ -88,14 +88,14 @@ describe('stances (Blood and Sand, Flesh and Stone)', () => {
   });
 });
 
-describe('Bladestorm (whirlwindCleave)', () => {
+describe('Whirlwind Cleave (whirlwindCleave)', () => {
   it('leaves a storm that hits for a time, half as hard, and gives the character in it a buff of its stance', () => {
     const { world: w } = world(['whirlwindCleave']);
     let storm = false;
     let buff = false;
     for (let i = 0; i < 5 * 60; i++) {
       stepWorld(w);
-      if (w.sides[0].fields.some((f) => f.kind === 'bladestorm')) storm = true;
+      if (w.sides[0].fields.some((f) => f.kind === 'stanceStorm')) storm = true;
       if (w.sides[0].buffT.bladestormBlood > 0) buff = true;
     }
     expect(storm).toBe(true);
@@ -104,7 +104,7 @@ describe('Bladestorm (whirlwindCleave)', () => {
     // It ends by itself.
     w.sides[0].player.stunT = 1e9;
     run(w, 4);
-    expect(w.sides[0].fields.some((f) => f.kind === 'bladestorm')).toBe(false);
+    expect(w.sides[0].fields.some((f) => f.kind === 'stanceStorm')).toBe(false);
   });
 
   it('in the Sand stance the storm drifts and quickens the character instead', () => {
@@ -116,7 +116,7 @@ describe('Bladestorm (whirlwindCleave)', () => {
     let sandBuff = false;
     for (let i = 0; i < 2 * 60; i++) {
       stepWorld(w);
-      const f = w.sides[0].fields.find((x) => x.kind === 'bladestorm');
+      const f = w.sides[0].fields.find((x) => x.kind === 'stanceStorm');
       if (f) {
         first ??= { x: f.x, y: f.y };
         moved = Math.hypot(f.x - first.x, f.y - first.y);
@@ -132,14 +132,14 @@ describe('Bladestorm (whirlwindCleave)', () => {
     let most = 0;
     for (let i = 0; i < 6 * 60; i++) {
       stepWorld(w);
-      most = Math.max(most, w.sides[0].fields.filter((f) => f.kind === 'bladestorm').length);
+      most = Math.max(most, w.sides[0].fields.filter((f) => f.kind === 'stanceStorm').length);
     }
     expect(most).toBeLessThanOrEqual(3);
     expect(most).toBeGreaterThanOrEqual(2);
   });
 });
 
-describe('Berserk (rampage)', () => {
+describe('Rampage Call (rampage)', () => {
   it('waits for rage, lasts as long as the rage does and spends it faster each second', () => {
     const { world: w, dummy } = world(['crushingBlow', 'rampage']);
     dummy.rarity = 'boss';
@@ -185,7 +185,7 @@ describe('Berserk (rampage)', () => {
   });
 });
 
-describe('Blood Rage (bloodSurgeCall)', () => {
+describe('Surge of Blood (bloodSurgeCall)', () => {
   it('costs life each second, a kill renews it, and it may give a charge', () => {
     const { world: w, dummy } = world(['crushingBlow', 'bloodSurgeCall'], 1.5, 'sword_3', DEX);
     dummy.rarity = 'boss';

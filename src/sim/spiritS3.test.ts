@@ -182,7 +182,7 @@ describe('the skills that inflict statuses', () => {
 });
 
 describe('the curses and marks with their reference effects', () => {
-  it('Enfeeble and Temporal Chains take half as much from rare and unique enemies', () => {
+  it('Feeble Grip and Leaden Limbs take half as much from rare and unique enemies', () => {
     const feeble = [{ id: 'feebleGrip' as const, effect: 30 }];
     expect(hexTotals(feeble, 'normal').damageMult).toBeCloseTo(0.7, 6);
     expect(hexTotals(feeble, 'rare').damageMult).toBeCloseTo(0.85, 6);
@@ -191,7 +191,7 @@ describe('the curses and marks with their reference effects', () => {
     expect(hexTotals(chains, 'boss').speedMult).toBeCloseTo(0.855, 6);
   });
 
-  it('effects on a cursed enemy run out more slowly under Temporal Chains', () => {
+  it('effects on a cursed enemy run out more slowly under Leaden Limbs', () => {
     const { world, dummy } = createDummyWorld(holding(['crushingBlow']), { distance: 3 });
     world.sides[0].opts.freeResources = true;
     world.sides[0].player.stunT = 1e9;
@@ -227,7 +227,7 @@ describe('the curses and marks with their reference effects', () => {
     expect(world.sides[0].player.life).toBeGreaterThan(5);
   });
 
-  it('Punishment makes a melee hit on the cursed enemy grant the Punisher buff', () => {
+  it('Penance makes a melee hit on the cursed enemy grant the Punisher buff', () => {
     const { world, dummy } = createDummyWorld(holding(['crushingBlow', 'penance']), {
       distance: 1.2,
     });
@@ -258,7 +258,7 @@ describe('the skills that lean on statuses', () => {
     return b;
   }
 
-  it('Ensnaring Arrow snares what it hits, and the snared take more from projectile attacks', () => {
+  it('Snare Shot snares what it hits, and the snared take more from projectile attacks', () => {
     const { world, dummy } = createDummyWorld(bow(['snareShot']), { distance: 4 });
     world.sides[0].opts.freeResources = true;
     for (let i = 0; i < 6 * 60 && !dummy.fx.ensnared; i++) stepWorld(world);
@@ -266,7 +266,7 @@ describe('the skills that lean on statuses', () => {
     expect(dummy.fx.ensnared!.x).toBeGreaterThan(0);
   });
 
-  it('Bear Trap holds an enemy for as long as the hit was a share of its life, then shackles it', () => {
+  it('Jaws Trap holds an enemy for as long as the hit was a share of its life, then shackles it', () => {
     const { world, dummy } = createDummyWorld(holding(['jawsTrap']), {
       distance: 3,
       maxTime: 60,
@@ -314,7 +314,7 @@ describe('the skills that lean on statuses', () => {
     expect(near.some((m) => m.fx.hinder)).toBe(true);
   });
 
-  it('Wave of Conviction exposes the enemy to the element it took the most damage from', () => {
+  it('Tide of Judgement exposes the enemy to the element it took the most damage from', () => {
     const { world, dummy } = createDummyWorld(holding(['tideOfJudgement']), { distance: 2 });
     world.sides[0].opts.freeResources = true;
     const seen = new Set<string>();

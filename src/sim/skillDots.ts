@@ -7,8 +7,8 @@ import { hunted } from './side';
 import type { Side } from './side';
 
 /**
- * Damage over time that a skill inflicts as a debuff of its own (docs/SPIRIT.md S7): Contagion, Blight, Essence Drain, Scorching
- * Ray, the ground of Caustic Arrow, Bane, the burning of a Torch Arrow, and the Decay a support puts on every hit. It is not an
+ * Damage over time that a skill inflicts as a debuff of its own (docs/SPIRIT.md S7): Creeping Plague, Withering Breath, Sap Bolt, Scorching
+ * Ray, the ground of Acid Arrow, Ruin Ritual, the burning of a Torch Arrow, and the Decay a support puts on every hit. It is not an
  * ailment. The enemy's resistance is taken off when the debuff lands; its damage taken and the curses' effects when it ticks.
  */
 export type SkillDot = {
@@ -22,7 +22,7 @@ export type SkillDot = {
   t: number;
   /** One of several layers of the same skill (each runs on its own time). */
   layer: boolean;
-  /** Stages built (Scorching Ray). */
+  /** Stages built (Searing Lance). */
   n: number;
   /** The radius around the enemy it passes on to when it dies, in tiles; 0 for none. 'carry' ones go along with one that spreads. */
   spreadR: number;
@@ -51,7 +51,7 @@ function radiusOf(p: SkillProfile): number {
 
 /**
  * Put a skill's damage over time on an enemy. `seconds` and `dps` are the profile's unless the caller gives its own (a patch of
- * ground renews it in short spans; a curse linked to Bane lengthens it). Returns whether it was inflicted.
+ * ground renews it in short spans; a curse linked to Ruin Ritual lengthens it). Returns whether it was inflicted.
  */
 export function applySkillDot(
   w: World,
@@ -116,7 +116,7 @@ export function applySkillDot(
   return true;
 }
 
-/** A flat damage over time from a named source: one at a time, renewed (Decay, the burn of a Herald of Ash). */
+/** A flat damage over time from a named source: one at a time, renewed (Decay, the burn of a Cinder Herald). */
 export function applyFlatDot(
   w: World,
   dst: Actor,
@@ -218,7 +218,7 @@ export function decaySkillDots(a: Actor, dt: number): void {
 
 /**
  * An enemy that dies with a spreading debuff passes it on, with the time it had left, to those near it that do not carry it;
- * one that goes along with a spreading debuff (Essence Drain, beside Contagion) is passed on too.
+ * one that goes along with a spreading debuff (Sap Bolt, beside Creeping Plague) is passed on too.
  */
 export function spreadSkillDots(w: World, dead: Actor): void {
   if (dead.sdots.length === 0) return;

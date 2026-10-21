@@ -409,7 +409,7 @@ function isSpecial(g: GemDef): boolean {
       g.adds?.length ||
       g.trigger ||
       g.hexOnHit ||
-      g.blasphemy ||
+      g.curseAura ||
       g.global ||
       g.extraTriggers
     );

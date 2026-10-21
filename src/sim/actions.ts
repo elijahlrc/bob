@@ -25,7 +25,7 @@ import {
   releaseCaught,
 } from './shots';
 import { catchProjectile, skillUsed } from './blinks';
-import { placeBladestorm } from './stances';
+import { placeStanceStorm } from './stances';
 import { areaRadiusOf, repeatSpot } from './spread';
 import { cascadeCast, extraStrikes, repeatTarget, startUse } from './supportFx';
 import {
@@ -100,7 +100,7 @@ export function startAction(
   w.events.push({ t: 'use', src: a.id, skill: p.skill.id });
   if (a.isPlayer) skillUsed(a.side!, p.skill.id);
   if (a.isPlayer && p.isAttack) fireTriggers(w, a.side!, { on: 'attack', target, tags: p.tagMask });
-  // Using a skill can grant a buff of its own (Flicker Strike's burst of speed).
+  // Using a skill can grant a buff of its own (Blinking Cut's burst of speed).
   if (a.isPlayer) {
     rollGains(w, a.side!, 'use', p.gains);
     rollCharges(w, a.side!, 'use', p.gains);
@@ -143,7 +143,7 @@ export function actorById(w: World, id: number): Actor | undefined {
 
 /**
  * When the next echo lands: a share of the use time after the first (and each earlier echo). The gap shrinks when there are
- * several echoes, so the last one still lands before the use ends (Multistrike repeats twice).
+ * several echoes, so the last one still lands before the use ends (Triple Cadence repeats twice).
  */
 const echoeAt = (act: Action) =>
   (HIT_AT +
@@ -189,7 +189,7 @@ export function updateAction(w: World, a: Actor, dt: number): void {
     act.elapsed >= echoeAt(act)
   ) {
     act.echoes++;
-    // The repeats of Multistrike go to random enemies near, harder each time, sharing the first strike's critical roll.
+    // The repeats of Triple Cadence go to random enemies near, harder each time, sharing the first strike's critical roll.
     const t2 = repeatTarget(w, a, act) ?? actorById(w, act.targetId);
     if (t2 && t2.alive) {
       act.aimX = t2.x;
@@ -241,7 +241,7 @@ function runStep(w: World, a: Actor, act: Action, target: Actor | undefined, dt:
   a.y = spot.y;
   a.moving = true;
   if (run.style !== 'charge') return;
-  // The charge so far is its distance: a longer run hits harder (Shield Charge).
+  // The charge so far is its distance: a longer run hits harder (Bulwark Rush).
   const ids = (act.hitIds ??= []);
   for (const e of enemiesOf(w, a)) {
     if (ids.includes(e.id) || e.phaseT > 0) continue;
@@ -276,7 +276,7 @@ function spinHit(p: SkillProfile): SkillProfile {
 }
 
 /**
- * Advance a spin (Whirling Blades): the character runs at its target, fast enough to arrive in most of the spin, and stops at
+ * Advance a spin (Spinning Dash): the character runs at its target, fast enough to arrive in most of the spin, and stops at
  * contact (it spins on the spot from there). The hits are spread over the whole use, so everything the character passes, and
  * the target when it arrives, is hit again and again.
  */
@@ -411,7 +411,7 @@ export function tickSkillZones(w: World, s: Side, dt: number): void {
 
 /** Resolve an action's effect: strikes, chains or projectiles. Triggers call it with no wind-up. */
 export function fire(w: World, a: Actor, act: Action): void {
-  // Whirling Blades sends out what a Venom Gyre has caught.
+  // Spinning Dash sends out what a Toxin Circle has caught.
   if (a.isPlayer && act.profile.skill.releasesCaught) releaseCaught(w, a);
   fireEffect(w, a, act);
   // The later hits of a spin are only hits: what a use leaves behind (ground, blades, charges spent) is left once.
@@ -419,7 +419,7 @@ export function fire(w: World, a: Actor, act: Action): void {
   leaveGround(w, a, act);
   bounceOrbs(w, a, act);
   cascadeCast(w, a, act);
-  if (act.profile.skill.bladestorm) placeBladestorm(w, a, act);
+  if (act.profile.skill.stanceStorm) placeStanceStorm(w, a, act);
   // An aftershock: the ground cracks, and a moment later it erupts, harder and wider.
   const aft = act.profile.skill.aftershock;
   if (aft && a.isPlayer && act.which !== 'deployed') {
@@ -619,12 +619,12 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
       dtype: dominantType(p, act.hand),
       heavy: isHeavy(a, p),
     });
-    // A skill that strikes with both weapons at once (Dual Strike) lands both blows.
+    // A skill that strikes with both weapons at once (Twin Blades) lands both blows.
     // (A monster has no side, so no outcome to follow.)
     if (a.side) a.side.lastOutcome = null;
     if (p.bothHands) for (let h = 0; h < p.hands.length; h++) hit(w, a, target, p, h, d);
     else hit(w, a, target, p, act.hand, d);
-    // A strike that hits more enemies at once (Ancestral Call).
+    // A strike that hits more enemies at once (Echoing Blow).
     extraStrikes(w, a, act, target);
     // A strike that sends more out after it (bolts, blades, balls) does so only if it landed.
     if (a.side?.lastOutcome === 'hit') afterStrike(w, a, act, target);
@@ -916,7 +916,7 @@ export function updateProjectiles(w: World, dt: number): void {
       for (let k = 0; k < na + nm; k++) {
         const e = k < na ? w.actors[k] : foes[k - na];
         if (!e.alive || e.team === pr.team || pr.hitIds.includes(e.id)) continue;
-        // The payload of an Arrow Nova passes through everything on its way down.
+        // The payload of an Arrow Tempest passes through everything on its way down.
         if (pr.kind === 'nova' || pr.kind === 'mortar' || pr.kind === 'orb') continue;
         const rr = e.r + pr.r;
         const dx = e.x - pr.x;
@@ -937,7 +937,7 @@ export function updateProjectiles(w: World, dt: number): void {
           alive = false;
           break;
         }
-        // An arrow of Explosive Arrow sticks in the enemy, to explode.
+        // An arrow of Fuse Arrow sticks in the enemy, to explode.
         if (pr.profile.skill.fuse && owner?.isPlayer) {
           stickArrow(owner.side!, pr, e);
           endProjectile(w, pr, 2);

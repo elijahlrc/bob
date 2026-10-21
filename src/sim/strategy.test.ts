@@ -380,7 +380,7 @@ describe('the escape role', () => {
     expect(uses(w, 5).cinderStep ?? 0).toBeGreaterThan(0);
   });
 
-  it('the threshold can be set, and an escape run (Phase Run) goes too', () => {
+  it('the threshold can be set, and an escape run (Slipstream Run) goes too', () => {
     const b = withStrategy(build(['crushingBlow', 'slipstream']), {
       1: { role: 'escape', life: 0.3 },
     });

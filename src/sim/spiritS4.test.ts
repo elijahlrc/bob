@@ -73,7 +73,7 @@ describe('Barrage (quiverRush): the projectiles come one after another and each 
     expect(volleyHits(p, 3)).toBe(p.projectiles);
   });
 
-  it('Barrage Support makes the projectiles of another skill sequential, three more, much weaker', () => {
+  it('Rolling Volleys makes the projectiles of another skill sequential, three more, much weaker', () => {
     const { world, dummy } = createDummyWorld(holding('bow_3', ['snareShot', 'rollingVolleys']), {
       distance: 2.5,
       maxTime: 60,
@@ -114,7 +114,7 @@ describe('the once-per-target rule, and its exceptions', () => {
   });
 });
 
-describe('Fork, Chain, Arrow Nova and Tornado Shot', () => {
+describe('Fork, Chain, Arrow Tempest and Whirl Shot', () => {
   it('Fork splits the projectile in two when it hits', () => {
     const { world, dummy } = createDummyWorld(holding('bow_3', ['snareShot', 'splitShot']), {
       distance: 3,
@@ -137,7 +137,7 @@ describe('Fork, Chain, Arrow Nova and Tornado Shot', () => {
     expect(other.life).toBeLessThan(1e9);
   });
 
-  it('Arrow Nova lands the shot at the target and sends a ring from there', () => {
+  it('Arrow Tempest lands the shot at the target and sends a ring from there', () => {
     const { world, dummy } = createDummyWorld(holding('bow_3', ['snareShot', 'arrowTempest']), {
       distance: 4,
       maxTime: 60,
@@ -150,7 +150,7 @@ describe('Fork, Chain, Arrow Nova and Tornado Shot', () => {
     expect(behind.life).toBeLessThan(1e9);
   });
 
-  it('Tornado Shot flies to the target and scatters arrows all round when it gets there', () => {
+  it('Whirl Shot flies to the target and scatters arrows all round when it gets there', () => {
     const { world, dummy } = createDummyWorld(holding('bow_3', ['whirlShot']), {
       distance: 4,
       maxTime: 60,
@@ -168,7 +168,7 @@ describe('Fork, Chain, Arrow Nova and Tornado Shot', () => {
 });
 
 describe('the strikes that send more out, and the cone', () => {
-  it('Lightning Strike sends bolts from the weapon in an arc when it hits', () => {
+  it('Bolt Cleave sends bolts from the weapon in an arc when it hits', () => {
     const { world, dummy } = createDummyWorld(holding('sword_3', ['boltCleave'], 'vanguard'), {
       distance: 1.4,
       maxTime: 60,
@@ -181,7 +181,7 @@ describe('the strikes that send more out, and the cone', () => {
     expect(aside.life).toBeLessThan(1e9);
   });
 
-  it('Frost Blades fly out from behind the struck enemy at the others near it', () => {
+  it('the blades of Rime Splinter fly out from behind the struck enemy at the others near it', () => {
     const { world, dummy } = createDummyWorld(holding('sword_3', ['rimeSplinter']), {
       distance: 1.4,
       maxTime: 60,
@@ -192,7 +192,7 @@ describe('the strikes that send more out, and the cone', () => {
     expect(near.life).toBeLessThan(1e9);
   });
 
-  it('Molten Strike throws balls to the ground around the struck enemy, which burst there', () => {
+  it('Slag Blow throws balls to the ground around the struck enemy, which burst there', () => {
     const { world, dummy } = createDummyWorld(holding('sword_3', ['slagBlow'], 'vanguard'), {
       distance: 1.4,
       maxTime: 60,
@@ -208,7 +208,7 @@ describe('the strikes that send more out, and the cone', () => {
     expect(near.life).toBeLessThan(1e9);
   });
 
-  it('Galvanic Arrow bursts in a cone with each shot, hitting everything in it at once', () => {
+  it('Storm Quill bursts in a cone with each shot, hitting everything in it at once', () => {
     const { world, dummy } = createDummyWorld(holding('bow_3', ['stormQuill']), {
       distance: 5,
       maxTime: 60,

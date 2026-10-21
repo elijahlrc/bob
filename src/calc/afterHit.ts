@@ -4,7 +4,7 @@ import type { SkillProfile } from './skill';
 
 /**
  * The hits of one use that land on a single target, beyond the first, for the skills that send more out after a hit or that
- * burst more than once (docs/SHEET-AUDIT.md, section 5): the bolts, blades and balls of a strike, the arrows a Tornado Shot
+ * burst more than once (docs/SHEET-AUDIT.md, section 5): the bolts, blades and balls of a strike, the arrows a Whirl Shot
  * scatters where it ends, the bursts of an orb that bounces on. `volleyHits` (character.ts) adds them to the use's hits.
  *
  * The sheet is for one target the size of the measuring dummy, hit dead centre, so the geometry below is the sim's own: the
@@ -25,7 +25,7 @@ const BALL_RADIUS = 1.2;
 const BOUNCE_RADIUS = 1.4;
 
 /**
- * The hits a Tornado Shot lands on one target: the piercing arrow, and then the scatter where it ends (a target at the end of
+ * The hits a Whirl Shot lands on one target: the piercing arrow, and then the scatter where it ends (a target at the end of
  * its flight is struck by one of the arrows of the scatter; they share a hit list, so extra projectiles add arrows but no
  * hits). Null for any other skill. The sim takes this path before any other projectile mode (src/sim/shots.ts,
  * `fireProjectiles`), so a barrage or a shotgun on the skill changes nothing here.

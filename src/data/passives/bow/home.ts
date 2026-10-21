@@ -1,11 +1,11 @@
 /**
  * The Bow's home: the Strider's first points, written from the player's seat.
  *
- * The reference's Ranger start, read as a walk (reference/tree/ref-tree.json): the start touches two +10 dexterity
+ * The reference's dexterity start, read as a walk (reference/tree/ref-tree.json): the start touches two +10 dexterity
  * nodes, each one step from a bare dexterity hub of degree five to seven; the first notable (frenzy charges) sits on a
  * loop between the two hubs; the hubs' other exits are three-node pockets (accuracy and attack speed, crit, evasion and
  * resistances, life), the bow road and the centre. Nothing within three steps names a weapon: the first notables are
- * about attacks, not bows, because a Ranger may be a bow, a dagger or a sword.
+ * about attacks, not bows, because a dexterity character may be a bow, a dagger or a sword.
  *
  * So here: the start touches two dexterity hubs, north (toward the Shade) and south (toward the Reaver). The first point
  * is a side, not a stat; the second is a real pick from four or five things; the third can be the signature, a pocket's

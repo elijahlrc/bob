@@ -43,7 +43,7 @@ const run = (w: World, seconds: number) => {
 
 const dist = (a: Actor, b: Actor) => Math.hypot(a.x - b.x, a.y - b.y);
 
-describe('Flame Dash (cinderStep)', () => {
+describe('Cinder Step (cinderStep)', () => {
   it('blinks toward a target out of reach, burns the ground it crossed and the enemies where it lands', () => {
     const { world: w, dummy } = blinkWorld(['cinderStep'], 7);
     const start = { x: w.sides[0].player.x, y: w.sides[0].player.y };
@@ -76,7 +76,7 @@ describe('Flame Dash (cinderStep)', () => {
   });
 });
 
-describe('Frostblink (rimeStep)', () => {
+describe('Rime Step (rimeStep)', () => {
   it('hurts and chills where the character left', () => {
     const { world: w } = blinkWorld(['rimeStep'], 30, 'sword_3', DEX);
     const here = neighbour(w, w.sides[0].player.x + 1, w.sides[0].player.y + 0.5);
@@ -122,7 +122,7 @@ describe('Frostblink (rimeStep)', () => {
   });
 });
 
-describe('Lightning Warp (boltStep)', () => {
+describe('Bolt Step (boltStep)', () => {
   it('the teleport waits for the run, the character can act meanwhile, and lightning bursts at both ends', () => {
     const { world: w, dummy } = blinkWorld(['boltStep'], 7.5, 'wand_3', INT);
     const start = { x: w.sides[0].player.x, y: w.sides[0].player.y };
@@ -152,8 +152,8 @@ describe('Lightning Warp (boltStep)', () => {
   });
 });
 
-describe('Withering Step (rotStride)', () => {
-  /** A pack stands about the target: Withering Step is for running through one. */
+describe('Rotting Stride (rotStride)', () => {
+  /** A pack stands about the target: Rotting Stride is for running through one. */
   const pack = (w: World, dummy: Actor) => {
     neighbour(w, dummy.x + 0.5, dummy.y + 1);
     neighbour(w, dummy.x + 0.5, dummy.y - 1);
@@ -232,7 +232,7 @@ describe('Withering Step (rotStride)', () => {
   });
 });
 
-describe('Blink Arrow (shadowQuiver)', () => {
+describe('Shadow Quiver (shadowQuiver)', () => {
   it('the arrow flies first, then the character is carried to it and a clone is left where it stood', () => {
     const { world: w } = blinkWorld(['shadowQuiver'], 7, 'bow_3', DEX);
     const start = { x: w.sides[0].player.x, y: w.sides[0].player.y };
@@ -325,8 +325,8 @@ describe('Frost Lance (frostLance)', () => {
   });
 });
 
-describe('Venom Gyre (toxinCircle) and Whirling Blades (spinningDash)', () => {
-  it('catches the blades that return, and Whirling Blades sends them out in a spiral', () => {
+describe('Toxin Circle (toxinCircle) and Spinning Dash (spinningDash)', () => {
+  it('catches the blades that return, and Spinning Dash sends them out in a spiral', () => {
     const run2 = createDummyWorld(buildFor(['toxinCircle', 'spinningDash'], 'dagger_3', DEX), {
       distance: 4,
       maxTime: 60,
@@ -340,7 +340,7 @@ describe('Venom Gyre (toxinCircle) and Whirling Blades (spinningDash)', () => {
       caught = Math.max(caught, w.sides[0].caught?.n ?? 0);
     }
     expect(caught).toBeGreaterThanOrEqual(1);
-    // Whirling Blades is the skill that lets them go: a spiral, none of it returning.
+    // Spinning Dash is the skill that lets them go: a spiral, none of it returning.
     w.sides[0].caught = {
       profile: w.sides[0].char.profile(w.sides[0].primary, 0),
       hand: 0,

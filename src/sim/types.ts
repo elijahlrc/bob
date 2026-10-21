@@ -29,7 +29,7 @@ export type Ailments = {
   ignites: Dot[];
   /** How many ignites burn at once (the strongest count), set by whoever ignited it. */
   igniteMax: number;
-  /** The radius, in tiles, to which its shock, chill and freeze spread (Elemental Proliferation); 0 for none. */
+  /** The radius, in tiles, to which its shock, chill and freeze spread (Wildfire Spread); 0 for none. */
   spreadEle: number;
   bleeds: Dot[];
   poisons: Dot[];
@@ -60,7 +60,7 @@ export type Action = {
   fired: boolean;
   /** Repeats (Echoing Cast) already fired after the first. */
   echoes: number;
-  /** What each repeat's damage is multiplied by (the ramp of Multistrike, the less of Unleash), by repeat. */
+  /** What each repeat's damage is multiplied by (the ramp of Triple Cadence, the less of Double Release), by repeat. */
   echoMult?: number[];
   /** Whether the first strike of the use was a critical strike: the repeats share it. */
   crit?: boolean;
@@ -69,7 +69,7 @@ export type Action = {
   targetId: number;
   aimX: number;
   aimY: number;
-  /** A spin: the hits of it already dealt (Whirling Blades). */
+  /** A spin: the hits of it already dealt (Spinning Dash). */
   spinN?: number;
   /** A skill that runs at its target over the wind-up: the distance run so far, and who it has hit on the way. */
   ran?: number;
@@ -154,7 +154,7 @@ export type Actor = {
   impales: { dmg: number; hits: number }[];
   /** Damage over time that skills inflicted as debuffs of their own (src/sim/skillDots.ts). */
   sdots: SkillDot[];
-  /** The life a killing blow went past (Herald of Ash burns by it). */
+  /** The life a killing blow went past (Cinder Herald burns by it). */
   overkill?: number;
   hex: {
     /** Resistance lowered by hexes, per damage type (index 0 unused). */

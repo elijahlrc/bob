@@ -190,7 +190,7 @@ export const CONDITION_TEXT: Record<string, string> = {
   targetFullLife: 'against Enemies on Full Life',
   cursedFrost: 'against enemies cursed with Rime Sap',
   smiteAura: 'while the lightning aura of your strike lasts',
-  phaseStrike: 'while Phase Run lasts',
+  phaseStrike: 'while Slipstream Run lasts',
   innervation: 'while Innervated',
   elemFire: 'when the use is fire',
   elemCold: 'when the use is cold',
@@ -601,7 +601,7 @@ Object.assign(STAT_TEXT, {
   'minion.nearMore': { base: 'Minions deal {v}% more damage to enemies near you' },
   meleeAilmentMore: { base: '{v}% more Damage with Bleeding and Poison caused by Melee Hits' },
   'stun.full': { base: 'Hits always stun enemies on full life, for {v} seconds' },
-  'surge.threshold': { base: 'Gain Arcane Surge after spending {v} mana with supported skills' },
+  'surge.threshold': { base: 'Gain Arcane Tide after spending {v} mana with supported skills' },
   'poison.baseDur': {
     base: 'Poison lasts {v} seconds, longer or shorter with skill effect duration',
   },

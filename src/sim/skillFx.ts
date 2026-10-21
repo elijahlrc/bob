@@ -34,7 +34,7 @@ function mainType(act: Action): number {
 
 /**
  * A wave along the ground from the caster toward the target hits everything on its way; then a shockwave goes out, about each
- * enemy the wave struck (Sunder) or about the target (Purifying Flame), at a share of the damage. An enemy is hit at most once
+ * enemy the wave struck (Rupture Line) or about the target (Cleansing Blaze), at a share of the damage. An enemy is hit at most once
  * by the shockwaves of a use, and not by them if the wave hit it.
  */
 export function lineWave(w: World, a: Actor, act: Action): void {
@@ -92,7 +92,7 @@ export function lineWave(w: World, a: Actor, act: Action): void {
   }
 }
 
-// ---- Soulrend: a projectile that turns toward enemies and puts a debuff on all about it
+// ---- Spirit Saw: a projectile that turns toward enemies and puts a debuff on all about it
 
 /** A projectile of a homing or debuff-carrying skill, once a step: it turns toward the nearest enemy ahead, and afflicts those about it. */
 export function projectileFx(w: World, s: Side, pr: Projectile, dt: number): void {
@@ -158,7 +158,7 @@ export function projectileFx(w: World, s: Side, pr: Projectile, dt: number): voi
         applySkillDot(w, e, pr.profile, { by: s });
 }
 
-// ---- Static Strike: a buff that stacks with hits, and beams while it lasts
+// ---- Charged Blow: a buff that stacks with hits, and beams while it lasts
 
 /** A hit of the skill gives a stack of the buff: up to the most, each with its own time; at the most, the oldest is renewed. */
 export function gainBeamStack(s: Side, p: SkillProfile): void {
@@ -238,7 +238,7 @@ function pulseBeams(w: World, s: Side, c: SkillChoice, spec: BeamSpec): void {
   s.inFx = false;
 }
 
-// ---- Infernal Blow: a debuff that charges with hits and bursts
+// ---- Cinder Blow: a debuff that charges with hits and bursts
 
 /** A hit of the skill puts a charge on the enemy (renewing the time); the most charges set it off at once. */
 export function chargeEnemy(w: World, s: Side, dst: Actor, p: SkillProfile): void {
@@ -324,7 +324,7 @@ export function tickSkillFx(w: World, s: Side, dt: number): void {
   }
 }
 
-// ---- Blade Vortex: blades that orbit the caster and hit everything about it together
+// ---- Orbiting Blades: blades that orbit the caster and hit everything about it together
 
 /** A cast adds a blade (up to the most; at the most the oldest is replaced). */
 export function addBlade(s: Side, p: SkillProfile): void {
@@ -395,7 +395,7 @@ function tickVortex(w: World, s: Side, dt: number): void {
   }
 }
 
-// ---- Storm Call: markers that all go off together
+// ---- Skyfall: markers that all go off together
 
 /** A cast sets a marker where it is aimed. */
 export function placeMarker(w: World, s: Side, act: Action): void {
@@ -432,7 +432,7 @@ function tickMarkers(w: World, s: Side, dt: number): void {
   }
 }
 
-// ---- Orb of Storms: an orb that strikes with lightning that splits
+// ---- Tempest Mote: an orb that strikes with lightning that splits
 
 /** A cast puts an orb next to the character, in place of the one before. */
 export function placeOrb(w: World, a: Actor, act: Action): void {
@@ -512,7 +512,7 @@ export function orbAnswers(w: World, s: Side, p: SkillProfile): void {
   orbBolt(w, s, s.player.x, s.player.y, o);
 }
 
-// ---- Rolling Magma: the orb bounces on and bursts again
+// ---- Slag Lob: the orb bounces on and bursts again
 
 /** After the first burst, the orb bounces on the same way, bursting again a moment later, whether or not an enemy is there. */
 export function bounceOrbs(w: World, a: Actor, act: Action): void {
@@ -547,7 +547,7 @@ export function bounceOrbs(w: World, a: Actor, act: Action): void {
   }
 }
 
-// ---- Explosive Arrow: arrows that stick, and the first to explode takes the rest with it
+// ---- Fuse Arrow: arrows that stick, and the first to explode takes the rest with it
 
 /** An arrow has struck an enemy (or a wall, with `target` null): it sticks, and the fuse starts if none is burning there. */
 export function stickArrow(s: Side, pr: Projectile, target: Actor | null): void {
@@ -615,7 +615,7 @@ function tickFuses(w: World, s: Side, dt: number): void {
   s.fuses.length = j;
 }
 
-// ---- Scourge Arrow: pods along the arrow's way that bloom into thorns
+// ---- Blight Hail: pods along the arrow's way that bloom into thorns
 
 /** The released arrow leaves a pod for each stage along its path; each, a moment later, blooms into thorn arrows. */
 export function scatterSpores(w: World, a: Actor, act: Action, stages: number): void {
@@ -700,7 +700,7 @@ export function frostBite(s: Side, attacker: Actor): void {
   attacker.ail.chillT = Math.max(attacker.ail.chillT, fr.seconds);
 }
 
-// ---- Herald of Agony: Virulence, and the crawler that follows it
+// ---- Sour Herald: Virulence, and the crawler that follows it
 
 /** A poison the character's hit put on an enemy while the herald stands: a point of Virulence, and the crawler if none lives. */
 export function gainVirulence(w: World, s: Side): void {
@@ -742,7 +742,7 @@ function tickAgony(s: Side, dt: number): void {
     }
 }
 
-// ---- Siphoning Trap: life and mana for the character from each enemy the beams hold
+// ---- Drain Trap: life and mana for the character from each enemy the beams hold
 
 function tickSiphon(w: World, s: Side, dt: number): void {
   const p = s.player;
@@ -781,7 +781,7 @@ function tickBots(w: World, s: Side, dt: number): void {
   }
 }
 
-// ---- Molten Shell: a pool that takes the damage, and goes off as fire
+// ---- Slag Carapace: a pool that takes the damage, and goes off as fire
 
 type ShellSpec = NonNullable<
   Extract<NonNullable<SkillChoice['skill']['utility']>, { kind: 'buff' }>['shell']
@@ -831,7 +831,7 @@ function tickShell(w: World, side: Side): void {
   w.events.push({ t: 'explode', x: p.x, y: p.y, r: s.radius, dtype: 3 });
   eachEnemy(w, side.team, (e) => {
     if (e.phaseT <= 0 && Math.hypot(e.x - p.x, e.y - p.y) <= s.radius + e.r)
-      rawHit(w, e, dmg, 3, side, 'Molten Shell');
+      rawHit(w, e, dmg, 3, side, 'Slag Carapace');
   });
 }
 
@@ -871,7 +871,7 @@ function tickRelicRegen(s: Side, dt: number): void {
   for (const m of s.minions) if (m.alive) m.life = Math.min(m.def.maxLife, m.life + g.minions * dt);
 }
 
-// ---- Ice Nova: cast on the character's Frostbolt projectiles
+// ---- Frost Ring: cast on the character's Glacier Dart projectiles
 
 /** The spell is cast on the character's projectiles of the named skill, when there are any: a burst about each (up to the most). */
 export function novaOnBolts(w: World, a: Actor, act: Action): boolean {
@@ -902,7 +902,7 @@ export function novaOnBolts(w: World, a: Actor, act: Action): boolean {
   return true;
 }
 
-// ---- Mirror Arrow: a clone where the arrow ends
+// ---- Mirror Quiver: a clone where the arrow ends
 
 /** The arrow has ended: the character's clone stands there for a few seconds and fires with the character's bow. */
 export function mirrorLanded(w: World, s: Side, pr: Projectile): void {
@@ -922,7 +922,7 @@ export function mirrorLanded(w: World, s: Side, pr: Projectile): void {
   cloneOfPlayer(m, spec.more);
 }
 
-// ---- Bladefall: volleys that widen and weaken
+// ---- Rain of Steel: volleys that widen and weaken
 
 /** The volleys land one after another, each a ring wider and weaker (and less likely to crit) than the one before, and a wave beyond it. */
 export function fireVolleys(w: World, a: Actor, act: Action): void {
@@ -967,7 +967,7 @@ export function fireVolleys(w: World, a: Actor, act: Action): void {
   }
 }
 
-// ---- Creeping Frost: chilled ground that creeps toward enemies
+// ---- Rime Drift: chilled ground that creeps toward enemies
 
 /** The skull has burst: the chilled ground it leaves, at most so many patches at once. */
 export function leaveCreeping(

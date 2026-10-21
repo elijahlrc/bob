@@ -199,7 +199,7 @@ describe('the gems of a swap (docs/EQUIP.md 3.1)', () => {
 describe('socketing over the primary skill', () => {
   it('replacing the primary skill gem leaves the primary pointing at a gem in the bag, so the next usable skill is used', () => {
     const { run, wearBody, gems } = setup();
-    const body = wearBody(2, ['flameBolt', 'frostbolt']);
+    const body = wearBody(2, ['flameBolt', 'glacierDart']);
     const [primary, other] = body.sockets as GemItem[];
     const [fresh] = gems(['kindle']);
     run.inventory.push(fresh);

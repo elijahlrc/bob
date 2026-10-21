@@ -130,7 +130,7 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
     hitTakenMult: db.mult('hitTaken', ctx),
     hitTakenType: [0, 1, 2, 3, 4].map((i) => db.mult('hitTakenType', { ...ctx, ancestry: 1 << i })),
     ailmentThreshold: opts.isPlayer ? maxLife + maxEs : maxLife,
-    // Chaos Inoculation: the stun threshold uses the life the character would have without it (as in the reference game).
+    // Hollow Vessel: the stun threshold uses the life the character would have without it (as in the reference game).
     stunThreshold: fullLife * db.mult('stunThreshold', ctx) * (opts.stunThreshMult ?? 1),
     stunAvoid: clamp(db.sum('base', 'stunAvoid', ctx) / 100, 0, 1),
     // Faster recovery from stuns shortens them: 100% increased recovery halves the time.

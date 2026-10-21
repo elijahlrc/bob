@@ -122,7 +122,7 @@ describe('landsPerUse', () => {
     expect(landsPerUse({ ...p, repeats: 2 }, ctx(1, { triggered: true }))).toBe(1);
   });
 
-  it('each repeat of a Multistrike is harder than the one before, the first blow is not', () => {
+  it('each repeat of a Triple Cadence is harder than the one before, the first blow is not', () => {
     const p = profileOf('crushingBlow');
     const m = { ...p, repeats: 2, multistrike: { ramp: 22 } };
     expect(landsPerUse(m, ctx(1))).toBeCloseTo(1 + 1.22 + 1.44, 9);

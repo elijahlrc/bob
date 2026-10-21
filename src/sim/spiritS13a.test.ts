@@ -93,8 +93,8 @@ describe('auras (stormHalo, frostHalo, arcaneWard)', () => {
   });
 });
 
-describe('Dual Strike, Lightning Trap, Puncture', () => {
-  it('Dual Strike crits more and hits harder against an enemy on full life only', () => {
+describe('Twin Blades, Bolt Trap, Gouge Shot', () => {
+  it('Twin Blades crits more and hits harder against an enemy on full life only', () => {
     const { world: w, dummy } = world(['twinBlades'], 1.4, 'sword_3', DEX, 'dual');
     const full = w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
     dummy.life = dummy.def.maxLife * 0.5;
@@ -103,7 +103,7 @@ describe('Dual Strike, Lightning Trap, Puncture', () => {
     expect(maxHit(full)).toBeGreaterThan(maxHit(half));
   });
 
-  it('Lightning Trap crits more against a shocked enemy', () => {
+  it('Bolt Trap crits more against a shocked enemy', () => {
     const { world: w, dummy } = world(['boltTrap'], 4, 'wand_3', DEX);
     const cold = w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
     dummy.ail.shock = 15;
@@ -111,7 +111,7 @@ describe('Dual Strike, Lightning Trap, Puncture', () => {
     expect(shocked.hands[0].critChance).toBeGreaterThan(cold.hands[0].critChance);
   });
 
-  it('Puncture is a shot with a bow and a stab with a dagger', () => {
+  it('Gouge Shot is a shot with a bow and a stab with a dagger', () => {
     const bow = world(['gougeShot'], 4, 'bow_3', DEX).world;
     expect(bow.sides[0].char.primary.skill.behaviour.kind).toBe('projectile');
     const dag = world(['gougeShot'], 1.2, 'dagger_3', DEX).world;
@@ -166,7 +166,7 @@ describe('Sweep (haloSweep)', () => {
   });
 });
 
-describe('Pestilent Strike (venomStrike)', () => {
+describe('Venom Strike (venomStrike)', () => {
   it('an enemy that dies poisoned sets its poison on those around it', () => {
     const { world: w, dummy } = world(['venomStrike'], 1.2, 'dagger_3', DEX);
     expect(w.sides[0].char.primary.skill.id).toBe('venomStrike');
@@ -185,7 +185,7 @@ describe('Pestilent Strike (venomStrike)', () => {
 });
 
 describe('strikes with a second effect (thunderRebuke, primalStrike, primeSplash)', () => {
-  it('Smite also strikes the enemies about the one it hit, which it does not hit twice, and lights the character', () => {
+  it('Thunder Rebuke also strikes the enemies about the one it hit, which it does not hit twice, and lights the character', () => {
     const { world: w, dummy } = world(['thunderRebuke'], 1.4, 'mace_3', STR);
     const near = neighbour(w, dummy.x + 0.8, dummy.y + 0.5);
     const far = neighbour(w, dummy.x + 6, dummy.y);
@@ -204,7 +204,7 @@ describe('strikes with a second effect (thunderRebuke, primalStrike, primeSplash
     ).toBeGreaterThan(0);
   });
 
-  it('Elemental Hit deals one element for each use, never the same one twice running', () => {
+  it('Primal Strike deals one element for each use, never the same one twice running', () => {
     const { world: w, dummy } = world(['primalStrike'], 1.4, 'sword_3', DEX);
     const seen: number[] = [];
     for (let i = 0; i < 60 * 14; i++) {
@@ -223,7 +223,7 @@ describe('strikes with a second effect (thunderRebuke, primalStrike, primeSplash
     }
   });
 
-  it('Elemental Hit has more area against an enemy with the ailment of its element', () => {
+  it('Primal Strike has more area against an enemy with the ailment of its element', () => {
     const { world: w, dummy } = world(['primalStrike'], 1.4, 'sword_3', DEX);
     w.sides[0].elem = 3;
     const prof = w.sides[0].char.profile(w.sides[0].primary, playerConds(w, w.sides[0], dummy));
@@ -255,7 +255,7 @@ describe('strikes with a second effect (thunderRebuke, primalStrike, primeSplash
     expect(radius()).toBeGreaterThan(plain);
   });
 
-  it('Wild Strike turns the damage into the element and sends out what the element says', () => {
+  it('Prime Splash turns the damage into the element and sends out what the element says', () => {
     for (const el of [3, 2, 1]) {
       const { world: w, dummy } = world(['primeSplash'], 1.4, 'sword_3', DEX);
       const near = neighbour(w, dummy.x + 1.0, dummy.y + 0.5);
@@ -273,7 +273,7 @@ describe('strikes with a second effect (thunderRebuke, primalStrike, primeSplash
 });
 
 describe('waves (ruptureLine, cleansingBlaze)', () => {
-  it('Sunder: the wave strikes what is in line, and each enemy it strikes sets off a shockwave on the others', () => {
+  it('Rupture Line: the wave strikes what is in line, and each enemy it strikes sets off a shockwave on the others', () => {
     const { world: w, dummy } = world(['ruptureLine'], 2.2, 'mace_3', STR);
     const beside = neighbour(w, dummy.x + 0.5, dummy.y + 1.6);
     const behind = neighbour(w, dummy.x + 3, dummy.y);
@@ -285,7 +285,7 @@ describe('waves (ruptureLine, cleansingBlaze)', () => {
     expect(1e9 - beside.life).toBeLessThan(1e9 - behind.life);
   });
 
-  it('Purifying Flame: a wave, consecrated ground, and a shockwave over the ground for 25% less', () => {
+  it('Cleansing Blaze: a wave, consecrated ground, and a shockwave over the ground for 25% less', () => {
     const { world: w, dummy } = world(['cleansingBlaze'], 5, 'wand_3', INT);
     const off = neighbour(w, dummy.x + 0.4, dummy.y + 2.6);
     run(w, 1.5);
@@ -296,7 +296,7 @@ describe('waves (ruptureLine, cleansingBlaze)', () => {
 });
 
 describe('strikes that leave something behind (chargedBlow, cinderBlow, rimeMallet)', () => {
-  it('Static Strike: hits build a stack of a buff, and beams strike the enemies near while it lasts', () => {
+  it('Charged Blow: hits build a stack of a buff, and beams strike the enemies near while it lasts', () => {
     const { world: w, dummy } = world(['chargedBlow'], 1.4, 'sword_3', STR);
     const near = neighbour(w, w.sides[0].player.x - 2.2, w.sides[0].player.y);
     let stacks = 0;
@@ -314,7 +314,7 @@ describe('strikes that leave something behind (chargedBlow, cinderBlow, rimeMall
     expect(w.sides[0].staticFx).toBeNull();
   });
 
-  it('Infernal Blow: charges build on the enemy, then burst on those about it; one that dies bursts as fire', () => {
+  it('Cinder Blow: charges build on the enemy, then burst on those about it; one that dies bursts as fire', () => {
     const { world: w, dummy } = world(['cinderBlow'], 1.4, 'sword_3', STR);
     const near = neighbour(w, dummy.x + 1.0, dummy.y);
     let maxN = 0;
@@ -329,7 +329,7 @@ describe('strikes that leave something behind (chargedBlow, cinderBlow, rimeMall
     expect(near.life).toBeLessThan(1e9);
   });
 
-  it('Infernal Blow: an enemy that dies carrying the debuff explodes as fire for a share of its life', () => {
+  it('Cinder Blow: an enemy that dies carrying the debuff explodes as fire for a share of its life', () => {
     const { world: w, dummy } = world(['cinderBlow'], 1.4, 'sword_3', STR);
     const near = neighbour(w, dummy.x + 1.0, dummy.y, 1e6);
     w.sides[0].player.stunT = 100;
@@ -342,7 +342,7 @@ describe('strikes that leave something behind (chargedBlow, cinderBlow, rimeMall
     expect(1e6 - near.life).toBeGreaterThan(1000);
   });
 
-  it('Glacial Hammer: a frozen enemy on under a third of its life shatters, but not a unique', () => {
+  it('Rime Mallet: a frozen enemy on under a third of its life shatters, but not a unique', () => {
     const { world: w, dummy } = world(['rimeMallet'], 1.4, 'mace_3', STR);
     dummy.def = dummyDefence({ maxLife: 100000 });
     dummy.life = 20000;
@@ -361,7 +361,7 @@ describe('strikes that leave something behind (chargedBlow, cinderBlow, rimeMall
 });
 
 describe('shield and charge skills (snagLash, bulwarkRush, ghostShard)', () => {
-  it('Chain Hook pulls the character to a distant enemy, gives rage, and is wider with rage', () => {
+  it('Snag Lash pulls the character to a distant enemy, gives rage, and is wider with rage', () => {
     const { world: w, dummy } = world(['snagLash'], 5, 'sword_3', STR);
     expect(
       Math.hypot(dummy.x - w.sides[0].player.x, dummy.y - w.sides[0].player.y),
@@ -381,7 +381,7 @@ describe('shield and charge skills (snagLash, bulwarkRush, ghostShard)', () => {
     expect(raging.radiusMult).toBeGreaterThan(calm.radiusMult);
   });
 
-  it('Shield Charge: the damage is the shield\u2019s, and a longer run hits harder', () => {
+  it('Bulwark Rush: the damage is the shield\u2019s, and a longer run hits harder', () => {
     const near = world(['bulwarkRush'], 1.6, 'sword_3', STR, 'shield');
     const far = world(['bulwarkRush'], 6.5, 'sword_3', STR, 'shield');
     expect(far.world.sides[0].char.primary.skill.id).toBe('bulwarkRush');
@@ -403,7 +403,7 @@ describe('shield and charge skills (snagLash, bulwarkRush, ghostShard)', () => {
     expect(plain.hands[0].chunks.every((c) => c.type === 0)).toBe(true);
   });
 
-  it('Spectral Shield Throw: one shield that shatters where it hits into shards that fly all round', () => {
+  it('Ghost Shard: one shield that shatters where it hits into shards that fly all round', () => {
     const { world: w, dummy } = world(['ghostShard'], 4, 'sword_3', DEX, 'shield');
     const behind = neighbour(w, dummy.x - 0.2, dummy.y + 1.6);
     let projectiles = 0;
@@ -417,14 +417,14 @@ describe('shield and charge skills (snagLash, bulwarkRush, ghostShard)', () => {
   });
 });
 
-describe('Shattering Steel and Soulrend (splinterVolley, spiritSaw)', () => {
+describe('Splinter Volley and Spirit Saw (splinterVolley, spiritSaw)', () => {
   it('shards hit harder the farther they have flown', () => {
     const { world: w } = world(['splinterVolley'], 3, 'sword_3', DEX);
     const p = w.sides[0].char.profile(w.sides[0].primary, 0);
     expect(distanceMult(p, 4.5)).toBeGreaterThan(distanceMult(p, 0.5));
   });
 
-  it('Soulrend turns toward enemies off its line, and afflicts those about it all the way', () => {
+  it('Spirit Saw turns toward enemies off its line, and afflicts those about it all the way', () => {
     const { world: w, dummy } = world(['spiritSaw'], 6, 'wand_3', INT);
     dummy.y += 0.0;
     const off = neighbour(w, dummy.x - 2.0, dummy.y + 1.2);
@@ -438,7 +438,7 @@ describe('Shattering Steel and Soulrend (splinterVolley, spiritSaw)', () => {
 });
 
 describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMote, slagLob, fuseArrow, blightHail)', () => {
-  it('Blade Vortex: each cast adds a blade to a ring that hits everything about together, and the blades run out', () => {
+  it('Orbiting Blades: each cast adds a blade to a ring that hits everything about together, and the blades run out', () => {
     const { world: w, dummy } = world(['orbitingBlades'], 1.2, 'wand_3', DEX);
     let most = 0;
     const near = neighbour(w, w.sides[0].player.x - 1.0, w.sides[0].player.y);
@@ -455,7 +455,7 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     expect(w.sides[0].vortex).toBeNull();
   });
 
-  it('Blade Vortex: more blades make a round come sooner and hit harder', () => {
+  it('Orbiting Blades: more blades make a round come sooner and hit harder', () => {
     const { world: w, dummy } = world(['orbitingBlades'], 1.2, 'wand_3', DEX);
     w.sides[0].player.stunT = 100;
     const dmg = (n: number) => {
@@ -471,7 +471,7 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     expect(dmg(8)).toBeGreaterThan(dmg(1) * 3);
   });
 
-  it('Storm Call: markers wait, and when one is struck all of them are', () => {
+  it('Skyfall: markers wait, and when one is struck all of them are', () => {
     const { world: w, dummy } = world(['skyfall'], 5, 'wand_3', INT);
     let most = 0;
     let struck = false;
@@ -486,7 +486,7 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     expect(dummy.life).toBeLessThan(1e9);
   });
 
-  it('Orb of Storms: one orb at a time, whose bolt splits to others, and a lightning cast inside it makes another bolt', () => {
+  it('Tempest Mote: one orb at a time, whose bolt splits to others, and a lightning cast inside it makes another bolt', () => {
     const { world: w, dummy } = world(['tempestMote', 'skyfall'], 2.0, 'wand_3', INT);
     const other = neighbour(w, dummy.x + 1.5, dummy.y + 1.0);
     let orbs = 0;
@@ -508,7 +508,7 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     expect(dummy.life).toBeLessThan(before);
   });
 
-  it('Rolling Magma: bursts where it lands, then bounces on and bursts again', () => {
+  it('Slag Lob: bursts where it lands, then bounces on and bursts again', () => {
     const { world: w, dummy } = world(['slagLob'], 5, 'wand_3', INT);
     const beyond = neighbour(w, dummy.x + 1.6, dummy.y);
     let bursts = 0;
@@ -521,7 +521,7 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     expect(beyond.life).toBeLessThan(1e9);
   });
 
-  it('Explosive Arrow: arrows stick, and the first to go off takes the others with it', () => {
+  it('Fuse Arrow: arrows stick, and the first to go off takes the others with it', () => {
     const { world: w, dummy } = world(['fuseArrow'], 6, 'bow_3', DEX);
     let most = 0;
     let bursts = 0;
@@ -538,7 +538,7 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     expect(dummy.life).toBeLessThan(1e9);
   });
 
-  it('Scourge Arrow: the released arrow leaves pods that bloom into thorn arrows', () => {
+  it('Blight Hail: the released arrow leaves pods that bloom into thorn arrows', () => {
     const { world: w } = world(['blightHail'], 6, 'bow_3', DEX);
     let pods = 0;
     let arrows = 0;
@@ -553,7 +553,7 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
 });
 
 describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMotes, smokeCharge, lureTotem, slagCarapace, slipstream)', () => {
-  it('Arctic Armour: less physical and fire damage from hits while standing still, a chill on what hits you, a chilled trail when moving', () => {
+  it('Rimeplate: less physical and fire damage from hits while standing still, a chill on what hits you, a chilled trail when moving', () => {
     const { world: w, dummy } = world(['crushingBlow', 'rimePlate'], 8, 'sword_3', STR);
     w.sides[0].player.moving = false;
     const still = w.sides[0].char.defence(playerConds(w, w.sides[0], null));
@@ -575,7 +575,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     expect(w.sides[0].fields.filter((f) => f.kind === 'chilling').length).toBeGreaterThanOrEqual(2);
   });
 
-  it('Herald of Agony: poisons build Virulence and call a crawler that cannot be hurt, and with no Virulence it is gone', () => {
+  it('Sour Herald: poisons build Virulence and call a crawler that cannot be hurt, and with no Virulence it is gone', () => {
     const { world: w } = world(['venomStrike', 'sourHerald'], 1.2, 'dagger_3', DEX);
     let v = 0;
     for (let i = 0; i < 60 * 12; i++) {
@@ -592,7 +592,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     expect(w.sides[0].minions.some((m) => m.kind === 'crawler' && m.alive)).toBe(false);
   });
 
-  it('Siphoning Trap: beams on up to ten enemies drain life and mana to the character, more for each', () => {
+  it('Drain Trap: beams on up to ten enemies drain life and mana to the character, more for each', () => {
     const { world: w, dummy } = world(['drainTrap'], 4, 'wand_3', DEX);
     const others = Array.from({ length: 3 }, (_, i) =>
       neighbour(w, dummy.x + 0.5 * i, dummy.y + 0.8),
@@ -622,7 +622,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     expect(got).toBeGreaterThan(0);
   });
 
-  it('Summon Skitterbots: two motes hold mana, chill and shock the enemies near, and set off traps from afar', () => {
+  it('Whirring Motes: two motes hold mana, chill and shock the enemies near, and set off traps from afar', () => {
     const { world: w, dummy } = world(['jawsTrap', 'whirringMotes'], 6, 'wand_3', DEX);
     expect(w.sides[0].char.reservedMana).toBeGreaterThan(0);
     let bots = 0;
@@ -642,7 +642,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     void dummy;
   });
 
-  it('Smoke Mine: the character gets away when hurt, with smoke at both ends that blinds, and a speed buff', () => {
+  it('Smoke Charge: the character gets away when hurt, with smoke at both ends that blinds, and a speed buff', () => {
     const { world: w, dummy } = world(['crushingBlow', 'smokeCharge'], 1.5, 'sword_3', DEX);
     const start = { x: w.sides[0].player.x, y: w.sides[0].player.y };
     w.sides[0].opts.godMode = true;
@@ -661,7 +661,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     expect(dummy.fx.blind).toBeDefined();
   });
 
-  it('Decoy Totem: a totem the enemies near it go for instead of the character', () => {
+  it('Lure Totem: a totem the enemies near it go for instead of the character', () => {
     const { world: w, dummy } = world(['crushingBlow', 'lureTotem'], 2.5, 'sword_3', STR);
     dummy.rarity = 'boss';
     let decoy;
@@ -679,7 +679,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     expect(w.sides[0].minions.some((m) => m.kind === 'decoy' && m.alive)).toBe(false);
   });
 
-  it('Molten Shell: most of the damage goes into a pool, and when the shell ends what it took goes out as fire', () => {
+  it('Slag Carapace: most of the damage goes into a pool, and when the shell ends what it took goes out as fire', () => {
     const { world: w, dummy } = world(['crushingBlow', 'slagCarapace'], 1.2, 'sword_3', STR);
     w.sides[0].opts.godMode = true;
     w.sides[0].player.life = w.sides[0].player.def.maxLife * 0.4;
@@ -700,7 +700,7 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     expect(dummy.life).toBeLessThan(before);
   });
 
-  it('Phase Run: speed and melee damage for a moment; the first skill used ends the speed, and the damage stays briefly', () => {
+  it('Slipstream Run: speed and melee damage for a moment; the first skill used ends the speed, and the damage stays briefly', () => {
     const { world: w, dummy } = world(['crushingBlow', 'slipstream'], 1.4, 'sword_3', STR);
     // A crowd is what it is used for.
     neighbour(w, dummy.x + 0.5, dummy.y + 1);
@@ -770,7 +770,7 @@ describe('repairs from the fresh audit (S14)', () => {
     expect([a, c, d].filter((m) => m.life < 1e9).length).toBeGreaterThanOrEqual(3);
   });
 
-  it('Viper Strike converts to chaos, and strikes with both weapons when dual wielding', () => {
+  it('Venom Cut converts to chaos, and strikes with both weapons when dual wielding', () => {
     const one = world(['venomCut'], 1.2, 'dagger_3', DEX).world;
     const p = one.sides[0].char.profile(one.sides[0].primary, 0);
     expect(p.hands[0].chunks.some((c) => c.type === 4 && c.max > 0)).toBe(true);
@@ -778,7 +778,7 @@ describe('repairs from the fresh audit (S14)', () => {
     expect(two.sides[0].char.profile(two.sides[0].primary, 0).bothHands).toBe(true);
   });
 
-  it('Leap Slam always stuns an enemy on full life and throws it back', () => {
+  it('Skyfall Leap always stuns an enemy on full life and throws it back', () => {
     const { world: w, dummy } = world(['skyfallLeap'], 3, 'sword_3', STR);
     dummy.def = dummyDefence({ maxLife: 1e9 });
     dummy.def.cannotBeStunned = false;
@@ -790,7 +790,7 @@ describe('repairs from the fresh audit (S14)', () => {
     expect(stunned).toBe(true);
   });
 
-  it('Whirling Blades hits everything on the way through', () => {
+  it('Spinning Dash hits everything on the way through', () => {
     const { world: w } = world(['spinningDash'], 6, 'dagger_3', DEX);
     const mid = neighbour(w, w.sides[0].player.x + 3, w.sides[0].player.y + 0.2);
     mid.def = dummyDefence({ maxLife: 1e9 });
@@ -798,7 +798,7 @@ describe('repairs from the fresh audit (S14)', () => {
     expect(mid.life).toBeLessThan(1e9);
   });
 
-  it('a Stormblast mine makes the enemies near it take more from every hit', () => {
+  it('a Storm Charge mine makes the enemies near it take more from every hit', () => {
     const { world: w, dummy } = world(['crushingBlow', 'stormCharge'], 6, 'sword_3', STR);
     let more = 0;
     for (let i = 0; i < 60 * 12 && more === 0; i++) {
@@ -808,7 +808,7 @@ describe('repairs from the fresh audit (S14)', () => {
     expect(more).toBeGreaterThan(0);
   });
 
-  it('Lacerate bleeds in Blood Stance and sweeps wider in Sand Stance', () => {
+  it('Twin Slash bleeds in Blood Stance and sweeps wider in Sand Stance', () => {
     const { world: w, dummy } = world(['twinSlash'], 1.2, 'sword_3', DEX);
     const blood = w.sides[0].char.profile(w.sides[0].primary, 0);
     expect(blood.bleed.chance).toBeGreaterThan(0);
@@ -818,7 +818,7 @@ describe('repairs from the fresh audit (S14)', () => {
     expect(sand.radiusMult).toBeGreaterThan(blood.radiusMult);
   });
 
-  it('Arcane Surge comes after enough mana is spent, and Raise Zombie uses up a corpse', () => {
+  it('Arcane Tide comes after enough mana is spent, and Raise Husk uses up a corpse', () => {
     const { world: w } = world(['suddenFrost', 'tideGathering'], 4, 'wand_3', INT);
     let surge = 0;
     w.sides[0].surgeMana = 300;
@@ -858,7 +858,7 @@ describe('repairs from the fresh audit (S14)', () => {
   });
 });
 
-describe('Cobra Lash (viperLash)', () => {
+describe('Viper Lash (viperLash)', () => {
   it('is a chaos projectile that flies on from enemy to enemy, not a bolt of lightning', () => {
     const { world: w, dummy } = world(['viperLash'], 4, 'dagger_3', DEX);
     const p = w.sides[0].char.profile(w.sides[0].primary, 0);
@@ -880,8 +880,8 @@ describe('Cobra Lash (viperLash)', () => {
   });
 });
 
-describe('Mirror Arrow and Blink Arrow clones', () => {
-  it('Mirror Arrow leaves a clone where the arrow ends, which fires with the character’s weapon', () => {
+describe('Mirror Quiver and Shadow Quiver clones', () => {
+  it('Mirror Quiver leaves a clone where the arrow ends, which fires with the character’s weapon', () => {
     const { world: w, dummy } = world(['mirrorQuiver'], 6, 'bow_3', DEX);
     let clone;
     for (let i = 0; i < 60 * 4 && !clone; i++) {
@@ -895,8 +895,8 @@ describe('Mirror Arrow and Blink Arrow clones', () => {
   });
 });
 
-describe('Bladefall, Creeping Frost and Melee Physical Damage', () => {
-  it('Bladefall falls in six volleys, each wider and weaker', () => {
+describe('Rain of Steel, Rime Drift and Brute Force', () => {
+  it('Rain of Steel falls in six volleys, each wider and weaker', () => {
     const { world: w, dummy } = world(['rainOfSteel'], 6, 'wand_3', DEX);
     const seen: { r: number; hitMult: number }[] = [];
     for (let i = 0; i < 60 * 3; i++) {
@@ -913,7 +913,7 @@ describe('Bladefall, Creeping Frost and Melee Physical Damage', () => {
     expect(dummy.life).toBeLessThan(1e9);
   });
 
-  it('Creeping Frost bursts, then leaves chilled ground that creeps toward an enemy, ten patches at most', () => {
+  it('Rime Drift bursts, then leaves chilled ground that creeps toward an enemy, ten patches at most', () => {
     const { world: w, dummy } = world(['rimeDrift'], 5, 'wand_3', INT);
     let patch: { x: number; y: number } | undefined;
     let start = 0;

@@ -210,5 +210,5 @@ export function loadNames(): Record<string, string> {
   return out;
 }
 
-/** The region of Bob's tree each reference sector lands in: by attribute, as the design says (marauder strength, and so on). */
+/** The region of Bob's tree each reference sector lands in: by attribute, as the design says (strength for the strength start, and so on). */
 export const SECTOR_REGION = ['str', 'dex', 'int', 'strdex', 'strint', 'dexint'] as const;

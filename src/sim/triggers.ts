@@ -159,7 +159,7 @@ function castTriggered(w: World, s: Side, choice: SkillChoice, ev: TriggerEvent)
   return true;
 }
 
-/** An enemy that dies under a status that makes it explode (Abyssal Cry): a blast of a share of its own life. */
+/** An enemy that dies under a status that makes it explode (a war cry's): a blast of a share of its own life. */
 export function corpseBlast(
   w: World,
   s: Side,

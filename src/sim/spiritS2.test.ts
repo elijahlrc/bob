@@ -43,7 +43,7 @@ function watch(world: World, seconds: number, skill: string) {
   return { uses, spends, others, buffs };
 }
 
-describe('Flicker Strike (blinkingCut)', () => {
+describe('Blinking Cut (blinkingCut)', () => {
   const build = () => holding('sword_3', ['blinkingCut']);
 
   it('waits out its cooldown when it holds no charges, and the weapon fills the gaps', () => {
@@ -89,7 +89,7 @@ describe('Flicker Strike (blinkingCut)', () => {
   });
 });
 
-describe('Vigilant Strike (guardedStrike)', () => {
+describe('Guarded Strike (guardedStrike)', () => {
   it('waits four seconds between uses unless a Grit charge is spent', () => {
     const { world } = createDummyWorld(holding('sword_3', ['guardedStrike']), { distance: 1.2 });
     world.sides[0].opts.freeResources = true;
@@ -129,7 +129,7 @@ describe('Discharge (chargeRelease)', () => {
   });
 });
 
-describe('Immortal Call (deathlessCall)', () => {
+describe('Deathless Call (deathlessCall)', () => {
   const build = () => holding('sword_3', ['crushingBlow', 'deathlessCall']);
 
   function cast(charges: number) {
