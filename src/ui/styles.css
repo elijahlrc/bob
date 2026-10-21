@@ -787,6 +787,21 @@ span.save-name {
   flex-direction: column;
   gap: 4px;
 }
+.gem-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: center;
+  font-size: 12px;
+}
+.gem-filters label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.gem-filters select {
+  max-width: 150px;
+}
 .gem-inv.drop,
 .socket.drop {
   border-color: var(--hi);

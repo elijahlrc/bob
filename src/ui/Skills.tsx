@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { sheetDps, type Character } from '../calc/character';
-import { naturalGemLevel } from '../calc/gems';
+import { naturalGemLevel, resolveActive } from '../calc/gems';
+import { supportLive } from '../calc/reach';
+import { typesAllow } from '../data/skillTypes';
+import { weaponBar } from '../data/weaponFit';
 import { gemDef, type GemDef } from '../data/gems';
 import { EQUIP_SLOTS, type EquipSlot, type GemItem } from '../data/types';
 import type { Controller } from '../run/controller';
@@ -96,14 +99,50 @@ export function Skills({
     [gemKey],
   );
   const needle = q.trim().toLowerCase();
-  const shownGems = needle
-    ? gems.filter((g) => {
-        const d = gemCardData(gemDef(g.gemId), 20);
-        return `${d.name} ${d.type} ${d.tags.join(' ')} ${d.description}`
-          .toLowerCase()
-          .includes(needle);
-      })
-    : gems;
+  // The list's filters (kept between visits): one of each gem, only what the weapons in hand can use, and the supports that
+  // would act on one chosen skill.
+  const [oneEach, setOneEach] = useState(() => loadPref('gemOneEach', false));
+  const [usableOnly, setUsableOnly] = useState(() => loadPref('gemUsable', false));
+  const [forSkill, setForSkill] = useState(() => loadPref('gemSupportsFor', ''));
+  const hold = ch.weaponHold();
+  // The skills a support can be asked about: the ones worn and the ones in the bag, one of each.
+  const skillIds = [
+    ...new Set([
+      ...ch.actives.flatMap((a) => (a.gemUid !== null && !a.skill.utility ? [a.skill.id] : [])),
+      ...gems.filter((g) => gemDef(g.gemId).kind === 'active').map((g) => g.gemId),
+    ]),
+  ];
+  const forDef = forSkill && skillIds.includes(forSkill) ? gemDef(forSkill) : null;
+  const forResolved = forDef?.kind === 'active' ? resolveActive(forDef, 20) : null;
+  const counts = new Map<string, number>();
+  for (const g of gems) counts.set(g.gemId, (counts.get(g.gemId) ?? 0) + 1);
+  const seen = new Set<string>();
+  const shownGems = gems.filter((g) => {
+    const def = gemDef(g.gemId);
+    if (oneEach) {
+      if (seen.has(g.gemId)) return false;
+      seen.add(g.gemId);
+    }
+    if (usableOnly) {
+      if (def.kind === 'active' && weaponBar(def, hold)) return false;
+      if (
+        def.kind === 'support' &&
+        def.limitWeapon &&
+        !def.limitWeapon.some((t) => hold.tags.has(t))
+      )
+        return false;
+    }
+    if (forResolved) {
+      if (def.kind !== 'support') return false;
+      if (!typesAllow(def, new Set(forResolved.types)) || !supportLive(def, forResolved).live)
+        return false;
+    }
+    if (!needle) return true;
+    const d = gemCardData(def, 20);
+    return `${d.name} ${d.type} ${d.tags.join(' ')} ${d.description}`
+      .toLowerCase()
+      .includes(needle);
+  });
   const levelOf = (uid: number) => ch.gems.find((g) => g.gem.uid === uid)?.level ?? 1;
 
   // The inventory gem being placed (selected or being dragged), and what each socket would gain.
@@ -421,6 +460,58 @@ export function Skills({
             }}
           />
         )}
+        {gems.length > 1 && (
+          <div class="gem-filters">
+            <label class="sx-check">
+              <input
+                type="checkbox"
+                checked={oneEach}
+                onChange={(e) => {
+                  const v = (e.target as HTMLInputElement).checked;
+                  setOneEach(v);
+                  savePref('gemOneEach', v);
+                }}
+              />
+              <span>One of each</span>
+            </label>
+            <label class="sx-check">
+              <input
+                type="checkbox"
+                checked={usableOnly}
+                onChange={(e) => {
+                  const v = (e.target as HTMLInputElement).checked;
+                  setUsableOnly(v);
+                  savePref('gemUsable', v);
+                }}
+              />
+              <span>Usable with my weapons</span>
+            </label>
+            <label class="gem-for">
+              <span>Supports for</span>
+              <select
+                value={forDef ? forSkill : ''}
+                onChange={(e) => {
+                  const v = (e.target as HTMLSelectElement).value;
+                  setForSkill(v);
+                  savePref('gemSupportsFor', v);
+                }}
+              >
+                <option value="">any skill</option>
+                {skillIds
+                  .map((id) => gemDef(id))
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.name}
+                    </option>
+                  ))}
+              </select>
+            </label>
+          </div>
+        )}
+        {gems.length > 0 && shownGems.length === 0 && (
+          <div class="muted">No gem matches the filters.</div>
+        )}
         {gems.length === 0 && (
           <div class="muted">
             No spare gems.{' '}
@@ -460,7 +551,12 @@ export function Skills({
                       setSel(null);
                     }}
                   >
-                    <span>{d.name}</span>
+                    <span>
+                      {d.name}
+                      {oneEach && (counts.get(g.gemId) ?? 1) > 1 && (
+                        <span class="muted"> ×{counts.get(g.gemId)}</span>
+                      )}
+                    </span>
                     {b && (
                       <span class="gem-chip-b">
                         <Badge
