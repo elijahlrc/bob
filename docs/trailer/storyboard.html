@@ -379,7 +379,7 @@
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">Storyboard · draft 7 · 2026-10-21</div>
+    <div class="eyebrow">Storyboard · draft 8 · 2026-10-21</div>
     <h1>Battle of Builds: the 30-second trailer</h1>
     <p class="lede">
       For players who love ARPGs and roguelikes. The pitch: <b>every run is a new build</b>, crafted
@@ -463,31 +463,31 @@
     {
       id: 'hook',
       name: 'Hook',
-      span: '0:00–0:03',
+      span: '0:00–0:02',
       note: 'An endgame build at full power. No text. The first frame should already look like the genre the viewer loves.',
     },
     {
       id: 'builds',
       name: 'New run, new build',
-      span: '0:03–0:15',
-      note: 'The selling point. Three runs, three classes, three colours, and each shows one layer of the crafting: the tree, linked gems, rolled gear. Together they show the whole depth in twelve seconds.',
+      span: '0:02–0:13',
+      note: 'The selling point. Three runs, three classes, three colours, and each shows one layer of the crafting: the tree, linked gems, rolled gear. Together they show the whole depth in eleven seconds.',
     },
     {
       id: 'climb',
       name: 'The climb',
-      span: '0:15–0:20',
+      span: '0:13–0:19',
       note: 'A whole build, level 1 to 100, in one sitting, and then it falls. The fall is shown, not captioned.',
     },
     {
       id: 'duel',
       name: 'Duels and the board',
-      span: '0:20–0:26',
+      span: '0:19–0:25',
       note: 'The arcade loop: the finished build fights other players’ builds, its Elo moves, and its name climbs the high scores.',
     },
     {
       id: 'title',
       name: 'The mashup',
-      span: '0:26–0:30',
+      span: '0:25–0:30',
       note: 'The genre mix is the selling point, so it gets said outright, then the name, the price and where to play.',
     },
   ];
@@ -495,17 +495,18 @@
   const SHOTS = [
     {
       act: 'hook',
-      t: [0, 3],
+      t: [0, 2],
       name: 'Endgame',
       frame: 'endgame',
       screen:
         'Cold open on map 80-something: a late build tears through a packed room, traps bursting violet, a ring of blades, critical strike numbers stacking up. The camera holds wide so the whole screen is busy.',
-      sound: 'Drone, then the first full downbeat at 2 s on the biggest burst.',
+      sound:
+        'Trap spires on the first beats, then the first full hit at 1.5 s on the biggest burst.',
       cap: 'A late save on a Packed map (Debug panel). Several takes; keep the busiest two seconds.',
     },
     {
       act: 'builds',
-      t: [3, 4],
+      t: [2, 3],
       name: 'Pick a class',
       frame: 'classes',
       text: 'New run. New build.',
@@ -515,17 +516,17 @@
     },
     {
       act: 'builds',
-      t: [4, 7],
+      t: [3, 6],
       name: 'Run one: the Vanguard',
       frame: 'runA',
       screen:
         'Insert (1 s): the passive tree, a path of nodes lighting up towards a keystone. Then the payoff (2 s): the Vanguard in a Forge, a fire slam cracking the floor, the pack thrown apart in orange.',
-      sound: 'Node chimes, then the slam on the bar line at 6 s.',
+      sound: 'Node chimes, then the slam on the beat at 5 s.',
       cap: 'Tree tab with points to spend; a fire slam build on a Forge map.',
     },
     {
       act: 'builds',
-      t: [7, 10],
+      t: [6, 9],
       name: 'Run two: the Shade',
       frame: 'runB',
       screen:
@@ -535,27 +536,28 @@
     },
     {
       act: 'builds',
-      t: [10, 13],
+      t: [9, 11],
       name: 'Run three: the Mystic',
       frame: 'runC',
       screen:
-        'Insert (1 s): a rare item drops, its card compared against what is worn, the gains in colour, and it goes on. Then the payoff (2 s): the Mystic in a Cavern with a crowd of minions pouring into the pack, cold and chaos glinting.',
-      sound: 'Item drop chime, then the minions surge on the bar line at 12 s.',
+        'Insert (0.6 s): a rare item drops, its card compared against what is worn, the gains in colour, and it goes on. Then the payoff (1.4 s): the Mystic in a Cavern with a crowd of minions pouring into the pack, cold and chaos glinting.',
+      sound: 'Item drop chime, then the minions surge on the bar line at 10 s.',
       cap: 'Items tab with a clear upgrade; a minion build on a Cavern map.',
     },
     {
       act: 'builds',
-      t: [13, 15],
+      t: [11, 13],
       name: 'Three more builds',
       frame: 'triptych',
       screen:
-        'Three more builds, one for each class not yet shown, side by side in upright phone-shaped panels with rounded corners, each fighting its own way on its own rhythm: a Strider loosing a fast stream of poison arrows into a rat swarm, a Reaver’s slow, heavy sword sweeps through armoured knights with big numbers, a Zealot dropping a totem that spreads holy ground and pulses beams at wraiths. Six classes, six builds in fifteen seconds. No hands, no device bezels; the shape alone says it runs on a phone.',
-      sound: 'All three skills’ impacts layered on the bar line at 14 s.',
+        'Three more builds, one for each class not yet shown, side by side in upright phone-shaped panels with rounded corners, each fighting its own way on its own rhythm: a Strider loosing a fast stream of poison arrows into a rat swarm, a Reaver’s slow, heavy sword sweeps through armoured knights with big numbers, a Zealot dropping a totem that spreads holy ground and pulses beams at wraiths. Six classes, six builds in thirteen seconds. No hands, no device bezels; the shape alone says it runs on a phone.',
+      sound:
+        'Each panel’s own sounds on its own rhythm: arrow rattles, sweep whooshes, totem chimes.',
       cap: 'Three more late saves (Strider, Reaver, Zealot), each recorded on a real phone in portrait (the game’s phone layout and HUD), laid side by side in the edit.',
     },
     {
       act: 'climb',
-      t: [15, 18.5],
+      t: [13, 16.5],
       name: 'Level 1 to 100',
       frame: 'climb',
       text: 'Grind to level 100 in a sitting.',
@@ -566,17 +568,18 @@
     },
     {
       act: 'climb',
-      t: [18.5, 20],
+      t: [16.5, 19],
       name: 'The fall',
       frame: 'fallen',
       screen:
-        'A boss’s signature attack: it raises its arms and the light drains, a vast rune closes on the character, a column of void slams down on the beat, the screen shakes and the floor shatters. The character falls. Cut to the end screen; the duel button is pressed.',
-      sound: 'The music cuts on the death, a single low hit, a bell on the button.',
+        'A boss’s signature attack: it raises its arms and the light drains, a vast rune closes on the character, a column of void slams down on the beat, the screen shakes and the floor shatters. The character falls, and the shot holds on the body for a full second while the room goes dark. Then the end screen; the duel button is pressed.',
+      sound:
+        'The music stops for the boss’s charge, a huge low impact, then silence through the pause, and a bell on the button.',
       cap: 'A run that dies to a boss; end screen with rivals switched on.',
     },
     {
       act: 'duel',
-      t: [20, 23.5],
+      t: [19, 22.5],
       name: 'The duel',
       frame: 'duel',
       text: 'Duel their builds.',
@@ -587,7 +590,7 @@
     },
     {
       act: 'duel',
-      t: [23.5, 24.5],
+      t: [22.5, 23.5],
       name: 'The rating',
       frame: 'elo',
       screen: 'The result line: “Rated · 712 → 748”, the number counting up.',
@@ -596,7 +599,7 @@
     },
     {
       act: 'duel',
-      t: [24.5, 26],
+      t: [23.5, 25],
       name: 'The board',
       frame: 'board',
       text: 'Take the top spot.',
@@ -608,24 +611,25 @@
     },
     {
       act: 'title',
-      t: [26, 28],
+      t: [25, 27],
       name: 'The genres',
       frame: 'genres',
       text: 'Roguelike. ARPG. Arcade. Autobattler.',
       screen:
         'All four words on screen at once, in four panels that appear one per beat, each over footage that proves it: Roguelike over a run’s end screen, ARPG over the passive tree and a loot drop, Arcade over the high scores, Autobattler over the character fighting on its own at 8×.',
-      sound: 'Four hits, one per word, on the beats of bar 14.',
+      sound: 'Four hits, one per word, on the beats.',
       cap: 'Made in the edit from leftover footage of shots 3, 7 and 10.',
     },
     {
       act: 'title',
-      t: [28, 30],
+      t: [27, 30],
       name: 'Battle of Builds',
       frame: 'logo',
       text: 'Battle of Builds · Free on itch.io',
       screen:
-        'The title over a dim crypt, “Free on itch.io” under it. The torch gutters out on the last frame.',
-      sound: 'Final hit at 28 s, the drone rings out, the torch hisses out at 30 s.',
+        'The title stamps in over the genre grid, which stays on screen dimmed, with “Free on itch.io” under it. It holds for three seconds; the torch gutters out on the last frame.',
+      sound:
+        'The last genre hit carries into the title at 27 s; the drone rings out and the torch hisses out at 30 s.',
       cap: 'Made in the edit.',
     },
   ];

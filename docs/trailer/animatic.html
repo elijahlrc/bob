@@ -338,11 +338,12 @@
   /* ---------- the shots ---------- */
   const SHOTS = [
     {
-      t: [0, 3],
+      t: [0, 2],
       name: 'Endgame',
       what: 'Cold open on a late build tearing through a packed room. No text.',
       push: 0.06,
       draw(lt) {
+        lt += 0.5;
         const traps = [
           [96, 86, 0.5],
           [128, 98, 1.0],
@@ -386,7 +387,7 @@
       },
     },
     {
-      t: [3, 4],
+      t: [2, 3],
       name: 'Pick a class',
       what: 'The class screen flicks through classes and lands on the Vanguard.',
       draw(lt) {
@@ -406,7 +407,7 @@
       },
     },
     {
-      t: [4, 7],
+      t: [3, 6],
       name: 'Run one: the Vanguard',
       what: 'The passive tree lights a path to a keystone, then a fire slam in a Forge, on the bar line at 6 s.',
       push: 0.05,
@@ -482,7 +483,7 @@
       },
     },
     {
-      t: [7, 10],
+      t: [6, 9],
       name: 'Run two: the Shade',
       what: 'A support gem goes into a link and the damage jumps, then Spire Traps thrown across Ruins, springing on the beats.',
       push: 0.05,
@@ -545,12 +546,13 @@
       },
     },
     {
-      t: [10, 13],
+      t: [9, 11],
       name: 'Run three: the Mystic',
       what: 'A rare drop compared and equipped, then minions pouring into the pack in a Cavern, surging on the bar line at 12 s.',
       push: 0.05,
       draw(lt) {
-        if (lt < 1) {
+        if (lt < 0.6) {
+          lt /= 0.6;
           const k = ease(lt / 0.25);
           let s = txt(16, 22, 'Items', { size: 9, col: C.mute });
           s +=
@@ -579,8 +581,8 @@
             }) + '</g>';
           return s;
         }
-        const k = lt - 1;
-        const surge = 1.0;
+        const k = lt - 0.6;
+        const surge = 0.4;
         let s = floor(130, 112, 140, 56, '#28324a') + glow(130, 110, 80, C.cold, 0.35);
         const pack = [
           [176, 100],
@@ -590,7 +592,7 @@
         ];
         pack.forEach(([x, y], i) => (s += skel(x, y, deadAfter(surge + i * 0.08, k) * 0.85)));
         for (let i = 0; i < 7; i++) {
-          const f = clamp((k - i * 0.1) / 1.0);
+          const f = clamp((k - i * 0.04) / 0.4);
           const tx = 170 + (i % 3) * 12,
             ty = 100 + (i % 4) * 7;
           const x = lerp(70, tx, ease(f)) + Math.sin(k * 9 + i) * 2,
@@ -606,7 +608,7 @@
       },
     },
     {
-      t: [13, 15],
+      t: [11, 13],
       name: 'Three more builds',
       what: 'The other three classes side by side in phone-shaped panels, each fighting its own way on its own rhythm: rapid poison arrows, slow heavy sweeps, a totem pulsing on holy ground.',
       draw(lt) {
@@ -749,7 +751,7 @@
       },
     },
     {
-      t: [15, 18.5],
+      t: [13, 16.5],
       name: 'Level 1 to 100',
       what: 'Half-second cuts, each a different build in a different place, using different skills against different enemies; the map number rolls up to 100.',
       draw(lt) {
@@ -917,11 +919,11 @@
       },
     },
     {
-      t: [18.5, 20],
+      t: [16.5, 19],
       name: 'The fall',
       what: 'A boss’s signature attack: the light drains, a vast rune closes on the character, a column of void slams down and the floor shatters. The character falls. Then the end screen, the duel button pressed. No text.',
       draw(lt) {
-        if (lt < 0.95) {
+        if (lt < 1.85) {
           const charge = clamp(lt / 0.5);
           const hit = 0.5;
           const k = lt - hit;
@@ -966,9 +968,11 @@
           /* the light drains to a vignette */
           s += `<rect width="320" height="180" fill="#000" opacity="${charge * 0.35 * (k > 0 ? 1 - clamp(k / 0.1) * 0.6 : 1)}"/>`;
           s += globes(lt < hit ? 0.3 : clamp(0.3 - k * 2));
+          /* the pause: dust settles, the boss lowers its glow, the room goes dark */
+          s += `<rect width="320" height="180" fill="#000" opacity="${clamp((lt - 0.9) / 0.9) * 0.55}"/>`;
           return s + label(8, 14, 'BOSS · SIGNATURE ATTACK');
         }
-        const k = lt - 0.95;
+        const k = lt - 1.85;
         const pressed = k > 0.25;
         let s =
           panel(60, 26, 200, 116) +
@@ -992,7 +996,7 @@
       },
     },
     {
-      t: [20, 23.5],
+      t: [19, 22.5],
       name: 'The duel',
       what: 'Our build against Sin’s. One kites and shoots, the other closes in; a held frame, then the deciding hit.',
       push: 0.07,
@@ -1037,7 +1041,7 @@
       },
     },
     {
-      t: [23.5, 24.5],
+      t: [22.5, 23.5],
       name: 'The rating',
       what: 'Victory, and the Elo rating counts up.',
       draw(lt) {
@@ -1065,7 +1069,7 @@
       },
     },
     {
-      t: [24.5, 26],
+      t: [23.5, 25],
       name: 'The board',
       what: 'The high scores, Sin on top; our character climbs past two players, arcade style.',
       draw(lt) {
@@ -1108,7 +1112,7 @@
       },
     },
     {
-      t: [26, 28],
+      t: [25, 27],
       name: 'The genres',
       what: 'All four words on screen at once, appearing one by one on the beats, each over a sketch of the footage that proves it.',
       draw(lt) {
@@ -1167,13 +1171,17 @@
       },
     },
     {
-      t: [28, 30],
+      t: [27, 30],
       name: 'Battle of Builds',
-      what: 'The title and “Free on itch.io”. The torch gutters out.',
+      what: 'The title and “Free on itch.io” over the dimmed genre grid, held; the torch gutters out.',
       draw(lt) {
         const flick = 0.55 + 0.1 * Math.sin(lt * 23) + 0.06 * Math.sin(lt * 51);
-        const out = clamp((lt - 1.6) / 0.4);
-        let s = glow(160, 80, 130, C.torch, flick * (1 - out));
+        const out = clamp((lt - 2.6) / 0.4);
+        /* the genre grid stays, dimmed, under the title */
+        let s =
+          SHOTS[11].draw(2 + lt) +
+          `<rect width="320" height="180" fill="#07070b" opacity="${lerp(0, 0.8, ease(lt / 0.25)) + 0.2 * out}"/>`;
+        s += glow(160, 80, 130, C.torch, flick * (1 - out));
         s +=
           `<g opacity="${ease(lt / 0.3) * (1 - out)}">` +
           txt(160, 86, 'Battle of Builds', { size: 32, font: 'display', anchor: 'middle' }) +
@@ -1191,7 +1199,7 @@
   ];
 
   /* hard cuts that land on a hit get a short flash */
-  const FLASH = [2.0, 6.0, 12.0, 14.0, 19.0, 20.0, 23.25, 26.0, 26.5, 27.0, 27.5, 28.0];
+  const FLASH = [1.5, 5.0, 10.0, 17.0, 22.25, 25.0, 25.5, 26.0, 26.5, 27.0];
 
   const svg = document.getElementById('svg');
   function draw(t) {
