@@ -1,6 +1,6 @@
 # Bob — Duel balance: reprieves, a life curve and the end of a fight
 
-Status: **B0 to B3 built (2026-10-20); B4, the measurement, next. The `duels` table's new rules (docs/rivals.sql 9) wait for
+Status: **B0 to B4 built and measured (2026-10-20, section 8.1); the cap's target is missed and the tuning is the owner's. The `duels` table's new rules (docs/rivals.sql 9) wait for
 the owner's go-ahead before they are applied to the live database** · Owner: the user · Author: Claude
 
 The duels of [DUEL.md](DUEL.md) (rivals after a run, "Duel for your damned soul's fate") are decided by damage. A character in
@@ -241,6 +241,47 @@ orders. One run, at the end, per the standing rule. It reports:
 | Mirrored builds, side 0's wins                               | Within the F4 fairness band                                      |
 
 If the medians still fall steeply with the level, the next lever is the ×0.3 itself (decision 5), not a steeper life curve.
+
+**Measured, 2026-10-20** (`scripts/duel-balance.ts`): the 54 bot rivals of save version 20 (levels 8 to 91), every pair within
+10 maps (532), both orders, seeds 1 and 2, under the new rules, the new rules with the curve off ("flat"), and F4's ("old": no
+reprieves, no curve, 90 s), plus each build against itself on six seeds: 6,708 fights.
+
+| Band (mean level) | Fights | New: median, on the cap (decided)                        | Flat  | Old   |
+| ----------------- | ------ | -------------------------------------------------------- | ----- | ----- |
+| 0–9               | 12     | 180 s, 75% (all decided)                                 | 150 s | 44 s  |
+| 10–19             | 172    | 46 s, 14% (79%)                                          | 20 s  | 7.2 s |
+| 20–29             | 832    | 34 s, 5% (70%)                                           | 17 s  | 6.0 s |
+| 30–39             | 652    | 91 s, 28% (67%)                                          | 29 s  | 8.5 s |
+| 40–49             | 324    | 104 s, 31% (65%)                                         | 28 s  | 9.5 s |
+| 50–59             | 80     | 106 s, 38% (70%)                                         | 27 s  | 10 s  |
+| 60–69             | 44     | 54 s, 20% (22%)                                          | 24 s  | 8.5 s |
+| 70–79             | 12     | 28 s, 33% (all decided)                                  | 15 s  | 5.7 s |
+| **All**           | 2,128  | **57 s; 81% a death, 13% won on time, 6% drawn on time** | 22 s  | 7.4 s |
+
+| Measure                                          | New             | Flat            | Old             | Target                    |
+| ------------------------------------------------ | --------------- | --------------- | --------------- | ------------------------- |
+| On the cap                                       | 19%             | 6%              | 2%              | 5% or fewer: **missed**   |
+| Lower level's score, gap 1–4 / 5–10 / 11+ levels | 40% / 22% / 16% | 39% / 23% / 16% | 40% / 24% / 18% | reported                  |
+| Score of the side whose damage landed first      | 44%             | 45%             | 47%             | lower than old: met       |
+| Score of a minion build against one without      | 42%             | 45%             | 49%             | reported                  |
+| Mirrored builds: side 0 won / side 1 won / drawn | 84 / 69 / 171   |                 |                 | within ±18.6 of 76.5: met |
+
+What it says:
+
+- **Fights are four to eight times as long as F4's**, and the medians no longer fall with the level: they are 34 to 46 s up to
+  level 30 and 91 to 106 s at levels 30 to 59. But a fifth of the fights reach the cap (a third at levels 30 to 59), so the cap's
+  target is missed at 180 s, and data cut at the cap cannot say what cap would meet it.
+- **The life curve gives the lower level almost nothing** that can be seen: a gap of 5 to 10 levels between bot builds is a gap in
+  power (the lower one scores 22% under every rule), and the 1.1× to 1.5× edge in life does not close it.
+- **The first hit no longer decides**, though in these builds it did not decide under F4's rules either (47%).
+- **Minion builds fall from 49% to 42%** against the others, as section 9 expected: the characters' life grows and the minions'
+  does not.
+- **A mirror is a draw half the time**: the same build on both sides uses as many reprieves and runs out the clock.
+- Three in four fights see one side use all three reprieves.
+
+The levers, for the owner: a longer cap (180 s is three minutes at 1×), a larger damage scale under the curve (×0.3 was chosen
+for a fight with one life and no curve; the "flat" column is the curve's whole effect on length), or a gentler curve. Until then
+the defaults stand as built: 180 s, ×0.3, the straight line to 10×.
 
 ### 8.2 Decisions
 

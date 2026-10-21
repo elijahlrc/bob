@@ -243,7 +243,9 @@ ledger of each side (damage dealt and taken by source, `src/sim/ledger.ts`) is t
   falls with the level is the open question (Built: F4).
 - **Life curve** (DUEL-BALANCE.md 4, 2026-10-20). Each side's maximum life and energy shield are multiplied by `duelLifeMult` of the
   other side's level: 1 at level 1 to 10 at level 100 on a straight line, so the lower-level character has the larger factor. It
-  sits on top of the ×0.3 scale; minions are not multiplied.
+  sits on top of the ×0.3 scale; minions are not multiplied. Measured with three Bargain Coins a side and the 180 s cap on the 54
+  bot rivals of save version 20 (DUEL-BALANCE.md 8.1): median 57 s (F4's rules: 7.4 s), 34 to 46 s up to level 30 and 91 to 106 s
+  at levels 30 to 59, with 19% of the fights on the cap (a third at levels 30 to 59), so the cap and the scale are still open.
 
 ---
 
