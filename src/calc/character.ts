@@ -73,6 +73,7 @@ import {
   type SupportGemDef,
 } from '../data/gems';
 import { excludedBy, resolveSupports, typesAllow } from '../data/skillTypes';
+import { weaponBar, type WeaponHold } from '../data/weaponFit';
 import { supportLive } from './reach';
 import {
   cloneDamage,
@@ -473,6 +474,14 @@ export class Character {
   /** Tags of the weapons held (staff, bow, twoHand, ...). */
   readonly weaponTags: Set<SkillTag>;
   readonly holdingShield: boolean;
+  /** What is held, as a skill's weapon rules ask it (`weaponBar`). */
+  weaponHold(): WeaponHold {
+    return {
+      tags: this.weaponTags,
+      dualWielding: this.dualWielding,
+      holdingShield: this.holdingShield,
+    };
+  }
   readonly flasks: FlaskSpec[];
   /** The bit of each condition this character's mods use; every ModDB of the character shares it. */
   readonly cond = new CondIndex();
@@ -858,26 +867,20 @@ export class Character {
           reason = `${s.def.name} limits ${skill.name} to ${lw.join(' or ')} weapons`;
         }
       }
-      if (skill.requiresWeapon && !skill.requiresWeapon.some((t) => weaponTags.has(t))) {
+      const barred = weaponBar(
+        {
+          id: skill.id,
+          name: skill.name,
+          requiresWeapon: skill.requiresWeapon,
+          needsTwoHand: skill.needsTwoHand,
+          needsDualWield: sg.def.needsDualWield,
+          needsShield: sg.def.needsShield,
+        },
+        this.weaponHold(),
+      );
+      if (barred) {
         usable = false;
-        const w = skill.requiresWeapon.join(' or ');
-        reason = `${skill.name} needs ${/^[aeiou]/.test(w) ? 'an' : 'a'} ${w}`;
-      }
-      if (skill.needsTwoHand && !weaponTags.has('twoHand')) {
-        usable = false;
-        reason = `${skill.name} needs a two-handed weapon`;
-      }
-      if (sg.def.needsDualWield && !this.dualWielding) {
-        usable = false;
-        reason = `${skill.name} needs two weapons`;
-      }
-      if (sg.def.needsShield && !this.holdingShield) {
-        usable = false;
-        reason = `${skill.name} needs a shield`;
-      }
-      if (skill.id === 'venomCut' && weaponTags.has('twoHand')) {
-        usable = false;
-        reason = `${skill.name} needs a one-handed weapon`;
+        reason = barred;
       }
       this.actives.push({
         key: `gem${sg.gem.uid}`,

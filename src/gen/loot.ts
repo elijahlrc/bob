@@ -26,6 +26,7 @@ import type {
 } from '../data/types';
 import { UNIQUE_FLASKS, type UniqueFlaskDef } from '../data/uniqueFlasks';
 import { UNIQUES, type UniqueDef } from '../data/uniques';
+import { weaponBar, type WeaponHold } from '../data/weaponFit';
 import type { Mod } from '../mods/types';
 import type { UidSource } from './items';
 
@@ -420,17 +421,25 @@ function isSpecial(g: GemDef): boolean {
  * character's own attribute twice as much, and four times as much through area level 20. The first four maps hold nothing
  * special at all.
  */
-export function gemWeight(g: GemDef, classId?: string, ilvl = 99): number {
+export function gemWeight(g: GemDef, classId?: string, ilvl = 99, hold?: WeaponHold): number {
   const special = isSpecial(g);
   if (special && ilvl <= EARLY_MAPS) return 0;
   let w = special ? 1 : g.kind === 'active' ? 3 : 2;
-  if (classId) {
-    const a = classDef(classId).attrs;
-    const main = a.str >= a.dex && a.str >= a.int ? 'str' : a.dex >= a.int ? 'dex' : 'int';
-    if (g.attr.includes(main)) w *= ilvl <= EARLY_ATTR_LEVELS ? EARLY_ATTR_MULT : 2;
-  }
+  if (classId && g.attr.includes(mainAttr(classId)))
+    w *= ilvl <= EARLY_ATTR_LEVELS ? EARLY_ATTR_MULT : 2;
+  // A skill the weapons in hand cannot use still drops (the weapon may change), but seldom.
+  if (hold && g.kind === 'active' && weaponBar(g, hold)) w *= OFF_WEAPON_MULT;
   return w;
 }
+
+/** The class's own attribute: the highest of its three (strength first on a tie, then dexterity). */
+export function mainAttr(classId: string): 'str' | 'dex' | 'int' {
+  const a = classDef(classId).attrs;
+  return a.str >= a.dex && a.str >= a.int ? 'str' : a.dex >= a.int ? 'dex' : 'int';
+}
+
+/** How much less often a skill gem drops when the weapons in hand cannot use it. */
+export const OFF_WEAPON_MULT = 0.25;
 
 export const EARLY_MAPS = 4;
 /** Through this area level the class's own attribute is favoured this much (twice as much after), so the first gems fit the class. */
@@ -440,9 +449,9 @@ export const EARLY_ATTR_MULT = 4;
 export function rollGem(
   rng: Rng,
   uid: UidSource,
-  ctx: { classId?: string; ilvl?: number } = {},
+  ctx: { classId?: string; ilvl?: number; hold?: WeaponHold } = {},
 ): GemItem {
-  const gem = rng.weighted(ALL_GEMS, (g) => gemWeight(g, ctx.classId, ctx.ilvl));
+  const gem = rng.weighted(ALL_GEMS, (g) => gemWeight(g, ctx.classId, ctx.ilvl, ctx.hold));
   return { kind: 'gem', uid: uid(), gemId: gem.id };
 }
 
@@ -510,6 +519,8 @@ export type DropContext = {
   faction?: string;
   /** The character's class (its own attribute's gems drop more often). */
   classId?: string;
+  /** What the character holds (skill gems its weapons cannot use drop less often). */
+  hold?: WeaponHold;
   /** The player's item quantity and rarity multipliers (1 = none), from gear and flasks. */
   playerQuantity?: number;
   playerRarity?: number;

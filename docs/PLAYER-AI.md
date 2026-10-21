@@ -54,6 +54,9 @@ have to handle everything that reaches it. A ranged character can be set to **ki
 - **Stall breaker:** if it deals no damage to its target for **20 seconds**, it ignores that enemy for **30
   seconds** and moves on. If the enemy is chasing, it will come back to the character later. This stops a run from
   hanging on an enemy it can't hurt, but you lose time and may arrive at the next pack with an enemy following.
+- **Screened targets:** if its hits have not reached its target for **4 seconds** while at least 3 of them landed on
+  other enemies (minions summoned in front of it, a pack in the way), it sets that target aside for **4 seconds** and
+  fights what is in the way. This is not counted as a stall.
 
 ---
 

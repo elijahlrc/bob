@@ -628,6 +628,9 @@ export type PlayerAI = {
   watchId: number;
   watchLife: number;
   watchT: number;
+  /** The player's hits since the watch began: on the watched target, and on other enemies (it may be screened). */
+  aimHits: number;
+  strayHits: number;
   /** A target the player has given up on, and until when. */
   skipId: number;
   skipUntil: number;

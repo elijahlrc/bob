@@ -145,6 +145,14 @@ export const SHOT_ALERT = 10;
 /** The player gives up on a target it has not damaged for this long (seconds), for SKIP_TIME. */
 export const STALL_TIME = 20;
 export const SKIP_TIME = 30;
+/**
+ * A target the player's hits have not reached for this long while they land on other enemies (minions summoned in front of
+ * it, a pack between) is set aside for SCREENED_SKIP seconds, so the player deals with what is in the way.
+ */
+export const SCREENED_TIME = 4;
+export const SCREENED_SKIP = 4;
+/** Hits on other enemies, in that time, that make a target screened. */
+export const SCREENED_HITS = 3;
 /** Arrows that hit walls within BLOCK_WINDOW seconds before the player moves in for a clearer shot. */
 export const BLOCK_LIMIT = 5;
 export const BLOCK_WINDOW = 3;

@@ -1,4 +1,4 @@
-import { ACTIVE_GEMS } from '../data/gems';
+import { ACTIVE_GEMS, type ActiveGemDef } from '../data/gems';
 import { Rng } from '../core/rng';
 import { DEFAULT, LEGACY, type Difficulty } from '../data/difficulty';
 import { classDef } from '../data/classes';
@@ -8,6 +8,8 @@ import type { AnyItem, Build, CurrencyItem, InventoryItem, Item } from '../data/
 import { rollCurrencyBundle, rollCurrencyDrops } from '../gen/currencyDrops';
 import { makeFlask, makeItem } from '../gen/items';
 import {
+  gemWeight,
+  mainAttr,
   rollChest,
   rollDrop,
   rollFlask,
@@ -16,6 +18,8 @@ import {
   rollUniqueOf,
   uniqueIdOf,
 } from '../gen/loot';
+import { Character } from '../calc/character';
+import { weaponBar } from '../data/weaponFit';
 import { affixReward, mapAffixDef } from '../data/mapAffixes';
 import { CRESCENDO_LOOT_PER_STEP, mapTypeDef } from '../data/mapTypes';
 import { biomeFor } from '../data/biomes';
@@ -296,6 +300,7 @@ export function worldOptsFor(run: RunState, plan: MapPlan): MapOpts {
         theme: plan.theme,
         faction,
         classId: run.build.classId,
+        hold: w.sides[0].char.weaponHold(),
         playerQuantity: mults.quantity * (1 + quantity) * (m.mon.kind.bonusLoot ?? 1),
         playerRarity: mults.rarity * (1 + rarity),
       });
@@ -420,17 +425,36 @@ export function stash(run: RunState, it: CurrencyItem): void {
 /** The early maps that end with a pick of three skill gems (the others follow the every-fifth-map pick). */
 export const SKILL_REWARD_MAPS = 4;
 
-/** Three different skill gems the run does not hold yet (as many as are left, if fewer). */
+/**
+ * Three different skill gems the run does not hold yet, that the weapons in hand can use (docs/NEWPLAYER.md N3): drawn as
+ * the drops are weighted (the class's own attribute first, nothing special on the first maps), and at least one of them a
+ * damage skill of the class's own attribute. As many as are left, if fewer.
+ */
 export function rollSkillRewards(run: RunState): AnyItem[] {
   const rng = new Rng(run.seed).fork(`skillreward${run.map}`);
   const held = new Set<string>();
   for (const it of run.inventory) if (it.kind === 'gem') held.add(it.gemId);
   for (const it of Object.values(run.build.equipment))
     for (const g of it?.sockets ?? []) if (g) held.add(g.gemId);
-  const pool = ACTIVE_GEMS.filter((g) => !held.has(g.id));
-  rng.shuffle(pool);
+  const hold = new Character(run.build).weaponHold();
+  const weight = (g: ActiveGemDef) => gemWeight(g, run.build.classId, run.map);
+  const fits = (g: ActiveGemDef) => !held.has(g.id) && !weaponBar(g, hold);
+  // A map with nothing usable left (never at the start) falls back to every gem not held.
+  let pool = ACTIVE_GEMS.filter((g) => fits(g) && weight(g) > 0);
+  if (pool.length < 3) pool = ACTIVE_GEMS.filter((g) => !held.has(g.id));
+  const picks: ActiveGemDef[] = [];
+  while (picks.length < 3 && pool.length) {
+    const g = rng.weighted(pool, (x) => Math.max(weight(x), 0.01));
+    picks.push(g);
+    pool = pool.filter((x) => x !== g);
+  }
+  const main = mainAttr(run.build.classId);
+  const own = (g: ActiveGemDef) => !g.utility && g.attr.includes(main);
+  const spare = pool.filter(own);
+  if (picks.length === 3 && !picks.some(own) && spare.length)
+    picks[2] = rng.weighted(spare, (x) => Math.max(weight(x), 0.01));
   const uid = uidSource(run);
-  return pool.slice(0, 3).map((g): AnyItem => ({ kind: 'gem', uid: uid(), gemId: g.id }));
+  return picks.map((g): AnyItem => ({ kind: 'gem', uid: uid(), gemId: g.id }));
 }
 
 /** Three reward offers drawn from the item, gem and flask pools. */
@@ -459,7 +483,14 @@ export function rollRewards(run: RunState): RewardCard[] {
       CURRENCY_DROPS ? 15 : 0,
     ]);
     if (pool === 'currency') out.push(rollCurrencyBundle(rng, uid, run.map));
-    else if (pool === 'gem') out.push(rollGem(rng, uid, { classId: run.build.classId, ilvl }));
+    else if (pool === 'gem')
+      out.push(
+        rollGem(rng, uid, {
+          classId: run.build.classId,
+          ilvl,
+          hold: new Character(run.build).weaponHold(),
+        }),
+      );
     else if (pool === 'flask') out.push(rollFlask(rng, uid, ilvl, 1));
     else out.push(rollDrop(rng, uid, { ilvl, monster: 'rare' }, rng.chance(0.7)));
   }

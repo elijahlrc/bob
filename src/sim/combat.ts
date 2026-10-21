@@ -537,6 +537,10 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   src.since.hit = 0;
   dst.since.beenHit = 0;
   if (src.isPlayer) {
+    // Whether the hits reach the target the AI is watching (a screened target is set aside, ai.ts).
+    const ai = src.side!.ai;
+    if (dst.id === ai.watchId) ai.aimHits++;
+    else if (dst.team !== src.team) ai.strayHits++;
     rollGains(w, src.side!, 'hit', p.gains);
     rollCharges(w, src.side!, 'hit', p.gains);
     if (p.skill.behaviour.kind === 'melee') {

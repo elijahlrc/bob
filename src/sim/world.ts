@@ -196,6 +196,8 @@ function makeSide(plan: MapPlan, id: number, inp: SideInput): Side {
       watchId: 0,
       watchLife: 0,
       watchT: 0,
+      aimHits: 0,
+      strayHits: 0,
       skipId: 0,
       skipUntil: 0,
       stuckT: 0,

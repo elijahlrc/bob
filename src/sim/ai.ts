@@ -18,6 +18,9 @@ import {
   REPOSITION_TIME,
   RETREAT_COOLDOWN,
   RETREAT_TIME,
+  SCREENED_HITS,
+  SCREENED_SKIP,
+  SCREENED_TIME,
   SKIP_TIME,
   STALL_TIME,
   STUCK_TIME,
@@ -513,6 +516,19 @@ export function playerAI(w: World, s: Side, dt: number): void {
         ai.watchId = target.id;
         ai.watchLife = target.life;
         ai.watchT = w.t;
+        ai.aimHits = 0;
+        ai.strayHits = 0;
+      } else if (
+        w.t - ai.watchT > SCREENED_TIME &&
+        ai.aimHits === 0 &&
+        ai.strayHits >= SCREENED_HITS
+      ) {
+        // Screened: every hit lands on something in front of it. Deal with that first; no stall, it was not the target's doing.
+        ai.skipId = target.id;
+        ai.skipUntil = w.t + SCREENED_SKIP;
+        ai.watchId = 0;
+        ai.targetId = 0;
+        return;
       } else if (w.t - ai.watchT > STALL_TIME && target.rarity !== 'boss') {
         // (A boss is never given up on: its shield or its regrowth may hold its life up for a while, docs/BOSSES.md 11.1.)
         ai.skipId = target.id;
