@@ -405,8 +405,39 @@ def degrade(x, rate, bits, drive):
     return np.round(y * q) / q
 
 
-bus['bass'] = degrade(bus['bass'], 6000, 3, 4.5) * 0.6  # a gritty, clipped bass, trimmed back to its old level
-bus['lead'] = degrade(bus['lead'], 7000, 3, 3.5)  # the phrase rougher, the same level
+def lowpass(x, cut):
+    """A steep low-pass through the FFT (the whole 30 s at once): takes the corners off the triangle so the fundamental stands alone."""
+    f = np.fft.rfft(x)
+    fr = np.fft.rfftfreq(len(x), 1 / SR)
+    f *= 1 / (1 + (fr / cut) ** 8)
+    return np.fft.irfft(f, len(x))
+
+
+def fold(x, k):
+    """Wavefold: a signal pushed past full scale folds back on itself, which adds bright inharmonic partials."""
+    return np.sin(np.clip(x, -1, 1) * k)
+
+
+# The bass: the old gritty triangle, a clean low sine under it for weight, and the sine saturated so the note still speaks on
+# a laptop speaker that cannot play 73 Hz. About 9 dB louder than it was.
+_b = bus['bass']
+_sub = lowpass(_b, 110)
+_grit = degrade(_b, 6000, 3, 4.5)
+_harm = np.tanh(_sub * 7.0) * 0.5
+bus['bass'] = (_grit * 0.6 * 1.2 + _sub * 1.5 + _harm * 0.7) * 1.0
+
+# The lead, crushed hard: held to a very low sample rate (aliasing), pushed into a hard clip, wavefolded, cut to 2 and 3 bits and
+# the two blended, then a short metallic comb (a 1.7 ms delay fed back) and a copy that is crushed harder still.
+_l = bus['lead']
+_a = degrade(_l, 3600, 2, 9.0)
+_f = degrade(fold(_l * 6.0, 2.4), 5200, 3, 6.0)
+_mix = 0.55 * _a + 0.45 * _f
+_cd = int(0.0017 * SR)
+_comb = _mix.copy()
+for _k in range(1, 4):
+    _comb[_cd * _k :] += _mix[: -_cd * _k] * (0.45 ** _k)
+_hard = degrade(_l, 2400, 2, 12.0)  # the same line crushed harder still, for the gritty edge
+bus['lead'] = (_comb * 0.8 + _hard * 0.25) * 0.5
 for a_, b_ in mute_spans:  # held silences
     for k_ in bus:
         bus[k_][int(a_ * SR) : int(b_ * SR)] = 0
@@ -442,13 +473,16 @@ def finish(x):
 
 
 L, R = finish(L), finish(R)
+# a crushed, clipped signal has hard edges and a lot above the range an encoder keeps; cut it first so the encoder does not ring
+# (which overshoots the peak by several dB and clips) and the sound is the same in the file as here
+L, R = lowpass(L, 14000), lowpass(R, 14000)
 # fade the last half second
 fade = np.ones(N)
 fade[-int(0.4 * SR) :] = np.linspace(1, 0, int(0.4 * SR))
 L *= fade
 R *= fade
 peak = max(np.max(np.abs(L)), np.max(np.abs(R)))
-L, R = L / peak * 0.95, R / peak * 0.95
+L, R = L / peak * 0.7, R / peak * 0.7  # headroom: the lossy encoders overshoot a crushed, clipped signal by about 2 dB
 
 st = np.empty(N * 2)
 st[0::2], st[1::2] = L, R

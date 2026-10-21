@@ -49,7 +49,7 @@ async function main(): Promise<void> {
         '-i',
         wav,
         '-b:a',
-        '160k',
+        '256k',
         path.join(DIR, 'animatic.mp3'),
       ]);
     }
@@ -85,7 +85,7 @@ async function main(): Promise<void> {
     run('ffmpeg', [
       '-y', '-loglevel', 'error', '-framerate', String(FPS), '-i', path.join(work, 'f%04d.png'), '-i', audio,
       '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '20', '-preset', 'medium',
-      '-c:a', 'aac', '-b:a', '192k', '-shortest', '-movflags', '+faststart', path.join(DIR, `${name}.mp4`),
+      '-c:a', 'aac', '-b:a', '320k', '-shortest', '-movflags', '+faststart', path.join(DIR, `${name}.mp4`),
     ]);
     console.log(`wrote docs/trailer/${name}.mp4`);
   } finally {

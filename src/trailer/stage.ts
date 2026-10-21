@@ -198,6 +198,57 @@ export function treeShot(run: RunState, steps = 4): { name: string; path: number
   return { name: tree.nodes[best.id].name, path: best.path.slice(-steps) };
 }
 
+/**
+ * A build's worth of passives, in the order they would be taken: from the class start, the nearest notable (a keystone counts as
+ * worth two and a half) by its shortest path, again and again, until `count` nodes are taken. A dense cluster growing out of the
+ * start, every node joined to the rest.
+ */
+export function growBuild(classId: string, count: number): number[] {
+  const tree = getTree();
+  const taken: number[] = [];
+  const targets = tree.nodes.filter(
+    (n) => (n.kind === 'notable' || n.kind === 'keystone') && !n.retired,
+  );
+  while (taken.length < count) {
+    let best: { path: number[]; score: number } | null = null;
+    for (const n of targets) {
+      if (taken.includes(n.id)) continue;
+      const p = pathTo(taken, classId, n.id);
+      if (!p || !p.length) continue;
+      const score = p.length / (n.kind === 'keystone' ? 2.5 : 1);
+      if (!best || score < best.score) best = { path: p, score };
+    }
+    if (!best) break;
+    taken.push(...best.path);
+  }
+  return taken;
+}
+
+/** The box the nodes `ids` fill, and where `classId` starts, in tree units. */
+export function boxOf(
+  classId: string,
+  ids: number[],
+): { minX: number; minY: number; maxX: number; maxY: number; startX: number; startY: number } {
+  const tree = getTree();
+  const st = tree.nodes[tree.starts[classId]];
+  const box = { minX: st.x, minY: st.y, maxX: st.x, maxY: st.y, startX: st.x, startY: st.y };
+  for (const id of ids) {
+    const n = tree.nodes[id];
+    box.minX = Math.min(box.minX, n.x);
+    box.minY = Math.min(box.minY, n.y);
+    box.maxX = Math.max(box.maxX, n.x);
+    box.maxY = Math.max(box.maxY, n.y);
+  }
+  return box;
+}
+
+/** Set the passives taken (in order) without spending points, for a tree that fills up on screen. */
+export function setAllocated(c: Controller, ids: number[]): void {
+  c.act((r) => {
+    r.build = { ...r.build, allocated: ids };
+  });
+}
+
 /** Take one node of the tree, as a click on it does. */
 export function take(c: Controller, node: number): void {
   c.act((r) => {

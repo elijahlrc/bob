@@ -96,20 +96,20 @@ const BOARD = [
 ] as const;
 
 export const CLIPS: Clip[] = [
-  /* 1. Cold open: a late Shade's traps and blades through a packed room. */
+  /* 1. Cold open: a late Mystic's Skyfall, lightning columns through a pack of rot brutes and ember creatures, close in. */
   mapClip(
     'endgame',
     {
-      classId: 'shade',
+      classId: 'mystic',
       level: 92,
-      body: ['spireTrap', 'wiredHarm', 'tripleSnare'],
+      weapon: 'wand_l72',
+      body: ['skyfall', 'echoingCast', 'wiredHarm'],
       helmet: ['orbitingBlades'],
-      primary: 'spireTrap',
     },
     84,
-    { theme: 'bonePits', biome: 'ruins' },
+    { theme: 'mix:charnelPits+kilnHall', biome: 'ruins' },
     150,
-    { zoom: 2, pack: 5 },
+    { zoom: 3, pack: 6 },
   ),
 
   /* 2. The class screen, the highlight stepping across the cards on the eighth notes. */
@@ -176,6 +176,66 @@ export const CLIPS: Clip[] = [
       for (let i = 0; i < 30; i++) {
         const k = [0, 8, 15, 23].indexOf(i);
         if (k >= 0) await t.stage((S, c, _g, node) => S.take(c, node), shot.path[k]);
+        await t.still(1);
+      }
+    },
+  },
+
+  /* 3x. TRY: a whole build growing, level 5 to 100, the tree zoomed out so it reads as big. Its own clip, to be judged first. */
+  {
+    name: 'tree3',
+    viewport: UI,
+    css: `.tree-bar, .tree-help, .tree-legend { display: none !important; }
+      .tree-wrap .tooltip, svg.tree g.preview { display: none !important; }
+      #trailer-level { position: fixed; left: 24px; top: 58px; z-index: 9999; font: 600 40px/1 'IM Fell English SC', Georgia, serif;
+        color: #d98a3a; text-shadow: 0 2px 6px #000, 0 0 14px #000; pointer-events: none; }`,
+    async film(t) {
+      const { order, box } = await t.stage((S, c) => {
+        const run = S.stagedRun({ classId: 'vanguard', level: 100, seed: 3 }, 60);
+        const ids = S.growBuild('vanguard', 99);
+        S.toCamp(c, run);
+        S.setAllocated(c, ids.slice(0, 3));
+        return { order: ids, box: S.boxOf('vanguard', ids) };
+      });
+      await tab(t, 'Passive tree');
+      await t.page.waitForTimeout(300);
+      await t.page.evaluate(() => {
+        const el = document.createElement('div');
+        el.id = 'trailer-level';
+        document.body.appendChild(el);
+      });
+      // Zoomed out until the finished build fills about two thirds of the view, and moved to put it in the middle (the tree opens at
+      // a fifth of a pixel a unit, centred on the class start; a wheel step scales by exp(-dy * 0.0015)).
+      const svg = (await t.page.locator('svg.tree').first().boundingBox())!;
+      const cx = svg.x + svg.width / 2;
+      const cy = svg.y + svg.height / 2;
+      const k = Math.min(
+        (svg.width * 0.7) / (box.maxX - box.minX),
+        (svg.height * 0.7) / (box.maxY - box.minY),
+        0.22,
+      );
+      await t.page.mouse.move(cx, cy);
+      await t.page.mouse.wheel(0, -Math.log(k / 0.22) / 0.0015);
+      await t.page.waitForTimeout(150);
+      await t.page.mouse.down();
+      await t.page.mouse.move(
+        cx + (box.startX - (box.minX + box.maxX) / 2) * k,
+        cy + (box.startY - (box.minY + box.maxY) / 2) * k,
+        { steps: 6 },
+      );
+      await t.page.mouse.up();
+      await t.page.mouse.move(5, 470);
+      const N = 90;
+      for (let i = 0; i < N; i++) {
+        const k = i / (N - 1);
+        const e = 1 - Math.pow(1 - k, 2);
+        const n = Math.max(3, Math.round(e * order.length));
+        const level = Math.round(5 + e * 95);
+        await t.stage((S, c, _g, a) => S.setAllocated(c, a), order.slice(0, n));
+        await t.page.evaluate((l: number) => {
+          const el = document.getElementById('trailer-level');
+          if (el) el.textContent = `Level ${l}`;
+        }, level);
         await t.still(1);
       }
     },

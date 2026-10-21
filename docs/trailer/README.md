@@ -45,7 +45,10 @@ deterministic: an unchanged page and score give byte-identical files.
   three more classes side by side in phone-shaped panels; the climb, ending at map 63; a boss's signature attack kills
   the character there, a pause, the end screen; the duel with Sin; the rating; the high scores (Sin first, as the first
   to beat the game; oostin and Eli are real players, the other names made up); the genre grid; the title over it.
-- Music: rhythm first, simple, one groove that only stops for the fall; the melody quiet and under the bass and drums;
-  crunchy. No silence before the duel's deciding blow, a restrained crash. The genre hits are set up by a drop-out and a
-  tom fill, not a riser.
+- Music: rhythm first, simple, one groove that only stops for the fall; a heavy bass (a clean sine and its saturated
+  harmonics under the gritty triangle, about 8 dB up from the first score) and a melody crushed hard (a very low sample
+  rate, hard clipping, wavefolding, 2 and 3 bits, a short metallic comb). No silence before the duel's deciding blow, a
+  restrained crash. The genre hits are set up by a drop-out and a tom fill, not a riser. The mix is cut at 14 kHz and
+  peaks at -3 dB, and the video's audio is 320 kb/s AAC: a crushed, clipped signal otherwise rings in the encoder and
+  clips on playback.
 - Cuts land on the beat (120 bpm: a beat is 0.5 s, a bar 2 s); any timing change keeps to the grid.
