@@ -745,11 +745,11 @@
     {
       t: [12.5, 16],
       name: 'Level 1 to 100',
-      what: 'Half-second cuts, each a different build in a different place, using different skills against different enemies; the map number rolls up to 100.',
+      what: 'Half-second cuts, each a different build in a different place, using different skills against different enemies; the map number climbs to 63, the map the character falls on.',
       draw(lt) {
         const i = Math.min(6, Math.floor(lt / 0.5));
         const l = lt - i * 0.5;
-        const map = [4, 17, 31, 48, 63, 82, 100][i];
+        const map = [4, 12, 21, 31, 41, 52, 63][i];
         const CUTS = [
           /* a Crypt corridor: a Reaver cleaving skeletons */
           () => {
@@ -882,7 +882,7 @@
             ].forEach(([x, y]) => (s += foe('knight', x, y, deadAfter(0.3, l))));
             return s + floatNum(184, 82, '7,230', C.gold, 0.2, l, 12);
           },
-          /* the Hollow at map 100: a Shade's ring of blades round a towering brute */
+          /* the Hollow at map 63: a Shade's ring of blades round a towering brute, the last map before the fall */
           () => {
             let s =
               `<rect width="320" height="180" fill="#3a2224" opacity=".45"/>` +
@@ -962,7 +962,11 @@
           s += globes(lt < hit ? 0.3 : clamp(0.3 - k * 2));
           /* the pause: dust settles, the boss lowers its glow, the room goes dark */
           s += `<rect width="320" height="180" fill="#000" opacity="${clamp((lt - 0.9) / 0.9) * 0.55}"/>`;
-          return s + label(8, 14, 'BOSS · SIGNATURE ATTACK');
+          return (
+            s +
+            txt(10, 18, 'Map 63', { size: 10, col: C.torch, weight: 600 }) +
+            label(8, 30, 'BOSS · SIGNATURE ATTACK')
+          );
         }
         const k = lt - 1.85;
         const pressed = k > 0.4;
