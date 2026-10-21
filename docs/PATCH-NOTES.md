@@ -4,6 +4,13 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-21
+
+- Orbiting Blades is cast on the move, and its ring of blades widens with every blade.
+- Primal Strike and Prime Splash now look like the element they deal.
+- Anvil Drop, Blade Wind and Rime Rebuke's cards now say they trigger themselves, not a socketed spell.
+- Tide Gathering's buff is renamed Arcane Tide.
+
 ## 2026-10-20
 
 - The passive tree is rebuilt from scratch, its class regions divided into named areas that show when zoomed out.
