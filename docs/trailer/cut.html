@@ -348,22 +348,23 @@
     classes: 30,
     tree: 30,
     vanguard: 150,
-    skills: 30,
+    skills: 60,
     shade: 150,
     drop: 30,
-    equip: 30,
+    equip: 45,
     strider: 90,
     reaver: 90,
     zealot: 90,
     climb1: 45,
     climb2: 45,
-    climb3: 45,
     climb4: 45,
     climb5: 45,
     climb6: 45,
-    climb7: 45,
+    climb7: 75,
     fall: 64,
     summary: 36,
+    duel1: 38,
+    duel2: 30,
     duel: 125,
     result: 30,
     board: 45,
@@ -373,17 +374,18 @@
   const IN = {
     endgame: 0,
     vanguard: 17,
-    shade: 0,
+    shade: 135,
     strider: 0,
     reaver: 0,
     zealot: 16,
     climb1: 2,
     climb2: 0,
-    climb3: 2,
     climb4: 0,
     climb5: 0,
     climb6: 2,
     climb7: 28,
+    duel1: 0,
+    duel2: 0,
     duel: 26,
     auto: 0,
   };
@@ -429,12 +431,12 @@
     {
       t: [6, 10.5],
       name: 'Run two: the Shade',
-      what: 'Wired Harm into the Spire Trap’s link, the damage jumps; traps across Ruins; the last kill drops a rare amulet for the build; Equip.',
+      what: 'The gem list, the socket and the DPS in one view: Wired Harm is picked up, its socket lights, and the Spire Trap’s damage jumps; then the traps, the last kill drops a rare amulet in one continuous shot; the card against the worn locket, and Swap.',
       draw(lt) {
-        if (lt < 1) return img(at('skills', lt));
-        if (lt < 3) return img(at('shade', lt - 1));
-        if (lt < 3.5) return img(at('drop', lt - 3, 0));
-        return crop(at('equip', lt - 3.5, 0), [373, 50, 907, 510]);
+        if (lt < 2) return img(at('skills', lt, 0));
+        if (lt < 2.5) return img(at('shade', lt - 2));
+        if (lt < 3) return img(at('drop', lt - 2.5, 0));
+        return crop(at('equip', lt - 3, 0), [427, 90, 853, 480]);
       },
     },
     {
@@ -446,10 +448,10 @@
           `<rect width="320" height="180" fill="#0b0b10"/>` + glow(160, 90, 160, C.torch, 0.25);
         ['strider', 'reaver', 'zealot'].forEach((clip, i) => {
           const k = ease((lt - i * 0.1) / 0.3);
-          const w = 74,
-            h = 160,
-            x = 160 - w * 1.5 - 10 + i * (w + 10),
-            y = 10 + (1 - k) * 170;
+          const w = 81,
+            h = 176,
+            x = 160 - w * 1.5 - 7 + i * (w + 7),
+            y = 2 + (1 - k) * 176;
           s += `<clipPath id="ph${i}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="9"/></clipPath>`;
           s += `<g clip-path="url(#ph${i})">${img(at(clip, lt), x, y, w, h)}</g>`;
           s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="9" fill="none" stroke="${C.uiLine}" stroke-width="1.2"/>`;
@@ -460,17 +462,18 @@
     {
       t: [12.5, 16],
       name: 'Level 1 to 100',
-      what: 'Half-second cuts, each a different build in a different place against different monsters; the map number climbs to 63.',
+      what: 'Half-second cuts, each a different build in a different place against different monsters, the level in large type; the last, the Shade that falls, is held for a second.',
       draw(lt) {
-        const i = Math.min(6, Math.floor(lt / 0.5));
+        const i = Math.min(5, Math.floor(lt / 0.5));
         const l = lt - i * 0.5;
-        const map = [4, 12, 21, 31, 41, 52, 63][i];
-        const names = ['Crypt', 'Forge', 'Cavern', 'Ruins', 'Marsh', 'Shrine', 'Warren'];
-        let s = img(at(`climb${i + 1}`, l));
+        const level = [12, 20, 42, 52, 62, 72][i];
+        const names = ['Crypt', 'Forge', 'Ruins', 'Marsh', 'Shrine', 'Warren'];
+        const clip = ['climb1', 'climb2', 'climb4', 'climb5', 'climb6', 'climb7'][i];
+        let s = img(at(clip, l));
         s +=
-          `<rect width="320" height="24" fill="#000" opacity=".35"/>` +
-          txt(10, 17, `Map ${map}`, { size: 11, col: C.torch, weight: 600, font: 'display' }) +
-          txt(310, 17, names[i], { size: 9, col: C.bone, anchor: 'end', font: 'display' });
+          `<rect width="320" height="38" fill="#000" opacity=".5"/>` +
+          txt(12, 28, `Level ${level}`, { size: 26, col: C.torch, weight: 600, font: 'display' }) +
+          txt(308, 25, names[i], { size: 12, col: C.bone, anchor: 'end', font: 'display' });
         return s + caption('Grind to level 100 in a sitting.', lt, 0.15, 170, 17);
       },
     },
@@ -491,13 +494,16 @@
     {
       t: [19, 22.5],
       name: 'The duel',
-      what: 'The arena: our Mystic against Sin’s Reaver, Sin’s name on the boss bar. The deciding blow is held for a quarter beat, then lands on 22.25.',
+      what: 'The arena: our Mystic against Sin’s Reaver, Sin’s name on the boss bar, in three cuts of the one fight: the first exchanges at full life, the middle, and the last blows. The deciding blow is held for a quarter beat, then lands on 22.25.',
       draw(lt) {
+        const cap = caption('Duel their builds.', lt, 0.1, 170, 16);
+        if (lt < 1.25) return img(at('duel1', lt, 0)) + cap;
+        if (lt < 2.25) return img(at('duel2', lt - 1.25, 0)) + cap;
         /* the deciding blow lands at frame IN + 90 of the duel clip */
         const tt = lt < 3.0 ? lt : lt < 3.25 ? 3.0 : 3.0 + (lt - 3.25);
         /* frame 118 is the last before the result screen comes up */
         const f = Math.min(118, IN.duel + tt * FPS);
-        return img(src('duel', f)) + caption('Duel their builds.', lt, 0.1, 170, 16);
+        return img(src('duel', f)) + cap;
       },
     },
     {

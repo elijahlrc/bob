@@ -24,6 +24,8 @@ const SOFT = { scaling: 0.6, base: 0.3, variance: 0 };
 /** The map's own text: the top line, the speed buttons and the biome's title card. */
 const BARE = `.hud-top, .speeds, .biome-banner, .hud-abandon { display: none !important; }`;
 const PHONE = { w: 390, h: 844, phone: true };
+/** The phone's whole map screen (top line, abandon button, bars); only the biome's title card, which fades mid-clip, is hidden. */
+const PHONE_UI = `.biome-banner { display: none !important; }`;
 /** The camp and title screens: 1280×720 drawn at 1.5× (the text reads at trailer size). */
 const UI = { w: 854, h: 480, scale: 1.5 };
 
@@ -42,13 +44,14 @@ function mapClip(
     viewport?: Clip['viewport'];
     zoom?: number;
     speed?: number;
+    css?: string;
   } = {},
 ): Clip {
   return {
     name,
     viewport: opts.viewport,
     zoom: opts.zoom ?? (opts.viewport ? 2 : 2.5),
-    css: BARE,
+    css: opts.css ?? BARE,
     async film(t) {
       await t.stage(
         (S, c, game, a) => {
@@ -197,6 +200,14 @@ export const CLIPS: Clip[] = [
   {
     name: 'skills',
     viewport: UI,
+    // Only the body's row and the gem list, so the gem, its socket and the number that moves are all on screen at once. The gem
+    // and the socket it goes to are lit, and an arrow runs from one to the other, before the gem is placed.
+    css: `
+      .socket-row:not([data-slot="body"]), .skill-summary.muted, .skills-help { display: none !important; }
+      .skill-summary { font-size: 1.25em; }
+      .trailer-lit { box-shadow: 0 0 0 2px #d98a3a, 0 0 22px rgba(217,138,58,.75) !important; border-color: #d98a3a !important; }
+      .skill-summary.trailer-flash b, .skill-summary.trailer-flash .muted { color: #ffd27a !important; }
+    `,
     async film(t) {
       await t.stage((S, c) => {
         const run = S.stagedRun(
@@ -211,18 +222,42 @@ export const CLIPS: Clip[] = [
       });
       await tab(t, 'Skills');
       await t.page.waitForTimeout(200);
-      for (let i = 0; i < 30; i++) {
-        if (i === 6) {
+      // 2 s: the gem and the empty socket (0.4 s), both lit with the arrow between them (0.6 s), placed, the DPS up (1 s).
+      for (let i = 0; i < 60; i++) {
+        if (i === 12)
+          await t.page.evaluate(() => {
+            const chip = document.querySelector('.gem-chip') as HTMLElement;
+            const slot = [...document.querySelectorAll('.socket.empty')].pop() as HTMLElement;
+            chip.classList.add('trailer-lit');
+            slot.classList.add('trailer-lit');
+            const a = chip.getBoundingClientRect();
+            const b = slot.getBoundingClientRect();
+            const x1 = a.left + a.width * 0.25;
+            const y1 = a.bottom;
+            const x2 = b.right + 4;
+            const y2 = b.top + b.height / 2;
+            const ns = 'http://www.w3.org/2000/svg';
+            const svg = document.createElementNS(ns, 'svg');
+            svg.setAttribute('id', 'trailer-arrow');
+            svg.setAttribute(
+              'style',
+              'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:9999',
+            );
+            svg.innerHTML =
+              '<defs><marker id="ah" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#d98a3a"/></marker></defs>' +
+              `<path d="M${x1} ${y1} C ${x1} ${y2}, ${x2 + 80} ${y2}, ${x2} ${y2}" fill="none" stroke="#d98a3a" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#ah)"/>`;
+            document.body.appendChild(svg);
+          });
+        if (i === 30) {
+          await t.page.evaluate(() => document.getElementById('trailer-arrow')?.remove());
           await t.page.click('.gem-chip:has-text("Wired Harm")');
-          await t.page.mouse.move(5, 470);
-        }
-        if (i === 12) await t.page.locator('.socket.empty').last().click();
-        if (i === 12) {
+          await t.page.locator('.socket.empty').last().click();
           await t.page.mouse.move(5, 470);
           // The click scrolls the tab; the skill's line, with its DPS, is at the top.
-          await t.page.evaluate(() =>
-            document.querySelectorAll('*').forEach((e) => (e.scrollTop = 0)),
-          );
+          await t.page.evaluate(() => {
+            document.querySelectorAll('*').forEach((e) => (e.scrollTop = 0));
+            document.querySelector('.skill-summary')?.classList.add('trailer-flash');
+          });
         }
         await t.still(1);
       }
@@ -274,6 +309,7 @@ export const CLIPS: Clip[] = [
           { classId: 'shade', level: 70, body: ['spireTrap', 'wiredHarm', 'swiftSnares'] },
           45,
         );
+        S.wornAmulet(run);
         const uid = S.rareAmulet(run, 70);
         run.lastDrops = [uid];
         S.toCamp(c, run);
@@ -289,7 +325,8 @@ export const CLIPS: Clip[] = [
           ?.scrollIntoView({ block: 'nearest' }),
       );
       await t.page.waitForTimeout(200);
-      for (let i = 0; i < 30; i++) {
+      // 1.5 s: the new amulet beside the worn one (0.7 s), the button pressed (0.3 s), the swap done (0.5 s).
+      for (let i = 0; i < 45; i++) {
         if (i === 21)
           await t.page.evaluate(() => {
             const b = [...document.querySelectorAll('button')].find((x) =>
@@ -297,7 +334,7 @@ export const CLIPS: Clip[] = [
             );
             (b as HTMLElement | undefined)?.classList.add('trailer-press');
           });
-        if (i === 24)
+        if (i === 30)
           await t.page.evaluate(() =>
             (document.querySelector('.trailer-press') as HTMLElement | null)?.click(),
           );
@@ -314,7 +351,7 @@ export const CLIPS: Clip[] = [
     35,
     { theme: 'gnawingWarrens', biome: 'cavern' },
     90,
-    { viewport: PHONE, pack: 4 },
+    { viewport: PHONE, pack: 4, css: PHONE_UI },
   ),
   mapClip(
     'reaver',
@@ -328,7 +365,7 @@ export const CLIPS: Clip[] = [
     35,
     { theme: 'giltHall', biome: 'shrine' },
     90,
-    { viewport: PHONE },
+    { viewport: PHONE, css: PHONE_UI },
   ),
   mapClip(
     'zealot',
@@ -336,10 +373,10 @@ export const CLIPS: Clip[] = [
     35,
     { theme: 'lamplitCloister', biome: 'hollow' },
     90,
-    { viewport: PHONE },
+    { viewport: PHONE, css: PHONE_UI },
   ),
 
-  /* 6. The climb: seven builds, seven places, a half second each. */
+  /* 6. The climb: six builds, six places, a half second each; the last, the build that falls, is held for a second. */
   mapClip(
     'climb1',
     { classId: 'reaver', level: 12, body: ['reapingArc', 'bruteForce'] },
@@ -352,13 +389,6 @@ export const CLIPS: Clip[] = [
     { classId: 'mystic', level: 20, weapon: 'wand_l35', body: ['flameBolt', 'echoingCast'] },
     12,
     { theme: 'bonePits', biome: 'forge' },
-    45,
-  ),
-  mapClip(
-    'climb3',
-    { classId: 'mystic', level: 30, weapon: 'wand_l35', body: ['frostRing'] },
-    21,
-    { theme: 'chitinGalleries', biome: 'cavern' },
     45,
   ),
   mapClip(
@@ -393,7 +423,7 @@ export const CLIPS: Clip[] = [
     { classId: 'shade', level: 72, body: ['orbitingBlades'] },
     63,
     { theme: 'kilnHall', biome: 'warren' },
-    45,
+    75,
   ),
 
   /* 7. The fall: the Magistrate's Sentence lands on the Shade at map 63; the body held; the end screen. */
@@ -449,10 +479,12 @@ export const CLIPS: Clip[] = [
     prefs: { 'bob.pref.rivalName': ME, 'bob.pref.rivals': true },
   },
 
-  /* 8. The duel: our Mystic against Sin's Reaver; the last four seconds up to the deciding blow; then the rating. */
+  /* 8. The duel: our Mystic against Sin's Reaver, in three cuts of the same fight: the start (full life, the first exchanges), the
+        middle, and the last four seconds up to the deciding blow; then the rating. A whole duel runs over a minute, so the cuts
+        skip what is between. */
   {
-    name: 'duel',
-    zoom: 2.5,
+    name: 'duel1',
+    zoom: 3.2,
     css: `.hud-top .muted, .speeds, .biome-banner { display: none !important; }`,
     async film(t) {
       const n = await t.stage((S, c, _g, me) => {
@@ -465,7 +497,7 @@ export const CLIPS: Clip[] = [
         });
         const b = mk({ classId: 'reaver', level: 84, body: ['reapingArc', 'bruteForce'] });
         (window as any).__builds = [a, b];
-        // Find a seed the Mystic wins, after a fight of five seconds or more.
+        // Find a seed the Mystic wins, in a fight that is not the longest.
         for (let seed = 1; seed < 60; seed++) {
           S.duel(c, a, b, seed, [me, 'Sin'], { before: 712, after: 748 });
           let f = 0;
@@ -474,7 +506,7 @@ export const CLIPS: Clip[] = [
             f++;
           }
           const out = c.lastDuel;
-          if (out && out.result.winner === 0 && out.result.how === 'death' && f > 150) {
+          if (out && out.result.winner === 0 && out.result.how === 'death' && f > 150 && f < 2400) {
             (window as any).__seed = seed;
             return f;
           }
@@ -482,14 +514,34 @@ export const CLIPS: Clip[] = [
         return -1;
       }, ME);
       if (n < 0) throw new Error('no duel the Mystic wins');
+      const A = 75; // frames into the fight where the first cut opens (the fighters have met)
+      const MID = Math.round(n * 0.45); // where the second opens
       await t.stage(
         (S, c, game, a) => {
           const [x, y] = (window as any).__builds;
           S.duel(c, x, y, (window as any).__seed, [a.me, 'Sin'], { before: 712, after: 748 });
-          S.warm(c, a.n - 120);
+          S.warm(c, a.A);
           S.settle(game, c);
         },
-        { me: ME, n },
+        { me: ME, A },
+      );
+      await t.rec(38);
+      t.cut('duel2');
+      await t.stage(
+        (S, c, game, a) => {
+          S.warm(c, a.gap);
+          S.settle(game, c);
+        },
+        { gap: MID - A - 38 },
+      );
+      await t.rec(30);
+      t.cut('duel');
+      await t.stage(
+        (S, c, game, a) => {
+          S.warm(c, a.gap);
+          S.settle(game, c);
+        },
+        { gap: n - 120 - (MID + 30) },
       );
       await t.rec(125);
       t.cut('result');

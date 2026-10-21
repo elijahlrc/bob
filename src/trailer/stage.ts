@@ -237,6 +237,13 @@ export function rareAmulet(run: RunState, ilvl: number): number {
   return pick.uid;
 }
 
+/** A poor amulet on the character's neck, for the drop to replace (a plain base and no affixes, named for the shot). */
+export function wornAmulet(run: RunState, name = 'Worn Locket'): void {
+  const it = makeItem(uidSource(run), 'amulet_liferegen', 5, 0, 'normal');
+  it.name = name;
+  run.build = { ...run.build, equipment: { ...run.build.equipment, amulet: it } };
+}
+
 /** Drop `itemUid`'s item from the bag on the ground beside the character, as a kill drops loot. */
 export function dropNear(w: World, run: RunState, itemUid: number, dx = 1.5, dy = 0.5): void {
   const item = run.inventory.find((i) => i.uid === itemUid)!;
