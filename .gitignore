@@ -35,3 +35,4 @@ scripts/coverage/staging/
 scripts/coverage/_*
 scripts/tree/staging/
 /reference/
+docs/trailer/footage/

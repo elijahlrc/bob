@@ -11,6 +11,16 @@ The 30-second trailer, planned with the owner on 2026-10-21. Nothing here ships 
   groove in D minor at 120 bpm, a pulsing bass on D, a noise kit and one quiet four-note phrase, with chip sound
   effects on their own layer. Cue times are in seconds and must match the animatic's shot times.
 
+- `cut.html`, `cut.mp4`: the first cut with real footage: the animatic's timing, captions and score over clips filmed from the
+  game. Each clip is staged by `src/trailer/stage.ts` (a dev-only module the game never imports: a character with chosen gems,
+  a theme, a biome, a boss) and filmed frame by frame by `scripts/trailer/capture.ts` from the clip list in
+  `scripts/trailer/clips.ts`. The frames go to `footage/` (git-ignored); `cut.html` picks which frames each shot uses (its `IN`
+  table; `npx tsx scripts/trailer/events.ts` shows where the kills fall in each clip).
+
+**Filming the footage:** run `npm run dev`, then `npx tsx scripts/trailer/capture.ts [clip ...]` (all clips with no names).
+Every frame is stepped by hand with the game's loop stopped, so a clip is the same on every run; at 1280×720 in software
+WebGL a frame takes about a second, the whole set about half an hour. Then `npm run trailer:render -- --cut` writes `cut.mp4`.
+
 **Re-rendering:** `npm run trailer:render` (`scripts/trailer/render.ts`) runs the score script, renders every frame in
 headless Chromium and joins them with ffmpeg. It needs Python 3 with numpy, ffmpeg on PATH and
 `npm i --no-save playwright-core` (with `npx playwright install chromium`, or `CHROME_PATH` set). Output is

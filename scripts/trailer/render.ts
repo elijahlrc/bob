@@ -12,6 +12,9 @@
  *    docs/trailer/animatic.mp3 for the page's own player.
  *
  * Frames go to a temporary folder that is removed at the end. `--frames-only` skips the audio and keeps the old score.
+ *
+ * `--cut` renders docs/trailer/cut.html, the cut with the game's footage (film it first: scripts/trailer/capture.ts), to
+ * docs/trailer/cut.mp4 over the same score.
  */
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, rmSync, existsSync } from 'node:fs';
@@ -30,7 +33,9 @@ function run(cmd: string, args: string[]): void {
 }
 
 async function main(): Promise<void> {
-  const framesOnly = process.argv.includes('--frames-only');
+  const cut = process.argv.includes('--cut');
+  const framesOnly = cut || process.argv.includes('--frames-only');
+  const name = cut ? 'cut' : 'animatic';
   const work = mkdtempSync(path.join(tmpdir(), 'bob-trailer-'));
   const wav = path.join(work, 'score.wav');
   try {
@@ -58,12 +63,13 @@ async function main(): Promise<void> {
     const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
     const errors: string[] = [];
     page.on('pageerror', (e: Error) => errors.push(String(e)));
-    await page.goto('file://' + path.join(DIR, 'animatic.html') + '?render');
+    await page.goto('file://' + path.join(DIR, `${name}.html`) + '?render');
     await page.waitForTimeout(1500); // the fonts
     const stage = await page.$('#stage');
     for (let i = 0; i < FPS * SECONDS; i++) {
+      // (the cut's seek is async: it resolves once the frame's footage has loaded)
       await page.evaluate(
-        (t: number) => (window as unknown as { seek: (t: number) => void }).seek(t),
+        (t: number) => (window as unknown as { seek: (t: number) => unknown }).seek(t),
         i / FPS,
       );
       await stage.screenshot({ path: path.join(work, `f${String(i).padStart(4, '0')}.png`) });
@@ -79,9 +85,9 @@ async function main(): Promise<void> {
     run('ffmpeg', [
       '-y', '-loglevel', 'error', '-framerate', String(FPS), '-i', path.join(work, 'f%04d.png'), '-i', audio,
       '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '20', '-preset', 'medium',
-      '-c:a', 'aac', '-b:a', '192k', '-shortest', '-movflags', '+faststart', path.join(DIR, 'animatic.mp4'),
+      '-c:a', 'aac', '-b:a', '192k', '-shortest', '-movflags', '+faststart', path.join(DIR, `${name}.mp4`),
     ]);
-    console.log('wrote docs/trailer/animatic.mp4');
+    console.log(`wrote docs/trailer/${name}.mp4`);
   } finally {
     rmSync(work, { recursive: true, force: true });
   }
