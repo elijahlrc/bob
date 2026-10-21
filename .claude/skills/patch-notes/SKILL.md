@@ -136,16 +136,18 @@ The notes commit stays local until the user says yes. Work out and show what wou
 - That the push deploys the game on GitHub Pages and that the same commit is then built and uploaded to itch.io
   (`elijahlrc/battle-of-builds:html5`).
 
-**Show the notes first, where the user will see them.** The question dialog can cover the text written just before it, and
-the user wants to read the notes before choosing (2026-10-20). So:
+**Present the notes before asking, and make sure they were seen.** The user wants to read the notes before choosing
+(2026-10-20, twice: a fenced block and option previews in the same turn as the dialog were not enough, the dialog covers
+them). So:
 
-- Write the notes as filed, in a fenced block, as the first thing in the message that asks, before the commit list.
-- Put the same notes in the question too: as the `preview` of every option, so the dialog itself shows them whichever
-  option is focused. The question's own text names the commit count and what a push does.
+- Show the whole day's section as filed (every bullet under today's heading, not only the ones added this run), as plain text
+  in a fenced block, in the message, before the commit list and before any question.
+- Then ask in chat as plain text (no dialog) and end the turn: "Push and upload to itch.io, push only, or stop?" The commit
+  count and what a push does go in that text. Only when the user has already seen the notes in an earlier turn may
+  AskUserQuestion be used, with the notes repeated as the `preview` of every option.
 
-Then ask with AskUserQuestion (or in chat if it is unavailable), and wait for the answer. Options: **Push and upload to
-itch.io**, **Push only (skip itch.io)**, **Stop here** (the commit stays local). Anything but a clear choice means stop. This
-answer covers this run only.
+Options: **Push and upload to itch.io**, **Push only (skip itch.io)**, **Stop here** (the commit stays local). Anything but a
+clear choice means stop. This answer covers this run only.
 
 ## 8. Push (this deploys the game)
 
