@@ -199,10 +199,10 @@ def groove(start, bars, g=1.0, busy=False, fill=False):
 D1, D2, Eb2 = 26, 38, 39
 
 
-def bar(t0, g=1.0):
+def bar(t0, g=1.0, steps=16):
     """The groove, one bar: kick on 1, the and-of-2 and 3; snare on 2 and 4; eighth hats; sixteenth bass on D,
-    lifting to Eb on the last eighth of every second bar."""
-    for st in range(16):
+    lifting to Eb on the last eighth of every second bar. `steps` cuts the bar short."""
+    for st in range(steps):
         at = t0 + st * S16
         if st in (0, 6, 8):
             kick(at, g)
@@ -238,9 +238,27 @@ for st in range(4):
     snare(18.5 + st * S16 * 2, 0.4 + 0.15 * st)
 
 # 19-25 s: the groove again, three bars, with one hit on the duel's deciding blow at 22.25 after a beat of silence.
-for b in range(3):
-    bar(19.0 + b * 2.0)
-mute_spans = [(22.0, 22.25)]
+bar(19.0)
+bar(21.0)
+bar(23.0, steps=8)
+mute_spans = [(22.0, 22.25), (24.875, 25.0)]
+
+# 23-25 s: the build into the four words. A riser from 23; at 24 the kick goes to eighths, the snare rolls in
+# sixteenths then thirty-seconds, the bass climbs a half step at a time; a sixteenth of silence before the first word.
+n = int(1.875 * SR)
+k_ = np.arange(n) / n
+hold_rates = 2000 + 18000 * k_ ** 2  # the noise brightens as it rises
+idx = np.cumsum(hold_rates / SR).astype(int) % len(_lfsr_long)
+place('sfx', 23.0, _lfsr_long[idx] * k_ ** 2, 0.22)
+place('pad', 23.0, pulse(midi(50), 1.875, 0.25, slide=1.6) * k_ ** 1.5, 0.12)
+for j in range(4):
+    kick(24.0 + j * 0.25, 0.9 + 0.05 * j)
+for j in range(4):
+    snare(24.0 + j * S16, 0.45 + 0.05 * j)
+for j in range(6):
+    snare(24.5 + j * S16 / 2, 0.7 + 0.05 * j)
+for j, m in enumerate((38, 39, 40, 41, 42, 43, 44)):
+    bassnote(24.0 + j * S16, m, S16 * 0.8, 1.0)
 boom(22.25, 1.1)
 for t0 in (19.0, 23.0):
     motif(t0)
@@ -367,8 +385,8 @@ def degrade(x, rate, bits, drive):
     return np.round(y * q) / q
 
 
-bus['bass'] = degrade(bus['bass'], 9000, 4, 3.0) * 0.7  # a gritty, clipped bass, trimmed back to its old level
-bus['lead'] = degrade(bus['lead'], 11025, 4, 2.5)  # the phrase rougher, the same level
+bus['bass'] = degrade(bus['bass'], 6000, 3, 4.5) * 0.6  # a gritty, clipped bass, trimmed back to its old level
+bus['lead'] = degrade(bus['lead'], 7000, 3, 3.5)  # the phrase rougher, the same level
 for a_, b_ in mute_spans:  # held silences
     for k_ in bus:
         bus[k_][int(a_ * SR) : int(b_ * SR)] = 0
