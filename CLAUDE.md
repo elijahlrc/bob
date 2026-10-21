@@ -76,6 +76,9 @@
 - **Performance** (2026-10-15): [docs/PERFORMANCE.md](docs/PERFORMANCE.md). A sheet is about 1 ms, and the Skills tab tries every gem in every socket, so what is asked of it is
   counted before what it costs: `npm run perf` times it on a late run. `sheetOf` remembers sheets by build, `ModDB.extend` layers a skill's mods on the character's,
   and `planRotation` remembers its plans; none changes a number, and a change to the calc should keep it so (hash the sheets before and after).
+- **Trailer** (2026-10-21): [docs/trailer/README.md](docs/trailer/README.md). A 30-second trailer storyboard
+  (`docs/trailer/storyboard.html`) and an animatic in motion with a chiptune score (`animatic.html`, `audio/chip_score.py`);
+  `npm run trailer:render` re-renders `animatic.mp4`. The README lists the owner's decisions; cuts stay on the 120 bpm beat.
 - **Patch notes:** [docs/PATCH-NOTES.md](docs/PATCH-NOTES.md), player-facing, newest first, shown on the Patch notes screen of the title
   menu (`src/ui/PatchNotes.tsx`): every change a player would notice gets an entry. **Never write or edit patch notes while doing
   the work** (not in the same commit, not as a finishing touch): only the `/patch-notes` skill

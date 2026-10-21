@@ -28,6 +28,7 @@
     "random": "tsx scripts/random-play.ts",
     "lethality": "tsx scripts/theme-lethality.ts",
     "sheet": "tsx scripts/sheet.ts",
+    "trailer:render": "tsx scripts/trailer/render.ts",
     "deaths": "tsx scripts/deaths.ts",
     "matrix": "tsx scripts/matrix.ts",
     "economy": "tsx scripts/currency-economy.ts",
