@@ -1,5 +1,7 @@
 # G1b. The Strider: growth brief
 
+**Joined (2026-10-22, [G1-brief.md](../G1-brief.md)):** The north dear crossing is the Shade's east rim road ending at J1; the spoke to `walk.r8` is dropped. RE-1 lands on `toBlood.c` and RE-6 on `hub.t` (the Reaver's placements). The Ford crossing Sidestep–`toBlood.a` is dropped: it was one step from RE-6's landing, for the same combination. SH-15 does not land on `jb3` (the Shade moved it north), and the Veiled Herald link is not added. `sketch.json` here is corrected to match; the pictures in this folder show the brief before the join, and the joined pictures are in [joined/](joined/).
+
 Written 2026-10-22 for phase G1b of [../G-growth.md](../G-growth.md), from the ledger ([../G1-ledger.md](../G1-ledger.md);
 its §0, the user's answers, wins over its rows), the baseline ([../G0-baseline.md](../G0-baseline.md),
 [../G0/builds.txt](../G0/builds.txt), [../G0/supply.md](../G0/supply.md)) and the region's area files

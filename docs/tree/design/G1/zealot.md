@@ -1,5 +1,7 @@
 # G1b. The Zealot (the Cathedral): growth brief
 
+**Joined (2026-10-22, [G1-brief.md](../G1-brief.md)):** ZE-3 moves to (−1650,−3800), a bridge from Shattering Rite to the north walk's east end, and the north walk joins the Mystic's north-west rim road: M1 and M2 become that one far-loop link. ZE-5's west end lands on the Vanguard's Battlements junction (`wall.resists.j.a`) instead of `rods.toWall.a`, which keeps it 6 steps from Hallowed Hammer. V1 (VA-1 is not built) and V2 (it doubled Hallowed Hammer's bridge between the same two nodes) are dropped. ZE-8 is the Grim Oath–Censer bridge for both regions. `sketch.json` here is corrected to match; the pictures in this folder show the brief before the join, and the joined pictures are in [joined/](joined/).
+
 Written 2026-10-22 for phase G1b of [G-growth.md](../G-growth.md), from [CONSTRAINTS.md](../CONSTRAINTS.md) (which wins),
 the ledger [G1-ledger.md](../G1-ledger.md) (its §0, the user's answers, wins over the rest of it), the baseline
 ([G0-baseline.md](../G0-baseline.md), [G0/builds.txt](../G0/builds.txt)) and the area files in

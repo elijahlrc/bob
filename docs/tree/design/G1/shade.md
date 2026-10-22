@@ -1,5 +1,7 @@
 # G1b. The Shade (the Knife): growth brief
 
+**Joined (2026-10-22, [G1-brief.md](../G1-brief.md)):** M2 is not built: the Mystic's curse crossing to `hex.j4.a` serves the hexer in a new place. M4 is folded into the Mystic's north-east rim road, which lands on `ridge.y1` beside Black Powder (one node fewer). The east rim road ends at the Strider's J1 as drawn here; the Strider's spoke through the Shade is dropped. SH-13 has no link toward the Mystic home, as the Mystic asked. `sketch.json` here is corrected to match; the pictures in this folder show the brief before the join, and the joined pictures are in [joined/](joined/).
+
 Written 2026-10-22 for phase G1b of [../G-growth.md](../G-growth.md), from the ledger
 ([../G1-ledger.md](../G1-ledger.md), §0 first), the baseline ([../G0-baseline.md](../G0-baseline.md),
 [../G0/builds.txt](../G0/builds.txt)) and the area files in `src/data/passives/knife/`. [../CONSTRAINTS.md](../CONSTRAINTS.md)

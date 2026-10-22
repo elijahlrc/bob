@@ -17,7 +17,7 @@
     {
       "id": "ZE-3",
       "label": "ZE-3 channelling + elemental",
-      "at": [-1560, -4090],
+      "at": [-1650, -3800],
       "nodes": 4
     },
     {
@@ -128,10 +128,6 @@
       "to": "ZE-5"
     },
     {
-      "from": "ZE-5",
-      "to": "cathedral.rods.toWall.a"
-    },
-    {
       "from": "cathedral.nave.jN.a",
       "to": "ZE-4"
     },
@@ -176,33 +172,27 @@
       "to": [-1800, -4050]
     },
     {
-      "from": "ZE-3",
-      "to": "spire.fire.cinder.b",
-      "label": "M1: to the Lantern"
-    },
-    {
       "from": "ZE-8",
       "to": "wall.maces.oath.n",
       "label": "V3: to Grim Oath"
-    },
-    {
-      "from": "cathedral.home.alms.n",
-      "to": [-1600, -20],
-      "label": "V1: to VA-1"
     },
     {
       "from": [-2270, -1670],
       "to": [-2268, -1745]
     },
     {
-      "from": "ZE-7",
-      "to": "wall.rampart.j1.a",
-      "label": "V2: to the Rampart"
+      "from": "ZE-5",
+      "to": "wall.resists.j.a",
+      "label": "joined: armoured sceptre crossing"
     },
     {
-      "from": "ZE-3",
-      "to": [-1250, -4420],
-      "label": "M2: to the Mystic north rim road"
+      "from": "cathedral.crypt.rite.n",
+      "to": "ZE-3"
+    },
+    {
+      "from": [-1800, -4050],
+      "to": [-1380, -4150],
+      "label": "joined: the far loop"
     }
   ],
   "cuts": [["cathedral.choir.jC.a", "cathedral.choir.loneVow.a"]],

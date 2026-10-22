@@ -113,11 +113,6 @@
       "nodes": 1
     },
     {
-      "label": "dear crossing to the Rooftops (Shade side)",
-      "points": [[3800, 150], [3720, -300], [3580, -680], "knife.roofs.walk.r8"],
-      "nodes": 2
-    },
-    {
       "label": "",
       "points": ["ST-5", [3640, 2260], "ST-3"],
       "nodes": 1
@@ -200,29 +195,29 @@
       "label": "crossing: life for the Shade, the outer road for Shade builds"
     },
     {
-      "from": "bow.steel.toBlood.a",
-      "to": "yard.dual.sidestep.n",
-      "label": "Ford crossing: evasion and dodge (or RE-6 lands here)"
-    },
-    {
-      "from": "bow.steel.hub.t",
-      "to": "bow.steel.hub.t",
-      "label": "RE-1 lands here"
-    },
-    {
-      "from": "bow.bows.road.jb3",
-      "to": "bow.bows.road.jb3",
-      "label": "SH-15 lands here"
-    },
-    {
-      "from": [1668, -150],
-      "to": [1668, -150],
-      "label": "SH-6 lands here"
-    },
-    {
       "from": "ST-10",
       "to": "bow.steel.pitch.n",
       "label": "Pitch Arrows a bridge"
+    },
+    {
+      "from": "bow.steel.hub.t",
+      "to": [880, 1640],
+      "label": "joined: RE-6 lands here"
+    },
+    {
+      "from": "bow.steel.toBlood.c",
+      "to": [790, 2580],
+      "label": "joined: RE-1 lands here"
+    },
+    {
+      "from": [1668, -30],
+      "to": [1990, -370],
+      "label": "joined: SH-6 rung"
+    },
+    {
+      "from": [3800, 150],
+      "to": [4100, -150],
+      "label": "joined: the Shade east rim road"
     }
   ],
   "cuts": [

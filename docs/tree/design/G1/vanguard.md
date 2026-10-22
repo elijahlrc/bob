@@ -1,5 +1,7 @@
 # G1b. The Vanguard (the Wall): growth brief
 
+**Joined (2026-10-22, [G1-brief.md](../G1-brief.md)):** The road node from Grim Oath to Censer is dropped: ZE-8 is that bridge. ZE-5 lands on `wall.resists.j.a`, the landing offered here. Second Wind–Thirsting Blade is kept and the Reaver's Thirsting Blade–`slams.j2` link is dropped. The sketch now draws the moves the text describes (VA-2 in Cleaver's square with its links, Stone Heart into Thick Skin's pocket, Iron Lungs onto the Bulwark, Unerring's spur turned). `sketch.json` here is corrected to match; the pictures in this folder show the brief before the join, and the joined pictures are in [joined/](joined/).
+
 Written 2026-10-22 for phase G1b of [G-growth.md](../G-growth.md), from the ledger
 ([G1-ledger.md](../G1-ledger.md), with the user's answers of its §0) and the map as it is. It places nothing in the area
 files. [CONSTRAINTS.md](../CONSTRAINTS.md) wins wherever this brief disagrees with it.

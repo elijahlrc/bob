@@ -59,11 +59,6 @@
       "nodes": 3
     },
     {
-      "label": "to Censer",
-      "points": ["wall.maces.oath.n", [-3990, -300], "cathedral.ambulatory.censer.n"],
-      "nodes": 1
-    },
-    {
       "label": "quarry floor",
       "points": [
         "wall.slams.j1.a",
@@ -153,12 +148,54 @@
       "from": [-1160, 3420],
       "to": "yard.fosse.road.f7",
       "label": "crossing: axes by the Fosse"
+    },
+    {
+      "from": "wall.maces.oath.n",
+      "to": [-4230, -330],
+      "label": "joined: ZE-8 is the bridge to Censer"
+    },
+    {
+      "from": "VA-2",
+      "to": "wall.maces.toCleaver.a"
+    },
+    {
+      "from": "VA-2",
+      "to": "wall.maces.crushing.a"
+    },
+    {
+      "from": "VA-2",
+      "to": "wall.rampart.steadyHands.b"
+    },
+    {
+      "from": "wall.rampart.bulwark.n1",
+      "to": "wall.rampart.thickSkin.b"
+    },
+    {
+      "from": "wall.rampart.ironLungs.n",
+      "to": "wall.rampart.bulwark.f"
+    },
+    {
+      "from": "wall.rampart.ironLungs.n",
+      "to": "wall.rampart.bulwark.b"
+    },
+    {
+      "from": "wall.rampart.ironLungs.n",
+      "to": "wall.rampart.j1.a"
     }
   ],
   "cuts": [
     ["wall.rampart.secondWind.n", "wall.resists.star.c"],
     ["wall.rampart.secondWind.b", "wall.rampart.toWind.a"],
-    ["wall.rampart.bulwark.b", "wall.rampart.secondWind.a"]
+    ["wall.rampart.bulwark.b", "wall.rampart.secondWind.a"],
+    ["wall.maces.cleaver.a", "wall.maces.toCleaver.a"],
+    ["wall.maces.cleaver.b", "wall.maces.crushing.a"],
+    ["wall.maces.cleaver.c", "wall.rampart.steadyHands.b"],
+    ["wall.maces.hammer.a", "wall.maces.toHymn.r2"],
+    ["wall.rampart.bulwark.n1", "wall.rampart.bulwark.f"],
+    ["wall.rampart.bulwark.n1", "wall.rampart.bulwark.b"],
+    ["wall.rampart.bulwark.n1", "wall.rampart.j1.a"],
+    ["wall.rampart.thickSkin.n", "wall.rampart.thickSkin.b"],
+    ["wall.rampart.ironLungs.n", "wall.rampart.ironLungs.b"]
   ],
   "moves": [
     {
@@ -195,6 +232,14 @@
       "id": "wall.rampart.unerring.k",
       "to": [-2860, 175],
       "label": "Unerring Discipline"
+    },
+    {
+      "id": "wall.rampart.unerring.a",
+      "to": [-2680, 230]
+    },
+    {
+      "id": "wall.rampart.unerring.b",
+      "to": [-2760, 205]
     }
   ]
 }

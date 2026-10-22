@@ -1,5 +1,7 @@
 # G1b. The Mystic's growth brief (the Spire)
 
+**Joined (2026-10-22, [G1-brief.md](../G1-brief.md)):** The north-west rim road now ends on the Zealot's north walk at (−1800,−4050) instead of on Shattering Rite (one road node fewer; ZE-3 takes the Shattering Rite end). The curse crossing (Hexwright to `knife.hex.j4.a`) is kept and the Shade's second Stair–Scriptorium link is not built. The Shade's dear crossing to Black Powder is folded into the north-east rim road, which already lands beside it. `sketch.json` here is corrected to match; the pictures in this folder show the brief before the join, and the joined pictures are in [joined/](joined/).
+
 Written 2026-10-22 for phase G1b of [G-growth.md](../G-growth.md), from the ledger's Mystic rows
 ([G1-ledger.md](../G1-ledger.md) §3.1 MY-1 to MY-10, §3.2 MY-s1 to MY-s6, §3.3 MY-m1, MY-m2, MY-p1), the baseline
 ([G0-baseline.md](../G0-baseline.md), [G0/builds.txt](../G0/builds.txt), [G0/supply.md](../G0/supply.md)) and the map.

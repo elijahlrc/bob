@@ -1,5 +1,7 @@
 # G1b. The Reaver (the Yard): growth brief
 
+**Joined (2026-10-22, [G1-brief.md](../G1-brief.md)):** Four crossings are dropped: Thirsting Blade–`wall.slams.j2.a` (the Vanguard's Second Wind link is kept), the west road's leg–`wall.grit.east.e7` (one node from the existing `e8` link; RE-7's wheel stays 8 steps from Greatblade), Festering–J8 (ST-10 and Festering stay 11 apart) and Sidestep–`toBlood.a` (it doubled RE-6's crossing). RE-6–`hub.t` and RE-1–`toBlood.c` are the landings. `sketch.json` here is corrected to match; the pictures in this folder show the brief before the join, and the joined pictures are in [joined/](joined/).
+
 Written 2026-10-22 for phase G1b of [G-growth.md](../G-growth.md), from the ledger
 ([G1-ledger.md](../G1-ledger.md), §0 first), the baseline ([G0-baseline.md](../G0-baseline.md),
 [G0/builds.txt](../G0/builds.txt)), the area files in `src/data/passives/yard/` and the pictures below.

@@ -117,11 +117,6 @@
       "label": "rung to SH-6",
       "points": ["knife.edge.j1.a", [1990, -370], "SH-6"],
       "nodes": 1
-    },
-    {
-      "label": "dear crossing to the Mystic north rim road",
-      "points": ["knife.hex.powder.n", [1700, -4000], [1400, -4150]],
-      "nodes": 2
     }
   ],
   "links": [
@@ -230,13 +225,8 @@
       "to": [4250, -1050]
     },
     {
-      "from": "knife.hex.climb.a",
-      "to": "spire.craft.toDevotion.a",
-      "label": "crossing: Stair to Scriptorium"
-    },
-    {
       "from": "knife.hex.toSpire.a",
-      "to": [1250, -3050],
+      "to": [1350, -3100],
       "label": "crossing: MY-10 (Mystic side)"
     },
     {

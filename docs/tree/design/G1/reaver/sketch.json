@@ -185,21 +185,6 @@
       "to": "yard.fosse.road.f1"
     },
     {
-      "from": "yard.blades.thirst.n",
-      "to": "wall.slams.j2.a",
-      "label": "X: leech for slams (or a moved Cleaver)"
-    },
-    {
-      "from": [-760, 3400],
-      "to": "wall.grit.east.e7",
-      "label": "X: two-handers"
-    },
-    {
-      "from": "yard.dual.sidestep.n",
-      "to": "bow.steel.toBlood.a",
-      "label": "X: dodge / Ford"
-    },
-    {
       "from": "yard.shield.shieldwall.c",
       "to": [-900, 2890]
     },
@@ -215,11 +200,6 @@
       "from": "yard.fosse.storm.n",
       "to": [1180, 3600],
       "label": "X: lightning strikes (Strider)"
-    },
-    {
-      "from": "yard.blood.festering.n",
-      "to": [1180, 3600],
-      "label": "X: poison bow (Strider)"
     },
     {
       "from": "yard.dual.ironDraw.c",
