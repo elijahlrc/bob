@@ -40,11 +40,11 @@ export const well: AreaSpec = {
     {
       id: 'deepWell',
       name: 'Deep Well',
-      why: 'The wheel: entered from the well road on the east, left to the junction on the west and to the column through the shield notable. Mana on the south side, shield on the north.',
-      at: [-450, -2000],
-      shape: { kind: 'ring', r: 150, a0: 0 },
+      why: 'The wheel: entered from the well road on the south-east, left to the junction on the west and to the column through the shield notable. Mana on the south side, shield on the north.',
+      at: [-469, -2000],
+      shape: { kind: 'ring', r: 80, a0: 30 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [mana(8)], why: 'The entrance, east.' },
+        { id: 'a', kind: 'small', lines: [mana(8)], why: 'The entrance, south-east.' },
         { id: 'b', kind: 'small', lines: [mana(8)] },
         {
           id: 'n1',
@@ -53,14 +53,14 @@ export const well: AreaSpec = {
           lines: [mana(20), manaRegen(20)],
           why: 'Mana and its regeneration: 2.5 + 2 units. The Frugal chain leaves here.',
         },
-        { id: 'c', kind: 'small', lines: [es(5)], why: 'The west exit, to the junction.' },
+        { id: 'c', kind: 'small', lines: [es(5)], why: 'The north-west exit, to the junction.' },
         { id: 'd', kind: 'small', lines: [es(5)], why: 'Where the recharge room opens.' },
         {
           id: 'n2',
           kind: 'notable',
           name: 'Glass Skin',
           lines: [es(16), esRecharge(20)],
-          why: 'Shield and its recharge: 3.2 + 1.3 units. The north exit, to the column.',
+          why: 'Shield and its recharge: 3.2 + 1.3 units. The north-east exit, to the column.',
         },
       ],
       links: [
@@ -76,18 +76,25 @@ export const well: AreaSpec = {
       id: 'recharge',
       name: 'Quickening',
       why: "Recharge rate and a faster start of recharge: the energy-shield build's decision, off the wheel's shield small, and the foot of the Siphon chain.",
-      at: [-560, -2320],
-      shape: { kind: 'ring', r: 100, a0: 90 },
+      at: [-481, -2357],
+      shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [esRecharge(15)] },
+        { id: 'a', kind: 'small', lines: [esRecharge(15)], at: [-478, -2287] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Quickening',
           lines: [esRechargeDelay(30), esRecharge(20), es(5)],
+          at: [-481, -2357],
           why: '3 + 1.3 + 1 units; the faster start is the half the sheet shows least and the fight feels most.',
         },
-        { id: 'b', kind: 'small', lines: [esRecharge(15)], why: 'Where the Siphon chain leaves.' },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [esRecharge(15)],
+          why: 'Where the Siphon chain leaves.',
+          at: [-484, -2427],
+        },
       ],
       links: [
         ['a', 'n'],
@@ -101,7 +108,7 @@ export const well: AreaSpec = {
       at: [-480, -2600],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [esOnHit(4)], at: [-520, -2520] },
+        { id: 'a', kind: 'small', lines: [esOnHit(4)], at: [-493, -2634] },
         {
           id: 'n',
           kind: 'notable',
@@ -120,7 +127,7 @@ export const well: AreaSpec = {
       at: [-750, -1780],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [wandSpellDamage(10)], at: [-680, -1800] },
+        { id: 'a', kind: 'small', lines: [wandSpellDamage(10)], at: [-772, -1800] },
         {
           id: 'n',
           kind: 'notable',
@@ -140,7 +147,7 @@ export const well: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: 'a', kind: 'small', lines: [flaskEffect(5)], at: [-1000, -1900] },
-        { id: 'b', kind: 'small', lines: [flaskEffect(5)], at: [-1150, -1950] },
+        { id: 'b', kind: 'small', lines: [flaskEffect(5)], at: [-1234, -1978] },
         {
           id: 'n',
           kind: 'notable',
@@ -171,8 +178,14 @@ export const well: AreaSpec = {
       at: [-800, -2480],
       shape: { kind: 'ring', r: 80, a0: 90 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [life(5)], why: 'The entrance, facing the junction.' },
-        { id: 'b', kind: 'small', lines: [life(5)] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [life(5)],
+          why: 'The entrance, facing the junction.',
+          at: [-751, -2394],
+        },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [-742, -2451] },
         {
           id: 'n',
           kind: 'notable',
@@ -198,8 +211,9 @@ export const well: AreaSpec = {
           kind: 'small',
           lines: [manaLeech(0.4, ['spell'])],
           why: 'The entrance, facing Quiet Pulse.',
+          at: [-851, -2960],
         },
-        { id: 'b', kind: 'small', lines: [manaLeech(0.4, ['spell'])] },
+        { id: 'b', kind: 'small', lines: [manaLeech(0.4, ['spell'])], at: [-805, -2996] },
         {
           id: 'n',
           kind: 'notable',
@@ -224,7 +238,7 @@ export const well: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [shieldDef(15)],
-          at: [-250, -2160],
+          at: [-221, -2272],
           why: 'The entrance, from Glass Skin.',
         },
         {
@@ -232,14 +246,14 @@ export const well: AreaSpec = {
           kind: 'notable',
           name: 'Spirit Ward',
           lines: [shieldSpellBlock(4), manaOnBlock(8), shieldDef(15)],
-          at: [-14, -2205],
+          at: [-152, -2263],
           why: "2 + 1 + 1 units; spell block is what a caster's shield is for.",
         },
         {
           id: 'b',
           kind: 'small',
           lines: [shieldDef(15)],
-          at: [-60, -2440],
+          at: [-179, -2328],
           why: "The exit, to the column's junction.",
         },
       ],
@@ -255,8 +269,8 @@ export const well: AreaSpec = {
       at: [-1030, -2270],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [mana(8)], at: [-930, -2200] },
-        { id: 'b', kind: 'small', lines: [mana(8)], at: [-1026, -2315] },
+        { id: 'a', kind: 'small', lines: [mana(8)], at: [-1025, -2325] },
+        { id: 'b', kind: 'small', lines: [mana(8)], at: [-1064, -2367] },
         { id: 'k', kind: 'keystone', name: 'Mind Bulwark', lines: [], at: [-1122, -2430] },
       ],
       links: [
@@ -307,9 +321,9 @@ export const well: AreaSpec = {
       id: 'toPulse',
       name: 'A road',
       why: 'Intelligence once between Siphon and Quiet Pulse.',
-      at: [-625, -2520],
+      at: [-612, -2577],
       shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [int(7)], at: [-625, -2520] }],
+      nodes: [{ id: 'a', kind: 'attribute', lines: [int(7)], at: [-612, -2577] }],
       links: [],
     },
   ],

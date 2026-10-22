@@ -31,7 +31,7 @@ export const fosse: AreaSpec = {
       at: [-140, 4120],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'f1', kind: 'attribute', lines: [str(6), dex(6)], at: [440, 3420] },
+        { id: 'f1', kind: 'attribute', lines: [str(6), dex(6)], at: [415, 3421] },
         {
           id: 'f2',
           kind: 'attribute',
@@ -40,7 +40,7 @@ export const fosse: AreaSpec = {
           why: 'The lightning strikes leave east.',
         },
         { id: 'f3', kind: 'attribute', lines: [str(6), dex(6)], at: [180, 3990] },
-        { id: 'f4', kind: 'attribute', lines: [str(6), dex(6)], at: [-140, 4120] },
+        { id: 'f4', kind: 'attribute', lines: [str(6), dex(6)], at: [-150, 4060] },
         {
           id: 'f5',
           kind: 'attribute',
@@ -48,7 +48,7 @@ export const fosse: AreaSpec = {
           at: [-480, 4130],
           why: 'The curse pocket leaves south.',
         },
-        { id: 'f6', kind: 'attribute', lines: [str(7)], at: [-800, 4040] },
+        { id: 'f6', kind: 'attribute', lines: [str(7)], at: [-785, 4005] },
         {
           id: 'f7',
           kind: 'attribute',
@@ -73,8 +73,8 @@ export const fosse: AreaSpec = {
       at: [680, 3845],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleAttackOne('lightning', 12)], at: [550, 3800] },
-        { id: 'b', kind: 'small', lines: [eleAttackOne('lightning', 12)], at: [680, 3845] },
+        { id: 'a', kind: 'small', lines: [eleAttackOne('lightning', 12)], at: [709, 3853] },
+        { id: 'b', kind: 'small', lines: [eleAttackOne('lightning', 12)], at: [764, 3872] },
         {
           id: 'n',
           kind: 'notable',
@@ -96,8 +96,8 @@ export const fosse: AreaSpec = {
       at: [-480, 4400],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [curseEffect(8)], at: [-480, 4270] },
-        { id: 'b', kind: 'small', lines: [curseEffect(8)], at: [-480, 4400] },
+        { id: 'a', kind: 'small', lines: [curseEffect(8)], at: [-480, 4422] },
+        { id: 'b', kind: 'small', lines: [curseEffect(8)], at: [-480, 4480] },
         {
           id: 'n',
           kind: 'notable',
@@ -119,8 +119,8 @@ export const fosse: AreaSpec = {
       at: [180, 4260],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [channelDamage(10)], at: [180, 4130] },
-        { id: 'b', kind: 'small', lines: [channelDamage(10)], at: [180, 4260] },
+        { id: 'a', kind: 'small', lines: [channelDamage(10)], at: [180, 4272] },
+        { id: 'b', kind: 'small', lines: [channelDamage(10)], at: [180, 4330] },
         {
           id: 'n',
           kind: 'notable',

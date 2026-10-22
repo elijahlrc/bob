@@ -44,7 +44,7 @@ export const slams: AreaSpec = {
       name: 'Thunderstep',
       why: 'Melee area first, then the notable with two-handed damage, melee area and radius: the two-handed slam, three steps below the south hub. Passed through to the junction; the pace chain leaves from its radius node.',
       at: [-1300, 1350],
-      shape: { kind: 'ring', r: 110, a0: -90 },
+      shape: { kind: 'ring', r: 55, a0: -90 },
       nodes: [
         { id: 'a', kind: 'small', lines: [meleeArea(8)], why: 'The entrance, from the slam road.' },
         {
@@ -73,20 +73,22 @@ export const slams: AreaSpec = {
       id: 'bracing',
       name: 'Bracing',
       why: "Block with a shield twice, then the notable with block, block recovery and stun threshold: the Wall's shield, on the slam road at the Yard border (round 3, 2026-10-20; it was a step from the Bulwark wheel and the maces). The shield Vanguard leaves the start south-east, toward the Yard's Steel Rim and Buckler, and the mace player west; a step from Thunderstep, so the shield and the two-hander are neighbours that compete. Passed through to the slam wheel's east small and the Yard's flask pocket, but a build bound for the Yard can go round by Thunderstep's smalls (thunderstep.a, thunderstep.b) without buying it.",
-      at: [-900, 1200],
-      shape: { kind: 'ring', r: 75, a0: 150 },
+      at: [-900, 1125],
+      shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [shieldBlock(3)],
           why: 'The entrance, facing the slam road.',
+          at: [-970, 1125],
         },
         {
           id: 'n',
           kind: 'notable',
           name: 'Bracing',
           lines: [shieldBlock(5), blockRecovery(20), stunThreshold(8)],
+          at: [-900, 1125],
           why: '2.5 + 1 + 1 units: the shield that does not buckle.',
         },
         {
@@ -94,6 +96,7 @@ export const slams: AreaSpec = {
           kind: 'small',
           lines: [shieldBlock(3)],
           why: 'The exit, to the slam wheel and the Yard.',
+          at: [-912, 1194],
         },
       ],
       links: [
@@ -117,7 +120,7 @@ export const slams: AreaSpec = {
       at: [-1200, 1620],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [moveSpeed(4)], at: [-1060, 1560] },
+        { id: 'a', kind: 'small', lines: [moveSpeed(4)], at: [-1040, 1643] },
         {
           id: 'n',
           kind: 'notable',
@@ -133,30 +136,30 @@ export const slams: AreaSpec = {
       id: 'unbloodied',
       name: 'Unbloodied',
       why: "Damage on full life three times round the notable with damage and crit on full life and life on kill: the Vanguard whose armour means the first hit never lands, the Wall's conditional damage. Its own diamond off the slam junction, passed through toward the warcries; the leech chain leaves from its notable. The crit mace is far off in the tower (Crushing Blow).",
-      at: [-1620, 1720],
+      at: [-1580, 1690],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [damageOnFullLife(8)],
-          at: [-1520, 1620],
+          at: [-1580, 1635],
           why: 'The entrance, from the junction.',
         },
-        { id: 'b', kind: 'small', lines: [damageOnFullLife(8)], at: [-1660, 1600] },
+        { id: 'b', kind: 'small', lines: [damageOnFullLife(8)], at: [-1635, 1690] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Unbloodied',
           lines: [damageOnFullLife(16), critOnFullLife(25), lifeOnKill(10)],
-          at: [-1720, 1740],
+          at: [-1580, 1745],
           why: '2 + 1 + 1 units.',
         },
         {
           id: 'c',
           kind: 'small',
           lines: [damageOnFullLife(8)],
-          at: [-1600, 1830],
+          at: [-1525, 1690],
           why: 'The exit, to the warcries.',
         },
       ],
@@ -174,7 +177,7 @@ export const slams: AreaSpec = {
       at: [-1950, 1760],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['melee'])], at: [-1880, 1720] },
+        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['melee'])], at: [-1968, 1767] },
         {
           id: 'n',
           kind: 'notable',
@@ -197,7 +200,7 @@ export const slams: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [areaDamage(10)],
-          at: [-2650, 1380],
+          at: [-2506, 1475],
           why: 'The entrance, from the road down from the tower junction.',
         },
         {
@@ -212,7 +215,7 @@ export const slams: AreaSpec = {
           id: 'b',
           kind: 'small',
           lines: [areaDamage(10)],
-          at: [-2300, 1680],
+          at: [-2421, 1578],
           why: 'The exit, to Vampiric Strikes.',
         },
       ],
@@ -226,7 +229,7 @@ export const slams: AreaSpec = {
       name: 'Standing Cairns',
       why: "Totems: damage, speed (a totem skill's speed is both how fast it is placed and how fast it fires), duration. Reached from the junction and from the pace chain.",
       at: [-1100, 1850],
-      shape: { kind: 'ring', r: 110, a0: -90 },
+      shape: { kind: 'ring', r: 55, a0: -90 },
       nodes: [
         { id: 'a', kind: 'small', lines: [totemDamage(12)], why: 'The entrance, top.' },
         {
@@ -262,8 +265,8 @@ export const slams: AreaSpec = {
       at: [-1120, 2180],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [projectileAttack(10)], at: [-1120, 2180] },
-        { id: 'b', kind: 'small', lines: [projectileAttack(10)], at: [-1131, 2310] },
+        { id: 'a', kind: 'small', lines: [projectileAttack(10)], at: [-1120, 2299] },
+        { id: 'b', kind: 'small', lines: [projectileAttack(10)], at: [-1129, 2356] },
         { id: 'k', kind: 'keystone', name: 'Strongarm', lines: [], at: [-1142, 2440] },
       ],
       links: [

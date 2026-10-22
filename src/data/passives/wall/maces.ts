@@ -37,7 +37,7 @@ export const maces: AreaSpec = {
       name: 'Weight of Iron',
       why: 'Maces first, because the kit is one. Mace lines also reach sceptres, so a Zealot who crosses here is served too. Passed through to the junction.',
       at: [-2275, 1176],
-      shape: { kind: 'ring', r: 110, a0: 0 },
+      shape: { kind: 'ring', r: 55, a0: -45 },
       nodes: [
         { id: 'a', kind: 'small', lines: [maceDamage(14)] },
         { id: 'b', kind: 'small', lines: [maceDamage(14)] },
@@ -70,19 +70,19 @@ export const maces: AreaSpec = {
       id: 'crushing',
       name: 'Crushing Blow',
       why: "Melee crit twice around the notable with mace crit, mace crit multiplier and double damage: the crit mace's cluster, a chain from the axes' far side to the two-hander wheel. The other mace cluster (Weight of Iron, by the tower road) sells the stun; a mace build picks the crit here or the stun there.",
-      at: [-3354, 786],
+      at: [-3408, 706],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [critChance(20, ['melee'])], at: [-3224, 686] },
+        { id: 'a', kind: 'small', lines: [critChance(20, ['melee'])], at: [-3338, 706] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Crushing Blow',
           lines: [weaponCrit('mace', 20), weaponCritMulti('mace', 20), doubleDamage(5)],
-          at: [-3374, 766],
+          at: [-3408, 706],
           why: '1 + 1.7 + 1 units.',
         },
-        { id: 'b', kind: 'small', lines: [critChance(20, ['melee'])], at: [-3474, 916] },
+        { id: 'b', kind: 'small', lines: [critChance(20, ['melee'])], at: [-3466, 706] },
       ],
       links: [
         ['a', 'n'],
@@ -94,7 +94,7 @@ export const maces: AreaSpec = {
       name: 'Cleaver',
       why: 'Axes have no class kit, so their home must be reachable early from a start: here, off the first junction of the tower, from the rampart by the accuracy loop, and from the two-hander wheel by the crit chain.',
       at: [-2990, 864],
-      shape: { kind: 'ring', r: 110, a0: 90 },
+      shape: { kind: 'ring', r: 55, a0: 45 },
       nodes: [
         { id: 'a', kind: 'small', lines: [axeDamage(12)] },
         {
@@ -124,7 +124,7 @@ export const maces: AreaSpec = {
       name: 'Greatweight',
       why: "The tower's landmark: a wheel of six with two notables, two-handed damage and strength on one side, life on the other, so the two-hander picks the bigger hit or the bigger body. Stun belongs to Weight of Iron (with a mace) and Headsman (with a two-hander); Greatweight sold stun too until round 4. Two-handed speed is far south (Heavy Hands, by the grit) and the slam with a two-hander is Thunderstep: three places, three partners. Passed through toward the keystone.",
       at: [-3315, 1254],
-      shape: { kind: 'ring', r: 150, a0: 0 },
+      shape: { kind: 'ring', r: 78, a0: -30 },
       nodes: [
         { id: 'a', kind: 'small', lines: [twoHandDamage(12)] },
         { id: 'b', kind: 'small', lines: [twoHandDamage(12)] },
@@ -170,8 +170,8 @@ export const maces: AreaSpec = {
       at: [-3835, 1475],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [stunThreshold(8)], at: [-3835, 1475] },
-        { id: 'b', kind: 'small', lines: [stunThreshold(8)], at: [-3950, 1547] },
+        { id: 'a', kind: 'small', lines: [stunThreshold(8)], at: [-3945, 1542] },
+        { id: 'b', kind: 'small', lines: [stunThreshold(8)], at: [-3994, 1573] },
         { id: 'k', kind: 'keystone', name: 'Rooted Stance', lines: [], at: [-4065, 1619] },
       ],
       links: [
@@ -252,8 +252,8 @@ export const maces: AreaSpec = {
       at: [-3710, 445],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [maceDamage(12)], at: [-3554, 378] },
-        { id: 'b', kind: 'small', lines: [maceDamage(12)], at: [-3710, 445] },
+        { id: 'a', kind: 'small', lines: [maceDamage(12)], at: [-3749, 462] },
+        { id: 'b', kind: 'small', lines: [maceDamage(12)], at: [-3802, 485] },
         {
           id: 'n',
           kind: 'notable',
@@ -275,8 +275,8 @@ export const maces: AreaSpec = {
       at: [-3820, 25],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [curseEffect(8)], at: [-3700, -20] },
-        { id: 'b', kind: 'small', lines: [curseEffect(8)], at: [-3820, 25] },
+        { id: 'a', kind: 'small', lines: [curseEffect(8)], at: [-3840, 35] },
+        { id: 'b', kind: 'small', lines: [curseEffect(8)], at: [-3894, 55] },
         {
           id: 'n',
           kind: 'notable',

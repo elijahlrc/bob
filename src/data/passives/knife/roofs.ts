@@ -40,7 +40,7 @@ export const roofs: AreaSpec = {
       at: [3230, -2240],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'r1', kind: 'attribute', lines: [dex(6), int(6)], at: [2280, -2480] },
+        { id: 'r1', kind: 'attribute', lines: [dex(6), int(6)], at: [2326, -2606] },
         { id: 'r2', kind: 'attribute', lines: [dex(6), int(6)], at: [2620, -2560] },
         {
           id: 'r3',
@@ -86,8 +86,8 @@ export const roofs: AreaSpec = {
       at: [3200, -2900],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [clawDamage(10)], at: [3080, -2690] },
-        { id: 'b', kind: 'small', lines: [clawDamage(10)], at: [3200, -2900] },
+        { id: 'a', kind: 'small', lines: [clawDamage(10)], at: [3265, -2989] },
+        { id: 'b', kind: 'small', lines: [clawDamage(10)], at: [3295, -3040] },
         {
           id: 'n',
           kind: 'notable',
@@ -109,8 +109,8 @@ export const roofs: AreaSpec = {
       at: [4000, -1720],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleDamage('cold', 10)], at: [3800, -1700] },
-        { id: 'b', kind: 'small', lines: [eleDamage('cold', 10)], at: [4000, -1720] },
+        { id: 'a', kind: 'small', lines: [eleDamage('cold', 10)], at: [4073, -1721] },
+        { id: 'b', kind: 'small', lines: [eleDamage('cold', 10)], at: [4131, -1730] },
         {
           id: 'n',
           kind: 'notable',
@@ -136,14 +136,14 @@ export const roofs: AreaSpec = {
           id: 't',
           kind: 'small',
           lines: [critChance(20)],
-          at: [2950, -2230],
+          at: [2950, -2165],
           why: 'The top, from the rooftop road.',
         },
         {
           id: 'w1',
           kind: 'small',
           lines: [daggerSpellDamage(8)],
-          at: [2820, -2155],
+          at: [2876, -2123],
           why: "The caster's side.",
         },
         {
@@ -151,14 +151,14 @@ export const roofs: AreaSpec = {
           kind: 'notable',
           name: 'Athame',
           lines: [daggerSpellDamage(16), daggerSpellCrit(30)],
-          at: [2820, -2005],
+          at: [2876, -2038],
           why: '2 + 2 units.',
         },
         {
           id: 'b',
           kind: 'small',
           lines: [critChance(20)],
-          at: [2950, -1930],
+          at: [2950, -1995],
           why: 'The bottom, to the Rookery.',
         },
         {
@@ -166,14 +166,14 @@ export const roofs: AreaSpec = {
           kind: 'notable',
           name: 'Long Knives',
           lines: [daggerDamage(16), weaponSpeed('dagger', 4), weaponAccuracy('dagger', 10)],
-          at: [3080, -2005],
+          at: [3024, -2038],
           why: "1.6 + 1.3 + 1 units. The dagger attacker's late notable: the build used to be done with daggers at point 17.",
         },
         {
           id: 'e1',
           kind: 'small',
           lines: [daggerDamage(10)],
-          at: [3080, -2155],
+          at: [3024, -2123],
           why: "The attacker's side.",
         },
       ],
@@ -193,8 +193,8 @@ export const roofs: AreaSpec = {
       at: [3830, -1275],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [physSpell(12)], at: [3690, -1290] },
-        { id: 'b', kind: 'small', lines: [physSpell(12)], at: [3830, -1275] },
+        { id: 'a', kind: 'small', lines: [physSpell(12)], at: [3853, -1274] },
+        { id: 'b', kind: 'small', lines: [physSpell(12)], at: [3910, -1268] },
         {
           id: 'n',
           kind: 'notable',
@@ -240,8 +240,8 @@ export const roofs: AreaSpec = {
       at: [2490, -3500],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [daggerSpellDamage(8)], at: [2390, -3420] },
-        { id: 'b', kind: 'small', lines: [daggerSpellDamage(8)], at: [2490, -3500] },
+        { id: 'a', kind: 'small', lines: [daggerSpellDamage(8)], at: [2501, -3509] },
+        { id: 'b', kind: 'small', lines: [daggerSpellDamage(8)], at: [2546, -3546] },
         {
           id: 'n',
           kind: 'notable',

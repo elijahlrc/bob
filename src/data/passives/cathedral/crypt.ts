@@ -42,12 +42,12 @@ export const crypt: AreaSpec = {
       at: P(1850, 1150),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'm1', kind: 'small', lines: [es(5)], at: P(1629, 1150), why: 'The west entrance.' },
+        { id: 'm1', kind: 'small', lines: [es(5)], at: P(1750, 1150), why: 'The west entrance.' },
         {
           id: 'm2',
           kind: 'small',
           lines: [spellDamage(8)],
-          at: P(1740, 959),
+          at: P(1779, 1079),
           why: 'The spell side.',
         },
         {
@@ -55,14 +55,14 @@ export const crypt: AreaSpec = {
           kind: 'notable',
           name: 'Homily',
           lines: [spellDamage(16), eleDamageAll(10), castSpeed(4)],
-          at: P(1961, 959),
+          at: P(1850, 1050),
           why: '2 + 1 + 1 units.',
         },
         {
           id: 'm4',
           kind: 'small',
           lines: [es(5)],
-          at: P(2071, 1150),
+          at: P(1950, 1150),
           why: 'The east exit, to the crypt junction.',
         },
         {
@@ -70,18 +70,18 @@ export const crypt: AreaSpec = {
           kind: 'notable',
           name: 'Glass Wall',
           lines: [shieldSpellBlock(4), shieldDef(15), esFlat(15)],
-          at: P(1961, 1341),
+          at: P(1850, 1250),
           why: 'Spell block behind a shield, shield defences and flat shield: 2 + 1 + 1 units.',
         },
         {
           id: 'm6',
           kind: 'small',
           lines: [spellBlock(2)],
-          at: P(1740, 1341),
+          at: P(1779, 1221),
           why: 'The spell-block side.',
         },
-        { id: 'm7', kind: 'small', lines: [spellDamage(8)], at: P(2058, 1030) },
-        { id: 'm8', kind: 'small', lines: [spellBlock(2)], at: P(2058, 1270) },
+        { id: 'm7', kind: 'small', lines: [spellDamage(8)], at: P(1921, 1079) },
+        { id: 'm8', kind: 'small', lines: [spellBlock(2)], at: P(1921, 1221) },
       ],
       links: [
         ['m1', 'm2'],
@@ -98,9 +98,9 @@ export const crypt: AreaSpec = {
       id: 'jV',
       name: 'Crypt junction',
       why: 'East of the wheel: the shrine ahead, the Volatile Servants spur toward the Spire side.',
-      at: P(2200, 1250),
+      at: P(2190, 1150),
       shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(2200, 1250) }],
+      nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(2190, 1150) }],
       links: [],
     },
     {
@@ -110,8 +110,8 @@ export const crypt: AreaSpec = {
       at: P(2300, 1650),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [minionLife(12)], at: P(2250, 1450) },
-        { id: 'b', kind: 'small', lines: [minionLife(12)], at: P(2300, 1650) },
+        { id: 'a', kind: 'small', lines: [minionLife(12)], at: P(2318, 1711) },
+        { id: 'b', kind: 'small', lines: [minionLife(12)], at: P(2331, 1767) },
         { id: 'k', kind: 'keystone', name: 'Volatile Servants', lines: [], at: P(2350, 1850) },
       ],
       links: [
@@ -130,7 +130,7 @@ export const crypt: AreaSpec = {
           id: 'w',
           kind: 'small',
           lines: [skillDuration(10)],
-          at: P(2350, 1150),
+          at: P(2425, 1150),
           why: 'The west entrance, from the crypt junction: duration, which both sides use.',
         },
         {
@@ -138,14 +138,14 @@ export const crypt: AreaSpec = {
           kind: 'notable',
           name: 'Reliquary',
           lines: [totemDamage(24), spellDamage(8), totemDuration(15)],
-          at: P(2500, 1000),
+          at: P(2500, 1075),
           why: 'The casting totem: 2 + 1 + 1 units.',
         },
         {
           id: 'e',
           kind: 'small',
           lines: [skillDuration(10)],
-          at: P(2650, 1150),
+          at: P(2575, 1150),
           why: 'The far node; the Sigil Warden spur leaves here.',
         },
         {
@@ -153,7 +153,7 @@ export const crypt: AreaSpec = {
           kind: 'notable',
           name: 'Runecarver',
           lines: [brandDamage(24), skillDuration(10), areaDamage(10)],
-          at: P(2500, 1300),
+          at: P(2500, 1225),
           why: 'Brands: damage, duration and area. 2 + 1 + 1 units.',
         },
       ],
@@ -171,8 +171,8 @@ export const crypt: AreaSpec = {
       at: P(2990, 1110),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [brandDamage(12)], at: P(2820, 1130) },
-        { id: 'b', kind: 'small', lines: [brandDamage(12)], at: P(2990, 1110) },
+        { id: 'a', kind: 'small', lines: [brandDamage(12)], at: P(3019, 1107) },
+        { id: 'b', kind: 'small', lines: [brandDamage(12)], at: P(3076, 1099) },
         { id: 'k', kind: 'keystone', name: 'Sigil Warden', lines: [], at: P(3160, 1090) },
       ],
       links: [
@@ -202,9 +202,9 @@ export const crypt: AreaSpec = {
       id: 'stair',
       name: 'The crypt stair',
       why: 'One attribute node from the Spire crossing down to the crypt junction (2026-10-20): the junction, the shrine and Volatile Servants had one way in, through the wheel.',
-      at: P(2090, 1470),
+      at: P(2085, 1420),
       shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(2090, 1470) }],
+      nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(2085, 1420) }],
       links: [],
     },
     {
@@ -214,8 +214,8 @@ export const crypt: AreaSpec = {
       at: [-1736, -3294],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [chaosSpell(12)], at: [-1736, -3124] },
-        { id: 'b', kind: 'small', lines: [chaosSpell(12)], at: [-1736, -3294] },
+        { id: 'a', kind: 'small', lines: [chaosSpell(12)], at: P(2171, 2021) },
+        { id: 'b', kind: 'small', lines: [chaosSpell(12)], at: P(2200, 2071) },
         {
           id: 'n',
           kind: 'notable',
@@ -237,8 +237,8 @@ export const crypt: AreaSpec = {
       at: [-1505, -3420],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [physSpell(12)], at: [-1490, -3290] },
-        { id: 'b', kind: 'small', lines: [physSpell(12)], at: [-1505, -3420] },
+        { id: 'a', kind: 'small', lines: [physSpell(12)], at: P(2030, 2226) },
+        { id: 'b', kind: 'small', lines: [physSpell(12)], at: P(2064, 2273) },
         {
           id: 'n',
           kind: 'notable',

@@ -50,7 +50,7 @@ export const home: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [es(5)],
-          at: [-150, -1120],
+          at: [-70, -1242],
           why: 'The west side: defence.',
         },
         {
@@ -65,7 +65,7 @@ export const home: AreaSpec = {
           id: 'b',
           kind: 'small',
           lines: [critChance(20)],
-          at: [150, -1120],
+          at: [70, -1242],
           why: 'The east side: offence, for any hit, spell or wand.',
         },
       ],
@@ -89,17 +89,24 @@ export const home: AreaSpec = {
     {
       id: 'stillMind',
       name: 'Still Mind',
-      why: "The west hub's pocket, a tight orbit: two mana regeneration nodes and a notable with regeneration and flat mana. A caster's first worry is running dry; three points after the hub it stops being one.",
-      at: [-470, -1150],
-      shape: { kind: 'ring', r: 75, a0: -30 },
+      why: "The west hub's pocket, a tight orbit: two mana regeneration nodes and a notable with regeneration and flat mana, on a half circle west of the hub and the road's first node. A caster's first worry is running dry; three points after the hub it stops being one.",
+      at: [-425, -1275],
+      shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [manaRegen(10)], why: 'The entrance, facing the hub.' },
-        { id: 'b', kind: 'small', lines: [manaRegen(10)] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [manaRegen(10)],
+          why: 'The entrance, facing the hub.',
+          at: [-368, -1237],
+        },
+        { id: 'b', kind: 'small', lines: [manaRegen(10)], at: [-425, -1275] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Still Mind',
           lines: [manaRegen(20), manaFlat(30)],
+          at: [-438, -1343],
           why: '2 + 1.5 units.',
         },
       ],
@@ -111,19 +118,26 @@ export const home: AreaSpec = {
     {
       id: 'sharpMind',
       name: 'Sharp Mind',
-      why: "The east hub's pocket, a tight orbit: two spell crit nodes and a notable with spell crit and spell crit multiplier. The crit caster's first three points after the hub, and the way the insight charges start paying.",
-      at: [470, -1150],
-      shape: { kind: 'ring', r: 75, a0: -150 },
+      why: "The east hub's pocket, a tight orbit: two spell crit nodes and a notable with spell crit and spell crit multiplier, on a half circle east of the hub and the road's first node. The crit caster's first three points after the hub, and the way the insight charges start paying.",
+      at: [425, -1275],
+      shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [spellCrit(15)], why: 'The entrance, facing the hub.' },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [spellCrit(15)],
+          why: 'The entrance, facing the hub.',
+          at: [368, -1237],
+        },
         {
           id: 'n',
           kind: 'notable',
           name: 'Sharp Mind',
           lines: [spellCrit(30), spellCritMulti(15)],
+          at: [438, -1343],
           why: '2 + 1.25 units.',
         },
-        { id: 'b', kind: 'small', lines: [spellCrit(15)] },
+        { id: 'b', kind: 'small', lines: [spellCrit(15)], at: [425, -1275] },
       ],
       links: [
         ['a', 'b'],
@@ -137,9 +151,9 @@ export const home: AreaSpec = {
       at: [-380, -1600],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'attribute', lines: [int(7)], at: [-380, -1400] },
+        { id: 'a', kind: 'attribute', lines: [int(7)], at: [-400, -1400] },
         { id: 'b', kind: 'attribute', lines: [int(7)], at: [-400, -1600] },
-        { id: 'c', kind: 'attribute', lines: [int(7)], at: [-240, -1820] },
+        { id: 'c', kind: 'attribute', lines: [int(7)], at: [-400, -1780] },
       ],
       links: [
         ['a', 'b'],
@@ -153,9 +167,9 @@ export const home: AreaSpec = {
       at: [380, -1600],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'attribute', lines: [int(7)], at: [380, -1400] },
+        { id: 'a', kind: 'attribute', lines: [int(7)], at: [400, -1400] },
         { id: 'b', kind: 'attribute', lines: [int(7)], at: [400, -1600] },
-        { id: 'c', kind: 'attribute', lines: [int(7)], at: [240, -1820] },
+        { id: 'c', kind: 'attribute', lines: [int(7)], at: [400, -1780] },
       ],
       links: [
         ['a', 'b'],
@@ -187,7 +201,7 @@ export const home: AreaSpec = {
       at: [0, -1700],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [life(5)], at: [-210, -1650] },
+        { id: 'a', kind: 'small', lines: [life(5)], at: [-68, -1683] },
         {
           id: 'n',
           kind: 'notable',
@@ -196,7 +210,7 @@ export const home: AreaSpec = {
           at: [0, -1700],
           why: 'Life and a little shield: 2.4 + 1.2 units.',
         },
-        { id: 'b', kind: 'small', lines: [life(5)], at: [210, -1650] },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [68, -1683] },
       ],
       links: [
         ['a', 'n'],
@@ -210,8 +224,8 @@ export const home: AreaSpec = {
       at: [-42, -1400],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [wandAttack(12)], at: [-212, -1400] },
-        { id: 'b', kind: 'small', lines: [wandAttack(12)], at: [-42, -1400] },
+        { id: 'a', kind: 'small', lines: [wandAttack(12)], at: [0, -1400] },
+        { id: 'b', kind: 'small', lines: [wandAttack(12)], at: [58, -1400] },
         {
           id: 'n',
           kind: 'notable',

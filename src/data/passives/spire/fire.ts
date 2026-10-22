@@ -34,7 +34,7 @@ export const fire: AreaSpec = {
       name: 'Hoarfrost',
       why: "Cold with energy shield: the careful cold caster's cluster, who wants the chill to keep things off and a shield for what gets through. The other cold cluster (Shatter, at the top) sells freeze and penetration instead, so a cold build picks safety here or the big hit up there, and both costs a crossing.",
       at: [-650, -3420],
-      shape: { kind: 'ring', r: 105, a0: 30 },
+      shape: { kind: 'ring', r: 56, a0: 30 },
       nodes: [
         {
           id: 'a',
@@ -89,7 +89,7 @@ export const fire: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [minionDamage(12)],
-          at: [-1060, -3120],
+          at: [-1126, -3256],
           why: 'The entrance, from Mana Tap.',
         },
         {
@@ -104,7 +104,7 @@ export const fire: AreaSpec = {
           id: 'b',
           kind: 'small',
           lines: [minionDamage(12)],
-          at: [-1120, -3470],
+          at: [-1137, -3356],
           why: "The exit, to the arm's junction.",
         },
       ],
@@ -118,7 +118,7 @@ export const fire: AreaSpec = {
       name: 'Cinder',
       why: "Ignite: chance, burning damage, faster burning. Fire as a burn, at the arm's end beside the two-element keystone; the fire caster who wants the hit instead goes east to Flashpoint. The arm's end: a dead end since 2026-10-20, when its link to the Prismatic spur went so the keystone sits on a spur.",
       at: [-1150, -3850],
-      shape: { kind: 'ring', r: 105, a0: 60 },
+      shape: { kind: 'ring', r: 56, a0: 60 },
       nodes: [
         { id: 'a', kind: 'small', lines: [burnDamage(12)] },
         {

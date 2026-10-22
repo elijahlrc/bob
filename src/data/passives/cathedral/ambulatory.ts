@@ -94,8 +94,8 @@ export const ambulatory: AreaSpec = {
       at: P(2330, -165),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(2210, -180) },
-        { id: 'b', kind: 'attribute', lines: [str(6), int(6)], at: P(2450, -150) },
+        { id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(2227, -150) },
+        { id: 'b', kind: 'attribute', lines: [str(6), int(6)], at: P(2463, -150) },
       ],
       links: [['a', 'b']],
     },
@@ -106,8 +106,8 @@ export const ambulatory: AreaSpec = {
       at: P(3050, 30),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [staffDamage(12)], at: P(2900, 60) },
-        { id: 'b', kind: 'small', lines: [staffDamage(12)], at: P(3080, 40) },
+        { id: 'a', kind: 'small', lines: [staffDamage(12)], at: P(3132, 29) },
+        { id: 'b', kind: 'small', lines: [staffDamage(12)], at: P(3190, 25) },
         {
           id: 'n',
           kind: 'notable',
@@ -129,7 +129,7 @@ export const ambulatory: AreaSpec = {
       at: P(2380, 260),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [armour(12)], at: P(2540, 330) },
+        { id: 'a', kind: 'small', lines: [armour(12)], at: P(2440, 277) },
         {
           id: 'n',
           kind: 'notable',
@@ -138,7 +138,7 @@ export const ambulatory: AreaSpec = {
           at: P(2370, 280),
           why: '2 + 2 units.',
         },
-        { id: 'b', kind: 'small', lines: [armour(12)], at: P(2380, 60) },
+        { id: 'b', kind: 'small', lines: [armour(12)], at: P(2385, 212) },
       ],
       links: [
         ['a', 'n'],
@@ -152,8 +152,8 @@ export const ambulatory: AreaSpec = {
       at: P(2420, 560),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [brandDamage(12)], at: P(2530, 500) },
-        { id: 'b', kind: 'small', lines: [brandDamage(12)], at: P(2370, 560) },
+        { id: 'a', kind: 'small', lines: [brandDamage(12)], at: P(2360, 613) },
+        { id: 'b', kind: 'small', lines: [brandDamage(12)], at: P(2305, 634) },
         {
           id: 'n',
           kind: 'notable',
@@ -175,8 +175,8 @@ export const ambulatory: AreaSpec = {
       at: P(3020, 720),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleAttackOne('fire', 12)], at: P(2870, 720) },
-        { id: 'b', kind: 'small', lines: [eleAttackOne('fire', 12)], at: P(3050, 760) },
+        { id: 'a', kind: 'small', lines: [eleAttackOne('fire', 12)], at: P(3102, 716) },
+        { id: 'b', kind: 'small', lines: [eleAttackOne('fire', 12)], at: P(3160, 718) },
         {
           id: 'n',
           kind: 'notable',
@@ -198,7 +198,7 @@ export const ambulatory: AreaSpec = {
       at: P(2380, -1000),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(2180, -960) },
+        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(2350, -1083) },
         {
           id: 'n',
           kind: 'notable',
@@ -207,12 +207,12 @@ export const ambulatory: AreaSpec = {
           at: P(2380, -1020),
           why: '2 + 1 units.',
         },
-        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(2560, -900) },
+        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(2410, -957) },
         {
           id: 'c',
           kind: 'attribute',
           lines: [str(6), int(6)],
-          at: P(2590, -720),
+          at: P(2507, -748),
           why: 'A road node onto the tower junction.',
         },
       ],
@@ -237,8 +237,8 @@ export const ambulatory: AreaSpec = {
           at: P(1900, -1400),
           why: 'Where the warcry pocket leaves.',
         },
-        { id: 'c', kind: 'attribute', lines: [str(7)], at: P(1720, -1640) },
-        { id: 'd', kind: 'attribute', lines: [str(7)], at: P(1500, -1650) },
+        { id: 'c', kind: 'attribute', lines: [str(7)], at: P(1868, -1521) },
+        { id: 'd', kind: 'attribute', lines: [str(7)], at: P(1835, -1644) },
       ],
       links: [
         ['a', 'b'],
@@ -253,8 +253,8 @@ export const ambulatory: AreaSpec = {
       at: P(2280, -1560),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [warcryEffect(10)], at: P(2100, -1500) },
-        { id: 'b', kind: 'small', lines: [warcryEffect(10)], at: P(2280, -1590) },
+        { id: 'a', kind: 'small', lines: [warcryEffect(10)], at: P(2335, -1492) },
+        { id: 'b', kind: 'small', lines: [warcryEffect(10)], at: P(2391, -1505) },
         {
           id: 'n',
           kind: 'notable',
@@ -276,8 +276,8 @@ export const ambulatory: AreaSpec = {
       at: [-3327, -2334],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [minionDamage(12)], at: [-3207, -2214] },
-        { id: 'b', kind: 'small', lines: [minionDamage(12)], at: [-3327, -2334] },
+        { id: 'a', kind: 'small', lines: [minionDamage(12)], at: P(3089, 369) },
+        { id: 'b', kind: 'small', lines: [minionDamage(12)], at: P(3147, 384) },
         {
           id: 'n',
           kind: 'notable',
@@ -299,8 +299,8 @@ export const ambulatory: AreaSpec = {
       at: [-3664, -1648],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleDamage('lightning', 10)], at: [-3507, -1583] },
-        { id: 'b', kind: 'small', lines: [eleDamage('lightning', 10)], at: [-3664, -1648] },
+        { id: 'a', kind: 'small', lines: [eleDamage('lightning', 10)], at: P(3039, -410) },
+        { id: 'b', kind: 'small', lines: [eleDamage('lightning', 10)], at: P(3096, -418) },
         {
           id: 'n',
           kind: 'notable',
@@ -322,14 +322,14 @@ export const ambulatory: AreaSpec = {
       at: [-3554, -638],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [burnDamage(12)], at: [-3397, -573] },
-        { id: 'b', kind: 'small', lines: [burnDamage(12)], at: [-3554, -638] },
+        { id: 'a', kind: 'small', lines: [burnDamage(12)], at: P(2424, -1295) },
+        { id: 'b', kind: 'small', lines: [burnDamage(12)], at: P(2479, -1313) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Censer',
           lines: [burnDamage(24), areaDamage(10), igniteDuration(15)],
-          at: [-3711, -703],
+          at: P(2546, -1334),
           why: '2 + 1 + 1 units.',
         },
       ],

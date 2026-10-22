@@ -99,7 +99,7 @@ export const home: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [mana(8)],
-          at: P(220, 440),
+          at: P(319, 494),
           why: 'The entrance, facing the hub.',
         },
         {
@@ -114,7 +114,7 @@ export const home: AreaSpec = {
           id: 'b',
           kind: 'small',
           lines: [mana(8)],
-          at: P(440, 630),
+          at: P(379, 618),
           why: 'The far node, onto the east road.',
         },
       ],
@@ -134,7 +134,7 @@ export const home: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [flaskEffect(5)],
-          at: P(520, -480),
+          at: P(605, -480),
           why: 'The entrance, from the west road.',
         },
         {
@@ -155,9 +155,9 @@ export const home: AreaSpec = {
       at: P(580, 0),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [life(5)], at: P(420, 0) },
-        { id: 'b', kind: 'small', lines: [life(5)], at: P(580, 0) },
-        { id: 'c', kind: 'small', lines: [life(5)], at: P(740, 0) },
+        { id: 'a', kind: 'small', lines: [life(5)], at: P(308, -16) },
+        { id: 'b', kind: 'small', lines: [life(5)], at: P(365, -28) },
+        { id: 'c', kind: 'small', lines: [life(5)], at: P(421, -41) },
       ],
       links: [
         ['a', 'b'],
@@ -171,8 +171,8 @@ export const home: AreaSpec = {
       at: P(565, -300),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(440, -330) },
-        { id: 'b', kind: 'attribute', lines: [str(6), int(6)], at: P(690, -270) },
+        { id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(477, -260) },
+        { id: 'b', kind: 'attribute', lines: [str(6), int(6)], at: P(703, -241) },
       ],
       links: [['a', 'b']],
     },
@@ -183,8 +183,8 @@ export const home: AreaSpec = {
       at: P(565, 300),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(440, 330) },
-        { id: 'b', kind: 'attribute', lines: [str(6), int(6)], at: P(690, 270) },
+        { id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(460, 297) },
+        { id: 'b', kind: 'attribute', lines: [str(6), int(6)], at: P(670, 313) },
       ],
       links: [['a', 'b']],
     },

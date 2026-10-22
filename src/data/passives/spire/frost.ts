@@ -38,7 +38,7 @@ export const frost: AreaSpec = {
       name: 'Thunderhead',
       why: "Lightning with cast speed and a chance to shock: the quick lightning caster's cluster, the first of the middle arm, with the two inter-arm junctions off its sides. The other lightning cluster (Overcharge, east) sells shock effect and penetration; this one sells speed.",
       at: [0, -3450],
-      shape: { kind: 'ring', r: 105, a0: 90 },
+      shape: { kind: 'ring', r: 56, a0: 90 },
       nodes: [
         {
           id: 'a',
@@ -98,13 +98,13 @@ export const frost: AreaSpec = {
       at: [-480, -3780],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleDamageAll(8)], at: [-470, -3790] },
-        { id: 'b', kind: 'small', lines: [eleDamageAll(8)], at: [-620, -3880] },
+        { id: 'a', kind: 'small', lines: [eleDamageAll(8)], at: [-745, -3962] },
+        { id: 'b', kind: 'small', lines: [eleDamageAll(8)], at: [-790, -3999] },
         {
           id: 'c',
           kind: 'small',
           lines: [eleDamageAll(8)],
-          at: [-770, -3960],
+          at: [-834, -4036],
           why: 'Where the ignite room arrives.',
         },
         { id: 'k', kind: 'keystone', name: 'Prismatic Balance', lines: [], at: [-900, -4090] },
@@ -129,7 +129,7 @@ export const frost: AreaSpec = {
       name: 'Shatter',
       why: 'Freeze chance, cold penetration and cold damage: cold as the big hit that stops a rare, under the crit keystone. The other cold cluster (Hoarfrost, west) is the safe one with a shield; this one is the dangerous one. Passed through, up to the top spur.',
       at: [0, -4080],
-      shape: { kind: 'ring', r: 105, a0: 90 },
+      shape: { kind: 'ring', r: 56, a0: 90 },
       nodes: [
         { id: 'a', kind: 'small', lines: [freezeChance(5)], why: 'The entrance, south.' },
         { id: 'b', kind: 'small', lines: [freezeChance(5)] },
@@ -161,8 +161,9 @@ export const frost: AreaSpec = {
           kind: 'small',
           lines: [ailmentEffect(10)],
           why: 'The entrance, facing the shatter room.',
+          at: [407, -3972],
         },
-        { id: 'b', kind: 'small', lines: [ailmentEffect(10)] },
+        { id: 'b', kind: 'small', lines: [ailmentEffect(10)], at: [461, -3949] },
         {
           id: 'n',
           kind: 'notable',
@@ -183,8 +184,8 @@ export const frost: AreaSpec = {
       at: [0, -4330],
       shape: { kind: 'line', heading: -90, gap: 145 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleDamageAll(8)] },
-        { id: 'b', kind: 'small', lines: [eleDamageAll(8)] },
+        { id: 'a', kind: 'small', lines: [eleDamageAll(8)], at: [56, -4489] },
+        { id: 'b', kind: 'small', lines: [eleDamageAll(8)], at: [33, -4542] },
         { id: 'k', kind: 'keystone', name: 'Fever Pitch', lines: [] },
       ],
       links: [
@@ -229,8 +230,8 @@ export const frost: AreaSpec = {
       at: [960, -4225],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [trapDamage(12)], at: [860, -4140] },
-        { id: 'b', kind: 'small', lines: [trapDamage(12)], at: [960, -4225] },
+        { id: 'a', kind: 'small', lines: [trapDamage(12)], at: [982, -4243] },
+        { id: 'b', kind: 'small', lines: [trapDamage(12)], at: [1026, -4280] },
         {
           id: 'n',
           kind: 'notable',
@@ -252,8 +253,8 @@ export const frost: AreaSpec = {
       at: [-326, -4166],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [channelDamage(10)], at: [-258, -4055] },
-        { id: 'b', kind: 'small', lines: [channelDamage(10)], at: [-326, -4166] },
+        { id: 'a', kind: 'small', lines: [channelDamage(10)], at: [-337, -4185] },
+        { id: 'b', kind: 'small', lines: [channelDamage(10)], at: [-368, -4234] },
         {
           id: 'n',
           kind: 'notable',

@@ -50,7 +50,7 @@ export const home: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [meleePhys(10)],
-          at: [-150, 1120],
+          at: [-70, 1242],
           why: 'The west side: damage.',
         },
         {
@@ -65,7 +65,7 @@ export const home: AreaSpec = {
           id: 'b',
           kind: 'small',
           lines: [attackSpeed(5)],
-          at: [150, 1120],
+          at: [70, 1242],
           why: 'The east side: speed.',
         },
       ],
@@ -93,7 +93,13 @@ export const home: AreaSpec = {
       at: [-470, 1150],
       shape: { kind: 'ring', r: 75, a0: 30 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [life(5)], why: 'The entrance, facing the hub.' },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [life(5)],
+          why: 'The entrance, facing the hub.',
+          at: [-411, 1221],
+        },
         {
           id: 'n',
           kind: 'notable',
@@ -101,7 +107,7 @@ export const home: AreaSpec = {
           lines: [life(10), lifeRegen(0.6), str(10)],
           why: '2 + 1.5 + 0.7 units.',
         },
-        { id: 'b', kind: 'small', lines: [life(5)] },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [-467, 1206] },
       ],
       links: [
         ['a', 'b'],
@@ -115,8 +121,14 @@ export const home: AreaSpec = {
       at: [450, 1380],
       shape: { kind: 'ring', r: 75, a0: -139 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [shieldBlock(3)], why: 'The entrance, facing the hub.' },
-        { id: 'b', kind: 'small', lines: [shieldBlock(3)] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [shieldBlock(3)],
+          why: 'The entrance, facing the hub.',
+          at: [365, 1347],
+        },
+        { id: 'b', kind: 'small', lines: [shieldBlock(3)], at: [397, 1396] },
         {
           id: 'n',
           kind: 'notable',
@@ -141,10 +153,10 @@ export const home: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [manaOnHit(4, ['attack'])],
-          at: [80, 1610],
+          at: [209, 1641],
           why: 'The entrance, from the middle road.',
         },
-        { id: 'b', kind: 'small', lines: [manaOnHit(4, ['attack'])], at: [180, 1700] },
+        { id: 'b', kind: 'small', lines: [manaOnHit(4, ['attack'])], at: [246, 1686] },
         {
           id: 'n',
           kind: 'notable',
@@ -162,15 +174,16 @@ export const home: AreaSpec = {
     {
       id: 'fieldDressing',
       name: 'Field Dressing',
-      why: "Flask recovery twice, then the notable with recovery, duration and life: the Yard sold no flask lines, and the early game is life flasks. A tight orbit west of Stout Heart, pointing at the Wall, passed through to Fencer's Eye: the life pocket and the crit pocket are joined along the Wall border.",
-      at: [-670, 1310],
-      shape: { kind: 'ring', r: 70, a0: -30 },
+      why: "Flask recovery twice, then the notable with recovery, duration and life: the Yard sold no flask lines, and the early game is life flasks. A pocket west of Stout Heart, its smalls on the way to the Wall, passed through to Fencer's Eye: the life pocket and the crit pocket are joined along the Wall border.",
+      at: [-700, 1290],
+      shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [flaskRecovery(10)],
           why: 'The entrance, facing Stout Heart.',
+          at: [-676, 1251],
         },
         {
           id: 'n',
@@ -178,12 +191,14 @@ export const home: AreaSpec = {
           name: 'Field Dressing',
           lines: [flaskRecovery(15), flaskDuration(10), life(5)],
           why: "1.5 + 1 + 1 units. The exit, to Fencer's Eye.",
+          at: [-693, 1340],
         },
         {
           id: 'b',
           kind: 'small',
           lines: [flaskRecovery(10)],
           why: "The west side, where the Wall's Bracing is one step away.",
+          at: [-731, 1275],
         },
       ],
       links: [
@@ -222,9 +237,9 @@ export const home: AreaSpec = {
       at: [-50, 1560],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [life(5)], at: [-40, 1400] },
-        { id: 'b', kind: 'small', lines: [life(5)], at: [-60, 1560] },
-        { id: 'c', kind: 'small', lines: [life(5)], at: [-70, 1720] },
+        { id: 'a', kind: 'small', lines: [life(5)], at: [-7, 1310] },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [-13, 1367] },
+        { id: 'c', kind: 'small', lines: [life(5)], at: [-19, 1425] },
       ],
       links: [
         ['a', 'b'],

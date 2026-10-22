@@ -47,7 +47,7 @@ export const grit: AreaSpec = {
       name: 'War Drums',
       why: 'Warcries: duration and buff effect. Entered from the road down from Vampiric Strikes; passed through to the Barrows junction.',
       at: [-2210, 2554],
-      shape: { kind: 'ring', r: 110, a0: -60 },
+      shape: { kind: 'ring', r: 55, a0: -45 },
       nodes: [
         { id: 'a', kind: 'small', lines: [warcryDuration(15)], why: 'An entrance.' },
         {
@@ -86,7 +86,7 @@ export const grit: AreaSpec = {
       name: 'Unbroken',
       why: 'The grit wheel: life at the entrance and the exit, a charge more on one side (Unbroken), a point of maximum resistance on the other (Tempered). Passed through, and neither side pays for the other.',
       at: [-2704, 2970],
-      shape: { kind: 'ring', r: 162, a0: -50 },
+      shape: { kind: 'ring', r: 90, a0: -30 },
       nodes: [
         { id: 'a', kind: 'small', lines: [life(5)] },
         {
@@ -97,7 +97,12 @@ export const grit: AreaSpec = {
           why: 'A fourth grit charge: 3 units by the table and the node the whole area is for.',
         },
         { id: 'b', kind: 'small', lines: [life(5)] },
-        { id: 'c', kind: 'small', lines: [resAll(4)], why: 'The resistance side.' },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [resAll(4)],
+          why: 'The resistance side.',
+        },
         {
           id: 'n2',
           kind: 'notable',
@@ -126,7 +131,7 @@ export const grit: AreaSpec = {
       name: 'Heavy Hands',
       why: "Two-handed attack speed three times, then the notable with speed and accuracy: the fast two-hander, far south beside the warcries and the grit (it was a side of the tower's wheel until 2026-10-20, a step from every other two-hander node). The approach to Blood Rite, whose own spur sells the life it asks for.",
       at: [-2496, 3386],
-      shape: { kind: 'ring', r: 110, a0: -120 },
+      shape: { kind: 'ring', r: 55, a0: -135 },
       nodes: [
         { id: 'a', kind: 'small', lines: [attackSpeed(4, ['twoHand'])] },
         { id: 'b', kind: 'small', lines: [attackSpeed(4, ['twoHand'])] },
@@ -153,8 +158,8 @@ export const grit: AreaSpec = {
       at: [-2665, 3581],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [life(5)], at: [-2665, 3581] },
-        { id: 'b', kind: 'small', lines: [life(5)], at: [-2749, 3681] },
+        { id: 'a', kind: 'small', lines: [life(5)], at: [-2741, 3671] },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [-2778, 3716] },
         { id: 'k', kind: 'keystone', name: 'Blood Rite', lines: [], at: [-2833, 3781] },
       ],
       links: [
@@ -220,8 +225,8 @@ export const grit: AreaSpec = {
       at: [-1690, 2860],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [twoHandDamage(12)], at: [-1760, 3000] },
-        { id: 'b', kind: 'small', lines: [twoHandDamage(12)], at: [-1690, 2840] },
+        { id: 'a', kind: 'small', lines: [twoHandDamage(12)], at: [-1633, 2816] },
+        { id: 'b', kind: 'small', lines: [twoHandDamage(12)], at: [-1609, 2764] },
         {
           id: 'n',
           kind: 'notable',
@@ -243,8 +248,8 @@ export const grit: AreaSpec = {
       at: [-1400, 3380],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [lifeRegen(0.4)], at: [-1430, 3340] },
-        { id: 'b', kind: 'small', lines: [lifeRegen(0.4)], at: [-1420, 3510] },
+        { id: 'a', kind: 'small', lines: [lifeRegen(0.4)], at: [-1347, 3533] },
+        { id: 'b', kind: 'small', lines: [lifeRegen(0.4)], at: [-1340, 3591] },
         {
           id: 'n',
           kind: 'notable',
@@ -266,8 +271,8 @@ export const grit: AreaSpec = {
       at: [-2540, 2010],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [spellDamage(8)], at: [-2370, 2090] },
-        { id: 'b', kind: 'small', lines: [spellDamage(8)], at: [-2540, 2020] },
+        { id: 'a', kind: 'small', lines: [spellDamage(8)], at: [-2590, 1994] },
+        { id: 'b', kind: 'small', lines: [spellDamage(8)], at: [-2644, 1974] },
         {
           id: 'n',
           kind: 'notable',
@@ -323,8 +328,8 @@ export const grit: AreaSpec = {
       at: [-3000, 2330],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [meleeArea(8)], at: [-2860, 2330] },
-        { id: 'b', kind: 'small', lines: [meleeArea(8)], at: [-3030, 2360] },
+        { id: 'a', kind: 'small', lines: [meleeArea(8)], at: [-3072, 2327] },
+        { id: 'b', kind: 'small', lines: [meleeArea(8)], at: [-3130, 2328] },
         {
           id: 'n',
           kind: 'notable',
@@ -346,8 +351,8 @@ export const grit: AreaSpec = {
       at: [-1010, 3460],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [swordDamage(10)], at: [-1010, 3330] },
-        { id: 'b', kind: 'small', lines: [swordDamage(10)], at: [-1010, 3460] },
+        { id: 'a', kind: 'small', lines: [swordDamage(10)], at: [-1010, 3482] },
+        { id: 'b', kind: 'small', lines: [swordDamage(10)], at: [-1010, 3540] },
         {
           id: 'n',
           kind: 'notable',
@@ -369,8 +374,8 @@ export const grit: AreaSpec = {
       at: [-2200, 3620],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [minionLife(12)], at: [-2200, 3450] },
-        { id: 'b', kind: 'small', lines: [minionLife(12)], at: [-2200, 3620] },
+        { id: 'a', kind: 'small', lines: [minionLife(12)], at: [-2200, 3662] },
+        { id: 'b', kind: 'small', lines: [minionLife(12)], at: [-2200, 3720] },
         {
           id: 'n',
           kind: 'notable',
@@ -392,8 +397,8 @@ export const grit: AreaSpec = {
       at: [-1960, 2315],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [spellBlock(2)], at: [-2090, 2320] },
-        { id: 'b', kind: 'small', lines: [spellBlock(2)], at: [-1960, 2315] },
+        { id: 'a', kind: 'small', lines: [spellBlock(2)], at: [-1938, 2311] },
+        { id: 'b', kind: 'small', lines: [spellBlock(2)], at: [-1880, 2308] },
         {
           id: 'n',
           kind: 'notable',
@@ -415,8 +420,8 @@ export const grit: AreaSpec = {
       at: [-3205, 1832],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [dualDamage(10)], at: [-3100, 1757] },
-        { id: 'b', kind: 'small', lines: [dualDamage(10)], at: [-3205, 1832] },
+        { id: 'a', kind: 'small', lines: [dualDamage(10)], at: [-3226, 1847] },
+        { id: 'b', kind: 'small', lines: [dualDamage(10)], at: [-3273, 1881] },
         {
           id: 'n',
           kind: 'notable',

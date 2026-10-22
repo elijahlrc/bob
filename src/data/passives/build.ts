@@ -4,10 +4,27 @@
  * and every link comes from an area file.
  */
 import { KEYSTONES } from '../tree/keystones';
-import type { Tree, TreeNode } from '../tree/types';
+import type { Tree, TreeNode, TreeNodeKind } from '../tree/types';
 import type { AreaSpec, ClusterSpec, LineSpec, NodeSpec, StartSpec } from './types';
 
 export type Registry = Record<string, number>;
+
+/**
+ * How large the game draws each kind of node (a notable's or keystone's frame), in tree units, and the gap kept between
+ * two shapes. The only spacing rule (CONSTRAINTS §11): no node drawn over another; tight clusters are wanted.
+ */
+export const DRAWN: Record<TreeNodeKind, number> = {
+  start: 42,
+  keystone: 47,
+  notable: 30,
+  small: 10,
+  travel: 8,
+  hub: 10,
+};
+export const DRAWN_GAP = 14;
+/** Whether two nodes of these kinds, this far apart, are drawn over each other (or nearly). */
+export const drawnOver = (a: TreeNodeKind, b: TreeNodeKind, d: number) =>
+  d < DRAWN[a] + DRAWN[b] + DRAWN_GAP;
 
 export type Built = {
   tree: Tree;
@@ -234,7 +251,10 @@ export function buildPassives(
     for (let j = i + 1; j < nodes.length; j++) {
       if (nodes[i].name === '(retired)' || nodes[j].name === '(retired)') continue;
       const d = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
-      if (d < 60) problems.push(`${ids[i]} and ${ids[j]} are ${Math.round(d)} units apart`);
+      if (drawnOver(nodes[i].kind, nodes[j].kind, d))
+        problems.push(
+          `${ids[i]} and ${ids[j]} are drawn over each other (${Math.round(d)} units apart)`,
+        );
     }
 
   const areaNames = areas.map((a) => ({ name: a.name, region: a.region, x: a.at[0], y: a.at[1] }));

@@ -61,7 +61,7 @@ export const string: AreaSpec = {
       at: P(1607, 135),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [attackSpeed(5)], at: P(1685, 90) },
+        { id: 'a', kind: 'small', lines: [attackSpeed(5)], at: P(1587, 141) },
         {
           id: 'n',
           kind: 'notable',
@@ -80,7 +80,7 @@ export const string: AreaSpec = {
       at: P(1285, -9),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [evasion(12)], at: P(1697, -10) },
+        { id: 'a', kind: 'small', lines: [evasion(12)], at: P(1600, -11) },
         {
           id: 'n',
           kind: 'notable',
@@ -89,8 +89,8 @@ export const string: AreaSpec = {
           at: P(1297, -21),
           why: '1.7 + 2 + 0.5 units.',
         },
-        { id: 'c', kind: 'small', lines: [life(5)], at: P(1141, -12) },
-        { id: 'd', kind: 'small', lines: [life(5)], at: P(1003, 10) },
+        { id: 'c', kind: 'small', lines: [life(5)], at: P(1227, -17) },
+        { id: 'd', kind: 'small', lines: [life(5)], at: P(1169, -13) },
       ],
       links: [
         ['n', 'c'],
@@ -104,7 +104,7 @@ export const string: AreaSpec = {
       at: P(1317, 108),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [attackSpeed(5)], at: P(1003, 149) },
+        { id: 'a', kind: 'small', lines: [attackSpeed(5)], at: P(1100, 175) },
         {
           id: 'qh',
           kind: 'notable',
@@ -117,7 +117,7 @@ export const string: AreaSpec = {
           id: 'm',
           kind: 'small',
           lines: [moveSpeed(5)],
-          at: P(1339, 231),
+          at: P(1348, 187),
           why: 'The node between the notables: a little of both.',
         },
         {
@@ -128,7 +128,7 @@ export const string: AreaSpec = {
           at: P(1472, -18),
           why: '2 + 1.3 + 1 units.',
         },
-        { id: 'b', kind: 'small', lines: [evasion(10)], at: P(1602, -13) },
+        { id: 'b', kind: 'small', lines: [evasion(10)], at: P(1542, -16) },
       ],
       links: [
         ['a', 'qh'],
@@ -143,7 +143,7 @@ export const string: AreaSpec = {
       at: P(2110, 127),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [evasion(12)], at: P(2016, 83) },
+        { id: 'a', kind: 'small', lines: [evasion(12)], at: P(2127, 138) },
         { id: 'k', kind: 'keystone', name: 'Arrow Weave', lines: [], at: P(2205, 171) },
       ],
       links: [['a', 'k']],
@@ -159,42 +159,42 @@ export const string: AreaSpec = {
           id: 'n402',
           kind: 'small',
           lines: [manaRegen(12)],
-          at: P(505, 147),
+          at: P(459, 226),
           why: 'Added in the editor (2026-10-19).',
         },
         {
           id: 'n417',
           kind: 'small',
           lines: [resOne('fire', 10)],
-          at: P(766, 320),
+          at: P(829, 366),
           why: 'Added in the editor (2026-10-19).',
         },
         {
           id: 'n418',
           kind: 'small',
           lines: [resOne('fire', 10)],
-          at: P(669, 191),
+          at: P(794, 319),
           why: 'Added in the editor (2026-10-19).',
         },
         {
           id: 'n419',
           kind: 'small',
           lines: [resOne('chaos', 10)],
-          at: P(1086, 412),
+          at: P(936, 395),
           why: 'Added in the editor (2026-10-19).',
         },
         {
           id: 'n420',
           kind: 'small',
           lines: [resOne('chaos', 10)],
-          at: P(1238, 336),
+          at: P(990, 373),
           why: 'Added in the editor (2026-10-19).',
         },
         {
           id: 'n431',
           kind: 'small',
           lines: [shieldDef(10)],
-          at: P(1464, -152),
+          at: P(1454, -86),
           why: 'Added in the editor (2026-10-19).',
         },
       ],

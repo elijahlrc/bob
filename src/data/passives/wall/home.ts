@@ -89,8 +89,14 @@ export const home: AreaSpec = {
       at: [-1180, 160],
       shape: { kind: 'ring', r: 75, a0: 28 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [stunThreshold(8)], why: 'The entrance, facing the hub.' },
-        { id: 'b', kind: 'small', lines: [stunThreshold(8)] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [stunThreshold(8)],
+          why: 'The entrance, facing the hub.',
+          at: [-1090, 173],
+        },
+        { id: 'b', kind: 'small', lines: [stunThreshold(8)], at: [-1132, 133] },
         {
           id: 'n',
           kind: 'notable',
@@ -116,6 +122,7 @@ export const home: AreaSpec = {
           kind: 'small',
           lines: [flaskRecovery(10)],
           why: 'The entrance, facing the hub.',
+          at: [-1137, 897],
         },
         {
           id: 'n',
@@ -124,7 +131,7 @@ export const home: AreaSpec = {
           lines: [flaskEffect(8), flaskRecovery(15), life(5)],
           why: '1.6 + 1.5 + 1 units.',
         },
-        { id: 'b', kind: 'small', lines: [flaskRecovery(10)] },
+        { id: 'b', kind: 'small', lines: [flaskRecovery(10)], at: [-1174, 941] },
       ],
       links: [
         ['a', 'b'],
@@ -150,9 +157,9 @@ export const home: AreaSpec = {
       at: [-1490, 790],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [life(5)], at: [-1300, 640] },
-        { id: 'b', kind: 'small', lines: [life(5)], at: [-1500, 800] },
-        { id: 'c', kind: 'small', lines: [life(5)], at: [-1680, 930] },
+        { id: 'a', kind: 'small', lines: [life(5)], at: [-1300, 628] },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [-1481, 756] },
+        { id: 'c', kind: 'small', lines: [life(5)], at: [-1662, 884] },
       ],
       links: [
         ['a', 'b'],

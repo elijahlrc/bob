@@ -56,28 +56,28 @@ export const column: AreaSpec = {
           id: 's',
           kind: 'small',
           lines: [resOne('fire', 10)],
-          at: [0, -2700],
+          at: [0, -2780],
           why: 'The fire spoke, to the junction.',
         },
         {
           id: 'w',
           kind: 'small',
           lines: [resOne('cold', 10)],
-          at: [-120, -2800],
+          at: [-70, -2850],
           why: 'The cold spoke, to the area cluster.',
         },
         {
           id: 'e',
           kind: 'small',
           lines: [resOne('lightning', 10)],
-          at: [120, -2800],
+          at: [70, -2850],
           why: 'The lightning spoke, to the projectile cluster.',
         },
         {
           id: 'f',
           kind: 'small',
           lines: [resOne('chaos', 10)],
-          at: [0, -3000],
+          at: [0, -2920],
           why: 'The chaos spoke, to the fork.',
         },
       ],
@@ -92,8 +92,8 @@ export const column: AreaSpec = {
       id: 'broadWeave',
       name: 'Broad Weave',
       why: "Spell area: radius and area damage, tagged spell so the Wall's slams do not shop here. West of the column, reached from the junction, the star's cold spoke and the Siphon chain; passed through to the fork and onto the Withering chain.",
-      at: [-300, -2850],
-      shape: { kind: 'ring', r: 105, a0: 60 },
+      at: [-300, -2899],
+      shape: { kind: 'ring', r: 56, a0: 60 },
       nodes: [
         {
           id: 'a',
@@ -122,8 +122,8 @@ export const column: AreaSpec = {
       id: 'dartingBolts',
       name: 'Darting Bolts',
       why: "Spell projectiles: damage, speed, cast speed. East of the column, reached from the junction and the star's lightning spoke; passed through to the fork and onto the Lingering chain.",
-      at: [330, -2850],
-      shape: { kind: 'ring', r: 120, a0: 90 },
+      at: [300, -2906],
+      shape: { kind: 'ring', r: 56, a0: 90 },
       nodes: [
         {
           id: 'a',
@@ -160,7 +160,7 @@ export const column: AreaSpec = {
       at: [-520, -3130],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [dotDamage(10)], at: [-470, -3060] },
+        { id: 'a', kind: 'small', lines: [dotDamage(10)], at: [-513, -3148] },
         {
           id: 'n',
           kind: 'notable',
@@ -179,7 +179,7 @@ export const column: AreaSpec = {
       at: [520, -3130],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [skillDuration(10)], at: [470, -3060] },
+        { id: 'a', kind: 'small', lines: [skillDuration(10)], at: [508, -3153] },
         {
           id: 'n',
           kind: 'notable',

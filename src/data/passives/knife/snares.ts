@@ -37,9 +37,9 @@ export const snares: AreaSpec = {
       id: 'jT',
       name: 'Trap junction',
       why: "Where the barb leaves the blade: the wheel south-east, the Bow's dear road south, the star's lightning spoke arriving from the west.",
-      at: P(1520, 330),
+      at: P(1470, 430),
       shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: P(1520, 330) }],
+      nodes: [{ id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: P(1470, 430) }],
       links: [],
     },
     {
@@ -49,12 +49,12 @@ export const snares: AreaSpec = {
       at: P(1760, 620),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 't1', kind: 'small', lines: [life(5)], at: P(1552, 620), why: 'The west entrance.' },
+        { id: 't1', kind: 'small', lines: [life(5)], at: P(1660, 620), why: 'The west entrance.' },
         {
           id: 't2',
           kind: 'small',
           lines: [trapDamage(12)],
-          at: P(1656, 438),
+          at: P(1689, 549),
           why: 'The trap side.',
         },
         {
@@ -62,14 +62,14 @@ export const snares: AreaSpec = {
           kind: 'notable',
           name: 'Trapper',
           lines: [trapDamage(24), aoe(16, ['trap'])],
-          at: P(1864, 438),
+          at: P(1760, 520),
           why: "Trap damage and trap area: 2 + 2 units. Tripwire, in the Strider, sells traps with throwing speed and cooldown; Snare Line, on the Spire's rim, with duration (round 4).",
         },
         {
           id: 't4',
           kind: 'small',
           lines: [life(5)],
-          at: P(1968, 620),
+          at: P(1860, 620),
           why: 'The east exit, to the bow chain.',
         },
         {
@@ -77,18 +77,18 @@ export const snares: AreaSpec = {
           kind: 'notable',
           name: 'Black Flock',
           lines: [minionDamage(20), minionSpeed(6), moveSpeed(4)],
-          at: P(1864, 802),
+          at: P(1760, 720),
           why: "Fast minions and a summoner who keeps up: 1.7 + 1.2 + 1 units. The Shade's summoner finds it twelve steps out; Shepherd and Ossuary are in the Cathedral, Familiars on the Spire's Cathedral side, Grave Host in the Barrows.",
         },
         {
           id: 't6',
           kind: 'small',
           lines: [minionDamage(12)],
-          at: P(1656, 802),
+          at: P(1689, 691),
           why: 'The minion side.',
         },
-        { id: 't7', kind: 'small', lines: [trapDamage(12)], at: P(1956, 506) },
-        { id: 't8', kind: 'small', lines: [minionDamage(12)], at: P(1956, 734) },
+        { id: 't7', kind: 'small', lines: [trapDamage(12)], at: P(1831, 549) },
+        { id: 't8', kind: 'small', lines: [minionDamage(12)], at: P(1831, 691) },
       ],
       links: [
         ['t1', 't2'],
@@ -112,7 +112,7 @@ export const snares: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [bowDamage(10)],
-          at: P(2040, 440),
+          at: P(2156, 310),
           why: 'The entrance, from the wheel.',
         },
         {
@@ -179,8 +179,8 @@ export const snares: AreaSpec = {
       at: [3211, -164],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [evasion(12)], at: [3047, -118] },
-        { id: 'b', kind: 'small', lines: [evasion(12)], at: [3211, -164] },
+        { id: 'a', kind: 'small', lines: [evasion(12)], at: P(1903, 1473) },
+        { id: 'b', kind: 'small', lines: [evasion(12)], at: P(1960, 1487) },
         {
           id: 'n',
           kind: 'notable',
@@ -202,8 +202,8 @@ export const snares: AreaSpec = {
       at: [3099, -478],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [dodgeAttack(3)], at: [2929, -478] },
-        { id: 'b', kind: 'small', lines: [dodgeAttack(3)], at: [3099, -478] },
+        { id: 'a', kind: 'small', lines: [dodgeAttack(3)], at: P(1959, 1157) },
+        { id: 'b', kind: 'small', lines: [dodgeAttack(3)], at: P(2009, 1186) },
         {
           id: 'n',
           kind: 'notable',
@@ -225,8 +225,8 @@ export const snares: AreaSpec = {
       at: [2649, -43],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [critMulti(12)], at: [2584, -200] },
-        { id: 'b', kind: 'small', lines: [critMulti(12)], at: [2649, -43] },
+        { id: 'a', kind: 'small', lines: [critMulti(12)], at: P(1310, 1329) },
+        { id: 'b', kind: 'small', lines: [critMulti(12)], at: P(1303, 1386) },
         {
           id: 'n',
           kind: 'notable',

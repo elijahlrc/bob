@@ -56,7 +56,7 @@ export const hex: AreaSpec = {
       name: 'Rotting Word',
       why: "The wheel of four on the Stair: attribute nodes at the south entrance and the north exit, so the Stair is a road and the wheel a fork on it. Chaos spells on the west (Rotting Word, round 3: the tree had no chaos-spell notable; here chaos comes with damage over time and cast speed, the Undercroft's Tomb Dust sells it with energy shield and area, and the Spire's Withering sells the damage-over-time multiplier). It carries no curse line, and Hexwright traded places with Devotion in round 3, so the curse notables are seven (Hexwright) and five (Second Curse) steps away: a chaos hexer had found Rotting Word, Hexwright and Second Curse by point 17, mines on the east (Sapper). The Spire's Hexwright lands on the north node, where the climb to Spellslip leaves. Festering (poison) was the west side until round 3, when it went to the Yard: the poison claw found all its notables round the Rookery.",
       at: [1509, -2026],
-      shape: { kind: 'ring', r: 150, a0: 90 },
+      shape: { kind: 'ring', r: 100, a0: 90 },
       nodes: [
         {
           id: 's',
@@ -117,8 +117,8 @@ export const hex: AreaSpec = {
       at: [1760, -3080],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [dodgeSpell(3)], at: [1700, -2900] },
-        { id: 'b', kind: 'small', lines: [dodgeSpell(3)], at: [1760, -3080] },
+        { id: 'a', kind: 'small', lines: [dodgeSpell(3)], at: P(2093, -1826) },
+        { id: 'b', kind: 'small', lines: [dodgeSpell(3)], at: P(2139, -1861) },
         { id: 'k', kind: 'keystone', name: 'Spellslip', lines: [], at: [1820, -3260] },
       ],
       links: [
@@ -145,14 +145,14 @@ export const hex: AreaSpec = {
       at: [1950, -2600],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleDamage('lightning', 10)], at: [1780, -2650] },
-        { id: 'b', kind: 'small', lines: [eleDamage('lightning', 10)], at: [1950, -2600] },
+        { id: 'a', kind: 'small', lines: [eleDamage('lightning', 10)], at: [1975, -2661] },
+        { id: 'b', kind: 'small', lines: [eleDamage('lightning', 10)], at: [2033, -2652] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Static Edge',
           lines: [eleDamage('lightning', 16), critChance(20), shockChance(10)],
-          at: [2110, -2670],
+          at: [2044, -2721],
           why: '1.6 + 1 + 1 units.',
         },
       ],
@@ -168,8 +168,8 @@ export const hex: AreaSpec = {
       at: [1640, -3540],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [mineDamage(12)], at: [1520, -3420] },
-        { id: 'b', kind: 'small', lines: [mineDamage(12)], at: [1640, -3540] },
+        { id: 'a', kind: 'small', lines: [mineDamage(12)], at: P(2231, -2257) },
+        { id: 'b', kind: 'small', lines: [mineDamage(12)], at: P(2289, -2272) },
         {
           id: 'n',
           kind: 'notable',
@@ -191,8 +191,8 @@ export const hex: AreaSpec = {
       at: [1800, -2210],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [1680, -2330] },
-        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [1800, -2210] },
+        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(1675, -973) },
+        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(1690, -916) },
         {
           id: 'n',
           kind: 'notable',

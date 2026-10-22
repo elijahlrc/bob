@@ -289,7 +289,7 @@ The core of section 1, made concrete.
 ## 11. Looks and communication
 
 1. **It must be aesthetically appealing.** [user, 10-18]
-2. **No overlapping lines.** [user, 10-20] No edge crossings, no two unlinked nodes closer than 100 units, and no area name
+2. **No overlapping lines.** [user, 10-20] No edge crossings, no two nodes drawn over each other, and no area name
    over another. An area name may lie over small nodes and links: some overlap is inevitable, and the names fade as
    the view closes in (item 4). [user, 10-20, the label pass]
 3. **Geometry.** [ref; adopted]
@@ -307,6 +307,30 @@ The core of section 1, made concrete.
      editor and the renders).
    - Colour says what a node gives, and shape says its rank.
    - The keystone card shows on tap, along with the path cost and search.
+5. **Clusters are drawn tight, and angles have reasons.** [user, 10-21] "Cluster the clusters more tightly, so that
+   notables and their associated small nodes are visibly placed in clusters", and "avoid arbitrary and ugly angles being
+   introduced without a good layout reason". In detail:
+   - **A cluster reads as one.** A notable's own smalls sit close round it: the first about 70 tree units out (85 from a
+     keystone, whose frame is larger), the next 50 to 60 apart. The game draws a small at radius 10 and a notable's
+     frame at 30, so that is tight without touching. The room goes on the links between clusters, never inside them.
+   - **A chain is straight.** A chain of smalls runs on the line from its notable toward the node it leads on to, every
+     small beside the notable and the rest of the distance on the link out. It bends only where the layout has a reason:
+     at a junction (three or more links), round a ring, or to clear something. A bend at a node with two links and no
+     such reason is a fault (a road → small → small → notable zig-zag is the user's example).
+   - **Shapes are regular, and shrink as a whole.** A wheel or loop is a regular polygon or circle at an even spacing
+     (octagons and hexagons at radius 75 to 105, four-node squares and diamonds at about 55, triangles with sides of
+     about 80), notables on the rim, its entrance facing the road it hangs off. A cluster is tightened by scaling its
+     shape about its centre, never by pulling its nodes in one by one.
+   - **Smalls between two notables are a judgement call, made by looking.** [user, 10-21] Usually the stat says whose a
+     small is (the same stat as the notable's other smalls or its theme), and it goes to that notable. Sometimes the two
+     notables are one group (a wheel, a pair), and the shape is laid out as one. A small that belongs to neither stays on
+     the straight line between them.
+   - **Roads keep their lines.** Road nodes are straight runs that turn at junctions; where several links leave one
+     node, they leave at clean angles (a cross, a right angle, an even fan), not a near-miss of one.
+   - **Empty space is welcome; spacing rules are not.** [user, 10-21] More nodes are coming. There is no minimum
+     distance between nodes beyond not drawing one over another (`drawnOver` in `src/data/passives/build.ts`, which
+     the build, the scripts and the checks share). Keep a region's footprint and its border with its neighbours.
+   - **What the user drew by hand stays** (the Oathbound diamond, the Strider's own clusters) unless they ask.
 
 ## 12. Size and balance
 
@@ -381,6 +405,11 @@ Each was tried or proposed and struck by the user. The date is when it was struc
   only kind and are placed with care.
 - **Build-named sections and area labels** ("Bows", "Physical attacks", "Fire", "Minions"), and one wheel per theme.
   [10-20]
+- **A minimum distance between nodes** ("no two unlinked nodes within 100 units", and the build's 60-unit check).
+  [10-21] Invented, never the user's; it kept clusters loose. The only spacing rule is not drawing one node over another.
+- **Laying out wheels, loops and other shapes by algorithm alone.** [10-21] Tightening node by node squashed every wheel
+  and loop it touched, took a road's smalls for a pocket and put kinks into the roads out of a start. A script places
+  the simple cases (a chain off one notable); every cluster is then looked at.
 - **Section ideas that confused the user, earlier** [10-19]:
   - Delivery categories that are not meaningful to a player (melee, projectile, area, chaining, channelled, triggered,
     slam, strike, nova).
@@ -406,7 +435,22 @@ Each was tried or proposed and struck by the user. The date is when it was struc
    a phone, so send files there.
 9. **The Strider region is the user's edit.** [user] Changes there are allowed but are not the priority. [user, 10-20]
    Fold the user's editor patches before registering new ids.
-10. **Repository rules.** [user, earlier sessions] Commit locally only, and push only when asked. Never use `git stash`.
+10. **Laying out the network: a script first, then eyes on every cluster.** [user, 10-21] "The programmatic approach is
+    a decent first pass, but you're going to need to spin off agents to manually audit the whole tree."
+    - `scripts/passives/tighten.ts` (reports only; `--write` rewrites each moved node's `at` in its area file, in the
+      file's own notation) pulls every chain of one stat that hangs off a single notable in onto a straight line toward
+      where it leads. It moves smalls only and leaves every chain that reaches two notables alone. It is never the last
+      step.
+    - Then one agent per region (and one for the centre) audits every cluster by eye and fixes it by hand, against §11
+      item 5. Each works only in its region's folder and may move any node there (notables, keystones, road nodes).
+      It renders its region and close-ups (`npm run passives:pic -- out.png --box x0,y0,x1,y1`) before and after each
+      batch of edits, and runs `npx tsx scripts/passives/geometry.ts --region <r> --bends`: crossings and nodes drawn
+      over each other must be zero, and every bend of over 20° at a two-link node is listed as a candidate, not a
+      verdict. It hands back start/end pictures of the region and of the spots it changed most, with a short report of
+      its judgement calls.
+    - Last, check the whole tree (`geometry.ts` with no region) once every agent is done, because agents re-aim border
+      links at nodes a neighbour may still be moving. Show the user the before/after pictures before baking.
+11. **Repository rules.** [user, earlier sessions] Commit locally only, and push only when asked. Never use `git stash`.
     Screenshots of the reference never go in the repo.
 
 ## 16. Open, not yet decided

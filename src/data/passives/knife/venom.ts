@@ -48,14 +48,14 @@ export const venom: AreaSpec = {
           id: 'v1',
           kind: 'attribute',
           lines: [dex(6), int(6)],
-          at: P(1529, 0),
+          at: P(1650, 0),
           why: 'The west entrance: a road node both sides use.',
         },
         {
           id: 'v2',
           kind: 'small',
           lines: [poisonDamage(12)],
-          at: P(1640, -191),
+          at: P(1679, -71),
           why: 'The poison side; the north junction leaves here.',
         },
         {
@@ -63,14 +63,14 @@ export const venom: AreaSpec = {
           kind: 'notable',
           name: 'Barbed Point',
           lines: [poisonDamage(24), poisonChance(10), critChance(20)],
-          at: P(1861, -191),
+          at: P(1750, -100),
           why: 'Poison that rides on crits: 2 + 1 + 1 units.',
         },
         {
           id: 'v4',
           kind: 'attribute',
           lines: [dex(6), int(6)],
-          at: P(1971, 0),
+          at: P(1850, 0),
           why: 'The east exit, to the point.',
         },
         {
@@ -78,12 +78,12 @@ export const venom: AreaSpec = {
           kind: 'notable',
           name: 'Shroud',
           lines: [es(10), evasion(14), stunAvoid(20)],
-          at: P(1861, 191),
+          at: P(1750, 100),
           why: "Both of the Shade's defences and a guard against stuns: 2 + 1.2 + 1 units.",
         },
-        { id: 'v6', kind: 'small', lines: [es(5)], at: P(1640, 191), why: 'The shield side.' },
-        { id: 'v7', kind: 'small', lines: [poisonDamage(12)], at: P(1958, -120) },
-        { id: 'v8', kind: 'small', lines: [es(5)], at: P(1958, 120) },
+        { id: 'v6', kind: 'small', lines: [es(5)], at: P(1679, 71), why: 'The shield side.' },
+        { id: 'v7', kind: 'small', lines: [poisonDamage(12)], at: P(1821, -71) },
+        { id: 'v8', kind: 'small', lines: [es(5)], at: P(1821, 71) },
       ],
       links: [
         ['v1', 'v2'],
@@ -100,9 +100,9 @@ export const venom: AreaSpec = {
       id: 'jN',
       name: 'North junction',
       why: "Off the wheel's chaos side: the Shade Leech spur north, the Veil pocket west to the curse junction.",
-      at: P(1760, -400),
+      at: P(1640, -380),
       shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: P(1760, -400) }],
+      nodes: [{ id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: P(1640, -380) }],
       links: [],
     },
     {
@@ -112,8 +112,8 @@ export const venom: AreaSpec = {
       at: P(1850, -800),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(1800, -600) },
-        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(1850, -800) },
+        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(1845, -868) },
+        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(1867, -922) },
         { id: 'k', kind: 'keystone', name: 'Shade Leech', lines: [], at: P(1900, -1000) },
       ],
       links: [
@@ -132,7 +132,7 @@ export const venom: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [curseEffect(8)],
-          at: P(1600, -500),
+          at: P(1540, -570),
           why: 'The entrance, from the north junction.',
         },
         {
@@ -140,7 +140,7 @@ export const venom: AreaSpec = {
           kind: 'notable',
           name: 'Second Curse',
           lines: [hexLimit(1)],
-          at: P(1560, -720),
+          at: P(1531, -640),
           why: 'One more curse at a time: 5 units by the table. The tip of the chain.',
         },
       ],
@@ -162,8 +162,8 @@ export const venom: AreaSpec = {
       at: P(2460, 0),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [critMulti(12)], at: P(2280, 0) },
-        { id: 'b', kind: 'small', lines: [critMulti(12)], at: P(2460, 0) },
+        { id: 'a', kind: 'small', lines: [critMulti(12)], at: P(2496, 0) },
+        { id: 'b', kind: 'small', lines: [critMulti(12)], at: P(2554, 0) },
         { id: 'k', kind: 'keystone', name: 'Cruel Agony', lines: [], at: P(2640, 0) },
       ],
       links: [
@@ -178,8 +178,8 @@ export const venom: AreaSpec = {
       at: P(2250, -450),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [es(5)], at: P(2160, -250) },
-        { id: 'b', kind: 'small', lines: [es(5)], at: P(2250, -450) },
+        { id: 'a', kind: 'small', lines: [es(5)], at: P(2290, -516) },
+        { id: 'b', kind: 'small', lines: [es(5)], at: P(2310, -571) },
         { id: 'k', kind: 'keystone', name: 'Hollow Vessel', lines: [], at: P(2340, -650) },
       ],
       links: [
