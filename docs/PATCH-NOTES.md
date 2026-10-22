@@ -4,6 +4,17 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-22
+
+- The passive tree grows by more than a third, with new clusters in every class region; its clusters sit tighter and some existing nodes change.
+- Zoomed in on the passive tree, every node shows its stat lines.
+- Collapse maps no longer appear in new offers; they were far deadlier than the other map types.
+- Skills that convert or add damage, such as Storm Quill, Venom Cut and Searing Lance, are drawn in the element they deal.
+- Rime Rebuke is renamed Iron Rebuke, as it deals physical damage.
+- Gems found on the level just played are marked NEW on the Skills tab.
+- New fonts for the interface and headings, and a pixel font for damage numbers and drop labels on the map.
+- Dropdown options are readable without hovering over them.
+
 ## 2026-10-21
 
 - Orbiting Blades is cast on the move, and its ring of blades widens with every blade.
