@@ -52,6 +52,12 @@ export function ageOf(run: RunState, uid: number): number {
   return at === undefined ? 0 : Math.max(0, run.map - at);
 }
 
+/** Found on the level just played or since (a map's drops, the pick and stops after it): the Skills tab marks such gems NEW. */
+export function foundLastLevel(run: RunState, uid: number): boolean {
+  const at = run.acquired[uid];
+  return at !== undefined && run.map - at <= 1;
+}
+
 export type CleanOpts = {
   /** Items found MORE than this many levels ago are old. */
   olderThan: number;

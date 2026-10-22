@@ -8,6 +8,7 @@ import { applyClean, cleanSummary } from './cleanUp';
 import {
   ageOf,
   DEFAULT_CLEAN,
+  foundLastLevel,
   isFavourite,
   markSeen,
   noteFound,
@@ -85,6 +86,20 @@ describe('finding things', () => {
     expect(run.acquired[flask.uid]).toBe(7);
     expect(run.acquired[803]).toBeUndefined();
     expect(unseenItems(run).map((x) => x.uid)).toEqual([801, flask.uid]);
+  });
+
+  it('a gem dropped on the level just played, or picked after it, counts as found last level', () => {
+    const run = newRun('vanguard', 3);
+    run.map = 7;
+    const old = found(run, 'gem', 3);
+    finishMap(run, cleared(7, [{ kind: 'gem', uid: 811, gemId: 'crushingBlow' }]));
+    run.reward = [{ kind: 'gem', uid: 812, gemId: 'crushingBlow' }];
+    takeReward(run, 812);
+    expect(foundLastLevel(run, 811)).toBe(true);
+    expect(foundLastLevel(run, 812)).toBe(true);
+    expect(foundLastLevel(run, old.uid)).toBe(false);
+    finishMap(run, cleared(8));
+    expect(foundLastLevel(run, 811)).toBe(false);
   });
 
   it('a picked reward is unseen too, and a skipped one is not', () => {
