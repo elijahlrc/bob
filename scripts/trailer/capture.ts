@@ -61,10 +61,13 @@ export type Take = {
   page: Page;
   /** Run a function of the stage module (and the controller and game) in the page. */
   stage<T>(fn: (S: any, c: any, game: any, arg: any) => T | Promise<T>, arg?: unknown): Promise<T>;
-  /** Draw and save `n` frames, each `dtMs` of game time apart; `each` runs in the page before each frame. */
+  /**
+   * Draw and save `n` frames, each `dtMs` of game time apart; `each` runs in the page before each frame. `film: false` draws
+   * them without saving them (so what the drawing queued while the sim was warmed without it plays out first).
+   */
   rec(
     n: number,
-    opts?: { dtMs?: number; each?: (S: any, c: any, i: number) => void },
+    opts?: { dtMs?: number; each?: (S: any, c: any, i: number) => void; film?: boolean },
   ): Promise<void>;
   /** Save one frame of the page as it is now (for UI screens), repeated `n` times. */
   still(n?: number): Promise<void>;
@@ -143,6 +146,7 @@ async function film(browser: any, clip: Clip, peek: boolean): Promise<void> {
           },
           [gameT, dt, opts.each ? opts.each.toString() : null, i],
         );
+        if (opts.film === false) continue;
         log.push(ev);
         if (!peek || i % Math.max(1, Math.floor(n / 4)) === 0) await shoot();
         frame++;

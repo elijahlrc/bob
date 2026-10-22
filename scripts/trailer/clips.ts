@@ -415,7 +415,7 @@ export const CLIPS: Clip[] = [
     { viewport: PHONE, css: PHONE_UI },
   ),
 
-  /* 6. The climb: five builds, five places, a half second each; then level 72, the boss fight (7). */
+  /* 6. The climb: four builds, four places, a half second each; then level 72, the boss fight (7). */
   mapClip(
     'climb1',
     { classId: 'reaver', level: 12, body: ['reapingArc', 'bruteForce'] },
@@ -444,21 +444,9 @@ export const CLIPS: Clip[] = [
     { theme: 'gnawingWarrens', biome: 'marsh' },
     45,
   ),
-  mapClip(
-    'climb6',
-    {
-      classId: 'vanguard',
-      level: 62,
-      weapon: 'mace2_l34',
-      offHand: null,
-      body: ['blessedTrail', 'bruteForce'],
-    },
-    52,
-    { theme: 'giltHall', biome: 'shrine' },
-    45,
-  ),
-  /* 7. The fall, level 72: the Shade fights the Tollkeeper, and his whole toll runs: the bell hoisted over his head through the
-        tell, brought down, and the rings of lightning going out from it, the first of which kills. The body is held. The shot
+  /* 7. The fall, level 72: the Shade fights the Tollkeeper, and his whole fourth toll runs: the bell hoisted over his head
+        through the tell and held while its six rings show, then brought down as the first ring strikes and kills. The body
+        is held. The shot
         is kept plain so the bell is what is seen: the Shade only stabs with its daggers (no skill and its effects), and no
         damage numbers are drawn. It opens on blows a moment before the tell; the frames the tell starts on and the ring lands
         on are printed, for the cut. */
@@ -472,23 +460,21 @@ export const CLIPS: Clip[] = [
         S.pastMaps(run);
         S.bossFight(c, run, 'tollkeeper', { biome: 'warren', dist: 5 });
         S.holdEnd(c);
-        S.warmUntil(
-          c,
-          (w: any) => {
-            const b = S.boss(w);
-            return !!b && b.st.begun && b.st.clock <= 0.3;
-          },
-          1200,
-        );
+        // Three tolls pass (the deathless Shade takes them); the shot is the fourth, six rings and the hardest yet.
+        S.untilTolls(c, 3, 2.3);
         S.settle(game, c);
-        // Hit after hit, he would flash white end to end: his flash is kept to a flicker, so the bell can be seen rising.
-        S.calmFlash(game, S.boss(c.world).m.id);
+        // Hit after hit, he would flash white end to end: his flash is kept off, so the bell is always seen.
+        S.calmFlash(game, S.boss(c.world).m.id, Infinity);
         S.quietNumbers(game);
       }, FALLEN);
-      await t.rec(150, {
+      // A second and a half drawn and not kept: what the drawing queued through the warm-up (the earlier tolls' call-outs, dust)
+      // plays out before the shot.
+      await t.rec(45, { film: false, each: (S, c) => S.keepBoss(c.world) });
+      await t.rec(170, {
         each: (S, c, i) => {
           const w = c.world;
           const win = window as any;
+          S.keepBoss(w);
           const b = S.boss(w);
           if (b && b.st.tellT > 0 && win.__tell == null) win.__tell = i;
           // Deathless until a ring that will catch it lands.
@@ -516,8 +502,16 @@ export const CLIPS: Clip[] = [
         const run = S.stagedRun(fallen, 63);
         S.pastMaps(run);
         S.bossFight(c, run, 'tollkeeper', { biome: 'warren', dist: 5 });
-        if (S.warmUntil(c, (w: any) => S.blastDue(w, 'Toll'), 3000) < 0)
-          throw new Error('no toll caught the Shade');
+        S.untilTolls(c, 3);
+        const caught = S.warmUntil(
+          c,
+          (w: any) => {
+            S.keepBoss(w);
+            return S.blastDue(w, 'Toll');
+          },
+          900,
+        );
+        if (caught < 0) throw new Error('the fourth toll did not catch the Shade');
         S.mortal(c.world);
         for (let i = 0; i < 300 && c.screen === 'map'; i++) c.bus.emit('frame', { dtMs: 33 });
       }, FALLEN);

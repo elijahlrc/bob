@@ -51,12 +51,13 @@ deterministic: an unchanged page and score give byte-identical files.
 - Shots: endgame cold open (a Skyfall in a mixed pack); the tree, one build growing from level 1 to 100 zoomed out and
   kept in frame (no class screen, no text); the Vanguard's slam on 5 s and the Shade (gem link, traps, a drop for the
   build);
-  three more classes side by side in phone-shaped panels; the climb, five half-second cuts; then level 72 is one shot of a
-  boss fight, the Shade against the Tollkeeper on map 63: he hoists his bell over his head through the tell (the game's
-  own animation, added for this), brings it down, and its first ring of lightning kills the Shade; a pause; the end screen
+  three more classes side by side in phone-shaped panels; the climb, four half-second cuts; then level 72 is one shot of a
+  boss fight, the Shade (two daggers, no skill, no damage numbers: the bell is what moves) against the Tollkeeper on map
+  63, his fourth toll: he hoists his bell over his head through the tell (the game's own animation, added for this), holds
+  it while the six rings show, and brings it down as the first ring strikes and kills the Shade; a pause; the end screen
   zoomed in on the "Killed by" line; the duel with Sin; the rating; the high scores (Sin first, as the first
   to beat the game; oostin and Eli are real players, the other names made up); the genre grid; the title over it.
-- Music: rhythm first, simple, one groove that stops dead when the bell tolls and comes back for the duel; a heavy bass (a clean sine and its saturated
+- Music: rhythm first, simple, one groove that stops dead when the toll's rings show, the bell and an impact as it comes down, and back for the duel; a heavy bass (a clean sine and its saturated
   harmonics under the gritty triangle, about 8 dB up from the first score) and a melody crushed hard (a very low sample
   rate, hard clipping, wavefolding, 2 and 3 bits, a short metallic comb). No silence before the duel's deciding blow, a
   restrained crash. The genre hits are set up by a drop-out and a tom fill, not a riser. The mix is cut at 14 kHz and

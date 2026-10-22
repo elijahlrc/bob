@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { itemBase } from '../../data/bases';
 import { classDef } from '../../data/classes';
 import { newRun } from '../../run/run';
-import { TOLL_TELL } from '../../data/bosses';
+import { TOLL_TELL, TOLL_WARN } from '../../data/bosses';
 import { bossState, initBoss } from '../../sim/bosses';
 import { createDuelWorld } from '../../sim/duel';
 import { AnimTrack } from './anim';
@@ -11,6 +11,7 @@ import {
   heroFigure,
   poseFor,
   poseForType,
+  RELEASE_LANDS,
   type AnimName,
   type FigureKind,
 } from './figure';
@@ -155,7 +156,7 @@ describe("the Tollkeeper's toll (a boss whose body shows its big move)", () => {
       ),
     );
 
-  it('hoists its bell through the tell, and brings it down when the bell tolls', () => {
+  it('hoists its bell through the tell, holds it while the rings show, and brings it down as the first strikes', () => {
     const a = {
       x: 5,
       y: 5,
@@ -175,11 +176,15 @@ describe("the Tollkeeper's toll (a boss whose body shows its big move)", () => {
     expect(t.state(a).anim).toBe('idle');
     st.tellT = TOLL_TELL / 4;
     expect(t.state(a)).toEqual({ anim: 'windup', t: 0.75 });
+    // It tolls: the rings show for TOLL_WARN, the bell held up, and it lands (RELEASE_LANDS into the blow) as they strike.
     st.tellT = 0;
     st.tolls = 1;
     t.update(a, 0.35);
-    expect(t.state(a)).toEqual({ anim: 'release', t: 0.5 });
-    t.update(a, 0.4);
+    expect(t.state(a)).toEqual({ anim: 'windup', t: 1 });
+    t.update(a, TOLL_WARN - 0.35);
+    expect(t.state(a).anim).toBe('release');
+    expect(t.state(a).t).toBeCloseTo(RELEASE_LANDS, 6);
+    t.update(a, 0.6);
     expect(t.state(a).anim).toBe('idle');
     // High over its head at the top of the tell; down on the floor when it lands.
     expect(top('windup', 1)).toBeLessThan(top('idle', 0) - 20);

@@ -1,20 +1,25 @@
-import { TOLL_TELL } from '../../data/bosses';
+import { TOLL_TELL, TOLL_WARN } from '../../data/bosses';
 import { ECHO_GAP, HIT_AT } from '../../data/constants';
 import { bossState } from '../../sim/bosses';
 import type { Action, Actor } from '../../sim/types';
-import type { AnimName } from './figure';
+import { RELEASE_LANDS, type AnimName } from './figure';
 
-/** How long a boss's blow plays once its big move lands. */
+/** How long a boss's blow plays. */
 const RELEASE_SECONDS = 0.7;
 
 /**
  * A boss whose body shows its big move (the Tollkeeper hoisting its bell through a toll's tell): how far through the wind-up
- * it is, 0 to 1 (null when it is not winding up), and how many of the moves it has made, so the blow plays when one lands.
+ * it is, 0 to 1 (null when it is not winding up), how many of the moves it has made, and how long after a move is made its
+ * blow lands (a toll's first ring strikes once its warning has shown), so the blow plays then.
  */
-function bigMove(a: Actor): { windup: number | null; made: number } | null {
+function bigMove(a: Actor): { windup: number | null; made: number; lands: number } | null {
   const st = bossState(a);
   if (st?.id !== 'tollkeeper') return null;
-  return { windup: st.tellT > 0 ? 1 - st.tellT / TOLL_TELL : null, made: st.tolls };
+  return {
+    windup: st.tellT > 0 ? 1 - st.tellT / TOLL_TELL : null,
+    made: st.tolls,
+    lands: TOLL_WARN,
+  };
 }
 
 /**
@@ -63,14 +68,18 @@ export class AnimTrack {
   lastAttackElapsed = 0;
   attackSeen = false;
   crit = false;
-  /** Seconds since a boss's big move landed (its blow plays for RELEASE_SECONDS), and how many it had made by the last update. */
+  /**
+   * Seconds into a boss's blow (it plays for RELEASE_SECONDS); below 0 the move is made and the wind-up is held until the blow
+   * lands. And how many moves it had made by the last update.
+   */
   releaseT = 99;
   private moves = -1;
 
   update(a: Actor, dt: number): void {
     const big = bigMove(a);
     if (big) {
-      if (this.moves >= 0 && big.made > this.moves) this.releaseT = 0;
+      if (this.moves >= 0 && big.made > this.moves)
+        this.releaseT = RELEASE_LANDS * RELEASE_SECONDS - big.lands;
       this.moves = big.made;
     }
     this.releaseT += dt;
@@ -129,6 +138,7 @@ export class AnimTrack {
     if (a.stunT > 0 || a.ail.freezeT > 0) return { anim: 'stun', t: (this.idlePhase * 2) % 1 };
     const big = bigMove(a);
     if (big?.windup != null) return { anim: 'windup', t: big.windup };
+    if (this.releaseT < 0) return { anim: 'windup', t: 1 };
     if (this.releaseT < RELEASE_SECONDS)
       return { anim: 'release', t: this.releaseT / RELEASE_SECONDS };
     if (a.action) return { anim: 'attack', t: attackTime(a.action) };

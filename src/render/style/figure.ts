@@ -88,6 +88,9 @@ export type FigureKind =
 /** `windup` is a boss's big move held over its tell, `release` the blow when it lands (anim.ts). */
 export type AnimName = 'idle' | 'walk' | 'attack' | 'stun' | 'death' | 'windup' | 'release';
 
+/** How far through `release` the blow lands (the Tollkeeper's bell reaches the floor), 0 to 1. */
+export const RELEASE_LANDS = 0.2;
+
 export type Pose = {
   bob: number;
   lean: number;
@@ -418,8 +421,9 @@ function rigPose(kind: FigureKind, anim: AnimName, t: number, p: Pose): Pose {
       }
       break;
     case 'tollkeeper':
-      // The toll: the bell hoisted over its head through the tell, rising on its legs, then brought down mouth-first on the
-      // floor in front of it. `charge` is how high the bell is, `armB` how far it has come down (1 on the floor).
+      // The toll: the bell hoisted over its head through the tell, rising on its legs, held there while the rings show, then
+      // brought down mouth-first on the floor in front of it as the first ring strikes. `charge` is how high the bell is, `armB`
+      // how far it has come down (1 on the floor).
       p.charge = 0;
       p.armB = 0;
       if (anim === 'windup') {
@@ -430,7 +434,7 @@ function rigPose(kind: FigureKind, anim: AnimName, t: number, p: Pose): Pose {
         p.head = -1.2 * up;
         p.legA = 0.3 * up;
       } else if (anim === 'release') {
-        const down = ease(clamp01(t / 0.2));
+        const down = ease(clamp01(t / RELEASE_LANDS));
         const back = ease(clamp01((t - 0.55) / 0.45));
         p.charge = 1 - down;
         p.armB = down * (1 - back);

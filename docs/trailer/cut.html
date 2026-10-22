@@ -360,7 +360,6 @@
     climb2: 45,
     climb4: 45,
     climb5: 45,
-    climb6: 45,
     fall: 150,
     summary: 36,
     duel: 106,
@@ -380,8 +379,7 @@
     climb2: 0,
     climb4: 0,
     climb5: 0,
-    climb6: 2,
-    fall: 27.5,
+    fall: 8.5,
     duel: 0,
     auto: 0,
   };
@@ -461,29 +459,29 @@
       },
     },
     {
-      t: [12.5, 15],
+      t: [12.5, 14.5],
       name: 'Level 1 to 100',
       what: 'Half-second cuts, each a different build in a different place against different monsters, the level in large type.',
       draw(lt) {
-        const i = Math.min(4, Math.floor(lt / 0.5));
+        const i = Math.min(3, Math.floor(lt / 0.5));
         const l = lt - i * 0.5;
-        const level = [12, 20, 42, 52, 62][i];
-        const names = ['Crypt', 'Forge', 'Ruins', 'Marsh', 'Shrine'];
-        const clip = ['climb1', 'climb2', 'climb4', 'climb5', 'climb6'][i];
+        const level = [12, 20, 42, 52][i];
+        const names = ['Crypt', 'Forge', 'Ruins', 'Marsh'];
+        const clip = ['climb1', 'climb2', 'climb4', 'climb5'][i];
         let s = img(at(clip, l));
         s += levelTag(level, names[i]);
         return s + caption('Grind to level 100 in a sitting.', lt, 0.15, 150, 17);
       },
     },
     {
-      t: [15, 20],
+      t: [14.5, 20],
       name: 'The fall',
-      what: 'Level 72, the Shade (two daggers, no skill, no damage numbers: the bell is what moves) against the Tollkeeper, one shot: the bell rises over his head from 15.25, comes down on 17.25, and its first ring of lightning kills the Shade on 18.05; the body held; the end screen, the duel button pressed.',
+      what: 'Level 72, the Shade (two daggers, no skill, no damage numbers: the bell is what moves) against the Tollkeeper, one shot: his fourth toll, the bell rising over his head from 15.25, held while its six rings show from 17.25, brought down as the first ring strikes and kills the Shade on 18.0; the body held; the end screen, the duel button pressed.',
       draw(lt) {
-        if (lt < 3.85) {
+        if (lt < 4.35) {
           let s = img(at('fall', lt));
           /* the room goes dark while the body is held */
-          s += `<rect width="320" height="180" fill="#000" opacity="${clamp((lt - 3.3) / 0.55) * 0.55}"/>`;
+          s += `<rect width="320" height="180" fill="#000" opacity="${clamp((lt - 3.8) / 0.55) * 0.55}"/>`;
           /* the level stays on screen, as in the climb (the boss's bar keeps the middle of the top clear) */
           return (
             s +
@@ -494,7 +492,7 @@
           );
         }
         /* zoomed in so the last line shown is "Killed by the Tollkeeper" */
-        return crop(at('summary', lt - 3.85, 0), [107, 95, 1067, 600]);
+        return crop(at('summary', lt - 4.35, 0), [107, 95, 1067, 600]);
       },
     },
     {

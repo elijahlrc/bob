@@ -397,6 +397,29 @@ export function boss(
   return null;
 }
 
+/** Keep the boss above `floor` of its life (a deathless character would kill it before the move a shot waits for). */
+export function keepBoss(w: World, floor = 0.45): void {
+  const b = boss(w);
+  if (b) b.m.life = Math.max(b.m.life, b.m.def.maxLife * floor);
+}
+
+/**
+ * Warm a Tollkeeper fight until it has tolled `n` times and the next toll is due in `lead` seconds or less, the boss kept
+ * from falling meanwhile.
+ */
+export function untilTolls(c: Controller, n: number, lead = 0.8): void {
+  const at = warmUntil(
+    c,
+    (w) => {
+      keepBoss(w);
+      const st = boss(w)?.st;
+      return !!st && st.tolls >= n && st.tellT <= 0 && !st.due && st.clock <= lead;
+    },
+    6000,
+  );
+  if (at < 0) throw new Error(`the Tollkeeper did not toll ${n} times`);
+}
+
 /**
  * Let actor `id`'s figure flash white when hit at most once every `gap` seconds. A boss under a stream of hits is otherwise
  * white from end to end and its wind-up cannot be seen. Only the drawing changes: the hits land as ever.

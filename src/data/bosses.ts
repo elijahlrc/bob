@@ -277,6 +277,8 @@ export const TOLL_RING_START = 2;
 export const TOLL_RING_STEP = 2.2;
 export const TOLL_RING_WIDTH = 1.1;
 export const TOLL_RING_DELAY = 0.45;
+/** A toll's rings show on the floor this long before they strike (the bell comes down as the first one does). */
+export const TOLL_WARN = 0.8;
 /** A toll's ring hits for this many of its blows, and shocks. */
 export const TOLL_RING_MULT = 1.2;
 export const TOLL_SHOCK = 0.2;
