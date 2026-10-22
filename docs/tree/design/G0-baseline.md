@@ -209,7 +209,7 @@ How to read a cell: for the classic caster, "spell damage 15 → 21 · 21 → 23
 
 **The measure** was agreed by the user on 2026-10-22: tension is what more points would still buy.
 
-**The targets (proposed).** They are judged at the end of G4 on the same 27 archetypes. Each is a direction with a
+**The targets**, agreed by the user on 2026-10-22. They are judged at the end of G4 on the same 27 archetypes. Each is a direction with a
 rough size, not a gate: a walk by eye still decides (CONSTRAINTS §15.2). For scale, if a stat grew evenly with points,
 40 more points at 120 would add about a third.
 

@@ -30,12 +30,13 @@ Answered before writing (2026-10-22):
 ## Start here (state on 2026-10-22)
 
 Plan approved by the user on 2026-10-22, with the two edits above (no power target; no deference to the Strider) and
-single-stat power added. **G0 is built (2026-10-22) and waits at user stop 1:** [G0-baseline.md](G0-baseline.md) holds
-the numbers and one question: does "what more points would still buy" capture the tension the user means? (The first
-version's step-count radius was rejected by the user the same day; see §1 and CONSTRAINTS §14.) The tools are
+single-stat power added. **G0 is done and stop 1 passed (2026-10-22):** the user agreed the measure (tension is what
+more points would still buy; the first version's step-count radius was rejected, see §1 and CONSTRAINTS §14) and the
+five targets in [G0-baseline.md](G0-baseline.md) ("Stop 1"). **G1a, the specialization ledger, is next**
+(`G1-ledger.md`). The tools are
 `scripts/passives/archetypes.ts` (27 archetypes), `scripts/passives/builds.ts` (`npm run passives:builds`: the
 allocator and report; `--pics`, `--json`) and `scripts/passives/supply.ts` (`npm run passives:supply`: supply map and
-empty space); their output is in `G0/`. Once the user answers, set the targets with them and start G1a. Tools already
+empty space); their output is in `G0/`. `builds.ts` ends with a summary against the targets. Tools already
 in the repo: `passives:pic` (`--region`, `--box`, `--text`, `--ids`), `passives:list`, `passives:audit`,
 `scripts/passives/geometry.ts` (crossings, overlaps, bends), `tighten.ts` (layout first pass), `fold.ts` (editor
 patches), `passives:register`, `passives:bake`. Node units come from `lines.ts` (`Line.units`); the built network from
