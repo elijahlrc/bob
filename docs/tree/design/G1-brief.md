@@ -1,5 +1,7 @@
 # G1b joined: the whole-map growth brief
 
+**Stop 2 (the user, 2026-10-22):** accepted as it stands. Size: accept about 1,373 and add from the reserves later where the measures call for it. Borders: add 1 to 2 crossings per border in G2's border pass, each for a named combination.
+
 Written 2026-10-22 for phase G1b of [G-growth.md](G-growth.md): the six region briefs ([G1/mystic.md](G1/mystic.md),
 [G1/zealot.md](G1/zealot.md), [G1/shade.md](G1/shade.md), [G1/strider.md](G1/strider.md),
 [G1/vanguard.md](G1/vanguard.md), [G1/reaver.md](G1/reaver.md)) reconciled into one, the borders decided pair by pair,

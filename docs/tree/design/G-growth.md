@@ -34,7 +34,7 @@ single-stat power added. **G0 is done and stop 1 passed (2026-10-22):** the user
 more points would still buy; the first version's step-count radius was rejected, see §1 and CONSTRAINTS §14) and the
 five targets in [G0-baseline.md](G0-baseline.md) ("Stop 1"). **G1a, the specialization ledger, is written**
 ([G1-ledger.md](G1-ledger.md): 66 new clusters, 30 small sections, 13 changes to existing clusters, about 27 crossings,
-about 1,480 nodes); G1b is written too: six region briefs in `G1/` and the joined brief [G1-brief.md](G1-brief.md) (about 1,373 nodes, borders 6 to 9 links), at **user stop 2**. The tools are
+about 1,480 nodes); G1b is written too: six region briefs in `G1/` and the joined brief [G1-brief.md](G1-brief.md) (about 1,373 nodes, borders 6 to 9 links). **Stop 2 passed (2026-10-22):** the user accepted the brief as it stands, the size (add from the named reserves later, where the measures show a build still takes everything) and asked for 1 to 2 more crossings per border in G2's border pass. **G2, the skeleton, is next:** one agent per region lays its own roads, cuts and moves (links inside its region only), then one border pass writes every crossing, then ids are registered and the network baked. The tools are
 `scripts/passives/archetypes.ts` (27 archetypes), `scripts/passives/builds.ts` (`npm run passives:builds`: the
 allocator and report; `--pics`, `--json`) and `scripts/passives/supply.ts` (`npm run passives:supply`: supply map and
 empty space); their output is in `G0/`. `builds.ts` ends with a summary against the targets. Tools already
