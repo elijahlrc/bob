@@ -30,14 +30,15 @@ Answered before writing (2026-10-22):
 ## Start here (state on 2026-10-22)
 
 Plan approved by the user on 2026-10-22, with the two edits above (no power target; no deference to the Strider) and
-single-stat power added. Nothing of G0 is built yet. The next step is G0: write `scripts/passives/builds.ts` (the
-allocator, a prize-collecting connected-subgraph search from a start: greedy by value per point with path costs, then
-local swaps, and a search for distinct near-best plans), the archetype file, the supply map and `G0-baseline.md`, then
-stop for the user (stop 1). Tools already in the repo: `passives:pic` (`--region`, `--box`, `--text`, `--ids`),
-`passives:list`, `passives:audit`, `scripts/passives/geometry.ts` (crossings, overlaps, bends), `tighten.ts` (layout
-first pass), `fold.ts` (editor patches), `passives:register`, `passives:bake`. Node units come from `lines.ts`
-(`Line.units`); the built network from `buildAll({ allowNew: true })` in `src/data/passives`. Layout rules for new
-nodes: CONSTRAINTS §11 item 5; the layout process: §15 item 10.
+single-stat power added. **G0 is built (2026-10-22) and waits at user stop 1:** [G0-baseline.md](G0-baseline.md) holds
+the numbers, the proposed radius (18 steps) and targets, and the questions. The tools are `scripts/passives/archetypes.ts`
+(22 archetypes), `scripts/passives/builds.ts` (the allocator and report; `--pics`, `--json`) and
+`scripts/passives/supply.ts` (supply map and empty space); their output is in `G0/`. Once the user answers, fix
+`REACH_RADIUS` in `builds.ts`, amend the archetype set, and start G1a. Tools already in the repo: `passives:pic`
+(`--region`, `--box`, `--text`, `--ids`), `passives:list`, `passives:audit`, `scripts/passives/geometry.ts` (crossings,
+overlaps, bends), `tighten.ts` (layout first pass), `fold.ts` (editor patches), `passives:register`, `passives:bake`.
+Node units come from `lines.ts` (`Line.units`); the built network from `buildAll({ allowNew: true })` in
+`src/data/passives`. Layout rules for new nodes: CONSTRAINTS §11 item 5; the layout process: §15 item 10.
 
 ## 1. What "tension" means, so it can be measured
 

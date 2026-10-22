@@ -1,0 +1,7416 @@
+{
+  "radius": 18,
+  "results": [
+    {
+      "id": "caster-es",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 23,
+        "p90": 20
+      },
+      "reach": 0.38477122080879556,
+      "reachAt": {
+        "12": 0.539115238323682,
+        "15": 0.398888217401945,
+        "18": 0.38477122080879556,
+        "21": 0.4157862769348904,
+        "24": 0.37277265673204557
+      },
+      "choice": 5,
+      "searchGain": 0,
+      "nearScores": [
+        1, 0.9957007430549085, 0.9881483816880315, 0.9754655737000124, 0.9649323941845385
+      ],
+      "tax": {
+        "points": 21,
+        "share": 0.35,
+        "road": 14
+      },
+      "attrs": {
+        "str": 12,
+        "dex": 0,
+        "int": 139
+      },
+      "families": [
+        {
+          "label": "spell damage",
+          "plan": {
+            "spellDamage": 78,
+            "spellAreaDamage": 12,
+            "wandSpellDamage": 30
+          },
+          "units": 15,
+          "takenWithin": 11,
+          "withinUnits": 17
+        },
+        {
+          "label": "cold damage",
+          "plan": {
+            "eleDamageAll": 34,
+            "eleDamage:cold": 58
+          },
+          "units": 9.200000000000001,
+          "takenWithin": 6.2,
+          "withinUnits": 9.2
+        },
+        {
+          "label": "energy shield",
+          "plan": {
+            "es": 83,
+            "esFlat": 15
+          },
+          "units": 17.6,
+          "takenWithin": 14,
+          "withinUnits": 30.200000000000006
+        },
+        {
+          "label": "cast speed",
+          "plan": {
+            "castSpeed": 10,
+            "wandCastSpeed": 8
+          },
+          "units": 4.5,
+          "takenWithin": 3.5,
+          "withinUnits": 13.5
+        }
+      ],
+      "pair": {
+        "labels": ["spell damage", "energy shield"],
+        "units": [15, 17.6],
+        "within": [17, 30.200000000000006]
+      },
+      "taken": [
+        "First Light",
+        "Still Mind",
+        "Glass Skin",
+        "Warded Mind",
+        "Deep Well",
+        "Arcane Focus",
+        "Quickening",
+        "Wandwork",
+        "Broad Weave",
+        "Siphon",
+        "Withering",
+        "Hoarfrost",
+        "Familiars",
+        "Homily",
+        "Glass Wall",
+        "Shatter",
+        "Tomb Dust"
+      ],
+      "gaveUp": [
+        {
+          "name": "Hedge Magic",
+          "value": 3.5,
+          "cost": 12
+        },
+        {
+          "name": "Quiet Knife",
+          "value": 3,
+          "cost": 12
+        },
+        {
+          "name": "Litany",
+          "value": 2,
+          "cost": 7
+        },
+        {
+          "name": "Devotion",
+          "value": 1.9333333333333336,
+          "cost": 5
+        },
+        {
+          "name": "Hymn",
+          "value": 1.9,
+          "cost": 4
+        },
+        {
+          "name": "Elemental Fletching",
+          "value": 1.6,
+          "cost": 15
+        },
+        {
+          "name": "Vigil",
+          "value": 1.5,
+          "cost": 6
+        },
+        {
+          "name": "Hearthfire",
+          "value": 1.45,
+          "cost": 8
+        },
+        {
+          "name": "Clear Head",
+          "value": 1.3875,
+          "cost": 16
+        },
+        {
+          "name": "Sharp Mind",
+          "value": 1.3,
+          "cost": 4
+        },
+        {
+          "name": "Snakeskin",
+          "value": 1,
+          "cost": 12
+        },
+        {
+          "name": "Elemental Ward",
+          "value": 1,
+          "cost": 13
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 18
+        },
+        {
+          "name": "Frugal",
+          "value": 0.8999999999999999,
+          "cost": 2
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 2
+        },
+        {
+          "name": "Shelter",
+          "value": 0.8,
+          "cost": 4
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 16
+        },
+        {
+          "name": "Choirmaster",
+          "value": 0.6333333333333333,
+          "cost": 4
+        },
+        {
+          "name": "Mana Tap",
+          "value": 0.6,
+          "cost": 3
+        }
+      ],
+      "plan": [
+        0, 314, 316, 317, 318, 319, 320, 321, 322, 323, 328, 329, 330, 332, 333, 346, 347, 348, 349,
+        360, 369, 371, 372, 373, 377, 378, 502, 503, 505, 509, 513, 514, 515, 519, 520, 534, 535,
+        627, 628, 778, 779, 780, 781, 782, 783, 795, 796, 800, 801, 811, 812, 813, 814, 862, 863,
+        966, 1017, 1018, 1080, 1081, 1082
+      ]
+    },
+    {
+      "id": "caster-es",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 24,
+        "p90": 20
+      },
+      "reach": 0.6835131847941414,
+      "reachAt": {
+        "12": 0.7926189905081731,
+        "15": 0.7515520505046975,
+        "18": 0.6835131847941414,
+        "21": 0.6776530493427368,
+        "24": 0.6334963579882525
+      },
+      "choice": 7,
+      "searchGain": 0,
+      "nearScores": [
+        1, 0.9939283801845942, 0.9832608814811379, 0.9811105161298485, 0.9704851814528881,
+        0.9625583444716638, 0.9566132167357456
+      ],
+      "tax": {
+        "points": 46,
+        "share": 0.38333333333333336,
+        "road": 31
+      },
+      "attrs": {
+        "str": 36,
+        "dex": 67,
+        "int": 247
+      },
+      "families": [
+        {
+          "label": "spell damage",
+          "plan": {
+            "spellDamage": 126,
+            "spellAreaDamage": 12,
+            "wandSpellDamage": 30
+          },
+          "units": 21,
+          "takenWithin": 17,
+          "withinUnits": 17
+        },
+        {
+          "label": "cold damage",
+          "plan": {
+            "eleDamageAll": 34,
+            "eleDamage:cold": 58
+          },
+          "units": 9.200000000000001,
+          "takenWithin": 6.2,
+          "withinUnits": 9.2
+        },
+        {
+          "label": "energy shield",
+          "plan": {
+            "es": 157,
+            "esFlat": 15
+          },
+          "units": 32.4,
+          "takenWithin": 25.8,
+          "withinUnits": 30.200000000000006
+        },
+        {
+          "label": "cast speed",
+          "plan": {
+            "castSpeed": 41,
+            "wandCastSpeed": 8
+          },
+          "units": 12.25,
+          "takenWithin": 11.25,
+          "withinUnits": 13.5
+        }
+      ],
+      "pair": {
+        "labels": ["spell damage", "energy shield"],
+        "units": [21, 32.4],
+        "within": [17, 30.200000000000006]
+      },
+      "taken": [
+        "First Light",
+        "Still Mind",
+        "Warm Blood",
+        "Glass Skin",
+        "Warded Mind",
+        "Deep Well",
+        "Arcane Focus",
+        "Quickening",
+        "Wandwork",
+        "Frugal",
+        "Hymn",
+        "Broad Weave",
+        "Siphon",
+        "Hedge Magic",
+        "Prism Ward",
+        "Devotion",
+        "Thick Blood",
+        "Quiet Knife",
+        "Hearthfire",
+        "Rotting Word",
+        "Withering",
+        "Snakeskin",
+        "Litany",
+        "Thunderhead",
+        "Hoarfrost",
+        "Familiars",
+        "Shroud",
+        "Homily",
+        "Glass Wall",
+        "Shatter",
+        "Tomb Dust",
+        "Hollow Vessel"
+      ],
+      "gaveUp": [
+        {
+          "name": "Elemental Fletching",
+          "value": 1.6,
+          "cost": 4
+        },
+        {
+          "name": "Vigil",
+          "value": 1.5,
+          "cost": 2
+        },
+        {
+          "name": "Clear Head",
+          "value": 1.3875,
+          "cost": 6
+        },
+        {
+          "name": "Sharp Mind",
+          "value": 1.3,
+          "cost": 4
+        },
+        {
+          "name": "Elemental Ward",
+          "value": 1,
+          "cost": 6
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 8
+        },
+        {
+          "name": "Shelter",
+          "value": 0.8,
+          "cost": 4
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 8
+        },
+        {
+          "name": "Choirmaster",
+          "value": 0.6333333333333333,
+          "cost": 3
+        },
+        {
+          "name": "Mana Tap",
+          "value": 0.6,
+          "cost": 3
+        }
+      ],
+      "plan": [
+        0, 254, 314, 316, 317, 318, 319, 320, 321, 322, 323, 328, 329, 330, 331, 332, 333, 337, 342,
+        343, 346, 347, 348, 349, 350, 360, 369, 371, 372, 373, 377, 378, 502, 503, 505, 509, 513,
+        514, 515, 519, 520, 529, 531, 534, 535, 611, 612, 613, 627, 628, 639, 644, 646, 647, 648,
+        652, 653, 657, 658, 662, 663, 664, 665, 668, 669, 670, 677, 681, 682, 683, 696, 697, 698,
+        699, 700, 715, 716, 724, 725, 726, 731, 732, 737, 739, 778, 779, 780, 781, 782, 783, 795,
+        796, 800, 801, 805, 806, 808, 809, 810, 811, 812, 813, 814, 816, 817, 862, 863, 875, 876,
+        878, 879, 885, 886, 887, 966, 1017, 1018, 1024, 1080, 1081, 1082
+      ]
+    },
+    {
+      "id": "sword-str",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 17,
+        "p90": 15
+      },
+      "reach": 0.41802222410005063,
+      "reachAt": {
+        "12": 0.6078893477788327,
+        "15": 0.4439798549233873,
+        "18": 0.41802222410005063,
+        "21": 0.3469566227509736,
+        "24": 0.3145785184405012
+      },
+      "choice": 3,
+      "searchGain": 0.010920237563062596,
+      "nearScores": [1, 0.9988502842703727, 0.9603916614024005],
+      "tax": {
+        "points": 16,
+        "share": 0.26666666666666666,
+        "road": 13
+      },
+      "attrs": {
+        "str": 161,
+        "dex": 49,
+        "int": 0
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 119
+          },
+          "units": 23.799999999999997,
+          "takenWithin": 23.799999999999997,
+          "withinUnits": 51.2
+        },
+        {
+          "label": "armour",
+          "plan": {
+            "armour": 174,
+            "physReduction": 3
+          },
+          "units": 17.499999999999996,
+          "takenWithin": 17.499999999999996,
+          "withinUnits": 20.5
+        },
+        {
+          "label": "sword damage",
+          "plan": {
+            "swordDamage": 54,
+            "oneHandMelee": 50,
+            "meleePhys": 40
+          },
+          "units": 14.4,
+          "takenWithin": 14.4,
+          "withinUnits": 30.3
+        },
+        {
+          "label": "attack speed",
+          "plan": {
+            "attackSpeed:oneHand": 5,
+            "attackSpeed": 9
+          },
+          "units": 4.666666666666667,
+          "takenWithin": 4.666666666666667,
+          "withinUnits": 25.333333333333336
+        }
+      ],
+      "pair": {
+        "labels": ["life", "armour"],
+        "units": [23.799999999999997, 17.499999999999996],
+        "within": [51.2, 20.5]
+      },
+      "taken": [
+        "Quickened Steel",
+        "Stout Heart",
+        "Keen Edge",
+        "Light Blades",
+        "Scarred Hide",
+        "Four Winds",
+        "Guarded",
+        "Oathbound",
+        "Quartermaster",
+        "Second Wind",
+        "Stone Heart",
+        "Thick Skin",
+        "Mortar and Stone",
+        "Elemental Ward"
+      ],
+      "gaveUp": [
+        {
+          "name": "Fleet Blade",
+          "value": 3,
+          "cost": 14
+        },
+        {
+          "name": "Long Breath",
+          "value": 2.8,
+          "cost": 11
+        },
+        {
+          "name": "Light Hand",
+          "value": 2.6833333333333336,
+          "cost": 13
+        },
+        {
+          "name": "Iron Draw",
+          "value": 2.2,
+          "cost": 3
+        },
+        {
+          "name": "True Aim",
+          "value": 1.9333333333333336,
+          "cost": 14
+        },
+        {
+          "name": "Hawk's Eye",
+          "value": 1.92,
+          "cost": 8
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 9
+        },
+        {
+          "name": "Red Harvest",
+          "value": 1.7999999999999998,
+          "cost": 4
+        },
+        {
+          "name": "Quick Hands",
+          "value": 1.6,
+          "cost": 12
+        },
+        {
+          "name": "Vampiric Strikes",
+          "value": 1.45,
+          "cost": 6
+        },
+        {
+          "name": "Thirsty Quiver",
+          "value": 1.3,
+          "cost": 13
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 11
+        },
+        {
+          "name": "Snakeskin",
+          "value": 1,
+          "cost": 15
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 9
+        },
+        {
+          "name": "Unshakable",
+          "value": 0.4,
+          "cost": 1
+        }
+      ],
+      "plan": [
+        3, 39, 40, 41, 42, 43, 44, 47, 48, 49, 50, 51, 90, 91, 135, 136, 137, 138, 147, 148, 149,
+        150, 167, 168, 172, 173, 434, 435, 436, 437, 438, 444, 445, 446, 447, 448, 450, 452, 454,
+        467, 468, 469, 470, 472, 473, 474, 478, 479, 482, 483, 484, 492, 493, 841, 842, 843, 888,
+        891, 907, 1039, 1046
+      ]
+    },
+    {
+      "id": "sword-str",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 19,
+        "p90": 16
+      },
+      "reach": 0.7224628189961124,
+      "reachAt": {
+        "12": 0.8232447459643741,
+        "15": 0.779312555939992,
+        "18": 0.7224628189961124,
+        "21": 0.6297996944677619,
+        "24": 0.5710265831765072
+      },
+      "choice": 3,
+      "searchGain": 0,
+      "nearScores": [1, 0.9662430223979286, 0.9526706293414257],
+      "tax": {
+        "points": 39,
+        "share": 0.325,
+        "road": 30
+      },
+      "attrs": {
+        "str": 259,
+        "dex": 214,
+        "int": 35
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 214
+          },
+          "units": 42.800000000000004,
+          "takenWithin": 41.2,
+          "withinUnits": 51.2
+        },
+        {
+          "label": "armour",
+          "plan": {
+            "armour": 202,
+            "physReduction": 3
+          },
+          "units": 19.833333333333332,
+          "takenWithin": 19.833333333333332,
+          "withinUnits": 20.5
+        },
+        {
+          "label": "sword damage",
+          "plan": {
+            "swordDamage": 94,
+            "oneHandMelee": 95,
+            "physAttack": 62,
+            "meleePhys": 40
+          },
+          "units": 29.099999999999998,
+          "takenWithin": 27.099999999999998,
+          "withinUnits": 30.3
+        },
+        {
+          "label": "attack speed",
+          "plan": {
+            "attackSpeed": 49,
+            "attackSpeed:oneHand": 5,
+            "weaponSpeed:sword": 3
+          },
+          "units": 19,
+          "takenWithin": 17.333333333333336,
+          "withinUnits": 25.333333333333336
+        }
+      ],
+      "pair": {
+        "labels": ["life", "armour"],
+        "units": [42.800000000000004, 19.833333333333332],
+        "within": [51.2, 20.5]
+      },
+      "taken": [
+        "Quickened Steel",
+        "Stout Heart",
+        "Keen Edge",
+        "Light Blades",
+        "Scarred Hide",
+        "Four Winds",
+        "Guarded",
+        "Hawk's Eye",
+        "Iron Draw",
+        "Oathbound",
+        "Quartermaster",
+        "Warlord's Banner",
+        "Long Breath",
+        "Red Harvest",
+        "Quick Hands",
+        "Second Wind",
+        "Zeal",
+        "Light Hand",
+        "Wanderer",
+        "Hard Target",
+        "Stone Heart",
+        "True Aim",
+        "Fleet Blade",
+        "Thick Skin",
+        "Mortar and Stone",
+        "Elemental Ward",
+        "Steady Hands",
+        "Heavy Draw"
+      ],
+      "gaveUp": [
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 8
+        },
+        {
+          "name": "Vampiric Strikes",
+          "value": 1.45,
+          "cost": 6
+        },
+        {
+          "name": "Thirsty Quiver",
+          "value": 1.3,
+          "cost": 6
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Snakeskin",
+          "value": 1,
+          "cost": 6
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 3
+        },
+        {
+          "name": "Unshakable",
+          "value": 0.4,
+          "cost": 1
+        }
+      ],
+      "plan": [
+        3, 15, 16, 17, 39, 40, 41, 42, 43, 44, 45, 47, 48, 49, 50, 51, 52, 57, 58, 90, 91, 135, 136,
+        137, 138, 147, 148, 149, 150, 167, 168, 171, 172, 173, 182, 187, 189, 204, 205, 206, 207,
+        211, 212, 213, 215, 219, 220, 223, 224, 225, 226, 227, 228, 236, 237, 244, 249, 250, 251,
+        255, 256, 257, 258, 291, 296, 297, 298, 403, 414, 415, 418, 434, 435, 436, 437, 438, 444,
+        445, 446, 447, 448, 450, 452, 454, 457, 458, 459, 467, 468, 469, 470, 471, 472, 473, 474,
+        478, 479, 482, 483, 484, 492, 493, 709, 710, 712, 719, 720, 721, 841, 842, 843, 850, 851,
+        852, 859, 888, 891, 892, 907, 1039, 1046
+      ]
+    },
+    {
+      "id": "mace-slam",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 15,
+        "p90": 13
+      },
+      "reach": 0.40315825729198596,
+      "reachAt": {
+        "12": 0.6213619989707816,
+        "15": 0.5593536107091028,
+        "18": 0.40315825729198596,
+        "21": 0.3219602957847563,
+        "24": 0.29537419936426107
+      },
+      "choice": 3,
+      "searchGain": 0.045765446191873504,
+      "nearScores": [1, 0.9698776703233258, 0.9562373700923787],
+      "tax": {
+        "points": 18,
+        "share": 0.3,
+        "road": 14
+      },
+      "attrs": {
+        "str": 186,
+        "dex": 37,
+        "int": 0
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 141
+          },
+          "units": 28.2,
+          "takenWithin": 28.2,
+          "withinUnits": 63.2
+        },
+        {
+          "label": "armour",
+          "plan": {
+            "armour": 134,
+            "physReduction": 3
+          },
+          "units": 14.166666666666668,
+          "takenWithin": 14.166666666666668,
+          "withinUnits": 24.833333333333332
+        },
+        {
+          "label": "two-handed mace damage",
+          "plan": {
+            "maceDamage": 66,
+            "twoHandDamage": 70,
+            "meleeArea": 36,
+            "meleePhys": 40
+          },
+          "units": 19.04761904761905,
+          "takenWithin": 19.04761904761905,
+          "withinUnits": 23.40476190476191
+        }
+      ],
+      "pair": {
+        "labels": ["life", "armour"],
+        "units": [28.2, 14.166666666666668],
+        "within": [63.2, 24.833333333333332]
+      },
+      "taken": [
+        "Oathbound",
+        "Quartermaster",
+        "Thunderstep",
+        "Second Wind",
+        "Stone Heart",
+        "Guarded",
+        "Mortar and Stone",
+        "Weight of Iron",
+        "Stout Heart",
+        "Quickened Steel",
+        "Broad Back",
+        "Greatweight",
+        "Scarred Hide"
+      ],
+      "gaveUp": [
+        {
+          "name": "Rooted Stance",
+          "value": 3,
+          "cost": 4
+        },
+        {
+          "name": "Long Breath",
+          "value": 2.8,
+          "cost": 12
+        },
+        {
+          "name": "Quiet Pulse",
+          "value": 2.6,
+          "cost": 16
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 13
+        },
+        {
+          "name": "Iron Draw",
+          "value": 2.2,
+          "cost": 3
+        },
+        {
+          "name": "Steady Hands",
+          "value": 2.1333333333333337,
+          "cost": 4
+        },
+        {
+          "name": "Elemental Ward",
+          "value": 2,
+          "cost": 2
+        },
+        {
+          "name": "Hawk's Eye",
+          "value": 1.92,
+          "cost": 9
+        },
+        {
+          "name": "Hatchet Work",
+          "value": 1.9,
+          "cost": 13
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 9
+        },
+        {
+          "name": "Four Winds",
+          "value": 1.6,
+          "cost": 2
+        },
+        {
+          "name": "Quick Hands",
+          "value": 1.6,
+          "cost": 13
+        },
+        {
+          "name": "Light Hand",
+          "value": 1.3333333333333335,
+          "cost": 14
+        },
+        {
+          "name": "Stagger",
+          "value": 1.0499999999999998,
+          "cost": 7
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 11
+        },
+        {
+          "name": "Litany",
+          "value": 1,
+          "cost": 11
+        },
+        {
+          "name": "Crushing Blow",
+          "value": 0.8,
+          "cost": 6
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 10
+        },
+        {
+          "name": "Vigil",
+          "value": 0.8,
+          "cost": 11
+        },
+        {
+          "name": "War Drums",
+          "value": 0.75,
+          "cost": 11
+        }
+      ],
+      "plan": [
+        4, 39, 40, 41, 42, 43, 44, 45, 47, 48, 70, 71, 72, 73, 74, 79, 80, 81, 82, 83, 84, 90, 91,
+        92, 93, 167, 168, 173, 434, 435, 436, 437, 438, 444, 445, 446, 447, 448, 449, 450, 467, 468,
+        470, 472, 473, 474, 482, 483, 484, 568, 570, 842, 843, 856, 888, 891, 894, 895, 907, 1039,
+        1049
+      ]
+    },
+    {
+      "id": "mace-slam",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 23,
+        "p90": 17
+      },
+      "reach": 0.6594515130255014,
+      "reachAt": {
+        "12": 0.8576605294756702,
+        "15": 0.7739332982122564,
+        "18": 0.6594515130255014,
+        "21": 0.5523340872500546,
+        "24": 0.5308986705656227
+      },
+      "choice": 3,
+      "searchGain": 0,
+      "nearScores": [1, 0.9755465388715671, 0.9573891412980412],
+      "tax": {
+        "points": 38,
+        "share": 0.31666666666666665,
+        "road": 30
+      },
+      "attrs": {
+        "str": 275,
+        "dex": 179,
+        "int": 25
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 238
+          },
+          "units": 47.6,
+          "takenWithin": 45.2,
+          "withinUnits": 63.2
+        },
+        {
+          "label": "armour",
+          "plan": {
+            "armour": 218,
+            "physReduction": 3
+          },
+          "units": 21.166666666666664,
+          "takenWithin": 21.166666666666664,
+          "withinUnits": 24.833333333333332
+        },
+        {
+          "label": "two-handed mace damage",
+          "plan": {
+            "maceDamage": 66,
+            "twoHandDamage": 70,
+            "meleeArea": 48,
+            "meleePhys": 60
+          },
+          "units": 22.54761904761905,
+          "takenWithin": 22.54761904761905,
+          "withinUnits": 23.40476190476191
+        }
+      ],
+      "pair": {
+        "labels": ["life", "armour"],
+        "units": [47.6, 21.166666666666664],
+        "within": [63.2, 24.833333333333332]
+      },
+      "taken": [
+        "Oathbound",
+        "Quartermaster",
+        "Warlord's Banner",
+        "Thunderstep",
+        "Second Wind",
+        "Stone Heart",
+        "Thick Skin",
+        "Zeal",
+        "Guarded",
+        "Mortar and Stone",
+        "Elemental Ward",
+        "Field Dressing",
+        "Weight of Iron",
+        "Stout Heart",
+        "Quickened Steel",
+        "Steady Hands",
+        "Broad Back",
+        "Hawk's Eye",
+        "Greatweight",
+        "Scarred Hide",
+        "Four Winds",
+        "Long Breath",
+        "Quick Hands",
+        "Hard Target",
+        "Hatchet Work",
+        "True Aim",
+        "Heavy Draw"
+      ],
+      "gaveUp": [
+        {
+          "name": "Rooted Stance",
+          "value": 3,
+          "cost": 4
+        },
+        {
+          "name": "Quiet Pulse",
+          "value": 2.6,
+          "cost": 11
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 12
+        },
+        {
+          "name": "Iron Draw",
+          "value": 2.2,
+          "cost": 3
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 8
+        },
+        {
+          "name": "Light Hand",
+          "value": 1.3333333333333335,
+          "cost": 3
+        },
+        {
+          "name": "Stagger",
+          "value": 1.0499999999999998,
+          "cost": 4
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Litany",
+          "value": 1,
+          "cost": 4
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 3
+        },
+        {
+          "name": "Vigil",
+          "value": 0.8,
+          "cost": 4
+        },
+        {
+          "name": "Crushing Blow",
+          "value": 0.8,
+          "cost": 5
+        },
+        {
+          "name": "War Drums",
+          "value": 0.75,
+          "cost": 11
+        }
+      ],
+      "plan": [
+        4, 15, 16, 17, 39, 40, 41, 42, 43, 44, 45, 47, 48, 49, 50, 51, 52, 57, 58, 70, 71, 72, 73,
+        74, 79, 80, 81, 82, 83, 84, 90, 91, 92, 93, 167, 168, 171, 172, 173, 204, 205, 206, 207,
+        211, 212, 213, 215, 219, 220, 223, 224, 225, 226, 227, 228, 257, 258, 268, 271, 286, 291,
+        296, 297, 298, 421, 422, 433, 434, 435, 436, 437, 438, 444, 445, 446, 447, 448, 449, 450,
+        452, 454, 457, 458, 459, 467, 468, 469, 470, 471, 472, 473, 474, 482, 483, 484, 492, 495,
+        568, 569, 570, 709, 710, 712, 719, 720, 721, 727, 841, 842, 843, 856, 859, 888, 891, 892,
+        894, 895, 907, 1039, 1046, 1049
+      ]
+    },
+    {
+      "id": "mace-shield",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 20,
+        "p90": 17
+      },
+      "reach": 0.3607828763239678,
+      "reachAt": {
+        "12": 0.5306846217105263,
+        "15": 0.4726401303110089,
+        "18": 0.3607828763239678,
+        "21": 0.3297979676122414,
+        "24": 0.30707309243040176
+      },
+      "choice": 3,
+      "searchGain": 0.03635222279290096,
+      "nearScores": [1, 0.9783039647577093, 0.9649229074889866],
+      "tax": {
+        "points": 16,
+        "share": 0.26666666666666666,
+        "road": 14
+      },
+      "attrs": {
+        "str": 176,
+        "dex": 64,
+        "int": 0
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 116
+          },
+          "units": 23.2,
+          "takenWithin": 23.2,
+          "withinUnits": 63.2
+        },
+        {
+          "label": "armour",
+          "plan": {
+            "armour": 122,
+            "physReduction": 3
+          },
+          "units": 13.166666666666666,
+          "takenWithin": 13.166666666666666,
+          "withinUnits": 24.833333333333332
+        },
+        {
+          "label": "block",
+          "plan": {
+            "shieldBlock": 45
+          },
+          "units": 22.5,
+          "takenWithin": 19.5,
+          "withinUnits": 31.5
+        },
+        {
+          "label": "mace damage",
+          "plan": {
+            "oneHandMelee": 30
+          },
+          "units": 3,
+          "takenWithin": 3,
+          "withinUnits": 15.071428571428573
+        }
+      ],
+      "pair": {
+        "labels": ["life", "block"],
+        "units": [23.2, 22.5],
+        "within": [63.2, 31.5]
+      },
+      "taken": [
+        "Oathbound",
+        "Bracing",
+        "Thick Skin",
+        "Stone Heart",
+        "Field Dressing",
+        "Mortar and Stone",
+        "Quickened Steel",
+        "Stout Heart",
+        "Buckler",
+        "Scarred Hide",
+        "Light Blades",
+        "Steel Rim",
+        "Shieldwall"
+      ],
+      "gaveUp": [
+        {
+          "name": "Broad Back",
+          "value": 3.7333333333333334,
+          "cost": 6
+        },
+        {
+          "name": "Long Breath",
+          "value": 2.8,
+          "cost": 10
+        },
+        {
+          "name": "Iron Faith",
+          "value": 2.6666666666666665,
+          "cost": 8
+        },
+        {
+          "name": "Second Wind",
+          "value": 2.6,
+          "cost": 3
+        },
+        {
+          "name": "Quiet Pulse",
+          "value": 2.6,
+          "cost": 16
+        },
+        {
+          "name": "Light Hand",
+          "value": 2.5333333333333337,
+          "cost": 12
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 13
+        },
+        {
+          "name": "Guarded",
+          "value": 2.333333333333333,
+          "cost": 4
+        },
+        {
+          "name": "Iron Draw",
+          "value": 2.2,
+          "cost": 3
+        },
+        {
+          "name": "Stone Ward",
+          "value": 2.2,
+          "cost": 13
+        },
+        {
+          "name": "Steady Hands",
+          "value": 2.1333333333333337,
+          "cost": 4
+        },
+        {
+          "name": "Elemental Ward",
+          "value": 2,
+          "cost": 4
+        },
+        {
+          "name": "Hawk's Eye",
+          "value": 1.92,
+          "cost": 7
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 9
+        },
+        {
+          "name": "Spirit Ward",
+          "value": 1.7999999999999998,
+          "cost": 16
+        },
+        {
+          "name": "Four Winds",
+          "value": 1.6,
+          "cost": 2
+        },
+        {
+          "name": "Quick Hands",
+          "value": 1.6,
+          "cost": 11
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 9
+        },
+        {
+          "name": "Litany",
+          "value": 1,
+          "cost": 12
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 8
+        },
+        {
+          "name": "Vigil",
+          "value": 0.8,
+          "cost": 12
+        },
+        {
+          "name": "Unshakable",
+          "value": 0.6,
+          "cost": 1
+        }
+      ],
+      "plan": [
+        4, 39, 40, 41, 42, 44, 45, 49, 50, 51, 148, 149, 167, 168, 169, 170, 171, 172, 173, 174,
+        178, 179, 180, 181, 434, 435, 436, 437, 438, 445, 446, 447, 448, 449, 450, 451, 467, 468,
+        469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 480, 482, 483, 484, 568, 569, 570, 888,
+        1046, 1047, 1048, 1049, 1101
+      ]
+    },
+    {
+      "id": "mace-shield",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 23,
+        "p90": 18
+      },
+      "reach": 0.6226400637249644,
+      "reachAt": {
+        "12": 0.7718056126644737,
+        "15": 0.6764556306403519,
+        "18": 0.6226400637249644,
+        "21": 0.5699771253250435,
+        "24": 0.552617066181353
+      },
+      "choice": 6,
+      "searchGain": 0,
+      "nearScores": [
+        1, 0.9924115459901403, 0.9859552403607839, 0.9730732277069494, 0.9620577299507014,
+        0.9542244871018138
+      ],
+      "tax": {
+        "points": 35,
+        "share": 0.2916666666666667,
+        "road": 31
+      },
+      "attrs": {
+        "str": 254,
+        "dex": 207,
+        "int": 16
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 199
+          },
+          "units": 39.800000000000004,
+          "takenWithin": 37.400000000000006,
+          "withinUnits": 63.2
+        },
+        {
+          "label": "armour",
+          "plan": {
+            "armour": 162,
+            "physReduction": 3,
+            "armourFlat": 40
+          },
+          "units": 17.166666666666664,
+          "takenWithin": 17.166666666666664,
+          "withinUnits": 24.833333333333332
+        },
+        {
+          "label": "block",
+          "plan": {
+            "shieldBlock": 63
+          },
+          "units": 31.5,
+          "takenWithin": 28.5,
+          "withinUnits": 31.5
+        },
+        {
+          "label": "mace damage",
+          "plan": {
+            "maceDamage": 66,
+            "oneHandMelee": 95
+          },
+          "units": 14.214285714285715,
+          "takenWithin": 14.214285714285715,
+          "withinUnits": 15.071428571428573
+        }
+      ],
+      "pair": {
+        "labels": ["life", "block"],
+        "units": [39.800000000000004, 31.5],
+        "within": [63.2, 31.5]
+      },
+      "taken": [
+        "Oathbound",
+        "Bracing",
+        "Second Wind",
+        "Thick Skin",
+        "Stone Heart",
+        "Mortar and Stone",
+        "Elemental Ward",
+        "Guarded",
+        "Quickened Steel",
+        "Stout Heart",
+        "Iron Faith",
+        "Weight of Iron",
+        "Buckler",
+        "Hawk's Eye",
+        "Scarred Hide",
+        "Light Blades",
+        "Four Winds",
+        "Steel Rim",
+        "Long Breath",
+        "Quick Hands",
+        "Light Hand",
+        "Hard Target",
+        "Wanderer",
+        "True Aim",
+        "Shieldwall",
+        "Heavy Draw"
+      ],
+      "gaveUp": [
+        {
+          "name": "Broad Back",
+          "value": 3.7333333333333334,
+          "cost": 4
+        },
+        {
+          "name": "Quiet Pulse",
+          "value": 2.6,
+          "cost": 12
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 13
+        },
+        {
+          "name": "Iron Draw",
+          "value": 2.2,
+          "cost": 3
+        },
+        {
+          "name": "Stone Ward",
+          "value": 2.2,
+          "cost": 13
+        },
+        {
+          "name": "Steady Hands",
+          "value": 2.1333333333333337,
+          "cost": 4
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 9
+        },
+        {
+          "name": "Spirit Ward",
+          "value": 1.7999999999999998,
+          "cost": 14
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Litany",
+          "value": 1,
+          "cost": 4
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 3
+        },
+        {
+          "name": "Vigil",
+          "value": 0.8,
+          "cost": 4
+        },
+        {
+          "name": "Unshakable",
+          "value": 0.6,
+          "cost": 1
+        }
+      ],
+      "plan": [
+        4, 15, 16, 17, 39, 40, 41, 42, 43, 44, 45, 47, 48, 49, 50, 51, 66, 70, 71, 72, 73, 91, 147,
+        148, 149, 150, 167, 168, 169, 170, 171, 172, 173, 174, 178, 179, 180, 181, 204, 206, 207,
+        211, 213, 214, 215, 219, 220, 223, 224, 225, 226, 227, 255, 256, 257, 258, 291, 296, 297,
+        298, 403, 404, 405, 414, 415, 418, 434, 435, 436, 437, 438, 445, 446, 447, 448, 449, 450,
+        451, 452, 454, 456, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 480, 482,
+        483, 484, 492, 496, 568, 570, 721, 727, 728, 729, 733, 842, 843, 859, 888, 891, 894, 895,
+        907, 955, 1039, 1046, 1047, 1048, 1049, 1101
+      ]
+    },
+    {
+      "id": "warcry-totem",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 16,
+        "p90": 14
+      },
+      "reach": 0.3902453540448454,
+      "reachAt": {
+        "12": 0.5902377521613834,
+        "15": 0.5156262884472667,
+        "18": 0.3902453540448454,
+        "21": 0.31941282432155493,
+        "24": 0.29501759699396896
+      },
+      "choice": 3,
+      "searchGain": 0,
+      "nearScores": [1, 0.9665243251486959, 0.9579075796858318],
+      "tax": {
+        "points": 18,
+        "share": 0.3,
+        "road": 12
+      },
+      "attrs": {
+        "str": 135,
+        "dex": 0,
+        "int": 25
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 115
+          },
+          "units": 23,
+          "takenWithin": 23,
+          "withinUnits": 63.2
+        },
+        {
+          "label": "totem damage",
+          "plan": {},
+          "units": 0,
+          "takenWithin": 0,
+          "withinUnits": 8
+        },
+        {
+          "label": "warcries",
+          "plan": {},
+          "units": 0,
+          "takenWithin": 0,
+          "withinUnits": 6.833333333333333
+        }
+      ],
+      "pair": {
+        "labels": ["totem damage", "life"],
+        "units": [0, 23],
+        "within": [8, 63.2]
+      },
+      "taken": [
+        "Oathbound",
+        "Warlord's Banner",
+        "Second Wind",
+        "Stone Heart",
+        "Thick Skin",
+        "Zeal",
+        "Mortar and Stone",
+        "Elemental Ward",
+        "Hearthfire",
+        "Broad Back",
+        "Vigil",
+        "Litany",
+        "Iron Liturgy"
+      ],
+      "gaveUp": [
+        {
+          "name": "Scarred Hide",
+          "value": 4,
+          "cost": 14
+        },
+        {
+          "name": "Long Breath",
+          "value": 3.6,
+          "cost": 15
+        },
+        {
+          "name": "Stout Heart",
+          "value": 3.2,
+          "cost": 9
+        },
+        {
+          "name": "Quiet Pulse",
+          "value": 3.2,
+          "cost": 11
+        },
+        {
+          "name": "War Drums",
+          "value": 2.6666666666666665,
+          "cost": 5
+        },
+        {
+          "name": "Standing Cairns",
+          "value": 2.6,
+          "cost": 10
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 12
+        },
+        {
+          "name": "Guarded",
+          "value": 2.333333333333333,
+          "cost": 9
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 8
+        },
+        {
+          "name": "Four Winds",
+          "value": 1.6,
+          "cost": 14
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 15
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 13
+        }
+      ],
+      "plan": [
+        4, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 74, 79, 80, 82, 83, 84, 434, 435,
+        437, 445, 446, 447, 448, 449, 452, 454, 457, 458, 459, 709, 710, 712, 719, 720, 721, 727,
+        730, 731, 732, 734, 735, 737, 739, 825, 826, 856, 888, 891, 925, 926, 927, 928, 929, 930,
+        956, 1039, 1046
+      ]
+    },
+    {
+      "id": "warcry-totem",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 22,
+        "p90": 18
+      },
+      "reach": 0.6595247660283596,
+      "reachAt": {
+        "12": 0.8904298751200772,
+        "15": 0.7314669745196671,
+        "18": 0.6595247660283596,
+        "21": 0.5663716383068527,
+        "24": 0.5295938341907138
+      },
+      "choice": 3,
+      "searchGain": 0.0892187902783379,
+      "nearScores": [1, 0.9751803821857041, 0.9527517006596311],
+      "tax": {
+        "points": 46,
+        "share": 0.38333333333333336,
+        "road": 28
+      },
+      "attrs": {
+        "str": 245,
+        "dex": 115,
+        "int": 66
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 229
+          },
+          "units": 45.8,
+          "takenWithin": 45.8,
+          "withinUnits": 63.2
+        },
+        {
+          "label": "totem damage",
+          "plan": {
+            "totemDamage": 108
+          },
+          "units": 9,
+          "takenWithin": 6,
+          "withinUnits": 8
+        },
+        {
+          "label": "warcries",
+          "plan": {},
+          "units": 0,
+          "takenWithin": 0,
+          "withinUnits": 6.833333333333333
+        }
+      ],
+      "pair": {
+        "labels": ["totem damage", "life"],
+        "units": [9, 45.8],
+        "within": [8, 63.2]
+      },
+      "taken": [
+        "Oathbound",
+        "Quartermaster",
+        "Warlord's Banner",
+        "Second Wind",
+        "Stone Heart",
+        "Thick Skin",
+        "Zeal",
+        "Mortar and Stone",
+        "Elemental Ward",
+        "Guarded",
+        "Field Dressing",
+        "Standing Cairns",
+        "Stout Heart",
+        "Quickened Steel",
+        "Hearthfire",
+        "Vigil",
+        "Litany",
+        "Scarred Hide",
+        "Four Winds",
+        "Long Breath",
+        "Weathered",
+        "Quiet Pulse",
+        "Hard Target",
+        "Sentry Post",
+        "Red Harvest",
+        "Spellsword"
+      ],
+      "gaveUp": [
+        {
+          "name": "Broad Back",
+          "value": 3.7333333333333334,
+          "cost": 6
+        },
+        {
+          "name": "War Drums",
+          "value": 2.6666666666666665,
+          "cost": 10
+        },
+        {
+          "name": "Iron Liturgy",
+          "value": 2.533333333333333,
+          "cost": 9
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 8
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 6
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 4
+        }
+      ],
+      "plan": [
+        4, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 90, 91, 93, 94, 99, 100, 101, 102,
+        167, 168, 171, 172, 173, 182, 187, 188, 189, 198, 211, 212, 213, 215, 223, 224, 225, 287,
+        302, 303, 304, 305, 306, 323, 407, 408, 425, 428, 434, 435, 436, 437, 438, 444, 445, 446,
+        447, 448, 449, 450, 452, 454, 457, 458, 459, 467, 468, 470, 472, 473, 474, 482, 483, 484,
+        492, 495, 538, 539, 540, 568, 569, 570, 609, 610, 617, 618, 619, 709, 710, 711, 712, 713,
+        716, 719, 720, 721, 724, 727, 730, 731, 732, 734, 735, 737, 739, 802, 841, 842, 843, 878,
+        879, 888, 891, 906, 907, 956, 1039, 1046, 1049
+      ]
+    },
+    {
+      "id": "bow-crit",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 12,
+        "p90": 11
+      },
+      "reach": 0.37916003386312924,
+      "reachAt": {
+        "12": 0.5302644801265741,
+        "15": 0.4406246668798633,
+        "18": 0.37916003386312924,
+        "21": 0.3449296173765193,
+        "24": 0.32533741737762994
+      },
+      "choice": 7,
+      "searchGain": 0,
+      "nearScores": [
+        1, 0.9875005040119352, 0.9870972944639329, 0.9733881698318616, 0.9659287931938231,
+        0.962098302487803, 0.952824482883755
+      ],
+      "tax": {
+        "points": 14,
+        "share": 0.23333333333333334,
+        "road": 14
+      },
+      "attrs": {
+        "str": 32,
+        "dex": 192,
+        "int": 10
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 70
+          },
+          "units": 14,
+          "takenWithin": 14,
+          "withinUnits": 56.2
+        },
+        {
+          "label": "evasion",
+          "plan": {
+            "evasion": 162
+          },
+          "units": 13.500000000000002,
+          "takenWithin": 13.500000000000002,
+          "withinUnits": 34.666666666666664
+        },
+        {
+          "label": "bow damage",
+          "plan": {
+            "bowDamage": 88,
+            "projectileDamage": 78,
+            "physAttack": 62
+          },
+          "units": 22.8,
+          "takenWithin": 22.8,
+          "withinUnits": 35.6
+        },
+        {
+          "label": "crit",
+          "plan": {
+            "critChance": 60,
+            "critMulti": 30
+          },
+          "units": 5.5,
+          "takenWithin": 5.5,
+          "withinUnits": 26.333333333333332
+        }
+      ],
+      "pair": {
+        "labels": ["bow damage", "life"],
+        "units": [22.8, 14],
+        "within": [35.6, 56.2]
+      },
+      "taken": [
+        "Hawk's Eye",
+        "Long Breath",
+        "Wayfarer",
+        "Vital Aim",
+        "Hard Target",
+        "Steady Draw",
+        "Wanderer",
+        "Weaving",
+        "Fleet Foot",
+        "Longbow",
+        "True Aim",
+        "Iron Draw",
+        "Ricochet",
+        "Rapid Fire",
+        "Heavy Draw",
+        "Split Volley",
+        "Far Flight"
+      ],
+      "gaveUp": [
+        {
+          "name": "Quiet Shot",
+          "value": 3.2333333333333334,
+          "cost": 10
+        },
+        {
+          "name": "Thick Blood",
+          "value": 3,
+          "cost": 8
+        },
+        {
+          "name": "Skewer",
+          "value": 2.8,
+          "cost": 5
+        },
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 8
+        },
+        {
+          "name": "Second Wind",
+          "value": 2.6,
+          "cost": 15
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 13
+        },
+        {
+          "name": "Stone Heart",
+          "value": 2.4,
+          "cost": 16
+        },
+        {
+          "name": "Guarded",
+          "value": 2.333333333333333,
+          "cost": 11
+        },
+        {
+          "name": "Quickened Steel",
+          "value": 2.2666666666666666,
+          "cost": 6
+        },
+        {
+          "name": "Scarred Hide",
+          "value": 2,
+          "cost": 5
+        },
+        {
+          "name": "Snakeskin",
+          "value": 2,
+          "cost": 6
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 9
+        },
+        {
+          "name": "Quartermaster",
+          "value": 1.775,
+          "cost": 11
+        },
+        {
+          "name": "Mercy Stroke",
+          "value": 1.666666666666667,
+          "cost": 6
+        },
+        {
+          "name": "Fencer's Eye",
+          "value": 1.666666666666667,
+          "cost": 9
+        },
+        {
+          "name": "Field Dressing",
+          "value": 1.625,
+          "cost": 11
+        },
+        {
+          "name": "Quick Hands",
+          "value": 1.6,
+          "cost": 1
+        },
+        {
+          "name": "Killing Eye",
+          "value": 1.6,
+          "cost": 5
+        },
+        {
+          "name": "Four Winds",
+          "value": 1.6,
+          "cost": 5
+        },
+        {
+          "name": "Light Hand",
+          "value": 1.3333333333333335,
+          "cost": 1
+        },
+        {
+          "name": "Red Harvest",
+          "value": 1.2,
+          "cost": 9
+        },
+        {
+          "name": "Alms",
+          "value": 1.15,
+          "cost": 16
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Thirsty Quiver",
+          "value": 0.8,
+          "cost": 5
+        },
+        {
+          "name": "Quick Sip",
+          "value": 0.75,
+          "cost": 6
+        },
+        {
+          "name": "Provisions",
+          "value": 0.65,
+          "cost": 11
+        }
+      ],
+      "plan": [
+        2, 154, 155, 156, 157, 158, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 215, 219,
+        220, 223, 224, 225, 226, 229, 235, 236, 237, 244, 245, 246, 247, 252, 253, 255, 256, 257,
+        258, 259, 260, 261, 268, 273, 274, 275, 280, 281, 282, 283, 288, 289, 290, 291, 296, 297,
+        298, 415, 615, 616, 849, 850
+      ]
+    },
+    {
+      "id": "bow-crit",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 15,
+        "p90": 12
+      },
+      "reach": 0.6425547934865066,
+      "reachAt": {
+        "12": 0.8267088580530665,
+        "15": 0.7467176562555512,
+        "18": 0.6425547934865066,
+        "21": 0.5845452032551411,
+        "24": 0.5513427006180169
+      },
+      "choice": 4,
+      "searchGain": 0,
+      "nearScores": [1, 0.9743931381937792, 0.9676419678917907, 0.9559240775878985],
+      "tax": {
+        "points": 26,
+        "share": 0.21666666666666667,
+        "road": 21
+      },
+      "attrs": {
+        "str": 100,
+        "dex": 282,
+        "int": 35
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 141,
+            "lifeFlat": 20
+          },
+          "units": 29.2,
+          "takenWithin": 29.2,
+          "withinUnits": 56.2
+        },
+        {
+          "label": "evasion",
+          "plan": {
+            "evasion": 310
+          },
+          "units": 25.833333333333332,
+          "takenWithin": 25.833333333333332,
+          "withinUnits": 34.666666666666664
+        },
+        {
+          "label": "bow damage",
+          "plan": {
+            "bowDamage": 108,
+            "projectileDamage": 128,
+            "physAttack": 62
+          },
+          "units": 29.8,
+          "takenWithin": 29.8,
+          "withinUnits": 35.6
+        },
+        {
+          "label": "crit",
+          "plan": {
+            "critChance": 200,
+            "critMulti": 54
+          },
+          "units": 14.5,
+          "takenWithin": 14.5,
+          "withinUnits": 26.333333333333332
+        }
+      ],
+      "pair": {
+        "labels": ["bow damage", "life"],
+        "units": [29.8, 29.2],
+        "within": [35.6, 56.2]
+      },
+      "taken": [
+        "Hawk's Eye",
+        "Long Breath",
+        "Wayfarer",
+        "Vital Aim",
+        "Quick Hands",
+        "Soft Step",
+        "Hard Target",
+        "Steady Draw",
+        "Wanderer",
+        "Light Hand",
+        "Weaving",
+        "Sidestep",
+        "Fleet Foot",
+        "Longbow",
+        "True Aim",
+        "Keen Instinct",
+        "Iron Draw",
+        "Quickened Steel",
+        "Buckler",
+        "Ricochet",
+        "Rapid Fire",
+        "Killing Eye",
+        "Stout Heart",
+        "Heavy Draw",
+        "Split Volley",
+        "Far Flight",
+        "Barbed Arrows",
+        "Thick Blood",
+        "Quick Sip",
+        "Scarred Hide",
+        "Four Winds",
+        "Skewer"
+      ],
+      "gaveUp": [
+        {
+          "name": "Quiet Shot",
+          "value": 3.2333333333333334,
+          "cost": 9
+        },
+        {
+          "name": "Second Wind",
+          "value": 2.6,
+          "cost": 12
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 11
+        },
+        {
+          "name": "Stone Heart",
+          "value": 2.4,
+          "cost": 13
+        },
+        {
+          "name": "Guarded",
+          "value": 2.333333333333333,
+          "cost": 6
+        },
+        {
+          "name": "Snakeskin",
+          "value": 2,
+          "cost": 4
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 7
+        },
+        {
+          "name": "Quartermaster",
+          "value": 1.775,
+          "cost": 6
+        },
+        {
+          "name": "Fencer's Eye",
+          "value": 1.666666666666667,
+          "cost": 3
+        },
+        {
+          "name": "Mercy Stroke",
+          "value": 1.666666666666667,
+          "cost": 6
+        },
+        {
+          "name": "Field Dressing",
+          "value": 1.625,
+          "cost": 3
+        },
+        {
+          "name": "Red Harvest",
+          "value": 1.2,
+          "cost": 3
+        },
+        {
+          "name": "Alms",
+          "value": 1.15,
+          "cost": 13
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Thirsty Quiver",
+          "value": 0.8,
+          "cost": 4
+        },
+        {
+          "name": "Provisions",
+          "value": 0.65,
+          "cost": 8
+        }
+      ],
+      "plan": [
+        2, 151, 154, 155, 156, 157, 158, 167, 168, 171, 172, 173, 203, 204, 205, 206, 207, 208, 209,
+        210, 211, 212, 213, 215, 219, 220, 221, 223, 224, 225, 226, 227, 229, 230, 231, 235, 236,
+        237, 244, 245, 246, 247, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 263, 264, 265,
+        268, 273, 274, 275, 280, 281, 282, 283, 288, 289, 290, 291, 296, 297, 298, 400, 401, 414,
+        415, 419, 420, 423, 424, 432, 467, 468, 469, 470, 471, 474, 477, 478, 480, 482, 483, 484,
+        491, 492, 493, 577, 578, 579, 580, 581, 582, 614, 615, 616, 629, 630, 631, 633, 637, 638,
+        639, 640, 641, 642, 647, 648, 662, 663, 849, 850, 851, 852
+      ]
+    },
+    {
+      "id": "bow-elemental",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 12,
+        "p90": 11
+      },
+      "reach": 0.38633513195032587,
+      "reachAt": {
+        "12": 0.5297940851463265,
+        "15": 0.44879266439190324,
+        "18": 0.38633513195032587,
+        "21": 0.34630044211789385,
+        "24": 0.3245472130377894
+      },
+      "choice": 3,
+      "searchGain": 0.01024107304694577,
+      "nearScores": [1, 0.9959630393827936, 0.9896384677491702],
+      "tax": {
+        "points": 12,
+        "share": 0.2,
+        "road": 9
+      },
+      "attrs": {
+        "str": 0,
+        "dex": 154,
+        "int": 25
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 55,
+            "lifeFlat": 20
+          },
+          "units": 12,
+          "takenWithin": 12,
+          "withinUnits": 56.2
+        },
+        {
+          "label": "evasion",
+          "plan": {
+            "evasion": 184
+          },
+          "units": 15.333333333333332,
+          "takenWithin": 15.333333333333332,
+          "withinUnits": 34.666666666666664
+        },
+        {
+          "label": "elemental attack damage",
+          "plan": {
+            "eleAttack": 60
+          },
+          "units": 6,
+          "takenWithin": 6,
+          "withinUnits": 14
+        },
+        {
+          "label": "bow damage",
+          "plan": {
+            "bowDamage": 52,
+            "projectileDamage": 68
+          },
+          "units": 12,
+          "takenWithin": 12,
+          "withinUnits": 26.200000000000003
+        }
+      ],
+      "pair": {
+        "labels": ["elemental attack damage", "life"],
+        "units": [6, 12],
+        "within": [14, 56.2]
+      },
+      "taken": [
+        "Hawk's Eye",
+        "Long Breath",
+        "Wayfarer",
+        "Elemental Fletching",
+        "Quick Hands",
+        "Soft Step",
+        "Hard Target",
+        "Fleet Foot",
+        "Longbow",
+        "True Aim",
+        "Keen Instinct",
+        "Rapid Fire",
+        "Split Volley",
+        "Far Flight",
+        "Thick Blood"
+      ],
+      "gaveUp": [
+        {
+          "name": "Weaving",
+          "value": 3,
+          "cost": 5
+        },
+        {
+          "name": "Stormstruck",
+          "value": 2.8666666666666667,
+          "cost": 14
+        },
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 9
+        },
+        {
+          "name": "Second Wind",
+          "value": 2.6,
+          "cost": 15
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 12
+        },
+        {
+          "name": "Stone Heart",
+          "value": 2.4,
+          "cost": 16
+        },
+        {
+          "name": "Guarded",
+          "value": 2.333333333333333,
+          "cost": 14
+        },
+        {
+          "name": "Iron Draw",
+          "value": 2.2800000000000002,
+          "cost": 7
+        },
+        {
+          "name": "Quickened Steel",
+          "value": 2.2666666666666666,
+          "cost": 7
+        },
+        {
+          "name": "Quiet Shot",
+          "value": 2.1133333333333337,
+          "cost": 9
+        },
+        {
+          "name": "Snakeskin",
+          "value": 2,
+          "cost": 4
+        },
+        {
+          "name": "Scarred Hide",
+          "value": 2,
+          "cost": 12
+        },
+        {
+          "name": "Zeal",
+          "value": 2,
+          "cost": 14
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 8
+        },
+        {
+          "name": "Pitch Arrows",
+          "value": 1.8,
+          "cost": 9
+        },
+        {
+          "name": "Vital Aim",
+          "value": 1.75,
+          "cost": 3
+        },
+        {
+          "name": "Four Winds",
+          "value": 1.6,
+          "cost": 12
+        },
+        {
+          "name": "Light Hand",
+          "value": 1.3333333333333335,
+          "cost": 3
+        },
+        {
+          "name": "Mercy Stroke",
+          "value": 1.0416666666666667,
+          "cost": 8
+        },
+        {
+          "name": "Fencer's Eye",
+          "value": 1.0416666666666667,
+          "cost": 16
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Killing Eye",
+          "value": 1,
+          "cost": 5
+        }
+      ],
+      "plan": [
+        2, 204, 205, 206, 207, 211, 212, 213, 215, 219, 220, 221, 223, 224, 225, 226, 227, 228, 229,
+        231, 235, 237, 241, 242, 243, 244, 245, 246, 247, 254, 257, 258, 259, 260, 261, 268, 273,
+        274, 275, 280, 281, 282, 288, 289, 290, 291, 412, 413, 630, 631, 633, 637, 638, 639, 640,
+        641, 642, 647, 648, 662, 663
+      ]
+    },
+    {
+      "id": "bow-elemental",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 20,
+        "p90": 13
+      },
+      "reach": 0.628015535545249,
+      "reachAt": {
+        "12": 0.8190670262948393,
+        "15": 0.7295447453976301,
+        "18": 0.628015535545249,
+        "21": 0.5853042885629898,
+        "24": 0.5485377797107033
+      },
+      "choice": 5,
+      "searchGain": 0,
+      "nearScores": [
+        1, 0.9938960470269769, 0.9835126922413451, 0.9825838298324067, 0.9659638274439034
+      ],
+      "tax": {
+        "points": 32,
+        "share": 0.26666666666666666,
+        "road": 21
+      },
+      "attrs": {
+        "str": 106,
+        "dex": 266,
+        "int": 47
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 151,
+            "lifeFlat": 20
+          },
+          "units": 31.2,
+          "takenWithin": 31.2,
+          "withinUnits": 56.2
+        },
+        {
+          "label": "evasion",
+          "plan": {
+            "evasion": 322
+          },
+          "units": 26.833333333333332,
+          "takenWithin": 26.833333333333332,
+          "withinUnits": 34.666666666666664
+        },
+        {
+          "label": "elemental attack damage",
+          "plan": {
+            "eleAttack": 104
+          },
+          "units": 10.4,
+          "takenWithin": 6,
+          "withinUnits": 14
+        },
+        {
+          "label": "bow damage",
+          "plan": {
+            "bowDamage": 98,
+            "projectileDamage": 78
+          },
+          "units": 17.6,
+          "takenWithin": 17.6,
+          "withinUnits": 26.200000000000003
+        }
+      ],
+      "pair": {
+        "labels": ["elemental attack damage", "life"],
+        "units": [10.4, 31.2],
+        "within": [14, 56.2]
+      },
+      "taken": [
+        "Hawk's Eye",
+        "Long Breath",
+        "Wayfarer",
+        "Vital Aim",
+        "Elemental Fletching",
+        "Quick Hands",
+        "Soft Step",
+        "Hard Target",
+        "Weaving",
+        "Sidestep",
+        "Wanderer",
+        "Light Hand",
+        "Fleet Foot",
+        "Longbow",
+        "True Aim",
+        "Keen Instinct",
+        "Iron Draw",
+        "Quickened Steel",
+        "Buckler",
+        "Snakeskin",
+        "Rapid Fire",
+        "Stout Heart",
+        "Split Volley",
+        "Far Flight",
+        "Thick Blood",
+        "Heavy Draw",
+        "Scarred Hide",
+        "Four Winds",
+        "Elemental Edge"
+      ],
+      "gaveUp": [
+        {
+          "name": "Stormstruck",
+          "value": 2.8666666666666667,
+          "cost": 10
+        },
+        {
+          "name": "Second Wind",
+          "value": 2.6,
+          "cost": 12
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 11
+        },
+        {
+          "name": "Stone Heart",
+          "value": 2.4,
+          "cost": 13
+        },
+        {
+          "name": "Guarded",
+          "value": 2.333333333333333,
+          "cost": 6
+        },
+        {
+          "name": "Quiet Shot",
+          "value": 2.1133333333333337,
+          "cost": 9
+        },
+        {
+          "name": "Zeal",
+          "value": 2,
+          "cost": 12
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 7
+        },
+        {
+          "name": "Pitch Arrows",
+          "value": 1.8,
+          "cost": 7
+        },
+        {
+          "name": "Fencer's Eye",
+          "value": 1.0416666666666667,
+          "cost": 2
+        },
+        {
+          "name": "Mercy Stroke",
+          "value": 1.0416666666666667,
+          "cost": 6
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Killing Eye",
+          "value": 1,
+          "cost": 5
+        }
+      ],
+      "plan": [
+        2, 143, 144, 145, 151, 154, 155, 156, 157, 158, 167, 168, 171, 172, 173, 174, 178, 179, 180,
+        204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 215, 219, 220, 221, 223, 224, 225, 226,
+        227, 228, 229, 230, 231, 235, 237, 241, 242, 243, 244, 245, 246, 247, 254, 255, 257, 258,
+        259, 260, 261, 268, 273, 274, 275, 280, 281, 282, 283, 288, 289, 290, 291, 296, 297, 298,
+        411, 412, 413, 414, 415, 416, 423, 424, 467, 468, 469, 470, 471, 472, 473, 474, 477, 478,
+        480, 482, 483, 484, 491, 492, 493, 616, 629, 630, 631, 633, 637, 638, 639, 640, 641, 642,
+        646, 647, 648, 653, 657, 658, 662, 663, 849, 850, 851, 852
+      ]
+    },
+    {
+      "id": "bow-poison",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 12,
+        "p90": 9
+      },
+      "reach": 0.4098748665259347,
+      "reachAt": {
+        "12": 0.599765266667147,
+        "15": 0.4780642347161324,
+        "18": 0.4098748665259347,
+        "21": 0.37685723075809396,
+        "24": 0.34304447025295093
+      },
+      "choice": 4,
+      "searchGain": 0.008816975099312119,
+      "nearScores": [1, 0.9874183634268154, 0.9802151363810987, 0.9524587014982713],
+      "tax": {
+        "points": 15,
+        "share": 0.25,
+        "road": 14
+      },
+      "attrs": {
+        "str": 53,
+        "dex": 189,
+        "int": 10
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 84
+          },
+          "units": 16.799999999999997,
+          "takenWithin": 16.799999999999997,
+          "withinUnits": 56.2
+        },
+        {
+          "label": "poison",
+          "plan": {
+            "chaosAttack": 48,
+            "poisonChance": 10,
+            "poisonDamage": 12
+          },
+          "units": 6,
+          "takenWithin": 6,
+          "withinUnits": 16.333333333333332
+        },
+        {
+          "label": "bow damage",
+          "plan": {
+            "bowDamage": 16,
+            "projectileDamage": 10
+          },
+          "units": 2.6,
+          "takenWithin": 2.6,
+          "withinUnits": 26.200000000000003
+        }
+      ],
+      "pair": {
+        "labels": ["poison", "life"],
+        "units": [6, 16.799999999999997],
+        "within": [16.333333333333332, 56.2]
+      },
+      "taken": [
+        "Hawk's Eye",
+        "Long Breath",
+        "Wayfarer",
+        "Quick Hands",
+        "Soft Step",
+        "Hard Target",
+        "Weaving",
+        "Wanderer",
+        "Light Hand",
+        "Fleet Foot",
+        "Longbow",
+        "True Aim",
+        "Venom Fletching",
+        "Buckler",
+        "Quickened Steel",
+        "Fighting Breath"
+      ],
+      "gaveUp": [
+        {
+          "name": "Thick Blood",
+          "value": 3,
+          "cost": 7
+        },
+        {
+          "name": "Barbed Point",
+          "value": 3,
+          "cost": 9
+        },
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 4
+        },
+        {
+          "name": "Second Wind",
+          "value": 2.6,
+          "cost": 14
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 13
+        },
+        {
+          "name": "Stone Heart",
+          "value": 2.4,
+          "cost": 15
+        },
+        {
+          "name": "Guarded",
+          "value": 2.333333333333333,
+          "cost": 9
+        },
+        {
+          "name": "Festering",
+          "value": 2.333333333333333,
+          "cost": 10
+        },
+        {
+          "name": "Scarred Hide",
+          "value": 2,
+          "cost": 3
+        },
+        {
+          "name": "Snakeskin",
+          "value": 2,
+          "cost": 4
+        },
+        {
+          "name": "Iron Draw",
+          "value": 1.96,
+          "cost": 3
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 9
+        },
+        {
+          "name": "Four Winds",
+          "value": 1.6,
+          "cost": 3
+        },
+        {
+          "name": "Rapid Fire",
+          "value": 1.56,
+          "cost": 5
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        }
+      ],
+      "plan": [
+        2, 151, 154, 155, 156, 158, 203, 204, 205, 206, 207, 211, 212, 213, 215, 219, 220, 221, 223,
+        224, 225, 226, 227, 228, 229, 230, 235, 236, 237, 244, 245, 246, 247, 254, 255, 256, 265,
+        283, 288, 289, 290, 414, 415, 423, 424, 468, 469, 471, 477, 480, 481, 482, 483, 484, 561,
+        574, 575, 576, 637, 638, 639
+      ]
+    },
+    {
+      "id": "bow-poison",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 16,
+        "p90": 13
+      },
+      "reach": 0.6873237773283534,
+      "reachAt": {
+        "12": 0.8826621352092798,
+        "15": 0.785601138685461,
+        "18": 0.6873237773283534,
+        "21": 0.6319561322547365,
+        "24": 0.5752551335590202
+      },
+      "choice": 3,
+      "searchGain": 0,
+      "nearScores": [1, 0.9882159221076747, 0.9622422680412371],
+      "tax": {
+        "points": 34,
+        "share": 0.2833333333333333,
+        "road": 27
+      },
+      "attrs": {
+        "str": 106,
+        "dex": 299,
+        "int": 59
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 161,
+            "lifeFlat": 20
+          },
+          "units": 33.2,
+          "takenWithin": 33.2,
+          "withinUnits": 56.2
+        },
+        {
+          "label": "poison",
+          "plan": {
+            "chaosAttack": 48,
+            "poisonChance": 20,
+            "poisonDamage": 60
+          },
+          "units": 11,
+          "takenWithin": 11,
+          "withinUnits": 16.333333333333332
+        },
+        {
+          "label": "bow damage",
+          "plan": {
+            "bowDamage": 98,
+            "projectileDamage": 40
+          },
+          "units": 13.799999999999999,
+          "takenWithin": 13.799999999999999,
+          "withinUnits": 26.200000000000003
+        }
+      ],
+      "pair": {
+        "labels": ["poison", "life"],
+        "units": [11, 33.2],
+        "within": [16.333333333333332, 56.2]
+      },
+      "taken": [
+        "Hawk's Eye",
+        "Long Breath",
+        "Wayfarer",
+        "Quick Hands",
+        "Soft Step",
+        "Hard Target",
+        "Weaving",
+        "Wanderer",
+        "Light Hand",
+        "Sidestep",
+        "Weathered",
+        "Fleet Foot",
+        "Longbow",
+        "True Aim",
+        "Keen Instinct",
+        "Venom Fletching",
+        "Iron Draw",
+        "Buckler",
+        "Quickened Steel",
+        "Snakeskin",
+        "Fighting Breath",
+        "Ricochet",
+        "Stout Heart",
+        "Rapid Fire",
+        "Thick Blood",
+        "Heavy Draw",
+        "Scarred Hide",
+        "Four Winds",
+        "Barbed Point",
+        "Veiled Herald"
+      ],
+      "gaveUp": [
+        {
+          "name": "Second Wind",
+          "value": 2.6,
+          "cost": 12
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 11
+        },
+        {
+          "name": "Stone Heart",
+          "value": 2.4,
+          "cost": 13
+        },
+        {
+          "name": "Guarded",
+          "value": 2.333333333333333,
+          "cost": 6
+        },
+        {
+          "name": "Festering",
+          "value": 2.333333333333333,
+          "cost": 8
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 7
+        }
+      ],
+      "plan": [
+        2, 151, 154, 155, 156, 157, 158, 167, 168, 171, 172, 173, 203, 204, 205, 206, 207, 211, 212,
+        213, 215, 219, 220, 221, 223, 224, 225, 226, 227, 228, 229, 230, 231, 235, 236, 237, 244,
+        245, 246, 247, 254, 255, 256, 258, 265, 268, 280, 281, 282, 283, 288, 289, 290, 296, 297,
+        409, 410, 414, 415, 423, 424, 425, 467, 468, 469, 470, 471, 472, 473, 474, 477, 478, 480,
+        481, 482, 483, 484, 491, 492, 495, 561, 574, 575, 576, 614, 615, 616, 629, 630, 631, 633,
+        637, 638, 639, 640, 641, 642, 647, 648, 657, 660, 661, 662, 663, 664, 665, 666, 667, 684,
+        685, 696, 849, 850, 851, 852, 950, 951, 952, 953, 954, 1023
+      ]
+    },
+    {
+      "id": "caster-life",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 21,
+        "p90": 17
+      },
+      "reach": 0.3399611259088618,
+      "reachAt": {
+        "12": 0.5818642993024733,
+        "15": 0.4499589768687116,
+        "18": 0.3399611259088618,
+        "21": 0.3062563247812368,
+        "24": 0.2745855704877084
+      },
+      "choice": 4,
+      "searchGain": 0.019620278251218926,
+      "nearScores": [1, 0.9807572694759756, 0.978541439900482, 0.9598818224226405],
+      "tax": {
+        "points": 25,
+        "share": 0.4166666666666667,
+        "road": 23
+      },
+      "attrs": {
+        "str": 0,
+        "dex": 89,
+        "int": 196
+      },
+      "families": [
+        {
+          "label": "spell damage",
+          "plan": {
+            "spellDamage": 86,
+            "spellProjectile": 50
+          },
+          "units": 15.75,
+          "takenWithin": 15.75,
+          "withinUnits": 16.75
+        },
+        {
+          "label": "elemental damage",
+          "plan": {
+            "eleDamage:lightning": 58,
+            "eleDamage:fire": 44
+          },
+          "units": 10.200000000000001,
+          "takenWithin": 9,
+          "withinUnits": 21.200000000000003
+        },
+        {
+          "label": "life",
+          "plan": {
+            "life": 42
+          },
+          "units": 8.4,
+          "takenWithin": 8.4,
+          "withinUnits": 51.800000000000004
+        },
+        {
+          "label": "spell crit",
+          "plan": {
+            "spellCrit": 85,
+            "spellCritMulti": 15
+          },
+          "units": 6.916666666666667,
+          "takenWithin": 6.916666666666667,
+          "withinUnits": 6.916666666666667
+        }
+      ],
+      "pair": {
+        "labels": ["spell damage", "life"],
+        "units": [15.75, 8.4],
+        "within": [16.75, 51.800000000000004]
+      },
+      "taken": [
+        "First Light",
+        "Sharp Mind",
+        "Warm Blood",
+        "Shelter",
+        "Arcane Focus",
+        "Darting Bolts",
+        "Hedge Magic",
+        "Quiet Knife",
+        "Long Breath",
+        "Thunderhead",
+        "Flashpoint",
+        "Overcharge"
+      ],
+      "gaveUp": [
+        {
+          "name": "Hearthfire",
+          "value": 3.45,
+          "cost": 11
+        },
+        {
+          "name": "Thick Blood",
+          "value": 3,
+          "cost": 3
+        },
+        {
+          "name": "Quiet Pulse",
+          "value": 2.6,
+          "cost": 5
+        },
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 11
+        },
+        {
+          "name": "Second Wind",
+          "value": 2.6,
+          "cost": 14
+        },
+        {
+          "name": "Stone Heart",
+          "value": 2.4,
+          "cost": 15
+        },
+        {
+          "name": "Elemental Ward",
+          "value": 2,
+          "cost": 15
+        },
+        {
+          "name": "Clear Head",
+          "value": 1.3875,
+          "cost": 4
+        },
+        {
+          "name": "Deep Well",
+          "value": 1.35,
+          "cost": 5
+        },
+        {
+          "name": "Vital Aim",
+          "value": 1.25,
+          "cost": 6
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 5
+        },
+        {
+          "name": "Snakeskin",
+          "value": 1,
+          "cost": 6
+        },
+        {
+          "name": "Litany",
+          "value": 1,
+          "cost": 13
+        },
+        {
+          "name": "Frugal",
+          "value": 0.8999999999999999,
+          "cost": 2
+        },
+        {
+          "name": "Hymn",
+          "value": 0.8999999999999999,
+          "cost": 8
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 2
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 6
+        },
+        {
+          "name": "Vigil",
+          "value": 0.8,
+          "cost": 12
+        },
+        {
+          "name": "Warded Mind",
+          "value": 0.76875,
+          "cost": 1
+        },
+        {
+          "name": "Still Mind",
+          "value": 0.6,
+          "cost": 3
+        },
+        {
+          "name": "Mana Tap",
+          "value": 0.6,
+          "cost": 7
+        }
+      ],
+      "plan": [
+        0, 7, 8, 9, 10, 11, 203, 205, 212, 213, 328, 329, 330, 346, 351, 352, 353, 354, 355, 370,
+        389, 390, 391, 392, 393, 503, 504, 506, 510, 511, 512, 516, 517, 518, 587, 588, 611, 612,
+        632, 643, 644, 815, 816, 817, 818, 819, 820, 821, 822, 861, 862, 863, 871, 872, 875, 876,
+        877, 885, 886, 887, 947
+      ]
+    },
+    {
+      "id": "caster-life",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 21,
+        "p90": 18
+      },
+      "reach": 0.6505046432942192,
+      "reachAt": {
+        "12": 0.7705770450221944,
+        "15": 0.7823183107106358,
+        "18": 0.6505046432942192,
+        "21": 0.5927590928031428,
+        "24": 0.5314603503303691
+      },
+      "choice": 7,
+      "searchGain": 0,
+      "nearScores": [
+        1, 0.9875875698952375, 0.9752353943055464, 0.9617624847355227, 0.9591715405874413,
+        0.9578820939649078, 0.9516397262034835
+      ],
+      "tax": {
+        "points": 44,
+        "share": 0.36666666666666664,
+        "road": 33
+      },
+      "attrs": {
+        "str": 41,
+        "dex": 96,
+        "int": 258
+      },
+      "families": [
+        {
+          "label": "spell damage",
+          "plan": {
+            "spellDamage": 118,
+            "spellProjectile": 50
+          },
+          "units": 19.75,
+          "takenWithin": 15.75,
+          "withinUnits": 16.75
+        },
+        {
+          "label": "elemental damage",
+          "plan": {
+            "eleDamage:lightning": 58,
+            "eleDamageAll": 30,
+            "eleDamage:fire": 84
+          },
+          "units": 17.2,
+          "takenWithin": 15,
+          "withinUnits": 21.200000000000003
+        },
+        {
+          "label": "life",
+          "plan": {
+            "life": 172,
+            "lifeFlat": 20
+          },
+          "units": 35.4,
+          "takenWithin": 35.4,
+          "withinUnits": 51.800000000000004
+        },
+        {
+          "label": "spell crit",
+          "plan": {
+            "spellCrit": 85,
+            "spellCritMulti": 15
+          },
+          "units": 6.916666666666667,
+          "takenWithin": 6.916666666666667,
+          "withinUnits": 6.916666666666667
+        }
+      ],
+      "pair": {
+        "labels": ["spell damage", "life"],
+        "units": [19.75, 35.4],
+        "within": [16.75, 51.800000000000004]
+      },
+      "taken": [
+        "First Light",
+        "Sharp Mind",
+        "Warm Blood",
+        "Shelter",
+        "Arcane Focus",
+        "Zeal",
+        "Darting Bolts",
+        "Siphon",
+        "Hedge Magic",
+        "Quiet Pulse",
+        "Hearthfire",
+        "Quiet Knife",
+        "Thick Blood",
+        "Vigil",
+        "Choirmaster",
+        "Long Breath",
+        "Litany",
+        "Thunderhead",
+        "Second Wind",
+        "Clear Head",
+        "Elemental Ward",
+        "Stone Heart",
+        "Flashpoint",
+        "Hard Target",
+        "Overcharge",
+        "Homily"
+      ],
+      "gaveUp": [
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 11
+        },
+        {
+          "name": "Deep Well",
+          "value": 1.35,
+          "cost": 3
+        },
+        {
+          "name": "Vital Aim",
+          "value": 1.25,
+          "cost": 6
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Snakeskin",
+          "value": 1,
+          "cost": 5
+        },
+        {
+          "name": "Frugal",
+          "value": 0.8999999999999999,
+          "cost": 1
+        },
+        {
+          "name": "Hymn",
+          "value": 0.8999999999999999,
+          "cost": 3
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 2
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 6
+        },
+        {
+          "name": "Warded Mind",
+          "value": 0.76875,
+          "cost": 1
+        },
+        {
+          "name": "Mana Tap",
+          "value": 0.6,
+          "cost": 2
+        },
+        {
+          "name": "Still Mind",
+          "value": 0.6,
+          "cost": 3
+        }
+      ],
+      "plan": [
+        0, 7, 8, 9, 10, 11, 39, 44, 45, 46, 47, 48, 66, 203, 205, 211, 212, 213, 215, 223, 224, 225,
+        328, 329, 330, 346, 347, 351, 352, 353, 354, 355, 370, 389, 390, 391, 398, 406, 452, 454,
+        456, 503, 504, 506, 510, 511, 512, 516, 517, 518, 519, 520, 538, 539, 540, 541, 587, 588,
+        611, 612, 613, 632, 643, 644, 648, 662, 663, 710, 711, 719, 720, 721, 727, 728, 730, 731,
+        732, 733, 734, 735, 737, 739, 766, 767, 768, 771, 778, 779, 780, 783, 805, 815, 816, 817,
+        818, 819, 820, 821, 822, 861, 862, 863, 871, 872, 875, 876, 877, 885, 886, 887, 941, 942,
+        943, 944, 947, 956, 963, 966, 1010, 1011, 1039
+      ]
+    },
+    {
+      "id": "summoner",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 25,
+        "p90": 20
+      },
+      "reach": 0.4358064945167004,
+      "reachAt": {
+        "12": 0.6515384882630196,
+        "15": 0.5858833398244406,
+        "18": 0.4358064945167004,
+        "21": 0.3966206937727631,
+        "24": 0.36515202635954447
+      },
+      "choice": 3,
+      "searchGain": 0,
+      "nearScores": [1, 0.9974868649425515, 0.9622637064029969],
+      "tax": {
+        "points": 23,
+        "share": 0.38333333333333336,
+        "road": 15
+      },
+      "attrs": {
+        "str": 36,
+        "dex": 0,
+        "int": 132
+      },
+      "families": [
+        {
+          "label": "minions",
+          "plan": {
+            "minionDamage": 60,
+            "minionLife": 84,
+            "minionSpeed": 5
+          },
+          "units": 13,
+          "takenWithin": 10,
+          "withinUnits": 11
+        },
+        {
+          "label": "energy shield",
+          "plan": {
+            "es": 100,
+            "esFlat": 15
+          },
+          "units": 21.000000000000004,
+          "takenWithin": 19.000000000000004,
+          "withinUnits": 30.200000000000006
+        },
+        {
+          "label": "life",
+          "plan": {
+            "life": 42
+          },
+          "units": 8.4,
+          "takenWithin": 8.4,
+          "withinUnits": 51.800000000000004
+        }
+      ],
+      "pair": {
+        "labels": ["minions", "energy shield"],
+        "units": [13, 21.000000000000004],
+        "within": [11, 30.200000000000006]
+      },
+      "taken": [
+        "First Light",
+        "Warm Blood",
+        "Glass Skin",
+        "Warded Mind",
+        "Quickening",
+        "Quiet Pulse",
+        "Devotion",
+        "Choirmaster",
+        "Shepherd",
+        "Vigil",
+        "Litany",
+        "Familiars",
+        "Glass Wall",
+        "Volatile Servants"
+      ],
+      "gaveUp": [
+        {
+          "name": "Thick Blood",
+          "value": 2.2,
+          "cost": 4
+        },
+        {
+          "name": "Elemental Ward",
+          "value": 1.6,
+          "cost": 9
+        },
+        {
+          "name": "Stone Heart",
+          "value": 1.44,
+          "cost": 13
+        },
+        {
+          "name": "Shelter",
+          "value": 1.4,
+          "cost": 4
+        },
+        {
+          "name": "Long Breath",
+          "value": 1.2,
+          "cost": 14
+        },
+        {
+          "name": "Snakeskin",
+          "value": 1,
+          "cost": 8
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 18
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 5
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 16
+        },
+        {
+          "name": "Hearthfire",
+          "value": 0.75,
+          "cost": 2
+        }
+      ],
+      "plan": [
+        0, 314, 317, 318, 319, 320, 321, 323, 328, 331, 332, 333, 337, 342, 343, 502, 503, 505, 513,
+        514, 515, 517, 518, 538, 539, 540, 541, 542, 626, 627, 628, 735, 737, 741, 766, 767, 768,
+        769, 770, 781, 782, 784, 785, 786, 787, 795, 796, 802, 803, 808, 809, 810, 875, 876, 877,
+        958, 963, 964, 965, 968, 1010
+      ]
+    },
+    {
+      "id": "summoner",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 30,
+        "p90": 24
+      },
+      "reach": 0.6334954880157354,
+      "reachAt": {
+        "12": 0.7446468483283345,
+        "15": 0.7631205248809134,
+        "18": 0.6334954880157354,
+        "21": 0.6200229688866419,
+        "24": 0.5847642322387684
+      },
+      "choice": 5,
+      "searchGain": 0,
+      "nearScores": [
+        1, 0.9828884168803699, 0.9804294869736353, 0.9622444157977074, 0.9549272643028526
+      ],
+      "tax": {
+        "points": 47,
+        "share": 0.39166666666666666,
+        "road": 29
+      },
+      "attrs": {
+        "str": 76,
+        "dex": 48,
+        "int": 227
+      },
+      "families": [
+        {
+          "label": "minions",
+          "plan": {
+            "minionDamage": 148,
+            "minionLife": 84,
+            "minionSpeed": 11
+          },
+          "units": 21.533333333333335,
+          "takenWithin": 11,
+          "withinUnits": 11
+        },
+        {
+          "label": "energy shield",
+          "plan": {
+            "es": 189,
+            "esFlat": 15
+          },
+          "units": 38.80000000000001,
+          "takenWithin": 28.200000000000006,
+          "withinUnits": 30.200000000000006
+        },
+        {
+          "label": "life",
+          "plan": {
+            "life": 97,
+            "lifeFlat": 20
+          },
+          "units": 20.4,
+          "takenWithin": 19.4,
+          "withinUnits": 51.800000000000004
+        }
+      ],
+      "pair": {
+        "labels": ["minions", "energy shield"],
+        "units": [21.533333333333335, 38.80000000000001],
+        "within": [11, 30.200000000000006]
+      },
+      "taken": [
+        "First Light",
+        "Warm Blood",
+        "Glass Skin",
+        "Warded Mind",
+        "Arcane Focus",
+        "Quickening",
+        "Zeal",
+        "Quiet Pulse",
+        "Devotion",
+        "Thick Blood",
+        "Hearthfire",
+        "Choirmaster",
+        "Shepherd",
+        "Vigil",
+        "Iron Faith",
+        "Litany",
+        "Snakeskin",
+        "Hoarfrost",
+        "Familiars",
+        "Shroud",
+        "Black Flock",
+        "Glass Wall",
+        "Tomb Dust",
+        "Reliquary",
+        "Volatile Servants",
+        "Consecrated Plate",
+        "Ossuary"
+      ],
+      "gaveUp": [
+        {
+          "name": "Elemental Ward",
+          "value": 1.6,
+          "cost": 5
+        },
+        {
+          "name": "Stone Heart",
+          "value": 1.44,
+          "cost": 9
+        },
+        {
+          "name": "Shelter",
+          "value": 1.4,
+          "cost": 4
+        },
+        {
+          "name": "Long Breath",
+          "value": 1.2,
+          "cost": 8
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 13
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 5
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 13
+        }
+      ],
+      "plan": [
+        0, 314, 317, 318, 319, 320, 321, 322, 323, 328, 330, 331, 332, 333, 337, 342, 343, 360, 502,
+        503, 505, 513, 514, 515, 517, 518, 538, 539, 540, 541, 542, 626, 627, 628, 657, 658, 660,
+        662, 663, 664, 665, 668, 669, 670, 677, 681, 682, 684, 685, 688, 689, 690, 696, 697, 698,
+        700, 710, 719, 720, 721, 727, 729, 730, 731, 732, 735, 737, 739, 741, 766, 767, 768, 769,
+        770, 771, 772, 773, 778, 781, 782, 784, 785, 786, 787, 788, 789, 790, 795, 796, 802, 803,
+        808, 809, 810, 812, 813, 875, 876, 877, 955, 956, 958, 963, 964, 965, 968, 972, 973, 974,
+        975, 981, 982, 1001, 1002, 1003, 1010, 1024, 1026, 1080, 1081, 1082
+      ]
+    },
+    {
+      "id": "wand-attack",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 19,
+        "p90": 14
+      },
+      "reach": 0.44040345333691394,
+      "reachAt": {
+        "12": 0.8025976651336737,
+        "15": 0.6157554598534553,
+        "18": 0.44040345333691394,
+        "21": 0.3628139807786578,
+        "24": 0.3184277426504143
+      },
+      "choice": 2,
+      "searchGain": 0,
+      "nearScores": [1, 0.9609416581371545],
+      "tax": {
+        "points": 23,
+        "share": 0.38333333333333336,
+        "road": 12
+      },
+      "attrs": {
+        "str": 0,
+        "dex": 34,
+        "int": 123
+      },
+      "families": [
+        {
+          "label": "wand damage",
+          "plan": {
+            "wandAttack": 92
+          },
+          "units": 7.666666666666667,
+          "takenWithin": 7.666666666666667,
+          "withinUnits": 7.666666666666667
+        },
+        {
+          "label": "energy shield",
+          "plan": {
+            "es": 120
+          },
+          "units": 24.000000000000004,
+          "takenWithin": 23.000000000000004,
+          "withinUnits": 30.200000000000006
+        },
+        {
+          "label": "attack speed",
+          "plan": {
+            "weaponSpeed:wand": 5,
+            "attackSpeed": 15
+          },
+          "units": 6.666666666666667,
+          "takenWithin": 6.666666666666667,
+          "withinUnits": 18
+        }
+      ],
+      "pair": {
+        "labels": ["wand damage", "energy shield"],
+        "units": [7.666666666666667, 24.000000000000004],
+        "within": [7.666666666666667, 30.200000000000006]
+      },
+      "taken": [
+        "First Light",
+        "Deft Wand",
+        "Warm Blood",
+        "Glass Skin",
+        "Warded Mind",
+        "Quickening",
+        "Keen Instinct",
+        "Flashes of Insight",
+        "Wand Volley",
+        "Quiet Pulse",
+        "Thick Blood",
+        "Devotion",
+        "Shroud"
+      ],
+      "gaveUp": [
+        {
+          "name": "Vital Aim",
+          "value": 2.1,
+          "cost": 11
+        },
+        {
+          "name": "Litany",
+          "value": 2,
+          "cost": 11
+        },
+        {
+          "name": "Hawk's Eye",
+          "value": 1.92,
+          "cost": 7
+        },
+        {
+          "name": "Quickened Steel",
+          "value": 1.6666666666666665,
+          "cost": 13
+        },
+        {
+          "name": "Quick Hands",
+          "value": 1.6,
+          "cost": 11
+        },
+        {
+          "name": "Vigil",
+          "value": 1.5,
+          "cost": 8
+        },
+        {
+          "name": "Elemental Ward",
+          "value": 1.5,
+          "cost": 14
+        },
+        {
+          "name": "Light Hand",
+          "value": 1.3333333333333335,
+          "cost": 7
+        },
+        {
+          "name": "Shelter",
+          "value": 1.3,
+          "cost": 4
+        },
+        {
+          "name": "Elemental Fletching",
+          "value": 1.2,
+          "cost": 9
+        },
+        {
+          "name": "Stone Heart",
+          "value": 1.2,
+          "cost": 15
+        },
+        {
+          "name": "Snakeskin",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Long Breath",
+          "value": 1,
+          "cost": 8
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 12
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 2
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 11
+        }
+      ],
+      "plan": [
+        0, 314, 317, 318, 319, 320, 321, 323, 331, 332, 333, 337, 340, 342, 343, 346, 351, 354, 502,
+        503, 504, 505, 513, 514, 515, 538, 539, 540, 620, 622, 623, 624, 625, 630, 631, 640, 641,
+        642, 647, 648, 650, 662, 663, 664, 665, 669, 670, 696, 697, 807, 808, 809, 810, 875, 876,
+        945, 946, 1024, 1077, 1078, 1079
+      ]
+    },
+    {
+      "id": "wand-attack",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 23,
+        "p90": 19
+      },
+      "reach": 0.6606621961133411,
+      "reachAt": {
+        "12": 0.8732501137110226,
+        "15": 0.7816605834423205,
+        "18": 0.6606621961133411,
+        "21": 0.5859538628362627,
+        "24": 0.5443061078156579
+      },
+      "choice": 5,
+      "searchGain": 0,
+      "nearScores": [
+        1, 0.9960240473282077, 0.9816914564920602, 0.9734138104476544, 0.9583243515125389
+      ],
+      "tax": {
+        "points": 39,
+        "share": 0.325,
+        "road": 23
+      },
+      "attrs": {
+        "str": 0,
+        "dex": 200,
+        "int": 168
+      },
+      "families": [
+        {
+          "label": "wand damage",
+          "plan": {
+            "wandAttack": 92
+          },
+          "units": 7.666666666666667,
+          "takenWithin": 7.666666666666667,
+          "withinUnits": 7.666666666666667
+        },
+        {
+          "label": "energy shield",
+          "plan": {
+            "es": 130
+          },
+          "units": 26.000000000000004,
+          "takenWithin": 23.000000000000004,
+          "withinUnits": 30.200000000000006
+        },
+        {
+          "label": "attack speed",
+          "plan": {
+            "attackSpeed": 50,
+            "weaponSpeed:wand": 5
+          },
+          "units": 18.333333333333332,
+          "takenWithin": 13.999999999999998,
+          "withinUnits": 18
+        }
+      ],
+      "pair": {
+        "labels": ["wand damage", "energy shield"],
+        "units": [7.666666666666667, 26.000000000000004],
+        "within": [7.666666666666667, 30.200000000000006]
+      },
+      "taken": [
+        "First Light",
+        "Deft Wand",
+        "Warm Blood",
+        "Glass Skin",
+        "Warded Mind",
+        "Quickening",
+        "Keen Instinct",
+        "Flashes of Insight",
+        "Prism Ward",
+        "Wand Volley",
+        "Quiet Pulse",
+        "Thick Blood",
+        "Devotion",
+        "Hawk's Eye",
+        "Long Breath",
+        "Elemental Fletching",
+        "Snakeskin",
+        "Vital Aim",
+        "Light Hand",
+        "Quick Hands",
+        "Shroud",
+        "Hard Target",
+        "Weathered",
+        "True Aim",
+        "Fleet Foot",
+        "Far Flight",
+        "Quiet Shot"
+      ],
+      "gaveUp": [
+        {
+          "name": "Litany",
+          "value": 2,
+          "cost": 11
+        },
+        {
+          "name": "Quickened Steel",
+          "value": 1.6666666666666665,
+          "cost": 7
+        },
+        {
+          "name": "Vigil",
+          "value": 1.5,
+          "cost": 8
+        },
+        {
+          "name": "Elemental Ward",
+          "value": 1.5,
+          "cost": 14
+        },
+        {
+          "name": "Shelter",
+          "value": 1.3,
+          "cost": 4
+        },
+        {
+          "name": "Stone Heart",
+          "value": 1.2,
+          "cost": 15
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 3
+        }
+      ],
+      "plan": [
+        0, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 219, 220, 223, 224, 225,
+        226, 227, 228, 229, 241, 242, 243, 258, 259, 260, 261, 314, 317, 318, 319, 320, 321, 322,
+        323, 331, 332, 333, 337, 340, 342, 343, 346, 351, 354, 400, 401, 402, 403, 407, 408, 412,
+        413, 414, 418, 425, 502, 503, 504, 505, 513, 514, 515, 529, 532, 538, 539, 540, 611, 620,
+        622, 623, 624, 625, 630, 631, 633, 640, 641, 642, 647, 648, 650, 657, 660, 662, 663, 664,
+        665, 668, 669, 670, 677, 678, 679, 681, 682, 684, 685, 696, 697, 807, 808, 809, 810, 854,
+        872, 875, 876, 877, 945, 946, 947, 1024, 1077, 1078, 1079, 1121
+      ]
+    },
+    {
+      "id": "axe-bleed",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 19,
+        "p90": 15
+      },
+      "reach": 0.36235690301804535,
+      "reachAt": {
+        "12": 0.5310585421777345,
+        "15": 0.4238824823764315,
+        "18": 0.36235690301804535,
+        "21": 0.30905363676466757,
+        "24": 0.2804175020511064
+      },
+      "choice": 3,
+      "searchGain": 0.04990845595714388,
+      "nearScores": [1, 0.969217851837499, 0.9524639927662597],
+      "tax": {
+        "points": 19,
+        "share": 0.31666666666666665,
+        "road": 14
+      },
+      "attrs": {
+        "str": 165,
+        "dex": 67,
+        "int": 0
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 114
+          },
+          "units": 22.799999999999997,
+          "takenWithin": 22.799999999999997,
+          "withinUnits": 51.2
+        },
+        {
+          "label": "bleed",
+          "plan": {
+            "bleedChance": 30,
+            "bleedDamage": 102
+          },
+          "units": 11.5,
+          "takenWithin": 11.5,
+          "withinUnits": 26.583333333333332
+        },
+        {
+          "label": "axe damage",
+          "plan": {
+            "axeDamage": 32,
+            "meleePhys": 40
+          },
+          "units": 6.666666666666667,
+          "takenWithin": 6.666666666666667,
+          "withinUnits": 11
+        }
+      ],
+      "pair": {
+        "labels": ["bleed", "life"],
+        "units": [11.5, 22.799999999999997],
+        "within": [26.583333333333332, 51.2]
+      },
+      "taken": [
+        "Quickened Steel",
+        "Stout Heart",
+        "Keen Edge",
+        "Scarred Hide",
+        "Guarded",
+        "Hewing",
+        "Oathbound",
+        "Quartermaster",
+        "Open Veins",
+        "Second Wind",
+        "Stone Heart",
+        "Mortar and Stone",
+        "Elemental Ward",
+        "Wound Dance"
+      ],
+      "gaveUp": [
+        {
+          "name": "Barbed Arrows",
+          "value": 4.8,
+          "cost": 16
+        },
+        {
+          "name": "Deep Cuts",
+          "value": 4.26,
+          "cost": 13
+        },
+        {
+          "name": "Long Breath",
+          "value": 2.8,
+          "cost": 11
+        },
+        {
+          "name": "Iron Draw",
+          "value": 1.96,
+          "cost": 3
+        },
+        {
+          "name": "True Aim",
+          "value": 1.9333333333333336,
+          "cost": 14
+        },
+        {
+          "name": "Hawk's Eye",
+          "value": 1.92,
+          "cost": 8
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 9
+        },
+        {
+          "name": "Red Harvest",
+          "value": 1.7999999999999998,
+          "cost": 2
+        },
+        {
+          "name": "Hatchet Work",
+          "value": 1.7333333333333334,
+          "cost": 13
+        },
+        {
+          "name": "Four Winds",
+          "value": 1.6,
+          "cost": 2
+        },
+        {
+          "name": "Quick Hands",
+          "value": 1.6,
+          "cost": 12
+        },
+        {
+          "name": "Vampiric Strikes",
+          "value": 1.45,
+          "cost": 6
+        },
+        {
+          "name": "Light Hand",
+          "value": 1.3333333333333335,
+          "cost": 13
+        },
+        {
+          "name": "Thirsty Quiver",
+          "value": 1.3,
+          "cost": 11
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 11
+        },
+        {
+          "name": "Snakeskin",
+          "value": 1,
+          "cost": 15
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 9
+        }
+      ],
+      "plan": [
+        3, 39, 40, 41, 42, 44, 45, 46, 47, 48, 90, 91, 135, 136, 137, 139, 140, 141, 167, 168, 171,
+        172, 173, 182, 183, 184, 185, 186, 191, 192, 193, 194, 195, 434, 435, 436, 437, 438, 444,
+        445, 446, 450, 452, 454, 467, 468, 469, 470, 472, 473, 474, 478, 479, 482, 483, 484, 841,
+        842, 843, 888, 907
+      ]
+    },
+    {
+      "id": "axe-bleed",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 22,
+        "p90": 18
+      },
+      "reach": 0.6188809472382034,
+      "reachAt": {
+        "12": 0.687171016136389,
+        "15": 0.640825557230757,
+        "18": 0.6188809472382034,
+        "21": 0.5941582614909542,
+        "24": 0.5434517632271462
+      },
+      "choice": 8,
+      "searchGain": 0,
+      "nearScores": [
+        1, 0.9821903473282187, 0.9806906572641653, 0.9707460458171978, 0.9677599962674379,
+        0.9562157154188133, 0.9535495997493851, 0.9529630543021108
+      ],
+      "tax": {
+        "points": 41,
+        "share": 0.3416666666666667,
+        "road": 29
+      },
+      "attrs": {
+        "str": 234,
+        "dex": 173,
+        "int": 0
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 188
+          },
+          "units": 37.6,
+          "takenWithin": 33.6,
+          "withinUnits": 51.2
+        },
+        {
+          "label": "bleed",
+          "plan": {
+            "bleedChance": 65,
+            "bleedDamage": 186
+          },
+          "units": 22,
+          "takenWithin": 22,
+          "withinUnits": 26.583333333333332
+        },
+        {
+          "label": "axe damage",
+          "plan": {
+            "axeDamage": 92,
+            "meleePhys": 40
+          },
+          "units": 11.666666666666668,
+          "takenWithin": 6.666666666666667,
+          "withinUnits": 11
+        }
+      ],
+      "pair": {
+        "labels": ["bleed", "life"],
+        "units": [22, 37.6],
+        "within": [26.583333333333332, 51.2]
+      },
+      "taken": [
+        "Quickened Steel",
+        "Stout Heart",
+        "Keen Edge",
+        "Scarred Hide",
+        "Guarded",
+        "Hawk's Eye",
+        "Hewing",
+        "Oathbound",
+        "Quartermaster",
+        "Long Breath",
+        "Open Veins",
+        "Red Harvest",
+        "Quick Hands",
+        "Second Wind",
+        "Thirsty Quiver",
+        "Hard Target",
+        "Stone Heart",
+        "Sentry Post",
+        "True Aim",
+        "Thick Skin",
+        "Mortar and Stone",
+        "Elemental Ward",
+        "Deep Cuts",
+        "Barbed Arrows",
+        "Wound Dance",
+        "Steady Hands",
+        "Heavy Draw",
+        "Cleaver",
+        "Broad Back"
+      ],
+      "gaveUp": [
+        {
+          "name": "Iron Draw",
+          "value": 1.96,
+          "cost": 3
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 9
+        },
+        {
+          "name": "Hatchet Work",
+          "value": 1.7333333333333334,
+          "cost": 4
+        },
+        {
+          "name": "Four Winds",
+          "value": 1.6,
+          "cost": 2
+        },
+        {
+          "name": "Vampiric Strikes",
+          "value": 1.45,
+          "cost": 6
+        },
+        {
+          "name": "Light Hand",
+          "value": 1.3333333333333335,
+          "cost": 3
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Snakeskin",
+          "value": 1,
+          "cost": 8
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 5
+        }
+      ],
+      "plan": [
+        3, 39, 40, 41, 42, 43, 44, 45, 47, 48, 49, 50, 51, 58, 59, 74, 75, 76, 77, 78, 79, 84, 90,
+        91, 135, 136, 137, 139, 140, 141, 167, 168, 171, 172, 173, 182, 183, 184, 185, 186, 187,
+        188, 189, 191, 192, 193, 194, 195, 198, 206, 211, 213, 214, 215, 219, 220, 223, 224, 225,
+        226, 227, 228, 257, 258, 259, 263, 264, 268, 271, 272, 277, 278, 279, 291, 296, 297, 298,
+        304, 305, 306, 434, 435, 436, 437, 438, 444, 445, 446, 447, 448, 450, 452, 454, 467, 468,
+        469, 470, 472, 473, 474, 478, 479, 482, 483, 484, 585, 617, 618, 619, 825, 826, 841, 842,
+        843, 856, 888, 891, 897, 907, 1039, 1046
+      ]
+    },
+    {
+      "id": "dual-wield",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 19,
+        "p90": 15
+      },
+      "reach": 0.4156929476271506,
+      "reachAt": {
+        "12": 0.5681364352935558,
+        "15": 0.46737290510621615,
+        "18": 0.4156929476271506,
+        "21": 0.368456889098326,
+        "24": 0.33346043265573116
+      },
+      "choice": 2,
+      "searchGain": 0,
+      "nearScores": [1, 0.9784964883378132],
+      "tax": {
+        "points": 13,
+        "share": 0.21666666666666667,
+        "road": 11
+      },
+      "attrs": {
+        "str": 69,
+        "dex": 154,
+        "int": 10
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 116
+          },
+          "units": 23.2,
+          "takenWithin": 21.6,
+          "withinUnits": 51.2
+        },
+        {
+          "label": "dual wield",
+          "plan": {
+            "oneHandMelee": 95,
+            "dualDamage": 30,
+            "dualSpeed": 3
+          },
+          "units": 13.5,
+          "takenWithin": 13.5,
+          "withinUnits": 18
+        },
+        {
+          "label": "evasion",
+          "plan": {
+            "evasion": 178
+          },
+          "units": 14.833333333333336,
+          "takenWithin": 14.833333333333336,
+          "withinUnits": 30.16666666666666
+        }
+      ],
+      "pair": {
+        "labels": ["dual wield", "life"],
+        "units": [13.5, 23.2],
+        "within": [18, 51.2]
+      },
+      "taken": [
+        "Quickened Steel",
+        "Buckler",
+        "Fighting Breath",
+        "Killing Pace",
+        "Weaving",
+        "Twin Fangs",
+        "Light Blades",
+        "Scarred Hide",
+        "Hawk's Eye",
+        "Wayfarer",
+        "Long Breath",
+        "Quick Hands",
+        "Light Hand",
+        "Hard Target",
+        "Wanderer",
+        "Fleet Foot",
+        "True Aim",
+        "Heavy Draw"
+      ],
+      "gaveUp": [
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 3
+        },
+        {
+          "name": "Oathbound",
+          "value": 2.6,
+          "cost": 9
+        },
+        {
+          "name": "Second Wind",
+          "value": 2.6,
+          "cost": 13
+        },
+        {
+          "name": "Fleet Blade",
+          "value": 2.4,
+          "cost": 6
+        },
+        {
+          "name": "Stone Heart",
+          "value": 2.4,
+          "cost": 14
+        },
+        {
+          "name": "Guarded",
+          "value": 2.333333333333333,
+          "cost": 7
+        },
+        {
+          "name": "Keen Edge",
+          "value": 2.2800000000000002,
+          "cost": 5
+        },
+        {
+          "name": "Crossed Blades",
+          "value": 2.25,
+          "cost": 5
+        },
+        {
+          "name": "Iron Draw",
+          "value": 2.2,
+          "cost": 3
+        },
+        {
+          "name": "Snakeskin",
+          "value": 2,
+          "cost": 6
+        },
+        {
+          "name": "Elemental Ward",
+          "value": 2,
+          "cost": 15
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 10
+        },
+        {
+          "name": "Red Harvest",
+          "value": 1.7999999999999998,
+          "cost": 3
+        },
+        {
+          "name": "Four Winds",
+          "value": 1.6,
+          "cost": 2
+        },
+        {
+          "name": "Vampiric Strikes",
+          "value": 1.45,
+          "cost": 14
+        },
+        {
+          "name": "Hatchet Work",
+          "value": 1.3333333333333333,
+          "cost": 5
+        },
+        {
+          "name": "Thirsty Quiver",
+          "value": 1.3,
+          "cost": 5
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        }
+      ],
+      "plan": [
+        3, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 158, 167, 168, 171, 172, 173, 204, 205,
+        206, 207, 211, 212, 213, 215, 219, 220, 223, 224, 225, 226, 227, 228, 229, 255, 256, 257,
+        283, 290, 291, 296, 297, 298, 403, 414, 415, 418, 423, 424, 467, 468, 469, 471, 477, 480,
+        481, 482, 483, 484, 561, 604
+      ]
+    },
+    {
+      "id": "dual-wield",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 19,
+        "p90": 16
+      },
+      "reach": 0.6844866704480994,
+      "reachAt": {
+        "12": 0.8134046720489182,
+        "15": 0.7335631410795358,
+        "18": 0.6844866704480994,
+        "21": 0.6099282566546791,
+        "24": 0.5519965737395929
+      },
+      "choice": 4,
+      "searchGain": 0,
+      "nearScores": [1, 0.9847115825312642, 0.9795717933608331, 0.9713546781902705],
+      "tax": {
+        "points": 33,
+        "share": 0.275,
+        "road": 23
+      },
+      "attrs": {
+        "str": 118,
+        "dex": 260,
+        "int": 35
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 161,
+            "lifeFlat": 20
+          },
+          "units": 33.2,
+          "takenWithin": 28.6,
+          "withinUnits": 51.2
+        },
+        {
+          "label": "dual wield",
+          "plan": {
+            "oneHandMelee": 95,
+            "dualDamage": 30,
+            "dualSpeed": 3,
+            "dualCrit": 90
+          },
+          "units": 18,
+          "takenWithin": 18,
+          "withinUnits": 18
+        },
+        {
+          "label": "evasion",
+          "plan": {
+            "evasion": 328
+          },
+          "units": 27.333333333333332,
+          "takenWithin": 27.333333333333332,
+          "withinUnits": 30.16666666666666
+        }
+      ],
+      "pair": {
+        "labels": ["dual wield", "life"],
+        "units": [18, 33.2],
+        "within": [18, 51.2]
+      },
+      "taken": [
+        "Quickened Steel",
+        "Buckler",
+        "Stout Heart",
+        "Fighting Breath",
+        "Killing Pace",
+        "Weaving",
+        "Twin Fangs",
+        "Keen Edge",
+        "Light Blades",
+        "Scarred Hide",
+        "Four Winds",
+        "Hawk's Eye",
+        "Guarded",
+        "Iron Draw",
+        "Wayfarer",
+        "Long Breath",
+        "Quick Hands",
+        "Red Harvest",
+        "Crossed Blades",
+        "Soft Step",
+        "Light Hand",
+        "Hard Target",
+        "Wanderer",
+        "Keen Instinct",
+        "Hatchet Work",
+        "Fleet Foot",
+        "True Aim",
+        "Fleet Blade",
+        "Snakeskin",
+        "Fine Point",
+        "Heavy Draw",
+        "Thick Blood"
+      ],
+      "gaveUp": [
+        {
+          "name": "Oathbound",
+          "value": 2.6,
+          "cost": 8
+        },
+        {
+          "name": "Second Wind",
+          "value": 2.6,
+          "cost": 12
+        },
+        {
+          "name": "Stone Heart",
+          "value": 2.4,
+          "cost": 13
+        },
+        {
+          "name": "Elemental Ward",
+          "value": 2,
+          "cost": 14
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 7
+        },
+        {
+          "name": "Vampiric Strikes",
+          "value": 1.45,
+          "cost": 9
+        },
+        {
+          "name": "Thirsty Quiver",
+          "value": 1.3,
+          "cost": 3
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 2
+        }
+      ],
+      "plan": [
+        3, 135, 136, 137, 138, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 158, 167, 168, 171,
+        172, 173, 182, 187, 189, 204, 205, 206, 207, 211, 212, 213, 215, 219, 220, 221, 223, 224,
+        225, 226, 227, 228, 229, 230, 235, 236, 237, 244, 249, 250, 251, 254, 255, 256, 257, 283,
+        286, 287, 288, 289, 290, 291, 296, 297, 298, 403, 414, 415, 418, 421, 422, 423, 424, 433,
+        467, 468, 469, 470, 471, 472, 473, 474, 477, 478, 479, 480, 481, 482, 483, 484, 492, 493,
+        561, 562, 563, 564, 604, 629, 630, 631, 633, 637, 638, 639, 640, 641, 642, 647, 648, 651,
+        652, 657, 659, 662, 663, 841, 842, 843, 850, 851, 852, 1008
+      ]
+    },
+    {
+      "id": "fire-burn",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 21,
+        "p90": 19
+      },
+      "reach": 0.34074562283290816,
+      "reachAt": {
+        "12": 0.4818774768824308,
+        "15": 0.4559037323852431,
+        "18": 0.34074562283290816,
+        "21": 0.2956698828164122,
+        "24": 0.26814164114964834
+      },
+      "choice": 5,
+      "searchGain": 0.013991298374169903,
+      "nearScores": [
+        1, 0.9862017569612249, 0.9818658115218717, 0.9662458691839239, 0.956572796458978
+      ],
+      "tax": {
+        "points": 22,
+        "share": 0.36666666666666664,
+        "road": 10
+      },
+      "attrs": {
+        "str": 28,
+        "dex": 0,
+        "int": 77
+      },
+      "families": [
+        {
+          "label": "fire damage",
+          "plan": {
+            "burnDamage": 66,
+            "dotDamage": 20,
+            "eleDamageAll": 30,
+            "eleDamage:fire": 40
+          },
+          "units": 14.5,
+          "takenWithin": 7,
+          "withinUnits": 18
+        },
+        {
+          "label": "spell damage",
+          "plan": {
+            "spellDamage": 68
+          },
+          "units": 8.5,
+          "takenWithin": 8.5,
+          "withinUnits": 15.75
+        },
+        {
+          "label": "life",
+          "plan": {
+            "life": 67
+          },
+          "units": 13.4,
+          "takenWithin": 13.4,
+          "withinUnits": 50.199999999999996
+        }
+      ],
+      "pair": {
+        "labels": ["fire damage", "life"],
+        "units": [14.5, 13.4],
+        "within": [18, 50.199999999999996]
+      },
+      "taken": [
+        "Zeal",
+        "Hearthfire",
+        "Vigil",
+        "Choirmaster",
+        "Litany",
+        "Quiet Pulse",
+        "Glass Skin",
+        "Warm Blood",
+        "Homily",
+        "Glass Wall",
+        "Warded Mind",
+        "Familiars",
+        "Arcane Focus",
+        "Withering",
+        "Cinder",
+        "Hoarfrost"
+      ],
+      "gaveUp": [
+        {
+          "name": "Thick Blood",
+          "value": 3.6,
+          "cost": 7
+        },
+        {
+          "name": "Hedge Magic",
+          "value": 3.5,
+          "cost": 12
+        },
+        {
+          "name": "Quiet Knife",
+          "value": 3,
+          "cost": 12
+        },
+        {
+          "name": "Censer",
+          "value": 2.8,
+          "cost": 13
+        },
+        {
+          "name": "Long Breath",
+          "value": 2.8,
+          "cost": 14
+        },
+        {
+          "name": "Second Wind",
+          "value": 2.6,
+          "cost": 7
+        },
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 14
+        },
+        {
+          "name": "Stone Heart",
+          "value": 2.4,
+          "cost": 9
+        },
+        {
+          "name": "Elemental Ward",
+          "value": 2,
+          "cost": 5
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 6
+        },
+        {
+          "name": "Benediction",
+          "value": 1.3599999999999999,
+          "cost": 10
+        },
+        {
+          "name": "Sharp Mind",
+          "value": 1.3,
+          "cost": 2
+        },
+        {
+          "name": "Consecrated Plate",
+          "value": 1.2,
+          "cost": 11
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 5
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 16
+        },
+        {
+          "name": "Mana Tap",
+          "value": 0.6,
+          "cost": 1
+        },
+        {
+          "name": "Frugal",
+          "value": 0.6,
+          "cost": 2
+        }
+      ],
+      "plan": [
+        5, 314, 317, 318, 319, 323, 328, 329, 330, 333, 360, 361, 362, 363, 364, 514, 515, 517, 518,
+        535, 538, 539, 540, 541, 542, 626, 627, 628, 710, 711, 719, 720, 721, 727, 731, 732, 734,
+        735, 737, 739, 766, 767, 768, 771, 778, 779, 780, 782, 783, 795, 796, 811, 812, 813, 875,
+        876, 877, 956, 963, 966, 1010
+      ]
+    },
+    {
+      "id": "fire-burn",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 22,
+        "p90": 19
+      },
+      "reach": 0.636587672292747,
+      "reachAt": {
+        "12": 0.7463259577278734,
+        "15": 0.6817756538511363,
+        "18": 0.636587672292747,
+        "21": 0.5343104196574631,
+        "24": 0.49425236314165105
+      },
+      "choice": 8,
+      "searchGain": 0.008434404793772998,
+      "nearScores": [
+        1, 0.9982030768225498, 0.993400391239183, 0.9916361393922316, 0.9889897616218049,
+        0.9815039430212, 0.9520629903252023, 0.9520384868273282
+      ],
+      "tax": {
+        "points": 47,
+        "share": 0.39166666666666666,
+        "road": 24
+      },
+      "attrs": {
+        "str": 41,
+        "dex": 64,
+        "int": 184
+      },
+      "families": [
+        {
+          "label": "fire damage",
+          "plan": {
+            "burnDamage": 66,
+            "dotDamage": 40,
+            "eleDamageAll": 30,
+            "eleDamage:fire": 40
+          },
+          "units": 16.5,
+          "takenWithin": 8,
+          "withinUnits": 18
+        },
+        {
+          "label": "spell damage",
+          "plan": {
+            "spellDamage": 126
+          },
+          "units": 15.75,
+          "takenWithin": 15.75,
+          "withinUnits": 15.75
+        },
+        {
+          "label": "life",
+          "plan": {
+            "life": 167,
+            "lifeFlat": 20
+          },
+          "units": 34.4,
+          "takenWithin": 29.4,
+          "withinUnits": 50.199999999999996
+        }
+      ],
+      "pair": {
+        "labels": ["fire damage", "life"],
+        "units": [16.5, 34.4],
+        "within": [18, 50.199999999999996]
+      },
+      "taken": [
+        "Zeal",
+        "Iron Faith",
+        "Hearthfire",
+        "Vigil",
+        "Choirmaster",
+        "Litany",
+        "Elemental Ward",
+        "First Light",
+        "Second Wind",
+        "Quiet Pulse",
+        "Glass Skin",
+        "Stone Heart",
+        "Warm Blood",
+        "Sharp Mind",
+        "Homily",
+        "Glass Wall",
+        "Warded Mind",
+        "Mana Tap",
+        "Familiars",
+        "Arcane Focus",
+        "Hedge Magic",
+        "Thick Blood",
+        "Quiet Knife",
+        "Flashes of Insight",
+        "Long Breath",
+        "Withering",
+        "Cinder",
+        "Hoarfrost",
+        "Rotting Word",
+        "Devotion",
+        "Hard Target"
+      ],
+      "gaveUp": [
+        {
+          "name": "Censer",
+          "value": 2.8,
+          "cost": 10
+        },
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 11
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 4
+        },
+        {
+          "name": "Benediction",
+          "value": 1.3599999999999999,
+          "cost": 8
+        },
+        {
+          "name": "Consecrated Plate",
+          "value": 1.2,
+          "cost": 10
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 5
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 6
+        },
+        {
+          "name": "Frugal",
+          "value": 0.6,
+          "cost": 2
+        }
+      ],
+      "plan": [
+        5, 39, 44, 45, 46, 47, 48, 66, 203, 205, 211, 212, 213, 215, 223, 224, 225, 254, 314, 317,
+        318, 319, 323, 328, 329, 330, 331, 332, 333, 337, 340, 360, 361, 362, 363, 364, 452, 454,
+        456, 502, 503, 504, 506, 512, 514, 515, 516, 517, 518, 534, 535, 538, 539, 540, 541, 542,
+        543, 611, 612, 613, 626, 627, 628, 639, 644, 646, 647, 648, 652, 653, 662, 663, 699, 700,
+        710, 711, 719, 720, 721, 727, 728, 729, 730, 731, 732, 733, 734, 735, 737, 739, 766, 767,
+        768, 771, 778, 779, 780, 781, 782, 783, 795, 796, 808, 809, 810, 811, 812, 813, 875, 876,
+        877, 885, 886, 887, 945, 946, 956, 963, 966, 1010, 1039
+      ]
+    },
+    {
+      "id": "staff-block",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 16,
+        "p90": 13
+      },
+      "reach": 0.4124080277133615,
+      "reachAt": {
+        "12": 0.7084948320413439,
+        "15": 0.553297105958159,
+        "18": 0.4124080277133615,
+        "21": 0.30543298238008953,
+        "24": 0.27625598506689836
+      },
+      "choice": 3,
+      "searchGain": 0.03537087912087955,
+      "nearScores": [1, 0.9658374792703147, 0.9633692005090824],
+      "tax": {
+        "points": 20,
+        "share": 0.3333333333333333,
+        "road": 14
+      },
+      "attrs": {
+        "str": 56,
+        "dex": 0,
+        "int": 138
+      },
+      "families": [
+        {
+          "label": "spell damage",
+          "plan": {
+            "spellDamage": 38,
+            "eleDamageAll": 20
+          },
+          "units": 6.75,
+          "takenWithin": 6.75,
+          "withinUnits": 23.75
+        },
+        {
+          "label": "block",
+          "plan": {
+            "blockAttack": 3
+          },
+          "units": 1.5,
+          "takenWithin": 1.5,
+          "withinUnits": 3.5
+        },
+        {
+          "label": "life",
+          "plan": {
+            "life": 107
+          },
+          "units": 21.4,
+          "takenWithin": 21.4,
+          "withinUnits": 50.199999999999996
+        }
+      ],
+      "pair": {
+        "labels": ["block", "life"],
+        "units": [1.5, 21.4],
+        "within": [3.5, 50.199999999999996]
+      },
+      "taken": [
+        "Zeal",
+        "Iron Faith",
+        "Hearthfire",
+        "Vigil",
+        "Litany",
+        "Elemental Ward",
+        "First Light",
+        "Second Wind",
+        "Quiet Pulse",
+        "Glass Skin",
+        "Quarterstaff",
+        "Stone Heart",
+        "Warm Blood",
+        "Warded Mind",
+        "Arcane Focus"
+      ],
+      "gaveUp": [
+        {
+          "name": "Homily",
+          "value": 3.8,
+          "cost": 8
+        },
+        {
+          "name": "Thick Blood",
+          "value": 3.7,
+          "cost": 7
+        },
+        {
+          "name": "Hedge Magic",
+          "value": 3.5,
+          "cost": 12
+        },
+        {
+          "name": "Quiet Knife",
+          "value": 3,
+          "cost": 12
+        },
+        {
+          "name": "Long Breath",
+          "value": 2.8,
+          "cost": 14
+        },
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 13
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 4
+        },
+        {
+          "name": "Benediction",
+          "value": 1.52,
+          "cost": 5
+        },
+        {
+          "name": "Consecrated Plate",
+          "value": 1.4,
+          "cost": 6
+        },
+        {
+          "name": "Sharp Mind",
+          "value": 1.3,
+          "cost": 2
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 5
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 16
+        },
+        {
+          "name": "Frugal",
+          "value": 0.6,
+          "cost": 2
+        },
+        {
+          "name": "Mana Tap",
+          "value": 0.6,
+          "cost": 4
+        }
+      ],
+      "plan": [
+        5, 39, 44, 45, 46, 47, 48, 66, 314, 317, 318, 319, 323, 328, 329, 330, 333, 452, 454, 456,
+        502, 503, 505, 513, 514, 515, 517, 518, 538, 539, 540, 710, 711, 713, 716, 719, 720, 721,
+        724, 727, 728, 729, 731, 732, 733, 734, 735, 737, 739, 740, 746, 747, 802, 875, 876, 877,
+        878, 879, 957, 960, 1039
+      ]
+    },
+    {
+      "id": "staff-block",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 22,
+        "p90": 18
+      },
+      "reach": 0.6805328905303138,
+      "reachAt": {
+        "12": 0.7424095607235145,
+        "15": 0.7227637892175166,
+        "18": 0.6805328905303138,
+        "21": 0.5567811564258835,
+        "24": 0.513821855429337
+      },
+      "choice": 11,
+      "searchGain": 0,
+      "nearScores": [
+        1, 0.9805833295318354, 0.9803179158389769, 0.9737240444070285, 0.9682747695255317,
+        0.9669808777728474, 0.9641691514641298, 0.9641359747525226, 0.9585456988466946,
+        0.9519020623473353, 0.9509731144223315
+      ],
+      "tax": {
+        "points": 49,
+        "share": 0.4083333333333333,
+        "road": 30
+      },
+      "attrs": {
+        "str": 77,
+        "dex": 58,
+        "int": 221
+      },
+      "families": [
+        {
+          "label": "spell damage",
+          "plan": {
+            "spellDamage": 134,
+            "eleDamageAll": 60
+          },
+          "units": 22.75,
+          "takenWithin": 20.75,
+          "withinUnits": 23.75
+        },
+        {
+          "label": "block",
+          "plan": {
+            "blockAttack": 3,
+            "spellBlock": 4
+          },
+          "units": 3.5,
+          "takenWithin": 3.5,
+          "withinUnits": 3.5
+        },
+        {
+          "label": "life",
+          "plan": {
+            "life": 162,
+            "lifeFlat": 20
+          },
+          "units": 33.4,
+          "takenWithin": 28.4,
+          "withinUnits": 50.199999999999996
+        }
+      ],
+      "pair": {
+        "labels": ["block", "life"],
+        "units": [3.5, 33.4],
+        "within": [3.5, 50.199999999999996]
+      },
+      "taken": [
+        "Zeal",
+        "Iron Faith",
+        "Hearthfire",
+        "Vigil",
+        "Choirmaster",
+        "Litany",
+        "Elemental Ward",
+        "First Light",
+        "Second Wind",
+        "Quiet Pulse",
+        "Glass Skin",
+        "Quarterstaff",
+        "Stone Heart",
+        "Warm Blood",
+        "Sharp Mind",
+        "Homily",
+        "Benediction",
+        "Warded Mind",
+        "Arcane Focus",
+        "Hedge Magic",
+        "Thick Blood",
+        "Quiet Knife",
+        "Consecrated Plate",
+        "Flashes of Insight",
+        "Long Breath",
+        "Crozier",
+        "Hard Target"
+      ],
+      "gaveUp": [
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 11
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 4
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 5
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 6
+        },
+        {
+          "name": "Mana Tap",
+          "value": 0.6,
+          "cost": 2
+        },
+        {
+          "name": "Frugal",
+          "value": 0.6,
+          "cost": 2
+        }
+      ],
+      "plan": [
+        5, 39, 44, 45, 46, 47, 48, 66, 203, 205, 211, 212, 213, 215, 223, 224, 225, 254, 314, 317,
+        318, 319, 323, 328, 329, 330, 331, 332, 333, 337, 340, 452, 454, 456, 503, 504, 506, 512,
+        514, 515, 516, 517, 518, 538, 539, 540, 541, 611, 612, 613, 639, 644, 646, 647, 648, 652,
+        653, 662, 663, 710, 711, 719, 720, 721, 727, 728, 729, 731, 732, 733, 734, 735, 737, 739,
+        740, 742, 745, 746, 747, 748, 755, 759, 760, 766, 767, 768, 771, 778, 779, 780, 781, 783,
+        808, 875, 876, 877, 885, 886, 887, 941, 942, 943, 944, 945, 946, 957, 960, 963, 966, 967,
+        970, 971, 976, 977, 978, 979, 980, 982, 983, 1010, 1039
+      ]
+    },
+    {
+      "id": "aura-brand",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 23,
+        "p90": 21
+      },
+      "reach": 0.32587487823672245,
+      "reachAt": {
+        "12": 0.49453142988717486,
+        "15": 0.4343056195071171,
+        "18": 0.32587487823672245,
+        "21": 0.27678491007071754,
+        "24": 0.28689117067519526
+      },
+      "choice": 2,
+      "searchGain": 0.008492864601461925,
+      "nearScores": [1, 0.9915786567267204],
+      "tax": {
+        "points": 18,
+        "share": 0.3,
+        "road": 9
+      },
+      "attrs": {
+        "str": 46,
+        "dex": 0,
+        "int": 67
+      },
+      "families": [
+        {
+          "label": "auras",
+          "plan": {
+            "reducedReservation": 6,
+            "auraEffect": 12
+          },
+          "units": 4,
+          "takenWithin": 4,
+          "withinUnits": 16.666666666666668
+        },
+        {
+          "label": "brand damage",
+          "plan": {
+            "spellDamage": 40,
+            "brandDamage": 92
+          },
+          "units": 12.666666666666666,
+          "takenWithin": 4,
+          "withinUnits": 15.75
+        },
+        {
+          "label": "life",
+          "plan": {
+            "life": 67
+          },
+          "units": 13.4,
+          "takenWithin": 13.4,
+          "withinUnits": 50.199999999999996
+        }
+      ],
+      "pair": {
+        "labels": ["auras", "life"],
+        "units": [4, 13.4],
+        "within": [16.666666666666668, 50.199999999999996]
+      },
+      "taken": [
+        "Zeal",
+        "Hearthfire",
+        "Vigil",
+        "Shepherd",
+        "Litany",
+        "Glass Skin",
+        "Quiet Pulse",
+        "Quickening",
+        "Warm Blood",
+        "Homily",
+        "Lone Vow",
+        "Runecarver",
+        "Reliquary",
+        "Sigil Warden",
+        "Brandwright"
+      ],
+      "gaveUp": [
+        {
+          "name": "Benediction",
+          "value": 4,
+          "cost": 8
+        },
+        {
+          "name": "Thick Blood",
+          "value": 4,
+          "cost": 12
+        },
+        {
+          "name": "Choirmaster",
+          "value": 3.3333333333333335,
+          "cost": 1
+        },
+        {
+          "name": "Arcane Focus",
+          "value": 2.9,
+          "cost": 5
+        },
+        {
+          "name": "Warded Mind",
+          "value": 2.86875,
+          "cost": 4
+        },
+        {
+          "name": "Long Breath",
+          "value": 2.8,
+          "cost": 15
+        },
+        {
+          "name": "Second Wind",
+          "value": 2.6,
+          "cost": 7
+        },
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 14
+        },
+        {
+          "name": "Hedge Magic",
+          "value": 2.5,
+          "cost": 13
+        },
+        {
+          "name": "Stone Heart",
+          "value": 2.4,
+          "cost": 9
+        },
+        {
+          "name": "Quiet Knife",
+          "value": 2.2,
+          "cost": 14
+        },
+        {
+          "name": "Consecrated Plate",
+          "value": 2,
+          "cost": 3
+        },
+        {
+          "name": "Elemental Ward",
+          "value": 2,
+          "cost": 5
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 6
+        },
+        {
+          "name": "Battle Hymn",
+          "value": 1.6666666666666667,
+          "cost": 14
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 5
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 17
+        }
+      ],
+      "plan": [
+        5, 314, 317, 318, 319, 320, 321, 323, 514, 515, 538, 539, 540, 710, 711, 719, 720, 721, 727,
+        731, 732, 734, 735, 737, 739, 765, 766, 768, 769, 770, 771, 772, 773, 774, 778, 779, 780,
+        781, 784, 788, 789, 790, 791, 792, 793, 794, 802, 803, 875, 876, 877, 963, 964, 965, 966,
+        973, 974, 975, 984, 985, 986
+      ]
+    },
+    {
+      "id": "aura-brand",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 23,
+        "p90": 20
+      },
+      "reach": 0.6370800075602274,
+      "reachAt": {
+        "12": 0.8153925857702051,
+        "15": 0.7427078536966227,
+        "18": 0.6370800075602274,
+        "21": 0.5618191045077779,
+        "24": 0.5533353796797795
+      },
+      "choice": 6,
+      "searchGain": 0,
+      "nearScores": [
+        1, 0.9922695631945314, 0.9683266825331496, 0.9647835656639765, 0.9564805039099548,
+        0.9520068714993826
+      ],
+      "tax": {
+        "points": 43,
+        "share": 0.35833333333333334,
+        "road": 24
+      },
+      "attrs": {
+        "str": 150,
+        "dex": 6,
+        "int": 158
+      },
+      "families": [
+        {
+          "label": "auras",
+          "plan": {
+            "reducedReservation": 33,
+            "auraEffect": 46
+          },
+          "units": 18.666666666666668,
+          "takenWithin": 15,
+          "withinUnits": 16.666666666666668
+        },
+        {
+          "label": "brand damage",
+          "plan": {
+            "spellDamage": 76,
+            "brandDamage": 92
+          },
+          "units": 17.166666666666668,
+          "takenWithin": 6.5,
+          "withinUnits": 15.75
+        },
+        {
+          "label": "life",
+          "plan": {
+            "life": 145,
+            "lifeFlat": 20
+          },
+          "units": 30,
+          "takenWithin": 30,
+          "withinUnits": 50.199999999999996
+        }
+      ],
+      "pair": {
+        "labels": ["auras", "life"],
+        "units": [18.666666666666668, 30],
+        "within": [16.666666666666668, 50.199999999999996]
+      },
+      "taken": [
+        "Zeal",
+        "Warlord's Banner",
+        "Iron Faith",
+        "Hearthfire",
+        "Choirmaster",
+        "Vigil",
+        "Oathbound",
+        "Shepherd",
+        "Litany",
+        "Elemental Ward",
+        "Second Wind",
+        "Glass Skin",
+        "Quiet Pulse",
+        "Stone Heart",
+        "Quickening",
+        "Warm Blood",
+        "Homily",
+        "Lone Vow",
+        "Benediction",
+        "Warded Mind",
+        "Arcane Focus",
+        "Thick Blood",
+        "Consecrated Plate",
+        "Flashes of Insight",
+        "Runecarver",
+        "Reliquary",
+        "Crozier",
+        "Devotion",
+        "Ossuary",
+        "Sigil Warden",
+        "Brandwright"
+      ],
+      "gaveUp": [
+        {
+          "name": "Long Breath",
+          "value": 2.8,
+          "cost": 11
+        },
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 9
+        },
+        {
+          "name": "Hedge Magic",
+          "value": 2.5,
+          "cost": 9
+        },
+        {
+          "name": "Quiet Knife",
+          "value": 2.2,
+          "cost": 5
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 6
+        },
+        {
+          "name": "Battle Hymn",
+          "value": 1.6666666666666667,
+          "cost": 8
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 5
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 13
+        }
+      ],
+      "plan": [
+        5, 39, 44, 45, 46, 47, 48, 66, 314, 317, 318, 319, 320, 321, 323, 328, 330, 331, 332, 333,
+        337, 340, 342, 343, 434, 435, 437, 447, 448, 449, 452, 454, 456, 457, 458, 459, 514, 515,
+        517, 518, 538, 539, 540, 662, 663, 709, 710, 711, 712, 719, 720, 721, 726, 727, 728, 729,
+        731, 732, 733, 735, 737, 739, 758, 759, 760, 761, 765, 766, 767, 768, 769, 771, 772, 773,
+        774, 778, 779, 780, 781, 784, 788, 789, 790, 791, 792, 793, 794, 802, 803, 808, 809, 810,
+        875, 876, 877, 945, 946, 962, 963, 964, 965, 966, 969, 970, 971, 972, 973, 974, 975, 978,
+        979, 980, 981, 982, 984, 985, 986, 1001, 1002, 1003, 1039
+      ]
+    },
+    {
+      "id": "dagger-crit",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 14,
+        "p90": 13
+      },
+      "reach": 0.4303743588652179,
+      "reachAt": {
+        "12": 0.6981964008828595,
+        "15": 0.5599714472959543,
+        "18": 0.4303743588652179,
+        "21": 0.351956960218757,
+        "24": 0.33820263763790714
+      },
+      "choice": 2,
+      "searchGain": 0,
+      "nearScores": [1, 0.9564280926164025],
+      "tax": {
+        "points": 11,
+        "share": 0.18333333333333332,
+        "road": 9
+      },
+      "attrs": {
+        "str": 6,
+        "dex": 136,
+        "int": 22
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 60,
+            "lifeFlat": 20
+          },
+          "units": 13,
+          "takenWithin": 13,
+          "withinUnits": 45.199999999999996
+        },
+        {
+          "label": "crit",
+          "plan": {
+            "critChance": 180,
+            "critMulti": 30,
+            "weaponCrit:dagger": 20
+          },
+          "units": 12.5,
+          "takenWithin": 12.5,
+          "withinUnits": 29.25
+        },
+        {
+          "label": "dagger damage",
+          "plan": {
+            "daggerDamage": 40
+          },
+          "units": 4,
+          "takenWithin": 4,
+          "withinUnits": 8.2
+        },
+        {
+          "label": "evasion",
+          "plan": {
+            "evasion": 242
+          },
+          "units": 20.166666666666668,
+          "takenWithin": 20.166666666666668,
+          "withinUnits": 33.33333333333333
+        }
+      ],
+      "pair": {
+        "labels": ["crit", "life"],
+        "units": [12.5, 13],
+        "within": [29.25, 45.199999999999996]
+      },
+      "taken": [
+        "Keen Instinct",
+        "Soft Step",
+        "Fine Point",
+        "Thick Blood",
+        "Snakeskin",
+        "Nimble Gambit",
+        "Hawk's Eye",
+        "Long Breath",
+        "Vital Aim",
+        "Wayfarer",
+        "Quick Hands",
+        "Hard Target",
+        "Twin Fangs",
+        "Fleet Foot",
+        "True Aim",
+        "Weaving",
+        "Sidestep"
+      ],
+      "gaveUp": [
+        {
+          "name": "Long Knives",
+          "value": 3.4333333333333336,
+          "cost": 9
+        },
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 9
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 11
+        },
+        {
+          "name": "Quickened Steel",
+          "value": 2.2666666666666666,
+          "cost": 6
+        },
+        {
+          "name": "Mercy Stroke",
+          "value": 2.0833333333333335,
+          "cost": 6
+        },
+        {
+          "name": "Killing Eye",
+          "value": 2,
+          "cost": 7
+        },
+        {
+          "name": "Bloodletter",
+          "value": 2,
+          "cost": 8
+        },
+        {
+          "name": "Tumble",
+          "value": 1.8333333333333335,
+          "cost": 8
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 7
+        },
+        {
+          "name": "Mist Walk",
+          "value": 1.6333333333333333,
+          "cost": 10
+        },
+        {
+          "name": "Light Hand",
+          "value": 1.3333333333333335,
+          "cost": 3
+        },
+        {
+          "name": "Thirsty Quiver",
+          "value": 1.3,
+          "cost": 5
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 13
+        },
+        {
+          "name": "Vigil",
+          "value": 0.8,
+          "cost": 17
+        }
+      ],
+      "plan": [
+        1, 153, 154, 155, 156, 158, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 215, 219,
+        220, 223, 224, 225, 226, 227, 228, 229, 235, 254, 283, 288, 289, 290, 400, 401, 490, 491,
+        629, 630, 631, 637, 638, 639, 640, 641, 642, 646, 647, 648, 650, 651, 652, 653, 654, 655,
+        656, 657, 659, 662, 663, 1022
+      ]
+    },
+    {
+      "id": "dagger-crit",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 24,
+        "p90": 20
+      },
+      "reach": 0.6293655691999914,
+      "reachAt": {
+        "12": 0.7961291560812757,
+        "15": 0.7310107595696171,
+        "18": 0.6293655691999914,
+        "21": 0.5667304192781706,
+        "24": 0.5583340921296405
+      },
+      "choice": 2,
+      "searchGain": 0,
+      "nearScores": [1, 0.9871529465016738],
+      "tax": {
+        "points": 32,
+        "share": 0.26666666666666666,
+        "road": 24
+      },
+      "attrs": {
+        "str": 77,
+        "dex": 257,
+        "int": 68
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 119,
+            "lifeFlat": 20
+          },
+          "units": 24.799999999999997,
+          "takenWithin": 20.799999999999997,
+          "withinUnits": 45.199999999999996
+        },
+        {
+          "label": "crit",
+          "plan": {
+            "critChance": 220,
+            "critMulti": 160,
+            "weaponCrit:dagger": 20
+          },
+          "units": 25.333333333333332,
+          "takenWithin": 21.25,
+          "withinUnits": 29.25
+        },
+        {
+          "label": "dagger damage",
+          "plan": {
+            "daggerDamage": 66
+          },
+          "units": 6.6,
+          "takenWithin": 6.6,
+          "withinUnits": 8.2
+        },
+        {
+          "label": "evasion",
+          "plan": {
+            "evasion": 336
+          },
+          "units": 28,
+          "takenWithin": 28,
+          "withinUnits": 33.33333333333333
+        }
+      ],
+      "pair": {
+        "labels": ["crit", "life"],
+        "units": [25.333333333333332, 24.799999999999997],
+        "within": [29.25, 45.199999999999996]
+      },
+      "taken": [
+        "Keen Instinct",
+        "Soft Step",
+        "Fine Point",
+        "Thick Blood",
+        "Snakeskin",
+        "Nimble Gambit",
+        "Hawk's Eye",
+        "Long Breath",
+        "Wanderer",
+        "Light Hand",
+        "Vital Aim",
+        "Wayfarer",
+        "Quick Hands",
+        "Shroud",
+        "Hard Target",
+        "Twin Fangs",
+        "Mercy Stroke",
+        "Fleet Foot",
+        "True Aim",
+        "Weaving",
+        "Sidestep",
+        "Buckler",
+        "Quickened Steel",
+        "Fighting Breath",
+        "Quiet Shot",
+        "Long Knives",
+        "Crossed Blades",
+        "Scarred Hide",
+        "Four Winds",
+        "Red Harvest",
+        "Fencer's Eye"
+      ],
+      "gaveUp": [
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 4
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 11
+        },
+        {
+          "name": "Killing Eye",
+          "value": 2,
+          "cost": 6
+        },
+        {
+          "name": "Bloodletter",
+          "value": 2,
+          "cost": 8
+        },
+        {
+          "name": "Tumble",
+          "value": 1.8333333333333335,
+          "cost": 7
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 7
+        },
+        {
+          "name": "Mist Walk",
+          "value": 1.6333333333333333,
+          "cost": 10
+        },
+        {
+          "name": "Thirsty Quiver",
+          "value": 1.3,
+          "cost": 5
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 13
+        },
+        {
+          "name": "Vigil",
+          "value": 0.8,
+          "cost": 17
+        }
+      ],
+      "plan": [
+        1, 151, 152, 153, 154, 155, 156, 158, 167, 168, 171, 172, 173, 174, 182, 187, 189, 203, 204,
+        205, 206, 207, 208, 209, 210, 211, 212, 213, 215, 219, 220, 221, 223, 224, 225, 226, 227,
+        228, 229, 230, 231, 235, 254, 255, 258, 283, 288, 289, 290, 400, 401, 411, 414, 415, 416,
+        423, 424, 468, 469, 471, 477, 480, 481, 482, 483, 484, 490, 491, 492, 495, 561, 562, 563,
+        564, 629, 630, 631, 637, 638, 639, 640, 641, 642, 646, 647, 648, 650, 651, 652, 653, 654,
+        655, 656, 657, 659, 661, 662, 663, 664, 665, 668, 669, 670, 677, 678, 679, 694, 695, 844,
+        845, 854, 1008, 1022, 1024, 1030, 1031, 1032, 1118, 1121, 1122, 1123
+      ]
+    },
+    {
+      "id": "claw-poison",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 14,
+        "p90": 13
+      },
+      "reach": 0.46704187565612953,
+      "reachAt": {
+        "12": 0.6762826070800406,
+        "15": 0.5677187460121655,
+        "18": 0.46704187565612953,
+        "21": 0.3457418560974029,
+        "24": 0.33417769060635133
+      },
+      "choice": 1,
+      "searchGain": 0.04672958276691408,
+      "nearScores": [1],
+      "tax": {
+        "points": 18,
+        "share": 0.3,
+        "road": 14
+      },
+      "attrs": {
+        "str": 16,
+        "dex": 163,
+        "int": 62
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 73,
+            "lifeFlat": 20
+          },
+          "units": 15.6,
+          "takenWithin": 15.6,
+          "withinUnits": 45.199999999999996
+        },
+        {
+          "label": "poison",
+          "plan": {
+            "chaosAttack": 48,
+            "poisonChance": 20,
+            "poisonDamage": 60
+          },
+          "units": 11,
+          "takenWithin": 11,
+          "withinUnits": 13.6
+        },
+        {
+          "label": "claw damage",
+          "plan": {
+            "clawDamage": 40
+          },
+          "units": 4,
+          "takenWithin": 4,
+          "withinUnits": 4
+        }
+      ],
+      "pair": {
+        "labels": ["poison", "life"],
+        "units": [11, 15.6],
+        "within": [13.6, 45.199999999999996]
+      },
+      "taken": [
+        "Keen Instinct",
+        "Talon",
+        "Thick Blood",
+        "Snakeskin",
+        "Hawk's Eye",
+        "Long Breath",
+        "Wanderer",
+        "Light Hand",
+        "Barbed Point",
+        "Wayfarer",
+        "Quick Hands",
+        "Venom Fletching",
+        "Hard Target",
+        "Fleet Foot",
+        "True Aim",
+        "Weaving",
+        "Sidestep"
+      ],
+      "gaveUp": [
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 9
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 11
+        },
+        {
+          "name": "Quickened Steel",
+          "value": 2.2666666666666666,
+          "cost": 6
+        },
+        {
+          "name": "Soft Step",
+          "value": 2.166666666666667,
+          "cost": 4
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 7
+        },
+        {
+          "name": "Thirsty Quiver",
+          "value": 1.3,
+          "cost": 5
+        },
+        {
+          "name": "Lingering",
+          "value": 1.2800000000000002,
+          "cost": 12
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Bloodletter",
+          "value": 1,
+          "cost": 7
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 13
+        },
+        {
+          "name": "Vigil",
+          "value": 0.8,
+          "cost": 17
+        }
+      ],
+      "plan": [
+        1, 154, 155, 156, 158, 204, 206, 207, 211, 212, 213, 214, 215, 219, 220, 223, 224, 225, 226,
+        227, 228, 229, 255, 267, 283, 288, 289, 290, 411, 414, 415, 416, 490, 491, 574, 575, 576,
+        629, 630, 640, 641, 642, 647, 648, 649, 657, 660, 662, 663, 664, 665, 666, 667, 684, 685,
+        693, 694, 695, 696, 1021, 1023
+      ]
+    },
+    {
+      "id": "claw-poison",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 22,
+        "p90": 20
+      },
+      "reach": 0.6856934561996966,
+      "reachAt": {
+        "12": 0.7891223028711573,
+        "15": 0.7722503438399478,
+        "18": 0.6856934561996966,
+        "21": 0.583615050838676,
+        "24": 0.569102366147811
+      },
+      "choice": 4,
+      "searchGain": 0,
+      "nearScores": [1, 0.9819613709358086, 0.9703755847888895, 0.9690190212210538],
+      "tax": {
+        "points": 35,
+        "share": 0.2916666666666667,
+        "road": 24
+      },
+      "attrs": {
+        "str": 112,
+        "dex": 264,
+        "int": 59
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 156,
+            "lifeFlat": 20
+          },
+          "units": 32.2,
+          "takenWithin": 28.2,
+          "withinUnits": 45.199999999999996
+        },
+        {
+          "label": "poison",
+          "plan": {
+            "chaosAttack": 48,
+            "poisonChance": 30,
+            "poisonDamage": 100
+          },
+          "units": 15.333333333333334,
+          "takenWithin": 11,
+          "withinUnits": 13.6
+        },
+        {
+          "label": "claw damage",
+          "plan": {
+            "clawDamage": 40
+          },
+          "units": 4,
+          "takenWithin": 4,
+          "withinUnits": 4
+        }
+      ],
+      "pair": {
+        "labels": ["poison", "life"],
+        "units": [15.333333333333334, 32.2],
+        "within": [13.6, 45.199999999999996]
+      },
+      "taken": [
+        "Keen Instinct",
+        "Soft Step",
+        "Talon",
+        "Thick Blood",
+        "Snakeskin",
+        "Hawk's Eye",
+        "Long Breath",
+        "Wanderer",
+        "Light Hand",
+        "Barbed Point",
+        "Quick Hands",
+        "Wayfarer",
+        "Shroud",
+        "Hard Target",
+        "Venom Fletching",
+        "Weathered",
+        "Fleet Foot",
+        "True Aim",
+        "Weaving",
+        "Sidestep",
+        "Buckler",
+        "Quickened Steel",
+        "Fighting Breath",
+        "Stout Heart",
+        "Heavy Draw",
+        "Scarred Hide",
+        "Four Winds",
+        "Red Harvest",
+        "Festering"
+      ],
+      "gaveUp": [
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 11
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 7
+        },
+        {
+          "name": "Thirsty Quiver",
+          "value": 1.3,
+          "cost": 5
+        },
+        {
+          "name": "Lingering",
+          "value": 1.2800000000000002,
+          "cost": 12
+        },
+        {
+          "name": "Bloodletter",
+          "value": 1,
+          "cost": 7
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 13
+        },
+        {
+          "name": "Vigil",
+          "value": 0.8,
+          "cost": 17
+        }
+      ],
+      "plan": [
+        1, 151, 154, 155, 156, 158, 167, 168, 171, 172, 173, 182, 187, 188, 189, 190, 198, 199, 200,
+        201, 204, 205, 206, 207, 211, 212, 213, 214, 215, 219, 220, 221, 223, 224, 225, 226, 227,
+        228, 229, 230, 231, 235, 241, 254, 255, 256, 257, 258, 265, 283, 288, 289, 290, 291, 296,
+        297, 298, 409, 410, 413, 414, 415, 423, 424, 425, 467, 468, 469, 470, 471, 472, 473, 474,
+        477, 478, 480, 481, 482, 483, 484, 490, 491, 492, 495, 496, 561, 574, 575, 576, 629, 630,
+        631, 633, 637, 638, 639, 640, 641, 642, 647, 648, 649, 657, 660, 661, 662, 663, 664, 665,
+        666, 667, 669, 670, 684, 685, 696, 1021, 1023, 1071, 1072, 1073
+      ]
+    },
+    {
+      "id": "trap-mine",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 15,
+        "p90": 13
+      },
+      "reach": 0.4013366790668673,
+      "reachAt": {
+        "12": 0.5912561118577189,
+        "15": 0.5254731001684336,
+        "18": 0.4013366790668673,
+        "21": 0.3299974364781691,
+        "24": 0.3058247164680349
+      },
+      "choice": 3,
+      "searchGain": 0,
+      "nearScores": [1, 0.9845765140659177, 0.9690248133343391],
+      "tax": {
+        "points": 22,
+        "share": 0.36666666666666664,
+        "road": 19
+      },
+      "attrs": {
+        "str": 16,
+        "dex": 198,
+        "int": 83
+      },
+      "families": [
+        {
+          "label": "trap and mine damage",
+          "plan": {
+            "trapDamage": 96,
+            "mineDamage": 24
+          },
+          "units": 10,
+          "takenWithin": 10,
+          "withinUnits": 13.666666666666666
+        },
+        {
+          "label": "energy shield",
+          "plan": {
+            "es": 35
+          },
+          "units": 7,
+          "takenWithin": 7,
+          "withinUnits": 28.8
+        },
+        {
+          "label": "evasion",
+          "plan": {
+            "evasion": 298
+          },
+          "units": 24.833333333333336,
+          "takenWithin": 24.833333333333336,
+          "withinUnits": 33.33333333333333
+        }
+      ],
+      "pair": {
+        "labels": ["trap and mine damage", "energy shield"],
+        "units": [10, 7],
+        "within": [13.666666666666666, 28.8]
+      },
+      "taken": [
+        "Keen Instinct",
+        "Soft Step",
+        "Snakeskin",
+        "Thick Blood",
+        "Hawk's Eye",
+        "Long Breath",
+        "Wanderer",
+        "Sapper",
+        "Tripwire",
+        "Wayfarer",
+        "Trapper",
+        "Shroud",
+        "Hard Target",
+        "Fleet Foot",
+        "Weaving"
+      ],
+      "gaveUp": [
+        {
+          "name": "Glass Skin",
+          "value": 3.8666666666666667,
+          "cost": 13
+        },
+        {
+          "name": "Quickening",
+          "value": 3.1666666666666665,
+          "cost": 15
+        },
+        {
+          "name": "Warded Mind",
+          "value": 2.86875,
+          "cost": 7
+        },
+        {
+          "name": "Black Powder",
+          "value": 2.626666666666667,
+          "cost": 8
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 11
+        },
+        {
+          "name": "Arcane Focus",
+          "value": 1.5,
+          "cost": 6
+        },
+        {
+          "name": "Vigil",
+          "value": 1.5,
+          "cost": 17
+        },
+        {
+          "name": "Static Edge",
+          "value": 1.46,
+          "cost": 6
+        },
+        {
+          "name": "Shelter",
+          "value": 1.3,
+          "cost": 7
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 12
+        }
+      ],
+      "plan": [
+        1, 154, 155, 156, 158, 203, 204, 205, 206, 207, 212, 213, 221, 223, 229, 230, 235, 236, 237,
+        254, 255, 267, 283, 288, 289, 290, 411, 415, 416, 423, 424, 571, 572, 573, 629, 630, 631,
+        633, 637, 638, 639, 657, 660, 663, 664, 665, 669, 670, 684, 685, 686, 687, 693, 694, 695,
+        696, 697, 698, 701, 1024, 1025
+      ]
+    },
+    {
+      "id": "trap-mine",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 22,
+        "p90": 18
+      },
+      "reach": 0.6596916799598028,
+      "reachAt": {
+        "12": 0.8207188402481915,
+        "15": 0.7326860200138711,
+        "18": 0.6596916799598028,
+        "21": 0.587347650893126,
+        "24": 0.5476451335373858
+      },
+      "choice": 3,
+      "searchGain": 0,
+      "nearScores": [1, 0.9897654476458426, 0.9523566846789172],
+      "tax": {
+        "points": 46,
+        "share": 0.38333333333333336,
+        "road": 36
+      },
+      "attrs": {
+        "str": 16,
+        "dex": 228,
+        "int": 240
+      },
+      "families": [
+        {
+          "label": "trap and mine damage",
+          "plan": {
+            "trapDamage": 96,
+            "mineDamage": 68
+          },
+          "units": 13.666666666666666,
+          "takenWithin": 13.666666666666666,
+          "withinUnits": 13.666666666666666
+        },
+        {
+          "label": "energy shield",
+          "plan": {
+            "es": 128
+          },
+          "units": 25.600000000000005,
+          "takenWithin": 23.2,
+          "withinUnits": 28.8
+        },
+        {
+          "label": "evasion",
+          "plan": {
+            "evasion": 298
+          },
+          "units": 24.833333333333336,
+          "takenWithin": 24.833333333333336,
+          "withinUnits": 33.33333333333333
+        }
+      ],
+      "pair": {
+        "labels": ["trap and mine damage", "energy shield"],
+        "units": [13.666666666666666, 25.600000000000005],
+        "within": [13.666666666666666, 28.8]
+      },
+      "taken": [
+        "Keen Instinct",
+        "Soft Step",
+        "Hedge Magic",
+        "Snakeskin",
+        "Thick Blood",
+        "Hawk's Eye",
+        "Long Breath",
+        "First Light",
+        "Wanderer",
+        "Sapper",
+        "Devotion",
+        "Arcane Focus",
+        "Tripwire",
+        "Wayfarer",
+        "Trapper",
+        "Shroud",
+        "Warded Mind",
+        "Warm Blood",
+        "Hard Target",
+        "Fleet Foot",
+        "Weaving",
+        "Glass Skin",
+        "Static Edge",
+        "Prism Ward",
+        "Black Powder",
+        "Quickening",
+        "Quiet Pulse",
+        "Thunderhead",
+        "Hoarfrost"
+      ],
+      "gaveUp": [
+        {
+          "name": "Vigil",
+          "value": 1.5,
+          "cost": 8
+        },
+        {
+          "name": "Shelter",
+          "value": 1.3,
+          "cost": 4
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        }
+      ],
+      "plan": [
+        1, 154, 155, 156, 158, 203, 204, 205, 206, 207, 212, 213, 221, 223, 229, 230, 235, 236, 237,
+        254, 255, 267, 283, 288, 289, 290, 317, 318, 319, 320, 321, 323, 328, 329, 330, 331, 332,
+        333, 337, 342, 343, 346, 355, 411, 415, 416, 423, 424, 502, 503, 504, 506, 516, 517, 518,
+        529, 530, 533, 538, 539, 540, 571, 572, 573, 612, 613, 620, 622, 629, 630, 631, 633, 637,
+        638, 639, 657, 660, 663, 664, 665, 669, 670, 684, 685, 686, 687, 693, 694, 695, 696, 697,
+        698, 700, 701, 702, 703, 707, 708, 808, 809, 810, 811, 812, 813, 815, 816, 817, 862, 863,
+        864, 865, 876, 877, 882, 883, 884, 1024, 1025, 1033, 1034, 1035
+      ]
+    },
+    {
+      "id": "dagger-caster",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 22,
+        "p90": 18
+      },
+      "reach": 0.47373449237743775,
+      "reachAt": {
+        "12": 0.47755309678239855,
+        "15": 0.4418060743868768,
+        "18": 0.47373449237743775,
+        "21": 0.41195785462616097,
+        "24": 0.36386148066116586
+      },
+      "choice": 2,
+      "searchGain": 0.09932816812659184,
+      "nearScores": [1, 0.9864372845506137],
+      "tax": {
+        "points": 27,
+        "share": 0.45,
+        "road": 16
+      },
+      "attrs": {
+        "str": 0,
+        "dex": 73,
+        "int": 122
+      },
+      "families": [
+        {
+          "label": "spell damage",
+          "plan": {
+            "spellDamage": 60,
+            "daggerSpellDamage": 24
+          },
+          "units": 10.5,
+          "takenWithin": 10.5,
+          "withinUnits": 13.75
+        },
+        {
+          "label": "spell crit",
+          "plan": {
+            "daggerSpellCrit": 30
+          },
+          "units": 2,
+          "takenWithin": 2,
+          "withinUnits": 7.25
+        },
+        {
+          "label": "energy shield",
+          "plan": {
+            "es": 119
+          },
+          "units": 23.800000000000004,
+          "takenWithin": 22.200000000000003,
+          "withinUnits": 28.8
+        }
+      ],
+      "pair": {
+        "labels": ["spell damage", "energy shield"],
+        "units": [10.5, 23.800000000000004],
+        "within": [13.75, 28.8]
+      },
+      "taken": [
+        "Keen Instinct",
+        "Quiet Knife",
+        "Thick Blood",
+        "Flashes of Insight",
+        "Arcane Focus",
+        "Devotion",
+        "Shroud",
+        "Warded Mind",
+        "Glass Skin",
+        "Quiet Shot",
+        "Darting Bolts",
+        "Athame",
+        "Quickening",
+        "Thunderhead",
+        "Hoarfrost"
+      ],
+      "gaveUp": [
+        {
+          "name": "Hedge Magic",
+          "value": 3.5,
+          "cost": 6
+        },
+        {
+          "name": "Sharp Mind",
+          "value": 2.5,
+          "cost": 5
+        },
+        {
+          "name": "Vigil",
+          "value": 1.5,
+          "cost": 9
+        },
+        {
+          "name": "Vital Aim",
+          "value": 1.5,
+          "cost": 12
+        },
+        {
+          "name": "Hearthfire",
+          "value": 1.45,
+          "cost": 10
+        },
+        {
+          "name": "Mercy Stroke",
+          "value": 1.25,
+          "cost": 6
+        },
+        {
+          "name": "Killing Eye",
+          "value": 1.2,
+          "cost": 15
+        },
+        {
+          "name": "Snakeskin",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 13
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 2
+        },
+        {
+          "name": "Shelter",
+          "value": 0.8,
+          "cost": 6
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 12
+        },
+        {
+          "name": "Frugal",
+          "value": 0.6,
+          "cost": 2
+        }
+      ],
+      "plan": [
+        1, 317, 318, 319, 320, 321, 329, 330, 331, 332, 333, 337, 340, 342, 343, 346, 351, 352, 355,
+        369, 620, 622, 629, 630, 632, 643, 644, 648, 662, 663, 664, 665, 668, 669, 670, 677, 681,
+        682, 696, 697, 808, 809, 810, 812, 813, 814, 815, 816, 817, 854, 862, 863, 885, 886, 887,
+        945, 946, 1024, 1119, 1120, 1121
+      ]
+    },
+    {
+      "id": "dagger-caster",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 28,
+        "p90": 23
+      },
+      "reach": 0.6840117706967338,
+      "reachAt": {
+        "12": 0.7675187587434821,
+        "15": 0.6889394185479941,
+        "18": 0.6840117706967338,
+        "21": 0.6093681909851603,
+        "24": 0.628439410273508
+      },
+      "choice": 5,
+      "searchGain": 0,
+      "nearScores": [
+        1, 0.9799981331590951, 0.9696505007133998, 0.957684939483241, 0.9520488578934033
+      ],
+      "tax": {
+        "points": 54,
+        "share": 0.45,
+        "road": 33
+      },
+      "attrs": {
+        "str": 12,
+        "dex": 136,
+        "int": 282
+      },
+      "families": [
+        {
+          "label": "spell damage",
+          "plan": {
+            "spellDamage": 126,
+            "daggerSpellDamage": 60
+          },
+          "units": 23.25,
+          "takenWithin": 13.75,
+          "withinUnits": 13.75
+        },
+        {
+          "label": "spell crit",
+          "plan": {
+            "spellCrit": 85,
+            "spellCritMulti": 15,
+            "daggerSpellCrit": 30
+          },
+          "units": 8.916666666666668,
+          "takenWithin": 7.25,
+          "withinUnits": 7.25
+        },
+        {
+          "label": "energy shield",
+          "plan": {
+            "es": 160,
+            "esFlat": 15
+          },
+          "units": 33,
+          "takenWithin": 25.2,
+          "withinUnits": 28.8
+        }
+      ],
+      "pair": {
+        "labels": ["spell damage", "energy shield"],
+        "units": [23.25, 33],
+        "within": [13.75, 28.8]
+      },
+      "taken": [
+        "Keen Instinct",
+        "Hedge Magic",
+        "Quiet Knife",
+        "Thick Blood",
+        "Flashes of Insight",
+        "Sharp Mind",
+        "First Light",
+        "Arcane Focus",
+        "Devotion",
+        "Shroud",
+        "Warded Mind",
+        "Warm Blood",
+        "Glass Skin",
+        "Quiet Shot",
+        "Static Edge",
+        "Darting Bolts",
+        "Athame",
+        "Prism Ward",
+        "Quickening",
+        "Flashpoint",
+        "Thunderhead",
+        "Hoarfrost",
+        "Ritual Blade",
+        "Homily",
+        "Glass Wall",
+        "Familiars",
+        "Tomb Dust"
+      ],
+      "gaveUp": [
+        {
+          "name": "Vigil",
+          "value": 1.5,
+          "cost": 6
+        },
+        {
+          "name": "Vital Aim",
+          "value": 1.5,
+          "cost": 8
+        },
+        {
+          "name": "Hearthfire",
+          "value": 1.45,
+          "cost": 8
+        },
+        {
+          "name": "Mercy Stroke",
+          "value": 1.25,
+          "cost": 6
+        },
+        {
+          "name": "Killing Eye",
+          "value": 1.2,
+          "cost": 14
+        },
+        {
+          "name": "Snakeskin",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 8
+        },
+        {
+          "name": "Shelter",
+          "value": 0.8,
+          "cost": 4
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 8
+        },
+        {
+          "name": "Frugal",
+          "value": 0.6,
+          "cost": 2
+        }
+      ],
+      "plan": [
+        1, 317, 318, 319, 320, 321, 328, 329, 330, 331, 332, 333, 337, 340, 342, 343, 346, 351, 352,
+        355, 360, 369, 370, 371, 372, 373, 502, 503, 504, 506, 510, 511, 512, 516, 517, 518, 529,
+        530, 611, 612, 613, 620, 622, 627, 628, 629, 630, 631, 632, 633, 643, 644, 648, 662, 663,
+        664, 665, 668, 669, 670, 677, 678, 679, 681, 682, 696, 697, 778, 779, 780, 781, 782, 795,
+        796, 808, 809, 810, 811, 812, 813, 814, 815, 816, 817, 818, 820, 821, 854, 862, 863, 872,
+        876, 877, 882, 883, 884, 885, 886, 887, 945, 946, 947, 966, 967, 1024, 1053, 1054, 1055,
+        1080, 1081, 1082, 1118, 1119, 1120, 1121, 1140, 1141, 1142, 1143, 1144, 1145
+      ]
+    },
+    {
+      "id": "two-hand-fire",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 15,
+        "p90": 13
+      },
+      "reach": 0.3735773372747704,
+      "reachAt": {
+        "12": 0.644710013593113,
+        "15": 0.5398296010056336,
+        "18": 0.3735773372747704,
+        "21": 0.2989281640001462,
+        "24": 0.27143283529680295
+      },
+      "choice": 3,
+      "searchGain": 0,
+      "nearScores": [1, 0.98562598821331, 0.9752766997268937],
+      "tax": {
+        "points": 17,
+        "share": 0.2833333333333333,
+        "road": 12
+      },
+      "attrs": {
+        "str": 163,
+        "dex": 6,
+        "int": 25
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 115
+          },
+          "units": 23,
+          "takenWithin": 23,
+          "withinUnits": 63.2
+        },
+        {
+          "label": "armour",
+          "plan": {
+            "armour": 194,
+            "physReduction": 2
+          },
+          "units": 18.166666666666668,
+          "takenWithin": 18.166666666666668,
+          "withinUnits": 24.833333333333332
+        },
+        {
+          "label": "fire attack damage",
+          "plan": {
+            "eleDamage:fire": 30
+          },
+          "units": 3,
+          "takenWithin": 3,
+          "withinUnits": 15.4
+        },
+        {
+          "label": "two-handed damage",
+          "plan": {
+            "twoHandDamage": 70
+          },
+          "units": 5.833333333333333,
+          "takenWithin": 5.833333333333333,
+          "withinUnits": 5.833333333333333
+        }
+      ],
+      "pair": {
+        "labels": ["fire attack damage", "life"],
+        "units": [3, 23],
+        "within": [15.4, 63.2]
+      },
+      "taken": [
+        "Oathbound",
+        "Quartermaster",
+        "Warlord's Banner",
+        "Second Wind",
+        "Thunderstep",
+        "Stone Heart",
+        "Thick Skin",
+        "Zeal",
+        "Mortar and Stone",
+        "Elemental Ward",
+        "Guarded",
+        "Hearthfire",
+        "Broad Back",
+        "Greatweight",
+        "Litany"
+      ],
+      "gaveUp": [
+        {
+          "name": "Scarred Hide",
+          "value": 4,
+          "cost": 9
+        },
+        {
+          "name": "Elemental Edge",
+          "value": 2.8,
+          "cost": 9
+        },
+        {
+          "name": "Long Breath",
+          "value": 2.8,
+          "cost": 14
+        },
+        {
+          "name": "Stout Heart",
+          "value": 2.6,
+          "cost": 4
+        },
+        {
+          "name": "Quiet Pulse",
+          "value": 2.6,
+          "cost": 11
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 12
+        },
+        {
+          "name": "Quickened Steel",
+          "value": 2.2666666666666666,
+          "cost": 8
+        },
+        {
+          "name": "Steady Hands",
+          "value": 2.1333333333333337,
+          "cost": 4
+        },
+        {
+          "name": "Elemental Fletching",
+          "value": 2,
+          "cost": 15
+        },
+        {
+          "name": "Hawk's Eye",
+          "value": 1.92,
+          "cost": 11
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 8
+        },
+        {
+          "name": "Four Winds",
+          "value": 1.6,
+          "cost": 9
+        },
+        {
+          "name": "Quick Hands",
+          "value": 1.6,
+          "cost": 15
+        },
+        {
+          "name": "Light Hand",
+          "value": 1.3333333333333335,
+          "cost": 16
+        },
+        {
+          "name": "Hatchet Work",
+          "value": 1.2999999999999998,
+          "cost": 16
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 14
+        },
+        {
+          "name": "Vigil",
+          "value": 0.8,
+          "cost": 2
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 12
+        }
+      ],
+      "plan": [
+        4, 39, 40, 41, 42, 43, 44, 45, 47, 48, 49, 50, 51, 74, 79, 80, 81, 82, 83, 84, 90, 91, 92,
+        93, 434, 435, 436, 437, 438, 444, 445, 446, 447, 448, 450, 452, 454, 457, 458, 459, 709,
+        710, 712, 719, 720, 721, 727, 731, 732, 737, 739, 825, 826, 842, 843, 856, 888, 891, 907,
+        1039, 1046
+      ]
+    },
+    {
+      "id": "two-hand-fire",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 19,
+        "p90": 16
+      },
+      "reach": 0.6899608809702162,
+      "reachAt": {
+        "12": 0.885761214318079,
+        "15": 0.8318900631624687,
+        "18": 0.6899608809702162,
+        "21": 0.5730595127861934,
+        "24": 0.5203496594897125
+      },
+      "choice": 2,
+      "searchGain": 0.02888331726133031,
+      "nearScores": [1, 0.9719275093912382],
+      "tax": {
+        "points": 35,
+        "share": 0.2916666666666667,
+        "road": 23
+      },
+      "attrs": {
+        "str": 251,
+        "dex": 144,
+        "int": 25
+      },
+      "families": [
+        {
+          "label": "life",
+          "plan": {
+            "life": 231
+          },
+          "units": 46.2,
+          "takenWithin": 46.2,
+          "withinUnits": 63.2
+        },
+        {
+          "label": "armour",
+          "plan": {
+            "armour": 218,
+            "physReduction": 3
+          },
+          "units": 21.166666666666664,
+          "takenWithin": 21.166666666666664,
+          "withinUnits": 24.833333333333332
+        },
+        {
+          "label": "fire attack damage",
+          "plan": {
+            "eleAttack": 60,
+            "eleDamage:fire": 40
+          },
+          "units": 10,
+          "takenWithin": 10,
+          "withinUnits": 15.4
+        },
+        {
+          "label": "two-handed damage",
+          "plan": {
+            "twoHandDamage": 70
+          },
+          "units": 5.833333333333333,
+          "takenWithin": 5.833333333333333,
+          "withinUnits": 5.833333333333333
+        }
+      ],
+      "pair": {
+        "labels": ["fire attack damage", "life"],
+        "units": [10, 46.2],
+        "within": [15.4, 63.2]
+      },
+      "taken": [
+        "Oathbound",
+        "Quartermaster",
+        "Warlord's Banner",
+        "Second Wind",
+        "Thunderstep",
+        "Stone Heart",
+        "Thick Skin",
+        "Zeal",
+        "Mortar and Stone",
+        "Elemental Ward",
+        "Guarded",
+        "Field Dressing",
+        "Stout Heart",
+        "Quickened Steel",
+        "Hearthfire",
+        "Steady Hands",
+        "Broad Back",
+        "Hawk's Eye",
+        "Greatweight",
+        "Litany",
+        "Vigil",
+        "Scarred Hide",
+        "Four Winds",
+        "Long Breath",
+        "Elemental Fletching",
+        "Quick Hands",
+        "Hard Target",
+        "True Aim",
+        "Fleet Foot"
+      ],
+      "gaveUp": [
+        {
+          "name": "Elemental Edge",
+          "value": 2.8,
+          "cost": 5
+        },
+        {
+          "name": "Quiet Pulse",
+          "value": 2.6,
+          "cost": 10
+        },
+        {
+          "name": "Warm Blood",
+          "value": 2.4,
+          "cost": 11
+        },
+        {
+          "name": "Shelter",
+          "value": 1.8,
+          "cost": 7
+        },
+        {
+          "name": "Light Hand",
+          "value": 1.3333333333333335,
+          "cost": 3
+        },
+        {
+          "name": "Hatchet Work",
+          "value": 1.2999999999999998,
+          "cost": 7
+        },
+        {
+          "name": "Weathered",
+          "value": 1,
+          "cost": 3
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 3
+        }
+      ],
+      "plan": [
+        4, 15, 16, 17, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 57, 58, 74, 79, 80,
+        81, 82, 83, 84, 90, 91, 92, 93, 167, 168, 171, 172, 173, 204, 205, 206, 207, 211, 212, 213,
+        215, 219, 220, 223, 224, 225, 226, 227, 228, 229, 241, 242, 243, 412, 413, 434, 435, 436,
+        437, 438, 444, 445, 446, 447, 448, 449, 450, 452, 454, 457, 458, 459, 467, 468, 469, 470,
+        471, 472, 473, 474, 482, 483, 484, 492, 495, 568, 569, 570, 709, 710, 711, 712, 719, 720,
+        721, 727, 730, 731, 732, 734, 735, 737, 739, 825, 826, 841, 842, 843, 856, 859, 888, 891,
+        892, 907, 956, 1039, 1046, 1049
+      ]
+    },
+    {
+      "id": "block-caster",
+      "budget": 60,
+      "points": 60,
+      "depth": {
+        "max": 16,
+        "p90": 15
+      },
+      "reach": 0.4337591363928218,
+      "reachAt": {
+        "12": 0.6238823842469399,
+        "15": 0.554479740586504,
+        "18": 0.4337591363928218,
+        "21": 0.3178873545090641,
+        "24": 0.2814837223195719
+      },
+      "choice": 2,
+      "searchGain": 0,
+      "nearScores": [1, 0.9907534454906148],
+      "tax": {
+        "points": 19,
+        "share": 0.31666666666666665,
+        "road": 9
+      },
+      "attrs": {
+        "str": 22,
+        "dex": 0,
+        "int": 71
+      },
+      "families": [
+        {
+          "label": "block",
+          "plan": {
+            "shieldBlock": 10
+          },
+          "units": 5,
+          "takenWithin": 5,
+          "withinUnits": 19
+        },
+        {
+          "label": "spell block",
+          "plan": {
+            "shieldSpellBlock": 8,
+            "spellBlock": 2
+          },
+          "units": 5,
+          "takenWithin": 5,
+          "withinUnits": 6
+        },
+        {
+          "label": "spell damage",
+          "plan": {
+            "spellDamage": 60
+          },
+          "units": 7.5,
+          "takenWithin": 7.5,
+          "withinUnits": 15.75
+        },
+        {
+          "label": "energy shield",
+          "plan": {
+            "es": 86,
+            "esFlat": 15
+          },
+          "units": 18.2,
+          "takenWithin": 18.2,
+          "withinUnits": 28.200000000000003
+        }
+      ],
+      "pair": {
+        "labels": ["block", "energy shield"],
+        "units": [5, 18.2],
+        "within": [19, 28.200000000000003]
+      },
+      "taken": [
+        "Zeal",
+        "Iron Faith",
+        "Hearthfire",
+        "Vigil",
+        "Choirmaster",
+        "Shepherd",
+        "Litany",
+        "Glass Skin",
+        "Quiet Pulse",
+        "Quickening",
+        "Warm Blood",
+        "Sharp Mind",
+        "Spirit Ward",
+        "Homily",
+        "Glass Wall",
+        "Warded Mind",
+        "Arcane Focus"
+      ],
+      "gaveUp": [
+        {
+          "name": "Hedge Magic",
+          "value": 3.5,
+          "cost": 11
+        },
+        {
+          "name": "Buckler",
+          "value": 3.2,
+          "cost": 16
+        },
+        {
+          "name": "Quiet Knife",
+          "value": 3,
+          "cost": 12
+        },
+        {
+          "name": "Bracing",
+          "value": 2.8,
+          "cost": 14
+        },
+        {
+          "name": "Thick Blood",
+          "value": 2.4,
+          "cost": 7
+        },
+        {
+          "name": "Consecrated Plate",
+          "value": 2,
+          "cost": 10
+        },
+        {
+          "name": "Elemental Ward",
+          "value": 1.7,
+          "cost": 4
+        },
+        {
+          "name": "Stone Heart",
+          "value": 1.68,
+          "cost": 8
+        },
+        {
+          "name": "Shelter",
+          "value": 1.5,
+          "cost": 5
+        },
+        {
+          "name": "Long Breath",
+          "value": 1.4,
+          "cost": 13
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 2
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 15
+        },
+        {
+          "name": "Frugal",
+          "value": 0.6,
+          "cost": 2
+        },
+        {
+          "name": "Mana Tap",
+          "value": 0.6,
+          "cost": 4
+        }
+      ],
+      "plan": [
+        5, 317, 318, 319, 320, 321, 323, 328, 329, 330, 332, 333, 346, 512, 516, 517, 518, 538, 539,
+        540, 620, 621, 622, 710, 711, 719, 720, 721, 727, 728, 729, 730, 731, 732, 734, 735, 737,
+        739, 766, 767, 768, 769, 771, 778, 779, 780, 781, 782, 802, 803, 862, 863, 875, 876, 877,
+        955, 963, 964, 965, 966, 967
+      ]
+    },
+    {
+      "id": "block-caster",
+      "budget": 120,
+      "points": 120,
+      "depth": {
+        "max": 26,
+        "p90": 20
+      },
+      "reach": 0.552868673423615,
+      "reachAt": {
+        "12": 0.5183076104310803,
+        "15": 0.5298421015482604,
+        "18": 0.552868673423615,
+        "21": 0.498052242445859,
+        "24": 0.46844445459163575
+      },
+      "choice": 3,
+      "searchGain": 0.02832759179460176,
+      "nearScores": [1, 0.9771217798321483, 0.9629279452790322],
+      "tax": {
+        "points": 48,
+        "share": 0.4,
+        "road": 34
+      },
+      "attrs": {
+        "str": 83,
+        "dex": 166,
+        "int": 186
+      },
+      "families": [
+        {
+          "label": "block",
+          "plan": {
+            "shieldBlock": 46
+          },
+          "units": 23,
+          "takenWithin": 9,
+          "withinUnits": 19
+        },
+        {
+          "label": "spell block",
+          "plan": {
+            "shieldSpellBlock": 8,
+            "spellBlock": 4
+          },
+          "units": 6,
+          "takenWithin": 6,
+          "withinUnits": 6
+        },
+        {
+          "label": "spell damage",
+          "plan": {
+            "spellDamage": 108
+          },
+          "units": 13.5,
+          "takenWithin": 13.5,
+          "withinUnits": 15.75
+        },
+        {
+          "label": "energy shield",
+          "plan": {
+            "es": 77,
+            "esFlat": 15
+          },
+          "units": 16.4,
+          "takenWithin": 16.4,
+          "withinUnits": 28.200000000000003
+        }
+      ],
+      "pair": {
+        "labels": ["block", "energy shield"],
+        "units": [23, 16.4],
+        "within": [19, 28.200000000000003]
+      },
+      "taken": [
+        "Zeal",
+        "Iron Faith",
+        "Hearthfire",
+        "Vigil",
+        "Choirmaster",
+        "Shepherd",
+        "Glass Skin",
+        "Quickening",
+        "Warm Blood",
+        "Spirit Ward",
+        "Homily",
+        "Glass Wall",
+        "Quickened Steel",
+        "Warded Mind",
+        "Arcane Focus",
+        "Darting Bolts",
+        "Hedge Magic",
+        "Buckler",
+        "Quiet Knife",
+        "Thick Blood",
+        "Long Breath",
+        "Scarred Hide",
+        "Thunderhead",
+        "Steel Rim",
+        "Flashpoint",
+        "Shieldwall"
+      ],
+      "gaveUp": [
+        {
+          "name": "Bracing",
+          "value": 2.8,
+          "cost": 8
+        },
+        {
+          "name": "Quiet Pulse",
+          "value": 2.2,
+          "cost": 2
+        },
+        {
+          "name": "Litany",
+          "value": 2,
+          "cost": 2
+        },
+        {
+          "name": "Consecrated Plate",
+          "value": 2,
+          "cost": 10
+        },
+        {
+          "name": "Elemental Ward",
+          "value": 1.7,
+          "cost": 4
+        },
+        {
+          "name": "Stone Heart",
+          "value": 1.68,
+          "cost": 8
+        },
+        {
+          "name": "Shelter",
+          "value": 1.5,
+          "cost": 2
+        },
+        {
+          "name": "Sharp Mind",
+          "value": 1.3,
+          "cost": 1
+        },
+        {
+          "name": "Prism Ward",
+          "value": 0.8,
+          "cost": 2
+        },
+        {
+          "name": "Wayfarer",
+          "value": 0.8,
+          "cost": 4
+        },
+        {
+          "name": "Frugal",
+          "value": 0.6,
+          "cost": 2
+        },
+        {
+          "name": "Mana Tap",
+          "value": 0.6,
+          "cost": 6
+        }
+      ],
+      "plan": [
+        5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 167, 168, 169, 170, 172, 173, 174, 178, 179,
+        180, 181, 203, 205, 211, 212, 213, 317, 318, 319, 320, 321, 323, 328, 329, 330, 333, 346,
+        351, 352, 355, 370, 404, 405, 468, 469, 471, 477, 480, 482, 483, 484, 506, 516, 517, 518,
+        538, 611, 612, 620, 621, 622, 632, 643, 644, 648, 662, 663, 710, 711, 719, 720, 721, 727,
+        728, 729, 730, 731, 732, 734, 735, 766, 767, 768, 769, 771, 778, 779, 780, 781, 782, 783,
+        802, 803, 815, 816, 817, 818, 819, 820, 821, 822, 859, 861, 862, 863, 871, 876, 877, 885,
+        886, 887, 955, 956, 963, 964, 965, 966, 967, 1101
+      ]
+    }
+  ]
+}
