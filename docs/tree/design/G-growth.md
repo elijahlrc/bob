@@ -31,14 +31,16 @@ Answered before writing (2026-10-22):
 
 Plan approved by the user on 2026-10-22, with the two edits above (no power target; no deference to the Strider) and
 single-stat power added. **G0 is built (2026-10-22) and waits at user stop 1:** [G0-baseline.md](G0-baseline.md) holds
-the numbers, the proposed radius (18 steps) and targets, and the questions. The tools are `scripts/passives/archetypes.ts`
-(22 archetypes), `scripts/passives/builds.ts` (the allocator and report; `--pics`, `--json`) and
-`scripts/passives/supply.ts` (supply map and empty space); their output is in `G0/`. Once the user answers, fix
-`REACH_RADIUS` in `builds.ts`, amend the archetype set, and start G1a. Tools already in the repo: `passives:pic`
-(`--region`, `--box`, `--text`, `--ids`), `passives:list`, `passives:audit`, `scripts/passives/geometry.ts` (crossings,
-overlaps, bends), `tighten.ts` (layout first pass), `fold.ts` (editor patches), `passives:register`, `passives:bake`.
-Node units come from `lines.ts` (`Line.units`); the built network from `buildAll({ allowNew: true })` in
-`src/data/passives`. Layout rules for new nodes: CONSTRAINTS §11 item 5; the layout process: §15 item 10.
+the numbers and one question: does "what more points would still buy" capture the tension the user means? (The first
+version's step-count radius was rejected by the user the same day; see §1 and CONSTRAINTS §14.) The tools are
+`scripts/passives/archetypes.ts` (27 archetypes), `scripts/passives/builds.ts` (`npm run passives:builds`: the
+allocator and report; `--pics`, `--json`) and `scripts/passives/supply.ts` (`npm run passives:supply`: supply map and
+empty space); their output is in `G0/`. Once the user answers, set the targets with them and start G1a. Tools already
+in the repo: `passives:pic` (`--region`, `--box`, `--text`, `--ids`), `passives:list`, `passives:audit`,
+`scripts/passives/geometry.ts` (crossings, overlaps, bends), `tighten.ts` (layout first pass), `fold.ts` (editor
+patches), `passives:register`, `passives:bake`. Node units come from `lines.ts` (`Line.units`); the built network from
+`buildAll({ allowNew: true })` in `src/data/passives`. Layout rules for new nodes: CONSTRAINTS §11 item 5; the layout
+process: §15 item 10.
 
 ## 1. What "tension" means, so it can be measured
 
@@ -52,23 +54,24 @@ A walk by eye is still the judge (CONSTRAINTS §15.2), but the walks need a comm
 - **What it can get.** An allocator buys the most valuable connected set of nodes from the archetype's start for a
   budget of 60 and of 120 points, and searches for alternative plans that score nearly as well.
 - **The numbers each walk reports:**
-  - **Reach:** the share of the value the network holds for this archetype within a fixed number of steps of its start
-    that the best plan takes. The radius is set once in G0 with the user (the steps a 120-point build can plausibly
-    travel) and never changed, so the baseline and every later round mean the same thing. Growth should push it down.
+  - **What more points would buy** (replaces "reach", 2026-10-22): the best plan at 60 and at 120 points, grown by 20
+    and 40 more points while keeping every node it has, and each main stat's amount at each step. A main stat that 40
+    more points barely raise is one the build already has all it wants of: no tension. One that keeps climbing is one
+    it had to leave behind. The allocator decides what is worth reaching, because it pays every path's cost. The first
+    version counted the value within a fixed number of steps of the start; the user rejected that, since a build may
+    stay compact or run long narrow branches to spread stats, and no step count says what it can reach.
   - **Choice:** how many plans that differ in at least a few notables score within about 5% of the best, by the
     archetype's own weights (a comparison of plans for one build, not a measure of its power). One plan far
     ahead of the rest means the network has made the decision for the player; three or more means a real trade-off.
   - **Tax:** the share of points spent on nodes worth nothing to the build (roads it only passes through). Some tax is
     the price of a choice; a lot is filler.
-  - **What it gave up:** the named notables of its own kind it could not afford, at 60 and at 120. This is the list the
-    user reads.
+  - **What it gave up:** the wanted notables and keystones that 40 more points would add, at 60 and at 120. This is
+    the list the user reads.
   - **Per-stat totals:** for each of the archetype's main stats, and for its main pair (spell damage with energy shield,
-    life with armour), the total its best plan collects (in the stat's own terms: 120% spell damage, +45% armour) and
-    how much of that stat lies within its radius. Compared before and after, and between archetypes that share a stat,
-    one stat or pair at a time.
+    life with armour), the total its best plan collects, in the stat's own terms (120% spell damage, +45% armour), at
+    each step above. Compared before and after, and between archetypes that share a stat, one stat or pair at a time.
 
-Targets are set from the baseline once it is measured (G0) and agreed with the user. As a first guess: reach at 120
-points well under two thirds for every archetype, at least three near-equal plans for most, tax under about a third. The allocator is a static tool over the network and the units, not the bot simulation, so
+Targets are set from the baseline once it is measured (G0) and the measure is agreed with the user. The allocator is a static tool over the network and the units, not the bot simulation, so
 it does not count against "no incremental balance simulations" (CONSTRAINTS §12.4); the one bot sim stays at the very
 end.
 

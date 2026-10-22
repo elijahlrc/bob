@@ -1,9 +1,11 @@
 /**
  * Walks the archetypes of `archetypes.ts` through the hand-written network and reports how much tension it gives them
- * (docs/tree/design/G-growth.md §1): for 60 and 120 points, the best plan an allocator finds and the plans nearly as good,
- * then reach, choice, tax, what each build gave up, and its main stats one at a time (never one number for a build).
+ * (docs/tree/design/G-growth.md §1). For every budget from 60 to 160 points, the best plan an allocator finds; from
+ * those, each main stat's curve (how much of it a build holds as its points grow, in the stat's own terms), what a build
+ * gave up at 60 and at 120 points (what 40 more points would buy), and at 60 and 120 the choice and the tax. Never one
+ * number for a build. Budgets above 123 are not reachable in a run: they probe what a finished build still wants.
  *
- *   npx tsx scripts/passives/builds.ts [--only id,id] [--budgets 60,120] [--radius 18] [--json out.json] [--pics dir]
+ *   npx tsx scripts/passives/builds.ts [--only id,id] [--json out.json] [--pics dir]
  *
  * The allocator buys a connected set of nodes from the class's start, one point a node, never through another start.
  * Greedy: from the set, the path (shortest, ties to the more valuable) whose value per point is highest; then swaps:
@@ -21,10 +23,13 @@ import { Canvas, hex } from '../tree/png';
 import { ARCHETYPES, type Archetype } from './archetypes';
 
 /**
- * Steps from the start within which reach and the gave-up lists count what the network holds. Proposed at G0 from the
- * depth of today's 120-point plans; once the user agrees it is never changed, so every round is measured the same way.
+ * The budgets judged: mid-run and a finished build (G-growth §0). Each is the best plan for its budget, then grown by
+ * GROW points at a time up to NEXT more (keeping every node it has, as a player's build grows): what more points would
+ * buy. 160 is above the game's 123 points: a probe of what a finished build still wants, not a reachable build.
  */
-export const REACH_RADIUS = 18;
+const JUDGED = [60, 120];
+const GROW = 20;
+const NEXT = 40;
 /** A plan within this share of the best counts as a near-equal choice. */
 const NEAR = 0.05;
 /** Two plans are different choices when each takes at least this many notables or keystones the other does not. */
@@ -36,8 +41,6 @@ const arg = (k: string) => {
   return i >= 0 ? argv[i + 1] : undefined;
 };
 const only = arg('--only')?.split(',');
-const budgets = (arg('--budgets') ?? '60,120').split(',').map(Number);
-const radius = Number(arg('--radius') ?? REACH_RADIUS);
 const jsonOut = arg('--json');
 const picDir = arg('--pics');
 
@@ -179,10 +182,10 @@ function leaves(set: Set<number>, start: number): number[] {
 }
 
 /** Removes the least valuable leaves until `free` points are free (a branch comes back one leaf at a time). */
-function prune(set: Set<number>, start: number, free: number, v: Float64Array, keep: number) {
+function prune(set: Set<number>, start: number, free: number, v: Float64Array, keep: Set<number>) {
   let freed = 0;
   while (freed < free) {
-    const ls = leaves(set, start).filter((i) => i !== keep);
+    const ls = leaves(set, start).filter((i) => !keep.has(i));
     if (!ls.length) return;
     // The leaf whose branch, back to the plan's next junction or valued node, is worth least per point.
     let worst = -1,
@@ -215,9 +218,16 @@ function prune(set: Set<number>, start: number, free: number, v: Float64Array, k
   }
 }
 
-function solve(a: Archetype, budget: number, v: Float64Array, banned: Set<number>): Plan {
+/** The best plan for a budget; with `base`, the best that keeps every node of `base` (a build growing from it). */
+function solve(
+  a: Archetype,
+  budget: number,
+  v: Float64Array,
+  banned: Set<number>,
+  base?: Set<number>,
+): Plan {
   const start = built.tree.starts[a.start];
-  const set = new Set<number>([start]);
+  const set = new Set<number>(base ?? [start]);
   fill(set, start, budget, v, banned);
   let score = scoreOf(set, v);
   // Swaps: reach for each wanted notable or keystone not taken, paying with the plan's weakest leaves.
@@ -233,7 +243,7 @@ function solve(a: Archetype, budget: number, v: Float64Array, banned: Set<number
       const need = bfs(trial, v, banned).d[t];
       if (need < 0) continue;
       const left = budget - (trial.size - 1);
-      if (need > left) prune(trial, start, need - left, v, -1);
+      if (need > left) prune(trial, start, need - left, v, base ?? new Set());
       const r = bfs(trial, v, banned);
       if (r.d[t] < 0 || r.d[t] > budget - (trial.size - 1)) continue;
       for (let c = t; !trial.has(c); c = r.prev[c]) trial.add(c);
@@ -305,126 +315,92 @@ function plans(
 }
 
 // ---- Reports.
-/** One stat family of a plan: amounts in their own terms, units taken, units taken within the radius, units there. */
-type Family = {
-  label: string;
-  plan: Record<string, number>;
-  units: number;
-  takenWithin: number;
-  withinUnits: number;
-};
-type Result = {
-  id: string;
+/** One stat family of a plan: units, and amounts in their own terms by line key. */
+type Family = { label: string; units: number; amounts: Record<string, number> };
+type Step = {
   budget: number;
   points: number;
-  depth: { max: number; p90: number };
-  reach: number;
-  reachAt: Record<number, number>;
+  families: Family[];
   choice: number;
+  nearScores: number[];
   /** How much the swaps and bans gained over the first greedy plan (a check on the search). */
   searchGain: number;
-  nearScores: number[];
   tax: { points: number; share: number; road: number };
   attrs: { str: number; dex: number; int: number };
-  families: Family[];
-  pair: { labels: [string, string]; units: [number, number]; within: [number, number] };
   taken: string[];
-  gaveUp: { name: string; value: number; cost: number }[];
   plan: number[];
 };
+/** What a build gave up at a budget: the wanted notables and keystones NEXT more points would add to its plan. */
+type Verdict = { budget: number; gaveUp: { name: string; value: number }[] };
+type Result = { id: string; start: string; want: string; curve: Step[]; judged: Verdict[] };
 
-function familyOf(
-  a: Archetype,
-  label: string,
-  set: Set<number>,
-  within: (i: number) => boolean,
-): Family {
+function familyOf(a: Archetype, label: string, set: Set<number>): Family {
   const keys = new Set(a.main[label]);
-  const plan: Record<string, number> = {};
-  let units = 0,
-    takenWithin = 0,
-    withinUnits = 0;
-  for (let i = 0; i < N; i++) {
-    if (!live(i)) continue;
+  const amounts: Record<string, number> = {};
+  let units = 0;
+  for (const i of set)
     for (const r of rows[i]) {
       if (!keys.has(r.key)) continue;
-      if (within(i)) withinUnits += r.units;
-      if (set.has(i)) {
-        units += r.units;
-        if (within(i)) takenWithin += r.units;
-        plan[r.key] = (plan[r.key] ?? 0) + r.amount;
-      }
+      units += r.units;
+      amounts[r.key] = (amounts[r.key] ?? 0) + r.amount;
     }
-  }
-  return { label, plan, units, takenWithin, withinUnits };
+  return { label, units, amounts };
 }
 
-function measure(a: Archetype, budget: number): Result {
+function measure(a: Archetype): Result {
   const v = valuesFor(a);
   const start = built.tree.starts[a.start];
-  const { best, near, firstGain } = plans(a, budget, v);
-  const set = best.set;
   const fromStart = bfs([start], v, new Set()).d;
-  const depths = [...set].map((i) => fromStart[i]).sort((x, y) => x - y);
-  const within = (r: number) => (i: number) => fromStart[i] >= 0 && fromStart[i] <= r;
-  const reachOf = (r: number) => {
-    let all = 0,
-      got = 0;
-    for (let i = 0; i < N; i++)
-      if (within(r)(i)) {
-        all += v[i];
-        if (set.has(i)) got += v[i];
-      }
-    return all ? got / all : 0;
+  const step = (budget: number, set: Set<number>, near: Plan[] | null, gain: number): Step => {
+    const points = set.size - 1;
+    let taxPts = 0,
+      road = 0;
+    for (const i of set) {
+      if (i === start) continue;
+      if (v[i] <= 0) taxPts++;
+      if (nodes[i].kind === 'travel') road++;
+    }
+    const attrs = { str: 0, dex: 0, int: 0 };
+    for (const i of set) for (const k of ['str', 'dex', 'int'] as const) attrs[k] += attrOf(i, k);
+    const score = scoreOf(set, v);
+    return {
+      budget,
+      points,
+      families: Object.keys(a.main).map((l) => familyOf(a, l, set)),
+      choice: near?.length ?? 0,
+      nearScores: near?.map((p) => p.score / score) ?? [],
+      searchGain: gain,
+      tax: { points: taxPts, share: points ? taxPts / points : 0, road },
+      attrs,
+      taken: [...set]
+        .filter(big)
+        .sort((x, y) => fromStart[x] - fromStart[y])
+        .map((i) => nodes[i].name),
+      plan: [...set].sort((x, y) => x - y),
+    };
   };
-  const reachAt: Record<number, number> = {};
-  for (const r of [12, 15, 18, 21, 24]) reachAt[r] = reachOf(r);
-  const points = set.size - 1;
-  let taxPts = 0,
-    road = 0;
-  for (const i of set) {
-    if (i === start) continue;
-    if (v[i] <= 0) taxPts++;
-    if (nodes[i].kind === 'travel') road++;
+  const curve: Step[] = [];
+  const judged: Verdict[] = [];
+  for (const budget of JUDGED) {
+    const { best, near, firstGain } = plans(a, budget, v);
+    curve.push(step(budget, best.set, near, firstGain));
+    // The same build grown by GROW points at a time: what more points would buy.
+    let set = best.set;
+    for (let more = GROW; more <= NEXT; more += GROW) {
+      set = solve(a, budget + more, v, new Set(), set).set;
+      curve.push(step(budget + more, set, null, 0));
+    }
+    const gaveUp = [...set]
+      .filter((i) => big(i) && !best.set.has(i) && v[i] > 0 && wantedShare(a, i) >= 0.5)
+      .map((i) => ({ name: nodes[i].name, value: v[i] }))
+      .sort((x, y) => y.value - x.value);
+    judged.push({ budget, gaveUp });
   }
-  const attrs = { str: 0, dex: 0, int: 0 };
-  for (const i of set) for (const k of ['str', 'dex', 'int'] as const) attrs[k] += attrOf(i, k);
-  const families = Object.keys(a.main).map((l) => familyOf(a, l, set, within(radius)));
-  const fp = (l: string) => families.find((f) => f.label === l)!;
-  const fromPlan = bfs(set, v, new Set()).d;
-  const gaveUp = [];
-  for (let i = 0; i < N; i++)
-    if (big(i) && !set.has(i) && within(radius)(i) && v[i] > 0 && wantedShare(a, i) >= 0.5)
-      gaveUp.push({ name: nodes[i].name, value: v[i], cost: fromPlan[i] });
-  gaveUp.sort((x, y) => y.value - x.value || x.cost - y.cost);
-  return {
-    id: a.id,
-    budget,
-    points,
-    depth: { max: depths[depths.length - 1], p90: depths[Math.floor(depths.length * 0.9)] },
-    reach: reachOf(radius),
-    reachAt,
-    choice: near.length,
-    searchGain: firstGain,
-    nearScores: near.map((p) => p.score / best.score),
-    tax: { points: taxPts, share: points ? taxPts / points : 0, road },
-    attrs,
-    families,
-    pair: {
-      labels: a.pair,
-      units: [fp(a.pair[0]).units, fp(a.pair[1]).units],
-      within: [fp(a.pair[0]).withinUnits, fp(a.pair[1]).withinUnits],
-    },
-    taken: bigOf(best)
-      .sort((x, y) => fromStart[x] - fromStart[y])
-      .map((i) => nodes[i].name),
-    gaveUp,
-    plan: [...set].sort((x, y) => x - y),
-  };
+  return { id: a.id, start: a.start, want: a.want, curve, judged };
 }
 
-// ---- Pictures: the network dimmed, the 60-point plan inside the 120-point one, what was given up ringed.
-function picture(a: Archetype, res: Result[], path: string) {
+// ---- Pictures: the network dimmed; the best 60-point plan, what the best 120-point plan adds, what 40 more would add.
+function picture(a: Archetype, res: Result, path: string) {
   const ids = built.tree.nodes.filter((n) => live(n.id));
   const xs = ids.map((n) => n.x),
     ys = ids.map((n) => n.y);
@@ -438,28 +414,24 @@ function picture(a: Archetype, res: Result[], path: string) {
   const cv = new Canvas(width, Math.round((maxY - minY) * scale), hex('#0f1016'));
   const X = (x: number) => (x - minX) * scale,
     Y = (y: number) => (y - minY) * scale;
-  const [small, large] = [...res].sort((p, q) => p.budget - q.budget);
-  const inS = new Set(small?.plan ?? []),
-    inL = new Set(large?.plan ?? []);
-  const COL = {
-    both: hex('#ffe08a'),
-    early: hex('#7fc8ff'),
-    late: hex('#f08a4a'),
-    off: hex('#3a3e4c'),
-  };
-  const colOf = (i: number) =>
-    inS.has(i) && inL.has(i) ? COL.both : inS.has(i) ? COL.early : inL.has(i) ? COL.late : COL.off;
+  const planAt = (b: number) => new Set(res.curve.find((s) => s.budget === b)?.plan ?? []);
+  const p60 = planAt(60),
+    p120 = planAt(120),
+    p160 = planAt(120 + NEXT);
+  const COL = [hex('#3a3e4c'), hex('#ffe08a'), hex('#f08a4a'), hex('#ff4a5a')];
+  const tier = (i: number) => (p60.has(i) ? 1 : p120.has(i) ? 2 : p160.has(i) ? 3 : 0);
   for (const n of nodes)
     for (const k of n.links)
       if (k > n.id && live(n.id) && live(k)) {
-        const on = (inS.has(n.id) && inS.has(k)) || (inL.has(n.id) && inL.has(k));
+        const on = tier(n.id) > 0 && tier(k) > 0;
+        const t = Math.max(tier(n.id), tier(k));
         cv.line(
           X(n.x),
           Y(n.y),
           X(nodes[k].x),
           Y(nodes[k].y),
           on ? 3 : 1,
-          on ? colOf(k) : COL.off,
+          on ? COL[t] : COL[0],
           on ? 0.9 : 0.6,
         );
       }
@@ -471,20 +443,24 @@ function picture(a: Archetype, res: Result[], path: string) {
     travel: 9,
     hub: 10,
   };
-  const gave = new Set(large?.gaveUp.map((g) => g.name) ?? []);
   for (const n of nodes) {
     if (!live(n.id)) continue;
     const r = R[n.kind] * scale * 1.4;
-    cv.disc(X(n.x), Y(n.y), r, n.kind === 'start' ? hex('#ffffff') : colOf(n.id), 1);
-    if (big(n.id) && gave.has(n.name) && !inL.has(n.id)) {
-      cv.ring(X(n.x), Y(n.y), r + 3, 2, hex('#ff4a5a'), 1);
-      cv.text(n.name, X(n.x), Y(n.y) + r + 9, 1, hex('#ff8a95'), 'middle');
-    }
-    if (big(n.id) && (inL.has(n.id) || inS.has(n.id)))
-      cv.text(n.name, X(n.x), Y(n.y) + r + 9, 1, hex('#e8e4d8'), 'middle');
+    const t = tier(n.id);
+    if (t === 3) cv.ring(X(n.x), Y(n.y), r, 2, COL[3], 1);
+    else cv.disc(X(n.x), Y(n.y), r, n.kind === 'start' ? hex('#ffffff') : COL[t], 1);
+    if (big(n.id) && t > 0)
+      cv.text(
+        n.name,
+        X(n.x),
+        Y(n.y) + r + 9,
+        1,
+        t === 3 ? hex('#ff8a95') : hex('#e8e4d8'),
+        'middle',
+      );
   }
   cv.text(
-    `${a.id}: blue 60 only, yellow both, orange 120 only, red ring given up at 120`,
+    `${a.id}: yellow the best 60 points, orange what the best 120 adds, red rings what ${NEXT} more would add`,
     10,
     16,
     2,
@@ -498,42 +474,43 @@ function picture(a: Archetype, res: Result[], path: string) {
 const pct = (x: number) => `${Math.round(100 * x)}%`;
 const fmt = (n: number) =>
   Math.abs(n - Math.round(n)) < 0.05 ? String(Math.round(n)) : n.toFixed(1);
+const pad = (s: string, n: number) => (s.length >= n ? s : ' '.repeat(n - s.length) + s);
 const all: Result[] = [];
 for (const a of ARCHETYPES) {
   if (only && !only.includes(a.id)) continue;
-  const res = budgets.map((b) => measure(a, b));
-  all.push(...res);
+  const res = measure(a);
+  all.push(res);
+  const at = (b: number) => res.curve.find((s) => s.budget === b)!;
   console.log(`\n== ${a.id} (${a.start}): ${a.want}`);
-  for (const r of res) {
+  for (const b of JUDGED) {
+    const s = at(b);
     console.log(
-      `  ${r.budget} pts: reach ${pct(r.reach)} (r${radius}; ${Object.entries(r.reachAt)
-        .map(([k, x]) => `${k}:${pct(x)}`)
-        .join(
-          ' ',
-        )}), choice ${r.choice} [${r.nearScores.map((s) => pct(s)).join(' ')}], tax ${pct(r.tax.share)} (${r.tax.points}; roads ${r.tax.road}), depth max ${r.depth.max} p90 ${r.depth.p90}, attrs str ${r.attrs.str} dex ${r.attrs.dex} int ${r.attrs.int}${r.points < r.budget ? `, ${r.budget - r.points} points unspent` : ''}`,
-    );
-    for (const f of r.families)
-      console.log(
-        `    ${f.label}: ${pct(f.takenWithin / (f.withinUnits || 1))} of the ${fmt(f.withinUnits)} units within reach; ${fmt(f.units)} units in all (${Object.entries(
-          f.plan,
-        )
-          .map(([k, x]) => `${k} ${fmt(x)}`)
-          .join(', ')})`,
-      );
-    console.log(
-      `    pair ${r.pair.labels.join(' + ')}: ${fmt(r.pair.units[0])} + ${fmt(r.pair.units[1])} units, of ${fmt(r.pair.within[0])} + ${fmt(r.pair.within[1])} within reach`,
-    );
-    console.log(`    took: ${r.taken.join(', ')}`);
-    console.log(
-      `    gave up: ${r.gaveUp
-        .slice(0, 12)
-        .map((g) => `${g.name} (${fmt(g.value)}, +${g.cost})`)
-        .join(', ')}${r.gaveUp.length > 12 ? `, and ${r.gaveUp.length - 12} more` : ''}`,
+      `  ${b} points: choice ${s.choice} [${s.nearScores.map(pct).join(' ')}], tax ${pct(s.tax.share)} (${s.tax.points}; roads ${s.tax.road}), attributes str ${s.attrs.str} dex ${s.attrs.dex} int ${s.attrs.int}${s.points < b ? `, ${b - s.points} points unspent` : ''}`,
     );
   }
+  console.log(`  ${pad('points', 34)}${res.curve.map((s) => pad(String(s.budget), 7)).join('')}`);
+  for (let f = 0; f < res.curve[0].families.length; f++) {
+    const label = res.curve[0].families[f].label;
+    console.log(
+      `  ${pad(`${label}, units`, 34)}${res.curve.map((s) => pad(fmt(s.families[f].units), 7)).join('')}`,
+    );
+    const keys = [...new Set(res.curve.flatMap((s) => Object.keys(s.families[f].amounts)))];
+    for (const k of keys)
+      console.log(
+        `  ${pad(k, 34)}${res.curve.map((s) => pad(fmt(s.families[f].amounts[k] ?? 0), 7)).join('')}`,
+      );
+  }
+  for (const j of res.judged)
+    console.log(
+      `  gave up at ${j.budget} (what ${NEXT} more points would add): ${j.gaveUp.map((g) => `${g.name} (${fmt(g.value)})`).join(', ') || 'nothing it wants'}`,
+    );
   if (picDir) {
     mkdirSync(picDir, { recursive: true });
     picture(a, res, join(picDir, `${a.id}.png`));
   }
 }
-if (jsonOut) writeFileSync(jsonOut, JSON.stringify({ radius, results: all }, null, 1));
+if (jsonOut)
+  writeFileSync(
+    jsonOut,
+    JSON.stringify({ judged: JUDGED, grow: GROW, next: NEXT, results: all }, null, 1),
+  );

@@ -1,232 +1,219 @@
 # G0. The baseline: how much tension the network gives today
 
 Measured 2026-10-22 on the network as committed (1,009 live nodes), for phase G0 of [G-growth.md](G-growth.md). Nothing in
-the network changed. This is user stop 1: the archetypes, the radius and the targets below are proposals for the user to
-accept, change or strike.
+the network changed. This is user stop 1.
+
+**Second version, same day.** The first version counted what lay "within reach" as a number of steps from the start.
+The user rejected that as incoherent: a build may stay compact near its start or run long narrow branches out to
+widely spread stats, and both are valid, so no step count says what a build can reach. That idea is now in
+CONSTRAINTS §14. This version lets the allocator decide what is worth reaching, since it already pays every path's cost,
+and measures tension as **what more points would still buy**.
 
 ## The tools
 
-- **`scripts/passives/archetypes.ts`**: 22 archetypes. Each is a player's wish list: a weight for each line of the
-  vocabulary (1 a main want, 0.5 a want, 0.25 to 0.4 a nice-to-have), the keystones it would take, the main stats
-  reported one at a time and the pair reported together, and what its weapon's gear asks for. The weights steer the
-  allocator. They never decide where a node goes (CONSTRAINTS §14).
-- **`scripts/passives/builds.ts`**: the allocator and the report.
-  `npx tsx scripts/passives/builds.ts [--only id,id] [--budgets 60,120] [--radius 18] [--json out.json] [--pics dir]`.
-  The output of this run is in [G0/builds.txt](G0/builds.txt) and [G0/builds.json](G0/builds.json) (run prettier on the
-  JSON after writing it, or `npm run check` fails), with a picture of each archetype's plans in [G0/builds/](G0/builds/).
-  `npm run passives:builds` and `npm run passives:supply` run the two scripts.
-- **`scripts/passives/supply.ts`**: the supply map.
-  `npx tsx scripts/passives/supply.ts [--md out.md] [--pic empty.png]`. It writes [G0/supply.md](G0/supply.md) (units by
-  stat family and region, nodes by area, every specialization's notables with their partners and nearest twin, and the
-  empty space) and [G0/empty.png](G0/empty.png).
+- **`scripts/passives/archetypes.ts`**: 27 archetypes.
+  - Each is a player's wish list: a weight for each line of the vocabulary (1 a main want, 0.5 a want, 0.25 to 0.4 a
+    nice-to-have), the keystones it would take, the main stats reported one at a time, and what its weapon's gear asks
+    for.
+  - The weights steer the allocator; they never decide where a node goes (CONSTRAINTS §14).
+  - The user's two examples come first. The user made up the first set casually and left it to us to maintain, so
+    five were added for builds it missed: a lightning and physical caster from the Zealot, a channeller, a sceptre fire
+    attacker, a curse build and a dodging Shade.
+- **`scripts/passives/builds.ts`** (`npm run passives:builds -- [--only id,id] [--json out.json] [--pics dir]`): the
+  allocator and the report.
+  - This run's output is [G0/builds.txt](G0/builds.txt) and [G0/builds.json](G0/builds.json). Run prettier on the
+    JSON after writing it, or `npm run check` fails.
+  - A picture of each archetype is in [G0/builds/](G0/builds/): yellow is the best 60-point plan, orange is what the
+    best 120-point plan adds, and red rings are what 40 more points would add.
+- **`scripts/passives/supply.ts`** (`npm run passives:supply -- [--md out.md] [--pic empty.png]`): the supply map.
+  - It writes [G0/supply.md](G0/supply.md): units by stat family and region, nodes by area, and every specialization's
+    notables with their partners and nearest twin.
+  - It also writes the empty space as [G0/empty.png](G0/empty.png).
 
-**How the allocator works.**
+## How tension is measured
+
+**The plans.**
 
 - A plan is a connected set of nodes from the class's start that never passes through another start. Every node costs
-  one point, whatever its kind.
-- A node is worth the sum of its lines' units (`Line.units`) times the archetype's weights. Attribute lines are worth
-  nothing: they are the road's supply, reported beside each plan against the gear. Otherwise every attribute node would
-  count as wanted and the tax would vanish.
-- **Search.** It first takes greedy paths by value per point. Then it tries swaps: for each wanted notable it skipped,
-  it frees points by pruning its least valuable leaves, reaches for that notable and refills.
-- **Alternative plans.** It solves again with one or two of the best plan's top notables banned. If a banned search
-  beats the best plan, the search restarts from it.
-- **Checks.** The swaps and bans improved on the first greedy plan by 0 to 10%. After a restart, no ban found anything
-  better.
-- It is deterministic, so a later round means the same thing as this one.
-- The 60-point plan is the best for 60 points, not the first 60 points of the 120-point plan. Even so, 14 of the 22
-  60-point plans lie wholly inside their 120-point plan, and the rest at least three quarters (warcry-totem 75%, staff
-  block 85%, block caster 89%, claw poison 90%, the others 97 to 98%).
+  one point.
+- A node is worth the sum of its lines' units (`Line.units`) times the archetype's weights.
+- Attribute lines are worth nothing to the build. They are the road's supply, reported beside each plan against the
+  gear. Otherwise every attribute node would count as wanted and the tax would vanish.
+- **The search:**
+  - It takes greedy paths by value per point, then tries swaps: for each wanted notable it skipped, it frees points by
+    pruning its least valuable leaves, reaches for that notable and refills.
+  - It solves again with one or two of the best plan's top notables banned. If a banned search beats the best, the
+    search restarts from it.
+  - Swaps and bans improved on the first greedy plan by 0 to 10%, and after the restarts nothing better turned up.
+  - It is deterministic, so a later round means the same thing as this one.
 
-**What it reports**, at 60 and 120 points:
+**What is reported, at 60 points (mid-run) and 120 (a finished build):**
 
-- **Reach:** the share of the value within 18 steps of the start that the best plan takes. All the build's wants count,
-  generic ones (resistances, mana) included, so this number is diluted. The main stats below are sharper.
+- **What more points would buy.** The best plan is grown by 20 and then 40 more points, keeping every node it has, as a
+  player's build grows. 160 points is more than a run gives (123): it is a probe of what a finished build still wants,
+  not a build anyone can have.
+  - Each main stat is reported at 60, 80 and 100 points, and at 120, 140 and 160, in its own terms (126% spell damage)
+    and in units (a unit is one small node of that stat).
+  - A main stat that 40 more points barely raise is one the build already has all it wants of: **no tension there.**
+  - A stat that keeps climbing is one the build had to leave behind.
+- **Gave up:** the wanted notables and keystones that 40 more points would add, each with its worth in units to the
+  build. This is the list of what the build chose against.
 - **Choice:** distinct plans within 5% of the best, where each takes at least three notables or keystones the others
-  do not (two was tried first: with about thirty notables in a 120-point plan, swapping two is nearly free, and almost
-  every build counted three or more).
+  do not. With two, almost every build counted three or more, since swapping two of thirty notables is nearly free.
 - **Tax:** the share of points spent on nodes worth nothing to the build (mostly attribute roads).
-- **Main stats, one at a time:** for each main stat family, the share of what lies within reach that the plan takes,
-  plus the amount in the stat's own terms (spell damage 126%, energy shield 157% and +15).
-- **Gave up:** the notables of its own kind within reach that it left, each with its worth and the points it would cost
-  from the plan.
 - **Attributes:** what the plan supplies.
 
 There is never one power number for a build (the user, 2026-10-22).
 
-## The headline: at 120 points, builds get nearly all of their main stats
+## The headline: most builds run out of what they want before 120 points
 
-The user's two examples, in their own terms:
+**The classic caster (Mystic; cold spells, energy shield).**
 
-- **The classic caster (Mystic; cold spells, energy shield).**
-  - At 60 points it takes 65% of the spell damage within 18 steps and 46% of the energy shield.
-  - At 120 points it takes **100% of the spell damage and 85% of the energy shield**: 126% spell damage, +30% with a
-    wand and +12% spell area damage, plus 157% energy shield and +15.
-  - **The whole network holds only 17 units (about 136%) of plain spell damage within its reach.** At 120 points it
-    gives up nothing it wants: the best notables it leaves are worth 1.6 units or less.
-- **The strength sword build (Reaver; life, armour, sword damage).**
-  - At 60 points it takes 85% of the armour within reach, 48% of the sword damage and 46% of the life.
-  - At 120 points it takes **97% of the armour, 89% of the sword damage and 80% of the life** (202% armour, 214% life),
-    reaching into the Vanguard for armour and into the Strider for attack speed.
-  - What it leaves at 120 is minor: Shelter, Vampiric Strikes, Thirsty Quiver.
+| points        |  60 |   80 |  100 |  120 |  140 |  160 |
+| ------------- | --: | ---: | ---: | ---: | ---: | ---: |
+| spell damage  | 78% |  78% | 126% | 126% | 126% | 142% |
+| energy shield | 83% | 131% | 141% | 157% | 170% | 198% |
+| cast speed    | 10% |  10% |  37% |  41% |  45% |  49% |
 
-Across all 22 archetypes:
+- The 60-to-100 columns grow the best 60-point plan; the 120-to-160 columns grow the best 120-point plan.
+- Throughout, it also has 30% spell damage with a wand, 12% spell area damage and +15 energy shield.
+- From 100 points on, the spell damage stops: **40 points past 120 buy 16% more spell damage**, because there is no
+  more within any sensible walk.
+- What 40 more points would add are notables it barely wants: Crozier, Consecrated Plate, Ossuary, Vigil, Shattering
+  Rite, worth 1.4 to 3 units each.
+- Only its cold damage still climbs (+9 units), since the elemental lines are spread far from the Mystic.
 
-- At 120 points, **most main stats are at 80 to 100%** of what lies within reach, and 12 of the 22 archetypes have at
-  least one main stat at 100%.
-- Life is the exception: it is spread widely, and the life share at 120 is 37 to 80%.
-- At 60 points, the main stats are mostly at 40 to 80%. A few are already full or nearly: wand damage, claw damage,
-  two-handed damage, spell damage for the life caster (94%) and minions (91%).
-- The weighted reach is 33 to 47% at 60 points and **55 to 72% at 120**, against the plan's first guess of "well under
-  two thirds".
+**The strength sword build (Reaver; life, armour, sword damage).**
 
-| archetype     | start    | reach 60 / 120 | choice 60 / 120 | tax 60 / 120 | main stats: share of what lies within reach, 60 / 120                                     |
-| ------------- | -------- | -------------- | --------------- | ------------ | ----------------------------------------------------------------------------------------- |
-| caster-es     | Mystic   | 38 / 68%       | 3 / 3           | 35 / 38%     | spell damage 65 / 100%; cold damage 67 / 67%; energy shield 46 / 85%; cast speed 26 / 83% |
-| sword-str     | Reaver   | 42 / 72%       | 2 / 2           | 27 / 32%     | life 46 / 80%; armour 85 / 97%; sword damage 48 / 89%; attack speed 18 / 68%              |
-| mace-slam     | Vanguard | 40 / 66%       | 2 / 2           | 30 / 32%     | life 45 / 72%; armour 57 / 85%; two-handed mace damage 81 / 96%                           |
-| mace-shield   | Vanguard | 36 / 62%       | 2 / 3           | 27 / 29%     | life 37 / 59%; armour 53 / 69%; block 62 / 90%; mace damage 20 / 94%                      |
-| warcry-totem  | Vanguard | 39 / 66%       | 1 / 3           | 30 / 38%     | life 36 / 72%; totem damage 0 / 75%; warcries 0 / 0%                                      |
-| bow-crit      | Strider  | 38 / 64%       | 3 / 1           | 23 / 22%     | life 25 / 52%; evasion 39 / 75%; bow damage 64 / 84%; crit 21 / 55%                       |
-| bow-elemental | Strider  | 39 / 63%       | 2 / 1           | 20 / 27%     | life 21 / 56%; evasion 44 / 77%; elemental attack damage 43 / 43%; bow damage 46 / 67%    |
-| bow-poison    | Strider  | 41 / 69%       | 1 / 1           | 25 / 28%     | life 30 / 59%; poison 37 / 67%; bow damage 10 / 53%                                       |
-| caster-life   | Mystic   | 34 / 65%       | 4 / 3           | 42 / 37%     | spell damage 94 / 94%; elemental damage 42 / 71%; life 16 / 68%; spell crit 100 / 100%    |
-| summoner      | Mystic   | 44 / 63%       | 1 / 3           | 38 / 39%     | minions 91 / 100%; energy shield 63 / 93%; life 16 / 37%                                  |
-| wand-attack   | Mystic   | 44 / 66%       | 1 / 2           | 38 / 32%     | wand damage 100 / 100%; energy shield 76 / 76%; attack speed 37 / 78%                     |
-| axe-bleed     | Reaver   | 36 / 62%       | 3 / 5           | 32 / 34%     | life 45 / 66%; bleed 43 / 83%; axe damage 61 / 61%                                        |
-| dual-wield    | Reaver   | 42 / 68%       | 1 / 2           | 22 / 28%     | life 42 / 56%; dual wield 75 / 100%; evasion 49 / 91%                                     |
-| fire-burn     | Zealot   | 34 / 64%       | 4 / 6           | 37 / 39%     | fire damage 39 / 44%; spell damage 54 / 100%; life 27 / 59%                               |
-| staff-block   | Zealot   | 41 / 68%       | 2 / 6           | 33 / 41%     | spell damage 28 / 87%; block 43 / 100%; life 43 / 57%                                     |
-| aura-brand    | Zealot   | 33 / 64%       | 2 / 4           | 30 / 36%     | auras 24 / 90%; brand damage 25 / 41%; life 27 / 60%                                      |
-| dagger-crit   | Shade    | 43 / 63%       | 1 / 2           | 18 / 27%     | life 29 / 46%; crit 43 / 73%; dagger damage 49 / 80%; evasion 61 / 84%                    |
-| claw-poison   | Shade    | 47 / 69%       | 1 / 1           | 30 / 29%     | life 35 / 62%; poison 81 / 81%; claw damage 100 / 100%                                    |
-| trap-mine     | Shade    | 40 / 66%       | 3 / 1           | 37 / 38%     | trap and mine damage 73 / 100%; energy shield 24 / 81%; evasion 75 / 75%                  |
-| dagger-caster | Shade    | 47 / 68%       | 2 / 3           | 45 / 45%     | spell damage 76 / 100%; spell crit 28 / 100%; energy shield 77 / 88%                      |
-| two-hand-fire | Vanguard | 37 / 69%       | 1 / 2           | 28 / 29%     | life 36 / 73%; armour 73 / 85%; fire attack damage 19 / 65%; two-handed damage 100 / 100% |
-| block-caster  | Zealot   | 43 / 55%       | 1 / 2           | 32 / 40%     | block 26 / 47%; spell block 83 / 100%; spell damage 48 / 86%; energy shield 65 / 58%      |
+| points              |   60 |   80 |  100 |  120 |  140 |  160 |
+| ------------------- | ---: | ---: | ---: | ---: | ---: | ---: |
+| life                | 119% | 161% | 186% | 214% | 246% | 266% |
+| armour              | 174% | 190% | 218% | 202% | 218% | 218% |
+| sword damage, units |   14 |   16 |   16 |   29 |   31 |   32 |
 
-How to read a row: the strength sword build at 120 points takes 97% of all the armour that lies within 18 steps of
-the Reaver's start.
+- It reaches into the Vanguard for its armour, and by 60 points it already has most of it.
+- At 120 points, 40 more points add **16% armour and 3 units of sword damage**. Life is the only main stat still
+  climbing.
+- What 40 more points would add is Broad Back (life) and minor notables: Thirsty Quiver, Weathered, Litany, Vigil.
+
+**Across the 27 archetypes**, 23 have at least one main stat that 40 points past 120 raise by two units or less: two
+small nodes' worth for a third of a run's points. The flat ones:
+
+- **Spell damage, for every caster.** The casters that put it first hold 102 to 134% at 120 points. The whole network
+  holds about 200% of plain spell damage (25 units), much of it in neighbours' regions.
+- **The main weapon's own lines:** wand, claw, dagger, mace, sword, and two-handed for some builds.
+- **Specializations a build can finish:** minions, dual wield, auras, block for the staff caster and for mace and
+  shield, spell block, spell crit, chaos and damage over time.
+- **Defences:** armour for the strength builds, evasion for the dexterity builds, energy shield for the summoner, the
+  wand build and the curser.
+
+What still climbs past 120 points, so the network already makes those builds choose:
+
+- **Life**, for most builds, since it is spread over every region.
+- **Elements spread across the map:** cold for the classic caster, fire for the burning and sceptre builds, lightning
+  for the storm caster, elemental attacks for the bows.
+- **A few specializations with far twins:** curses, crit for the bow, axe damage, block for the block caster, dodge.
+
+| archetype     | start    | choice 60 / 120 | tax 60 / 120 | main stats in units: 60 → 100 points · 120 → 160 points                                                                  |
+| ------------- | -------- | --------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| caster-es     | Mystic   | 3 / 3           | 35 / 38%     | spell damage 15 → 21 · 21 → 23; cold damage 9 → 9 · 9 → 18; energy shield 18 → 29 · 32 → 41; cast speed 4 → 11 · 12 → 14 |
+| sword-str     | Reaver   | 2 / 2           | 27 / 32%     | life 24 → 37 · 43 → 53; armour 18 → 21 · 20 → 21; sword damage 14 → 16 · 29 → 32; attack speed 5 → 6 · 19 → 21           |
+| mace-slam     | Vanguard | 2 / 2           | 30 / 32%     | life 28 → 38 · 48 → 51; armour 14 → 21 · 21 → 22; two-handed mace damage 19 → 19 · 23 → 27                               |
+| mace-shield   | Vanguard | 2 / 3           | 27 / 29%     | life 23 → 37 · 40 → 54; armour 13 → 20 · 17 → 22; block 22 → 28 · 32 → 32; mace damage 3 → 10 · 14 → 14                  |
+| warcry-totem  | Vanguard | 1 / 3           | 30 / 38%     | life 23 → 31 · 46 → 54; totem damage 0 → 0 · 9 → 9; warcries 0 → 7 · 0 → 7                                               |
+| bow-crit      | Strider  | 3 / 1           | 23 / 22%     | life 14 → 26 · 29 → 34; evasion 14 → 21 · 26 → 30; bow damage 23 → 30 · 30 → 32; crit 6 → 8 · 14 → 25                    |
+| bow-elemental | Strider  | 2 / 1           | 20 / 27%     | life 12 → 27 · 31 → 34; evasion 15 → 26 · 27 → 31; elemental attack damage 6 → 6 · 10 → 14; bow damage 12 → 18 · 18 → 25 |
+| bow-poison    | Strider  | 1 / 1           | 25 / 28%     | life 17 → 29 · 33 → 42; poison 6 → 11 · 11 → 15; bow damage 3 → 7 · 14 → 21                                              |
+| caster-life   | Mystic   | 4 / 3           | 42 / 37%     | spell damage 16 → 16 · 20 → 22; elemental damage 10 → 15 · 17 → 24; life 8 → 29 · 35 → 39; spell crit 7 → 7 · 7 → 7      |
+| summoner      | Mystic   | 1 / 3           | 38 / 39%     | minions 13 → 22 · 22 → 22; energy shield 21 → 34 · 39 → 40; life 8 → 14 · 20 → 34                                        |
+| wand-attack   | Mystic   | 1 / 2           | 38 / 32%     | wand damage 8 → 8 · 8 → 8; energy shield 24 → 24 · 26 → 26; attack speed 7 → 17 · 18 → 21                                |
+| axe-bleed     | Reaver   | 3 / 5           | 32 / 34%     | life 23 → 36 · 38 → 49; bleed 12 → 12 · 22 → 25; axe damage 7 → 13 · 12 → 16                                             |
+| dual-wield    | Reaver   | 1 / 2           | 22 / 28%     | life 23 → 28 · 33 → 47; dual wield 14 → 17 · 18 → 18; evasion 15 → 25 · 27 → 27                                          |
+| fire-burn     | Zealot   | 4 / 6           | 37 / 39%     | fire damage 14 → 24 · 16 → 27; spell damage 8 → 10 · 16 → 16; life 13 → 22 · 34 → 40                                     |
+| staff-block   | Zealot   | 2 / 6           | 33 / 41%     | spell damage 7 → 17 · 23 → 25; block 2 → 4 · 4 → 4; life 21 → 25 · 33 → 40                                               |
+| aura-brand    | Zealot   | 2 / 4           | 30 / 36%     | auras 4 → 11 · 19 → 19; brand damage 13 → 20 · 17 → 25; life 13 → 25 · 30 → 36                                           |
+| dagger-crit   | Shade    | 1 / 2           | 18 / 27%     | life 13 → 25 · 25 → 31; crit 12 → 18 · 25 → 30; dagger damage 4 → 4 · 7 → 7; evasion 20 → 26 · 28 → 31                   |
+| claw-poison   | Shade    | 1 / 1           | 30 / 29%     | life 16 → 26 · 32 → 39; poison 11 → 15 · 15 → 17; claw damage 4 → 4 · 4 → 8                                              |
+| trap-mine     | Shade    | 3 / 1           | 37 / 38%     | trap and mine damage 10 → 14 · 14 → 18; energy shield 7 → 21 · 26 → 28; evasion 25 → 25 · 25 → 26                        |
+| dagger-caster | Shade    | 2 / 3           | 45 / 45%     | spell damage 10 → 22 · 23 → 23; spell crit 2 → 2 · 9 → 9; energy shield 24 → 28 · 33 → 37                                |
+| two-hand-fire | Vanguard | 1 / 2           | 28 / 29%     | life 23 → 38 · 46 → 51; armour 18 → 21 · 21 → 25; fire attack damage 3 → 8 · 10 → 14; two-handed damage 6 → 6 · 6 → 10   |
+| block-caster  | Zealot   | 1 / 2           | 32 / 40%     | block 5 → 6 · 23 → 32; spell block 5 → 6 · 6 → 6; spell damage 8 → 9 · 14 → 15; energy shield 18 → 22 · 16 → 21          |
+| storm-caster  | Zealot   | 5 / 7           | 35 / 41%     | spell damage 4 → 13 · 18 → 19; lightning damage 7 → 12 · 13 → 18; life 21 → 21 · 33 → 39; cast speed 4 → 6 · 9 → 12      |
+| channeller    | Mystic   | 2 / 3           | 33 / 32%     | channelling and spell damage 13 → 13 · 17 → 19; mana sustain 21 → 32 · 36 → 43; energy shield 17 → 25 · 31 → 34          |
+| sceptre-fire  | Zealot   | 2 / 2           | 25 / 32%     | life 23 → 23 · 38 → 48; fire attack damage 4 → 12 · 10 → 20; sceptre damage 9 → 12 · 13 → 18; armour 15 → 20 · 26 → 26   |
+| curser        | Shade    | 1 / 1           | 45 / 39%     | curses 11 → 11 · 11 → 17; chaos and damage over time 7 → 12 · 12 → 12; energy shield 20 → 30 · 32 → 32                   |
+| dodge-blades  | Shade    | 1 / 2           | 18 / 25%     | dodge 6 → 10 · 10 → 17; evasion 22 → 26 · 29 → 29; life 13 → 26 · 30 → 31; blade damage 6 → 8 · 8 → 14                   |
+
+How to read a cell: for the classic caster, "spell damage 15 → 21 · 21 → 23" means 15 units at its best 60 points and
+21 after 40 more, then 21 units at its best 120 points and 23 after 40 more.
+
+**Choice** is 1 to 7 and mostly 1 to 3: most builds have one clearly best plan and a near-equal second at most.
 
 ## One stat at a time, across the builds that share it (120 points)
 
-- **Life.** Strength builds take about 190 to 240%: mace slam 238%, two-handed fire 231%, warcry-totem 229%, sword
-  214%, mace and shield 199%, axe bleed 188%. The others take about 120 to 170%, most with +20 flat besides (dagger
-  crit 119%, bow crit 141%, aura and brand 145%, bow poison and dual wield 161%, staff block 162%, fire burn 167%,
-  caster on life 172%). The summoner, which only half wants life, takes 97% and +20.
-- **Energy shield.** Five builds take 128 to 189% (summoner 189%, dagger caster 160%, classic caster 157%, wand 130%,
-  traps 128%). The block caster takes only 77%, since block pulls it elsewhere.
-- **Spell damage.** Every caster that puts it first lands on 108 to 134% (the aura and brand build, which puts it
-  second, takes 76%), because about 136% is all there is within reach. The supply is
-  the cap, not the build's choices.
-- **Armour.** The four strength builds take 162 to 218%. Armour is 35 units in the whole network, 23 of them in the
-  Vanguard.
-- **Evasion.** The five evasion builds take 298 to 336%.
+- **Life.**
+  - The strength builds take about 190 to 240%: mace slam 238%, two-handed fire 231%, warcry and totems 229%, sword
+    214%, mace and shield 199%, sceptre fire 191%, axe bleed 188%.
+  - The others take about 120 to 170%, most with +20 flat besides. They range from the dagger crit build's 119% to the
+    life caster's 172%.
+  - The summoner, which only half wants life, takes 97% and +20.
+- **Energy shield.** Seven builds take 128 to 189%: the summoner 189%, the dagger caster 160%, the classic caster 157%,
+  the curser 156%, the channeller 148%, the wand build 130% and traps 128%. The block caster takes 77%.
+- **Spell damage.** The casters that put it first land on 102 to 134%. The aura and brand build, which puts it second,
+  takes 76%.
+- **Armour.** Five builds take 162 to 266%. Armour is 35 units in the whole network, 23 of them in the Vanguard.
+- **Evasion.** Six builds take 298 to 350%.
 
-## Where tension is missing first
+## Why: the supply ([G0/supply.md](G0/supply.md))
 
-These stats are taken at 90% or more at 120 points, so a build gives up none of them:
-
-- **Spell damage** (every caster).
-- **Energy shield** (the summoner, the dagger caster).
-- **Armour** (the sword build).
-- **Weapons and mechanics:**
-  - the main weapon's own lines: wand, claw, mace, two-handed;
-  - minions, traps and mines, dual wield, spell crit;
-  - block (the staff caster, mace and shield), spell block, auras.
-
-Three reasons stand out in the supply map ([G0/supply.md](G0/supply.md)):
-
-- **The supply is small.** The whole network holds:
-  - 76 units of spell lines, 57 of energy shield, 35 of armour and 35 of evasion;
-  - 21 or fewer units of each weapon.
-
-  A build's main stat is a few clusters, and 120 points reach all of them.
-
+- **The supply is small.**
+  - The whole network holds 76 units of spell lines, 57 of energy shield, 35 of armour and 35 of evasion.
+  - Each weapon has 21 units or fewer.
+  - A build's main stat is a few clusters, and a mid-run build reaches all of them.
 - **Twins sit close.** For example, the Cloister's energy shield notables are 3 steps apart, and so are the Rooftops'
   dagger notables (2 steps). The supply map marks every pair under five steps.
-- **Some specializations have one home or one twin**: sceptre, area damage, staff, brands, claws, mines, channelling
-  (whose two notables are 45 steps apart).
+- **Some specializations have one home, or one twin far away:** sceptre, area damage, staff, brands, claws, mines, and
+  channelling (whose two notables are 45 steps apart).
 
-What already works: life is spread over every region, fire spells are spread (Cinder, Flashpoint, Hearthfire, Censer
-11 to 16 steps apart), and the elemental bow cannot reach most elemental attack lines.
+## Tax, attributes and room
 
-## Tax, attributes and depth
-
-- **Tax.** 18 to 45% of points go to nodes worth nothing to the build. The casters pay most (37 to 45%), the bow and
-  dagger builds least (18 to 28%). Nine archetypes are above a third at 120 points. Growth should bring this down by
-  putting wanted nodes along the roads, not by adding more road.
-- **Attributes are oversupplied** (CONSTRAINTS §16 says to check this at the end). At 120 points a plan collects:
-  - about 230 to 280 strength (Vanguard and Reaver builds), against gear asking 120 to 180;
-  - about 255 to 300 dexterity (Strider and Shade attack builds), against 140 to 180;
-  - about 230 to 260 intelligence (Mystic casters), against 150.
+- **Tax.** 18 to 45% of points go to nodes worth nothing to the build.
+  - The casters pay most (32 to 45%); the bow, dagger and dodge builds pay least (18 to 28%).
+  - Growth should bring this down by putting wanted nodes along the roads, not by adding more road.
+- **Attributes are oversupplied** (CONSTRAINTS §16 asks for this check at the end). At 120 points a plan collects:
+  - about 230 to 280 strength for the Vanguard and Reaver builds, against gear asking 120 to 180;
+  - about 255 to 300 dexterity for the Strider and Shade attackers, against 140 to 180;
+  - about 230 to 260 intelligence for the Mystic casters, against 150.
 
   More roads per walk will add more, so G5 has to look at road values again.
 
-- **Depth.** The 120-point plans reach a median of 22 steps from the start at their deepest. Ninety per cent of their
-  nodes lie within 12 to 24 steps, with a median of 18.
+- **Room.** Cells of 100 × 100 tree units with no node within 170 units ([G0/empty.png](G0/empty.png)).
 
-## The empty space
+  | region   | cells inside the outline | empty inside | share | empty at the rim |
+  | -------- | -----------------------: | -----------: | ----: | ---------------: |
+  | Strider  |                      598 |           90 |   15% |              553 |
+  | Shade    |                      939 |          304 |   32% |              263 |
+  | Mystic   |                      884 |          179 |   20% |               77 |
+  | Zealot   |                      821 |          234 |   29% |              221 |
+  | Vanguard |                     1069 |          312 |   29% |              236 |
+  | Reaver   |                      679 |          147 |   22% |              144 |
+  | centre   |                      254 |           99 |   39% |                0 |
+  - **Inside** means within the network's own outline: room to fill without growing. **The rim** is the band between
+    that outline and the circle through the farthest node: room to grow outward.
+  - The Shade, the Vanguard and the Zealot have the most room inside.
+  - The Strider is compact, with its room at the rim to the south-east.
+  - The Mystic is the densest.
+  - The centre's empty cells are the inside of the ring, which by design holds no nodes.
 
-Measured in cells of 100 × 100 tree units with no node within 170 units ([G0/empty.png](G0/empty.png)):
+## The question for stop 1
 
-| region   | cells inside the outline | empty inside | share | empty at the rim |
-| -------- | -----------------------: | -----------: | ----: | ---------------: |
-| Strider  |                      598 |           90 |   15% |              553 |
-| Shade    |                      939 |          304 |   32% |              263 |
-| Mystic   |                      884 |          179 |   20% |               77 |
-| Zealot   |                      821 |          234 |   29% |              221 |
-| Vanguard |                     1069 |          312 |   29% |              236 |
-| Reaver   |                      679 |          147 |   22% |              144 |
-| centre   |                      254 |           99 |   39% |                0 |
-
-- **Inside** means within the network's own outline: room to fill without growing. **The rim** is the band between that
-  outline and the circle through the farthest node: room to grow outward.
-- The Shade, the Vanguard and the Zealot have the most room inside.
-- The Strider is compact: little room inside, the most at the rim (south-east).
-- The Mystic is the densest and has little room either way.
-- The centre's empty cells are the inside of the ring, which by design holds no nodes.
-
-As a rough guide, a cluster of a notable and three smalls with room round it takes four to six cells, and roads take
-more. So the inside could hold a few hundred new nodes. The Strider and a growth of 500 to 900 nodes would need the rim.
-Whether the map grows is G1's question, not this one's.
-
-## Proposals for stop 1
-
-1. **The radius: 18 steps.** It is the median depth of the 120-point plans: 90% of their nodes lie within 12 to 24
-   steps. Once agreed, it is fixed for every later round.
-2. **Targets, all measured at the end of G4 against this baseline:**
-   - **Main stats at 120 points.** For most archetypes, no main stat above about two thirds of what lies within reach,
-     and never both stats of the pair above two thirds. Today most are at 80 to 100%.
-   - **Main stats at 60 points.** No main stat above about half (today 20 to 100%). The radius is the same 18 steps,
-     so part of what a 60-point build leaves is simply too far for 60 points; this number matters less than the one
-     at 120.
-   - **Weighted reach at 120:** under about 55% for most (today 55 to 72%).
-   - **Choice:** at least 3 at 120 points for most and at least 2 at 60 for most. Today it is 1 to 6 at 120 (ten
-     archetypes at 3 or more) and 1 to 4 at 60 (thirteen at 2 or more, nine at 1).
-   - **Tax:** at or under about a third at 120 for most (today 22 to 45%), so the new tension comes from wanted nodes,
-     not from distance.
-   - **One stat at a time:** shown before and after, with no target, since the absolute numbers are balance (the user,
-     2026-10-22). One example: a caster's spell damage at 120 points should come out roughly where it is (about 110 to
-     135%) while being a smaller share of what it could reach.
-3. **The archetype set:** the 22 in `archetypes.ts`, starting with the user's two. See the questions below.
-
-## Questions for the user
-
-- **The strength sword build starts as the Reaver,** since swords and the Reaver's starting kit are there. Should it be
-  a Vanguard starting with a sword instead, or both?
-- **Archetypes to add or strike.** Missing today:
-  - a lightning or physical spell caster from the Zealot;
-  - a channelling build;
-  - a sceptre fire attacker;
-  - a curse build;
-  - a dodge or spell-dodge Shade.
-- **Are the targets right?** For example, is two thirds at 120 points the right amount of tension, or should it be
-  tighter?
+**Does "what more points would still buy" capture the tension the user means?** If yes, targets come next: for
+example, that 40 points past 120 should still buy a fair share of every main stat for most builds, and that the
+gave-up lists should name notables the build really wanted. No target is proposed until the measure is agreed.
 
 ## What was checked
 
 - CONSTRAINTS §1 item 1 (tension), §5.1–2 (twins and partners, in the supply map), §7.4 (attributes) and §12.3–4
   (balance is supply; this is a static tool, not a bot simulation).
-- §14 (the archetypes are a yardstick and never place a node).
-- No power number for a build anywhere, per G-growth §0.
+- §14: the archetypes are a yardstick and never place a node; a step-count radius is now listed as rejected.
+- No power number for a build anywhere (G-growth §0).

@@ -408,6 +408,10 @@ Each was tried or proposed and struck by the user. The date is when it was struc
   [10-20]
 - **A minimum distance between nodes** ("no two unlinked nodes within 100 units", and the build's 60-unit check).
   [10-21] Invented, never the user's; it kept clusters loose. The only spacing rule is not drawing one node over another.
+- **A step-count radius for what a build can reach** (measuring tension as the share of what lies within so many steps
+  of the start). [10-22] "Not a coherent concept": a build may stay compact near its start or run long narrow branches
+  to pick up widely spread stats, and both are valid. What a build can reach is the allocator's to decide, by paying
+  each path's cost; tension is measured as what more points would still buy (G-growth §1).
 - **Laying out wheels, loops and other shapes by algorithm alone.** [10-21] Tightening node by node squashed every wheel
   and loop it touched, took a road's smalls for a pocket and put kinks into the roads out of a start. A script places
   the simple cases (a chain off one notable); every cluster is then looked at.
