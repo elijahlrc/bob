@@ -330,7 +330,8 @@ The core of section 1, made concrete.
    - **Empty space is welcome; spacing rules are not.** [user, 10-21] More nodes are coming. There is no minimum
      distance between nodes beyond not drawing one over another (`drawnOver` in `src/data/passives/build.ts`, which
      the build, the scripts and the checks share). Keep a region's footprint and its border with its neighbours.
-   - **What the user drew by hand stays** (the Oathbound diamond, the Strider's own clusters) unless they ask.
+   - **The user's hand edits are a starting point, not a fixture.** [user, 10-22] They may be reshaped like any other
+     part of the network when that makes it better.
 
 ## 12. Size and balance
 
@@ -433,8 +434,8 @@ Each was tried or proposed and struck by the user. The date is when it was struc
    them in your own words. [user, 10-20]
 8. **Ask questions plainly,** without jargon you invented, using the question dialog. [user, 10-19] The user is often on
    a phone, so send files there.
-9. **The Strider region is the user's edit.** [user] Changes there are allowed but are not the priority. [user, 10-20]
-   Fold the user's editor patches before registering new ids.
+9. **The Strider is a region like the others.** [user, 10-22] It began as the user's hand edit, but it needs no special
+   deference: grow and rewire it like every other region. Fold the user's editor patches before registering new ids.
 10. **Laying out the network: a script first, then eyes on every cluster.** [user, 10-21] "The programmatic approach is
     a decent first pass, but you're going to need to spin off agents to manually audit the whole tree."
     - `scripts/passives/tighten.ts` (reports only; `--write` rewrites each moved node's `at` in its area file, in the
@@ -465,8 +466,8 @@ Each was tried or proposed and struck by the user. The date is when it was struc
   round 4, and a ridge road along its north rim (Ritual Blade).
 - **The road skeleton.** Every home's two hub roads are highways; the Spire, the Cathedral (the Ambulatory), the Wall
   (the Barrows road, the tower road, the barrow stair) and the Knife have real roads. The Yard's centre is still a
-  lattice, joined cluster to cluster with single road nodes; it needs re-laying like the Cathedral's. The Strider is the
-  user's and is untouched.
+  lattice, joined cluster to cluster with single road nodes; it needs re-laying like the Cathedral's. The Strider is grown
+  like the others (§15 item 9).
 - **Roads between regions.** Every border now has 4 to 6 links, against the reference's 10 to 13 per neighbouring
   pair; more are needed as the regions grow toward their borders.
 - **One-stop shops after round 3.** Fixed in round 3: the mace-and-shield Vanguard (Bracing and Thick Skin traded
