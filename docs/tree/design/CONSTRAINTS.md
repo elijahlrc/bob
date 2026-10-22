@@ -148,6 +148,12 @@ Each item states the rule or the workflow, not how it was learned. History lives
    means mana and reservation, leech, crit, attack and cast speed, movement, flasks, cost, duration, and the weapon lines
    of the weapons its skills can hold.
 7. **The centre holds generic nodes** for things everyone or many classes may want. [user, 10-19]
+8. **No large stretch that is all defence or all offence, above all near a start.** [user, 10-22] "I want to push to
+   not having huge regions that are all similar defense or all similar offense. I remember seeing large regions that
+   were only health and armor and maybe a bit of es or flask recharge near one of the starts, And it's not good to have
+   only offense or only defense in a region, especially near the start where it feels very limiting. None of this
+   should be construed as a hard rule." A guide, not a rule: an area, and above all a home, mixes offence and defence,
+   so the first points never feel like a corridor of one kind.
 
 ## 5. Specializations and trade-offs
 

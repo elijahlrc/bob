@@ -43,6 +43,8 @@ import { seawall } from './knife/rim';
 import { farPasture } from './bow/rim';
 import { parapet } from './spire/rim';
 import { outerWalk } from './cathedral/rim';
+import { lychway } from './cathedral/walk';
+import { waterMeadows } from './bow/south';
 import { choir } from './cathedral/choir';
 import { crypt } from './cathedral/crypt';
 import { home as cathedralHome, START as ZEALOT } from './cathedral/home';
@@ -97,6 +99,8 @@ export const AREAS: AreaSpec[] = [
   seawall,
   parapet,
   outerWalk,
+  lychway,
+  waterMeadows,
 ];
 
 export const STARTS: StartSpec[] = [MYSTIC, SHADE, STRIDER, REAVER, VANGUARD, ZEALOT];
