@@ -400,6 +400,14 @@
     return `<g transform="translate(160 90) scale(${s}) translate(-160 -90)">${img(href)}</g>`;
   };
 
+  /* the level in large type at the top of a map shot, and the place at the right: the climb's, and the fall's that follows it */
+  const levelTag = (level, place, bands = [[0, 320]]) =>
+    bands
+      .map(([x, w]) => `<rect x="${x}" width="${w}" height="38" fill="#000" opacity=".5"/>`)
+      .join('') +
+    txt(12, 28, `Level ${level}`, { size: 26, col: C.torch, weight: 600, font: 'display' }) +
+    txt(308, 25, place, { size: 12, col: C.bone, anchor: 'end', font: 'display' });
+
   /* ---------- the shots ---------- */
   const SHOTS = [
     {
@@ -462,10 +470,7 @@
         const names = ['Crypt', 'Forge', 'Ruins', 'Marsh', 'Shrine', 'Warren'];
         const clip = ['climb1', 'climb2', 'climb4', 'climb5', 'climb6', 'climb7'][i];
         let s = img(at(clip, l));
-        s +=
-          `<rect width="320" height="38" fill="#000" opacity=".5"/>` +
-          txt(12, 28, `Level ${level}`, { size: 26, col: C.torch, weight: 600, font: 'display' }) +
-          txt(308, 25, names[i], { size: 12, col: C.bone, anchor: 'end', font: 'display' });
+        s += levelTag(level, names[i]);
         return s + caption('Grind to level 100 in a sitting.', lt, 0.15, 150, 17);
       },
     },
@@ -478,7 +483,14 @@
           let s = img(at('fall', lt, 0));
           /* the room goes dark while the body is held */
           s += `<rect width="320" height="180" fill="#000" opacity="${clamp((lt - 0.8) / 1.0) * 0.55}"/>`;
-          return s;
+          /* the level stays on screen, as in the climb (the boss's bar keeps the middle of the top clear) */
+          return (
+            s +
+            levelTag(72, 'Warren', [
+              [0, 104],
+              [250, 70],
+            ])
+          );
         }
         /* zoomed in so the last line shown is "Killed by the Magistrate" */
         return crop(at('summary', lt - 1.85, 0), [107, 95, 1067, 600]);
